@@ -58,7 +58,7 @@
 | 2 | `kcos-operator@o4o.com` | k-cosmetics | operator | `cosmetics:operator` | `[]` | `['cosmetics:operator']` | **YES** |
 | 3 | `kcos-admin@o4o.com` | k-cosmetics | admin | `cosmetics:admin` | `[]` | `['cosmetics:admin']` | **YES** |
 | 4 | `neture-operator@o4o.com` | neture | operator | `neture:operator` | `[]` | `['neture:operator']` | **YES** |
-| 5 | `sohae2100@gmail.com` | kpa-society | admin | `kpa:admin` | — | `[]` | 정상 |
+| 5 | `[REDACTED_EMAIL_A]` | kpa-society | admin | `kpa:admin` | — | `[]` | 정상 |
 
 **보정 대상 = 4 건.** sohae2100 (platform admin) 1 건은 정상.
 

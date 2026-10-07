@@ -15,10 +15,7 @@
  * NormalizedRecord → 자기 도메인 타입 변환은 surface adapter 가 담당한다.
  */
 
-export * from './contract.js';
-export * from './decode.js';
-export * from './profile.js';
-export * from './fingerprint.js';
-export * from './normalize.js';
+// 순수 계층(decode·profile·fingerprint·normalize·contract)은 공용 패키지가 소유한다(브라우저와 같은 구현).
+export * from '@o4o/file-understanding-core';
 export { inferFileStructure } from './structure-inference.service.js';
 export type { InferFileStructureRequest, InferFileStructureResult } from './structure-inference.service.js';

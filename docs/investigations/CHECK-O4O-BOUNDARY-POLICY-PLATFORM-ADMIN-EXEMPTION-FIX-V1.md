@@ -13,7 +13,7 @@
   - [IR-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-V1](IR-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-V1.md) (Option B 권장)
   - [IR-O4O-OPERATOR-CONSOLE-PLATFORM-ADMIN-CALLER-AUDIT-V1](IR-O4O-OPERATOR-CONSOLE-PLATFORM-ADMIN-CALLER-AUDIT-V1.md) (W1 진행 가능 PASS)
 - **검증 환경:** `api.neture.co.kr` (Cloud Run 배포본)
-- **검증 계정:** `sohae2100@gmail.com` — `platform:super_admin` 보유
+- **검증 계정:** `[REDACTED_EMAIL_A]` — `platform:super_admin` 보유
 
 ---
 

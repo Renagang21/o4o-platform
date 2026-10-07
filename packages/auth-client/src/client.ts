@@ -4,6 +4,8 @@ import type {
   GoogleAuthResponse,
   GoogleAuthConfig,
   GoogleSignupConsents,
+  EmailSignupRequest,
+  EmailAuthNotice,
 } from './types.js';
 import {
   getAccessToken,
@@ -17,21 +19,26 @@ import {
 /**
  * Auth Strategy
  *
- * Phase 6-7: Cookie Auth Primary
- * - 'cookie': Use httpOnly cookies (DEFAULT, recommended for B2C)
- * - 'localStorage': Use localStorage tokens (legacy, for specific use cases)
+ * - 'cookie':       httpOnly 쿠키. 이 클라이언트의 기본값이며 **admin-dashboard 가 쓴다.**
+ * - 'localStorage': body 로 받은 토큰을 localStorage 에 둔다.
  *
- * @see docs/architecture/auth-ssot-declaration.md (Phase 6-7)
+ * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — 이름 정정:
+ *   `'localStorage'` 는 **legacy 가 아니라 현행**이다. 웹 서비스 8개
+ *   (neture · k-cosmetics · kpa-society · pharmacy-hub · kpa-branch · store · lecture ·
+ *   hospital-pharmacy)가 이 전략으로 로그인한다. 종전 주석의 "legacy, for specific use cases"
+ *   는 사실과 반대여서 제거 후보로 오판될 소지가 있었다(IR §5).
+ *   `includeLegacyTokens` 플래그도 이 전략이 **지금 동작하기 위해** 보내는 값이다.
+ *   전략 자체의 변경(cookie 단일화)은 별도 트랙이며 이 WO 의 범위가 아니다.
+ *
+ * @see docs/architecture/auth-ssot-declaration.md
  */
 export type AuthStrategy = 'cookie' | 'localStorage';
 
 export interface AuthClientOptions {
   /**
    * Authentication strategy
-   * - 'cookie': Use httpOnly cookies (DEFAULT)
-   * - 'localStorage': Use localStorage tokens (legacy)
-   *
-   * Phase 6-7: Cookie is the primary strategy for B2C launch
+   * - 'cookie':       httpOnly 쿠키 (기본값 · admin-dashboard)
+   * - 'localStorage': body 토큰 + localStorage (웹 서비스 8개의 **현행** 경로)
    */
   strategy?: AuthStrategy;
 }
@@ -293,6 +300,56 @@ export class AuthClient {
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
   }
 
+  // ── WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일·비밀번호 ──────────────────────────
+  //   옛 `login(email,password)` 의 부활이 아니다 — 새 경로 `/auth/email/*` · `/auth/password/*` 이며
+  //   세션 채택은 Google 과 같은 `adoptSessionResponse` 한 곳이다. 비밀번호·토큰은 로그·저장소에 두지 않는다.
+
+  /** POST /auth/email/login — 확인된 이메일 계정 → 세션. 실패는 axios 오류로 전파(code: INVALID_CREDENTIALS · EMAIL_NOT_VERIFIED …). */
+  async loginWithEmail(email: string, password: string): Promise<GoogleAuthResponse> {
+    const response = await this.api.post('/auth/email/login', {
+      email,
+      password,
+      ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
+    });
+    return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  /** POST /auth/email/signup — 계정 생성 + 확인 메일. **세션을 열지 않는다.** */
+  async signupWithEmail(request: EmailSignupRequest): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/signup', request);
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/email/verify — 메일 링크의 토큰으로 주소 확인(자동 로그인 없음). */
+  async verifyEmail(token: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/verify', { token });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/email/resend — 확인 메일 재발송(계정 존재 여부와 무관하게 같은 응답). */
+  async resendVerificationEmail(email: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/email/resend', { email });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/password/forgot — 재설정 메일(계정 존재 여부와 무관하게 같은 응답). */
+  async requestPasswordReset(email: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/password/forgot', { email });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/password/reset — 새 비밀번호 저장 + 모든 기기 로그아웃. */
+  async resetPassword(token: string, newPassword: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/password/reset', { token, newPassword });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
+  /** POST /auth/account/find-id — 이름 + 휴대전화 → 가린 이메일 힌트. */
+  async findLoginId(name: string, phone: string): Promise<EmailAuthNotice> {
+    const response = await this.api.post('/auth/account/find-id', { name, phone });
+    return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
+  }
+
   /** GET /auth/google/config — 공개 Client ID(secret 아님). 실패·미설정은 `{ enabled: false, clientId: null }`. */
   async getGoogleAuthConfig(): Promise<GoogleAuthConfig> {
     try {
@@ -308,16 +365,9 @@ export class AuthClient {
   //   linkGoogle / getGoogleLinkStatus 는 은퇴했다. password 로 재인증하고 Google 을 붙이던
   //   전환기 경로이며, 세션 자체가 이미 Google 연결에서만 나온다.
 
-  /**
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — 전환기 1회용 Admin Google Bootstrap.
-   * 세션 없이 호출한다. 서버가 env 플래그 + 일회용 코드를 확인하고 `platform:super_admin` users.id 에 연결한다.
-   * 실패(404 비활성 · 401 코드 오류 · 409 이미 연결/다른 사용자)는 axios 오류로 전파된다.
-   */
-  async bootstrapAdminGoogle(idToken: string, bootstrapCode: string): Promise<{ linked: boolean }> {
-    const response = await this.api.post('/auth/google/bootstrap-admin', { idToken, bootstrapCode });
-    const data = (response.data as { data?: { linked?: boolean } })?.data;
-    return { linked: data?.linked === true };
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+  //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+  //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
   /**
    * 세션 응답 채택 — /auth/login · /auth/google/login · /auth/google/signup 공통.

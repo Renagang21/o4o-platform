@@ -220,7 +220,7 @@ Admin 생성 (POST /admin/users)
   POST /admin/users
   {
     email: "operator@example.com",
-    password: "NewPassword123",
+    password: "[REDACTED]",
     firstName: "홍",
     lastName: "길동",
     role: "operator",                   ← Legacy 필드

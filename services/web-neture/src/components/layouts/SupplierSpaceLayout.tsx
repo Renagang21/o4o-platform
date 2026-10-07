@@ -92,6 +92,10 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: '판매자 모집', path: '/supplier/recruitments' },
       { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
       { label: '이벤트 오퍼', path: '/supplier/event-offers' },
+      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 공급 경로
+      { label: '공급 제안', path: '/supplier/supply-proposals' },
+      { label: '세미프랜차이즈 이벤트', path: '/supplier/semi-franchise-events' },
+      { label: '세미프랜차이즈 모집', path: '/supplier/semi-franchise-recruitments' },
     ],
   },
   {

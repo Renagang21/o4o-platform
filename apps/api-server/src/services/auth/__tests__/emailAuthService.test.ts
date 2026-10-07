@@ -1,0 +1,976 @@
+/**
+ * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §6 — EmailAuthService 계약
+ *
+ * 실제 DB/SMTP 없이 가입 → 확인 → 로그인 → 재설정 · 아이디 찾기 계약을 고정한다.
+ *  V1 가입은 users 1행 + 비밀번호 수단 1행만 만든다(역할·멤버십 0) · 세션 없음 · 확인 메일 1통
+ *  V2 같은 이메일(대소문자 무관)은 거절 — 기존 행을 덮어쓰지 않는다 · 자동 병합 0
+ *  V3 확인 전 로그인 거절(EMAIL_NOT_VERIFIED) → 메일 링크 토큰으로 확인 → 로그인 성공
+ *  V4 토큰은 해시만 저장 · 1회용 · 만료 · 재발급 시 이전 링크 무효
+ *  V5 틀린 비밀번호 · 없는 계정 · Google 전용 계정은 같은 INVALID_CREDENTIALS
+ *  V6 관리자 화면 · platform 역할은 비밀번호 세션 거절
+ *  V7 세션 토큰에 authMethod='password' claim · refresh family 기록
+ *  V8 재설정은 전역 폐기를 **먼저** 하고 새 해시 저장 · 이전 비밀번호 무효
+ *     forgot/reset 은 **기존 비밀번호 수단의 복구 전용** — 수단이 없는 계정(Google 전용)에 첫 비밀번호를 만들지 않는다
+ *     (2026-10-01 정책 변경, PR #257 Codex 재리뷰 P1). 첫 추가는 로그인 상태의 `POST /auth/password`(V12) 뿐.
+ *  V9 resend / forgot 은 계정 존재 여부와 무관하게 조용하다
+ *  V10 아이디 찾기는 정확히 1건일 때만 가린 힌트
+ *  V11 정책 위반 · 동의 누락 · 형태 오류는 저장 전에 거절
+ *  V12 로그·메일 외 경로에 평문 토큰/비밀번호가 남지 않는다(DB 에는 해시만)
+ *  V14 로그인 자격 게이트(WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1) — 인증 성공 뒤에만
+ *      SERVICE_NOT_MEMBER, 인증 실패는 INVALID_CREDENTIALS 그대로 · 세션 흔적 없음 · 다른 서비스 membership 불인정
+ *  V15 세미프랜차이즈 자격(WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1) — kpa-society(pharmacy.neture.co.kr) 게이트는
+ *      Neture 기본 active ∧ pharmacy 세미프랜차이즈 active 이면 membership 없이 통과 · 미충족은 상태별 serviceAccess.next
+ */
+
+import { EmailAuthService, EmailAuthError, hashToken, type PasswordStore } from '../email-auth.service.js';
+import { User } from '../../../entities/User.js';
+import { AccountActivity } from '../../../entities/AccountActivity.js';
+import { UserStatus } from '../../../types/auth.js';
+import * as tokenUtils from '../../../utils/token.utils.js';
+import { decideSemiFranchiseAccess } from '../../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
+
+type Row = Record<string, any>;
+
+interface Store {
+  users: Row[];
+  creds: Map<string, string>;
+  evt: Row[];
+  prt: Row[];
+  activities: Row[];
+  /** Demo 보호 판정용 — 이 목록에 있는 user 는 demo_accounts 에 활성 행이 있는 셈이다. */
+  demoUserIds: string[];
+}
+
+let seq = 0;
+const uuid = () => `00000000-0000-4000-8000-${String(++seq).padStart(12, '0')}`;
+
+const clone = (s: Store): Store => ({
+  users: s.users.map((u) => Object.assign(new User(), u)),
+  creds: new Map(s.creds),
+  evt: s.evt.map((r) => ({ ...r })),
+  prt: s.prt.map((r) => ({ ...r })),
+  activities: [...s.activities],
+  demoUserIds: [...s.demoUserIds],
+});
+
+function makeHarness(
+  opts: {
+    roles?: Record<string, string[]>;
+    memberships?: Record<string, { serviceKey: string; status: string }[]>;
+    /** Neture 약국 조직별 (기본, 세미프랜차이즈) 가입 상태 — 세미프랜차이즈 자격 fake. 기본 = 약국 없음 */
+    semiFranchiseRows?: { basic: string | null; semi: string | null }[];
+    now?: Date;
+  } = {},
+) {
+  let store: Store = { users: [], creds: new Map(), evt: [], prt: [], activities: [], demoUserIds: [] };
+  const sql: Array<{ q: string; p: unknown[] }> = [];
+  const nowRef = { t: opts.now ?? new Date('2026-09-30T00:00:00Z') };
+
+  const tokenTable = (q: string) => (q.includes('email_verification_tokens') ? store.evt : store.prt);
+  const live = (r: Row) => r.consumed_at == null && r.expires_at > nowRef.t;
+
+  const query = jest.fn(async (q: string, p: any[] = []) => {
+    sql.push({ q, p });
+    const s = q.replace(/\s+/g, ' ').trim();
+    // WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1: Demo 보호 판정(demo_accounts).
+    //   기본은 'Demo 아님'(빈 배열). Demo 를 흉내 내려면 store.demoUserIds 에 넣는다.
+    if (s.includes('FROM demo_accounts')) {
+      const target = String(p[0] ?? '');
+      const byEmail = s.includes('JOIN users');
+      const hit = byEmail
+        ? store.users.some((u) => u.email.toLowerCase() === target && store.demoUserIds.includes(u.id))
+        : store.demoUserIds.includes(target);
+      return hit ? [{ demo_type: 'STORE_OWNER' }] : [];
+    }
+    if (s.startsWith('SELECT id FROM users WHERE lower(email)')) {
+      return store.users.filter((u) => u.email.toLowerCase() === p[0]).slice(0, 2).map((u) => ({ id: u.id }));
+    }
+    if (s.startsWith('SELECT id, "isEmailVerified" FROM users')) {
+      return store.users
+        .filter((u) => u.email.toLowerCase() === p[0])
+        .slice(0, 2)
+        .map((u) => ({ id: u.id, isEmailVerified: u.isEmailVerified }));
+    }
+    if (s.startsWith('DELETE FROM')) {
+      const t = tokenTable(s);
+      const keep = t.filter((r) => !(r.user_id === p[0] && (r.consumed_at != null || r.expires_at < nowRef.t)));
+      t.splice(0, t.length, ...keep);
+      return [];
+    }
+    if (s.includes('SET consumed_at = now() WHERE user_id')) {
+      tokenTable(s).filter((r) => r.user_id === p[0] && r.consumed_at == null).forEach((r) => (r.consumed_at = nowRef.t));
+      return [];
+    }
+    if (s.startsWith('INSERT INTO email_verification_tokens')) {
+      store.evt.push({ user_id: p[0], email: p[1], token_hash: p[2], expires_at: p[3], consumed_at: null });
+      return [];
+    }
+    if (s.startsWith('INSERT INTO password_reset_tokens')) {
+      store.prt.push({ user_id: p[0], token_hash: p[1], expires_at: p[2], consumed_at: null });
+      return [];
+    }
+    if (s.includes('WHERE token_hash = $1')) {
+      const t = tokenTable(s);
+      const hit = t.find((r) => r.token_hash === p[0] && live(r));
+      if (!hit) return [[], 0];
+      hit.consumed_at = nowRef.t;
+      return [[{ user_id: hit.user_id, email: hit.email ?? '' }], 1];
+    }
+    if (s.startsWith('SELECT u.email FROM users u JOIN user_password_credentials')) {
+      return store.users
+        .filter((u) => store.creds.has(u.id) && String(u.phone ?? '').replace(/\D/g, '') === p[0] && u.name === p[1])
+        .slice(0, 2)
+        .map((u) => ({ email: u.email }));
+    }
+    throw new Error(`unexpected SQL: ${s}`);
+  });
+
+  const repoFor = (entity: unknown) => {
+    if (entity === AccountActivity) {
+      return {
+        create: (d: Row) => ({ ...d }),
+        save: jest.fn(async (r: Row) => (store.activities.push(r), r)),
+      };
+    }
+    if (entity !== User) throw new Error('unexpected repository');
+    return {
+      findOne: jest.fn(async ({ where }: { where: Row }) => store.users.find((u) => u.id === where.id) ?? null),
+      create: (d: Row) => Object.assign(new User(), d),
+      save: jest.fn(async (u: Row) => {
+        if (store.users.some((x) => x !== u && x.email === u.email)) {
+          throw Object.assign(new Error('dup'), { code: '23505' });
+        }
+        if (!u.id) u.id = uuid();
+        if (!store.users.includes(u)) store.users.push(u);
+        return u;
+      }),
+      update: jest.fn(async ({ id }: Row, patch: Row) => {
+        const u = store.users.find((x) => x.id === id);
+        if (u) Object.assign(u, patch);
+      }),
+    };
+  };
+
+  const manager = { query, getRepository: repoFor };
+  const dataSource = {
+    query,
+    getRepository: repoFor,
+    transaction: jest.fn(async (cb: (m: any) => Promise<any>) => {
+      const snapshot = clone(store);
+      try {
+        return await cb(manager);
+      } catch (e) {
+        store = snapshot;
+        throw e;
+      }
+    }),
+  };
+
+  // 비밀번호 수단 — 서비스 계약만 본다(해시 자체는 passwordCredentialService.test 가 본다).
+  const passwords: PasswordStore = {
+    hasPassword: jest.fn(async (id: string) => store.creds.has(id)),
+    setPassword: jest.fn(async (id: string, plain: string) => {
+      store.creds.set(id, `fakehash:${hashToken(plain)}`);
+    }),
+    verifyPassword: jest.fn(async (id: string | null, plain: string) => {
+      if (!id) return false;
+      return store.creds.get(id) === `fakehash:${hashToken(plain)}`;
+    }),
+  };
+
+  const mails: Array<{ to: string; subject: string; template?: string; data?: any; html?: string }> = [];
+  const mailer = { sendEmail: jest.fn(async (m: any) => (mails.push(m), { success: true })) };
+
+  const revoked: string[] = [];
+  const order: string[] = [];
+  const revokeAllSessions = jest.fn(async (id: string) => {
+    revoked.push(id);
+    order.push('revoke');
+  });
+  (passwords.setPassword as jest.Mock).mockImplementation(async (id: string, plain: string) => {
+    order.push('setPassword');
+    store.creds.set(id, `fakehash:${hashToken(plain)}`);
+  });
+
+  const roles = opts.roles ?? {};
+  const semiFranchiseResolver = jest.fn(async (_userId: string, key: string) =>
+    decideSemiFranchiseAccess(key, opts.semiFranchiseRows ?? []),
+  );
+  const service = new EmailAuthService({
+    dataSource: dataSource as any,
+    passwords,
+    mailer,
+    revokeAllSessions,
+    readRoles: async (id) => roles[id] ?? [],
+    issueSession: async (user, key) => ({
+      tokens: tokenUtils.generateTokens(user, roles[user.id] ?? [], 'neture.co.kr', [], null, key, null, 'password'),
+      roles: roles[user.id] ?? [],
+      memberships: opts.memberships?.[user.id] ?? [],
+    }),
+    resolveSemiFranchiseAccess: semiFranchiseResolver,
+    now: () => nowRef.t,
+  });
+
+  const lastLinkToken = (path: string) => {
+    const m = [...mails].reverse().find((x) => (x.data?.verifyUrl ?? x.html ?? '').includes(path));
+    const src: string = m?.data?.verifyUrl ?? m?.html ?? '';
+    const match = src.match(new RegExp(`${path}#token=([A-Za-z0-9_%-]+)`));
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
+  return {
+    service,
+    get store() {
+      return store;
+    },
+    sql,
+    mails,
+    mailer,
+    passwords,
+    revoked,
+    order,
+    nowRef,
+    lastLinkToken,
+    semiFranchiseResolver,
+    addUser(u: Partial<Row>) {
+      const row = Object.assign(new User(), {
+        id: uuid(),
+        status: UserStatus.ACTIVE,
+        isActive: true,
+        isEmailVerified: true,
+        ...u,
+      });
+      store.users.push(row);
+      return row;
+    },
+  };
+}
+
+const META = { ipAddress: '127.0.0.1', userAgent: 'jest', sessionServiceKey: 'neture' };
+const GOOD_PW = 'abcd1234!';
+const signupInput = (over: Partial<Record<string, any>> = {}) => ({
+  email: 'New.User@Example.com',
+  password: GOOD_PW,
+  name: '홍길동',
+  phone: '010-1234-5678',
+  consents: { terms: true, privacy: true },
+  ...META,
+  ...over,
+});
+
+async function expectCode(p: Promise<unknown>, code: string) {
+  await expect(p).rejects.toMatchObject({ code });
+}
+
+describe('EmailAuthService', () => {
+  beforeAll(() => {
+    process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-email-auth';
+    process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-jwt-refresh-secret-email-auth';
+  });
+
+  describe('V1 가입', () => {
+    it('users 1행 + 수단 1행, 이메일은 정규화, 미확인 상태, 세션 없음, 확인 메일 1통', async () => {
+      const h = makeHarness();
+      const res = await h.service.signup(signupInput());
+      expect(res).toEqual({ maskedEmail: 'n***@e***.com', mailSent: true });
+      expect(res).not.toHaveProperty('tokens');
+
+      expect(h.store.users).toHaveLength(1);
+      const u = h.store.users[0];
+      expect(u.email).toBe('new.user@example.com');
+      expect(u.phone).toBe('01012345678');
+      expect(u.isEmailVerified).toBe(false);
+      expect(u.password).toBeUndefined();
+      expect(h.store.creds.size).toBe(1);
+
+      expect(h.mails).toHaveLength(1);
+      expect(h.mails[0].template).toBe('email-verification');
+      expect(h.mails[0].data.verifyUrl).toMatch(/\/verify-email#token=/);
+    });
+
+    it('역할·멤버십·조직 테이블을 건드리지 않는다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const touched = h.sql.map((x) => x.q).join('\n');
+      expect(touched).not.toMatch(/role_assignments|service_memberships|organization_members/);
+    });
+  });
+
+  describe('V2 중복 이메일', () => {
+    it('Google 로 가입한 같은 이메일(대소문자 다름) → EMAIL_IN_USE, 기존 행 불변, 수단 추가 0', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'new.user@example.com', name: '기존' });
+      await expectCode(h.service.signup(signupInput()), 'EMAIL_IN_USE');
+      expect(h.store.users).toHaveLength(1);
+      expect(h.store.users[0]).toMatchObject({ id: g.id, name: '기존', isEmailVerified: true });
+      expect(h.store.creds.size).toBe(0);
+      expect(h.mails).toHaveLength(0);
+    });
+
+    it('확인 대기 중인 이메일가입 → EMAIL_PENDING_VERIFICATION, 비밀번호를 덮어쓰지 않는다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const before = [...h.store.creds.values()][0];
+      await expectCode(h.service.signup(signupInput({ password: 'other999#' })), 'EMAIL_PENDING_VERIFICATION');
+      expect([...h.store.creds.values()][0]).toBe(before);
+      expect(h.store.users).toHaveLength(1);
+    });
+
+    it('동시 가입 race(unique 위반) → EMAIL_IN_USE, 트랜잭션 롤백으로 수단이 남지 않는다', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'new.user@example.com' });
+      // 선조회는 비었다고 보고 insert 에서 충돌하게 만든다
+      const q = (h.service as any)._dataSource.query as jest.Mock;
+      const orig = q.getMockImplementation()!;
+      q.mockImplementation(async (s: string, p: any[]) =>
+        s.includes('"isEmailVerified" FROM users') ? [] : orig(s, p),
+      );
+      await expectCode(h.service.signup(signupInput()), 'EMAIL_IN_USE');
+      expect(h.store.creds.size).toBe(0);
+    });
+  });
+
+  describe('V3 확인 → 로그인', () => {
+    it('확인 전 로그인은 EMAIL_NOT_VERIFIED, 링크 토큰으로 확인 후 로그인 성공', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await expectCode(h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META }), 'EMAIL_NOT_VERIFIED');
+
+      const token = h.lastLinkToken('/verify-email');
+      expect(token.length).toBeGreaterThan(20);
+      await expect(h.service.verifyEmail(token)).resolves.toEqual({ maskedEmail: 'n***@e***.com' });
+      expect(h.store.users[0].isEmailVerified).toBe(true);
+
+      const s = await h.service.login({ email: ' NEW.USER@example.com ', password: GOOD_PW, ...META });
+      expect(s.isNewUser).toBe(false);
+      expect(s.user.id).toBe(h.store.users[0].id);
+      expect(s.user).not.toHaveProperty('password');
+    });
+
+    it('토큰 발급 뒤 주소가 바뀌면 옛 링크는 확인하지 못한다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      h.store.users[0].email = 'changed@example.com';
+      await expectCode(h.service.verifyEmail(token), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(h.store.users[0].isEmailVerified).toBe(false);
+    });
+  });
+
+  describe('V4 토큰', () => {
+    it('DB 에는 해시만 — 평문 토큰이 어떤 SQL 파라미터에도 없다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      expect(h.store.evt[0].token_hash).toBe(hashToken(token));
+      expect(JSON.stringify(h.sql.map((x) => x.p))).not.toContain(token);
+    });
+
+    it('1회용 — 두 번째 사용은 INVALID_OR_EXPIRED_TOKEN', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      await h.service.verifyEmail(token);
+      await expectCode(h.service.verifyEmail(token), 'INVALID_OR_EXPIRED_TOKEN');
+    });
+
+    it('만료(24h) 뒤에는 거절', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const token = h.lastLinkToken('/verify-email');
+      h.nowRef.t = new Date(h.nowRef.t.getTime() + 24 * 60 * 60 * 1000 + 1);
+      await expectCode(h.service.verifyEmail(token), 'INVALID_OR_EXPIRED_TOKEN');
+    });
+
+    it('재발송하면 이전 링크는 무효, 새 링크만 유효', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const first = h.lastLinkToken('/verify-email');
+      await h.service.resendVerification('new.user@example.com', META);
+      const second = h.lastLinkToken('/verify-email');
+      expect(second).not.toBe(first);
+      await expectCode(h.service.verifyEmail(first), 'INVALID_OR_EXPIRED_TOKEN');
+      await expect(h.service.verifyEmail(second)).resolves.toBeDefined();
+    });
+
+    // PR #257 보완 5 — 발송 실패는 계정을 되돌리지 않고, 재발송이 새 링크로 복구한다.
+    let h0: ReturnType<typeof makeHarness>;
+    it.each([
+      ['success:false 응답', () => h0.mailer.sendEmail.mockImplementationOnce(async () => ({ success: false, error: 'smtp down' }))],
+      ['예외', () => h0.mailer.sendEmail.mockImplementationOnce(async () => { throw new Error('smtp down'); })],
+    ])('발송 실패(%s) → mailSent:false · 계정 유지 · 재발송 링크로 확인 완료', async (_label, failOnce) => {
+      h0 = makeHarness();
+      failOnce();
+      const res = await h0.service.signup(signupInput());
+      expect(res.mailSent).toBe(false);
+      expect(h0.store.users).toHaveLength(1);
+      expect(h0.store.creds.size).toBe(1);
+      expect(h0.lastLinkToken('/verify-email')).toBe('');
+
+      await h0.service.resendVerification('new.user@example.com', META);
+      const token = h0.lastLinkToken('/verify-email');
+      expect(token).not.toBe('');
+      await expect(h0.service.verifyEmail(token)).resolves.toBeDefined();
+      expect(h0.store.users[0].isEmailVerified).toBe(true);
+    });
+
+    it('형태가 아닌 토큰은 DB 를 조회하지 않고 거절', async () => {
+      const h = makeHarness();
+      const n = h.sql.length;
+      await expectCode(h.service.verifyEmail('short'), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(h.sql.length).toBe(n);
+    });
+  });
+
+  describe('V5 같은 실패 응답', () => {
+    it('틀린 비밀번호 · 없는 계정 · Google 전용 계정 모두 INVALID_CREDENTIALS 이고 verifyPassword 를 한 번씩 부른다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      h.store.users[0].isEmailVerified = true;
+      h.addUser({ email: 'google.only@example.com' });
+
+      for (const email of ['new.user@example.com', 'nobody@example.com', 'google.only@example.com']) {
+        (h.passwords.verifyPassword as jest.Mock).mockClear();
+        await expectCode(h.service.login({ email, password: 'wrong1234!', ...META }), 'INVALID_CREDENTIALS');
+        expect(h.passwords.verifyPassword).toHaveBeenCalledTimes(1);
+      }
+    });
+
+    it('정지된 계정은 비밀번호가 맞아도 ACCOUNT_NOT_ACTIVE', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      Object.assign(h.store.users[0], { isEmailVerified: true, status: UserStatus.SUSPENDED });
+      await expectCode(h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META }), 'ACCOUNT_NOT_ACTIVE');
+    });
+  });
+
+  describe('V6 관리자 경계', () => {
+    it('관리자 화면(origin=admin)은 자격 확인 전에 거절', async () => {
+      const h = makeHarness();
+      await expectCode(
+        h.service.login({ email: 'a@example.com', password: GOOD_PW, ...META, sessionServiceKey: 'admin' }),
+        'PASSWORD_SESSION_NOT_ALLOWED',
+      );
+      expect(h.passwords.verifyPassword).not.toHaveBeenCalled();
+    });
+
+    it('platform 역할 사용자는 서비스 화면에서도 비밀번호 세션 거절, family 기록 없음', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const u = h.store.users[0];
+      u.isEmailVerified = true;
+      const h2 = makeHarness({ roles: { [u.id]: ['platform:super_admin'] } });
+      h2.store.users.push(u);
+      h2.store.creds.set(u.id, h.store.creds.get(u.id)!);
+      await expectCode(h2.service.login({ email: u.email, password: GOOD_PW, ...META }), 'PASSWORD_SESSION_NOT_ALLOWED');
+      expect(u.refreshTokenFamily).toBeUndefined();
+    });
+
+    it('platform 역할은 재설정 메일을 받지 않고 비밀번호 설정도 거절', async () => {
+      const h = makeHarness();
+      const admin = h.addUser({ email: 'admin@example.com' });
+      const h2 = makeHarness({ roles: { [admin.id]: ['platform:super_admin'] } });
+      h2.store.users.push(admin);
+      await h2.service.requestPasswordReset('admin@example.com', META);
+      expect(h2.mails).toHaveLength(0);
+      await expectCode(h2.service.setPasswordForUser(admin.id, { newPassword: GOOD_PW }), 'PASSWORD_SESSION_NOT_ALLOWED');
+      expect(h2.store.creds.size).toBe(0);
+    });
+
+    it('platform 역할은 비밀번호 수단 행이 있어도 재설정 메일 0 · reset 거절 (수단 보유 조건보다 관리자 경계가 먼저)', async () => {
+      const h = makeHarness();
+      const admin = h.addUser({ email: 'admin@example.com' });
+      const h2 = makeHarness({ roles: { [admin.id]: ['platform:super_admin'] } });
+      h2.store.users.push(admin);
+      h2.store.creds.set(admin.id, 'fakehash:x');
+      await h2.service.requestPasswordReset('admin@example.com', META);
+      expect(h2.mails).toHaveLength(0);
+      expect(h2.store.prt).toHaveLength(0);
+      const token: string = await (h2.service as any).issueToken('reset', admin.id, 30 * 60 * 1000);
+      await expectCode(h2.service.resetPassword(token, 'newpass99$'), 'PASSWORD_SESSION_NOT_ALLOWED');
+      expect(h2.store.creds.get(admin.id)).toBe('fakehash:x');
+      expect(h2.revoked).toEqual([]);
+    });
+  });
+
+  describe('V7 세션', () => {
+    it('access/refresh 에 authMethod=password, sub=users.id, refresh family 기록', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.verifyEmail(h.lastLinkToken('/verify-email'));
+      const s = await h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META });
+
+      const access = tokenUtils.verifyAccessToken(s.tokens.accessToken) as any;
+      const refresh = tokenUtils.verifyRefreshToken(s.tokens.refreshToken) as any;
+      expect(access.authMethod).toBe('password');
+      expect(refresh.authMethod).toBe('password');
+      expect(access.userId ?? access.sub).toBe(h.store.users[0].id);
+      expect(h.store.users[0].refreshTokenFamily).toBe(refresh.tokenFamily);
+      expect(h.store.users[0].lastLoginAt).toEqual(h.nowRef.t);
+    });
+  });
+
+  describe('V14 로그인 자격 게이트 (SERVICE_NOT_MEMBER)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+
+    async function verifiedUser(over: Parameters<typeof makeHarness>[0] = {}, roles: string[] = []) {
+      const seed = makeHarness();
+      await seed.service.signup(signupInput());
+      const u = seed.store.users[0];
+      u.isEmailVerified = true;
+      const h = makeHarness({
+        ...over,
+        roles: { [u.id]: roles },
+        memberships: over.memberships ? { [u.id]: over.memberships[Object.keys(over.memberships)[0]] } : undefined,
+      });
+      h.store.users.push(u);
+      h.store.creds.set(u.id, seed.store.creds.get(u.id)!);
+      return { h, u };
+    }
+
+    it('인증 성공 + 게이트 서비스 membership 없음 → 403 SERVICE_NOT_MEMBER, 세션 흔적 없음, 실패 기록', async () => {
+      const { h, u } = await verifiedUser();
+      const err = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(EmailAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(u.lastLoginAt).toBeUndefined();
+      expect(h.store.activities).toEqual([expect.objectContaining({ userId: u.id, success: false })]);
+    });
+
+    it('비밀번호가 틀리면 게이트 서비스에서도 INVALID_CREDENTIALS — 가입 여부를 드러내지 않는다', async () => {
+      const { h, u } = await verifiedUser();
+      await expectCode(h.service.login({ email: u.email, password: 'wrong1234!', ...GATED }), 'INVALID_CREDENTIALS');
+      await expectCode(h.service.login({ email: 'nobody@example.com', password: GOOD_PW, ...GATED }), 'INVALID_CREDENTIALS');
+    });
+
+    it.each(['active', 'pending', 'rejected', 'suspended'])('해당 서비스 row 가 있으면(status=%s) 로그인 성공', async (status) => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'kpa-society', status }] } });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+    });
+
+    it('다른 서비스 membership 은 대신 인정하지 않는다', async () => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'neture', status: 'active' }] } });
+      await expectCode(h.service.login({ email: u.email, password: GOOD_PW, ...GATED }), 'SERVICE_NOT_MEMBER');
+    });
+
+    it('legacy super_admin 은 통과', async () => {
+      const { h, u } = await verifiedUser({}, ['super_admin']);
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+    });
+
+    it('게이트 키가 없으면(neture · store · 공유 호스트 등) membership 없이도 로그인 성공', async () => {
+      const { h, u } = await verifiedUser();
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...META, loginMembershipGateKey: null });
+      expect(s.tokens.accessToken).toBeTruthy();
+    });
+  });
+
+  describe('V15 세미프랜차이즈 자격 (pharmacy.neture.co.kr = kpa-society 게이트)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+
+    async function verifiedUser(over: Parameters<typeof makeHarness>[0] = {}) {
+      const seed = makeHarness();
+      await seed.service.signup(signupInput());
+      const u = seed.store.users[0];
+      u.isEmailVerified = true;
+      const h = makeHarness({
+        ...over,
+        memberships: over.memberships ? { [u.id]: over.memberships[Object.keys(over.memberships)[0]] } : undefined,
+      });
+      h.store.users.push(u);
+      h.store.creds.set(u.id, seed.store.creds.get(u.id)!);
+      return { h, u };
+    }
+
+    it('Neture 기본 active ∧ pharmacy 세미프랜차이즈 active → kpa-society membership 없이 로그인 성공', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'active' }] });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+      expect(h.semiFranchiseResolver).toHaveBeenCalledWith(u.id, 'pharmacy');
+    });
+
+    it.each([
+      [[], 'apply_pharmacy'],
+      [[{ basic: 'pending', semi: null }], 'pharmacy_pending'],
+      [[{ basic: 'suspended', semi: null }], 'pharmacy_suspended'],
+      [[{ basic: 'rejected', semi: null }], 'apply_pharmacy'],
+      [[{ basic: 'active', semi: null }], 'apply_semi_franchise'],
+      [[{ basic: 'active', semi: 'pending' }], 'semi_franchise_pending'],
+      [[{ basic: 'active', semi: 'suspended' }], 'semi_franchise_suspended'],
+    ] as const)('미충족(%j) → SERVICE_NOT_MEMBER + serviceAccess.next=%s, 세션 흔적 없음', async (rows, next) => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [...rows] });
+      const err = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(EmailAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(err.serviceAccess).toMatchObject({ semiFranchiseKey: 'pharmacy', next });
+      expect(err.serviceAccess).not.toHaveProperty('allowed');
+      expect(u.refreshTokenFamily).toBeUndefined();
+    });
+
+    it('기본 가입만 active(세미프랜차이즈 미가입)이면 통과시키지 않는다', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'terminated' }] });
+      await expectCode(h.service.login({ email: u.email, password: GOOD_PW, ...GATED }), 'SERVICE_NOT_MEMBER');
+    });
+
+    it('기존 kpa-society row 가 있으면 세미프랜차이즈 조회 없이 기존 규칙대로 통과(재해석 없음)', async () => {
+      const { h, u } = await verifiedUser({ memberships: { x: [{ serviceKey: 'kpa-society', status: 'pending' }] } });
+      const s = await h.service.login({ email: u.email, password: GOOD_PW, ...GATED });
+      expect(s.tokens.accessToken).toBeTruthy();
+      expect(h.semiFranchiseResolver).not.toHaveBeenCalled();
+    });
+
+    it('semiFranchiseAccessKey 가 없는 게이트(k-cosmetics)는 세미프랜차이즈를 조회하지 않는다', async () => {
+      const { h, u } = await verifiedUser({ semiFranchiseRows: [{ basic: 'active', semi: 'active' }] });
+      const err = await h.service
+        .login({ email: u.email, password: GOOD_PW, ...META, sessionServiceKey: 'k-cosmetics', loginMembershipGateKey: 'k-cosmetics' })
+        .catch((e) => e);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER' });
+      expect(err.serviceAccess).toBeUndefined();
+      expect(h.semiFranchiseResolver).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('V8 비밀번호 재설정', () => {
+    async function verifiedUser() {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.verifyEmail(h.lastLinkToken('/verify-email'));
+      return h;
+    }
+
+    it('메일 링크 → 새 비밀번호, 전역 폐기가 저장보다 먼저, 이전 비밀번호 무효', async () => {
+      const h = await verifiedUser();
+      h.order.length = 0;
+      await h.service.requestPasswordReset('New.User@example.com', META);
+      const token = h.lastLinkToken('/reset-password');
+      expect(token.length).toBeGreaterThan(20);
+      expect(h.store.prt[0].token_hash).toBe(hashToken(token));
+
+      await h.service.resetPassword(token, 'newpass99$');
+      expect(h.revoked).toEqual([h.store.users[0].id]);
+      expect(h.order).toEqual(['revoke', 'setPassword']);
+
+      await expectCode(h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META }), 'INVALID_CREDENTIALS');
+      await expect(h.service.login({ email: 'new.user@example.com', password: 'newpass99$', ...META })).resolves.toBeDefined();
+      await expectCode(h.service.resetPassword(token, 'again999$'), 'INVALID_OR_EXPIRED_TOKEN');
+    });
+
+    it('30분 만료', async () => {
+      const h = await verifiedUser();
+      await h.service.requestPasswordReset('new.user@example.com', META);
+      const token = h.lastLinkToken('/reset-password');
+      h.nowRef.t = new Date(h.nowRef.t.getTime() + 30 * 60 * 1000 + 1);
+      await expectCode(h.service.resetPassword(token, 'newpass99$'), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(h.revoked).toEqual([]);
+    });
+
+    it('정책 위반 새 비밀번호는 토큰을 소비하지 않는다', async () => {
+      const h = await verifiedUser();
+      await h.service.requestPasswordReset('new.user@example.com', META);
+      const token = h.lastLinkToken('/reset-password');
+      await expectCode(h.service.resetPassword(token, 'short'), 'PASSWORD_POLICY_VIOLATION');
+      await expectCode(h.service.resetPassword(token, 'a1!' + 'x'.repeat(70)), 'PASSWORD_POLICY_VIOLATION');
+      await expect(h.service.resetPassword(token, 'newpass99$')).resolves.toBeUndefined();
+    });
+
+    // 2026-10-01 정책 변경 — 종전 계약("재설정 링크로 Google 전용 사용자에게 수단 추가")을 반전한다.
+    it('Google 전용(확인된 주소 · 수단 없음) → forgot 은 메일 0 · 토큰 0 · 수단 0', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      await expect(h.service.requestPasswordReset('Google.Only@example.com', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.store.creds.size).toBe(0);
+    });
+
+    it('Google 전용(수단 없음)은 유효한 reset 토큰이 있어도 첫 비밀번호를 만들 수 없다 — 세션 폐기 0 · 수단 0', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      // 정책 변경 전에 발급된 토큰 등 — forgot 을 거치지 않은 토큰을 직접 만든다
+      const token: string = await (h.service as any).issueToken('reset', g.id, 30 * 60 * 1000);
+      await expectCode(h.service.resetPassword(token, 'newpass99$'), 'INVALID_OR_EXPIRED_TOKEN');
+      expect(h.store.creds.size).toBe(0);
+      expect(h.revoked).toEqual([]);
+      expect(h.store.users).toHaveLength(1);
+      await expectCode(h.service.login({ email: 'google.only@example.com', password: 'newpass99$', ...META }), 'INVALID_CREDENTIALS');
+    });
+
+    it('로그인한 Google 사용자가 `POST /auth/password` 로 첫 비밀번호를 추가하면 그 뒤로는 forgot/reset 이 동작한다', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'google.only@example.com', isEmailVerified: true });
+      await h.service.setPasswordForUser(g.id, { newPassword: GOOD_PW });
+      expect([...h.store.creds.keys()]).toEqual([g.id]);
+      await h.service.requestPasswordReset('google.only@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      await h.service.resetPassword(h.lastLinkToken('/reset-password'), 'newpass99$');
+      await expect(h.service.login({ email: 'google.only@example.com', password: 'newpass99$', ...META })).resolves.toBeDefined();
+      expect(h.store.users).toHaveLength(1);
+    });
+  });
+
+  describe('링크 토큰 위치 — query 가 아닌 fragment', () => {
+    // fragment(`#...`)는 HTTP 요청에 실리지 않는다 → 웹 서버 · Cloud Run 요청 로그에 토큰이 남지 않는다.
+    it('확인 링크는 `/verify-email#token=` 이고 `?token=` 이 없다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      const url = new URL(h.mails[0].data.verifyUrl);
+      expect(url.pathname).toBe('/verify-email');
+      expect(url.search).toBe('');
+      expect(url.hash).toMatch(/^#token=[A-Za-z0-9_%-]{20,}$/);
+      expect(JSON.stringify(h.mails[0])).not.toContain('?token=');
+    });
+
+    it('재설정 링크는 `/reset-password#token=` 이고 `?token=` 이 없다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.verifyEmail(h.lastLinkToken('/verify-email'));
+      await h.service.requestPasswordReset('New.User@example.com', META);
+      const mail = JSON.stringify(h.mails[h.mails.length - 1]);
+      expect(mail).toContain('/reset-password#token=');
+      expect(mail).not.toContain('?token=');
+      expect(h.lastLinkToken('/reset-password').length).toBeGreaterThan(20);
+    });
+  });
+
+  describe('V9 존재 여부 비노출', () => {
+    it('없는 주소 · 확인 완료 주소에는 resend 가 메일을 보내지 않고 오류도 없다', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'done@example.com' });
+      await expect(h.service.resendVerification('nobody@example.com', META)).resolves.toBeUndefined();
+      await expect(h.service.resendVerification('done@example.com', META)).resolves.toBeUndefined();
+      await expect(h.service.resendVerification('not-an-email', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+    });
+
+    it('forgot 은 없는 주소에 조용하다', async () => {
+      const h = makeHarness();
+      await expect(h.service.requestPasswordReset('nobody@example.com', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+    });
+  });
+
+  // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1 — 재설정 메일은 수단 보유 또는 확인된 주소에만.
+  //   → 2026-10-01 정책 변경: **수단 보유자에게만**(확인된 주소라도 수단이 없으면 발송 0). S1-P2 를 반전했다.
+  describe('S1 forgot 발송 대상', () => {
+    it('S1-P1 비밀번호 수단 보유 사용자 → 발송 (미확인 상태여도 본인 수단 복구는 허용)', async () => {
+      const h = makeHarness();
+      const u = h.addUser({ email: 'has.cred@example.com', isEmailVerified: false });
+      h.store.creds.set(u.id, 'fakehash:x');
+      await h.service.requestPasswordReset('has.cred@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      expect(h.store.prt).toHaveLength(1);
+    });
+
+    it('S1-P2 확인된 Google 전용 사용자(수단 없음) → 발송 0 (2026-10-01 정책 변경 — 종전 "발송")', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
+      await h.service.requestPasswordReset('g.verified@example.com', META);
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
+    });
+
+    it('S1-P3 미확인 Google 전용 사용자 → 메일 0 · 토큰 0 · 수단 0', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.unverified@example.com', isEmailVerified: false });
+      await expect(h.service.requestPasswordReset('g.unverified@example.com', META)).resolves.toBeUndefined();
+      expect(h.mails).toHaveLength(0);
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.store.creds.size).toBe(0);
+    });
+
+    it('S1-P4 없는 주소 · 미확인 · Google 전용 · 발송 대상의 서비스 결과가 같다 (발송 여부로 존재 추론 불가)', async () => {
+      const h = makeHarness();
+      h.addUser({ email: 'g.unverified@example.com', isEmailVerified: false });
+      h.addUser({ email: 'g.verified@example.com', isEmailVerified: true });
+      const c = h.addUser({ email: 'has.cred@example.com', isEmailVerified: true });
+      h.store.creds.set(c.id, 'fakehash:x');
+      const results = await Promise.all([
+        h.service.requestPasswordReset('nobody@example.com', META),
+        h.service.requestPasswordReset('g.unverified@example.com', META),
+        h.service.requestPasswordReset('g.verified@example.com', META),
+        h.service.requestPasswordReset('has.cred@example.com', META),
+      ]);
+      expect(results).toEqual([undefined, undefined, undefined, undefined]);
+      expect(h.mails.map((m) => m.to)).toEqual(['has.cred@example.com']);
+    });
+  });
+
+  describe('V10 아이디 찾기', () => {
+    it('이름+휴대전화가 정확히 1건이면 가린 힌트, 하이픈 무관', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await expect(h.service.findLoginId({ name: '홍길동', phone: '01012345678' })).resolves.toEqual({
+        found: true,
+        maskedEmail: 'n***@e***.com',
+      });
+    });
+
+    it('0건 · 2건 · 형태 오류는 found=false', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.signup(signupInput({ email: 'second@example.com' }));
+      await expect(h.service.findLoginId({ name: '홍길동', phone: '010-1234-5678' })).resolves.toEqual({ found: false, maskedEmail: null });
+      await expect(h.service.findLoginId({ name: '없음', phone: '01099998888' })).resolves.toEqual({ found: false, maskedEmail: null });
+      await expect(h.service.findLoginId({ name: '홍길동', phone: '12' })).resolves.toEqual({ found: false, maskedEmail: null });
+    });
+  });
+
+  describe('V11 입력 거절 (저장 전)', () => {
+    it.each([
+      [{ consents: { terms: true, privacy: false } }, 'CONSENT_REQUIRED'],
+      [{ email: 'bad' }, 'INVALID_EMAIL'],
+      [{ name: '  ' }, 'INVALID_NAME'],
+      [{ phone: '02-123-4567' }, 'INVALID_PHONE'],
+      [{ password: 'abcdefgh1' }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'abc!1' }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'abcdef1가' }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'a1!' + 'x'.repeat(70) }, 'PASSWORD_POLICY_VIOLATION'],
+      [{ password: 'a1!' + '가'.repeat(24) }, 'PASSWORD_POLICY_VIOLATION'],
+    ])('%j → %s', async (over, code) => {
+      const h = makeHarness();
+      await expectCode(h.service.signup(signupInput(over)), code);
+      expect(h.store.users).toHaveLength(0);
+      expect(h.store.creds.size).toBe(0);
+    });
+
+    it('정책 위반은 위반 항목을 details 로 돌려준다(대소문자 요구 없음)', async () => {
+      const h = makeHarness();
+      const err: EmailAuthError = await h.service.signup(signupInput({ password: 'ABCDEFGH' })).catch((e) => e);
+      expect(err.details).toEqual({ violations: ['no_digit', 'no_symbol'] });
+      await expect(h.service.signup(signupInput({ password: 'ABCD123!' }))).resolves.toBeDefined();
+    });
+  });
+
+  describe('V12 비밀번호 설정 (로그인 사용자)', () => {
+    it('수단이 없으면 현재 비밀번호 없이 추가, 있으면 현재 비밀번호 필수·일치', async () => {
+      const h = makeHarness();
+      const g = h.addUser({ email: 'g@example.com' });
+      await expectCode(h.service.setPasswordForUser(g.id, { newPassword: 'a1!' + '가'.repeat(24) }), 'PASSWORD_POLICY_VIOLATION');
+      expect(h.store.creds.has(g.id)).toBe(false);
+      await h.service.setPasswordForUser(g.id, { newPassword: GOOD_PW });
+      expect(h.store.creds.has(g.id)).toBe(true);
+
+      await expectCode(h.service.setPasswordForUser(g.id, { newPassword: 'next999$x' }), 'CURRENT_PASSWORD_REQUIRED');
+      await expectCode(
+        h.service.setPasswordForUser(g.id, { currentPassword: 'wrong999$', newPassword: 'next999$x' }),
+        'CURRENT_PASSWORD_MISMATCH',
+      );
+      await h.service.setPasswordForUser(g.id, { currentPassword: GOOD_PW, newPassword: 'next999$x' });
+      expect(h.revoked).toEqual([]);
+    });
+
+    it('어느 경로도 평문 비밀번호를 SQL 파라미터 · 활동 로그에 싣지 않는다', async () => {
+      const h = makeHarness();
+      await h.service.signup(signupInput());
+      await h.service.verifyEmail(h.lastLinkToken('/verify-email'));
+      await h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META });
+      await h.service.login({ email: 'new.user@example.com', password: 'wrong1234!', ...META }).catch(() => {});
+      await new Promise((r) => setImmediate(r));
+      const dump = JSON.stringify({ sql: h.sql.map((x) => x.p), act: h.store.activities });
+      expect(dump).not.toContain(GOOD_PW);
+      expect(dump).not.toContain('wrong1234!');
+      expect(h.store.activities.length).toBeGreaterThan(0);
+      expect(h.store.activities.every((a) => a.email === null)).toBe(true);
+    });
+  });
+  /**
+   * V13 Demo 계정 보호 — WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+   *
+   *   Demo 계정의 비밀번호는 **문서에 적힌 공개 credential** 이다. 막지 않으면 그 비밀번호를
+   *   아는 누구나 `POST /auth/password` 로 바꿔 공개 체험 계정을 사유화할 수 있다.
+   *   판정은 `demo_accounts.user_id` 한 곳만 본다 — 여기서 `store.demoUserIds` 가 그 행이다.
+   */
+  describe('V13 Demo 계정 보호', () => {
+    /** Demo 1명 + 비밀번호 수단 보유 상태 — 일반 사용자와 **같은** 조건에서 차이를 본다. */
+    const demoHarness = () => {
+      const h = makeHarness();
+      const demo = h.addUser({ email: 'teststoreowner@example.com' });
+      const normal = h.addUser({ email: 'normal@example.com' });
+      h.store.creds.set(demo.id, `fakehash:${hashToken(GOOD_PW)}`);
+      h.store.creds.set(normal.id, `fakehash:${hashToken(GOOD_PW)}`);
+      h.store.demoUserIds.push(demo.id);
+      return { h, demo, normal };
+    };
+
+    it('비밀번호 변경은 거절된다 — 저장된 해시가 그대로 남는다', async () => {
+      const { h, demo } = demoHarness();
+      const before = h.store.creds.get(demo.id);
+
+      await expectCode(
+        h.service.setPasswordForUser(demo.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' }),
+        'DEMO_ACCOUNT_FORBIDDEN',
+      );
+
+      // 403 이고, 공개 비밀번호가 바뀌지 않았다(정책 검사 · 현재 비밀번호 확인보다 먼저 거절).
+      expect(h.store.creds.get(demo.id)).toBe(before);
+      expect(h.passwords.setPassword).not.toHaveBeenCalled();
+    });
+
+    it('forgot 은 토큰 · 메일을 만들지 않는다 — 응답 문구는 일반 계정과 같다', async () => {
+      const { h, demo } = demoHarness();
+
+      await h.service.requestPasswordReset('TestStoreOwner@Example.com', META);
+
+      expect(h.store.prt).toHaveLength(0);
+      expect(h.mails).toHaveLength(0);
+      // 존재하지 않는 주소와 구별되지 않는다(조용한 return — Demo 여부가 드러나지 않는다).
+      await h.service.requestPasswordReset('nobody@example.com', META);
+      expect(h.mails).toHaveLength(0);
+      expect(demo.id).toBeTruthy();
+    });
+
+    it('이미 발급된 reset 토큰도 소비 단계에서 거절된다 — 세션 폐기 0', async () => {
+      const { h, demo } = demoHarness();
+      // Demo 지정 **전에** 발급된 과거 토큰을 재현한다.
+      h.store.demoUserIds.splice(0, h.store.demoUserIds.length);
+      await h.service.requestPasswordReset('teststoreowner@example.com', META);
+      const token = h.lastLinkToken('/reset-password');
+      expect(token).not.toBe('');
+      h.store.demoUserIds.push(demo.id);
+      const before = h.store.creds.get(demo.id);
+
+      await expectCode(h.service.resetPassword(token, 'other999$x'), 'DEMO_ACCOUNT_FORBIDDEN');
+
+      expect(h.store.creds.get(demo.id)).toBe(before);
+      expect(h.revoked).toEqual([]);
+    });
+
+    it('로그인은 막지 않는다 — 체험 입구이므로 비밀번호 로그인은 그대로 된다', async () => {
+      const { h } = demoHarness();
+      const result = await h.service.login({ email: 'teststoreowner@example.com', password: GOOD_PW, ...META });
+      expect(result.tokens.accessToken).toBeTruthy();
+    });
+
+    it('일반 사용자 동작은 불변 — 같은 호출이 모두 성공한다', async () => {
+      const { h, normal } = demoHarness();
+
+      await h.service.setPasswordForUser(normal.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' });
+      expect(h.store.creds.get(normal.id)).toBe(`fakehash:${hashToken('other999$x')}`);
+
+      await h.service.requestPasswordReset('normal@example.com', META);
+      expect(h.mails).toHaveLength(1);
+      const token = h.lastLinkToken('/reset-password');
+      await h.service.resetPassword(token, 'third999$x');
+      expect(h.store.creds.get(normal.id)).toBe(`fakehash:${hashToken('third999$x')}`);
+      expect(h.revoked).toEqual([normal.id]);
+    });
+
+    it('판정은 user_id 로 한다 — 같은 주소라도 registry 행이 없으면 일반 계정이다', async () => {
+      const h = makeHarness();
+      // 주소는 Demo 와 같지만 `demo_accounts` 에 행이 없다(이메일 문자열 비교였다면 여기서 막혔을 것이다).
+      const u = h.addUser({ email: 'teststoreowner@example.com' });
+      h.store.creds.set(u.id, `fakehash:${hashToken(GOOD_PW)}`);
+
+      await h.service.setPasswordForUser(u.id, { currentPassword: GOOD_PW, newPassword: 'other999$x' });
+
+      expect(h.store.creds.get(u.id)).toBe(`fakehash:${hashToken('other999$x')}`);
+      const demoSql = h.sql.filter((x) => x.q.includes('demo_accounts'));
+      expect(demoSql.length).toBeGreaterThan(0);
+      // 질의 파라미터는 user_id 다 — 상수 이메일을 코드에서 비교하지 않는다.
+      expect(demoSql.some((x) => x.p[0] === u.id)).toBe(true);
+    });
+  });
+});

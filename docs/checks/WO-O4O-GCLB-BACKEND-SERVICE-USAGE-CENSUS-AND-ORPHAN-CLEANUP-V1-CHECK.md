@@ -61,7 +61,7 @@
 URL map `o4o-global-lb` 의 host rule 11그룹 / pathMatcher 11개를 전수 전개했다. **어떤 hostRule 에도 참조되지 않는 pathMatcher 는 0개**였고, 모든 pathMatcher 는 `pathRules` 없이 `defaultService` 만 갖는 단순 구조였다.
 
 ```text
-136.110.132.35 :443
+[REDACTED_IP] :443
   └─ o4o-global-lb-forwarding-rule-2
        └─ o4o-global-lb-target-proxy-2 (HTTPS, certificateMap=o4o-main-cert-map)
             └─ URL map: o4o-global-lb        [defaultService = backend-neture-web-http]
@@ -155,7 +155,7 @@ LB 를 통하지 않는 Cloud Run: `kpa-branch-web` 27 · `o4o-main-site` 11 · 
 
 | 확인 항목 | 실측 |
 |---|---|
-| 현재 DNS | `siteguide.co.kr` · `www.siteguide.co.kr` → **136.110.132.35** (GCLB) / `api.siteguide.co.kr` → 미해석 |
+| 현재 DNS | `siteguide.co.kr` · `www.siteguide.co.kr` → **[REDACTED_IP]** (GCLB) / `api.siteguide.co.kr` → 미해석 |
 | GCLB 도달 여부 | **도달함** — HTTP 301 → HTTPS 200 |
 | host rule 존재 여부 | **없음** (URL map `o4o-global-lb` 의 hostRules 11그룹 어디에도 siteguide 없음) |
 | fallthrough 대상 | URL map `defaultService` = **`backend-neture-web-http`** → `neture-web` |

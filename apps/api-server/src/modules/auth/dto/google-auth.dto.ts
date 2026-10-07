@@ -53,18 +53,6 @@ export class GoogleSignupRequestDto {
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
 //   GoogleLinkRequestDto 는 은퇴했다 (`currentPassword` 재인증 전제).
 
-/**
- * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15 — Admin Google Bootstrap(전환기 1회용)
- * 세션 없이 호출되는 경로이므로 입력은 `idToken` + 일회용 `bootstrapCode` 뿐이다.
- * 연결 대상 users.id 는 서버가 `platform:super_admin` role 로 결정한다 — 클라이언트가 지정할 수 없다
- * (userId/email/sub/providerId/role 은 whitelist 밖이라 400).
- */
-export class GoogleAdminBootstrapRequestDto {
-  @IsString()
-  @IsNotEmpty()
-  idToken!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  bootstrapCode!: string;
-}
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+//   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+//   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.

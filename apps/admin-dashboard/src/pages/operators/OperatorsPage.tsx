@@ -10,12 +10,13 @@
  *     - 등록 폼의 비밀번호 입력 · 초기 서비스 비밀번호 · 비밀번호 정책 검증
  *     - 행 액션 "서비스 비밀번호 변경" 모달
  *     - `POST /admin/users` 를 통한 신규 계정 생성
- *   대신 두 경로만 남는다:
- *     (A) 기존 Google 사용자 검색·선택 → `POST /admin/operator-assignments` (userId 로 지정)
- *     (B) 미가입자 → `POST /admin/operator-invitations` (이메일 초대 → 본인이 Google 로 수락)
+ *   대신 한 경로만 남는다:
+ *     기존 Google 사용자 검색·선택 → `POST /admin/operator-assignments` (userId 로 지정)
+ *
+ * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 초대 경로(B)는 은퇴했다. 미가입자는 먼저 Google 로 O4O 에 가입한 뒤 지정 대상이 된다.
  *
  * 구조:
- * - 탭: 운영 권한(assignment row) / 초대 대기(operator_invitations)
+ * - 목록: 운영 권한(assignment row) 단일
  * - 행 단위: 1 role_assignment (assignment-row, multi-role 자동 펼침)
  * - DataTable: @o4o/operator-ux-core (selectable, onRowClick → detail drawer)
  * - Bulk Action: ActionBar — 선택된 assignment row 의 role 만 해제 (per-assignment),
@@ -28,7 +29,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle, UserX, Mail, Search, Send, Ban } from 'lucide-react';
+import { Plus, RefreshCw, Shield, Users, X, Check, AlertCircle, UserX, Search } from 'lucide-react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 import { ActionBar, BulkResultModal, RowActionMenu, FilterBar, BaseDetailDrawer } from '@o4o/ui';
@@ -58,16 +59,14 @@ import {
   ASSIGNABLE_ROLES,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
-  findRoleOption,
 } from '@/lib/operator-role-catalog';
 
 
 /**
- * 등록 경로 — 계약이 완전히 다르므로 화면에서 먼저 가른다 (§1).
- *   assign: 이미 O4O 에 있고 Google 이 연결된 사용자에게 지금 권한을 준다(즉시 반영).
- *   invite: 아직 계정이 없는 사람에게 이메일 초대를 보낸다(수락 시점에 권한이 생긴다).
+ * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 경로는 **지정 하나**다.
+ *   이미 O4O 에 있고 Google 이 연결된 사용자에게 권한을 준다(즉시 반영).
+ *   미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다 — 이메일 초대 흐름은 은퇴했다.
  */
-type RegisterMode = 'assign' | 'invite';
 
 /** 지정 후보 — 서버가 Google 연결 여부까지 함께 준다(연결 없으면 지정 대상이 아니다). */
 interface OperatorCandidate {
@@ -76,21 +75,6 @@ interface OperatorCandidate {
   name: string | null;
   hasGoogleLink: boolean;
 }
-
-interface InvitationRow {
-  id: string;
-  invitedEmail: string;
-  serviceKey: string;
-  serviceName: string;
-  role: string;
-  status: 'pending' | 'accepted' | 'cancelled' | string;
-  expiresAt: string;
-  createdAt: string;
-  acceptedAt: string | null;
-  cancelledAt: string | null;
-}
-
-type TabKey = 'assignments' | 'invitations';
 
 interface Facets {
   service: string;
@@ -120,20 +104,10 @@ export default function OperatorsPage() {
   const [detailTarget, setDetailTarget] = useState<AssignmentRow | null>(null);
   const batch = useBatchAction();
 
-  // 탭 — 운영 권한(부여됨) / 초대 대기(아직 Identity 가 확정되지 않음)
-  const [tab, setTab] = useState<TabKey>('assignments');
-
-  // 초대 목록 (§15)
-  const [invitations, setInvitations] = useState<InvitationRow[]>([]);
-  const [invitationsLoading, setInvitationsLoading] = useState(false);
-  const [invitationsError, setInvitationsError] = useState<string | null>(null);
-
   // Create/Edit modal
   const [showModal, setShowModal] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormState>({ email: '', lastName: '', firstName: '', roles: [] });
-  // 등록 모달 상태 — 기본은 '지정'이다. 초대는 "계정이 없을 때" 의 경로다.
-  const [registerMode, setRegisterMode] = useState<RegisterMode>('assign');
   // 대상 서비스는 **기본값 없이 시작**한다. 첫 서비스를 자동 확정하면 관리자가 고르지 않은 서비스로
   // 등록이 나가고(과거 KPA 고정 결함), 화면 표시와 실제 serviceKey 가 어긋날 수 있다.
   const [targetServiceKey, setTargetServiceKey] = useState<string>('');
@@ -143,14 +117,11 @@ export default function OperatorsPage() {
   const [candidates, setCandidates] = useState<OperatorCandidate[]>([]);
   const [candidatesLoading, setCandidatesLoading] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<OperatorCandidate | null>(null);
-  // (B) 초대 경로 — 이메일은 **수락 조건**이지 사람을 찾는 키가 아니다.
-  const [inviteEmail, setInviteEmail] = useState('');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
-    fetchInvitations();
   }, []);
 
   /**
@@ -204,40 +175,10 @@ export default function OperatorsPage() {
     }
   };
 
-  /**
-   * 초대 목록 조회 (§15).
-   * 실패를 "초대 0건" 으로 위장하지 않는다 — 목록 조회와 같은 계약으로 지속 배너를 남긴다.
-   */
-  const fetchInvitations = async () => {
-    try {
-      setInvitationsLoading(true);
-      const response = await authClient.api.get('/admin/operator-invitations');
-      if (response.data?.success === false) {
-        throw new Error(response.data?.error || '초대 목록 조회에 실패했습니다.');
-      }
-      const raw = response.data?.data ?? response.data?.invitations ?? [];
-      if (!Array.isArray(raw)) throw new Error('초대 목록 응답 형식이 올바르지 않습니다.');
-      setInvitations(raw as InvitationRow[]);
-      setInvitationsError(null);
-    } catch (err: any) {
-      setInvitationsError(
-        err?.response?.data?.error || err?.message || '초대 목록을 불러오지 못했습니다.',
-      );
-    } finally {
-      setInvitationsLoading(false);
-    }
-  };
-
   // assignment-row flatMap + operator-only preset filter
   const allRows = useMemo<AssignmentRow[]>(
     () => flattenUsersToAssignments(users).filter((row) => isOperatorRole(row.role)),
     [users],
-  );
-
-  /** 탭 배지는 "아직 처리할 것" 만 센다 — 수락·취소된 초대는 대기가 아니다. */
-  const pendingInvitations = useMemo(
-    () => invitations.filter((i) => i.status === 'pending'),
-    [invitations],
   );
 
   const filteredRows = useMemo<AssignmentRow[]>(() => {
@@ -273,13 +214,11 @@ export default function OperatorsPage() {
   const openCreateModal = () => {
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
-    setRegisterMode('assign');
     setTargetServiceKey('');
     setTargetRole('');
     setCandidateQuery('');
     setCandidates([]);
     setSelectedCandidate(null);
-    setInviteEmail('');
     setFormErrors({});
     setShowModal(true);
   };
@@ -314,7 +253,6 @@ export default function OperatorsPage() {
     setSelectedCandidate(null);
     setCandidates([]);
     setCandidateQuery('');
-    setInviteEmail('');
     setFormErrors({});
   };
 
@@ -364,18 +302,13 @@ export default function OperatorsPage() {
       return Object.keys(errors).length === 0;
     }
 
-    // ── 등록(지정/초대 공통) — 대상 서비스와 역할은 **명시 선택**이어야 한다 ──
+    // ── 등록 — 대상 서비스와 역할은 **명시 선택**이어야 한다 ──
     if (!targetServiceKey) errors.targetService = '대상 서비스를 선택하세요.';
     else if (!targetRole) errors.roles = '역할을 선택하세요.';
 
-    if (registerMode === 'assign') {
-      if (!selectedCandidate) errors.candidate = '대상 사용자를 검색해서 선택하세요.';
-      else if (!selectedCandidate.hasGoogleLink) {
-        errors.candidate = 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 연결을 마친 뒤 지정할 수 있습니다.';
-      }
-    } else {
-      if (!inviteEmail) errors.email = '초대할 이메일을 입력하세요.';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail)) errors.email = '이메일 형식이 올바르지 않습니다.';
+    if (!selectedCandidate) errors.candidate = '대상 사용자를 검색해서 선택하세요.';
+    else if (!selectedCandidate.hasGoogleLink) {
+      errors.candidate = 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 연결을 마친 뒤 지정할 수 있습니다.';
     }
 
     setFormErrors(errors);
@@ -411,8 +344,8 @@ export default function OperatorsPage() {
       const canonicalServiceKey = resolveCanonicalServiceKey(targetServiceKey);
       const serviceLabel = SERVICES[targetServiceKey as keyof typeof SERVICES]?.label ?? targetServiceKey;
 
-      if (registerMode === 'assign') {
-        // (A) 직접 지정 — 대상은 언제나 userId 다.
+      {
+        // 직접 지정 — 대상은 언제나 userId 다.
         const res = await authClient.api.post('/admin/operator-assignments', {
           userId: selectedCandidate!.userId,
           serviceKey: canonicalServiceKey,
@@ -429,21 +362,6 @@ export default function OperatorsPage() {
         }
         closeModal();
         fetchUsers();
-      } else {
-        // (B) 초대 — 이 시점에는 계정도 권한도 만들지 않는다. 초대 1행이 전부다.
-        const res = await authClient.api.post('/admin/operator-invitations', {
-          email: inviteEmail.trim(),
-          serviceKey: canonicalServiceKey,
-          role: targetRole,
-        });
-        if (res?.data?.data?.emailSent === false) {
-          toast.error('초대는 생성됐지만 메일 발송에 실패했습니다. [초대 대기] 탭에서 재전송하세요.');
-        } else {
-          toast.success(`${inviteEmail.trim()} 로 초대 메일을 보냈습니다. 본인이 Google 로 수락하면 권한이 부여됩니다.`);
-        }
-        closeModal();
-        setTab('invitations');
-        fetchInvitations();
       }
     } catch (err: any) {
       const code = err?.response?.data?.code;
@@ -453,41 +371,10 @@ export default function OperatorsPage() {
         setFormErrors((prev) => ({ ...prev, roles: msg }));
       } else if (code === 'USER_NOT_FOUND' || code === 'GOOGLE_LINK_REQUIRED') {
         setFormErrors((prev) => ({ ...prev, candidate: msg }));
-      } else if (code === 'INVITATION_DUPLICATE' || code === 'INVALID_EMAIL') {
-        setFormErrors((prev) => ({ ...prev, email: msg }));
       }
       toast.error(msg);
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  // ─── 초대 재전송 · 취소 (§15) ───
-  const resendInvitation = async (row: InvitationRow) => {
-    try {
-      await authClient.api.post(`/admin/operator-invitations/${row.id}/resend`);
-      toast.success(`${row.invitedEmail} 로 초대를 다시 보냈습니다. 이전 링크는 무효가 됩니다.`);
-      fetchInvitations();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || err?.message || '재전송에 실패했습니다.');
-    }
-  };
-
-  const cancelInvitation = async (row: InvitationRow) => {
-    // 취소는 초대만 무효화한다 — 이미 부여된 권한을 회수하지 않는다는 점을 문구로 분명히 한다.
-    if (
-      !confirm(
-        `${row.invitedEmail} 의 초대를 취소하시겠습니까?\n\n※ 초대 링크만 무효가 되며, 이미 부여된 권한은 이 조작으로 회수되지 않습니다.`,
-      )
-    ) {
-      return;
-    }
-    try {
-      await authClient.api.post(`/admin/operator-invitations/${row.id}/cancel`);
-      toast.success('초대를 취소했습니다.');
-      fetchInvitations();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || err?.message || '취소에 실패했습니다.');
     }
   };
 
@@ -661,31 +548,7 @@ export default function OperatorsPage() {
         <StatCard label="Operator Roles" value={stats.operators} color="text-blue-600" Icon={Shield} />
       </div>
 
-      {/* 탭 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §15
-          "운영 권한" = 이미 부여된 것(role_assignments), "초대 대기" = 아직 사람이 확정되지 않은 것.
-          초대는 계정도 권한도 아니므로 같은 표에 섞지 않는다. */}
-      <div className="mb-4 flex gap-1 border-b border-gray-200">
-        {([
-          { key: 'assignments' as const, label: '운영 권한', count: filteredRows.length },
-          { key: 'invitations' as const, label: '초대 대기', count: pendingInvitations.length },
-        ]).map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setTab(t.key)}
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
-              tab === t.key
-                ? 'border-blue-600 text-blue-700'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {t.label}
-            <span className="ml-1.5 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{t.count}</span>
-          </button>
-        ))}
-      </div>
-
-      {tab === 'assignments' && (
+      {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 대기 탭 은퇴 — 이 화면은 운영 권한(role_assignments) 하나만 보여준다. */}
       <>
       {/* FilterBar */}
       <div className="bg-white rounded-lg border border-gray-200 p-3 mb-4">
@@ -777,118 +640,7 @@ export default function OperatorsPage() {
       />
 
       </>
-      )}
 
-      {/* 초대 대기 탭 (§15) — 재전송 · 취소 */}
-      {tab === 'invitations' && (
-        <div className="rounded-lg border border-gray-200 bg-white">
-          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-900">초대 대기</h2>
-              <p className="mt-0.5 text-xs text-gray-500">
-                초대 시점에는 계정 · 권한이 만들어지지 않습니다. 수신자가 <b>같은 이메일의 Google 계정</b>으로
-                수락할 때 권한이 부여됩니다.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={fetchInvitations}
-              disabled={invitationsLoading}
-              className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              새로고침
-            </button>
-          </div>
-
-          {/* 조회 실패를 "초대 0건" 으로 위장하지 않는다. */}
-          {invitationsError && (
-            <div role="alert" className="m-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-              <p className="font-semibold">초대 목록을 불러오지 못했습니다.</p>
-              <p className="mt-1 break-all">{invitationsError}</p>
-            </div>
-          )}
-
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-4 py-2 font-medium">초대 이메일</th>
-                <th className="px-4 py-2 font-medium">서비스</th>
-                <th className="px-4 py-2 font-medium">역할</th>
-                <th className="px-4 py-2 font-medium">상태</th>
-                <th className="px-4 py-2 font-medium">만료</th>
-                <th className="px-4 py-2 font-medium text-right">작업</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {invitationsLoading && (
-                <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-500">불러오는 중...</td></tr>
-              )}
-              {!invitationsLoading && invitations.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
-                    {invitationsError ? '목록을 불러오지 못해 표시할 수 없습니다.' : '대기 중인 초대가 없습니다.'}
-                  </td>
-                </tr>
-              )}
-              {!invitationsLoading && invitations.map((row) => {
-                const expired = row.status === 'pending' && new Date(row.expiresAt).getTime() <= Date.now();
-                const statusLabel = expired
-                  ? '만료'
-                  : row.status === 'pending' ? '대기'
-                  : row.status === 'accepted' ? '수락됨'
-                  : row.status === 'cancelled' ? '취소됨'
-                  : row.status;
-                return (
-                  <tr key={row.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 break-all text-gray-900">{row.invitedEmail}</td>
-                    <td className="px-4 py-2 text-gray-700">{row.serviceName || row.serviceKey}</td>
-                    <td className="px-4 py-2 font-mono text-xs text-gray-700">{row.role}</td>
-                    <td className="px-4 py-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs ${
-                          expired ? 'bg-amber-100 text-amber-800'
-                            : row.status === 'pending' ? 'bg-blue-100 text-blue-800'
-                            : row.status === 'accepted' ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {statusLabel}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 text-xs text-gray-500">
-                      {new Date(row.expiresAt).toLocaleString('ko-KR')}
-                    </td>
-                    <td className="px-4 py-2">
-                      <div className="flex justify-end gap-2">
-                        {/* 수락 · 취소된 초대는 되살리지 않는다(서버도 거부한다). */}
-                        <button
-                          type="button"
-                          onClick={() => resendInvitation(row)}
-                          disabled={row.status !== 'pending'}
-                          className="flex items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-40"
-                        >
-                          <Send className="h-3.5 w-3.5" />
-                          재전송
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => cancelInvitation(row)}
-                          disabled={row.status !== 'pending'}
-                          className="flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs text-red-700 hover:bg-red-50 disabled:opacity-40"
-                        >
-                          <Ban className="h-3.5 w-3.5" />
-                          취소
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {/* Bulk 결과 모달 */}
       <BulkResultModal
@@ -978,7 +730,7 @@ export default function OperatorsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {editingUserId ? '운영자 편집' : '서비스 운영자 지정 · 초대'}
+                {editingUserId ? '운영자 편집' : '서비스 운영자 지정'}
               </h2>
               <button onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />
@@ -986,47 +738,13 @@ export default function OperatorsPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {/* 등록 유형 — WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1
-                  두 경로는 계약이 다르다(신규=계정+credential 생성 / 기존=권한 추가, 기존 credential 유지).
-                  화면에서 먼저 갈라 관리자가 무엇이 일어나는지 알고 진행하게 한다. */}
-              {!editingUserId && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">등록 유형</label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {([
-                      { key: 'assign' as const, title: '기존 사용자 지정', desc: '이미 가입하고 Google 이 연결된 사용자를 검색해 선택합니다. 선택 즉시 권한이 부여됩니다.' },
-                      { key: 'invite' as const, title: '초대 (미가입자)', desc: '이메일로 초대를 보냅니다. 본인이 Google 로 수락하는 시점에 계정과 권한이 만들어집니다.' },
-                    ]).map((opt) => (
-                      <label
-                        key={opt.key}
-                        className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
-                          registerMode === opt.key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="register-mode"
-                          checked={registerMode === opt.key}
-                          onChange={() => {
-                            setRegisterMode(opt.key);
-                            setFormErrors({});
-                          }}
-                          className="mt-0.5 text-blue-600"
-                        />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{opt.title}</div>
-                          <div className="text-xs text-gray-500">{opt.desc}</div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 등록 유형 선택 은퇴 — 경로는 "기존 사용자 지정" 하나다.
+                  미가입자는 먼저 Google 로 가입한 뒤 지정 대상이 된다. */}
 
               {/* 대상 —
                   WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §1·§5·§7
                   (A) 지정: 사람을 **검색해서 고른다**. 전송되는 값은 userId 다(email 은 Identity Key 가 아니다).
-                  (B) 초대: 이메일은 사람을 찾는 키가 아니라 **수락 조건**이다. */}
+                  전송되는 값은 userId 다(email 은 Identity Key 가 아니다). */}
               {editingUserId ? (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -1037,7 +755,7 @@ export default function OperatorsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100"
                   />
                 </div>
-              ) : registerMode === 'assign' ? (
+              ) : (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     대상 사용자 <span className="text-red-500">*</span>
@@ -1118,32 +836,7 @@ export default function OperatorsPage() {
                     </p>
                   )}
                   <p className="mt-1 text-xs text-slate-500">
-                    검색 결과에 없다면 아직 가입하지 않은 사람입니다 — <b>초대</b> 경로를 사용하세요.
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    초대할 이메일 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                      formErrors.email ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="operator@example.com"
-                  />
-                  {formErrors.email && (
-                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {formErrors.email}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-slate-500">
-                    초대 메일에는 <b>비밀번호가 포함되지 않습니다.</b> 수신자가 <b>같은 이메일의 Google 계정</b>으로
-                    수락해야 권한이 부여됩니다. 이 단계에서는 계정도 권한도 만들어지지 않습니다.
+                    검색 결과에 없다면 아직 가입하지 않은 사람입니다 — 대상자가 <b>Google 로 O4O 에 가입</b>한 뒤 지정하세요.
                   </p>
                 </div>
               )}
@@ -1371,7 +1064,7 @@ export default function OperatorsPage() {
                     || (!editingUserId
                         && (!targetServiceKey
                             || !targetRole
-                            || (registerMode === 'assign' && !selectedCandidate?.hasGoogleLink)))
+                            || !selectedCandidate?.hasGoogleLink))
                   }
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                 >
@@ -1383,7 +1076,7 @@ export default function OperatorsPage() {
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      {editingUserId ? '운영자 수정' : registerMode === 'assign' ? '권한 부여' : '초대 메일 보내기'}
+                      {editingUserId ? '운영자 수정' : '권한 부여'}
                     </>
                   )}
                 </button>

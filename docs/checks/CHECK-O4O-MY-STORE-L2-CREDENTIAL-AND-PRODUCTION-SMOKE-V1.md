@@ -31,10 +31,10 @@ serviceKey 없음                   → V1 fallback
 
 | 계정 | membership | service_credentials | store_owner role | 매장 org | L2 로그인 가능 |
 |---|---|---|---|---|:---:|
-| `renagang21@gmail.com` | kpa-society·k-cosmetics·pharmacy-hub·neture·platform (전부 active) | **5건 전부 존재 · L1과 상이** | kpa·cosmetics·pharmacy-hub **4종** | 테스트 약국 / 테스트 뷰티샵 / 네뚜레 공급자 | ❌ (비밀번호 불명) |
-| `sohae2100@gmail.com` | 6개 active | 4건 존재 · L1과 상이 | kpa 만 | Sohae 약국 | ❌ |
-| `sohae21@naver.com` | — | 2건 | — | — | ❌ (users.status=`deleted`) |
-| `renariver21@gmail.com` | platform 만 | **0건** | 없음 | 없음 | ✅ (credential 부재 → L1 fallback) |
+| `[REDACTED_EMAIL_B]` | kpa-society·k-cosmetics·pharmacy-hub·neture·platform (전부 active) | **5건 전부 존재 · L1과 상이** | kpa·cosmetics·pharmacy-hub **4종** | 테스트 약국 / 테스트 뷰티샵 / 네뚜레 공급자 | ❌ (비밀번호 불명) |
+| `[REDACTED_EMAIL_A]` | 6개 active | 4건 존재 · L1과 상이 | kpa 만 | Sohae 약국 | ❌ |
+| `[REDACTED_EMAIL_C]` | — | 2건 | — | — | ❌ (users.status=`deleted`) |
+| `[REDACTED_EMAIL_D]` | platform 만 | **0건** | 없음 | 없음 | ✅ (credential 부재 → L1 fallback) |
 
 > `renariver21` 의 "L2 `neture` 200" 은 credential 부재로 인한 **L1 fallback** 임이 확정됐다
 > (기존 문서의 "확정하지 않았다" 관찰 메모 해소).

@@ -5,11 +5,8 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import {
-  GoogleAdminBootstrapRequestDto,
-  GoogleLoginRequestDto,
-  GoogleSignupRequestDto,
-} from '../google-auth.dto.js';
+import * as GoogleAuthDto from '../google-auth.dto.js';
+import { GoogleLoginRequestDto, GoogleSignupRequestDto } from '../google-auth.dto.js';
 
 const OPTS = { whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: false } as const;
 const run = (cls: any, body: unknown) => validate(plainToInstance(cls, body), OPTS);
@@ -37,14 +34,16 @@ describe('Google auth DTO — 입력 계약', () => {
     }
   });
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: GoogleLinkRequestDto(currentPassword 재인증) 계약은 은퇴했다.
-  it('bootstrap-admin: { idToken, bootstrapCode } 만 허용 — 대상 지정 필드는 400 (WO §15)', async () => {
-    expect(await run(GoogleAdminBootstrapRequestDto, { idToken: 't', bootstrapCode: 'c' })).toHaveLength(0);
-    expect((await run(GoogleAdminBootstrapRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
-    expect((await run(GoogleAdminBootstrapRequestDto, { bootstrapCode: 'c' })).length).toBeGreaterThan(0);
-    expect((await run(GoogleAdminBootstrapRequestDto, { idToken: 't', bootstrapCode: '' })).length).toBeGreaterThan(0);
-    for (const field of ['userId', 'email', 'sub', 'providerId', 'role', 'serviceKey', 'currentPassword']) {
-      const errors = await run(GoogleAdminBootstrapRequestDto, { idToken: 't', bootstrapCode: 'c', [field]: 'x' });
-      expect(errors.some((e) => e.property === field && e.constraints?.whitelistValidation)).toBe(true);
-    }
+  /**
+   * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — 계약 반전
+   *   구 계약은 `GoogleAdminBootstrapRequestDto` 의 입력 whitelist 를 고정했다.
+   *   Admin Google Bootstrap 경로가 은퇴해 DTO 자체가 사라졌으므로 **부재**를 고정한다.
+   *   세션 없이 열리는 연결 경로가 다시 생기면 여기서 먼저 깨진다.
+   */
+  it('bootstrap-admin DTO 가 없다 (전환기 1회용 경로 은퇴)', () => {
+    expect('GoogleAdminBootstrapRequestDto' in GoogleAuthDto).toBe(false);
+    // 로그인·가입 DTO 는 그대로 있어야 한다(은퇴가 본체로 번지지 않았다).
+    expect('GoogleLoginRequestDto' in GoogleAuthDto).toBe(true);
+    expect('GoogleSignupRequestDto' in GoogleAuthDto).toBe(true);
   });
 });

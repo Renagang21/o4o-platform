@@ -168,8 +168,8 @@ E2E 8항목 + W1 잔여 1항목이 여기서 막혔다.
 ```
 GET /api/v1/kpa-branch/branches/namgu/me/annual-report
   미인증                → 401
-  sohae2100@gmail.com   → 403   (kpa:admin·neture:admin 등 타 서비스 admin 다수 보유)
-  renagang21@gmail.com  → 403
+  [REDACTED_EMAIL_A]   → 403   (kpa:admin·neture:admin 등 타 서비스 admin 다수 보유)
+  [REDACTED_EMAIL_B]  → 403
 ```
 
 → **E2E 12 PASS.** `blockedServicePrefixes` 가 서비스 간 권한 누수를 막고 있음이 실증됐다.
@@ -180,32 +180,32 @@ GET /api/v1/kpa-branch/branches/namgu/me/annual-report
 
 | 계정 | 역할 | 목적 |
 |---|---|---|
-| `renagang21@gmail.com` | `kpa-branch:member` | E2E 1·2·3·5·6·10·11 (일반 회원 경로 · 기간 외 제출 차단) |
-| `sohae2100@gmail.com` | `kpa-branch:operator` | E2E 7·8 (정상 제출 — 기간 외 예외) + W1 잔여 operator 200 smoke |
+| `[REDACTED_EMAIL_B]` | `kpa-branch:member` | E2E 1·2·3·5·6·10·11 (일반 회원 경로 · 기간 외 제출 차단) |
+| `[REDACTED_EMAIL_A]` | `kpa-branch:operator` | E2E 7·8 (정상 제출 — 기간 외 예외) + W1 잔여 operator 200 smoke |
 
 ```sql
 -- 1) 서비스 접근
 INSERT INTO service_memberships (user_id, service_key, status, role)
 SELECT u.id, 'kpa-branch', 'active', 'user' FROM users u
- WHERE u.email IN ('renagang21@gmail.com','sohae2100@gmail.com')
+ WHERE u.email IN ('[REDACTED_EMAIL_B]','[REDACTED_EMAIL_A]')
    AND NOT EXISTS (SELECT 1 FROM service_memberships s
                     WHERE s.user_id=u.id AND s.service_key='kpa-branch');
 
 -- 2) 서비스 역할
 INSERT INTO role_assignments (user_id, role, is_active, scope_type)
 SELECT u.id,
-       CASE WHEN u.email='sohae2100@gmail.com' THEN 'kpa-branch:operator'
+       CASE WHEN u.email='[REDACTED_EMAIL_A]' THEN 'kpa-branch:operator'
             ELSE 'kpa-branch:member' END,
        true, 'global'
   FROM users u
- WHERE u.email IN ('renagang21@gmail.com','sohae2100@gmail.com');
+ WHERE u.email IN ('[REDACTED_EMAIL_B]','[REDACTED_EMAIL_A]');
 
 -- 3) 분회 소속
 INSERT INTO branch_memberships (user_id, organization_id, status, joined_at, note)
 SELECT u.id, 'ba1e90a6-ae34-46b7-8134-07669b51a2fa', 'active', now(),
        'WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1 검증계정'
   FROM users u
- WHERE u.email IN ('renagang21@gmail.com','sohae2100@gmail.com')
+ WHERE u.email IN ('[REDACTED_EMAIL_B]','[REDACTED_EMAIL_A]')
    AND NOT EXISTS (SELECT 1 FROM branch_memberships b
                     WHERE b.user_id=u.id AND b.status='active');
 ```

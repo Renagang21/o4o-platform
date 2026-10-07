@@ -406,7 +406,7 @@ Deploy API Server · Deploy Web Services · Deploy Admin Dashboard · CodeQL 모
 
 ## A-3. 인증 — 우회 조성 없음
 
-계정 `renagang21@gmail.com` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNTS.local.md`).
+계정 `[REDACTED_EMAIL_B]` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNTS.local.md`).
 **임시 계정 생성 0 · self-grant 0 · role 변경 0 · membership 생성 0 · DB 직접 수정 0.**
 
 발급 토큰의 roles 에 `kpa:store_owner` · `cosmetics:store_owner`
@@ -493,7 +493,7 @@ MY STORE RUNTIME CONTRACT PRODUCTION E2E = CLOSED
 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 실측 불일치 2건. **본 WO 범위 밖이라 수정하지 않고 보고만 한다.**
 
 1. K-Cosmetics serviceKey 표기가 `cosmetics` 로 되어 있으나 실제 membership 은 `k-cosmetics`.
-2. `renagang21@gmail.com` 의 pharmacy-hub 서비스 credential 이 문서 값과 불일치 (401).
+2. `[REDACTED_EMAIL_B]` 의 pharmacy-hub 서비스 credential 이 문서 값과 불일치 (401).
 
 ## A-7. production DB 순변화
 

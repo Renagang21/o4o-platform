@@ -14,7 +14,7 @@
 
 ## 2. 검증 계정
 
-- `sohae2100@gmail.com` (roles 에 `platform:super_admin` 포함). httpOnly 쿠키 인증.
+- `[REDACTED_EMAIL_A]` (roles 에 `platform:super_admin` 포함). httpOnly 쿠키 인증.
 - pure 비-platform 계정 부재 → negative guard 미검증(코드상 PlatformRoute+requireRole). 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(gitignore) transient 사용 — 본 문서 미기재.
 
 ## 3. 검증 결과 (`GET /api/v1/admin/platform-users`)

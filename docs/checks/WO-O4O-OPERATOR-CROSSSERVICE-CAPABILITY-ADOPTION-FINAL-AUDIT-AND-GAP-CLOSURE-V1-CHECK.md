@@ -122,7 +122,7 @@
 
 - 방식: headless Chromium(Playwright) 실로그인 → 서비스별 운영자 메뉴 **전 경로 직접 방문**(deep link) + hard load.
   sidebar DOM 열거는 다항목 그룹이 기본 접힘이라 과소보고되므로 **config 기준 전 경로 열거**로 수행.
-- 계정: 실 운영자 계정(`sohae2100@gmail.com`) — 4 공식 서비스.
+- 계정: 실 운영자 계정(`[REDACTED_EMAIL_A]`) — 4 공식 서비스.
 - 판정: white screen(main 텍스트 40자 미만) / placeholder(준비 중·Coming Soon) / 예기치 않은 4xx·5xx / JS exception / 리다이렉트 이탈.
 
 ### 5-1. 경로 방문 결과

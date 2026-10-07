@@ -28,7 +28,7 @@ import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../module
 
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
-const TRANSLATIONS_DIR = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations');
+const TRANSLATIONS_DIR = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations');
 
 // query() RETURNING 정규화(Gotcha #3): [rows, affected] | rows | [].
 const retRows = <T = { id?: string }>(res: unknown): T[] =>

@@ -54,7 +54,7 @@ store 모달과 동일 CSS(`.ccg-*`, `<style>` 1회 주입). `width: min(720px, 
 
 - Web 배포(Cloud Run) success (커밋 b708eceb4 포함 HEAD).
 
-## 브라우저 smoke (kpa-society.co.kr, KPA operator = sohae2100@gmail.com)
+## 브라우저 smoke (kpa-society.co.kr, KPA operator = [REDACTED_EMAIL_A])
 
 > 회원이 점유 중이던 브라우저를 닫아 프로필이 해제된 뒤 operator 라이브 smoke 완료.
 

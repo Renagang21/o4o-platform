@@ -9,22 +9,25 @@
 
 import type { DataSource } from 'typeorm';
 import type { Request, Response, NextFunction } from 'express';
+import {
+  resolveSupplierIdForUser,
+  readOrganizationContext,
+} from '../modules/neture/middleware/supplier-context.resolver.js';
 
 /**
- * neture_suppliers 기반 supplier 연결 확인
+ * supplier 연결 확인
+ * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+ *   `neture_suppliers.user_id LIMIT 1` → canonical resolver(organization_members owner) 재사용.
  */
 export async function resolveSupplier(
   dataSource: DataSource,
-  userId: string
+  userId: string,
+  requestedOrganizationId: string | null = null,
 ): Promise<{ isSupplier: boolean; supplierId: string | null }> {
-  const rows = await dataSource.query(
-    `SELECT id FROM neture_suppliers WHERE user_id = $1 LIMIT 1`,
-    [userId]
-  );
-  if (rows.length > 0) {
-    return { isSupplier: true, supplierId: rows[0].id };
-  }
-  return { isSupplier: false, supplierId: null };
+  const resolved = await resolveSupplierIdForUser(dataSource, userId, requestedOrganizationId);
+  return resolved
+    ? { isSupplier: true, supplierId: resolved.supplierId }
+    : { isSupplier: false, supplierId: null };
 }
 
 /**
@@ -43,7 +46,7 @@ export function createRequireSupplier(dataSource: DataSource) {
       return;
     }
 
-    const { isSupplier, supplierId } = await resolveSupplier(dataSource, user.id);
+    const { isSupplier, supplierId } = await resolveSupplier(dataSource, user.id, readOrganizationContext(req));
     if (isSupplier && supplierId) {
       (req as any).supplierId = supplierId;
       next();

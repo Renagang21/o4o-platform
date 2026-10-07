@@ -94,7 +94,7 @@ organization_members (owner|admin|manager, left_at IS NULL)
 | `PATCH /pharmacy-hub/store-owner/info` (토큰 없음) | 401 |
 | 로그아웃 후 `GET .../info` | 401 |
 
-### 3-2. 미연결 계정 (`renagang21@gmail.com` — PH enrollment 0, 타 서비스 조직 3개 보유)
+### 3-2. 미연결 계정 (`[REDACTED_EMAIL_B]` — PH enrollment 0, 타 서비스 조직 3개 보유)
 
 | 검증 | 결과 |
 |------|:----:|

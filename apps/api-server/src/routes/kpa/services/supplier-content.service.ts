@@ -45,7 +45,33 @@ export interface SubmitContentData {
   organizationId?: string;
   /** cms_contents."serviceKey" 물리 키 (canonical→물리 매핑은 호출측 책임). 기본 'kpa'. */
   serviceKey?: string;
+  /**
+   * WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1 — handoff 멱등성.
+   *
+   * 원본 자료의 출처. 주어지면 **같은 출처 + 같은 serviceKey 의 살아 있는 수신 행이
+   * 1개를 넘지 않도록** 보장한다(이미 있으면 새로 만들지 않고 그 행을 돌려준다).
+   * 주어지지 않으면 기존 동작 그대로 — 매 호출이 새 제출이다(KPA 직접 제출 경로 무회귀).
+   *
+   * 저장 위치는 `cms_contents.metadata` 로, 새 원장·새 컬럼을 만들지 않는다(migration 0).
+   */
+  sourceRef?: {
+    /** 출처 종류. 현재 유일한 값은 Supplier Library 원장이다. */
+    kind: 'supplier_library_item';
+    /** `neture_supplier_library_items.id` */
+    id: string;
+    /** 참고용 — 소유 공급자. 멱등 키에는 넣지 않는다(같은 자료의 소유자는 하나다). */
+    supplierId?: string;
+  };
 }
+
+/**
+ * 재제공을 허용하는 수신 상태.
+ *
+ * `archived` = 서비스 운영자가 내린 상태다. 이때는 공급자가 다시 제공할 수 있어야 하므로
+ * 멱등 판정에서 제외한다. `draft` · `pending` · `published` 는 살아 있는 수신으로 보고
+ * 중복 생성을 막는다. (상태 어휘는 migration 20260224700000 의 CHECK 제약과 같다.)
+ */
+const HANDOFF_REUSABLE_STATUS = 'archived';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -80,16 +106,54 @@ export class SupplierContentService {
     await qr.startTransaction();
 
     try {
+      // WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+      //   출처가 주어졌으면 **같은 출처 + 같은 serviceKey 의 중복 수신을 만들지 않는다.**
+      //   check-then-insert 는 그 자체로는 동시 요청에 안전하지 않다(막을 행이 아직 없어
+      //   잠글 대상도 없다). 그래서 이 트랜잭션에 advisory lock 을 걸어 같은 (출처, 서비스)
+      //   조합을 직렬화한다 — unique index 를 만들지 않고 migration 0 으로 해결한다.
+      if (data.sourceRef?.id) {
+        const lockKey = `${data.sourceRef.kind}:${data.sourceRef.id}:${serviceKey}`;
+        await qr.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [lockKey]);
+
+        const existing = await qr.query(
+          `SELECT id, title, status
+             FROM cms_contents
+            WHERE "serviceKey" = $1
+              AND metadata->'sourceRef'->>'kind' = $2
+              AND metadata->'sourceRef'->>'id'   = $3
+              AND status <> $4
+            ORDER BY "createdAt" ASC
+            LIMIT 1`,
+          [serviceKey, data.sourceRef.kind, data.sourceRef.id, HANDOFF_REUSABLE_STATUS],
+        );
+
+        if (existing[0]) {
+          // 아무것도 쓰지 않았다 — 열어둔 트랜잭션을 닫고 기존 수신을 그대로 돌려준다.
+          await qr.rollbackTransaction();
+          return {
+            data: {
+              approvalRequestId: null,
+              contentId: existing[0].id,
+              title: existing[0].title,
+              status: existing[0].status,
+              serviceKey,
+              /** 새로 만들지 않고 기존 수신을 재사용했다 — 호출측이 사용자에게 구분해 알릴 수 있다. */
+              reused: true,
+            },
+          };
+        }
+      }
+
       // 1. cms_contents INSERT
       const [cms] = await qr.query(
         `INSERT INTO cms_contents
            (id, "serviceKey", "organizationId", type, title, summary, body,
             "imageUrl", "linkUrl", status, "authorRole", "visibilityScope",
-            "createdBy", "createdAt", "updatedAt")
+            "createdBy", metadata, "createdAt", "updatedAt")
          VALUES
            (gen_random_uuid(), $1, $2, $3, $4, $5, $6,
             $7, $8, 'pending', 'supplier', 'service',
-            $9, NOW(), NOW())
+            $9, $10, NOW(), NOW())
          RETURNING id, title, status`,
         [
           serviceKey,
@@ -101,6 +165,9 @@ export class SupplierContentService {
           data.imageUrl?.trim() || null,
           data.linkUrl?.trim() || null,
           userId,
+          // metadata 는 NOT NULL DEFAULT '{}' 다 — 출처가 없으면 빈 객체를 그대로 넣는다.
+          // jsonb 연산자 없이 문자열 파라미터로 대입한다(컬럼 물리 타입을 코드에서 단정하지 않는다).
+          JSON.stringify(data.sourceRef?.id ? { sourceRef: data.sourceRef } : {}),
         ],
       );
 

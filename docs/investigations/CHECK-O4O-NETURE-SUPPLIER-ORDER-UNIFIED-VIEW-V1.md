@@ -57,7 +57,7 @@
 | 권한 없는 요청(no token) | `AUTH_REQUIRED` 차단 |
 | 스키마 정합 fix 전 | 500(`neture_order_items does not exist`) → fix 후 정상 (회귀 검증됨) |
 
-- smoke 계정: `sohae21@naver.com`(쓰리라이프존), `renagang21@gmail.com`(테스트공급자) — 둘 다 linked Neture supplier. 현재 두 계정 모두 **주문 0건**이라 행 렌더는 라이브 데이터로 시각 확인하지 못함(쿼리 실행·응답 스키마·필터·권한·degrade 는 검증). 주문 보유 공급자 확보 시 행 매핑(배지/itemsPreview/canFulfill) 추가 확인 권장.
+- smoke 계정: `[REDACTED_EMAIL_C]`(쓰리라이프존), `[REDACTED_EMAIL_B]`(테스트공급자) — 둘 다 linked Neture supplier. 현재 두 계정 모두 **주문 0건**이라 행 렌더는 라이브 데이터로 시각 확인하지 못함(쿼리 실행·응답 스키마·필터·권한·degrade 는 검증). 주문 보유 공급자 확보 시 행 매핑(배지/itemsPreview/canFulfill) 추가 확인 권장.
 - read-only: 데이터 변경 없음(조회 전용 endpoint).
 
 ---

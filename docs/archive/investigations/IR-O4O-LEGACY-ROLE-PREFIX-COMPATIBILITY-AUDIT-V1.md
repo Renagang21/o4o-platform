@@ -117,7 +117,7 @@ if (!scope.isPlatformAdmin && scope.serviceKeys.length === 0) {
 ### Scenario A — 운영 계정 serviceScope 오판정 (실증됨)
 
 ```
-sohae2100@gmail.com 역할:
+[REDACTED_EMAIL_A] 역할:
 
 extractServiceScope() 처리:
   isPlatformAdmin(['super_admin', ...]) → FALSE (platform: 없음)

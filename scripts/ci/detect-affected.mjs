@@ -57,8 +57,8 @@
  *     - 변경 전체가 `docs/**` 안
  *     - 상태가 A(추가) · M(수정) 뿐 — 삭제 · 이동은 기록물 존재를 단언하는
  *       정적 spec 이 있으므로 기존 full fallback 유지
- *     - 확장자가 `.md` 뿐 — `docs/checks/data/**` 의 JSON fixture 처럼
- *       **코드·테스트가 읽는 데이터 자산**은 문서가 아니다
+ *     - 확장자가 `.md` 뿐 — JSON fixture 처럼 **코드·테스트가 읽는 데이터 자산**은 문서가 아니다
+ *       (docs 안의 데이터는 2026-10-03 `apps/api-server/src/scripts/data/` 로 분리됐지만 규칙은 유지한다)
  *     - 경로에 `data/` 세그먼트가 없음 (같은 이유의 보수적 여유)
  *   나머지는 전부 기존 경로다. 애매하면 full CI 한 번을 선택한다.
  */
@@ -119,6 +119,35 @@ const GLOBAL_PREFIXES = [
 
 /** 추가·수정일 때 중립으로 취급하는 경로 (삭제·이동은 중립이 아니다). */
 const NEUTRAL_PREFIXES = ['docs/'];
+
+/**
+ * WO-O4O-CICD-PRODUCTION-STATE-RECONCILIATION-AND-LEVEL3-RULE-PRECISION-V1 §12 · §13 — **배포 축 전용** NON_RUNTIME_GLOBAL.
+ * workspace 매핑이 없는 root 경로 중 어떤 이미지 · 빌드 컨텍스트 · runtime 에도 닿지 않는 것만 (census 근거: Dockerfile 은
+ * 서비스 · package 디렉터리만 COPY, API 이미지는 dist bundle 만). 이 목록 밖의 매핑 없는 경로는 종전대로 전 서비스 fallback(UNKNOWN).
+ * 빌드 컨텍스트(.dockerignore · .gcloudignore) · checkout 바이트(.gitattributes) · env · _generated 는 의도적으로 넣지 않는다.
+ * CI 축(classify)의 full fallback 은 건드리지 않는다.
+ */
+const NON_RUNTIME_GLOBAL_EXACT = new Set([
+  '.gitignore',
+  '.editorconfig',
+  '.lighthouserc.json',
+  'sonar-project.properties',
+  'start-chrome-debug.sh',
+]);
+const NON_RUNTIME_GLOBAL_PREFIXES = [
+  '.claude/',
+  '.playwright-mcp/',
+  '.idx/',
+  // 배포 · 소스 은퇴한 앱 디렉터리 — workspace 에서 빠져 매핑이 없지만 어떤 Dockerfile 도 COPY 하지 않는다.
+  // 없으면 소스 삭제 diff 가 "매핑 불가" 로 전 서비스 fallback 배포가 된다 (WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1).
+  'services/signage-player-web/',
+];
+/** root 최상위 문서(README · AGENTS · CLAUDE · SETUP · CHANGELOG) · root 로컬 도구 스크립트(*.cmd) */
+const NON_RUNTIME_GLOBAL_ROOT = /^[^/]+\.(md|cmd)$/i;
+
+export function isNonRuntimeGlobal(file) {
+  return NON_RUNTIME_GLOBAL_EXACT.has(file) || hasPrefix(file, NON_RUNTIME_GLOBAL_PREFIXES) || NON_RUNTIME_GLOBAL_ROOT.test(file);
+}
 
 /** docs fast path 대상 확장자 — Markdown 문서만. */
 const DOCS_FAST_EXTENSIONS = ['.md'];
@@ -274,8 +303,7 @@ export function workspaceDirOf(graph, filePath) {
  *   docs_only          변경 전체가 `docs/**` 안
  *   docs_fast_eligible docs_only + 상태 A/M + 확장자 `.md` + data 세그먼트 없음
  *
- * `.md` 가 아니거나(예: `docs/checks/data/**.json` guard fixture,
- * `docs/guides/.../translations/*.json`) 삭제·이동이면 fast 대상이 아니다.
+ * `.md` 가 아니거나(예: docs 에 다시 들어온 JSON fixture · 번역 JSON) 삭제·이동이면 fast 대상이 아니다.
  * 이 경우 docs_only 는 참일 수 있지만 docs_fast_eligible 은 거짓이며,
  * 호출자는 기존 full 경로를 그대로 탄다.
  *
@@ -494,10 +522,10 @@ export function classify(changedFiles, graph, opts = {}) {
  *   api_deploy_affected — production **image/runtime/schema** 가 바뀌는가
  *
  * 후자가 거짓이면 Docker build/push · Cloud Run migration Job 실행 ·
- * 새 revision · one-off job image 재고정이 **전부 불필요한 프로덕션 작업**이다.
+ * 새 revision 이 **전부 불필요한 프로덕션 작업**이다.
  *
  * production image 실측 구성 (Dockerfile · tsup.config.ts · deploy-api.yml 조사):
- *   dist/main.js · dist/migrate.js · one-off job entry 7개 (tsup 번들)
+ *   dist/main.js · dist/migrate.js (tsup 번들)
  *   dist/database/** (tsc 산출 migration + migration-config)
  *   src/assets/** · packages/mail-core/templates/email
  * 이 중 어디에도 test 파일은 들어가지 않는다.
@@ -530,7 +558,7 @@ const API_NON_DEPLOY_PATTERNS = [
  * 조사 근거(census):
  *   - `apps/api-server/tsconfig.build.json` 이 `*.spec.ts` · `*.test.ts` ·
  *     `src/__tests__/**` 를 exclude 한다 → tsc migration 산출물에 없다.
- *   - `tsup.config.ts` entry 9개(main · migrate · *-job)에서 test 파일로 가는
+ *   - `tsup.config.ts` entry 2개(main · migrate)에서 test 파일로 가는
  *     import 경로가 없다. production source 가 `__tests__`/`tests/` 에서
  *     import 하는 사례 **0건**.
  *   - production source 가 test 파일을 raw text 로 읽는 사례 **0건**
@@ -705,6 +733,10 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
       continue;
     }
 
+    if (isNonRuntimeGlobal(file)) {
+      reasons.push(`non-runtime global(이미지 · 빌드 컨텍스트 밖) — 배포 무영향: ${file}`);
+      continue;
+    }
     const wsDir = workspaceDirOf(graph, file);
     if (!wsDir) {
       affected = true;
@@ -736,13 +768,12 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
  */
 export const WEB_SERVICES = [
   { key: 'neture', dir: 'services/web-neture' },
-  { key: 'k-cosmetics', dir: 'services/web-k-cosmetics' },
   { key: 'kpa-society', dir: 'services/web-kpa-society' },
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub' },
   { key: 'lecture', dir: 'services/web-lecture' },
   { key: 'store', dir: 'services/web-store' },
   { key: 'kpa-branch', dir: 'services/web-kpa-branch' },
-  { key: 'signage-player', dir: 'services/signage-player-web' },
+  // signage-player-web 은 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) — 다시 넣으면 Cloud Run 이 재생성된다.
   { key: 'hospital-pharmacy', dir: 'services/web-hospital-pharmacy' },
 ];
 
@@ -889,6 +920,10 @@ export function classifyWebDeploy(changedFiles, graph, opts = {}) {
       continue;
     }
 
+    if (isNonRuntimeGlobal(file)) {
+      reasons.push(`non-runtime global(이미지 · 빌드 컨텍스트 밖) — Web 이미지 무영향: ${file}`);
+      continue;
+    }
     const wsDir = workspaceDirOf(graph, file);
     if (!wsDir) {
       return allTrue(`Web 판정 불가(workspace 매핑 없음) — 안전 fallback: ${file}`, reasons);
@@ -986,7 +1021,7 @@ export function selectPathGuardSpecs(changedFiles, graph, root = REPO_ROOT) {
  *
  * 문서를 **실제로 읽는** test 는 top-level `src/__tests__/*.spec.ts` 에만 있지 않다.
  * 전수 조사에서 nested test(`src/modules/content-guard/__tests__/liquid-guard.test.ts`)가
- * `docs/checks/data/**` 를 읽는 사례가 확인됐다. 따라서 docs 축 선별은
+ * 당시 `docs/checks/data/**` 를 읽는 사례가 확인됐다(2026-10-03 fixture 는 테스트 옆으로 이동). 따라서 docs 축 선별은
  * `apps/api-server/src` 전체를 재귀로 훑는다.
  *
  * Admin 축(`selectPathGuardSpecs`)의 탐색 범위는 **바꾸지 않는다** —
@@ -1761,6 +1796,8 @@ function main() {
         `api_deploy_affected=${verdict.api_deploy_affected}`,
         // Web 서비스 판정은 workflow output key 와 동일한 이름으로 그대로 내보낸다.
         ...WEB_SERVICES.map((svc) => `${svc.key}=${verdict.web_deploy?.[svc.key] === true}`),
+        // WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P4 — CI 의 Web production build 대상 (배포 판정과 같은 축 · JSON 배열)
+        `web_build_dirs=${JSON.stringify(WEB_SERVICES.filter((svc) => verdict.web_deploy?.[svc.key] === true).map((svc) => svc.dir))}`,
         `docs_only=${verdict.docs_only}`,
         `docs_fast_eligible=${verdict.docs_fast_eligible}`,
         `global_or_unknown=${verdict.global_or_unknown}`,

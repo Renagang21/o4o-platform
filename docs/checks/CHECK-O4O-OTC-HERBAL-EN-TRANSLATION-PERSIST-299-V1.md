@@ -1,7 +1,7 @@
 # CHECK-O4O-OTC-HERBAL-EN-TRANSLATION-PERSIST-299-V1 — 은행엽·포도엽 영문 전개 저장
 
 WO: `WO-O4O-OTC-HERBAL-EN-TRANSLATION-PERSIST-299-V1` · 일자: 2026-07-17 · 상태: **완료 (적용·검증)**
-근거: [HERBAL-CANONICAL-PROMOTION](./CHECK-O4O-OTC-HERBAL-CANONICAL-PROMOTION-299-V1.md) · [TRANSLATION-DRAFTS P6/P7](../guides/products/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md)
+근거: [HERBAL-CANONICAL-PROMOTION](./CHECK-O4O-OTC-HERBAL-CANONICAL-PROMOTION-299-V1.md) · [TRANSLATION-DRAFTS P6/P7](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md)
 
 > **INSERT only 299 (en needs_review).** UPDATE/DELETE **0** · ko canonical 변경 **0** · 단일 TX · 이중 게이트.
 
@@ -17,7 +17,7 @@ WO: `WO-O4O-OTC-HERBAL-EN-TRANSLATION-PERSIST-299-V1` · 일자: 2026-07-17 · �
 
 - 번역 소스: `otc-en-translations-herbal-v1.json`(2건, 공유 파일 미수정 — clobber 방지).
 - 필드: title·usageLabel·efficacy·usage·caution·summaryTable(영문 키). **GMP 푸터는 빌더 상수** 자동(ingredientSelection 번역 불필요). **bodyMarkdown·translatorNote 본문 미삽입.**
-- TEST-LOG 2건: [TRANSLATION-DRAFTS P6(은행엽)/P7(포도엽)](../guides/products/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) — 수치·용량·기간·금기 전건 대조 ✅.
+- TEST-LOG 2건: [TRANSLATION-DRAFTS P6(은행엽)/P7(포도엽)](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/TRANSLATION-DRAFTS-V1.md) — 수치·용량·기간·금기 전건 대조 ✅.
 
 | 그룹 | title | 핵심 수치 대조 |
 |---|---|---|

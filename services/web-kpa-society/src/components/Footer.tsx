@@ -20,7 +20,7 @@ export function Footer() {
     <CommunitySiteFooter
       brand={{
         icon: '💊',
-        name: 'KPA-Society',
+        name: 'O4O 약국',
         tagline: 'AI · 운영자 자료 · 매장 도구를 연결해 작은 약국도 경쟁력을 만듭니다',
         accentColor: '#2563eb',
       }}

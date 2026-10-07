@@ -33,6 +33,8 @@ import {
 import { StoreHubShell, StoreWorkspaceNav, resolveStoreWorkspacePaths, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreHubNavGroup } from '@o4o/store-ui-core';
 import { eventOfferApi } from '../../api/eventOffer';
+import { useAuth } from '../../contexts/AuthContext';
+import { NETURE_COMMERCE_NOTICE_PATH, isNetureCommerceUser } from '../../lib/netureCommerce';
 
 const KPA_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(KPA_SOCIETY_STORE_CONFIG);
 
@@ -111,7 +113,28 @@ export function PharmacyHubLayout() {
     return () => { cancelled = true; };
   }, []);
 
+  const { user } = useAuth();
+  const netureCommerce = isNetureCommerceUser(user);
+
   const groups = useMemo<StoreHubNavGroup[]>(() => {
+    // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국은 옛 이벤트 담기 · 장바구니(kpa-society 회원 전용
+    //   backend) 대신 내 매장의 새 commerce 로 가는 안내 항목 하나를 본다. KPA 회원 메뉴는 그대로.
+    if (netureCommerce) {
+      return HUB_MENU_GROUPS.map(group => ({
+        ...group,
+        items: group.items.flatMap(item => {
+          if (item.key === 'cart') return [];
+          if (item.key !== 'event-offers') return [item];
+          return [{
+            key: 'neture-commerce',
+            label: '주문·이벤트',
+            to: NETURE_COMMERCE_NOTICE_PATH,
+            icon: ShoppingCart,
+            description: '공급 상품 · 이벤트 담기 · 장바구니 · 주문 내역 (내 매장)',
+          }];
+        }),
+      }));
+    }
     if (!activeEventCount || activeEventCount <= 0) return HUB_MENU_GROUPS;
     return HUB_MENU_GROUPS.map(group => ({
       ...group,
@@ -119,7 +142,7 @@ export function PharmacyHubLayout() {
         item.key === 'event-offers' ? { ...item, countBadge: `진행 ${activeEventCount}` } : item,
       ),
     }));
-  }, [activeEventCount]);
+  }, [activeEventCount, netureCommerce]);
 
   // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14 · §19:
   //   Store Hub 를 Store Workspace 상위 구조(Home/내 매장/매장 HUB/내 서비스)에 편입 — 데스크톱·모바일 동일 위치(본문 상단).

@@ -64,7 +64,7 @@ users.password` dual-read 의 **L1 fallback** 으로 성사된다
 
 ## 2. W1 잔여 — operator 200 smoke
 
-`sohae2100@gmail.com` (`kpa-branch:operator`) 로 실측.
+`[REDACTED_EMAIL_A]` (`kpa-branch:operator`) 로 실측.
 
 ```
 GET /branches/namgu/operator/annual-report-templates        200  · 1건 (2026 v1 active)
@@ -111,7 +111,7 @@ W1 §3 의 DB 실측값(`steps=4 / fields=51 / rules=11`)과 API 응답이 일�
 | 4 STEP 렌더 | `01. 약관동의` / `02. 인적사항` / `03. 취업현황` / `04. 기타사항` |
 | STEP 별 표시 필드 수 | 2 / 18 / 11 / 10 (합 41 — 51 중 조건부 숨김 10개 제외) |
 | prefill 화면 반영 | 성명·Email·소속 지부(부산광역시약사회)·소속 분회(남구약사회)·신고년도(2026) |
-| draft 저장 → **실제 새로고침** → 복원 | 입력 `0107477708` → "임시저장했습니다." → `reload()` → 동일 값 복원 ✅ |
+| draft 저장 → **실제 새로고침** → 복원 | 입력 `[REDACTED_PHONE]` → "임시저장했습니다." → `reload()` → 동일 값 복원 ✅ |
 | 제출 버튼 (member · 기간 종료) | 존재하되 **disabled** |
 | 제출완료본 (operator) | "제출이 완료되어 읽기 전용입니다" · 임시저장/제출 버튼 **0개** |
 | console error | 0 (분회 홈페이지 미게시로 인한 API 404 제외) |

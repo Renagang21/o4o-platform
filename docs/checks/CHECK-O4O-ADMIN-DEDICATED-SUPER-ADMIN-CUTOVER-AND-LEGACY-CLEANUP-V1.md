@@ -5,7 +5,7 @@ WO: `WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1`
 
 > # ✅ 2026-07-26 CUTOVER 완료 — 아래 "부분 수행" 결론은 갱신되었다
 >
-> `renariver21@gmail.com` 자격증명이 등록되어 §1 중지 조건이 해소되었고, cutover 전 단계를 완료했다.
+> `[REDACTED_EMAIL_D]` 자격증명이 등록되어 §1 중지 조건이 해소되었고, cutover 전 단계를 완료했다.
 > 상세는 문서 말미 **§10 Cutover 실행 기록 (2026-07-26)** 참조. 아래 §0~§9 는 실행 이전 시점의 조사 기록이다.
 
 ## 0. 결론 — **부분 수행**
@@ -20,8 +20,8 @@ UI 범위만 구현했다. **프로덕션 역할 변경 0 · DB write 0 · migra
 
 ## 1. 새 전용 계정 로그인 — **미확인 (중지 조건 1 해당)**
 
-- `renariver21@gmail.com` 의 비밀번호가 자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)에 **미등재**다.
-  해당 문서는 `sohae2100` / `renagang21` / `sohae21@naver.com` 3계정만 관리한다.
+- `[REDACTED_EMAIL_D]` 의 비밀번호가 자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)에 **미등재**다.
+  해당 문서는 `sohae2100` / `renagang21` / `[REDACTED_EMAIL_C]` 3계정만 관리한다.
 - 따라서 WO 가 선행으로 요구한 "새 전용 계정 로그인·복구 가능성 확인"과 `platform:super_admin` 기능 smoke 를
   **수행할 수 없었다.** 자격증명 추측·probe 는 시도하지 않았다.
 - 중지 조건 "새 전용 계정 로그인이 실패하는 경우"에 해당(= 성공을 실증할 수 없음) → cutover 전체 보류.
@@ -128,9 +128,9 @@ typecheck 기준선은 변경분을 `git stash` 후 재측정해 동일 4건임�
 
 | 계정 | platform:super_admin | legacy super_admin | 비고 |
 |------|:---:|:---:|------|
-| `sohae2100@gmail.com` | ✅ | ❌ | 4개 서비스 admin/operator 겸임. **제거 대상이었으나 미변경** |
+| `[REDACTED_EMAIL_A]` | ✅ | ❌ | 4개 서비스 admin/operator 겸임. **제거 대상이었으나 미변경** |
 | `super-admin@o4o.com` | ✅ | ✅ | bootstrap 시드, memberships 0 |
-| `renariver21@gmail.com` | — | — | **존재 여부 미확인** |
+| `[REDACTED_EMAIL_D]` | — | — | **존재 여부 미확인** |
 
 `platform:admin` 보유자 0명.
 
@@ -150,7 +150,7 @@ typecheck 기준선은 변경분을 `git stash` 후 재측정해 동일 4건임�
    `system-settings`/`integrations`/`tools`/`import-export`/`database` 를 보지 못하는 은폐 해소.
    **legacy 제거의 선행 조건**이기도 하다(이것 없이 legacy 를 걷어내면 해당 메뉴 접근자가 0이 된다).
    frontend 전용·additive 변경이라 위험 낮음.
-2. `renariver21@gmail.com` 자격증명을 `TEST-ACCOUNTS.local.md` 에 등재 → §1 게이트 해소.
+2. `[REDACTED_EMAIL_D]` 자격증명을 `TEST-ACCOUNTS.local.md` 에 등재 → §1 게이트 해소.
 3. 1·2 완료 후 cutover 재시도(부트스트랩 이전 → sohae2100 제거 → legacy 정리) 순서로 수행.
 4. `removeMemberRole` 최후 platform admin 보호 가드
    (`CHECK-O4O-KPA-PLATFORM-SUPER-ADMIN-ROLE-SEPARATION-V1 §9` 와 동일 권고).
@@ -212,13 +212,13 @@ admin 만 실패하는 양상은 **자동화 프로필의 서드파티 쿠키 �
 
 | 계정 | 발견 상태 | 판정 |
 |------|-----------|------|
-| `sohae2100@gmail.com` | `isActive=false` 로 **비활성화됨** | 의도치 않음 → 재활성화 대상 |
-| `renagang21@gmail.com` | `platform:super_admin` **신규 보유** + 비활성 | 의도치 않음 → 회수 대상 |
+| `[REDACTED_EMAIL_A]` | `isActive=false` 로 **비활성화됨** | 의도치 않음 → 재활성화 대상 |
+| `[REDACTED_EMAIL_B]` | `platform:super_admin` **신규 보유** + 비활성 | 의도치 않음 → 회수 대상 |
 
 두 소스(`/admin/platform-accounts`, `/operator/members?all=true`)에서 교차 확인했다.
 사용자 확인 후 목표 상태에 맞춰 교정하는 방향으로 진행했다.
 
-## 10-2. 실행 내역 (actor = `renariver21@gmail.com`, 감사 로그 경로)
+## 10-2. 실행 내역 (actor = `[REDACTED_EMAIL_D]`, 감사 로그 경로)
 
 | # | 작업 | 엔드포인트 | 결과 |
 |---|------|-----------|:---:|
@@ -245,9 +245,9 @@ admin 만 실패하는 양상은 **자동화 프로필의 서드파티 쿠키 �
 
 | 계정 | active | 역할 | 목표 부합 |
 |------|:---:|------|:---:|
-| `renariver21@gmail.com` | ✅ | `platform:super_admin` (1) | ✅ 운영 canonical, 서비스 역할 0 |
-| `sohae2100@gmail.com` | ✅ | 서비스 admin/operator 9종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
-| `renagang21@gmail.com` | ✅ | 서비스 테스트 역할 6종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
+| `[REDACTED_EMAIL_D]` | ✅ | `platform:super_admin` (1) | ✅ 운영 canonical, 서비스 역할 0 |
+| `[REDACTED_EMAIL_A]` | ✅ | 서비스 admin/operator 9종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
+| `[REDACTED_EMAIL_B]` | ✅ | 서비스 테스트 역할 6종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
 | `super-admin@o4o.com` | ✅ | `platform:super_admin` (1) | ✅ 복구용, legacy 제거 |
 
 - `platform:super_admin` **활성 보유자 = 2명** (`renariver21`, `super-admin@o4o.com`)
@@ -256,7 +256,7 @@ admin 만 실패하는 양상은 **자동화 프로필의 서드파티 쿠키 �
 
 ## 10-4. 새 canonical 계정 기능 검증 (cutover 후)
 
-`renariver21@gmail.com` 세션으로 재검증 — 전부 **200**:
+`[REDACTED_EMAIL_D]` 세션으로 재검증 — 전부 **200**:
 `/admin/platform-accounts` · `/admin/users` · `/operator/members?all=true` · `/operator/roles` · `/operator/stores?all=true`
 
 `auth/status` → `authenticated: true`, `roles: ['platform:super_admin']`.
@@ -281,7 +281,7 @@ admin 만 실패하는 양상은 **자동화 프로필의 서드파티 쿠키 �
 - `platform:super_admin` 유지, legacy `super_admin` 제거 완료.
 - 부트스트랩 마이그레이션은 **변경하지 않았다**(안 B) — 실인물 계정을 시드 대상으로 삼으면
   CI/fresh DB 에서 그 계정의 비밀번호·상태를 덮어쓸 위험이 있기 때문이다.
-- 운영 canonical 은 `renariver21@gmail.com` 으로 확정. 로컬 자격 SSOT 에 동일 내용 기재.
+- 운영 canonical 은 `[REDACTED_EMAIL_D]` 으로 확정. 로컬 자격 SSOT 에 동일 내용 기재.
 
 ## 10-7. `AI 질문` 버튼 잔존 재조사 — 소스·번들 모두 clean
 

@@ -6,6 +6,32 @@ import type { AuthRequest } from '../types/auth.js';
 import { Parser } from 'json2csv';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import logger from '../utils/logger.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
+import { AdminRoleEditForbiddenError, applyAdminRoleEdit } from '../services/admin/admin-role-edit.js';
+import { isPlatformAdmin } from '../utils/role.utils.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+  respondDemoAccountForbidden,
+} from '../services/auth/demo-account.service.js';
+import { OperatorRoleContractError } from '../config/operator-role-catalog.js';
+
+/** Admin 역할 편집 요청자 맥락 — 해제 안전장치는 요청자 권한에서 파생한다. */
+function editRequester(req: Request) {
+  const user = (req as AuthRequest).user as { id?: string; roles?: string[] } | undefined;
+  return { id: user?.id, isPlatformSuperAdmin: isPlatformAdmin(user?.roles ?? []) };
+}
+
+/** 역할 편집 경계 위반을 계약 코드로 응답한다(400 ROLE_NOT_ASSIGNABLE · 403 SELF_ROLE_REVOKE_FORBIDDEN · LAST_ADMIN_PROTECTED). */
+function sendRoleEditError(res: Response, error: unknown): boolean {
+  if (error instanceof OperatorRoleContractError || error instanceof AdminRoleEditForbiddenError) {
+    res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
+    return true;
+  }
+  return false;
+}
 
 export class UserManagementController {
   private userRepository: UserRepository;
@@ -145,7 +171,9 @@ export class UserManagementController {
   // Create new user
   createUser = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, firstName, lastName, role, roles, status } = req.body;
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 생성 시 역할을 받지 않는다(`User.roles` 는 비영속
+      //   필드라 종전에도 저장되지 않았다). 서비스 운영자 지정은 `POST /admin/operator-assignments` 만 쓴다.
+      const { email, firstName, lastName, status } = req.body;
 
       // Check if user already exists
       const existingUser = await this.userRepository.findOne({ where: { email } });
@@ -163,7 +191,6 @@ export class UserManagementController {
         email,
         firstName,
         lastName,
-        roles: roles || [role || 'customer'],
         status: status || 'pending'
       });
 
@@ -214,14 +241,23 @@ export class UserManagementController {
         return;
       }
 
+      // Demo 계정 보호(정책 §8 이메일 변경 · role 변경): 어떤 write 보다도 **먼저** 막는다.
+      //   이름 등 나머지 필드만 바꾸는 요청은 판정 질의 없이 종전대로 간다.
+      if ((email && email !== user.email) || Array.isArray(roles)) {
+        if (await demoAccountService.isDemoAccount(user.id)) {
+          respondDemoAccountForbidden(res);
+          return;
+        }
+      }
+
       // Update user fields
       if (email) user.email = email;
       if (firstName !== undefined) user.firstName = firstName;
       if (lastName !== undefined) user.lastName = lastName;
       if (status) user.status = status;
-      if (roles) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        await roleAssignmentService.assignRoles(user.id, roles);
+      // 요청 배열로 덮어쓰지 않는다 — 서비스 운영자 역할만 차이로 추가·해제, 회원 역할 등은 그대로.
+      if (Array.isArray(roles)) {
+        await applyAdminRoleEdit(user.id, roles, editRequester(req));
       }
 
       const updatedUser = await this.userRepository.save(user);
@@ -231,6 +267,7 @@ export class UserManagementController {
         data: updatedUser.toPublicData()
       });
     } catch (error) {
+      if (sendRoleEditError(res, error)) return;
       logger.error('Error updating user:', error);
       res.status(500).json({
         success: false,
@@ -250,6 +287,18 @@ export class UserManagementController {
         res.status(404).json({
           success: false,
           error: 'User not found'
+        });
+        return;
+      }
+
+      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
+      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
+      if (await demoAccountService.isDemoAccount(id)) {
+        res.status(403).json({
+          success: false,
+          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
         });
         return;
       }
@@ -402,13 +451,25 @@ export class UserManagementController {
       const { id } = req.params;
       const { roles } = req.body;
 
-      const user = await this.userRepository.updateUserRoles(id, roles);
+      // 종전 `updateUserRoles`(removeAllRoles → assignRoles) 대신 같은 경계를 쓴다.
+      const user = await this.userRepository.findOne({ where: { id } });
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+      // Demo 계정 보호(정책 §8 role 변경): 역할 편집 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(user.id)) {
+        respondDemoAccountForbidden(res);
+        return;
+      }
+      await applyAdminRoleEdit(user.id, Array.isArray(roles) ? roles : [], editRequester(req));
 
       res.json({
         success: true,
         data: user.toPublicData()
       });
     } catch (error) {
+      if (sendRoleEditError(res, error)) return;
       logger.error('Error updating user roles:', error);
       res.status(500).json({
         success: false,

@@ -40,9 +40,12 @@ module.exports = {
     // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
     //   병원약국 얇은 Domain Core(순수). dist 빌드 전 src 로 매핑해 결정론 테스트에서 소비한다.
     '^@o4o/hospital-pharmacy-core$': '<rootDir>/../../packages/hospital-pharmacy-core/src/index.ts',
+    '^@o4o/file-understanding-core$': '<rootDir>/../../packages/file-understanding-core/src/index.ts',
     // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
     // BaseController 가 에러코드 SSOT 를 @o4o/types 에서 가져오므로 컨트롤러 단위 테스트에 필요하다.
     '^@o4o/types$': '<rootDir>/../../packages/types/src/index.ts',
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일·비밀번호 판정 규칙 정본. dist 는 ESM 이라 src 로 매핑한다.
+    '^@o4o/auth-utils$': '<rootDir>/../../packages/auth-utils/src/index.ts',
     // WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1:
     // channels entity 등록 회귀 테스트는 mock 이 아닌 **실제** entity 클래스로
     // TypeORM metadata 를 build 해야 한다. dist 는 ESM 이라 ts-jest 가 변환하지 못하므로

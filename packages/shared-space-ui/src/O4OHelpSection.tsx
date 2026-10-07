@@ -31,13 +31,7 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
     href: 'https://kpa-society.co.kr/',
     external: true,
   },
-  {
-    serviceKey: 'k-cosmetics',
-    title: 'K-Cosmetics',
-    description: '약국에서 취급할 수 있는 다양한 제품과 판매 확장을 돕는 서비스입니다',
-    href: 'https://www.k-cosmetics.site/',
-    external: true,
-  },
+  // K-Cosmetics(www.k-cosmetics.site)는 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1:
   //   유통참여형 펀딩은 독립 서비스가 아니라 Neture 내부 기능이다. cross-service 카탈로그
   //   ("다른 서비스 보기")에서 제거 — KPA/KCos 매장 측 유통참여형 펀딩 연결 흔적 제거.

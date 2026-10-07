@@ -7,7 +7,7 @@
  *
  * 책임:
  * - 입력 검증 (offerId, serviceKeys 배열)
- * - supplier 계정 연결 확인 (neture_suppliers.user_id)
+ * - supplier 계정 연결 확인 (canonical resolver — organization_members owner)
  * - EventOfferService.createMultiServiceProposal 호출
  * - 서비스별 결과 매핑 (frontend가 서비스별 toast/status 표시)
  *
@@ -24,18 +24,14 @@ import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { EventOfferService } from '../../kpa/services/event-offer.service.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { resolveSupplierIdForUser, readOrganizationContext } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 type AuthMiddleware = RequestHandler;
 
-async function resolveSupplierIdByUser(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const rows = await dataSource.query(
-    `SELECT id FROM neture_suppliers WHERE user_id = $1 LIMIT 1`,
-    [userId],
-  );
-  return rows[0]?.id ?? null;
+// WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `user_id LIMIT 1` → canonical resolver.
+async function resolveSupplierIdByUser(dataSource: DataSource, req: Request): Promise<string | null> {
+  const resolved = await resolveSupplierIdForUser(dataSource, (req as any).user?.id, readOrganizationContext(req));
+  return resolved?.supplierId ?? null;
 }
 
 export function createSupplierEventOfferProposalsController(
@@ -174,7 +170,7 @@ export function createSupplierEventOfferProposalsController(
       }
 
       // 공급자 계정 연결 확인 (UI fast-fail)
-      const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+      const supplierId = await resolveSupplierIdByUser(dataSource, req);
       if (!supplierId) {
         res.status(403).json({
           success: false,
@@ -224,7 +220,7 @@ export function createSupplierEventOfferProposalsController(
         return;
       }
 
-      const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+      const supplierId = await resolveSupplierIdByUser(dataSource, req);
       if (!supplierId) {
         res.status(403).json({
           success: false,

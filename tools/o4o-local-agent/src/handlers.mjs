@@ -43,8 +43,9 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, LocalWorkflowCandidateRepository, LocalWorkRunExperienceRepository, LocalWorkRunContextRepository, LocalWorkRunAssistanceRepository, LocalExperiencePatternRepository, LocalDatasetRepository, DATASET_NAME_RE, FIELD_NAME_RE, WORK_RUN_ID_RE, WORK_RUN_STATUSES, WORKFLOW_CANDIDATE_ID_RE, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
+import { validateContextSaveArgs, validateContextRecallArgs, validateAssistanceRecordArgs, validateExperienceRecallArgs, takeOwnerKey } from './work-assistance.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
 import {
@@ -57,8 +58,9 @@ import {
   validateDomSetInputArgs,
   validateNoArgs,
 } from './browser-dom-limits.mjs';
+import { runDomUnit, validateDomRunUnitArgs } from './browser-dom-unit.mjs';
 
-export const AGENT_VERSION = '0.1.0';
+export const AGENT_VERSION = '0.3.0';
 
 /** 서버 계약(local-agent-protocol.ts)의 action 이름과 반드시 일치해야 한다. */
 export const ACTIONS = {
@@ -85,6 +87,8 @@ export const ACTIONS = {
   DOM_SELECT_OPTION: 'local.browser.dom.select_option',
   DOM_CLICK: 'local.browser.dom.click',
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  // WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1 — 판단이 끝난 짧은 단계 묶음을 이 노드가 이어서 실행(browser-dom-unit.mjs).
+  DOM_RUN_UNIT: 'local.browser.dom.run_unit',
   // WO-O4O-LOCAL-DATA-SQLITE-V0 §35 — 최소 안전 데이터 tool 3개.
   // WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33 — `local.target.prepare#<targetId>`(등재 siteId 또는 appId).
   //   있으면 재사용·활성화 → 없으면 등재 방법으로 열기 → 그래도 안 되면 사용자 요청. 인자 없음.
@@ -102,6 +106,15 @@ export const ACTIONS = {
   DATA_QUERY: 'local.data.query',
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
+  DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
+  DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
+  DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
+  DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
+  // WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 (Experience Model V1 Phase 2)
+  DATA_WORK_RUN_CONTEXT_SAVE: 'local.data.work_run_context_save',
+  DATA_WORK_RUN_CONTEXT_RECALL: 'local.data.work_run_context_recall',
+  DATA_WORK_RUN_ASSISTANCE_RECORD: 'local.data.work_run_assistance_record',
+  DATA_WORK_RUN_EXPERIENCE_RECALL: 'local.data.work_run_experience_recall',
 };
 
 /**
@@ -574,6 +587,7 @@ const DOM_HANDLERS = {
   [ACTIONS.DOM_SELECT_OPTION]: { validate: validateDomSelectOptionArgs },
   [ACTIONS.DOM_CLICK]: { validate: validateDomElementArgs },
   [ACTIONS.DOM_READ_TABLE]: { validate: validateDomReadTableArgs },
+  [ACTIONS.DOM_RUN_UNIT]: { validate: validateDomRunUnitArgs },
 };
 
 /** 확장 응답 봉투 → agent 결과. 성공/실패 어느 쪽이든 필드는 trimDomResult 를 통과한 것뿐이다. */
@@ -606,6 +620,31 @@ async function runDomAction(base, site, args, context) {
     return { status: 'failed', errorCode, data: base0 };
   }
   return domOutcome(site, reply.message);
+}
+
+/**
+ * `local.browser.dom.run_unit` — 단계마다 **단발 action 과 같은 검증 · 같은 실행 경로(runDomAction)**를 지난다.
+ * 단위가 새 실행 수단을 갖지 않는다는 뜻이다. 확장 미연결이면 아무것도 실행하지 않고 실패로 돌려준다.
+ * 시간 상한은 단위 상한과 명령 만료(제출 여유 포함) 중 이른 쪽이다.
+ */
+async function runDomUnitAction(site, args, context) {
+  const bridge = context && context.bridge;
+  if (!bridge || !bridge.isExtensionConnected()) {
+    return { status: 'failed', errorCode: 'O4O_EXTENSION_NOT_CONNECTED', data: { siteId: site.siteId, displayName: site.displayName } };
+  }
+  const expiresAt = context && context.commandExpiresAt ? new Date(context.commandExpiresAt).getTime() : undefined;
+  const call = async (base, a) => {
+    const handler = DOM_HANDLERS[base];
+    if (!handler || base === ACTIONS.DOM_RUN_UNIT) return { status: 'denied', errorCode: 'DOM_ACTION_NOT_ALLOWED' };
+    const checked = handler.validate(a);
+    if (!checked.ok) return { status: 'denied', errorCode: 'DOM_ACTION_NOT_ALLOWED' };
+    try {
+      return await runDomAction(base, site, checked.args, context);
+    } catch {
+      return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' };
+    }
+  };
+  return runDomUnit(site, args, { call, expiresAt, ...(context && context.unitClock ? context.unitClock : {}) });
 }
 
 /** siteId 를 받는 handler. APP_HANDLERS 와 같은 규칙 — 인자 유무가 곧 계약이다. */
@@ -712,6 +751,7 @@ function dataWorkRunUpsert(args) {
     targetId: args.targetId,
     goalSummary: args.goalSummary,
     note: args.note,
+    ownerKey: args.ownerKey,
   });
   return { status: 'success', data: { runId: saved.runId, runStatus: saved.status, saved: true } };
 }
@@ -724,13 +764,17 @@ function dataWorkRunSetStatus(args) {
 }
 
 /** work_run_upsert 인자 검사 — 서버 validateDataWorkRunUpsertArgs 와 동일 규칙. */
-function validateWorkRunUpsertArgs(args) {
+function validateWorkRunUpsertArgs(rawArgs) {
+  // Phase D — 선택 인자 ownerKey(local.db v8 소유 주체). 없으면 이전 묶음.
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
   const allowed = new Set(['runId', 'status', 'targetId', 'goalSummary', 'note']);
   for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
   if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
   if (typeof args.status !== 'string' || !WORK_RUN_UPSERT_STATUSES.includes(args.status)) return { ok: false };
-  const out = { runId: args.runId, status: args.status };
+  const out = { runId: args.runId, status: args.status, ownerKey: owned.ownerKey };
   if (args.targetId !== undefined) {
     // 등재 대상만 — resolveRegisteredTarget 이 site/app registry 로 판정한다.
     if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
@@ -747,6 +791,358 @@ function validateWorkRunUpsertArgs(args) {
     out.note = n;
   }
   return { ok: true, args: out };
+}
+
+// ── Workflow Candidate (WEB-AUTOMATION-RESUME-V1 PHASE 2 · IR §8·§9-3) ─────────
+// 서버 workflow-candidate.ts · local-agent-protocol.ts 와 같은 형상 규칙(손 복제 — agent 는 TS 를 import 하지 않는다).
+// 저장은 값 없는 semantic 단계 + 요청 템플릿만. 대조 결과로는 이번 요청의 값을 채운 재생 단계만 돌려준다.
+const WORKFLOW_ACTION_KINDS = Object.freeze(['set_input', 'select_option', 'click']);
+const WORKFLOW_FIND_ROLES = Object.freeze([
+  'button', 'link', 'textbox', 'searchbox', 'combobox', 'checkbox', 'radio', 'heading', 'table', 'tab', 'menuitem', 'listitem',
+]);
+const WORKFLOW_MAX_STEPS = 12;
+const WORKFLOW_MAX_SLOTS = 4;
+const WORKFLOW_LOCATOR_MAX = 100;
+const WORKFLOW_TEMPLATE_MAX = 300;
+const WORKFLOW_OPTION_MAX = 100;
+const WORKFLOW_PATH_MAX = 120;
+const WORKFLOW_REQUEST_MAX = 500;
+
+/** 제어문자 → 공백 · 공백 1칸 · trim. 정규식에 제어문자를 두지 않는다(char code 비교). */
+function workflowNormalize(value) {
+  if (typeof value !== 'string') return '';
+  let s = '';
+  for (const ch of value) {
+    const code = ch.charCodeAt(0);
+    s += code < 0x20 || code === 0x7f ? ' ' : ch;
+  }
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+function isWorkflowText(value, max) {
+  return typeof value === 'string' && value.length > 0 && value.length <= max && workflowNormalize(value) === value && !/[<>{}]/.test(value);
+}
+
+function validateWorkflowLocator(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  for (const k of Object.keys(raw)) if (!['role', 'name', 'text'].includes(k)) return null;
+  const out = {};
+  if (raw.role !== undefined) {
+    if (!WORKFLOW_FIND_ROLES.includes(raw.role)) return null;
+    out.role = raw.role;
+  }
+  for (const k of ['name', 'text']) {
+    if (raw[k] === undefined) continue;
+    if (!isWorkflowText(raw[k], WORKFLOW_LOCATOR_MAX)) return null;
+    out[k] = raw[k];
+  }
+  if (!out.name && !out.text) return null;
+  return out;
+}
+
+function validateWorkflowExpect(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const keys = Object.keys(raw).sort();
+  if (keys.length !== 2 || keys[0] !== 'changed' || keys[1] !== 'navigated') return null;
+  if (typeof raw.navigated !== 'boolean' || typeof raw.changed !== 'boolean') return null;
+  return { navigated: raw.navigated, changed: raw.changed };
+}
+
+function validateWorkflowSteps(raw) {
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > WORKFLOW_MAX_STEPS) return null;
+  const out = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+    for (const k of Object.keys(item)) if (!['actionKind', 'locator', 'slot', 'option', 'expect', 'path'].includes(k)) return null;
+    if (!WORKFLOW_ACTION_KINDS.includes(item.actionKind)) return null;
+    const locator = validateWorkflowLocator(item.locator);
+    const expect = validateWorkflowExpect(item.expect);
+    if (!locator || !expect) return null;
+    const step = { actionKind: item.actionKind, locator, expect };
+    if (item.slot !== undefined) {
+      if (!Number.isInteger(item.slot) || item.slot < 1 || item.slot > WORKFLOW_MAX_SLOTS) return null;
+      step.slot = item.slot;
+    }
+    if (item.option !== undefined) {
+      if (!isWorkflowText(item.option, WORKFLOW_OPTION_MAX)) return null;
+      step.option = item.option;
+    }
+    if (item.path !== undefined) {
+      if (typeof item.path !== 'string' || !item.path.startsWith('/') || /[?#\s]/.test(item.path) || item.path.length > WORKFLOW_PATH_MAX) return null;
+      step.path = item.path;
+    }
+    if (step.actionKind === 'set_input' && (step.slot === undefined || step.option !== undefined)) return null;
+    if (step.actionKind === 'select_option' && (step.slot === undefined) === (step.option === undefined)) return null;
+    if (step.actionKind === 'click' && (step.slot !== undefined || step.option !== undefined)) return null;
+    out.push(step);
+  }
+  return out;
+}
+
+function isValidWorkflowTemplate(value) {
+  if (typeof value !== 'string' || value.length === 0 || value.length > WORKFLOW_TEMPLATE_MAX) return false;
+  if (workflowNormalize(value) !== value) return false;
+  const slots = [...value.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1]));
+  if (slots.some((n) => n < 1 || n > WORKFLOW_MAX_SLOTS)) return false;
+  const rest = value.replace(/\{\{\d\}\}/g, '');
+  if (rest.includes('{') || rest.includes('}')) return false;
+  return rest.replace(/\s+/g, '').length >= 2;
+}
+
+/** candidate_save 인자 검사 — 서버 validateDataWorkRunCandidateSaveArgs 와 동일 규칙. */
+function validateCandidateSaveArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  for (const k of Object.keys(args)) if (!['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'].includes(k)) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
+  if (!isValidWorkflowTemplate(args.template)) return { ok: false };
+  const steps = validateWorkflowSteps(args.steps);
+  if (!steps) return { ok: false };
+  const templateSlots = new Set([...args.template.matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
+  const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot));
+  if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
+  const out = { runId: args.runId, targetId: args.targetId, template: args.template, steps, ownerKey: owned.ownerKey };
+  if (args.replayedCandidateId !== undefined) {
+    if (typeof args.replayedCandidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.replayedCandidateId)) return { ok: false };
+    out.replayedCandidateId = args.replayedCandidateId;
+  }
+  return { ok: true, args: out };
+}
+
+/** candidate_match 인자 검사 — `{ targetId, request }`. */
+function validateCandidateMatchArgs(rawArgs) {
+  const owned = takeOwnerKey(rawArgs);
+  if (!owned.ok) return { ok: false };
+  const args = owned.rest;
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  for (const k of Object.keys(args)) if (!['targetId', 'request'].includes(k)) return { ok: false };
+  if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
+  if (typeof args.request !== 'string' || args.request.length === 0 || args.request.length > WORKFLOW_REQUEST_MAX) return { ok: false };
+  if (workflowNormalize(args.request) !== args.request) return { ok: false };
+  return { ok: true, args: { targetId: args.targetId, request: args.request, ownerKey: owned.ownerKey } };
+}
+
+/** candidate_result 인자 검사 — `{ candidateId, outcome }`. */
+function validateCandidateResultArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args).sort();
+  if (keys.length !== 2 || keys[0] !== 'candidateId' || keys[1] !== 'outcome') return { ok: false };
+  if (typeof args.candidateId !== 'string' || !WORKFLOW_CANDIDATE_ID_RE.test(args.candidateId)) return { ok: false };
+  if (!['replay_completed', 'replay_diverged'].includes(args.outcome)) return { ok: false };
+  return { ok: true, args: { candidateId: args.candidateId, outcome: args.outcome } };
+}
+
+/** `local.data.work_run_candidate_save` — 저장 확인만 돌려준다(id · 상태). */
+function dataCandidateSave(args) {
+  const r = LocalWorkflowCandidateRepository.save(args);
+  return { status: 'success', data: { saved: true, candidateId: r.candidateId, candidateStatus: r.candidateStatus } };
+}
+
+/** `local.data.work_run_candidate_match` — 대조는 여기서. 템플릿 · 통계 · source run 은 돌려주지 않는다. */
+function dataCandidateMatch(args) {
+  const r = LocalWorkflowCandidateRepository.match(args);
+  if (!r.matched) return { status: 'success', data: { matched: false } };
+  return { status: 'success', data: { matched: true, candidateId: r.candidateId, steps: r.steps } };
+}
+
+/** `local.data.work_run_candidate_result` — 재생 결과 반영(id · 상태만). */
+function dataCandidateResult(args) {
+  const r = LocalWorkflowCandidateRepository.recordResult(args);
+  return { status: 'success', data: { saved: true, candidateId: r.candidateId, candidateStatus: r.candidateStatus } };
+}
+
+// ─── Experience 원장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) ──────
+// 서버 validateDataWorkRunExperienceRecordArgs 와 같은 규칙(손으로 복제). enum · 정수 · semantic locator 만 받는다 —
+// 자유 텍스트 칸이 없다(입력 내용 · 사용자 답변 · 화면 글 · 모델 근거가 실릴 자리가 형상에 없다).
+const EXPERIENCE_END_STATES = Object.freeze(['completed', 'waiting_for_user', 'taken_over', 'stopped', 'resume_failed']);
+const EXPERIENCE_TARGET_KINDS = Object.freeze(['browser_site', 'windows_app']);
+const EXPERIENCE_OUTCOME_STATUSES = Object.freeze(['SUCCESS', 'PARTIAL_SUCCESS', 'USER_COMPLETED', 'BLOCKED', 'FAILED', 'CANCELLED', 'ABANDONED']);
+const EXPERIENCE_EVIDENCE = Object.freeze(['system_verified', 'user_confirmed', 'agent_inferred']);
+const EXPERIENCE_STAGES = Object.freeze(['observe', 'read', 'input', 'activate']);
+const EXPERIENCE_ACTION_KINDS = Object.freeze([
+  'inspect', 'find', 'read_text', 'read_table', 'set_input', 'select_option', 'click', 'takeover', 'done', 'key', 'visual_click', 'visual_type', 'visual_key',
+]);
+const EXPERIENCE_METHODS = Object.freeze(['browser_dom', 'windows_uia', 'computer_use']);
+const EXPERIENCE_ACTORS = Object.freeze(['deterministic', 'ai_normal', 'ai_strong']);
+const EXPERIENCE_RESULT_STATUSES = Object.freeze(['success', 'failed', 'denied', 'rejected']);
+const EXPERIENCE_LAYERS = Object.freeze(['runtime', 'ui_change', 'business_knowledge', 'input_missing', 'judgment', 'policy_risk']);
+const EXPERIENCE_FAILURE_CLASSES = Object.freeze([
+  'DISCOVERY_FAILURE', 'TARGET_FAILURE', 'OBSERVATION_FAILURE', 'PLANNING_FAILURE', 'ACTION_FAILURE', 'NO_PROGRESS',
+  'AMBIGUOUS_STATE', 'UNSUPPORTED_UI', 'USER_INTERFERENCE', 'RISK_BLOCKED', 'EXTERNAL_CHANGE',
+]);
+const EXPERIENCE_RECOVERY_TIERS = Object.freeze(['normal_retry', 'strong_model', 'user_assistance']);
+const EXPERIENCE_RECOVERY_RESULTS = Object.freeze([
+  'recovered_by_normal_retry', 'recovered_by_strong_model', 'recovered_by_user_hint', 'recovered_by_user_action', 'not_recovered',
+]);
+const EXPERIENCE_MAX_STEPS = 60;
+const EXPERIENCE_MAX_FAILURES = 20;
+const EXPERIENCE_MS_MAX = 86_400_000;
+const EXPERIENCE_COUNT_MAX = 10_000;
+const EXPERIENCE_ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
+const EXPERIENCE_ERROR_CODE_RE = /^[A-Z][A-Z0-9_]{1,63}$/;
+const EXPERIENCE_METRIC_KEYS = Object.freeze([
+  'totalMs', 'aiMs', 'aiCalls', 'commandWaitMs', 'executionMs', 'settleMs', 'actionCount', 'stepCount', 'retryCount',
+]);
+
+function expPlain(v) {
+  return !!v && typeof v === 'object' && !Array.isArray(v);
+}
+function expExactKeys(v, keys) {
+  const own = Object.keys(v);
+  return own.length === keys.length && own.every((k) => keys.includes(k));
+}
+function expEnumOrNull(v, list) {
+  return v === null || (typeof v === 'string' && list.includes(v));
+}
+function expIntOrNull(v, max) {
+  return v === null || (Number.isInteger(v) && v >= 0 && v <= max);
+}
+function expErrorCodeOrNull(v) {
+  return v === null || (typeof v === 'string' && EXPERIENCE_ERROR_CODE_RE.test(v));
+}
+
+function validateExperienceStep(raw, index) {
+  if (!expPlain(raw)) return null;
+  if (!expExactKeys(raw, ['seq', 'stage', 'actionKind', 'method', 'locator', 'actor', 'resultStatus', 'resultEvidence', 'errorCode', 'durationMs'])) return null;
+  if (raw.seq !== index + 1) return null;
+  if (!expEnumOrNull(raw.stage, EXPERIENCE_STAGES)) return null;
+  if (!EXPERIENCE_ACTION_KINDS.includes(raw.actionKind)) return null;
+  if (!expEnumOrNull(raw.method, EXPERIENCE_METHODS)) return null;
+  if (!expEnumOrNull(raw.actor, EXPERIENCE_ACTORS)) return null;
+  if (!EXPERIENCE_RESULT_STATUSES.includes(raw.resultStatus)) return null;
+  if (!expEnumOrNull(raw.resultEvidence, EXPERIENCE_EVIDENCE)) return null;
+  if (!expErrorCodeOrNull(raw.errorCode)) return null;
+  if (!expIntOrNull(raw.durationMs, EXPERIENCE_MS_MAX)) return null;
+  let locator = null;
+  if (raw.locator !== null) {
+    // semantic locator 는 DOM 단계에만(역할 + 접근 이름/보이는 이름). 좌표 · elementRef · 입력 내용은 형상에 없다.
+    if (raw.method !== 'browser_dom') return null;
+    locator = validateWorkflowLocator(raw.locator);
+    if (!locator) return null;
+  }
+  return {
+    seq: raw.seq, stage: raw.stage, actionKind: raw.actionKind, method: raw.method, locator, actor: raw.actor,
+    resultStatus: raw.resultStatus, resultEvidence: raw.resultEvidence, errorCode: raw.errorCode, durationMs: raw.durationMs,
+  };
+}
+
+function validateExperienceFailure(raw, stepCount) {
+  if (!expPlain(raw)) return null;
+  if (!expExactKeys(raw, ['stepSeq', 'stage', 'layer', 'failureClass', 'errorCode', 'method', 'recoveryTier', 'recoveryResult', 'uiChangeSuspected'])) return null;
+  if (raw.stepSeq !== null && !(Number.isInteger(raw.stepSeq) && raw.stepSeq >= 1 && raw.stepSeq <= stepCount)) return null;
+  if (!expEnumOrNull(raw.stage, EXPERIENCE_STAGES)) return null;
+  if (!expEnumOrNull(raw.layer, EXPERIENCE_LAYERS)) return null;
+  if (!expEnumOrNull(raw.failureClass, EXPERIENCE_FAILURE_CLASSES)) return null;
+  if (!expErrorCodeOrNull(raw.errorCode)) return null;
+  if (!expEnumOrNull(raw.method, EXPERIENCE_METHODS)) return null;
+  if (!expEnumOrNull(raw.recoveryTier, EXPERIENCE_RECOVERY_TIERS)) return null;
+  if (!expEnumOrNull(raw.recoveryResult, EXPERIENCE_RECOVERY_RESULTS)) return null;
+  if (typeof raw.uiChangeSuspected !== 'boolean') return null;
+  return {
+    stepSeq: raw.stepSeq, stage: raw.stage, layer: raw.layer, failureClass: raw.failureClass, errorCode: raw.errorCode, method: raw.method,
+    recoveryTier: raw.recoveryTier, recoveryResult: raw.recoveryResult, uiChangeSuspected: raw.uiChangeSuspected,
+  };
+}
+
+/** experience_record 인자 검사 — `{ runId, segment, target, outcome, metric, steps, failures }`. 서버와 동일 규칙. */
+function validateExperienceRecordArgs(args) {
+  if (!expPlain(args)) return { ok: false };
+  if (!expExactKeys(args, ['runId', 'segment', 'target', 'outcome', 'metric', 'steps', 'failures'])) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  const seg = args.segment;
+  if (!expPlain(seg) || !expExactKeys(seg, ['startedAt', 'endedAt', 'endState', 'resumed'])) return { ok: false };
+  if (typeof seg.startedAt !== 'string' || !EXPERIENCE_ISO_RE.test(seg.startedAt)) return { ok: false };
+  if (typeof seg.endedAt !== 'string' || !EXPERIENCE_ISO_RE.test(seg.endedAt)) return { ok: false };
+  if (Date.parse(seg.endedAt) < Date.parse(seg.startedAt)) return { ok: false };
+  if (!EXPERIENCE_END_STATES.includes(seg.endState) || typeof seg.resumed !== 'boolean') return { ok: false };
+  const tg = args.target;
+  if (!expPlain(tg) || !expExactKeys(tg, ['targetId', 'targetKind'])) return { ok: false };
+  if (!resolveRegisteredTarget(tg.targetId) || !EXPERIENCE_TARGET_KINDS.includes(tg.targetKind)) return { ok: false };
+  let outcome = null;
+  if (args.outcome !== null) {
+    const oc = args.outcome;
+    if (!expPlain(oc) || !expExactKeys(oc, ['status', 'evidence'])) return { ok: false };
+    if (!EXPERIENCE_OUTCOME_STATUSES.includes(oc.status) || !EXPERIENCE_EVIDENCE.includes(oc.evidence)) return { ok: false };
+    // 최종 결과는 종료 segment 에만 붙는다 — 사용자 대기 · 재개 실패 segment 는 결과가 아니다.
+    if (seg.endState === 'waiting_for_user' || seg.endState === 'resume_failed') return { ok: false };
+    outcome = { status: oc.status, evidence: oc.evidence };
+  }
+  const mt = args.metric;
+  if (!expPlain(mt) || !expExactKeys(mt, EXPERIENCE_METRIC_KEYS)) return { ok: false };
+  for (const k of EXPERIENCE_METRIC_KEYS) {
+    if (!expIntOrNull(mt[k], k.endsWith('Ms') ? EXPERIENCE_MS_MAX : EXPERIENCE_COUNT_MAX)) return { ok: false };
+  }
+  if (!Array.isArray(args.steps) || args.steps.length > EXPERIENCE_MAX_STEPS) return { ok: false };
+  const steps = [];
+  for (let i = 0; i < args.steps.length; i += 1) {
+    const s = validateExperienceStep(args.steps[i], i);
+    if (!s) return { ok: false };
+    steps.push(s);
+  }
+  if (!Array.isArray(args.failures) || args.failures.length > EXPERIENCE_MAX_FAILURES) return { ok: false };
+  const failures = [];
+  for (const f of args.failures) {
+    const v = validateExperienceFailure(f, steps.length);
+    if (!v) return { ok: false };
+    failures.push(v);
+  }
+  return {
+    ok: true,
+    args: {
+      runId: args.runId,
+      segment: { startedAt: seg.startedAt, endedAt: seg.endedAt, endState: seg.endState, resumed: seg.resumed },
+      target: { targetId: tg.targetId, targetKind: tg.targetKind },
+      outcome,
+      metric: Object.fromEntries(EXPERIENCE_METRIC_KEYS.map((k) => [k, mt[k]])),
+      steps,
+      failures,
+    },
+  };
+}
+
+/** `local.data.work_run_experience_record` — 기록 확인(segment 번호 · 건수)만 돌려준다. */
+function dataExperienceRecord(args) {
+  const r = LocalWorkRunExperienceRepository.record(args);
+  return {
+    status: 'success',
+    data: { saved: r.recorded, duplicate: r.duplicate === true, segmentIndex: r.segmentIndex, stepCount: r.stepCount ?? 0, failureCount: r.failureCount ?? 0 },
+  };
+}
+
+// ─── Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1) ──────
+// 형상 검사는 work-assistance.mjs. 응답에는 확인값 · 구조만 담는다(원문 · 값 · 출처 run · 시각 없음).
+
+/** `local.data.work_run_context_save` — QUESTION 시점 원래 업무 구조. */
+function dataContextSave(args) {
+  LocalWorkRunContextRepository.save(args);
+  return { status: 'success', data: { saved: true, runId: args.runId } };
+}
+
+/** `local.data.work_run_context_recall` — 같은 run 의 원래 업무 구조(+ 막힌 자리를 채운 재생 단계). */
+function dataContextRecall(args) {
+  const r = LocalWorkRunContextRepository.recall(args);
+  if (!r.found) return { status: 'success', data: { found: false } };
+  const data = { found: true, taskKey: r.taskKey, stageKey: r.stageKey, ask: r.ask, strategy: r.strategy };
+  if (r.replaySteps) {
+    data.candidateId = r.replayCandidateId;
+    data.steps = r.replaySteps;
+  }
+  return { status: 'success', data };
+}
+
+/** `local.data.work_run_assistance_record` — 도움 · 교정 기록 + 검증된 Preferred/Avoid. */
+function dataAssistanceRecord(args) {
+  const r = LocalWorkRunAssistanceRepository.record(args);
+  return { status: 'success', data: { saved: r.recorded, seq: r.seq, patternCount: r.patternCount } };
+}
+
+/** `local.data.work_run_experience_recall` — 최소 recall(업무 키 목록 또는 한 Task × Target 의 verified 패턴). */
+function dataExperienceRecall(args) {
+  const r = LocalExperiencePatternRepository.recall(args);
+  return { status: 'success', data: args.taskKey ? { patterns: r.patterns } : { taskKeys: r.taskKeys } };
 }
 
 /** work_run_set_status 인자 검사 — `{ runId, status, note? }`. */
@@ -839,6 +1235,14 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_QUERY]: { validate: validateDataQueryArgs, run: (args) => dataQuery(args) },
   [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
   [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE]: { validate: validateCandidateSaveArgs, run: (args) => dataCandidateSave(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH]: { validate: validateCandidateMatchArgs, run: (args) => dataCandidateMatch(args) },
+  [ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT]: { validate: validateCandidateResultArgs, run: (args) => dataCandidateResult(args) },
+  [ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD]: { validate: validateExperienceRecordArgs, run: (args) => dataExperienceRecord(args) },
+  [ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE]: { validate: validateContextSaveArgs, run: (args) => dataContextSave(args) },
+  [ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL]: { validate: validateContextRecallArgs, run: (args) => dataContextRecall(args) },
+  [ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD]: { validate: validateAssistanceRecordArgs, run: (args) => dataAssistanceRecord(args) },
+  [ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL]: { validate: validateExperienceRecallArgs, run: (args) => dataExperienceRecall(args) },
 };
 
 /**
@@ -888,6 +1292,7 @@ export async function runAction(action, context, args) {
       };
     }
     try {
+      if (base === ACTIONS.DOM_RUN_UNIT) return await runDomUnitAction(site, checked.args, context);
       return await runDomAction(base, site, checked.args, context);
     } catch {
       return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' };

@@ -167,8 +167,11 @@ export async function cancelStoreOrderBeforePayment(
 
   // 복원 대상 산출 — 이벤트 오퍼 주문의 line item 만.
   const releaseTargets = new Map<string, number>();
-  if (isEventOfferOrderServiceKey(order.serviceKey)) {
-    for (const item of order.items ?? []) {
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 주문은 한 주문에 일반 · 이벤트 라인이 섞인다 —
+  //   이벤트 라인(metadata.supplyKind='event')만 복원한다.
+  const eventOrder = isEventOfferOrderServiceKey(order.serviceKey);
+  for (const item of order.items ?? []) {
+    if (eventOrder || item?.metadata?.supplyKind === 'event') {
       const listingId = item?.metadata?.eventOfferId ?? item?.metadata?.organizationProductListingId;
       const qty = Number(item?.quantity ?? 0);
       if (typeof listingId === 'string' && listingId && qty > 0) {
@@ -178,7 +181,8 @@ export async function cancelStoreOrderBeforePayment(
   }
 
   // 상태 전이 — row 는 남기고 status 만 cancelled 로. metadata 는 merge(덮어쓰기 금지).
-  await dataSource.query(
+  //   조건부 전이: 동시 취소 · 결제 확인과 경합하면 한쪽만 이긴다(이중 복원 · 결제된 주문 취소 방지).
+  const transitioned = await dataSource.query(
     `UPDATE checkout_orders
         SET status = 'cancelled',
             metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object(
@@ -187,9 +191,21 @@ export async function cancelStoreOrderBeforePayment(
               'cancelledAt', to_char(NOW() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
             ),
             "updatedAt" = NOW()
-      WHERE id = $1::uuid`,
+      WHERE id = $1::uuid AND status IN ('created','pending_payment') AND "paymentStatus" <> 'paid'
+    RETURNING id`,
     [orderId, reason],
   );
+  // TypeORM postgres 는 UPDATE 결과를 [rows, affectedCount] 로 돌려준다.
+  const transitionedRows =
+    Array.isArray(transitioned) && Array.isArray(transitioned[0]) ? transitioned[0] : transitioned;
+  if (!Array.isArray(transitionedRows) || transitionedRows.length === 0) {
+    return {
+      ok: false,
+      httpStatus: 409,
+      code: 'ORDER_NOT_CANCELLABLE',
+      message: '주문 상태가 바뀌었습니다. 다시 확인해 주세요.',
+    };
+  }
 
   // 예약 재고 복원 (best-effort — 원본 보상 경로와 동일 정책).
   //

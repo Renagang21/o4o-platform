@@ -162,7 +162,7 @@ import { kpaActionConfig } from './action-definitions.js';
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
-import { requireCommunityAccess } from '../forum/service-forum.routes.js';
+import { requireCommunityAccess } from '../../middleware/community-access.middleware.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
 //   KPA 는 더 이상 LMS runtime 을 소유하지 않는다. `/api/v1/kpa/lms/*` remount · LMS controller import ·
 //   course-request → LMS course 생성 경로를 제거했다. 강의는 O4O 강의(lecture) 서비스(study.neture.co.kr) 가 담당한다.
@@ -570,7 +570,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B: 공급자 Screen Set 원본 제작·HUB 게시 API
   // /api/v1/kpa/supplier/screen-sets (공급자가 매장 배포용 화면 세트 원본을 제작 — origin='supplier')
-  // 권한: 로그인 사용자가 ACTIVE neture_suppliers 구성원(user_id 매핑). 자기 원본만 접근.
+  // 권한: 로그인 사용자가 ACTIVE neture_suppliers 구성원(canonical: organization_members owner). 자기 원본만 접근.
   // 매장/운영자 API 와 별도 라우터. origin='supplier' AND supplier_id AND service_key='kpa' 격리.
   // 차단: 매장·코너 적용 / current 지정 / 공개 타블렛 URL / Screen Set QR / 매장 콘텐츠 조회.
   const kpaSupplierScreenSetController = createSupplierScreenSetController(

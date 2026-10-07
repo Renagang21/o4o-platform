@@ -17,6 +17,17 @@
  *     (API key·SMTP·OAuth secret 마스킹 등 인증과 무관한 입력은 ALLOWLIST 로 명시 제외)
  *  P5 유일 로그인 계약 유지 — Google 경로(`/auth/google/login` · `/auth/google/signup`)는 살아 있다.
  *
+ * 정책 변경 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 · 사용자 승인 2026-09-29)
+ * ---------------------------------------------------------------------
+ *  이메일·비밀번호 가입·로그인을 **새 구조**(계정당 1행 `user_password_credentials`)로 도입했다.
+ *  이 spec 은 여전히 **옛 구조의 부활**을 막는다:
+ *   - 옛 파일 · 옛 route 이름 · 옛 스키마(users.password · service_credentials · 서비스별 password 축)는
+ *     P1 · P2 · P6 그대로 금지.
+ *   - P3: bcrypt 는 `services/auth/password-credential.service.ts` 한 파일에서만 쓴다.
+ *     hashPassword/comparePassword 공용 export 는 여전히 금지(다른 곳이 해시를 직접 만들지 못한다).
+ *   - P4: 로그인 비밀번호 입력은 공통 컴포넌트 `packages/auth-react/src/email/PasswordInput.tsx` 한 곳.
+ *     서비스별 화면이 제 폼을 복제하면 이 가드가 깬다. P5 는 Google 경로가 계속 살아 있음을 확인한다.
+ *
  * 고정하지 않는 것 (의도적)
  * -------------------------
  *  - `database/migrations/**` 의 과거 password migration: HISTORICAL_KEEP (CHECK §1-5).
@@ -84,15 +95,22 @@ const PASSWORD_INPUT_ALLOWLIST = [
   'apps/admin-dashboard/src/components/cms/forms/InputText.tsx',
   'apps/admin-dashboard/src/pages/settings/AppServices.tsx',
   'apps/admin-dashboard/src/pages/settings/EmailSettings.tsx',
-  'apps/admin-dashboard/src/pages/settings/OAuthSettings.tsx',
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuthSettings 화면은 제거됐다(passport 은퇴로 소비처 0 · clientSecret 노출면 동반 폐쇄).
   'apps/admin-dashboard/src/pages/__debug__/LoginDiagnostic.tsx',
   'apps/admin-dashboard/src/pages/__debug__/AuthBootstrapDebug.tsx',
   'apps/admin-dashboard/src/pages/__debug__/AuthStateJsonDebug.tsx',
   // 매장 태블릿 PIN(선택) — 사용자 로그인 비밀번호가 아니다(CHECK §1-6 OUT_OF_SCOPE).
-  'services/web-k-cosmetics/src/pages/store/StoreSettingsPage.tsx',
+  // 원본 앱(services/web-k-cosmetics)은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — store.neture.co.kr 이식본만 남았다(같은 태블릿 PIN 입력).
+  'services/web-store/src/services/kcos/pages/store/StoreSettingsPage.tsx',
   // SMTP 발신 계정 비밀번호/앱 비밀번호 — 메일 전송 자격이며 로그인 축이 아니다.
   'services/web-neture/src/pages/admin/settings/EmailSettingsPage.tsx',
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 로그인 비밀번호 입력의 **유일한** 공통 컴포넌트
+  //   (보기/숨기기 토글 포함). 서비스 화면은 이 컴포넌트를 쓰고 직접 password 입력을 만들지 않는다.
+  'packages/auth-react/src/email/PasswordInput.tsx',
 ];
+
+/** P3 — bcrypt 를 import 해도 되는 유일한 파일 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 · 해시 단일 경로) */
+const BCRYPT_ALLOWED_FILES = ['apps/api-server/src/services/auth/password-credential.service.ts'];
 
 /** 스캔 대상 — 런타임 소스만(테스트·migration·dist·node_modules 제외) */
 const SCAN_TARGETS = [
@@ -182,10 +200,11 @@ describe('WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 — 재유입 차단 정적 
     });
   });
 
-  describe('P3 bcrypt 소비 0', () => {
-    it('런타임 소스에 bcrypt/bcryptjs import 가 없다', () => {
+  describe('P3 bcrypt 소비는 해시 단일 경로 한 파일뿐', () => {
+    it('런타임 소스에 bcrypt/bcryptjs import 가 없다 (password-credential.service 제외)', () => {
       const violations: string[] = [];
       for (const [f, src] of SOURCES) {
+        if (BCRYPT_ALLOWED_FILES.includes(rel(f))) continue;
         for (const line of codeOnly(src).split('\n')) {
           if (/(from\s+['"]bcryptjs?['"]|require\(['"]bcryptjs?['"]\))/.test(line)) {
             violations.push(`${rel(f)} :: ${line.trim()}`);
@@ -193,6 +212,14 @@ describe('WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 — 재유입 차단 정적 
         }
       }
       expect(violations).toEqual([]);
+    });
+
+    it('해시 단일 경로가 실재하고 bcrypt 를 실제로 쓴다 (예외가 죽은 항목이 되지 않는다)', () => {
+      for (const r of BCRYPT_ALLOWED_FILES) {
+        const f = path.join(REPO, r);
+        expect(fs.existsSync(f)).toBe(true);
+        expect(codeOnly(fs.readFileSync(f, 'utf-8'))).toMatch(/from\s+['"]bcryptjs['"]/);
+      }
     });
 
     it('hashPassword / comparePassword export 가 없다', () => {

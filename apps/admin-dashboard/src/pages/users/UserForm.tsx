@@ -8,23 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: BusinessInfoSection (backend 없는 /users/:id/business-info 전용) 제거.
 import toast from 'react-hot-toast';
 import { UserApi } from '@/api/userApi';
-import { ROLES } from '@/lib/rbac-catalog';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
 //   사용자 생성/편집에서 비밀번호 필드를 제거했다. 서버(`POST /api/v1/users`)도 password 를 받지 않고,
 //   로그인 수단은 Google 계정 하나다(초대받은 사용자가 Google 로 최초 로그인하며 계정이 연결된다).
-
-const ROLE_OPTIONS = Object.values(ROLES).map((r) => ({ value: r.key, label: r.label }));
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  roles: z.array(z.string()).min(1, 'At least one role is required'),
   status: z.enum(['active', 'pending', 'approved', 'rejected']),
 });
 
@@ -49,13 +44,9 @@ export default function UserForm() {
       email: '',
       firstName: '',
       lastName: '',
-      roles: ['customer'],
       status: 'pending',
     },
   });
-
-  const selectedRoles = watch('roles');
-  const roles = ROLE_OPTIONS;
 
   useEffect(() => {
     if (isEdit) {
@@ -80,7 +71,6 @@ export default function UserForm() {
         setValue('email', userData.email);
         setValue('firstName', userData.firstName || '');
         setValue('lastName', userData.lastName || '');
-        setValue('roles', userData.roles || [userData.role] || ['customer']);
         setValue('status', userData.status || 'pending');
       } else {
         throw new Error('Invalid user data received');
@@ -98,14 +88,12 @@ export default function UserForm() {
     try {
       setLoading(true);
 
-      // Backend expects: email, firstName, lastName, status, roles
-      // Do NOT send: role (single) or name
+      // Backend expects: email, firstName, lastName, status — 역할은 보내지 않는다(서버도 거절/무시).
       const payload: Partial<UserFormData> = {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         status: data.status,
-        roles: data.roles
       };
 
       if (isEdit) {
@@ -124,18 +112,6 @@ export default function UserForm() {
       toast.error(error.response?.data?.error || 'Failed to save user');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleRoleToggle = (role: string) => {
-    const currentRoles = selectedRoles || [];
-    if (currentRoles.includes(role)) {
-      // Don't allow removing the last role
-      if (currentRoles.length > 1) {
-        setValue('roles', currentRoles.filter((r) => r !== role));
-      }
-    } else {
-      setValue('roles', [...currentRoles, role]);
     }
   };
 
@@ -232,37 +208,22 @@ export default function UserForm() {
             </Card>
           </div>
 
-          {/* Roles */}
+          {/* WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 역할 편집 제거.
+              Admin 은 서비스 운영자만 지정한다(Service Operators 화면). 회원 역할 · 개별 분회/커뮤니티 운영자는
+              그 서비스 운영자가 자기 서비스 화면에서 관리한다. 서버도 이 경로의 역할 변경을 받지 않는다. */}
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>User Roles</CardTitle>
+                <CardTitle>역할</CardTitle>
                 <CardDescription>
-                  Select one or more roles for this user
+                  이 화면에서는 역할을 바꾸지 않습니다. 서비스 운영자 지정·해제는 Service Operators 화면에서 하고,
+                  회원 역할과 개별 분회·커뮤니티 운영자는 해당 서비스 운영자가 관리합니다.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {roles.map((role) => (
-                    <div
-                      key={role.value}
-                      className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleRoleToggle(role.value)}
-                    >
-                      <Checkbox
-                        checked={selectedRoles?.includes(role.value) || false}
-                        onCheckedChange={() => handleRoleToggle(role.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium">{role.label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {errors.roles && (
-                  <p className="text-sm text-red-500 mt-2">{errors.roles.message}</p>
-                )}
+                <Button type="button" variant={"outline" as const} onClick={() => navigate('/operators')}>
+                  Service Operators 로 이동
+                </Button>
               </CardContent>
             </Card>
 

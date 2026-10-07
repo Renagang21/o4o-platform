@@ -1,5 +1,7 @@
 # IR-O4O-CHECKOUT-STABLE-DECLARATION-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) · **표기일**: 2026-10-06 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`): Stable 범위를 B2B checkout · PaymentCore · 매장 구독 결제 계약으로 축소. 공개 상품 조회(QR 랜딩)는 checkout 이 아니라 정보 표시(ACTIVE)로 분류. 아래 본문은 2026-02 기록으로 보존하며 근거로 쓰지 않는다.
+
 > ---
 >
 > **[2026-08-25 · Business Boundary 정합 표기]**
@@ -12,6 +14,12 @@
 > **충돌 후보**이며, 같은 문서 §8 판정 전까지 `UNKNOWN` 이다.
 > 해당 결제 경로는 `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` 로 이미
 > `410 STORE_SALE_PAYMENT_DEPRECATED` 차단 상태다. 본문은 변경하지 않았다.
+>
+> **[2026-10-04 정합 · 현행 코드 사실]** (2026-10-06 판정 확정 → V2)
+> - §3-A 의 `cosmetics-payment.controller.ts` 는 `/prepare` · `/confirm` · `/order/:orderId` 전부 `410 STORE_SALE_PAYMENT_DEPRECATED` 로 은퇴했다(Toss 직접 호출 경로 소멸). 소비자 주문 생성 `POST /cosmetics/orders` 도 `410 STORE_CONSUMER_ORDER_RETIRED` 다.
+> - `unified-store-public.routes.ts` 에는 checkout · 결제 경로가 없다 — 공개 매장 정보 · 상품 **조회**(B2C visibility gate) · 태블릿 관심요청만 남아 있다.
+> - `PaymentCoreService`(`packages/payment-core`) 의 현행 소비처는 공급자→매장 B2B 결제(`neture-b2b-payment.controller.ts` · `PharmacyHubPaymentController.ts`) 등이다. 현행 내부 주문 경로는 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
+> - 따라서 §2 · §4 · §5 의 "Storefront 4중 게이트 · Checkout 7중 검증 = Stable 보호" 는 소비자 결제 leg 이 닫힌 상태의 서술이며, §6 · §7("판매 · 결제 축 Stable 달성", "수익 흐름 보호 완료")은 현행 사업 경계(소비자→매장 O4O commerce 없음)와 맞지 않는다. **기능 복구 · 확장 근거로 쓰지 않는다.**
 >
 > ---
 
@@ -140,4 +148,4 @@ Phase2: Redis 기반 이동 가능 (지금은 변경하지 않음)
 
 *Checkout Stable Declaration v1.0*
 *Date: 2026-02-24*
-*Status: Active*
+*Status: SUPERSEDED (2026-10-06 → V2)*

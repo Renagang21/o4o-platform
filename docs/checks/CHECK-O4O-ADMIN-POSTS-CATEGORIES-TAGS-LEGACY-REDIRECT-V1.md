@@ -71,7 +71,7 @@ WO §5.3 에 따라 **route redirect 만** 했다. 다음은 전부 유지했다
 
 ## 5. 실브라우저 route smoke (프로덕션)
 
-환경: `https://admin.neture.co.kr` · 계정 `sohae2100@gmail.com` · 빌드 스탬프 `2026. 8. 10. 오후 3:43:59`
+환경: `https://admin.neture.co.kr` · 계정 `[REDACTED_EMAIL_A]` · 빌드 스탬프 `2026. 8. 10. 오후 3:43:59`
 
 | # | 진입 URL | 최종 URL | 결과 |
 |---|---|---|---|

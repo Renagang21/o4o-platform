@@ -13,7 +13,7 @@
 
 | 항목 | `o4o-global-lb-forwarding-rule` | `o4o-global-lb-forwarding-rule-3` |
 |---|---|---|
-| IP | `34.117.153.136` (**ephemeral**) | `34.54.126.46` (**ephemeral**) |
+| IP | `[REDACTED_IP]` (**ephemeral**) | `[REDACTED_IP]` (**ephemeral**) |
 | protocol / port | TCP / **80-80** | TCP / **80-80** |
 | scheme | EXTERNAL_MANAGED, PREMIUM | EXTERNAL_MANAGED, PREMIUM |
 | target proxy | `o4o-global-lb-target-proxy` (HTTP) | `o4o-global-lb-target-proxy-3` (HTTP) |
@@ -34,10 +34,10 @@ URL map `o4o-global-lb` 의 host rule 19개 + `siteguide.co.kr` / `www.siteguide
 
 | 결과 | 도메인 |
 |---|---|
-| → `136.110.132.35` (**KEEP static IP**) | `neture.co.kr` · `www.neture.co.kr` · `admin.neture.co.kr` · `api.neture.co.kr` · `kpa-society.co.kr` · `www.` · `api.` · `www.` · `api.` · `k-cosmetics.site` · `www.` · `api.` · `glucoseview.co.kr` · `www.` · `api.` · `pharmacyhub.co.kr` · `www.` · `siteguide.co.kr` · `www.` — **20건** |
-| → Google ghs (`74.125.203.121` / `142.251.24.121`) | `account.neture.co.kr` (Census 기록과 동일, LB 미사용) |
-| → 외부 파킹 (`15.197.148.33` / `3.33.130.190`) | `glucoseview.com` (O4O LB 아님) |
-| → `34.117.153.136` 또는 `34.54.126.46` | **0건** |
+| → `[REDACTED_IP]` (**KEEP static IP**) | `neture.co.kr` · `www.neture.co.kr` · `admin.neture.co.kr` · `api.neture.co.kr` · `kpa-society.co.kr` · `www.` · `api.` · `www.` · `api.` · `k-cosmetics.site` · `www.` · `api.` · `glucoseview.co.kr` · `www.` · `api.` · `pharmacyhub.co.kr` · `www.` · `siteguide.co.kr` · `www.` — **20건** |
+| → Google ghs (`[REDACTED_IP]` / `[REDACTED_IP]`) | `account.neture.co.kr` (Census 기록과 동일, LB 미사용) |
+| → 외부 파킹 (`[REDACTED_IP]` / `[REDACTED_IP]`) | `glucoseview.com` (O4O LB 아님) |
+| → `[REDACTED_IP]` 또는 `[REDACTED_IP]` | **0건** |
 
 - 프로젝트에 **Cloud DNS managed zone 0개** (DNS 는 외부 등록기관 관리) → 프로젝트 내부 record 참조 가능성 없음
 - 두 후보 IP 의 **PTR 없음**, 주요 도메인 **AAAA 없음**
@@ -55,7 +55,7 @@ URL map `o4o-global-lb` 의 host rule 19개 + `siteguide.co.kr` / `www.siteguide
 
 | rule | URL map | 성격 |
 |---|---|---|
-| `neture-https-frontend-forwarding-rule` (:80, `136.110.132.35`) | `neture-https-frontend-redirect` (`httpsRedirect: true`, 301) | **production 의 HTTP→HTTPS redirect 담당 = KEEP** |
+| `neture-https-frontend-forwarding-rule` (:80, `[REDACTED_IP]`) | `neture-https-frontend-redirect` (`httpsRedirect: true`, 301) | **production 의 HTTP→HTTPS redirect 담당 = KEEP** |
 | 후보 2건 (:80) | `o4o-global-lb` (application) | redirect 아님. **평문 HTTP 로 앱을 그대로 서빙** |
 
 → 후보 삭제로 redirect 기능이 손실되지 않는다. 오히려 평문 노출 경로가 사라진다.
@@ -77,14 +77,14 @@ Cloud Run `neture-web` 요청 로그(7일) 실측 — 전부 **bare IP Host** �
 
 | IP | 표본 Host | User-Agent / 경로 |
 |---|---|---|
-| `34.117.153.136` | `http://34.117.153.136/…` 100% | `FlowIQLabsBot`, `forestengine.net`, `/geoserver/web/`, `/SDK/webLanguage` — 취약점 스캔 |
-| `34.54.126.46` | `http://34.54.126.46/…` 100% | `Infrawatch/1.0`, `/mcp` · `/api/mcp` · `/sse` — MCP 엔드포인트 스캔 |
+| `[REDACTED_IP]` | `http://[REDACTED_IP]/…` 100% | `FlowIQLabsBot`, `forestengine.net`, `/geoserver/web/`, `/SDK/webLanguage` — 취약점 스캔 |
+| `[REDACTED_IP]` | `http://[REDACTED_IP]/…` 100% | `Infrawatch/1.0`, `/mcp` · `/api/mcp` · `/sse` — MCP 엔드포인트 스캔 |
 
 도메인 Host **0건**. 30일 request_count(후보 약 72.6k / 74.3k)는 전량 이 스캐너 트래픽이다.
 
 ### 2-5. 저장소
 
-`34.117.153.136` / `34.54.126.46` / `o4o-global-lb-forwarding-rule` / `o4o-global-lb-target-proxy` 전체 검색:
+`[REDACTED_IP]` / `[REDACTED_IP]` / `o4o-global-lb-forwarding-rule` / `o4o-global-lb-target-proxy` 전체 검색:
 **배포 스크립트·infra 설정·코드 참조 0건.** 매칭은 전부 `docs/checks/**` 기록물이며, 그중 실사용 언급은
 KEEP 규칙 `-2` 에 대한 것이다.
 
@@ -124,8 +124,8 @@ KEEP 규칙 `-2` 에 대한 것이다.
 
 | name | IP | port | target |
 |---|---|---|---|
-| `neture-https-frontend-forwarding-rule` | `136.110.132.35` | 80 | `neture-https-frontend-target-proxy` (redirect) |
-| `o4o-global-lb-forwarding-rule-2` | `136.110.132.35` | 443 | `o4o-global-lb-target-proxy-2` |
+| `neture-https-frontend-forwarding-rule` | `[REDACTED_IP]` | 80 | `neture-https-frontend-target-proxy` (redirect) |
+| `o4o-global-lb-forwarding-rule-2` | `[REDACTED_IP]` | 443 | `o4o-global-lb-target-proxy-2` |
 
 **UNKNOWN 0.** §6 대로 static IP · target proxy · URL map · backend · certificate 는 하나도 삭제하지 않았다.
 
@@ -133,9 +133,9 @@ KEEP 규칙 `-2` 에 대한 것이다.
 
 | IP | 분류 | 비고 |
 |---|---|---|
-| `136.110.132.35` (`neture-static-ip`) | **ACTIVE · SHARED** | KEEP 규칙 2건이 공유. production 20 도메인 전량의 진입점 |
-| `34.117.153.136` | **소멸** | 예약 IP 가 아닌 ephemeral 이라 rule 삭제와 함께 회수됨 (**동일 IP 재확보 불가**) |
-| `34.54.126.46` | **소멸** | 동일 |
+| `[REDACTED_IP]` (`neture-static-ip`) | **ACTIVE · SHARED** | KEEP 규칙 2건이 공유. production 20 도메인 전량의 진입점 |
+| `[REDACTED_IP]` | **소멸** | 예약 IP 가 아닌 ephemeral 이라 rule 삭제와 함께 회수됨 (**동일 IP 재확보 불가**) |
+| `[REDACTED_IP]` | **소멸** | 동일 |
 
 → **새로 생긴 `RESERVED_UNUSED` IP 0건.** 프로젝트의 예약 IP 는 여전히 `neture-static-ip` 1개뿐이며 사용 중이다.
 static IP 관련 후속 삭제 후보 **없음**.
@@ -160,18 +160,18 @@ static IP 관련 후속 삭제 후보 **없음**.
 
 | 도메인 | :80 | :443 최종 | 도달 IP | TLS 검증 |
 |---|---|---|---|---|
-| `neture.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `kpa-society.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `k-cosmetics.site` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `glucoseview.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `pharmacyhub.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `admin.neture.co.kr` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `api.neture.co.kr` | 301 → https | **404** (루트 라우트 없음 — 삭제 전과 동일) | `136.110.132.35` | OK(0) |
-| `siteguide.co.kr` | 301 → https | **200** (default backend fallthrough — 기존과 동일) | `136.110.132.35` | OK(0) |
+| `neture.co.kr` / `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `kpa-society.co.kr` / `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `k-cosmetics.site` / `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `glucoseview.co.kr` / `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `pharmacyhub.co.kr` / `www.` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `admin.neture.co.kr` | 301 → https | **200** | `[REDACTED_IP]` | OK(0) |
+| `api.neture.co.kr` | 301 → https | **404** (루트 라우트 없음 — 삭제 전과 동일) | `[REDACTED_IP]` | OK(0) |
+| `siteguide.co.kr` | 301 → https | **200** (default backend fallthrough — 기존과 동일) | `[REDACTED_IP]` | OK(0) |
 
 - `glucoseview.com` 은 O4O LB 소속이 아니다(외부 파킹). WO §8 의 목록 중 실제 운영 도메인은 `glucoseview.co.kr` 다.
-- 삭제된 IP 직접 접근: `http://34.117.153.136/` · `http://34.54.126.46/` → **503** (LB 미연결). 의도한 결과다.
+- 삭제된 IP 직접 접근: `http://[REDACTED_IP]/` · `http://[REDACTED_IP]/` → **503** (LB 미연결). 의도한 결과다.
 
 ## 8. API / Cloud Run 검증 (§9)
 

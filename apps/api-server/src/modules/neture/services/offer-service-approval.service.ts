@@ -12,6 +12,7 @@
 import type { DataSource, QueryRunner } from 'typeorm';
 import { autoExpandPublicProduct, autoExpandServiceProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
+import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
 
 /** DataSource 또는 QueryRunner 양쪽에서 query() 실행 가능 */
 type QueryExecutor = Pick<DataSource, 'query'> | Pick<QueryRunner, 'query'>;
@@ -596,18 +597,20 @@ export class OfferServiceApprovalService {
    */
   private async notifySupplier(offerId: string, status: 'approved' | 'rejected', reason?: string): Promise<void> {
     try {
-      // offer → supplier → user
+      // offer → supplier → 사업자 본인(canonical organization_members owner 전부)
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id` 단일 수신자 → owner 집합.
       const rows = await this.dataSource.query(
-        `SELECT ns.user_id, COALESCE(pm.name, pm.regulatory_name, '') AS product_name
+        `SELECT spo.supplier_id, COALESCE(pm.name, pm.regulatory_name, '') AS product_name
          FROM supplier_product_offers spo
-         JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          JOIN product_masters pm ON pm.id = spo.master_id
          WHERE spo.id = $1`,
         [offerId],
       );
-      if (!rows.length || !rows[0].user_id) return;
+      if (!rows.length) return;
+      const recipients = await listSupplierOwnerUserIds(this.dataSource, rows[0].supplier_id);
+      if (!recipients.length) return;
 
-      const { user_id: userId, product_name: productName } = rows[0];
+      const { product_name: productName } = rows[0];
       const isApproved = status === 'approved';
 
       // WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1:
@@ -630,11 +633,13 @@ export class OfferServiceApprovalService {
       // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1:
       // serviceKey 누락 defect 수정 — serviceKey=NULL 이면 serviceKey 필터 소비처에서
       // 미노출될 수 있으므로 'neture' 명시(라우트/스키마 무변경, 컬럼 값만 보정).
-      await this.dataSource.query(
-        `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "serviceKey", "isRead", "createdAt")
-         VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, 'neture', false, NOW())`,
-        [userId, title, message, JSON.stringify({ offerId, status, productName, targetUrl })],
-      );
+      for (const userId of recipients) {
+        await this.dataSource.query(
+          `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "serviceKey", "isRead", "createdAt")
+           VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, 'neture', false, NOW())`,
+          [userId, title, message, JSON.stringify({ offerId, status, productName, targetUrl })],
+        );
+      }
     } catch (err) {
       logger.warn('[ServiceApproval] Failed to send notification', err);
     }

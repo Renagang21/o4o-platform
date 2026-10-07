@@ -48,8 +48,13 @@ const ORG_OTHER = 'org-store-2';
 interface Fixture {
   /** user_id → role_assignments.role[] (is_active = true 인 것만) */
   roles: Record<string, string[]>;
-  /** user_id → neture_suppliers */
+  /** user_id → neture_suppliers (legacy user_id pointer) */
   suppliers: Record<string, { id: string; status: string }>;
+  /**
+   * user_id → canonical 공급자(organization_members owner → organizations(supplier) → neture_suppliers).
+   * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1
+   */
+  canonicalSuppliers?: Record<string, { id: string; status: string; organizationId: string }>;
   /** supplier_id → 자기 offer 의 master_id[] */
   offers: Record<string, string[]>;
   /** user_id → organization_members.organization_id */
@@ -93,6 +98,10 @@ interface QueryLogEntry {
   params: unknown[];
 }
 
+/** 매장 소속 조회(= 매장 관계 평가) — 공급자 canonical 후보 조회는 제외한다 */
+const isStoreMembershipQuery = (q: QueryLogEntry): boolean =>
+  /organization_members/.test(q.sql) && !/neture_suppliers/.test(q.sql);
+
 function createStubDataSource(fixture: Fixture = FIXTURE): {
   dataSource: DataSource;
   queries: QueryLogEntry[];
@@ -106,6 +115,15 @@ function createStubDataSource(fixture: Fixture = FIXTURE): {
       const [userId, allowedRoles] = params as [string, string[]];
       const held = fixture.roles[userId] ?? [];
       return held.some((r) => allowedRoles.includes(r)) ? [{ '?column?': 1 }] : [];
+    }
+
+    // canonical 공급자 후보 — organization_members JOIN neture_suppliers (매장 소속 조회와 구분)
+    if (/FROM organization_members/.test(sql) && /JOIN neture_suppliers/.test(sql)) {
+      const [userId] = params as [string];
+      const c = fixture.canonicalSuppliers?.[userId];
+      return c
+        ? [{ supplier_id: c.id, organization_id: c.organizationId, status: c.status, organization_name: null }]
+        : [];
     }
 
     if (/FROM neture_suppliers/.test(sql)) {
@@ -218,6 +236,23 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
       }
     });
 
+    it('canonical owner 공급자는 legacy user_id pointer 없이도 공급자로 판정된다', async () => {
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1 Phase D
+      const fixture: Fixture = {
+        ...FIXTURE,
+        suppliers: {},
+        canonicalSuppliers: {
+          [USER_SUPPLIER_A]: { id: 'supplier-a', status: 'ACTIVE', organizationId: 'org-supplier-a' },
+        },
+      };
+      const { result, queries } = await resolve(USER_SUPPLIER_A, MASTER_A, 'render_read', fixture);
+      expect(result.allowed).toBe(true);
+      expect(result.actorType).toBe('supplier');
+      expect(result.supplierId).toBe('supplier-a');
+      // canonical 로 해결되면 legacy pointer 를 조회하지 않는다
+      expect(queries.some((q) => /FROM neture_suppliers WHERE user_id/.test(q.sql))).toBe(false);
+    });
+
     it('ACTIVE 공급자라도 자기 offer master 에 대한 write 는 거부 (§F 권한 축소)', async () => {
       const { result } = await resolve(USER_SUPPLIER_A, MASTER_A, 'write');
       expect(result.allowed).toBe(false);
@@ -254,7 +289,7 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
         const { result, queries } = await resolve(USER_SUPPLIER_B, MASTER_A, mode, fixture);
         expect(result.allowed).toBe(false);
         expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
-        expect(queries.some((q) => /organization_members/.test(q.sql))).toBe(false);
+        expect(queries.some(isStoreMembershipQuery)).toBe(false);
       },
     );
   });
@@ -269,7 +304,7 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
       expect(result.allowed).toBe(true);
       expect(result.actorType).toBe('supplier');
       expect(result.grantReason).toBe('OWN_SUPPLIER_OFFER');
-      expect(queries.some((q) => /organization_members/.test(q.sql))).toBe(false);
+      expect(queries.some(isStoreMembershipQuery)).toBe(false);
     });
 
     it('타 supplier master + active OPL + render_read → 매장 관계로 허용', async () => {
@@ -290,14 +325,14 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
       const { result, queries } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'write');
       expect(result.allowed).toBe(false);
       expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
-      expect(queries.some((q) => /organization_/.test(q.sql))).toBe(false);
+      expect(queries.some((q) => /organization_/.test(q.sql) && !/neture_suppliers/.test(q.sql))).toBe(false);
     });
 
     it('타 supplier master + active OPL + manage_read → 403 (fallthrough 금지)', async () => {
       const { result, queries } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'manage_read');
       expect(result.allowed).toBe(false);
       expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
-      expect(queries.some((q) => /organization_/.test(q.sql))).toBe(false);
+      expect(queries.some((q) => /organization_/.test(q.sql) && !/neture_suppliers/.test(q.sql))).toBe(false);
     });
 
     it('타 조직이 진열한 master 는 겸업 사용자에게도 render_read 거부', async () => {

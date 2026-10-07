@@ -14,8 +14,9 @@ import { useState, useRef, useCallback } from 'react';
 import { GuideBackLink } from '../components/GuideBackLink';
 import { QRCodeCanvas } from 'qrcode.react';
 
-// Base URL for QR codes (production URL)
-const BASE_URL = 'https://neture.o4o.kr';
+// Base URL for QR codes (production URL) — `/seller/overview*` 는 neture.co.kr 이 서빙한다.
+//   이전 값 `neture.o4o.kr` 은 NXDOMAIN 이었다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-2).
+const BASE_URL = 'https://neture.co.kr';
 
 interface QRTemplate {
   id: string;

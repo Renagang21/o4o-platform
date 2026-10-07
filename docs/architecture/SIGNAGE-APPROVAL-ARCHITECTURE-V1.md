@@ -3,6 +3,19 @@
 > **Signage 승인형 모델 전환 아키텍처 설계**
 > WO-O4O-SIGNAGE-APPROVAL-ARCHITECTURE-DESIGN-V1
 > 2026-02-24
+>
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-06 · **판정 확정**(2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) — 색인 §9 에서 해제.
+>
+> **판정 (현행 기준 — 본문 §1~§14 의 "승인 필수" 설계보다 우선한다)**
+> 1. **기본 모델은 `draft → active` 직접 게시다.** 서비스 Operator(`requireSignageOperator` 통과자)는 해당 서비스의 실제 운영 주체이므로 Platform Admin 승인 없이 HQ 사이니지를 게시(`active`)할 수 있다.
+> 2. **생성 시 `active` 허용.** HQ 생성 DTO 가 `status` 를 주지 않으면 `draft`, `active` 를 주면 그대로 게시된다(`global-content.service.ts` `status: dto.status || 'draft'`). 생성 시 `draft` 강제(본문 §5-A/B)는 채택하지 않는다.
+> 3. **`draft → pending → active` 는 선택 경로다.** 서비스가 별도 승인 정책을 둘 때만 쓴다(승인 개입 여부 = 서비스별 정책, [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1). 플랫폼 공통 필수 단계가 아니다.
+> 4. **전환 표는 코드가 정본이다** — `apps/api-server/src/routes/signage/dto/index.ts` `ALLOWED_STATUS_TRANSITIONS`: `draft→pending|active` · `pending→active|draft` · `active→archived` · `archived→draft`(재활성 사이클). `draft→archived` 는 없다. 역할별 전환 차등은 두지 않는다.
+> 5. **Supplier 사이니지**도 승인 절차 없이 게시 즉시 KPA 매장 HUB 노출(`draft→active→archived→draft`) — [`CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1`](../checks/CHECK-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1.md) · [`CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1`](../checks/CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1.md).
+> 6. **그대로 유효한 본문**: 상태 집합 `draft|pending|active|archived` · 값 전환 migration · CHECK 제약(§3 · §9, `20260224500000-SignageApprovalStatusModel.ts`) · HUB 노출 조건 `status='active'` · `scope='global'` · `source IN (hq, supplier, community)`(§7) · Store 경로 무변경(§5-C/D).
+> 7. **채택하지 않은 본문** (2026-02 설계 기록으로만 보존): §4 Platform Admin 전용 `draft→active` · §5-A/B 생성 시 `draft` 강제 · §6 `ALLOWED_TRANSITIONS` / `ADMIN_OVERRIDE_TRANSITIONS` 코드 예시 · §6 "archived = 최종 상태" · §11 승인 화면 · Admin 긴급 경로 · §14 원칙 4.
+>
+> 이 판정은 권한 · role · route 변경이 아니다 — 현행 코드(`requireSignageOperator` 단일 guard)를 정본으로 확정한 것이다.
 
 ---
 
@@ -118,6 +131,8 @@ draft ──→ pending ──→ active ──→ archived
 
 ## 4. 역할별 Status 전환 권한
 
+> **(2026-10-06 판정) 채택하지 않음** — 아래 매트릭스는 2026-02 설계안이다. 현행 기준은 상단 판정 1·4: signage operator 는 역할 차등 없이 `draft → active` 직접 게시 가능.
+
 ### 전환 권한 매트릭스
 
 | 전환 | Platform Admin | Service Operator | Store User | Supplier |
@@ -137,6 +152,8 @@ Platform Admin(`platform:super_admin`)은 `draft → active` 직접 전환 가�
 ---
 
 ## 5. 생성 경로별 변경
+
+> **(2026-10-06 판정)** §5-A · §5-B 의 생성 시 `draft` 강제는 채택하지 않는다 — 상단 판정 2(생성 시 `active` 허용).
 
 ### A. HQ Media 생성 (변경 필요)
 
@@ -184,6 +201,8 @@ Seller extension 경로 확인 필요. 현재 승인 워크플로우가 존재�
 ---
 
 ## 6. 승인 API 설계
+
+> **(2026-10-06 판정)** 엔드포인트 · 가드 표는 구현과 일치한다. 아래 "전환 검증 로직" 코드 예시는 채택하지 않았다 — 실제 전환 표는 상단 판정 4.
 
 ### 신규 엔드포인트
 
@@ -326,6 +345,8 @@ UPDATE signage_playlists SET status = 'inactive' WHERE status = 'archived';
 
 ## 11. UX 흐름
 
+> **(2026-10-06 판정)** 아래 승인 화면 · Platform Admin 긴급 경로는 필수 흐름이 아니다. 기본 흐름은 Operator 의 직접 게시(`draft → active`)이고, 승인 요청(`pending`)은 서비스별 선택 경로다.
+
 ### 생성 화면 (HQ Operator)
 
 ```
@@ -403,7 +424,7 @@ Signage: draft → pending → active    → archived
 1. **HUB는 `active`만 소비** — HUB 쿼리 변경 없음
 2. **승인은 HQ/Global 경로만 적용** — Store 경로 무영향
 3. **VARCHAR 기반** — DB ENUM 마이그레이션 불필요
-4. **Platform Admin 즉시 배포** — 긴급 경로 유지
+4. ~~**Platform Admin 즉시 배포** — 긴급 경로 유지~~ → (2026-10-06 판정) Operator 직접 게시가 기본, `pending` 은 서비스별 선택
 5. **CMS 모델 정렬** — 두 도메인 동일한 상태 흐름
 
 ### 구현 우선순위

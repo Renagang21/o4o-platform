@@ -55,9 +55,42 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '설정', items: [
       { key: 'info', label: '매장 정보', subPath: '/info' },
+      // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+      //   화면은 StoreOwnerOnly 가 감싸고 서버도 Owner 를 요구한다. 메뉴가 없으면 경영자가
+      //   URL 을 추측하지 않는 한 초대 기능을 찾지 못해 사실상 없는 기능이 된다.
+      { key: 'members', label: '매장 구성원', subPath: '/members' },
     ]},
   ],
 };
+
+/**
+ * Neture 약국 매장 메뉴 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §6)
+ *
+ * 약국은 매장 HUB 단계(취급 신청 → 승인 → 주문 가능) 없이 내 매장에서 바로 공급 상품을 주문한다.
+ * `UNIFIED_STORE_CONFIG` 는 K-Cosmetics · PharmacyHub 공통 문맥에도 쓰이므로 직접 바꾸지 않고,
+ * 약국(kpa-society) 문맥일 때만 `withPharmacyStoreMenu` 로 홈 바로 뒤에 붙인다.
+ * subPath 는 pages/neture-pharmacy/shared.tsx 의 PHARMACY_STORE_PATHS 와 같다.
+ */
+export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['menuSections']> = [
+  { label: '상품 · 주문', items: [
+    { key: 'pharmacy-supply',       label: '공급 상품',       subPath: '/pharmacy/supply' },
+    { key: 'pharmacy-cart',         label: '장바구니 · 결제', subPath: '/pharmacy/cart' },
+    { key: 'pharmacy-orders',       label: '주문 내역',       subPath: '/pharmacy/orders' },
+    { key: 'pharmacy-recruitments', label: '취급매장 모집',   subPath: '/pharmacy/recruitments' },
+  ]},
+  { label: '콘텐츠', items: [
+    { key: 'pharmacy-contents', label: '이용 가능 콘텐츠', subPath: '/pharmacy/contents' },
+  ]},
+  { label: '가입', items: [
+    { key: 'pharmacy-semi-franchises', label: '세미프랜차이즈', subPath: '/pharmacy/semi-franchises' },
+    { key: 'pharmacy-membership',      label: '기본 가입',      subPath: '/pharmacy/membership' },
+  ]},
+];
+
+export function withPharmacyStoreMenu(config: StoreDashboardConfig): StoreDashboardConfig {
+  const [head, ...rest] = config.menuSections ?? [];
+  return { ...config, menuSections: head ? [head, ...PHARMACY_STORE_MENU_SECTIONS, ...rest] : [...PHARMACY_STORE_MENU_SECTIONS] };
+}
 
 /** 서비스 업무 — 서비스 종속 기능만. basePath = /work/<serviceKey> */
 export const SERVICE_WORK_CONFIGS: Readonly<Record<UnifiedServiceKey, StoreDashboardConfig>> = Object.freeze({

@@ -51,8 +51,8 @@
 ```bash
 Grep "kpa-admin@o4o\.com|kpa-operator@o4o\.com|phamacy1@o4o\.com"
 Grep "b0000000-b000-4000-b000-00000000000[234]"
-Grep "O4oBootstrap1!|BootstrapCanonicalSeed|BOOTSTRAP_PASSWORD|SEED_BOOTSTRAP_PASSWORD"
-Grep "O4oTestPass"
+Grep "[REDACTED]|BootstrapCanonicalSeed|BOOTSTRAP_PASSWORD|SEED_BOOTSTRAP_PASSWORD"
+Grep "[REDACTED]"
 ```
 
 ---
@@ -65,7 +65,7 @@ Grep "O4oTestPass"
 |---|------|------|:----:|:--------:|
 | A1 | [`20260927100000-BootstrapCanonicalSeedAccounts.ts`](apps/api-server/src/database/migrations/20260927100000-BootstrapCanonicalSeedAccounts.ts) | 매 배포마다 idempotent 재실행 (Cloud Run 로그 5 회 확인) | **A 삭제** (또는 super-admin 만 보존) | **HIGH** |
 | A2 | [`apps/api-server/src/routes/admin/seed-test-accounts.ts`](apps/api-server/src/routes/admin/seed-test-accounts.ts) | 호출 = production 에 임시 계정 즉시 재생성 | **A 삭제** | **CRITICAL** |
-| A3 | [`1769408012358-UpdateOperatorPasswords.ts`](apps/api-server/src/database/migrations/1769408012358-UpdateOperatorPasswords.ts) | 모든 operator 계정 비밀번호를 평문 `O4oTestPass` 로 일괄 reset. precomputed bcrypt hash 직접 SQL | **A 삭제** (이미 적용됨 — git/migration 파일만 잔재) | M |
+| A3 | [`1769408012358-UpdateOperatorPasswords.ts`](apps/api-server/src/database/migrations/1769408012358-UpdateOperatorPasswords.ts) | 모든 operator 계정 비밀번호를 평문 `[REDACTED]` 로 일괄 reset. precomputed bcrypt hash 직접 SQL | **A 삭제** (이미 적용됨 — git/migration 파일만 잔재) | M |
 | A4 | [`20260212200000-CreateKpaSocietyOperatorAccount.ts`](apps/api-server/src/database/migrations/20260212200000-CreateKpaSocietyOperatorAccount.ts) | `kpa-society@o4o.com` operator 계정 — dropped columns (`role`, `roles`, `permissions`) 참조. legacy dead code | C (자연 무효화) | L |
 
 ### 2.2 phamacy1 전용 보조 migration 3 종
@@ -83,7 +83,7 @@ Grep "O4oTestPass"
 | # | 파일 | 비고 |
 |---|------|------|
 | A8 | [`20260216200001-CreateKpaAdminAccount.ts`](apps/api-server/src/database/migrations/20260216200001-CreateKpaAdminAccount.ts) | dropped columns 참조 (`role`, `roles`, `domain`, `service_key`). 신규 배포 시 실행되면 SQL 오류 발생. **이미 production migrations 테이블에 entry 존재 → 재실행 안 됨**. 단 git 잔재. | C (자연 무효화) → 정리 권고 |
-| A9 | [`20260403900000-SeedKpaOperatorTestData.ts`](apps/api-server/src/database/migrations/20260403900000-SeedKpaOperatorTestData.ts) | `test-yaksa01~13@o4o.com` 시드 + 평문 `O4oTestPass`. KPI 검증용 가짜 데이터 | 본 IR 범위 밖 (별도 `test-yaksa*` 패턴) — 별도 audit 권고 |
+| A9 | [`20260403900000-SeedKpaOperatorTestData.ts`](apps/api-server/src/database/migrations/20260403900000-SeedKpaOperatorTestData.ts) | `test-yaksa01~13@o4o.com` 시드 + 평문 `[REDACTED]`. KPI 검증용 가짜 데이터 | 본 IR 범위 밖 (별도 `test-yaksa*` 패턴) — 별도 audit 권고 |
 
 ---
 
@@ -130,18 +130,18 @@ Grep "O4oTestPass"
 
 | # | 파일 | 위반 내용 | 분류 |
 |---|------|----------|:----:|
-| C1 | [`scripts/verify/verify-ai-content-modal.mjs:14-15`](scripts/verify/verify-ai-content-modal.mjs#L14-L15) | `TEST_EMAIL='phamacy1@o4o.com'`, `TEST_PASSWORD='O4oTestPass@1'` | **A 삭제** (또는 env var 화) |
-| C2 | [`e2e/registration-approval-login.spec.ts:13,102,161,221,298`](e2e/registration-approval-login.spec.ts) | `TEST_USER` email + `operatorPassword: 'O4oTestPass'` 다중 위치 | **D 전환** (TEST-ACCOUNTS.local.md SSOT 로) |
-| C3 | `scripts/care-data-accumulation-test.{mjs,py,sh}` | `O4oTestPass` 패턴 (미상세 검증, 동일 카테고리 추정) | A/D 결정 후 처리 |
+| C1 | [`scripts/verify/verify-ai-content-modal.mjs:14-15`](scripts/verify/verify-ai-content-modal.mjs#L14-L15) | `TEST_EMAIL='phamacy1@o4o.com'`, `TEST_PASSWORD='[REDACTED]'` | **A 삭제** (또는 env var 화) |
+| C2 | [`e2e/registration-approval-login.spec.ts:13,102,161,221,298`](e2e/registration-approval-login.spec.ts) | `TEST_USER` email + `operatorPassword: '[REDACTED]'` 다중 위치 | **D 전환** (TEST-ACCOUNTS.local.md SSOT 로) |
+| C3 | `scripts/care-data-accumulation-test.{mjs,py,sh}` | `[REDACTED]` 패턴 (미상세 검증, 동일 카테고리 추정) | A/D 결정 후 처리 |
 | C4 | `scripts/care-e2e-operation-test-v2.mjs` | 동일 | A/D 결정 후 처리 |
 
 ### 4.2 본 IR 의 평문 패스워드 매트릭스
 
 | 평문 비밀번호 | 발견된 위치 | 권고 |
 |--------------|-------------|------|
-| `O4oTestPass` | 19 파일 | env var / SSOT 화 또는 삭제 |
-| `O4oTestPass@1` | 다수 | 동일 |
-| `O4oBootstrap1!` | A1 (`BootstrapCanonicalSeedAccounts`) 의 default | A1 삭제 시 자연 제거 |
+| `[REDACTED]` | 19 파일 | env var / SSOT 화 또는 삭제 |
+| `[REDACTED]` | 다수 | 동일 |
+| `[REDACTED]` | A1 (`BootstrapCanonicalSeedAccounts`) 의 default | A1 삭제 시 자연 제거 |
 
 ---
 
@@ -165,7 +165,7 @@ Grep "O4oTestPass"
 
 | # | 파일 | 위반 | 분류 | 우선순위 |
 |---|------|------|:----:|:--------:|
-| E2 | 동 파일:219-223 | "테스트 약국" 버튼 — `O4oTestPass@1` 평문 | **A 삭제** | **CRITICAL** |
+| E2 | 동 파일:219-223 | "테스트 약국" 버튼 — `[REDACTED]` 평문 | **A 삭제** | **CRITICAL** |
 | E3 | — | 유사 패턴 추정 (확인 필요) | A 삭제 | HIGH |
 | E4 | `services/web-k-cosmetics/src/pages/auth/LoginPage.tsx` | 동일 패턴 추정 (Grep 매치) | A 삭제 | HIGH |
 | E5 | `services/web-k-cosmetics/src/components/common/LoginModal.tsx` | 동일 | A 삭제 | HIGH |
@@ -211,7 +211,7 @@ Grep "O4oTestPass"
 |------|---------|--------|:----:|
 | Bootstrap migration 의 임시 계정 자동 생성 | 매 배포 idempotent 재실행 | 임시 계정 = 삭제 상태 정상 (memory: `project_test_account_cleanup_policy`) | **위반** |
 | LoginPage 평문 quick-login 버튼 | production 빌드 포함 | CLAUDE.md §15 "자격증명 하드코딩 금지 — 발견 시 즉시 제거" | **위반** (CRITICAL) |
-| `seed-test-accounts.ts` runtime endpoint | requireAdmin guard 있으나 평문 `O4oTestPass@1` 으로 INSERT | 동일 | **위반** |
+| `seed-test-accounts.ts` runtime endpoint | requireAdmin guard 있으나 평문 `[REDACTED]` 으로 INSERT | 동일 | **위반** |
 | 검증 script 의 `TEST_EMAIL`/`TEST_PASSWORD` | 평문 하드코딩 | 동일 | **위반** |
 | reset plan 의 "BootstrapCanonical 자동 복구" smoke test | 임시 계정 로그인을 운영 검증 절차로 명시 | 임시 계정 = 운영 critical path 아님 | **위반** |
 | 이전 IR (HYGIENE-AUDIT-V1) 의 recreate 권고 | 본 IR 가 폐기 명시 | cleanup 방향 정상화 | **본 IR 가 해소** |
@@ -271,7 +271,7 @@ Grep -r "kpa-admin@o4o\.com|kpa-operator@o4o\.com|phamacy1@o4o\.com" .
 Grep -r "b0000000-b000-4000-b000-00000000000[234]" .
 
 # 평문 패스워드 / Bootstrap 키워드
-Grep -r "O4oBootstrap1!|BootstrapCanonicalSeed|O4oTestPass" .
+Grep -r "[REDACTED]|BootstrapCanonicalSeed|[REDACTED]" .
 
 # 확장 — 다른 8 임시 계정
 ```

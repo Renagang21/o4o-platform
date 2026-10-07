@@ -61,15 +61,9 @@ export class MailTemplateService {
 
     // 2. Inline template fallback
     const inlineTemplates: Record<string, (d: any) => string> = {
-      verification: this.verificationEmailTemplate,
       welcome: this.welcomeEmailTemplate,
       accountLocked: this.accountLockedTemplate,
-      // Merged from emailService.ts (B)
-      'email-verification': (d) => this.wrapSimpleTemplate(`
-        <h2>Verify Your Email</h2>
-        <p>Please click the link below to verify your email address:</p>
-        <p><a href="${d.verifyUrl}">Verify Email</a></p>
-      `),
+      // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 'email-verification' 템플릿 은퇴 — 발송 경로가 없다.
       'account-approved': (d) => this.wrapSimpleTemplate(`
         <h2>Account Approved!</h2>
         <p>Hi ${d.name},</p>
@@ -142,49 +136,6 @@ export class MailTemplateService {
   }
 
   // ── Inline templates ──
-
-  private verificationEmailTemplate(data: EmailTemplateData): string {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이메일 인증</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #4A90E2; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-    .content { background-color: #f8f9fa; padding: 40px; border-radius: 0 0 10px 10px; }
-    .button { display: inline-block; padding: 15px 30px; background-color: #4A90E2; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-    .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>${data.companyName}</h1>
-    </div>
-    <div class="content">
-      <h2>안녕하세요, ${data.name}님!</h2>
-      <p>회원가입을 환영합니다. 아래 버튼을 클릭하여 이메일 주소를 인증해주세요.</p>
-      <div style="text-align: center;">
-        <a href="${data.actionUrl}" class="button">이메일 인증하기</a>
-      </div>
-      <p>버튼이 작동하지 않는 경우, 아래 링크를 복사하여 브라우저에 붙여넣으세요:</p>
-      <p style="word-break: break-all; color: #666;">${data.actionUrl}</p>
-      <p style="margin-top: 30px;">이 링크는 24시간 동안 유효합니다.</p>
-    </div>
-    <div class="footer">
-      <p>이 이메일은 ${data.companyName}에서 발송되었습니다.</p>
-      <p>문의사항이 있으시면 ${data.supportEmail}로 연락주세요.</p>
-      <p>&copy; ${data.year} ${data.companyName}. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>`;
-  }
-
 
   private welcomeEmailTemplate(data: EmailTemplateData): string {
     return `

@@ -98,12 +98,11 @@ export function resolveExposableAccountStatus(status: unknown): ExposableAccount
 export const RESTRICTED_ALLOWLIST: ReadonlySet<string> = new Set([
   // ── 공통 인증 (로그인 세션 유지 / 로그아웃 / 본인 최소 정보) ──
   'GET /api/v1/auth/me',
-  'GET /api/v1/auth/verify',
   'GET /api/v1/auth/status',
   'POST /api/v1/auth/logout',
   'POST /api/v1/auth/logout-all',
-  // 이메일 인증 재발송 — 인증 완료가 pending 해소 경로 중 하나다 (§2.4)
-  'POST /api/v1/auth/resend-verification',
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 인증 재발송 경로는 은퇴했다
+  //   (토큰 producer 0 · Google 이 이미 이메일을 검증한다).
   // 내 service membership 상태 목록 (본인 것만 반환)
   'GET /api/v1/auth/services',
 

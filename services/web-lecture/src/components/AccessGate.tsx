@@ -8,9 +8,9 @@
  * 판정 정본은 백엔드 guard 다. 이 컴포넌트는 안내 화면만 담당하며 role 이 있어도 membership 이
  * 없으면 막는다 (role without membership → deny). KPA/KCos/PH membership · role 은 보지 않는다.
  */
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ROLES, SERVICE_KEY } from '../config/service';
+import { INQUIRY_URL, ROLES, SERVICE_KEY } from '../config/service';
 
 export type AccessArea = 'learner' | 'instructor' | 'operator';
 
@@ -40,16 +40,27 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 export default function AccessGate({ area }: { area: AccessArea }) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
   const config = AREA[area];
   if (isLoading) return <Card title={config.title}><p>로그인 상태를 확인하는 중...</p></Card>;
   if (!isAuthenticated || !user) {
-    return <Card title={config.title}><p>로그인이 필요합니다.</p><Link className="button-link" to="/login">로그인</Link></Card>;
+    return <Card title={config.title}><p>로그인이 필요합니다.</p><Link className="button-link" to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link></Card>;
   }
   if ((user.roles ?? []).includes('platform:super_admin')) return <Outlet />;
   if (!hasLectureMembership(user.memberships)) {
+    // 로그인은 됐고 강의 서비스 이용 자격만 없다 — 공개 강의와 이용 문의로 안내한다 (자동 가입 없음)
+    // WO-O4O-LECTURE-HANDOFF-NONMEMBER-UX-V1
+    const status = user.memberships?.find((m) => m.serviceKey === SERVICE_KEY)?.status;
     return <Card title={config.title}>
-      <p>활성 O4O 강의 서비스 membership 이 필요합니다.</p>
-      <p className="muted">다른 O4O 서비스 회원 자격은 이 서비스로 승계되지 않습니다. 강의 서비스 가입 후 이용해 주세요.</p>
+      <p>로그인은 완료되었지만 O4O 강의 서비스 이용 자격이 필요합니다.</p>
+      <p className="muted">{status
+        ? '강의 서비스 이용이 아직 승인되지 않았거나 이용할 수 없는 상태입니다.'
+        : '다른 O4O 서비스 회원 자격은 강의 서비스로 이어지지 않습니다.'}</p>
+      <p className="muted">공개 강의는 회원이 아니어도 볼 수 있습니다. 이용 신청은 문의하기로 남겨 주세요.</p>
+      <div className="actions">
+        <Link className="button-link" to="/courses">공개 강의 둘러보기</Link>
+        <a className="secondary-link" href={INQUIRY_URL}>이용 문의하기</a>
+      </div>
     </Card>;
   }
   if (!hasAreaRole(area, user.roles)) {

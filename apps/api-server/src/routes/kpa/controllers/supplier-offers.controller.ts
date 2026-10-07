@@ -3,7 +3,7 @@
  *
  * WO-EVENT-OFFER-SUPPLIER-PROPOSAL-PATH-V1
  *
- * Neture 공급자(neture_suppliers.user_id 매핑)가
+ * Neture 공급자(canonical: organization_members owner → supplier organization)가
  * 자신의 APPROVED SPO를 KPA 이벤트로 제안하는 경로.
  *
  * 공급자 역할: "제안자" (노출 관리 X)
@@ -22,6 +22,10 @@ import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 // WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1
 import { EventOfferService, EventOfferCreateError } from '../services/event-offer.service.js';
 import { resolveOrganizationForEventOffer } from '../helpers/event-offer-organization.helper.js';
+import {
+  resolveSupplierIdForUser,
+  readOrganizationContext,
+} from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -40,13 +44,14 @@ function err(res: Response, status: number, code: keyof typeof ERROR_CODES): voi
   res.status(status).json({ success: false, error: ERROR_CODES[code] });
 }
 
-/** neture_suppliers.user_id → supplierId 조회 */
-async function resolveSupplierIdByUser(dataSource: DataSource, userId: string): Promise<string | null> {
-  const rows = await dataSource.query(
-    `SELECT id FROM neture_suppliers WHERE user_id = $1 LIMIT 1`,
-    [userId]
-  );
-  return rows[0]?.id ?? null;
+/**
+ * 로그인 사용자 → supplierId.
+ * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+ *   `neture_suppliers.user_id LIMIT 1` → canonical resolver 재사용(N 개면 context 필요 · 임의 선택 0).
+ */
+async function resolveSupplierIdByUser(dataSource: DataSource, req: Request): Promise<string | null> {
+  const resolved = await resolveSupplierIdForUser(dataSource, (req as any).user?.id, readOrganizationContext(req));
+  return resolved?.supplierId ?? null;
 }
 
 // WO-O4O-EVENT-OFFER-CREATE-SERVICE-CAPSULE-V1: resolveKpaOrgId() →
@@ -69,8 +74,7 @@ export function createSupplierOffersController(
     '/my-offers',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const userId = (req as any).user?.id;
-        const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+        const supplierId = await resolveSupplierIdByUser(dataSource, req);
 
         if (!supplierId) {
           err(res, 403, 'SUPPLIER_NOT_FOUND');
@@ -116,15 +120,14 @@ export function createSupplierOffersController(
    *
    * 집계 기준:
    *   organization_product_listings (OPL, service_key='kpa-groupbuy')
-   *   → supplier_product_offers → neture_suppliers (user_id 일치)
+   *   → supplier_product_offers (supplier_id = canonical resolve 결과)
    *   → checkout_orders (metadata.productListingId, serviceKey='kpa-groupbuy', status='paid')
    */
   router.get(
     '/event-offers/stats',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const userId = (req as any).user?.id;
-        const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+        const supplierId = await resolveSupplierIdByUser(dataSource, req);
 
         if (!supplierId) {
           err(res, 403, 'SUPPLIER_NOT_FOUND');
@@ -146,8 +149,8 @@ export function createSupplierOffersController(
             AND co.metadata->>'serviceKey'       = $2
             AND co.status = 'paid'
           WHERE opl.service_key = $2
-            AND ns.user_id = $1
-        `, [userId, SERVICE_KEYS.KPA_GROUPBUY]);
+            AND ns.id = $1
+        `, [supplierId, SERVICE_KEYS.KPA_GROUPBUY]);
 
         res.json({
           success: true,
@@ -174,8 +177,7 @@ export function createSupplierOffersController(
     '/event-offers',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const userId = (req as any).user?.id;
-        const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+        const supplierId = await resolveSupplierIdByUser(dataSource, req);
 
         if (!supplierId) {
           err(res, 403, 'SUPPLIER_NOT_FOUND');
@@ -252,7 +254,7 @@ export function createSupplierOffersController(
         }
 
         // 공급자 계정 연결 확인 (UI fast-fail)
-        const supplierId = await resolveSupplierIdByUser(dataSource, userId);
+        const supplierId = await resolveSupplierIdByUser(dataSource, req);
         if (!supplierId) {
           err(res, 403, 'SUPPLIER_NOT_FOUND');
           return;

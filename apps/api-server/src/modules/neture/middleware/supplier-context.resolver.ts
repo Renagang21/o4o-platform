@@ -168,3 +168,72 @@ export async function resolveSupplierForUser(
     via: 'legacy_user_id',
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1
+//   middleware 밖의 Supplier runtime(controller · service · notification)이 각자
+//   `neture_suppliers WHERE user_id = $1 LIMIT 1` 을 다시 쓰지 않도록 이 파일의 의미를
+//   그대로 재사용하는 얇은 adapter 3개. 새 resolver framework 가 아니다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * controller 용 — resolved 면 `{ supplierId, status }`, 아니면 null.
+ * N 개(context_required) · 스푸핑(forbidden_context) 도 null 이다(임의 선택 0).
+ * 응답 코드는 호출자가 기존 계약대로 만든다.
+ */
+export async function resolveSupplierIdForUser(
+  dataSource: DataSource,
+  userId: string | null | undefined,
+  requestedOrganizationId: string | null = null,
+): Promise<{ supplierId: string; status: string } | null> {
+  if (!userId) return null;
+  const r = await resolveSupplierForUser(dataSource, userId, requestedOrganizationId);
+  return r.kind === 'resolved' ? { supplierId: r.supplierId, status: r.status } : null;
+}
+
+/**
+ * ownership 판정용 — "이 자원이 이 사용자의 공급자 소유인가".
+ * 선택이 아니라 소속 판정이므로 N 개면 전부 반환한다. canonical 이 없을 때만 legacy fallback(경고).
+ */
+export async function listOwnedSupplierIds(
+  dataSource: DataSource,
+  userId: string | null | undefined,
+): Promise<string[]> {
+  if (!userId) return [];
+  const candidates = await listSupplierCandidates(dataSource, userId);
+  if (candidates.length > 0) return candidates.map((c) => c.supplierId);
+  const legacy = await resolveByLegacyUserId(dataSource, userId);
+  if (!legacy) return [];
+  logger.warn('[SupplierContext] LEGACY_SUPPLIER_USER_ID_FALLBACK used (ownership)', {
+    userId,
+    supplierId: legacy.supplierId,
+  });
+  return [legacy.supplierId];
+}
+
+/**
+ * 알림 수신자 — 공급자 사업자 본인 = 현재 organization_members(owner) 전부.
+ * owner 가 하나도 없을 때만 legacy `neture_suppliers.user_id` 로 fallback(경고).
+ */
+export async function listSupplierOwnerUserIds(
+  dataSource: DataSource,
+  supplierId: string | null | undefined,
+): Promise<string[]> {
+  if (!supplierId) return [];
+  const rows: Array<{ user_id: string | null; legacy_user_id: string | null }> = await dataSource.query(
+    `SELECT om.user_id::text AS user_id, s.user_id::text AS legacy_user_id
+       FROM neture_suppliers s
+       LEFT JOIN organizations o         ON o.id = s.organization_id AND o.type = 'supplier'
+       LEFT JOIN organization_members om ON om.organization_id = o.id
+                                        AND om.left_at IS NULL
+                                        AND om.role = ANY($2::text[])
+      WHERE s.id = $1`,
+    [supplierId, SUPPLIER_WORK_MEMBER_ROLES],
+  );
+  const owners = [...new Set(rows.map((r) => r.user_id).filter((v): v is string => !!v))];
+  if (owners.length > 0) return owners;
+  const legacy = rows[0]?.legacy_user_id;
+  if (!legacy) return [];
+  logger.warn('[SupplierContext] LEGACY_SUPPLIER_USER_ID_FALLBACK used (recipient)', { supplierId });
+  return [legacy];
+}

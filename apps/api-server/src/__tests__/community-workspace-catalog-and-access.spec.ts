@@ -5,11 +5,20 @@
  *   1. Community Catalog SSOT = 1 · Community Identity ≠ Service Identity · 초기 3 Community · policy 2종만
  *   2. Access 시나리오 A~E (resolveCommunityAccess — 순수 함수, DB 0, membership 생성 0)
  *   3. Pharmacy 동일성: KPA `/kpa/forum` 과 PH `/pharmacy-hub/forum` 컨텍스트가 같은 원장 코드 집합을 본다
- *   4. Cross-community leakage: KCos-only → pharmacy write 403 · non-member → cosmetics/pharmacy 403 · o4o-general = authenticated
+ *   4. Cross-community leakage: KCos-only → pharmacy write 403 · non-member → cosmetics/pharmacy 403
+ *      (o4o-general = authenticated 는 **SUPERSEDED** — 아래 §4 주석)
  *   5. 공통 Core 재사용: Forum Core 복제 0 · communityKey 컨텍스트 · service-scoped route = KEEP_AS_CONTEXT_ALIAS
- *   6. Industry Community / Neture Community identity / PH 별도 약사 Community = 0 · 새 membership 테이블 0
+ *   6. Industry Community / Neture Community identity / PH 별도 약사 Community = 0
+ *      (새 membership 테이블 0 은 **SUPERSEDED** — 아래 §6 주석)
  *
  * 순수 단위 테스트 — DB 접속 없음.
+ *
+ * ── SUPERSEDED 축 (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1) ───────────
+ *   이 WO 는 모든 커뮤니티를 **가입 승인형 하나**로 통일했다. 그래서
+ *     · catalog policy 는 게시글 권한을 **더 이상 단독으로 판정하지 않는다**(참여 자격일 뿐)
+ *     · `community_memberships` 개체 원장이 생겼다
+ *     · `/api/v1/communities` 에 개설·가입 신청/승인 write 경로가 생겼다
+ *   해당 계약은 **지우지 않고 뒤집어** 둔다 — 되돌리면 이 파일이 먼저 실패해야 한다.
  */
 import { existsSync, readFileSync, readdirSync } from 'fs';
 import { resolve } from 'path';
@@ -33,7 +42,20 @@ jest.mock(
   { virtual: true },
 );
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }), { virtual: true });
-jest.mock('../database/connection.js', () => ({ AppDataSource: { getRepository: () => ({}), query: async () => [] } }));
+jest.mock('../database/connection.js', () => ({
+  AppDataSource: {
+    getRepository: () => ({}),
+    // 가입 승인 조회만 흉내낸다. factory 실행 시점에는 approvedMemberships 를 읽지 않는다
+    // (hoist 된 mock 이 아래 const 보다 먼저 평가되므로) — 호출 시점에 읽는다.
+    query: async (sql: string, params: unknown[] = []) => {
+      if (/FROM community_memberships cm/i.test(sql)) {
+        const [communityKey, userId] = params as [string, string];
+        return approvedMemberships.has(`${communityKey}:${userId}`) ? [{ ok: 1 }] : [];
+      }
+      return [];
+    },
+  },
+}));
 import {
   O4O_COMMUNITIES,
   getCommunityDefinition,
@@ -47,7 +69,10 @@ import {
   communityForumStorageCodes,
   type CommunityAccessUser,
 } from '../utils/community-access.resolver.js';
-import { requireCommunityAccess } from '../routes/forum/service-forum.routes.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 게이트가 middleware 계층으로 이동했다.
+//   종전 위치(routes/forum/service-forum.routes.ts)에서는 게이트 하나를 확인하려면 forum
+//   controller 전체와 그 entity 그래프를 함께 적재해야 했다.
+import { requireCommunityAccess } from '../middleware/community-access.middleware.js';
 import { ForumControllerBase } from '../controllers/forum/ForumControllerBase.js';
 import type { ForumContext } from '../middleware/forum-context.middleware.js';
 
@@ -217,25 +242,62 @@ describe('Pharmacy Community 동일성 — KPA · PH 진입이 같은 원장 코
 // 4. Cross-community leakage (backend guard)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function runGuard(communityKey: string, user: CommunityAccessUser | null) {
+/**
+ * 게이트는 이제 **비동기**이고 두 조건을 본다(참여 자격 AND 가입 승인).
+ * `approvedMemberships` 로 `community_memberships` 조회 결과를 흉내낸다 —
+ * 이 spec 은 DB 에 붙지 않는다(상단 connection mock).
+ */
+const approvedMemberships = new Set<string>(); // `${communityKey}:${userId}`
+
+async function runGuard(communityKey: string, user: CommunityAccessUser | null) {
   const res: any = { statusCode: 200, body: null, status(c: number) { this.statusCode = c; return this; }, json(b: any) { this.body = b; return this; } };
   let passed = false;
-  requireCommunityAccess(communityKey)({ user } as any, res, () => { passed = true; });
+  await (requireCommunityAccess(communityKey) as any)({ user } as any, res, () => { passed = true; });
   return { passed, status: res.statusCode, code: res.body?.code, reason: res.body?.reason };
 }
 
+beforeEach(() => approvedMemberships.clear());
+
 describe('Cross-community leakage 차단 — backend 강제 (WO §37)', () => {
-  it('KCos-only user → pharmacy write 403 COMMUNITY_ACCESS_DENIED', () => {
-    expect(runGuard('pharmacy', member('c', 'k-cosmetics'))).toMatchObject({ passed: false, status: 403, code: 'COMMUNITY_ACCESS_DENIED', reason: 'SERVICE_MEMBERSHIP_REQUIRED' });
+  // 승인 조건과 무관하게 **참여 자격 자체가 없으면** 종전 코드로 막힌다.
+  it('KCos-only user → pharmacy write 403 COMMUNITY_ACCESS_DENIED', async () => {
+    approvedMemberships.add('pharmacy:c'); // 승인이 있어도 자격이 없으면 막힌다
+    expect(await runGuard('pharmacy', member('c', 'k-cosmetics'))).toMatchObject({ passed: false, status: 403, code: 'COMMUNITY_ACCESS_DENIED', reason: 'SERVICE_MEMBERSHIP_REQUIRED' });
   });
-  it('non-member → pharmacy / cosmetics write 403 · 비로그인 → 401', () => {
-    expect(runGuard('pharmacy', member('d'))).toMatchObject({ passed: false, status: 403 });
-    expect(runGuard('cosmetics', member('d'))).toMatchObject({ passed: false, status: 403 });
-    expect(runGuard('cosmetics', null)).toMatchObject({ passed: false, status: 401, code: 'AUTH_REQUIRED' });
+  it('non-member → pharmacy / cosmetics write 403 · 비로그인 → 401', async () => {
+    expect(await runGuard('pharmacy', member('d'))).toMatchObject({ passed: false, status: 403 });
+    expect(await runGuard('cosmetics', member('d'))).toMatchObject({ passed: false, status: 403 });
+    expect(await runGuard('cosmetics', null)).toMatchObject({ passed: false, status: 401, code: 'AUTH_REQUIRED' });
   });
-  it('PH-only user → pharmacy write 통과 (KPA membership 없이) · authenticated → o4o-general 통과', () => {
-    expect(runGuard('pharmacy', member('b', 'pharmacy-hub')).passed).toBe(true);
-    expect(runGuard('o4o-general', member('d')).passed).toBe(true);
+
+  /**
+   * SUPERSEDED (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 V7).
+   *
+   * 종전 계약: "PH-only user → pharmacy write 통과" · "authenticated → o4o-general 통과".
+   * 즉 catalog policy 통과가 곧 게시글 권한이었다.
+   *
+   * 이제 그것은 **참여 자격**일 뿐이고, 글을 읽고 쓰려면 그 커뮤니티에 **가입 승인**을
+   * 받아야 한다. 폴백 커뮤니티(`pharmacy`·`cosmetics`·`o4o-general`)도 예외가 아니다 —
+   * 예외를 두면 "모든 커뮤니티는 가입 승인형 하나" 라는 결정이 무효가 된다.
+   */
+  it('자격이 있어도 **가입 승인이 없으면** 403 (종전에는 통과였다)', async () => {
+    expect(await runGuard('pharmacy', member('b', 'pharmacy-hub'))).toMatchObject({
+      passed: false,
+      status: 403,
+      code: 'COMMUNITY_MEMBERSHIP_REQUIRED',
+    });
+    // o4o-general 은 policy 가 `authenticated` 라 자격은 항상 통과 — 그래도 승인이 필요하다.
+    expect(await runGuard('o4o-general', member('d'))).toMatchObject({
+      passed: false,
+      code: 'COMMUNITY_MEMBERSHIP_REQUIRED',
+    });
+  });
+
+  it('자격 + 가입 승인 둘 다 있으면 통과한다', async () => {
+    approvedMemberships.add('pharmacy:b');
+    expect((await runGuard('pharmacy', member('b', 'pharmacy-hub'))).passed).toBe(true);
+    approvedMemberships.add('o4o-general:d');
+    expect((await runGuard('o4o-general', member('d'))).passed).toBe(true);
   });
   it('공통 라우터는 쓰기 경로에 requireCommunityAccess 를 먼저 적용한다 (프런트 gate 만으로 보호하지 않는다)', () => {
     const src = code('apps/api-server/src/routes/forum/service-forum.routes.ts');
@@ -272,21 +334,79 @@ describe('Community Core 재사용 · 복제 0 · 새 membership 테이블 0 (WO
     }
     expect(code('apps/api-server/src/controllers/forum/ForumControllerBase.ts')).toContain('communityForumStorageCodes(communityKey)');
   });
-  it('새 Community membership 테이블 · migration · entity 0', () => {
-    const mig = readdirSync(resolve(REPO, 'apps/api-server/migrations')).filter((f) => /community/i.test(f));
-    expect(mig).toEqual([]);
-    const inc = readdirSync(resolve(REPO, 'apps/api-server/src/database/migrations')).filter((f) => /community[-_]?member|CommunityMembership/i.test(f));
-    expect(inc).toEqual([]);
-    expect(existsSync(resolve(REPO, 'apps/api-server/src/entities/CommunityMembership.ts'))).toBe(false);
+  /**
+   * SUPERSEDED (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3-1).
+   *
+   * 종전 계약: "새 Community membership 테이블 0". 그때 커뮤니티는 카탈로그 상수뿐이었고
+   * 참여 자격은 `service_memberships` 로 판정했으므로 개체 원장이 필요 없었다.
+   *
+   * 개설 신청·승인과 커뮤니티별 운영자·가입 승인이 생기면서 **개체 단위 원장이 필요해졌다.**
+   * `service_memberships` 로는 "어느 커뮤니티의 운영자인가" 를 표현할 수 없다.
+   *
+   * 다만 원래 의도(**Forum Core 복제 금지**)는 그대로 유효하다 — 아래에서 그것을 고정한다.
+   */
+  it('커뮤니티 개체 원장은 3테이블이며 Forum Core 를 복제하지 않는다', () => {
+    // 레거시 migrations 디렉터리에는 여전히 커뮤니티 파일이 없다(추가는 incremental 로만).
+    expect(readdirSync(resolve(REPO, 'apps/api-server/migrations')).filter((f) => /community/i.test(f))).toEqual([]);
+
+    const inc = readdirSync(resolve(REPO, 'apps/api-server/src/database/migrations')).filter((f) =>
+      /CreateCommunityDomain/.test(f),
+    );
+    expect(inc).toHaveLength(1);
+
+    const mig = read(`apps/api-server/src/database/migrations/${inc[0]}`);
+    // 개체·신청·가입 3개만. forum_* 을 다시 만들지 않는다.
+    for (const t of ['communities', 'community_creation_requests', 'community_memberships']) {
+      expect(mig).toContain(`CREATE TABLE ${t}`);
+    }
+    expect(mig).not.toMatch(/CREATE TABLE (forum_|community_post|community_comment)/);
   });
-  it('/api/v1/communities 는 조회 전용이며 registry 에 mount 된다', () => {
+
+  /**
+   * SUPERSEDED — 카탈로그 **조회** 경로는 여전히 write 0 이지만, 같은 라우터에 개설·가입
+   * 신청/승인 write 가 생겼다. 그 write 는 이름 있는 가드를 반드시 지난다.
+   */
+  it('/api/v1/communities — 카탈로그 조회는 write 0 · lifecycle write 는 가드를 지난다', () => {
     const r = code('apps/api-server/src/routes/communities.routes.ts');
-    expect(r).not.toMatch(/router\.(post|put|patch|delete)\(/);
-    expect(code('apps/api-server/src/bootstrap/register-routes.ts')).toContain("app.use('/api/v1/communities'");
+
+    // 카탈로그 조회 2경로는 optionalAuth 하나만 붙는다(종전 계약 유지).
+    expect(r).toMatch(/router\.get\(\s*'\/',\s*optionalAuth,/);
+    expect(r).toMatch(/router\.get\(\s*'\/:communityKey\/access',\s*optionalAuth,/);
+
+    // lifecycle write 는 무인증으로 열려 있지 않다 — 모든 POST 가 authenticate 로 시작한다.
+    const posts = r.match(/router\.post\([\s\S]{0,120}/g) ?? [];
+    expect(posts.length).toBeGreaterThan(0);
+    for (const p of posts) expect(p).toMatch(/authenticate|serviceAdminOnly|operatorOnly/);
+
+    // mount 는 여러 줄로 쓰여 있을 수 있다 — 형식이 아니라 사실을 본다.
+    const registry = code('apps/api-server/src/bootstrap/register-routes.ts').replace(/\s+/g, ' ');
+    expect(registry).toMatch(/app\.use\( ?'\/api\/v1\/communities',/);
   });
   it('대표 홈은 /communities 만 읽고 membership 으로 커뮤니티를 추론하지 않는다', () => {
     const home = code('services/web-neture/src/lib/home-entry.ts');
     expect(home).toContain("api.get('/communities')");
     expect(home).not.toMatch(/community:neture|community:kpa-society|community:pharmacy-hub/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 승격 CLI 의 원장 컬럼 = baseline 스키마 (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 CHECK §8-2)
+//   운영 적용 직전 `c.post_id`(존재하지 않는 컬럼)로 dry-run 이 실패하던 결함의 회귀 방지.
+//   댓글 작성자도 참여 증거이므로 이 JOIN 이 깨지면 댓글만 쓴 참여자가 이행에서 빠진다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('승격 CLI — forum_comment 원장 컬럼이 baseline 스키마와 일치', () => {
+  const baseline = read('apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts');
+  const commentTable = baseline.match(/CREATE TABLE public\.forum_comment \(([\s\S]*?)\n\s*\);/)?.[1] ?? '';
+  const cli = code('apps/api-server/src/scripts/community-catalog-promotion.ts');
+
+  it('baseline 의 forum_comment 글 참조 컬럼은 "postId" 다', () => {
+    expect(commentTable).toMatch(/"postId" uuid NOT NULL/);
+    expect(commentTable).not.toMatch(/\bpost_id\b/);
+  });
+
+  it('CLI 의 댓글 증거 JOIN 은 c."postId" 를 쓴다', () => {
+    expect(cli).toContain('JOIN forum_post p ON p.id = c."postId"');
+    expect(cli).not.toMatch(/c\.post_id\b/);
   });
 });

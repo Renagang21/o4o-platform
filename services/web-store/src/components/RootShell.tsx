@@ -3,7 +3,7 @@
  * 상위 nav 6개(홈 · 내 매장 · 서비스 업무 · 매장 HUB · 내 서비스 · 설정) 골격만. 하위 항목·기능은 WO B.
  * `내 매장: ○○ ▼` 로 언제든 매장을 바꾼다(Selector 재진입).
  */
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, PLATFORM_LEGAL_SERVICE_KEY, PLATFORM_ORIGIN, ROOT_NAV_ITEMS, WORKSPACE_PATHS } from '../config/workspace';
 import { loadFooterLegal } from '../lib/footerLegal';
@@ -11,6 +11,7 @@ import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
+import { withReturnTo } from '../lib/returnTo';
 
 function StoreSwitcher() {
   const { status, organizationName, stores, clearStore } = useUnifiedStore();
@@ -33,6 +34,11 @@ function StoreSwitcher() {
 
 export default function RootShell() {
   const { isAuthenticated, logout } = useAuth();
+  // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
+  const { pathname, search, hash } = useLocation();
+  // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
+  const { effectiveServiceKey } = useUnifiedStore();
+  const navItems = effectiveServiceKey === 'kpa-society' ? ROOT_NAV_ITEMS.filter((i) => i.key !== 'store-hub') : ROOT_NAV_ITEMS;
   return <div className="site">
     <header className="header">
       <div className="header-left">
@@ -40,16 +46,16 @@ export default function RootShell() {
         <StoreSwitcher />
       </div>
       <nav className="nav" aria-label="매장 업무공간" data-testid="root-nav">
-        {ROOT_NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink key={item.key} to={item.to} end={item.end} className={({ isActive }) => (isActive ? 'active' : undefined)}>
             {item.label}
           </NavLink>
         ))}
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="link-button" />
+        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} className="o4o-home-link" />
         {isAuthenticated
           ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button>
-          : <Link to={WORKSPACE_PATHS.login}>로그인</Link>}
+          : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}
       </nav>
     </header>
     <div className="content"><Outlet /></div>

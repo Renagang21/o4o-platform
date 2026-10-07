@@ -7,13 +7,20 @@
 
 ## 1. 필수 도구
 
-| 도구 | 버전 | 확인 |
-|---|---|---|
-| Node.js | 22.18.0 | `node --version` |
-| pnpm | 10.25.0 | `pnpm --version` |
-| gcloud CLI | 최신 | `gcloud --version` |
-| Cloud SQL Auth Proxy | v2 (v2.14.3 기준) | `bin/cloud-sql-proxy-v2.exe --version` |
-| PostgreSQL (로컬 개발 DB) | 선택 | `psql --version` |
+| 도구 | 버전 | 확인 | 필요한 사람 |
+|---|---|---|---|
+| Node.js | 22.18.0 | `node --version` | 전원 |
+| pnpm | 10.25.0 | `pnpm --version` | 전원 |
+| PostgreSQL (로컬 개발 DB) | 15 | `psql --version` | 로컬 API 를 띄우는 개발자 (운영 DB 와 같은 major) |
+| gcloud CLI | 최신 | `gcloud --version` | **운영자 전용** — 공동개발 로컬환경에는 필요 없음 |
+| Cloud SQL Auth Proxy | v2 (v2.14.3 기준) | `bin/cloud-sql-proxy-v2.exe --version` | **운영자 전용** — 공동개발 로컬환경에는 필요 없음 |
+
+> **공동개발 로컬환경은 운영 credential 없이 구성합니다.** 운영 DB · Secret Manager · GCP 자격증명 · 운영 OAuth /
+> AI key 는 필요 조건이 아니며 제공하지 않습니다. 이 문서의 프록시 · `gcloud` · 운영 DB identity 절(§2-2 · §2-3 ·
+> §3 터미널 1 · §4 운영 DB 열 · §7)은 운영자용입니다. 공동개발자는 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture) 부터 보면 됩니다.
+
+TypeScript · Vite 는 workspace 별로 여러 버전이 공존합니다(예: web-neture 는 TS 5.9 · Vite 5, 일부 서비스는 Vite 7).
+**직접 맞추지 않습니다** — `pnpm-lock.yaml` 이 패키지별로 해결합니다.
 
 **기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.18.0` · `pnpm 10.25.0`).
 CI(`.github/actions/setup-build-env`)도 동일 버전을 사용하므로, 로컬을 이 값에 맞추면
@@ -47,6 +54,8 @@ pnpm install --frozen-lockfile
 **`--frozen-lockfile` 이 기본입니다.** `pnpm-lock.yaml` 을 그대로 재현하므로 CI 와 같은 의존성 트리를 얻습니다.
 CI(`ci-pipeline.yml`)도 동일하게 설치하며 lockfile 이 어긋나면 **실패합니다**.
 
+설치 후 `pnpm-lock.yaml` 이 의도하지 않게 바뀌었다면 **커밋하지 말고** Node · pnpm 버전(§1)부터 확인합니다.
+
 의존성을 **의도적으로 추가·변경할 때만** 잠금 없이 설치합니다.
 
 ```bash
@@ -55,6 +64,8 @@ git add pnpm-lock.yaml       # package.json 과 함께 stage (pre-commit 이 검
 ```
 
 ### 2-2. Cloud SQL Proxy 설치
+
+> 운영자 전용. 공동개발 로컬환경에는 필요 없습니다(§2-3 도 같음).
 
 ```cmd
 .\setup-cloud-sql-proxy.cmd
@@ -88,7 +99,16 @@ cp apps/api-server/.env.example apps/api-server/.env
 ```
 
 로컬 개발 DB(기본값) 또는 프록시 경유 운영 DB 중 하나를 선택해 값을 채웁니다.
-두 경로의 예제는 `.env.example`의 (A)/(B) 블록에 분리되어 있습니다.
+두 경로의 예제는 `.env.example`의 (A)/(B) 블록에 분리되어 있습니다. 공동개발자는 **(A) 로컬 DB 만** 씁니다.
+
+로컬에서 채울 값은 모두 **본인 로컬 전용 값**입니다.
+
+| 변수 | 값 |
+|---|---|
+| `PORT` | `3002` (로컬 API 기준 포트 — 예제 기본값 그대로) |
+| `DB_HOST` / `DB_PORT` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | 본인 로컬 PostgreSQL 15 값 |
+| `JWT_SECRET` / `JWT_REFRESH_SECRET` / `SESSION_SECRET` | 임의 난수 문자열 (로컬 전용, 공유 금지) |
+| `GOOGLE_*` · AI key · 결제 · 소셜 · 이메일 | UI 기동에는 불필요 — [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture) 의 로그인 · AI 항목 참고 |
 
 **`.env`는 절대 커밋하지 않습니다** (`.gitignore` 처리됨).
 비밀번호를 PC 간에 복사하지 말고 각 PC에서 개별 설정합니다.
@@ -128,13 +148,55 @@ Listening on 127.0.0.1:5442
 ### 터미널 2 — 개발 서버
 
 ```bash
-pnpm run build:packages   # 최초 1회 또는 packages/ 수정 시
-pnpm run dev:admin        # Admin Dashboard  → http://localhost:5173
-pnpm run dev:api          # API 서버         → http://localhost:3001
-pnpm run dev              # Admin Dashboard (= dev:admin)
+pnpm run build:packages                # 최초 1회 또는 packages/ 수정 시
+pnpm run dev:admin                     # Admin Dashboard  → http://localhost:5173
+pnpm run dev:api                       # API 서버         → http://localhost:3002 (.env PORT)
+pnpm --filter @o4o/web-neture dev      # web-neture       → http://localhost:3000
+pnpm run dev                           # Admin Dashboard (= dev:admin)
 ```
 
-API 상태 확인: `curl http://localhost:3001/health`
+API 상태 확인: `curl http://localhost:3002/health`
+
+로컬 API 포트 **3002** 가 기준입니다(`apps/api-server/.env.example` `PORT` · web-neture dev 기본값 · `@o4o/auth-client` localhost 기본값).
+소스의 `PORT || 8080` 은 Cloud Run runtime 기본값이며 로컬 기준이 아닙니다.
+
+### 3-1. 공동개발 로컬환경 — 로컬 API + web-neture
+
+첫 공동개발 대상(neture.co.kr Main · O4O Agent) 기준 절차입니다. **운영 credential 은 필요 없습니다.**
+
+1. **설치** — §1 도구(Node 22.18.0 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
+2. **공통 패키지 빌드** — `pnpm run build:packages`.
+   web-neture 가 쓰는 `@o4o/*` 일부(types · auth-client · ui · content-editor · forum-core 등)는 소스가 아니라 `dist` 를 import 하므로, 이 빌드 없이는 dev server 가 뜨지 않습니다.
+3. **로컬 DB** — PostgreSQL 15 에 빈 DB(예: `o4o_platform`)와 그 DB 의 owner 사용자를 만듭니다.
+   필요한 extension(`uuid-ossp`)은 아래 bootstrap 이 생성합니다.
+4. **API env** — §2-4 대로 `apps/api-server/.env` 작성 (`PORT=3002`, 로컬 DB 값, 임의 JWT/SESSION secret).
+5. **스키마 bootstrap** — `pnpm --filter @o4o/api-server migration:run`.
+   빈 DB 면 canonical schema baseline 을 적용한 뒤 incremental migration 을 적용합니다(`apps/api-server/src/migrate.ts`).
+   반드시 **로컬 DB** 를 가리키는 `.env` 로 실행합니다. seed · 테스트 계정은 없습니다.
+6. **API 기동** — `pnpm run dev:api` → `curl http://localhost:3002/health`.
+7. **web-neture 기동** — `pnpm --filter @o4o/web-neture dev` → http://localhost:3000 . `/` 에 `O4OHomePage`(메인 화면)가 보이면 정상입니다.
+   - API 대상은 `VITE_API_BASE_URL` 입니다. 다른 로컬 주소를 쓰려면 `services/web-neture/.env.example` 을 `.env.local` 로 복사해 수정합니다.
+   - **dev server 는 이 값이 없어도 `http://localhost:3002` 를 씁니다. 운영 API 로 fallback 하지 않습니다**
+     (`vite.config.ts` · `src/lib/apiBaseUrl.ts`). 운영 API 주소를 직접 적어 넣지 않습니다.
+   - 브라우저 개발자도구 Network 탭에서 요청이 `localhost:3002` 로 가는지 한 번 확인합니다.
+
+**로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
+
+- 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
+- 로그인은 Google 로그인뿐입니다(GIS popup → ID token → API 가 `aud` 검증). 로컬 로그인 smoke 에는
+  Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
+  `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
+
+  ```bash
+  GOOGLE_ALLOWED_CLIENT_IDS=<개발용 OAuth Client ID>
+  ```
+
+  - popup 방식이라 **redirect URI 는 필요 없고, Client Secret 도 쓰지 않습니다.**
+  - `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` 은 은퇴한 passport 설정이라 넣어도 효과가 없습니다.
+  - `GOOGLE_WEB_CLIENT_ID` 는 선택입니다. 비우면 `GOOGLE_ALLOWED_CLIENT_IDS` 의 첫 항목을 씁니다.
+  - 운영 OAuth Client 는 제공하지 않으며, 개발용 Client ID 제공 방식은 별도로 안내합니다.
+- O4O Agent 의 실제 AI 요청(`/api/ai/*`)은 로그인이 필요하고, **개발용 Gemini 또는 OpenAI key**(`GEMINI_API_KEY` / `OPENAI_API_KEY`)가
+  있어야 합니다. key 가 없으면 `AI_NOT_CONFIGURED` 로 실패합니다. 운영 AI key 는 제공하지 않습니다.
 
 ---
 
@@ -153,12 +215,24 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
+**운영 DB identity** (2026-09-30 기준):
+
+| role | 성격 | 사용처 |
+|---|---|---|
+| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 운영 DB read-only 조회 |
+| `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
+
+`o4o_api` 로 직접 로그인하는 현행 스크립트 · Job 은 없다. 운영 스크립트는 로그인 identity 기본값을 두지 않고
+`DB_USERNAME` 이 없으면 즉시 실패한다(`apps/api-server/src/scripts/require-db-username.mjs`). 운영 접속 시 `DB_USERNAME` 을 명시한다.
+어떤 스크립트가 현행(ACTIVE · PAUSED)이고 어떤 것이 실행 금지 legacy 인지는
+[O4O-API-SERVER-SCRIPTS-INVENTORY-V1](docs/baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md) 이 정본이다.
+
 다른 인스턴스에 연결하려면 `start-cloud-sql-proxy.cmd`의
 `INSTANCE_CONNECTION_NAME`을 수정합니다. 현재 이 프로젝트의 Cloud SQL 인스턴스는
 `o4o-platform-db` 하나뿐입니다 (`neture-db` 는 2026-08-18 영구 삭제).
 
-**마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행**됩니다 (CLAUDE.md §0).
-로컬 수동 실행은 예외 상황에 한정합니다.
+**운영 DB 마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행**됩니다 (CLAUDE.md §0).
+운영 DB 대상 수동 실행은 예외 상황에 한정합니다. 로컬 DB bootstrap 은 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture) 의 같은 명령으로 합니다.
 
 ```bash
 pnpm --filter @o4o/api-server migration:run
@@ -185,16 +259,19 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 ### CI 게이트 현재 상태
 
 `ci-pipeline.yml` 은 `main` push · PR 에서 실행되며, 아래는 **실패 시 CI 를 차단**합니다.
+변경 범위에 따라 문서 전용 변경은 `docs-fast`, admin 전용 변경은 `admin-fast` 잡으로 대체됩니다(`scripts/ci/detect-affected.mjs`).
 
 | 검사 | 비고 |
 |---|---|
-| `pnpm install --frozen-lockfile` | lockfile drift = 실패 |
-| `type-check:frontend` | |
-| `typecheck:app-store-packages` | |
-| **api-server `type-check`** | 사전 빌드 후 실행 (아래 주의) |
-| `console.log` 검사 | `apps/**` 프로덕션 코드 |
-| Jest · Vitest (3종) | |
-| main-site · admin-dashboard 빌드 | |
+| `pnpm install --frozen-lockfile` + `build:packages` | lockfile drift = 실패 |
+| `type-check:frontend` · `typecheck:app-store-packages` · api-server `type-check` | api-server 는 사전 빌드 후 실행 (아래 주의) |
+| ESLint ratchet · 정적 guard | unsafe route · TypeORM entity registry · bootstrap/migration 계약 · `console.log`(`apps/**`) |
+| Vitest | admin-dashboard · 공통 packages · 서비스별(web-neture · web-kpa-society · web-kpa-branch 등) — 각 `vitest.config.mjs` 를 루트에서 실행 |
+| Jest | 일부 packages · api-server (3 shard, `@o4o/api-server^...` 사전 빌드) |
+| 앱 빌드 | `admin-dashboard` 만. 서비스 web 앱(web-neture 등)의 빌드는 CI 가 아니라 배포 Docker 빌드에서 수행 |
+
+web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run --config services/web-neture/vitest.config.mjs` 를 실행합니다
+(web-neture `package.json` 에는 test script 가 없습니다).
 
 > **api-server type-check 주의.** api-server 는 `@o4o/security-core` 등 11개 패키지 타입을
 > `dist/*.d.ts` 로 해석하는데, 이 패키지들은 `build:packages` 체인에 **없습니다**.
@@ -203,9 +280,10 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 > **로컬 green ≠ CI green** 인 대표 사례이므로, clean 체크아웃에서 검증할 때는 위 사전 빌드를 먼저 실행하세요.
 
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
-기존 오류 **102건**(warning 2,366건)이 baseline 으로 남아 있고,
+기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
 `scripts/lint-ratchet.mjs` 가 `pnpm run lint` 와 동일한 설정·범위로 검사해
-**오류 수가 102를 넘으면 실패**합니다. 즉 신규 lint 오류는 CI 를 막습니다.
+**오류 수가 46을 넘으면 실패**합니다. 즉 신규 lint 오류는 CI 를 막습니다.
+숫자의 정본은 `scripts/lint-ratchet.mjs` 의 `ERROR_BASELINE` 이며, 이 문서는 그것을 인용합니다.
 
 - baseline 은 **내리는 방향으로만** 갱신합니다(오류를 실제로 고친 뒤 숫자를 낮춤).
 - 순증 차단이지 1:1 동일성 판정이 아닙니다(1건 고치고 1건 추가하면 통과).
@@ -213,10 +291,11 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 
 ### Git 절차
 
-브랜치 전략은 [CLAUDE.md](CLAUDE.md) §1(`main` 직접 작업)을 따릅니다.
-**다중 PC · 다중 세션 환경의 stage · 커밋 · PC 이동 절차는
-[docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다** —
-path-specific stage, 다른 세션 미커밋 변경 불가침, `HEAD == origin/main` 완료 조건,
+**worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
+독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(사용자 통합 승인 후) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
+**stage · 커밋 · PC 이동 절차는
+[docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
+path-specific stage, 다른 세션 미커밋 변경 불가침,
 PC 이동 체크리스트, `.husky/pre-commit` 의 lockfile 검증 계약이 모두 그 문서에 있습니다.
 
 ---
@@ -247,7 +326,8 @@ pnpm run build:packages
 netstat -ano | findstr :5432    :: 로컬 PostgreSQL
 netstat -ano | findstr :5442    :: Cloud SQL Auth Proxy
 netstat -ano | findstr :5173
-netstat -ano | findstr :3001
+netstat -ano | findstr :3002    :: 로컬 API
+netstat -ano | findstr :3000    :: web-neture (web-kpa-society 도 3000 — 동시에 하나만)
 taskkill /PID <PID> /F
 ```
 로컬 PostgreSQL이 `5432`를 점유하므로 프록시는 `5442`를 사용합니다.
@@ -258,9 +338,13 @@ taskkill /PID <PID> /F
 ```bash
 pnpm run clean
 rm -rf node_modules
-pnpm install
+pnpm install --frozen-lockfile
 pnpm run build:packages
 ```
+
+### web-neture 설정 변경이 반영되지 않음
+`services/web-*/vite.config.js` · `vite.config.d.ts` 가 로컬에 생겨 있으면(과거 `tsc` 산출물, git 미추적) Vite 가
+`vite.config.ts` 대신 그 파일을 읽습니다. 두 파일을 지우면 정본인 `vite.config.ts` 가 적용됩니다.
 
 ### 메모리 부족
 ```bash

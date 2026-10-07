@@ -18,7 +18,7 @@
 
 | 항목 | 결과 |
 |---|---|
-| 계정 | `renagang21@gmail.com` (공급자 `(주)네뚜레 공급자 테스트`) |
+| 계정 | `[REDACTED_EMAIL_B]` (공급자 `(주)네뚜레 공급자 테스트`) |
 | serviceKey | `neture` — UI 로그인 폼이 자동 전송 |
 | UI 로그인 | PASS |
 | `/supplier/dashboard` | PASS |

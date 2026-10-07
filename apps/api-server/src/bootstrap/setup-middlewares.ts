@@ -13,8 +13,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import passport from '../config/passportDynamic.js';
 
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
@@ -51,7 +49,7 @@ export const getAllowedOrigins = (): string[] => {
 
   const prodOrigins = [
     "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
-    "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
+    "https://shop.neture.co.kr", "https://forum.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
@@ -64,6 +62,15 @@ export const getAllowedOrigins = (): string[] => {
     // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1:
     //   store.neture.co.kr = O4O 공통 Store Workspace(서비스가 아님 · serviceKey 없음). 정확한 origin 만, wildcard 금지.
     "https://store.neture.co.kr",
+    // CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 (서브도메인 이전): 확정된 목표 호스트.
+    //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다(pharmacyhub 선례).
+    //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
+    //   funding.neture.co.kr 은 위에 이미 있다. partner 는 주소 예약만이라 등록하지 않는다.
+    "https://supplier.neture.co.kr",
+    "https://pharmacy.neture.co.kr",
+    "https://retail.neture.co.kr",
+    "https://kpa.neture.co.kr",
+    "https://community.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
@@ -83,18 +90,13 @@ export const getAllowedOrigins = (): string[] => {
     //     이미 위에 등록된 "https://kpa-society.co.kr" / "https://www.kpa-society.co.kr"
     //     가 그대로 분회 앱의 origin 이 된다 — 별도 항목을 추가하지 않는다.
     "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
-    // WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1:
-    //   signage-player-web(Cloud Run) 은 익명 단말 런타임으로 api.neture.co.kr 을
-    //   cross-origin 호출한다. 정확한 origin 1개만 추가한다 —
-    //   wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
-    //   "https://signage.neture.co.kr" 은 이미 위에 등록돼 있으나 DNS 는 아직 없다(NXDOMAIN).
-    "https://signage-player-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-HOSPITAL-PHARMACY-SERVICE-FOUNDATION-V1:
     //   web-hospital-pharmacy(Cloud Run) 는 /api/ai/* (파일 이해·조사) 를 cross-origin 호출한다.
-    //   canonical 도메인(hospital.neture.co.kr)은 DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서
-    //   API 재배포가 불필요하다(pharmacyhub 선례). Cloud Run URL 은 DNS 이전 브라우저 smoke 용.
+    //   정식 진입은 neture.co.kr/hospital 이라 origin 은 위의 "https://neture.co.kr" 이다.
+    //   Cloud Run URL 은 브라우저 smoke 용.
     //   정확한 origin 만 — wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
-    "https://hospital.neture.co.kr",
+    // (은퇴 · WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1) signage-player-web run.app · signage.neture.co.kr ·
+    //   hospital.neture.co.kr — 서비스 삭제 · DNS 없음. 다시 넣지 않는다.
     "https://hospital-pharmacy-web-3e3aws7zqa-du.a.run.app",
   ];
 
@@ -113,9 +115,9 @@ export const getAllowedOrigins = (): string[] => {
  *   6. Security middleware + SQL injection detection
  *   7. Tenant context
  *   8. Cookie parser + body parsing
- *   9. Session (memory store — passport OAuth 전용)
- *  10. Passport initialization
- *  11. HTTP metrics + slow request threshold
+ *   9. HTTP metrics + slow request threshold
+ *
+ * (은퇴) express-session · Passport 초기화 — WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1
  */
 export function setupMiddlewares(app: Application): void {
   // 1. Security headers
@@ -177,7 +179,7 @@ export function setupMiddlewares(app: Application): void {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 기기 토큰 헤더
     //   (heartbeat · 직원 runtime API). 허용 목록에 없으면 브라우저 preflight 에서 차단된다.
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Organization-Id', 'X-Tablet-Device-Token'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Organization-Id', 'X-Store-Organization-Id', 'X-Tablet-Device-Token'],
     // WO-O4O-KPA-QR-EXPORT-FILENAME-BY-TITLE-V1: 교차출처 다운로드에서 파일명(Content-Disposition)을
     //   프론트가 읽을 수 있도록 노출 (QR/CSV/PDF 등 모든 첨부 다운로드 공통 혜택).
     exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After', 'Content-Disposition'],
@@ -241,25 +243,16 @@ export function setupMiddlewares(app: Application): void {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-  // 9. Session configuration
-  const sessionConfig: any = {
-    secret: env.getString('SESSION_SECRET', 'o4o-platform-session-secret'),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: env.isProduction(),
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      domain: env.getString('COOKIE_DOMAIN', undefined),
-      sameSite: 'lax'
-    }
-  };
-
-  // Session middleware for passport (required for OAuth)
-  app.use(session(sessionConfig) as any);
-
-  // 10. Initialize passport
-  app.use(passport.initialize() as any);
+  // 9~10. (은퇴) express-session + passport.initialize()
+  //
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — IR §3-1:
+  //   세션은 주석 그대로 "required for OAuth" 용이었고 Passport 전략 외에는 쓰이지 않았다.
+  //   `req.session` 사용처 0건 · `passport.authenticate` 호출 0건 ·
+  //   전략이 가리키던 `/api/v1/social/*` 콜백은 라우터에 **등록된 적이 없다**.
+  //   로그인 정본은 Google ID token 검증(`/auth/google/login`)이고 세션을 쓰지 않는다.
+  //
+  //   따라서 세션 미들웨어와 Passport 초기화를 함께 제거한다. 쿠키 인증은
+  //   `cookieParser` + httpOnly 토큰 쿠키로 동작하며 이 변경의 영향을 받지 않는다.
 
   // 11. HTTP Metrics
   const httpMetrics = HttpMetricsService.getInstance(prometheusMetrics.registry);

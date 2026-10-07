@@ -9,6 +9,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { getServiceMembershipStatus, isPlatformSuperAdmin } from '../../lib/membershipGate';
 import { ForumHubTemplate, type ForumHubConfig } from '@o4o/shared-space-ui';
 import { ForumHubSection } from '../../components/forum/ForumHubSection';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
@@ -35,8 +36,13 @@ const requestBtnStyle: React.CSSProperties = {
 };
 
 function ForumRequestButton() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 개설신청 backend 는 KPA 회원(kpa_members active)만 받는다 —
+  //   kpa-society 가입이 active 가 아닌 로그인 사용자(Neture 자격만 가진 약국 등)에게는 버튼을 보이지 않는다.
+  if (isAuthenticated && user && !isPlatformSuperAdmin(user) && getServiceMembershipStatus(user) !== 'active') {
+    return null;
+  }
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -57,7 +63,7 @@ function ForumRequestButton() {
 
 const kpaForumConfig: ForumHubConfig = {
   serviceKey: 'kpa-society',
-  heroTitle: 'KPA-Society 포럼',
+  heroTitle: 'O4O 약국 포럼',
   heroDesc: '약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요',
   categoryPath: (id) => `/forum/all?category=${id}`,
   listPath: '/forum/all',

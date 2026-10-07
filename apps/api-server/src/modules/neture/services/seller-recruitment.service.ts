@@ -37,6 +37,7 @@ import { ServiceAudienceService } from './service-audience.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
+import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -259,7 +260,8 @@ export class SellerRecruitmentService {
     if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
     if (serviceKeys.length === 0) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
 
-    // offer 해소 (master_id + 공급자 user_id). PRIVATE·APPROVED 우선.
+    // offer 해소 (master_id + 이 사용자의 canonical 공급자 집합). PRIVATE·APPROVED 우선.
+    // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id = $2` → listOwnedSupplierIds.
     const rows: Array<{
       offer_id: string; distribution_type: string; product_name: string;
       manufacturer: string | null; is_regulated: boolean | null; seller_name: string | null;
@@ -271,10 +273,10 @@ export class SellerRecruitmentService {
        JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN product_categories c ON c.id = pm.category_id
        LEFT JOIN organizations org ON org.id = ns.organization_id
-       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
        ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
        LIMIT 1`,
-      [masterId, supplierUserId],
+      [masterId, await listOwnedSupplierIds(AppDataSource, supplierUserId)],
     );
     if (!rows.length) return { success: false as const, error: 'OFFER_NOT_FOUND' };
     const offer = rows[0];
@@ -478,10 +480,14 @@ export class SellerRecruitmentService {
     await this.applicationRepo.save(application);
 
     // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 승인 → 판매자 주문 가능화 (best-effort · idempotent)
-    try {
-      await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
-    } catch (bridgeError) {
-      logger.error(`[SellerRecruitmentService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 모집은 승인된 약국 조직이
+    //   모집 공급가로 바로 주문한다(공급 옵션 판정 SSOT). 사용자 단위 allowed_seller_ids · 진열 bridge 를 만들지 않는다.
+    if (!recruitment.semiFranchiseId) {
+      try {
+        await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
+      } catch (bridgeError) {
+        logger.error(`[SellerRecruitmentService] C-bridge failed (approval kept): application=${application.id}`, bridgeError);
+      }
     }
 
     await this.notifyApplicant(
@@ -548,10 +554,10 @@ export class SellerRecruitmentService {
       `SELECT spo.id
        FROM supplier_product_offers spo
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-       WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+       WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
        ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
        LIMIT 1`,
-      [recruitment.productId, supplierUserId],
+      [recruitment.productId, await listOwnedSupplierIds(AppDataSource, supplierUserId)],
     );
     if (offerRows.length) {
       const offerId = offerRows[0].id;
@@ -606,10 +612,10 @@ export class SellerRecruitmentService {
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories c ON c.id = pm.category_id
-         WHERE spo.master_id = $1 AND ns.user_id = $2 AND spo.deleted_at IS NULL
+         WHERE spo.master_id = $1 AND ns.id = ANY($2::uuid[]) AND spo.deleted_at IS NULL
          ORDER BY (spo.distribution_type = 'PRIVATE') DESC, (spo.approval_status = 'APPROVED') DESC, spo.created_at DESC
          LIMIT 1`,
-        [recruitment.productId, recruitment.sellerId],
+        [recruitment.productId, await listOwnedSupplierIds(AppDataSource, recruitment.sellerId)],
       );
     if (!offerRows.length) {
       logger.warn(`[C-Bridge] offer not found (master=${recruitment.productId}, supplierUser=${recruitment.sellerId}) — bridge skipped`);
@@ -648,7 +654,7 @@ export class SellerRecruitmentService {
       `INSERT INTO organization_product_listings
         (id, organization_id, service_key, master_id, offer_id, is_active, price, source_type, source_id, created_at, updated_at)
        VALUES (gen_random_uuid(), $1, $2, $3, $4, true, NULL, 'seller_recruitment', $5, NOW(), NOW())
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [orgRows[0].organization_id, serviceKey, offer.master_id, offer.id, recruitment.id],
     );
     logger.info(`[C-Bridge] OPL ensured (org=${orgRows[0].organization_id}, offer=${offer.id}, service=${serviceKey})`);

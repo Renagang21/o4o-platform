@@ -60,6 +60,8 @@ import { runWebResearch } from '../services/ai/web-research.service.js';
 import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
+import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
+import type { ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
 import {
   selectToolInvocationForRequest,
   executeAiTool,
@@ -271,9 +273,11 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 interface RouteReply {
   status: number;
   body: Record<string, unknown>;
+  /** 직렬화되지 않는 실행 요약 — Personal Assistant 가 Task 에 올리는 구조 키(Phase A) + 실행 보고(Phase B). */
+  execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-async function performWorkAgentRun(userId: string, body: Record<string, unknown>): Promise<RouteReply> {
+async function performWorkAgentRun(userId: string, body: Record<string, unknown>, intent?: ExecutionIntent): Promise<RouteReply> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -315,6 +319,8 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
       runId: typeof body.runId === 'string' ? body.runId : undefined,
       // 실패 인계 뒤 사용자가 다시 요청하며 준 힌트(§64·§65). runtime 이 sanitize 한다.
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
+      // Personal Assistant Phase B — Assistant Planning 의 실행 지시(구조만). /work-agent/run 직접 호출에는 없다.
+      ...(intent ? { intent } : {}),
     },
     plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
@@ -342,8 +348,11 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
         errorCode: result.errorCode ?? null,
         // WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 요약(안전 필드만). 경로 · 탭 제목 · 실행 경로 없음.
         target: result.target,
+        // PHASE 2 — Workflow 재생/저장 요약(enum · 개수만). 단계 내용 · 템플릿 · 값은 응답에 싣지 않는다.
+        workflow: result.workflow ?? null,
       },
     },
+    execution: { taskKey: result.taskKey ?? null, report: result.report },
   };
 }
 
@@ -2185,7 +2194,7 @@ async function performHospitalDrugRequest(
 // POST /api/ai/request — 단일 자연어 요청 진입점 (Unified Request Router)
 // WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §4·§5·§6
 //
-//   { text, attachments?: [{ name, mimeType, base64 }], runId?, routeHint?: 'work', workScope? }
+//   { text, attachments?: [{ name, mimeType, base64 }], runId?, targetHint?(runId 와 함께만), routeHint?: 'work', workScope? }
 //
 //   사용자는 "질문 / 작업 수행" 을 고르지 않는다. 서버 라우터(unified-request-router, 결정론적 · AI 호출 없음)가
 //   판정해 기존 두 본체(performHomeChat · performWorkAgentRun) 중 하나로 보낸다. 응답은 `data.kind` 로 갈린다:
@@ -2195,6 +2204,10 @@ async function performHospitalDrugRequest(
 //   첨부: 이미지는 두 경로 모두(Work Agent 는 첫 이미지 1장 — 기존 계약), 문서 · 표는 chat 경로에서만 읽는다.
 //   안전: Work 경로의 COMMIT · credential · never-escalate 판정은 runtime 그대로 — 라우터는 권한을 넓히지 않는다.
 //   저장: 첨부 · 텍스트 · 응답 어느 것도 DB · 파일 · 로그에 쓰지 않는다. 로그는 route 판정 이름과 첨부 개수뿐이다.
+//     예외(Personal Assistant Phase A): work 요청은 `assistant_tasks` 에 **구조 metadata 만**(소유 · 대상 id · 상태 ·
+//     provisional Task type) 남기고 run 을 그 Task 에 붙인다. 요청 원문 · 첨부 · 답변은 여전히 저장하지 않는다.
+//     응답: work 일 때만 data.taskId · data.taskStatus(additive). chat · confirm 에는 Task 가 없다.
+//     요청: taskId?(이어갈 Task — 요청자 본인 · 미종결일 때만 쓰인다).
 // ===========================================
 router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
@@ -2275,11 +2288,29 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
     const image = firstImageAttachment(attachments);
     const workBody: Record<string, unknown> = { request: text };
     if (image) workBody.image = image;
+    // 재개는 원래 run 의 대상을 상속한다 — work-agent/run 의 기존 targetHint 를 재개 요청에서만 전달한다(FIX-V1 §2-B).
     if (runId) workBody.runId = runId;
+    if (runId && typeof body.targetHint === 'string') workBody.targetHint = body.targetHint;
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
-    const reply = await performWorkAgentRun(userId, workBody);
-    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
-    return res.json({ success: true, data: { kind: 'work', route: decision.route, reason: decision.reason, work: reply.body.data } });
+    // Personal Assistant Phase A — Assistant → Task → Execution. 실행 본체(performWorkAgentRun)는 그대로이고,
+    // Task 는 구조만 남긴다(원문 미저장). taskId 는 additive — 기존 work 필드의 의미는 바뀌지 않는다.
+    const { reply, task } = await runAssistantWorkTask(
+      AppDataSource,
+      { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
+      performWorkAgentRun,
+    );
+    if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);
+    return res.json({
+      success: true,
+      data: {
+        kind: 'work',
+        route: decision.route,
+        reason: decision.reason,
+        taskId: task?.taskId ?? null,
+        taskStatus: task?.status ?? null,
+        work: reply.body.data,
+      },
+    });
   }
 
   const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider }, attachments);

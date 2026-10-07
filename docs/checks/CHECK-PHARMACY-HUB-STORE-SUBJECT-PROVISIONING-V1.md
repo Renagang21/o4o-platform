@@ -122,7 +122,7 @@ KPA·K-Cosmetics 승인 경로에 회귀 위험이 생긴다. KPA 가 자기 컨
 | # | user_id | 계정 | 약국명 | 사업자번호 | 후보 조직 | 판정 |
 |---|---|---|---|---|---:|---|
 | 1 | `5ee37566…e014` | `e2e.test.pharmacyhub.owner.active@example.com` (E2E 픽스처) | `[E2E_TEST] Pharmacy-Hub 검증약국 A` | 없음 | **0** | **created** — `ph-pharm-5ee375662a51` 신규 생성 예정 |
-| 2 | `6967ebe0…3cef` | `renagang21@gmail.com` (다역할 테스트 계정) | 테스트약국 | 1088699992 | **3** | **held** — `AMBIGUOUS_ORGANIZATION` |
+| 2 | `6967ebe0…3cef` | `[REDACTED_EMAIL_B]` (다역할 테스트 계정) | 테스트약국 | 1088699992 | **3** | **held** — `AMBIGUOUS_ORGANIZATION` |
 
 **#2 의 후보 조직 3개:**
 

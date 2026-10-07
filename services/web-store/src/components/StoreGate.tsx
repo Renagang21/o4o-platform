@@ -14,6 +14,7 @@ import { WORKSPACE_PATHS } from '../config/workspace';
 import { useAuth } from '../contexts/AuthContext';
 import { useUnifiedStore } from '../contexts/StoreContext';
 import NoStorePage from '../pages/NoStorePage';
+import { withReturnTo } from '../lib/returnTo';
 
 function Card({ title, children }: { title: string; children?: ReactNode }) {
   return <main className="center-card"><section className="card"><h1>{title}</h1>{children}</section></main>;
@@ -23,11 +24,13 @@ export function StoreGate({ children }: { children: ReactNode }) {
   const { isLoading: authLoading } = useAuth();
   const { status, error, reload } = useUnifiedStore();
   const location = useLocation();
+  // 선택 · 로그인 뒤 원래 경로로 돌아오게 보존한다(§21-14)
+  const current = `${location.pathname}${location.search}${location.hash}`;
 
   if (authLoading) return <Card title="내 매장"><p>로그인 상태를 확인하는 중...</p></Card>;
   switch (status) {
     case 'idle':
-      return <Card title="내 매장"><p>로그인이 필요합니다.</p><Link className="button-link" to={WORKSPACE_PATHS.login}>로그인</Link></Card>;
+      return <Card title="내 매장"><p>로그인이 필요합니다.</p><Link className="button-link" to={withReturnTo(WORKSPACE_PATHS.login, current)}>로그인</Link></Card>;
     case 'loading':
       return <Card title="내 매장"><p>접근 가능한 매장을 확인하는 중...</p></Card>;
     case 'resolving':
@@ -37,7 +40,7 @@ export function StoreGate({ children }: { children: ReactNode }) {
     case 'none':
       return <NoStorePage />;
     case 'select':
-      return location.pathname === WORKSPACE_PATHS.select ? <>{children}</> : <Navigate to={WORKSPACE_PATHS.select} replace />;
+      return location.pathname === WORKSPACE_PATHS.select ? <>{children}</> : <Navigate to={withReturnTo(WORKSPACE_PATHS.select, current)} replace />;
     case 'ready':
       return <>{children}</>;
   }

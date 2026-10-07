@@ -1,8 +1,12 @@
-# O4O Platform Alpha 상태 표시 기준
+# O4O Platform Alpha 상태 표시 기준 — OBSOLETE (표시 의무 폐기)
 
 > **작성일**: 2026-01-20
 > **Work Order**: WO-GLOBAL-ALPHA-STATUS-HERO-V080
 > **적용 버전**: v0.8.0 (운영형 알파)
+>
+> **상태**: OBSOLETE · 전제(운영형 알파 단계 · Hero 표시 의무)가 폐기돼 내용 자체가 무효 — 대체 문서 없음 · **표기일**: 2026-10-06 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`): **"운영형 알파 · v0.8.0" 공개 표시 의무는 종료됐다.** 어떤 서비스 Hero 에도 이 배지 · 안내 문구를 다시 넣지 않는다. 운영 상태는 단계 표시가 아니라 상시 운영 점검([`O4O-API-OPERATIONS-RUNBOOK-V1`](../baseline/operations/O4O-API-OPERATIONS-RUNBOOK-V1.md))으로 본다. [PLATFORM-CONTENT-POLICY-V1](../baseline/PLATFORM-CONTENT-POLICY-V1.md) §12 의 "0.80 운영형 알파" 문구는 당시 시점 기록으로 정정했다. 아래 본문은 2026-01 기록으로 보존한다.
+>
+> (2026-10-04 정합) 현행 서비스 코드에는 이 배지 · 안내 문구가 없다 — `services/` · `apps/` · `packages/` 에 "운영형 알파" 표시 0건. §7 의 "적용됨" 표기는 현재 사실이 아니다. 적용 대상 중 `web-glucoseview` 만 은퇴했고(현행 `services/` 에 없음) 나머지 서비스는 활성이다. §7.2 · §10 의 파트너 안내 페이지 · 체크리스트는 Legacy Partner 은퇴([ROLE-WORKSPACE-ARCHITECTURE](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7)로 소멸했다.
 
 ---
 
@@ -92,6 +96,8 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 | web-k-cosmetics | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-glucoseview | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-kpa-society | `src/components/platform/HeroSection.tsx` | ✅ 적용됨 |
+
+> (2026-10-04 정합) 위 "적용됨" 표기와 아래 §7.2 는 2026-01 시점 기록이다 — 현행 코드에 배지 0건, `web-glucoseview` 서비스 부재, 파트너 안내 페이지(`PartnerManualPage` · `PartnerInfoPage` · `PartnerOverviewInfoPage`)는 web-neture 에 없다.
 
 ### 7.2 파트너 안내 페이지 적용 (WO-V080-PARTNER-STABILITY-CHECKLIST-UPDATE)
 
@@ -185,4 +191,4 @@ Alpha → Beta 전환 시:
 
 ---
 
-*이 문서는 O4O Platform 운영형 알파 단계의 공식 상태 표시 기준입니다.*
+*이 문서는 O4O Platform 운영형 알파 단계의 공식 상태 표시 기준이었다 — 2026-10-06 OBSOLETE(표시 의무 폐기).*

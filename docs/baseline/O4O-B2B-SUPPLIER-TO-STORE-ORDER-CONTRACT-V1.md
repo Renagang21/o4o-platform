@@ -6,7 +6,7 @@
 > **위상**: 조사 보고서가 아니라 **공급자→매장 B2B 주문 축을 고정하는 canonical 계약 문서**다.
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
-> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 나머지 절은 불변이며 문서 전체는 **Active** 다.
+> **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
 
 ---
 
@@ -114,9 +114,9 @@ active service membership  ∧  service-scoped role/capability
 | 테이블 | 역할 | 계약 |
 |---|---|---|
 | `store_cart_items` | **B2B 장바구니**. 매장(buyer) 이 공급자 offer 를 담는다 | 소비자 장바구니가 아니다. `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 소비자 cart 금지선 대상 아님 |
-| `checkout_orders` | **canonical 주문 원장**. 3개 축 전부가 여기로 수렴한다 | 신규 `*_orders` 테이블 생성 금지 (CLAUDE.md §4) |
+| `checkout_orders` | **canonical 주문 원장**. 현행 주문 경로 전부(§5 정정 주석의 5개)가 여기로 수렴한다 | 신규 `*_orders` 테이블 생성 금지 (CLAUDE.md §4) |
 | `neture_orders` | **공급자 fulfillment 원장**. 결제 확정 후 bridge 가 투영한다 | 주문의 정본이 아니라 공급자 처리 뷰다 |
-| 결제 축 | live producer **4개 한정** — `pharmacy-hub` · `neture-b2b` · `store-b2b` · `store-service-subscription` | 그 외 producer 신규 추가 금지. `store-b2b` 는 승인축 B2B(`store_b2b_cart`) + Event Offer 특가(`store_cart_checkout`) 공용 결제 축이며(`STORE_B2B_PAYMENT_SERVICE_KEY`) `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` 로 승인됐다 |
+| 결제 축 | **PaymentCore** live producer **4개 한정** — `pharmacy-hub` · `neture-b2b` · `store-b2b` · `store-service-subscription` (+ PaymentCore 미경유 `o4o_payments` 기록 경로 1개: `neture-pharmacy`, 아래 정정) | 그 외 producer 신규 추가 금지. `store-b2b` 는 승인축 B2B(`store_b2b_cart`) + Event Offer 특가(`store_cart_checkout`) 공용 결제 축이며(`STORE_B2B_PAYMENT_SERVICE_KEY`) `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` 로 승인됐다. **(2026-10-06 정정)** "4개 한정"은 PaymentCore `sourceService` 기준이다. Axis D(§5) 의 `neture-pharmacy`(`NETURE_PHARMACY_PAYMENT_SOURCE`) 는 `PharmacyPaymentService.prepare()` 가 `o4o_payments` 에 직접 INSERT 하고 `confirm()` 이 테스트 결제 트랜잭션 안에서 `PAID` 로 갱신하는 **정상 · 등록된 경로**다(PaymentCore 이벤트 없음, `WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`). 결제 경로 감사는 이 5개를 대상으로 하며, 그 밖의 `o4o_payments` 기록 경로는 미등록이다 |
 
 **불변식 T1.** 주문 정본은 `checkout_orders` 다. `neture_orders` 는 파생이다.
 공급자 처리 상태를 `checkout_orders` 없이 단독으로 만들지 않는다.
@@ -135,6 +135,17 @@ WO 가 정한 canonical 흐름:
 ```
 
 현재 main 에 **살아 있는 구현은 3개 축**이다. 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
+
+> **(2026-10-06 정정) 현행 주문 경로는 5개다** — 위 "3개 축"은 작성 시점 표기다. 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders` 로 수렴하고 **모두 payment-first** 다(UNPAID 주문은 fulfillment 대상 아님).
+> 1. Axis A — Event Offer 특가(§5-1, order source `store_cart_checkout`)
+> 2. **승인축 B2B** — KPA Society · K-Cosmetics 승인 카탈로그 담기(§13-6) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
+> 3. Axis B — Neture B2B(§5-2)
+> 4. Axis C — PharmacyHub(§5-3)
+> 5. Axis D — Neture 약국 매장(아래, order source `neture_pharmacy_cart`)
+>
+> 경로 감사 · 후속 checkout 작업은 이 5개를 모두 대상으로 한다. Stable 범위는 [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) §2.
+
+> **Axis D — Neture 약국 매장 축 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 같은 원장(`store_cart_items` `service_key='neture-pharmacy'` → `checkoutService.createOrder()` → `checkout_orders`)을 쓴다. 장바구니에 선택한 공급 옵션(기본 공급 · 공급 제안 · 이벤트 · 모집)을 저장하고, 확정 시 서버가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 로 재판정 · 단가 확정 후 (수취 주체, 공급자) 단위로 주문을 만든다. 결제는 payment-first 이며 현재 테스트 결제만 있다(실제 PG 미선정). 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8.
 
 ### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics) — **payment-first**
 
@@ -226,13 +237,15 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
 ```text
 [cart]  장바구니 항목            store_cart_items
    |
-   +- (Axis A) checkout-confirm ------------> checkout_orders : 주문 확정 (결제 축 없음)
+   +- (Axis A · 승인축 B2B) checkout-confirm -> checkout_orders : paymentStatus = pending
    |
    +- (Axis B/C) 주문 생성 -----------------> checkout_orders : paymentStatus = pending
-                                                    |
-                                     결제 완료 이벤트 |  (유일한 전이 트리거)
-                                                    v
-                                              checkout_orders : paid
+   |                                                |
+   |                  PaymentCore 결제 완료 이벤트 |  (Axis A · 승인축 · B · C 의 유일한 전이 트리거)
+   |                                                v
+   |                                          checkout_orders : paid
+   |                                                ^
+   +- (Axis D) 주문 생성 -> pending -> 테스트 결제 confirm 트랜잭션 (PaymentCore 이벤트 없음)
                                                     |
                                     fulfillment bridge |
                                                     v
@@ -267,6 +280,8 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
 
 ---
 
+> (2026-10-06 정정) **Axis D 는 PaymentCore 결제 이벤트를 거치지 않는다** — `PharmacyPaymentService.confirm()` 이 테스트 결제 트랜잭션 안에서 `o4o_payments` 와 `checkout_orders` 를 직접 paid 로 전이한다([`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) §2-1). Axis D 용 `payment.completed` handler 를 전제로 구현하지 않는다.
+
 ## 7. Cart 판정 — `store_cart_items` 는 B2B cart 다
 
 | 질문 | 답 |
@@ -288,12 +303,15 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 
 ## 8. 서비스별 계약 요약
 
+> **(2026-10-06 정정)** 이 표는 §5 정정 주석의 현행 주문 경로 5개를 모두 담는다 — KPA Society · K-Cosmetics 행에 **승인축 B2B**(§13 · §13-6) 를, **Neture 약국 매장**(Axis D) 행을 추가했다. 이전 표는 Axis A · B · C 만 있었다.
+
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
-| **KPA Society** | Axis A (`kpa-groupbuy`) · **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*` | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
-| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) · **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
+| **KPA Society** | Axis A (`kpa-groupbuy`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*`. 승인축 B2B 확정은 `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, 결제 축 `store-b2b`) | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
+| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*`. 승인축 B2B 확정은 KPA 와 같은 `/store/cart/:serviceKey/checkout-confirm-b2b` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
+| **Neture 약국 매장** (`service_key='neture-pharmacy'`) | **Axis D** (order source `neture_pharmacy_cart`) · **payment-first** (현재 테스트 결제만, §4 결제 축 정정) | 있음 — `/api/v1/neture/pharmacy/cart*` · `/pharmacy/cart/checkout` · `/pharmacy/orders` · 결제 `/pharmacy/payments/{prepare,confirm}` | Neture 공급자 화면(bridge tag `neture_pharmacy_cart`, §13-5) | 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8 |
 
 **불변식 S1.** 공급자(seller) 의 B2B 주문 화면은 **Neture 측이 canonical** 이다.
 KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들지 않는다.
@@ -436,6 +454,8 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 `apps/api-server/src/services/cart/offer-exposure-strategy.ts`.
 §8 불변식 S2 의 공급 축을 confirm 에서 집행하는 지점이다.
 
+> Axis D(Neture 약국 매장)는 이 strategy 를 쓰지 않는다 — 노출 판정이 serviceKey 가 아니라 세미프랜차이즈 데이터 행 · 공급 제안 기준이라 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 모듈이 분기점이다(2026-10-05 명시 예외). 아래 3개 strategy 는 무변경.
+
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|
 | `approval` | kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
@@ -512,6 +532,7 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 | `neture_b2b_checkout` | `neture-b2b` |
 | `pharmacy_hub_cart` | `pharmacy-hub` |
 | `store_b2b_cart` (신규) | `store-b2b` |
+| `neture_pharmacy_cart` (2026-10-05) | `neture-pharmacy` |
 
 서비스별로 tag 를 쪼개지 않는다 — 공급자 workspace 의 실제 스코프 축은
 `metadata.serviceKey` → `neture_orders.service_key` 이고 `source` 는 bridge 진입 자격 판정용이다.

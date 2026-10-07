@@ -10,6 +10,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
+import { demoAccountService, sendDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
 import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
@@ -111,9 +112,13 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16:
       //   현재 published 이용약관 중 이 사용자가 아직 승낙하지 않은 것(본문 없음 · 식별자만).
       //   프론트는 이 목록이 비어 있지 않으면 닫을 수 없는 재동의 화면으로 전환한다. 판정 실패는 [] (hot path).
+      //   enforced pending — 서버 게이트와 같은 값(Demo 계정 예외 · 정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2).
       try {
-        ud.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(req.user.id);
+        ud.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(req.user.id);
       } catch { ud.pendingPolicyAcceptances = []; }
+
+      // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).
+      ud.demo = await demoAccountService.getDemoMetadata(req.user.id);
 
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:
       //   restricted 계정은 role/scope 를 노출하지 않는다 (membership 상태만 유지).
@@ -266,6 +271,9 @@ export class AuthAccountController extends BaseController {
         //    (WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1) 로 차단되어
         //    본 경로에서는 거의 발생하지 않음 — 본 WO 범위 외.
         if (prevActivityType === 'pharmacy_owner' && resolvedActivityType !== 'pharmacy_owner') {
+          // Demo 계정 보호(정책 §8 role 변경): role write 전에 던진다 — 같은 transaction 이라
+          // 앞선 프로필 write 도 함께 rollback 되어 남는 것이 없다.
+          await demoAccountService.assertNotDemoAccount(userId, manager);
           await manager.query(
             `UPDATE role_assignments
              SET is_active = false, updated_at = NOW()
@@ -283,6 +291,7 @@ export class AuthAccountController extends BaseController {
         activityType: resolvedActivityType,
       });
     } catch (error: any) {
+      if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[AuthAccountController.updateProfile] Update failed', {
         error: error.message,
         userId,

@@ -104,11 +104,11 @@ NON_STORE_CONSUMERS (prop 미지정)          = 23 파일 · 기본 true 유지
 
 | 시도 | 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`) | 결과 |
 |---|---|---|
-| `kpa-society.co.kr/login` | `kpa-society:store_owner` `renagang21@gmail.com` | `POST /api/v1/auth/login` **401** `INVALID_USER`("User account not found or has been deactivated" · UI "등록되지 않은 이메일입니다") |
-| `kpa-society.co.kr/login` | `sohae2100@gmail.com`(KPA 행) | **403** "로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다"(lockout) — 추가 시도 중단 |
-| `pharmacyhub.co.kr/login` | `pharmacy-hub:store_owner` `renagang21@gmail.com` | **401** `INVALID_USER`(동일) |
+| `kpa-society.co.kr/login` | `kpa-society:store_owner` `[REDACTED_EMAIL_B]` | `POST /api/v1/auth/login` **401** `INVALID_USER`("User account not found or has been deactivated" · UI "등록되지 않은 이메일입니다") |
+| `kpa-society.co.kr/login` | `[REDACTED_EMAIL_A]`(KPA 행) | **403** "로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다"(lockout) — 추가 시도 중단 |
+| `pharmacyhub.co.kr/login` | `pharmacy-hub:store_owner` `[REDACTED_EMAIL_B]` | **401** `INVALID_USER`(동일) |
 
-- `renagang21@gmail.com` 이 두 서비스 모두 `INVALID_USER` → 계정 상태(비활성/삭제) 또는 최근 배포된 auth 변경(WO-2A/2B email+password 로그인 경로 — 메모 상 "운영 email/password 200 login smoke" 가 WO-2C 게이트로 PENDING) 의 영향으로 추정. **본 WO 변경(프론트 prop 추가)과 무관한 실패 → 중지 조건(현재 변경과 무관한 실패) 적용, 보고만.**
+- `[REDACTED_EMAIL_B]` 이 두 서비스 모두 `INVALID_USER` → 계정 상태(비활성/삭제) 또는 최근 배포된 auth 변경(WO-2A/2B email+password 로그인 경로 — 메모 상 "운영 email/password 200 login smoke" 가 WO-2C 게이트로 PENDING) 의 영향으로 추정. **본 WO 변경(프론트 prop 추가)과 무관한 실패 → 중지 조건(현재 변경과 무관한 실패) 적용, 보고만.**
 - 미수행 항목: Store 편집 화면 "AI 정리" 버튼 부재 · 편집 가능 · HTML 탭 · 미리보기 · 템플릿 · 저장 성공 / 비Store 화면 "AI 정리" 유지. 이 항목들은 source-contract 34/34 + 3 서비스 tsc/vite build 로만 보증된 상태.
 - 재개 방법: 운영 로그인 정상화("운영 로그인 정상 확인" 통보) 후 `/store/blog`(KPA) 또는 `/store-owner/blog`(PH) 에서 위 항목 확인 → 본 절과 §7 갱신.
 

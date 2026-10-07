@@ -1,5 +1,5 @@
 // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql, checkoutOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
+import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import { Repository } from 'typeorm';
 import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
@@ -9,10 +9,12 @@ import {
   ContactVisibility,
 } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { listOwnedSupplierIds, resolveSupplierIdForUser } from '../middleware/supplier-context.resolver.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
+import { demoAccountService, DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
 
 /**
@@ -55,13 +57,14 @@ export class NetureSupplierService {
 
   // ==================== Supplier Identity ====================
 
+  // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+  //   이 두 getter 는 Content Library · 상품 이미지 · hub-trigger 의 guard 가 쓴다. `where: { userId }`
+  //   (legacy pointer) 대신 API guard 와 같은 canonical resolver 로 공급자를 찾는다.
+  //   후보 N 개면 null(임의 선택 0) — 호출부는 기존 NO_SUPPLIER 계약을 유지한다.
   async getSupplierIdByUserId(userId: string): Promise<string | null> {
     try {
-      const supplier = await this.supplierRepo.findOne({
-        where: { userId },
-        select: ['id'],
-      });
-      return supplier?.id || null;
+      const resolved = await resolveSupplierIdForUser(AppDataSource, userId);
+      return resolved?.supplierId ?? null;
     } catch (error) {
       logger.error('[NetureSupplierService] Error finding supplier by user ID:', error);
       return null;
@@ -70,8 +73,10 @@ export class NetureSupplierService {
 
   async getSupplierByUserId(userId: string): Promise<NetureSupplier | null> {
     try {
+      const resolved = await resolveSupplierIdForUser(AppDataSource, userId);
+      if (!resolved) return null;
       return await this.supplierRepo.findOne({
-        where: { userId },
+        where: { id: resolved.supplierId },
         relations: ['offers'],
       });
     } catch (error) {
@@ -132,6 +137,9 @@ export class NetureSupplierService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
+      if (await this.isDemoSupplier(supplier.userId, supplier.organizationId)) {
+        return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+      }
 
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
       // 승인은 서비스 이용 자격만 판단한다. 대표자명/담당자명/담당자 연락처 등 프로필 정보는
@@ -196,6 +204,9 @@ export class NetureSupplierService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
+      if (await this.isDemoSupplier(supplier.userId, supplier.organizationId)) {
+        return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+      }
 
       supplier.status = SupplierStatus.REJECTED;
       supplier.approvedBy = rejectedByUserId;
@@ -238,6 +249,22 @@ export class NetureSupplierService {
       logger.error('[NetureSupplierService] Error rejecting supplier:', error);
       throw error;
     }
+  }
+
+  /**
+   * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+   * Demo 공급자는 `neture_suppliers.user_id` 가 NULL 일 수 있다 — 연결 user 와 조직 owner 를 함께 본다.
+   * 판정 정본은 `demo_accounts.user_id`. 조회 실패는 그대로 올린다(fail-closed).
+   */
+  private async isDemoSupplier(
+    userId: string | null | undefined,
+    organizationId: string | null | undefined,
+    manager?: EntityManager,
+  ): Promise<boolean> {
+    return (
+      (await demoAccountService.isDemoAccount(userId, manager)) ||
+      (await demoAccountService.isDemoOrganization(organizationId, manager))
+    );
   }
 
   /**
@@ -340,6 +367,9 @@ export class NetureSupplierService {
         const locked = lockedRows[0];
         if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
         if (locked.status !== SupplierStatus.ACTIVE) return { success: false, error: 'INVALID_STATUS' };
+        if (await this.isDemoSupplier(locked.user_id, locked.organization_id, manager)) {
+          return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+        }
 
         // §6: 서버 측 주문·정산 재검증 (강제 override 없음)
         const guard = await this.countSupplierObligations(supplierId, manager);
@@ -457,6 +487,9 @@ export class NetureSupplierService {
         const locked = lockedRows[0];
         if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
         if (locked.status !== SupplierStatus.INACTIVE) return { success: false, error: 'INVALID_STATUS' };
+        if (await this.isDemoSupplier(locked.user_id, locked.organization_id, manager)) {
+          return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
+        }
 
         await manager.query(
           `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,
@@ -533,8 +566,8 @@ export class NetureSupplierService {
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE spo.supplier_id = $1
          AND o.status IN ('created','pending_payment','paid','preparing','shipped')
-         AND ${netureOrderServiceScopeSql('o', '$2')}`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+         AND ${netureOrderServiceSetSql('o', '$2')}`,
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     // 결제완료·미브릿지 checkout_orders (워크스페이스가 진행 주문으로 노출)
     const checkoutRows: Array<{ c: string }> = await manager.query(
@@ -542,11 +575,11 @@ export class NetureSupplierService {
        FROM checkout_orders co
        WHERE co."supplierId" = $1
          AND co."paymentStatus" = 'paid'
-         AND ${checkoutOrderServiceScopeSql('co', '$2')}
+         AND ${checkoutOrderServiceSetSql('co', '$2')}
          AND NOT EXISTS (
            SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
          )`,
-      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
+      [supplierId, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
     );
     const unsettledRows: Array<{ c: string }> = await manager.query(
       `SELECT COUNT(*)::text AS c FROM neture_settlements
@@ -623,9 +656,9 @@ export class NetureSupplierService {
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = ANY($1::uuid[])
            AND o.status IN ('created','pending_payment','paid','preparing','shipped')
-           AND ${netureOrderServiceScopeSql('o', '$2')}
+           AND ${netureOrderServiceSetSql('o', '$2')}
          GROUP BY spo.supplier_id`,
-        [ids, NETURE_FULFILLMENT_SERVICE_KEY],
+        [ids, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
       );
       for (const r of netureRows) activeOrderMap.set(r.sid, parseInt(r.c, 10));
 
@@ -634,12 +667,12 @@ export class NetureSupplierService {
          FROM checkout_orders co
          WHERE co."supplierId" = ANY($1::text[])
            AND co."paymentStatus" = 'paid'
-           AND ${checkoutOrderServiceScopeSql('co', '$2')}
+           AND ${checkoutOrderServiceSetSql('co', '$2')}
            AND NOT EXISTS (
              SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
            )
          GROUP BY co."supplierId"`,
-        [ids, NETURE_FULFILLMENT_SERVICE_KEY],
+        [ids, SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS],
       );
       for (const r of checkoutRows) {
         activeOrderMap.set(r.sid, (activeOrderMap.get(r.sid) ?? 0) + parseInt(r.c, 10));
@@ -859,7 +892,9 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: org-primary read for name
       const org = await this.getOrgData(supplier.organizationId);
 
-      const isOwner = !!viewerId && supplier.userId === viewerId;
+      // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 소유자 판정 = canonical 관계
+      //   (organization_members owner). `supplier.userId === viewerId` 는 legacy pointer 비교였다.
+      const isOwner = !!viewerId && (await listOwnedSupplierIds(AppDataSource, viewerId)).includes(supplier.id);
       const isApprovedBuyer = !!viewerId && !isOwner
         ? await this.hasApprovedPrivateSupply(supplier.id, viewerId)
         : false;

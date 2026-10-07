@@ -11,7 +11,7 @@
 ## 1. 실측 방법
 
 - 진단 엔드포인트 배포: `feat(debug): order canonical table read-only diagnostic endpoint` (`0468a0387`) → CI/CD "Deploy API Server (Cloud Run)" 성공(✓ Deploy + ✓ migrations + ✓ verify).
-- 호출: 배포 서비스 `https://o4o-core-api-...run.app` 에 `sohae2100@gmail.com`(platform:super_admin) 로그인 → `GET /__debug__/order-canonical-table` (authenticate + requireAdmin).
+- 호출: 배포 서비스 `https://o4o-core-api-...run.app` 에 `[REDACTED_EMAIL_A]`(platform:super_admin) 로그인 → `GET /__debug__/order-canonical-table` (authenticate + requireAdmin).
 - 인증: 로그인 httpOnly 쿠키 `accessToken`(Domain=.neture.co.kr) 값을 수동 `Cookie`/`Bearer` 헤더로 전달(호스트 불일치 회피).
 - **read-only**: SELECT / information_schema 만. DB write 없음. PII row 미조회.
 

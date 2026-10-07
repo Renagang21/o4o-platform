@@ -39,6 +39,7 @@ import {
 } from '../../api/tabletDisplays';
 // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정(경영자 PC · 직원 태블릿 공용 컴포넌트).
 import { TabletProductListQuickEditor } from '../tablet/TabletProductListQuickEditor';
+import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
 // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 기존 매장 QR 출력/다운로드 기능 재사용(신규 엔드포인트 없음).
 import {
   getStoreQrCodes,
@@ -724,12 +725,12 @@ export default function TabletContentLibraryList({
                   </div>
                 )}
                 <a
-                  href={`/qr/${qrFor.set.publicQrSlug}`}
+                  href={`${getActiveServicePublicOrigin()}/qr/${qrFor.set.publicQrSlug}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-xs text-indigo-600 hover:underline break-all text-center"
                 >
-                  {`${window.location.origin}/qr/${qrFor.set.publicQrSlug}`}
+                  {`${getActiveServicePublicOrigin()}/qr/${qrFor.set.publicQrSlug}`}
                 </a>
               </div>
 

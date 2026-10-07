@@ -5,6 +5,8 @@
  * 이 스펙은 그 계약이 work-agent-runtime 의 실제 loop 에 **어떻게 물렸는가** 만 본다 — 같은 runWorkAgent · 같은 DB stub 하네스:
  *
  *   ① 정상 planner 로 뚫지 못한 국면(무진전·반복 행동)에서 strong planner 가 실제로 갈아끼워진다(§11·§16).
+ *      STRONG-FIRST-DISCOVERY-ROUTING-V1 이후 정상 planner 는 검증된 Preferred 경험이 있을 때(Experienced 역할)만 쓴다 —
+ *      새 업무는 처음부터 Discovery(strong)로 시작한다(work-agent-discovery-routing.spec.ts).
  *      → strong 이 성공하면 recovered_by_strong_model 로 기록되고 개선 후보로 신호된다(§22·§27).
  *   ② strong planner 가 없으면 escalation 없이 기존대로 인계된다(무회귀). "올릴 곳이 없다" → PROVIDER_UNAVAILABLE(§67).
  *   ③ 사용자 복구 힌트(source=user)가 sanitize 되어 planner 입력으로 전달되고, 그 뒤 성공은 recovered_by_user_hint(§64·§65·§27).
@@ -47,6 +49,15 @@ const STUCK_SCRIPT: Script = {
   inspect: [INSPECT],
   click: [OK({ elementRef: 'e_3', changed: true, role: 'button', riskLevel: 'REVERSIBLE' })],
 };
+
+/** 검증된 Preferred 경험 — 업무 선언 뒤 Experienced 역할(정상 planner)로 계획하게 한다. */
+const EXPERIENCED: Script = {
+  'local.data.work_run_experience_recall': [
+    { status: 'success', data: { taskKeys: ['drug_info.search'] } },
+    { status: 'success', data: { patterns: [{ stageKey: 'search_drug', polarity: 'preferred', strategy: { ops: [{ op: 'search' }] }, verifiedCount: 2 }] } },
+  ],
+};
+const DECLARE = { assessment: 'progress', action: { kind: 'click', elementRef: 'e_3' }, task: 'drug_info.search', stage: 'search_drug' };
 
 async function drive(db: LocalAgentDb, script: Script, max = 80) {
   const cursors: Record<string, number> = {};
@@ -104,11 +115,12 @@ beforeEach(() => jest.clearAllMocks());
 describe('escalation 배선 (§11·§16·§22·§27)', () => {
   it('정상 planner 가 같은 행동만 반복하면 strong planner 로 갈아끼워지고, strong 성공은 recovered_by_strong_model 로 남는다', async () => {
     const normal = scripted([{ assessment: 'progress', action: { kind: 'click', elementRef: 'e_3' } }]);
-    const strong = scripted([{ assessment: 'completed', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
-    const result = await run(normal, STUCK_SCRIPT, { strongPlanner: strong });
+    const strong = scripted([DECLARE, { assessment: 'completed', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
+    const result = await run(normal, { ...STUCK_SCRIPT, ...EXPERIENCED }, { strongPlanner: strong });
 
-    // strong 이 실제로 호출됐다(정상 planner 만으로는 goal_sufficiently_advanced 를 낼 수 없다).
-    expect(strong.calls.length).toBeGreaterThanOrEqual(1);
+    // Discovery(업무 선언) → Experienced(정상 planner 반복) → 막힘 → strong 으로 되돌아왔다.
+    expect(normal.calls.length).toBeGreaterThanOrEqual(1);
+    expect(strong.calls).toHaveLength(2);
     expect(result.takeover?.reason).toBe('goal_sufficiently_advanced');
     expect(result.progress).toBe('completed');
 
@@ -121,9 +133,9 @@ describe('escalation 배선 (§11·§16·§22·§27)', () => {
 
   it('strong planner 가 escalation 전에 관찰을 넘겨받는다(정상 planner 입력과 같은 형상)', async () => {
     const normal = scripted([{ assessment: 'progress', action: { kind: 'click', elementRef: 'e_3' } }]);
-    const strong = scripted([{ assessment: 'completed', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
-    await run(normal, STUCK_SCRIPT, { strongPlanner: strong });
-    const input = strong.calls[0];
+    const strong = scripted([DECLARE, { assessment: 'completed', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
+    await run(normal, { ...STUCK_SCRIPT, ...EXPERIENCED }, { strongPlanner: strong });
+    const input = strong.calls[1]; // escalation 뒤 첫 strong 계획
     expect(input.observation.siteId).toBe(SITE);
     expect(input.goal.request).toBe(REQUEST);
     // strong 도 권한·위험을 못 바꾼다 — 같은 goal·관찰만 받는다. (내부 tier/모델명은 planner 입력에 없다.)

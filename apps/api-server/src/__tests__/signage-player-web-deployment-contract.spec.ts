@@ -1,16 +1,19 @@
 /**
- * WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1 §30
+ * WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1
+ *   (이전: WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1 §30 채택 계약)
  *
- * signage-player-web 배포 계약의 정적 회귀 방지.
+ * signage-player-web 배포 **은퇴** 계약의 정적 회귀 방지.
+ *
+ * 이 앱의 유일한 재생 route 는 익명 401 · telemetry endpoint 부재로 동작하지 않았고,
+ * 정본 재생 경로는 Tablet ScreenSet(각 web 앱 내부)이다 — O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.
+ * Cloud Run 서비스는 삭제 대상이다. 배포 경로가 하나라도 되살아나면 다음 배포가 서비스를 재생성한다.
  *
  * 이 spec 이 막는 회귀:
- *  1. nginx listen 포트와 Cloud Run --port 가 어긋나 컨테이너가 기동 실패하는 것
- *     (원래 nginx 는 80, workflow 의 web service 패턴은 8080 이었다)
- *  2. deploy-web-services.yml 에서 player 가 다시 빠져 "소스는 있는데 미배포" 상태로
- *     되돌아가는 것 (path trigger / detect-changes / deploy job 3곳 모두 필요)
- *  3. frontend build-arg 에 secret 성 값이 주입되는 것 (§28 — 발견 시 즉시 FAIL)
- *  4. Cloud Run origin 이 API CORS allowlist 에서 빠져 player 의 API 호출이 죽는 것
+ *  1. deploy-web-services.yml 에 player deploy job · output · dispatch 선택지가 다시 생기는 것
+ *  2. 자동 배포 판정 registry(detect-affected WEB_SERVICES) · risk 매핑(deploy-risk WEB_CLOUD_RUN)에 다시 들어가는 것
  *
+ *  3. 앱 소스(services/signage-player-web)가 workspace 로 되돌아오는 것
+ *     — 소스 은퇴 WO-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1. Cloud Run · gcr.io 이미지 · CORS origin 도 삭제됐다.
  * 실제 배포/네트워크에 접근하지 않는 순수 정적 검사다.
  */
 import * as fs from 'fs';
@@ -18,131 +21,40 @@ import * as path from 'path';
 
 const ROOT = path.resolve(__dirname, '../../../..');
 const WORKFLOW = path.join(ROOT, '.github/workflows/deploy-web-services.yml');
-const DOCKERFILE = path.join(ROOT, 'services/signage-player-web/Dockerfile');
-const NGINX_CONF = path.join(ROOT, 'services/signage-player-web/nginx.conf');
-const MIDDLEWARES = path.join(ROOT, 'apps/api-server/src/bootstrap/setup-middlewares.ts');
 const DETECTOR = path.join(ROOT, 'scripts/ci/detect-affected.mjs');
+const RISK = path.join(ROOT, 'scripts/ci/deploy-risk.mjs');
 
 const read = (p: string) => fs.readFileSync(p, 'utf8');
 
-const CLOUD_RUN_ORIGIN = 'https://signage-player-web-3e3aws7zqa-du.a.run.app';
 const SERVICE_NAME = 'signage-player-web';
-const CONTAINER_PORT = '8080';
 
-describe('STATIC CONTRACT: signage-player-web 배포 채택 (§30)', () => {
-  it('필요한 파일이 모두 존재한다', () => {
-    for (const p of [WORKFLOW, DOCKERFILE, NGINX_CONF, MIDDLEWARES]) {
-      expect(fs.existsSync(p)).toBe(true);
-    }
-  });
-
-  // ---- 1. 포트 정합 ----
-  it('nginx 는 Cloud Run 컨테이너 포트(8080)로 listen 한다', () => {
-    const conf = read(NGINX_CONF);
-    const listens = conf
-      .split(String.fromCharCode(10))
-      .map((l) => l.trim())
-      .filter((l) => l.startsWith('listen '));
-    expect(listens).toEqual([`listen ${CONTAINER_PORT};`]);
-  });
-
-  it('Dockerfile 의 EXPOSE 가 nginx listen 포트와 같다', () => {
-    const exposes = read(DOCKERFILE)
-      .split(String.fromCharCode(10))
-      .map((l) => l.trim())
-      .filter((l) => l.startsWith('EXPOSE '));
-    expect(exposes).toEqual([`EXPOSE ${CONTAINER_PORT}`]);
-  });
-
-  it('Cloud Run deploy 의 --port 가 컨테이너 포트와 같다', () => {
+describe('STATIC CONTRACT: signage-player-web 배포 은퇴', () => {
+  it('deploy-web-services.yml 에 player deploy job · gcloud deploy · image 가 없다', () => {
     const wf = read(WORKFLOW);
-    const job = wf.slice(wf.indexOf('deploy-signage-player:'));
-    expect(job).toMatch(new RegExp(`--port=${CONTAINER_PORT}`));
+    expect(wf).not.toContain('deploy-signage-player:');
+    expect(wf).not.toContain(`gcloud run deploy ${SERVICE_NAME}`);
+    expect(wf).not.toContain(`/${SERVICE_NAME}:`);
+    expect(wf).not.toContain('services/signage-player-web/Dockerfile');
   });
 
-  // ---- 2. workflow 채택 3요소 ----
-  it('push path trigger 에 player 경로가 있다', () => {
-    expect(read(WORKFLOW)).toContain("- 'services/signage-player-web/**'");
-  });
-
-  // WO-O4O-WEB-SERVICES-CD-DEPENDENCY-AFFECTED-DEPLOY-GATE-V1:
-  //   판정이 workflow 인라인 `decide` 헬퍼에서 공통 SSOT(detect-affected.mjs)의
-  //   WEB_SERVICES registry 로 옮겨졌다. 단언 대상을 사라진 구현 세부가 아니라
-  //   **현재 판정 지점**으로 옮긴다 — 막는 회귀(#2 player 가 다시 빠지는 것)는 그대로다.
-  it('detect-changes 가 player 를 판정하고 output 으로 노출한다', () => {
-    expect(read(DETECTOR)).toMatch(
-      /key:\s*'signage-player'\s*,\s*dir:\s*'services\/signage-player-web'/,
-    );
-    expect(read(WORKFLOW)).toContain('signage-player: ${{ steps.changes.outputs.signage-player }}');
-  });
-
-  it('deploy job 이 존재하고 detect-changes 결과로 gate 된다', () => {
+  it('detect-changes output · dispatch 선택지에 signage-player 가 없다', () => {
     const wf = read(WORKFLOW);
-    expect(wf).toContain('deploy-signage-player:');
-    expect(wf).toContain("needs.detect-changes.outputs.signage-player == 'true'");
-    expect(wf).toContain(`gcloud run deploy ${SERVICE_NAME}`);
+    expect(wf).not.toContain('steps.changes.outputs.signage-player');
+    expect(wf).not.toContain('needs.detect-changes.outputs.signage-player');
+    expect(wf).not.toMatch(/description: 'Service to deploy \([^)]*signage-player/);
   });
 
-  it('image tag 는 commit SHA 다 (배포 검증 규약)', () => {
-    const wf = read(WORKFLOW);
-    const job = wf.slice(wf.indexOf('deploy-signage-player:'));
-    expect(job).toContain(`gcr.io/\${{ env.PROJECT_ID }}/${SERVICE_NAME}:\${{ github.sha }}`);
+  it('자동 배포 판정 registry 에 player 가 없다', () => {
+    expect(read(DETECTOR)).not.toMatch(/key:\s*'signage-player'\s*,\s*dir:/);
   });
 
-  // ---- 3. secret 금지 (§28) ----
-  it('player build-arg 는 public runtime config 뿐이다 (secret 주입 0)', () => {
-    const wf = read(WORKFLOW);
-    const job = wf.slice(wf.indexOf('deploy-signage-player:'), wf.indexOf('  summary:'));
-    const FORBIDDEN = ['SECRET', 'PASSWORD', 'TOKEN', 'CREDENTIAL', 'PRIVATE_KEY', 'SERVICE_ACCOUNT', 'DATABASE'];
-    const buildArgLines = job
-      .split(String.fromCharCode(10))
-      .map((l) => l.trim())
-      .filter((l) => l.startsWith('--build-arg '));
-    expect(buildArgLines.length).toBeGreaterThan(0);
-    for (const line of buildArgLines) {
-      const name = line.slice('--build-arg '.length).split('=')[0];
-      expect(name.startsWith('VITE_')).toBe(true);
-      for (const bad of FORBIDDEN) expect(name).not.toContain(bad);
-      // build-arg 값으로 GitHub secret 을 흘려보내지 않는다 (GCP 인증용 secrets.GCP_SA_KEY 는 별개)
-      expect(line).not.toContain('secrets.');
-    }
+  it('risk 매핑(web key → Cloud Run 서비스)에 player 가 없다', () => {
+    expect(read(RISK)).not.toContain(`'${SERVICE_NAME}'`);
   });
 
-  it('Dockerfile ARG 에도 secret 성 이름이 없다', () => {
-    const FORBIDDEN = ['SECRET', 'PASSWORD', 'TOKEN', 'CREDENTIAL', 'PRIVATE_KEY', 'SERVICE_ACCOUNT', 'DATABASE'];
-    const args = read(DOCKERFILE)
-      .split(String.fromCharCode(10))
-      .map((l) => l.trim())
-      .filter((l) => l.startsWith('ARG '))
-      .map((l) => l.slice('ARG '.length).split('=')[0]);
-    expect(args.length).toBeGreaterThan(0);
-    for (const name of args) {
-      for (const bad of FORBIDDEN) expect(name.toUpperCase()).not.toContain(bad);
-    }
-  });
-
-  // ---- 4. CORS ----
-  it('API CORS allowlist 에 player 의 Cloud Run origin 이 정확히 1개 등록돼 있다', () => {
-    const src = read(MIDDLEWARES);
-    expect(src).toContain(`"${CLOUD_RUN_ORIGIN}"`);
-  });
-
-  it('CORS 를 wildcard 로 완화하지 않았다', () => {
-    const src = read(MIDDLEWARES);
-    expect(src).not.toContain('"*"');
-    expect(src.replace(/ /g, '')).not.toContain('origin:true');
-  });
-
-  // ---- 5. SPA fallback / health ----
-  it('nginx 가 SPA fallback 과 /health 를 제공한다 (deep-link 라우팅 전제)', () => {
-    const conf = read(NGINX_CONF);
-    expect(conf).toContain('try_files $uri $uri/ /index.html');
-    expect(conf).toContain('location /health');
-  });
-
-  it('§24 — media/video 를 깨뜨릴 수 있는 CSP / X-Frame-Options 를 도입하지 않았다', () => {
-    const conf = read(NGINX_CONF);
-    expect(conf).not.toMatch(/add_header\s+Content-Security-Policy/i);
-    expect(conf).not.toMatch(/add_header\s+X-Frame-Options/i);
+  it('앱 소스가 workspace 에 없다', () => {
+    // 디렉터리가 아니라 package.json 으로 본다 — 로컬에 ignore 된 node_modules 잔재가 남을 수 있다.
+    expect(fs.existsSync(path.join(ROOT, 'services/signage-player-web/package.json'))).toBe(false);
+    expect(read(path.join(ROOT, 'pnpm-lock.yaml'))).not.toContain('services/signage-player-web:');
   });
 });

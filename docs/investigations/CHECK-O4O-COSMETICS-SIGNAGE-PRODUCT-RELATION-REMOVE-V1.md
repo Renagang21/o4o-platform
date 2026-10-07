@@ -22,7 +22,7 @@
 
 **게이트 PASS — 네 값 모두 NULL(테이블 부재).**
 
-- 접속: prod `o4o-platform-db`(public IP `34.64.96.252`, egress IP 영구 authorized) 직접 psql read-only(`sslmode=require`). user=`o4o_api`, db=`o4o_platform`.
+- 접속: prod `o4o-platform-db`(public IP `[REDACTED_IP]`, egress IP 영구 authorized) 직접 psql read-only(`sslmode=require`). user=`o4o_api`, db=`o4o_platform`.
 - 쿼리:
   ```sql
   SELECT to_regclass('public.cosmetics_signage_playlists'),

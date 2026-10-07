@@ -26,42 +26,11 @@ const REPO = join(SRC, '..', '..', '..');
 const read = (...p: string[]) => readFileSync(join(...p), 'utf-8');
 const codeOnly = (s: string) => s.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
-const KCOS = [REPO, 'services', 'web-k-cosmetics', 'src'];
+// §1 · §2 의 KCos 앱(services/web-k-cosmetics) 소스 단언과 §4 의 앱 화면 단언은 앱 퇴역 삭제로 제거했다
+//   (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). 공통 Core · backend 계약은 유지한다.
 const CORE_LIB = [REPO, 'packages', 'store-ui-core', 'src', 'components', 'library'];
 
-describe('§1 source — KCos 콘텐츠 탭은 B+D 만 읽는다', () => {
-  const page = codeOnly(read(...KCOS, 'pages', 'store', 'StoreLibraryContentsPage.tsx'));
-
-  it('B: getStoreContents (/cosmetics/store-contents) 를 읽는다', () => {
-    expect(page).toMatch(/import \{ getStoreContents \} from '\.\.\/\.\.\/api\/storeProductionSources'/);
-    const sources = codeOnly(read(...KCOS, 'api', 'storeProductionSources.ts'));
-    expect(sources).toMatch(/export async function getStoreContents\(/);
-    expect(sources).toMatch(/api\.get\('\/cosmetics\/store-contents'\)/);
-  });
-
-  it('D: getStoreExecutionAssets (/cosmetics/store/assets) 를 읽는다', () => {
-    expect(page).toMatch(/import \{ getStoreExecutionAssets \} from '\.\.\/\.\.\/api\/storeExecutionAssets'/);
-    expect(page).toMatch(/isActive !== false/);
-  });
-
-  it('snapshot 계층(assetSnapshotApi · /cosmetics/assets · type=content) 을 읽지 않는다', () => {
-    expect(page).not.toMatch(/assetSnapshotApi|\/cosmetics\/assets|type:\s*'content'/);
-    expect(page).not.toMatch(/kpa_contents|kpaContent|storeAssetControlApi|\/store-assets/);
-  });
-});
-
 describe('§2 origin — POP V2 handoff origin 이 원장과 1:1 이다', () => {
-  const page = codeOnly(read(...KCOS, 'pages', 'store', 'StoreLibraryContentsPage.tsx'));
-
-  it("B 행은 origin 'direct', D 행은 origin 'library'", () => {
-    expect(page).toMatch(/origin:\s*'direct' as const/);
-    expect(page).toMatch(/origin:\s*'library' as const/);
-  });
-
-  it("KCos 어댑터는 'snapshot' origin 을 만들지 않는다", () => {
-    expect(page).not.toMatch(/'snapshot'/);
-  });
-
   it('resolver 어휘와 일치한다 (handoff CONTENT_ORIGINS ⊇ direct · library)', () => {
     const handoff = codeOnly(read(REPO, 'packages', 'store-ui-core', 'src', 'components', 'pop-v2', 'handoff.ts'));
     expect(handoff).toMatch(/CONTENT_ORIGINS[^\n]*=\s*\[[^\]]*'direct'[^\]]*'library'/);
@@ -91,17 +60,6 @@ describe('§4 axis — 범위 밖 축은 무변경', () => {
   //   위 WO 시점의 "채널 통제 축은 손대지 않았다" 가드였다. 그 축(KPA 전용 kpa_store_asset_controls 를
   //   KPA 조직 resolver 로 마운트하던 P0 결함)은 후속 WO 가 **의도적으로 은퇴**시켰으므로
   //   금지 단언을 새 계약(redirect-only · storeAssetControlApi 0)으로 갱신한다. 회귀가 아니라 계약 변경이다.
-  it('KCos /store/content 는 은퇴됐다 — storeAssetControlApi 0 · canonical 자료함으로 redirect', () => {
-    const s = codeOnly(read(...KCOS, 'pages', 'store', 'StoreAssetsPage.tsx'));
-    expect(s).not.toMatch(/storeAssetControlApi/);
-    expect(s).toMatch(/<Navigate to="\/store\/library\/contents" replace \/>/);
-  });
-
-  it('HUB cms · signage copy 는 여전히 assetSnapshotApi.copy 를 쓴다', () => {
-    expect(codeOnly(read(...KCOS, 'pages', 'hub', 'HubContentPage.tsx'))).toMatch(/assetSnapshotApi\.copy\(/);
-    expect(codeOnly(read(...KCOS, 'pages', 'hub', 'HubSignagePage.tsx'))).toMatch(/assetSnapshotApi\.copy\(/);
-  });
-
   it('cosmetics.routes.ts 마운트 (/store-contents wrapper · /store/assets · /assets 유지 · /store-assets 는 은퇴)', () => {
     const r = codeOnly(read(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'));
     expect(r).toMatch(/router\.use\(\s*'\/store-contents'\s*,\s*createCosmeticsStoreContentController\(/);

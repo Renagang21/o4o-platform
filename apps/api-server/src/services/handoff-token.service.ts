@@ -42,6 +42,28 @@ export interface HandoffTokenPayload {
   /** WORKSPACE HANDOFF 일 때만 존재 */
   targetWorkspace?: HandoffWorkspace;
   createdAt: string;
+  /**
+   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차):
+   * 발급 시점의 **출발 서비스 세대**. 교환 시 현재 세대와 비교해 "발급 뒤 그 서비스에서
+   * 로그아웃했는가" 를 판정한다. `created_at` 시각 비교를 쓰지 않는 이유는 §8 과 같다 —
+   * 초 단위 값으로는 같은 초의 선후를 알 수 없다.
+   * 이 컬럼이 없던 시절 발급분은 `null` 이다(판정에서 제외).
+   */
+  sourceSessionEpoch?: number | null;
+  /**
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (최종 보완 1):
+   * 발급 시점에 서버가 검증한 **출발 세션의 인증 수단**. 교환 세션은 이 값을 승계한다.
+   * 컬럼 이전 발급분 · 알 수 없는 값은 `'password'` 로 읽는다(fail-closed · 승격 없음).
+   */
+  sourceAuthMethod: HandoffAuthMethod;
+}
+
+/** handoff 원장에 남기는 인증 수단. DB CHECK(`chk_handoff_source_auth_method`)와 1:1. */
+export type HandoffAuthMethod = 'google' | 'password';
+
+/** 원장 값 → 인증 수단. 'google' 로 명시된 경우만 Google, 나머지(NULL · 알 수 없는 값)는 password. */
+export function readHandoffAuthMethod(value: unknown): HandoffAuthMethod {
+  return value === 'google' ? 'google' : 'password';
 }
 
 export type HandoffTarget =
@@ -71,6 +93,8 @@ class HandoffTokenService {
     userId: string,
     sourceServiceKey: string,
     target: string | HandoffTarget,
+    sourceSessionEpoch?: number | null,
+    sourceAuthMethod: HandoffAuthMethod = 'password',
   ): Promise<string> {
     const resolved: HandoffTarget =
       typeof target === 'string' ? { kind: 'service', targetServiceKey: target } : target;
@@ -92,11 +116,24 @@ class HandoffTokenService {
     }
 
     const rows: Array<{ id: string }> = await AppDataSource.query(
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (4차):
+      //   세대를 **호출자가 검증한 값**으로 받는다. 여기서 현재 세대를 다시 읽으면(subquery 든
+      //   별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가 적혀,
+      //   이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
       `INSERT INTO handoff_tokens
-         (user_id, source_service_key, target_service_key, target_workspace, expires_at)
-       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval)
+         (user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch,
+          source_auth_method)
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval, $6, $7)
        RETURNING id`,
-      [userId, sourceServiceKey, targetServiceKey, targetWorkspace, String(this.TOKEN_TTL)],
+      [
+        userId,
+        sourceServiceKey,
+        targetServiceKey,
+        targetWorkspace,
+        String(this.TOKEN_TTL),
+        sourceSessionEpoch ?? null,
+        readHandoffAuthMethod(sourceAuthMethod),
+      ],
     );
 
     const tokenId = rows?.[0]?.id;
@@ -113,6 +150,7 @@ class HandoffTokenService {
       sourceServiceKey,
       targetServiceKey,
       targetWorkspace,
+      sourceAuthMethod: readHandoffAuthMethod(sourceAuthMethod),
       ttl: this.TOKEN_TTL,
     });
 
@@ -139,7 +177,8 @@ class HandoffTokenService {
         WHERE id = $1
           AND consumed_at IS NULL
           AND expires_at > now()
-        RETURNING user_id, source_service_key, target_service_key, target_workspace, created_at`,
+        RETURNING user_id, source_service_key, target_service_key, target_workspace, created_at,
+                  source_session_epoch, source_auth_method`,
       [tokenId],
     );
 
@@ -159,6 +198,13 @@ class HandoffTokenService {
         row.created_at instanceof Date
           ? row.created_at.toISOString()
           : String(row.created_at),
+      sourceSessionEpoch:
+        typeof row.source_session_epoch === 'number'
+          ? row.source_session_epoch
+          : row.source_session_epoch === null || row.source_session_epoch === undefined
+            ? null
+            : Number(row.source_session_epoch),
+      sourceAuthMethod: readHandoffAuthMethod(row.source_auth_method),
     };
     // 두 형태 중 정확히 하나 (DB CHECK) — 행 그대로 payload 에 반영한다
     if (row.target_service_key) {

@@ -176,7 +176,7 @@ WO §4 의 서비스별 승인 분포 / 우회 신청 가능 후보 수 집계�
 |------|------|
 | `gcloud sql connect --user=postgres` | psql 이 비대화형 stdin 에서 비밀번호 프롬프트로 블록 → timeout (exit 124) |
 | `gcloud sql connect --user=o4o_api` + env 자격증명 | 동일하게 블록 |
-| allowlist 창 내 직접 `psql -h 34.64.96.252` | **권한 분류기에 차단** — 우회하지 않았다 |
+| allowlist 창 내 직접 `psql -h [REDACTED_IP]` | **권한 분류기에 차단** — 우회하지 않았다 |
 
 - 클론 #1 에는 프로덕션 자격증명이 없다 (`apps/api-server/.env` = `DB_HOST=127.0.0.1` 로컬 dev, `.env` = placeholder).
 - 따라서 아래 표는 **공란으로 남긴다.**

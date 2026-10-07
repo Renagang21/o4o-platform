@@ -9,8 +9,10 @@
  */
 import { AuthClient } from '@o4o/auth-client';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
+import { resolveApiBaseUrl } from './apiBaseUrl';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+// dev server 는 env 미설정 시 로컬 API, production build 는 운영 API — apiBaseUrl.ts
+const API_BASE_URL = resolveApiBaseUrl(import.meta.env);
 
 export const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
   strategy: 'localStorage',

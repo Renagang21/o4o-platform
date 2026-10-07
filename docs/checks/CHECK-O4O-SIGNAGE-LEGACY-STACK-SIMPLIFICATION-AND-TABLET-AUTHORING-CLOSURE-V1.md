@@ -121,7 +121,7 @@ mount: `register-routes.ts:1031` → `/api/signage/:serviceKey/public`
 차단 사유:
 1. `gcloud secrets versions access latest --secret=o4o-db-password` → **auto mode classifier 거부**
 2. `gcloud run services describe o4o-core-api ... env` → **auto mode classifier 거부**
-3. Cloud SQL `o4o-platform-db` 의 `authorizedNetworks` **비어 있음** (작업 IP `124.194.156.36` 미허용)
+3. Cloud SQL `o4o-platform-db` 의 `authorizedNetworks` **비어 있음** (작업 IP `[REDACTED_IP]` 미허용)
 
 **우회 credential 생성·self-grant 를 시도하지 않았다** (§15).
 

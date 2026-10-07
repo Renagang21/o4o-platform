@@ -24,8 +24,8 @@ import path from 'node:path';
 import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc-description-consumer-html.js';
 import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../modules/neture/drug-import/drug-otc-en-consumer-html.js';
 
-const WL_PATH = path.resolve(process.cwd(), '../../docs/investigations/samples/nb-doc-bulk-v1/additive-warning-whitelist-v2.json');
-const EN_PATH = path.resolve(process.cwd(), '../../docs/guides/products/drug/pilot-en-design/translations/otc-en-translations-v1.json');
+const WL_PATH = path.resolve(process.cwd(), 'src/scripts/data/investigation-samples/nb-doc-bulk-v1/additive-warning-whitelist-v2.json');
+const EN_PATH = path.resolve(process.cwd(), 'src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-v1.json');
 const EXPECTED_MASTERS = 117;
 const EXPECTED_ROWS = 234;
 const KO_BOUNDARY = /(복용하지\s*(않습니다|마십시오|마세요)|복용을\s*피하십시오|복용해서는\s*안\s*됩니다)\.?/;

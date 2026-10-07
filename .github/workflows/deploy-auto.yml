@@ -1,0 +1,128 @@
+name: Deploy Auto (risk-gated) — RETIRED
+
+# ⛔ RETIRED (WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P3 cutover, 2026-10-02)
+#   자동 배포 경로는 `delivery.yml`(Unified Delivery) 하나다. 이 workflow 는 main CI 에 반응하지 않고(workflow_run 제거)
+#   job 은 `if: false` 로 수동 실행도 하지 않는다 — 두 자동 경로가 동시에 배포 권한을 갖는 순간을 없애기 위해
+#   delivery.yml `DELIVERY_ENFORCE: 'true'` 와 **같은 commit** 에서 전환했다.
+#   rollback: 이 commit 을 revert (workflow_run 복원 + DELIVERY_ENFORCE 'false') — 배포 runtime 과는 별개.
+#   아래 설명은 은퇴 전 동작 기록이다.
+#
+# WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — production 자동 배포의 **유일한 진입점**
+#
+#   main push → CI Pipeline 완료 → 이 workflow
+#     → CI gate (target SHA green)          실패/미확정 → BLOCKED_CI_NOT_GREEN
+#     → DEPLOY_FREEZE                        'false' 가 아니면(부재 · 공백 · 오타 포함) → BLOCKED_DEPLOY_FREEZE
+#     → target == main HEAD                  아니면 SUPERSEDED (더 새 commit 의 cycle 이 누적 diff 로 처리)
+#     → 서비스별 serving SHA → target 판정
+#         LEVEL_1 → NO_DEPLOY
+#         LEVEL_2 → AUTO_DEPLOY (verified rollout) — API 먼저, 성공 확인 뒤 web · admin
+#         LEVEL_2 + rollout_pending → CONTROLLED_FIRST_ROLLOUT_REQUIRED
+#         LEVEL_3 → AUTO_DEPLOY_BLOCKED reason=LEVEL_3 (사람이 통제 배포)
+#         API 가 배포 대상인데 자동 배포 안 됨 → 프런트도 HELD_API_NOT_DEPLOYED
+#     → 배포는 `deploy/auto-<sha12>` 태그 ref 로 deploy-api/web-services/admin 을 dispatch
+#       (target SHA 고정 · 서비스별 concurrency 로 rollout 1개씩)
+#
+#   판정 · 결정 · 결과는 Job Summary 와 artifact(JSON, 30일)로 남는다 — 이전 shadow 기록을 대체한다.
+#   근거: docs/checks/CHECK-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1.md
+#
+#   WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 P0 (가시성 · 배포 동작 불변):
+#     run 이름 = 실제 판정 target SHA (workflow_run run 은 목록에 main 최신 commit 으로 표시돼 다른 commit 의 판정처럼 보였다)
+#     commit status `production` = target commit 에 결과 1줄 (NO_DEPLOY · DEPLOYING · HELD_LEVEL_3 · BLOCKED_FREEZE …)
+#   이 workflow 는 Unified Delivery(`delivery.yml`) cutover 때 비활성화된다 — 그 전까지 자동 경로의 권한은 여기 있다.
+
+run-name: Deploy Auto ${{ github.event.workflow_run.head_sha || inputs.target_sha || github.sha }}
+
+on:
+  # workflow_run(CI Pipeline · main) trigger 은퇴 — 자동 경로는 delivery.yml
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: '판정할 target SHA (40자 · 비우면 현재 ref)'
+        required: false
+        default: ''
+      dry_run:
+        description: "'true'(기본) = 판정만 · dispatch 0 / 'false' = 결정대로 배포"
+        required: false
+        default: 'true'
+      base_sha:
+        description: '(fixture) base SHA — head_sha 와 함께 주면 모든 서비스가 base 를 서빙한다고 보고 판정만 한다'
+        required: false
+        default: ''
+      head_sha:
+        description: '(fixture) head SHA'
+        required: false
+        default: ''
+
+# 한 번에 한 판정. 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체된다(새 target 의 누적 diff 가 이전 것을 포함).
+concurrency:
+  group: deploy-auto
+  cancel-in-progress: false
+
+# 은퇴 — 태그 생성 · dispatch · commit status 권한을 내려놓는다
+permissions:
+  contents: read
+
+jobs:
+  decide-and-deploy:
+    name: Risk-gated auto deploy
+    # main push 로 돈 CI 만 (PR run 은 branches 필터로 빠진다). CI 실패도 기록을 위해 돈다(결정 = BLOCKED_CI_NOT_GREEN).
+    # RETIRED — 수동 dispatch 로도 실행하지 않는다 (태그 · dispatch 자동 경로 부활 방지)
+    if: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TARGET_SHA: ${{ github.event.workflow_run.head_sha || github.event.inputs.target_sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 0
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+
+      - name: Authenticate to Google Cloud (read-only serving 조회)
+        # 은퇴 workflow — WIF provider 의 허용 workflow 목록에 없다(environment · id-token 도 없음). 되살리면 인증부터 실패한다.
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: netureyoutube
+          skip_install: true
+
+      - name: Decide and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_FREEZE_RAW: ${{ vars.DEPLOY_FREEZE }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          BASE_SHA: ${{ github.event.inputs.base_sha }}
+          HEAD_SHA: ${{ github.event.inputs.head_sha }}
+        run: |
+          ARGS=(--freeze "$DEPLOY_FREEZE_RAW" --dry-run "$DRY_RUN" --json "$RUNNER_TEMP/deploy-auto.json")
+          # 실제 판정(dry-run 아님)만 target commit 에 상태를 남긴다 — 수동 재현 · fixture 는 기록하지 않는다
+          if [ "$DRY_RUN" = "false" ] && [ -z "$BASE_SHA" ]; then ARGS+=(--status-context production); fi
+          if [ -n "$BASE_SHA" ] && [ -n "$HEAD_SHA" ]; then
+            ARGS+=(--base "$BASE_SHA" --head "$HEAD_SHA")
+          else
+            ARGS+=(--target "$TARGET_SHA")
+          fi
+          node scripts/ci/deploy-orchestrate.mjs "${ARGS[@]}"
+
+      - name: Upload decision record
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: deploy-auto-${{ env.TARGET_SHA }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/deploy-auto.json
+          retention-days: 30
+          if-no-files-found: ignore

@@ -1,6 +1,6 @@
 # O4O Signage Canonical Playback Path V1
 
-> **상태**: ACTIVE · **제정일**: 2026-08-26
+> **상태**: ACTIVE · **제정일**: 2026-08-26 · **최종 갱신**: 2026-10-05 (§5-1 · §9 player telemetry "결손" 서술 정정)
 > **제정 WO**: `WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1`
 > **선행 감사**: [`CHECK-O4O-SIGNAGE-CHANNEL-STACK-REDUCTION-AND-SIMPLE-VIDEO-PLAYBACK-AUDIT-V1`](../checks/CHECK-O4O-SIGNAGE-CHANNEL-STACK-REDUCTION-AND-SIMPLE-VIDEO-PLAYBACK-AUDIT-V1.md)
 > **guard**: `apps/api-server/src/__tests__/channels-stack-retirement.spec.ts`
@@ -106,15 +106,18 @@ runtime 을 먼저 죽이고 dead 상태를 확정한 뒤, schema drop 은 **마
 | `/global/*` · `/community/*` | — | **DEFER** |
 | `/active-content` | — | **KEEP (조건부)** — §5-1 |
 
-### 5-1. 확인된 결함 2건 (이번 WO 에서 고치지 않음 · 별도 WO)
+### 5-1. 확인된 결함 (이번 WO 에서 고치지 않음 · 별도 WO)
 
-1. **player telemetry 3개가 서버에 없다.**
-   `PlayerTelemetry` 는 `/api/signage/:serviceKey/channels/:channelId/{heartbeat,playback-logs,errors}` 를
-   호출하지만 **api-server 에 해당 핸들러가 존재하지 않는다.** 전부 404 로 버려진다.
-   → `signage_playback_logs` 0행의 직접 원인.
+1. ~~player telemetry 3개가 서버에 없다~~ — **결손 아님 · 정정 (2026-10-05)**.
+   `/api/signage/:serviceKey/channels/:channelId/{heartbeat,playback-logs,errors}` 는 별도 앱 `signage-player-web` 의
+   `PlayerTelemetry` 가 호출하던 대상일 뿐 **서버에 구현된 적이 없다**(signage route 정의 · git 이력 0).
+   실제 옛 Channel telemetry API(`/api/v1/channels/:id/heartbeat` · `/:id/playback-log`)는 §4 대로 `a193ba4df` 에서 은퇴했고,
+   유일한 호출자였던 `signage-player-web` 도 은퇴했다(배포 PR #306 · 소스 PR #311). 운영 요청 30일 0건.
+   따라서 구현할 대상이 아니다 — 근거: [CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1 §5](../checks/CHECK-O4O-RETIRED-WEB-RESIDUAL-CLEANUP-V1.md).
+   `signage_playback_logs` 의 쓰기 경로는 이와 별개인 `POST /api/signage/:serviceKey/public/playback/log` 이며 **보존한다**.
 2. **`/active-content` 는 인증을 요구한다** (`allowSignageStoreRead` → 미인증 401).
-   따라서 **로그인 없는 매장 태블릿은 축 B player 로 재생할 수 없다.**
-   이것이 축 C 가 실사용 경로가 된 구조적 이유다.
+   따라서 **로그인 없는 매장 태블릿은 축 B player 로 재생할 수 없다**(그 별도 player 앱은 2026-10-05 은퇴).
+   이것이 축 C 가 실사용 경로가 된 구조적 이유다. `/active-content` 는 store-web 이 쓰므로 계약 그대로 **보존한다**.
 
 ---
 
@@ -173,7 +176,7 @@ CMS read serviceKey 경계                  — signage 축소와 무관, 유지
 ```text
 1. [완료] Channel 축 runtime 은퇴 + 본 문서 canonical 확정
 2. Signage 72 endpoint 실행 단계 축소 (§5)
-3. §5-1 결함 2건 처리 (player telemetry 미구현 / active-content 인증)
+3. §5-1 결함 처리 (active-content 인증) — player telemetry 항목은 결손 아님으로 정정(2026-10-05)
 4. signage_forced_content(2행) 소비처 조사
 5. dead table/schema 제거 여부 결정 — channels 3테이블 drop 판단 (마지막)
 ```

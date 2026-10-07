@@ -59,6 +59,10 @@ export class SellerRecruitmentApplication {
   @Column({ name: 'applicant_name', nullable: true })
   applicantName: string;
 
+  /** WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 모집의 참여 단위 = 약국 조직 */
+  @Column({ name: 'applicant_organization_id', type: 'uuid', nullable: true })
+  applicantOrganizationId: string | null;
+
   @Column({
     type: 'enum',
     enum: ApplicationStatus,

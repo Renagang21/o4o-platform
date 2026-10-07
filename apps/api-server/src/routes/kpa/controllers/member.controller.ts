@@ -12,6 +12,11 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import { ensureKpaStoreOrganization } from '../services/kpa-store-organization.provisioning.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+} from '../../../services/auth/demo-account.service.js';
 import { emailService } from '../../../services/email.service.js';
 // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
 //   회원 승인/반려 시 신청자에게 in-app 알림 발송.
@@ -85,13 +90,26 @@ function resolveRunnerFromDataSource(dataSource: DataSource): KpaMemberResolveRu
   };
 }
 
+/**
+ * Demo 계정 보호(정책 §8 role 변경 · ownership 해제) — 이 resolver 의 소비처는 쓰기 경로
+ * (PATCH /:id/status · /:id/info) 뿐이다. skeleton INSERT 를 포함한 **어떤 write 보다도 먼저** 막는다.
+ */
+async function assertNotDemoMember(manager: KpaMemberResolveRunner, userId: string | null | undefined): Promise<void> {
+  if (await demoAccountService.isDemoAccount(userId, manager)) {
+    throw new MemberInfoAbort(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
+  }
+}
+
 async function resolveKpaMemberByAnyId(
   manager: KpaMemberResolveRunner,
   id: string,
 ): Promise<{ member: KpaMember; ensured: boolean }> {
   // 1) kpa_members.id
   const byMemberId = await manager.findMember({ id });
-  if (byMemberId) return { member: byMemberId, ensured: false };
+  if (byMemberId) {
+    await assertNotDemoMember(manager, byMemberId.user_id);
+    return { member: byMemberId, ensured: false };
+  }
 
   // 2) users.id 또는 service_memberships.id → user_id 해석
   const smRows = await manager.query(
@@ -106,6 +124,7 @@ async function resolveKpaMemberByAnyId(
     throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
   }
   const sm = smRows[0];
+  await assertNotDemoMember(manager, sm.user_id);
 
   // 3) 같은 user 의 kpa_members row (sm.id ≠ km.id 인 경우 포함)
   const byUserId = await manager.findMember({ user_id: sm.user_id });
@@ -1147,6 +1166,12 @@ export function createMemberController(
           return;
         }
 
+        // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+        if (await demoAccountService.isDemoAccount(member.user_id)) {
+          res.status(403).json({ error: { code: DEMO_ACCOUNT_FORBIDDEN_CODE, message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE } });
+          return;
+        }
+
         const oldRole = member.role;
         const newRole = req.body.role;
 
@@ -1652,6 +1677,12 @@ export function createMemberController(
         const member = await memberRepo.findOne({ where: { id: req.params.id } });
         if (!member) {
           res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+          return;
+        }
+
+        // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
+        if (await demoAccountService.isDemoAccount(member.user_id)) {
+          res.status(403).json({ error: { code: DEMO_ACCOUNT_FORBIDDEN_CODE, message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE } });
           return;
         }
 

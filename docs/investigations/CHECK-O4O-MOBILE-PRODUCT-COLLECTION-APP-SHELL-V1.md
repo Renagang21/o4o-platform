@@ -152,7 +152,7 @@
 | 라이브 e2e: list `?status=submitted` 에 해당 row 노출 | ✅ present |
 | 라이브 e2e: archive 정리 (disposable `[SMOKE]`) | ✅ `draftStatus=archived` |
 
-> 계정: `sohae2100@gmail.com` (SSOT). disposable `[SMOKE]` draft 1건 생성→archive 로 정리. UI 육안(에뮬레이터) 검증은 후속 — 본 검증은 API 계약 e2e + tsc 기준.
+> 계정: `[REDACTED_EMAIL_A]` (SSOT). disposable `[SMOKE]` draft 1건 생성→archive 로 정리. UI 육안(에뮬레이터) 검증은 후속 — 본 검증은 API 계약 e2e + tsc 기준.
 
 ---
 

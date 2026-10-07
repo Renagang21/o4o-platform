@@ -27,7 +27,7 @@ jest.mock('../../database/connection.js', () => ({
   },
 }));
 
-import { runWebResearch } from '../../services/ai/web-research.service.js';
+import { WEB_RESEARCH_MAX_ATTEMPTS, WEB_RESEARCH_TIMEOUT_MS, runWebResearch } from '../../services/ai/web-research.service.js';
 import { GEMINI_CANONICAL_MODEL } from '../../types/ai-proxy.types.js';
 
 const GROUNDED_RESPONSE = {
@@ -123,6 +123,32 @@ describe('runWebResearch — admin 모델 해석 → grounding end-to-end', () =
     expect(bodyText).not.toContain('health.kr');
     expect(bodyText).not.toContain('hira');
     expect(bodyText).not.toContain('mfds');
+  });
+
+  // ⑤ 시간 예산 — grounding 조사는 provider 기본(10초 × 2회 = 22초 실패)이 아니라 1회 24초. LB(30초) 안쪽.
+  it('uses a single grounded attempt with the research time budget (within LB 30s)', async () => {
+    mockFindOne.mockResolvedValue({ id: 1, defaultModel: GEMINI_CANONICAL_MODEL });
+    let calls = 0;
+    const timers: number[] = [];
+    const realSetTimeout = global.setTimeout;
+    global.setTimeout = ((fn: (...a: unknown[]) => void, ms?: number, ...rest: unknown[]) => {
+      if (typeof ms === 'number') timers.push(ms);
+      return realSetTimeout(fn, ms, ...rest);
+    }) as typeof setTimeout;
+    global.fetch = (async () => {
+      calls += 1;
+      return { ok: false, status: 503, json: async () => ({}), text: async () => 'unavailable' } as any;
+    }) as any;
+    try {
+      await expect(runWebResearch({ query: '느린 조사' })).rejects.toBeTruthy();
+    } finally {
+      global.setTimeout = realSetTimeout;
+    }
+    expect(calls).toBe(WEB_RESEARCH_MAX_ATTEMPTS);
+    expect(WEB_RESEARCH_MAX_ATTEMPTS).toBe(1);
+    expect(timers).toContain(WEB_RESEARCH_TIMEOUT_MS);
+    expect(WEB_RESEARCH_TIMEOUT_MS).toBeGreaterThan(10_000);
+    expect(WEB_RESEARCH_TIMEOUT_MS).toBeLessThan(30_000);
   });
 
   // ④ admin policy 가 비-gemini 모델이면 안전 fallback(gemini) 으로 강등 — grounding 은 gemini 전용.

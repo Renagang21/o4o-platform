@@ -33,12 +33,30 @@
  *     · Cloud 에는 **최소 coordination**(runId · 소유자 · device · status · version · 만료)만 둔다 —
  *       goal/질문/답변 원문 · DOM · 관찰 · trajectory · step 전문은 cloud 에 넣지 않고, cloud 는 Local 을 read-back 하지 않는다.
  *     · 재개 = 같은 runId + **현재 화면 재관찰** + planner re-prime. 저장된 관찰을 되살리지 않는다.
+ *   PHASE 2(Workflow Candidate · IR §8·§9-3·§9-4)가 더 허용하는 것도 이것뿐이다:
+ *     · 성공 run 의 **값 없는 semantic 단계**(행동 종류 · role·name|text · 예상 변화) + 요청 템플릿을 Local SQLite 에 저장한다
+ *       (서버 → Local write, 명령 인자로 한 번 지나갈 뿐 cloud 에 저장하지 않는다).
+ *     · 재생용 조회는 Local 이 템플릿을 대조해 **이번 요청의 값을 채운 단계만** 돌려준다 — 과거 요청 문장 · 템플릿 · 통계는
+ *       돌아오지 않는다. 재생은 같은 loop 안의 bounded prefix 이며(현재 화면 재검증 · 어긋나면 AI loop), 엔진이 아니다.
  *   `automation_jobs` 는 이 축에 재사용하지 않는다(video 트랙 전용). 다음은 PHASE 1 이후로도 계속 금지한다:
  *     scheduler · background queue · executor · general workflow engine · agent loop · retry orchestration ·
  *     planner state machine · tool execution queue · background worker · 사이트별 사전 정의 workflow ·
  *     단일 실행의 공용 workflow 자동 승격 · Safety/Risk/capability 완화.
  *   `automation_jobs is a lightweight persistent work record. It is not a scheduler, executor, workflow engine,
- *    agent runtime, or tool execution queue. The PHASE 1 run ledger is Local-canonical; cloud holds coordination only.`
+ *    agent runtime, or tool execution queue.`
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * V2 정렬 (2026-10-03 · WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1)
+ *
+ *   정본이 `O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2` 로 바뀌었다(AGENT-ARCHITECTURE-V1 SUPERSEDED).
+ *   · 위 "Local SQLite(정본)" · "Cloud 에는 최소 coordination" 은 **현재 구현의 저장 위치**를 적은 것이다. V2 의 원칙은
+ *     Local-first 가 아니라 Ownership-first(V2 §9) — 기억은 organization · user · run 에, 실행환경 상태만 node 에 속한다.
+ *     실제 저장 위치 이동은 V2 §17 Legal / Data Processing Gate 이후(단계 C)이며 Phase A 는 옮기지 않는다.
+ *   · Cloud 에 새로 생긴 것은 Personal Assistant 의 **Task**(`assistant_tasks` — 구조 metadata 만)와
+ *     run → Task 연결(`work_run_coordination.task_id`, Task 1 : N run)뿐이다. goal/질문/답변 원문 · 관찰 · step 전문은
+ *     여전히 cloud 에 넣지 않는다. Task 는 위 금지 목록의 어느 것(scheduler · queue · workflow engine · planner state
+ *     machine 등)도 아니다 — 실행 순서를 정하지 않고, 대기열이 아니며, 재시도를 orchestrate 하지 않는다.
+ *   · 업무 판단(Assistant Planning)과 화면 조작 판단(Execution Planning)의 분리는 V2 §18 단계 B 이며 여기서 하지 않는다.
  */
 
 import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-contract.js';
@@ -52,6 +70,19 @@ import {
   type RecoveryUsageFields,
 } from './automation-recovery-contract.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
+import {
+  sanitizeAsk,
+  sanitizeStageKey,
+  sanitizeStrategy,
+  sanitizeTaskKey,
+  sanitizeUserInput,
+  type CloudRecalledPattern,
+  type DerivedPattern,
+  type ProposalAsk,
+  type ProposalUserInput,
+  type RunResumeFrame,
+  type Strategy,
+} from './work-assistance.js';
 import { COMPUTER_ALLOWED_KEYS, textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
@@ -249,6 +280,17 @@ export interface WorkProposal {
   rationale?: string;
   /** 지금 필요한 사용자 입력이 무엇인지(§11 need-based). */
   neededInput?: string;
+  // ── Phase 2 업무 구조 선언(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1). 선택 · 잘못되면 그 칸만 버린다. ──
+  /** 업무 키(snake_case 점 표기, 예: drug_info.same_ingredient). 값이 들어갈 수 없는 형식. */
+  task?: string;
+  /** 지금 단계 키(snake_case). */
+  stage?: string;
+  /** 이번 단계에서 쓰려는 방법(op 어휘 나열). Avoid 대조 대상. */
+  strategy?: Strategy;
+  /** 질문(needs_user)일 때 무엇을 묻는가 + 채울 자리 키. */
+  ask?: ProposalAsk;
+  /** 사용자 입력(재개 답변 · 요청 안의 방법 지시)을 분류한 구조. 원문 없음. */
+  userInput?: ProposalUserInput;
 }
 
 export type ProposalRejectReason =
@@ -265,7 +307,9 @@ export type ProposalRejectReason =
   | 'KEY_INVALID'
   | 'USER_ACTION_WINDOW'
   | 'WINDOW_NOT_NAMED_IN_GOAL'
-  | 'SAFETY_REJECT';
+  | 'SAFETY_REJECT'
+  /** 이 Task × Target × stage 에서 검증된 Avoid 방법을 다시 쓰려 했다(Phase 2 §7-6). runtime 이 판정한다. */
+  | 'AVOID_PATTERN';
 
 /** URL · selector · JS · shell · credential 을 실어 오는 키 — 있으면 proposal 전체를 거절한다(§10·§47). */
 export const FORBIDDEN_PROPOSAL_KEYS: readonly string[] = Object.freeze([
@@ -438,7 +482,11 @@ function validateSingleAction(act: Record<string, unknown>, observation: WorkObs
  *   - `action` 하나를 validateSingleAction 으로 검증한다.
  *   - `actions`(배치, §7 Fast Loop)가 있으면 각 항목을 같은 규칙으로 검증한다 — 실행 행동만, 최대 WORK_BATCH_MAX.
  */
-export function validateWorkProposal(raw: unknown, observation: WorkObservation | null): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
+export function validateWorkProposal(
+  raw: unknown,
+  observation: WorkObservation | null,
+  meta: { forbiddenValues?: readonly string[] } = {},
+): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, reason: 'SHAPE' };
   if (hasForbiddenKey(raw)) return { ok: false, reason: 'FORBIDDEN_KEY' };
   const r = raw as Record<string, unknown>;
@@ -466,6 +514,22 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
     }
     out.batch = batch;
   }
+  // Phase 2 업무 구조 — 형식 밖이면 그 칸만 버린다(실행 행동 검증과 무관 · proposal 거절 사유가 아니다).
+  // label 에는 이번 run 의 입력값(사용자 답변 · 입력/선택 텍스트)이 들어갈 수 없다.
+  const forbidden = [
+    ...(meta.forbiddenValues ?? []),
+    ...[out.action, ...(out.batch ?? [])].flatMap((x) => [x.text, x.option]).filter((v): v is string => typeof v === 'string'),
+  ];
+  const task = sanitizeTaskKey(r.task);
+  if (task) out.task = task;
+  const stage = sanitizeStageKey(r.stage);
+  if (stage) out.stage = stage;
+  const strategy = sanitizeStrategy(r.strategy, forbidden);
+  if (strategy) out.strategy = strategy;
+  const ask = sanitizeAsk(r.ask);
+  if (ask) out.ask = ask;
+  const userInput = sanitizeUserInput(r.userInput, forbidden);
+  if (userInput) out.userInput = userInput;
   return { ok: true, proposal: out };
 }
 
@@ -529,6 +593,8 @@ export interface WorkAgentState {
   takeover: { reason: TakeoverReason; step: number } | null;
   /** 실패→복구 계층 상태(WO-O4O-AUTOMATION-FAILURE-ESCALATION). 요청 안에서만 산다. */
   recovery: RecoveryState;
+  /** 이번 요청에서 분류된 사용자 교정 수(Phase 2 · 구조 분류 기준). */
+  userCorrectionCount?: number;
   startedAt: number;
 }
 
@@ -557,7 +623,7 @@ export interface WorkAgentUsageEvent extends RecoveryUsageFields {
   aiPlanCount: number;
   takeoverReason: TakeoverReason | null;
   takeoverStep: number | null;
-  /** V0 는 클라이언트가 보고하지 않으므로 0. 계약만 둔다(§22). */
+  /** Phase 2: runtime 이 사용자 입력을 교정(kind=correction)으로 분류한 수. 그 밖에는 0. */
   userCorrectionCount: number;
   completionState: WorkProgress;
   durationMs: number;
@@ -577,7 +643,7 @@ export function buildWorkAgentUsageEvent(
     aiPlanCount: state.aiPlanCount,
     takeoverReason: state.takeover?.reason ?? null,
     takeoverStep: state.takeover?.step ?? null,
-    userCorrectionCount: 0,
+    userCorrectionCount: state.userCorrectionCount ?? 0,
     completionState: state.progress,
     durationMs: Math.max(0, now.getTime() - state.startedAt),
     timestamp: now.toISOString(),
@@ -608,3 +674,107 @@ export const WORK_AGENT_ERROR = Object.freeze({
   /** 재개 요청(runId)이 유효하지 않다 — 이미 종료(taken_over/completed)됐거나 TTL 만료됐거나 소유자가 아니다(PHASE 1). */
   RESUME_REJECTED: 'WORK_AGENT_RESUME_REJECTED',
 } as const);
+
+// ─── Assistant ↔ Execution 경계 (Personal Assistant Phase B) ──────────────────
+//
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-B-PLANNING-SEPARATION-V1 · 정본 V2 §2-1 · §0-1(P3)
+//
+//   Assistant Planning(L1 · L2)이 Task 마다 **ExecutionIntent** 를 정해 Execution 에 넘기고,
+//   Execution Planning(L3 · L4 — 이 runtime 의 planner)은 그 지시 안에서 화면 행동만 정한 뒤 **ExecutionReport** 를 돌려준다.
+//   Task 의 완료는 Execution 의 `done` 이 아니라 Assistant 가 완료 계약과 보고의 근거로 판정한다.
+//
+//   두 타입에는 요청 원문 · 입력값 · 화면 글 · 개인정보가 없다 — enum · 구조 키 · 불리언뿐이다.
+//   ExecutionIntent 에는 "어느 Workflow 를 실행하라" 는 칸이 없다. Task type 은 이어받기 힌트일 뿐 절차 선택 키가 아니다(P3).
+
+/** Execution 의 시작 역할. Assistant 가 정하고, Execution 은 실행 중 근거(어긋남 · 교정)로 Discovery 로만 내려갈 수 있다. */
+export type ExecutionStartMode = 'discovery' | 'resume';
+
+/** Assistant 가 이번 Task 의 방법을 고를 때 참고하는 근거의 출처(V2 §0-1). */
+export type PlanningEvidenceSource = 'own_experience' | 'knowledge' | 'shared_candidate' | 'discovery';
+
+export interface PlanningEvidence {
+  source: PlanningEvidenceSource;
+  /** 이번 Task 에서 실제로 쓸 수 있는가(배선되지 않은 출처는 false). */
+  available: boolean;
+  /**
+   * 그 출처가 Execution 을 구속하는가. **항상 false** — 어떤 근거도 강제 절차가 아니다.
+   * 자기 Experience 도 현재 화면으로 다시 검증하며 쓰고, Shared Candidate 는 추천 후보로만 들어온다(V2 §0-1 · §10).
+   */
+  binding: false;
+  /** 결정적(Experienced) 실행의 근거가 될 수 있는가 — 그 사용자 · 매장 자신의 검증된 Experience 만 true. */
+  mayAuthorizeExperienced: boolean;
+}
+
+/** 완료 계약(V2 §4-3) — 실행 검증 기준이지 KPI 가 아니다. */
+export interface CompletionContract {
+  /** 이 업무가 끝났다고 보려면 Execution 이 남겨야 하는 근거의 종류. */
+  requires: 'result_observed';
+  /** 사용자가 이어서 끝낸 것(USER_COMPLETED) · 부분 완료는 정상 결과다. */
+  acceptsUserCompletion: true;
+}
+
+export interface ExecutionIntent {
+  version: 1;
+  /** 이 지시를 낸 Task(없으면 Task 저장이 실패한 실행 — 지시는 그대로 유효). */
+  taskId: string | null;
+  startMode: ExecutionStartMode;
+  /** 같은 Task 를 이어갈 때 이전 run 이 남긴 provisional Task type — Execution 이 같은 키로 경험을 찾게 하는 힌트. 절차 선택 키가 아니다. */
+  taskTypeHint: string | null;
+  /**
+   * Phase C — Assistant Memory: 같은 소유 주체(본인 USER Task 또는 그 조직의 ORGANIZATION Task) · 같은 대상에서 이전 Task 가
+   * 확인한 업무 유형(Cloud · 실행 노드 무관). 새 노드에서도 같은 업무를 같은 키로 이어가 경험을 찾게 한다. 절차 선택 키가 아니다(P3).
+   */
+  knownTaskTypes: readonly string[];
+  /**
+   * Cloud Continuity — 소유 주체 전용 Assistant Memory 가 이번 Task 에 넘기는 근거(실행 노드 무관).
+   *   patterns     같은 소유 주체 · 같은 대상의 검증된 방법(Task 키별). Execution 이 노드 원장과 합쳐 현재 화면으로 다시 검증한다.
+   *   resumeFrame  재개하는 run 의 원래 업무 구조. 노드 원장에 없을 때(다른 PC)만 쓴다.
+   * 둘 다 근거일 뿐 절차 강제가 아니다(P3). 값 · 원문 · 화면 글은 없다.
+   */
+  memory?: { patterns: readonly CloudRecalledPattern[]; resumeFrame: RunResumeFrame | null };
+  /**
+   * Phase D — Execution Node 조정(V2 §11-1). 노드 선택과 노드 원장 경계에 쓰는 구조만.
+   *   ownerKey            이 Task 의 소유 주체를 가리키는 불투명 키(원 ID 아님). 노드 원장을 소유 주체별로 나눠 쓰게 한다.
+   *   preferredDeviceIds  Assistant 가 우선하는 노드(같은 Task 의 이전 run 노드 등). 강제가 아니다 — online · capability 가 맞을 때만.
+   */
+  node?: { ownerKey: string | null; preferredDeviceIds: readonly string[] };
+  evidence: readonly PlanningEvidence[];
+  completion: CompletionContract;
+  /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
+  approval: { commit: 'user_only'; credential: 'user_only' };
+}
+
+/** Execution 이 스스로 주장하는 실행 결과. Task 상태가 아니다. */
+export type ExecutionClaim = 'execution_complete' | 'needs_user' | 'handed_over' | 'stopped' | 'not_started';
+
+export interface ExecutionReport {
+  claim: ExecutionClaim;
+  /** logical run 이 열렸는가. */
+  runOpened: boolean;
+  /** 결과 화면에 닿았다는 실행 근거 — 행동 뒤 문서 이동 · 결과 읽기 성공 · 결정적 재생 완료 중 하나 이상. */
+  resultObserved: boolean;
+  /** 결정적 재생(Workflow Candidate)이 어긋남 없이 끝났는가. */
+  replayVerified: boolean;
+  /** 실행 중 실제로 쓴 역할(마지막). */
+  plannerMode: 'discovery' | 'experienced';
+  /** Execution 이 관찰한 provisional Task type(planner 선언) — Assistant 가 Task 에 올린다. */
+  taskTypeProposal: string | null;
+  /** Cloud Continuity — 이번 run 이 남긴 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다. */
+  memory?: ExecutionMemoryReport;
+}
+
+/**
+ * Execution → Assistant 기억 후보. 서버가 이미 만든 구조화 도움 · 교정 이벤트에서 파생한 검증 방법과 재개 구조뿐이다.
+ * 노드 원장을 read-back 한 것이 아니다. 값 · 원문 · 화면 글 · Provider 고유 값이 없다.
+ */
+export interface ExecutionMemoryReport {
+  targetId: string | null;
+  targetKind: 'browser_site' | 'windows_app' | null;
+  taskKey: string | null;
+  /** verified + reusable_knowledge 로 파생된 Preferred / Avoid(노드 규칙과 같음). */
+  verifiedPatterns: readonly DerivedPattern[];
+  /** 검증에 실패한 대안(기존 preferred 의 실패 횟수만 올린다). */
+  failedAlternative: { stageKey: string; strategy: Strategy } | null;
+  /** 질문으로 멈췄을 때만 — 다른 노드에서 이어갈 구조(label 없는 op). */
+  resumeFrame: RunResumeFrame | null;
+}

@@ -126,3 +126,36 @@ describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services �
     expect(operatorGroup(m)!.items.map((i) => [i.label, i.note])).toEqual([['서울분회', 'kpa-branch']]);
   });
 });
+
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 서브도메인 운영자 화면은 이 앱 안(내부 이동)이다.
+describe('buildHomeEntryModel — supplier · funding · community 운영 카드', () => {
+  it('supplier admin → 공급자 상태 관리 (내부 이동)', () => {
+    const m = buildHomeEntryModel(user(['supplier:admin']), data([op('supplier', 'admin', 'none')]));
+    expect(operatorGroup(m)!.items.map((i) => [i.id, i.action])).toEqual([
+      ['operator:supplier:admin', { kind: 'internal', to: '/admin/supplier-governance' }],
+    ]);
+  });
+
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (잔여 gap): 승인 콘솔(/operator/suppliers)이
+  // supplier:operator 축으로 정렬되면서 이 scope 도 들어갈 화면이 생겼다 — 카드가 있어야 한다.
+  it('supplier operator → 공급자 승인 콘솔 (내부 이동)', () => {
+    const m = buildHomeEntryModel(user(['supplier:operator']), data([op('supplier', 'operator', 'none')]));
+    expect(operatorGroup(m)!.items.map((i) => [i.id, i.action])).toEqual([
+      ['operator:supplier:operator', { kind: 'internal', to: '/operator/suppliers' }],
+    ]);
+  });
+
+  it('funding admin · operator → 펀딩 운영 화면 (내부 이동)', () => {
+    for (const scope of ['admin', 'operator'] as const) {
+      const m = buildHomeEntryModel(user([`funding:${scope}`]), data([op('funding', scope, 'none')]));
+      expect(operatorGroup(m)!.items.map((i) => i.action)).toEqual([{ kind: 'internal', to: '/operator/market-trial' }]);
+    }
+  });
+
+  it('community admin → 커뮤니티 서비스 관리 (개설 심사 · 커뮤니티 운영자 지정, 내부 이동)', () => {
+    const m = buildHomeEntryModel(user(['community:admin']), data([op('community', 'admin', 'none')]));
+    expect(operatorGroup(m)!.items.map((i) => [i.id, i.action])).toEqual([
+      ['operator:community:admin', { kind: 'internal', to: '/admin/communities' }],
+    ]);
+  });
+});

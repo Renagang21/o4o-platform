@@ -8,6 +8,11 @@ import 'reflect-metadata';
 
 const assignRoleMock = jest.fn(async () => ({}));
 
+// Demo 판정은 "Demo 아님" 으로 고정 (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 근거는 support 헬퍼).
+jest.mock('../../auth/demo-account.service.js', () =>
+  jest.requireActual('../../../__tests__/support/not-demo-account.js').notDemoAccountModule(),
+);
+
 jest.mock('../../../utils/logger.js', () => ({
   __esModule: true,
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() },

@@ -12,6 +12,7 @@
 import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
 // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
 // 정산 지급(완료) 알림용 canonical notificationService.
 import { notificationService } from '../../../services/NotificationService.js';
@@ -454,7 +455,9 @@ export class NetureSettlementService {
   }
 
   /**
-   * 정산 완료 알림 (fire-and-forget). supplier_id → neture_suppliers.user_id 로 단일 수신자 도출.
+   * 정산 완료 알림 (fire-and-forget).
+   * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 수신자 = 공급자 사업자 본인 =
+   *   현재 organization_members(owner) 전부. owner 가 없을 때만 legacy user_id fallback.
    * targetUrl 은 canonical `/supplier/settlements`(목록; 정산 상세 route 부재). 공급자는 활성 상태이므로 guard 통과.
    */
   private async notifySupplierSettlementPaid(
@@ -463,23 +466,20 @@ export class NetureSettlementService {
   ): Promise<void> {
     if (!supplierId) return;
     try {
-      const rows: Array<{ user_id: string | null }> = await this.dataSource.query(
-        `SELECT user_id FROM neture_suppliers WHERE id = $1`,
-        [supplierId],
-      );
-      const userId = rows[0]?.user_id;
-      if (!userId) return;
-      await notificationService.createNotification({
-        userId,
-        // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축 §11):
-        //   legacy 'custom' → canonical 'settlement.paid' 수렴.
-        //   새 notification transport 는 만들지 않고 기존 notificationService 를 그대로 쓴다.
-        type: 'settlement.paid',
-        title: '정산이 완료되었습니다',
-        message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.',
-        serviceKey: 'neture',
-        metadata: { settlementId, status: 'paid', targetUrl: '/supplier/settlements' },
-      });
+      const recipients = await listSupplierOwnerUserIds(this.dataSource, supplierId);
+      for (const userId of recipients) {
+        await notificationService.createNotification({
+          userId,
+          // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축 §11):
+          //   legacy 'custom' → canonical 'settlement.paid' 수렴.
+          //   새 notification transport 는 만들지 않고 기존 notificationService 를 그대로 쓴다.
+          type: 'settlement.paid',
+          title: '정산이 완료되었습니다',
+          message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.',
+          serviceKey: 'neture',
+          metadata: { settlementId, status: 'paid', targetUrl: '/supplier/settlements' },
+        });
+      }
     } catch (err) {
       logger.warn('[Neture Settlement] Failed to send settlement-paid notification', err);
     }

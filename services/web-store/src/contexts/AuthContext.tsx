@@ -33,6 +33,8 @@ interface AuthContextValue {
   isLoading: boolean;
   logout: () => void;
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<StoreUser>>;
+  /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 범위는 서버가 Origin 으로 정한다). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<StoreUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<StoreUser>>;
   pendingPolicyAcceptances: PendingPolicyAcceptance[];
   acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
@@ -58,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: core.isLoading,
     logout: () => { void core.logout(); },
     loginWithGoogle: core.loginWithGoogle,
+    loginWithEmail: core.loginWithEmail,
     signupWithGoogle: core.signupWithGoogle,
     pendingPolicyAcceptances: core.pendingPolicyAcceptances,
     acceptPendingPolicies: core.acceptPendingPolicies,

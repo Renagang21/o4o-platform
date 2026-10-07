@@ -58,6 +58,9 @@ import { createOperatorRecruitmentExposureController } from './controllers/opera
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
+import { getServiceOrigin } from '../../config/service-catalog.js';
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 · 세미프랜차이즈 · 공급 제안 · 내 매장 주문 · 테스트 결제
+import { createNeturePharmacyRoutes } from '../neture-pharmacy/neture-pharmacy.routes.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -71,6 +74,9 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   const router: ExpressRouter = Router();
   const netureService = new NetureService();
   const netureActionLogService = new ActionLogService(dataSource);
+
+  // 경로가 겹치지 않는 독립 라우터 — 다른 /operator · /supplier 컨트롤러의 미들웨어보다 먼저 둔다.
+  router.use(createNeturePharmacyRoutes(dataSource));
 
   // Helper for getSupplierIdFromUser (needed by hub-trigger controller)
   async function getSupplierIdFromUser(req: AuthenticatedRequest): Promise<string | null> {
@@ -547,12 +553,14 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         return res.status(404).json({ success: false, error: 'NOT_FOUND' });
       }
 
-      const publicDomain = process.env.PUBLIC_DOMAIN || 'neture.o4o.kr';
+      // 공개 상품 페이지는 neture-web(neture.co.kr)이 서빙한다 — 호스트는 카탈로그 파생.
+      //   이전 기본값 `neture.o4o.kr`(PUBLIC_DOMAIN 미설정 시)은 NXDOMAIN 이었다(URL-FIRST-CENSUS §7-2).
+      const publicOrigin = getServiceOrigin('neture') ?? 'https://neture.co.kr';
       let qrUrl: string;
       if (product.store_slug && product.product_slug) {
-        qrUrl = `https://${publicDomain}/store/${product.store_slug}/product/${product.product_slug}`;
+        qrUrl = `${publicOrigin}/store/${product.store_slug}/product/${product.product_slug}`;
       } else {
-        qrUrl = `https://${publicDomain}/store/product/${offerId}`;
+        qrUrl = `${publicOrigin}/store/product/${offerId}`;
       }
       if (orgId) {
         qrUrl += `?org=${orgId}`;

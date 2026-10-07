@@ -26,6 +26,16 @@ import { AppDataSource } from '../../database/connection.js';
 import { resolveEditingModel } from '../../utils/ai-editing-model-resolver.js';
 import { resolveAiApiKey } from '../../utils/ai-key.util.js';
 
+/**
+ * grounding 조사 1회 시간 예산(ms). provider 기본값(10초 × 2회 시도 + 2초 대기 = 22초)은 Google Search grounding 과
+ * 긴 답변에 자주 모자라 운영에서 약 22초에 실패(502 AI_ERROR)했다 — 같은 질의가 8초에 끝나기도, 10초를 넘기기도 한다.
+ * 한 번 느린 grounding 은 다시 해도 느린 경향이라 **한 번에 넉넉히** 기다린다. 상한은 API 앞단 LB backend timeout(30초)
+ * 안쪽이어야 한다 — 넘기면 502 대신 LB 504 가 된다. 호출측이 timeoutMs 를 주면 그 값을 쓴다.
+ */
+export const WEB_RESEARCH_TIMEOUT_MS = 24_000;
+/** 시도 횟수 — 시간 예산 안에서 1회. 재시도를 넣으면 최악 시간이 LB 상한을 넘는다. */
+export const WEB_RESEARCH_MAX_ATTEMPTS = 1;
+
 const DEFAULT_SYSTEM_PROMPT =
   '너는 근거를 검색해 답하는 범용 리서치 어시스턴트다. 최신 웹 검색 결과에 근거해 간결하고 정확하게 답하라.';
 
@@ -71,7 +81,8 @@ export async function runWebResearch(request: WebResearchRequest): Promise<WebRe
     provider: 'gemini',
     grounding: true,
     config: { apiKey, model },
-    timeoutMs: request.timeoutMs,
+    timeoutMs: request.timeoutMs ?? WEB_RESEARCH_TIMEOUT_MS,
+    retry: { maxAttempts: WEB_RESEARCH_MAX_ATTEMPTS },
     meta: { service: 'web-research', callerName: 'runWebResearch' },
   });
 

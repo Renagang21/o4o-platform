@@ -32,11 +32,6 @@ export interface ConfigStatus {
     database: FeatureStatus;
     auth: FeatureStatus;
     email: FeatureStatus;
-    socialAuth: {
-      google: FeatureStatus;
-      kakao: FeatureStatus;
-      naver: FeatureStatus;
-    };
     payment: FeatureStatus;
     monitoring: FeatureStatus;
   };
@@ -182,35 +177,15 @@ export const emailConfig = {
 /**
  * B) Social Auth Configuration - Per-provider disabled if not configured
  */
-export const socialAuthConfig = {
-  google: {
-    clientId: getEnv('GOOGLE_CLIENT_ID', ''),
-    clientSecret: getEnv('GOOGLE_CLIENT_SECRET', ''),
-    isConfigured: () => !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-    getStatus: (): FeatureStatus => ({
-      enabled: socialAuthConfig.google.isConfigured(),
-      reason: socialAuthConfig.google.isConfigured() ? 'Google OAuth configured' : 'GOOGLE_CLIENT_ID/SECRET not set'
-    })
-  },
-  kakao: {
-    clientId: getEnv('KAKAO_CLIENT_ID', ''),
-    clientSecret: getEnv('KAKAO_CLIENT_SECRET', ''),
-    isConfigured: () => !!(process.env.KAKAO_CLIENT_ID && process.env.KAKAO_CLIENT_SECRET),
-    getStatus: (): FeatureStatus => ({
-      enabled: socialAuthConfig.kakao.isConfigured(),
-      reason: socialAuthConfig.kakao.isConfigured() ? 'Kakao OAuth configured' : 'KAKAO_CLIENT_ID/SECRET not set'
-    })
-  },
-  naver: {
-    clientId: getEnv('NAVER_CLIENT_ID', ''),
-    clientSecret: getEnv('NAVER_CLIENT_SECRET', ''),
-    isConfigured: () => !!(process.env.NAVER_CLIENT_ID && process.env.NAVER_CLIENT_SECRET),
-    getStatus: (): FeatureStatus => ({
-      enabled: socialAuthConfig.naver.isConfigured(),
-      reason: socialAuthConfig.naver.isConfigured() ? 'Naver OAuth configured' : 'NAVER_CLIENT_ID/SECRET not set'
-    })
-  }
-};
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — socialAuthConfig 은퇴
+//
+//   `GOOGLE_CLIENT_ID/SECRET` · `KAKAO_*` · `NAVER_*` 는 **passport 시절 OAuth 설정**이었고,
+//   그 사실은 `google-identity.config.ts` 주석이 이미 명시하고 있었다
+//   ("legacy passport 설정이며 ID token 검증 allowlist 로 재사용하지 않는다").
+//   Passport 계층 제거로 소비처가 0이 되어 함께 은퇴한다.
+//
+//   현재 Google 로그인 정본: ID token 검증 + `GOOGLE_ALLOWED_CLIENT_IDS` allowlist
+//   (`config/google-identity.config.ts`). 이 경로는 위 설정을 쓰지 않는다.
 
 /**
  * B) Payment Configuration - Payment disabled if not configured
@@ -347,11 +322,6 @@ export function getConfigStatus(): ConfigStatus {
       database: databaseConfig.getStatus(),
       auth: authConfig.getStatus(),
       email: emailConfig.getStatus(),
-      socialAuth: {
-        google: socialAuthConfig.google.getStatus(),
-        kakao: socialAuthConfig.kakao.getStatus(),
-        naver: socialAuthConfig.naver.getStatus()
-      },
       payment: paymentConfig.getStatus(),
       monitoring: monitoringConfig.getStatus()
     },
@@ -379,13 +349,6 @@ export function logConfigStatus(): void {
   logger.info(`  Auth:        ${status.features.auth.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.auth.reason}`);
   logger.info(`  Email:       ${status.features.email.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.email.reason}`);
   logger.info(`  Payment:     ${status.features.payment.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.payment.reason}`);
-  logger.info('');
-
-  // Social Auth
-  logger.info('Social Auth:');
-  logger.info(`  Google:      ${status.features.socialAuth.google.enabled ? '✅' : '❌'}`);
-  logger.info(`  Kakao:       ${status.features.socialAuth.kakao.enabled ? '✅' : '❌'}`);
-  logger.info(`  Naver:       ${status.features.socialAuth.naver.enabled ? '✅' : '❌'}`);
   logger.info('');
 
   // Warnings
@@ -418,9 +381,6 @@ export function getEnabledFeatures(): string[] {
   if (status.features.auth.enabled) enabled.push('auth');
   if (status.features.email.enabled) enabled.push('email');
   if (status.features.payment.enabled) enabled.push('payment');
-  if (status.features.socialAuth.google.enabled) enabled.push('oauth:google');
-  if (status.features.socialAuth.kakao.enabled) enabled.push('oauth:kakao');
-  if (status.features.socialAuth.naver.enabled) enabled.push('oauth:naver');
   if (status.features.monitoring.enabled) enabled.push('monitoring');
 
   return enabled;
@@ -432,7 +392,6 @@ export default {
   database: databaseConfig,
   auth: authConfig,
   email: emailConfig,
-  socialAuth: socialAuthConfig,
   payment: paymentConfig,
   monitoring: monitoringConfig,
   operational: operationalConfig,

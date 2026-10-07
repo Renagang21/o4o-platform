@@ -72,6 +72,8 @@ if (!isAdmin && !hasOperatorMembership) {
 | web-glucoseview | `glucoseview` |
 | web-k-cosmetics | `k-cosmetics` |
 
+> (2026-10-05 사실 정정) `web-glucoseview` 는 서비스 은퇴로 현행 `services/` 에 없다([CHECK](../checks/CHECK-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1.md)). 동결 구조 · 정책 변경 아님.
+
 ---
 
 ## 4. Backend Guard

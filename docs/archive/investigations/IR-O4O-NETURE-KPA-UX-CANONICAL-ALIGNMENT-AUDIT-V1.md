@@ -219,7 +219,7 @@ cd packages/account-ui && npm run build
 
 | # | 파일:라인 | 문제 | 우선순위 |
 |:-:|----------|------|:--------:|
-| B1 | [components/Footer.tsx:11](../../services/web-neture/src/components/Footer.tsx#L11) | footer 연락처 개인 이메일 `sohae2100@gmail.com` 운영 노출 | **HIGH** |
+| B1 | [components/Footer.tsx:11](../../services/web-neture/src/components/Footer.tsx#L11) | footer 연락처 개인 이메일 `[REDACTED_EMAIL_A]` 운영 노출 | **HIGH** |
 | B2 | [pages/mypage/MyPageHub.tsx:56](../../services/web-neture/src/pages/mypage/MyPageHub.tsx#L56) | 로그아웃 후 redirect `/workspace` — 라우트 미정의 | **HIGH** |
 | B3 | [components/home/HeroSlider.tsx:114](../../services/web-neture/src/components/home/HeroSlider.tsx#L114) | 버튼 `to="/workspace/suppliers"` 라우트 미정의 | **HIGH** |
 | B4 | [pages/hub/HubPage.tsx:569](../../services/web-neture/src/pages/hub/HubPage.tsx#L569) | 버튼 `to="/workspace"` 라우트 미정의 | **HIGH** |

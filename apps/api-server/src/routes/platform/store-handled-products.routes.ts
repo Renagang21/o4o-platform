@@ -22,6 +22,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR(ProductMaster Landing) — 다국어 무관 항상 발급.
 import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1: PNG/SVG/PDF export (지정 mm 라벨 PDF)
@@ -78,7 +79,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         return;
       }
       const userRoles: string[] = authReq.user?.roles || [];
-      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa');
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa', readPreferredStoreOrganizationId(req));
       if (!organizationId) {
         res.json({ success: true, data: { items: [], pagination: { page: 1, limit: 20, total: 0 } } });
         return;
@@ -126,7 +127,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         return;
       }
       const userRoles: string[] = authReq.user?.roles || [];
-      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa');
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa', readPreferredStoreOrganizationId(req));
       if (!organizationId) {
         res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
         return;
@@ -169,7 +170,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
         return;
       }
-      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa');
+      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa', readPreferredStoreOrganizationId(req));
       if (!organizationId) {
         res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
         return;
@@ -241,7 +242,7 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
         return;
       }
-      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa');
+      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa', readPreferredStoreOrganizationId(req));
       if (!organizationId) {
         res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
         return;

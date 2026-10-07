@@ -145,7 +145,7 @@ PHASE4 LEGACY_ENTRY_HANDOFF=COMPLETE   082f5887f  UnifiedStoreHandoffGate(store-
        FALLBACK=handoff 실패 시 기존 화면(console.warn) · 인증/역할 판정은 기존 가드 그대로(게이트는 가드 안쪽)
 PHASE5 INFRA: Cloud Run store-web=DEPLOYED(revision 00002 → Dockerfile 정정 4d7213a72 재배포) · NEG neg-store-web=CREATED · backend-store-web(EXTERNAL_MANAGED · HTTPS · portName http)=CREATED+NEG 연결
        URL map o4o-global-lb host store.neture.co.kr → path-matcher-store=ADDED · managed cert cm-cert-store-v1=CREATED(PROVISIONING · DNS 대기)
-       cert map entry cm-entry-store=PENDING_USER_ACTION(자동 분류기 차단) · Gabia DNS A store.neture.co.kr → 136.110.132.35=PENDING_USER_ACTION · Google origin=PENDING_USER_ACTION
+       cert map entry cm-entry-store=PENDING_USER_ACTION(자동 분류기 차단) · Gabia DNS A store.neture.co.kr → [REDACTED_IP]=PENDING_USER_ACTION · Google origin=PENDING_USER_ACTION
        API: POST /auth/handoff(no auth)=401(라우트 생존) · CORS preflight Origin store.neture.co.kr → allow-origin 정확 일치 PASS
 PHASE6 E2E: 결정론 검증 전부 PASS(아래) · 브라우저 인증 E2E=PENDING_USER_VERIFICATION(store_owner 계정 · DNS/cert 선행)
 LEGACY_COMPAT: KPA/KCos/PH 프로덕션 배포(082f5887f run 35670783101 · 3 서비스 success) · /store · /store-owner · /store-hub SPA 200 · 플래그 OFF → 기존 화면 (게이트 코드는 번들에 포함 · 실행 분기만 OFF)
@@ -179,7 +179,7 @@ LEGACY_COMPAT: KPA/KCos/PH 프로덕션 배포(082f5887f run 35670783101 · 3 �
 | # | 조작 | 값 |
 |---|---|---|
 | 1 | ~~cert map entry 생성~~ **DONE 2026-09-23** (`cm-entry-store` ACTIVE) | `gcloud certificate-manager maps entries create cm-entry-store --project netureyoutube --map o4o-main-cert-map --hostname store.neture.co.kr --certificates cm-cert-store-v1` |
-| 2 | ~~Gabia DNS~~ **DONE 2026-09-23** (A 레코드 전파 확인 · `cm-cert-store-v1` = ACTIVE/AUTHORIZED) | `store.neture.co.kr` A → `136.110.132.35` (study.neture.co.kr 과 동일 LB). 등록 후 cert `cm-cert-store-v1` PROVISIONING → ACTIVE 확인. 오래 실패한 cert 는 backoff 로 안 움직임 → lecture 선례처럼 새 cert(`cm-cert-store-v2`) 병행 연결(dual-cert) |
+| 2 | ~~Gabia DNS~~ **DONE 2026-09-23** (A 레코드 전파 확인 · `cm-cert-store-v1` = ACTIVE/AUTHORIZED) | `store.neture.co.kr` A → `[REDACTED_IP]` (study.neture.co.kr 과 동일 LB). 등록 후 cert `cm-cert-store-v1` PROVISIONING → ACTIVE 확인. 오래 실패한 cert 는 backoff 로 안 움직임 → lecture 선례처럼 새 cert(`cm-cert-store-v2`) 병행 연결(dual-cert) |
 | 3 | Google Cloud Console OAuth authorized JavaScript origins | `https://store.neture.co.kr` (+ 로컬 검증용 `http://localhost:4210`) |
 | 4 | cutover flip | `.github/workflows/deploy-web-services.yml` `VITE_UNIFIED_STORE_HANDOFF: 'false'` → `'true'` 1줄 (1~3 완료 + 브라우저 E2E PASS 후). 되돌리기 = 같은 줄 `'false'` |
 | 5 | 브라우저 E2E | store_owner 계정으로 `https://kpa-society.co.kr/store` 진입 → (flip 후) `store.neture.co.kr` 착지 · 매장 선택 · `/store` · `/work/kpa-society` · `/hub` 확인 |
@@ -203,7 +203,7 @@ LEGACY_COMPAT: KPA/KCos/PH 프로덕션 배포(082f5887f run 35670783101 · 3 �
 ```text
 CERT            cm-cert-store-v1 = ACTIVE / AUTHORIZED
 CERT_MAP_ENTRY  cm-entry-store (o4o-main-cert-map) = ACTIVE · hostname store.neture.co.kr
-DNS             store.neture.co.kr A = 136.110.132.35 (8.8.8.8 기준)
+DNS             store.neture.co.kr A = [REDACTED_IP] (8.8.8.8 기준)
 HTTPS           GET https://store.neture.co.kr/         = 200 (html data-workspace="store")
 HTTPS           GET https://store.neture.co.kr/handoff  = 200
 CORS            OPTIONS https://api.neture.co.kr/api/v1/auth/handoff

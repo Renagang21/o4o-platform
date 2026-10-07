@@ -2,7 +2,7 @@
 
 **WO:** WO-O4O-KPA-STORE-DESCRIPTION-LIVE-DATA-SMOKE-V1
 **선행:** WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1 (commit `766d6baa2`)
-**일자:** 2026-07-10 · **환경:** 프로덕션 (kpa-society-web / o4o-core-api) · **계정:** 체험용 약국 경영자(renagang21@gmail.com)
+**일자:** 2026-07-10 · **환경:** 프로덕션 (kpa-society-web / o4o-core-api) · **계정:** 체험용 약국 경영자([REDACTED_EMAIL_B])
 
 ## 목적
 

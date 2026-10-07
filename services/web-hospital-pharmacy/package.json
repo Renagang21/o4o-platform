@@ -10,13 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@o4o/auth-client": "workspace:*",
-    "@o4o/auth-react": "workspace:*",
-    "@o4o/auth-utils": "workspace:*",
+    "@o4o/file-understanding-core": "workspace:*",
     "@o4o/hospital-pharmacy-core": "workspace:*",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "xlsx": "0.18.5"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

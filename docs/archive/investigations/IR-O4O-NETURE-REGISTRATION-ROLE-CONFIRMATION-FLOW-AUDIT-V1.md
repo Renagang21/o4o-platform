@@ -564,7 +564,7 @@ ORDER BY sm.approved_at DESC;
 ```sql
 -- (1) 사용자 식별
 SELECT id, email, status, "isActive", "isEmailVerified", "createdAt"
-FROM users WHERE email ILIKE '%renagang%' OR email = 'renagang21@gmail.com';
+FROM users WHERE email ILIKE '%renagang%' OR email = '[REDACTED_EMAIL_B]';
 
 -- (2) service_memberships (Neture)
 SELECT id, user_id, service_key, role, status, created_at, approved_at, rejection_reason

@@ -1,5 +1,7 @@
 # O4O Shared Space Frame Principle v1
 
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (본문 전수 검증 — 상위 정본 · `packages/shared-space-ui` 구현과 충돌 없음, 본문 변경 없음)
+
 ## 1. 배경
 
 Forum, Content, Signage, LMS, Market Trial 등은 각각 독립된 기능과 책임을 가진 앱 성격의 파트이며, 이들은 core + extension 구조로 설계·확장한다.

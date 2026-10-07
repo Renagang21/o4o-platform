@@ -91,9 +91,9 @@ unknown-svc/*           → 404 UNKNOWN_SERVICE                      (계약 유
 
 | 주체 | admin GET/PUT profile | policies list | public terms/privacy/footer |
 |---|---|---|---|
-| admin (`sohae2100@gmail.com`) | **200** (5서비스) | **200** | 200 |
+| admin (`[REDACTED_EMAIL_A]`) | **200** (5서비스) | **200** | 200 |
 | operator | **200** (scope `{prefix}:operator`) | **200** | 200 |
-| store_owner (`renagang21@gmail.com`) | **403 FORBIDDEN** (`Required scope: kpa:operator` / `pharmacy-hub:operator`) — GET·PUT 양쪽 | **403** | 200 |
+| store_owner (`[REDACTED_EMAIL_B]`) | **403 FORBIDDEN** (`Required scope: kpa:operator` / `pharmacy-hub:operator`) — GET·PUT 양쪽 | **403** | 200 |
 | anonymous | **401** | **401** | **200 / 404(미게시)** — 공개 조회 가능 |
 
 권한 모델·role·scope 정의는 **한 줄도 변경하지 않았다.**

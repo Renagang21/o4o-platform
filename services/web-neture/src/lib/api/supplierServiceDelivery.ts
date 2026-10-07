@@ -18,7 +18,7 @@ export const SUPPLIER_OPTIN_SERVICES: { key: string; label: string; description:
   {
     key: 'pharmacy-hub',
     label: 'Pharmacy-Hub',
-    description: '약국 경영자 대상 서비스. 운영자 상품 승인이 없어 제공 시작 즉시 매장 HUB 에 노출됩니다.',
+    description: '약국 경영자 대상 서비스. 신규 제공 시작은 종료되었고, 제공 중인 상품과 기존 주문 처리만 유지됩니다.',
   },
 ];
 

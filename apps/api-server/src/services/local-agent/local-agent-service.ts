@@ -34,6 +34,7 @@ import {
   COMPUTER_TARGET_ACTIONS,
   DOM_TARGET_ACTIONS,
   UIA_TARGET_ACTIONS,
+  LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
@@ -43,6 +44,7 @@ import {
   type LocalCommand,
   type LocalCommandResult,
 } from './local-agent-protocol.js';
+import { DOM_UNIT_COMMAND_TTL_MS } from './browser-dom-contract.js';
 
 // ─── 정책 상수 ────────────────────────────────────────────────────────────────
 
@@ -109,7 +111,32 @@ export interface DeviceRow {
   agentVersion: string;
   status: string;
   lastSeenAt: string | null;
+  /** heartbeat 로 보고된 capability(마지막 값). null = 보고하지 않는 이전 에이전트. */
+  capabilities: NodeCapabilities | null;
 }
+
+/**
+ * Execution Node capability (Phase D · V2 §11-1). 에이전트가 heartbeat 로 보고한다 — boolean 만.
+ *   browser            Chrome 확장이 이 노드의 에이전트에 연결돼 있다(DOM 실행 가능)
+ *   windowsUia         Windows UIA 실행 가능
+ *   localData          이 노드에 로컬 데이터 소스가 연결돼 있다
+ *   ownerScopedLedger  노드 원장을 소유 주체별로 나눠 저장 · 조회한다(local.db v8+)
+ *   taskUnit           브라우저 작업 단위(`local.browser.dom.run_unit`)를 이어 실행할 수 있다(Phase E · agent 0.3.0+).
+ *                      선택 키 — 보고하지 않는 이전 에이전트는 false(= 단발 명령 경로).
+ */
+export interface NodeCapabilities {
+  browser: boolean;
+  windowsUia: boolean;
+  localData: boolean;
+  ownerScopedLedger: boolean;
+  taskUnit: boolean;
+}
+
+/** 실행에 필요한 capability. 'any' = 노드면 된다(상태 · 시스템 정보 등). */
+export type NodeNeed = 'any' | 'browser' | 'windows_uia' | 'local_data';
+
+/** 왜 이 노드를 골랐는가 — 로그 · 테스트용(사용자에게 노드 선택을 묻지 않는다). */
+export type NodeSelectionReason = 'only_online' | 'preferred' | 'capable' | 'capability_unknown' | 'most_recent';
 
 export interface AgentSessionContext {
   deviceId: string;
@@ -117,11 +144,14 @@ export interface AgentSessionContext {
   sessionId: string;
 }
 
+/**
+ * 노드 선택 결과. online 노드가 여러 대라는 이유로 멈추지 않는다(Phase D) — 'ambiguous' 상태는 없다.
+ * none = 등록 노드 없음 · offline = 등록은 됐으나 online 노드 없음.
+ */
 export type DeviceResolution =
-  | { status: 'ok'; device: DeviceRow }
+  | { status: 'ok'; device: DeviceRow; reason: NodeSelectionReason; onlineCount: number }
   | { status: 'none' }
-  | { status: 'offline'; device: DeviceRow }
-  | { status: 'ambiguous'; count: number };
+  | { status: 'offline'; device: DeviceRow };
 
 // ─── 1. Pairing — one-click grant (ONECLICK §6·§7·§10) ───────────────────────
 
@@ -379,14 +409,75 @@ export async function authenticateAgentSession(
   return { sessionId: row.session_id, deviceId: row.device_id, userId: row.user_id };
 }
 
-/** heartbeat (§32). lastSeenAt 갱신이 전부다 — 별도 연결 상태 테이블을 두지 않는다. */
-export async function recordHeartbeat(dataSource: DataSource, deviceId: string): Promise<void> {
-  await dataSource.query(`UPDATE local_agent_devices SET last_seen_at = now() WHERE id = $1`, [
-    deviceId,
-  ]);
+/** heartbeat 로 에이전트가 보고하는 노드 상태(Phase D). 형식이 맞는 값만 남기고 나머지는 버린다. */
+export interface HeartbeatReport {
+  agentVersion: string;
+  capabilities: NodeCapabilities;
 }
 
-// ─── 3. Device 선택 (§33·§34) ─────────────────────────────────────────────────
+const AGENT_VERSION_RE = /^[0-9A-Za-z][0-9A-Za-z.+-]{0,31}$/;
+
+/**
+ * heartbeat body → 보고값. 이전 에이전트는 `{}` 를 보내므로 null(= capability 미보고).
+ * capabilities 는 네 boolean 이 모두 있어야 받는다 — 일부만 온 값으로 노드를 판단하지 않는다.
+ * Phase E `taskUnit` 은 선택 키다 — 없으면 false(Phase D 에이전트), 있으면 boolean 이어야 한다.
+ */
+export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
+  if (!body || typeof body !== 'object') return null;
+  const b = body as Record<string, unknown>;
+  const c = b.capabilities as Record<string, unknown> | undefined;
+  if (typeof b.agentVersion !== 'string' || !AGENT_VERSION_RE.test(b.agentVersion)) return null;
+  if (!c || typeof c !== 'object') return null;
+  const keys = ['browser', 'windowsUia', 'localData', 'ownerScopedLedger'] as const;
+  if (!keys.every((k) => typeof c[k] === 'boolean')) return null;
+  if (c.taskUnit !== undefined && typeof c.taskUnit !== 'boolean') return null;
+  return {
+    agentVersion: b.agentVersion,
+    capabilities: {
+      browser: c.browser as boolean,
+      windowsUia: c.windowsUia as boolean,
+      localData: c.localData as boolean,
+      ownerScopedLedger: c.ownerScopedLedger as boolean,
+      taskUnit: c.taskUnit === true,
+    },
+  };
+}
+
+/**
+ * heartbeat (§32). lastSeenAt 갱신 + (보고가 있으면) 에이전트 버전 · capability 의 마지막 값.
+ * 별도 연결 상태 테이블 · 이력은 두지 않는다.
+ */
+export async function recordHeartbeat(
+  dataSource: DataSource,
+  deviceId: string,
+  report: HeartbeatReport | null = null,
+): Promise<void> {
+  if (!report) {
+    await dataSource.query(`UPDATE local_agent_devices SET last_seen_at = now() WHERE id = $1`, [deviceId]);
+    return;
+  }
+  await dataSource.query(
+    `UPDATE local_agent_devices
+        SET last_seen_at = now(), agent_version = $2, capabilities = $3::jsonb, capabilities_reported_at = now()
+      WHERE id = $1`,
+    [deviceId, report.agentVersion, JSON.stringify(report.capabilities)],
+  );
+}
+
+// ─── 3. Execution Node 선택 (Phase D · V2 §11-1) ─────────────────────────────
+
+function mapCapabilities(v: unknown): NodeCapabilities | null {
+  const c = typeof v === 'string' ? (() => { try { return JSON.parse(v); } catch { return null; } })() : v;
+  if (!c || typeof c !== 'object') return null;
+  const o = c as Record<string, unknown>;
+  return {
+    browser: o.browser === true,
+    windowsUia: o.windowsUia === true,
+    localData: o.localData === true,
+    ownerScopedLedger: o.ownerScopedLedger === true,
+    taskUnit: o.taskUnit === true,
+  };
+}
 
 function mapDevice(row: Record<string, unknown>): DeviceRow {
   return {
@@ -397,6 +488,7 @@ function mapDevice(row: Record<string, unknown>): DeviceRow {
     agentVersion: String(row.agent_version),
     status: String(row.status),
     lastSeenAt: row.last_seen_at ? new Date(row.last_seen_at as string).toISOString() : null,
+    capabilities: mapCapabilities(row.capabilities),
   };
 }
 
@@ -405,32 +497,88 @@ function isOnline(device: DeviceRow): boolean {
   return Date.now() - new Date(device.lastSeenAt).getTime() <= ONLINE_WINDOW_MS;
 }
 
+/** 이 노드가 필요한 capability 를 가졌는가: true(확인) · false(확인된 부재) · null(보고 없음 — 이전 에이전트). */
+export function nodeSatisfies(device: DeviceRow, need: NodeNeed): boolean | null {
+  if (need === 'any') return true;
+  const c = device.capabilities;
+  if (!c) return null;
+  if (need === 'browser') return c.browser;
+  if (need === 'windows_uia') return c.windowsUia;
+  return c.localData;
+}
+
+export interface NodeSelectionOptions {
+  /** 실행에 필요한 capability. 기본 'any'. */
+  need?: NodeNeed;
+  /**
+   * Assistant 가 우선하는 노드(앞일수록 우선) — 예: 이 run 이 마지막으로 질문한 노드, 같은 Task 의 이전 run 노드.
+   * online 이고 capability 가 확인된 부재가 아닐 때만 쓴다.
+   */
+  prefer?: readonly string[];
+}
+
 /**
- * 이 사용자의 명령을 어느 device 로 보낼지 정한다.
+ * 이 사용자의 명령을 어느 Execution Node 로 보낼지 **Assistant 가 정한다**(V2 §3 (5) · §11-1 (5)).
  *
- * **device 가 2대 이상이면 임의로 고르지 않는다**(§33). "아마 이걸 쓰겠지" 로 남의 PC 에
- * 명령을 보내는 것보다, 모호하다고 말하고 멈추는 편이 옳다. V0 는 online device 가
- * 정확히 1대일 때만 자동 사용한다(§34).
+ * online 노드가 여러 대라는 사실만으로 멈추거나 사용자에게 PC 정리를 넘기지 않는다. 순서:
+ *   1. capability 가 확인된 부재인 노드는 뒤로(그것뿐이면 그래도 고른다 — 실행이 정직한 오류를 돌려준다)
+ *   2. Assistant 선호 노드(prefer 순)
+ *   3. capability 가 확인된 노드 → 보고가 없는 이전 에이전트 노드
+ *   4. 같은 등급이면 최근 heartbeat 순
+ * 노드 선택은 권한 경계가 아니다 — 후보는 언제나 이 사용자의 active 노드뿐이다.
  */
+export function selectExecutionNode(
+  devices: readonly DeviceRow[],
+  options: NodeSelectionOptions = {},
+): DeviceResolution {
+  if (devices.length === 0) return { status: 'none' };
+  const online = devices.filter(isOnline);
+  if (online.length === 0) return { status: 'offline', device: devices[0] };
+  const need = options.need ?? 'any';
+  if (online.length === 1) return { status: 'ok', device: online[0], reason: 'only_online', onlineCount: 1 };
+
+  const prefer = options.prefer ?? [];
+  const rank = (d: DeviceRow): number => {
+    const sat = nodeSatisfies(d, need);
+    if (sat === false) return 0;
+    if (prefer.includes(d.id)) return 3;
+    return sat === true ? 2 : 1;
+  };
+  const seen = (d: DeviceRow) => (d.lastSeenAt ? new Date(d.lastSeenAt).getTime() : 0);
+  const sorted = [...online].sort((a, b) => {
+    const r = rank(b) - rank(a);
+    if (r !== 0) return r;
+    const pa = prefer.indexOf(a.id);
+    const pb = prefer.indexOf(b.id);
+    if (pa !== pb && pa >= 0 && pb >= 0) return pa - pb;
+    return seen(b) - seen(a);
+  });
+  const chosen = sorted[0];
+  const reasonByRank: Record<number, NodeSelectionReason> = {
+    3: 'preferred',
+    2: 'capable',
+    1: 'capability_unknown',
+    0: 'most_recent',
+  };
+  return { status: 'ok', device: chosen, reason: reasonByRank[rank(chosen)], onlineCount: online.length };
+}
+
+const DEVICE_COLUMNS = `id, user_id, device_name, platform, agent_version, status, last_seen_at, capabilities`;
+
+/** 이 사용자의 Execution Node 를 골라 돌려준다. 후보 조회는 언제나 user_id 로 한정한다. */
 export async function resolveTargetDevice(
   dataSource: DataSource,
   userId: string,
+  options: NodeSelectionOptions = {},
 ): Promise<DeviceResolution> {
   const rows = await dataSource.query(
-    `SELECT id, user_id, device_name, platform, agent_version, status, last_seen_at
+    `SELECT ${DEVICE_COLUMNS}
        FROM local_agent_devices
       WHERE user_id = $1 AND status = 'active'
       ORDER BY last_seen_at DESC NULLS LAST`,
     [userId],
   );
-  const devices: DeviceRow[] = (rows ?? []).map(mapDevice);
-  if (devices.length === 0) return { status: 'none' };
-
-  const online = devices.filter(isOnline);
-  if (online.length > 1) return { status: 'ambiguous', count: online.length };
-  if (online.length === 1) return { status: 'ok', device: online[0] };
-  // 등록은 되어 있으나 아무도 살아 있지 않다. 2대 이상이어도 결론은 같다 — offline.
-  return { status: 'offline', device: devices[0] };
+  return selectExecutionNode((rows ?? []).map(mapDevice), options);
 }
 
 /** 사용자에게 보여줄 목록 (§39 GET /devices, §40 "이 PC 연결됨"). */
@@ -439,7 +587,7 @@ export async function listUserDevices(
   userId: string,
 ): Promise<Array<DeviceRow & { online: boolean }>> {
   const rows = await dataSource.query(
-    `SELECT id, user_id, device_name, platform, agent_version, status, last_seen_at
+    `SELECT ${DEVICE_COLUMNS}
        FROM local_agent_devices
       WHERE user_id = $1 AND status = 'active'
       ORDER BY last_seen_at DESC NULLS LAST`,
@@ -491,7 +639,9 @@ export async function issueCommand(
   const hasArgs = Object.keys(args).length > 0;
   const commandId = randomUUID();
   const issuedAt = new Date();
-  const expiresAt = new Date(issuedAt.getTime() + COMMAND_TTL_MS);
+  // PHASE-E: 작업 단위는 Node 안에서 여러 단계를 이어 실행하므로 TTL 이 길다(실행 상한 30 s + 여유). 그 밖은 그대로 20 s.
+  const ttlMs = base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT ? DOM_UNIT_COMMAND_TTL_MS : COMMAND_TTL_MS;
+  const expiresAt = new Date(issuedAt.getTime() + ttlMs);
 
   await dataSource.query(
     `INSERT INTO local_agent_commands

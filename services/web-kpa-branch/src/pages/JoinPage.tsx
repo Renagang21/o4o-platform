@@ -1,9 +1,9 @@
 /**
  * JoinPage — KPA Branch 가입 신청
  * WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1
- * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   계정은 Google 로그인으로 먼저 만들어진다. 이 화면은 그 세션에 분회 서비스 가입 신청만 붙인다
- *   (이메일·비밀번호·이름 입력 없음 — Identity 는 Google sub → users.id).
+ * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 · WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1:
+ *   계정(플랫폼 이메일 계정 또는 Google)으로 먼저 로그인한다. 이 화면은 그 세션에 분회 서비스 가입 신청만 붙인다
+ *   (계정 만들기는 계정 센터 Neture 또는 Google 버튼의 약관 동의).
  *
  * `POST /kpa-branch/join` 하나로 끝난다. 분회 소속(branch_memberships)은 여기서 만들지 않는다 —
  * 가입 승인 후 운영자가 분회에 등록한다. 면허번호·직역은 가입 시점에 canonical 약사 프로필로 승격되며,
@@ -11,7 +11,8 @@
  */
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { GoogleContinue } from '@o4o/auth-react';
+import { LoginMethods } from '@o4o/auth-react';
+import { authClient } from '../lib/apiClient';
 import { BRAND } from '../config/service';
 import { useAuth, type BranchUser } from '../contexts/AuthContext';
 import { applyBranchJoin, toJoinFailure, JOIN_ACTIVITY_TYPE_OPTIONS } from '../lib/api/join';
@@ -23,7 +24,7 @@ const PLATFORM_TERMS_URL = 'https://neture.co.kr/terms';
 const PLATFORM_PRIVACY_URL = 'https://neture.co.kr/privacy';
 
 export default function JoinPage() {
-  const { user, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { user, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const [licenseNumber, setLicenseNumber] = useState('');
   const [activityType, setActivityType] = useState('');
   const [tos, setTos] = useState(false);
@@ -59,7 +60,7 @@ export default function JoinPage() {
       <div className="mx-auto max-w-sm px-4 py-16">
         <h1 className="text-xl font-bold text-gray-900">가입 신청이 접수되었습니다</h1>
         <p className="mt-3 text-sm text-gray-600">
-          분회 운영자의 승인 후 이용할 수 있습니다. 승인되면 같은 Google 계정으로 로그인해 주세요.
+          분회 운영자의 승인 후 이용할 수 있습니다. 승인되면 같은 계정으로 로그인해 주세요.
         </p>
         <Link to="/login" className="mt-6 inline-block text-sm font-medium text-primary-600 underline">
           로그인 화면으로
@@ -72,24 +73,26 @@ export default function JoinPage() {
     return <div className="mx-auto max-w-sm px-4 py-16 text-sm text-gray-500">확인 중…</div>;
   }
 
-  // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 생성은 Google 하나 — 먼저 로그인한다.
+  // 먼저 로그인한다(이메일 계정 · Google). 오류는 각 폼이 표시한다.
   if (!user) {
     return (
       <div className="mx-auto max-w-sm px-4 py-16">
         <h1 className="text-xl font-bold text-gray-900">{BRAND.nameKo} 가입 신청</h1>
         <p className="mt-2 text-sm text-gray-500">
-          먼저 Google 계정으로 로그인해 주세요. 계정이 없으면 같은 버튼에서 약관 동의 후 만들어집니다.
+          먼저 로그인해 주세요. 계정이 없으면 회원가입하거나 Google 버튼에서 약관 동의 후 만들 수 있습니다.
         </p>
         <div className="mt-6">
-          <GoogleContinue<BranchUser>
-            getConfig={getGoogleAuthConfig}
-            loginWithGoogle={loginWithGoogle}
-            signupWithGoogle={signupWithGoogle}
+          <LoginMethods<BranchUser>
+            loginWithEmail={loginWithEmail}
+            api={authClient}
             onSuccess={() => setError(null)}
-            onStart={() => setError(null)}
-            onError={(e) => setError(e.message)}
-            termsHref={PLATFORM_TERMS_URL}
-            privacyHref={PLATFORM_PRIVACY_URL}
+            google={{
+              getConfig: getGoogleAuthConfig,
+              loginWithGoogle,
+              signupWithGoogle,
+              termsHref: PLATFORM_TERMS_URL,
+              privacyHref: PLATFORM_PRIVACY_URL,
+            }}
           />
         </div>
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}

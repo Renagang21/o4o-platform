@@ -25,6 +25,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { resolveStoreAccess, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
 import { StorePlaylistRepository } from '../repositories/store-playlist.repository.js';
 
 type AuthMiddleware = RequestHandler;
@@ -101,7 +102,7 @@ export function createStorePlaylistController(
           return;
         }
 
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -133,7 +134,7 @@ export function createStorePlaylistController(
           return;
         }
 
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -171,7 +172,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -221,7 +222,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -262,7 +263,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -300,7 +301,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -349,7 +350,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -399,7 +400,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const storeOrgId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const storeOrgId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!storeOrgId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -450,7 +451,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
@@ -494,7 +495,7 @@ export function createStorePlaylistController(
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;

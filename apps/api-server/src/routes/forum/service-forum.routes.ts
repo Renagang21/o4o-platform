@@ -10,7 +10,7 @@ import {
   type ForumContext,
 } from '../../middleware/forum-context.middleware.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
-import { resolveCommunityAccess } from '../../utils/community-access.resolver.js';
+import { requireCommunityAccess } from '../../middleware/community-access.middleware.js';
 import { communityKeyForServiceEntry } from '../../config/community-catalog.js';
 
 /**
@@ -75,37 +75,6 @@ export function requireActiveServiceMembership(rolePrefix: string): RequestHandl
   };
 }
 
-/**
- * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1
- *
- * Community 참여 자격 write gate. 판정은 `resolveCommunityAccess`(community catalog 의 participation
- * policy) 한 곳이며 서비스별 분기가 없다:
- *   pharmacy     = kpa-society OR pharmacy-hub active membership
- *   cosmetics    = k-cosmetics active membership
- *   o4o-general  = authenticated O4O user (Neture membership 불요)
- * 참여 자격만 판정한다 — 운영자 권한 · closed forum 멤버십 · 공개 read 는 기존 계약 그대로.
- */
-export function requireCommunityAccess(communityKey: string): RequestHandler {
-  return (req, res, next) => {
-    const user = (req as any).user;
-    const access = resolveCommunityAccess(user, communityKey);
-    if (access.allowed) {
-      next();
-      return;
-    }
-    if (access.reason === 'AUTH_REQUIRED') {
-      res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
-      return;
-    }
-    res.status(403).json({
-      success: false,
-      error: `Participation in community '${communityKey}' requires eligible service membership.`,
-      code: 'COMMUNITY_ACCESS_DENIED',
-      reason: access.reason,
-    });
-  };
-}
-
 export interface ServiceForumRouterOptions {
   /**
    * forumContextMiddleware 에 주입할 컨텍스트 (serviceCode 는 RBAC prefix).
@@ -141,15 +110,18 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   router.use(forumContextMiddleware(context));
 
   const write: RequestHandler[] = [authenticate as any, ...communityGuards, ...writeGuards];
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (V7): **읽기도 같은 가입 승인 검사**를 지난다.
+  //   Community 컨텍스트가 아닌 mount(일반 서비스 포럼)는 communityGuards 가 비어 있어 종전 그대로다.
+  const read: RequestHandler[] = communityKey ? [authenticate as any, ...communityGuards] : [optionalAuth as any];
 
   // Health / Stats
   router.get('/health', moderationController.health.bind(moderationController));
   router.get('/stats', optionalAuth, moderationController.getStats.bind(moderationController));
 
   // Posts (tags/popular 는 /posts/:id 보다 먼저 등록)
-  router.get('/posts', optionalAuth, postController.listPosts.bind(postController));
-  router.get('/posts/tags/popular', optionalAuth, postController.getPopularTags.bind(postController));
-  router.get('/posts/:id', optionalAuth, postController.getPost.bind(postController));
+  router.get('/posts', ...read, postController.listPosts.bind(postController));
+  router.get('/posts/tags/popular', ...read, postController.getPopularTags.bind(postController));
+  router.get('/posts/:id', ...read, postController.getPost.bind(postController));
   router.post('/posts', ...write, postController.createPost.bind(postController));
   router.put('/posts/:id', ...write, postController.updatePost.bind(postController));
   router.delete('/posts/:id', ...write, postController.deletePost.bind(postController));
@@ -157,7 +129,7 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   router.patch('/posts/:id/pin', ...write, postController.pinPost.bind(postController));
 
   // Comments
-  router.get('/posts/:postId/comments', commentController.listComments.bind(commentController));
+  router.get('/posts/:postId/comments', ...read, commentController.listComments.bind(commentController));
   router.post('/posts/:postId/comments', ...write, commentController.createComment.bind(commentController));
   router.post('/comments', ...write, commentController.createComment.bind(commentController));
   router.put('/comments/:id', ...write, commentController.updateComment.bind(commentController));

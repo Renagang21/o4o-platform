@@ -32,8 +32,8 @@ Neture 로그인 폼은 `serviceKey:'neture'` 를 보내 L2 자격으로 판정�
 
 | 계정 | serviceKey | 결과 |
 |---|---|:---:|
-| `renagang21@gmail.com` (Neture 공급자) | `neture` | **401** |
-| `renagang21@gmail.com` | 없음(L1) | 200 |
+| `[REDACTED_EMAIL_B]` (Neture 공급자) | `neture` | **401** |
+| `[REDACTED_EMAIL_B]` | 없음(L1) | 200 |
 
 → 직전 WO 와 동일하게 **문서화된 L1 토큰 주입 우회**(`TEST-ACCOUNTS.local.md §4-2`)를 사용했다.
 `roles` 에 `supplier` 가 있어 `SupplierRoute` 를 통과한다. **로그인 자체는 미검증.**

@@ -44,10 +44,10 @@ router.post('/',
     // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §18:
     //   password 검증 선언을 제거한다 — 이 경로는 더 이상 비밀번호를 만들지 않으며
     //   password 가 오면 controller 가 400 `PASSWORD_NOT_ALLOWED_HERE` 로 거절한다.
-    //   운영자는 Google 계정으로 지정(`POST /admin/operator-assignments`) 하거나
-    //   초대(`POST /admin/operator-invitations`) 한다.
+    //   운영자는 Google 계정으로 지정한다(`POST /admin/operator-assignments`).
+    //   WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 초대 경로는 은퇴했다.
     // 이름은 optional 이다 — 이 경로는 **기존 사용자에게 역할을 추가**할 뿐이며 이름을 쓰지 않는다
-    //   (신규 user 생성 경로는 §18 에서 은퇴했다: 400 OPERATOR_INVITATION_REQUIRED).
+    //   (신규 user 생성 경로는 은퇴했다: 400 USER_SIGNUP_REQUIRED — 대상자가 Google 로 가입한 뒤 지정한다).
     body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
     body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
     body('role').optional().custom(isValidRole),

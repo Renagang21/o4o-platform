@@ -10,4 +10,3 @@
 //   로그인·가입은 GoogleAuthController 하나이며 별도 barrel 을 거치지 않는다.
 export { AuthSessionController } from './auth-session.controller.js';
 export { AuthAccountController } from './auth-account.controller.js';
-export { VerificationController } from './verification.controller.js';

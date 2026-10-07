@@ -134,22 +134,22 @@ on:
 **DNS:**
 ```
 $ nslookup account.neture.co.kr
-account.neture.co.kr  →  CNAME → ghs.googlehosted.com → 142.251.23.121
+account.neture.co.kr  →  CNAME → ghs.googlehosted.com → [REDACTED_IP]
 ```
 → Google 도메인 매핑용 CNAME 설정됨.
 
 **비교 (api.neture.co.kr):**
 ```
 $ nslookup api.neture.co.kr
-api.neture.co.kr → 136.110.132.35  (Cloud Run / LB IP 직접)
+api.neture.co.kr → [REDACTED_IP]  (Cloud Run / LB IP 직접)
 ```
 → api 는 직접 IP, account 는 ghs (Google Hosted Service) — 매핑 방식 다름.
 
 **SSL handshake:**
 ```
 $ curl -v https://account.neture.co.kr/
-* IPv4: 142.250.21.121
-* Trying 142.250.21.121:443...
+* IPv4: [REDACTED_IP]
+* Trying [REDACTED_IP]:443...
 * schannel: failed to receive handshake, SSL/TLS connection failed
 curl: (35) ...
 ```

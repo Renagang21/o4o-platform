@@ -37,6 +37,16 @@ interface MembershipGateProps {
 /** 안내 문구에 넣을 서비스 표시명 (공통 문구의 `{service}` 자리). */
 const SERVICE_NAME = '네뚜레(Neture)';
 
+/**
+ * 같은 앱이 다른 서비스 키의 membership 을 검사할 때의 표시명 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.
+ * (서브도메인 운영자 화면이 supplier · funding · community membership 을 요구한다.)
+ */
+const SERVICE_NAMES: Readonly<Record<string, string>> = {
+  supplier: '공급자 서비스',
+  funding: '유통참여형 펀딩',
+  community: '커뮤니티',
+};
+
 export function MembershipGate({ children, serviceKey = SERVICE_KEY }: MembershipGateProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
 
@@ -61,12 +71,18 @@ export function MembershipGate({ children, serviceKey = SERVICE_KEY }: Membershi
     return <>{children}</>;
   }
 
-  return <MembershipStatusScreen status={status} />;
+  return <MembershipStatusScreen status={status} serviceName={SERVICE_NAMES[serviceKey] ?? SERVICE_NAME} />;
 }
 
-function MembershipStatusScreen({ status }: { status: Exclude<MembershipStatus, 'active'> }) {
+function MembershipStatusScreen({
+  status,
+  serviceName,
+}: {
+  status: Exclude<MembershipStatus, 'active'>;
+  serviceName: string;
+}) {
   const navigate = useNavigate();
-  const membership = buildMembershipViewModel({ status, serviceName: SERVICE_NAME });
+  const membership = buildMembershipViewModel({ status, serviceName });
 
   const actions: MembershipStatusNoticeAction[] = [
     { key: 'home', label: '홈으로 돌아가기', onClick: () => navigate('/'), variant: 'secondary' },

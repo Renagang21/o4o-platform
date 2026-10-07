@@ -17,9 +17,19 @@
  * 없기 때문이다. 승인 시점에는 서비스 행이 만들어지므로(operator-registration.service) 이후로는
  * 서비스 행이 우선한다. 서버 guard(neture-identity.middleware) 도 같은 테이블을 본다.
  *
+ * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
+ *   공급자 행은 API guard(neture-identity.middleware) 와 **같은** canonical resolver 로 찾는다
+ *   (organization_members(owner) → organizations(supplier) → neture_suppliers.organization_id ·
+ *   legacy user_id 는 그 resolver 안의 관측 가능한 fallback). 과거 `WHERE user_id = $1 LIMIT 1`
+ *   은 guard 가 공급자로 인정한 사용자를 홈에서 'none' 으로 판정하는 모순을 만들었다.
+ *   후보가 N 개면 임의 1건을 고르지 않는다 — 후보 상태를 우선순위(active > pending > suspended >
+ *   rejected)로 합친 값을 돌려준다. 실제 작업 조직 선택은 guard 의 409 SUPPLIER_CONTEXT_REQUIRED
+ *   계약이 맡는다(전용 UX 신설 없음).
+ *
  * 여기서 데이터를 바꾸지 않는다(읽기 전용).
  */
 import type { DataSource } from 'typeorm';
+import { resolveSupplierForUser } from '../middleware/supplier-context.resolver.js';
 
 /** 서비스별 이용 상태 — 미가입 · 신청 중 · 승인·이용 중 · 반려 · 정지 · 탈퇴 */
 export type NetureServiceUsageStatus = 'none' | 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
@@ -72,6 +82,13 @@ function mapMembershipStatus(raw: string | null | undefined): NetureServiceUsage
   }
 }
 
+/** N 개 후보 → 하나의 이용 상태 (임의 선택이 아니라 결정적 합성) */
+const STATUS_PRIORITY: NetureServiceUsageStatus[] = ['active', 'pending', 'suspended', 'rejected'];
+export function mergeCandidateStatuses(raw: string[]): NetureServiceUsageStatus {
+  const mapped = raw.map(mapSupplierRowStatus);
+  return STATUS_PRIORITY.find((s) => mapped.includes(s)) ?? 'none';
+}
+
 /**
  * 요청자 본인의 공급자 서비스 상태를 해석한다.
  * 조회 실패는 삼키지 않고 던진다 — 호출부가 "미가입" 으로 오인하지 않도록.
@@ -82,10 +99,8 @@ export async function resolveNetureServiceStates(
 ): Promise<NetureServiceStates> {
   if (!userId) return { supplier: NONE };
 
-  const [supplierRows, membershipRows] = await Promise.all([
-    dataSource.query(`SELECT status FROM neture_suppliers WHERE user_id = $1 LIMIT 1`, [userId]) as Promise<
-      Array<{ status: string }>
-    >,
+  const [resolution, membershipRows] = await Promise.all([
+    resolveSupplierForUser(dataSource, userId, null),
     dataSource.query(
       `SELECT role, status FROM service_memberships WHERE user_id = $1 AND service_key = 'neture' LIMIT 1`,
       [userId],
@@ -96,8 +111,10 @@ export async function resolveNetureServiceStates(
   const membershipRole = String(membership?.role ?? '').toLowerCase();
 
   let supplier: NetureServiceState = NONE;
-  if (supplierRows[0]) {
-    supplier = { status: mapSupplierRowStatus(supplierRows[0].status), source: 'neture_suppliers' };
+  if (resolution.kind === 'resolved') {
+    supplier = { status: mapSupplierRowStatus(resolution.status), source: 'neture_suppliers' };
+  } else if (resolution.kind === 'context_required') {
+    supplier = { status: mergeCandidateStatuses(resolution.candidates.map((c) => c.status)), source: 'neture_suppliers' };
   } else if (membership && membershipRole === 'supplier') {
     supplier = { status: mapMembershipStatus(membership.status), source: 'service_memberships' };
   }

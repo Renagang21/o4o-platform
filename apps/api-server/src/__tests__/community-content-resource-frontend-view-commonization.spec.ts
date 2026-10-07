@@ -232,51 +232,7 @@ describe('공통 View 순수성', () => {
   });
 });
 
-describe('K-Cosmetics wrapper — 콘텐츠 목록·상세', () => {
-  const cases: Array<[string, string]> = [
-    ['services/web-k-cosmetics/src/pages/contents', '/cosmetics/contents'],
-  ];
-
-  it.each(cases)('%s 목록은 공통 Template 을 소비하고 자체 카드/상태 JSX 를 갖지 않는다', (dir) => {
-    const src = read(`${dir}/ContentListPage.tsx`);
-    expect(src).toContain("from '@o4o/shared-space-ui'");
-    expect(src).toContain('<CommunityContentListTemplate');
-    expect(src).toContain('standardContentToListItem');
-    // 제거된 중복 표현
-    expect(src).not.toContain('cardTitleRow');
-    expect(src).not.toContain('statusBadge');
-    expect(src).not.toContain('불러오는 중...');
-    expect(src).not.toContain('더 보기');
-    expect(src).not.toContain('STATUS_LABEL');
-  });
-
-  it.each(cases)('%s 상세는 공통 Template 을 소비하고 자체 로딩/오류 JSX 를 갖지 않는다', (dir) => {
-    const src = read(`${dir}/ContentDetailPage.tsx`);
-    expect(src).toContain('<CommunityContentDetailTemplate');
-    expect(src).toContain('standardContentToDetailData');
-    expect(src).not.toContain('불러오는 중...');
-    expect(src).not.toContain('콘텐츠를 찾을 수 없습니다\'}');
-    // 서비스 고유 책임은 유지
-    expect(src).toContain('링크 복사');
-    expect(src).toContain('/edit');
-  });
-
-  it('목록 adapter 는 조회 실패를 빈 목록으로 삼키지 않는다 (throw 전파)', () => {
-    for (const [dir] of cases) {
-      const src = read(`${dir}/ContentListPage.tsx`);
-      expect(src).toContain('throw new Error');
-      expect(src).not.toContain('.catch(() => ({ items: []');
-    }
-  });
-
-  it.each(cases)('%s 는 서비스 API URL 계약을 유지한다', (dir, endpoint) => {
-    const service = dir.split('/')[1];
-    const api = read(`services/${service}/src/api/content.ts`);
-    expect(api).toContain(`'${endpoint}'`);
-    expect(api).toContain("sub_type: 'content'");
-    expect(api).toContain(`\`${endpoint}/\${id}\``);
-  });
-});
+// K-Cosmetics wrapper(services/web-k-cosmetics) 단언은 앱 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 
 describe('KPA — 서비스 고유 View 유지 (공통 primitive 소비)', () => {
   it('KPA 콘텐츠 목록은 canonical table 축을 유지하고 공통 검색 primitive 를 쓴다', () => {
@@ -300,7 +256,6 @@ describe('KPA — 서비스 고유 View 유지 (공통 primitive 소비)', () =>
 
 describe('자료실 축 — 3서비스 공통 Template 유지', () => {
   const cases: Array<[string, string]> = [
-    ['services/web-k-cosmetics/src/pages/resources/ResourcesPage.tsx', 'k-cosmetics'],
     ['services/web-neture/src/pages/resources/NetureResourcesPage.tsx', 'neture'],
   ];
 

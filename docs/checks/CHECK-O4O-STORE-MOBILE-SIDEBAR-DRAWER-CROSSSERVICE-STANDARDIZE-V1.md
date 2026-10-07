@@ -64,7 +64,7 @@
 
 ## 6. 운영 브라우저 smoke (prod, 2026-07-12)
 
-계정 `sohae2100@gmail.com`. Playwright DOM 실측.
+계정 `[REDACTED_EMAIL_A]`. Playwright DOM 실측.
 
 ### 6-A. KPA `kpa-society.co.kr/store`
 | viewport | 업무 메뉴 버튼 | drawer | 비고 |

@@ -44,7 +44,7 @@ const REGULATORY_TYPE = '건강기능식품';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../../../..');
-const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'docs/checks/data/product-description-guard');
+const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'apps/api-server/src/scripts/data/check-data/product-description-guard');
 const SP = process.env.HFF_SCRATCH_DIR ?? path.join(REPO_ROOT, 'scratchpad');
 
 const FILES = (process.env.HFF_APPLY_FILES ?? '').split(',').map((s) => s.trim()).filter(Boolean);

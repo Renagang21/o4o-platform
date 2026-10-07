@@ -89,6 +89,11 @@ interface AuthContextType {
   logoutAll: () => Promise<void>;
   clearError: () => void;
   getSessionStatus: () => SessionStatus | null;
+  /**
+   * 세션 사용자 교체 감지(CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1).
+   * true 이면 화면을 비우고 명시적 재로그인 전까지 어떤 서버 세션 사용자도 채택하지 않는다.
+   */
+  sessionConflict?: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { translateSlot } from './hff-en-c01-translate.mjs';
 import { SEC, HANGUL, norm } from './hff-en-c01-lib.mjs';
 
@@ -45,7 +46,7 @@ if (process.argv.includes('--plan')) {
 
 const plan = JSON.parse(fs.readFileSync(PLAN, 'utf8'));
 const APPLY = process.argv.includes('--apply') && process.env.HFF_EN_C01_APPLY_CONFIRM === 'YES';
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5621', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5621', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
 const ids = plan.map((p) => p.enId);
 const cur = new Map();

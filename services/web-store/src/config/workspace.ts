@@ -32,6 +32,12 @@ export const WORKSPACE_PATHS = {
   select: '/select-store',
   login: '/login',
   handoff: '/handoff',
+  /** 받은 매장 초대 수락 — 매장이 아직 없는 사용자도 열 수 있어야 해서 StoreGate 밖에 둔다. */
+  invitations: '/invitations',
+  /** 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰므로 StoreGate 밖이다. */
+  enrollment: '/start-store',
+  /** Neture 약국 기본 가입 — 약국은 `/start-store` 자가 가입 대상이 아니다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1 · §5). StoreGate 밖. */
+  pharmacyEnrollment: '/start-pharmacy',
 } as const;
 
 export interface RootNavItem {

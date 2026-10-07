@@ -15,6 +15,7 @@ import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { useServiceAuth, useRoleSelection, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
+import { readDemoMetadata, type DemoMetadata } from '../lib/demoAccounts';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
@@ -34,6 +35,8 @@ export interface User {
   name: string;
   roles: UserRole[];
   memberships?: { serviceKey: string; status: string }[];
+  /** WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(demo_accounts) — 배지 · 안내 전용 */
+  demo?: DemoMetadata;
 }
 
 interface AuthContextType {
@@ -41,9 +44,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   /**
-   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
-   *   email+password login 은 은퇴했다. Neture 로그인 진입은 Google 하나다.
+   * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 것은 서비스별 service_credentials 비밀번호다.
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호는 단일 user_password_credentials
+   *   경로로 새로 도입했다 — Google 과 병행. 관리자(platform 역할)는 서버가 비밀번호 세션을 거부한다.
    */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
@@ -74,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         serviceKey: 'neture',
         authClient,
         getAccessToken,
-        toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+        toUser: (apiUser) => ({ ...(buildPlatformUser(apiUser as never) as User), demo: readDemoMetadata(apiUser) }),
         // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
         clearSessionOnLogoutAll: false,
       }),
@@ -128,6 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
+        loginWithEmail: core.loginWithEmail,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,

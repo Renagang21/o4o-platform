@@ -36,7 +36,9 @@ import type { AIGroundingMetadata } from '@o4o/ai-core';
 import type { TaskModality } from './task-modality-router.js';
 import {
   extractProduct,
+  buildHospitalResearchQuery,
   extractStrength,
+  looksLikeDrugQuestion,
   mentionsHospital,
   mentionsSameIngredient,
   queryLocal,
@@ -121,6 +123,8 @@ export function decideHospitalDrugSurfacePlan(
   }
   if (modality === 'research') return 'research';
   if (product) return 'research';
+  // 병원 surface: 원내가 명확한 요청이 아니면 대상이 있는 질문은 조사(Gemini)에 맡긴다. 대상이 없을 때만 되묻는다(공통 Router 무변경).
+  if (looksLikeDrugQuestion(message)) return 'research';
   return 'question';
 }
 
@@ -175,8 +179,11 @@ export async function runHospitalDrugSurface(
   }
 
   // ── research — 순수 grounded 조사(§4). 특정 Source 강제 없음. ──────────────────
+  // 원내·동일성분 문장은 원문 대신 "약품 정보만 · 원내 보유 언급 금지" 질의로 조사한다(원내 보유의 정본 = 브라우저 Local).
+  const researchQuery = buildHospitalResearchQuery(message);
+
   if (plan === 'research') {
-    const res = await deps.research(message);
+    const res = await deps.research(researchQuery);
     return {
       answer: res.content,
       plan,
@@ -189,7 +196,7 @@ export async function runHospitalDrugSurface(
   }
 
   // ── research_and_local — 조사(성분/효능 근거) + 원내 Context 결합(§8-C). ───────
-  const res = await deps.research(message);
+  const res = await deps.research(researchQuery);
   const local = await queryLocal(deps.exec, 'product_name', product ?? message);
   const block = renderLocalBlock(local.data, strength);
   const contextHead = product ? `[원내 약품] '${product}' 관련 원내 보유 현황` : '[원내 약품] 원내 보유 현황';

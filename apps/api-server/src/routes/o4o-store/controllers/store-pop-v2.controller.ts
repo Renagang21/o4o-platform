@@ -56,7 +56,7 @@ const POP_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
 function storePublicOrigin(serviceKey?: StoreOwnerServiceKey): string {
   const catalogKey = serviceKey ? POP_SERVICE_TO_CATALOG_KEY[serviceKey] : 'kpa-society';
   const domain = getService(catalogKey)?.domain;
-  return `https://${domain || 'kpa-society.co.kr'}`;
+  return `https://${domain || 'pharmacy.neture.co.kr'}`;
 }
 
 /**

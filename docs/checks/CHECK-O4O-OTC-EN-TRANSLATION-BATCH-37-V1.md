@@ -31,8 +31,8 @@ WO: `WO-O4O-OTC-EN-TRANSLATION-BATCH-37-V1` · 일자: 2026-07-16 · 상태: 완
 
 | 산출물 | 위치 |
 |---|---|
-| **구조화 번역 결과 파일** (apply 가 읽음) | [translations/otc-en-translations-v1.json](../guides/products/drug/pilot-en-design/translations/otc-en-translations-v1.json) — 37건 |
-| **그룹별 sd-* HTML 37건** | [translations/html/](../guides/products/drug/pilot-en-design/translations/html/) |
+| **구조화 번역 결과 파일** (apply 가 읽음) | [translations/otc-en-translations-v1.json](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/otc-en-translations-v1.json) — 37건 |
+| **그룹별 sd-* HTML 37건** | [translations/html/](../../apps/api-server/src/scripts/data/product-descriptions/drug/pilot-en-design/translations/html/) |
 | 영문 HTML 빌더 (신규) | `modules/neture/drug-import/drug-otc-en-consumer-html.ts` — 입력 타입에 `bodyMarkdown`·`translatorNote` **없음**(CR-021 타입 강제) |
 | 번역 TEST-LOG | [T-11](../guides/OTC-EN-TRANSLATION-TEST-LOG.md) |
 | 오류·용어 후보 | §5-3 |

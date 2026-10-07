@@ -224,7 +224,7 @@ gcloud compute networks vpc-access connectors list --region=asia-northeast3  →
 
 | 구성요소 | 실측 |
 |---|---|
-| static IP | **`neture-static-ip` = 136.110.132.35** (global · EXTERNAL · **IN_USE** · users 2) |
+| static IP | **`neture-static-ip` = [REDACTED_IP]** (global · EXTERNAL · **IN_USE** · users 2) |
 | forwarding rules | **2개** — `o4o-global-lb-forwarding-rule-2`(443) · `neture-https-frontend-forwarding-rule`(80) |
 | target proxies | `o4o-global-lb-target-proxy-2`(HTTPS) · `neture-https-frontend-target-proxy`(HTTP→리다이렉트) |
 | URL maps | `o4o-global-lb`(본 라우팅) · `neture-https-frontend-redirect`(HTTP→HTTPS) |

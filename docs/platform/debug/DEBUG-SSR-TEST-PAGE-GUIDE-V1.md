@@ -2,6 +2,9 @@
 
 > **디버그용 JSON/데이터 테스트 페이지를 만들 때의 기본 규칙.**
 > 프로덕션 Cloud Run 환경에서 안전하게 동작하는 SSR 방식의 디버그 페이지 표준.
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-06 (`/__debug__/user` 제거 — backend debug router 0개. 2026-10-04 `CLAUDE.md` §8 정합 — 디버그 페이지는 읽기 전용 · 비프로덕션 전용 등록 · GET 상태 변경 금지 · 액션은 CLI 우선)
+>
+> (2026-10-04 정합) 디버그 페이지는 **프로덕션에 등록되지 않는다**(`CLAUDE.md` §8-3 · `apps/api-server/src/bootstrap/register-routes.ts` 의 `NODE_ENV !== 'production'` 게이트). "프로덕션에서 안전하게 동작" 은 CSP 하에서도 깨지지 않는 SSR 작성 방식을 뜻하며 프로덕션 노출을 허용한다는 뜻이 아니다. 진단 · seed · repair · backfill 은 **CLI 우선**이다(§8-1). 이 문서와 `CLAUDE.md` §8 이 충돌하면 §8 이 우선한다.
 
 ---
 
@@ -21,7 +24,7 @@
 ✅ 모든 데이터 조회/표시 = 서버에서 HTML 렌더링 (res.send)
 ✅ 네비게이션 = <a href="..."> 링크
 ✅ 검색/입력 = <form method="GET" action="...">
-✅ 액션(승인/거부 등) = <a href="..."> 링크 (GET으로 실행)
+❌ 액션(승인/거부 등 상태 변경) — 디버그 페이지에 두지 않는다 (2026-10-04 정합: 구 "GET 링크로 실행" 폐기 · §4.3 참조)
 ❌ fetch() / XMLHttpRequest — 금지
 ❌ onclick / addEventListener — 금지
 ❌ <script> 태그 — 금지
@@ -52,12 +55,17 @@ export function create{Name}Router(dataSource: DataSource): Router {
 }
 ```
 
-### main.ts 등록
+### 등록 위치
+
+> (2026-10-04 정합) 구판의 `main.ts` 등록은 현행 `apps/api-server/src/bootstrap/register-routes.ts` 로 바뀌었고, 반드시 `NODE_ENV !== 'production'` 게이트 블록 **안**에 등록한다(§7 체크리스트).
 
 ```typescript
+// bootstrap/register-routes.ts — registerDomainRoutes(app, dataSource) 의 비프로덕션 게이트 블록 안
+// NODE_ENV 게이트는 "프로덕션 미등록" 일 뿐 접근 제어가 아니다 — CLAUDE.md §8-2 에 따라 requireAuth + role guard 필수.
+// (import 경로는 bootstrap/ 기준: '../middleware/auth.middleware.js')
 try {
-  const { create{Name}Router } = await import('./routes/debug/{name}.controller.js');
-  app.use('/__debug__/{name}', create{Name}Router(AppDataSource));
+  const { create{Name}Router } = await import('../routes/debug/{name}.controller.js');
+  app.use('/__debug__/{name}', requireAuth, requireRole(['platform:super_admin']), create{Name}Router(dataSource));
   logger.info('✅ {Name} debug endpoint registered at /__debug__/{name}');
 } catch (err) {
   logger.error('Failed to register {Name} debug routes:', err);
@@ -145,7 +153,6 @@ router.get('/', async (req: Request, res: Response) => {
       <td><a href="/__debug__/{name}/detail/${esc(r.id)}">${esc(r.id)}</a></td>
       <td>${esc(r.name)}</td>
       <td>${esc(r.status)}</td>
-      <td><a href="/__debug__/{name}/action/${esc(r.id)}" class="btn btn-success">Action</a></td>
     </tr>
   `).join('');
 
@@ -184,14 +191,18 @@ router.get('/user', async (req: Request, res: Response) => {
 });
 ```
 
-### 4.3 액션 (GET `/action/:id`)
+### 4.3 액션 — 디버그 페이지에서 하지 않는다
 
-- 승인/거부/수정 등 상태 변경 액션
-- **GET 요청으로 실행** (디버그 전용이므로 POST 불필요)
-- 결과를 HTML로 즉시 표시
-- 성공/실패 색상 구분 (`.ok` / `.err`)
+> (2026-10-04 정합) 구판의 "승인/거부/수정 등 상태 변경을 **GET 요청으로 실행**(디버그 전용이므로 POST 불필요)" 규칙은 **폐기**한다. `CLAUDE.md` §8 과 충돌한다:
+> - §8-4 **GET 으로 상태를 변경하지 않는다.**
+> - §8-1 진단 · seed · repair · backfill 은 **CLI 우선** — HTTP route 로 만들지 않는다.
+> - §8-2 HTTP 가 불가피하면 **`requireAuth` + role guard 필수** (§8-5 권한은 요청자에서 파생, 하드코딩 금지).
+> - §8-3 debug / test 성격 route 는 **프로덕션에 등록하지 않는다.**
+>
+> 따라서 디버그 SSR 페이지는 **읽기 전용**(본 문서 §7 체크리스트 · 본 문서 §8 "상태를 변경하는 `/__debug__` route 0개")이다. 상태 변경이 필요하면 ① CLI 스크립트, 또는 ② `requireAuth` + role guard 를 갖춘 정식 기능(GET 이 아닌 메서드 · 정식 admin API)을 쓴다. 아래 코드는 **금지 패턴의 기록**으로만 남긴다. 결과 표시의 성공/실패 색상 구분(`.ok` / `.err`)은 읽기 페이지에 그대로 쓸 수 있다.
 
 ```typescript
+// ❌ 금지 패턴 (기록용) — GET 으로 상태 변경 · 인증 없음 · 프로덕션 노출 위험
 router.get('/approve/:id', async (req: Request, res: Response) => {
   try {
     const result = await service.approve(req.params.id);
@@ -214,6 +225,8 @@ router.get('/approve/:id', async (req: Request, res: Response) => {
 ## 5. DB 쿼리 규칙
 
 ### SELECT FOR UPDATE (변경 작업 시)
+
+> (2026-10-04 정합) 디버그 페이지는 읽기 전용이므로, 아래는 CLI 스크립트 · 정식 기능에서 변경 작업을 할 때의 쿼리 주의사항이다. 운영 DB write 는 `CLAUDE.md` 「DB · 보안 경계」(UPDATE / DELETE 는 사용자 명시 승인)를 따른다.
 
 TypeORM `queryRunner.query()` 에서 `UPDATE...RETURNING`은 컬럼 값이 null로 반환될 수 있다.
 안전한 패턴:
@@ -279,6 +292,7 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 - [ ] Raw JSON 덤프 포함 (`<pre>` 블록)
 - [ ] 에러 시 상세 정보 표시 (message + code + stack)
 - [ ] `bootstrap/register-routes.ts` 의 **`NODE_ENV !== 'production'` 게이트 블록 안에** `app.use('/__debug__/{name}', ...)` 등록 (게이트 밖 등록 금지)
+- [ ] 등록 시 **`requireAuth` + role guard 적용** (CLAUDE.md §8-2 — 비프로덕션 게이트는 접근 제어가 아니다). 가드 없이 등록돼 있던 기존 `/__debug__/user` 는 2026-10-06 제거됐다(`WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1`)
 - [ ] Parameter Binding 사용 (String Interpolation 금지)
 - [ ] **읽기 전용일 것** — 디버그 페이지에서 상태 변경(UPDATE/INSERT/DELETE) 금지. 변경이 필요하면 정식 admin API 를 사용한다 (`AdminUserController` · `MembershipConsoleController` 등)
 
@@ -288,13 +302,9 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 
 **backend `/__debug__/**` — 전부 `NODE_ENV !== 'production'` 에서만 등록된다.**
 
-| 경로 | 파일 | 용도 |
-|------|------|------|
-| `/__debug__/user` | `routes/debug/user-debug.controller.ts` | 사용자 진단 (읽기 전용) |
+**현재 backend debug router 는 0개다** (2026-10-06 `/__debug__/user` 제거 — 아래 제거 이력). 사용자 진단은 [`SETUP.md`](../../../SETUP.md) 의 read-only DB 채널로 SELECT 한다(`CLAUDE.md` §8-1 CLI 우선). 새 debug router 를 만들면 위 §7 체크리스트(비프로덕션 게이트 + `requireAuth` + role guard + 읽기 전용)를 따르고 이 절에 다시 등재한다.
 
-**현재 backend debug router 는 위 1개뿐이며, 상태를 변경하는 `/__debug__` route 는 0개다.**
-
-> `/__debug__/auth-bootstrap` · `/__debug__/login` · `/debug/auth` · `/auth-inspector` 는 **`apps/admin-dashboard` 의 프런트 라우트**이며 backend 라우터가 아니다. CLAUDE.md §8 의 진단 Entry Point 도 이쪽을 가리킨다. (`/__debug__/neture-tier1` 은 `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 로 제거됐다.)
+> `/__debug__/auth-bootstrap` · `/__debug__/login` · `/debug/auth` · `/auth-inspector` 는 **`apps/admin-dashboard` 의 프런트 라우트**(`apps/admin-dashboard/src/routes/public.routes.tsx`)이며 backend 라우터가 아니다. (2026-10-04 정합: 현행 `CLAUDE.md` §8 에는 진단 Entry Point 목록이 없다 — 구 "§8 의 진단 Entry Point 도 이쪽을 가리킨다" 서술 정정.) (`/__debug__/neture-tier1` 은 `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 로 제거됐다.)
 
 ### 제거 이력
 
@@ -304,12 +314,13 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 | `4971381fb` | `/api/v1/ops/seed-store-hub` · `/api/v1/ops/seed-neture-offers` (2) | `WO-O4O-API-DEBUG-SEED-ROUTE-OPERATIONAL-BOUNDARY-CLEANUP-V1` |
 | `abf6c8a0e` | `/__debug__/pharmacy` (1) | `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` |
 | `824ffe54c` | `/api/internal/v2/product-policy/*` (9) — `JWT_SECRET` 관리키 재사용 소멸 | `WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1` |
-| 본 커밋 | `/api/v1/neture/__test__/tier1/*` (5) + 프런트 `/__debug__/neture-tier1` — **코드 차원 test/debug surface 정비 마감** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` |
+| `d14671fff` | `/api/v1/neture/__test__/tier1/*` (5) + 프런트 `/__debug__/neture-tier1` — **코드 차원 test/debug surface 정비 마감** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` |
+| 본 커밋 | `/__debug__/user` (1) — 무인증 `SELECT * FROM users` 개인정보 렌더링 · 소비처 0 · 제거된 상태 변경 GET 링크 잔존. **backend debug router 0** | `WO-O4O-DEBUG-USER-UNGUARDED-ROUTE-CLOSURE-V1` |
 
 > **임시 상태 변경 도구를 debug route 로 만들지 않는다.** 상태 변경이 필요하면 사유·권한·감사·영향 범위·재활성화를 갖춘 정식 기능으로 설계한다. 재발 방지는 `scripts/check-unsafe-routes.mjs` (CI `check:unsafe-routes`) 가 강제한다.
 
 ---
 
 *Created: 2026-03-17*
-*Updated: 2026-08-08*
-*Version: 1.1*
+*Updated: 2026-10-06*
+*Version: 1.2*

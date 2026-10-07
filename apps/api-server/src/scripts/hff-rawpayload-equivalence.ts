@@ -11,7 +11,7 @@ import * as fs from 'node:fs';
 import { DataSource } from 'typeorm';
 
 const PROXY_PORT = parseInt(process.env.PROXY_PORT ?? '5446', 10);
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 const SAMPLES = [
   { label: '단일:아연', file: 'hff-zinc.json' },
   { label: '기능성:MSM', file: 'hff-func-msm.json' },

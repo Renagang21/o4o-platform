@@ -93,7 +93,7 @@ https://api.neture.co.kr/api/v1/lms/instructor/courses?page=1&limit=50
 
 ## 6. smoke 결과 (실브라우저 · 프로덕션)
 
-환경: `https://admin.neture.co.kr` · 계정 `sohae2100@gmail.com` · 배포 후 빌드 스탬프 `2026. 8. 10. 오후 2:56`
+환경: `https://admin.neture.co.kr` · 계정 `[REDACTED_EMAIL_A]` · 배포 후 빌드 스탬프 `2026. 8. 10. 오후 2:56`
 
 | # | 항목 | 결과 |
 |---|---|---|

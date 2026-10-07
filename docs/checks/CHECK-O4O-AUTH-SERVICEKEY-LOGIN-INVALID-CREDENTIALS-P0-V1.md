@@ -79,7 +79,7 @@ serviceKey 처리 실패를 INVALID_CREDENTIALS로 반환하지 말 것
 선행 조사는 `serviceKey='kpa-society'` 로 재현했다. 본 건은 `serviceKey='neture'` 에서 발생했고,
 동일 원인임을 확인했다.
 
-| 요청 (`renagang21@gmail.com`, 동일 비밀번호) | 결과 |
+| 요청 (`[REDACTED_EMAIL_B]`, 동일 비밀번호) | 결과 |
 |---|---|
 | `{email, password}` | **200** |
 | `{email, password, serviceKey:'neture', includeLegacyTokens:true}` | **401 `INVALID_CREDENTIALS`** |
@@ -125,8 +125,8 @@ serviceKey 처리 실패를 INVALID_CREDENTIALS로 반환하지 말 것
 `docs/local/TEST-ACCOUNTS.local.md` 는 **계정당 비밀번호 1개**를 기재한다. 이는 L2 credential 계약과
 구조적으로 어긋난다 — 실제로는 `(계정 × 서비스)` 마다 비밀번호가 다를 수 있다.
 
-본 세션 실측: `sohae21@naver.com` 은 `serviceKey` 없는 로그인조차 401(문서값 불일치),
-`renagang21@gmail.com` 은 `serviceKey` 없으면 200 / `neture` 포함하면 401.
+본 세션 실측: `[REDACTED_EMAIL_C]` 은 `serviceKey` 없는 로그인조차 401(문서값 불일치),
+`[REDACTED_EMAIL_B]` 은 `serviceKey` 없으면 200 / `neture` 포함하면 401.
 
 → **문서를 서비스별 비밀번호 컬럼 구조로 바꾸는 것**이 정합하다(선행 조사 §6-4 와 동일 결론).
 

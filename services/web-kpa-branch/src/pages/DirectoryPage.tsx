@@ -32,15 +32,11 @@ export default function DirectoryPage() {
   }, [items, q]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
+    <div className="mx-auto max-w-5xl px-4 py-12">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{BRAND.nameKo}</h1>
         <p className="mt-1 text-gray-600">{BRAND.tagline}</p>
-        <div className="mt-4 flex gap-3 text-sm">
-          <Link to="/login" className="text-primary-700 hover:underline">로그인</Link>
-          <Link to="/join" className="text-primary-700 hover:underline">가입 신청</Link>
-          <Link to="/me" className="text-primary-700 hover:underline">내 분회</Link>
-        </div>
+        {/* 로그인 · 가입 신청 · 내 분회 진입은 DirectoryShell 헤더로 옮겼다 — WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1 */}
       </header>
 
       <input

@@ -16,7 +16,7 @@
 | 코드 기준 | `main` (조사 착수 시 HEAD `181a15f29`) |
 | 대상 | `https://kpa-society.co.kr` (프로덕션) |
 | 계정 | 로그인 화면의 **🧪 체험용 약국 경영자 계정** 버튼 (자격증명 미출력) |
-| 실제 세션 | `renagang21@gmail.com` · 매장 org `9c87f46b…` (`테스트 약국`, storeSlug `네뚜레-약국`) |
+| 실제 세션 | `[REDACTED_EMAIL_B]` · 매장 org `9c87f46b…` (`테스트 약국`, storeSlug `네뚜레-약국`) |
 | 브라우저 | 로컬 Playwright(Chromium) 독립 프로파일 — 병렬 세션의 `.playwright-o4o-profile` 미사용 |
 
 **한계 2가지 (보고에 반드시 포함)**

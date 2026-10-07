@@ -26,7 +26,7 @@ import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import LoginModal from './components/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { usePageSeo } from '@o4o/shared-space-ui';
-import { netureSeoRegistry, resolveNetureSeoDefaults } from './config/seoRegistry';
+import { applyNetureUrlMeta, netureSeoRegistryForHost, resolveNetureSeoDefaults } from './config/seoRegistry';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -36,8 +36,13 @@ import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute, SubdomainOperatorRoute } from './components/auth/RoleGuard';
+import { RegisterRedirect } from './components/auth/RegisterRedirect';
+import SubdomainOperatorLayoutWrapper from './components/layouts/SubdomainOperatorLayoutWrapper';
 import { ADMIN_ROLES } from './lib/role-constants';
+import { resolveLoginReturnPath } from './lib/loginReturnPath';
+import HostBoundary from './components/HostBoundary';
+import { CURRENT_HOST_PROFILE } from './lib/hostProfile';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -47,7 +52,6 @@ import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10:
 //   운영자 초대 수락(공개). 초대받은 사람은 아직 계정이 없을 수 있으므로 인증 게이트 밖에 둔다.
-const OperatorInvitationAcceptPage = lazy(() => import('./pages/auth/OperatorInvitationAcceptPage'));
 import CommunityPage from './pages/CommunityPage';
 // WO-O4O-COMMON-HOME-PHASE1-V1: O4O 전체 대표 진입점 (`/`)
 import O4OHomePage from './pages/O4OHomePage';
@@ -58,6 +62,7 @@ import {
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
+import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -96,14 +101,19 @@ import {
 // RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
-import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 가입 · 확인 · 아이디/비밀번호 찾기 (본체는 @o4o/auth-react)
+import { SignupPage, VerifyEmailPage, FindIdPage, ForgotPasswordPage, ResetPasswordPage } from './pages/auth/EmailAuthPages';
+// WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 자체 로그인 화면이 없는 서비스(O4O 강의)로 로그인 상태를 이어 보내는 출발점
+import ServiceEntryPage from './pages/auth/ServiceEntryPage';
 // MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1)
 import MyPageHub from './pages/mypage/MyPageHub';
 import MyProfilePage from './pages/mypage/MyProfilePage';
 import MySettingsPage from './pages/mypage/MySettingsPage';
 // WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1
 import MyBusinessProfilePage from './pages/mypage/MyBusinessProfilePage';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개별 커뮤니티 운영자의 가입 심사 (/mypage 는 community 호스트 공용 prefix)
+import MyCommunityOperatorPage from './pages/mypage/MyCommunityOperatorPage';
 
 
 // Forum Pages
@@ -260,6 +270,14 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { GuideBackLink } from './components/GuideBackLink';
 // Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 기본 가입 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
+const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/PharmacyMembershipReviewPage'));
+const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
+const SemiFranchiseContentFormPage = lazy(() => import('./pages/operator/SemiFranchiseContentFormPage'));
+const AdminSemiFranchisePage = lazy(() => import('./pages/admin/AdminSemiFranchisePage'));
+const SupplierSupplyProposalsPage = lazy(() => import('./pages/supplier/SupplierSupplyProposalsPage'));
+const SupplierSemiFranchiseEventsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseEventsPage'));
+const SupplierSemiFranchiseRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierSemiFranchiseRecruitmentsPage'));
 
 // Admin Dashboard (admin-only pages, now under /operator/*)
 const AiCardExplainPage = lazy(() => import('./pages/admin/AiCardExplainPage'));
@@ -452,6 +470,7 @@ const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
 // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
 const OperatorSupplierApprovalPage = lazy(() => import('./pages/operator/OperatorSupplierApprovalPage'));
+const CommunityServiceAdminPage = lazy(() => import('./pages/admin/CommunityServiceAdminPage'));
 // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
 const OperatorContactMessagesPage = lazy(() => import('./pages/operator/OperatorContactMessagesPage'));
 
@@ -603,27 +622,24 @@ function ModalRenderer() {
 // /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  const returnUrl = (location.state as any)?.from || new URLSearchParams(location.search).get('returnUrl');
+  const returnUrl = resolveLoginReturnPath(location.state, location.search);
 
+  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
   useEffect(() => {
+    if (isLoading || isAuthenticated) return;
     openLoginModal(returnUrl || undefined);
-  }, [openLoginModal, returnUrl]);
+  }, [openLoginModal, returnUrl, isAuthenticated, isLoading]);
 
+  if (isLoading) return null; // 세션 확인 전에는 이동하지 않는다(이동하면 모달을 열 기회가 사라진다)
+  if (isAuthenticated) return <Navigate to={returnUrl || '/'} replace />;
   return <Navigate to="/" replace />;
 }
 
-// /register 경로 접근 시 홈으로 리다이렉트하고 회원가입 모달 열기
-function RegisterRedirect() {
-  const { openRegisterModal } = useLoginModal();
-
-  useEffect(() => {
-    openRegisterModal();
-  }, [openRegisterModal]);
-
-  return <Navigate to="/" replace />;
-}
+// /register 는 components/auth/RegisterRedirect — 비로그인에게만 가입(=로그인) 모달을 연다
+//   (WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1)
 
 const ProtectedRoute = RoleGuard;
 
@@ -631,9 +647,12 @@ const ProtectedRoute = RoleGuard;
 // WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1: 미등록 경로의 fallback 은 surface 별
 //   (O4O 대표 / Supplier Workspace / Service Operator / Platform Admin) — O4O 대표 title 이
 //   Neture 업무 공간까지 퍼지지 않고, 옛 "유통·협업 플랫폼" 정체성도 퍼지지 않는다.
+// WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: host-aware — 하위 host `/` 는 서비스 Hero 문구,
+//   og:url · canonical 은 현재 host origin 기준.
 function SeoWatcher() {
   const { pathname } = useLocation();
-  usePageSeo({ registry: netureSeoRegistry, pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  usePageSeo({ registry: netureSeoRegistryForHost(CURRENT_HOST_PROFILE), pathname, defaults: resolveNetureSeoDefaults(pathname) });
+  useEffect(() => { applyNetureUrlMeta(CURRENT_HOST_PROFILE, pathname); }, [pathname]);
   return null;
 }
 
@@ -668,6 +687,8 @@ function App() {
           {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
           <TermsAcceptanceGate>
           <Suspense fallback={<PageLoading />}>
+            {/* 서브도메인(supplier · funding) 경계 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 */}
+            <HostBoundary>
             <Routes>
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
@@ -675,11 +696,15 @@ function App() {
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterRedirect />} />
-            {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 찾기·재설정 경로는 은퇴했다. */}
-            <Route path="/forgot-password" element={<Navigate to="/" replace />} />
-            <Route path="/reset-password" element={<Navigate to="/" replace />} />
-            <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+            {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.
+                (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 service_credentials 흐름의 부활이 아니다.) */}
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/find-id" element={<FindIdPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
+            <Route path="/service-entry/:serviceKey" element={<ServiceEntryPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />
             {/* Cafe24 Developers 의 App URL 진입점. Cafe24 관리자 iframe 안에서 열리므로
@@ -695,7 +720,8 @@ function App() {
                 (NetureGlobalHeader/Footer/BottomNav)을 씌우지 않으므로
                 NetureLayout 밖에 배치한다. 기존 Neture 커뮤니티 홈은 /community.
             ================================================================ */}
-            <Route path="/" element={<O4OHomePage />} />
+            {/* 서브도메인(supplier · funding · community)에서는 `/` 가 각 호스트 대표 화면이다(아래 NetureLayout 안). */}
+            {CURRENT_HOST_PROFILE === 'main' && <Route path="/" element={<O4OHomePage />} />}
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)
@@ -704,6 +730,10 @@ function App() {
             <Route element={<NetureLayout />}>
               {/* WO-O4O-COMMON-HOME-PHASE1-V1: `/` 에 있던 CommunityPage 를 이동.
                   페이지 자체는 복제하지 않고 같은 컴포넌트를 그대로 사용한다. */}
+              {/* 서브도메인 대표 화면 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10 */}
+              {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierLandingPage />} />}
+              {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
+              {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               <Route path="/community" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
@@ -711,6 +741,7 @@ function App() {
               <Route path="/mypage/settings" element={<MySettingsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1: 사업자 정보 */}
               <Route path="/mypage/business-profile" element={<MyBusinessProfilePage />} />
+              <Route path="/mypage/communities" element={<MyCommunityOperatorPage />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
@@ -722,7 +753,6 @@ function App() {
 
               {/* WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10~§14:
                   초대 토큰 + Google 인증만으로 운영 권한을 수락한다(비밀번호 없음). */}
-              <Route path="/operator-invitations/accept" element={<OperatorInvitationAcceptPage />} />
 
               {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
               <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />
@@ -856,6 +886,10 @@ function App() {
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}
               {/* Event Offer 현황 — 공급자 지원 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1) */}
               <Route path="/supplier/event-offers" element={<SupplierEventOfferPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 공급 제안 · 이벤트 · 모집 */}
+              <Route path="/supplier/supply-proposals" element={<SupplierSupplyProposalsPage />} />
+              <Route path="/supplier/semi-franchise-events" element={<SupplierSemiFranchiseEventsPage />} />
+              <Route path="/supplier/semi-franchise-recruitments" element={<SupplierSemiFranchiseRecruitmentsPage />} />
               <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
@@ -1023,12 +1057,9 @@ function App() {
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
-              <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
+              {/* /admin/supplier-quality · /admin/market-trial alias 는 아래 서브도메인 운영자 블록으로 옮겼다 */}
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               <Route path="/admin/roles" element={<RoleManagementPage />} />
-              {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
-              <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
               <Route path="/admin/categories" element={<CategoryManagementPage />} />
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />
@@ -1041,10 +1072,7 @@ function App() {
               <Route path="/admin/operators" element={<OperatorsPage />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessagesPage />} />
               <Route path="/admin/service-approvals" element={<AdminServiceApprovalPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
-                  구 admin 승인 화면은 governance 로 canonical redirect, 신규 상태 관리 라우트 신설 */}
-              <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
-              <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+              {/* /admin/admin-suppliers · /admin/supplier-governance 는 아래 서브도메인 운영자 블록(supplier:admin)으로 옮겼다 */}
               <Route path="/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/admin/catalog-import/csv" element={<CSVImportPage />} />
@@ -1067,6 +1095,8 @@ function App() {
               <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
               <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 관리 (neture:admin) */}
+              <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
             </Route>
 
             {/* ================================================================
@@ -1094,6 +1124,55 @@ function App() {
               <Route path="roles" element={<PlatformRolesPage />} />
               {/* WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1: 서비스 대상 정책 platform 이동 */}
               <Route path="service-audience" element={<ServiceAudiencePolicyPage />} />
+            </Route>
+
+            {/* ================================================================
+                서브도메인 운영자 화면 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
+                백엔드가 두 영역의 운영자 경계를 neture:* 에서 독립 키로 옮겼다. 화면도 같은 판정을 쓴다:
+                  공급자 상태 관리  supplier:admin + supplier membership   ← /neture/admin/suppliers*
+                  공급자 승인·거절  supplier:operator(admin 포함) + supplier membership ← /neture/operator/suppliers*
+                  유통참여형 펀딩    funding:operator(admin 포함) + funding membership ← /neture/operator/market-trial/*
+                  커뮤니티 서비스 관리 community:admin + community membership ← /communities/requests* · /communities/admin/*
+                Neture 역할만으로는 들어오지 못하고, 서브도메인 역할만으로 들어올 수 있다.
+            ================================================================ */}
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="supplier" level="admin">
+                <SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
+                  구 admin 승인 화면은 governance 로 canonical redirect */}
+              <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
+              <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
+              <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="supplier" level="operator">
+                <SubdomainOperatorLayoutWrapper serviceKey="supplier" area="operator" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
+              <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
+              {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="funding" level="operator">
+                <SubdomainOperatorLayoutWrapper serviceKey="funding" area="operator" />
+              </SubdomainOperatorRoute>
+            }>
+              {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
+              <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
+              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+            </Route>
+            <Route element={
+              <SubdomainOperatorRoute serviceKey="community" level="admin">
+                <SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />
+              </SubdomainOperatorRoute>
+            }>
+              <Route path="/admin/communities" element={<CommunityServiceAdminPage />} />
             </Route>
 
             {/* ================================================================
@@ -1141,21 +1220,22 @@ function App() {
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
-              <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               <Route path="/operator/category-mapping-rules" element={<CategoryMappingRulesPage />} />
-              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
-              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              {/* /operator/market-trial · /operator/market-trial/:id 는 위 서브도메인 운영자 블록(funding:operator)으로 옮겼다 */}
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
               {/* WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5) */}
               <Route path="/operator/product-candidates" element={<ProductCandidateReviewPage />} />
               {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /operator/curation 라우트 제거 */}
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
-              {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
-              <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
+              {/* /operator/suppliers · /operator/supplier-quality 는 위 서브도메인 운영자 블록(supplier:operator)으로 옮겼다 */}
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 심사 · 담당 세미프랜차이즈 (neture:operator) */}
+              <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
+              <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
+              <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage />} />
+              <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage />} />
             </Route>
 
             {/* ================================================================
@@ -1204,6 +1284,7 @@ function App() {
             ================================================================ */}
             <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            </HostBoundary>
           </Suspense>
           </TermsAcceptanceGate>
           </WorkScopeProvider>

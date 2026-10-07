@@ -260,7 +260,7 @@ User ID: `34bd2682-3c19-40c5-ae31-37159ffaf30b`
 ```bash
 BASE="https://api.neture.co.kr/api/v1"
 EMAIL="handoff-v2-20260524-094515@example.test"
-PWD="HandoffV2X!2026"
+PWD="[REDACTED]"
 
 # Login (KPA active session)
 curl -X POST "$BASE/auth/login" -c sess.txt \

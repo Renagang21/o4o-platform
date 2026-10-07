@@ -7,6 +7,8 @@
  * 기능 동작 변경 없음.
  */
 
+import { isServiceAccessAllowed, type UserLike } from './membershipGate';
+
 // ─── Role Strings ──────────────────────────────────────────────────────────
 
 export const NETURE_ROLES = {
@@ -98,3 +100,94 @@ export const DASHBOARD_B2B_ROLES: string[] = [
   LEGACY_ROLES.SUPPLIER,
   LEGACY_ROLES.SELLER,
 ];
+
+// ─── 서브도메인 운영자 범위 (supplier · funding · community) ────────────────────
+//
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 배포 2 전 경계 보정.
+//   백엔드는 세 서브도메인 영역의 운영자 경계를 `neture:*` 에서 독립 키로 옮겼다
+//   (`requireSupplierScope` · `requireFundingScope` · `requireCommunityServiceScope`).
+//   화면 가드가 여전히 `neture:*` + neture membership 을 요구하면 새 역할만 가진 운영자는
+//   자기 화면에 못 들어오고, 새 역할이 없는 Neture 관리자는 화면에 들어와 API 403 만 본다.
+//   아래 값은 백엔드 `subdomain-operator-scope.ts` 의 scopeRoleMapping 과 같은 의미다:
+//     `{key}:operator` ← operator · admin      `{key}:admin` ← admin
+//   `platform:super_admin` 은 백엔드 platformBypass 와 같이 통과한다.
+//   `community` 는 `community:admin` 단일 계층이다(`community:operator` 는 만들지 않았다).
+//   Neture 역할(`neture:admin` · `neture:operator`)은 **포함하지 않는다** — 다른 축이다.
+
+export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
+export type SubdomainOperatorLevel = 'admin' | 'operator';
+
+export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: SubdomainOperatorLevel): string[] {
+  if (level === 'operator' && key !== 'community') {
+    return [`${key}:operator`, `${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+  }
+  return [`${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+}
+
+/**
+ * 서브도메인 운영자 경계가 걸린 화면 경로 — 가드 · 메뉴 노출 · 대표 홈 진입이 같은 표를 본다.
+ *   supplier  `/admin/supplier-governance`  ← `/api/v1/neture/admin/suppliers*` (supplier:admin)
+ *   supplier  `/operator/suppliers`          ← `/api/v1/neture/operator/suppliers*` (supplier:operator)
+ *   funding   `/operator/market-trial`       ← `/api/v1/neture/operator/market-trial/*` (funding:operator)
+ *   community `/admin/communities`           ← `/api/v1/communities/requests*` · `/communities/admin/communities*` (community:admin)
+ */
+export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
+  path: string;
+  key: SubdomainOperatorKey;
+  level: SubdomainOperatorLevel;
+}> = Object.freeze([
+  { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
+  // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
+  { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
+  { path: '/operator/market-trial', key: 'funding', level: 'operator' },
+  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 은 community:admin 만 지정하고 이후는 이 화면이다.
+  { path: '/admin/communities', key: 'community', level: 'admin' },
+]);
+
+const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>
+  (roles ?? []).some((r) => allowed.includes(r));
+
+/** 화면 진입 판정에 필요한 사용자 정보 — 역할과 서비스 membership. */
+export type SubdomainOperatorViewer = UserLike | null | undefined;
+
+/**
+ * 메뉴 항목 경로가 서브도메인 운영자 화면이면 **`SubdomainOperatorRoute` 와 같은 조건**일 때만 true:
+ *   범위 역할(`{key}:{level}`, admin ⊃ operator) **그리고** 그 서비스 membership active.
+ *   `platform:super_admin` 은 membership 없이 통과(MembershipGate · 백엔드 platformBypass 와 같음).
+ * 역할만 남고 membership 이 없거나 pending · suspended 인 계정은 route 에서 막히므로 링크도 숨긴다.
+ * 그 밖의 경로는 이 함수가 판정하지 않는다(true) — 기존 메뉴 규칙 그대로.
+ */
+export function canSeeSubdomainOperatorPath(viewer: SubdomainOperatorViewer, path: string): boolean {
+  const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => path === s.path || path.startsWith(`${s.path}/`));
+  if (!screen) return true;
+  return hasAny(viewer?.roles, subdomainOperatorRoles(screen.key, screen.level)) && isServiceAccessAllowed(viewer, screen.key);
+}
+
+/**
+ * 사이드바 메뉴에서 **범위 역할이 없는** 서브도메인 운영자 화면 항목을 뺀다.
+ * 빈 그룹은 남기지 않는다(`filterMenuByRole` 과 같은 규칙).
+ */
+export function withoutUnreachableSubdomainOperatorItems<T extends { path: string }>(
+  menu: Partial<Record<string, T[]>>,
+  viewer: SubdomainOperatorViewer,
+): Partial<Record<string, T[]>> {
+  const out: Partial<Record<string, T[]>> = {};
+  for (const [group, items] of Object.entries(menu)) {
+    const visible = (items ?? []).filter((item) => canSeeSubdomainOperatorPath(viewer, item.path));
+    if (visible.length > 0) out[group] = visible;
+  }
+  return out;
+}
+
+/**
+ * 대시보드 카드 · 대기열 · 바로가기처럼 **링크를 가진 항목** 에서 범위 역할이 없는
+ * 서브도메인 운영자 화면으로 가는 항목을 뺀다. 링크 필드(`link` · `actionUrl` · `href`) 중
+ * 하나라도 닿을 수 없는 화면이면 뺀다. 링크가 없는 항목은 그대로 둔다.
+ */
+export function withoutUnreachableSubdomainOperatorLinks<
+  T extends { link?: string; actionUrl?: string; href?: string },
+>(items: readonly T[] | undefined | null, viewer: SubdomainOperatorViewer): T[] {
+  return (items ?? []).filter((item) =>
+    [item.link, item.actionUrl, item.href].every((p) => !p || canSeeSubdomainOperatorPath(viewer, p)),
+  );
+}

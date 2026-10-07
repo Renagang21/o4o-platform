@@ -64,27 +64,6 @@ COPY --chown=o4oapi:nodejs dist/main.js ./dist/main.js
 COPY --chown=o4oapi:nodejs dist/main.js.map ./dist/main.js.map
 COPY --chown=o4oapi:nodejs dist/migrate.js ./dist/migrate.js
 COPY --chown=o4oapi:nodejs dist/migrate.js.map ./dist/migrate.js.map
-# - drug-seed-candidate-import-job.js: 약가마스터 candidate 적재 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/drug-seed-candidate-import-job.js ./dist/drug-seed-candidate-import-job.js
-COPY --chown=o4oapi:nodejs dist/drug-seed-candidate-import-job.js.map ./dist/drug-seed-candidate-import-job.js.map
-# - drug-seed-promotion-apply-job.js: candidate → ProductMaster/Identifier 승격 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/drug-seed-promotion-apply-job.js ./dist/drug-seed-promotion-apply-job.js
-COPY --chown=o4oapi:nodejs dist/drug-seed-promotion-apply-job.js.map ./dist/drug-seed-promotion-apply-job.js.map
-# - easy-drug-seed-candidate-import-job.js: e약은요 JSONL → ProductCandidate 적재 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/easy-drug-seed-candidate-import-job.js ./dist/easy-drug-seed-candidate-import-job.js
-COPY --chown=o4oapi:nodejs dist/easy-drug-seed-candidate-import-job.js.map ./dist/easy-drug-seed-candidate-import-job.js.map
-# - easy-drug-shared-description-derive-job.js: e약은요 candidate → master별 SharedProductDescription 파생 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/easy-drug-shared-description-derive-job.js ./dist/easy-drug-shared-description-derive-job.js
-COPY --chown=o4oapi:nodejs dist/easy-drug-shared-description-derive-job.js.map ./dist/easy-drug-shared-description-derive-job.js.map
-# - drug-representative-grouping-job.js: MFDS_CODE 기준 representative_products 생성+연결 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/drug-representative-grouping-job.js ./dist/drug-representative-grouping-job.js
-COPY --chown=o4oapi:nodejs dist/drug-representative-grouping-job.js.map ./dist/drug-representative-grouping-job.js.map
-# - easy-drug-image-copy-job.js: e약은요 외부이미지 → GCS 사본 → ProductImage → 대표 thumbnail one-off Job entry
-COPY --chown=o4oapi:nodejs dist/easy-drug-image-copy-job.js ./dist/easy-drug-image-copy-job.js
-COPY --chown=o4oapi:nodejs dist/easy-drug-image-copy-job.js.map ./dist/easy-drug-image-copy-job.js.map
-# - drug-shared-description-bulk-canonical-job.js: e약은요 설명 안전후보 → canonical 일괄 승격 one-off Job entry
-COPY --chown=o4oapi:nodejs dist/drug-shared-description-bulk-canonical-job.js ./dist/drug-shared-description-bulk-canonical-job.js
-COPY --chown=o4oapi:nodejs dist/drug-shared-description-bulk-canonical-job.js.map ./dist/drug-shared-description-bulk-canonical-job.js.map
 
 # Copy database folder for migrations
 # - migration-config.js: Lightweight DataSource for TypeORM CLI (fallback)

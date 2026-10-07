@@ -53,7 +53,7 @@ WO 요구대로 **UI/API 배포 후** 별도 수행:
    - DB 직접 조회는 운영 DB 비밀번호 노출 정책으로 본 세션 미수행. 운영자 Network 탭 또는 승인된 read-only SQL 필요.
 
 ## 6. 상태 전이 기록 (배포·smoke 후 업데이트)
-- sohae21@naver.com 활성화 클릭 응답: _(기록 예정)_
+- [REDACTED_EMAIL_C] 활성화 클릭 응답: _(기록 예정)_
 - 누락 필드 입력 → activationReady=true → 활성화 → status=ACTIVE: _(기록 예정)_
 - 멤버십/role/org 정합: _(기록 예정)_
 - 공급자 재로그인 후 상품 등록 성공: _(기록 예정)_

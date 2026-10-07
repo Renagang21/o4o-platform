@@ -63,7 +63,7 @@ WHERE sm.service_key IN ('kpa-society', 'kpa')
 
 ### 2-A. 실측
 
-`renagang21@gmail.com` 기준 (프로덕션 probe, 모두 read-only 로그인 시도):
+`[REDACTED_EMAIL_B]` 기준 (프로덕션 probe, 모두 read-only 로그인 시도):
 
 | # | 비밀번호 | serviceKey | 결과 | 대조된 hash |
 |---|----------|:---:|:---:|------|

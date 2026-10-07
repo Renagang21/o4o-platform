@@ -107,7 +107,7 @@
 
 ## 6. 실브라우저 smoke (§6)
 
-계정: `sohae2100@gmail.com` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
+계정: `[REDACTED_EMAIL_A]` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
 배포 스탬프: `배포 테스트 v3.0 · 2026. 8. 11. 오전 9:25:51` (commit `8dee7a651` 리비전)
 가드 통과: `AdminProtectedRoute(['partner','admin'])` → `AppRouteGuard appId="partnerops"` — 7개 경로 모두 실도달 (app-disabled 리다이렉트 0건).
 

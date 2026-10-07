@@ -28,6 +28,8 @@ import {
 } from '@o4o/operator-core-ui/modules/members';
 import { api } from '@/lib/apiClient';
 import { operatorSupplierApi } from '@/lib/api/admin';
+import { useAuth } from '@/contexts/AuthContext';
+import { canSeeSubdomainOperatorPath } from '@/lib/role-constants';
 import EditUserModal from './EditUserModal';
 
 // ─── Helpers — Neture-specific role/dashboard logic ──────────
@@ -178,18 +180,26 @@ const netureMembersClient: MembersConsoleClient = {
 //   회원 가입 승인 = 공급자 승인(하나의 인지된 승인). 이 화면에서 승인하면 공급자도 함께 활성화된다.
 //   프로필 정보(대표자명/담당자)는 승인 조건이 아니라 승인 후 공급자가 보완하는 정보.
 //   이전 구조에서 남은 공급 승인 대기 건은 공급자 승인 관리에서 처리한다.
-function SupplierTwoStepGuide({ pendingSupplierCount }: { pendingSupplierCount: number }) {
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 공급자 승인 관리(`/operator/suppliers`)는
+//   `supplier:operator` 범위 화면이다. 그 역할이 없는 Neture 운영자에게는 잔여 대기 안내와 CTA 를 숨긴다.
+function SupplierTwoStepGuide({
+  pendingSupplierCount,
+  canOpenSupplierConsole,
+}: Readonly<{
+  pendingSupplierCount: number;
+  canOpenSupplierConsole: boolean;
+}>) {
   return (
     <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex items-start gap-2">
         <Info size={16} className="mt-0.5 shrink-0 text-slate-400" />
         <p className="flex-1 text-xs leading-relaxed text-slate-600">
           Neture 공급자는 이 화면의 <b>회원 가입 승인 한 번</b>으로 활성화됩니다. 대표자·담당자 등{' '}
-          <b>공급자 프로필 정보는 승인 후 공급자가 보완</b>하며 승인을 막지 않습니다. 아직 공급 승인
-          대기(이전 구조 잔여) 상태인 공급자는 아래 안내로 표시됩니다.
+          <b>공급자 프로필 정보는 승인 후 공급자가 보완</b>하며 승인을 막지 않습니다.
+          {canOpenSupplierConsole && ' 아직 공급 승인 대기(이전 구조 잔여) 상태인 공급자는 아래 안내로 표시됩니다.'}
         </p>
       </div>
-      {pendingSupplierCount > 0 && (
+      {canOpenSupplierConsole && pendingSupplierCount > 0 && (
         <div className="mt-2 flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
           <span className="text-xs font-medium text-amber-800">
             공급 승인 대기 {pendingSupplierCount}건 — 공급자 승인 관리에서 승인하면 바로 활성화됩니다.
@@ -213,10 +223,19 @@ export default function UsersManagementPage() {
   // 회원 목록에 "공급자 프로필 상태"를 함께 보여주기 위해 neture_suppliers 상태를 userId→status 로 1회 로드.
   // 표시 보강용 — 실패해도 회원 목록 자체에는 영향 없음(컬럼만 '—' 로 표시).
   // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1: 회사명 컬럼 표시를 위해 name 도 함께 매핑.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 출처 API(`/neture/operator/suppliers`)는
+  //   `supplier:operator` + supplier membership active 를 요구한다. 둘 중 하나라도 없으면 호출하지 않고(403 을 '—' 로
+  //   삼키지 않는다) 공급자 컬럼 · CTA 도 그리지 않는다. Neture 역할로 대신 열지 않는다.
+  const { user } = useAuth();
+  const canSeeSupplierConsole = canSeeSubdomainOperatorPath(user, '/operator/suppliers');
   const [supplierStatusMap, setSupplierStatusMap] = useState<
     Map<string, { status: string; companyName?: string }>
   >(new Map());
   useEffect(() => {
+    if (!canSeeSupplierConsole) {
+      setSupplierStatusMap(new Map());
+      return;
+    }
     let cancelled = false;
     operatorSupplierApi
       .getSuppliers()
@@ -234,7 +253,7 @@ export default function UsersManagementPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [canSeeSupplierConsole]);
 
   // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
   //   공급 승인 대기(neture_suppliers.status === 'PENDING') 건수 — 안내 배너 CTA 표시용.
@@ -246,7 +265,10 @@ export default function UsersManagementPage() {
 
   return (
     <>
-    <SupplierTwoStepGuide pendingSupplierCount={pendingSupplierCount} />
+    <SupplierTwoStepGuide
+      pendingSupplierCount={pendingSupplierCount}
+      canOpenSupplierConsole={canSeeSupplierConsole}
+    />
     <OperatorMembersConsolePage
       serviceKey="neture"
       client={netureMembersClient}
@@ -265,7 +287,7 @@ export default function UsersManagementPage() {
       getPrimaryRole={getPrimaryRole}
       roleDisplayMap={NETURE_ROLE_DISPLAY}
       roleColumnHeader="회원 유형"
-      extraColumns={[
+      extraColumns={canSeeSupplierConsole ? [
         {
           // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1:
           // 공급자는 개인 이름보다 회사명이 중요 — neture_suppliers.name 표시.
@@ -318,7 +340,7 @@ export default function UsersManagementPage() {
             return badge;
           },
         },
-      ]}
+      ] : []}
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}

@@ -12,7 +12,7 @@ import { runGuard } from '../product-description-guard.js';
 import type { GuardProductInput } from '../product-description-guard.types.js';
 
 // jest 는 apps/api-server 에서 실행 → 저장소 루트 기준 상대경로
-const LIQ_JSON = join(process.cwd(), '../../docs/checks/data/product-description-guard/hff-probiotics-liq-cp01.json');
+const LIQ_JSON = join(process.cwd(), 'src/modules/content-guard/__tests__/fixtures/hff-probiotics-liq-cp01.json');
 const ITEMS: GuardProductInput[] = JSON.parse(readFileSync(LIQ_JSON, 'utf8'));
 
 const bySlug = (slug: string): GuardProductInput => {

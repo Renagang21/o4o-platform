@@ -99,7 +99,7 @@
 
 ### 5.1 KPA admin
 
-1. `https://kpa-society.co.kr/admin` 접속 (KPA admin 계정 로그인 — `sohae2100@gmail.com`)
+1. `https://kpa-society.co.kr/admin` 접속 (KPA admin 계정 로그인 — `[REDACTED_EMAIL_A]`)
 2. AdminDashboardLayout 의 Block D (Structure Actions) 영역 확인:
    - "회원 관리" → Users lucide icon (인물 실루엣)
    - "운영 대시보드" → BarChart3 lucide icon (막대 차트)

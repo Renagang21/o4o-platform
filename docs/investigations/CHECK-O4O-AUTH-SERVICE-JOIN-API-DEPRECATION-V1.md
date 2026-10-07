@@ -57,7 +57,7 @@
 
 | 계정 | 용도 |
 |---|---|
-| `sohae2100+v2check2@gmail.com` (Account #3) | C/D/G 시나리오 — KPA active 멤버, neture/k-cosmetics 미가입 |
+| `[REDACTED_EMAIL]` (Account #3) | C/D/G 시나리오 — KPA active 멤버, neture/k-cosmetics 미가입 |
 | `register-regression-20260523-083933@example.test` (신규 disposable) | F 시나리오 — register pending 회귀 |
 
 ---
@@ -174,7 +174,7 @@ Handoff API 변경 없음 — 본 WO 와 무관 영역 정상 작동 확인.
 
 | Email | User ID | 변경 / 생성 |
 |---|---|---|
-| `sohae2100+v2check2@gmail.com` (Account #3) | `c12c1f59-1708-4346-a341-2657e0f45e6e` | **neture: pending 신규 생성**, **k-cosmetics: pending 신규 생성** (C-1, C-2 결과) |
+| `[REDACTED_EMAIL]` (Account #3) | `c12c1f59-1708-4346-a341-2657e0f45e6e` | **neture: pending 신규 생성**, **k-cosmetics: pending 신규 생성** (C-1, C-2 결과) |
 | `register-regression-20260523-083933@example.test` | (신규 생성) | kpa-society pending (F 결과) — disposable |
 
 > 정리 옵션: (a) 운영자 화면에서 정지/삭제 / (b) 그대로 보존 / (c) Phase 4 일괄 정리 — 사용자 선택.
@@ -231,7 +231,7 @@ BASE="https://api.neture.co.kr/api/v1"
 # C-1/C-2/C-3: Account #3 join 정책
 curl -X POST "$BASE/auth/login" -c sess.txt \
   -H "Content-Type: application/json" \
-  -d '{"email":"sohae2100+v2check2@gmail.com","password":"V2Check2X!2026","serviceKey":"kpa-society"}' -o /dev/null
+  -d '{"email":"[REDACTED_EMAIL]","password":"[REDACTED]","serviceKey":"kpa-society"}' -o /dev/null
 
 for svc in neture k-cosmetics kpa-society; do
   curl -X POST "$BASE/auth/services/$svc/join" -b sess.txt \

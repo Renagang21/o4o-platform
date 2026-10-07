@@ -181,6 +181,8 @@ export interface UnifiedRequestInput {
   workScope: WorkScope;
   /** 직전 Work 응답이 resumable 이었을 때 같은 업무를 잇는 앵커(PHASE 1). */
   runId?: string;
+  /** runId 와 함께만 — 그 run 의 원래 대상(직전 응답 goal.siteId). 짧은 답변에서 대상을 다시 찾지 않게 한다(FIX-V1 §2-B). */
+  resumeTargetId?: string;
   /** confirm 응답에 사용자가 "진행" 으로 답했을 때만. UI 모드가 아니다. */
   routeHint?: 'work';
   /**
@@ -218,6 +220,7 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
       text: input.text,
       ...(attachments.length > 0 ? { attachments } : {}),
       ...(input.runId ? { runId: input.runId } : {}),
+      ...(input.runId && input.resumeTargetId ? { targetHint: input.resumeTargetId } : {}),
       ...(input.routeHint ? { routeHint: input.routeHint } : {}),
       ...(input.surface ? { surface: input.surface } : {}),
       ...(input.localSource ? { localSource: input.localSource } : {}),

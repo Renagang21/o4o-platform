@@ -7,6 +7,7 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
@@ -19,29 +20,44 @@ export class AuthSessionController extends BaseController {
    */
   static async logout(req: AuthRequest, res: Response): Promise<any> {
     const userId = req.user?.id;
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
+    //   **요청 origin 의 서비스 세션만** 서버에서 무효화한다. 본문 값을 믿지 않는다 —
+    //   클라이언트가 serviceKey 를 지정할 수 있으면 남의 서비스 세션을 끊을 수 있다.
+    const serviceKey = resolveSessionServiceKey(req.get('origin'));
 
     try {
       if (userId) {
-        await authenticationService.logout(userId);
+        await authenticationService.logout(userId, serviceKey);
       }
 
       authenticationService.clearAuthCookies(req, res);
 
       return BaseController.ok(res, {
         message: 'Logout successful',
+        // 서버측 무효화가 실제로 일어났는지 프런트·검증이 구분할 수 있게 밝힌다.
+        scope: serviceKey ? { serviceKey, serverRevoked: true } : { serviceKey: null, serverRevoked: false },
       });
     } catch (error: any) {
       logger.error('[AuthSessionController.logout] Logout error', {
         error: error.message,
         userId,
+        serviceKey,
       });
 
-      // Still clear cookies even if error occurs
+      // 쿠키는 그대로 지운다 — 브라우저가 이 인증을 계속 들고 있을 이유가 없다.
       authenticationService.clearAuthCookies(req, res);
 
-      return BaseController.ok(res, {
-        message: 'Logout successful',
-      });
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차 리뷰):
+      //   **성공으로 응답하지 않는다.** 종전에는 서버측 폐기가 실패해도 'Logout successful' 을
+      //   돌려줘서, 이미 발급된 refresh token 이 살아 있는데도 화면에는 로그아웃으로 보였다.
+      //   프런트는 실패 시에도 로컬 세션을 정리하도록 이미 되어 있다(authClient.logout 의
+      //   catch → finally), 그래서 오류를 돌려주는 것이 화면을 깨지 않고 사실을 전달한다.
+      return BaseController.error(
+        res,
+        '로그아웃은 처리됐지만 서버 세션 종료에 실패했습니다. 모든 기기에서 로그아웃을 사용하세요.',
+        500,
+        'LOGOUT_REVOCATION_FAILED',
+      );
     }
   }
 

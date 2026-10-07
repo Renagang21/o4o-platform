@@ -58,8 +58,8 @@
 
 | 계정 | 역할 | 결과 |
 |---|---|---|
-| `renagang21@gmail.com` | `pharmacy-hub:store_owner` | 로그인 OK · contextual nav `['/', '/forum', '/store-hub', '/store-owner']` |
-| `sohae2100@gmail.com` | `pharmacy-hub:operator` | 로그인 OK · contextual nav `['/', '/forum', '/store-hub', '/operator']` |
+| `[REDACTED_EMAIL_B]` | `pharmacy-hub:store_owner` | 로그인 OK · contextual nav `['/', '/forum', '/store-hub', '/store-owner']` |
+| `[REDACTED_EMAIL_A]` | `pharmacy-hub:operator` | 로그인 OK · contextual nav `['/', '/forum', '/store-hub', '/operator']` |
 
 | 구분 | 라우트 | headerCount | footer | "준비 중" | 화이트 스크린 |
 |---|---|:---:|:---:|:---:|:---:|

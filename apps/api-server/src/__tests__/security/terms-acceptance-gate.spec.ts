@@ -12,6 +12,8 @@
  * DB 미사용 — AppDataSource.query 를 SQL 접두로 분기하는 스텁으로 대체한다.
  */
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import express from 'express';
 import request from 'supertest';
 
@@ -33,18 +35,36 @@ let membershipRows: any[] = [];
 /** user_policy_acceptances policy_document_id set for USER_ID */
 let acceptedIds: string[] = [];
 let queryShouldThrow = false;
+/** demo_accounts 활성 user_id 목록 · 조회 실패 스위치 */
+let demoUserIds: string[] = [];
+let demoQueryShouldThrow = false;
+/** Neture 기본 가입 원장 active 조직의 owner/admin/manager 여부 · active role_assignments */
+let ledgerStoreOwner = false;
+let activeRoles: string[] = [];
 const queryLog: string[] = [];
 
 async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
   queryLog.push(sql.replace(/\s+/g, ' ').trim());
   if (queryShouldThrow) throw new Error('db down');
   const q = sql.replace(/\s+/g, ' ');
+  if (q.includes('FROM demo_accounts')) {
+    if (demoQueryShouldThrow) throw new Error('demo registry down');
+    return demoUserIds.includes(params[0]) ? [{ '?column?': 1 }] : [];
+  }
   if (q.includes('FROM service_policy_documents WHERE id = $1')) {
     return publishedRows.filter((r) => r.id === params[0]);
   }
   if (q.includes('FROM service_policy_documents')) {
-    if (q.includes('AND service_key = $2')) return publishedRows.filter((r) => r.service_key === params[1] && r.status === 'published');
-    return publishedRows.filter((r) => r.status === 'published');
+    const ofType = (r: any) => r.status === 'published' && r.document_type === params[0];
+    if (q.includes('AND service_key = $2')) return publishedRows.filter((r) => ofType(r) && r.service_key === params[1]);
+    return publishedRows.filter(ofType);
+  }
+  if (q.includes('FROM neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ '?column?': 1 }] : [];
+  // isStoreOwner('kpa') → resolveStoreOrganization 의 원장 기반 매장 후보
+  if (q.includes('JOIN neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ organization_id: 'org-pharmacy', role: 'owner' }] : [];
+  if (q.includes('FROM role_assignments')) {
+    if (q.includes('AND role = $2')) return activeRoles.includes(params[1]) ? [{ '?column?': 1 }] : [];
+    return activeRoles.map((role) => ({ role }));
   }
   if (q.includes('FROM service_memberships')) {
     if (q.includes('AND service_key = $2')) return membershipRows.filter((m) => m.serviceKey === params[1]).map((m) => ({ status: m.status }));
@@ -90,6 +110,7 @@ import {
   policyAcceptanceService,
 } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 import policyAcceptanceRoutes from '../../modules/policy-acceptance/policy-acceptance.routes.js';
+import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 
 function makeToken(): string {
   return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [] }), 'utf8').toString('base64');
@@ -113,6 +134,10 @@ beforeEach(() => {
   membershipRows = [];
   acceptedIds = [];
   queryShouldThrow = false;
+  demoUserIds = [];
+  demoQueryShouldThrow = false;
+  ledgerStoreOwner = false;
+  activeRoles = [];
   queryLog.length = 0;
   policyAcceptanceService.invalidateAll();
 });
@@ -329,5 +354,208 @@ describe('requireAuth 약관 게이트', () => {
     queryShouldThrow = true;
     const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
     expect(res.status).toBe(200);
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// 매장 경영자 계약 — 요구 판정과 승낙 API 가 같은 기준 (WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1)
+// ─────────────────────────────────────────────────────
+
+describe('store_owner_agreement — 요구 · 승낙 같은 자격 기준', () => {
+  const DOC_KPA_AGREEMENT = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+  const DOC_KCOS_AGREEMENT = 'ffffffff-ffff-4fff-8fff-ffffffffffff';
+  const agreementDoc = (id: string, serviceKey: string) => ({
+    ...publishedDoc(id, serviceKey), document_type: 'store_owner_agreement', title: '매장 경영자 이용계약',
+  });
+  const auth = () => `Bearer ${makeToken()}`;
+  const pendingOf = (app: express.Express, serviceKey: string) =>
+    request(app).get(`/api/v1/auth/policy-acceptances?documentType=store_owner_agreement&serviceKey=${serviceKey}`).set('Authorization', auth());
+  const accept = (app: express.Express, serviceKey: string, policyDocumentId: string) =>
+    request(app).post('/api/v1/auth/policy-acceptances').set('Authorization', auth())
+      .send({ serviceKey, policyDocumentId, version: 1, documentType: 'store_owner_agreement' });
+
+  it('Neture 원장 약국(kpa-society membership · kpa:store_owner 없음) — 게시 계약 pending 1 → 승낙 200 → pending 0', async () => {
+    publishedRows = [agreementDoc(DOC_KPA_AGREEMENT, 'kpa-society')];
+    membershipRows = [{ serviceKey: 'neture', status: 'active' }];
+    activeRoles = ['neture:store_owner'];
+    ledgerStoreOwner = true;
+    const app = makeApp();
+
+    const before = await pendingOf(app, 'kpa-society');
+    expect(before.body.data.pending).toEqual([expect.objectContaining({ serviceKey: 'kpa-society', policyDocumentId: DOC_KPA_AGREEMENT })]);
+
+    const res = await accept(app, 'kpa-society', DOC_KPA_AGREEMENT);
+    expect(res.status).toBe(200);
+    expect(res.body.data.accepted).toMatchObject({ documentType: 'store_owner_agreement', policyDocumentId: DOC_KPA_AGREEMENT, created: true });
+    expect(res.body.data.pending).toEqual([]);
+    expect(acceptedIds).toEqual([DOC_KPA_AGREEMENT]);
+    // 승낙 판정은 원장만 본다 — kpa-society membership · role 조회 0
+    const acceptQueries = queryLog.filter((q) => q.includes('service_memberships WHERE user_id = $1 AND service_key = $2') || q.includes('AND role = $2'));
+    expect(acceptQueries).toEqual([]);
+  });
+
+  it('게시 계약 → 내 매장 가드 428 → 승낙 → 같은 가드 통과 (Neture 원장 약국)', async () => {
+    publishedRows = [agreementDoc(DOC_KPA_AGREEMENT, 'kpa-society')];
+    membershipRows = [{ serviceKey: 'neture', status: 'active' }];
+    activeRoles = ['neture:store_owner'];
+    ledgerStoreOwner = true;
+    const guard = createRequireStoreOwner({ query: (sql: string, params?: any[]) => fakeQuery(sql, params) } as any, 'kpa');
+    const runGuard = async () => {
+      const req: any = { user: { id: USER_ID, roles: ['neture:store_owner'], memberships: [{ serviceKey: 'neture', status: 'active' }] } };
+      const res: any = { status: jest.fn(() => res), json: jest.fn(() => res) };
+      const next = jest.fn();
+      await guard(req, res, next);
+      return { req, res, next };
+    };
+
+    const blocked = await runGuard();
+    expect(blocked.next).not.toHaveBeenCalled();
+    expect(blocked.res.status).toHaveBeenCalledWith(428);
+    expect(blocked.res.json.mock.calls[0][0]).toMatchObject({ code: 'STORE_OWNER_AGREEMENT_REQUIRED' });
+
+    expect((await accept(makeApp(), 'kpa-society', DOC_KPA_AGREEMENT)).status).toBe(200);
+
+    const passed = await runGuard();
+    expect(passed.next).toHaveBeenCalled();
+    expect(passed.req.organizationId).toBe('org-pharmacy');
+  });
+
+  it('원장 대상이 아니면 승낙 403 STORE_OWNER_REQUIRED — kpa-society membership · kpa:store_owner 가 있어도(요구 대상도 아님)', async () => {
+    publishedRows = [agreementDoc(DOC_KPA_AGREEMENT, 'kpa-society')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
+    activeRoles = ['kpa:store_owner'];
+    ledgerStoreOwner = false;
+    const app = makeApp();
+    expect((await pendingOf(app, 'kpa-society')).body.data.pending).toEqual([]);
+    const res = await accept(app, 'kpa-society', DOC_KPA_AGREEMENT);
+    expect([res.status, res.body.code]).toEqual([403, 'STORE_OWNER_REQUIRED']);
+    expect(acceptedIds).toEqual([]);
+  });
+
+  it('k-cosmetics 매장계약은 종전 기준 그대로 — membership 없으면 MEMBERSHIP_NOT_FOUND, role 없으면 STORE_OWNER_REQUIRED, 둘 다 있으면 200', async () => {
+    publishedRows = [agreementDoc(DOC_KCOS_AGREEMENT, 'k-cosmetics')];
+    ledgerStoreOwner = true; // 원장은 k-cosmetics 판정에 쓰이지 않는다
+    const app = makeApp();
+
+    let res = await accept(app, 'k-cosmetics', DOC_KCOS_AGREEMENT);
+    expect([res.status, res.body.code]).toEqual([403, 'MEMBERSHIP_NOT_FOUND']);
+
+    membershipRows = [{ serviceKey: 'k-cosmetics', status: 'active' }];
+    res = await accept(app, 'k-cosmetics', DOC_KCOS_AGREEMENT);
+    expect([res.status, res.body.code]).toEqual([403, 'STORE_OWNER_REQUIRED']);
+
+    activeRoles = ['cosmetics:store_owner'];
+    res = await accept(app, 'k-cosmetics', DOC_KCOS_AGREEMENT);
+    expect(res.status).toBe(200);
+    expect(queryLog.some((q) => q.includes('FROM neture_pharmacy_memberships'))).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// Demo 계정 예외 — raw pending ≠ enforced pending
+// (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2)
+// ─────────────────────────────────────────────────────
+
+describe('Demo 계정 약관 예외 (enforced pending)', () => {
+  const demoQueries = () => queryLog.filter((q) => q.includes('FROM demo_accounts'));
+
+  beforeEach(() => {
+    publishedRows = [publishedDoc(DOC_KPA, 'kpa-society'), publishedDoc(DOC_NETURE, 'neture')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }, { serviceKey: 'neture', status: 'active' }];
+  });
+
+  it('활성 Demo + raw pending 존재 → enforced pending [] · raw pending 은 그대로 · acceptance 기록 0', async () => {
+    demoUserIds = [USER_ID];
+    expect(await policyAcceptanceService.getPendingForUser(USER_ID)).toHaveLength(2);
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    expect(acceptedIds).toEqual([]);
+    expect(queryLog.some((q) => q.startsWith('INSERT') || q.startsWith('UPDATE'))).toBe(false);
+  });
+
+  it('Demo 판정은 demo_accounts.user_id 로만 한다 (email 비교 0)', async () => {
+    demoUserIds = [USER_ID];
+    await policyAcceptanceService.getEnforcedPendingForUser(USER_ID);
+    expect(demoQueries()).toHaveLength(1);
+    expect(demoQueries()[0]).toContain('WHERE user_id = $1');
+    expect(demoQueries()[0]).not.toMatch(/email/i);
+  });
+
+  it('활성 Demo → 보호 API 는 약관 428 없이 다음 단계로 진행 (POST /auth/password 포함)', async () => {
+    demoUserIds = [USER_ID];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken()}`;
+    const api = await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth);
+    expect(api.status).toBe(200);
+    expect(api.body.reached).toBe(true);
+    const pw = await request(app).post('/api/v1/auth/password').set('Authorization', auth).send({});
+    expect(pw.status).toBe(200);
+    expect(pw.body.reached).toBe(true);
+  });
+
+  it('GET /auth/policy-acceptances 는 raw 정책 상태를 그대로 보여 준다 (Demo 도 동의로 바꾸지 않는다)', async () => {
+    demoUserIds = [USER_ID];
+    const res = await request(makeApp()).get('/api/v1/auth/policy-acceptances').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.pending).toHaveLength(2);
+  });
+
+  it('일반 사용자 + 미동의 → enforced = raw · 428 유지', async () => {
+    const raw = await policyAcceptanceService.getPendingForUser(USER_ID);
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual(raw);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(428);
+    expect(res.body.pendingPolicyAcceptances).toHaveLength(2);
+  });
+
+  it('일반 사용자 + 동의 완료 → 통과 · Demo registry 조회 0', async () => {
+    acceptedIds = [DOC_KPA, DOC_NETURE];
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(200);
+    expect(demoQueries()).toHaveLength(0);
+  });
+
+  it('raw pending 0 (published terms 0) → Demo registry 조회 0', async () => {
+    publishedRows = [];
+    demoUserIds = [USER_ID];
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toEqual([]);
+    expect(demoQueries()).toHaveLength(0);
+  });
+
+  it('Demo registry 조회 실패 + raw pending → 예외를 열지 않는다 (raw 유지 · 428)', async () => {
+    demoUserIds = [USER_ID];
+    demoQueryShouldThrow = true;
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID)).toHaveLength(2);
+    const res = await request(makeApp()).get('/api/v1/kpa/x').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(428);
+  });
+
+  it('비활성 Demo 기록(is_active=false)은 예외 대상이 아니다 — 조회 SQL 이 is_active 를 건다', async () => {
+    await policyAcceptanceService.getEnforcedPendingForUser(USER_ID);
+    expect(demoQueries()[0]).toMatch(/is_active/);
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// 소비처 계약 — 서비스 접근을 강제하는 3 경로는 enforced pending 을 쓴다
+// ─────────────────────────────────────────────────────
+
+describe('enforced pending 소비처 계약', () => {
+  const read = (rel: string) => readFileSync(resolve(__dirname, '../..', rel), 'utf8');
+
+  it.each([
+    'common/middleware/auth/authentication.middleware.ts',
+    'modules/auth/controllers/email-auth.controller.ts',
+    'modules/auth/controllers/auth-account.controller.ts',
+  ])('%s 는 getEnforcedPendingForUser 를 쓰고 raw getPendingForUser 를 직접 부르지 않는다', (rel) => {
+    const src = read(rel);
+    expect(src).toContain('getEnforcedPendingForUser(');
+    expect(src).not.toMatch(/\.getPendingForUser\(/);
+  });
+
+  it('Demo 예외 판정에 email 문자열 비교가 없다', () => {
+    const src = read('modules/policy-acceptance/policy-acceptance.service.ts');
+    expect(src).not.toMatch(/@example\.com/);
+    expect(src).not.toMatch(/isDemoLoginEmail/);
   });
 });

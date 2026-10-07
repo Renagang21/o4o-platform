@@ -44,7 +44,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './apiClient';
-import { PLATFORM_ROLES } from './role-constants';
+import { PLATFORM_ROLES, SUBDOMAIN_OPERATOR_SCREENS } from './role-constants';
 import type { User } from '../contexts/AuthContext';
 
 // ─── API 응답 타입 ────────────────────────────────────────────────────────────
@@ -200,7 +200,17 @@ interface ServicePaths {
 //   대표 홈 "내 매장" 진입 = 각 서비스 Store Workspace Home (`<basePath>/workspace`) — Home / My Store / Store Hub / My Services 상위 구조로 들어간다.
 //   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
-  neture: { home: '/community', operator: '/operator', admin: '/admin', join: '/register' },
+  // WO-O4O-NETURE-REGISTER-AUTHENTICATED-LOOP-FIX-V1: neture 는 join 경로를 두지 않는다.
+  //   `/register` 는 비로그인 전용 진입(= Google 로그인 모달)이라 로그인 사용자에게는 가입 화면이 아니고,
+  //   `service_memberships('neture')` 는 운영자 지정 · 공급자 승인 등으로 생긴다(자가 가입 화면 없음).
+  //   그래서 '가입 가능한 서비스' 에 Neture 가 나타나지 않는다. membership 자체와 상태 안내는 그대로다.
+  neture: { home: '/community', operator: '/operator', admin: '/admin' },
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티는 `community.neture.co.kr` 독립
+  //   서비스다(같은 앱을 서빙하더라도 주소·권한 경계는 독립). 호스트 프로필의 `/` 가 진입이다.
+  //   join 경로를 두지 않는다 — 가입은 개별 커뮤니티 단위(승인형)이고 서비스 단위 자가 신청이 없다
+  //   (service-catalog joinEnabled=false). 그래서 '가입 가능한 서비스' 에도 나타나지 않는다.
+  //   서비스 운영 화면(`/admin/communities`)은 대표 호스트에 있고 SUBDOMAIN_OPERATOR_SCREENS 로 진입한다.
+  community: { home: '/' },
   'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
   'k-cosmetics': { myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
@@ -251,6 +261,39 @@ export interface UseHomeEntryResult {
 }
 
 /**
+ * 홈 진입 데이터 조회 — `useHomeEntry` 와 Demo 매장 자동 진입이 같은 출처 · 같은 검증을 쓴다.
+ * 어느 한쪽이라도 실패하면 throw (부분 데이터로 "미가입" 처럼 보이지 않게).
+ */
+export async function fetchHomeEntryData(): Promise<HomeEntryData> {
+  const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
+    api.get('/auth/services'),
+    api.get('/neture/home/entry'),
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
+    api.get('/work-scope/operator-services'),
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
+    //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
+    //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
+    api.get('/communities').catch(() => null),
+  ]);
+  const services = servicesRes.data?.data?.services;
+  const entry = entryRes.data?.data;
+  const operatorServices = operatorRes.data?.data?.services;
+  const communitiesRaw = communitiesRes?.data?.data?.communities;
+  const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
+  if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
+    throw new Error('bad response');
+  }
+  return {
+    services,
+    stores: Array.isArray(entry.stores) ? entry.stores : [],
+    branches: Array.isArray(entry.branches) ? entry.branches : [],
+    serviceStates: normalizeServiceStates(entry.serviceStates),
+    operatorServices,
+    communities,
+  };
+}
+
+/**
  * 로그인 상태에서만 조회한다. 어느 한쪽이라도 실패하면 전체를 error 로 둔다 —
  * 부분 데이터로 "미가입" 처럼 보이는 화면을 만들지 않기 위해서다.
  */
@@ -274,33 +317,9 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     setError(null);
     (async () => {
       try {
-        const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
-          api.get('/auth/services'),
-          api.get('/neture/home/entry'),
-          // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
-          api.get('/work-scope/operator-services'),
-          // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
-          //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
-          //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
-          api.get('/communities').catch(() => null),
-        ]);
-        const services = servicesRes.data?.data?.services;
-        const entry = entryRes.data?.data;
-        const operatorServices = operatorRes.data?.data?.services;
-        const communitiesRaw = communitiesRes?.data?.data?.communities;
-        const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
-        if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
-          throw new Error('bad response');
-        }
+        const next = await fetchHomeEntryData();
         if (cancelled) return;
-        setData({
-          services,
-          stores: Array.isArray(entry.stores) ? entry.stores : [],
-          branches: Array.isArray(entry.branches) ? entry.branches : [],
-          serviceStates: normalizeServiceStates(entry.serviceStates),
-          operatorServices,
-          communities,
-        });
+        setData(next);
       } catch {
         if (cancelled) return;
         setData(null);
@@ -345,9 +364,12 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
     const res = await api.post('/auth/handoff', { targetServiceKey: serviceKey, returnPath });
     targetUrl = res.data?.data?.targetUrl;
   } catch (err: unknown) {
-    const body = (err as { response?: { data?: { code?: string; error?: string } } })?.response?.data;
+    const body = (err as { response?: { data?: { code?: string; error?: string; serviceAccess?: unknown } } })?.response?.data;
+    // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈로 이용하는 서비스(pharmacy)는 서버가 상태별 안내
+    // (약국 가입 · 세미프랜차이즈 가입 · 승인 대기 · 정지)를 `serviceAccess` 와 함께 준다 — 고정 문구보다 우선.
+    const serverMessage = body?.serviceAccess && typeof body.error === 'string' ? body.error : undefined;
     throw new ServiceEntryError(
-      HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      serverMessage ?? HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.',
       body?.code,
     );
   }
@@ -360,6 +382,19 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
 /** 발급 + 즉시 이동. 성공하면 현재 탭이 대상 서비스로 바뀐다. */
 export async function openServiceEntry(serviceKey: string, returnPath?: string): Promise<void> {
   window.location.assign(await resolveServiceEntryUrl(serviceKey, returnPath));
+}
+
+/**
+ * WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1 — 로그인 직후 Store Workspace 로 바로 가는 URL.
+ * 홈 매장 카드와 **같은 계산**(`buildHomeEntryModel` 의 store 항목)과 **같은 handoff**(`resolveServiceEntryUrl`)다 —
+ * 새 경로 · 우회 없음. 매장이 정확히 하나일 때만 이동한다(복수 매장 자동 선택 금지 원칙 유지).
+ */
+export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string> {
+  const data = await fetchHomeEntryData();
+  const items = buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [];
+  const only = items.length === 1 ? items[0].action : null;
+  if (!only || only.kind !== 'handoff') throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
+  return resolveServiceEntryUrl(only.serviceKey, only.returnPath);
 }
 
 /** 공개 안내 URL (로그인 · handoff 없이 열리는 주소) */
@@ -455,6 +490,19 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
         if (!b.slug) continue;
         operator.push({ id: `operator:kpa-branch:${b.organizationId}`, label: b.name, note: nameOf('kpa-branch'), action: { kind: 'handoff', serviceKey: 'kpa-branch', returnPath: `/${b.slug}/operator/site` } });
       }
+      continue;
+    }
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: supplier · funding 운영 화면은 이 앱(대표 호스트)에 있다 —
+    //   handoff 가 아니라 내부 이동. 화면이 요구하는 수준(SUBDOMAIN_OPERATOR_SCREENS)을 scope 가 채울 때만 노출한다.
+    //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
+    //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
+    //   카드를 만들지 않는다(dead link 0).
+    //   community 는 admin 단일 계층 — `/admin/communities`(개설 심사 · 커뮤니티 운영자 지정).
+    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
+    if (screens.length > 0) {
+      const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
+      if (!screen) continue;
+      operator.push({ id: `operator:${key}:${svc.scope}`, label, note, action: { kind: 'internal', to: screen.path } });
       continue;
     }
     const paths = SERVICE_PATHS[key];

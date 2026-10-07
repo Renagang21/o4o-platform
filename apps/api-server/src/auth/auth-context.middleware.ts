@@ -21,6 +21,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import type { AuthContext } from './auth-context.js';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../utils/store-organization.resolver.js';
 
 /**
  * org 필수 미들웨어. user 없으면 401, org 없으면 403.
@@ -39,7 +40,12 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
       return;
     }
 
-    const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(dataSource, user.id, serviceKey);
+    const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(
+      dataSource,
+      user.id,
+      serviceKey,
+      readPreferredStoreOrganizationId(req),
+    );
     // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
     //   같은 서비스 매장 후보가 2개 이상이면 임의 선택하지 않고 명시적으로 차단한다.
     if (isOwner && resolution.status === 'ambiguous') {
@@ -88,7 +94,12 @@ export function optionalStoreAuth(dataSource: DataSource, serviceKey?: StoreOwne
     }
 
     try {
-      const { isOwner, organizationId, memberRole } = await isStoreOwner(dataSource, user.id, serviceKey);
+      const { isOwner, organizationId, memberRole } = await isStoreOwner(
+        dataSource,
+        user.id,
+        serviceKey,
+        readPreferredStoreOrganizationId(req),
+      );
       if (isOwner && organizationId) {
         const authContext: AuthContext = {
           userId: user.id,

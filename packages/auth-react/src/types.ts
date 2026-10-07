@@ -33,8 +33,24 @@ export interface AuthLoginResult<TUser> {
    * 만들 필요는 없다.** 상태에 따라 UI 강조·행동 버튼을 달리해야 할 때만 쓴다.
    */
   accountStatus?: string;
+  /**
+   * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
+   *
+   * `SERVICE_NOT_MEMBER` · handoff 거절이 세미프랜차이즈 자격(예: pharmacy.neture.co.kr)일 때만 함께 오는 상태.
+   * `error` 에는 이미 서버 문구가 들어 있다 — 서비스는 `next` 로 신청 링크 · 행동 버튼만 고른다.
+   */
+  serviceAccess?: AuthServiceAccess;
   /** 성공 시 변환된 사용자. 실패 시 undefined. */
   user?: TUser;
+}
+
+/** 세미프랜차이즈 이용 자격 거절 상태(서버 `serviceAccess`). 알 수 없는 `next` 도 문자열 그대로 전달한다. */
+export interface AuthServiceAccess {
+  semiFranchiseKey: string;
+  pharmacyMembershipStatus: string | null;
+  semiFranchiseMembershipStatus: string | null;
+  /** apply_pharmacy · pharmacy_pending · pharmacy_suspended · apply_semi_franchise · semi_franchise_pending · semi_franchise_suspended */
+  next: string | null;
 }
 
 /** POST /auth/google/signup 동의 항목(@o4o/auth-client `GoogleSignupConsents` 와 동일 형태). */
@@ -51,6 +67,12 @@ export interface AuthClientLike {
   loginWithGoogle(idToken: string, options?: { serviceKey?: string }): Promise<unknown>;
   signupWithGoogle(idToken: string, consents: GoogleSignupConsents): Promise<unknown>;
   getGoogleAuthConfig(): Promise<{ enabled: boolean; clientId: string | null }>;
+  /**
+   * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID) + 비밀번호 → 세션.
+   * 선택 항목 — 없으면 `loginWithEmail` 이 실패 result 를 돌려준다(기존 목·소비처 계약 무변경).
+   * 은퇴한 `login(email+password)`(service_credentials 기반)의 부활이 아니다 — 단일 user_password_credentials 경로다.
+   */
+  loginWithEmail?(email: string, password: string): Promise<unknown>;
   logout(): Promise<unknown>;
   api: {
     get(url: string): Promise<{ data: unknown }>;
@@ -140,6 +162,8 @@ export interface ServiceAuthCore<TUser> {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<TUser>>;
   /** 약관·개인정보(+마케팅) 동의와 함께 Google 계정 생성 → 세션. */
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<TUser>>;
+  /** WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(인증 완료 이메일만). */
+  loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   /** 세션 재확인(기존 KPA `checkAuth` 와 동일 의미). */

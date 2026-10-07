@@ -1,0 +1,26 @@
+{
+  "name": "@o4o/file-understanding-core",
+  "version": "0.1.0",
+  "description": "Generic File Understanding 순수 계층(decode·profile·fingerprint·normalize·contract) — api-server 와 브라우저가 같은 구현을 소비한다. AI 호출·DB·DOM 의존 없음.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "xlsx": "0.18.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "license": "UNLICENSED"
+}

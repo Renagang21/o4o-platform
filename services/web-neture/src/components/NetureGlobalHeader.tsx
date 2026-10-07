@@ -15,15 +15,14 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
+import { O4OHomeButton } from '@o4o/auth-react';
+import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
-import {
-  ADMIN_ROLES,
-  OPERATOR_OR_ABOVE_ROLES,
-  SUPPLIER_ONLY_ROLES,
-} from '../lib/role-constants';
+import { SUPPLIER_ONLY_ROLES } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+import { DEMO_NOTICE } from '../lib/demoAccounts';
 import {
   NETURE_PUBLIC_NAV,
   NETURE_CONTEXTUAL_NAV,
@@ -48,8 +47,8 @@ export const NETURE_HEADER_BRAND = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function NetureGlobalHeader() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const { openLoginModal, openRegisterModal } = useLoginModal();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
 
   // WO-O4O-NOTIFICATION-UI-CORE-V1
@@ -71,16 +70,12 @@ export function NetureGlobalHeader() {
     [navigate],
   );
 
-  const isAdmin = isAuthenticated && user?.roles?.some((r: string) => ADMIN_ROLES.includes(r));
-  const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
   const isSupplier = isAuthenticated && user?.roles?.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
 
-  // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
-  const contextualNav = filterContextualNav(
-    NETURE_CONTEXTUAL_NAV,
-    { supplier: !!isSupplier },
-    { showAll: !!(isAdmin || isOperator) },
-  );
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
+  //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
+  //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
+  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier });
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
@@ -98,11 +93,26 @@ export function NetureGlobalHeader() {
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
-      onRegister={openRegisterModal}
+      // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 회원가입 = 가입 화면 정본(/signup, 이메일 + Google). 로그인 모달 아님.
+      onRegister={() => navigate('/signup')}
       onLogout={handleLogout}
       logoutLabel="O4O 로그아웃"
+      /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
+         로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
+      homeSlot={<O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />}
       utilitySlot={
         <>
+          {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(user.demo) 기준 Demo 배지 — modal 없음 */}
+          {isAuthenticated && user?.demo?.isDemo && (
+            <span
+              role="status"
+              title={DEMO_NOTICE}
+              className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800 whitespace-nowrap"
+            >
+              Demo 계정
+              <span className="sr-only"> — {DEMO_NOTICE}</span>
+            </span>
+          )}
           {isAuthenticated && user && (
             <NotificationBell
               unreadCount={notif.unreadCount}

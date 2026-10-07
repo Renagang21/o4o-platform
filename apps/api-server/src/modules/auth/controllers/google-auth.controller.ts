@@ -8,6 +8,8 @@
  */
 import { Request, Response } from 'express';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
+import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -16,7 +18,6 @@ import { googleAuthService, GoogleAuthError, type GoogleAuthSession } from '../.
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
 import type {
-  GoogleAdminBootstrapRequestDto,
   GoogleLoginRequestDto,
   GoogleSignupRequestDto,
 } from '../dto/index.js';
@@ -56,6 +57,11 @@ export class GoogleAuthController extends BaseController {
         ...(serviceKey && { serviceKey }),
         ipAddress: getTrustedClientIp(req),
         userAgent: req.headers['user-agent'] || 'Unknown',
+        // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 세션 귀속은 origin 파생이다.
+        //   위 body `serviceKey` 는 가입 상태 조회 대상일 뿐 세션 귀속이 아니다.
+        sessionServiceKey: resolveSessionServiceKey(req.get('origin')),
+        // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 로그인 자격도 origin 파생이다(본문 값 아님).
+        loginMembershipGateKey: resolveLoginMembershipGateKey(req.get('origin')),
       });
       return GoogleAuthController.respondWithSession(req, res, session, includeLegacyTokens, 'Login successful');
     } catch (error) {
@@ -72,6 +78,7 @@ export class GoogleAuthController extends BaseController {
         consents,
         ipAddress: getTrustedClientIp(req),
         userAgent: req.headers['user-agent'] || 'Unknown',
+        sessionServiceKey: resolveSessionServiceKey(req.get('origin')),
       });
       return GoogleAuthController.respondWithSession(req, res, session, includeLegacyTokens, 'Signup successful', 201);
     } catch (error) {
@@ -82,26 +89,9 @@ export class GoogleAuthController extends BaseController {
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
   //   link / linkStatus 는 은퇴했다 (users.password 재인증 전제).
 
-  /**
-   * POST /api/v1/auth/google/bootstrap-admin — `{ idToken, bootstrapCode }` (세션 없음 · 전환기 1회용)
-   * WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 §15. 대상은 서버가 `platform:super_admin` 으로 결정하고,
-   * env 플래그 + 일회용 코드가 모두 맞을 때만 열린다. 세션은 발급하지 않는다(연결 후 Google 로 로그인).
-   */
-  static async bootstrapAdmin(req: Request, res: Response): Promise<any> {
-    const { idToken, bootstrapCode } = req.body as GoogleAdminBootstrapRequestDto;
-    try {
-      const result = await googleAuthService.bootstrapAdminLink({
-        idToken,
-        bootstrapCode,
-        ipAddress: getTrustedClientIp(req),
-        userAgent: req.headers['user-agent'] || 'Unknown',
-      });
-      // userId 는 서버 판정 결과 확인용으로만 돌려준다(세션·토큰 없음).
-      return BaseController.ok(res, { linked: result.linked });
-    } catch (error) {
-      return GoogleAuthController.handleError(res, error, 'link');
-    }
-  }
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: Admin Google Bootstrap(전환기 1회용)은 은퇴했다.
+  //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
+  //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
   private static async respondWithSession(
     req: Request,
@@ -151,6 +141,10 @@ export class GoogleAuthController extends BaseController {
       return BaseController.unauthorized(res, 'Google 인증에 실패했습니다.', error.code);
     }
     if (error instanceof GoogleAuthError) {
+      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
+      if (error.serviceAccess) {
+        return BaseController.forbidden(res, error.message, error.code, { serviceAccess: error.serviceAccess });
+      }
       return BaseController.error(res, error.message, error.statusCode, error.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {

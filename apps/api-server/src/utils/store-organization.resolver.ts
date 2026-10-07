@@ -146,6 +146,29 @@ export async function findStoreOrganizationCandidates(
   userId: string,
   serviceKey: StoreOwnerServiceKey,
 ): Promise<StoreOrganizationCandidate[]> {
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
+  //   약국 매장(`kpa`) 후보는 서비스 연결(enrollment · slug)이 아니라 **Neture 기본 가입 원장 active** 로 판정한다.
+  //   kpa-society 가입 · 옛 약국 조직을 매장 자격으로 재해석하지 않는다(대체, 누적 아님).
+  if (serviceKey === 'kpa') {
+    const pharmacyRows = await dataSource.query(
+      `SELECT DISTINCT ON (om.organization_id)
+              om.organization_id AS organization_id,
+              om.role            AS role
+         FROM organization_members om
+         JOIN neture_pharmacy_memberships npm
+           ON npm.organization_id = om.organization_id AND npm.status = 'active'
+        WHERE om.user_id = $1
+          AND om.role = ANY($2::text[])
+          AND om.left_at IS NULL
+        ORDER BY om.organization_id, om.role`,
+      [userId, STORE_MEMBER_ROLES],
+    );
+    return (pharmacyRows as Array<{ organization_id: string; role: string }>).map((r) => ({
+      organizationId: r.organization_id,
+      memberRole: r.role,
+    }));
+  }
+
   const linkage = STORE_SERVICE_ORG_LINKAGE[serviceKey];
   const rows = await dataSource.query(
     `SELECT DISTINCT ON (om.organization_id)
@@ -226,19 +249,61 @@ export async function findAnyServiceStoreOrganizationCandidates(
 }
 
 /**
+ * Store Member(사업자가 허가한 사용자)의 매장 후보.
+ *
+ * WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1
+ *
+ * `STORE_MEMBER_ROLES`(owner/admin/manager)를 **넓히지 않는다** — 그 집합은 owner 조직 해석이
+ * 쓰는 것이라 값을 더하면 소유 판정까지 같이 넓어진다. Member 는 별도 집합(`'staff'`)으로 본다.
+ *
+ * 인가는 호출 측이 `role_assignments`(`{prefix}:store_member`)로 확인한다 — 이 함수는
+ * **관계 후보만** 돌려준다(Identity V3 §7: Relationship 은 조건, Role 이 권한).
+ */
+export async function findStoreMemberOrganizationCandidates(
+  dataSource: DataSource,
+  userId: string,
+): Promise<StoreOrganizationCandidate[]> {
+  if (!userId) return [];
+  const rows = (await dataSource.query(
+    `SELECT organization_id, role
+       FROM organization_members
+      WHERE user_id = $1 AND left_at IS NULL AND role = 'staff'
+      ORDER BY is_primary DESC, joined_at ASC, organization_id ASC`,
+    [userId],
+  )) as Array<{ organization_id: string; role: string }>;
+  return rows.map((r) => ({ organizationId: r.organization_id, memberRole: r.role }));
+}
+
+/**
  * 매장 조직 확정.
  *
  * @param serviceKey 지정 시 해당 서비스에 등록된 조직만 후보가 된다.
  *                   미지정 시 back-compat — 허용 집합은 기존과 동일하되 선택이 결정적이다.
+ * @param preferredOrganizationId 클라이언트가 고른 매장(`X-Store-Organization-Id`). **선택 힌트일 뿐 권한 근거가
+ *                   아니다** — 위 후보 집합 안에 있을 때만 쓰이고, 밖이면 없는 것과 같다.
  */
 export async function resolveStoreOrganization(
   dataSource: DataSource,
   userId: string,
   serviceKey?: StoreOwnerServiceKey,
+  preferredOrganizationId?: string | null,
 ): Promise<StoreOrganizationResolution> {
   if (serviceKey) {
     const candidates = await findStoreOrganizationCandidates(dataSource, userId, serviceKey);
     if (candidates.length === 0) return NONE;
+    // 선택 매장(CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14): 이미 허용된 후보 안에서만 고른다.
+    //   후보 밖 값은 무시하고 기존 규칙(1개 확정 / 2개 이상 ambiguous)을 그대로 따른다 — 허용 집합 불변.
+    const preferred = preferredOrganizationId
+      ? candidates.find((c) => c.organizationId === preferredOrganizationId)
+      : undefined;
+    if (preferred) {
+      return {
+        status: 'resolved',
+        organizationId: preferred.organizationId,
+        memberRole: preferred.memberRole,
+        candidateCount: candidates.length,
+      };
+    }
     if (candidates.length > 1) {
       logger.warn('[StoreOrgResolver] ambiguous store organization', {
         userId,
@@ -264,6 +329,19 @@ export async function resolveStoreOrganization(
   const list = await findUnscopedStoreOrganizationRows(dataSource, userId);
   if (list.length === 0) return NONE;
 
+  // 선택 매장이 허용 후보 안에 있으면 그것을 쓴다(결정적 정렬보다 우선). 후보 밖 값은 무시.
+  const preferredRow = preferredOrganizationId
+    ? list.find((r) => r.organization_id === preferredOrganizationId)
+    : undefined;
+  if (preferredRow) {
+    return {
+      status: 'resolved',
+      organizationId: preferredRow.organization_id,
+      memberRole: preferredRow.role,
+      candidateCount: list.length,
+    };
+  }
+
   const sorted = [...list].sort((a, b) => {
     const pa = a.is_primary === true ? 0 : 1;
     const pb = b.is_primary === true ? 0 : 1;
@@ -287,4 +365,24 @@ export async function resolveStoreOrganization(
     memberRole: sorted[0].role,
     candidateCount: sorted.length,
   };
+}
+
+/**
+ * 선택 매장 헤더 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14
+ *
+ * 한 서비스에 매장이 2개 이상인 경영자는 409 AMBIGUOUS_STORE_CONNECTION 으로 막혔다. 통합 매장 공간
+ * (store.neture.co.kr)은 사용자가 고른 매장을 이 헤더로 보낸다. `X-Organization-Id` 를 쓰지 않는 이유:
+ * 그 헤더는 signage 조회 범위(`extractScope`) 등 다른 의미로 이미 쓰이고 있어, 모든 요청에 실으면
+ * 기존 화면의 조회 범위가 바뀐다. 이 헤더는 매장 조직 해석에서만 읽는다.
+ */
+export const STORE_ORGANIZATION_HEADER = 'x-store-organization-id';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function readPreferredStoreOrganizationId(
+  req: { headers?: Record<string, string | string[] | undefined> } | undefined,
+): string | null {
+  const raw = req?.headers?.[STORE_ORGANIZATION_HEADER];
+  const v = typeof raw === 'string' ? raw.trim() : '';
+  return UUID_RE.test(v) ? v.toLowerCase() : null;
 }

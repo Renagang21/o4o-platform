@@ -31,6 +31,28 @@ interface AuthProviderProps {
   strategy?: AuthStrategy;
 }
 
+/**
+ * 세션 사용자 교체 표식 (CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1 · §21-2).
+ *
+ * 쿠키 세션은 같은 `.neture.co.kr` 쿠키를 쓰는 다른 경로에서 다른 사용자로 바뀔 수 있다.
+ * 캐시된 사용자와 `/auth/status` 사용자가 다르면 새 사용자를 조용히 채택하지 않고
+ * 이 표식을 남긴다. 표식이 있는 동안은 새로고침해도 서버 세션을 채택하지 않으며,
+ * 명시적 로그인(loginWithGoogle) 성공이나 명시적 logout 에서만 지운다.
+ * `logout()` 은 호출하지 않는다 — 서버 logout 은 쿠키 주인(다른 사용자)의 refresh family 를 끊는다.
+ */
+export const SESSION_CONFLICT_STORAGE_KEY = 'admin-session-conflict';
+
+const hasSessionConflictMark = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem(SESSION_CONFLICT_STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
+};
+
+const sameUserId = (a: unknown, b: unknown) => a != null && b != null && String(a) === String(b);
+
 export const AuthProvider: FC<AuthProviderProps> = ({
   children,
   ssoClient,
@@ -75,6 +97,32 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     return !(storedUser && storedToken);
   });
   const [error, setError] = useState<string | null>(null);
+  const [sessionConflict, setSessionConflict] = useState<boolean>(() => hasSessionConflictMark());
+
+  /** 사용자 교체 감지 → 화면 비움 · 캐시 제거 · 표식 기록. 서버 logout 은 호출하지 않는다. */
+  const enterSessionConflict = () => {
+    try {
+      localStorage.setItem(
+        SESSION_CONFLICT_STORAGE_KEY,
+        JSON.stringify({ detectedAt: new Date().toISOString() }),
+      );
+    } catch {
+      // storage 불가 환경에서도 이번 화면은 비운다
+    }
+    localStorage.removeItem('admin-auth-storage');
+    setUser(null);
+    setSessionConflict(true);
+    onAuthError?.('session_user_changed');
+  };
+
+  const clearSessionConflict = () => {
+    try {
+      localStorage.removeItem(SESSION_CONFLICT_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setSessionConflict(false);
+  };
 
   // Phase 6-7: Create AuthClient with appropriate strategy
   const authClient = ssoClient || new AuthClient(
@@ -126,8 +174,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({
                 createdAt: statusData.user.createdAt || new Date().toISOString(),
                 updatedAt: statusData.user.updatedAt || new Date().toISOString()
               };
-              // Only update if different from cached (prevents unnecessary re-renders)
-              if (!cachedUser || cachedUser.id !== userWithDates.id) {
+              if (hasSessionConflictMark()) {
+                // 사용자 교체 표식이 남아 있다 — 명시적 재로그인 전에는 어떤 서버 세션도 채택하지 않는다.
+                setUser(null);
+              } else if (cachedUser && !sameUserId(cachedUser.id, userWithDates.id)) {
+                // 캐시된 사용자와 서버 세션 사용자가 다르다 — 조용히 채택하지 않는다(§19-1).
+                enterSessionConflict();
+              } else if (!cachedUser) {
                 setUser(userWithDates);
               }
             } else if (isAuthenticatedFlag === false) {
@@ -188,7 +241,39 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     };
 
     checkInitialAuth();
+    // 초기 1회 판정 — enterSessionConflict 는 setState 만 쓰므로 재실행 트리거가 아니다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authClient, ssoClient, strategy]);
+
+  // 세션 도중 사용자 교체 감지(§19-1): 창으로 돌아올 때 `/auth/status` 사용자를 다시 대조한다.
+  //   페이지 로드 때만 비교하면 새로고침 전까지 다른 사용자 권한으로 API 가 나간다.
+  useEffect(() => {
+    if (strategy !== 'cookie' || typeof window === 'undefined' || !user) return;
+    let lastCheck = 0;
+    const recheck = async () => {
+      if (document.visibilityState === 'hidden') return;
+      const now = Date.now();
+      if (now - lastCheck < 5000) return;
+      lastCheck = now;
+      try {
+        const response = await authClient.api.get('/auth/status');
+        const body = response.data as any;
+        const statusData = (body?.data ?? body) as any;
+        if (statusData?.authenticated === true && statusData?.user && !sameUserId(statusData.user.id, user.id)) {
+          enterSessionConflict();
+        }
+      } catch {
+        // 판정 불가 — 기존 세션 처리(401 인터셉터 등)에 맡긴다
+      }
+    };
+    window.addEventListener('focus', recheck);
+    document.addEventListener('visibilitychange', recheck);
+    return () => {
+      window.removeEventListener('focus', recheck);
+      document.removeEventListener('visibilitychange', recheck);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authClient, strategy, user?.id]);
 
   /** 로그인 응답 → 세션 채택(Google 로그인 단일 경로). */
   const adoptLoginResponse = (response: unknown) => {
@@ -204,6 +289,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       updatedAt: userData?.updatedAt || new Date().toISOString()
     };
     setUser(userWithDates as any);
+    // 명시적 로그인 성공 = 재인증 완료 → 사용자 교체 표식 해제
+    clearSessionConflict();
 
     // Phase 6-7: Token storage depends on strategy
     // - Cookie strategy: Server sets httpOnly cookies, no localStorage needed
@@ -279,6 +366,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     }
     // Clear user info cache
     localStorage.removeItem('admin-auth-storage');
+    clearSessionConflict();
   };
 
   /**
@@ -352,7 +440,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     logout,
     logoutAll,
     clearError,
-    getSessionStatus
+    getSessionStatus,
+    sessionConflict
   };
 
   return (

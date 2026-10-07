@@ -67,7 +67,7 @@ import {
   StoreQrPlacementAnalyticsPanel,
   isArchivedCornerQr,
 } from '@o4o/store-ui-core';
-import { getActiveServicePrefix } from '../../lib/serviceContext';
+import { getActiveServicePrefix, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -400,7 +400,8 @@ export function StoreQRPage() {
   };
 
   const handleCopyUrl = (slug: string, id: string) => {
-    const url = `${window.location.origin}/qr/${slug}`;
+    // 공개 QR 경로는 서비스 앱이 서빙한다(store 호스트에는 /qr 없음) — URL-FIRST-CENSUS §7-6
+    const url = `${getActiveServicePublicOrigin()}/qr/${slug}`;
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -612,7 +613,7 @@ export function StoreQRPage() {
     }
   };
 
-  const qrBaseUrl = `${window.location.origin}/qr/`;
+  const qrBaseUrl = `${getActiveServicePublicOrigin()}/qr/`;
 
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
@@ -1112,7 +1113,7 @@ export function StoreQRPage() {
             <StoreQrOperationBoard<StoreQrCode>
               items={filteredItems}
               loading={loading}
-              publicUrl={(item) => `/qr/${item.slug}`}
+              publicUrl={(item) => `${getActiveServicePublicOrigin()}/qr/${item.slug}`}
               selectedIds={Array.from(selectedIds)}
               onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
               onExport={(item, format, preset) => handleExport(item.id, format, preset)}

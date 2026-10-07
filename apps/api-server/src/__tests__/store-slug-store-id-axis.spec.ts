@@ -47,6 +47,8 @@ const EXPECTED: Record<string, string[]> = {
   //   축 자체는 정상 — `storeId: organizationId` 로 organization id 축을 그대로 따른다.
   //   (파일럿 코드를 고친 게 아니라 census 를 실제 호출부 집합에 맞춘 것이다.)
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 기본 가입 승인 시 매장 공개 주소 — 원장의 organization_id 그대로.
+  'modules/neture-pharmacy/services/pharmacy-store-link.ts': ['organizationId'],
 };
 
 /** 축이 어긋난 것으로 확인된 표현식은 어떤 호출부에서도 다시 나타나면 안 된다. */
@@ -93,7 +95,7 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
     if (ids.length > 0) actual[rel] = ids;
   }
 
-  it('reserveSlug 호출부 집합이 문서화된 9곳뿐이다', () => {
+  it('reserveSlug 호출부 집합이 문서화된 곳뿐이다', () => {
     expect(Object.keys(actual).sort()).toEqual(Object.keys(EXPECTED).sort());
   });
 

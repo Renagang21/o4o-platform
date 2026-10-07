@@ -61,7 +61,7 @@
 | 항목 | 값 |
 |------|---|
 | Email | `identityv2-check-20260523-032218@example.test` |
-| Password | `V2Check!Phase1` |
+| Password | `[REDACTED]` |
 | User ID | `8eefe5a4-9346-45b5-94df-8516dddd4f80` |
 | Memberships | kpa-society (active) |
 | 용도 | B, C, D-pseudo, F, G, J 검증 (이메일 수신 불요) |
@@ -70,9 +70,9 @@
 
 | 항목 | 값 |
 |------|---|
-| Email | `sohae2100+v2check@gmail.com` |
-| Password A | `V2CheckA!2026` (KPA 유지) |
-| Password B | `V2CheckB!2026` |
+| Email | `[REDACTED_EMAIL]` |
+| Password A | `[REDACTED]` (KPA 유지) |
+| Password B | `[REDACTED]` |
 | User ID | `f0ba48fa-8ada-41d4-ba5b-f64f4c50f51f` |
 | Memberships | kpa-society (active) |
 | 용도 | D-real, H, I 핵심 검증 (이메일 reset token 수신) |
@@ -99,7 +99,7 @@
 
 **결과:**
 - Account #1 (`identityv2-check-...@example.test`): HTTP 201, `user.id=8eefe5a4-...`, `status=pending`, `pendingApproval=true`
-- Account #2 (`sohae2100+v2check@gmail.com`): HTTP 201, `user.id=f0ba48fa-...`, `status=pending`
+- Account #2 (`[REDACTED_EMAIL]`): HTTP 201, `user.id=f0ba48fa-...`, `status=pending`
 - 두 계정 모두 후속 단계에서 credential 기준 로그인 성공 → register 시점에 credential row 가 생성되었음이 실증
 
 **판정:** ✅ PASS
@@ -139,7 +139,7 @@
 **검증 방법:** KPA + 잘못된 password 로그인 시도
 
 **결과:**
-- Account #1 KPA + `V2Wrong!Phase1`: `{"success":false,"code":"INVALID_CREDENTIALS","error":"비밀번호가 일치하지 않습니다."}`
+- Account #1 KPA + `[REDACTED]`: `{"success":false,"code":"INVALID_CREDENTIALS","error":"비밀번호가 일치하지 않습니다."}`
 - I-2 (KPA + B), I-4 (A) 도 모두 INVALID_CREDENTIALS
 
 **판정:** ✅ PASS — credential 의 bcrypt 검증 정상
@@ -273,7 +273,7 @@
 | Email | User ID | Memberships | Credentials |
 |---|---|---|---|
 | `identityv2-check-20260523-032218@example.test` | `8eefe5a4-9346-45b5-94df-8516dddd4f80` | kpa-society (active) | kpa-society |
-| `sohae2100+v2check@gmail.com` | `f0ba48fa-8ada-41d4-ba5b-f64f4c50f51f` | kpa-society (active) | kpa-society (`V2CheckA!2026`) |
+| `[REDACTED_EMAIL]` | `f0ba48fa-8ada-41d4-ba5b-f64f4c50f51f` | kpa-society (active) | kpa-society (`[REDACTED]`) |
 
 **정리 옵션 (선택):**
 - (a) 운영자 화면 "정지/삭제" 로 제거

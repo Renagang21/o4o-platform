@@ -56,15 +56,12 @@ export const REQUIRED_MEMBERSHIP_STATUSES: ReadonlySet<string> = new Set(['activ
 export const TERMS_PENDING_ALLOWLIST: ReadonlySet<string> = new Set([
   // ── 공통 인증 (세션 유지 · 로그아웃 · 본인 최소 정보) ──
   'GET /api/v1/auth/me',
-  'GET /api/v1/auth/verify',
   'GET /api/v1/auth/status',
   'POST /api/v1/auth/logout',
   'POST /api/v1/auth/logout-all',
-  'POST /api/v1/auth/resend-verification',
   'GET /api/v1/auth/services',
   // legacy mount (/api/auth) — 같은 라우터가 두 prefix 에 마운트된다
   'GET /api/auth/me',
-  'GET /api/auth/verify',
   'GET /api/auth/status',
   'POST /api/auth/logout',
   'POST /api/auth/logout-all',

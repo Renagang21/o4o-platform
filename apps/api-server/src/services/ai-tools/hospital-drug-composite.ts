@@ -102,6 +102,94 @@ export function mentionsSameIngredient(message: string): boolean {
   return SAME_INGREDIENT_TOKENS.some((t) => c.includes(t));
 }
 
+/**
+ * 약품 정보 의도어 — 질문을 **분류하는 목록이 아니다**. 붙여 쓴 문장("타이레놀성분이무어니")에서 대상을 잘라 내고
+ * "성분이 뭐야" 의 '성분' 을 대상으로 오인하지 않기 위해서만 쓴다. 공통 Task Modality Router 에는 넣지 않는다.
+ * `@o4o/hospital-pharmacy-core` nl.ts 와 같은 규칙.
+ */
+const DRUG_INFO_INTENT_TOKENS: readonly string[] = [
+  '성분', '효능', '효과', '부작용', '주의사항', '주의점', '용법', '용량', '복용', '금기', '상호작용', '적응증', '약효', '대체약', '제형', '함량', '보관법',
+];
+
+/** 의도어 앞에 와도 "대상 약품"으로 치지 않는 일반어. */
+const DRUG_INFO_NON_SUBJECT: ReadonlySet<string> = new Set([
+  '우리', '원내', '병원', '약국', '이약', '그약', '약', '같은', '동일', '동일한', '무슨', '어떤', '어떻게', '무엇', '뭐', '뭐야', '뭐니',
+  '무어', '무어니', '뭔가요', '뭐예요', '무엇인가요', '알려', '알려줘', '알려주세요', '좀', '해줘', '해주세요', '조사', '조사해', '조사해줘',
+  '설명', '설명해줘', '정리', '정리해줘', '궁금해', '궁금해요', '있어', '있나요', '대해', '대해서', '주요', '주',
+  // 대상 없는 인사 · 도움 요청 · 막연한 질문 — 이것만 있으면 되묻는다.
+  '안녕', '안녕하세요', '반가워', '반갑습니다', '감사', '감사합니다', '고마워', '고맙습니다', '도와줘', '도와주세요', '질문', '문의',
+  '테스트', '시작', '안내', '사용법', '이용', '너는', '누구', '뭐해', '약이야', '약인가요', '약이에요', '약이니',
+]);
+
+const DRUG_INFO_TRAILING_PARTICLES: readonly string[] = ['이랑', '하고', '으로', '을', '를', '이', '가', '은', '는', '도', '과', '와', '의', '로', '랑'];
+const DRUG_INFO_TRIM_CHARS: ReadonlySet<string> = new Set(['"', "'", '(', ')', '[', ']', ',', '.', '?', '!', '~', '“', '”', '‘', '’', '「', '」']);
+
+/**
+ * 문장에 **물어볼 대상**(약품명 등)이 있는가 — 병원 surface 의 "원내가 명확하지 않으면 조사" 기본값을 위한 판정.
+ * 키워드로 질문 형태를 쫓지 않는다: 대상 단어(2자 이상 · 일반어 아님 · 숫자만 아님)가 있으면 true → 조사가 답한다.
+ * 대상 없이 인사·도움 요청·"성분이 뭐야" 만 있으면 false(되묻기).
+ */
+export function looksLikeDrugQuestion(message: string): boolean {
+  return extractDrugQuestionSubject(message) !== null;
+}
+
+/**
+ * 문장에서 **물어볼 대상**(첫 번째 대상 단어)을 뽑는다. 없으면 null.
+ * '원내'로 시작하는 말(원내에·원내약)은 대상이 아니다 — 원내 보유는 브라우저 Local 이 판단하는 영역이다.
+ */
+export function extractDrugQuestionSubject(message: string): string | null {
+  const text = String(message ?? '');
+  for (const raw of text.split(/\s+/)) {
+    let token = raw;
+    while (token.length > 0 && DRUG_INFO_TRIM_CHARS.has(token[0])) token = token.slice(1);
+    while (token.length > 0 && DRUG_INFO_TRIM_CHARS.has(token[token.length - 1])) token = token.slice(0, -1);
+    const lower = token.toLowerCase();
+    let cut = lower.length;
+    for (const intent of DRUG_INFO_INTENT_TOKENS) {
+      const i = lower.indexOf(intent);
+      if (i >= 0 && i < cut) cut = i;
+    }
+    let candidate = token.slice(0, cut);
+    for (const particle of DRUG_INFO_TRAILING_PARTICLES) {
+      if (candidate.length > particle.length + 1 && candidate.endsWith(particle)) {
+        candidate = candidate.slice(0, -particle.length);
+        break;
+      }
+    }
+    if (
+      candidate.length >= 2 &&
+      !DRUG_INFO_NON_SUBJECT.has(candidate) &&
+      !candidate.startsWith('원내') &&
+      !/^[0-9.,]+$/.test(candidate)
+    ) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+/** research 가 원내 재고를 지어내지 않도록 모든 병원 질의에 붙이는 금지 문구. */
+export const HOSPITAL_RESEARCH_NO_INVENTORY =
+  '특정 병원의 원내 보유·재고·구비 여부는 알 수 없으므로 판단하거나 언급하지 마세요.';
+
+/**
+ * 병원 surface 의 research 질의 — 원내/동일성분 질문은 원문을 그대로 넘기지 않는다.
+ *
+ * 서버는 사용자의 원내 파일을 모른다. "타이레놀과 같은 성분의 원내약 있어?" 를 그대로 조사에 넘기면 Gemini 가
+ * "원내에 있습니다" 같은 보유 사실을 지어낼 수 있다. 원내 보유의 정본은 브라우저가 읽은 실제 파일뿐이므로,
+ * 원내·동일성분 문장은 **약품 정보만 묻는 질의**로 바꾸고 보유 여부 언급을 금지한다. 그 밖의 일반 질문은 원문 그대로.
+ */
+export function buildHospitalResearchQuery(message: string): string {
+  const sameIngredient = mentionsSameIngredient(message);
+  if (!sameIngredient && !mentionsHospital(message)) return message;
+  const subject = extractProduct(message) ?? extractDrugQuestionSubject(message);
+  if (!subject) return `의약품 정보만 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
+  if (sameIngredient) {
+    return `${subject}의 유효성분(주성분)을 확인하고, 같은 유효성분을 가진 의약품(제품명·제형·함량)을 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
+  }
+  return `${subject}에 대한 의약품 정보(유효성분·효능·주의사항)를 조사해 주세요. ${HOSPITAL_RESEARCH_NO_INVENTORY}`;
+}
+
 /** 따옴표 구절 → 제품명 토큰 순으로 제품 하나를 뽑는다. 없으면 null. */
 export function extractProduct(message: string): string | null {
   const m = /["'“”‘’]([^"'“”‘’]{1,80})["'“”‘’]/.exec(String(message ?? ''));
@@ -204,9 +292,6 @@ export function renderLocalBlock(
     const code = String(data?.errorCode ?? '');
     if (LOCAL_UNAVAILABLE_CODES.includes(code)) {
       return { text: `[원내 약품] ${LOCAL_NOT_CONNECTED}`, unavailable: true, rowCount: 0 };
-    }
-    if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
-      return { text: '[원내 약품] 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.', unavailable: true, rowCount: 0 };
     }
     return { text: '[원내 약품] 원내 데이터를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.', unavailable: true, rowCount: 0 };
   }

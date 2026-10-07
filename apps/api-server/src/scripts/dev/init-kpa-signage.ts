@@ -17,12 +17,19 @@ import { v4 as uuidv4 } from 'uuid';
 
 const SERVICE_KEY = 'kpa-society';
 
+// 로그인 identity 는 env 에서만 받는다 — o4o_api 는 NOLOGIN owner role (SETUP.md §4).
+function requireDbUsername(): string {
+  const user = (process.env.DB_USERNAME ?? '').trim();
+  if (!user) throw new Error('DB_USERNAME is required — no default login identity (see SETUP.md §4)');
+  return user;
+}
+
 // 운영 DB 접근은 Cloud SQL Auth Proxy 를 경유한다 (직접 host 지정 금지).
 const pool = new Pool({
   host: process.env.DB_HOST || '127.0.0.1',
   port: parseInt(process.env.DB_PORT || '5442'),
   database: process.env.DB_NAME || 'o4o_platform',
-  user: process.env.DB_USERNAME || 'o4o_api',
+  user: requireDbUsername(),
   password: process.env.DB_PASSWORD,
   ssl: false,
 });

@@ -32,6 +32,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { resolveSupplierIdForUser } from '../../neture/middleware/supplier-context.resolver.js';
 
 /**
  * §8.1 ID 계약 가드.
@@ -146,13 +147,12 @@ export async function resolveGlobalProductResourceAccess(
 
   // 2. 공급자 — 자기 offer 에 연결된 master 만.
   //    neture-identity.middleware 와 동일한 해석: 링크된 공급자는 read, 쓰기는 ACTIVE 만.
-  const supplierRows = await dataSource.query(
-    `SELECT id, status FROM neture_suppliers WHERE user_id = $1 LIMIT 1`,
-    [userId],
-  );
-  if (supplierRows.length > 0) {
-    const supplierId: string = supplierRows[0].id;
-    const supplierStatus: string = supplierRows[0].status;
+  //    WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 관계 판정만 canonical resolver 로
+  //    교체(`neture_suppliers.user_id LIMIT 1` 제거). write 금지 · manage/render read · fall-through 는 불변.
+  const supplierResolved = await resolveSupplierIdForUser(dataSource, userId);
+  if (supplierResolved) {
+    const supplierId: string = supplierResolved.supplierId;
+    const supplierStatus: string = supplierResolved.status;
     const ownRows = await dataSource.query(
       `SELECT 1 FROM supplier_product_offers
        WHERE supplier_id = $1 AND master_id = $2 LIMIT 1`,

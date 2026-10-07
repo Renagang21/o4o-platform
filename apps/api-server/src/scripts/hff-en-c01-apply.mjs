@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { requireDbUsername } from './require-db-username.mjs';
 import { translateSlot, ROUNDS } from './hff-en-c01-translate.mjs';
 import { SEC, HANGUL, norm, numericLoss } from './hff-en-c01-lib.mjs';
 
@@ -22,7 +23,7 @@ const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
 const targets = JSON.parse(fs.readFileSync(`${CACHE}/hff-en-c01-slots.json`, 'utf8'));
 
 const APPLY = process.argv.includes('--apply') && process.env.HFF_EN_C01_APPLY_CONFIRM === 'YES';
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5611', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5611', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
 const globals = async () => (await c.query(`
   SELECT (SELECT count(*)::int FROM shared_product_descriptions WHERE deleted_at IS NULL AND description_type='STORE'

@@ -74,7 +74,6 @@ import {
   Layers,
   Shield,
   Coins,
-  UserCheck,
   Clapperboard,
 } from 'lucide-react';
 
@@ -155,17 +154,9 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },
-      // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
-      //   kpa-branch 서비스 가입 승인/반려. 서비스 전용 업무지만 "사람·권한" 축이고,
-      //   백엔드 `/api/v1/kpa-branch/admin/service-members*` 는 kpa-society 와 달리
-      //   platformBypass 라 플랫폼 관리자가 정상 통과한다. 승인 = service_memberships 만
-      //   (분회 소속 branch_memberships 는 분회 운영자 콘솔이 정본 — 여기서 결합하지 않는다).
-      {
-        id: 'core-kpa-branch-service-members',
-        label: '분회 서비스 가입 승인',
-        icon: <UserCheck className="w-4 h-4" />,
-        path: '/admin/kpa-branch/service-members',
-      },
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: '분회 서비스 가입 승인'(core-kpa-branch-service-members) 제거.
+      //   서비스 회원 가입 승인은 그 서비스 운영자(kpa-branch:admin)가 분회 서비스 화면에서 한다.
+      //   Admin 은 서비스 운영자만 지정한다.
       // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
       //   포인트 운영은 금액성 write(지급/차감)를 가진 화면이라 Admin 거버넌스 그룹에 둔다.
       //   백엔드 `/api/v1/points/admin/*` = requireAuth + requireAdmin(platform:super_admin).

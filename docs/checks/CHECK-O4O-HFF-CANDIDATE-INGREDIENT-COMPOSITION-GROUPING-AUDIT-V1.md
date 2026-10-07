@@ -5,7 +5,7 @@
 > **결과: 대표 골격 재사용(A/B) = 22,347품목(54.2%, 보수적 하한) · HOLD 30 · 파일럿 1순위 = 유산균 장건강(보장균수 96% 표기)**
 > **근거 WO:** WO-O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPING-AUDIT-V1 (사용자 지시)
 > **선행:** [`CHECK-O4O-HFF-CANDIDATE-GROUPING-POTENTIAL-AUDIT-V1`](CHECK-O4O-HFF-CANDIDATE-GROUPING-POTENTIAL-AUDIT-V1.md)
-> **그룹 정의표:** [`data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv`](data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv) (≥2품목 그룹 3,845행)
+> **그룹 정의표:** [`data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv`](../../apps/api-server/src/scripts/data/check-data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv) (≥2품목 그룹 3,845행)
 > **실측일:** 2026-07-15 (프로덕션 read-only)
 
 ---
@@ -90,7 +90,7 @@ DB 접근 read-only(집계·덤프) · 후보 삭제/archived 0 · 시판 사전
 | B | 207 | 33 | 8 | 비타민D+칼슘 | 칼슘흡수·뼈·골다공증 |
 | B | 170 | 67 | 9 | 아연 | 면역·세포분열 |
 
-- 전체 그룹 정의표(≥2품목 **3,845행**) = [`data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv`](data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv). 컬럼: group_key·normalized_main_function·functional_ingredient_set·composition_type·item_count·manufacturer_count·statement_no_count·dosage_form_count·base_parseable/partial/unparseable/missing·representative_*(id/제품명/제조사/품목번호)·grouping_confidence·hold_count·hold_reason. (raw_payload 원문·개인정보 미포함.)
+- 전체 그룹 정의표(≥2품목 **3,845행**) = [`data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv`](../../apps/api-server/src/scripts/data/check-data/O4O-HFF-CANDIDATE-INGREDIENT-COMPOSITION-GROUPS-V1.csv). 컬럼: group_key·normalized_main_function·functional_ingredient_set·composition_type·item_count·manufacturer_count·statement_no_count·dosage_form_count·base_parseable/partial/unparseable/missing·representative_*(id/제품명/제조사/품목번호)·grouping_confidence·hold_count·hold_reason. (raw_payload 원문·개인정보 미포함.)
 
 ## 8. 표본 검수
 

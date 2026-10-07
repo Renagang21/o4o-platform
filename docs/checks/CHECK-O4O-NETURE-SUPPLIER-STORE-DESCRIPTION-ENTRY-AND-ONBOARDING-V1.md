@@ -75,8 +75,8 @@ SPD 스키마/마이그레이션 (없음)
 
 | 계정 | 상태 | heading | 분기 | 사이드바 진입점 | 정책문구 | SUPPLIER_STORE 미노출 | 콘솔오류 |
 |------|------|:------:|------|:------:|:------:|:------:|:------:|
-| `sohae21@naver.com`(공급자) | PENDING | ✅ | "승인 후 사용 가능" ✅ | ✅ | ✅ | ✅ | 0 |
-| `renagang21@gmail.com`(공급자2) | ACTIVE | ✅ | "상품별 준비" ✅ | ✅ | ✅ | ✅ | 0 |
+| `[REDACTED_EMAIL_C]`(공급자) | PENDING | ✅ | "승인 후 사용 가능" ✅ | ✅ | ✅ | ✅ | 0 |
+| `[REDACTED_EMAIL_B]`(공급자2) | ACTIVE | ✅ | "상품별 준비" ✅ | ✅ | ✅ | ✅ | 0 |
 
 - `/supplier/store-descriptions` HTTP 200, 로그인 후 정상 렌더.
 - 스크린샷: 스캐치패드 저장(`store-desc-pending.png`, `store-desc-active.png`) — 저장소 커밋 안 함.

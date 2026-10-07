@@ -382,7 +382,7 @@ export function MyParticipationsPage() {
     } catch (err: unknown) {
       const e = err as { response?: { status?: number } };
       if (e?.response?.status === 401) {
-        navigate('/login?redirect=/market-trial/my');
+        navigate('/login?returnUrl=/market-trial/my');
         return;
       }
       setError('내 참여 내역을 불러오지 못했습니다.');
@@ -394,7 +394,7 @@ export function MyParticipationsPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
-      navigate('/login?redirect=/market-trial/my');
+      navigate('/login?returnUrl=/market-trial/my');
       return;
     }
     fetchData();

@@ -8,24 +8,30 @@
  * 공통 기능은 KPA canonical 트리(pages/pharmacy)를 서비스 prefix 만 동적으로 바꿔 1회 mount 한다(복사 3벌 금지).
  * 서비스 종속 기능은 /work/<serviceKey> 아래에만 있다. 모든 업무 화면은 StoreGate(매장 선택·서버 재검증) 뒤에 있다.
  */
-import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from 'react';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { AuthProvider } from './contexts/AuthContext';
 import { StoreProvider } from './contexts/StoreContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
 import RootShell from './components/RootShell';
-import UnifiedStoreLayout from './components/layouts/UnifiedStoreLayout';
+import UnifiedStoreLayout, { ServiceRoleOnly, ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
+import { getActiveServiceKey, getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
 import UnifiedHubLayout from './components/layouts/UnifiedHubLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
 import StoreSelectorPage from './pages/StoreSelectorPage';
+// WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1
+import StoreMembersPage from './pages/StoreMembersPage';
+import StoreInvitationsPage from './pages/StoreInvitationsPage';
+import StoreEnrollmentPage from './pages/StoreEnrollmentPage';
 import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
 import { WORKSPACE_PATHS } from './config/workspace';
+import { PHARMACY_STORE_PATHS, PharmacyContextOnly } from './pages/neture-pharmacy/shared';
 
 const named = <M extends Record<string, unknown>, K extends keyof M>(load: () => Promise<M>, key: K) =>
   lazy(() => load().then((m) => ({ default: m[key] as ComponentType<Record<string, unknown>> })));
@@ -81,13 +87,33 @@ const KcosStoreOrdersPage = lazy(() => import('./services/kcos/pages/StoreOrders
 const KcosStoreRevenueSummaryPage = lazy(() => import('./services/kcos/pages/StoreRevenueSummaryPage'));
 const KcosInterestRequestsPage = lazy(() => import('./services/kcos/pages/InterestRequestsPage'));
 
+// ── K-Cosmetics 매장(서비스 지정 매장 화면 /work/k-cosmetics/store) — web-k-cosmetics `/store` 화면 이식(§21-15) ──
+const KcosStoreCockpitPage = lazy(() => import('./services/kcos/pages/operator/StoreCockpitPage'));
+const KcosStoreChannelsPage = lazy(() => import('./services/kcos/pages/store/StoreChannelsPage'));
+const KcosForeignVisitorSalesSupportPage = lazy(() => import('./services/kcos/pages/store/ForeignVisitorSalesSupportPage'));
+const KcosStoreLocalProductsPage = lazy(() => import('./services/kcos/pages/store/StoreLocalProductsPage'));
+const KcosStoreTabletDisplaysPage = lazy(() => import('./services/kcos/pages/store/StoreTabletDisplaysPage'));
+const KcosStoreRecruitmentApplicationsPage = lazy(() => import('./services/kcos/pages/store/StoreRecruitmentApplicationsPage'));
+const KcosStoreSignagePage = lazy(() => import('./services/kcos/pages/store/StoreSignagePage'));
+const KcosStorePlaylistCreatePage = lazy(() => import('./services/kcos/pages/store/StorePlaylistCreatePage'));
+const KcosSignagePlayerSelectPage = named(() => import('./services/kcos/pages/store/signage/SignagePlayerSelectPage'), 'SignagePlayerSelectPage');
+const KcosStoreAssetsPage = lazy(() => import('./services/kcos/pages/store/StoreAssetsPage'));
+const KcosStoreSettingsPage = lazy(() => import('./services/kcos/pages/store/StoreSettingsPage'));
+const KcosStoreInfoPage = lazy(() => import('./services/kcos/pages/store/StoreInfoPage'));
+const KcosStoreBlogManagePage = lazy(() => import('./services/kcos/pages/store/StoreBlogManagePage'));
+const KcosStorePopV2Page = lazy(() => import('./services/kcos/pages/store/StorePopV2Page'));
+const KcosStorePopStaffPage = lazy(() => import('./services/kcos/pages/store/StorePopStaffPage'));
+const KcosStoreQrPage = lazy(() => import('./services/kcos/pages/store/StoreQrPage'));
+const KcosStoreMarketingAnalyticsPage = named(() => import('./services/kcos/pages/store/StoreMarketingAnalyticsPage'), 'StoreMarketingAnalyticsPage');
+const KcosStoreLibraryContentsPage = lazy(() => import('./services/kcos/pages/store/StoreLibraryContentsPage'));
+const KcosStoreLibraryResourcesPage = lazy(() => import('./services/kcos/pages/store/StoreLibraryResourcesPage'));
+const KcosStoreProductionMaterialsPage = lazy(() => import('./services/kcos/pages/store/StoreProductionMaterialsPage'));
+const KcosProductionMaterialEditorPage = lazy(() => import('./services/kcos/pages/store/ProductionMaterialEditorPage'));
+const KcosStoreProductDescriptionsPage = lazy(() => import('./services/kcos/pages/store/StoreProductDescriptionsPage'));
+const KcosProductMarketingPage = named(() => import('./services/kcos/pages/store/ProductMarketingPage'), 'ProductMarketingPage');
+const KcosProductPopBuilderPage = named(() => import('./services/kcos/pages/store/ProductPopBuilderPage'), 'ProductPopBuilderPage');
+
 // ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
-const PhProductsPage = lazy(() => import('./services/ph/pages/ProductsPage'));
-const PhProductDetailPage = lazy(() => import('./services/ph/pages/ProductDetailPage'));
-const PhCartPage = lazy(() => import('./services/ph/pages/CartPage'));
-const PhOrdersPage = lazy(() => import('./services/ph/pages/OrdersPage'));
-const PhOrderDetailPage = lazy(() => import('./services/ph/pages/OrderDetailPage'));
-const PhPaymentPage = lazy(() => import('./services/ph/pages/PaymentPage'));
 const PhPaymentSuccessPage = lazy(() => import('./services/ph/pages/PaymentSuccessPage'));
 const PhPaymentFailPage = lazy(() => import('./services/ph/pages/PaymentFailPage'));
 
@@ -107,45 +133,87 @@ const HubMultilingualContentLibraryPage = named(() => import('./pages/pharmacy/H
 const StoreMultilingualContentsMyPage = named(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage'), 'StoreMultilingualContentsMyPage');
 const HubSupplierLibraryPage = named(() => import('./pages/pharmacy/HubSupplierLibraryPage'), 'HubSupplierLibraryPage');
 
+// ── Neture 약국 매장(기본 가입 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
+const PharmacyMembershipPage = lazy(() => import('./pages/neture-pharmacy/PharmacyMembershipPage'));
+const SemiFranchisesPage = lazy(() => import('./pages/neture-pharmacy/SemiFranchisesPage'));
+const SupplyOptionsPage = lazy(() => import('./pages/neture-pharmacy/SupplyOptionsPage'));
+const PharmacyContentSourcesPage = lazy(() => import('./pages/neture-pharmacy/PharmacyContentSourcesPage'));
+const PharmacyRecruitmentsPage = lazy(() => import('./pages/neture-pharmacy/PharmacyRecruitmentsPage'));
+const PharmacyCartPage = lazy(() => import('./pages/neture-pharmacy/PharmacyCartPage'));
+const PharmacyOrdersPage = lazy(() => import('./pages/neture-pharmacy/PharmacyOrdersPage'));
+
 const gated = (el: ReactElement) => <StoreGate>{el}</StoreGate>;
 const Loading = <div className="p-8 text-center text-sm text-slate-500">불러오는 중...</div>;
 const NotFound = <main className="center-card"><section className="card"><h1>페이지를 찾을 수 없습니다</h1></section></main>;
+/**
+ * K-Cosmetics 퇴역 — 공개 서비스(retail.neture.co.kr · k-cosmetics.site)가 종료됐다
+ * (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1). 이 앱의 K-Cosmetics 화면은 종료 안내만 보여 준다.
+ * 같은 기능이라는 근거가 없으므로 약국 화면으로 보내지 않는다. 화면 코드 삭제는 다음 퇴역 단계에서 한다.
+ */
+const KcosRetired = (
+  <main className="center-card">
+    <section className="card">
+      <h1>K-Cosmetics 서비스가 종료되었습니다</h1>
+      <p className="muted">K-Cosmetics 매장 · 업무 화면은 더 이상 제공되지 않습니다.</p>
+      <a className="secondary-link" href={WORKSPACE_PATHS.home}>매장 홈으로</a>
+    </section>
+  </main>
+);
 const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
 const H = WORKSPACE_PATHS.storeHub;
+const PP = PHARMACY_STORE_PATHS;
+/** 약국 화면 subPath(앞의 `/` 제거) — `/store/*` · `/work/kpa-society/store/*` 자식 route 용 */
+const rel = (p: string) => p.replace(/^\//, '');
+const pharmacyOnly = (el: ReactElement) => <PharmacyContextOnly>{el}</PharmacyContextOnly>;
+const KCOS_STORE_INFO_ROLES = ['cosmetics:store_owner', 'cosmetics:admin', 'platform:super_admin'] as const;
 
-export default function App() {
-  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
-    <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
-    {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
-    <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
+/** `:param` 을 채워 이동 — 원본 앱의 ParamRedirect 와 같은 동작 */
+function ParamRedirect({ to }: { to: string }) {
+  const params = useParams();
+  return <Navigate to={to.replace(/:([A-Za-z]+)/g, (_, k: string) => encodeURIComponent(params[k] ?? ''))} replace />;
+}
 
-    <Route element={<RootShell />}>
-      <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
-      <Route path={WORKSPACE_PATHS.select} element={gated(<StoreSelectorPage />)} />
-      <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
-      <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
-      <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
+/**
+ * 이용 방법(`/guide/*`)은 서비스 앱이 서빙한다 — 이식 화면의 GuideBackLink 가 store 호스트에서 404 가 되지 않게
+ * 현재 서비스 문맥의 공개 사이트로 보낸다(§21-15). 종료된 K-Cosmetics 문맥은 이동하지 않고 종료 안내를 보여 준다.
+ */
+function ServiceGuideRedirect() {
+  const { pathname, search } = useLocation();
+  const retired = getActiveServiceKey() === 'k-cosmetics';
+  useEffect(() => {
+    if (!retired) window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);
+  }, [retired, pathname, search]);
+  return retired ? KcosRetired : null;
+}
 
-      {/* ── 내 매장(공통 기능 1회) ── */}
-      <Route path={S} element={gated(<UnifiedStoreLayout />)}>
+/**
+ * 내 매장 화면(공통 컴포넌트) — `/store/*` 와 서비스 지정 `/work/<serviceKey>/store/*` 두 곳에 같은 트리를 mount 한다.
+ * CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13 (서비스별 매장 경영자 화면 위치 이전). 경로 · 컴포넌트 · 권한 동작은 그대로다.
+ */
+function storeChildRoutes() {
+  return <>
         <Route index element={<StoreHomePage />} />
         <Route path="info" element={<PharmacyInfoPage />} />
         <Route path="settings" element={<Navigate to={`${S}/info`} replace />} />
+        {/* 서비스 앱의 옛 매장 경로(북마크 · handoff returnPath) — 404 대신 같은 화면으로(§21-14) */}
+        <Route path="dashboard" element={<Navigate to={S} replace />} />
+        <Route path="settings/layout" element={<Navigate to={`${S}/info`} replace />} />
+        <Route path="settings/template" element={<Navigate to={`${S}/info`} replace />} />
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
-        <Route path="my-products" element={<StoreProductsManagerPage
+        <Route path="my-products" element={<StoreOwnerOnly><StoreProductsManagerPage
           title="내 매장 제품"
           description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 태블릿, QR, 사이니지 등 매장 서비스에 활용합니다."
           registerButtonLabel="O4O 제품 취급 등록"
           infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 태블릿 전시, QR 안내, 사이니지 등에 연결해 활용할 수 있습니다."
           emptyTitle="취급 중인 O4O 제품이 없습니다"
           emptyDescription="O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주세요."
-        />} />
-        <Route path="handled-products" element={<StoreHandledProductsPage />} />
-        <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
-        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreProductMultilingualContentPage />} />
+        /></StoreOwnerOnly>} />
+        <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
+        <Route path="commerce/local-products" element={<StoreOwnerOnly><StoreLocalProductsPage /></StoreOwnerOnly>} />
+        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreOwnerOnly><StoreProductMultilingualContentPage /></StoreOwnerOnly>} />
         {/* 매장 경영지원 */}
         <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
         <Route path="marketing/qr" element={<StoreQRPage />} />
@@ -173,6 +241,8 @@ export default function App() {
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
         <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
+        {/* 매장 구성원 — Owner 전용 화면. 권한은 서버가 판정한다(StoreOwnerOnly 는 화면 가드일 뿐) */}
+        <Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />
         {/* 분석 */}
         <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />
         <Route path="analytics" element={<Navigate to={`${S}/analytics/marketing`} replace />} />
@@ -180,10 +250,110 @@ export default function App() {
         <Route path="qr" element={<Navigate to={`${S}/marketing/qr`} replace />} />
         <Route path="pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="signage" element={<Navigate to={`${S}/marketing/signage/playlist`} replace />} />
+        {/* Neture 약국 매장 — 약국(kpa-society) 문맥 전용. 매장 HUB 단계 없이 내 매장에서 바로 주문(DESIGN §6) */}
+        <Route path={rel(PP.membership)} element={pharmacyOnly(<PharmacyMembershipPage />)} />
+        <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
+        <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
+        <Route path={rel(PP.contents)} element={pharmacyOnly(<PharmacyContentSourcesPage />)} />
+        <Route path={rel(PP.recruitments)} element={pharmacyOnly(<PharmacyRecruitmentsPage />)} />
+        <Route path={rel(PP.cart)} element={pharmacyOnly(<PharmacyCartPage />)} />
+        <Route path={rel(PP.orders)} element={pharmacyOnly(<PharmacyOrdersPage />)} />
         <Route path="*" element={NotFound} />
+  </>;
+}
+
+export default function App() {
+  return <BrowserRouter><AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+    <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
+    {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
+    <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
+    <Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={KcosRetired} />
+    <Route path="/guide/*" element={<ServiceGuideRedirect />} />
+
+    <Route element={<RootShell />}>
+      <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
+      <Route path={WORKSPACE_PATHS.select} element={gated(<StoreSelectorPage />)} />
+      <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
+      <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
+      <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
+      {/*
+        WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1 — 초대 수락은 **StoreGate 밖**이다.
+        초대받은 사용자는 수락 전까지 접근 가능한 매장이 0 이라, gate 안에 두면 NoStorePage 에
+        막혀 수락 자체를 못 한다(PR #277 리뷰 P1). 로그인만 요구한다.
+      */}
+      <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
+      {/* 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰는 화면이라 StoreGate 밖이다 */}
+      <Route path={WORKSPACE_PATHS.enrollment} element={<StoreEnrollmentPage />} />
+      {/* Neture 약국 기본 가입 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
+      <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
+
+      {/* ── 내 매장(공통 기능 1회) ── */}
+      <Route path={S} element={gated(<UnifiedStoreLayout />)}>
+        {storeChildRoutes()}
       </Route>
 
       {/* ── 서비스 업무(서비스 종속 기능만) ── */}
+      {/* 서비스 지정 매장 화면 — 각 서비스 앱의 매장 경영자용 /store 의 새 위치(§21-13). 현재 KPA 만. */}
+      <Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}>
+        {storeChildRoutes()}
+        {/* KPA `/store` 의 옛 단축 경로 — KPA 서비스 업무 화면으로(§21-14) */}
+        <Route path="products" element={<Navigate to={`${W}/kpa-society/commerce/products`} replace />} />
+        <Route path="products/b2c" element={<Navigate to={`${W}/kpa-society/commerce/products/b2c`} replace />} />
+        <Route path="orders" element={<Navigate to={`${W}/kpa-society/commerce/orders`} replace />} />
+      </Route>
+      {/* K-Cosmetics 매장 경영자용 /store 의 새 위치(§21-15) — 원본 앱의 화면 · 경로 · 옛 alias 를 그대로 옮겼다.
+          서비스 업무(상품 · 주문 · 매출 · 관심 요청)는 기존 /work/k-cosmetics 화면으로 보낸다(같은 화면 중복 이식 없음). */}
+      {/* K-Cosmetics 퇴역 — 아래 자식 route 는 종료 안내 뒤에 가려져 렌더되지 않는다(코드 삭제는 다음 단계). */}
+      <Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>
+        <Route index element={<KcosStoreCockpitPage />} />
+        <Route path="my-products" element={<StoreProductsManagerPage title="O4O 주문 가능 상품" description="공급자 또는 운영자 승인 후 매장에서 반복 주문할 수 있는 O4O 공급 상품을 관리합니다." />} />
+        <Route path="channels" element={<KcosStoreChannelsPage />} />
+        <Route path="sales-channels/foreign-visitor" element={<KcosForeignVisitorSalesSupportPage />} />
+        <Route path="commerce/products" element={<Navigate to={`${W}/k-cosmetics/commerce/products`} replace />} />
+        <Route path="commerce/local-products" element={<KcosStoreLocalProductsPage />} />
+        <Route path="commerce/tablet-displays" element={<KcosStoreTabletDisplaysPage />} />
+        <Route path="commerce/orders" element={<Navigate to={`${W}/k-cosmetics/commerce/orders`} replace />} />
+        <Route path="commerce/recruitment-applications" element={<KcosStoreRecruitmentApplicationsPage />} />
+        <Route path="commerce/billing" element={<Navigate to={`${W}/k-cosmetics/commerce/billing`} replace />} />
+        <Route path="commerce/products/:productId/marketing" element={<KcosProductMarketingPage />} />
+        <Route path="commerce/products/:productId/pop" element={<KcosProductPopBuilderPage />} />
+        <Route path="marketing/signage" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="marketing/signage/playlist" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/playlist/new" element={<KcosStorePlaylistCreatePage />} />
+        <Route path="marketing/signage/videos" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/schedules" element={<KcosStoreSignagePage />} />
+        <Route path="marketing/signage/player" element={<KcosSignagePlayerSelectPage />} />
+        <Route path="content" element={<KcosStoreAssetsPage />} />
+        <Route path="content/blog" element={<KcosStoreBlogManagePage />} />
+        <Route path="interest-requests" element={<Navigate to={`${W}/k-cosmetics/interest-requests`} replace />} />
+        <Route path="settings" element={<KcosStoreSettingsPage />} />
+        {/* 원본: RoleGuard(cosmetics:store_owner · cosmetics:admin · platform:super_admin) — operator 제외 */}
+        <Route path="info" element={<ServiceRoleOnly serviceKey="k-cosmetics" roles={KCOS_STORE_INFO_ROLES}><KcosStoreInfoPage /></ServiceRoleOnly>} />
+        <Route path="marketing/pop" element={<Navigate to={`${W}/k-cosmetics/store/marketing/pop-v2`} replace />} />
+        <Route path="marketing/pop-v2" element={<KcosStorePopV2Page />} />
+        <Route path="marketing/pop/library" element={<KcosStorePopStaffPage />} />
+        <Route path="marketing/qr" element={<KcosStoreQrPage />} />
+        <Route path="analytics/marketing" element={<KcosStoreMarketingAnalyticsPage />} />
+        <Route path="library/contents" element={<KcosStoreLibraryContentsPage />} />
+        <Route path="library/resources" element={<KcosStoreLibraryResourcesPage />} />
+        <Route path="library/production-materials" element={<KcosStoreProductionMaterialsPage />} />
+        <Route path="library/production-materials/new" element={<KcosProductionMaterialEditorPage />} />
+        <Route path="library/product-descriptions" element={<KcosStoreProductDescriptionsPage />} />
+        {/* 원본 앱의 옛 평면 경로(북마크 · handoff) */}
+        <Route path="local-products" element={<Navigate to={`${W}/k-cosmetics/store/commerce/local-products`} replace />} />
+        <Route path="tablet-displays" element={<Navigate to={`${W}/k-cosmetics/store/commerce/tablet-displays`} replace />} />
+        <Route path="orders" element={<Navigate to={`${W}/k-cosmetics/commerce/orders`} replace />} />
+        <Route path="billing" element={<Navigate to={`${W}/k-cosmetics/commerce/billing`} replace />} />
+        <Route path="signage" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="signage/playlist" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/playlist`} replace />} />
+        <Route path="signage/videos" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/videos`} replace />} />
+        <Route path="signage/schedules" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/schedules`} replace />} />
+        <Route path="signage/player" element={<Navigate to={`${W}/k-cosmetics/store/marketing/signage/player`} replace />} />
+        <Route path="signage/play/:playlistId" element={<ParamRedirect to={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} />} />
+        <Route path="pop" element={<Navigate to={`${W}/k-cosmetics/store/marketing/pop-v2`} replace />} />
+        <Route path="qr" element={<Navigate to={`${W}/k-cosmetics/store/marketing/qr`} replace />} />
+        <Route path="*" element={NotFound} />
+      </Route>
       <Route path={W} element={gated(<ServiceWorkIndexPage />)} />
       <Route path={`${W}/:serviceKey`} element={gated(<ServiceWorkLayout />)}>
         <Route index element={<ServiceWorkHomePage />} />
@@ -195,7 +365,8 @@ export default function App() {
         <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
         <Route path="commerce/products/:productId/marketing" element={<ProductMarketingPage />} />
         <Route path="commerce/products/:productId/pop" element={<ProductPopBuilderPage />} />
-        <Route path="commerce/orderable" element={<Navigate to={`${H}/b2b`} replace />} />
+        {/* 약국은 매장 HUB 단계가 없다 — 주문 가능 상품 = 내 매장 공급 상품(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1) */}
+        <Route path="commerce/orderable" element={<Navigate to={`${S}${PP.supply}`} replace />} />
         <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
         <Route path="commerce/orders" element={<KpaStoreOrdersPage />} />
         <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
@@ -205,6 +376,8 @@ export default function App() {
         <Route path="online-sales/orders" element={<OnlineSalesOrdersRetiredPage />} />
         <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrdersRetiredPage />} />
         <Route path="channels" element={<Navigate to={`${W}/kpa-society/online-sales/settings`} replace />} />
+        {/* KPA `/store/channels/tablet` → `/store/requests` 와 같은 대상(§21-14) */}
+        <Route path="channels/tablet" element={<Navigate to={`${W}/kpa-society/store/requests`} replace />} />
         <Route path="sales-channels/foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
         <Route path="sales-channels/foreign-visitor/payment/success" element={<ForeignVisitorSalesSupportPaymentSuccessPage />} />
         <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />
@@ -212,7 +385,7 @@ export default function App() {
         <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
         <Route path="*" element={NotFound} />
       </Route>
-      <Route path={`${W}/k-cosmetics`} element={gated(<ServiceWorkLayout />)}>
+      <Route path={`${W}/k-cosmetics`} element={KcosRetired}>
         <Route index element={<ServiceWorkHomePage />} />
         <Route path="commerce/products" element={<KcosStoreCommerceProductsPage />} />
         <Route path="commerce/orders" element={<KcosStoreOrdersPage />} />
@@ -222,12 +395,14 @@ export default function App() {
       </Route>
       <Route path={`${W}/pharmacy-hub`} element={gated(<ServiceWorkLayout />)}>
         <Route index element={<ServiceWorkHomePage />} />
-        <Route path="products" element={<PhProductsPage />} />
-        <Route path="products/:offerId" element={<PhProductDetailPage />} />
-        <Route path="cart" element={<PhCartPage />} />
-        <Route path="orders" element={<PhOrdersPage />} />
-        <Route path="orders/:orderId" element={<PhOrderDetailPage />} />
-        <Route path="payment" element={<PhPaymentPage />} />
+        {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Pharmacy-Hub 주문 화면 은퇴 — 약국 주문은 Neture 약국 매장(공급 상품 · 장바구니 · 주문).
+            PG 결제 복귀(success · fail)는 옛 결제 확인 · 기록 경로라 유지한다. */}
+        <Route path="products" element={<Navigate to={`${S}${PP.supply}`} replace />} />
+        <Route path="products/:offerId" element={<Navigate to={`${S}${PP.supply}`} replace />} />
+        <Route path="cart" element={<Navigate to={`${S}${PP.cart}`} replace />} />
+        <Route path="orders" element={<Navigate to={`${S}${PP.orders}`} replace />} />
+        <Route path="orders/:orderId" element={<Navigate to={`${S}${PP.orders}`} replace />} />
+        <Route path="payment" element={<Navigate to={`${S}${PP.orders}`} replace />} />
         <Route path="payment/success" element={<PhPaymentSuccessPage />} />
         <Route path="payment/fail" element={<PhPaymentFailPage />} />
         <Route path="*" element={NotFound} />

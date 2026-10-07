@@ -4,7 +4,8 @@ name: Deploy Admin Dashboard (Cloud Run)
 # Migrated from AWS Lightsail SSH to GCP Cloud Run (2025-12-29)
 
 concurrency:
-  group: deploy-admin-${{ github.ref }}
+  # 서비스 단위 1개 rollout (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 §18)
+  group: deploy-admin-production
   cancel-in-progress: false
 
 # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
@@ -18,18 +19,9 @@ concurrency:
 #   - root manifest / lockfile / setup-build-env 는 Admin build 결과를 실제로 바꾸는데도
 #     trigger 에 없어 배포되지 않았다(false negative). census 근거로 추가한다.
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - 'apps/admin-dashboard/**'
-      - 'packages/**'
-      # root 의존성 · 설치 · 빌드 환경 — Admin 산출물에 직접 영향을 준다.
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '.npmrc'
-      - '.github/actions/setup-build-env/**'
-      - '.github/workflows/deploy-admin.yml'
+  # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴. 자동 배포는 `deploy-auto.yml`(main CI 성공 → 위험 판정 →
+  #   LEVEL_2 만 이 workflow 를 `deploy/auto-<sha>` 태그 ref 로 dispatch) 이 유일한 진입점이다. 사람은 통제 배포(LEVEL_3 ·
+  #   첫 rollout)만 이 workflow 를 직접 dispatch 한다. 게이트는 `DEPLOY_FREEZE` 하나 — 정확히 'false' 일 때만 배포.
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -44,34 +36,67 @@ on:
         description: '판정 기준 head SHA (비우면 현재 SHA)'
         required: false
         default: ''
+      # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — 기본 legacy = 종전 동작 그대로.
+      rollout_mode:
+        description: "'verified'(기본 · 0% 배포 → 검증 → 전환 → 실패 시 복귀) | 'legacy'(종전 — 새 revision 즉시 서빙/pin 유지)"
+        required: false
+        default: 'verified'
+  # WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — Unified Delivery(`delivery.yml` · `promote.yml`)의 자동 · 승인 진입점.
+  #   태그 · dispatch 없음. target SHA = 호출자의 `github.sha`(호출자가 target == github.sha == main HEAD 를 강제).
+  #   GITHUB_REF 는 호출자 것(refs/heads/main) — 아래 production 설정 분기가 그대로 성립한다.
+  workflow_call:
+    inputs:
+      rollout_mode:
+        type: string
+        required: false
+        default: 'verified'
+      force_deploy:
+        type: string
+        required: false
+        default: 'false'
+      base_sha:
+        type: string
+        required: false
+        default: ''
+      head_sha:
+        type: string
+        required: false
+        default: ''
+      dry_run:
+        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · deploy 0)"
+        type: string
+        required: false
+        default: 'false'
 
 env:
   PROJECT_ID: netureyoutube
   REGION: asia-northeast3
+  # WO-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1 — Cloud Run runtime identity (default compute SA · roles/editor 사용 종료).
+  #   github-actions SA 는 이 SA 에 대해서만 actAs 할 수 있다(SA 리소스 단위 iam.serviceAccountUser). 권한: CHECK-O4O-CLOUD-RUN-RUNTIME-SA-LEAST-PRIVILEGE-V1
+  RUNTIME_SA: o4o-runtime@netureyoutube.iam.gserviceaccount.com
+  # WO-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1 — 배포는 Cloud Run IAM 을 바꾸지 않는다(github-actions = roles/run.developer · setIamPolicy 없음).
+  #   기존 서비스의 공개 접근(allUsers → roles/run.invoker)은 서비스 IAM 에 이미 있고 배포가 유지한다. 새 서비스는 최초 1회 소유자가 부여 — CHECK-O4O-GITHUB-ACTIONS-RUN-ADMIN-TO-DEVELOPER-V1.
   REPOSITORY_NAME: o4o-api
 
 jobs:
-  deploy-hold-notice:
-    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
-    #   배포 job 이 skip 되면 run 이 조용히 성공처럼 보여 "왜 반영이 안 되나" 착시가 생긴다.
-    #   이 job 은 게이트가 닫혔을 때**만** 돌며, 보류 사유를 Job Summary 에 남긴다.
-    #   배포 job 과 의존관계가 없으므로 skip 여부와 무관하게 실행된다.
-    if: vars.DEPLOY_ENABLED != 'true'
+  freeze-notice:
+    # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — DEPLOY_FREEZE 가 'false' 가 아니면(부재 · 공백 · true · 오타 포함 = fail-closed)
+    #   이 job 만 돌고 배포 job 은 전부 skip 된다. GitHub 식의 문자열 비교는 대소문자를 구분하지 않는다.
+    if: vars.DEPLOY_FREEZE != 'false'
     runs-on: ubuntu-latest
     steps:
-      - name: Report deploy hold
+      - name: Report deploy freeze
         run: |
           {
-            echo "## ⛔ 배포 보류 — DEPLOY_ENABLED ≠ 'true'"
+            echo "## 🧊 Production deploy frozen — DEPLOY_FREEZE != 'false'"
             echo ""
             echo "이 워크플로의 배포 job 은 실행되지 않았습니다 (build · migration · Cloud Run deploy 0)."
             echo ""
-            echo "- 현재 값: '${{ vars.DEPLOY_ENABLED }}'  (변수 부재 · 공백도 차단 = fail-closed)"
-            echo "- 사유: WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 INCIDENT — main 의 Lecture Phase 2 runtime 이 data cutover 전에 서빙되는 것을 막는다."
-            echo "- 해제: 사용자 승인 후 \`gh variable set DEPLOY_ENABLED --body true\`"
+            echo "- DEPLOY_FREEZE = '${{ vars.DEPLOY_FREEZE }}'  (정확히 'false' 일 때만 배포 · 부재/공백/오타 = freeze)"
+            echo "- 정상 운영값은 false. 비상 · 정비 시에만 true — README \"배포\" 절."
             echo "- commit: ${{ github.sha }}"
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "DEPLOY_HOLD_ACTIVE=1 (DEPLOY_ENABLED='${{ vars.DEPLOY_ENABLED }}')"
+          echo "DEPLOY_FREEZE_ACTIVE=1 (DEPLOY_FREEZE='${{ vars.DEPLOY_FREEZE }}')"
 
   # 판정 전용 경량 잡 — checkout + node 만 쓴다. pnpm install · GCP 인증 없음.
   # 판정기는 `scripts/ci/detect-affected.mjs` 로 CI Pipeline 과 **같은 단일 지점**이다.
@@ -93,25 +118,57 @@ jobs:
     - name: Classify changed scope
       id: scope
       env:
-        BASE_SHA: ${{ github.event.inputs.base_sha || github.event.before }}
-        HEAD_SHA: ${{ github.event.inputs.head_sha || github.sha }}
+        BASE_SHA: ${{ inputs.base_sha || github.event.before }}
+        HEAD_SHA: ${{ inputs.head_sha || github.sha }}
       run: node scripts/ci/detect-affected.mjs
+
+  # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
+  #   CI Pipeline 이 target SHA 에서 green 이 아니면 배포하지 않는다. 배포가 열릴 수 있을 때만 돈다.
+  ci-gate:
+    name: CI gate (target SHA must be green)
+    needs: [detect]
+    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy 도 needs 로 skip.
+    # WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
+    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
+    if: >-
+      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+      (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+      (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: scripts/ci
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+    - name: Require green CI for target SHA
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
 
   deploy:
     runs-on: ubuntu-latest
-    # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §20 — 배포 승인 게이트.
-    #   environment 가 붙은 job 은 required reviewer 승인 전에는 runner 가 배정되지 않는다
-    #   (변수 게이트는 skip, environment 는 waiting — build · migration · deploy 가 시작도 안 된다).
+    # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
+    #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
+    #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
+    #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
+    #   와 ci-gate(수동 실행 = 소유자만)다.
     environment: production
-    needs: [detect]
+    # ci-gate skip(게이트 닫힘) · 실패(CI not green) → 이 job 도 skip
+    needs: [detect, ci-gate]
     # Admin 과 무관한 변경에서는 install / build / Docker push / Cloud Run deploy 가
     # 한 줄도 실행되지 않는다. 수동 강제 배포는 force_deploy 로 계속 가능하다.
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
-    #   DEPLOY GATE (fail-closed): `DEPLOY_ENABLED` 가 'true' 일 때만. 변수 부재/공백 = 차단.
+    #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만. 변수 부재/공백/오타 = freeze.
     #   force_deploy 수동 실행보다도 우선한다(괄호로 묶어 AND).
     if: >-
-      vars.DEPLOY_ENABLED == 'true' &&
-      (needs.detect.outputs.admin_affected == 'true' || github.event.inputs.force_deploy == 'true')
+      vars.DEPLOY_FREEZE == 'false' &&
+      (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
 
     permissions:
       contents: read
@@ -227,7 +284,8 @@ jobs:
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v3
       with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+        service_account: github-actions@netureyoutube.iam.gserviceaccount.com
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
@@ -292,8 +350,18 @@ jobs:
         echo "✅ Image pushed: ${FULL_IMAGE}"
         echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
+    # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만 배포 전 traffic 기록
+    - name: Record traffic before deploy (verified rollout)
+      if: inputs.rollout_mode == 'verified'
+      uses: ./.github/actions/cloud-run-verified-rollout
+      with:
+        phase: plan
+        service: ${{ steps.config.outputs.service_name }}
+
     - name: Deploy to Cloud Run
       run: |
+        ROLLOUT_ARGS=()
+        if [ "${{ inputs.rollout_mode }}" = "verified" ]; then ROLLOUT_ARGS=(--no-traffic "--tag=sha-${GITHUB_SHA:0:12}"); fi
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ steps.config.outputs.image_name }}:${{ env.IMAGE_TAG }}"
 
         echo "🚀 Deploying to Cloud Run..."
@@ -301,15 +369,26 @@ jobs:
           --image="${FULL_IMAGE}" \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
+          --service-account=${{ env.RUNTIME_SA }} \
           --platform=managed \
-          --allow-unauthenticated \
           --port=8080 \
           --memory=256Mi \
           --cpu=1 \
           --min-instances=0 \
           --max-instances=5 \
           --concurrency=80 \
-          --timeout=60
+          --timeout=60 \
+          "${ROLLOUT_ARGS[@]}" \
+          --update-labels="o4o-commit-sha=${{ github.sha }}"
+
+    # verified 모드: 새 revision 을 tag URL 로 직접 smoke → PASS 일 때만 전환. 실패 = 전환 없음 = 기존 revision 유지.
+    - name: Smoke new revision and switch traffic (verified rollout)
+      if: inputs.rollout_mode == 'verified'
+      uses: ./.github/actions/cloud-run-verified-rollout
+      with:
+        phase: finish
+        service: ${{ steps.config.outputs.service_name }}
+        paths: '/'
 
     - name: Verify deployment
       run: |

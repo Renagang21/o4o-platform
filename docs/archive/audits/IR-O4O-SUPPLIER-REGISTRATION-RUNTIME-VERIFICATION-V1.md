@@ -45,7 +45,7 @@
 POST /api/v1/auth/register
 {
   email: "ir-supplier-test@o4o.com",
-  password: "Test1234!",
+  password: "[REDACTED]",
   name: "IR Supplier Test",
   service: "neture",
   role: "supplier",

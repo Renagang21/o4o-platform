@@ -15,6 +15,7 @@ import { CosmeticsStorePlaylistService } from '../services/cosmetics-store-playl
 import { CosmeticsStoreInsightsService } from '../services/cosmetics-store-insights.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { cosmeticsStoreApplicationToCanonical } from '../utils/canonical-status.js';
+import { sendDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
 
 function errorResponse(
   res: Response,
@@ -178,6 +179,7 @@ export function createCosmeticsStoreController(
 
         res.json(result);
       } catch (error: any) {
+        if (sendDemoAccountForbidden(res, error)) return;
         console.error('[CosmeticsStore] Review application error:', error);
         if (error.message === 'APPLICATION_NOT_FOUND') {
           return errorResponse(res, 404, 'STORE_002', 'Application not found');

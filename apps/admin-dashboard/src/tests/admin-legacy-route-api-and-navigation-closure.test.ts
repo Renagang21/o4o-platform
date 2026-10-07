@@ -276,7 +276,9 @@ describe('§7-§8 · 연결 수정 호출이 backend 계약 경로를 가리킨�
     expect(stripAllComments(read('api/settings.ts'))).not.toContain('/settings/cache/clear');
     expect(stripAllComments(read('config/rolePermissions.ts'))).not.toContain("get('/roles')");
     expect(stripAllComments(read('types/user.ts'))).not.toContain('/api/v1/roles');
-    expect(stripAllComments(read('pages/settings/OAuthSettings.tsx'))).not.toContain('/settings/oauth/test');
+    // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuthSettings 화면 자체가 제거됐다(passport 은퇴로 소비처 0).
+    //   dead helper 가 아니라 **파일 부재**로 계약을 뒤집는다.
+    expect(existsSync(join(SRC, 'pages/settings/OAuthSettings.tsx'))).toBe(false);
     // pages/neture/PartnerListPage.tsx 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 삭제됐다.
     expect(existsSync(join(SRC, 'pages/neture/PartnerListPage.tsx'))).toBe(false);
   });

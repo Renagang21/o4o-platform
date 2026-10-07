@@ -50,6 +50,7 @@ import {
 import { getServiceMembershipStatusFromDb } from './service-membership.js';
 import {
   findAnyServiceStoreOrganizationCandidates,
+  findStoreMemberOrganizationCandidates,
   type StoreOrganizationCandidate,
 } from './store-organization.resolver.js';
 
@@ -261,9 +262,32 @@ export async function resolveAccessibleStores(
 ): Promise<AccessibleStore[]> {
   if (!userId) return [];
   const candidates = await findAnyServiceStoreOrganizationCandidates(dataSource, userId);
-  if (candidates.length === 0) return [];
+  // WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1:
+  //   Store Member(사업자가 허가한 사용자)도 자기 매장을 볼 수 있어야 한다. 위 후보는 owner 해석기가
+  //   쓰는 집합(owner/admin/manager)이라 member 가 빠진다 — **그 배열을 넓히지 않고** 별도 후보를
+  //   더한다(넓히면 owner 조직 해석까지 같이 넓어진다).
+  //   인가는 role 이 한다: `{prefix}:store_member` 보유자의 활성 'staff' 관계만 후보가 된다.
+  const memberCandidates = await findStoreMemberOrganizationCandidates(dataSource, userId);
+  const merged = [...candidates];
+  for (const m of memberCandidates) {
+    if (!merged.some((c) => c.organizationId === m.organizationId)) merged.push(m);
+  }
+  if (merged.length === 0) return [];
 
-  const ids = candidates.map((c) => c.organizationId);
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 매장은 기본 가입 원장이 active 일 때만 매장이다.
+  //   신청 대기 · 반려 · 정지 · 종료 약국 조직은 매장 목록에서 뺀다(빈 매장 화면 대신 "연결된 매장 없음 → 기본 가입 상태").
+  //   원장 행이 없는 조직(다른 업종 · 서비스)은 영향이 없다.
+  const inactivePharmacyRows = (await dataSource.query(
+    `SELECT organization_id
+       FROM neture_pharmacy_memberships
+      WHERE organization_id = ANY($1::uuid[]) AND status <> 'active'`,
+    [merged.map((c) => c.organizationId)],
+  )) as Array<{ organization_id: string }>;
+  const inactivePharmacy = new Set(inactivePharmacyRows.map((r) => r.organization_id));
+  const visible = merged.filter((c) => !inactivePharmacy.has(c.organizationId));
+  if (visible.length === 0) return [];
+
+  const ids = visible.map((c) => c.organizationId);
   const rows = (await dataSource.query(
     `SELECT id, name
        FROM organizations
@@ -272,7 +296,7 @@ export async function resolveAccessibleStores(
   )) as Array<{ id: string; name: string | null }>;
   const nameById = new Map(rows.map((r) => [r.id, r.name ?? '']));
 
-  return candidates
+  return visible
     .map((c) => ({
       organizationId: c.organizationId,
       organizationName: nameById.get(c.organizationId) ?? '',

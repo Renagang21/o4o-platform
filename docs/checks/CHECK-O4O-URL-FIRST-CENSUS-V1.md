@@ -1,7 +1,19 @@
 # CHECK — O4O URL 중심 서비스 재구성 G0/G1 전수 대응표
 
+> **이 문서는 URL 재구성 통합 작업의 단일 TODO 이다** (2026-09-26 사용자 지시 · 실행 규칙: 큰 목표 1 = 작업 1, 새 문제 발견 ≠ 새 WO). 진행 기록은 §21.
+>
+> **INITIAL_PURPOSE** — 기존 서브디렉토리와 독립 도메인에 흩어진 O4O 기능을 확정된 URL 체계에 배치한다. 서비스별 운영 영역 · 독립 커뮤니티 · 매장 Hub 와 내 매장의 경계를 코드와 주소에서 일치시키고, 기존 QR · 인증 · 주문 경로가 전환 과정에서 끊기지 않게 한다.
+>
+> **CONFIRMED_DECISIONS** — 약국 `pharmacy.neture.co.kr` · 소매 `retail.neture.co.kr` · KPA 분회 `kpa.neture.co.kr/{분회}` · 커뮤니티 `community.neture.co.kr/pharmacist`·`/retail`(서비스 회원과 별도 가입) · 매장 `store.neture.co.kr/hub`·`/my-store`(서비스별 거래 화면은 필요한 범위에서 유지) · 공급자 `supplier.neture.co.kr`(공급자 도메인 기준 재사용) · 파트너 `partner.neture.co.kr` 예약(공급자 기능을 파트너로 되돌리지 않음) · 펀딩 `funding.neture.co.kr` · 병원약국 공개 화면 `neture.co.kr/hospital` · Cafe24 `neture.co.kr/cafe24` 유지 · 운영은 `admin.neture.co.kr` 고려하되 O4O 운영자에게 `platform:super_admin` 비부여. Neture 중복 `/hospital-drug` 제거(병원 앱 공유 저장 키 · 기기 데이터 보존). `pharmacyhub.co.kr` 에 새 독립 서비스 불가, 기존 호스트 HTTPS · QR · 호환 경로 · 데이터 식별자는 안전한 목적지 검증까지 보존. 서비스 키 · role prefix 일괄 변경 금지. **환불은 별도 확정 정책**(오프라인 처리 + 수기 기록, `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1`) — PG 자동 환불을 이 작업에 다시 넣지 않는다. **Hub 두 종류(2026-09-26 정정, §21-17)**: `pharmacy.neture.co.kr` · `retail.neture.co.kr` 의 Hub = 그 **서비스 운영자가 관리하는 서비스 Hub** / `store.neture.co.kr/hub` = **매장 경영자가 참여한 서비스들의 Hub 를 모아 보는 매장 Hub** — 같은 화면 · 같은 서비스 문맥으로 간주하지 않는다. 그 밖의 확정 결정은 §9 · §12.
+>
+> **OUT_OF_SCOPE** — 새 사업 기능 개발 · PharmacyHub 데이터의 근거 없는 일괄 이관 · 폐기 · 환불 자동화 · signage 새 공개 도메인 · 운영 DB 무승인 쓰기. 사업 · 계약 판단이 남은 부분(opt-in 채널의 KPA 편입 등)은 현재 기능을 보존하고 결정 · 검증 조건을 이 문서에 표시한다.
+>
+> **DONE_CRITERIA** — ① 확정된 각 주소에서 의도한 앱 · 권한 화면이 열리고 직접 접속 · 새로고침 · 로그인 복귀 통과 ② 기존 인쇄 QR · 보존 대상 링크가 열리고, 인증 · 결제 옛 경로는 경로별 검증 결과 보유 ③ 관리자 세션 사용자 교체 미재현 · O4O 운영자가 관리자 전체 권한을 얻지 않음 ④ 다중 서비스 가입 매장 · 별도 커뮤니티 가입자 · 비로그인 병원 화면 핵심 흐름 검증 ④-2 **Store 이전 완료** = 각 서비스의 `/store` · `/store-hub`(PH `/store-owner`) 기능과 연결을 확인하고 `store.neture.co.kr` 통합 매장 공간(`/hub` = 가입 서비스가 매장에 제공하는 기능, `/my-store` = 경영자 매장 화면)으로 옮긴 상태. 호스트가 열리는 것만으로는 완료 아님(§21-12) ⑤ 환불 자동 실행 경로 신설 0 · 의약품 거래 차단 유지 ⑥ 코드 준비 · 외부 설정 확인 · 운영 배포 결과를 구분 보고, 미확인 콘솔 · 현장 항목이 있으면 해당 전환 **미완료** + 필요한 증빙 명시.
+>
+> 방향 변경 시 먼저 기록: 원래 목적 · 새 발견 · 변경 이유 · 원래 목적과의 관계 · 범위 확대 여부 · 완료 기준 변경 여부.
+
 - 작성일: 2026-09-25
-- 단계: **G0 (현재 상태) · G1 (데이터/외부 환경 실측)**. 구현 A~F 는 이 결과 검토 후 별도 지시로 진행한다.
+- 단계: G0 · G1 조사(§0~§20) 완료 → **2026-09-26 부터 통합 TODO 로 구현 진행 중**(진행 상태 = §21). 운영 전환은 외부 설정 증빙과 `DEPLOY_ENABLED` 개방 후에만 완료로 표시한다.
 - 선행: [`IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1`](../investigations/IR-O4O-URL-FIRST-SERVICE-RESTRUCTURE-ADDENDUM-V1.md) §0~§11 (결정 8건 = §11).
 - 변경: 코드 · 운영 DB · DNS · LB · 배포 설정 **변경 0**. 운영 DB 는 Cloud SQL Auth Proxy + `default_transaction_read_only=on` 세션으로 **집계 SELECT 만** 실행(개인정보 미출력). GCP 는 `describe`/`list` 만.
 - 판정: **G0 PASS · G1 PARTIAL** (사용자 동의 2026-09-25 · 결정 = §9 · PH 대응 설계 = §10 · 커뮤니티 권한 설계 = §11 · 2차 결정 = §12 · B 모델 = §13 · 결제 = §14 · 운영자 권한 = §15 · 호스트 진입 = §16 · Store Hub = §17 · 커뮤니티 모델 = §18 · 현재 결함 = §19 · 다음 판단 = §20) — 저장소 밖 콘솔 3건(Google · Toss · Gabia 관리 화면)과 발송 메일 · 설치 PC 현장 확인이 미확인.
@@ -48,8 +60,8 @@
 
 | 호스트 | DNS | HTTPS | 비고 |
 |---|---|---|---|
-| neture.co.kr · www · admin · store · study | 136.110.132.35 | 200 | |
-| api.neture.co.kr | 136.110.132.35 | 404(루트) | 정상 (API) |
+| neture.co.kr · www · admin · store · study | [REDACTED_IP] | 200 | |
+| api.neture.co.kr | [REDACTED_IP] | 404(루트) | 정상 (API) |
 | kpa-society.co.kr · www | LB IP | 200 | |
 | pharmacyhub.co.kr · www | LB IP | 200 | |
 | k-cosmetics.site · www | LB IP | 200 | |
@@ -660,3 +672,585 @@ KPA 는 주문 생성 · prepare/confirm · 결제완료 핸들러 · fulfillmen
 4. **§14 결제**: 금액 결정 9개 중 최소 1 · 3 · 5.
 5. **§17 Store Hub**: 서비스 키 데이터(POP · 블로그 등)의 공통화 방식, 테스트 매장 준비 방식(격리 DB vs 운영 쓰기).
 6. §18 커뮤니티 키 명명(`retail` 키 금지 원칙과 `community.neture.co.kr/retail` 경로의 관계).
+
+---
+
+## 21. 통합 작업 진행 기록
+
+### 21-1. 2026-09-26 — 최신 main 대조 (HEAD `cacc2a57d`)
+
+§4 이후 반영된 커밋: Google-only 인증 정리(PR #238), 플랫폼 관리자 역할 가드 수정, membership 종료 분리, Supplier Domain 경계 동결(`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`, 303221b8b). 이에 따라 낡은 사실:
+
+| 위치 | 이전 | 현재 | 근거 |
+|---|---|---|---|
+| A2 `/auth/verify-email` | KEEP + REPOINT | **제거 완료**(3앱 페이지 · 백엔드 route · 메일 템플릿 전부) → 이관 대상 없음 | `auth.routes.ts:149-152` · `google-only-auth-cleanup.spec.ts:107-108` |
+| A3 `/operator-invitations/accept` | KEEP | **제거 완료**. 대체 = 관리자가 기존 Google 사용자에게 직접 지정(`/admin/operator-assignments`), 메일 초대 없음 | `OperatorAssignmentController.ts:50-66,92` |
+| X3 모바일 앱 | KEEP | **은퇴**(추적 파일 0 · `/api/v1/mobile/*` 제거) → 호스트 의존 없음 | 7595e6d27 |
+| §2-3 발송 메일 게이트 | 미확인 | **해당 없음**(인증 · 초대 메일 자체가 없음) | `mail.service.ts:355` |
+| A6 CORS | `setup-middlewares.ts:39-102` | 내용 동일 · 줄 이동(`:37-99`). funding 있음 · supplier 없음 유지 | — |
+| §19-1 전제 | — | **모두 그대로**(handoff · cookie.utils · AuthProvider 변경 0) | — |
+| 그 외 | — | `service-catalog.ts` · `store-workspace.ts` · `representative-entry.ts` · `tenant.tsx` 변경 0 | — |
+
+**Supplier 기준(`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`, FROZEN)이 이 작업에 거는 제약**
+- 호스트 · 도메인 규정은 없다(§16 · F1 과 충돌도 확정도 아님). 공급자 호스트 설계는 §16 그대로.
+- 펀딩 호스트의 문구 · SEO · 메뉴는 플랫폼 공통 제품명 **"유통참여형 펀딩"** 유지, 자금 모집 · 정산을 암시하지 않는다(:124). 이름 변경은 플랫폼 어휘 변경이라 이 작업 밖.
+- `/supplier/forum*` · `/supplier/my-forum` 은 legacy deep-link 보존 — 공급자 호스트 route 트리에서 이름 변경 · 리다이렉트 체인 금지(:53).
+- 공급자 영역에 운영자 · 커뮤니티 · Store 운영 기능 신설 금지(§9) · 조직 전환 switcher 금지(§7) → 공급자 호스트에서 `/admin`·`/operator`·`/store` 숨김과 일치.
+- **opt-in 모델 B(§13) 추가 제약**: 공급 가능 판정의 SSOT 는 `offer_service_approvals`(서비스 운영자 소유, 공급자는 읽기만), `distribution_type` 은 `(isPublic, serviceKeys)` 파생만. B 의 "승인 OR opt-in" · opt-in 을 파생에 반영 · 공급자 쓰기 권한은 모두 **이 FROZEN 기준의 명시적 개정**이 필요하다 → 결정 문구대로 현재 기능 보존, 결정 · 검증 조건만 유지.
+- 실제 공급자 계정 smoke 는 `DEFERRED_PENDING_GOOGLE_IDENTITY` → 공급자 호스트 전환 검증도 그 해제 이후.
+
+### 21-2. 인증 게이트 — §19-1 관리자 세션 사용자 교체
+
+**판정: 결함 확정(코드 · 이력), 브라우저 재현 미실시**(두 번째 사용자 계정 필요 · 운영 smoke 계정 정지 상태).
+
+- **근본 원인 = 회귀.** 2026-03-13 handoff 설계(3946b17ee)는 쿠키 전략 앱용으로 exchange 에서 쿠키도 내렸다 → 2026-03-17(adb23b828) 앱들이 localStorage 로 바뀌며 `credentials:'include'` 제거 → **2026-09-14(2464f2494) HandoffPage 재작성 때 `credentials:'include'` 재유입**, 이후 lecture · store 가 복사.
+- **노출 호스트 4곳**: neture.co.kr · store · study(같은 사이트) + **pharmacyhub.co.kr**(쿠키 도메인이 `COOKIE_DOMAIN=.neture.co.kr` 폴백 → 서드파티 쿠키 허용 브라우저에서 저장). kpa-society.co.kr · k-cosmetics.site 는 도메인 불일치로 브라우저가 거부.
+- **exchange 쿠키에 의존하는 운영 앱 없음**: 배포 서비스 8개 전부 localStorage + Bearer, admin-dashboard 는 handoff 대상 아님. 유일한 쿠키 의존은 web-account(미배포 · 카탈로그 미등록).
+
+**조치 (a) — 이번에 구현 (프론트만 · API 계약 불변)**
+- 배포되는 HandoffPage 6곳(neture · store · lecture · pharmacy-hub · k-cosmetics · kpa-branch)에서 `credentials:'include'` 제거 → 브라우저가 exchange 응답 쿠키를 저장하지 않는다. web-account 는 쿠키 전략 앱이라 제외.
+- 테스트: `apps/api-server/src/__tests__/handoff-exchange-no-credentials.spec.ts`(7개 HandoffPage 정적 계약 · PASS 7/7) · web-neture `HandoffPage.staleTokenGuard.test.tsx` 에 exchange 요청 `credentials !== 'include'` 단언 추가(PASS 3/3). eslint 오류 0(kpa-branch 기존 경고 1건은 변경 무관).
+- 한계: 이미 배포된 옛 번들 · 앞으로 복사될 페이지에는 효과 없음 → (b) 필요.
+
+**(b) · (c) — 2026-09-26 승인 · 구현 완료(§21-5).** 아래는 승인 전 기록:
+- (b) 서버 `handoff.controller.ts:478` exchange 에서 `setAuthCookies` 제거(body 토큰 응답은 불변). 문서화된 "쿠키 + body 이중" 동작을 바꾸므로 승인 대상. 함께 바꿀 것: 같은 파일 주석 · `unified-store-workspace-handoff.spec.ts:263` 반전 · `representative-entry-return-handoff.spec.ts` 성공 경로 단언 · 신원 아키텍처 문서 문구.
+- (c) admin-dashboard `packages/auth-context/src/AuthProvider.tsx:129-131` — 캐시 사용자와 `/auth/status` 사용자가 다르면 조용히 채택하는 대신 세션 무효화 후 로그인으로(단 `authClient.logout()` 은 호출하지 않는다 — 다른 사용자의 refresh family 를 끊음). 공용 패키지(소비처 admin-dashboard 1곳) · 방어 심층.
+- 쿠키 이름 분리(admin 전용 쿠키) · host-only 쿠키 안은 채택하지 않음(동명 쿠키 공존 시 우선순위 불확정).
+
+**인증 게이트 나머지**
+| 항목 | 상태 |
+|---|---|
+| Store Google 로그인 origin(`https://store.neture.co.kr`) | **미확인** — `WO-O4O-GOOGLE-IDENTITY-STORE-ORIGIN-AND-SMOKE-V1` ACTIVE, CHECK 없음. 콘솔 캡처 필요 |
+| 새 호스트 Google origin · CORS · handoff 대상 | 호스트 구현 단계에서(아래 21-4) |
+| 브라우저 재현(§19-1 절차) | 계정 2개 필요 → 한 계정으로도 가능한 대체 절차: DevTools 에서 `.neture.co.kr` `accessToken` 쿠키 값 · 만료 기록 → 자기 handoff 실행 → 수정 전에는 exchange 응답에 `Set-Cookie … Domain=.neture.co.kr` 가 있고 값이 바뀜, 수정 후에는 없음 |
+
+### 21-3. §19 · §7 결함 재분류 (실행 규칙: 원래 목적 안 → 포함 / 밖 → 사유 기록)
+
+| 결함 | 분류 | 사유 · 처리 |
+|---|---|---|
+| 19-1 관리자 세션 교체 | **포함** | DONE ③. (a) 완료 · (b)(c) 승인 대기 |
+| 19-6 운영자 가드 membership 누락(`/neture/operator/registrations` · 포럼 운영자) | **포함** | DONE ③ "O4O 운영자가 전체 권한을 얻지 않음" · §15 운영자 권한 설계와 같은 작업. API 가드 변경 = 승인 대상 |
+| 19-7 펀딩 `/login?redirect=` 무시 | **포함** | DONE ① 로그인 복귀. 프론트 수정 |
+| 19-3 공급자 가격 저장 시 PH 가격행 삭제 | **포함** | OUT_OF_SCOPE 문구 "현재 기능 보존"의 대상인 PH opt-in 기능을 훼손. Supplier FROZEN 은 버그 수정 허용 |
+| §7-1 화장품 QR 호스트(`cosmetics.neture.co.kr` · `k-cosmetics.neture.co.kr` NXDOMAIN) · KCos 공개 QR route 부재 | **포함** | QR 목적지 = 이 작업의 핵심(DONE ②) |
+| §7-2 상품 QR 기본 호스트 `neture.o4o.kr` | **포함** | 동일 |
+| §7-3 `www.neture.co.kr/hospital` LB 규칙 누락 | **포함** | DONE ④ 비로그인 병원 화면. LB 변경 = 인프라(승인) |
+| §7-5 `platform_services.entry_url` · §7-6 web-store dead QR URL · §7-7 LB/인증서 잔재 | **포함** | URL 정합 |
+| §7-4 메일 MX(수신 미검증) | **포함(검증만)** | 표기 주소가 새 호스트 체계에 남는지 판단 필요. 수신 시험은 사용자 |
+| 19-2 PH 환불 행 선택 · R1 결제 확정 경쟁 | **밖** | 환불은 별도 확정 정책 — `WO-O4O-OFFLINE-REFUND-MANUAL-RECORD-ONLY-V1` 이 처리(410 · R1 설계) |
+| 19-4 공급자가 KPA B2B 주문 미표시 | **밖** | 주문 가시성 문제로 URL 목적과 무관. 현재 영향 0(`neture_orders` kpa-society 0행). PH 흡수 · B 모델 전환 조건(§13-7 ⑤)으로만 추적 — 독립 위험이 현실화(첫 KPA B2B 결제)되기 전 처리 필요, 별도 작업 여부는 그때 판단 |
+| 19-5 매장 상품 라이브러리 전역 승인 누수 · 19-8 bridge 중복 경쟁 | **밖** | 공급 노출 경계(Supplier FROZEN 영역) · fulfillment — URL 목적과 무관. 기록만 |
+| 19-9 · 인증 정리 잔재(swagger `auth.yaml:77` verify-email · `OperatorAssignmentController.ts:2,6` 주석) | **밖(문서)** | 기록물 · 주석 — 보고만 |
+
+### 21-4. 다음 실행 묶음과 필요한 판단
+
+| 묶음 | 내용 | 코드만으로 가능 | 승인 필요 지점 |
+|---|---|---|---|
+| 인증 게이트 마감 | (b) · (c) | — | (b) API 동작 · (c) 공용 패키지 |
+| QR · 호스트 정합(현재 결함) | 화장품 QR 호스트 표 2곳 → 카탈로그 파생 · 상품 QR 기본 호스트 · web-store dead URL · 펀딩 로그인 복귀 | 예 | 없음(프론트 · 서버 내부 계산) |
+| 운영자 권한 | §15 P1(`neture:operator` + `/ops`) 또는 P2 · 19-6 가드 | — | CLOSED 결정 번복 · API 가드 |
+| 호스트 진입 | neture-web 호스트 프로필(supplier · funding · community), 분회 6곳 동시 변경, pharmacy/retail 호스트 | 프론트 준비 가능 | handoff 새 대상(인증) · CORS(API 재배포) · DNS/인증서/LB/Google 콘솔(외부) |
+| 매장 · 커뮤니티 | Store Hub C안 · `/my-store` · 커뮤니티 membership | — | `store-ui-core`(F3) · DB 스키마 · RBAC F9 · ROLE-WORKSPACE V2 |
+| 배포 | 모든 운영 전환 | — | `DEPLOY_ENABLED=false`(2026-09-25T23:02Z 갱신) — 게이트 개방 전 운영 전환 완료 표시 금지 |
+
+### 21-5. 인증 게이트 (b) · (c) 구현 (2026-09-26 사용자 승인 → `5fd971083`)
+
+| 항목 | 내용 | 검증 |
+|---|---|---|
+| (b) 서버 | `handoff.controller.ts` exchange 에서 `setAuthCookies` 제거 — body 토큰만. 변경 전 재확인: 배포 서비스 8개 전부 localStorage, 쿠키 전략은 admin-dashboard 뿐(handoff 대상 아님), web-account 는 배포 workflow · 카탈로그 둘 다 없음 | 계약 테스트: workspace · 대표 진입 성공 경로에서 `setAuthCookies` · `res.cookie` · `Set-Cookie` 헤더 **0**(이미 배포된 HandoffPage 가 `credentials:'include'` 로 호출해도 저장될 쿠키가 없음을 서버 쪽에서 고정) · 정적 가드에 서버 `setAuthCookies` 부재 추가 · 관련 4 suite 66 tests PASS |
+| (b) 문서 | `O4O-IDENTITY-ARCHITECTURE-V3` 승계 표에 "V1 §8 쿠키 설정 · Cookie domain 자동 감지 비승계" 예외 기록 | — |
+| (c) admin | `@o4o/auth-context` AuthProvider: 캐시 사용자 ≠ `/auth/status` 사용자 → 새 사용자 **채택 안 함** · 화면 비움(user=null → 보호 화면 unmount, 이후 API 요청 없음) · 재채택 금지 표식(`admin-session-conflict`) 저장 → 새로고침 후에도 서버 세션 비채택 · **명시적 Google 로그인 성공 · 명시적 logout 에서만 해제** · `logout()` 호출 없음 · 창 포커스/가시성 복귀 때 재대조. 로그인 화면에 세션 변경 안내(`data-testid=session-conflict-notice`) | vitest 6건(교체 감지 · 새로고침 후 비채택 · 회귀 2 · 재로그인 해제 · 포커스 재대조) — CI(`ci-pipeline.yml` auth-context step) PASS. 소비처 = admin-dashboard 1곳(auth-react 는 별도 패키지) |
+| CI | `5fd971083` CI Pipeline success (run 36222991651) | — |
+
+**판정 구분 (요청대로 분리 보고)**
+- 코드 · CI: **PASS**.
+- **운영 브라우저에서 사용자 교체 미재현: 미판정** — `DEPLOY_ENABLED=false` 로 운영 미반영(Deploy 워크플로 build-and-deploy · 서비스별 deploy job 전부 skipped). 배포 후 §21-2 의 한 계정 절차(exchange 응답에 `Set-Cookie` 없음 · `.neture.co.kr` 쿠키 불변) + 두 계정 절차(admin 탭 새로고침 · 포커스 시 안내 화면)로 판정한다.
+- 남는 경로: `google-auth` 로그인 · `/auth/refresh` 는 여전히 `.neture.co.kr` 쿠키를 설정한다(admin 자체 로그인에 필요). 서비스 웹은 이 요청에 credentials 를 싣지 않아 쿠키가 저장되지 않는다(§21-2 분석). 새 호스트도 같은 패턴을 따라야 한다(호스트 구현 시 점검 항목).
+
+### 21-6. QR · 호스트 정합 수정 (승인 불요 묶음)
+
+| 결함 | 수정 | 검증 |
+|---|---|---|
+| §7-1 화장품 QR 호스트(`cosmetics.neture.co.kr` NXDOMAIN) — 다국어 · 제휴 QR | 파일별 호스트 표 2곳 삭제 → `getServicePublicOrigin()`(카탈로그 + `resolveCanonicalServiceKey` alias) 파생. kpa · pharmacy-hub 값 불변, cosmetics → `https://k-cosmetics.site` | api spec 13건 PASS(alias 6종 · 미지 키 · 제휴 URL · 하드코딩 재유입 금지) |
+| §7-1 Neture 공급자 대시보드 `k-cosmetics.neture.co.kr` | 카탈로그 파생 | 동일 spec |
+| §7-2 상품 QR/전단 기본 호스트 `neture.o4o.kr` | 서버: `getServiceOrigin('neture')` · `PUBLIC_DOMAIN`(미설정) 의존 제거 / 프론트 `SellerQRGuidePage` → `https://neture.co.kr` | 동일 spec |
+| §7-6 web-store 가 store 호스트로 `/qr` · `/tablet` URL 생성(열리지 않음) | `SERVICE_PUBLIC_ORIGIN` · `getActiveServicePublicOrigin()` 추가, QR 복사 · 미리보기 · 운영 보드 링크 · 태블릿 URL · 태블릿 설정 URL 을 활성 서비스 공개 origin 으로. 미설정 `VITE_KPA_WEB_ORIGIN` 의존 제거 | web-store tsc 0 |
+| §19-7 펀딩 로그인 복귀 | `lib/loginReturnPath.ts` — `state.from` → `?returnUrl` → 레거시 `?redirect` 순, 같은 origin 상대 경로만 허용(`//` · `/\` · 절대 URL 거부). 펀딩 화면 5곳 `?returnUrl=` 로 정정 | vitest 5건 PASS · web-neture tsc 0 |
+
+**남은 것 (이 묶음에서 코드로 끝나지 않음)**
+- 화장품 앱에 공개 route(`/qr/:slug` · `/multilingual-products/:publicKey` · `/foreign-visitor/affiliate/:shortCode` · `/tablet/setup`)가 **없다** → 호스트는 맞아졌지만 착지 화면이 없다. PH 판(가장 작음)을 옮기거나 `store-ui-core` 로 공통화 필요 — 소매 호스트(`retail.neture.co.kr`) 구현 묶음에서 함께 처리(현재 화장품 활성 QR 0 · 다국어/제휴 0).
+- 이미 저장된 제휴 QR `landing_url` 은 운영 0행이라 데이터 조치 불필요(§3 Q2).
+- 공급자 대시보드의 화장품 `ordersPath=/supplier/orders` 는 화장품 앱에서 RoleNotAvailable 화면 — 경로 자체는 공급자 호스트 설계(§16)에서 정리.
+- 배포 전이므로 운영 반영 **미반영**(`DEPLOY_ENABLED=false`).
+
+### 21-7. O4O 운영자 권한 — P2 설계 (2026-09-26 사용자 지시: P2 기준, super_admin 비부여)
+
+**원칙**: `neture:operator` 의 넓은 서버 권한을 `/ops` 메뉴에서 숨기는 방식은 쓰지 않는다. 실제 O4O 운영 업무 API 에만 접근하는 **별도 역할**을 만든다.
+
+#### 21-7-1. 권한표 (허용 = 새 역할 접근, 제외 = 접근 불가)
+
+| 업무 | API (현재 가드) | 새 역할 | 비고 |
+|---|---|---|---|
+| 공급자 승인 · 관리 | `/api/v1/neture/operator/suppliers*` 12개(읽기 6 · 쓰기 6: 목록 · 대기 · 일괄 · 문서 다운로드 · 규제 카테고리 · 기본정보 수정 · 승인 · 반려) — `requireNetureScope('neture:operator')` | **허용** | `GET /suppliers/:id/onboarding` 호출처 없음 |
+| 공급자 비활성/재활성(governance) | `/api/v1/neture/admin/suppliers/*/deactivate · reactivate` — `neture:admin` | **제외(결정 필요)** | 현재 운영자보다 상위 등급 |
+| 펀딩 승인 · 운영 | `/api/v1/neture/operator/market-trial*` 17개(목록 · KPI · 상세 · 참여자 · 상태 · 승인 · 반려 · 포럼 동기화) — `neture:operator` | **허용** | 단 참여자 `settlement-status` · `payment-status`(:118 · :120) 는 **결정 필요**(정산 제외 원칙과 겹침) |
+| 커뮤니티 운영(포럼) | `/api/v1/forum/operator/*`(serviceCode=neture) — 요청 검토 · 일괄 검토 · 삭제 요청 처리 · 카테고리 수정/비활성/활성 · 분석 — `isServiceOperator` (역할만, membership 미확인) | **허용** | **`DELETE /categories/:id/hard`(영구 삭제) 제외** |
+| 포럼 관리자(복원 · 영구삭제 · 감사로그) | `/api/v1/forum/admin/*` — `neture:admin` | 제외 | |
+| 가입 신청 승인 | `/api/v1/neture/operator/registrations*`(목록 · 승인 · 반려 · 메모 · 일괄) — `requireRole` 목록(membership 미확인) | **결정 필요** | 승인이 `neture:supplier` 역할 부여 + 공급자 행 생성 → 사실상 공급자 온보딩. `/registrations/copilot`(AI) 제외 |
+| 커뮤니티 회원 승인(독립 커뮤니티) | **API 없음**(§18 미구현) | 설계 시 허용 대상 | 커뮤니티 membership 구현과 함께 |
+| 회원 · 매장 · 주문 · 상품 승인 · 홈 CMS · 광고/스폰서 · 서비스 약관/문의 · cafe24 · 정산 · AI | 각 `neture:operator`/`neture:admin` | **제외** | 새 역할은 어떤 기존 exact-match 역할 목록에도 들어가지 않는다 |
+
+#### 21-7-2. 안 비교 → 권고
+
+| 안 | 내용 | F9 · F11 대조 | 판정 |
+|---|---|---|---|
+| **Z. `neture:o4o_operator`** (새 역할 · 기존 서비스 키 `neture`) | 로컬 scope 설정 `o4o-operator-scope.middleware.ts`(`createMembershipScopeGuard` 재사용, `scopeRoleMapping['neture:o4o_ops'] = [o4o_operator, operator, admin]`) 를 위 허용 API 에만 적용 | F9 §4: ① `UserRole` 상수 ② `operator-assignment.service`(→ `assignRole`) 로만 부여(두 operator-role-catalog 동기 테스트 존재) ③ 가드 = 로컬 설정 ④ `RBAC-ROLE-CATALOG-V1` 갱신 ⑤ security-core 동결이라 **로컬 설정 예외**(pharmacy-hub · lecture 선례, 카탈로그 :88-91). F11: 부여 시 `service_memberships('neture')` active 자동 보장 · 스코프 가드가 DB 에서 membership 확인. **포럼 · 가입 경로는 역할만 보므로 새 역할에는 membership 확인을 추가**(설정 표 방식, 서비스별 inline 분기 금지) | **권고** — 새 ServiceKey · `platform_services` 행 · security-core/`@core` 변경 0 |
+| Y. `o4o:operator` (새 서비스 키 `o4o`) | 새 ServiceKey · scope config · `service_memberships('o4o')` · `platform_services('o4o')` · 라우트마다 역할별 가드 분기 | 새 서비스 정체성 = 구조 변경(F11 §9 · CLAUDE.md 인프라 목록). `o4o→neture` alias 는 역맵을 깨므로 불가 | 비권고(범위 · 위험 큼) |
+
+- 가드 결합 주의: Express 미들웨어는 AND 라 "기존 가드 OR 새 가드"를 쌓을 수 없다 → 허용 라우트의 라우터 가드를 **하나의 설정**(두 역할 집합을 모두 받는)으로 교체한다. `NETURE_SCOPE_CONFIG` 의 `neture:operator` 매핑에 새 역할을 넣으면 14개 이상 컨트롤러로 번지므로 금지.
+- **선결 구조 문제**: `neture.routes.ts` 에서 운영자 대시보드 라우터(:171)가 `/operator` 전체에 `requireNetureScope('neture:operator')` 를 걸고 먼저 마운트된다 → 새 역할은 공급자 · 가입 라우트에 닿기 전에 403. 공급자 · 가입 컨트롤러를 먼저 마운트하고 가드를 경로 한정으로 바꿔야 한다(모든 `/operator/*` 순서에 영향).
+
+#### 21-7-3. 변경 목록 (Z 기준 · 구현 시)
+
+- API: 새 `middleware/o4o-operator-scope.middleware.ts` · `operator-supplier.controller.ts`(경로 한정 가드) · `neture.routes.ts`(마운트 순서) · `market-trial-operator.routes.ts` · `operator-registration.controller.ts` · `operator-forum.routes.ts`(새 역할 + membership · 영구삭제 거부) · `types/auth.ts` `UserRole` · `types/roles.ts` · `config/operator-role-catalog.ts`.
+- **DB**: `roles` 에 `('neture:o4o_operator', service_key 'neture', role_key 'o4o_operator', is_assignable, not admin)` seed migration(`ON CONFLICT DO UPDATE`) — **migration = 중지 조건**.
+- admin-dashboard: `lib/operator-role-catalog.ts` + 동기 테스트 · `/ops/*` 형제 경로(기존 `/*` platform floor 문자열 불변) · 운영자 메뉴(deny-by-default) · `AdminProtectedRoute` 에 membership 확인 · 역할별 착지 · 회귀 테스트 4개 개정(**`/ops` 진입 범위에서만**: `/ops` 는 새 역할+membership 허용 · `kpa:*` 거부 · platform 메뉴는 여전히 platform 전용).
+- 문서: `RBAC-ROLE-CATALOG-V1`(로컬 설정 예외 · 새 역할) · CLOSED 결정 2건(`WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS…` · IA 재편 CHECK)에 `/ops` 예외 기록.
+- 테스트: 새 역할 403 확인(`/operator/dashboard` · members · stores · 상품 승인 · 포럼 영구삭제 · `/api/v1/admin/*`) · `neture:supplier` 가 새 scope 에 403 · 기존 `neture:operator` 동작 불변.
+
+#### 21-7-4. 실행 전 사용자 결정 (중지 조건)
+
+1. 안 Z 채택 · 역할 이름(`neture:o4o_operator`) · **roles seed migration** 승인.
+2. `/operator/*` 마운트 순서 변경 승인(선결 구조 문제).
+3. 공급자 governance(비활성/재활성, 현재 `neture:admin`) 포함 여부.
+4. 펀딩 참여자 정산 · 결제 상태 변경(:118 · :120) 포함 여부.
+5. 가입 신청 승인(= 공급자 역할 부여) 포함 여부.
+6. 포럼 영구 삭제를 새 역할만 막을지, 기존 `neture:operator` 에게도 막을지.
+7. admin-dashboard `/ops` 개방(CLOSED 결정 · 회귀 테스트 범위 개정) — 지시상 허용 범위이나 구현 착수 확인.
+
+### 21-8. 방향 변경 기록 — 서브도메인 이전 우선 (2026-09-26 사용자 지시)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | INITIAL_PURPOSE 그대로(흩어진 기능을 확정 URL 체계에 배치 · 기존 QR · 인증 · 주문 경로 보존) |
+| 현재 발견 | P2 운영자 역할은 roles migration · `/operator/*` 마운트 순서 · CLOSED 결정 번복 등 결정 7건이 남아 있다(§21-7-4). 반면 새 호스트는 전부 NXDOMAIN 이고 `neture.co.kr/supplier` 만 열린다 |
+| 변경 이유 | 사용자가 **서브도메인 이전을 먼저** 진행하도록 우선순위를 바꿨다. 목표는 새 주소에서 기존 기능에 실제 진입 · 사용 가능한 상태(빈 진입 화면은 완료 아님) |
+| 원래 목적과의 관계 | 같은 목적의 실행 순서 변경. P2 운영자 역할 · `/ops` 는 서브도메인 안정화 뒤 **같은 TODO 의 다음 순서** |
+| 범위 확대 | **NO** — 오히려 이번 단계에서 `neture:o4o_operator` · roles migration · `/ops` · 운영자 등록 변경 · 공급자 경계 재설계 · PH 고유 기능 일괄 이관 · 환불 자동화를 제외 |
+| 완료 기준 변경 | **NO** — DONE_CRITERIA 유지. 커뮤니티 별도 가입 · 매장 다중 서비스 데이터는 "주소 이전과 연결된 후속 기능"으로 남은 조건 표시(동작하지 않는 기능을 이전 완료로 표시하지 않음) |
+
+**실행 순서(지시)**: ① 경로 대응표 확정 ② 공급자 · 펀딩 ③ 약국 · 소매 · 분회(`/kpa/tablet/*` · `/kpa/store/*` 보존, 소매 공개 QR 은 실제 열리는 경로만) ④ 커뮤니티 · 매장 링크 ⑤ 호스트별 DNS · 인증서 · LB · CORS · Google origin · handoff · 로그인 복귀(Store Google origin 미확인 상태로 로그인 PASS 금지) ⑥ 옛 주소 경로별 보호(일괄 301 금지).
+**보고 구분**: 코드/CI · DNS/콘솔 설정 · 운영 배포 · 브라우저 실측. `DEPLOY_ENABLED=false` 동안 운영 이전 완료 판정 없음.
+
+### 21-9. 서브도메인 이전 ① 대응표 · ② 공급자 · 펀딩 (2026-09-26)
+
+**출발 상태(실측 §2-1)**: `neture.co.kr/supplier` · `/market-trial` 정상, `supplier.neture.co.kr` · `funding.neture.co.kr` 은 NXDOMAIN(서비스 없음).
+
+#### 대응표 — 공급자 · 펀딩 (나머지 호스트는 §4 행 그대로, 착수 시 이 형식으로 확정)
+
+| 현재 | 새 호스트 | 처리 | 세션 · 인증 |
+|---|---|---|---|
+| `neture.co.kr/supplier` (랜딩) · `/supplier/*` (약 40, `SupplierRoute`) · `/supplier/forum*` 레거시 deep-link · `/account/supplier/*` · `/workspace/*` | `supplier.neture.co.kr` — **경로 형태 그대로**(`/supplier/...`), `/` → `/supplier` | 같은 번들 재사용 · 호스트 경계(`HostBoundary`) | 호스트별 localStorage — 새 호스트에서 Google 로그인 필요(아래 게이트) |
+| `neture.co.kr/market-trial` · `/market-trial/my` · `/market-trial/:id` | `funding.neture.co.kr` — 경로 그대로, `/` → `/market-trial` | 동일 | 참여는 로그인만 필요(`market-trial.routes.ts:33`) |
+| 공급자 호스트에서 소유하지 않은 경로(`/operator` · `/admin` · `/guide` · `/forum` · `/store` · `/` 외 전부) | → `https://neture.co.kr` 같은 경로 · 쿼리 · 해시 | 전체 이동(내부 링크 약 135개 수정 불요) | 대표 호스트 세션 필요 |
+| 모든 새 호스트의 `/handoff` · `/login` · `/register*` · `/terms` · `/privacy` · `/contact` · `/mypage*` | 그 호스트에서 그대로 | — | 그 호스트 세션 |
+| 대표 호스트 `neture.co.kr/supplier*` · `/market-trial*` 옛 링크 · 알림 `targetUrl`(상대경로) | **당분간 대표 호스트에서 그대로 동작**. 새 호스트 검증 후 빌드 플래그(`VITE_HOST_CUTOVER_SUPPLIER` / `_FUNDING`)로만 경로 · 쿼리 보존 이동 | 일괄 301 아님 · 앱 단 전환 | — |
+| 공급자 운영 승인(`/operator/suppliers` · `/operator/market-trial`) | 대표 호스트 유지 | — | P2 운영자 역할은 다음 순서 |
+
+#### 구현 (코드)
+
+- `services/web-neture/src/lib/hostProfile.ts` — 호스트 판정 · 소유/공유 경로 · 판정 함수 · cutover 플래그(기본 꺼짐).
+- `services/web-neture/src/components/HostBoundary.tsx` — `<Routes>` 를 감싸 판정 적용(route 선언 · 경로 불변).
+- API CORS 에 목표 호스트 5개 추가(`supplier` · `pharmacy` · `retail` · `kpa` · `community` `.neture.co.kr`, `funding` 은 기존). 정확 origin 만 · 와일드카드 0 · `partner` 는 예약이라 제외. 쿠키 도메인은 `.neture.co.kr` 자동 판정이라 변경 불요.
+- 테스트: web-neture vitest 11건(호스트 판정 · 소유/공유 · 교차 이동 쿼리 보존 · 접두만 같은 경로 · cutover 플래그) · CORS 계약 spec PASS · web-neture tsc 0.
+- Supplier FROZEN 기준 준수: 공급자 호스트에 운영자 · 커뮤니티 · Store 기능 신설 없음(소유하지 않은 경로는 대표 호스트로), `/supplier/forum*` 경로 · 리다이렉트 체인 변경 없음, 펀딩 명칭 "유통참여형 펀딩" 변경 없음.
+
+#### 남은 게이트 (공급자 · 펀딩 호스트)
+
+| 게이트 | 내용 | 주체 | 상태 |
+|---|---|---|---|
+| DNS | Gabia A 레코드 `supplier` · `funding` → `[REDACTED_IP]` | 사용자(Gabia) | 미실시 |
+| 인증서 | 호스트별 **별도** 관리형 인증서 + cert map entry(`cm-cert-neture-v2` 13도메인 묶음에 추가 금지 — §2-2) | gcloud(운영 인프라 변경) | **승인 대기** |
+| LB | URL map host rule `supplier.neture.co.kr` · `funding.neture.co.kr` → 기존 `backend-neture-web-http`(새 backend · NEG 불요) | gcloud(운영 인프라 변경) | **승인 대기** |
+| Google JS origin | `https://supplier.neture.co.kr` · `https://funding.neture.co.kr` 추가 | 사용자(GCP 콘솔) | 미실시 · Store origin 도 **미확인** |
+| 배포 | neture-web · API(CORS) | `DEPLOY_ENABLED=false` | 미반영 |
+| 대표 → 새 호스트 로그인 이어받기 | 현재 handoff 는 neture 대표 진입이 `returnPath='/'` · origin `neture.co.kr/www` 고정이라 새 호스트로 세션을 옮길 대상이 없다 → 새 호스트에서 직접 Google 로그인은 가능 | handoff 새 대상 추가 = **인증 API 계약 변경(중지 조건)** | 결정 필요 |
+| SEO | 새 호스트가 전체 사이트와 같은 `robots.txt` · sitemap 을 서빙(소유하지 않은 경로는 이동하므로 중복 색인은 제한적) · 호스트별 canonical 은 미구현 | — | 기록 |
+| 브라우저 실측 | 직접 접속 · 새로고침 · 로그인 · 복귀 · 핵심 업무(공급자 대시보드 · 상품 · 주문 / 펀딩 목록 · 상세 · 참여) | — | 배포 후 |
+| 공급자 실계정 | Supplier 기준 §10 `DEFERRED_PENDING_GOOGLE_IDENTITY` — 실제 공급자 로그인 smoke 는 그 해제 뒤 | — | 차단 |
+
+**인증서 · LB 실행 절차(승인 후 · 선례 = store · study)**
+```
+gcloud certificate-manager certificates create cm-cert-supplier-v1 --domains=supplier.neture.co.kr
+gcloud certificate-manager maps entries create cm-entry-supplier --map=o4o-main-cert-map --certificates=cm-cert-supplier-v1 --hostname=supplier.neture.co.kr
+gcloud certificate-manager certificates create cm-cert-funding-v1 --domains=funding.neture.co.kr
+gcloud certificate-manager maps entries create cm-entry-funding --map=o4o-main-cert-map --certificates=cm-cert-funding-v1 --hostname=funding.neture.co.kr
+gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.neture.co.kr,funding.neture.co.kr --path-matcher-name=path-matcher-neture
+```
+- 관리형 인증서는 DNS 가 LB IP 를 가리켜야 발급된다 → DNS 선행. 발급 전까지 HTTPS 불가.
+- 원복: host rule 제거(`url-maps remove-host-rule`) · map entry 삭제. 기존 호스트 · 인증서 영향 0.
+
+### 21-10. 여섯 호스트 인프라 · 코드 (2026-09-26 · 사용자 지시 "서브도메인 이전 계속")
+
+#### DNS · 인증서 · LB (운영 인프라 — 사용자 승인 범위)
+
+| 호스트 | 공개 DNS(8.8.8.8 · 1.1.1.1) | 인증서(별도 · 관리형) | LB 연결 | HTTPS 실측 | 현재 서빙 |
+|---|---|---|---|---|---|
+| supplier.neture.co.kr | [REDACTED_IP] | `cm-cert-supplier-v1` **ACTIVE** | host rule → `path-matcher-neture` → neture-web | 200 | 운영 neture-web(`14587a9ad`) — 새 호스트 코드 **미배포**라 O4O 홈이 보인다 |
+| funding.neture.co.kr | 〃 | `cm-cert-funding-v1` ACTIVE | 〃 | 200 | 〃 |
+| community.neture.co.kr | 〃 | `cm-cert-community-v1` ACTIVE | 〃 | 200 | 〃 |
+| pharmacy.neture.co.kr | 〃 | `cm-cert-pharmacy-v1` ACTIVE | **새 matcher** `path-matcher-pharmacy` → kpa-society-web(`/kpa` 분회 규칙 없음) | 200 | KPA 앱 그대로(호스트 비의존 확인) |
+| retail.neture.co.kr | 〃 | `cm-cert-retail-v1` ACTIVE | host rule → `path-matcher-k-cosmetics` | 200 | K-Cosmetics 앱 그대로(호스트 비의존 확인) |
+| kpa.neture.co.kr | 〃 | `cm-cert-kpa-v1` ACTIVE | **새 matcher** `path-matcher-kpa-host` → kpa-branch-web | 200 · `/kpa/assets/*` 200 | 분회 앱 — 운영 버전은 이 호스트를 자체 도메인으로 오판(수정 코드 **미배포**) |
+
+- 기존 13도메인 인증서(`cm-cert-neture-v2`) 수정 0. 변경 전 URL map export 백업(세션 scratchpad `urlmap-before-20260926.yaml`). 원복 = 추가한 host rule · path matcher · map entry 삭제.
+- 변경 직후 기존 호스트 회귀: neture · www · admin · store · study · kpa-society · k-cosmetics · pharmacyhub `/` 200, `neture.co.kr/hospital` 200, `kpa-society.co.kr/kpa/` · `/kpa/tablet/x` 200, `pharmacyhub.co.kr/qr/x` 200, API `/health` 200. **옛 `/kpa/tablet/*` · `/kpa/store/*` 규칙 변경 없음.**
+
+#### 코드 (이번 커밋)
+
+- web-neture: `/` 를 호스트별 대표 화면으로 **직접 렌더**(supplier = `SupplierLandingPage`, funding = `MarketTrialHubPage`, community = 커뮤니티 진입 화면) — 리다이렉트 없음. `community` 호스트 프로필: `/pharmacist` → `pharmacy.neture.co.kr/forum`, `/retail` → `retail.neture.co.kr/forum`(현재 동작하는 각 서비스 포럼으로 연결). vitest 15건.
+- web-kpa-branch: `PLATFORM_HOSTS` 에 `kpa.neture.co.kr` — `kpa.neture.co.kr/{분회}` root 진입. 옛 `kpa-society.co.kr/kpa/{분회}` 판정 · `/kpa` asset base 불변. 정적 계약 spec 2건.
+- pharmacy · retail: 앱 코드 변경 불요(호스트 의존 코드 없음 — `@k-cosmetics.site` 메일 표기만).
+- 서비스 키 · role prefix · `service-catalog` 도메인 **변경 없음** — 새 호스트 검증 전까지 handoff 대상 · 새 QR 인쇄 호스트는 옛 도메인 유지(옛 QR 보호).
+
+#### 커뮤니티 · Store 표시 기준
+
+- `community.neture.co.kr/pharmacist` · `/retail`: **주소 진입 연결(부분)** — 실제 활동은 각 서비스 포럼. 독립 커뮤니티 가입 · 승인은 **미구현**(§18) → 완료로 표시하지 않는다.
+- `store.neture.co.kr/hub` · `/my-store`: `/hub` 는 기존 동작, `/my-store` 는 **미구현**(현재 `/store`), 다중 서비스 데이터 통합 미구현(§17) → 완료로 표시하지 않는다.
+
+#### 새로 드러난 선결 조건 — handoff 대상 추가는 DB 변경을 요구한다
+
+- 승인된 "공급자 · 펀딩 handoff 대상 추가"는 작업공간 대상을 늘리는 방식인데, `handoff_tokens` 의 CHECK 제약이 `target_workspace = 'store'` 만 허용한다(`1789974015939-AlterHandoffTokensTargetWorkspace.ts:29-33`) → **제약 변경 migration 필요 = 중지 조건(DB schema)**. 코드는 아직 넣지 않았다.
+- 제안: incremental migration 으로 제약을 `target_workspace IN ('store','supplier','funding')` 로 교체(+ `expected-schema-states` · ledger spec 같은 커밋), `HANDOFF_WORKSPACES` 확장, 대상별 exchange origin lock(`supplier.neture.co.kr` · `funding.neture.co.kr` 정확 일치), 대상 URL 생성, Neture 에서 공급자 · 펀딩으로 가는 진입 링크를 handoff 로. 원복 = 이전 제약으로 되돌리는 down migration.
+- 이 전까지: 새 호스트에서 **직접 Google 로그인**은 가능(Google 승인 원본 등록 전제).
+
+### 21-11. 통제 배포 준비 · handoff migration 설계 (2026-09-26 사용자 판정)
+
+**판정(사용자)**: 서브도메인 코드 `236c22dfc` 를 먼저 통제 배포(조건부 승인 — Google 원본 확인 · 배포 직전 SHA/CI/revision 점검 선행, `303221b8b` Supplier 동결 포함 범위), handoff 제약 변경 migration 은 **같은 TODO 의 다음 단계**로 구현 · 운영 적용은 검토 후. 첫 배포(migration 0건)와 DB 변경의 판정은 분리한다.
+
+#### 배포 선행 조건 — Google 승인 원본
+
+| 원본 | 상태 | 근거 |
+|---|---|---|
+| `https://supplier.neture.co.kr` · `https://funding.neture.co.kr` · `https://community.neture.co.kr` · `https://pharmacy.neture.co.kr` · `https://retail.neture.co.kr` · `https://kpa.neture.co.kr` | **미확인** | GCP 콘솔(OAuth 웹 클라이언트) 화면은 gcloud 로 조회 불가 · 이 세션에 브라우저 도구 없음. Google `checkOrigin` 공개 엔드포인트는 등록된 `neture.co.kr` 까지 모두 403 → 증거로 쓸 수 없음 |
+| `https://store.neture.co.kr` | **미확인**(기존) | 동일 |
+
+→ **사용자 콘솔 확인 · 누락분 등록 · 캡처(또는 실제 로그인 결과) 전까지 배포 보류.** 등록 완료로 추정하지 않는다.
+
+#### 배포 직전 점검 절차 (조건 충족 시)
+
+1. `git fetch` → `origin/main` 이 `236c22dfc` 인지 확인. **다르면 중지** — 게이트를 연 동안의 push 는 곧바로 배포된다(push 트리거). 현재 작업트리에 다른 세션의 미커밋 변경(ai-tools · package.json · lockfile)이 있어, 게이트 개방 중 push 가능성을 사용자와 확인한다.
+2. `236c22dfc` CI success 확인(run 36228186534 ✔).
+3. 서비스별 현재 revision · 이미지 태그 기록(원복 대상 = `14587a9ad` 이미지 revision).
+4. `gh variable set DEPLOY_ENABLED --body true` → API workflow dispatch(main) → 배포 3신호(job 실행 · revision 생성 · traffic 100%) 확인 → API 회귀 smoke(`/health` · 기존 로그인 경로 · exchange 응답에 `Set-Cookie` 없음).
+5. 웹 앱 순서 dispatch: neture-web → kpa-branch-web → store-web · k-cosmetics-web · lecture-web · pharmacy-hub-web → o4o-admin-dashboard. 각 단계 기존 호스트 · 새 호스트 실측.
+6. 감시: 같은 시간대 다른 서비스 자동 추종 · 재실행(deploy-web concurrency 상호 취소 주의).
+7. 종료: `gh variable set DEPLOY_ENABLED --body false` → 확인.
+8. 회귀 시: 해당 서비스 `gcloud run services update-traffic <svc> --to-revisions=<이전 revision>=100`.
+9. cutover 플래그(`VITE_HOST_CUTOVER_SUPPLIER` / `_FUNDING`)는 **꺼 둔 채** 배포.
+
+#### handoff 제약 변경 migration — 설계 (구현 승인 · 운영 적용은 검토 후)
+
+**왜 지금 파일을 main 에 넣지 않는가**: 이 저장소는 API 배포 Job 이 migration 을 자동 실행한다. `236c22dfc` 배포 전에 migration 이 main 에 들어가면 첫 배포(= main 기준 dispatch)에 DB 변경이 섞인다. → **첫 배포 완료 후** migration 커밋을 올린다(사용자 지시 "섞지 말 것").
+
+| 항목 | 내용 |
+|---|---|
+| 파일 | `apps/api-server/src/database/migrations/<ts>-ExtendHandoffTokensWorkspaceTargets.ts` + `database/incremental/manifest.ts` 등록 |
+| up | `DROP CONSTRAINT "CHK_handoff_tokens_target_kind"` → 재생성: `(target_service_key IS NOT NULL AND target_workspace IS NULL) OR (target_service_key IS NULL AND target_workspace IS NOT NULL AND target_workspace IN ('store','supplier','funding'))` — `store` 보존, 두 값만 추가, 임의 문자열 금지 · 둘 다 NULL 차단 유지 |
+| down | ① `DELETE FROM handoff_tokens WHERE target_workspace IN ('supplier','funding')` (단일 사용 · 60초 TTL 토큰이라 소비 · 만료된 행은 효력 없음) ② 제약을 `'store'` 전용으로 재생성. **①이 없으면 새 대상 토큰 행이 남아 있는 한 down 이 CHECK 위반으로 실패한다** |
+| 원복 운영 조건 | 새 대상 토큰 발급 중단(코드 원복 배포 또는 해당 진입 비활성) → 60초 + 여유 대기 → 미사용 새 대상 토큰 0 확인(`SELECT count(*) … WHERE target_workspace IN ('supplier','funding') AND consumed_at IS NULL AND expires_at > now()`) → down 실행. 정리 job(`expires_at < now() - 1h` 삭제)이 이미 있다(`handoff-token.service.ts:187`) |
+| 코드 | `HANDOFF_WORKSPACES = ['store','supplier','funding']` · 대상별 exchange origin 정확 일치(`supplier.neture.co.kr` · `funding.neture.co.kr`, 비프로덕션 localhost) · 대상 URL `https://{host}/handoff?token=&returnTo=` · 대상 자격(공급자 = 활성 neture membership + 공급자 역할, 펀딩 = 인증 사용자) — 기존 store 자격 규칙 불변 |
+| 스키마 기대 상태 | `expected-schema-states.ts` 에 새 fingerprint — baseline 2026-09-18-id685 fresh bootstrap + incremental 전체를 **격리 PostgreSQL 15** 에서 산출(운영 DB fingerprint 채택 아님) · ledger spec · agent 테스트 같은 커밋 |
+| 계약 테스트 | 제약: `store` · `supplier` · `funding` 허용, 임의 값 · 둘 다 NULL 거부 / exchange: supplier 토큰을 funding · store · neture origin 에서 교환 → 401 / 기존 store · 서비스 handoff 회귀 0 / down 이 새 대상 행 삭제 후 성공 |
+| 운영 적용 | 배포 Job 자동 실행(CI/CD 원칙). 적용 전 사용자에게 migration · 영향 · 원복 결과 제시 |
+
+### 21-12. 방향 변경 기록 — Store 완료 기준 확정 (2026-09-26 사용자 지시)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | INITIAL_PURPOSE 그대로 |
+| 새 발견 | 이전 정리(§21-10 · §21-11)가 Store 를 "`/my-store` 구현 여부"로만 다뤄 범위를 좁혔다 |
+| 변경 이유 | 사용자 정정: **`store.neture.co.kr` 은 각 서비스에 흩어진 `/store` 와 `/store-hub` 를 하나로 모으는 통합 매장 공간**이다. `hub` = 가입한 서비스가 매장에 제공하는 기능, `my-store` = 경영자의 매장 화면. 한 매장이 여러 서비스에 가입한 경우 무엇을 합쳐 보여줄지는 기획 원칙(§9 C안 혼합형 등)에 따른다 |
+| 원래 목적과의 관계 | INITIAL_PURPOSE 의 "매장 Hub 와 내 매장의 경계를 코드와 주소에서 일치" 그 자체 — 같은 목적 |
+| 범위 확대 | **YES(명시)** — 서브도메인 배포 후에도 기존 서비스별 매장 경로(KPA `/store` ~70 · `/store-hub` / KCos `/store` ~55 · `/store-hub` / PH `/store-owner` ~37 · `/store-hub`)의 기능 · 연결 확인과 통합 매장 공간으로의 이전이 같은 TODO 에 포함된다 |
+| 완료 기준 변경 | **YES** — DONE_CRITERIA ④-2 추가: Store 이전 완료 = 기존 경로 기능 · 연결 확인 + 통합 매장 공간 이전. `store.neture.co.kr` 이 열리는 것만으로 완료 판정 금지 |
+
+- 이번 서브도메인 배포(`236c22dfc` 코드)에서 Store 는 **미완료**로 표시한다.
+- 이전 작업의 출발점은 §17(Store Hub C안 · `/my-store` 설계)의 한계 6건: 선택 매장 미전달(organizationId) · 공통 화면의 단일 서비스 API 의존 · PH 경로 형태 불일치(404) · KCos 마운트 부재 · 서비스 키 데이터(POP · 블로그 · 동영상 · 다국어 · 사이니지) 통합 방식 · KPA enrollment 누락 가능 — 그리고 테스트 매장(복수 서비스 가입) 준비 방식 결정.
+- 서비스 앱 쪽 진입 플래그 `VITE_UNIFIED_STORE_HANDOFF` 는 현재 3앱 모두 `false` — 통합 매장 공간으로 옮길 때 경로별로 연다.
+
+### 21-13. 매장 `/store` 위치 이전 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+**대상**: 각 서비스의 **매장 경영자용 `/store` 화면과 그 진입**. 제외: `/store-hub` · PH `/store-owner` · 공개 · 기기 경로(아래) · 통합 `/hub`/`/my-store` 설계 · 데이터 병합 · 다중 서비스 표시 방식.
+**판정 분리**: 이 단계 = "`/store` 위치 이전". "Store 통합 리팩토링"(DONE ④-2)과 별개로 판정한다 — 이 단계가 끝나도 Store 전체 완료로 표시하지 않는다.
+
+#### 조사 결과 — 구현 방향을 바꾼 사실
+
+| 사실 | 근거 | 영향 |
+|---|---|---|
+| web-store `/store/*` 화면은 **KPA 페이지의 파일 복사본**(대부분 동일, 일부 링크 · prefix 만 수정). 패키지 공유는 `StoreProductsManagerPage` 1개뿐 | `services/web-store/src/pages/pharmacy/*` ↔ `services/web-kpa-society/src/pages/pharmacy/*` | **KPA 는 같은 화면으로 이전 가능** |
+| 공통 `/store/*` 는 서비스를 지정할 수 없다 — 문맥이 우선순위(KPA → KCos → PH)로만 정해짐 | `lib/serviceContext.ts` · `StoreContext.tsx` | 서비스별 경로를 위해 **서비스 고정** 필요 |
+| web-store 가 KPA 의 owner-only 가드를 빠뜨림(`my-products` · `handled-products` · `commerce/local-products` · `products/multilingual/*`) | KPA `PharmacyOwnerOnlyGuard` | 권한 동작 보존을 위해 복원 필요 |
+| **K-Cosmetics**: web-store 의 `/store/*` 는 KCos 화면이 아니라 KPA 화면을 `cosmetics` prefix 로 렌더 — KCos owner 화면 **11개 대응 없음**(cockpit 홈 · channels · 외국인 판매 · settings · info · recruitment-applications · 상품 marketing/pop · POP 라이브러리 · 제작물 목록/새로), 여러 화면이 cosmetics 에 없는 API 호출(`/pharmacy/info` · `/store-assets` · 동영상 staff) · 사이니지 미디어/스케줄은 `kpa-society` 하드코딩 | web-store `App.tsx` · KCos `App.tsx` 대조(이 절 요약) | KCos 는 **링크만으로 옮길 수 없다** — KCos 자체 화면 코드를 web-store 로 옮기는(porting) 작업이 필요 |
+| 옛 handoff 경로 표(`unifiedStoreHandoff.ts` RULES)의 일부 대상이 web-store 에 없음(KPA `/store/dashboard` · `/store/products` · `/store/orders` · `/store/channels/tablet` · `/store/settings/layout|template`, KCos 다수) | store-ui-core(F3 동결) | 전환 시 해당 경로는 404 — 전환 전 보완 대상 |
+
+**방향 기록**: 원래 목적(서비스별 매장 화면을 store 호스트로) 불변 · 범위 확대 없음 · 완료 기준 불변. 단 **서비스별 순서**로 진행한다 — KPA(같은 화면 이전) 먼저, KCos(화면 porting)는 다음. PH `/store-owner` 는 이번 대상 아님.
+
+#### 구현 (KPA · 코드)
+
+- **web-store**
+  - 서비스 지정 매장 화면 `store.neture.co.kr/work/kpa-society/store/*` — 공통 `/store/*` 와 **같은 화면 트리**를 한 번 더 mount(`storeChildRoutes()`), 사이드바 제목 "KPA Society 매장" · basePath 도 서비스 경로. `/work/:serviceKey` 규칙(이 매장의 활성 서비스일 때만)을 그대로 따른다 — 아니면 안내 카드.
+  - **서비스 고정(세션)**: 진입 시 `o4o.store.serviceScope` 에 서비스 저장 → 화면 안의 `/store/...` 링크(약 69곳, 수정 없음)로 이동해도 같은 서비스 API. 고정은 그 매장의 활성 서비스일 때만 유효, 매장 변경 시 해제. 고정이 없으면 기존 우선순위 동작 그대로.
+  - 이용계약(428) 게이트 · `/work/:serviceKey` 업무 복귀 문맥을 고정 서비스 기준으로.
+  - **owner-only 복원**: 위 4개 화면에 `StoreOwnerOnly`(= `{서비스}:store_owner` · `{서비스}:admin` · `{서비스}:operator` · `platform:super_admin`, KPA `PharmacyOwnerOnlyGuard` 와 같은 규칙).
+- **KPA 앱**: 통합 매장 handoff 의 returnPath 중 공통 매장 화면(`/store`, `/store/...`)만 `/work/kpa-society/store/...` 로(`lib/unifiedStoreScope.ts`). `/store/commerce/*` 등 서비스 업무 · `/store-hub` · 워크스페이스 홈은 기존 대상 그대로. store-ui-core RULES 수정 없음(F3).
+- **옛 링크 유지**: `VITE_UNIFIED_STORE_HANDOFF` 는 여전히 `'false'` — KPA `kpa-society.co.kr/store/*` 는 그대로 KPA 앱에서 동작. 공개 · 기기 경로(`/store/:slug/products/:id` · `/store/:slug/blog*` · `/store/marketing/signage/play/*` · `/kpa/store/*` · `/qr` · `/tablet`) 변경 없음.
+- 테스트: KPA vitest 3(경로 대응 — RULES 결과와 결합) · api 정적 계약 7(web-store mount · owner-only · 서비스 고정 · 복원 · KPA handoff · 플래그 false) · 기존 foundation spec 회귀 0 · web-store · KPA tsc 0 · lint 오류 0.
+
+#### 검증 계획 (배포 후 · 서비스별)
+
+| 단계 | KPA 검증 |
+|---|---|
+| 진입 | `store.neture.co.kr/work/kpa-society/store` 직접 접속 |
+| 로그인 · handoff | store 호스트 Google 로그인(**Store Google origin 미확인** — 게이트) · 또는 KPA 앱에서 handoff(플래그 켠 빌드에서만) |
+| 권한 | KPA 매장 경영자 → 화면 · `/api/v1/kpa/*` 호출 / KPA 가입 없는 매장 → 안내 카드 / 경영자 아닌 구성원 → owner-only 4화면 차단 + 서버 403 |
+| 화면 · 새로고침 | 홈 · QR · POP · 사이니지 · 자료함 · 정보 새로고침 후 KPA 문맥 유지 |
+| 다른 서비스 오진입 | KCos 만 가입한 매장이 `/work/kpa-society/store` → 안내 카드 |
+| 옛 주소 | `kpa-society.co.kr/store/*` · 공개 QR · 태블릿 그대로 |
+
+**미해결(이 단계 안)**: 복수 매장 사용자는 매장 선택 후 원래 경로(returnTo)를 잃고 홈으로 간다(`StoreGate` → `/select-store`) · 매장 선택값이 서비스 API 에 전달되지 않는다(서버가 사용자+서비스로 추정 — 같은 서비스에 매장 2개면 409) — KPA 전환 전 보완 여부 판단 필요.
+
+#### 배포 범위 재산정
+
+이 단계 코드가 main 에 들어가므로 첫 서브도메인 배포 대상 SHA 는 이 커밋으로 바뀐다. 영향 서비스 추가: **store-web · kpa-society-web**(둘 다 기존 목록에 있음 — store-web 은 QR URL, kpa-society-web 은 이번이 첫 변경). migration 0 · 플래그 false 유지라 운영 동작 변화는 web-store 의 새 경로 추가와 owner-only 복원뿐이다.
+
+### 21-14. KPA 전환 경로 차단 요인 정리 (2026-09-26 사용자 지시 — 통합 TODO 내 단계 · KCos 이전 전 선행)
+
+**대상**: §21-13 의 미해결 3건 + 전환 대상 링크의 404. 새 WO 없음 · 범위 확대 없음 · 완료 기준 불변.
+**배포 판정 분리**: (a) **플래그 꺼진 코드 배포** — 이 절 코드가 운영에 들어가도 `kpa-society.co.kr/store/*` 는 KPA 앱 그대로(`VITE_UNIFIED_STORE_HANDOFF: 'false'`), 새 경로는 `store.neture.co.kr` 에서 직접 열 때만 쓰인다. (b) **KPA 옛→새 전환** — kpa-society-web 빌드 플래그를 켜는 별도 판정(배포 후 실측 PASS 뒤). 이 절은 (b) 를 열지 않는다.
+
+#### 확인한 문제 → 조치
+
+| # | 문제 | 조치 |
+|---|---|---|
+| 1 | 서비스 지정 화면(`/work/kpa-society/store`)에서 화면 안 `/store/...` 링크(약 69곳)를 누르면 URL 이 `/store/...` 로 바뀌어 서비스가 URL 에서 사라짐(데이터 문맥은 세션 고정으로 유지됐음) | `/store/*` mount 가 **고정 서비스에 서비스 지정 mount 가 있으면** `/work/<key>/store/...` 로 `replace` 이동(`toServiceScopedStorePath` · `SERVICE_SCOPED_STORE_KEYS=['kpa-society']` — App.tsx mount 와 같은 목록, 정적 계약으로 고정). 링크 69곳은 수정하지 않음 |
+| 2 | 다른 서비스로 이동 · 계정 변경 · 매장 변경 흐름 | 매장 변경 → 고정 해제(§21-13, 유지). **다른 서비스 업무(`/work/k-cosmetics/*` 등) 진입 → 고정 해제**(이후 `/store` 는 공통 문맥). 같은 서비스 업무(`/work/kpa-society/commerce/*`)는 유지. **같은 탭 계정 변경 → 매장 선택 · 고정 모두 해제**(새로고침 · 최초 로드는 해제하지 않음) |
+| 3 | 복수 매장 사용자가 서비스 경로로 들어오면 `StoreGate` → `/select-store` → 선택 후 홈(`/`)으로 떨어져 원래 경로 유실. 비로그인 → 로그인도 같음 | `?returnTo=` 로 보존(`lib/returnTo.ts`) — 같은 앱 경로만(`/` 시작 · `//` · `\` · 외부 URL · 로그인/선택/handoff 자체 거부). 선택 · 로그인 성공 후 그 경로로 |
+| 4 | 매장을 골라도 선택값이 API 에 전달되지 않아, **같은 서비스에 매장 2개 이상**이면 서버가 409 `AMBIGUOUS_STORE_CONNECTION`(가드) 또는 403(직접 호출 경로) | 아래 "선택 매장 헤더" |
+| 5 | 옛 handoff 경로 표(RULES) 결과 중 web-store 에 없는 KPA 대상 → 404 | 리다이렉트 추가: `/store/dashboard`→`/store` · `/store/settings/layout|template`→`/store/info`(공통 mount) · `/work/kpa-society/store/products`→`/work/kpa-society/commerce/products` · `…/products/b2c`→`…/commerce/products/b2c` · `…/orders`→`…/commerce/orders`(KPA 서비스 지정 mount 에만 — 서비스 업무라 공통 mount 에 두지 않음) · `/work/kpa-society/channels/tablet`→`/work/kpa-society/store/requests`(KPA 앱과 같은 대상). store-ui-core RULES(F3) 수정 없음 |
+
+#### 선택 매장 헤더 (API 동작 변경 — 권한 인접, 확대 없음)
+
+- **헤더 `X-Store-Organization-Id`**(신규 · CORS 허용 목록에 추가). 기존 `X-Organization-Id` 를 쓰지 않은 이유: signage 조회 범위(`extractScope` · signage-role 미들웨어)가 이미 그 헤더를 다른 의미로 읽는다 — 모든 요청에 실으면 기존 화면의 사이니지 조회 범위가 바뀐다.
+- **서버**: `resolveStoreOrganization(…, preferredOrganizationId)` — 값이 **이미 허용된 후보 안에 있을 때만** 그 매장으로 확정. 후보 밖 값은 무시하고 기존 규칙(후보 1개 확정 · 2개 이상 409 · 0개 403) 그대로. UUID 형식만 읽음. 적용 지점: `createRequireStoreOwner` · `requireStoreAuth` · `optionalStoreAuth` · `resolveStoreAccess` 직접 호출 중 KPA 매장 화면이 쓰는 store-playlist(10) · store-handled-products(4) · store-local-product(1).
+- **미적용(기존 동작 유지)**: event-offer(`resolveStoreAccess` 를 서비스 계층에서 호출 — req 없음) · Neture seller · Pharmacy-Hub 전용 해석기 · `/work-scope/*`(자체 `organizationId` 파라미터로 이미 선택 매장 사용). 이 경로들은 복수 매장 사용자에게 여전히 409/403 일 수 있다 — KPA 전환 실측에서 해당 화면 사용 여부 확인.
+- **web-store**: 현재 매장(1개 자동 · 선택 · 복원)을 API origin 으로 가는 요청에만 싣는다(fetch 래퍼 1곳 + axios interceptor — api 모듈 20여 개 개별 수정 없음). 매장 값은 render 중 설정(자식 첫 fetch 가 먼저 실행되므로).
+
+#### 테스트
+
+- api jest: 해석기 · 가드 선택 7건 추가(후보 안 선택 확정 · 후보 밖 = ambiguous 유지 · 단일 후보에서 선택값이 이기지 않음 · 후보 0 = none · serviceKey 미지정 우선순위 · 헤더 파싱(UUID · `X-Organization-Id` 미해석) · 가드 next/409) — 변경 모듈을 참조하는 suite 두 묶음(20 · 8, 일부 중복 · 328 tests) PASS.
+- 정적 계약(`store-service-scoped-owner-entry.spec.ts`) 6건 추가 — mount 목록 일치 · 고정 해제 3경로 · returnTo · 전용 헤더 · 404 리다이렉트.
+- tsc: api-server 0 · web-store(`tsconfig.app.json`) 0 · lint 오류 0.
+- **미검증**: 브라우저 실측(배포 전 · Google origin 게이트) — 복수 매장 계정의 선택 → 원래 경로 복귀 · 헤더 전송 · 409 해소는 배포 후 실측 항목.
+
+#### 남은 것 (이 TODO 안)
+
+- 배포: 이 절로 대상 SHA 갱신 · 영향 서비스에 **API** 추가(헤더 해석 · CORS). 순서 API → web. Google origin 확인 전 게이트 닫힘 유지.
+- 다음: KCos 매장 화면 porting(§21-13 표).
+
+### 21-15. K-Cosmetics 매장 `/store` 화면 이전 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+**대상**: K-Cosmetics 매장 경영자용 `/store` 화면 트리(§21-13 표 — "링크만으로 옮길 수 없다"). 제외: PH `/store-owner` · `/store-hub` 통합 · 데이터 병합 · 공개/기기 경로(`/store/:slug/blog*` · `/tablet/:slug` · 송출 원본 경로).
+**방식**: 링크 연결이 아니라 **원본 화면 코드 이식** — 기존 선례(`services/kcos/` · 6581dc821: import 경로만 수정)와 같은 방식. 범위 확대 없음 · 완료 기준 불변(§21-12: 이전 = 서비스별 경로 · 권한 · 매장 선택 확인).
+
+#### 이식 (web-store `src/services/kcos/`)
+
+- **대상 산정**: 원본 `App.tsx` 의 `/store` 트리 44 경로(옛 alias 포함) → 화면 29개의 import closure(내부 59 파일 · 약 7.1k 줄). 외부 패키지 13개는 **전부 web-store 기존 의존성** — package.json · lockfile · Dockerfile(선별 COPY closure) 변경 0.
+- **복사 44 파일**(화면 25 · api 12 · 설정/컴포넌트/서비스 7) — import 경로만 재작성(`@/` → 상대).
+- **재사용(복사 안 함)**: 이미 이식된 KCos 화면 4개(상품 · 주문 · 매출 · 관심 요청 = `/work/k-cosmetics/*`)와 그 api 3개 · web-store 의 guide 컴포넌트/client(활성 서비스 문맥으로 동작).
+- **shim 3**: `lib/apiClient` · `contexts/AuthContext` → web-store 의 단일 client · 인증(**선택 매장 헤더 interceptor 공유**, §21-14) / `api/mypage` → 매장 화면이 쓰는 사업자 정보 부분만(내 신청 내역 · forumApi 599줄 미이식).
+
+#### 서비스별 경로 · 권한 · 매장 선택
+
+| 항목 | 원본(k-cosmetics.site) | 이식(store.neture.co.kr) |
+|---|---|---|
+| 경로 | `/store/*` | `/work/k-cosmetics/store/*` — 44 경로 1:1(정적 계약으로 대조). 상품 · 주문 · 매출 · 관심 요청은 `/work/k-cosmetics/…` 서비스 업무 화면으로 redirect(중복 이식 없음) |
+| 사이드바 | `COSMETICS_STORE_CONFIG` | 같은 config · basePath 만 서비스 경로 |
+| 트리 권한 | `StoreOwnerGuard`(cosmetics store_owner 또는 운영자 이상) | `ServiceRoleOnly`(cosmetics store_owner · admin · operator · super_admin) + 서버 store-owner 가드 |
+| `info` 권한 | RoleGuard(store_owner · admin · super_admin — operator 제외) | 같은 목록 |
+| 매장 선택 | 홈이 `/cosmetics/stores/me` **첫 매장 자동 선택** · 자체 selector | 통합 선택 매장만(`organization_id` 일치). 운영 실측(read-only): KCos 매장 2 · 조직 미연결 0 · 복수 매장 사용자 0 |
+| 서비스 문맥 | — | 진입 시 `k-cosmetics` 고정 → 화면 안 `/store/...` 링크는 `/work/k-cosmetics/store/...` 로(§21-14 규칙에 KCos 추가) |
+
+#### store 호스트에서 열리지 않던 대상 정리 (이식 화면만)
+
+- 공개 태블릿 `/tablet/:slug`(설정 화면 링크 · 미리보기 iframe 3곳) → `https://k-cosmetics.site/tablet/…`(원본 앱은 framing 헤더 없음 — `serve` 기본).
+- `/store-hub/b2b` · `/store-hub/signage` → `/hub/b2b` · `/hub/signage`.
+- 홈의 `/operator/*` 링크(원본에서도 매장 경영자에겐 운영자 전용 화면) → 매장 경영자 대응 화면(`/work/k-cosmetics/commerce/products|orders` · `/hub/signage` · 매장 없음 → `/services`). **동작 변경** — 보고 항목.
+- TV 송출: 원본은 `/store/marketing/signage/play/:id` → 이식은 chrome-free `/work/k-cosmetics/store/marketing/signage/play/:id`(`playPathPrefix`).
+- `/guide/*`(이용 방법): web-store 에 없어 KPA 이식 화면에서도 404 였다 → 활성 서비스 공개 사이트로 redirect(KPA · KCos 공통).
+
+#### K-Cosmetics 앱 handoff (플래그 기본 꺼짐 유지)
+
+- `lib/unifiedStoreScope.ts` `toKcosScopedStorePath` — `/store`, `/store/...` 는 **같은 경로를** `/work/k-cosmetics/store/...` 로. `/store/workspace` · `/store/services` · `/store-hub/*` 는 기존 RULES 결과. store-ui-core RULES(F3) 수정 없음(이식 전 공통 트리 기준 표라 KCos 에는 우회).
+- `VITE_UNIFIED_STORE_HANDOFF` 는 `'false'` 그대로 — `k-cosmetics.site/store/*` 는 기존 앱에서 동작.
+
+#### 검증
+
+- tsc: web-store(`tsconfig.app.json`) 0 · web-k-cosmetics 0 · `vite build`(web-store) PASS · eslint 오류 0 · lint ratchet 46 = baseline.
+- api 정적 계약 `store-service-scoped-owner-entry.spec.ts` 7건 추가(경로 44 대조 · 서비스 업무 redirect · 권한 · 단일 client · cockpit 매장 일치 · store 호스트 밖 경로 · KCos handoff/플래그) + KPA 기존 계약 회귀 PASS.
+- 매핑 로직 실행 확인(tsx): KCos 9 경로(`/store` · `/store/` · query 보존 · `channels` · `marketing/pop/library` · commerce · workspace · services · `/store-hub`).
+- `legacy-password-auth-retirement.spec` allowlist 에 이식본 1줄 추가 — 원본과 같은 **태블릿 PIN**(로그인 비밀번호 아님).
+- **미검증**: 브라우저 실측(배포 전 · Google origin 게이트). KPA 경로 · 옛 주소 유지는 코드 · 계약으로만 확인(플래그 false · KPA 계약 회귀 PASS).
+- **표시 차이(기록)**: web-store Tailwind `primary` 는 파랑(KPA 토큰), KCos 는 분홍 — `primary-*` 를 쓰는 일부 요소 색만 다르다(명시적 `pink-*` 는 동일).
+- **중복 코드(의도)**: 원본 앱 화면과 같은 코드가 두 곳에 있다(KPA 이식과 같은 상태). 원본 은퇴 · 공통화는 전환 판정 이후 별도 판단.
+
+#### 배포 영향
+
+대상 SHA 재산정 필요(이 커밋). 영향 서비스: **API 없음(이번 절)** · store-web · k-cosmetics-web(handoff wrapper — 플래그 false 라 동작 변화 0). 배포 순서는 §21-14 대로 API(`dc5b16451` 헤더) → web. `DEPLOY_ENABLED=false` 유지.
+
+### 21-16. 방향 변경 기록 — `/hub` 차이는 이번 배포 차단 조건 아님 (2026-09-26 사용자 결정 정정)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | KPA · K-Cosmetics **매장 경영자용 `/store` 위치 이전**(§21-13 · §21-15) |
+| 새 발견 | K-Cosmetics `/store-hub` 와 통합 공간 `/hub` 의 화면 · 경로가 다르다(아래 표) |
+| 변경 이유 | 사용자 결정 정정 — `/hub` 가 KPA 화면과 일치하는지는 이번 배포의 차단 조건이 아니다. 허브 링크 수정을 선행 작업으로 잡지 않는다 |
+| 목적과의 관계 | `/store` 이전 판정과 분리. 차이는 **Store 통합 리팩토링**(DONE ④-2)에서 처리 |
+| 범위 확대 여부 | 없음(오히려 선행 작업 제외) |
+| 완료 기준 변경 여부 | 없음. **`/hub` 이전 완료로 표시하지 않는다** — `/hub` 는 미완 상태로 남는다 |
+
+**주소 확정 유지**: 소매 `retail.neture.co.kr` · 약국 `pharmacy.neture.co.kr` · 분회 `kpa.neture.co.kr` — 변경 없음.
+
+#### 현재 차이 (코드 조사 · 2026-09-26 · 수정 없음)
+
+| KCos `k-cosmetics.site/store-hub/*` | 통합 공간 `store.neture.co.kr/hub/*` (KCos 문맥) |
+|---|---|
+| 홈 `KCosmeticsHubPage` | KPA `StoreHubPage` 를 `cosmetics` prefix 로 렌더 |
+| `b2b` | KPA `HubB2BCatalogPage` |
+| `content` `HubContentPage` · `signage` `HubSignagePage` | KPA `HubContentLibraryPage` · `HubSignageLibraryPage` |
+| `event-offers` `HubEventOffersPage` | KPA `KpaEventOfferPage` |
+| `blog` · `pop` · `qr` · `cart` | 같은 경로 존재(KPA 화면) |
+| `services/tourists` `TouristHubPage` | **없음 → 404**(handoff RULES `/store-hub/*` → `/hub/*` 대상) |
+| — | KCos 에 없는 경로: `multilingual-product-contents(/my)` · `video` · `screen-set` · `supplier-library` |
+
+- §21-15 이식 화면의 `/hub/b2b` · `/hub/signage` 링크(원본 `/store-hub/*`)도 위 KPA 화면으로 연결된다 — 이번 단계에서 그대로 둔다.
+- 이 차이는 `VITE_UNIFIED_STORE_HANDOFF` 가 꺼져 있는 동안 KCos 사용자에게 노출되지 않는다(KCos `/store-hub/*` 는 KCos 앱이 서빙). **KCos 전환 판정 시** `/store-hub` 를 handoff 대상에서 뺄지 함께 판단한다.
+- 배포 대상 · 순서 변경 없음(§21-14 · §21-15).
+
+### 21-17. Hub 개념 정정 (2026-09-26 사용자 지시 — §21-16 대체 설명)
+
+| 항목 | 내용 |
+|---|---|
+| 원래 목적 | KPA · K-Cosmetics 매장 경영자용 `/store` 위치 이전(변경 없음) |
+| 새 발견 | §21-16 은 KCos `/store-hub` 와 `store.neture.co.kr/hub` 를 **같은 화면의 대응쌍**처럼 비교했다(사용자 설명 오류에서 비롯 — 사용자 정정) |
+| 변경 이유 | 두 Hub 는 다른 공간이다 — 아래 정의 |
+| 목적과의 관계 | 이번 단계는 `/store` 이전까지. 매장 Hub 의 통합 표시 · 서비스별 자료 구분은 **후속 Store 리팩토링에서 설계 · 검증** |
+| 범위 확대 여부 | 없음 |
+| 완료 기준 변경 여부 | 없음. `/hub` 서비스별 정합성은 이번 `/store` 배포 차단 조건이 아니며, **Hub 이전 완료로도 표시하지 않는다**(§21-16 과 같음) |
+
+| 공간 | 의미 | 관리 주체 |
+|---|---|---|
+| `pharmacy.neture.co.kr` · `retail.neture.co.kr` 의 Hub | 서비스별 Hub | 해당 **서비스 운영자** |
+| `store.neture.co.kr/hub` | 그 매장이 **참여한 서비스들의 Hub 를 모아 보는** 매장 Hub — 어느 서비스의 자료인지 구분해 표시 | 매장 경영자가 보는 공간(자료는 각 서비스 운영자 소관) |
+
+**§21-16 표의 읽는 법(수정 없이 의미만 정정)**: 그 표는 현재 코드의 **경로 재고(inventory)**일 뿐 목표 대응이 아니다. "KPA 화면을 `cosmetics` prefix 로 렌더"는 결함 목록이 아니라, 현재 `/hub` 가 서비스 Hub 하나를 문맥만 바꿔 보여 주는 **임시 구조**라는 사실 기록이다. 매장 Hub 는 KPA Hub 를 K-Cosmetics 에 그대로 보여 주는 화면이 아니다.
+
+**Store 리팩토링으로 넘기는 판단 항목(이번 단계에서 수정 없음)**
+- 매장 Hub 표시 방식: 참여 서비스별 출처 구분 · 통합 목록 여부(§6-3 · §17 의 C안 설계를 이 정의로 재검토).
+- 현재 `/hub` 의 서비스 문맥 전환 구조(활성 서비스 1개 문맥으로 KPA 화면 렌더)를 매장 Hub 로 바꾸는 방법.
+- 옛 handoff 경로 표(store-ui-core RULES)의 `/store-hub/* → /hub/*` — 서비스 Hub 를 매장 Hub 와 같은 것으로 보는 매핑이다. 전환 플래그(`VITE_UNIFIED_STORE_HANDOFF`)가 꺼져 있어 현재 사용자 영향 없음. 각 서비스 전환 판정 때 `/store-hub` 를 handoff 대상에서 뺄지 함께 정한다.
+- §21-13 · §21-15 이식 화면의 Hub 링크(`/hub/b2b` · `/hub/signage` 등 — 원본은 서비스 Hub `/store-hub/*`)의 목적지.
+- 서비스 Hub 의 새 위치(`pharmacy.neture.co.kr` · `retail.neture.co.kr`)는 확정 주소 그대로 — 이번 단계에서 옮기지 않는다.
+
+배포 대상 · 순서 변경 없음(코드 `83d44c189` · API → web · `DEPLOY_ENABLED=false`).
+
+### 21-18. 옛 주소 전환 검증 조건 — 서비스 Hub 는 매장 Hub 로 넘어가지 않는다 (2026-09-26 사용자 지시)
+
+**조건 (KPA · K-Cosmetics `/store` 옛 주소 전환 = `VITE_UNIFIED_STORE_HANDOFF` 켜기 전)**: `/store-hub/*`(서비스 Hub)가 `store.neture.co.kr/hub/*`(매장 Hub)로 함께 넘어가지 않음을 확인한다. §21-17 의 두 Hub 구분과 충돌하지 않게 하기 위함.
+**적용 범위**: 옛 주소 전환의 검증 조건. **플래그가 꺼진 첫 코드 배포의 차단 조건은 아니다.** §21-17 의 "전환 판정 때 뺄지 정한다"는 이 조건으로 확정(빼는 쪽).
+
+#### 현재 코드 사실 (조사 · 수정 없음)
+
+| 앱 | `/store` | `/store-hub` | 결과(플래그 켜면) |
+|---|---|---|---|
+| KPA `web-kpa-society/src/App.tsx` | `KpaUnifiedStoreHandoff` | **같은 `KpaUnifiedStoreHandoff`**(L824) | `/store-hub/*` → RULES `/hub$1` 로 handoff |
+| K-Cosmetics `web-k-cosmetics/src/App.tsx` | `KCosUnifiedStoreHandoff` | **같은 `KCosUnifiedStoreHandoff`**(L706) | 동일 |
+
+- 두 앱 모두 `/store` 와 `/store-hub` 가 **한 플래그**에 묶여 있다 → 지금 코드 그대로 플래그를 켜면 조건 위반.
+- 따라서 전환 전에 **코드 조치가 필요**하다(예: `/store-hub` 경로의 handoff gate 제거, 또는 handoff api wrapper 에서 `/store-hub` 를 대상에서 제외). store-ui-core RULES(F3)는 건드리지 않는 방식을 우선한다. 조치 · 검증은 전환 판정 단계에서 수행한다.
+
+#### 전환 검증 항목 (서비스별)
+
+1. `/store`, `/store/*` → `store.neture.co.kr/work/<서비스>/store/*` 로 이동(§21-13 · §21-15 매핑).
+2. `/store-hub`, `/store-hub/*` → 서비스 앱에 **그대로 남는다**(handoff 요청 0 · URL 불변).
+3. `/store/workspace` · `/store/services` 의 목적지는 전환 판정 때 함께 확인.
+4. 공개 · 기기 경로(`/store/:slug/*` · `/qr` · `/tablet` · 송출)는 대상 아님 — 변경 0 확인.
+
+**배포 상태**: 코드 `83d44c189` · 문서 포함 main 은 이 커밋 · 운영 미반영. `DEPLOY_ENABLED=false` 유지(Google origin 확인 전). 확인 후에도 **코드 배포**와 **옛 주소 전환**을 따로 판정한다.
+
+### 21-19. 1차 운영 배포 · `/store` 전환 준비 (2026-09-26 사용자 지시 — 통합 TODO 내 단계)
+
+#### 상태 구분 (이 절 기준)
+
+| 축 | 상태 |
+|---|---|
+| 코드 · CI | **준비 완료**(이 절 커밋의 CI 결과는 보고에 기재) — 서브도메인 · KPA/KCos `/store` 이식 · 선택 매장 헤더 · 서비스 Hub handoff 제외 |
+| 운영 배포 | **대기 — Google 승인 원본 7개 미등록**(아래). `DEPLOY_ENABLED=false` 유지. PASS 아님 |
+| 서비스별 `/store` 옛 주소 전환 | **미착수**(첫 배포 실측 PASS 후 KPA · KCos 각각 판정). 플래그 두 앱 모두 `'false'` |
+| Hub 통합(매장 Hub) | **범위 밖** — Store 리팩토링(§21-17). 완료로 표시하지 않음 |
+
+#### 1. 배포 기준 재대조
+
+- `origin/main` = 이 절 커밋 직전 `a6374ea8b`, 그 뒤 다른 세션 커밋 0. 운영 이미지 `14587a9ad` 이후 17커밋(코드 기준 `83d44c189` + 이 절 코드).
+- **이 TODO 밖 커밋 2개가 함께 실린다**: `303221b8b`(Supplier Domain 경계 동결 — Distribution SSOT · Content handoff 멱등성) · `2f4777aca`(병원약국 V1 무로그인 · `file-understanding-core` 신규 패키지 · lockfile 변경). 배포 창에서 두 트랙의 배포 가능 여부를 함께 확인한다(각 트랙 CHECK 기준).
+- **migration 0** (범위 내 migration 파일 없음 — API 배포 Job 의 자동 실행 대상 없음).
+- 영향 서비스: API · admin-dashboard · hospital-pharmacy · k-cosmetics · kpa-branch · kpa-society · lecture · neture · pharmacy-hub · store.
+
+#### 2. 서비스 Hub · 공개 · 기기 경로 handoff 제외 (코드 보완)
+
+- `web-kpa-society` `/store-hub` · `web-k-cosmetics` `store-hub` 에서 `UnifiedStoreHandoff` 게이트 제거 → 플래그를 켜도 서비스 Hub 는 각 앱에 남는다(§21-18 조건 충족). `/store` · `/store/workspace` · `/store/services` 는 게이트 유지(두 앱 각 2곳).
+- 경로 판정 실측: 실제 `App.tsx` 에서 경로를 뽑아 react-router 6.30 `matchRoutes` 로 31 URL 판정 — `/store/*`(owner 화면 · KCos 옛 alias 포함) = 게이트 안 / `/store-hub/*` = 게이트 밖 / 공개 블로그 · 상품(`/store/:slug/*`) · `/qr/:slug` · `/tablet/:slug` · `/tablet/setup` · 송출 `/store/marketing/signage/play/:id` · `/multilingual-products/*` · `/foreign-visitor/affiliate/*` · `/view/*` · `/kpa/store/*` = 게이트 밖(최상위 경로가 우선 매칭). 전부 기대와 일치.
+- 정적 계약 3건 추가(`store-service-scoped-owner-entry.spec.ts`) + 기존 foundation 계약 1줄을 이 결정으로 갱신(`<HubGuard><PharmacyHubLayout /></HubGuard>`).
+- **§21-16 표 정정**: "KCos `/store-hub/services/tourists` → `/hub` 404" 는 잘못된 기록이다 — KCos 의 `TouristHubPage` 는 `store-hub` 밖 최상위 `/services/tourists` 다(`store-hub` 하위 아님). 이번 조치로 `/store-hub/*` 자체가 handoff 대상에서 빠졌으므로 영향 없음.
+
+#### 3. Google 승인 원본 (배포 게이트)
+
+조회: 운영 client ID(공개 `/auth/google/config`)로 Google `iframerpc?action=checkOrigin`. 대조군으로 판별력 확인 — 이미 쓰는 원본은 `valid:true`, 없는 도메인은 `false`.
+
+| 원본 | 결과 |
+|---|---|
+| supplier · funding · community · pharmacy · retail · kpa · store `.neture.co.kr` | **7개 모두 `valid:false` (미등록)** |
+| 대조: `neture.co.kr` · `kpa-society.co.kr` · `k-cosmetics.site` · `pharmacyhub.co.kr` · `admin.neture.co.kr` | `valid:true` |
+| 참고: `www.neture.co.kr` · `study.neture.co.kr` | `valid:false` (이 TODO 대상 아님 — 기록만) |
+
+- 판정: **게이트 미충족 → 운영 배포 대기.** 등록은 Google Cloud Console(OAuth 2.0 웹 클라이언트 → 승인된 JavaScript 원본)에서 사용자 작업. 등록 후 반영까지 시간이 걸릴 수 있어, 배포 직전 같은 조회로 7개 `valid:true` 를 다시 확인한다.
+- `store.neture.co.kr` 미등록 = 현재 운영 store-web 의 Google 로그인도 동작하지 않는 상태(기존 배포분 포함).
+
+#### 4. 운영 검증 절차 (배포 후 · 플래그 false)
+
+계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNTS.local.md` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
+
+| # | 항목 | KPA | K-Cosmetics |
+|---|---|---|---|
+| V1 | 새 주소 직접 진입 → 로그인 → **원래 경로 복귀** | `store.neture.co.kr/work/kpa-society/store/marketing/qr` | `…/work/k-cosmetics/store/marketing/qr` |
+| V2 | 화면 · API 문맥 | `/api/v1/kpa/*` 호출 | `/api/v1/cosmetics/*` 호출 |
+| V3 | 새로고침 · 사이드바 이동 · 화면 안 `/store/...` 링크 후 URL 이 서비스 경로 유지 | ✓ | ✓ |
+| V4 | 권한 | owner-only 4화면 | 트리 전체 owner · `info` operator 제외 |
+| V5 | 선택 매장 헤더 | 요청에 `X-Store-Organization-Id` = 선택 매장 · 200 | 동일 · 홈이 선택 매장만 표시 |
+| V6 | 헤더 변조(개발자 도구로 다른 UUID) | 권한 확대 없음 — 같은 매장 응답(단일 후보) | 동일 |
+| V7 | 다른 서비스 업무 이동 후 `/store` → 공통 문맥 | ✓ | ✓ |
+| V8 | 옛 주소(플래그 false) | `kpa-society.co.kr/store/*` · `/store-hub/*` 기존 앱 그대로 | `k-cosmetics.site/store/*` · `/store-hub/*` 그대로 |
+| V9 | 공개 · 기기 | 인쇄 QR `/qr/:slug`(활성 샘플) · `/tablet/:slug` · 공개 블로그 | `/tablet/:slug` · 공개 블로그 |
+| V10 | TV 송출 | `/store/marketing/signage/play/:id` | `/work/k-cosmetics/store/marketing/signage/play/:id` |
+
+- **검증 한계(명시)**: 복수 매장 409 해소(선택 매장으로 확정)는 운영 실데이터가 없어 브라우저로 재현 불가 — 단위 테스트(§21-14)로만 확인. 운영 재현이 필요하면 테스트 매장 · 멤버십 추가(DB 쓰기 = 사용자 승인)가 선행된다.
+- 서브도메인 6호스트 · 관리자 세션 교체 실측은 §21-11 절차 그대로.
+- **V1 운영 실측 발견 · 수정(2026-09-28 발견 · 2026-10-02 커밋)**: store-web 상단 nav `로그인` 링크가 `WORKSPACE_PATHS.login` 고정이라 원래 경로를 잃었다(본문 카드 · gate 만 보존). `RootShell.tsx` 를 `withReturnTo(WORKSPACE_PATHS.login, pathname+search+hash)` 로 수정 + `store-service-scoped-owner-entry.spec.ts` 정적 계약 1줄. 검증: spec 22/22 · web-store `tsc --noEmit` 0. **운영 반영은 다음 store-web 배포 시** — V1 재실측은 그 뒤.
+
+#### 5. 통제 배포 순서 (게이트 충족 시)
+
+다른 세션 push 정지 확인 → 대상 SHA · CI · 기존 revision 기록 → `DEPLOY_ENABLED=true` → **API** → neture-web → kpa-branch-web → store-web · k-cosmetics-web · lecture-web · pharmacy-hub-web · kpa-society-web · hospital-pharmacy-web → admin → 배포 판정 3신호(job 실행 · revision 생성 · traffic 전환) → 실측(§4 · §21-11) → 회귀 시 해당 서비스 이전 revision 으로 traffic 복귀 → `DEPLOY_ENABLED=false`. 두 앱 `VITE_UNIFIED_STORE_HANDOFF` 는 `'false'` 유지.
+
+#### 6. 옛 `/store` 전환 판정 (첫 배포 실측 PASS 후 · 서비스별)
+
+전환 = 해당 앱 빌드 플래그 `'true'`(workflow 한 줄) 재배포. 검증 = §21-18 항목 1~4 + 인쇄 QR 샘플. 회귀 시 플래그 `'false'` 재배포. KPA · KCos 각각 판정하고 이 절에 결과를 남긴다.

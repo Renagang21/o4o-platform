@@ -10,7 +10,7 @@
 ## 0. 검증 방식
 
 - 정적 코드 분석(read-only) + **프로덕션 API read-only 호출**(CLAUDE.md §8 허용 채널).
-- 운영 데이터 변경·상태 전이 실행 없음. 검증은 운영자 계정(`sohae2100@gmail.com`, `neture:operator`/`neture:admin`/`platform:super_admin` 보유)으로 GET 호출만 수행.
+- 운영 데이터 변경·상태 전이 실행 없음. 검증은 운영자 계정(`[REDACTED_EMAIL_A]`, `neture:operator`/`neture:admin`/`platform:super_admin` 보유)으로 GET 호출만 수행.
 - 민감 데이터(비밀번호/토큰)는 본 문서에 기록하지 않음.
 
 ---
@@ -65,7 +65,7 @@ GET /operator/members/stats?serviceKey=neture
 
 GET /neture/operator/suppliers
   → 5건 중 PENDING 3, ACTIVE 2
-     PENDING: test@test.com, aop80@naver.com, sohae21@naver.com
+     PENDING: test@test.com, [REDACTED_EMAIL], [REDACTED_EMAIL_C]
 ```
 
 **판정: Case A (정상).** 모든 Neture 회원의 가입 상태가 `active`이므로 "대기 0"은 **가입 대기 기준으로 정확**하다. 화면의 "공급자 프로필: 승인대기"는 `neture_suppliers.status='PENDING'`(② 축)이며, **members stats 카드는 ② 축을 집계하지 않는다.** 두 숫자가 다른 것은 서로 다른 축을 세기 때문이다.
@@ -78,7 +78,7 @@ GET /neture/operator/suppliers
 - `UsersManagementPage.tsx`의 client `updateStatus`(`:126-143`): `approved` + (현재 pending/rejected) → `POST /neture/operator/registrations/:id/approve` = **가입 승인(step1)**.
 - `approveRegistration`(`operator-registration.service.ts:97-105`)은 `service_memberships.status IN ('pending','rejected')`가 없으면 **`REGISTRATION_NOT_FOUND`**("Registration not found or already processed")을 던진다.
 
-**프로덕션 실데이터:** `test@test.com`, `aop80@naver.com` 모두 `user.status=active`, neture membership `active`(role `supplier`), `neture_suppliers=PENDING`.
+**프로덕션 실데이터:** `test@test.com`, `[REDACTED_EMAIL]` 모두 `user.status=active`, neture membership `active`(role `supplier`), `neture_suppliers=PENDING`.
 
 → 이들은 **이미 가입 승인(step1)이 끝난 상태**다. 따라서 members 화면에서 가입 승인을 다시 시도하면 "already processed"가 정상 응답이다.
 
@@ -115,8 +115,8 @@ GET /neture/operator/suppliers
 | 계정 | user.status | neture membership | role | neture_suppliers | 해석 |
 |------|:-----------:|:-----------------:|------|:---------------:|------|
 | `test@test.com` | active | active | supplier | **PENDING** | step1 완료 · step2 대기 (화면 상태와 일치) |
-| `aop80@naver.com` | active | active | supplier | **PENDING** | step1 완료 · step2 대기 |
-| `renagang21@gmail.com` | active | active | supplier 외 | ACTIVE | 4서비스 회원 · 공급자 ACTIVE (공유 계정) |
+| `[REDACTED_EMAIL]` | active | active | supplier | **PENDING** | step1 완료 · step2 대기 |
+| `[REDACTED_EMAIL_B]` | active | active | supplier 외 | ACTIVE | 4서비스 회원 · 공급자 ACTIVE (공유 계정) |
 
 `renagang21`은 다중 서비스 공유 계정(KPA 약국 / K-cosmetics store_owner / Neture supplier)이며 **운영 권한(operator/admin) 없음**.
 

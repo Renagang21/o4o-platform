@@ -67,7 +67,8 @@ jobs:
       #   Google 경로 생존과 토큰 검증(가짜 토큰 401) · 미인증 동작.
       # 세션 이후 런타임(refresh · logout · token-cleared)은 통제된 배포 창의 사용자 브라우저 smoke 다.
       #
-      # 남은 secret 은 삭제하지 않는다 — 저장소 secret 정리는 사용자 판단 사항이며, 여기서는 **소비 0** 으로 끊는다.
+      # 남아 있던 repository secret 6개는 사용자 승인으로 2026-10-02 삭제됐다
+      # (WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1). 아래 검사는 소비 재도입을 막는다.
       - name: Verify no password credential is consumed
         run: |
           if grep -RInE 'E2E_[A-Z]+_ADMIN_(EMAIL|PASSWORD)' e2e/auth-runtime; then

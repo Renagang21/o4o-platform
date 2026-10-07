@@ -53,7 +53,7 @@ React Router v6 특성상 `path="*"` 는 **가장 낮은 우선순위**로만 �
 
 ## 4. 정상 route 회귀 결과
 
-계정: `renagang21@gmail.com` (Neture 공급자2) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
+계정: `[REDACTED_EMAIL_B]` (Neture 공급자2) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
 프로덕션 `https://neture.co.kr` · 배포 리비전 = commit `af62069a7`
 
 | 경로 | h1 | 판정 |

@@ -80,7 +80,7 @@ canonical 승격 로직 · QR · product landing · tablet · SUPPLIER_STORE 무
 
 ## 13. 실브라우저 smoke 결과 (prod, 2026-07-13)
 
-전 과정 **PASS**. 공급자(ACTIVE, renagang21@gmail.com=(주)네뚜레 공급자 테스트) → 운영자(sohae2100@gmail.com=Neture admin).
+전 과정 **PASS**. 공급자(ACTIVE, [REDACTED_EMAIL_B]=(주)네뚜레 공급자 테스트) → 운영자([REDACTED_EMAIL_A]=Neture admin).
 
 1. 운영자 큐 UI = `수정 요청` 필터 탭 + `만료 정리`(대상 확인 dry-run) 패널 + 행 액션 `수정 요청`(반려 대체) 노출. ✅
 2. 수정 요청 모달 = 사유 없이 "수정 요청 보내기" **비활성**(필수 검증). ✅

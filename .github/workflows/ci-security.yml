@@ -113,3 +113,18 @@ jobs:
         category: "/language:${{matrix.language}}"
         ram: 6000
         threads: 2
+        # 이 저장소(개인 계정 private)는 code scanning 을 켤 수 없어 SARIF 업로드가
+        # "Code scanning is not enabled" 로 step 을 실패시킨다. 분석은 그대로 수행하고
+        # (분석 실패는 여전히 step 실패), 업로드만 하지 않는다. 결과는 아래 artifact 로 본다.
+        upload: never
+        output: codeql-sarif
+
+    # 분석 결과 SARIF 를 artifact 로 보존한다 — code scanning 대신 결과를 확인하는 경로.
+    - name: Preserve CodeQL SARIF
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: codeql-sarif-${{ matrix.language }}
+        path: codeql-sarif
+        if-no-files-found: warn
+        retention-days: 14

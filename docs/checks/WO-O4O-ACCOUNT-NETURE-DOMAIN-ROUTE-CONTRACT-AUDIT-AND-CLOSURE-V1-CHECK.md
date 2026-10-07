@@ -41,12 +41,12 @@
 
 ```text
 account.neture.co.kr  CNAME  ghs.googlehosted.com
-ghs.googlehosted.com  A      142.250.198.211
+ghs.googlehosted.com  A      [REDACTED_IP]
                       AAAA   2404:6800:4005:80a::2013
 ```
 
 - `ghs.googlehosted.com` = Google 의 **custom-domain 호스트**(Firebase Hosting / App Engine / Cloud Run 도메인 매핑 계열).
-- **GCLB IP(`136.110.132.35`) 가 아니다.** → account 트래픽은 애초에 LB 에 도달하지 않는다.
+- **GCLB IP(`[REDACTED_IP]`) 가 아니다.** → account 트래픽은 애초에 LB 에 도달하지 않는다.
 
 실제 응답:
 

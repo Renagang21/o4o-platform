@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
+import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
+import { useEffect, useMemo, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -14,7 +15,7 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, NotFound } from '@o4o/ui';
 import { templates, usePageSeo, StoreFacingFooter } from '@o4o/shared-space-ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
-import { kpaSeoRegistry, KPA_SEO_DEFAULTS } from './config/seoRegistry';
+import { kpaSeoRegistry, KPA_SEO_DEFAULTS, applyPharmacyUrlMeta } from './config/seoRegistry';
 import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
@@ -29,7 +30,6 @@ import { getKpaPostLoginRoute } from './config/dashboard';
 import HandoffPage from './pages/HandoffPage';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 화면은 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
-const VerifyEmailPage = lazy(() => import('./pages/auth/VerifyEmailPage'));
 
 // Forum pages — Phase 2 lazy (barrel unwound)
 const ForumHomePage = lazy(() => import('./pages/forum/ForumHomePage').then(m => ({ default: m.ForumHomePage })));
@@ -292,6 +292,9 @@ const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').the
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
 import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
+// WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 옛 KPA HUB 주문 진입 → Neture 약국은 새 commerce 안내
+import { NetureCommerceNotice, NetureCommerceRedirect } from './components/neture-commerce/NetureCommerceRedirect';
+import { isNetureCommerceUser } from './lib/netureCommerce';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
 import { HubGuard } from './components/auth/HubGuard';
 
@@ -336,7 +339,7 @@ const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/publ
  * 지부·분회 기능은 별도 분회 서비스(services/web-kpa-branch) 소관이다.
  */
 
-const SERVICE_NAME = 'KPA-Society';
+const SERVICE_NAME = 'O4O 약국';
 
 // ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
 // Service User 인증 제거, Platform User 단일 인증으로 통합
@@ -421,17 +424,24 @@ function LoginRoute() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) return;
     const returnTo = searchParams.get('returnTo') ||
                      (location.state as { from?: string })?.from;
+    // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
+    if (isAuthenticated) {
+      navigate(returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/', { replace: true });
+      return;
+    }
     if (returnTo) {
       setOnLoginSuccess(() => {
         navigate(returnTo, { replace: true });
       });
     }
     openLoginModal();
-  }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate]);
+  }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate, isAuthenticated, isLoading]);
 
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }
@@ -500,9 +510,25 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국은 옛 발주 내역(kpa-society 회원 전용 backend) 메뉴를
+  //   보지 않는다 — 주문 내역은 내 매장의 새 commerce. 직접 URL 은 NetureCommerceRedirect 가 안내한다. KPA 회원 메뉴 불변.
+  const netureCommerce = isNetureCommerceUser(user);
+  const storeConfig = useMemo(
+    () => netureCommerce
+      ? {
+          ...KPA_SOCIETY_STORE_CONFIG,
+          menuSections: KPA_SOCIETY_STORE_CONFIG.menuSections?.map((section) => ({
+            ...section,
+            items: section.items.filter((item) => item.key !== 'orders'),
+          })),
+        }
+      : KPA_SOCIETY_STORE_CONFIG,
+    [netureCommerce],
+  );
+
   return (
     <MyStoreShell
-      config={KPA_SOCIETY_STORE_CONFIG}
+      config={storeConfig}
       fetchCapabilities={fetchStoreCapabilities}
       userName={user ? getUserDisplayName(user) : ''}
       homeLink="/"
@@ -531,9 +557,13 @@ const kpaStoreServicesApi = createStoreServicesApi({
  * handoff 실패 시 기존 화면으로 fallback — 송출 화면(/store/marketing/signage/play/*)은 대상 아님.
  */
 const UNIFIED_STORE_HANDOFF_ENABLED = isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF);
+/** 공통 매장 화면(/store/...) returnPath → KPA 서비스 지정 매장 화면(/work/kpa-society/store/...) — §21-13 */
+const kpaStoreHandoffApi = {
+  resolveWorkspaceEntryUrl: (returnPath: string) => kpaStoreServicesApi.resolveWorkspaceEntryUrl(toKpaScopedStorePath(returnPath)),
+};
 function KpaUnifiedStoreHandoff({ children }: { children: ReactNode }) {
   return (
-    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="kpa-society" api={kpaStoreServicesApi}>
+    <UnifiedStoreHandoffGate enabled={UNIFIED_STORE_HANDOFF_ENABLED} serviceKey="kpa-society" api={kpaStoreHandoffApi}>
       {children}
     </UnifiedStoreHandoffGate>
   );
@@ -590,7 +620,7 @@ function KpaStoreWorkspaceHomePage() {
       paths={KPA_STORE_WORKSPACE_PATHS}
       accent="blue"
       storeName={pharmacy?.name}
-      serviceName="KPA Society"
+      serviceName="O4O 약국"
     />
   );
 }
@@ -638,6 +668,8 @@ function PageLoader() {
 function SeoWatcher() {
   const { pathname } = useLocation();
   usePageSeo({ registry: kpaSeoRegistry, pathname, defaults: KPA_SEO_DEFAULTS });
+  // WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: og:url · canonical = pharmacy.neture.co.kr 기준
+  useEffect(() => { applyPharmacyUrlMeta(pathname); }, [pathname]);
   return null;
 }
 
@@ -812,19 +844,22 @@ function App() {
           {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 계정 찾기 · 비밀번호 재설정 경로는 은퇴했다. */}
           <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
           <Route path="/reset-password" element={<Navigate to="/login" replace />} />
-          <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
           {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}
           {/* WO-O4O-HUB-TO-STORE-HUB-RENAMING-V1: /hub → /store-hub */}
           <Route path="/hub" element={<Navigate to="/store-hub" replace />} />
           <Route path="/hub/*" element={<Navigate to="/store-hub" replace />} />
-          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><KpaUnifiedStoreHandoff><PharmacyHubLayout /></KpaUnifiedStoreHandoff></HubGuard></Layout>}>
+          {/* 서비스 Hub(서비스 운영자 관리)는 매장 Hub(store.neture.co.kr/hub)로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18.
+              통합 매장 handoff 플래그를 켜도 /store-hub/* 는 이 앱에 남는다. */}
+          <Route path="/store-hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
             <Route index element={<StoreHubPage />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
-            <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="event-offers" element={<NetureCommerceRedirect><PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect>} />
             {/* WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): 내 장바구니 */}
-            <Route path="cart" element={<PharmacyOwnerOnlyGuard><StoreCartPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="cart" element={<NetureCommerceRedirect><PharmacyOwnerOnlyGuard><StoreCartPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect>} />
+            {/* WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 약국 사이드바의 주문 진입(새 commerce 안내) */}
+            <Route path="neture-commerce" element={<NetureCommerceNotice />} />
             <Route path="content" element={<HubContentLibraryPage />} />
             {/* WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기 */}
             <Route path="blog" element={<HubBlogLibraryPage />} />
@@ -976,7 +1011,7 @@ function App() {
 
           {/* Event Offers (이벤트) */}
           <Route path="/event-offers" element={<Navigate to="/store-hub/event-offers" replace />} />
-          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
+          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><NetureCommerceRedirect><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></NetureCommerceRedirect></Layout>} />
 
           {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
           {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: COMPAT_REDIRECT — 모바일 약국 경영 허브 → Store Workspace Home */}
@@ -1103,8 +1138,8 @@ function App() {
             {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1: 구형 상품 정보 제작 화면 은퇴 (prod row 0). canonical "상품 상세정보" = handled-products 중심. 구 URL/북마크 대비 redirect 유지. */}
             <Route path="execution/product-info" element={<Navigate to="/store/handled-products" replace />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
-            <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
-            <Route path="commerce/orders" element={<StoreOrdersPage />} />
+            <Route path="commerce/order-worktable" element={<NetureCommerceRedirect><StoreOrderWorktablePage /></NetureCommerceRedirect>} />
+            <Route path="commerce/orders" element={<NetureCommerceRedirect><StoreOrdersPage /></NetureCommerceRedirect>} />
             {/* WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여 */}
             <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
             {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}

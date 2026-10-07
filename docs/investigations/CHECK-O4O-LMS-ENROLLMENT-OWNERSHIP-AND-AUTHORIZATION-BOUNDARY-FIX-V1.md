@@ -187,7 +187,7 @@ does not exist, or Cloud Run does not have permission to use it.
 
 ### 배포 전 production 실측 — 결함 재현 (read-only)
 
-`sohae2100@gmail.com` 로그인 후, 타 사용자(`renagang21@gmail.com`) 소유 enrollment 를 ID 로 조회:
+`[REDACTED_EMAIL_A]` 로그인 후, 타 사용자(`[REDACTED_EMAIL_B]`) 소유 enrollment 를 ID 로 조회:
 
 | 요청 | 응답 |
 |---|---|

@@ -25,6 +25,11 @@ const assignRoleMock = jest.fn(async () => ({}));
 const transactionMock = jest.fn();
 const getRepositoryMock = jest.fn();
 
+// Demo 판정은 "Demo 아님" 으로 고정 (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 근거는 support 헬퍼).
+jest.mock('../../../services/auth/demo-account.service.js', () =>
+  jest.requireActual('../../../__tests__/support/not-demo-account.js').notDemoAccountModule(),
+);
+
 jest.mock('../../../utils/auth.utils.js', () => ({ hashPassword: (p: string) => hashPasswordMock(p) }));
 jest.mock('../../../utils/logger.js', () => ({
   __esModule: true,
@@ -175,9 +180,11 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
     expect(payload.user.isActive).toBe(false);
   });
 
-  it('실제 회귀 케이스: 정지된 검증 계정에 kpa:store_owner 를 다시 부여해도 suspended 유지', async () => {
-    // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-BACKFILL-AND-PRODUCTION-VERIFY-V1 에서
-    // 관측된 시나리오를 회귀 케이스로 고정한다.
+  it('실제 회귀 케이스: 정지된 검증 계정에 kpa:store_owner 를 다시 부여하는 요청은 이제 400 으로 거절된다', async () => {
+    // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-BACKFILL-AND-PRODUCTION-VERIFY-V1 에서 관측된 시나리오.
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 지정한다 — 회원 역할
+    //   (kpa:store_owner)은 서비스 운영자가 자기 서비스에서 관리하므로 이 경로는 쓰기 전에 거절한다.
+    //   suspended 보존 계약은 위 운영자 역할 케이스가 계속 고정한다.
     const rec = install({
       existingUser: { ...SUSPENDED_USER, email: 'o4o-smoke-mystore@example.com' },
       existingCredential: { userId: SUSPENDED_USER.id, serviceKey: 'kpa-society' },
@@ -188,11 +195,9 @@ describe('A. 기존 suspended 사용자 — role 추가로 되살아나지 않�
       res,
     );
 
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0]).toMatchObject({ success: false, code: 'ROLE_NOT_ASSIGNABLE' });
     expect(rec.userSaves).toHaveLength(0);
-    const payload = res.json.mock.calls[0][0];
-    expect(payload.user.status).toBe('suspended');
-    // credential 은 읽지도 쓰지도 않는다 — 운영자 인증은 Google 하나다 (§18)
-    expect(payload.credentialPolicy).toBe('NOT_APPLICABLE');
     expect(rec.credentials).toHaveLength(0);
   });
 });
@@ -218,7 +223,8 @@ describe('B. 기존 approved 사용자 — 상태 그대로', () => {
 // ─── C. 은퇴한 입력 — 조용히 무시하지 않고 명시 코드로 거절한다 (§18) ───────
 
 describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
-  it('미가입 email → 400 OPERATOR_INVITATION_REQUIRED (users 를 만들지 않는다)', async () => {
+  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 초대 경로 은퇴 — 미가입자는 Google 가입 후 지정 대상이 된다.
+  it('미가입 email → 400 USER_SIGNUP_REQUIRED (users 를 만들지 않는다)', async () => {
     const rec = install({ existingUser: null });
     const res = mockRes();
     await new AdminUserController().createUser(
@@ -227,7 +233,7 @@ describe('C. 신규 생성 · 비밀번호 경로는 은퇴했다', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json.mock.calls[0][0].code).toBe('OPERATOR_INVITATION_REQUIRED');
+    expect(res.json.mock.calls[0][0].code).toBe('USER_SIGNUP_REQUIRED');
     // 어떤 행도 쓰지 않는다.
     expect(rec.userSaves).toHaveLength(0);
     expect(rec.memberships).toHaveLength(0);

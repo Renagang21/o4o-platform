@@ -20,10 +20,10 @@ export function ContactPage() {
 
   useEffect(() => {
     const prev = document.title;
-    document.title = 'KPA-Society Contact';
+    document.title = 'O4O 약국 Contact';
     const meta = document.querySelector('meta[name="description"]');
     const prevContent = meta?.getAttribute('content') ?? '';
-    meta?.setAttribute('content', 'KPA-Society 협업 및 강의 개설 안내');
+    meta?.setAttribute('content', 'O4O 약국 협업 및 강의 개설 안내');
     return () => {
       document.title = prev;
       if (meta) meta.setAttribute('content', prevContent);
@@ -35,10 +35,10 @@ export function ContactPage() {
       {/* ── Hero ── */}
       <section style={s.hero}>
         <div style={s.heroInner}>
-          <span style={s.heroBadge}>KPA-Society</span>
+          <span style={s.heroBadge}>O4O 약국</span>
           <h1 style={s.heroTitle}>협업과 연결</h1>
           <p style={s.heroSub}>
-            KPA-Society는 약사 네트워크와 함께<br />
+            O4O 약국은 약사 네트워크와 함께<br />
             다양한 교육과 운영 협업을 지원합니다.
           </p>
         </div>
@@ -93,7 +93,7 @@ export function ContactPage() {
         {/* ── CTA ── */}
         <section style={s.ctaSection}>
           <div style={s.ctaLinks}>
-            <a href="/about" style={s.ctaLink}>KPA-Society 소개 →</a>
+            <a href="/about" style={s.ctaLink}>O4O 약국 소개 →</a>
             <a href="/forum" style={s.ctaLink}>포럼 →</a>
             <a href="/guide/intro" style={s.ctaLink}>이용 가이드 →</a>
           </div>

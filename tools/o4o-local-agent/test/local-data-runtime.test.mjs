@@ -163,6 +163,105 @@ test('migration failure → 해당 migration 롤백 · MIGRATION_FAILED · 이�
   assert.equal(db.LocalSettingsRepository.get('locale'), 'ko');
 });
 
+test('v5(Candidate) DB → v6 work_experience: pre-migration 백업 · run/Candidate/run 단계 원장 보존 · 재기동 no-op', () => {
+  // v5 시점의 DB — 실제 v1~v5 migration 으로 만든다.
+  const h = new DatabaseSync(dbFile());
+  h.exec('PRAGMA journal_mode = WAL');
+  for (const m of db.MIGRATIONS.filter((x) => x.version <= 5)) {
+    m.up(h);
+    h.prepare('INSERT INTO local_schema_migrations(version, name, applied_at) VALUES(?, ?, ?)').run(m.version, m.name, '2026-09-30T00:00:00.000Z');
+  }
+  h.prepare("INSERT INTO local_meta(key, value, updated_at) VALUES('local_db_id', 'fixture-id-0005', ?)").run('2026-09-30T00:00:00.000Z');
+  h.prepare(
+    "INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, created_at, updated_at) VALUES('g_old', 'completed', 'healthkr', '약학정보원 검색', NULL, ?, ?)",
+  ).run('2026-09-30T00:00:00.000Z', '2026-09-30T00:00:00.000Z');
+  h.prepare(
+    "INSERT INTO local_work_run_steps(run_id, step_index, action_kind, step_json, created_at) VALUES('g_old', 1, 'click', '{\"actionKind\":\"click\"}', ?)",
+  ).run('2026-09-30T00:00:00.000Z');
+  h.prepare(
+    "INSERT INTO local_workflow_candidates(candidate_id, target_id, request_template, steps_json, source_run_id, success_count, failure_count, status, created_at, updated_at) " +
+      "VALUES('wc_fixture01', 'healthkr', '약학정보원에서 {{1}} 검색해줘', '[]', 'g_old', 4, 1, 'active', ?, ?)",
+  ).run('2026-09-30T00:00:00.000Z', '2026-09-30T00:00:00.000Z');
+  h.close();
+
+  const s = boot();
+  assert.equal(s.ready, true);
+  assert.deepEqual(s.appliedNow, db.MIGRATIONS.filter((m) => m.version >= 6).map((m) => m.version));
+  assert.equal(s.backupStatus, 'created');
+  assert.equal(db.LocalMetaRepository.get('local_db_id'), 'fixture-id-0005');
+  const run = db.openLocalDb().prepare('SELECT * FROM local_work_runs WHERE run_id=?').get('g_old');
+  assert.equal(run.status, 'completed');
+  assert.equal(run.goal_summary, '약학정보원 검색');
+  assert.equal(run.segment_count, 0, '기존 run 은 새 칸 기본값으로 올라온다');
+  assert.equal(run.outcome_status, null);
+  const cand = db.openLocalDb().prepare('SELECT * FROM local_workflow_candidates WHERE candidate_id=?').get('wc_fixture01');
+  assert.equal(cand.success_count, 4);
+  assert.equal(cand.failure_count, 1);
+  assert.equal(cand.status, 'active');
+  assert.equal(db.openLocalDb().prepare("SELECT COUNT(*) AS n FROM local_work_run_steps WHERE run_id='g_old'").get().n, 1);
+  for (const t of ['local_work_run_segments', 'local_work_run_experience_steps', 'local_work_run_failures']) {
+    assert.ok(db.openLocalDb().prepare('SELECT 1 AS ok FROM sqlite_master WHERE name=?').get(t), t);
+  }
+  // 재기동 → no-op. v6 up 을 한 번 더 돌려도(재실행) 칸 중복 추가로 실패하지 않는다.
+  db.closeLocalDb();
+  const s2 = boot();
+  assert.deepEqual(s2.appliedNow, []);
+  const raw = new DatabaseSync(dbFile());
+  db.MIGRATIONS.find((m) => m.version === 6).up(raw);
+  raw.close();
+});
+
+test('v6(Experience) DB → v7 assistance/correction: pre-migration 백업 · run/Candidate/Experience 원장 보존 · 재기동 no-op', () => {
+  // v6 시점의 DB — 실제 v1~v6 migration 으로 만든다.
+  const h = new DatabaseSync(dbFile());
+  h.exec('PRAGMA journal_mode = WAL');
+  for (const m of db.MIGRATIONS.filter((x) => x.version <= 6)) {
+    m.up(h);
+    h.prepare('INSERT INTO local_schema_migrations(version, name, applied_at) VALUES(?, ?, ?)').run(m.version, m.name, '2026-10-01T00:00:00.000Z');
+  }
+  const T = '2026-10-01T00:00:00.000Z';
+  h.prepare("INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, created_at, updated_at) VALUES('g_v6', 'completed', 'healthkr', '약학정보원 검색', NULL, ?, ?)").run(T, T);
+  h.prepare("UPDATE local_work_runs SET task_key='drug_info.lookup', segment_count=1, outcome_status='SUCCESS' WHERE run_id='g_v6'").run();
+  h.prepare(
+    "INSERT INTO local_workflow_candidates(candidate_id, target_id, request_template, steps_json, source_run_id, success_count, failure_count, status, created_at, updated_at) " +
+      "VALUES('wc_fixture06', 'healthkr', '약학정보원에서 {{1}} 검색해줘', '[]', 'g_v6', 3, 0, 'active', ?, ?)",
+  ).run(T, T);
+  const segCols = h.prepare('PRAGMA table_info(local_work_run_segments)').all().map((c) => c.name);
+  const expCols = h.prepare('PRAGMA table_info(local_work_run_experience_steps)').all().map((c) => c.name);
+  const before = {
+    seg: segCols.length, exp: expCols.length,
+    runs: h.prepare('SELECT COUNT(*) AS n FROM local_work_runs').get().n,
+  };
+  h.close();
+
+  const s = boot();
+  assert.equal(s.ready, true);
+  assert.deepEqual(s.appliedNow, db.MIGRATIONS.filter((m) => m.version >= 7).map((m) => m.version));
+  assert.equal(s.backupStatus, 'created');
+  const d = db.openLocalDb();
+  const run = d.prepare('SELECT * FROM local_work_runs WHERE run_id=?').get('g_v6');
+  assert.equal(run.task_key, 'drug_info.lookup');
+  assert.equal(run.segment_count, 1);
+  assert.equal(run.outcome_status, 'SUCCESS');
+  assert.equal(d.prepare('SELECT COUNT(*) AS n FROM local_work_runs').get().n, before.runs);
+  const cand = d.prepare('SELECT * FROM local_workflow_candidates WHERE candidate_id=?').get('wc_fixture06');
+  assert.equal(cand.success_count, 3);
+  assert.equal(cand.status, 'active');
+  assert.equal(d.prepare('PRAGMA table_info(local_work_run_segments)').all().length, before.seg, 'v6 테이블 칸 불변');
+  assert.equal(d.prepare('PRAGMA table_info(local_work_run_experience_steps)').all().length, before.exp);
+  for (const t of ['local_work_run_context', 'local_work_run_assistance', 'local_work_run_corrections', 'local_experience_patterns']) {
+    assert.ok(d.prepare('SELECT 1 AS ok FROM sqlite_master WHERE name=?').get(t), t);
+    assert.equal(d.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n, 0, '새 테이블은 비어 시작 — 과거 run 을 소급 해석하지 않는다');
+  }
+  // 재기동 → no-op. v7 up 재실행도 실패하지 않는다.
+  db.closeLocalDb();
+  const s2 = boot();
+  assert.deepEqual(s2.appliedNow, []);
+  const raw = new DatabaseSync(dbFile());
+  db.MIGRATIONS.find((m) => m.version === 7).up(raw);
+  raw.close();
+});
+
 test('chain 정합: 중복 id · 빈틈 · 이름 불일치 · 적용 이력 빈틈은 시작에서 감지된다', () => {
   assert.deepEqual(db.validateMigrationChain([db.MIGRATIONS[0], { ...db.MIGRATIONS[1], version: 1 }]).reason, 'duplicate');
   assert.deepEqual(db.validateMigrationChain([db.MIGRATIONS[0], { ...db.MIGRATIONS[1], version: 3 }]).reason, 'gap');

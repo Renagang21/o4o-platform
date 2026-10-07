@@ -1,5 +1,7 @@
 # DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1
 
+> **상태**: SUPERSEDED · **대체 문서**: [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · **표기일**: 2026-10-04
+
 > **공식 결정 문서 (Decision Record).** O4O Platform 의 Identity Architecture 를 V1 → V2 로 공식 전환한다.
 
 - **결정일 (Decision Date):** 2026-05-23

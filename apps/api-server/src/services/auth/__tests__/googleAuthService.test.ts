@@ -18,10 +18,11 @@ import { User } from '../../../entities/User.js';
 import { LinkedAccount } from '../../../entities/LinkedAccount.js';
 import { AccountActivity } from '../../../entities/AccountActivity.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
+import { decideSemiFranchiseAccess } from '../../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 
 // ── in-memory fake DB ───────────────────────────────────────────────────────
 type Row = Record<string, any>;
-type Store = { users: Row[]; linked: Row[]; activities: Row[] };
+type Store = { users: Row[]; linked: Row[]; activities: Row[]; demoUserIds: string[] };
 
 let seq = 0;
 const uuid = () => `00000000-0000-4000-8000-${String(++seq).padStart(12, '0')}`;
@@ -81,13 +82,26 @@ function makeDataSource(store: Store) {
     getRepository: jest.fn(getRepository),
     // 트랜잭션: 스냅샷 위에서 실행하고 성공 시에만 커밋한다(실패 → orphan 0 증명).
     transaction: jest.fn(async (fn: (manager: any) => Promise<any>) => {
-      const staged: Store = { users: [...store.users], linked: [...store.linked], activities: [...store.activities] };
+        const staged: Store = { users: [...store.users], linked: [...store.linked], activities: [...store.activities], demoUserIds: [...store.demoUserIds] };
       const stagedRepos = new Map<unknown, ReturnType<typeof repoFor>>();
       const manager = {
         getRepository: (entity: unknown) => {
           if (!stagedRepos.has(entity)) stagedRepos.set(entity, repoFor(staged, entity));
           return stagedRepos.get(entity)!;
         },
+        // 가입 시 대소문자만 다른 기존 주소 확인(`lower(email) = $1`) — 그 외 raw SQL 은 쓰지 않는다.
+        query: jest.fn(async (sql: string, params: unknown[]) => {
+          // Demo 계정 판정(`demo_accounts` JOIN `users`) — 판정 정본은 user_id 다.
+          if (/FROM demo_accounts/.test(sql)) {
+            const target = String(params[0]);
+            return staged.users
+              .filter((u) => staged.demoUserIds.includes(String(u.id)) && String(u.email).toLowerCase() === target)
+              .slice(0, 1)
+              .map(() => ({ '?column?': 1 }));
+          }
+          if (!/FROM users WHERE lower\(email\) = \$1/.test(sql)) throw new Error(`unexpected query: ${sql}`);
+          return staged.users.filter((u) => String(u.email).toLowerCase() === params[0]).slice(0, 1).map(() => ({ '?column?': 1 }));
+        }),
       };
       const result = await fn(manager);
       store.users.splice(0, store.users.length, ...staged.users);
@@ -108,7 +122,9 @@ function identityFor(map: Record<string, Partial<VerifiedGoogleIdentity> | Googl
       if (!entry) throw new GoogleIdTokenError('SIGNATURE_INVALID');
       if (entry instanceof GoogleIdTokenError) throw entry;
       return {
+        // 기본 fixture 는 Google 이 이메일을 확인한 계정이다 — 미확인은 테스트가 명시한다(S1).
         sub: SUB_A, audience: 'web', issuer: 'https://accounts.google.com', expiresAt: new Date(Date.now() + 3600_000),
+        emailVerified: true,
         ...entry,
       } as VerifiedGoogleIdentity;
     }),
@@ -134,6 +150,12 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   let ds: ReturnType<typeof makeDataSource>;
   let identity: ReturnType<typeof identityFor>;
   let svc: GoogleAuthService;
+  /** issueSession 이 돌려줄 역할 · membership — 로그인 자격 게이트 테스트용. */
+  let sessionRoles: string[];
+  let sessionMemberships: { serviceKey: string; status: string }[];
+  /** 세미프랜차이즈 자격 fake — Neture 약국 조직별 (기본, 세미프랜차이즈) 가입 상태. */
+  let semiFranchiseRows: { basic: string | null; semi: string | null }[];
+  let semiFranchiseResolver: jest.Mock;
 
   beforeAll(() => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-google-auth';
@@ -147,15 +169,20 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
       dataSource: ds as any,
       issueSession: async (user) => ({
         tokens: tokenUtils.generateTokens(user, [], 'neture.co.kr', []),
-        roles: [],
-        memberships: [],
+        roles: sessionRoles,
+        memberships: sessionMemberships,
       }),
+      resolveSemiFranchiseAccess: semiFranchiseResolver,
     });
   };
 
   beforeEach(() => {
-    store = { users: [], linked: [], activities: [] };
+    store = { users: [], linked: [], activities: [], demoUserIds: [] };
     ds = makeDataSource(store);
+    sessionRoles = [];
+    sessionMemberships = [];
+    semiFranchiseRows = [];
+    semiFranchiseResolver = jest.fn(async (_userId: string, key: string) => decideSemiFranchiseAccess(key, semiFranchiseRows));
   });
 
   // ── signup ────────────────────────────────────────────────────────────────
@@ -211,6 +238,105 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     expect(store.linked).toHaveLength(0);
   });
 
+  // WO-O4O-EMAIL-PASSWORD-AUTH-S1-CLOSURE-V1 — Google 이 확인한 주소만 users 를 만든다.
+  it('S1-G1 signup · email_verified=true → 가입 허용, isEmailVerified=true', async () => {
+    build({ 'tok-a': { sub: SUB_A, email: 'verified@example.test', emailVerified: true } });
+    await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+    expect(store.users).toHaveLength(1);
+    expect(store.users[0].isEmailVerified).toBe(true);
+    expect(store.linked).toHaveLength(1);
+  });
+
+  it.each([
+    ['false', false],
+    ['claim 없음', undefined],
+  ])('S1-G2 signup · email_verified=%s → GOOGLE_EMAIL_UNVERIFIED, users/linked_accounts 0, 세션 0', async (_l, emailVerified) => {
+    build({ 'tok-a': { sub: SUB_A, email: 'unverified@example.test', emailVerified } });
+    await expect(svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META }))
+      .rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED', statusCode: 400 });
+    expect(store.users).toHaveLength(0);
+    expect(store.linked).toHaveLength(0);
+  });
+
+  it('S1-G2 createGoogleUser 직접 호출(초대 수락 경로)도 미확인 주소는 거절', async () => {
+    build({});
+    const manager = { getRepository: (e: unknown) => ds.getRepository(e) };
+    await expect(svc.createGoogleUser(manager as any, {
+      sub: SUB_A, email: 'invitee@example.test', emailVerified: false,
+      audience: 'web', issuer: 'https://accounts.google.com', expiresAt: new Date(Date.now() + 3600_000),
+    } as VerifiedGoogleIdentity, CONSENTS)).rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED' });
+    expect(store.users).toHaveLength(0);
+    expect(store.linked).toHaveLength(0);
+  });
+
+  it('S1-G3 이미 가입한 sub 의 login 은 email_verified=false 토큰이어도 영향 없음', async () => {
+    build({ 'tok-a': { sub: SUB_A, email: 'existing.g@example.test', emailVerified: true } });
+    await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+    build({ 'tok-a2': { sub: SUB_A, email: 'existing.g@example.test', emailVerified: false } });
+    const session = await svc.login({ idToken: 'tok-a2', ...META });
+    expect(session.isNewUser).toBe(false);
+    expect(store.users).toHaveLength(1);
+  });
+
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 — Google 가입도 로그인 이메일 정규화를 쓴다(대소문자 중복 users 0 · 병합 0).
+  describe('이메일 대소문자 정규화', () => {
+    it('Google `A@X.com` 가입 → users.email 은 `a@x.com` 으로 저장', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: ' New.User@Example.TEST ' } });
+      await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+      expect(store.users.map((u) => u.email)).toEqual(['new.user@example.test']);
+      expect(store.linked).toHaveLength(1);
+    });
+
+    it('기존 비밀번호 계정 `a@x.com` + Google `A@X.com` 가입 → EMAIL_IN_USE · users 증가 0 · 연결 0 · 세션 0', async () => {
+      const existing = seedUser(store, { email: 'same@example.test' });
+      build({ 'tok-b': { sub: SUB_B, email: 'Same@Example.TEST' } });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE', statusCode: 409 });
+      expect(store.users).toEqual([existing]);
+      expect(store.linked).toHaveLength(0); // 기존 users.id 로 자동 연결하지 않는다
+      expect(existing.refreshTokenFamily).toBeUndefined();
+      expect(existing.lastLoginAt).toBeUndefined();
+    });
+
+    it('기존 Google `a@x.com` + 다른 sub 의 Google `A@X.com` 가입 → EMAIL_IN_USE · 기존 연결만 유지', async () => {
+      build({
+        'tok-a': { sub: SUB_A, email: 'shared@example.test' },
+        'tok-b': { sub: SUB_B, email: 'SHARED@example.test' },
+      });
+      await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toHaveLength(1);
+      expect(store.linked.map((l) => l.providerId)).toEqual([SUB_A]);
+    });
+
+    it('정규화 전 저장된 기존 행 `A@x.com` 도 같은 주소로 본다 → EMAIL_IN_USE', async () => {
+      seedUser(store, { email: 'Legacy@Example.test' });
+      build({ 'tok-b': { sub: SUB_B, email: 'legacy@example.test' } });
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toHaveLength(1);
+      expect(store.linked).toHaveLength(0);
+    });
+
+    it('기존 Google sub 로그인은 영향 없음 — 저장된 원문 대소문자 주소도 그대로 · 재기록 0', async () => {
+      const u = seedUser(store, { email: 'Old.Case@Example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, isVerified: true, isPrimary: true });
+      build({ 'tok-a': { sub: SUB_A, email: 'Old.Case@Example.test' } });
+      const session = await svc.login({ idToken: 'tok-a', ...META });
+      expect(session.isNewUser).toBe(false);
+      expect(session.user.id).toBe(u.id);
+      expect(u.email).toBe('Old.Case@Example.test');
+    });
+
+    it('S1 차단 유지 — 대소문자와 무관하게 email_verified=false 는 GOOGLE_EMAIL_UNVERIFIED', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: 'Unverified@Example.test', emailVerified: false } });
+      await expect(svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'GOOGLE_EMAIL_UNVERIFIED' });
+      expect(store.users).toHaveLength(0);
+    });
+  });
+
   it('signup · 같은 sub 재가입 → GOOGLE_ALREADY_REGISTERED, users 증가 0', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test' } });
     await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...META });
@@ -242,7 +368,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     // sub 중복 사전 확인은 통과하지만 insert 에서 unique 충돌이 나는 race 를 재현한다.
     identity.findGoogleIdentityBySub.mockResolvedValue(null);
     ds.transaction.mockImplementationOnce(async (fn: any) => {
-      const staged: Store = { users: [], linked: [], activities: [] };
+      const staged: Store = { users: [], linked: [], activities: [], demoUserIds: [] };
       const manager = {
         getRepository: (entity: unknown) => {
           const repo = repoFor(staged, entity);
@@ -251,6 +377,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
           }
           return repo;
         },
+        query: jest.fn(async () => []), // 대소문자만 다른 기존 주소 없음
       };
       try {
         return await fn(manager);
@@ -326,5 +453,127 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     // 타입 계약 고정: 컴파일 타임 검증. 런타임은 validateDto(forbidNonWhitelisted) 가 담당.
     const input: Parameters<GoogleAuthService['login']>[0] = { idToken: 't', serviceKey: 'neture', ...META };
     expect(Object.keys(input).sort()).toEqual(['idToken', 'ipAddress', 'serviceKey', 'userAgent']);
+  });
+  // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+  //   Demo 계정의 인증 수단은 비밀번호 하나로 고정이다 — Google 연결을 만들지 않는다.
+  describe('Demo 계정 보호', () => {
+    it('Demo 주소로 Google 가입 → DEMO_ACCOUNT_FORBIDDEN · users 증가 0 · 연결 0', async () => {
+      const demo = seedUser(store, { email: 'teststoreowner@example.com' });
+      store.demoUserIds.push(String(demo.id));
+      build({ 'tok-b': { sub: SUB_B, email: 'TestStoreOwner@Example.com' } });
+
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'DEMO_ACCOUNT_FORBIDDEN', statusCode: 403 });
+
+      // 사유가 "이미 쓰는 주소"(EMAIL_IN_USE)가 아니라 Demo 보호로 끝난다 — 순서가 지켜진다.
+      expect(store.users).toEqual([demo]);
+      expect(store.linked).toHaveLength(0);
+    });
+
+    it('registry 행이 없으면 같은 주소도 일반 계정 규칙을 따른다 — 판정은 user_id 다', async () => {
+      const existing = seedUser(store, { email: 'teststoreowner@example.com' });
+      build({ 'tok-b': { sub: SUB_B, email: 'teststoreowner@example.com' } });
+
+      // 이메일 문자열 비교였다면 여기서도 DEMO_ACCOUNT_FORBIDDEN 이 났을 것이다.
+      await expect(svc.signup({ idToken: 'tok-b', consents: CONSENTS, ...META }))
+        .rejects.toMatchObject({ code: 'EMAIL_IN_USE' });
+      expect(store.users).toEqual([existing]);
+    });
+  });
+
+  // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1
+  describe('로그인 자격 게이트 (SERVICE_NOT_MEMBER)', () => {
+    const GATED = { ...META, sessionServiceKey: 'k-cosmetics', loginMembershipGateKey: 'k-cosmetics' };
+    const linkedUser = () => {
+      const u = seedUser(store, { email: 'member@example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, lastUsedAt: new Date(0) });
+      build({ 'tok-a': { sub: SUB_A } });
+      return u;
+    };
+
+    it('인증 성공 + 게이트 서비스 membership 없음 → 403 SERVICE_NOT_MEMBER, 세션 · lastUsedAt 흔적 없음', async () => {
+      const u = linkedUser();
+      sessionMemberships = [{ serviceKey: 'neture', status: 'active' }];
+      const p = svc.login({ idToken: 'tok-a', ...GATED });
+      await expect(p).rejects.toBeInstanceOf(GoogleAuthError);
+      await expect(p).rejects.toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(store.linked[0].lastUsedAt.getTime()).toBe(0);
+    });
+
+    it('Google 인증 실패는 게이트와 무관하게 GOOGLE_ID_TOKEN_INVALID', async () => {
+      linkedUser();
+      build({ 'tok-bad': new GoogleIdTokenError('TOKEN_EXPIRED') });
+      await expect(svc.login({ idToken: 'tok-bad', ...GATED })).rejects.toMatchObject({ code: 'GOOGLE_ID_TOKEN_INVALID' });
+    });
+
+    it.each(['active', 'pending', 'rejected'])('해당 서비스 row(status=%s) 가 있으면 세션 발급', async (status) => {
+      linkedUser();
+      sessionMemberships = [{ serviceKey: 'k-cosmetics', status }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+    });
+
+    it('platform:super_admin 은 통과', async () => {
+      linkedUser();
+      sessionRoles = ['platform:super_admin'];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+    });
+
+    it('가입(signup)은 게이트 대상이 아니다 — 계정만 만들고 세션을 준다', async () => {
+      build({ 'tok-a': { sub: SUB_A, email: 'new@example.test' } });
+      const session = await svc.signup({ idToken: 'tok-a', consents: CONSENTS, ...GATED });
+      expect(session.isNewUser).toBe(true);
+    });
+  });
+
+  // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 — pharmacy.neture.co.kr(kpa-society) 게이트의 세미프랜차이즈 자격
+  describe('세미프랜차이즈 자격 (kpa-society 게이트)', () => {
+    const GATED = { ...META, sessionServiceKey: 'kpa-society', loginMembershipGateKey: 'kpa-society' };
+    const linkedUser = () => {
+      const u = seedUser(store, { email: 'pharmacy@example.test' });
+      store.linked.push({ id: uuid(), userId: u.id, provider: 'google', providerId: SUB_A, lastUsedAt: new Date(0) });
+      build({ 'tok-a': { sub: SUB_A } });
+      return u;
+    };
+
+    it('Neture 기본 active ∧ pharmacy active → kpa-society membership 없이 세션 발급', async () => {
+      const u = linkedUser();
+      semiFranchiseRows = [{ basic: 'active', semi: 'active' }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+      expect(semiFranchiseResolver).toHaveBeenCalledWith(u.id, 'pharmacy');
+    });
+
+    it('세미프랜차이즈 대기 → SERVICE_NOT_MEMBER + serviceAccess(next=semi_franchise_pending), 흔적 없음', async () => {
+      const u = linkedUser();
+      semiFranchiseRows = [{ basic: 'active', semi: 'pending' }];
+      const err = await svc.login({ idToken: 'tok-a', ...GATED }).catch((e) => e);
+      expect(err).toBeInstanceOf(GoogleAuthError);
+      expect(err).toMatchObject({ code: 'SERVICE_NOT_MEMBER', statusCode: 403 });
+      expect(err.serviceAccess).toEqual({
+        semiFranchiseKey: 'pharmacy',
+        pharmacyMembershipStatus: 'active',
+        semiFranchiseMembershipStatus: 'pending',
+        next: 'semi_franchise_pending',
+      });
+      expect(u.refreshTokenFamily).toBeUndefined();
+      expect(store.linked[0].lastUsedAt.getTime()).toBe(0);
+    });
+
+    it('Neture 약국 미가입 → next=apply_pharmacy', async () => {
+      linkedUser();
+      const err = await svc.login({ idToken: 'tok-a', ...GATED }).catch((e) => e);
+      expect(err.serviceAccess).toMatchObject({ next: 'apply_pharmacy', pharmacyMembershipStatus: null });
+    });
+
+    it('기존 kpa-society row 는 기존 규칙대로 통과 — 세미프랜차이즈 조회 없음', async () => {
+      linkedUser();
+      sessionMemberships = [{ serviceKey: 'kpa-society', status: 'active' }];
+      const session = await svc.login({ idToken: 'tok-a', ...GATED });
+      expect(session.tokens.accessToken).toBeTruthy();
+      expect(semiFranchiseResolver).not.toHaveBeenCalled();
+    });
   });
 });

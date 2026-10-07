@@ -36,7 +36,7 @@
 
 - Playwright (chromium, headless) — gitignored SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 자격증명 직접 파싱(명령/로그 비노출).
 - 각 서비스 `/login` 로그인 → 대상 route hard-navigation → `h1/h2/h3` 텍스트 추출 + screenshot + console/pageerror/4xx-5xx 수집.
-- 계정: KPA = `renagang21@gmail.com`(약국 경영자/약국 = store_owner), KCos = `sohae2100@gmail.com`(admin — store_owner 전용 계정 SSOT 부재).
+- 계정: KPA = `[REDACTED_EMAIL_B]`(약국 경영자/약국 = store_owner), KCos = `[REDACTED_EMAIL_A]`(admin — store_owner 전용 계정 SSOT 부재).
 - 산출물(로컬, 비커밋): `c:\tmp\smoke-heading-result.json`, `c:\tmp\smoke-*.png`.
 
 ---

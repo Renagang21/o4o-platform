@@ -146,7 +146,9 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
 
     it('fulfillment serviceKey 경계는 SSOT 헬퍼로만 표현된다', () => {
       const code = read('modules/neture/services/supplier-order.service.ts');
-      expect(code).toContain('netureOrderServiceScopeSql');
+      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 공급자 목록 경계는 서비스 집합 SSOT 헬퍼(약국 주문 포함).
+      expect(code).toContain('netureOrderServiceSetSql');
+      expect(code).toContain('SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS');
       // `neture_orders` 서비스 경계 조각을 컨트롤러/서비스가 직접 써버리면 조건이 갈라진다.
       // (SSOT 파일 자신과 그 테스트만 이 문자열을 가질 수 있다.)
       const hard = hits(/COALESCE\([^)]*service_key,\s*'neture'\)/);

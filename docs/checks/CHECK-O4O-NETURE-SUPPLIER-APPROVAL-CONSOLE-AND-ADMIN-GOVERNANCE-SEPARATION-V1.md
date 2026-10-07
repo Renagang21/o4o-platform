@@ -100,7 +100,7 @@ FROM neture_settlements WHERE supplier_id = $1 AND status IN ('calculated','appr
 | neture-web 번들에 `/admin/supplier-governance` 라우트 + redirect | 배포 index chunk grep: `supplier-governance`×3, `admin-suppliers`×1, `AdminSupplierGovernance`×2 | ✅ |
 | 구 `AdminSupplierApprovalPage` 제거 반영 | 배포 번들 grep: `AdminSupplierApproval` 0건 | ✅ |
 
-**브라우저 UI smoke (로그인 후 화면 관측) — 2026-07-29 수행 (Neture admin `sohae2100@gmail.com`):**
+**브라우저 UI smoke (로그인 후 화면 관측) — 2026-07-29 수행 (Neture admin `[REDACTED_EMAIL_A]`):**
 
 | 관측 항목 | 결과 |
 |-----------|:----:|

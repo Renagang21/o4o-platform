@@ -16,6 +16,13 @@ import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import { isPlatformAdmin } from '../../utils/role.utils.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
+import {
+  demoAccountService,
+  DEMO_ACCOUNT_FORBIDDEN_CODE,
+  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+  respondDemoAccountForbidden,
+} from '../../services/auth/demo-account.service.js';
 import {
   canRevokeOwnRole,
   getServiceAdminRoleServiceKey,
@@ -148,6 +155,13 @@ import {
   ensureServiceMembershipsForRoles,
   type MembershipPolicy,
 } from '../../services/admin/service-membership-ensure.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
+import {
+  AdminRoleEditForbiddenError,
+  applyAdminRoleEdit,
+  assertAdminAssignableRoles,
+} from '../../services/admin/admin-role-edit.js';
+import { OperatorRoleContractError } from '../../config/operator-role-catalog.js';
 
 export {
   resolveMembershipPolicy,
@@ -292,9 +306,8 @@ export class AdminUserController {
    *   운영자 onboarding 의 Identity 계약이 Google 기준으로 바뀌었다. 관리자는 더 이상 타인의
    *   비밀번호를 만들지 않는다. 따라서 이 경로에서 은퇴하는 것은 다음 둘이다.
    *     1. `password` 수신 → `service_credentials` / `users.password` 생성  (400 PASSWORD_NOT_ALLOWED_HERE)
-   *     2. 미가입 email 로 신규 user 생성                                     (400 OPERATOR_INVITATION_REQUIRED)
+   *     2. 미가입 email 로 신규 user 생성                                     (400 USER_SIGNUP_REQUIRED)
    *   대체 경로: `POST /api/v1/admin/operator-assignments` (기존 사용자 · userId 로 지정) ·
-   *             `POST /api/v1/admin/operator-invitations` (미가입자 초대).
    *   **조용한 대체(silent fallback)를 만들지 않는다** — 옛 계약으로 온 요청은 명시 코드로 거절한다.
    */
   createUser = async (req: Request, res: Response): Promise<void> => {
@@ -327,7 +340,10 @@ export class AdminUserController {
       }
 
       const userRepo = AppDataSource.getRepository(User);
-      const rolesToAssign = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role];
+      // 서비스 범위 운영자 역할만 받는다 — 일반 회원 역할 · 개별 분회 운영자는 거절(ROLE_NOT_ASSIGNABLE).
+      const rolesToAssign = assertAdminAssignableRoles(
+        Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role],
+      );
 
       // 대상 서비스 확정 — 여기서 걸리면 아무것도 쓰지 않는다(멀티 서비스 · serviceKey 모순 거절).
       const target = resolveOperatorTargetServiceKey(rolesToAssign, req.body?.serviceKey);
@@ -347,9 +363,15 @@ export class AdminUserController {
       if (!existingUser) {
         res.status(400).json({
           success: false,
-          error: '가입하지 않은 사용자입니다. 운영자 초대(POST /api/v1/admin/operator-invitations)를 사용하세요.',
-          code: 'OPERATOR_INVITATION_REQUIRED',
+          error: '가입하지 않은 사용자입니다. 대상자가 Google 로 O4O 에 가입한 뒤 운영자로 지정하세요.',
+          code: 'USER_SIGNUP_REQUIRED',
         });
+        return;
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경): 기존 계정에 역할을 더하기 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(existingUser.id)) {
+        respondDemoAccountForbidden(res);
         return;
       }
 
@@ -385,6 +407,10 @@ export class AdminUserController {
           error: error.message,
           code: error.code,
         });
+        return;
+      }
+      if (error instanceof OperatorRoleContractError) {
+        res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
         return;
       }
       logger.error('Error creating user:', error);
@@ -461,20 +487,30 @@ export class AdminUserController {
         }
       }
 
+      const requestedRoles = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : role ? [role] : null;
+
+      // Demo 계정 보호(정책 §8 이메일 변경 · role 변경): 어떤 write 보다도 **먼저** 막는다.
+      //   이름 등 나머지 필드만 바꾸는 요청은 판정 질의 없이 종전대로 간다.
+      if ((email && email !== user.email) || requestedRoles) {
+        if (await demoAccountService.isDemoAccount(user.id)) {
+          respondDemoAccountForbidden(res);
+          return;
+        }
+      }
+
       // Update fields
       if (email) user.email = email;
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (name) user.name = name;
-      // WO-OPERATOR-FIX-V1: Support multiple roles from frontend
-      if (Array.isArray(rolesArray) && rolesArray.length > 0) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        for (const r of rolesArray) {
-          await roleAssignmentService.assignRole({ userId: user.id, role: r });
-        }
-      } else if (role) {
-        await roleAssignmentService.removeAllRoles(user.id);
-        await roleAssignmentService.assignRole({ userId: user.id, role });
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 요청 배열로 역할을 **덮어쓰지 않는다**.
+      //   서비스 운영자 역할만 차이로 추가·해제하고, 카탈로그 밖 역할(회원 역할 등)은 그대로 둔다.
+      if (requestedRoles) {
+        await applyAdminRoleEdit(user.id, requestedRoles, {
+          id: (req as any).user?.id,
+          isPlatformSuperAdmin: isPlatformAdmin((req as any).user?.roles ?? []),
+        });
+        invalidateRoles(user.id);
       }
       if (status !== undefined) user.status = status;
       if (isActive !== undefined) user.isActive = isActive;
@@ -487,6 +523,10 @@ export class AdminUserController {
         message: 'User updated successfully'
       });
     } catch (error) {
+      if (error instanceof OperatorRoleContractError || error instanceof AdminRoleEditForbiddenError) {
+        res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
+        return;
+      }
       logger.error('Error updating user:', error);
       res.status(500).json({
         success: false,
@@ -561,6 +601,18 @@ export class AdminUserController {
           success: false,
           error: 'Cannot delete or deactivate a platform super admin account',
           code: 'SUPER_ADMIN_PROTECTED',
+        });
+        return;
+      }
+
+      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
+      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
+      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
+      if (await demoAccountService.isDemoAccount(id)) {
+        res.status(403).json({
+          success: false,
+          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
+          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
         });
         return;
       }
@@ -643,6 +695,12 @@ export class AdminUserController {
       const user = await userRepo.findOne({ where: { id: userId } });
       if (!user) {
         res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      // Demo 계정 보호(정책 §8 role 변경): 해제 **전에** 막는다.
+      if (await demoAccountService.isDemoAccount(userId)) {
+        respondDemoAccountForbidden(res);
         return;
       }
 

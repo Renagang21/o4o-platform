@@ -22,6 +22,9 @@ import {
   OPERATOR_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ROLES,
+  subdomainOperatorRoles,
+  type SubdomainOperatorKey,
+  type SubdomainOperatorLevel,
 } from '../../lib/role-constants';
 
 // re-export for backward compat — 기존 import 유지
@@ -172,6 +175,32 @@ export function SupplierRoute({ children, fallback = '/login' }: Omit<LegacyGuar
     <RouteGuard
       allowedRoles={SUPPLIER_ROLES}
       requireMembership="neture"
+      fallback={fallback}
+    >
+      {children}
+    </RouteGuard>
+  );
+}
+
+/**
+ * SubdomainOperatorRoute — 서브도메인 운영자 범위(supplier · funding · community) 화면 guard
+ *
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — 배포 2 전 경계 보정.
+ *   백엔드와 같은 판정: `{key}:{level}`(admin ⊃ operator) **그리고** 그 서비스의 membership active.
+ *   Neture 역할 · Neture membership 을 요구하지 않는다 — 요구하면 새 역할만 가진 운영자가
+ *   자기 화면에 못 들어오고, 허용하면 새 역할이 없는 Neture 관리자가 API 403 화면에 들어온다.
+ *   platform:super_admin 은 역할 목록과 MembershipGate 양쪽에서 통과(백엔드 platformBypass 와 같음).
+ */
+export function SubdomainOperatorRoute({
+  children,
+  serviceKey,
+  level,
+  fallback = '/login',
+}: Omit<LegacyGuardProps, 'allowedRoles'> & { serviceKey: SubdomainOperatorKey; level: SubdomainOperatorLevel }) {
+  return (
+    <RouteGuard
+      allowedRoles={subdomainOperatorRoles(serviceKey, level)}
+      requireMembership={serviceKey}
       fallback={fallback}
     >
       {children}

@@ -4,7 +4,7 @@
 > 최상위 정책: [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md)  
 > 실행 가이드: [O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md)  
 > 공통 규칙: [CONTENT-RULE-REGISTRY](../../common/CONTENT-RULE-REGISTRY.md) (CR-NNN) · 공통 작성 원칙: [CONTENT-AUTHORING-PRINCIPLES](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md)  
-> 배치 실행: [AGENT-KICKOFF.md](AGENT-KICKOFF.md) · 정본 예제: [examples/](examples/) · 처리 원장: [PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)
+> 배치 실행: [AGENT-KICKOFF.md](AGENT-KICKOFF.md) · 정본 예제: [examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/) · 처리 원장: [PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)
 
 **이 문서는 건강기능식품 설명서 작성 규칙의 SSOT다.** 다른 건기식 문서(README·AGENT-KICKOFF 등)는 규칙을 다시 길게 적지 않고 규칙 ID(HFF-RNN)로만 참조한다.
 
@@ -155,7 +155,7 @@ For any questions, please ask a store staff member or a relevant professional.
 
 부족한 근거를 보수적 추정 설명서로 채우지 않는다 — **근거가 부족하면 문구를 약하게 쓰는 것이 아니라 제작 자체를 보류**한다. 근거가 충분한 제품은 매력과 신뢰를 적극적으로 보여 구매를 돕고(HFF-R06 임팩트), 근거가 부족한 제품은 제작하지 않는다. 공통 원칙 = [CONTENT-AUTHORING-PRINCIPLES](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) (CR-007, 건기식·의약품·의료기기·의약외품 및 향후 상품군 공통).
 
-**작성 시 반복 검출되는 grounding 실패 5유형** — ①부재를 허용으로 ②외부 지식 유입 ③전수 비교 없는 최상급 ④허위 차별화 ⑤추론 확장 = [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) (CR-002·003·004). **①④는 "창작 금지" 점검만으로 잡히지 않는다**(지어낸 사실이 없어도 위반). 유산균 그룹 파일럿에서 5유형 전량 실검출 — [pilot-probiotics/REVIEW-V1 §2 Q4](pilot-probiotics/REVIEW-V1.md).
+**작성 시 반복 검출되는 grounding 실패 5유형** — ①부재를 허용으로 ②외부 지식 유입 ③전수 비교 없는 최상급 ④허위 차별화 ⑤추론 확장 = [CONTENT-AUTHORING-PRINCIPLES §4-1](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) (CR-002·003·004). **①④는 "창작 금지" 점검만으로 잡히지 않는다**(지어낸 사실이 없어도 위반). 유산균 그룹 파일럿에서 5유형 전량 실검출 — [pilot-probiotics/REVIEW-V1 §2 Q4](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/pilot-probiotics/REVIEW-V1.md).
 
 ### HFF-R10 — 검수·승격·이중게이트 (CR-008 · CR-009)
 
@@ -222,7 +222,7 @@ DB 비밀정보는 문서·커밋에 기록하지 않고 env에서만 추출한�
 제품별 사실은 해당 제품 원천으로 다시 확인한다(HFF-R09).
 ```
 
-- **정본 예제** = [examples/byeonenjang.semantic.html](examples/byeonenjang.semantic.html) (시맨틱 `sd-*`, `<style>` 없음, 식약처 grounding).
+- **정본 예제** = [examples/byeonenjang.semantic.html](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/byeonenjang.semantic.html) (시맨틱 `sd-*`, `<style>` 없음, 식약처 grounding).
 - **사진 기반 임시 예제**(맨파워포텐 등 photo 배치, `ko+zh`)는 문장 예시용이며 **정본으로 사용하지 않는다.** 향후 보존·정리 여부는 별도 결정한다(LEDGER 헤더).
 
 ---

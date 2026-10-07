@@ -39,6 +39,27 @@ import { CreateHospitalDeviceTables1790125390245 } from '../migrations/179012539
 //   런타임 의존은 Phase B-1 에서 0 이 됐고(B-1 revision 서빙 상태에서 Google 로그인 회귀 PASS),
 //   deploy 는 migration 이 새 revision 보다 먼저 실행되므로 코드 선행이 필수였다.
 import { DropLegacyPasswordAuthSchema1790251584623 } from '../migrations/1790251584623-DropLegacyPasswordAuthSchema.js';
+import { CreateCommunityDomain1790400000000 } from '../migrations/1790400000000-CreateCommunityDomain.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §5 (branch_creation_requests: 분회 개설 신청 축)
+import { CreateBranchCreationRequests1790400000001 } from '../migrations/1790400000001-CreateBranchCreationRequests.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (service_session_revocations: 서비스 단위 세션 폐기)
+import { CreateServiceSessionRevocations1790400000002 } from '../migrations/1790400000002-CreateServiceSessionRevocations.js';
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (handoff 원장에 출발 서비스 세대 보관)
+import { AlterHandoffTokensSourceSessionEpoch1790400000003 } from '../migrations/1790400000003-AlterHandoffTokensSourceSessionEpoch.js';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2 (이메일·비밀번호 인증 저장 구조 3테이블 · 신규)
+import { CreateEmailPasswordAuthTables1790683000000 } from '../migrations/1790683000000-CreateEmailPasswordAuthTables.js';
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1 (handoff 원장에 출발 세션 인증 수단 보관)
+import { AddHandoffTokenSourceAuthMethod1790684000000 } from '../migrations/1790684000000-AddHandoffTokenSourceAuthMethod.js';
+// WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 Phase B-A (demo_accounts registry)
+import { CreateDemoAccounts1790940000000 } from '../migrations/1790940000000-CreateDemoAccounts.js';
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1 (assistant_tasks + work_run_coordination.task_id)
+import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-CreateAssistantTasks.js';
+// WO-O4O-PERSONAL-ASSISTANT-MEMORY-CLOUD-CONTINUITY-V1 (assistant_procedural_patterns + assistant_run_frames)
+import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791100000000-CreateAssistantProceduralMemory.js';
+// WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 (local_agent_devices.capabilities)
+import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791177033073-AddLocalAgentDeviceCapabilities.js';
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
+import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -58,6 +79,17 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateOperatorInvitations1790125106065,
   CreateHospitalDeviceTables1790125390245,
   DropLegacyPasswordAuthSchema1790251584623,
+  CreateCommunityDomain1790400000000,
+  CreateBranchCreationRequests1790400000001,
+  CreateServiceSessionRevocations1790400000002,
+  AlterHandoffTokensSourceSessionEpoch1790400000003,
+  CreateEmailPasswordAuthTables1790683000000,
+  AddHandoffTokenSourceAuthMethod1790684000000,
+  CreateDemoAccounts1790940000000,
+  CreateAssistantTasks1791012819443,
+  CreateAssistantProceduralMemory1791100000000,
+  AddLocalAgentDeviceCapabilities1791177033073,
+  CreateNeturePharmacyCommerce1791200000000,
 ];
 
 export function incrementalMigrationNames(): string[] {

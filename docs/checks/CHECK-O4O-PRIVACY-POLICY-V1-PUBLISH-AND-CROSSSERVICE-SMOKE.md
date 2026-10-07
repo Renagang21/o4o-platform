@@ -93,7 +93,7 @@ draft(201) → readback sha 일치 → publish(200, status `published`) 4/4. 같
 
 ## 12. 책임자 정합 (Footer ↔ 제13조)
 
-Footer `개인정보보호책임자 서철환 | threelifezone3@nate.com | 1577-2779` ↔ 본문 제13조 `성명: 서철환 / 직위: 대표이사 / 전화: 1577-2779 / 이메일: threelifezone3@nate.com` 4/4 일치. `service_legal_profiles` 이번 WO 수정 0.
+Footer `개인정보보호책임자 서철환 | [REDACTED_EMAIL_E] | 1577-2779` ↔ 본문 제13조 `성명: 서철환 / 직위: 대표이사 / 전화: 1577-2779 / 이메일: [REDACTED_EMAIL_E]` 4/4 일치. `service_legal_profiles` 이번 WO 수정 0.
 
 ## 13. 본문 동일성
 

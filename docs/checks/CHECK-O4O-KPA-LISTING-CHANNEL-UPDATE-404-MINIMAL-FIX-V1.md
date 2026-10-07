@@ -99,7 +99,7 @@ backend / DB / migration                — 무변경
 
 ## 5. 프로덕션 실증
 
-계정: 약국 경영자 `renagang21@gmail.com` · 조직 `테스트 약국 매장` (`9c87f46b-…`)
+계정: 약국 경영자 `[REDACTED_EMAIL_B]` · 조직 `테스트 약국 매장` (`9c87f46b-…`)
 (자격증명은 env 주입, 문서·로그·커밋 미기록)
 
 ### 5.1 진열 저장 write smoke — **PASS** (수정 전 FAIL → 수정 후 PASS)

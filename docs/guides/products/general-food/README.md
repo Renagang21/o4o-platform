@@ -27,9 +27,9 @@ O4O는 일반식품의 공통 매장용 상세설명서를 **새로 제작하지
 
 ## 2. 기존 샘플
 
-- 흑염소 진액: [한국어](samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어](samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
-- 리포좀 콜라겐: [한국어](samples/elamor-liposome-collagen-glutathione.html) · [중국어](samples/elamor-liposome-collagen-glutathione.zh.html)
-- 콸콸포맨: [한국어](samples/coolman-cheonmundong-liquid-tea.html) · [중국어](samples/coolman-cheonmundong-liquid-tea.zh.html)
+- 흑염소 진액: [한국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/damrokwon-heukyeomso-jinaek-gold.html) · [중국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/damrokwon-heukyeomso-jinaek-gold.zh.html)
+- 리포좀 콜라겐: [한국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/elamor-liposome-collagen-glutathione.html) · [중국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/elamor-liposome-collagen-glutathione.zh.html)
+- 콸콸포맨: [한국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/coolman-cheonmundong-liquid-tea.html) · [중국어](../../../../apps/api-server/src/scripts/data/product-descriptions/general-food/samples/coolman-cheonmundong-liquid-tea.zh.html)
 
 기존 콘텐츠를 수정하거나 유지해야 할 경우에는 당시 제품 근거와 연결 상태를 보존하고, 신규 제작 정책으로 확대하지 않는다.
 

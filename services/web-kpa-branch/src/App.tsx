@@ -6,6 +6,7 @@
  *   /                                 분회 찾기 (registry)
  *   /login                            로그인 (serviceKey='kpa-branch')
  *   /me                               내 분회 / 전입·전출 이력
+ *   /service-admin                    분회 서비스 관리 — 가입 승인 · 분회 운영자 지정 (kpa-branch:admin)
  *   /:branchSlug                      분회 홈 (고정 템플릿)
  *   /:branchSlug/notices              공지
  *   /:branchSlug/resources            자료실
@@ -42,9 +43,11 @@ import { AuthProvider } from './contexts/AuthContext';
 import { TenantProvider, useTenant, detectBasename } from './lib/tenant';
 import { BranchLayout } from './layouts/BranchLayout';
 import DirectoryPage from './pages/DirectoryPage';
+import DirectoryShell from './layouts/DirectoryShell';
 import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
 import MyBranchPage from './pages/MyBranchPage';
+import ServiceAdminPage from './pages/service-admin/ServiceAdminPage';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 재설정 화면은 은퇴했다.
 import HandoffPage from './pages/HandoffPage';
 import BranchHomePage from './pages/BranchHomePage';
@@ -135,7 +138,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<DirectoryPage />} />
+      {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: `/` 에 헤더 · 푸터(KPA 정체성 · O4O 홈 · 로그인 · 첫 탐색) */}
+      <Route path="/" element={<DirectoryShell><DirectoryPage /></DirectoryShell>} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/join" element={<JoinPage />} />
       {/* WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 재설정할 비밀번호가 없다. */}
@@ -147,6 +151,8 @@ function AppRoutes() {
       */}
       <Route path="/handoff" element={<HandoffPage />} />
       <Route path="/me" element={<MyBranchPage />} />
+      {/* WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 서비스 단위 화면이라 공용 경로에만 둔다(분회 자체 도메인 트리에는 없음). */}
+      <Route path="/service-admin" element={<ServiceAdminPage />} />
       <Route path="/:branchSlug/*" element={<BranchBySlug />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

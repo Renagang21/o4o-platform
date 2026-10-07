@@ -249,6 +249,281 @@ export const MIGRATIONS = Object.freeze([
       `);
     },
   },
+  {
+    version: 5,
+    name: 'workflow_candidates_v1',
+    up(db) {
+      // WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1 (PHASE 2 · IR §8·§9-2)
+      // 성공 run 의 **semantic trajectory** 와 그것을 일반화한 **Workflow Candidate** 의 정본.
+      //   local_work_run_steps       — run 하나의 성공 단계(순서 · 행동 종류 · semantic locator JSON). 원장.
+      //   local_workflow_candidates  — (대상, 요청 템플릿) 하나 = Candidate 하나. steps_json 은 값 없는 semantic 단계.
+      //     request_template — 요청 문장에서 입력값 자리만 {{n}} 으로 바꾼 것. 업무 값은 담기지 않는다.
+      //     success_count/failure_count — 재생 결과. 반복 실패면 status='disabled'(재생 안 함).
+      // 저장 금지(IR §11): 좌표 · elementRef · snapshot · DOM 전문 · 화면 캡처 · 입력값 · 인증정보 · 개인정보.
+      // 개인 범위 전용 — 공유 workflow 로 자동 승격하지 않는다. cloud 는 이 테이블을 읽지 않는다(재생 대조는 이 PC 에서).
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_work_run_steps (
+          run_id       TEXT NOT NULL,
+          step_index   INTEGER NOT NULL,
+          action_kind  TEXT NOT NULL,
+          step_json    TEXT NOT NULL,
+          created_at   TEXT NOT NULL,
+          PRIMARY KEY (run_id, step_index)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_workflow_candidates (
+          candidate_id     TEXT PRIMARY KEY,
+          target_id        TEXT NOT NULL,
+          request_template TEXT NOT NULL,
+          steps_json       TEXT NOT NULL,
+          source_run_id    TEXT,
+          success_count    INTEGER NOT NULL DEFAULT 0,
+          failure_count    INTEGER NOT NULL DEFAULT 0,
+          status           TEXT NOT NULL DEFAULT 'active',
+          created_at       TEXT NOT NULL,
+          updated_at       TEXT NOT NULL,
+          UNIQUE (target_id, request_template)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_local_workflow_candidates_target
+          ON local_workflow_candidates (target_id, status);
+      `);
+    },
+  },
+  {
+    version: 6,
+    name: 'work_experience_v1',
+    up(db) {
+      // WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 (Experience Model V1 Phase 1 · §15 최소 집합)
+      // 성공·실패·사용자 대기 run 모두가 남기는 **구조화된 경험** — 쓰기 전용(recall·승격·공유 없음).
+      //   local_work_runs (확장)          — task/target 식별 · 시작/종료 · segment 수 · Outcome(상태 + 근거 등급).
+      //   local_work_run_segments         — 요청 1회 = segment 1개. 시간 분해 metric(근거 없으면 NULL).
+      //   local_work_run_experience_steps — run 의 **모든** 단계(성공·실패·거절). stage · 수단 · semantic locator · 결과.
+      //   local_work_run_failures         — 실패 이벤트. 원인 층(runtime/ui_change/...) · 회복 tier/결과.
+      // local_work_run_steps(v5) 는 Candidate 저장이 run 단위로 지우고 다시 쓰는 성공 경로 원장이라 재사용하지 않는다.
+      // 저장 금지(Experience Model §15·§9): 입력한 업무 내용 · 사용자 답변 원문 · 화면 글 · DOM · 캡처 · 프롬프트 ·
+      //   모델 근거 · 결과 데이터 · 개인/환자 정보 · 인증정보. cloud 는 이 테이블을 읽지 않는다(ARCHITECTURE §5-1).
+      const has = (table, col) => db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === col);
+      const addRunColumns = [
+        ['task_key', 'TEXT'],
+        ['task_provisional', 'INTEGER'],
+        ['target_kind', 'TEXT'],
+        ['started_at', 'TEXT'],
+        ['ended_at', 'TEXT'],
+        ['segment_count', 'INTEGER NOT NULL DEFAULT 0'],
+        ['outcome_status', 'TEXT'],
+        ['outcome_evidence', 'TEXT'],
+      ];
+      for (const [col, type] of addRunColumns) {
+        if (!has('local_work_runs', col)) db.exec(`ALTER TABLE local_work_runs ADD COLUMN ${col} ${type}`);
+      }
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_work_run_segments (
+          run_id           TEXT NOT NULL,
+          segment_index    INTEGER NOT NULL,
+          started_at       TEXT NOT NULL,
+          ended_at         TEXT NOT NULL,
+          end_state        TEXT NOT NULL,
+          resumed          INTEGER NOT NULL DEFAULT 0,
+          user_wait_ms     INTEGER,
+          total_ms         INTEGER,
+          ai_ms            INTEGER,
+          ai_calls         INTEGER,
+          command_wait_ms  INTEGER,
+          execution_ms     INTEGER,
+          settle_ms        INTEGER,
+          action_count     INTEGER,
+          step_count       INTEGER,
+          retry_count      INTEGER,
+          created_at       TEXT NOT NULL,
+          PRIMARY KEY (run_id, segment_index),
+          UNIQUE (run_id, started_at)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_experience_steps (
+          run_id            TEXT NOT NULL,
+          seq               INTEGER NOT NULL,
+          segment_index     INTEGER NOT NULL,
+          stage             TEXT,
+          stage_provisional INTEGER NOT NULL DEFAULT 1,
+          action_kind       TEXT NOT NULL,
+          method            TEXT,
+          locator_json      TEXT,
+          decided_by        TEXT,
+          result_status     TEXT NOT NULL,
+          result_evidence   TEXT,
+          error_code        TEXT,
+          duration_ms       INTEGER,
+          created_at        TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_failures (
+          run_id              TEXT NOT NULL,
+          seq                 INTEGER NOT NULL,
+          segment_index       INTEGER NOT NULL,
+          step_seq            INTEGER,
+          stage               TEXT,
+          layer               TEXT,
+          failure_class       TEXT,
+          error_code          TEXT,
+          method              TEXT,
+          recovery_tier       TEXT,
+          recovery_result     TEXT,
+          ui_change_suspected INTEGER NOT NULL DEFAULT 0,
+          created_at          TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+      `);
+    },
+  },
+  {
+    version: 7,
+    name: 'work_assistance_correction_v1',
+    up(db) {
+      // WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 (Experience Model V1 Phase 2 · §7-1·§7-5·§7-6)
+      // 추가만 한다 — v1~v6 테이블 · 행은 건드리지 않는다.
+      //   local_work_run_context      — QUESTION 시점의 원래 업무 구조(task · stage · ask · 방법 · 재생 위치). 재개 때 같은 run 의 목적을 잇는다.
+      //   local_work_run_assistance   — 사용자 도움 이벤트(막힌 stage · 물은 것 · 준 정보 종류 · 구조 · 해결 · 재사용성).
+      //   local_work_run_corrections  — 교정(유형 · 이유 코드 · 틀린 방법 · 대안 · 검증 결과).
+      //   local_experience_patterns   — 검증된 Preferred/Avoid(Task × Target × Stage 한정). 단일 교정이 전역 규칙이 되지 않는다.
+      // 저장 금지: 사용자 답변 원문 · slot 값 · 화면 글 · 요청 원문. 방법 label 은 검증된(성공 단계 locator 와 맞은) 화면 이름뿐.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_work_run_context (
+          run_id              TEXT PRIMARY KEY,
+          target_id           TEXT NOT NULL,
+          task_key            TEXT,
+          stage_key           TEXT,
+          ask_kind            TEXT,
+          slot_kinds_json     TEXT,
+          strategy_json       TEXT,
+          replay_candidate_id TEXT,
+          replay_step_index   INTEGER,
+          updated_at          TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_assistance (
+          run_id           TEXT NOT NULL,
+          seq              INTEGER NOT NULL,
+          task_key         TEXT,
+          target_id        TEXT NOT NULL,
+          stage_key        TEXT,
+          kind             TEXT NOT NULL,
+          ask_kind         TEXT NOT NULL,
+          provided_kind    TEXT NOT NULL,
+          structured_json  TEXT,
+          resolution       TEXT NOT NULL,
+          progressed_steps INTEGER NOT NULL DEFAULT 0,
+          reusability      TEXT NOT NULL,
+          created_at       TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_work_run_corrections (
+          run_id              TEXT NOT NULL,
+          seq                 INTEGER NOT NULL,
+          assistance_seq      INTEGER NOT NULL,
+          task_key            TEXT,
+          target_id           TEXT NOT NULL,
+          stage_key           TEXT,
+          correction_type     TEXT NOT NULL,
+          reason_code         TEXT,
+          wrong_json          TEXT,
+          alternative_json    TEXT,
+          validation_result   TEXT NOT NULL,
+          validation_evidence TEXT,
+          reusability         TEXT NOT NULL,
+          created_at          TEXT NOT NULL,
+          PRIMARY KEY (run_id, seq)
+        );
+
+        CREATE TABLE IF NOT EXISTS local_experience_patterns (
+          pattern_id     TEXT PRIMARY KEY,
+          target_id      TEXT NOT NULL,
+          task_key       TEXT NOT NULL,
+          stage_key      TEXT NOT NULL,
+          polarity       TEXT NOT NULL,
+          pattern_json   TEXT NOT NULL,
+          pattern_sig    TEXT NOT NULL,
+          source_run_id  TEXT NOT NULL,
+          verified_count INTEGER NOT NULL DEFAULT 0,
+          failed_count   INTEGER NOT NULL DEFAULT 0,
+          status         TEXT NOT NULL DEFAULT 'verified',
+          created_at     TEXT NOT NULL,
+          updated_at     TEXT NOT NULL,
+          UNIQUE (target_id, task_key, stage_key, polarity, pattern_sig)
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_local_experience_patterns_scope
+          ON local_experience_patterns (target_id, task_key, status);
+      `);
+    },
+  },
+  {
+    version: 8,
+    name: 'node_ledger_owner_scope_v1',
+    up(db) {
+      // WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 (V2 §3-1 · §9-2)
+      // 노드 원장의 기억 경계 = 소유 주체. 한 PC 에서 개인 업무와 여러 조직 업무를 해도 서로의 경험이 섞이지 않게
+      // owner_key(서버가 준 불투명 키 — 원 사용자/조직 id 가 아니다)를 붙인다.
+      //   local_experience_patterns · local_workflow_candidates — 유일키에 owner_key 를 넣기 위해 재생성한다(행 보존).
+      //   local_work_runs · local_work_run_assistance           — owner_key 컬럼 추가.
+      // 이전 행은 owner_key NULL 로 남는다 — 소유 주체를 알 수 없으므로 owner_key 를 지정한 조회에는 나오지 않는다(격리).
+      const has = (table, col) => db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === col);
+      if (!has('local_work_runs', 'owner_key')) db.exec('ALTER TABLE local_work_runs ADD COLUMN owner_key TEXT');
+      if (!has('local_work_run_assistance', 'owner_key')) db.exec('ALTER TABLE local_work_run_assistance ADD COLUMN owner_key TEXT');
+      db.exec(`
+        CREATE TABLE local_experience_patterns_v8 (
+          pattern_id     TEXT PRIMARY KEY,
+          owner_key      TEXT,
+          target_id      TEXT NOT NULL,
+          task_key       TEXT NOT NULL,
+          stage_key      TEXT NOT NULL,
+          polarity       TEXT NOT NULL,
+          pattern_json   TEXT NOT NULL,
+          pattern_sig    TEXT NOT NULL,
+          source_run_id  TEXT NOT NULL,
+          verified_count INTEGER NOT NULL DEFAULT 0,
+          failed_count   INTEGER NOT NULL DEFAULT 0,
+          status         TEXT NOT NULL DEFAULT 'verified',
+          created_at     TEXT NOT NULL,
+          updated_at     TEXT NOT NULL,
+          UNIQUE (owner_key, target_id, task_key, stage_key, polarity, pattern_sig)
+        );
+        INSERT INTO local_experience_patterns_v8 (pattern_id, owner_key, target_id, task_key, stage_key, polarity, pattern_json, pattern_sig,
+          source_run_id, verified_count, failed_count, status, created_at, updated_at)
+          SELECT pattern_id, NULL, target_id, task_key, stage_key, polarity, pattern_json, pattern_sig,
+            source_run_id, verified_count, failed_count, status, created_at, updated_at FROM local_experience_patterns;
+        DROP TABLE local_experience_patterns;
+        ALTER TABLE local_experience_patterns_v8 RENAME TO local_experience_patterns;
+        CREATE INDEX IF NOT EXISTS idx_local_experience_patterns_scope
+          ON local_experience_patterns (owner_key, target_id, task_key, status);
+
+        CREATE TABLE local_workflow_candidates_v8 (
+          candidate_id     TEXT PRIMARY KEY,
+          owner_key        TEXT,
+          target_id        TEXT NOT NULL,
+          request_template TEXT NOT NULL,
+          steps_json       TEXT NOT NULL,
+          source_run_id    TEXT,
+          success_count    INTEGER NOT NULL DEFAULT 0,
+          failure_count    INTEGER NOT NULL DEFAULT 0,
+          status           TEXT NOT NULL DEFAULT 'active',
+          created_at       TEXT NOT NULL,
+          updated_at       TEXT NOT NULL,
+          UNIQUE (owner_key, target_id, request_template)
+        );
+        INSERT INTO local_workflow_candidates_v8 (candidate_id, owner_key, target_id, request_template, steps_json, source_run_id,
+          success_count, failure_count, status, created_at, updated_at)
+          SELECT candidate_id, NULL, target_id, request_template, steps_json, source_run_id,
+            success_count, failure_count, status, created_at, updated_at FROM local_workflow_candidates;
+        DROP TABLE local_workflow_candidates;
+        ALTER TABLE local_workflow_candidates_v8 RENAME TO local_workflow_candidates;
+        CREATE INDEX IF NOT EXISTS idx_local_workflow_candidates_target
+          ON local_workflow_candidates (owner_key, target_id, status);
+      `);
+    },
+  },
 ]);
 
 /** DB 스키마 버전 = 체크인된 마지막 migration 의 version(§11). 따로 손으로 올리지 않는다. */
@@ -631,19 +906,20 @@ function clampWorkRunText(value) {
 
 export const LocalWorkRunRepository = {
   /** logical run 생성/갱신(idempotent). 재개 요청이 같은 runId 로 다시 와도 안전하다. */
-  upsert({ runId, status, targetId, goalSummary, note }) {
+  upsert({ runId, status, targetId, goalSummary, note, ownerKey }) {
     const id = String(runId);
     const st = WORK_RUN_STATUSES.includes(status) ? status : 'active';
     const now = nowIso();
     openLocalDb()
       .prepare(
-        'INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, created_at, updated_at) ' +
-          'VALUES(?, ?, ?, ?, ?, ?, ?) ' +
+        'INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, owner_key, created_at, updated_at) ' +
+          'VALUES(?, ?, ?, ?, ?, ?, ?, ?) ' +
           'ON CONFLICT(run_id) DO UPDATE SET ' +
           'status=excluded.status, ' +
           'target_id=COALESCE(excluded.target_id, local_work_runs.target_id), ' +
           'goal_summary=COALESCE(excluded.goal_summary, local_work_runs.goal_summary), ' +
           'note=excluded.note, ' +
+          'owner_key=COALESCE(excluded.owner_key, local_work_runs.owner_key), ' +
           'updated_at=excluded.updated_at',
       )
       .run(
@@ -652,6 +928,7 @@ export const LocalWorkRunRepository = {
         targetId == null ? null : String(targetId),
         clampWorkRunText(goalSummary),
         clampWorkRunText(note),
+        ownerKey ?? null,
         now,
         now,
       );
@@ -676,6 +953,499 @@ export const LocalWorkRunRepository = {
     return openLocalDb()
       .prepare('SELECT run_id, status, target_id, goal_summary, note, created_at, updated_at FROM local_work_runs WHERE run_id=?')
       .get(String(runId)) || null;
+  },
+};
+
+/**
+ * Experience 원장(Experience Model V1 Phase 1 · §15 최소 집합). **쓰기 전용** — cloud 로 read-back 하지 않는다.
+ * 요청(segment) 하나가 끝날 때마다 한 번 기록한다. 형상 검증은 handlers.mjs 가 먼저 한다.
+ *   - run row 가 없으면 만든다(대상 준비 전 실패한 새 run). 있으면 status 는 건드리지 않는다(상태 전이는 upsert/set_status 몫).
+ *   - segment_index · step seq · failure seq 는 이 run 의 기존 최대값 뒤로 잇는다 — 재개(QUESTION→resume)도 같은 run.
+ *   - user_wait_ms = 직전 segment 가 사용자 대기로 끝났을 때 그 종료 ~ 이번 시작(대기 시간은 실행 시간과 분리).
+ *   - 같은 (run, 시작 시각) segment 가 이미 있으면 중복 전송으로 보고 아무것도 쓰지 않는다.
+ *   - Outcome 은 넘긴 경우에만 갱신(대기 segment 는 최종 결과가 아니다).
+ */
+export const LocalWorkRunExperienceRepository = {
+  record({ runId, segment, target, outcome, metric, steps, failures }) {
+    const db = openLocalDb();
+    const id = String(runId);
+    const now = nowIso();
+    const nn = (v) => (v === undefined || v === null ? null : v);
+    db.exec('BEGIN');
+    try {
+      const dup = db.prepare('SELECT segment_index FROM local_work_run_segments WHERE run_id=? AND started_at=?').get(id, segment.startedAt);
+      if (dup) {
+        db.exec('COMMIT');
+        return { recorded: false, duplicate: true, segmentIndex: dup.segment_index };
+      }
+      db.prepare(
+        'INSERT INTO local_work_runs(run_id, status, target_id, created_at, updated_at) VALUES(?, ?, ?, ?, ?) ' +
+          'ON CONFLICT(run_id) DO NOTHING',
+      ).run(id, segment.endState === 'completed' ? 'completed' : 'taken_over', nn(target?.targetId), now, now);
+      const prev = db
+        .prepare('SELECT segment_index, ended_at, end_state FROM local_work_run_segments WHERE run_id=? ORDER BY segment_index DESC LIMIT 1')
+        .get(id);
+      const segmentIndex = prev ? prev.segment_index + 1 : 1;
+      let userWaitMs = null;
+      if (prev && prev.end_state === 'waiting_for_user') {
+        const gap = Date.parse(segment.startedAt) - Date.parse(prev.ended_at);
+        if (Number.isFinite(gap) && gap >= 0) userWaitMs = gap;
+      }
+      const m = metric || {};
+      db.prepare(
+        'INSERT INTO local_work_run_segments(run_id, segment_index, started_at, ended_at, end_state, resumed, user_wait_ms, total_ms, ai_ms, ai_calls, ' +
+          'command_wait_ms, execution_ms, settle_ms, action_count, step_count, retry_count, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      ).run(
+        id, segmentIndex, segment.startedAt, segment.endedAt, segment.endState, segment.resumed ? 1 : 0, userWaitMs,
+        nn(m.totalMs), nn(m.aiMs), nn(m.aiCalls), nn(m.commandWaitMs), nn(m.executionMs), nn(m.settleMs),
+        nn(m.actionCount), nn(m.stepCount), nn(m.retryCount), now,
+      );
+      const stepBase = db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM local_work_run_experience_steps WHERE run_id=?').get(id).n;
+      const insStep = db.prepare(
+        'INSERT INTO local_work_run_experience_steps(run_id, seq, segment_index, stage, stage_provisional, action_kind, method, locator_json, ' +
+          'decided_by, result_status, result_evidence, error_code, duration_ms, created_at) VALUES(?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      );
+      for (const s of steps || []) {
+        insStep.run(
+          id, stepBase + s.seq, segmentIndex, nn(s.stage), s.actionKind, nn(s.method), s.locator ? JSON.stringify(s.locator) : null,
+          nn(s.actor), s.resultStatus, nn(s.resultEvidence), nn(s.errorCode), nn(s.durationMs), now,
+        );
+      }
+      const failBase = db.prepare('SELECT COALESCE(MAX(seq), 0) AS n FROM local_work_run_failures WHERE run_id=?').get(id).n;
+      const insFail = db.prepare(
+        'INSERT INTO local_work_run_failures(run_id, seq, segment_index, step_seq, stage, layer, failure_class, error_code, method, ' +
+          'recovery_tier, recovery_result, ui_change_suspected, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      );
+      (failures || []).forEach((f, i) => {
+        insFail.run(
+          id, failBase + i + 1, segmentIndex, f.stepSeq == null ? null : stepBase + f.stepSeq, nn(f.stage), nn(f.layer), nn(f.failureClass),
+          nn(f.errorCode), nn(f.method), nn(f.recoveryTier), nn(f.recoveryResult), f.uiChangeSuspected ? 1 : 0, now,
+        );
+      });
+      const hasOutcome = !!outcome;
+      db.prepare(
+        'UPDATE local_work_runs SET ' +
+          'target_id=COALESCE(target_id, ?), target_kind=COALESCE(?, target_kind), task_provisional=1, ' +
+          'started_at=COALESCE(started_at, ?), ended_at=?, segment_count=segment_count+1, ' +
+          (hasOutcome ? 'outcome_status=?, outcome_evidence=?, ' : '') +
+          'updated_at=? WHERE run_id=?',
+      ).run(
+        ...[nn(target?.targetId), nn(target?.targetKind), segment.startedAt, segment.endedAt],
+        ...(hasOutcome ? [outcome.status, nn(outcome.evidence)] : []),
+        now, id,
+      );
+      db.exec('COMMIT');
+      return { recorded: true, segmentIndex, stepCount: (steps || []).length, failureCount: (failures || []).length };
+    } catch (e) {
+      db.exec('ROLLBACK');
+      throw e;
+    }
+  },
+  /** agent 내부 진단·테스트용 조회. cloud 로 read-back 하지 않는다. */
+  get(runId) {
+    const db = openLocalDb();
+    const id = String(runId);
+    const run = db
+      .prepare(
+        'SELECT run_id, status, target_id, task_key, task_provisional, target_kind, started_at, ended_at, segment_count, outcome_status, outcome_evidence ' +
+          'FROM local_work_runs WHERE run_id=?',
+      )
+      .get(id);
+    if (!run) return null;
+    return {
+      run,
+      segments: db.prepare('SELECT * FROM local_work_run_segments WHERE run_id=? ORDER BY segment_index').all(id),
+      steps: db.prepare('SELECT * FROM local_work_run_experience_steps WHERE run_id=? ORDER BY seq').all(id),
+      failures: db.prepare('SELECT * FROM local_work_run_failures WHERE run_id=? ORDER BY seq').all(id),
+    };
+  },
+};
+
+/**
+ * Workflow Candidate 정본(PHASE 2 · IR §8·§9-2). 고정 쿼리만 — 임의 SQL 통로 없음.
+ *
+ * 템플릿 대조는 **여기(이 PC)** 에서 한다. cloud 에는 이번 요청의 값을 채운 재생 단계만 돌려준다 —
+ * 과거 요청 템플릿 · 통계 · source run 은 밖으로 나가지 않는다. 단계 형상 검증은 handlers.mjs 가 먼저 한다.
+ * 같은 규칙(값 자리 · 공백 정규화 · 상한)이 서버 workflow-candidate.ts 에 손으로 복제돼 있다.
+ */
+export const WORKFLOW_CANDIDATE_ID_RE = /^wc_[a-z0-9]{6,32}$/;
+const WORKFLOW_VALUE_MAX = 200;
+/** 반복 실패 차단 — 실패가 이만큼 쌓이고 성공보다 많으면 재생하지 않는다. */
+const WORKFLOW_DISABLE_FAILURES = 3;
+
+function workflowText(value) {
+  return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+/** 템플릿 대조 — 맞으면 자리 번호 순 값 배열(1번 → [0]), 아니면 null. 서버 matchRequestTemplate 과 같은 규칙. */
+export function matchWorkflowTemplate(template, request) {
+  const req = workflowText(request);
+  if (!req || typeof template !== 'string' || !template) return null;
+  const parts = template.split(/(\{\{\d\}\})/);
+  const order = [];
+  const pattern = parts
+    .map((p) => {
+      const m = /^\{\{(\d)\}\}$/.exec(p);
+      if (m) {
+        order.push(Number(m[1]));
+        return '(.+?)';
+      }
+      return p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    })
+    .join('');
+  const hit = new RegExp(`^${pattern}$`).exec(req);
+  if (!hit) return null;
+  const values = [];
+  for (let i = 0; i < order.length; i += 1) {
+    const slot = order[i];
+    const v = hit[i + 1].trim();
+    if (!v || v.length > WORKFLOW_VALUE_MAX) return null;
+    if (values[slot - 1] !== undefined && values[slot - 1] !== v) return null;
+    values[slot - 1] = v;
+  }
+  for (let i = 0; i < values.length; i += 1) if (values[i] === undefined) return null;
+  return values;
+}
+
+export const LocalWorkflowCandidateRepository = {
+  /**
+   * 성공 run → run 단계 원장 + Candidate upsert((대상, 템플릿) 하나 = Candidate 하나). 같은 형태를 다시 성공하면
+   * 단계를 최신 성공 경로로 갱신한다(AI 가 이어받아 고친 경로 = self-healing 반영). replayedCandidateId 가 있으면 그 성공을 센다.
+   */
+  save({ runId, targetId, template, steps, replayedCandidateId, ownerKey }) {
+    const db = openLocalDb();
+    const now = nowIso();
+    const stepsJson = JSON.stringify(steps);
+    const owner = ownerKey ?? null;
+    db.exec('BEGIN');
+    try {
+      db.prepare('DELETE FROM local_work_run_steps WHERE run_id=?').run(String(runId));
+      const ins = db.prepare('INSERT INTO local_work_run_steps(run_id, step_index, action_kind, step_json, created_at) VALUES(?, ?, ?, ?, ?)');
+      steps.forEach((s, i) => ins.run(String(runId), i + 1, String(s.actionKind), JSON.stringify(s), now));
+      // v8 — 같은 소유 주체의 Candidate 만 갱신한다(owner_key 없음 = 이전 묶음).
+      const existing = db
+        .prepare('SELECT candidate_id FROM local_workflow_candidates WHERE owner_key IS ? AND target_id=? AND request_template=?')
+        .get(owner, String(targetId), String(template));
+      const candidateId = existing ? existing.candidate_id : `wc_${randomUUID().replace(/-/g, '').slice(0, 20)}`;
+      if (existing) {
+        // 다시 성공했다 — 최신 성공 경로로 갱신하고 다시 켠다(재생 실패로 꺼졌던 Candidate 도 새 성공으로 회복).
+        db.prepare(
+          "UPDATE local_workflow_candidates SET steps_json=?, source_run_id=?, status='active', updated_at=? WHERE candidate_id=?",
+        ).run(stepsJson, String(runId), now, candidateId);
+      } else {
+        db.prepare(
+          'INSERT INTO local_workflow_candidates(candidate_id, owner_key, target_id, request_template, steps_json, source_run_id, created_at, updated_at) ' +
+            'VALUES(?, ?, ?, ?, ?, ?, ?, ?)',
+        ).run(candidateId, owner, String(targetId), String(template), stepsJson, String(runId), now, now);
+      }
+      if (replayedCandidateId) {
+        db.prepare('UPDATE local_workflow_candidates SET success_count=success_count+1, updated_at=? WHERE candidate_id=?').run(now, String(replayedCandidateId));
+      }
+      db.exec('COMMIT');
+      return { candidateId, candidateStatus: 'active' };
+    } catch (e) {
+      db.exec('ROLLBACK');
+      throw e;
+    }
+  },
+
+  /**
+   * 이번 요청과 맞는 active Candidate 하나 → 값을 채운 재생 단계. 성공이 많은 것부터 본다.
+   * 돌려주는 것은 candidateId + 단계(actionKind · locator · value · expect)뿐 — 템플릿 · 통계 · source run 은 담지 않는다.
+   */
+  match({ targetId, request, ownerKey }) {
+    // v8 — 이 소유 주체의 Candidate 만 대조한다. 다른 소유 주체 · 소유 주체를 모르는 이전 행은 나오지 않는다.
+    const rows = openLocalDb()
+      .prepare(
+        "SELECT candidate_id, request_template, steps_json FROM local_workflow_candidates WHERE owner_key IS ? AND target_id=? AND status='active' " +
+          'ORDER BY success_count DESC, updated_at DESC LIMIT 50',
+      )
+      .all(ownerKey ?? null, String(targetId));
+    for (const row of rows) {
+      const values = matchWorkflowTemplate(row.request_template, request);
+      if (!values) continue;
+      let steps;
+      try {
+        steps = JSON.parse(row.steps_json);
+      } catch {
+        continue;
+      }
+      if (!Array.isArray(steps)) continue;
+      const filled = [];
+      let ok = true;
+      for (const s of steps) {
+        const out = { actionKind: s.actionKind, locator: s.locator, expect: s.expect };
+        if (s.slot !== undefined) {
+          const v = values[s.slot - 1];
+          if (v === undefined) { ok = false; break; }
+          out.value = v;
+        } else if (s.option !== undefined) {
+          out.value = s.option;
+        }
+        filled.push(out);
+      }
+      if (ok && filled.length > 0) return { matched: true, candidateId: row.candidate_id, steps: filled };
+    }
+    return { matched: false };
+  },
+
+  /** 재생 결과 반영. 실패가 쌓이고 성공보다 많으면 끈다(다음부터 AI 가 처음부터 푼다). */
+  recordResult({ candidateId, outcome }) {
+    const db = openLocalDb();
+    const now = nowIso();
+    const id = String(candidateId);
+    if (outcome === 'replay_completed') {
+      db.prepare('UPDATE local_workflow_candidates SET success_count=success_count+1, updated_at=? WHERE candidate_id=?').run(now, id);
+    } else {
+      db.prepare('UPDATE local_workflow_candidates SET failure_count=failure_count+1, updated_at=? WHERE candidate_id=?').run(now, id);
+      db.prepare(
+        "UPDATE local_workflow_candidates SET status='disabled', updated_at=? WHERE candidate_id=? AND failure_count>=? AND failure_count>success_count",
+      ).run(now, id, WORKFLOW_DISABLE_FAILURES);
+    }
+    const row = db.prepare('SELECT status FROM local_workflow_candidates WHERE candidate_id=?').get(id);
+    return { candidateId: id, candidateStatus: row ? row.status : null };
+  },
+};
+
+/**
+ * Run context(Experience Model V1 Phase 2 · WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1).
+ * QUESTION 으로 멈출 때 원래 업무의 **구조**(task · stage · 무엇을 물었나 · 방법 · 재생 위치)를 남기고,
+ * 같은 runId 로 재개될 때 그 구조를 돌려준다 — 짧은 답변이 새 업무 목표가 되지 않게 한다.
+ * 원문 · 값은 저장하지 않는다. 재생 재개는 이 PC 에서 원래 요청(goal_summary)으로 Candidate 를 다시 대조하고,
+ * 막혔던 자리만 이번 답(slotValue — 저장하지 않음)으로 채워 돌려준다.
+ */
+export const LocalWorkRunContextRepository = {
+  save({ runId, targetId, taskKey, stageKey, ask, strategy, replay }) {
+    const db = openLocalDb();
+    const now = nowIso();
+    db.prepare(
+      'INSERT INTO local_work_run_context(run_id, target_id, task_key, stage_key, ask_kind, slot_kinds_json, strategy_json, replay_candidate_id, replay_step_index, updated_at) ' +
+        'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(run_id) DO UPDATE SET ' +
+        'target_id=excluded.target_id, task_key=COALESCE(excluded.task_key, local_work_run_context.task_key), ' +
+        'stage_key=excluded.stage_key, ask_kind=excluded.ask_kind, slot_kinds_json=excluded.slot_kinds_json, ' +
+        'strategy_json=COALESCE(excluded.strategy_json, local_work_run_context.strategy_json), ' +
+        'replay_candidate_id=excluded.replay_candidate_id, replay_step_index=excluded.replay_step_index, updated_at=excluded.updated_at',
+    ).run(
+      String(runId), String(targetId), taskKey ?? null, stageKey ?? null, ask ? ask.kind : null, ask ? JSON.stringify(ask.slots) : null,
+      strategy ? JSON.stringify(strategy) : null, replay ? replay.candidateId : null, replay ? replay.stepIndex : null, now,
+    );
+    if (taskKey) db.prepare('UPDATE local_work_runs SET task_key=?, updated_at=? WHERE run_id=?').run(taskKey, now, String(runId));
+    return { saved: true };
+  },
+
+  recall({ runId, targetId, slotValue }) {
+    const db = openLocalDb();
+    const row = db.prepare('SELECT * FROM local_work_run_context WHERE run_id=? AND target_id=?').get(String(runId), String(targetId));
+    if (!row) return { found: false };
+    const parse = (s) => {
+      if (!s) return null;
+      try { return JSON.parse(s); } catch { return null; }
+    };
+    const out = {
+      found: true,
+      taskKey: row.task_key ?? null,
+      stageKey: row.stage_key ?? null,
+      ask: row.ask_kind ? { kind: row.ask_kind, slots: parse(row.slot_kinds_json) ?? [] } : null,
+      strategy: parse(row.strategy_json),
+    };
+    if (row.replay_candidate_id != null && typeof slotValue === 'string' && slotValue.trim()) {
+      const steps = rederiveReplaySteps(db, row, String(runId), workflowText(slotValue));
+      if (steps) {
+        out.replayCandidateId = row.replay_candidate_id;
+        out.replaySteps = steps;
+      }
+    }
+    return out;
+  },
+};
+
+/** 원래 요청(goal_summary)으로 Candidate 템플릿을 다시 대조 → 막힌 단계의 자리만 새 값으로 바꿔 채운다. 실패하면 null. */
+function rederiveReplaySteps(db, ctx, runId, slotValue) {
+  if (!slotValue || slotValue.length > WORKFLOW_VALUE_MAX) return null;
+  const run = db.prepare('SELECT goal_summary FROM local_work_runs WHERE run_id=?').get(runId);
+  const cand = db
+    .prepare("SELECT request_template, steps_json FROM local_workflow_candidates WHERE candidate_id=? AND target_id=? AND status='active'")
+    .get(String(ctx.replay_candidate_id), String(ctx.target_id));
+  if (!run?.goal_summary || !cand) return null;
+  const values = matchWorkflowTemplate(cand.request_template, run.goal_summary);
+  if (!values) return null;
+  let steps;
+  try { steps = JSON.parse(cand.steps_json); } catch { return null; }
+  if (!Array.isArray(steps)) return null;
+  const blocked = steps[ctx.replay_step_index];
+  if (!blocked || blocked.slot === undefined) return null;
+  values[blocked.slot - 1] = slotValue;
+  return fillWorkflowSteps(steps, values);
+}
+
+function fillWorkflowSteps(steps, values) {
+  const filled = [];
+  for (const s of steps) {
+    const out = { actionKind: s.actionKind, locator: s.locator, expect: s.expect };
+    if (s.slot !== undefined) {
+      const v = values[s.slot - 1];
+      if (v === undefined) return null;
+      out.value = v;
+    } else if (s.option !== undefined) {
+      out.value = s.option;
+    }
+    filled.push(out);
+  }
+  return filled.length ? filled : null;
+}
+
+/** 방법 서명 — 서버 work-assistance.ts strategySignature 와 같은 규칙. */
+function patternSignature(strategy) {
+  return strategy.ops.map((o) => (o.label ? `${o.op}:${o.label}` : o.op)).join('>');
+}
+export const EXPERIENCE_PATTERN_ID_RE = /^lp_[a-z0-9]{6,32}$/;
+
+/**
+ * Assistance · Correction 원장 + 검증된 Preferred/Avoid(§7-5·§7-6). 형상 검증은 handlers.mjs 가 먼저 한다.
+ * 패턴 규칙(D5 · §7-6):
+ *   - 검증(verified) + reusable_knowledge + task · stage 가 있을 때만 만든다. 한 번의 교정은 이 Task × Target × Stage 밖으로 번지지 않는다.
+ *   - 방법 교정(procedure_method) → 대안 = preferred, 틀린 방법 = avoid. 메뉴 위치 · 업무 순서 도움 → 경로 = preferred.
+ *   - 같은 방법이 반대 극성으로 있으면 그쪽을 retired 로 내린다(새 검증이 이긴다).
+ *   - 검증 실패(failed)한 대안이 기존 preferred 와 같으면 failed_count 만 올린다.
+ */
+export const LocalWorkRunAssistanceRepository = {
+  record({ runId, targetId, taskKey, event, ownerKey }) {
+    const db = openLocalDb();
+    const id = String(runId);
+    const now = nowIso();
+    const owner = ownerKey ?? null;
+    db.exec('BEGIN');
+    try {
+      db.prepare('INSERT INTO local_work_runs(run_id, status, target_id, owner_key, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?) ON CONFLICT(run_id) DO NOTHING')
+        .run(id, 'active', String(targetId), owner, now, now);
+      if (taskKey) db.prepare('UPDATE local_work_runs SET task_key=?, updated_at=? WHERE run_id=?').run(taskKey, now, id);
+      const seq = db.prepare('SELECT COALESCE(MAX(seq), 0) + 1 AS n FROM local_work_run_assistance WHERE run_id=?').get(id).n;
+      db.prepare(
+        'INSERT INTO local_work_run_assistance(run_id, seq, task_key, target_id, stage_key, kind, ask_kind, provided_kind, structured_json, resolution, ' +
+          'progressed_steps, reusability, owner_key, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      ).run(
+        id, seq, taskKey ?? null, String(targetId), event.stageKey ?? null, event.kind, event.askKind, event.providedKind,
+        event.structured ? JSON.stringify(event.structured) : null, event.resolution, event.progressedSteps, event.reusability, owner, now,
+      );
+      const c = event.correction;
+      if (c) {
+        const cseq = db.prepare('SELECT COALESCE(MAX(seq), 0) + 1 AS n FROM local_work_run_corrections WHERE run_id=?').get(id).n;
+        db.prepare(
+          'INSERT INTO local_work_run_corrections(run_id, seq, assistance_seq, task_key, target_id, stage_key, correction_type, reason_code, wrong_json, ' +
+            'alternative_json, validation_result, validation_evidence, reusability, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        ).run(
+          id, cseq, seq, taskKey ?? null, String(targetId), event.stageKey ?? null, c.type, c.reason ?? null,
+          c.wrong ? JSON.stringify(c.wrong) : null, c.alternative ? JSON.stringify(c.alternative) : null,
+          event.validation.result, event.validation.evidence ?? null, event.reusability, now,
+        );
+      }
+      const patterns = derivePatterns(taskKey, event);
+      let patternCount = 0;
+      for (const p of patterns) {
+        upsertPattern(db, { runId: id, ownerKey: owner, targetId: String(targetId), taskKey, stageKey: event.stageKey, ...p }, now);
+        patternCount += 1;
+      }
+      if (event.validation.result === 'failed' && taskKey && event.stageKey) {
+        const alt = c?.alternative ?? (event.structured && event.structured.strategy) ?? null;
+        if (alt) {
+          db.prepare(
+            "UPDATE local_experience_patterns SET failed_count=failed_count+1, updated_at=? WHERE owner_key IS ? AND target_id=? AND task_key=? AND stage_key=? AND polarity='preferred' AND pattern_sig=?",
+          ).run(now, owner, String(targetId), taskKey, event.stageKey, patternSignature(alt));
+        }
+      }
+      db.exec('COMMIT');
+      return { recorded: true, seq, patternCount };
+    } catch (e) {
+      db.exec('ROLLBACK');
+      throw e;
+    }
+  },
+  /** agent 내부 진단 · 테스트용. cloud 로 read-back 하지 않는다. */
+  get(runId) {
+    const db = openLocalDb();
+    const id = String(runId);
+    return {
+      assistance: db.prepare('SELECT * FROM local_work_run_assistance WHERE run_id=? ORDER BY seq').all(id),
+      corrections: db.prepare('SELECT * FROM local_work_run_corrections WHERE run_id=? ORDER BY seq').all(id),
+      context: db.prepare('SELECT * FROM local_work_run_context WHERE run_id=?').get(id) || null,
+    };
+  },
+};
+
+function derivePatterns(taskKey, event) {
+  if (!taskKey || !event.stageKey) return [];
+  if (event.validation.result !== 'verified' || event.reusability !== 'reusable_knowledge') return [];
+  const out = [];
+  const c = event.correction;
+  if (c) {
+    if (c.type !== 'procedure_method') return [];
+    if (c.alternative) out.push({ polarity: 'preferred', strategy: c.alternative });
+    if (c.wrong) out.push({ polarity: 'avoid', strategy: c.wrong });
+    return out;
+  }
+  if ((event.askKind === 'menu_location' || event.askKind === 'procedure_order') && event.structured && event.structured.strategy) {
+    out.push({ polarity: 'preferred', strategy: event.structured.strategy });
+  }
+  return out;
+}
+
+function upsertPattern(db, { runId, ownerKey, targetId, taskKey, stageKey, polarity, strategy }, now) {
+  const sig = patternSignature(strategy);
+  const owner = ownerKey ?? null;
+  const existing = db
+    .prepare('SELECT pattern_id FROM local_experience_patterns WHERE owner_key IS ? AND target_id=? AND task_key=? AND stage_key=? AND polarity=? AND pattern_sig=?')
+    .get(owner, targetId, taskKey, stageKey, polarity, sig);
+  if (existing) {
+    db.prepare("UPDATE local_experience_patterns SET verified_count=verified_count+1, status='verified', updated_at=? WHERE pattern_id=?").run(now, existing.pattern_id);
+  } else {
+    db.prepare(
+      'INSERT INTO local_experience_patterns(pattern_id, owner_key, target_id, task_key, stage_key, polarity, pattern_json, pattern_sig, source_run_id, verified_count, ' +
+        "status, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'verified', ?, ?)",
+    ).run(`lp_${randomUUID().replace(/-/g, '').slice(0, 20)}`, owner, targetId, taskKey, stageKey, polarity, JSON.stringify(strategy), sig, runId, now, now);
+  }
+  // 반대 극성 은퇴도 같은 소유 주체 안에서만 — 다른 소유 주체의 방법을 내리지 않는다.
+  const opposite = polarity === 'preferred' ? 'avoid' : 'preferred';
+  db.prepare(
+    "UPDATE local_experience_patterns SET status='retired', updated_at=? WHERE owner_key IS ? AND target_id=? AND task_key=? AND stage_key=? AND polarity=? AND pattern_sig=?",
+  ).run(now, owner, targetId, taskKey, stageKey, opposite, sig);
+}
+
+/**
+ * 최소 recall(D1 질의형 · ARCHITECTURE §5-1). 전체 read-back · dump 가 아니다.
+ *   - taskKey 없음 → 이 대상에서 확인된 업무 키(최대 10). 검증된 패턴 · 성공한 run 의 키만.
+ *   - taskKey 있음 → 그 Task × Target 의 **verified** 패턴(최대 8): stage · 극성 · 방법 · 검증 횟수. 출처 run · 시각은 내보내지 않는다.
+ */
+export const LocalExperiencePatternRepository = {
+  recall({ targetId, taskKey, ownerKey }) {
+    // v8 — 이 소유 주체의 기억만. 다른 소유 주체 · 소유 주체를 모르는 이전 행은 나오지 않는다.
+    const db = openLocalDb();
+    const tg = String(targetId);
+    const owner = ownerKey ?? null;
+    if (!taskKey) {
+      const rows = db
+        .prepare(
+          "SELECT task_key, MAX(t) AS t FROM (SELECT task_key, updated_at AS t FROM local_experience_patterns WHERE owner_key IS ? AND target_id=? AND status='verified' " +
+            "UNION ALL SELECT task_key, updated_at AS t FROM local_work_runs WHERE owner_key IS ? AND target_id=? AND task_key IS NOT NULL AND outcome_status IN ('SUCCESS','PARTIAL_SUCCESS')) " +
+            'GROUP BY task_key ORDER BY t DESC LIMIT 10',
+        )
+        .all(owner, tg, owner, tg);
+      return { taskKeys: rows.map((r) => r.task_key) };
+    }
+    const rows = db
+      .prepare(
+        "SELECT stage_key, polarity, pattern_json, verified_count FROM local_experience_patterns WHERE owner_key IS ? AND target_id=? AND task_key=? AND status='verified' " +
+          'ORDER BY verified_count DESC, updated_at DESC LIMIT 8',
+      )
+      .all(owner, tg, String(taskKey));
+    const patterns = [];
+    for (const r of rows) {
+      try {
+        patterns.push({ stageKey: r.stage_key, polarity: r.polarity, strategy: JSON.parse(r.pattern_json), verifiedCount: r.verified_count });
+      } catch {
+        /* 깨진 행은 건너뛴다 */
+      }
+    }
+    return { patterns };
   },
 };
 

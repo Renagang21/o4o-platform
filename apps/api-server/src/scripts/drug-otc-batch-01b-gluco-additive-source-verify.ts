@@ -18,7 +18,7 @@
  * 접속: Cloud SQL Auth Proxy(localhost:5442 → netureyoutube:asia-northeast3:o4o-platform-db).
  * Usage: (apps/api-server) NODE_ENV= ../../node_modules/.bin/tsx src/scripts/drug-otc-batch-01b-gluco-additive-source-verify.ts
  *   (apps/api-server/.env = gitignored, DB_PORT=5442 / o4o_api creds)
- * 산출: docs/checks/data/batch-01b-gluco-additive-source-verification-v1.json
+ * 산출: apps/api-server/src/scripts/data/check-data/batch-01b-gluco-additive-source-verification-v1.json
  */
 import '../env-loader.js';
 import { DataSource } from 'typeorm';
@@ -26,8 +26,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const REPO_ROOT = process.cwd().includes('api-server') ? path.resolve(process.cwd(), '../..') : process.cwd();
-const TARGETS_PATH = path.resolve(REPO_ROOT, 'docs/checks/data/batch-01b-gluco-additive-verify-targets-v1.json');
-const OUT_PATH = path.resolve(REPO_ROOT, 'docs/checks/data/batch-01b-gluco-additive-source-verification-v1.json');
+const TARGETS_PATH = path.resolve(REPO_ROOT, 'apps/api-server/src/scripts/data/check-data/batch-01b-gluco-additive-verify-targets-v1.json');
+const OUT_PATH = path.resolve(REPO_ROOT, 'apps/api-server/src/scripts/data/check-data/batch-01b-gluco-additive-source-verification-v1.json');
 
 const DYE_Y5 = /(황색\s*5호|Yellow\s*5|타르트라진|tartrazine|E102)/i;
 const DYE_Y4 = /(황색\s*4호|Sunset|선셋|E110)/i;

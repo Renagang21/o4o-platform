@@ -13,7 +13,9 @@ import { Response } from 'express';
 import { AuthRequest } from '../types/auth.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
-import { requireNetureScope } from '../middleware/neture-scope.middleware.js';
+import { requireFundingScope } from '../middleware/funding-service-scope.middleware.js';
+// CodeQL 이 인식하는 limiter (선례: routes/admin/platform-accounts.routes.ts).
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 /**
  * Neture operator 1차 승인 라우터
@@ -22,9 +24,14 @@ import { requireNetureScope } from '../middleware/neture-scope.middleware.js';
 export function createNetureOperatorTrialRoutes(): Router {
   const router = Router();
 
-  // All routes require auth + neture operator scope
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4:
+  //   종전 `requireNetureScope('neture:operator')` → `requireFundingScope('funding:operator')`.
+  //   주소(`funding.neture.co.kr`)가 독립이면 운영자 범위도 독립이어야 한다. 종전에는 Neture
+  //   운영자 하나가 이 서브도메인까지 열었다.
+  //   `platform:super_admin` 은 platformBypass 로 계속 통과하므로 역할 부여 전에도 잠기지 않는다.
+  router.use(apiLimiter as any);
   router.use(requireAuth as any);
-  router.use(requireNetureScope('neture:operator') as any);
+  router.use(requireFundingScope('funding:operator') as any);
 
   router.get('/', MarketTrialOperatorController.listAll);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: aggregate KPI (literal path — must precede /:id)
@@ -54,7 +61,14 @@ export function createNetureOperatorTrialRoutes(): Router {
         idx++;
       }
       if (supplierUserId) {
-        conditions.push(`ns.user_id = $${idx}`);
+        // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 운영자 필터도 canonical 관계
+        //   (organization_members owner) 로 공급자를 찾는다. legacy user_id 는 owner 가 없는 공급자에 한해 유지.
+        conditions.push(`(ns.organization_id IN (
+            SELECT om.organization_id FROM organization_members om
+             WHERE om.user_id = $${idx} AND om.left_at IS NULL AND om.role = 'owner')
+          OR (ns.user_id = $${idx} AND NOT EXISTS (
+            SELECT 1 FROM organization_members om2
+             WHERE om2.organization_id = ns.organization_id AND om2.left_at IS NULL AND om2.role = 'owner')))`);
         params.push(supplierUserId);
         idx++;
       }
@@ -121,7 +135,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.patch('/:id/status', MarketTrialOperatorController.updateTrialStatus);
   router.patch('/:id/approve', MarketTrialOperatorController.approve1st);
   // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1: 포럼 공고 게시 재시도 (멱등)
-  // 상단 router.use(requireAuth) + requireNetureScope('neture:operator') 가 적용된다.
+  // 상단 router.use(requireAuth) + requireFundingScope('funding:operator') 가 적용된다.
   router.post('/:id/forum-sync/retry', MarketTrialOperatorController.retryForumSync);
   router.patch('/:id/reject', MarketTrialOperatorController.reject1st);
 

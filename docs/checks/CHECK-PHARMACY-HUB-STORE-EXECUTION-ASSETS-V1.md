@@ -207,7 +207,7 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 ### 5-7. 인증 사용자 실측 (2026-08-08, 자격증명 갱신 후 재수행)
 
 `docs/local/TEST-ACCOUNTS.local.md` 갱신으로 **`pharmacy-hub:store_owner` 계정을 확보**했다.
-`renagang21@gmail.com` — PH membership `active`, roleType `store_owner`(2026-07-30 승인),
+`[REDACTED_EMAIL_B]` — PH membership `active`, roleType `store_owner`(2026-07-30 승인),
 `entryPoints.storeOwner=true`. §5-6 의 BLOCKED 는 아래 범위에서 해소됐다.
 
 #### (A) 검증 6 — 조직 격리 · 미연결 계정 : **23/23 PASS**
@@ -324,7 +324,7 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 ### 5-6. (경과) 인증 사용자 실측이 한때 BLOCKED 였던 이유
 
 > **이 절은 경과 기록이다.** 사용자가 비밀번호를 일괄 교체하고 SSOT 문서에 Pharmacy-Hub
-> 절을 추가해 §5-7 로 재수행했다 — `renagang21@gmail.com` 이 `pharmacy-hub:store_owner`
+> 절을 추가해 §5-7 로 재수행했다 — `[REDACTED_EMAIL_B]` 이 `pharmacy-hub:store_owner`
 > 로 정상 로그인되며, 검증 2·6 은 완료됐다.
 
 작업요청서가 요구한 실측 7개 항목 중 **1·3·4·5·6·7 은 인증된 `pharmacy-hub:store_owner`
@@ -332,9 +332,9 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 
 | 계정 | 로그인 결과 (자격증명 갱신 **전**) |
 |---|---|
-| `sohae2100@gmail.com` | `401 INVALID_CREDENTIALS` — SSOT 문서의 비밀번호가 프로덕션과 불일치 |
-| `sohae21@naver.com` | `403 ACCOUNT_NOT_ACTIVE` |
-| `renagang21@gmail.com` | SSOT 문서에 이미 **무효** 로 기록됨 (2026-08-03 정정) |
+| `[REDACTED_EMAIL_A]` | `401 INVALID_CREDENTIALS` — SSOT 문서의 비밀번호가 프로덕션과 불일치 |
+| `[REDACTED_EMAIL_C]` | `403 ACCOUNT_NOT_ACTIVE` |
+| `[REDACTED_EMAIL_B]` | SSOT 문서에 이미 **무효** 로 기록됨 (2026-08-03 정정) |
 
 더 근본적으로, `docs/local/TEST-ACCOUNTS.local.md` 의 역할 인벤토리상
 **`pharmacy-hub:store_owner` 를 가진 계정이 하나도 없다.**

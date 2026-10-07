@@ -16,6 +16,7 @@ import { forumApi } from '../../api';
 import { LoadingSpinner } from '../../components/common';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { useAuth } from '../../contexts/AuthContext';
+import { ForumWriteDeniedNotice, useForumWriteAccess } from '../../lib/forumWriteAccess';
 import type { ForumPost } from '../../types';
 
 interface ForumDetail {
@@ -67,6 +68,8 @@ export function ForumFeedPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isAuthenticated } = useAuth();
+  // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 쓰기 자격이 없으면(서버 판정) 글쓰기 대신 안내
+  const writeAccess = useForumWriteAccess();
 
   // URL state
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
@@ -422,7 +425,9 @@ export function ForumFeedPage() {
               />
               <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap">검색</button>
             </form>
-            <button onClick={handleWriteClick} style={styles.writeBtn}>+ 글쓰기</button>
+            {writeAccess?.allowed === false
+              ? <ForumWriteDeniedNotice access={writeAccess} compact />
+              : <button onClick={handleWriteClick} style={styles.writeBtn}>+ 글쓰기</button>}
           </div>
 
           {/* Sort tabs + info */}

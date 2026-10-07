@@ -69,7 +69,7 @@ GET /applications · /approved — read axis from mount    3/3
 |------|-----|
 | 도구 | Playwright 1.57.0 (chromium, headless, 1440×1000) |
 | 대상 | `https://kpa-society.co.kr` (프로덕션) |
-| 계정 | 약국 경영자 `renagang21@gmail.com` (자격증명은 env 주입, 문서·로그·커밋 미기록) |
+| 계정 | 약국 경영자 `[REDACTED_EMAIL_B]` (자격증명은 env 주입, 문서·로그·커밋 미기록) |
 | 조직 | `테스트 약국 매장` · organizationId `9c87f46b-57a1-4afe-80bd-60782c49ce96` |
 | 범위 | KPA 화면 전용. KCos 화면 미사용·미수정 |
 | 아티팩트 | 스크린샷 8매 + `smoke-report.json` + `smoke-pass2.json` (scratchpad, 비커밋) |

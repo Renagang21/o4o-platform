@@ -37,7 +37,7 @@
 
 ## 3. 실브라우저 smoke 상세
 
-계정: `sohae2100@gmail.com` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
+계정: `[REDACTED_EMAIL_A]` (admin) — 자격증명 SSOT `docs/local/TEST-ACCOUNTS.local.md`
 배포 스탬프 확인: `배포 성공 v4.0 · 2026. 8. 10. 오후 4:41:22` (commit `4e5d634a2` 리비전)
 
 | 경로 | 관측 | `pharmacy/qr` 호출 | 콘솔 에러 |

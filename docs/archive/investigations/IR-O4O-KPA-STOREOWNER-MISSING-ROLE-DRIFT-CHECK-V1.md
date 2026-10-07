@@ -7,7 +7,7 @@ type: investigation
 scope:
   - 운영 DB read-only SELECT 로 activity_type=pharmacy_owner ↔ role_assignments(kpa:store_owner) drift 전수 측정
   - 누락 사용자별 활성화 chain (5-step) 단계 분류 (F1~F4)
-  - 보고 케이스 (sohae2100@gmail.com) 의 실제 단계 확인
+  - 보고 케이스 ([REDACTED_EMAIL_A]) 의 실제 단계 확인
   - 역방향 drift (role 만 보유, activity_type 미스매치) 점검
   - revoke 흔적 (kpa:store_owner inactive row) 점검
 related:
@@ -55,10 +55,10 @@ related:
 ### 1-1. 접근 채널
 - CLAUDE.md §0 정책 — Claude Code 가 read-only 검증 직접 수행 가능.
 - 절차:
-  1. `gcloud sql instances describe` 로 기존 authorized_networks 백업 확인 (`124.194.156.36/32` 단일)
-  2. `gcloud sql instances patch --authorized-networks=124.194.156.36/32,<현재IP>/32` 로 현재 IP 임시 추가
-  3. `PGPASSWORD='...' psql -h 34.64.96.252 -U o4o_api -d o4o_platform -f /c/tmp/storeowner-drift-check.sql` 실행
-  4. `gcloud sql instances patch --authorized-networks=124.194.156.36/32` 로 원본 복원
+  1. `gcloud sql instances describe` 로 기존 authorized_networks 백업 확인 (`[REDACTED_IP]/32` 단일)
+  2. `gcloud sql instances patch --authorized-networks=[REDACTED_IP]/32,<현재IP>/32` 로 현재 IP 임시 추가
+  3. `PGPASSWORD='...' psql -h [REDACTED_IP] -U o4o_api -d o4o_platform -f /c/tmp/storeowner-drift-check.sql` 실행
+  4. `gcloud sql instances patch --authorized-networks=[REDACTED_IP]/32` 로 원본 복원
 - 실행 SQL 파일: `/c/tmp/storeowner-drift-check.sql` (로컬 임시, 본 IR §11 에 본문 첨부)
 - 결과 파일: `/c/tmp/storeowner-drift-out.txt` (로컬 임시)
 - 데이터 변경 없음. authorized_networks 원본 상태로 복원 완료.
@@ -117,8 +117,8 @@ related:
 ```
         email         | user_status |  pp_activity   |  km_activity   | step1_bizno | step1_bizname | step3_org_id | step4_has_owner_row | step5_has_store_owner_role | km_member_status
 ----------------------+-------------+----------------+----------------+-------------+---------------+--------------+---------------------+----------------------------+------------------
- renagang21@gmail.com | active      | pharmacy_owner | pharmacy_owner | 1089999999  | Renagang 약국 | (null)       | f                   | f                          | active
- sohae2100@gmail.com  | active      | pharmacy_owner | pharmacy_owner | 1089999999  | (empty)       | (null)       | f                   | f                          | active
+ [REDACTED_EMAIL_B] | active      | pharmacy_owner | pharmacy_owner | 1089999999  | Renagang 약국 | (null)       | f                   | f                          | active
+ [REDACTED_EMAIL_A]  | active      | pharmacy_owner | pharmacy_owner | 1089999999  | (empty)       | (null)       | f                   | f                          | active
 ```
 
 **해석**:
@@ -136,8 +136,8 @@ related:
 ```
         email         | user_status |  pp_activity   |  km_activity   |      gap_classification      | step5_inactive_row_exists
 ----------------------+-------------+----------------+----------------+------------------------------+---------------------------
- renagang21@gmail.com | active      | pharmacy_owner | pharmacy_owner | F2: organization not created | f
- sohae2100@gmail.com  | active      | pharmacy_owner | pharmacy_owner | F2: organization not created | f
+ [REDACTED_EMAIL_B] | active      | pharmacy_owner | pharmacy_owner | F2: organization not created | f
+ [REDACTED_EMAIL_A]  | active      | pharmacy_owner | pharmacy_owner | F2: organization not created | f
 ```
 
 **해석**:
@@ -157,7 +157,7 @@ related:
 ```
         email        | user_status |  pp_activity   |  km_activity   | km_member_status |   bizno    | bizname | expected_org_id | has_owner_row | has_store_owner_role_active | has_store_owner_role_inactive
 ---------------------+-------------+----------------+----------------+------------------+------------+---------+-----------------+---------------+-----------------------------+-------------------------------
- sohae2100@gmail.com | active      | pharmacy_owner | pharmacy_owner | active           | 1089999999 | (empty) | (null)          | f             | f                           | f
+ [REDACTED_EMAIL_A] | active      | pharmacy_owner | pharmacy_owner | active           | 1089999999 | (empty) | (null)          | f             | f                           | f
 ```
 
 **해석**:
@@ -197,8 +197,8 @@ related:
 
 | 사용자 | step1 (bizno) | step2 (km/pp activity) | step3 (org) | step4 (owner) | step5 (role) | 분류 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| renagang21@gmail.com | ✅ 1089999999 | ✅ pharmacy_owner / ✅ pharmacy_owner | ❌ | ❌ | ❌ | F2 |
-| sohae2100@gmail.com | ✅ 1089999999 | ✅ pharmacy_owner / ✅ pharmacy_owner | ❌ | ❌ | ❌ | F2 |
+| [REDACTED_EMAIL_B] | ✅ 1089999999 | ✅ pharmacy_owner / ✅ pharmacy_owner | ❌ | ❌ | ❌ | F2 |
+| [REDACTED_EMAIL_A] | ✅ 1089999999 | ✅ pharmacy_owner / ✅ pharmacy_owner | ❌ | ❌ | ❌ | F2 |
 
 → step3 에서 동일하게 끊김. step1/step2 는 정상.
 
@@ -265,7 +265,7 @@ SELECT o.id, u.id, 'owner', NOW(), NOW()
 FROM organizations o
 CROSS JOIN users u
 WHERE o.code = 'kpa-pharm-1089999999'
-  AND u.email IN ('renagang21@gmail.com', 'sohae2100@gmail.com')
+  AND u.email IN ('[REDACTED_EMAIL_B]', '[REDACTED_EMAIL_A]')
   AND NOT EXISTS (
     SELECT 1 FROM organization_members om
     WHERE om.user_id = u.id AND om.organization_id = o.id AND om.left_at IS NULL
@@ -275,7 +275,7 @@ WHERE o.code = 'kpa-pharm-1089999999'
 INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
 SELECT u.id, 'kpa:store_owner', 'backfill-WO-V1', true, NOW(), NOW(), NOW()
 FROM users u
-WHERE u.email IN ('renagang21@gmail.com', 'sohae2100@gmail.com')
+WHERE u.email IN ('[REDACTED_EMAIL_B]', '[REDACTED_EMAIL_A]')
 ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO UPDATE SET updated_at = NOW();
 ```
 
@@ -308,8 +308,8 @@ ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO UPDATE SET updated_at
 
 - 운영 DB read-only SELECT 7 회 (Q0 ~ Q7).
 - `gcloud sql instances patch` 2 회:
-  1. authorized_networks 임시 추가 (`124.194.156.36/32` + `112.153.205.95/32`)
-  2. 원본 복원 (`124.194.156.36/32` 단일)
+  1. authorized_networks 임시 추가 (`[REDACTED_IP]/32` + `[REDACTED_IP]/32`)
+  2. 원본 복원 (`[REDACTED_IP]/32` 단일)
 - 로컬 임시 파일: `/c/tmp/storeowner-drift-check.sql`, `/c/tmp/storeowner-drift-out.txt` (repo 미포함).
 - 데이터 변경 없음.
 

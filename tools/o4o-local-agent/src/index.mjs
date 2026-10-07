@@ -23,16 +23,17 @@
  */
 
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
-import { bootstrapLocalDb, getLocalDbState } from './local-db.mjs';
+import { bootstrapLocalDb, getLocalDbState, LocalDatasetRepository } from './local-db.mjs';
+import { buildHeartbeatReport } from './node-report.mjs';
 import { createBackup, backupSummary } from './local-db-backup.mjs';
 import { automationSummary } from './windows-automation-safety.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 import { startBridgeRelay } from './bridge-relay.mjs';
+import { nextPollDelayMs } from './poll-schedule.mjs';
 
 const API_BASE = process.env.O4O_API_BASE || 'https://api.neture.co.kr';
-/** 명령을 물어보러 가는 주기. 짧으면 반응이 빠르고, 길면 조용하다. */
-const POLL_INTERVAL_MS = 5000;
+// 명령을 물어보러 가는 주기는 poll-schedule.mjs — 명령을 받은 직후엔 짧게, idle 이면 5 s.
 /** 연결이 끊겼을 때의 재시도 간격 (§32). 지수 백오프로 늘어난다. */
 const RECONNECT_MIN_MS = 3000;
 const RECONNECT_MAX_MS = 60000;
@@ -147,7 +148,8 @@ async function handleCommand(command, context, sessionToken) {
     return;
   }
 
-  const outcome = await runAction(command.action, context, command.args);
+  // 단위 실행(run_unit)은 명령 만료 전에 스스로 멈춘다 — 만료 시각을 넘긴다.
+  const outcome = await runAction(command.action, { ...context, commandExpiresAt: command.expiresAt }, command.args);
   if (outcome.status === 'denied') {
     // 서버가 모르는 action 을 보냈다. 실행하지 않았다는 사실을 분명히 되돌린다.
     log(`허용되지 않은 action 거부: ${command.action}`);
@@ -207,6 +209,8 @@ async function commandRun() {
   let sessionToken = null;
   let backoff = RECONNECT_MIN_MS;
   let running = true;
+  /** 마지막으로 명령을 받아 처리한 시각. 이것에서 멀어질수록 heartbeat 간격이 idle(5 s)로 돌아간다. */
+  let lastCommandAt = null;
 
   const stop = () => {
     if (!running) return;
@@ -247,7 +251,24 @@ async function commandRun() {
       log('연결되었습니다.');
     }
 
-    const { status, payload } = await apiPost('/api/local-agent/heartbeat', {}, sessionToken);
+    // Phase D — 노드 상태(버전 · capability)를 함께 보고한다. 서버가 여러 노드 중 하나를 고르는 근거다.
+    const dbState = getLocalDbState();
+    let hasLocalData = false;
+    if (dbState.ready) {
+      try {
+        hasLocalData = LocalDatasetRepository.list().length > 0;
+      } catch {
+        hasLocalData = false;
+      }
+    }
+    const report = buildHeartbeatReport({
+      agentVersion: AGENT_VERSION,
+      extensionConnected: context.bridge?.isExtensionConnected?.() === true,
+      platform: process.platform,
+      dbState,
+      hasLocalData,
+    });
+    const { status, payload } = await apiPost('/api/local-agent/heartbeat', report, sessionToken);
 
     if (status === 401) {
       // 세션 만료 또는 해지. credential 로 조용히 다시 연다 — 사용자 개입 없이.
@@ -267,8 +288,9 @@ async function commandRun() {
     for (const command of commands) {
       await handleCommand(command, context, sessionToken);
     }
+    if (commands.length > 0) lastCommandAt = Date.now();
 
-    await sleep(POLL_INTERVAL_MS);
+    await sleep(nextPollDelayMs(lastCommandAt, Date.now()));
   }
 }
 

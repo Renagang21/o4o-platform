@@ -45,7 +45,7 @@ services/web-kpa-society/src/contexts/AuthContext.tsx:259
 프로덕션 DB 실측 (read-only · 해시/비밀번호 미출력):
 
 ```
-sohae2100@gmail.com × kpa-society
+[REDACTED_EMAIL_A] × kpa-society
   created_at = 2026-05-24 06:00:21
   updated_at = 2026-08-21 01:26:53   ← 변경됨
 ```

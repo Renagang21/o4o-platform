@@ -11,13 +11,27 @@
  * DB 접속 없음 — AppDataSource / 토큰 유틸은 double. 토큰 소비는 handoff-token.service 의 실제 SQL 경로를 탄다.
  */
 
-const query = jest.fn();
+// 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
+// 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+const query = jest.fn().mockResolvedValue([]);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
     query: (...args: unknown[]) => query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
+    //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
+    //   맞춰 둔 handoff SQL 응답이 한 칸씩 밀려 엉뚱한 값을 받는다(실제로 그렇게 깨졌다).
+    //   여기서는 "폐기 기록 없음"(= 빈 배열)을 돌려주고, 나머지는 그대로 위임한다.
+    //   세대 판정 자체는 전용 spec(service-logout-auth-boundary.spec.ts)이 본다.
+    manager: {
+      query: (...args: unknown[]) => {
+        const sql = String(args[0] ?? '');
+        if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
+        return query(...args);
+      },
+    },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -26,7 +40,14 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames: (...a: unknown[]) => getRoleNames(...a) },
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
-jest.mock('../utils/token.utils.js', () => ({ generateTokens: (...a: unknown[]) => generateTokens(...a) }));
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
+//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
+//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+jest.mock('../utils/token.utils.js', () => ({
+  generateTokens: (...a: unknown[]) => generateTokens(...a),
+  verifyAccessToken: () => null,
+}));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
@@ -36,6 +57,8 @@ jest.mock('../utils/cookie.utils.js', () => ({ setAuthCookies: (...a: unknown[])
 jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
 jest.mock('../utils/service-tenant.resolver.js', () => ({ resolveAccessibleStores: jest.fn() }));
 
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
 import { isRepresentativeEntryExchangeOrigin, isRepresentativeEntryTarget } from '../config/representative-entry.js';
 import { REPRESENTATIVE_ENTRY_SERVICE_KEY } from '../config/service-catalog.js';
@@ -48,18 +71,25 @@ const KPA_ONLY_USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActi
 const KPA_ONLY_MEMBERSHIPS = [{ serviceKey: 'kpa-society', status: 'active' }];
 
 function mockReq(body: Record<string, unknown>, origin?: string, user: unknown = KPA_ONLY_USER) {
-  return { body, user, get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined) } as any;
+  // 실제 Express req 는 언제나 headers·cookies 를 갖는다. 없으면 토큰 추출이 터진다
+    //   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 발급이 access token 의
+    //    세션 귀속을 읽는다 — 로그아웃된 서비스의 남은 인증으로 긴 세션을 얻지 못하게).
+    return {
+      body,
+      user,
+      headers: {},
+      cookies: {},
+      get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
+    } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  return res;
-}
+const mockRes = mockHandoffRes;
 const sqlCalls = () => query.mock.calls.map((c) => norm(String(c[0])));
 
 beforeEach(() => {
   query.mockReset();
+  // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
+  // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
+  query.mockResolvedValue([]);
   findOne.mockReset();
   getRoleNames.mockClear();
   generateTokens.mockClear();
@@ -118,8 +148,9 @@ describe('B. generateHandoff', () => {
     expect(res.body.data.targetUrl).toBe(`https://neture.co.kr/handoff?token=${uuid}&returnTo=%2F`);
     expect(res.body.data.targetService.key).toBe('neture');
     expect(sqlCalls()).not.toEqual(expect.arrayContaining([expect.stringContaining('service_memberships')]));
-    // source 는 Origin host 정확 일치로 판정, target 은 neture 로 고정 기록
-    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'kpa-society', 'neture', null]);
+    // target 은 neture 로 고정 기록. source 는 Origin 이 아니라 **토큰 claim** 이 증명한다 —
+    //   이 대역의 토큰은 claim 이 없으므로 'unknown'(Origin 은 클라이언트가 지정할 수 있다 · §8 5차).
+    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'neture', null]);
   });
 
   it("target=neture 는 returnPath '/' 만 허용 — 다른 경로는 400 (범용 redirect 0)", async () => {
@@ -158,7 +189,8 @@ describe('B. generateHandoff', () => {
     const res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.targetUrl).toBe(`https://kpa-society.co.kr/handoff?token=${uuid}`);
+    // canonical 호스트로 넘긴다 (WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1)
+    expect(res.body.data.targetUrl).toBe(`https://pharmacy.neture.co.kr/handoff?token=${uuid}`);
   });
 
   it.each([['neture'], ['kpa-society']])(
@@ -177,8 +209,9 @@ describe('B. generateHandoff', () => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('C. exchangeHandoff', () => {
+  // 원장 수단 = Google 세션 출발(종전 계약: claim 없음 = null). 수단 승계 자체는 unified-store-workspace-handoff.spec D.
   const consumed = (target: string, source = 'kpa-society') =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0) }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0), source_auth_method: 'google' }], 1]);
   const withProduction = async (fn: () => Promise<void>) => {
     const prev = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
@@ -196,9 +229,20 @@ describe('C. exchangeHandoff', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.data.targetServiceKey).toBe('neture');
       expect(res.body.data.user.memberships).toEqual(KPA_ONLY_MEMBERSHIPS); // neture membership 이 생기지 않는다
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1');
+      // 성공 경로도 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2)
+      expect(res.body.data.tokens).toEqual(expect.objectContaining({ accessToken: expect.any(String) }));
+      expect(setAuthCookies).not.toHaveBeenCalled();
+      expect(res.cookie).not.toHaveBeenCalled();
+      expect(res.setHeader).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
+      expect(res.append).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
+      // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
+      //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
+      //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, null);
       expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
-      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0
+      // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0.
+      //   세션 세대 조회는 이 spec 에서 connection double 의 `manager` 가 직접 답하므로 여기 집계에
+      //   들어오지 않는다(세대 판정은 전용 spec 이 본다). write 0 계약은 그대로다.
       const sql = sqlCalls();
       expect(sql).toHaveLength(2);
       expect(sql[0]).toContain('UPDATE handoff_tokens');

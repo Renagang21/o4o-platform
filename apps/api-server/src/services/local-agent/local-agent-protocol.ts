@@ -37,6 +37,25 @@ import { WINDOWS_APP_IDS } from './windows-app-registry.js';
 import { pickSafeUiaInfo, validateUiaClickArgs, validateUiaInvokeArgs, validateUiaKeyArgs, validateUiaSetValueArgs, type UiaActionArgs } from './windows-uia-contract.js';
 import { BROWSER_SITE_IDS } from './browser-site-registry.js';
 import {
+  isValidRequestTemplate,
+  validateReplaySteps,
+  validateWorkflowSteps,
+  type WorkflowStep,
+} from '../ai-tools/workflow-candidate.js';
+import { validateWorkExperienceRecordShape, type DataWorkRunExperienceRecordArgs } from '../ai-tools/work-experience.js';
+import {
+  pickRecalledContext,
+  pickSafeExperienceRecall,
+  validateAssistanceRecordShape,
+  validateContextRecallShape,
+  validateContextSaveShape,
+  validateExperienceRecallShape,
+  type DataExperienceRecallArgs,
+  type DataWorkRunAssistanceRecordArgs,
+  type DataWorkRunContextRecallArgs,
+  type DataWorkRunContextSaveArgs,
+} from '../ai-tools/work-assistance.js';
+import {
   COMPUTER_ALLOWED_KEYS,
   validateClickArgs,
   validateKeyArgs,
@@ -46,12 +65,15 @@ import {
 import {
   BROWSER_DOM_ERROR,
   pickSafeDomInfo,
+  pickSafeDomUnitInfo,
   validateDomElementArgs,
+  validateDomRunUnitArgs,
   validateDomFindArgs,
   validateDomReadTableArgs,
   validateDomSelectOptionArgs,
   validateDomSetInputArgs,
   type DomActionArgs,
+  type DomRunUnitArgs,
 } from './browser-dom-contract.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
@@ -108,6 +130,12 @@ export const LOCAL_AGENT_ACTIONS = {
   DOM_CLICK: 'local.browser.dom.click',
   /** table/role=table 읽기, 행 상한 있음 (§26·§27). */
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  /**
+   * 작업 단위 실행 (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1). 이미 판단한 행동 묶음(ref 배치 또는 재생 단계)을
+   * Node 가 local bridge 로 이어 실행하고, 판단이 필요한 자리에서 멈춰 단계 보고 + 최종 관찰을 돌려준다. 단계마다 확장의
+   * 검사(COMMIT · 자격 · 형상)는 그대로다. 노드가 `taskUnit` capability 를 보고할 때만 쓴다(아니면 단발 명령 경로).
+   */
+  DOM_RUN_UNIT: 'local.browser.dom.run_unit',
   // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
   /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
   // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33) ────────
@@ -135,6 +163,25 @@ export const LOCAL_AGENT_ACTIONS = {
   DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
   /** logical Work Run 의 상태를 전이한다(complete/expire/taken_over 포함). */
   DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
+  // ── Workflow Candidate 정본 (WEB-AUTOMATION-RESUME-V1 PHASE 2 · IR §8·§9-2·§9-3) ──
+  /** 성공 run 의 semantic 단계 + 요청 템플릿을 Candidate 로 저장한다(값 없음). generic row write 아님. */
+  DATA_WORK_RUN_CANDIDATE_SAVE: 'local.data.work_run_candidate_save',
+  /** 이번 요청과 맞는 Candidate 를 Local 에서 대조해, 이번 요청의 값을 채운 재생 단계만 돌려준다(과거 요청 문장 반환 없음). */
+  DATA_WORK_RUN_CANDIDATE_MATCH: 'local.data.work_run_candidate_match',
+  /** 재생 결과(성공/어긋남)를 Candidate 통계에 반영한다. 반복 실패 Candidate 는 Local 이 끈다. */
+  DATA_WORK_RUN_CANDIDATE_RESULT: 'local.data.work_run_candidate_result',
+  // ── Local Experience 최소 저장 (WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1 · EXPERIENCE-MODEL-V1) ──
+  /** run segment 1개의 구조화 Experience(Run · Step · Failure · Metric · Outcome)를 기록한다. write only — 결과는 확인 건수만. */
+  DATA_WORK_RUN_EXPERIENCE_RECORD: 'local.data.work_run_experience_record',
+  // ── User Assistance · Correction (WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1 · EXPERIENCE-MODEL-V1 Phase 2) ──
+  /** QUESTION 시점의 원래 업무 구조(task · stage · ask · 방법 · 재생 위치)를 저장한다. 원문 · 값 없음. */
+  DATA_WORK_RUN_CONTEXT_SAVE: 'local.data.work_run_context_save',
+  /** 재개 시 같은 run 의 원래 업무 구조를 돌려준다. slotValue 가 있으면 막힌 재생 단계만 그 값으로 채운다(저장 안 함). */
+  DATA_WORK_RUN_CONTEXT_RECALL: 'local.data.work_run_context_recall',
+  /** 도움 · 교정 이벤트 1건(구조)을 기록한다. 검증된 reusable 방법만 Local Preferred/Avoid 가 된다. */
+  DATA_WORK_RUN_ASSISTANCE_RECORD: 'local.data.work_run_assistance_record',
+  /** D1 질의형 recall — 대상의 업무 키 목록 또는 Task × Target 의 verified Preferred/Avoid 만. dump 없음. */
+  DATA_WORK_RUN_EXPERIENCE_RECALL: 'local.data.work_run_experience_recall',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -213,6 +260,7 @@ export const DOM_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** 인자를 받는 DOM action — get_context · inspect 는 없다. read_table 은 선택적 인자. */
@@ -223,6 +271,7 @@ export const DOM_ARGS_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** DOM action 인가 — 결과 화이트리스트 · 실패 데이터 보존 판정에 쓴다. */
@@ -256,6 +305,14 @@ export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
   LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL,
 ]);
 
 /**
@@ -420,7 +477,119 @@ export interface DataWorkRunSetStatusArgs {
   status: string;
   note?: string;
 }
-export type DataActionArgs = DataGetMetaArgs | DataQueryArgs | DataSetSettingArgs | DataWorkRunUpsertArgs | DataWorkRunSetStatusArgs;
+export interface DataWorkRunCandidateSaveArgs {
+  runId: string;
+  targetId: string;
+  template: string;
+  steps: WorkflowStep[];
+  /** 이번 run 이 이 Candidate 를 재생했다면 그 id(성공 통계 반영). */
+  replayedCandidateId?: string;
+}
+export interface DataWorkRunCandidateMatchArgs {
+  targetId: string;
+  request: string;
+}
+export interface DataWorkRunCandidateResultArgs {
+  candidateId: string;
+  outcome: 'replay_completed' | 'replay_diverged';
+}
+export type DataActionArgs =
+  | DataGetMetaArgs
+  | DataQueryArgs
+  | DataSetSettingArgs
+  | DataWorkRunUpsertArgs
+  | DataWorkRunSetStatusArgs
+  | DataWorkRunCandidateSaveArgs
+  | DataWorkRunCandidateMatchArgs
+  | DataWorkRunCandidateResultArgs
+  | DataWorkRunExperienceRecordArgs
+  | DataWorkRunContextSaveArgs
+  | DataWorkRunContextRecallArgs
+  | DataWorkRunAssistanceRecordArgs
+  | DataExperienceRecallArgs;
+
+/** Candidate id — Local 이 발급(`wc_` + 소문자·숫자). */
+const LOCAL_WORKFLOW_CANDIDATE_ID_RE = /^wc_[a-z0-9]{6,32}$/;
+export function isValidWorkflowCandidateId(value: unknown): value is string {
+  return typeof value === 'string' && LOCAL_WORKFLOW_CANDIDATE_ID_RE.test(value);
+}
+const WORKFLOW_RESULT_OUTCOMES: readonly string[] = Object.freeze(['replay_completed', 'replay_diverged']);
+
+function onlyKeys(src: Record<string, unknown>, allowed: readonly string[]): boolean {
+  return Object.keys(src).every((k) => allowed.includes(k));
+}
+
+/** `{ runId, targetId, template, steps, replayedCandidateId? }` — 값 없는 semantic 단계 + 요청 템플릿만. */
+export function validateDataWorkRunCandidateSaveArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateSaveArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  if (!onlyKeys(src, ['runId', 'targetId', 'template', 'steps', 'replayedCandidateId'])) return { ok: false };
+  if (!isValidLocalWorkRunId(src.runId) || !isRegisteredWorkTarget(src.targetId) || !isValidRequestTemplate(src.template)) return { ok: false };
+  const steps = validateWorkflowSteps(src.steps);
+  if (!steps) return { ok: false };
+  // 템플릿의 값 자리와 단계의 slot 이 서로 맞아야 한다(없는 자리를 쓰는 단계 · 안 쓰이는 자리 금지).
+  const templateSlots = new Set([...(src.template as string).matchAll(/\{\{(\d)\}\}/g)].map((m) => Number(m[1])));
+  const usedSlots = new Set(steps.filter((s) => s.slot !== undefined).map((s) => s.slot as number));
+  if (templateSlots.size !== usedSlots.size || [...usedSlots].some((n) => !templateSlots.has(n))) return { ok: false };
+  const out: DataWorkRunCandidateSaveArgs = { runId: src.runId as string, targetId: src.targetId as string, template: src.template as string, steps };
+  if (src.replayedCandidateId !== undefined) {
+    if (!isValidWorkflowCandidateId(src.replayedCandidateId)) return { ok: false };
+    out.replayedCandidateId = src.replayedCandidateId;
+  }
+  return { ok: true, args: out };
+}
+
+/** `{ targetId, request }` — 대조는 Local 이 한다. 요청은 정규화·절단(목표 요약과 같은 상한). */
+export function validateDataWorkRunCandidateMatchArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateMatchArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  if (!onlyKeys(src, ['targetId', 'request'])) return { ok: false };
+  if (!isRegisteredWorkTarget(src.targetId)) return { ok: false };
+  const request = sanitizeWorkRunText(src.request);
+  if (!request || request !== src.request) return { ok: false };
+  return { ok: true, args: { targetId: src.targetId as string, request } };
+}
+
+/** `{ candidateId, outcome }` — 재생 결과 enum 만. */
+export function validateDataWorkRunCandidateResultArgs(args: unknown): { ok: boolean; args?: DataWorkRunCandidateResultArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  const keys = Object.keys(src).sort();
+  if (keys.length !== 2 || keys[0] !== 'candidateId' || keys[1] !== 'outcome') return { ok: false };
+  if (!isValidWorkflowCandidateId(src.candidateId)) return { ok: false };
+  if (typeof src.outcome !== 'string' || !WORKFLOW_RESULT_OUTCOMES.includes(src.outcome)) return { ok: false };
+  return { ok: true, args: { candidateId: src.candidateId, outcome: src.outcome as DataWorkRunCandidateResultArgs['outcome'] } };
+}
+
+/** `{ runId, segment, target, outcome, metric, steps, failures }` — enum · 정수 · semantic locator 만(자유 텍스트 칸 없음). */
+export function validateDataWorkRunExperienceRecordArgs(args: unknown): { ok: boolean; args?: DataWorkRunExperienceRecordArgs } {
+  const r = validateWorkExperienceRecordShape(args);
+  if (!r.ok || !r.args) return { ok: false };
+  if (!isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.target.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+
+/** Phase 2 형상(work-assistance.ts) + runId 형식 · 대상 등재. */
+export function validateDataWorkRunContextSaveArgs(args: unknown): { ok: boolean; args?: DataWorkRunContextSaveArgs } {
+  const r = validateContextSaveShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataWorkRunContextRecallArgs(args: unknown): { ok: boolean; args?: DataWorkRunContextRecallArgs } {
+  const r = validateContextRecallShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataWorkRunAssistanceRecordArgs(args: unknown): { ok: boolean; args?: DataWorkRunAssistanceRecordArgs } {
+  const r = validateAssistanceRecordShape(args);
+  if (!r.ok || !r.args || !isValidLocalWorkRunId(r.args.runId) || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
+export function validateDataExperienceRecallArgs(args: unknown): { ok: boolean; args?: DataExperienceRecallArgs } {
+  const r = validateExperienceRecallShape(args);
+  if (!r.ok || !r.args || !isRegisteredWorkTarget(r.args.targetId)) return { ok: false };
+  return { ok: true, args: r.args };
+}
 
 /** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
 export function validateDataGetMetaArgs(args: unknown): { ok: boolean; args?: DataGetMetaArgs } {
@@ -485,6 +654,27 @@ export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; 
 }
 
 /**
+ * Phase D — 노드 원장 소유 주체 키(선택 인자). 서버가 소유 주체를 해시해 만든 불투명 값이며 원 사용자/조직 id 가 아니다.
+ * 에이전트 `work-assistance.mjs` OWNER_KEY_RE 와 같은 규칙. 이 키를 받는 것은 local.db v8 에이전트뿐이므로
+ * 보내는 쪽(runtime)이 노드 capability(ownerScopedLedger)를 확인한 뒤에만 싣는다.
+ */
+export const NODE_LEDGER_OWNER_KEY_RE = /^o_[0-9a-f]{32}$/;
+
+/** ownerKey 를 떼어 형식만 보고, 나머지는 각 action 의 기존 검증기를 그대로 통과시킨 뒤 다시 붙인다. */
+function withOwnerKey<T extends object>(
+  args: unknown,
+  validate: (a: unknown) => { ok: boolean; args?: T },
+): { ok: boolean; args?: T & { ownerKey?: string } } {
+  if (!args || typeof args !== 'object' || Array.isArray(args) || !Object.prototype.hasOwnProperty.call(args, 'ownerKey')) {
+    return validate(args);
+  }
+  const { ownerKey, ...rest } = args as Record<string, unknown>;
+  if (typeof ownerKey !== 'string' || !NODE_LEDGER_OWNER_KEY_RE.test(ownerKey)) return { ok: false };
+  const r = validate(rest);
+  return r.ok && r.args ? { ok: true, args: { ...r.args, ownerKey } } : { ok: false };
+}
+
+/**
  * base action 에 맞는 인자 검증. 통과하면 **정규화된 사본**을 돌려준다(원본 객체를 그대로
  * 흘리지 않는다 — 추가 키가 있으면 여기서 이미 실패한다).
  *
@@ -494,7 +684,7 @@ export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; 
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | UiaActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs | UiaActionArgs } | { ok: false } {
   // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
   if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
     const r = validateDomFindArgs(args);
@@ -514,6 +704,11 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TABLE) {
     const r = validateDomReadTableArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  // PHASE-E: 단계 형상 · 값 규칙은 단발 action 과 같다. 형상 밖이면 단계 하나도 발행되지 않는다.
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    const r = validateDomRunUnitArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   // WINDOWS-UI-AUTOMATION-V0: 요소 ref+snapshot · 텍스트(computer-use 규칙) · 허용 키 · 0..1 좌표만.
@@ -546,11 +741,43 @@ export function validateLocalCommandArgs(
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT) {
-    const r = validateDataWorkRunUpsertArgs(args);
+    const r = withOwnerKey(args, validateDataWorkRunUpsertArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS) {
     const r = validateDataWorkRunSetStatusArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_SAVE) {
+    const r = withOwnerKey(args, validateDataWorkRunCandidateSaveArgs);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
+    const r = withOwnerKey(args, validateDataWorkRunCandidateMatchArgs);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_RESULT) {
+    const r = validateDataWorkRunCandidateResultArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECORD) {
+    const r = validateDataWorkRunExperienceRecordArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_SAVE) {
+    const r = validateDataWorkRunContextSaveArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL) {
+    const r = validateDataWorkRunContextRecallArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_ASSISTANCE_RECORD) {
+    const r = withOwnerKey(args, validateDataWorkRunAssistanceRecordArgs);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
+    const r = withOwnerKey(args, validateDataExperienceRecallArgs);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
@@ -672,7 +899,7 @@ export function isAllowedLocalAction(action: string): boolean {
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs;
+  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -1109,7 +1336,7 @@ export function pickSafeCaptureResultData(data: unknown): Record<string, unknown
 // 여전히 경로 · 파일명 · 행 데이터는 없다 — 상태 enum · 정수 · ISO 시각뿐.
 const SAFE_DATA_INFO_STRING_FIELDS: readonly string[] = Object.freeze(['key', 'value', 'migrationStatus', 'integrityStatus', 'lastBackupAt']);
 const SAFE_DATA_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze(['ok', 'saved', 'ready']);
-const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion', 'latestMigration', 'pendingMigrations', 'backupCount']);
+const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion', 'latestMigration', 'pendingMigrations', 'backupCount', 'seq', 'patternCount']);
 const SAFE_DATA_MIGRATION_STATUS: readonly string[] = Object.freeze(['current', 'behind', 'failed', 'too_new']);
 const SAFE_DATA_INTEGRITY_STATUS: readonly string[] = Object.freeze(['ok', 'failed', 'unknown']);
 const ISO_INSTANT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
@@ -1139,6 +1366,38 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
   // Work Run 쓰기 verb 확인용 — runId 반향 + 상태 enum 만. goal/note/화면 텍스트는 통과하지 않는다.
   if (isValidLocalWorkRunId(src.runId)) out.runId = src.runId;
   if (typeof src.runStatus === 'string' && LOCAL_WORK_RUN_STATUSES.includes(src.runStatus)) out.runStatus = src.runStatus;
+  // Candidate 저장·결과 확인용 — id 반향 + 결과 enum 만.
+  if (isValidWorkflowCandidateId(src.candidateId)) out.candidateId = src.candidateId;
+  if (typeof src.candidateStatus === 'string' && ['active', 'disabled'].includes(src.candidateStatus)) out.candidateStatus = src.candidateStatus;
+  return out;
+}
+
+/**
+ * `local.data.work_run_candidate_match` 응답 화이트리스트. matched · candidateId · **재생 단계(값 채움)** 만.
+ * 단계는 validateReplaySteps 형상을 통과해야 한다 — 과거 요청 문장 · 템플릿 · 통계 · 임의 필드는 통과하지 않는다.
+ */
+export function pickSafeWorkflowMatchInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return { matched: false };
+  const src = data as Record<string, unknown>;
+  if (src.matched !== true || !isValidWorkflowCandidateId(src.candidateId)) return { matched: false };
+  const steps = validateReplaySteps(src.steps);
+  if (!steps) return { matched: false };
+  return { matched: true, candidateId: src.candidateId, steps };
+}
+
+/**
+ * `local.data.work_run_context_recall` 응답 화이트리스트 — 구조(task · stage · ask · 방법) + 재생 단계(형상 통과 시)만.
+ * 원래 요청 문장 · 템플릿 · 시각은 통과하지 않는다.
+ */
+export function pickSafeContextRecallInfo(data: unknown): Record<string, unknown> {
+  const c = pickRecalledContext(data);
+  if (!c.found) return { found: false };
+  const out: Record<string, unknown> = { found: true, taskKey: c.taskKey, stageKey: c.stageKey, ask: c.ask, strategy: c.strategy };
+  const steps = c.candidateId ? validateReplaySteps(c.steps) : null;
+  if (c.candidateId && steps) {
+    out.candidateId = c.candidateId;
+    out.steps = steps;
+  }
   return out;
 }
 
@@ -1245,8 +1504,20 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   if (base === LOCAL_AGENT_ACTIONS.DATA_QUERY) {
     return pickSafeDataQueryInfo(data);
   }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CANDIDATE_MATCH) {
+    return pickSafeWorkflowMatchInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_CONTEXT_RECALL) {
+    return pickSafeContextRecallInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_EXPERIENCE_RECALL) {
+    return pickSafeExperienceRecall(data);
+  }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    return pickSafeDomUnitInfo(data);
   }
   if (DOM_TARGET_ACTIONS.includes(base)) {
     return pickSafeDomInfo(data);

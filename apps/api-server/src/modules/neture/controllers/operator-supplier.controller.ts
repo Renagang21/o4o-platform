@@ -24,13 +24,28 @@
  *  - deactivate 는 admin 전용 유지 — ACTIVE 공급자 비활성화는 운영 정책 영향이 크므로
  *    operator scope 에서는 노출하지 않는다.
  *
- * Auth: requireAuth + requireNetureScope('neture:operator')
- *   scopeRoleMapping 에 의해 neture:operator + neture:admin 모두 통과.
+ * Auth: requireAuth + requireSupplierScope('supplier:operator')
+ *   scopeRoleMapping 에 의해 supplier:operator + supplier:admin 이 통과하고,
+ *   platformBypass 로 platform:super_admin 도 통과한다.
+ *
+ * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정 · 잔여 gap):
+ *   종전 `requireNetureScope('neture:operator')`. 공급자 **상태 관리**
+ *   (`/admin/suppliers/governance`)는 이미 `requireSupplierScope('supplier:admin')` 으로
+ *   옮겼는데 **승인·거절 canonical 인 이쪽만 neture 축에 남아 있었다.** 같은 업무 축의 두
+ *   endpoint 가 서로 다른 경계를 쓰면 `supplier:admin` + supplier membership 만 가진
+ *   운영자가 목록은 보고 승인은 못 한다.
+ *
+ *   level 은 종전과 같은 **operator** 다 — 권한 범위를 넓히지 않는다. admin 전용으로 둔
+ *   deactivate/reactivate 는 여기 없고 admin.controller 에 그대로 있다.
+ *
+ *   공급자 **사업자 본인**의 인가(`organization_members` → `organizations(type='supplier')`)는
+ *   이 축이 아니다 (O4O-SUPPLIER-DOMAIN-BOUNDARY-V1 §7 FROZEN · 건드리지 않았다).
+ *   여기서 나누는 것은 그 영역을 운영하는 쪽의 권한뿐이다.
  */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { requireSupplierScope } from '../../../middleware/supplier-service-scope.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { SupplierStatus } from '../entities/index.js';
@@ -40,6 +55,7 @@ import {
 } from '../services/supplier-onboarding.service.js';
 import { SupplierRegulatedCategoryService } from '../services/supplier-regulated-category.service.js';
 import logger from '../../../utils/logger.js';
+import { DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };
@@ -52,9 +68,9 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
   const actionLogService = new ActionLogService(dataSource);
 
-  // Router-level guard: operator scope (admin 도 scopeRoleMapping 으로 통과)
+  // Router-level guard: supplier 서브도메인 운영자 (supplier:admin 도 scopeRoleMapping 으로 통과)
   router.use(requireAuth);
-  router.use(requireNetureScope('neture:operator') as any);
+  router.use(requireSupplierScope('supplier:operator') as any);
 
   /**
    * GET /operator/suppliers
@@ -357,7 +373,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
 
       const result = await netureService.approveSupplier(id, approvedBy);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
         // 구조화된 누락 필드를 함께 반환 — 프론트가 사람이 읽을 메시지로 변환.
         return res.status(status).json({
@@ -393,7 +409,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
       const { reason } = req.body || {};
       const result = await netureService.rejectSupplier(id, rejectedBy, reason);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 

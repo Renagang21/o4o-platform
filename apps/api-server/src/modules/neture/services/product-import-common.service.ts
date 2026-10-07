@@ -82,15 +82,33 @@ export class ProductImportCommonService {
     const servicePrice = extra?.servicePrice ?? null;
     const spotPrice = extra?.spotPrice ?? null;
 
+    // WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §6 (Distribution SSOT):
+    //   유통 판정의 **입력**은 `is_public` · `service_keys` · `allowed_seller_ids` 이고,
+    //   `distribution_type` 은 그 범위의 **파생 표기**다(offer.service.ts deriveDistributionType).
+    //   이 import 경로는 파생 필드를 독립 입력처럼 써서 `is_public` 을 건드리지 않았다.
+    //   그러면 `distribution_type='PUBLIC'` + `is_public=false` 같은 모순 행이 생기고,
+    //   distribution_type 을 읽는 소비처(Pharmacy-Hub 노출 · 대시보드 집계)와
+    //   is_public 을 읽는 소비처(공급자 화면)가 같은 행을 다르게 판정한다.
+    //   여기서는 요청값을 **입력축으로 환원**한 뒤 같은 규칙으로 파생시킨다.
+    //     PUBLIC  → is_public = true
+    //     그 외   → is_public = false · 파생은 service_keys 유무로 결정
+    //   (import 는 service_keys 를 정하지 않으므로 'SERVICE' 요청이 서비스 0개인 죽은 SERVICE
+    //    행으로 남지 않는다 — 노출 방향으로는 더 닫히는 쪽이라 안전하다.)
+    //   `$3`(원래의 distribution_type 직접 대입)은 더 이상 SQL 에서 참조하지 않는다.
+    //   파라미터 자리는 그대로 두어 뒤 인덱스를 밀지 않는다(재번호 오류 방지).
+    const requestedIsPublic = String(distributionType ?? '').toUpperCase() === 'PUBLIC';
+
     // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: service_keys 포함
     // WO-NETURE-B2B-PRICE-THREE-TIER-POLICY-ALIGNMENT-V1: price_gold(서비스가), price_platinum(스팟가)
     await manager.query(
       `INSERT INTO supplier_product_offers
-        (id, master_id, supplier_id, distribution_type, approval_status, is_active,
+        (id, master_id, supplier_id, is_public, distribution_type, approval_status, is_active,
          price_general, price_gold, price_platinum, consumer_reference_price, stock_quantity,
          consumer_short_description, consumer_detail_description, slug, service_keys, created_at, updated_at)
        VALUES
-        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $11, $12, $6, $7, $8, $9, $10, ARRAY[]::text[], NOW(), NOW())
+        (gen_random_uuid(), $1, $2, $13,
+         (CASE WHEN $13 THEN 'PUBLIC' ELSE 'PRIVATE' END)::supplier_product_offers_distribution_type_enum,
+         $4, false, $5, $11, $12, $6, $7, $8, $9, $10, ARRAY[]::text[], NOW(), NOW())
        ON CONFLICT (master_id, supplier_id) DO UPDATE SET
          price_general = EXCLUDED.price_general,
          price_gold = COALESCE(EXCLUDED.price_gold, supplier_product_offers.price_gold),
@@ -99,10 +117,17 @@ export class ProductImportCommonService {
          stock_quantity = COALESCE(EXCLUDED.stock_quantity, supplier_product_offers.stock_quantity),
          consumer_short_description = COALESCE(EXCLUDED.consumer_short_description, supplier_product_offers.consumer_short_description),
          consumer_detail_description = COALESCE(EXCLUDED.consumer_detail_description, supplier_product_offers.consumer_detail_description),
-         distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
+         is_public = EXCLUDED.is_public,
          service_keys = supplier_product_offers.service_keys,
+         distribution_type = (
+           CASE
+             WHEN EXCLUDED.is_public THEN 'PUBLIC'
+             WHEN COALESCE(array_length(supplier_product_offers.service_keys, 1), 0) > 0 THEN 'SERVICE'
+             ELSE 'PRIVATE'
+           END
+         )::supplier_product_offers_distribution_type_enum,
          updated_at = NOW()`,
-      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug, servicePrice, spotPrice],
+      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug, servicePrice, spotPrice, requestedIsPublic],
     );
 
     // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1: offer ID 조회 (RETURNING 대신 안전한 SELECT)

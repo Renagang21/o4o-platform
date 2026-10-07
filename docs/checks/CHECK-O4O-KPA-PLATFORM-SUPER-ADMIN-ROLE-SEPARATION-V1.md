@@ -15,7 +15,7 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 
 ## 1. 제거 전 역할 상태 (프로덕션 실측)
 
-대상: `sohae2100@gmail.com` (`cfd2a5e7-db28-4842-bd5c-4814cba49ca5`) · status `active`
+대상: `[REDACTED_EMAIL_A]` (`cfd2a5e7-db28-4842-bd5c-4814cba49ca5`) · status `active`
 
 | 항목 | 값 |
 |------|-----|
@@ -32,7 +32,7 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 
 | # | 계정 | id | status | memberships | 비고 |
 |---|------|----|--------|-------------|------|
-| 1 | `sohae2100@gmail.com` | `cfd2a5e7…` | active | 4개 active | **본 WO 의 제거 대상** |
+| 1 | `[REDACTED_EMAIL_A]` | `cfd2a5e7…` | active | 4개 active | **본 WO 의 제거 대상** |
 | 2 | `super-admin@o4o.com` | `b0000000-…-000000000001` | active | **0개** | bootstrap seed 계정 |
 
 `platform:admin` 보유자는 **0명** — 즉 플랫폼 관리 tier 는 위 2계정이 전부다.
@@ -40,8 +40,8 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 ### 2-A. 왜 "로그인 가능"을 확인하지 못했나
 
 - `super-admin@o4o.com` 의 비밀번호는 **자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)
-  에 등재되어 있지 않다.** 해당 문서는 sohae2100 / renagang21 / sohae21@naver.com 3계정만 관리한다.
-- 코드상 시드 값은 `BOOTSTRAP_PASSWORD = process.env.SEED_BOOTSTRAP_PASSWORD || 'O4oBootstrap1!'`
+  에 등재되어 있지 않다.** 해당 문서는 sohae2100 / renagang21 / [REDACTED_EMAIL_C] 3계정만 관리한다.
+- 코드상 시드 값은 `BOOTSTRAP_PASSWORD = process.env.SEED_BOOTSTRAP_PASSWORD || '[REDACTED]'`
   (`20260927100000-BootstrapCanonicalSeedAccounts.ts:39`). 프로덕션 생성 시점에 env 가 설정되었는지
   **로컬에서 알 수 없어**, fallback 값이 유효하다고 단정할 수 없다.
 - 해당 평문은 `TEST-ACCOUNTS.local.md` 가 이미 **보안 cleanup 대상**으로 지정한 항목이다
@@ -65,7 +65,7 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 | 정의 위치 | `20260927100000-BootstrapCanonicalSeedAccounts.ts` |
 
 **결론: 사용 가능한 대체 플랫폼 super admin 은 사실상 0명이다.**
-`sohae2100@gmail.com` 이 **현재 유일하게 사용 가능한 플랫폼 최고 관리자**이며,
+`[REDACTED_EMAIL_A]` 이 **현재 유일하게 사용 가능한 플랫폼 최고 관리자**이며,
 이는 중지 조건 2("현재 KPA 계정이 유일한 비상 복구용 플랫폼 관리자")의 **확정 성립**을 의미한다.
 따라서 본 WO 는 현재 상태 그대로는 **수행 불가**이며, 선행 작업(§8) 없이는 재시도해서도 안 된다.
 
@@ -84,7 +84,7 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 1. 최초 진술: "admin.neture.co.kr 아이디는 (운영자와) 다르다. 비밀번호도 운영자와 다르다"
 2. **최종 확인: "운영자 아이디와 admin.neture.co.kr 의 아이디도 같고 비밀번호도 같다"**
 
-즉 admin.neture.co.kr 은 **`sohae2100@gmail.com` 동일 계정 · 동일 비밀번호**로 접속한다.
+즉 admin.neture.co.kr 은 **`[REDACTED_EMAIL_A]` 동일 계정 · 동일 비밀번호**로 접속한다.
 별도 인증 저장소나 별도 관리자 계정 체계는 **존재하지 않는다** (동일 `users` 행 = 단일 password hash).
 
 이로써 WO 목표 문장의 전제가 무너진다.
@@ -161,7 +161,7 @@ WO 검증 항목 중 다음은 권한 제거를 전제하므로 수행하지 않
 
 ## 9. 최종 판정 (§2-C 확인 반영)
 
-`admin.neture.co.kr` = `sohae2100@gmail.com` 동일 계정·동일 비밀번호임이 확인되어,
+`admin.neture.co.kr` = `[REDACTED_EMAIL_A]` 동일 계정·동일 비밀번호임이 확인되어,
 **본 WO 는 현재 구조에서 수행 불가**로 확정한다. 재시도 전에 아래 선행 작업이 필요하다.
 
 ### 선행 작업 (택 1)

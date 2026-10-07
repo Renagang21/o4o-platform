@@ -30,11 +30,17 @@ const SCAN_ROOTS = [
   'services/auth',
   'modules/auth',
 ];
+// WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: `account-linking.service.ts` · `passportDynamic.ts` 는 제거됐다.
+//   두 파일의 **부재** 자체를 G4 · G6 이 계약으로 고정한다(아래).
 const SCAN_FILES = [
-  'services/account-linking.service.ts',
   'services/authentication.service.ts',
-  'config/passportDynamic.ts',
   'config/google-identity.config.ts',
+];
+
+/** 되살아나면 안 되는 파일 — 부재를 계약으로 고정한다. */
+const RETIRED_FILES = [
+  'config/passportDynamic.ts',
+  'services/account-linking.service.ts',
 ];
 
 const REPO_QUERY_METHODS = new Set(['findOne', 'findOneBy', 'find', 'findBy', 'exists', 'existsBy', 'count', 'countBy', 'findAndCount']);
@@ -120,7 +126,7 @@ describe('WO-2B 정적 guard — OAuth/Google 흐름의 email lookup · 자동 �
     expect(files.length).toBeGreaterThan(5);
     expect(files.some((f) => rel(f) === 'services/auth/google-auth.service.ts')).toBe(true);
     expect(files.some((f) => rel(f) === 'services/auth/google-identity.service.ts')).toBe(true);
-    expect(files.some((f) => rel(f) === 'config/passportDynamic.ts')).toBe(true);
+    expect(files.some((f) => rel(f) === 'services/auth/google-auth.service.ts')).toBe(true);
   });
 
   it('G1 legacy socialAuthService 파일 부재 · import 0', () => {
@@ -179,22 +185,31 @@ describe('WO-2B 정적 guard — OAuth/Google 흐름의 email lookup · 자동 �
     expect(importers).toEqual([]);
   });
 
-  it('G4 passportDynamic strategy verify callback — repository 조회/저장 · handleSocialAuth 호출 없음', () => {
-    const f = path.join(SRC, 'config/passportDynamic.ts');
-    const sf = sources.get(f)!;
-    const violations: string[] = [];
-    walk(sf, (n) => {
-      if (!ts.isMethodDeclaration(n) || !ts.isIdentifier(n.name) || !/^configure\w+Strategy$/.test(n.name.text)) return;
-      walk(n as unknown as ts.SourceFile, (inner) => {
-        if (!ts.isCallExpression(inner)) return;
-        const m = calledMethodName(inner);
-        if (!m) return;
-        if (REPO_QUERY_METHODS.has(m) || /^(save|insert|update|upsert|getRepository|query|handleSocialAuth|linkOAuthAccount|mergeAccounts)$/.test(m)) {
-          violations.push(`${n.name.getText(sf)} → ${m}`);
+  /**
+   * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — 계약 반전
+   *
+   *   구 G4: "passportDynamic 의 verify callback 이 repository 를 건드리지 않는다".
+   *   Passport 계층 자체를 은퇴시켰으므로(전략을 쓰는 route 0 · `passport.authenticate` 0 ·
+   *   `/api/v1/social/*` 콜백 미등록) 이제 **파일의 부재**를 고정한다.
+   *   되살아나면 여기서 먼저 깨진다.
+   */
+  it('G4 passportDynamic · account-linking service 부재 (되살아나면 먼저 깨진다)', () => {
+    for (const rel of RETIRED_FILES) {
+      expect({ rel, exists: fs.existsSync(path.join(SRC, rel)) }).toEqual({ rel, exists: false });
+    }
+  });
+
+  it('G4-b passport · express-session import 가 runtime 에 0건이다', () => {
+    const offenders: string[] = [];
+    for (const [f, sf] of sources) {
+      walk(sf, (n) => {
+        if (!ts.isImportDeclaration(n) || !ts.isStringLiteral(n.moduleSpecifier)) return;
+        if (/^(passport|passport-.+|express-session)$/.test(n.moduleSpecifier.text)) {
+          offenders.push(`${rel(f)} → ${n.moduleSpecifier.text}`);
         }
       });
-    });
-    expect(violations).toEqual([]);
+    }
+    expect(offenders).toEqual([]);
   });
 
   it('G5 google-identity.service.ts — email · provider_id · users.provider 를 조회 키로 쓰지 않는다', () => {
@@ -217,16 +232,21 @@ describe('WO-2B 정적 guard — OAuth/Google 흐름의 email lookup · 자동 �
     expect(violations).toEqual([]);
   });
 
-  it('G6 AccountLinkingService.mergeAccounts 없음', () => {
-    const f = path.join(SRC, 'services/account-linking.service.ts');
-    const sf = sources.get(f)!;
-    const methods: string[] = [];
-    walk(sf, (n) => {
-      if (ts.isMethodDeclaration(n) && ts.isIdentifier(n.name)) methods.push(n.name.text);
-    });
-    expect(methods).not.toContain('mergeAccounts');
-    expect(methods).toContain('linkOAuthAccount'); // WO-2C 골격 유지
-    expect(methods).toContain('getMergedProfile'); // login 응답 사용
+  /**
+   * WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1 — 계약 반전
+   *   구 G6 은 `AccountLinkingService` 의 **메서드 구성**을 고정했다(mergeAccounts 없음 ·
+   *   linkOAuthAccount/getMergedProfile 유지). 서비스 자체가 runtime consumer 0 으로
+   *   은퇴했으므로, 이제 **이름이 runtime 에 다시 나타나지 않는 것**을 고정한다.
+   */
+  it('G6 AccountLinking 계열 식별자가 runtime 에 없다', () => {
+    const banned = /^(AccountLinkingService|mergeAccounts|getMergedProfile|linkOAuthAccount)$/;
+    const offenders: string[] = [];
+    for (const [f, sf] of sources) {
+      walk(sf, (n) => {
+        if (ts.isIdentifier(n) && banned.test(n.text)) offenders.push(`${rel(f)} → ${n.text}`);
+      });
+    }
+    expect(offenders).toEqual([]);
   });
 
   it('G7 autoLinked 신호가 auth 타입/서비스에 없다', () => {

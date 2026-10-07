@@ -24,6 +24,13 @@ import {
   isTermsPendingRequestAllowed,
 } from '../../auth/terms-acceptance.policy.js';
 import { policyAcceptanceService } from '../../../modules/policy-acceptance/policy-acceptance.service.js';
+import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import {
+  isPasswordSessionAllowed,
+  PASSWORD_SESSION_NOT_ALLOWED_CODE,
+  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+} from '../../auth/password-session.policy.js';
+import type { AccessTokenPayload } from '../../../types/auth.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -94,7 +101,8 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {
-    pending = await policyAcceptanceService.getPendingForUser(user.id);
+    // enforced pending — Demo 계정 예외만 반영(정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2). 판정 로직은 불변.
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,
@@ -114,6 +122,52 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
     error: TERMS_ACCEPTANCE_REQUIRED_MESSAGE,
     code: TERMS_ACCEPTANCE_REQUIRED_CODE,
     pendingPolicyAcceptances: pending,
+  });
+  return true;
+}
+
+/**
+ * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 · §5-3 — 비밀번호 세션의 관리자 경계
+ *
+ * Admin · `platform:*` 는 Google 전용이다. 비밀번호로 발급된 세션(`authMethod:'password'`)이
+ * `platform:*` 역할을 가진 계정이면 **어떤 경로든** 거절한다 — 개별 admin guard 가 JWT roles 를 보든
+ * DB 를 보든 그 앞에서 막는다. 역할은 JWT 가 아니라 DB 에서 다시 읽는다(발급 뒤 부여를 잡는다).
+ * Google 세션에는 claim 이 없으므로 조회도 하지 않는다(기존 hot path 비용 0).
+ *
+ * 판정 실패(DB 오류)는 **fail-closed** 다 — 약관 게이트와 달리 이것은 권한 경계다.
+ *
+ * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
+ */
+async function enforcePasswordSessionBoundary(
+  req: AuthRequest,
+  res: Response,
+  user: { id: string },
+  payload: AccessTokenPayload,
+): Promise<boolean> {
+  if (payload.authMethod !== 'password') return false;
+  let allowed = false;
+  try {
+    const roles = await roleAssignmentService.getRoleNames(user.id);
+    allowed = isPasswordSessionAllowed(payload.serviceKey, roles);
+  } catch (error) {
+    logger.warn('[passwordSessionBoundary] role check failed (fail-closed)', {
+      userId: user.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+  if (allowed) {
+    (req as AuthRequest & { authMethod?: string }).authMethod = 'password';
+    return false;
+  }
+  logger.warn('[passwordSessionBoundary] password session rejected', {
+    userId: user.id,
+    path: req.originalUrl,
+    method: req.method,
+  });
+  res.status(403).json({
+    success: false,
+    error: PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+    code: PASSWORD_SESSION_NOT_ALLOWED_CODE,
   });
   return true;
 }
@@ -205,6 +259,8 @@ export const requireAuth = async (
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
+    if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
     if (await enforceTermsAcceptance(req, res, user)) return;
 
@@ -286,7 +342,21 @@ export const optionalAuth = async (
       optionalAccess === 'normal' ||
       (optionalAccess === 'restricted' && isRestrictedRequestAllowed(req.method, req.originalUrl));
 
-    if (user && user.isActive && optionalAllowed) {
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 관리자 경계에 걸리는 비밀번호 세션은
+    //   403 대신 비로그인과 같게 취급한다(공개 경로의 성질을 유지한다).
+    let passwordSessionAllowed = true;
+    if (user && payload.authMethod === 'password') {
+      try {
+        passwordSessionAllowed = isPasswordSessionAllowed(
+          payload.serviceKey,
+          await roleAssignmentService.getRoleNames(user.id),
+        );
+      } catch {
+        passwordSessionAllowed = false;
+      }
+    }
+
+    if (user && user.isActive && optionalAllowed && passwordSessionAllowed) {
       // Phase3-E: Assign roles from JWT payload
       user.roles = payload.roles || [];
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
@@ -380,6 +450,8 @@ export const requirePlatformUser = async (
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
+    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
+    if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
     if (await enforceTermsAcceptance(req, res, user)) return;
 

@@ -34,7 +34,7 @@ const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
 const EXPECT = 417;
 const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/2b5935f9-9c75-483f-8206-e3385235d4d4/scratchpad';
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+const DATA = 'src/scripts/data/check-data/product-description-guard';
 
 function loadTargets(): GuardProductInput[] {
   const a: GuardProductInput[] = JSON.parse(fs.readFileSync(`${DATA}/hff-vitamin-d-new-30.json`, 'utf8'));

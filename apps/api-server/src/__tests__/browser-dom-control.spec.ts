@@ -491,7 +491,7 @@ describe('18~19. arbitrary selector · arbitrary JS 부재', () => {
     for (const call of calls) {
       const arg = call.replace(/^querySelector(?:All)?\(/, '').replace(/\)$/, '').trim();
       // 리터럴 문자열 또는 이 파일의 상수 이름만.
-      expect(arg).toMatch(/^('[^']*'|CANDIDATE_SELECTOR|TABLE_SELECTOR|PASSWORD_IN_FORM_SELECTOR)$/);
+      expect(arg).toMatch(/^('[^']*'|CANDIDATE_SELECTOR|TABLE_SELECTOR|PASSWORD_IN_FORM_SELECTOR|NATIVE_CONTROL_SELECTOR)$/);
     }
     for (const bad of ['document.evaluate', 'XPathEvaluator', 'querySelector(payload', 'querySelector(msg', 'querySelector(q']) {
       expect(cs).not.toContain(bad);

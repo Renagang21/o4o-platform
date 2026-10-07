@@ -22,13 +22,32 @@ const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 // Module doubles
 // ─────────────────────────────────────────────────────────────────────────────
 
-const query = jest.fn();
+// 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
+// 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+const query = jest.fn().mockResolvedValue([]);
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1: handoff 는 계정의 Google 연결 여부를 읽지 않는다.
+//   수단은 발급 시 검증된 토큰 claim → 원장 `source_auth_method` → 교환 세션 승계. 누가
+//   `linked_accounts` 를 다시 읽기 시작하면 잡히도록 조회를 따로 받아 0 회를 확인한다.
+const linkedAccountsQuery = jest.fn().mockResolvedValue([{ '?column?': 1 }]);
 const findOne = jest.fn();
 jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
-    query: (...args: unknown[]) => query(...args),
+    query: (...args: unknown[]) =>
+      /FROM linked_accounts/i.test(String(args[0] ?? '')) ? linkedAccountsQuery(...args) : query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
+    //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
+    //   맞춰 둔 handoff SQL 응답이 한 칸씩 밀려 엉뚱한 값을 받는다(실제로 그렇게 깨졌다).
+    //   여기서는 "폐기 기록 없음"(= 빈 배열)을 돌려주고, 나머지는 그대로 위임한다.
+    //   세대 판정 자체는 전용 spec(service-logout-auth-boundary.spec.ts)이 본다.
+    manager: {
+      query: (...args: unknown[]) => {
+        const sql = String(args[0] ?? '');
+        if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
+        return query(...args);
+      },
+    },
   },
 }));
 jest.mock('../modules/auth/entities/User.js', () => ({ User: class User {} }));
@@ -36,7 +55,15 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames: jest.fn(async () => ['store_owner']) },
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
-jest.mock('../utils/token.utils.js', () => ({ generateTokens: (...a: unknown[]) => generateTokens(...a) }));
+// WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
+//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
+//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
+const verifyAccessToken = jest.fn((_token: string): unknown => null);
+jest.mock('../utils/token.utils.js', () => ({
+  generateTokens: (...a: unknown[]) => generateTokens(...a),
+  verifyAccessToken: (t: string) => verifyAccessToken(t),
+}));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
@@ -50,29 +77,38 @@ jest.mock('../utils/service-tenant.resolver.js', () => ({
 }));
 
 import { handoffTokenService, isHandoffWorkspace, HANDOFF_WORKSPACES } from '../services/handoff-token.service.js';
+// req/res 대역은 공통 support — 세 handoff spec 이 같은 것을 각자 갖고 있었다.
+import { mockHandoffRes } from './support/handoff-http.js';
 import { HandoffController } from '../modules/auth/controllers/handoff.controller.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import { isStoreWorkspaceExchangeOrigin, STORE_WORKSPACE_ORIGIN } from '../config/store-workspace.js';
 
 const USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActive: true, refreshTokenFamily: 'fam-1' };
 const STORE = { organizationId: 'org-1', organizationName: '가나약국', memberRole: 'owner' };
 
 function mockReq(body: Record<string, unknown>, origin?: string, user: unknown = USER) {
+  // 실제 Express req 는 언제나 headers·cookies 를 갖는다. 없으면 토큰 추출이 터진다
+  //   (WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 발급이 access token 의
+  //    세션 귀속을 읽는다 — 로그아웃된 서비스의 남은 인증으로 긴 세션을 얻지 못하게).
   return {
     body,
     user,
+    headers: {},
+    cookies: {},
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
 }
-function mockRes() {
-  const res: any = { statusCode: 200, body: undefined };
-  res.status = (c: number) => { res.statusCode = c; return res; };
-  res.json = (b: unknown) => { res.body = b; return res; };
-  return res;
-}
+const mockRes = mockHandoffRes;
 const uuid = '11111111-2222-4333-8444-555555555555';
 
 beforeEach(() => {
   query.mockReset();
+  // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
+  // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
+  query.mockResolvedValue([]);
+  linkedAccountsQuery.mockClear();
+  verifyAccessToken.mockReset();
+  verifyAccessToken.mockReturnValue(null);
   findOne.mockReset();
   resolveAccessibleStores.mockReset();
   generateTokens.mockClear();
@@ -131,8 +167,29 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     await handoffTokenService.generateToken('user-1', 'neture', 'kpa-society');
     const [sql, params] = query.mock.calls[0];
-    expect(norm(sql)).toContain('(user_id, source_service_key, target_service_key, target_workspace, expires_at)');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): source_session_epoch 컬럼이 늘었고
+    //   값은 **같은 문장 안의 subquery** 로 채운다(별도 SELECT 를 앞세우면 왕복이 늘고 그 사이
+    //   로그아웃이 끼어들 틈이 생긴다). 컬럼 목록과 subquery 둘 다 고정한다.
+    expect(norm(sql)).toContain(
+      '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch, source_auth_method)',
+    );
+    // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다($6). 여기서 현재 세대를 다시
+    //   읽으면(subquery 든 별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가
+    //   적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
+    expect(norm(sql)).toContain("now() + ($5 || ' seconds')::interval, $6, $7)");
+    expect(norm(sql)).not.toContain('SELECT session_epoch FROM service_session_revocations');
     expect(params.slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
+    // 수단을 넘기지 않은 호출은 password 로 적힌다(fail-closed · 승격 없음).
+    expect(params[6]).toBe('password');
+  });
+
+  it("수단은 호출자가 넘긴 값만 적는다 — 'google' · 'password' · 그 밖의 값은 password", async () => {
+    for (const [given, stored] of [['google', 'google'], ['password', 'password'], ['GOOGLE', 'password']] as const) {
+      query.mockReset();
+      query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+      await handoffTokenService.generateToken('user-1', 'neture', 'kpa-society', 0, given as any);
+      expect(query.mock.calls[0][1][6]).toBe(stored);
+    }
   });
 
   it("workspace 대상은 target_service_key NULL + target_workspace 'store' (가짜 serviceKey 0)", async () => {
@@ -153,12 +210,16 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
     const ws = await handoffTokenService.exchangeToken(uuid);
     expect(norm(query.mock.calls[0][0])).toContain('SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL AND expires_at > now() RETURNING');
-    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString() });
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): payload 에 출발 서비스 세대가
+    //   실린다. 이 행에는 컬럼이 없으므로(컬럼 도입 이전 발급분) null — 교환 판정에서 제외된다.
+    //   source_auth_method 도 없는 행(컬럼 이전 발급분)은 password 로 읽는다 — Google 로 승격하지 않는다.
+    expect(norm(query.mock.calls[0][0])).toContain('source_session_epoch, source_auth_method');
+    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString(), sourceSessionEpoch: null, sourceAuthMethod: 'password' });
     expect(ws).not.toHaveProperty('targetServiceKey');
 
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01' }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01', source_auth_method: 'google' }], 1]);
     const svc = await handoffTokenService.exchangeToken(uuid);
-    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01' });
+    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01', sourceSessionEpoch: null, sourceAuthMethod: 'google' });
     expect(svc).not.toHaveProperty('targetWorkspace');
   });
 });
@@ -215,11 +276,66 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.statusCode).toBe(200);
     expect(norm(query.mock.calls[0][0])).toContain('SELECT status FROM service_memberships');
     expect(query.mock.calls[0][1]).toEqual(['user-1', 'kpa-society']);
-    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
+    // 출발은 Origin 이 아니라 토큰 claim 이 증명한다 — 이 대역의 토큰은 claim 이 없으므로 'unknown' (§8 5차).
+    expect(query.mock.calls[1][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'kpa-society', null]);
     expect(res.body.data.targetService.key).toBe('kpa-society');
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
+  });
+});
+
+// WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1: Google 연결 여부로 비밀번호 세션의 이동을 막지 않는다.
+//   발급 시 **검증된 토큰의 claim** 을 원장에 적는다 — 계정의 Google 연결 · body · Origin 은 쓰지 않는다.
+describe('C-2. generateHandoff — 출발 세션 수단을 원장에 적는다', () => {
+  function sessionReq(body: Record<string, unknown>, token: string) {
+    const req = mockReq(body, 'https://neture.co.kr');
+    req.headers = { authorization: `Bearer ${token}` };
+    return req;
+  }
+  beforeEach(() => {
+    verifyAccessToken.mockImplementation((t: string) => {
+      if (t === 'PW-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0, authMethod: 'password' };
+      if (t === 'GOOGLE-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0 };
+      return null;
+    });
+  });
+  const inserted = () => query.mock.calls.find((c) => /INSERT INTO handoff_tokens/i.test(norm(c[0])));
+
+  it.each([
+    ['service', { targetServiceKey: 'kpa-society' }],
+    ['workspace', { targetWorkspace: 'store' }],
+    ['대표 진입', { targetServiceKey: 'neture' }],
+  ])("%s handoff: 비밀번호 세션(Google 연결 계정이어도) → 발급 · 원장 source_auth_method 'password'", async (_label, body) => {
+    resolveAccessibleStores.mockResolvedValue([STORE]);
+    query.mockImplementation(async (sql: string) =>
+      /INSERT INTO handoff_tokens/i.test(norm(sql)) ? [{ id: uuid }] : [{ status: 'active' }],
+    );
+    const res = mockRes();
+    await HandoffController.generateHandoff(sessionReq(body, 'PW-SESSION'), res);
+    expect(res.statusCode).toBe(200);
+    expect(inserted()?.[1].slice(0, 2)).toEqual(['user-1', 'neture']);
+    expect(inserted()?.[1][6]).toBe('password');
+    expect(linkedAccountsQuery).not.toHaveBeenCalled();
+  });
+
+  it("Google 세션(authMethod claim 없음) → 원장 'google'", async () => {
+    query.mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(sessionReq({ targetServiceKey: 'kpa-society' }, 'GOOGLE-SESSION'), res);
+    expect(res.statusCode).toBe(200);
+    expect(inserted()?.[1][6]).toBe('google');
+  });
+
+  it("검증되지 않는 토큰 · body 의 authMethod 주장 → 'password' (fail-closed)", async () => {
+    query.mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(
+      sessionReq({ targetServiceKey: 'kpa-society', authMethod: 'google', sourceAuthMethod: 'google' }, 'FORGED'),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(inserted()?.[1][6]).toBe('password');
   });
 });
 
@@ -229,9 +345,10 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
 
 describe('D. exchangeHandoff — origin 고정 · organization 재검증 · service 경로 불변', () => {
   const consumedWorkspace = () =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
-  const consumedService = () =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: new Date(0) }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0), source_auth_method: 'google' }], 1]);
+  // 기본 = Google 세션 출발(종전 계약: claim 없음 = null). 수단별 시나리오는 인자로 바꾼다.
+  const consumedService = (authMethod: 'google' | 'password' | null = 'google') =>
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: new Date(0), source_auth_method: authMethod }], 1]);
   const memberships = [{ serviceKey: 'kpa-society', status: 'active' }];
 
   it('isStoreWorkspaceExchangeOrigin: 프로덕션은 store.neture.co.kr 정확 host 만', () => {
@@ -258,9 +375,17 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data.targetWorkspace).toBe('store');
     expect(res.body.data).not.toHaveProperty('targetServiceKey');
     expect(res.body.data.tokens).toEqual({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 });
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 끝 두 인자 = 이 세션이 속한 대상과
+    //   그 대상의 **현재 세대**. WORKSPACE handoff 는 서비스가 아니므로 workspace 키를 쓴다.
+    //   세대를 새기지 않으면 그 대상에서 로그아웃한 뒤 재발급된 토큰까지 거절된다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0, null);
     expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
-    expect(setAuthCookies).toHaveBeenCalledWith(req, res, expect.objectContaining({ accessToken: 'AT' }));
+    // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
+    //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
+    expect(setAuthCookies).not.toHaveBeenCalled();
+    expect(res.cookie).not.toHaveBeenCalled();
+    expect(res.setHeader).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
+    expect(res.append).not.toHaveBeenCalledWith('Set-Cookie', expect.anything());
     expect(resolveAccessibleStores).toHaveBeenCalledWith(expect.anything(), 'user-1');
   });
 
@@ -302,8 +427,67 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.statusCode).toBe(200);
     expect(res.body.data.targetServiceKey).toBe('kpa-society');
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1');
+    // SERVICE handoff 는 대상 서비스 키와 그 서비스의 세대를 새긴다 —
+    //   그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, null);
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
+  });
+
+  // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 · 최종 보완 1: 교환 세션은 **원장의 출발 수단**을 승계한다.
+  //   교환 시점의 Google 연결 여부로 추정하지 않는다(linked_accounts 조회 0) — 발급 뒤 Google 이 연결돼도,
+  //   역할이 붙어도 비밀번호 세션이 Google 세션으로 승격되지 않는다.
+  it("원장 'password' → 대상 세션도 authMethod password (교환 시 Google 이 연결돼 있어도)", async () => {
+    consumedService('password');
+    findOne.mockResolvedValueOnce(USER);
+    query.mockResolvedValueOnce(memberships);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    expect(res.statusCode).toBe(200);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+    expect(linkedAccountsQuery).not.toHaveBeenCalled();
+  });
+
+  it('원장 NULL(컬럼 이전 발급분) → password 로 승계 (Google 로 승격 없음)', async () => {
+    consumedService(null);
+    findOne.mockResolvedValueOnce(USER);
+    query.mockResolvedValueOnce(memberships);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    expect(res.statusCode).toBe(200);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+  });
+
+  it('원장 password + 발급 뒤 platform 역할이 붙음 → 403 PASSWORD_SESSION_NOT_ALLOWED · 토큰 발급 0', async () => {
+    consumedService('password');
+    findOne.mockResolvedValueOnce(USER);
+    query.mockResolvedValueOnce(memberships);
+    jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['store_owner', 'platform:super_admin']);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    expect([res.statusCode, res.body.code]).toEqual([403, 'PASSWORD_SESSION_NOT_ALLOWED']);
+    expect(generateTokens).not.toHaveBeenCalled();
+  });
+
+  it('원장 password + 서비스 :admin 역할 → 허용 (platform:* 만 거부)', async () => {
+    consumedService('password');
+    findOne.mockResolvedValueOnce(USER);
+    query.mockResolvedValueOnce(memberships);
+    jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['kpa-society:admin']);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    expect(res.statusCode).toBe(200);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
+  });
+
+  it("원장 'google' + platform 역할 → Google 세션 그대로 (claim 없음)", async () => {
+    consumedService('google');
+    findOne.mockResolvedValueOnce(USER);
+    query.mockResolvedValueOnce(memberships);
+    jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(['platform:super_admin']);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
+    expect(res.statusCode).toBe(200);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, null);
   });
 
   it('service 토큰 + 대상 서비스 membership pending → 403 HANDOFF_TARGET_NOT_ACTIVE (회귀 0)', async () => {

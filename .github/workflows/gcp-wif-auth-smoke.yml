@@ -1,0 +1,46 @@
+name: GCP WIF Auth Smoke
+
+# WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1 — GitHub OIDC → WIF → github-actions SA 인증만 검증한다 (read-only).
+#
+#   배포 · revision 변경 · DB · secret 접근 0. 출력은 인증 주체 · project id · serving revision 이름뿐이다
+#   (OIDC token · access token · credential 파일 내용은 출력하지 않는다).
+#   WIF provider 조건: repository_id · owner_id · environment=production · ref(main · deploy/*) ·
+#   event(workflow_run · workflow_dispatch — dispatch 는 소유자만) · 허용 workflow(이 파일 포함).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+
+concurrency:
+  group: gcp-wif-auth-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: WIF auth (read-only)
+    if: github.triggering_actor == github.repository_owner
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: netureyoutube
+          skip_install: true
+
+      - name: Read-only identity · project · serving revision
+        run: |
+          set -euo pipefail
+          echo "active account: $(gcloud auth list --filter=status:ACTIVE --format='value(account)')"
+          echo "project: $(gcloud projects describe netureyoutube --format='value(projectId)')"
+          echo "o4o-core-api serving: $(gcloud run services describe o4o-core-api --region=asia-northeast3 --format='value(status.latestReadyRevisionName)')"
+          echo "WIF_AUTH_PASS"

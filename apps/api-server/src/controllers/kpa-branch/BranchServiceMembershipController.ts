@@ -26,6 +26,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
+import { sendDemoAccountForbidden } from '../../services/auth/demo-account.service.js';
 import { PharmacistProfilePromotionService } from '../../services/kpa-branch/PharmacistProfilePromotionService.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
@@ -163,6 +164,7 @@ export class BranchServiceMembershipController {
         },
       });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[BranchServiceMembership] approve error', {
         membershipId,
         error: error instanceof Error ? error.message : String(error),
@@ -207,6 +209,7 @@ export class BranchServiceMembershipController {
         },
       });
     } catch (error) {
+      if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[BranchServiceMembership] reject error', {
         membershipId,
         error: error instanceof Error ? error.message : String(error),

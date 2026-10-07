@@ -102,7 +102,7 @@ export async function autoExpandPublicProduct(
          --   (canonical 행이 같은 조직에 이미 있어 진열 대상이 줄지 않는다)
          AND NOT (ose.service_code = ANY($3::text[]))
          AND ${drugAudienceSqlCondition('$2', 'ose.service_code')}
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [offerId, masterId, NON_CANONICAL_ENROLLMENT_CODES],
     );
 
@@ -159,7 +159,7 @@ export async function autoExpandServiceProduct(
          AND ose.status = 'active'
          AND ose.service_code = ANY($3::text[])
          AND ${drugAudienceSqlCondition('$2', 'ose.service_code')}
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [offerId, masterId, approvedServiceKeys],
     );
 
@@ -213,7 +213,7 @@ export async function autoListPublicProductsForOrg(
          AND spo.distribution_type = 'PUBLIC'
          AND s.status = 'ACTIVE'
          AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [organizationId, serviceKey],
     );
 
@@ -263,7 +263,7 @@ export async function autoListServiceProductsForOrg(
          AND spo.distribution_type = 'SERVICE'
          AND s.status = 'ACTIVE'
          AND ${drugAudienceSqlConditionForOrg('spo.master_id', '$2')}
-       ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
+       ON CONFLICT (organization_id, service_key, offer_id) WHERE service_key <> 'neture-event-offer' DO NOTHING`,
       [organizationId, serviceKey],
     );
 

@@ -83,6 +83,18 @@ describe('HandoffPage stale-token guard 실행 순서', () => {
     expect(localStorage.getItem(RT)).toBe('new-refresh');
   });
 
+  it('exchange 는 credentials 를 보내지 않는다 — 응답 쿠키가 admin 세션을 덮어쓰지 않게 (URL-FIRST-CENSUS §19-1)', async () => {
+    render(
+      <AuthProvider>
+        <HandoffPage />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const init = (fetchMock.mock.calls[0] as unknown[])[1] as RequestInit;
+    expect(init.credentials).not.toBe('include');
+  });
+
   it('exchange 실패 → stale 토큰은 되살아나지 않고 /auth/me 도 나가지 않는다', async () => {
     seedStaleTokens();
     fetchMock.mockImplementationOnce(async () => ({

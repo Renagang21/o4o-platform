@@ -102,7 +102,7 @@
 - `npx vite build` (web-pharmacy-hub) — 성공 (3,574 modules)
 
 **Browser smoke** (Playwright · 실제 로그인 · 로컬 dev server + 프로덕션 API)
-- 계정: `renagang21@gmail.com` (`pharmacy-hub:store_owner`), serviceKey `pharmacy-hub`
+- 계정: `[REDACTED_EMAIL_B]` (`pharmacy-hub:store_owner`), serviceKey `pharmacy-hub`
 - 콘솔 에러 **0건**
 - 확인 URL 전이: `/store-hub` → 카드 클릭 → `/store-owner/products` · `/store-owner/cart` · `/store-owner`
 - smoke 전용 임시 vite config(프록시)는 검증 후 삭제 — 커밋에 포함되지 않음

@@ -123,6 +123,54 @@ export default function AdminAccountsSettings() {
     return false;
   };
 
+  /**
+   * 관리자 권한(platform:super_admin) 부여 — WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1 (B1)
+   *
+   * 정식 경로는 `POST /admin/platform-accounts/:id/super-admin` 하나다.
+   * 범용 역할 API(`POST /operator/members/:id/roles`)로 돌아가지 않는다 —
+   * `operator-assignments` allowlist 가 `platform:*` 을 의도적으로 제외한 경계를 우회하는 것이기 때문이다.
+   *
+   * 서버가 판정하는 것(화면은 그 결과를 그대로 보여준다):
+   *   GOOGLE_LINK_REQUIRED  Google 연결 없음 — 그 계정으로는 로그인 자체가 불가능하다
+   *   TARGET_INACTIVE       비활성 계정
+   *   changed:false         이미 보유(멱등)
+   */
+  const grantSuperAdmin = async (acct: AdminAccount) => {
+    if (
+      !window.confirm(
+        `${acct.email} 에게 최고 관리자 권한(platform:super_admin)을 부여하시겠습니까?\n\n` +
+          '이 계정은 모든 서비스의 거버넌스 권한을 갖게 됩니다.',
+      )
+    ) {
+      return;
+    }
+    setBusyId(acct.id);
+    try {
+      const res = await authClient.api.post(`/admin/platform-accounts/${acct.id}/super-admin`);
+      if (res.data?.success) {
+        toast.success(
+          res.data?.data?.changed === false
+            ? '이미 관리자 권한을 보유하고 있습니다.'
+            : '관리자 권한을 부여했습니다.',
+        );
+        await load();
+      } else {
+        toast.error(res.data?.error || '관리자 권한 부여에 실패했습니다.');
+      }
+    } catch (e: any) {
+      const code = e?.response?.data?.code;
+      toast.error(
+        code === 'GOOGLE_LINK_REQUIRED'
+          ? 'Google 계정이 연결되지 않은 사용자입니다. 본인이 Google 로 로그인한 뒤 부여할 수 있습니다.'
+          : code === 'TARGET_INACTIVE'
+            ? '비활성 계정에는 부여할 수 없습니다.'
+            : e?.response?.data?.error || '관리자 권한 부여에 실패했습니다.',
+      );
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const toggleStatus = async (acct: AdminAccount) => {
     const next = !acct.isActive;
     if (!window.confirm(`${acct.email} 계정을 ${next ? '활성화' : '비활성화'} 하시겠습니까?`)) return;
@@ -290,6 +338,19 @@ export default function AdminAccountsSettings() {
               variant: 'primary',
               onClick: () => navigate(`/users/${a.id}/edit`),
             },
+            // WO-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1 (B1): 관리자 권한 부여 — 이미 보유한 계정에는 노출하지 않는다.
+            ...(isSuper(a)
+              ? []
+              : [
+                  {
+                    key: 'grant-super-admin',
+                    label: '관리자 권한 부여',
+                    icon: <ShieldCheck size={14} />,
+                    variant: 'primary' as const,
+                    disabled: busyId === a.id,
+                    onClick: () => grantSuperAdmin(a),
+                  },
+                ]),
             {
               key: 'toggle',
               label: a.isActive ? '비활성화' : '활성화',

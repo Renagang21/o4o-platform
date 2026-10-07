@@ -1,0 +1,256 @@
+name: Delivery
+
+# WO-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1 — push → CI → **이 run 하나**가 판정 · 배포 · 검증 · 결과 기록을 맡는다.
+#
+#   main commit → CI Pipeline 완료 → workflow_run → 이 workflow (run 이름 = 실제 target SHA)
+#     classify  : CI green · DEPLOY_FREEZE · target == github.sha == main HEAD · 서비스별 serving SHA → target 누적 판정
+#                 LEVEL_1 → NO_DEPLOY · LEVEL_2 → 배포 · LEVEL_3 / 첫 rollout → HOLD (promote 1회) · API 의존 정밀화
+#     deploy-*  : 기존 deploy-api / deploy-web-services / deploy-admin 을 **workflow_call** 로 호출 (태그 0 · dispatch 0)
+#                 API 먼저 → API 에 의존하는 프런트는 API 성공 뒤 · 독립 프런트는 병렬
+#     report    : 배포 뒤 serving SHA 를 다시 읽어 DEPLOYED / FAILED 확정 → commit status `production`
+#
+#   promote.yml(LEVEL_3 · 첫 rollout 승인)이 같은 workflow 를 mode=promote 로 호출한다 — 판정 · 배포 · 검증 경로 하나.
+#
+#   전환 상태: DELIVERY_ENFORCE='true' = **자동 경로의 유일한 권한** (P3 cutover 2026-10-02 · deploy-auto.yml 은 같은 commit 에서 은퇴).
+#      'false'(SHADOW)면 판정 · Job Summary · 판정 JSON 만 남기고 배포 job 0 · commit status 0 — rollback 은 이 값 + deploy-auto 복원을 같은 commit 으로.
+#      DEPLOY_FREEZE 는 별도 비상 정지로 그대로 fail-closed (CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1).
+#   근거: docs/investigations/CHECK-O4O-CICD-PUSH-TO-PRODUCTION-FLOW-REDESIGN-AUDIT-V1.md
+
+run-name: Delivery ${{ github.event.workflow_run.head_sha || inputs.target_sha }}
+
+on:
+  workflow_run:
+    workflows: ['CI Pipeline']
+    types: [completed]
+    branches: [main]
+  # promote.yml 전용 (mode=promote). 사람이 직접 부르지 않는다.
+  workflow_call:
+    inputs:
+      mode:
+        type: string
+        required: true
+      target_sha:
+        type: string
+        required: true
+      services:
+        type: string
+        required: false
+        default: ''
+      dry_run:
+        type: string
+        required: false
+        default: 'false'
+  # 판정 재현 · 배선 검증 (배포 0 고정)
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: '판정할 target SHA (40자). 판정만 — 배포하지 않는다'
+        required: true
+      wiring_services:
+        description: "(배선 검증) 쉼표 목록 — 판정과 무관하게 reusable deploy 를 dry_run 으로 호출 (detect 까지만 · 배포 0). 예: 'api,neture' / 'store'"
+        required: false
+        default: ''
+
+# 자동 경로는 한 번에 한 판정 — 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체된다(새 target 의 누적 diff 가 이전 것을 포함).
+# promote 호출 · 수동 판정은 자동 경로의 대기열을 밀어내지 않도록 별도 group (promote.yml 은 자체 group 을 갖는다).
+concurrency:
+  group: ${{ github.event_name == 'workflow_run' && 'delivery-production' || format('delivery-{0}', github.run_id) }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read     # ci-gate (CI run 조회)
+  statuses: write   # commit status `production`
+  id-token: write   # GCP 인증 = WIF (GitHub OIDC → github-actions SA impersonation · 장기 key 없음)
+
+env:
+  # 'true' = enforcement (P3 cutover) · 'false' = SHADOW. 이 값 하나가 자동 경로의 배포 여부를 정한다 (DEPLOY_FREEZE 는 그대로 별도 비상 정지).
+  DELIVERY_ENFORCE: 'true'
+  STATUS_CONTEXT: production
+
+jobs:
+  classify:
+    name: Classify (CI · freeze · serving → target · risk)
+    # main push 로 돈 CI 만 (PR run 은 branches 필터 + 이 조건으로 빠진다). CI 실패도 기록을 위해 돈다(BLOCKED_CI).
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.event == 'push'
+    # `production` environment = 배포 ref 경계(main · deploy/*). GCP 인증은 WIF 이고 provider 조건이 environment=production ·
+    #   ref · 소유자 dispatch · 허용 workflow 를 다시 요구한다 (WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1).
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      execute: ${{ steps.decide.outputs.execute }}
+      dry_call: ${{ steps.decide.outputs.dry_call }}
+      target_sha: ${{ steps.decide.outputs.target_sha }}
+      deploy_api: ${{ steps.decide.outputs.deploy_api }}
+      admin_after_api: ${{ steps.decide.outputs.admin_after_api }}
+      admin_parallel: ${{ steps.decide.outputs.admin_parallel }}
+      web_after_api: ${{ steps.decide.outputs.web_after_api }}
+      web_parallel: ${{ steps.decide.outputs.web_parallel }}
+      state: ${{ steps.decide.outputs.state }}
+    env:
+      TARGET_SHA: ${{ github.event.workflow_run.head_sha || inputs.target_sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 0
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+
+      - name: Authenticate to Google Cloud (read-only serving 조회)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: netureyoutube
+          skip_install: true
+
+      - name: Decide
+        id: decide
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPLOY_FREEZE_RAW: ${{ vars.DEPLOY_FREEZE }}
+          EVENT: ${{ github.event_name }}
+          MODE: ${{ inputs.mode }}
+          SERVICES: ${{ inputs.services }}
+          PROMOTE_DRY_RUN: ${{ inputs.dry_run }}
+          WIRING: ${{ inputs.wiring_services }}
+        run: |
+          set -euo pipefail
+          if [ -n "${WIRING:-}" ]; then
+            node scripts/ci/deploy-orchestrate.mjs wiring --services "$WIRING" --target "$TARGET_SHA"
+            exit 0
+          fi
+          ARGS=(--plan-only --target "$TARGET_SHA" --workflow-sha "$GITHUB_SHA" --freeze "$DEPLOY_FREEZE_RAW" --json "$RUNNER_TEMP/delivery.json")
+          if [ "${MODE:-}" = "promote" ]; then
+            # 승인 경로: 실제 배포 (dry_run='true' 면 판정만) · commit status 기록
+            ARGS+=(--mode promote --services "${SERVICES:-}")
+            if [ "${PROMOTE_DRY_RUN:-false}" = "true" ]; then ARGS+=(--dry-run true); else ARGS+=(--dry-run false --status-context "$STATUS_CONTEXT"); fi
+          elif [ "$EVENT" = "workflow_run" ] && [ "$DELIVERY_ENFORCE" = "true" ]; then
+            ARGS+=(--dry-run false --status-context "$STATUS_CONTEXT")
+          elif [ "$EVENT" = "workflow_run" ]; then
+            ARGS+=(--shadow --dry-run true)
+          else
+            ARGS+=(--dry-run true)   # 수동 판정 재현
+          fi
+          node scripts/ci/deploy-orchestrate.mjs "${ARGS[@]}"
+
+      - name: Upload decision record
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: delivery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/delivery.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  deploy-api:
+    name: API
+    needs: classify
+    if: needs.classify.outputs.deploy_api == 'true'
+    uses: ./.github/workflows/deploy-api.yml
+    with:
+      rollout_mode: verified
+      dry_run: ${{ needs.classify.outputs.dry_call }}
+    secrets: inherit
+
+  # API 변경에 의존하는 프런트 — API 성공 뒤에만 (API 실패 · skip = 배포 0)
+  deploy-web-after-api:
+    name: Web (after API)
+    needs: [classify, deploy-api]
+    if: needs.classify.outputs.web_after_api != '[]' && needs.classify.outputs.web_after_api != '' && needs.deploy-api.result == 'success'
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.classify.outputs.web_after_api) }}
+    uses: ./.github/workflows/deploy-web-services.yml
+    with:
+      service: ${{ matrix.service }}
+      rollout_mode: verified
+      dry_run: ${{ needs.classify.outputs.dry_call }}
+    secrets: inherit
+
+  # API 와 독립인(또는 API 배포가 없는) 프런트 — 병렬
+  deploy-web-parallel:
+    name: Web
+    needs: classify
+    if: needs.classify.outputs.web_parallel != '[]' && needs.classify.outputs.web_parallel != ''
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.classify.outputs.web_parallel) }}
+    uses: ./.github/workflows/deploy-web-services.yml
+    with:
+      service: ${{ matrix.service }}
+      rollout_mode: verified
+      dry_run: ${{ needs.classify.outputs.dry_call }}
+    secrets: inherit
+
+  deploy-admin:
+    name: Admin
+    needs: [classify, deploy-api]
+    if: >-
+      always() && needs.classify.result == 'success' &&
+      (needs.classify.outputs.admin_parallel == 'true' ||
+       (needs.classify.outputs.admin_after_api == 'true' && needs.deploy-api.result == 'success'))
+    uses: ./.github/workflows/deploy-admin.yml
+    with:
+      rollout_mode: verified
+      dry_run: ${{ needs.classify.outputs.dry_call }}
+    secrets: inherit
+
+  report:
+    name: Report (serving SHA · commit status)
+    needs: [classify, deploy-api, deploy-web-after-api, deploy-web-parallel, deploy-admin]
+    if: always() && needs.classify.outputs.execute == 'true' && needs.classify.outputs.dry_call != 'true'
+    # `production` environment = 배포 ref 경계(main · deploy/*). GCP 인증은 WIF 이고 provider 조건이 environment=production ·
+    #   ref · 소유자 dispatch · 허용 workflow 를 다시 요구한다 (WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1).
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.classify.outputs.target_sha }}
+          sparse-checkout: |
+            /*
+            !/apps/api-server/src/scripts/data/
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: delivery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/decision
+
+      - name: Authenticate to Google Cloud (read-only serving 조회)
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
+          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: netureyoutube
+          skip_install: true
+
+      - name: Final serving SHA → DEPLOYED / FAILED
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/deploy-orchestrate.mjs report --decision "$RUNNER_TEMP/decision/delivery.json" --status-context "$STATUS_CONTEXT"

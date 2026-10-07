@@ -14,6 +14,7 @@
  *       JA_OFFLINE=1 node ...b04-measure.mjs → 캐시만 사용(자격증명 불필요)
  */
 import fs from 'node:fs';
+import { requireDbUsername } from './require-db-username.mjs';
 import crypto from 'node:crypto';
 import { build } from './hff-ja-b01-build.mjs';
 import { FAILED, dictSize, authoredRounds, clearMemo } from './hff-ja-b01-translate.mjs';
@@ -30,7 +31,7 @@ const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
 if (!fs.existsSync(SRC)) {
   if (process.env.JA_OFFLINE) { console.error('NO_CACHE'); process.exit(1); }
   const { default: pg } = await import('pg');
-  const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5471', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
+  const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5471', 10), user: requireDbUsername(), password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
   await c.connect();
   await c.query('SET default_transaction_read_only = on');
   if ((await c.query('SHOW transaction_read_only')).rows[0].transaction_read_only !== 'on') { console.error('NOT_READ_ONLY'); process.exit(1); }

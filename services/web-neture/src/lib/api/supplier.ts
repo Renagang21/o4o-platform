@@ -162,6 +162,12 @@ export interface SupplierLibraryHandoffResult {
   cmsServiceKey: string;
   approvalRequestId: string | null;
   title: string;
+  /**
+   * WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1 §7.1:
+   *   true = 이미 제공된 자료라 서버가 **새 수신을 만들지 않고** 기존 것을 돌려줬다(HTTP 200).
+   *   false = 새로 제공됐다(HTTP 201). 사용자에게 두 경우를 다르게 알린다.
+   */
+  reused?: boolean;
 }
 
 export interface SupplierProduct {
@@ -453,6 +459,8 @@ export interface UnifiedSupplierOrder {
   supplierId: string;
   buyerName: string | null;
   buyerOrganizationName: string | null;
+  /** WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 실제 결제가 아닌 테스트 결제 주문 */
+  testPayment?: boolean;
   subtotal: number;
   shippingFee: number;
   totalAmount: number;

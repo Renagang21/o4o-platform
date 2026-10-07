@@ -38,7 +38,7 @@
 - 양 서비스 `inapp:sent;email:sent` — in-app 생성 + SMTP 발송 성공(메시지 수락) 동시 확인. (email OFF 기본 상태에서는 `email:off`, 수신자 0+ON 은 설정 단계에서 차단.)
 
 ## 11. 실제 메일 도착 여부
-- 테스트 수신자 = **사용자 SSOT 테스트 계정 `sohae2100@gmail.com`**(본인 확인 가능 주소, RFC reserved 아님). `email:sent`(SMTP 수락) 까지 실증. **최종 수신함 도착 확인은 사용자 inbox 확인 항목**(메일 2건: KCos 각 1건, 제목 `[K-Cosmetics] 새 문의가 접수되었습니다…`).
+- 테스트 수신자 = **사용자 SSOT 테스트 계정 `[REDACTED_EMAIL_A]`**(본인 확인 가능 주소, RFC reserved 아님). `email:sent`(SMTP 수락) 까지 실증. **최종 수신함 도착 확인은 사용자 inbox 확인 항목**(메일 2건: KCos 각 1건, 제목 `[K-Cosmetics] 새 문의가 접수되었습니다…`).
 
 ## 12. 테스트 수신자 제거 여부
 - KCos 모두 검증 후 **수신자 삭제 + email 알림 OFF 로 복구** — 운영 상태 clean(실 contact 제출이 사용자 개인 inbox 로 가지 않음).
