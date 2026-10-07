@@ -28,6 +28,8 @@
 | R4 | DB 스키마 — `cosmetics` 스키마 · `public.cosmetics_members` · `public.cosmetics_contents` · 관련 migration | 남음 | 처리 방식(유지 · 제거 · archive · 파기)은 퇴역 작업이 정한다 · 사용자 승인 |
 | R5 | `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 코드 매핑(`CART_TO_EVENT_OFFER_SERVICE_KEY` · `COSMETICS_B2B_SERVICE_KEYS` 등) | 남음 | 기존 주문 데이터는 `checkout_orders` B2B 원장(§2 규칙 4) |
 | R6 | community / signage / LMS / CMS 의 `k-cosmetics` identity | 남음 | 공통 구조 serviceKey 격리 데이터 |
+| R7 | **외부 설정 (사용자 작업)** — 외부 DNS(`k-cosmetics.site` · `www.` · `api.` A 레코드와 `_acme-challenge` CNAME · `retail.neture.co.kr` A 레코드) · Google OAuth 승인 origin / redirect URI 의 K-Cos host | 남음 · 사용자 작업 | 저장소 밖 콘솔 작업이라 자동 변경하지 않는다. 근거 `CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-RUNTIME-V1` §4 |
+| R8 | **인프라 잔재** — 컨테이너 이미지(`k-cosmetics-web`) · API CORS 의 `retail` origin 등 1차-A CHECK §5 "API" · "이미지" 항목 중 1차-B 가 정리하지 않은 것 | 확인 필요 | 1차-B 는 CORS / cookie 의 K-Cos 도메인을 제거하면서 `retail` 은 유지했다. 이미지 삭제는 저장소 단위 개별 승인. 다음 퇴역 단계에서 전수 확인 후 이 행을 갱신한다 |
 
 퇴역 대상은 **서비스**이지 화장품 **제품군**(Neture 공급 제품 · 카테고리)이 아니다. 제품군은 이 문서의 대상이 아니다.
 
@@ -46,4 +48,4 @@
 
 ## 3. 이 문서가 끝나는 조건
 
-§1-1 잔여 목록의 R1 ~ R6 이 모두 정리됨으로 갱신되면(퇴역 작업의 마지막 단계) 이 문서 상단 상태를 OBSOLETE 로 바꾸고 `CANONICAL-INDEX` 행을 정리한다.
+§1-1 잔여 목록의 모든 행(현재 R1 ~ R8)이 정리됨으로 갱신되면(퇴역 작업의 마지막 단계) 이 문서 상단 상태를 OBSOLETE 로 바꾸고 `CANONICAL-INDEX` 행을 정리한다.
