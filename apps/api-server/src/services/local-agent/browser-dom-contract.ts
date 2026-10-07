@@ -424,3 +424,217 @@ export function pickSafeDomInfo(data: unknown): Record<string, unknown> {
   }
   return out;
 }
+
+// ─── 작업 단위 실행 (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1) ────────
+//
+// `local.browser.dom.run_unit#siteId` — Assistant 가 **이미 판단을 마친 행동 묶음**을 한 번에 Execution Node 로 보낸다.
+// Node(agent)는 local bridge 로 단계를 이어 실행하고, 판단이 새로 필요한 자리(실패 · 화면 변화 뒤 옛 ref · 대상 없음 ·
+// 모호 · COMMIT · 자격 · 다른 사이트 · 예상 불일치 · 예산 · 시간)에서 **멈춰** 결과와 최종 관찰을 돌려준다.
+//
+//   - 새 능력이 아니라 기존 DOM action(click · set_input · select_option · find · get_context · inspect)의 **연속 실행**이다.
+//     확장 content script 는 단계마다 지금과 같은 검사(COMMIT · 자격 · 형상)를 그대로 한다.
+//   - Task 의 목적 · 순서를 Node 가 바꾸지 않는다 — 단계는 서버가 정한 그대로, 앞에서부터, 건너뛰지 않는다.
+//   - 단계 형상은 둘뿐이다(한 단위 안에서 섞지 않는다).
+//       act       현재 snapshot 의 elementRef 로 행동(Fast Loop 배치 — 서버가 validateWorkProposal 로 이미 검증)
+//       find_act  구조화 조건으로 찾아 **유일할 때만** 행동(Workflow Candidate 재생 — pickReplayTarget 규칙)
+//   - agent 사본: `tools/o4o-local-agent/src/browser-dom-limits.mjs`(상수 · 원인 목록이 같다 — 테스트 대조).
+
+/** 한 단위에 담는 단계 상한. 재생 단계 · Fast Loop 배치(WORK_BATCH_MAX 4) 모두 이 안이다. */
+export const DOM_UNIT_MAX_STEPS = 12;
+/** 한 단위가 쓸 수 있는 유효 명령(행동 · 찾기 · 관찰) 상한. 서버는 남은 loop 예산 이하로 보낸다. */
+export const DOM_UNIT_MAX_COMMANDS = 60;
+/** 한 단위의 실행 시간 상한(ms). Node 는 이것과 명령 만료 중 이른 쪽에서 멈춘다. */
+export const DOM_UNIT_MAX_DURATION_MS = 30000;
+/** 단위 명령 TTL(ms) — 발행 → claim → 실행 → 결과 제출. 단발 명령(20 s)보다 길다(실행 상한 + 여유). */
+export const DOM_UNIT_COMMAND_TTL_MS = 45000;
+/** 일반 / 이동 뒤 관찰의 재시도 횟수와 간격 — 서버 observe() 와 같은 값. */
+export const DOM_UNIT_OBSERVE_ATTEMPTS = 3;
+export const DOM_UNIT_OBSERVE_ATTEMPTS_AFTER_NAVIGATION = 10;
+export const DOM_UNIT_SETTLE_MS = 700;
+
+export const DOM_UNIT_OPS: readonly string[] = Object.freeze(['act', 'find_act']);
+export const DOM_UNIT_ACT_KINDS: readonly string[] = Object.freeze(['click', 'set_input', 'select_option']);
+/** find_act 가 고른 요소의 role 이 행동과 맞아야 한다(work-agent-contract 의 CLICK/INPUT/SELECT_ROLES 와 같다). */
+export const DOM_UNIT_KIND_ROLES: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  click: Object.freeze(['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem']),
+  set_input: Object.freeze(['textbox', 'searchbox', 'textarea']),
+  select_option: Object.freeze(['combobox']),
+});
+/**
+ * Node 가 멈춘 이유. 어느 것이든 "여기서부터는 Assistant 가 판단한다" 는 뜻이다.
+ *   step_failed          행동이 실패했다(오류 코드 동반 — 자격 · COMMIT · 다른 사이트 포함)
+ *   reobserve            화면이 바뀌어 남은 ref 단계가 더는 유효하지 않다
+ *   find_failed          찾기 자체가 실패했다
+ *   locator_not_found    유일한 대상이 없다(없음 · 모호)
+ *   validation_rejected  고른 대상이 행동과 맞지 않는다(role · disabled · COMMIT)
+ *   expect_mismatch      저장 때 이동했던 단계가 이번엔 이동하지 않았다
+ *   cross_origin         다른 사이트로 넘어갔다
+ *   not_ready            화면이 준비되지 않았다(재시도 소진)
+ *   budget · time        예산 · 시간 상한
+ */
+export const DOM_UNIT_STOP_CAUSES: readonly string[] = Object.freeze([
+  'step_failed',
+  'reobserve',
+  'find_failed',
+  'locator_not_found',
+  'validation_rejected',
+  'expect_mismatch',
+  'cross_origin',
+  'not_ready',
+  'budget',
+  'time',
+]);
+export const DOM_DOC_ID_RE = /^d_[a-z0-9]{4,32}$/;
+
+export type DomUnitActKind = 'click' | 'set_input' | 'select_option';
+export interface DomUnitActStep {
+  op: 'act';
+  kind: DomUnitActKind;
+  elementRef: string;
+  snapshotId: string;
+  text?: string;
+  option?: string;
+}
+export interface DomUnitFindActStep {
+  op: 'find_act';
+  kind: DomUnitActKind;
+  query: DomFindQuery;
+  expectNavigated: boolean;
+  text?: string;
+  option?: string;
+}
+export type DomUnitStep = DomUnitActStep | DomUnitFindActStep;
+export interface DomRunUnitArgs {
+  steps: DomUnitStep[];
+  /** 단계 뒤(또는 멈춘 자리에서) get_context + inspect 관찰을 함께 돌려줄 것인가. */
+  observe: boolean;
+  maxCommands: number;
+  maxDurationMs: number;
+  /** 단위 시작 시점 문서 id — 이동 뒤 옛 문서를 새 관찰로 받아들이지 않기 위해서만 쓴다. */
+  docId?: string;
+  /** 단계 없이 관찰만 할 때, 직전 행동이 이동했는가(서버 observe({afterNavigation}) 와 같다). */
+  afterNavigation?: boolean;
+}
+
+/** set_input 값 — 단발 경로(validateSingleAction)와 같은 규칙: 비어 있지 않음 · 입력 거절 규칙 · HTML 문자 없음. */
+export function isDomUnitText(v: unknown): v is string {
+  return typeof v === 'string' && v.trim().length > 0 && domInputDenyReason(v) === null && !/[<>{}]/.test(v);
+}
+
+/** 단계 하나. 키 집합이 정확해야 하고, 값은 단발 action 과 같은 규칙을 지난다. */
+function validateDomUnitStep(raw: unknown): DomUnitStep | null {
+  if (!isPlainObject(raw)) return null;
+  const kind = raw.kind;
+  if (typeof kind !== 'string' || !DOM_UNIT_ACT_KINDS.includes(kind)) return null;
+  const valueKey = kind === 'set_input' ? 'text' : kind === 'select_option' ? 'option' : null;
+  const value = valueKey ? raw[valueKey] : undefined;
+  if (valueKey === 'text' && !isDomUnitText(value)) return null;
+  if (valueKey === 'option' && !isShortText(value, DOM_QUERY_VALUE_MAX)) return null;
+  const extra: Record<string, unknown> = valueKey ? { [valueKey]: value } : {};
+  if (raw.op === 'act') {
+    if (!exactKeys(raw, ['op', 'kind', 'elementRef', 'snapshotId', ...(valueKey ? [valueKey] : [])])) return null;
+    if (!isDomElementRef(raw.elementRef) || !isDomSnapshotId(raw.snapshotId)) return null;
+    return { op: 'act', kind: kind as DomUnitActKind, elementRef: raw.elementRef, snapshotId: raw.snapshotId, ...extra };
+  }
+  if (raw.op === 'find_act') {
+    if (!exactKeys(raw, ['op', 'kind', 'query', 'expectNavigated', ...(valueKey ? [valueKey] : [])])) return null;
+    if (typeof raw.expectNavigated !== 'boolean') return null;
+    const q = validateDomFindQuery(raw.query);
+    if (!q.ok || !q.query) return null;
+    return { op: 'find_act', kind: kind as DomUnitActKind, query: q.query, expectNavigated: raw.expectNavigated, ...extra };
+  }
+  return null;
+}
+
+/**
+ * `run_unit` 인자. 단계 0~12(0 이면 관찰 전용 — observe 필수), 한 단위 안에서 op 를 섞지 않는다,
+ * 예산 · 시간은 상한 안의 정수. 형상 밖이면 **단계 하나도 실행되지 않는다**(agent 도 같은 검사를 먼저 한다).
+ */
+export function validateDomRunUnitArgs(args: unknown): { ok: boolean; args?: DomRunUnitArgs } {
+  if (!isPlainObject(args)) return { ok: false };
+  const allowed = ['steps', 'observe', 'maxCommands', 'maxDurationMs', 'docId', 'afterNavigation'];
+  if (Object.keys(args).some((k) => !allowed.includes(k))) return { ok: false };
+  if (!Array.isArray(args.steps) || args.steps.length > DOM_UNIT_MAX_STEPS) return { ok: false };
+  if (typeof args.observe !== 'boolean') return { ok: false };
+  if (args.steps.length === 0 && args.observe !== true) return { ok: false };
+  const intIn = (v: unknown, lo: number, hi: number) => typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi;
+  if (!intIn(args.maxCommands, 1, DOM_UNIT_MAX_COMMANDS)) return { ok: false };
+  if (!intIn(args.maxDurationMs, 1000, DOM_UNIT_MAX_DURATION_MS)) return { ok: false };
+  if (args.docId !== undefined && !(typeof args.docId === 'string' && DOM_DOC_ID_RE.test(args.docId))) return { ok: false };
+  if (args.afterNavigation !== undefined && typeof args.afterNavigation !== 'boolean') return { ok: false };
+  const steps: DomUnitStep[] = [];
+  for (const raw of args.steps) {
+    const s = validateDomUnitStep(raw);
+    if (!s) return { ok: false };
+    steps.push(s);
+  }
+  if (new Set(steps.map((s) => s.op)).size > 1) return { ok: false };
+  const out: DomRunUnitArgs = { steps, observe: args.observe, maxCommands: args.maxCommands as number, maxDurationMs: args.maxDurationMs as number };
+  if (typeof args.docId === 'string') out.docId = args.docId;
+  if (typeof args.afterNavigation === 'boolean') out.afterNavigation = args.afterNavigation;
+  return { ok: true, args: out };
+}
+
+const UNIT_REPORT_STATUSES: readonly string[] = Object.freeze(['success', 'failed', 'denied']);
+const SAFE_CODE_RE = /^[A-Z0-9_]{1,64}$/;
+
+function safeSmallInt(v: unknown, hi: number): v is number {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= hi;
+}
+
+/**
+ * `run_unit` 결과 화이트리스트. 단계별 보고(번호 · 종류 · 상태 · 오류 코드 · 이동/변경 · 위험 등급 · 고른 요소 요약),
+ * 멈춘 이유, 명령 수 · 시간, 그리고 최종 관찰(pickSafeDomInfo 와 같은 element 요약)뿐이다.
+ * **입력한 텍스트 · 선택값 · 찾기 조건은 되돌아오지 않는다** — 서버가 이미 알고 있고, 결과에 실릴 자리가 없다.
+ */
+export function pickSafeDomUnitInfo(data: unknown): Record<string, unknown> {
+  if (!isPlainObject(data)) return {};
+  const out: Record<string, unknown> = {};
+  for (const key of ['siteId', 'displayName']) {
+    const v = clip(data[key], 64);
+    if (v) out[key] = v;
+  }
+  if (typeof data.errorCode === 'string' && SAFE_CODE_RE.test(data.errorCode)) out.errorCode = data.errorCode;
+  for (const key of ['commandCount', 'probeCount']) if (safeSmallInt(data[key], 1000)) out[key] = data[key];
+  if (safeSmallInt(data.durationMs, 600000)) out.durationMs = data.durationMs;
+
+  const reports: Record<string, unknown>[] = [];
+  if (Array.isArray(data.reports)) {
+    for (const r of data.reports) {
+      if (reports.length >= DOM_UNIT_MAX_STEPS) break;
+      if (!isPlainObject(r)) continue;
+      if (!safeSmallInt(r.index, DOM_UNIT_MAX_STEPS - 1)) continue;
+      if (typeof r.status !== 'string' || !UNIT_REPORT_STATUSES.includes(r.status)) continue;
+      const rep: Record<string, unknown> = { index: r.index, status: r.status };
+      if (typeof r.op === 'string' && DOM_UNIT_OPS.includes(r.op)) rep.op = r.op;
+      if (typeof r.kind === 'string' && DOM_UNIT_ACT_KINDS.includes(r.kind)) rep.kind = r.kind;
+      if (typeof r.errorCode === 'string' && SAFE_CODE_RE.test(r.errorCode)) rep.errorCode = r.errorCode;
+      for (const key of ['navigated', 'changed']) if (typeof r[key] === 'boolean') rep[key] = r[key];
+      if (typeof r.riskLevel === 'string' && SAFE_RISK.includes(r.riskLevel)) rep.riskLevel = r.riskLevel;
+      const target = r.target === undefined ? null : pickSafeDomElement(r.target);
+      if (target) rep.target = target;
+      reports.push(rep);
+    }
+  }
+  out.reports = reports;
+
+  out.stop = null;
+  if (isPlainObject(data.stop) && typeof data.stop.cause === 'string' && DOM_UNIT_STOP_CAUSES.includes(data.stop.cause)) {
+    const stop: Record<string, unknown> = { cause: data.stop.cause };
+    if (safeSmallInt(data.stop.stepIndex, DOM_UNIT_MAX_STEPS)) stop.stepIndex = data.stop.stepIndex;
+    if (typeof data.stop.errorCode === 'string' && SAFE_CODE_RE.test(data.stop.errorCode)) stop.errorCode = data.stop.errorCode;
+    out.stop = stop;
+  }
+
+  if (isPlainObject(data.observation)) {
+    const o = pickSafeDomInfo(data.observation);
+    const obs: Record<string, unknown> = {};
+    for (const key of ['siteId', 'path', 'docId', 'snapshotId', 'ready', 'elementCount', 'elements', 'source']) {
+      if (o[key] !== undefined) obs[key] = o[key];
+    }
+    out.observation = obs;
+    out.source = DOM_CONTENT_SOURCE;
+  }
+  if (typeof data.observeErrorCode === 'string' && SAFE_CODE_RE.test(data.observeErrorCode)) out.observeErrorCode = data.observeErrorCode;
+  return out;
+}

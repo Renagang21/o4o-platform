@@ -258,7 +258,7 @@ test('C4. COMMIT 분류: 결제·주문확정·삭제 = COMMIT, 검색·필터·
 // ── D. handlers ───────────────────────────────────────────────────────────────
 
 test('D1. handlers: DOM action 은 bridge 로만 가고, 확장 미연결이면 O4O_EXTENSION_NOT_CONNECTED', async () => {
-  assert.equal(handlers.listAllowedActions().filter((a) => a.startsWith('local.browser.dom.')).length, 8);
+  assert.equal(handlers.listAllowedActions().filter((a) => a.startsWith('local.browser.dom.')).length, 9);
   const noBridge = await handlers.runAction('local.browser.dom.inspect#o4o.neture', {}, {});
   assert.deepEqual(noBridge, { status: 'failed', errorCode: 'O4O_EXTENSION_NOT_CONNECTED', data: { siteId: 'o4o.neture', displayName: 'O4O 홈' } });
 
