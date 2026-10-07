@@ -152,6 +152,10 @@ describe('① 업무 이해(실행 전)', () => {
     // 확정은 사용자 — 변경 + 확정이 들어 있으면 사용자 확인 조건이 붙는다.
     expect(change.criteria.map((c) => c.evidence)).toEqual(['observed', 'user']);
     expect(fallbackUnderstanding('약학정보원 검색 페이지 열어줘').outcome).toBe('screen');
+    // 조건 글에 다 담기지 않는 긴 요청 — 잘린 앞부분 근거만으로 닫지 않는다(요청 전체는 사용자 확인).
+    const long = fallbackUnderstanding(`약학정보원에서 ${'아모디핀 동일성분 제품의 성분 · 함량 · 제조사 · 보험코드를 '.repeat(3)}찾고 마지막에 대체 가능 제품도 알려줘`);
+    expect(long.commitBoundary).toBe(false);
+    expect(long.criteria.map((c) => c.evidence)).toEqual(['observed', 'user']);
   });
 
   it('AI 이해 sanitize — 조건 최대 4 · id 재부여 · 형식 밖 slot 버림 · 필수 칸 없으면 null', () => {
@@ -190,10 +194,12 @@ describe('① 업무 이해(실행 전)', () => {
     for (const r of ['네뚜레에 신제품 등록해줘', '이 내용으로 저장해 주세요', '신청서 제출까지 해줘', '결제 진행해줘', '거래처에 메일 보내줘', '주문해줘'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
     // 일반적인 지시형(부탁 · 바랍니다 · 넣어줘 · 처리)도 확정이다.
-    for (const r of ['이 내용 저장 부탁해', '신청서 제출 바랍니다', '상품 등록 부탁드립니다', '주문 넣어줘', '결제 처리해줘', '게시글 등록도 해줘'])
+    for (const r of ['이 내용 저장 부탁해', '신청서 제출 바랍니다', '상품 등록 부탁드립니다', '주문 넣어줘', '결제 처리해줘', '게시글 등록도 해줘',
+      '주소 변경해줘', '신청서 작성해줘', '상품 추가해줘', '이 글 삭제해 주세요', '등록하고 알려줘', '저장해'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, true]);
     for (const r of ['등록된 제품 목록 찾아줘', '주문 내역 보여줘', '약학정보원에서 아모디핀 찾아줘', '저장 위치가 어디야',
-      '주문 처리 상태 보여줘', '신청 완료 여부 확인해줘', '결제 진행 상황 알려줘', '등록 요청 내역 찾아줘'])
+      '주문 처리 상태 보여줘', '신청 완료 여부 확인해줘', '결제 진행 상황 알려줘', '등록 요청 내역 찾아줘',
+      '결제하는 방법 알려줘', '주문을 하는 방법 보여줘', '신청해 둔 내역 보여줘', '등록하고 싶은데 방법 알려줘'])
       expect([r, requestHasCommitIntent(r)]).toEqual([r, false]);
 
     // AI 가 확정 경계를 놓쳤다(false · observed 만).
@@ -320,7 +326,7 @@ describe('사용자 완료 선언 판별', () => {
     // 발화 전체가 선언일 때만 — 값 · 대상 답의 부분 문자열 · 상태 질문은 선언이 아니다(run 을 닫지 않는다).
     for (const t of ['완료된 주문', '끝났나요?', '됐나요', '됐어?', '완료 화면 열어', '끝난 거 맞아요?', '등록 완료된 것'])
       expect([t, isCompletionDeclaration(t, 'target_confirmation')]).toEqual([t, false]);
-    for (const t of ['완료', '완료됐어요', '끝났어요', '되었습니다', '네, 됐어요', '전부 끝냈어요', '마쳤습니다.'])
+    for (const t of ['완료', '완료됐어요', '끝났어요', '되었습니다', '네, 됐어요', '전부 끝냈어요', '마쳤습니다.', '이제 완료됐어요', '이제 다 했어요'])
       expect([t, isCompletionDeclaration(t, null)]).toEqual([t, true]);
   });
 });

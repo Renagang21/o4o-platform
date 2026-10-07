@@ -44,14 +44,21 @@ export const UNDERSTANDING_LIMITS = Object.freeze({
 const CHANGE_RE = /(등록|입력|저장|수정|작성|변경|신청|보내|전송|추가|삭제)/;
 const SCREEN_RE = /(열어|이동|들어가|화면|페이지|켜\s*줘|띄워)/;
 /**
- * 확정 의도 — 요청이 저장 · 제출 · 등록 · 결제 같은 **확정 행위를 하라고** 말하는가(동사 모양만 · 사이트 · 업무 표 없음).
- * "해줘" 뿐 아니라 "부탁해 · 바랍니다 · 넣어줘 · 처리해줘 · 요청해" 같은 일반 지시도 확정이다.
- * 지시어는 **동사로 끝맺을 때만**(처리해 · 완료해 · 진행해 · 요청해) — "주문 처리 상태 보여줘" · "신청 완료 여부 확인해줘" ·
- * "결제 진행 상황 알려줘" · "등록 요청 내역 찾아줘" 처럼 상태 · 내역 명사를 꾸미는 말은 조회다.
- * "등록된 제품 찾아줘" · "주문 내역 보여줘" 처럼 명사로만 쓰인 것도 아니다. 그 밖에 애매하면 확정 쪽(사용자 확인)으로 기운다.
+ * 확정 의도 — 요청이 저장 · 제출 · 등록 · 결제 · 변경 같은 **확정 행위를 하라고** 말하는가(동사 모양만 · 사이트 · 업무 표 없음).
+ *   - 대상: 저장 · 제출 · 등록 · 결제 · 주문 · 신청 … 과 실제 변경(변경 · 수정 · 작성 · 추가 · 삭제).
+ *   - 지시형 활용일 때만: 해줘 · 해 주세요 · 해요 · 하세요 · 하고 ~ · 부탁 · 바랍니다 · 넣어줘 · 처리해줘 · 진행해줘.
+ *     "결제하는 방법" · "신청해 둔 내역" · "주문 처리 상태" · "신청 완료 여부" · "등록 요청 내역" 처럼
+ *     꾸미는 활용(하는 · 해 둔)이나 상태 · 내역 명사를 꾸미는 말은 조회다. "등록된 제품" 같은 명사 쓰임도 아니다.
+ * 그 밖에 애매하면 확정 쪽(사용자 확인)으로 기운다.
  */
-const COMMIT_INTENT_RE =
-  /(저장|제출|등록|전송|발송|결제|주문|신청|확정|게시|발행|접수)\s*(을|를|도|만)?\s*(해|하|좀|까지|눌러|부탁|바랍|바라|넣어|걸어|시켜|(완료|진행|처리|요청)\s*(해|하))|보내\s*(줘|주|기|고)|올려\s*(줘|주)/;
+const COMMIT_NOUN = '(?:저장|제출|등록|전송|발송|결제|주문|신청|확정|게시|발행|접수|변경|수정|작성|추가|삭제)';
+const COMMIT_PARTICLE = '(?:\\s*(?:을|를|도|만|까지|좀))*\\s*';
+/** 하다 동사의 지시형 활용 — 해줘 · 해 주세요 · 해 줄래 · 해요 · 해둬 · 하세요 · 하자 · 하기 바랍니다 · 하고 ~(하고 싶은 은 제외) · 문장 끝 "해". */
+const COMMIT_DO = '(?:해\\s*(?:줘|주|줄|요|라|둬|놔|버려|봐)|해\\s*[.!~]*$|하(?:세요|십시오|시오|자|라)|하기\\s*바|하고\\s+(?!싶))';
+const COMMIT_INTENT_RE = new RegExp(
+  `${COMMIT_NOUN}${COMMIT_PARTICLE}(?:${COMMIT_DO}|부탁|바랍|바라|눌러|넣어|걸어|시켜|(?:완료|진행|처리|요청)\\s*${COMMIT_DO})`
+  + '|(?:보내|올려)\\s*(?:줘|주|줄|고\\s+(?!싶))',
+);
 const SLOT_RE = /^[a-z][a-z0-9_]{0,31}$/;
 
 function clip(v: unknown, max: number): string {
@@ -65,14 +72,18 @@ function clip(v: unknown, max: number): string {
 export function fallbackUnderstanding(request: string): TaskUnderstanding {
   const goal = clip(request, UNDERSTANDING_LIMITS.goalMax) || '요청한 업무';
   const outcome: TaskUnderstanding['outcome'] = CHANGE_RE.test(goal) ? 'change' : SCREEN_RE.test(goal) ? 'screen' : 'information';
+  const whole = `요청한 결과가 화면에 보인다: ${clip(request, Number.MAX_SAFE_INTEGER)}`;
   const criteria: CompletionCriterion[] = [
-    { id: 'c1', text: clip(`요청한 결과가 화면에 보인다: ${goal}`, UNDERSTANDING_LIMITS.criterionMax), evidence: 'observed' },
+    { id: 'c1', text: clip(whole, UNDERSTANDING_LIMITS.criterionMax), evidence: 'observed' },
   ];
+  // 조건 글에 요청이 다 담기지 않으면(긴 요청) 잘린 앞부분 근거만으로 닫지 않는다 — 요청 전체가 끝났는지는 사용자 확인으로.
+  if (whole.length > UNDERSTANDING_LIMITS.criterionMax) criteria.push({ id: 'c2', text: FALLBACK_WHOLE_REQUEST_CRITERION, evidence: 'user' });
   // 확정이 요청에 들어 있으면 그 확정은 사용자만 한다 — 끝났는지는 사용자 확인으로 닫는다(enforceCommitBoundary).
   return enforceCommitBoundary({ version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary: false }, request);
 }
 
 const COMMIT_USER_CRITERION = '최종 확정(저장 · 제출 등)은 사용자가 했다';
+const FALLBACK_WHOLE_REQUEST_CRITERION = '요청 전체(조건 글에 다 담지 못한 뒷부분 포함)가 끝났다고 사용자가 확인했다';
 
 /** 요청 글에 확정 의도가 있는가 — AI 판단과 무관한 결정적 신호. */
 export function requestHasCommitIntent(request: string): boolean {
@@ -368,8 +379,6 @@ const STRONG_DONE_RE =
   /^(?:(?:네|예|응)[,.!~\s]*)?(?:(?:이제|모두|전부)\s*)?(?:됐|되었|완료|끝났|끝냈|다\s*했|마쳤)(?:했|됐|되었)?(?:어요|어|습니다|다|음|네요|요|입니다|이에요|예요)?[.!~\s]*$/;
 const WEAK_YES_RE = /^(네|예|응|맞아요|맞습니다|맞아|그래요|좋아요|ok|okay|yes)[.!~ ]*$/i;
 const NEGATION_RE = /(안\s*됐|안\s*돼|안됨|못|아니|아직|실패|안\s*되|않)/;
-/** 완료와 함께 새 요청을 붙인 답("됐고 이것도 해줘")은 선언이 아니다 — 새 업무로 이어간다. */
-const FOLLOW_UP_RE = /(해\s*줘|해\s*주세요|해\s*줄래|주세요|하고\s|이제|다음|그리고|도\s)/;
 
 /**
  * 질문 대기 중 사용자 답이 "업무가 끝났다" 는 선언인가.
@@ -383,7 +392,8 @@ const FOLLOW_UP_RE = /(해\s*줘|해\s*주세요|해\s*줄래|주세요|하고\s
 export function isCompletionDeclaration(text: unknown, askKind: string | null | undefined): boolean {
   const t = String(text ?? '').trim();
   if (!t || t.length > 20 || /[?？]/.test(t)) return false;
-  if (NEGATION_RE.test(t) || FOLLOW_UP_RE.test(t)) return false;
+  // 완료와 함께 새 요청을 붙인 답("됐고 이것도 해줘")은 발화 전체 모양(STRONG_DONE_RE · WEAK_YES_RE)에서 이미 빠진다.
+  if (NEGATION_RE.test(t)) return false;
   if (askKind && askKind !== 'success_confirmation') return false;
   if (STRONG_DONE_RE.test(t)) return true;
   return askKind === 'success_confirmation' && WEAK_YES_RE.test(t);
