@@ -203,7 +203,7 @@ import type { RelatedEntity } from './related.entity.js';
 
 ## 9. 도메인별 규칙 (참조)
 
-Cosmetics(퇴역 결정 2026-10-05 · 퇴역 전 유지 계약 — `cosmetics_` prefix · 주문은 §4 경유 · 새 Core FK · 개인정보 필드 · 전용 기능 추가 금지) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
+K-Cosmetics(퇴역 결정 2026-10-05 · 운영 runtime 제거 완료 · 잔여 유지 계약 — 제거된 runtime 재생성 금지 · 새 테이블 · Core FK · 개인정보 필드 · 전용 기능 추가 금지 · 주문 데이터는 §4 원장) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
 `O4O-RETAIL-STABLE-V1` 은 SUPERSEDED(소비자 commerce loop 은퇴 완료) — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) 판정 해제 기록.
 
 ## 10. KPA Society 구조

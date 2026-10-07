@@ -57,7 +57,7 @@ O4O 는 전체 리팩토링 중이다. 이 문서는 **"지금 무엇이 정리�
 |---|---|
 | [O4O-3-ROLE-FLOW-BASELINE-V1](../baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | §2 · §6 · §3 일부 SUPERSEDED. §4 · §5 는 참고만 |
 
-2026-10-07 판정 확정으로 §9 에서 빠진 문서(근거로 쓰지 않는다): [O4O-RETAIL-STABLE-V1](../platform/architecture/O4O-RETAIL-STABLE-V1.md) SUPERSEDED · [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) SUPERSEDED(주문 생성 규칙은 [CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2). [COSMETICS-DOMAIN-RULES](../architecture/COSMETICS-DOMAIN-RULES.md) 는 K-Cosmetics 퇴역 전 유지 계약(ACTIVE 범위 축소 — 상단 유효 규칙만)으로 확정.
+2026-10-07 판정 확정으로 §9 에서 빠진 문서(근거로 쓰지 않는다): [O4O-RETAIL-STABLE-V1](../platform/architecture/O4O-RETAIL-STABLE-V1.md) SUPERSEDED · [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) SUPERSEDED(주문 생성 규칙은 [CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2). [COSMETICS-DOMAIN-RULES](../architecture/COSMETICS-DOMAIN-RULES.md) 는 K-Cosmetics 퇴역 잔여 유지 계약(ACTIVE 범위 축소 — 상단 유효 규칙만, 잔여 정리 완료 시 OBSOLETE)으로 확정.
 
 ---
 
