@@ -59,12 +59,29 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     expect(g.items.some((i) => i.id === 'community:cosmetics')).toBe(false);
   });
 
-  it('Scenario E: KPA + KCos 회원 → 약사(KPA surface) · 화장품 · O4O 공통 3개', () => {
+  it('Scenario E: KPA + KCos 회원 → 약사(KPA surface) · O4O 공통 2개 — 운영 종료된 K-Cos 화장품 커뮤니티는 없다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY, COSMETICS, GENERAL], { 'kpa-society': 'active', 'k-cosmetics': 'active' }));
     expect(group(m)!.items.map((i) => [i.id, (i.action as any).serviceKey ?? 'neture'])).toEqual([
       ['community:pharmacy', 'kpa-society'],
-      ['community:cosmetics', 'k-cosmetics'],
       ['community:o4o-general', 'neture'],
+    ]);
+  });
+
+  it('운영 종료 — K-Cos membership 이 active 여도 K-Cos 커뮤니티 · 내 서비스 진입이 없고, 다른 서비스는 그대로다', () => {
+    const m = buildHomeEntryModel(user(), data([PHARMACY, COSMETICS], { 'pharmacy-hub': 'active', 'k-cosmetics': 'active' }));
+    expect(group(m)!.items.map((i) => i.id)).toEqual(['community:pharmacy']);
+    const handoffs = [...m.groups.flatMap((g) => g.items), ...m.myServices]
+      .map((i) => i.action as { serviceKey?: string })
+      .filter((a) => a.serviceKey === 'k-cosmetics');
+    expect(handoffs).toEqual([]);
+    expect(m.myServices.map((i) => i.id)).toEqual(['svc:pharmacy-hub']);
+  });
+
+  it('운영 종료 서비스 surface 만 빠진다 — 다른 surface 가 남은 Community 는 그 surface 로 들어간다', () => {
+    const MIXED: EntryCommunity = { ...PHARMACY, entries: [{ serviceKey: 'k-cosmetics', path: '/forum' }, ...PHARMACY.entries] };
+    const m = buildHomeEntryModel(user(), data([MIXED], { 'k-cosmetics': 'active', 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
+    expect(group(m)!.items.map((i) => [i.id, i.action, i.note])).toEqual([
+      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, 'KPA Society에서 참여'],
     ]);
   });
 
