@@ -295,7 +295,7 @@ describe('local-products — mount 계약', () => {
   it('I. 서비스 라우터는 serviceKey 를 명시해 mount 한다', () => {
     for (const [file, key] of [
       ['routes/kpa/kpa.routes.ts', 'kpa'],
-      ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
+      // routes/cosmetics/cosmetics.routes.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거 — Core 의 'cosmetics' 축 동작(D · F)은 위에서 계속 검증한다.
     ]) {
       const text = fs.readFileSync(path.join(src, file), 'utf8');
       expect(text).toContain(`createStoreLocalProductRoutes(dataSource, '${key}')`);

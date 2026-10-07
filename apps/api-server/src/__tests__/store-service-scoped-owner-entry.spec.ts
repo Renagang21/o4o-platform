@@ -65,10 +65,10 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
   const main = read('services/web-store/src/main.tsx');
 
   it('고정 서비스에서 `/store/...` 링크를 따라오면 `/work/<key>/store/...` 로 옮긴다 · mount 목록과 일치', () => {
-    expect(svc).toContain("SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society', 'k-cosmetics']");
+    expect(svc).toContain("SERVICE_SCOPED_STORE_KEYS: readonly UnifiedServiceKey[] = ['kpa-society']");
     expect(norm(app)).toContain('<Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}>');
-    // K-Cosmetics 는 공개 서비스 종료 — mount 위치는 종료 안내를 보여 준다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
-    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>');
+    // K-Cosmetics 는 서비스 종료 — /work/k-cosmetics/* 전체가 종료 안내 하나다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/*`} element={KcosRetired} />');
     expect(layout).toContain('toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`)');
     expect(layout).toContain('<Navigate to={scopedPath} replace />');
   });
@@ -114,48 +114,35 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
   });
 });
 
-describe('K-Cosmetics 매장 화면 이전 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-15', () => {
+describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1', () => {
   const app = read('services/web-store/src/App.tsx');
   const layout = read('services/web-store/src/components/layouts/UnifiedStoreLayout.tsx');
-  // 원본 앱(services/web-k-cosmetics) 은 퇴역 삭제됐다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) —
-  //   원본 대조 · 원본 handoff 계약은 함께 제거. 이식 트리(web-store kcos)는 다음 단계에서 제거한다.
-  const K = 'services/web-store/src/services/kcos/';
+  const svc = read('services/web-store/src/lib/serviceContext.ts');
 
-  it('서비스 업무 화면은 중복 이식하지 않고 /work/k-cosmetics 로 보낸다', () => {
-    const n = norm(app);
-    for (const [from, to] of [['commerce/products', 'commerce/products'], ['commerce/orders', 'commerce/orders'], ['commerce/billing', 'commerce/billing'], ['interest-requests', 'interest-requests']]) {
-      expect(n).toContain(`<Route path="${from}" element={<Navigate to={\`\${W}/k-cosmetics/${to}\`} replace />} />`);
-    }
+  it('이식 트리(services/kcos)는 삭제됐다', () => {
+    expect(fs.existsSync(path.join(REPO, 'services/web-store/src/services/kcos'))).toBe(false);
+    expect(app).not.toMatch(/from '\.\/services\/kcos\//);
   });
 
-  it('권한: 트리 전체 매장 경영자 게이트(원본 StoreOwnerGuard) · info 는 operator 제외(원본 RoleGuard)', () => {
-    expect(layout).toContain("'k-cosmetics': { menu: COSMETICS_STORE_CONFIG, ownerOnly: true }");
-    expect(layout).toContain("'kpa-society': { menu: UNIFIED_STORE_CONFIG, ownerOnly: false }");
-    expect(app).toContain("KCOS_STORE_INFO_ROLES = ['cosmetics:store_owner', 'cosmetics:admin', 'platform:super_admin']");
-    expect(norm(app)).toContain('<Route path="info" element={<ServiceRoleOnly serviceKey="k-cosmetics" roles={KCOS_STORE_INFO_ROLES}><KcosStoreInfoPage /></ServiceRoleOnly>} />');
+  it('k-cosmetics 는 더 이상 web-store 의 서비스 문맥이 아니다', () => {
+    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';");
+    expect(layout).not.toContain("'k-cosmetics':");
+    expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });
 
-  it('이식 화면은 web-store 의 단일 client · 인증을 쓴다(선택 매장 헤더 공유)', () => {
-    expect(read(`${K}lib/apiClient.ts`)).toContain("export { API_BASE_URL, authClient, api } from '../../../lib/apiClient';");
-    expect(read(`${K}contexts/AuthContext.tsx`)).toContain("export { useAuth, getAccessToken } from '../../../contexts/AuthContext';");
-  });
-
-  it('홈(cockpit)은 통합 매장 선택과 같은 매장만 보여 준다', () => {
-    const cockpit = read(`${K}pages/operator/StoreCockpitPage.tsx`);
-    expect(cockpit).toContain('?.filter((s) => s.organization_id === organizationId) ?? []');
-    expect(cockpit).not.toMatch(/to="\/operator\//);
-    expect(cockpit).not.toMatch(/(actionTo|moreTo)="\/operator\//);
-  });
-
-  it('store 호스트에서 열리지 않는 경로를 쓰지 않는다(공개 태블릿 · /store-hub · 송출)', () => {
-    const settings = read(`${K}pages/store/StoreSettingsPage.tsx`);
-    expect(settings).not.toContain('`/tablet/');
-    expect((settings.match(/\$\{KCOS_PUBLIC_ORIGIN\}\/tablet\//g) ?? []).length).toBe(3);
-    expect(read(`${K}pages/store/StoreSignagePage.tsx`)).toContain("navigate('/hub/signage')");
-    expect(read(`${K}pages/store/StoreChannelsPage.tsx`)).toContain("hubB2b: '/hub/b2b'");
-    expect(read(`${K}pages/store/signage/SignagePlayerSelectPage.tsx`)).toContain('playPathPrefix="/work/k-cosmetics/store/marketing/signage/play"');
-    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store/marketing/signage/play/:playlistId`} element={KcosRetired} />');
-    expect(app).toContain('<Route path="/guide/*" element={<ServiceGuideRedirect />} />');
+  it('종료 서비스만 가입된 매장은 /store · /hub 에서 KPA 기본 문맥으로 떨어지지 않고 종료 안내를 받는다', () => {
+    // 종료 서비스는 catalog 에서 workspaceAvailable=false 로 내려온다 — active 가입 기준으로 판정해야 KPA 기본 문맥으로 새지 않는다.
+    expect(svc).toContain('export function hasOnlyRetiredWorkspaces(');
+    expect(svc).toContain("const active = services.filter((s) => s.enrollmentStatus === 'active');");
+    expect(svc).toContain('!active.some((s) => s.workspaceAvailable && isUnifiedServiceKey(s.serviceKey))');
+    expect(layout).toContain('return !effectiveServiceKey && hasOnlyRetiredWorkspaces(services);');
+    expect(layout).toContain('data-testid="store-retired-service"');
+    expect(layout).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
+    // /hub 도 같은 판정 — HUB 조회가 KPA fallback 으로 나가지 않는다. 상단 nav 의 HUB 도 숨긴다.
+    expect(read('services/web-store/src/components/layouts/UnifiedHubLayout.tsx')).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
+    expect(read('services/web-store/src/components/RootShell.tsx')).toContain("effectiveServiceKey === 'kpa-society' || retiredOnly");
+    // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
+    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
   });
 });
 
@@ -205,14 +192,15 @@ describe('KPA 앱 — 매장 handoff 는 서비스 지정 경로로(플래그 �
 describe('K-Cosmetics 공개 서비스 종료 — store 호스트는 종료된 호스트로 보내지 않는다', () => {
   // WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1 (Codex P1 수용 · B안)
   const app = read('services/web-store/src/App.tsx');
-  it('K-Cosmetics 업무 · 매장 · 송출 mount 는 종료 안내만 보여 준다', () => {
-    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics`} element={KcosRetired}>');
-    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/store`} element={KcosRetired}>');
+  const svc = read('services/web-store/src/lib/serviceContext.ts');
+  it('K-Cosmetics 업무 · 매장 · 송출 경로는 하나의 종료 안내 catch-all 이다', () => {
+    expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/*`} element={KcosRetired} />');
     expect(app).not.toMatch(/k-cosmetics[^\n]*element=\{gated\(/);
   });
-  it('이용 방법 이동은 K-Cosmetics 문맥에서 공개 사이트로 replace 하지 않는다', () => {
-    expect(app).toContain("const retired = getActiveServiceKey() === 'k-cosmetics';");
-    expect(app).toContain('if (!retired) window.location.replace(');
+  it('이용 방법 이동은 서비스 문맥이 K-Cosmetics 일 수 없으므로 종료 호스트로 replace 하지 않는다', () => {
+    // UnifiedServiceKey 에서 k-cosmetics 가 빠져 getActiveServicePublicOrigin() 이 종료 호스트를 돌려줄 수 없다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+    expect(svc).not.toMatch(/k-cosmetics\.site|retail\.neture\.co\.kr/);
+    expect(app).toContain('window.location.replace(`${getActiveServicePublicOrigin()}${pathname}${search}`);');
   });
   it('종료 안내는 약국 화면으로 redirect 하지 않는다', () => {
     const notice = app.slice(app.indexOf('const KcosRetired'), app.indexOf('const S = '));

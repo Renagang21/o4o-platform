@@ -22,8 +22,8 @@ describe('listStoreCapableServices — catalog storeWorkspaceEnabled 파생 (WO 
   const list = listStoreCapableServices();
   const keys = list.map((s) => s.serviceKey);
 
-  it('kpa-society · k-cosmetics · pharmacy-hub 가 대상이다', () => {
-    expect(keys.sort()).toEqual(['k-cosmetics', 'kpa-society', 'pharmacy-hub']);
+  it('kpa-society · pharmacy-hub 가 대상이다 (k-cosmetics 는 운영 종료로 storeWorkspaceEnabled=false)', () => {
+    expect(keys.sort()).toEqual(['kpa-society', 'pharmacy-hub']);
   });
 
   it('모든 항목은 catalog storeWorkspaceEnabled=true 이고 canonical key 다', () => {
@@ -60,16 +60,16 @@ describe('My Services 합성 시나리오 매장 A (WO §21)', () => {
     { organization_id: ORG_A, service_code: 'pharmacy-hub', status: 'inactive' },
   ];
 
-  it('KPA + KCos 는 workspaceAvailable=true, PH 는 inactive · workspaceAvailable=false 로 명확히 구분된다', () => {
+  it('KPA 는 workspaceAvailable=true, 종료된 KCos 는 active 라도 workspaceAvailable=false, PH 는 inactive 로 구분된다', () => {
     const services = foldEnrollmentsToStoreServices(ORG_A, rows);
     const byKey = Object.fromEntries(services.map((s) => [s.serviceKey, s]));
 
     expect(byKey['kpa-society']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: true, organizationId: ORG_A });
-    expect(byKey['k-cosmetics']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: true, organizationId: ORG_A });
+    expect(byKey['k-cosmetics']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: false, organizationId: ORG_A });
     expect(byKey['pharmacy-hub']).toMatchObject({ enrollmentStatus: 'inactive', workspaceAvailable: false, organizationId: ORG_A });
 
     const shown = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable).map((s) => s.serviceKey);
-    expect(shown.sort()).toEqual(['k-cosmetics', 'kpa-society']);
+    expect(shown).toEqual(['kpa-society']);
   });
 
   it('모든 row 는 요청 조직으로 귀속된다 — 다른 조직 row 가 섞이면 FAIL 조건', () => {

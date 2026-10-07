@@ -26,7 +26,7 @@ const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf-8');
 
 const WRAPPERS = [
   'routes/kpa/controllers/kpa-checkout.controller.ts',
-  'routes/cosmetics/controllers/cosmetics-order.controller.ts',
+  // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
 ];
 
 const BUYER = '11111111-1111-4111-8111-111111111111';
@@ -258,7 +258,7 @@ describe('B. wrapper 계약 — 3서비스가 같은 Core 를 쓴다 (DF-4)', ()
     expect(code).toMatch(/authReq\.user\?\.id/);
   });
 
-  it('세 wrapper 의 404 응답 코드가 동일하다', () => {
+  it('wrapper 의 404 응답 코드가 Core 와 동일하다', () => {
     const core = read('services/checkout/buyer-order-read.service.ts');
     expect(core).toContain("code: 'ORDER_NOT_FOUND'");
     for (const file of WRAPPERS) {

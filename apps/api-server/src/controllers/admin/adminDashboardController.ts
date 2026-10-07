@@ -9,7 +9,6 @@
  * Entities used:
  * - User (users table) - user growth
  * - NetureOrder (neture.neture_orders) - order/sales data
- * - CosmeticsProduct - cosmetics metrics
  */
 
 import { Response } from 'express';
@@ -17,7 +16,6 @@ import { AppDataSource, checkDatabaseHealth } from '../../database/connection.js
 import { User } from '../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { NetureOrder } from '../../routes/neture/entities/neture-order.entity.js';
-import { CosmeticsProduct, CosmeticsBrand, CosmeticsProductStatus } from '../../routes/cosmetics/entities/index.js';
 
 export class AdminDashboardController {
   /**

@@ -18,7 +18,7 @@
  *
  * raw-source spec — import graph 가 아니라 소스 문자열을 단언한다 (Shared Module Change Rule).
  */
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 const SRC = join(__dirname, '..');
@@ -60,13 +60,10 @@ describe('§4 axis — 범위 밖 축은 무변경', () => {
   //   위 WO 시점의 "채널 통제 축은 손대지 않았다" 가드였다. 그 축(KPA 전용 kpa_store_asset_controls 를
   //   KPA 조직 resolver 로 마운트하던 P0 결함)은 후속 WO 가 **의도적으로 은퇴**시켰으므로
   //   금지 단언을 새 계약(redirect-only · storeAssetControlApi 0)으로 갱신한다. 회귀가 아니라 계약 변경이다.
-  it('cosmetics.routes.ts 마운트 (/store-contents wrapper · /store/assets · /assets 유지 · /store-assets 는 은퇴)', () => {
-    const r = codeOnly(read(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'));
-    expect(r).toMatch(/router\.use\(\s*'\/store-contents'\s*,\s*createCosmeticsStoreContentController\(/);
-    expect(r).toMatch(/createStoreExecutionAssetsController\(dataSource,[^)]*'cosmetics'\)/);
-    // WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1: KPA 전용 자산 통제 마운트 제거
-    expect(r).not.toMatch(/router\.use\(\s*'\/store-assets'/);
-    expect(r).toMatch(/router\.use\(\s*'\/assets'/);
+  // K-Cosmetics API(routes/cosmetics/**)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거됐다 —
+  //   마운트 단언 대신 그 라우터가 더는 존재하지 않음을 고정한다.
+  it('cosmetics.routes.ts 는 제거됐다 (/api/v1/cosmetics/* 은퇴)', () => {
+    expect(existsSync(join(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'))).toBe(false);
   });
 });
 

@@ -1,7 +1,7 @@
 # CHECK-O4O-SITEGUIDE-RETIREMENT-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-06
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-07
 > **근거 WO**: WO-O4O-SITEGUIDE-RETIREMENT-V1 · 선행 WO-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1 (소스 `07496aa5f` · 스키마 drop migration)
 
 **사용자 결정 (2026-10-05)**: siteguide 서비스는 진행하지 않는다. 전용 코드와 O4O 인프라 연결을 퇴역한다.
@@ -135,7 +135,7 @@ historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록
 | promote | **하지 않음** — promote 는 다른 트랙의 LEVEL_3 변경을 함께 배포한다(사용자 지시: 다른 트랙 HOLD 포함 시 임의 promote 금지) |
 | 운영 serving (확인 시점) | `o4o-core-api-03834-fuh` = `e0be29869` · `neture-web-01689-lev` = `4263d5fae` — 둘 다 #333 미포함. API `/api/health` 200 |
 
-### 5-4. 배포 후 검증 — **대기**
+### 5-4. 배포 후 검증 — **완료 (2026-10-07, §5-4-a)**
 
 다른 트랙의 통제 배포(#323 · #308 축)로 api · neture-web 이 `195ea6fee` 이후 SHA 로 올라간 뒤 수행한다. 운영에 테스트 문의를 저장하지 않는다.
 
@@ -147,3 +147,18 @@ historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록
 | 관리자 문의 화면 | Neture admin vault 문의 화면 — 유형 필터에 SiteGuide 없음 · 기존 `platform` 1건 목록 · 상세 조회 |
 
 배포 전 사전 확인: 운영 DB 의 `platform_inquiries` = `platform` 1행(§5-1 삭제 후) — 화면 검증의 기대값.
+
+#### 5-4-a. 결과 (2026-10-07 · production)
+
+배포: 다른 트랙의 통제 promote(`b34da10a8`, 07:21Z — 이 트랙이 실행하지 않음)로 반영. 이 트랙은 promote 를 별도로 실행하지 않았다.
+
+| 검증 | 결과 |
+|---|---|
+| serving 에 #333 포함 | `o4o-core-api-03840-mos`(100%) = `5e97815c7` · `neture-web-01698-yet`(100%) = `a07861f57` — 둘 다 `195ea6fee` 를 조상으로 가짐 · **PASS** |
+| API health | `200` · **PASS** |
+| siteguide 접수 400 | 형식이 틀린 email payload → HTTP 400 · 오류 코드 `RETIRED_INQUIRY_TYPE` · **PASS** |
+| 저장 없음 | 운영 DB read-only: `type='siteguide'` 0행 · 최근 1일 생성 0행 · **PASS** |
+| 관리자 화면 — 유형 제거 | 배포된 neture-web 번들(`index-CL5z4Yne.js`, 문의 화면 포함)에서 `SiteGuide 도입` · `siteguide` **0건**, 새 설명 문구 1건 · `플랫폼 문의` · `제휴 문의` 라벨 존재 · **PASS (번들 기준)** |
+| 관리자 화면 — 기존 문의 조회 | 목록 API `GET /api/v1/admin/platform/inquiries` 비인증 `401`(route 정상 등록). 화면 기대값인 `platform` 1행(현재 상태 `closed`)은 DB 에 유지. **실계정 로그인 화면 확인은 미수행** — 관리자 계정이 Google-only 라 이 세션에서 로그인 불가 |
+
+판정: **배포 후 검증 완료(실계정 화면 확인 1건 미수행)**. 이 트랙의 코드 · 데이터 정리는 종결한다. 문서 상태는 §4 의 gabia DNS 레코드 실삭제 미확인 항목 때문에 ACTIVE 로 유지한다.

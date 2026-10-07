@@ -11,6 +11,7 @@ import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
+import { useRetiredOnlyStore } from './layouts/UnifiedStoreLayout';
 import { withReturnTo } from '../lib/returnTo';
 
 function StoreSwitcher() {
@@ -37,8 +38,10 @@ export default function RootShell() {
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
   // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
+  //   종료 서비스만 가입된 매장도 HUB 를 열지 않는다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   const { effectiveServiceKey } = useUnifiedStore();
-  const navItems = effectiveServiceKey === 'kpa-society' ? ROOT_NAV_ITEMS.filter((i) => i.key !== 'store-hub') : ROOT_NAV_ITEMS;
+  const retiredOnly = useRetiredOnlyStore();
+  const navItems = effectiveServiceKey === 'kpa-society' || retiredOnly ? ROOT_NAV_ITEMS.filter((i) => i.key !== 'store-hub') : ROOT_NAV_ITEMS;
   return <div className="site">
     <header className="header">
       <div className="header-left">

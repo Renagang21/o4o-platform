@@ -74,7 +74,7 @@ const homeProps: GuideFeaturesPageProps = {
     ],
     cards: [
       { title: 'KPA Society', audience: '약국 · 약사', summary: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.', to: '/guide/services/kpa-society' },
-      { title: 'K-Cosmetics', audience: '화장품 매장', summary: '화장품 매장에서 상품 설명 · 콘텐츠 · QR · POP · 사이니지 · 타블렛을 활용하도록 돕는 O4O 서비스입니다.', to: '/guide/services/k-cosmetics' },
+      // K-Cosmetics 카드 · /guide/services/k-cosmetics 는 서비스 운영 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
     ],
   },
   groups: [

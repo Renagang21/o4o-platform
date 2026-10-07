@@ -31,11 +31,6 @@ const STORE_QR_ENTRIES: { service: string; url: string; note: string }[] = [
     note: '약국 매장 QR 관리',
   },
   {
-    service: 'K-Cosmetics',
-    url: 'https://k-cosmetics.site/store/marketing/qr',
-    note: '매장 QR 관리',
-  },
-  {
     service: 'Pharmacy-Hub',
     url: 'https://pharmacyhub.co.kr/store-owner/qr',
     note: '매장 실행 자산 — QR',

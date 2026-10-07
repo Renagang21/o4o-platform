@@ -186,7 +186,7 @@ describe('게시글 라우트 배선', () => {
 describe('mount 된 커뮤니티는 모두 승격 대상이다', () => {
   const MOUNTS: Array<[string, string]> = [
     ['routes/kpa/kpa.routes.ts', 'pharmacy'],
-    ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
+    // routes/cosmetics/cosmetics.routes.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
     ['routes/neture/neture.routes.ts', 'o4o-general'],
     ['routes/pharmacy-hub/pharmacy-hub.routes.ts', 'pharmacy'],
     ['routes/neture/controllers/neture.controller.ts', 'o4o-general'],
