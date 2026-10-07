@@ -156,7 +156,7 @@ historical migration(`CreateSiteGuideTables` · `DropSiteGuideSchema`) · 기록
 |---|---|
 | serving 에 #333 포함 | `o4o-core-api-03840-mos`(100%) = `5e97815c7` · `neture-web-01698-yet`(100%) = `a07861f57` — 둘 다 `195ea6fee` 를 조상으로 가짐 · **PASS** |
 | API health | `200` · **PASS** |
-| siteguide 접수 400 | 형식이 틀린 email payload → `400 {"success":false,"code":"RETIRED_INQUIRY_TYPE"}` · **PASS** |
+| siteguide 접수 400 | 형식이 틀린 email payload → HTTP 400 · 오류 코드 `RETIRED_INQUIRY_TYPE` · **PASS** |
 | 저장 없음 | 운영 DB read-only: `type='siteguide'` 0행 · 최근 1일 생성 0행 · **PASS** |
 | 관리자 화면 — 유형 제거 | 배포된 neture-web 번들(`index-CL5z4Yne.js`, 문의 화면 포함)에서 `SiteGuide 도입` · `siteguide` **0건**, 새 설명 문구 1건 · `플랫폼 문의` · `제휴 문의` 라벨 존재 · **PASS (번들 기준)** |
 | 관리자 화면 — 기존 문의 조회 | 목록 API `GET /api/v1/admin/platform/inquiries` 비인증 `401`(route 정상 등록). 화면 기대값인 `platform` 1행(현재 상태 `closed`)은 DB 에 유지. **실계정 로그인 화면 확인은 미수행** — 관리자 계정이 Google-only 라 이 세션에서 로그인 불가 |
