@@ -27,6 +27,12 @@
  *   Assistant Memory 가 소유 주체의 검증 방법 · 재개 구조까지 돌려주고(→ ExecutionIntent.memory), 실행 뒤에는
  *   ExecutionReport.memory(구조만)를 소유 주체 기억에 반영한다(rememberExecution). 실행 노드가 바뀌어도 이어진다.
  *
+ * Task Understanding & Completion (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1)
+ *   Task → **업무 이해(assistant-understanding.ts — 목표 · 완료조건 · 빠진 정보)** → Assistant Planning → Execution
+ *   → Execution 이 "완료"를 주장하면 **Assistant 판정기(judge)** 가 조건 ↔ 근거를 비교(complete · continue · ask)
+ *   → 질문 대기 중 사용자의 "됐어요" 는 사용자 완료 선언으로 Task 를 닫는다(실행 호출 없음).
+ *   이해는 메모리에서만 산다(로그 · DB 없음 — §17). 계측은 `assistant task completion` 로그 한 줄(수치 · enum 만).
+ *
  * 이 모듈이 하지 않는 일
  *   - 완료 계약의 영속화 · Knowledge / Shared Candidate 배선(후속 단계)
  *   - 요청 원문 · 대화 저장 (V2 §17 Gate 대상) — 원문은 실행 본체로만 흘러가고 Task · 실행 지시에는 닿지 않는다
@@ -53,7 +59,19 @@ import { resolveTaskOwnership } from './task-ownership.js';
 import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
 import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory, rememberExecution } from './assistant-memory.js';
 import { memoryOwnerOf } from './procedural-memory-store.js';
-import type { ExecutionIntent, ExecutionReport } from '../ai-tools/work-agent-contract.js';
+import type { CompletionJudge, ExecutionIntent, ExecutionReport, TaskUnderstanding } from '../ai-tools/work-agent-contract.js';
+import {
+  cacheUnderstanding,
+  cachedUnderstanding,
+  createCompletionJudge,
+  fallbackUnderstanding,
+  forgetUnderstanding,
+  isCompletionDeclaration,
+  newJudgeCounters,
+  type CompletionVerifier,
+  type TaskUnderstander,
+} from './assistant-understanding.js';
+import { checkResumable, transitionWorkRun, WORK_RUN_STATUS } from '../ai-tools/work-run-coordination-service.js';
 import { resolveWorkTarget } from '../ai-tools/work-target-resolver.js';
 import { nodeLedgerOwnerKey } from '../ai-tools/node-ledger-owner.js';
 
@@ -74,12 +92,19 @@ export interface WorkExecutionReply {
   execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-/** 실행 위임 — Assistant 가 정한 실행 지시(intent)를 함께 넘긴다. */
+/** 실행 위임 — Assistant 가 정한 실행 지시(intent)와 완료 판정기(judge)를 함께 넘긴다. */
 export type WorkExecutor = (
   userId: string,
   workBody: Record<string, unknown>,
   intent?: ExecutionIntent,
+  judge?: CompletionJudge,
 ) => Promise<WorkExecutionReply>;
+
+/** 업무 이해 · 완료 검증 주입점. 생략하면 결정적 기본 이해 · 의미 검증 없음(AI 호출 0). */
+export interface AssistantUnderstandingDeps {
+  understand?: TaskUnderstander | null;
+  verify?: CompletionVerifier | null;
+}
 
 export interface AssistantWorkInput {
   /** 인증 세션의 사용자. */
@@ -151,7 +176,10 @@ async function continueExistingTask(
   return null;
 }
 
-async function acquireTask(dataSource: DataSource, input: AssistantWorkInput): Promise<AssistantTaskRow> {
+async function acquireTask(
+  dataSource: DataSource,
+  input: AssistantWorkInput,
+): Promise<{ task: AssistantTaskRow; priorStatus: AssistantTaskStatus | null }> {
   const existing = await continueExistingTask(dataSource, input);
   if (existing) {
     const resumed = await updateAssistantTask(dataSource, {
@@ -159,21 +187,64 @@ async function acquireTask(dataSource: DataSource, input: AssistantWorkInput): P
       requestedByUserId: input.userId,
       status: 'running',
     });
-    return resumed ?? existing;
+    return { task: resumed ?? existing, priorStatus: existing.status };
   }
   const ownership = await resolveTaskOwnership(dataSource, { userId: input.userId, workScope: input.workScope });
-  return createAssistantTask(dataSource, { requestedByUserId: input.userId, ownership });
+  return { task: await createAssistantTask(dataSource, { requestedByUserId: input.userId, ownership }), priorStatus: null };
+}
+
+/**
+ * 사용자 완료 선언 — 질문 대기 중 run 에 사용자가 "됐어요" 라고 답했다. 실행을 다시 돌리지 않고
+ * 그 run 을 완료로 닫고 Task 를 completed 로 판정한다(완료 계약 acceptsUserCompletion).
+ * run 이 이미 종결 · 만료 · 남의 것이면 선언으로 닫지 않는다(null → 일반 재개 경로).
+ */
+async function completeByUserDeclaration(
+  dataSource: DataSource,
+  input: AssistantWorkInput,
+  task: AssistantTaskRow,
+): Promise<WorkExecutionReply | null> {
+  const runId = String(input.workBody.runId);
+  const check = await checkResumable(dataSource, { runId, userId: input.userId });
+  const row = check.ok ? check.row : null;
+  if (!row) return null;
+  const closed = await transitionWorkRun(dataSource, { runId, status: WORK_RUN_STATUS.COMPLETED, expectedVersion: row.version });
+  if (!closed) return null;
+  return {
+    status: 200,
+    body: {
+      success: true,
+      data: {
+        goal: { goalId: null, status: 'completed', siteId: task.targetId ?? null, displayName: null },
+        runId,
+        resumable: false,
+        progress: 'completed',
+        takeover: null,
+        neededInput: null,
+        stepCount: 0,
+        aiPlanCount: 0,
+        path: null,
+        history: [],
+        message: '완료로 기록했습니다. 필요하면 새 요청으로 이어서 말씀해 주세요.',
+        errorCode: null,
+        target: null,
+        workflow: null,
+      },
+    },
+  };
 }
 
 export async function runAssistantWorkTask(
   dataSource: DataSource,
   input: AssistantWorkInput,
   execute: WorkExecutor,
+  deps: AssistantUnderstandingDeps = {},
 ): Promise<AssistantWorkOutcome> {
+  const t0 = Date.now();
   // ── Assistant → Task ──
   let task: AssistantTaskRow | null = null;
+  let priorStatus: AssistantTaskStatus | null = null;
   try {
-    task = await acquireTask(dataSource, input);
+    ({ task, priorStatus } = await acquireTask(dataSource, input));
   } catch (err) {
     logger.warn('assistant task unavailable — work runs without task', {
       userId: input.userId,
@@ -191,6 +262,59 @@ export async function runAssistantWorkTask(
     runId: resuming ? String(input.workBody.runId) : null,
   }) : EMPTY_ASSISTANT_MEMORY;
 
+  // ── 사용자 완료 선언 — 질문 대기 중 "됐어요" 는 실행 없이 Task 를 닫는다 ──
+  if (task && resuming && priorStatus === 'waiting_for_user'
+    && isCompletionDeclaration(input.workBody.request, memory.resumeFrame?.ask?.kind ?? null)) {
+    try {
+      const declared = await completeByUserDeclaration(dataSource, input, task);
+      if (declared) {
+        const updated = await updateAssistantTask(dataSource, { taskId: task.taskId, requestedByUserId: input.userId, status: 'completed' });
+        await rememberExecution(dataSource, {
+          userId: input.userId, taskId: task.taskId, ownership, runId: String(input.workBody.runId), taskStatus: 'completed', memory: undefined,
+        });
+        forgetUnderstanding(task.taskId);
+        logCompletion({
+          taskId: task.taskId, outcome: updated?.status ?? 'completed', completedBy: 'user_declared', understandingSource: 'none',
+          criteria: 0, criteriaMet: 0, counters: newJudgeCounters(), report: undefined, questions: 0, totalMs: Date.now() - t0,
+        });
+        const plan = planAssistantTask({
+          taskId: task.taskId, resuming, priorTaskTypeKey: task.taskTypeKey ?? null, userMethodHint: false, nodeExperienceReachable: true,
+        });
+        return { reply: declared, task: { taskId: task.taskId, status: updated?.status ?? 'completed' }, plan };
+      }
+    } catch (err) {
+      logger.warn('assistant completion declaration failed', { taskId: task.taskId, error: err instanceof Error ? err.name : 'unknown' });
+    }
+  }
+
+  // ── 업무 이해(실행 전) — 새 요청이면 이번 요청에서 세우고, 재개면 같은 Task 의 이해를 이어 쓴다(메모리 전용) ──
+  const counters = newJudgeCounters();
+  let understanding: TaskUnderstanding | null = null;
+  let understandingSource: 'ai' | 'fallback' | 'cached' | 'none' = 'none';
+  if (resuming) {
+    understanding = task ? cachedUnderstanding(task.taskId) : null;
+    understandingSource = understanding ? 'cached' : 'none';
+  } else {
+    const request = String(input.workBody.request ?? '');
+    if (deps.understand) {
+      const ut0 = Date.now();
+      counters.aiCalls += 1;
+      try {
+        understanding = await deps.understand({
+          request, targetHint: typeof input.workBody.targetHint === 'string' ? input.workBody.targetHint : null,
+        });
+      } catch (err) {
+        logger.warn('assistant understanding failed', { error: err instanceof Error ? err.name : 'unknown' });
+      } finally {
+        counters.aiMs += Date.now() - ut0;
+      }
+    }
+    if (!understanding) understanding = fallbackUnderstanding(request);
+    understandingSource = understanding.source;
+    if (task) cacheUnderstanding(task.taskId, understanding);
+  }
+  const judge = understanding ? createCompletionJudge(understanding, { verify: deps.verify ?? null, counters }) : undefined;
+
   // ── Assistant Planning — 이번 Task 의 수행 방향(구조만 · 원문 없음) ──
   const plan = planAssistantTask({
     taskId: task?.taskId ?? null,
@@ -201,6 +325,7 @@ export async function runAssistantWorkTask(
     nodeExperienceReachable: true,
     knownTaskTypes: memory.knownTaskTypes,
     memory: { patterns: memory.patterns, resumeFrame: memory.resumeFrame },
+    understanding,
   });
   logger.info('assistant plan', {
     taskId: plan.intent.taskId,
@@ -211,6 +336,10 @@ export async function runAssistantWorkTask(
     memoryPatterns: memory.patterns.length,
     memoryResumeFrame: memory.resumeFrame !== null,
     memorySources: memory.sources.map((s) => `${s.kind}:${s.placement}:${s.readByAssistant ? 'read' : s.note ?? 'skip'}`),
+    // 이해 · 조건 자체(원문 파생 글)는 싣지 않는다 — 출처 · 개수만.
+    understandingSource,
+    criteria: understanding?.criteria.length ?? 0,
+    missing: understanding?.missing.length ?? 0,
   });
 
   // ── Phase D — Execution Node 조정(V2 §11-1). 노드는 Assistant 가 고르고, 노드 원장은 Task 소유 주체로 나눈다 ──
@@ -231,7 +360,7 @@ export async function runAssistantWorkTask(
   };
 
   // ── Task → Execution (실행 지시와 함께 위임 · 화면 판단은 Execution 이 한다) ──
-  const reply = await execute(input.userId, input.workBody, intent);
+  const reply = judge ? await execute(input.userId, input.workBody, intent, judge) : await execute(input.userId, input.workBody, intent);
   if (!task) return { reply, task: null, plan };
 
   // ── Execution → Task (Assistant 가 완료 계약으로 판정) ──
@@ -261,6 +390,21 @@ export async function runAssistantWorkTask(
       taskStatus: updated?.status ?? status,
       memory: report?.memory,
     });
+    const finalStatus = updated?.status ?? status;
+    if (isTerminalTaskStatus(finalStatus)) forgetUnderstanding(task.taskId);
+    logCompletion({
+      taskId: task.taskId,
+      outcome: finalStatus,
+      completedBy: finalStatus !== 'completed' ? null
+        : plan.intent.completion.requires === 'criteria_evidence' && report?.verdict?.decision === 'complete' ? 'criteria' : 'legacy_result',
+      understandingSource,
+      criteria: understanding?.criteria.length ?? 0,
+      criteriaMet: counters.lastMet,
+      counters,
+      report,
+      questions: finalStatus === 'waiting_for_user' ? 1 : 0,
+      totalMs: Date.now() - t0,
+    });
     logger.info('assistant task updated', {
       taskId: task.taskId,
       ownershipScope: task.ownershipScope,
@@ -279,4 +423,42 @@ export async function runAssistantWorkTask(
     });
     return { reply, task: { taskId: task.taskId, status: task.status }, plan };
   }
+}
+
+/**
+ * 업무 단위 계측 한 줄 — 총 시간 · AI 호출(Assistant 이해 · 판정 + Execution planner) · 실행 왕복 · 질문 · 완료/중단.
+ * 수치와 enum 만 싣는다(목표 · 조건 · 인용 · 원문 없음). 별도 분석 플랫폼 없이 운영 로그 조회로 비교한다.
+ */
+function logCompletion(e: {
+  taskId: string;
+  outcome: AssistantTaskStatus;
+  completedBy: 'criteria' | 'user_declared' | 'legacy_result' | null;
+  understandingSource: 'ai' | 'fallback' | 'cached' | 'none';
+  criteria: number;
+  criteriaMet: number;
+  counters: ReturnType<typeof newJudgeCounters>;
+  report: ExecutionReport | undefined;
+  questions: number;
+  totalMs: number;
+}): void {
+  const m = e.report?.metrics;
+  logger.info('assistant task completion', {
+    taskId: e.taskId,
+    outcome: e.outcome,
+    completedBy: e.completedBy,
+    understandingSource: e.understandingSource,
+    criteria: e.criteria,
+    criteriaMet: e.criteriaMet,
+    verdict: e.report?.verdict?.decision ?? null,
+    judgeCalls: e.counters.judgeCalls,
+    continuations: e.counters.continuations,
+    assistantAiCalls: e.counters.aiCalls,
+    assistantAiMs: e.counters.aiMs,
+    executionAiCalls: m?.aiCalls ?? null,
+    executionAiMs: m?.aiMs ?? null,
+    roundTrips: m?.roundTrips ?? null,
+    stepCount: m?.stepCount ?? null,
+    questions: e.questions,
+    totalMs: e.totalMs,
+  });
 }

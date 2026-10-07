@@ -177,7 +177,9 @@ describe('⑤ Assistant 경로 통합', () => {
     expect(out.plan.intent.knownTaskTypes).toEqual(['drug_info.search']);
     expect(ds.calls[0].params).toEqual([ME, 'healthkr', ASSISTANT_MEMORY_TASK_TYPE_LIMIT]);
     expect(JSON.stringify(ds.calls)).not.toContain('SENTINEL_RAW_TEXT');
-    expect(JSON.stringify(intent)).not.toContain('SENTINEL_RAW_TEXT');
+    // 업무 이해(메모리 전용 · 요청 파생)를 뺀 실행 지시 구조 칸에는 원문이 없다.
+    const { understanding: _u, ...structural } = intent;
+    expect(JSON.stringify(structural)).not.toContain('SENTINEL_RAW_TEXT');
   });
 
   it('ORGANIZATION Task 는 조직 기억을 쓴다 — 소유 범위는 기억의 경계일 뿐 절차가 아니다', async () => {

@@ -61,7 +61,8 @@ import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tool
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
-import type { ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
+import { createLlmCompletionVerifier, createLlmTaskUnderstander } from '../services/assistant/assistant-understanding.js';
+import type { CompletionJudge, ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
 import {
   selectToolInvocationForRequest,
   executeAiTool,
@@ -277,7 +278,12 @@ interface RouteReply {
   execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-async function performWorkAgentRun(userId: string, body: Record<string, unknown>, intent?: ExecutionIntent): Promise<RouteReply> {
+async function performWorkAgentRun(
+  userId: string,
+  body: Record<string, unknown>,
+  intent?: ExecutionIntent,
+  judge?: CompletionJudge,
+): Promise<RouteReply> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -321,6 +327,8 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
       // Personal Assistant Phase B — Assistant Planning 의 실행 지시(구조만). /work-agent/run 직접 호출에는 없다.
       ...(intent ? { intent } : {}),
+      // Task Understanding — 완료 주장은 Assistant 판정기로(조건 ↔ 근거). 직접 /work-agent/run 에는 없다(종전 판정).
+      ...(judge ? { judge } : {}),
     },
     plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
@@ -2298,6 +2306,8 @@ router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: R
       AppDataSource,
       { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
       performWorkAgentRun,
+      // 실행 전 업무 이해 · 완료 의미 검증 — 기존 provider abstraction(같은 provider · 키). 실패하면 결정적 기본 이해 · 검증 생략.
+      { understand: createLlmTaskUnderstander(AppDataSource), verify: createLlmCompletionVerifier(AppDataSource) },
     );
     if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);
     return res.json({

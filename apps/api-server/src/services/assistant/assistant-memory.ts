@@ -10,13 +10,16 @@
  *
  *   종류                 위치     읽기                                   쓰기
  *   task_type_history    Cloud    같은 소유 주체 · 같은 대상의 업무 유형    (assistant_tasks 갱신으로)
- *   procedural_memory    Cloud    같은 소유 주체 · 같은 공개 대상의 검증 방법  이번 run 의 구조화 도움 · 교정에서 파생된 것만
+ *   procedural_memory    Cloud    요청자 개인 · 같은 공개 대상의 검증 방법    이번 run 의 구조화 도움 · 교정에서 파생된 것만(요청자 개인)
  *   run_resume_frame     Cloud    재개하는 본인 run 의 원래 업무 구조         질문으로 멈추면 저장 · 그 밖 종결이면 삭제
  *   그 밖                노드     Execution 이 그 노드에서 현재 화면과 함께 읽는다
  *
  * 경계
  *   - 소유 주체 밖은 읽지도 쓰지도 않는다: USER Task → 요청자 본인 · ORGANIZATION Task → membership 으로 확정된 그 조직.
  *     다른 사용자 · 다른 조직의 기억은 이 경로로 오지 않는다(Shared 는 §10 경로 — 미구현).
+ *   - P3(WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1): 방법 기억은 개인 교정 · 선호 · 회피에서 나오므로
+ *     ORGANIZATION Task 여도 요청자 개인 기억으로만 읽고 쓴다 — 개인 규칙을 조직 실행 규칙으로 자동 승격하지 않는다.
+ *     조직 공통 규칙은 명시적 조직 정책으로만 다룬다(채널 미구현 — Known Gap). 기존 조직 소유 행은 더 읽지도 쓰지도 않는다.
  *   - 구조만: 업무 키 · stage · op 목록(검증 label) · slot 종류. 절차를 정하지 않는다 — Execution 이 현재 화면으로 다시 검증한다(P3).
  *   - 사설 대상(Windows 앱 등)의 방법은 Cloud 에 두지 않는다(정책 §2-6 · M9).
  *   - 모든 Cloud 기억 접근은 `decideCloudPlacement` 를 먼저 통과한다.
@@ -100,6 +103,11 @@ async function readTaskTypeHistory(dataSource: DataSource, q: AssistantMemoryQue
   return (rows ?? []).map((r) => r.task_type_key).filter((k) => typeof k === 'string' && TASK_KEY_RE.test(k));
 }
 
+/** P3 — 방법 기억의 소유 주체는 언제나 요청자 개인이다(Task 소유 범위와 무관). */
+function personalMemoryOwner(userId: string) {
+  return memoryOwnerOf(userId, { scope: 'USER', organizationId: null, serviceKey: null });
+}
+
 /** 한 출처를 읽는다 — 실패는 빈 값 + READ_FAILED(업무를 막지 않는다). */
 async function readSource<T>(kind: MemoryKind, empty: T, read: () => Promise<T>, sources: MemorySourceReport[]): Promise<T> {
   try {
@@ -116,7 +124,8 @@ async function readSource<T>(kind: MemoryKind, empty: T, read: () => Promise<T>,
 export async function recallAssistantMemory(dataSource: DataSource, q: AssistantMemoryQuery): Promise<AssistantMemory> {
   const sources: MemorySourceReport[] = [];
   const hasTarget = !!q.targetId && TARGET_ID_RE.test(q.targetId);
-  const owner = memoryOwnerOf(q.userId, q.ownership);
+  // P3 — 검증된 방법(개인 교정 · 선호 · 회피에서 온다)은 요청자 개인 기억에서만 읽는다. 조직 Task 여도 같다.
+  const owner = personalMemoryOwner(q.userId);
 
   // ── 업무 유형 이력 ──
   let knownTaskTypes: string[] = [];
@@ -176,7 +185,9 @@ export interface RememberOutcome {
 export async function rememberExecution(dataSource: DataSource, input: RememberInput): Promise<RememberOutcome> {
   const out: RememberOutcome = { patternsWritten: 0, failedRecorded: false, frame: 'none' };
   const m = input.memory;
-  const owner = memoryOwnerOf(input.userId, input.ownership);
+  // P3 — 검증된 방법 · 실패 대안은 요청자 개인 기억으로만 쓴다. 개인의 Correction/Preferred/Avoid 를 조직 기억으로 자동 승격하지 않는다
+  // (조직 공통 규칙은 명시적 조직 정책으로만 — 아직 채널 없음).
+  const owner = personalMemoryOwner(input.userId);
 
   if (m && owner && m.targetId && m.taskKey && isCloudProceduralTarget(m.targetKind) && decideCloudPlacement('procedural_memory').ok) {
     try {

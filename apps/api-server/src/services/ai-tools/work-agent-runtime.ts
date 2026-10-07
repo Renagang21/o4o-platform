@@ -51,6 +51,11 @@ import {
   sameWorkAction,
   validateWorkImageInput,
   validateWorkProposal,
+  normalizeEvidenceText,
+  type CompletionJudge,
+  type CompletionVerdict,
+  type ExecutionEvidence,
+  type WorkProposal,
   type ProposalRejectReason,
   type TakeoverReason,
   type WorkAgentState,
@@ -209,6 +214,8 @@ function resumeRejectMessage(reason: ResumeRejectReason): string {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const NAVIGATION_SETTLE_MS = 700;
 const READ_SUMMARY_MAX = 600;
+/** 완료 근거 대조용으로 기억하는 화면 글 묶음 수(읽기 결과 · 관찰 요소). 메모리 전용. */
+const SEEN_TEXT_MAX = 40;
 
 // ─── Planner 인터페이스 (§8) ────────────────────────────────────────────────
 
@@ -245,6 +252,8 @@ export interface PlannerInput {
    * 화면 행동만 정한다. 업무 완료 판정은 Assistant 가 실행 근거로 한다(V2 §2-1).
    */
   intent?: ExecutionIntent;
+  /** Assistant 가 직전 완료 보고를 "아직" 으로 판정한 이유(조건 id · 조건 문장 기반 안내). */
+  assistantFeedback?: { unmet: string[]; note: string };
 }
 
 export interface WorkPlanner {
@@ -271,7 +280,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '- visual_type: (시각 모드에서만) {"text"} 현재 포커스된 입력 위치에 짧은 텍스트를 넣는다(비밀번호·인증번호·명령어 금지).',
   '- visual_key: (시각 모드에서만) {"key"} ENTER · TAB · ESC 하나를 보낸다.',
   '- takeover: {"reason"} 사용자에게 화면을 넘긴다. reason 은 goal_sufficiently_advanced · user_judgment_required · ambiguous_result · unsupported_control · review_required · commit_required · credential_required 중 하나.',
-  '- done: 목적이 요구하는 결과 화면에 이미 닿았다(실행 결과의 주장 — 업무 완료 판정은 Assistant 가 실행 근거로 한다).',
+  '- done: 목적이 요구하는 결과 화면에 이미 닿았다(실행 결과의 주장 — 업무 완료 판정은 Assistant 가 실행 근거로 한다). 실행 지시에 완료조건(c1..)이 있으면 "evidence" 를 함께 낸다.',
   '',
   '시각 모드(Visual Computer Use):',
   '- UIA 가 화면 요소를 노출하지 못할 때만 runtime 이 캡처 이미지를 함께 준다("현재 화면 이미지" 표시). 그때만 visual_click/visual_type/visual_key 를 쓸 수 있다.',
@@ -286,7 +295,8 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '규칙:',
   '- elementRef 는 관찰 목록에 있는 것만 쓴다. URL · CSS selector · XPath · JavaScript · 명령어 · 좌표는 절대 쓰지 않는다.',
   '- 로그인 · 비밀번호 · 인증번호 · 결제 · 주문 확정 · 삭제 · 게시(COMMIT 표시) 는 하지 않는다 → takeover(credential_required 또는 commit_required).',
-  '- 목적이 요구하는 정보 · 화면에 실제로 닿았을 때 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 목적이 목록의 한 항목 안 내용(상세 · 하위 탭의 정보)을 요구하면 목록에서 멈추지 말고 그 항목을 열어 이어간다. 어느 항목인지 사용자만 정할 수 있으면 그때 묻는다(target_confirmation).',
+  '- 실행 지시에 "완료조건" 이 있으면: 끝났는지 스스로 판정하지 않는다. 조건을 확인할 화면 글을 읽은 뒤(read_text · read_table 또는 관찰 목록) done 을 내고 "evidence":[{"criterion":"c1","source":"read|screen","quote":"화면에 보인 글 그대로(짧게)"}] 로 조건마다 근거를 보고한다. 근거 인용은 실제로 본 글만 — 지어내거나 입력한 값을 인용하지 않는다. "사용자 확인" 조건은 화면으로 확인할 수 없으니 근거를 내지 않는다. 아직이면 Assistant 가 "Assistant 판정" 으로 이유를 돌려준다.',
+  '- (완료조건이 없을 때) 목적이 요구하는 정보 · 화면에 실제로 닿았을 때 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 목적이 목록의 한 항목 안 내용(상세 · 하위 탭의 정보)을 요구하면 목록에서 멈추지 말고 그 항목을 열어 이어간다. 어느 항목인지 사용자만 정할 수 있으면 그때 묻는다(target_confirmation).',
   '- 질문 이유를 구분한다. ① 정보가 없다(값 · 대상을 사용자만 안다) → 바로 묻는다(value_confirmation · target_confirmation). ② 사용자가 결정해야 한다(로그인 · 인증번호 · 결제 · 제출 · 서명 · 본질적 선택 · 결과 확인) → 바로 넘긴다(credential_required · commit_required · success_confirmation). ③ 방법을 모른다(어디를 눌러야 하는지 · 메뉴 위치 · 절차) → 묻기 전에 직접 찾는다.',
   '- 방법을 모른다는 이유만으로 사용자에게 넘기지 않는다. 관찰 목록의 링크 · 버튼(스크립트로 눌리는 표 칸 · 목록 행도 button 으로 보인다) · 탭 · 목록 항목 · 표를 업무 의미로 살피고, find · read_text · read_table 로 확인한 뒤 맞는 항목을 열어 본다. 그래도 방법을 찾지 못할 때만 ask.kind=menu_location · procedure_order · manual_request 로 묻는다.',
   '- 후보가 보인다는 이유만으로 누르지 않는다 — 목적에 맞는 항목인지 이름 · 텍스트로 판단한 뒤 행동한다. 같은 행동을 반복하지 않는다.',
@@ -301,7 +311,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '- "stage": 지금 단계의 키(snake_case, 예: "find_same_ingredient").',
   '- "strategy": 이 단계에서 쓰는 방법 {"ops":[{"op":"search|open_detail|open_tab|open_menu|select_filter|read_result|extract_field|re_search|return_to_list|compare","label"?:"화면의 탭·메뉴·필터 이름"}]}. label 은 open_tab·open_menu·select_filter 에만, 화면에 보이는 이름만 쓴다(입력값 금지).',
   '- 사용자에게 물을 때(takeover user_judgment_required) "ask":{"kind":"value_confirmation|target_confirmation|menu_location|procedure_order|manual_request|success_confirmation","slots":["drug_name"]} 로 무엇을 묻는지 적는다.',
-  '- 결과가 목적에 맞는지 확신이 없으면 끝내지 말고 takeover(user_judgment_required) + ask.kind=success_confirmation 로 확인을 받는다.',
+  '- (완료조건이 없을 때) 결과가 목적에 맞는지 확신이 없으면 끝내지 말고 takeover(user_judgment_required) + ask.kind=success_confirmation 로 확인을 받는다.',
   '- "확인된 방법(Preferred)" 이 있으면 그 단계에서 먼저 쓴다. "피할 방법(Avoid)" 은 그 단계에서 쓰지 않는다(쓰면 runtime 이 거절한다).',
   '- "사용자 답변" 이 있으면 새 목적이 아니다 — "원래 업무" 를 같은 대상에서 이어간다. 그리고 답변을 분류해 "userInput" 에 적는다:',
   '  {"kind":"assistance|correction","askKind":"…ask kind…","providedKind":"value|target|path|procedure|document|confirmation|takeover|correction","correctionType":"task_intent|target|procedure_method|outcome","stage":"…","reason":"inaccurate_results|site_feature_exists|wrong_target|wrong_intent|inefficient|incomplete_result|other","wrong":{"ops":[…]},"alternative":{"ops":[…]},"reusability":"reusable_knowledge|per_run_value|personal_preference|not_reusable"}',
@@ -311,7 +321,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '  · "나는 보통 ~ 를 써" 같은 개인 선호 → reusability=personal_preference.',
   '- 사용자 목적 문장 안에 방법 지시("~ 말고 ~ 로")가 있으면 같은 방식으로 userInput 에 분류한다.',
   '',
-  '출력(JSON 만): {"assessment":"progress|no_progress|needs_user|completed","action":{"kind":"...", ...},"actions":[…선택, 배치일 때만…],"rationale":"짧게","neededInput":"필요할 때만","task"?:"…","stage"?:"…","strategy"?:{"ops":[…]},"ask"?:{…},"userInput"?:{…}}',
+  '출력(JSON 만): {"assessment":"progress|no_progress|needs_user|completed","action":{"kind":"...", ...},"actions":[…선택, 배치일 때만…],"rationale":"짧게","neededInput":"필요할 때만","task"?:"…","stage"?:"…","strategy"?:{"ops":[…]},"ask"?:{…},"userInput"?:{…},"evidence"?:[{"criterion":"c1","source":"read|screen","quote":"…"}]}',
 ].join('\n');
 
 /**
@@ -322,14 +332,31 @@ export function describeExecutionIntent(intent: ExecutionIntent): string {
   const start = intent.startMode === 'resume' ? '원래 업무를 이어간다(재개)' : '현재 화면에서 방법을 찾으며 시작한다(Discovery)';
   const own = intent.evidence.find((e) => e.source === 'own_experience');
   const shared = intent.evidence.find((e) => e.source === 'shared_candidate');
-  return [
+  const u = intent.understanding;
+  const lines = [
     '## 실행 지시 (Assistant · 구조)',
     `- 시작: ${start}`,
     intent.taskTypeHint ? `- 이어가는 업무 키: ${intent.taskTypeHint} (같은 업무면 이 키를 task 로 쓴다 — 절차를 고정하는 키가 아니다)` : '',
     `- 근거: ${own?.available ? '이 사용자의 확인된 방법이 있으면 먼저 쓰되 현재 화면으로 다시 확인한다' : '이 사용자의 확인된 방법 없음'}${shared?.available ? ' · 다른 사용자 후보는 참고만(강제 아님)' : ''}`,
-    '- 끝: 목적이 요구하는 결과가 화면에 실제로 보이면 멈추고 넘긴다. 업무가 끝났는지는 Assistant 가 실행 근거로 판정한다.',
+    u
+      ? '- 끝: 완료조건을 확인할 화면 글을 읽었으면 done + evidence 로 보고한다. 끝났는지는 Assistant 가 완료조건과 근거를 비교해 판정한다.'
+      : '- 끝: 목적이 요구하는 결과가 화면에 실제로 보이면 멈추고 넘긴다. 업무가 끝났는지는 Assistant 가 실행 근거로 판정한다.',
     '- 확정 · 결제 · 인증은 언제나 사용자(takeover).',
-  ].filter(Boolean).join('\n');
+  ].filter(Boolean);
+  if (u) {
+    // 업무 이해(Assistant · 실행 전) — 요청에서 세운 목표 · 완료조건. 사이트 · 업무별 고정 절차가 아니다(P3).
+    const OUTCOME_LABEL = { information: '정보 확인', screen: '화면 도달', change: '변경(확정은 사용자)' } as const;
+    lines.push(
+      '',
+      '## 업무 이해 (Assistant · 실행 전)',
+      `- 원하는 결과: ${u.goal} (${OUTCOME_LABEL[u.outcome] ?? u.outcome})`,
+      '- 완료조건(모두 근거가 있어야 끝난다 — 판정은 Assistant):',
+      ...u.criteria.map((c) => `  · ${c.id}: ${c.text}${c.evidence === 'user' ? ' [사용자 확인 — 화면 근거 불필요]' : ''}`),
+    );
+    if (u.missing.length) lines.push(`- 요청에 없는 정보: ${u.missing.map((m) => `${m.slot}(${m.question})`).join(' · ')} — 화면에서도 정할 수 없으면 그때 ask.kind=value_confirmation 으로 묻는다(지어내지 않는다).`);
+    if (u.commitBoundary) lines.push('- 최종 제출 · 저장 · 결제는 하지 않는다 — 그 직전까지 하고 takeover(commit_required).');
+  }
+  return lines.join('\n');
 }
 
 export function buildPlannerUserPrompt(input: PlannerInput): string {
@@ -353,6 +380,10 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
   }
   lines.push(`## 대상 사이트\n${input.siteDisplayName} (등록됨) · 현재 경로 ${obs.path} · 준비 ${obs.ready ? '됨' : '안 됨'} · 남은 행동 ${input.stepsLeft}`);
   if (input.intent) lines.push(describeExecutionIntent(input.intent));
+  if (input.assistantFeedback) {
+    // Assistant 판정 — 직전 done 이 완료조건을 다 채우지 못했다. 조건 id · 조건 문장 기반 안내뿐(화면 글 없음).
+    lines.push(`## Assistant 판정 (직전 완료 보고 · 아직 끝나지 않음)\n미충족: ${input.assistantFeedback.unmet.join(', ')}\n${input.assistantFeedback.note}\n(그 조건을 확인할 화면 글을 찾아 읽은 뒤 다시 done + evidence 로 보고한다. 찾을 수 없으면 takeover(user_judgment_required) + ask.kind=success_confirmation.)`);
+  }
   if (input.knownTaskKeys && input.knownTaskKeys.length) lines.push(`## 이 대상에서 확인된 업무 키\n${input.knownTaskKeys.join(', ')}`);
   if (input.patterns && input.patterns.length) {
     const pref = input.patterns.filter((p) => p.polarity === 'preferred').map((p) => `- [${p.stageKey}] ${describeStrategy(p.strategy)} (확인 ${p.verifiedCount}회)`);
@@ -592,6 +623,11 @@ export interface WorkAgentRunInput {
   runId?: string;
   /** Personal Assistant Phase B — Assistant Planning 의 실행 지시. 없으면 종전 동작(지시 없이 실행). */
   intent?: ExecutionIntent;
+  /**
+   * Task Understanding — Execution 이 완료를 주장할 때(done · goal_sufficiently_advanced) Assistant 에 판정을 묻는 hook.
+   * 있으면 완료는 Assistant 가 완료조건과 근거를 비교해 정하고, 없으면(직접 /work-agent/run) 종전 판정 그대로다.
+   */
+  judge?: CompletionJudge;
 }
 
 /** runWorkAgent 선택 의존성. strongPlanner 는 복구 계층의 "더 강한 추론" 경로(§11·§12) — 없으면 escalation 없이 기존대로 동작한다. */
@@ -694,6 +730,12 @@ export async function runWorkAgent(
    * 그 노드 원장은 소유 주체를 구분하지 못한다(V2 §23 — 에이전트 업데이트로 해소). 기능을 끄지 않는다(회귀 금지).
    */
   let ledgerOwner: string | null = null;
+  /**
+   * P3 — 개인 교정 · 선호 · 회피(assistance)와 그것에서 나온 방법 패턴은 **요청자 개인** 원장에 둔다
+   * (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1). 조직 Task 여도 한 사람의 Correction/Preferred/Avoid 가
+   * 조직 전체 실행 규칙이 되지 않는다. run · 경험 · 후보 · 업무 키 목록은 Task 소유 원장 그대로다. 개인 Task 면 두 키가 같다.
+   */
+  const personalLedgerOwner = (): string | null => (ledgerOwner ? nodeLedgerOwnerKey('USER', ctx.userId) : null);
   let neededInput: string | null = null;
   let sameObservationRun = 0;
   let repeatedActionRun = 0;
@@ -761,6 +803,22 @@ export async function runWorkAgent(
   let declaredStage: string | null = null;
   let declaredStrategy: Strategy | null = null;
   let declaredAsk: ProposalAsk | null = null;
+  // Task Understanding — 완료 근거 대조용 "이번 run 에서 실제 본 화면 글"(메모리 전용 · 상한) · 판정 결과.
+  const seenTexts: string[] = [];
+  const noteSeen = (text: string | null | undefined): void => {
+    const t = normalizeEvidenceText(String(text ?? ''));
+    if (!t) return;
+    seenTexts.push(t);
+    if (seenTexts.length > SEEN_TEXT_MAX) seenTexts.shift();
+  };
+  const noteObservationSeen = (o: WorkObservation | null): void => {
+    if (!o) return;
+    noteSeen((o.elements ?? []).map((e) => `${e.name ?? ''} ${e.text ?? ''}`).join('\n'));
+  };
+  let lastEvidence: ExecutionEvidence[] = [];
+  let lastVerdict: CompletionVerdict | null = null;
+  let assistantFeedback: PlannerInput['assistantFeedback'] = undefined;
+  const runT0 = Date.now();
   /** Planner 가 분류한 사용자 입력(재개 답변 · 요청 안 방법 지시) — 첫 분류를 쓴다. */
   let userInput: ProposalUserInput | null = null;
   /** 재생 전 의미 검증이 멈춘 자리 — 재개 답이 값이면 그 자리만 채워 결정적으로 잇는다. */
@@ -1019,7 +1077,7 @@ export async function runWorkAgent(
       };
       if (isCorrection) state.userCorrectionCount = (state.userCorrectionCount ?? 0) + 1;
       lastAssistanceEvent = event;
-      const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
+      const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId, ownerKey: personalLedgerOwner() }, {
         runId: goal.runId, targetId: siteId, taskKey: declaredTask ?? resumeFrame?.taskKey ?? null, event,
       });
       logger.info('work-agent assistance', {
@@ -1078,6 +1136,10 @@ export async function runWorkAgent(
           && (h.navigated === true || h.action.kind === 'read_text' || h.action.kind === 'read_table')),
         replayVerified: workflow.replay === 'completed',
         plannerMode,
+        // Task Understanding — 완료조건별 근거(메모리 전용 — 로그 · 저장 금지) · Assistant 판정 · 실행 비용.
+        evidence: lastEvidence,
+        verdict: lastVerdict,
+        metrics: { aiCalls, aiMs, roundTrips, stepCount: state.stepCount, totalMs: Date.now() - runT0 },
         taskTypeProposal: declaredTask ?? resumeFrame?.taskKey ?? null,
         // Cloud Continuity — 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다.
         memory: runCreated ? {
@@ -1294,7 +1356,9 @@ export async function runWorkAgent(
     let nodePatterns: RecalledPattern[] = [];
     // Phase D — 소유 주체 원장 노드면 ledgerCtx.ownerKey 로 이 소유 주체의 기억만 돌아온다.
     try {
-      const r = await issueExperienceRecall(dataSource, ledgerCtx, { targetId: siteId, taskKey });
+      // 업무 키 목록은 Task 소유 원장, 그 업무의 방법 패턴(개인 교정에서 나온다)은 요청자 개인 원장(P3).
+      const recallCtx = taskKey === null ? ledgerCtx : { ...ledgerCtx, ownerKey: personalLedgerOwner() };
+      const r = await issueExperienceRecall(dataSource, recallCtx, { targetId: siteId, taskKey });
       if (r.status === 'success') {
         const safe = pickSafeExperienceRecall(r.safe);
         if (taskKey === null) knownTaskKeys = safe.taskKeys ?? [];
@@ -1837,6 +1901,52 @@ export async function runWorkAgent(
     if (r) return r;
   }
 
+  /**
+   * Task Understanding — Execution 의 완료 주장(done · goal_sufficiently_advanced)을 Assistant 판정에 넘긴다.
+   *   근거 인용은 이번 run 에서 실제 본 화면 글(읽기 결과 · 관찰 요소)에 있어야 grounded 다 — 입력한 값만으로는 근거가 아니다.
+   *   complete → 완료로 끝낸다 · continue → 미충족 안내를 planner 에 돌려주고 루프를 잇는다(null) · ask → 사용자에게 묻는다(QUESTION).
+   *   판정 hook 이 실패하면 종전 판정으로 끝낸다(회귀 금지) — 로그만 남긴다.
+   */
+  const judgeCompletion = async (proposal: WorkProposal, via: 'done' | 'goal_sufficiently_advanced'): Promise<WorkAgentRunResult | null> => {
+    noteObservationSeen(state.observation);
+    const typed = new Set(state.history.flatMap((h) => [h.action.text, h.action.option]).filter((v): v is string => typeof v === 'string').map(normalizeEvidenceText));
+    const evidence: ExecutionEvidence[] = (proposal.evidence ?? []).map((e) => {
+      const q = normalizeEvidenceText(e.quote);
+      const grounded = q.length > 0 && !typed.has(q) && seenTexts.some((t) => t.includes(q));
+      return { criterionId: e.criterion, source: e.source, quote: e.quote, grounded };
+    });
+    lastEvidence = evidence;
+    let verdict: CompletionVerdict | null = null;
+    try {
+      verdict = await (input.judge as CompletionJudge)({ evidence, via });
+    } catch (e) {
+      logger.warn('work-agent completion judge failed', { code: (e as { code?: string })?.code ?? null });
+    }
+    lastVerdict = verdict;
+    const legacy = (): Promise<WorkAgentRunResult> => {
+      markRecovered();
+      if (via === 'goal_sufficiently_advanced') { plannerTakeover = true; return takeover('goal_sufficiently_advanced', 'completed'); }
+      state.progress = 'completed';
+      return finish();
+    };
+    // 판정 없음(판정기 실패) → 종전 경로 그대로. 판정이 complete 면 Assistant 가 완료조건 충족을 확인한 것이므로
+    // 어느 경로(done · goal_sufficiently_advanced)로 왔든 실행 완료로 보고한다 — 끝났는지는 Assistant 판정이 정한다.
+    if (!verdict) return legacy();
+    if (verdict.decision === 'complete') {
+      markRecovered();
+      state.progress = 'completed';
+      return finish();
+    }
+    if (verdict.decision === 'continue') {
+      assistantFeedback = { unmet: verdict.unmet.slice(0, 4), note: String(verdict.note ?? '').slice(0, 300) };
+      lastRejectReason = undefined;
+      return null;
+    }
+    declaredAsk = { kind: verdict.askKind ?? 'success_confirmation', slots: [] };
+    plannerTakeover = true;
+    return question('user_judgment_required');
+  };
+
   // ── loop ──────────────────────────────────────────────────────────────────
   // B — 새 업무 · 경험 없음 · 재생 불일치 · 교정 직후는 Discovery 역할로 시작한다. 검증 경험이 있으면 Experienced.
   refreshPlannerMode('start');
@@ -1850,6 +1960,7 @@ export async function runWorkAgent(
 
     // Plan (§8)
     let raw: unknown;
+    noteObservationSeen(state.observation);
     state.aiPlanCount += 1;
     const planT0 = Date.now();
     aiCalls += 1;
@@ -1865,8 +1976,10 @@ export async function runWorkAgent(
         ...(patterns.length ? { patterns } : {}),
         ...(methodDiscovery ? { methodDiscovery } : {}),
         ...(input.intent ? { intent: input.intent } : {}),
+        ...(assistantFeedback ? { assistantFeedback } : {}),
       });
       methodDiscovery = undefined;
+      assistantFeedback = undefined;
       aiMs += Date.now() - planT0;
     } catch {
       aiMs += Date.now() - planT0;
@@ -1953,11 +2066,22 @@ export async function runWorkAgent(
         const v = await enterVisualFallback();
         if (v.ok) { lastRejectReason = undefined; continue; }
       }
+      if (reason === 'goal_sufficiently_advanced' && input.judge) {
+        const judged = await judgeCompletion(proposal, 'goal_sufficiently_advanced');
+        if (judged) return judged;
+        continue;
+      }
       if (reason === 'goal_sufficiently_advanced') markRecovered();
       plannerTakeover = true;
       return takeover(reason, reason === 'goal_sufficiently_advanced' ? 'completed' : 'needs_user');
     }
     if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
+      // Task Understanding — 실행의 완료 주장일 뿐이다. judge 가 있으면 Assistant 가 완료조건과 근거로 판정한다.
+      if (input.judge) {
+        const judged = await judgeCompletion(proposal, 'done');
+        if (judged) return judged;
+        continue;
+      }
       state.progress = 'completed';
       markRecovered();
       return finish();
@@ -2005,6 +2129,7 @@ export async function runWorkAgent(
         return true;
       });
       lastRead = matches.length ? matches.slice(0, 20).map(describeObservationElement).join('\n') : '(일치하는 요소 없음)';
+      noteSeen(lastRead);
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
@@ -2014,6 +2139,7 @@ export async function runWorkAgent(
     if (surface === 'uia' && a.kind === 'read_text') {
       const el = (state.observation?.elements ?? []).find((e) => e.elementRef === a.elementRef);
       lastRead = String(el?.text ?? el?.name ?? '').slice(0, READ_SUMMARY_MAX);
+      noteSeen(lastRead);
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
@@ -2054,11 +2180,13 @@ export async function runWorkAgent(
       }
       if (a.kind === 'read_text') {
         lastRead = String(outcome.safe.text ?? '').slice(0, READ_SUMMARY_MAX);
+        noteSeen(lastRead);
         continue;
       }
       const columns = (Array.isArray(outcome.safe.columns) ? outcome.safe.columns : []) as string[];
       const rows = (Array.isArray(outcome.safe.rows) ? outcome.safe.rows : []) as string[][];
       lastRead = [columns.join(' | '), ...rows.slice(0, 8).map((r) => r.join(' | '))].join('\n').slice(0, READ_SUMMARY_MAX) + (rows.length > 8 ? `\n… (전체 ${rows.length}행)` : '');
+      noteSeen(lastRead);
       continue;
     }
 

@@ -291,6 +291,47 @@ export interface WorkProposal {
   ask?: ProposalAsk;
   /** 사용자 입력(재개 답변 · 요청 안의 방법 지시)을 분류한 구조. 원문 없음. */
   userInput?: ProposalUserInput;
+  /**
+   * 완료 근거(WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1) — 실행 지시에 완료조건(criteria)이 있을 때
+   * planner 가 `done` 과 함께 "어느 조건을 화면의 어떤 글로 확인했는가" 를 보고한다. 완료 판정은 Assistant 가 한다.
+   * 화면 글 인용이 들어가므로 로그 · 저장 대상이 아니다(메모리 안에서만 Assistant 로 전달).
+   */
+  evidence?: ProposalEvidence[];
+}
+
+export interface ProposalEvidence {
+  /** 실행 지시의 완료조건 id(c1..c4). */
+  criterion: string;
+  /** read = read_text/read_table 결과 · screen = 관찰(요소 이름 · 화면 글). */
+  source: 'read' | 'screen';
+  /** 화면에서 그대로 옮긴 짧은 인용(≤ EVIDENCE_QUOTE_MAX). runtime 이 이번 run 에서 실제 본 글인지 대조한다. */
+  quote: string;
+}
+
+export const EVIDENCE_QUOTE_MAX = 120;
+export const EVIDENCE_ITEMS_MAX = 4;
+const CRITERION_ID_RE = /^c[1-4]$/;
+
+/** planner 의 evidence 칸 정리 — 형식 밖 항목만 버린다(proposal 거절 사유 아님). */
+export function sanitizeProposalEvidence(raw: unknown): ProposalEvidence[] | null {
+  if (!Array.isArray(raw)) return null;
+  const out: ProposalEvidence[] = [];
+  for (const item of raw.slice(0, EVIDENCE_ITEMS_MAX * 2)) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
+    const it = item as Record<string, unknown>;
+    if (typeof it.criterion !== 'string' || !CRITERION_ID_RE.test(it.criterion)) continue;
+    if (typeof it.quote !== 'string' || it.quote.trim().length === 0) continue;
+    if (it.source !== 'read' && it.source !== 'screen') continue;
+    const source: ProposalEvidence['source'] = it.source;
+    out.push({ criterion: it.criterion, source, quote: it.quote.trim().slice(0, EVIDENCE_QUOTE_MAX) });
+    if (out.length >= EVIDENCE_ITEMS_MAX) break;
+  }
+  return out.length ? out : null;
+}
+
+/** 근거 대조용 정규화 — 공백 제거 · 소문자. */
+export function normalizeEvidenceText(v: string): string {
+  return String(v ?? '').replace(/\s+/g, '').toLowerCase();
 }
 
 export type ProposalRejectReason =
@@ -530,6 +571,8 @@ export function validateWorkProposal(
   if (ask) out.ask = ask;
   const userInput = sanitizeUserInput(r.userInput, forbidden);
   if (userInput) out.userInput = userInput;
+  const evidence = sanitizeProposalEvidence(r.evidence);
+  if (evidence) out.evidence = evidence;
   return { ok: true, proposal: out };
 }
 
@@ -707,11 +750,83 @@ export interface PlanningEvidence {
 
 /** 완료 계약(V2 §4-3) — 실행 검증 기준이지 KPI 가 아니다. */
 export interface CompletionContract {
-  /** 이 업무가 끝났다고 보려면 Execution 이 남겨야 하는 근거의 종류. */
-  requires: 'result_observed';
-  /** 사용자가 이어서 끝낸 것(USER_COMPLETED) · 부분 완료는 정상 결과다. */
+  /**
+   * 이 업무가 끝났다고 보려면 무엇이 있어야 하는가.
+   *   criteria_evidence  Assistant 가 실행 전에 세운 완료조건(understanding.criteria)마다 근거가 있어야 한다 — 판정은 Assistant.
+   *   result_observed    (이해가 없을 때의 하위호환) 결과 화면에 닿았다는 실행 근거.
+   */
+  requires: 'criteria_evidence' | 'result_observed';
+  /** 사용자가 이어서 끝낸 것(USER_COMPLETED) · 사용자의 "됐다" 선언 · 부분 완료는 정상 결과다. */
   acceptsUserCompletion: true;
 }
+
+// ─── Task Understanding (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1) ─────────
+//
+//   "무엇을 해야 하는지와 언제 업무가 끝났는지는 Execution Runtime 이 아니라 Personal Assistant 가 책임진다."
+//   Assistant 는 실행 전에 요청에서 목표 · 결과 형태 · 완료조건 · 부족한 정보를 세우고(TaskUnderstanding),
+//   Execution 은 그 조건을 보고 일한 뒤 결과와 근거(ExecutionEvidence)를 돌려준다. 끝났는지는 Assistant 가 비교해 정한다.
+//
+//   이해는 요청 원문에서 파생한 글을 담으므로 **로그 · DB 저장 대상이 아니다**(V2 §17 원문 미저장). 프로세스 메모리에서만 산다.
+//   사이트별 · 업무별 고정 Workflow 가 아니다 — 매 요청마다 그 요청에서 새로 세운다(P3). 경험 · 후보는 이 조건을 강제하지 않는다.
+
+/** 그 조건을 무엇으로 확인하는가 — observed: 실행이 화면에서 확인 · user: 사용자 확인이 필요(최종 확정 · 주관 판단 등). */
+export type CriterionEvidenceKind = 'observed' | 'user';
+
+export interface CompletionCriterion {
+  /** c1..c4 */
+  id: string;
+  /** 짧은 조건 문장(예: "아모디핀정 5mg 의 성분 정보가 화면에 보인다"). */
+  text: string;
+  evidence: CriterionEvidenceKind;
+}
+
+export interface TaskUnderstanding {
+  version: 1;
+  /** ai = Assistant 이해 호출 · fallback = 결정적 기본 이해(요청 자체가 목표 · 조건 1개). */
+  source: 'ai' | 'fallback';
+  /** 사용자가 원하는 결과(한 문장). */
+  goal: string;
+  /** 결과 형태 — 정보 확인 · 화면 도달 · 변경(입력/등록 등 — 확정은 사용자). */
+  outcome: 'information' | 'screen' | 'change';
+  criteria: CompletionCriterion[];
+  /** 요청에 없고 화면에서도 정할 수 없는 정보 — 실행 중 필요하면 그때 묻는다(미리 막지 않는다). */
+  missing: { slot: string; question: string }[];
+  /** 최종 제출 · 저장 · 결제 같은 확정 단계가 목표에 들어 있는가(있어도 확정은 언제나 사용자). */
+  commitBoundary: boolean;
+}
+
+/** Execution 이 완료조건별로 돌려준 근거. grounded = 인용이 이번 run 에서 실제 읽은 화면 글에 있었는가. */
+export interface ExecutionEvidence {
+  criterionId: string;
+  source: 'read' | 'screen';
+  quote: string;
+  grounded: boolean;
+}
+
+/** Execution 의 실행 비용 계측(조회 비교용 — 별도 분석 플랫폼 없음). */
+export interface ExecutionMetrics {
+  /** 이번 호출의 planner AI 호출 수 · 누적 시간. */
+  aiCalls: number;
+  aiMs: number;
+  /** 실행 노드 왕복(명령) 수. */
+  roundTrips: number;
+  stepCount: number;
+  totalMs: number;
+}
+
+/** Assistant 의 완료 판정. continue = 아직 조건 미충족 → 이유를 실행에 돌려준다 · ask = 사용자에게 묻는다. */
+export interface CompletionVerdict {
+  decision: 'complete' | 'continue' | 'ask';
+  met: string[];
+  unmet: string[];
+  /** continue 일 때 planner 에 돌려줄 짧은 안내(조건 문장 기반 — 화면 글 없음). */
+  note?: string;
+  /** ask 일 때 질문 종류. */
+  askKind?: 'success_confirmation' | 'value_confirmation';
+}
+
+/** Execution 이 완료를 주장할 때 Assistant 에 묻는 판정 hook. 없으면(직접 /work-agent/run) 종전 판정 그대로. */
+export type CompletionJudge = (claim: { evidence: ExecutionEvidence[]; via: 'done' | 'goal_sufficiently_advanced' }) => Promise<CompletionVerdict>;
 
 export interface ExecutionIntent {
   version: 1;
@@ -740,6 +855,8 @@ export interface ExecutionIntent {
   node?: { ownerKey: string | null; preferredDeviceIds: readonly string[] };
   evidence: readonly PlanningEvidence[];
   completion: CompletionContract;
+  /** 실행 전 Assistant 의 업무 이해(목표 · 완료조건). 메모리 전용 — 로그 · 저장 금지. 없으면 종전(result_observed) 계약. */
+  understanding?: TaskUnderstanding;
   /** 승인 경계(V2 §15). 최종 확정 · 결제 · 인증은 언제나 사용자. */
   approval: { commit: 'user_only'; credential: 'user_only' };
 }
@@ -761,6 +878,12 @@ export interface ExecutionReport {
   taskTypeProposal: string | null;
   /** Cloud Continuity — 이번 run 이 남긴 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다. */
   memory?: ExecutionMemoryReport;
+  /** 마지막 완료 주장의 근거(완료조건별 인용 · 대조 결과). 메모리 전용 — 로그 · 저장 금지. */
+  evidence?: ExecutionEvidence[];
+  /** Assistant 가 이번 run 의 완료 주장을 판정했으면 그 결과(judge hook 이 있었을 때만). */
+  verdict?: CompletionVerdict | null;
+  /** 실행 비용 계측. */
+  metrics?: ExecutionMetrics;
 }
 
 /**
