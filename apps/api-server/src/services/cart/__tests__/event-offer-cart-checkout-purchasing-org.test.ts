@@ -9,7 +9,7 @@
  *     - B 약국 주문 → 차단(SEMI_FRANCHISE_MEMBERSHIP_REQUIRED) · 재고 차감 · 주문 생성 없음
  *     - 약국 선택 없음 → 임의의 약국을 고르지 않는다(400 AMBIGUOUS) — B2B confirm 과 같은 계약
  *     - 남의 약국 지정 → 403
- *   이벤트 운영 조직(ctx.organizationId)은 구매 약국 판정에 쓰지 않는다. k-cosmetics 는 판정 대상이 아니다.
+ *   이벤트 운영 조직(ctx.organizationId)은 구매 약국 판정에 쓰지 않는다. k-cosmetics 는 퇴역으로 이벤트 장바구니 확정 자체를 지원하지 않는다.
  */
 import { EventOfferCartCheckoutService } from '../event-offer-cart-checkout.service.js';
 import { B2BConfirmError } from '../b2b-checkout-confirm.core.js';
@@ -199,12 +199,14 @@ describe('이벤트 장바구니 확정 — 구매 약국 조직 기준 pharmacy
     expect(sfQueries.flat()).not.toContain('event-operator-org');
   });
 
-  it('k-cosmetics 이벤트는 세미프랜차이즈 판정 대상이 아니다 (조직 확정 · 가입 조회 없음)', async () => {
-    const r = await makeService([eventItem({ serviceKey: 'k-cosmetics' })]).confirm(
-      { buyerId: 'user-1', serviceKey: 'k-cosmetics' },
-      {},
-    );
-    expect(r.createdOrders).toHaveLength(1);
+  // WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1: K-Cosmetics 퇴역 — 이벤트 장바구니 확정 매핑 삭제.
+  //   결제 경로가 없으므로 주문 확정 자체를 받지 않는다(route 에서는 그 전에 410 SERVICE_RETIRED).
+  it('k-cosmetics 이벤트 장바구니 확정은 지원하지 않는다 (퇴역 · 주문 생성 · 가입 조회 없음)', async () => {
+    const err = await makeService([eventItem({ serviceKey: 'k-cosmetics' })])
+      .confirm({ buyerId: 'user-1', serviceKey: 'k-cosmetics' }, {})
+      .catch((e) => e);
+    expect(err.code).toBe('UNSUPPORTED_CART_SERVICE');
+    expect(createOrderCalls).toEqual([]);
     expect(sfQueries).toEqual([]);
   });
 });
