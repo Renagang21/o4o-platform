@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) 배포 · production smoke PASS(§9). 나머지 host 는 미배포 |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -26,7 +26,7 @@
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
-| 운영 배포 | **미배포** | 이 PR 은 merge 전이다. 운영 smoke 는 배포 후에 한다 |
+| 운영 배포 | **부분 배포 (01/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9). pharmacy · study · store · kpa 는 미배포 |
 
 ---
 
@@ -191,3 +191,82 @@ web-neture · web-kpa-society · web-store · web-lecture · web-kpa-branch 의 
 | 3 | kpa-branch index.html 의 고정 og:url(`kpa.neture.co.kr/`)이 분회 slug · 분회 자체 도메인에도 그대로 나간다 | **수정**. 고정 og:url 을 제거하고 이유를 주석으로 남겼다. `publicBrandConsumers.test.ts` 는 kpa-branch 에 og:url 이 없음을 확인한다 |
 
 대응 후 재검증: auth-react 138 · web-neture 334 · web-kpa-society 67 · web-kpa-branch 20 passed. web-neture · web-kpa-society · web-kpa-branch 빌드 exit 0.
+
+---
+
+## 9. Production 배포 01 — web-neture (WO-O4O-PUBLIC-DESIGN-PRODUCTION-DEPLOY-01-NETURE-V1)
+
+> 실행일 2026-10-07. 배포 대상은 `neture-web` Cloud Run service 하나다. 다른 서비스 · API · Admin · DB · migration 은 건드리지 않았다.
+
+### 9-1. 배포 단위
+
+- URL map 에서 `neture.co.kr`(path-matcher-neture-hospital) 과 `supplier` · `community` · `funding.neture.co.kr`(path-matcher-neture) 의 기본 backend 가 모두 `backend-neture-web-http` 다.
+- 따라서 web-neture artifact 1회 배포로 **4 host 가 함께 바뀐다**. "neture 만 화면 변경" 이 아니다. 4 host 를 같은 범위로 smoke 했다.
+- `neture.co.kr/hospital` 은 별도 service(`hospital-pharmacy-web`) 이고 이번 배포에서 바뀌지 않았다.
+
+### 9-2. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| service | `neture-web` (asia-northeast3) |
+| serving revision | `neture-web-01692-pir` · traffic 100% |
+| image | `neture-web:0e283ba10…` · digest `sha256:5bff7260…` |
+| `o4o-commit-sha` | `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` |
+| 배포 gate | `DEPLOY_FREEZE=false` (2026-10-03 부터 유지). WO 의 `DEPLOY_ENABLED` 에 해당하는 현행 변수는 `DEPLOY_FREEZE` 다 |
+
+### 9-3. 후보 census (serving 0e283ba10 → candidate)
+
+- candidate 는 처음 `0d0ff4fdc`(PR #337 merge) 였다. dispatch 직전 main HEAD 가 `6ad3d1263`(PR #343, `docs/investigations/` IR 1개) 로 움직였다. promote 는 SHA == main HEAD 를 요구하므로 **candidate 를 `6ad3d12638bf4915acaf9b26e707c209f899f899` 로 바꿨다**. 0d0ff4fdc → 6ad3d1263 의 runtime diff 는 0 이다.
+- 0e283ba10 → 6ad3d1263 에서 web-neture 와 의존 package closure 를 바꾼 commit 은 PR #337 의 2건(9a4c0e571 · 0920e1895) 뿐이다.
+
+| 분류 | 내용 |
+|---|---|
+| DESIGN_REFRESH_REQUIRED | `services/web-neture/**`(index.html · App.tsx · NetureGlobalHeader · seoRegistry · publicHero · index.css · Supplier/Community/MarketTrial Hero) · `packages/auth-react`(public-brand · useO4OHomeReturn · index) · `packages/ui` GlobalHeader |
+| SAFE_DEPENDENCY | 없음 |
+| UNRELATED | Phase E(#325 · api-server · tools/o4o-local-agent) · docs/HANDOFF commit — web-neture artifact 에 들어가지 않는다 |
+| UNVERIFIED | 0 |
+
+- 공통 package 는 publish 하지 않는다. `@o4o/auth-react` 는 `main/types/exports = ./src/index.ts` 로 monorepo source 를 직접 소비하므로 web-neture build 에 함께 들어간다. 서빙 HTML 에서 Pretendard 링크를, 화면에서 O4O 홈 · Hero 를 확인했다(§9-5).
+- Delivery 판정: neture = `BEHIND · LEVEL_3` (rule `auth-package` — auth-react 경로 변경). 자동 경로는 배포하지 않는다(main push 의 Delivery run 2회 모두 Classify 만 · 배포 job skipped). 그래서 `promote.yml` 로 neture 하나만 승격했다.
+
+### 9-4. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| CI (candidate) | CI Pipeline run 37559092714 success |
+| dry-run | Promote run 37559025270 (0d0ff4fdc · `services=neture` · dry_run) → neture=PROMOTE · 나머지 NOT_SELECTED · api=NO_DEPLOY |
+| 실제 promote | Promote run **37559429675** (`sha=6ad3d1263…` · `services=neture`) success |
+| job | `deploy-neture` success (01:56:54Z~01:59:14Z). deploy-kpa-society · kpa-branch · lecture · store · pharmacy-hub · hospital-pharmacy · API · Admin = skipped |
+| 새 revision | **`neture-web-01695-kos`** · `o4o-commit-sha=6ad3d1263…` · digest `sha256:88d8edad…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `neture-web-01692-pir` 보존 (rollback 가능) |
+| 다른 service | kpa-society 02029 · lecture 00043 · store 00059 · kpa-branch 00202 · pharmacy-hub 00284 · core-api 03840 · admin 01352 — 배포 전과 같다 |
+| gate | `DEPLOY_FREEZE` 는 열고 닫지 않았다. 배포 전후 모두 `false`(10-03 부터의 운영 상태) 다. L3 는 promote 없이는 자동 배포되지 않으므로 열린 gate 를 다른 push 가 이 변경에 쓸 수는 없다 |
+
+### 9-5. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+4 host × 1280/390 = 8 run. 모두 HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0 · Pretendard loaded · 화면에 KPA-Society/K-Cosmetics 0.
+
+| host | h1 | O4O 홈 | 주 CTA | title (JS 실행 후) | og:url |
+|---|---|---|---|---|---|
+| neture.co.kr | O4O (60px / 390: 48px, 1줄) | (O4O 홈 자체) | 로그인하고 시작하기 | O4O — 소규모 사업자를 위한 통합 업무 공간 | neture.co.kr/ |
+| supplier | 제품과 콘텐츠를 매장과 연결합니다 (2줄) | 보임 (1280 · 390) | 공급자 등록 → /register | 공급자 — 제품과 콘텐츠를 매장과 연결합니다 \| O4O | supplier…/ |
+| community | 현장의 경험과 정보를 함께 나눕니다 (2줄) | 보임 | 약사 커뮤니티 들어가기 → /pharmacist | O4O 커뮤니티 — 현장의 경험과 정보를 함께 나눕니다 | community…/ |
+| funding | 제품의 가능성을 유통 참여로 연결합니다 (2줄) | 보임 | 모집 중인 펀딩 보기 → #market-trial-recruiting | 유통참여형 펀딩 — 제품의 가능성을 유통 참여로 연결합니다 \| O4O | funding…/ |
+
+neture.co.kr 대표 홈 IA 회귀 확인(화면 판독):
+
+- O4O 소개 → [로그인하고 시작하기] → 주요 서비스(약국 · 공급자) → 함께 이용하는 서비스(커뮤니티 · 강의 · 유통참여형 펀딩) → O4O AI → Footer(법정정보) 순서가 그대로다.
+- WO 의 "Google로 시작" 은 #320(로그인 진입 정상화) 에서 "로그인하고 시작하기"(모달: 이메일 · Google) 로 바뀐 기존 문구다. 이번 배포의 회귀가 아니다.
+- "서비스 소식" 은 정책상 공개 글이 있을 때만 나온다. 이번 smoke 에서는 섹션이 없었고 소식 API 실패 응답도 없었다.
+- Hero 는 과하지 않다(워드마크 + 2줄 + 설명 + CTA 1개). 첫 화면에 O4O 정체성과 CTA 가 보인다. AI 는 서비스 발견 뒤에 있다. 390 에서 제목 줄바꿈이 자연스럽고 카드는 1열로 쌓인다.
+- 스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 9-6. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| FUNDING_SMOKE_ROW | **PRESENT** — funding 목록에 `[SMOKE]` row 가 그대로 보인다. DB 는 수정하지 않았다(§6, 별도 data cleanup) |
+| 정적 OG (known limitation) | 재현됨 — `curl` 로 받은 supplier.neture.co.kr HTML 의 `<title>` · `og:title` 은 neture 기본값이다. JS 실행 후에는 host 별 값이다. 별도 인프라 WO 유지(§8 finding 2) |
+| AUTHENTICATED_SMOKE | **PENDING_USER_VERIFICATION** — 사용할 Google 테스트 계정이 없어 로그인 상태는 확인하지 않았다. 계정 생성 · DB 수정은 하지 않았다 |
+| ROLLBACK | 없음 — rollback 사유(접근 불가 · fatal error · navigation · 로그인 진입 · responsive 파손) 0 |
