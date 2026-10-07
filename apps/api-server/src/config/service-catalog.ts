@@ -115,7 +115,7 @@ export interface O4OService {
    * Neture 세미프랜차이즈 이용 자격 (optional). WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1
    *
    *   값(세미프랜차이즈 key)이 있으면 이 서비스의 직접 로그인 게이트와 handoff 는 이 서비스 membership 이 없어도
-   *   **Neture 기본 가입 active ∧ 이 세미프랜차이즈 가입 active** 인 약국 조직의 owner/admin/manager 를 통과시킨다
+   *   **내 매장(약국) 신청 active ∧ 이 세미프랜차이즈 가입 active** 인 약국 조직의 owner/admin/manager 를 통과시킨다
    *   (`modules/neture-pharmacy/services/semi-franchise-service-access`).
    *
    *   **독립 자격**: 이 서비스 membership 과 Neture 가입은 서로 독립이다.
@@ -158,7 +158,7 @@ export const O4O_SERVICES: O4OService[] = [
     description: '약국 사업자 매장 운영 서비스',
     joinEnabled: true,
     // 이 호스트 밖에서 이용 자격이 생긴다 — 미자격 사용자에게 이 호스트 세션을 주지 않는다.
-    //   Neture 약국은 store.neture.co.kr 에서 기본 가입 · pharmacy 세미프랜차이즈 가입을 신청하며 kpa-society
+    //   Neture 약국은 store.neture.co.kr 에서 내 매장(약국) 신청 · pharmacy 세미프랜차이즈 가입을 신청하며 kpa-society
     //   service_membership 은 생기지 않는다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §17) → 아래 semiFranchiseAccessKey.
     loginMembershipRequired: true,
     semiFranchiseAccessKey: 'pharmacy',

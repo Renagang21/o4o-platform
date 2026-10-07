@@ -97,7 +97,7 @@ describe('G4 세미프랜차이즈 자격', () => {
   it.each([
     [null, null, 'apply_pharmacy'],
     ['rejected', null, 'apply_pharmacy'],
-    ['terminated', 'active', 'apply_pharmacy'], // 기본 가입이 끝났으면 세미프랜차이즈 active 도 불인정
+    ['terminated', 'active', 'apply_pharmacy'], // 내 매장(약국) 신청이 끝났으면 세미프랜차이즈 active 도 불인정
     ['pending', null, 'pharmacy_pending'],
     ['suspended', 'active', 'pharmacy_suspended'],
     ['active', null, 'apply_semi_franchise'],

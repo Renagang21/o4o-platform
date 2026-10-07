@@ -16,10 +16,10 @@ export default function NoStorePage() {
       WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1 §8 · §16:
         매장이 없는 사용자가 여기서 막히면 더 갈 곳이 없었다. 자가 가입과 받은 초대 수락,
         두 출구를 같이 둔다.
-      WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국은 기본 가입(/start-pharmacy) — 승인 대기 중에도 여기서 상태를 본다.
+      WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국은 내 매장(약국) 신청(/start-pharmacy) — 승인 대기 중에도 여기서 상태를 본다.
     */}
     <div className="actions">
-      <Link className="button-link" to={WORKSPACE_PATHS.pharmacyEnrollment}>약국 기본 가입 · 신청 상태</Link>
+      <Link className="button-link" to={WORKSPACE_PATHS.pharmacyEnrollment}>내 매장(약국) 신청 · 신청 상태</Link>
       <Link className="link-button secondary-link" to={WORKSPACE_PATHS.enrollment}>매장 시작하기(약국 외 업종)</Link>
       <Link className="link-button secondary-link" to={WORKSPACE_PATHS.invitations}>받은 초대 확인</Link>
       <a className="link-button secondary-link" href={PLATFORM_ORIGIN}>Neture 홈에서 서비스 보기</a>

@@ -59,7 +59,7 @@ import { createOperatorSupplierController } from './controllers/operator-supplie
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
 import { getServiceOrigin } from '../../config/service-catalog.js';
-// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 · 세미프랜차이즈 · 공급 제안 · 내 매장 주문 · 테스트 결제
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 · 세미프랜차이즈 · 공급 제안 · 내 매장 주문 · 테스트 결제
 import { createNeturePharmacyRoutes } from '../neture-pharmacy/neture-pharmacy.routes.js';
 
 // Request type

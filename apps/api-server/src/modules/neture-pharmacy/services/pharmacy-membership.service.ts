@@ -1,5 +1,8 @@
 /**
- * Neture 기본 가입 (약국 1 = 기본 가입 1 = 조직 1 = 내 매장 1)
+ * 내 매장(약국) 신청 · 승인 원장 (약국 1 = 원장 1 행 = 조직 1 = 내 매장 1)
+ *
+ * 명칭 정정(2026-10-07): 과거 "Neture 약국 기본 가입"으로 불렀으나 Neture 메인 가입(service_memberships 'neture')이
+ * 아니다. 메인 가입 승인은 이 신청의 **전제조건**이며, 이 원장의 처리는 메인 가입 원장을 바꾸지 않는다.
  *
  * **인계 대상 — 인증 · 가입 트랙 (DESIGN §13)**: 가입 원장 · 신청 입력(자격 정보) · 상태 전이 · 운영자 승인/반려 ·
  * 승인 orchestration 은 인증 · 가입 트랙 소유다. 조직 · 매장 연결은 pharmacy-store-link.ts(Store 트랙 계약)를 호출한다.
@@ -8,6 +11,7 @@
  * - 신청: 조직(type='pharmacy') + owner 관계 + 원장(pending) 을 한 트랜잭션에.
  * - 자격 확인: 운영자가 원장의 사업자번호 · 약사 면허번호를 검토(operator_review). 자동 검증 · 점수 없음.
  * - kpa-society 가입 · kpa_members · kpa_pharmacist_profiles 를 읽지 않는다(재해석 금지).
+ * - 신청 · 승인(재활성화 포함) 시 Neture 메인 가입 active 를 확인한다(neture-main-membership.ts).
  * - 매장 판정은 원장 status='active' 가 한다. 승인 시 role 기반 소비처용 표식(neture:store_owner 등)을 붙이고
  *   정지 · 종료 시 거둔다(provisioner). 표식 실패는 원장 판정에 영향 없음.
  */
@@ -22,6 +26,7 @@ import {
 } from '../constants.js';
 import logger from '../../../utils/logger.js';
 import { createPharmacyStoreOrganization, updatePharmacyStoreProfile } from './pharmacy-store-link.js';
+import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
 
 export interface PharmacyApplicationInput {
   pharmacyName: string;
@@ -108,6 +113,8 @@ export class PharmacyMembershipService {
     return this.dataSource.transaction(async (m) => {
       // 같은 사용자의 동시 신청을 직렬화한다.
       await m.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`neture-pharmacy-apply:${userId}`]);
+      // 신청 자격 = Neture 가입 승인(active). 이 신청은 Neture 원장을 만들거나 바꾸지 않는다.
+      await assertNetureMainMembershipActive(m, userId);
 
       const existing = await this.findMine(userId, m);
       if (existing && !canReapply(existing.status)) {
@@ -194,6 +201,10 @@ export class PharmacyMembershipService {
       const next = nextMembershipStatus(current.status, action);
       if (!next) {
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);
+      }
+      if (next === 'active') {
+        // 승인 · 재활성화 시점의 **현재** Neture 가입 상태를 확인한다(신청 이후 바뀌었을 수 있다).
+        await assertNetureMainMembershipActive(m, current.applicant_user_id, 'applicant');
       }
       const [row] = rowsOf(await m.query(
         `UPDATE neture_pharmacy_memberships npm

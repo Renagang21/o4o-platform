@@ -58,8 +58,8 @@ export function createAssetSnapshotController(
     // WO-O4O-ASSET-SNAPSHOT-COPY-STORE-OWNER-ALIGN-V1: kpa:store_owner 추가.
     // 매장 단위 자료함은 store_owner가 canonical principal. 동일 controller가 cms/signage/lesson/
     // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
-    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 기본 가입 승인 약국(neture:store_owner)도 내 매장 자료함으로
-    //   가져온다. 조직은 resolveKpaOrgId → isStoreOwner('kpa')(기본 가입 원장)가 확정한다.
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
+    //   가져온다. 조직은 resolveKpaOrgId → isStoreOwner('kpa')(내 매장(약국) 신청 원장)가 확정한다.
     allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),

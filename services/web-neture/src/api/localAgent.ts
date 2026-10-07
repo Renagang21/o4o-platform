@@ -198,7 +198,9 @@ export async function connectThisPc(health: LocalAgentHealth): Promise<ConnectOu
     const { data } = await api.post(`${API_BASE_URL}/api/local-agent/pairing-grants`, {});
     grant = data?.data?.grant;
     if (!grant) return { ok: false, code: 'GRANT_ISSUE_FAILED' };
-  } catch {
+  } catch (err: any) {
+    // 서버 guard — Neture 가입 승인 전에는 이 PC 연결 승인권을 발급하지 않는다(CHECK-NETURE-PHARMACY §10 E5).
+    if (err?.response?.data?.code === 'NETURE_MEMBERSHIP_REQUIRED') return { ok: false, code: 'NETURE_MEMBERSHIP_REQUIRED' };
     return { ok: false, code: 'GRANT_ISSUE_FAILED' };
   }
 
@@ -256,6 +258,8 @@ export function describeConnectFailure(code: string): string {
       return '연결 승인 시간이 지났습니다. 다시 한 번 눌러 주세요.';
     case 'UNSUPPORTED_PLATFORM':
       return '지원하지 않는 운영체제입니다.';
+    case 'NETURE_MEMBERSHIP_REQUIRED':
+      return 'Neture 가입 승인 후 이 PC 를 연결할 수 있습니다. 홈 화면에서 가입 상태를 확인해 주세요.';
     case 'GRANT_ISSUE_FAILED':
       return '연결 승인을 받지 못했습니다. 잠시 후 다시 시도해 주세요.';
     case 'AGENT_NOT_RUNNING':

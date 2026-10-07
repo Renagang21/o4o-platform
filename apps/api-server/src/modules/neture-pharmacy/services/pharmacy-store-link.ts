@@ -7,7 +7,7 @@
  *
  *   createPharmacyStoreOrganization  신청 시 약국 조직(= 내 매장) 1개 + owner 관계
  *   updatePharmacyStoreProfile       재신청 시 같은 조직의 표시 정보 갱신(약국 1 : 매장 1 유지)
- *   activatePharmacyStore            기본 가입 활성 시 약국 업무 영역(kpa-society enrollment) · slug
+ *   activatePharmacyStore            내 매장(약국) 신청 활성 시 약국 업무 영역(kpa-society enrollment) · slug
  *   deactivatePharmacyStore          정지 · 종료 시 업무 영역 inactive (조직 · 데이터는 남긴다)
  *
  * 매장 접근 판정(isStoreOwner 'kpa')은 원장 `neture_pharmacy_memberships.status='active'` 를 읽는다 —

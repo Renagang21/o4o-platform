@@ -162,7 +162,7 @@ export interface SemiFranchiseContent {
 const P = '/neture/pharmacy';
 
 export const neturePharmacyApi = {
-  // ─── 기본 가입 (매장 게이트 이전 — 로그인만) ───
+  // ─── 내 매장(약국) 신청 (매장 게이트 이전 — 로그인 + 서버의 Neture 가입 승인 확인) ───
   async getMembership(): Promise<PharmacyMembership | null> {
     return (await coreApiClient.get<Envelope<PharmacyMembership | null>>(`${P}/membership`)).data;
   },
@@ -170,7 +170,7 @@ export const neturePharmacyApi = {
     return (await coreApiClient.post<Envelope<PharmacyMembership>>(`${P}/membership`, input)).data;
   },
 
-  // ─── 내 매장 (기본 가입 active) ───
+  // ─── 내 매장 (내 매장(약국) 신청 active) ───
   async getStoreContext(): Promise<PharmacyStoreContext> {
     return (await coreApiClient.get<Envelope<PharmacyStoreContext>>(`${P}/store/context`)).data;
   },

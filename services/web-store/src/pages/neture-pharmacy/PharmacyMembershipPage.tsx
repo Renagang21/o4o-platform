@@ -1,5 +1,9 @@
 /**
- * Neture 약국 기본 가입 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1
+ * 내 매장(약국) 신청 · 승인 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1
+ *
+ * 이 원장(`neture_pharmacy_memberships`)은 Neture 가입이 아니다. 신청 · 승인의 전제는 Neture 가입 승인(active)이며
+ * 서버가 직접 확인한다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E2). 승인 전이면
+ * `NETURE_MEMBERSHIP_REQUIRED` 로 거절되고, 이 화면은 Neture 가입 안내를 보인다.
  *
  * 로그인만 된 사용자가 약국 매장을 여는 유일한 경로다(약국은 `/start-store` 자가 가입 대상이 아니다).
  *   GET  /api/v1/neture/pharmacy/membership  → 내 신청 원장(없으면 null)
@@ -10,12 +14,13 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { WORKSPACE_PATHS } from '../../config/workspace';
+import { PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../../config/workspace';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { withReturnTo } from '../../lib/returnTo';
 import {
   neturePharmacyApi,
+  pharmacyErrorCode,
   pharmacyErrorMessage,
   type PharmacyMembership,
   type PharmacyMembershipInput,
@@ -26,7 +31,7 @@ const EMPTY: PharmacyMembershipInput = { pharmacyName: '', businessNumber: '', p
 
 const STATUS_HELP: Record<string, string> = {
   pending: 'Neture 운영자가 사업자등록번호와 약사 면허번호를 확인하고 있습니다. 승인되면 내 매장을 이용할 수 있습니다.',
-  active: '기본 가입이 승인되었습니다. 내 매장 기본 기능을 이용할 수 있습니다. 세미프랜차이즈는 내 매장에서 따로 가입 신청합니다.',
+  active: '내 매장(약국) 신청이 승인되었습니다. 내 매장 기본 기능을 이용할 수 있습니다. 세미프랜차이즈는 내 매장에서 따로 가입 신청합니다.',
   rejected: '신청이 반려되었습니다. 정보를 확인한 뒤 다시 신청할 수 있습니다.',
   suspended: '이용이 정지되었습니다. Neture 운영자에게 문의해 주세요.',
   terminated: '이용이 종료되었습니다. 다시 신청할 수 있습니다.',
@@ -41,6 +46,7 @@ export default function PharmacyMembershipPage() {
   const [form, setForm] = useState<PharmacyMembershipInput>(EMPTY);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [netureRequired, setNetureRequired] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,7 +70,7 @@ export default function PharmacyMembershipPage() {
   if (!isAuthenticated) {
     return (
       <main className="center-card"><section className="card">
-        <h1>약국 기본 가입</h1>
+        <h1>내 매장(약국) 신청</h1>
         <p>로그인이 필요합니다.</p>
         <Link className="button-link" to={withReturnTo(WORKSPACE_PATHS.login, WORKSPACE_PATHS.pharmacyEnrollment)}>로그인</Link>
       </section></main>
@@ -80,6 +86,7 @@ export default function PharmacyMembershipPage() {
     if (busy || !ready) return;
     setBusy(true);
     setError(null);
+    setNetureRequired(false);
     try {
       const saved = await neturePharmacyApi.applyMembership({
         pharmacyName: form.pharmacyName.trim(),
@@ -91,6 +98,7 @@ export default function PharmacyMembershipPage() {
       setMembership(saved);
     } catch (e) {
       setError(pharmacyErrorMessage(e));
+      setNetureRequired(pharmacyErrorCode(e) === 'NETURE_MEMBERSHIP_REQUIRED');
     } finally {
       setBusy(false);
     }
@@ -99,8 +107,8 @@ export default function PharmacyMembershipPage() {
   return (
     <main className="center-card" data-testid="pharmacy-membership">
       <section className="card">
-        <h1>약국 기본 가입</h1>
-        <p>Neture 약국 매장을 이용하려면 기본 가입 승인이 필요합니다. 기존 KPA 가입은 자격 근거로 쓰지 않습니다.</p>
+        <h1>내 매장(약국) 신청</h1>
+        <p>약국 매장을 이용하려면 내 매장(약국) 신청 승인이 필요합니다. 신청 전에 Neture 가입 승인이 먼저 필요합니다. 기존 KPA 가입은 자격 근거로 쓰지 않습니다.</p>
 
         {loading ? (
           <p>가입 상태를 확인하는 중...</p>
@@ -146,6 +154,11 @@ export default function PharmacyMembershipPage() {
               </form>
             )}
             {error && <p className="error" role="alert">{error}</p>}
+            {netureRequired && (
+              <div className="actions" data-testid="pharmacy-membership-neture-required">
+                <a className="button-link" href={PLATFORM_ORIGIN}>Neture 가입 상태 확인 · 신청</a>
+              </div>
+            )}
           </>
         )}
       </section>

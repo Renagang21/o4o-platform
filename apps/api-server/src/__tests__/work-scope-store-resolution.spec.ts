@@ -152,7 +152,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
     expect(flat).toContain('k-cosmetics');
   });
 
-  it('5-a. kpa-society 매장 후보는 Neture 기본 가입 원장(active) 조직으로 스코프된다', async () => {
+  it('5-a. kpa-society 매장 후보는 내 매장(약국) 신청 원장(active) 조직으로 스코프된다', async () => {
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5): 약국 매장 후보 = 원장 active 조직.
     // service_memberships 질의 없이 바로 원장 후보를 본다(kpa-society membership 은 매장 자격이 아니다).
     const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-1', role: 'owner' }]]);

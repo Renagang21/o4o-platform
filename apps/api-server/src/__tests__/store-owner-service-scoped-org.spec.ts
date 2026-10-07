@@ -67,7 +67,7 @@ describe('store organization resolution — service scoped', () => {
     expect(params[3]).toEqual(STORE_SERVICE_ORG_LINKAGE.cosmetics.slugKeys);
   });
 
-  it('B-kpa. 약국 매장(kpa) 후보는 Neture 기본 가입 원장(active) 조직만 — enrollment/slug 를 보지 않는다', async () => {
+  it('B-kpa. 약국 매장(kpa) 후보는 내 매장(약국) 신청 원장(active) 조직만 — enrollment/slug 를 보지 않는다', async () => {
     const { dataSource, calls } = makeDataSource([[{ organization_id: 'org-kpa', role: 'owner' }]]);
     const candidates = await findStoreOrganizationCandidates(dataSource, 'user-1', 'kpa');
 

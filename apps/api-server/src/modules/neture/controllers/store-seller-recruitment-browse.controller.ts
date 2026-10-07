@@ -12,6 +12,10 @@
  * 응답은 SellerRecruitmentService.getRecruitments (감사 필드 미포함) 재사용 — 운영자 검토 정보 노출 0.
  *
  * 신규 테이블·상태·승인 API·migration 없음. 참여(apply)는 POST /neture/seller-recruitment/applications 사용.
+ *
+ * CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: kpa-society 서비스 운영자가 승인한 모집은
+ *   pharmacy 세미프랜차이즈가 **제공하는** 항목이다 → 이 약국 조직의 그 세미프랜차이즈 가입이 active 일 때만 보인다.
+ *   (매장 게이트는 그대로 — 미가입이면 빈 목록. 내 매장 자기 기능이 아니므로 항목 단위로 뺀다.)
  */
 import { Router, Request, Response, RequestHandler } from 'express';
 import { NetureService } from '../neture.service.js';
@@ -19,6 +23,10 @@ import { ExposureStatus, RecruitmentStatus } from '../entities/index.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
+import { listActiveSemiFranchiseKeys } from '../../neture-pharmacy/services/supply-access.js';
+
+const RECRUITMENT_SERVICE_KEY = 'kpa-society';
 
 export function createStoreSellerRecruitmentBrowseController(
   dataSource: DataSource,
@@ -34,10 +42,20 @@ export function createStoreSellerRecruitmentBrowseController(
     '/store/seller-recruitments',
     authMiddleware,
     requireStoreOwner,
-    async (_req: Request, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       try {
+        // D1 — 세미프랜차이즈 제공 항목: 그 세미프랜차이즈 가입 active 가 아니면 빈 목록.
+        const sfKey = semiFranchiseAccessKeyFor(RECRUITMENT_SERVICE_KEY);
+        if (sfKey) {
+          const organizationId = (req as Request & { organizationId?: string }).organizationId;
+          const keys = organizationId ? await listActiveSemiFranchiseKeys(dataSource, organizationId) : [];
+          if (!keys.includes(sfKey)) {
+            res.json({ success: true, data: [] });
+            return;
+          }
+        }
         const data = await netureService.getSellerRecruitments({
-          serviceKey: 'kpa-society', // 고정 — 클라이언트 입력 무시
+          serviceKey: RECRUITMENT_SERVICE_KEY, // 고정 — 클라이언트 입력 무시
           exposureStatus: ExposureStatus.APPROVED, // 승인만
           status: RecruitmentStatus.RECRUITING, // 모집 중만
         });

@@ -106,8 +106,8 @@ export function resolveEffectiveServiceKey(
 export function isServiceStoreOwner(roles: readonly string[] | undefined, serviceKey: UnifiedServiceKey): boolean {
   const short = SERVICE_SHORT_KEY[serviceKey];
   const allowed = [`${short}:store_owner`, `${short}:admin`, `${short}:operator`, 'platform:super_admin'];
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 기본 가입 승인 약국은 `neture:store_owner` 를 받는다
-  // (kpa:store_owner 아님). 약국 매장 판정 SSOT 는 서버의 기본 가입 원장 게이트다 — 화면 가드는 표시 분기일 뿐.
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국은 `neture:store_owner` 를 받는다
+  // (kpa:store_owner 아님). 약국 매장 판정 SSOT 는 서버의 내 매장(약국) 신청 원장 게이트다 — 화면 가드는 표시 분기일 뿐.
   if (serviceKey === 'kpa-society') allowed.push('neture:store_owner');
   return (roles ?? []).some((r) => allowed.includes(r));
 }

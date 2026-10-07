@@ -107,7 +107,7 @@ let cart: PharmacyCartService;
 let payments: PharmacyPaymentService;
 let operatorId: string;
 
-/** 기본 가입 신청 → 승인된 약국(매장). */
+/** 내 매장(약국) 신청 신청 → 승인된 약국(매장). */
 async function approvedPharmacy() {
   const owner = await user();
   const bizno = randomBizno();
@@ -150,7 +150,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
   });
 
   // ─── 가입 · 권한 ────────────────────────────────────────────────────────
-  describe('기본 가입 · 매장 게이트', () => {
+  describe('내 매장(약국) 신청 · 매장 게이트', () => {
     it('신청(pending)은 매장 권한이 없고, 운영자 승인 후에만 매장이 열린다', async () => {
       const owner = await user();
       const bizno = randomBizno();
@@ -183,7 +183,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await expect(membership.decide(operatorId, row.id, 'approve')).rejects.toMatchObject({ code: 'INVALID_TRANSITION' });
     });
 
-    it('kpa-society 가입 + kpa:store_owner + 연결 조직이 있어도 기본 가입이 없으면 매장 권한이 없다(재해석 금지)', async () => {
+    it('kpa-society 가입 + kpa:store_owner + 연결 조직이 있어도 내 매장(약국) 신청이 없으면 매장 권한이 없다(재해석 금지)', async () => {
       const legacy = await user();
       const [org] = await ds.query(`INSERT INTO organizations (name, code, type) VALUES ('옛약국', $1, 'pharmacy') RETURNING id`, [uniq('kpa-pharm')]);
       await ds.query(`INSERT INTO organization_members (organization_id, user_id, role) VALUES ($1, $2, 'owner')`, [org.id, legacy]);
@@ -256,7 +256,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await sfs.decideMembership(sf, pharmacyOperator, app.id, 'reactivate');
       expect((await access(owner)).allowed).toBe(true);
 
-      // 기본 가입 정지 → 세미프랜차이즈 active 여도 차단
+      // 내 매장(약국) 신청 정지 → 세미프랜차이즈 active 여도 차단
       await membership.decide(operatorId, row.id, 'suspend', '테스트');
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'pharmacy_suspended' });
       await membership.decide(operatorId, row.id, 'reactivate');

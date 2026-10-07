@@ -766,10 +766,19 @@ export class HandoffController extends BaseController {
         }
 
         // rejected / suspended → pending 으로 재신청 (active 직접 전환 금지)
-        await AppDataSource.query(
-          `UPDATE service_memberships SET status = 'pending', updated_at = NOW() WHERE id = $1`,
-          [current.id],
-        );
+        // Neture 재신청은 legacy role(예: 과거 가입 시 'supplier')을 들고 가지 않는다 — Neture 가입은
+        // 메인 이용 자격만이며 연결 서비스 역할은 각 서비스 승인으로만 생긴다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 B2).
+        if (serviceKey === 'neture') {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'pending', role = 'member', updated_at = NOW() WHERE id = $1`,
+            [current.id],
+          );
+        } else {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'pending', updated_at = NOW() WHERE id = $1`,
+            [current.id],
+          );
+        }
       } else {
         // 신규 → pending 으로 가입 신청 (instant active 금지)
         await AppDataSource.query(

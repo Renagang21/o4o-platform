@@ -37,6 +37,7 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
+import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
 import { createLlmPlanner, createStrongLlmPlanner, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
 // WO-O4O-COMMON-AUTOMATION-CORE-CAPABILITY-C-TASK-MODALITY-ROUTER-V1 — per-task provider 선택(전역 provider 불변)
 import { classifyTaskModality } from '../services/ai-tools/task-modality-router.js';
@@ -98,6 +99,10 @@ import {
 } from '../services/ai-prompts/homeChat.js';
 
 const router: Router = Router();
+
+// Neture 메인 AI(통합 요청 · 홈 대화 · 작업 에이전트) = Neture 가입 승인 회원 전용 서버 판정
+// (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5). body.surface 로 우회할 수 없다.
+const requireNetureMember = requireNetureMainMembership(AppDataSource);
 
 // ===========================================
 // POST /api/ai/generate — Text Generation Proxy
@@ -356,7 +361,7 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
   };
 }
 
-router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+router.post('/work-agent/run', authenticate, requireNetureMember, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
   const userId = authReq.user?.id;
   if (!userId) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
@@ -2094,7 +2099,7 @@ async function performHomeChat(
   }
 }
 
-router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+router.post('/home-chat', authenticate, requireNetureMember, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
   const userId = authReq.user?.id;
   if (!userId) {
@@ -2209,7 +2214,7 @@ async function performHospitalDrugRequest(
 //     응답: work 일 때만 data.taskId · data.taskStatus(additive). chat · confirm 에는 Task 가 없다.
 //     요청: taskId?(이어갈 Task — 요청자 본인 · 미종결일 때만 쓰인다).
 // ===========================================
-router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+router.post('/request', authenticate, requireNetureMember, dynamicLimiter('free'), async (req, res: Response) => {
   const authReq = req as AuthRequest;
   const userId = authReq.user?.id;
   if (!userId) {

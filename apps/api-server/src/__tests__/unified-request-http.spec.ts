@@ -20,6 +20,9 @@
  *   ⑬  Personal Assistant Phase A — work 응답에 taskId · taskStatus(additive) · chat/confirm 에는 Task 없음 ·
  *       403 에도 taskId · 재요청 taskId 로 같은 Task · 원문이 Task 저장 경로에 닿지 않는다
  *       (WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1)
+ *   ⑭  Neture 가입 승인 guard — 미승인 · 대기 · 반려 · 정지는 403 NETURE_MEMBERSHIP_REQUIRED(본체 미호출) ·
+ *       surface=hospital-drug 로도 우회 불가 · platform:super_admin 만 예외
+ *       (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5)
  */
 
 import express from 'express';
@@ -34,11 +37,13 @@ const fetchMock = jest.fn();
 const logInfo = jest.fn();
 const logError = jest.fn();
 const logWarn = jest.fn();
+const netureStatusMock = jest.fn();
+let testUserRoles: string[] = ['user'];
 
 jest.mock('../middleware/auth.middleware.js', () => ({
   authenticate: (req: any, res: any, next: () => void) => {
     if (req.headers['x-test-anon']) return res.status(401).json({ success: false });
-    req.user = { id: '00000000-0000-4000-8000-000000000001', roles: ['user'] };
+    req.user = { id: '00000000-0000-4000-8000-000000000001', roles: testUserRoles };
     next();
   },
 }));
@@ -48,6 +53,10 @@ jest.mock('../utils/logger.js', () => ({
   default: { info: (...a: unknown[]) => logInfo(...a), warn: (...a: unknown[]) => logWarn(...a), error: (...a: unknown[]) => logError(...a), debug: jest.fn() },
 }));
 jest.mock('../database/connection.js', () => ({ AppDataSource: { isInitialized: true } }));
+jest.mock('../modules/neture/services/neture-main-membership.js', () => ({
+  ...jest.requireActual('../modules/neture/services/neture-main-membership.js'),
+  getNetureMainMembershipStatus: (...a: unknown[]) => netureStatusMock(...a),
+}));
 jest.mock('../services/local-agent/local-agent-service.js', () => ({ resolveTargetDevice: (...a: unknown[]) => resolveTargetDeviceMock(...a) }));
 jest.mock('../utils/work-scope-store-resolution.js', () => ({ resolveWorkScopeStore: jest.fn(), STORE_SCOPED_WORKSPACES: ['store'] }));
 jest.mock('../utils/ai-provider-runtime.js', () => {
@@ -143,6 +152,8 @@ function workResult(over: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  testUserRoles = ['user'];
+  netureStatusMock.mockResolvedValue('active');
   executeMock.mockResolvedValue({ content: '텍스트 답변', model: 'gemini-test' });
   runWorkAgentMock.mockResolvedValue(workResult());
   runSurfaceMock.mockResolvedValue({
@@ -439,5 +450,63 @@ describe('⑬ Personal Assistant Phase A — Task (additive)', () => {
     await request(app).post('/api/ai/request').send({ text: '약학정보원에서 비밀약품SENTINEL 검색해줘', workScope: { workspace: 'home', organizationId: 'x' } });
     expect(runWorkAgentMock.mock.calls[0][2].request).toContain('비밀약품SENTINEL');
     expect(JSON.stringify(taskStoreCalls)).not.toContain('SENTINEL');
+  });
+});
+
+describe('⑭ Neture 가입 승인 guard (CHECK §10 E5)', () => {
+  const ENDPOINTS: Array<[string, Record<string, unknown>]> = [
+    ['/api/ai/request', { text: '오늘 날씨 알려줘' }],
+    ['/api/ai/home-chat', { message: '안녕' }],
+    ['/api/ai/work-agent/run', { request: '쿠팡 주문 확인해줘' }],
+  ];
+
+  it.each([['none'], ['pending'], ['rejected'], ['suspended'], ['withdrawn']])(
+    "Neture 가입 %s → 세 endpoint 모두 403 NETURE_MEMBERSHIP_REQUIRED · 본체 미호출",
+    async (status) => {
+      netureStatusMock.mockResolvedValue(status);
+      for (const [path, body] of ENDPOINTS) {
+        const r = await request(app).post(path).send(body);
+        expect(r.status).toBe(403);
+        expect(r.body.code).toBe('NETURE_MEMBERSHIP_REQUIRED');
+        expect(r.body.details).toEqual({ netureMembershipStatus: status });
+      }
+      expect(executeMock).not.toHaveBeenCalled();
+      expect(runWorkAgentMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it('상태별 안내 문구 — 미가입 · 대기', async () => {
+    netureStatusMock.mockResolvedValue('none');
+    expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('Neture 가입 승인이 필요합니다.');
+    netureStatusMock.mockResolvedValue('pending');
+    expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('Neture 가입 승인 대기 중입니다.');
+  });
+
+  it('surface=hospital-drug 를 보내도 승인 검사를 우회할 수 없다', async () => {
+    netureStatusMock.mockResolvedValue('none');
+    const r = await request(app).post('/api/ai/request').send({ text: '우루사정 원내약 있어?', surface: 'hospital-drug' });
+    expect(r.status).toBe(403);
+    expect(r.body.code).toBe('NETURE_MEMBERSHIP_REQUIRED');
+    expect(runSurfaceMock).not.toHaveBeenCalled();
+  });
+
+  it('platform:super_admin 은 서버 확인 역할로 통과한다 (가입 조회 없이)', async () => {
+    testUserRoles = ['platform:super_admin'];
+    netureStatusMock.mockResolvedValue('none');
+    const r = await request(app).post('/api/ai/request').send({ text: '안녕하세요 오늘 일정 알려줘' });
+    expect(r.status).toBe(200);
+    expect(netureStatusMock).not.toHaveBeenCalled();
+  });
+
+  it('가입 상태 조회 실패는 통과가 아니다 (fail-closed 503)', async () => {
+    netureStatusMock.mockRejectedValue(new Error('db down'));
+    const r = await request(app).post('/api/ai/request').send({ text: 'x' });
+    expect(r.status).toBe(503);
+    expect(executeMock).not.toHaveBeenCalled();
+  });
+
+  it('guard 는 serviceKey 를 고정 neture 로만 조회한다 (요청 body 무관)', async () => {
+    await request(app).post('/api/ai/request').send({ text: 'x', serviceKey: 'kpa-society', surface: 'hospital-drug' });
+    expect(netureStatusMock).toHaveBeenCalledWith(expect.anything(), '00000000-0000-4000-8000-000000000001');
   });
 });

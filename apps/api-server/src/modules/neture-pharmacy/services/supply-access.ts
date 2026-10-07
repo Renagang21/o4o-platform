@@ -7,7 +7,7 @@
  * 과거 축(kpa-society membership · offer_service_approvals · distribution_type · allowed_seller_ids)은
  * 여기서 읽지 않는다(대체, 누적 아님).
  *
- * $1 = 약국 조직 id. 호출자가 매장 게이트(기본 가입 active)를 먼저 통과시켰어야 한다.
+ * $1 = 약국 조직 id. 호출자가 매장 게이트(내 매장(약국) 신청 active)를 먼저 통과시켰어야 한다.
  */
 import { DEFAULT_SEMI_FRANCHISE_KEY, SEMI_FRANCHISE_EVENT_SERVICE_KEY, type SupplyKind } from '../constants.js';
 

@@ -15,7 +15,7 @@
  * 신청 경로)** 만 남는다. 상태 판정은 `@o4o/auth-utils` SSOT 를 그대로 쓴다.
  *
  * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 이 호스트(pharmacy.neture.co.kr)는 kpa-society membership 이 active 가
- * 아니어도 **Neture 약국 기본 가입 active ∧ pharmacy 세미프랜차이즈 가입 active** 이면 이용한다 — 로그인 · handoff
+ * 아니어도 **내 매장(약국) 신청 active ∧ pharmacy 세미프랜차이즈 가입 active** 이면 이용한다 — 로그인 · handoff
  * 와 같은 서버 판정(`/neture/pharmacy/service-access/kpa-society`)을 조회해 통과시키고, 미충족이면 상태별 안내 ·
  * 신청 링크를 보인다. 기존 kpa-society 가입을 Neture 자격으로 재해석하지 않는다(판정은 서버의 Neture 원장).
  * 두 가입은 독립이다 — kpa-society 가 suspended · withdrawn 이어도 Neture 자격이 있으면 이 화면을 쓰되,
@@ -131,7 +131,7 @@ function SemiFranchiseAccessScreen({ access }: { access: SemiFranchiseServiceAcc
   return (
     <MembershipStatusNotice
       icon="🏥"
-      title="Neture 약국 가입 후 이용할 수 있습니다"
+      title="내 매장(약국) 신청 승인 후 이용할 수 있습니다"
       message={access.message ?? ''}
       actions={actions}
     />

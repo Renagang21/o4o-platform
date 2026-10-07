@@ -77,7 +77,7 @@ export default function UnifiedStoreLayout() {
   );
 }
 
-/** 약국(kpa-society) 문맥에만 Neture 약국 메뉴(상품 · 주문 · 세미프랜차이즈 · 기본 가입)를 붙인다 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 */
+/** 약국(kpa-society) 문맥에만 Neture 약국 메뉴(상품 · 주문 · 세미프랜차이즈 · 내 매장 신청)를 붙인다 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 */
 function storeMenuFor(serviceKey: UnifiedServiceKey | null | undefined, menu: StoreDashboardConfig): StoreDashboardConfig {
   return serviceKey === 'kpa-society' ? withPharmacyStoreMenu(menu) : menu;
 }

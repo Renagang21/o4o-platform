@@ -33,7 +33,7 @@ let CURRENT_MEMBERSHIPS: Array<{ serviceKey: string; status: string }> = [
 
 /**
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
- *   약국 매장(`kpa`) 후보는 Neture 기본 가입 원장(neture_pharmacy_memberships.status='active') 조직이다.
+ *   약국 매장(`kpa`) 후보는 내 매장(약국) 신청 원장(neture_pharmacy_memberships.status='active') 조직이다.
  *   공통 stub 은 원장 질의를 모르므로 여기서 그 분기만 덧댄다(판정 로직은 넣지 않는다 — 고정 응답).
  */
 let LEDGER_ACTIVE_ORGS: string[] = [ORG_KPA];
@@ -76,7 +76,7 @@ describe('축 B — store tablet routes: service-scoped organization resolution'
     expect(poolOrgParams[0]).toBe(ORG_NETURE);
   });
 
-  it('B. storeOwnerServiceKey="kpa" mount 는 기본 가입 원장 active 약국 조직을 고른다', async () => {
+  it('B. storeOwnerServiceKey="kpa" mount 는 내 매장(약국) 신청 원장 active 약국 조직을 고른다', async () => {
     const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/product-pool');
     expect(res.status).toBe(200);
@@ -89,7 +89,7 @@ describe('축 B — store tablet routes: service-scoped organization resolution'
     expect(poolOrgParams[0]).toBe(ORG_COS);
   });
 
-  it('D. 기본 가입 원장이 active 가 아니면 KPA mount 에서 차단된다 (role · kpa-society membership 무관)', async () => {
+  it('D. 내 매장(약국) 신청 원장이 active 가 아니면 KPA mount 에서 차단된다 (role · kpa-society membership 무관)', async () => {
     LEDGER_ACTIVE_ORGS = []; // pending / suspended 원장 → 후보 0
     const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/product-pool');

@@ -121,8 +121,6 @@ const PhPaymentFailPage = lazy(() => import('./services/ph/pages/PaymentFailPage
 const StoreHubPage = named(() => import('./pages/pharmacy/StoreHubPage'), 'StoreHubPage');
 const HubB2BCatalogPage = named(() => import('./pages/pharmacy/HubB2BCatalogPage'), 'HubB2BCatalogPage');
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
-const KpaEventOfferPage = named(() => import('./pages/event-offer/KpaEventOfferPage'), 'KpaEventOfferPage');
-const StoreCartPage = named(() => import('./pages/store-cart/StoreCartPage'), 'StoreCartPage');
 const HubContentLibraryPage = named(() => import('./pages/pharmacy/HubContentLibraryPage'), 'HubContentLibraryPage');
 const HubBlogLibraryPage = named(() => import('./pages/pharmacy/HubBlogLibraryPage'), 'HubBlogLibraryPage');
 const HubPopLibraryPage = named(() => import('./pages/pharmacy/HubPopLibraryPage'), 'HubPopLibraryPage');
@@ -133,7 +131,7 @@ const HubMultilingualContentLibraryPage = named(() => import('./pages/pharmacy/H
 const StoreMultilingualContentsMyPage = named(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage'), 'StoreMultilingualContentsMyPage');
 const HubSupplierLibraryPage = named(() => import('./pages/pharmacy/HubSupplierLibraryPage'), 'HubSupplierLibraryPage');
 
-// ── Neture 약국 매장(기본 가입 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
+// ── Neture 약국 매장(내 매장(약국) 신청 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
 const PharmacyMembershipPage = lazy(() => import('./pages/neture-pharmacy/PharmacyMembershipPage'));
 const SemiFranchisesPage = lazy(() => import('./pages/neture-pharmacy/SemiFranchisesPage'));
 const SupplyOptionsPage = lazy(() => import('./pages/neture-pharmacy/SupplyOptionsPage'));
@@ -284,7 +282,7 @@ export default function App() {
       <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
       {/* 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰는 화면이라 StoreGate 밖이다 */}
       <Route path={WORKSPACE_PATHS.enrollment} element={<StoreEnrollmentPage />} />
-      {/* Neture 약국 기본 가입 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
+      {/* 내 매장(약국) 신청 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
       <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
       {/* ── 내 매장(공통 기능 1회) ── */}
@@ -412,8 +410,10 @@ export default function App() {
       <Route path={H} element={gated(<UnifiedHubLayout />)}>
         <Route index element={<StoreHubPage />} />
         <Route path="b2b" element={<HubB2BCatalogPage />} />
-        <Route path="event-offers" element={<KpaEventOfferPage />} />
-        <Route path="cart" element={<StoreCartPage />} />
+        {/* CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 옛 이벤트 오퍼 · 매장 HUB 장바구니는 이 호스트에서
+            403 막다른 길이었다 — 약국 공급 상품 · 장바구니(세미프랜차이즈 제공분은 서버가 가입 상태로 판정)로 보낸다. */}
+        <Route path="event-offers" element={<Navigate to={`${S}${PP.supply}`} replace />} />
+        <Route path="cart" element={<Navigate to={`${S}${PP.cart}`} replace />} />
         <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
         <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />
         <Route path="blog" element={<HubBlogLibraryPage />} />

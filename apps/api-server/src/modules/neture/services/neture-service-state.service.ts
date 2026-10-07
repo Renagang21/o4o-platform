@@ -12,10 +12,13 @@
  *
  *   공급자: `neture_suppliers.status`        (PENDING · ACTIVE · REJECTED · INACTIVE)
  *
- * legacy fallback (행이 없을 때만): `service_memberships(neture)` 의 `role` 이 supplier 이면
- * 그 가입 신청 상태를 서비스 상태로 본다 — 승인 전(pending · rejected) 회원은 아직 서비스 행이
- * 없기 때문이다. 승인 시점에는 서비스 행이 만들어지므로(operator-registration.service) 이후로는
- * 서비스 행이 우선한다. 서버 guard(neture-identity.middleware) 도 같은 테이블을 본다.
+ * (제거) legacy fallback — 과거에는 서비스 행이 없을 때 `service_memberships(neture).role='supplier'`
+ * 의 가입 상태를 공급자 상태로 보였다. Neture 가입 승인이 공급자를 만들지 않게 된 뒤로는(§10 E4)
+ * 그 fallback 이 "Neture 가입 승인 = 공급자 이용 중" 으로 잘못 보이게 하므로 없앴다
+ * (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D). 공급자 상태 = neture_suppliers 뿐.
+ *
+ * `netureMain` = Neture 가입(메인 AI 이용 · 연결 서비스 신청 자격) 상태. `service_memberships(neture).status`
+ * 를 그대로 보인다 — 공급자 상태와 섞지 않는다.
  *
  * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1:
  *   공급자 행은 API guard(neture-identity.middleware) 와 **같은** canonical resolver 로 찾는다
@@ -43,6 +46,8 @@ export interface NetureServiceState {
 
 export interface NetureServiceStates {
   supplier: NetureServiceState;
+  /** Neture 가입 승인 상태 (메인 AI · 연결 서비스 신청 자격) — 연결 서비스 상태와 별개 */
+  netureMain: NetureServiceState;
 }
 
 const NONE: NetureServiceState = { status: 'none', source: 'none' };
@@ -64,7 +69,7 @@ export function mapSupplierRowStatus(raw: string | null | undefined): NetureServ
   }
 }
 
-/** service_memberships.status → 이용 상태 (legacy fallback 전용) */
+/** service_memberships.status → 이용 상태 (Neture 가입 상태) */
 function mapMembershipStatus(raw: string | null | undefined): NetureServiceUsageStatus {
   switch (String(raw ?? '').toLowerCase()) {
     case 'active':
@@ -97,27 +102,27 @@ export async function resolveNetureServiceStates(
   dataSource: DataSource,
   userId: string,
 ): Promise<NetureServiceStates> {
-  if (!userId) return { supplier: NONE };
+  if (!userId) return { supplier: NONE, netureMain: NONE };
 
   const [resolution, membershipRows] = await Promise.all([
     resolveSupplierForUser(dataSource, userId, null),
     dataSource.query(
-      `SELECT role, status FROM service_memberships WHERE user_id = $1 AND service_key = 'neture' LIMIT 1`,
+      `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'neture' LIMIT 1`,
       [userId],
-    ) as Promise<Array<{ role: string | null; status: string }>>,
+    ) as Promise<Array<{ status: string }>>,
   ]);
 
   const membership = membershipRows[0];
-  const membershipRole = String(membership?.role ?? '').toLowerCase();
+  const netureMain: NetureServiceState = membership
+    ? { status: mapMembershipStatus(membership.status), source: 'service_memberships' }
+    : NONE;
 
   let supplier: NetureServiceState = NONE;
   if (resolution.kind === 'resolved') {
     supplier = { status: mapSupplierRowStatus(resolution.status), source: 'neture_suppliers' };
   } else if (resolution.kind === 'context_required') {
     supplier = { status: mergeCandidateStatuses(resolution.candidates.map((c) => c.status)), source: 'neture_suppliers' };
-  } else if (membership && membershipRole === 'supplier') {
-    supplier = { status: mapMembershipStatus(membership.status), source: 'service_memberships' };
   }
 
-  return { supplier };
+  return { supplier, netureMain };
 }

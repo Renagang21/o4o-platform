@@ -15,7 +15,7 @@ import { useUnifiedStore } from '../contexts/StoreContext';
  * 이미 매장이 있으면 서버가 그 매장을 그대로 돌려준다(중복 생성 0).
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국은 여기서 열지 않는다(서버 ENROLLABLE_SERVICE_KEYS 에서 kpa 제거).
- * 약국은 Neture 약국 기본 가입(`/start-pharmacy`) — 사업자번호 · 약사 면허번호를 운영자가 확인한 뒤 승인된다.
+ * 약국은 내 매장(약국) 신청(`/start-pharmacy`) — 사업자번호 · 약사 면허번호를 운영자가 확인한 뒤 승인된다.
  */
 
 const SERVICES: ReadonlyArray<{ key: EnrollableServiceKey; label: string; hint: string }> = [
@@ -57,7 +57,7 @@ export default function StoreEnrollmentPage() {
         <h1>매장 시작하기</h1>
         <p>사업자 정보를 등록하면 매장 업무공간이 열립니다. 이미 연결된 매장이 있으면 그 매장으로 들어갑니다.</p>
         <p className="muted" data-testid="pharmacy-enrollment-link">
-          약국은 <Link to={WORKSPACE_PATHS.pharmacyEnrollment}>약국 기본 가입</Link>으로 신청합니다(운영자 승인 후 매장이 열립니다).
+          약국은 <Link to={WORKSPACE_PATHS.pharmacyEnrollment}>내 매장(약국) 신청</Link>으로 신청합니다(운영자 승인 후 매장이 열립니다).
         </p>
 
         <form onSubmit={submit}>
