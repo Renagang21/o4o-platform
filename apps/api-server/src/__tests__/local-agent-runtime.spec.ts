@@ -506,7 +506,7 @@ describe('14. 연결된 PC 가 여러 대여도 Assistant 가 노드를 고른�
     capabilities,
   });
   const caps = (over: Partial<NodeCapabilities> = {}): NodeCapabilities => ({
-    browser: true, windowsUia: true, localData: false, ownerScopedLedger: true, ...over,
+    browser: true, windowsUia: true, localData: false, ownerScopedLedger: true, taskUnit: false, ...over,
   });
 
   it('필요한 capability 가 확인된 노드를 고른다 — 더 최근 노드라도 확인된 부재면 뒤로', () => {
@@ -666,6 +666,9 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       // BROWSER-DOM-CONTROL-V0: DOM 인자·결과 한도 사본(순수). 확장 통로(bridge relay)는 index.mjs 가
       // context 로 넘기므로 handler 는 net 모듈을 import 하지 않는다.
       './browser-dom-limits.mjs',
+      // PHASE-E-TASK-UNIT-DISPATCH-V1: 작업 단위 loop(순수 — 단계마다 기존 단발 DOM 실행을 deps 로 받아 부른다.
+      // import 는 한도 사본 두 개뿐이고 프로세스 · net 수단은 없다).
+      './browser-dom-unit.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
     for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {

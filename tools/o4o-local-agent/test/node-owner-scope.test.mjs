@@ -139,9 +139,9 @@ test('v7 → v8 업그레이드: 기존 패턴 · Candidate 행은 보존되고 
 
 test('⑤ heartbeat 보고 = 버전 + boolean capability 뿐', () => {
   const ready = buildHeartbeatReport({ agentVersion: handlers.AGENT_VERSION, extensionConnected: true, platform: 'win32', dbState: { ready: true, schemaVersion: 8 }, hasLocalData: true });
-  assert.deepEqual(ready, { agentVersion: handlers.AGENT_VERSION, capabilities: { browser: true, windowsUia: true, localData: true, ownerScopedLedger: true } });
+  assert.deepEqual(ready, { agentVersion: handlers.AGENT_VERSION, capabilities: { browser: true, windowsUia: true, localData: true, ownerScopedLedger: true, taskUnit: true } });
   const cold = buildHeartbeatReport({ agentVersion: '0.2.0', extensionConnected: false, platform: 'linux', dbState: { ready: false, schemaVersion: 0 }, hasLocalData: true });
-  assert.deepEqual(cold.capabilities, { browser: false, windowsUia: false, localData: false, ownerScopedLedger: false });
+  assert.deepEqual(cold.capabilities, { browser: false, windowsUia: false, localData: false, ownerScopedLedger: false, taskUnit: false });
   const v7 = buildHeartbeatReport({ agentVersion: '0.2.0', extensionConnected: true, platform: 'win32', dbState: { ready: true, schemaVersion: 7 }, hasLocalData: false });
   assert.equal(v7.capabilities.ownerScopedLedger, false);
 });

@@ -11,6 +11,8 @@
  *   windowsUia         Windows UIA 실행이 가능한 플랫폼이다
  *   localData          로컬 데이터 저장소가 준비됐고 데이터셋이 하나 이상 있다
  *   ownerScopedLedger  노드 원장을 소유 주체별로 나눠 쓴다(local.db v8 이상이 준비됨)
+ *   taskUnit           브라우저 작업 단위 실행(`local.browser.dom.run_unit`)을 지금 받을 수 있다 — agent 0.3.0+ · 확장 연결
+ *                      (Phase E · WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1). 없으면 서버는 단발 명령으로 보낸다.
  */
 
 export const OWNER_SCOPED_LEDGER_MIN_SCHEMA = 8;
@@ -24,6 +26,7 @@ export function buildHeartbeatReport({ agentVersion, extensionConnected, platfor
       windowsUia: platform === 'win32',
       localData: dbReady && hasLocalData === true,
       ownerScopedLedger: dbReady && Number(dbState.schemaVersion) >= OWNER_SCOPED_LEDGER_MIN_SCHEMA,
+      taskUnit: extensionConnected === true,
     },
   };
 }

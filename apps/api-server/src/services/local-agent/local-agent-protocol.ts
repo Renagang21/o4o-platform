@@ -65,12 +65,15 @@ import {
 import {
   BROWSER_DOM_ERROR,
   pickSafeDomInfo,
+  pickSafeDomUnitInfo,
   validateDomElementArgs,
+  validateDomRunUnitArgs,
   validateDomFindArgs,
   validateDomReadTableArgs,
   validateDomSelectOptionArgs,
   validateDomSetInputArgs,
   type DomActionArgs,
+  type DomRunUnitArgs,
 } from './browser-dom-contract.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
@@ -127,6 +130,12 @@ export const LOCAL_AGENT_ACTIONS = {
   DOM_CLICK: 'local.browser.dom.click',
   /** table/role=table 읽기, 행 상한 있음 (§26·§27). */
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  /**
+   * 작업 단위 실행 (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1). 이미 판단한 행동 묶음(ref 배치 또는 재생 단계)을
+   * Node 가 local bridge 로 이어 실행하고, 판단이 필요한 자리에서 멈춰 단계 보고 + 최종 관찰을 돌려준다. 단계마다 확장의
+   * 검사(COMMIT · 자격 · 형상)는 그대로다. 노드가 `taskUnit` capability 를 보고할 때만 쓴다(아니면 단발 명령 경로).
+   */
+  DOM_RUN_UNIT: 'local.browser.dom.run_unit',
   // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
   /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
   // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33) ────────
@@ -251,6 +260,7 @@ export const DOM_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** 인자를 받는 DOM action — get_context · inspect 는 없다. read_table 은 선택적 인자. */
@@ -261,6 +271,7 @@ export const DOM_ARGS_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
   LOCAL_AGENT_ACTIONS.DOM_CLICK,
   LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+  LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT,
 ]);
 
 /** DOM action 인가 — 결과 화이트리스트 · 실패 데이터 보존 판정에 쓴다. */
@@ -673,7 +684,7 @@ function withOwnerKey<T extends object>(
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | UiaActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs | UiaActionArgs } | { ok: false } {
   // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
   if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
     const r = validateDomFindArgs(args);
@@ -693,6 +704,11 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TABLE) {
     const r = validateDomReadTableArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  // PHASE-E: 단계 형상 · 값 규칙은 단발 action 과 같다. 형상 밖이면 단계 하나도 발행되지 않는다.
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    const r = validateDomRunUnitArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   // WINDOWS-UI-AUTOMATION-V0: 요소 ref+snapshot · 텍스트(computer-use 규칙) · 허용 키 · 0..1 좌표만.
@@ -883,7 +899,7 @@ export function isAllowedLocalAction(action: string): boolean {
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs;
+  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -1499,6 +1515,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT) {
+    return pickSafeDomUnitInfo(data);
   }
   if (DOM_TARGET_ACTIONS.includes(base)) {
     return pickSafeDomInfo(data);

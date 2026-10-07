@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 마지막 작업: 2026-10-06 (KST) · worktree `C:/tmp/o4o-neture-pharmacy` · branch `wo/neture-pharmacy-store-commerce-refactor-v1` · draft PR #308 (merge 보류)
+> 마지막 작업: 2026-10-07 (KST) · PR #308 · #332 · #336 · #328 **main 통합 완료** · 운영 promote 실행(SHA `0e283ba10`) — 결과 확인 · 운영 검증 남음
 
 ## 요약
 
@@ -10,10 +10,13 @@
 
 | 항목 | 상태 |
 |---|---|
-| 코드 구현 (branch) | 이 트랙 범위 완료 · 다른 트랙 담당 미완료 3건(DESIGN §15-2) |
+| 코드 구현 | main 통합 완료(#308 · #332 운영 전환 호환 · #336 배포 전 접근 정렬 · #328 결제 모드 주입) · 다른 트랙 담당 미완료 3건(DESIGN §15-2) |
 | 테스트 결제 흐름 | 격리 PostgreSQL 통합 17건 + 로컬 브라우저 20항목 PASS ([CHECK](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) |
 | 실제 PG 연동 | 대기(D1) |
-| main 통합 · 운영 migration · 배포 · 운영 실결제 | 미실시 — 사용자 승인 대기 |
+| 운영 배포 | Promote run `37548237819`(SHA `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9`, 대상 migration 1 · API · 웹 8 — admin · neture · kpa-society · pharmacy-hub · lecture · store · kpa-branch · hospital-pharmacy). 확인된 것: migration · API 배포 · 트래픽 전환 job 단계 success. **웹 8개 최종 결과 · API traffic 100% 직접 조회 · 공개 화면 점검 미확인** |
+| 결제 모드 | variable `NETURE_PHARMACY_PAYMENT_MODE=test` 설정(2026-10-06 23:53Z) — **API 배포 이후 설정이라 운영 API 에 미반영**(테스트 결제 꺼짐 · 실 PG 차단). 켜려면 API 재배포 필요(사용자 승인) |
+| 운영 업무 흐름 검증 | 미검증 — Google 인증 약국 · 공급자 테스트 계정 · `pharmacy` 담당 운영자 필요(CHECK §9-5 · [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](docs/checks/CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §5-4) |
+| 인덱스 2단계(부분 UNIQUE · 이벤트 재신청 409 해제) | 미착수 — 운영 안정화 후 별도 migration WO(DESIGN §17-1) |
 | 테스트 데이터 초기화 | 범위만 확정(DESIGN §12) — 운영 DB write 사용자 승인 필요 |
 | pharmacyhub.co.kr QR link 4행(비활성 E2E) | 테스트 데이터 초기화 대상으로 결정(DESIGN §12 · §16-3 A) — 삭제 미실행 · 초기화 승인 때 함께 |
 | PH 공급자 opt-in | Neture 에 재구현 안 함 — 신규 시작 410 · 단독 키 중지 409(기본 공급 노출 방지) · 기존 주문 처리 유지(DESIGN §16-5) |
@@ -32,9 +35,11 @@
 
 ## 다음에 할 일
 
-1. PR #308 통합 결정 — 체크리스트 [CHECK §9](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). merge 만으로는 API LEVEL_3 HOLD 라 배포 · migration 미실행, 배포는 수동 promote(사용자 승인). merge 는 사용자 "main 통합 진행" 후, 직전에 브랜치 갱신 · CI 재확인.
-2. 결정 대기 없음(2026-10-06 결정 반영). 테스트 데이터 초기화(DESIGN §12, QR 4행 포함) 운영 write 는 사용자 승인 후 dry-run 과 함께.
-3. merge 후(API LEVEL_3 HOLD · 프런트 4개도 보류 확정 — CHECK §9-2): 결제 모드 workflow 변경안(CHECK §9-4, 미적용) 승인 · 반영 · variable 설정 → `promote.yml` 로 API(migration 포함) → 프런트 배포 → 운영 smoke(콘텐츠 자료함 · 새 호스트 QR 포함) → `pharmacy` 담당 운영자 지정 → 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
+1. Promote run `37548237819` 결과 확인 — 웹 8개 배포 결과 · API 새 revision traffic 100% · 공개 화면 · 로그인 전 화면 · 서비스 기본 진입.
+2. 테스트 결제 반영 — variable 은 설정됨. API 재배포(사용자 승인) 후 새 revision env 의 `NETURE_PHARMACY_PAYMENT_MODE=test` 확인.
+3. 사용자가 Google 로그인 · 테스트 계정 준비 후 운영 업무 흐름 검증 — 기본 가입 → 승인 → pharmacy 세미프랜차이즈 가입 → pharmacy.neture.co.kr 접근(직접 로그인 · handoff) → 내 매장 · 계약 승낙 · 사이니지 → 주문 → 테스트 결제 → 공급자 처리 · 콘텐츠 · QR(CHECK §9-5).
+4. 그 뒤: `pharmacy` 담당 운영자 지정 → 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
+5. 별도 승인 · 별도 WO: 테스트 데이터 초기화(DESIGN §12, QR 4행 포함, dry-run 동반) · 매장 경영자 계약 게시 · 인덱스 2단계 · LB/도메인 변경 · 실제 PG(D1) · 세미프랜차이즈 커뮤니티 게시판.
 
 ## 로컬 검증 재현
 

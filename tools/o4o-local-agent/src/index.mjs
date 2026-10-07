@@ -148,7 +148,8 @@ async function handleCommand(command, context, sessionToken) {
     return;
   }
 
-  const outcome = await runAction(command.action, context, command.args);
+  // 단위 실행(run_unit)은 명령 만료 전에 스스로 멈춘다 — 만료 시각을 넘긴다.
+  const outcome = await runAction(command.action, { ...context, commandExpiresAt: command.expiresAt }, command.args);
   if (outcome.status === 'denied') {
     // 서버가 모르는 action 을 보냈다. 실행하지 않았다는 사실을 분명히 되돌린다.
     log(`허용되지 않은 action 거부: ${command.action}`);
