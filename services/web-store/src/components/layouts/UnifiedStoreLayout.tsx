@@ -27,6 +27,7 @@ import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeM
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import {
   SERVICE_LABEL,
+  hasOnlyRetiredWorkspaces,
   isServiceStoreOwner,
   isUnifiedServiceKey,
   setActiveServiceContext,
@@ -64,8 +65,17 @@ export function StoreWorkDashboard({ config, withCapabilities = false }: { confi
 
 export default function UnifiedStoreLayout() {
   // 서비스 고정(§21-13)이 있으면 그 서비스, 없으면 공통 우선순위 문맥으로 이용계약 게이트를 통과한다.
-  const { effectiveServiceKey, scopedServiceKey } = useUnifiedStore();
+  const { effectiveServiceKey, scopedServiceKey, services } = useUnifiedStore();
   const { pathname, search, hash } = useLocation();
+  if (!effectiveServiceKey && hasOnlyRetiredWorkspaces(services)) {
+    return (
+      <main className="center-card"><section className="card" data-testid="store-retired-service">
+        <h1>이 매장의 서비스 업무공간이 종료되었습니다</h1>
+        <p className="muted">이 매장이 가입한 서비스는 더 이상 매장 업무 화면을 제공하지 않습니다.</p>
+        <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+      </section></main>
+    );
+  }
   // 서비스 지정 화면으로 고정된 상태에서 `/store/...` 링크를 따라오면 서비스가 보이는 URL 로 옮긴다(§21-14).
   const scopedPath = toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`);
   if (scopedPath) return <Navigate to={scopedPath} replace />;

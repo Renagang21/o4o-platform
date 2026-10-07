@@ -129,6 +129,15 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     expect(layout).not.toContain("'k-cosmetics':");
     expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });
+
+  it('종료 서비스만 가입된 매장은 /store 에서 KPA 기본 문맥으로 떨어지지 않고 종료 안내를 받는다', () => {
+    // catalog 는 아직 workspaceAvailable=true 를 줄 수 있다(service identity DEFER) — 화면이 일관되게 판정한다.
+    expect(svc).toContain('export function hasOnlyRetiredWorkspaces(');
+    expect(layout).toContain('if (!effectiveServiceKey && hasOnlyRetiredWorkspaces(services)) {');
+    expect(layout).toContain('data-testid="store-retired-service"');
+    // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
+    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
+  });
 });
 
 describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로는 handoff 하지 않는다(§21-18 · §21-19)', () => {

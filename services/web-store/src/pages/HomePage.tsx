@@ -5,10 +5,11 @@ import { pharmacyStorePath } from './neture-pharmacy/shared';
 
 /** Workspace 홈 — 선택된 매장 + 서비스 요약 + 4 영역 진입(§8-3). */
 export default function HomePage() {
-  const { organizationName, services, effectiveServiceKey } = useUnifiedStore();
+  const { organizationName, services, effectiveServiceKey, workServiceKeys } = useUnifiedStore();
   // 약국 문맥은 매장 HUB 단계 없이 내 매장에서 바로 공급 상품을 주문한다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6).
   const pharmacy = effectiveServiceKey === 'kpa-society';
-  const available = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable);
+  // 내 서비스와 같은 기준 — 이 앱이 열 수 있는 업무공간만 센다(종료 서비스 제외).
+  const available = workServiceKeys;
   return <main className="page"><section className="hero">
     <span className="eyebrow">Unified Store Workspace</span>
     <h1>{organizationName || BRAND.name}</h1>

@@ -5,10 +5,7 @@
  * 정책 정본: `docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md`
  *
  * 고정하는 것
- *   E1 가입은 조직 · 소유 관계 · 서비스 참여를 **공용 helper** 로 만든다(프로비저닝 중복 0)
- *   E2 Role ∧ Relationship — 관계를 세운 뒤에 `{prefix}:store_owner` 를 발급한다
- *   E3 멱등 — 이미 이 서비스의 매장 경영자면 아무 것도 만들지 않는다
- *   E4 임의 병합 금지 — 후보가 2개 이상이면 고르지 않고 409
+ *   (E1~E4 가입 성공 경로 — 가입 대상 업종 0 으로 도달 불가 · PHASE1B 에서 제거)
  *   E5 입력 검증 — 가입 불가 서비스(약국 kpa 포함) · 이름 누락은 쓰기 전에 거절
  */
 import {
@@ -44,7 +41,6 @@ jest.mock('../../admin/service-membership-ensure.js', () => ({
 
 const USER = 'user-1';
 const ORG_A = '11111111-1111-4111-8111-111111111111';
-const ORG_B = '22222222-2222-4222-8222-222222222222';
 
 /** organization_members 후보만 돌려주는 가짜 DataSource. */
 const makeDs = (orgIds: string[]) => {
@@ -76,91 +72,28 @@ beforeEach(() => {
 const expectCode = async (p: Promise<unknown>, code: string) =>
   expect(p).rejects.toMatchObject({ code } as Partial<StoreEnrollmentError>);
 
-describe('E1·E2 가입은 공용 helper 를 쓰고, role 은 관계 뒤에 발급한다', () => {
-  it('매장이 없으면 조직 · 소유 · 서비스 참여를 helper 가 만들고 owner role 을 발급한다', async () => {
+// E1~E4(가입 성공 경로)는 마지막 가입 대상이던 K-Cosmetics 가 은퇴하면서 도달 불가가 됐다 —
+//   WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1. 현재 자가 가입 대상 업종은 없다.
+
+describe('K-Cosmetics 자가 가입은 은퇴했다', () => {
+  it('cosmetics 는 가입 대상이 아니다 — 조직 · role · membership 을 만들지 않는다', async () => {
     const { ds } = makeDs([]);
-    const r = await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' });
-
-    expect(r).toMatchObject({ organizationId: ORG_A, serviceKey: 'cosmetics', outcome: 'created' });
-    // 조직 생성을 이 모듈이 직접 하지 않는다 — helper 한 곳만 쓴다(프로비저닝 중복 0).
-    expect(ensureOrgMock).toHaveBeenCalledTimes(1);
-    expect(ensureOrgMock).toHaveBeenCalledWith(
-      expect.objectContaining({ name: '가나상점', type: 'store' }),
-      USER,
-      'cosmetics',
-    );
-    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: USER, role: 'cosmetics:store_owner' }));
-  });
-
-  it('관계(helper) 가 role 발급보다 먼저다', async () => {
-    const order: string[] = [];
-    ensureOrgMock.mockImplementation(async () => {
-      order.push('relationship');
-      return { id: ORG_A, created: true };
-    });
-    assignRoleMock.mockImplementation(async () => {
-      order.push('role');
-      return {};
-    });
-    const { ds } = makeDs([]);
-    await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '다라상점' });
-    expect(order).toEqual(['relationship', 'role']);
-  });
-
-  it('서비스 가입은 status 를 보존하는 기존 ensure 계약을 쓴다', async () => {
-    const { ds } = makeDs([]);
-    await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' });
-    expect(ensureMembershipMock).toHaveBeenCalledWith(USER, ['cosmetics:store_owner']);
-  });
-
-  it('서비스별 owner role 규약을 따른다 — 새 prefix 를 만들지 않는다', () => {
-    for (const key of ENROLLABLE_SERVICE_KEYS) {
-      expect(STORE_OWNER_ROLE_BY_SERVICE[key]).toBe(`${key}:store_owner`);
-    }
-  });
-});
-
-describe('E3·E4 중복 생성과 임의 병합을 하지 않는다', () => {
-  it('이미 이 서비스의 경영자면 아무 것도 만들지 않는다', async () => {
-    hasRoleMock.mockResolvedValue(true);
-    const { ds } = makeDs([ORG_A]);
-
-    const r = await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' });
-
-    expect(r).toEqual({ organizationId: ORG_A, serviceKey: 'cosmetics', outcome: 'existing' });
-    expect(ensureOrgMock).not.toHaveBeenCalled();
-    expect(assignRoleMock).not.toHaveBeenCalled();
-  });
-
-  it('관계는 있는데 role 이 없으면 그 조직에 연결한다(중복 생성 0)', async () => {
-    ensureOrgMock.mockResolvedValue({ id: ORG_A, created: false });
-    const { ds } = makeDs([ORG_A]);
-
-    const r = await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' });
-
-    expect(r.outcome).toBe('connected');
-    expect(assignRoleMock).toHaveBeenCalled();
-  });
-
-  it('후보가 둘 이상이면 고르지 않고 거절한다', async () => {
-    const { ds } = makeDs([ORG_A, ORG_B]);
     await expectCode(
       enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' }),
-      'AMBIGUOUS_ORGANIZATION',
+      'SERVICE_NOT_ENROLLABLE',
     );
+    expect(ds.query).not.toHaveBeenCalled();
     expect(ensureOrgMock).not.toHaveBeenCalled();
+    expect(ensureMembershipMock).not.toHaveBeenCalled();
     expect(assignRoleMock).not.toHaveBeenCalled();
   });
 
-  it('다른 서비스의 조직은 후보가 아니다 — 업종을 건너뛰지 않는다', async () => {
-    linkedMock.mockResolvedValue(false); // 내 조직이지만 이 서비스에 등록돼 있지 않다
-    const { ds } = makeDs([ORG_A, ORG_B]);
+  it('현재 자가 가입 대상 업종은 없다', () => {
+    expect(ENROLLABLE_SERVICE_KEYS).toEqual([]);
+  });
 
-    const r = await enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '가나상점' });
-
-    // 후보 0 → 모호하지 않고, 새로 만든다.
-    expect(r.outcome).toBe('created');
-    expect(ensureOrgMock).toHaveBeenCalledTimes(1);
+  it('owner role 규약은 그대로다 — 기존 cosmetics:store_owner 보유자 identity 는 DEFER', () => {
+    expect(STORE_OWNER_ROLE_BY_SERVICE.cosmetics).toBe('cosmetics:store_owner');
   });
 });
 
@@ -189,17 +122,8 @@ describe('E5 입력 검증은 쓰기 전에 끝난다', () => {
     expect(assignRoleMock).not.toHaveBeenCalled();
   });
 
-  it('이름이 없으면 거절한다', async () => {
-    const { ds } = makeDs([]);
-    await expectCode(
-      enrollStoreBusiness(ds, { userId: USER, serviceKey: 'cosmetics', businessName: '   ' }),
-      'BUSINESS_NAME_REQUIRED',
-    );
-    expect(ensureOrgMock).not.toHaveBeenCalled();
-  });
-
-  it('가입 가능 서비스 목록은 owner role registry 와 같은 축이다', () => {
-    expect(isEnrollableServiceKey('cosmetics')).toBe(true);
+  it('가입 가능 서비스 목록은 비어 있다 — 어떤 owner role 도 자가 가입으로 열리지 않는다', () => {
+    expect(isEnrollableServiceKey('cosmetics')).toBe(false); // K-Cosmetics 은퇴(PHASE1B)
     // Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국은 Neture 기본 가입으로 통합(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
     expect(isEnrollableServiceKey('pharmacy-hub')).toBe(false);
     // owner role 은 있지만 자가 가입 대상이 아니다(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
