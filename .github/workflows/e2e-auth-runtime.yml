@@ -1,6 +1,6 @@
 name: E2E — Auth Runtime Regression
 
-# 3개 배포 서비스(Neture / KPA-Society / K-Cosmetics) auth runtime 검증 — **Google-only 기준**
+# 배포 서비스(Neture / KPA-Society) auth runtime 검증 (K-Cosmetics 는 서비스 종료로 제외 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — **Google-only 기준**
 # (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 로그인 시나리오·secret 소비 0)
 # 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
 #   - workflow_dispatch: 유일한 실행 경로 (배포 후 수동 검증)

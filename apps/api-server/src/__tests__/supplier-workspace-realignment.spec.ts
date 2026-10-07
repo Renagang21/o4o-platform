@@ -39,8 +39,9 @@ describe('Supplier → Service Operator handoff targets (WO §10)', () => {
     }
   });
 
-  it('kpa-society · k-cosmetics · pharmacy-hub 가 대상이다', () => {
-    expect(keys).toEqual(expect.arrayContaining(['kpa-society', 'k-cosmetics', 'pharmacy-hub']));
+  it('kpa-society · pharmacy-hub 가 대상이다 — 운영 종료된 k-cosmetics 는 제외', () => {
+    expect(keys).toEqual(expect.arrayContaining(['kpa-society', 'pharmacy-hub']));
+    expect(keys).not.toContain('k-cosmetics');
   });
 
   it('neture(special) · kpa-branch(none) · cafe24-b2b(undecided) 는 임의 포함되지 않는다', () => {

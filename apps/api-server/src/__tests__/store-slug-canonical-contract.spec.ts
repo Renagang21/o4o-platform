@@ -101,13 +101,9 @@ describe('§4 서비스 로컬 정규화 중복 제거', () => {
 });
 
 describe('§5 public store slug SSOT = platform_store_slugs', () => {
-  it('cosmetics 신규 매장 생성이 cosmetics_stores.slug 를 더 쓰지 않는다', () => {
-    const src = read('routes/cosmetics/services/cosmetics-store.service.ts');
-    const createBlock = src.slice(src.indexOf("manager.create('CosmeticsStore'"));
-    const entityLiteral = createBlock.slice(0, createBlock.indexOf('});'));
-    expect(entityLiteral).not.toMatch(/^\s*slug,?\s*$/m);
-    // registry 예약은 유지된다.
-    expect(src).toMatch(/reserveSlug\(\{/);
+  it('cosmetics 신규 매장 생성 경로는 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+    // cosmetics_stores.slug 를 쓰던 생성 경로(routes/cosmetics/services/cosmetics-store.service.ts)가 API 와 함께 사라졌다.
+    expect(fs.existsSync(path.join(API_SERVER_SRC, 'routes/cosmetics/services/cosmetics-store.service.ts'))).toBe(false);
   });
 
   it('slug 변경 route 가 서비스 전용 테이블로 mirror write 하지 않는다', () => {
@@ -135,7 +131,7 @@ describe('§6 공개 조회의 service 귀속 검증', () => {
 
   it('서비스별 mount 는 slug 축 serviceKey 를 주입한다', () => {
     const mounts: Array<[string, string]> = [
-      ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
+      // routes/cosmetics/cosmetics.routes.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
       ['routes/kpa/kpa.routes.ts', 'kpa'],
     ];
     for (const [rel, key] of mounts) {

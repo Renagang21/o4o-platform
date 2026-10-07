@@ -53,8 +53,6 @@ const ALLOWED_ORIGINS = new Set([
   'https://www.pharmacyhub.co.kr',
   'https://kpa-society.co.kr',
   'https://www.kpa-society.co.kr',
-  'https://k-cosmetics.site',
-  'https://www.k-cosmetics.site',
 ]);
 
 /** /health 의 localData 요약 — 허용 키만, 실패해도 창구는 산다. */

@@ -81,15 +81,15 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     renderPanel(
       user(),
       data({
-        services: [svc('neture', 'Neture'), svc('kpa-society', 'KPA Society'), svc('k-cosmetics', 'K-Cosmetics')] as unknown as HomeEntryData['services'],
+        services: [svc('neture', 'Neture'), svc('kpa-society', 'KPA Society'), svc('pharmacy-hub', 'Pharmacy Hub')] as unknown as HomeEntryData['services'],
         stores: [
           { serviceKey: 'kpa-society', organizationId: 'o1', name: '테스트 약국', memberRole: 'owner' },
-          { serviceKey: 'k-cosmetics', organizationId: 'o2', name: '테스트 뷰티샵', memberRole: 'owner' },
+          { serviceKey: 'pharmacy-hub', organizationId: 'o2', name: '테스트 허브약국', memberRole: 'owner' },
         ],
       }),
     );
     const store = cards()[1];
-    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국KPA Society', '테스트 뷰티샵K-Cosmetics']);
+    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국KPA Society', '테스트 허브약국Pharmacy Hub']);
     expect(store.querySelector('ul')).toBeNull();
   });
 

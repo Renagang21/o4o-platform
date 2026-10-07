@@ -49,7 +49,7 @@ describe('Store service-key residual integrity', () => {
   // ── enrollment write: canonical only ──────────────────────────────
   it('enrollment write 경로에 legacy service_code 리터럴이 없다', () => {
     for (const rel of [
-      'routes/cosmetics/services/cosmetics-store.service.ts',
+      // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
       'modules/neture/services/supplier.service.ts',
     ]) {
       const src = read(rel);

@@ -271,7 +271,7 @@ function makeDataSource(responses: Row[][]) {
 }
 
 describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
-  it('operator-services 는 2건(KPA · K-Cos)이며 PH 는 없다 · 둘 다 전환 가능(/operator)', async () => {
+  it('operator-services 는 2건(KPA · K-Cos)이며 PH 는 없다 · 전환 가능은 KPA 뿐(K-Cos 는 운영 종료로 workspaceAvailable=false)', async () => {
     const { dataSource, calls } = makeDataSource([
       [{ role: 'cosmetics:operator' }, { role: 'kpa:operator' }],
       // membership 질의는 catalog 순서(kpa-society → k-cosmetics)
@@ -283,8 +283,9 @@ describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
     expect(list.map((s) => s.serviceKey)).not.toContain('pharmacy-hub');
     expect(calls.slice(1).map((c) => c.params[1])).toEqual(['kpa-society', 'k-cosmetics']);
 
-    const { available } = selectOperatorServices(list);
-    expect(available).toHaveLength(2);
+    const { available, unavailable } = selectOperatorServices(list);
+    expect(available.map((s) => s.serviceKey)).toEqual(['kpa-society']);
+    expect(unavailable.map((s) => s.serviceKey)).toEqual(['k-cosmetics']);
     for (const s of available) expect(defaultOperatorEntryPath(s)).toBe('/operator');
   });
 
@@ -359,9 +360,9 @@ describe('합성 Operator X — KPA + K-Cos 운영자 (WO §21)', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Supplier → Service Operator 수신함 (WO §12)', () => {
-  it('제공 대상 3 서비스 모두 운영자 진입이 있다: KPA=/operator/approvals(자체 승인) · K-Cos/PH=/operator/supplier-contents(공통 inbox)', () => {
+  it('제공 대상 2 서비스 모두 운영자 진입이 있다: KPA=/operator/approvals(자체 승인) · PH=/operator/supplier-contents(공통 inbox) — K-Cos 는 운영 종료로 제외', () => {
     const targets = listSupplierContentHandoffTargets().map((t) => t.key).sort();
-    expect(targets).toEqual(['k-cosmetics', 'kpa-society', 'pharmacy-hub']);
+    expect(targets).toEqual(['kpa-society', 'pharmacy-hub']);
     expect(KPA_MENU.approvals!.some((i) => i.path === '/operator/approvals' && i.domain === 'service_operation')).toBe(true);
     expect(PH_MENU.content!.some((i) => i.path === '/operator/supplier-contents')).toBe(true);
     expect(code('services/web-pharmacy-hub/src/App.tsx')).toContain('path="supplier-contents"');

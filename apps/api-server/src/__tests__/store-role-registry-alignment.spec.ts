@@ -12,7 +12,7 @@
  *                                     cafe24-b2b 제외 — HMAC 쿠키 세션이라 isStoreOwner() 를 안 거친다
  *   STORE_MEMBER_ROLE_BY_SERVICE (4)  초대 수락이 발급하는 member role
  *                                     조직↔서비스 linkage 가 있는 서비스 전부 (cafe24-b2b 포함)
- *   ENROLLABLE_SERVICE_KEYS      (2)  자가 가입 가능 업종 — 외부 로그인 전용 채널 · 약국(kpa) 제외
+ *   ENROLLABLE_SERVICE_KEYS      (0)  자가 가입 가능 업종 — 외부 로그인 전용 채널 · 약국(kpa) · 은퇴 K-Cosmetics 제외
  *                                     약국 매장은 Neture 기본 가입 신청 + 운영자 승인으로만 열린다
  *                                     (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · ACCESS 정본 §3-A)
  *   STORE_OWNER_ROLE_BY_SERVICE  (3)  owner role 규약 — 게이트 registry 와 같은 키(kpa 포함)

@@ -10,7 +10,7 @@ import { AuthTokens } from '../types/auth.js';
  * Supports multiple service domains:
  * - neture.co.kr (and subdomains)
  * - kpa-society.co.kr
- * - k-cosmetics.site
+ * (k-cosmetics.site 는 K-Cosmetics 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  */
 
 /**
@@ -20,7 +20,6 @@ import { AuthTokens } from '../types/auth.js';
 const SERVICE_DOMAINS = [
   '.neture.co.kr',
   '.kpa-society.co.kr',
-  '.k-cosmetics.site',
 ];
 
 /**

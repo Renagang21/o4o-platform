@@ -35,7 +35,7 @@ describe('가입 가능한 서비스 — Neture 비노출', () => {
       data([
         svc('neture', 'neture.co.kr', true),
         svc('kpa-society', 'pharmacy.neture.co.kr', true),
-        svc('k-cosmetics', 'retail.neture.co.kr', true),
+        svc('k-cosmetics', 'retail.neture.co.kr', false),
       ]),
     );
     const ids = m.joinable.map((j) => j.id);
@@ -43,18 +43,18 @@ describe('가입 가능한 서비스 — Neture 비노출', () => {
     expect(JSON.stringify(m.joinable)).not.toContain('"to":"/register"');
   });
 
-  it('회귀 — 약국 · 리테일 가입 · 공급자 신청은 그대로다', () => {
+  it('회귀 — 약국 가입 · 공급자 신청은 그대로다 (리테일은 운영 종료로 가입 안내 없음)', () => {
     const m = buildHomeEntryModel(
       user,
       data([
         svc('neture', 'neture.co.kr', true),
         svc('kpa-society', 'pharmacy.neture.co.kr', true),
-        svc('k-cosmetics', 'retail.neture.co.kr', true),
+        svc('k-cosmetics', 'retail.neture.co.kr', false),
       ]),
     );
     const byId = Object.fromEntries(m.joinable.map((j) => [j.id, j.action]));
     expect(byId['join:kpa-society']).toEqual({ kind: 'public', href: 'https://pharmacy.neture.co.kr/register' });
-    expect(byId['join:k-cosmetics']).toEqual({ kind: 'public', href: 'https://retail.neture.co.kr/register' });
+    expect(byId['join:k-cosmetics']).toBeUndefined();
     expect(byId['join:neture-supplier']).toEqual({ kind: 'internal', to: '/supplier' });
   });
 
