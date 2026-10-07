@@ -403,8 +403,8 @@ export class HandoffController extends BaseController {
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-      //   basePath 를 가진 서비스(kpa-branch = kpa-society.co.kr/kpa)는 host 루트가
-      //   다른 서비스이므로 origin helper 로 base URL 을 만든다.
+      //   basePath 를 가진 서비스는 host 루트가 다른 서비스이므로 origin helper 로 base URL 을 만든다.
+      //   (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch → https://kpa.neture.co.kr/handoff)
       const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
       const targetUrl =
         `${targetOrigin}/handoff?token=${handoffToken}` +

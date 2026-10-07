@@ -4,7 +4,7 @@
  *
  * tenant 는 딱 두 경로로만 결정된다 — backend `resolveBranch` 와 같은 규칙이다.
  *   1) 공용 경로:    https://kpa.neture.co.kr/{slug}/...           → URL segment (canonical 분회 공용 호스트)
- *                    https://kpa-society.co.kr/kpa/{slug}/...      → URL segment (옛 공용 경로 · 보존)
+ *                    https://kpa-society.co.kr/kpa/{slug}/...      → 옛 공용 경로 — 그리기 전에 canonical 호스트로 이동(lib/canonicalHost)
  *   2) 자체 도메인:  https://{분회 도메인}/...                     → Host (GET /kpa-branch/resolve)
  *
  * 분회 서비스(`kpa-branch`)는 약사 개인 대상이다. 약국 사업자 서비스(`kpa-society` · role prefix `kpa:*`
@@ -28,7 +28,8 @@ import { resolveBranchByHost, type BranchSummary } from './api/branch';
  * `kpa.neture.co.kr` (CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10): 분회 전용 공용 호스트.
  *   `kpa.neture.co.kr/{slug}` 는 `/kpa` prefix 없이 root 진입이다(detectBasename → '').
  *   목록에 없으면 자체 도메인으로 오판해 `resolve?host=` 조회 후 "분회 없음" 이 된다.
- *   옛 공용 경로 `kpa-society.co.kr/kpa/{slug}` 는 그대로 유지한다.
+ *   옛 공용 경로 `kpa-society.co.kr/kpa/{slug}` 는 계속 서빙되지만 main.tsx 가 canonical 호스트로 옮긴다
+ *   (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1). 호스트 목록은 이동 실패 · 로컬 대비로 유지한다.
  */
 const PLATFORM_HOSTS = [
   'kpa-society.co.kr',
