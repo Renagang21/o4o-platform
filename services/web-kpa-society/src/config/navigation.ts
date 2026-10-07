@@ -79,9 +79,10 @@ export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] 
     ],
   },
   {
-    title: '약사회',
+    // WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: /about 은 O4O 약국 서비스 소개다(약사회 조직 페이지 아님)
+    title: 'O4O 약국',
     links: [
-      { label: '약사회 소개', href: '/about' },
+      { label: '서비스 소개', href: '/about' },
       { label: '협업 문의', href: '/contact' },
     ],
   },

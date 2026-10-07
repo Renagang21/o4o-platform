@@ -73,6 +73,26 @@ describe('pharmacy — 표시 이름 O4O 약국', () => {
   });
 });
 
+/**
+ * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1 — 공개 헤더 · footer 의 O4O 홈은 세션 복구 중 비활성이어야 한다
+ * (PR #337 Codex finding 1 의 공통 패턴). 로그인 전용 화면(isAuthenticated 고정)과 은퇴 예정 pharmacy-hub 는 대상이 아니다.
+ */
+describe('O4O 홈 — 세션 복구 중 비활성(authLoading) 연결', () => {
+  const SHELLS = [
+    'services/web-neture/src/components/NetureGlobalHeader.tsx',
+    'services/web-kpa-society/src/components/KpaGlobalHeader.tsx',
+    'services/web-kpa-branch/src/layouts/BranchLayout.tsx',
+    'services/web-kpa-branch/src/layouts/DirectoryShell.tsx',
+    'services/web-lecture/src/components/SiteShell.tsx',
+    'services/web-store/src/components/RootShell.tsx',
+  ];
+  it.each(SHELLS)('%s — 모든 O4OHomeButton 이 authLoading 을 넘긴다', (file) => {
+    const buttons = read(file).match(/<O4OHomeButton\b[^>]*\/>/g) ?? [];
+    expect(buttons.length).toBeGreaterThan(0);
+    for (const b of buttons) expect(b).toMatch(/authLoading=\{/);
+  });
+});
+
 describe('공통 토큰', () => {
   it('Pretendard 우선 글꼴 스택 · Hero · CTA · O4O 홈 클래스', () => {
     const tokens = read('packages/auth-react/src/public-brand/tokens.css');
