@@ -7,6 +7,7 @@
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
 > **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
+> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 따라서 본문의 `/api/v1/cosmetics/orders`(§5 흐름도 · §9 은퇴 축 표의 `410` 표기) · `/api/v1/cosmetics/payments/*`(§5) · §8 K-Cosmetics 행의 `/cosmetics/orders` · `/cosmetics/b2b/payments/*` · §12 조회 표의 `GET /api/v1/cosmetics/orders` 는 **존재하지 않는 endpoint** 다(`410` 응답도 없다 — 경로 자체가 없다). 남은 `k-cosmetics` serviceKey 의 B2B 주문 데이터 · Event Offer 범위는 퇴역 잔여이며 [`COSMETICS-DOMAIN-RULES`](../architecture/COSMETICS-DOMAIN-RULES.md) 가 다룬다. 다른 축 · 서비스의 계약은 불변.
 
 ---
 
