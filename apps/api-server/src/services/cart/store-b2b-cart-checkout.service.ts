@@ -20,8 +20,10 @@
  * `CheckoutFulfillmentBridge` 가 공급자 fulfillment 로 넘긴다(그 단계는 confirm 밖).
  */
 import { DataSource } from 'typeorm';
+import { hasServiceSemiFranchiseSupplyAccess } from '../../modules/neture-pharmacy/services/supply-access.js';
 import {
   B2BCheckoutConfirmCore,
+  B2BConfirmError,
   type B2BConfirmAdapter,
   type B2BConfirmInput,
   type B2BConfirmScope,
@@ -67,6 +69,19 @@ const storeB2BAdapter: B2BConfirmAdapter = {
     code: 'ORDER_CREATE_FAILED',
     reason: (error as { message?: string } | null)?.message || '주문 생성에 실패했습니다.',
   }),
+
+  // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1 — 세미프랜차이즈 서비스(kpa-society → pharmacy)의
+  //   공급 상품은 공급처 미지정(PUBLIC)을 포함해 매장 조직의 그 세미프랜차이즈 가입 active 일 때만 주문한다.
+  //   목록에서 빼는 것만으로 대신하지 않는다(직접 호출 차단). k-cosmetics 는 판정 대상이 아니다.
+  async assertSupplyAccess(exec, scope, organizationId) {
+    if (!(await hasServiceSemiFranchiseSupplyAccess(exec, scope.serviceKey, organizationId))) {
+      throw new B2BConfirmError(
+        'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
+        '세미프랜차이즈 가입 승인 후 주문할 수 있는 공급 상품입니다.',
+        403,
+      );
+    }
+  },
 
   buildLineItemMetadata: (v, ctx) => ({
     sourceType: v.item.sourceType,

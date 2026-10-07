@@ -25,7 +25,7 @@ import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { ApiError } from '../../../utils/api-error.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
-import { listActiveSemiFranchiseKeys } from '../../../modules/neture-pharmacy/services/supply-access.js';
+import { hasServiceSemiFranchiseSupplyAccess } from '../../../modules/neture-pharmacy/services/supply-access.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -203,21 +203,23 @@ export function createPharmacyProductsController(
 
   // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1 — 항목 단위 세미프랜차이즈 판정.
   //   마운트 서비스가 세미프랜차이즈 서비스(카탈로그 `semiFranchiseAccessKey` — 현재 kpa-society → 'pharmacy')이면
-  //   **그 서비스 운영자 승인으로 제공되는 항목**(SERVICE · PRIVATE offer, 서비스 판매자 모집)은 이 약국 조직의
-  //   그 세미프랜차이즈 가입이 active 일 때만 보이고 신청 · 주문 대상이 된다.
-  //   PUBLIC offer(플랫폼 전체 공개)와 내 매장 자기 진열은 내 매장 기능 — 세미프랜차이즈 승인과 무관하다.
-  //   API 전체를 막지 않는다(혼합 API 는 항목별 판정). 세미프랜차이즈가 아닌 마운트(cosmetics · back-compat)는 무영향.
+  //   **공급자 공급 상품(offer)은 distribution_type 과 무관하게** 이 약국 조직의 그 세미프랜차이즈 가입이 active 일
+  //   때만 보이고 신청 · 주문 대상이 된다. 공급처 미지정(PUBLIC) 상품도 pharmacy 기본 공급이다 — commerce 공급
+  //   이용 판정(supply-access.ts ACCESS_CTE: 4개 공급 경로 모두 가입 세미프랜차이즈 `my_sf` 필수)과 같은 규칙이며,
+  //   가입 판정은 그 CTE 와 같은 조건의 `listActiveSemiFranchiseKeys` 를 재사용한다.
+  //   이 판정은 공급 상품 항목에만 건다 — 약국 자체 제품 · 공개/커뮤니티 콘텐츠 · 신청 이력(/applications)은 무영향.
+  //   세미프랜차이즈가 아닌 마운트(cosmetics · back-compat)는 무영향.
   const mountSemiFranchiseKey = serviceKey
     ? semiFranchiseAccessKeyFor(STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey])
     : null;
-  const hasMountSemiFranchiseAccess = async (organizationId: string | undefined): Promise<boolean> => {
-    if (!mountSemiFranchiseKey) return true;
-    if (!organizationId) return false;
-    const keys = await listActiveSemiFranchiseKeys(dataSource, organizationId);
-    return keys.includes(mountSemiFranchiseKey);
-  };
-  /** 세미프랜차이즈 미가입 시 목록 필터 — PUBLIC(내 매장 기능) 항목만 남긴다. */
-  const PUBLIC_ONLY_SQL = `AND spo.distribution_type = 'PUBLIC'`;
+  const hasMountSemiFranchiseAccess = (organizationId: string | undefined): Promise<boolean> =>
+    hasServiceSemiFranchiseSupplyAccess(
+      dataSource,
+      serviceKey ? STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey] : null,
+      organizationId,
+    );
+  /** 세미프랜차이즈 미가입 시 목록 필터 — 공급 상품 항목을 모두 뺀다(공급처 미지정 PUBLIC 포함). */
+  const NO_SUPPLY_SQL = `AND FALSE`;
 
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
@@ -240,8 +242,8 @@ export function createPharmacyProductsController(
     let distributionFilter = '';
     let operatorFilter = '';
     const params: any[] = [organizationId, limit, offset];
-    // D1 — 세미프랜차이즈 제공 항목(SERVICE · PRIVATE)은 그 세미프랜차이즈 가입 active 일 때만 노출.
-    const semiFranchiseFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : PUBLIC_ONLY_SQL;
+    // D1 — 공급 상품(PUBLIC · SERVICE · PRIVATE)은 그 세미프랜차이즈 가입 active 일 때만 노출.
+    const semiFranchiseFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : NO_SUPPLY_SQL;
 
     if (category) {
       params.push(category);
@@ -464,9 +466,8 @@ export function createPharmacyProductsController(
       // WO §8: 내부 상태를 구분해 노출하지 않는다.
       throw new ApiError(404, 'Product not available for this service', 'OFFER_NOT_AVAILABLE');
     }
-    // D1 — 세미프랜차이즈 제공 항목(SERVICE · PRIVATE)은 그 세미프랜차이즈 가입 active 일 때만 신청한다.
-    //   PUBLIC 은 내 매장 기능이라 그대로 둔다.
-    if (offer.distribution_type !== 'PUBLIC' && !(await hasMountSemiFranchiseAccess(organizationId))) {
+    // D1 — 공급 상품은 공급처 미지정(PUBLIC)을 포함해 그 세미프랜차이즈 가입 active 일 때만 신청한다.
+    if (!(await hasMountSemiFranchiseAccess(organizationId))) {
       throw new ApiError(
         403,
         `${mountSemiFranchiseKey} 세미프랜차이즈 가입 승인 후 신청할 수 있는 상품입니다.`,
@@ -565,9 +566,9 @@ export function createPharmacyProductsController(
     const organizationId = (req as any).organizationId;
     // HUB-P0-04: /applications 와 동일 — 마운트에서 도출.
     const readServiceKey = resolveMountServiceKeyForRead();
-    // D1 — 승인 상품은 세미프랜차이즈 제공 항목이다. 가입 active 가 아니면 PUBLIC 외 항목을 뺀다.
+    // D1 — 승인 상품은 공급 상품이다. 가입 active 가 아니면 이용 대상에서 뺀다.
     //   (신청 이력 /applications 는 매장 자기 기록이라 그대로 둔다.)
-    const semiFranchiseFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : PUBLIC_ONLY_SQL;
+    const semiFranchiseFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : NO_SUPPLY_SQL;
 
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
@@ -631,11 +632,9 @@ export function createPharmacyProductsController(
     // serviceKey 미지정(back-compat 마운트)이면 SERVICE 승인 게이트 미적용(catalog 와 동일 정책).
     const approvalServiceKey = serviceKey ? STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey] : null;
     const searchPattern = search ? `%${search}%` : null;
-    // D1 — 세미프랜차이즈 미가입이면 그 세미프랜차이즈가 제공하는 행(SERVICE · PRIVATE offer, 서비스 판매자 모집)을
-    //   뺀다. PUBLIC offer 진열(b2b)은 내 매장 기능이라 남는다.
-    const semiFranchiseOrderableFilter = (await hasMountSemiFranchiseAccess(organizationId))
-      ? ''
-      : `AND spo.distribution_type = 'PUBLIC' AND opl.source_type IS DISTINCT FROM 'seller_recruitment'`;
+    // D1 — 이 목록의 행은 모두 공급 상품 진열(offer JOIN)이다. 세미프랜차이즈 미가입이면 공급처 미지정(PUBLIC b2b)을
+    //   포함해 주문 대상에서 뺀다.
+    const semiFranchiseOrderableFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : NO_SUPPLY_SQL;
 
     // 공통 CTE — 분류 + 제외 게이트. $1=orgId, $2=approvalServiceKey(nullable).
     const baseCte = `

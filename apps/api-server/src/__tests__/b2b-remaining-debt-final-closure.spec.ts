@@ -60,6 +60,8 @@ function harness(cartItems: Array<Record<string, any>>) {
     }),
     query: jest.fn(async (sql: string, params: any[]) => {
       queries.push({ sql, params });
+      // 세미프랜차이즈 공급 이용 판정(CHECK §10 D1)은 가입 상태로 둔다 — 이 harness 의 관심사는 offer 재조회 SQL 이다.
+      if (sql.includes('semi_franchise_memberships')) return [{ key: 'pharmacy' }];
       return [];
     }),
   } as any;

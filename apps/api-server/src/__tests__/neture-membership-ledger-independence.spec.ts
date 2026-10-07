@@ -8,9 +8,12 @@
  *   L1 연결 서비스 처리(신청 · 승인 · 반려 · 재활성화)는 Neture 원장을 쓰지 않는다 — 현재 상태를 읽어 전제조건으로만 쓴다.
  *   L2 Neture 승인 · 반려 · 재활성화는 연결 서비스 원장을 쓰지 않고, 연결 서비스 역할을 부여 · 복구하지 않는다.
  *      (행동 계약은 MembershipApprovalService.bareRoleContract / suspensionLifecycleContract 테스트가 고정)
- *   L3 메인 AI 진입점은 서버 guard 로 Neture 가입 승인을 확인한다 — 요청 body(surface · serviceKey)로 우회 불가,
+ *   L3 메인 AI 진입점은 서버 guard 로 Neture 가입 승인을 확인한다 — 요청 body(surface · serviceKey)로 Neture 자격 우회 불가,
  *      예외는 서버가 확인한 platform:super_admin 뿐, 조회 실패는 fail-closed.
+ *      `/request` 의 병원약국 화면 첫 요청만 병원약국 공개 범위(무로그인 `/api/hospital/ai/request` 와 같은 조사 capability)로 처리.
  *   L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한다 — 공통 API 전체를 막지 않는다.
+ *      공급 상품은 distribution_type 무관(공급처 미지정 PUBLIC 포함) 가입 승인 대상 — 목록 · 신청 · 장바구니 확정 ·
+ *      취급매장 모집 신청 모두 같은 판정을 쓴다(직접 호출 우회 차단).
  *
  * DB 접속 없음.
  */
@@ -18,7 +21,11 @@ jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { requireNetureMainMembership } from '../middleware/neture-main-membership.middleware.js';
+import {
+  isHospitalPublicScopeRequest,
+  requireNetureMainMembership,
+} from '../middleware/neture-main-membership.middleware.js';
+import { hasServiceSemiFranchiseSupplyAccess } from '../modules/neture-pharmacy/services/supply-access.js';
 import {
   assertNetureMainMembershipActive,
   getNetureMainMembershipStatus,
@@ -107,15 +114,29 @@ describe('L2 Neture 승인은 연결 서비스 원장 · 역할을 바꾸지 않
 describe('L3 메인 AI 진입점 서버 guard', () => {
   it('통합 요청 · 홈 대화 · 작업 에이전트 · 로컬 에이전트 연결에 guard 가 붙어 있다', () => {
     const ai = read('routes/ai-proxy.routes.ts');
-    for (const path of ['/request', '/home-chat', '/work-agent/run']) {
+    for (const path of ['/home-chat', '/work-agent/run']) {
       expect(ai).toContain(`router.post('${path}', authenticate, requireNetureMember,`);
     }
+    // 통합 요청은 같은 guard + 병원약국 공개 범위 옵션
+    expect(ai).toContain(
+      `const requireNetureMemberOrHospitalPublic = requireNetureMainMembership(AppDataSource, { hospitalPublicScope: true });`,
+    );
+    expect(ai).toContain(`router.post('/request', authenticate, requireNetureMemberOrHospitalPublic,`);
+    // 공개 범위로 내려온 요청은 병원약국 서비스 capability(조사 전용)만 실행한다
+    expect(ai).toMatch(/if \(res\.locals\.hospitalPublicScope === true\) \{[\s\S]{0,400}runHospitalAiRequest\(/);
     expect(read('routes/local-agent.routes.ts')).toContain(
       `router.post('/pairing-grants', authenticate, requireNetureMainMembership(AppDataSource),`,
     );
   });
 
-  const run = async (opts: { roles?: string[]; rows?: unknown[]; fail?: boolean; body?: unknown; userId?: string | null }) => {
+  const run = async (opts: {
+    roles?: string[];
+    rows?: unknown[];
+    fail?: boolean;
+    body?: unknown;
+    userId?: string | null;
+    hospitalPublicScope?: boolean;
+  }) => {
     const query = opts.fail
       ? jest.fn().mockRejectedValue(new Error('db down'))
       : jest.fn().mockResolvedValue(opts.rows ?? []);
@@ -123,9 +144,10 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
       user: opts.userId === null ? undefined : { id: opts.userId ?? 'u1', roles: opts.roles ?? [] },
       body: opts.body ?? {},
     };
-    const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
+    const res: any = { status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis(), locals: {} };
     const next = jest.fn();
-    await requireNetureMainMembership({ query } as any)(req, res, next);
+    const options = opts.hospitalPublicScope ? { hospitalPublicScope: true } : undefined;
+    await requireNetureMainMembership({ query } as any, options)(req, res, next);
     return { query, res, next };
   };
 
@@ -150,6 +172,62 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
     expect(next).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(403);
     expect(query.mock.calls[0][1]).toEqual(['u1', 'neture']);
+  });
+
+  describe('병원약국 공개 범위 (`/request` 전용 옵션)', () => {
+    it('Neture 미승인 · 병원약국 화면 첫 요청 → 공개 범위로 통과 (locals 표식)', async () => {
+      const { next, res, query } = await run({ rows: [], hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.locals.hospitalPublicScope).toBe(true);
+      // Neture 자격 판정은 그대로 'neture' 고정
+      expect(query.mock.calls[0][1]).toEqual(['u1', 'neture']);
+    });
+
+    it('Neture 승인 회원은 공개 범위 표식 없이 정상 경로', async () => {
+      const { next, res } = await run({ rows: [{ status: 'active' }], hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
+      expect(next).toHaveBeenCalled();
+      expect(res.locals.hospitalPublicScope).toBeUndefined();
+    });
+
+    it('runId(실행 재개)를 붙이면 공개 범위가 아니다 → 403', async () => {
+      const { next, res } = await run({
+        rows: [],
+        hospitalPublicScope: true,
+        body: { surface: 'hospital-drug', runId: 'r1' },
+      });
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    it.each([{}, { surface: 'home' }, { surface: 'hospital' }, { serviceKey: 'hospital-pharmacy' }])(
+      '다른 surface %j → 403',
+      async (body) => {
+        const { next, res } = await run({ rows: [], hospitalPublicScope: true, body });
+        expect(next).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(403);
+      },
+    );
+
+    it('옵션이 없는 진입점(홈 대화 · 작업 에이전트 · 로컬 연결)은 병원약국 body 로도 403', async () => {
+      const { next, res } = await run({ rows: [], body: { surface: 'hospital-drug' } });
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.locals.hospitalPublicScope).toBeUndefined();
+    });
+
+    it('조회 실패는 공개 범위로도 내려보내지 않는다 (503)', async () => {
+      const { next, res } = await run({ fail: true, hospitalPublicScope: true, body: { surface: 'hospital-drug' } });
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(503);
+    });
+
+    it('isHospitalPublicScopeRequest', () => {
+      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug' })).toBe(true);
+      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug', runId: '' })).toBe(true);
+      expect(isHospitalPublicScopeRequest({ surface: 'hospital-drug', runId: 'x' })).toBe(false);
+      expect(isHospitalPublicScopeRequest(undefined)).toBe(false);
+    });
   });
 
   it('서버가 확인한 platform:super_admin 만 예외 — DB 조회 없이 통과', async () => {
@@ -179,27 +257,85 @@ describe('L3 메인 AI 진입점 서버 guard', () => {
 describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한다', () => {
   const products = read('routes/o4o-store/controllers/pharmacy-products.controller.ts');
 
-  it('PUBLIC 공급은 내 매장 기능 — 미가입이면 PUBLIC 만 남기고 API 자체는 막지 않는다', () => {
-    expect(products).toContain(`const PUBLIC_ONLY_SQL = \`AND spo.distribution_type = 'PUBLIC'\`;`);
-    // catalog(목록 + count) · approved 에 같은 필터
+  it('공급 상품은 공급처 미지정 PUBLIC 포함 모두 가입 승인 대상 — 미가입이면 공급 항목만 빼고 API 자체는 막지 않는다', () => {
+    expect(products).toContain('const NO_SUPPLY_SQL = `AND FALSE`;');
+    expect(products).not.toContain('PUBLIC_ONLY_SQL');
+    // catalog(목록 + count) · approved 에 같은 필터, orderable 도 같은 판정
     expect(products.match(/\$\{semiFranchiseFilter\}/g)?.length).toBe(3);
+    expect(products).toContain(
+      `const semiFranchiseOrderableFilter = (await hasMountSemiFranchiseAccess(organizationId)) ? '' : NO_SUPPLY_SQL;`,
+    );
     expect(products).toContain('${semiFranchiseOrderableFilter}');
   });
 
-  it('SERVICE/PRIVATE 상품 신청은 세미프랜차이즈 가입 승인이 필요하다', () => {
-    expect(products).toMatch(
-      /offer\.distribution_type !== 'PUBLIC' && !\(await hasMountSemiFranchiseAccess\(organizationId\)\)/,
-    );
+  it('상품 신청은 distribution_type 무관 세미프랜차이즈 가입 승인이 필요하다', () => {
+    expect(products).toContain('if (!(await hasMountSemiFranchiseAccess(organizationId))) {');
+    expect(products).not.toMatch(/distribution_type !== 'PUBLIC' &&/);
     expect(products).toContain(`'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
   });
 
-  it('세미프랜차이즈 키가 없는 마운트(cosmetics 등)는 판정하지 않는다', () => {
-    expect(products).toMatch(/if \(!mountSemiFranchiseKey\) return true;/);
+  it('판정은 commerce 공급 이용 판정(supply-access)을 재사용한다', () => {
+    expect(products).toContain('hasServiceSemiFranchiseSupplyAccess(');
+  });
+
+  describe('hasServiceSemiFranchiseSupplyAccess', () => {
+    const exec = (keys: string[]) => ({ query: jest.fn().mockResolvedValue(keys.map((key) => ({ key }))) });
+
+    it('세미프랜차이즈 키가 없는 서비스(k-cosmetics 등)는 판정하지 않는다', async () => {
+      const e = exec([]);
+      await expect(hasServiceSemiFranchiseSupplyAccess(e as any, 'k-cosmetics', 'o1')).resolves.toBe(true);
+      await expect(hasServiceSemiFranchiseSupplyAccess(e as any, null, 'o1')).resolves.toBe(true);
+      expect(e.query).not.toHaveBeenCalled();
+    });
+
+    it('kpa-society → pharmacy 가입 active 일 때만', async () => {
+      await expect(hasServiceSemiFranchiseSupplyAccess(exec(['pharmacy']) as any, 'kpa-society', 'o1')).resolves.toBe(true);
+      await expect(hasServiceSemiFranchiseSupplyAccess(exec([]) as any, 'kpa-society', 'o1')).resolves.toBe(false);
+      await expect(hasServiceSemiFranchiseSupplyAccess(exec(['other']) as any, 'kpa-society', 'o1')).resolves.toBe(false);
+    });
+
+    it('조직이 없으면 거부', async () => {
+      const e = exec(['pharmacy']);
+      await expect(hasServiceSemiFranchiseSupplyAccess(e as any, 'kpa-society', undefined)).resolves.toBe(false);
+      expect(e.query).not.toHaveBeenCalled();
+    });
+  });
+
+  it('장바구니 확정(공용 B2B)도 같은 판정 — 목록 숨김을 직접 confirm 으로 우회할 수 없다', () => {
+    const core = read('services/cart/b2b-checkout-confirm.core.ts');
+    expect(core).toContain('await this.adapter.assertSupplyAccess?.(this.dataSource, scope, organizationId);');
+    const store = read('services/cart/store-b2b-cart-checkout.service.ts');
+    expect(store).toMatch(
+      /async assertSupplyAccess\(exec, scope, organizationId\) \{\s+if \(!\(await hasServiceSemiFranchiseSupplyAccess\(exec, scope\.serviceKey, organizationId\)\)\)/,
+    );
+    expect(store).toContain(`'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
+  });
+
+  it('이벤트 장바구니 확정은 구매자 기준 세미프랜차이즈 이용 자격을 확인한다', () => {
+    const ev = read('services/cart/event-offer-cart-checkout.service.ts');
+    expect(ev).toContain('resolveSemiFranchiseServiceAccess(this.dataSource, scope.buyerId, semiFranchiseKey)');
+    expect(ev).toContain(`reason: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'`);
   });
 
   it('취급매장 모집(서비스 제공 자료)은 세미프랜차이즈 미가입이면 빈 목록', () => {
     const browse = read('modules/neture/controllers/store-seller-recruitment-browse.controller.ts');
     expect(browse).toContain('listActiveSemiFranchiseKeys(dataSource, organizationId)');
     expect(browse).toContain(`res.json({ success: true, data: [] });`);
+  });
+
+  it('취급매장 모집 신청 POST 도 같은 판정 — 직접 호출로 미가입 신청 불가', () => {
+    const svc = read('modules/neture/services/seller-recruitment.service.ts');
+    expect(svc).toContain('const semiFranchiseKey = semiFranchiseAccessKeyFor(recruitment.serviceId);');
+    expect(svc).toContain(
+      'if (semiFranchiseKey && !(await resolveSemiFranchiseServiceAccess(AppDataSource, applicantId, semiFranchiseKey)).allowed) {',
+    );
+    // 판정은 신청 저장보다 먼저
+    const createFn = svc.slice(svc.indexOf('async createApplication('));
+    expect(createFn.indexOf(`throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED')`)).toBeGreaterThan(0);
+    expect(createFn.indexOf(`throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED')`)).toBeLessThan(
+      createFn.indexOf('this.applicationRepo.save('),
+    );
+    const ctrl = read('modules/neture/controllers/seller-recruitment.controller.ts');
+    expect(ctrl).toMatch(/msg === 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED'\) \{\s+return res\.status\(403\)/);
   });
 });

@@ -192,7 +192,7 @@ const denyExec = async () => ({ ok: false, tool: 'none', reason: 'local_exec_not
  *   - 그 밖 → runHospitalDrugSurface(suppressLocal=true): 서버 원내 조회 없이 research/question 만.
  *     원내 결합은 브라우저가 실제 hospital-drugs.xlsx 에서 읽은 Local Context 로 한다(§8).
  */
-async function runHospitalAiRequest(text: string): Promise<{ kind: 'chat' | 'work'; message: string; plan: string }> {
+export async function runHospitalAiRequest(text: string): Promise<{ kind: 'chat' | 'work'; message: string; plan: string }> {
   const modality = classifyTaskModality({ request: text, image: null });
 
   if (modality.modality === 'screen') {

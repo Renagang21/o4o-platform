@@ -38,6 +38,9 @@ import { notificationService } from '../../../services/NotificationService.js';
 import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
+// CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
+import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
+import { resolveSemiFranchiseServiceAccess } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -342,6 +345,12 @@ export class SellerRecruitmentService {
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
     if (recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
+    // D1 — 세미프랜차이즈가 제공하는 모집(예: kpa-society → pharmacy)은 목록에서만 숨기지 않고 신청도 막는다.
+    //   직접 POST 우회 차단. 판정은 신청자(사용자) 기준 — 그가 owner/admin/manager 인 약국 조직의 가입 active.
+    const semiFranchiseKey = semiFranchiseAccessKeyFor(recruitment.serviceId);
+    if (semiFranchiseKey && !(await resolveSemiFranchiseServiceAccess(AppDataSource, applicantId, semiFranchiseKey)).allowed) {
+      throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
+    }
 
     const existing = await this.applicationRepo.findOne({ where: { recruitmentId, applicantId } });
     if (existing) throw new Error('DUPLICATE_APPLICATION');

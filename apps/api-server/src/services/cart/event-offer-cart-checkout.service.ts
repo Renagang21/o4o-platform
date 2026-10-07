@@ -28,6 +28,8 @@ import {
 import { checkoutService } from '../checkout.service.js';
 import { calculateSupplierShippingFee } from '../shipping/supplier-shipping.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
+import { resolveSemiFranchiseServiceAccess } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 
 /**
  * cart serviceKey(플랫폼 키) → event-offer(OPL) service_key.
@@ -149,6 +151,24 @@ export class EventOfferCartCheckoutService {
         continue;
       }
       eligible.push(it);
+    }
+
+    // 2-1. CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1 — 세미프랜차이즈 서비스(kpa-society → pharmacy)의
+    //   이벤트 공급은 구매자의 그 세미프랜차이즈 이용 자격(내 매장(약국) active ∧ 가입 active)이 있을 때만 주문한다.
+    //   ctx.organizationId 는 이벤트 운영 조직이라 구매 약국 판정에 쓰지 않는다 — 로그인 자격과 같은 판정을 재사용한다.
+    const semiFranchiseKey = semiFranchiseAccessKeyFor(scope.serviceKey);
+    if (
+      semiFranchiseKey &&
+      eligible.length > 0 &&
+      !(await resolveSemiFranchiseServiceAccess(this.dataSource, scope.buyerId, semiFranchiseKey)).allowed
+    ) {
+      for (const it of eligible.splice(0)) {
+        failedItems.push({
+          itemId: it.id,
+          reason: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
+          message: `${semiFranchiseKey} 세미프랜차이즈 가입 승인 후 주문할 수 있는 이벤트 상품입니다.`,
+        });
+      }
     }
 
     // 3. 각 item 컨텍스트 로드 (실패 → failedItems)

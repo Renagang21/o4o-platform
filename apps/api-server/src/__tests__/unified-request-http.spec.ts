@@ -21,7 +21,8 @@
  *       403 에도 taskId · 재요청 taskId 로 같은 Task · 원문이 Task 저장 경로에 닿지 않는다
  *       (WO-O4O-PERSONAL-ASSISTANT-PHASE-A-TASK-FOUNDATION-V1)
  *   ⑭  Neture 가입 승인 guard — 미승인 · 대기 · 반려 · 정지는 403 NETURE_MEMBERSHIP_REQUIRED(본체 미호출) ·
- *       surface=hospital-drug 로도 우회 불가 · platform:super_admin 만 예외
+ *       surface=hospital-drug 로 Neture 자격을 얻을 수 없다 — 미승인은 병원약국 공개 범위(조사 전용 · 원내/화면/작업 실행 없음)로만
+ *       처리 · runId 재개 · 홈 대화 · 작업 에이전트는 403 · platform:super_admin 만 예외
  *       (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5)
  */
 
@@ -482,12 +483,49 @@ describe('⑭ Neture 가입 승인 guard (CHECK §10 E5)', () => {
     expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('Neture 가입 승인 대기 중입니다.');
   });
 
-  it('surface=hospital-drug 를 보내도 승인 검사를 우회할 수 없다', async () => {
+  it('surface=hospital-drug 미승인 → Neture 경로가 아니라 병원약국 공개 범위(조사 전용 · 원내 조회 차단)로만 처리', async () => {
     netureStatusMock.mockResolvedValue('none');
     const r = await request(app).post('/api/ai/request').send({ text: '우루사정 원내약 있어?', surface: 'hospital-drug' });
+    expect(r.status).toBe(200);
+    expect(r.body.data.kind).toBe('chat');
+    expect(r.body.data.route).toBe('hospital-drug');
+    expect(r.body.data.reason).toBe('research_and_local');
+    expect(runSurfaceMock).toHaveBeenCalledTimes(1);
+    expect(runSurfaceMock.mock.calls[0][3]).toBe(true); // suppressLocal — 서버는 원내 조회를 열지 않는다
+    // Neture 본체(홈 대화 · Work Agent)는 호출되지 않는다
+    expect(executeMock).not.toHaveBeenCalled();
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+  });
+
+  it('surface=hospital-drug 미승인 · 화면 조작 요청 → 실행하지 않고 안내만', async () => {
+    netureStatusMock.mockResolvedValue('none');
+    const r = await request(app)
+      .post('/api/ai/request')
+      .send({ text: '원내 프로그램 열어서 재고 화면 클릭해줘', surface: 'hospital-drug' });
+    expect(r.status).toBe(200);
+    expect(r.body.data.kind).toBe('chat');
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+    expect(resolveTargetDeviceMock).not.toHaveBeenCalled();
+  });
+
+  it('surface=hospital-drug 미승인 + runId(실행 재개) → 403 (공개 범위 아님)', async () => {
+    netureStatusMock.mockResolvedValue('none');
+    const r = await request(app).post('/api/ai/request').send({ text: '계속', surface: 'hospital-drug', runId: 'g_1' });
     expect(r.status).toBe(403);
     expect(r.body.code).toBe('NETURE_MEMBERSHIP_REQUIRED');
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
     expect(runSurfaceMock).not.toHaveBeenCalled();
+  });
+
+  it('홈 대화 · 작업 에이전트는 surface=hospital-drug 를 보내도 403', async () => {
+    netureStatusMock.mockResolvedValue('none');
+    for (const [path, body] of ENDPOINTS.slice(1)) {
+      const r = await request(app).post(path).send({ ...body, surface: 'hospital-drug' });
+      expect(r.status).toBe(403);
+      expect(r.body.code).toBe('NETURE_MEMBERSHIP_REQUIRED');
+    }
+    expect(executeMock).not.toHaveBeenCalled();
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
   });
 
   it('platform:super_admin 은 서버 확인 역할로 통과한다 (가입 조회 없이)', async () => {
