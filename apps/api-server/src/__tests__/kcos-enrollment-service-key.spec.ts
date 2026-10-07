@@ -51,19 +51,9 @@ describe('K-Cos enrollment canonical key', () => {
   });
 
   // ── WRITE 경로: 신규 write 는 canonical 만 ─────────────────────────
-  it('KCos 매장 생성/연결 write 는 canonical enrollment key 만 기록한다', () => {
-    const src = read('routes/cosmetics/services/cosmetics-store.service.ts');
-    const enrollCalls = src.match(/enrollService\(\{[\s\S]{0,200}?\}/g) ?? [];
-    expect(enrollCalls.length).toBeGreaterThanOrEqual(2);
-    for (const call of enrollCalls) {
-      expect(call).toContain("serviceCode: 'k-cosmetics'");
-      expect(call).not.toContain("serviceCode: 'cosmetics'");
-    }
-  });
-
+  // KCos 매장 생성/연결 write(routes/cosmetics/services/cosmetics-store.service.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거됐다.
   it('런타임 enrollment write 어디에도 legacy key 리터럴이 없다', () => {
     for (const rel of [
-      'routes/cosmetics/services/cosmetics-store.service.ts',
       'modules/organization/services/organization-ops.service.ts',
     ]) {
       expect(read(rel)).not.toMatch(/serviceCode:\s*'cosmetics'/);

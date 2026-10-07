@@ -37,8 +37,8 @@ describe('§1 backend — legacy generate 축 제거', () => {
     expect(existsSync(join(SRC, 'routes', 'o4o-store', 'controllers', 'store-pop.controller.ts'))).toBe(false);
   });
 
-  it('KPA / cosmetics / pharmacy-hub route 에 createStorePopController mount 가 없다', () => {
-    for (const f of ['kpa/kpa.routes.ts', 'cosmetics/cosmetics.routes.ts', 'pharmacy-hub/pharmacy-hub.routes.ts']) {
+  it('KPA / pharmacy-hub route 에 createStorePopController mount 가 없다 (cosmetics.routes.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거)', () => {
+    for (const f of ['kpa/kpa.routes.ts', 'pharmacy-hub/pharmacy-hub.routes.ts']) {
       expect(codeOnly(read(SRC, 'routes', f))).not.toMatch(/createStorePopController|store-pop\.controller/);
     }
   });
@@ -57,9 +57,9 @@ describe('§1 backend — legacy generate 축 제거', () => {
     );
   });
 
-  it('POP V2 controller mount 는 KPA / cosmetics / pharmacy-hub 3곳 그대로다', () => {
+  it('POP V2 controller mount 는 KPA / pharmacy-hub 그대로다 (cosmetics mount 는 API 와 함께 제거)', () => {
     expect(codeOnly(read(SRC, 'routes', 'kpa', 'kpa.routes.ts'))).toMatch(/createStorePopV2Controller\(dataSource,\s*coreRequireAuth as any,\s*'kpa'\)/);
-    expect(codeOnly(read(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'))).toMatch(/createStorePopV2Controller\(dataSource,\s*coreRequireAuth as any,\s*'cosmetics'\)/);
+    expect(existsSync(join(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'))).toBe(false);
     expect(codeOnly(read(SRC, 'routes', 'pharmacy-hub', 'pharmacy-hub.routes.ts'))).toMatch(/createStorePopV2Controller\(/);
   });
 });
@@ -109,8 +109,8 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     expect((menu.match(/subPath: '\/marketing\/pop-v2'/g) ?? []).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('가이드 copy 의 POP route 는 pop-v2 다 (KPA · KCos)', () => {
-    for (const f of ['kpa.ts', 'k-cosmetics.ts']) {
+  it('가이드 copy 의 POP route 는 pop-v2 다 (KPA — KCos copy 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거)', () => {
+    for (const f of ['kpa.ts']) {
       const src = codeOnly(read(GUIDE, f));
       expect(src).not.toMatch(/'\/store\/marketing\/pop'/);
       expect(src).toMatch(/'\/store\/marketing\/pop-v2'/);

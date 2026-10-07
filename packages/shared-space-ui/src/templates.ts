@@ -29,7 +29,7 @@
 
 // ─── Token Types ────────────────────────────────────────────
 
-export type TemplateKey = 'kpa' | 'kcosmetics' | 'referenceA';
+export type TemplateKey = 'kpa' | 'referenceA';
 
 export interface TemplateTokens {
   hero: {
@@ -110,38 +110,7 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
     },
   },
 
-  kcosmetics: {
-    key: 'kcosmetics',
-    name: 'Beauty Brand',
-    description: '브랜드 중심 — 부드러운 곡선, 중간 그림자, pill 버튼',
-    category: 'brand',
-    tokens: {
-      hero: {
-        bg: 'bg-primary-50',
-        border: 'border border-primary-100',
-        padding: 'py-20',
-      },
-      card: {
-        radius: 'rounded-xl',
-        shadow: 'shadow-md',
-      },
-      section: {
-        spacing: 'mb-20',
-      },
-      button: {
-        radius: 'rounded-full',
-      },
-      icon: {
-        wrapper: 'bg-primary-50 rounded-full w-11 h-11',
-        icon: 'text-primary',
-      },
-      layout: {
-        container: 'max-w-6xl',
-        grid: 'grid-cols-2 lg:grid-cols-4',
-        gap: 'gap-4',
-      },
-    },
-  },
+  // kcosmetics(Beauty Brand) preset 은 K-Cosmetics 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
 
   /**
    * WO-O4O-REFERENCE-DESIGN-IMPORT-V1

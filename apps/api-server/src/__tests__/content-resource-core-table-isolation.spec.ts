@@ -17,7 +17,6 @@ import {
   sanitizeContentTags,
   type ContentResourceConfig,
 } from '../routes/common/content-resource/content-resource-core.js';
-import { COSMETICS_CONTENT_CONFIG } from '../routes/cosmetics/controllers/resources.controller.js';
 import { createKpaContentResourceConfig, resolveKpaListVisibility } from '../routes/kpa/controllers/kpa-content-resource.config.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -63,13 +62,42 @@ function touchedTables(queries: string[]): string[] {
   return [...found];
 }
 
+/**
+ * 두 번째 테이블 fixture — K-Cosmetics 의 `/api/v1/cosmetics/contents|resources` 소비처가
+ * WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거돼 운영 config 가 사라졌다. Core 의 cross-table 격리는
+ * 소비처가 하나여도 계약이므로, 제거 직전 운영 config 를 그대로 옮긴 fixture 로 계속 검증한다.
+ * (테이블 `cosmetics_contents` 는 DB 에 보존 — 이 fixture 는 SQL 을 실행하지 않는다.)
+ */
+const COSMETICS_CONTENT_CONFIG: ContentResourceConfig = {
+  tableName: 'cosmetics_contents',
+  logPrefix: 'K-Cosmetics',
+  operatorRoles: ['cosmetics:operator', 'cosmetics:admin', 'platform:super_admin'],
+  listColumns: `c.id, c.title, c.summary, c.tags, c.category, c.status,
+                  c.sub_type, c.source_type, c.usage_type, c.source_url, c.source_file_name,
+                  c.thumbnail_url, c.created_by, c.author_name,
+                  c.like_count, c.view_count, c.reusable_policy, c.created_at, c.updated_at`,
+  operatorListColumns: `c.id, c.title, c.summary, c.tags, c.category, c.status,
+                    c.source_type, c.usage_type, c.source_url, c.source_file_name,
+                    c.thumbnail_url, c.created_by, c.author_name,
+                    c.like_count, c.view_count, c.reusable_policy, c.created_at, c.updated_at`,
+  listFilters: [
+    { param: 'sub_type', column: 'sub_type' },
+    { param: 'usage_type', column: 'usage_type' },
+    { param: 'source_type', column: 'source_type' },
+  ],
+  operatorListFilters: [
+    { param: 'source_type', column: 'source_type' },
+    { param: 'usage_type', column: 'usage_type' },
+  ],
+};
+
 const KPA_CONFIG = createKpaContentResourceConfig({
   mapCmsStatus: (s: string) => s,
   audit: () => {},
 });
 
 const SERVICE_CASES: Array<{ name: string; config: ContentResourceConfig; table: string }> = [
-  { name: 'K-Cosmetics', config: COSMETICS_CONTENT_CONFIG, table: 'cosmetics_contents' },
+  { name: 'K-Cosmetics(fixture)', config: COSMETICS_CONTENT_CONFIG, table: 'cosmetics_contents' },
   { name: 'KPA-Society', config: KPA_CONFIG, table: 'kpa_contents' },
 ];
 
@@ -106,7 +134,7 @@ describe('tableName 안전 계약 (WO §4)', () => {
     }
   });
 
-  it('서비스 config 3종은 모두 안전한 테이블명을 명시 주입한다', () => {
+  it('서비스 config 는 모두 안전한 테이블명을 명시 주입한다', () => {
     for (const { config, table } of SERVICE_CASES) {
       expect(config.tableName).toBe(table);
       expect(assertSafeTableName(config.tableName)).toBe(table);
@@ -213,7 +241,7 @@ describe('필터 계약', () => {
     expect(KPA_CONFIG.listFilters.map((f) => f.param).sort()).toEqual(['content_type', 'sub_type']);
   });
 
-  it('KCos 회원 목록은 sub_type/usage_type/source_type 을 읽는다', () => {
+  it('KCos(fixture) 회원 목록은 sub_type/usage_type/source_type 을 읽는다', () => {
     for (const config of [COSMETICS_CONTENT_CONFIG]) {
       expect(config.listFilters.map((f) => f.param).sort()).toEqual(['source_type', 'sub_type', 'usage_type']);
     }

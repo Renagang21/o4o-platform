@@ -76,10 +76,10 @@ const DEAD_UNREACHABLE_SERVICE = (svc) =>
 export const UNREGISTERED_INVENTORY = new Map([
   // [WO-O4O-LEGACY-FILES-DEPENDENCIES-AND-DEAD-RUNTIME-FINAL-CLEANUP-V1]
   //   `src/entities/**` 의 runtime 미도달 legacy entity 정의 31건이 파일째 제거되면서
-  //   해당 재고 항목도 함께 사라졌다. 남은 5건은 정의 파일이 살아 있는 미등록 재고다.
+  //   해당 재고 항목도 함께 사라졌다. 남은 항목은 정의 파일이 살아 있는 미등록 재고다.
+  //   (CosmeticsContent 는 routes/cosmetics 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
   // --- module / route 하위 legacy 정의 ---
   ['OfferServicePrice', { file: 'apps/api-server/src/modules/neture/entities/OfferServicePrice.entity.ts', reason: DEAD }],
-  ['CosmeticsContent', { file: 'apps/api-server/src/routes/cosmetics/entities/cosmetics-content.entity.ts', reason: DEAD }],
   ['KpaCourseRequest', { file: 'apps/api-server/src/routes/kpa/entities/kpa-course-request.entity.ts', reason: DEAD }],
   ['KpaInstructorQualification', { file: 'apps/api-server/src/routes/kpa/entities/kpa-instructor-qualification.entity.ts', reason: DEAD }],
 

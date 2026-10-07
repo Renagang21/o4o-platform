@@ -13,7 +13,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
-  COSMETICS_STORE_CONFIG,
   StoreDashboardLayout,
   resolveStoreMenu,
   useStoreCapabilities,
@@ -131,17 +130,17 @@ export function ServiceStoreLayout() {
 
 /**
  * 서비스 지정 매장 화면의 서비스별 차이 — §21-13 · §21-15
- *   menu      : 사이드바(basePath 는 위에서 서비스 경로로 덮는다). KPA = 공통 트리 메뉴, KCos = 원본 앱 메뉴(`COSMETICS_STORE_CONFIG`).
- *   ownerOnly : 원본 앱이 `/store` 전체를 매장 경영자 가드로 막았는지(KCos `StoreOwnerGuard`). KPA 는 화면 단위(StoreOwnerOnly).
+ *   menu      : 사이드바(basePath 는 위에서 서비스 경로로 덮는다). KPA = 공통 트리 메뉴.
+ *   ownerOnly : 원본 앱이 `/store` 전체를 매장 경영자 가드로 막았는지. KPA 는 화면 단위(StoreOwnerOnly).
+ *   (K-Cosmetics §21-15 mount 는 퇴역으로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  */
 const SERVICE_STORE_MOUNTS: Partial<Record<UnifiedServiceKey, { menu: StoreDashboardConfig; ownerOnly: boolean }>> = {
   'kpa-society': { menu: UNIFIED_STORE_CONFIG, ownerOnly: false },
-  'k-cosmetics': { menu: COSMETICS_STORE_CONFIG, ownerOnly: true },
 };
 
 /**
  * 서비스 지정 역할 게이트 — 서비스 문맥 전환(effect) 전 첫 렌더에도 맞는 서비스로 판정하도록 serviceKey 를 직접 받는다.
- *   roles 미지정 = 매장 경영자 규칙(`isServiceStoreOwner`). 지정 시 그 목록만(예: KCos `/store/info` 는 operator 제외).
+ *   roles 미지정 = 매장 경영자 규칙(`isServiceStoreOwner`). 지정 시 그 목록만.
  */
 export function ServiceRoleOnly({ serviceKey, roles, children }: { serviceKey: UnifiedServiceKey; roles?: readonly string[]; children: ReactNode }) {
   const { user } = useAuth();

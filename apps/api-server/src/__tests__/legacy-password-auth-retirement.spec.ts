@@ -100,8 +100,8 @@ const PASSWORD_INPUT_ALLOWLIST = [
   'apps/admin-dashboard/src/pages/__debug__/AuthBootstrapDebug.tsx',
   'apps/admin-dashboard/src/pages/__debug__/AuthStateJsonDebug.tsx',
   // 매장 태블릿 PIN(선택) — 사용자 로그인 비밀번호가 아니다(CHECK §1-6 OUT_OF_SCOPE).
-  // 원본 앱(services/web-k-cosmetics)은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — store.neture.co.kr 이식본만 남았다(같은 태블릿 PIN 입력).
-  'services/web-store/src/services/kcos/pages/store/StoreSettingsPage.tsx',
+  // K-Cosmetics 태블릿 PIN 입력(원본 web-k-cosmetics · 이식본 web-store kcos)은 앱 · 화면 퇴역으로 모두 삭제 —
+  //   WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1 · WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1.
   // SMTP 발신 계정 비밀번호/앱 비밀번호 — 메일 전송 자격이며 로그인 축이 아니다.
   'services/web-neture/src/pages/admin/settings/EmailSettingsPage.tsx',
   // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 로그인 비밀번호 입력의 **유일한** 공통 컴포넌트

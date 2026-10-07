@@ -115,32 +115,12 @@ export {
   netureGuideServiceKcosmeticsProps,
 } from './copy/neture.js';
 
-// WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
-export {
-  kCosmeticsGuideIntroProps,
-  kCosmeticsGuideIntroStructureProps,
-  kCosmeticsGuideIntroKpaProps,
-  kCosmeticsGuideIntroOperationProps,
-  kCosmeticsGuideIntroConceptProps,
-  kCosmeticsGuideUsageProps,
-  kCosmeticsGuideFeaturesProps,
-  kCosmeticsGuideFeatureForumProps,
-  kCosmeticsGuideFeatureContentProps,
-  kCosmeticsGuideFeatureResourcesProps,
-  kCosmeticsGuideFeatureSignageProps,
-  kCosmeticsGuideFeaturePopProps,
-  kCosmeticsGuideFeatureBlogProps,
-  kCosmeticsGuideFeatureProductionMaterialsProps,
-  // WO-O4O-GUIDE-CROSSSERVICE-COVERAGE-GAP-CLOSURE-V1 (A형 gap 해소)
-  kCosmeticsGuideFeatureStoreProps,
-  kCosmeticsGuideFeatureQrProps,
-} from './copy/k-cosmetics.js';
+// K-Cosmetics guide copy(copy/k-cosmetics.ts)는 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
 
 // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1
 //   /service-guide 공통 서비스 소개 landing + 서비스별 config
 export { GuideServiceIntroPage } from './GuideServiceIntroPage.js';
 export { kpaServiceIntroProps } from './copy/kpa.js';
-export { kCosmeticsServiceIntroProps } from './copy/k-cosmetics.js';
 
 // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
 //   PharmacyHub 는 공통 Guide View 를 그대로 채택하고 copy/config 만 주입한다.

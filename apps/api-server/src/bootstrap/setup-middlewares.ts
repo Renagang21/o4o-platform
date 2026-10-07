@@ -52,7 +52,7 @@ export const getAllowedOrigins = (): string[] => {
     "https://shop.neture.co.kr", "https://forum.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
-    "https://k-cosmetics.site", "https://www.k-cosmetics.site",
+    // k-cosmetics.site · www — K-Cosmetics 종료로 제거(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     // WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1:
     //   canonical 도메인은 platform_services.entry_url / Dockerfile VITE_SERVICE_URL 과 동일.
     //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다.
@@ -74,7 +74,6 @@ export const getAllowedOrigins = (): string[] => {
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
-    "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",
     "https://pharmacy-hub-web-3e3aws7zqa-du.a.run.app",
     "https://lecture-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1:
