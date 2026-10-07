@@ -7,7 +7,7 @@
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
 > **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
-> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 본문의 해당 위치(§5 Axis A 흐름도 · 불변식 A3 · §8 K-Cosmetics 행 · §9 은퇴 축 표 · §12-3 조회 경로 표)를 그 자리에서 정정했다 — cosmetics 주문 · 결제 · B2B 결제 · 조회 endpoint 는 존재하지 않는다(410 도 아니다). §5 의 serviceKey 매핑표(`k-cosmetics` → `k-cosmetics-event-offer`)는 코드 상수가 남아 있어 그대로 둔다. 남은 `k-cosmetics` B2B 데이터 · Event Offer 범위는 퇴역 잔여이며 [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 가 다룬다. **분류 규칙**: 이 문서에서 K-Cosmetics(`k-cosmetics` · `k-cosmetics-event-offer`)가 나오는 모든 흐름 · 표 · 불변식 · §10 DF · §13 항목은 2026-10-07 부터 **현행 계약이 아니라 퇴역 잔여 기록**이다(해당 위치에 표시). 공통 경로 · strategy 코드에 `k-cosmetics` 가 남아 있어도 지원 대상이 아니며, 그 정리는 퇴역 잔여 계약 R1 · R5 가 다룬다. 다른 축 · 서비스의 계약은 불변.
+> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 본문의 해당 위치(§5 Axis A 흐름도 · 불변식 A3 · §8 K-Cosmetics 행 · §9 은퇴 축 표 · §12-3 조회 경로 표)를 그 자리에서 정정했다 — cosmetics 주문 · 결제 · B2B 결제 · 조회 endpoint 는 존재하지 않는다(410 도 아니다). §5 serviceKey 매핑표의 `k-cosmetics` → `k-cosmetics-event-offer` 행은 코드(`CART_TO_EVENT_OFFER_SERVICE_KEY`)에서 삭제돼 표에서도 뺐다 — 다시 넣지 않는다. 남은 `k-cosmetics` B2B 데이터 · Event Offer 범위는 퇴역 잔여이며 [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 가 다룬다. **분류 규칙**: 이 문서에서 K-Cosmetics(`k-cosmetics` · `k-cosmetics-event-offer`)가 나오는 모든 흐름 · 표 · 불변식 · §10 DF · §13 항목은 2026-10-07 부터 **현행 계약이 아니라 퇴역 잔여 기록**이다(해당 위치에 표시). 공통 경로 · strategy 코드에 `k-cosmetics` 가 남아 있어도 지원 대상이 아니며, 그 정리는 퇴역 잔여 계약 R1 · R5 가 다룬다. 다른 축 · 서비스의 계약은 불변.
 
 ---
 
@@ -150,7 +150,7 @@ WO 가 정한 canonical 흐름:
 
 ### 5-1. Axis A — Event-Offer 축 (KPA Society · ~~K-Cosmetics~~) — **payment-first**
 
-> (2026-10-07 정정) K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없어, 공통 `/api/v1/store/cart/:serviceKey/*` 는 `k-cosmetics` 를 **410 `SERVICE_RETIRED`** 로 닫았고(`RETIRED_CART_SERVICE_KEYS`) event-offer 장바구니 매핑도 삭제했다. 남은 잔여는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1. 아래 흐름 · 매핑표의 `k-cosmetics` 는 남은 코드 상수 기록이며 현행 축 계약이 아니다.
+> (2026-10-07 정정) K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없어, 공통 `/api/v1/store/cart/:serviceKey/*` 는 `k-cosmetics` 를 **410 `SERVICE_RETIRED`** 로 닫았고(`RETIRED_CART_SERVICE_KEYS`) event-offer 장바구니 매핑도 삭제했다. 남은 잔여는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1. 아래 매핑표의 `k-cosmetics` 행은 코드와 함께 삭제했다.
 
 Event Offer 는 **특가 판매**다. 참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 같은 개념은
 이 축에 존재하지 않는다. 일반 공급자→매장 B2B commerce 와 **같은 결제·처리 축**을 쓴다.
@@ -178,7 +178,6 @@ event_offer (공급자 특가 제안, 운영자 승인)
 | cart serviceKey | event-offer serviceKey |
 |---|---|
 | `kpa-society` | `kpa-groupbuy` |
-| `k-cosmetics` | `k-cosmetics-event-offer` |
 
 **불변식 A1 (payment-first).** 주문은 `paymentStatus='pending'` 으로 생성되고, **결제 완료 event 만이**
 `paid` 로 전이시킨다. 라우트가 결제 상태를 직접 조작하지 않는다(Axis B 의 불변식 B1 과 동일).
