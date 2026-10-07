@@ -9,15 +9,25 @@
 
 ---
 
-## 1. 현재 상태 (2026-10-07)
+## 1. 현재 상태와 잔여 목록
+
+> **잔여 목록의 정본은 이 절이다.** 퇴역 작업이 잔여를 정리하면 같은 변경에서 이 표를 갱신한다(상태 열 · 근거 커밋/PR). WO · CHECK 는 근거로만 링크한다.
 
 - **퇴역 결정**: K-Cosmetics(`k-cosmetics`, `retail.neture.co.kr`)는 퇴역한다 — 사용자 결정 2026-10-05, [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14.
 - **이미 삭제된 runtime**:
-  - 퇴역 1차-A(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1`) — 독립 웹 앱 `services/web-k-cosmetics` · 웹 배포 job.
-  - 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339) — `/api/v1/cosmetics/*` 전체(`routes/cosmetics/**` · 주문 · 결제 · B2B 결제 · 전용 entity 13개) · web-store `/work/k-cosmetics/*` 기능 화면(종료 안내만 남김) · admin `/cosmetics-products`.
-- **남은 잔여** (1차-B 가 DEFER 로 남긴 것): service identity · catalog row(`k-cosmetics`, 진입 capability 닫힘) · `SERVICE_KEYS` · `cosmetics:*` roles · DB 스키마(`cosmetics` 스키마 · `public.cosmetics_members` · `public.cosmetics_contents`) · migration · `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 매핑 · community / signage / LMS / CMS 의 `k-cosmetics` identity.
+  - 퇴역 1차-A(커밋 518da8b59, `WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1`) — 독립 웹 앱 `services/web-k-cosmetics` · 웹 배포 job.
+  - 퇴역 1차-B(PR #339, `WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`) — `/api/v1/cosmetics/*` 전체(`routes/cosmetics/**` · 주문 · 결제 · B2B 결제 · 전용 entity 13개) · web-store `/work/k-cosmetics/*` 기능 화면(종료 안내만 남김) · admin `/cosmetics-products`.
 
-잔여의 최신 목록은 **가장 최근 퇴역 WO 의 DEFER 항목**이 정본이다. 이 절은 작성 시점 기록이다.
+### 1-1. 잔여 목록 (2026-10-07 기준)
+
+| # | 잔여 | 상태 | 비고 |
+|---|---|---|---|
+| R1 | **공통 cart write 경로가 `k-cosmetics` 를 받는다** — `/api/v1/store/cart/:serviceKey/*`(`checkout-confirm` · `checkout-confirm-b2b`)는 `getAllServiceKeys()` 로 serviceKey 를 검증하고 catalog 에 `k-cosmetics` 가 남아 있다 | 남음 · **우선 정리 대상** | `k-cosmetics` 결제 경로(`/cosmetics/b2b/payments/*`)는 삭제됐고 `/kpa/b2b/payments/*` 는 KPA serviceKey 만 받는다 → **결제할 수 없는 pending 주문**이 생길 수 있다. 차단은 runtime 변경이라 퇴역 작업 범위 |
+| R2 | service identity · catalog row(`k-cosmetics`, 진입 capability 닫힘) · `SERVICE_KEYS` | 남음 | R1 의 원인. 정리는 소비처 전수 확인 후(§2 규칙 3) |
+| R3 | `cosmetics:*` roles | 남음 | RBAC SSOT 절차 |
+| R4 | DB 스키마 — `cosmetics` 스키마 · `public.cosmetics_members` · `public.cosmetics_contents` · 관련 migration | 남음 | 처리 방식(유지 · 제거 · archive · 파기)은 퇴역 작업이 정한다 · 사용자 승인 |
+| R5 | `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 코드 매핑(`CART_TO_EVENT_OFFER_SERVICE_KEY` · `COSMETICS_B2B_SERVICE_KEYS` 등) | 남음 | 기존 주문 데이터는 `checkout_orders` B2B 원장(§2 규칙 4) |
+| R6 | community / signage / LMS / CMS 의 `k-cosmetics` identity | 남음 | 공통 구조 serviceKey 격리 데이터 |
 
 퇴역 대상은 **서비스**이지 화장품 **제품군**(Neture 공급 제품 · 카테고리)이 아니다. 제품군은 이 문서의 대상이 아니다.
 
@@ -36,4 +46,4 @@
 
 ## 3. 이 문서가 끝나는 조건
 
-§1 의 잔여가 모두 정리되면(퇴역 작업의 마지막 단계) 이 문서 상단 상태를 OBSOLETE 로 바꾸고 `CANONICAL-INDEX` 행을 정리한다.
+§1-1 잔여 목록의 R1 ~ R6 이 모두 정리됨으로 갱신되면(퇴역 작업의 마지막 단계) 이 문서 상단 상태를 OBSOLETE 로 바꾸고 `CANONICAL-INDEX` 행을 정리한다.

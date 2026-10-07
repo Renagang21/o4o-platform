@@ -139,7 +139,7 @@ WO 가 정한 canonical 흐름:
 
 > **(2026-10-06 정정) 현행 주문 경로는 5개다** — 위 "3개 축"은 작성 시점 표기다. 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders` 로 수렴하고 **모두 payment-first** 다(UNPAID 주문은 fulfillment 대상 아님).
 > 1. Axis A — Event Offer 특가(§5-1, order source `store_cart_checkout`)
-> 2. **승인축 B2B** — KPA Society · K-Cosmetics 승인 카탈로그 담기(§13-6) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
+> 2. **승인축 B2B** — KPA Society 승인 카탈로그 담기(§13-6. K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없는데 공통 `/api/v1/store/cart/:serviceKey/*` 는 catalog 에 남은 `k-cosmetics` 를 아직 받아 **결제할 수 없는 pending 주문**이 생길 수 있다. 이 write 경로 차단은 퇴역 잔여([K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1)) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
 > 3. Axis B — Neture B2B(§5-2)
 > 4. Axis C — PharmacyHub(§5-3)
 > 5. Axis D — Neture 약국 매장(아래, order source `neture_pharmacy_cart`)
@@ -148,7 +148,9 @@ WO 가 정한 canonical 흐름:
 
 > **Axis D — Neture 약국 매장 축 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 같은 원장(`store_cart_items` `service_key='neture-pharmacy'` → `checkoutService.createOrder()` → `checkout_orders`)을 쓴다. 장바구니에 선택한 공급 옵션(기본 공급 · 공급 제안 · 이벤트 · 모집)을 저장하고, 확정 시 서버가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 로 재판정 · 단가 확정 후 (수취 주체, 공급자) 단위로 주문을 만든다. 결제는 payment-first 이며 현재 테스트 결제만 있다(실제 PG 미선정). 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8.
 
-### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics) — **payment-first**
+### 5-1. Axis A — Event-Offer 축 (KPA Society · ~~K-Cosmetics~~) — **payment-first**
+
+> (2026-10-07 정정) K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없는데 공통 `/api/v1/store/cart/:serviceKey/*` 는 catalog 에 남은 `k-cosmetics` 를 아직 받아 **결제할 수 없는 pending 주문**이 생길 수 있다. 이 write 경로 차단은 퇴역 잔여([K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1). 아래 흐름 · 매핑표의 `k-cosmetics` 는 남은 코드 상수 기록이며 현행 축 계약이 아니다.
 
 Event Offer 는 **특가 판매**다. 참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 같은 개념은
 이 축에 존재하지 않는다. 일반 공급자→매장 B2B commerce 와 **같은 결제·처리 축**을 쓴다.
