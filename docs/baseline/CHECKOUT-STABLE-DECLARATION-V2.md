@@ -10,7 +10,7 @@
 
 V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 closed loop 을 Stable 로 선언했다. 이 축은 현재 사업 경계에 없다:
 
-- 소비자 결제 경로는 모두 `410 STORE_SALE_PAYMENT_DEPRECATED`(`/kpa/payments/*` · `/cosmetics/payments/*`)이고, 소비자 주문 생성은 `410 STORE_CONSUMER_ORDER_RETIRED` 다.
+- 소비자 결제 경로는 모두 `410 STORE_SALE_PAYMENT_DEPRECATED`(`/kpa/payments/*`)이고, 소비자 주문 생성은 `410 STORE_CONSUMER_ORDER_RETIRED` 다. `/cosmetics/payments/*` 는 `/api/v1/cosmetics/*` 전체와 함께 삭제됐다(2026-10-07 정정 — K-Cosmetics 퇴역 1차-B `WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`).
 - 플랫폼 직접 판매 계약은 NONE 이다(COMMERCE-BOUNDARY, 2026-08-25 확정).
 
 그래서 V2 는 **현재 살아 있는 B2B checkout 과 PaymentCore 공통 계약만** Stable 로 둔다. 이것은 현행 정책을 기록한 것이지 영구 계약이 아니다 — 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차를 따른다.
@@ -20,9 +20,9 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 ### 2-1. B2B checkout 계약
 
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점**(`apps/api-server/src/services/checkout.service.ts`). 독립 `*_orders` · `*_payments` 테이블을 만들지 않는다(`scripts/check-forbidden-tables.mjs`).
-- 현행 내부 주문 경로 = 공급자 → 매장 B2B 5축 — event-offer · **승인축 B2B**(KPA Society · K-Cosmetics 승인 상품, `/store/cart/:serviceKey/checkout-confirm-b2b` → `StoreB2BCartCheckoutService`, order source `store_b2b_cart`) · Neture B2B · PharmacyHub · **Neture 약국 매장**(B2B 계약 Axis D, `/neture/pharmacy/cart/checkout` → `PharmacyCartService`, `service_key='neture-pharmacy'` · order source `neture_pharmacy_cart`) — 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders`. 주문 축의 세부 계약은 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
+- 현행 내부 주문 경로 = 공급자 → 매장 B2B 5축 — event-offer · **승인축 B2B**(KPA Society · K-Cosmetics 승인 상품 — K-Cosmetics 는 퇴역 결정 · 운영 runtime 제거, 남은 `k-cosmetics` B2B 범위는 퇴역 잔여로 [COSMETICS-DOMAIN-RULES](../architecture/COSMETICS-DOMAIN-RULES.md) 가 다룬다(2026-10-07 정정), `/store/cart/:serviceKey/checkout-confirm-b2b` → `StoreB2BCartCheckoutService`, order source `store_b2b_cart`) · Neture B2B · PharmacyHub · **Neture 약국 매장**(B2B 계약 Axis D, `/neture/pharmacy/cart/checkout` → `PharmacyCartService`, `service_key='neture-pharmacy'` · order source `neture_pharmacy_cart`) — 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders`. 주문 축의 세부 계약은 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
 - **payment-first**: UNPAID 주문은 공급자 fulfillment · 배송 · 정산 대상이 아니다. `checkout_order` 의 paid 전이는 결제 완료 처리로만 일어난다(route 가 직접 조작하지 않는다) — PaymentCore 경로는 결제 완료 이벤트(§2-3), Neture 약국 매장은 아래 테스트 결제 confirm 트랜잭션 안에서다.
-- 결제 진입은 B2B 전용 namespace 에만 둔다 — `/neture/b2b/payments/*` · `/kpa/b2b/payments/*` · `/cosmetics/b2b/payments/*`(`b2b-payment-controller.factory.ts`) · PharmacyHub `/store-owner/payments/*` · Neture 약국 매장 `/neture/pharmacy/payments/{prepare,confirm}`. 각 진입은 허용 `metadata.serviceKey` · order source 집합으로 서비스 경계를 지킨다.
+- 결제 진입은 B2B 전용 namespace 에만 둔다 — `/neture/b2b/payments/*` · `/kpa/b2b/payments/*`(`b2b-payment-controller.factory.ts`) · PharmacyHub `/store-owner/payments/*` · Neture 약국 매장 `/neture/pharmacy/payments/{prepare,confirm}`. 각 진입은 허용 `metadata.serviceKey` · order source 집합으로 서비스 경계를 지킨다. (2026-10-07 정정) `/cosmetics/b2b/payments/*` 는 K-Cosmetics 퇴역 1차-B 로 삭제됐다(`store-b2b-payment-first-canonicalization.spec.ts` 부재 단언).
 - **Neture 약국 매장 결제는 PG 독립 테스트 결제다**(`PharmacyPaymentService`, [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8-3). PG 와 PaymentCore `confirm()` · 이벤트를 거치지 않고, 결제 묶음 advisory lock · `FOR UPDATE` 아래에서 서버 합산 금액을 재검증한 뒤 `o4o_payments`(`paymentMethod='TEST'`)와 `checkout_orders` 를 직접 paid 로 전이한다. `NETURE_PHARMACY_PAYMENT_MODE=live` 는 `503 PAYMENT_PROVIDER_NOT_SELECTED`, production 미설정은 `503 PAYMENT_NOT_CONFIGURED` 다. 실 PG 연결 방식은 이 문서가 정하지 않는다 — DESIGN 문서 범위다. 아래 §2-2 PaymentCore 규칙은 PaymentCore 를 거치는 경로에 적용된다.
 
 ### 2-2. PaymentCore (`packages/payment-core`)
@@ -56,7 +56,7 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 | 공개 매장 상품 조회 `GET /:slug/products/:id`(B2C visibility gate) — 소비처 = KPA QR 상품 랜딩 | **정보 표시**(ACTIVE) — checkout 이 아니다 | COMMERCE-BOUNDARY §4 |
 | 태블릿 상품 노출 | 정보 표시 — `TABLET` 채널 게이트 | COMMERCE-BOUNDARY §4 |
 | V1 의 "Storefront 4중 게이트" · "Checkout 7중 검증(B2C)" · "판매 · 결제 축 Stable 달성" | 은퇴 — 소비자 결제 410 | V1 · COMMERCE-BOUNDARY §2 · §12 |
-| 소비자 결제 · 주문 경로(`/kpa/payments/*` · `/cosmetics/payments/*` · 소비자 주문 생성) | LEGACY_COMMERCE — **복구 · 확장 금지** | COMMERCE-BOUNDARY §8 · §9 · §10 |
+| 소비자 결제 · 주문 경로(`/kpa/payments/*` · 소비자 주문 생성. `/cosmetics/payments/*` 는 퇴역 1차-B 로 삭제) | LEGACY_COMMERCE — **복구 · 확장 금지** | COMMERCE-BOUNDARY §8 · §9 · §10 |
 
 정보 표시 경로는 동결 대상이 아니므로 일반 WO 로 고친다. 단 그 경로에 cart · checkout · 결제를 붙이는 것은 COMMERCE-BOUNDARY §15 절차 없이 할 수 없다.
 
