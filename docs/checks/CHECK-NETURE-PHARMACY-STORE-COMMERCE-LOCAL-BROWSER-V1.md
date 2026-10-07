@@ -565,3 +565,16 @@ guard 안: 얇은 middleware = `platform:super_admin` 통과 + `hasActiveService
 - Neture 정지 · 재활성화 비대칭(A5) · 기존 공급자 데이터 · 화면 이전 · 커뮤니티 — 범위 밖 유지.
 
 **상태**: 정정 구현 · 로컬 검증 완료 · **미통합 · 미배포**. main 통합은 사용자 승인 후 PR merge.
+
+### 10-12. PR #349 인계 — 모집 행 기준 가입 판정 (2026-10-07)
+
+Codex P1 `r4206382303` 대응. §10-10 R3의 serviceKey 기반 판정을 대체한다. 정본 [DESIGN](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §2는 세미프랜차이즈를 데이터 행으로 구분하며, `seller_recruitments.semi_franchise_id IS NULL`인 기존 서비스 모집은 보존한다.
+
+- KPA 매장 모집 목록: 서버가 확정한 `organizationId`를 내부 조회 필터로 전달한다. 일반 모집(NULL)은 유지하고, 세미프랜차이즈 모집은 해당 조직의 내 매장(약국) 신청 active · 해당 모집의 세미프랜차이즈 가입 active · 세미프랜차이즈 active일 때만 노출한다. 다른 세미프랜차이즈 가입으로 대신 인정하지 않는다.
+- 직접 신청 POST: NULL 모집은 기존 흐름을 유지한다. 세미프랜차이즈 모집은 `semiFranchiseId`로 신청자의 owner/admin/manager 조직 관계와 위 active 조건을 확인하고, 미충족 시 저장 전에 기존 403 `SEMI_FRANCHISE_MEMBERSHIP_REQUIRED`로 차단한다.
+- 서비스 로그인(#323 `SERVICE_NOT_MEMBER` 및 pharmacy 호환) 판정 · 공급 상품 판정 · supplier/public 모집 목록 · HTTP route/응답 형식 · DB schema/migration은 변경하지 않는다.
+- 기존 리뷰 4건은 DESIGN/색인 정합 · 이벤트 확정 선택 매장 헤더 · 세미프랜차이즈 실제 신청자 재확인을 코드와 §10-11 기록으로 확인하고 스레드를 해결했다.
+
+**검증**: 신규 행동 테스트 12건 포함 focused Jest 4 suites / 129 PASS. api-server `tsc --noEmit` PASS. 전체 API Jest와 원격 CI 결과는 최종 PR 보고 참조.
+
+**운영 영향 · 남은 항목**: 운영 DB write · 배포 · 브라우저 smoke 미실시. 배포 후 §9-5 가입 흐름부터 smoke 재개. §10-11의 모집 신청 사용자 단위 한계와 Neture 정지/재활성화 비대칭, 기존 공급자 데이터, Frozen F8 옛 명칭은 후속 항목으로 유지한다. 현재 **미통합 · 미배포**이며 main 통합은 사용자 승인 후 PR merge한다.

@@ -339,18 +339,16 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
     );
   });
 
-  it('취급매장 모집(서비스 제공 자료)은 세미프랜차이즈 미가입이면 빈 목록', () => {
+  it('취급매장 모집은 서버가 확정한 조직으로 행별 판정한다', () => {
     const browse = read('modules/neture/controllers/store-seller-recruitment-browse.controller.ts');
-    expect(browse).toContain('listActiveSemiFranchiseKeys(dataSource, organizationId)');
-    expect(browse).toContain(`res.json({ success: true, data: [] });`);
+    expect(browse).toContain("storeOrganizationId: (req as Request & { organizationId?: string }).organizationId ?? ''");
+    expect(browse).not.toContain('semiFranchiseAccessKeyFor');
   });
 
-  it('취급매장 모집 신청 POST 도 같은 판정 — 직접 호출로 미가입 신청 불가', () => {
+  it('세미프랜차이즈 모집 신청 POST 는 실제 모집 행 기준으로 직접 호출을 방어한다', () => {
     const svc = read('modules/neture/services/seller-recruitment.service.ts');
-    expect(svc).toContain('const semiFranchiseKey = semiFranchiseAccessKeyFor(recruitment.serviceId);');
-    expect(svc).toContain(
-      'if (semiFranchiseKey && !(await resolveSemiFranchiseServiceAccess(AppDataSource, applicantId, semiFranchiseKey)).allowed) {',
-    );
+    expect(svc).toContain('if (recruitment.semiFranchiseId) {');
+    expect(svc).toContain('[applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES]]');
     // 판정은 신청 저장보다 먼저
     const createFn = svc.slice(svc.indexOf('async createApplication('));
     expect(createFn.indexOf(`throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED')`)).toBeGreaterThan(0);

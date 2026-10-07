@@ -39,8 +39,7 @@ import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
-import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
-import { resolveSemiFranchiseServiceAccess } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
+import { PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -88,13 +87,28 @@ export class SellerRecruitmentService {
    *  - exposureStatus 필터(public browse 는 컨트롤러에서 APPROVED 강제 → 미승인/반려 모집 미노출)
    *  - serviceKey scope(serviceId 일치) — 누락 시 노출은 exposureStatus 게이트로만 제한
    */
-  async getRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus }) {
+  async getRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus; storeOrganizationId?: string }) {
     const where: Record<string, unknown> = {};
     if (filters?.status) where.status = filters.status;
     if (filters?.serviceKey) where.serviceId = filters.serviceKey;
     if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
 
-    const recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
+    let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
+    // Store browse only: NULL is a legacy service recruitment, not a semi-franchise offering.
+    // Compare the actual row ID, never infer it from the host/service key.
+    if (filters?.storeOrganizationId !== undefined && recruitments.some((r) => r.semiFranchiseId)) {
+      const memberships: Array<{ semi_franchise_id: string }> = filters.storeOrganizationId
+        ? await AppDataSource.query(
+          `SELECT sfm.semi_franchise_id
+             FROM semi_franchise_memberships sfm
+             JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
+             JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
+            WHERE sfm.organization_id = $1 AND sfm.status = 'active'`,
+          [filters.storeOrganizationId],
+        ) : [];
+      const activeIds = new Set(memberships.map((m) => m.semi_franchise_id));
+      recruitments = recruitments.filter((r) => !r.semiFranchiseId || activeIds.has(r.semiFranchiseId));
+    }
     return recruitments.map((r) => ({
       id: r.id,
       productId: r.productId,
@@ -345,11 +359,21 @@ export class SellerRecruitmentService {
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
     if (recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
-    // D1 — 세미프랜차이즈가 제공하는 모집(예: kpa-society → pharmacy)은 목록에서만 숨기지 않고 신청도 막는다.
-    //   직접 POST 우회 차단. 판정은 신청자(사용자) 기준 — 그가 owner/admin/manager 인 약국 조직의 가입 active.
-    const semiFranchiseKey = semiFranchiseAccessKeyFor(recruitment.serviceId);
-    if (semiFranchiseKey && !(await resolveSemiFranchiseServiceAccess(AppDataSource, applicantId, semiFranchiseKey)).allowed) {
-      throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
+    // Only an actual semi-franchise recruitment requires its own membership.
+    // Legacy service recruitments (NULL) retain their existing application flow.
+    if (recruitment.semiFranchiseId) {
+      const access = await AppDataSource.query(
+        `SELECT sfm.id
+           FROM organization_members om
+           JOIN neture_pharmacy_memberships npm ON npm.organization_id = om.organization_id AND npm.status = 'active'
+           JOIN semi_franchise_memberships sfm ON sfm.organization_id = om.organization_id AND sfm.status = 'active'
+           JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
+          WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL
+            AND sf.id = $2
+          LIMIT 1`,
+        [applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES]],
+      );
+      if (!access.length) throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
     }
 
     const existing = await this.applicationRepo.findOne({ where: { recruitmentId, applicantId } });
