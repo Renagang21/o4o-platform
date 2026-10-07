@@ -82,6 +82,8 @@ export function fallbackUnderstanding(request: string): TaskUnderstanding {
   return enforceCommitBoundary({ version: 1, source: 'fallback', goal, outcome, criteria, missing: [], commitBoundary: false }, request);
 }
 
+/** 확인 질문 상한 — planner neededInput 과 같은 200자. */
+const CONFIRM_QUESTION_MAX = 200;
 const COMMIT_USER_CRITERION = '최종 확정(저장 · 제출 등)은 사용자가 했다';
 const FALLBACK_WHOLE_REQUEST_CRITERION = '요청 전체(조건 글에 다 담지 못한 뒷부분 포함)가 끝났다고 사용자가 확인했다';
 
@@ -91,13 +93,14 @@ export function requestHasCommitIntent(request: string): boolean {
 }
 
 /**
- * 확정 경계 불변식 — commitBoundary 면 user 조건이 반드시 하나 있다. 없으면 상한(4) 안에서 붙인다(마지막 observed 를 대신).
- * sanitize · 판정기 · Assistant 가 모두 이것을 거친다 — 어느 경로로 만든 이해든 확정 업무가 observed 근거만으로 complete 되지 않는다.
+ * 확정 경계 불변식 — commitBoundary 면 user 조건이 반드시 하나 있다. 없으면 붙인다.
+ * 기존 조건은 하나도 버리지 않는다 — 상한(4)이 찬 이해에는 확정 확인 한 칸을 상한 밖에 더한다(최대 maxCriteria + 1).
+ * sanitize · 판정기 · Assistant 가 모두 이것을 거친다 — 어느 경로로 만든 이해든 확정 업무가 observed 근거만으로 complete 되지 않고,
+ * observed 조건이 빠져 결과 확인 없이 닫히지도 않는다.
  */
 export function ensureCommitConfirmation(u: TaskUnderstanding): TaskUnderstanding {
   if (!u.commitBoundary || u.criteria.some((c) => c.evidence === 'user')) return u;
-  const criteria = u.criteria.slice(0, UNDERSTANDING_LIMITS.maxCriteria - 1);
-  criteria.push({ id: `c${criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' });
+  const criteria = [...u.criteria, { id: `c${u.criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' as const }];
   return { ...u, criteria };
 }
 
@@ -328,6 +331,11 @@ export function createCompletionJudge(
   understanding = ensureCommitConfirmation(understanding);
   const observed = understanding.criteria.filter((c) => c.evidence === 'observed');
   const userOnly = understanding.criteria.filter((c) => c.evidence === 'user');
+  /** 사용자에게 무엇을 확인받는지 질문에 그대로 싣는다 — "네" 한마디가 막연한 동의가 아니라 이 조건들의 확인이 되게(조건 문장만 · 화면 글 없음). */
+  const confirmQuestion = (ids: string[]): string => {
+    const lines = understanding.criteria.filter((c) => ids.includes(c.id)).map((c) => c.text);
+    return clip(`다음이 끝났는지 확인해 주세요: ${lines.join(' · ')}`, CONFIRM_QUESTION_MAX);
+  };
   return async ({ evidence }): Promise<CompletionVerdict> => {
     counters.judgeCalls += 1;
     const grounded = new Set(evidence.filter((e) => e.grounded).map((e) => e.criterionId));
@@ -353,7 +361,7 @@ export function createCompletionJudge(
     const userIds = userOnly.map((c) => c.id);
     if (unmet.length === 0) {
       if (userIds.length === 0) return { decision: 'complete', met, unmet: [] };
-      return { decision: 'ask', met, unmet: userIds, askKind: 'success_confirmation' };
+      return { decision: 'ask', met, unmet: userIds, askKind: 'success_confirmation', question: confirmQuestion(userIds) };
     }
     if (counters.continuations < UNDERSTANDING_LIMITS.maxContinuations) {
       counters.continuations += 1;
@@ -365,7 +373,7 @@ export function createCompletionJudge(
         note: `아직 근거가 확인되지 않은 완료조건: ${pending}. 그 결과를 화면에서 찾아 읽고(read) 실제 글을 인용해 다시 보고하라.`,
       };
     }
-    return { decision: 'ask', met, unmet: [...unmet, ...userIds], askKind: 'success_confirmation' };
+    return { decision: 'ask', met, unmet: [...unmet, ...userIds], askKind: 'success_confirmation', question: confirmQuestion([...unmet, ...userIds]) };
   };
 }
 

@@ -171,7 +171,7 @@ describe('① 업무 이해(실행 전)', () => {
     expect(sanitizeUnderstanding({ goal: 'x', outcome: 'screen', criteria: [] })).toBeNull();
   });
 
-  it('확정 경계(commitBoundary) — AI 가 user 조건을 빠뜨려도 결정적으로 붙는다 · 상한 4 안에서(마지막 observed 를 대신한다)', () => {
+  it('확정 경계(commitBoundary) — AI 가 user 조건을 빠뜨려도 결정적으로 붙는다 · 기존 조건은 하나도 버리지 않는다(상한이 차면 한 칸 더)', () => {
     const one = sanitizeUnderstanding({ goal: '신제품 등록', outcome: 'change', commitBoundary: true, criteria: [{ text: '입력 값이 폼에 보인다', evidence: 'observed' }] });
     expect(one!.criteria.map((c) => `${c.id}:${c.evidence}`)).toEqual(['c1:observed', 'c2:user']);
     expect(one!.commitBoundary).toBe(true);
@@ -179,7 +179,11 @@ describe('① 업무 이해(실행 전)', () => {
       goal: '신제품 등록', outcome: 'change', commitBoundary: true,
       criteria: [{ text: 'a' }, { text: 'b' }, { text: 'c' }, { text: 'd' }],
     });
-    expect(full!.criteria.map((c) => `${c.id}:${c.text.length > 3 ? 'U' : c.text}:${c.evidence}`)).toEqual(['c1:a:observed', 'c2:b:observed', 'c3:c:observed', 'c4:U:user']);
+    expect(full!.criteria.map((c) => `${c.id}:${c.text.length > 3 ? 'U' : c.text}:${c.evidence}`))
+      .toEqual(['c1:a:observed', 'c2:b:observed', 'c3:c:observed', 'c4:d:observed', 'c5:U:user']);
+    // 저장 · 재개(restore)에도 같은 모양으로 돌아온다 — 네 번째 observed 조건이 사라지지 않는다.
+    expect(restoreUnderstanding(JSON.parse(JSON.stringify(full)))!.criteria.map((c) => c.evidence))
+      .toEqual(['observed', 'observed', 'observed', 'observed', 'user']);
     // 이미 user 조건이 있으면 그대로 · 확정 경계가 없으면 붙이지 않는다.
     const has = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: true, criteria: [{ text: 'a' }, { text: '저장은 사용자', evidence: 'user' }] });
     expect(has!.criteria).toHaveLength(2);
@@ -288,6 +292,19 @@ describe('② 완료 판정기', () => {
     const judge = createCompletionJudge(U([C1, C2_USER]));
     expect(await judge({ evidence: [G('c1')], via: 'done' })).toMatchObject({ decision: 'ask', met: ['c1'], unmet: ['c2'], askKind: 'success_confirmation' });
   });
+  it('ask 는 무엇을 확인받는지 조건 문장을 싣는다 — "네" 가 막연한 동의가 아니라 그 조건의 확인이 되게', async () => {
+    const v = await createCompletionJudge(U([C1, C2_USER]))({ evidence: [G('c1')], via: 'done' });
+    expect(v.question).toContain(C2_USER.text);
+    expect(v.question).not.toContain(C1.text);
+    // 근거 없이 반복 끝 ask — 미확인 화면 조건까지 함께 묻는다.
+    const judge = createCompletionJudge(U([C1, C2_USER]));
+    await judge({ evidence: [], via: 'done' });
+    await judge({ evidence: [], via: 'done' });
+    const last = await judge({ evidence: [], via: 'done' });
+    expect(last.decision).toBe('ask');
+    expect(last.question).toContain(C1.text);
+    expect(last.question).toContain(C2_USER.text);
+  });
   it('의미 검증 — 거절한 조건은 미충족 · 검증기 장애는 결정적 결과 유지', async () => {
     const counters = newJudgeCounters();
     const rejecting = createCompletionJudge(U([C1]), { verify: async () => ['c1'], counters });
@@ -395,6 +412,9 @@ describe('③ runtime — done 은 주장일 뿐 · Assistant 가 조건과 근�
     expect(result.report?.evidence?.[0].grounded).toBe(true); // 관찰 요소 이름도 이번 run 에서 본 글이다
     expect(result.goal.status).toBe('waiting_for_user');
     expect(result.report?.verdict).toMatchObject({ decision: 'ask', met: ['c1'], unmet: ['c2'] });
+    // 질문에 확인할 조건 문장이 실린다(neededInput · 안내 메시지).
+    expect(result.neededInput).toContain(C2_USER.text);
+    expect(result.message).toContain(C2_USER.text);
   });
 
   it('goal_sufficiently_advanced 인계도 판정기를 거친다 — complete 면 실행 완료 보고', async () => {

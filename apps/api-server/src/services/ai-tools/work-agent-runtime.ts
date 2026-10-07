@@ -1943,6 +1943,8 @@ export async function runWorkAgent(
       return null;
     }
     declaredAsk = { kind: verdict.askKind ?? 'success_confirmation', slots: [] };
+    // 무엇을 확인받는지 질문에 싣는다 — 사용자의 "네" 가 그 조건의 확인이 되게(막연한 동의로 Task 를 닫지 않는다).
+    if (verdict.question) neededInput = verdict.question;
     plannerTakeover = true;
     return question('user_judgment_required');
   };

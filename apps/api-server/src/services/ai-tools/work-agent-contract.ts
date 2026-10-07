@@ -823,6 +823,8 @@ export interface CompletionVerdict {
   note?: string;
   /** ask 일 때 질문 종류. */
   askKind?: 'success_confirmation' | 'value_confirmation';
+  /** ask 일 때 사용자에게 확인받을 완료조건 문장(조건 글만 · 화면 글 없음). 실행은 이것을 neededInput 으로 싣는다. */
+  question?: string;
 }
 
 /** Execution 이 완료를 주장할 때 Assistant 에 묻는 판정 hook. 없으면(직접 /work-agent/run) 종전 판정 그대로. */
