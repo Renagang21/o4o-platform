@@ -85,7 +85,7 @@ dropshippingProductId?: string;  // Soft FK (참조만, FK 제약 없음)
 
 > (2026-10-04 정합) 현행 코드 기준 사실:
 > - **런타임**: `OrderCreationGuard` · `apps/api-server/src/guards/` 는 존재하지 않는다. 주문 생성 단일 지점은 `apps/api-server/src/services/checkout.service.ts` `createOrder()` 이며, 여기서 의약품 포함 주문을 일괄 거부한다(`assertNoDrugItems`). 우회 저장을 런타임에서 막는 별도 guard 는 없다 — 규칙 준수는 코드 리뷰와 아래 스키마 검사에 의존한다.
-> - **계약**: `CreateOrderDto` 에 `orderType` 필드가 없고 `CheckoutOrder` 엔티티는 `order_type` 컬럼을 매핑하지 않는다(DB 에는 enum 컬럼 `GENERIC`/`DROPSHIPPING`/`COSMETICS`/`TOURISM`, 기본값 `GENERIC` 만 잔존). 따라서 §2.3 · §3.3 의 "OrderType 강제 · enum 추가" 절차는 현행 코드와 맞지 않는다. 서비스 구분은 `metadata.serviceKey` 로 한다([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)). `OrderType` 상태는 [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) 행(`CANONICAL-INDEX` §9) 참조.
+> - **계약**: `CreateOrderDto` 에 `orderType` 필드가 없고 `CheckoutOrder` 엔티티는 `order_type` 컬럼을 매핑하지 않는다(DB 에는 enum 컬럼 `GENERIC`/`DROPSHIPPING`/`COSMETICS`/`TOURISM`, 기본값 `GENERIC` 만 잔존). 따라서 §2.3 · §3.3 의 "OrderType 강제 · enum 추가" 절차는 현행 코드와 맞지 않는다. 서비스 구분은 `metadata.serviceKey` 로 한다([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)). [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) 는 2026-10-07 SUPERSEDED — 주문 생성 기술 계약은 [CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2.
 > - **스키마**: `scripts/check-forbidden-tables.mjs` 는 존재하지만 현재 CI workflow · `package.json` 어디에서도 호출되지 않는다(수동 실행). `@Entity('x_orders')` 문자열 형태만 검사한다.
 
 ### 2.2 Guardrail 1: 런타임 차단 (Service Layer)

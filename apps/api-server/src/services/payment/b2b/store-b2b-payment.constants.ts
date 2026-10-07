@@ -33,5 +33,5 @@ export const STORE_B2B_PAYABLE_ORDER_SOURCES: readonly string[] = [
 /** KPA 축 B2B 결제가 허용하는 checkout_order metadata.serviceKey */
 export const KPA_B2B_SERVICE_KEYS: readonly string[] = ['kpa-society', 'kpa-groupbuy'];
 
-/** K-Cosmetics 축 B2B 결제가 허용하는 checkout_order metadata.serviceKey */
-export const COSMETICS_B2B_SERVICE_KEYS: readonly string[] = ['k-cosmetics', 'k-cosmetics-event-offer'];
+// K-Cosmetics 축(COSMETICS_B2B_SERVICE_KEYS)은 결제 route 와 함께 삭제됐다 — K-Cosmetics 퇴역
+// (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 · WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1).

@@ -385,8 +385,8 @@ external sales channel
 | [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) | 상위 — 사업 철학 SSOT (참여 주체 정의) |
 | [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) | 상위 — 3자 Canonical Flow |
 | [`STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1`](STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 정합 — 매장 자체 상품의 Commerce 연결 금지 |
-| [`E-COMMERCE-ORDER-CONTRACT`](E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약 — 주문 **생성 방식**을 정의. 어떤 주문이 사업적으로 허용되는가는 본 문서가 정한다 |
-| [`O4O-RETAIL-STABLE-V1`](../platform/architecture/O4O-RETAIL-STABLE-V1.md) | **조사 필요** — `channel_type='B2C'` storefront closed loop 을 기술한다. §8 판정 대상 |
+| [`E-COMMERCE-ORDER-CONTRACT`](E-COMMERCE-ORDER-CONTRACT.md) | **SUPERSEDED (2026-10-07)** — 주문 **생성 방식** 기술 계약은 아래 CHECKOUT-STABLE-V2 §2 가 잇는다. 어떤 주문이 사업적으로 허용되는가는 본 문서가 정한다 |
+| [`O4O-RETAIL-STABLE-V1`](../platform/architecture/O4O-RETAIL-STABLE-V1.md) | **SUPERSEDED (2026-10-07)** — `channel_type='B2C'` storefront closed loop. §8 판정 결과 `LEGACY_COMMERCE` · 은퇴 완료(storefront 목록 철거 · 결제 · 주문 생성 `410`). 남는 B2C visibility 조건은 QR 제품 랜딩의 read-only 노출 필터(§4 정보 제공) |
 | [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) | 기술 계약 — B2B checkout · PaymentCore 안정화 선언 (V1 SUPERSEDED, 2026-10-06) |
 | `CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` | 선례 — KPA 자체몰 철거 (역사 기록, 수정 금지) |
 | `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` | 선례 — 소비자→매장 결제 경로 `410` 차단 (역사 기록, 수정 금지) |
