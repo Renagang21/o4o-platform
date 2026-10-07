@@ -19,11 +19,12 @@ export const SERVICE_KEY = 'kpa-branch' as const;
 export const BRAND = {
   name: 'KPA Branch',
   nameKo: '약사회 분회',
-  // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-  //   공용 공개 URL = https://kpa-society.co.kr/kpa/{branchSlug}
-  //   (backend service-catalog 의 domain + basePath 와 같은 값)
-  domain: 'kpa-society.co.kr',
-  basePath: '/kpa',
+  // WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1:
+  //   공용 공개 URL = https://kpa.neture.co.kr/{branchSlug}
+  //   (backend service-catalog 의 domain 과 같은 값 — basePath 없음).
+  //   옛 경로 kpa-society.co.kr/kpa/* 는 lib/canonicalHost 가 이 호스트로 옮긴다.
+  domain: 'kpa.neture.co.kr',
+  basePath: '',
   tagline: '분회별 홈페이지와 회원 소속을 한 곳에서',
 } as const;
 
