@@ -10,14 +10,14 @@
 ## 0. 판정
 
 ```text
-STATE              = READY_TO_INTEGRATE (main 미통합 · 배포 0 · production migration 0)
+STATE              = INTEGRATED · API DEPLOYED (2026-10-07, main 5e97815c7 · production migration 0)
 RT 병목            = 완화 — 브라우저(DOM) 표면에서 관찰 · 같은 화면 행동 묶음 · 절차 재생을 작업 단위 1 왕복으로
 경계               = 판단은 Assistant, 연속 실행은 Execution Node — 노드는 Task 목적 · 절차를 정하지 않는다
 안전               = 단위 안 각 단계는 단발 action 과 같은 검증 · 자격 · COMMIT 은 사용자 몫으로 멈춤(단발과 동일 결과)
 호환               = taskUnit 미보고 노드 · 0.2.0 이하 agent · 단위 거절 → 기존 단발 경로 그대로
 MIGRATION          = 0 · package.json/lockfile 변경 0 · Chrome 확장 변경 0
 AGENT              = 0.3.0 (run_unit · heartbeat taskUnit) — 사용자 PC 수동 업데이트
-DEPLOYMENT (통합 시) = API 코드 변경만(migration 없음) → 일반 API delivery · agent 0.3.0 배포는 별도
+DEPLOYMENT         = 일반 API Delivery 자동 배포 완료(§11) · agent 0.3.0 배포는 별도
 실 PC 측정          = 미실시 (Known Gap ①)
 ```
 
@@ -107,3 +107,17 @@ Assistant(서버)의 DOM 명령 하나 = Cloud DB 큐 왕복 1회(노드 polling
 
 V2 §11-2 (Phase E 구현 · 멈춤 목록 · P3 · 단발 유지/유실 비재전송) · §23 L5 (해소 범위 · 남은 한계) 갱신 · agent README capability 표에 `taskUnit` · 0.3.0 안내 추가.
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(Known Gap 7 — 코드 한도 정합).
+
+## 11. 통합 · 배포 기록 (2026-10-07)
+
+| 항목 | 결과 |
+|---|---|
+| 통합 순서 | 선행 LEVEL 3(#308 migration · #323 auth 등) promote 완료(run `37548237819`, `0e283ba10`) 후 조건 재확인 → 새 승인 → merge |
+| merge 전 재확인 | 충돌 0 · Phase E ↔ main 변경 파일 겹침 0 · CI green · 딸려오는 migration / LEVEL 3 0 |
+| main merge | PR #325 → `5e97815c7` |
+| main CI · CodeQL | success |
+| Delivery | run `37552776731` success — API 만 자동 배포(Web · Admin skipped) · 추가 promote 승인 불필요 |
+| migration job | 성공(적용 대상 없음 — Phase E migration 0) |
+| API rollout | 새 revision traffic 100% · 공개 health `/health/ready` HTTP 200 |
+| 배포 후 오류 로그 | 새 revision ERROR 0 (배포 직후 확인 시점까지) |
+| agent 0.3.0 · 실 PC smoke | 미실시 — 통합과 분리(Known Gap ① · ⑥). 실 PC 업데이트 전까지 운영은 단발 경로로 동작 |
