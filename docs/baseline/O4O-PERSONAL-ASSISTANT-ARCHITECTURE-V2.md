@@ -1,7 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-03 · **개정**: 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
+> **작성일**: 2026-10-03 · **개정**: 2026-10-06 Phase E 구현 반영 — §11-2 작업 단위 dispatch · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1`) · 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) (2026-10-03 부분 개정으로 이 문서와 정합). EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 구조로 만드는가. 둘이 충돌하면 EVOLUTION 이 우선하며, 충돌은 개정 WO 로 해소한다.
@@ -353,6 +353,10 @@ CHECK 에 적힌 "사무실 PC" 는 당시 그 capability 를 가진 노드가 �
 ### 11-2. Node 계약
 
 - 노드는 Assistant 에게서 **작업 단위**(Skill 실행 · 관찰 · 탐색 구간)를 받는다. 명령 하나마다 원격 왕복하는 것은 계약이 아니라 현재 구현의 한계다.
+  - Phase E(2026-10-06) 구현 — Browser DOM 표면: `local.browser.dom.run_unit`. 노드가 heartbeat 로 `taskUnit` 을 보고하면(에이전트 0.3.0 · 확장 연결 시) Assistant 는 **관찰 · 행동 묶음(같은 화면의 ref 행동) · 결정적 재생(현재 화면에서 다시 찾아 행동)** 을 단위 하나로 보내고, 노드는 단계마다 단발 명령과 같은 검증 · 같은 실행 경로를 지나며 이어 실행한 뒤 단계별 결과 · 멈춘 이유 · 지금 화면 관찰을 한 번에 돌려준다.
+  - **판단 지점은 Assistant, 연속 실행은 노드.** 노드는 다음 중 하나면 그 자리에서 멈추고 판단을 되돌린다: 화면이 바뀌어 남은 ref 가 무효(reobserve) · 대상 없음/모호 · 검증 거절 · 실패 · 저장 때와 다른 이동 결과 · 다른 사이트 · 화면 미준비 · 예산/시간 상한. 자격 입력 · COMMIT(주문 · 결제 · 제출 확정)은 단발과 같이 실행하지 않고 사용자 인계다.
+  - 단위는 Task 목적 · 절차를 정하지 않는다(인자에 목적 · URL · 절차 키가 없다 — 정확 키 검증). 사용자 공용 workflow · 사이트별 스크립트 없음(P3).
+  - 단발 경로는 그대로다: `taskUnit` 미보고 노드 · UIA/Computer Use 표면 · 읽기 행동(find · read) · 단위 형상 거절(denied — 실행 없음). 단위 결과를 잃으면(만료 · 전송) **다시 보내지 않고** 지금 화면을 관찰해 Assistant 가 이어간다.
 - 노드 안에서는 **검증된 Skill 의 결정적 실행만** 내부에서 끝까지 수행하고, 어긋나면 판단을 Assistant 로 되돌린다.
 - 노드는 관찰 제공 · 지시된 행동의 안전한 수행 · 결과와 실패의 정직한 보고 · 위험 행동 차단(최종 확정 클릭 · 결제 · 서명 · 비밀번호 입력)을 책임진다.
 
@@ -595,7 +599,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장) | Phase A · B CHECK |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
-| L5 Execution Node | EXISTS — **Phase D(2026-10-05)**: 에이전트가 heartbeat 로 capability(브라우저 확장 연결 · Windows UIA · 로컬 데이터 · 소유 주체 원장)를 보고하고, `resolveTargetDevice` 가 필요 capability → Assistant 선호 노드(이 run 이 마지막으로 질문한 노드 · 같은 Task 의 최근 노드) → 최근 heartbeat 순으로 고른다. 여러 노드가 online 이어도 멈추지 않고, 사용자에게 PC 정리를 요구하는 안내는 없앴다. 남은 한계: 작업 단위 dispatch(명령 1개씩 왕복)는 그대로 | Phase D CHECK |
+| L5 Execution Node | EXISTS — **Phase D(2026-10-05)**: 에이전트가 heartbeat 로 capability(브라우저 확장 연결 · Windows UIA · 로컬 데이터 · 소유 주체 원장)를 보고하고, `resolveTargetDevice` 가 필요 capability → Assistant 선호 노드(이 run 이 마지막으로 질문한 노드 · 같은 Task 의 최근 노드) → 최근 heartbeat 순으로 고른다. 여러 노드가 online 이어도 멈추지 않고, 사용자에게 PC 정리를 요구하는 안내는 없앴다. **Phase E(2026-10-06)**: Browser DOM 작업 단위 dispatch(`run_unit` · §11-2) — 관찰 2→1 · 행동 묶음+재관찰 n+2→1 · 재생 단계당 4→단위 전체 1 왕복. 남은 한계: UIA · Computer Use 표면과 읽기 행동은 명령 1개씩 왕복 · 실 PC 왕복/시간 실측 대기 | Phase D CHECK · Phase E CHECK |
 | Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
 
 **노드 원장 KNOWN GAP — Phase D 해소 상태 (2026-10-05 · `WO-…-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`)**

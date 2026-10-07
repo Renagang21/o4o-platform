@@ -34,6 +34,7 @@ import {
   COMPUTER_TARGET_ACTIONS,
   DOM_TARGET_ACTIONS,
   UIA_TARGET_ACTIONS,
+  LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
@@ -43,6 +44,7 @@ import {
   type LocalCommand,
   type LocalCommandResult,
 } from './local-agent-protocol.js';
+import { DOM_UNIT_COMMAND_TTL_MS } from './browser-dom-contract.js';
 
 // ─── 정책 상수 ────────────────────────────────────────────────────────────────
 
@@ -119,12 +121,15 @@ export interface DeviceRow {
  *   windowsUia         Windows UIA 실행 가능
  *   localData          이 노드에 로컬 데이터 소스가 연결돼 있다
  *   ownerScopedLedger  노드 원장을 소유 주체별로 나눠 저장 · 조회한다(local.db v8+)
+ *   taskUnit           브라우저 작업 단위(`local.browser.dom.run_unit`)를 이어 실행할 수 있다(Phase E · agent 0.3.0+).
+ *                      선택 키 — 보고하지 않는 이전 에이전트는 false(= 단발 명령 경로).
  */
 export interface NodeCapabilities {
   browser: boolean;
   windowsUia: boolean;
   localData: boolean;
   ownerScopedLedger: boolean;
+  taskUnit: boolean;
 }
 
 /** 실행에 필요한 capability. 'any' = 노드면 된다(상태 · 시스템 정보 등). */
@@ -415,6 +420,7 @@ const AGENT_VERSION_RE = /^[0-9A-Za-z][0-9A-Za-z.+-]{0,31}$/;
 /**
  * heartbeat body → 보고값. 이전 에이전트는 `{}` 를 보내므로 null(= capability 미보고).
  * capabilities 는 네 boolean 이 모두 있어야 받는다 — 일부만 온 값으로 노드를 판단하지 않는다.
+ * Phase E `taskUnit` 은 선택 키다 — 없으면 false(Phase D 에이전트), 있으면 boolean 이어야 한다.
  */
 export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
   if (!body || typeof body !== 'object') return null;
@@ -424,6 +430,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
   if (!c || typeof c !== 'object') return null;
   const keys = ['browser', 'windowsUia', 'localData', 'ownerScopedLedger'] as const;
   if (!keys.every((k) => typeof c[k] === 'boolean')) return null;
+  if (c.taskUnit !== undefined && typeof c.taskUnit !== 'boolean') return null;
   return {
     agentVersion: b.agentVersion,
     capabilities: {
@@ -431,6 +438,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
       windowsUia: c.windowsUia as boolean,
       localData: c.localData as boolean,
       ownerScopedLedger: c.ownerScopedLedger as boolean,
+      taskUnit: c.taskUnit === true,
     },
   };
 }
@@ -467,6 +475,7 @@ function mapCapabilities(v: unknown): NodeCapabilities | null {
     windowsUia: o.windowsUia === true,
     localData: o.localData === true,
     ownerScopedLedger: o.ownerScopedLedger === true,
+    taskUnit: o.taskUnit === true,
   };
 }
 
@@ -630,7 +639,9 @@ export async function issueCommand(
   const hasArgs = Object.keys(args).length > 0;
   const commandId = randomUUID();
   const issuedAt = new Date();
-  const expiresAt = new Date(issuedAt.getTime() + COMMAND_TTL_MS);
+  // PHASE-E: 작업 단위는 Node 안에서 여러 단계를 이어 실행하므로 TTL 이 길다(실행 상한 30 s + 여유). 그 밖은 그대로 20 s.
+  const ttlMs = base === LOCAL_AGENT_ACTIONS.DOM_RUN_UNIT ? DOM_UNIT_COMMAND_TTL_MS : COMMAND_TTL_MS;
+  const expiresAt = new Date(issuedAt.getTime() + ttlMs);
 
   await dataSource.query(
     `INSERT INTO local_agent_commands
