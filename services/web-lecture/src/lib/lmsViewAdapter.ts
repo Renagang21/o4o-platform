@@ -192,7 +192,8 @@ export function useLectureViewConfig(): LmsViewConfig {
     lessonPath,
     certificatesPath: LECTURE_CERTIFICATES_PATH,
     isAuthenticated,
-    onRequireLogin: () => navigate('/login'),
+    // 로그인 후 보던 강의 화면으로 돌아오도록 현재 경로를 넘긴다 (WO-O4O-LECTURE-HANDOFF-NONMEMBER-UX-V1)
+    onRequireLogin: () => navigate('/login', { state: { from: `${window.location.pathname}${window.location.search}` } }),
     navigate: (path: string) => navigate(path),
     notify: { success: toast.success, error: toast.error },
     labels: lectureLabels,
