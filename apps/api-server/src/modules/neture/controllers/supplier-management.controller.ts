@@ -38,6 +38,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       const result = await netureService.registerSupplier(userId, { name, slug, contactEmail });
       if (!result.success) {
         const statusMap: Record<string, number> = {
+          NETURE_MEMBERSHIP_REQUIRED: 403,
           MISSING_NAME: 400,
           INVALID_SLUG: 400,
           USER_ALREADY_HAS_SUPPLIER: 409,

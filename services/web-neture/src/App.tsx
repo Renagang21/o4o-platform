@@ -270,7 +270,7 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { GuideBackLink } from './components/GuideBackLink';
 // Neture Event Offer — 공급자 현황 허브 (WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1)
 const SupplierEventOfferPage = lazy(() => import('./pages/supplier/SupplierEventOfferPage'));
-// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 기본 가입 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 commerce — 내 매장(약국) 신청 심사 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집
 const PharmacyMembershipReviewPage = lazy(() => import('./pages/operator/PharmacyMembershipReviewPage'));
 const OperatorSemiFranchisePage = lazy(() => import('./pages/operator/OperatorSemiFranchisePage'));
 const SemiFranchiseContentFormPage = lazy(() => import('./pages/operator/SemiFranchiseContentFormPage'));
@@ -1229,7 +1229,7 @@ function App() {
               {/* /operator/suppliers · /operator/supplier-quality 는 위 서브도메인 운영자 블록(supplier:operator)으로 옮겼다 */}
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
-              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입 심사 · 담당 세미프랜차이즈 (neture:operator) */}
+              {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 심사 · 담당 세미프랜차이즈 (neture:operator) */}
               <Route path="/operator/pharmacy-memberships" element={<PharmacyMembershipReviewPage />} />
               <Route path="/operator/semi-franchises" element={<OperatorSemiFranchisePage />} />
               <Route path="/operator/semi-franchises/:key/contents/new" element={<SemiFranchiseContentFormPage />} />

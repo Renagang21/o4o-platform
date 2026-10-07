@@ -13,9 +13,7 @@
  *   → service_key, approved_at, approved_by, rejection_reason, created_at, updated_at
  */
 import type { DataSource } from 'typeorm';
-import logger from '../../../utils/logger.js';
 import { isAdminTierRoleName } from '../../../utils/role-revoke-safety.js';
-import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 
 export class OperatorRegistrationService {
@@ -79,11 +77,8 @@ export class OperatorRegistrationService {
    * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
    *   1. service_memberships.status → 'active'
    *   2. users.status → 'ACTIVE' (pending/rejected 모두 처리)
-   *   3. role_assignment 생성 (prefixed role — 'neture:supplier')
-   *
-   * WO-O4O-NETURE-RBAC-APPROVAL-PRODUCT-FLOW-INTEGRATION-V1:
-   *   4. supplier role → neture_suppliers 레코드 자동 생성 (status='ACTIVE')
-   *   5. organization 연동 (businessInfo 있는 경우)
+   *   3. (제거) role_assignment 생성 · supplier 자동 생성 — Neture 가입 승인은 연결 서비스 원장 · role 을
+   *      만들지 않는다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4). 공급자는 공급자 신청 · 승인으로만.
    *
    * WO-O4O-NETURE-SUPPLIER-APPROVAL-ROLE-ASSIGN-FIX-V1:
    *   UPDATE...RETURNING 제거 — TypeORM queryRunner에서 RETURNING 컬럼이 null 반환되는
@@ -138,178 +133,17 @@ export class OperatorRegistrationService {
         [approvedBy, userId],
       );
 
-      // 4. role_assignment 생성
-      // WO-NETURE-ROLE-NORMALIZATION-V1: admin/operator만 prefixed, 나머지는 unprefixed
+      // 4. Neture 가입 승인은 **role 을 부여하지 않고 공급자도 만들지 않는다** (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4).
+      //   Neture 가입 승인 = 메인 AI 이용 + 연결 서비스 신청 자격. 공급자 · 내 매장(약국) · 세미프랜차이즈는
+      //   각자 신청 · 승인하며 그 원장(neture_suppliers 등)과 role 은 그 승인 경로만 만든다.
+      //   과거 이 자리의 bare role 부여(`sm.role` 원문)와 supplier ONE-STEP 자동 생성은 제거했다
+      //   (WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1 의 '회원 승인 = 공급자 승인' 통합 폐기).
       //
-      // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1):
-      //   가입 승인은 **신청 가능한 역할(supplier)만** 확정한다.
-      //   운영자·관리자 부여는 중앙 `/operators`(플랫폼 관리자) 전용이므로
-      //   (WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1 로 Neture 전용 경로는 은퇴),
-      //   이 경로에서 admin/operator 로 승격되는 분기 자체를 제거하고 명시적으로 거부한다.
-      //   현재 Neture 신청 허용 role 은 supplier 뿐이라 정상 흐름에는 영향이 없다
-      //   (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner 신청 경로 은퇴).
-      //   (다만 service_memberships 에 과거 API 가 남긴 role='operator' 행이 실재하므로
-      //    그 행이 pending/rejected 로 되돌아가는 경우를 대비한 방어다.)
+      // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1) 방어는 유지한다:
+      //   과거 API 가 남긴 role='operator' 등 관리자 계열 membership 행은 승인 자체를 거부한다.
       const rawRole = smRow.role || 'member';
       if (isAdminTierRoleName(rawRole)) {
         throw new Error('ROLE_PROMOTION_NOT_ALLOWED');
-      }
-      const finalRole = rawRole;
-      // WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9:
-      //   migration 20270301000000 이 `unique_active_role_per_user UNIQUE (user_id, role, is_active)`
-      //   를 부분 유니크 인덱스 `(user_id, role) WHERE is_active` 로 교체했는데 이 호출부만
-      //   옛 3 컬럼 추론 대상을 그대로 두고 있었다. 대응 제약이 없으면 Postgres 는 데이터와
-      //   무관하게 42P10 으로 실패하므로 **Neture 가입 승인 트랜잭션 전체가 깨진다**.
-      //   같은 규칙을 쓰는 다른 호출부(MembershipApprovalService · PharmacyHubStoreProvisioningService)
-      //   와 표현을 일치시킨다. 부여 대상 role 문자열은 바꾸지 않는다.
-      await queryRunner.query(
-        `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-         VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-         ON CONFLICT (user_id, role) WHERE is_active DO UPDATE SET updated_at = NOW()`,
-        [userId, finalRole, approvedBy],
-      );
-
-      // 4. supplier role → neture_suppliers 자동 생성 (ONE-STEP 승인)
-      if (rawRole === 'supplier') {
-        const existingSupplier = await queryRunner.query(
-          `SELECT id FROM neture_suppliers WHERE user_id = $1`,
-          [userId],
-        );
-        // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1 (Phase F):
-        //   승인 결과는 canonical 관계(organizations(type='supplier') + organization_members(owner))
-        //   까지 만들어야 한다. 과거에는 neture_suppliers.user_id 만 채우고 owner membership 을
-        //   만들지 않아 legacy pointer 에만 의존하는 공급자가 생겼다.
-        //   owner = 이 가입 신청의 본인(userId). approved_by(승인 운영자)는 owner 가 아니다.
-        const ensureOrganizationAndOwner = async (
-          supplierId: string,
-          existingOrganizationId: string | null,
-          orgName: string,
-          slugForCode: string,
-          businessNumber: string | null,
-          businessAddress: string | null,
-          addressDetailJson: string | null,
-        ): Promise<void> => {
-          let orgId = existingOrganizationId;
-          if (!orgId) {
-            const orgCode = `neture-${slugForCode}`;
-            const orgPath = `/${orgCode}`;
-            // organizations 테이블은 camelCase 컬럼 (TypeORM SnakeNamingStrategy 미적용),
-            // business_number / address 는 snake_case 컬럼 (organizations schema 기준)
-            const [org] = await queryRunner.query(
-              `INSERT INTO organizations (name, code, type, "isActive", "createdAt", "updatedAt", level, path, "childrenCount", business_number, address, address_detail)
-               VALUES ($1, $2, 'supplier', true, NOW(), NOW(), 0, $3, 0, $4, $5, $6::jsonb)
-               ON CONFLICT (code) DO UPDATE SET
-                 "isActive" = true,
-                 "updatedAt" = NOW(),
-                 business_number = COALESCE(EXCLUDED.business_number, organizations.business_number),
-                 address = COALESCE(EXCLUDED.address, organizations.address),
-                 address_detail = COALESCE(EXCLUDED.address_detail, organizations.address_detail)
-               RETURNING id`,
-              [orgName, orgCode, orgPath, businessNumber, businessAddress, addressDetailJson],
-            );
-            if (!org?.id) return;
-            await queryRunner.query(
-              `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
-              [org.id, supplierId],
-            );
-            orgId = String(org.id);
-          }
-          await organizationOpsService.setOwner(orgId, userId, queryRunner);
-        };
-
-        if (!existingSupplier?.length) {
-          const [userRow] = await queryRunner.query(
-            `SELECT name, email, phone, "businessInfo" FROM users WHERE id = $1`,
-            [userId],
-          );
-          const slug = `supplier-${userId.substring(0, 8)}`;
-          const contactEmail = userRow?.email || null;
-          const contactPhone = userRow?.phone || null;
-          const bizInfo = userRow?.businessInfo;
-          const bizName = bizInfo?.businessName || userRow?.name || '';
-          // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1:
-          // representativeName canonical — ceoName legacy fallback (백필 전 데이터 대비)
-          const representativeName = bizInfo?.representativeName || bizInfo?.ceoName || userRow?.name || null;
-          const businessNumber = bizInfo?.businessNumber || null;
-          // businessAddress canonical — address legacy fallback
-          const businessAddress = bizInfo?.businessAddress || bizInfo?.address || null;
-          // taxInvoiceEmail canonical → tax_invoice_email 컬럼
-          const taxInvoiceEmail = bizInfo?.taxInvoiceEmail || null;
-          // WO-O4O-NETURE-SUPPLIER-ONBOARDING-BUSINESS-PROFILE-SYNC-AND-SIMPLIFICATION-V1 (D1):
-          // businessInfo seed 완성 — 담당자/업태/상세주소도 supplier seed 시 복사(프로필 비어 보임 해소).
-          const managerName = bizInfo?.contactName || null;
-          const managerPhone = bizInfo?.managerPhone || userRow?.phone || null;
-          const businessType = bizInfo?.businessType || null;
-          const zipCode = bizInfo?.zipCode || null;
-          const businessAddressDetail = bizInfo?.businessAddressDetail || bizInfo?.address2 || null;
-          const addressDetailJson = (zipCode || businessAddressDetail)
-            ? JSON.stringify({ zipCode, detailAddress: businessAddressDetail })
-            : null;
-
-          // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
-          // 회원 가입 승인 = 공급자 승인(하나의 인지된 승인). 승인 시 바로 ACTIVE로 생성한다.
-          // 프로필 정보(대표자명/담당자명/담당자 연락처)는 승인 후 보완하는 프로필 완성 상태로만 관리.
-          // (기존 WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1의 PENDING 이중 승인 구조 폐기)
-          // WO-O4O-NETURE-SUPPLIER-APPROVAL-INSERT-FIX-V1:
-          // business_number, business_address 컬럼은 migration 20260327000300으로 삭제됨.
-          // 해당 값은 organizations 테이블(org SSOT)에 저장한다.
-          const [insertedSupplier] = await queryRunner.query(
-            `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, manager_name, manager_phone, business_type, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'ACTIVE', $10, NOW(), NOW(), NOW())
-             ON CONFLICT (user_id) DO NOTHING
-             RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail, approvedBy],
-          );
-
-          // organization 연동 + owner membership — business_number, address 는 org SSOT 에 저장.
-          // 이름이 비어도 organization 은 반드시 만든다(canonical 관계 없는 공급자 생성 0).
-          if (insertedSupplier?.id) {
-            await ensureOrganizationAndOwner(
-              String(insertedSupplier.id), null, bizName || slug, slug,
-              businessNumber, businessAddress, addressDetailJson,
-            );
-          }
-
-          logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (ACTIVE) — approval unified`);
-        } else {
-          // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
-          // 이미 존재하는 PENDING 공급자는 회원 승인과 함께 ACTIVE로 전이.
-          // REJECTED/INACTIVE는 건드리지 않는다(거절·이용정지 상태 보존).
-          const activated = await queryRunner.query(
-            `UPDATE neture_suppliers
-             SET status = 'ACTIVE', approved_by = $2, approved_at = NOW(), updated_at = NOW()
-             WHERE user_id = $1 AND status = 'PENDING'
-             RETURNING id, organization_id`,
-            [userId, approvedBy],
-          );
-          // TypeORM queryRunner UPDATE...RETURNING → [rows, count]
-          const activatedRow = Array.isArray(activated?.[0]) ? activated[0][0] : activated?.[0];
-          if (activatedRow?.organization_id) {
-            await queryRunner.query(
-              `UPDATE organizations SET "isActive" = true, "updatedAt" = NOW() WHERE id = $1`,
-              [activatedRow.organization_id],
-            );
-          }
-          if (activatedRow?.id) {
-            // 이번 승인으로 ACTIVE 가 된 공급자만 canonical 관계를 보장한다(기존 ACTIVE/REJECTED 는 불변).
-            const [userRow] = await queryRunner.query(
-              `SELECT name, "businessInfo" FROM users WHERE id = $1`,
-              [userId],
-            );
-            const bizInfo = userRow?.businessInfo;
-            const fallbackSlug = `supplier-${userId.substring(0, 8)}`;
-            await ensureOrganizationAndOwner(
-              String(activatedRow.id),
-              activatedRow.organization_id ? String(activatedRow.organization_id) : null,
-              bizInfo?.businessName || userRow?.name || fallbackSlug,
-              fallbackSlug,
-              bizInfo?.businessNumber || null,
-              bizInfo?.businessAddress || bizInfo?.address || null,
-              null,
-            );
-            logger.info(`[Registration] Existing PENDING supplier activated with member approval for user ${userId}`);
-          }
-        }
       }
 
       // 5. (은퇴) partner role → neture.neture_partners 자동 생성 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1

@@ -37,7 +37,7 @@
 | `community.neture.co.kr` | 커뮤니티 회원 | 독립 커뮤니티 — 서비스 가입과 **별도**인 커뮤니티 단위 가입(승인형). `/pharmacist` · `/retail` | `community` | `community:admin` | 없음 | 각 서비스의 `/forum` |
 | `admin.neture.co.kr` | 플랫폼 관리자 | 플랫폼 · 서비스 관리 영역. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
 
-**세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 Neture 기본 가입이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
+**세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 내 매장(약국) 신청이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
 
 보조 주소: `study.neture.co.kr` = O4O 강의(`lecture`). `partner.neture.co.kr` = 주소 예약만(공급자 기능을 파트너로 되돌리지 않는다).
 

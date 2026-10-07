@@ -6,7 +6,8 @@
  *   탭: 가입 신청 / 공급 제안 / 이벤트 / 모집 조건 / 콘텐츠.
  *   콘텐츠: 운영자가 작성 · 게시. 게시본은 활성 가입 약국만 열람하고 매장 사본으로 복사한다.
  *   ?key=&tab= 쿼리로 세미프랜차이즈 · 탭을 지정해 진입할 수 있다(콘텐츠 작성 화면 복귀용).
- *   가입 신청 목록은 기본 가입 원장의 사업자번호 · 면허번호 · 기본 가입 상태를 함께 보여준다.
+ *   가입 신청 목록은 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장 신청 상태를 함께 보여준다.
+ *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -284,7 +285,7 @@ export default function OperatorSemiFranchisePage() {
                 <th className={TH}>약국</th>
                 <th className={TH}>사업자등록번호</th>
                 <th className={TH}>약사 면허번호</th>
-                <th className={TH}>기본 가입</th>
+                <th className={TH}>내 매장 신청</th>
                 <th className={TH}>신청일</th>
                 <th className={TH}>상태</th>
                 <th className={TH}>처리</th>

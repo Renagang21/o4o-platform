@@ -5,7 +5,7 @@
  * (createRequireStoreOwner → isStoreOwner → resolveStoreOrganization)와 **같은 판정**인지.
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5) 이후 진리표:
- *   약국 매장(`kpa`) 게이트 = **Neture 기본 가입 원장 active ∧ 그 조직의 owner/admin/manager**.
+ *   약국 매장(`kpa`) 게이트 = **내 매장(약국) 신청 원장 active ∧ 그 조직의 owner/admin/manager**.
  *   kpa-society membership · `kpa:store_owner` role 은 판정 근거가 아니다(대체, 누적 아님).
  *   1) 원장 active 조직 1개                                  → true
  *   2) 원장 active + kpa-society membership 정지            → true (membership 무관)
@@ -59,7 +59,7 @@ async function callMeContext(sc: Scenario) {
   return request(app).get('/me-context');
 }
 
-describe('축 C — /kpa/me-context isStoreOwner 진리표 (Neture 기본 가입 원장 기준)', () => {
+describe('축 C — /kpa/me-context isStoreOwner 진리표 (내 매장(약국) 신청 원장 기준)', () => {
   it('1) 원장 active 조직 1개 → isStoreOwner=true', async () => {
     const res = await callMeContext({ membershipActive: true, hasRole: true, ledgerOrgs: ['org-kpa'] });
     expect(res.status).toBe(200);

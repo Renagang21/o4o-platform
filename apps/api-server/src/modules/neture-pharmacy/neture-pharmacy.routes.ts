@@ -1,10 +1,10 @@
 /**
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
  *
- *   /pharmacy/membership                         기본 가입 신청 · 내 상태          (로그인)
+ *   /pharmacy/membership                         내 매장(약국) 신청 · 내 상태       (로그인 · 신청은 Neture 가입 승인 필요)
  *   /pharmacy/service-access/:serviceKey         세미프랜차이즈 서비스 이용 자격    (로그인 · 본인 판정만)
- *   /pharmacy/...                                내 매장(약국)                    (로그인 + 매장 게이트 = 기본 가입 원장)
- *   /operator/pharmacy-memberships               기본 가입 승인                    (neture:operator)
+ *   /pharmacy/...                                내 매장(약국)                    (로그인 + 매장 게이트 = 내 매장(약국) 신청 원장)
+ *   /operator/pharmacy-memberships               내 매장(약국) 승인                (neture:operator · 신청자 Neture 승인 확인)
  *   /operator/semi-franchises/:key/...           담당 세미프랜차이즈 처리          (neture:operator ∧ 담당 관계)
  *   /admin/semi-franchises                       세미프랜차이즈 · 담당 지정        (neture:admin)
  *   /supplier/...                                공급 제안 · 이벤트 · 모집 신청    (ACTIVE 공급자)
@@ -47,6 +47,7 @@ import { SemiFranchiseContentService } from './services/semi-franchise-content.s
 import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
 import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
 import { AssetCopyService } from '@o4o/asset-copy-core';
+import { NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
 type Handler = (req: Req, res: Response) => Promise<unknown>;
@@ -60,6 +61,15 @@ function handle(fn: Handler): RequestHandler {
     } catch (err) {
       if (err instanceof NeturePharmacyError) {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
+        return;
+      }
+      if (err instanceof NetureMainMembershipRequiredError) {
+        res.status(err.httpStatus).json({
+          success: false,
+          error: err.message,
+          code: err.code,
+          details: { netureMembershipStatus: err.membershipStatus },
+        });
         return;
       }
       logger.error('[NeturePharmacy] request failed', {
@@ -103,7 +113,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const supplier = [requireAuth, createRequireActiveSupplier(dataSource) as RequestHandler];
   const org = (req: Req) => req.organizationId as string;
 
-  // ─── 기본 가입 (매장 게이트 이전) ─────────────────────────────────────────
+  // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
   router.post('/pharmacy/membership', requireAuth, handle(async (req, res) => {
     res.status(201);
@@ -119,7 +129,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return { ...access, message: access.next ? SEMI_FRANCHISE_ACCESS_MESSAGES[access.next] : null };
   }));
 
-  // ─── 내 매장 (기본 가입 active) ───────────────────────────────────────────
+  // ─── 내 매장 (내 매장(약국) 신청 active) ───────────────────────────────────────────
   router.get('/pharmacy/store/context', ...store, handle(async (req) => ({
     organizationId: org(req),
     semiFranchiseKeys: await listActiveSemiFranchiseKeys(dataSource, org(req)),
@@ -204,7 +214,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return payments.confirm(req.user!.id, { paymentId, paymentGroupId });
   }));
 
-  // ─── Neture 운영자 — 기본 가입 ────────────────────────────────────────────
+  // ─── Neture 운영자 — 내 매장(약국) 신청 ────────────────────────────────────────────
   router.get('/operator/pharmacy-memberships', ...operator, handle(async (req) => membership.list({
     status: typeof req.query.status === 'string' ? req.query.status : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,

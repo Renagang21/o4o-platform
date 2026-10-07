@@ -7,9 +7,10 @@
  * 과거 축(kpa-society membership · offer_service_approvals · distribution_type · allowed_seller_ids)은
  * 여기서 읽지 않는다(대체, 누적 아님).
  *
- * $1 = 약국 조직 id. 호출자가 매장 게이트(기본 가입 active)를 먼저 통과시켰어야 한다.
+ * $1 = 약국 조직 id. 호출자가 매장 게이트(내 매장(약국) 신청 active)를 먼저 통과시켰어야 한다.
  */
 import { DEFAULT_SEMI_FRANCHISE_KEY, SEMI_FRANCHISE_EVENT_SERVICE_KEY, type SupplyKind } from '../constants.js';
+import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
 
 type Exec = { query: (sql: string, params?: unknown[]) => Promise<any[]> };
 
@@ -182,4 +183,24 @@ export async function listActiveSemiFranchiseKeys(exec: Exec, organizationId: st
     [organizationId],
   );
   return rows.map((r: { key: string }) => r.key);
+}
+
+/**
+ * 세미프랜차이즈 서비스 마운트(카탈로그 `semiFranchiseAccessKey` — 현재 kpa-society → 'pharmacy')에서
+ * 이 약국 조직이 **공급 상품**을 이용 · 주문할 수 있는지 — CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1.
+ *
+ * 위 ACCESS_CTE 와 같은 규칙: 공급 경로는 모두 가입 세미프랜차이즈(`my_sf`)를 요구하고, 공급처 미지정 제품도
+ * pharmacy 기본 공급이다 — distribution_type(PUBLIC 포함)으로 면제하지 않는다.
+ * 공급 상품 항목에만 쓴다(약국 자체 제품 · 콘텐츠 · 신청 이력에는 쓰지 않는다).
+ * 세미프랜차이즈 서비스가 아닌 마운트(k-cosmetics 등)는 판정 대상이 아니다(true).
+ */
+export async function hasServiceSemiFranchiseSupplyAccess(
+  exec: Exec,
+  serviceKey: string | null | undefined,
+  organizationId: string | null | undefined,
+): Promise<boolean> {
+  const semiFranchiseKey = semiFranchiseAccessKeyFor(serviceKey);
+  if (!semiFranchiseKey) return true;
+  if (!organizationId) return false;
+  return (await listActiveSemiFranchiseKeys(exec, organizationId)).includes(semiFranchiseKey);
 }

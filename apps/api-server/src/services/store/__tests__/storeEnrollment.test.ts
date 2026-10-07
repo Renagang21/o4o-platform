@@ -98,7 +98,7 @@ describe('E5 입력 검증은 쓰기 전에 끝난다', () => {
   });
 
   // kpa — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · O4O-STORE-ACCESS-AND-MEMBERSHIP-V1 §3-A:
-  //   약국 매장은 Neture 기본 가입 신청 + 운영자 승인으로만 열린다(승인 우회 경로 차단).
+  //   약국 매장은 내 매장(약국) 신청 + 운영자 승인으로만 열린다(승인 우회 경로 차단).
   // cosmetics — 서비스 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   it.each([
     ['kpa', '가나약국'],
@@ -117,7 +117,7 @@ describe('E5 입력 검증은 쓰기 전에 끝난다', () => {
 
   it('가입 가능 서비스 목록은 비어 있다 — 어떤 owner role 도 자가 가입으로 열리지 않는다', () => {
     expect(isEnrollableServiceKey('cosmetics')).toBe(false); // K-Cosmetics 은퇴(PHASE1B)
-    // Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국은 Neture 기본 가입으로 통합(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
+    // Pharmacy-Hub 매장 자가 가입도 은퇴 — 약국은 내 매장(약국) 신청으로 통합(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
     expect(isEnrollableServiceKey('pharmacy-hub')).toBe(false);
     // owner role 은 있지만 자가 가입 대상이 아니다(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
     expect(STORE_OWNER_ROLE_BY_SERVICE.kpa).toBe('kpa:store_owner');

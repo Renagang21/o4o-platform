@@ -142,7 +142,7 @@ export class PolicyAcceptanceService {
   }
 
   /**
-   * kpa-society 매장계약 대상 = Neture 기본 가입 원장 active 조직의 owner/admin/manager (isStoreOwner('kpa') 와 같은 기준).
+   * kpa-society 매장계약 대상 = 내 매장(약국) 신청 원장 active 조직의 owner/admin/manager (isStoreOwner('kpa') 와 같은 기준).
    * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 계약 요구(아래 pending)와 승낙 API(policy-acceptance.routes)가
    * 이 함수 하나를 쓴다 — 요구는 원장 기준인데 승낙은 kpa-society membership · `kpa:store_owner` 를 요구하던 deadlock 해소.
    */
@@ -189,7 +189,7 @@ export class PolicyAcceptanceService {
     )) as { role: string }[];
     const activeRoles = new Set(roles.map((r) => r.role));
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 매장(kpa-society) 경영자는 membership · role 이 아니라
-    //   Neture 기본 가입 원장(active)으로 판정한다(isStoreOwner 와 같은 기준). 계약 게이트도 같은 기준을 써야 우회가 없다.
+    //   내 매장(약국) 신청 원장(active)으로 판정한다(isStoreOwner 와 같은 기준). 계약 게이트도 같은 기준을 써야 우회가 없다.
     const pharmacyOwner = published.some((d) => d.serviceKey === 'kpa-society')
       ? await this.isPharmacyLedgerStoreOwner(userId, q)
       : false;

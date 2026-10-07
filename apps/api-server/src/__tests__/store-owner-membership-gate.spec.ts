@@ -13,7 +13,7 @@
  * 판정 근거는 JWT 가 아니라 DB 다 — 정지가 토큰 재발급을 기다리지 않는다.
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
- *   약국 매장(`kpa`)은 membership/role 이 아니라 Neture 기본 가입 원장으로 판정한다(맨 아래 describe).
+ *   약국 매장(`kpa`)은 membership/role 이 아니라 내 매장(약국) 신청 원장으로 판정한다(맨 아래 describe).
  *   membership 게이트 계약은 그 계약을 유지하는 서비스(cosmetics)로 고정한다.
  */
 
@@ -126,10 +126,10 @@ describe('requireStoreAuth / optionalStoreAuth — 정지 회원에게 매장 �
 
 /**
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5)
- *   약국 매장(`kpa`) = Neture 기본 가입 원장(neture_pharmacy_memberships.status='active') 조직의
+ *   약국 매장(`kpa`) = 내 매장(약국) 신청 원장(neture_pharmacy_memberships.status='active') 조직의
  *   owner/admin/manager. kpa-society membership · `kpa:store_owner` role 은 매장 판정 근거가 아니다.
  */
-describe('약국(kpa) — Neture 기본 가입 원장이 매장 게이트다', () => {
+describe('약국(kpa) — 내 매장(약국) 신청 원장이 매장 게이트다', () => {
   type LedgerRow = { organization_id: string; status: 'active' | 'pending' | 'suspended'; member_role: string };
 
   /** 원장 질의는 SQL 의 `npm.status = 'active'` 조건을 흉내 내 active 행만 돌려준다. */

@@ -1,5 +1,5 @@
 /**
- * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1 — Neture 기본 가입 약국의 내 매장 signage
+ * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1 — 내 매장(약국) 신청 약국의 내 매장 signage
  *
  * Neture 승인 약국은 kpa-society membership 이 없다. 매장 기본 기능(동영상 · 스케줄 · 플레이리스트 · TV 재생)은
  * 내 매장 API 와 같은 기준 `isStoreOwner(ds, userId, 'kpa', org)` 로 연다.

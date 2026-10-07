@@ -85,6 +85,11 @@ export interface NetureServiceState {
 
 export interface NetureServiceStates {
   supplier: NetureServiceState;
+  /**
+   * Neture 메인 가입 상태(`service_memberships` service_key='neture') — 메인 AI 입력창 안내용.
+   * 구 API 는 이 값을 보내지 않는다 — 없으면 화면에서 막지 않는다(판정은 서버 guard).
+   */
+  netureMain?: NetureServiceState;
 }
 
 export const NONE_SERVICE_STATES: NetureServiceStates = {
@@ -254,7 +259,11 @@ export function normalizeServiceStates(raw: unknown): NetureServiceStates {
     status: (v?.status as NetureServiceUsageStatus) ?? 'none',
     source: v?.source ?? 'none',
   });
-  return { supplier: pick(r.supplier) };
+  const raw2 = (raw ?? {}) as { netureMain?: Partial<NetureServiceState> };
+  return {
+    supplier: pick(r.supplier),
+    ...(raw2.netureMain && typeof raw2.netureMain === 'object' ? { netureMain: pick(raw2.netureMain) } : {}),
+  };
 }
 
 // ─── 조회 ─────────────────────────────────────────────────────────────────────

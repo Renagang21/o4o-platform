@@ -35,6 +35,10 @@ jest.mock('../../../utils/store-organization.resolver.js', () => ({
 
 type Row = Record<string, any>;
 
+/** 매장 조직의 active 세미프랜차이즈 가입 키 — semi_franchise_memberships 의 대역 (CHECK §10 D1) */
+let semiFranchiseKeys: string[] = ['pharmacy'];
+const semiFranchiseQueries: any[] = [];
+
 function makeService(cartItems: Row[], offerRows: Row[]) {
   const deleted: any[] = [];
   const queries: any[] = [];
@@ -47,6 +51,10 @@ function makeService(cartItems: Row[], offerRows: Row[]) {
       }),
     }),
     query: jest.fn(async (sql: string, params: any[]) => {
+      if (sql.includes('semi_franchise_memberships')) {
+        semiFranchiseQueries.push({ sql, params });
+        return semiFranchiseKeys.map((key) => ({ key }));
+      }
       queries.push({ sql, params });
       return offerRows;
     }),
@@ -90,6 +98,8 @@ const scope = { buyerId: 'buyer-1', serviceKey: 'kpa-society' };
 
 beforeEach(() => {
   createOrderCalls.length = 0;
+  semiFranchiseKeys = ['pharmacy'];
+  semiFranchiseQueries.length = 0;
   candidates.length = 0;
   candidates.push({ organizationId: 'org-mine' });
 });
@@ -252,5 +262,35 @@ describe('서비스 격리 및 경로 보호 (§23 · §29)', () => {
       expect(queries[0].params[1]).toBe(serviceKey);
       expect(createOrderCalls[0].metadata.serviceKey).toBe(serviceKey);
     }
+  });
+});
+
+describe('세미프랜차이즈 공급 이용 판정 (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1)', () => {
+  it('kpa-society — 확정 매장 조직이 pharmacy 미가입이면 공급처 미지정 PUBLIC 공급도 주문 불가 (목록 숨김 직접 confirm 우회 차단)', async () => {
+    semiFranchiseKeys = [];
+    const { service, queries } = makeService([cart()], [offer({ distribution_type: 'PUBLIC' })]);
+
+    await expect(service.confirm(scope)).rejects.toMatchObject({
+      code: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
+      status: 403,
+    });
+    expect(semiFranchiseQueries[0].params).toEqual(['org-mine']);
+    // offer 조회 · 주문 생성 전에 멈춘다
+    expect(queries).toHaveLength(0);
+    expect(createOrderCalls).toHaveLength(0);
+  });
+
+  it('kpa-society — 판정은 서버가 확정한 매장 조직 기준이다', async () => {
+    const { service } = makeService([cart({ organizationId: 'org-other' })], [offer()]);
+    await service.confirm(scope);
+    expect(semiFranchiseQueries[0].params).toEqual(['org-mine']);
+  });
+
+  it('k-cosmetics — 세미프랜차이즈 키가 없어 판정하지 않는다', async () => {
+    semiFranchiseKeys = [];
+    const { service } = makeService([cart()], [offer()]);
+    const out = await service.confirm({ buyerId: 'buyer-1', serviceKey: 'k-cosmetics' });
+    expect(out.orderCount).toBe(1);
+    expect(semiFranchiseQueries).toHaveLength(0);
   });
 });

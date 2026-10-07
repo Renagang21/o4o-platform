@@ -190,6 +190,9 @@ export function createSellerRecruitmentController(deps: {
       if (msg === 'RECRUITMENT_NOT_EXPOSED') {
         return res.status(400).json({ success: false, error: 'RECRUITMENT_NOT_EXPOSED', message: '아직 서비스 노출 승인이 완료되지 않은 모집입니다.' });
       }
+      if (msg === 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED') {
+        return res.status(403).json({ success: false, error: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED', message: '세미프랜차이즈 가입 승인 후 참여할 수 있는 모집입니다.' });
+      }
       if (msg === 'DUPLICATE_APPLICATION') {
         return res.status(409).json({ success: false, error: 'DUPLICATE_APPLICATION', message: '이미 신청한 모집입니다.' });
       }

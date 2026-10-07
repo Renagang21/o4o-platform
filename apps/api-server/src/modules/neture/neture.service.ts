@@ -559,7 +559,7 @@ export class NetureService {
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
   //   운영자 노출 승인 큐 · 매장 browse 컨트롤러가 쓰는 위임 메서드. 본체는 SellerRecruitmentService.
 
-  async getSellerRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus }) {
+  async getSellerRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus; storeOrganizationId?: string }) {
     return this.sellerRecruitmentService.getRecruitments(filters);
   }
 

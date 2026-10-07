@@ -374,11 +374,18 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
     }
   });
 
-  it('가입 승인 결과는 organization + owner membership 까지 만든다 (Phase F)', () => {
+  it('공급자 승인 결과는 organization + owner membership 까지 만든다 (Phase F)', () => {
+    // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4: Neture 가입 승인(operator-registration)은
+    // 공급자를 만들지 않는다 — 공급자 원장 · organization · owner 는 공급자 신청 · 승인 경로만 만든다.
     const reg = stripComments(read(`${API}/modules/neture/services/operator-registration.service.ts`));
-    expect(reg).toContain('organizationOpsService.setOwner(');
-    // owner 는 가입 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
-    expect(reg).not.toMatch(/setOwner\([^)]*approvedBy/);
+    expect(reg).not.toMatch(/INSERT INTO neture_suppliers/);
+    expect(reg).not.toContain('setOwner(');
+
+    const svc = stripComments(read(SUPPLIER_SVC));
+    expect(svc).toContain('await this.syncSupplierOrganization(supplier, { isActive: true });');
+    // owner 는 공급자 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
+    expect(svc).toContain('organizationOpsService.setOwner(orgId, supplier.userId)');
+    expect(svc).not.toMatch(/setOwner\([^)]*approvedBy/);
   });
 });
 

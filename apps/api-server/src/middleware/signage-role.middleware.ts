@@ -143,11 +143,11 @@ async function hasSignageServiceMembership(user: any, serviceKey: string): Promi
 }
 
 /**
- * Neture 기본 가입 약국의 **자기 매장** signage 진입 — store 계열 게이트(store · operator-or-store 의 store 분기 ·
+ * 내 매장(약국) 신청 약국의 **자기 매장** signage 진입 — store 계열 게이트(store · operator-or-store 의 store 분기 ·
  * store read) 전용. operator · community · supplier 경로에서 호출하지 않는다.
  *
  * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: Neture 승인 약국은 kpa-society membership 이 없다. 매장 기본
- * 기능(동영상 · 스케줄 · TV 재생)은 내 매장 API 와 같은 기준 — `isStoreOwner(ds, userId, 'kpa', org)`(Neture 기본 가입
+ * 기능(동영상 · 스케줄 · TV 재생)은 내 매장 API 와 같은 기준 — `isStoreOwner(ds, userId, 'kpa', org)`(내 매장(약국) 신청
  * 원장 active ∧ 그 조직 owner/admin/manager ∧ 매장계약) — 으로 연다. 세미프랜차이즈 가입은 요구하지 않는다.
  * 요청 org 가 판정된 매장 org 와 같을 때만 허용한다(다른 org 지정 → 차단). 판정 실패는 차단(fail-closed).
  */

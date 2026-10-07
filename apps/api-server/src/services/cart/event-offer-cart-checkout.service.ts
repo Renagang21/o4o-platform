@@ -28,6 +28,10 @@ import {
 import { checkoutService } from '../checkout.service.js';
 import { calculateSupplierShippingFee } from '../shipping/supplier-shipping.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
+import { hasServiceSemiFranchiseSupplyAccess } from '../../modules/neture-pharmacy/services/supply-access.js';
+import { resolveBuyerOrganization } from '../../utils/buyer-organization.resolver.js';
+import { B2BConfirmError } from './b2b-checkout-confirm.core.js';
 
 /**
  * cart serviceKey(플랫폼 키) → event-offer(OPL) service_key.
@@ -46,6 +50,13 @@ export interface CheckoutConfirmScope {
 export interface CheckoutConfirmInput {
   itemIds?: string[];
   note?: string;
+  /** 구매 매장(조직) 선택값(hint). 권위는 서버 검증이다 — B2B confirm 과 같은 계약(결함 O1). */
+  organizationId?: string;
+  /**
+   * 화면이 고른 매장(`X-Store-Organization-Id`, CHECK-O4O-URL-FIRST-CENSUS-V1 §21-14). 후보 안에 있을 때만 쓰고
+   * 밖이면 없는 것과 같다(`resolveStoreOrganization` 의 preferred 와 같은 계약).
+   */
+  preferredOrganizationId?: string | null;
 }
 
 export interface CreatedOrderSummary {
@@ -147,6 +158,30 @@ export class EventOfferCartCheckoutService {
         continue;
       }
       eligible.push(it);
+    }
+
+    // 2-1. CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1 — 세미프랜차이즈 서비스(kpa-society → pharmacy)의
+    //   이벤트 공급은 **구매 약국 조직**의 그 세미프랜차이즈 가입이 active 일 때만 주문한다.
+    //   구매 조직은 B2B confirm 과 같은 계약으로 서버가 확정한다(선택값은 hint · 다중 약국에서 선택이 없으면 400 ·
+    //   타인 조직은 403). 사용자가 가진 다른 약국의 가입으로 대신 인정하지 않고, 임의의 약국을 고르지 않는다.
+    //   ctx.organizationId 는 이벤트 운영 조직이라 구매 약국 판정에 쓰지 않는다.
+    const semiFranchiseKey = semiFranchiseAccessKeyFor(scope.serviceKey);
+    if (
+      semiFranchiseKey &&
+      eligible.length > 0 &&
+      !(await hasServiceSemiFranchiseSupplyAccess(
+        this.dataSource,
+        scope.serviceKey,
+        await this.resolvePurchasingOrganization(scope, input, eligible),
+      ))
+    ) {
+      for (const it of eligible.splice(0)) {
+        failedItems.push({
+          itemId: it.id,
+          reason: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
+          message: `${semiFranchiseKey} 세미프랜차이즈 가입 승인 후 주문할 수 있는 이벤트 상품입니다.`,
+        });
+      }
     }
 
     // 3. 각 item 컨텍스트 로드 (실패 → failedItems)
@@ -327,5 +362,44 @@ export class EventOfferCartCheckoutService {
       failedItems,
       removedCartItemIds,
     };
+  }
+
+  /**
+   * 구매 약국 조직 확정 — `resolveBuyerOrganization`(B2B confirm 결함 O1 과 같은 판정)을 재사용한다.
+   * 순서: ① 요청 `organizationId`(명시 선택 — 타인 조직 403) ② 화면 선택 매장 헤더(후보 안일 때만)
+   * ③ 장바구니 항목에 담긴 조직(한 곳일 때만) ④ 후보가 하나면 서버 확정 · 여럿이면 400. 모두 클라이언트 유래라 서버가 검증한다.
+   */
+  private async resolvePurchasingOrganization(
+    scope: CheckoutConfirmScope,
+    input: CheckoutConfirmInput,
+    items: StoreCartItem[],
+  ): Promise<string> {
+    const explicit = input.organizationId?.trim() || null;
+    if (!explicit && input.preferredOrganizationId) {
+      const preferred = await resolveBuyerOrganization(
+        this.dataSource,
+        scope.buyerId,
+        scope.serviceKey,
+        input.preferredOrganizationId,
+      );
+      if (preferred.status === 'resolved') return preferred.organizationId;
+    }
+    const cartOrgs = [...new Set(items.map((it) => it.organizationId).filter((o): o is string => !!o))];
+    const requested = explicit || (cartOrgs.length === 1 ? cartOrgs[0] : null);
+    if (!requested && cartOrgs.length > 1) {
+      throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+    }
+    const resolution = await resolveBuyerOrganization(this.dataSource, scope.buyerId, scope.serviceKey, requested);
+    switch (resolution.status) {
+      case 'resolved':
+        return resolution.organizationId;
+      case 'none':
+        throw new B2BConfirmError('STORE_ORGANIZATION_NOT_FOUND', '주문할 수 있는 매장(조직)이 없습니다.', 403);
+      case 'ambiguous':
+        throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+      case 'forbidden':
+      default:
+        throw new B2BConfirmError('FOREIGN_STORE_ORGANIZATION', '선택한 매장에 대한 권한이 없습니다.', 403);
+    }
   }
 }

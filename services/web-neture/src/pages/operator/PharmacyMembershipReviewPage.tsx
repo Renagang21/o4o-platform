@@ -1,5 +1,6 @@
 /**
- * PharmacyMembershipReviewPage — 약국 기본 가입 심사 (/operator/pharmacy-memberships)
+ * PharmacyMembershipReviewPage — 내 매장(약국) 신청 심사 (/operator/pharmacy-memberships)
+ *   이 원장은 Neture 가입이 아니다. 승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · DESIGN §3-1
  *   운영자가 신청 원장의 사업자번호 · 약사 면허번호를 검토해 승인 · 반려 · 정지 · 재개 · 종료한다.
@@ -96,8 +97,8 @@ export default function PharmacyMembershipReviewPage() {
   return (
     <div className="space-y-4 p-6">
       <PageHeader
-        title="약국 기본 가입 심사"
-        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 기본 가입 승인은 세미프랜차이즈 가입을 만들지 않습니다."
+        title="내 매장(약국) 신청 심사"
+        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 승인하려면 신청자의 Neture 가입이 승인 상태여야 합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">

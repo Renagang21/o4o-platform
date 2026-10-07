@@ -60,6 +60,18 @@ export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
  * 데드링크 0: 여기 등재하는 href 는 전부 App.tsx 에 실제 route 가 있는 경로다.
  * 법정정보(사업자번호 등)는 하드코딩하지 않는다 — PublicLegalFooterInfo(API) 소관.
  */
+/**
+ * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: 옛 "약사회" 그룹. /about 은 O4O 약국 서비스 소개다
+ * (약사회 조직 페이지 아님) — 그룹 · 링크 모두 서비스 브랜드로 표시한다.
+ */
+const PHARMACY_FOOTER_ABOUT_SECTION: { title: string; links: GlobalHeaderNavItem[] } = {
+  title: 'O4O 약국',
+  links: [
+    { label: '서비스 소개', href: '/about' },
+    { label: '협업 문의', href: '/contact' },
+  ],
+};
+
 export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
   {
     title: '서비스',
@@ -78,13 +90,7 @@ export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] 
       { label: '기능별 이용 방법', href: '/guide/features' },
     ],
   },
-  {
-    title: '약사회',
-    links: [
-      { label: '약사회 소개', href: '/about' },
-      { label: '협업 문의', href: '/contact' },
-    ],
-  },
+  PHARMACY_FOOTER_ABOUT_SECTION,
   {
     title: '약관',
     links: [
