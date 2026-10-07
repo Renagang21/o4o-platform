@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_SMOKE_PENDING_DEPLOY`** — 단계 배포 중. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) · 04 web-store(store) 배포 · production smoke PASS(§9 · §10 · §11 · §13). 나머지 host 는 미배포 |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_DEPLOYED`** — 단계 배포 01~05 완료. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) · 04 web-store(store) · 05 web-kpa-branch(kpa) 배포 · production smoke PASS(§9 · §10 · §11 · §13 · §14). 로그인 후 smoke 는 PENDING_USER_VERIFICATION · 잔여 정리는 06 별도 WO |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -26,7 +26,7 @@
 | RETAIL | **NOT_REDESIGNED** | `services/web-k-cosmetics` 변경 0 |
 | HOSPITAL | **UNTOUCHED** | neture.co.kr/hospital 관련 파일 변경 0 |
 | DB_CHANGE | **0** | migration · write 0. 아래 §6 의 [SMOKE] row 는 STOP 하고 보고만 한다 |
-| 운영 배포 | **부분 배포 (04/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포한다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10) · 03 study 완료(§11) · 04 store 완료(§13). kpa 는 미배포 |
+| 운영 배포 | **배포 완료 (05/05)** | PR #337 merge(0d0ff4fdc) 후 서비스별로 하나씩 배포했다. 01 web-neture 완료(§9) · 02 pharmacy 완료(§10) · 03 study 완료(§11) · 04 store 완료(§13) · 05 kpa 완료(§14) |
 
 ---
 
@@ -555,4 +555,92 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 | AUTHENTICATED_WORKSPACE_SMOKE | **PENDING_USER_VERIFICATION** — Google store_owner 테스트 계정이 없어 확인하지 않았다. 계정 생성 · DB 수정 없음 |
 | ROLLBACK | 없음 — rollback 사유 0 |
 | 시각 잔여 (배포 전부터 있던 것 · rollback 사유 아님) | ① 390 에서 헤더 brand "내 매장" 이 두 줄, nav 가 두 줄로 접힘(O4O 홈 · 로그인 접근 가능) ② StoreGate 카드 제목(h1)이 본문 크기(16px)라 위계가 약하고 1280 에서 카드 주변 여백이 넓다 ③ store RootShell 의 O4O 홈은 `authLoading` 을 넘기지 않는다(neture · kpa-society · kpa-branch 는 넘김) — 세션 복구 중 클릭 시 handoff 없이 대표 홈으로 갈 수 있다. 셋 다 06 잔여 정리 후보 |
-| 남은 배포 | 05 kpa (미착수, 별도 지시) |
+| 남은 배포 | 05 kpa — §14 에서 완료 |
+
+## 14. Production 배포 05 — web-kpa-branch / kpa (WO-O4O-PUBLIC-DESIGN-PRODUCTION-DEPLOY-05-KPA-V1)
+
+> 실행일 2026-10-07. 배포 대상은 `kpa-branch-web` Cloud Run service 하나다(`kpa.neture.co.kr`). O4O 약국(`kpa-society-web`) · neture · lecture · store · retail · API · Admin · Hospital · DB · migration 은 건드리지 않았다. KPA 는 약사회 · 분회 정체성을 유지하고 O4O 약국과 합치지 않는다(WO §6).
+
+### 14-1. Mapping census (추측 없이 실측)
+
+| 단계 | 실측 값 |
+|---|---|
+| host | `kpa.neture.co.kr` → 전역 LB `o4o-global-lb` (Cloud Run domain mapping 아님 — `domain-mappings list` 0) |
+| URL map | host rule `kpa.neture.co.kr` → path matcher `path-matcher-kpa-host` → default `backend-kpa-branch-web` (path rule 없음) |
+| backend → service | `backend-kpa-branch-web` → serverless NEG `neg-kpa-branch-web` → Cloud Run **`kpa-branch-web`** |
+| deploy key / job | promote key **`kpa-branch`** → `deploy-web-services.yml` job `deploy-kpa-branch` |
+| build app | `services/web-kpa-branch/Dockerfile` (vite `base: '/kpa/'`, runner 가 dist 를 `/` 와 `/kpa/` 두 곳에 서빙) |
+| 같은 이미지의 다른 진입 | `kpa-society.co.kr` · `www.kpa-society.co.kr` 의 path rule `/kpa` · `/kpa/*` → `backend-kpa-branch-web` (옛 공용 경로). 같은 host 의 `/kpa/tablet/*` · `/kpa/store/*` 와 그 밖의 경로 → `backend-kpa-society-web` (이번 대상 아님) |
+
+### 14-2. 배포 전 상태 (rollback 기준)
+
+| 항목 | 값 |
+|---|---|
+| service | `kpa-branch-web` (asia-northeast3) |
+| serving revision | `kpa-branch-web-00202-cen` · traffic 100% (그 이전 `00199-deq`) |
+| `o4o-commit-sha` | `0e283ba102a86b2e6ce07d88926d3b39a0ea6fe9` · digest `sha256:9e22d360…` |
+| `/` 화면 (1280/390) | title "약사회 분회" · description · og · canonical 없음 · favicon link 없음 · Pretendard 이름만 있고 미로드 · 헤더 = 페이지 안 제목 블록(로그인 · 가입 신청 · 내 분회 텍스트 링크) · **footer 없음 · O4O 홈 0** · overflow 0 |
+| 분회 route | `/o4o-pilot` · `/gangnamgu` · `kpa-society.co.kr/kpa/o4o-pilot` — 분회 헤더 · nav · footer 있음, **O4O 홈 0** |
+| 배포 gate | `DEPLOY_FREEZE=false` 유지 (열고 닫지 않음) |
+
+### 14-3. 후보 census (serving 0e283ba10 → candidate b34da10a8)
+
+- candidate = main HEAD `b34da10a851f02c0250fd9132ac6b9fca6e62da0` (CI Pipeline · CodeQL · Delivery success). a07861f57 이후는 docs commit(#350 · #351) 만.
+- kpa-branch image 의 **소스** closure(Dockerfile 이 COPY 하는 `services/web-kpa-branch` + `packages/types` · `auth-utils` · `auth-client` · `auth-react` + root 설정 · `pnpm-workspace.yaml` · package.json) 에 들어간 commit: **PR #337 2건(9a4c0e571 · 0920e1895) 만**. package.json · Dockerfile 변경 0.
+- **외부 dependency 는 이 census 로 고정되지 않는다** (Codex review PR #353 P2). `services/web-kpa-branch/Dockerfile` 은 `pnpm-lock.yaml` 을 COPY 하지 않고 `pnpm install --filter kpa-branch-web... --ignore-scripts` 로 범위 버전(`^`)을 **빌드 시점에** 해석한다. 그래서 이전 이미지(00202)와 새 이미지(00205)의 third-party 버전이 같다는 보장이 없고, 소스 commit 2건만으로 이미지 입력 전체를 확정할 수 없다. 이 부분은 diff 가 아니라 아래 14-6 운영 smoke(pageerror 0 · 예상 밖 console error 0)로 확인했다.
+
+| 분류 | 내용 |
+|---|---|
+| KPA_DESIGN_REQUIRED | `services/web-kpa-branch`: index.html(description · og:title/description/type/site_name · favicon · Pretendard, **og:url 없음**) · `public/favicon.svg` · `DirectoryShell`(신규 — `/` 헤더 · nav · O4O 홈 · 로그인 · footer) · `BranchLayout`(헤더에 O4O 홈 · `authLoading`) · `DirectoryPage`(진입 링크를 shell 로 이동) · index.css(`tokens.css` import · `Pretendard Variable`) · tailwind.config.js(글꼴) |
+| SAFE_DEPENDENCY | `packages/auth-react` public-brand(tokens · O4OPublicHero export) · `useO4OHomeReturn`(`authLoading` prop 추가, 기본 false) — 01~04 에서 운영 검증됨 |
+| UNRELATED | 테스트 파일 · 다른 서비스 · docs |
+| UNVERIFIED | 소스 0 · **외부 dependency 해석 1건**(lockfile 미사용 — diff 로 고정 불가, 운영 smoke 로 확인) |
+
+- 라우팅: `App.tsx` 변경은 `/` element 를 `DirectoryShell` 로 감싼 것 하나. 분회 route · `detectBasename` · `tenant.tsx`(PLATFORM_HOSTS · 자체 도메인 해석) · LoginPage · HandoffPage · AuthContext diff 0. 분회 routing · custom domain 처리 변경 없음.
+- 테스트: web-kpa-branch Vitest(`DirectoryShell.test.tsx` 포함)는 candidate CI Pipeline 에서 PASS.
+
+### 14-4. 분회 route · custom domain census (read-only)
+
+- 공개 목록 API `GET /api/v1/kpa-branch/branches` → 분회 211개. smoke 대상: **`o4o-pilot`**(영구 검증 tenant · 공개 홈페이지 있음) · **`gangnamgu`**(실제 목록 항목 · 홈페이지 미공개).
+- 분회 자체 도메인: LB host rule 에 분회 전용 host 0 (LB default = `backend-neture-web-http`) · 공개 API 응답에 domain 필드 없음 → **등록 · 연결된 자체 도메인 0**. DNS · 설정 변경 없음. 대신 같은 이미지가 서빙하는 옛 공용 경로 `kpa-society.co.kr/kpa/o4o-pilot` 를 smoke 했다.
+
+### 14-5. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| dry-run | Promote run **37586568354** (`b34da10a8` · `services=kpa-branch`) → kpa-branch = PROMOTE(LEVEL_3, rule `auth-package` `packages/auth-react/src/index.ts`) · admin · pharmacy-hub = NOT_SELECTED · api · neture · kpa-society · lecture · store · hospital-pharmacy = NO_DEPLOY · plan `api=false` · `web(parallel)=kpa-branch` |
+| 실제 promote | Promote run **37586853950** (`sha=b34da10a8…` · `services=kpa-branch`) success |
+| job | `deploy-kpa-branch` 만 실행. 다른 web · API · Admin = skipped |
+| 새 revision | **`kpa-branch-web-00205-puz`** · `o4o-commit-sha=b34da10a851f…` · digest `sha256:c9f1e4a9…` |
+| traffic | 새 revision 100% |
+| 이전 revision | `kpa-branch-web-00202-cen` 보존 (rollback 가능) |
+| 다른 service | neture 01698 · kpa-society 02032 · lecture 00046 · store 00062 · pharmacy-hub 00284 · core-api 03840 · admin 01352 · hospital-pharmacy 00029 — 배포 전과 같다 |
+
+### 14-6. Production smoke (비로그인 · Chrome headless · 실 URL)
+
+1280/390: `kpa.neture.co.kr/` · `/o4o-pilot` · `/gangnamgu` · `kpa-society.co.kr/kpa/o4o-pilot` · `/login` 모두 HTTP 200 · pageerror 0 · 가로 overflow 0 · Pretendard loaded(`Pretendard Variable`). console error · 4xx 는 `/gangnamgu` 의 `GET /kpa-branch/branches/gangnamgu/site` 404 뿐이다 — 홈페이지 미공개 분회의 기존 응답이고 화면은 "아직 공개되지 않은 분회 홈페이지입니다" 로 처리된다(배포 전과 같음).
+
+| 항목 | 결과 |
+|---|---|
+| `/` 구조 | 헤더(분회 마크 + "약사회 분회" · O4O 홈 · 로그인) · nav "분회 찾기 · 가입 신청 · 내 분회" · 첫 콘텐츠 = 분회 검색 + 목록 · footer "약사회 분회 · 분회별 홈페이지와 회원 소속을 한 곳에서 · O4O 홈". 무거운 Hero 없음(의도) |
+| KPA 정체성 | 루트 = "약사회 분회", 분회 = 분회명(예: "O4O 파일럿 테스트분회"). **"O4O 약국" 표시 0** (4개 URL × 2 viewport) |
+| O4O 홈 | 루트 · 분회 · 옛 공용 경로 모두 **헤더**에 보임(1280 · 390, 루트는 footer 에도). **실제 클릭** → `https://neture.co.kr/` 도착(루트 · `/o4o-pilot` × 1280 · 390). 버튼 disabled 아님 |
+| 분회 route | `/o4o-pilot` — 분회명 h1 · nav(홈 · 공지 · 행사 · 자료실 · 임원소개, 390 은 "메뉴 열기") · footer 연락처 정상. 옛 공용 경로도 같은 화면 |
+| 로그인 진입 | 헤더 [로그인] → `/login` "약사회 분회 로그인" · Google 진입 표시. 이메일 · 비밀번호 폼은 배포 전과 같다(로그인 화면 diff 0, 정본 "Google + 이메일·비밀번호 병행"). 인증은 진행하지 않았다 |
+| title / description | "약사회 분회" / "분회별 홈페이지와 회원 소속을 한 곳에서 — 약사회 분회 서비스입니다." |
+| og:url | **없음** (루트 · 분회 slug · 옛 공용 경로 모두) — `https://kpa.neture.co.kr/` 고정 회귀 없음 |
+| canonical | 없음 (배포 전과 같음) |
+| favicon | `kpa.neture.co.kr/kpa/favicon.svg` · `kpa-society.co.kr/kpa/favicon.svg` 200 image/svg+xml (O4O 공통 마크 fallback). 배포 전 옛 공용 경로 1280 에서 보이던 404 console error 1건(URL 미기록 · favicon link 부재로 추정)은 배포 후 0 |
+
+스크린샷은 세션 scratchpad 에만 두고 저장소에는 커밋하지 않았다.
+
+### 14-7. 기타 판정
+
+| 항목 | 값 |
+|---|---|
+| OG_URL_FIXED_REGRESSION | 없음 |
+| AUTHENTICATED_SMOKE | **PENDING_USER_VERIFICATION** — 분회 회원 테스트 계정으로 로그인하지 않았다. 계정 생성 · DB 수정 없음 |
+| ROLLBACK | 없음 — rollback 사유 0 |
+| 시각 잔여 (rollback 사유 아님) | ① 390 분회 헤더가 3단(분회명 / O4O 홈 · 로그인 · 가입 신청 / 메뉴 열기)으로 높이 171px(배포 전 127px) ② favicon 은 KPA 전용 마크가 아닌 O4O 공통 마크 fallback. 둘 다 06 잔여 정리 후보 |
+| 이미지 재현성 (별도 WO 제안) | 배포 web Dockerfile 중 `web-account` 만 `pnpm-lock.yaml` 을 COPY 한다. kpa-branch · kpa-society · neture · lecture · store · pharmacy-hub · hospital-pharmacy 는 lockfile 없이 설치하므로 01~04(§9~§13) 이미지도 같은 조건이다. Dockerfile 변경은 build 인프라 변경이라 이번 범위 밖 — 보고만 한다 |
+| 남은 배포 | 없음 — 단계 배포 01~05 완료. 06(최종 smoke · 잔여 정리)은 별도 WO |
