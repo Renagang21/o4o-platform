@@ -682,6 +682,57 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 
 ---
 
+## 16. FIX_NOW 결과
+
+PR #357 (`wo/o4o-cross-service-public-design-final-polish-v1`). route · 권한 · StoreGate 로직 · API · DB · Dockerfile · package.json 변경 0.
+
+### 16-1. 변경
+
+| host | 파일 | 변경 |
+|---|---|---|
+| pharmacy | `web-kpa-society` `config/navigation.ts` · `components/Footer.tsx` · `config/seoRegistry.ts` | footer 그룹 "약사회" → "O4O 약국" · "약사회 소개" → "서비스 소개"(→ `/about`) · copyright "© 2026 Neture · O4O 약국"(다른 O4O 서비스와 같은 형식) · `/about` description 의 "대한약사회" 제거. 그룹은 상수로 분리했다(pharmacy-hub footer 와의 기존 중복 블록 분리 — Sonar) |
+| store | `web-store` `components/RootShell.tsx` · `index.css` | O4O 홈 · 계정을 nav 와 분리한 `header-actions`. 1280 은 brand │ nav │ O4O 홈 · 로그인(배치 동일), 390 은 1줄 brand + O4O 홈 · 로그인 / 2줄 nav 한 줄(넘치면 nav 안에서만 가로 스크롤). 카드 `.card>h1` 22px(390 20px) · `.card>p` 간격 — tailwind base 리셋 보정, 직계 자식만이라 폼 카드 내부는 영향 없음 |
+| store · study | `RootShell.tsx` · `web-lecture` `components/SiteShell.tsx` | 헤더 · footer O4OHomeButton 4곳에 `authLoading` 연결 |
+| kpa | `web-kpa-branch` `layouts/BranchLayout.tsx` | 모바일 헤더 2단 — 메뉴 토글을 계정 줄로 올리고 닫힌 nav 는 높이 0 · 로고 32px(md 40px). md 이상 배치 동일 |
+
+### 16-2. 검증
+
+| 묶음 | 결과 |
+|---|---|
+| `packages/auth-react` vitest | 9 files / 144 passed — 신규: 공개 헤더 6곳(neture · pharmacy · kpa 2 · study · store)의 모든 O4OHomeButton 이 `authLoading` 을 넘기는지 소스 스캔 |
+| `web-kpa-society` vitest | 7 files / 69 passed — 신규: footer 그룹 · 라벨 "약사회" 0 · `/about` = "서비스 소개" · `/about` description "약사회" 0 |
+| `web-kpa-branch` vitest | 3 files / 34 passed |
+| tsc · vite build | web-store · web-lecture · web-kpa-branch · web-kpa-society exit 0 (store 는 origin/main #339 병합 후 재확인) |
+| CI (PR #357) | CI Gate · Web production build(affected) · API Jest 3 · CodeQL · Docs sensitive guard · SonarCloud 모두 pass. Sonar 첫 run 의 실패(CSS 중복 selector 2 · 기존 중복 블록 안 수정 줄)는 코드로 고쳤다 — 게이트 완화 없음 |
+
+로컬 dist smoke (실 hostname route interception · 비로그인 · 운영 아님) — 4 host × 1280/390 = 10 run(kpa 는 `/` · `/o4o-pilot`):
+
+| host | 390 header 높이 | h1 | 결과 |
+|---|---|---|---|
+| pharmacy | 65px | Hero 32px | 본문 "약사회" 0 |
+| study | 69px | Hero 32px | O4O 홈 헤더 · footer |
+| store | **88px (2줄)** | 카드 제목 **20px**(1280 22px, 이전 16px) | 1줄 brand · O4O 홈 · 로그인 / 2줄 nav 6개 한 줄 |
+| kpa `/o4o-pilot` | **97px (2단, 이전 171px)** | 분회명 | 분회명 / O4O 홈 · 로그인 · 가입 신청 · 메뉴 열기 |
+
+모든 run: HTTP 200 · 가로 overflow 0 · pageerror 0 · console error 0 · 4xx/5xx 0. 스크린샷은 세션 scratchpad 에만 두었다.
+
+### 16-3. KEEP_AS_IS
+
+- Store 로그인 방식(G) — 정본 그대로
+- KPA favicon(I) — O4O 공통 마크 유지
+
+### 16-4. Pharmacy brand assets — PENDING_USER_ASSET
+
+자산이 들어오면 `public/brand/` 투입 → `PHARMACY_BRAND_ASSETS_READY=true` → `index.html` favicon · apple-touch-icon · og:image 와 `manifest.json` icons 를 `PHARMACY_BRAND_ASSET_SLOTS` 경로로 교체한다(§3). 소비 자리:
+
+- favicon · apple-touch-icon · manifest icon 192/512 · og:image — `index.html` · `manifest.json`
+- `logo-mark` — 헤더 `PHARMACY_HEADER_BRAND.icon` 과 footer `brand.icon`
+  - 지금은 💊 문자다
+  - 두 슬롯 모두 ReactNode(`GlobalHeader` · `CommunitySiteFooter`)라 앱 config 에서 `<img>` 로 바꿀 수 있고, 공통 package 변경은 필요 없다
+- `logo-horizontal` — 현재 소비 자리가 없다. 쓰지 않는 파일을 형식적으로 만들지 않는다
+
+---
+
 ## 17. Separate Tracks
 
 ### 17-1. PRODUCTION_TEST_DATA_CLEANUP — Funding `[SMOKE]` row
@@ -690,7 +741,7 @@ HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflo
 
 | 항목 | 값 |
 |---|---|
-| row id | `cf6cdc98-69a1-49ef-9628-76a7f882c9b1` |
+| row id | `[REDACTED_ROW_ID]` (§6 의 prefix 와 같은 row) |
 | title | `[SMOKE] 유통참여형 펀딩 운영 루프 테스트` |
 | status | `closed` |
 | 생성 | 2026-06-07 · [`CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-SMOKE-DATA-FLOW-V1`](../investigations/CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-SMOKE-DATA-FLOW-V1.md) 의 운영 smoke 로 만든 테스트 데이터 |
