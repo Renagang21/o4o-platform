@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES OBSOLETE, 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -183,9 +183,16 @@
 | 문서 | 상황 | 상태 |
 |---|---|---|
 | [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 는 2026-09-16 판정 확정 → [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 SUPERSEDED** (헤더 표기, 본문 보존). §4 · §5 는 참고만, 근거로 승격하지 않는다 | 부분 SUPERSEDED (판정 확정) |
-| [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
-| [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
-| [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | Cosmetics 도메인 규칙. 본문 사실 정정 완료(2026-10-04 — 별도 cosmetics-api 없음 · migration 은 deploy Job · 소비자 주문 410). **필요한 결정**: "Core 테이블 생성 · Core FK 금지" 원칙과 `public.cosmetics_members`(→ users FK) · `public.cosmetics_contents` 의 관계(허용 예외로 둘지 원칙 범위를 좁힐지) · 개인정보 저장 금지와 매장 신청 테이블의 연락처 · 사업자번호 필드의 관계 | 판정 대기 |
+
+현재 `판정 대기` 문서는 **0건**이다(2026-10-07). 위 행은 판정이 끝난 부분 SUPERSEDED 문서의 상태 주의 표기다.
+
+**판정 해제 기록 (2026-10-07, `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`)** — 아래 3건을 현재 main 의 코드 · 상위 정본과 본문 전체를 대조해 판정하고 §9 에서 뺐다. 세 문서 모두 기록물이 되어 색인에 등재하지 않는다(§0). 각 문서 상단에 상태 줄을 달았고 본문은 보존했다.
+
+| 문서 | 판정 근거 | 결과 |
+|---|---|---|
+| [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | COMMERCE-BOUNDARY §8 판정 = `LEGACY_COMMERCE`, 은퇴 완료 — 자체 storefront 목록 철거 · 결제 `410` · 주문 생성 `POST /checkout` `410 STORE_CONSUMER_ORDER_RETIRED`. §3 판매 한도 · §5 TTL cleanup 은 코드에 없다. 남는 B2C visibility 조건은 QR 제품 랜딩 상세의 read-only 노출 필터(정보 표시, COMMERCE-BOUNDARY §4) | SUPERSEDED → [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) (§1) · PaymentCore 는 [CHECKOUT-STABLE-V2](baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2-2 (§2). FROZEN 해제 |
+| [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 유효했던 두 규칙(`checkoutService.createOrder()` 단일 지점 · 독립 `*_orders` / `*_payments` 금지)은 CHECKOUT-STABLE-V2 §2 · `CLAUDE.md` §4 가 그대로 정한다 — **규칙은 유지, 문서만 교체**. `OrderType` 열거 · 서비스별 정책 · `/checkout/initiate` 예시는 stale | SUPERSEDED → [CHECKOUT-STABLE-V2](baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 · [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) (§1) |
+| [COSMETICS-DOMAIN-RULES](architecture/COSMETICS-DOMAIN-RULES.md) | K-Cosmetics 퇴역 결정(사용자 결정 2026-10-05, [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14). 독립 API · 독립 DB 전제는 실재하지 않고, 남는 원칙(주문 §4 · 인증 재구현 금지 · Boundary)은 플랫폼 공통 정본이 이미 정한다. `cosmetics_members` FK · 매장 신청 연락처 필드 문제는 **판정하지 않고** 퇴역 작업 범위로 넘긴다 | OBSOLETE (퇴역 서비스 기록물 · 대체 문서 없음). `CLAUDE.md` §9 문구 정리 |
 
 **판정 해제 기록 (2026-10-06, `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`)** — 아래 6건은 사용자 판정이 확정되어 §9 에서 뺐다. 기록물이 된 문서는 색인에 등재하지 않는다(§0).
 

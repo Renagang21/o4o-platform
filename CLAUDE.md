@@ -164,7 +164,7 @@ import type { RelatedEntity } from './related.entity.js';
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점.** 독립 `*_orders` · `*_payments` 테이블 신설 금지 (`scripts/check-forbidden-tables.mjs` 가 검사).
 - 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B / PharmacyHub → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
 - 새 주문 구조 · 결제 · 환불을 만들기 전에 위 두 정본을 먼저 확인한다. 이는 현행 계약이며, 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차를 따른다.
-- 기술 계약 [`E-COMMERCE-ORDER-CONTRACT`](docs/baseline/E-COMMERCE-ORDER-CONTRACT.md) 는 `createOrder()` 단일 지점 규칙만 유효하고 `OrderType` 열거 절은 stale — 상태는 [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
+- 주문 생성 기술 계약(`createOrder()` 단일 지점 · 독립 테이블 금지 · PaymentCore)의 정본은 [`CHECKOUT-STABLE-DECLARATION-V2`](docs/baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 다. 구 `E-COMMERCE-ORDER-CONTRACT` 는 2026-10-07 SUPERSEDED(`OrderType` 열거는 현행 코드에 없음, 서비스 구분은 `metadata.serviceKey`) — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) 판정 해제 기록.
 
 ## 5. O4O Store & Order
 
@@ -203,8 +203,8 @@ import type { RelatedEntity } from './related.entity.js';
 
 ## 9. 도메인별 규칙 (참조)
 
-Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
-`O4O-RETAIL-STABLE-V1` 은 현행 규칙이 아니라 **판정 대기(UNKNOWN)** — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
+Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
+K-Cosmetics 는 퇴역 결정(2026-10-05) — 전용 규칙 `COSMETICS-DOMAIN-RULES` 는 OBSOLETE 이며, 남은 cosmetics 코드에도 플랫폼 공통 규칙(§1 · §4 · §7)이 그대로 적용된다. `O4O-RETAIL-STABLE-V1` 은 SUPERSEDED(소비자 commerce loop 은퇴 완료) — 둘 다 [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) 판정 해제 기록.
 
 ## 10. KPA Society 구조
 
@@ -272,6 +272,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-10-06*
-*Version: 9.4*
+*Updated: 2026-10-07*
+*Version: 9.5*
 *Status: Active — Claude Code Entry Point*

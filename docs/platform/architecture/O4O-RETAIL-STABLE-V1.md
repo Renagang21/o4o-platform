@@ -1,4 +1,6 @@
-# O4O Retail Stable v1.0 — Platform Architecture Freeze
+# O4O Retail Stable v1.0 — SUPERSEDED (FROZEN 해제 · 소비자 commerce loop 은퇴)
+
+> **상태**: SUPERSEDED · **대체 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §4 · §10 (사업 경계) · [`CHECKOUT-STABLE-DECLARATION-V2`](../../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2-2 (PaymentCore) · **표기일**: 2026-10-07 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`). COMMERCE-BOUNDARY §8 판정 결과 이 문서의 B2C closed loop 은 `LEGACY_COMMERCE` 이며 **은퇴가 완료됐다** — 자체 storefront 목록 철거(`WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1`) · 결제 `410 STORE_SALE_PAYMENT_DEPRECATED` · 주문 생성 `POST /checkout` `410 STORE_CONSUMER_ORDER_RETIRED`(`WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1`). §3 판매 한도 · §5 TTL cleanup(`/checkout/cleanup-expired`) 은 코드에 남아 있지 않다. §4 PaymentCore 계약은 CHECKOUT-STABLE-V2 §2-2 가 정한다. §2 의 4중 visibility 조건은 QR 제품 랜딩 상세(`GET /:slug/products/:id`, `routes/platform/store-public/store-public-utils.ts` `queryVisibleProducts`)의 **read-only 노출 필터**로만 남는다 — commerce 게이트가 아니라 정보 표시(COMMERCE-BOUNDARY §4)이며, 이 문서의 §8 변경 절차 대상이 아니다. 아래 본문은 2026-02 기록으로 보존하며 근거로 쓰지 않는다. 기능 복구는 COMMERCE-BOUNDARY §15 절차 없이 하지 않는다.
 
 > ---
 >
@@ -23,7 +25,7 @@
 
 > **Status**: FROZEN
 > **Effective**: 2026-02-16
-> **Authority**: 판정 대기 — [`docs/CANONICAL-INDEX.md`](../../CANONICAL-INDEX.md) §9 (`UNKNOWN`). 현행 CLAUDE.md 는 본 문서를 현행 규칙으로 인용하지 않는다; 사업 경계는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다
+> **Authority**: 없음 — 2026-10-07 SUPERSEDED (위 상태 줄). 위 `Status: FROZEN` 은 작성 당시 값이다. 사업 경계는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다
 
 ---
 

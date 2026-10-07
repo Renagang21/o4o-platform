@@ -1,7 +1,9 @@
-# E-commerce Core Order Contract
+# E-commerce Core Order Contract — SUPERSEDED
+
+> **상태**: SUPERSEDED · **대체 문서**: [`CHECKOUT-STABLE-DECLARATION-V2`](CHECKOUT-STABLE-DECLARATION-V2.md) §2 (주문 생성 기술 계약) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) (현행 주문 축 · 저장 계약) · **표기일**: 2026-10-07 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`). 이 문서에서 유효했던 두 규칙 — **주문 생성은 `checkoutService.createOrder()` 단일 지점** · **독립 `*_orders` / `*_payments` 테이블 금지**(`scripts/check-forbidden-tables.mjs`) — 은 CHECKOUT-STABLE-V2 §2 와 `CLAUDE.md` §4 가 그대로 정하며 규칙 자체는 바뀌지 않았다. 나머지는 stale 이다: §3 · §6.2 · §7.2 `OrderType` 열거(`CheckoutOrder` 엔티티 · `CreateOrderDto` 가 `order_type` 을 매핑하지 않음 — 서비스 구분은 `metadata.serviceKey`), §5 서비스별 정책(Cosmetics 독립 commerce · Dropshipping · Tourism — 현행 주문 경로는 B2B 계약의 5개 축), §6.1 `POST /api/checkout/initiate` 소비자 주문 예시(이 route 는 현행 `apps/api-server` 에 없다 · 어떤 주문이 허용되는가는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다). 아래 본문은 2026-01 기록으로 보존하며 근거로 쓰지 않는다.
 
 **Version**: 1.0
-**Status**: Active
+**Status**: Active (작성 당시 값 — 위 상태 줄이 우선)
 **Effective Date**: 2026-01-11
 **Reference**: WO-O4O-STRUCTURE-REFORM-PHASE5-A′-V01
 
