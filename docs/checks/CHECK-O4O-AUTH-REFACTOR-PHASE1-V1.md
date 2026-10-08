@@ -103,3 +103,9 @@ Neture·약국 계정 보안 화면에서 일반 logout과 공통 계정 표시�
 - 비밀번호 변경·소셜 연결·실제 데이터 연결 및 정리는 후속 단계다. 24개 조합의 로그인 성공을 전체 업무 기능 PASS로 확대하지 않는다.
 
 **운영 판정:** 1단계의 로그인·일반 logout 및 공개 전체 logout UI 제거는 확인했다. 두 역할의 완전한 기능 체험은 매장 접근/샘플 데이터 연결과 후속 세션 처리 작업이 남아 있어 미완료다. 단계별 TODO를 유지한다.
+
+## 사용자 삭제 대상 지정 반영 — 2026-10-09 KST
+
+사용자가 Pharmacy-Hub(`pharmacy-hub`, `pharmacyhub.co.kr`)를 삭제 대상으로 지정했다. 이후 인증 리팩토링·공개 Demo·기능 체험 검증 대상에서 제외하며, 도메인 허용 설정을 추가해야 하는 인증 검증 미완료 항목으로 취급하지 않는다. 위 소비처 matrix와 운영 접속 제약은 지정 이전의 실행 기록이다. 약국장 검증을 수행한 별도 약국 서비스 `pharmacy.neture.co.kr`(`kpa-society`)는 삭제 대상에 포함하지 않는다.
+
+코드 조사에서 `services/web-pharmacy-hub`, API의 service catalog와 Pharmacy-Hub routes, Store의 `/pharmacy-hub` 경로, 배포 workflow와 deploy-risk 참조가 남아 있음을 확인했다. canonical index의 약관·개인정보 설명에도 활성 서비스로 기재되어 있다. [WO의 삭제 대상 서비스 정리 TODO](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md#삭제-대상-서비스-정리-pharmacy-hub)에 의존 관계·보존 대상·코드/운영/데이터 제거·문서 정합 검토를 기록했다. 이번 변경은 범위와 TODO 반영이며, 실제 앱·운영 서비스·데이터 삭제는 수행하지 않았다.
