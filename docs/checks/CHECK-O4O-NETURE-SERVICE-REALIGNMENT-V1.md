@@ -1,6 +1,6 @@
 # CHECK — Neture 서비스 재배치
 
-> 상태: branch 구현·로컬 검증 완료, 통합·운영 적용 진행 대상
+> 상태: main 통합·통제 배포 완료, 실제 운영 업무 검증 대기
 > 작성일: 2026-10-08
 > 작업: [전체 WO와 T01~T13](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)
 > 기준: main `0795464cc5` · branch `wo/neture-service-realignment-v1`
@@ -110,3 +110,30 @@ pnpm exec tsx src/scripts/neture-pharmacy/retirement-census.ts
 main 통합·배포·운영 업무·수동 운영 인덱스 전환·운영 데이터 처분·외부 LB/DNS/이미지/서버 변경은 이 로컬 검증에서 실행하지 않았다. 외부 OAuth/메일/증빙 저장소·운영 계정·URL map·실제 인쇄 QR 검증 결과가 아직 없다. 이 항목들은 같은 전체 WO에서 계속 처리하며 일부 구현 PASS를 전체 종료로 해석하지 않는다.
 
 문서 정합: 역할·서브도메인·commerce 설계·canonical index·퇴역 잔여 계약을 실제 branch에 맞춰 수정했다. 잘못된 여러 약국 통합, HUB 보존, 강좌의 커뮤니티 귀속, 사업 포럼의 독립 가입 동기화 및 후속 미구현 설명을 정정했다. 과거 WO/CHECK의 당시 기록은 보존한다.
+
+## 5. main 통합·통제 배포와 읽기 전용 운영 smoke — 2026-10-09
+
+§2~§4는 당시 로컬 검증 기록이다. 아래는 이후에 실행한 통합·배포 결과이며 실제 로그인 업무와 구분한다. 시간은 KST다.
+
+| 단계 | 실제 결과 |
+|---|---|
+| main 통합 | 사용자 승인 후 PR #364 → `7202a56b73c1ea0327e987fe5f654730c4816b1b`, 06:55 |
+| PR 최종 HEAD | `8edf916ab3`의 CI·SonarCloud PASS, Codex 주요 문제 없음, 미해결 스레드 0. 배포 SHA와 파일 트리 동일 |
+| 병합 후 검사 | 해당 SHA의 CI Pipeline·CodeQL·Scheduled API Full Jest PASS |
+| main SonarCloud | FAIL: 76 Security Hotspots·Security/Reliability E가 직전 main과 같은 항목이며 중복률 15.0%→14.6%. PR 신규 hotspot 0/PASS와 별도로 기록. 상세 개별 이슈 API 미확인, 집계 동일을 개별 동일로 해석하지 않음 |
+| 통제 배포 승인·실행 | 사용자 별도 승인, Promote run `37857583333`, 08:06 시작. target SHA 고정·선택 7개 서비스·기존 CI/main/freeze/serving gate 유지 |
+| canonical migration | `AlignSellerRecruitmentApplicationIdentity1791477914134`를 포함하는 migration job 단계 PASS, 08:11. 이벤트 2단계 수동 전환은 포함하지 않음 |
+| API 전환 | 새 revision readiness·traffic switch·전환 후 `/health/ready` 검증 PASS, 08:12 |
+| 프런트·serving | API·admin·Neture·pharmacy·PharmacyHub·Study·Store의 배포 작업과 최종 serving SHA 확인 PASS, production `DEPLOYED`, 08:17 |
+| 공개 HTTP | 9개 호스트의 HTML 또는 API readiness HTTP 200, 8개 웹의 entry JS HTTP 200/정상 JS MIME. TLS·hostname 검증과 환경 proxy 유지 |
+| 익명 보호 API | 내 매장 context·담당 신청 심사·사업 등록·공급자 제안·Study 기존 문의 401, 독립 약사 포럼 403. 로그인 회원의 사업/조직 격리 검증을 대신하지 않음 |
+
+근거: [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/37850103184), [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/37850103282), [Scheduled API Full Jest](https://github.com/Renagang21/o4o-platform/actions/runs/37854938966), [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/37857583333). GH job/production 상태와 실제 HTTPS 요청을 대조했다. 상세 판정 artifact/log의 다운로드는 환경 호스트 정책으로 차단되어 전체 JSON·revision ID를 직접 읽었다고 기록하지 않는다.
+
+배포 중 별도 AUTH 트랙의 PR #365가 main `3e7f44c38c`에 추가됐다. 이번 결과는 승인한 `7202a56b73`의 배포이며 이후 main cycle과 구분한다. 다음 업무 검증 착수 때 실제 serving/main을 다시 확인한다.
+
+운영 Chromium은 환경의 기존 NSS 신뢰 DB가 read-only여서 초기화와 TLS 신뢰에 실패했다. 제공된 공개 CA로 OpenSSL/curl의 인증서·hostname 검증은 정상이다. workspace NSS/XDG는 기존 HOME NSS 우선 경로를 대체하지 못했으며 HOME 변경·TLS 검증 해제·private key DB 복사는 하지 않았다. 이를 운영 앱 TLS 장애나 브라우저 UI PASS로 기록하지 않는다.
+
+신규 실제 계정·메일/증빙·담당 운영자·두 번째 승인 사업의 준비 확인은 대기 중이다. 실제 가입·사업 정지/재활성화·공급/주문/test 결제·커뮤니티·기기/인쇄 QR, 이벤트 2단계, 원장 처분·302/301·서버 퇴역은 미실행이다. 전체 WO는 OPEN이며 자기 작업공간도 KEEP다.
+
+문서 정합: 당시 로컬 기록은 보존하고 이 배포 단계와 [WO §7](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md#7-main-통합통제-배포-실행-기록--2026-10-09)의 현재 체크 상태를 추가했다. 운영 응답 원문·실제 계정 정보·자격증명은 공개 문서에 넣지 않는다.

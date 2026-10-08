@@ -1,7 +1,7 @@
 # Neture 서비스 재배치 리팩터링 — 코드·문서 대조 후 작업안
 
-> **상태**: ACTIVE — 구현·격리 환경 검증 진행
-> **작성일**: 2026-10-08 · **최종 갱신**: 2026-10-08
+> **상태**: ACTIVE — main 통합·통제 배포 완료, 실제 운영 업무 검증 대기
+> **작성일**: 2026-10-08 · **최종 갱신**: 2026-10-09
 > **근거**: 현재 사용자 지시 — 전체 서비스 재배치. 초안 ToDo → 코드·문서 점검 → ToDo 수정 → 필요한 결정 논의 → 수정 ToDo 재점검 → 최종 작업안 순서로 기획
 > **관련 정본**: [역할·업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [서브도메인 의미](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md), [인증·가입](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [약국 commerce 설계](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
 
@@ -199,7 +199,8 @@ T01~T13은 전체 작업 내부의 순서·의존성이다. 임의로 일부만 
 - [ ] 신규 계정 가입·이메일 확인 → 약국 증빙/검토/내 매장 승인 → pharmacy 및 검증용 두 번째 사업 가입/승인 → 공급자·제품 승인 → 공급/모집/주문/테스트 결제/처리 확인
 - [ ] 일반 약사 커뮤니티 별도 승인과 사업 포럼, 자료 원본/사본·편집 후 출처, 계약·QR·태블릿·사이니지, 한 사업 정지 시 다른 사업/내 매장 유지 및 타 조직 차단 확인
 - [ ] study·funding·supplier·kpa의 독립 업무와 커뮤니티/내 매장 자격 비전파 확인. 실제 OAuth·메일·서류 저장소가 불가하면 미확인 범위 기록
-- [ ] 최신 HEAD의 required CI·SonarCloud 결과/적용 여부·Codex·미해결 스레드 확인 → integration-ready 보고 → 저장소 규칙에 따른 사용자 main 통합 승인 → PR merge → 현재 Delivery 정책으로 배포/운영 smoke
+- [x] 최종 PR HEAD의 required CI·SonarCloud·Codex·미해결 스레드 확인 → integration-ready 보고 → 사용자 main 통합 승인 → PR #364 merge
+- [x] main CI·Delivery·Sonar 결과 구분 검토 → 별도 사용자 승인 → 정확한 SHA의 7개 서비스 통제 배포·canonical migration·serving SHA·공개 HTTP/익명 차단 smoke 확인
 - [ ] T11/T12의 선행 업무 검증을 먼저 수행하고, 각 적용 후 회귀를 확인. 결함은 해당 부분 수정·재배포하여 전체 완료까지 진행
 - [ ] 최종 정본·index·WO·CHECK·handoff에 구현/자동 검증/통합/배포/실제 업무/퇴역을 구분해 기록하고 자기 작업공간만 안전하게 종료
 - 완료 기준: T01~T12의 실제 결과가 모두 기록됨. 파이프라인 성공·공개 화면 로드만으로 가입/업무 완료를 판정하지 않음
@@ -244,3 +245,13 @@ T01~T13은 전체 작업 내부의 순서·의존성이다. 임의로 일부만 
 - T13: 실제 로컬 API 34건, 한 약국 두 사업의 승인·해당 사업 정지 격리, 브라우저 10개 흐름을 확인했다. 검토 지적에 따라 공용/구형 Forum·홈/운영 요약의 승인 경계를 보완하고 강좌·내 매장 검토 이미지를 검증했다. 상세 회귀·빌드와 운영 한계는 [CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)를 따른다.
 - 문서 정합: 역할·주소·commerce 설계와 canonical index의 HUB/복수 약국/커뮤니티 후속 미구현 설명을 현재 branch에 맞추어 수정했다. 과거 CHECK의 당시 결과를 현재 PASS로 다시 쓰지 않았다.
 - 남은 연속 단계: 최신 HEAD CI·리뷰 → main 통합 승인 → 배포 → 실제 신규 계정 가입·증빙·사업/공급자 승인·테스트 주문·QR 업무 → 운영 조건이 충족된 인덱스/퇴역 적용. 외부 선행조건은 전체 완료까지 열린 항목으로 유지한다.
+
+## 7. main 통합·통제 배포 실행 기록 — 2026-10-09
+
+- 사용자 승인으로 [PR #364](https://github.com/Renagang21/o4o-platform/pull/364)를 main `7202a56b73c1ea0327e987fe5f654730c4816b1b`에 통합했다. 최종 PR HEAD의 CI·SonarCloud·Codex는 PASS/주요 문제 없음, 미해결 스레드 0건이다. 병합 후 CI Pipeline·CodeQL 및 같은 SHA의 Scheduled API Full Jest는 PASS다.
+- main SonarCloud는 실패로 완료했다. 직전 main과 같은 76 Security Hotspots·Security/Reliability E이며 중복률은 15.0%→14.6%다. PR 최종 HEAD의 신규 hotspot 0/PASS와 동일 파일 트리의 증거를 함께 검토했다. 집계가 같다고 개별 이슈가 전부 같다고 판정하지 않으며, 상세 issue API는 환경 호스트 정책으로 미확인이다. main Quality Gate를 PASS로 기록하거나 기준을 변경하지 않았다.
+- 별도 사용자 승인 후 [Promote run 37857583333](https://github.com/Renagang21/o4o-platform/actions/runs/37857583333)을 08:06 KST에 시작했다. 선택 범위는 `api,admin,neture,kpa-society,pharmacy-hub,lecture,store` 7개이며 target은 위 SHA로 고정했다. canonical migration·API readiness/트래픽 전환·프런트 verified rollout·serving SHA 확인이 성공했고 08:17 KST에 production `DEPLOYED`로 기록됐다.
+- 배포 후 9개 운영 호스트의 root 또는 API `/health/ready`, 8개 웹 호스트의 JS 자산은 모두 HTTP 200이다. 내 매장·담당 심사·사업 등록·공급자·Study 기존 문의·약사 포럼의 보호 API 6개는 익명 요청을 401/403으로 차단했다. 실제 로그인·가입·주문·기기 업무의 PASS는 아니다.
+- 배포 중 다른 AUTH 트랙의 [PR #365](https://github.com/Renagang21/o4o-platform/pull/365)가 main `3e7f44c38cee7aa2eacf069d5eedcdf07c7bbaad`에 추가됐다. 이번 승인은 `7202a56b73` 배포이며 후속 main의 통합·배포 결과를 이번 결과에 합치지 않는다. 다음 운영 검증 착수 시 실제 serving/main 상태를 다시 확인한다.
+- 실제 신규 약국·공급자 가입 대상, 담당 운영자, pharmacy 외 두 번째 승인 사업과 안전한 로그인·증빙 방법은 준비 확인을 요청했다. 계정·사업 원장을 직접 주입하거나 로컬 fixture를 운영 증거로 사용하지 않았다. T10/T13의 실제 업무, T11 이벤트 2단계, T12 QR/데이터/서버 퇴역은 계속 열린 항목이다.
+- 문서 정합: §6의 당시 로컬 실행 기록을 보존하고 현재 통합·배포 결과를 이 절과 [CHECK §5](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md#5-main-통합통제-배포와-읽기-전용-운영-smoke--2026-10-09)에 추가했다. 전체 WO와 작업공간은 KEEP/OPEN이며 다른 세션의 `SETUP.md` 수정은 보존한다.
