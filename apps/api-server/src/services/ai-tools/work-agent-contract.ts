@@ -334,6 +334,19 @@ export function normalizeEvidenceText(v: string): string {
   return String(v ?? '').replace(/\s+/g, '').toLowerCase();
 }
 
+/** 근거가 될 수 있는 인용의 최소 길이(정규화 후) · 그 안의 최소 문자 수. */
+export const EVIDENCE_QUOTE_MIN = 3;
+const EVIDENCE_QUOTE_MIN_LETTERS = 2;
+
+/**
+ * 정규화된 인용이 대상을 식별할 만한가 — "5" · "mg" · "." 처럼 화면 어디에나 있는 짧은 글은 화면에 있어도 근거가 아니다.
+ * 의미 검증기가 실패하면 결정적 판정이 그대로 남으므로, 약한 인용이 조건을 충족시키지 않게 여기서 거른다.
+ */
+export function isIdentifyingQuote(normalized: string): boolean {
+  if (normalized.length < EVIDENCE_QUOTE_MIN) return false;
+  return (normalized.match(/\p{L}/gu)?.length ?? 0) >= EVIDENCE_QUOTE_MIN_LETTERS;
+}
+
 export type ProposalRejectReason =
   | 'SHAPE'
   | 'UNKNOWN_ACTION'

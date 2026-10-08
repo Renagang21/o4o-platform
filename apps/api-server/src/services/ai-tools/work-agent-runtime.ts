@@ -52,6 +52,7 @@ import {
   validateWorkImageInput,
   validateWorkProposal,
   normalizeEvidenceText,
+  isIdentifyingQuote,
   type CompletionJudge,
   type CompletionVerdict,
   type ExecutionEvidence,
@@ -1920,7 +1921,8 @@ export async function runWorkAgent(
     const typed = new Set(state.history.flatMap((h) => [h.action.text, h.action.option]).filter((v): v is string => typeof v === 'string').map(normalizeEvidenceText));
     const evidence: ExecutionEvidence[] = (proposal.evidence ?? []).map((e) => {
       const q = normalizeEvidenceText(e.quote);
-      const grounded = q.length > 0 && !typed.has(q) && seenTexts.some((t) => t.includes(q));
+      // 짧거나 비식별적인 인용("5" 등)은 화면 어디에나 있어 근거가 아니다(isIdentifyingQuote).
+      const grounded = isIdentifyingQuote(q) && !typed.has(q) && seenTexts.some((t) => t.includes(q));
       return { criterionId: e.criterion, source: e.source, quote: e.quote, grounded };
     });
     // 같은 run 의 앞선 판정에서 grounded 된 조건 근거를 누적한다 — 이번 보고가 그 조건을 다시 싣지 않아도 유지된다.

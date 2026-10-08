@@ -99,7 +99,7 @@ jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) 
 
 import logger from '../utils/logger.js';
 import { buildPlannerUserPrompt, describeExecutionIntent } from '../services/ai-tools/work-agent-runtime.js';
-import { validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
+import { isIdentifyingQuote, normalizeEvidenceText, validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
 import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assistant-planning.js';
 import {
   __resetUnderstandingCacheForTest,
@@ -459,6 +459,17 @@ describe('③ runtime — done 은 주장일 뿐 · Assistant 가 조건과 근�
     // 화면 이동은 성공했지만(resultObserved) Task 는 완료가 아니다.
     expect(result.report?.resultObserved).toBe(true);
     expect(judgeTaskStatus(intent.completion, result.report!)).toBe('waiting_for_user');
+  });
+
+  it('짧거나 비식별적인 인용은 화면에 있어도 근거가 아니다 — "5" 로 조건이 충족되지 않는다', async () => {
+    expect(['5', 'mg', '.', '12', '5.0'].map((q) => isIdentifyingQuote(normalizeEvidenceText(q)))).toEqual([false, false, false, false, false]);
+    expect(['우루사', '아모디핀정 5mg', 'abc'].map((q) => isIdentifyingQuote(normalizeEvidenceText(q)))).toEqual([true, true, true]);
+    const u = U([C1]);
+    const intent = planAssistantTask({ ...BASE, understanding: u }).intent;
+    const planner = scripted([CLICK, DONE_EV('5'), DONE_EV('5'), DONE_EV('5')]);
+    const result = await run(planner, SEARCH, intent, createCompletionJudge(u));
+    expect(result.report?.evidence?.every((e) => e.grounded === false)).toBe(true);
+    expect(result.goal.status).not.toBe('completed');
   });
 
   it('사용자 확인 조건 — 화면 조건이 충족돼도 Assistant 가 성공 확인을 묻는다', async () => {
