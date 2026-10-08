@@ -76,6 +76,8 @@ HEAD `7fca827af8`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·Cod
 
 기존 `contact_requests`의 `kpa-society`/`education` 문의는 **Study 전용** 조회·상태 처리 adapter로 연결했다. 신규 강좌 문의와 함께 Study 운영 화면에서 처리하며 일반 협업·다른 서비스 문의는 조회·수정하지 않는다. 원장 재분류·가입 권한 추가·백필·데이터 삭제는 하지 않는다. API HTTP 회귀 8건과 Study 화면 Vitest 2건, 기존 강좌 권한·라우터 회귀 47건, 강좌 앱 빌드·API tsc·production 번들은 PASS다. lint ratchet은 기존 46 errors 기준으로 PASS다. 실제 Chromium의 Study 운영 화면에서 PC·모바일 조회와 상태 저장 → 기존 PostgreSQL 행의 원장 보존을 확인했으며 보호된 문의 불변·익명/비운영자 차단·토큰 유지 상태의 즉시 정지 차단도 PASS, JavaScript error는 0이다. 이 수정 이후 최신 HEAD의 CI·리뷰를 다시 확인한다.
 
+HEAD `f8cdffce5d`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·CodeQL·SonarCloud가 모두 PASS였다. 해당 Codex 재검토의 P2는 옛 HUB handoff의 중첩 자료함 경로를 보존하도록 첫 경로 구간으로 종류를 판정해 보완했다. 기존 매장 자체 자료의 서비스 지정 경로는 유지한다. pharmacy 앱 빌드·기존 자료 경로/단일 토큰 교환 Vitest 5건은 PASS다. 실제 Chromium에서 `/store-hub/multilingual-product-contents/my`와 `/hub/multilingual-product-contents/my`가 PC·모바일의 실제 내 다국어 콘텐츠 화면에 도착하고 query·hash를 유지하는 것을 확인했다. 실제 목록 API는 HTTP 200이며 JavaScript·HTTP 오류는 0이다. 후속 수정 HEAD의 CI·리뷰는 다시 확인한다.
+
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.

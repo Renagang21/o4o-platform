@@ -554,7 +554,7 @@ function KpaUnifiedStoreHandoff({ children, force = false }: { children?: ReactN
     const libraryResources = ['content', 'supplier-library', 'multilingual-product-contents', 'blog', 'pop', 'qr', 'video', 'signage', 'screen-set', 'contents'];
     const hubPath = ['b2b', 'event-offers'].includes(resource) ? '/store/pharmacy/supply'
       : resource === 'cart' ? '/store/pharmacy/cart'
-        : libraryResources.includes(resource) ? `/store/library/${resource}` : '/store/pharmacy/contents';
+        : libraryResources.includes(resource.split('/')[0]) ? `/store/library/${resource}` : '/store/pharmacy/contents';
     const returnPath = (legacyHub ? hubPath + location.search : mapLegacyStorePathToUnified('kpa-society', location.pathname, location.search)) + location.hash;
     if (!user) { window.location.replace(`https://store.neture.co.kr${toKpaScopedStorePath(returnPath)}`); return; }
     kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath).then(url => {
