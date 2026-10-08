@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PostStatus, CommentStatus } from '@o4o/forum-core/entities';
-import { MoreThanOrEqual } from 'typeorm';
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 import logger from '../../utils/logger.js';
 import { FORUM_ICON_SAMPLES } from './forumIconSamples.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
@@ -63,6 +63,16 @@ export class ForumModerationController extends ForumControllerBase {
         .where('cat.status = :status', { status: 'completed' })
         .orderBy('cat.createdAt', 'DESC')
         .take(10);
+      this.applyForumContextFilter(activeCatQb, 'cat', ctx);
+
+      const commentsQb = this.commentRepository.createQueryBuilder('comment')
+        .innerJoin('forum_post', 'post', 'post.id = comment.postId')
+        .where('comment.status = :commentStatus', { commentStatus: CommentStatus.PUBLISHED });
+      this.applyContextFilter(commentsQb, 'post', ctx);
+      const todayCommentsQb = commentsQb.clone().andWhere('comment.createdAt >= :today', { today });
+      const usersCount = ctx
+        ? totalPostsQb.clone().select('COUNT(DISTINCT post.authorId)', 'count').getRawOne().then(row => Number(row?.count ?? 0))
+        : this.userRepository.count();
 
       const [
         totalPosts,
@@ -73,15 +83,10 @@ export class ForumModerationController extends ForumControllerBase {
         activeCategories,
       ] = await Promise.all([
         totalPostsQb.getCount(),
-        this.commentRepository.count({ where: { status: CommentStatus.PUBLISHED } }),
-        this.userRepository.count(),
+        commentsQb.getCount(),
+        usersCount,
         todayPostsQb.getCount(),
-        this.commentRepository.count({
-          where: {
-            status: CommentStatus.PUBLISHED,
-            createdAt: MoreThanOrEqual(today),
-          },
-        }),
+        todayCommentsQb.getCount(),
         activeCatQb.getMany(),
       ]);
 
@@ -185,7 +190,7 @@ export class ForumModerationController extends ForumControllerBase {
 
       // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
       const userRoles: string[] = (req as any).user?.roles || [];
-      if (!userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
+      if (!isPlatformAdmin(userRoles) && !userRoles.includes('kpa:admin') && !userRoles.includes('kpa:operator')) {
         res.status(403).json({
           success: false,
           error: 'KPA operator role required for content moderation',

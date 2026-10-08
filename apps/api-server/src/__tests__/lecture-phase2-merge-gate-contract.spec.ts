@@ -1375,7 +1375,9 @@ describe('정적 계약', () => {
   it('11차 P2-35: PharmacyHub 가이드·KPA 홈 피드에 내부 강의 안내가 남아 있지 않다', () => {
     const ph = read('packages/shared-space-ui/src/guide/copy/pharmacy-hub.ts');
     expect(ph).not.toContain('교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.');
-    expect(ph).toContain('O4O 강의로 이동');
+    // 강좌 진입은 Neture 메인·study로 이전했으므로 커뮤니티 안내에는 남기지 않는다.
+    expect(ph).not.toContain('O4O 강의로 이동');
+    expect(ph).not.toContain("key: 'lms'");
     const home = read('services/web-kpa-society/src/pages/HomeLatestPage.tsx');
     expect(home).not.toContain("{ key: 'course'");
     expect(home).not.toContain("label: '강의'");

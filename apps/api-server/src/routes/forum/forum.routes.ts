@@ -184,10 +184,10 @@ router.get('/categories/:id/membership-status', optionalAuth, membershipControll
 // Moderation (authenticated - admin/manager only)
 // ============================================================================
 // Get moderation queue
-router.get('/moderation', authenticate, moderationController.getModerationQueue.bind(moderationController));
+router.get('/moderation', authenticate, requireGenericForumWriteAdmin, moderationController.getModerationQueue.bind(moderationController));
 
 // Moderate content (approve/reject)
-router.post('/moderation/:type/:id', authenticate, moderationController.moderateContent.bind(moderationController));
+router.post('/moderation/:type/:id', authenticate, requireGenericForumWriteAdmin, moderationController.moderateContent.bind(moderationController));
 
 // ============================================================================
 // Notifications (Phase 13)

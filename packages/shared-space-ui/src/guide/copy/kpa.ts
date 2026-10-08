@@ -46,9 +46,9 @@ export const kpaGuideIntroProps: GuideIntroPageProps = {
       title: 'KPA-Society 위치',
       href: '/guide/intro/kpa',
       description:
-        'KPA-Society는 약사 커뮤니티를 기반으로 플랫폼에 참여하는 서비스입니다. 약국은 매장 역할을 하며, 포럼·교육·자료실로 구성원 간 네트워크를 형성합니다.',
+        'KPA-Society는 약사 커뮤니티를 기반으로 플랫폼에 참여하는 서비스입니다. 약국은 매장 역할을 하며, 포럼·자료실로 구성원 간 네트워크를 형성합니다.',
       items: [
-        { label: '커뮤니티 기반 서비스', detail: '포럼, 교육, 자료실이 약사 네트워크의 중심 채널입니다.' },
+        { label: '커뮤니티 기반 서비스', detail: '포럼, 자료실이 약사 네트워크의 중심 채널입니다.' },
         { label: '약사 네트워크', detail: '약사회 회원이 서로 정보를 공유하고 업무를 협력합니다.' },
         { label: '매장 연결 구조', detail: '약국은 O4O 매장으로 등록되어 상품 수급·고객 응대를 운영합니다.' },
       ],
@@ -61,7 +61,7 @@ export const kpaGuideIntroProps: GuideIntroPageProps = {
       items: [
         { label: '운영자 중심 구조', detail: '승인, 정책, 커미션 등 플랫폼 규칙을 운영자가 담당합니다.' },
         { label: '매장 실행 구조', detail: '약국이 상품을 취급하고 고객에게 직접 서비스를 제공합니다.' },
-        { label: '커뮤니티 확장 구조', detail: '포럼과 교육이 매장 운영 노하우를 네트워크 전체에 확산합니다.' },
+        { label: '커뮤니티 확장 구조', detail: '포럼과 공유 자료가 매장 운영 노하우를 네트워크 전체에 확산합니다.' },
       ],
     },
     {
@@ -180,7 +180,6 @@ export const kpaGuideIntroKpaProps: GuideIntroKpaPageProps = {
     sectionTitle: '커뮤니티 — 무엇이 쌓이는가',
     cards: [
       { label: '포럼',   summary: '질문 · 답변 · 경험 공유' },
-      { label: '강의',   summary: '지식 전달 · 학습' },
       { label: '콘텐츠', summary: '자료 축적 · 활용 기반' },
     ],
   },
@@ -512,7 +511,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'KPA-Society 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '강의', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '제작 자료', '블로그'],
+    flowLabels: ['커뮤니티', '콘텐츠', '자료실', '설문조사', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '제작 자료', '블로그'],
   },
   groups: [
     {
@@ -524,20 +523,6 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '포럼 이용 방법', route: '/guide/features/forum' },
       ],
       linkTo: '/guide/features/forum',
-    },
-    {
-      // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §14·§15:
-      // 강의는 독립 서비스 O4O 강의(study.neture.co.kr)가 소유한다. KPA 의 /lms · /mypage/enrollments 는
-      // 외부 이동 진입점만 남는다 — KPA 안에 강의 이용 가이드는 두지 않는다.
-      step: '02',
-      title: '강의',
-      primaryRoute: '/lms',
-      description: '약사 전문 교육 강의는 독립 서비스 「O4O 강의」에서 제공합니다. 아래 진입점에서 O4O 강의(study.neture.co.kr)로 이동해 수강·학습 관리·수료증을 이용합니다.',
-      items: [
-        { label: 'O4O 강의로 이동', route: '/lms' },
-        { label: '내 강의·수강 이력 (O4O 강의)', route: '/mypage/enrollments' },
-      ],
-      linkTo: '/lms',
     },
     {
       step: '03',
@@ -753,7 +738,7 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
     description: '문서형 콘텐츠를 읽고 작성하고, AI로 만들고, 자료실에서 가져오는 방법을 안내합니다',
     primaryAction: { label: '콘텐츠 허브로 이동 →', to: '/content' },
     flowBarTitle: '이용 흐름',
-    flowLabels: ['콘텐츠 허브', '문서형 콘텐츠', '콘텐츠 작성', 'AI로 만들기', '자료실', '설문·강의'],
+    flowLabels: ['콘텐츠 허브', '문서형 콘텐츠', '콘텐츠 작성', 'AI로 만들기', '자료실', '설문'],
   },
   sections: [
     {
@@ -821,11 +806,10 @@ export const kpaGuideFeatureContentProps: GuideFeatureManualPageProps = {
     },
     {
       step: '06',
-      title: '설문·강의 이용',
-      description: '설문조사와 강의는 각각의 전용 화면과 가이드에서 이용합니다.',
+      title: '설문 이용',
+      description: '설문조사는 전용 화면과 가이드에서 이용합니다.',
       items: [
         { label: '설문조사 가이드', detail: '설문 참여·작성·결과 확인·포인트 보상은 /guide/features/survey 가이드를 참고합니다.' },
-        { label: '강의(O4O 강의)', detail: '강의 수강·작성은 독립 서비스 O4O 강의(study.neture.co.kr)에서 합니다. 홈의 강의 메뉴(/lms)에서 이동합니다.' },
       ],
     },
   ],

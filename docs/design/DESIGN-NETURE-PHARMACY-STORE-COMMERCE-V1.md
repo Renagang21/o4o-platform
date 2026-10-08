@@ -591,7 +591,7 @@ pathRules:
 | **1단계** (`CreateNeturePharmacyCommerce1791200000000`) | 전체 UNIQUE `(organization_id, service_key, offer_id)` 유지 | 신버전 `ON CONFLICT ... WHERE service_key <> 'neture-event-offer'` · 구버전 `ON CONFLICT (cols)` 모두 동작. 이벤트 재신청 · 같은 offer 복수 이벤트 → `409 EVENT_REAPPLY_NOT_YET_SUPPORTED` | **가능** — 인덱스가 바뀌지 않았으므로 migration 이전 API 로 되돌려도 쿼리가 실패하지 않는다(새 테이블 · 컬럼은 구버전이 읽지 않는다) |
 | **2단계** (수동 전환 도구, 자동 migration에 미등록) | 부분 UNIQUE `WHERE service_key <> 'neture-event-offer'` 로 교체 | 실제 인덱스 상태가 phase-two일 때 재신청·같은 offer 복수 이벤트 허용 | **불가** — 구버전 `ON CONFLICT (cols)` 가 `no unique or exclusion constraint matching` 으로 실패. 롤백은 1단계 이후 API 까지만 |
 
-수동 CLI: API를 tsc로 빌드한 뒤 `node --import tsx dist/scripts/neture-pharmacy/event-index-transition.js`를 실행한다. 기본은 읽기 전용이며, 적용에는 `--apply --phase-one-verified --rollback-floor=<검토된 API commit SHA>`가 필요하다. 이 옵션은 운영 검증 기록을 대신하지 않는다. 전환은 한 transaction과 테이블 잠금으로 처리하며, 원복 시 중복 행이 있으면 인덱스를 건드리기 전에 차단한다.
+수동 CLI: 검토한 checkout에서 API를 tsc로 빌드한 뒤 `node --import tsx dist/modules/neture-pharmacy/operations/event-index-transition-cli.js`를 실행한다. 기본은 읽기 전용이며, 적용에는 `--apply --phase-one-verified --rollback-floor=<검토된 API commit SHA>`가 필요하다. 이 옵션은 운영 검증 기록을 대신하지 않는다. 전환은 한 transaction과 테이블 잠금으로 처리하며, 원복 시 중복 행이 있으면 인덱스를 건드리기 전에 차단한다.
 
 2단계 착수 조건: 1단계 API 가 운영에 배포 · 안정화되어 구버전 롤백 필요성이 없어진 뒤. 그 전에 남은 `ON CONFLICT (cols)` 소비처 0 건 재확인(이미 적용된 옛 migration 파일 2개는 재실행되지 않으므로 대상 아님).
 

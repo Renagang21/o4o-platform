@@ -132,7 +132,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = user?.id;
-  const isAdmin = user?.roles?.some(r => r === 'neture:admin' || r === 'platform:super_admin') ?? false;
+  const isAdmin = !basePath.startsWith('/communities/') && (user?.roles?.some(r => r === 'neture:admin' || r === 'platform:super_admin') ?? false);
 
   // Close action menu on outside click
   useEffect(() => {

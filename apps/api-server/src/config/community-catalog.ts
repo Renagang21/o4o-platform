@@ -97,6 +97,11 @@ export function getCommunityDefinition(key: string | null | undefined): Communit
   return O4O_COMMUNITIES.find((c) => c.key === k);
 }
 
+/** These legacy ledgers also require community approval; generic public APIs cannot bypass it. */
+export const CATALOG_FORUM_STORAGE_CODES: readonly string[] = Object.freeze(
+  [...new Set(O4O_COMMUNITIES.flatMap(c => c.forumStorageCodes))],
+);
+
 export function listActiveCommunities(): CommunityDefinition[] {
   return O4O_COMMUNITIES.filter((c) => c.status === 'active');
 }

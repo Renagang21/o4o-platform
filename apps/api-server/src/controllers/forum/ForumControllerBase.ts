@@ -16,6 +16,7 @@ import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
 import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
+import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 
 /**
  * ForumControllerBase
@@ -51,6 +52,44 @@ export class ForumControllerBase {
    */
   protected getForumContext(req: Request): ForumContext | undefined {
     return (req as any).forumContext;
+  }
+
+  /**
+   * Apply organization/scope filter to a ForumCategoryRequest query.
+   */
+  protected applyForumContextFilter(
+    qb: any,
+    alias: string,
+    ctx: ReturnType<typeof this.getForumContext>,
+  ): void {
+    if (!ctx) return;
+    // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+    //   forum 원장은 service_code 컬럼을 직접 가지므로 EXISTS 없이 직접 비교한다.
+    //   아래 scope 분기들이 early return 하므로 반드시 그 앞에 AND 로 붙인다.
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
+    const codes = this.getContextForumCodes(ctx);
+    if (ctx.excludeScopedCommunities) {
+      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%' AND ${alias}.serviceCode NOT IN (:...ctxExcludedCommunityCodes)`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+      if (!codes) return;
+    }
+    if (codes) {
+      qb.andWhere(`${alias}.serviceCode IN (:...ctxForumCodes)`, { ctxForumCodes: codes.length ? codes : ['__none__'] });
+    }
+    if (ctx.scope === 'demo') {
+      qb.andWhere('1 = 0');
+      return;
+    }
+    if (ctx.scope === 'community') {
+      qb.andWhere(`${alias}.organizationId IS NULL`);
+      return;
+    }
+    if (ctx.scope === 'organization' && ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+      return;
+    }
+    if (ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+    }
   }
 
   /**
@@ -138,7 +177,7 @@ export class ForumControllerBase {
   ): void {
     const codes = this.getContextForumCodes(ctx);
     if (ctx?.excludeScopedCommunities) {
-      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = ${alias}.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%')`);
+      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = ${alias}.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
     }
     if (!codes) return; // generic/admin route — 무필터 현행 유지
     if (!codes.length) { qb.andWhere('1 = 0'); return; }
@@ -196,7 +235,7 @@ export class ForumControllerBase {
     const codes = this.getContextForumCodes(ctx);
     if (ctx?.excludeScopedCommunities && forumId) {
       const rows = await AppDataSource.query(
-        `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code NOT LIKE 'sf:%' AND service_code NOT LIKE 'community:%'`, [forumId],
+        `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code NOT LIKE 'sf:%' AND service_code NOT LIKE 'community:%' AND NOT (service_code = ANY($2::text[]))`, [forumId, CATALOG_FORUM_STORAGE_CODES],
       );
       if (!rows.length) return false;
     }

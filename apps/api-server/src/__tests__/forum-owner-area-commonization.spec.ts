@@ -234,18 +234,18 @@ describe('공통 컴포넌트는 서비스를 모른다', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('서비스 고유 정책이 보존된다', () => {
-  it('Neture — 폐쇄형 회원 관리 동선을 만들지 않는다 (memberManageHref 미주입)', () => {
+  it('Neture — 회원 공간에서만 폐쇄형 회원 관리 동선을 제공한다', () => {
     const page = read('services/web-neture/src/pages/supplier/MyForumDashboardPage.tsx');
     // 주석은 "왜 주지 않는가" 를 설명하므로 코드 라인만 본다.
-    expect(codeOf(page)).not.toContain('memberManageHref');
+    expect(codeOf(page)).toContain('...(basePath ? { memberManageHref:');
     // 회원 관리 route/page 자체도 신설하지 않았다.
     expect(fs.existsSync(path.join(REPO, 'services/web-neture/src/pages/supplier/ForumMemberManagementPage.tsx'))).toBe(false);
   });
 
   it('Neture — 공급자 공간 basePath 를 유지한다', () => {
     const page = read('services/web-neture/src/pages/supplier/MyForumDashboardPage.tsx');
-    expect(page).toContain("forumHomeHref: '/supplier/forum'");
-    expect(page).toContain("requestFormHref: '/supplier/forum/request-category'");
+    expect(page).toContain("forumHomeHref: basePath ?? '/supplier/forum'");
+    expect(page).toContain("requestFormHref: basePath ? `${basePath}/request` : '/supplier/forum/request-category'");
   });
 
   it('KPA — 신청 내역은 통합 신청함으로 유지 (fetchMyRequests 미주입 + 안내 slot)', () => {

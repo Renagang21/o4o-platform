@@ -6,8 +6,9 @@ export async function eventIndexState(exec: Pick<EntityManager, 'query'>) {
     FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
     WHERE c.oid = to_regclass('public.idx_org_listing_unique_v2') AND i.indisvalid AND i.indisunique`);
   if (!row) throw new Error('EVENT_INDEX_MISSING_OR_INVALID');
+  const predicate = typeof row.predicate === 'string' ? row.predicate.replace(/[()]/g, '').replace(/\s+/g, ' ').trim() : null;
   return row.predicate === null ? 'phase-one' as const
-    : /service_key.*<>.*neture-event-offer/.test(row.predicate) ? 'phase-two' as const
+    : predicate && /^service_key(?:::text)? <> 'neture-event-offer'(?:::text)?$/.test(predicate) ? 'phase-two' as const
     : (() => { throw new Error('EVENT_INDEX_UNEXPECTED_PREDICATE'); })();
 }
 

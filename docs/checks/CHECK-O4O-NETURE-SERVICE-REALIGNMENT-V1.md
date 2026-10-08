@@ -44,7 +44,15 @@
 
 Chromium으로 실제 로컬 Vite·API를 이용했다. canonical HTTPS 호스트를 로컬 서버로 연결하는 테스트 proxy를 사용하며 운영 서버에 요청하지 않았다. API 주소 재작성은 이 테스트 proxy에서만 수행하고 제품 코드의 인증·CORS를 완화하지 않았다.
 
-8개 흐름 PASS, page JavaScript error 0: 승인된 독립 커뮤니티, 실제 글 작성·상세, 한 약국의 두 사업 진입, 내 매장 자료함, 약국을 소유하지 않은 운영자의 모바일 신청 심사, pharmacy 담당 운영 화면, 모바일 커뮤니티 목록, study 독립 문의 화면. 담당 운영자의 비공개 사업 게시판 열람·중재도 실제 로컬 API로 추가 확인했다. 전체관리자 메뉴는 권한 registry 회귀와 아래 적용 전 확인 항목을 함께 따른다.
+10개 흐름 PASS, page JavaScript error 0: 승인된 독립 커뮤니티, 실제 글 작성·상세, 한 약국의 두 사업 진입, 내 매장 자료함, 공통 제공 자료 화면, 옛 HUB 자료 handoff의 실제 자료함 도착, 약국을 소유하지 않은 운영자의 모바일 신청 심사, pharmacy 담당 운영 화면, 모바일 커뮤니티 목록, study 독립 문의 화면. 담당 운영자의 비공개 사업 게시판 열람·중재도 실제 로컬 API로 추가 확인했다. 전체관리자 메뉴는 권한 registry 회귀와 아래 적용 전 확인 항목을 함께 따른다.
+
+### 2-3. PR 검토 후 보완
+
+[PR #364](https://github.com/Renagang21/o4o-platform/pull/364)의 첫 HEAD에서 앱 빌드·CodeQL·Guard Policy·SonarCloud는 PASS였고, 전체 API CI는 실패했으며 로컬 전체 suite 대조로 옛 HUB·강좌·포럼·문서/모집 경로를 고정한 검사와 Forum 위임 모듈의 ESM 테스트 경계를 확인했다. 로컬 전체 실행은 412개 suite PASS·7개 실패였고 실패한 7개 suite와 새 경계 검사를 묶은 재검증 336건은 PASS였다. 해당 검사의 배치 기준을 현행 구조에 맞춰 정정하고 기존 조직·권한·기기 경로 보존 검사는 유지한다. 최신 HEAD의 required CI와 Codex 재검토가 끝나기 전에는 integration-ready로 기록하지 않는다.
+
+Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했다. 통계의 게시판·댓글·작성자 집계와 인기 태그에 동일한 경계를 적용하고 공용 검토 대기열·중재는 전체 관리자 전용으로 제한했다. 공용 AI 메타데이터·추천 및 관련 글의 기준 게시글에도 비공개 경계를 적용한다. 새 비공개 공간과 기존 4개 커뮤니티 저장 코드를 포함한 경계 회귀 24건과 실제 로컬 HTTP에서 익명·일반 회원·서비스 운영자의 통계/태그/글/AI/추천/검토 대기열 차단 및 가입자의 해당 공간 조회를 확인했다.
+
+옛 HUB 자료 handoff는 실제 공통 `/store/library/*` 경로를 보존한다. 매장 자체 콘텐츠는 기존 서비스 경로를 유지하며 경로 회귀 4건과 브라우저 실제 도착으로 확인했다. Store handoff의 React StrictMode 중복 교환을 차단하여 일회용 토큰을 한 번만 교환한다(StrictMode 회귀 1건 PASS). 수동 이벤트 CLI는 tsc 산출물에 포함되는 operations 경로로 옮기고 기본 dry-run이 phase-one을 조회하는 것을 확인했다. 인덱스 판정은 추가 predicate가 섞인 구조를 phase-two로 인정하지 않으며 실제 DB·판정 회귀 25건이 PASS다.
 
 ## 3. 적용·복구 순서
 
@@ -60,10 +68,11 @@ API 디렉터리에서 올바른 대상 DB 환경을 먼저 확인한다. 검토
 
 ```bash
 pnpm --filter @o4o/api-server run build
+# 검토한 checkout에서 API tsc 빌드 후 실행(Docker bundle 포함을 전제하지 않음)
 # 기본: 인덱스 상태 조회만
-node --import tsx dist/scripts/neture-pharmacy/event-index-transition.js
+node --import tsx dist/modules/neture-pharmacy/operations/event-index-transition-cli.js
 # 운영 검증·복구 기준을 확정한 뒤의 적용 형식
-node --import tsx dist/scripts/neture-pharmacy/event-index-transition.js --apply --phase-one-verified --rollback-floor=<reviewed-api-commit>
+node --import tsx dist/modules/neture-pharmacy/operations/event-index-transition-cli.js --apply --phase-one-verified --rollback-floor=<reviewed-api-commit>
 # 옛 데이터 수량과 FK만 조회 (READ ONLY transaction, 개인정보 출력 없음)
 pnpm exec tsx src/scripts/neture-pharmacy/retirement-census.ts
 ```

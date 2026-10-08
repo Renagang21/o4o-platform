@@ -9,6 +9,8 @@
 export const KPA_SCOPED_STORE_BASE = '/work/kpa-society/store';
 
 export function toKpaScopedStorePath(returnPath: string): string {
+  // 제공 자료 화면은 공통 /store/library 트리에만 있다. 조직은 목적지 Store gate가 확인한다.
+  if (/^\/store\/library\/(?:content|supplier-library|multilingual-product-contents|blog|pop|qr|video|signage|screen-set)(?:[/?#]|$)/.test(returnPath)) return returnPath;
   if (returnPath === '/store' || returnPath.startsWith('/store/') || returnPath.startsWith('/store?')) {
     return `/work/kpa-society${returnPath}`;
   }

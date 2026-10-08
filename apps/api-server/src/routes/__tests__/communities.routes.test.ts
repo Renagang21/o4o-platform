@@ -35,6 +35,13 @@ jest.mock('../../middleware/community-service-scope.middleware.js', () => ({
 }));
 
 jest.mock('../../database/connection.js', () => ({ AppDataSource: {} }));
+jest.mock('../../services/forum/ForumRequestService.js', () => ({ forumRequestService: {} }));
+
+// This suite checks outer community guard wiring. The delegated Forum router
+// has separate boundary tests and requires its real entity graph at runtime.
+jest.mock('../forum/service-forum.routes.js', () => ({
+  createServiceForumRouter: () => require('express').Router(),
+}));
 
 jest.mock('../../services/auth/auth-context.helper.js', () => ({
   freshenUserContext: async () => ({ roles: [], memberships: [] }),

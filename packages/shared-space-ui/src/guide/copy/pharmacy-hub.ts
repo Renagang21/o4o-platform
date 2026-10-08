@@ -37,7 +37,6 @@ import {
   BookOpen,
   Boxes,
   Compass,
-  GraduationCap,
   LayoutGrid,
   MessagesSquare,
   MonitorPlay,
@@ -75,7 +74,7 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
         'PharmacyHub 는 약국 경영에 필요한 상품 수급과 매장 실행을 한 서비스 안에서 잇는 O4O 서비스입니다.',
       items: [
         { label: '약국 중심 서비스', detail: '약국이 직접 공급 상품을 탐색·주문하고 매장 운영까지 이어갑니다.' },
-        { label: '커뮤니티 · 교육', detail: '포럼과 교육 콘텐츠로 매장 운영 정보를 나눕니다.' },
+        { label: '커뮤니티', detail: '포럼과 공유 자료로 매장 운영 정보를 나눕니다.' },
         { label: '매장 실행 연결', detail: '주문한 상품이 QR · POP · 사이니지 · 태블릿 · 설명서로 매장에서 쓰입니다.' },
       ],
     },
@@ -103,7 +102,7 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
     },
     /*
      * WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §1·§2:
-     *   커뮤니티 홈 우측의 `커뮤니티 이용 안내` 카드(포럼 글쓰기 / 교육 콘텐츠 /
+     *   커뮤니티 홈 우측의 `커뮤니티 이용 안내` 카드(포럼 글쓰기 / 공유 자료 /
      *   내가 쓴 글 / 콘텐츠 공개·검토 4줄)를 홈에서 제거하고 이 이용 가이드로 옮겼다.
      *   홈은 최신 정보 소비(공지 + 뉴스 + 최신글), 이용 방법은 이용 안내가 설명한다.
      *   문구는 그대로 보존하고 각 항목에 실제 route 를 연결해 안내에서 실행으로
@@ -223,7 +222,6 @@ export const pharmacyHubGuideIntroKpaProps: GuideIntroKpaPageProps = {
     sectionTitle: '커뮤니티',
     cards: [
       { label: '포럼', summary: '약국 운영 · 상품 정보 교류' },
-      { label: '교육', summary: '매장 운영 · 상품 이해 콘텐츠' },
       { label: '내 글', summary: '내가 쓴 글 모아보기' },
     ],
   },
@@ -292,7 +290,6 @@ export const pharmacyHubGuideIntroOperationProps: GuideIntroOperationPageProps =
     sectionTitle: '커뮤니티',
     cards: [
       { label: '포럼', summary: '질문 · 사례 공유' },
-      { label: '교육', summary: '운영 · 상품 이해 학습' },
       { label: '검색', summary: '필요한 글 찾기' },
     ],
   },
@@ -548,7 +545,7 @@ export const pharmacyHubGuideFeatureForumProps: GuideFeatureManualPageProps = {
   hero: {
     eyebrow: '기능별 이용 방법',
     title: '커뮤니티 이용 방법',
-    description: '포럼 · 검색 · 내 글 · 교육으로 구성된 커뮤니티 영역 이용 순서입니다.',
+    description: '포럼 · 검색 · 내 글로 구성된 커뮤니티 영역 이용 순서입니다.',
     primaryAction: { label: '커뮤니티로 이동 →', to: '/community' },
     flowBarTitle: '이용 순서',
     flowLabels: ['커뮤니티 홈', '포럼', '글 작성', '내 글'],
@@ -558,7 +555,7 @@ export const pharmacyHubGuideFeatureForumProps: GuideFeatureManualPageProps = {
       step: '01',
       title: '커뮤니티 홈',
       routeLabel: '/community',
-      description: '포럼 · 교육 · 검색 · 내 글 진입점이 모여 있습니다.',
+      description: '포럼 · 검색 · 내 글 진입점이 모여 있습니다.',
       items: [
         { label: '진입 카드', detail: '홈 상단 카드에서 원하는 영역으로 바로 이동합니다.' },
         { label: '가입 전', detail: '가입 승인 전에는 글쓰기 등 일부 기능이 제한됩니다.' },
@@ -583,16 +580,6 @@ export const pharmacyHubGuideFeatureForumProps: GuideFeatureManualPageProps = {
       items: [
         { label: '검색', detail: '커뮤니티 글을 한 번에 검색합니다.' },
         { label: '내 글', detail: '내가 작성한 글 목록을 확인합니다.' },
-      ],
-    },
-    {
-      step: '04',
-      title: '교육',
-      routeLabel: '/education',
-      description: '매장 운영 · 상품 이해 교육 콘텐츠를 이용합니다.',
-      items: [
-        { label: '과정 선택', detail: '교육 목록에서 과정을 선택합니다.' },
-        { label: '강의 수강', detail: '과정 안의 강의를 순서대로 진행합니다.' },
       ],
     },
   ],
@@ -995,7 +982,7 @@ export const pharmacyHubServiceIntroProps: GuideServiceIntroPageProps = {
     paragraphs: [
       '약국은 상품을 들이는 일과 매장에서 고객에게 설명하는 일을 따로 준비해 왔습니다. PharmacyHub 는 이 둘을 하나의 흐름으로 연결합니다.',
       '공급자가 제공한 상품을 약국이 직접 탐색해 주문하고, 주문한 상품을 매장 제품으로 등록한 뒤 설명서 · 콘텐츠 · QR · POP · 사이니지로 매장에서 바로 활용합니다.',
-      '포럼과 교육으로 다른 약국의 운영 경험을 참고할 수 있습니다.',
+      '포럼과 공유 자료로 다른 약국의 운영 경험을 참고할 수 있습니다.',
     ],
   },
   audiences: {
@@ -1016,7 +1003,6 @@ export const pharmacyHubServiceIntroProps: GuideServiceIntroPageProps = {
       { icon: BookOpen, title: '콘텐츠 · 자료함', desc: '매장에서 쓸 글을 작성하거나 제공된 자료를 가져와 보관하고 블로그로 이어갑니다.' },
       { icon: MonitorPlay, title: '매장 실행 자산', desc: 'QR · POP · 디지털 사이니지 · 태블릿 · 상품 설명서를 매장에서 바로 사용합니다.' },
       { icon: MessagesSquare, title: '커뮤니티', desc: '포럼에서 약국 운영과 상품 정보를 나누고 필요한 글을 검색합니다.' },
-      { icon: GraduationCap, title: '교육', desc: '매장 운영과 상품 이해를 돕는 교육 과정을 수강합니다.' },
     ],
     note: '역할과 가입 승인 상태에 따라 이용 가능한 메뉴가 달라집니다.',
   },

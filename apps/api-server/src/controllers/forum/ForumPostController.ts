@@ -8,6 +8,7 @@ import { blocksToText, normalizeMetadata } from '@o4o/forum-core';
 import { normalizeForumContentServer as normalizeContent } from '../../utils/forumContentServer.js';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
+import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
 import { isPlatformAdmin } from '../../utils/role.utils.js';
 
@@ -772,10 +773,14 @@ export class ForumPostController extends ForumControllerBase {
       // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1: 서비스 격리
       // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 원장 코드 집합
       let serviceCondition = '';
+      if (ctx?.excludeScopedCommunities) {
+        params.push(CATALOG_FORUM_STORAGE_CODES);
+        serviceCondition = `AND EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = p.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND NOT (_public.service_code = ANY($${params.length}::text[])))`;
+      }
       const ctxForumCodes = this.getContextForumCodes(ctx);
       if (ctxForumCodes) {
         params.push(ctxForumCodes);
-        serviceCondition = `AND EXISTS (
+        serviceCondition += ` AND EXISTS (
              SELECT 1 FROM forum_category_requests _svc
              WHERE _svc.id = p.forum_id AND _svc.service_code = ANY($${params.length}::text[])
            )`;

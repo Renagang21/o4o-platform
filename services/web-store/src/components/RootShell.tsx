@@ -1,6 +1,6 @@
 /**
  * 공통 root shell — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥
- * 상위 nav 6개(홈 · 내 매장 · 서비스 업무 · 매장 HUB · 내 서비스 · 설정) 골격만. 하위 항목·기능은 WO B.
+ * 홈 · 내 매장 · 서비스 업무 · 내 서비스 · 설정을 제공한다. HUB 기능은 내 매장에 배치한다.
  * `내 매장: ○○ ▼` 로 언제든 매장을 바꾼다(Selector 재진입).
  */
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -11,7 +11,6 @@ import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
-import { useRetiredOnlyStore } from './layouts/UnifiedStoreLayout';
 import { withReturnTo } from '../lib/returnTo';
 
 function StoreSwitcher() {
@@ -37,11 +36,7 @@ export default function RootShell() {
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
-  // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
-  //   종료 서비스만 가입된 매장도 HUB 를 열지 않는다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
-  const { effectiveServiceKey } = useUnifiedStore();
-  const retiredOnly = useRetiredOnlyStore();
-  const navItems = effectiveServiceKey === 'kpa-society' || retiredOnly ? ROOT_NAV_ITEMS.filter((i) => i.key !== 'store-hub') : ROOT_NAV_ITEMS;
+  const navItems = ROOT_NAV_ITEMS;
   return <div className="site">
     <header className="header">
       <div className="header-left">

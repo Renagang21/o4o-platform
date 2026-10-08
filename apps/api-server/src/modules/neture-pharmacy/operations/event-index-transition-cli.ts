@@ -1,7 +1,7 @@
 /** Default read-only. Run after phase-one production verification and rollback-floor decision. */
 import 'reflect-metadata';
-import { AppDataSource } from '../../database/connection.js';
-import { eventIndexState, transitionEventIndex } from '../../modules/neture-pharmacy/operations/event-index-transition.js';
+import { AppDataSource } from '../../../database/connection.js';
+import { eventIndexState, transitionEventIndex } from './event-index-transition.js';
 
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');

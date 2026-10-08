@@ -5,8 +5,9 @@
  * Extracted from ForumRecommendationService.ts
  */
 
-import { Repository } from 'typeorm';
+import { Repository, type SelectQueryBuilder } from 'typeorm';
 import { ForumPost, PostStatus } from '@o4o/forum-core/entities';
+import { CATALOG_FORUM_STORAGE_CODES } from '../../../config/community-catalog.js';
 import type {
   UserContext,
   RecommendationItem,
@@ -23,6 +24,13 @@ import {
   calculateTagSimilarity,
   extractAllTags,
 } from './recommendation-score.js';
+
+
+function applyPublicCommunityBoundary(qb: SelectQueryBuilder<ForumPost>, options: RecommendationOptions): void {
+  if (options.excludeScopedCommunities) {
+    qb.andWhere("EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = post.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))", { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+  }
+}
 
 // =============================================================================
 // Query Methods
@@ -58,6 +66,7 @@ export async function getPersonalizedRecommendations(
     queryBuilder.andWhere('post.isOrganizationExclusive = false');
   }
 
+  applyPublicCommunityBoundary(queryBuilder, options);
   const posts = await queryBuilder.getMany();
 
   const scoredPosts = posts.map(post =>
@@ -87,13 +96,14 @@ export async function getCosmeticsRecommendations(
 ): Promise<RecommendationItem[]> {
   const { limit = 10, includeBreakdown = false } = options;
 
-  const posts = await repository.createQueryBuilder('post')
+  const queryBuilder = repository.createQueryBuilder('post')
     .where('post.status = :status', { status: PostStatus.PUBLISHED })
     .andWhere('post.isOrganizationExclusive = false')
-    .andWhere("post.metadata->>'extensions'->>'neture' IS NOT NULL OR post.metadata->>'neture' IS NOT NULL")
+    .andWhere("(post.metadata->'extensions'->'neture' IS NOT NULL OR post.metadata->'neture' IS NOT NULL)")
     .orderBy('post.createdAt', 'DESC')
-    .limit(limit * 3)
-    .getMany();
+    .limit(limit * 3);
+  applyPublicCommunityBoundary(queryBuilder, options);
+  const posts = await queryBuilder.getMany();
 
   const scoredPosts = posts.map(post =>
     scoreCosmeticsPost(post, userContext, recencyConfig, includeBreakdown)
@@ -129,6 +139,7 @@ export async function getYaksaRecommendations(
     queryBuilder.andWhere('post.isOrganizationExclusive = false');
   }
 
+  applyPublicCommunityBoundary(queryBuilder, options);
   const posts = await queryBuilder.getMany();
 
   const scoredPosts = posts.map(post =>
@@ -163,6 +174,7 @@ export async function getTrendingPosts(
     queryBuilder.andWhere('post.forumId = :forumId', { forumId: categoryId });
   }
 
+  applyPublicCommunityBoundary(queryBuilder, options);
   const posts = await queryBuilder.getMany();
 
   return posts.map(post => ({
@@ -183,7 +195,11 @@ export async function getRelatedPosts(
 ): Promise<RecommendationItem[]> {
   const { limit = 5 } = options;
 
-  const sourcePost = await repository.findOne({ where: { id: postId } });
+  const sourceQb = repository.createQueryBuilder('post').where('post.id = :postId', { postId });
+  applyPublicCommunityBoundary(sourceQb, options);
+  const sourcePost = options.excludeScopedCommunities
+    ? await sourceQb.getOne()
+    : await repository.findOne({ where: { id: postId } });
   if (!sourcePost) {
     return [];
   }
@@ -201,6 +217,7 @@ export async function getRelatedPosts(
     });
   }
 
+  applyPublicCommunityBoundary(queryBuilder, options);
   const posts = await queryBuilder.getMany();
 
   const sourceTags = extractAllTags(sourcePost);

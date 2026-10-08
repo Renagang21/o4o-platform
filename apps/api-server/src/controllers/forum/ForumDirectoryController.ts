@@ -5,6 +5,7 @@ import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import { PostStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
+import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 
 /**
  * ForumDirectoryController
@@ -21,44 +22,6 @@ export class ForumDirectoryController extends ForumControllerBase {
 
   private get forumRequestRepo() {
     return AppDataSource.getRepository(ForumCategoryRequest);
-  }
-
-  /**
-   * Apply organization/scope filter to a ForumCategoryRequest query.
-   */
-  private applyForumContextFilter(
-    qb: any,
-    alias: string,
-    ctx: ReturnType<typeof this.getForumContext>,
-  ): void {
-    if (!ctx) return;
-    // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
-    //   forum 원장은 service_code 컬럼을 직접 가지므로 EXISTS 없이 직접 비교한다.
-    //   아래 scope 분기들이 early return 하므로 반드시 그 앞에 AND 로 붙인다.
-    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
-    const codes = this.getContextForumCodes(ctx);
-    if (ctx.excludeScopedCommunities) {
-      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%'`);
-      if (!codes) return;
-    }
-    if (codes) {
-      qb.andWhere(`${alias}.serviceCode IN (:...ctxForumCodes)`, { ctxForumCodes: codes.length ? codes : ['__none__'] });
-    }
-    if (ctx.scope === 'demo') {
-      qb.andWhere('1 = 0');
-      return;
-    }
-    if (ctx.scope === 'community') {
-      qb.andWhere(`${alias}.organizationId IS NULL`);
-      return;
-    }
-    if (ctx.scope === 'organization' && ctx.organizationId) {
-      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
-      return;
-    }
-    if (ctx.organizationId) {
-      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
-    }
   }
 
   /**
@@ -119,7 +82,7 @@ export class ForumDirectoryController extends ForumControllerBase {
       if (forum && ctxForumCodes && !ctxForumCodes.includes(forum.serviceCode)) {
         forum = null;
       }
-      if (forum && this.getForumContext(req)?.excludeScopedCommunities && /^(sf|community):/.test(forum.serviceCode)) forum = null;
+      if (forum && this.getForumContext(req)?.excludeScopedCommunities && (/^(sf|community):/.test(forum.serviceCode) || CATALOG_FORUM_STORAGE_CODES.includes(forum.serviceCode))) forum = null;
 
       if (!forum) {
         res.status(404).json({

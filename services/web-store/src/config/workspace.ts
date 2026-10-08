@@ -43,7 +43,7 @@ export const WORKSPACE_PATHS = {
 } as const;
 
 export interface RootNavItem {
-  key: 'home' | 'my-store' | 'service-work' | 'store-hub' | 'my-services' | 'settings';
+  key: 'home' | 'my-store' | 'service-work' | 'my-services' | 'settings';
   label: string;
   to: string;
   end: boolean;
