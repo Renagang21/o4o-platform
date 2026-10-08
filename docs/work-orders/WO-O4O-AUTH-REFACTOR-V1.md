@@ -64,6 +64,8 @@ Pharmacy-Hub(`pharmacy-hub`, `services/web-pharmacy-hub`, `pharmacyhub.co.kr`)�
 - [ ] 실제 대상 DB와 접속 경로 확인; 격리 로컬 DB와 기존 데이터 DB를 혼동하지 않음
 - [ ] 계정·가입·역할·소유권·콘텐츠·상품·주문·FK 목록 조사 및 disposition 작성
 - [ ] 약국장 Demo의 승인 원장·매장 ownership·진입 연결 확인 및 복구 — 운영 `/neture/home/entry`의 매장 0건, 약국 업무 API `403 STORE_OWNER_REQUIRED` 해소 후 재검증
+- [ ] 메인 헤더 로그인 모달의 약국장 Demo 클릭부터 실제 매장 착지까지 회귀 검증 — 인증 HTTP 200만으로 PASS 판정하지 않음; 매장 이동 오류가 남으면 체험 FAIL
+- [ ] 대표 홈의 약국 매장 진입 판정을 약국 업무 guard의 승인 원장·조직 소유 관계와 정합화 — 현재 홈의 추가 service membership/`kpa:store_owner` 조건과 합성 Demo provisioning의 `neture:store_owner` 정책 차이 검토
 - [ ] 공급자 Demo에 재사용할 상품·자료 ownership 연결 — 운영 공급자 상품 0건·라이브러리 자료 0건 상태에서 실제 기능 체험이 가능한 샘플 연결
 - [ ] 기존 provisioning의 고정 보호 ID/과거 실사용 가정 재검토; 기본 dry-run인 명시적 대상 계획으로 교체
 - [ ] 재사용 데이터 연결 → 기능 검증 → 미사용 데이터 삭제 → 마지막에 불필요 계정 삭제

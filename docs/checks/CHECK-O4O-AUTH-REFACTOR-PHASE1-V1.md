@@ -109,3 +109,20 @@ Neture·약국 계정 보안 화면에서 일반 logout과 공통 계정 표시�
 사용자가 Pharmacy-Hub(`pharmacy-hub`, `pharmacyhub.co.kr`)를 삭제 대상으로 지정했다. 이후 인증 리팩토링·공개 Demo·기능 체험 검증 대상에서 제외하며, 도메인 허용 설정을 추가해야 하는 인증 검증 미완료 항목으로 취급하지 않는다. 위 소비처 matrix와 운영 접속 제약은 지정 이전의 실행 기록이다. 약국장 검증을 수행한 별도 약국 서비스 `pharmacy.neture.co.kr`(`kpa-society`)는 삭제 대상에 포함하지 않는다.
 
 코드 조사에서 `services/web-pharmacy-hub`, API의 service catalog와 Pharmacy-Hub routes, Store의 `/pharmacy-hub` 경로, 배포 workflow와 deploy-risk 참조가 남아 있음을 확인했다. canonical index의 약관·개인정보 설명에도 활성 서비스로 기재되어 있다. [WO의 삭제 대상 서비스 정리 TODO](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md#삭제-대상-서비스-정리-pharmacy-hub)에 의존 관계·보존 대상·코드/운영/데이터 제거·문서 정합 검토를 기록했다. 이번 변경은 범위와 TODO 반영이며, 실제 앱·운영 서비스·데이터 삭제는 수행하지 않았다.
+
+## 메인 로그인 모달 재검증·판정 정정 — 2026-10-09 KST
+
+사용자가 메인 화면의 매장 Demo 이동 실패를 제시했다. 위 24개 조합의 PASS는 인증 요청·인증 조회·일반 logout 결과이며, 약국장 Demo 체험 진입 PASS를 뜻하지 않는다. 사용자 보고에서 이를 ‘모두 PASS’로 요약한 것은 체험 실패를 충분히 전달하지 못한 판정이다. **약국장 Demo의 실제 체험 진입은 FAIL이며, `403 STORE_OWNER_REQUIRED`는 아직 해결하지 않았다.**
+
+이번에는 `/login` 직접 접속 대신 `https://neture.co.kr/`의 헤더 로그인 버튼으로 모달을 열고 두 Demo 버튼을 각각 클릭했다. 새 Chromium context에서 desktop 1440×900·mobile 390×844를 재검증했다.
+
+| 메인 로그인 모달 | desktop/mobile 실제 결과 | 체험 진입 판정 |
+|---|---|---|
+| 매장 경영자 Demo | 이메일 로그인·`/auth/me` HTTP 200. 경로는 `/`에 남고 모달에 매장 이동 실패 안내 표시. `/neture/home/entry` HTTP 200·매장 0건. 약국 capabilities/info 모두 HTTP 403·`STORE_OWNER_REQUIRED` | **FAIL · 미해결** |
+| 공급자 Demo | 이메일 로그인·`/auth/me` HTTP 200. `/supplier/dashboard`로 이동하고 매장 이동 오류 없음 | 대시보드 진입 PASS; 상품·자료 체험 완료는 앞선 샘플 데이터 TODO 유지 |
+
+클라이언트 `LoginModal.handleDemo`는 인증 후 `resolveSingleStoreWorkspaceUrl`을 호출한다. 홈 매장 후보가 정확히 1개가 아니면 이 함수가 실패하고 모달에 이동 오류를 남긴다. 따라서 첨부 화면의 안내는 인증 이후 매장 진입 단계의 실패와 일치한다.
+
+약국 업무 guard는 `isStoreOwner(..., 'kpa')`와 공통 조직 해석기를 사용한다. `neture_pharmacy_memberships.status = 'active'`인 조직에 연결되고, 해당 Demo의 `organization_members`가 owner/admin/manager이며 `left_at IS NULL`이어야 후보가 된다. 현재 응답은 이 업무 접근 판정을 충족하지 못함을 보여주지만, 직접 DB 조회를 하지 않았으므로 어떤 원장/조직 연결 row가 누락됐는지는 확정하지 않았다. 환경의 DB binding과 GCP identity manifest 연결 목록도 없었다. guard를 Demo 예외로 우회하거나 운영 DB를 수정하지 않았다.
+
+추가로 대표 홈은 승인 원장 후보 조회 전에 service membership과 서비스별 store_owner role을 검사한다. 이는 약국 업무 guard의 원장 기준 및 현행 Demo provisioning의 `neture:store_owner` 정책과 차이가 있다. 데이터 연결 확인과 함께 이 소비처 정합도 WO TODO에 기록했다. 수정·배포 후 메인 모달에서 실제 매장 착지와 업무 API 성공을 확인하기 전에는 해결 완료로 판정하지 않는다.
