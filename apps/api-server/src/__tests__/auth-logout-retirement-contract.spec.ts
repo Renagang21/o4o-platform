@@ -19,4 +19,12 @@ describe('user all-device logout retirement', () => {
     expect(read('services/auth/email-auth.service.ts')).toContain('authenticationService.revokeAllSessions(userId)');
     expect(read('services/authentication.service.ts')).not.toContain('async logoutAll');
   });
+
+  it('does not advertise the retired request in the API reference or Postman collection', () => {
+    expect(read('../docs/API_AUTHENTICATION.md')).not.toContain('POST /logout-all');
+    const collectionText = read('../docs/postman/O4O_Authentication_API.postman_collection.json');
+    expect(() => JSON.parse(collectionText)).not.toThrow();
+    expect(collectionText).not.toContain('/logout-all');
+    expect(collectionText).toContain('{{baseUrl}}/logout');
+  });
 });

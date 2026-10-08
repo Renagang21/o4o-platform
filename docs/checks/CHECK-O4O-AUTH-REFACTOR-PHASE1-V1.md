@@ -5,7 +5,7 @@
 
 ## 변경
 
-사용자용 전체/다른 기기 로그아웃을 공통 인증 클라이언트·Context·계정 보안 화면·전체관리자 메뉴에서 제거했다. 공개 `/auth/logout-all`과 계정 상태/약관 예외도 제거했다. 비밀번호 reset의 서버 내부 전역 폐기는 `revokeAllSessions`로 구분하여 유지했다. 일반 logout API·서비스 epoch 동작은 이번 단계에서 바꾸지 않았다.
+사용자용 전체/다른 기기 로그아웃을 공통 인증 클라이언트·Context·계정 보안 화면·전체관리자 메뉴에서 제거했다. 공개 `/auth/logout-all`과 계정 상태/약관 예외도 제거했다. 자동 review에서 확인된 API 안내·Postman의 폐기 요청도 제거하고, 과거 migration guide에는 현재 사용 금지 안내를 추가했다. 비밀번호 reset의 서버 내부 전역 폐기는 `revokeAllSessions`로 구분하여 유지했다. 일반 logout API·서비스 epoch 동작은 이번 단계에서 바꾸지 않았다.
 
 보안 화면의 Google 고정 표기를 공통 O4O 계정 표시로 바꿨다. Neture/KPA 설정에는 일반 logout을 연결했고, 처리 중 중복 클릭 방지와 실패 안내를 유지했다. 전체관리자 메뉴의 일반 logout은 완료를 기다린 뒤 성공 메시지를 표시한다.
 
@@ -29,7 +29,7 @@
 | 사용자 서비스 operator/store/forum/mypage | 상위 auth Context의 간접 소비 | 역할·보호 route·capability 불변 | 서비스 타입 검사·관련 계약 테스트 PASS |
 | retired K-Cosmetics | 현재 앱 없음 | 신규 복구 없음 | 최신 checkout 소비처 검색 |
 | Hospital Pharmacy | 인증 모듈 미사용 | 변경 없음 | 최신 checkout 소비처 검색 |
-| API reset/refresh/handoff | 내부 폐기 메서드 이름 변경 | reset 전역 폐기 보존, 공개 endpoint 제거 | 189 tests + 신규 계약 3 tests PASS |
+| API reset/refresh/handoff | 내부 폐기 메서드 이름 변경 | reset 전역 폐기 보존, 공개 endpoint 제거 | 189 tests + 신규 계약 4 tests PASS |
 
 symbol, endpoint, 화면 문구, 수정 파일 경로 및 raw-source 소비처를 검색했다. `/auth/logout-all`·`logoutAll`은 활성 런타임/UI 소비처가 없고 제거 회귀를 확인하는 negative assertion만 남았다. WebSocket의 미사용 전 기기 logout 요청 메서드도 제거했고 서버 수신 이벤트·보안 처리 계약은 확대하지 않았다.
 
@@ -48,8 +48,8 @@ Chromium에서 Neture와 KPA `/mypage/settings`를 1440×900 및 390×844로 확
 - `node scripts/lint-ratchet.mjs` PASS: 기존 오류 46건 유지, warning 998건. lint 오류 0으로 보고하지 않는다.
 - `node scripts/check-doc-sensitive.mjs` PASS.
 - Vitest: auth-react 149, auth-client 15, auth-context 13, Neture 360, KPA 69, KPA-Branch 34, 전체관리자 338 PASS.
-- Jest: auth/API 관련 189 + 공개 logout 제거 계약 3 PASS. 기존 DB 통합 suite 1개/2 tests는 skip되었으며 PASS에 포함하지 않는다.
-- 합계 **1,170 tests PASS**, 기존 통합 2 tests skipped.
+- Jest: auth/API 관련 189 + 공개 logout 제거 계약 4 PASS. 기존 DB 통합 suite 1개/2 tests는 skip되었으며 PASS에 포함하지 않는다.
+- 합계 **1,171 tests PASS**, 기존 통합 2 tests skipped.
 - Neture/KPA production build PASS. 기존 bundle-size/Browserslist 경고 잔존.
 - 전체관리자 Vitest 첫 실행은 잘못된 작업 디렉터리로 setup 파일을 찾지 못해 0 tests 실행 실패. CI와 같은 앱 디렉터리에서 재실행하여 338 tests PASS.
 
