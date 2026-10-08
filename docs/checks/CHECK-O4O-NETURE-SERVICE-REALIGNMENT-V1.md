@@ -63,7 +63,7 @@ Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했�
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.
-2. 현재 Delivery 정책으로 영향 서비스 API·공통 Neture 번들·store·pharmacy·study·admin을 배포한다. `VITE_UNIFIED_STORE_HANDOFF=true`는 pharmacy 앱에 적용하며 다른 서비스·PH 플래그를 일괄 바꾸지 않는다. 공급자·펀딩 공개 호스트 전환은 해당 빌드 플래그를 명시적 false로 돌릴 수 있다.
+2. branch와 main의 코드 차이에 대한 현행 판정기는 API·admin·공통 Neture 번들·pharmacy·PharmacyHub·study·store를 영향 대상으로 판정했다(LEVEL_3, 병원약국·분회는 제외). 실제 serving→main 차이는 통합 후 Delivery에서 다시 판정하며 HOLD라면 검토한 main SHA로 Promote를 승인한다. `VITE_UNIFIED_STORE_HANDOFF=true`는 pharmacy 앱에 적용하며 PH 플래그는 유지한다. 공급자·펀딩 전환의 개별 롤백은 Neture Docker build argument `VITE_HOST_CUTOVER_SUPPLIER=false` 또는 `VITE_HOST_CUTOVER_FUNDING=false`로 명시한다. 이 옵션은 빌드 시 반영되며 Cloud Run runtime 환경변수만으로 변경되지 않는다.
 3. 전체관리자가 pharmacy 사업의 별도 community_key와 담당 운영자를 설정하고 독립 약사 key와 충돌하지 않음을 확인한다. 신규 실제 계정 가입/메일 확인 → 증빙 업로드/담당 승인 → 한 약국의 복수 사업 → 공급자/제품 승인 → 모집·주문·test 결제·처리와 독립/사업 커뮤니티·사본·QR·태블릿·사이니지를 운영에서 확인한다. 실제 PG는 계약 후 별도 연결이며 test 모드 성공과 구분한다.
 4. 1단계 API 안정·구버전 `ON CONFLICT` 소비처·rollback-floor를 확인한 뒤 수동 이벤트 인덱스를 전환한다. 단순 flag 입력은 업무 검증 증거가 아니다.
 5. PH 네 QR 경로를 실제 새 호스트에서 확인 → 실제 URL map export로 302 초안을 검토/적용 → 옛 주문·공급 설정의 소유권/FK/처분/복구 확인 → 조건 충족 후 301·서버 종료. 인쇄 QR의 기존 도메인·인증서 보존은 서버 종료와 별도로 판단한다.
