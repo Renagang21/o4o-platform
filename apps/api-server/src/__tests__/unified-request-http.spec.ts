@@ -59,7 +59,11 @@ jest.mock('../modules/neture/services/neture-main-membership.js', () => ({
   ...jest.requireActual('../modules/neture/services/neture-main-membership.js'),
   getNetureMainMembershipStatus: (...a: unknown[]) => netureStatusMock(...a),
 }));
-jest.mock('../services/local-agent/local-agent-service.js', () => ({ resolveTargetDevice: (...a: unknown[]) => resolveTargetDeviceMock(...a) }));
+jest.mock('../services/local-agent/local-agent-service.js', () => ({
+  resolveTargetDevice: (...a: unknown[]) => resolveTargetDeviceMock(...a),
+  // capability 판정은 실제 규칙 그대로(순수 함수).
+  nodeSatisfies: (...a: unknown[]) => jest.requireActual('../services/local-agent/local-agent-service.js').nodeSatisfies(...a),
+}));
 jest.mock('../utils/work-scope-store-resolution.js', () => ({ resolveWorkScopeStore: jest.fn(), STORE_SCOPED_WORKSPACES: ['store'] }));
 jest.mock('../utils/ai-provider-runtime.js', () => {
   const actual = jest.requireActual('../utils/ai-provider-runtime.js');
@@ -396,6 +400,21 @@ describe('POST /api/ai/request', () => {
     expect(runWorkAgentMock).not.toHaveBeenCalled();
     expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
     resolveTargetDeviceMock.mockReset();
+    resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
+  });
+
+  it('⑩-c online 노드가 하나뿐이고 그 노드가 browser 를 확인된 부재로 보고 → 노드는 골라지지만 이해 모델은 부르지 않는다', async () => {
+    // 노드 선택은 단일 online 노드면 capability 를 보지 않고 고른다 — preflight 가 고른 노드의 capability 를 따로 확인한다.
+    resolveTargetDeviceMock.mockResolvedValue({ status: 'ok', device: { id: 'dev-1', capabilities: { browser: false, windowsUia: true, localData: true } } });
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
+    // 실행 경로의 판정은 종전과 같다(runtime 이 정직한 오류를 돌려준다).
+    expect(runWorkAgentMock).toHaveBeenCalledTimes(1);
+    // 보고 없음(이전 에이전트)은 막지 않는다 — 이해 모델을 부른다.
+    executeMock.mockClear();
+    resolveTargetDeviceMock.mockResolvedValue({ status: 'ok', device: { id: 'dev-1', capabilities: null } });
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(1);
     resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
   });
 

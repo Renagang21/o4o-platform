@@ -92,13 +92,14 @@ export function requestHasCommitIntent(request: string): boolean {
 }
 
 /**
- * 확정 경계 불변식 — commitBoundary 면 user 조건이 반드시 하나 있다. 없으면 붙인다.
+ * 확정 경계 불변식 — commitBoundary 면 **최종 확정 전용** user 조건이 반드시 있다. 없으면 붙인다.
+ * 다른 user 조건(예: 결과가 마음에 드는지)이 있어도 확정 확인을 대신하지 않는다 — 그 조건의 "네" 로 저장 전 Task 가 닫히지 않게.
  * 기존 조건은 하나도 버리지 않는다 — 상한(4)이 찬 이해에는 확정 확인 한 칸을 상한 밖에 더한다(최대 maxCriteria + 1).
  * sanitize · 판정기 · Assistant 가 모두 이것을 거친다 — 어느 경로로 만든 이해든 확정 업무가 observed 근거만으로 complete 되지 않고,
  * observed 조건이 빠져 결과 확인 없이 닫히지도 않는다.
  */
 export function ensureCommitConfirmation(u: TaskUnderstanding): TaskUnderstanding {
-  if (!u.commitBoundary || u.criteria.some((c) => c.evidence === 'user')) return u;
+  if (!u.commitBoundary || u.criteria.some((c) => c.evidence === 'user' && c.text === COMMIT_USER_CRITERION)) return u;
   const criteria = [...u.criteria, { id: `c${u.criteria.length + 1}`, text: COMMIT_USER_CRITERION, evidence: 'user' as const }];
   return { ...u, criteria };
 }

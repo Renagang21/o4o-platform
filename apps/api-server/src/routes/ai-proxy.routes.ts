@@ -17,7 +17,7 @@ import { aiProxyService } from '../services/ai-proxy.service.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: surface→provider guardrail gate
 import { resolveEditingModel, editingSurfaceForOutputType } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
-import { resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
+import { nodeSatisfies, resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
 import { resolveWorkTarget } from '../services/ai-tools/work-target-resolver.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
@@ -294,6 +294,7 @@ interface RouteReply {
 async function checkWorkAgentRunnable(
   userId: string,
   body: Record<string, unknown>,
+  opts: { requireCapability?: boolean } = {},
 ): Promise<{ ok: false; reply: RouteReply } | { ok: true; toolCtx: VerifiedToolContext }> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
@@ -312,16 +313,19 @@ async function checkWorkAgentRunnable(
   // 대상을 정하지 못하면 capability 를 묻지 않는다(runtime 이 대상 미확정으로 끝낸다 — 종전과 같음).
   const hint = typeof body.targetHint === 'string' ? body.targetHint : undefined;
   const targetRef = body.runId !== undefined ? resolveWorkTarget('', hint) : resolveWorkTarget(String(body.request ?? ''), hint);
-  const deviceResolution = await resolveTargetDevice(
-    AppDataSource,
-    userId,
-    targetRef ? { need: targetRef.targetType === 'windows_app' ? 'windows_uia' : 'browser' } : undefined,
-  );
+  const need = targetRef ? (targetRef.targetType === 'windows_app' ? 'windows_uia' : 'browser') : undefined;
+  const deviceResolution = await resolveTargetDevice(AppDataSource, userId, need ? { need } : undefined);
   toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
   if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
   const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);
   if (!authz.allowed) {
     return { ok: false, reply: { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } } };
+  }
+  // preflight(이해 모델 호출 전) 전용 — 노드 선택은 capability 가 확인된 부재인 노드라도 고른다(단일 online 노드 · 전부 부재).
+  // 고른 노드가 그 capability 를 확인된 부재(false)로 보고했으면 실행은 runtime 에서 실패하므로 모델을 부르지 않는다.
+  // 보고 없음(null · 이전 에이전트)은 막지 않는다. 실행 경로(performWorkAgentRun)의 판정은 종전과 같다.
+  if (opts.requireCapability && need && deviceResolution.status === 'ok' && nodeSatisfies(deviceResolution.device, need) === false) {
+    return { ok: false, reply: { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: 'CAPABILITY_MISSING' } } };
   }
   return { ok: true, toolCtx };
 }
@@ -2348,7 +2352,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
       // 실행 전 업무 이해 · 완료 의미 검증 — 기존 provider abstraction(같은 provider · 키). 실패하면 결정적 기본 이해 · 검증 생략.
       // 이해 모델은 실행 가능할 때만 부른다 — 노드 미연결 · 권한 없음 · 형식 오류면 모델 없이 결정적 기본 이해(실행은 같은 이유로 거절된다).
       {
-        understand: async (u) => ((await checkWorkAgentRunnable(userId, workBody)).ok ? understandLlm(u) : null),
+        understand: async (u) => ((await checkWorkAgentRunnable(userId, workBody, { requireCapability: true })).ok ? understandLlm(u) : null),
         verify: createLlmCompletionVerifier(AppDataSource),
       },
     );

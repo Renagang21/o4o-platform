@@ -191,9 +191,12 @@ describe('① 업무 이해(실행 전)', () => {
       .toEqual(['c1:a:observed', 'c2:b:observed', 'c3:c:observed', 'c4:d:observed', 'c5:U:user']);
     // 저장용 재개 표현에는 조건 글이 없다 — 결과 형태 · 확정 경계만(정책 M13).
     expect(toStoredUnderstanding(full)).toEqual({ version: 2, outcome: 'change', commitBoundary: true });
-    // 이미 user 조건이 있으면 그대로 · 확정 경계가 없으면 붙이지 않는다.
-    const has = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: true, criteria: [{ text: 'a' }, { text: '저장은 사용자', evidence: 'user' }] });
-    expect(has!.criteria).toHaveLength(2);
+    // 다른 user 조건(주관적 확인 등)은 최종 확정 확인을 대신하지 않는다 — 전용 확정 조건이 붙는다 · 이미 있으면 다시 붙이지 않는다.
+    const has = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: true, criteria: [{ text: 'a' }, { text: '결과가 마음에 드는지 사용자가 확인했다', evidence: 'user' }] });
+    expect(has!.criteria.map((c) => c.evidence)).toEqual(['observed', 'user', 'user']);
+    expect(has!.criteria[2].text).toBe(full!.criteria[4].text);
+    expect(sanitizeUnderstanding(has)!.criteria).toHaveLength(3);
+    // 확정 경계가 없으면 붙이지 않는다.
     const none = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: false, criteria: [{ text: 'a' }] });
     expect(none!.criteria.map((c) => c.evidence)).toEqual(['observed']);
     // 판정 — observed 근거가 다 있어도 확정 경계 업무는 complete 가 아니라 사용자 확인.
