@@ -3,7 +3,7 @@ jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest
 jest.mock('../modules/neture/entities/index.js', () => ({
   SellerRecruitment: class {}, SellerRecruitmentApplication: class {},
   RecruitmentStatus: { RECRUITING: 'recruiting' }, ExposureStatus: { APPROVED: 'approved' },
-  ApplicationStatus: { PENDING: 'pending' },
+  ApplicationStatus: { PENDING: 'pending', CANCELLED: 'cancelled' },
   SELLER_RECRUITMENT_TABLE: 'seller_recruitments', SELLER_RECRUITMENT_APPLICATION_TABLE: 'seller_recruitment_applications',
 }));
 jest.mock('../modules/neture/services/service-audience.service.js', () => ({}));
@@ -83,6 +83,57 @@ describe('recruitment row membership', () => {
     query.mockResolvedValue([{ id: 'membership' }]);
     await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-a')).resolves.toMatchObject({ status: 'pending' });
     expect(applicationRepo.create).toHaveBeenCalledWith(expect.objectContaining({ applicantOrganizationId: 'org-a' }));
+  });
+  it('authorized organizations apply independently and another user cannot duplicate the same organization', async () => {
+    recruitmentRepo.findOne.mockResolvedValue(row('other', 'sf-other'));
+    query.mockResolvedValue([{ id: 'membership' }]);
+    const applications: any[] = [];
+    applicationRepo.findOne.mockImplementation(async ({ where }: any) => applications.find(app =>
+      app.recruitmentId === where.recruitmentId && app.applicantOrganizationId === where.applicantOrganizationId,
+    ) ?? null);
+    applicationRepo.save.mockImplementation(async (app: any) => { applications.push(app); return { ...app, id: String(applications.length) }; });
+    await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-a')).resolves.toHaveProperty('id', '1');
+    await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-b')).resolves.toHaveProperty('id', '2');
+    await expect(service.createApplication('other', 'user-b', 'Applicant', 'org-a')).rejects.toThrow('DUPLICATE_APPLICATION');
+    expect(applications).toHaveLength(2);
+  });
+  it('organization-less service applications retain user uniqueness only within their legacy scope', async () => {
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('legacy', null), serviceId: 'other-service' });
+    applicationRepo.findOne.mockResolvedValue({ id: 'existing' });
+    await expect(service.createApplication('legacy', 'user-a', 'Applicant')).rejects.toThrow('DUPLICATE_APPLICATION');
+    expect(applicationRepo.findOne).toHaveBeenCalledWith({ where: {
+      recruitmentId: 'legacy', applicantId: 'user-a', applicantOrganizationId: expect.objectContaining({ _type: 'isNull' }),
+    } });
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+  });
+  it.each(['uq_seller_recruitment_applications_org', 'uq_seller_recruitment_applications_legacy_applicant'])('concurrent duplicate %s has the same application conflict', async constraint => {
+    recruitmentRepo.findOne.mockResolvedValue(row('other', 'sf-other'));
+    query.mockResolvedValue([{ id: 'membership' }]);
+    applicationRepo.save.mockRejectedValue({ driverError: { code: '23505', constraint } });
+    await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-a')).rejects.toThrow('DUPLICATE_APPLICATION');
+  });
+  it('unrelated persistence failures are propagated', async () => {
+    recruitmentRepo.findOne.mockResolvedValue(row('other', 'sf-other'));
+    query.mockResolvedValue([{ id: 'membership' }]);
+    applicationRepo.save.mockRejectedValue(new Error('storage unavailable'));
+    await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-a')).rejects.toThrow('storage unavailable');
+  });
+  it('application history binds the selected organization or the organization-less legacy scope', async () => {
+    query.mockResolvedValue([]);
+    await service.getApplicationsForApplicant('user-a', 'org-a');
+    expect(query.mock.calls[0][1]).toEqual(['user-a', 'org-a']);
+    expect(query.mock.calls[0][0]).toContain('a.applicant_organization_id = $2::uuid');
+    await service.getApplicationsForApplicant('user-a');
+    expect(query.mock.calls[1][1]).toEqual(['user-a', null]);
+    expect(query.mock.calls[1][0]).toContain('a.applicant_organization_id IS NULL');
+  });
+  it('a request in another store cannot cancel even the same user’s application', async () => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', applicantId: 'user-a', applicantOrganizationId: 'org-a', status: 'pending' });
+    await expect(service.cancelApplication('app', 'user-a', 'org-b')).resolves.toEqual({ success: false, error: 'NOT_OWNER' });
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+    await expect(service.cancelApplication('app', 'user-a', 'org-a')).resolves.toMatchObject({ success: true });
+    expect(applicationRepo.save).toHaveBeenCalledTimes(1);
+    expect(applicationRepo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'cancelled', decidedBy: 'user-a' }));
   });
   it('membership lookup failure does not save an application', async () => {
     recruitmentRepo.findOne.mockResolvedValue(row('other', 'sf-other'));

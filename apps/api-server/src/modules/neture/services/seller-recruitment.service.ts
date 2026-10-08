@@ -20,7 +20,7 @@
  * 물리 테이블명(seller_recruitments · seller_recruitment_applications)은 엔티티 파일의 상수가 격리한다.
  * 이 서비스의 raw SQL 은 상수 SELLER_RECRUITMENT_*_TABLE 만 사용한다.
  */
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
   SellerRecruitment,
@@ -379,21 +379,33 @@ export class SellerRecruitmentService {
       if (!access.length) throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
     }
 
-    const existing = await this.applicationRepo.findOne({ where: { recruitmentId, applicantId } });
+    const applicantScope = storeOrganizationId
+      ? { applicantOrganizationId: storeOrganizationId }
+      : { applicantId, applicantOrganizationId: IsNull() };
+    const existing = await this.applicationRepo.findOne({ where: { recruitmentId, ...applicantScope } });
     if (existing) throw new Error('DUPLICATE_APPLICATION');
 
-    const saved = await this.applicationRepo.save(
-      this.applicationRepo.create({ recruitmentId, applicantId, applicantName, applicantOrganizationId: storeOrganizationId ?? null, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
-    );
+    let saved: SellerRecruitmentApplication;
+    try {
+      saved = await this.applicationRepo.save(
+        this.applicationRepo.create({ recruitmentId, applicantId, applicantName, applicantOrganizationId: storeOrganizationId ?? null, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
+      );
+    } catch (error) {
+      const databaseError = (error as { driverError?: { code?: string; constraint?: string } }).driverError;
+      if (databaseError?.code === '23505' && [
+        'uq_seller_recruitment_applications_org', 'uq_seller_recruitment_applications_legacy_applicant',
+      ].includes(databaseError.constraint ?? '')) throw new Error('DUPLICATE_APPLICATION');
+      throw error;
+    }
     logger.info(`[SellerRecruitmentService] application created: ${saved.id}`);
     return { id: saved.id, status: saved.status, appliedAt: saved.appliedAt };
   }
 
   /**
    * WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
-   * 신청자 본인이 신청한 모집 목록 + 상태(심사대기/승인/반려/철회/참여해지).
+   * 선택한 약국의 신청 현황. 조직 없는 기존 호출만 신청자 본인의 조직 없는 행을 조회한다.
    */
-  async getApplicationsForApplicant(applicantUserId: string) {
+  async getApplicationsForApplicant(applicantUserId: string, storeOrganizationId?: string) {
     const rows: Array<{
       id: string; recruitment_id: string; status: string; applied_at: Date; decided_at: Date | null; decided_by: string | null; reason: string | null;
       product_id: string; product_name: string; seller_name: string | null; service_id: string | null; seller_id: string;
@@ -402,9 +414,10 @@ export class SellerRecruitmentService {
               r.product_id, r.product_name, r.seller_name, r.service_id, r.seller_id
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
        JOIN ${SELLER_RECRUITMENT_TABLE} r ON r.id = a.recruitment_id
-       WHERE a.applicant_id = $1
+       WHERE (($2::uuid IS NOT NULL AND a.applicant_organization_id = $2::uuid)
+          OR ($2::uuid IS NULL AND a.applicant_id = $1 AND a.applicant_organization_id IS NULL))
        ORDER BY a.applied_at DESC`,
-      [applicantUserId],
+      [applicantUserId, storeOrganizationId ?? null],
     );
     return rows.map((a) => ({
       applicationId: a.id,
@@ -422,10 +435,13 @@ export class SellerRecruitmentService {
   }
 
   /** WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 pending 철회. idempotent. */
-  async cancelApplication(applicationId: string, applicantUserId: string) {
+  async cancelApplication(applicationId: string, applicantUserId: string, storeOrganizationId?: string) {
     const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
     if (!application) return { success: false as const, error: 'APPLICATION_NOT_FOUND' };
     if (application.applicantId !== applicantUserId) return { success: false as const, error: 'NOT_OWNER' };
+    if (application.applicantOrganizationId && application.applicantOrganizationId !== storeOrganizationId) {
+      return { success: false as const, error: 'NOT_OWNER' };
+    }
     if (application.status === ApplicationStatus.CANCELLED) {
       return { success: true as const, data: { applicationId, alreadyCancelled: true } };
     }

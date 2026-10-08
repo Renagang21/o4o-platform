@@ -4,7 +4,8 @@
  * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
  *   (구 NeturePartnerApplication · WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1 에서 분리)
  *
- * 신청 주체 = 매장/판매자 사용자(applicantId). Legacy Partner 계정·role·계약과 무관하다.
+ * 신청 주체 = 명시한 약국 조직. 신청 사용자(applicantId)는 작업자·알림 수신자다.
+ * 조직이 없는 기존 서비스 신청만 사용자 단위로 중복을 제한한다.
  *
  * 물리 테이블 `seller_recruitment_applications` · 컬럼 `applicant_id` / `applicant_name`
  *   (구 neture_partner_applications · partner_id / partner_name →
@@ -24,7 +25,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Unique,
   Index,
 } from 'typeorm';
 
@@ -40,7 +40,8 @@ export enum ApplicationStatus {
 export const SELLER_RECRUITMENT_APPLICATION_TABLE = 'seller_recruitment_applications';
 
 @Entity(SELLER_RECRUITMENT_APPLICATION_TABLE)
-@Unique(['recruitmentId', 'applicantId'])
+@Index('uq_seller_recruitment_applications_org', ['recruitmentId', 'applicantOrganizationId'], { unique: true, where: 'applicant_organization_id IS NOT NULL' })
+@Index('uq_seller_recruitment_applications_legacy_applicant', ['recruitmentId', 'applicantId'], { unique: true, where: 'applicant_organization_id IS NULL' })
 @Index(['recruitmentId'])
 @Index(['applicantId'])
 @Index(['status'])

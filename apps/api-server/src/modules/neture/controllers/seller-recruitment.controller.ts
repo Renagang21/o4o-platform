@@ -159,11 +159,12 @@ export function createSellerRecruitmentController(deps: {
   // ==================== Application ====================
 
   /** GET /applications/mine — 신청자 본인 신청 현황 (WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1) */
-  router.get('/applications/mine', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/applications/mine', requireAuth, createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
-      const data = await service.getApplicationsForApplicant(userId);
+      const organizationId = (req as AuthenticatedRequest & { organizationId?: string }).organizationId;
+      const data = await service.getApplicationsForApplicant(userId, organizationId);
       res.json({ success: true, data });
     } catch (error) {
       logger.error('[SellerRecruitment API] Error fetching applications:', error);
@@ -207,11 +208,12 @@ export function createSellerRecruitmentController(deps: {
   });
 
   /** POST /applications/:id/cancel — 신청자 본인 pending 철회 (WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1) */
-  router.post('/applications/:id/cancel', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/applications/:id/cancel', requireAuth, createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
-      const result = await service.cancelApplication(req.params.id, userId);
+      const organizationId = (req as AuthenticatedRequest & { organizationId?: string }).organizationId;
+      const result = await service.cancelApplication(req.params.id, userId, organizationId);
       if (!result.success) {
         const map: Record<string, [number, string]> = {
           APPLICATION_NOT_FOUND: [404, '신청을 찾을 수 없습니다.'],

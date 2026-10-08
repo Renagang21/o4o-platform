@@ -95,6 +95,8 @@ supply_proposals
 | `organization_product_listings` | ~~`idx_org_listing_unique_v2` 를 부분 UNIQUE 로 교체~~ → **이 migration 에서는 바꾸지 않는다(전체 UNIQUE 유지, §17-1 1단계)**. 부분 UNIQUE 교체는 별도 2단계 migration | 구버전 API 의 `ON CONFLICT (organization_id, service_key, offer_id)` 가 부분 인덱스를 추론하지 못해 실패 → 배포 중 · 롤백 시 구버전과 호환되지 않는다. 이벤트 재신청 · 같은 제품 복수 이벤트는 2단계 전까지 API 가 명시 거절(409) |
 | `seller_recruitments` | UNIQUE 를 `(product_id, seller_id, service_id, semi_franchise_id) NULLS NOT DISTINCT` 로 | 세미프랜차이즈별 모집 1건. 기존 행(semi_franchise_id NULL) 유일성 동일 |
 
+재배치 보완 migration `AlignSellerRecruitmentApplicationIdentity1791477914134`는 기존 약국 조직 UNIQUE를 유지하고, 사용자 UNIQUE를 `applicant_organization_id IS NULL`인 신청에만 적용한다. 직접 신청 API도 같은 조직으로 중복을 확인한다. 한 약국의 경영자·내 매장은 하나이며, 담당자가 접근할 수 있는 다른 약국은 각각 독립 조직으로 처리한다. 이 변경은 소유 조직을 추가하거나 합치지 않는다. 조직별 신청이 같은 사용자를 공유하면 `down()`은 데이터를 삭제하지 않고 사용자 UNIQUE 복원을 차단한다. 운영 적용은 검토한 migration/배포 경로로 수행하고 이벤트 2단계 수동 인덱스와 구분한다.
+
 - `idx_org_listing_unique_v2` 를 쓰는 `ON CONFLICT (organization_id, service_key, offer_id)` 소비처 9곳에 같은 predicate(`WHERE service_key <> 'neture-event-offer'`)를 붙인다. PostgreSQL 은 predicate 를 준 ON CONFLICT 가 비부분 인덱스도 추론하므로 **코드 변경을 migration 보다 먼저 배포해도 안전**하다. 반대 방향(부분 인덱스 + 구버전 코드)은 실패하므로 인덱스 교체는 §17-1 2단계에서만 한다.
 - 만들지 않는 것: `checkout_orders` 컬럼(서비스 · 수취 주체는 metadata), 독립 `*_orders` · `*_payments`, `neture_orders` · `o4o_payments` unique 인덱스(운영 중복 데이터가 있으면 migration 이 깨질 수 있으므로 멱등은 advisory lock + 조건부 UPDATE 로 코드에서 보장 — §8).
 - migration 규약: epoch13 은 manifest 최대값 초과, `manifest.ts` append + `expected-schema-states.ts` 지문을 같은 커밋에(격리 PostgreSQL 15 실행값). ESM 엔티티 규칙(CLAUDE.md §2).

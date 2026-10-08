@@ -12,9 +12,9 @@ if (apply && (!args.includes('--phase-one-verified') || !args.some(a => /^--roll
 await AppDataSource.initialize();
 try {
   const state = await eventIndexState(AppDataSource.manager);
-  console.log(JSON.stringify({ mode: apply ? 'apply' : 'dry-run', direction, current: state }));
+  process.stdout.write(JSON.stringify({ mode: apply ? 'apply' : 'dry-run', direction, current: state }) + '\n');
   if (apply) {
     await AppDataSource.transaction(manager => transitionEventIndex(manager, direction));
-    console.log(JSON.stringify({ result: await eventIndexState(AppDataSource.manager) }));
+    process.stdout.write(JSON.stringify({ result: await eventIndexState(AppDataSource.manager) }) + '\n');
   }
 } finally { await AppDataSource.destroy(); }

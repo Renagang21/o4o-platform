@@ -60,6 +60,8 @@ Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했�
 
 옛 KPA Forum의 읽기와 홈 요약에도 현재 독립 약사 커뮤니티 승인을 적용했다. PharmacyHub 최신 활동과 Neture 홈 미리보기, 옛 운영 대시보드의 포럼 부분까지 대조했으며 미승인자는 글·통계가 노출되지 않는다. 승인된 운영 요약·분석도 해당 커뮤니티 저장 코드와 조직 범위만 집계한다. 관련 라우트/공용 접근/이미지 회귀 81건과 별도 카탈로그·실제 PostgreSQL 집계 검사 33건은 PASS다. 실제 로컬 HTTP로 pharmacy 사업 가입만 한 계정의 독립 약사 Forum 차단, 독립 신청·승인 후 조회, 탈퇴 후 즉시 차단과 다른 사업 공급 유지, 일반 커뮤니티 승인 전후 운영 요약의 격리를 확인했다.
 
+추가 검토 P2의 모집 신청 중복 기준도 약국 조직으로 맞췄다. 이미 존재하던 조직 UNIQUE를 유지하고 사용자 UNIQUE는 조직 없는 신청에만 적용한다. 동시 신청의 UNIQUE 충돌은 동일한 `DUPLICATE_APPLICATION`/409로 처리한다. 선택한 약국의 신청 현황·취소도 조직 문맥을 확인하며 기존 신청자 본인 취소 권한은 유지한다. 서비스·실제 PostgreSQL 회귀 21건과 기존 commerce DB 회귀 23건은 PASS다. 새 migration `AlignSellerRecruitmentApplicationIdentity1791477914134`는 새 격리 DB의 정본 baseline+incremental 1..16 위에서 실제 적용해 fingerprint `515f8b4c…`·6154 lines를 확인했고 canonical migration CLI의 사후 스키마 검증도 PASS다. 조직별 신청이 같은 사용자를 공유하면 제약 원복을 차단하며 데이터 삭제·백필은 하지 않는다. 이벤트 2단계와 달리 이 모집 제약 보완은 통합·통제 배포 시 canonical migration job의 대상이다. 운영에는 아직 적용하지 않았다. 수동 이벤트 CLI의 출력은 표준 출력으로 변경하여 저장소의 production console 검사도 PASS다.
+
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.

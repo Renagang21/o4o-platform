@@ -199,6 +199,13 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
     fingerprintLineCount: 6155,
   },
+  // Fresh isolated PostgreSQL 15 baseline + incrementals 1..16; reviewed migration 17
+  // replaces the global applicant constraint with a legacy-only partial index. No production fingerprint adoption.
+  {
+    appliedThrough: 'AlignSellerRecruitmentApplicationIdentity1791477914134',
+    fingerprint: '515f8b4c82da92b5e8b94bc75ad90bccfa639454c2fbb2149a5ad72f8b69e93d',
+    fingerprintLineCount: 6154,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
