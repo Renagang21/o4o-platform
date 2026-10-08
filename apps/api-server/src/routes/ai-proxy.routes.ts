@@ -17,7 +17,8 @@ import { aiProxyService } from '../services/ai-proxy.service.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: surface→provider guardrail gate
 import { resolveEditingModel, editingSurfaceForOutputType } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
-import { resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
+import { nodeSatisfies, resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
+import { resolveWorkTarget } from '../services/ai-tools/work-target-resolver.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
@@ -63,7 +64,8 @@ import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tool
 import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
-import type { ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
+import { createLlmCompletionVerifier, createLlmTaskUnderstander } from '../services/assistant/assistant-understanding.js';
+import type { CompletionJudge, ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
 import {
   selectToolInvocationForRequest,
   executeAiTool,
@@ -285,7 +287,15 @@ interface RouteReply {
   execution?: { taskKey: string | null; report?: ExecutionReport };
 }
 
-async function performWorkAgentRun(userId: string, body: Record<string, unknown>, intent?: ExecutionIntent): Promise<RouteReply> {
+/**
+ * 실행 가능성 확인 — 인자 형식 · 실행 노드 · tool 권한. 읽기만 한다(부작용 없음).
+ * performWorkAgentRun 의 첫 단계이자, Assistant 가 이해 모델을 부르기 전 preflight 로도 쓴다(실행 못 할 요청에 모델 비용 · 지연 없음).
+ */
+async function checkWorkAgentRunnable(
+  userId: string,
+  body: Record<string, unknown>,
+  opts: { requireCapability?: boolean } = {},
+): Promise<{ ok: false; reply: RouteReply } | { ok: true; toolCtx: VerifiedToolContext }> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -294,17 +304,41 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
 
   const tool = findToolDefinition(AI_TOOL_NAMES.WORK_AGENT_PERFORM);
   const argCheck = validateToolArguments(args, tool);
-  if (!argCheck.ok) return { status: 400, body: { success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' } };
+  if (!argCheck.ok) return { ok: false, reply: { status: 400, body: { success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' } } };
 
   // home-chat 과 같은 방식으로 서버가 tool 컨텍스트를 확정한다 — 클라이언트 값은 권한 근거가 아니다.
   const toolCtx: VerifiedToolContext = { userId, workspace: 'home' };
-  const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
+  // 대상 표면에 맞는 capability 를 가진 노드가 있어야 실행 가능하다 — runtime 의 노드 선택과 같은 규칙(재개는 힌트만 · 그 밖은
+  // 요청 + 힌트). Local Agent 는 online 이지만 Chrome 확장(browser)이 꺼진 경우를 여기서 걸러 이해 모델 호출 · 지연을 만들지 않는다.
+  // 대상을 정하지 못하면 capability 를 묻지 않는다(runtime 이 대상 미확정으로 끝낸다 — 종전과 같음).
+  const hint = typeof body.targetHint === 'string' ? body.targetHint : undefined;
+  const targetRef = body.runId !== undefined ? resolveWorkTarget('', hint) : resolveWorkTarget(String(body.request ?? ''), hint);
+  const need = targetRef ? (targetRef.targetType === 'windows_app' ? 'windows_uia' : 'browser') : undefined;
+  const deviceResolution = await resolveTargetDevice(AppDataSource, userId, need ? { need } : undefined);
   toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
   if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
   const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);
   if (!authz.allowed) {
-    return { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } };
+    return { ok: false, reply: { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } } };
   }
+  // preflight(이해 모델 호출 전) 전용 — 노드 선택은 capability 가 확인된 부재인 노드라도 고른다(단일 online 노드 · 전부 부재).
+  // 고른 노드가 그 capability 를 확인된 부재(false)로 보고했으면 실행은 runtime 에서 실패하므로 모델을 부르지 않는다.
+  // 보고 없음(null · 이전 에이전트)은 막지 않는다. 실행 경로(performWorkAgentRun)의 판정은 종전과 같다.
+  if (opts.requireCapability && need && deviceResolution.status === 'ok' && nodeSatisfies(deviceResolution.device, need) === false) {
+    return { ok: false, reply: { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: 'CAPABILITY_MISSING' } } };
+  }
+  return { ok: true, toolCtx };
+}
+
+async function performWorkAgentRun(
+  userId: string,
+  body: Record<string, unknown>,
+  intent?: ExecutionIntent,
+  judge?: CompletionJudge,
+): Promise<RouteReply> {
+  const runnable = await checkWorkAgentRunnable(userId, body);
+  if ('reply' in runnable) return runnable.reply;
+  const { toolCtx } = runnable;
 
   // Capability C(Task Modality Router) — per-task provider. Work Agent 로 온 Goal 은 실행 표면(등재 대상 · 화면 캡처 · UI 어휘)이
   // 있으면 screen 이고, screen 은 openai(Astra vision planner · Capability B)로 간다. 전역 AI_DEFAULT_PROVIDER 는 그대로(gemini).
@@ -329,6 +363,8 @@ async function performWorkAgentRun(userId: string, body: Record<string, unknown>
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
       // Personal Assistant Phase B — Assistant Planning 의 실행 지시(구조만). /work-agent/run 직접 호출에는 없다.
       ...(intent ? { intent } : {}),
+      // Task Understanding — 완료 주장은 Assistant 판정기로(조건 ↔ 근거). 직접 /work-agent/run 에는 없다(종전 판정).
+      ...(judge ? { judge } : {}),
     },
     plannerProvider ? createLlmPlannerForProvider(AppDataSource, plannerProvider) : createLlmPlanner(AppDataSource),
     // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
@@ -2308,10 +2344,17 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
     if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
     // Personal Assistant Phase A — Assistant → Task → Execution. 실행 본체(performWorkAgentRun)는 그대로이고,
     // Task 는 구조만 남긴다(원문 미저장). taskId 는 additive — 기존 work 필드의 의미는 바뀌지 않는다.
+    const understandLlm = createLlmTaskUnderstander(AppDataSource);
     const { reply, task } = await runAssistantWorkTask(
       AppDataSource,
       { userId, workBody, requestedTaskId: body.taskId, workScope: body.workScope },
       performWorkAgentRun,
+      // 실행 전 업무 이해 · 완료 의미 검증 — 기존 provider abstraction(같은 provider · 키). 실패하면 결정적 기본 이해 · 검증 생략.
+      // 이해 모델은 실행 가능할 때만 부른다 — 노드 미연결 · 권한 없음 · 형식 오류면 모델 없이 결정적 기본 이해(실행은 같은 이유로 거절된다).
+      {
+        understand: async (u) => ((await checkWorkAgentRunnable(userId, workBody, { requireCapability: true })).ok ? understandLlm(u) : null),
+        verify: createLlmCompletionVerifier(AppDataSource),
+      },
     );
     if (reply.status !== 200) return res.status(reply.status).json(task ? { ...reply.body, taskId: task.taskId } : reply.body);
     return res.json({

@@ -58,7 +58,7 @@ export const MEMORY_KINDS = Object.freeze({
   },
   run_resume_frame: {
     owner: 'run', placementNow: 'cloud', cloudPlacement: 'allowed', complianceReview: true,
-    basis: '정책 M5 — 질문으로 멈춘 run 의 task · stage · slot 종류 · label 없는 op · run 종결 시 삭제 · assistant_run_frames',
+    basis: '정책 M5 — 질문으로 멈춘 run 의 task · stage · slot 종류 · label 없는 op + 업무 이해(M10 좁은 예외 · 질문 대기 동안만) · run 종결 시 삭제 · assistant_run_frames',
   },
   // ── 노드에 남는다 (최소화) ──
   assistant_experience: {

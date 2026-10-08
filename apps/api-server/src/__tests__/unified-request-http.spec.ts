@@ -59,7 +59,11 @@ jest.mock('../modules/neture/services/neture-main-membership.js', () => ({
   ...jest.requireActual('../modules/neture/services/neture-main-membership.js'),
   getNetureMainMembershipStatus: (...a: unknown[]) => netureStatusMock(...a),
 }));
-jest.mock('../services/local-agent/local-agent-service.js', () => ({ resolveTargetDevice: (...a: unknown[]) => resolveTargetDeviceMock(...a) }));
+jest.mock('../services/local-agent/local-agent-service.js', () => ({
+  resolveTargetDevice: (...a: unknown[]) => resolveTargetDeviceMock(...a),
+  // capability 판정은 실제 규칙 그대로(순수 함수).
+  nodeSatisfies: (...a: unknown[]) => jest.requireActual('../services/local-agent/local-agent-service.js').nodeSatisfies(...a),
+}));
 jest.mock('../utils/work-scope-store-resolution.js', () => ({ resolveWorkScopeStore: jest.fn(), STORE_SCOPED_WORKSPACES: ['store'] }));
 jest.mock('../utils/ai-provider-runtime.js', () => {
   const actual = jest.requireActual('../utils/ai-provider-runtime.js');
@@ -215,7 +219,10 @@ describe('POST /api/ai/request', () => {
     expect(r.body.data.work.runId).toBe('g_2');
     expect(r.body.data.work.resumable).toBe(true);
     expect(r.body.data.work.aiPlanCount).toBe(1);
-    expect(executeMock).not.toHaveBeenCalled();
+    // home-chat 본체는 타지 않는다. Assistant 의 실행 전 업무 이해(TaskUnderstanding)만 같은 provider 로 1회 —
+    // (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 · 이 mock 응답은 형식 밖이라 결정적 기본 이해로 진행)
+    const byCaller = executeMock.mock.calls.map((c) => c[0]?.meta?.callerName ?? 'home-chat');
+    expect(byCaller).toEqual(['TaskUnderstanding']);
     expect(runSurfaceMock).not.toHaveBeenCalled();
     const input = runWorkAgentMock.mock.calls[0][2];
     expect(input.request).toBe('약학정보원에서 타이레놀 검색해줘');
@@ -367,6 +374,9 @@ describe('POST /api/ai/request', () => {
     const img = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 이 사진의 약을 찾아줘', attachments: [{ name: 'a.png', mimeType: 'image/png', base64: b64('png') }] });
     expect(img.body.data.kind).toBe('work');
     expect(runWorkAgentMock.mock.calls[0][2].image).toEqual({ mimeType: 'image/png', base64: b64('png') });
+    // 이해는 사진을 보지 않는다 — 사진 속 대상과 결과가 맞는지는 사용자 확인 조건으로 닫힌다.
+    const criteria = runWorkAgentMock.mock.calls[0][2].intent.understanding.criteria;
+    expect(criteria.some((c: { text: string; evidence: string }) => c.evidence === 'user' && c.text.includes('사진'))).toBe(true);
   });
 
   it('⑩ Local Agent 미연결 + work → 403 WORK_AGENT_NOT_AVAILABLE (안전 경계 · 기존 계약)', async () => {
@@ -375,6 +385,37 @@ describe('POST /api/ai/request', () => {
     expect(r.status).toBe(403);
     expect(r.body.code).toBe('WORK_AGENT_NOT_AVAILABLE');
     expect(runWorkAgentMock).not.toHaveBeenCalled();
+    // 실행 못 할 요청에는 이해 모델을 부르지 않는다(preflight — 모델 비용 · 지연 0).
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
+  });
+
+  it('⑩-b Local Agent 는 online 이지만 대상 표면 capability(browser) 없음 → preflight 에서 403 · 이해 모델 미호출', async () => {
+    // 노드는 있지만 Chrome 확장(browser)이 꺼진 정상 상태 — capability 를 묻지 않으면 connected 로 보인다.
+    resolveTargetDeviceMock.mockImplementation(async (_ds: unknown, _u: unknown, opts?: { need?: string }) =>
+      (opts?.need === 'browser' ? { status: 'none' } : CONNECTED));
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(r.status).toBe(403);
+    expect(r.body.code).toBe('WORK_AGENT_NOT_AVAILABLE');
+    expect(resolveTargetDeviceMock).toHaveBeenCalledWith(expect.anything(), expect.anything(), { need: 'browser' });
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
+    resolveTargetDeviceMock.mockReset();
+    resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
+  });
+
+  it('⑩-c online 노드가 하나뿐이고 그 노드가 browser 를 확인된 부재로 보고 → 노드는 골라지지만 이해 모델은 부르지 않는다', async () => {
+    // 노드 선택은 단일 online 노드면 capability 를 보지 않고 고른다 — preflight 가 고른 노드의 capability 를 따로 확인한다.
+    resolveTargetDeviceMock.mockResolvedValue({ status: 'ok', device: { id: 'dev-1', capabilities: { browser: false, windowsUia: true, localData: true } } });
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
+    // 실행 경로의 판정은 종전과 같다(runtime 이 정직한 오류를 돌려준다).
+    expect(runWorkAgentMock).toHaveBeenCalledTimes(1);
+    // 보고 없음(이전 에이전트)은 막지 않는다 — 이해 모델을 부른다.
+    executeMock.mockClear();
+    resolveTargetDeviceMock.mockResolvedValue({ status: 'ok', device: { id: 'dev-1', capabilities: null } });
+    await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(1);
+    resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
   });
 
   it('⑪ 기존 endpoint 회귀 — /home-chat · /work-agent/run 그대로', async () => {

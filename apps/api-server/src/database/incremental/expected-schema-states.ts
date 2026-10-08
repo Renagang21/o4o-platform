@@ -199,6 +199,16 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
     fingerprintLineCount: 6155,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — assistant_run_frames.understanding jsonb(nullable) + COMMENT.
+  // 질문 대기 run 의 업무 이해 중 글 없는 구조(결과 형태 · 확정 경계)만 재개 구조(M5)와 같은 행 · 같은 수명에 둔다(목표 · 조건 글 저장 금지 · M13).
+  // baseline fresh bootstrap + incremental 1..17 을 격리 PostgreSQL 17(로컬 일회용 클러스터 127.0.0.1:55434 · trust)에서
+  // migration:run 으로 실제 적용해 산출: 운영 DB fingerprint 채택 아님. 컬럼 COMMENT 정정(글 없음)으로 종전 d77825df…(6157)에서 재산출 —
+  // 종전 값은 운영에 적용된 적 없다(미병합 PR). 직전 상태 c8325ff5…(6155)는 같은 실행의 PRE 단계가 재현.
+  {
+    appliedThrough: 'AddAssistantRunFrameUnderstanding1791349365734',
+    fingerprint: '4e37812dd66d051c1eb5f145e6012ac6f61e80632fe608e5f8b77cfc964c9a1e',
+    fingerprintLineCount: 6157,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
