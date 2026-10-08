@@ -28,7 +28,7 @@ export async function inspectDemoPharmacyAccess(db: Queryable): Promise<DemoPhar
     `SELECT om.organization_id FROM organization_members om
      WHERE om.user_id = $1 AND om.role = 'owner' AND om.left_at IS NULL`, [userId],
   );
-  if (owners.length !== 1 || !String(owners[0].organization_id).startsWith('9c87f46b'))
+  if (owners.length !== 1 || owners[0].organization_id !== '9c87f46b-57a1-4afe-80bd-60782c49ce96')
     throw new Error('CANONICAL_DEMO_STORE_NOT_RESOLVED');
   const organizationId = owners[0].organization_id as string;
   const others = await db.query(

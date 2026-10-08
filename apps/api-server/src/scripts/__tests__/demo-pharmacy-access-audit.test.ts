@@ -1,7 +1,7 @@
 import { inspectDemoPharmacyAccess } from '../lib/demo-pharmacy-access-audit';
 
 const USER = 'synthetic-user';
-const ORG = '9c87f46b-0000-4000-8000-000000000000';
+const ORG = '9c87f46b-57a1-4afe-80bd-60782c49ce96';
 function fixture(overrides: Partial<Record<string, Record<string, unknown>[]>> = {}) {
   const state: Record<string, Record<string, unknown>[]> = {
     users: [{ id: USER }], memberships: [{ id: 'membership' }], owners: [{ organization_id: ORG }],
@@ -37,6 +37,7 @@ describe('canonical Demo pharmacy audit', () => {
   it.each([
     { users: [] }, { users: [{ id: USER }, { id: 'other' }] }, { memberships: [] },
     { owners: [] }, { owners: [{ organization_id: 'unrelated' }] },
+    { owners: [{ organization_id: '9c87f46b-0000-4000-8000-000000000000' }] },
     { owners: [{ organization_id: ORG }, { organization_id: 'other' }] },
     { others: [{ id: 'real-member' }] }, { conflicts: [{ id: 'other-ledger' }] },
     ...['pending', 'suspended', 'rejected', 'terminated'].map(status => ({ pharmacies: [{ status, applicant_user_id: USER }] })),

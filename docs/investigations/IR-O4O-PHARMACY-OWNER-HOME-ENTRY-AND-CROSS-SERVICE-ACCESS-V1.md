@@ -112,3 +112,5 @@ node --import tsx apps/api-server/src/scripts/demo-pharmacy-access-audit.ts
 ```
 
 현재 환경의 조회 실행은 `DB_CONFIGURATION_REQUIRED`로 중단됐다. `.env` 파일도 없어 DB 행을 조회·복구한 것으로 보고하지 않는다. 운영 DB write는 AGENTS.md §5의 별도 명시 승인 경계다. 실제 복구 적용 후 Store 업무 API와 이용계약 동의 조건을 재검증해야 한다. 운영 403 해소는 코드 커밋만으로 완료라고 판정하지 않는다.
+
+후속 검증: 진단·기존 Demo 구축·약국 guard 회귀 3 suites / 56 tests PASS, API TypeScript 검사 PASS, 변경 스크립트 ESLint PASS. 초기 TypeScript 검사는 미빌드 workspace 모듈을 찾지 못해 실패했으며 해당 패키지를 빌드한 뒤 통과했다. 실제 PostgreSQL 복구 통합 검증은 최신 main의 CHECK 기록과 구분하며 이 세션에서 실행했다고 주장하지 않는다. 문서 정합: 초기 잔여 데이터 문제에 최신 main의 복구 구현 및 읽기 전용 진단 경로를 연결했다.
