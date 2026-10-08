@@ -11,7 +11,7 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
-import { KPA_CANONICAL_SERVICE_CODE } from '../services/kpa-store-organization.provisioning.js';
+import { KPA_CANONICAL_SERVICE_CODE } from '../services/store-identity.constants.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;

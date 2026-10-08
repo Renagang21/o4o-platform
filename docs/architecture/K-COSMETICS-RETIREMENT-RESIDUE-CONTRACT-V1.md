@@ -18,7 +18,7 @@
   - 퇴역 1차-A(커밋 518da8b59, `WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1`) — 독립 웹 앱 `services/web-k-cosmetics` · 웹 배포 job.
   - 퇴역 1차-B(PR #339, `WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`) — `/api/v1/cosmetics/*` 전체(`routes/cosmetics/**` · 주문 · 결제 · B2B 결제 · 전용 entity 13개) · web-store `/work/k-cosmetics/*` 기능 화면(종료 안내만 남김) · admin `/cosmetics-products`.
 
-### 1-1. 잔여 목록 (2026-10-07 기준)
+### 1-1. 잔여 목록 (2026-10-08 branch 구현·외부 미확인 구분)
 
 | # | 잔여 | 상태 | 비고 |
 |---|---|---|---|
@@ -29,7 +29,7 @@
 | R5 | `k-cosmetics` / `k-cosmetics-event-offer` serviceKey 의 Event Offer · B2B 데이터와 코드 매핑 — 남은 코드: event-offer 도메인 매핑(`event-offer-service-mapping` · `EventOfferService` · 공급자 제안) · 승인축 `APPROVAL_ELIGIBLE_SERVICE_KEYS`(공급자 offer 승인 데이터와 연동 — Supplier Domain 경계) · buyer 조회 scope 등 | 남음 (장바구니 매핑 · 결제 상수는 R1 에서 삭제) | 기존 주문 데이터는 `checkout_orders` B2B 원장(§2 규칙 4) |
 | R6 | community / signage / LMS / CMS 의 `k-cosmetics` identity | 남음 | 공통 구조 serviceKey 격리 데이터 |
 | R7 | **외부 설정 (사용자 작업)** — 외부 DNS(`k-cosmetics.site` · `www.` · `api.` A 레코드와 `_acme-challenge` CNAME · `retail.neture.co.kr` A 레코드) · Google OAuth 승인 origin / redirect URI 의 K-Cos host | 남음 · 사용자 작업 | 저장소 밖 콘솔 작업이라 자동 변경하지 않는다. 근거 `CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-RUNTIME-V1` §4 |
-| R8 | **인프라 잔재** — 컨테이너 이미지(`k-cosmetics-web`) · API CORS 의 `retail` origin 등 1차-A CHECK §5 "API" · "이미지" 항목 중 1차-B 가 정리하지 않은 것 | 확인 필요 | 1차-B 는 CORS / cookie 의 K-Cos 도메인을 제거하면서 `retail` 은 유지했다. 이미지 삭제는 저장소 단위 개별 승인. 다음 퇴역 단계에서 전수 확인 후 이 행을 갱신한다 |
+| R8 | **인프라 잔재** — 컨테이너 이미지(`k-cosmetics-web`) · API CORS 의 `retail` origin | CORS 정리 구현 · 이미지 미확인 | 2026-10-08 전체 재배치 branch에서 `retail.neture.co.kr` CORS origin 제거. 외부 컨테이너 이미지 보유·사용 상태는 확인하지 않았으며 삭제하지 않음. 저장소 단위 처분은 외부 조사·승인 후 진행 |
 
 퇴역 대상은 **서비스**이지 화장품 **제품군**(Neture 공급 제품 · 카테고리)이 아니다. 제품군은 이 문서의 대상이 아니다.
 

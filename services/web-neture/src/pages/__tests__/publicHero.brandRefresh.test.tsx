@@ -56,10 +56,10 @@ describe('supplier `/`', () => {
 });
 
 describe('community `/`', () => {
-  it('확정 Hero 문구 · 주 CTA = 실제 커뮤니티 /pharmacist', () => {
+  it('확정 Hero 문구 · 주 CTA = 독립 약사 커뮤니티', () => {
     renderAt(<CommunityHostHomePage />);
     expect(h1Text()).toBe('현장의 경험과 정보를함께 나눕니다');
-    expect(screen.getByTestId('community-hero-primary').getAttribute('href')).toBe('/pharmacist');
+    expect(screen.getByTestId('community-hero-primary').getAttribute('href')).toBe('/communities/pharmacy/forum');
   });
 });
 

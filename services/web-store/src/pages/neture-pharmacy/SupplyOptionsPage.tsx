@@ -45,7 +45,7 @@ function Conditions({ o }: { o: SupplyOption }) {
 }
 
 export default function SupplyOptionsPage() {
-  const [source, setSource] = useState('all');
+  const [source, setSource] = useState(() => new URLSearchParams(window.location.search).get('source') || 'all');
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);

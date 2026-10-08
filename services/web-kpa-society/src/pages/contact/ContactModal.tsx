@@ -42,8 +42,8 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [agree, setAgree] = useState(false);
 
-  const isPartner = type === 'partner';
-  const title = isPartner ? '운영자 / 단체 협력 문의' : '강의 개설 / 협업 문의';
+  const isPartner = true;
+  const title = '운영자 / 단체 협력 문의';
 
   function update(field: keyof FormState) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -109,19 +109,6 @@ export function ContactModal({ type, onClose }: ContactModalProps) {
                   onChange={update('organization_name')}
                   placeholder="약사회 / 전문약사 모임 / 협동조합 등"
                   required
-                />
-              </label>
-            )}
-
-            {/* education: 강의 주제 */}
-            {!isPartner && (
-              <label style={s.label}>
-                소속 / 강의 주제
-                <input
-                  style={s.input}
-                  value={form.subject}
-                  onChange={update('subject')}
-                  placeholder="소속 기관 또는 강의 주제"
                 />
               </label>
             )}

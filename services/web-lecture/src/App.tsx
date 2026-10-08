@@ -4,6 +4,8 @@ import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { ToastProvider } from './components/Toast';
 import AccessGate from './components/AccessGate';
 import SiteShell from './components/SiteShell';
+import ContactPage from './pages/ContactPage';
+import OperatorContactPage from './pages/operator/OperatorContactPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
@@ -39,6 +41,7 @@ export default function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/contact" element={<ContactPage />} />
       <Route path="/courses" element={<CoursesPage />} />
       <Route path="/courses/:courseId" element={<CourseDetailPage />} />
       <Route path="/courses/:courseId/lesson/:lessonId" element={<LessonPage />} />
@@ -63,6 +66,7 @@ export default function App() {
         <Route path="/operator" element={<OperatorCoursesPage />} />
         {/* 11차 P2: 운영자 검토 전용 read-only 화면 (수강 등록·편집 권한 없음) */}
         <Route path="/operator/courses/:courseId/review" element={<OperatorCourseReviewPage />} />
+        <Route path="/operator/contact" element={<OperatorContactPage />} />
         <Route path="/operator/instructors" element={<OperatorInstructorsPage />} />
         <Route path="/operator/certificates" element={<OperatorCertificatesPage />} />
       </Route>

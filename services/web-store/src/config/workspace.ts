@@ -26,7 +26,9 @@ export const WORKSPACE_PATHS = {
   home: '/',
   myStore: '/store',
   serviceWork: '/work',
+  /** Obsolete incoming URL only; no HUB navigation or workflow remains. */
   storeHub: '/hub',
+  library: '/store/library',
   myServices: '/services',
   settings: '/settings',
   select: '/select-store',
@@ -51,7 +53,6 @@ export const ROOT_NAV_ITEMS: readonly RootNavItem[] = [
   { key: 'home', label: '홈', to: WORKSPACE_PATHS.home, end: true },
   { key: 'my-store', label: '내 매장', to: WORKSPACE_PATHS.myStore, end: false },
   { key: 'service-work', label: '서비스 업무', to: WORKSPACE_PATHS.serviceWork, end: false },
-  { key: 'store-hub', label: '매장 HUB', to: WORKSPACE_PATHS.storeHub, end: false },
   { key: 'my-services', label: '내 서비스', to: WORKSPACE_PATHS.myServices, end: true },
   { key: 'settings', label: '설정', to: WORKSPACE_PATHS.settings, end: false },
 ] as const;

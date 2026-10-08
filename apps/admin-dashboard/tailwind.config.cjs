@@ -2,6 +2,8 @@
 module.exports = {
   content: [
     "./index.html",
+    "../../packages/operator-core-ui/src/**/*.{ts,tsx}",
+    "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/ui/**/*.{js,ts,jsx,tsx}"
   ],

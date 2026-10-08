@@ -132,15 +132,15 @@ describe('§9-4~6 · 메뉴 권한 정책', () => {
   //   두 메뉴 모두 cms_media 하나에 의존했고 그 테이블은 운영에 존재한 적이 없어 상시 500 이었다.
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: core-kpa-branch-service-members **제거** (23 → 22).
   //   분회 가입 승인은 kpa-branch:admin 이 분회 서비스 화면에서 한다 — Admin 은 서비스 운영자만 지정.
-  it('클릭 가능한 정적 메뉴는 22개다', () => {
-    expect(CLICKABLE).toHaveLength(22);
+  it('클릭 가능한 정적 메뉴는 24개다', () => {
+    expect(CLICKABLE).toHaveLength(24);
   });
 
-  it('4. 정적 메뉴 전 노드(클릭 22 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
+  it('4. 정적 메뉴 전 노드(클릭 24 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
     const configured = new Set(menuPermissions.map((m) => m.menuId));
     const missing = ALL_NODES.map((n) => n.id).filter((id) => !!id && !configured.has(id));
     expect(missing).toEqual([]);
-    expect(ALL_NODES).toHaveLength(28); // 클릭 22 + 그룹 헤더 6
+    expect(ALL_NODES).toHaveLength(30); // 클릭 24 + 그룹 헤더 6
   });
 
   it('4-b. 모든 설정 항목이 명시적 역할을 갖는다 (무게이트 항목 0)', () => {

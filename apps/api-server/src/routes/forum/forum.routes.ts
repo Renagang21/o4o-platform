@@ -17,6 +17,12 @@ import operatorForumRoutes from './operator-forum.routes.js';
 import adminForumRoutes from './admin-forum.routes.js';
 
 const router: Router = Router();
+router.use(optionalAuth, (req, _res, next) => {
+  if (!isPlatformAdmin((req as any).user?.roles ?? [])) {
+    req.forumContext = { excludeScopedCommunities: true };
+  }
+  next();
+});
 
 /**
  * WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8

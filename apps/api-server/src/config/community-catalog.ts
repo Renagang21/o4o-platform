@@ -31,7 +31,7 @@ export type CommunityParticipationPolicy =
   | { mode: 'authenticated' }
   | { mode: 'service_membership_any'; serviceKeys: readonly string[] };
 
-export type CommunityCapability = 'forum' | 'content' | 'resources' | 'education';
+export type CommunityCapability = 'forum' | 'content' | 'resources';
 
 /** 서비스 web 안의 진입 경로 (UI metadata · route 가 실재하는 것만) */
 export interface CommunityEntry {
@@ -61,8 +61,8 @@ export const O4O_COMMUNITIES: readonly CommunityDefinition[] = Object.freeze([
     key: 'pharmacy',
     name: '약사 커뮤니티',
     status: 'active',
-    participationPolicy: { mode: 'service_membership_any', serviceKeys: ['kpa-society', 'pharmacy-hub'] },
-    capabilities: ['forum', 'content', 'resources', 'education'],
+    participationPolicy: { mode: 'authenticated' },
+    capabilities: ['forum', 'content', 'resources'],
     // KPA 와 Pharmacy-Hub 가 만든 포럼은 하나의 약사 커뮤니티다 (PH 별도 약사 Community = 0).
     forumStorageCodes: ['kpa-society', 'pharmacy-hub'],
     entries: [
@@ -75,7 +75,7 @@ export const O4O_COMMUNITIES: readonly CommunityDefinition[] = Object.freeze([
     name: '화장품 커뮤니티',
     status: 'active',
     participationPolicy: { mode: 'service_membership_any', serviceKeys: ['k-cosmetics'] },
-    capabilities: ['forum', 'content', 'resources', 'education'],
+    capabilities: ['forum', 'content', 'resources'],
     forumStorageCodes: ['k-cosmetics'],
     entries: [{ serviceKey: 'k-cosmetics', path: '/forum' }],
   },

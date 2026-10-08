@@ -111,7 +111,7 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   };
 }
 
-export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {}) {
+export function ForumPostPage({ basePath = '/forum', canModerate = false }: { basePath?: string; canModerate?: boolean } = {}) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -260,7 +260,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
         <nav style={styles.breadcrumb}>
           <Link to="/" style={styles.breadcrumbLink}>홈</Link>
           <span style={styles.breadcrumbDivider}>/</span>
-          <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
+          <Link to={basePath} style={styles.breadcrumbLink}>포럼</Link>
         </nav>
         <ForumDetailNotFoundState
           message={error || '요청하신 게시글이 존재하지 않거나 삭제되었습니다.'}
@@ -282,7 +282,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
       <nav style={styles.breadcrumb}>
         <Link to="/" style={styles.breadcrumbLink}>홈</Link>
         <span style={styles.breadcrumbDivider}>/</span>
-        <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
+        <Link to={basePath} style={styles.breadcrumbLink}>포럼</Link>
         <span style={styles.breadcrumbDivider}>/</span>
         <span style={styles.breadcrumbCurrent}>게시글</span>
       </nav>
@@ -303,7 +303,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
           </>
         }
         actionSlot={
-          canManagePost ? (
+          canManagePost || canModerate ? (
             isMobile ? (
               /* Mobile: ⋮ action menu */
               <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
@@ -316,12 +316,10 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
                 </button>
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
-                    <button
+                    {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
-                    >
-                      수정
-                    </button>
+                    >수정</button>}
                     <button
                       style={{ ...styles.moreMenuItem, color: '#dc2626' }}
                       onClick={() => { setShowActionMenu(false); handleDeletePost(); }}
@@ -334,7 +332,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
             ) : (
               /* Desktop: inline actions */
               <>
-                <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>
+                {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
                 <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
               </>
             )
@@ -432,6 +430,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
             content: c.content,
             createdAt: `${formatForumDate(c.createdAt)}${c.isEdited ? ' (수정됨)' : ''}`,
             isAuthor: (!!currentUserId && c.authorId === currentUserId) || isAdmin,
+            canDelete: canModerate,
           }))}
           onEditComment={handleUpdateComment}
           onDeleteComment={handleDeleteComment}

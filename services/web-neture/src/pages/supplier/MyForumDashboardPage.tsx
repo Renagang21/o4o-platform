@@ -18,16 +18,17 @@ import {
   NETURE_FORUM_OWNER_THEME,
 } from '@/services/forumOwnerAdapter';
 
-export default function MyForumDashboardPage() {
+export default function MyForumDashboardPage({ basePath }: { basePath?: string } = {}) {
   return (
     <ForumOwnerDashboard
       api={netureForumOwnerApi}
       theme={NETURE_FORUM_OWNER_THEME}
       containerClassName="max-w-4xl"
       links={{
-        forumHomeHref: '/supplier/forum',
-        requestFormHref: '/supplier/forum/request-category',
-        forumHref: (slug) => `/supplier/forum?category=${slug}`,
+        forumHomeHref: basePath ?? '/supplier/forum',
+        requestFormHref: basePath ? `${basePath}/request` : '/supplier/forum/request-category',
+        forumHref: (slug) => basePath ? `${basePath}/posts?board=${encodeURIComponent(slug)}` : `/supplier/forum?category=${slug}`,
+        ...(basePath ? { memberManageHref: (id: string) => `${basePath}/owned/${id}/members` } : {}),
       }}
       headerSlot={
         <div className="mb-6">

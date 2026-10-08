@@ -34,7 +34,7 @@ function StoreSwitcher() {
 }
 
 export default function RootShell() {
-  const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
   // 약국 문맥은 매장 HUB 단계가 없다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6). /hub 라우트 자체는 K-Cosmetics 용으로 남는다.
@@ -54,6 +54,7 @@ export default function RootShell() {
             {item.label}
           </NavLink>
         ))}
+        {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <NavLink to="/operator/pharmacy-memberships">매장 신청 심사</NavLink>}
       </nav>
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}

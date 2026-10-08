@@ -21,7 +21,6 @@ import { colors } from '../../styles/theme';
 
 const TYPE_LABELS: Record<string, string> = {
   partner:   '운영자/단체 협력',
-  education: '강의 개설/협업',
 };
 
 const STATUS_CONFIG: Record<ContactRequestStatus, { text: string; cls: string }> = {
@@ -190,7 +189,6 @@ export default function CollaborationRequestsPage() {
         >
           <option value="">전체 유형</option>
           <option value="partner">운영자/단체 협력</option>
-          <option value="education">강의 개설/협업</option>
         </select>
         <span style={styles.totalBadge}>총 {total}건</span>
       </div>
@@ -264,7 +262,7 @@ export default function CollaborationRequestsPage() {
             )}
             {selected.subject && (
               <div style={styles.detailRow}>
-                <span style={styles.detailLabel}>강의 주제</span>
+                <span style={styles.detailLabel}>문의 주제</span>
                 <span style={styles.detailValue}>{selected.subject}</span>
               </div>
             )}

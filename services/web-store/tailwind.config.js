@@ -3,6 +3,8 @@
 export default {
   content: [
     "./index.html",
+    "../../packages/operator-core-ui/src/**/*.{ts,tsx}",
+    "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "./src/**/*.{js,ts,jsx,tsx}",
     "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "../../packages/store-ui-core/src/**/*.{ts,tsx}",

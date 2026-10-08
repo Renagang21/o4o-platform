@@ -19,7 +19,7 @@ import { organizationOpsService } from '../../organization/services/organization
 import {
   KPA_CANONICAL_SERVICE_CODE,
   KPA_STORE_SLUG_SERVICE_KEY,
-} from '../../../routes/kpa/services/kpa-store-organization.provisioning.js';
+} from '../../../routes/kpa/services/store-identity.constants.js';
 import logger from '../../../utils/logger.js';
 
 type Exec = { query: (sql: string, params?: unknown[]) => Promise<any> };

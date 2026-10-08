@@ -1,5 +1,5 @@
 /**
- * HubVideoLibraryPage — 매장 HUB 동영상 진열 + 매장으로 가져오기 (표준 테이블)
+ * HubVideoLibraryPage — 제공 자료 동영상 진열 + 매장으로 가져오기 (표준 테이블)
  *
  * WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 (2026-06-23)
  *
@@ -8,7 +8,7 @@
  * HubPopLibraryPage 패턴 mirror.
  *
  * 데이터 흐름:
- *   - HUB 목록: hubContentApi.list({ serviceKey='kpa', sourceDomain='video' })
+ *   - 제공 자료 목록: hubContentApi.list({ serviceKey='kpa', sourceDomain='video' })
  *   - 단건 가져가기: importOperatorVideo(slug, sourceId)
  *   - 일괄 가져가기: Promise.allSettled fan-out
  *
@@ -209,7 +209,7 @@ export function HubVideoLibraryPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       <header className="mb-6 pb-5 border-b-2 border-slate-200 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">매장 HUB 동영상</h1>
+          <h1 className="text-2xl font-bold text-slate-900">제공 자료 동영상</h1>
           <p className="mt-1.5 text-sm text-slate-500">
             KPA 운영자가 발행한 동영상을 선택해 내 약국으로 가져가세요(초안 사본).
             가져온 동영상은 QR-code 로 연결할 수 있습니다.

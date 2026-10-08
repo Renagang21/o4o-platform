@@ -24,6 +24,7 @@ const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 
 // 실제 TypeORM `query` 는 언제나 배열을 돌려준다. double 이 undefined 를 주면 호출부가
 // 그것을 '행 0건' 으로 오해하거나 터지므로 기본값을 배열로 둔다 — 개별 테스트가 덮어쓴다.
+let verifiedMain = false;
 const query = jest.fn().mockResolvedValue([]);
 // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 최종 보완 1: handoff 는 계정의 Google 연결 여부를 읽지 않는다.
 //   수단은 발급 시 검증된 토큰 claim → 원장 `source_auth_method` → 교환 세션 승계. 누가
@@ -34,7 +35,7 @@ jest.mock('../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
     query: (...args: unknown[]) =>
-      /FROM linked_accounts/i.test(String(args[0] ?? '')) ? linkedAccountsQuery(...args) : query(...args),
+       /FROM users u/i.test(String(args[0] ?? '')) ? Promise.resolve([{ account_status: 'active', account_active: true, email_verified: verifiedMain }]) : /FROM linked_accounts/i.test(String(args[0] ?? '')) ? linkedAccountsQuery(...args) : query(...args),
     getRepository: () => ({ findOne: (...args: unknown[]) => findOne(...args) }),
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: handoff 가 세션 **세대**를 읽는다.
     //   세대 조회는 `query` 의 once 큐를 **소비하지 않는다** — 소비하면 이 spec 들이 순서로
@@ -103,6 +104,7 @@ const mockRes = mockHandoffRes;
 const uuid = '11111111-2222-4333-8444-555555555555';
 
 beforeEach(() => {
+  verifiedMain = false;
   query.mockReset();
   // mockReset 은 구현까지 지운다 → 기본 반환이 undefined 가 된다. 실제 TypeORM `query` 는
   // 언제나 배열이므로 기본값을 되돌린다(개별 테스트가 필요하면 다시 덮어쓴다).
@@ -252,6 +254,17 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.statusCode).toBe(403);
     expect(res.body.code).toBe('HANDOFF_TARGET_NO_MEMBERSHIP');
     expect(query).not.toHaveBeenCalled();
+  });
+
+  it('확인된 메인 계정은 약국 조직이 없어도 가입·운영 화면으로 로그인만 전달한다', async () => {
+    verifiedMain = true;
+    resolveAccessibleStores.mockResolvedValueOnce([]);
+    query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(mockReq({ targetWorkspace: 'store', returnPath: '/start-pharmacy' }), res);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.targetUrl).toContain('returnTo=%2Fstart-pharmacy');
+    expect(query.mock.calls.every(call => !/INSERT INTO (?:role_assignments|service_memberships|organizations)/.test(call[0]))).toBe(true);
   });
 
   it("임의 workspace 400 INVALID_WORKSPACE · 둘 다 / 둘 다 없음 400 · targetServiceKey='store' 는 기존 INVALID_SERVICE", async () => {

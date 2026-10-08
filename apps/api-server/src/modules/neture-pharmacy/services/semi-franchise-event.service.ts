@@ -1,3 +1,4 @@
+import { eventIndexState } from '../operations/event-index-transition.js';
 /**
  * 세미프랜차이즈 이벤트 — DESIGN §3-5
  *
@@ -132,7 +133,9 @@ export class SemiFranchiseEventService {
         WHERE organization_id = $1 AND service_key = $2 AND offer_id = $3::uuid LIMIT 1`,
       [sf.organization_id, SEMI_FRANCHISE_EVENT_SERVICE_KEY, offer.id],
     );
-    if (existing) throw new NeturePharmacyError(409, EVENT_REAPPLY_NOT_YET_SUPPORTED, EVENT_REAPPLY_MESSAGE);
+    if (existing && await eventIndexState(this.dataSource.manager) === 'phase-one') {
+      throw new NeturePharmacyError(409, EVENT_REAPPLY_NOT_YET_SUPPORTED, EVENT_REAPPLY_MESSAGE);
+    }
     const [row] = await this.dataSource.query(
       `INSERT INTO organization_product_listings
          (id, organization_id, service_key, master_id, offer_id, is_active, status, price, event_price,

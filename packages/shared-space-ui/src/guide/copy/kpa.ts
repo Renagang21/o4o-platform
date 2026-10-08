@@ -355,15 +355,15 @@ export const kpaGuideUsageProps: GuideUsagePageProps = {
       title: '상품 확보',
       routeLabel: '/store/commerce/products',
       description:
-        '플랫폼 B2B 카탈로그에서 취급할 상품을 선택해 내 매장에 추가합니다. 추가된 상품은 주문 작업 시 빠르게 사용할 수 있습니다.',
+        '내 매장에서 가입·승인 조건에 맞는 공급 상품을 확인하고 바로 주문합니다. 이벤트와 취급매장 모집도 같은 공급 화면에서 확인합니다.',
       items: [
         {
           label: 'B2B 카탈로그 탐색',
-          detail: '공급사별로 공급 가능한 상품을 확인합니다. 매장 허브(/store-hub/b2b)에서 상품 목록을 탐색합니다.',
+          detail: '공급사별로 공급 가능한 상품을 확인합니다. 내 매장 공급 화면에서 상품 목록을 탐색합니다.',
         },
         {
-          label: '내 매장에 추가',
-          detail: '상품 옆 + 버튼을 누르면 내 매장 취급 목록에 등록됩니다.',
+          label: '바로 주문',
+          detail: '공급 조건과 가격을 확인하고 필요한 수량을 장바구니에 담습니다.',
         },
         {
           label: '소매가 및 채널 설정',
@@ -492,8 +492,8 @@ export const kpaGuideUsageProps: GuideUsagePageProps = {
           detail: '시간대·요일별로 다른 플레이리스트를 재생하도록 스케줄을 설정합니다.',
         },
         {
-          label: '허브 라이브러리 활용',
-          detail: '매장 허브(/store-hub/signage)에서 플랫폼 공용 사이니지 콘텐츠를 탐색해 내 매장에 활용합니다.',
+          label: '자료함 활용',
+          detail: '내 매장 자료함의 사이니지 목록에서 플랫폼 공용 사이니지 콘텐츠를 탐색해 내 매장에 활용합니다.',
         },
       ],
     },
@@ -1414,9 +1414,9 @@ export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
       title: '매장 운영 개요',
       description: '약사 계정이 승인되면 "내 매장"이 자동 생성됩니다. 별도의 매장 개설 절차는 없습니다. 매장은 상품 진열·고객 응대·사이니지 노출을 통합하는 오프라인 경쟁력 강화 허브이며, O4O 구조에서 매장은 공급자의 상품과 콘텐츠를 받아 고객에게 직접 전달하는 실행 주체입니다.',
       items: [
-        { label: '자동 생성 매장', detail: '계정 승인 시 내 매장이 자동으로 생성됩니다. 별도 개설 단계 없음.' },
+        { label: '내 매장 신청·승인', detail: '내 매장 신청과 증빙 검토가 승인되면 약국 조직과 매장이 연결됩니다.' },
         { label: '운영·상담·노출 허브', detail: '주문/결제 시스템이 아니라 상품 진열, 고객 상담 보조, 사이니지 노출을 관리하는 공간입니다.' },
-        { label: 'O4O 매장 역할', detail: '공급자 카탈로그에서 상품을 받아 채널별로 노출하고, 고객 관심 요청에 직원이 대응합니다.' },
+        { label: 'O4O 매장 역할', detail: '소비자 안내 자료를 채널별로 활용하고, 고객 관심 요청에 직원이 대응합니다.' },
       ],
     },
     {
@@ -1426,7 +1426,7 @@ export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
       description: '매장 운영은 여러 경로로 접근합니다. 각 경로는 역할이 구분되어 있습니다.',
       items: [
         { label: '/store (대시보드)', detail: '매장 전체 현황을 한눈에 확인합니다. 최근 요청·채널 상태·상품 수가 표시됩니다.' },
-        { label: '/store-hub (운영 허브)', detail: '상품·콘텐츠·사이니지를 통합 관리하는 허브 화면입니다.' },
+        { label: '내 매장', detail: '가입 사업의 공급·콘텐츠를 내 매장에서 바로 이용합니다.' },
         { label: '/store/channels (채널 관리)', detail: 'B2C·TABLET·KIOSK·SIGNAGE 채널별 진열 상품을 설정합니다.' },
         { label: '/store/requests (관심 요청)', detail: '태블릿·QR에서 접수된 고객 관심 요청을 확인하고 처리합니다.' },
       ],
@@ -1446,11 +1446,11 @@ export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
     {
       step: '04',
       title: '상품/콘텐츠 운영 흐름',
-      routeLabel: '/store-hub',
+      routeLabel: '내 매장',
       description: '매장 운영은 상품·콘텐츠·사이니지 3축으로 구성됩니다. 각 축은 공급자에서 매장으로 흐릅니다.',
       items: [
-        { label: '상품 축 — 공급자 카탈로그', detail: '공급자 카탈로그에서 상품을 내 매장에 추가(B2B)하고, 채널별로 진열합니다.' },
-        { label: '콘텐츠 축 — CMS 복사/활용', detail: '플랫폼 콘텐츠(CMS)를 매장 허브로 복사해 고객 상담과 설명 자료로 활용합니다.' },
+        { label: '상품 축 — 공급자 카탈로그', detail: '내 매장에서 이용 가능한 공급 상품을 바로 주문합니다. 소비자 안내에는 제품 검색과 약국 자체 제품 정보를 사용합니다.' },
+        { label: '콘텐츠 축 — CMS 복사/활용', detail: '플랫폼 콘텐츠(CMS)를 내 매장 자료함으로 복사해 고객 상담과 설명 자료로 활용합니다.' },
         { label: '사이니지 축 — 플레이리스트', detail: '콘텐츠와 상품 이미지를 사이니지 플레이리스트로 구성해 매장 TV에 노출합니다.' },
       ],
     },
@@ -1488,7 +1488,7 @@ export const kpaGuideFeatureStoreProps: GuideFeatureManualPageProps = {
 // - 글쓰기/수정/댓글/좋아요/공지 라우트 반영
 // - 감사 포인트 시스템 추가 (Phase 1 구현 완료)
 // - 비공개 포럼 가입 신청 흐름
-// - 포럼 개설 신청 (/forum/request)
+// - 포럼 개설 신청 (게시판 개설 신청)
 // - 내 활동 (/mypage/my-forums, /mypage/my-requests)
 
 export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
@@ -1508,7 +1508,7 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
       description: '포럼 홈에서 추천 포럼·활동 글을 확인하거나 전체 글 목록에서 포럼·태그별로 탐색합니다.',
       items: [
         { label: '포럼 홈', detail: '/forum 에서 추천 포럼, 최근 활동 글, 통합 검색이 표시됩니다.' },
-        { label: '전체 글 목록', detail: '/forum/all 에서 모든 포럼의 글을 한 번에 봅니다.' },
+        { label: '전체 글 목록', detail: '전체 글 에서 모든 포럼의 글을 한 번에 봅니다.' },
         { label: '포럼 선택 필터', detail: '전체 글 목록 상단의 Combobox에서 포럼을 선택해 해당 포럼 글만 표시합니다.' },
         { label: '인기 태그', detail: '인기 태그 칩을 클릭하면 해당 태그가 붙은 글만 필터링됩니다.' },
       ],
@@ -1516,7 +1516,7 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
     {
       step: '02',
       title: '글 찾기',
-      routeLabel: '/forum/all',
+      routeLabel: '전체 글',
       description: '키워드 · 태그 · 포럼 조합으로 원하는 글을 빠르게 찾습니다. 필터 상태는 URL에 유지되어 공유·북마크가 가능합니다.',
       items: [
         { label: '키워드 검색', detail: '제목·본문 키워드로 글을 검색합니다. 포럼 홈 통합 검색은 포럼과 글을 함께 찾습니다.' },
@@ -1527,12 +1527,12 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
     {
       step: '03',
       title: '글쓰기와 참여',
-      routeLabel: '/forum/write',
+      routeLabel: '글쓰기',
       description: '글을 작성·수정하고 다른 회원의 글에 댓글·좋아요로 참여합니다. 포럼 운영자는 중요한 글을 공지로 지정할 수 있습니다.',
       items: [
-        { label: '글 작성', detail: '/forum/write 에서 포럼을 선택해 글을 등록합니다. 포럼 안에서는 /forum/:slug/write 로 바로 진입합니다.' },
-        { label: '글 수정', detail: '/forum/edit/:id 에서 본인이 작성한 글을 수정합니다.' },
-        { label: '글 상세 · 댓글', detail: '/forum/post/:id 에서 본문과 댓글을 확인하고 답변을 등록합니다.' },
+        { label: '글 작성', detail: '글쓰기 에서 포럼을 선택해 글을 등록합니다. 포럼 안에서는 선택한 게시판의 글쓰기 로 바로 진입합니다.' },
+        { label: '글 수정', detail: '내 글 수정 에서 본인이 작성한 글을 수정합니다.' },
+        { label: '글 상세 · 댓글', detail: '글 상세 에서 본문과 댓글을 확인하고 답변을 등록합니다.' },
         { label: '좋아요', detail: '글 상세 화면에서 👍 버튼으로 좋아요를 누릅니다. 로그인 회원만 가능합니다.' },
         { label: '공지글', detail: '포럼 운영자가 공지로 지정한 글은 목록 상단에 공지 배지와 함께 고정 표시됩니다.' },
       ],
@@ -1540,7 +1540,7 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
     {
       step: '04',
       title: '감사 시스템',
-      routeLabel: '/forum/post/:id',
+      routeLabel: '글 상세',
       description: '도움이 된 글에 감사 포인트와 메시지를 보내고, 글마다 받은 감사 집계를 확인합니다.',
       items: [
         { label: '감사 포인트 보내기', detail: '글 상세 화면의 감사 버튼을 눌러 1P 이상 금액을 선택해 전달합니다. 본인 글에는 전달할 수 없습니다.' },
@@ -1563,7 +1563,7 @@ export const kpaGuideFeatureForumProps: GuideFeatureManualPageProps = {
     {
       step: '06',
       title: '포럼 개설 신청',
-      routeLabel: '/forum/request',
+      routeLabel: '게시판 개설 신청',
       description: '새 포럼이 필요할 때 직접 개설을 신청합니다. 운영자 검토 후 승인되면 포럼이 생성됩니다.',
       items: [
         { label: '포럼 정보 입력', detail: '포럼 이름(2~50자), 설명(10자 이상), 태그(1개 이상), 신청 사유를 입력합니다.' },
@@ -1607,14 +1607,14 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
     {
       step: '01',
       title: '운영자가 준비한 자료 받기',
-      routeLabel: '/store-hub/content · /store-hub/blog',
+      routeLabel: '내 매장 자료함의 일반 콘텐츠 · 내 매장 자료함의 블로그',
       description:
-        '운영자가 HUB 에 게시한 콘텐츠와 블로그 자료를 내 매장 자료함으로 가져옵니다. 모든 매장이 같은 자료를 받을 수 있으므로 일관된 정보 전달이 가능합니다.',
+        '이용 가능한 콘텐츠와 블로그 자료를 내 매장 자료함으로 가져옵니다. 가입한 사업과 출처에 따라 이용 가능한 자료가 다릅니다. 사본은 내 매장에서 독립적으로 관리합니다.',
       items: [
-        { label: 'HUB 콘텐츠 받기', detail: '/store-hub/content — 운영자 게시 자료 조회·가져오기' },
-        { label: 'HUB 블로그 받기', detail: '/store-hub/blog — 매장 블로그에 적용 가능' },
+        { label: '일반 콘텐츠 활용', detail: '내 매장 자료함의 일반 콘텐츠 — 운영자 게시 자료 조회·가져오기' },
+        { label: '블로그 자료 활용', detail: '내 매장 자료함의 블로그 — 매장 블로그에 적용 가능' },
         { label: '내 자료함', detail: '/store/library/contents, /store/library/resources — 받은 자료 적재' },
-        { label: 'Event Offer 참여', detail: '/store-hub/event-offers — 공급자 이벤트 적용' },
+        { label: 'Event Offer 참여', detail: '내 매장 공급 화면의 이벤트 — 공급자 이벤트 적용' },
       ],
     },
     {
@@ -1700,7 +1700,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
     description:
       '서비스 운영자는 생태계를 운영하고 매장을 지원합니다. 단순 관리자가 아니라 공급자 자료를 받아 매장 실행 자산으로 구성하는 운영 사업자입니다.',
     flowBarTitle: '운영자 흐름',
-    flowLabels: ['공급자 협력', '콘텐츠 구성', '매장 HUB', '매장·회원 지원', '준비 중', 'O4O 철학'],
+    flowLabels: ['공급자 협력', '콘텐츠 구성', '내 매장 자료함', '매장·회원 지원', '준비 중', 'O4O 철학'],
   },
   sections: [
     {
@@ -1720,7 +1720,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
       title: '콘텐츠·자료 구성과 게시',
       routeLabel: '/operator/{docs, resources, guide-contents, ai-report}',
       description:
-        '운영자가 직접 콘텐츠를 작성하거나 자료실을 정리해서 매장 HUB 로 게시합니다. AI 리포트로 운영 데이터를 참고합니다.',
+        '운영자가 직접 콘텐츠를 작성하거나 자료실을 정리해서 내 매장 자료함 로 게시합니다. AI 리포트로 운영 데이터를 참고합니다.',
       items: [
         { label: '콘텐츠 작성·HUB 게시', detail: '/operator/docs — RichTextEditor 기반 항목별 게시' },
         { label: '자료실 관리', detail: '/operator/resources — 자료 등록·분류·배포' },
@@ -1730,7 +1730,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
     },
     {
       step: '03',
-      title: '매장 HUB 운영 — 사이니지·미디어',
+      title: '내 매장 자료함 운영 — 사이니지·미디어',
       routeLabel: '/operator/signage/*',
       description:
         '매장이 사용하는 사이니지 / 미디어 / 플레이리스트를 중앙에서 관리하고 배포합니다. 현재는 전체 매장 대상 일괄 배포가 중심입니다.',
@@ -1746,11 +1746,11 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
       title: '매장·회원 지원과 커뮤니티 운영',
       routeLabel: '/operator/{members, forum-management, surveys}',
       description:
-        '회원 신청을 승인하고 포럼·설문 등 커뮤니티 활동을 운영합니다. 강의 운영은 독립 서비스 O4O 강의의 운영자 화면이 담당합니다. 약국 경영자 회원을 승인하면 매장 운영 권한이 함께 부여됩니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
+        '회원 신청을 승인하고 포럼·설문 등 커뮤니티 활동을 운영합니다. 강의 운영은 독립 서비스 O4O 강의의 운영자 화면이 담당합니다. 내 매장 신청과 사업 가입은 각각의 승인 원장으로 심사합니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
       items: [
         // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
         //   별도 '약국 신청 승인'(/operator/pharmacy-requests) 폐지 → 약국 경영자 회원 승인(회원 관리)에서 매장 권한 자동 부여.
-        { label: '회원 관리', detail: '/operator/members — 가입 승인·역할·자격 관리 (약국 경영자 승인 시 매장 권한 자동 부여)' },
+        { label: '회원 관리', detail: '/operator/members — 해당 사업의 가입·자격 관리. 내 매장 신청은 별도 심사' },
         { label: '포럼 관리', detail: '/operator/forum-management — 포럼 개설 승인·콘텐츠' },
         { label: '설문 운영', detail: '/operator/surveys — 설문 작성·배포·응답 분석' },
       ],
@@ -1777,7 +1777,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
         '운영자는 관리자가 아니라 매장을 지원하는 운영 사업자입니다. 공급자 자료 + 커뮤니티 데이터 + AI + 운영 경험 + 현장 이해를 활용하여 매장 실행 자산을 생산·구성·운영합니다.',
       items: [
         { label: '소규모 사업자 경쟁력', detail: '개별 매장이 운영자 지원으로 큰 조직과 대등하게 운영합니다.' },
-        { label: '3 자 협력 구조', detail: '공급자 → 운영자 → AI 활용 → 매장 HUB → 매장 실행 흐름의 중간 책임자입니다.' },
+        { label: '3 자 협력 구조', detail: '공급자 → 운영자 → AI 활용 → 내 매장 자료함 → 매장 실행 흐름의 중간 책임자입니다.' },
         { label: 'AI 활용', detail: 'AI 는 운영자의 가공·구성·요약·추천을 보조합니다. 역할을 대체하지 않습니다.' },
         { label: '정보 → 실행', detail: '커뮤니티에서 나온 정보를 큐레이션해 매장 실행 자산으로 만드는 책임을 가집니다.' },
       ],
@@ -1798,9 +1798,9 @@ export const kpaGuideForMemberProps: GuideUsagePageProps = {
     eyebrow: '역할별 이용 가이드',
     title: '커뮤니티 참여자',
     description:
-      '정보를 나누는 것을 넘어 실제 현장 활용으로 연결합니다. 약사 / 직원 / 강사 등 약사 네트워크 구성원으로 참여하는 흐름입니다.',
+      '정보를 나누는 것을 넘어 실제 현장 활용으로 연결합니다. 약사 네트워크 구성원으로 참여하는 흐름입니다.',
     flowBarTitle: '참여 흐름',
-    flowLabels: ['포럼', '강의', '콘텐츠·자료', '설문', '준비 중', 'O4O 철학'],
+    flowLabels: ['포럼', '콘텐츠·자료', '설문', '준비 중', 'O4O 철학'],
   },
   sections: [
     {
@@ -1808,23 +1808,11 @@ export const kpaGuideForMemberProps: GuideUsagePageProps = {
       title: '포럼 — 동료 약사와 경험 공유',
       routeLabel: '/forum',
       description:
-        '질문·답변·경험 공유로 현장 노하우를 나눕니다. 좋은 게시물은 운영자가 큐레이션해 매장 HUB 자료로 활용될 수 있습니다 (현장 → 매장 환류).',
+        '질문·답변·경험 공유로 현장 노하우를 나눕니다. 좋은 게시물은 운영자가 큐레이션해 내 매장 자료함 자료로 활용될 수 있습니다 (현장 → 매장 환류).',
       items: [
-        { label: '포럼 글쓰기', detail: '/forum/write — 카테고리별 게시물 작성' },
-        { label: '카테고리별 피드', detail: '/forum/:slug — 주제별 토론' },
-        { label: '댓글·좋아요', detail: '/forum/post/:id — 게시물 토론·추천' },
-      ],
-    },
-    {
-      step: '02',
-      title: '강의 (LMS) — 전문성 강화',
-      routeLabel: '/lms',
-      description:
-        '보수교육·세미나·전문 강의를 수강하고 이수증·자격증을 발급받습니다. 매장 경영자는 직원 교육 자료로도 활용 가능합니다.',
-      items: [
-        { label: '강의 목록·수강', detail: '/lms — 강의 조회·수강' },
-        { label: '내 수강', detail: '/mypage/enrollments — 진도·과제' },
-        { label: '이수증·자격증', detail: '/mypage/certificates, /mypage/qualifications' },
+        { label: '포럼 글쓰기', detail: '글쓰기 — 카테고리별 게시물 작성' },
+        { label: '카테고리별 피드', detail: '선택한 게시판 — 주제별 토론' },
+        { label: '댓글·좋아요', detail: '글 상세 — 게시물 토론·추천' },
       ],
     },
     {
@@ -1869,7 +1857,7 @@ export const kpaGuideForMemberProps: GuideUsagePageProps = {
       description:
         '좋은 정보는 실제 현장에서 활용될 때 더 큰 가치가 됩니다. O4O 는 정보를 제공하는 플랫폼이 아닙니다. 정보를 실행 경쟁력으로 전환하는 플랫폼입니다.',
       items: [
-        { label: '커뮤니티 → 운영자 → 매장', detail: '포럼·강의의 좋은 정보는 운영자 큐레이션을 거쳐 매장 실행 자산이 됩니다.' },
+        { label: '커뮤니티 → 운영자 → 매장', detail: '커뮤니티의 좋은 정보는 운영자 큐레이션을 거쳐 매장 실행 자산이 됩니다.' },
         { label: '소규모 사업자 경쟁력', detail: '내 지식·경험이 다른 약사·매장의 경쟁력으로 확장됩니다.' },
         { label: 'AI 활용', detail: 'AI 는 약사·운영자·매장의 역할을 대체하지 않습니다. 경쟁력 증폭 도구입니다.' },
         { label: '운영자 보완', detail: '커뮤니티의 자발적 정보가 운영자 단독으로 만들기 어려운 가치를 만듭니다.' },

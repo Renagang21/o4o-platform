@@ -1,5 +1,5 @@
 /**
- * HubBlogLibraryPage — 매장 HUB 블로그 진열 + 매장으로 가져오기
+ * HubBlogLibraryPage — 제공 자료 블로그 진열 + 매장으로 가져오기
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
  *   KPA·K-Cosmetics 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
@@ -9,11 +9,11 @@
  * WO-KPA-STORE-HUB-ASSET-CREATE-ACTION-RESTORE-V1: "가져가기"와 "직접 글쓰기" 분리 노출
  *
  * 데이터 흐름 (변경 없음):
- *   - HUB 목록: hubContentApi.list({ sourceDomain: 'blog' })
+ *   - 제공 자료 목록: hubContentApi.list({ sourceDomain: 'blog' })
  *   - 단건 가져가기: importOperatorBlog(slug, sourceId)
  *   - 일괄 가져가기: 단건 endpoint fan-out (신규 backend 없음)
  *
- * HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+ * 제공 자료 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
  */
 
 import { useCallback } from 'react';
@@ -45,7 +45,7 @@ export function HubBlogLibraryPage() {
     resolveStoreSlug: getStoreSlug,
     importOne: (storeSlug, id) => importOperatorBlog(storeSlug, id),
     messages: {
-      loadError: 'HUB 블로그를 불러올 수 없습니다',
+      loadError: '제공 블로그를 불러올 수 없습니다',
       storeMissing: '매장 정보를 확인할 수 없습니다',
       storeMissingBatchError: '매장 정보 미연결',
       importSuccess: (result) =>
@@ -60,7 +60,7 @@ export function HubBlogLibraryPage() {
     <HubImportLibraryView
       core={hub}
       accent="blue"
-      title="매장 HUB 블로그"
+      title="제공 자료 블로그"
       description="KPA 운영자가 발행한 블로그를 선택해 내 약국으로 가져가거나(초안 사본), 내 약국 블로그 글을 직접 작성하세요."
       tableId="store-hub-blog"
       titleIcon={<FileText className="w-3.5 h-3.5" />}

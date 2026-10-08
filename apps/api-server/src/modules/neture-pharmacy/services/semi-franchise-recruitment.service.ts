@@ -8,10 +8,11 @@
  *   그 약국은 모집 공급가로 바로 주문한다(supply-access SSOT 의 recruitment 경로).
  */
 import type { DataSource } from 'typeorm';
-import { NeturePharmacyError, NETURE_PHARMACY_SERVICE_KEY,
+import { NeturePharmacyError, NETURE_PHARMACY_SERVICE_KEY, DEFAULT_SEMI_FRANCHISE_KEY,
   rowsOf,
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
+import { recruitmentTargetMatch } from './recruitment-target.js';
 
 const RECRUITMENT_VIEW = `
   SELECT sr.id, sr.product_id AS "masterId", sr.product_name AS "productName", sr.seller_name AS "supplierName",
@@ -19,7 +20,7 @@ const RECRUITMENT_VIEW = `
          sr.status::text AS status, sr.exposure_status::text AS "exposureStatus", sr.exposure_review_note AS "exposureReviewNote",
          sr.created_at AS "createdAt", sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName"
     FROM seller_recruitments sr
-    JOIN semi_franchises sf ON sf.id = sr.semi_franchise_id`;
+    JOIN semi_franchises sf ON ${recruitmentTargetMatch()}`;
 
 export class SemiFranchiseRecruitmentService {
   constructor(private readonly dataSource: DataSource) {}
@@ -47,7 +48,7 @@ export class SemiFranchiseRecruitmentService {
     if (!offer) throw new NeturePharmacyError(404, 'OFFER_NOT_FOUND', '등록 승인된 공급 제품을 찾을 수 없습니다.');
     const [sf] = await this.dataSource.query(
       `SELECT id, name FROM semi_franchises WHERE key = $1 AND status = 'active'`,
-      [input.semiFranchiseKey],
+      [input.semiFranchiseKey?.trim() || DEFAULT_SEMI_FRANCHISE_KEY],
     );
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
     const [dup] = await this.dataSource.query(
@@ -81,7 +82,7 @@ export class SemiFranchiseRecruitmentService {
   async operatorList(sf: SemiFranchiseRow, exposureStatus?: string) {
     const s = exposureStatus && exposureStatus !== 'all' ? exposureStatus : null;
     return this.dataSource.query(
-      `${RECRUITMENT_VIEW} WHERE sr.semi_franchise_id = $1 AND ($2::text IS NULL OR sr.exposure_status::text = $2)
+      `${RECRUITMENT_VIEW} WHERE sf.id = $1 AND ($2::text IS NULL OR sr.exposure_status::text = $2)
        ORDER BY sr.created_at DESC`,
       [sf.id, s],
     );
@@ -94,7 +95,9 @@ export class SemiFranchiseRecruitmentService {
       `UPDATE seller_recruitments
           SET exposure_status = $3::seller_recruitment_exposure_status_enum, exposure_reviewed_at = NOW(),
               exposure_reviewed_by = $4, exposure_review_note = $5, updated_at = NOW()
-        WHERE id = $1::uuid AND semi_franchise_id = $2 AND exposure_status = 'pending'
+        WHERE id = $1::uuid AND exposure_status = 'pending'
+          AND EXISTS (SELECT 1 FROM semi_franchises sf
+            WHERE sf.id = $2 AND ${recruitmentTargetMatch('seller_recruitments', 'sf')})
       RETURNING id, exposure_status::text AS "exposureStatus"`,
       [recruitmentId, sf.id, target, operatorId, note?.trim()?.slice(0, 1000) || null],
     ));
@@ -110,7 +113,7 @@ export class SemiFranchiseRecruitmentService {
               sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName",
               sra.id AS "applicationId", sra.status::text AS "applicationStatus"
          FROM seller_recruitments sr
-         JOIN semi_franchises sf ON sf.id = sr.semi_franchise_id AND sf.status = 'active'
+         JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
          JOIN semi_franchise_memberships sfm
            ON sfm.semi_franchise_id = sf.id AND sfm.organization_id = $1 AND sfm.status = 'active'
          LEFT JOIN seller_recruitment_applications sra
@@ -126,7 +129,7 @@ export class SemiFranchiseRecruitmentService {
     return this.dataSource.transaction(async (m) => {
       const [rec] = await m.query(
         `SELECT sr.id FROM seller_recruitments sr
-           JOIN semi_franchises sf ON sf.id = sr.semi_franchise_id AND sf.status = 'active'
+           JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
            JOIN semi_franchise_memberships sfm
              ON sfm.semi_franchise_id = sf.id AND sfm.organization_id = $2 AND sfm.status = 'active'
           WHERE sr.id = $1::uuid AND sr.exposure_status = 'approved' AND sr.status = 'recruiting'`,

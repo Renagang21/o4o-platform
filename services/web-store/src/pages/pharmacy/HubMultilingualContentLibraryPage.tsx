@@ -1,5 +1,5 @@
 /**
- * HubMultilingualContentLibraryPage — 매장 HUB 다국어 상품 콘텐츠 진열 + 가져오기(=복사)
+ * HubMultilingualContentLibraryPage — 제공 자료 다국어 상품 콘텐츠 진열 + 가져오기(=복사)
  *
  * WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
  *
@@ -8,7 +8,7 @@
  * 가져오면 내 약국 콘텐츠로 복사되어 이후 원본과 분리된다.
  *
  * 데이터 흐름:
- *   - HUB 목록: listMlcHub()  → GET /pharmacy/multilingual-product-contents/hub
+ *   - 제공 자료 목록: listMlcHub()  → GET /pharmacy/multilingual-product-contents/hub
  *   - 가져오기: importMlcFromHub({ sourceGroupId, targetKind, targetId })
  *               → POST /pharmacy/multilingual-product-contents/import
  *
@@ -124,7 +124,7 @@ export function HubMultilingualContentLibraryPage() {
       });
       toast.success(`"${importTarget.title}" 가져오기 완료 — 내 약국 콘텐츠(초안)에 복사되었습니다`);
       setImportTarget(null);
-      navigate(`/hub/multilingual-product-contents/my?groupId=${group.id}`);
+      navigate(`/store/library/multilingual-product-contents/my?groupId=${group.id}`);
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
@@ -135,7 +135,7 @@ export function HubMultilingualContentLibraryPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <header className="mb-6 pb-5 border-b-2 border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">매장 HUB 다국어 상품 콘텐츠</h1>
+        <h1 className="text-2xl font-bold text-slate-900">제공 자료 다국어 상품 콘텐츠</h1>
         {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 사본 정책 안내 표준화.
             ⚠ 다른 HUB 자원(블로그/POP/QR/동영상/사이니지)과 정책이 다르다 —
             backend import 가 (organization_id, target_kind, target_id, content_key) 기준

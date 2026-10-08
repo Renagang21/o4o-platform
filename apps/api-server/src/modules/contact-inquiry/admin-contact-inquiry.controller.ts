@@ -26,7 +26,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
 
 /** 본 contact 관리가 다루는 serviceKey(공통 ContactInquiry 사용 서비스). */
-const CONTACT_ADMIN_SERVICE_KEYS = ['k-cosmetics'] as const;
+const CONTACT_ADMIN_SERVICE_KEYS = ['k-cosmetics', 'lecture'] as const;
 const VALID_STATUSES = ['received', 'in_review', 'answered', 'closed', 'spam'] as const;
 
 function guardServiceKey(req: Request, res: Response): string | null {

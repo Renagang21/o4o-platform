@@ -6,7 +6,7 @@
  * WO-O4O-KPA-LEGACY-MANUAL-PRODUCT-APPLICATION-REMOVE-AND-LISTING-MANAGEMENT-PRESERVE-V1:
  *   깨진 구형 수동 판매 신청(externalProductId 자유입력 → 항상 400) 탭 제거.
  *   진열 관리·채널 설정 편집기(탭2)만 보존해 단일 목적 화면으로 축소.
- *   새 상품 추가는 매장 HUB 카탈로그(/store-hub/b2b · applyBySupplyProductId)로 일원화.
+ *   새 상품 추가는 제공 자료 카탈로그(/store-hub/b2b · applyBySupplyProductId)로 일원화.
  */
 
 import { useState, useEffect, useCallback } from 'react';

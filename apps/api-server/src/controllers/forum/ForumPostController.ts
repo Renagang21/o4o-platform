@@ -542,7 +542,7 @@ export class ForumPostController extends ForumControllerBase {
       // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
       // Author-only self-service; platform admin/super_admin retained as governance override.
       // Service operator moderation is handled via dedicated /forum/operator/* endpoints.
-      if (post.authorId !== userId && !isPlatformAdmin(userRoles)) {
+      if (post.authorId !== userId && !isPlatformAdmin(userRoles) && !this.getForumContext(req)?.communityOperator) {
         res.status(403).json({
           success: false,
           error: 'Permission denied',
@@ -619,6 +619,7 @@ export class ForumPostController extends ForumControllerBase {
       const moderationOverride = await this.hasForumModerationOverride(
         post.forumId,
         this.getUserFromReq(req).roles,
+        userId,
       );
       const isOwnerByCreester = forum.requester_id === userId;
       if (!moderationOverride && !isOwnerByCreester) {

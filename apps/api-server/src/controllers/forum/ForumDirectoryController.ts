@@ -37,6 +37,10 @@ export class ForumDirectoryController extends ForumControllerBase {
     //   아래 scope 분기들이 early return 하므로 반드시 그 앞에 AND 로 붙인다.
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
     const codes = this.getContextForumCodes(ctx);
+    if (ctx.excludeScopedCommunities) {
+      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%'`);
+      if (!codes) return;
+    }
     if (codes) {
       qb.andWhere(`${alias}.serviceCode IN (:...ctxForumCodes)`, { ctxForumCodes: codes.length ? codes : ['__none__'] });
     }
@@ -115,6 +119,7 @@ export class ForumDirectoryController extends ForumControllerBase {
       if (forum && ctxForumCodes && !ctxForumCodes.includes(forum.serviceCode)) {
         forum = null;
       }
+      if (forum && this.getForumContext(req)?.excludeScopedCommunities && /^(sf|community):/.test(forum.serviceCode)) forum = null;
 
       if (!forum) {
         res.status(404).json({
@@ -346,7 +351,8 @@ export class ForumDirectoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const forum = await this.forumRequestRepo.findOne({ where: { id } });
+      const forum = await this.isForumInServiceScope(id, this.getForumContext(req))
+        ? await this.forumRequestRepo.findOne({ where: { id } }) : null;
 
       if (!forum) {
         res.status(404).json({ success: false, error: 'Forum not found' });
@@ -393,7 +399,8 @@ export class ForumDirectoryController extends ForumControllerBase {
       }
 
       const { id } = req.params;
-      const forum = await this.forumRequestRepo.findOne({ where: { id } });
+      const forum = await this.isForumInServiceScope(id, this.getForumContext(req))
+        ? await this.forumRequestRepo.findOne({ where: { id } }) : null;
 
       if (!forum) {
         res.status(404).json({ success: false, error: 'Forum not found' });

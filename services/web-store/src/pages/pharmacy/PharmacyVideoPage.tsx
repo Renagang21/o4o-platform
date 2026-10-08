@@ -311,7 +311,7 @@ export function PharmacyVideoPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">내 매장 동영상</h1>
           <p className="text-sm text-slate-500 mt-1">
-            매장 HUB 에서 가져온 동영상 사본 목록입니다. 수정할 수 있으며, QR-code 로 연결하면
+            제공 자료 에서 가져온 동영상 사본 목록입니다. 수정할 수 있으며, QR-code 로 연결하면
             QR 스캔 시 동영상 전용 화면이 열립니다.
           </p>
         </div>
@@ -321,7 +321,7 @@ export function PharmacyVideoPage() {
             className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
           >
             <ExternalLink className="w-4 h-4" />
-            매장 HUB 동영상
+            제공 자료 동영상
           </button>
           <button
             onClick={() => navigate('/store/marketing/qr')}
@@ -479,7 +479,7 @@ export function PharmacyVideoPage() {
                 onClick={() => navigate('/hub/video')}
                 className="text-sm text-blue-600 hover:underline"
               >
-                매장 HUB 동영상에서 가져오기
+                제공 자료 동영상에서 가져오기
               </button>
             </div>
           )}

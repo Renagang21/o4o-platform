@@ -39,7 +39,8 @@ import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
-import { PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
+import { DEFAULT_SEMI_FRANCHISE_KEY, PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
+import { PHARMACY_RECRUITMENT_SERVICE_KEYS } from '../../neture-pharmacy/services/recruitment-target.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -94,12 +95,11 @@ export class SellerRecruitmentService {
     if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
 
     let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
-    // Store browse only: NULL is a legacy service recruitment, not a semi-franchise offering.
-    // Compare the actual row ID, never infer it from the host/service key.
-    if (filters?.storeOrganizationId !== undefined && recruitments.some((r) => r.semiFranchiseId)) {
-      const memberships: Array<{ semi_franchise_id: string }> = filters.storeOrganizationId
+    // 약국 문맥의 미지정 모집도 pharmacy 가입을 확인한다. 목록에서만 우회하지 않는다.
+    if (filters?.storeOrganizationId !== undefined) {
+      const memberships: Array<{ semi_franchise_id: string; key: string }> = filters.storeOrganizationId
         ? await AppDataSource.query(
-          `SELECT sfm.semi_franchise_id
+          `SELECT sfm.semi_franchise_id, sf.key
              FROM semi_franchise_memberships sfm
              JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
              JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
@@ -107,7 +107,10 @@ export class SellerRecruitmentService {
           [filters.storeOrganizationId],
         ) : [];
       const activeIds = new Set(memberships.map((m) => m.semi_franchise_id));
-      recruitments = recruitments.filter((r) => !r.semiFranchiseId || activeIds.has(r.semiFranchiseId));
+      const defaultActive = memberships.some((m) => m.key === DEFAULT_SEMI_FRANCHISE_KEY);
+      recruitments = recruitments.filter((r) => r.semiFranchiseId
+        ? activeIds.has(r.semiFranchiseId)
+        : PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(r.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number]) ? defaultActive : true);
     }
     return recruitments.map((r) => ({
       id: r.id,
@@ -353,15 +356,14 @@ export class SellerRecruitmentService {
   // ==================== Application (store/seller side) ====================
 
   /** Store/판매자의 모집 참여 신청 */
-  async createApplication(recruitmentId: string, applicantId: string, applicantName: string) {
+  async createApplication(recruitmentId: string, applicantId: string, applicantName: string, storeOrganizationId?: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
     if (recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
-    // Only an actual semi-franchise recruitment requires its own membership.
-    // Legacy service recruitments (NULL) retain their existing application flow.
-    if (recruitment.semiFranchiseId) {
+    if (recruitment.semiFranchiseId || PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(recruitment.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number])) {
+      if (!storeOrganizationId) throw new Error('STORE_CONTEXT_REQUIRED');
       const access = await AppDataSource.query(
         `SELECT sfm.id
            FROM organization_members om
@@ -369,9 +371,10 @@ export class SellerRecruitmentService {
            JOIN semi_franchise_memberships sfm ON sfm.organization_id = om.organization_id AND sfm.status = 'active'
            JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
           WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL
-            AND sf.id = $2
+            AND (sf.id = $2 OR ($2::uuid IS NULL AND sf.key = 'pharmacy'))
+            AND om.organization_id = $4::uuid
           LIMIT 1`,
-        [applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES]],
+        [applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES], storeOrganizationId],
       );
       if (!access.length) throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
     }
@@ -380,7 +383,7 @@ export class SellerRecruitmentService {
     if (existing) throw new Error('DUPLICATE_APPLICATION');
 
     const saved = await this.applicationRepo.save(
-      this.applicationRepo.create({ recruitmentId, applicantId, applicantName, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
+      this.applicationRepo.create({ recruitmentId, applicantId, applicantName, applicantOrganizationId: storeOrganizationId ?? null, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
     );
     logger.info(`[SellerRecruitmentService] application created: ${saved.id}`);
     return { id: saved.id, status: saved.status, appliedAt: saved.appliedAt };
@@ -515,7 +518,7 @@ export class SellerRecruitmentService {
     // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 승인 → 판매자 주문 가능화 (best-effort · idempotent)
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 모집은 승인된 약국 조직이
     //   모집 공급가로 바로 주문한다(공급 옵션 판정 SSOT). 사용자 단위 allowed_seller_ids · 진열 bridge 를 만들지 않는다.
-    if (!recruitment.semiFranchiseId) {
+    if (!recruitment.semiFranchiseId && !application.applicantOrganizationId) {
       try {
         await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
       } catch (bridgeError) {

@@ -23,6 +23,8 @@ export interface ForumCommentListItem {
   createdAt?: string;
   updatedAt?: string;
   isAuthor?: boolean;
+  /** 삭제 중재만 허용한다. 타인의 댓글 수정은 허용하지 않는다. */
+  canDelete?: boolean;
 }
 
 export interface ForumCommentListProps {
@@ -76,7 +78,7 @@ function CommentRow({
   const [draft, setDraft] = useState(comment.content);
   const [saving, setSaving] = useState(false);
 
-  const builtInActions = !renderCommentActions && comment.isAuthor && (onEditComment || onDeleteComment);
+  const builtInActions = !renderCommentActions && (comment.isAuthor || comment.canDelete) && (onEditComment || onDeleteComment);
 
   const handleSave = async () => {
     if (!draft.trim() || saving || !onEditComment) return;
@@ -105,7 +107,7 @@ function CommentRow({
           <div style={styles.actions}>{renderCommentActions(comment)}</div>
         ) : builtInActions && !editing ? (
           <div style={styles.actions}>
-            {onEditComment && (
+            {comment.isAuthor && onEditComment && (
               <button
                 type="button"
                 style={actionBtn}
@@ -117,7 +119,7 @@ function CommentRow({
                 수정
               </button>
             )}
-            {onDeleteComment && (
+            {(comment.isAuthor || comment.canDelete) && onDeleteComment && (
               <button
                 type="button"
                 style={{ ...actionBtn, color: '#dc2626' }}

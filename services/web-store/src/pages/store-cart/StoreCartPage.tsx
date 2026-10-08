@@ -29,7 +29,7 @@ export function StoreCartPage() {
     return <LoadingSpinner message="장바구니를 불러오는 중..." />;
   }
 
-  const goEventOffers = () => navigate('/hub/event-offers');
+  const goEventOffers = () => navigate('/store/pharmacy/supply');
 
   return (
     <StoreCartView
@@ -41,7 +41,7 @@ export function StoreCartPage() {
           title="내 장바구니"
           breadcrumb={[
             { label: '홈', href: '/' },
-            { label: '매장 허브', href: '/hub' },
+            { label: '공급 상품', href: '/store/pharmacy/supply' },
             { label: '내 장바구니' },
           ]}
         />

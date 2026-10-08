@@ -24,7 +24,7 @@ export default function HomePage() {
       <Link className="secondary-link" to={WORKSPACE_PATHS.serviceWork}>서비스 업무</Link>
       {pharmacy
         ? <Link className="secondary-link" to={pharmacyStorePath('supply')}>공급 상품</Link>
-        : !retiredOnly && <Link className="secondary-link" to={WORKSPACE_PATHS.storeHub}>매장 HUB</Link>}
+        : !retiredOnly && <Link className="secondary-link" to={WORKSPACE_PATHS.library}>제공 자료</Link>}
       <Link className="secondary-link" to={WORKSPACE_PATHS.myServices}>내 서비스</Link>
     </div>
   </section></main>;

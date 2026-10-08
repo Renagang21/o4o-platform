@@ -16,7 +16,7 @@ import { fetchMyForumPosts } from '../../services/forumApi';
 const PAGE_SIZE = 20;
 const ACCENT = '#059669';
 
-export default function MyPostsPage() {
+export default function MyPostsPage({ basePath = '/forum' }: { basePath?: string } = {}) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,7 +52,7 @@ export default function MyPostsPage() {
   return (
     <main className="min-h-screen bg-slate-50 py-8">
       <div className="mx-auto max-w-5xl px-4">
-        <button className="mb-2 text-sm text-emerald-600" onClick={() => navigate('/forum')} type="button">
+        <button className="mb-2 text-sm text-emerald-600" onClick={() => navigate(basePath)} type="button">
           ← 커뮤니티 홈
         </button>
         <MyForumPostsTemplate
@@ -91,7 +91,7 @@ export default function MyPostsPage() {
               <div className="mt-3">
                 <button
                   className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
-                  onClick={() => navigate('/forum/write')}
+                  onClick={() => navigate(`${basePath}/write`)}
                   type="button"
                 >
                   글쓰기

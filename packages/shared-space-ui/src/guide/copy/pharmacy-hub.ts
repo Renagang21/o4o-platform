@@ -12,7 +12,7 @@
  *   - 구현되지 않은 기능은 안내하지 않는다.
  *
  * PharmacyHub 실제 기능 축 (2026-08-20 기준):
- *   커뮤니티  /community · /forum · /education
+ *   커뮤니티  /community · /forum
  *   약국 상품·거래  /store-owner/products · /cart · /orders (+ /payment)
  *   매장 제품  /store-owner/handled-products · /local-products
  *   콘텐츠·자료함  /store-owner/content · /library · /blog
@@ -116,19 +116,12 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
       title: '커뮤니티 이용 방법',
       href: '/guide/features',
       description:
-        '포럼 · 내 글 · 콘텐츠 공개 절차와 O4O 강의 이동 경로를 정리했습니다. 각 항목을 누르면 해당 기능 또는 기능별 매뉴얼로 이동합니다.',
+        '포럼 · 내 글 · 콘텐츠 공개 절차를 정리했습니다. 각 항목을 누르면 해당 기능 또는 기능별 매뉴얼로 이동합니다.',
       items: [
         {
           label: '포럼 이용 방법',
           detail: '포럼 글쓰기는 PharmacyHub 가입 승인 후 가능합니다.',
           href: '/guide/features/forum',
-        },
-        {
-          // Phase 2 §14: 강의는 독립 서비스 O4O 강의가 소유한다. PharmacyHub 의 /education 은
-          // 외부 이동 진입점만 남으므로 "PharmacyHub 에 등록된 강의" 안내는 두지 않는다.
-          label: 'O4O 강의로 이동',
-          detail: '교육 강의는 독립 서비스 「O4O 강의」(study.neture.co.kr)에서 제공합니다.',
-          href: '/education',
         },
         {
           label: '내가 쓴 글 확인',
@@ -412,11 +405,10 @@ export const pharmacyHubGuideUsageProps: GuideUsagePageProps = {
     {
       step: '02',
       title: '커뮤니티 참여',
-      routeLabel: '/community · /forum · /education',
-      description: '운영 정보를 나누고 교육 콘텐츠를 이용합니다. 승인 전에도 커뮤니티 진입점은 열려 있습니다.',
+      routeLabel: '/community · /forum',
+      description: '승인된 커뮤니티에서 약국 운영 정보를 나눕니다.',
       items: [
         { label: '포럼', detail: '약국 운영과 상품에 대한 글을 읽고 작성합니다.' },
-        { label: '교육', detail: '교육 과정과 강의를 순서대로 학습합니다.' },
         { label: '검색 · 내 글', detail: '커뮤니티 글을 검색하고 내가 쓴 글을 모아 봅니다.' },
       ],
     },
@@ -486,13 +478,11 @@ export const pharmacyHubGuideFeaturesProps: GuideFeaturesPageProps = {
       step: '01',
       title: '커뮤니티',
       primaryRoute: '/community',
-      description: '약국 운영 정보를 나눕니다. 교육 강의는 독립 서비스 「O4O 강의」에서 제공합니다.',
+      description: '약국 운영 정보를 나눕니다.',
       items: [
         { label: '포럼', route: '/forum' },
         { label: '커뮤니티 검색', route: '/community/search' },
         { label: '내 글', route: '/forum/my-posts' },
-        // Phase 2 §14: /education 은 O4O 강의(study.neture.co.kr) 외부 이동 진입점.
-        { label: 'O4O 강의로 이동', route: '/education' },
       ],
       linkTo: '/guide/features/forum',
     },

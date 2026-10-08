@@ -239,6 +239,12 @@ importers:
 
   apps/admin-dashboard:
     dependencies:
+      '@o4o/error-handling':
+        specifier: workspace:*
+        version: link:../../packages/error-handling
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@babel/runtime':
         specifier: ^7.28.4
         version: 7.28.4
@@ -2512,6 +2518,9 @@ importers:
 
   services/web-lecture:
     dependencies:
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -2543,6 +2552,15 @@ importers:
         specifier: ^7.9.6
         version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.4.22(postcss@8.5.6)
+      postcss:
+        specifier: ^8.4.38
+        version: 8.5.6
+      tailwindcss:
+        specifier: ^3.4.17
+        version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -2776,6 +2794,9 @@ importers:
 
   services/web-store:
     dependencies:
+      '@o4o/operator-core-ui':
+        specifier: workspace:*
+        version: link:../../packages/operator-core-ui
       '@o4o/account-ui':
         specifier: workspace:*
         version: link:../../packages/account-ui

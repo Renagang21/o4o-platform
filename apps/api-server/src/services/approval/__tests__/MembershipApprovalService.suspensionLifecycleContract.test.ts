@@ -242,29 +242,32 @@ describe('§12 active → suspended → active 왕복', () => {
       const storeOwnerRole = `${prefix}:store_owner`;
 
       await suspend([serviceKey]);
-      expect(activeRoles()).not.toContain(storeOwnerRole);
+      if (serviceKey === 'kpa-society') {
+        expect(activeRoles()).toContain(storeOwnerRole);
+      } else {
+        expect(activeRoles()).not.toContain(storeOwnerRole);
+      }
 
       await reactivate([serviceKey]);
       if (serviceKey === 'kpa-society') {
-        // KPA membership reactivation cannot restore pharmacy ownership.
-        expect(activeRoles()).not.toContain(storeOwnerRole);
+        // 별도 약국 승인 표식을 KPA 정지·복구가 변경하지 않는다.
+        expect(activeRoles()).toContain(storeOwnerRole);
       } else {
         expect(activeRoles()).toContain(storeOwnerRole);
       }
     },
   );
 
-  it('neture — 재활성화는 연결 서비스 역할(neture:store_owner)을 복구하지 않는다 (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10)', async () => {
+  it('neture — 정지·복구는 별도 내 매장 승인 표식을 변경하지 않는다', async () => {
     // Neture 메인 가입 재활성화는 연결 서비스(내 매장(약국)) 권한을 바꾸지 않는다.
-    // 정지 시 회수(cascade)는 기존 동작 유지 — 별도 트랙에서 정리한다.
     seedAllFive({ membershipRole: 'store_owner', pharmacyOwner: true });
 
     await suspend(['neture']);
-    expect(activeRoles()).not.toContain('neture:store_owner');
+    expect(activeRoles()).toContain('neture:store_owner');
 
     await reactivate(['neture']);
     expect(statusOf('neture')).toBe('active');
-    expect(activeRoles()).not.toContain('neture:store_owner');
+    expect(activeRoles()).toContain('neture:store_owner');
     expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
   });
 

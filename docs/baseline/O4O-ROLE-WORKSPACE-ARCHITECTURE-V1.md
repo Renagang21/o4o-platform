@@ -1,13 +1,23 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 세미프랜차이즈 = 데이터 행 · 세미프랜차이즈 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-08 (§0 · §2 · §3 · §4 · §5 · §6 현재 서비스 재배치 정책·사용자 결정·재대조 작업안) · 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 세미프랜차이즈 = 데이터 행 · 세미프랜차이즈 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
 ---
 
 ## 0. 이 문서가 정하는 것 · 정하지 않는 것
+
+**2026-10-08 사용자 정정 — 현재 Neture 서비스 재배치 기준** ([전체 작업 ToDo](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)):
+
+- 약국 경영자의 약국과 내 매장은 하나다. 한 약국이 여러 세미프랜차이즈 서비스를 이용하며 그 제공 기능을 같은 내 매장에 적용한다. 서비스별 구획은 탭 등으로 표현한다. 별개 내 매장은 권한·자료·장바구니·주문을 독립적으로 관리한다.
+- 각 세미프랜차이즈는 독립된 약국 지원 사업자다. 혈당관리·협동조합 등 사업별 업무는 해당 사업에 맞게 개발한다. 공통 가입 식별과 권한 격리는 업무 표준화나 범용 개설 기능의 근거가 아니다.
+- 각 서브도메인에는 해당 서비스의 관리자(=운영자)가 있고 자기 공간에서 업무를 관리한다. 공급자·펀딩·커뮤니티 관리도 각각 해당 호스트에 배치한다. 전체관리자는 admin.neture.co.kr에만 두며 서비스 관리 주체와 구분한다. 기존 role 문자열을 주소나 용어 변경 때문에 일괄 바꾸지 않는다.
+- 매장 HUB의 필요한 기능은 내 매장 공급 화면·자료함과 세미프랜차이즈 회원 커뮤니티에 배치한다. HUB는 이용 중간 단계로 두지 않는다. 과거 구현 기록의 HUB 화면 보존은 현재 완료 기준이 아니다.
+- community 공간은 독립 가입 커뮤니티와 사업 참여자 전용 커뮤니티를 함께 제공한다. 기존 약사 커뮤니티는 독립 가입으로 유지하고 pharmacy 사업 회원 포럼은 별도로 둔다. 두 공간의 식별·가입·게시글을 합치지 않는다. 사업자별 포럼 등은 해당 사업 참여 회원만 이용한다. 가입 정지·종료 시 제품 공급·회원 커뮤니티 참여를 차단하며 이미 가져온 사본은 매장 소유로 남는다.
+- 강좌는 커뮤니티에서 완전히 제거하고 독립 서비스 study.neture.co.kr로 이전한다. 강좌와 펀딩은 내 매장과 독립이며 Neture 메인에서 접근한다. 분회 연수 이력·학점은 강좌 서비스와 구분한다.
+- 전체 작업안은 초안 ToDo → 코드·문서 점검 → ToDo 수정 → 필요한 결정 논의 → 수정 ToDo 재점검 → 최종안 순서로 만든다. 문서 정비를 먼저 실행해 계획을 확정한 것으로 간주하지 않는다. 아래 역사적 구현 상태와 현행 정책은 구분한다.
 
 **정한다** — O4O 전체를 "서비스별 애플리케이션 구조" 에서 **"사용자 역할별 업무공간 구조"** 로 리팩터링하기 위한 최상위 기준. 업무공간의 구성, 역할 간 콘텐츠 제공 경로, Store ↔ Service 관계의 기대 모델, Legacy Partner 의 처분, 리팩터링 전 단계에 적용할 실행 규칙.
 
@@ -46,7 +56,7 @@ Supplier
 ### 2-1. 공급자 콘텐츠의 공식 온라인 제공 경로
 
 ```text
-Supplier → Store Hub          (매장 HUB 로 제공)
+Supplier → 내 매장 자료함       (이용 가능한 공개 자료 목록)
 Supplier → Service Operator   (서비스 운영자에게 제공)
 ```
 
@@ -58,10 +68,10 @@ Supplier → Community 직접 게시           ✕
 ```
 
 - 특정 매장에 직접 자료를 줄 필요가 있으면 **O4O 밖에서** 전달하고, Store 가 필요 시 **직접 등록**한다 (§5 Store Direct Authoring).
-- 이 절은 `O4O-BUSINESS-PHILOSOPHY-V1` §3 의 "공급자는 O4O 내부에서 콘텐츠를 직접 제작·등록하는 주체가 아니다" 와 `O4O-3-ROLE-FLOW-BASELINE-V1` §6 의 "공급자가 O4O 시스템에서 직접 HUB 콘텐츠를 제작·게시 금지" 를 **대체**한다. 공급자는 Content 를 가지며, Store Hub 와 Service Operator 에 온라인으로 제공한다.
-- Store Hub 에 도달한 공급자 콘텐츠에 운영자 검수·승인이 개입하는지는 **이 문서가 정하지 않는다.** 현행 서비스별 정책(예: [`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 원칙 4 = 운영자 승인 없이 유입)이 각자 유지되며, 통일은 Supplier / Store Hub 리팩터링 단계 WO 가 정한다.
+- 이 절은 `O4O-BUSINESS-PHILOSOPHY-V1` §3 의 "공급자는 O4O 내부에서 콘텐츠를 직접 제작·등록하는 주체가 아니다" 와 `O4O-3-ROLE-FLOW-BASELINE-V1` §6 의 "공급자가 O4O 시스템에서 직접 HUB 콘텐츠를 제작·게시 금지" 를 **대체**한다. 공급자는 Content 를 가지며, 매장에서 이용 가능한 자료 목록과 Service Operator 에 온라인으로 제공한다. 특정 매장을 대상으로 직접 전송하는 경로와는 구분한다.
+- 공급자 콘텐츠의 운영자 검수·승인은 현행 서비스별 정책을 따른다. 내 매장으로 화면을 옮긴다는 이유로 열람·사본 권한을 확대하지 않는다. 아래 adapter 계약을 대조하고 필요한 기능을 재배치한다.
 - **구현 계약 상세화 (2026-09-16, `WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`)** — 공급자 콘텐츠의 canonical 원장은 `neture_supplier_library_items` 하나다(새 원장 없음).
-  · `Supplier → Store Hub` = Hub source adapter `sourceDomain=supplier-library` (`is_public=true` 행을 `storeWorkspaceEnabled` 서비스의 Store Hub 에 노출 · 사본 없음 · 특정 매장 대상 없음 · Hub UI 편입은 Store Workspace 단계).
+  · 당시 `Supplier → Store Hub` = Hub source adapter `sourceDomain=supplier-library` (`is_public=true` 행 노출 · 사본 없음 · 특정 매장 대상 없음). 현재는 이 열람 계약을 유지하며 내 매장으로 화면을 재배치한다. adapter 이름이 남았다는 이유로 중간 HUB 화면을 유지하지 않는다.
   · `Supplier → Service Operator` = `POST /neture/library/:id/handoff {serviceKey}` — 대상은 canonical catalog(`operatorWorkspaceEnabled=true` + `workspaceMode=standard`)에서만 파생, 수신은 기존 `cms_contents(authorRole=supplier, status=pending)` 계약 재사용. 제공 후 검토·수정·발행은 운영자 업무이며 **공급자 책임은 제공에서 끝난다** (상태 기계 · 전송 엔진 · lineage 없음).
 
 ---
@@ -72,20 +82,19 @@ Supplier → Community 직접 게시           ✕
 Store Workspace
 ├─ Home
 ├─ My Store
-├─ Store Hub
 └─ My Services
 ```
 
 - **한 Store 는 여러 Service 에 가입할 수 있어야 한다** (1 Store : N Services). 데이터 모델 판정은 IR §A — `organizations` 는 서비스 중립이며 `organization_service_enrollments`(UNIQUE(organization_id, service_code)) 가 이미 1:N 을 표현한다. 신규 Store-Service 테이블을 만들지 않는다.
 - **My Store 와 Store Hub 의 기존 공통 Core 는 재작성하지 않고 최대한 유지**한다 (`store-core` · `store-ui-core` · `hub-core` · `asset-copy-core` · [`STORE-LAYER-ARCHITECTURE`](../architecture/STORE-LAYER-ARCHITECTURE.md) F3).
-- My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 서비스별로 달라지는 것은 My Services (§4) 안에서만 표현한다.
-- **주소 정합 (2026-10-03 표기)**: 이 Store Workspace 의 공통 주소는 `store.neture.co.kr`(serviceKey 없음 · 약국 · 화장품 · 소매 운영 영역 · Store Owner / Store Member 접근 모델)이며, 서비스 운영자의 서비스 Hub(`pharmacy` · `retail`)와 구분한다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3. 아래 §3-1 은 서비스 앱 안 `/store` 기준의 2026-09-16 구현 기록이며, 통합 주소로의 이전 진행은 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21 이 기록한다.
+- My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 같은 약국이 가입한 서비스의 기능은 내 매장 안에서 탭 등으로 구획하며, 서비스별 조건·출처·접근 권한을 유지한다. My Services (§4)는 가입 상태와 진입을 정리한다.
+- **주소 정합 (2026-10-08)**: 공통 주소는 `store.neture.co.kr`이며 현재 신규 가입은 약국 전용이다. 약국 경영자의 내 매장과 각 독립 사업자의 운영 공간을 구분한다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3. 아래 §3-1 은 서비스 앱 안 `/store` 기준의 2026-09-16 구현 기록이다. 현재 전체 이전 작업은 §0의 ToDo가 관리하며, 기존 주소 전환 근거는 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21에서 대조한다.
 
-- **Neture 약국 매장 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 약국 매장 이용자에게는 **Store Hub 단계가 없다** — 내 매장이 이용 권한이 있는 상품 · 이벤트 · 모집 · 콘텐츠를 직접 판정해 보여주며, "Hub 진열 → 가져오기 → 취급 등록 → 주문" 을 주문 전제로 두지 않는다. 약국 매장 기본 게이트 = 내 매장(약국) 신청 · 승인 원장(`neture_pharmacy_memberships`, 2026-10-07 명칭 정정 — 과거 "Neture 기본 가입". Neture 메인 가입 `service_memberships('neture')` 과 다른 원장이며 신청 · 승인 전제로만 읽는다), 세미프랜차이즈(pharmacy 포함) = Service 가 아니라 **데이터 행**(`semi_franchises` · 약국 조직 단위 `semi_franchise_memberships`)이며 My Services 의 `organization_service_enrollments` 로 표현하지 않는다. Store Hub 코드는 이 트랙에서 지우지 않았지만 K-Cosmetics 보존을 전제로 남긴 것이 아니다(K-Cosmetics 퇴역 결정 2026-10-05 — 제거 범위는 퇴역 작업이 정한다). 기준: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §5 · §6.
+- **Neture 약국 매장 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 약국 매장 이용자에게는 **Store Hub 단계가 없다** — 내 매장이 이용 권한이 있는 상품 · 이벤트 · 모집 · 콘텐츠를 직접 판정해 보여주며, "Hub 진열 → 가져오기 → 취급 등록 → 주문" 을 주문 전제로 두지 않는다. 약국 매장 기본 게이트 = 내 매장(약국) 신청 · 승인 원장(`neture_pharmacy_memberships`, 2026-10-07 명칭 정정 — 과거 "Neture 기본 가입". Neture 메인 가입 `service_memberships('neture')` 과 다른 원장이며 신청 · 승인 전제로만 읽는다), 세미프랜차이즈(pharmacy 포함) = Service 가 아니라 **데이터 행**(`semi_franchises` · 약국 조직 단위 `semi_franchise_memberships`)이며 My Services 의 `organization_service_enrollments` 로 표현하지 않는다. 2026-10-08 재배치 branch에서 내 매장 자료함으로 기능을 이전하고 중복 HUB 화면을 제거했다. 옛 HUB 주소는 기능별 목적지로 연결하며 공통 API·Core는 유지한다. 기준: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §5 · §6.
 
 ### 3-1. 구현 상태 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 · 2026-09-16)
 
-- **상위 구조 구현 = 1 (`@o4o/store-ui-core` `workspace/`)** — `resolveStoreWorkspacePaths(config)` 가 서비스 `basePath` 에서 `Home = <base>/workspace` · `My Store = <base>` · `Store Hub = /store-hub`(공통) · `My Services = <base>/services` 를 파생한다 (KPA · KCos `/store`, Pharmacy Hub `/store-owner` — PG callback 경로 불변). 서비스는 `StoreWorkspaceNav` 를 `MyStoreShell.banner` 슬롯과 Store Hub 레이아웃 위에 조립만 하고, Home / My Services 는 `StoreWorkspaceShell` + `StoreWorkspaceHomeView` / `MyServicesView` 조립만 한다. `MyStoreShell` · `StoreHubShell` · `store-core` · `hub-core` · `asset-copy-core` 는 재작성하지 않았다.
+- **기존 서비스 연결 helper (현재 주소 adapter의 기반)** (`@o4o/store-ui-core` `workspace/`) — `resolveStoreWorkspacePaths(config)` 가 서비스 `basePath` 에서 `Home = <base>/workspace` · `My Store = <base>` · `Store Hub = /store-hub`(공통) · `My Services = <base>/services` 를 파생한다 (KPA · KCos `/store`, Pharmacy Hub `/store-owner` — PG callback 경로 불변). 서비스는 `StoreWorkspaceNav` 를 `MyStoreShell.banner` 슬롯과 Store Hub 레이아웃 위에 조립만 하고, Home / My Services 는 `StoreWorkspaceShell` + `StoreWorkspaceHomeView` / `MyServicesView` 조립만 한다. `MyStoreShell` · `StoreHubShell` · `store-core` · `hub-core` · `asset-copy-core` 는 재작성하지 않았다.
 - **My Store canonical = KPA 기반 공통 `MyStoreShell` 1개.** 세 서비스 모두 공통 `StoreOwnerGuard(serviceKey)` + 서비스 `MembershipGate` 로 진입하며 매장 자산 경계는 `organizationId` 다. 서비스별 메뉴 집합 차이는 `StoreDashboardConfig` 의 실제 capability 차이(REAL_STORE_CAPABILITY_DIFFERENCE) 또는 구현 시점 차이이지, My Store 구현이 복수라는 뜻이 아니다.
 - **My Services 출처 = `GET /api/v1/work-scope/store-services` 하나.** 표시 조건 `enrollmentStatus=active AND workspaceAvailable=true`(= §4-1). 다른 서비스 진입은 기존 `POST /auth/handoff` → 대상 서비스 My Store. 새 membership 테이블 0 · 권한 판정 0.
 - **대표 홈(Neture) "내 매장" 진입 = 각 서비스 Store Workspace Home.** 대상 서비스 목록은 하드코딩이 아니라 catalog `storeWorkspaceEnabled` ∩ store_owner role registry 파생(`listStoreCapableServices`) — 권한 SSOT 는 그대로다.
@@ -103,7 +112,9 @@ My Services
 └─ Service C
 ```
 
-Service 내부 (표준 Service Operator 최상위 IA — 2026-09-16 확정):
+기존 Service Operator의 메뉴 분류 (2026-09-16 확정):
+
+각 세미프랜차이즈의 실제 업무·화면은 독립 사업에 맞게 개발한다. 아래 분류나 공통 UI를 재사용한다는 이유로 신규 사업의 기능과 운영 절차를 동일하게 만들지 않는다.
 
 ```text
 Home
@@ -143,31 +154,30 @@ Home
 
 ## 5. Community Workspace
 
-> `WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1` (2026-09-16) 이 확정. 종전 "Industry Community" 방향은 **폐기(RETIRED)** — Industry / IndustryMembership / IndustryCommunity / Industry-Service mapping 을 만들지 않는다.
+2026-10-08 사용자 결정과 [전체 재배치 WO](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)를 적용한다. 초기 Industry Community 방향은 **RETIRED**이며 범용 policy engine·workflow engine을 만들지 않는다.
 
 ```text
 Community Identity ≠ Service Identity
-
-O4O Community Workspace
-├─ 약사 커뮤니티      (pharmacy)      참여 = kpa-society OR pharmacy-hub active membership
-├─ 화장품 커뮤니티    (cosmetics)     참여 = k-cosmetics active membership
-└─ O4O 공통 커뮤니티  (o4o-general)   참여 = authenticated O4O user (Neture membership · role 불요)
+community.neture.co.kr
+├─ 독립 약사 커뮤니티 (pharmacy) — 개별 가입·승인 유지
+├─ O4O 공통·개설 승인 커뮤니티 — 개별 가입·승인
+└─ 각 세미프랜차이즈 회원용 공간 — 해당 사업의 활성 가입
 ```
 
-- **Community 는 Service 와 독립된 별도 Identity 다.** Service 는 Community 의 소유자가 아니며, Service membership 은 특정 Community 의 **참여 자격 조건 중 하나**일 뿐이다. `Community = Service` · `Community isolation = serviceKey 자체` 는 현행 구조가 아니다.
-- **Community Catalog SSOT = `apps/api-server/src/config/community-catalog.ts` (`O4O_COMMUNITIES`).** 초기 3개는 고정 enum 이 아니라 등록값이다 — 새 Community = Catalog 등록 + participation policy + capabilities(forum/content/resources/education) + UI metadata(entries). Forum / Content / Resources / LMS 공통 Core 는 수정하지 않는다. `key` 는 string 이며 고정 union 을 복제하지 않는다.
-- **Participation policy 는 두 가지뿐**: `authenticated` · `service_membership_any(serviceKeys)`. 범용 policy engine · rule builder · workflow engine 없음. 새 Service 가 약사 커뮤니티에 참여하려면 `pharmacy.participationPolicy.serviceKeys` 에 추가하는 것으로 끝난다.
-  - **예외 1종 — 세미프랜차이즈 커뮤니티 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: `communities.slug` 가 `semi_franchises.community_key` 인 커뮤니티는 별도 커뮤니티 가입 없이 **그 세미프랜차이즈 가입이 `active` 인 약국 조직의 owner/admin/manager** 만 참여한다(정지 · 종료 · 미가입 = 차단). `community_memberships` 행을 만들거나 동기화하지 않는다. 일반 커뮤니티의 독립 가입 정책은 그대로 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §7.
-- **참여 판정 = `resolveCommunityAccess(user, communityKey)` 한 곳** (`utils/community-access.resolver.ts`, 기존 service_memberships 를 **읽기만**). Community 접근을 위해 membership · role · enrollment 를 만들지 않는다 (PH 만 가입한 회원 → 약사 커뮤니티 O, KPA My Services X, KPA membership 생성 0). 읽기 계약은 `GET /api/v1/communities`(목록 + canParticipate) · `/communities/:key/access`. 프런트가 `if (hasKpaMembership)` 를 반복하지 않는다.
-- **참여 자격 ≠ 운영 권한 ≠ 공개 read.** 운영자 권한(승인·중재)은 각 forum 원장의 `service_code` 서비스 운영자가 그대로 맡는다(다중 운영 governance engine 없음). 비로그인 read 정책은 기존 route 계약 그대로다.
-- **약사 커뮤니티는 하나다.** KPA `/kpa/forum` 과 Pharmacy-Hub `/pharmacy-hub/forum` 은 같은 `communityKey=pharmacy` context(원장 코드 kpa-society + pharmacy-hub 합집합)를 소비한다 — URL 이 여러 개여도 데이터 · Identity 는 하나 (PH 별도 약사 Community = 0). O4O 공통 커뮤니티는 종전 Neture 커뮤니티 구현을 **seed** 로 재사용하지만 identity 는 `o4o-general` 이며 "Neture Community" 라는 business identity 는 없다.
-- **Forum Core 는 하나** (`createServiceForumRouter` · `ForumControllerBase` · `ForumQueryService`). `ForumContext.communityKey` 가 논리 경계이고, 물리 원장 `forum_category_requests.service_code` 는 (a) 파티션 (b) 운영 governance 를 겸하는 실제 Service scope 라 rename 하지 않는다 — Catalog `forumStorageCodes` 가 `논리 communityKey → 물리 코드 집합` adapter 다(dual-read · bridge table · lineage 없음). 새 business logic 은 `community == serviceKey` 를 가정하지 않는다.
-- **Content · Resources · Education** 은 Content Boundary Alignment 의 `Community Content ≠ Service Content` 를 유지한다. 현재 물리 원장(`cms_contents.serviceKey` · `lms_courses.service_key`)은 실제 Service scope(운영자 승인 · course scope · points)와 공유되므로 rename 하지 않고 EXISTING_BOUNDARY_REUSED 로 둔다 — 논리 귀속은 Catalog `capabilities` 와 participation policy 로 표현하며 Core 재작성은 하지 않는다.
-- Community → My Store 는 §6 의 Copy 계약(독립 사본 · auto sync 0)을 그대로 쓴다. Community 가 늘어나도 같다.
-
----
+- 독립 커뮤니티는 `communities`·`community_memberships`를 사용한다. 정상 메인 계정·커뮤니티 active·개별 승인·해당 카탈로그 정책을 함께 확인한다. 약사 커뮤니티는 KPA/PH 서비스 가입을 추가로 요구하지 않는다. 기존 화장품 identity는 퇴역 잔여 계약에 따른 현재 scope를 유지하며 서비스를 복구하지 않는다.
+- 사업 회원 커뮤니티는 `semi_franchises.community_key`로 식별한다. 독립 커뮤니티 행이나 가입 원장을 생성·동기화하지 않는다. 활성 약국 승인·같은 조직의 owner/admin/manager·활성 사업 가입을 확인한다. 담당 지정과 현재 운영 역할을 가진 사업자는 약국 소유 없이 자기 공간을 관리한다. 폐쇄·정지·종료는 같은 판정에서 차단한다.
+- 독립 약사 커뮤니티와 pharmacy 사업 포럼은 다른 공간이다. 카탈로그·독립 커뮤니티·개설 신청·다른 사업 간 주소 충돌을 공통 transaction advisory lock 아래 차단한다.
+- 목록·access·게시판 경계는 `resolveCommunityWorkspace`가 현재 DB 상태를 읽어 판정한다. 카탈로그(`community-catalog.ts`)는 기존 공간의 표시·정책·저장 코드 adapter를 제공한다. 새 독립 DB 커뮤니티 개설을 고정 카탈로그에 등록해야 이용할 수 있는 구조로 만들지 않는다.
+- **Forum Core는 하나다.** 기존 약사 게시판은 `kpa-society`·`pharmacy-hub`, 공통 게시판은 `neture` 코드를 보존한다. 신규 공간은 `community:<UUID>`·`sf:<UUID>`를 사용한다. 기존 저장 범위와 역할 이름을 변경하거나 백필하지 않는다.
+- `/communities/:key/forum`는 기존 Forum router/controller를 재사용해 글·댓글·좋아요·게시판 개설/심사·소유 게시판 회원 관리·담당 운영자의 중재를 제공한다. 서버가 저장 범위와 관리 가능 여부를 정하며 클라이언트 serviceCode를 권한으로 신뢰하지 않는다. 일반 공개 Forum API에서 신규 회원 공간을 열람할 수 없다.
+- **참여 자격과 운영 권한은 구분한다.** 독립 커뮤니티 가입 심사는 기존 개체 운영자, 개설/운영자 지정은 community 서비스 관리자, 사업 포럼 관리는 해당 사업 담당자가 수행한다. 다른 사업이나 플랫폼 전체 권한을 합성하지 않는다.
+- 콘텐츠·자료는 현행 출처·Copy 계약을 유지한다. 강좌·학습·강사·강좌 문의는 study의 독립 서비스이며 커뮤니티 capability에 넣지 않는다. 분회 연수 이력·학점·자격 업무는 분회에 남긴다.
+- Community → My Store는 §6의 독립 사본 계약을 사용한다. 사업 가입 정지 후 기존 사본을 회수하지 않고 신규 원본·공급·포럼만 차단한다.
+- 현재 branch의 구현·로컬 검증과 운영 배포·업무 확인은 [CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)에 각각 기록한다.
 
 ## 6. Store 콘텐츠 유입 경로
+
+**현재 재배치 기준(2026-10-08)**: 아래 도식은 기존 출처·사본 계약의 기록이다. 이용 가능한 콘텐츠는 내 매장 자료함에서 출처별로 직접 이용하며 Store Hub를 거치지 않는다. 공급자 공개 자료는 §2-1의 열람 계약을 따른다. 자료 열람과 사본 생성 권한은 같다고 가정하지 않는다.
 
 공식 경로는 세 개만 둔다.
 

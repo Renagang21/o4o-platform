@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { ForumRequestForm, type ForumRequestFormPayload } from '@o4o/shared-space-ui';
 import { createForumCategoryRequest } from '@/services/forumApi';
 
-export default function ForumRequestPage() {
+export default function ForumRequestPage({ basePath = '/forum' }: { basePath?: string } = {}) {
   const navigate = useNavigate();
 
   const handleSubmit = async (payload: ForumRequestFormPayload) => {
@@ -29,8 +29,8 @@ export default function ForumRequestPage() {
   return (
     <ForumRequestForm
       onSubmit={handleSubmit}
-      onSuccess={() => setTimeout(() => navigate('/forum'), 3000)}
-      backTo="/forum"
+      onSuccess={() => setTimeout(() => navigate(basePath), 3000)}
+      backTo={basePath}
       backLabel="포럼으로 돌아가기"
       title="새 포럼 신청"
       description={(

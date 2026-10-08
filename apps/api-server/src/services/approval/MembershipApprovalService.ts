@@ -196,7 +196,7 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
  * 공급자(`supplier`) · 내 매장(약국)(`neture:store_owner`) 역할은 각 연결 서비스의 승인 경로
  * (공급자 승인 · 내 매장(약국) 승인)만 부여 · 회수한다. 따라서 Neture 가입의 승인 · 반려 · 재활성화는
  * 이 역할들을 부여 · 회수 · 복구하지 않는다 — legacy membership.role 에 'supplier' 등이 남아 있어도 같다.
- * (정지 시 회수 = 정지 연쇄 정책은 별도 트랙 — suspend 경로는 이 판정을 쓰지 않는다.)
+ * 메인 정지도 연결 서비스의 승인 표식을 회수하지 않는다. 접근은 현재 메인 자격으로 차단한다.
  */
 const NETURE_CONNECTED_SERVICE_ROLES = new Set(['supplier', 'neture:supplier', 'store_owner', 'neture:store_owner']);
 function isNetureConnectedServiceRole(serviceKey: string, role: string | null | undefined): boolean {
@@ -669,7 +669,7 @@ export class MembershipApprovalService {
         logger.error('[REJECTION][STEP2] user_id is null — role deactivation skipped', {
           membershipId, serviceKey: membership.service_key,
         });
-      } else if (isNetureConnectedServiceRole(membership.service_key, grantedRole)) {
+      } else if (isNetureConnectedServiceRole(membership.service_key, grantedRole) || (membership.service_key === 'kpa-society' && grantedRole === 'kpa:store_owner')) {
         logger.info('[REJECTION][STEP2] neture connected-service role — deactivation skipped', {
           userId, role: grantedRole,
         });
@@ -826,6 +826,10 @@ export class MembershipApprovalService {
         // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: 승인 시 부여한 역할과 동일하게 계산 +
         //   legacy 중복 row 로 인한 unique constraint 충돌 방어 (deactivateRoleAssignment 공통화)
         const grantedRole = resolveGrantedRole(membership.service_key, membership.role);
+        // 약국 소유 자격은 별도 내 매장 승인 원장이 통제한다. 메인/KPA 정지는
+        // 해당 서비스만 차단하며 연결 서비스 역할을 회수하지 않는다.
+        if (isNetureConnectedServiceRole(membership.service_key, grantedRole)
+          || (membership.service_key === 'kpa-society' && grantedRole === 'kpa:store_owner')) continue;
         if (grantedRole) {
           const affected = await this.deactivateRoleAssignment(queryRunner, userId, grantedRole);
           logger.info('[SUSPEND][STEP2] role DEACTIVATE', { userId, role: grantedRole, affected });
@@ -833,24 +837,14 @@ export class MembershipApprovalService {
         }
       }
 
-      // STEP2.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
-      //   service_memberships.role (member/operator/admin) 만으로는 kpa:store_owner 같은
-      //   capability role 이 회수되지 않는다. kpa:store_owner 는 service_memberships 와 별개의
-      //   role_assignments 단독 row 이기 때문 (IR-O4O-KPA-STORE-PERMISSION-ADDRESS-DRIFT-AUDIT-V1 §3-2 F1).
-      //
-      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
-      //   이 단계가 kpa-society 에만 걸려 있어 k-cosmetics / pharmacy-hub 는
-      //   정지해도 `{prefix}:store_owner` 가 활성으로 남았다 (5개 서비스 lifecycle INCONSISTENT).
-      //   정지된 membership 의 서비스마다 대칭으로 회수한다. 정지한 서비스의 역할만 건드리며
-      //   (cross-service fan-out 0), prefix 는 @o4o/security-core SSOT 에서 도출한다.
-      //
-      //   접근 차단 자체는 membership 게이트가 정본이다(store-owner.utils.ts isStoreOwner).
-      //   이 회수는 role 문자열을 직접 읽는 legacy consumer(auth-helpers 매장 플래그 등)를
-      //   위한 이중 방어이지 SSOT 가 아니다.
+      // STEP2.5: 종전 서비스 소유 store_owner 표식의 역할 회수.
+      // 메인·KPA는 현재 독립 약국 원장의 승인 표식을 소유하지 않으므로 제외한다.
+      // 해당 서비스의 접근 차단은 원장 게이트가 판정한다. 다른 서비스 역할은 회수하지 않는다.
       const storeOwnerServiceKeys = Array.from(
         new Set<string>(selectResult.map((m: any) => m.service_key as string))
       );
       for (const svcKey of storeOwnerServiceKeys) {
+        if (svcKey === 'neture' || svcKey === 'kpa-society') continue;
         const storeOwnerRole = `${resolveRolePrefixFromCanonicalServiceKey(svcKey)}:store_owner`;
         const affected = await this.deactivateRoleAssignment(queryRunner, userId, storeOwnerRole);
         if (affected > 0) {

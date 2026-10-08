@@ -38,7 +38,6 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
 const EXPECTED: Record<string, string[]> = {
   // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거됐다.
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
-  'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
   'services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts': ['organizationId'],
   // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1:

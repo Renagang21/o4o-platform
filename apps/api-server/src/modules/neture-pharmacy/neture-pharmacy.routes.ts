@@ -17,6 +17,7 @@ import { Router } from 'express';
 import type { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireNetureMainMembership } from '../../middleware/neture-main-membership.middleware.js';
+import { requireRole } from '../../middleware/auth.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
@@ -113,7 +114,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   const mainAccess = requireNetureMainMembership(dataSource);
   const store = [requireAuth, mainAccess, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
-  const admin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
+  const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
   const org = (req: Req) => req.organizationId as string;
 

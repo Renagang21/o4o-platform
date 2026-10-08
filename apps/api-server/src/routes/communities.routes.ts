@@ -1,3 +1,4 @@
+import { forumRequestService } from '../services/forum/ForumRequestService.js';
 /**
  * Communities — Community Catalog read contract (service-neutral)
  *
@@ -33,11 +34,12 @@
  *   - 비로그인도 200 으로 목록을 돌려주되 canParticipate=false · reason=AUTH_REQUIRED (공개 read 정책과 분리).
  */
 
+import { createServiceForumRouter } from './forum/service-forum.routes.js';
+import { listCommunityWorkspaces, resolveCommunityWorkspace, createCommunityBoard } from '../services/community/community-workspace.service.js';
 import { Router, type RequestHandler, type Response } from 'express';
 import { asyncHandler } from '../middleware/error-handler.js';
 import type { AuthRequest } from '../types/auth.js';
 import { AppDataSource } from '../database/connection.js';
-import { resolveSemiFranchiseCommunityAccess } from '../modules/neture-pharmacy/services/semi-franchise-community-access.js';
 // CodeQL(js/missing-rate-limiting) 이 인식하는 limiter 를 쓴다(선례: admin/platform-accounts.routes).
 import { apiLimiter } from '../middleware/rateLimiter.js';
 import { resolveCommunity, requireCommunityScope } from '../middleware/community-scope.middleware.js';
@@ -52,21 +54,14 @@ import {
 } from '../services/community/community-operator-designation.service.js';
 import { freshenUserContext } from '../services/auth/auth-context.helper.js';
 import {
-  listCommunitiesForUser,
-  resolveCommunityAccess,
   type CommunityAccessUser,
 } from '../utils/community-access.resolver.js';
 
 async function currentCommunityUser(req: AuthRequest): Promise<CommunityAccessUser | null> {
   const user = req.user;
   if (!user?.id) return null;
-  try {
-    const fresh = await freshenUserContext(user.id);
-    return { id: user.id, roles: fresh.roles, memberships: fresh.memberships };
-  } catch {
-    // DB 갱신 실패 시 JWT payload 로 판정 (기존 guard 와 동일 소스)
-    return { id: user.id, roles: user.roles ?? [], memberships: (user as any).memberships ?? [] };
-  }
+  const fresh = await freshenUserContext(user.id);
+  return { id: user.id, roles: fresh.roles, memberships: fresh.memberships };
 }
 
 /** lifecycle 오류를 응답으로 옮긴다 — 라우트마다 분기를 복제하지 않는다. */
@@ -101,7 +96,7 @@ export function createCommunitiesRoutes(
   optionalAuth: RequestHandler,
   authenticate: RequestHandler,
 ): Router {
-  const router = Router();
+  const router = Router({ mergeParams: true });
 
   // 개체 운영자 경계: slug -> 행 확인 -> active 가입 -> role='operator'
   const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];
@@ -113,7 +108,7 @@ export function createCommunitiesRoutes(
     optionalAuth,
     asyncHandler(async (req, res) => {
       const user = await currentCommunityUser(req as AuthRequest);
-      res.json({ success: true, data: { communities: listCommunitiesForUser(user) } });
+      res.json({ success: true, data: { communities: await listCommunityWorkspaces(AppDataSource, user) } });
     }),
   );
 
@@ -364,28 +359,81 @@ export function createCommunitiesRoutes(
     }),
   );
 
+  // Forum creation requests keep the existing state machine and historical storage codes.
+  // Scope is always resolved on the server, never from client serviceCode/organizationId.
+  router.all('/:communityKey/board-requests/:requestId?', apiLimiter, authenticate, asyncHandler(async (req, res) => {
+    const user = await currentCommunityUser(req as AuthRequest);
+    const workspace = await resolveCommunityWorkspace(AppDataSource, user, req.params.communityKey);
+    if (!workspace?.allowed) { res.status(403).json({ success: false, code: 'COMMUNITY_ACCESS_REQUIRED' }); return; }
+    const reviewer = { id: user!.id!, name: (req as AuthRequest).user?.name, email: (req as AuthRequest).user?.email };
+    const body = bodyOf(req);
+    let result: any;
+    if (req.method === 'GET') {
+      if (req.query.review === 'true' && !workspace.canManage) { res.status(403).json({ success: false, code: 'COMMUNITY_OPERATOR_REQUIRED' }); return; }
+      const results = await Promise.all(workspace.forumStorageCodes.map(serviceCode =>
+        req.query.review === 'true' ? forumRequestService.listByService({ serviceCode, status: 'pending', limit: 100 })
+          : forumRequestService.listMy(user!.id!, serviceCode)));
+      const failed = results.find(r => 'error' in r);
+      if (failed) result = failed;
+      else result = { data: results.flatMap(r => 'data' in r ? Array.isArray(r.data) ? r.data : r.data.data ?? [] : []) };
+    } else if (req.method === 'POST' && !req.params.requestId) {
+      result = await forumRequestService.create(reviewer, {
+        serviceCode: workspace.forumStorageCodes[0], name: trimmed(body.name), description: trimmed(body.description),
+        reason: trimmed(body.reason), forumType: body.forumType === 'closed' ? 'closed' : 'open',
+        tags: Array.isArray(body.tags) ? body.tags.filter((t): t is string => typeof t === 'string') : [],
+      });
+    } else if (req.method === 'PATCH' && req.params.requestId && workspace.canManage) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.requestId)) {
+        res.status(400).json({ success: false, code: 'INVALID_REQUEST_ID' }); return;
+      }
+      if (!['approve', 'reject', 'revision'].includes(String(body.action))) { res.status(400).json({ success: false, code: 'INVALID_ACTION' }); return; }
+      const [row] = await AppDataSource.query('SELECT service_code FROM forum_category_requests WHERE id = $1::uuid AND service_code = ANY($2::text[])', [req.params.requestId, workspace.forumStorageCodes]);
+      if (!row) { res.status(404).json({ success: false, code: 'REQUEST_NOT_FOUND' }); return; }
+      result = await forumRequestService.review(req.params.requestId, row.service_code, reviewer, { action: body.action as 'approve' | 'reject' | 'revision', reviewComment: trimmed(body.reviewComment) });
+    } else { res.status(403).json({ success: false, code: 'COMMUNITY_OPERATOR_REQUIRED' }); return; }
+    if ('error' in result) { res.status(result.error.status).json({ success: false, error: result.error.message, code: result.error.code }); return; }
+    res.status(req.method === 'POST' ? 201 : 200).json({ success: true, data: result.data });
+  }));
+
+  router.post('/:communityKey/boards', apiLimiter, authenticate, asyncHandler(async (req, res) => {
+    const user = await currentCommunityUser(req as AuthRequest);
+    const board = await AppDataSource.transaction(async (m) => {
+      const workspace = await resolveCommunityWorkspace(m, user, req.params.communityKey);
+      if (!workspace?.allowed || !workspace.canManage) return null;
+      return createCommunityBoard(m, workspace, user!.id!, bodyOf(req));
+    }).catch(error => {
+      if (error.message === 'INVALID_BOARD_NAME') return 'invalid' as const;
+      throw error;
+    });
+    if (!board) { res.status(403).json({ success: false, code: 'COMMUNITY_OPERATOR_REQUIRED' }); return; }
+    if (board === 'invalid') { res.status(400).json({ success: false, code: 'INVALID_BOARD_NAME' }); return; }
+    res.status(201).json({ success: true, data: board });
+  }));
+
+  router.use('/:communityKey/forum', createServiceForumRouter({
+    context: { scope: 'community' },
+    resolveContext: async (req, res, next) => {
+      try {
+        const user = await currentCommunityUser(req as AuthRequest);
+        const workspace = await resolveCommunityWorkspace(AppDataSource, user, req.params.communityKey);
+        if (!workspace?.allowed) {
+          res.status(workspace ? 403 : 404).json({ success: false, code: workspace?.reason ?? 'COMMUNITY_NOT_FOUND' }); return;
+        }
+        req.forumContext = { communityKey: workspace.communityKey, forumStorageCodes: workspace.forumStorageCodes,
+          communityOperator: workspace.canManage, scope: 'community' };
+        next();
+      } catch (error) { next(error); }
+    },
+  }));
+
   router.get(
     '/:communityKey/access',
     optionalAuth,
     asyncHandler(async (req, res) => {
       const user = await currentCommunityUser(req as AuthRequest);
       const communityKey = String(req.params.communityKey ?? '');
-      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 커뮤니티는 가입 상태로 직접 판정(게이트와 같은 함수).
-      const sf = await resolveSemiFranchiseCommunityAccess(AppDataSource, user?.id ?? null, communityKey);
-      if (sf.semiFranchise) {
-        res.json({
-          success: true,
-          data: {
-            communityKey,
-            allowed: sf.allowed,
-            reason: sf.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
-            via: sf.allowed ? `semi-franchise:${sf.semiFranchiseKey}` : null,
-          },
-        });
-        return;
-      }
-      const access = resolveCommunityAccess(user, communityKey);
-      if (access.reason === 'UNKNOWN_COMMUNITY') {
+      const access = await resolveCommunityWorkspace(AppDataSource, user, communityKey);
+      if (!access) {
         res.status(404).json({ success: false, error: 'Community not found', code: 'COMMUNITY_NOT_FOUND' });
         return;
       }
