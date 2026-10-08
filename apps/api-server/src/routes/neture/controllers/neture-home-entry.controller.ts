@@ -71,20 +71,26 @@ export function createNetureHomeEntryController(
       const userId = user.id;
 
       // ── 내 매장 ─────────────────────────────────────────────────────────
-      // 서비스별: active membership + {prefix}:store_owner role + 기존 후보 해석기.
+      // 약국(kpa): 승인 원장 + 조직 소유 관계(업무 guard와 같은 후보 해석기).
+      // 다른 서비스: active membership + {prefix}:store_owner role + 기존 후보 해석기.
       // 복수 매장은 전부 나열한다 (자동 선택 없음 — WO §3 "주요 업무").
       const stores: HomeEntryStore[] = [];
       for (const svc of STORE_CAPABLE_SERVICES) {
-        const membershipStatus = await getServiceMembershipStatusFromDb(dataSource, userId, svc.serviceKey);
-        if (membershipStatus !== 'active') continue;
+        // 약국 매장은 KPA 개인 회원 가입/역할로 얻는 권한이 아니다.
+        // findStoreOrganizationCandidates('kpa')는 active 약국 원장과
+        // 활성 owner/admin/manager 관계를 결합하므로 여기서 KPA 가입을 덧붙이지 않는다.
+        if (svc.rolePrefix !== 'kpa') {
+          const membershipStatus = await getServiceMembershipStatusFromDb(dataSource, userId, svc.serviceKey);
+          if (membershipStatus !== 'active') continue;
 
-        const [ra] = await dataSource.query(
-          `SELECT 1 FROM role_assignments
-            WHERE user_id = $1 AND role = $2 AND is_active = true
-            LIMIT 1`,
-          [userId, svc.storeOwnerRole],
-        );
-        if (!ra) continue;
+          const [ra] = await dataSource.query(
+            `SELECT 1 FROM role_assignments
+              WHERE user_id = $1 AND role = $2 AND is_active = true
+              LIMIT 1`,
+            [userId, svc.storeOwnerRole],
+          );
+          if (!ra) continue;
+        }
 
         const candidates = await findStoreOrganizationCandidates(dataSource, userId, svc.rolePrefix);
         if (candidates.length === 0) continue;

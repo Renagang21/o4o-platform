@@ -12,16 +12,16 @@ const get = vi.fn();
 const post = vi.fn();
 vi.mock('../apiClient', () => ({ api: { get: (...a: unknown[]) => get(...a), post: (...a: unknown[]) => post(...a) } }));
 
-import { resolveSingleStoreWorkspaceUrl, ServiceEntryError } from '../home-entry';
+import { resolveSingleStoreWorkspaceUrl, resolveServiceEntryUrl, ServiceEntryError } from '../home-entry';
 import type { User } from '../../contexts/AuthContext';
 
-const user: User = { id: 'o1', email: 'owner@example.test', name: '점주', roles: ['kpa:store_owner'] };
+const user: User = { id: 'o1', email: 'owner@example.test', name: '점주', roles: ['neture:store_owner'] };
 const kpa = { key: 'kpa-society', name: 'kpa', nameKo: 'KPA', domain: 'pharmacy.example', basePath: '', description: '', joinEnabled: true, membership: { status: 'active' } };
 const store = (organizationId: string) => ({ serviceKey: 'kpa-society', organizationId, name: `매장 ${organizationId}`, memberRole: 'owner' });
 
-function respond(stores: unknown[]) {
+function respond(stores: unknown[], services: unknown[] = [kpa]) {
   get.mockImplementation(async (url: string) => {
-    if (url === '/auth/services') return { data: { data: { services: [kpa] } } };
+    if (url === '/auth/services') return { data: { data: { services } } };
     if (url === '/neture/home/entry') return { data: { data: { stores, branches: [], serviceStates: { supplier: { status: 'none', source: 'none' } } } } };
     if (url === '/work-scope/operator-services') return { data: { data: { services: [] } } };
     if (url === '/communities') return { data: { data: { communities: [] } } };
@@ -37,11 +37,24 @@ beforeEach(() => {
 describe('resolveSingleStoreWorkspaceUrl', () => {
   it('매장 하나 → 홈 매장 버튼과 같은 handoff 요청', async () => {
     respond([store('org-1')]);
-    post.mockResolvedValue({ data: { data: { targetUrl: 'https://pharmacy.example/auth/handoff?c=1' } } });
-    await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://pharmacy.example/auth/handoff?c=1');
+    post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
+    await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.example/handoff?token=1');
     expect(post).toHaveBeenCalledTimes(1);
-    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/store/workspace' });
+    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
   });
+
+  it.each([
+    { services: [] },
+    { services: [{ ...kpa, membership: null }] },
+    { services: [{ ...kpa, membership: { status: 'suspended' } }] },
+  ])(
+    '승인 원장으로 반환된 약국은 KPA 개인 가입 $services와 무관하게 Store로 이동한다', async ({ services }) => {
+      respond([store('org-1')], services);
+      post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
+      await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.example/handoff?token=1');
+      expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
+    },
+  );
 
   it.each([[[]], [[store('org-1'), store('org-2')]]])('매장 %j → 이동하지 않는다', async (stores) => {
     respond(stores);
@@ -53,5 +66,11 @@ describe('resolveSingleStoreWorkspaceUrl', () => {
     get.mockRejectedValue(new Error('500'));
     await expect(resolveSingleStoreWorkspaceUrl(user)).rejects.toThrow();
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it('약사 커뮤니티는 Store로 우회하지 않고 서비스 handoff를 유지한다', async () => {
+    post.mockResolvedValue({ data: { data: { targetUrl: 'https://pharmacy.example/handoff?token=1' } } });
+    await expect(resolveServiceEntryUrl('kpa-society', '/forum')).resolves.toBe('https://pharmacy.example/handoff?token=1');
+    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/forum' });
   });
 });
