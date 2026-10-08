@@ -100,7 +100,7 @@ describe('시나리오', () => {
       }),
     );
     expect(card(m, 'store').items.map((i) => [i.label, i.note, (i.action as { returnPath?: string }).returnPath])).toEqual([
-      ['테스트 약국', 'KPA Society', '/store/workspace'],
+      ['테스트 약국', 'O4O 약국', '/store/workspace'],
       ['테스트 허브약국', 'Pharmacy Hub', '/store-owner/workspace'],
     ]);
   });
@@ -116,13 +116,13 @@ describe('시나리오', () => {
   it('단일 서비스 운영자: 서비스 운영 카드 버튼 1개 = 서비스 이름 → /operator', () => {
     const m = buildHomeEntryModel(user(['kpa:operator']), base({ operatorServices: [op('kpa-society')] }));
     expect(card(m, 'operator').items).toEqual([
-      { id: 'operator:kpa-society:operator', label: 'KPA Society', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' } },
+      { id: 'operator:kpa-society:operator', label: 'O4O 약국', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' } },
     ]);
   });
 
   it('복수 서비스 운영자: 서비스별 버튼 (프런트 role 파싱 없음 — 목록에 없는 서비스는 role 이 있어도 없음)', () => {
     const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), base({ operatorServices: [op('kpa-society'), op('pharmacy-hub')] }));
-    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['KPA Society', 'Pharmacy Hub']);
+    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['O4O 약국', 'Pharmacy Hub']);
   });
 
   it('플랫폼 관리자: "플랫폼 관리" 별도 · 4 카드에는 섞이지 않음 · 공급자 카드는 bypass 로 열리지 않음', () => {
@@ -144,7 +144,7 @@ describe('시나리오', () => {
     expect(activeCards(m)).toEqual(['community', 'store', 'supplier', 'operator']);
     expect(card(m, 'store').items.map((i) => i.label)).toEqual(['테스트 약국']);
     expect(card(m, 'supplier').items.map((i) => i.label)).toEqual(['공급자 업무']);
-    expect(card(m, 'operator').items.map((i) => [i.label, i.note])).toEqual([['KPA Society', '관리자']]);
+    expect(card(m, 'operator').items.map((i) => [i.label, i.note])).toEqual([['O4O 약국', '관리자']]);
     expect(m.platformAdmin?.label).toBe('플랫폼 관리');
     // 항목 id 는 전부 유일 (같은 데이터가 두 카드에 실리지 않는다)
     const ids = [...m.groups.flatMap((g) => g.items.map((i) => i.id)), m.platformAdmin!.id, ...m.myServices.map((i) => i.id)];
