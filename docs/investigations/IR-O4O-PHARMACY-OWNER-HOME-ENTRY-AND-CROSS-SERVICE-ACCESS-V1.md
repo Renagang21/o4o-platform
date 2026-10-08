@@ -96,3 +96,19 @@ DATA_REPAIR = NOT_EXECUTED. DIRECT_DB_WRITE = 0. PRODUCTION_DEPLOY = 0.
 ## 9. 최신 main 통합
 
 PR 검증 중 `main`에 Demo 체험 수리 단계 1(`3e7f44c38c`)이 반영되어 통합했다. API의 승인 약국 후보는 KPA 개인 membership/역할을 추가 요구하지 않는 최신 변경을 보존했다. §2의 운영 실측과 §3의 기존 코드 분석은 통합 전 기록이며 최신 API가 동일 조건이라고 해석하지 않는다. 프런트의 기존 순수 모델 입력 호환 경로에도 약국 후보의 개인 가입 추가 필터 제거를 보존했다. 조직 기반 조회·직접 Workspace 인계·목적지 검증은 유지하고, 추가된 커뮤니티 handoff 보존 및 개인 가입 상태별 회귀를 함께 실행했다. 통합 후 45 files / 378 tests PASS.
+
+## 10. 403 후속 코드 수정
+
+사용자의 추가 지시에 따라 약국 업무 403과 Demo 구축 코드를 재검증했다. `createRequireStoreOwner('kpa')` → `isStoreOwner` → `resolveStoreOrganization`의 약국 원장 active 및 활성 조직 관계 조건은 정책에 맞으므로 제거하지 않았다. 기존 provisioning의 dry-run에는 약국 원장 생성 계획이 출력되지 않았고 기존 행은 상태 검증 없이 존재만 확인했다. 구축 출력에 pharmacy 계획을 추가하고, 존재만 확인한 상태는 `exists(unverified)`로 명시한다.
+
+작업 중 최신 main에 PR #367의 `RepairCanonicalDemoExperience1791501198171`이 반영됐다. 해당 migration은 Demo registry·고정 테스트 조직·생존 소유자·합성 원장·경합 조직을 확인하고, 원장·소유 관계·역할·세미프랜차이즈 연결을 복구하며 before/after를 DB snapshot에 보관한다. 쓰기 경로는 기존 승인된 migration 하나로 유지하고 중복 repair CLI는 도입하지 않는다. 타 세션 문서의 승인 기록을 이번 세션의 DB write 승인으로 전용하지 않는다.
+
+추가한 `apps/api-server/src/scripts/demo-pharmacy-access-audit.ts`는 읽기 전용 SERIALIZABLE 트랜잭션으로 조회한다. 공개 credential 정본의 매장 계정·활성 Demo registry·활성 Neture 가입·단일 owner 관계·기존 canonical Demo 조직을 확인한다. 다른 생존 구성원, 충돌 원장, 다른 신청자, 비활성 원장은 상태 코드로 구분한다. 승인 원장과 표식의 누락 여부만 요약하며 사용자·조직 ID나 실제 응답은 출력하지 않는다. `--apply`를 거부한다. 소유 관계가 누락되거나 비활성인 경우도 진단 오류로 보이며 이 도구에서 복구하지 않는다.
+
+안전하게 DB 환경 변수를 구성한 후 저장소 루트에서:
+
+```bash
+node --import tsx apps/api-server/src/scripts/demo-pharmacy-access-audit.ts
+```
+
+현재 환경의 조회 실행은 `DB_CONFIGURATION_REQUIRED`로 중단됐다. `.env` 파일도 없어 DB 행을 조회·복구한 것으로 보고하지 않는다. 운영 DB write는 AGENTS.md §5의 별도 명시 승인 경계다. 실제 복구 적용 후 Store 업무 API와 이용계약 동의 조건을 재검증해야 한다. 운영 403 해소는 코드 커밋만으로 완료라고 판정하지 않는다.
