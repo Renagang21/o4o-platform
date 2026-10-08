@@ -81,7 +81,7 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     const MIXED: EntryCommunity = { ...PHARMACY, entries: [{ serviceKey: 'k-cosmetics', path: '/forum' }, ...PHARMACY.entries] };
     const m = buildHomeEntryModel(user(), data([MIXED], { 'k-cosmetics': 'active', 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     expect(group(m)!.items.map((i) => [i.id, i.action, i.note])).toEqual([
-      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, 'KPA Society에서 참여'],
+      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, 'O4O 약국에서 참여'],
     ]);
   });
 
@@ -104,6 +104,6 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY], { 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     const items = group(m)!.items.filter((i) => i.id.startsWith('community:pharmacy'));
     expect(items).toHaveLength(1);
-    expect(items[0].note).toBe('KPA Society에서 참여');
+    expect(items[0].note).toBe('O4O 약국에서 참여');
   });
 });

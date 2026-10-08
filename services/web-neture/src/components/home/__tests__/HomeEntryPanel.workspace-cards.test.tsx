@@ -89,7 +89,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
       }),
     );
     const store = cards()[1];
-    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국KPA Society', '테스트 허브약국Pharmacy Hub']);
+    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국O4O 약국', '테스트 허브약국Pharmacy Hub']);
     expect(store.querySelector('ul')).toBeNull();
   });
 
@@ -97,7 +97,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     renderPanel(user(['platform:super_admin']), data({ operatorServices: [{ serviceKey: 'kpa-society', serviceName: 'kpa-society', scope: 'operator', workspaceMode: 'standard', workspaceAvailable: true }] }), <section><h2>O4O 서비스 소식</h2></section>);
     expect(headings()).toEqual(['내 업무 공간', '플랫폼 관리', '내 서비스', 'O4O 서비스 소식', '가입 가능한 서비스']);
     const operator = cards()[3];
-    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['KPA Society']);
+    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['O4O 약국']);
     expect(within(operator).queryByText(/관리자/)).toBeNull();
     const platform = screen.getByRole('heading', { level: 2, name: '플랫폼 관리' }).parentElement!;
     expect(within(platform).getByRole('link', { name: /플랫폼 관리/ }).getAttribute('href')).toBe('/admin');

@@ -24,7 +24,7 @@ import { Loader2, ArrowUpRight, ExternalLink, RefreshCw } from 'lucide-react';
 import type { User } from '../../contexts/AuthContext';
 import {
   buildHomeEntryModel,
-  resolveServiceEntryUrl,
+  resolveHomeEntryUrl,
   ServiceEntryError,
   type EntryItem,
   type HomeEntryData,
@@ -117,13 +117,13 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
   }, []);
 
   const handleHandoff = async (item: EntryItem) => {
-    if (item.action.kind !== 'handoff') return;
+    if (item.action.kind !== 'handoff' && item.action.kind !== 'workspace') return;
     if (busyId !== null) return; // 정상 이동 중 중복 클릭 방지 (버튼 disabled 와 이중 방어)
     const generation = ++handoffGeneration.current;
     setBusyId(item.id);
     setMoveError(null);
     try {
-      const targetUrl = await resolveServiceEntryUrl(item.action.serviceKey, item.action.returnPath);
+      const targetUrl = await resolveHomeEntryUrl(item.action);
       if (generation !== handoffGeneration.current) return; // 복원 이후 늦게 도착한 응답 — 재이동하지 않는다
       // 성공 시 현재 탭이 대상 서비스로 이동한다 — busy 는 pageshow(복원) 에서 푼다.
       window.location.assign(targetUrl);

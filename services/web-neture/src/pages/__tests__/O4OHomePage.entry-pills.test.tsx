@@ -178,10 +178,12 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
     expect(screen.getAllByTestId('home-composer')).toHaveLength(1);
   });
 
-  it('공개 소개 · 서비스 안내 · Google 시작은 보이지 않는다', () => {
+  it('업무 진입 뒤 공개 서비스 둘러보기를 제공하고 공개 소개·로그인 CTA는 숨긴다', () => {
     mount();
     expect(screen.queryByText(/오프라인 매장의 활동으로 연결합니다/)).toBeNull();
-    expect(screen.queryByRole('navigation', { name: '주요 서비스' })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'O4O 서비스 둘러보기' })).toBeTruthy();
+    expect(before(screen.getByTestId('entry-panel'), screen.getByRole('navigation', { name: '주요 서비스' }))).toBe(true);
+    expect(linksOf('함께 이용하는 서비스')).toHaveLength(3);
     expect(screen.queryByTestId('home-google-start')).toBeNull();
   });
 

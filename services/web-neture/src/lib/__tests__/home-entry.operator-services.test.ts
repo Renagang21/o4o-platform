@@ -64,7 +64,7 @@ describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services �
       { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/operator' },
     ]);
     expect(g.title).toBe('서비스 운영');
-    expect(g.items.map((i) => [i.label, i.note])).toEqual([['KPA Society', undefined], ['Pharmacy Hub', undefined]]);
+    expect(g.items.map((i) => [i.label, i.note])).toEqual([['O4O 약국', undefined], ['Pharmacy Hub', undefined]]);
     // role 만 있고 목록에 없는 K-Cos 는 진입이 없다 (누출 0)
     expect(g.items.some((i) => i.id.includes('k-cosmetics'))).toBe(false);
   });
@@ -95,7 +95,7 @@ describe('buildHomeEntryModel — 서비스 운영 카드 = operator-services �
       ['operator:neture', { kind: 'internal', to: '/operator' }],
       ['operator:kpa-society:admin', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/admin' }],
     ]);
-    expect(g.items.map((i) => [i.label, i.note])).toEqual([['Neture', undefined], ['KPA Society', '관리자']]);
+    expect(g.items.map((i) => [i.label, i.note])).toEqual([['Neture', undefined], ['O4O 약국', '관리자']]);
     expect(m.platformAdmin).toBeNull();
   });
 

@@ -131,7 +131,7 @@ function PrimaryServices() {
         주요 서비스
       </h2>
       <nav aria-label="주요 서비스" className="mt-5">
-        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-3">
+        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
           {PRIMARY_SERVICES.map((s) => (
             <li key={s.href}>
               <ExternalLink
@@ -780,13 +780,12 @@ export default function O4OHomePage() {
             newsSlot={<HomeServiceNews />}
           />
 
-          {/* 개인화 조회 실패 시 공개 서비스 안내로 대체 — 이동 수단을 잃지 않게 */}
-          {entry.error && (
-            <div className="mt-10 flex w-full flex-col items-center">
-              <PrimaryServices />
-              <CompanionServices className="mt-10" />
-            </div>
-          )}
+          {/* 공개 서비스 발견은 가입·업무 권한과 별개다. 개인화 조회 상태와 무관하게 제공한다. */}
+          <section aria-labelledby="home-discovery-title" className="mt-14 flex w-full flex-col items-center">
+            <h2 id="home-discovery-title" className="m-0 mb-6 text-lg font-semibold text-slate-900">O4O 서비스 둘러보기</h2>
+            <PrimaryServices />
+            <CompanionServices className="mt-10" />
+          </section>
         </main>
       ) : (
         /*

@@ -16,7 +16,8 @@
  *
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
- *   - `GET /neture/home/entry`       내 매장(복수 나열) · 내 분회(slug)  — 이번 WO 의 홈 전용 read API
+ *   - `GET /neture/home/entry`       분회(slug) · 공급자/메인 상태 (기존 서비스별 매장 목록은 신규 흐름에서 미사용)
+ *   - `GET /work-scope/accessible-stores` Store와 같은 조직 기반 매장 목록
  *   - `user.roles` (from /auth/me)   platform:super_admin · 관리자 판정 (Neture RoleGuard 와 같은 상수)
  *   - `GET /communities`             Community Catalog + 참여 가능 여부 — **커뮤니티 진입의 유일한 출처**
  *                                    (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: Community Identity ≠
@@ -69,6 +70,13 @@ export interface EntryStore {
   memberRole: string;
 }
 
+/** Store Workspace가 확정한 조직 목록. 서비스 가입 여부를 다시 판정하지 않는다. */
+export interface EntryWorkspaceStore {
+  organizationId: string;
+  organizationName: string;
+  memberRole: string;
+}
+
 export interface EntryBranch {
   organizationId: string;
   slug: string | null;
@@ -118,6 +126,8 @@ export interface EntryCommunity {
 export interface HomeEntryData {
   services: EntryService[];
   stores: EntryStore[];
+  /** 새 조회 경로는 항상 제공한다. 기존 모델 호출부와의 점진적 호환만 optional. */
+  workspaceStores?: EntryWorkspaceStore[];
   branches: EntryBranch[];
   serviceStates: NetureServiceStates;
   /** 운영자로 참여하는 서비스 (서버 확정 목록). 없으면 빈 배열로 취급한다 */
@@ -136,7 +146,8 @@ export interface HomeEntryData {
 export type EntryAction =
   | { kind: 'internal'; to: string }
   | { kind: 'handoff'; serviceKey: string; returnPath?: string }
-  | { kind: 'public'; href: string };
+  | { kind: 'public'; href: string }
+  | { kind: 'workspace'; returnPath: '/store' | '/select-store' };
 
 export interface EntryItem {
   id: string;
@@ -280,7 +291,7 @@ export interface UseHomeEntryResult {
  * 어느 한쪽이라도 실패하면 throw (부분 데이터로 "미가입" 처럼 보이지 않게).
  */
 export async function fetchHomeEntryData(): Promise<HomeEntryData> {
-  const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
+  const [servicesRes, entryRes, operatorRes, communitiesRes, workspaceRes] = await Promise.all([
     api.get('/auth/services'),
     api.get('/neture/home/entry'),
     // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
@@ -289,17 +300,21 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
     //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
     api.get('/communities').catch(() => null),
+    // Store와 동일한 조직 기반 목록. 실패를 기존 목록으로 대체하지 않는다.
+    api.get('/work-scope/accessible-stores'),
   ]);
+  const workspaceStores = workspaceRes.data?.data?.stores;
   const services = servicesRes.data?.data?.services;
   const entry = entryRes.data?.data;
   const operatorServices = operatorRes.data?.data?.services;
   const communitiesRaw = communitiesRes?.data?.data?.communities;
   const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
-  if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
+  if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices) || !Array.isArray(workspaceStores)) {
     throw new Error('bad response');
   }
   return {
     services,
+    workspaceStores,
     stores: Array.isArray(entry.stores) ? entry.stores : [],
     branches: Array.isArray(entry.branches) ? entry.branches : [],
     serviceStates: normalizeServiceStates(entry.serviceStates),
@@ -399,6 +414,25 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
   return targetUrl;
 }
 
+/** 기존 Workspace handoff를 사용한다. 서비스·매장 권한은 대상 서버가 재검증한다. */
+export async function resolveHomeEntryUrl(action: Extract<EntryAction, { kind: 'handoff' | 'workspace' }>): Promise<string> {
+  if (action.kind === 'handoff') return resolveServiceEntryUrl(action.serviceKey, action.returnPath);
+  let url: string | undefined;
+  try {
+    const res = await api.post('/auth/handoff', { targetWorkspace: 'store', returnPath: action.returnPath });
+    url = res.data?.data?.targetUrl;
+  } catch {
+    throw new ServiceEntryError('내 매장으로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+  }
+  try {
+    const target = new URL(url ?? '');
+    if (target.origin !== 'https://store.neture.co.kr' || target.pathname !== '/handoff') throw new Error('invalid target');
+  } catch {
+    throw new ServiceEntryError('매장 이동 주소를 확인하지 못했습니다.');
+  }
+  return url!;
+}
+
 /** 발급 + 즉시 이동. 성공하면 현재 탭이 대상 서비스로 바뀐다. */
 export async function openServiceEntry(serviceKey: string, returnPath?: string): Promise<void> {
   window.location.assign(await resolveServiceEntryUrl(serviceKey, returnPath));
@@ -413,8 +447,8 @@ export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string
   const data = await fetchHomeEntryData();
   const items = buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [];
   const only = items.length === 1 ? items[0].action : null;
-  if (!only || only.kind !== 'handoff') throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
-  return resolveServiceEntryUrl(only.serviceKey, only.returnPath);
+  if (!only || (only.kind !== 'handoff' && only.kind !== 'workspace')) throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
+  return resolveHomeEntryUrl(only);
 }
 
 /** 공개 안내 URL (로그인 · handoff 없이 열리는 주소) */
@@ -430,7 +464,7 @@ const hasAnyRole = (roles: string[], set: string[]) => roles.some((r) => set.inc
 export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryModel {
   const roles = user.roles ?? [];
   const byKey = new Map(data.services.map((s) => [s.key, s]));
-  const nameOf = (key: string) => byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
+  const nameOf = (key: string) => key === 'kpa-society' ? 'O4O 약국' : byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
   const isActive = (key: string) => byKey.get(key)?.membership?.status === 'active';
   const isPlatformAdmin = hasAnyRole(roles, PLATFORM_ROLES);
 
@@ -461,14 +495,21 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     }
   }
 
-  // 매장 — 버튼 하나 = 매장 하나 (`GET /neture/home/entry` stores 그대로, 자동 선택 없음).
-  //   진입은 그 매장이 속한 서비스의 Store Workspace Home. 같은 매장이 여러 서비스에 등록돼 있으면
-  //   (1 Store : N Services) 서비스마다 버튼이 생기고, 매장이 둘 이상일 때만 서비스 이름을 보조 정보로 붙인다.
-  //   "매장 HUB" 는 Store Workspace 안의 탭이므로 대표 홈에 별도 진입을 두지 않는다.
+  // 매장 — Store의 조직 목록을 사용하고 같은 조직을 서비스마다 중복 노출하지 않는다.
+  // 복수 조직은 대상 Workspace에서 선택한다. 서비스별 가입을 매장 자격으로 다시 해석하지 않는다.
+  // workspaceStores가 없는 기존 모델 입력만 종전 서비스별 경로를 유지한다(신규 API 조회는 항상 제공).
   const store: EntryItem[] = [];
-  for (const s of data.stores) {
-    // 약국은 API가 승인 원장·조직 관계로 확정한 매장이다. KPA 개인 가입을
-    // UI에서 추가 요구하지 않는다. 다른 서비스의 가입 판정은 유지한다.
+  if (data.workspaceStores !== undefined) {
+    for (const s of data.workspaceStores) {
+      store.push({
+        id: `workspace-store:${s.organizationId}`,
+        label: s.organizationName || '이름 없는 매장',
+        note: data.workspaceStores.length > 1 ? '매장 선택 후 이용' : undefined,
+        action: { kind: 'workspace', returnPath: data.workspaceStores.length > 1 ? '/select-store' : '/store' },
+      });
+    }
+  } else for (const s of data.stores) {
+    // 승인된 약국 후보의 기존 모델 입력도 KPA 개인 가입을 다시 요구하지 않는다.
     if (s.serviceKey !== 'kpa-society' && !isActive(s.serviceKey)) continue;
     const path = SERVICE_PATHS[s.serviceKey]?.myStore;
     if (!path) continue; // Store Workspace 경로가 확인된 서비스만 (dead link 0)
@@ -478,7 +519,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
       action: { kind: 'handoff', serviceKey: s.serviceKey, returnPath: path },
     });
   }
-  if (store.length > 1) {
+  if (data.workspaceStores === undefined && store.length > 1) {
     // 구분 정보는 매장이 여럿일 때만 (§6) — 서비스 이름
     for (const item of store) item.note = nameOf((item.action as { serviceKey: string }).serviceKey);
   }
