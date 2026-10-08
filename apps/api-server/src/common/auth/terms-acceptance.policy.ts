@@ -58,13 +58,11 @@ export const TERMS_PENDING_ALLOWLIST: ReadonlySet<string> = new Set([
   'GET /api/v1/auth/me',
   'GET /api/v1/auth/status',
   'POST /api/v1/auth/logout',
-  'POST /api/v1/auth/logout-all',
   'GET /api/v1/auth/services',
   // legacy mount (/api/auth) — 같은 라우터가 두 prefix 에 마운트된다
   'GET /api/auth/me',
   'GET /api/auth/status',
   'POST /api/auth/logout',
-  'POST /api/auth/logout-all',
   // ── 약관 acceptance 자체 (pending 조회 · 승낙 제출) ──
   'GET /api/v1/auth/policy-acceptances',
   'POST /api/v1/auth/policy-acceptances',

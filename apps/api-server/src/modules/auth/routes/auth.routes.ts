@@ -151,13 +151,6 @@ router.post(
   asyncHandler(AuthSessionController.logout)
 );
 
-// POST /api/v1/auth/logout-all - Logout from all devices
-router.post(
-  '/logout-all',
-  requireAuth,
-  asyncHandler(AuthSessionController.logoutAll)
-);
-
 /**
  * ========================================
  * Service Handoff Routes

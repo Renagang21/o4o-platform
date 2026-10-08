@@ -78,8 +78,8 @@ export class AuthenticationService {
     return this.tokenSessionService.logout(userId, serviceKey);
   }
 
-  async logoutAll(userId: string): Promise<void> {
-    return this.tokenSessionService.logoutAll(userId);
+  async revokeAllSessions(userId: string): Promise<void> {
+    return this.tokenSessionService.revokeAllSessions(userId);
   }
 
   setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {

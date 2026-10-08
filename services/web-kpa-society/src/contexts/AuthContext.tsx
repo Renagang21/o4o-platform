@@ -12,7 +12,7 @@ import React, { createContext, useContext, useState, useMemo, useCallback, useRe
 import { AuthClient, getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
 import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
-//   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 공통 Core 로 이동.
+//   세션 복구 · 토큰 정리 이벤트 · login/logout 은 공통 Core 로 이동.
 //   KPA 고유분(KPA context 비동기 로딩 · activityType)만 이 파일에 남는다.
 import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
@@ -131,7 +131,6 @@ interface AuthContextType {
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
-  logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
   /** WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1: activityType + optional businessInfo */
   setActivityType: (activityType: string, businessInfo?: Record<string, any>) => Promise<void>;
@@ -291,11 +290,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = core.logout;
 
-  const logoutAll = async () => {
-    // 기존 계약 보존: 실패를 호출부로 전파한다(Core 는 삼키지 않고 그대로 throw).
-    await core.logoutAll();
-  };
-
   /**
    * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
    * activityType + optional businessInfo 저장
@@ -327,7 +321,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,
         logout,
-        logoutAll,
         checkAuth,
         setActivityType,
         pendingPolicyAcceptances: core.pendingPolicyAcceptances,

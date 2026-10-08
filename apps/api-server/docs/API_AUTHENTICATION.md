@@ -285,25 +285,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 ---
 
-### Logout from All Devices
-
-**Endpoint:** `POST /logout-all`
-
-**Headers:**
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Logged out from all devices"
-}
-```
-
----
-
 ## Password Management
 
 ### Request Password Reset

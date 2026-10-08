@@ -21,7 +21,7 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
-  const { user, logout, logoutAll, getSessionStatus } = useAuth();
+  const { user, logout, getSessionStatus } = useAuth();
   // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
   //   표시 전용 값이다 — 인가는 AdminProtectedRoute/백엔드 guard 가 roles[] 로 한다.
   const accountDisplay = buildAccountDisplayInfo(user);
@@ -59,24 +59,11 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
   const handleLogout = async () => {
     try {
-      logout();
+      await logout();
       toast.success('로그아웃되었습니다.');
     } catch (error: any) {
     // Error logging - use proper error handler
       toast.error('로그아웃 처리 중 오류가 발생했습니다.');
-    }
-  };
-
-  /**
-   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
-   * "모든 기기에서 로그아웃" 은 logout() 이 아니라 logoutAll() 을 호출해야 한다.
-   */
-  const handleLogoutAll = async () => {
-    try {
-      await logoutAll();
-      toast.success('모든 기기에서 로그아웃되었습니다.');
-    } catch (error: any) {
-      toast.error('전체 로그아웃 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -251,27 +238,11 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
 
               <DropdownMenuSeparator />
               
-              {/* Security Section */}
-              <DropdownMenuLabel className="font-normal">
-                <div className="text-xs text-o4o-text-secondary">보안</div>
-              </DropdownMenuLabel>
-              
-              <DropdownMenuItem 
-                onClick={handleLogoutAll}
-                className="text-orange-600 focus:text-orange-600 focus:bg-orange-50"
-              >
-                <Shield className="mr-2 h-3 w-3" />
-                모든 기기에서 로그아웃
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator />
-              
               <DropdownMenuItem 
                 onClick={handleLogout}
                 className="text-red-600 focus:text-red-600 focus:bg-red-50"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                {/* 서버 logout 은 사용자 refresh family 전체 폐기 = O4O 계정 전체 종료 */}
                 {O4O_LOGOUT_LABEL}
               </DropdownMenuItem>
 

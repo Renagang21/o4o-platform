@@ -2,7 +2,7 @@
  * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
  * WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1
  *
- * `logout-all` 이 실제로 모든 기기의 refresh token 을 무효화하는지,
+ * `보안 세션 폐기` 이 실제로 모든 기기의 refresh token 을 무효화하는지,
  * 그리고 refresh 회전이 family 를 **승계**하는지 고정한다.
  *
  * ── 계약 ───────────────────────────────────────────────────────────────────
@@ -13,13 +13,13 @@
  *   family null 이후   → TOKEN_FAMILY_REVOKED
  *   logout (서비스 하나) → family **유지** + service_session_revocations 행 기록
  *                          (그 서비스 토큰만 무효 · 다른 서비스 세션은 살아 있다)
- *   logout-all           → family null (전역)
+ *   보안 세션 폐기           → family null (전역)
  *
  * ── 이 테스트가 증명하는 것 ────────────────────────────────────────────────
  *   - 정상 세션은 refresh 로 재발급되고 **family 는 유지**된다
  *     (회귀 지점: 회전마다 새 family 를 단일 슬롯에 덮어써 handoff 로 family 를 공유한
  *      다른 origin 의 refresh token 을 stale 로 만들었다 — IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1)
- *   - `logoutAll()` 이후 기존 refresh token 은 절대 재발급되지 않는다
+ *   - `revokeAllSessions()` 이후 기존 refresh token 은 절대 재발급되지 않는다
  *     (회귀 지점: `users.refreshTokenFamily = null` 이 family 검사 전체를 우회시켰다)
  *   - 다른 기기에서 발급된 family 는 mismatch 로 거부되고 전체 세션이 폐기된다
  *
@@ -39,7 +39,7 @@ jest.mock('../auth-context.helper.js', () => ({
   persistRefreshTokenFamily: jest.fn(async () => undefined),
 }));
 
-describe('refresh token family 계약 — logout-all 무효화', () => {
+describe('refresh token family 계약 — 보안 세션 폐기 무효화', () => {
   const USER_ID = '00000000-0000-4000-8000-000000000001';
 
   let service: AuthTokenSessionService;
@@ -178,10 +178,10 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
     });
   });
 
-  it('F · logout-all 이후에는 기존 refresh token 으로 재발급할 수 없다', async () => {
+  it('F · 보안 세션 폐기가후에는 기존 refresh token 으로 재발급할 수 없다', async () => {
     const stolenToken = user.__loginRefreshToken;
 
-    await service.logoutAll(USER_ID);
+    await service.revokeAllSessions(USER_ID);
     expect(user.refreshTokenFamily).toBeNull();
 
     await expect(service.refreshTokens(stolenToken)).rejects.toMatchObject({
@@ -189,12 +189,12 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
     });
   });
 
-  it('logout-all 은 다른 기기에서 발급된 토큰도 무효화한다', async () => {
+  it('보안 세션 폐기는 다른 기기에서 발급된 토큰도 무효화한다', async () => {
     const deviceA = user.__loginRefreshToken;
     // 기기 B 로그인 — 같은 family 를 승계한 토큰(handoff) 과 새 family 토큰 모두 검사한다.
     const deviceB = makeRefreshTokenForCurrentFamily();
 
-    await service.logoutAll(USER_ID);
+    await service.revokeAllSessions(USER_ID);
 
     await expect(service.refreshTokens(deviceA)).rejects.toMatchObject({
       code: 'TOKEN_FAMILY_REVOKED',
@@ -204,8 +204,8 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
     });
   });
 
-  it('logout-all 후 재로그인하면 새 refresh token 은 정상 동작한다', async () => {
-    await service.logoutAll(USER_ID);
+  it('보안 세션 폐기 후 재로그인하면 새 refresh token 은 정상 동작한다', async () => {
+    await service.revokeAllSessions(USER_ID);
 
     const relogin = tokenUtils.generateTokens(user, [], 'neture.co.kr');
     user.refreshTokenFamily = tokenUtils.getTokenFamily(relogin.refreshToken);
@@ -238,7 +238,7 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
 
   // ── WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (S7) ────────────────
   //
-  // 종전에는 `logout` 이 `logoutAll` 에 위임해서 family 를 비웠다. family 는 **사용자 전체**
+  // 종전에는 `logout` 이 `revokeAllSessions` 에 위임해서 family 를 비웠다. family 는 **사용자 전체**
   // 범위이므로, 한 서비스에서 로그아웃하면 9개 주소의 refresh 가 모두 거부됐다.
   // 프런트는 두 경로를 이미 구분해 불렀으므로(useServiceAuth) 차이는 서버 하나에 있었다.
   describe('S7 · 서비스 단위 로그아웃 — 서버에서 실제로 무효화된다', () => {
@@ -364,9 +364,9 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       await expect(service.refreshTokens(legacyToken)).resolves.toBeTruthy();
     });
 
-    it('logout-all 은 여전히 전역 폐기다 — 위임이 아니라 자기 구현으로', async () => {
+    it('보안 세션 폐기는 여전히 전역 폐기다 — 위임이 아니라 자기 구현으로', async () => {
       const token = user.__loginRefreshToken;
-      await service.logoutAll(USER_ID);
+      await service.revokeAllSessions(USER_ID);
       expect(user.refreshTokenFamily).toBeNull();
       await expect(service.refreshTokens(token)).rejects.toMatchObject({
         code: 'TOKEN_FAMILY_REVOKED',
@@ -426,7 +426,7 @@ describe('refresh token family 계약 — logout-all 무효화', () => {
       const before = user.refreshTokenFamily;
       await service.logout(USER_ID, 'neture');
       const afterLogout = user.refreshTokenFamily;
-      await service.logoutAll(USER_ID);
+      await service.revokeAllSessions(USER_ID);
       const afterLogoutAll = user.refreshTokenFamily;
 
       expect({ afterLogout, afterLogoutAll }).toEqual({ afterLogout: before, afterLogoutAll: null });

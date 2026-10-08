@@ -191,15 +191,6 @@ export class WebSocketSessionClient {
   }
 
   /**
-   * Logout from all devices
-   */
-  logoutAllDevices() {
-    if (this.socket?.connected) {
-      this.socket.emit('session:logout', { allDevices: true });
-    }
-  }
-
-  /**
    * Update authentication token (e.g., after refresh)
    */
   updateToken(newToken: string) {

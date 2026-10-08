@@ -339,20 +339,6 @@
             "description": "Logout from current session"
           },
           "response": []
-        },
-        {
-          "name": "Logout from All Devices",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/logout-all",
-              "host": ["{{baseUrl}}"],
-              "path": ["logout-all"]
-            },
-            "description": "Logout from all devices and sessions"
-          },
-          "response": []
         }
       ],
       "description": "Session management endpoints"
