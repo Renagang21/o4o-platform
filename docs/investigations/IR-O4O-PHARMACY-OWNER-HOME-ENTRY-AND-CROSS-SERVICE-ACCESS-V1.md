@@ -86,9 +86,13 @@ Store의 `accessible-stores`는 조직 관계 후보를 조회하고 **존재하
 
 ## 8. 검증 및 완료 상태
 
-운영 API 실측은 위 §2·§5. 코드 수정은 로컬/PR 단계이며 운영에 적용하지 않았다. 검증: web-neture Vitest 45 files / 374 tests PASS, TypeScript 및 Vite production build PASS. 변경 소스 ESLint error 0 · 기존 unused-disable warning 1. 문서 민감정보 검사 PASS. Chromium 로컬 빌드 smoke는 로그인 전/후 × 1280/390 총 4회: 가로 overflow 0, pageerror 0, h1 1개. 로그인 후 매장 버튼 → targetWorkspace store / returnPath /store 이동 확인. 브라우저 API는 실측 형상의 합성 fixture로 mock했으며 운영 업무 성공 증거가 아니다. 스크린샷은 checkout 밖 scratch에 보관하고 커밋하지 않는다.
+운영 API 실측은 위 §2·§5. 코드 수정은 로컬/PR 단계이며 운영에 적용하지 않았다. 검증: web-neture Vitest 45 files / 378 tests PASS, TypeScript 및 Vite production build PASS. 변경 소스 ESLint error 0 · 기존 unused-disable warning 1. 문서 민감정보 검사 PASS. Chromium 로컬 빌드 smoke는 로그인 전/후 × 1280/390 총 4회: 가로 overflow 0, pageerror 0, h1 1개. 로그인 후 매장 버튼 → targetWorkspace store / returnPath /store 이동 확인. 브라우저 API는 실측 형상의 합성 fixture로 mock했으며 운영 업무 성공 증거가 아니다. 스크린샷은 checkout 밖 scratch에 보관하고 커밋하지 않는다.
 
 IR 핵심 원인 조사 = COMPLETE(API·코드 범위), DB/Google 연결·실제 로그인 브라우저 업무 = BLOCKED/UNVERIFIED.
 TARGET_ACCOUNT = VERIFIED(public STORE_OWNER Demo, user-confirmed).
 DATA_REPAIR = NOT_EXECUTED. DIRECT_DB_WRITE = 0. PRODUCTION_DEPLOY = 0.
 문서 정합: 요청서의 Google 로그인 가정, 이전 4개 API 흐름, 서비스별 매장 진입 설명을 현재 실측·수정과 구분했다. 정본 정책은 변경하지 않았다.
+
+## 9. 최신 main 통합
+
+PR 검증 중 `main`에 Demo 체험 수리 단계 1(`3e7f44c38c`)이 반영되어 통합했다. API의 승인 약국 후보는 KPA 개인 membership/역할을 추가 요구하지 않는 최신 변경을 보존했다. §2의 운영 실측과 §3의 기존 코드 분석은 통합 전 기록이며 최신 API가 동일 조건이라고 해석하지 않는다. 프런트의 기존 순수 모델 입력 호환 경로에도 약국 후보의 개인 가입 추가 필터 제거를 보존했다. 조직 기반 조회·직접 Workspace 인계·목적지 검증은 유지하고, 추가된 커뮤니티 handoff 보존 및 개인 가입 상태별 회귀를 함께 실행했다. 통합 후 45 files / 378 tests PASS.

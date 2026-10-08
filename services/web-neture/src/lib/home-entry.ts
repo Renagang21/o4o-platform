@@ -383,7 +383,7 @@ const HANDOFF_ERROR_MESSAGES: Record<string, string> = {
 };
 
 /**
- * 다른 서비스 진입 URL 을 발급받는다 — 기존 handoff 계약 재사용(서버 계약 무변경).
+ * 서비스 또는 약국의 공통 Store 진입 URL을 발급받는다 — 기존 handoff 계약 재사용.
  * 이동은 하지 않는다: 호출부가 응답이 아직 유효한지(뒤로가기 복원 이후 늦게 도착한 응답이 아닌지)
  * 판단한 뒤 `window.location.assign` 한다 (WO-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1).
  * 실패는 예외로 돌려 호출부가 화면에 표시한다. 토큰 · 개인정보를 로그에 남기지 않는다.
@@ -391,7 +391,12 @@ const HANDOFF_ERROR_MESSAGES: Record<string, string> = {
 export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: string): Promise<string> {
   let targetUrl: string | undefined;
   try {
-    const res = await api.post('/auth/handoff', { targetServiceKey: serviceKey, returnPath });
+    // 승인된 약국의 내 매장은 KPA 개인 회원 공간이 아닌 공통 Store 공간이다.
+    // 커뮤니티/운영 등 다른 KPA 진입의 service handoff는 그대로 구분한다.
+    const target = serviceKey === 'kpa-society' && returnPath === SERVICE_PATHS['kpa-society'].myStore
+      ? { targetWorkspace: 'store', returnPath: '/' }
+      : { targetServiceKey: serviceKey, returnPath };
+    const res = await api.post('/auth/handoff', target);
     targetUrl = res.data?.data?.targetUrl;
   } catch (err: unknown) {
     const body = (err as { response?: { data?: { code?: string; error?: string; serviceAccess?: unknown } } })?.response?.data;
@@ -504,7 +509,8 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
       });
     }
   } else for (const s of data.stores) {
-    if (!isActive(s.serviceKey)) continue;
+    // 승인된 약국 후보의 기존 모델 입력도 KPA 개인 가입을 다시 요구하지 않는다.
+    if (s.serviceKey !== 'kpa-society' && !isActive(s.serviceKey)) continue;
     const path = SERVICE_PATHS[s.serviceKey]?.myStore;
     if (!path) continue; // Store Workspace 경로가 확인된 서비스만 (dead link 0)
     store.push({
