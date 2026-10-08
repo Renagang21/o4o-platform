@@ -72,6 +72,10 @@ HEAD `91e5047c41`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·Cod
 
 해당 HEAD의 추가 Codex P2 두 건은 기존/신규 모집의 생성 중복 검사에 같은 `recruitmentTargetMatch`를 적용하고 폐쇄형 게시판 반려 payload를 `reviewComment`로 정정했다. 실제 commerce PostgreSQL 회귀 26건은 미지정 neture-pharmacy/KPA 모집의 중복 차단과 비약국 서비스 미지정 모집의 비재해석을 포함해 PASS다. 실제 공통 회원 관리 화면을 렌더한 Vitest 1건과 Neture 빌드·타입 검사도 PASS다. 별도 Chromium 실행에서 게시판 개설 신청·승인 → 가입 신청 → 소유자 화면의 반려 입력 → DB `review_comment` 저장까지 확인했고 JavaScript error는 0이다. 격리 API·DB와 로컬 호스트 proxy를 사용했으며 운영 검증과 구분한다. 최신 수정 HEAD의 CI·리뷰는 다시 확인한다.
 
+HEAD `7fca827af8`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·CodeQL·SonarCloud가 모두 PASS였다. 해당 HEAD의 Codex P1/P2 두 건은 독립 약사 커뮤니티 운영자의 폐쇄형 Forum 권한과 이미 접수된 강좌 개설 문의의 처리 경로를 보완했다. 기존 KPA/PharmacyHub 저장 코드도 현재 독립 커뮤니티의 가입·담당 운영 판정을 사용하며 UUID 사업 공간에는 과거 서비스 역할을 우회로 사용하지 않는다. 권한 회귀 11건과 기존 Forum 관련 95건은 PASS다. 실제 격리 API에서 과거 서비스 역할·개별 폐쇄형 가입이 없는 독립 약사 운영자의 두 저장 코드 열람·중재, 탈퇴 후 즉시 차단을 확인했다.
+
+기존 `contact_requests`의 `kpa-society`/`education` 문의는 **Study 전용** 조회·상태 처리 adapter로 연결했다. 신규 강좌 문의와 함께 Study 운영 화면에서 처리하며 일반 협업·다른 서비스 문의는 조회·수정하지 않는다. 원장 재분류·가입 권한 추가·백필·데이터 삭제는 하지 않는다. API HTTP 회귀 8건과 Study 화면 Vitest 2건, 기존 강좌 권한·라우터 회귀 47건, 강좌 앱 빌드·API tsc·production 번들은 PASS다. lint ratchet은 기존 46 errors 기준으로 PASS다. 실제 Chromium의 Study 운영 화면에서 PC·모바일 조회와 상태 저장 → 기존 PostgreSQL 행의 원장 보존을 확인했으며 보호된 문의 불변·익명/비운영자 차단·토큰 유지 상태의 즉시 정지 차단도 PASS, JavaScript error는 0이다. 이 수정 이후 최신 HEAD의 CI·리뷰를 다시 확인한다.
+
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.

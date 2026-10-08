@@ -16,7 +16,7 @@ import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
 import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
-import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
+import { CATALOG_FORUM_STORAGE_CODES, communityKeyForServiceEntry } from '../../config/community-catalog.js';
 
 /**
  * ForumControllerBase
@@ -353,14 +353,19 @@ export class ForumControllerBase {
       [forumId],
     );
     if (!forum || !forum.service_code) return false;
-    if (userId && /^(sf|community):/.test(forum.service_code)) {
-      const rows = await AppDataSource.query(
+    const legacyCommunityKey = communityKeyForServiceEntry(forum.service_code);
+    if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
+      const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
         `SELECT community_key AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
          UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forum.service_code],
       );
       if (!rows[0]) return false;
       const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
-      return (await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key))?.canManage ?? false;
+      const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
+      if (workspace?.allowed && workspace.canManage) return true;
+      // New UUID spaces have no service-role fallback. Historical service
+      // governance remains behind the mount's current community approval gate.
+      if (!legacyCommunityKey) return false;
     }
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(forum.service_code);
     return rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false;
@@ -390,13 +395,7 @@ export class ForumControllerBase {
     // Admin / operator bypass — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S3)
     // Platform admin/super_admin bypass globally; service operators/admins bypass
     // ONLY for closed forums belonging to their own service (no cross-service bypass).
-    const rolePrefix = forum.service_code
-      ? resolveRolePrefixFromCanonicalServiceKey(forum.service_code)
-      : null;
-    const bypass = /^(sf|community):/.test(forum.service_code ?? '')
-      ? await this.hasForumModerationOverride(forumId, userRoles, userId)
-      : isPlatformAdmin(userRoles) ||
-        (rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false);
+    const bypass = await this.hasForumModerationOverride(forumId, userRoles, userId);
     if (bypass) {
       return { allowed: true, forumType: 'closed' };
     }

@@ -1,5 +1,6 @@
 import { ContactInquiryAdminPage, type ContactInquiryApi } from '@o4o/operator-core-ui/modules/contact-inquiry';
 import { api } from '../../lib/apiClient';
+import LegacyEducationRequestsPanel from './LegacyEducationRequestsPanel';
 
 const BASE = '/admin/services/lecture/contact-inquiries';
 const contactApi: ContactInquiryApi = {
@@ -10,6 +11,9 @@ const contactApi: ContactInquiryApi = {
 };
 
 export default function OperatorContactPage() {
-  return <ContactInquiryAdminPage serviceKey="lecture" api={contactApi} title="강의 서비스 문의 관리"
-    inquiryTypeLabels={{ account_permission: '이용 신청', partnership: '강의 개설 · 협업', technical_issue: '오류 신고', other: '기타' }} />;
+  return <>
+    <ContactInquiryAdminPage serviceKey="lecture" api={contactApi} title="강의 서비스 문의 관리"
+      inquiryTypeLabels={{ account_permission: '이용 신청', partnership: '강의 개설 · 협업', technical_issue: '오류 신고', other: '기타' }} />
+    <LegacyEducationRequestsPanel />
+  </>;
 }
