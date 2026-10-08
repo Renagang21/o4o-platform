@@ -13,6 +13,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { Router } from 'express';
 
 const calls: string[] = [];
 
@@ -40,7 +41,7 @@ jest.mock('../../services/forum/ForumRequestService.js', () => ({ forumRequestSe
 // This suite checks outer community guard wiring. The delegated Forum router
 // has separate boundary tests and requires its real entity graph at runtime.
 jest.mock('../forum/service-forum.routes.js', () => ({
-  createServiceForumRouter: () => require('express').Router(),
+  createServiceForumRouter: () => Router(),
 }));
 
 jest.mock('../../services/auth/auth-context.helper.js', () => ({

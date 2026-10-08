@@ -21,6 +21,8 @@ import { SupplierStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import logger from '../../../utils/logger.js';
+import { requireCommunityAccess } from '../../../middleware/community-access.middleware.js';
+import { resolveCommunityWorkspace } from '../../../services/community/community-workspace.service.js';
 
 /**
  * Create Neture Controller (P1 - GET Only)
@@ -217,7 +219,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * GET /home/forum
    * Home page forum preview (recent posts)
    */
-  router.get('/home/forum', async (req: Request, res: Response) => {
+  router.get('/home/forum', optionalAuth, requireCommunityAccess('o4o-general'), async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 5;
       const posts = await forumService.listRecentPosts(limit);
@@ -238,6 +240,7 @@ export function createNetureController(dataSource: DataSource): Router {
    */
   router.get('/admin/dashboard/summary', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
+      const workspace = await resolveCommunityWorkspace(dataSource, (req as any).user, 'o4o-general');
       // Parallel fetch: Neture stats + APP summaries
       const [
         supplierCount,
@@ -253,10 +256,10 @@ export function createNetureController(dataSource: DataSource): Router {
         dataSource.query(`SELECT COUNT(*) as count FROM cms_contents WHERE "serviceKey" = 'neture' AND status = 'published'`),
         contentService.listForHome(['notice', 'news', 'hero'], 5),
         signageService.listForHome(3, 3),
-        forumService.listRecentPosts(5),
+        workspace?.allowed ? forumService.listRecentPosts(5) : [],
         dataSource.query(`SELECT COUNT(*) as count FROM signage_media WHERE "serviceKey" = 'neture' AND status = 'active'`),
         dataSource.query(`SELECT COUNT(*) as count FROM signage_playlists WHERE "serviceKey" = 'neture' AND status = 'active'`),
-        dataSource.query(`SELECT COUNT(*) as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`), // DESIGN-ACCEPT: Community domain shared (F6)
+        workspace?.allowed ? forumService.countVisiblePosts() : 0,
       ]);
 
       res.json({
@@ -280,7 +283,7 @@ export function createNetureController(dataSource: DataSource): Router {
             recentPlaylists: signageHome.playlists,
           },
           forum: {
-            totalPosts: parseInt(forumPostCount[0]?.count || '0', 10),
+            totalPosts: forumPostCount,
             recentPosts,
           },
           serviceStatus: [],

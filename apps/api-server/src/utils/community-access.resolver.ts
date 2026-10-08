@@ -13,7 +13,7 @@
  *     `user.memberships`(JWT payload — `freshenUserContext` 가 만든 것) 다. DB 를 직접 보지 않는다.
  *   - `platform:super_admin` 은 기존 forum write guard 와 같은 예외로 통과한다.
  *   - 참여 자격(participation) ≠ 운영 권한(moderation) — 운영자 권한은 여기서 추론하지 않는다 (WO §19).
- *   - 참여 자격 ≠ 공개 read 정책 — 비로그인 read 는 기존 route 계약 그대로다 (WO §13).
+ *   - 참여 자격 ≠ 가입 승인 — 게시글 읽기·쓰기는 DB workspace gate가 현재 승인을 추가 확인한다.
  *
  * 순수 함수라 DB 없이 테스트한다. 서비스별 `if (hasKpaMembership)` 분기를 프런트·라우트에 복제하지 않는다.
  */

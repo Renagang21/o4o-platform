@@ -54,6 +54,12 @@ Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했�
 
 옛 HUB 자료 handoff는 실제 공통 `/store/library/*` 경로를 보존한다. 매장 자체 콘텐츠는 기존 서비스 경로를 유지하며 경로 회귀 4건과 브라우저 실제 도착으로 확인했다. Store handoff의 React StrictMode 중복 교환을 차단하여 일회용 토큰을 한 번만 교환한다(StrictMode 회귀 1건 PASS). 수동 이벤트 CLI는 tsc 산출물에 포함되는 operations 경로로 옮기고 기본 dry-run이 phase-one을 조회하는 것을 확인했다. 인덱스 판정은 추가 predicate가 섞인 구조를 phase-two로 인정하지 않으며 실제 DB·판정 회귀 25건이 PASS다.
 
+두 번째 HEAD에서는 API Jest 3개 shard가 모두 PASS였고 SonarCloud·앱 빌드도 PASS였다. Code Quality는 라우트 테스트의 CommonJS `require`로 신규 lint error가 발생해 실패했다. ES import로 수정한 뒤 로컬 lint ratchet은 기존 baseline 46 errors로 PASS다. 이후 변경을 포함한 최신 HEAD의 CI와 리뷰는 별도로 확인한다.
+
+후속 Codex P1 두 건을 보완했다. 강좌·내 매장 Dockerfile에 `operator-core-ui`와 전이 의존성의 manifest/source를 포함하고 Node/pnpm 버전·frozen lockfile·일치하는 filter를 고정했다. 선언된 workspace 의존 그래프 전체의 COPY 회귀 2건은 PASS다. 로컬 Docker의 vfs 저장 방식과 네트워크 신뢰 환경에 맞춰 **저장소 밖 검토용 Dockerfile**에 공개 CA secret과 layer 병합을 적용해 두 이미지를 빌드하고 root·생성 JS asset의 HTTP 200을 확인했다. TLS·패키지 integrity는 유지했으며, 실제 운영 빌더·배포 성공으로 기록하지 않는다.
+
+옛 KPA Forum의 읽기와 홈 요약에도 현재 독립 약사 커뮤니티 승인을 적용했다. PharmacyHub 최신 활동과 Neture 홈 미리보기, 옛 운영 대시보드의 포럼 부분까지 대조했으며 미승인자는 글·통계가 노출되지 않는다. 승인된 운영 요약·분석도 해당 커뮤니티 저장 코드와 조직 범위만 집계한다. 관련 라우트/공용 접근/이미지 회귀 81건과 별도 카탈로그·실제 PostgreSQL 집계 검사 33건은 PASS다. 실제 로컬 HTTP로 pharmacy 사업 가입만 한 계정의 독립 약사 Forum 차단, 독립 신청·승인 후 조회, 탈퇴 후 즉시 차단과 다른 사업 공급 유지, 일반 커뮤니티 승인 전후 운영 요약의 격리를 확인했다.
+
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.
