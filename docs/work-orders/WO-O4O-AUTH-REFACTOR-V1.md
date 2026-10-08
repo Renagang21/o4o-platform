@@ -15,7 +15,7 @@
 
 ## 단계와 TODO
 
-각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 이번 클라우드는 setup 스킬에 따라 이미 격리된 checkout을 사용하며 `wo/auth-refactor-phase1`에서 작업한다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
+각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 1단계 구현은 setup 스킬에 따라 이미 격리된 클라우드 checkout의 `wo/auth-refactor-phase1`에서 진행했다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
 
 ### 1. 정책·공개 로그아웃 계약 정리
 
@@ -26,7 +26,9 @@
 - [x] 공개 `/auth/logout-all` 제거, 비밀번호 재설정의 내부 보안 폐기 유지
 - [x] 영향 범위 테스트·타입 검사·lint·화면 smoke
 - [x] commit·push·PR용 변경과 검증 자료 준비
-- [ ] 필수 CI·review 확인 및 main 통합 (통합은 사용자 승인 후)
+- [x] 필수 CI·review 확인 및 사용자 승인 후 main 통합 — [PR #361](https://github.com/Renagang21/o4o-platform/pull/361), `0795464cc5597eb995d591b99ef7587a20da7d14`
+
+운영 배포와 2026-10-08 공개 테스트 버튼 실접속 결과는 [단계 1 CHECK의 운영 검증](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE1-V1.md#운영-배포-후-공개-demo-실접속-검증--2026-10-08)을 따른다. 로그인 성공과 업무 데이터 체험 완료를 구분한다.
 
 ### 2. 세션·비밀번호
 
@@ -37,6 +39,8 @@
 - [ ] 공통 계정 보안 UI에 첫 비밀번호 추가·기존 비밀번호 변경 구현; Demo 계정 변경 차단
 - [ ] 전체관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
 - [ ] 서비스별 일반 logout, 다른 기기 유지, 비밀번호 변경·reset 전역 폐기 회귀 검증
+
+운영 검증에서 같은 Neture 서브도메인의 다른 브라우저는 기존 access token으로 조회할 수 있었지만, logout 후 refresh가 `401 SERVICE_SESSION_REVOKED`로 거절됐다. 다른 브라우저 유지와 access token 폐기 판정을 함께 검증해야 한다. Neture logout 후 약국·Store 세션은 두 Demo 모두 refresh 및 새 access token 발급이 성공했다.
 
 ### 3. 카카오 로그인·명시적 연결
 
@@ -55,6 +59,8 @@
 
 - [ ] 실제 대상 DB와 접속 경로 확인; 격리 로컬 DB와 기존 데이터 DB를 혼동하지 않음
 - [ ] 계정·가입·역할·소유권·콘텐츠·상품·주문·FK 목록 조사 및 disposition 작성
+- [ ] 약국장 Demo의 승인 원장·매장 ownership·진입 연결 확인 및 복구 — 운영 `/neture/home/entry`의 매장 0건, 약국 업무 API `403 STORE_OWNER_REQUIRED` 해소 후 재검증
+- [ ] 공급자 Demo에 재사용할 상품·자료 ownership 연결 — 운영 공급자 상품 0건·라이브러리 자료 0건 상태에서 실제 기능 체험이 가능한 샘플 연결
 - [ ] 기존 provisioning의 고정 보호 ID/과거 실사용 가정 재검토; 기본 dry-run인 명시적 대상 계획으로 교체
 - [ ] 재사용 데이터 연결 → 기능 검증 → 미사용 데이터 삭제 → 마지막에 불필요 계정 삭제
 - [ ] 삭제 전 복구 자료, 정확한 대상 목록, transaction·멱등성과 참조 무결성 검증

@@ -62,3 +62,44 @@ Chromium에서 Neture와 KPA `/mypage/settings`를 1440×900 및 390×844로 확
 ## 문서 정합
 
 인증 정본·Identity V3·Demo 정본·canonical index를 승인된 정책에 맞췄다. 과거 카카오 제외/전체 로그아웃 서술은 현행 정본의 갱신 안내로 대체 범위를 명시했다. 단계별 완료 여부는 WO TODO를 따른다.
+
+## 운영 배포 후 공개 Demo 실접속 검증 — 2026-10-08
+
+위 로컬/fixture 검증 이후, 사용자 승인으로 [PR #361](https://github.com/Renagang21/o4o-platform/pull/361)을 main에 통합하고 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/37769623016)로 배포했다. 대상은 `0795464cc5597eb995d591b99ef7587a20da7d14`이며, main CI 및 최종 serving SHA 보고가 성공하고 commit status `production`은 `DEPLOYED`다.
+
+사용자 지시에 따라 로그인 화면의 공개 테스트 버튼을 직접 클릭했다. 인증 응답이나 업무 조회를 fixture로 대체하지 않았다. 시스템 Chromium의 격리된 프로필에서 환경 프록시와 TLS 검증을 유지했고, credentials는 정본의 두 Demo만 사용했다. token·개인정보·응답 원문을 검증 기록에 남기지 않았다.
+
+### 버튼·일반 로그인·일반 로그아웃
+
+| 운영 로그인 화면 | 약국장/매장 경영자 버튼 | 공급자 버튼 | desktop/mobile 로그인 | 일반 로그아웃 |
+|---|---|---|---|---|
+| `neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | 설정 화면에서 PASS |
+| `supplier.neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | 설정 화면에서 PASS |
+| `pharmacy.neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | 설정 화면에서 PASS |
+| `store.neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | PASS |
+| `study.neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | PASS |
+| `kpa.neture.co.kr` | 표시·클릭 정상 | 표시·클릭 정상 | 두 역할 PASS | 서비스 홈에서 PASS |
+
+범위는 5개 앱의 6개 로그인 화면 × 2개 역할 × 2개 viewport = **24개 조합**이다. desktop은 1440×900, mobile은 390×844다. 모든 버튼이 viewport 안에 있었고, 로그인 HTTP 200과 해당 브라우저의 `/auth/me` HTTP 200·Demo 판정을 확인했다. 일반 logout은 HTTP 200과 access/refresh token 삭제를 확인했다. 첫 실행에서 로그아웃을 확인하지 못한 6개 조합은 설정/서비스 홈으로 이동한 추가 실행에서 확인했다. 실제 접속한 화면에는 누락 버튼이 없으므로 앱 코드는 변경하지 않았다.
+
+Neture·약국 계정 보안 화면에서 일반 logout과 공통 계정 표시를 확인했고, 전체/다른 기기 logout action은 보이지 않았다. 두 Demo의 인증 응답에는 각각 `kpa:store_owner`, `neture:supplier` 역할만 있었으며 전체관리자 역할은 없었다.
+
+### 기능 체험에서 확인된 미완료 사항
+
+| 대상 | 실제 결과 | 판단·후속 |
+|---|---|---|
+| 약국장: Neture/공급자 호스트의 Demo 매장 자동 이동 | 로그인은 성공했지만 이동 실패 안내 표시. `/neture/home/entry`는 HTTP 200·매장 0건. Neture·약국 서비스 membership은 active | 유효한 매장 진입 연결이 없음. 승인 원장·매장 ownership·진입 데이터를 조사하고 연결해야 함 |
+| 약국장: 약국 업무 화면 | `/api/v1/kpa/store-hub/capabilities`, `/api/v1/kpa/pharmacy/info`가 desktop/mobile 모두 HTTP 403·`STORE_OWNER_REQUIRED` | 로그인된 identity와 업무 접근 요건은 별개. 서버 guard를 우회하지 않고 승인·소유 관계를 확인해야 함 |
+| 공급자: 대시보드·상품·자료 | 대시보드 진입 성공. 상품 조회 HTTP 200·0건, 라이브러리 조회 HTTP 200·자료 0건 | 샘플 데이터가 없는 상태이므로 데이터 기능 체험 완료로 판정하지 않음. 재사용할 데이터를 Demo ownership에 연결해야 함 |
+| 같은 Neture 서브도메인의 다른 브라우저 | 일반 logout 전후 기존 access token의 `/auth/me`는 HTTP 200. logout 후 다른 브라우저의 refresh는 HTTP 401·`SERVICE_SESSION_REVOKED` | 같은 서비스 epoch가 다른 브라우저의 갱신까지 막는 기존 동작 재현. 2단계의 브라우저별 세션 종료 및 access token 판정 TODO 유지 |
+| 다른 서브도메인: 약국·Store | 두 Demo 모두 Neture logout 전후 인증 조회 HTTP 200. 실제 클라이언트와 같은 refresh 옵션으로 HTTP 200·새 access token 발급 확인 | 확인한 방향(Neture → 약국/Store)의 세션 분리 PASS. 모든 서브도메인 조합을 검증했다는 뜻은 아님 |
+
+### 범위와 제약
+
+- 업무 조회를 수행했다. 상품 생성·주문 확정·결제·메일 발송·승인/role/ownership 변경·데이터 삭제는 수행하지 않았다.
+- 공개 테스트 로그인·logout·refresh로 생기는 정상 인증 상태 변경 외에 운영 업무 데이터를 수정하지 않았다. 운영 DB 직접 조회·승인 원장 row 조사도 수행하지 않았으므로 매장 접근 실패의 정확한 DB 원인은 아직 미확정이다.
+- `pharmacyhub.co.kr`은 현재 환경 허용 도메인에 없어 운영 화면을 검증하지 못했다. 접근 정책을 우회하지 않았다. 나머지 Neture host profile 전체에 대한 실접속도 미실행이다.
+- Google SDK 호스트가 환경 네트워크 정책으로 접근 실패했다. 공개 이메일 Demo 흐름은 정상이며, Google·카카오 실제 OAuth 성공을 이 검증으로 주장하지 않는다.
+- 비밀번호 변경·소셜 연결·실제 데이터 연결 및 정리는 후속 단계다. 24개 조합의 로그인 성공을 전체 업무 기능 PASS로 확대하지 않는다.
+
+**운영 판정:** 1단계의 로그인·일반 logout 및 공개 전체 logout UI 제거는 확인했다. 두 역할의 완전한 기능 체험은 매장 접근/샘플 데이터 연결과 후속 세션 처리 작업이 남아 있어 미완료다. 단계별 TODO를 유지한다.
