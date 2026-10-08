@@ -206,6 +206,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '515f8b4c82da92b5e8b94bc75ad90bccfa639454c2fbb2149a5ad72f8b69e93d',
     fingerprintLineCount: 6154,
   },
+  // Demo repair snapshot table, verified on isolated PostgreSQL 15.
+  {
+    appliedThrough: 'RepairCanonicalDemoExperience1791501198171',
+    fingerprint: '702c212dfaa42db0e0c5076ab4afb76f382e70992929aeda69d09c314d8112bf',
+    fingerprintLineCount: 6163,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
