@@ -259,7 +259,7 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 ### CI 게이트 현재 상태
 
 `ci-pipeline.yml` 은 `main` push · PR 에서 실행되며, 아래는 **실패 시 CI 를 차단**합니다.
-변경 범위에 따라 문서 전용 변경은 `docs-fast`, admin 전용 변경은 `admin-fast` 잡으로 대체됩니다(`scripts/ci/detect-affected.mjs`).
+변경 범위에 따라 조건을 충족한 문서 전용 변경은 `docs-fast`, admin 전용 변경은 `admin-fast` 잡으로 대체됩니다(`scripts/ci/detect-affected.mjs`).
 
 | 검사 | 비고 |
 |---|---|
@@ -268,16 +268,27 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 | ESLint ratchet · 정적 guard | unsafe route · TypeORM entity registry · bootstrap/migration 계약 · `console.log`(`apps/**`) |
 | Vitest | admin-dashboard · 공통 packages · 서비스별(web-neture · web-kpa-society · web-kpa-branch 등) — 각 `vitest.config.mjs` 를 루트에서 실행 |
 | Jest | 일부 packages · api-server (3 shard, `@o4o/api-server^...` 사전 빌드) |
-| 앱 빌드 | `admin-dashboard` 만. 서비스 web 앱(web-neture 등)의 빌드는 CI 가 아니라 배포 Docker 빌드에서 수행 |
+| 앱 빌드 | `admin-dashboard` 와 변경 영향이 있는 서비스 web 앱(`Web production build (affected)`)을 CI 에서 빌드. 배포 시 Docker 이미지도 별도로 빌드 |
 
 web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run --config services/web-neture/vitest.config.mjs` 를 실행합니다
 (web-neture `package.json` 에는 test script 가 없습니다).
 
-> **api-server type-check 주의.** api-server 는 `@o4o/security-core` 등 11개 패키지 타입을
-> `dist/*.d.ts` 로 해석하는데, 이 패키지들은 `build:packages` 체인에 **없습니다**.
-> CI 는 `pnpm --filter '@o4o/api-server^...' run build` 로 먼저 빌드합니다.
-> 로컬은 이전 빌드의 `dist` 가 남아 있어 이 문제가 재현되지 않습니다 —
-> **로컬 green ≠ CI green** 인 대표 사례이므로, clean 체크아웃에서 검증할 때는 위 사전 빌드를 먼저 실행하세요.
+> **api-server type-check 의 사전 빌드.** api-server 는 의존 패키지의 타입을 `dist/*.d.ts` 로 해석합니다.
+> 현재 `build:packages` 는 `build:api-deps` 를 포함하며, API 의존 패키지를 pnpm 의 의존성 순서로 빌드합니다.
+> 최초 설치 · clean 체크아웃에서는 아래 순서로 실행하세요.
+
+```bash
+pnpm run build:packages
+pnpm --filter @o4o/api-server run type-check
+```
+
+API 의존성만 준비할 때는 `pnpm run build:api-deps` 를 사용할 수 있습니다.
+이 명령은 `pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build` 를 실행하므로,
+`build:packages` 를 마친 뒤 같은 의존성을 추가로 빌드할 필요는 없습니다.
+의존 패키지 소스가 바뀌었다면 타입 검사 전에 다시 빌드해 이전 `dist` 를 사용하는 것을 방지하세요.
+
+CI 의 `quality-check` 는 `setup-build-env` 에서 `build:packages` 를 실행한 뒤 API 타입을 검사합니다.
+별도 runner 에서 실행되는 API Jest shard 는 자체적으로 API 의존성을 먼저 빌드합니다.
 
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
 기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
