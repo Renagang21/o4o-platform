@@ -52,9 +52,10 @@ export class SemiFranchiseRecruitmentService {
     );
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
     const [dup] = await this.dataSource.query(
-      `SELECT 1 FROM seller_recruitments
-        WHERE product_id = $1 AND seller_id = $2 AND service_id = $3 AND semi_franchise_id = $4`,
-      [input.masterId, supplierUserId, NETURE_PHARMACY_SERVICE_KEY, sf.id],
+      `SELECT 1 FROM seller_recruitments sr
+         JOIN semi_franchises sf ON ${recruitmentTargetMatch()}
+        WHERE sr.product_id = $1 AND sr.seller_id = $2 AND sf.id = $3`,
+      [input.masterId, supplierUserId, sf.id],
     );
     if (dup) throw new NeturePharmacyError(409, 'RECRUITMENT_ALREADY_EXISTS', '이 세미프랜차이즈에 이미 모집이 있습니다.');
     const consumerPrice = Number.isFinite(Number(input.consumerPrice)) ? Math.max(0, Number(input.consumerPrice)) : 0;

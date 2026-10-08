@@ -13,7 +13,7 @@ export default function CommunityForumMembersPage({ basePath }: { basePath: stri
       fetchJoinRequests: id => api.get(`${base}/${id}/join-requests`).then((r: { data: any }) => r.data),
       fetchMembers: id => api.get(`${base}/${id}/members`).then((r: { data: any }) => r.data),
       approveJoin: (id, requestId) => api.post(`${base}/${id}/join-requests/${requestId}/approve`).then((r: { data: any }) => r.data),
-      rejectJoin: (id, requestId, comment) => api.post(`${base}/${id}/join-requests/${requestId}/reject`, { comment }).then((r: { data: any }) => r.data),
+      rejectJoin: (id, requestId, comment) => api.post(`${base}/${id}/join-requests/${requestId}/reject`, { reviewComment: comment }).then((r: { data: any }) => r.data),
       removeMember: (id, userId) => api.delete(`${base}/${id}/members/${userId}`).then((r: { data: any }) => r.data),
     });
   }, [communityKey]);

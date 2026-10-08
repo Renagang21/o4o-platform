@@ -68,6 +68,10 @@ Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했�
 
 실제로 실행한 격리 API에서도 옛 KPA·PharmacyHub 별칭의 익명/미승인 차단, 독립 가입 승인 후 조회, 탈퇴 후 통계·게시판·회원 상태 차단과 다른 사업의 포럼/공급 유지가 PASS다. 미승인 상태의 게시판 소유자 작업·폐쇄형 회원 관리 요청도 controller 이전에 `COMMUNITY_MEMBERSHIP_REQUIRED`로 거절됨을 확인했다.
 
+HEAD `91e5047c41`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·CodeQL·SonarCloud가 모두 PASS였다. SonarCloud는 Quality Gate passed와 신규 Security Hotspots 0을 반환했다. 유지보수 관련 annotation은 남아 있으며 전체 지적 0으로 기록하지 않는다.
+
+해당 HEAD의 추가 Codex P2 두 건은 기존/신규 모집의 생성 중복 검사에 같은 `recruitmentTargetMatch`를 적용하고 폐쇄형 게시판 반려 payload를 `reviewComment`로 정정했다. 실제 commerce PostgreSQL 회귀 26건은 미지정 neture-pharmacy/KPA 모집의 중복 차단과 비약국 서비스 미지정 모집의 비재해석을 포함해 PASS다. 실제 공통 회원 관리 화면을 렌더한 Vitest 1건과 Neture 빌드·타입 검사도 PASS다. 별도 Chromium 실행에서 게시판 개설 신청·승인 → 가입 신청 → 소유자 화면의 반려 입력 → DB `review_comment` 저장까지 확인했고 JavaScript error는 0이다. 격리 API·DB와 로컬 호스트 proxy를 사용했으며 운영 검증과 구분한다. 최신 수정 HEAD의 CI·리뷰는 다시 확인한다.
+
 ## 3. 적용·복구 순서
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.

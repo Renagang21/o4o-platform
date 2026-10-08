@@ -535,6 +535,24 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(typeof (events as any).updatePrice).toBe('undefined');
     });
 
+    it.each(['neture-pharmacy', 'kpa-society'])('미지정 %s 모집도 pharmacy 중복 생성 검사에 포함한다', async serviceKey => {
+      const prod = await supplierWithProduct({ price: 15000 });
+      const existing = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 13000 });
+      await ds.query('UPDATE seller_recruitments SET semi_franchise_id = NULL, service_id = $2 WHERE id = $1', [existing.id, serviceKey]);
+      await expect(recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, semiFranchiseKey: 'pharmacy', supplyUnitPrice: 12000 }))
+        .rejects.toMatchObject({ code: 'RECRUITMENT_ALREADY_EXISTS' });
+      expect((await recruitments.supplierList(prod.supplierUser)).map(row => row.id)).toEqual([existing.id]);
+    });
+
+    it('약국 대상이 아닌 서비스의 미지정 모집은 pharmacy 중복으로 재해석하지 않는다', async () => {
+      const prod = await supplierWithProduct({ price: 15000 });
+      const foreign = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 13000 });
+      await ds.query("UPDATE seller_recruitments SET semi_franchise_id = NULL, service_id = 'k-cosmetics' WHERE id = $1", [foreign.id]);
+      const pharmacy = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 12000 });
+      expect(pharmacy.id).not.toBe(foreign.id);
+      expect((await recruitments.supplierList(prod.supplierUser)).map(row => row.id)).toEqual([pharmacy.id]);
+    });
+
     it('모집: 조건 승인 → 약국 조직 참여 신청 → 공급자 승인 후 모집 공급가로 바로 주문 옵션이 생긴다', async () => {
       const prod = await supplierWithProduct({ price: 15000 });
       const member = await approvedPharmacy();
@@ -562,7 +580,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const b = await approvedPharmacy();
       await joinSemiFranchise(a.orgId, a.owner, 'pharmacy', pharmacyOperator);
       await joinSemiFranchise(b.orgId, b.owner, 'pharmacy', pharmacyOperator);
-      const buyer = a.owner; // 두 약국을 함께 운영하는 사용자 (조직 소유 판정은 route 게이트가 맡는다)
+      const buyer = a.owner; // 내부 격리 검증용 호출. 실제 타 약국 접근은 route의 조직 권한 gate가 판정한다.
       const added = await cart.add(buyer, a.orgId, { kind: 'default', id: prod.offerId, quantity: 1 });
 
       expect(await cart.list(buyer, b.orgId)).toEqual([]);
