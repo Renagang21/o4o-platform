@@ -344,8 +344,14 @@ describe('② 완료 판정기', () => {
     const rejecting = createCompletionJudge(U([C1]), { verify: async () => ['c1'], counters });
     expect((await rejecting({ evidence: [G('c1')], via: 'done' })).decision).toBe('continue');
     expect(counters.aiCalls).toBe(1);
+    // 의미 검증 실패(오류 · 무효 응답) — 인용이 화면에 있어도 조건과의 관계를 모른다 → 완료가 아니라 사용자 확인.
     const broken = createCompletionJudge(U([C1]), { verify: async () => { throw new Error('provider down'); } });
-    expect((await broken({ evidence: [G('c1')], via: 'done' })).decision).toBe('complete');
+    expect(await broken({ evidence: [G('c1')], via: 'done' })).toMatchObject({ decision: 'ask', askKind: 'success_confirmation', unmet: ['c1'] });
+    const invalid = createCompletionJudge(U([C1]), { verify: async () => null });
+    expect(await invalid({ evidence: [G('c1')], via: 'done' })).toMatchObject({ decision: 'ask', unmet: ['c1'] });
+    // 검증 통과(빈 배열) · 검증기 없는 구성은 결정적 판정 그대로.
+    expect((await createCompletionJudge(U([C1]), { verify: async () => [] })({ evidence: [G('c1')], via: 'done' })).decision).toBe('complete');
+    expect((await createCompletionJudge(U([C1]))({ evidence: [G('c1')], via: 'done' })).decision).toBe('complete');
   });
   it('Task 상태 — criteria_evidence 는 Assistant 판정이 정한다 · 판정 없으면 종전 결과 근거 규칙', () => {
     const c = planAssistantTask({ ...BASE, understanding: U([C1]) }).intent.completion;

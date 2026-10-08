@@ -379,17 +379,21 @@ export function createCompletionJudge(
     const grounded = new Set(evidence.filter((e) => e.grounded).map((e) => e.criterionId));
     let met = observed.filter((c) => grounded.has(c.id)).map((c) => c.id);
     let unmet = observed.filter((c) => !grounded.has(c.id)).map((c) => c.id);
+    /** 의미 검증을 시도했지만 결과를 얻지 못했다(timeout · 오류 · 무효 응답). */
+    let verifyUnavailable = false;
     if (unmet.length === 0 && observed.length > 0 && opts.verify) {
       const t0 = Date.now();
       counters.verifierCalls += 1;
       counters.aiCalls += 1;
       try {
         const rejected = await opts.verify({ goal: understanding.goal, criteria: understanding.criteria, evidence });
-        if (rejected && rejected.length) {
+        if (rejected === null) verifyUnavailable = true;
+        else if (rejected.length) {
           unmet = observed.filter((c) => rejected.includes(c.id)).map((c) => c.id);
           met = met.filter((id) => !unmet.includes(id));
         }
       } catch (err) {
+        verifyUnavailable = true;
         logger.warn('assistant completion verifier failed', { error: err instanceof Error ? err.name : 'unknown' });
       } finally {
         counters.aiMs += Date.now() - t0;
@@ -397,6 +401,12 @@ export function createCompletionJudge(
     }
     counters.lastMet = met.length;
     const userIds = userOnly.map((c) => c.id);
+    // 의미 검증이 실패하면 "인용이 화면에 있다" 만으로는 조건과의 관계를 알 수 없다 — 완료로 닫지 않고 사용자 확인으로 넘긴다.
+    // (검증기가 없는 구성은 종전대로 결정적 판정이다. 검증 실패가 실행을 반복시키지 않도록 continue 가 아니라 ask.)
+    if (verifyUnavailable) {
+      const ids = [...observed.map((c) => c.id), ...userIds];
+      return { decision: 'ask', met: [], unmet: ids, askKind: 'success_confirmation', question: confirmQuestion(ids) };
+    }
     if (unmet.length === 0) {
       if (userIds.length === 0) return { decision: 'complete', met, unmet: [] };
       return { decision: 'ask', met, unmet: userIds, askKind: 'success_confirmation', question: confirmQuestion(userIds) };

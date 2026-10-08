@@ -2154,7 +2154,8 @@ export async function runWorkAgent(
         return true;
       });
       lastRead = matches.length ? matches.slice(0, 20).map(describeObservationElement).join('\n') : '(일치하는 요소 없음)';
-      noteSeen(lastRead);
+      // 근거 모집단에는 직렬화 글(입력 칸의 text="값" 포함)이 아니라 값을 뺀 요소 글만 넣는다(elementEvidenceText).
+      noteSeen(matches.slice(0, 20).map(elementEvidenceText).join('\n'));
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
@@ -2164,7 +2165,8 @@ export async function runWorkAgent(
     if (surface === 'uia' && a.kind === 'read_text') {
       const el = (state.observation?.elements ?? []).find((e) => e.elementRef === a.elementRef);
       lastRead = String(el?.text ?? el?.name ?? '').slice(0, READ_SUMMARY_MAX);
-      noteSeen(lastRead);
+      // 입력 칸을 읽은 값은 근거가 아니다 — 값을 뺀 요소 글만 근거 모집단에.
+      if (el) noteSeen(elementEvidenceText(el));
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
       state.history.push(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
