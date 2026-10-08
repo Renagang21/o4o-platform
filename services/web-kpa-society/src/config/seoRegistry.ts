@@ -73,7 +73,7 @@ export const kpaSeoRegistry: SeoRegistry = {
   },
   '/about': {
     title: 'O4O 약국 소개',
-    description: '대한약사회 약사 커뮤니티·매장 지원 플랫폼 소개.',
+    description: 'O4O 약국 서비스 소개 — 약국의 정보와 업무를 하나로 연결합니다.',
     ogType: 'website',
   },
   '/contact': {

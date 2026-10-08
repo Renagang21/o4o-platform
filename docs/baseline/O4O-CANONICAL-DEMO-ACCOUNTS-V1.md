@@ -1,5 +1,7 @@
 # O4O-CANONICAL-DEMO-ACCOUNTS-V1
 
+> **2026-10-07 갱신**: 모든 사용자 서비스 로그인 화면에 두 테스트 로그인 버튼을 제공한다. credential의 공통 코드 정본은 `packages/auth-utils/src/demoAccounts.ts`다. 매장 Demo는 합성 약국 승인 원장과 `neture:store_owner` 표식으로 접근하며 KPA 회원 승인으로 접근을 얻지 않는다. 인가 우회·관리자 권한은 없다.
+
 > 발행: 2026-10-01 · 상태: **ACTIVE (정책 정본)**
 > 집행 WO: [`WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1`](../work-orders/WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1.md)
 > 선행: [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md) (이메일·비밀번호 로그인)
@@ -198,7 +200,7 @@ O4O 가 처음이신가요?
 REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 ```
 
-재사용 가능한 것은 Demo 계정으로 **연결**한다. **실제 사용자 데이터는 변경하지 않는다.**
+재사용 가능한 것은 Demo 계정으로 **연결**한다. 2026-10-08 사용자가 현재 계정과 데이터를 모두 테스트 데이터로 지정했다. 현재 데이터에 대한 과거 실사용 분류는 보존 근거가 아니다. 연결하지 않는 불필요 테스트 데이터와 개발을 방해하는 계정은 대상 조사·복구 자료 확보·기능 검증 후 정리한다. 신규 실사용 데이터가 생기면 이번 테스트 데이터 정리의 대상으로 확대하지 않는다.
 
 ## 15. 개발 데이터 생성 원칙
 
@@ -217,20 +219,20 @@ REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 → 5 재사용 relink → 6 불필요 데이터 삭제 → 7 **마지막에** user 삭제
 ```
 
-운영 사용자·운영 데이터와 연결돼 있으면 **자동 삭제하지 않는다.**
+기존 테스트 데이터의 삭제는 사용자 승인 범위다. 대상 DB와 참조 관계를 확인하고 연결·삭제 계획을 먼저 dry-run한다. DB 전체 초기화나 연결 관계를 모르는 자동 일괄 삭제로 대체하지 않는다. 실행 단계는 [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md)을 따른다.
 
-## 17. Google 연결 금지
+## 17. 소셜 연결 금지
 
-Demo 계정에 `linked_accounts(provider='google')` 를 **만들지 않는다.**
+Demo 계정에 Google·카카오 로그인 Identity를 **연결하지 않는다.**
 인증 수단은 password credential 하나뿐이다.
 
-## 18. Admin 정책 · role 허용 범위
+## 18. 전체관리자 정책 · role 허용 범위
 
 ```text
 platform:* 없음 · admin-dashboard 접근 금지
 ```
 
-현재의 "password 세션은 Admin Google 전용" 정책을 그대로 따른다.
+`admin.neture.co.kr`의 관리 주체는 **전체관리자**라고 부른다. 전체관리자의 Google 전용 인증 정책을 그대로 따른다.
 
 ### 18-1. service-scoped role allowlist (2026-10-02 확정)
 
@@ -239,7 +241,7 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 
 | | role | 쓰는 곳 |
 |---|---|---|
-| Store Owner Demo | `kpa:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
+| Store Owner Demo | `neture:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
 | Supplier Demo | `neture:supplier` | web-neture `SupplierRoute` 의 `SUPPLIER_ROLES` |
 
 ```text
@@ -256,7 +258,7 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 
 ```text
 CLI      apps/api-server/src/scripts/demo-account-provision.ts
-         ALLOWED_DEMO_ROLES = { kpa:store_owner, neture:supplier }
+         ALLOWED_DEMO_ROLES = { neture:store_owner, neture:supplier }
          목록 밖 role 은 DB 를 건드리기 전(assertPreconditions)에 거절한다
 계약     src/scripts/__tests__/demo-account-provision.contract.test.ts ⑦
          allowlist 값 · 실제 부여 role · 금지 prefix · 선행 거절 · INSERT guard 순서를 고정

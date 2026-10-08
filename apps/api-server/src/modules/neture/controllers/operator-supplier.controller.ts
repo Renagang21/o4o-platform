@@ -373,7 +373,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
 
       const result = await netureService.approveSupplier(id, approvedBy);
       if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : 400;
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : result.error === DEMO_ACCOUNT_FORBIDDEN_CODE ? 403 : result.error === 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' ? 409 : 400;
         // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
         // 구조화된 누락 필드를 함께 반환 — 프론트가 사람이 읽을 메시지로 변환.
         return res.status(status).json({

@@ -41,19 +41,19 @@ const data = (services: Svc[]): HomeEntryData => ({
 const CATALOG = (phStatus?: string) => [
   svc('neture', 'neture.co.kr', true, 'active'),
   svc('kpa-society', 'pharmacy.neture.co.kr', true),
-  svc('k-cosmetics', 'retail.neture.co.kr', true),
+  svc('k-cosmetics', 'retail.neture.co.kr', false), // 운영 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
   svc('pharmacy-hub', 'pharmacyhub.co.kr', false, phStatus),
 ];
 
 describe('가입 가능한 서비스 — canonical 호스트 · Pharmacy-Hub 비노출', () => {
-  it('약국 · 리테일 가입 안내는 canonical 호스트를 가리킨다', () => {
+  it('약국 가입 안내는 canonical 호스트를 가리키고, 운영 종료된 리테일(K-Cosmetics)은 가입 안내가 없다', () => {
     const m = buildHomeEntryModel(user, data(CATALOG()));
     const href = (id: string) => {
       const a = m.joinable.find((j) => j.id === id)?.action;
       return a && a.kind === 'public' ? a.href : undefined;
     };
     expect(href('join:kpa-society')).toBe('https://pharmacy.neture.co.kr/register');
-    expect(href('join:k-cosmetics')).toBe('https://retail.neture.co.kr/register');
+    expect(m.joinable.some((j) => j.id === 'join:k-cosmetics')).toBe(false);
   });
 
   it('Pharmacy-Hub 는 신규 가입 안내에 나타나지 않는다', () => {

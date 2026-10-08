@@ -327,7 +327,7 @@ export default function MyProfilePage({
           보안 설정 · 계정 관리(로그아웃) 를 5 서비스 공통
           `AccountSecuritySettings` 로 수렴한다. Pharmacy-Hub 는 `/mypage` 축이 없어
           이 화면이 Profile + Settings 를 함께 담는다(§13 계약 유지).
-          `logoutAll` 계약이 없으므로 현재 기기 로그아웃만 노출한다 — 세션 backend 는
+          현재 브라우저 로그아웃을 제공한다 — 세션 backend 는
           신설하지 않는다.
           ⚠️ WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: 비밀번호 변경 모달은 은퇴했다 —
           이 블록은 로그인 수단 표기와 로그아웃만 담는다. */}

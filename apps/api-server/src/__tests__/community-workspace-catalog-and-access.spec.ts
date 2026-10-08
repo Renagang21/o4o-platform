@@ -222,11 +222,11 @@ describe('Pharmacy Community 동일성 — KPA · PH 진입이 같은 원장 코
     expect(base.codes({ communityKey: 'cosmetics' })).toEqual(['k-cosmetics']);
     expect(base.codes({ communityKey: 'o4o-general' })).toEqual(['neture']);
   });
-  it('4개 mount 가 communityKey 를 명시한다 (KPA remount 포함) · PH 서비스 전용 membership guard 0', () => {
+  it('mount 가 communityKey 를 명시한다 (KPA remount 포함) · PH 서비스 전용 membership guard 0', () => {
     expect(read('apps/api-server/src/routes/kpa/kpa.routes.ts')).toMatch(/communityKey: 'pharmacy'/);
     expect(read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts')).toMatch(/communityKey: 'pharmacy'/);
     expect(read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts')).not.toContain('requireActiveServiceMembership(SERVICE_KEY)');
-    expect(read('apps/api-server/src/routes/cosmetics/cosmetics.routes.ts')).toMatch(/communityKey: 'cosmetics'/);
+    // cosmetics 커뮤니티 mount(routes/cosmetics/cosmetics.routes.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 API 와 함께 제거 — 카탈로그 정의는 DEFER.
     expect(read('apps/api-server/src/routes/neture/neture.routes.ts')).toMatch(/communityKey: 'o4o-general'/);
   });
   it('홈 피드(ForumQueryService · PH home/latest)도 Community 원장 코드 집합으로 경계 짓는다', () => {

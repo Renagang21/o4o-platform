@@ -32,6 +32,8 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
+    if (/FROM users u/i.test(sql)) return [{ account_status: 'active', account_active: true, email_verified: true }];
+    if (/SELECT nickname FROM users/i.test(sql)) return [{ nickname: '테스트 닉네임' }];
     if (/FROM demo_accounts/i.test(sql)) {
       if (db.demoLookupFails) throw new Error('db down');
       return db.demoUsers.includes(params[0]) ? [{ '?column?': 1 }] : [];

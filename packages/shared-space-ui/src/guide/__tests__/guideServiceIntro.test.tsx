@@ -4,7 +4,7 @@
  * WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §15
  *
  * 1) Shared landing 렌더 계약 (제목/lead · 카드 · 선택 섹션 · 링크)
- * 2) Adoption 정적 고정 — KPA / K-Cosmetics wrapper 가 공통 View 를 쓰는지
+ * 2) Adoption 정적 고정 — KPA wrapper 가 공통 View 를 쓰는지
  * 3) Route contract — /guide · /guide/intro · /guide/usage · /guide/features · /service-guide 관계 유지
  */
 import { readFileSync } from 'node:fs';
@@ -14,7 +14,6 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { GuideServiceIntroPage } from '../GuideServiceIntroPage.js';
 import { kpaServiceIntroProps } from '../copy/kpa.js';
-import { kCosmeticsServiceIntroProps } from '../copy/k-cosmetics.js';
 import { pharmacyHubServiceIntroProps } from '../copy/pharmacy-hub.js';
 import type { GuideServiceIntroPageProps } from '../types.js';
 
@@ -33,7 +32,7 @@ function renderPage(props: GuideServiceIntroPageProps) {
 
 const SERVICES: [string, GuideServiceIntroPageProps][] = [
   ['KPA', kpaServiceIntroProps],
-  ['K-Cosmetics', kCosmeticsServiceIntroProps],
+  // K-Cosmetics 는 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   ['PharmacyHub', pharmacyHubServiceIntroProps],
 ];
@@ -83,7 +82,7 @@ describe('GuideServiceIntroPage — 렌더 계약', () => {
   });
 
   it('mobile-friendly: 카드 그리드가 1열 기본 + sm 이상 다열이다', () => {
-    const { container } = renderPage(kCosmeticsServiceIntroProps);
+    const { container } = renderPage(pharmacyHubServiceIntroProps);
     const grids = [...container.querySelectorAll('div')].filter((d) =>
       (d.getAttribute('class') ?? '').includes('grid-cols-1'),
     );
@@ -139,8 +138,8 @@ describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
     expect(src).not.toMatch(/path="\/guide"\s+element=\{<Navigate/);
   });
 
-  it('2 서비스 guide intro 하단에 서비스 소개(/service-guide) 상호 연결이 있다', () => {
-    for (const f of ['kpa.ts', 'k-cosmetics.ts']) {
+  it('guide intro 하단에 서비스 소개(/service-guide) 연결이 있다', () => {
+    for (const f of ['kpa.ts', 'pharmacy-hub.ts']) {
       const src = read(`packages/shared-space-ui/src/guide/copy/${f}`);
       expect(src).toContain("serviceGuide: { label: '서비스 소개', to: '/service-guide' }");
     }

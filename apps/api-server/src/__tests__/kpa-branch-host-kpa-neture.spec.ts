@@ -3,6 +3,7 @@
  *
  * - 분회 앱은 `kpa.neture.co.kr` 을 공용 호스트로 판정해야 한다(아니면 자체 도메인으로 오판 → "분회 없음").
  * - 옛 공용 경로 `kpa-society.co.kr/kpa/{slug}` 판정과 `/kpa` asset base 는 그대로 유지한다.
+ * - WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: 옛 경로는 그리기 전에 canonical 호스트로 옮긴다.
  * DB · 네트워크 0 — 텍스트 검사만 한다.
  */
 import * as fs from 'fs';
@@ -24,5 +25,15 @@ describe('kpa-branch 공용 호스트', () => {
   it('옛 `/kpa` prefix 와 asset base 를 유지한다', () => {
     expect(tenant).toContain("export const PUBLIC_BASE_PATH = '/kpa';");
     expect(read('services/web-kpa-branch/vite.config.ts')).toContain("base: '/kpa/'");
+  });
+
+  it('옛 경로는 render 전에 kpa.neture.co.kr 로 옮긴다', () => {
+    expect(read('services/web-kpa-branch/src/lib/canonicalHost.ts')).toContain(
+      "export const CANONICAL_BRANCH_HOST = 'kpa.neture.co.kr';",
+    );
+    const main = read('services/web-kpa-branch/src/main.tsx');
+    expect(main).toContain('legacyBranchRedirectUrl(');
+    expect(main.indexOf('window.location.replace(')).toBeGreaterThan(-1);
+    expect(main.indexOf('window.location.replace(')).toBeLessThan(main.indexOf('createRoot('));
   });
 });

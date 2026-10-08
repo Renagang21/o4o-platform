@@ -1,17 +1,4 @@
-/**
- * WO-O4O-KPA-APPROVAL-ORGANIZATION-CONTACT-WRITE-ALIGNMENT-V1
- *
- * PATCH /kpa/members/:id/status 의 organization 주소·약국 전화 동기화 계약을 고정한다.
- *
- * 고정 항목:
- *   - pending → active (pharmacy_owner) 승인만 organization 연락처를 건드린다.
- *   - suspended → active 재활성화는 organizations 에 **아무것도 쓰지 않는다** (검증 8).
- *   - 기존 유효 값은 승인만으로 덮어쓰지 않는다 (검증 7).
- *   - organization 동기화 실패는 승인 transaction 을 되돌리지 않는다 (검증 10 · 후처리 경계).
- *
- * 모든 값은 개인정보가 아닌 합성 문자열이다.
- */
-
+/** KPA approval must not create or modify Store pharmacy organizations. */
 const mockApprovalService = {
   approveMembership: jest.fn(),
   suspendMembership: jest.fn().mockResolvedValue(null),
@@ -158,118 +145,13 @@ const orgWrites = (calls: Call[]) =>
 
 beforeEach(() => jest.clearAllMocks());
 
-describe('승인(pending → active) — organization 연락처 초기화', () => {
-  it('canonical 키를 우선해 주소·우편번호·약국 전화를 채운다', async () => {
-    const h = makeHarness({
-      businessInfo: {
-        businessNumber: '123-45-67890',
-        address: 'CANON', address2: 'C2', zipCode: '11111',
-        businessAddress: 'LEGACY',
-        metadata: { pharmacy_phone: '02-000-0001' },
-        pharmacyPhone: '02-000-0002',
-      },
-    });
-    await patchStatus(h, 'active');
-
-    const updates = contactUpdates(h.calls);
-    expect(updates).toHaveLength(1);
-    const [address, detailJson, phone] = updates[0].params;
-    expect(address).toBe('CANON C2');
-    expect(JSON.parse(detailJson)).toEqual({ zipCode: '11111', baseAddress: 'CANON', detailAddress: 'C2' });
-    expect(phone).toBe('02-000-0001');
-  });
-
-  it('legacy 키만 있어도 주소가 organization 에 반영된다', async () => {
-    const h = makeHarness({
-      businessInfo: {
-        businessNumber: '123-45-67890',
-        businessAddress: 'LEGACY', businessAddressDetail: 'L2',
-        pharmacyPhone: '02-000-0002',
-      },
-    });
-    await patchStatus(h, 'active');
-
-    const [address, detailJson, phone] = contactUpdates(h.calls)[0].params;
-    expect(address).toBe('LEGACY L2');
-    expect(JSON.parse(detailJson)).toEqual({ baseAddress: 'LEGACY', detailAddress: 'L2' });
-    expect(phone).toBe('02-000-0002');
-  });
-
-  it('대표 전화만 있으면 약국 전화를 만들지 않는다', async () => {
-    const h = makeHarness({
-      businessInfo: { businessNumber: '123-45-67890', phone: '02-999-9999' },
-    });
-    await patchStatus(h, 'active');
-    expect(contactUpdates(h.calls)).toHaveLength(0);
-  });
-
-  it('7) 기존 organization 의 유효한 값은 승인만으로 덮어쓰지 않는다', async () => {
-    const h = makeHarness({
-      businessInfo: {
-        businessNumber: '123-45-67890',
-        address: 'CANON', zipCode: '11111', metadata: { pharmacy_phone: '02-000-0001' },
-      },
-      orgRow: {
-        address: 'OPERATOR-EDITED',
-        address_detail: { zipCode: '33333', baseAddress: 'OP-BASE', detailAddress: 'OP-DETAIL' },
-        phone: '02-777-7777',
-      },
-    });
-    await patchStatus(h, 'active');
-    expect(contactUpdates(h.calls)).toHaveLength(0);
-  });
-
-  it('기존 organization 에서 비어 있는 항목만 보완한다', async () => {
-    const h = makeHarness({
-      businessInfo: { businessNumber: '123-45-67890', address: 'CANON', zipCode: '11111' },
-      orgRow: { address: 'OPERATOR-EDITED', address_detail: { baseAddress: 'OP-BASE' }, phone: '02-777-7777' },
-    });
-    await patchStatus(h, 'active');
-
-    const [address, detailJson, phone] = contactUpdates(h.calls)[0].params;
-    expect(address).toBeNull();
-    expect(JSON.parse(detailJson)).toEqual({ zipCode: '11111' });
-    expect(phone).toBeNull();
-  });
-
-  it('연락처 UPDATE 는 기존 값 우선 병합 SQL 을 유지한다 (이중 방어)', async () => {
-    const h = makeHarness({
-      businessInfo: { businessNumber: '123-45-67890', address: 'CANON' },
-    });
-    await patchStatus(h, 'active');
-    const sql = contactUpdates(h.calls)[0].sql;
-    expect(sql).toContain("address = COALESCE(NULLIF(address, ''), $1)");
-    expect(sql).toContain("address_detail = $2::jsonb || COALESCE(address_detail, '{}'::jsonb)");
-    expect(sql).toContain("phone = COALESCE(NULLIF(phone, ''), $3)");
-  });
-});
-
-describe('재활성화(suspended → active) — organization 무변경', () => {
-  it('8) organizations 에 어떤 write 도 발생하지 않는다', async () => {
-    const h = makeHarness({
-      status: 'suspended',
-      businessInfo: {
-        businessNumber: '123-45-67890', address: 'CANON', metadata: { pharmacy_phone: '02-000-0001' },
-      },
-    });
-    await patchStatus(h, 'active');
-    expect(orgWrites(h.calls)).toEqual([]);
-    expect(mockApprovalService.reactivateMembership).toHaveBeenCalled();
-  });
-});
-
-describe('후처리 경계 — 실패 격리', () => {
-  it('10) organization 연락처 write 실패가 승인 transaction 을 되돌리지 않는다', async () => {
-    const h = makeHarness({
-      businessInfo: { businessNumber: '123-45-67890', address: 'CANON' },
-      failOn: /^UPDATE organizations SET address =/i,
-    });
+describe('KPA approval is independent of Store pharmacy approval', () => {
+  it.each(['pending', 'suspended'])('%s to active never provisions a pharmacy store', async (status) => {
+    const h = makeHarness({ status, businessInfo: { businessNumber: '123-45-67890', address: 'SYNTHETIC' } });
     const res = await patchStatus(h, 'active');
-
-    expect(h.state.txCommitted).toBe(1);
+    expect(res.json).toHaveBeenCalled();
+    expect(orgWrites(h.calls)).toEqual([]);
+    expect(h.calls.some((c) => /neture_pharmacy_memberships/.test(c.sql))).toBe(false);
     expect(h.state.txRolledBack).toBe(0);
-    expect(res.status).not.toHaveBeenCalledWith(500);
-    // 승인 자체의 후속 단계(kpa_members.organization_id 연결)는 계속 진행된다.
-    expect(h.calls.some((c) => /^UPDATE kpa_members SET organization_id/i.test(c.sql))).toBe(true);
   });
 });

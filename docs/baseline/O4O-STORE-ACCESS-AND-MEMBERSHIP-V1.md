@@ -1,5 +1,7 @@
 # O4O-STORE-ACCESS-AND-MEMBERSHIP-V1
 
+> **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
+
 > **Status**: Active · **확정일**: 2026-10-03 · **갱신**: 2026-10-05 (§3-A 약국 자가 가입 제외)
 > **WO**: `WO-O4O-STORE-BUSINESS-ENROLLMENT-AND-MEMBER-ACCESS-V1`
 > **상위 정본**: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3 ·
@@ -123,9 +125,9 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 채널이라 자가 가입 대상이 아니다.
 
 **약국(`kpa`)은 자가 가입 대상이 아니다 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).**
-약국 매장은 Neture 기본 가입 신청(`neture_pharmacy_memberships`) → 자격 확인 · Neture 운영자 승인으로만 열리고,
+약국 매장은 내 매장(약국) 신청(`neture_pharmacy_memberships` — Neture 가입 승인(`service_memberships(neture)`)을 전제로만 읽는 별도 원장) → 자격 확인 · Neture 운영자 승인으로만 열리고,
 약국 매장 접근 판정(`isStoreOwner(…, 'kpa')`)은 `kpa:store_owner` · `kpa-society` membership 이 아니라
-"owner/admin/manager 인 조직의 기본 가입 원장 `active`" 다. 기준:
+"owner/admin/manager 인 조직의 내 매장(약국) 신청 원장 `active`" 다. 기준:
 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §3-1 · §5.
 
 ---

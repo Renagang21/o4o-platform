@@ -156,6 +156,12 @@ export interface B2BConfirmAdapter {
   /** 주문 대상이 하나도 없을 때. throw 하면 그대로 전파된다(PH EMPTY_CART). */
   onEmptySelection?(scope: B2BConfirmScope): void;
 
+  /**
+   * 서버가 확정한 매장 조직의 공급 이용 자격(선택). throw 하면 주문을 하나도 만들지 않는다.
+   * 구현하지 않은 adapter(Neture · Pharmacy-Hub)는 종전과 같다.
+   */
+  assertSupplyAccess?(exec: DataSource, scope: B2BConfirmScope, organizationId: string | null): Promise<void>;
+
   buildLineItemMetadata(v: CoreValidItem, ctx: CoreGroupContext): Record<string, unknown>;
   buildOrderMetadata(ctx: CoreGroupContext): Record<string, unknown>;
   buildSellerAxis(ctx: CoreGroupContext): { sellerId: string; sellerOrganizationId?: string };
@@ -235,6 +241,7 @@ export class B2BCheckoutConfirmCore {
 
     // ── 2. buyer organization 서버 확정 (결함 O1) ────────────────────────────
     const organizationId = await this.resolveOrganization(scope, input, selected);
+    await this.adapter.assertSupplyAccess?.(this.dataSource, scope, organizationId);
 
     const paymentGroupId = `${this.adapter.paymentGroupIdPrefix ?? ''}${randomUUID()}`;
     const failedItems: CoreFailedItem[] = [];

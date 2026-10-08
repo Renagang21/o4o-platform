@@ -51,3 +51,6 @@ export type {
 export { readPendingPolicyAcceptances } from './useServiceAuth';
 export type { RouteGuardDeps, RouteGuardProps, GuardAuthState } from './createRouteGuard';
 export type { RoleSelection } from './useRoleSelection';
+
+export { DemoLoginButtons } from './DemoLoginButtons';
+export type { DemoLoginButtonsProps } from './DemoLoginButtons';

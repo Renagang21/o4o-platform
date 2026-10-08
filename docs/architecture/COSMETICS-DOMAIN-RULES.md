@@ -1,9 +1,10 @@
-# Cosmetics Domain Rules (Mandatory)
+# Cosmetics Domain Rules — SUPERSEDED (K-Cosmetics 퇴역)
 
-> **CLAUDE.md §9 (도메인별 규칙) 의 Cosmetics 상세 규칙** (구 §11~§13 에서 분리)
-> 이 문서는 CLAUDE.md의 보조 문서입니다.
+> **상태**: SUPERSEDED · **대체 문서**: [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · **표기일**: 2026-10-07 — 판정 확정(`WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`). K-Cosmetics 는 퇴역이 결정됐고(2026-10-05) 이 문서가 규율하던 runtime(`/api/v1/cosmetics/*` · `routes/cosmetics` · 독립 웹 앱 · web-store 기능 화면 · admin)은 퇴역 1차-A · 1차-B 로 삭제됐다. 남은 잔여(catalog identity · serviceKey · `cosmetics:*` roles · DB 스키마 · Event Offer/B2B 데이터)를 다루는 규칙은 대체 문서만 정한다. 아래 본문(2026-01 원문 + 2026-10-04 사실 정정 주석)은 기록으로 보존하며 근거로 쓰지 않는다.
 >
-> (2026-10-04 정합) **배포 구조 사실 정정**: 별도 `cosmetics-api` 서버 · `cosmetics-api.neture.co.kr` 은 존재하지 않는다. Cosmetics API 는 단일 core API(`apps/api-server`, Cloud Run `o4o-core-api`)의 `apps/api-server/src/routes/cosmetics/**` 이고, 웹은 `services/web-k-cosmetics` 다. 데이터는 같은 DB(`o4o_platform`)의 **`cosmetics` 스키마**(`cosmetics.cosmetics_products` 등 12개)에 있으며, `public.cosmetics_members`(FK → `public.users`) · `public.cosmetics_contents` 2개는 `public` 스키마에 있다(`apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts`). 아래 본문의 "cosmetics-api / core-api / Cosmetics DB / Core DB" 는 각각 "`routes/cosmetics` 계층 / auth · platform 계층 / `cosmetics` 스키마 / `public` 의 Core 테이블" 로 읽는다. **유효**: `cosmetics_` prefix · 플랫폼 기능(인증 · 사용자) 재구현 금지 · 주문은 `CLAUDE.md` §4 경유. 독립성 원칙의 현행 범위는 `CANONICAL-INDEX` §9 판정 대기.
+> (원문) **CLAUDE.md §9 (도메인별 규칙) 의 Cosmetics 상세 규칙** (구 §11~§13 에서 분리)
+>
+> (2026-10-04 정합) **배포 구조 사실 정정**: 별도 `cosmetics-api` 서버 · `cosmetics-api.neture.co.kr` 은 존재하지 않는다. Cosmetics API 는 단일 core API(`apps/api-server`, Cloud Run `o4o-core-api`)의 `apps/api-server/src/routes/cosmetics/**` 이고, 웹은 `services/web-k-cosmetics` 다. 데이터는 같은 DB(`o4o_platform`)의 **`cosmetics` 스키마**(`cosmetics.cosmetics_products` 등 12개)에 있으며, `public.cosmetics_members`(FK → `public.users`) · `public.cosmetics_contents` 2개는 `public` 스키마에 있다(`apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts`). 아래 본문의 "cosmetics-api / core-api / Cosmetics DB / Core DB" 는 각각 "`routes/cosmetics` 계층 / auth · platform 계층 / `cosmetics` 스키마 / `public` 의 Core 테이블" 로 읽는다. **유효**: `cosmetics_` prefix · 플랫폼 기능(인증 · 사용자) 재구현 금지 · 주문은 `CLAUDE.md` §4 경유. 독립성 원칙은 2026-10-07 SUPERSEDED — 잔여 규칙은 `K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1` 이 정한다.
 
 ---
 
@@ -43,7 +44,7 @@ cosmetics DB에 아래 데이터 저장 금지:
 * **FK 제약을 Core 테이블에 설정 금지** (서비스 간 결합 방지)
 * Core DB 변경이 cosmetics DB에 영향을 주면 안 됨
 
-> (2026-10-04 정합) 현행 코드 사실: `public.cosmetics_members.user_id` 는 `public.users(id)` 에 FK(`ON DELETE CASCADE`)를 가진다(`WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1` 의 서비스 회원 프로필 패턴). `cosmetics.cosmetics_stores` · `cosmetics.cosmetics_store_applications` 는 `owner_name` · `contact_phone` · `business_number` 를 저장한다. 위 §1.1 · §1.3 · §1.4 와의 관계(허용 예외인지, 원칙의 적용 범위를 `cosmetics` 스키마 상품 테이블로 한정할지)는 **판정 전**이다 — 이 문서만으로 해당 테이블 변경 근거로 쓰지 않는다.
+> (2026-10-04 정합) 현행 코드 사실: `public.cosmetics_members.user_id` 는 `public.users(id)` 에 FK(`ON DELETE CASCADE`)를 가진다(`WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1` 의 서비스 회원 프로필 패턴). `cosmetics.cosmetics_stores` · `cosmetics.cosmetics_store_applications` 는 `owner_name` · `contact_phone` · `business_number` 를 저장한다. 위 §1.1 · §1.3 · §1.4 와의 관계(허용 예외인지, 원칙의 적용 범위를 `cosmetics` 스키마 상품 테이블로 한정할지)는 2026-10-07 판정 확정 — `K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1` §2 규칙 2(현재 구조 인정 · 새 Core FK · 새 개인정보 필드 추가 금지 · 처리는 퇴역 작업)가 정한다. 이 문서만으로 해당 테이블 변경 근거로 쓰지 않는다.
 
 ### 1.5 마이그레이션 규칙
 
@@ -65,7 +66,7 @@ cosmetics DB에 아래 데이터 저장 금지:
 > Cosmetics는 **상품 데이터**에 대해 독립 스키마를 유지하되,
 > **주문/결제**는 E-commerce Core를 통해 처리한다.
 
-> (2026-10-04 정합) `OrderType` 은 `CheckoutOrder` 엔티티에 매핑되지 않으며 서비스 구분은 `metadata.serviceKey` 다([E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) 행 · `CANONICAL-INDEX` §9). 소비자 주문 생성 `POST /cosmetics/orders` 는 `410 STORE_CONSUMER_ORDER_RETIRED` 로 은퇴했고(`routes/cosmetics/controllers/cosmetics-order.controller.ts` · [COMMERCE-BOUNDARY](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)), 현행 Cosmetics 주문 축은 공급자→매장 B2B([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md))다.
+> (2026-10-04 정합) `OrderType` 은 `CheckoutOrder` 엔티티에 매핑되지 않으며 서비스 구분은 `metadata.serviceKey` 다(주문 생성 기술 계약 [CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 — 구 E-COMMERCE-ORDER-CONTRACT 는 2026-10-07 SUPERSEDED). 소비자 주문 생성 `POST /cosmetics/orders` 는 `410 STORE_CONSUMER_ORDER_RETIRED` 로 은퇴했고(`routes/cosmetics/controllers/cosmetics-order.controller.ts` · [COMMERCE-BOUNDARY](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)), 현행 Cosmetics 주문 축은 공급자→매장 B2B([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md))다.
 
 ---
 

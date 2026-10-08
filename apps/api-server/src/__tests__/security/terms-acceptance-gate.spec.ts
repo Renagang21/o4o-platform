@@ -38,7 +38,7 @@ let queryShouldThrow = false;
 /** demo_accounts 활성 user_id 목록 · 조회 실패 스위치 */
 let demoUserIds: string[] = [];
 let demoQueryShouldThrow = false;
-/** Neture 기본 가입 원장 active 조직의 owner/admin/manager 여부 · active role_assignments */
+/** 내 매장(약국) 신청 원장 active 조직의 owner/admin/manager 여부 · active role_assignments */
 let ledgerStoreOwner = false;
 let activeRoles: string[] = [];
 const queryLog: string[] = [];

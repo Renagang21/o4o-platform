@@ -7,6 +7,7 @@
 > **선행 문서**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) · [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md)
 > **회귀 가드**: `apps/api-server/src/__tests__/b2b-supplier-to-store-order-canonical-contract.spec.ts`
 > **정정 이력**: 2026-09-24 · `WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1` — §5-1(Axis A · Event Offer = 특가 · payment-first) · §3(결제 축 producer 4종) · §8(KPA · K-Cosmetics 행). 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1` — §4 · §5 의 "3개 축" 정정 주석(현행 주문 경로 5개) · §6 흐름도의 Axis A 를 payment-first 로 정정(2026-09-24 §5-1 정정의 누락분) · §4 결제 축 행에 Axis D 의 PaymentCore 미경유 `neture-pharmacy` 기록 경로 등록 · §8 서비스별 요약에 승인축 B2B(KPA Society · K-Cosmetics) 와 Neture 약국 매장(Axis D) 추가. 나머지 절은 불변이며 문서 전체는 **Active** 다.
+> **(2026-10-07 정정 · `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) K-Cosmetics route 삭제 반영**: K-Cosmetics 퇴역 1차-B(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`, PR #339)가 `/api/v1/cosmetics/*` 전체를 삭제했다. 본문의 해당 위치(§5 Axis A 흐름도 · 불변식 A3 · §8 K-Cosmetics 행 · §9 은퇴 축 표 · §12-3 조회 경로 표)를 그 자리에서 정정했다 — cosmetics 주문 · 결제 · B2B 결제 · 조회 endpoint 는 존재하지 않는다(410 도 아니다). §5 serviceKey 매핑표의 `k-cosmetics` → `k-cosmetics-event-offer` 행은 코드(`CART_TO_EVENT_OFFER_SERVICE_KEY`)에서 삭제돼 표에서도 뺐다 — 다시 넣지 않는다. 남은 `k-cosmetics` B2B 데이터 · Event Offer 범위는 퇴역 잔여이며 [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 가 다룬다. **분류 규칙**: 이 문서에서 K-Cosmetics(`k-cosmetics` · `k-cosmetics-event-offer`)가 나오는 모든 흐름 · 표 · 불변식 · §10 DF · §13 항목은 2026-10-07 부터 **현행 계약이 아니라 퇴역 잔여 기록**이다(해당 위치에 표시). 공통 경로 · strategy 코드에 `k-cosmetics` 가 남아 있어도 지원 대상이 아니며, 그 정리는 퇴역 잔여 계약 R1 · R5 가 다룬다. 다른 축 · 서비스의 계약은 불변.
 
 ---
 
@@ -138,7 +139,7 @@ WO 가 정한 canonical 흐름:
 
 > **(2026-10-06 정정) 현행 주문 경로는 5개다** — 위 "3개 축"은 작성 시점 표기다. 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders` 로 수렴하고 **모두 payment-first** 다(UNPAID 주문은 fulfillment 대상 아님).
 > 1. Axis A — Event Offer 특가(§5-1, order source `store_cart_checkout`)
-> 2. **승인축 B2B** — KPA Society · K-Cosmetics 승인 카탈로그 담기(§13-6) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
+> 2. **승인축 B2B** — KPA Society 승인 카탈로그 담기(§13-6. K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없어, 공통 `/api/v1/store/cart/:serviceKey/*` 는 `k-cosmetics` 를 **410 `SERVICE_RETIRED`** 로 닫았고(`RETIRED_CART_SERVICE_KEYS`) event-offer 장바구니 매핑도 삭제했다. 남은 잔여는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1) → `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, §13), order source `store_b2b_cart`. 결제 축은 Axis A 와 같은 `store-b2b`(§4)
 > 3. Axis B — Neture B2B(§5-2)
 > 4. Axis C — PharmacyHub(§5-3)
 > 5. Axis D — Neture 약국 매장(아래, order source `neture_pharmacy_cart`)
@@ -147,7 +148,9 @@ WO 가 정한 canonical 흐름:
 
 > **Axis D — Neture 약국 매장 축 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 같은 원장(`store_cart_items` `service_key='neture-pharmacy'` → `checkoutService.createOrder()` → `checkout_orders`)을 쓴다. 장바구니에 선택한 공급 옵션(기본 공급 · 공급 제안 · 이벤트 · 모집)을 저장하고, 확정 시 서버가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 로 재판정 · 단가 확정 후 (수취 주체, 공급자) 단위로 주문을 만든다. 결제는 payment-first 이며 현재 테스트 결제만 있다(실제 PG 미선정). 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8.
 
-### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics) — **payment-first**
+### 5-1. Axis A — Event-Offer 축 (KPA Society · ~~K-Cosmetics~~) — **payment-first**
+
+> (2026-10-07 정정) K-Cosmetics 는 2026-10-07 정정 — live 축이 아니다: 퇴역으로 `k-cosmetics` 결제 경로가 없어, 공통 `/api/v1/store/cart/:serviceKey/*` 는 `k-cosmetics` 를 **410 `SERVICE_RETIRED`** 로 닫았고(`RETIRED_CART_SERVICE_KEYS`) event-offer 장바구니 매핑도 삭제했다. 남은 잔여는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) §1. 아래 매핑표의 `k-cosmetics` 행은 코드와 함께 삭제했다.
 
 Event Offer 는 **특가 판매**다. 참여 신청 · 구매 의향 · 예약 · 약정 · 참가자 모집 · 펀딩 같은 개념은
 이 축에 존재하지 않는다. 일반 공급자→매장 B2B commerce 와 **같은 결제·처리 축**을 쓴다.
@@ -158,7 +161,7 @@ event_offer (공급자 특가 제안, 운영자 승인)
   → POST /api/v1/store/cart/:serviceKey/checkout-confirm
       → EventOfferCartCheckoutService  (공급자별로 주문 분리 생성 · 한정수량 원자 확보)
       → checkout_orders                (paymentStatus='pending')
-  → POST /api/v1/{kpa,cosmetics}/b2b/payments/prepare   (B2B 전용 namespace)
+  → POST /api/v1/kpa/b2b/payments/prepare              (B2B 전용 namespace · cosmetics 는 2026-10-07 삭제)
       → PaymentCore + Toss → /confirm → payment.completed(serviceKey='store-b2b')
       → checkout_orders  paid
   → CheckoutFulfillmentBridgeService
@@ -166,7 +169,7 @@ event_offer (공급자 특가 제안, 운영자 승인)
   → 공급자 처리 → 공급자가 직접 배송 → neture_shipments 상태 기록 → delivered
   → settlement
   → 매장 조회: /api/v1/kpa/checkout/orders
-              /api/v1/cosmetics/orders
+              (/api/v1/cosmetics/orders 는 K-Cosmetics 퇴역 1차-B 로 삭제)
 ```
 
 `serviceKey` → event-offer 도메인 매핑은 **단일 상수**가 정본이다
@@ -175,7 +178,6 @@ event_offer (공급자 특가 제안, 운영자 승인)
 | cart serviceKey | event-offer serviceKey |
 |---|---|
 | `kpa-society` | `kpa-groupbuy` |
-| `k-cosmetics` | `k-cosmetics-event-offer` |
 
 **불변식 A1 (payment-first).** 주문은 `paymentStatus='pending'` 으로 생성되고, **결제 완료 event 만이**
 `paid` 로 전이시킨다. 라우트가 결제 상태를 직접 조작하지 않는다(Axis B 의 불변식 B1 과 동일).
@@ -184,10 +186,10 @@ event_offer (공급자 특가 제안, 운영자 승인)
 UNPAID 주문은 fulfillment · 배송 처리 · 정산 대상이 아니다. 후불 · 외상 · 인보이스 · `collectionStatus`
 기반 무결제 fulfillment 는 **없다**. 정산은 `PAID + DELIVERED` 기준이다.
 
-**불변식 A3 (경계).** 결제 진입은 **B2B 전용 namespace** (`/api/v1/{kpa,cosmetics}/b2b/payments/*`) 다.
-소비자→매장 판매 결제(`/api/v1/kpa/payments/*` · `/api/v1/cosmetics/payments/*`)는 **410 은퇴 상태 그대로**이며
+**불변식 A3 (경계).** 결제 진입은 **B2B 전용 namespace** (`/api/v1/kpa/b2b/payments/*`) 다.
+소비자→매장 판매 결제(`/api/v1/kpa/payments/*`)는 **410 은퇴 상태 그대로**이며
 되살리지 않는다(§9 · `O4O-STORE-COMMERCE-BOUNDARY-V1`). 공급자→매장 B2B 결제와 소비자→매장 commerce 를
-혼동하지 않는다.
+혼동하지 않는다. (2026-10-07 정정) `/api/v1/cosmetics/b2b/payments/*` · `/api/v1/cosmetics/payments/*` 는 K-Cosmetics 퇴역 1차-B 로 `/api/v1/cosmetics/*` 전체와 함께 삭제됐다 — 410 이 아니라 경로가 없다.
 
 > **정정 이력.** 이 절은 과거 "이 축은 결제 축이 아니다 — 주문 생성까지가 O4O 의 책임이고 정산은 공급자–매장
 > 간 기존 거래 관계를 따른다" 였다. Event Offer 를 특가 판매로 확정하고 payment-first 로 구현하면서
@@ -303,12 +305,12 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 
 ## 8. 서비스별 계약 요약
 
-> **(2026-10-06 정정)** 이 표는 §5 정정 주석의 현행 주문 경로 5개를 모두 담는다 — KPA Society · K-Cosmetics 행에 **승인축 B2B**(§13 · §13-6) 를, **Neture 약국 매장**(Axis D) 행을 추가했다. 이전 표는 Axis A · B · C 만 있었다.
+> **(2026-10-06 정정)** 이 표는 §5 정정 주석의 현행 주문 경로 5개를 모두 담는다 — KPA Society · K-Cosmetics 행에 **승인축 B2B**(§13 · §13-6) 를, **Neture 약국 매장**(Axis D) 행을 추가했다. 이전 표는 Axis A · B · C 만 있었다. (2026-10-07 정정) K-Cosmetics 행은 퇴역으로 현행 축이 아니다.
 
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
 | **KPA Society** | Axis A (`kpa-groupbuy`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/kpa/checkout/orders` · 결제 `/kpa/b2b/payments/*`. 승인축 B2B 확정은 `/store/cart/:serviceKey/checkout-confirm-b2b`(`StoreB2BCartCheckoutService`, 결제 축 `store-b2b`) | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 소비자→매장 판매 leg 은 410 은퇴(B2B 결제와 별개 축) |
-| **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) + **승인축 B2B** (order source `store_b2b_cart`) · 둘 다 **payment-first** | 있음 — 장바구니 · `/cosmetics/orders` · 결제 `/cosmetics/b2b/payments/*`. 승인축 B2B 확정은 KPA 와 같은 `/store/cart/:serviceKey/checkout-confirm-b2b` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
+| ~~K-Cosmetics~~ | **현행 축 없음 (2026-10-07 정정)** — 과거 Axis A(`k-cosmetics-event-offer`) · 승인축 B2B 였다 | **퇴역** — 서비스 퇴역 결정 · `/cosmetics/orders` · `/cosmetics/b2b/payments/*` 를 포함한 `/api/v1/cosmetics/*` 는 퇴역 1차-B 로 삭제. 남은 `k-cosmetics` B2B 데이터 · Event Offer 매핑은 퇴역 잔여([K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md)) | 없음 | — |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
 | **Neture 약국 매장** (`service_key='neture-pharmacy'`) | **Axis D** (order source `neture_pharmacy_cart`) · **payment-first** (현재 테스트 결제만, §4 결제 축 정정) | 있음 — `/api/v1/neture/pharmacy/cart*` · `/pharmacy/cart/checkout` · `/pharmacy/orders` · 결제 `/pharmacy/payments/{prepare,confirm}` | Neture 공급자 화면(bridge tag `neture_pharmacy_cart`, §13-5) | 상세 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §8 |
@@ -320,7 +322,7 @@ KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들�
 
 | 축 | 상수 | 서비스 |
 |---|---|---|
-| 운영자 승인형 | `APPROVAL_ELIGIBLE_SERVICE_KEYS` | kpa-society · k-cosmetics |
+| 운영자 승인형 | `APPROVAL_ELIGIBLE_SERVICE_KEYS` | kpa-society · k-cosmetics *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)* |
 | 공급자 opt-in 형 | `SUPPLIER_OPTIN_SERVICE_KEYS` | pharmacy-hub |
 
 ---
@@ -331,7 +333,7 @@ KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들�
 
 | 은퇴 대상 | 상태 | 근거 |
 |---|---|---|
-| 소비자→매장 주문 (`POST /api/v1/cosmetics/orders`) | `410 STORE_CONSUMER_ORDER_RETIRED` | `O4O-STORE-COMMERCE-BOUNDARY-V1` |
+| 소비자→매장 주문 (`POST /api/v1/cosmetics/orders`) | `410 STORE_CONSUMER_ORDER_RETIRED` → **2026-10-07 정정: 경로 삭제**(K-Cosmetics 퇴역 1차-B) | `O4O-STORE-COMMERCE-BOUNDARY-V1` |
 | 매장 소비자 판매 결제 | `410 STORE_SALE_PAYMENT_DEPRECATED` | 동일 |
 | 매장 B2C 채널 | `410 STORE_B2C_CHANNEL_RETIRED` | 동일 |
 | `/api/v1/ecommerce/*` (admin-dashboard 소비자 commerce client) | **서버에 없음 (404)** — client 도 제거 | 본 WO 결함 D2 |
@@ -346,14 +348,14 @@ KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들�
 
 | # | 내용 | 왜 미루는가 |
 |---|---|---|
-| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA 는 `/checkout/orders`, K-Cosmetics 는 `/orders` | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요
+| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA 는 `/checkout/orders`, K-Cosmetics 는 `/orders` *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)* — cosmetics 경로는 삭제됨 | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요
 | ↳ **DF-1 종결** | `WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1` | 경로는 그대로 두고(`KEEP_COMPATIBLE_ALIASES`) **의미·ownership·응답 계약**을 §12 로 통일했다. 불일치의 실체는 경로 이름이 아니라 응답 계약이었다 |
 | DF-3 | KPA `관심상품 주문 작업대` → canonical 장바구니 담기 이관 | 동일. 현재는 안내만 한다 |
-| DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / K-Cosmetics 2벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 2서비스 동시 회귀가 필요해 별도 WO |
+| DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / K-Cosmetics 2벌로 중복 *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)* — cosmetics 컨트롤러는 삭제됨 | `B2B_COMMONIZABLE` 로 분류. 공통화는 2서비스 동시 회귀가 필요해 별도 WO |
 | ↳ **DF-4 종결** | 동일 WO | 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. 서비스별 controller 는 thin wrapper |
 | DF-5 | `/store/commerce/products` 는 "공급 상품 **신청**"(ProductApproval PENDING) 이며 신청 ≠ 주문 | 담기 버튼을 붙이는 것은 그 화면의 **의미를 바꾸는 제품/UX 결정**이다 (DF-3 과 같은 이유). 임의 배선 금지 |
 | ↳ **DF-5 종결** | canonical cart producer 채택 (§13-6) | 새 주문 UI 를 만들지 않고, `/store/commerce/products` 카탈로그를 **opt-in** cart producer 로 연결했다(§13-6). "신청"(ProductApproval) 액션은 그대로 남고 "담기"가 별개 액션으로 추가된다 — 담기 ≠ 신청 ≠ 주문 |
-| DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 kpa-society · k-cosmetics 2서비스에 동시 영향이다. 완화가 아니라 축 정렬이므로 별도 WO |
+| DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 kpa-society · k-cosmetics 2서비스에 동시 영향이다 *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)*. 완화가 아니라 축 정렬이므로 별도 WO |
 | DF-6 | `neture` 노출 strategy 는 `spo.deleted_at IS NULL` 을 걸지 않는다 — soft-delete 된 offer 가 Neture confirm 에서 여전히 보인다 | 현행 main 과 **정확히 동일한 동작**이다. confirm 공통화 WO 에서 Neture 노출 범위를 바꾸면 §22 회귀 위험. 별도 WO 로 축소 |
 | ↳ **DF-6 종결** | `WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1` | soft delete 는 서비스별 공급 노출 정책이 아니라 **3축 공통 불변식**이라고 판정하고, strategy 조각이 아니라 `b2b-checkout-confirm.core.ts` 의 base 쿼리가 소유하게 옮겼다(`approval`/`optin` 조각에서 제거 · `neture` 축이 자동 상속). 같은 게이트를 catalog SSOT 4개 쿼리(`/catalog` 목록·건수 · `findApplicableOffer` · `/orderable`)에도 맞췄다 — `삭제된 offer → catalog 미노출 → cart 담기 불가 → confirm 불가` |
 
@@ -406,7 +408,7 @@ controller 는 thin wrapper 다 — 경로 · 서비스 scope · 서비스별 �
 | 서비스 | 목록 | 상세 |
 |---|---|---|
 | KPA Society | `GET /api/v1/kpa/checkout/orders` | `.../orders/:orderId` |
-| K-Cosmetics | `GET /api/v1/cosmetics/orders` | `/orders/:id` |
+| ~~K-Cosmetics~~ | ~~`GET /api/v1/cosmetics/orders`~~ — 2026-10-07 정정: 퇴역 1차-B 로 삭제 | — |
 
 경로 접두어 차이는 **의도적으로 남긴다** (`KEEP_COMPATIBLE_ALIASES`). 통일 대상은 경로 이름이 아니라 의미·소유권·응답 계약이다.
 
@@ -458,7 +460,7 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|
-| `approval` | kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
+| `approval` | kpa-society · k-cosmetics *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)* | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
 | `optin` | pharmacy-hub | `$key = ANY(spo.service_keys)` | `DISTRIBUTION_DENIED` · `MASTER_INACTIVE` |
 | `neture` | neture | 없음 (junction 미사용) | `PRODUCT_NOT_APPROVED` · `DISTRIBUTION_DENIED` |
 
@@ -512,7 +514,7 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 
 | 서비스 | 경로 | 구현 |
 |---|---|---|
-| KPA · K-Cosmetics (event_offer) | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` — **변경 없음** |
+| KPA · K-Cosmetics *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)* (event_offer) | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` — **변경 없음** |
 | 승인축 B2B | `POST /store/cart/:serviceKey/checkout-confirm-b2b` | `StoreB2BCartCheckoutService` (wrapper) |
 | Neture B2B | 동일 경로 | `NetureB2BCartCheckoutService` (wrapper) |
 | PharmacyHub | 자체 `PharmacyHubOrderController` | `PharmacyHubCartCheckoutService` (wrapper) |
@@ -628,7 +630,7 @@ WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
 서버가 항목 단위로 fail-closed 하므로 **축 오염은 없었지만** 사용자에게는 "반쪽 주문"으로 보였다.
 새 cart architecture 를 만들지 않고 경로 선택만 고쳤다(§8 — 새 cart 구조 금지).
 
-적용 범위: `useStoreCart` 를 쓰는 KPA-Society · K-Cosmetics.
+적용 범위: `useStoreCart` 를 쓰는 KPA-Society · K-Cosmetics *(K-Cosmetics = 퇴역 잔여 — 2026-10-07, 현행 계약 아님)*.
 Neture 매장 장바구니(`services/web-neture/.../StoreCartPage.tsx`)는 이 hook 을 쓰지 않지만
 `neture` 축에는 event-offer producer 자체가 없어(`getBuyerOrderServiceKeys` 의 event-offer 키는
 KPA/K-Cosmetics 전용) 혼재가 성립하지 않는다 — **억지로 hook 으로 이관하지 않는다**.

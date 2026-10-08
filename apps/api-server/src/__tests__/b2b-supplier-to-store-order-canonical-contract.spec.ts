@@ -101,6 +101,21 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       expect(code).not.toMatch(/req\.(body|query)[.[]\s*['"`]?serviceKey/);
     });
 
+    it('퇴역 K-Cosmetics 는 store-cart 전 endpoint 에서 410 이다 — membership 판정보다 먼저 (퇴역 잔여 R1)', () => {
+      const code = read('routes/cart/store-cart.routes.ts');
+      expect(code).toContain('RETIRED_CART_SERVICE_KEYS');
+      expect(code).toContain("code: 'SERVICE_RETIRED'");
+      const scope = code.slice(
+        code.indexOf('async function resolveScope'),
+        code.indexOf('function handleError'),
+      );
+      const retiredAt = scope.indexOf('RETIRED_CART_SERVICE_KEYS.has(serviceKey)');
+      expect(retiredAt).toBeGreaterThan(-1);
+      expect(retiredAt).toBeLessThan(scope.indexOf('hasActiveServiceMembership'));
+      // event-offer 장바구니 확정의 k-cosmetics 매핑도 삭제됐다.
+      expect(read('services/cart/event-offer-cart-checkout.service.ts')).not.toContain('K_COSMETICS_EVENT_OFFER');
+    });
+
     it('B2B cart checkout 진입점 2종이 유지된다 (event-offer 축 / Neture B2B 축)', () => {
       const code = read('routes/cart/store-cart.routes.ts');
       expect(code).toContain("'/cart/:serviceKey/checkout-confirm'");
@@ -110,7 +125,7 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('구매자 주문 조회는 buyerId + serviceKey 집합을 항상 함께 건다', () => {
       const controllers = [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/cosmetics/controllers/cosmetics-order.controller.ts',
+        // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
       ];
       for (const c of controllers) {
         const code = read(c);
@@ -182,7 +197,7 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('서비스별 주문 생성 producer(POST /)는 410 으로 은퇴 상태를 유지한다', () => {
       for (const c of [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/cosmetics/controllers/cosmetics-order.controller.ts',
+        // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
       ]) {
         expect(read(c)).toContain('410');
       }

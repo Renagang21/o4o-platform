@@ -6,7 +6,7 @@
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  *
  * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
- *   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 @o4o/auth-react 의 useServiceAuth 로 이동.
+ *   세션 복구 · 토큰 정리 이벤트 · login/logout 은 @o4o/auth-react 의 useServiceAuth 로 이동.
  *   이 파일에는 **Neture 고유분**만 남는다 — serviceKey/user 변환 주입 + 역할 전환 UI 상태.
  */
 
@@ -33,6 +33,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  nickname?: string;
+  phone?: string;
   roles: UserRole[];
   memberships?: { serviceKey: string; status: string }[];
   /** WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(demo_accounts) — 배지 · 안내 전용 */
@@ -53,7 +55,6 @@ interface AuthContextType {
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
-  logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   updateUser: (updates: Partial<User>) => void;
@@ -80,8 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authClient,
         getAccessToken,
         toUser: (apiUser) => ({ ...(buildPlatformUser(apiUser as never) as User), demo: readDemoMetadata(apiUser) }),
-        // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
-        clearSessionOnLogoutAll: false,
       }),
       [],
     ),
@@ -138,7 +137,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signupWithGoogle: core.signupWithGoogle,
         getGoogleAuthConfig,
         logout: core.logout,
-        logoutAll: core.logoutAll,
         switchRole,
         hasMultipleRoles,
         updateUser,

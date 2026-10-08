@@ -113,14 +113,9 @@ describe('mount · client 계약 (raw source)', () => {
   const repo = path.resolve(__dirname, '..', '..', '..', '..');
   const read = (p: string) => fs.readFileSync(p, 'utf8');
 
-  it('F. KCos 서비스 라우터가 태블릿 라우트를 서비스 축으로 mount 한다', () => {
-    for (const [file, key] of [
-      ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
-    ]) {
-      const text = read(path.join(apiSrc, file));
-      expect(text).toContain('createStoreTabletRoutes(dataSource, {');
-      expect(text).toContain(`storeOwnerServiceKey: '${key}'`);
-    }
+  it('F. KCos 서비스 라우터는 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+    // 태블릿 라우트의 'cosmetics' 서비스 축 동작(B · C · D-2)은 위 Core 테스트가 계속 검증한다.
+    expect(fs.existsSync(path.join(apiSrc, 'routes/cosmetics/cosmetics.routes.ts'))).toBe(false);
   });
 
   it('G. KPA mount 와 서비스 중립 back-compat mount 는 유지된다', () => {

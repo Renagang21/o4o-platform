@@ -190,6 +190,20 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
 }
 
 /**
+ * Neture 연결 서비스 역할 판정 (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 A2 · A3)
+ *
+ * Neture 가입(`service_memberships` service_key='neture')은 메인 이용 자격만 준다.
+ * 공급자(`supplier`) · 내 매장(약국)(`neture:store_owner`) 역할은 각 연결 서비스의 승인 경로
+ * (공급자 승인 · 내 매장(약국) 승인)만 부여 · 회수한다. 따라서 Neture 가입의 승인 · 반려 · 재활성화는
+ * 이 역할들을 부여 · 회수 · 복구하지 않는다 — legacy membership.role 에 'supplier' 등이 남아 있어도 같다.
+ * (정지 시 회수 = 정지 연쇄 정책은 별도 트랙 — suspend 경로는 이 판정을 쓰지 않는다.)
+ */
+const NETURE_CONNECTED_SERVICE_ROLES = new Set(['supplier', 'neture:supplier', 'store_owner', 'neture:store_owner']);
+function isNetureConnectedServiceRole(serviceKey: string, role: string | null | undefined): boolean {
+  return serviceKey === 'neture' && !!role && NETURE_CONNECTED_SERVICE_ROLES.has(role);
+}
+
+/**
  * 접두어 없는 admin tier 역할 판정 (WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9)
  *
  * `service_memberships.role` 에는 legacy 표기로 prefix 없는 `admin` · `operator` · `super_admin`
@@ -473,6 +487,8 @@ export class MembershipApprovalService {
           role: memberRole,
           serviceKey: membership.service_key,
         });
+      } else if (isNetureConnectedServiceRole(membership.service_key, memberRole) || (membership.service_key === 'kpa-society' && memberRole === 'kpa:store_owner')) {
+        logger.info('[APPROVAL][STEP3] neture connected-service role grant SKIPPED', { userId, role: memberRole });
       } else {
         const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
         logger.info('[APPROVAL][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
@@ -652,6 +668,10 @@ export class MembershipApprovalService {
       } else if (!userId) {
         logger.error('[REJECTION][STEP2] user_id is null — role deactivation skipped', {
           membershipId, serviceKey: membership.service_key,
+        });
+      } else if (isNetureConnectedServiceRole(membership.service_key, grantedRole)) {
+        logger.info('[REJECTION][STEP2] neture connected-service role — deactivation skipped', {
+          userId, role: grantedRole,
         });
       } else {
         const affected = await this.deactivateRoleAssignment(queryRunner, userId, grantedRole);
@@ -1006,6 +1026,10 @@ export class MembershipApprovalService {
           });
           continue;
         }
+        if (isNetureConnectedServiceRole(membership.service_key, memberRole) || (membership.service_key === 'kpa-society' && memberRole === 'kpa:store_owner')) {
+          logger.info('[REACTIVATE][STEP3] neture connected-service role restore SKIPPED', { userId, role: memberRole });
+          continue;
+        }
         // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §9:
         //   복구는 **복구만** 한다. 정지 이전에 없던 역할을 새로 만들지 않는다.
         const roleOutcome = await this.activateRoleAssignment(
@@ -1017,35 +1041,16 @@ export class MembershipApprovalService {
         }
       }
 
-      // STEP3.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
-      //   suspendMembership STEP2.5 에서 kpa:store_owner 를 deactivate 했으므로, 재활성화 시에도
-      //   동일 정책으로 복원. 단:
-      //     (a) activity_type='pharmacy_owner' (SSOT = kpa_pharmacist_profiles) 인 경우만
-      //     (b) deactivated row 가 존재할 때만 in-place 활성화 (UPDATE only — INSERT 없음)
-      //   부여 자체는 별도 트리거 (PATCH /:id/status pending→active 자동활성화,
-      //   PATCH /:id/info activity_type 전환) 가 담당. 본 단계는 "정지 직전 상태 복귀" 만 수행.
-      //
-      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
-      //   SUSPEND STEP2.5 를 5개 서비스 대칭으로 확장했으므로 복구도 같은 축으로 맞춘다.
-      //   전 서비스 공통으로 **비활성 row 가 있을 때만** in-place 복구한다(INSERT 없음 —
-      //   activateRoleAssignment 의 restore-only 와 같은 원칙). kpa 만 추가로
-      //   kpa_pharmacist_profiles.activity_type='pharmacy_owner' 게이트를 유지한다
-      //   (다른 직역으로 전환한 회원의 매장 권한이 복구로 되살아나지 않게 하는 기존 계약).
+      // KPA membership never grants or restores Store pharmacy ownership.
       const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
-      let kpaStoreOwnerAllowed = false;
-      if (hasKpaSocietyMembership) {
-        const profileRows = await queryRunner.query(
-          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
-          [userId]
-        );
-        kpaStoreOwnerAllowed = profileRows?.[0]?.activity_type === 'pharmacy_owner';
-      }
 
       const restoreServiceKeys = Array.from(
         new Set<string>(selectResult.map((m: any) => m.service_key as string))
       );
       for (const svcKey of restoreServiceKeys) {
-        if (svcKey === 'kpa-society' && !kpaStoreOwnerAllowed) continue;
+        if (svcKey === 'kpa-society') continue;
+        // neture:store_owner = 내 매장(약국) 승인 표식 — Neture 가입 재활성화가 되살리지 않는다(§10 A3).
+        if (svcKey === 'neture') continue;
         const storeOwnerRole = `${resolveRolePrefixFromCanonicalServiceKey(svcKey)}:store_owner`;
         if (reactivatedRoles.includes(storeOwnerRole)) continue;
         // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
@@ -1076,21 +1081,8 @@ export class MembershipApprovalService {
         );
       }
 
-      // STEP5: WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1 — neture_suppliers 프로필 복구
-      //   neture membership 이 복구 대상에 포함된 경우, deactivate 로 INACTIVE 된 공급자 프로필을
-      //   ACTIVE 로 되돌린다. REJECTED(의도적 거절)는 복구 대상이 아니므로 INACTIVE 만 전환.
-      //   상품 승인/listing 재활성은 정책상 운영자 수동 (이 트랜잭션 범위 외).
-      const hasNetureMembership = selectResult.some((m: any) => m.service_key === 'neture');
-      if (hasNetureMembership) {
-        logger.info('[REACTIVATE][STEP5] neture_suppliers profile restore', { userId });
-        await queryRunner.query(
-          `UPDATE neture_suppliers
-           SET status = 'ACTIVE', updated_at = NOW()
-           WHERE user_id = $1 AND status = 'INACTIVE'`,
-          [userId]
-        );
-      }
-
+      // STEP5: (제거) neture_suppliers INACTIVE → ACTIVE 복구 — Neture 가입 재활성화는 공급자 원장을 바꾸지 않는다.
+      //   공급자 재활성화는 공급자 재활성화 경로(reactivateSupplier)만 한다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 A3).
 
       logger.info('[REACTIVATE][SUCCESS]', {
         userId, reactivatedMemberships: selectResult.length, reactivatedRoles, reactivatedBy,

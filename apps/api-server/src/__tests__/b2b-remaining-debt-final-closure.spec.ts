@@ -60,6 +60,8 @@ function harness(cartItems: Array<Record<string, any>>) {
     }),
     query: jest.fn(async (sql: string, params: any[]) => {
       queries.push({ sql, params });
+      // 세미프랜차이즈 공급 이용 판정(CHECK §10 D1)은 가입 상태로 둔다 — 이 harness 의 관심사는 offer 재조회 SQL 이다.
+      if (sql.includes('semi_franchise_memberships')) return [{ key: 'pharmacy' }];
       return [];
     }),
   } as any;
@@ -232,7 +234,7 @@ describe('⑤ 경계 — serviceKey · buyer organization · membership', () => 
   //   조회(목록·상세)에는 붙이지 않는다 — 자기 주문 열람은 write 가 아니다.
   it.each([
     ['routes/kpa/controllers/kpa-checkout.controller.ts', 'SERVICE_KEYS.KPA_SOCIETY'],
-    ['routes/cosmetics/controllers/cosmetics-order.controller.ts', 'SERVICE_KEYS.K_COSMETICS'],
+    // routes/cosmetics/controllers/cosmetics-order.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
   ])('%s 의 주문 취소는 active membership 을 요구한다', (rel, key) => {
     const src = read(rel);
     expect(src).toContain(`requireActiveServiceMembership(dataSource, ${key})`);

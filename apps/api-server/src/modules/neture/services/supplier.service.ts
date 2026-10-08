@@ -11,7 +11,7 @@ import {
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds, resolveSupplierIdForUser } from '../middleware/supplier-context.resolver.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
-import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
+import { getNetureMainMembershipStatus } from './neture-main-membership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import { demoAccountService, DEMO_ACCOUNT_FORBIDDEN_CODE } from '../../../services/auth/demo-account.service.js';
@@ -39,20 +39,12 @@ export class SupplierProfileFieldUnsupportedError extends Error {
 export class NetureSupplierService {
   // Lazy repositories
   private _supplierRepo?: Repository<NetureSupplier>;
-  private _membershipRepo?: Repository<ServiceMembership>;
 
   private get supplierRepo(): Repository<NetureSupplier> {
     if (!this._supplierRepo) {
       this._supplierRepo = AppDataSource.getRepository(NetureSupplier);
     }
     return this._supplierRepo;
-  }
-
-  private get membershipRepo(): Repository<ServiceMembership> {
-    if (!this._membershipRepo) {
-      this._membershipRepo = AppDataSource.getRepository(ServiceMembership);
-    }
-    return this._membershipRepo;
   }
 
   // ==================== Supplier Identity ====================
@@ -100,6 +92,10 @@ export class NetureSupplierService {
       if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
         return { success: false, error: 'INVALID_SLUG' };
       }
+      // 신청 자격 = Neture 가입 승인(active). 공급자 신청 · 승인은 Neture 원장을 바꾸지 않는다(CHECK §10 E2 · E3).
+      if ((await getNetureMainMembershipStatus(AppDataSource, userId)) !== 'active') {
+        return { success: false, error: 'NETURE_MEMBERSHIP_REQUIRED' };
+      }
       const existingByUser = await this.supplierRepo.findOne({ where: { userId }, select: ['id'] });
       if (existingByUser) {
         return { success: false, error: 'USER_ALREADY_HAS_SUPPLIER' };
@@ -140,28 +136,32 @@ export class NetureSupplierService {
       if (await this.isDemoSupplier(supplier.userId, supplier.organizationId)) {
         return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
       }
+      // 승인 전제조건 = 신청자의 **현재** Neture 가입 승인. 공급자 승인이 Neture 가입을 대신 승인하지 않는다(CHECK §10 E3).
+      if (supplier.userId && (await getNetureMainMembershipStatus(AppDataSource, supplier.userId)) !== 'active') {
+        return { success: false, error: 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' };
+      }
 
-      // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
-      // 승인은 서비스 이용 자격만 판단한다. 대표자명/담당자명/담당자 연락처 등 프로필 정보는
-      // 승인 후 보완하는 프로필 완성 상태(profileComplete/missingProfileFields)로만 노출하며
-      // 승인을 차단하지 않는다 (기존 ONBOARDING_INCOMPLETE 게이트 제거).
+      // Business registration details and owned evidence precede approval.
+      const businessOrganization = await this.getOrgData(supplier.organizationId);
+      if (!supplier.businessRegistrationDocumentId || !businessOrganization?.business_number?.trim() || !businessOrganization?.address?.trim() || !supplier.representativeName?.trim() || !supplier.businessType?.trim() || !supplier.businessItem?.trim()) {
+        return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
+      }
+      const [proof] = await AppDataSource.query(
+        `SELECT id FROM kyc_documents WHERE id = $1 AND user_id = $2
+           AND "documentType" = 'business_registration' AND "verificationStatus" IN ('PENDING','VERIFIED')`,
+        [supplier.businessRegistrationDocumentId, supplier.userId],
+      );
+      if (!proof) return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
       supplier.status = SupplierStatus.ACTIVE;
       supplier.approvedBy = approvedByUserId;
       supplier.approvedAt = new Date();
       await this.supplierRepo.save(supplier);
 
       if (supplier.userId) {
-        const membership = await this.membershipRepo.findOne({
-          where: { userId: supplier.userId, serviceKey: 'neture' },
-        });
-        if (membership && membership.status !== 'active') {
-          membership.status = 'active';
-          await this.membershipRepo.save(membership);
-          logger.info(`[NetureSupplierService] Membership activated for user ${supplier.userId}`);
-        }
-        // WO-NETURE-ROLE-NORMALIZATION-V1: unprefixed role
+        // Neture 가입 원장(service_memberships 'neture')은 바꾸지 않는다 — 위 전제조건으로 active 임을 확인했다.
+        // Service-scoped supplier role; legacy unprefixed assignments are not newly granted.
         await roleAssignmentService.assignRole({
-          userId: supplier.userId, role: 'supplier', assignedBy: approvedByUserId,
+          userId: supplier.userId, role: 'neture:supplier', assignedBy: approvedByUserId,
         });
         logger.info(`[NetureSupplierService] Role supplier assigned to user ${supplier.userId}`);
       }
@@ -215,14 +215,9 @@ export class NetureSupplierService {
       await this.supplierRepo.save(supplier);
 
       if (supplier.userId) {
-        const membership = await this.membershipRepo.findOne({
-          where: { userId: supplier.userId, serviceKey: 'neture' },
-        });
-        if (membership) {
-          membership.status = 'rejected';
-          await this.membershipRepo.save(membership);
-        }
+        // 공급자 반려는 공급자 원장만 바꾼다 — Neture 가입(service_memberships 'neture')은 그대로 둔다(CHECK §10 E3).
         await roleAssignmentService.removeRole(supplier.userId, 'supplier');
+        await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
       }
 
       const org = await this.getOrgData(supplier.organizationId);
@@ -406,13 +401,7 @@ export class NetureSupplierService {
           [supplierId],
         );
 
-        if (locked.user_id) {
-          await manager.query(
-            `UPDATE service_memberships SET status = 'suspended', updated_at = NOW()
-             WHERE user_id = $1 AND service_key = 'neture'`,
-            [locked.user_id],
-          );
-        }
+        // 공급자 비활성화는 공급자 원장 · 조직 · role 만 바꾼다 — Neture 가입 원장은 그대로 둔다(CHECK §10 E3).
 
         if (locked.organization_id) {
           await manager.query(
@@ -440,6 +429,7 @@ export class NetureSupplierService {
       }).then(async (result) => {
         if (result.success && result.data?.userId) {
           await roleAssignmentService.removeRole(result.data.userId as string, 'supplier');
+          await roleAssignmentService.removeRole(result.data.userId as string, 'neture:supplier');
         }
         if (result.success) {
           logger.info(
@@ -466,7 +456,7 @@ export class NetureSupplierService {
 
   // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §7:
   // 재활성화 (INACTIVE → ACTIVE, admin 전용). 접근 상태만 복구한다:
-  // supplier status / organization active / service membership / supplier role.
+  // supplier status / organization active / supplier role. (Neture 가입 원장은 복구하지 않는다 — 전제조건으로 확인만)
   // 상품 승인·매장 진열·HUB 게시 등 상거래 상태는 자동 복구하지 않는다(운영자·공급자가 재수행).
   async reactivateSupplier(
     supplierId: string,
@@ -490,19 +480,28 @@ export class NetureSupplierService {
         if (await this.isDemoSupplier(locked.user_id, locked.organization_id, manager)) {
           return { success: false, error: DEMO_ACCOUNT_FORBIDDEN_CODE };
         }
+        // 재활성화 전제조건 = 현재 Neture 가입 승인. Neture 가입 원장은 바꾸지 않는다(CHECK §10 E3).
+        if (locked.user_id && (await getNetureMainMembershipStatus(manager, locked.user_id)) !== 'active') {
+          return { success: false, error: 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' };
+        }
+
+        const [proof] = await manager.query(
+          `SELECT d.id FROM neture_suppliers s
+             JOIN organizations o ON o.id = s.organization_id
+             JOIN kyc_documents d ON d.id = s.business_registration_document_id AND d.user_id = s.user_id
+            WHERE s.id = $1 AND d."documentType" = 'business_registration'
+              AND d."verificationStatus" IN ('PENDING','VERIFIED')
+              AND NULLIF(TRIM(o.business_number), '') IS NOT NULL AND NULLIF(TRIM(o.address), '') IS NOT NULL
+              AND NULLIF(TRIM(s.representative_name), '') IS NOT NULL
+              AND NULLIF(TRIM(s.business_type), '') IS NOT NULL AND NULLIF(TRIM(s.business_item), '') IS NOT NULL`,
+          [supplierId],
+        );
+        if (!proof) return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
 
         await manager.query(
           `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,
           [supplierId, SupplierStatus.ACTIVE],
         );
-
-        if (locked.user_id) {
-          await manager.query(
-            `UPDATE service_memberships SET status = 'active', updated_at = NOW()
-             WHERE user_id = $1 AND service_key = 'neture'`,
-            [locked.user_id],
-          );
-        }
 
         if (locked.organization_id) {
           await manager.query(
@@ -528,7 +527,7 @@ export class NetureSupplierService {
           // RBAC SSOT (F9): 커밋 성공 후 supplier role 복구 (assignRole 은 기존 비활성 배정을 재활성화).
           await roleAssignmentService.assignRole({
             userId: result.data.userId as string,
-            role: 'supplier',
+            role: 'neture:supplier',
             assignedBy: adminUserId,
           });
         }

@@ -26,12 +26,13 @@ const SUPPLIER_ID = '11111111-1111-4111-8111-111111111111';
 const USER_ID = '22222222-2222-4222-8222-222222222222';
 const CANDIDATE_ID = '33333333-3333-4333-8333-333333333333';
 
-function dataSourceWithSupplier(row: { id: string; status: string } | null): DataSource {
+function dataSourceWithSupplier(row: { id: string; status: string } | null, emailVerified = true): DataSource {
   return {
     query: jest.fn(async (sql: string) => {
       // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1:
       //   supplier resolve 가 canonical(organization_members JOIN) → legacy(neture_suppliers.user_id)
       //   두 질의를 한다. 이 테스트는 legacy 경로를 쓰므로 canonical 은 빈 배열을 돌려준다.
+      if (sql.includes('FROM users u')) return [{ account_status: 'active', account_active: true, email_verified: emailVerified }];
       if (sql.includes('organization_members')) return [];
       if (sql.includes('neture_suppliers')) return row ? [row] : [];
       throw new Error(`unexpected query: ${sql}`);
@@ -56,6 +57,14 @@ const createdCandidate = (overrides: Record<string, unknown> = {}) => ({
 });
 
 describe('POST /api/v1/neture/supplier/product-candidates', () => {
+  it('email unverified main account cannot author supplier candidates', async () => {
+    const create = jest.fn();
+    const res = await request(makeApp(dataSourceWithSupplier({ id: SUPPLIER_ID, status: 'ACTIVE' }, false), create))
+      .post('/api/v1/neture/supplier/product-candidates').set('x-test-user', USER_ID).send({ name: 'A' });
+    expect(res.status).toBe(403);
+    expect(create).not.toHaveBeenCalled();
+  });
+
   it('미인증 → 401 · createCandidate 미호출', async () => {
     const create = jest.fn();
     const res = await request(makeApp(dataSourceWithSupplier({ id: SUPPLIER_ID, status: 'ACTIVE' }), create))

@@ -27,6 +27,7 @@
  * - GET  /api/v1/auth/services        — User's service catalog (requireAuth)
  */
 
+import { getNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES } from '../../neture/services/neture-main-membership.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
@@ -35,13 +36,13 @@ import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
-import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
+import { persistRefreshTokenFamily, readUserMembershipsWithMainAccess } from '../../../services/auth/auth-context.helper.js';
 import {
   isPasswordSessionAllowed,
   PASSWORD_SESSION_NOT_ALLOWED_CODE,
   PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
 } from '../../../common/auth/password-session.policy.js';
-import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
+import { REPRESENTATIVE_ENTRY_SERVICE_KEY, getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
 import { resolveAccessibleStores } from '../../../utils/service-tenant.resolver.js';
 import { isHandoffWorkspace, type HandoffAuthMethod } from '../../../services/handoff-token.service.js';
@@ -55,40 +56,15 @@ import {
 import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
 import { verifyAccessToken } from '../../../utils/token.utils.js';
 import logger from '../../../utils/logger.js';
-import {
-  defaultSemiFranchiseAccessResolver,
-  semiFranchiseAccessKeyFor,
-  serviceNotMemberMessage,
-} from '../../../common/auth/service-login-eligibility.policy.js';
-import type { SemiFranchiseServiceAccess } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
-import { toAccessDetails } from '../../neture-pharmacy/services/semi-franchise-service-access.js';
-
-/**
- * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 (직접 로그인 gate 와 같은 기준).
- * 대상 서비스 membership 이 active 가 아닐 때만, 카탈로그 `semiFranchiseAccessKey` 가 있는 대상 서비스에 한해 조회한다.
- * 그 밖에는 null — 기존 membership 검사만 적용(기존 경로의 조회 · 응답 불변).
- * 독립 자격(카탈로그 `semiFranchiseAccessKey` 주석): KPA row 가 suspended · withdrawn 이어도 Neture 자격이 있으면
- * 통과한다. 통과 판정은 호출부의 지역 값일 뿐 — 세션에 싣는 memberships · roles 는 원장 그대로다.
- */
-async function resolveHandoffSemiFranchiseAccess(
-  userId: string,
-  targetServiceKey: string | undefined,
-  currentStatus: string | undefined,
-): Promise<SemiFranchiseServiceAccess | null> {
-  if (currentStatus === 'active') return null;
-  const key = semiFranchiseAccessKeyFor(targetServiceKey);
-  return key ? defaultSemiFranchiseAccessResolver(userId, key) : null;
-}
-
 /**
  * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §6 — 폐기된 세션의 handoff 부활 차단.
  *
- * logout-all / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
+ * 보안 세션 폐기 / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
  * access token(최대 15분)으로 handoff 를 발급·교환하면 exchange 가 새 family 를 만들어 세션이 되살아났다.
  * 모든 로그인 경로는 family 를 기록하므로(`persistRefreshTokenFamily` 계약) null family = 종료된 세션이다.
  *
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 서비스 하나의 `logout` 은 더 이상 family 를
- * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 logout-all · 도난 판정
+ * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 보안 세션 폐기 · 도난 판정
  * 두 경우이며, 한 서비스에서 로그아웃한 뒤 다른 서비스로 handoff 하는 것은 **정상 동작**이다.
  */
 /**
@@ -324,70 +300,8 @@ export class HandoffController extends BaseController {
     }
 
     try {
-      // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
-      //   target service active membership 검증 (generation 시점).
-      //   미가입 / pending / rejected / suspended / withdrawn 모두 차단.
-      const serviceMembership: { status: string }[] = await AppDataSource.query(
-        `SELECT status FROM service_memberships
-           WHERE user_id = $1 AND service_key = $2`,
-        [user.id, targetServiceKey],
-      );
-      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: active membership 이 없어도(row 의 suspended · withdrawn 포함 — 독립 자격)
-      //   세미프랜차이즈 자격(Neture 기본 active ∧ 세미프랜차이즈 active)이 있으면 통과한다. 없으면 기존 검사 그대로.
-      const sfAccess = await resolveHandoffSemiFranchiseAccess(user.id, targetServiceKey, serviceMembership[0]?.status);
-      const targetMembership = sfAccess?.allowed ? [{ status: 'active' }] : serviceMembership;
-
-      if (targetMembership.length === 0) {
-        logger.warn('[Handoff] Blocked generation — no membership on target service', {
-          userId: user.id,
-          targetServiceKey,
-          reason: 'no_membership',
-          semiFranchiseNext: sfAccess?.next ?? undefined,
-        });
-        if (sfAccess) {
-          const serviceAccess = toAccessDetails(sfAccess);
-          return BaseController.forbidden(res, serviceNotMemberMessage(serviceAccess), 'HANDOFF_TARGET_NO_MEMBERSHIP', { serviceAccess });
-        }
-        return BaseController.error(
-          res,
-          '대상 서비스에 가입되어 있지 않습니다.',
-          403,
-          'HANDOFF_TARGET_NO_MEMBERSHIP',
-        );
-      }
-
-      const targetStatus = targetMembership[0].status;
-
-      if (targetStatus === 'withdrawn') {
-        logger.warn('[Handoff] Blocked generation — withdrawn membership on target service', {
-          userId: user.id,
-          targetServiceKey,
-          membershipStatus: targetStatus,
-          reason: 'withdrawn',
-        });
-        return BaseController.error(
-          res,
-          '탈퇴한 서비스는 Handoff 로 접근할 수 없습니다.',
-          403,
-          'HANDOFF_TARGET_WITHDRAWN',
-        );
-      }
-
-      if (targetStatus !== 'active') {
-        logger.warn('[Handoff] Blocked generation — non-active membership on target service', {
-          userId: user.id,
-          targetServiceKey,
-          membershipStatus: targetStatus,
-          reason: 'not_active',
-        });
-        return BaseController.error(
-          res,
-          '대상 서비스 가입이 아직 승인되지 않았습니다.',
-          403,
-          'HANDOFF_TARGET_NOT_ACTIVE',
-        );
-      }
-
+      // Authentication transport only: target API guards decide service access.
+      // Nonmembers can view the introduction/application page without re-login.
       // 대표 진입·workspace 와 같은 출발 검사를 거친다 — 이 경로만 빠져 있으면 로그아웃된
       // 서비스의 남은 access token 으로 발급받고, 원장 세대가 null 이라 교환 검사도 건너뛴다.
       const source = await resolveVerifiedHandoffSource(req, user.id);
@@ -403,8 +317,8 @@ export class HandoffController extends BaseController {
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
-      //   basePath 를 가진 서비스(kpa-branch = kpa-society.co.kr/kpa)는 host 루트가
-      //   다른 서비스이므로 origin helper 로 base URL 을 만든다.
+      //   basePath 를 가진 서비스는 host 루트가 다른 서비스이므로 origin helper 로 base URL 을 만든다.
+      //   (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch → https://kpa.neture.co.kr/handoff)
       const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
       const targetUrl =
         `${targetOrigin}/handoff?token=${handoffToken}` +
@@ -462,6 +376,10 @@ export class HandoffController extends BaseController {
         return BaseController.error(res, 'User not found or inactive', 401, 'INVALID_USER');
       }
 
+      if (resolveAccountAccess(user.status) !== 'normal' || user.isEmailVerified === false) {
+        return BaseController.error(res, '이메일 확인과 계정 상태를 확인해 주세요.', 403, 'ACCOUNT_NOT_ACTIVE');
+      }
+
       // §6: 토큰 발급 뒤 60s 사이 logout 됐으면 교환으로 세션을 되살리지 않는다(모든 대상 공통).
       if (!hasLiveSession(user)) {
         logger.warn('[Handoff] Blocked exchange — session revoked', { userId: user.id, reason: 'session_revoked' });
@@ -494,12 +412,8 @@ export class HandoffController extends BaseController {
       // 3. Load fresh roles from role_assignments
       const roles = await roleAssignmentService.getRoleNames(user.id);
 
-      // 4. Load fresh memberships from service_memberships
-      const memberships: { serviceKey: string; status: string }[] =
-        await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
-          [user.id],
-        );
+      // 4. Project verified main access while preserving independent service approvals.
+      const memberships = await readUserMembershipsWithMainAccess(user.id);
 
       // §8-2: 대상 종류 판정 — WORKSPACE(store) 면 organization 축으로 재검증하고 origin 을 고정한다.
       //   토큰은 이미 원자적으로 소비됐으므로(단일 사용) 여기서 거부되면 재사용될 수 없다.
@@ -550,67 +464,7 @@ export class HandoffController extends BaseController {
         }, payload.sourceAuthMethod);
       }
 
-      // ── SERVICE HANDOFF (기존 로직 불변) ────────────────────────────────────
-      // WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1:
-      //   target service active membership 재검증 (exchange 시점).
-      //   generation 시점에 active 였더라도 60s TTL 사이에 status 가 변경됐을 수 있으므로
-      //   exchange 시점에 다시 확인 (이중 안전판).
-      // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격도 exchange 시점에 다시 확인한다.
-      const serviceMembership = memberships.find(m => m.serviceKey === payload.targetServiceKey);
-      const sfAccess = await resolveHandoffSemiFranchiseAccess(user.id, payload.targetServiceKey, serviceMembership?.status);
-      const targetMembership = sfAccess?.allowed
-        ? { serviceKey: payload.targetServiceKey, status: 'active' }
-        : serviceMembership;
-
-      if (!targetMembership) {
-        logger.warn('[Handoff] Blocked exchange — no membership on target service', {
-          userId: user.id,
-          targetServiceKey: payload.targetServiceKey,
-          reason: 'no_membership',
-          semiFranchiseNext: sfAccess?.next ?? undefined,
-        });
-        if (sfAccess) {
-          const serviceAccess = toAccessDetails(sfAccess);
-          return BaseController.forbidden(res, serviceNotMemberMessage(serviceAccess), 'HANDOFF_TARGET_NO_MEMBERSHIP', { serviceAccess });
-        }
-        return BaseController.error(
-          res,
-          '대상 서비스에 가입되어 있지 않습니다.',
-          403,
-          'HANDOFF_TARGET_NO_MEMBERSHIP',
-        );
-      }
-
-      if (targetMembership.status === 'withdrawn') {
-        logger.warn('[Handoff] Blocked exchange — withdrawn membership on target service', {
-          userId: user.id,
-          targetServiceKey: payload.targetServiceKey,
-          membershipStatus: targetMembership.status,
-          reason: 'withdrawn',
-        });
-        return BaseController.error(
-          res,
-          '탈퇴한 서비스는 Handoff 로 접근할 수 없습니다.',
-          403,
-          'HANDOFF_TARGET_WITHDRAWN',
-        );
-      }
-
-      if (targetMembership.status !== 'active') {
-        logger.warn('[Handoff] Blocked exchange — non-active membership on target service', {
-          userId: user.id,
-          targetServiceKey: payload.targetServiceKey,
-          membershipStatus: targetMembership.status,
-          reason: 'not_active',
-        });
-        return BaseController.error(
-          res,
-          '대상 서비스 가입이 아직 승인되지 않았습니다.',
-          403,
-          'HANDOFF_TARGET_NOT_ACTIVE',
-        );
-      }
-
+      // Preserve the account session without granting service membership or roles.
       return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
         targetServiceKey: payload.targetServiceKey,
       }, payload.sourceAuthMethod);
@@ -713,6 +567,15 @@ export class HandoffController extends BaseController {
     }
 
     try {
+      const mainStatus = await getNetureMainMembershipStatus(AppDataSource, user.id);
+      if (serviceKey === REPRESENTATIVE_ENTRY_SERVICE_KEY) {
+        return BaseController.ok(res, { serviceKey, serviceName: service.name, status: mainStatus,
+          pendingApproval: false, requestSubmitted: false,
+          message: mainStatus === 'active' ? '이메일 확인이 완료되었습니다.' : NETURE_MAIN_MEMBERSHIP_MESSAGES[mainStatus] });
+      }
+      if (mainStatus !== 'active') {
+        return BaseController.error(res, NETURE_MAIN_MEMBERSHIP_MESSAGES[mainStatus], 403, 'NETURE_MEMBERSHIP_REQUIRED');
+      }
       // Check existing membership
       const existing: { id: string; status: string }[] = await AppDataSource.query(
         `SELECT id, status FROM service_memberships WHERE user_id = $1 AND service_key = $2`,
@@ -766,10 +629,19 @@ export class HandoffController extends BaseController {
         }
 
         // rejected / suspended → pending 으로 재신청 (active 직접 전환 금지)
-        await AppDataSource.query(
-          `UPDATE service_memberships SET status = 'pending', updated_at = NOW() WHERE id = $1`,
-          [current.id],
-        );
+        // Neture 재신청은 legacy role(예: 과거 가입 시 'supplier')을 들고 가지 않는다 — Neture 가입은
+        // 메인 이용 자격만이며 연결 서비스 역할은 각 서비스 승인으로만 생긴다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 B2).
+        if (serviceKey === 'neture') {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'pending', role = 'member', updated_at = NOW() WHERE id = $1`,
+            [current.id],
+          );
+        } else {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'pending', updated_at = NOW() WHERE id = $1`,
+            [current.id],
+          );
+        }
       } else {
         // 신규 → pending 으로 가입 신청 (instant active 금지)
         await AppDataSource.query(
@@ -814,6 +686,7 @@ export class HandoffController extends BaseController {
           [user.id],
         );
 
+      const mainStatus = await getNetureMainMembershipStatus(AppDataSource, user.id);
       const membershipMap = new Map(
         memberships.map(m => [m.serviceKey, m.status]),
       );
@@ -829,7 +702,7 @@ export class HandoffController extends BaseController {
         basePath: svc.basePath ?? '',
         description: svc.description,
         joinEnabled: svc.joinEnabled,
-        membership: membershipMap.has(svc.key)
+        membership: svc.key === REPRESENTATIVE_ENTRY_SERVICE_KEY ? { status: mainStatus } : membershipMap.has(svc.key)
           ? { status: membershipMap.get(svc.key)! }
           : null,
       }));

@@ -1,7 +1,9 @@
 # O4O 서브도메인 · 서비스 의미 정본
 
+> **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
+
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-05 (§2 세미프랜차이즈 식별 · §3-1 약국 Store Hub 단계 없음)
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
 > **근거 WO/IR**: WO-O4O-SUBDOMAIN-SERVICE-SEMANTICS-DOCUMENT-ALIGNMENT-V1 · 주소 결정은 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) CONFIRMED_DECISIONS · §9 · §12 · §21-17
 
 **`*.neture.co.kr` 각 주소가 사업적으로 무엇이고 누구를 위한 것인가**를 정한다. 주소 · 내부 키 · role prefix 가 서로 다른 시기에 만들어져 이름만으로는 의미가 어긋나므로, 이름에서 의미를 추론하지 말고 이 표를 기준으로 읽는다.
@@ -37,7 +39,7 @@
 | `community.neture.co.kr` | 커뮤니티 회원 | 독립 커뮤니티 — 서비스 가입과 **별도**인 커뮤니티 단위 가입(승인형). `/pharmacist` · `/retail` | `community` | `community:admin` | 없음 | 각 서비스의 `/forum` |
 | `admin.neture.co.kr` | 플랫폼 관리자 | 플랫폼 · 서비스 관리 영역. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
 
-**세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 Neture 기본 가입이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
+**세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 내 매장(약국) 신청이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
 
 보조 주소: `study.neture.co.kr` = O4O 강의(`lecture`). `partner.neture.co.kr` = 주소 예약만(공급자 기능을 파트너로 되돌리지 않는다).
 
@@ -102,7 +104,7 @@ owner/member permission          — 그 안에서 무엇을 할 수 있는가
 | `kpa:store_owner` · label `KPA Store Owner` | 이름은 "KPA" | 약국 서비스의 매장 경영자. 약사회 · 분회 소속을 뜻하지 않는다 |
 | serviceKey `k-cosmetics` · role prefix `cosmetics:*` | 이름은 "화장품" | 화장품 **및 일반 소매** 사업자 서비스(`retail.neture.co.kr`) |
 | catalog `kpa-society.description` | `약사 커뮤니티 서비스` | 사용자 노출 문자열(`/check-email` 등). 현재 의미와 다름 — 변경은 별도 WO |
-| catalog `kpa-branch.domain` | `kpa-society.co.kr` + basePath `/kpa` | 목표 호스트 `kpa.neture.co.kr` 은 앱이 이미 판정(`web-kpa-branch` `PLATFORM_HOSTS`). catalog 이전은 handoff · slug 해석과 함께 DEFERRED |
+| 옛 분회 공용 경로 `kpa-society.co.kr/kpa/*` | 계속 서빙(인쇄 QR · 북마크) | catalog `kpa-branch.domain` 은 `kpa.neture.co.kr`(basePath 없음)이다. 세션 판정은 host 만 보므로 이 경로의 로그인은 `kpa-society` 로 귀속된다 — 분회 앱이 이 경로 방문을 같은 path 의 `kpa.neture.co.kr` 로 옮긴다(WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1). LB · DNS 정리는 별도 |
 | catalog `pharmacy-hub.domain` | `pharmacyhub.co.kr` | 호환 호스트(§2-2) |
 | 「KPA Society」 · 「K-Cosmetics」 서비스명 | 문서 · 계약 원문 · 화면 | 내부 서비스 이름. 사업 의미는 §2 의 주소 기준으로 읽는다 |
 

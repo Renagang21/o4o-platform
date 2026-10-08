@@ -1,9 +1,9 @@
 # WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
+> **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-07
 > **근거 WO/IR**: 사용자 작업 지시(2026-10-05) — Neture 약국 서비스 및 내 매장 중심 거래 구조 리팩토링
-> **작업 branch**: `wo/neture-pharmacy-store-commerce-refactor-v1` (base `57b1dc149`, 2026-10-05 origin/main `a68a15d00` 병합)
+> **작업 branch**: `wo/neture-pharmacy-store-commerce-refactor-v1` (base `57b1dc149`, 2026-10-05 origin/main `a68a15d00` 병합) — PR #308 main 통합 완료 · branch 삭제(2026-10-07)
 
 Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에서 가입 · 승인된 공급 경로의 상품과 콘텐츠를 직접 이용하고, 선택한 공급 조건으로 주문 · 결제하는 구조로 단순하게 구현한다.
 
@@ -64,7 +64,9 @@ Neture(neture.co.kr) 약국 서비스를 **약국별 하나의 내 매장**에�
 - [x] 6-2f QR 4행 행별 기록 · 인쇄 QR 보존 분리(§16-3) · 경로 보존 리다이렉트 구현안 · 검증 방법(§16-7) — 운영 DB 변경 · 도메인 전환 미실행. QR 4행은 테스트 데이터 초기화 대상으로 결정(§12). 리다이렉트 4경로 새 화면 · 문맥 · 쿼리 코드 대조 — 차단 격차 없음, 301 전 조건 4건(§16-7)
 - [x] 6-3 정본 문서 반영 — Supplier Domain §4 · F8 §5 · B2B 계약 Axis D/§13 `350d9abb1` · CANONICAL-INDEX §1 등재(PR #304 통합 후, 2026-10-05)
 - [ ] 6-4 테스트 데이터 초기화 — 범위 확정(DESIGN §12). **운영 DB write 는 사용자 승인 대기 · 미실행**
-- [ ] 6-5 CI · PR · 완료 보고 — PR #308 (draft) 최신 HEAD 필수 검사 PASS · Codex 미완료. 통합 · 운영 전환 체크리스트(자동 실행 범위 · migration/배포 순서 · 결제 설정 · 운영 smoke · 분리 항목) [CHECK §9](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). main 통합 · 배포 · migration 운영 적용은 사용자 승인 후
+- [ ] 6-5 CI · PR · 완료 보고 — **main 통합 완료**(PR #308 · 선행 #332 운영 전환 호환 · #336 배포 전 접근 정렬 · #328 결제 모드 주입) · **운영 배포 완료**(Promote run `37548237819`, SHA `0e283ba10` — migration 1 · API · 웹 8, 2026-10-07) · **테스트 결제 활성**(운영 API env `NETURE_PHARMACY_PAYMENT_MODE=test`). **미완료: 운영 업무 흐름 검증**(계정 · `pharmacy` 담당 운영자 준비 후 [CHECK §9-5](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 완료 보고는 그 뒤. 후속 구현(6-2 · 3-4 · 6-4 · 실제 PG D1)은 각 항목 상태 유지
+  - **운영 검증 중단 (2026-10-07)**: 세미프랜차이즈 운영 화면 배치 결함(#1, FAIL) 발견 → 화면 이동 · 권한 변경 보류 → 가입 구조 읽기 전용 조사. 개발 오류 E1~E5(E1 · E2 = 이번 commerce 구현, E3~E5 = 기존) · 명칭 혼동 · D1~D3 사용자 확정 · 구현 전 확인 ①②③ · 수정/유지/다른 트랙 최소 범위 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). E1~E5 수정 대상 인정. 상태 = 배포 완료 · 가입 구조 검증 FAIL. 수정 반영 전까지 §9-5 검증 재개하지 않음
+  - **가입 구조 수정 (2026-10-07)**: E1~E5 · 공급자 상태 표시(D) · D1 항목 단위 판정 · AI 입력창 안내 + 서버 guard · 명칭 정정("내 매장(약국) 신청 · 승인") 구현, type-check · jest · vitest PASS, 운영 영향 census 읽기 전용(정리 없음) — [CHECK §10-9](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md). 상태 = 구현 완료 · 미배포. 배포 후 §9-5 가입부터 재개
 
 ### 단계 1 조사 핵심 사실 (설계 1-7 의 입력 — 상세 근거는 IR)
 - **기본 가입이 없다**: `pharmacy.neture.co.kr` = serviceKey `kpa-society` · role `kpa:*`. 매장 기본 API 전부가 `isStoreOwner(...,'kpa')`(kpa-society active membership + `kpa:store_owner` + 조직 연결)를 요구 → §3-1 "미가입이어도 내 매장" 과 정면 충돌. 자격 확인은 사실상 없음(`license_verified` 쓰는 코드 0).

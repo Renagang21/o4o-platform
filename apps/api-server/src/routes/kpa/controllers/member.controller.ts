@@ -10,7 +10,6 @@ import type { EntityManager } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
-import { ensureKpaStoreOrganization } from '../services/kpa-store-organization.provisioning.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 import {
   demoAccountService,
@@ -27,7 +26,6 @@ import { notificationService } from '../../../services/NotificationService.js';
 // WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1: slug 생성 (pharmacy-request 경로와 동일)
 // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
 import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
-import { planKpaOrganizationContactSync } from '../shared/organizationContactSync.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
 import type { BusinessInfoPatch } from '../../../utils/business-info-write.js';
 import { applyBusinessInfoPatch, buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
@@ -843,145 +841,7 @@ export function createMemberController(
           return savedMember;
         });
 
-        // ============================================================
-        // WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1
-        //
-        // pending → active 승인 + activity_type='pharmacy_owner' 인 회원은
-        // 별도 pharmacy_request 없이 다음을 자동 수행:
-        //   1) organizations(type='pharmacy') ensureOrganization
-        //      code = `kpa-pharm-{businessNumber}` (pharmacy-request 와 동일 규칙)
-        //   2) kpa_members.organization_id 보정 (null 인 경우에만 — 분회 연결 보호)
-        //   3) organization_members(role='owner') 추가
-        //   4) role_assignments('kpa:store_owner') 부여
-        //
-        // 패턴은 pharmacy-request.controller.ts /:id/approve
-        // (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 와 byte-equivalent.
-        // 차이점: businessNumber 가 users.businessInfo 에서 옴 (가입 단계 입력).
-        //
-        // Graceful fallback:
-        //   businessNumber 또는 pharmacy_name 이 없으면 skip + warn 만 (회원 승인은 성공).
-        //   legacy active+pharmacy_owner 회원이나 데이터 결손 케이스 대응 — 이런 경우
-        //   기존 pharmacy_request 흐름으로 복구 가능.
-        //
-        // 실패 isolation:
-        //   자동 활성화 실패는 회원 승인 자체를 실패시키지 않음 (별도 try/catch).
-        // ============================================================
-        if (
-          oldStatus === 'pending' &&
-          newStatus === 'active' &&
-          member.activity_type === 'pharmacy_owner'
-        ) {
-          try {
-            const [userRow] = await dataSource.query(
-              `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
-              [member.user_id]
-            );
-            const biz = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
-              ? (userRow.businessInfo as Record<string, any>)
-              : {};
-            const rawBusinessNumber = typeof biz.businessNumber === 'string' ? biz.businessNumber : '';
-            const businessNumberDigits = rawBusinessNumber.replace(/[^0-9]/g, '');
-            const pharmacyName = member.pharmacy_name || (typeof biz.businessName === 'string' ? biz.businessName : null);
-
-            if (businessNumberDigits.length === 0 || !pharmacyName) {
-              const missing: string[] = [];
-              if (businessNumberDigits.length === 0) missing.push('사업자번호');
-              if (!pharmacyName) missing.push('약국명');
-              const reason = `매장 운영 권한(store_owner) 자동 부여 보류: ${missing.join(' / ')} 입력 후 다시 저장하세요.`;
-              console.warn(
-                `[KPA Approval] pharmacy_owner auto-activation skipped — ${missing.join(',')} missing for member ${member.id}`,
-              );
-              warnings.push(reason);
-            } else {
-              // 1~4) + service enrollment + slug — canonical helper 로 수렴
-              //   WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
-              //   기존에는 organization / member / role / slug 만 기록하고
-              //   organization_service_enrollments 를 만들지 않아 KPA 조직에
-              //   canonical service 연결 근거가 없었다. helper 가 전 단계를 멱등 수행한다.
-              const provisioned = await ensureKpaStoreOrganization({
-                dataSource,
-                pharmacyName,
-                businessNumberDigits,
-                userId: member.user_id,
-                assignedBy: req.user!.id,
-              });
-              const orgResult = { id: provisioned.organizationId, created: provisioned.created };
-              if (provisioned.slugError) {
-                console.error('[KPA Approval] Slug generation failed (non-blocking):', provisioned.slugError);
-              }
-
-              // 1-b. WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
-              //   organizations 테이블에 약국 정보 동기화 (NULL 또는 빈 값만 채움, 기존 값 보존)
-              //   소스: users.businessInfo (경로 B 사용자는 kpa_pharmacy_requests 없음)
-              //
-              // WO-O4O-KPA-APPROVAL-ORGANIZATION-CONTACT-WRITE-ALIGNMENT-V1:
-              //   주소·약국 전화의 원천 키 선택을 공통 resolver 로 수렴.
-              //   기존 구현의 3가지 불일치를 교정한다.
-              //     ① 주소가 `storeAddress` 우선이라 운영자가 고친 최신 `address` 가 밀렸다.
-              //     ② `businessAddress` / `businessAddressDetail` (가입 경로 키) fallback 이 없어
-              //        가입 시 입력한 주소가 organization 에 전혀 반영되지 않았다.
-              //     ③ 약국 전화가 `pharmacyPhone` (공통 운영자 콘솔 키) 을 못 보고,
-              //        대신 대표 전화 `biz.phone` 로 fallback 해 두 의미를 합쳤다.
-              //   우편번호는 지금까지 어디에도 기록되지 않아 address_detail.zipCode 로 채운다.
-              try {
-                const orgMeta: Record<string, string | null> = {};
-                if (biz.taxInvoiceEmail) orgMeta.taxInvoiceEmail = biz.taxInvoiceEmail;
-                if (biz.ceoName) orgMeta.ceoName = biz.ceoName;
-                if (biz.contactName) orgMeta.contactName = biz.contactName;
-                if (biz.managerPhone) orgMeta.managerPhone = biz.managerPhone;
-                await dataSource.query(
-                  `UPDATE organizations SET
-                     business_number = COALESCE(NULLIF(business_number, ''), $1),
-                     metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
-                   WHERE id = $3`,
-                  [
-                    biz.businessNumber || null,
-                    JSON.stringify(orgMeta),
-                    orgResult.id,
-                  ],
-                );
-
-                // 주소·약국 전화: 현재 organization 값을 먼저 읽어 "빈 칸만" 채운다.
-                //   기존 유효 값 보존이 계약이므로 SQL 의 COALESCE 가드도 함께 유지한다 (이중 방어).
-                const [orgRow] = await dataSource.query(
-                  `SELECT address, address_detail, phone FROM organizations WHERE id = $1 LIMIT 1`,
-                  [orgResult.id],
-                );
-                const contactPlan = planKpaOrganizationContactSync(biz, orgRow ?? null);
-                if (contactPlan.hasChanges) {
-                  await dataSource.query(
-                    `UPDATE organizations SET
-                       address = COALESCE(NULLIF(address, ''), $1),
-                       address_detail = $2::jsonb || COALESCE(address_detail, '{}'::jsonb),
-                       phone = COALESCE(NULLIF(phone, ''), $3)
-                     WHERE id = $4`,
-                    [
-                      contactPlan.address,
-                      JSON.stringify(contactPlan.addressDetail ?? {}),
-                      contactPlan.phone,
-                      orgResult.id,
-                    ],
-                  );
-                }
-              } catch (orgSyncError) {
-                console.error('[KPA Approval] Organization sync failed (non-blocking):', orgSyncError);
-              }
-
-            }
-          } catch (autoActivationError) {
-            // 회원 승인 자체는 성공시킴 — 운영자가 legacy pharmacy_request 흐름으로 복구 가능
-            const errMsg = autoActivationError instanceof Error
-              ? autoActivationError.message
-              : String(autoActivationError);
-            console.error(
-              `[KPA Approval] pharmacy_owner auto-activation failed for member ${member.id}:`,
-              autoActivationError
-            );
-            warnings.push(
-              `매장 운영 권한(store_owner) 자동 부여 실패: ${errMsg.slice(0, 200)} (운영자 수동 확인 필요)`,
-            );
-          }
-        }
+        // Store access is granted only by the separate pharmacy application approval.
 
         // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
         try {
@@ -1471,84 +1331,7 @@ export function createMemberController(
 
         const { member, prevBiz, prevActivityType } = txResult;
 
-        // 3) pharmacy_owner 부여 — 이전 != pharmacy_owner, 새 = pharmacy_owner
-        //   WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
-        //     silent skip 제거 — 누락 항목을 warnings 로 명시하여 운영자에게 노출.
-        //   WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
-        //     organizationOpsService / roleAssignmentService 는 자체 connection 을 사용하는
-        //     외부 서비스이므로 transaction 에 포함하지 않는다. 기존 계약대로 non-blocking
-        //     (실패해도 회원정보 수정은 성공, warnings 로 노출) 을 유지한다.
-        if (
-          activity_type === 'pharmacy_owner'
-          && prevActivityType !== 'pharmacy_owner'
-        ) {
-          try {
-            const rawBusinessNumber = typeof prevBiz.businessNumber === 'string' ? prevBiz.businessNumber : '';
-            const businessNumberDigits = rawBusinessNumber.replace(/[^0-9]/g, '');
-            const pName = member.pharmacy_name || (typeof prevBiz.businessName === 'string' ? prevBiz.businessName : null);
-
-            const missing: string[] = [];
-            if (businessNumberDigits.length === 0) missing.push('사업자번호');
-            if (!pName) missing.push('약국명');
-
-            if (missing.length > 0) {
-              const reason = `매장 운영 권한(store_owner) 자동 부여 보류: ${missing.join(' / ')} 입력 후 다시 저장하세요.`;
-              console.warn(`[KPA Operator] ${reason} — member ${member.id}`);
-              changes._store_owner_activation = `skipped:missing:${missing.join(',')}`;
-              warnings.push(reason);
-            } else {
-              // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
-              //   승인 경로(PATCH /:id/status)와 **같은 canonical helper** 를 사용한다.
-              //   이 경로에는 기존에 service enrollment 도 slug 도 없어 승인 경로와
-              //   결과가 갈렸다 (같은 store_owner 인데 매장 URL 없음).
-              const provisioned = await ensureKpaStoreOrganization({
-                dataSource,
-                pharmacyName: pName,
-                businessNumberDigits,
-                userId: member.user_id,
-                assignedBy: (req as any).user?.id,
-              });
-              const orgResult = { id: provisioned.organizationId, created: provisioned.created };
-              if (provisioned.slugError) {
-                console.error('[KPA Operator] Slug generation failed (non-blocking):', provisioned.slugError);
-              }
-
-              // WO-O4O-KPA-ACTIVITY-TYPE-PHARMACY-OWNER-ORGANIZATION-CONTACT-ALIGNMENT-V1
-              //   승인 경로(PATCH /:id/status) 와 동일한 주소·약국 전화 초기화 계약을 적용한다.
-              //   - 신규 organization: resolver 결과로 초기화.
-              //   - 기존 organization: 유효한 값은 덮어쓰지 않고 비어 있는 항목만 보완.
-              //   - 대표 전화(businessInfo.phone) 는 약국 전화로 승격하지 않는다.
-              //   prevBiz 는 이 요청의 businessInfo patch 가 반영된 "갱신 후" 값이다.
-              //   권한 부여와 독립된 try/catch — 연락처 동기화 실패가 store_owner 부여 결과를
-              //   'error' 로 바꾸지 않는다 (기존 후처리 계약 유지).
-              try {
-                const [orgRow] = await dataSource.query(
-                  `SELECT address, address_detail, phone FROM organizations WHERE id = $1 LIMIT 1`,
-                  [orgResult.id],
-                );
-                const contactPlan = planKpaOrganizationContactSync(prevBiz, orgRow ?? null);
-                if (contactPlan.hasChanges) {
-                  await dataSource.query(
-                    `UPDATE organizations SET
-                       address = COALESCE(NULLIF(address, ''), $1),
-                       address_detail = $2::jsonb || COALESCE(address_detail, '{}'::jsonb),
-                       phone = COALESCE(NULLIF(phone, ''), $3)
-                     WHERE id = $4`,
-                    [contactPlan.address, JSON.stringify(contactPlan.addressDetail ?? {}), contactPlan.phone, orgResult.id],
-                  );
-                }
-              } catch (orgContactErr) {
-                console.error('[KPA Operator] Organization contact sync failed (non-blocking):', orgContactErr);
-              }
-
-              changes._store_owner_activated = true;
-            }
-          } catch (activateErr) {
-            console.error('[KPA Operator] pharmacy_owner activation failed:', activateErr);
-            changes._store_owner_activation = 'error';
-            warnings.push('매장 운영 권한(store_owner) 자동 부여 중 오류가 발생했습니다. 수동 확인이 필요합니다.');
-          }
-        }
+        // Pharmacy store provisioning belongs to the separate Store approval flow.
 
         // Audit log
         try {

@@ -1,6 +1,8 @@
-# Cosmetics Retail Service - Definition
+# Cosmetics Retail Service - Definition — SUPERSEDED (서비스 퇴역)
 
-> 서비스 정의 문서
+> **상태**: SUPERSEDED · **대체 문서**: [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · **표기일**: 2026-10-07 — K-Cosmetics 는 퇴역이 결정됐고(2026-10-05) 운영 runtime 은 퇴역 1차-A · 1차-B 로 삭제됐다. 아래 "운영중" 상태와 기능 목록(드롭쉬핑 · 샘플 · E-commerce 주문/결제 등)은 퇴역 이전 기록이며 기준이 아니다.
+>
+> (원문) 서비스 정의 문서
 
 ## 서비스 정보
 

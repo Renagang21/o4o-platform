@@ -58,7 +58,7 @@ import { CreateAssistantTasks1791012819443 } from '../migrations/1791012819443-C
 import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791100000000-CreateAssistantProceduralMemory.js';
 // WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1 (local_agent_devices.capabilities)
 import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791177033073-AddLocalAgentDeviceCapabilities.js';
-// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (기본 가입 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
+// WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (내 매장(약국) 신청 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
 import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 (assistant_run_frames.understanding)
 import { AddAssistantRunFrameUnderstanding1791349365734 } from '../migrations/1791349365734-AddAssistantRunFrameUnderstanding.js';

@@ -21,7 +21,7 @@ jest.mock('../../../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
-describe('가입 상태 전이 (기본 가입 · 세미프랜차이즈 공용)', () => {
+describe('가입 상태 전이 (내 매장(약국) 신청 · 세미프랜차이즈 공용)', () => {
   it.each([
     ['pending', 'approve', 'active'],
     ['pending', 'reject', 'rejected'],

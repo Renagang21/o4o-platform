@@ -4,7 +4,7 @@
  * WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 / DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §17
  *
  * 카탈로그 `semiFranchiseAccessKey` 를 가진 서비스(현재 kpa-society = pharmacy.neture.co.kr → 'pharmacy')는
- * 그 서비스 membership 이 없어도 **Neture 기본 가입 active ∧ 그 세미프랜차이즈 가입 active** 인 약국 조직의
+ * 그 서비스 membership 이 없어도 **내 매장(약국) 신청 active ∧ 그 세미프랜차이즈 가입 active** 인 약국 조직의
  * owner/admin/manager 이면 이용 자격이 있다(약국 조직 하나라도 두 조건을 함께 만족해야 한다).
  *
  *   - service_memberships · role 을 만들지 않는다(읽기만).
@@ -17,17 +17,17 @@ type Exec = { query: (sql: string, params?: unknown[]) => Promise<any[]> };
 
 /** 거절 사유 = 다음에 할 일. 화면은 이 값으로 안내 문구와 신청 링크를 고른다. */
 export type SemiFranchiseAccessNext =
-  | 'apply_pharmacy' // 기본 가입 없음 · 반려 · 종료 → 약국 가입 신청
-  | 'pharmacy_pending' // 기본 가입 승인 대기
-  | 'pharmacy_suspended' // 기본 가입 정지
-  | 'apply_semi_franchise' // 기본 active, 세미프랜차이즈 가입 없음 · 반려 · 종료 → 가입 신청
+  | 'apply_pharmacy' // 내 매장(약국) 신청 없음 · 반려 · 종료 → 약국 가입 신청
+  | 'pharmacy_pending' // 내 매장(약국) 신청 승인 대기
+  | 'pharmacy_suspended' // 내 매장(약국) 신청 정지
+  | 'apply_semi_franchise' // 내 매장(약국) active, 세미프랜차이즈 가입 없음 · 반려 · 종료 → 가입 신청
   | 'semi_franchise_pending' // 세미프랜차이즈 가입 승인 대기
   | 'semi_franchise_suspended'; // 세미프랜차이즈 가입 정지
 
 export interface SemiFranchiseServiceAccess {
   semiFranchiseKey: string;
   allowed: boolean;
-  /** 안내 기준 약국 조직(가장 진행된 조직)의 기본 가입 상태. 없으면 null */
+  /** 안내 기준 약국 조직(가장 진행된 조직)의 내 매장(약국) 신청 상태. 없으면 null */
   pharmacyMembershipStatus: string | null;
   /** 같은 조직의 세미프랜차이즈 가입 상태. 없으면 null */
   semiFranchiseMembershipStatus: string | null;
@@ -42,9 +42,9 @@ const STATUS_RANK: Record<string, number> = { active: 0, pending: 1, suspended: 
 const rank = (s: string | null) => (s === null ? 9 : STATUS_RANK[s] ?? 8);
 
 export const SEMI_FRANCHISE_ACCESS_MESSAGES: Record<SemiFranchiseAccessNext, string> = {
-  apply_pharmacy: '약국 서비스는 Neture 약국 가입과 pharmacy 세미프랜차이즈 가입 승인 후 이용할 수 있습니다. 약국 가입을 먼저 신청해 주세요.',
-  pharmacy_pending: 'Neture 약국 가입 승인을 기다리고 있습니다. 승인 후 pharmacy 세미프랜차이즈 가입을 신청할 수 있습니다.',
-  pharmacy_suspended: 'Neture 약국 가입이 정지된 상태입니다. 운영자에게 문의해 주세요.',
+  apply_pharmacy: '약국 서비스는 내 매장(약국) 신청 승인과 pharmacy 세미프랜차이즈 가입 승인 후 이용할 수 있습니다. 내 매장(약국) 신청을 먼저 해 주세요.',
+  pharmacy_pending: '내 매장(약국) 신청 승인을 기다리고 있습니다. 승인 후 pharmacy 세미프랜차이즈 가입을 신청할 수 있습니다.',
+  pharmacy_suspended: '내 매장(약국) 이용이 정지된 상태입니다. 운영자에게 문의해 주세요.',
   apply_semi_franchise: 'pharmacy 세미프랜차이즈 가입 승인 후 이용할 수 있습니다. 세미프랜차이즈 가입을 신청해 주세요.',
   semi_franchise_pending: 'pharmacy 세미프랜차이즈 가입 승인을 기다리고 있습니다.',
   semi_franchise_suspended: 'pharmacy 세미프랜차이즈 가입이 정지된 상태입니다. 운영자에게 문의해 주세요.',
@@ -95,7 +95,9 @@ export async function resolveSemiFranchiseServiceAccess(
        LEFT JOIN semi_franchises sf ON sf.key = $2 AND sf.status = 'active'
        LEFT JOIN semi_franchise_memberships sfm
          ON sfm.organization_id = om.organization_id AND sfm.semi_franchise_id = sf.id
-      WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL`,
+      WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL
+        AND EXISTS (SELECT 1 FROM users u WHERE u.id = $1 AND u."isEmailVerified" = true AND u."isActive" = true AND u.status IN ('active','approved'))
+        AND NOT EXISTS (SELECT 1 FROM service_memberships main WHERE main.user_id = $1 AND main.service_key = 'neture' AND main.status IN ('suspended','withdrawn'))`,
     [userId, semiFranchiseKey, [...PHARMACY_STORE_MEMBER_ROLES]],
   );
   return decideSemiFranchiseAccess(semiFranchiseKey, rows);

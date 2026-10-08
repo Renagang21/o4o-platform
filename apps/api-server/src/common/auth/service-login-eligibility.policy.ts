@@ -18,7 +18,7 @@
  *   - 가입 · role 을 만들거나 다른 서비스 membership 으로 대신 인정하지 않는다.
  *
  *   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 카탈로그 `semiFranchiseAccessKey` 가 있는 게이트 서비스는
- *   위 판정에 더해 **Neture 기본 가입 active ∧ 그 세미프랜차이즈 가입 active** 도 통과시킨다
+ *   위 판정에 더해 **내 매장(약국) 신청 active ∧ 그 세미프랜차이즈 가입 active** 도 통과시킨다
  *   (`evaluateServiceLoginAccess`). handoff 도 같은 세미프랜차이즈 판정을 쓴다.
  */
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
@@ -55,7 +55,9 @@ const PLATFORM_ADMIN_BYPASS_ROLES: readonly string[] = ['platform:super_admin', 
  * 요청 origin → 로그인 자격을 요구하는 서비스 키. 요구하지 않으면 `null`.
  *
  * 호스트가 다른 서비스의 `domain` · `legacyDomains` 와도 겹치면 어느 서비스 로그인인지 origin 만으로
- * 단정할 수 없으므로 판정하지 않는다(예: kpa-society.co.kr 은 kpa-branch `/kpa` 의 호스트이기도 하다).
+ * 단정할 수 없으므로 판정하지 않는다. (종전 kpa-society.co.kr 은 kpa-branch `/kpa` 의 domain 이기도 해 판정
+ * 불가였다 — WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1 로 kpa-branch 가 kpa.neture.co.kr 로
+ * 옮겨 이제 kpa-society 의 legacy 호스트로만 판정된다.)
  */
 export function resolveLoginMembershipGateKey(origin: string | undefined | null): string | null {
   if (!origin) return null;

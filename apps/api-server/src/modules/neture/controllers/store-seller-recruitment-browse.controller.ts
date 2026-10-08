@@ -12,6 +12,9 @@
  * 응답은 SellerRecruitmentService.getRecruitments (감사 필드 미포함) 재사용 — 운영자 검토 정보 노출 0.
  *
  * 신규 테이블·상태·승인 API·migration 없음. 참여(apply)는 POST /neture/seller-recruitment/applications 사용.
+ *
+ * 세미프랜차이즈 제공 모집은 모집 행의 semi_franchise_id 로 판정한다.
+ *   해당 조직의 그 세미프랜차이즈 가입이 active 일 때만 보이며, 기존 일반 모집(NULL)은 그대로 보인다.
  */
 import { Router, Request, Response, RequestHandler } from 'express';
 import { NetureService } from '../neture.service.js';
@@ -19,6 +22,8 @@ import { ExposureStatus, RecruitmentStatus } from '../entities/index.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+
+const RECRUITMENT_SERVICE_KEY = 'kpa-society';
 
 export function createStoreSellerRecruitmentBrowseController(
   dataSource: DataSource,
@@ -34,10 +39,11 @@ export function createStoreSellerRecruitmentBrowseController(
     '/store/seller-recruitments',
     authMiddleware,
     requireStoreOwner,
-    async (_req: Request, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       try {
         const data = await netureService.getSellerRecruitments({
-          serviceKey: 'kpa-society', // 고정 — 클라이언트 입력 무시
+          storeOrganizationId: (req as Request & { organizationId?: string }).organizationId ?? '',
+          serviceKey: RECRUITMENT_SERVICE_KEY, // 고정 — 클라이언트 입력 무시
           exposureStatus: ExposureStatus.APPROVED, // 승인만
           status: RecruitmentStatus.RECRUITING, // 모집 중만
         });

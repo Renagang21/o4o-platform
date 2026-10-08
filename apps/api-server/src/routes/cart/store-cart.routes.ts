@@ -31,6 +31,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
 import { getAllServiceKeys } from '../../config/service-catalog.js';
+import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import {
   StoreCartService,
   CartError,
@@ -53,8 +54,15 @@ import { isApprovalEligibleServiceKey } from '../../modules/neture/constants/app
 //   checkout-confirm 으로 B2B 주문까지 생성할 수 있었다 (cross-service leak).
 //   판정 정본은 DB membership 이다 (JWT 스냅샷 금지 — `utils/service-membership.ts` 참조).
 import { hasActiveServiceMembership } from '../../utils/service-membership.js';
+import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 
 type AuthMiddleware = RequestHandler;
+
+// WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1 (K-Cosmetics 퇴역 잔여 R1):
+//   K-Cosmetics 는 퇴역했고 결제 경로(`/cosmetics/b2b/payments/*`)가 삭제됐다. catalog row 는 retired identity 로
+//   남아 있어 serviceKey 검증만으로는 통과하므로, 이 라우터에서 명시적으로 닫는다 — 결제할 수 없는
+//   pending 주문 방지. 조회 포함 전 endpoint 410.
+export const RETIRED_CART_SERVICE_KEYS: ReadonlySet<string> = new Set([SERVICE_KEYS.K_COSMETICS]);
 
 export function createStoreCartRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -104,6 +112,16 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
         success: false,
         error: `invalid serviceKey: ${serviceKey}`,
         code: 'VALIDATION_ERROR',
+      });
+      return null;
+    }
+
+    // 퇴역 서비스는 membership 판정보다 먼저 닫는다(RETIRED_CART_SERVICE_KEYS).
+    if (RETIRED_CART_SERVICE_KEYS.has(serviceKey)) {
+      res.status(410).json({
+        success: false,
+        error: '운영이 종료된 서비스입니다.',
+        code: 'SERVICE_RETIRED',
       });
       return null;
     }
@@ -238,7 +256,16 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
           ? body.itemIds.filter((x: unknown): x is string => typeof x === 'string')
           : undefined;
         const note = typeof body.note === 'string' ? body.note : undefined;
-        const result = await checkoutService.confirm(scope, { itemIds, note });
+        // 구매 매장(조직)은 선택값(hint)이다 — 세미프랜차이즈 서비스의 구매 약국 판정은 서버가 확정한다.
+        //   공용 장바구니 화면은 body 에 조직을 싣지 않으므로, 통합 매장 공간이 고른 매장 헤더를 함께 넘긴다.
+        const organizationId =
+          typeof body.organizationId === 'string' ? body.organizationId : undefined;
+        const result = await checkoutService.confirm(scope, {
+          itemIds,
+          note,
+          organizationId,
+          preferredOrganizationId: readPreferredStoreOrganizationId(req),
+        });
         res.json({ success: true, data: result });
       } catch (error) {
         handleError(res, error, 'POST checkout-confirm');

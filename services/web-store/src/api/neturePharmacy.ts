@@ -22,6 +22,9 @@ export interface PharmacyMembership {
   applied_at: string;
   decided_at: string | null;
   reason: string | null;
+  address?: string;
+  phone?: string;
+  business_profile?: Record<string, string>;
 }
 
 export interface PharmacyMembershipInput {
@@ -30,6 +33,10 @@ export interface PharmacyMembershipInput {
   pharmacistLicenseNumber: string;
   address?: string;
   phone?: string;
+  businessRegistrationDocumentId?: string;
+  representativeName?: string;
+  businessType?: string;
+  businessCategory?: string;
 }
 
 export type PaymentMode = 'test' | 'live' | 'disabled';
@@ -41,6 +48,7 @@ export interface PharmacyStoreContext {
 }
 
 export interface SemiFranchiseRow {
+  registrationConditions?: string;
   key: string;
   name: string;
   communityKey: string | null;
@@ -162,7 +170,7 @@ export interface SemiFranchiseContent {
 const P = '/neture/pharmacy';
 
 export const neturePharmacyApi = {
-  // ─── 기본 가입 (매장 게이트 이전 — 로그인만) ───
+  // ─── 내 매장(약국) 신청 (매장 게이트 이전 — 로그인 + 서버의 Neture 가입 승인 확인) ───
   async getMembership(): Promise<PharmacyMembership | null> {
     return (await coreApiClient.get<Envelope<PharmacyMembership | null>>(`${P}/membership`)).data;
   },
@@ -170,7 +178,7 @@ export const neturePharmacyApi = {
     return (await coreApiClient.post<Envelope<PharmacyMembership>>(`${P}/membership`, input)).data;
   },
 
-  // ─── 내 매장 (기본 가입 active) ───
+  // ─── 내 매장 (내 매장(약국) 신청 active) ───
   async getStoreContext(): Promise<PharmacyStoreContext> {
     return (await coreApiClient.get<Envelope<PharmacyStoreContext>>(`${P}/store/context`)).data;
   },
@@ -178,8 +186,8 @@ export const neturePharmacyApi = {
   async listSemiFranchises(): Promise<SemiFranchiseRow[]> {
     return (await coreApiClient.get<Envelope<SemiFranchiseRow[]>>(`${P}/semi-franchises`)).data ?? [];
   },
-  async applySemiFranchise(key: string): Promise<unknown> {
-    return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/apply`)).data;
+  async applySemiFranchise(key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}): Promise<unknown> {
+    return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/apply`, application)).data;
   },
   async withdrawSemiFranchise(key: string): Promise<unknown> {
     return (await coreApiClient.post<Envelope<unknown>>(`${P}/semi-franchises/${encodeURIComponent(key)}/withdraw`)).data;

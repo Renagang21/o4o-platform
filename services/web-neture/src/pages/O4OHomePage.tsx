@@ -66,6 +66,7 @@ import {
   type UnifiedRequestResult,
 } from '../lib/ai/unified-request';
 import { useHomeEntry } from '../lib/home-entry';
+import { NetureMembershipNotice } from '../components/home/NetureMembershipNotice';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
@@ -383,6 +384,8 @@ export default function O4OHomePage() {
       if (gen !== aiGenRef.current) return;
       setAnswer(null);
       setError(err instanceof UnifiedRequestError || err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
+      // 서버 guard 가 Neture 가입 승인 전이라고 답하면 상태를 다시 읽어 입력창 자리를 안내로 바꾼다.
+      if (err instanceof UnifiedRequestError && err.code === 'NETURE_MEMBERSHIP_REQUIRED') entry.reload();
     } finally {
       if (gen === aiGenRef.current) setPending(false);
     }
@@ -427,6 +430,15 @@ export default function O4OHomePage() {
       )}
     </>
   ) : null;
+
+  /*
+   * Neture 가입 승인 전에는 입력창 대신 상태 안내(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5).
+   * 안내는 편의이고 판정은 서버 guard 다. 상태를 모르면(구 API · 로딩 · 오류) 입력창을 그대로 둔다.
+   * platform:super_admin 은 서버 guard 예외와 같게 입력창을 둔다.
+   */
+  const netureMainStatus = entry.data?.serviceStates.netureMain?.status;
+  const isSuperAdmin = !!user?.roles?.some((r) => String(r) === 'platform:super_admin');
+  const netureGateStatus = netureMainStatus && netureMainStatus !== 'active' && !isSuperAdmin ? netureMainStatus : null;
 
   // AI Composer 는 하나다 — 로그인 전후로 **위치만** 다르다(복제하지 않는다).
   const composerArea = (
@@ -749,8 +761,14 @@ export default function O4OHomePage() {
 
           <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
-          {introBanner}
-          {composerArea}
+          {netureGateStatus ? (
+            <NetureMembershipNotice status={netureGateStatus} />
+          ) : (
+            <>
+              {introBanner}
+              {composerArea}
+            </>
+          )}
 
           {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
           <HomeEntryPanel

@@ -29,8 +29,12 @@ describe('resolveLoginMembershipGateKey', () => {
     ['https://k-cosmetics.site', 'k-cosmetics'],
     ['https://www.k-cosmetics.site', 'k-cosmetics'], // www 별칭도 같은 게이트
     ['https://www.pharmacy.neture.co.kr', 'kpa-society'],
+    // WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1: kpa-branch 가 kpa.neture.co.kr 로 옮겨
+    //   kpa-society.co.kr 은 kpa-society 의 legacy 호스트로만 남는다(종전: kpa-branch `/kpa` 와 겹쳐 단정 불가).
+    ['https://kpa-society.co.kr', 'kpa-society'],
+    ['https://www.kpa-society.co.kr', 'kpa-society'],
   ])('G1 %s → %s', (origin, key) => {
-    expect(resolveLoginMembershipGateKey(origin)).toBe(key);
+    expect(resolveLoginMembershipGateKey(origin)).toBeNull();
   });
 
   it.each([
@@ -38,8 +42,7 @@ describe('resolveLoginMembershipGateKey', () => {
     'https://store.neture.co.kr', // Store Workspace — 매장 가입 신청 자리
     'https://admin.neture.co.kr', // 관리자 — Google 전용 · platform 역할 축
     'https://pharmacyhub.co.kr', // 자기 호스트 /join (requireAuth)
-    'https://kpa-society.co.kr', // kpa-society legacy 이자 kpa-branch(/kpa) 호스트 — 단정 불가
-    'https://www.kpa-society.co.kr',
+    'https://kpa.neture.co.kr', // kpa-branch — 자기 호스트 /join(분회 운영자 승인) · 게이트 없음
     'https://www.neture.co.kr',
     'https://study.neture.co.kr', // lecture — 이 WO 범위 밖
     'https://community.neture.co.kr',
@@ -53,11 +56,8 @@ describe('resolveLoginMembershipGateKey', () => {
     expect(resolveLoginMembershipGateKey(origin as string | undefined | null)).toBeNull();
   });
 
-  it('게이트 서비스는 catalog 선언과 일치한다 (kpa-society · k-cosmetics 뿐)', () => {
-    expect(O4O_SERVICES.filter((s) => s.loginMembershipRequired).map((s) => s.key).sort()).toEqual([
-      'k-cosmetics',
-      'kpa-society',
-    ]);
+  it('서비스 미가입은 로그인 자체를 거부하지 않는다', () => {
+    expect(O4O_SERVICES.filter((s) => s.loginMembershipRequired).map((s) => s.key).sort()).toEqual([]);
   });
 });
 
@@ -97,7 +97,7 @@ describe('G4 세미프랜차이즈 자격', () => {
   it.each([
     [null, null, 'apply_pharmacy'],
     ['rejected', null, 'apply_pharmacy'],
-    ['terminated', 'active', 'apply_pharmacy'], // 기본 가입이 끝났으면 세미프랜차이즈 active 도 불인정
+    ['terminated', 'active', 'apply_pharmacy'], // 내 매장(약국) 신청이 끝났으면 세미프랜차이즈 active 도 불인정
     ['pending', null, 'pharmacy_pending'],
     ['suspended', 'active', 'pharmacy_suspended'],
     ['active', null, 'apply_semi_franchise'],

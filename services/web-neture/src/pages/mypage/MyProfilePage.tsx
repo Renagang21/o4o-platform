@@ -59,6 +59,8 @@ export default function MyProfilePage() {
 
   const fields: AccountProfileFieldSpec[] = [
     { key: 'name', label: '이름', icon: <User className="w-5 h-5 text-gray-400" /> },
+    { key: 'nickname', label: '커뮤니티 닉네임' },
+    { key: 'phone', label: '개인 휴대전화' },
     {
       key: 'email',
       label: '이메일',
@@ -75,13 +77,15 @@ export default function MyProfilePage() {
 
   const values: Record<string, string> = {
     name: user.name || '',
+    nickname: user.nickname || '',
+    phone: user.phone || '',
     email: user.email,
     role: roleLabel,
   };
 
   const handleSave = async (draft: Record<string, string>) => {
-    await api.patch('/users/me/profile', { name: draft.name });
-    updateUser({ name: draft.name });
+    await api.patch('/users/me/profile', { name: draft.name, nickname: draft.nickname, phone: draft.phone });
+    updateUser({ name: draft.name, nickname: draft.nickname, phone: draft.phone });
     toast.success('프로필이 수정되었습니다.');
   };
 

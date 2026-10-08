@@ -51,8 +51,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   대상이 달라 대체 관계가 아니다. 라우트/guard 무변경, 메뉴 진입점만 추가한다.
     { label: '상품 승인', path: '/operator/product-approvals' },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
-    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 약국 기본 가입(내 매장 이용 판정 원장) 심사
-    { label: '약국 기본 가입 심사', path: '/operator/pharmacy-memberships' },
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 · 승인(내 매장 이용 판정 원장) 심사 — Neture 가입과 별개
+    { label: '내 매장(약국) 신청 심사', path: '/operator/pharmacy-memberships' },
     { label: '유통참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/admin/service-approvals', adminOnly: true },
   ],

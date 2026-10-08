@@ -14,7 +14,6 @@ const core = {
   isLoading: false,
   login: vi.fn(),
   logout: vi.fn(),
-  logoutAll: vi.fn(),
   refresh: vi.fn(async () => {}),
   setUser: vi.fn(),
 };
@@ -23,7 +22,7 @@ vi.mock('@o4o/auth-react', () => ({
   useRoleSelection: () => ({ switchRole: vi.fn(), updateUser: vi.fn(), hasMultipleRoles: false }),
 }));
 vi.mock('@o4o/auth-client', () => ({ getAccessToken: vi.fn(() => null) }));
-vi.mock('@o4o/auth-utils', () => ({ buildPlatformUser: (u: unknown) => u }));
+vi.mock('@o4o/auth-utils', async (importOriginal) => ({ ...await importOriginal<typeof import('@o4o/auth-utils')>(), buildPlatformUser: (u: unknown) => u }));
 vi.mock('../../lib/apiClient', () => ({ authClient: { api: { get: vi.fn(), post: vi.fn() } } }));
 
 import { AuthProvider } from '../AuthContext';

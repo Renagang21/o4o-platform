@@ -31,7 +31,7 @@ export class NeturePharmacyError extends Error {
   }
 }
 
-// ─── 가입 상태 전이 (기본 가입 · 세미프랜차이즈 가입 공용) ──────────────────────
+// ─── 가입 상태 전이 (내 매장(약국) 신청 · 세미프랜차이즈 가입 공용) ──────────────────────
 
 export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'suspended' | 'terminated';
 export type MembershipAction = 'approve' | 'reject' | 'suspend' | 'reactivate' | 'terminate';

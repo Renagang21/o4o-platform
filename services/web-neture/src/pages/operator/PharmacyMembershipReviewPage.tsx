@@ -1,5 +1,7 @@
+import { api } from '../../lib/apiClient';
 /**
- * PharmacyMembershipReviewPage — 약국 기본 가입 심사 (/operator/pharmacy-memberships)
+ * PharmacyMembershipReviewPage — 내 매장(약국) 신청 심사 (/operator/pharmacy-memberships)
+ *   이 원장은 Neture 가입이 아니다. 승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · DESIGN §3-1
  *   운영자가 신청 원장의 사업자번호 · 약사 면허번호를 검토해 승인 · 반려 · 정지 · 재개 · 종료한다.
@@ -91,13 +93,21 @@ export default function PharmacyMembershipReviewPage() {
     }
   };
 
+  const download = async (id: string) => {
+    try {
+      const response = await api.get(`/neture/operator/pharmacy-documents/${id}`, { responseType: 'blob' });
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement('a'); link.href = url; link.download = 'business-registration'; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch { setMessage({ type: 'error', text: '사업자등록증을 불러오지 못했습니다.' }); }
+  };
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
 
   return (
     <div className="space-y-4 p-6">
       <PageHeader
-        title="약국 기본 가입 심사"
-        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 기본 가입 승인은 세미프랜차이즈 가입을 만들지 않습니다."
+        title="내 매장(약국) 신청 심사"
+        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 사업자등록증 사본과 약사 면허번호를 검토하고 오프라인으로 약국 여부를 확인해 주세요. 신청자의 메인 이메일 확인이 필요합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -152,7 +162,10 @@ export default function PharmacyMembershipReviewPage() {
                     {m.organization_address && <div className="text-xs text-gray-500">{m.organization_address}</div>}
                   </td>
                   <td className={TD}>{m.business_number}</td>
-                  <td className={TD}>{m.pharmacist_license_number}</td>
+                  <td className={TD}>{m.pharmacist_license_number}
+                    {m.business_profile?.businessRegistrationDocumentId && <button type="button" className="block text-blue-700" onClick={() => void download(m.business_profile!.businessRegistrationDocumentId)}>사업자등록증 확인</button>}
+                    <span className="block text-xs">{m.business_profile?.representativeName} · {m.organization_address}</span>
+                  </td>
                   <td className={TD}>{formatDateTime(m.applied_at)}</td>
                   <td className={TD}>
                     <StatusBadge status={m.status} />

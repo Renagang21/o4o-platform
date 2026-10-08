@@ -108,7 +108,7 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
     ]);
   });
 
-  it('Neture 약국 기본 가입이 active 가 아닌(대기 · 정지 등) 약국 조직은 매장 목록에서 뺀다 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)', async () => {
+  it('내 매장(약국) 신청이 active 가 아닌(대기 · 정지 등) 약국 조직은 매장 목록에서 뺀다 (WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)', async () => {
     const { dataSource, calls } = makeDataSource([
       [memberRow(STORE_A), memberRow(STORE_B)],
       [],

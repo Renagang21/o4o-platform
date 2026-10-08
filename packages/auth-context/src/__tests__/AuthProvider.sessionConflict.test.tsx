@@ -26,7 +26,6 @@ function makeClient() {
   return {
     api: { get: vi.fn() },
     logout: vi.fn(),
-    logoutAll: vi.fn(),
     loginWithGoogle: vi.fn(),
     getGoogleAuthConfig: vi.fn(async () => ({ enabled: true, clientId: 'x' })),
     checkSession: vi.fn(),
@@ -69,7 +68,6 @@ describe('AuthProvider — 세션 사용자 교체', () => {
     expect(localStorage.getItem(SESSION_CONFLICT_STORAGE_KEY)).not.toBeNull();
     expect(localStorage.getItem(CACHE_KEY)).toBeNull();
     expect(client.logout).not.toHaveBeenCalled();
-    expect(client.logoutAll).not.toHaveBeenCalled();
   });
 
   it('표식이 남아 있으면 새로고침 후 캐시가 없어도 서버 세션 사용자를 채택하지 않는다', async () => {

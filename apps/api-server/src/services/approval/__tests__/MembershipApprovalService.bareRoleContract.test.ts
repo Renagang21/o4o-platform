@@ -175,6 +175,10 @@ function seed(
   jest.clearAllMocks();
 }
 
+/** Neture 메인 승인 · 재활성화가 건드리지 않는 연결 서비스 역할 (MembershipApprovalService NETURE_CONNECTED_SERVICE_ROLES) */
+const isNetureConnected = (serviceKey: string, role: string) =>
+  (serviceKey === 'neture' || serviceKey === 'kpa-society') && role === 'store_owner';
+
 const grantedRoles = () => db.roles.filter((r) => r.is_active).map((r) => r.role);
 
 const approve = () =>
@@ -200,7 +204,9 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
       async (role) => {
         seed(serviceKey, role, 'pending');
         await approve();
-        expect(grantedRoles()).toEqual([`${prefix}:${role}`]);
+        // neture/KPA store_owner 는 별도 약국 승인에 속하며 연결 서비스(내 매장(약국)) 역할 — Neture 승인이 부여하지 않는다 (§10 A2)
+        const expected = isNetureConnected(serviceKey, role) ? [] : [`${prefix}:${role}`];
+        expect(grantedRoles()).toEqual(expected);
       },
     );
 
@@ -209,7 +215,9 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
       async (role) => {
         seed(serviceKey, role, 'suspended', `${prefix}:${role}`);
         await reactivate();
-        expect(grantedRoles()).toEqual([`${prefix}:${role}`]);
+        // neture/KPA store_owner 는 별도 약국 승인에 속하며 Neture 재활성화가 복구하지 않는다 (§10 A3)
+        const expected = isNetureConnected(serviceKey, role) ? [] : [`${prefix}:${role}`];
+        expect(grantedRoles()).toEqual(expected);
       },
     );
 
@@ -252,7 +260,6 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
 
   describe('의도적으로 접두어가 없는 전역 역할은 그대로 부여한다', () => {
     it.each([
-      ['neture', 'supplier'],
       ['kpa-society', 'user'],
       ['k-cosmetics', 'customer'],
     ])('%s / %s', async (serviceKey, role) => {
@@ -260,6 +267,19 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
       await approve();
       expect(grantedRoles()).toEqual([role]);
     });
+  });
+
+  describe('Neture 승인은 연결 서비스 역할을 부여하지 않는다 (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10)', () => {
+    it.each(['supplier', 'neture:supplier', 'store_owner', 'neture:store_owner'])(
+      "neture membership.role '%s' 승인 → 역할 부여 없음 · membership 은 active",
+      async (role) => {
+        seed('neture', role, 'pending');
+        await approve();
+        expect(db.roles).toHaveLength(0);
+        expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
+        expect(db.memberships[0].status).toBe('active');
+      },
+    );
   });
 
   describe('prefixed 역할은 그대로 둔다', () => {

@@ -1,5 +1,7 @@
 # Authentication API Migration Guide
 
+> Historical migration reference. As of 2026-10-08, the user-facing all-device logout endpoint is retired. Do not use the `/logout-all` examples below. Current authentication policy and staged implementation are tracked in [WO-O4O-AUTH-REFACTOR-V1](../../../docs/work-orders/WO-O4O-AUTH-REFACTOR-V1.md); the current route registry is [auth.routes.ts](../src/modules/auth/routes/auth.routes.ts).
+
 ## Overview
 
 The O4O Platform authentication system has been consolidated into a unified API endpoint at `/api/v1/authentication`. This guide explains the migration from legacy authentication routes to the new unified system.

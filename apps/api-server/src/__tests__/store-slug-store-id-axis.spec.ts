@@ -36,7 +36,7 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
  *   organizations.id 를 그대로 쓰므로 축은 canonical 이다 (PharmacyHub 와 동형).
  */
 const EXPECTED: Record<string, string[]> = {
-  'routes/cosmetics/services/cosmetics-store.service.ts': ['orgId', 'organizationId'],
+  // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거됐다.
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
@@ -47,7 +47,7 @@ const EXPECTED: Record<string, string[]> = {
   //   축 자체는 정상 — `storeId: organizationId` 로 organization id 축을 그대로 따른다.
   //   (파일럿 코드를 고친 게 아니라 census 를 실제 호출부 집합에 맞춘 것이다.)
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 기본 가입 승인 시 매장 공개 주소 — 원장의 organization_id 그대로.
+  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 시 매장 공개 주소 — 원장의 organization_id 그대로.
   'modules/neture-pharmacy/services/pharmacy-store-link.ts': ['organizationId'],
 };
 
@@ -123,12 +123,9 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
    *   - KCos `linkOwnerToStore`  : org member + enrollment 만 보강
    * 두 경로가 다시 slug 없이 조직을 확정하지 않도록 고정한다.
    */
-  it('KCos 기존 매장 연결 경로가 slug 를 보강한다', () => {
-    const src = fs.readFileSync(
-      path.join(API_SERVER_SRC, 'routes/cosmetics/services/cosmetics-store.service.ts'),
-      'utf-8',
-    );
-    expect(src).toMatch(/linkOwnerToStore[\s\S]{0,1200}ensureCosmeticsStoreSlug\(/);
+  it('KCos 기존 매장 연결 경로는 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+    // slug 없이 조직을 확정하던 KCos 승인 경로(linkOwnerToStore) 자체가 API 와 함께 사라졌다.
+    expect(fs.existsSync(path.join(API_SERVER_SRC, 'routes/cosmetics/services/cosmetics-store.service.ts'))).toBe(false);
   });
 
   it('공개 조회는 slug.storeId 를 organizations 로 해석한다 (축의 근거)', () => {

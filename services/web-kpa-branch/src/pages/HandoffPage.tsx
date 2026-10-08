@@ -16,7 +16,8 @@
  *     `useLayoutEffect` 로 저장 토큰을 선제 제거한다 — layout effect 는 모든 passive effect(AuthProvider
  *     의 `useEffect` 복구) 보다 먼저 실행되므로 낡은 토큰으로 `/auth/me` 가 나가지 않는다.
  *
- * URL: /kpa/handoff?token={handoffToken}[&returnTo=/relative/path]
+ * URL: https://kpa.neture.co.kr/handoff?token={handoffToken}[&returnTo=/relative/path]
+ *      (backend `getServiceOrigin('kpa-branch')` + `/handoff`. 옛 `/kpa/handoff` 는 main.tsx 가 같은 query 로 옮긴다)
  */
 
 import { useEffect, useLayoutEffect, useState } from 'react';

@@ -96,7 +96,7 @@ import operatorProductRoutes from '../routes/operator/products.routes.js';
 import operatorStoreRoutes from '../routes/operator/stores.routes.js';
 import operatorRoleRoutes from '../routes/operator/roles.routes.js';
 import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.routes.js';
-import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
+// WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1: `/api/v1/cosmetics/*` (createCosmeticsRoutes) 제거 — K-Cosmetics 서비스 종료.
 // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
 //   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
@@ -683,18 +683,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/operator/analytics', createOperatorAnalyticsRoutes(dataSource));
     logger.info('✅ Operator Analytics routes registered at /api/v1/operator/analytics');
 
-    // 25. Register Cosmetics routes (Phase 7-A-1)
-    try {
-      const cosmeticsRoutes = createCosmeticsRoutes(dataSource);
-      app.use('/api/v1/cosmetics', cosmeticsRoutes);
-      logger.info('✅ Cosmetics routes registered at /api/v1/cosmetics');
-
-      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
-      //   KCosmeticsPaymentEventHandler 제거 — payment.completed(serviceKey='cosmetics') 를
-      //   발행하던 유일한 producer 가 매장 소비자 결제 은퇴로 410 이 되어 소비처만 남았다.
-    } catch (cosmeticsError) {
-      logger.error('Failed to register Cosmetics routes:', cosmeticsError);
-    }
+    // 25. (제거됨) Cosmetics routes — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1
+    //   K-Cosmetics 서비스 종료로 `/api/v1/cosmetics/*` mount 를 제거했다. 공통 o4o-store · platform factory 는
+    //   다른 서비스 mount 가 계속 쓰므로 그대로 두고, cosmetics 전용 runtime(routes/cosmetics)만 삭제했다.
+    //   DB 스키마(cosmetics.*)와 service identity(serviceKey · role)는 이번 단계에서 유지한다.
 
     // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
     //   LmsPaymentEventHandler 제거 — serviceKey='lms' payment.completed producer 가

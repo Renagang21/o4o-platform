@@ -31,7 +31,7 @@ function mockRes() {
 function dataSourceWith(rows: any[], canonicalRows: any[] = []): DataSource {
   return {
     query: jest.fn(async (sql: string) =>
-      sql.includes('organization_members') ? canonicalRows : rows,
+      sql.includes('FROM users u') ? [{ account_status: 'active', account_active: true, email_verified: true }] : sql.includes('organization_members') ? canonicalRows : rows,
     ),
   } as unknown as DataSource;
 }

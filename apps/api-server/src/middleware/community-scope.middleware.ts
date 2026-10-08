@@ -18,6 +18,7 @@
  * 전체 관리자는 **개설 신청 승인** 경로에서만 쓰고, 개별 커뮤니티 운영 기능은
  * 개체 역할로만 통과시킨다 — 전체 권한이 모든 커뮤니티의 내부 운영까지 여는 것을 막는다.
  */
+import { getNetureMainMembershipStatus } from '../modules/neture/services/neture-main-membership.js';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { Community } from '../entities/Community.js';
@@ -99,6 +100,10 @@ export function requireCommunityScope(level: CommunityScopeLevel): RequestHandle
         return;
       }
 
+      if ((await getNetureMainMembershipStatus(AppDataSource, user.id)) !== 'active') {
+        res.status(403).json({ success: false, error: '메인 계정의 이메일 확인과 이용 상태를 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
+        return;
+      }
       const membership = await AppDataSource.getRepository(CommunityMembership).findOne({
         where: { communityId: req.community.id, userId: user.id },
       });

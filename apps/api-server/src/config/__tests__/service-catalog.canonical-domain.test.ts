@@ -6,7 +6,8 @@
  *   ① 생성(Generation)  handoff · QR · 공개 랜딩은 canonical 호스트만 쓴다.
  *   ② 수용(Compatibility) 옛 호스트(인쇄 QR · 북마크)로 들어온 로그인도 같은 서비스 세션으로 판정한다.
  *   ③ Pharmacy-Hub 는 신규 가입 서비스로 제시하지 않지만 카탈로그 · handoff 대상에서 사라지지 않는다.
- *   ④ kpa-branch 는 이번 정렬 대상이 아니다(DEFERRED) — 옛 공용 경로 그대로.
+ *   ④ kpa-branch 는 당시 DEFERRED 였고 WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1 에서
+ *      canonical kpa.neture.co.kr(basePath 없음)로 옮겼다 — 아래 마지막 describe.
  * DB · 네트워크 0.
  */
 import {
@@ -82,15 +83,48 @@ describe('Pharmacy-Hub 신규 가입 비노출', () => {
     expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(true);
   });
 
-  it('kpa-society · k-cosmetics 는 여전히 가입 가능하다', () => {
+  it('kpa-society 는 여전히 가입 가능하다', () => {
     const keys = getJoinableServices().map((s) => s.key);
-    expect(keys).toEqual(expect.arrayContaining(['kpa-society', 'k-cosmetics']));
+    expect(keys).toContain('kpa-society');
   });
 });
 
-describe('kpa-branch — DEFERRED', () => {
-  it('옛 공용 경로(kpa-society.co.kr/kpa) 그대로', () => {
-    expect(getService('kpa-branch')?.domain).toBe('kpa-society.co.kr');
-    expect(getServiceOrigin('kpa-branch')).toBe('https://kpa-society.co.kr/kpa');
+describe('K-Cosmetics 운영 종료 — catalog row 는 남기고 진입 capability 만 닫는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+  it('joinEnabled=false · 가입 가능 목록에 없다 (→ /auth/services/k-cosmetics/join 은 JOIN_DISABLED)', () => {
+    expect(getService('k-cosmetics')?.joinEnabled).toBe(false);
+    expect(getJoinableServices().map((s) => s.key)).not.toContain('k-cosmetics');
+  });
+
+  it('매장 · 운영자 업무공간이 닫혀 있다', () => {
+    expect(getService('k-cosmetics')?.workspace).toMatchObject({ storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false });
+  });
+});
+
+describe('kpa-branch — canonical kpa.neture.co.kr (WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1)', () => {
+  it('domain = kpa.neture.co.kr · basePath 없음 · origin 은 host 루트', () => {
+    expect(getService('kpa-branch')?.domain).toBe('kpa.neture.co.kr');
+    expect(getService('kpa-branch')?.basePath).toBeUndefined();
+    expect(getServiceOrigin('kpa-branch')).toBe('https://kpa.neture.co.kr');
+  });
+
+  it('kpa.neture.co.kr 로그인 · 로그아웃은 kpa-branch 세션 범위다', () => {
+    expect(resolveSessionServiceKey('https://kpa.neture.co.kr')).toBe('kpa-branch');
+  });
+
+  it('옛 공용 경로 호스트 kpa-society.co.kr 는 kpa-branch 의 legacyDomains 가 아니다 (호스트 루트 = kpa-society)', () => {
+    expect(getService('kpa-branch')?.legacyDomains).toBeUndefined();
+    expect(resolveSessionServiceKey('https://kpa-society.co.kr')).toBe('kpa-society');
+  });
+
+  it('생성 경로에 옛 분회 경로가 나오지 않는다', () => {
+    expect(getServiceOrigin('kpa-branch')).not.toContain('kpa-society.co.kr');
+    expect(new URL(getServiceOrigin('kpa-branch')).pathname).toBe('/');
+  });
+
+  it('pharmacy.neture.co.kr(kpa-society) 와 kpa.neture.co.kr(kpa-branch) 는 서로 다른 서비스로 판정된다', () => {
+    expect(resolveSessionServiceKey('https://pharmacy.neture.co.kr')).toBe('kpa-society');
+    expect(resolveSessionServiceKey('https://kpa.neture.co.kr')).toBe('kpa-branch');
+    // role prefix 별칭 `kpa` 는 kpa-society 로만 흡수된다 — 분회로 재해석하지 않는다.
+    expect(getServicePublicOrigin('kpa')).toBe('https://pharmacy.neture.co.kr');
   });
 });

@@ -13,7 +13,7 @@
  * 실제 선택된 organization_id 만 본다.
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
- *   약국 매장(`kpa`) 후보는 enrollment/slug 가 아니라 **Neture 기본 가입 원장(active)** 으로 판정한다.
+ *   약국 매장(`kpa`) 후보는 enrollment/slug 가 아니라 **내 매장(약국) 신청 원장(active)** 으로 판정한다.
  *   fixture 의 `pharmacyLedger` 가 neture_pharmacy_memberships.status 를 흉내 낸다.
  */
 
@@ -50,7 +50,7 @@ interface Membership {
   enrollments: string[];
   /** platform_store_slugs.service_key (is_active) */
   slugKeys: string[];
-  /** neture_pharmacy_memberships.status (약국 기본 가입 원장) — 없으면 미가입 */
+  /** neture_pharmacy_memberships.status (내 매장(약국) 신청 원장) — 없으면 미가입 */
   pharmacyLedger?: 'active' | 'pending' | 'suspended';
 }
 
@@ -119,7 +119,7 @@ function makeDataSource() {
         return activeRoles.some((r) => allowed.includes(r)) ? [{ ok: 1 }] : [];
       }
 
-      // 2-a) 약국 매장(kpa) 후보 — Neture 기본 가입 원장 active 조직
+      // 2-a) 약국 매장(kpa) 후보 — 내 매장(약국) 신청 원장 active 조직
       if (sql.includes('neture_pharmacy_memberships')) {
         const roles = params[1] as string[];
         return memberships
@@ -198,7 +198,7 @@ describe('local-products — service-scoped organization resolution', () => {
     expect(res.body.data.total).toBe(0);
   });
 
-  it('B. serviceKey="kpa" mount 는 기본 가입 원장 active 약국 조직을 골라 자체상품이 보인다', async () => {
+  it('B. serviceKey="kpa" mount 는 내 매장(약국) 신청 원장 active 약국 조직을 골라 자체상품이 보인다', async () => {
     const { dataSource, listOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'kpa')).get('/store/local-products');
 
@@ -231,7 +231,7 @@ describe('local-products — service-scoped organization resolution', () => {
   });
 
   it('E. 타 서비스 조직만 가진 사용자는 그 서비스에서 후보 0 → 쓰기 403', async () => {
-    memberships = [MEMBERSHIPS[2]]; // K-Cosmetics 조직만 보유 (약국 기본 가입 원장 없음)
+    memberships = [MEMBERSHIPS[2]]; // K-Cosmetics 조직만 보유 (내 매장(약국) 신청 원장 없음)
     const { dataSource, listOrgParams } = makeDataSource();
 
     const res = await request(makeApp(dataSource, 'kpa'))
@@ -295,7 +295,7 @@ describe('local-products — mount 계약', () => {
   it('I. 서비스 라우터는 serviceKey 를 명시해 mount 한다', () => {
     for (const [file, key] of [
       ['routes/kpa/kpa.routes.ts', 'kpa'],
-      ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
+      // routes/cosmetics/cosmetics.routes.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거 — Core 의 'cosmetics' 축 동작(D · F)은 위에서 계속 검증한다.
     ]) {
       const text = fs.readFileSync(path.join(src, file), 'utf8');
       expect(text).toContain(`createStoreLocalProductRoutes(dataSource, '${key}')`);

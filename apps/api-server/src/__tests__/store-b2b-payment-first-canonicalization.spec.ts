@@ -19,8 +19,8 @@ import {
   STORE_B2B_CART_ORDER_SOURCE,
   EVENT_OFFER_CART_ORDER_SOURCE,
   KPA_B2B_SERVICE_KEYS,
-  COSMETICS_B2B_SERVICE_KEYS,
 } from '../services/payment/b2b/store-b2b-payment.constants.js';
+import * as storeB2bPaymentConstants from '../services/payment/b2b/store-b2b-payment.constants.js';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
 const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
@@ -126,8 +126,8 @@ describe('§2-E 공통 B2B payment 계약', () => {
 });
 
 describe('§1.1-A 소비자 commerce 경계 — 410 은 그대로다', () => {
-  it('KPA/K-Cos 의 기존 payments 컨트롤러는 여전히 410 Gone 이다', () => {
-    for (const rel of [KPA_LEGACY_PAY, COS_LEGACY_PAY]) {
+  it('KPA 의 기존 payments 컨트롤러는 여전히 410 Gone 이다', () => {
+    for (const rel of [KPA_LEGACY_PAY]) {
       const src = read(rel);
       expect(src).toMatch(/410/);
       expect(src).toMatch(/router\.post\('\/prepare',\s*gone\)/);
@@ -137,17 +137,24 @@ describe('§1.1-A 소비자 commerce 경계 — 410 은 그대로다', () => {
 
   it('신규 B2B 결제는 별도 namespace(/b2b/payments)로만 마운트된다', () => {
     expect(read(KPA_ROUTES)).toContain("router.use(\n    '/b2b/payments',");
-    expect(read(COS_ROUTES)).toContain("'/b2b/payments',");
   });
 
   it('기존 소비자 /payments 마운트는 유지된다 (410 응답 경로 보존)', () => {
     expect(read(KPA_ROUTES)).toContain("router.use('/payments', kpaPaymentController);");
-    expect(read(COS_ROUTES)).toContain("router.use('/payments', paymentController);");
+  });
+
+  it('K-Cos 결제 경로(/cosmetics/payments · /cosmetics/b2b/payments)는 API 와 함께 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
+    // 410 응답 경로가 아니라 /api/v1/cosmetics/* 전체가 사라졌다 — 소비자 commerce 부활 여지 0.
+    expect(fs.existsSync(path.join(REPO_ROOT, COS_ROUTES))).toBe(false);
+    expect(fs.existsSync(path.join(REPO_ROOT, COS_LEGACY_PAY))).toBe(false);
   });
 
   it('서비스별 결제 허용 serviceKey 는 B2B/특가 축뿐이다', () => {
     expect(KPA_B2B_SERVICE_KEYS).toEqual(['kpa-society', 'kpa-groupbuy']);
-    expect(COSMETICS_B2B_SERVICE_KEYS).toEqual(['k-cosmetics', 'k-cosmetics-event-offer']);
+  });
+
+  it('K-Cosmetics 결제 허용 serviceKey 상수는 삭제됐다 (퇴역 — 결제 route 없음)', () => {
+    expect('COSMETICS_B2B_SERVICE_KEYS' in storeB2bPaymentConstants).toBe(false);
   });
 });
 

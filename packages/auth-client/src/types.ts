@@ -98,6 +98,8 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
+  phone: string;
+  name: string;
 }
 
 /** GET /auth/google/config — 공개 Client ID(secret 아님). enabled=false 면 Google 버튼을 "준비 중"으로 표시. */
@@ -121,7 +123,7 @@ export interface EmailSignupRequest {
   password: string;
   name: string;
   phone: string;
-  consents: GoogleSignupConsents;
+  consents: Omit<GoogleSignupConsents, 'phone' | 'name'>;
 }
 
 /** 가입·재발송·찾기 등 세션을 열지 않는 이메일 인증 요청의 결과(서버 `data`). */

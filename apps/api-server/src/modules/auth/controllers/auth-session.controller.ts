@@ -1,6 +1,6 @@
 /**
  * @core O4O_PLATFORM_CORE — Auth
- * Auth Session Controller: refresh, logout, logoutAll
+ * Auth Session Controller: refresh, logout
  * Split from auth.controller.ts (WO-O4O-AUTH-CONTROLLER-SPLIT-V1)
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
@@ -54,7 +54,7 @@ export class AuthSessionController extends BaseController {
       //   catch → finally), 그래서 오류를 돌려주는 것이 화면을 깨지 않고 사실을 전달한다.
       return BaseController.error(
         res,
-        '로그아웃은 처리됐지만 서버 세션 종료에 실패했습니다. 모든 기기에서 로그아웃을 사용하세요.',
+        '서버 세션 종료에 실패했습니다. 다시 로그인한 뒤 로그아웃을 시도해주세요.',
         500,
         'LOGOUT_REVOCATION_FAILED',
       );
@@ -141,33 +141,5 @@ export class AuthSessionController extends BaseController {
     }
   }
 
-  /**
-   * POST /api/v1/auth/logout-all
-   * Logout from all devices
-   */
-  static async logoutAll(req: AuthRequest, res: Response): Promise<any> {
-    const userId = req.user?.id;
 
-    if (!userId) {
-      return BaseController.unauthorized(res, 'Not authenticated');
-    }
-
-    try {
-      await authenticationService.logoutAll(userId);
-      authenticationService.clearAuthCookies(req, res);
-
-      return BaseController.ok(res, {
-        message: 'Logged out from all devices',
-      });
-    } catch (error: any) {
-      logger.error('[AuthSessionController.logoutAll] Logout all error', {
-        error: error.message,
-        userId,
-      });
-
-      authenticationService.clearAuthCookies(req, res);
-
-      return BaseController.error(res, 'Failed to logout from all devices');
-    }
-  }
 }

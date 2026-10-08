@@ -1,10 +1,12 @@
+import multer from 'multer';
+import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
  * Neture 약국 매장 commerce 라우트 — /api/v1/neture 아래 (DESIGN §3 · §4 · §8)
  *
- *   /pharmacy/membership                         기본 가입 신청 · 내 상태          (로그인)
+ *   /pharmacy/membership                         내 매장(약국) 신청 · 내 상태       (로그인 · 신청은 Neture 가입 승인 필요)
  *   /pharmacy/service-access/:serviceKey         세미프랜차이즈 서비스 이용 자격    (로그인 · 본인 판정만)
- *   /pharmacy/...                                내 매장(약국)                    (로그인 + 매장 게이트 = 기본 가입 원장)
- *   /operator/pharmacy-memberships               기본 가입 승인                    (neture:operator)
+ *   /pharmacy/...                                내 매장(약국)                    (로그인 + 매장 게이트 = 내 매장(약국) 신청 원장)
+ *   /operator/pharmacy-memberships               내 매장(약국) 승인                (neture:operator · 신청자 Neture 승인 확인)
  *   /operator/semi-franchises/:key/...           담당 세미프랜차이즈 처리          (neture:operator ∧ 담당 관계)
  *   /admin/semi-franchises                       세미프랜차이즈 · 담당 지정        (neture:admin)
  *   /supplier/...                                공급 제안 · 이벤트 · 모집 신청    (ACTIVE 공급자)
@@ -14,6 +16,7 @@
 import { Router } from 'express';
 import type { NextFunction, Request, RequestHandler, Response, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
+import { requireNetureMainMembership } from '../../middleware/neture-main-membership.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
@@ -47,6 +50,7 @@ import { SemiFranchiseContentService } from './services/semi-franchise-content.s
 import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
 import { semiFranchiseAccessKeyFor } from '../../common/auth/service-login-eligibility.policy.js';
 import { AssetCopyService } from '@o4o/asset-copy-core';
+import { NetureMainMembershipRequiredError } from '../neture/services/neture-main-membership.js';
 
 type Req = Request & { user?: { id: string }; organizationId?: string; supplierId?: string };
 type Handler = (req: Req, res: Response) => Promise<unknown>;
@@ -60,6 +64,15 @@ function handle(fn: Handler): RequestHandler {
     } catch (err) {
       if (err instanceof NeturePharmacyError) {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
+        return;
+      }
+      if (err instanceof NetureMainMembershipRequiredError) {
+        res.status(err.httpStatus).json({
+          success: false,
+          error: err.message,
+          code: err.code,
+          details: { netureMembershipStatus: err.membershipStatus },
+        });
         return;
       }
       logger.error('[NeturePharmacy] request failed', {
@@ -97,13 +110,44 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return { snapshotId: snapshot.id };
   });
 
-  const store = [requireAuth, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
+  const mainAccess = requireNetureMainMembership(dataSource);
+  const store = [requireAuth, mainAccess, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
   const admin = [requireAuth, requireNetureScope('neture:admin') as RequestHandler];
-  const supplier = [requireAuth, createRequireActiveSupplier(dataSource) as RequestHandler];
+  const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
   const org = (req: Req) => req.organizationId as string;
 
-  // ─── 기본 가입 (매장 게이트 이전) ─────────────────────────────────────────
+  const documents = new BusinessRegistrationDocumentService(dataSource);
+  const parseDocument = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } }).single('file');
+  const documentUpload: RequestHandler = (req, res, next) => {
+    parseDocument(req, res, (error) => {
+      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주세요.' }); return; }
+      next();
+    });
+  };
+  router.post('/pharmacy/business-registration', requireAuth, mainAccess, documentUpload, handle(async (req) => documents.upload(req.user!.id, req.file)));
+  const downloadDocument: RequestHandler = async (request, res) => {
+    const req = request as Req;
+    try {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(req.params.id)) {
+        res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return;
+      }
+      const mine = await documents.findOwned(req.user!.id, req.params.id);
+      if (!mine && !(res.locals.documentReviewer && await documents.canReviewPharmacyDocument(req.params.id))) { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); return; }
+      const { document, stream } = await documents.read(req.params.id);
+      res.setHeader('Content-Type', document.mimeType || 'application/pdf');
+      res.setHeader('Cache-Control', 'private, no-store');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(document.fileName)}"`);
+      stream.on('error', () => { if (!res.headersSent) res.status(500); res.end(); });
+      stream.pipe(res);
+    } catch { res.status(404).json({ success: false, code: 'DOCUMENT_NOT_FOUND' }); }
+  };
+  router.get('/pharmacy/business-registration/:id', requireAuth, downloadDocument);
+  router.get('/operator/pharmacy-documents/:id', ...operator,
+    (_req, res, next) => { res.locals.documentReviewer = true; next(); }, downloadDocument);
+
+  // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
   router.post('/pharmacy/membership', requireAuth, handle(async (req, res) => {
     res.status(201);
@@ -119,7 +163,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return { ...access, message: access.next ? SEMI_FRANCHISE_ACCESS_MESSAGES[access.next] : null };
   }));
 
-  // ─── 내 매장 (기본 가입 active) ───────────────────────────────────────────
+  // ─── 내 매장 (내 매장(약국) 신청 active) ───────────────────────────────────────────
   router.get('/pharmacy/store/context', ...store, handle(async (req) => ({
     organizationId: org(req),
     semiFranchiseKeys: await listActiveSemiFranchiseKeys(dataSource, org(req)),
@@ -128,7 +172,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
 
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
-    semiFranchises.apply(org(req), req.user!.id, req.params.key)));
+    semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));
   router.post('/pharmacy/semi-franchises/:key/withdraw', ...store, handle(async (req) =>
     semiFranchises.withdraw(org(req), req.params.key)));
 
@@ -204,7 +248,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     return payments.confirm(req.user!.id, { paymentId, paymentGroupId });
   }));
 
-  // ─── Neture 운영자 — 기본 가입 ────────────────────────────────────────────
+  // ─── Neture 운영자 — 내 매장(약국) 신청 ────────────────────────────────────────────
   router.get('/operator/pharmacy-memberships', ...operator, handle(async (req) => membership.list({
     status: typeof req.query.status === 'string' ? req.query.status : undefined,
     q: typeof req.query.q === 'string' ? req.query.q : undefined,
