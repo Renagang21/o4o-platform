@@ -1,7 +1,7 @@
 # O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1
 
 > **상태**: DRAFT — **D1 · D2 · D4 결정됨 · D3 · D5 법률 확인 대기** (§8-1, 2026-10-04 사용자 결정). **Gate 의미 전환(2026-10-04 사용자 확정)**: V2 §17 은 개발 선행조건이 아니라 **실사용 확대 전 Compliance Gate** 다. §9 구현은 개발 단계에서 진행했고(Cloud Continuity), D3 · D5 의 법적 절차는 정식 운영 · 실사용 확대 전에 확인한다.
-> **작성일**: 2026-10-04 · **개정**: 2026-10-07 M5 에 질문 대기 run 의 업무 이해 동행 — M10 의 좁은 예외(§4 M5 · M10 행 · §9 #2) (`WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1`)
+> **작성일**: 2026-10-04 · **개정**: 2026-10-07 M5 에 질문 대기 run 의 업무 이해 동행 — M10 의 좁은 예외(§4 M5 · M10 행 · §9 #2) · 같은 날 **글 없는 구조로 축소**(목표 · 조건 · 질문 글 저장 금지 — M13) (`WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-MEMORY-LEGAL-DATA-PLACEMENT-GATE-V1`
 > **상위 정본**: [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §0-1 (P3) · §6 · §9 · §10 · §17 — 이 문서는 V2 §9 · §17 의 **세부 배치 · 보존 · 고지 정책**이다. 충돌하면 V2 가 우선한다.
 > **관련 정본**: [`O4O-AUTOMATION-EXPERIENCE-MODEL-V1`](O4O-AUTOMATION-EXPERIENCE-MODEL-V1.md) §15 · §16 · [`O4O-PRIVACY-POLICY-V1.0`](O4O-PRIVACY-POLICY-V1.0.md) · [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) · [`O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0`](O4O-STORE-OWNER-SERVICE-AGREEMENT-V1.0.md) · [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)
@@ -73,12 +73,12 @@
 | M2 | 업무 유형 이력(Task 기록의 task_type_key) | 조직 또는 사용자 | **Cloud** (읽기) | 새 저장 없음 · 보존은 M1 을 따름 | task_type_history · allowed |
 | M3 | 검증된 방법 Preferred / Avoid — **공개 사이트 대상** | 조직 또는 사용자 | **Cloud 후보** | **D1 승인 필요** | procedural_memory · gate_required |
 | M4 | 검증된 절차(Procedure · Workflow Candidate 의 값 없는 단계) — 공개 사이트 대상 | 조직 또는 사용자 | **Cloud 후보** | **D1 승인 필요** | procedural_memory · gate_required |
-| M5 | 재개 구조(run resume frame) — **2026-10-07**: 질문 대기 run 의 업무 이해(목표 한 줄 · 완료조건 · 결과 형태 · 확정 경계 · 부족 정보 질문, 정규화 · 상한)를 같은 행에 둔다(`assistant_run_frames.understanding`) | run | **Cloud 후보 · 단기** | **D1 승인 필요** · 보존 = run 종료 사건(이해도 같은 행이라 함께 삭제 · CASCADE) | run_resume_frame · gate_required |
+| M5 | 재개 구조(run resume frame) — **2026-10-07**: 질문 대기 run 의 업무 이해 중 **글 없는 구조(결과 형태 · 확정 경계)만** 같은 행에 둔다(`assistant_run_frames.understanding` = `{version:2, outcome, commitBoundary}`). 목표 · 완료조건 · 질문 글은 요청에서 파생돼 환자 · 고객명 · 처방 식별자 같은 업무 값을 담을 수 있으므로 저장하지 않는다(M13). 다른 인스턴스 재개는 이 구조로 사용자 확인 판정 + 확정 경계 유지만 한다 | run | **Cloud 후보 · 단기** | **D1 승인 필요** · 보존 = run 종료 사건(이해도 같은 행이라 함께 삭제 · CASCADE) · 질문에 답하지 않은 **만료 run 도** 요청 경로의 주기 정리로 지운다(coordination 지연 삭제를 기다리지 않음) | run_resume_frame · gate_required |
 | M6 | 구조화된 개인 선호 | 사용자 | Cloud 후보(형태가 생길 때) | 그때 D1 범위에 포함 | (미구현 — 현재 분류 라벨뿐) |
 | M7 | 도움 · 교정 이벤트(구조화) | 사용자 · 조직 | **Node** (최소화 §2-1) | Gate 대상 아님 — 이동하지 않음 | assistant_experience → **node 유지로 정렬** |
 | M8 | 실행 단계 · trace · 실패 · 시간 측정 | 조직 또는 사용자 | **Node** (최소화) · 장래 Shared 집계는 별도 Gate | 이동하지 않음 | execution_experience → **node 유지로 정렬** |
 | M9 | 사설 시스템 대상의 M3 · M4 | 조직 또는 사용자 | **Node** (§2-6) | 이동하지 않음 | procedural_memory 의 대상 조건으로 구현 |
-| M10 | 요청 원문 요약 `goal_summary` | 사용자 | **Cloud 금지** · Node 에서도 축소 대상(D3 어긋남). **좁은 예외(2026-10-07 사용자 결정)**: 요청에서 정리한 업무 이해는 **run 이 질문으로 멈춘 동안에만** M5 행에 함께 둘 수 있다 — 재개가 다른 API 인스턴스에 닿아도 원래 완료조건 · 확정 경계로 판정하기 위해서다. 요청 원문 · 화면 글 · 입력값 · 근거 인용은 두지 않고, run 이 질문 대기를 벗어나면 행째 지운다. 장기 요약 저장(`goal_summary` 류)은 여전히 금지 | — | request_summary → **never 로 정렬** (예외는 run_resume_frame 이 담는다) |
+| M10 | 요청 원문 요약 `goal_summary` | 사용자 | **Cloud 금지** · Node 에서도 축소 대상(D3 어긋남). **좁은 예외(2026-10-07 사용자 결정 · 같은 날 축소)**: 요청에서 정리한 업무 이해의 **글 없는 구조(결과 형태 · 확정 경계)만** run 이 질문으로 멈춘 동안 M5 행에 함께 둘 수 있다 — 재개가 다른 API 인스턴스에 닿아도 확정 경계를 잃지 않고 조용한 결과 근거 완료 없이 사용자 확인으로 판정하기 위해서다. 목표 · 완료조건 · 질문 글 · 요청 원문 · 화면 글 · 입력값 · 근거 인용은 두지 않고, run 이 질문 대기를 벗어나면 행째 지운다. 장기 요약 저장(`goal_summary` 류)은 여전히 금지 | — | request_summary → **never 로 정렬** (예외는 run_resume_frame 이 담는다) |
 | M11 | slot 값 | run | run 동안만 · 종료 시 삭제 | — | slot_values · never |
 | M12 | 실행환경 상태(credential · 세션 · 쿠키 · 현재 화면 · 로컬 경로 · PC 이름) | node | Node | — | node_environment · never |
 | M13 | 원문(사용자 답변 · 교정 문장 · 화면 텍스트 · 캡처 · prompt · 비밀번호 · OTP · 환자/고객 정보) | — | **어디에도 저장 금지** | — | raw_content · never |

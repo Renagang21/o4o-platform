@@ -18,6 +18,7 @@ import { aiProxyService } from '../services/ai-proxy.service.js';
 import { resolveEditingModel, editingSurfaceForOutputType } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
 import { resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
+import { resolveWorkTarget } from '../services/ai-tools/work-target-resolver.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
@@ -298,7 +299,16 @@ async function checkWorkAgentRunnable(
 
   // home-chat 과 같은 방식으로 서버가 tool 컨텍스트를 확정한다 — 클라이언트 값은 권한 근거가 아니다.
   const toolCtx: VerifiedToolContext = { userId, workspace: 'home' };
-  const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
+  // 대상 표면에 맞는 capability 를 가진 노드가 있어야 실행 가능하다 — runtime 의 노드 선택과 같은 규칙(재개는 힌트만 · 그 밖은
+  // 요청 + 힌트). Local Agent 는 online 이지만 Chrome 확장(browser)이 꺼진 경우를 여기서 걸러 이해 모델 호출 · 지연을 만들지 않는다.
+  // 대상을 정하지 못하면 capability 를 묻지 않는다(runtime 이 대상 미확정으로 끝낸다 — 종전과 같음).
+  const hint = typeof body.targetHint === 'string' ? body.targetHint : undefined;
+  const targetRef = body.runId !== undefined ? resolveWorkTarget('', hint) : resolveWorkTarget(String(body.request ?? ''), hint);
+  const deviceResolution = await resolveTargetDevice(
+    AppDataSource,
+    userId,
+    targetRef ? { need: targetRef.targetType === 'windows_app' ? 'windows_uia' : 'browser' } : undefined,
+  );
   toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
   if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
   const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);

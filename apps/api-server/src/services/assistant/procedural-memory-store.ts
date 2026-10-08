@@ -29,7 +29,7 @@ import {
   type Strategy,
 } from '../ai-tools/work-assistance.js';
 import type { TaskUnderstanding } from '../ai-tools/work-agent-contract.js';
-import { restoreUnderstanding } from './assistant-understanding.js';
+import { restoreUnderstanding, toStoredUnderstanding } from './assistant-understanding.js';
 import type { TaskOwnership } from './assistant-task-store.js';
 
 /** 정책 D2 — 마지막 사용 · 검증 후 이 기간 쓰이지 않으면 근거로 쓰지 않는다. */
@@ -193,8 +193,8 @@ function isEmptyFrame(f: RunResumeFrame): boolean {
 /**
  * 질문으로 멈춘 run 의 재개 구조를 남긴다. 요청자의 run(work_run_coordination.user_id)에만 붙는다 — 남의 run 이면 0 행.
  * 같은 사용자의 대기 중이 아닌 다른 run 의 재개 구조는 함께 지운다(종결 · 만료된 run 의 흔적이 남지 않게).
- * understanding — 그 run 의 업무 이해(목표 · 완료조건 · 확정 경계). 정책 M5 의 M10 예외: 질문 대기 동안만 · 행과 같은 수명.
- *   저장 직전에 다시 정규화한다(호출자를 믿지 않는다).
+ * understanding — 그 run 의 업무 이해 중 **글이 없는 구조(결과 형태 · 확정 경계)만** 남긴다. 목표 · 완료조건 · 질문 글은
+ *   업무 값(환자 · 고객명 · 처방 식별자)을 담을 수 있어 저장하지 않는다(정책 §4 M13). 질문 대기 동안만 · 행과 같은 수명.
  */
 export async function saveRunFrame(
   dataSource: DataSource,
@@ -202,7 +202,8 @@ export async function saveRunFrame(
 ): Promise<boolean> {
   if (!RUN_ID_RE.test(input.runId) || !UUID_RE.test(input.userId) || !TARGET_ID_RE.test(input.targetId)) return false;
   const f = normalizeFrame(input.frame);
-  const understanding = input.understanding ? restoreUnderstanding(input.understanding) : null;
+  const u = input.understanding;
+  const understanding = u && (u.outcome === 'information' || u.outcome === 'screen' || u.outcome === 'change') ? toStoredUnderstanding(u) : null;
   const taskId = input.taskId && UUID_RE.test(input.taskId) ? input.taskId : null;
   const rows = rowsOf(
     await dataSource.query(
@@ -224,7 +225,7 @@ export async function saveRunFrame(
     `DELETE FROM assistant_run_frames f
       WHERE f.user_id = $1 AND f.run_id <> $2
         AND NOT EXISTS (SELECT 1 FROM work_run_coordination c
-                         WHERE c.run_id = f.run_id AND c.user_id = $1 AND c.status = 'waiting_for_user')`,
+                         WHERE c.run_id = f.run_id AND c.user_id = $1 AND c.status = 'waiting_for_user' AND c.expires_at > now())`,
     [input.userId, input.runId],
   );
   return rows.length > 0;
@@ -269,4 +270,19 @@ export async function readRunResume(dataSource: DataSource, input: { runId: stri
 export async function deleteRunFrame(dataSource: DataSource, input: { runId: string; userId: string }): Promise<void> {
   if (!RUN_ID_RE.test(input.runId) || !UUID_RE.test(input.userId)) return;
   await dataSource.query(`DELETE FROM assistant_run_frames WHERE run_id = $1 AND user_id = $2`, [input.runId, input.userId]);
+}
+
+/**
+ * 끝난 run 의 재개 구조 · 업무 이해를 지운다 — 질문에 답하지 않아 TTL 이 지난(만료) run 포함.
+ * coordination 행은 만료돼도 즉시 지워지지 않으므로(지연 삭제 · CASCADE 대기) 그것을 기다리지 않는다(정책 M5 "run 종료 사건에 삭제").
+ * 남는 행 = 질문 대기 중이고 만료 전인 run 의 것뿐. 운영 유지보수 질의라 사용자 경계 없이 run 상태로만 고른다(값을 읽지 않는다).
+ */
+export async function purgeEndedRunFrames(dataSource: DataSource): Promise<number> {
+  const r = await dataSource.query(
+    `DELETE FROM assistant_run_frames f
+      WHERE NOT EXISTS (SELECT 1 FROM work_run_coordination c
+                         WHERE c.run_id = f.run_id AND c.user_id = f.user_id
+                           AND c.status = 'waiting_for_user' AND c.expires_at > now())`,
+  );
+  return Array.isArray(r) && typeof r[1] === 'number' ? r[1] : 0;
 }

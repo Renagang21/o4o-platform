@@ -112,12 +112,19 @@ import {
   newJudgeCounters,
   requestHasCommitIntent,
   restoreUnderstanding,
+  toStoredUnderstanding,
   enforceImageConfirmation,
   resumeFallbackUnderstanding,
   sanitizeUnderstanding,
 } from '../services/assistant/assistant-understanding.js';
-import { readRunResume, saveRunFrame } from '../services/assistant/procedural-memory-store.js';
-import { runAssistantWorkTask, type WorkExecutionReply } from '../services/assistant/personal-assistant.js';
+import { purgeEndedRunFrames, readRunResume, saveRunFrame } from '../services/assistant/procedural-memory-store.js';
+import {
+  RUN_FRAME_PURGE_INTERVAL_MS,
+  __resetRunFramePurgeForTest,
+  maybePurgeEndedRunFrames,
+  runAssistantWorkTask,
+  type WorkExecutionReply,
+} from '../services/assistant/personal-assistant.js';
 import { HEALTHKR, HEALTHKR_SEARCH, domOk, runOnHealthkr, scriptedPlanner } from './helpers/healthkr-dom-harness.js';
 
 jest.setTimeout(180_000);
@@ -182,9 +189,8 @@ describe('① 업무 이해(실행 전)', () => {
     });
     expect(full!.criteria.map((c) => `${c.id}:${c.text.length > 3 ? 'U' : c.text}:${c.evidence}`))
       .toEqual(['c1:a:observed', 'c2:b:observed', 'c3:c:observed', 'c4:d:observed', 'c5:U:user']);
-    // 저장 · 재개(restore)에도 같은 모양으로 돌아온다 — 네 번째 observed 조건이 사라지지 않는다.
-    expect(restoreUnderstanding(JSON.parse(JSON.stringify(full)))!.criteria.map((c) => c.evidence))
-      .toEqual(['observed', 'observed', 'observed', 'observed', 'user']);
+    // 저장용 재개 표현에는 조건 글이 없다 — 결과 형태 · 확정 경계만(정책 M13).
+    expect(toStoredUnderstanding(full)).toEqual({ version: 2, outcome: 'change', commitBoundary: true });
     // 이미 user 조건이 있으면 그대로 · 확정 경계가 없으면 붙이지 않는다.
     const has = sanitizeUnderstanding({ goal: 'x', outcome: 'change', commitBoundary: true, criteria: [{ text: 'a' }, { text: '저장은 사용자', evidence: 'user' }] });
     expect(has!.criteria).toHaveLength(2);
@@ -320,8 +326,11 @@ describe('② 완료 판정기', () => {
     expect(withImage.criteria.map((c) => c.evidence)).toEqual(['observed', 'observed', 'observed', 'observed', 'user', 'user']);
     expect(enforceImageConfirmation(withImage, true)).toBe(withImage); // 다시 붙이지 않는다
     expect(enforceImageConfirmation(full, false)).toBe(full);
-    // 저장된 이해를 되살려도 확정 · 사진 확인 조건이 모두 남는다.
-    expect(restoreUnderstanding(JSON.parse(JSON.stringify(withImage)))!.criteria.map((c) => c.text)).toEqual(withImage.criteria.map((c) => c.text));
+    // 저장 · 되살림 — 조건 글은 남지 않지만 사용자 확인으로만 닫히고 확정 확인은 유지된다(observed 조건 없음).
+    const restored = restoreUnderstanding(JSON.parse(JSON.stringify(toStoredUnderstanding(withImage))))!;
+    expect(restored.criteria.every((c) => c.evidence === 'user')).toBe(true);
+    expect(restored.commitBoundary).toBe(true);
+    expect(restored.criteria.length).toBe(2);
     // 화면 조건이 다 충족돼도 사진 확인은 사용자에게 묻는다.
     const v = await createCompletionJudge(enforceImageConfirmation(U([C1]), true))({ evidence: [G('c1')], via: 'done' });
     expect(v).toMatchObject({ decision: 'ask', unmet: ['c2'] });
@@ -405,6 +414,28 @@ describe('③ runtime — done 은 주장일 뿐 · Assistant 가 조건과 근�
     // ⑦ 계측
     expect(result.report?.metrics).toMatchObject({ aiCalls: 4, stepCount: expect.any(Number), totalMs: expect.any(Number) });
     expect(result.report!.metrics!.roundTrips).toBeGreaterThan(0);
+  });
+
+  it('조건이 서로 다른 화면에서 확인돼도 앞 판정의 근거가 누적된다 — c1(목록) 확인 뒤 c2(상세)만 보고해도 complete', async () => {
+    const u = U([
+      { id: 'c1', text: '검색 결과에 아모디핀정 5mg 이 보인다', evidence: 'observed' },
+      { id: 'c2', text: '아모디핀정 5mg 의 성분이 보인다', evidence: 'observed' },
+    ]);
+    const intent = planAssistantTask({ ...BASE, understanding: u }).intent;
+    const planner = scripted([
+      CLICK,
+      DONE_EV('아모디핀정 5mg', 'c1'), // 목록 화면에서 c1 만 확인 — c2 는 아직
+      { assessment: 'progress', action: { kind: 'read_text', elementRef: 'e_9' } },
+      DONE_EV('성분: 암로디핀베실산염', 'c2'), // 상세 글에서 c2 만 보고 — c1 근거는 다시 싣지 않는다
+    ]);
+    const result = await run(planner, SEARCH, intent, createCompletionJudge(u));
+    // continue 안내에 이미 확인된 조건이 실린다 — planner 가 c1 으로 되돌아가 왕복하지 않게.
+    expect(planner.calls[2].assistantFeedback).toMatchObject({ unmet: ['c2'], confirmed: ['c1'] });
+    expect(buildPlannerUserPrompt(planner.calls[2])).toContain('이미 확인됨');
+    expect(result.goal.status).toBe('completed');
+    expect(result.report?.verdict).toMatchObject({ decision: 'complete' });
+    expect(result.report?.evidence?.filter((e) => e.grounded).map((e) => e.criterionId).sort()).toEqual(['c1', 'c2']);
+    expect(judgeTaskStatus(intent.completion, result.report!)).toBe('completed');
   });
 
   it('지어낸 인용 · 내가 입력한 값의 인용은 근거가 아니다 → 이어서 일하다 사용자 확인으로', async () => {
@@ -564,25 +595,30 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     },
   });
 
-  it('다른 인스턴스 재개 — 질문 대기 run 에 남긴 원래 이해(목표 · 완료조건)로 판정한다 · resume_fallback 아님', async () => {
+  it('다른 인스턴스 재개 — 재개 행에는 글 없는 구조만 남고(업무 값 저장 없음), 되살린 이해는 사용자 확인으로만 닫힌다', async () => {
     const db = frameDb({ g_f1: ME });
-    const understand = jest.fn(async () => U([C1, C2_USER]));
+    // 이해 모델이 요청의 민감한 업무 값(환자명 · 처방 식별자)을 목표 · 조건 · 질문 글에 그대로 옮긴 경우.
+    const understand = jest.fn(async () => U(
+      [{ id: 'c1', text: `${SENTINEL} 환자 홍길동 처방번호 RX-2026-0042 조회 결과가 보인다`, evidence: 'observed' as const }],
+      { goal: `${SENTINEL} 환자 홍길동 처방 조회`, missing: [{ slot: 'patient_birth', question: '홍길동 님 생년월일은?' }] },
+    ));
     const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_f1')), { understand });
     expect(out.task?.status).toBe('waiting_for_user');
-    // 이해는 질문 대기 run 의 재개 행에 함께 남는다(구조가 없어도 · 대상은 응답의 target).
-    expect(db.frames.get('g_f1')?.understanding).toMatchObject({ version: 1, source: 'ai', criteria: [C1, C2_USER] });
+    // 재개 행의 이해 = 결과 형태 · 확정 경계뿐. 목표 · 조건 · 질문 글(업무 값)은 저장되지 않는다(정책 M13).
+    expect(db.frames.get('g_f1')?.understanding).toEqual({ version: 2, outcome: 'information', commitBoundary: false });
+    const stored = JSON.stringify([...db.frames.values()]);
+    for (const v of ['SENTINEL_RAW_TEXT', '홍길동', 'RX-2026-0042', '생년월일', '처방']) expect([v, stored.includes(v)]).toEqual([v, false]);
 
     __resetUnderstandingCacheForTest(); // 이해를 세운 인스턴스가 사라졌다
     const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_f1'));
     await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f1' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
     expect(understand).toHaveBeenCalledTimes(1);
     const [, , intent, judge] = exec2.mock.calls[0] as unknown as [string, unknown, ExecutionIntent, CompletionJudge];
-    expect(intent.understanding).toEqual(U([C1, C2_USER]));
-    expect(intent.understanding).not.toEqual(resumeFallbackUnderstanding());
+    expect(intent.understanding?.criteria.every((c) => c.evidence === 'user')).toBe(true);
     expect(intent.completion.requires).toBe('criteria_evidence');
-    // 원래 조건 c1(화면) 근거 없음 → continue(조건 문장이 이유) — 사용자 확인으로 뭉개지 않는다.
-    await expect(judge({ evidence: [] } as any)).resolves.toMatchObject({ decision: 'continue' });
-    expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'frame', criteria: 2 }));
+    // 실행이 "끝났다" 고 해도 종전 결과 근거로 조용히 닫지 않는다 — 사용자 확인.
+    await expect(judge({ evidence: [] } as any)).resolves.toMatchObject({ decision: 'ask', askKind: 'success_confirmation' });
+    expect(logger.info).toHaveBeenCalledWith('assistant plan', expect.objectContaining({ understandingSource: 'frame' }));
   });
 
   it('다른 인스턴스 재개 — 확정 경계 · 사용자 확인 조건이 그대로 이어진다(화면 근거만으로 complete 없음)', async () => {
@@ -617,24 +653,55 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(await saveRunFrame(db.ds, { runId: 'g_f4', userId: ME, taskId: null, targetId: SITE, frame: { taskKey: null, stageKey: null, ask: null, strategy: null }, understanding: U([C1]) })).toBe(true);
     expect(await readRunResume(db.ds, { runId: 'g_f4', userId: OTHER })).toBeNull();
     // 이해만 남긴 행 — 재개 구조는 null 로(빈 구조를 runtime 에 넘기지 않는다).
-    expect(await readRunResume(db.ds, { runId: 'g_f4', userId: ME })).toEqual({ frame: null, understanding: U([C1]) });
+    expect(await readRunResume(db.ds, { runId: 'g_f4', userId: ME })).toEqual({
+      frame: null, understanding: restoreUnderstanding({ version: 2, outcome: 'information', commitBoundary: false }),
+    });
   });
 
-  it('저장된 이해를 믿지 않는다 — 다시 정규화 · 확정 불변식 · 형식 밖이면 null(→ 재개 기본 이해)', () => {
-    // 확정 경계인데 사용자 조건이 빠진 행 → 사용자 조건이 붙는다.
-    const r = restoreUnderstanding({ ...U([C1]), commitBoundary: true });
-    expect(r?.criteria.some((c) => c.evidence === 'user')).toBe(true);
-    expect(restoreUnderstanding({ ...U([C1]), source: 'fallback' })?.source).toBe('fallback');
-    expect(restoreUnderstanding({ ...U([C1]), version: 2 })).toBeNull();
-    expect(restoreUnderstanding({ version: 1, goal: 'x' })).toBeNull();
-    expect(restoreUnderstanding('{"version":1}')).toBeNull();
+  it('만료(TTL)된 run — 질문에 답하지 않아도 재개 행(이해 포함)을 지운다 · coordination 지연 삭제를 기다리지 않는다', async () => {
+    const calls: string[] = [];
+    const rec = { query: jest.fn(async (sql: string) => { calls.push(sql.replace(/\s+/g, ' ').trim()); return [[], 3]; }) } as any;
+    expect(await purgeEndedRunFrames(rec)).toBe(3);
+    // 남는 행 = 질문 대기 중이고 만료 전인 run 의 것뿐(만료된 waiting 도 지운다).
+    expect(calls[0]).toMatch(/^DELETE FROM assistant_run_frames f WHERE NOT EXISTS/);
+    expect(calls[0]).toMatch(/c\.status = 'waiting_for_user' AND c\.expires_at > now\(\)/);
+    // 새 재개 행을 남길 때 같은 사용자의 끝난 · 만료된 run 행도 함께 정리한다.
+    calls.length = 0;
+    const save = { query: jest.fn(async (sql: string) => { calls.push(sql.replace(/\s+/g, ' ').trim()); return sql.includes('INSERT') ? [{ run_id: 'g_x' }] : [[], 0]; }) } as any;
+    await saveRunFrame(save, { runId: 'g_x', userId: ME, taskId: null, targetId: SITE, frame: { taskKey: null, stageKey: null, ask: null, strategy: null } });
+    expect(calls[1]).toMatch(/c\.status = 'waiting_for_user' AND c\.expires_at > now\(\)/);
+  });
+
+  it('끝난 run 정리는 요청 경로에서 인스턴스마다 주기적으로(기다리지 않음 · 실패해도 업무 계속)', () => {
+    __resetRunFramePurgeForTest();
+    const q = jest.fn(async () => { throw new Error('db down'); });
+    const t = 1_000_000;
+    expect(maybePurgeEndedRunFrames({ query: q } as any, t)).toBe(true);
+    expect(maybePurgeEndedRunFrames({ query: q } as any, t + 1000)).toBe(false); // 주기 안 — 다시 하지 않는다
+    expect(maybePurgeEndedRunFrames({ query: q } as any, t + RUN_FRAME_PURGE_INTERVAL_MS)).toBe(true);
+    expect(q).toHaveBeenCalledTimes(2);
+  });
+
+  it('저장된 이해를 믿지 않는다 — 글 없는 구조(version 2)만 받고 조건을 지어내지 않는다 · 글을 담은 예전 형식은 null', () => {
+    // 확정 경계 → 사용자 확인 + 확정 확인. 조건은 모두 사용자 확인(화면 근거만으로 닫히지 않는다).
+    const r = restoreUnderstanding({ version: 2, outcome: 'change', commitBoundary: true });
+    expect(r?.commitBoundary).toBe(true);
+    expect(r?.outcome).toBe('change');
+    expect(r?.criteria.map((c) => c.evidence)).toEqual(['user', 'user']);
+    expect(restoreUnderstanding({ version: 2, outcome: 'information', commitBoundary: false })?.criteria).toHaveLength(1);
+    // 저장 칸에 글이 섞여 와도(변조 · 예전 형식) 글을 되살리지 않는다.
+    expect(restoreUnderstanding({ version: 2, outcome: 'information', commitBoundary: false, goal: '홍길동' } as any)?.goal)
+      .toBe(resumeFallbackUnderstanding().goal);
+    expect(restoreUnderstanding({ ...U([C1]) })).toBeNull();
+    expect(restoreUnderstanding({ version: 2, outcome: 'nope', commitBoundary: false })).toBeNull();
+    expect(restoreUnderstanding('{"version":2}')).toBeNull();
     expect(restoreUnderstanding(null)).toBeNull();
   });
 
   it('저장된 이해가 형식 밖이면 — 조용히 결과 근거로 닫지 않고 재개 기본 이해(사용자 확인)', async () => {
     const db = frameDb({ g_f5: ME });
     const out = await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_f5')), { understand: async () => U([C1]) });
-    db.frames.get('g_f5').understanding = { version: 1, goal: '', criteria: 'tampered' };
+    db.frames.get('g_f5').understanding = { version: 2, outcome: 'tampered' };
     __resetUnderstandingCacheForTest();
     const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_f5'));
     await runAssistantWorkTask(db.ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_f5' }, requestedTaskId: out.task!.taskId }, exec2);

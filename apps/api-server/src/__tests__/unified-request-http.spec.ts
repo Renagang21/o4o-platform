@@ -372,6 +372,20 @@ describe('POST /api/ai/request', () => {
     expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
   });
 
+  it('⑩-b Local Agent 는 online 이지만 대상 표면 capability(browser) 없음 → preflight 에서 403 · 이해 모델 미호출', async () => {
+    // 노드는 있지만 Chrome 확장(browser)이 꺼진 정상 상태 — capability 를 묻지 않으면 connected 로 보인다.
+    resolveTargetDeviceMock.mockImplementation(async (_ds: unknown, _u: unknown, opts?: { need?: string }) =>
+      (opts?.need === 'browser' ? { status: 'none' } : CONNECTED));
+    const r = await request(app).post('/api/ai/request').send({ text: '약학정보원에서 우루사정 찾아줘' });
+    expect(r.status).toBe(403);
+    expect(r.body.code).toBe('WORK_AGENT_NOT_AVAILABLE');
+    expect(resolveTargetDeviceMock).toHaveBeenCalledWith(expect.anything(), expect.anything(), { need: 'browser' });
+    expect(runWorkAgentMock).not.toHaveBeenCalled();
+    expect(executeMock.mock.calls.filter((c) => c[0]?.meta?.callerName === 'TaskUnderstanding')).toHaveLength(0);
+    resolveTargetDeviceMock.mockReset();
+    resolveTargetDeviceMock.mockResolvedValue(CONNECTED);
+  });
+
   it('⑪ 기존 endpoint 회귀 — /home-chat · /work-agent/run 그대로', async () => {
     const chat = await request(app).post('/api/ai/home-chat').send({ message: '안녕' });
     expect(chat.status).toBe(200);

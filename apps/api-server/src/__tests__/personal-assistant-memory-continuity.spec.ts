@@ -74,6 +74,13 @@ function fakeDs(rows: { task_type_key: string }[] | Error) {
   } as any;
 }
 
+/** 기록된 질의 중 업무 유형 이력 조회(assistant_tasks) — 다른 질의(주기 정리 등)와 순서에 기대지 않는다. */
+function taskTypeQuery(ds: { calls: { sql: string; params: unknown[] }[] }) {
+  const c = ds.calls.find((x) => x.sql.includes('FROM assistant_tasks'));
+  if (!c) throw new Error('assistant_tasks 조회 없음');
+  return c;
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   ownership = { scope: 'USER', organizationId: null, serviceKey: null };
@@ -175,7 +182,8 @@ describe('⑤ Assistant 경로 통합', () => {
     const intent = exec.mock.calls[0][2] as ExecutionIntent;
     expect(intent.knownTaskTypes).toEqual(['drug_info.search']);
     expect(out.plan.intent.knownTaskTypes).toEqual(['drug_info.search']);
-    expect(ds.calls[0].params).toEqual([ME, 'healthkr', ASSISTANT_MEMORY_TASK_TYPE_LIMIT]);
+    // 요청 경로의 주기적 run frame 정리(값 없는 DELETE)가 먼저 나갈 수 있다 — 업무 유형 조회를 찾아 본다.
+    expect(taskTypeQuery(ds).params).toEqual([ME, 'healthkr', ASSISTANT_MEMORY_TASK_TYPE_LIMIT]);
     expect(JSON.stringify(ds.calls)).not.toContain('SENTINEL_RAW_TEXT');
     // 업무 이해(메모리 전용 · 요청 파생)를 뺀 실행 지시 구조 칸에는 원문이 없다.
     const { understanding: _u, ...structural } = intent;
@@ -187,7 +195,7 @@ describe('⑤ Assistant 경로 통합', () => {
     const ds = fakeDs([{ task_type_key: 'store.restock_review' }]);
     const exec = jest.fn(async (): Promise<WorkExecutionReply> => ({ status: 403, body: { success: false } }));
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '약학정보원에서 찾아줘' }, workScope: { workspace: 'store' } }, exec);
-    expect(ds.calls[0].params[0]).toBe(ORG);
+    expect(taskTypeQuery(ds).params[0]).toBe(ORG);
     const intent = exec.mock.calls[0][2] as ExecutionIntent;
     expect(intent.knownTaskTypes).toEqual(['store.restock_review']);
     expect(JSON.stringify(intent)).not.toMatch(/workflow|procedure|steps/i);

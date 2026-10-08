@@ -12,7 +12,8 @@
  *   사용자    isCompletionDeclaration — 질문 대기 중 "됐어요" 는 사용자 완료 선언으로 Task 완료에 연결된다
  *
  * 경계
- *   - 이해는 요청 원문에서 파생한 글이다 — 로그 · DB 에 남기지 않는다(V2 §17). 프로세스 메모리 캐시(재개용)에만 산다.
+ *   - 이해는 요청 원문에서 파생한 글이다 — 로그 · DB 에 남기지 않는다(V2 §17). 글은 프로세스 메모리 캐시(재개용)에만 산다.
+ *     다른 인스턴스 재개를 위해 DB(run frame)에 남기는 것은 글 없는 구조(결과 형태 · 확정 경계)뿐이다(toStoredUnderstanding).
  *   - 사이트 · 업무별 고정 Workflow 가 아니다. 매 요청마다 그 요청에서 세운다. Experience · Candidate 는 조건을 정하지 않는다(P3).
  *   - 판정기 장애는 완료를 막지도 꾸며내지도 않는다 — 실패하면 판정 없음(null)으로 종전 결과 근거 규칙에 맡긴다.
  *   - 화면 인용은 판정 근거로만 쓰고 저장 · 로그하지 않는다. LLM 검증에 넘길 때는 UNTRUSTED 로 표시한다.
@@ -144,12 +145,6 @@ export function sanitizeUnderstanding(raw: unknown): TaskUnderstanding | null {
   return sanitizeWithCap(raw, UNDERSTANDING_LIMITS.maxCriteria);
 }
 
-/**
- * 결정적으로 더해지는 사용자 확인 조건(확정 · 첨부 사진)의 최대 칸 수. AI 출력은 maxCriteria 까지만 받고,
- * 이 칸들은 그 밖에 붙는다 — 저장된 이해를 되살릴 때(restore) 이만큼 더 받아 그 조건들이 빠지지 않게 한다.
- */
-const DETERMINISTIC_USER_SLOTS = 2;
-
 function sanitizeWithCap(raw: unknown, cap: number): TaskUnderstanding | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const r = raw as Record<string, unknown>;
@@ -181,14 +176,35 @@ function sanitizeWithCap(raw: unknown, cap: number): TaskUnderstanding | null {
 }
 
 /**
- * 저장된 이해(run frame · M5) → TaskUnderstanding. 저장소를 믿지 않는다 — AI 출력과 같은 정규화 · 상한 · 확정 불변식을 다시 건다.
- * 출처(ai · fallback)는 보존한다. 형식이 맞지 않으면 null(→ 재개 기본 이해).
+ * 저장용 재개 표현(run frame · M5) — **글이 없는 구조만**. 목표 · 완료조건 · 질문 글은 요청 원문에서 파생돼 환자 · 고객명이나
+ * 처방 식별자 같은 업무 값을 담을 수 있으므로 Cloud 에 남기지 않는다(정책 §4 M13 · V2 §17). 결과 형태와 확정 경계만 남긴다.
+ */
+export interface StoredUnderstanding {
+  version: 2;
+  outcome: TaskUnderstanding['outcome'];
+  commitBoundary: boolean;
+}
+
+export function toStoredUnderstanding(u: TaskUnderstanding): StoredUnderstanding {
+  return { version: 2, outcome: u.outcome, commitBoundary: u.commitBoundary };
+}
+
+/**
+ * 저장된 재개 표현 → TaskUnderstanding. 이해를 세운 인스턴스의 캐시가 없을 때만 쓰인다.
+ * 원래 조건 글은 저장하지 않았으므로 조건을 지어내지 않는다 — 재개 기본 이해(사용자 확인)에 결과 형태와 확정 경계만 되살린다.
+ * 확정 업무면 확정 확인 조건이 함께 붙어(ensureCommitConfirmation) observed 근거만으로 닫히지 않는다.
+ * 글을 담은 예전 형식(version 1)은 믿지 않는다 — null(→ 재개 기본 이해).
  */
 export function restoreUnderstanding(raw: unknown): TaskUnderstanding | null {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw) || (raw as Record<string, unknown>).version !== 1) return null;
-  const u = sanitizeWithCap(raw, UNDERSTANDING_LIMITS.maxCriteria + DETERMINISTIC_USER_SLOTS);
-  if (!u) return null;
-  return (raw as Record<string, unknown>).source === 'fallback' ? { ...u, source: 'fallback' } : u;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const r = raw as Record<string, unknown>;
+  if (r.version !== 2) return null;
+  const outcome = r.outcome === 'information' || r.outcome === 'screen' || r.outcome === 'change' ? r.outcome : null;
+  if (!outcome) return null;
+  const base = resumeFallbackUnderstanding();
+  if (r.commitBoundary !== true) return { ...base, outcome };
+  // 확정 업무 — 결과 확인과 별개로 최종 확정을 사용자가 했는지도 따로 확인받는다(재개 기본 조건이 user 라도 생략하지 않는다).
+  return { ...base, outcome, commitBoundary: true, criteria: [...base.criteria, { id: 'c2', text: COMMIT_USER_CRITERION, evidence: 'user' }] };
 }
 
 export const UNDERSTANDING_SYSTEM_PROMPT = [

@@ -252,8 +252,11 @@ export interface PlannerInput {
    * 화면 행동만 정한다. 업무 완료 판정은 Assistant 가 실행 근거로 한다(V2 §2-1).
    */
   intent?: ExecutionIntent;
-  /** Assistant 가 직전 완료 보고를 "아직" 으로 판정한 이유(조건 id · 조건 문장 기반 안내). */
-  assistantFeedback?: { unmet: string[]; note: string };
+  /**
+   * Assistant 가 직전 완료 보고를 "아직" 으로 판정한 이유(조건 id · 조건 문장 기반 안내).
+   * confirmed = 이번 run 에서 이미 화면 근거로 확인된 조건 id(다른 화면에서 확인한 것도 유지된다 — 다시 보고하지 않아도 된다).
+   */
+  assistantFeedback?: { unmet: string[]; note: string; confirmed?: string[] };
 }
 
 export interface WorkPlanner {
@@ -382,7 +385,10 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
   if (input.intent) lines.push(describeExecutionIntent(input.intent));
   if (input.assistantFeedback) {
     // Assistant 판정 — 직전 done 이 완료조건을 다 채우지 못했다. 조건 id · 조건 문장 기반 안내뿐(화면 글 없음).
-    lines.push(`## Assistant 판정 (직전 완료 보고 · 아직 끝나지 않음)\n미충족: ${input.assistantFeedback.unmet.join(', ')}\n${input.assistantFeedback.note}\n(그 조건을 확인할 화면 글을 찾아 읽은 뒤 다시 done + evidence 로 보고한다. 찾을 수 없으면 takeover(user_judgment_required) + ask.kind=success_confirmation.)`);
+    const confirmed = input.assistantFeedback.confirmed?.length
+      ? `\n이미 확인됨(이번 run 의 다른 화면 근거 유지 — 다시 보고하지 않아도 된다): ${input.assistantFeedback.confirmed.join(', ')}`
+      : '';
+    lines.push(`## Assistant 판정 (직전 완료 보고 · 아직 끝나지 않음)\n미충족: ${input.assistantFeedback.unmet.join(', ')}${confirmed}\n${input.assistantFeedback.note}\n(그 조건을 확인할 화면 글을 찾아 읽은 뒤 다시 done + evidence 로 보고한다. 찾을 수 없으면 takeover(user_judgment_required) + ask.kind=success_confirmation.)`);
   }
   if (input.knownTaskKeys && input.knownTaskKeys.length) lines.push(`## 이 대상에서 확인된 업무 키\n${input.knownTaskKeys.join(', ')}`);
   if (input.patterns && input.patterns.length) {
@@ -816,6 +822,8 @@ export async function runWorkAgent(
     noteSeen((o.elements ?? []).map((e) => `${e.name ?? ''} ${e.text ?? ''}`).join('\n'));
   };
   let lastEvidence: ExecutionEvidence[] = [];
+  /** 이번 run 에서 화면 근거로 확인된(grounded) 조건별 근거 — 조건이 서로 다른 화면에서 확인돼도 앞 판정의 근거를 잃지 않는다. */
+  const groundedByCriterion = new Map<string, ExecutionEvidence>();
   let lastVerdict: CompletionVerdict | null = null;
   let assistantFeedback: PlannerInput['assistantFeedback'] = undefined;
   const runT0 = Date.now();
@@ -1915,10 +1923,16 @@ export async function runWorkAgent(
       const grounded = q.length > 0 && !typed.has(q) && seenTexts.some((t) => t.includes(q));
       return { criterionId: e.criterion, source: e.source, quote: e.quote, grounded };
     });
-    lastEvidence = evidence;
+    // 같은 run 의 앞선 판정에서 grounded 된 조건 근거를 누적한다 — 이번 보고가 그 조건을 다시 싣지 않아도 유지된다.
+    for (const e of evidence) if (e.grounded) groundedByCriterion.set(e.criterionId, e);
+    const accumulated: ExecutionEvidence[] = [
+      ...groundedByCriterion.values(),
+      ...evidence.filter((e) => !groundedByCriterion.has(e.criterionId)),
+    ];
+    lastEvidence = accumulated;
     let verdict: CompletionVerdict | null = null;
     try {
-      verdict = await (input.judge as CompletionJudge)({ evidence, via });
+      verdict = await (input.judge as CompletionJudge)({ evidence: accumulated, via });
     } catch (e) {
       logger.warn('work-agent completion judge failed', { code: (e as { code?: string })?.code ?? null });
     }
@@ -1938,7 +1952,12 @@ export async function runWorkAgent(
       return finish();
     }
     if (verdict.decision === 'continue') {
-      assistantFeedback = { unmet: verdict.unmet.slice(0, 4), note: String(verdict.note ?? '').slice(0, 300) };
+      const confirmed = [...groundedByCriterion.keys()].filter((id) => !verdict.unmet.includes(id)).slice(0, 6);
+      assistantFeedback = {
+        unmet: verdict.unmet.slice(0, 4),
+        note: String(verdict.note ?? '').slice(0, 300),
+        ...(confirmed.length ? { confirmed } : {}),
+      };
       lastRejectReason = undefined;
       return null;
     }

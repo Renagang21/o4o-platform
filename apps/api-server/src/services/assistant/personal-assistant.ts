@@ -58,7 +58,7 @@ import {
 import { resolveTaskOwnership } from './task-ownership.js';
 import { judgeTaskStatus, planAssistantTask, type AssistantPlan } from './assistant-planning.js';
 import { EMPTY_ASSISTANT_MEMORY, recallAssistantMemory, rememberExecution } from './assistant-memory.js';
-import { memoryOwnerOf } from './procedural-memory-store.js';
+import { memoryOwnerOf, purgeEndedRunFrames } from './procedural-memory-store.js';
 import type { CompletionJudge, ExecutionIntent, ExecutionReport, TaskUnderstanding } from '../ai-tools/work-agent-contract.js';
 import {
   cacheUnderstanding,
@@ -246,6 +246,24 @@ async function completeByUserDeclaration(
   };
 }
 
+/** 끝난(만료 포함) run 의 재개 구조 · 업무 이해 정리 주기 — 인스턴스마다 이 간격에 한 번(요청 경로 · best-effort). */
+export const RUN_FRAME_PURGE_INTERVAL_MS = 5 * 60 * 1000;
+let lastRunFramePurgeAt = 0;
+
+/** 요청이 들어올 때 주기가 지났으면 끝난 run 의 frame 을 지운다. 실패 · 지연이 업무를 막지 않는다(기다리지 않음). */
+export function maybePurgeEndedRunFrames(dataSource: DataSource, now = Date.now()): boolean {
+  if (now - lastRunFramePurgeAt < RUN_FRAME_PURGE_INTERVAL_MS) return false;
+  lastRunFramePurgeAt = now;
+  purgeEndedRunFrames(dataSource).catch((err) => {
+    logger.warn('assistant run frame purge failed', { error: err instanceof Error ? err.name : 'unknown' });
+  });
+  return true;
+}
+
+export function __resetRunFramePurgeForTest(): void {
+  lastRunFramePurgeAt = 0;
+}
+
 export async function runAssistantWorkTask(
   dataSource: DataSource,
   input: AssistantWorkInput,
@@ -253,6 +271,7 @@ export async function runAssistantWorkTask(
   deps: AssistantUnderstandingDeps = {},
 ): Promise<AssistantWorkOutcome> {
   const t0 = Date.now();
+  maybePurgeEndedRunFrames(dataSource, t0);
   // ── Assistant → Task ──
   let task: AssistantTaskRow | null = null;
   let priorStatus: AssistantTaskStatus | null = null;
@@ -307,8 +326,8 @@ export async function runAssistantWorkTask(
   if (resuming) {
     understanding = task ? cachedUnderstanding(task.taskId) : null;
     understandingSource = understanding ? 'cached' : 'none';
-    // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 질문 대기 run 의 재개 구조(M5)에 함께 남긴 원래 이해를 쓴다 —
-    // 원래 목표 · 완료조건 · 확정 경계가 인스턴스와 무관하게 이어진다.
+    // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 질문 대기 run 의 재개 구조(M5)에 남긴 글 없는 구조(결과 형태 ·
+    // 확정 경계)로 되살린다 — 원래 조건 글은 저장하지 않으므로 사용자 확인으로 닫고, 확정 업무는 확정 확인을 계속 요구한다.
     if (!understanding && task && memory.understanding) {
       understanding = memory.understanding;
       understandingSource = 'frame';
