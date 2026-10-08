@@ -20,7 +20,7 @@
  *      링크는 토큰을 query 가 아닌 **fragment(`#token=`)** 에 싣는다 — fragment 는 HTTP 요청에 실리지 않아
  *      웹 서버 · Cloud Run 요청 로그에 남지 않는다. 화면이 fragment 에서 읽어 JSON body 로 보낸다.
  *   ⑤ 확인 메일이 가는 곳만 확인된 주소다. 로그인은 `users.isEmailVerified=true` 일 때만 발급한다.
- *   ⑥ 비밀번호 재설정은 `logoutAll` 을 호출해 전역 폐기(`refreshTokenFamily=null`)를 한다.
+ *   ⑥ 비밀번호 재설정은 `revokeAllSessions` 을 호출해 전역 폐기(`refreshTokenFamily=null`)를 한다.
  */
 import crypto from 'crypto';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -246,7 +246,7 @@ export interface EmailAuthServiceDeps {
   passwords?: PasswordStore;
   mailer?: MailSender;
   issueSession?: PasswordSessionIssuer;
-  /** 전역 세션 폐기(= logout-all). 기본값은 `authenticationService.logoutAll`. */
+  /** 보안 이벤트에 대한 전역 세션 폐기. 기본값은 `authenticationService.revokeAllSessions`. */
   revokeAllSessions?: (userId: string) => Promise<void>;
   /** 역할 이름 조회. 기본값은 `roleAssignmentService.getRoleNames`. */
   readRoles?: (userId: string) => Promise<string[]>;
@@ -285,7 +285,7 @@ export class EmailAuthService {
       deps.revokeAllSessions ??
       (async (userId) => {
         const { authenticationService } = await import('../authentication.service.js');
-        await authenticationService.logoutAll(userId);
+        await authenticationService.revokeAllSessions(userId);
       });
     this.readRoles =
       deps.readRoles ??
@@ -556,7 +556,7 @@ export class EmailAuthService {
     //   2차 방어. 정책 변경 전에 발급된 토큰 · 다른 경로로 생긴 토큰도 막는다). 세션 폐기보다 먼저 거절한다.
     if (!(await this.passwords.hasPassword(row.user_id))) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
 
-    // 전역 폐기는 `logoutAll` 한 경로만 한다(auth-token-session.service). 폐기를 **먼저** 한다 —
+    // 전역 폐기는 `revokeAllSessions` 한 경로만 한다(auth-token-session.service). 폐기를 **먼저** 한다 —
     // 뒤의 저장이 실패해도 "비밀번호는 그대로인데 세션만 끊긴" 안전한 쪽으로 남는다.
     await this.revokeAllSessions(row.user_id);
     await this.dataSource.transaction(async (manager) => {
@@ -569,7 +569,8 @@ export class EmailAuthService {
    * POST /auth/password — 로그인한 사용자의 비밀번호 설정·변경.
    * Google 로만 가입한 사용자도 비밀번호 수단을 **추가**할 수 있다(같은 users.id — 병합이 아니다).
    * 첫 비밀번호 추가는 **이 경로(로그인 상태)뿐**이다 — forgot/reset 은 기존 수단의 복구 전용(2026-10-01 정책 변경).
-   * 변경 시 전역 폐기는 하지 않는다(본인 세션 안의 조작) — 필요하면 사용자가 logout-all 을 쓴다.
+   * 현재 변경 경로는 전역 폐기를 하지 않는다. WO-O4O-AUTH-REFACTOR-V1 단계 2에서
+   * 변경·재설정 모두 기존 access/refresh/handoff 세션을 폐기하도록 교체한다.
    */
   async setPasswordForUser(userId: string, input: { currentPassword?: string; newPassword: string }): Promise<void> {
     // Demo 계정의 비밀번호는 공개 credential 이고 고정이다 — 로그인했더라도 바꿀 수 없다.

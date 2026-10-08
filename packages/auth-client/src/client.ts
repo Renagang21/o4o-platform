@@ -84,7 +84,7 @@ export class AuthClient {
   private strategy: AuthStrategy;
   /**
    * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1:
-   * 로그아웃(명시적 logout/logoutAll · refresh 실패 정리)마다 증가하는 세션 세대.
+   * 로그아웃(명시적 logout · refresh 실패 정리)마다 증가하는 세션 세대.
    * refresh 시작 시점의 세대와 응답 시점의 세대가 다르면 그 응답은 "로그아웃 이후 도착한 늦은 응답" 이므로
    * 토큰을 저장하지 않는다. 다른 탭 로그아웃은 세대가 아니라 storage 의 refresh token 부재로 판정한다.
    */
@@ -453,23 +453,6 @@ export class AuthClient {
     const pending = this.refreshSubscribers;
     this.refreshSubscribers = [];
     pending.forEach((cb) => cb(null));
-  }
-
-  /**
-   * Logout from all devices
-   *
-   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
-   *   서버가 users.refreshTokenFamily 를 폐기하여 이미 발급된 모든 refresh token 을 무효화한다.
-   *   실패는 호출부로 전파한다 (일반 logout 과 달리 조용히 삼키면 안 된다).
-   */
-  async logoutAll(): Promise<void> {
-    try {
-      await this.api.post('/auth/logout-all', {});
-    } finally {
-      if (this.strategy === 'localStorage') {
-        this.endLocalSession();
-      }
-    }
   }
 
   /**

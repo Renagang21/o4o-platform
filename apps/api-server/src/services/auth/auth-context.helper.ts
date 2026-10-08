@@ -69,10 +69,10 @@ export async function generateTokensWithContext(
   //
   //   handoff 는 이미 같은 이유로 승계한다. family = "이 사용자의 살아 있는 세션 계보" 이고,
   //   **서비스 단위 종료는 세대(session_epoch)가 담당**하므로 family 를 회전시킬 필요가 없다.
-  //   logout-all 은 family 를 비우므로 그 뒤 로그인은 새 family 를 만든다(승계할 것이 없다).
+  //   보안 세션 폐기는 family 를 비우므로 그 뒤 로그인은 새 family 를 만든다(승계할 것이 없다).
   //
   //   ⚠ 되돌리기 어려운 trade-off: 재로그인이 family 를 회전시키지 않으므로, 탈취된 refresh
-  //   token 은 재로그인만으로는 무효화되지 않는다. 대응 경로는 `logout-all` 이다.
+  //   token 은 재로그인만으로는 무효화되지 않는다. 대응 경로는 `보안 세션 폐기` 이다.
   const reuseFamily = user.refreshTokenFamily ?? null;
 
   const tokens = tokenUtils.generateTokens(
@@ -96,7 +96,7 @@ export async function generateTokensWithContext(
  *   토큰을 발급하는 **모든 경로**는 발급한 refresh token 의 family 를
  *   users.refreshTokenFamily 에 반드시 기록한다.
  *   기록하지 않으면 (1) 다음 refresh 가 family mismatch 로 도난 처리되거나
- *   (2) family 가 null 인 채로 남아 logout / logout-all 무효화가 무력해진다.
+ *   (2) family 가 null 인 채로 남아 logout / 보안 세션 폐기 무효화가 무력해진다.
  *
  * users 는 namingStrategy 미적용이라 컬럼명이 quoted camelCase 다.
  */

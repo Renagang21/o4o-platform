@@ -14,7 +14,6 @@ const core = {
   isLoading: false,
   login: vi.fn(),
   logout: vi.fn(),
-  logoutAll: vi.fn(),
   refresh: vi.fn(async () => {}),
   setUser: vi.fn(),
 };

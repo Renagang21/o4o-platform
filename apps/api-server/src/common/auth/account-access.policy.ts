@@ -100,7 +100,6 @@ export const RESTRICTED_ALLOWLIST: ReadonlySet<string> = new Set([
   'GET /api/v1/auth/me',
   'GET /api/v1/auth/status',
   'POST /api/v1/auth/logout',
-  'POST /api/v1/auth/logout-all',
   // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 이메일 인증 재발송 경로는 은퇴했다
   //   (토큰 producer 0 · Google 이 이미 이메일을 검증한다).
   // 내 service membership 상태 목록 (본인 것만 반환)

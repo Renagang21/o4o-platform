@@ -59,12 +59,12 @@ import logger from '../../../utils/logger.js';
 /**
  * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §6 — 폐기된 세션의 handoff 부활 차단.
  *
- * logout-all / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
+ * 보안 세션 폐기 / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
  * access token(최대 15분)으로 handoff 를 발급·교환하면 exchange 가 새 family 를 만들어 세션이 되살아났다.
  * 모든 로그인 경로는 family 를 기록하므로(`persistRefreshTokenFamily` 계약) null family = 종료된 세션이다.
  *
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 서비스 하나의 `logout` 은 더 이상 family 를
- * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 logout-all · 도난 판정
+ * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 보안 세션 폐기 · 도난 판정
  * 두 경우이며, 한 서비스에서 로그아웃한 뒤 다른 서비스로 handoff 하는 것은 **정상 동작**이다.
  */
 /**

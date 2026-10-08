@@ -24,7 +24,7 @@ import { getNetureMyPageNavItems } from './navItems';
 import LocalAgentCard from '../../components/mypage/LocalAgentCard';
 
 export default function MySettingsPage() {
-  const { user, isAuthenticated, isLoading, logoutAll } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
 
   /**
@@ -73,7 +73,7 @@ export default function MySettingsPage() {
 
       <AccountSecuritySettings
         notify={{ success: toast.success, error: toast.error }}
-        onLogoutAll={logoutAll}
+        onLogout={logout}
       />
     </MyPageLayout>
   );

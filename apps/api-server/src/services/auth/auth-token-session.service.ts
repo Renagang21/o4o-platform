@@ -41,7 +41,7 @@ export class AuthTokenSessionService {
    * - REFRESH_TOKEN_EXPIRED: Token has expired (do NOT retry)
    * - REFRESH_TOKEN_INVALID: Token is malformed or signature invalid (do NOT retry)
    * - TOKEN_FAMILY_MISMATCH: Token rotation detected, possible theft (do NOT retry)
-   * - TOKEN_FAMILY_REVOKED: logout / logout-all 로 폐기된 세션 (do NOT retry)
+   * - TOKEN_FAMILY_REVOKED: logout / 보안 세션 폐기로 폐기된 세션 (do NOT retry)
    * - USER_NOT_FOUND: User does not exist or is inactive (do NOT retry)
    */
   async refreshTokens(refreshToken: string): Promise<AuthTokens> {
@@ -105,9 +105,9 @@ export class AuthTokenSessionService {
     await this.assertServiceSessionNotRevoked(payload);
 
     // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
-    //   users.refreshTokenFamily 가 비어 있다 = logout-all / 도난 대응으로
+    //   users.refreshTokenFamily 가 비어 있다 = 보안 세션 폐기 / 도난 대응으로
     //   해당 사용자의 모든 refresh token 이 폐기된 상태다.
-    //   이전에는 이 조건이 family 검사 전체를 우회시켜 logout-all 이 무력했다.
+    //   이전에는 이 조건이 family 검사 전체를 우회시켜 보안 세션 폐기가 무력했다.
     if (!user.refreshTokenFamily) {
       logger.warn('[refreshTokens] refresh rejected — token family revoked', { userId: user.id });
       const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
@@ -144,7 +144,7 @@ export class AuthTokenSessionService {
     //   매 refresh 마다 새 family 를 덮어쓰면 handoff 로 같은 family 를 승계한 다른 origin 의
     //   refresh token 이 즉시 stale 이 되고, 그 다음 refresh 가 MISMATCH → family null →
     //   모든 origin 이 TOKEN_FAMILY_REVOKED 로 연쇄 사망했다 (IR-O4O-CROSSSERVICE-HANDOFF-SESSION-PERSISTENCE-V1).
-    //   새 로그인 = 새 family / logout·logout-all = family null 계약은 그대로다.
+    //   로그인은 살아 있는 family를 재사용한다. 전역 보안 폐기만 family를 비운다.
     const ctx = await freshenUserContext(user.id);
 
     // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션은 관리자 경계 밖에서만 산다.
@@ -195,8 +195,8 @@ export class AuthTokenSessionService {
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (S7):
     //   로그아웃은 **지금 쓰던 서비스의 세션만** 서버에서 무효화한다. 다른 서비스 세션은 유지된다.
     //
-    //   종전 1차: `logoutAll` 위임 → `users.refreshTokenFamily = null`. 그 값은 **사용자 전체**
-    //     범위라서 한 서비스 로그아웃이 9개 주소를 모두 끊었다(= logout-all 과 동일).
+    //   종전 1차: `revokeAllSessions` 위임 → `users.refreshTokenFamily = null`. 그 값은 **사용자 전체**
+    //     범위라서 한 서비스 로그아웃이 9개 주소를 모두 끊었다(= 보안 세션 폐기와 동일).
     //   종전 2차: 아무것도 하지 않고 기록만 남겼다. 그러면 **이미 발급된 refresh token 이
     //     서버에서 계속 유효**하므로 "세션 종료" 가 아니다.
     //
@@ -207,7 +207,7 @@ export class AuthTokenSessionService {
     //   토큰과 새 토큰을 구별할 수 없고, 로그아웃한 같은 초에 다시 로그인하면 새 토큰까지
     //   거절됐다. 그래서 시간 비교를 버렸다.
     //
-    //   `users.refreshTokenFamily` 는 손대지 않는다 — 그것은 전역 축이고 logout-all 의 것이다.
+    //   `users.refreshTokenFamily` 는 손대지 않는다 — 그것은 전역 축이고 보안 세션 폐기 의 것이다.
     if (!serviceKey) {
       // 서비스를 식별하지 못하면 **무효화 범위를 정할 수 없다.** 전역 폐기로 확대하지 않고
       // (그것이 고치려는 결함이다) 쿠키 정리에만 의존한다는 사실을 남긴다.
@@ -253,7 +253,7 @@ export class AuthTokenSessionService {
   }
 
   /**
-   * Logout from all devices
+   * Internal global session revocation for password reset and security events.
    *
    * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
    *   users.refreshTokenFamily 를 비우면 refreshTokens() 가 TOKEN_FAMILY_REVOKED 로
@@ -263,7 +263,7 @@ export class AuthTokenSessionService {
    * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: **전역 폐기는 이 경로만 한다.**
    *   `logout` 에 위임하지 않는다 — 위임하던 동안 서비스 하나의 로그아웃이 전역 폐기였다.
    */
-  async logoutAll(userId: string): Promise<void> {
+  async revokeAllSessions(userId: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (user) {

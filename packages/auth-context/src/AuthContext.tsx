@@ -86,7 +86,6 @@ interface AuthContextType {
   getGoogleAuthConfig: () => Promise<{ enabled: boolean; clientId: string | null }>;
   logout: () => void;
   /** WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 전 기기 로그아웃 (refresh token family 폐기) */
-  logoutAll: () => Promise<void>;
   clearError: () => void;
   getSessionStatus: () => SessionStatus | null;
   /**
