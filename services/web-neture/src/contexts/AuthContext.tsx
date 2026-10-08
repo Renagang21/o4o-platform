@@ -33,6 +33,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  nickname?: string;
+  phone?: string;
   roles: UserRole[];
   memberships?: { serviceKey: string; status: string }[];
   /** WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(demo_accounts) — 배지 · 안내 전용 */

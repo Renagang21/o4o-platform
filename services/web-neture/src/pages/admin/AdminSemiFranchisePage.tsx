@@ -17,6 +17,7 @@ interface EditForm {
   status: 'active' | 'closed';
   communityKey: string;
   paymentReceiverKey: string;
+  registrationConditions: string;
 }
 
 export default function AdminSemiFranchisePage() {
@@ -24,9 +25,9 @@ export default function AdminSemiFranchisePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<Msg>(null);
   const [busy, setBusy] = useState(false);
-  const [createForm, setCreateForm] = useState({ key: '', name: '', communityKey: '' });
+  const [createForm, setCreateForm] = useState({ key: '', name: '', communityKey: '', registrationConditions: '' });
   const [editKey, setEditKey] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<EditForm>({ name: '', status: 'active', communityKey: '', paymentReceiverKey: '' });
+  const [editForm, setEditForm] = useState<EditForm>({ name: '', status: 'active', communityKey: '', paymentReceiverKey: '', registrationConditions: '' });
   const [operatorInput, setOperatorInput] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
@@ -67,10 +68,11 @@ export default function AdminSemiFranchisePage() {
           key: createForm.key.trim(),
           name: createForm.name.trim(),
           communityKey: createForm.communityKey.trim() || undefined,
+          registrationConditions: createForm.registrationConditions.trim(),
         }),
       '세미프랜차이즈를 만들었습니다.',
     );
-    if (ok) setCreateForm({ key: '', name: '', communityKey: '' });
+    if (ok) setCreateForm({ key: '', name: '', communityKey: '', registrationConditions: '' });
   };
 
   const startEdit = (sf: SemiFranchise) => {
@@ -80,6 +82,7 @@ export default function AdminSemiFranchisePage() {
       status: sf.status,
       communityKey: sf.community_key ?? '',
       paymentReceiverKey: sf.payment_receiver_key ?? '',
+      registrationConditions: sf.registration_conditions ?? '',
     });
   };
 
@@ -88,6 +91,7 @@ export default function AdminSemiFranchisePage() {
       name: editForm.name.trim(),
       status: editForm.status,
       communityKey: editForm.communityKey.trim() || null,
+      registrationConditions: editForm.registrationConditions.trim(),
     };
     // 수취 주체 키는 바뀐 경우에만 보낸다(빈 값 = 미정으로 되돌림).
     if ((sf.payment_receiver_key ?? '') !== editForm.paymentReceiverKey.trim()) {
@@ -139,6 +143,7 @@ export default function AdminSemiFranchisePage() {
             value={createForm.communityKey}
             onChange={(e) => setCreateForm({ ...createForm, communityKey: e.target.value })}
           />
+          <textarea aria-label="서비스 가입 조건" className={INPUT} maxLength={4000} placeholder="운영자와 협의한 가입 조건" value={createForm.registrationConditions} onChange={(e) => setCreateForm({ ...createForm, registrationConditions: e.target.value })} />
           <button
             type="button"
             disabled={busy || !createForm.key.trim() || !createForm.name.trim()}
@@ -199,6 +204,7 @@ export default function AdminSemiFranchisePage() {
                       />
                     </label>
                   </div>
+                  <textarea aria-label="서비스 가입 조건 수정" className={INPUT} maxLength={4000} value={editForm.registrationConditions} onChange={(e) => setEditForm({ ...editForm, registrationConditions: e.target.value })} />
                   <div className="flex gap-2">
                     <button
                       type="button"

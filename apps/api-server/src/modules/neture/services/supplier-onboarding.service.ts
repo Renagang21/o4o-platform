@@ -144,7 +144,7 @@ export class SupplierOnboardingService {
 
     const originalName = decodeOriginalName(file.originalname || 'document.pdf');
     const ext = path.extname(originalName).toLowerCase();
-    if (file.mimetype !== 'application/pdf' && ext !== '.pdf') {
+    if (file.mimetype !== 'application/pdf' || ext !== '.pdf' || file.buffer.subarray(0, 5).toString() !== '%PDF-') {
       return { success: false as const, error: 'PDF_ONLY' };
     }
 

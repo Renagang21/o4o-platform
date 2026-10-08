@@ -24,7 +24,7 @@ function makeDataSource(fx: Fixture) {
     query: jest.fn(async (sql: string) => {
       if (sql.includes('FROM organization_members')) return fx.canonical ?? [];
       if (sql.includes('FROM neture_suppliers')) return (fx.suppliers ?? []).map((r, i) => ({ id: `legacy-${i}`, organization_id: null, ...r }));
-      if (sql.includes('FROM service_memberships')) return fx.memberships ?? [];
+      if (sql.includes('FROM users u')) return [{ account_status: 'active', account_active: true, email_verified: true, membership_status: fx.memberships?.[0]?.status ?? null }];
       return [];
     }),
   } as any;
@@ -35,7 +35,7 @@ describe('resolveNetureServiceStates — 공급자 단일 출처', () => {
     const ds = makeDataSource({ memberships: [{ role: 'member', status: 'active' }] });
     await expect(resolveNetureServiceStates(ds, 'u1')).resolves.toEqual({
       supplier: { status: 'none', source: 'none' },
-      netureMain: { status: 'active', source: 'service_memberships' },
+      netureMain: { status: 'active', source: 'account_verification' },
     });
   });
 
@@ -45,13 +45,13 @@ describe('resolveNetureServiceStates — 공급자 단일 출처', () => {
       const ds = makeDataSource({ memberships: [{ role: 'supplier', status }] });
       const r = await resolveNetureServiceStates(ds, 'u1');
       expect(r.supplier).toEqual({ status: 'none', source: 'none' });
-      expect(r.netureMain).toEqual({ status, source: 'service_memberships' });
+      expect(r.netureMain).toEqual({ status: status === 'suspended' ? 'suspended' : 'active', source: 'account_verification' });
     },
   );
 
   it('Neture 가입 row 가 없으면 netureMain=none', async () => {
     const r = await resolveNetureServiceStates(makeDataSource({}), 'u1');
-    expect(r.netureMain).toEqual({ status: 'none', source: 'none' });
+    expect(r.netureMain).toEqual({ status: 'active', source: 'account_verification' });
   });
 
   it('공급자 ACTIVE 행이 있으면 supplier=active', async () => {

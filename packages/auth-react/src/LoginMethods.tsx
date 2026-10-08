@@ -8,6 +8,7 @@
  */
 import type { CSSProperties, ReactNode } from 'react';
 import { GoogleContinue, type GoogleContinueProps } from './GoogleContinue';
+import { DemoLoginButtons } from './DemoLoginButtons';
 import { EmailLoginForm } from './email/EmailLoginForm';
 import type { EmailAuthApi, EmailAuthLinks } from './email/shared';
 import type { AuthLoginResult } from './types';
@@ -65,6 +66,7 @@ export function LoginMethods<TUser = unknown>({
         <span style={rule} />또는<span style={rule} />
       </div>
       <GoogleContinue<TUser> {...google} hint={hint} onSuccess={({ user }) => onSuccess(user)} />
+      <DemoLoginButtons loginWithEmail={loginWithEmail} onSuccess={onSuccess} onFailure={onEmailFailure} />
     </div>
   );
 }

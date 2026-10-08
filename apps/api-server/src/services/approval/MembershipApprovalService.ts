@@ -487,7 +487,7 @@ export class MembershipApprovalService {
           role: memberRole,
           serviceKey: membership.service_key,
         });
-      } else if (isNetureConnectedServiceRole(membership.service_key, memberRole)) {
+      } else if (isNetureConnectedServiceRole(membership.service_key, memberRole) || (membership.service_key === 'kpa-society' && memberRole === 'kpa:store_owner')) {
         logger.info('[APPROVAL][STEP3] neture connected-service role grant SKIPPED', { userId, role: memberRole });
       } else {
         const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
@@ -1026,7 +1026,7 @@ export class MembershipApprovalService {
           });
           continue;
         }
-        if (isNetureConnectedServiceRole(membership.service_key, memberRole)) {
+        if (isNetureConnectedServiceRole(membership.service_key, memberRole) || (membership.service_key === 'kpa-society' && memberRole === 'kpa:store_owner')) {
           logger.info('[REACTIVATE][STEP3] neture connected-service role restore SKIPPED', { userId, role: memberRole });
           continue;
         }
@@ -1041,35 +1041,14 @@ export class MembershipApprovalService {
         }
       }
 
-      // STEP3.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
-      //   suspendMembership STEP2.5 에서 kpa:store_owner 를 deactivate 했으므로, 재활성화 시에도
-      //   동일 정책으로 복원. 단:
-      //     (a) activity_type='pharmacy_owner' (SSOT = kpa_pharmacist_profiles) 인 경우만
-      //     (b) deactivated row 가 존재할 때만 in-place 활성화 (UPDATE only — INSERT 없음)
-      //   부여 자체는 별도 트리거 (PATCH /:id/status pending→active 자동활성화,
-      //   PATCH /:id/info activity_type 전환) 가 담당. 본 단계는 "정지 직전 상태 복귀" 만 수행.
-      //
-      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
-      //   SUSPEND STEP2.5 를 5개 서비스 대칭으로 확장했으므로 복구도 같은 축으로 맞춘다.
-      //   전 서비스 공통으로 **비활성 row 가 있을 때만** in-place 복구한다(INSERT 없음 —
-      //   activateRoleAssignment 의 restore-only 와 같은 원칙). kpa 만 추가로
-      //   kpa_pharmacist_profiles.activity_type='pharmacy_owner' 게이트를 유지한다
-      //   (다른 직역으로 전환한 회원의 매장 권한이 복구로 되살아나지 않게 하는 기존 계약).
+      // KPA membership never grants or restores Store pharmacy ownership.
       const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
-      let kpaStoreOwnerAllowed = false;
-      if (hasKpaSocietyMembership) {
-        const profileRows = await queryRunner.query(
-          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
-          [userId]
-        );
-        kpaStoreOwnerAllowed = profileRows?.[0]?.activity_type === 'pharmacy_owner';
-      }
 
       const restoreServiceKeys = Array.from(
         new Set<string>(selectResult.map((m: any) => m.service_key as string))
       );
       for (const svcKey of restoreServiceKeys) {
-        if (svcKey === 'kpa-society' && !kpaStoreOwnerAllowed) continue;
+        if (svcKey === 'kpa-society') continue;
         // neture:store_owner = 내 매장(약국) 승인 표식 — Neture 가입 재활성화가 되살리지 않는다(§10 A3).
         if (svcKey === 'neture') continue;
         const storeOwnerRole = `${resolveRolePrefixFromCanonicalServiceKey(svcKey)}:store_owner`;

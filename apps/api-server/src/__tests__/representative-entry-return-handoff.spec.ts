@@ -50,6 +50,7 @@ jest.mock('../utils/token.utils.js', () => ({
 }));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
+  readUserMembershipsWithMainAccess: (id: string) => query(`SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`, [id]),
   persistRefreshTokenFamily: (...a: unknown[]) => persistRefreshTokenFamily(...a),
 }));
 const setAuthCookies = jest.fn();
@@ -175,17 +176,16 @@ describe('B. generateHandoff', () => {
     [[{ status: 'suspended' }], 'HANDOFF_TARGET_NOT_ACTIVE'],
     [[{ status: 'rejected' }], 'HANDOFF_TARGET_NOT_ACTIVE'],
     [[{ status: 'withdrawn' }], 'HANDOFF_TARGET_WITHDRAWN'],
-  ])('일반 서비스 target 은 기존 계약 그대로 — membership %j → 403 %s · 토큰 INSERT 0', async (rows, code) => {
-    query.mockResolvedValueOnce(rows);
+  ])('서비스 가입 상태 %j 와 무관하게 인증 이동 허용 · 가입 원장 변경 없음 (%s)', async (rows, code) => {
+    query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'pharmacy-hub' }, 'https://neture.co.kr'), res);
-    expect([res.statusCode, res.body.code]).toEqual([403, code]);
-    expect(query).toHaveBeenCalledTimes(1);
-    expect(sqlCalls()[0]).toContain('SELECT status FROM service_memberships');
+    expect(res.statusCode).toBe(200);
+    expect(sqlCalls().join(' ')).not.toMatch(/INSERT INTO service_memberships|UPDATE service_memberships/);
   });
 
   it('일반 서비스 target + active → 200 (회귀 0)', async () => {
-    query.mockResolvedValueOnce([{ status: 'active' }]).mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
@@ -328,7 +328,7 @@ describe('C. exchangeHandoff', () => {
     query.mockResolvedValueOnce(KPA_ONLY_MEMBERSHIPS); // pharmacy-hub membership 없음
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacyhub.co.kr', undefined), res);
-    expect([res.statusCode, res.body.code]).toEqual([403, 'HANDOFF_TARGET_NO_MEMBERSHIP']);
-    expect(generateTokens).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(200);
+    expect(generateTokens).toHaveBeenCalled();
   });
 });

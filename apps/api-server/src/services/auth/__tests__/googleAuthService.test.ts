@@ -134,7 +134,7 @@ function identityFor(map: Record<string, Partial<VerifiedGoogleIdentity> | Googl
 }
 
 const META = { ipAddress: '127.0.0.1', userAgent: 'jest' };
-const CONSENTS = { terms: true, privacy: true };
+const CONSENTS = { name: '테스트회원', phone: '01012345678', terms: true, privacy: true };
 
 function seedUser(store: Store, over: Row = {}): Row {
   const u = Object.assign(new User(), {
@@ -185,8 +185,15 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     semiFranchiseResolver = jest.fn(async (_userId: string, key: string) => decideSemiFranchiseAccess(key, semiFranchiseRows));
   });
 
+  it.each(['', '   ', 'x'.repeat(101)])('signup rejects a missing or oversized name before creating an account', async (name) => {
+    build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
+    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, name }, ...META })).rejects.toMatchObject({ code: 'INVALID_NAME' });
+    expect(store.users).toHaveLength(0);
+    expect(store.linked).toHaveLength(0);
+  });
+
   // ── signup ────────────────────────────────────────────────────────────────
-  it('signup · 신규 sub → users + linked_accounts 생성, password 키 자체 없음, name NULL, picture 미저장, role/membership 0', async () => {
+  it('signup · 신규 sub → users + linked_accounts 생성, password 키 자체 없음, 입력 이름·모바일 저장, picture 미저장, role/membership 0', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
 
     const session = await svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, marketing: true }, ...META });
@@ -199,7 +206,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     //   구 계약은 `password: null` 을 명시적으로 기록하는 것이었다. 컬럼이 B-2 에서 사라지므로
     //   이제는 **키 자체를 만들지 않는다**. 다시 생기면 password 축이 부활한 것이다.
     expect('password' in u).toBe(false);
-    expect(u.name).toBeNull();
+    expect(u.name).toBe('테스트회원');
+    expect(u.phone).toBe('01012345678');
     expect(u.status).toBe('active');
     expect(u.isEmailVerified).toBe(true);
     expect(u.tosAcceptedAt).toBeInstanceOf(Date);

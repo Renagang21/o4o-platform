@@ -18,7 +18,7 @@
  * ⑦ 은 2026-10-02 에 좁혔다(WO-O4O-DEMO-ACCOUNT-ROLE-CONTRACT-UPDATE-AND-CI-RECOVERY-V1).
  * 종전 단언은 "소스에 `role_assignments` 라는 글자가 없다" 였다 — 그 때는 CLI 가 role 을 아예
  * 부여하지 않았기 때문이다. 이후 정본 정책이 **service-scoped role 허용**으로 바뀌어 CLI 가
- * `kpa:store_owner` · `neture:supplier` 를 부여하게 되자, 코드가 아니라 **이 테스트가** 틀린
+ * `neture:store_owner` · `neture:supplier` 를 부여하게 되자, 코드가 아니라 **이 테스트가** 틀린
  * 것이 되어 main CI 를 red 로 만들었다. 지금은 금지를 넓게 거는 대신 **허용값을 정확히** 묶는다
  * — 보호는 약해지지 않고 더 구체적이 된다.
  */
@@ -139,7 +139,7 @@ describe('⑥ 멱등 · 선행 조건', () => {
 /**
  * ⑦ Demo role — service-scoped allowlist (정본: `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §18)
  *
- * 허용: `kpa:store_owner` · `neture:supplier` — 체험 화면에 들어가려면 필요하다.
+ * 허용: `neture:store_owner` · `neture:supplier` — 체험 화면에 들어가려면 필요하다.
  * 금지: `platform:*` · `admin` · `operator` · 그 밖의 모든 role.
  *
  * 이 블록은 "글자가 있다/없다" 로 정책을 정의하지 않는다. 소스에서 **실제 값**(allowlist 집합 ·
@@ -148,7 +148,7 @@ describe('⑥ 멱등 · 선행 조건', () => {
  */
 describe('⑦ Demo role — service-scoped allowlist', () => {
   /** 정본 허용값. 바뀌면 baseline §18 과 CLI 를 함께 고쳐야 한다. */
-  const CANONICAL_ALLOWED = ['kpa:store_owner', 'neture:supplier'];
+  const CANONICAL_ALLOWED = ['neture:store_owner', 'neture:supplier'];
 
   /** 권한 상승 성격의 role — naming convention(`<service>:<role>`) 기준 deterministic rule. */
   const isPrivileged = (role: string) =>
@@ -171,7 +171,7 @@ describe('⑦ Demo role — service-scoped allowlist', () => {
     return hits.flatMap((h) => [...h[1].matchAll(/'([^']+)'/g)].map((x) => x[1]));
   };
 
-  it('allowlist 는 정확히 2개 — kpa:store_owner · neture:supplier', () => {
+  it('allowlist 는 정확히 2개 — neture:store_owner · neture:supplier', () => {
     expect([...parseAllowlist()].sort()).toEqual([...CANONICAL_ALLOWED].sort());
   });
 

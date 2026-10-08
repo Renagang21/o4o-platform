@@ -1,3 +1,4 @@
+import { isPhoneShapeValid, normalizePhoneDigits } from '../../../common/auth/phone-shape.js';
 /**
  * Self Profile Controller — 플랫폼 공통 ACCOUNT_CORE 자기 수정 계약
  *
@@ -164,7 +165,11 @@ export class SelfProfileController {
     for (const field of SELF_PROFILE_EDITABLE_FIELDS) {
       if (!(field in body)) continue;
 
-      const value = normalizeText(body[field]);
+      let value = normalizeText(body[field]);
+      if (field === 'phone') {
+        if (!isPhoneShapeValid(value)) { res.status(400).json({ success: false, code: 'VALIDATION_FAILED', error: '개인 휴대전화 번호를 입력해 주세요.' }); return; }
+        value = normalizePhoneDigits(value);
+      }
       if (value === undefined) {
         res.status(400).json({
           success: false,

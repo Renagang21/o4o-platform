@@ -161,7 +161,7 @@ export const O4O_SERVICES: O4OService[] = [
     // 이 호스트 밖에서 이용 자격이 생긴다 — 미자격 사용자에게 이 호스트 세션을 주지 않는다.
     //   Neture 약국은 store.neture.co.kr 에서 내 매장(약국) 신청 · pharmacy 세미프랜차이즈 가입을 신청하며 kpa-society
     //   service_membership 은 생기지 않는다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §17) → 아래 semiFranchiseAccessKey.
-    loginMembershipRequired: true,
+    loginMembershipRequired: false,
     semiFranchiseAccessKey: 'pharmacy',
     // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
@@ -177,7 +177,7 @@ export const O4O_SERVICES: O4OService[] = [
     // 운영 종료(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — 신규 가입 · 매장/운영자 업무공간 진입을 닫는다.
     //   row 는 retired identity 로 남긴다: serviceKey · cosmetics:* role · 기존 membership · DB 는 후속 정리 대상(이번 범위 밖).
     joinEnabled: false,
-    loginMembershipRequired: true,
+    loginMembershipRequired: false,
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
   /**

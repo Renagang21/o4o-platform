@@ -762,7 +762,7 @@ export default function O4OHomePage() {
           <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
           {netureGateStatus ? (
-            <NetureMembershipNotice status={netureGateStatus} onApplied={entry.reload} />
+            <NetureMembershipNotice status={netureGateStatus} />
           ) : (
             <>
               {introBanner}

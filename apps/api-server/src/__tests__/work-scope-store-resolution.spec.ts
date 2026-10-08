@@ -225,7 +225,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
   });
 
   it('7-b. 매장 축이 없는 서비스(neture)는 STORE_IDENTITY_NOT_SUPPORTED 이고 매장 질의를 하지 않는다', async () => {
-    const { dataSource, calls } = makeDataSource([ACTIVE]);
+    const { dataSource, calls } = makeDataSource([[{ account_status: 'active', account_active: true, email_verified: true }]]);
 
     const result = await resolveWorkScopeStore(dataSource, {
       userId: 'user-1',

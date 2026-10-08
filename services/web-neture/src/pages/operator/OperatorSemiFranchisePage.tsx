@@ -301,6 +301,8 @@ export default function OperatorSemiFranchisePage() {
                   <tr key={m.id}>
                     <td className={TD}>
                       <div className="font-medium text-gray-900">{m.organizationName || '-'}</div>
+                      {m.application?.note && <p className="text-xs whitespace-pre-wrap">신청 내용: {m.application.note}</p>}
+                      {m.application?.conditions && <p className="text-xs whitespace-pre-wrap">신청 시 가입 조건: {m.application.conditions}</p>}
                       {m.organizationAddress && <div className="text-xs text-gray-500">{m.organizationAddress}</div>}
                     </td>
                     <td className={TD}>{m.businessNumber || '-'}</td>

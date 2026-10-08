@@ -23,6 +23,7 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
+import { requireNetureMainMembership } from '../../../middleware/neture-main-membership.middleware.js';
 import type { DataSource } from 'typeorm';
 import {
   resolveSupplierForUser,
@@ -126,6 +127,9 @@ export function createRequireActiveSupplier(dataSource: DataSource) {
       });
       return;
     }
+    let eligible = false;
+    await requireNetureMainMembership(dataSource)(req, res, () => { eligible = true; });
+    if (!eligible) return;
     next();
   };
 }

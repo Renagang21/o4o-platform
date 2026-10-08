@@ -177,7 +177,7 @@ function seed(
 
 /** Neture 메인 승인 · 재활성화가 건드리지 않는 연결 서비스 역할 (MembershipApprovalService NETURE_CONNECTED_SERVICE_ROLES) */
 const isNetureConnected = (serviceKey: string, role: string) =>
-  serviceKey === 'neture' && role === 'store_owner';
+  (serviceKey === 'neture' || serviceKey === 'kpa-society') && role === 'store_owner';
 
 const grantedRoles = () => db.roles.filter((r) => r.is_active).map((r) => r.role);
 
@@ -204,7 +204,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
       async (role) => {
         seed(serviceKey, role, 'pending');
         await approve();
-        // neture store_owner 는 연결 서비스(내 매장(약국)) 역할 — Neture 승인이 부여하지 않는다 (§10 A2)
+        // neture/KPA store_owner 는 별도 약국 승인에 속하며 연결 서비스(내 매장(약국)) 역할 — Neture 승인이 부여하지 않는다 (§10 A2)
         const expected = isNetureConnected(serviceKey, role) ? [] : [`${prefix}:${role}`];
         expect(grantedRoles()).toEqual(expected);
       },
@@ -215,7 +215,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
       async (role) => {
         seed(serviceKey, role, 'suspended', `${prefix}:${role}`);
         await reactivate();
-        // neture store_owner 는 Neture 재활성화가 복구하지 않는다 (§10 A3)
+        // neture/KPA store_owner 는 별도 약국 승인에 속하며 Neture 재활성화가 복구하지 않는다 (§10 A3)
         const expected = isNetureConnected(serviceKey, role) ? [] : [`${prefix}:${role}`];
         expect(grantedRoles()).toEqual(expected);
       },

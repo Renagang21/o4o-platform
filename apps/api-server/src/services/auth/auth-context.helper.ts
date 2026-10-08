@@ -1,3 +1,4 @@
+import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { AppDataSource } from '../../database/connection.js';
 import { compatPrimaryRole } from '../../utils/compat-primary-role.js';
 import { readServiceSessionEpoch } from './service-session-epoch.js';
@@ -20,6 +21,17 @@ export interface UserContext {
   memberships: { serviceKey: string; status: string; role?: string }[];
 }
 
+/** Main membership is a read projection of email/account eligibility, never a ledger write. */
+export async function readUserMembershipsWithMainAccess(userId: string): Promise<UserContext['memberships']> {
+  const [memberships, mainStatus] = await Promise.all([
+    AppDataSource.query(`SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`, [userId]) as Promise<UserContext['memberships']>,
+    getNetureMainMembershipStatus(AppDataSource, userId),
+  ]);
+  const services = memberships.filter((membership) => membership.serviceKey !== 'neture');
+  if (mainStatus !== 'none') services.push({ serviceKey: 'neture', status: mainStatus, role: 'member' });
+  return services;
+}
+
 /**
  * Freshen user roles and service memberships from DB.
  * Used on every token generation to ensure JWT contains latest state.
@@ -27,10 +39,7 @@ export interface UserContext {
 export async function freshenUserContext(userId: string): Promise<UserContext> {
   const [roles, memberships] = await Promise.all([
     roleAssignmentService.getRoleNames(userId),
-    AppDataSource.query(
-      `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
-      [userId],
-    ) as Promise<{ serviceKey: string; status: string; role?: string }[]>,
+    readUserMembershipsWithMainAccess(userId),
   ]);
   return { roles, memberships };
 }

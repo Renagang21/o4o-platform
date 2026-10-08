@@ -1,3 +1,4 @@
+import { getNetureMainMembershipStatus } from './neture-main-membership.js';
 /**
  * Neture 공급자 서비스 이용 상태 해석기 (단일 출처)
  *
@@ -36,7 +37,7 @@ import { resolveSupplierForUser } from '../middleware/supplier-context.resolver.
 
 /** 서비스별 이용 상태 — 미가입 · 신청 중 · 승인·이용 중 · 반려 · 정지 · 탈퇴 */
 export type NetureServiceUsageStatus = 'none' | 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
-export type NetureServiceStateSource = 'neture_suppliers' | 'service_memberships' | 'none';
+export type NetureServiceStateSource = 'neture_suppliers' | 'account_verification' | 'service_memberships' | 'none';
 
 export interface NetureServiceState {
   status: NetureServiceUsageStatus;
@@ -104,18 +105,11 @@ export async function resolveNetureServiceStates(
 ): Promise<NetureServiceStates> {
   if (!userId) return { supplier: NONE, netureMain: NONE };
 
-  const [resolution, membershipRows] = await Promise.all([
+  const [resolution, mainStatus] = await Promise.all([
     resolveSupplierForUser(dataSource, userId, null),
-    dataSource.query(
-      `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'neture' LIMIT 1`,
-      [userId],
-    ) as Promise<Array<{ status: string }>>,
+    getNetureMainMembershipStatus(dataSource, userId),
   ]);
-
-  const membership = membershipRows[0];
-  const netureMain: NetureServiceState = membership
-    ? { status: mapMembershipStatus(membership.status), source: 'service_memberships' }
-    : NONE;
+  const netureMain: NetureServiceState = { status: mainStatus, source: 'account_verification' };
 
   let supplier: NetureServiceState = NONE;
   if (resolution.kind === 'resolved') {

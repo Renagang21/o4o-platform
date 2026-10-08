@@ -46,7 +46,12 @@ export default function SemiFranchisesPage() {
     setNetureRequired(false);
     setMessage(null);
     try {
-      if (action === 'apply') await neturePharmacyApi.applySemiFranchise(row.key);
+      if (action === 'apply') {
+        if (row.registrationConditions && !window.confirm(`${row.name} 가입 조건\n\n${row.registrationConditions}\n\n조건을 확인하고 가입을 신청하시겠습니까?`)) return;
+        const note = window.prompt('추가 신청 내용 (선택, 2000자 이내)', '');
+        if (note === null) return;
+        await neturePharmacyApi.applySemiFranchise(row.key, { acceptedConditions: true, conditions: row.registrationConditions || undefined, note });
+      }
       else await neturePharmacyApi.withdrawSemiFranchise(row.key);
       setMessage(action === 'apply' ? `${row.name} 가입을 신청했습니다. 담당 운영자 승인 후 이용할 수 있습니다.` : `${row.name} 가입을 ${row.membershipStatus === 'pending' ? '취소' : '탈퇴'}했습니다.`);
       await load();
@@ -94,7 +99,7 @@ export default function SemiFranchisesPage() {
                 const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
                   <tr key={r.key} className="border-b border-gray-100 last:border-0" data-testid={`semi-franchise-${r.key}`}>
-                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
                     <td className="px-4 py-3">
                       {st ? <StatusBadge status={st} /> : <span className="text-gray-400">미가입</span>}
                       {r.reason && <p className="mt-1 text-xs text-gray-500">사유: {r.reason}</p>}

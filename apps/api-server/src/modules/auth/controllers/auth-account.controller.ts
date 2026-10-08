@@ -4,6 +4,7 @@
  * Split from auth.controller.ts (WO-O4O-AUTH-CONTROLLER-SPLIT-V1)
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
+import { readUserMembershipsWithMainAccess } from '../../../services/auth/auth-context.helper.js';
 import { Response } from 'express';
 import { compatPrimaryRole } from '../../../utils/compat-primary-role.js';
 import { BaseController } from '../../../common/base.controller.js';
@@ -103,10 +104,7 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       const ud = userData as Record<string, unknown>;
       try {
-        ud.memberships = await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
-          [req.user.id]
-        );
+        ud.memberships = await readUserMembershipsWithMainAccess(req.user.id);
       } catch { ud.memberships = []; }
 
       // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §16:
@@ -327,10 +325,7 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       const ud = userData as Record<string, unknown>;
       try {
-        ud.memberships = await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
-          [req.user.id]
-        );
+        ud.memberships = await readUserMembershipsWithMainAccess(req.user.id);
       } catch { ud.memberships = []; }
 
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D

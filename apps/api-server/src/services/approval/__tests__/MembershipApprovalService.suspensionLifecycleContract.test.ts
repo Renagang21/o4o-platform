@@ -245,7 +245,12 @@ describe('§12 active → suspended → active 왕복', () => {
       expect(activeRoles()).not.toContain(storeOwnerRole);
 
       await reactivate([serviceKey]);
-      expect(activeRoles()).toContain(storeOwnerRole);
+      if (serviceKey === 'kpa-society') {
+        // KPA membership reactivation cannot restore pharmacy ownership.
+        expect(activeRoles()).not.toContain(storeOwnerRole);
+      } else {
+        expect(activeRoles()).toContain(storeOwnerRole);
+      }
     },
   );
 

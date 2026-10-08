@@ -51,9 +51,9 @@ const DEMOS = [
     name: '매장 경영자 Demo',
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
-    serviceKeys: ['kpa-society', 'neture'],
-    /** isStoreOwner('kpa') 의 STORE_OWNER_ROLES_BY_SERVICE.kpa — store-contents · store-playlists 진입 자격. */
-    roles: ['kpa:store_owner'],
+    serviceKeys: ['kpa-society', 'neture', 'lecture', 'community'],
+    /** Approved Store pharmacy marker; unrelated to KPA personal membership. */
+    roles: ['neture:store_owner'],
   },
   {
     demoType: 'SUPPLIER' as const,
@@ -62,7 +62,7 @@ const DEMOS = [
     /** 기존 조직을 쓰지 않는다 — 셋 다 실제 주문·실제 신청과 얽혀 있다(§주석 상단). 새로 만든다. */
     organizationId: null,
     newOrganization: { name: 'O4O 공급자 Demo', code: 'O4O-SUPPLIER-DEMO', type: 'supplier' },
-    serviceKeys: ['supplier', 'neture'],
+    serviceKeys: ['supplier', 'neture', 'lecture', 'community'],
     /** web-neture SupplierRoute 의 SUPPLIER_ROLES 정본(NETURE_ROLES.SUPPLIER). 데이터 범위는 위 ownership 이 정한다. */
     roles: ['neture:supplier'],
   },
@@ -78,7 +78,7 @@ const FORBIDDEN_USER_PREFIXES = ['cfd2a5e7', 'c0156a4a', '322667c8'];
  * Demo 여부는 demo_accounts 가, 화면 접근은 이 role 이, 데이터 범위는 ownership 이 정한다
  * (route guard 를 Demo 라는 이유로 우회하지 않는다).
  */
-const ALLOWED_DEMO_ROLES: ReadonlySet<string> = new Set(['kpa:store_owner', 'neture:supplier']);
+const ALLOWED_DEMO_ROLES: ReadonlySet<string> = new Set(['neture:store_owner', 'neture:supplier']);
 
 function createDataSource(): DataSource {
   const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
@@ -246,6 +246,20 @@ async function run(): Promise<void> {
           `INSERT INTO neture_suppliers (slug, status, organization_id, representative_name)
            VALUES ($1, 'ACTIVE', $2, $3)`,
           ['o4o-supplier-demo', orgId, demo.name],
+        );
+        writes += 1;
+      }
+    }
+
+    // Demo registry is explicit synthetic provisioning; normal pharmacy signup still requires evidence and review.
+    if (demo.demoType === 'STORE_OWNER' && userId && orgId) {
+      const pharmacy = await one(`SELECT id FROM neture_pharmacy_memberships WHERE organization_id = $1`, [orgId]);
+      if (!pharmacy && APPLY) {
+        await ds.query(
+          `INSERT INTO neture_pharmacy_memberships (organization_id, applicant_user_id, status,
+             pharmacy_name, business_number, pharmacist_license_number, reason)
+           VALUES ($1, $2, 'active', $3, '0000000000', 'DEMO-ONLY', 'Synthetic public experience account')`,
+          [orgId, userId, demo.name],
         );
         writes += 1;
       }
