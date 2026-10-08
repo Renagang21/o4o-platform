@@ -20,7 +20,8 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     if (owner.length !== 1 || supplier.length !== 1 || demos.length !== 2) {
       throw new Error('Demo repair requires exactly one active account of each type');
     }
-    const orgs = await q.query(`SELECT id FROM organizations WHERE id = $1 FOR UPDATE`,
+    const orgs = await q.query(`SELECT id FROM organizations WHERE id = $1
+      AND (name LIKE '%테스트%' OR name LIKE '%Demo%') FOR UPDATE`,
       ['9c87f46b-57a1-4afe-80bd-60782c49ce96']);
     const suppliers = await q.query(`SELECT s.id, s.organization_id FROM neture_suppliers s
       JOIN organizations o ON o.id = s.organization_id
@@ -39,6 +40,21 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     const franchiseId = franchises[0].id;
     const existingMembers = await q.query(`SELECT * FROM organization_members
       WHERE organization_id = $1 AND user_id = $2 FOR UPDATE`, [orgId, owner[0].user_id]);
+    // Orphan historical memberships confer no access; every surviving operator must be this Demo.
+    const operators = await q.query(`SELECT m.id,m.user_id,m.role FROM organization_members m
+      JOIN users u ON u.id=m.user_id WHERE m.organization_id=$1 AND m.left_at IS NULL
+        AND m.role IN ('owner','admin','manager') FOR UPDATE OF m,u`, [orgId]);
+    if (operators.some((m: { user_id: string }) => m.user_id !== owner[0].user_id)) {
+      throw new Error('Demo repair refuses an organization managed by another surviving user');
+    }
+    // The prior census identified this explicitly labelled test supplier. Never select arbitrary
+    // private supplier rows, even though the current user classified existing data as test data.
+    const sources = await q.query(`SELECT s.id FROM neture_suppliers s
+      JOIN organizations o ON o.id=s.organization_id
+      WHERE o.id::text LIKE '95aad740%' AND o.name LIKE '%테스트%' AND s.id<>$1
+      FOR UPDATE OF s,o`, [supplierId]);
+    if (sources.length > 1) throw new Error('Demo sample source census is ambiguous');
+    const sourceIds = sources.map((s: { id: string }) => s.id);
     const ledger = await q.query(`SELECT * FROM neture_pharmacy_memberships
       WHERE organization_id = $1 FOR UPDATE`, [orgId]);
     if (existingMembers.length > 1 || ledger.length > 1 ||
@@ -55,6 +71,8 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     // Census and before-images remain in the DB, never in public CI logs.
     const before = {
       organization_members: existingMembers,
+      surviving_operators: operators,
+      allowed_sample_supplier_ids: sourceIds,
       neture_pharmacy_memberships: ledger,
       semi_franchise_memberships: await q.query(`SELECT * FROM semi_franchise_memberships
         WHERE organization_id=$1 AND semi_franchise_id=$2 FOR UPDATE`, [orgId, franchiseId]),
@@ -100,15 +118,15 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
         x.consumer_short_description,x.consumer_detail_description,x.business_short_description,x.business_detail_description,
         'PRIVATE','PENDING',false,false
       FROM (SELECT DISTINCT ON (s.master_id) s.* FROM supplier_product_offers s
-        WHERE s.supplier_id <> $1 AND s.deleted_at IS NULL AND NOT EXISTS (
+        WHERE s.supplier_id=ANY($2::uuid[]) AND s.deleted_at IS NULL AND NOT EXISTS (
           SELECT 1 FROM supplier_product_offers d WHERE d.supplier_id=$1 AND d.master_id=s.master_id)
         ORDER BY s.master_id,s.created_at,s.id LIMIT 5) x
-      RETURNING id`, [supplierId]) : [];
+      RETURNING id`, [supplierId, sourceIds]) : [];
     const library = before.library_count === 0 ? await q.query(`INSERT INTO neture_supplier_library_items
       (supplier_id,title,description,file_url,file_name,file_size,mime_type,category,content_type,blocks,is_public,visibility)
       SELECT $1,title,description,file_url,file_name,file_size,mime_type,category,content_type,blocks,false,'personal'
-      FROM neture_supplier_library_items WHERE supplier_id <> $1
-      ORDER BY created_at,id LIMIT 5 RETURNING id`, [supplierId]) : [];
+      FROM neture_supplier_library_items WHERE supplier_id=ANY($2::uuid[])
+      ORDER BY created_at,id LIMIT 5 RETURNING id`, [supplierId, sourceIds]) : [];
     const after = {
       organization_members: await q.query(`SELECT * FROM organization_members WHERE organization_id=$1 AND user_id=$2`, [orgId, owner[0].user_id]),
       neture_pharmacy_memberships: await q.query(`SELECT * FROM neture_pharmacy_memberships WHERE organization_id=$1`, [orgId]),

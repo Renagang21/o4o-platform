@@ -26,11 +26,14 @@ integration('canonical Demo repair (isolated PostgreSQL)', () => {
     ownerId = (await q.query(`INSERT INTO users(email,name) VALUES ('owner@fixture.invalid','Fixture owner') RETURNING id`))[0].id;
     const supplierUser = (await q.query(`INSERT INTO users(email,name) VALUES ('supplier@fixture.invalid','Fixture supplier') RETURNING id`))[0].id;
     await q.query(`INSERT INTO demo_accounts(user_id,demo_type) VALUES ($1,'STORE_OWNER'),($2,'SUPPLIER')`, [ownerId, supplierUser]);
-    await q.query(`INSERT INTO organizations(id,code,name,type) VALUES ($1,'FIXTURE-PHARMACY','Fixture pharmacy','pharmacy')`, [orgId]);
+    await q.query(`INSERT INTO organizations(id,code,name,type) VALUES ($1,'FIXTURE-PHARMACY','테스트 약국 fixture','pharmacy')`, [orgId]);
     const supplierOrg = (await q.query(`INSERT INTO organizations(code,name,type) VALUES ('O4O-SUPPLIER-DEMO','Fixture supplier','supplier') RETURNING id`))[0].id;
     await q.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES ($1,$2,'owner')`, [supplierOrg, supplierUser]);
     supplierId = (await q.query(`INSERT INTO neture_suppliers(slug,status,organization_id) VALUES ('fixture-demo','ACTIVE',$1) RETURNING id`, [supplierOrg]))[0].id;
-    sourceId = (await q.query(`INSERT INTO neture_suppliers(slug,status) VALUES ('fixture-source','ACTIVE') RETURNING id`))[0].id;
+    const sourceOrg = (await q.query(`INSERT INTO organizations(id,code,name,type)
+      VALUES ('95aad740-0000-4000-8000-000000000001','FIXTURE-SOURCE','공급자 테스트 fixture','supplier') RETURNING id`))[0].id;
+    sourceId = (await q.query(`INSERT INTO neture_suppliers(slug,status,organization_id)
+      VALUES ('fixture-source','ACTIVE',$1) RETURNING id`, [sourceOrg]))[0].id;
     const master = (await q.query(`INSERT INTO product_masters(name,regulatory_name,manufacturer_name)
       VALUES ('Fixture sample','Fixture sample','Fixture maker') RETURNING id`))[0].id;
     await q.query(`INSERT INTO supplier_product_offers(master_id,supplier_id,slug,price_general)
@@ -90,5 +93,21 @@ integration('canonical Demo repair (isolated PostgreSQL)', () => {
     await q.rollbackTransaction();
     expect((await q.query(`SELECT count(*)::int AS n FROM organization_members WHERE user_id=$1`, [ownerId]))[0].n).toBe(0);
     expect((await q.query(`SELECT to_regclass('public.canonical_demo_repair_snapshots') AS name`))[0].name).toBeNull();
+  });
+
+  it('rejects another surviving operator of the target organization', async () => {
+    const other = (await q.query(`INSERT INTO users(email) VALUES ('other@fixture.invalid') RETURNING id`))[0].id;
+    await q.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES ($1,$2,'manager')`, [orgId, other]);
+    await expect(migration.up(q)).rejects.toThrow('another surviving user');
+    expect((await q.query(`SELECT count(*)::int AS n FROM canonical_demo_repair_snapshots`))[0].n).toBe(0);
+  });
+
+  it('does not copy another supplier private library', async () => {
+    const other = (await q.query(`INSERT INTO neture_suppliers(slug,status) VALUES ('fixture-private','ACTIVE') RETURNING id`))[0].id;
+    await q.query(`INSERT INTO neture_supplier_library_items(supplier_id,title,file_url,file_name,file_size,mime_type,created_at)
+      VALUES ($1,'Private outside source','https://example.invalid/private.pdf','private.pdf',10,'application/pdf','2000-01-01')`, [other]);
+    await migration.up(q);
+    const titles = await q.query(`SELECT title FROM neture_supplier_library_items WHERE supplier_id=$1`, [supplierId]);
+    expect(titles).toEqual([{ title: 'Fixture sample' }]);
   });
 });
