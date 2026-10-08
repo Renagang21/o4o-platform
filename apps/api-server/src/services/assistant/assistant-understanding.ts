@@ -260,14 +260,15 @@ function extractJsonObject(text: string): unknown {
 }
 
 // ─── 재개용 메모리 캐시(§17 — DB 비저장) ───────────────────────────────────
+// 키 = logical run id. 한 Task 가 여러 run 을 가질 수 있으므로 Task 로 묶으면 다른 run 의 이해로 재개 판정이 섞인다.
 
 const CACHE_TTL_MS = 2 * 60 * 60 * 1000;
 const CACHE_MAX = 1000;
 const understandingCache = new Map<string, { u: TaskUnderstanding; at: number }>();
 
-export function cacheUnderstanding(taskId: string, u: TaskUnderstanding, now = Date.now()): void {
-  understandingCache.delete(taskId);
-  understandingCache.set(taskId, { u, at: now });
+export function cacheUnderstanding(runId: string, u: TaskUnderstanding, now = Date.now()): void {
+  understandingCache.delete(runId);
+  understandingCache.set(runId, { u, at: now });
   while (understandingCache.size > CACHE_MAX) {
     const oldest = understandingCache.keys().next().value;
     if (oldest === undefined) break;
@@ -275,18 +276,18 @@ export function cacheUnderstanding(taskId: string, u: TaskUnderstanding, now = D
   }
 }
 
-export function cachedUnderstanding(taskId: string, now = Date.now()): TaskUnderstanding | null {
-  const hit = understandingCache.get(taskId);
+export function cachedUnderstanding(runId: string, now = Date.now()): TaskUnderstanding | null {
+  const hit = understandingCache.get(runId);
   if (!hit) return null;
   if (now - hit.at > CACHE_TTL_MS) {
-    understandingCache.delete(taskId);
+    understandingCache.delete(runId);
     return null;
   }
   return hit.u;
 }
 
-export function forgetUnderstanding(taskId: string): void {
-  understandingCache.delete(taskId);
+export function forgetUnderstanding(runId: string): void {
+  understandingCache.delete(runId);
 }
 
 /** 테스트 전용. */

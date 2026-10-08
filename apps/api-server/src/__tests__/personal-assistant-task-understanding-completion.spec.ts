@@ -99,7 +99,7 @@ jest.mock('@o4o/ai-core', () => ({ __esModule: true, execute: (...a: unknown[]) 
 
 import logger from '../utils/logger.js';
 import { buildPlannerUserPrompt, describeExecutionIntent } from '../services/ai-tools/work-agent-runtime.js';
-import { isIdentifyingQuote, normalizeEvidenceText, validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
+import { elementEvidenceText, isIdentifyingQuote, normalizeEvidenceText, validateWorkProposal, WORK_GOAL_MAX_LENGTH, type CompletionJudge, type ExecutionIntent, type ExecutionReport, type TaskUnderstanding } from '../services/ai-tools/work-agent-contract.js';
 import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assistant-planning.js';
 import {
   __resetUnderstandingCacheForTest,
@@ -545,13 +545,32 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(intent.completion.requires).toBe('criteria_evidence');
     expect(typeof judge).toBe('function');
     expect(out.task?.status).toBe('waiting_for_user');
-    expect(cachedUnderstanding(out.task!.taskId)).toMatchObject({ goal: U([]).goal });
+    expect(cachedUnderstanding('g_u1')).toMatchObject({ goal: U([]).goal });
 
     // 재개(사용자가 값을 답함) — 이해를 다시 세우지 않고 캐시를 쓴다.
     const exec2 = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_u1'));
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_u1' }, requestedTaskId: out.task!.taskId }, exec2, { understand });
     expect(understand).toHaveBeenCalledTimes(1);
     expect((exec2.mock.calls[0] as any)[2].understanding).toMatchObject({ criteria: [C1, C2_USER] });
+  });
+
+  it('같은 Task 의 다른 run 이 열려도 — 재개는 그 run 의 이해로 판정한다(캐시 키 = logical run)', async () => {
+    const C_B = { id: 'c1', text: '다른 요청 B 의 조건', evidence: 'observed' as const };
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_ra')), { understand: async () => U([C1, C2_USER]) });
+    // 같은 Task 로 새 요청 → run B 가 열린다(A 는 아직 질문 대기).
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '다른 요청' }, requestedTaskId: out.task!.taskId }, jest.fn(async () => waiting('g_rb')), { understand: async () => U([C_B]) });
+    expect(cachedUnderstanding('g_rb')).toMatchObject({ criteria: [C_B] });
+    // run A 재개 — B 의 이해가 아니라 A 의 이해.
+    const execA = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_ra'));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_ra' }, requestedTaskId: out.task!.taskId }, execA);
+    expect((execA.mock.calls[0] as any)[2].understanding).toMatchObject({ criteria: [C1, C2_USER] });
+  });
+
+  it('입력 · 선택 칸의 현재 값은 근거 모집단에 들어가지 않는다(이름 · 라벨만)', () => {
+    expect(elementEvidenceText({ elementRef: 'e_1', role: 'textbox', name: '제품명', text: '아모디핀정', hasValue: true } as any)).toBe('제품명');
+    expect(elementEvidenceText({ elementRef: 'e_2', role: 'custom', name: '제품명', text: '아모디핀정', editable: true } as any)).toBe('제품명');
+    expect(elementEvidenceText({ elementRef: 'e_3', role: 'combobox', name: '규격', text: '5mg' } as any)).toBe('규격');
+    expect(elementEvidenceText({ elementRef: 'e_4', role: 'text', name: '결과', text: '아모디핀정 5mg' } as any)).toBe('결과 아모디핀정 5mg');
   });
 
   it('다른 인스턴스 재개(캐시 · 저장된 이해 모두 없음) — 종전 결과 근거로 조용히 닫지 않고 사용자 확인 조건 하나로 판정한다', async () => {
@@ -742,7 +761,7 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(localSetStatus).toHaveBeenCalledWith({ userId: ME, deviceId: 'dev-1' }, { runId: 'g_d1', status: 'completed' });
     expect(out.task?.status).toBe('completed');
     expect(out.reply.body.data).toMatchObject({ runId: 'g_d1', resumable: false, progress: 'completed', goal: { status: 'completed' } });
-    expect(cachedUnderstanding(first.task!.taskId)).toBeNull();
+    expect(cachedUnderstanding('g_d1')).toBeNull();
     const done = (logger.info as jest.Mock).mock.calls.find((c) => c[0] === 'assistant task completion' && c[1].completedBy === 'user_declared');
     expect(done).toBeTruthy();
   });

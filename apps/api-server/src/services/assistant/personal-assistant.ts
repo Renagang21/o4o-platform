@@ -304,7 +304,7 @@ export async function runAssistantWorkTask(
         await rememberExecution(dataSource, {
           userId: input.userId, taskId: task.taskId, ownership, runId: String(input.workBody.runId), taskStatus: 'completed', memory: undefined,
         });
-        forgetUnderstanding(task.taskId);
+        forgetUnderstanding(String(input.workBody.runId));
         logCompletion({
           taskId: task.taskId, outcome: updated?.status ?? 'completed', completedBy: 'user_declared', understandingSource: 'none',
           criteria: 0, criteriaMet: 0, counters: newJudgeCounters(), report: undefined, questions: 0, totalMs: Date.now() - t0,
@@ -324,21 +324,21 @@ export async function runAssistantWorkTask(
   let understanding: TaskUnderstanding | null = null;
   let understandingSource: UnderstandingSource = 'none';
   if (resuming) {
-    understanding = task ? cachedUnderstanding(task.taskId) : null;
+    understanding = task ? cachedUnderstanding(String(input.workBody.runId)) : null;
     understandingSource = understanding ? 'cached' : 'none';
     // 이해를 세운 인스턴스가 아닌 곳에서 재개되면(캐시 없음) 질문 대기 run 의 재개 구조(M5)에 남긴 글 없는 구조(결과 형태 ·
     // 확정 경계)로 되살린다 — 원래 조건 글은 저장하지 않으므로 사용자 확인으로 닫고, 확정 업무는 확정 확인을 계속 요구한다.
     if (!understanding && task && memory.understanding) {
       understanding = memory.understanding;
       understandingSource = 'frame';
-      cacheUnderstanding(task.taskId, understanding);
+      cacheUnderstanding(String(input.workBody.runId), understanding);
     }
     // 그래도 없으면(이해 이전 저장분 · 만료 · 읽기 실패) 원래 조건을 알 수 없다 — 종전 결과 근거 규칙으로 조용히 닫지 않고
     // 사용자 확인 조건 하나로 판정한다(실행의 "끝났다" → 사용자 성공 확인). 원래 요청 원문은 재개에 오지 않고 저장하지 않는다(§17).
     if (!understanding && task) {
       understanding = resumeFallbackUnderstanding();
       understandingSource = 'resume_fallback';
-      cacheUnderstanding(task.taskId, understanding);
+      cacheUnderstanding(String(input.workBody.runId), understanding);
     }
   } else {
     const request = String(input.workBody.request ?? '');
@@ -361,7 +361,7 @@ export async function runAssistantWorkTask(
     // 사진이 붙은 요청 — 이해는 사진을 보지 않으므로 사진 속 대상과 결과가 맞는지는 사용자 확인으로 닫는다.
     understanding = enforceImageConfirmation(understanding, input.workBody.image !== undefined && input.workBody.image !== null);
     understandingSource = understanding.source;
-    if (task) cacheUnderstanding(task.taskId, understanding);
+    // 캐시는 logical run 키 — run id 는 실행이 연 뒤에야 알 수 있으므로 실행 결과에서 건다(아래).
   }
   const judge = understanding ? createCompletionJudge(understanding, { verify: deps.verify ?? null, counters }) : undefined;
 
@@ -418,6 +418,9 @@ export async function runAssistantWorkTask(
   const data = (reply.body.data ?? {}) as Record<string, unknown>;
   const goal = (data.goal ?? {}) as Record<string, unknown>;
   const target = (data.target ?? {}) as Record<string, unknown>;
+  // 재개용 이해 캐시는 Task 가 아니라 logical run 에 붙인다 — 같은 Task 의 다른 run 이 이 run 의 이해를 덮어쓰지 않게.
+  const runKey = typeof data.runId === 'string' && data.runId.length > 0 ? data.runId : null;
+  if (runKey && understanding) cacheUnderstanding(runKey, understanding);
   try {
     if (typeof data.runId === 'string') {
       await attachRunToTask(dataSource, { taskId: task.taskId, runId: data.runId, userId: input.userId });
@@ -444,7 +447,7 @@ export async function runAssistantWorkTask(
       fallbackTargetId: typeof target.targetId === 'string' ? target.targetId : typeof goal.siteId === 'string' ? goal.siteId : null,
     });
     const finalStatus = updated?.status ?? status;
-    if (isTerminalTaskStatus(finalStatus)) forgetUnderstanding(task.taskId);
+    if (isTerminalTaskStatus(finalStatus) && runKey) forgetUnderstanding(runKey);
     logCompletion({
       taskId: task.taskId,
       outcome: finalStatus,

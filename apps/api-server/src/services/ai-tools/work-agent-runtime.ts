@@ -53,6 +53,7 @@ import {
   validateWorkProposal,
   normalizeEvidenceText,
   isIdentifyingQuote,
+  elementEvidenceText,
   type CompletionJudge,
   type CompletionVerdict,
   type ExecutionEvidence,
@@ -820,7 +821,8 @@ export async function runWorkAgent(
   };
   const noteObservationSeen = (o: WorkObservation | null): void => {
     if (!o) return;
-    noteSeen((o.elements ?? []).map((e) => `${e.name ?? ''} ${e.text ?? ''}`).join('\n'));
+    // 입력 · 선택 칸의 현재 값은 근거가 아니다(elementEvidenceText) — 입력한 값이 섞인 인용으로 조건이 충족되지 않게.
+    noteSeen((o.elements ?? []).map(elementEvidenceText).join('\n'));
   };
   let lastEvidence: ExecutionEvidence[] = [];
   /** 이번 run 에서 화면 근거로 확인된(grounded) 조건별 근거 — 조건이 서로 다른 화면에서 확인돼도 앞 판정의 근거를 잃지 않는다. */

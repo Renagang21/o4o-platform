@@ -375,6 +375,16 @@ const INPUT_ROLES: readonly string[] = Object.freeze(['textbox', 'searchbox', 't
 const CLICK_ROLES: readonly string[] = Object.freeze(['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem']);
 const SELECT_ROLES: readonly string[] = Object.freeze(['combobox']);
 
+/**
+ * 완료 근거 모집단에 넣을 요소의 글 — 입력 · 선택 칸의 현재 값은 넣지 않는다(이름 · 라벨만).
+ * 입력 칸의 값은 Execution(또는 사용자)이 넣은 것이라 화면 결과가 아니다 — "제품명 아모디핀정" 처럼 값이 섞인 인용이
+ * 입력만으로 조건을 충족시키지 않게 한다(DOM: 입력 · 선택 role · hasValue / UIA: 값 패턴(editable) · hasValue).
+ */
+export function elementEvidenceText(e: WorkElement): string {
+  const valueBearing = e.hasValue === true || e.editable === true || INPUT_ROLES.includes(e.role) || SELECT_ROLES.includes(e.role);
+  return valueBearing ? `${e.name ?? ''}` : `${e.name ?? ''} ${e.text ?? ''}`;
+}
+
 function hasForbiddenKey(obj: unknown, depth = 0): boolean {
   if (!obj || typeof obj !== 'object' || depth > 3) return false;
   for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
