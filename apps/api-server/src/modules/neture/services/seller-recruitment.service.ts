@@ -10,9 +10,9 @@
  *
  *   Store 가 모집에 신청  →  Supplier 승인/반려
  *   승인 결과 = application.status=approved
- *             + C bridge: supplier_product_offers.allowed_seller_ids += 신청자 · 매장 OPL(source_type='seller_recruitment')
+ *             + 조직 없는 기존 신청만 C bridge: allowed_seller_ids · OPL(source_type='seller_recruitment')
  *             + in-app 알림
- *   참여 해지 = application.status=cancelled (decidedBy=공급자) + allowed_seller_ids 제거 + OPL 비활성
+ *   참여 해지 = application.status=cancelled (decidedBy=공급자). 기존 bridge가 있는 신청만 bridge 정리.
  *
  * 흐름(E2E 계약):
  *   Supplier 모집 생성 → Service Operator 노출 승인 → Store browse/apply → Supplier approve/reject/terminate
@@ -434,12 +434,14 @@ export class SellerRecruitmentService {
     }));
   }
 
-  /** WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 pending 철회. idempotent. */
+  /** 선택한 약국의 pending 신청 철회. 조직 없는 기존 신청만 신청자 본인으로 판정한다. */
   async cancelApplication(applicationId: string, applicantUserId: string, storeOrganizationId?: string) {
     const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
     if (!application) return { success: false as const, error: 'APPLICATION_NOT_FOUND' };
-    if (application.applicantId !== applicantUserId) return { success: false as const, error: 'NOT_OWNER' };
-    if (application.applicantOrganizationId && application.applicantOrganizationId !== storeOrganizationId) {
+    const canCancel = application.applicantOrganizationId
+      ? application.applicantOrganizationId === storeOrganizationId
+      : application.applicantId === applicantUserId;
+    if (!canCancel) {
       return { success: false as const, error: 'NOT_OWNER' };
     }
     if (application.status === ApplicationStatus.CANCELLED) {
@@ -449,7 +451,7 @@ export class SellerRecruitmentService {
 
     application.status = ApplicationStatus.CANCELLED;
     application.decidedAt = new Date();
-    application.decidedBy = applicantUserId; // 신청자 본인 철회
+    application.decidedBy = applicantUserId; // 현재 약국 권한을 가진 철회 작업자
     await this.applicationRepo.save(application);
     logger.info(`[SellerRecruitmentService] application cancelled by applicant: app=${applicationId}`);
     return { success: true as const, data: { applicationId } };
@@ -472,11 +474,13 @@ export class SellerRecruitmentService {
     }> = await AppDataSource.query(
       `SELECT a.id, a.applicant_id, a.applicant_name, a.status, a.applied_at, a.decided_at, a.decided_by, a.reason,
               u.name AS applicant_user_name, u.email AS applicant_email,
-              (SELECT o.name FROM organization_members om
+              COALESCE(org.name, (SELECT o.name FROM organization_members om
                  JOIN organizations o ON o.id = om.organization_id
-               WHERE om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1) AS organization_name
+               WHERE a.applicant_organization_id IS NULL
+                 AND om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1)) AS organization_name
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
        LEFT JOIN users u ON u.id = a.applicant_id
+       LEFT JOIN organizations org ON org.id = a.applicant_organization_id
        WHERE a.recruitment_id = $1
        ORDER BY a.applied_at DESC`,
       [recruitmentId],
@@ -587,8 +591,7 @@ export class SellerRecruitmentService {
    * 승인된 신청자의 모집 참여를 해지한다(= 신규 조달 노출 중단). 기존 주문 이력 유지.
    *  ① 소유권: recruitment.sellerId === supplierUserId, application=approved
    *  ② application → cancelled (decidedBy=공급자) — legacy 계약 행 대신 신청 행이 종결 상태를 보유
-   *  ③ offer.allowed_seller_ids 에서 신청자 userId 제거
-   *  ④ source_type='seller_recruitment' OPL is_active=false
+   *  ③ 조직 없는 기존 신청만 offer.allowed_seller_ids · seller_recruitment OPL 정리
    */
   async terminateParticipation(applicationId: string, supplierUserId: string) {
     const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
@@ -602,6 +605,27 @@ export class SellerRecruitmentService {
     application.decidedBy = supplierUserId;
     await this.applicationRepo.save(application);
 
+    // 조직 신청은 승인 행 자체가 공급 조건이다. 승인 때 만들지 않은 사용자
+    // bridge 를 정리하면 같은 사용자의 다른 약국 공급 권한까지 바뀐다.
+    if (!recruitment.semiFranchiseId && !application.applicantOrganizationId) {
+      await this.removeLegacyRecruitmentBridge(recruitment, application.applicantId, supplierUserId, applicationId);
+    }
+
+    await this.notifyApplicant(
+      application.applicantId,
+      'recruitment.participation_terminated',
+      '판매자 모집 참여가 해지되었습니다.',
+      `${recruitment.productName} 모집 제품의 조달 가능 상태가 종료되었습니다. 기존 주문 이력은 유지됩니다.`,
+      recruitment,
+      application.id,
+    );
+
+    return { success: true as const, data: { applicationId, participationTerminated: true } };
+  }
+
+  private async removeLegacyRecruitmentBridge(
+    recruitment: SellerRecruitment, applicantId: string, supplierUserId: string, applicationId: string,
+  ): Promise<void> {
     const offerRows: Array<{ id: string }> = await AppDataSource.query(
       `SELECT spo.id
        FROM supplier_product_offers spo
@@ -617,11 +641,11 @@ export class SellerRecruitmentService {
         `UPDATE supplier_product_offers
          SET allowed_seller_ids = array_remove(coalesce(allowed_seller_ids, '{}'), $1), updated_at = NOW()
          WHERE id = $2`,
-        [application.applicantId, offerId],
+        [applicantId, offerId],
       );
       const orgRows: Array<{ organization_id: string }> = await AppDataSource.query(
         `SELECT organization_id FROM organization_members WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
-        [application.applicantId],
+        [applicantId],
       );
       if (orgRows.length) {
         await AppDataSource.query(
@@ -631,21 +655,10 @@ export class SellerRecruitmentService {
           [offerId, orgRows[0].organization_id],
         );
       }
-      logger.info(`[Participation] terminated app=${applicationId} applicant=${application.applicantId} offer=${offerId}`);
+      logger.info(`[Participation] terminated app=${applicationId} applicant=${applicantId} offer=${offerId}`);
     } else {
       logger.warn(`[Participation] offer not found — allowedSellerIds/OPL cleanup skipped (app=${applicationId})`);
     }
-
-    await this.notifyApplicant(
-      application.applicantId,
-      'recruitment.participation_terminated',
-      '판매자 모집 참여가 해지되었습니다.',
-      `${recruitment.productName} 모집 제품의 조달 가능 상태가 종료되었습니다. 기존 주문 이력은 유지됩니다.`,
-      recruitment,
-      application.id,
-    );
-
-    return { success: true as const, data: { applicationId, participationTerminated: true } };
   }
 
   // ==================== internals ====================

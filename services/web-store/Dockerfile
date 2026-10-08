@@ -3,7 +3,7 @@
 # 선별 COPY: store-web 의 workspace 의존 closure 전부(신규 패키지 추가 시 package.json + source 두 줄 + 필요 시 build 한 줄).
 FROM node:22.18.0-alpine AS builder
 WORKDIR /app
-RUN npm install -g pnpm@10.25.0
+RUN npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
@@ -67,8 +67,9 @@ RUN pnpm exec vite build
 
 FROM node:22.18.0-alpine AS runner
 WORKDIR /app
-RUN npm install -g serve@14.2.4
+RUN npm install -g --ignore-scripts serve@14.2.4
 COPY --from=builder /app/services/web-store/dist ./dist
+USER node
 ENV PORT=8080
 EXPOSE 8080
 CMD ["serve", "-s", "dist", "-l", "8080"]

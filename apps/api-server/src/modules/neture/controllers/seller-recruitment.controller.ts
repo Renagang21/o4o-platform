@@ -207,7 +207,7 @@ export function createSellerRecruitmentController(deps: {
     }
   });
 
-  /** POST /applications/:id/cancel — 신청자 본인 pending 철회 (WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1) */
+  /** POST /applications/:id/cancel — 현재 권한을 확인한 약국의 pending 신청 철회 */
   router.post('/applications/:id/cancel', requireAuth, createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
@@ -217,7 +217,7 @@ export function createSellerRecruitmentController(deps: {
       if (!result.success) {
         const map: Record<string, [number, string]> = {
           APPLICATION_NOT_FOUND: [404, '신청을 찾을 수 없습니다.'],
-          NOT_OWNER: [403, '본인 신청만 취소할 수 있습니다.'],
+          NOT_OWNER: [403, '이 신청을 취소할 약국 권한이 없습니다.'],
           NOT_PENDING: [400, '심사 대기 중인 신청만 취소할 수 있습니다.'],
         };
         const [status, message] = map[result.error] || [400, '신청 취소에 실패했습니다.'];

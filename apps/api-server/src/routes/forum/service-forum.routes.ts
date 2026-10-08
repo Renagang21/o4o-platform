@@ -110,6 +110,9 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   // optionalAuth 가 먼저 실행돼야 컨텍스트 해석 시점에 userId 를 쓸 수 있다.
   router.use(optionalAuth as any);
   router.use(options.resolveContext ?? forumContextMiddleware(context));
+  // Static community aliases must protect every endpoint, including directory,
+  // stats, board ownership and closed-board membership administration.
+  if (communityKey) router.use(...communityGuards);
 
   const write: RequestHandler[] = [authenticate as any, ...communityGuards, ...writeGuards];
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (V7): **읽기도 같은 가입 승인 검사**를 지난다.

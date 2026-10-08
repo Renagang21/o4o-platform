@@ -1,14 +1,14 @@
 /** 약국 미지정 모집은 pharmacy, 지정 모집은 해당 사업 가입이 필요하다. */
-jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), error: jest.fn() } }));
+jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
 jest.mock('../modules/neture/entities/index.js', () => ({
   SellerRecruitment: class {}, SellerRecruitmentApplication: class {},
   RecruitmentStatus: { RECRUITING: 'recruiting' }, ExposureStatus: { APPROVED: 'approved' },
-  ApplicationStatus: { PENDING: 'pending', CANCELLED: 'cancelled' },
+  ApplicationStatus: { PENDING: 'pending', APPROVED: 'approved', CANCELLED: 'cancelled' },
   SELLER_RECRUITMENT_TABLE: 'seller_recruitments', SELLER_RECRUITMENT_APPLICATION_TABLE: 'seller_recruitment_applications',
 }));
 jest.mock('../modules/neture/services/service-audience.service.js', () => ({}));
-jest.mock('../services/NotificationService.js', () => ({ notificationService: {} }));
-jest.mock('../modules/neture/middleware/supplier-context.resolver.js', () => ({}));
+jest.mock('../services/NotificationService.js', () => ({ notificationService: { createNotification: jest.fn().mockResolvedValue({}) } }));
+jest.mock('../modules/neture/middleware/supplier-context.resolver.js', () => ({ listOwnedSupplierIds: jest.fn().mockResolvedValue(['owned-supplier']) }));
 
 import { AppDataSource } from '../database/connection.js';
 import { SellerRecruitmentService } from '../modules/neture/services/seller-recruitment.service.js';
@@ -134,6 +134,46 @@ describe('recruitment row membership', () => {
     await expect(service.cancelApplication('app', 'user-a', 'org-a')).resolves.toMatchObject({ success: true });
     expect(applicationRepo.save).toHaveBeenCalledTimes(1);
     expect(applicationRepo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'cancelled', decidedBy: 'user-a' }));
+  });
+  it('a currently authorized colleague can withdraw the selected organization’s application', async () => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', applicantId: 'departed-user', applicantOrganizationId: 'org-a', status: 'pending' });
+    await expect(service.cancelApplication('app', 'user-a')).resolves.toEqual({ success: false, error: 'NOT_OWNER' });
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+    await expect(service.cancelApplication('app', 'user-a', 'org-a')).resolves.toMatchObject({ success: true });
+    expect(applicationRepo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'cancelled', decidedBy: 'user-a' }));
+  });
+  it('organization-less applications still require their original applicant', async () => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', applicantId: 'user-a', applicantOrganizationId: null, status: 'pending' });
+    await expect(service.cancelApplication('app', 'user-b', 'org-a')).resolves.toEqual({ success: false, error: 'NOT_OWNER' });
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+    await expect(service.cancelApplication('app', 'user-a')).resolves.toMatchObject({ success: true });
+  });
+  it.each([
+    { organization: 'org-a', business: null },
+    { organization: 'org-a', business: 'sf-other' },
+    { organization: null, business: 'sf-other' },
+  ])('ending membership %j leaves other stores’ legacy supply and listings untouched', async ({ organization, business }) => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', recruitmentId: 'r', applicantId: 'user-a', applicantOrganizationId: organization, status: 'approved' });
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('r', business), sellerId: 'supplier' });
+    await expect(service.terminateParticipation('app', 'supplier')).resolves.toMatchObject({ success: true });
+    expect(applicationRepo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'cancelled', decidedBy: 'supplier' }));
+    expect(query).not.toHaveBeenCalled();
+  });
+  it('legacy recruitment still removes only the existing applicant bridge on termination', async () => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', recruitmentId: 'r', applicantId: 'user-a', applicantOrganizationId: null, status: 'approved' });
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('r', null), sellerId: 'supplier', productId: 'product' });
+    query.mockResolvedValueOnce([{ id: 'offer' }]).mockResolvedValueOnce([]).mockResolvedValueOnce([{ organization_id: 'legacy-org' }]).mockResolvedValueOnce([]);
+    await expect(service.terminateParticipation('app', 'supplier')).resolves.toMatchObject({ success: true });
+    expect(query).toHaveBeenCalledTimes(4);
+    expect(query.mock.calls[1][1]).toEqual(['user-a', 'offer']);
+    expect(query.mock.calls[3][1]).toEqual(['offer', 'legacy-org']);
+  });
+  it('another supplier cannot terminate an approved organization application', async () => {
+    applicationRepo.findOne.mockResolvedValue({ id: 'app', recruitmentId: 'r', applicantId: 'user-a', applicantOrganizationId: 'org-a', status: 'approved' });
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('r', null), sellerId: 'supplier' });
+    await expect(service.terminateParticipation('app', 'other-supplier')).resolves.toEqual({ success: false, error: 'NOT_OWNER' });
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+    expect(query).not.toHaveBeenCalled();
   });
   it('membership lookup failure does not save an application', async () => {
     recruitmentRepo.findOne.mockResolvedValue(row('other', 'sf-other'));

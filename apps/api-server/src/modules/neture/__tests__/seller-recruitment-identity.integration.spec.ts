@@ -81,4 +81,31 @@ databaseTests('Recruitment application identity — isolated PostgreSQL', () => 
       } finally { query.mockRestore(); }
     });
   });
+
+  it('supplier review names the application organization instead of the operator’s first membership', async () => {
+    await database.transaction(async manager => {
+      await manager.query(`CREATE TEMP TABLE seller_recruitment_applications(id uuid PRIMARY KEY, recruitment_id uuid,
+        applicant_id uuid, applicant_organization_id uuid, applicant_name text, status text, applied_at timestamptz,
+        decided_at timestamptz, decided_by uuid, reason text) ON COMMIT DROP;
+        CREATE TEMP TABLE users(id uuid PRIMARY KEY, name text, email text) ON COMMIT DROP;
+        CREATE TEMP TABLE organizations(id uuid PRIMARY KEY, name text) ON COMMIT DROP;
+        CREATE TEMP TABLE organization_members(user_id uuid, organization_id uuid, left_at timestamptz) ON COMMIT DROP;`);
+      const actor=randomUUID(); const recruitment=randomUUID(); const supplier=randomUUID(); const first=randomUUID(); const selected=randomUUID();
+      await manager.query("INSERT INTO users VALUES($1,'LOCAL OPERATOR','local-review@example.test')",[actor]);
+      await manager.query("INSERT INTO organizations VALUES($1,'FIRST STORE'),($2,'SELECTED STORE')",[first,selected]);
+      await manager.query('INSERT INTO organization_members VALUES($1,$2,NULL)',[actor,first]);
+      const application=randomUUID(); const legacy=randomUUID();
+      for (const [id,org] of [[application,selected],[legacy,null]]) {
+        await manager.query("INSERT INTO seller_recruitment_applications VALUES($1,$2,$3,$4,'LOCAL OPERATOR','pending',NOW(),NULL,NULL,NULL)",[id,recruitment,actor,org]);
+      }
+      const query=jest.spyOn(AppDataSource,'query').mockImplementation((sql: string,params?: any[])=>manager.query(sql,params));
+      try {
+        const service=new SellerRecruitmentService();
+        (service as any)._recruitmentRepo={ findOne: jest.fn().mockResolvedValue({ id: recruitment, sellerId: supplier }) };
+        const review=await service.getRecruitmentApplications(recruitment,supplier);
+        expect(review?.applications.find(row=>row.id===application)?.organizationName).toBe('SELECTED STORE');
+        expect(review?.applications.find(row=>row.id===legacy)?.organizationName).toBe('FIRST STORE');
+      } finally { query.mockRestore(); }
+    });
+  });
 });

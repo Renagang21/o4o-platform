@@ -60,7 +60,13 @@ Codex의 P1(공용 Forum 조회를 통한 비공개 자료 노출)을 반영했�
 
 옛 KPA Forum의 읽기와 홈 요약에도 현재 독립 약사 커뮤니티 승인을 적용했다. PharmacyHub 최신 활동과 Neture 홈 미리보기, 옛 운영 대시보드의 포럼 부분까지 대조했으며 미승인자는 글·통계가 노출되지 않는다. 승인된 운영 요약·분석도 해당 커뮤니티 저장 코드와 조직 범위만 집계한다. 관련 라우트/공용 접근/이미지 회귀 81건과 별도 카탈로그·실제 PostgreSQL 집계 검사 33건은 PASS다. 실제 로컬 HTTP로 pharmacy 사업 가입만 한 계정의 독립 약사 Forum 차단, 독립 신청·승인 후 조회, 탈퇴 후 즉시 차단과 다른 사업 공급 유지, 일반 커뮤니티 승인 전후 운영 요약의 격리를 확인했다.
 
-추가 검토 P2의 모집 신청 중복 기준도 약국 조직으로 맞췄다. 이미 존재하던 조직 UNIQUE를 유지하고 사용자 UNIQUE는 조직 없는 신청에만 적용한다. 동시 신청의 UNIQUE 충돌은 동일한 `DUPLICATE_APPLICATION`/409로 처리한다. 선택한 약국의 신청 현황·취소도 조직 문맥을 확인하며 기존 신청자 본인 취소 권한은 유지한다. 서비스·실제 PostgreSQL 회귀 21건과 기존 commerce DB 회귀 23건은 PASS다. 새 migration `AlignSellerRecruitmentApplicationIdentity1791477914134`는 새 격리 DB의 정본 baseline+incremental 1..16 위에서 실제 적용해 fingerprint `515f8b4c…`·6154 lines를 확인했고 canonical migration CLI의 사후 스키마 검증도 PASS다. 조직별 신청이 같은 사용자를 공유하면 제약 원복을 차단하며 데이터 삭제·백필은 하지 않는다. 이벤트 2단계와 달리 이 모집 제약 보완은 통합·통제 배포 시 canonical migration job의 대상이다. 운영에는 아직 적용하지 않았다. 수동 이벤트 CLI의 출력은 표준 출력으로 변경하여 저장소의 production console 검사도 PASS다.
+추가 검토 P2의 모집 신청 중복 기준도 약국 조직으로 맞췄다. 이미 존재하던 조직 UNIQUE를 유지하고 사용자 UNIQUE는 조직 없는 신청에만 적용한다. 동시 신청의 UNIQUE 충돌은 동일한 `DUPLICATE_APPLICATION`/409로 처리한다. 선택한 약국의 신청 현황·취소는 현재 조직 권한으로 판정하며 조직 없는 기존 신청만 신청자 본인으로 제한한다. 서비스·실제 PostgreSQL 회귀 21건과 기존 commerce DB 회귀 23건은 PASS다. 새 migration `AlignSellerRecruitmentApplicationIdentity1791477914134`는 새 격리 DB의 정본 baseline+incremental 1..16 위에서 실제 적용해 fingerprint `515f8b4c…`·6154 lines를 확인했고 canonical migration CLI의 사후 스키마 검증도 PASS다. 조직별 신청이 같은 사용자를 공유하면 제약 원복을 차단하며 데이터 삭제·백필은 하지 않는다. 이벤트 2단계와 달리 이 모집 제약 보완은 통합·통제 배포 시 canonical migration job의 대상이다. 운영에는 아직 적용하지 않았다. 수동 이벤트 CLI의 출력은 표준 출력으로 변경하여 저장소의 production console 검사도 PASS다.
+
+후속 HEAD `56a00161c1`에서는 required CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·CodeQL이 모두 PASS였다. SonarCloud는 새 코드 Security Rating C로 실패했다. GitHub annotation에 표시된 강좌·내 매장 이미지의 root 실행과 npm lifecycle script 실행을 보완해 runner를 `USER node`로 제한하고 전역 설치에도 `--ignore-scripts`를 적용했다. 두 로컬 검토 이미지를 다시 빌드해 UID 1000과 root HTML·생성 JS asset HTTP 200을 확인했다. 상세 보안 API는 현재 환경의 호스트 허용 목록으로 차단되어 `sonarcloud.io` 추가를 환경 설정 초안에 저장했다. 이 보완만으로 최종 SonarCloud PASS를 선언하지 않으며 새 HEAD의 결과를 확인한다.
+
+동일 HEAD의 추가 Codex P1/P2 세 건도 보완했다. PharmacyHub의 정적 커뮤니티 mount는 통계·게시판 조회/소유자 작업·폐쇄형 회원 관리를 포함한 모든 endpoint에서 현재 가입 승인을 확인한다. 실제 HTTP router와 접근 middleware 회귀 14건 및 기존 카탈로그 검사 31건은 PASS다. 모집의 조직 신청은 현재 권한을 가진 동료가 철회할 수 있고, 참여 종료는 승인 때 만들지 않은 사용자 bridge를 정리하지 않는다. 공급자 심사 화면의 약국명도 신청 조직을 사용하며 첫 번째 사용자 소속으로 대체하지 않는다. 관련 모집 서비스 26건·실제 PostgreSQL identity/조회 3건·기존 commerce DB 23건·이미지 의존 그래프 2건, 총 54건은 PASS다. 조직 없는 기존 신청의 본인 취소와 legacy bridge 정리 계약은 별도로 유지한다. 소유자·관리자가 다른 조직에 권한을 갖더라도 각 약국을 독립 처리하며 여러 약국 소유권을 생성하지 않는다.
+
+실제로 실행한 격리 API에서도 옛 KPA·PharmacyHub 별칭의 익명/미승인 차단, 독립 가입 승인 후 조회, 탈퇴 후 통계·게시판·회원 상태 차단과 다른 사업의 포럼/공급 유지가 PASS다. 미승인 상태의 게시판 소유자 작업·폐쇄형 회원 관리 요청도 controller 이전에 `COMMUNITY_MEMBERSHIP_REQUIRED`로 거절됨을 확인했다.
 
 ## 3. 적용·복구 순서
 
