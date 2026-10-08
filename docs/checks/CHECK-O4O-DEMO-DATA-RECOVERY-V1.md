@@ -14,7 +14,8 @@ Migration `RepairCanonicalDemoExperience1791501198171`은 활성 Demo registry�
 일반 약국 승인 원장이나 다른 승인 약국의 소유 관계가 발견되면 쓰기 전에 중단한다.
 빈 신규 DB에는 백업 테이블만 생성하고 계정 seed는 수행하지 않는다.
 
-매장 Demo의 조직 소유 관계, 합성 약국 승인 원장, `neture:store_owner` 역할을 복구한다.
+매장 Demo의 조직 소유 관계, 합성 약국 승인 원장, `neture:store_owner` 역할과
+기존 `pharmacy` 세미프랜차이즈 이용 승인을 복구한다. 활성 세미프랜차이즈가 유일하지 않으면 중단한다.
 샘플이 없는 공급자 Demo에는 기존 상품 offer와 자료에서 최대 5개씩 복사해 연결한다.
 상품 master는 재사용하고 상품은 비공개·미승인·비활성 draft로 둔다. 자료도 비공개 personal이다.
 다른 조직의 원본, 기존 주문, 비밀번호, 일반 계정, 전체관리자 권한은 변경하지 않는다.

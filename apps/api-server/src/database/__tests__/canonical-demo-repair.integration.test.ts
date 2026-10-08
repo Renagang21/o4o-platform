@@ -45,6 +45,7 @@ integration('canonical Demo repair (isolated PostgreSQL)', () => {
     expect((await q.query(`SELECT status FROM neture_pharmacy_memberships WHERE organization_id=$1`, [orgId]))[0].status).toBe('active');
     expect((await q.query(`SELECT role FROM organization_members WHERE organization_id=$1 AND user_id=$2`, [orgId, ownerId]))[0].role).toBe('owner');
     expect((await q.query(`SELECT role FROM role_assignments WHERE user_id=$1`, [ownerId]))[0].role).toBe('neture:store_owner');
+    expect((await q.query(`SELECT status FROM semi_franchise_memberships WHERE organization_id=$1`, [orgId]))[0].status).toBe('active');
     const offers = await q.query(`SELECT approval_status,is_active,is_public FROM supplier_product_offers WHERE supplier_id=$1`, [supplierId]);
     expect(offers).toEqual([{ approval_status: 'PENDING', is_active: false, is_public: false }]);
     expect((await q.query(`SELECT count(*)::int AS n FROM supplier_product_offers WHERE supplier_id=$1`, [sourceId]))[0].n).toBe(1);

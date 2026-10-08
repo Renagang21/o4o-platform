@@ -33,6 +33,10 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     }
     const orgId = orgs[0].id;
     const supplierId = suppliers[0].id;
+    const franchises = await q.query(`SELECT id FROM semi_franchises
+      WHERE key='pharmacy' AND status='active' FOR UPDATE`);
+    if (franchises.length !== 1) throw new Error('Demo repair requires one active pharmacy semi-franchise');
+    const franchiseId = franchises[0].id;
     const existingMembers = await q.query(`SELECT * FROM organization_members
       WHERE organization_id = $1 AND user_id = $2 FOR UPDATE`, [orgId, owner[0].user_id]);
     const ledger = await q.query(`SELECT * FROM neture_pharmacy_memberships
@@ -52,6 +56,8 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     const before = {
       organization_members: existingMembers,
       neture_pharmacy_memberships: ledger,
+      semi_franchise_memberships: await q.query(`SELECT * FROM semi_franchise_memberships
+        WHERE organization_id=$1 AND semi_franchise_id=$2 FOR UPDATE`, [orgId, franchiseId]),
       role_assignments: await q.query(`SELECT * FROM role_assignments WHERE user_id = $1`, [owner[0].user_id]),
       offer_count: (await q.query(`SELECT count(*)::int AS n FROM supplier_product_offers WHERE supplier_id = $1 AND deleted_at IS NULL`, [supplierId]))[0].n,
       library_count: (await q.query(`SELECT count(*)::int AS n FROM neture_supplier_library_items WHERE supplier_id = $1`, [supplierId]))[0].n,
@@ -79,6 +85,11 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     await q.query(`INSERT INTO role_assignments (user_id,role,is_active)
       SELECT $1,'neture:store_owner',true WHERE NOT EXISTS (
         SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='neture:store_owner' AND is_active)`, [owner[0].user_id]);
+    await q.query(`INSERT INTO semi_franchise_memberships
+      (semi_franchise_id,organization_id,status,applied_by,decided_at,reason)
+      VALUES ($1,$2,'active',$3,now(),'Synthetic public Demo experience')
+      ON CONFLICT (semi_franchise_id,organization_id) DO UPDATE
+        SET status='active',decided_at=now(),updated_at=now()`, [franchiseId, orgId, owner[0].user_id]);
 
     // Reuse existing sample masters and descriptions as private drafts. Never transfer historical orders
     // or globally publish/approve a new Demo offer. Unique(master,supplier) prevents duplicate drafts.
@@ -101,6 +112,8 @@ export class RepairCanonicalDemoExperience1791501198171 implements MigrationInte
     const after = {
       organization_members: await q.query(`SELECT * FROM organization_members WHERE organization_id=$1 AND user_id=$2`, [orgId, owner[0].user_id]),
       neture_pharmacy_memberships: await q.query(`SELECT * FROM neture_pharmacy_memberships WHERE organization_id=$1`, [orgId]),
+      semi_franchise_memberships: await q.query(`SELECT * FROM semi_franchise_memberships
+        WHERE organization_id=$1 AND semi_franchise_id=$2`, [orgId, franchiseId]),
       role_assignments: await q.query(`SELECT * FROM role_assignments WHERE user_id=$1`, [owner[0].user_id]),
       inserted_offer_ids: offers.map((r: { id: string }) => r.id),
       inserted_library_ids: library.map((r: { id: string }) => r.id),
