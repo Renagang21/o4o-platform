@@ -15,6 +15,11 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 // ============================================================================
 
 export interface ForumContext {
+  /** Server-resolved DB community scope. Never accepted from the request body/query. */
+  forumStorageCodes?: string[];
+  communityOperator?: boolean;
+  /** Generic public endpoints cannot expose independently gated DB spaces. */
+  excludeScopedCommunities?: boolean;
   /** Organization UUID — null means global (admin-dashboard) */
   organizationId?: string | null;
   /**

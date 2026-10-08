@@ -685,6 +685,18 @@ describe('Static regression guards', () => {
     expect(kpa).toContain("forumRouter.patch('/posts/:id/pin'");
   });
 
+  it('legacy KPA reads and home Forum summaries use independent community approval', () => {
+    const kpa = read('routes/kpa/kpa.routes.ts');
+    expect(kpa.indexOf('forumRouter.use(pharmacyWrite);')).toBeLessThan(kpa.indexOf("forumRouter.get('/posts'"));
+    expect(kpa).toContain('forumRouter.use(pharmacyWrite);');
+    for (const route of ['/community', '/forum-hub', '/forum/:slug', '/forum/:slug/posts', '/forum-activity']) {
+      expect(kpa).toContain(`homeRouter.get('${route}', optionalAuth, pharmacyWrite,`);
+    }
+    expect(kpa).toContain("await resolveCommunityWorkspace(dataSource, user, 'pharmacy')");
+    expect(kpa).toContain('if (mayReadForum) {');
+    expect(read('routes/neture/controllers/neture.controller.ts')).toContain("router.get('/home/forum', optionalAuth, requireCommunityAccess('o4o-general'),");
+  });
+
   it('서비스 forum mount 는 forumContextMiddleware 계약을 유지한다', () => {
     const kpa = read('routes/kpa/kpa.routes.ts');
     expect(kpa).toContain('forumContextMiddleware({');

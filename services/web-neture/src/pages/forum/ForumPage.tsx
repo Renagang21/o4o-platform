@@ -85,7 +85,9 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
 
   // URL-driven state
   const searchQuery = searchParams.get('q') || '';
-  const categoryFilter = searchParams.get('category') || '';
+  const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const categoryFilter = searchParams.get('category') || categories.find(c => c.slug === boardSlug)?.id || '';
   const typeFilter = (searchParams.get('type') || '') as PostType | '';
   const sortBy = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'oldest';
   // WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 태그 분류 필터 (홈 바로가기 → `?category=<forumId>&tag=<태그>`)
@@ -94,7 +96,6 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   const hasFilters = !!searchQuery || !!categoryFilter || !!typeFilter || !!tagFilter || sortBy !== 'latest';
 
   const [searchInput, setSearchInput] = useState(searchQuery);
-  const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [pinnedPosts, setPinnedPosts] = useState<DisplayPost[]>([]);
   const [posts, setPosts] = useState<DisplayPost[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -109,14 +110,20 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   useEffect(() => {
     fetchForumCategories().then((res) => {
       if (res.success && res.data) setCategories(res.data);
+      setCategoriesLoaded(true);
     });
   }, []);
 
   // Load posts when filters/page change
-  const filterKey = `${boardSlug}|${searchQuery}|${categoryFilter}|${typeFilter}|${tagFilter}|${sortBy}|${currentPage}`;
+  const filterKey = `${boardSlug}|${categoriesLoaded}|${searchQuery}|${categoryFilter}|${typeFilter}|${tagFilter}|${sortBy}|${currentPage}`;
 
   useEffect(() => {
     let cancelled = false;
+    if (boardSlug && !categoryFilter) {
+      setIsLoading(!categoriesLoaded);
+      if (categoriesLoaded) setError('게시판을 찾을 수 없습니다.');
+      return;
+    }
 
     async function load() {
       setIsLoading(true);

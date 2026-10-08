@@ -163,6 +163,7 @@ import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
 import { requireCommunityAccess } from '../../middleware/community-access.middleware.js';
+import { resolveCommunityWorkspace } from '../../services/community/community-workspace.service.js';
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2:
 //   KPA 는 더 이상 LMS runtime 을 소유하지 않는다. `/api/v1/kpa/lms/*` remount · LMS controller import ·
 //   course-request → LMS course 생성 경로를 제거했다. 강의는 O4O 강의(lecture) 서비스(study.neture.co.kr) 가 담당한다.
@@ -648,7 +649,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*
-  // Mixed: Public reads / Admin writes / Operator moderation
+  // Approved independent community reads/writes; scoped administration/moderation
   // ============================================================================
   const forumRouter = Router();
   const forumController = new ForumController();
@@ -660,14 +661,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // 커뮤니티 포럼은 organizationId IS NULL인 글만 조회/생성
   // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
   //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface — Pharmacy-Hub `/pharmacy-hub/forum` 과
-  //   같은 Community(원장 코드 kpa-society + pharmacy-hub). 쓰기 자격 = kpa-society OR pharmacy-hub active
-  //   membership. 구조 변경(categories)·중재(moderation)는 kpa 운영 governance 그대로.
+  //   같은 독립 Community(저장 코드 kpa-society + pharmacy-hub). 읽기·쓰기는 현재 독립
+  //   커뮤니티 승인으로 판정하며 pharmacy 사업 가입과 별개다. 구조 변경·중재는 기존 guard를 유지한다.
   forumRouter.use(forumContextMiddleware({
     serviceCode: 'kpa',
     communityKey: 'pharmacy',
     scope: 'community',
   }));
   const pharmacyWrite = requireCommunityAccess('pharmacy');
+  // The legacy alias serves the same independent community ledger. Reads must
+  // pass its current approval gate too, including directory, comments and stats.
+  forumRouter.use(pharmacyWrite);
 
   // Health check
   forumRouter.get('/health', forumController.health.bind(forumController));
@@ -701,7 +705,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   //   공통 service-forum.routes.ts 와 동일 경로·핸들러 그대로 사용한다(신규 로직 0).
   forumRouter.put('/comments/:id', authenticate, pharmacyWrite, forumController.updateComment.bind(forumController));
 
-  // Forum Directory (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
+  // Forum Directory (읽기: 독립 커뮤니티 승인, 쓰기: 기존 admin scope)
   // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)
   forumRouter.get('/categories', forumController.listForums.bind(forumController));
   // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 (before :id to avoid param matching)
@@ -748,7 +752,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   // GET /home/community - 포럼 최근글 + featured 콘텐츠 (APP-FORUM Phase 1: ForumQueryService)
-  homeRouter.get('/community', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+  homeRouter.get('/community', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
     const postLimit = parseInt(req.query.postLimit as string) || 5;
     const featuredLimit = parseInt(req.query.featuredLimit as string) || 3;
 
@@ -772,7 +776,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // GET /home/forum-hub - 포럼 허브 요약 (멀티 포럼 — forum_category_requests 기반)
   // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
   // ?sort=default|recent|popular|joined  ?q=검색어
-  homeRouter.get('/forum-hub', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+  homeRouter.get('/forum-hub', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
     const sort = (req.query.sort as string) || 'default';
     const keyword = (req.query.q as string) || '';
     // WO-O4O-KPA-FORUM-MEMBERSHIP-UX-ENHANCEMENT-V1: 멤버십 상태 포함을 위해 항상 전달
@@ -783,7 +787,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // GET /home/forum/:slug - 포럼 단건 조회 (멀티 포럼)
   // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  homeRouter.get('/forum/:slug', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+  homeRouter.get('/forum/:slug', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
     const slug = String(req.params.slug || '').trim();
     if (!slug) {
       res.status(400).json({ success: false, error: 'INVALID_SLUG' });
@@ -799,7 +803,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // GET /home/forum/:slug/posts - 포럼의 게시글 목록 (멀티 포럼)
   // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
-  homeRouter.get('/forum/:slug/posts', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+  homeRouter.get('/forum/:slug/posts', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
     const slug = String(req.params.slug || '').trim();
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
     const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
@@ -852,7 +856,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // GET /home/forum-activity - 포럼 카테고리별 최근 활동 (APP-FORUM Phase 3: ForumQueryService)
   // ?sort=recent|popular|recommended  ?limit=5
-  homeRouter.get('/forum-activity', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+  homeRouter.get('/forum-activity', optionalAuth, pharmacyWrite, asyncHandler(async (req: Request, res: Response) => {
     const sort = (req.query.sort as string) || 'recent';
     const limit = Math.min(parseInt(req.query.limit as string) || 5, 10);
     const data = await forumService.listForumActivity({ sort, limit });
@@ -877,7 +881,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const items: LatestItem[] = [];
     const tasks: Promise<void>[] = [];
 
-    if (filterType === 'all' || filterType === 'forum') {
+    const user = (req as any).user;
+    const mayReadForum = (filterType === 'all' || filterType === 'forum') && user?.id
+      ? (await resolveCommunityWorkspace(dataSource, user, 'pharmacy'))?.allowed === true
+      : false;
+    if (mayReadForum) {
       tasks.push((async () => {
         const posts = await forumService.listRecentPosts(perLimit);
         for (const p of posts) {

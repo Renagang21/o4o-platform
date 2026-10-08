@@ -5,7 +5,7 @@
  *   1. Community Catalog SSOT = 1 · Community Identity ≠ Service Identity · 초기 3 Community · policy 2종만
  *   2. Access 시나리오 A~E (resolveCommunityAccess — 순수 함수, DB 0, membership 생성 0)
  *   3. Pharmacy 동일성: KPA `/kpa/forum` 과 PH `/pharmacy-hub/forum` 컨텍스트가 같은 원장 코드 집합을 본다
- *   4. Cross-community leakage: KCos-only → pharmacy write 403 · non-member → cosmetics/pharmacy 403
+ *   4. Cross-community leakage: 약사 커뮤니티 독립 가입은 다른 서비스 가입과 분리 · non-member → cosmetics/pharmacy 403
  *      (o4o-general = authenticated 는 **SUPERSEDED** — 아래 §4 주석)
  *   5. 공통 Core 재사용: Forum Core 복제 0 · communityKey 컨텍스트 · service-scoped route = KEEP_AS_CONTEXT_ALIAS
  *   6. Industry Community / Neture Community identity / PH 별도 약사 Community = 0
@@ -48,6 +48,11 @@ jest.mock('../database/connection.js', () => ({
     // 가입 승인 조회만 흉내낸다. factory 실행 시점에는 approvedMemberships 를 읽지 않는다
     // (hoist 된 mock 이 아래 const 보다 먼저 평가되므로) — 호출 시점에 읽는다.
     query: async (sql: string, params: unknown[] = []) => {
+      if (/FROM users u/.test(sql)) return [{ account_status: 'active', account_active: true, email_verified: true }];
+      if (/FROM communities WHERE slug/.test(sql)) return [{ id: params[0], name: params[0], status: 'active' }];
+      if (/SELECT status, role FROM community_memberships/.test(sql)) {
+        return approvedMemberships.has(`${params[0]}:${params[1]}`) ? [{ status: 'active', role: 'member' }] : [];
+      }
       if (/FROM community_memberships cm/i.test(sql)) {
         const [communityKey, userId] = params as [string, string];
         return approvedMemberships.has(`${communityKey}:${userId}`) ? [{ ok: 1 }] : [];
@@ -101,8 +106,8 @@ describe('Community Catalog — SSOT · Identity 분리 (WO §2 · §3 · §4 ·
     expect(getCommunityDefinition('o4o-general')?.name).toBe('O4O 공통 커뮤니티');
   });
 
-  it('참여 정책: pharmacy = kpa-society OR pharmacy-hub · cosmetics = k-cosmetics · o4o-general = authenticated', () => {
-    expect(getCommunityDefinition('pharmacy')?.participationPolicy).toEqual({ mode: 'service_membership_any', serviceKeys: ['kpa-society', 'pharmacy-hub'] });
+  it('참여 정책: pharmacy = independent authenticated · cosmetics = k-cosmetics · o4o-general = authenticated', () => {
+    expect(getCommunityDefinition('pharmacy')?.participationPolicy).toEqual({ mode: 'authenticated' });
     expect(getCommunityDefinition('cosmetics')?.participationPolicy).toEqual({ mode: 'service_membership_any', serviceKeys: ['k-cosmetics'] });
     expect(getCommunityDefinition('o4o-general')?.participationPolicy).toEqual({ mode: 'authenticated' });
   });
@@ -163,16 +168,16 @@ describe('Community access 시나리오 (WO §35) — 읽기만, membership 생�
   it('B: pharmacy-hub active (KPA 없음) → pharmacy O (via pharmacy-hub) · cosmetics X · o4o-general O', () => {
     const u = member('b', 'pharmacy-hub');
     expect(table(u)).toEqual({ pharmacy: 'O', cosmetics: 'X', 'o4o-general': 'O' });
-    expect(resolveCommunityAccess(u, 'pharmacy')).toEqual({ communityKey: 'pharmacy', allowed: true, reason: null, via: 'pharmacy-hub' });
+    expect(resolveCommunityAccess(u, 'pharmacy')).toEqual({ communityKey: 'pharmacy', allowed: true, reason: null, via: null });
     // KPA membership 자동 생성 = 0: 입력 객체가 그대로다
     expect(u.memberships).toEqual([{ serviceKey: 'pharmacy-hub', status: 'active' }]);
   });
-  it('C: k-cosmetics active → pharmacy X · cosmetics O · o4o-general O', () => {
-    expect(table(member('c', 'k-cosmetics'))).toEqual({ pharmacy: 'X', cosmetics: 'O', 'o4o-general': 'O' });
+  it('C: k-cosmetics active → pharmacy O · cosmetics O · o4o-general O', () => {
+    expect(table(member('c', 'k-cosmetics'))).toEqual({ pharmacy: 'O', cosmetics: 'O', 'o4o-general': 'O' });
   });
-  it('D: authenticated · membership 없음 → pharmacy X · cosmetics X · o4o-general O', () => {
-    expect(table(member('d'))).toEqual({ pharmacy: 'X', cosmetics: 'X', 'o4o-general': 'O' });
-    expect(resolveCommunityAccess(member('d'), 'pharmacy').reason).toBe('SERVICE_MEMBERSHIP_REQUIRED');
+  it('D: authenticated · membership 없음 → pharmacy O · cosmetics X · o4o-general O', () => {
+    expect(table(member('d'))).toEqual({ pharmacy: 'O', cosmetics: 'X', 'o4o-general': 'O' });
+    expect(resolveCommunityAccess(member('d'), 'pharmacy').reason).toBeNull();
   });
   it('E: kpa-society + k-cosmetics active → 전부 O', () => {
     expect(table(member('e', 'kpa-society', 'k-cosmetics'))).toEqual({ pharmacy: 'O', cosmetics: 'O', 'o4o-general': 'O' });
@@ -183,7 +188,7 @@ describe('Community access 시나리오 (WO §35) — 읽기만, membership 생�
   });
   it('active 가 아닌 membership(pending/suspended) 은 자격이 아니다 · role prefix 별칭(kpa)도 canonical 로 접힌다', () => {
     const pending: CommunityAccessUser = { id: 'p', roles: [], memberships: [{ serviceKey: 'kpa-society', status: 'pending' }] };
-    expect(resolveCommunityAccess(pending, 'pharmacy').allowed).toBe(false);
+    expect(resolveCommunityAccess(pending, 'pharmacy').allowed).toBe(true);
     const alias: CommunityAccessUser = { id: 'k', roles: [], memberships: [{ serviceKey: 'kpa', status: 'active' }] };
     expect(resolveCommunityAccess(alias, 'pharmacy').allowed).toBe(true);
   });
@@ -262,7 +267,7 @@ describe('Cross-community leakage 차단 — backend 강제 (WO §37)', () => {
   // 승인 조건과 무관하게 **참여 자격 자체가 없으면** 종전 코드로 막힌다.
   it('KCos-only user → pharmacy write 403 COMMUNITY_ACCESS_DENIED', async () => {
     approvedMemberships.add('pharmacy:c'); // 승인이 있어도 자격이 없으면 막힌다
-    expect(await runGuard('pharmacy', member('c', 'k-cosmetics'))).toMatchObject({ passed: false, status: 403, code: 'COMMUNITY_ACCESS_DENIED', reason: 'SERVICE_MEMBERSHIP_REQUIRED' });
+    expect((await runGuard('pharmacy', member('c', 'k-cosmetics'))).passed).toBe(true);
   });
   it('non-member → pharmacy / cosmetics write 403 · 비로그인 → 401', async () => {
     expect(await runGuard('pharmacy', member('d'))).toMatchObject({ passed: false, status: 403 });

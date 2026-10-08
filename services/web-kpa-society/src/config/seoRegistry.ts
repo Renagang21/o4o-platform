@@ -78,7 +78,7 @@ export const kpaSeoRegistry: SeoRegistry = {
   },
   '/contact': {
     title: '협업과 연결 — O4O 약국',
-    description: 'O4O 약국 협업 및 강의 개설 안내.',
+    description: 'O4O 약국 협업 안내.',
     ogType: 'website',
   },
 };

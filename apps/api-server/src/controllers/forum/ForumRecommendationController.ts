@@ -315,6 +315,7 @@ export class ForumRecommendationController {
       limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
       scope: (req.query.scope as RecommendationOptions['scope']) || 'personal',
       categoryId: req.query.categoryId as string,
+      excludeScopedCommunities: req.forumContext?.excludeScopedCommunities === true,
       excludeViewed: req.query.excludeViewed !== 'false',
       includeBreakdown: req.query.includeBreakdown === 'true',
     };

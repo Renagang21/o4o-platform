@@ -1,5 +1,5 @@
 /**
- * HubPopLibraryPage — 매장 HUB POP 진열 + 매장으로 가져오기
+ * HubPopLibraryPage — 제공 자료 POP 진열 + 매장으로 가져오기
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
  *   KPA·K-Cosmetics 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
@@ -8,11 +8,11 @@
  *   backend · API 계약 무변경.
  *
  * 데이터 흐름 (변경 없음):
- *   - HUB 목록: hubContentApi.list({ sourceDomain: 'pop' })
+ *   - 제공 자료 목록: hubContentApi.list({ sourceDomain: 'pop' })
  *   - 단건 가져가기: importOperatorPop(slug, sourceId)
  *   - 일괄 가져가기: 단건 endpoint fan-out (신규 backend 없음)
  *
- * HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+ * 제공 자료 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
  */
 
 import { useCallback } from 'react';
@@ -59,7 +59,7 @@ export function HubPopLibraryPage() {
     <HubImportLibraryView
       core={hub}
       accent="blue"
-      title="매장 HUB POP"
+      title="제공 자료 POP"
       description="KPA 운영자가 발행한 POP 을 선택해 내 약국으로 가져가거나(초안 사본), 내 약국용 POP 을 직접 만드세요."
       tableId="store-hub-pop"
       titleIcon={<Megaphone className="w-3.5 h-3.5" />}

@@ -78,6 +78,31 @@ export class ForumQueryService {
     `, [this.config.organizationId, limit]);
   }
 
+  /** Summary counts use the same storage and open-board boundary as recent posts. */
+  async countVisiblePosts(): Promise<number> {
+    const params: any[] = this.config.scope === 'community' ? [] : [this.config.organizationId];
+    const scope = this.config.scope === 'community' ? 'p.organization_id IS NULL' : 'p.organization_id = $1';
+    const filter = this.communityFilter('f', params);
+    const [row] = await this.dataSource.query(`
+      SELECT COUNT(*)::int AS count FROM forum_post p
+      JOIN forum_category_requests f ON p.forum_id = f.id
+      WHERE p.status = 'publish' AND ${scope}
+        AND f.status = 'completed' AND f.forum_type != 'closed' ${filter}
+    `, params);
+    return Number(row?.count ?? 0);
+  }
+
+  async countPendingRequests(): Promise<number> {
+    const params: any[] = this.config.scope === 'community' ? [] : [this.config.organizationId];
+    const scope = this.config.scope === 'community' ? 'f.organization_id IS NULL' : 'f.organization_id = $1';
+    const filter = this.communityFilter('f', params);
+    const [row] = await this.dataSource.query(`
+      SELECT COUNT(*)::int AS count FROM forum_category_requests f
+      WHERE f.status = 'pending' AND ${scope} ${filter}
+    `, params);
+    return Number(row?.count ?? 0);
+  }
+
   /**
    * 포럼 허브 — 멀티 포럼 목록 (forum_category_requests 기반)
    *
@@ -407,15 +432,18 @@ export class ForumQueryService {
   async getForumAnalytics() {
     const isCommunity = this.config.scope === 'community';
     const params = isCommunity ? [] : [this.config.organizationId];
-    const scopeFilter = isCommunity
+    const paramsForCodes: any[] = isCommunity ? [] : [this.config.organizationId];
+    const boardFilter = this.communityFilter('c', paramsForCodes);
+    const postFilter = this.communityFilter('f', params);
+    const visibleBoard = `EXISTS (SELECT 1 FROM forum_category_requests f
+      WHERE f.id = p.forum_id AND f.status = 'completed' AND f.forum_type != 'closed' ${postFilter})`;
+    const scopeFilter = (isCommunity
       ? 'p.organization_id IS NULL'
-      : 'p.organization_id = $1';
-    const catScopeFilter = isCommunity
+      : 'p.organization_id = $1') + ` AND ${visibleBoard}`;
+    const catScopeFilter = (isCommunity
       ? 'c.organization_id IS NULL'
-      : 'c.organization_id = $1';
-    const commentScopeFilter = isCommunity
-      ? 'p.organization_id IS NULL'
-      : 'p.organization_id = $1';
+      : 'c.organization_id = $1') + ` AND c.forum_type != 'closed' ${boardFilter}`;
+    const commentScopeFilter = `${scopeFilter} AND p.status = 'publish'`;
 
     const [kpiRows, topRows, inactiveRows] = await Promise.all([
       // Query 1: KPI 4개

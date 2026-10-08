@@ -11,7 +11,9 @@
 import { Suspense, lazy, useEffect, type ComponentType, type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
-import { AuthProvider } from './contexts/AuthContext';
+import { PharmacyMembershipReviewPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
+import { api } from './lib/apiClient';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { StoreProvider } from './contexts/StoreContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { StoreGate } from './components/StoreGate';
@@ -19,7 +21,7 @@ import RootShell from './components/RootShell';
 import UnifiedStoreLayout, { ServiceStoreLayout, StoreOwnerOnly } from './components/layouts/UnifiedStoreLayout';
 import { getActiveServicePublicOrigin } from './lib/serviceContext';
 import ServiceWorkLayout, { ServiceWorkHomePage, ServiceWorkIndexPage } from './components/layouts/ServiceWorkLayout';
-import UnifiedHubLayout from './components/layouts/UnifiedHubLayout';
+import UnifiedStoreLibraryLayout from './components/layouts/UnifiedStoreLibraryLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
@@ -32,6 +34,16 @@ import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
 import { WORKSPACE_PATHS } from './config/workspace';
 import { PHARMACY_STORE_PATHS, PharmacyContextOnly } from './pages/neture-pharmacy/shared';
+
+configurePharmacyManagementClient(api);
+
+function PharmacyReviewAccess() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <p>권한을 확인하는 중입니다…</p>;
+  if (!isAuthenticated) return <Navigate to="/login?returnTo=%2Foperator%2Fpharmacy-memberships" replace />;
+  if (!user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r))) return <p>내 매장 신청 심사 권한이 필요합니다.</p>;
+  return <PharmacyMembershipReviewPage />;
+}
 
 const named = <M extends Record<string, unknown>, K extends keyof M>(load: () => Promise<M>, key: K) =>
   lazy(() => load().then((m) => ({ default: m[key] as ComponentType<Record<string, unknown>> })));
@@ -71,8 +83,6 @@ const ProductMarketingPage = named(() => import('./pages/pharmacy/ProductMarketi
 const ProductPopBuilderPage = named(() => import('./pages/pharmacy/ProductPopBuilderPage'), 'ProductPopBuilderPage');
 const StoreOrderWorktablePage = named(() => import('./pages/pharmacy/StoreOrderWorktablePage'), 'StoreOrderWorktablePage');
 const KpaStoreOrdersPage = named(() => import('./pages/pharmacy/StoreOrdersPage'), 'StoreOrdersPage');
-const SellerRecruitmentsBrowsePage = lazy(() => import('./pages/pharmacy/SellerRecruitmentsBrowsePage'));
-const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then((m) => ({ default: m.StoreChannelsPage })));
 const OnlineSalesOrdersRetiredPage = named(() => import('./pages/pharmacy/OnlineSalesOrdersRetiredPage'), 'OnlineSalesOrdersRetiredPage');
 const ForeignVisitorSalesSupportPage = named(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPage'), 'ForeignVisitorSalesSupportPage');
@@ -86,8 +96,6 @@ const PhPaymentSuccessPage = lazy(() => import('./services/ph/pages/PaymentSucce
 const PhPaymentFailPage = lazy(() => import('./services/ph/pages/PaymentFailPage'));
 
 // ── 매장 HUB ─────────────────────────────────────────────────────────────────
-const StoreHubPage = named(() => import('./pages/pharmacy/StoreHubPage'), 'StoreHubPage');
-const HubB2BCatalogPage = named(() => import('./pages/pharmacy/HubB2BCatalogPage'), 'HubB2BCatalogPage');
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
 const HubContentLibraryPage = named(() => import('./pages/pharmacy/HubContentLibraryPage'), 'HubContentLibraryPage');
 const HubBlogLibraryPage = named(() => import('./pages/pharmacy/HubBlogLibraryPage'), 'HubBlogLibraryPage');
@@ -128,7 +136,6 @@ const KcosRetired = (
 );
 const S = WORKSPACE_PATHS.myStore;
 const W = WORKSPACE_PATHS.serviceWork;
-const H = WORKSPACE_PATHS.storeHub;
 const PP = PHARMACY_STORE_PATHS;
 /** 약국 화면 subPath(앞의 `/` 제거) — `/store/*` · `/work/kpa-society/store/*` 자식 route 용 */
 const rel = (p: string) => p.replace(/^\//, '');
@@ -245,6 +252,8 @@ export default function App() {
       {/* 내 매장(약국) 신청 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
       <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
 
+      <Route path="/operator/pharmacy-memberships" element={<PharmacyReviewAccess />} />
+
       {/* ── 내 매장(공통 기능 1회) ── */}
       <Route path={S} element={gated(<UnifiedStoreLayout />)}>
         {storeChildRoutes()}
@@ -276,8 +285,8 @@ export default function App() {
         <Route path="commerce/orderable" element={<Navigate to={`${S}${PP.supply}`} replace />} />
         <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
         <Route path="commerce/orders" element={<KpaStoreOrdersPage />} />
-        <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
-        <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
+        <Route path="commerce/seller-recruitments" element={<Navigate to={`${S}${PP.recruitments}`} replace />} />
+        <Route path="commerce/recruitment-applications" element={<Navigate to={`${S}${PP.recruitments}`} replace />} />
         <Route path="online-sales/settings" element={<StoreChannelsPage section="settings" />} />
         <Route path="online-sales/products" element={<StoreChannelsPage section="products" />} />
         <Route path="online-sales/orders" element={<OnlineSalesOrdersRetiredPage />} />
@@ -307,10 +316,9 @@ export default function App() {
         <Route path="*" element={NotFound} />
       </Route>
 
-      {/* ── 매장 HUB ── */}
-      <Route path={H} element={gated(<UnifiedHubLayout />)}>
-        <Route index element={<StoreHubPage />} />
-        <Route path="b2b" element={<HubB2BCatalogPage />} />
+      {/* ── 내 매장에서 직접 사용하는 제공 자료 ── */}
+      <Route path={`${S}/library`} element={gated(<UnifiedStoreLibraryLayout />)}>
+        <Route index element={<Navigate to={`${S}${PP.contents}`} replace />} />
         {/* CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 옛 이벤트 오퍼 · 매장 HUB 장바구니는 이 호스트에서
             403 막다른 길이었다 — 약국 공급 상품 · 장바구니(세미프랜차이즈 제공분은 서버가 가입 상태로 판정)로 보낸다. */}
         <Route path="event-offers" element={<Navigate to={`${S}${PP.supply}`} replace />} />
@@ -328,6 +336,7 @@ export default function App() {
         <Route path="*" element={NotFound} />
       </Route>
       {/* 기존 서비스의 /store-hub 경로로 들어온 handoff returnPath 호환 */}
+      <Route path="/hub/*" element={<LegacyHubRedirect />} />
       <Route path="/store-hub/*" element={<LegacyHubRedirect />} />
 
       <Route path="*" element={NotFound} />
@@ -336,6 +345,10 @@ export default function App() {
 }
 
 function LegacyHubRedirect() {
-  const rest = window.location.pathname.replace(/^\/store-hub/, '');
-  return <Navigate to={`${H}${rest}${window.location.search}`} replace />;
+  const { pathname, search, hash } = useLocation();
+  const rest = pathname.replace(/^\/(?:store-hub|hub)\/?/, '');
+  const destinations: Record<string, string> = { b2b: `${S}${PP.supply}`, 'event-offers': `${S}${PP.supply}`, cart: `${S}${PP.cart}` };
+  const sources = ['content', 'supplier-library', 'multilingual-product-contents', 'blog', 'pop', 'qr', 'video', 'signage', 'screen-set'];
+  const destination = destinations[rest] || (sources.includes(rest.split('/')[0]) ? `${S}/library/${rest}` : `${S}${PP.contents}`);
+  return <Navigate to={`${destination}${search}${hash}`} replace />;
 }

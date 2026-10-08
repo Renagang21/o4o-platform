@@ -31,7 +31,9 @@
     "./modules/qr-template-write": "./src/modules/qr-template-write/index.ts",
     "./modules/operator-analytics": "./src/modules/operator-analytics/index.ts",
     "./modules/community-home": "./src/modules/community-home/index.ts",
-    "./modules/operator-content-hub": "./src/modules/operator-content-hub/index.ts"
+    "./modules/operator-content-hub": "./src/modules/operator-content-hub/index.ts",
+    "./modules/pharmacy-management": "./src/modules/pharmacy-management/index.ts",
+    "./modules/pharmacy-management/*": "./src/modules/pharmacy-management/*.tsx"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",

@@ -1,50 +1,36 @@
-/**
- * community.neture.co.kr `/` — 커뮤니티 진입 (CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10)
- *
- * 약사 커뮤니티로 들어가는 주소 진입점이다. 현재 커뮤니티 활동(포럼)은 각 서비스
- * 앱이 제공하므로 `/pharmacist` 는 그 포럼으로 이어진다(HostBoundary).
- * 소매업소 커뮤니티(`/retail` → retail.neture.co.kr)는 K-Cosmetics 공개 서비스 종료로 제거했다 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
- * 커뮤니티별 독립 가입 · 승인은 아직 없다 — 이 화면은 그 기능을 대신하지 않는다.
- *
- * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 상단을 공통 O4OPublicHero(확정 문구)로.
- *   주 CTA 는 실제로 동작하는 커뮤니티(`/pharmacist`) 하나뿐이다 — 없는 커뮤니티를 만들지 않는다.
- */
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { O4OPublicHero } from '@o4o/auth-react';
 import { COMMUNITY_HERO } from '../../config/publicHero';
-
-const COMMUNITIES = [
-  { path: '/pharmacist', title: '약사 커뮤니티', desc: '약사 회원이 함께 쓰는 포럼과 자료' },
-];
+import { api } from '../../lib/apiClient';
+import { useAuth } from '../../contexts';
+import type { CommunityWorkspace } from './CommunityWorkspacePage';
 
 export default function CommunityHostHomePage() {
-  const primary = COMMUNITIES[0];
-  return (
-    <O4OPublicHero
-      eyebrow={COMMUNITY_HERO.eyebrow}
-      title={COMMUNITY_HERO.title}
-      description={COMMUNITY_HERO.description}
-      accent={COMMUNITY_HERO.accent}
-      actions={
-        <Link to={primary.path} className="o4o-cta" data-testid="community-hero-primary">
-          {primary.title} 들어가기
-        </Link>
-      }
-    >
-      <h2 className="text-sm font-semibold text-slate-500">참여할 수 있는 커뮤니티</h2>
-      <ul className="mt-3 divide-y divide-slate-100 border-y border-slate-100">
-        {COMMUNITIES.map((c) => (
-          <li key={c.path}>
-            <Link to={c.path} className="flex items-center justify-between gap-4 py-4 hover:text-slate-900">
-              <span>
-                <span className="block text-base font-semibold text-slate-900">{c.title}</span>
-                <span className="mt-0.5 block text-sm text-slate-600">{c.desc}</span>
-              </span>
-              <span aria-hidden="true" className="text-slate-400">→</span>
-            </Link>
-          </li>
-        ))}
+  const { user } = useAuth();
+  const [rows, setRows] = useState<CommunityWorkspace[]>([]);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    let active = true;
+    setError('');
+    api.get('/communities').then((r: { data: { data: { communities: CommunityWorkspace[] } } }) => { if (active) setRows(r.data.data.communities); })
+      .catch(() => { if (active) setError('커뮤니티 목록을 불러오지 못했습니다.'); });
+    return () => { active = false; };
+  }, [user?.id]);
+  return <O4OPublicHero {...COMMUNITY_HERO}
+    actions={<Link to="/communities/pharmacy/forum" className="o4o-cta" data-testid="community-hero-primary">약사 커뮤니티 들어가기</Link>}>
+    {error && <p role="alert" className="text-red-700">{error}</p>}
+    {(['independent', 'semi-franchise'] as const).map(kind => <section key={kind} className="mt-6">
+      <h2 className="text-base font-semibold">{kind === 'independent' ? '독립 가입 커뮤니티' : '가입한 사업의 회원 커뮤니티'}</h2>
+      <ul className="mt-3 divide-y border-y">
+        {rows.filter(c => c.kind === kind).map(c => <li key={c.communityKey}>
+          <Link to={`/communities/${encodeURIComponent(c.communityKey)}/forum`} className="flex justify-between gap-4 py-4">
+            <span><strong className="block">{c.name}</strong><span className="text-sm text-slate-600">{c.allowed ? '참여 가능' : c.membershipStatus === 'pending' ? '승인 대기' : '가입 승인 후 이용'}</span></span><span aria-hidden>→</span>
+          </Link>
+        </li>)}
       </ul>
-    </O4OPublicHero>
-  );
+      {kind === 'semi-franchise' && !rows.some(c => c.kind === kind) && <p className="mt-3 text-sm text-slate-600">가입 승인된 사업의 커뮤니티가 여기에 표시됩니다.</p>}
+    </section>)}
+    <Link to="/mypage/communities" className="mt-6 inline-block text-sm text-blue-700">커뮤니티 개설 신청 · 운영</Link>
+  </O4OPublicHero>;
 }

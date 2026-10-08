@@ -1,5 +1,5 @@
 /**
- * HubSupplierLibraryPage — 매장 HUB 공급자 콘텐츠 진열 (읽기 전용 · 사본 없음)
+ * HubSupplierLibraryPage — 제공 자료 공급자 콘텐츠 진열 (읽기 전용 · 사본 없음)
  *
  * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14 (Store Hub 편입):
  *   ROLE-WORKSPACE-ARCHITECTURE §2-1 `Supplier → Store Hub` 의 UI 편입.

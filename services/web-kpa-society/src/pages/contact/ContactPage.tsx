@@ -23,7 +23,7 @@ export function ContactPage() {
     document.title = 'O4O 약국 Contact';
     const meta = document.querySelector('meta[name="description"]');
     const prevContent = meta?.getAttribute('content') ?? '';
-    meta?.setAttribute('content', 'O4O 약국 협업 및 강의 개설 안내');
+    meta?.setAttribute('content', 'O4O 약국 협업 안내');
     return () => {
       document.title = prev;
       if (meta) meta.setAttribute('content', prevContent);
@@ -39,7 +39,7 @@ export function ContactPage() {
           <h1 style={s.heroTitle}>협업과 연결</h1>
           <p style={s.heroSub}>
             O4O 약국은 약사 네트워크와 함께<br />
-            다양한 교육과 운영 협업을 지원합니다.
+            약국 운영 협업을 지원합니다.
           </p>
         </div>
       </section>
@@ -69,23 +69,7 @@ export function ContactPage() {
               </button>
             </div>
 
-            {/* 카드 2: 강의 개설 / 협업 */}
-            <div style={s.card}>
-              <div style={s.cardIcon}>🎓</div>
-              <h2 style={s.cardTitle}>강의 개설 / 협업</h2>
-              <p style={s.cardDesc}>
-                약사 대상 교육 콘텐츠 개설 및 강의 운영 협업에 관한
-                문의를 받습니다.
-              </p>
-              <ul style={s.cardList}>
-                <li style={s.cardListItem}>온라인 강의 개설</li>
-                <li style={s.cardListItem}>보수교육 협력</li>
-                <li style={s.cardListItem}>세미나 / 워크숍 운영</li>
-              </ul>
-              <button style={s.cardBtn} onClick={() => setModalType('education')}>
-                강의 개설 문의
-              </button>
-            </div>
+
 
           </div>
         </section>

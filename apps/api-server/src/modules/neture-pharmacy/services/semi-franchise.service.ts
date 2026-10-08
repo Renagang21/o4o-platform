@@ -1,3 +1,4 @@
+import { businessCommunityKeyTaken } from '../../../services/community/community-key-namespace.js';
 /**
  * 세미프랜차이즈 = 데이터 행 (DESIGN §1 R3 · R4 · §3-2)
  *
@@ -235,6 +236,10 @@ export class SemiFranchiseService {
     return this.dataSource.transaction(async (m) => {
       const [dup] = await m.query(`SELECT 1 FROM semi_franchises WHERE key = $1`, [key]);
       if (dup) throw new NeturePharmacyError(409, 'KEY_IN_USE', '이미 있는 key 입니다.');
+      const communityKey = input.communityKey?.trim() || null;
+      if (communityKey && (!KEY_RE.test(communityKey) || await businessCommunityKeyTaken(m, communityKey))) {
+        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주세요.');
+      }
       // 운영 조직 — 이 세미프랜차이즈 이벤트 원장(OPL)의 소유 조직.
       const [org] = await m.query(
         `INSERT INTO organizations (name, code, type, "isActive", metadata) VALUES ($1, $2, 'semi_franchise', true, $3::jsonb) RETURNING id`,
@@ -244,7 +249,7 @@ export class SemiFranchiseService {
         `INSERT INTO semi_franchises (key, name, organization_id, community_key)
          VALUES ($1, $2, $3, $4)
          RETURNING id, key, name, organization_id, status, payment_receiver_key, community_key`,
-        [key, name, org.id, input.communityKey?.trim() || null],
+        [key, name, org.id, communityKey],
       );
       return row;
     });
@@ -264,6 +269,10 @@ export class SemiFranchiseService {
       throw new NeturePharmacyError(400, 'INVALID_STATUS', 'status 는 active · closed 입니다.');
     }
     return this.dataSource.transaction(async (m) => {
+      const communityKey = patch.communityKey?.trim() || null;
+      if (communityKey && (!KEY_RE.test(communityKey) || await businessCommunityKeyTaken(m, communityKey, sf.id))) {
+        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주세요.');
+      }
       if (patch.registrationConditions !== undefined) {
         if (typeof patch.registrationConditions !== 'string' || patch.registrationConditions.length > 4000) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
         await m.query(`UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('registrationConditions', $2::text) WHERE id = $1`, [sf.organization_id, patch.registrationConditions.trim()]);

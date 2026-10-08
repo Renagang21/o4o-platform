@@ -17,6 +17,12 @@ import operatorForumRoutes from './operator-forum.routes.js';
 import adminForumRoutes from './admin-forum.routes.js';
 
 const router: Router = Router();
+router.use(optionalAuth, (req, _res, next) => {
+  if (!isPlatformAdmin((req as any).user?.roles ?? [])) {
+    req.forumContext = { excludeScopedCommunities: true };
+  }
+  next();
+});
 
 /**
  * WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8
@@ -178,10 +184,10 @@ router.get('/categories/:id/membership-status', optionalAuth, membershipControll
 // Moderation (authenticated - admin/manager only)
 // ============================================================================
 // Get moderation queue
-router.get('/moderation', authenticate, moderationController.getModerationQueue.bind(moderationController));
+router.get('/moderation', authenticate, requireGenericForumWriteAdmin, moderationController.getModerationQueue.bind(moderationController));
 
 // Moderate content (approve/reject)
-router.post('/moderation/:type/:id', authenticate, moderationController.moderateContent.bind(moderationController));
+router.post('/moderation/:type/:id', authenticate, requireGenericForumWriteAdmin, moderationController.moderateContent.bind(moderationController));
 
 // ============================================================================
 // Notifications (Phase 13)

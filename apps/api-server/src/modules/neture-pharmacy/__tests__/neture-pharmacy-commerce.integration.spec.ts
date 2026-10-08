@@ -1,3 +1,5 @@
+import { eventIndexState, transitionEventIndex } from '../operations/event-index-transition.js';
+import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoard } from '../../../services/community/community-workspace.service.js';
 /**
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 — 실제 PostgreSQL 통합 검증 (WO §7)
  *
@@ -152,6 +154,51 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
   afterAll(async () => {
     if (ds?.isInitialized) await ds.destroy();
+  });
+
+  describe('독립 커뮤니티 · 사업 커뮤니티 공간', () => {
+    it('같은 약국의 독립 가입과 복수 사업을 분리하고, 담당 운영자·정지·종료를 원장에서 판정한다', async () => {
+      const member = await approvedPharmacy();
+      const independentKey = uniq('independent');
+      const [independent] = await ds.query("INSERT INTO communities (slug,name,status) VALUES ($1,'Independent','active') RETURNING id", [independentKey]);
+      const sfKey = uniq('biz-community');
+      const sfCommunityKey = uniq('biz-forum');
+      await sfs.create({ key: sfKey, name: 'Business', communityKey: sfCommunityKey });
+      const otherOperator = await user();
+      await role(otherOperator, 'neture:operator');
+      await sfs.assignOperator(sfKey, pharmacyOperator, operatorId);
+      const actor = { id: member.owner };
+      expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toMatchObject({ allowed: false, canJoin: true });
+      await ds.query("INSERT INTO community_memberships (community_id,user_id,status,role) VALUES ($1,$2,'active','member')", [independent.id, member.owner]);
+      expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toMatchObject({ allowed: true, forumStorageCodes: [`community:${independent.id}`] });
+      expect(await resolveCommunityWorkspace(ds, actor, sfCommunityKey)).toMatchObject({ allowed: false, canJoin: false });
+      expect(await listCommunityWorkspaces(ds, actor)).not.toEqual(expect.arrayContaining([expect.objectContaining({ communityKey: sfCommunityKey })]));
+      const businessMembershipId = await joinSemiFranchise(member.orgId, member.owner, sfKey, pharmacyOperator);
+      const business = (await resolveCommunityWorkspace(ds, actor, sfCommunityKey))!;
+      expect(business.allowed).toBe(true);
+      expect(business.forumStorageCodes).not.toEqual([`community:${independent.id}`]);
+      expect(await resolveCommunityWorkspace(ds, { id: otherOperator }, sfCommunityKey)).toMatchObject({ allowed: false, canManage: false });
+      const operator = (await resolveCommunityWorkspace(ds, { id: pharmacyOperator }, sfCommunityKey))!;
+      expect(operator).toMatchObject({ allowed: true, canManage: true });
+      const board = await createCommunityBoard(ds, operator, pharmacyOperator, { name: 'Members board' });
+      expect((await ds.query('SELECT service_code FROM forum_category_requests WHERE id = $1', [board.id]))[0].service_code).toBe(operator.forumStorageCodes[0]);
+      await expect(createCommunityBoard(ds, business, member.owner, { name: 'Forbidden' })).rejects.toThrow('COMMUNITY_OPERATOR_REQUIRED');
+      await ds.query("UPDATE semi_franchise_memberships SET status = 'suspended' WHERE id = $1", [businessMembershipId]);
+      expect(await resolveCommunityWorkspace(ds, actor, sfCommunityKey)).toMatchObject({ allowed: false });
+      expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toMatchObject({ allowed: true });
+      await ds.query("UPDATE semi_franchises SET status = 'closed' WHERE key = $1", [sfKey]);
+      expect(await resolveCommunityWorkspace(ds, { id: pharmacyOperator }, sfCommunityKey)).toMatchObject({ kind: 'semi-franchise', allowed: false, canManage: false });
+    });
+
+    it('사업 포럼 주소는 기존 약사 포럼·독립 커뮤니티·개설 신청과 충돌할 수 없다', async () => {
+      await expect(sfs.create({ key: uniq('bad'), name: 'Bad', communityKey: 'pharmacy' })).rejects.toMatchObject({ code: 'COMMUNITY_KEY_IN_USE' });
+      const slug = uniq('reserved-community');
+      await ds.query("INSERT INTO communities (slug,name,status) VALUES ($1,'Reserved','active')", [slug]);
+      await expect(sfs.create({ key: uniq('bad'), name: 'Bad', communityKey: slug })).rejects.toMatchObject({ code: 'COMMUNITY_KEY_IN_USE' });
+      const pendingSlug = uniq('pending-community');
+      await ds.query("INSERT INTO community_creation_requests (requester_user_id,desired_slug,name,status) VALUES ($1,$2,'Pending','pending')", [operatorId, pendingSlug]);
+      await expect(sfs.create({ key: uniq('bad'), name: 'Bad', communityKey: pendingSlug })).rejects.toMatchObject({ code: 'COMMUNITY_KEY_IN_USE' });
+    });
   });
 
   // ─── 가입 · 권한 ────────────────────────────────────────────────────────
@@ -421,6 +468,37 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await getSupplyOption(ds, b.orgId, 'proposal', sp.id)).toBeNull();
     });
 
+    it('2단계: 같은 제품의 복수 이벤트·취소 후 재신청 허용, 중복 원장이 있으면 인덱스 롤백 차단', async () => {
+      const prod = await supplierWithProduct({ price: 10000 });
+      const member = await approvedPharmacy();
+      await joinSemiFranchise(member.orgId, member.owner, 'pharmacy', pharmacyOperator);
+      const sf = (await sfs.getByKey('pharmacy'))!;
+      const window = { startAt: new Date(Date.now() - 3600_000).toISOString(), endAt: new Date(Date.now() + 86400_000).toISOString() };
+      try {
+        await ds.transaction(m => transitionEventIndex(m, 'up'));
+        expect(await eventIndexState(ds.manager)).toBe('phase-two');
+        await ds.transaction(m => transitionEventIndex(m, 'up')); // repeatable
+        const input = { offerId: prod.offerId, semiFranchiseKey: 'pharmacy', eventPrice: 8000, totalQuantity: 10, ...window };
+        const a = await events.supplierCreate(prod.supplierId, prod.supplierUser, input);
+        const b = await events.supplierCreate(prod.supplierId, prod.supplierUser, input);
+        await events.operatorDecide(sf, pharmacyOperator, a.id, 'approve');
+        await events.operatorDecide(sf, pharmacyOperator, b.id, 'approve');
+        expect(await getSupplyOption(ds, member.orgId, 'event', a.id)).toMatchObject({ totalQuantity: 10 });
+        expect(await getSupplyOption(ds, member.orgId, 'event', b.id)).toMatchObject({ totalQuantity: 10 });
+        await events.supplierCancel(prod.supplierId, a.id);
+        const c = await events.supplierCreate(prod.supplierId, prod.supplierUser, input);
+        expect(c.id).not.toBe(a.id);
+        expect(await getSupplyOption(ds, member.orgId, 'event', a.id)).toBeNull();
+        expect(await getSupplyOption(ds, member.orgId, 'event', b.id)).not.toBeNull();
+        await expect(ds.transaction(m => transitionEventIndex(m, 'down'))).rejects.toThrow('EVENT_INDEX_ROLLBACK_HAS_DUPLICATE_LISTINGS');
+        expect(await eventIndexState(ds.manager)).toBe('phase-two');
+      } finally {
+        await ds.query('DELETE FROM organization_product_listings WHERE offer_id = $1', [prod.offerId]);
+        await ds.transaction(m => transitionEventIndex(m, 'down'));
+        expect(await eventIndexState(ds.manager)).toBe('phase-one');
+      }
+    });
+
     // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1 1단계: idx_org_listing_unique_v2 전체 UNIQUE 유지 → 재신청 · 복수 이벤트는 명시 거절.
     //   2단계(부분 UNIQUE) 배포 때 이 기대값을 '재신청 가능 · 복수 승인 공존'으로 되돌린다.
     it('이벤트: 승인 후 노출 · 종료 후 같은 제품 재신청은 1단계에서 명시 거절(500 아님) · 가격 수정 경로 없음', async () => {
@@ -457,6 +535,24 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(typeof (events as any).updatePrice).toBe('undefined');
     });
 
+    it.each(['neture-pharmacy', 'kpa-society'])('미지정 %s 모집도 pharmacy 중복 생성 검사에 포함한다', async serviceKey => {
+      const prod = await supplierWithProduct({ price: 15000 });
+      const existing = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 13000 });
+      await ds.query('UPDATE seller_recruitments SET semi_franchise_id = NULL, service_id = $2 WHERE id = $1', [existing.id, serviceKey]);
+      await expect(recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, semiFranchiseKey: 'pharmacy', supplyUnitPrice: 12000 }))
+        .rejects.toMatchObject({ code: 'RECRUITMENT_ALREADY_EXISTS' });
+      expect((await recruitments.supplierList(prod.supplierUser)).map(row => row.id)).toEqual([existing.id]);
+    });
+
+    it('약국 대상이 아닌 서비스의 미지정 모집은 pharmacy 중복으로 재해석하지 않는다', async () => {
+      const prod = await supplierWithProduct({ price: 15000 });
+      const foreign = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 13000 });
+      await ds.query("UPDATE seller_recruitments SET semi_franchise_id = NULL, service_id = 'k-cosmetics' WHERE id = $1", [foreign.id]);
+      const pharmacy = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 12000 });
+      expect(pharmacy.id).not.toBe(foreign.id);
+      expect((await recruitments.supplierList(prod.supplierUser)).map(row => row.id)).toEqual([pharmacy.id]);
+    });
+
     it('모집: 조건 승인 → 약국 조직 참여 신청 → 공급자 승인 후 모집 공급가로 바로 주문 옵션이 생긴다', async () => {
       const prod = await supplierWithProduct({ price: 15000 });
       const member = await approvedPharmacy();
@@ -484,7 +580,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const b = await approvedPharmacy();
       await joinSemiFranchise(a.orgId, a.owner, 'pharmacy', pharmacyOperator);
       await joinSemiFranchise(b.orgId, b.owner, 'pharmacy', pharmacyOperator);
-      const buyer = a.owner; // 두 약국을 함께 운영하는 사용자 (조직 소유 판정은 route 게이트가 맡는다)
+      const buyer = a.owner; // 내부 격리 검증용 호출. 실제 타 약국 접근은 route의 조직 권한 gate가 판정한다.
       const added = await cart.add(buyer, a.orgId, { kind: 'default', id: prod.offerId, quantity: 1 });
 
       expect(await cart.list(buyer, b.orgId)).toEqual([]);
@@ -502,6 +598,30 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(o.items[0].quantity).toBe(1);
       // A 주문 확정은 B 장바구니를 지우지 않는다
       expect(await cart.list(buyer, b.orgId)).toEqual([expect.objectContaining({ id: addedB.id, quantity: 2 })]);
+    });
+
+    it('미지정 모집은 pharmacy로 판정하고 다른 사업의 가입으로 신청·주문을 열지 않는다', async () => {
+      const prod = await supplierWithProduct({ price: 20000 });
+      const member = await approvedPharmacy();
+      const outsider = await approvedPharmacy();
+      const sf = (await sfs.getByKey('pharmacy'))!;
+      await joinSemiFranchise(member.orgId, member.owner, 'pharmacy', pharmacyOperator);
+      const otherKey = uniq('other-recruitment');
+      await sfs.create({ key: otherKey, name: 'Other business' });
+      await sfs.assignOperator(otherKey, pharmacyOperator, operatorId);
+      await joinSemiFranchise(outsider.orgId, outsider.owner, otherKey, pharmacyOperator);
+      const rec = await recruitments.supplierCreate(prod.supplierUser, [prod.supplierId], { masterId: prod.masterId, supplyUnitPrice: 12000 });
+      await ds.query('UPDATE seller_recruitments SET semi_franchise_id = NULL WHERE id = $1', [rec.id]);
+      await recruitments.operatorDecide(sf, pharmacyOperator, rec.id, 'approve');
+      expect(await recruitments.pharmacyBrowse(member.orgId)).toEqual(expect.arrayContaining([expect.objectContaining({ id: rec.id, semiFranchiseKey: 'pharmacy' })]));
+      expect(await recruitments.pharmacyBrowse(outsider.orgId)).not.toEqual(expect.arrayContaining([expect.objectContaining({ id: rec.id })]));
+      await expect(recruitments.pharmacyApply(outsider.orgId, outsider.owner, rec.id)).rejects.toMatchObject({ code: 'RECRUITMENT_NOT_AVAILABLE' });
+      const application = await recruitments.pharmacyApply(member.orgId, member.owner, rec.id);
+      await ds.query("UPDATE seller_recruitment_applications SET status = 'approved' WHERE id = $1", [application.id]);
+      expect(await getSupplyOption(ds, member.orgId, 'recruitment', rec.id)).toMatchObject({ semiFranchiseKey: 'pharmacy', unitPrice: 12000 });
+      expect(await getSupplyOption(ds, outsider.orgId, 'recruitment', rec.id)).toBeNull();
+      await ds.query("UPDATE semi_franchise_memberships SET status = 'suspended' WHERE organization_id = $1 AND semi_franchise_id = $2", [member.orgId, sf.id]);
+      expect(await getSupplyOption(ds, member.orgId, 'recruitment', rec.id)).toBeNull();
     });
 
     it('선택 제안 가격이 청구 가격이고, 수취 주체별로 결제 묶음이 나뉘며, 결제는 대응 · 금액 · 멱등을 검증한다', async () => {

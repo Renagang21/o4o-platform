@@ -26,6 +26,8 @@ import { KpaMember } from '../entities/kpa-member.entity.js';
 import { buildKpaOperatorDashboardConfig } from '../services/operator-dashboard.service.js';
 // WO-O4O-KPA-OPERATOR-ORDER-VIEW-BACKEND-ENABLE-V1: 공통 view-only 주문 조회 헬퍼
 import { queryOperatorOrders } from '../../common/order/operatorOrderQuery.js';
+import { requireCommunityAccess } from '../../../middleware/community-access.middleware.js';
+import { resolveCommunityWorkspace } from '../../../services/community/community-workspace.service.js';
 
 interface OperatorSummaryServices {
   contentService: ContentQueryService;
@@ -71,6 +73,7 @@ export function createOperatorSummaryController(
    * 운영자 대시보드 통합 요약: 승인/요청 대기 + 최근 활동
    */
   router.get('/summary', asyncHandler(async (req: Request, res: Response) => {
+    const workspace = await resolveCommunityWorkspace(dataSource, (req as any).user, 'pharmacy');
     // Parallel fetch: totals + pending counts + recent items
     const [
       recentContent,
@@ -101,7 +104,7 @@ export function createOperatorSummaryController(
     ] = await Promise.all([
       contentService.listForHome(['notice', 'news'], 5),
       signageService.listForHome(3, 3),
-      forumService.listRecentPosts(5),
+      workspace?.allowed ? forumService.listRecentPosts(5) : [],
       // Total COUNT queries (Hub/BranchOperator 통계용)
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
@@ -115,14 +118,7 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM signage_playlists
         WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL
       `),
-      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: DESIGN-ACCEPT
-      // Forum is Community domain (Boundary Policy F6, primary boundary = organizationId).
-      // Public posts (organization_id IS NULL) are shared across services by design.
-      // forum_post/forum_category have no serviceKey column — isolation is via organizationId.
-      dataSource.query(`
-        SELECT COUNT(*) as count FROM forum_post
-        WHERE status = 'publish' AND organization_id IS NULL
-      `),
+      workspace?.allowed ? forumService.countVisiblePosts() : 0,
       // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required COUNT queries
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
@@ -144,10 +140,7 @@ export function createOperatorSummaryController(
       `),
       // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: 미존재 테이블 참조 제거 — safe fallback
       // Forum category request pending
-      dataSource.query(`
-        SELECT COUNT(*) AS count FROM forum_category_requests
-        WHERE status = 'pending' AND service_code = 'kpa-society'
-      `),
+      workspace?.canManage ? forumService.countPendingRequests() : 0,
       // Instructor qualification pending (kpa_approval_requests 테이블 복구됨)
       dataSource.query(`
         SELECT COUNT(*) AS count FROM kpa_approval_requests
@@ -211,8 +204,8 @@ export function createOperatorSummaryController(
           recentPlaylists: signageHome.playlists,
         },
         forum: {
-          totalPosts: parseInt(forumPostTotalCount[0]?.count || '0', 10),
-          pendingRequests: parseInt(forumPendingRequestCount[0]?.count || '0', 10),
+          totalPosts: forumPostTotalCount,
+          pendingRequests: forumPendingRequestCount,
           recentPosts,
         },
         // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1
@@ -270,7 +263,7 @@ export function createOperatorSummaryController(
    * GET /operator/forum-analytics
    * 포럼 운영 통계: KPI 4개 + Top 5 활성 포럼 + 무활동 포럼
    */
-  router.get('/forum-analytics', asyncHandler(async (req: Request, res: Response) => {
+  router.get('/forum-analytics', requireCommunityAccess('pharmacy'), asyncHandler(async (req: Request, res: Response) => {
     const data = await forumService.getForumAnalytics();
     res.json({ success: true, data });
   }));

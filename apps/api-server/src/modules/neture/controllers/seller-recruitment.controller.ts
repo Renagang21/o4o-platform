@@ -29,6 +29,9 @@ import type { AuthenticatedRequest } from '../middleware/neture-identity.middlew
 import type { SellerRecruitmentService } from '../services/seller-recruitment.service.js';
 import { RecruitmentStatus, ExposureStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { AppDataSource } from '../../../database/connection.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { requireNetureMainMembership } from '../../../middleware/neture-main-membership.middleware.js';
 
 export function createSellerRecruitmentController(deps: {
   sellerRecruitmentService: SellerRecruitmentService;
@@ -156,11 +159,12 @@ export function createSellerRecruitmentController(deps: {
   // ==================== Application ====================
 
   /** GET /applications/mine — 신청자 본인 신청 현황 (WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1) */
-  router.get('/applications/mine', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/applications/mine', requireAuth, createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
-      const data = await service.getApplicationsForApplicant(userId);
+      const organizationId = (req as AuthenticatedRequest & { organizationId?: string }).organizationId;
+      const data = await service.getApplicationsForApplicant(userId, organizationId);
       res.json({ success: true, data });
     } catch (error) {
       logger.error('[SellerRecruitment API] Error fetching applications:', error);
@@ -169,7 +173,7 @@ export function createSellerRecruitmentController(deps: {
   });
 
   /** POST /applications — 모집 신청 */
-  router.post('/applications', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/applications', requireAuth, requireNetureMainMembership(AppDataSource), createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
@@ -177,7 +181,8 @@ export function createSellerRecruitmentController(deps: {
       if (!recruitmentId) {
         return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'recruitmentId is required' });
       }
-      const result = await service.createApplication(recruitmentId, userId, req.user?.name || '');
+      const organizationId = (req as AuthenticatedRequest & { organizationId?: string }).organizationId;
+      const result = await service.createApplication(recruitmentId, userId, req.user?.name || '', organizationId);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       const msg = (error as Error).message;
@@ -190,6 +195,7 @@ export function createSellerRecruitmentController(deps: {
       if (msg === 'RECRUITMENT_NOT_EXPOSED') {
         return res.status(400).json({ success: false, error: 'RECRUITMENT_NOT_EXPOSED', message: '아직 서비스 노출 승인이 완료되지 않은 모집입니다.' });
       }
+      if (msg === 'STORE_CONTEXT_REQUIRED') return res.status(400).json({ success: false, error: msg, message: '내 매장을 선택해 주세요.' });
       if (msg === 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED') {
         return res.status(403).json({ success: false, error: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED', message: '세미프랜차이즈 가입 승인 후 참여할 수 있는 모집입니다.' });
       }
@@ -201,16 +207,17 @@ export function createSellerRecruitmentController(deps: {
     }
   });
 
-  /** POST /applications/:id/cancel — 신청자 본인 pending 철회 (WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1) */
-  router.post('/applications/:id/cancel', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  /** POST /applications/:id/cancel — 현재 권한을 확인한 약국의 pending 신청 철회 */
+  router.post('/applications/:id/cancel', requireAuth, createRequireStoreOwner(AppDataSource, 'kpa') as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) return unauthorized(res);
-      const result = await service.cancelApplication(req.params.id, userId);
+      const organizationId = (req as AuthenticatedRequest & { organizationId?: string }).organizationId;
+      const result = await service.cancelApplication(req.params.id, userId, organizationId);
       if (!result.success) {
         const map: Record<string, [number, string]> = {
           APPLICATION_NOT_FOUND: [404, '신청을 찾을 수 없습니다.'],
-          NOT_OWNER: [403, '본인 신청만 취소할 수 있습니다.'],
+          NOT_OWNER: [403, '이 신청을 취소할 약국 권한이 없습니다.'],
           NOT_PENDING: [400, '심사 대기 중인 신청만 취소할 수 있습니다.'],
         };
         const [status, message] = map[result.error] || [400, '신청 취소에 실패했습니다.'];

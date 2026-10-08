@@ -11,7 +11,7 @@
  */
 
 // Feature flag for API switching
-const USE_REAL_API = import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
+const usesRealApi = () => !!communityPathKey() || import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
 
 import { api } from '../lib/apiClient';
 /**
@@ -21,7 +21,13 @@ import { api } from '../lib/apiClient';
  * `/forum/category-requests` · `/forum/operator` · `/forum/admin` 은 자체 serviceCode
  * 권한 계약을 이미 갖고 있어 공통 경로를 그대로 유지한다.
  */
-const FORUM_BASE = '/neture/forum';
+function communityPathKey(): string | undefined {
+  return typeof window === 'undefined' ? undefined : /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
+}
+function forumBase(): string {
+  const key = communityPathKey();
+  return key ? `/communities/${encodeURIComponent(key)}/forum` : '/neture/forum';
+}
 
 
 // ============================================================================
@@ -235,7 +241,7 @@ export async function fetchForumPosts(params: {
   tag?: string;
   sortBy?: 'latest' | 'popular' | 'oldest';
 }): Promise<PostsResponse> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response
     let posts = [...MOCK_POSTS];
 
@@ -278,7 +284,7 @@ export async function fetchForumPosts(params: {
     if (params.tag) queryParams.append('tag', params.tag);
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
-    const response = await api.get(`${FORUM_BASE}/posts?${queryParams}`);
+    const response = await api.get(`${forumBase()}/posts?${queryParams}`);
     const data = response.data;
 
     if (!data.success) {
@@ -293,8 +299,8 @@ export async function fetchForumPosts(params: {
     return data;
   } catch (error) {
     console.error('Error fetching forum posts:', error);
-    // Fallback to mock on error
-    return fetchForumPosts({ ...params });
+    // Preserve the access/network failure; recursive retries would never reach mock mode.
+    throw error;
   }
 }
 
@@ -310,7 +316,7 @@ export async function fetchPinnedPosts(limit: number = 2): Promise<ForumPost[]> 
  * Fetch a single post by slug
  */
 export async function fetchForumPostBySlug(slug: string): Promise<PostResponse | null> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response
     const detail = MOCK_POST_DETAILS[slug];
     if (!detail) {
@@ -332,7 +338,7 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
 
   // Real API call - get post by slug directly
   try {
-    const response = await api.get(`${FORUM_BASE}/posts/${encodeURIComponent(slug)}`);
+    const response = await api.get(`${forumBase()}/posts/${encodeURIComponent(slug)}`);
     const data = response.data;
 
     if (!data.success) {
@@ -351,7 +357,7 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
  * Fetch comments for a post
  */
 export async function fetchForumComments(postId: string): Promise<CommentsResponse> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response - find comments by post slug or id
     const detail = Object.values(MOCK_POST_DETAILS).find(d => d.post.id === postId);
     const comments = detail?.comments || [];
@@ -370,7 +376,7 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 
   // Real API call
   try {
-    const response = await api.get(`${FORUM_BASE}/posts/${postId}/comments`);
+    const response = await api.get(`${forumBase()}/posts/${postId}/comments`);
     return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
@@ -382,7 +388,7 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
  * Fetch categories
  */
 export async function fetchForumCategories(): Promise<ForumCategoryListResponse> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     return {
       success: true,
       data: [MOCK_CATEGORY],
@@ -391,7 +397,7 @@ export async function fetchForumCategories(): Promise<ForumCategoryListResponse>
   }
 
   try {
-    const response = await api.get(`${FORUM_BASE}/categories`);
+    const response = await api.get(`${forumBase()}/categories`);
     return response.data;
   } catch (error) {
     console.error('Error fetching forum categories:', error);
@@ -421,12 +427,12 @@ export interface PopularForum {
 }
 
 export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: PopularForum[] }> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     return { success: true, data: [] };
   }
 
   try {
-    const response = await api.get(`${FORUM_BASE}/categories/popular?limit=${limit}`);
+    const response = await api.get(`${forumBase()}/categories/popular?limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching popular forums:', error);
@@ -471,7 +477,7 @@ export interface UserContactSettings {
  * Fetch current user's contact settings
  */
 export async function fetchUserContactSettings(): Promise<UserContactSettings | null> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response
     return {
       contactEnabled: false,
@@ -497,7 +503,7 @@ export async function fetchUserContactSettings(): Promise<UserContactSettings | 
 export async function updateUserContactSettings(
   settings: Partial<UserContactSettings>,
 ): Promise<{ success: boolean; error?: string }> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response
     await new Promise(resolve => setTimeout(resolve, 300));
     return { success: true };
@@ -589,7 +595,7 @@ export interface CreatePostResponse {
 export async function createForumPost(
   payload: CreateForumPostPayload,
 ): Promise<CreatePostResponse> {
-  if (!USE_REAL_API) {
+  if (!usesRealApi()) {
     // Mock response - simulate post creation
     const now = new Date().toISOString();
     const newPost: ForumPost = {
@@ -626,7 +632,7 @@ export async function createForumPost(
 
   // Real API call
   try {
-    const response = await api.post(`${FORUM_BASE}/posts`, {
+    const response = await api.post(`${forumBase()}/posts`, {
       title: payload.title,
       content: payload.content,
       ...(payload.forumId ? { forumId: payload.forumId } : {}),
@@ -661,7 +667,7 @@ export async function createForumComment(
   parentId?: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await api.post(`${FORUM_BASE}/comments`, { postId, content, parentId });
+    const response = await api.post(`${forumBase()}/comments`, { postId, content, parentId });
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -682,7 +688,7 @@ export async function updateForumPost(
   payload: { title?: string; content?: any; categorySlug?: string }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
-    const response = await api.put(`${FORUM_BASE}/posts/${postId}`, payload);
+    const response = await api.put(`${forumBase()}/posts/${postId}`, payload);
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -699,7 +705,7 @@ export async function toggleForumPostLike(
   postId: string
 ): Promise<{ success: boolean; data?: { likeCount: number; isLiked: boolean }; error?: string }> {
   try {
-    const response = await api.post(`${FORUM_BASE}/posts/${postId}/like`, {});
+    const response = await api.post(`${forumBase()}/posts/${postId}/like`, {});
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -713,7 +719,7 @@ export async function deleteForumPost(
   postId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`${FORUM_BASE}/posts/${postId}`);
+    await api.delete(`${forumBase()}/posts/${postId}`);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;
@@ -730,7 +736,7 @@ export async function updateForumComment(
   content: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await api.put(`${FORUM_BASE}/comments/${commentId}`, { content });
+    const response = await api.put(`${forumBase()}/comments/${commentId}`, { content });
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -747,7 +753,7 @@ export async function deleteForumComment(
   commentId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`${FORUM_BASE}/comments/${commentId}`);
+    await api.delete(`${forumBase()}/comments/${commentId}`);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;
@@ -762,7 +768,7 @@ export async function deleteForumComment(
 
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
   try {
-    const response = await api.get(`${FORUM_BASE}/categories/mine`);
+    const response = await api.get(`${forumBase()}/categories/mine`);
     return response.data;
   } catch (error) {
     console.error('Error fetching my categories:', error);
@@ -775,7 +781,7 @@ export async function updateMyCategory(
   data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.patch(`${FORUM_BASE}/categories/${id}/owner`, data);
+    const response = await api.patch(`${forumBase()}/categories/${id}/owner`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
@@ -788,7 +794,7 @@ export async function requestDeleteCategory(
   data: { reason?: string },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.post(`${FORUM_BASE}/categories/${id}/delete-request`, data);
+    const response = await api.post(`${forumBase()}/categories/${id}/delete-request`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
@@ -798,7 +804,7 @@ export async function requestDeleteCategory(
 
 export async function fetchMyForumRequests(): Promise<{ success: boolean; data: any[] }> {
   try {
-    const response = await api.get('/forum/category-requests/my?serviceCode=neture');
+    const response = await api.get(communityPathKey() ? `/communities/${communityPathKey()}/board-requests` : '/forum/category-requests/my?serviceCode=neture');
     return response.data;
   } catch (error) {
     console.error('Error fetching my forum requests:', error);
@@ -810,7 +816,7 @@ export async function createForumCategoryRequest(
   data: { name: string; description: string; reason?: string; tags?: string[] },
 ): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
-    const response = await api.post('/forum/category-requests', {
+    const response = await api.post(communityPathKey() ? `/communities/${communityPathKey()}/board-requests` : '/forum/category-requests', {
       ...data,
       serviceCode: 'neture',
     });
@@ -1059,7 +1065,7 @@ export async function fetchMyForumPosts(params: {
   if (params.limit) query.set('limit', String(params.limit));
 
   // 내가 쓴 글은 mock fallback 을 쓰지 않는다 — 조회 실패는 throw 해서 공통 View 의 error 상태로 보낸다.
-  const response = await api.get(`${FORUM_BASE}/posts?${query.toString()}`);
+  const response = await api.get(`${forumBase()}/posts?${query.toString()}`);
   const body = response.data;
   if (!body?.success) throw new Error(body?.error || '내가 쓴 글을 불러오지 못했습니다.');
 
@@ -1078,7 +1084,7 @@ export async function fetchMyForumPosts(params: {
         ? (post.type as ForumListItemPostType)
         : undefined,
       statusLabel: myPostStatusLabel(post.status),
-      routeTo: `/forum/post/${post.slug || post.id}`,
+      routeTo: `${communityPathKey() ? `/communities/${communityPathKey()}/forum` : '/forum'}/post/${post.slug || post.id}`,
     })),
     page: body.pagination?.page ?? params.page ?? 1,
     totalPages: body.pagination?.totalPages ?? 0,

@@ -22,7 +22,7 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
-  { label: '커뮤니티', href: '/' },
+  { label: '커뮤니티', href: 'https://community.neture.co.kr' },
 ];
 
 // WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 단일 진입점 (커뮤니티 중심 공개 안내)
@@ -46,7 +46,6 @@ export type KpaContextualNavItem = ContextualNavItem<'storeOwner' | 'operator' |
 //   guard redirect 되는 UX 함정 제거.
 export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
-  { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeOwner' },
 ];
 
 // ─── Footer Nav ──────────────────────────────────────────────────────────────

@@ -41,16 +41,18 @@ describe('주소별 사업 의미 (§2)', () => {
     expect(r).toContain('`kpa:*`');
   });
 
-  it('retail.neture.co.kr = 화장품 · 일반 소매 사업자 대상 세미프랜차이즈 운영', () => {
+  it('retail.neture.co.kr = 옛 화장품·소매 영역의 퇴역 대조 대상', () => {
     const r = row('retail.neture.co.kr');
     expect(r).toContain('소매 사업자');
-    expect(r).toContain('세미프랜차이즈');
+    expect(r).toContain('퇴역');
     expect(r).toContain('`k-cosmetics`');
   });
 
   it('store.neture.co.kr = 공통 Store Workspace · serviceKey 없음', () => {
     const r = row('store.neture.co.kr');
-    expect(r).toContain('Store Workspace');
+    expect(r).toContain('약국 하나의 내 매장');
+    expect(r).toContain('복수 서비스');
+    expect(r).toContain('중간 HUB 없음');
     expect(r).toContain('**없음**');
   });
 

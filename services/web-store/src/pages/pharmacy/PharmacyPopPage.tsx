@@ -323,7 +323,7 @@ export function PharmacyPopPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-800">내 매장 POP</h1>
           <p className="text-sm text-slate-500 mt-1">
-            매장 HUB 에서 가져온 POP 사본 목록입니다. 자유롭게 수정할 수 있으며,
+            제공 자료 에서 가져온 POP 사본 목록입니다. 자유롭게 수정할 수 있으며,
             PDF 출력은 POP 제작 화면에서 진행합니다.
           </p>
         </div>
@@ -333,7 +333,7 @@ export function PharmacyPopPage() {
             className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
           >
             <ExternalLink className="w-4 h-4" />
-            매장 HUB POP
+            제공 자료 POP
           </button>
           <button
             onClick={() => navigate(CANONICAL_STORE_POP_V2_ROUTE)}
@@ -516,7 +516,7 @@ export function PharmacyPopPage() {
                 onClick={() => navigate('/hub/pop')}
                 className="text-sm text-blue-600 hover:underline"
               >
-                매장 HUB POP 에서 가져오기
+                제공 자료 POP 에서 가져오기
               </button>
             </div>
           )}

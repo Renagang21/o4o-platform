@@ -10,9 +10,9 @@
  *
  *   Store 가 모집에 신청  →  Supplier 승인/반려
  *   승인 결과 = application.status=approved
- *             + C bridge: supplier_product_offers.allowed_seller_ids += 신청자 · 매장 OPL(source_type='seller_recruitment')
+ *             + 조직 없는 기존 신청만 C bridge: allowed_seller_ids · OPL(source_type='seller_recruitment')
  *             + in-app 알림
- *   참여 해지 = application.status=cancelled (decidedBy=공급자) + allowed_seller_ids 제거 + OPL 비활성
+ *   참여 해지 = application.status=cancelled (decidedBy=공급자). 기존 bridge가 있는 신청만 bridge 정리.
  *
  * 흐름(E2E 계약):
  *   Supplier 모집 생성 → Service Operator 노출 승인 → Store browse/apply → Supplier approve/reject/terminate
@@ -20,7 +20,7 @@
  * 물리 테이블명(seller_recruitments · seller_recruitment_applications)은 엔티티 파일의 상수가 격리한다.
  * 이 서비스의 raw SQL 은 상수 SELLER_RECRUITMENT_*_TABLE 만 사용한다.
  */
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
   SellerRecruitment,
@@ -39,7 +39,8 @@ import type { NotificationType } from '../../../entities/Notification.js';
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
-import { PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
+import { DEFAULT_SEMI_FRANCHISE_KEY, PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
+import { PHARMACY_RECRUITMENT_SERVICE_KEYS } from '../../neture-pharmacy/services/recruitment-target.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -94,12 +95,11 @@ export class SellerRecruitmentService {
     if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
 
     let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
-    // Store browse only: NULL is a legacy service recruitment, not a semi-franchise offering.
-    // Compare the actual row ID, never infer it from the host/service key.
-    if (filters?.storeOrganizationId !== undefined && recruitments.some((r) => r.semiFranchiseId)) {
-      const memberships: Array<{ semi_franchise_id: string }> = filters.storeOrganizationId
+    // 약국 문맥의 미지정 모집도 pharmacy 가입을 확인한다. 목록에서만 우회하지 않는다.
+    if (filters?.storeOrganizationId !== undefined) {
+      const memberships: Array<{ semi_franchise_id: string; key: string }> = filters.storeOrganizationId
         ? await AppDataSource.query(
-          `SELECT sfm.semi_franchise_id
+          `SELECT sfm.semi_franchise_id, sf.key
              FROM semi_franchise_memberships sfm
              JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
              JOIN neture_pharmacy_memberships npm ON npm.organization_id = sfm.organization_id AND npm.status = 'active'
@@ -107,7 +107,10 @@ export class SellerRecruitmentService {
           [filters.storeOrganizationId],
         ) : [];
       const activeIds = new Set(memberships.map((m) => m.semi_franchise_id));
-      recruitments = recruitments.filter((r) => !r.semiFranchiseId || activeIds.has(r.semiFranchiseId));
+      const defaultActive = memberships.some((m) => m.key === DEFAULT_SEMI_FRANCHISE_KEY);
+      recruitments = recruitments.filter((r) => r.semiFranchiseId
+        ? activeIds.has(r.semiFranchiseId)
+        : PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(r.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number]) ? defaultActive : true);
     }
     return recruitments.map((r) => ({
       id: r.id,
@@ -353,15 +356,14 @@ export class SellerRecruitmentService {
   // ==================== Application (store/seller side) ====================
 
   /** Store/판매자의 모집 참여 신청 */
-  async createApplication(recruitmentId: string, applicantId: string, applicantName: string) {
+  async createApplication(recruitmentId: string, applicantId: string, applicantName: string, storeOrganizationId?: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
     if (recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
-    // Only an actual semi-franchise recruitment requires its own membership.
-    // Legacy service recruitments (NULL) retain their existing application flow.
-    if (recruitment.semiFranchiseId) {
+    if (recruitment.semiFranchiseId || PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(recruitment.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number])) {
+      if (!storeOrganizationId) throw new Error('STORE_CONTEXT_REQUIRED');
       const access = await AppDataSource.query(
         `SELECT sfm.id
            FROM organization_members om
@@ -369,28 +371,41 @@ export class SellerRecruitmentService {
            JOIN semi_franchise_memberships sfm ON sfm.organization_id = om.organization_id AND sfm.status = 'active'
            JOIN semi_franchises sf ON sf.id = sfm.semi_franchise_id AND sf.status = 'active'
           WHERE om.user_id = $1 AND om.role = ANY($3::text[]) AND om.left_at IS NULL
-            AND sf.id = $2
+            AND (sf.id = $2 OR ($2::uuid IS NULL AND sf.key = 'pharmacy'))
+            AND om.organization_id = $4::uuid
           LIMIT 1`,
-        [applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES]],
+        [applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES], storeOrganizationId],
       );
       if (!access.length) throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
     }
 
-    const existing = await this.applicationRepo.findOne({ where: { recruitmentId, applicantId } });
+    const applicantScope = storeOrganizationId
+      ? { applicantOrganizationId: storeOrganizationId }
+      : { applicantId, applicantOrganizationId: IsNull() };
+    const existing = await this.applicationRepo.findOne({ where: { recruitmentId, ...applicantScope } });
     if (existing) throw new Error('DUPLICATE_APPLICATION');
 
-    const saved = await this.applicationRepo.save(
-      this.applicationRepo.create({ recruitmentId, applicantId, applicantName, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
-    );
+    let saved: SellerRecruitmentApplication;
+    try {
+      saved = await this.applicationRepo.save(
+        this.applicationRepo.create({ recruitmentId, applicantId, applicantName, applicantOrganizationId: storeOrganizationId ?? null, status: ApplicationStatus.PENDING, appliedAt: new Date() }),
+      );
+    } catch (error) {
+      const databaseError = (error as { driverError?: { code?: string; constraint?: string } }).driverError;
+      if (databaseError?.code === '23505' && [
+        'uq_seller_recruitment_applications_org', 'uq_seller_recruitment_applications_legacy_applicant',
+      ].includes(databaseError.constraint ?? '')) throw new Error('DUPLICATE_APPLICATION');
+      throw error;
+    }
     logger.info(`[SellerRecruitmentService] application created: ${saved.id}`);
     return { id: saved.id, status: saved.status, appliedAt: saved.appliedAt };
   }
 
   /**
    * WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
-   * 신청자 본인이 신청한 모집 목록 + 상태(심사대기/승인/반려/철회/참여해지).
+   * 선택한 약국의 신청 현황. 조직 없는 기존 호출만 신청자 본인의 조직 없는 행을 조회한다.
    */
-  async getApplicationsForApplicant(applicantUserId: string) {
+  async getApplicationsForApplicant(applicantUserId: string, storeOrganizationId?: string) {
     const rows: Array<{
       id: string; recruitment_id: string; status: string; applied_at: Date; decided_at: Date | null; decided_by: string | null; reason: string | null;
       product_id: string; product_name: string; seller_name: string | null; service_id: string | null; seller_id: string;
@@ -399,9 +414,10 @@ export class SellerRecruitmentService {
               r.product_id, r.product_name, r.seller_name, r.service_id, r.seller_id
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
        JOIN ${SELLER_RECRUITMENT_TABLE} r ON r.id = a.recruitment_id
-       WHERE a.applicant_id = $1
+       WHERE (($2::uuid IS NOT NULL AND a.applicant_organization_id = $2::uuid)
+          OR ($2::uuid IS NULL AND a.applicant_id = $1 AND a.applicant_organization_id IS NULL))
        ORDER BY a.applied_at DESC`,
-      [applicantUserId],
+      [applicantUserId, storeOrganizationId ?? null],
     );
     return rows.map((a) => ({
       applicationId: a.id,
@@ -418,11 +434,16 @@ export class SellerRecruitmentService {
     }));
   }
 
-  /** WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 pending 철회. idempotent. */
-  async cancelApplication(applicationId: string, applicantUserId: string) {
+  /** 선택한 약국의 pending 신청 철회. 조직 없는 기존 신청만 신청자 본인으로 판정한다. */
+  async cancelApplication(applicationId: string, applicantUserId: string, storeOrganizationId?: string) {
     const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
     if (!application) return { success: false as const, error: 'APPLICATION_NOT_FOUND' };
-    if (application.applicantId !== applicantUserId) return { success: false as const, error: 'NOT_OWNER' };
+    const canCancel = application.applicantOrganizationId
+      ? application.applicantOrganizationId === storeOrganizationId
+      : application.applicantId === applicantUserId;
+    if (!canCancel) {
+      return { success: false as const, error: 'NOT_OWNER' };
+    }
     if (application.status === ApplicationStatus.CANCELLED) {
       return { success: true as const, data: { applicationId, alreadyCancelled: true } };
     }
@@ -430,7 +451,7 @@ export class SellerRecruitmentService {
 
     application.status = ApplicationStatus.CANCELLED;
     application.decidedAt = new Date();
-    application.decidedBy = applicantUserId; // 신청자 본인 철회
+    application.decidedBy = applicantUserId; // 현재 약국 권한을 가진 철회 작업자
     await this.applicationRepo.save(application);
     logger.info(`[SellerRecruitmentService] application cancelled by applicant: app=${applicationId}`);
     return { success: true as const, data: { applicationId } };
@@ -453,11 +474,13 @@ export class SellerRecruitmentService {
     }> = await AppDataSource.query(
       `SELECT a.id, a.applicant_id, a.applicant_name, a.status, a.applied_at, a.decided_at, a.decided_by, a.reason,
               u.name AS applicant_user_name, u.email AS applicant_email,
-              (SELECT o.name FROM organization_members om
+              COALESCE(org.name, (SELECT o.name FROM organization_members om
                  JOIN organizations o ON o.id = om.organization_id
-               WHERE om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1) AS organization_name
+               WHERE a.applicant_organization_id IS NULL
+                 AND om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1)) AS organization_name
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
        LEFT JOIN users u ON u.id = a.applicant_id
+       LEFT JOIN organizations org ON org.id = a.applicant_organization_id
        WHERE a.recruitment_id = $1
        ORDER BY a.applied_at DESC`,
       [recruitmentId],
@@ -515,7 +538,7 @@ export class SellerRecruitmentService {
     // WO-O4O-SELLER-RECRUITMENT-C-BRIDGE-BACKEND-V1: 승인 → 판매자 주문 가능화 (best-effort · idempotent)
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Neture 약국 세미프랜차이즈 모집은 승인된 약국 조직이
     //   모집 공급가로 바로 주문한다(공급 옵션 판정 SSOT). 사용자 단위 allowed_seller_ids · 진열 bridge 를 만들지 않는다.
-    if (!recruitment.semiFranchiseId) {
+    if (!recruitment.semiFranchiseId && !application.applicantOrganizationId) {
       try {
         await this.bridgeRecruitmentToOrderable(recruitment, application.applicantId);
       } catch (bridgeError) {
@@ -568,8 +591,7 @@ export class SellerRecruitmentService {
    * 승인된 신청자의 모집 참여를 해지한다(= 신규 조달 노출 중단). 기존 주문 이력 유지.
    *  ① 소유권: recruitment.sellerId === supplierUserId, application=approved
    *  ② application → cancelled (decidedBy=공급자) — legacy 계약 행 대신 신청 행이 종결 상태를 보유
-   *  ③ offer.allowed_seller_ids 에서 신청자 userId 제거
-   *  ④ source_type='seller_recruitment' OPL is_active=false
+   *  ③ 조직 없는 기존 신청만 offer.allowed_seller_ids · seller_recruitment OPL 정리
    */
   async terminateParticipation(applicationId: string, supplierUserId: string) {
     const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
@@ -583,6 +605,27 @@ export class SellerRecruitmentService {
     application.decidedBy = supplierUserId;
     await this.applicationRepo.save(application);
 
+    // 조직 신청은 승인 행 자체가 공급 조건이다. 승인 때 만들지 않은 사용자
+    // bridge 를 정리하면 같은 사용자의 다른 약국 공급 권한까지 바뀐다.
+    if (!recruitment.semiFranchiseId && !application.applicantOrganizationId) {
+      await this.removeLegacyRecruitmentBridge(recruitment, application.applicantId, supplierUserId, applicationId);
+    }
+
+    await this.notifyApplicant(
+      application.applicantId,
+      'recruitment.participation_terminated',
+      '판매자 모집 참여가 해지되었습니다.',
+      `${recruitment.productName} 모집 제품의 조달 가능 상태가 종료되었습니다. 기존 주문 이력은 유지됩니다.`,
+      recruitment,
+      application.id,
+    );
+
+    return { success: true as const, data: { applicationId, participationTerminated: true } };
+  }
+
+  private async removeLegacyRecruitmentBridge(
+    recruitment: SellerRecruitment, applicantId: string, supplierUserId: string, applicationId: string,
+  ): Promise<void> {
     const offerRows: Array<{ id: string }> = await AppDataSource.query(
       `SELECT spo.id
        FROM supplier_product_offers spo
@@ -598,11 +641,11 @@ export class SellerRecruitmentService {
         `UPDATE supplier_product_offers
          SET allowed_seller_ids = array_remove(coalesce(allowed_seller_ids, '{}'), $1), updated_at = NOW()
          WHERE id = $2`,
-        [application.applicantId, offerId],
+        [applicantId, offerId],
       );
       const orgRows: Array<{ organization_id: string }> = await AppDataSource.query(
         `SELECT organization_id FROM organization_members WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
-        [application.applicantId],
+        [applicantId],
       );
       if (orgRows.length) {
         await AppDataSource.query(
@@ -612,21 +655,10 @@ export class SellerRecruitmentService {
           [offerId, orgRows[0].organization_id],
         );
       }
-      logger.info(`[Participation] terminated app=${applicationId} applicant=${application.applicantId} offer=${offerId}`);
+      logger.info(`[Participation] terminated app=${applicationId} applicant=${applicantId} offer=${offerId}`);
     } else {
       logger.warn(`[Participation] offer not found — allowedSellerIds/OPL cleanup skipped (app=${applicationId})`);
     }
-
-    await this.notifyApplicant(
-      application.applicantId,
-      'recruitment.participation_terminated',
-      '판매자 모집 참여가 해지되었습니다.',
-      `${recruitment.productName} 모집 제품의 조달 가능 상태가 종료되었습니다. 기존 주문 이력은 유지됩니다.`,
-      recruitment,
-      application.id,
-    );
-
-    return { success: true as const, data: { applicationId, participationTerminated: true } };
   }
 
   // ==================== internals ====================

@@ -7,7 +7,7 @@
  * basePath prop 으로 /forum, /workspace/forum 동일 컴포넌트 재사용.
  */
 
-import { useMemo, type CSSProperties } from 'react';
+import { useMemo, type ReactNode, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ForumHubTemplate,
@@ -30,6 +30,7 @@ interface ForumHubPageProps {
   title?: string;
   description?: string;
   basePath?: string;
+  requestAction?: ReactNode;
 }
 
 function mapPopularToCategory(raw: PopularForum): ForumHubCategory {
@@ -109,6 +110,7 @@ export default function ForumHubPage({
   title = '네뚜레 포럼',
   description = 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다',
   basePath = '/forum',
+  requestAction,
 }: ForumHubPageProps) {
   const { isAuthenticated } = useAuth();
 
@@ -136,17 +138,17 @@ export default function ForumHubPage({
     writePrompt: { ctaPath: `${basePath}/posts` },
 
     // WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: Hero 우측 개설신청 CTA
-    headerAction: <ForumRequestButton />,
+    headerAction: requestAction === undefined ? <ForumRequestButton /> : requestAction,
 
     infoLinks: [
-      { label: '포럼 개설 신청', href: '/forum/request' },
+      ...(requestAction === undefined ? [{ label: '포럼 개설 신청', href: '/forum/request' }] : []),
       { label: '인기 글', href: `${basePath}/posts?sort=popular` },
       { label: '공지사항', href: `${basePath}/posts?type=announcement` },
       // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
       // 내가 쓴 글은 canonical 커뮤니티 포럼(/forum) 에만 존재한다(공급자·파트너 허브 제외).
       ...(basePath === '/forum' ? [{ label: '내가 쓴 글', href: '/forum/my-posts' }] : []),
     ],
-  }), [title, description, basePath]);
+  }), [title, description, basePath, requestAction]);
 
   return <ForumHubTemplate config={config} isAuthenticated={isAuthenticated} />;
 }

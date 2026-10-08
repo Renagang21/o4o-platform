@@ -347,8 +347,8 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
 
   it('세미프랜차이즈 모집 신청 POST 는 실제 모집 행 기준으로 직접 호출을 방어한다', () => {
     const svc = read('modules/neture/services/seller-recruitment.service.ts');
-    expect(svc).toContain('if (recruitment.semiFranchiseId) {');
-    expect(svc).toContain('[applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES]]');
+    expect(svc).toContain('if (recruitment.semiFranchiseId || PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(');
+    expect(svc).toContain('[applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES], storeOrganizationId]');
     // 판정은 신청 저장보다 먼저
     const createFn = svc.slice(svc.indexOf('async createApplication('));
     expect(createFn.indexOf(`throw new Error('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED')`)).toBeGreaterThan(0);

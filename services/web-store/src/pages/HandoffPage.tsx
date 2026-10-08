@@ -7,7 +7,7 @@
  * 서버는 이 origin(store.neture.co.kr)에서만 workspace 토큰을 교환하며, 판정 축은 서비스 membership 이 아니라
  * "접근 가능한 매장(organization)" 이다. 가짜 serviceKey 로 우회하지 않는다.
  */
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { BRAND, PLATFORM_ORIGIN } from '../config/workspace';
@@ -25,8 +25,12 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 export default function HandoffPage() {
   const [error, setError] = useState('');
+  const exchangeStarted = useRef(false);
   useLayoutEffect(() => { clearStoredTokens(); }, []);
   useEffect(() => {
+    // StrictMode replays effects; the server consumes each handoff token once.
+    if (exchangeStarted.current) return;
+    exchangeStarted.current = true;
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     const returnTo = resolveReturnTo(params.get('returnTo'));

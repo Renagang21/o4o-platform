@@ -1,5 +1,5 @@
 /**
- * HubScreenSetLibraryPage — 매장 HUB 태블릿 화면(운영자·공급자 제공) 진열 + 내 태블릿 콘텐츠로 가져오기
+ * HubScreenSetLibraryPage — 제공 자료 태블릿 화면(운영자·공급자 제공) 진열 + 내 태블릿 콘텐츠로 가져오기
  *
  * WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (운영자 제공)
  * WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C           (공급자 제공 섹션 추가)
@@ -325,7 +325,7 @@ export function HubScreenSetLibraryPage() {
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <MonitorSmartphone className="w-5 h-5 text-indigo-600" />
-          태블릿 화면 (HUB)
+          제공 태블릿 화면
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           운영자·공급자가 제작한 태블릿 화면을 내 매장으로 가져올 수 있습니다. 가져오면 <b>내 매장 소유의 사본</b>이 만들어지며,

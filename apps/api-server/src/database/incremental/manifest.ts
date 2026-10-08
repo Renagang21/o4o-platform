@@ -60,6 +60,7 @@ import { CreateAssistantProceduralMemory1791100000000 } from '../migrations/1791
 import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791177033073-AddLocalAgentDeviceCapabilities.js';
 // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (내 매장(약국) 신청 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
 import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
+import { AlignSellerRecruitmentApplicationIdentity1791477914134 } from '../migrations/1791477914134-AlignSellerRecruitmentApplicationIdentity.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -90,6 +91,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateAssistantProceduralMemory1791100000000,
   AddLocalAgentDeviceCapabilities1791177033073,
   CreateNeturePharmacyCommerce1791200000000,
+  AlignSellerRecruitmentApplicationIdentity1791477914134,
 ];
 
 export function incrementalMigrationNames(): string[] {

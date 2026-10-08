@@ -30,8 +30,6 @@ const TYPE_FILTERS = [
   // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5:
   // `forum_member_join` 은 실제 데이터가 있으나 필터 탭이 없어 '전체' 에서만 보였다.
   { key: 'forum_member_join', label: '포럼 가입' },
-  { key: 'course', label: '강좌' },
-  { key: 'instructor_qualification', label: '강사' },
   { key: 'membership', label: '가입' },
 ];
 
@@ -113,7 +111,7 @@ export default function MyRequestsPage() {
   return (
     <MyPageLayout
       title="내 신청 내역"
-      description="포럼, 강좌, 강사 등 모든 승인 요청을 확인합니다"
+      description="가입과 포럼 신청 이력을 확인합니다. 강좌 신청은 study에서 확인해 주세요."
       breadcrumb={[
         { label: '홈', href: '/' },
         { label: '마이페이지', href: '/mypage' },
@@ -128,7 +126,7 @@ export default function MyRequestsPage() {
         onRetry={loadData}
         typeFilters={TYPE_FILTERS}
         actionSection={actionSection}
-        emptyDescription="새 포럼이나 강좌를 신청하면 여기에 표시됩니다"
+        emptyDescription="가입 또는 포럼 신청 이력이 여기에 표시됩니다"
       />
     </MyPageLayout>
   );
