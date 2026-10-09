@@ -30,12 +30,12 @@ jobs:
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
-      CUTOVER_OUTPUT: ${{ runner.temp }}/pharmacyhub-qr-cutover
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
-      PROBE_OUTPUT: ${{ runner.temp }}/pharmacyhub-qr-probes.txt
     steps:
       - name: Enforce production write gate
         run: |
+          echo "CUTOVER_OUTPUT=$RUNNER_TEMP/pharmacyhub-qr-cutover" >> "$GITHUB_ENV"
+          echo "PROBE_OUTPUT=$RUNNER_TEMP/pharmacyhub-qr-probes.txt" >> "$GITHUB_ENV"
           echo "CUTOVER_DEADLINE_MS=$(( $(date +%s) * 1000 + 29 * 60 * 1000 ))" >> "$GITHUB_ENV"
           if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
             echo 'Production inventory requires main.'
