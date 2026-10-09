@@ -16,18 +16,19 @@
 
 일반 로그인 상태의 복귀는 기존 `O4OHomeButton`과 `/auth/handoff`를 사용한다. 약관 미동의는 서버 `TERMS_PENDING_ALLOWLIST`에 handoff가 없으므로 공개 대표 홈 링크로 돌아간다. 동의 기록이나 토큰을 변경하지 않고, 목적지에서 로그인 상태가 유지된다고 보장하지 않는다. 인계 실패 화면도 공개 링크를 사용한다.
 
-`PolicyAcceptanceGate` 소비처 전수 확인: Neture·약국·강의·매장·은퇴 대상 Pharmacy Hub의 약관 wrapper 및 `StoreOwnerAgreementGate`. 인터페이스·허용 경로·승낙 로직 변경 없음. 은퇴 대상의 코드 삭제·기능 확장은 하지 않았다. 공통 dialog 내부 링크라 모바일·보조기술에서도 동의 화면의 일부로 탐색할 수 있다.
+`PolicyAcceptanceGate` 소비처 전수 확인: Neture·약국·강의·매장·은퇴 대상 Pharmacy Hub의 약관 wrapper 및 `StoreOwnerAgreementGate`. 공통 인터페이스·승낙 로직 변경 없음. Neture 대표 호스트의 `/`만 공개 홈 예외로 허용하고, 미동의 세션에서는 개인화 조회·업무 패널·AI 입력 대신 공개 서비스를 표시한다. 다른 업무 경로와 형제 서브도메인은 계속 차단한다. 은퇴 대상의 코드 삭제·기능 확장은 하지 않았다. 공통 dialog 내부 링크라 모바일·보조기술에서도 동의 화면의 일부로 탐색할 수 있다.
 
 ## 검증
 
 - Neture·약국·강의·매장·분회·병원 약품 앱: tsc 및 Vite build 6개 PASS.
-- Neture: 46 files / 375 tests PASS.
+- Neture: 47 files / 379 tests PASS.
 - shared-space-ui: 8 files / 85 tests PASS. 링크가 dialog 안에 있고 동의·로그아웃을 호출하지 않는 회귀 검증 포함.
 - 분회: 3 files / 34 tests PASS.
 - 병원 약품: 1 file / 20 tests PASS.
 - auth-react 기존 복귀 동작: 1 file / 19 tests PASS.
 - 로컬 브라우저: 병원·분회 로그인·없는 분회·Neture 가입·Neture/강의 인계 실패 × 1280/390px = 12회 PASS. 실제 복귀 클릭, 가로 넘침 없음, pageerror 0. 병원은 새 탭과 원래 업무 탭 유지 확인.
 - 강의 약관 미동의 synthetic 세션 × 1280/390px = 2회 PASS. 동의 dialog 유지, 업무 shell 미렌더, 공개 복귀 클릭, handoff·승낙 POST 0회, 넘침·pageerror 없음.
+- 자동 리뷰 P1: Neture 미동의 세션이 같은 origin의 동의 화면으로 되돌아가는 루프를 수정. 대표 공개 홈 예외와 공개 렌더링을 연결하고 `/mypage`에서 동의 화면 복귀 확인. Neture synthetic 세션 × 1280/390px = 2회 PASS, handoff·승낙 POST 0회. 총 브라우저 16회.
 - API와 메인 목적지는 로컬 브라우저에서 synthetic 응답으로 통제했다. 실제 운영 계정·DB 변경·운영 배포 검증은 하지 않았다.
 
 초기 환경 검증에서 pnpm launcher의 저장소 경로 권한 문제와 선행 패키지 산출물 누락을 확인했다. 설치된 pinned 도구로 동일한 tsc/Vite 명령을 실행하고, 작업공간의 누락 산출물을 빌드하여 검증했다. 의존성·lockfile·배포 설정은 변경하지 않았다.
