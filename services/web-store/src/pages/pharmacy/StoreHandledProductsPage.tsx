@@ -2,6 +2,7 @@
  * 상품 원장과 매장 소유권은 기존 API 계약을 유지한다. 공급 상품 주문과는 별개다.
  */
 
+import { STORE_PRODUCT_NAME } from '../../config/productTerminology';
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
@@ -285,11 +286,11 @@ export default function StoreHandledProductsPage() {
           <>
             <span>매장 제품</span>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>내 매장 제품</span>
+            <span style={{ color: colors.neutral700 }}>{STORE_PRODUCT_NAME}</span>
           </>
         }
         icon={<Boxes size={20} style={{ color: colors.primary }} />}
-        title="내 매장 제품"
+        title={STORE_PRODUCT_NAME}
         description={
           <>
             O4O DB 기반 제품과 직접 등록 제품을 한곳에서 관리합니다. O4O 구매 이력 없이 등록·활용할 수 있습니다.

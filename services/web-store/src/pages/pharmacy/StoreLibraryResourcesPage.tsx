@@ -21,6 +21,7 @@
  *   본문(ActionBar + DataTable + Drawer)·삭제 정책·조회 경로는 무변경.
  */
 
+import { STORE_RESOURCES_HEADING } from '../../config/storeLibraryLabels';
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
 import { Library, ExternalLink, Trash2, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -304,10 +305,7 @@ export default function StoreLibraryResourcesPage() {
   return (
     <StorePageShell
       labels={{
-        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
-        breadcrumbRoot: '내 자료함',
-        pageTitle: '파일 · 참고 자료',
+        ...STORE_RESOURCES_HEADING,
         subtitle: (
           <>
             콘텐츠를 만들 때 참고할 원소스 자료를 보관합니다.

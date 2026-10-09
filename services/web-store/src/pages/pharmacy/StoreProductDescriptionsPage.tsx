@@ -26,7 +26,7 @@
  * Backend: store_local_products (Display Domain, organization_id 격리).
  */
 
-import { DIRECT_PRODUCT_DESCRIPTION_LABELS } from '../../config/productTerminology';
+import { DIRECT_PRODUCT_DESCRIPTION_LABELS, DIRECT_PRODUCT_DESCRIPTION_NOTICE } from '../../config/productTerminology';
 import {
   StoreProductDescriptionsView,
   type StoreProductDescriptionsApi,
@@ -84,13 +84,7 @@ export default function StoreProductDescriptionsPage() {
             신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 진입하세요.
           </>
         ),
-        notice: (
-          <>
-            이 화면의 상세설명은 <strong>직접 등록 제품에 저장</strong>되며, 해당 매장에서만 조회·수정됩니다.
-            O4O 공용 상품 DB(표준 상품)의 대표 설명은 O4O 관리자가 관리하며 이 화면에서 수정되지 않습니다.
-            약국 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
-          </>
-        ),
+        notice: DIRECT_PRODUCT_DESCRIPTION_NOTICE,
         // WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 메뉴 라벨 '직접 등록 제품'과 정렬
         ...DIRECT_PRODUCT_DESCRIPTION_LABELS,
         saveSuccessToast: '상품 설명이 저장되었습니다',

@@ -31,6 +31,7 @@
  *   본문(StoreContentsSelector)·모달·동작은 무변경.
  */
 
+import { STORE_CONTENTS_HEADING } from '../../config/storeLibraryLabels';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
@@ -103,10 +104,7 @@ export default function StoreLibraryContentsPage() {
   return (
     <StorePageShell
       labels={{
-        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
-        breadcrumbRoot: '내 자료함',
-        pageTitle: '내 자료함',
+        ...STORE_CONTENTS_HEADING,
         subtitle:
           '매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.',
       }}
