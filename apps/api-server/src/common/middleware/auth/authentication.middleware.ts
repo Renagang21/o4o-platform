@@ -132,7 +132,7 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
  * Admin · `platform:*` 는 Google 전용이다. 비밀번호로 발급된 세션(`authMethod:'password'`)이
  * `platform:*` 역할을 가진 계정이면 **어떤 경로든** 거절한다 — 개별 admin guard 가 JWT roles 를 보든
  * DB 를 보든 그 앞에서 막는다. 역할은 JWT 가 아니라 DB 에서 다시 읽는다(발급 뒤 부여를 잡는다).
- * Google 세션에는 claim 이 없으므로 조회도 하지 않는다(기존 hot path 비용 0).
+ * Google 세션도 인증 지점에서 최신 활성 역할을 조회한다.
  *
  * 판정 실패(DB 오류)는 **fail-closed** 다 — 약관 게이트와 달리 이것은 권한 경계다.
  *
@@ -141,14 +141,14 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
 async function enforcePasswordSessionBoundary(
   req: AuthRequest,
   res: Response,
-  user: { id: string },
+  user: { id: string; roles?: string[] },
   payload: AccessTokenPayload,
 ): Promise<boolean> {
   if (payload.authMethod !== 'password') return false;
   let allowed = false;
   try {
-    const roles = await roleAssignmentService.getRoleNames(user.id);
-    allowed = isPasswordSessionAllowed(payload.serviceKey, roles);
+    user.roles = await roleAssignmentService.getRoleNames(user.id);
+    allowed = isPasswordSessionAllowed(payload.serviceKey, user.roles);
   } catch (error) {
     logger.warn('[passwordSessionBoundary] role check failed (fail-closed)', {
       userId: user.id,
@@ -260,12 +260,12 @@ export const requireAuth = async (
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
     // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
+    // Authorization must reflect revocations/downgrades without refreshing the token.
+    if (payload.authMethod !== 'password') user.roles = await roleAssignmentService.getRoleNames(user.id);
     if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
     if (await enforceTermsAcceptance(req, res, user)) return;
 
-    // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
-    user.roles = payload.roles || [];
     // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload
     user.memberships = (payload as any).memberships || [];
 
@@ -344,12 +344,15 @@ export const optionalAuth = async (
 
     // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 관리자 경계에 걸리는 비밀번호 세션은
     //   403 대신 비로그인과 같게 취급한다(공개 경로의 성질을 유지한다).
+    if (user && user.isActive && optionalAllowed) {
+      user.roles = await roleAssignmentService.getRoleNames(user.id);
+    }
     let passwordSessionAllowed = true;
     if (user && payload.authMethod === 'password') {
       try {
         passwordSessionAllowed = isPasswordSessionAllowed(
           payload.serviceKey,
-          await roleAssignmentService.getRoleNames(user.id),
+          user.roles ?? [],
         );
       } catch {
         passwordSessionAllowed = false;
@@ -357,8 +360,6 @@ export const optionalAuth = async (
     }
 
     if (user && user.isActive && optionalAllowed && passwordSessionAllowed) {
-      // Phase3-E: Assign roles from JWT payload
-      user.roles = payload.roles || [];
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
       req.user = user;
     }
@@ -451,12 +452,11 @@ export const requirePlatformUser = async (
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
     // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
+    // Authorization must reflect revocations/downgrades without refreshing the token.
+    if (payload.authMethod !== 'password') user.roles = await roleAssignmentService.getRoleNames(user.id);
     if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
     if (await enforceTermsAcceptance(req, res, user)) return;
-
-    // Phase3-E: Assign roles from JWT payload
-    user.roles = payload.roles || [];
 
     req.user = user;
     next();

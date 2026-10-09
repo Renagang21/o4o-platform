@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 근거: 사용자 명시 지시 — Pharmacy Hub의 경로·서버·도메인·인증서를 모두 제거한다.
-> 기준: 최신 `origin/main` (`0f8535d6b1`) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · 검증 결합 main: `240a2dfd42` · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 확정 범위
 

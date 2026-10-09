@@ -24,8 +24,7 @@ export const SERVICE_KEYS = [
   'kpa-branch',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1:
   //   커뮤니티 서비스. role prefix = canonical service_key = 'community' (security-core self-map).
-  //   지정 가능한 역할은 `community:admin` **하나**다 — 개별 커뮤니티 운영은 개체 역할
-  //   (`community_memberships.role='operator'`)이며 서비스 전역 operator 를 만들지 않았다.
+  // 서비스 Admin/Operator와 개별 커뮤니티 membership 운영자는 별도 권한이다.
   'community',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
   'supplier',

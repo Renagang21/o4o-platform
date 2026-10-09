@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · 검토 중 main: `70f9355935`(PR #372) · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `240a2dfd42`(PR #372·#374) · branch: `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 결과와 남은 실행
 
@@ -37,8 +37,9 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·추가 PH 참조·공통 쓰기/권한 리뷰 보완 API Jest | **213 suites · 4,128 tests PASS** · 216 suites 중 DB integration 3개 SKIP |
-| 최신 main(PR #370) 반영 후 Neture Vitest | **45 files · 371 tests PASS** |
+| 변경 소비처·추가 PH 참조·공통 쓰기/권한·최신 main 결합 API Jest | **217 suites · 4,180 tests PASS** · 220 suites 중 DB integration 3개 SKIP |
+| 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
+| 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
 | 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
@@ -66,4 +67,6 @@ Store 접근 정본과 Store Owner RBAC §3.1/§3.1-A도 정정했다. PH 역할
 
 세 번째 HEAD `c1b5980367`은 CI Gate·SonarCloud·CodeQL을 통과했지만 리뷰가 공통 매장/CMS의 PH 신규 쓰기 잔여를 지적했다. UI 제거만으로 이 API들을 종료하지 못했던 문제를 보완했다. 직접 HTTP 호출에서 기존 PH 회원·운영자·전체 관리자도 PH 콘텐츠를 생성·수정·전이하지 못하고, 신규 이용권 결제/활성화·파트너·QR 생성도 차단되는지 검사한다. CMS 슬롯 GET·기존 이용권 GET은 유지한다. 현재 서비스의 owner/member·초대 수락과 PH 전용 초대/역할 발급 차단도 함께 검증한다. 이 보완 후 최신 커밋의 required CI/Codex를 다시 확인하며 이전 HEAD 성공으로 대체하지 않는다.
 
-검토 중 main에 PR #372의 커뮤니티 운영자 분리가 통합됐다. `git merge-tree --write-tree HEAD origin/main`으로 충돌 없는 결합을 확인했다. 작업 branch를 자동으로 main과 합치지 않으며 사용자 통합 승인 후 최신 main을 merge하고 필요한 검증을 다시 수행한다.
+검토 중 main에 PR #372·#374의 커뮤니티 운영자 권한 수정이 통합됐다. #374와 PH 제거가 `routes/operator/membership.routes.ts`에서 실제 충돌해, 두 정책을 함께 검증하기 위해 최신 main을 전용 작업 branch에 merge했다(원격 이력 재작성 없음). PH 역할은 허용 목록에서 제외하고 `community:admin`/`community:operator`, `injectOperatorServiceScope`와 새 회원 쓰기 범위 검사를 유지했다. main branch 자체와 운영 runtime은 변경하지 않았다. 이 결합 결과를 검증해 PR로 준비하며 실제 main 반영은 사용자 통합 승인 후 PR merge로만 수행한다.
+
+결합 후 API 4,180건·type-check, Neture 375건·production build, 관리자 운영자 지정 10건이 통과했다. DB가 필요한 `neture-pharmacy-commerce.integration`, `store-owner-termination.integration`, `forum-summary.integration` 3개 suite는 SKIP했다. 실제 운영 테스트 계정·모바일 smoke와 PH 인프라 삭제는 여전히 미실행이다.
