@@ -73,11 +73,11 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
       ...screen.getAllByRole('button').map((b) => b.textContent ?? ''),
       ...screen.getAllByRole('link').map((l) => l.textContent ?? ''),
     ];
-    expect(labels.filter((t) => /매장 HUB|^내 매장$|Neture 커뮤니티|KPA Society 커뮤니티|주요 업무|내가 이용하는 서비스/.test(t))).toEqual([]);
+    expect(labels.filter((t) => /매장 HUB|^내 매장$|Neture 커뮤니티|O4O 약국 경영지원 커뮤니티|주요 업무|내가 이용하는 서비스/.test(t))).toEqual([]);
     expect(within(cards()[0]).getByRole('link', { name: /O4O 공통 커뮤니티/ }).getAttribute('href')).toBe('/community');
   });
 
-  it('복수 매장이면 버튼 안 보조 정보로 서비스 이름 · 반복 note 목록 없음', () => {
+  it('삭제 대상 PH 매장을 제외하면 단일 약국 버튼만 표시', () => {
     renderPanel(
       user(),
       data({
@@ -89,7 +89,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
       }),
     );
     const store = cards()[1];
-    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국KPA Society', '테스트 허브약국Pharmacy Hub']);
+    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국']);
     expect(store.querySelector('ul')).toBeNull();
   });
 
@@ -97,7 +97,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     renderPanel(user(['platform:super_admin']), data({ operatorServices: [{ serviceKey: 'kpa-society', serviceName: 'kpa-society', scope: 'operator', workspaceMode: 'standard', workspaceAvailable: true }] }), <section><h2>O4O 서비스 소식</h2></section>);
     expect(headings()).toEqual(['내 업무 공간', '플랫폼 관리', '내 서비스', 'O4O 서비스 소식', '가입 가능한 서비스']);
     const operator = cards()[3];
-    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['KPA Society']);
+    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['O4O 약국 경영지원']);
     expect(within(operator).queryByText(/관리자/)).toBeNull();
     const platform = screen.getByRole('heading', { level: 2, name: '플랫폼 관리' }).parentElement!;
     expect(within(platform).getByRole('link', { name: /플랫폼 관리/ }).getAttribute('href')).toBe('/admin');
