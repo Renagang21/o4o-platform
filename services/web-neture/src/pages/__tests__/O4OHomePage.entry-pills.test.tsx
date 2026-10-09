@@ -97,9 +97,9 @@ describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시�
       'https://pharmacy.neture.co.kr/',
       'https://supplier.neture.co.kr',
     ]);
-    ['약국', '공급자'].forEach((label, i) => {
+    ['O4O 약국 경영지원', '공급자'].forEach((label, i) => {
       expect(links[i].text.startsWith(label)).toBe(true);
-      expect(links[i].text).toContain(`${label} 서비스`);
+      expect(links[i].text).toContain(i === 0 ? 'O4O를 이용하는 약국 내 업무를 지원하는 약국 개설자 서비스' : '공급자 서비스');
     });
     for (const l of links) {
       expect(l.target).toBe('_blank');

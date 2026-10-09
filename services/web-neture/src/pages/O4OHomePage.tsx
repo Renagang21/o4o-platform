@@ -98,7 +98,7 @@ interface HomeService {
 }
 
 const PRIMARY_SERVICES: readonly HomeService[] = [
-  { label: '약국', description: '약사와 약국을 위한 정보와 매장 서비스를 이용합니다.', href: 'https://pharmacy.neture.co.kr/' },
+  { label: 'O4O 약국 경영지원', description: 'O4O를 이용하는 약국 내 업무를 지원하는 약국 개설자 서비스', href: 'https://pharmacy.neture.co.kr/' },
   // 리테일(retail.neture.co.kr · K-Cosmetics)은 공개 서비스 종료 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 공개 Partner 진입은 은퇴.
   { label: '공급자', description: '제품과 콘텐츠를 등록하고 매장과 연결합니다.', href: HOST_ORIGIN.supplier },
@@ -131,7 +131,7 @@ function PrimaryServices() {
         주요 서비스
       </h2>
       <nav aria-label="주요 서비스" className="mt-5">
-        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-3">
+        <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2">
           {PRIMARY_SERVICES.map((s) => (
             <li key={s.href}>
               <ExternalLink
