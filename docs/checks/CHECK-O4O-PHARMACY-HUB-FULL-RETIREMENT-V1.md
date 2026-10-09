@@ -28,6 +28,7 @@
 - Local Agent: PH root/www를 pairing origin에서 제거했다. 두 origin의 health/preflight/pair가 403으로 종료되고 Neture 정상 pairing은 유지된다. 설치 사본의 업데이트는 별도 로컬 실행이다.
 - 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
 - 매장 구성원 요청: 명시적 PH `serviceKey`를 서비스 미지정으로 바꾸지 않고 410으로 거부한다. PH·현재 역할을 함께 가진 사용자, 반복 query·공백 입력도 동일하다. 서비스 미지정 초대도 PH 전용 조직이면 생성 전에 거부하며 현재 linkage와 PH 이력이 함께 있는 매장의 초대는 유지한다.
+- 서비스 미지정 조직 후보: PH 전용 조직은 owner·staff·구매 조직 후보에서 제외한다. 현재 역할·가입과 과거 PH 조직 선택 헤더가 함께 있어도 PH 자료·진열 쓰기가 불가능하다. 현재 내 매장 원장(active)만 승인된 조직은 세미프랜차이즈 가입·slug 없이 유지하고 PH 이력이 함께 있어도 초대 수락·현재 member 접근을 유지한다.
 - 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
 - 공개 매장: PH slug·PH에서 변경된 과거 slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
 - DB 공개 catalog: active PH 행도 익명·로그인 사용자 목록에서 제외한다. 현재 서비스의 가입 상태 표시와 전체 관리자의 catalog 이력 조회는 보존하며 DB write는 없다.
@@ -46,7 +47,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **238 suites · 4,442 tests PASS** · 244 suites 중 DB integration 6개(48건) SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **247 suites · 4,577 tests PASS** · 253 suites 중 DB integration 6개(48건) SKIP |
 | 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
@@ -121,3 +122,7 @@ HEAD `8d72542589`의 늦게 완료된 리뷰는 실제 PH 콘텐츠를 현재/�
 HEAD `8cabb2c5a2`의 CI Gate·SonarCloud는 통과했다. 최신 리뷰는 현재 slug 선택도 원래 history 서비스와 활성 상태로 한정해야 한다고 지적했다. StoreSlugService는 같은 조직의 PH 주소를 KPA redirect 대상으로 임의 선택하지 않으며 다른 서비스로 fallback하지 않는다. 실제 helper fixture가 PH/KPA 활성 주소를 함께 제공하도록 고쳐 현재 서비스 redirect·PH 주소 부재·현재 주소 inactive 사례를 검증한다. 슬롯/초대 보완과 함께 최신 커밋의 required CI·Sonar·Codex를 다시 확인한다.
 
 슬롯 원본·초대 목록·서비스별 slug 대상 보완을 모두 포함한 API 244 suites에서 238 suites·4,442 tests가 통과했다. DB integration 6개(48건)는 SKIP했다. API type-check와 platform-core build도 통과했다. current/global 자료·현재 서비스로 복사된 PH 출처 자료·현재/혼합 조직 초대·원장 보존과 실제 history helper의 서비스별 active 선택을 함께 검증한 결과다. 최신 PR 커밋의 required CI·Sonar·Codex는 별도 remote gate다.
+
+HEAD `dd97a2dfb0`의 CI Gate·SonarCloud는 통과했지만 리뷰가 서비스 미지정 공통 Store 조직 판정의 PH 전용 후보 잔여를 지적했다. 현재 역할·가입과 PH 조직 선택 헤더가 있어도 자료·상품 진열을 만들 수 없도록 후보를 걸러내고 구매 조직·staff 후보에도 같은 판정을 적용했다. inactive PH 원장도 퇴역 식별로 읽되 현재 내 매장 신청 원장(active)은 세미프랜차이즈 가입·slug 없이 인정한다. 구성원 초대·수락·접근 역시 현재 원장을 인정하며 PH-only 관계는 현재 member role만으로 복구되지 않는다. 관련 그래프·raw 소비처를 합친 API 253 suites에서 247 suites·4,577 tests와 API type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. 새 SQL을 서비스 scoped 질의로 오인하던 기존 모형과 퇴역 전 SQL 단언을 보완했으며 기존 현재 서비스 조직 선택·태블릿·자체 상품 검증은 유지했다.
+
+검증 중 main은 PR #377의 매장 관리 화면 개선을 포함한 `090fb542aa`로 이동했다. 이 HEAD와의 read-only merge-tree에서 충돌은 없었다. 자동 결합·main merge는 수행하지 않았으며 통합 승인 뒤 최신 main을 자기 branch에 결합하고 필요한 검증을 수행한다. 최신 보완 커밋의 CI·Sonar·Codex 결과는 PR에서 별도로 확인한다. 로컬 운영 인계 문서에는 전체 URL map/backend/NEG·인증서 참조 조회 명령을 추가하고 map entry 삭제 명령을 해당 단계에 배치했다. 실제 조회·배포·삭제 결과는 아니다.

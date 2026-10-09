@@ -76,7 +76,7 @@ export function makeStoreTabletDataSource(opts: StoreTabletStubOptions) {
         const allowed = params[1] as string[];
         return opts.currentRoles().some((r) => allowed.includes(r)) ? [{ ok: 1 }] : [];
       }
-      if (sql.includes('organization_service_enrollments')) {
+      if (sql.includes('organization_service_enrollments') && !sql.includes('AS retired_store_identity')) {
         const roles = params[1] as string[];
         const enrollmentCodes = params[2] as string[];
         const slugKeys = params[3] as string[];
@@ -93,6 +93,8 @@ export function makeStoreTabletDataSource(opts: StoreTabletStubOptions) {
           .map((m) => ({
             organization_id: m.organizationId, role: m.role,
             is_primary: m.isPrimary, joined_at: m.joinedAt,
+            retired_store_identity: m.organizationId === ORG_PH,
+            current_store_identity: m.organizationId !== ORG_PH,
           }));
       }
       if (sql.includes('platform_store_slugs')) return opts.storeSlugRows ?? [];

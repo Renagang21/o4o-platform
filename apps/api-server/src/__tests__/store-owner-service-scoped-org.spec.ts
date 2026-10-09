@@ -112,8 +112,9 @@ describe('store organization resolution — service scoped', () => {
     // is_primary 우선 → org-a
     expect(result.organizationId).toBe('org-a');
     expect(result.candidateCount).toBe(2);
-    // 서비스 조건은 걸지 않는다 (허용 집합 불변)
-    expect(calls[0].sql).not.toContain('organization_service_enrollments');
+    // 현재 후보의 정렬 계약은 유지하고 PH-only 이력만 구분한다.
+    expect(calls[0].sql).toContain('retired_store_identity');
+    expect(calls[0].sql).toContain('current_store_identity');
   });
 
   it('F. store_owner role 없음 → isOwner=false, 조직 조회조차 하지 않는다 (cosmetics)', async () => {

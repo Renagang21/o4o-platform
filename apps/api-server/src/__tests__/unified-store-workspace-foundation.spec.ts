@@ -60,7 +60,8 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
     const stores = await resolveAccessibleStores(dataSource, USER_X);
     expect(calls).toHaveLength(4);
     expect(norm(calls[0].sql)).toContain('organization_members');
-    expect(norm(calls[0].sql)).not.toContain('organization_service_enrollments');
+    expect(norm(calls[0].sql)).toContain('AS retired_store_identity');
+    expect(norm(calls[0].sql)).toContain('AS current_store_identity');
     expect(calls[0].params[0]).toBe(USER_X);
     // owner 후보는 종전 역할 집합 그대로, member 후보는 'staff' 만 본다.
     expect(calls[0].params[1]).toEqual(['owner', 'admin', 'manager']);

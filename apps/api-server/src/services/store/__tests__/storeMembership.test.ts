@@ -59,7 +59,7 @@ const OUTSIDER = 'outsider-1';
 type Row = Record<string, any>;
 
 /** organization_members · users 를 메모리로 둔 가짜 DataSource. SQL 모양으로 분기한다. */
-function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: string[] } = {}) {
+function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: string[]; activePharmacyOrganizations?: string[] } = {}) {
   const members: Row[] = seed.members ?? [];
   const users: Row[] = seed.users ?? [];
   const sql: string[] = [];
@@ -70,6 +70,9 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: s
 
     if (s.startsWith('SELECT 1 WHERE EXISTS')) {
       return seed.retiredOrganizations?.includes(p[0]) ? [{ linked: 1 }] : [];
+    }
+    if (s.startsWith('SELECT 1 FROM neture_pharmacy_memberships')) {
+      return seed.activePharmacyOrganizations?.includes(p[0]) ? [{ active: 1 }] : [];
     }
     if (s.startsWith('SELECT organization_id, role FROM organization_members')) {
       return members
@@ -355,6 +358,22 @@ describe('M5 수락은 받은 본인만', () => {
       { organizationId: ORG_A, organizationName: '테스트 매장' },
     ]);
   });
+
+  it('current Store ledger keeps invitations actionable without franchise enrollment or slugs, despite PH history', async () => {
+    const { ds, members } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+      activePharmacyOrganizations: [ORG_A],
+    });
+    linkedMock.mockResolvedValue(false);
+    expect(await listMyInvitations(ds, STAFF)).toHaveLength(1);
+    expect(await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A })).toMatchObject({ services: ['kpa'] });
+    expect(members[0].role).toBe(STORE_STAFF_ROLE);
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'kpa:store_member' }));
+    asNotOwner();
+    expect(await resolveStoreAccessLevel(ds, STAFF, 'kpa')).toMatchObject({ level: 'member', organizationId: ORG_A });
+  });
 });
 
 describe('M6 해제는 이 모듈이 만든 역할만 건드린다', () => {
@@ -478,6 +497,27 @@ describe('M7 Role ∧ Relationship', () => {
     const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     hasAnyRoleMock.mockImplementation(async (_user: string, roles: string[]) => roles.includes('pharmacy-hub:store_member'));
     expect((await resolveStoreAccessLevel(ds, STAFF)).level).toBe('none');
+  });
+
+  it('a current member role and retired PH relationship cannot reopen a PH-only store', async () => {
+    asNotOwner();
+    linkedMock.mockResolvedValue(false);
+    const { ds } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+    });
+    expect((await resolveStoreAccessLevel(ds, STAFF, undefined, ORG_A)).level).toBe('none');
+  });
+
+  it('a retired selection hint cannot suppress access to an independent current Store', async () => {
+    asNotOwner();
+    linkedMock.mockResolvedValue(false);
+    const { ds } = makeDs({
+      members: [ORG_A, ORG_B].map(organization_id => ({ organization_id, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null })),
+      retiredOrganizations: [ORG_A],
+      activePharmacyOrganizations: [ORG_B],
+    });
+    expect(await resolveStoreAccessLevel(ds, STAFF, undefined, ORG_A)).toMatchObject({ level: 'member', organizationId: ORG_B });
   });
 
   it('초대가 없으면 role 도 발급되지 않는다', async () => {

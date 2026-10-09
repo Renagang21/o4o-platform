@@ -100,6 +100,13 @@ async function linkedServiceKeys(
   for (const key of keys) {
     if (await isOrganizationLinkedToService(dataSource, organizationId, key)) {
       linked.push(key);
+    } else if (key === 'kpa') {
+      // Current pharmacy Store approval is independent of franchise enrollment and public slugs.
+      const current: unknown[] = await dataSource.query(
+        `SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
+        [organizationId],
+      );
+      if (current.length > 0) linked.push(key);
     } else if (key === 'pharmacy-hub') {
       // Inactive PH records still identify a retired organization; they cannot become an unscoped store.
       const linkage = STORE_SERVICE_ORG_LINKAGE[key];
@@ -204,18 +211,21 @@ export async function resolveStoreAccessLevel(
     return { level: 'none', organizationId: null, memberRole: null };
   }
 
+  const accessibleRows: typeof rows = [];
+  for (const row of rows) {
+    const linked = await linkedServiceKeys(dataSource, row.organization_id);
+    if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) continue;
+    if (serviceKey && !linked.includes(serviceKey)) continue;
+    accessibleRows.push(row);
+  }
   const preferred = preferredOrganizationId
-    ? rows.find((r) => r.organization_id === preferredOrganizationId)
+    ? accessibleRows.find((r) => r.organization_id === preferredOrganizationId)
     : undefined;
   // 선택 힌트는 **허용 후보 안에서만** 고른다 — 없는 조직을 요청하면 힌트를 버리고 기본 후보로 간다.
-  const candidates = preferred ? [preferred] : rows;
+  const candidates = preferred ? [preferred] : accessibleRows;
 
-  for (const row of candidates) {
-    if (serviceKey && !(await isOrganizationLinkedToService(dataSource, row.organization_id, serviceKey))) {
-      continue; // 업종 경계 — 다른 서비스의 매장이면 이 요청에서는 접근이 아니다
-    }
-    return { level: 'member', organizationId: row.organization_id, memberRole: row.role };
-  }
+  const member = candidates[0];
+  if (member) return { level: 'member', organizationId: member.organization_id, memberRole: member.role };
   return { level: 'none', organizationId: null, memberRole: null };
 }
 

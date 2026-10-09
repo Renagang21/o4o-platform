@@ -40,6 +40,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 공개 Store 조회도 PH slug와 PH에서 변경됐거나 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. 원래 주소의 서비스 출처를 보존하고 현재 redirect 대상도 같은 서비스의 active 주소로 한정한다. 현재 KPA 주소가 함께 있어도 PH 이력을 공개하지 않으며 현재 KPA 이력이 임의의 PH 주소 때문에 404가 되지 않는다. 정책 조회·slug resolver도 같은 출처/대상 차단을 적용한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
 - DB 기반 공개 `platform-services` 목록도 active PH 행을 제외한다. 익명·로그인 사용자 모두 현재 서비스와 가입 상태만 보며 PH catalog 원장과 관리자 이력 조회는 보존한다. DB 갱신으로 숨기지 않는다.
 - 공통 구성원 API는 명시적 PH 요청을 서비스 미지정으로 강등하지 않는다. 서비스 미지정 초대도 PH만 연결된 과거 조직이면 생성 전에 거부하며 현재 서비스와 PH 이력이 함께 있는 매장의 초대는 유지한다. 수락할 수 없는 PH-only 초대는 받은 목록에서도 제외한다. inactive PH 원장도 퇴역 식별로만 읽어 서비스 미지정 복구를 차단하며 DB 상태는 바꾸지 않는다. PaymentCore 신규 producer 3종과 역사적 PH 완료 consumer 보존은 별도 회귀로 검증한다.
+- 서비스 미지정 매장 조직 판정도 PH 전용 조직을 후보에서 제외한다. 현재 서비스 역할·가입이 있어도 과거 PH 관계나 선택 헤더만으로 자료·진열·구매 조직·직원 접근이 PH 조직으로 향하지 않는다. 현재 내 매장 원장(active)만 있는 조직은 세미프랜차이즈 가입·slug 없이 유지하며, PH 이력이 함께 있어도 초대 목록·수락·현재 member 접근을 유지한다.
 - Sonar 중복률 보완은 PH·Neture·Store B2B의 선택된 주문 후속 처리에 한정한다. 상태 전이·bridge·실패 기록만 API Extension 함수로 공유하고 세 consumer의 구독 키·주문 선택·멱등성과 PaymentCore/PG/DB 계약은 유지한다. 공유 모듈 변경 규칙에 따라 세 소비처와 raw-source 계약·실제 이벤트 회귀를 함께 검증한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
@@ -85,9 +86,30 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
    node scripts/deployment/pharmacy-hub-retirement.mjs /tmp/ph-retirement-map.original.json /tmp/ph-retirement-map.review.json
    ```
 
+   PH 전용 여부와 다른 자원의 참조를 확인하는 read-only 명령은 다음과 같다. 출력은 비공개 로컬 폴더에 보관한다. 인증서 map이 여러 개면 **각 map의 entries**도 조회한다. backend 참조가 남거나 다른 NEG가 같은 Cloud Run을 사용하면 해당 자원의 삭제를 보류한다.
+
+   ```bash
+   gcloud compute url-maps list --project=netureyoutube --format=json
+   gcloud compute backend-services list --project=netureyoutube --format=json
+   gcloud compute network-endpoint-groups list --project=netureyoutube --format=json
+   gcloud run services describe pharmacy-hub-web --region=asia-northeast3 --project=netureyoutube --format=json
+   gcloud certificate-manager maps list --location=global --project=netureyoutube --format=json
+   gcloud certificate-manager maps entries list --map=o4o-main-cert-map --location=global --project=netureyoutube --format=json
+   gcloud certificate-manager certificates list --location=global --project=netureyoutube --format=json
+   gcloud certificate-manager dns-authorizations list --location=global --project=netureyoutube --format=json
+   ```
+
    스크립트는 PH 호스트와 해당 호스트의 URL map 검증 테스트를 제외하고 PH에만 쓰이던 matcher를 지운다. 다른 호스트의 검증 테스트와 공유 matcher·backend는 보존한다. `removedTestHosts`로 제거한 검증 대상도 확인한다. 검증 테스트의 기대 backend는 실제 라우팅 참조로 세지 않는다. GCP를 호출하거나 삭제하지 않으며 출력 파일을 덮어쓰지 않는다. `unreferencedBackendCandidates`는 이 URL map 안에서만 미참조인 후보이므로 전체 프로젝트 참조를 다시 확인한다. import는 남은 URL map 검증 테스트를 실행하므로 실패하면 해당 구성을 적용하지 않는다.
 3. 원본/초안의 diff에서 PH 외 변화가 없고 리다이렉트가 없음을 확인한다. 적용 직전 URL map을 다시 조회해 원본 fingerprint와 비교한다. 다른 실행자의 변경이 있으면 적용하지 않고 새 원본으로 초안을 다시 만든다.
 4. PH DNS A·인증용 CNAME 및 PH certificate map entry를 제거한다. 도메인 등록·갱신도 Gabia 계정에서 종료한다. 다른 서비스의 인증서 map이나 공용 IP를 지우지 않는다. DNS cache가 남아도 PH를 다른 서비스로 호환 이동시키지 않는다.
+
+   다음은 실제 entry 이름·PH hostname을 확인한 후 이 단계에서 개별 실행한다.
+
+   ```bash
+   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-root --map=o4o-main-cert-map --location=global --project=netureyoutube
+   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-www --map=o4o-main-cert-map --location=global --project=netureyoutube
+   ```
+
 5. 검토한 URL map을 적용한다. PH 외 호스트와 path matcher, default backend가 그대로인지 확인한다.
 
    ```bash
@@ -97,8 +119,6 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
 6. 전체 참조가 0인 PH backend → NEG → Cloud Run을 제거한다. PH 전용 certificate → DNS authorization도 참조가 0일 때 제거한다. 현재 이름이 표와 일치할 때 사용하는 명령은 다음과 같다. 각 명령 사이에 실제 참조와 결과를 확인하며 한꺼번에 실행하지 않는다.
 
    ```bash
-   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-root --map=o4o-main-cert-map --location=global --project=netureyoutube
-   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-www --map=o4o-main-cert-map --location=global --project=netureyoutube
    gcloud compute backend-services delete backend-pharmacy-hub-web --global --project=netureyoutube
    gcloud compute network-endpoint-groups delete neg-pharmacy-hub-web --region=asia-northeast3 --project=netureyoutube
    gcloud run services delete pharmacy-hub-web --region=asia-northeast3 --project=netureyoutube
@@ -107,7 +127,7 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
    gcloud certificate-manager dns-authorizations delete dns-auth-pharmacyhub-www --location=global --project=netureyoutube
    ```
 
-   앞의 map entry 2개는 4단계에서 이미 제거했다면 다시 실행하지 않는다. 삭제 명령은 실행 결과가 아니며 현재 환경에서는 수행하지 않았다.
+   map entry는 4단계에서 제거하며 여기서 반복하지 않는다. 삭제 명령은 실행 결과가 아니며 현재 환경에서는 수행하지 않았다.
 7. PH 서비스·NEG·backend·host rule·인증서/entry/auth·권한 DNS가 제거됐음을 각각 조회한다. 다른 Neture 서브도메인의 HTTPS와 Store QR·태블릿·사이니지·공급자 주문을 재검증한 뒤 CHECK에 실제 결과를 기록한다. 접근 권한이 없거나 공유 참조가 남은 항목은 완료로 표시하지 않는다.
 
 ## 6. 로컬 운영 작업자에게 전달할 내용
