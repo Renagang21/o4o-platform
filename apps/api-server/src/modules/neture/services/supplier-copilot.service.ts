@@ -6,10 +6,8 @@
  * Copilot dashboard data: KPI, product performance, distribution, trending.
  *
  * Orders: checkout_orders table (JSONB items), NOT neture_orders.
- * Column naming: snake_case (SnakeNamingStrategy was active at table creation).
- *
- * NOTE: checkout_orders table may not exist yet in production.
- * All order queries are wrapped in try/catch to return 0/empty gracefully.
+ * Checkout columns follow CheckoutOrder entity camelCase naming.
+ * Required query failures propagate; unavailable metrics must not appear as zero.
  */
 
 import type { DataSource } from 'typeorm';
@@ -66,20 +64,15 @@ export class SupplierCopilotService {
       [supplierId]
     );
 
-    // Recent orders (7 days) — table may not exist yet
-    let recentOrders = 0;
-    try {
-      const orderRows = await this.dataSource.query(
-        `SELECT COUNT(*)::int AS "recentOrders"
+    const orderRows = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS "recentOrders"
          FROM checkout_orders
-         WHERE supplier_id = $1
-           AND created_at >= CURRENT_DATE - INTERVAL '7 days'`,
-        [supplierId]
-      );
-      recentOrders = orderRows[0]?.recentOrders ?? 0;
-    } catch {
-      // checkout_orders table may not exist yet
-    }
+        WHERE "supplierId" = $1
+          AND "createdAt" >= CURRENT_DATE - INTERVAL '7 days'
+          AND "paymentStatus" = 'paid' AND status NOT IN ('cancelled', 'refunded')`,
+      [supplierId]
+    );
+    const recentOrders = orderRows[0]?.recentOrders ?? 0;
 
     return {
       registeredProducts: productRows[0]?.registeredProducts ?? 0,
@@ -90,54 +83,33 @@ export class SupplierCopilotService {
   }
 
   async getProductPerformance(supplierId: string, limit = 10): Promise<ProductPerformanceItem[]> {
-    // Try full query with checkout_orders; fall back to products-only if table missing
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT
-           pm.id AS "productId",
-           pm.name AS "productName",
-           COUNT(DISTINCT o.id)::int AS orders,
-           COALESCE(SUM((item->>'subtotal')::int), 0)::int AS revenue,
-           0 AS "qrScans"
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN checkout_orders o ON o.supplier_id = $1
-           AND o.status IN ('paid','created')
-         LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
-           ON (item->>'productId')::uuid = spo.id
-         WHERE spo.supplier_id = $1
-         GROUP BY pm.id, pm.name
-         ORDER BY revenue DESC
-         LIMIT $2`,
-        [supplierId, limit]
-      );
+    const rows = await this.dataSource.query(
+      `SELECT
+         pm.id AS "productId",
+         pm.name AS "productName",
+         COUNT(DISTINCT o.id) FILTER (WHERE item IS NOT NULL)::int AS orders,
+         COALESCE(SUM((item->>'subtotal')::int), 0)::int AS revenue,
+         0 AS "qrScans"
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN checkout_orders o ON o."supplierId" = $1
+         AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
+       LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
+         ON (item->>'productId')::uuid = spo.id
+       WHERE spo.supplier_id = $1
+       GROUP BY pm.id, pm.name
+       ORDER BY revenue DESC
+       LIMIT $2`,
+      [supplierId, limit]
+    );
 
-      return rows.map((r: any) => ({
-        productId: r.productId,
-        productName: r.productName || '(이름 없음)',
-        orders: r.orders,
-        revenue: r.revenue,
-        qrScans: r.qrScans,
-      }));
-    } catch {
-      // checkout_orders table may not exist — return products with 0 order metrics
-      const rows = await this.dataSource.query(
-        `SELECT pm.id AS "productId", pm.name AS "productName"
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         WHERE spo.supplier_id = $1
-         ORDER BY spo.created_at DESC
-         LIMIT $2`,
-        [supplierId, limit]
-      );
-      return rows.map((r: any) => ({
-        productId: r.productId,
-        productName: r.productName || '(이름 없음)',
-        orders: 0,
-        revenue: 0,
-        qrScans: 0,
-      }));
-    }
+    return rows.map((r: any) => ({
+      productId: r.productId,
+      productName: r.productName || '(이름 없음)',
+      orders: r.orders,
+      revenue: r.revenue,
+      qrScans: r.qrScans,
+    }));
   }
 
   async getDistribution(supplierId: string): Promise<DistributionItem[]> {
@@ -167,17 +139,16 @@ export class SupplierCopilotService {
   }
 
   async getTrendingProducts(supplierId: string, limit = 5): Promise<TrendingProductItem[]> {
-    try {
-      const rows = await this.dataSource.query(
+    const rows = await this.dataSource.query(
         `WITH current_period AS (
            SELECT (item->>'productId') AS product_id, COUNT(DISTINCT o.id)::int AS orders
            FROM checkout_orders o,
                 jsonb_array_elements(o.items) AS item
            JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
            WHERE spo.supplier_id = $1
-             AND o.supplier_id = $1
-             AND o.created_at >= CURRENT_DATE - INTERVAL '7 days'
-             AND o.status IN ('paid','created')
+             AND o."supplierId" = $1
+             AND o."createdAt" >= CURRENT_DATE - INTERVAL '7 days'
+             AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
            GROUP BY (item->>'productId')
          ),
          prev_period AS (
@@ -186,10 +157,10 @@ export class SupplierCopilotService {
                 jsonb_array_elements(o.items) AS item
            JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
            WHERE spo.supplier_id = $1
-             AND o.supplier_id = $1
-             AND o.created_at >= CURRENT_DATE - INTERVAL '14 days'
-             AND o.created_at < CURRENT_DATE - INTERVAL '7 days'
-             AND o.status IN ('paid','created')
+             AND o."supplierId" = $1
+             AND o."createdAt" >= CURRENT_DATE - INTERVAL '14 days'
+             AND o."createdAt" < CURRENT_DATE - INTERVAL '7 days'
+             AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
            GROUP BY (item->>'productId')
          )
          SELECT
@@ -217,9 +188,5 @@ export class SupplierCopilotService {
         previousOrders: r.previousOrders,
         growthRate: r.growthRate,
       }));
-    } catch {
-      // checkout_orders table may not exist yet
-      return [];
-    }
   }
 }

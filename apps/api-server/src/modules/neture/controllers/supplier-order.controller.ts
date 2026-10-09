@@ -45,7 +45,7 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
       res.json({
         success: true,
         data: summary,
-        notice: 'Neture는 주문을 직접 처리하지 않습니다. 각 서비스에서 주문을 관리하세요.',
+        notice: '주문은 공통 결제 프로세스를 거치며, 공급자는 결제 완료 후 최종 배송을 진행합니다.',
       });
     } catch (error) {
       logger.error('[Neture API] Error fetching order summary:', error);
