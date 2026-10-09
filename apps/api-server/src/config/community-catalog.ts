@@ -67,7 +67,6 @@ export const O4O_COMMUNITIES: readonly CommunityDefinition[] = Object.freeze([
     forumStorageCodes: ['kpa-society', 'pharmacy-hub'],
     entries: [
       { serviceKey: 'kpa-society', path: '/forum' },
-      { serviceKey: 'pharmacy-hub', path: '/forum' },
     ],
   },
   {
@@ -115,4 +114,11 @@ export function communityKeyForServiceEntry(serviceKey: string | null | undefine
   const k = String(serviceKey ?? '').trim();
   if (!k) return undefined;
   return O4O_COMMUNITIES.find((c) => c.entries.some((e) => e.serviceKey === k))?.key;
+}
+
+/** Stored forum identity survives retirement of its original web entry. */
+export function communityKeyForForumStorageCode(storageCode: string | null | undefined): string | undefined {
+  const k = String(storageCode ?? '').trim();
+  if (!k) return undefined;
+  return O4O_COMMUNITIES.find(c => c.forumStorageCodes.includes(k))?.key;
 }

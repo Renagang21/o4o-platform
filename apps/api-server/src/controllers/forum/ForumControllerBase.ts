@@ -16,7 +16,7 @@ import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
 import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
-import { CATALOG_FORUM_STORAGE_CODES, communityKeyForServiceEntry } from '../../config/community-catalog.js';
+import { CATALOG_FORUM_STORAGE_CODES, communityKeyForForumStorageCode } from '../../config/community-catalog.js';
 
 /**
  * ForumControllerBase
@@ -353,7 +353,7 @@ export class ForumControllerBase {
       [forumId],
     );
     if (!forum || !forum.service_code) return false;
-    const legacyCommunityKey = communityKeyForServiceEntry(forum.service_code);
+    const legacyCommunityKey = communityKeyForForumStorageCode(forum.service_code);
     if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
       const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
         `SELECT community_key AS key FROM semi_franchises WHERE 'sf:' || id::text = $1

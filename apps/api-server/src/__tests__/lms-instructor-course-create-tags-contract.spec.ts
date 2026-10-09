@@ -46,15 +46,4 @@ describe('LMS 강의 생성 태그 계약 (§10/§15 → Lecture Phase 2)', () =
     expect(lectureApi).toContain("createCourse: (dto: CourseInput) => lmsHttp.post<LmsApiResponse<{ course: LectureCourse }>>('/lms/courses', dto)");
     expect(lectureCourseEdit).not.toContain('serviceKey:');
   });
-
-  it('PH / KPA 강사 강의 화면은 삭제되었다 (§14)', () => {
-    for (const rel of [
-      'services/web-pharmacy-hub/src/pages/instructor',
-      'services/web-pharmacy-hub/src/api/lms.ts',
-      'services/web-kpa-society/src/pages/instructor',
-      'services/web-kpa-society/src/api/lms-instructor.ts',
-    ]) {
-      expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
-    }
-  });
 });

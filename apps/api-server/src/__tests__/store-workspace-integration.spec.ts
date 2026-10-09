@@ -22,8 +22,8 @@ describe('listStoreCapableServices — catalog storeWorkspaceEnabled 파생 (WO 
   const list = listStoreCapableServices();
   const keys = list.map((s) => s.serviceKey);
 
-  it('kpa-society · pharmacy-hub 가 대상이다 (k-cosmetics 는 운영 종료로 storeWorkspaceEnabled=false)', () => {
-    expect(keys.sort()).toEqual(['kpa-society', 'pharmacy-hub']);
+  it('kpa-society 만 대상이다 (K-Cosmetics · PharmacyHub 은퇴)', () => {
+    expect(keys.sort()).toEqual(['kpa-society']);
   });
 
   it('모든 항목은 catalog storeWorkspaceEnabled=true 이고 canonical key 다', () => {

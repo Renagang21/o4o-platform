@@ -118,18 +118,5 @@ export const SERVICE_WORK_CONFIGS: Readonly<Record<UnifiedServiceKey, StoreDashb
       ]},
     ],
   },
-  'pharmacy-hub': {
-    serviceKey: 'pharmacy-hub',
-    serviceName: 'PharmacyHub',
-    basePath: `${WORKSPACE_PATHS.serviceWork}/pharmacy-hub`,
-    enabledMenus: ['dashboard'],
-    menuSections: [
-      { label: '', items: [{ key: 'home', label: '홈', subPath: '' }] },
-      { label: '공급 상품 · 주문', items: [
-        { key: 'products', label: '공급 상품', subPath: '/products' },
-        { key: 'cart',     label: '장바구니', subPath: '/cart' },
-        { key: 'orders',   label: '주문',     subPath: '/orders' },
-      ]},
-    ],
-  },
+
 });

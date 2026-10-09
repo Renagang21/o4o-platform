@@ -1,5 +1,7 @@
 # O4O Pharmacy-Hub Service Model Baseline V1
 
+> **2026-10-09 실행 갱신:** PharmacyHub 전용 앱·API·배포 경로 제거는 [WO-O4O-PHARMACYHUB-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-V1.md)이 현재 실행 범위다. 기존 식별자와 운영 데이터는 보존하며 운영 인프라 정리는 아직 미실행이다.
+
 > **상태**: ACTIVE · **제정일**: 2026-08-21
 > **근거 WO**: `WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1`
 > **적용 범위**: Pharmacy-Hub 서비스의 역할 모델 · 가입 · 운영자 capability · 매장 HUB 공급 유입
