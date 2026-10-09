@@ -225,7 +225,7 @@ export class GoogleAuthService {
     this.readContext = deps.readContext ?? freshenUserContext;
     this.issueSession =
       deps.issueSession ??
-      ((user, sessionServiceKey, context) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, null, context));
+      ((user, sessionServiceKey, context) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, 'google', context));
   }
 
   /** env 는 요청 시점에 읽는다 — 플래그 제거(폐쇄)가 재배포 없이도 즉시 반영되도록. */

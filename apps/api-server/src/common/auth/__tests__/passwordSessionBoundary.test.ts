@@ -45,6 +45,48 @@ function mockRes() {
 
 const USER = { refreshTokenFamily: 'family-1', id: 'u1', isActive: true, status: 'active' };
 
+describe('Google-positive admin boundary for current and legacy methods', () => {
+  const cases = [
+    ['google', 'admin', ['platform:super_admin'], true],
+    ['google', 'neture', ['platform:operator'], true],
+    ['password', 'admin', [], false],
+    ['password', 'neture', ['platform:super_admin'], false],
+    ['kakao', 'admin', [], false],
+    ['kakao', 'neture', ['platform:super_admin'], false],
+    [undefined, 'admin', [], false],
+    [undefined, 'neture', ['platform:super_admin'], false],
+    ['GOOGLE', 'neture', ['platform:super_admin'], false],
+    ['unknown', 'admin', [], false],
+    ['password', 'supplier', ['supplier:admin'], true],
+    ['kakao', 'supplier', ['supplier:admin'], true],
+    [undefined, 'neture', [], true],
+  ] as const;
+  beforeEach(() => {
+    jest.clearAllMocks();
+    findOne.mockResolvedValue({ ...USER, linkedAccounts: [{ provider: 'google' }] });
+  });
+  it.each(cases)('%s / %s / %j: signed method controls both required and optional auth', async (authMethod, serviceKey, roles, allowed) => {
+    // A linked Google account and stale JWT roles cannot upgrade the session method.
+    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', serviceKey, authMethod, roles: ['platform:super_admin'] });
+    getRoleNames.mockResolvedValue([...roles]);
+    for (const authenticate of [requireAuth, requirePlatformUser]) {
+      const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+      const res = mockRes(); const next = jest.fn();
+      await authenticate(req, res, next);
+      expect(next.mock.calls.length).toBe(allowed ? 1 : 0);
+      if (!allowed) {
+        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.json.mock.calls[0][0].code).toBe(authMethod === 'password' ? 'PASSWORD_SESSION_NOT_ALLOWED' : 'GOOGLE_SESSION_REQUIRED');
+        expect(req.user).toBeUndefined();
+      } else expect(req.user.roles).toEqual([...roles]);
+    }
+    const req: any = { method: 'GET', originalUrl: '/x', headers: {} }; const next = jest.fn();
+    await optionalAuth(req, mockRes(), next);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(Boolean(req.user)).toBe(allowed);
+  });
+});
+
 describe('비밀번호 세션 관리자 경계', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -91,7 +133,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B4 Google 세션도 DB 역할을 다시 읽는다', async () => {
-    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', serviceKey: 'admin', roles: ['platform:super_admin'] });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', authMethod: 'google', serviceKey: 'admin', roles: ['platform:super_admin'] });
     getRoleNames.mockResolvedValue([]);
     const next = jest.fn();
     await requireAuth({ method: 'GET', originalUrl: '/x', headers: {} } as any, mockRes(), next);

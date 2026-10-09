@@ -13,7 +13,7 @@ describe('browser logout / account security generation', () => {
   let service: AuthTokenSessionService;
   let revoked: Set<string>;
   let query: jest.Mock;
-  const issue = (serviceKey = 'neture') => tokenUtils.generateTokens(user, [], 'neture.co.kr', [], user.refreshTokenFamily, serviceKey, 0);
+  const issue = (serviceKey = 'neture') => tokenUtils.generateTokens(user, [], 'neture.co.kr', [], user.refreshTokenFamily, serviceKey, 0, 'google');
   const end = (tokens: { accessToken: string }) => {
     const claims = tokenUtils.verifyAccessToken(tokens.accessToken)!;
     return service.logout(USER_ID, claims.serviceKey!, claims.sessionId!);
@@ -114,10 +114,38 @@ describe('browser logout / account security generation', () => {
       expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBe('password');
     });
 
-    it('P4 Google 세션(표식 없음)은 platform 역할이 있어도 종전대로 회전된다', async () => {
+    it('P4 명시적 Google 세션은 platform 역할이 있어도 수단을 승계한다', async () => {
       jest.mocked(freshenUserContext).mockResolvedValueOnce({ roles: ['platform:super_admin'], memberships: [] } as any);
       const rotated = await service.refreshTokens(user.__loginRefreshToken);
-      expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBeUndefined();
+      expect((tokenUtils.verifyAccessToken(rotated.accessToken) as any)?.authMethod).toBe('google');
+    });
+  });
+
+  describe('explicit authentication method survives refresh without promotion', () => {
+    const refreshFor = (method: any, serviceKey = 'neture') => tokenUtils.generateTokens(
+      user, [], 'neture.co.kr', [], user.refreshTokenFamily, serviceKey, 0, method,
+    ).refreshToken;
+    it.each(['google', 'password', 'kakao'] as const)('preserves %s on both tokens and browser/family/scope', async (method) => {
+      const original = refreshFor(method); const before = tokenUtils.verifyRefreshToken(original)!;
+      const rotated = await service.refreshTokens(original);
+      const access = tokenUtils.verifyAccessToken(rotated.accessToken)!;
+      const refresh = tokenUtils.verifyRefreshToken(rotated.refreshToken)!;
+      for (const claims of [access, refresh]) {
+        expect(claims.authMethod).toBe(method);
+        expect([claims.sessionId, claims.tokenFamily, claims.serviceKey]).toEqual([before.sessionId, before.tokenFamily, before.serviceKey]);
+      }
+    });
+    it.each(['kakao', undefined, 'GOOGLE', 'unknown'])('does not upgrade %s after Google is linked/platform role is assigned', async (method) => {
+      jest.mocked(freshenUserContext).mockResolvedValueOnce({ roles: ['platform:super_admin'], memberships: [] } as any);
+      await expect(service.refreshTokens(refreshFor(method))).rejects.toMatchObject({ code: 'GOOGLE_SESSION_REQUIRED' });
+    });
+    it.each(['kakao', undefined])('requires explicit Google for admin-scoped %s session with no role', async (method) => {
+      await expect(service.refreshTokens(refreshFor(method, 'admin'))).rejects.toMatchObject({ code: 'GOOGLE_SESSION_REQUIRED' });
+    });
+    it('keeps a legacy normal-service session unmarked instead of upgrading it to Google', async () => {
+      const rotated = await service.refreshTokens(refreshFor(undefined));
+      expect(tokenUtils.verifyAccessToken(rotated.accessToken)!.authMethod).toBeUndefined();
+      expect(tokenUtils.verifyRefreshToken(rotated.refreshToken)!.authMethod).toBeUndefined();
     });
   });
 });
