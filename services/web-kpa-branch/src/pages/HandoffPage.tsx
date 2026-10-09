@@ -28,10 +28,12 @@ import { detectBasename } from '../lib/tenant';
 type HandoffStatus = 'loading' | 'success' | 'error';
 
 /** '/' 로 시작하는 단일 슬래시 상대 경로만 허용 (open redirect 차단). 그 외는 홈. */
-function resolveReturnTo(raw: string | null): string {
+export function resolveReturnTo(raw: string | null): string {
   if (!raw) return '/';
   if (!raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
-  return raw;
+  if (Array.from(raw).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) return '/';
+  const target = new URL(raw, window.location.origin);
+  return target.origin === window.location.origin ? `${target.pathname}${target.search}${target.hash}` : '/';
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -80,7 +82,12 @@ export default function HandoffPage() {
           storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
           setStatus('success');
           // 전체 리로드 — AuthProvider 가 저장된 토큰으로 /auth/me 를 다시 읽게 한다.
-          window.location.replace(`${basename}${returnTo}`);
+          const target = new URL(`${basename}${returnTo}`, window.location.origin);
+          if (target.origin !== window.location.origin) {
+            setStatus("error"); setError('이동 경로를 확인할 수 없습니다.');
+            return;
+          }
+          window.location.replace(`${window.location.origin}${target.pathname}${target.search}${target.hash}`);
         } else {
           setStatus('error');
           setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');

@@ -21,7 +21,7 @@
 ## 검증
 
 - Neture·약국·강의·매장·분회·병원 약품 앱: tsc 및 Vite build 6개 PASS.
-- Neture: 47 files / 379 tests PASS.
+- Neture: 48 files / 382 tests PASS.
 - shared-space-ui: 8 files / 85 tests PASS. 링크가 dialog 안에 있고 동의·로그아웃을 호출하지 않는 회귀 검증 포함.
 - 분회: 3 files / 34 tests PASS.
 - 병원 약품: 1 file / 20 tests PASS.
@@ -30,7 +30,7 @@
 - 로컬 브라우저: 병원·분회 로그인·없는 분회·Neture 가입·Neture/강의 인계 실패 × 1280/390px = 12회 PASS. 실제 복귀 클릭, 가로 넘침 없음, pageerror 0. 병원은 새 탭과 원래 업무 탭 유지 확인.
 - 강의 약관 미동의 synthetic 세션 × 1280/390px = 2회 PASS. 동의 dialog 유지, 업무 shell 미렌더, 공개 복귀 클릭, handoff·승낙 POST 0회, 넘침·pageerror 없음.
 - 자동 리뷰 P1: Neture 미동의 세션이 같은 origin의 동의 화면으로 되돌아가는 루프를 수정. 대표 공개 홈 예외와 공개 렌더링을 연결하고 `/mypage`에서 동의 화면 복귀 확인. Neture synthetic 세션 × 1280/390px = 2회 PASS, handoff·승낙 POST 0회. 총 브라우저 16회.
-- 강의 인증 인계 성공 후 이동: 제어문자 입력과 정상 내부 경로 × 1280/390px = 4회 PASS. 잘못된 경로는 홈으로, 정상 경로는 검색·앵커까지 유지하며 외부 요청 0회. 최종 브라우저 총 20회.
+- 강의 인증 인계 성공 후 이동: 제어문자 입력과 정상 내부 경로 × 1280/390px = 4회 PASS. 잘못된 경로는 홈으로, 정상 경로는 검색·앵커까지 유지하며 외부 요청 0회. Neture·분회·매장에서도 같은 두 경로를 desktop/mobile로 12회 추가 검증하여 최종 브라우저 총 32회 PASS. 분회 성공 이동은 StrictMode 개발 재실행 영향을 제외하기 위해 production preview로 확인했다.
 - API와 메인 목적지는 로컬 브라우저에서 synthetic 응답으로 통제했다. 실제 운영 계정·DB 변경·운영 배포 검증은 하지 않았다.
 
 초기 환경 검증에서 pnpm launcher의 저장소 경로 권한 문제와 선행 패키지 산출물 누락을 확인했다. 설치된 pinned 도구로 동일한 tsc/Vite 명령을 실행하고, 작업공간의 누락 산출물을 빌드하여 검증했다. 의존성·lockfile·배포 설정은 변경하지 않았다.
@@ -39,6 +39,6 @@
 
 기존 일반 헤더의 `O4O 홈`은 유지한다. 이번 변경은 복귀 누락·실패 안내 보완이며 서비스명·메뉴 순서·소개 영역 제거는 별도 트랙이다. 서비스 소개는 legacy 제거 agent의 담당으로 남겼다. 기존 디자인·권한·서비스 계약 정본의 수정 사항은 없다.
 
-SonarCloud에서 기존 강의 handoff의 외부 이동 위험을 지적하여 제어문자 거절·동일 origin 검증·고정 origin 기반 URL 구성을 보완했다. 새로운 권한이나 인증 API를 추가하지 않았다.
+SonarCloud에서 기존 강의 handoff의 외부 이동 위험을 지적하여 제어문자 거절·동일 origin 검증·고정 origin 기반 URL 구성을 보완했다. 동일 취약 패턴을 Neture·분회·매장에서도 수정하고 3개 서비스의 경로 검사 회귀 테스트를 추가했다. 새로운 권한이나 인증 API를 추가하지 않았다.
 
 main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 이후 검증이 필요하다.
