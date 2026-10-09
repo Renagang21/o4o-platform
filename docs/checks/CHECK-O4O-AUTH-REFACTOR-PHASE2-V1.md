@@ -122,6 +122,8 @@ PR [#378](https://github.com/Renagang21/o4o-platform/pull/378)은 main `03f97298
 
 ## 가입·권한 회귀 · Phase 3
 
+**후속 PR**: [#382](https://github.com/Renagang21/o4o-platform/pull/382) — 최신 HEAD CI/review는 PR에서 확인한다.
+
 **기준**: 배포된 main `03f97298560136883c10045794d2d26fa675fe3b` · 작업 branch `wo/auth-refactor-phase3`. 최신 모집단은 유지 사용자 origin 8개, runtime 웹 앱 5개, 전체관리자 및 API다. Phase 2 이후 runtime 수정 없이 기존 정책과 현재 코드의 일치 여부를 검사한다. Pharmacy-Hub는 최신 main에서 제거됐으며 되살리지 않는다.
 
 ### 코드·자동 회귀
