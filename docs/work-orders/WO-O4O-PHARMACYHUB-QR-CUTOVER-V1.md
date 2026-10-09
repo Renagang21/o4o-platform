@@ -1,6 +1,8 @@
 # PharmacyHub QR redirect cutover
 
-> 상태: ACTIVE · 2026-10-09 · 범위: 기존 인쇄 QR 경로 전환 도구 · 실제 운영 적용 미실행
+> 상태: SUPERSEDED · 2026-10-09 · 대체: [PH 완전 퇴역 WO](WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
+
+현재 사용자는 PH 경로·서버·도메인·인증서를 모두 제거하고 인쇄 QR용 302/301 연결도 보존하지 않기로 확정했다. 이 문서의 QR 전환 지시와 `PharmacyHub QR Cutover` workflow·도구는 폐기 대상이다. 아래 내용은 당시 작업 기록이며 현재 운영 실행 절차가 아니다. 실제 삭제는 대체 WO §5의 로컬 GCP/Gabia 절차를 따른다.
 
 사용자 승인: PharmacyHub QR을 Neture 약국으로 전환하고 push까지 진행한다. 지정된 `/workspace/o4o-pharmacyhub-retirement` worktree에서 최신 `origin/main` 기준 새 branch `wo/pharmacyhub-qr-cutover`를 사용한다. 기존 제거 PR #375는 병합 완료됐으며 사용자가 Delivery green을 보고했다.
 

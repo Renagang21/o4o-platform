@@ -55,6 +55,8 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
 
 PR 전체 CI에서 최신 main `01a47e6d4c`의 새 권한 회귀가 PH 역할 부여의 정상 퇴역 응답(410)을 일반 권한 거부(403)로 기대하는 충돌을 재현했다. 단순 main 이동이 아니라 이 결합 오류를 수정하기 위해 전용 branch에 해당 main을 결합했다. 권한 회귀의 대상만 현재 `supplier`로 바꾸며 위조된 body 서비스로 catalog의 실제 서비스 권한을 우회하지 못한다는 검증과 별도 PH 역할 부여 차단 회귀는 유지한다. main의 매장 화면·커뮤니티·운영자/가입 경계 수정도 보존하며 실제 main에는 반영하지 않았다.
 
+검사 중 main `57be2f2604`에 PR #384·#388의 PH 인쇄 QR 302 보존 workflow·도구가 추가돼 폐기한 redirect 검사를 다시 실행하는 충돌이 발생했다. 이 구체적 결합 문제 때문에 자기 branch에 해당 main을 결합하고 PH 전용 cutover workflow·도구·경로 수집·전용 CI 검사를 함께 제거한다. QR cutover WO는 당시 기록을 보존하며 SUPERSEDED로 정정한다. 현재 Store QR·자료·주문과 삭제 초안 planner 검증은 유지하며 실제 main이나 운영 URL map을 변경하지 않는다.
+
 ## 5. 운영 인프라 제거 절차
 
 아래 이름은 과거 `CHECK-O4O-PHARMACY-HUB-OFFICIAL-DOMAIN-CONNECTION-V1`에서 확인한 후보이며, 현재 운영 조회로 확정한 목록이 아니다. GCP/Gabia 작업 권한이 있는 실행자가 현재 연결과 공유 여부를 조회한 뒤 수행한다. 사용자 지시는 PH 자원 제거를 포함한다. 자격증명을 저장소에 넣지 않는다.
@@ -165,6 +167,7 @@ WO §5의 과거 이름은 후보이며, 실제 이름·PH 전용 여부·공유
 PH root/www DNS와 인증서 entry, PH host rule/matcher, 전용 backend/NEG/Cloud Run,
 PH 전용 인증서/DNS authorization을 제거하고 Gabia 등록·갱신도 종료한다.
 302/301·인쇄 QR 보존은 만들지 않는다. 기존 PH 도메인은 연결 유지 대상이 아니다.
+폐기된 PharmacyHub QR Cutover의 plan/apply는 실행하지 않는다.
 공유 o4o-global-lb, 공용 IP, o4o-main-cert-map, 다른 호스트·인증서·서버는 보존한다.
 운영 DB의 주문·결제·회원·콘텐츠·공급 키는 삭제하거나 바꾸지 않는다.
 각 자원의 실제 삭제와 다른 서비스 HTTPS/Store QR/공급자 후속 처리 결과를 기록한다.
