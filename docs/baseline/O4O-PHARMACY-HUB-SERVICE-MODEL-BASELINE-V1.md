@@ -1,7 +1,8 @@
 # O4O Pharmacy-Hub Service Model Baseline V1
 
-> **상태**: ACTIVE · **제정일**: 2026-08-21
-> **2026-10-09 SUPERSEDED**: PH 경로·웹·API·가입·운영자 부여·배포·도메인·인증서의 현행 결정은 [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §16](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)이 대체한다. 아래의 호환 호스트·역할 모델·HUB 설명은 과거 기록이며 재구현이나 QR 보존의 근거가 아니다. 실제 제거 상태는 [퇴역 CHECK](../checks/CHECK-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)를 따른다.
+> **상태**: SUPERSEDED · **대체 문서**: [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §16](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) · **표기일**: 2026-10-09
+> **제정일**: 2026-08-21
+> PH 경로·웹·API·가입·운영자 부여·배포·도메인·인증서의 현행 결정은 위 대체 문서를 따른다. 아래 본문과 2026-10-03 호스트 정합은 과거 기록이며 재구현이나 QR 보존의 근거가 아니다. 실제 제거 상태는 [퇴역 CHECK](../checks/CHECK-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)를 따른다.
 > **근거 WO**: `WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1`
 > **적용 범위**: Pharmacy-Hub 서비스의 역할 모델 · 가입 · 운영자 capability · 매장 HUB 공급 유입
 > **호스트 정합 (2026-10-03)**: `pharmacyhub.co.kr` 은 **호환 호스트**다 — 새 독립 서비스를 두지 않고 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향, `pharmacy-hub` 키 · role 은 호환 식별자로 보존 ([`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2-2 · `CHECK-O4O-URL-FIRST-CENSUS-V1` §9). 본문의 역할 모델은 그대로 유효하다.
