@@ -6,7 +6,7 @@ import { api } from '../../lib/apiClient';
 import type { SubdomainOperatorKey } from '../../lib/role-constants';
 
 const adapter = createUserDetailApiAdapter(api);
-export default function ServiceMembersPage({ serviceKey }: { serviceKey: SubdomainOperatorKey }) {
+export default function ServiceMembersPage({ serviceKey }: Readonly<{ serviceKey: SubdomainOperatorKey }>) {
   const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();

@@ -83,6 +83,11 @@ export interface RejectParams {
   serviceKeys: string[];
 }
 
+/** Application rejection is open to operators; an active member requires its service admin. */
+function canRejectServiceMembership(membership: Pick<ApproveResult, 'status' | 'service_key'>, params: RejectParams): boolean {
+  return membership.status !== 'active' || params.isPlatformAdmin || params.adminServiceKeys?.includes(membership.service_key) === true;
+}
+
 export interface DeleteMemberParams {
   userId: string;
   deletedBy: string | null;
@@ -612,7 +617,7 @@ export class MembershipApprovalService {
       const membership = selectResult[0] as ApproveResult;
       const userId = membership.user_id;
       const statusBefore = membership.status;
-      if (statusBefore === 'active' && !isPlatformAdmin && !params.adminServiceKeys?.includes(membership.service_key)) {
+      if (!canRejectServiceMembership(membership, params)) {
         await queryRunner.rollbackTransaction();
         return null;
       }

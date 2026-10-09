@@ -99,6 +99,20 @@ export class MembershipConsoleController {
     return { isPlatformAdmin: false, serviceKeys: [serviceKey] };
   }
 
+  private roleReadScopeParams(serviceKeys: string[] | null): [string[] | null, string[] | null] {
+    const prefixes = serviceKeys?.map(key => resolveRolePrefixFromCanonicalServiceKey(key)) ?? null;
+    return [prefixes?.map(prefix => `${prefix}:%`) ?? null, prefixes];
+  }
+
+  /** The same catalogue ownership check applies to role assignment and removal. */
+  private requireMemberRoleAdmin(req: Request, res: Response, serviceKey: string): boolean {
+    const scope: ServiceScope = (req as any).serviceScope;
+    const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
+    if (scope.isPlatformAdmin || !adminKeys || adminKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
+    res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
+    return false;
+  }
+
   private async checkServiceBoundary(userId: string, serviceKeys: string[]): Promise<boolean> {
     const result = await AppDataSource.query(
       `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
@@ -224,7 +238,7 @@ export class MembershipConsoleController {
            AND ($2::text[] IS NULL OR ra.role LIKE ANY($2)
                 OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          GROUP BY ra.user_id`,
-        [userIds, resolved.serviceKeys === null ? null : resolved.serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), resolved.serviceKeys === null ? null : resolved.serviceKeys.map(resolveRolePrefixFromCanonicalServiceKey)]
+        [userIds, ...this.roleReadScopeParams(resolved.serviceKeys)]
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
@@ -373,7 +387,7 @@ export class MembershipConsoleController {
          WHERE ra.user_id = $1
            AND ($2::text[] IS NULL OR ra.role LIKE ANY($2) OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          ORDER BY ra.is_active DESC, ra.created_at DESC`,
-        [userId, serviceKeys === null ? null : serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), serviceKeys === null ? null : serviceKeys.map(resolveRolePrefixFromCanonicalServiceKey)]
+        [userId, ...this.roleReadScopeParams(serviceKeys)]
       );
 
       // Fetch service_memberships (scoped by service)
@@ -1328,12 +1342,7 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const roleServiceKey = resolveCanonicalServiceKey(roleEntity.serviceKey);
-        const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
-        if (adminKeys && !adminKeys.includes(roleServiceKey)) {
-          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
-          return;
-        }
+        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
         // Assignability check
         if (!roleEntity.isAssignable) {
           res.status(403).json({ success: false, error: 'This role is not assignable' });
@@ -1467,12 +1476,7 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const roleServiceKey = resolveCanonicalServiceKey(roleEntity.serviceKey);
-        const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
-        if (adminKeys && !adminKeys.includes(roleServiceKey)) {
-          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
-          return;
-        }
+        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });

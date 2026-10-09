@@ -103,7 +103,7 @@ const ACTIVITY_TYPE_LABELS: Record<string, string> = {
 
 // ─── Component ───────────────────────────────────────────────
 
-export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false }: KpaEditUserModalProps) {
+export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false }: Readonly<KpaEditUserModalProps>) {
   const isSuperAdmin = (member.capabilities ?? []).includes('platform:super_admin');
   const isWithdrawn = member.status === 'withdrawn';
 

@@ -6,14 +6,14 @@ import { OperatorMemberSoftDeleteFlow } from './OperatorMemberSoftDeleteFlow';
 import type { MembersConsoleClient } from './types';
 
 /** Service membership console, independent of business entities and community membership. */
-export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, userId, navigate }: {
+export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, userId, navigate }: Readonly<{
   serviceKey: string;
   basePath: string;
   api: UserDetailApiAdapter;
   roles: string[];
   userId?: string;
   navigate: (path: string) => void;
-}) {
+}>) {
   const isAdmin = roles.includes(`${serviceKey}:admin`) || roles.includes('platform:super_admin');
   const client = useMemo<MembersConsoleClient>(() => ({
     list: params => {

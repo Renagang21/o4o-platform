@@ -220,3 +220,15 @@ unsafe routes 1,132 files / 위반 0. 기존 공통 UI·KPA 변경 경로는 mai
 운영 데이터 정리는 수행하지 않으며 새 호환 역할이나 변환 테이블을 만들지 않는다.
 
 최종 추가 경계까지 포함한 API 회귀: 16 suites / 314 tests PASS. API 타입 검사 PASS.
+
+
+### CI 재현 및 정적 분석 정비
+
+CI API 1/3 실패를 동일 Jest shard로 재현했다: 139 suites PASS, 3 skipped,
+KPA orgContactSync 1 suite 실패. 새 서비스 가입 상태 잠금 조회에 응답하지 않던
+모형을 수정하고 정지 해제 사례를 확정 정책대로 kpa:admin으로 실행한다.
+성공 응답과 transaction commit을 명시하여 매장 조직 미변경 회귀가 오류 응답으로 통과하지 않게 했다.
+해당 2 tests PASS. 기존 회원 API 314 tests 및 타입 검사, 공통 UI 19 tests와 Neture build PASS.
+Sonar가 지적한 map 콜백 인수, 반려 조건 복잡도, 중복 import, 중첩 template,
+읽기 전용 React props를 정비했다. 역할 조회 인수와 실제 카탈로그 admin 검사를 공통 helper로 정리했다.
+필수 CI의 최종 성공 여부는 수정 후 PR HEAD에서 다시 확인한다.

@@ -1,4 +1,3 @@
-import { useAuth } from '../../contexts/AuthContext';
 /**
  * MemberManagementPage - KPA-a 회원 관리 (thin wrapper)
  *
@@ -39,7 +38,7 @@ import {
 } from '@o4o/operator-core-ui/modules/members';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getBusinessEntityTypeLabel } from '@o4o/types';
-import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
+import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────

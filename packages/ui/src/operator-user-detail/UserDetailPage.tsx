@@ -220,7 +220,8 @@ export default function UserDetailPage({
     setLoading(true);
     setError('');
     try {
-      const data = await apiAdapter.get(`/operator/members/${id}?${config.serviceKey ? `serviceKey=${encodeURIComponent(config.serviceKey)}` : 'all=true'}`);
+      const query = config.serviceKey ? `serviceKey=${encodeURIComponent(config.serviceKey)}` : 'all=true';
+      const data = await apiAdapter.get(`/operator/members/${id}?${query}`);
       setUser(data.user);
       setRoles(data.roles || []);
       setMemberships(data.memberships || []);

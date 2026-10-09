@@ -40,7 +40,8 @@ export default function EditUserModal({ userId, serviceKey, apiAdapter, theme, o
   useEffect(() => {
     (async () => {
       try {
-        const data = await apiAdapter.get(`/operator/members/${userId}?${serviceKey ? `serviceKey=${encodeURIComponent(serviceKey)}` : 'all=true'}`);
+        const query = serviceKey ? `serviceKey=${encodeURIComponent(serviceKey)}` : 'all=true';
+        const data = await apiAdapter.get(`/operator/members/${userId}?${query}`);
         const u = data.user;
         const biz: BusinessInfoData = u.businessInfo || {};
         const hasBiz = !!(biz.businessName || u.company);

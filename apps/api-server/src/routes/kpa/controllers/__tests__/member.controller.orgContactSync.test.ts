@@ -78,6 +78,7 @@ function makeHarness(options: HarnessOptions = {}) {
     const n = norm(sql);
     calls.push({ sql: n, params });
     if (options.failOn && options.failOn.test(n)) throw new Error('INJECTED_FAILURE');
+    if (/SELECT status FROM service_memberships.*FOR UPDATE/i.test(n)) return [{ status: options.status ?? 'pending' }];
     if (/SELECT "businessInfo" FROM users/i.test(n)) return [{ businessInfo }];
     if (/SELECT address, address_detail, phone FROM organizations/i.test(n)) {
       return options.orgRow === undefined ? [{ address: null, address_detail: null, phone: null }] : [options.orgRow];
@@ -117,7 +118,7 @@ function makeHarness(options: HarnessOptions = {}) {
   return { dataSource, calls, state, member };
 }
 
-async function patchStatus(h: ReturnType<typeof makeHarness>, newStatus: string) {
+async function patchStatus(h: ReturnType<typeof makeHarness>, newStatus: string, role = 'kpa:operator') {
   const router: any = createMemberController(
     h.dataSource,
     ((_r: any, _s: any, next: any) => next()) as any,
@@ -129,7 +130,7 @@ async function patchStatus(h: ReturnType<typeof makeHarness>, newStatus: string)
 
   const res: any = { status: jest.fn(() => res), json: jest.fn(() => res) };
   await handler(
-    { params: { id: MEMBER_ID }, body: { status: newStatus }, user: { id: OPERATOR_ID, roles: ['kpa:operator'] } } as any,
+    { params: { id: MEMBER_ID }, body: { status: newStatus }, user: { id: OPERATOR_ID, roles: [role] } } as any,
     res,
   );
   return res;
@@ -148,8 +149,10 @@ beforeEach(() => jest.clearAllMocks());
 describe('KPA approval is independent of Store pharmacy approval', () => {
   it.each(['pending', 'suspended'])('%s to active never provisions a pharmacy store', async (status) => {
     const h = makeHarness({ status, businessInfo: { businessNumber: '123-45-67890', address: 'SYNTHETIC' } });
-    const res = await patchStatus(h, 'active');
+    const res = await patchStatus(h, 'active', status === 'suspended' ? 'kpa:admin' : 'kpa:operator');
     expect(res.json).toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expect(h.state.txCommitted).toBe(1);
     expect(orgWrites(h.calls)).toEqual([]);
     expect(h.calls.some((c) => /neture_pharmacy_memberships/.test(c.sql))).toBe(false);
     expect(h.state.txRolledBack).toBe(0);
