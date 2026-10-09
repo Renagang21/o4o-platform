@@ -15,7 +15,7 @@
 
 ## 단계와 TODO
 
-각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 이번 클라우드는 setup 스킬에 따라 이미 격리된 checkout을 사용하며 단계 1은 `wo/auth-refactor-phase1`, 단계 2는 최신 main 기반 `wo/auth-refactor-phase2`에서 작업한다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
+각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 이번 클라우드는 setup 스킬에 따라 이미 격리된 checkout을 사용하며 단계 1은 `wo/auth-refactor-phase1`, 단계 2는 최신 main 기반 `wo/auth-refactor-phase2`에서 작업한다. 단계 3은 배포된 최신 main `03f9729856` 기반 `wo/auth-refactor-phase3`에서 회귀 검증한다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
 
 ### 1. 정책·공개 로그아웃 계약 정리
 
@@ -38,18 +38,20 @@
 - [x] 전체관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
 - [x] 서비스별 일반 logout, 다른 기기 유지, 비밀번호 변경·reset 전역 폐기 회귀 검증
 
-- [ ] 단계 2 PR 필수 CI·review, main 통합 승인 및 운영 적용
-- [ ] 단계 2 배포 후 유지 서비스 8개 PC·모바일 운영 smoke (격리 검증과 별개)
+- [x] 단계 2 PR 필수 CI·review, main 통합 승인 및 운영 적용 (PR #378, main `03f9729856`, Promote #37886624466)
+- [x] 단계 2 배포 후 유지 서비스 8개 PC·모바일 운영 smoke (일반 32/32, access 제거 후 logout 32/32; 운영 API 세션 격리 32/32)
 
 ### 3. 가입·권한 회귀 테스트
 
-- [ ] 최신 main 기준 가입·로그인·서비스 이용 자격·조직 소유권·role 소비처 재조사
-- [ ] 이메일·Google 계정 가입이 서비스 membership·역할·매장을 자동 생성하지 않는지 검증
-- [ ] 미가입·pending·rejected·suspended·withdrawn 상태와 승인 전후 접근 검증
-- [ ] 약국장·공급자 Demo 데이터 연결, 매장 원장 기반 권한 및 가입 우회 방지 검증
-- [ ] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
-- [ ] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
-- [ ] 검증 자료·수정·commit·push·PR 및 사용자 승인 후 main 통합
+- [x] 최신 main 기준 가입·로그인·서비스 이용 자격·조직 소유권·role 소비처 재조사
+- [x] 이메일·Google 계정 가입이 서비스 membership·역할·매장을 자동 생성하지 않는지 검증
+- [x] 미가입·pending·rejected·suspended·withdrawn 상태와 승인 전후 접근 검증
+- [x] 약국장·공급자 Demo 데이터 연결, 매장 원장 기반 권한 및 가입 우회 방지 검증
+- [x] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
+- [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
+- [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
+- [ ] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합
+- [ ] 별도 문서 정합 작업: Identity V3의 과거 kpa-society/k-cosmetics 로그인 membership 필수 문구를 현행 공통 로그인 정책과 정렬 (CHECK의 OPEN 드리프트; Frozen 본문 임의 수정 없음)
 
 ### 4. 카카오 로그인·명시적 연결
 
@@ -88,3 +90,5 @@
 
 
 단계 2 검증 결과: [CHECK-O4O-AUTH-REFACTOR-PHASE2-V1](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md). 사용자 지정 순서(2026-10-09)는 세션·비밀번호 → 가입·권한 회귀 → 카카오·계정 연결이다. 데이터 연결 확인은 각 단계의 Demo 검증에 포함하고, 별도 정리 TODO를 선행 완료로 간주하지 않는다.
+
+단계 3: 같은 CHECK의 [가입·권한 회귀](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md#가입권한-회귀--phase-3)에 API 483건·UI 130건과 운영 8개 서비스 PC/모바일 32건의 결과를 기록했다. 이 후속은 기록-only이며 추가 배포 대상이 아니다. 실제 카카오 OAuth와 계정 연결·데이터 정리는 후속 TODO다.

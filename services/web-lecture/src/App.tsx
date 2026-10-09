@@ -1,3 +1,4 @@
+import OperatorMembersPage from './pages/operator/OperatorMembersPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
@@ -64,6 +65,8 @@ export default function App() {
       </Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
+        <Route path="/operator/members" element={<OperatorMembersPage />} />
+        <Route path="/operator/members/:id" element={<OperatorMembersPage />} />
         {/* 11차 P2: 운영자 검토 전용 read-only 화면 (수강 등록·편집 권한 없음) */}
         <Route path="/operator/courses/:courseId/review" element={<OperatorCourseReviewPage />} />
         <Route path="/operator/contact" element={<OperatorContactPage />} />

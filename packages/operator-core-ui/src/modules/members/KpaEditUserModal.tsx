@@ -77,6 +77,7 @@ export interface KpaMemberForEdit {
 }
 
 export interface KpaEditUserModalProps {
+  canChangeMembershipType?: boolean;
   member: KpaMemberForEdit;
   /** Injected API adapter. Paths are relative to /api/v1/kpa (e.g. /members/:id/info) */
   makeRequest: ApiRequestFn;
@@ -102,7 +103,7 @@ const ACTIVITY_TYPE_LABELS: Record<string, string> = {
 
 // ─── Component ───────────────────────────────────────────────
 
-export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess }: KpaEditUserModalProps) {
+export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false }: Readonly<KpaEditUserModalProps>) {
   const isSuperAdmin = (member.capabilities ?? []).includes('platform:super_admin');
   const isWithdrawn = member.status === 'withdrawn';
 
@@ -159,7 +160,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess }: Kp
 
       const nameChanged = trim(form.name) !== trim(member.user?.name);
       const nicknameChanged = trim(form.nickname) !== trim(member.user?.nickname);
-      const typeChanged = form.membership_type !== (member.membership_type || '');
+      const typeChanged = canChangeMembershipType && form.membership_type !== (member.membership_type || '');
       const activityChanged = form.activity_type !== (member.activity_type || '');
       const licenseChanged = trim(form.license_number) !== trim(member.license_number);
       const pharmacyNameChanged = trim(form.pharmacy_name) !== trim(member.pharmacy_name);
@@ -339,9 +340,9 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess }: Kp
             <div style={fieldStyle}>
               <label style={labelStyle}>유형</label>
               <select
+                disabled={!canChangeMembershipType || saving}
                 value={form.membership_type}
                 onChange={(e) => setForm((f) => ({ ...f, membership_type: e.target.value }))}
-                disabled={saving}
                 style={inputStyle}
               >
                 <option value="pharmacist">약사</option>

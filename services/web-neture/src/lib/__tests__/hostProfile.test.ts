@@ -146,3 +146,12 @@ describe('이전 커뮤니티 주소', () => {
     expect(decideHost('main', loc('/forum/service-update/notice'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/post/notice' });
   });
 });
+
+
+it.each(['supplier', 'funding', 'community'] as const)('%s member list/detail remain on their own service host', profile => {
+  for (const tail of ['', '/fixture-user']) {
+    const pathname = `/operator/service-members/${profile}${tail}`;
+    expect(decideHost(profile, { pathname, search: '', hash: '' })).toEqual({ kind: 'stay' });
+    expect(decideHost('main', { pathname, search: '?page=2', hash: '' })).toEqual({ kind: 'external', href: `https://${profile}.neture.co.kr${pathname}?page=2` });
+  }
+});
