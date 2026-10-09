@@ -130,6 +130,22 @@ export function injectServiceScope(req: Request, _res: Response, next: NextFunct
   next();
 }
 
+/** Membership administration must not derive authority from ordinary member/store roles. */
+export function injectOperatorServiceScope(req: Request, res: Response, next: NextFunction): void {
+  injectServiceScope(req, res, () => {
+    const scope: ServiceScope = (req as any).serviceScope;
+    if (!scope.isPlatformAdmin) {
+      const operatorRoles = ((req as any).user?.roles || []).filter(
+        (role: string) => /^[^:]+:(admin|operator)$/.test(role),
+      );
+      const authorized = extractServiceScope(operatorRoles);
+      scope.serviceKeys = scope.serviceKeys.filter(k => authorized.serviceKeys.includes(k));
+      scope.rolePrefixes = scope.rolePrefixes.filter(p => authorized.rolePrefixes.includes(p));
+    }
+    next();
+  });
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // WO-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-FIX-V1
 //
