@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import StoreHandledProductsPage from '../pharmacy/StoreHandledProductsPage';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import MyServicesPage from '../MyServicesPage';
@@ -35,7 +35,8 @@ const businesses = [
   { key: 'diabetes', name: '혈당관리 사업', membershipStatus: 'active', communityKey: null },
   { key: 'waiting', name: '승인 대기 사업', membershipStatus: 'pending', communityKey: null },
 ];
-function mount(node: React.ReactNode, path = '/') { return render(<MemoryRouter initialEntries={[path]}>{node}</MemoryRouter>); }
+function LocationProbe() { const location = useLocation(); return <output data-testid="location">{location.pathname + location.search}</output>; }
+function mount(node: React.ReactNode, path = '/') { return render(<MemoryRouter initialEntries={[path]}>{node}<LocationProbe /></MemoryRouter>); }
 beforeEach(() => {
   cleanup(); vi.clearAllMocks(); mocks.serviceKey = 'kpa-society';
   mocks.products.mockResolvedValue({ items: [], pagination: { total: 0 } });
@@ -106,5 +107,69 @@ describe('내 매장 경영지원', () => {
     await screen.findByText('ORDER-B');
     expect(screen.queryByText('ORDER-A')).toBeNull();
     expect(screen.getByText('2,000원')).toBeTruthy();
+  });
+});
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: Error) => void;
+  const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
+  return { promise, resolve, reject };
+}
+const sourceRow = (title: string) => ({ id: title, title, summary: null, body: null, tags: [], semiFranchiseName: '사업', publishedAt: null });
+const supplyRow = (productName: string) => ({ productName, kind: 'default', optionId: productName, supplierName: '공급자', unitPrice: 100, semiFranchiseName: '사업', semiFranchiseKey: 'diabetes' });
+
+describe('사업 조회 응답 순서', () => {
+  it.each(['자료', '공급'] as const)('%s: 이전 사업 응답이 늦게 도착해도 현재 목록을 덮어쓰지 않는다', async kind => {
+    const previous = deferred<{ items: unknown[]; total: number }>();
+    const current = deferred<{ items: unknown[]; total: number }>();
+    const api = kind === '자료' ? mocks.contents : mocks.supply;
+    const row = kind === '자료' ? sourceRow : supplyRow;
+    api.mockReturnValueOnce(previous.promise).mockReturnValueOnce(current.promise);
+    mount(kind === '자료' ? <PharmacyContentSourcesPage /> : <SupplyOptionsPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '혈당관리 사업' }));
+    await waitFor(() => expect(api).toHaveBeenCalledTimes(2));
+    await act(async () => { current.resolve({ items: [row('현재 항목')], total: 1 }); });
+    await screen.findByText('현재 항목');
+    await act(async () => { previous.resolve({ items: [row('이전 항목')], total: 1 }); });
+    expect(screen.queryByText('이전 항목')).toBeNull();
+    expect(screen.getByText('현재 항목')).toBeTruthy();
+  });
+  it('이전 사업의 실패가 현재 성공 목록에 오류를 표시하지 않는다', async () => {
+    const previous = deferred<{ items: unknown[]; total: number }>();
+    mocks.contents.mockReturnValueOnce(previous.promise).mockResolvedValueOnce({ items: [sourceRow('현재 자료')], total: 1 });
+    mount(<PharmacyContentSourcesPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '혈당관리 사업' }));
+    await screen.findByText('현재 자료');
+    await act(async () => { previous.reject(new Error('이전 사업 조회 실패')); });
+    expect(screen.queryByText('이전 사업 조회 실패')).toBeNull();
+  });
+  it('현재 사업 조회 실패 시 이전 자료의 복사 버튼을 남기지 않는다', async () => {
+    mocks.contents.mockResolvedValueOnce({ items: [sourceRow('이전 자료')], total: 1 }).mockRejectedValueOnce(new Error('현재 사업 조회 실패'));
+    mount(<PharmacyContentSourcesPage />);
+    await screen.findByText('이전 자료');
+    fireEvent.click(await screen.findByRole('button', { name: '혈당관리 사업' }));
+    await screen.findByText('현재 사업 조회 실패');
+    expect(screen.queryByText('이전 자료')).toBeNull();
+  });
+});
+
+describe('제작·사본 동선', () => {
+  it('직접 등록 제품을 선택해 제작을 시작하면 제품 문맥을 유지한다', async () => {
+    mocks.products.mockResolvedValue({ items: [{ sourceType: 'local', sourceId: 'local-a', name: '제품 문맥', imageUrl: null, price: null, originLabel: '직접 등록', ownerLabel: '내 매장', isActive: true, classificationCode: '', classificationLabel: '', updatedAt: '', managePath: '' }], pagination: { total: 1 } });
+    mount(<StoreHandledProductsPage />, '/store/my-products');
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-a 선택' }));
+    fireEvent.click(screen.getByRole('button', { name: '콘텐츠 만들기' }));
+    const url = new URL(screen.getByTestId('location').textContent!, 'http://local.test');
+    expect(url.pathname).toBe('/store/library/contents');
+    expect(Object.fromEntries(url.searchParams)).toMatchObject({ create: '1', pType: 'local', pId: 'local-a', pName: '제품 문맥' });
+  });
+  it('사업 자료 사본을 만든 뒤 내 자료함의 동일 관리 흐름으로 연결한다', async () => {
+    mocks.contents.mockResolvedValue({ items: [sourceRow('복사 자료')], total: 1 });
+    mocks.copy.mockResolvedValue({ snapshotId: 'snapshot-a' });
+    mount(<PharmacyContentSourcesPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '내 매장 사본 만들기' }));
+    await waitFor(() => expect(mocks.copy).toHaveBeenCalledWith('복사 자료'));
+    expect((await screen.findByRole('link', { name: '내 매장 자료함에서 보기' })).getAttribute('href')).toBe('/store/library/contents');
   });
 });

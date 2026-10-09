@@ -6,6 +6,7 @@
  * 어떤 콘텐츠를 볼 수 있는지는 서버 판정이다(가입 상태 · 게시 상태). 화면은 응답을 그대로 보여준다.
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
  */
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
@@ -56,21 +57,27 @@ export default function PharmacyContentSourcesPage() {
       .catch(() => setFranchises([]));
   }, []);
 
+  const { begin, invalidate } = useLatestRequest();
   const load = useCallback(async () => {
+    const isCurrent = begin();
+    setItems([]);
+    setTotal(0);
     setLoading(true);
     setError(null);
     try {
       const res = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
+      if (!isCurrent()) return;
       setItems(res.items);
       setTotal(res.total);
     } catch (e) {
+      if (!isCurrent()) return;
       setError(pharmacyErrorMessage(e, '콘텐츠 목록을 불러오지 못했습니다.'));
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [sf, q, page]);
+  }, [sf, q, page, begin]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(); return invalidate; }, [load, invalidate]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();

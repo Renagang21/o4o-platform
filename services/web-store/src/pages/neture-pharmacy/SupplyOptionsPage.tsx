@@ -7,6 +7,7 @@
  * 목록은 서버가 이 약국이 지금 이용 · 주문할 수 있는 공급 옵션만 돌려준다(미가입 세미프랜차이즈 항목 0).
  * 같은 제품의 여러 공급 경로를 그대로 나열한다 — 가격 비교 · 최저가 강조 · 자동 선택을 하지 않는다.
  */
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
@@ -67,23 +68,29 @@ export default function SupplyOptionsPage() {
       .catch(() => setFranchises([]));
   }, []);
 
+  const { begin, invalidate } = useLatestRequest();
   const load = useCallback(async () => {
+    const isCurrent = begin();
+    setItems([]);
+    setTotal(0);
     setLoading(true);
     setError(null);
     try {
       const res = await neturePharmacyApi.listSupplyOptions({ source, q: query || undefined, page, limit: PAGE_SIZE });
+      if (!isCurrent()) return;
       setItems(res.items);
       setTotal(res.total);
     } catch (e) {
+      if (!isCurrent()) return;
       setError(pharmacyErrorMessage(e, '공급 상품을 불러오지 못했습니다.'));
       setItems([]);
       setTotal(0);
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [source, query, page]);
+  }, [source, query, page, begin]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(); return invalidate; }, [load, invalidate]);
 
   const choose = (next: string) => { setSource(next); setPage(1); };
   const rowKey = (o: SupplyOption) => `${o.kind}:${o.optionId}`;

@@ -11,6 +11,7 @@
  * Local Products are Display Domain only — NOT Commerce Objects.
  */
 
+import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
 import { getAccessToken } from '../contexts/AuthContext';
 import { tryRefreshToken } from './token-refresh';
 import { apiV1Service } from '../lib/serviceContext';
@@ -80,20 +81,21 @@ export interface LocalProductListResponse {
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   const token = getAccessToken();
-  const headers: HeadersInit = {
+  const headers = captureStoreOrganizationHeaders({
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
-  };
+  });
 
   let response = await fetch(url, { ...options, headers });
 
   if (response.status === 401) {
     const newToken = await tryRefreshToken();
     if (newToken) {
+      headers.set('Authorization', `Bearer ${newToken}`);
       response = await fetch(url, {
         ...options,
-        headers: { ...headers, Authorization: `Bearer ${newToken}` },
+        headers,
       });
     }
   }

@@ -8,6 +8,7 @@
  *   매장 경영활용 제품의 온라인몰/상품설명은 구조적으로 'not_supported'.
  */
 
+import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
 import type {
   HandledProductListItem,
   HandledProductsPagination,
@@ -38,15 +39,16 @@ export interface HandledProductsResponse {
 
 async function request<T>(url: string): Promise<T> {
   const token = getAccessToken();
-  const headers: HeadersInit = {
+  const headers = captureStoreOrganizationHeaders({
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
-  };
+  });
   let response = await fetch(url, { headers });
   if (response.status === 401) {
     const newToken = await tryRefreshToken();
     if (newToken) {
-      response = await fetch(url, { headers: { ...headers, Authorization: `Bearer ${newToken}` } });
+      headers.set('Authorization', `Bearer ${newToken}`);
+      response = await fetch(url, { headers });
     }
   }
   if (!response.ok) {
@@ -83,17 +85,18 @@ export interface RemoveHandledResult {
 
 async function post<T>(url: string, body: unknown): Promise<T> {
   const token = getAccessToken();
-  const headers: HeadersInit = {
+  const headers = captureStoreOrganizationHeaders({
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
-  };
+  });
   let response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
   if (response.status === 401) {
     const newToken = await tryRefreshToken();
     if (newToken) {
+      headers.set('Authorization', `Bearer ${newToken}`);
       response = await fetch(url, {
         method: 'POST',
-        headers: { ...headers, Authorization: `Bearer ${newToken}` },
+        headers,
         body: JSON.stringify(body),
       });
     }
@@ -148,11 +151,14 @@ export async function fetchHandledProductQrFile(
   if (sizeMm) qs.set('sizeMm', String(Math.round(sizeMm)));
   const url = `${BASE}/handled-products/qr/export?${qs.toString()}`;
   const token = getAccessToken();
-  const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = captureStoreOrganizationHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   let response = await fetch(url, { headers });
   if (response.status === 401) {
     const newToken = await tryRefreshToken();
-    if (newToken) response = await fetch(url, { headers: { Authorization: `Bearer ${newToken}` } });
+    if (newToken) {
+      headers.set('Authorization', `Bearer ${newToken}`);
+      response = await fetch(url, { headers });
+    }
   }
   if (!response.ok) {
     const b = await response.json().catch(() => ({ message: 'Network error' }));
