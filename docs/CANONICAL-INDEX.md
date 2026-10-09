@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES SUPERSEDED → 새 K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1(§5 ACTIVE), 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-09 (PH 모델 정본 SUPERSEDED · `WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1`) · 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES SUPERSEDED → 새 K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1(§5 ACTIVE), 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -110,7 +110,7 @@
 | [SIGNAGE-APPROVAL-ARCHITECTURE-V1](architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md) | Signage 상태 모델 — **Operator 직접 게시가 정본**(2026-10-06 판정 확정): `draft → active` · `active` 로 생성 허용, Admin 승인 불필요. `pending` 승인 흐름은 서비스별 선택 정책. 상태 전이 SSOT = 코드 `ALLOWED_STATUS_TRANSITIONS` | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |
 | [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) | **K-Cosmetics 퇴역 잔여 계약** (2026-10-07) — 퇴역 결정(2026-10-05) · 운영 runtime 제거 완료(1차-A 웹 앱 · 1차-B `/api/v1/cosmetics` · web-store 화면 · admin) 뒤 남은 잔여(catalog identity · `SERVICE_KEYS` · `cosmetics:*` roles · DB 스키마 · migration · Event Offer/B2B · 공통 구조 identity)에만 적용. 규칙 4개: 제거된 runtime 재생성 금지 · 잔여 구조 고정(새 테이블 · Core FK · 개인정보 필드 · 전용 기능 추가 금지) · 정리 승인 경계 · 주문 데이터는 B2B 원장. 구 COSMETICS-DOMAIN-RULES 를 대체. 잔여 정리 완료 시 OBSOLETE | ACTIVE |
-| [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 capability · supplier 역할 없음 | ACTIVE |
+| [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PH 완전 퇴역으로 호환 호스트·역할 모델·HUB 설명은 과거 기록. 원문 보존, 기능 복구·QR 보존 근거로 사용 금지 (2026-10-09, `WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1`) | SUPERSEDED → [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §16 (§1) |
 | [EVENT-OFFER-COMMON-DOMAIN-V1](baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) | Event Offer 공통 도메인 | ACTIVE |
 | [EVENT-OFFER-STORE-INTEGRATION-V1](baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md) | Event Offer Store 통합 | ACTIVE |
 | [EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1](baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md) | Event Offer 에서의 Neture 역할 구분 | ACTIVE |
