@@ -1,3 +1,4 @@
+import { hasCommunityServiceOperator } from './community-service-operator-access.js';
 /**
  * Community Lifecycle — 개설 신청 · 승인 · 가입
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3-2
@@ -371,13 +372,22 @@ export class CommunityLifecycleService {
   /**
    * 내가 운영하는 커뮤니티 — 가입 심사 화면의 진입 목록.
    *
-   * 개체 운영자 판정(`requireCommunityScope('operator')`)과 같은 조건이다: 커뮤니티 active ·
+   * 중앙 서비스 운영자는 활성 독립 커뮤니티 전체를 조회한다. 기존 개체 운영자는 다음 조건이다: 커뮤니티 active ·
    * 내 가입 active · role='operator' · 내 커뮤니티 서비스 가입 active. 서비스 가입이 active 가
    * 아니면 빈 목록이다(심사 경로가 어차피 403 이므로 화면에 들이지 않는다).
    */
   async listOperatedCommunities(userId: string): Promise<
     Array<{ id: string; slug: string; name: string; pendingCount: number }>
   > {
+    if (await hasCommunityServiceOperator(this.dataSource, userId)) {
+      const rows: any[] = await this.dataSource.query(
+        `SELECT c.id, c.slug, c.name,
+           (SELECT COUNT(*)::int FROM community_memberships p
+             WHERE p.community_id = c.id AND p.status = 'pending') AS pending_count
+         FROM communities c WHERE c.status = 'active' ORDER BY c.name ASC`,
+      );
+      return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0) }));
+    }
     const rows: any[] = await this.dataSource.query(
       `SELECT c.id, c.slug, c.name,
               (SELECT COUNT(*)::int FROM community_memberships p

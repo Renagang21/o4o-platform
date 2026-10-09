@@ -316,6 +316,7 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
     const calls: Array<{ sql: string; params: unknown[] }> = [];
     const svc = new CommunityLifecycleService({
       query: async (sql: string, params: unknown[]) => {
+        if (!sql.includes('SELECT c.id, c.slug, c.name')) return [];
         calls.push({ sql, params });
         return [{ id: 'c1', slug: 'alpha', name: 'Alpha', pending_count: 2 }];
       },

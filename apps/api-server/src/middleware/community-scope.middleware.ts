@@ -14,10 +14,10 @@
  * `branch_memberships` 하나로 소속만 보는 반면, 커뮤니티는 **같은 테이블 안에서
  * 역할까지 갈라야 한다**는 것이다.
  *
- * `community:admin`(서비스 전체 관리자)을 여기서 bypass 시키지 않는다.
- * 전체 관리자는 **개설 신청 승인** 경로에서만 쓰고, 개별 커뮤니티 운영 기능은
- * 개체 역할로만 통과시킨다 — 전체 권한이 모든 커뮤니티의 내부 운영까지 여는 것을 막는다.
+ * 중앙 지정된 community Admin/Operator는 활성 서비스 소속과 현재 DB 역할을 확인해 운영한다.
+ * 서비스 운영자는 해당 서비스의 활성 독립 커뮤니티를 관리한다. 다른 서비스 역할은 적용하지 않는다.
  */
+import { hasCommunityServiceOperator } from '../services/community/community-service-operator-access.js';
 import { getNetureMainMembershipStatus } from '../modules/neture/services/neture-main-membership.js';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
@@ -102,6 +102,10 @@ export function requireCommunityScope(level: CommunityScopeLevel): RequestHandle
 
       if ((await getNetureMainMembershipStatus(AppDataSource, user.id)) !== 'active') {
         res.status(403).json({ success: false, error: '메인 계정의 이메일 확인과 이용 상태를 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
+        return;
+      }
+      if (req.community.status === 'active' && await hasCommunityServiceOperator(AppDataSource, user.id)) {
+        next();
         return;
       }
       const membership = await AppDataSource.getRepository(CommunityMembership).findOne({

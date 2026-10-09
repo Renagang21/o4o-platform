@@ -178,7 +178,7 @@ export default function MyCommunityOperatorPage() {
   return layout(
     <div className="text-sm">
       <p className="text-xs text-gray-500">
-        내가 운영자로 있는 커뮤니티의 가입 신청만 심사합니다. 서비스 이용이 정지된 신청자는 승인되지 않습니다.
+        담당 커뮤니티의 가입 신청을 심사합니다. 중앙에서 지정한 커뮤니티 서비스 Admin/Operator는 전체 독립 커뮤니티를 관리합니다. 서비스 이용이 정지된 신청자는 승인되지 않습니다.
       </p>
       {error && <p className="mt-3 text-red-600">{error}</p>}
       {communities === null && !error && <p className="mt-4 text-gray-500">불러오는 중입니다…</p>}

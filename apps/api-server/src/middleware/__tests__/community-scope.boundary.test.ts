@@ -14,14 +14,15 @@ import * as path from 'path';
 const store: {
   communities: Array<{ id: string; slug: string; name: string; status: string }>;
   memberships: Array<{ id: string; communityId: string; userId: string; role: string; status: string }>;
+  centralOperators: string[];
   serviceMemberships: Array<{ userId: string; status: string }>;
-} = { communities: [], memberships: [], serviceMemberships: [] };
+} = { communities: [], memberships: [], serviceMemberships: [], centralOperators: [] };
 
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
     // 운영자 수준의 서비스 가입 조회만 흉내낸다 (service_key 는 'community' 고정).
     query: async (_sql: string, params: string[]) =>
-      /FROM users u/.test(_sql) ? [{ account_status: 'active', account_active: true, email_verified: true }] : params[1] === 'community'
+      /FROM role_assignments ra/.test(_sql) ? (store.centralOperators.includes(params[0]) && store.serviceMemberships.some(s => s.userId === params[0] && s.status === 'active') ? [{ exists: 1 }] : []) : /FROM users u/.test(_sql) ? [{ account_status: 'active', account_active: true, email_verified: true }] : params[1] === 'community'
         ? store.serviceMemberships.filter((s) => s.userId === params[0]).map((s) => ({ status: s.status }))
         : [],
     getRepository: (entity: { name?: string }) => {
@@ -61,6 +62,7 @@ const NO_SERVICE_OP_A = 'u-no-service-operator-a';
 const WITHDRAWN_A = 'u-withdrawn-operator-a';
 
 function seed() {
+  store.centralOperators = [];
   store.communities = [
     { id: C_A, slug: 'alpha', name: 'Alpha', status: 'active' },
     { id: C_B, slug: 'beta', name: 'Beta', status: 'active' },
@@ -175,7 +177,7 @@ describe('커뮤니티 개체 경계', () => {
     expect(codeOf(res)).toBe(COMMUNITY_MEMBERSHIP_REQUIRED);
   });
 
-  it('V4 가드는 서비스 전체 역할(community:admin)을 보지 않는다', () => {
+  it('역할 문자열로 platform 권한을 우회하지 않는다', () => {
     // 전체 관리자가 모든 커뮤니티의 **내부 운영**까지 열지 않도록, 소스에 bypass 가 없음을 고정한다.
     const src = fs.readFileSync(
       path.resolve(__dirname, '..', 'community-scope.middleware.ts'),
@@ -188,5 +190,25 @@ describe('커뮤니티 개체 경계', () => {
       .join('\n');
     expect(code).not.toMatch(/community:admin/);
     expect(code).not.toMatch(/platform:super_admin/);
+  });
+});
+
+
+describe('중앙 커뮤니티 운영자 지정', () => {
+  beforeEach(seed);
+  it('개별 가입이 없어도 두 독립 커뮤니티의 운영을 허용한다', async () => {
+    store.centralOperators = ['u-central'];
+    store.serviceMemberships.push({ userId: 'u-central', status: 'active' });
+    expect((await run('alpha', 'u-central', 'operator')).passed).toBe(true);
+    expect((await run('beta', 'u-central', 'operator')).passed).toBe(true);
+  });
+  it('중앙 역할이 해제되면 다음 요청에서 거부한다', async () => {
+    store.serviceMemberships.push({ userId: 'u-central', status: 'active' });
+    expect((await run('alpha', 'u-central', 'operator')).passed).toBe(false);
+  });
+  it('서비스 이용이 정지되면 중앙 역할이 있어도 거부한다', async () => {
+    store.centralOperators = ['u-central'];
+    store.serviceMemberships.push({ userId: 'u-central', status: 'suspended' });
+    expect((await run('alpha', 'u-central', 'operator')).passed).toBe(false);
   });
 });
