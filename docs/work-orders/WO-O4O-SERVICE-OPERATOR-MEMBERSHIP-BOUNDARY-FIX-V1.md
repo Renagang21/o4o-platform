@@ -6,8 +6,10 @@
 
 ## 구현 범위
 
-확인된 F1~F3의 권한·서비스 경계 결함을 수정한다. admin/operator의 새 권한 차이,
-공통 계정 수정·복구 정책, branch/community의 서비스 전역 operator 신설은 결정 전 현행 유지한다.
+확인된 F1~F3의 권한·서비스 경계 결함과 아래 후속 단계의 사용자 확정 정책을 적용한다.
+operator는 조회·승인·반려, 같은 서비스 admin은 정지·해제·서비스 탈퇴를 담당한다.
+공통 프로필 수정은 유지하고 공통 계정 상태 복구는 중앙 계정 관리에 한정한다.
+개별 커뮤니티 운영자 정비는 회원 관리 통합 후의 별도 조사 범위다.
 새 DB 구조·migration·운영 데이터 변경·배포는 수행하지 않는다.
 
 ## TODO
@@ -232,3 +234,10 @@ KPA orgContactSync 1 suite 실패. 새 서비스 가입 상태 잠금 조회에 
 Sonar가 지적한 map 콜백 인수, 반려 조건 복잡도, 중복 import, 중첩 template,
 읽기 전용 React props를 정비했다. 역할 조회 인수와 실제 카탈로그 admin 검사를 공통 helper로 정리했다.
 필수 CI의 최종 성공 여부는 수정 후 PR HEAD에서 다시 확인한다.
+
+
+최신 main `03f9729856`(인증 Phase 2·공급자 정비)을 같은 WO branch에 통합했다.
+Lecture SiteShell 충돌은 서비스 회원 관리 링크와 새 서브도메인 브라우저 로그아웃 설명을
+함께 보존하여 해결했다. incoming main 86개 경로 외 변경이 없는 것을 검증했다.
+인증 패키지 재빌드와 API 타입 검사 PASS, frozen install PASS.
+전체 API 1/3 재실행 및 Lecture 빌드·원격 CI 결과는 PR 최신 HEAD를 기준으로 확인한다.
