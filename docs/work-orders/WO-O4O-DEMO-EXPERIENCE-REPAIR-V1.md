@@ -60,3 +60,32 @@ Pharmacy-Hub는 사용자 지정 삭제 대상이므로 인증·Demo 검증에�
 이번 PR은 1단계 코드 정합과 나머지 실행 계획이다. DB write·schema migration·운영 배포·세션 구현·Pharmacy-Hub 실제 삭제는 수행하지 않는다. 로컬 fixture 성공은 운영 데이터 복구 성공을 증명하지 않는다. main 통합은 사용자 승인 후 PR merge로만 진행한다.
 
 검증 기록: [CHECK-O4O-DEMO-EXPERIENCE-REPAIR-V1](../checks/CHECK-O4O-DEMO-EXPERIENCE-REPAIR-V1.md).
+
+## 2026-10-09 KST — 사용자 승인에 따른 후속 실행
+
+앞의 적용 경계와 미완료 표시들은 PR #365 작성 당시 기록이다. 사용자가 main 통합·운영 데이터
+복구·배포·전체 서비스 smoke를 명시 승인한 뒤 아래 작업을 실행했다.
+
+- [x] PR #365 CI·review 확인, main 통합, API·Neture 배포
+- [x] 기존 Actions WIF → Cloud SQL migration Job 실행 경로 재사용
+- [x] PR #367의 대상 한정 census·테스트 데이터 출처 확인·before/after 백업·transaction 복구
+- [x] 합성 약국 원장·조직 owner·약국 세미프랜차이즈 승인 연결, 업무 API 200 확인
+- [x] 공급자 Demo 상품 5개 연결, 일반 자료 작성 API로 상품 안내 1개를 비공개 personal로 생성
+- [x] PR #367 main 통합, 승인된 L3 Promote의 migration·API 배포·serving SHA 검증
+- [x] 전체 유지 서비스에서 발견한 실제 상품 페이지 500 수정, 실제 PostgreSQL 7개와 기존 회귀 44개 통과
+- [x] PR #368 필수 CI·security analysis·review 확인 후 main 통합
+- [x] PR #368 API serving SHA 확인 후 PC·모바일 전체 유지 서비스의 로그인·이동·대표 조회·logout 32개 PASS, 별도 세션 FAIL과 미검증 범위 기록
+
+세션 분리는 별개다. 두 Demo 각각 Neture logout 후 다른 7개 서브도메인의 refresh가
+200이고 새 access token을 반환했다. 같은 Neture의 다른 브라우저 refresh는
+`401 SERVICE_SESSION_REVOKED`로 실패한다. 일반 logout의 서비스 epoch 폐기를 브라우저별
+세션 폐기로 교체할 3절 작업은 미완료다. 카카오·소셜 연결·비밀번호 후속 단계도 완료로 바꾸지 않는다.
+
+Pharmacy-Hub는 요청대로 삭제 대상·smoke 제외이며 실제 삭제는 별도 의존 관계 확인 대상이다.
+K-Cosmetics/소매 서비스는 기존 퇴역 CHECK의 운영 종료 대상, Partner 주소는 예약 상태다.
+전체관리자는 Google 전용 공개 로그인 경계와 Demo의 권한 거절만 검사하며 관리자 로그인 성공을 주장하지 않는다.
+삭제 census와 미사용 계정·데이터 정리는 완료하지 않았고 이번 실행에 무관한 삭제는 없다.
+
+실제 결과: [운영 Demo 데이터 복구 CHECK](../checks/CHECK-O4O-DEMO-DATA-RECOVERY-V1.md).
+운영 결과 문서는 onboarding skill 예외에 따라 기존 격리 checkout의 최신 main에서 만든
+`wo/auth-demo-production-verification`에 추가한다.

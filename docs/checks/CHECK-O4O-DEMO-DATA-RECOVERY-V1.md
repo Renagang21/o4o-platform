@@ -87,3 +87,72 @@ DB 통합 7개가 skipped이며 로컬 실행 결과와 구분한다. API type-c
 `wo/auth-demo-smoke-regressions`에서 작업한다. 사용자가 승인한 통합·배포 범위의 발견 회귀이며,
 필수 CI·review와 최신 main 확인 후 PR merge 경로를 사용한다. 수정 배포와 PC·모바일 전체
 서비스 최종 결과는 실제 실행 후 덧붙인다. 현재 전체 PASS로 판정하지 않는다.
+
+## 2026-10-09 KST — 세션 분리와 공개 화면
+
+두 Demo 유형 × 8개 origin의 `/auth/me` baseline 16개 모두 200이었다.
+각 유형의 Neture 정상 logout 2개 모두 200, 그 뒤 다른 7개 origin의 refresh 합계
+14개 모두 200·새 access token 발급을 확인했다. 실제 공통 SDK의 `data.tokens` 응답 구조를
+기준으로 검사했다. 같은 Neture의 별도 브라우저는 logout 전 me 200, 다른 브라우저 logout 200,
+이후 refresh `401 SERVICE_SESSION_REVOKED`였다. 이 항목은 FAIL이며 인증 WO 단계 2에 남는다.
+
+유지 host 8개와 전체관리자 health 9개는 200이었다. 소매 host의 503은
+[K-Cosmetics 운영 종료 CHECK](CHECK-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-RUNTIME-V1.md)의
+퇴역 대상과 일치한다. Partner host의 403은 예약 주소로 기록하며 유지 서비스 성공에 포함하지 않는다.
+
+변경 없는 병원약국·Cafe24·전체관리자 공개 화면을 PC/모바일 각각 확인했다.
+6개 모두 200·실제 안내 화면 표시·page error 0이다. 병원약국은 무로그인 파일 연결 안내이고
+실제 원내 파일 연결·약품 업무까지 검증한 결과가 아니다. 전체관리자는 Google 안내·Demo 버튼 0,
+두 Demo의 전체관리자 사용자 API는 모두 `403 ROLE_REQUIRED`로 차단됐다.
+Google 실제 로그인은 이 환경의 외부 제공자 접근 제한과 개인 계정 인증 없이 미검증이다.
+전체관리자 모바일 390px에서 문서 가로 넘침도 관측했다. 공개 로그인 경계 판정과 별도로
+레이아웃 후속 확인 항목으로 남기며 모바일 화면 전체 품질 PASS로 확대하지 않는다.
+
+## 2026-10-09 KST — 상품 페이지 수정 배포
+
+PR #368은 main `19f9338a8fcbf036a0a63a8bab058b5cc04e1734`로 통합됐다.
+[main CI](https://github.com/Renagang21/o4o-platform/actions/runs/37864683913)와 security analysis가 성공했다.
+[Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/37865489452)는 API 배포·migration Job·
+새 revision readiness·traffic switch·전환 후 검증·serving SHA report를 모두 통과했다.
+commit production status는 `DEPLOYED · deploy: api` 성공이다. 프런트 변경은 없으므로 별도 프런트 배포는 없다.
+
+
+## 2026-10-09 KST — 배포 후 전체 Demo smoke 최종 결과
+
+API serving target `19f9338a8fcbf036a0a63a8bab058b5cc04e1734` 배포 확인 후 실행했다.
+PC 1440×900, 모바일 390×844에서 서비스마다 매장 경영자·공급자 버튼을 실제 클릭했다.
+로그인 응답 200·서버 Demo registry 유형·실제 이동 완료·페이지/API 오류·정상 logout 200과
+현재 origin 토큰 제거를 각각 확인했다. 아래 32개 시나리오 모두 PASS, API 오류 0·page error 0이다.
+
+| 서비스 | PC 매장 | PC 공급자 | 모바일 매장 | 모바일 공급자 |
+|---|---|---|---|---|
+| Neture | PASS | PASS | PASS | PASS |
+| 공급자 | PASS | PASS | PASS | PASS |
+| 커뮤니티 | PASS | PASS | PASS | PASS |
+| 펀딩 | PASS | PASS | PASS | PASS |
+| 약국 | PASS | PASS | PASS | PASS |
+| Store | PASS | PASS | PASS | PASS |
+| 강의 | PASS | PASS | PASS | PASS |
+| 약사회 분회 | PASS | PASS | PASS | PASS |
+
+메인은 `/login` 직접 방문 결과만으로 대체하지 않고 홈 헤더의 로그인 모달에서 시작했다.
+매장 Demo는 실제 Store로 이동해 홈 후보 1개·약국 capabilities/info 200을 확인했다.
+공급자 Demo는 실제 UI의 페이지 조회 200·상품 이름 5개와 비공개 안내 자료 1개 표시를
+PC/모바일 모두 확인했다. `403 STORE_OWNER_REQUIRED`, 상품 페이지 500, 로그인 이동 오류는
+최종 시나리오에서 재현되지 않았다. community/funding의 계정 보안 화면 logout도 통과했다.
+
+PC 진행 중 클라우드 환경 재시작으로 프로세스가 종료됐다. 저장된 완료 7개는 유지하고
+미완료 시나리오부터 새 브라우저 context로 재개했다. 실패·중단을 완료 PASS로 기록하지 않았다.
+32개는 인증·업무공간 진입·대표 업무 조회·현재 origin logout의 범위이며 모든 서비스 기능,
+실제 Google 로그인, 이미지 로딩, 주문·결제까지 완료했다는 의미가 아니다. 외부 제공자와
+저장소 이미지 요청은 현재 환경의 domain 제한이 있어 해당 매체/연동 성공을 주장하지 않는다.
+다른 브라우저 보존·전체관리자 모바일 레이아웃·불필요 데이터 삭제·Pharmacy-Hub 실제 삭제는
+각각 위 후속 항목으로 남는다.
+
+## 2026-10-09 KST — 최신 배포의 세션 회귀 재확인
+
+32개 Demo 시나리오 이후 API `19f9338a8fcbf036a0a63a8bab058b5cc04e1734`에서 두 유형을 다시 확인했다.
+Neture 별도 브라우저의 me 200 → 첫 브라우저 logout 200 → 다른 브라우저 refresh
+`401 SERVICE_SESSION_REVOKED`가 매장·공급자 모두 재현됐다(보존 요구 기준 2 FAIL).
+각 유형의 별도 Store origin은 logout 전 me 200, 이후 refresh 200·새 token 발급이었다(2 PASS).
+일반 Demo logout 32 PASS와 다른 브라우저 보존 2 FAIL을 합쳐 전체 인증 PASS로 보고하지 않는다.
