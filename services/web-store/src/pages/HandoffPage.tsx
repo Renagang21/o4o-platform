@@ -13,9 +13,7 @@ import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { BRAND, PLATFORM_ORIGIN } from '../config/workspace';
 
-export function resolveReturnTo(raw: string | null): string {
-  return resolveHandoffReturnTo(raw, window.location.origin);
-}
+
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다.',
   HANDOFF_TARGET_NO_MEMBERSHIP: '접근 가능한 매장이 없습니다.',
@@ -33,7 +31,7 @@ export default function HandoffPage() {
     exchangeStarted.current = true;
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    const returnTo = resolveReturnTo(params.get('returnTo'));
+    const returnTo = resolveHandoffReturnTo(params.get('returnTo'), window.location.origin);
     if (!token) { setError('이동 정보가 없습니다.'); return; }
     void (async () => {
       try {

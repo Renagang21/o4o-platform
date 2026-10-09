@@ -26,10 +26,7 @@ import { API_BASE_URL } from '../lib/apiClient';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
-/** '/' 로 시작하는 단일 슬래시 상대 경로만 허용 (open redirect 차단). 그 외는 홈. */
-export function resolveReturnTo(raw: string | null): string {
-  return resolveHandoffReturnTo(raw, window.location.origin);
-}
+
 
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.',
@@ -55,7 +52,7 @@ export default function HandoffPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    const returnTo = resolveReturnTo(params.get('returnTo'));
+    const returnTo = resolveHandoffReturnTo(params.get('returnTo'), window.location.origin);
 
     if (!token) {
       setStatus('error');

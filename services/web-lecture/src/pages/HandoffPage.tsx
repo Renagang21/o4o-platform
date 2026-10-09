@@ -4,9 +4,7 @@ import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 
-export function resolveReturnTo(raw: string | null): string {
-  return resolveHandoffReturnTo(raw, window.location.origin);
-}
+
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다.',
   HANDOFF_TARGET_NO_MEMBERSHIP: 'O4O 강의 서비스에 가입되어 있지 않습니다.',
@@ -20,7 +18,7 @@ const MEMBERSHIP_CODES = new Set(['HANDOFF_TARGET_NO_MEMBERSHIP', 'HANDOFF_TARGE
 export default function HandoffPage() {
   const [error, setError] = useState('');
   const [code, setCode] = useState('');
-  const [returnTo] = useState(() => resolveReturnTo(new URLSearchParams(window.location.search).get('returnTo')));
+  const [returnTo] = useState(() => resolveHandoffReturnTo(new URLSearchParams(window.location.search).get('returnTo'), window.location.origin));
   useLayoutEffect(() => { clearStoredTokens(); }, []);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
