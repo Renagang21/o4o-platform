@@ -98,6 +98,11 @@ async function assertNotDemoMember(manager: KpaMemberResolveRunner, userId: stri
   }
 }
 
+/** Common denial for membership lifecycle operations reserved to the service admin. */
+function memberAdminRequired(): MemberInfoAbort {
+  return new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '서비스 관리자 권한이 필요합니다.');
+}
+
 async function resolveKpaMemberByAnyId(
   manager: KpaMemberResolveRunner,
   id: string,
@@ -124,7 +129,7 @@ async function resolveKpaMemberByAnyId(
   }
   const sm = smRows[0];
   if (applicationOnly && !['pending', 'rejected'].includes(sm.status)) {
-    throw new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '서비스 관리자 권한이 필요합니다.');
+    throw memberAdminRequired();
   }
   await assertNotDemoMember(manager, sm.user_id);
 
@@ -661,8 +666,7 @@ export function createMemberController(
         const newStatus = req.body.status;
         const canAdministerMembers = req.user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
         if (!canAdministerMembers && !['active', 'rejected'].includes(newStatus)) {
-          res.status(403).json({ error: { code: 'SERVICE_MEMBER_ADMIN_REQUIRED', message: '서비스 관리자 권한이 필요합니다.' } });
-          return;
+          throw memberAdminRequired();
         }
         let resolvedMember: { member: KpaMember; ensured: boolean };
         try {
@@ -686,8 +690,7 @@ export function createMemberController(
         const oldStatus = member.status;
         const applicationDecision = (oldStatus === 'pending' || oldStatus === 'rejected') && ['active', 'rejected'].includes(newStatus);
         if (!canAdministerMembers && !applicationDecision) {
-          res.status(403).json({ error: { code: 'SERVICE_MEMBER_ADMIN_REQUIRED', message: '서비스 관리자 권한이 필요합니다.' } });
-          return;
+          throw memberAdminRequired();
         }
 
         member.status = newStatus;
@@ -745,7 +748,7 @@ export function createMemberController(
               [member.user_id],
             );
             if (!current || !['pending', 'rejected'].includes(current.status) || !['active', 'rejected'].includes(newStatus)) {
-              throw new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '서비스 관리자 권한이 필요합니다.');
+              throw memberAdminRequired();
             }
           }
 

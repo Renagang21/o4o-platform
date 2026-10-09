@@ -241,3 +241,18 @@ Lecture SiteShell 충돌은 서비스 회원 관리 링크와 새 서브도메�
 함께 보존하여 해결했다. incoming main 86개 경로 외 변경이 없는 것을 검증했다.
 인증 패키지 재빌드와 API 타입 검사 PASS, frozen install PASS.
 전체 API 1/3 재실행 및 Lecture 빌드·원격 CI 결과는 PR 최신 HEAD를 기준으로 확인한다.
+
+
+### Sonar 중복률 후속 TODO (사용자 제공 분석 결과)
+
+- [x] 회원 경계 테스트의 반복 준비·SQL 검증을 공통화하고 검증 시나리오 유지
+- [x] 표시된 KPA·공통 controller 중복을 조사하고 필요한 최소 정리
+- [x] 관련 회귀·타입 검사, commit/push 및 최신 Sonar·필수 CI 추적 (최종 결과는 PR HEAD 체크)
+
+검사 제외나 기준 완화 없이 실제 반복 코드를 정리한다.
+
+회원 경계 테스트 26개 유지: list/detail 읽기 fixture·SQL 스코프 assertion을 공통화하고
+권한 거부·scope 미지정·조회 불가 사례를 data-driven cases로 정리했다.
+KPA의 반복 lifecycle 권한 거부는 동일 MemberInfoAbort 생성과 기존 catch에 수렴했다.
+KPA 화면·공통 controller의 소량 중복은 기존 업무별 맥락을 유지한다.
+관련 API 3 suites / 50 tests 및 API 타입 검사 PASS. 검사 설정·제외 규칙은 변경하지 않았다.
