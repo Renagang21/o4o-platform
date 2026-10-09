@@ -212,6 +212,13 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '702c212dfaa42db0e0c5076ab4afb76f382e70992929aeda69d09c314d8112bf',
     fingerprintLineCount: 6163,
   },
+  // PostgreSQL 15: baseline + incrementals 1..19; migration 19 explicitly converges pgcrypto
+  // with the registered established states. Verified through the normal migration runner.
+  {
+    appliedThrough: 'CreateBrowserSessionRevocations1791509600000',
+    fingerprint: '49e6d7b2a2558750f52b42add1865a42495a6650d344ba916e0f464cba98dab0',
+    fingerprintLineCount: 6176,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

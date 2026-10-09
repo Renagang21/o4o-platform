@@ -1,9 +1,8 @@
-import { FC, useState, ReactNode, useEffect  } from 'react';
+import { FC, useState, ReactNode, useEffect, useRef, useMemo } from 'react';
 import { AuthContext } from './AuthContext';
 import { AuthClient, AuthStrategy } from '@o4o/auth-client';
 import type { User, SessionStatus } from './AuthContext';
 import {
-  getAccessToken,
   setAccessToken,
   clearAllTokens,
   setRefreshToken,
@@ -38,7 +37,7 @@ interface AuthProviderProps {
  * 캐시된 사용자와 `/auth/status` 사용자가 다르면 새 사용자를 조용히 채택하지 않고
  * 이 표식을 남긴다. 표식이 있는 동안은 새로고침해도 서버 세션을 채택하지 않으며,
  * 명시적 로그인(loginWithGoogle) 성공이나 명시적 logout 에서만 지운다.
- * `logout()` 은 호출하지 않는다 — 서버 logout 은 쿠키 주인(다른 사용자)의 refresh family 를 끊는다.
+ * `logout()` 은 호출하지 않는다 — 서버 logout 은 쿠키 주인(다른 사용자)의 브라우저 세션을 끊는다.
  */
 export const SESSION_CONFLICT_STORAGE_KEY = 'admin-session-conflict';
 
@@ -77,25 +76,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     return null;
   };
 
-  // Phase 6-7 Optimized: Check localStorage for cached user first
-  // This allows instant UI render while API verification happens in background
-  const [user, setUser] = useState<User | null>(() => {
-    return getInitialStateFromStorage();
-  });
-
-  // Phase 6-7 Optimized: If we have cached user, don't show loading
-  // API verification happens in background without blocking render
-  const [isLoading, setIsLoading] = useState(() => {
-    const storedUser = getInitialStateFromStorage();
-    if (storedUser) {
-      return false; // Instant render with cached user
-    }
-    if (strategy === 'cookie') {
-      return true; // No cache, need API verification
-    }
-    const storedToken = getAccessToken();
-    return !(storedUser && storedToken);
-  });
+  // Cached identity is used only to detect account replacement after server verification.
+  const sessionGeneration = useRef(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessionConflict, setSessionConflict] = useState<boolean>(() => hasSessionConflictMark());
 
@@ -125,27 +109,33 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   };
 
   // Phase 6-7: Create AuthClient with appropriate strategy
-  const authClient = ssoClient || new AuthClient(
-    typeof window !== 'undefined' ?
-      'https://api.neture.co.kr/api' :
-      'https://api.neture.co.kr/api',
-    { strategy }
-  );
+  const authClient = useMemo(() => ssoClient || new AuthClient(
+    'https://api.neture.co.kr/api/v1', { strategy }
+  ), [ssoClient, strategy]);
 
-  // Phase 6-7 Optimized: Background auth verification
-  // - If cached user exists, verify in background (non-blocking)
-  // - If no cached user, blocking check is needed
+  useEffect(() => {
+    const clearSession = () => {
+      sessionGeneration.current += 1;
+      setUser(null);
+      setIsLoading(false);
+      localStorage.removeItem('admin-auth-storage');
+    };
+    window.addEventListener('auth:token-cleared', clearSession);
+    return () => window.removeEventListener('auth:token-cleared', clearSession);
+  }, []);
+
+  // Restore identity only after server verification; cache alone never grants access.
   useEffect(() => {
     const checkInitialAuth = async () => {
+      const generation = sessionGeneration.current;
       const cachedUser = getInitialStateFromStorage();
 
       try {
         if (strategy === 'cookie') {
-          // Phase 6-7 Optimized: Cookie strategy
-          // If we have cached user, verify in background without blocking
-          // If no cached user, do blocking verification
+          // Keep isLoading until the cookie status has been checked.
           try {
             const response = await authClient.api.get('/auth/status');
+            if (generation !== sessionGeneration.current) return;
 
             // WO-O4O-ADMIN-AUTH-STATUS-ENVELOPE-FIX-V1
             //   백엔드는 표준 봉투로 응답한다(CLAUDE.md §8):
@@ -180,7 +170,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
               } else if (cachedUser && !sameUserId(cachedUser.id, userWithDates.id)) {
                 // 캐시된 사용자와 서버 세션 사용자가 다르다 — 조용히 채택하지 않는다(§19-1).
                 enterSessionConflict();
-              } else if (!cachedUser) {
+              } else {
                 setUser(userWithDates);
               }
             } else if (isAuthenticatedFlag === false) {
@@ -190,12 +180,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({
             } else {
               // C. 판정 불가 — 세션 만료로 단정하지 않는다.
               //    캐시가 없으면 미인증 상태로 두되(무한 loading 방지), 캐시는 지우지 않는다.
-              //    guard 는 isLoading=false 이후 자체 유예로 판단하므로 무한 redirect 도 생기지 않는다.
+              //    서버가 인증하지 않은 캐시로 보호 화면을 열지 않는다.
               if (!cachedUser) {
                 setUser(null);
               }
             }
           } catch (apiError: any) {
+            if (generation !== sessionGeneration.current) return;
             // API call failed - check if it's a definitive auth failure (401)
             // vs a transient network error
             if (apiError?.response?.status === 401) {
@@ -205,31 +196,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({
             } else if (!cachedUser) {
               setUser(null);
             }
-            // For non-401 errors with cached user, keep it to prevent
-            // flash of login screen on temporary network issues
+            // Preserve the cache for account comparison on a later verified login.
           }
           setIsLoading(false);
         } else {
-          // localStorage strategy - legacy behavior
-          const storedUser = getInitialStateFromStorage();
-          const storedToken = getAccessToken();
-
-          if (storedUser && storedToken) {
-            // SSO 세션 확인은 백그라운드에서 수행 (옵션)
-            if (ssoClient && typeof window !== 'undefined') {
-              authClient.checkSession().then(sessionData => {
-                if (!sessionData.isAuthenticated) {
-                  // SSO 세션이 없어도 로컬 세션은 유지 (토큰이 유효한 경우)
-                }
-              }).catch(() => {
-                // SSO 체크 실패 시에도 기존 세션 유지
-              });
-            }
-            setIsLoading(false);
-          } else {
-            setUser(null);
-            setIsLoading(false);
-          }
+          const session = await authClient.checkSession();
+          if (generation !== sessionGeneration.current) return;
+          if (session.isAuthenticated && session.user && !hasSessionConflictMark()) {
+            if (cachedUser && !sameUserId(cachedUser.id, session.user.id)) enterSessionConflict();
+            else setUser(session.user as User);
+          } else setUser(null);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Initial auth check failed:', error);
@@ -255,14 +232,21 @@ export const AuthProvider: FC<AuthProviderProps> = ({
       const now = Date.now();
       if (now - lastCheck < 5000) return;
       lastCheck = now;
+      const generation = sessionGeneration.current;
       try {
         const response = await authClient.api.get('/auth/status');
+        if (generation !== sessionGeneration.current) return;
         const body = response.data as any;
         const statusData = (body?.data ?? body) as any;
         if (statusData?.authenticated === true && statusData?.user && !sameUserId(statusData.user.id, user.id)) {
           enterSessionConflict();
+        } else if (statusData?.authenticated === false) {
+          setUser(null); localStorage.removeItem('admin-auth-storage');
         }
-      } catch {
+      } catch (failure) {
+        if (generation === sessionGeneration.current && (failure as { response?: { status?: number } }).response?.status === 401) {
+          setUser(null); localStorage.removeItem('admin-auth-storage');
+        }
         // 판정 불가 — 기존 세션 처리(401 인터셉터 등)에 맡긴다
       }
     };
@@ -277,6 +261,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
 
   /** 로그인 응답 → 세션 채택(Google 로그인 단일 경로). */
   const adoptLoginResponse = (response: unknown) => {
+    sessionGeneration.current += 1;
     // API 응답 구조: { success, data: { user, accessToken, refreshToken } }
     const loginData = (response as any).data || response;
     const userData = loginData.user;
@@ -354,7 +339,11 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   const getGoogleAuthConfig = () => authClient.getGoogleAuthConfig();
 
   const logout = () => {
-    authClient.logout();
+    sessionGeneration.current += 1;
+    setIsLoading(false);
+    void Promise.resolve(authClient.logout()).catch(() => {
+      onAuthError?.('서버 세션 종료에 실패했습니다. 다시 로그인한 뒤 로그아웃을 시도해 주세요.');
+    });
     setUser(null);
     setError(null);
 

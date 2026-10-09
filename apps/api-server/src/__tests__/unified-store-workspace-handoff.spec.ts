@@ -45,6 +45,7 @@ jest.mock('../database/connection.js', () => ({
     manager: {
       query: (...args: unknown[]) => {
         const sql = String(args[0] ?? '');
+        if (/browser_session_revocations/i.test(sql)) return Promise.resolve([{ '?column?': 1 }]);
         if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
         return query(...args);
       },
@@ -57,13 +58,13 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
-//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
-//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   브라우저 귀속과 계정 세대(serviceKey · sessionId · tokenFamily)를 읽는다.
+//   유효한 기본 세션으로 기존 workspace 계약을 검증한다. 폐기 시나리오는 전용 spec
 //   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
-const verifyAccessToken = jest.fn((_token: string): unknown => null);
+const verifyAccessToken = jest.fn((_token: string): unknown => ({ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }));
 jest.mock('../utils/token.utils.js', () => ({
   generateTokens: (...a: unknown[]) => generateTokens(...a),
-  verifyAccessToken: (t: string) => verifyAccessToken(t),
+  verifyAccessToken: (t: string) => { const claims = verifyAccessToken(t); return claims ? { ...{ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }, ...(claims as object) } : null; },
 }));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
@@ -95,7 +96,7 @@ function mockReq(body: Record<string, unknown>, origin?: string, user: unknown =
   return {
     body,
     user,
-    headers: {},
+    headers: { authorization: 'Bearer fixture-access' },
     cookies: {},
     get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
   } as any;
@@ -111,7 +112,7 @@ beforeEach(() => {
   query.mockResolvedValue([]);
   linkedAccountsQuery.mockClear();
   verifyAccessToken.mockReset();
-  verifyAccessToken.mockReturnValue(null);
+  verifyAccessToken.mockReturnValue({ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' });
   findOne.mockReset();
   resolveAccessibleStores.mockReset();
   generateTokens.mockClear();
@@ -174,12 +175,12 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
     //   값은 **같은 문장 안의 subquery** 로 채운다(별도 SELECT 를 앞세우면 왕복이 늘고 그 사이
     //   로그아웃이 끼어들 틈이 생긴다). 컬럼 목록과 subquery 둘 다 고정한다.
     expect(norm(sql)).toContain(
-      '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch, source_auth_method)',
+      '(user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch, source_auth_method, source_session_id, source_token_family)',
     );
     // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다($6). 여기서 현재 세대를 다시
     //   읽으면(subquery 든 별도 SELECT 든) 발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가
     //   적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
-    expect(norm(sql)).toContain("now() + ($5 || ' seconds')::interval, $6, $7)");
+    expect(norm(sql)).toContain("now() + ($5 || ' seconds')::interval, $6, $7, $8, $9)");
     expect(norm(sql)).not.toContain('SELECT session_epoch FROM service_session_revocations');
     expect(params.slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
     // 수단을 넘기지 않은 호출은 password 로 적힌다(fail-closed · 승격 없음).
@@ -210,19 +211,19 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
   });
 
   it('exchange 는 기존 원자 UPDATE(consumed_at IS NULL) 하나로 두 형태를 소비하고 종류를 payload 에 반영한다', async () => {
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: null, target_workspace: 'store', created_at: new Date(0) }], 1]);
     const ws = await handoffTokenService.exchangeToken(uuid);
     expect(norm(query.mock.calls[0][0])).toContain('SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL AND expires_at > now() RETURNING');
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): payload 에 출발 서비스 세대가
     //   실린다. 이 행에는 컬럼이 없으므로(컬럼 도입 이전 발급분) null — 교환 판정에서 제외된다.
     //   source_auth_method 도 없는 행(컬럼 이전 발급분)은 password 로 읽는다 — Google 로 승격하지 않는다.
     expect(norm(query.mock.calls[0][0])).toContain('source_session_epoch, source_auth_method');
-    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString(), sourceSessionEpoch: null, sourceAuthMethod: 'password' });
+    expect(ws).toEqual({ userId: 'user-1', sourceServiceKey: 'kpa-society', targetWorkspace: 'store', createdAt: new Date(0).toISOString(), sourceSessionEpoch: null, sourceAuthMethod: 'password', sourceSessionId: '00000000-0000-4000-8000-000000000001', sourceTokenFamily: 'fam-1' });
     expect(ws).not.toHaveProperty('targetServiceKey');
 
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01', source_auth_method: 'google' }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', target_workspace: null, created_at: '2026-01-01', source_auth_method: 'google' }], 1]);
     const svc = await handoffTokenService.exchangeToken(uuid);
-    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01', sourceSessionEpoch: null, sourceAuthMethod: 'google' });
+    expect(svc).toEqual({ userId: 'user-1', sourceServiceKey: 'neture', targetServiceKey: 'kpa-society', createdAt: '2026-01-01', sourceSessionEpoch: null, sourceAuthMethod: 'google', sourceSessionId: '00000000-0000-4000-8000-000000000001', sourceTokenFamily: 'fam-1' });
     expect(svc).not.toHaveProperty('targetWorkspace');
   });
 });
@@ -290,7 +291,7 @@ describe('C. generateHandoff — workspace 는 organization 축', () => {
     expect(res.statusCode).toBe(200);
     expect(norm(query.mock.calls[0][0])).toContain('INSERT INTO handoff_tokens');
     // 출발은 Origin 이 아니라 토큰 claim 이 증명한다 — 이 대역의 토큰은 claim 이 없으므로 'unknown' (§8 5차).
-    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'kpa-society', null]);
+    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'neture', 'kpa-society', null]);
     expect(res.body.data.targetService.key).toBe('kpa-society');
     expect(res.body.data.targetUrl).toMatch(/^https:\/\/[^/]+\/handoff\?token=/);
     expect(res.body.data.targetUrl).not.toContain('store.neture.co.kr');
@@ -340,15 +341,15 @@ describe('C-2. generateHandoff — 출발 세션 수단을 원장에 적는다',
     expect(inserted()?.[1][6]).toBe('google');
   });
 
-  it("검증되지 않는 토큰 · body 의 authMethod 주장 → 'password' (fail-closed)", async () => {
+  it("검증되지 않는 토큰 · body 의 authMethod 주장 → 발급 거절 (fail-closed)", async () => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
     await HandoffController.generateHandoff(
       sessionReq({ targetServiceKey: 'kpa-society', authMethod: 'google', sourceAuthMethod: 'google' }, 'FORGED'),
       res,
     );
-    expect(res.statusCode).toBe(200);
-    expect(inserted()?.[1][6]).toBe('password');
+    expect(res.statusCode).toBe(401);
+    expect(inserted()).toBeUndefined();
   });
 });
 
@@ -358,10 +359,10 @@ describe('C-2. generateHandoff — 출발 세션 수단을 원장에 적는다',
 
 describe('D. exchangeHandoff — origin 고정 · organization 재검증 · service 경로 불변', () => {
   const consumedWorkspace = () =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', target_service_key: null, target_workspace: 'store', created_at: new Date(0), source_auth_method: 'google' }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: null, target_workspace: 'store', created_at: new Date(0), source_auth_method: 'google' }], 1]);
   // 기본 = Google 세션 출발(종전 계약: claim 없음 = null). 수단별 시나리오는 인자로 바꾼다.
   const consumedService = (authMethod: 'google' | 'password' | null = 'google') =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', target_service_key: 'kpa-society', target_workspace: null, created_at: new Date(0), source_auth_method: authMethod }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', target_workspace: null, created_at: new Date(0), source_auth_method: authMethod }], 1]);
   const memberships = [{ serviceKey: 'kpa-society', status: 'active' }];
 
   it('isStoreWorkspaceExchangeOrigin: 프로덕션은 store.neture.co.kr 정확 host 만', () => {
@@ -392,7 +393,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     //   그 대상의 **현재 세대**. WORKSPACE handoff 는 서비스가 아니므로 workspace 키를 쓴다.
     //   세대를 새기지 않으면 그 대상에서 로그아웃한 뒤 재발급된 토큰까지 거절된다.
     expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0, null);
-    expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
+    expect(persistRefreshTokenFamily).not.toHaveBeenCalled();
     // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
     //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
     expect(setAuthCookies).not.toHaveBeenCalled();

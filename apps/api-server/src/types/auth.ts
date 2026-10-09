@@ -140,6 +140,10 @@ export type TokenType = 'user' | 'service' | 'guest';
 export type SessionAuthMethod = 'password';
 
 export interface AccessTokenPayload {
+  /** Browser session identity; absent legacy tokens require re-login. */
+  sessionId?: string;
+  /** Account security generation, shared by access/refresh/handoff. */
+  tokenFamily?: string;
   userId?: string;
   id?: string; // Primary ID field
   email?: string;
@@ -206,24 +210,16 @@ export interface AccessTokenPayload {
   sessionEpoch?: number;
 }
 
-/**
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속 claim 두 개.
- *
- * refresh token 에만 있으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
- * (최대 15분)으로 `POST /auth/handoff` 를 불러 **수명이 긴 세션을 새로 얻을 수 있었다.**
- * 그래서 access token 에도 같은 두 값을 싣고, 긴 세션을 만들어 주는 경로가 그것을 검사한다.
- *
- * 모든 API 요청마다 검사하지는 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로의 비용이
- * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
- */
+/** Signed origin scope. Browser-session ID and account family are checked on every protected request. */
 export interface SessionScopeClaims {
   /** 이 토큰이 속한 서비스(또는 `store`·`admin` 같은 surface) 키 */
   serviceKey?: string;
-  /** 발급 시점의 `service_session_revocations.session_epoch` */
+  /** Compatibility claim only; ordinary logout is enforced by sessionId. */
   sessionEpoch?: number;
 }
 
 export interface RefreshTokenPayload {
+  sessionId?: string;
   userId: string;
   tokenVersion: number;
   sub?: string; // JWT standard claim
@@ -239,17 +235,7 @@ export interface RefreshTokenPayload {
    * `auth-token-session.service.ts` 의 폐기 검사 주석 참조.
    */
   serviceKey?: string;
-  /**
-   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션의 **세대**.
-   *
-   * 서비스 단위 로그아웃 판정은 시각이 아니라 이 값으로 한다. `iat` 는 **초 단위**라
-   * 같은 초의 기존 토큰과 새 토큰을 구별할 수 없고, 그래서 로그아웃한 같은 초에 다시
-   * 로그인하면 새 토큰까지 거절되는 결함이 있었다. 세대는 단조 증가하므로 시각이 같아도
-   * 선후가 갈린다. 발급 시점의 `service_session_revocations.session_epoch` 를 새긴다.
-   *
-   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 처리는 `service-session-epoch.ts` 의
-   * `isSessionEpochLive` 주석 참조.
-   */
+  /** Compatibility claim; not the browser logout axis. */
   sessionEpoch?: number;
   /** WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 — 회전이 승계한다(`SessionAuthMethod`) */
   authMethod?: SessionAuthMethod;

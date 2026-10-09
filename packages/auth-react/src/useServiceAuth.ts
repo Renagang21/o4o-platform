@@ -89,10 +89,12 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
   // config 는 매 렌더 새 객체일 수 있다. effect 를 재실행시키지 않도록 ref 로 고정한다.
+  const sessionGeneration = useRef(0);
   const cfgRef = useRef(config);
   cfgRef.current = config;
 
   const refresh = useCallback(async () => {
+    const generation = sessionGeneration.current;
     const cfg = cfgRef.current;
     if (!cfg.getAccessToken()) {
       setUser(null);
@@ -101,6 +103,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     }
     try {
       const response = await cfg.authClient.api.get(cfg.meEndpoint ?? '/auth/me');
+      if (generation !== sessionGeneration.current || !cfg.getAccessToken()) return;
       const { user: apiUser } = parseAuthResponse(response.data as never);
       if (apiUser) {
         const built = cfg.toUser(apiUser as unknown as Record<string, unknown>);
@@ -112,6 +115,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         setUser(null);
       }
     } catch {
+      if (generation !== sessionGeneration.current) return;
       // 세션 없음/만료 — 비로그인 상태로 진행(정상 경로).
       setPendingPolicyAcceptances([]);
       setUser(null);
@@ -126,7 +130,10 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
 
   // 토큰 갱신 실패 시 stale auth 정리 (auth-client 가 이벤트를 발행).
   useEffect(() => {
-    const handleTokenCleared = () => setUser(null);
+    const handleTokenCleared = () => {
+      sessionGeneration.current += 1;
+      setPendingPolicyAcceptances([]); setUser(null);
+    };
     window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
     return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
   }, []);
@@ -145,9 +152,11 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       //   공통 코드표(AUTH_ERROR_MESSAGES)에 이메일 코드를 넣지 않고 서버 `error` 를 그대로 쓴다.
       preferServerMessage = false,
     ): Promise<AuthLoginResult<TUser>> => {
+      const generation = ++sessionGeneration.current;
       setIsLoading(true);
       try {
         const result = (await request()) as { user?: unknown };
+        if (generation !== sessionGeneration.current) return { success: false, error: '로그인이 취소되었습니다. 다시 시도해 주세요.' };
         const apiUser = result?.user as Record<string, unknown> | undefined;
         if (!apiUser) {
           return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
@@ -224,6 +233,8 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   );
 
   const logout = useCallback(async () => {
+    sessionGeneration.current += 1;
+    setPendingPolicyAcceptances([]); setUser(null);
     try {
       await authClient.logout();
     } catch {

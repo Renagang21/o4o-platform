@@ -54,3 +54,5 @@ export type { RoleSelection } from './useRoleSelection';
 
 export { DemoLoginButtons } from './DemoLoginButtons';
 export type { DemoLoginButtonsProps } from './DemoLoginButtons';
+export { PasswordSecuritySettings } from './PasswordSecuritySettings';
+export type { PasswordSecuritySettingsProps } from './PasswordSecuritySettings';
