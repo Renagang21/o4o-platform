@@ -12,8 +12,10 @@ import { isStoreOwner } from '../utils/store-owner.utils.js';
 let query: jest.Mock;
 let phOnlyOrganization = false;
 let currentLinkage = false;
+let currentStoreApproval = false;
 function makeApp() {
   query = jest.fn(async (sql: string, params: any[] = []) => {
+    if (sql.includes('FROM neture_pharmacy_memberships')) return currentStoreApproval ? [{ active: 1 }] : [];
     if (sql.includes('WHERE EXISTS')) {
       return (phOnlyOrganization && params[1]?.includes('pharmacy-hub'))
         || (currentLinkage && params[1]?.includes('kpa-society')) ? [{ linked: 1 }] : [];
@@ -37,6 +39,7 @@ function makeApp() {
 beforeEach(() => {
   phOnlyOrganization = false;
   currentLinkage = false;
+  currentStoreApproval = false;
   jest.mocked(isStoreOwner).mockClear();
   jest.mocked(isStoreOwner).mockResolvedValue({ isOwner: true, organizationId: 'legacy-org', memberRole: 'owner' });
 });
@@ -93,8 +96,16 @@ it('a mixed-service owner cannot create an unscoped invitation in a PH-only hist
 
 it('a current organization can invite when its PH linkage also remains as history', async () => {
   phOnlyOrganization = true;
-  currentLinkage = true;
+  currentStoreApproval = true;
   const res = await request(makeApp()).post('/api/v1/store/members/invite').send({ email: 'invitee@example.test' });
   expect(res.status).toBe(200);
   expect(query.mock.calls.some(([sql]) => String(sql).includes('INSERT INTO organization_members'))).toBe(true);
+});
+
+it('legacy KPA linkage cannot reopen invitations in a PH organization without current Store approval', async () => {
+  phOnlyOrganization = true;
+  currentLinkage = true;
+  const res = await request(makeApp()).post('/api/v1/store/members/invite').send({ email: 'invitee@example.test' });
+  expect(res.status).toBe(403);
+  expect(query.mock.calls.some(([sql]) => String(sql).includes('INSERT INTO organization_members'))).toBe(false);
 });

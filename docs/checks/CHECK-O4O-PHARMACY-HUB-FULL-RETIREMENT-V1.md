@@ -47,7 +47,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **247 suites · 4,577 tests PASS** · 253 suites 중 DB integration 6개(48건) SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **247 suites · 4,579 tests PASS** · 253 suites 중 DB integration 6개(48건) SKIP |
 | 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
@@ -126,3 +126,5 @@ HEAD `8cabb2c5a2`의 CI Gate·SonarCloud는 통과했다. 최신 리뷰는 현�
 HEAD `dd97a2dfb0`의 CI Gate·SonarCloud는 통과했지만 리뷰가 서비스 미지정 공통 Store 조직 판정의 PH 전용 후보 잔여를 지적했다. 현재 역할·가입과 PH 조직 선택 헤더가 있어도 자료·상품 진열을 만들 수 없도록 후보를 걸러내고 구매 조직·staff 후보에도 같은 판정을 적용했다. inactive PH 원장도 퇴역 식별로 읽되 현재 내 매장 신청 원장(active)은 세미프랜차이즈 가입·slug 없이 인정한다. 구성원 초대·수락·접근 역시 현재 원장을 인정하며 PH-only 관계는 현재 member role만으로 복구되지 않는다. 관련 그래프·raw 소비처를 합친 API 253 suites에서 247 suites·4,577 tests와 API type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. 새 SQL을 서비스 scoped 질의로 오인하던 기존 모형과 퇴역 전 SQL 단언을 보완했으며 기존 현재 서비스 조직 선택·태블릿·자체 상품 검증은 유지했다.
 
 검증 중 main은 PR #377의 매장 관리 화면 개선을 포함한 `090fb542aa`로 이동했다. 이 HEAD와의 read-only merge-tree에서 충돌은 없었다. 자동 결합·main merge는 수행하지 않았으며 통합 승인 뒤 최신 main을 자기 branch에 결합하고 필요한 검증을 수행한다. 최신 보완 커밋의 CI·Sonar·Codex 결과는 PR에서 별도로 확인한다. 로컬 운영 인계 문서에는 전체 URL map/backend/NEG·인증서 참조 조회 명령을 추가하고 map entry 삭제 명령을 해당 단계에 배치했다. 실제 조회·배포·삭제 결과는 아니다.
+
+HEAD `eafdd9b838`의 CI Gate는 통과했고 최신 리뷰가 PH 이력과 함께 남은 legacy KPA enrollment/slug가 현재 매장 자격으로 오인되는 문제를 지적했다. 약국 현재 자격은 active `neture_pharmacy_memberships`만 사용하며 KPA enrollment/slug를 non-PH 현재 자격 합집합에서 제외했다. 구성원 초대·수락·staff 접근의 KPA 판정도 먼저 현재 원장을 확인해 과거 KPA linkage로 PH 조직을 다시 열지 않는다. 현재 승인 없이 PH/KPA 표식만 남은 경우의 직접 HTTP·초대·role 발급 차단과 현재 승인된 매장의 이용을 검증했다. 최신 보완을 포함한 API 253 suites에서 247 suites·4,579 tests와 type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. 운영 삭제 절차에는 PowerShell의 비공개 임시 경로·BOM 없는 JSON 생성·검토한 파일의 import 예시를 추가했다. 최신 보완 커밋의 required CI·Sonar·Codex와 실제 운영 실행 결과는 별도 확인 대상이다.

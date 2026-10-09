@@ -98,15 +98,15 @@ async function linkedServiceKeys(
   const keys = Object.keys(STORE_SERVICE_ORG_LINKAGE) as StoreOwnerServiceKey[];
   const linked: StoreOwnerServiceKey[] = [];
   for (const key of keys) {
-    if (await isOrganizationLinkedToService(dataSource, organizationId, key)) {
-      linked.push(key);
-    } else if (key === 'kpa') {
-      // Current pharmacy Store approval is independent of franchise enrollment and public slugs.
+    if (key === 'kpa') {
+      // Only the current Store ledger authorizes pharmacy access; legacy KPA linkage is not approval.
       const current: unknown[] = await dataSource.query(
         `SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
         [organizationId],
       );
       if (current.length > 0) linked.push(key);
+    } else if (await isOrganizationLinkedToService(dataSource, organizationId, key)) {
+      linked.push(key);
     } else if (key === 'pharmacy-hub') {
       // Inactive PH records still identify a retired organization; they cannot become an unscoped store.
       const linkage = STORE_SERVICE_ORG_LINKAGE[key];

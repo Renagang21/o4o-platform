@@ -92,6 +92,10 @@ it('current Store ledger approval preserves a mixed organization without requiri
   expect(sql).toContain("npm.status = 'active'");
   expect(params[2]).toEqual(['pharmacy-hub']);
   expect(params[4]).not.toContain('pharmacy-hub');
+  expect(params[4]).not.toContain('kpa-society');
+  expect(params[4]).not.toContain('kpa');
+  expect(params[5]).not.toContain('kpa');
+  expect(params[4]).toContain('k-cosmetics');
   // Retired identity includes inactive history; current identity requires active evidence.
   const historical = sql.split('AS retired_store_identity')[0];
   expect(historical).not.toContain("e.status = 'active'");

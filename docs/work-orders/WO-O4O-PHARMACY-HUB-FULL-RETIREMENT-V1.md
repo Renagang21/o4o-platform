@@ -40,7 +40,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 공개 Store 조회도 PH slug와 PH에서 변경됐거나 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. 원래 주소의 서비스 출처를 보존하고 현재 redirect 대상도 같은 서비스의 active 주소로 한정한다. 현재 KPA 주소가 함께 있어도 PH 이력을 공개하지 않으며 현재 KPA 이력이 임의의 PH 주소 때문에 404가 되지 않는다. 정책 조회·slug resolver도 같은 출처/대상 차단을 적용한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
 - DB 기반 공개 `platform-services` 목록도 active PH 행을 제외한다. 익명·로그인 사용자 모두 현재 서비스와 가입 상태만 보며 PH catalog 원장과 관리자 이력 조회는 보존한다. DB 갱신으로 숨기지 않는다.
 - 공통 구성원 API는 명시적 PH 요청을 서비스 미지정으로 강등하지 않는다. 서비스 미지정 초대도 PH만 연결된 과거 조직이면 생성 전에 거부하며 현재 서비스와 PH 이력이 함께 있는 매장의 초대는 유지한다. 수락할 수 없는 PH-only 초대는 받은 목록에서도 제외한다. inactive PH 원장도 퇴역 식별로만 읽어 서비스 미지정 복구를 차단하며 DB 상태는 바꾸지 않는다. PaymentCore 신규 producer 3종과 역사적 PH 완료 consumer 보존은 별도 회귀로 검증한다.
-- 서비스 미지정 매장 조직 판정도 PH 전용 조직을 후보에서 제외한다. 현재 서비스 역할·가입이 있어도 과거 PH 관계나 선택 헤더만으로 자료·진열·구매 조직·직원 접근이 PH 조직으로 향하지 않는다. 현재 내 매장 원장(active)만 있는 조직은 세미프랜차이즈 가입·slug 없이 유지하며, PH 이력이 함께 있어도 초대 목록·수락·현재 member 접근을 유지한다.
+- 서비스 미지정 매장 조직 판정도 PH 전용 조직을 후보에서 제외한다. 현재 서비스 역할·가입이 있어도 과거 PH 관계나 선택 헤더만으로 자료·진열·구매 조직·직원 접근이 PH 조직으로 향하지 않는다. 약국의 현재 근거는 내 매장 원장(active)뿐이며 옛 KPA enrollment/slug는 인정하지 않는다. 현재 내 매장 원장만 있는 조직은 세미프랜차이즈 가입·slug 없이 유지하며, PH 이력이 함께 있어도 초대 목록·수락·현재 member 접근을 유지한다.
 - Sonar 중복률 보완은 PH·Neture·Store B2B의 선택된 주문 후속 처리에 한정한다. 상태 전이·bridge·실패 기록만 API Extension 함수로 공유하고 세 consumer의 구독 키·주문 선택·멱등성과 PaymentCore/PG/DB 계약은 유지한다. 공유 모듈 변경 규칙에 따라 세 소비처와 raw-source 계약·실제 이벤트 회귀를 함께 검증한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
@@ -86,6 +86,20 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
    node scripts/deployment/pharmacy-hub-retirement.mjs /tmp/ph-retirement-map.original.json /tmp/ph-retirement-map.review.json
    ```
 
+   위 경로는 Bash/WSL 예시다. Windows PowerShell에서는 저장소 루트에서 다음으로 비공개 임시 폴더와 UTF-8(BOM 없음) JSON을 준비한다. 같은 PowerShell 창을 유지한다.
+
+   ```powershell
+   $phRetirementDirectory = Join-Path $env:TEMP ('ph-retirement-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+   New-Item -ItemType Directory -Path $phRetirementDirectory | Out-Null
+   $phMapOriginal = Join-Path $phRetirementDirectory 'original.json'
+   $phMapReview = Join-Path $phRetirementDirectory 'review.json'
+   $phMapJson = gcloud compute url-maps describe o4o-global-lb --global --project=netureyoutube --format=json
+   if ($LASTEXITCODE -ne 0) { throw 'URL map 조회 실패. 초안을 만들지 않습니다.' }
+   [System.IO.File]::WriteAllText($phMapOriginal, ($phMapJson -join "`n"), [System.Text.UTF8Encoding]::new($false))
+   node scripts/deployment/pharmacy-hub-retirement.mjs $phMapOriginal $phMapReview
+   if ($LASTEXITCODE -ne 0) { throw '초안 생성 실패. 적용하지 않습니다.' }
+   ```
+
    PH 전용 여부와 다른 자원의 참조를 확인하는 read-only 명령은 다음과 같다. 출력은 비공개 로컬 폴더에 보관한다. 인증서 map이 여러 개면 **각 map의 entries**도 조회한다. backend 참조가 남거나 다른 NEG가 같은 Cloud Run을 사용하면 해당 자원의 삭제를 보류한다.
 
    ```bash
@@ -115,6 +129,8 @@ main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실
    ```bash
    gcloud compute url-maps import o4o-global-lb --global --project netureyoutube --source=/tmp/ph-retirement-map.review.json
    ```
+
+   PowerShell에서는 2단계에서 준비한 파일의 diff·최신 fingerprint를 확인한 후 같은 창에서 `gcloud compute url-maps import o4o-global-lb --global --project=netureyoutube "--source=$phMapReview"`로 적용한다.
 
 6. 전체 참조가 0인 PH backend → NEG → Cloud Run을 제거한다. PH 전용 certificate → DNS authorization도 참조가 0일 때 제거한다. 현재 이름이 표와 일치할 때 사용하는 명령은 다음과 같다. 각 명령 사이에 실제 참조와 결과를 확인하며 한꺼번에 실행하지 않는다.
 

@@ -211,8 +211,9 @@ interface StoreRetirementIdentity {
 const RETIREMENT_IDENTITY_PARAMETERS = [
   STORE_SERVICE_ORG_LINKAGE['pharmacy-hub'].enrollmentCodes,
   STORE_SERVICE_ORG_LINKAGE['pharmacy-hub'].slugKeys,
-  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub').flatMap(([, value]) => value.enrollmentCodes))],
-  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub').flatMap(([, value]) => value.slugKeys))],
+  // Pharmacy approval comes only from npm, never legacy KPA enrollment or slug records.
+  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub' && key !== 'kpa').flatMap(([, value]) => value.enrollmentCodes))],
+  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub' && key !== 'kpa').flatMap(([, value]) => value.slugKeys))],
 ];
 
 function storeRetirementIdentityProjection(
