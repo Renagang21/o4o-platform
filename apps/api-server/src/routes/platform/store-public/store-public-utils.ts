@@ -34,7 +34,7 @@ import { PHARMACY_HUB_SERVICE_KEY } from '../../../utils/service-retirement.js';
  *    태블릿·화면세트·공개 storefront 전 경로에서 service_scope_mismatch 로 떨어졌다).
  *   새 로컬 맵을 만들지 않고 security-core 의 SSOT
  *   (`ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY` = { kpa: 'kpa-society', cosmetics: 'k-cosmetics' })
- *   에서 파생한다. self-map 서비스(neture · pharmacy-hub)는 `[key]` 그대로다.
+ *   에서 파생한다. self-map 서비스(neture 등)는 `[key]` 그대로다.
  *
  * 게이트를 넓히지 않는다 — `kpa-groupbuy` · `k-cosmetics-event-offer` 같은
  * **다른 축의 파생 키는 포함하지 않는다**(기존 kpa 동작과 동일한 범위).
@@ -70,7 +70,7 @@ export async function resolvePublicStore(
 
   if (!record || !record.isActive) {
     const redirect = await slugService.findOldSlugRedirect(slug);
-    if (redirect && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
+    if (redirect && redirect.sourceServiceKey !== PHARMACY_HUB_SERVICE_KEY && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
       const newPath = req.originalUrl.replace(
         `/${encodeURIComponent(slug)}`,
         `/${encodeURIComponent(redirect.newSlug)}`,

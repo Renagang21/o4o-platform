@@ -34,9 +34,10 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - Local Agent의 loopback pairing origin도 PH root/www를 신뢰하고 있었다. 두 origin을 제거하고 실제 HTTP health/preflight/pair가 403으로 끝나는지 검증한다. 이미 설치된 Agent에는 자동 업데이트가 없어 도메인 등록 종료 전에 로컬 코드 갱신·재시작이 필요하다.
 - 공통 모집은 PH 생성·재개·노출 승인·신규 신청·참여 승인을 거부하고 public/Store 참여 목록에서 제외한다. 과거 공급자/운영자 조회·마감·노출 반려·신청 반려/철회/해지는 유지한다. 과거 알림의 후속 경로도 현재 Store 신청 내역으로 향한다.
 - 과거 PH membership과 약관이 남아 있으면 현재 서비스까지 428 동의 게이트에 걸렸다. PH 이용약관·경영자 계약은 pending에서 제외하고 PH 신규 승낙 쓰기는 거부한다. 현재 서비스 약관 동의 요구와 과거 동의 원장은 유지한다.
+- admin-dashboard·Neture·KPA가 공유하는 역할 화면에서도 PH 필터를 제거한다. 과거 할당의 표시는 유지한다.
 - 공통 역할 선택 목록과 부여 API는 전체 관리자에게도 PH prefix와 PH catalog 항목의 신규 부여를 거부한다. 기존 할당·역할 식별 조회와 회수는 유지한다. PH 가입의 승인·재활성화·active 전이는 거부하고, 전체 복구의 PH 원장은 제외해 현재 서비스 가입만 복구한다. 가입 거부·정지·탈퇴·회수는 유지한다.
 - 공통 `products/from-master` 생성도 PH 공급 키가 있으면 혼합 서비스 요청 전체를 거부한다. 기존 Offer의 PH 키와 후속 처리 원장은 그대로 둔다. 신규 입력에서 키를 지워 기본 공급으로 전환하지 않는다.
-- 공개 Store 조회도 PH slug와 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
+- 공개 Store 조회도 PH slug와 PH에서 변경됐거나 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. 원래 주소의 서비스 출처를 보존해 현재 KPA 주소가 함께 있어도 PH 이력을 공개하지 않는다. 정책 조회·slug resolver도 같은 출처/대상 차단을 적용한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
 - DB 기반 공개 `platform-services` 목록도 active PH 행을 제외한다. 익명·로그인 사용자 모두 현재 서비스와 가입 상태만 보며 PH catalog 원장과 관리자 이력 조회는 보존한다. DB 갱신으로 숨기지 않는다.
 - 공통 구성원 API는 명시적 PH 요청을 서비스 미지정으로 강등하지 않는다. 서비스 미지정 초대도 PH만 연결된 과거 조직이면 생성 전에 거부하며 현재 서비스와 PH 이력이 함께 있는 매장의 초대는 유지한다. PaymentCore 신규 producer 3종과 역사적 PH 완료 consumer 보존은 별도 회귀로 검증한다.
 - Sonar 중복률 보완은 PH·Neture·Store B2B의 선택된 주문 후속 처리에 한정한다. 상태 전이·bridge·실패 기록만 API Extension 함수로 공유하고 세 consumer의 구독 키·주문 선택·멱등성과 PaymentCore/PG/DB 계약은 유지한다. 공유 모듈 변경 규칙에 따라 세 소비처와 raw-source 계약·실제 이벤트 회귀를 함께 검증한다.

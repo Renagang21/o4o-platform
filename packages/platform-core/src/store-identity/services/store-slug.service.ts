@@ -263,7 +263,7 @@ export class StoreSlugService {
    */
   async findOldSlugRedirect(
     oldSlug: string
-  ): Promise<{ newSlug: string; serviceKey: string } | null> {
+  ): Promise<{ newSlug: string; serviceKey: string; sourceServiceKey: string } | null> {
     const history = await this.historyRepo.findOne({
       where: { oldSlug: normalizeSlug(oldSlug) },
       order: { changedAt: 'DESC' },
@@ -285,6 +285,8 @@ export class StoreSlugService {
     return {
       newSlug: currentSlug.slug,
       serviceKey: currentSlug.serviceKey,
+      // The current store may have several service addresses; retain the old address origin.
+      sourceServiceKey: history.serviceKey,
     };
   }
 

@@ -29,7 +29,7 @@
 - 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
 - 매장 구성원 요청: 명시적 PH `serviceKey`를 서비스 미지정으로 바꾸지 않고 410으로 거부한다. PH·현재 역할을 함께 가진 사용자, 반복 query·공백 입력도 동일하다. 서비스 미지정 초대도 PH 전용 조직이면 생성 전에 거부하며 현재 linkage와 PH 이력이 함께 있는 매장의 초대는 유지한다.
 - 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
-- 공개 매장: PH slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
+- 공개 매장: PH slug·PH에서 변경된 과거 slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
 - DB 공개 catalog: active PH 행도 익명·로그인 사용자 목록에서 제외한다. 현재 서비스의 가입 상태 표시와 전체 관리자의 catalog 이력 조회는 보존하며 DB write는 없다.
 - 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
 - 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
@@ -46,7 +46,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **236 suites · 4,422 tests PASS** · 242 suites 중 DB integration 6개(48건) SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **237 suites · 4,430 tests PASS** · 243 suites 중 DB integration 6개(48건) SKIP |
 | 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
@@ -54,6 +54,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
 | 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
+| 공유 `@o4o/ui` Vitest | **1 file · 10 tests PASS** |
 | CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **332 tests PASS** · CI blocking Node 목록 전체 |
 | Local Agent CI Node tests + PH origin 실제 loopback HTTP | **75 tests PASS** · native bridge·local DB·browser DOM·pairing 차단 |
 | `git diff --check` | PASS |
@@ -110,3 +111,7 @@ HEAD `29e91ffaf6`의 CI는 통과했으나 재리뷰가 명시적 PH 구성원 �
 main PR #378·#379의 공급자/인증 수정과 모집 목록의 실제 충돌을 확인하고 작업 branch에서 결합했다. 일반 공개 모집은 운영자 노출 승인 없이 유지하고 세미프랜차이즈 조건도 보존한다. PH는 두 목록에서 계속 제외하며 과거 원장 조회·종결은 유지한다. 인증 세션/로그아웃 변경을 되돌리지 않고 새 이벤트/가입 판정과 관련 API·웹 회귀를 다시 검증한다. 실제 main 통합은 아직 승인 대기다.
 
 PR #378·#379 결합 후 API 242 suites에서 236 suites·4,422 tests와 type-check가 통과했다. DB integration 6개(48건)는 SKIP했으며 기존 4개 외에 main이 추가한 browser session·supplier phase1 integration이 포함된다. Neture 46 files·375 tests와 production build, 인증 공통 패키지 34/16/156건 및 관리자 cookie session 3건도 통과했다. 신규 일반 공개 모집 회귀는 PH를 제외하면서 노출 승인 없이 현재 모집이 보이는지 확인한다. 최신 remote CI·Sonar·Codex는 이 결합 커밋에서 다시 확인한다.
+
+HEAD `5ab28af7d8`의 늦게 완료된 리뷰는 과거 slug의 출처와 공유 역할 화면의 PH 선택지를 지적했다. `StoreSlugService.findOldSlugRedirect`가 현재 행의 서비스만 반환하던 문제를 sourceServiceKey metadata로 보완한다. 현재 target 계약과 DB 원장은 유지하고 공개 Store·정책 조회·slug resolver의 모든 소비처에서 PH source/target을 차단한다. mock 반환값 대신 실제 helper를 호출하는 HTTP 회귀로 PH 이력과 현재 KPA 주소가 섞인 경우 및 현재 서비스의 정상 redirect를 검증한다. 공통 역할 관리 화면의 PH 필터도 제거하며 admin-dashboard·Neture·KPA wrapper와 raw-source 소비처를 확인했다. 과거 역할의 표시·회수는 유지한다.
+
+slug 출처·공유 역할 UI 보완 후 API 243 suites에서 237 suites·4,430 tests 및 API type-check가 통과했다. DB integration 6개(48건)는 SKIP했다. 실제 history helper를 호출한 공개 HTTP를 포함한 관련 5 suites·56건, @o4o/ui 기존 회귀 10건, platform-core/UI 패키지 build 및 admin-dashboard·Neture·KPA production build가 통과했다. 신규 source metadata는 모든 runtime 소비처에 적용했고 기존 target 형태·원장 계약은 유지한다. 최신 커밋의 CI·Sonar·Codex를 다시 확인하며 이전 HEAD 결과를 최종 결과로 쓰지 않는다.
