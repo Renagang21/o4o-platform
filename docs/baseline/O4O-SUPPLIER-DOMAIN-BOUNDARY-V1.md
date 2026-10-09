@@ -1,5 +1,7 @@
 # O4O-SUPPLIER-DOMAIN-BOUNDARY-V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: Active · **FROZEN ARCHITECTURE** — 구조 변경은 명시적 WO 필수 (버그 수정 · 성능 · 문서 · 테스트는 허용)
 > **근거 WO**: [`WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1`](../work-orders/WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1.md)
 > **소스 계약**: `apps/api-server/src/__tests__/supplier-domain-boundary.spec.ts`
@@ -95,8 +97,8 @@ Supplier
 물리 컬럼 DROP 은 이 경계의 완료 조건이 아니다.
 
 **예외 — Neture 약국 매장 흐름 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 명시 WO)**
-- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 세미프랜차이즈 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
-- 세미프랜차이즈별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
+- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 약국 협력사업 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
+- 약국 협력사업별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
 - Neture 약국 흐름의 이용 판정은 이 절의 축(`is_public` · `service_keys` · `allowed_seller_ids` · OSA)을 AND 로 더하지 않고 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 로 대체한다. 이 축들과 다른 서비스 흐름은 보존한다.
 
 ---
