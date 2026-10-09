@@ -35,7 +35,10 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
   (req as any).memberAdminServiceKeys = adminKeys;
   const role = req.body?.role ?? (req.path.includes('/roles/') ? decodeURIComponent(req.path.split('/roles/')[1]) : undefined);
   const roleService = typeof role === 'string' && role.includes(':') ? resolveCanonicalServiceKey(role.split(':')[0]) : undefined;
-  const selected = req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey ?? roleService;
+  const roleMutation = req.path.endsWith('/roles') || req.path.includes('/roles/');
+  // Role ownership determines authority; an unrelated body serviceKey cannot override it.
+  // Bare roles are checked again against the resolved catalogue service in the controller.
+  const selected = roleMutation && roleService ? roleService : req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
   const keys = typeof selected === 'string' ? [selected] : scope.serviceKeys;
   const admin = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => adminKeys.includes(key)));
   (req as any).memberManagementApprovalOnly = !admin;

@@ -513,3 +513,16 @@ describe('tier 제한 — 카탈로그 플래그 + 이름 규칙 이중 판정',
     expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'neture:operator');
   });
 });
+
+it.each(['assignMemberRole', 'removeMemberRole'] as const)('%s validates a bare role against its catalogue service, not a forged body serviceKey', async action => {
+  mockGetRoleByName.mockResolvedValue({ name: 'member', serviceKey: 'pharmacy-hub', roleKey: 'member', isAdminRole: false, isAssignable: true });
+  const request = makeReq(TARGET_ID, 'member', { isPlatformAdmin: false, serviceKeys: ['neture', 'pharmacy-hub'], rolePrefixes: ['neture', 'pharmacy-hub'] });
+  request.body = { role: 'member', serviceKey: 'neture' };
+  request.memberAdminServiceKeys = ['neture'];
+  const response = makeRes();
+  await controller[action](request, response);
+  expect(response.status).toHaveBeenCalledWith(403);
+  expect(response.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_MEMBER_ADMIN_REQUIRED' }));
+  expect(mockRemoveRole).not.toHaveBeenCalled();
+  expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
+});

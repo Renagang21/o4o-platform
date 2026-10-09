@@ -7,7 +7,7 @@
  */
 import { Request, Response } from 'express';
 import { In } from 'typeorm';
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
@@ -1324,6 +1324,12 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
+        const roleServiceKey = resolveCanonicalServiceKey(roleEntity.serviceKey);
+        const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
+        if (adminKeys && !adminKeys.includes(roleServiceKey)) {
+          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
+          return;
+        }
         // Assignability check
         if (!roleEntity.isAssignable) {
           res.status(403).json({ success: false, error: 'This role is not assignable' });
@@ -1457,6 +1463,12 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
+        const roleServiceKey = resolveCanonicalServiceKey(roleEntity.serviceKey);
+        const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
+        if (adminKeys && !adminKeys.includes(roleServiceKey)) {
+          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
+          return;
+        }
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });

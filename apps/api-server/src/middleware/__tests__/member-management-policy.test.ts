@@ -46,3 +46,10 @@ it.each([['neture', 'neture'], ['kpa-society', 'kpa'], ['k-cosmetics', 'cosmetic
   expect(check('PATCH', '/u/status', { status: 'suspended', serviceKey }, [`${prefix}:operator`], [serviceKey]).res.status).toHaveBeenCalledWith(403);
   expect(check('PATCH', '/u/status', { status: 'suspended', serviceKey }, [`${prefix}:admin`], [serviceKey]).next).toHaveBeenCalledTimes(1);
 });
+
+
+it.each(['pharmacy-hub:member'])('a forged serviceKey cannot authorize role assignment in an operator-only service (%s)', role => {
+  const { res, next } = check('POST', '/u/roles', { role, serviceKey: 'neture' }, ['neture:admin', 'pharmacy-hub:operator'], ['neture', 'pharmacy-hub']);
+  expect(res.status).toHaveBeenCalledWith(403);
+  expect(next).not.toHaveBeenCalled();
+});

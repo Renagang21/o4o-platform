@@ -97,7 +97,7 @@ PR #374로 반영된 역할 회수·운영 scope·쓰기 경계는 유지하고 
 - [x] 현재 회원 관리 업무별 admin/operator 권한 비교와 사용자 정책 확정
 - [x] 결정된 정책 적용 및 공통 계정과 서비스 가입 변경 분리 검증
 - [x] 서비스별·역할별 회귀, 타입 검사, 영향 빌드/화면 검증
-- [ ] PR 설명 최신화, commit/push, 최신 CI·리뷰 확인
+- [x] PR 설명 최신화, commit/push, 최신 CI·리뷰 추적 (최종 판정은 PR 체크 기준)
 - [x] 회원 관리 구현 후 개별 커뮤니티 운영자 후속 조사 지시서 정리
 
 main 병합·배포는 새 PR 결과를 검토한 사용자의 통합 승인 후 진행한다. 새 권한 차이나 운영 DB 변경은 조사만으로 확정하지 않는다.
@@ -180,7 +180,7 @@ admin/operator 권한을 구분할 경우 버튼과 API guard를 함께 변경�
 
 ### 정책 반영 로컬 검증
 
-- API 회원 관리/승인/권한 Jest: 15 suites, 293 tests PASS. 별도 Neture integration 1 suite/3 tests는 기존 skip(운영 DB 미접속).
+- API 회원 관리/승인/권한 Jest: 15 suites, 293 tests PASS; 실제 역할 소유 서비스 판정 3개 회귀 추가 PASS. 별도 Neture integration 1 suite/3 tests는 기존 skip(운영 DB 미접속).
 - Neture 전용 가입 승인 회귀 13 tests에서 공통 users 상태 쓰기 0을 검증한다.
 - UI: 공통 상세 19, 공통 운영 UI 53, Neture 378, KPA 71, Lecture 2 tests PASS.
 - API·operator-core-ui·KPA·Pharmacy-Hub 타입 검사, Neture·Lecture·KPA production build PASS.
@@ -189,5 +189,11 @@ admin/operator 권한을 구분할 경우 버튼과 API guard를 함께 변경�
   실제 목록·drawer·상세, operator 프로필 수정, 같은 서비스 admin의 정지/탈퇴 버튼을 확인했다.
 - 중앙 서비스 운영자 지정·변경·회수는 main PR #374의 구현/검증을 유지한다.
 
-현재 단계: 구현·로컬 검증 완료. commit/push 후 최신 CI 및 미해결 리뷰를 확인한다.
+현재 단계: 구현·로컬 검증·commit/push 완료. 최신 CI 및 미해결 리뷰의 최종 판정은 PR #371 체크를 기준으로 한다.
 main 통합·배포와 실제 역할 계정 smoke는 별도 통합 승인 이후 절차다.
+
+
+최종 권한 점검: 다중 서비스 admin/operator의 일반 역할 변경에서 body serviceKey로
+역할 소유 서비스를 위장하는 우회를 차단했다. namespaced role은 그 prefix를, bare role은
+실제 카탈로그의 canonical service key를 기준으로 admin 권한을 검증한다.
+관련 middleware/role controller 회귀 2 suites / 53 tests 및 API 타입 검사 PASS.
