@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { prepareQrRedirect, printedQrPaths } from './pharmacy-hub-qr-redirect.mjs';
@@ -121,7 +121,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   };
   await mkdir(output, { recursive: true, mode: 0o700 });
   const result = await runCutover({
-    mode, probes: process.env.QR_PROBE_PATHS ?? '',
+    mode, probes: process.env.QR_PROBE_PATHS || (process.env.PROBE_OUTPUT ? await readFile(process.env.PROBE_OUTPUT, 'utf8') : ''),
     preflight: paths => verifyTargets(paths),
     read: () => api(endpoint),
     save: (name, data) => writeFile(`${output}/${name}`, JSON.stringify(data, null, 2) + '\n', { mode: 0o600 }),

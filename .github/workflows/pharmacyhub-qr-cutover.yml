@@ -9,7 +9,7 @@ on:
         options: [plan, apply]
         default: plan
       probe_paths:
-        description: 'apply: four active relative paths, one per line (qr, tablet, multilingual-products, foreign-visitor/affiliate); preserve query parameters'
+        description: '(optional) four active relative paths; leave empty to collect from the read-only production inventory'
         type: string
         required: false
 
@@ -23,17 +23,23 @@ concurrency:
 
 jobs:
   cutover:
-    # Read-only plans may run before merge; production writes require main and an explicit unfrozen state.
+    # Production inventory requires main; writes also require an explicit unfrozen state.
     runs-on: ubuntu-latest
+    environment: production
     timeout-minutes: 15
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       CUTOVER_OUTPUT: ${{ runner.temp }}/pharmacyhub-qr-cutover
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
+      PROBE_OUTPUT: ${{ runner.temp }}/pharmacyhub-qr-probes.txt
     steps:
       - name: Enforce production write gate
         run: |
+          if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
+            echo 'Production inventory requires main.'
+            exit 1
+          fi
           if [ "$CUTOVER_MODE" = 'apply' ]; then
             if [ "$GITHUB_REF" != 'refs/heads/main' ] || [ "$DEPLOY_FREEZE" != 'false' ]; then
               echo 'Apply requires main and DEPLOY_FREEZE=false.'
@@ -41,11 +47,13 @@ jobs:
             fi
           fi
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup-build-env
         with:
           node-version: '22.18.0'
+          build-packages: 'false'
+          strict-lockfile: 'true'
       - name: Test cutover safety
-        run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs
+        run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
@@ -54,6 +62,35 @@ jobs:
         with:
           project_id: netureyoutube
           skip_install: true
+      - name: Start authenticated Cloud SQL proxy for read-only inventory
+        if: inputs.probe_paths == ''
+        run: |
+          docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
+            --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
+            gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.3 \
+            --credentials-file=/credentials.json --address=127.0.0.1 --port=55432 \
+            netureyoutube:asia-northeast3:o4o-platform-db
+          node --input-type=module -e '
+            import net from "node:net";
+            for (let attempt = 0; attempt < 30; attempt++) {
+              const ready = await new Promise(resolve => {
+                const socket = net.connect(55432, "127.0.0.1");
+                socket.setTimeout(1000);
+                socket.on("connect", () => { socket.destroy(); resolve(true); });
+                socket.on("error", () => { socket.destroy(); resolve(false); });
+                socket.on("timeout", () => { socket.destroy(); resolve(false); });
+              });
+              if (ready) process.exit(0);
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            process.exit(1);
+          '
+      - name: Collect existing active public paths without database writes
+        if: inputs.probe_paths == ''
+        env:
+          DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
+          DB_NAME: ${{ secrets.GCP_DB_NAME }}
+        run: node scripts/deployment/pharmacy-hub-qr-probes.mjs
       - name: Inventory, validate, optionally apply and verify
         run: node scripts/deployment/pharmacy-hub-qr-cutover.mjs
       - name: Save backup and verification evidence
@@ -64,3 +101,8 @@ jobs:
           path: ${{ runner.temp }}/pharmacyhub-qr-cutover/*.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Stop inventory proxy and remove public-path inventory
+        if: always()
+        run: |
+          docker rm -f pharmacyhub-qr-sql-proxy >/dev/null 2>&1 || true
+          rm -f "$PROBE_OUTPUT"
