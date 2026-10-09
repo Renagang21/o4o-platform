@@ -87,8 +87,8 @@ export interface PharmacyRecruitment {
   supplyUnitPrice: number | string | null;
   consumerPrice: number | string | null;
   createdAt: string;
-  semiFranchiseKey: string;
-  semiFranchiseName: string;
+  semiFranchiseKey: string | null;
+  semiFranchiseName: string | null;
   applicationId: string | null;
   applicationStatus: string | null;
 }

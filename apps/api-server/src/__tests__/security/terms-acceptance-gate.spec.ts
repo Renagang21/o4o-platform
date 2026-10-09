@@ -86,6 +86,8 @@ async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
     isInitialized: true,
+    // Session persistence is separate from the terms-query failure injection.
+    manager: { query: async () => [{ live: 1 }] },
     getRepository: () => ({ findOne: async () => currentUser }),
     query: (sql: string, params?: any[]) => fakeQuery(sql, params),
   },
@@ -117,7 +119,7 @@ import policyAcceptanceRoutes from '../../modules/policy-acceptance/policy-accep
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 
 function makeToken(): string {
-  return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [] }), 'utf8').toString('base64');
+  return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [], serviceKey: 'neture', sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' }), 'utf8').toString('base64');
 }
 
 function makeApp() {
@@ -133,7 +135,7 @@ function publishedDoc(id: string, serviceKey: string, version = 1, content = 'v1
 }
 
 beforeEach(() => {
-  currentUser = { id: USER_ID, status: 'active', isActive: true, roles: [], memberships: [] };
+  currentUser = { id: USER_ID, status: 'active', isActive: true, roles: [], memberships: [], refreshTokenFamily: 'user-family' };
   publishedRows = [];
   membershipRows = [];
   acceptedIds = [];
@@ -351,7 +353,7 @@ describe('requireAuth 약관 게이트', () => {
     expect(res.status).toBe(200);
   });
 
-  it('판정 DB 오류는 fail-open (인증 hot path 를 500 으로 만들지 않는다)', async () => {
+  it('약관 판정 DB 오류는 fail-open (세션 검증 성공 후)', async () => {
     publishedRows = [publishedDoc(DOC_KPA, 'kpa-society')];
     membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
     policyAcceptanceService.invalidateAll();

@@ -1,6 +1,7 @@
 // Authentication client exports
 export * from './types.js';
 export * from './client.js';
+export { refreshStoredSession } from './refresh-coordinator.js';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: CookieAuthClient(/auth/cookie/login · register) 는 은퇴했다.
 export * from './sso-client.js';
 // Google Identity Services loader (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1)

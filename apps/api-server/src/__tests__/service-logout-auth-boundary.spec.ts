@@ -26,10 +26,14 @@ const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** `service_session_revocations` in-memory 대역 */
+let sessions = new Map<string, string>();
+let revoked = new Set<string>();
 let epochs: Array<{ userId: string; serviceKey: string; epoch: number }> = [];
 const epochOf = (userId: string, serviceKey: string) =>
   epochs.find((e) => e.userId === userId && e.serviceKey === serviceKey)?.epoch ?? 0;
 const bump = (userId: string, serviceKey: string) => {
+  const id = sessions.get(serviceKey);
+  if (id) revoked.add(id);
   const found = epochs.find((e) => e.userId === userId && e.serviceKey === serviceKey);
   if (found) found.epoch += 1;
   else epochs.push({ userId, serviceKey, epoch: 1 });
@@ -44,6 +48,7 @@ let bumpDuringHandoffInsert: string | null = null;
 const query = jest.fn(async (sql: string, params: unknown[] = []) => {
   const q = String(sql).replace(/\s+/g, ' ');
 
+  if (/browser_session_revocations/i.test(q)) return USER.refreshTokenFamily === params[3] && !revoked.has(String(params[2])) ? [{ '?column?': 1 }] : [];
   if (/INSERT INTO service_session_revocations/i.test(q)) {
     bump(String(params[0]), String(params[1]));
     return [{ session_epoch: epochOf(String(params[0]), String(params[1])) }];
@@ -73,6 +78,7 @@ const query = jest.fn(async (sql: string, params: unknown[] = []) => {
       // WO §8 (4차): 세대는 **호출자가 검증한 값**으로 넘어온다. 여기서 현재 세대를 다시 읽으면
       //   발급 검사와 기록 사이에 로그아웃이 끼었을 때 새 세대가 적힌다(그것이 고친 결함이다).
       source_session_epoch: params[5] ?? null,
+      source_session_id: params[7], source_token_family: params[8],
       consumed_at: null,
     };
     handoffRows.push(row);
@@ -149,9 +155,11 @@ function mockReq(body: Record<string, unknown>, origin?: string, accessToken?: s
 const mockRes = mockHandoffRes;
 
 /** 그 서비스의 현재 세대를 새긴 access token — 실제 로그인이 만드는 것과 같은 모양. */
-const accessTokenFor = (serviceKey: string) =>
-  tokenUtils.generateTokens(USER, [], 'neture.co.kr', MEMBERSHIPS, 'fam-1', serviceKey, epochOf(USER_ID, serviceKey))
-    .accessToken;
+const accessTokenFor = (serviceKey: string) => {
+  const tokens = tokenUtils.generateTokens(USER, [], 'neture.co.kr', MEMBERSHIPS, 'fam-1', serviceKey, epochOf(USER_ID, serviceKey));
+  sessions.set(serviceKey, tokenUtils.verifyAccessToken(tokens.accessToken)!.sessionId!);
+  return tokens.accessToken;
+};
 
 /** 이 변경 배포 **전에** 발급된 access token — serviceKey · sessionEpoch claim 이 없다. */
 const legacyAccessToken = () =>
@@ -163,6 +171,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
+  sessions = new Map(); revoked = new Set();
   epochs = [];
   handoffRows = [];
   bumpDuringHandoffInsert = null;
@@ -293,15 +302,15 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
     expect(handoffRows).toEqual([]);
   });
 
-  it('5-1b 폐기 기록이 없으면 배포 전 토큰도 정상 발급된다 (배포만으로 막지 않는다)', async () => {
+  it('5-1b 브라우저 ID가 없는 배포 전 토큰은 재로그인이 필요하다', async () => {
     const res = mockRes();
     await HandoffController.generateHandoff(
       mockReq({ targetServiceKey: 'neture' }, 'https://kpa-society.co.kr', legacyAccessToken()),
       res,
     );
 
-    expect(res.statusCode).toBe(200);
-    expect(handoffRows).toHaveLength(1);
+    expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
+    expect(handoffRows).toHaveLength(0);
   });
 
   it('5-1c claim 없는 토큰은 Origin 으로 범위를 좁히지 않는다 — A 로그아웃 뒤 Origin: B 도 거절', async () => {
@@ -321,18 +330,11 @@ describe('5. handoff 원장은 **검증된 access token** 의 출발 서비스·
     expect(handoffRows).toEqual([]);
   });
 
-  it('5-1d claim 없는 토큰의 발급 뒤 어느 서비스든 로그아웃하면 교환도 거절된다', async () => {
-    await HandoffController.generateHandoff(
-      mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr', legacyAccessToken()),
-      mockRes(),
-    );
-    expect(handoffRows).toHaveLength(1);
-    // 출발을 모르므로 원장은 Origin(neture) 이 아니라 'unknown' + 초기 세대다.
-    expect([handoffRows[0].source_service_key, handoffRows[0].source_session_epoch]).toEqual(['unknown', 0]);
-
-    bump(USER_ID, 'lecture'); // Origin 과 무관한 서비스의 로그아웃
+  it('5-1d 배포 전 원장의 브라우저 ID 없는 pending handoff도 거부한다', async () => {
+    handoffRows.push({ id: HANDOFF_ID, user_id: USER_ID, source_service_key: 'neture',
+      target_service_key: 'kpa-society', consumed_at: null });
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://kpa-society.co.kr'), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: HANDOFF_ID }, 'https://pharmacy.neture.co.kr'), res);
     expect([res.statusCode, res.body?.code]).toEqual([401, 'SERVICE_SESSION_REVOKED']);
   });
 

@@ -117,38 +117,6 @@ apiV1Client.interceptors.response.use(
 // 요청 인터셉터 (토큰 추가)
 apiClient.interceptors.request.use(
   (config) => {
-    // 여러 위치에서 토큰 확인
-    let token = localStorage.getItem('authToken');
-    if (!token) {
-      token = localStorage.getItem('accessToken');
-    }
-    if (!token) {
-      token = localStorage.getItem('token');
-    }
-    
-    // Zustand store에서도 확인
-    if (!token) {
-      const adminStorage = localStorage.getItem('admin-auth-storage');
-      if (adminStorage) {
-        try {
-          const parsed = JSON.parse(adminStorage);
-          if (parsed.state?.token) {
-            token = parsed.state.token;
-          }
-        } catch {
-          // Ignore parse error
-        }
-      }
-    }
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    // 개발 환경에서 토큰이 없으면 테스트 토큰 생성
-    else if (import.meta.env.DEV) {
-      const testToken = 'test-token-for-development';
-      config.headers.Authorization = `Bearer ${testToken}`;
-    }
     // Dev-only: log post endpoints
     try {
       if (import.meta.env?.DEV && config?.url) {
@@ -171,38 +139,6 @@ apiClient.interceptors.request.use(
 // V1 API 요청 인터셉터 (토큰 추가)
 apiV1Client.interceptors.request.use(
   (config) => {
-    // 여러 위치에서 토큰 확인
-    let token = localStorage.getItem('authToken');
-    if (!token) {
-      token = localStorage.getItem('accessToken');
-    }
-    if (!token) {
-      token = localStorage.getItem('token');
-    }
-    
-    // Zustand store에서도 확인
-    if (!token) {
-      const adminStorage = localStorage.getItem('admin-auth-storage');
-      if (adminStorage) {
-        try {
-          const parsed = JSON.parse(adminStorage);
-          if (parsed.state?.token) {
-            token = parsed.state.token;
-          }
-        } catch {
-          // Ignore parse error
-        }
-      }
-    }
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    // 개발 환경에서 토큰이 없으면 테스트 토큰 생성
-    else if (import.meta.env.DEV) {
-      const testToken = 'test-token-for-development';
-      config.headers.Authorization = `Bearer ${testToken}`;
-    }
     // Dev-only: log post endpoints
     try {
       if (import.meta.env?.DEV && config?.url) {

@@ -75,6 +75,7 @@ export type MigrationClass = new () => MigrationInterface;
 
 /** Append only. Order must match ascending epoch. */
 import { RepairCanonicalDemoExperience1791501198171 } from '../migrations/1791501198171-RepairCanonicalDemoExperience.js';
+import { CreateBrowserSessionRevocations1791509600000 } from '../migrations/1791509600000-CreateBrowserSessionRevocations.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -95,6 +96,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateNeturePharmacyCommerce1791200000000,
   AlignSellerRecruitmentApplicationIdentity1791477914134,
   RepairCanonicalDemoExperience1791501198171,
+  CreateBrowserSessionRevocations1791509600000,
 ];
 
 export function incrementalMigrationNames(): string[] {

@@ -215,7 +215,7 @@ export class SupplierUnifiedOrderService {
       // IR-O4O-STORE-ORDER-PAYMENT-READINESS-MODEL-V1) 충족 주문에 한정해야 한다. paymentStatus 는 위에서 노출.
       canFulfill: false,
       fulfillmentUrl: null,
-      readOnlyReason: '결제 확인 및 공급자 배송 연결(bridge)이 완료된 주문만 배송 처리할 수 있습니다. checkout 주문 배송 통합은 후속 작업입니다.',
+      readOnlyReason: '결제 확인 및 공급자 배송 연결(bridge)이 완료된 주문만 배송 처리할 수 있습니다. 배송 처리 연결 상태를 확인해야 합니다.',
     }));
   }
 }

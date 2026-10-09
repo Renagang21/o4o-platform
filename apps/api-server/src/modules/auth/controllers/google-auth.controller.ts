@@ -147,6 +147,9 @@ export class GoogleAuthController extends BaseController {
       }
       return BaseController.error(res, error.message, error.statusCode, error.code);
     }
+    if (err.code === 'SESSION_CHANGED_RETRY_LOGIN') {
+      return BaseController.error(res, err.message, 409, err.code);
+    }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {
       const accountStatus = resolveExposableAccountStatus(err.details?.status);
       return BaseController.forbidden(res, err.message, err.code, accountStatus ? { accountStatus } : undefined);

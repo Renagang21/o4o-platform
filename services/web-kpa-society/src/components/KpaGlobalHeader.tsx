@@ -126,7 +126,7 @@ export function KpaGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
-      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 O4O 계정 전체 종료 */
+      /* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: 서버 logout 은 현재 브라우저 세션만 종료 */
       logoutLabel={O4O_LOGOUT_LABEL}
       /* O4O 홈 — 로그인 여부와 무관하게 표시. 로그인 중이면 로그인 유지한 채 neture.co.kr 대표 홈으로 복귀 (로그아웃 아님)
          WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 조건 제거 · 모바일 헤더에도 노출 */
