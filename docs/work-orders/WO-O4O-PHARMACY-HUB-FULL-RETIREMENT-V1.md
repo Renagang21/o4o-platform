@@ -18,7 +18,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 |---|---|---|
 | R01 | PH 웹·API 제거 | `web-pharmacy-hub`, 전용 라우터·컨트롤러·scope·생성 코드 삭제; `/api/v1/pharmacy-hub` 미등록 |
 | R02 | 내 매장 PH 문맥 제거 | PH route·API adapter·메뉴·공개 origin·서비스 선택 분기 제거; 현재 약국 원장과 KPA 공통 구현은 유지 |
-| R03 | 신규 PH 진입·공통 쓰기 제거 | 서비스 catalog·CORS·운영자 부여·공급자 PH 설정 제거; 공통 Store owner/member·이용권·QR·CMS 쓰기에서도 PH 차단. 독립 약사 포럼 저장 코드·기존 주문 후속 처리 보존 |
+| R03 | 신규 PH 진입·공통 쓰기 제거 | 서비스 catalog·CORS·Local Agent origin·운영자 부여·공급자 PH 설정 제거; Store·이용권·QR·CMS·모집 신규 참여/승인 차단. 과거 PH 약관은 현재 동의 요구에서 제외. 독립 약사 포럼 저장 코드·기존 주문 후속 처리 보존 |
 | R04 | PH 재배포 제거 | CD registry·workflow job·lockfile importer 정리; 다른 웹·API·병원약국 배포 유지 |
 | R05 | 운영 인프라 제거 준비·실행 | 실제 PH host rule·NEG·backend·Cloud Run·DNS·인증서 조사 후 PH 전용 자원만 제거; 공유 LB·IP·인증서의 다른 호스트 보호 |
 | R06 | 회귀 검증 | 변경 소비처 type-check/build, API focused tests, CD detector tests; PH 원장 조회·Store·공급자·커뮤니티 권한 보호 |
@@ -31,6 +31,9 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 공급자 공통 주문 목록은 `pharmacy-hub` 원장 키를 조회해 기존 주문을 처리한다. 이 조회 집합에서 키를 빼면 기존 주문이 사라지므로 유지한다.
 - 독립 약사 커뮤니티는 `pharmacy-hub` 저장 코드의 글도 읽는다. 저장 코드는 유지하고 PH 웹 진입 metadata만 제거한다.
 - 공통 이용권 결제·외국인 파트너·QR과 CMS가 과거 PH 역할/가입으로 신규 쓰기를 허용하고 있었다. 공통 Store owner/member 접근과 PH 역할 발급, PH 이용권 결제·활성화·자산 생성·CMS 생성/수정/상태 전이/슬롯 쓰기를 차단한다. 기존 이용권·CMS GET과 공급자 주문 원장 조회는 유지한다. 현재 매장에 PH 과거 linkage가 함께 남아도 PH 역할은 발급하지 않으며 PH 전용 초대는 활성화하지 않는다.
+- Local Agent의 loopback pairing origin도 PH root/www를 신뢰하고 있었다. 두 origin을 제거하고 실제 HTTP health/preflight/pair가 403으로 끝나는지 검증한다. 이미 설치된 Agent에는 자동 업데이트가 없어 도메인 등록 종료 전에 로컬 코드 갱신·재시작이 필요하다.
+- 공통 모집은 PH 생성·재개·노출 승인·신규 신청·참여 승인을 거부하고 public/Store 참여 목록에서 제외한다. 과거 공급자/운영자 조회·마감·노출 반려·신청 반려/철회/해지는 유지한다. 과거 알림의 후속 경로도 현재 Store 신청 내역으로 향한다.
+- 과거 PH membership과 약관이 남아 있으면 현재 서비스까지 428 동의 게이트에 걸렸다. PH 이용약관·경영자 계약은 pending에서 제외하고 PH 신규 승낙 쓰기는 거부한다. 현재 서비스 약관 동의 요구와 과거 동의 원장은 유지한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
 
@@ -54,6 +57,16 @@ DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다
 | Gabia DNS·도메인 | PH root/www A 및 PH 인증용 CNAME | 권한 DNS를 재확인; 다른 도메인·공유 IP·DNS zone은 유지. PH 등록·갱신 종료도 registrar에서 처리 |
 
 1. API·Store·공급자 변경을 운영 반영하고 현재 Store QR·주문·공급자 후속 처리가 정상인지 확인한다. PH 신규 API·가입·설정이 없어야 한다. 운영 DB 원장 삭제는 포함하지 않는다.
+
+   **도메인 등록 종료 전 Local Agent 갱신:** Agent가 설치된 PC마다 이 PR이 반영된 main 코드로 실제 실행 사본을 갱신하고 기존 프로세스를 종료한 뒤 재시작한다. [Local Agent README](../../tools/o4o-local-agent/README.md)의 수동 업데이트 방식과 저장소 `AGENTS.md` §4-1(g)(h)의 실 PC 작업 직렬화를 따른다. `local.db`·credential·pairing을 삭제하거나 재발급하지 않는다. 이번 origin 수정은 버전 문자열만으로 구분되지 않으므로 적용 main SHA·실행 사본과 시작 경로를 기록한다. 실행 중인 서버가 두 PH origin에 모두 403, Neture origin에는 200을 반환하는지 확인한다. Windows의 read-only 예시는 다음과 같다.
+
+   ```powershell
+   curl.exe --silent --output NUL --write-out "%{http_code}\n" --header "Origin: https://pharmacyhub.co.kr" http://127.0.0.1:47821/health
+   curl.exe --silent --output NUL --write-out "%{http_code}\n" --header "Origin: https://www.pharmacyhub.co.kr" http://127.0.0.1:47821/health
+   curl.exe --silent --output NUL --write-out "%{http_code}\n" --header "Origin: https://neture.co.kr" http://127.0.0.1:47821/health
+   ```
+
+   기존 사본의 origin 신뢰를 제거하기 전에 도메인 등록을 종료하면 제3자 재등록 후 pairing에 악용될 수 있다. 업데이트하지 않은 실행 사본이 남거나 설치 현황을 확인하지 못하면 등록 종료 단계는 수행하지 않고 잔여 작업으로 보고한다. 이 환경에서 설치 PC를 갱신하거나 실 PC Agent를 실행한 결과는 없다.
 2. URL map·backend·NEG·Cloud Run·인증서 map/entry·certificate·DNS authorization의 현재 JSON을 비공개 작업 폴더에 저장한다. 과거 표와 다르면 현재 참조를 기준으로 목록을 수정한다. 새 URL map 초안은 다음으로 준비한다.
 
    ```bash
@@ -93,6 +106,9 @@ DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다
 ```text
 Pharmacy Hub 완전 퇴역의 운영 삭제를 수행한다.
 먼저 PR #373의 main 반영·통제 배포와 Store/공급자/독립 약사 커뮤니티 정상 동작을 확인한다.
+설치된 모든 Local Agent의 실제 실행 사본도 최신 코드로 갱신·재시작한다.
+PH root/www Origin의 /health 403과 Neture Origin 200을 확인하고 적용 SHA를 기록한다.
+설치 Agent의 PH origin 신뢰 제거를 확인하기 전에는 PH 도메인 등록을 종료하지 않는다.
 다른 실행자의 배포·LB/DNS 변경과 겹치지 않는 시간에 GCP/Gabia에서 작업한다.
 프로젝트 netureyoutube / 리전 asia-northeast3의 현재 PH 자원과 모든 참조를 조회한다.
 WO §5의 과거 이름은 후보이며, 실제 이름·PH 전용 여부·공유 참조를 재확인한다.
@@ -105,4 +121,4 @@ PH 전용 인증서/DNS authorization을 제거하고 Gabia 등록·갱신도 �
 전체 삭제·검증 후 CHECK에 실제 완료를 기록하고, 미완료 항목이 있으면 구분해 보고한다.
 ```
 
-필수 보고는 `main/배포 SHA`, `삭제한 자원 이름`, `PH DNS/인증서/서버 조회 결과`, `다른 서비스 검증 결과`, `남은 항목`이다. 인증 정보·운영 snapshot·DNS IP를 공개 저장소에 올리지 않는다.
+필수 보고는 `main/배포 SHA`, `Local Agent 갱신·origin 차단 결과`, `삭제한 자원 이름`, `PH DNS/인증서/서버 조회 결과`, `다른 서비스 검증 결과`, `남은 항목`이다. 인증 정보·운영 snapshot·DNS IP를 공개 저장소에 올리지 않는다.
