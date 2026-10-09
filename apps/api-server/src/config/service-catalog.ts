@@ -204,7 +204,7 @@ export const O4O_SERVICES: O4OService[] = [
     description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
     joinEnabled: false,
     // STANDARD_CANDIDATE — 매장 linkage(pharmacy-hub) · pharmacy-hub:store_owner · pharmacy-hub:operator 존재. 자동 활성화 아님.
-    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
   /**
    * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 — Phase 1 Foundation

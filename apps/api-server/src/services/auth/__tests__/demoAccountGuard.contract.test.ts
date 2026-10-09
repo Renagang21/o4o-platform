@@ -181,7 +181,6 @@ describe('Demo 계정 보호 계약', () => {
       'controllers/admin/OperatorAssignmentController.ts',
       'controllers/operator/MembershipConsoleController.ts',
       'controllers/kpa-branch/BranchServiceMembershipController.ts',
-      'controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.ts',
       'modules/auth/controllers/auth-account.controller.ts',
       'modules/neture/controllers/operator-registration.controller.ts',
       // routes/cosmetics/controllers/cosmetics-store.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.

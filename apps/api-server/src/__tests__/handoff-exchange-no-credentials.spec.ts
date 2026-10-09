@@ -26,7 +26,6 @@ const HANDOFF_PAGES = [
   'services/web-neture/src/pages/HandoffPage.tsx',
   'services/web-store/src/pages/HandoffPage.tsx',
   'services/web-lecture/src/pages/HandoffPage.tsx',
-  'services/web-pharmacy-hub/src/pages/HandoffPage.tsx',
   'services/web-kpa-branch/src/pages/HandoffPage.tsx',
   'services/web-kpa-society/src/pages/HandoffPage.tsx',
 ];

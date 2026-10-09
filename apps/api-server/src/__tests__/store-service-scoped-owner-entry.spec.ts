@@ -125,7 +125,7 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
   });
 
   it('k-cosmetics 는 더 이상 web-store 의 서비스 문맥이 아니다', () => {
-    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';");
+    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society';");
     expect(layout).not.toContain("'k-cosmetics':");
     expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });

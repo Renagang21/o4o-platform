@@ -15,30 +15,27 @@
  * 요청 시점 함수로 바꿨기 때문이다(React 밖에서도 읽을 수 있어야 한다). 값의 SSOT 는 StoreContext 가 set 한다.
  */
 
-export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';
+export type UnifiedServiceKey = 'kpa-society';
 
 /** canonical serviceKey → 백엔드 라우터 mount prefix (`/api/v1/<prefix>`) */
 export const SERVICE_API_PREFIX: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'kpa',
-  'pharmacy-hub': 'pharmacy-hub',
 });
 
 /** 일부 공통 API(콘텐츠 HUB · 미디어 · 구독)는 짧은 service 식별자를 쓴다 */
 export const SERVICE_SHORT_KEY: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'kpa',
-  'pharmacy-hub': 'pharmacy-hub',
 });
 
 export const SERVICE_LABEL: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'KPA Society',
-  'pharmacy-hub': 'PharmacyHub',
 });
 
 /** 공통 매장 업무의 문맥 우선순위 — KPA(reference) → PH */
-export const COMMON_CONTEXT_PRIORITY: readonly UnifiedServiceKey[] = ['kpa-society', 'pharmacy-hub'];
+export const COMMON_CONTEXT_PRIORITY: readonly UnifiedServiceKey[] = ['kpa-society'];
 
 export function isUnifiedServiceKey(v: unknown): v is UnifiedServiceKey {
-  return v === 'kpa-society' || v === 'pharmacy-hub';
+  return v === 'kpa-society';
 }
 
 /**
@@ -141,7 +138,6 @@ export function setActiveServiceContext(key: UnifiedServiceKey | null): void {
  */
 export const SERVICE_PUBLIC_ORIGIN: Readonly<Record<UnifiedServiceKey, string>> = Object.freeze({
   'kpa-society': 'https://pharmacy.neture.co.kr',
-  'pharmacy-hub': 'https://pharmacyhub.co.kr',
 });
 
 export function getActiveServicePublicOrigin(): string {

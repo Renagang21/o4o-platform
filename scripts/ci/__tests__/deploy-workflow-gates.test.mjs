@@ -26,11 +26,11 @@ describe('Phase 1 — CI gate 는 모든 배포 경로 앞에 있다', () => {
     });
   }
 
-  // web 7 — signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
+  // web 6 — pharmacy-hub-web 배포 은퇴 · signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
   //         k-cosmetics-web 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
-  it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 7 · admin 1)', () => {
+  it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 6 · admin 1)', () => {
     assert.match(read(DEPLOY[0]), /build-and-deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
-    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes, ci-gate\]$/gm), 7);
+    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes, ci-gate\]$/gm), 6);
     assert.match(read(DEPLOY[2]), /\n {2}deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
   });
 });
@@ -58,8 +58,8 @@ describe('Phase 4 — verified rollout (cutover 후 기본값)', () => {
 
   it('web · admin 은 verified 에서 새 revision tag URL smoke 후 전환한다', () => {
     const web = read(DEPLOY[1]);
-    assert.equal(count(web, /phase: plan/g), 7);
-    assert.equal(count(web, /phase: finish/g), 7);
+    assert.equal(count(web, /phase: plan/g), 6);
+    assert.equal(count(web, /phase: finish/g), 6);
     assert.equal(count(read(DEPLOY[2]), /phase: finish/g), 1);
     const action = read('.github/actions/cloud-run-verified-rollout/action.yml');
     const smoke = action.indexOf('cloud-run-rollout.mjs smoke');
@@ -89,7 +89,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
       const wf = read(file);
       const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
-      const expected = file.endsWith('web-services.yml') ? 8 : 2; // web: ci-gate 1 + deploy 7 · api/admin: ci-gate 1 + deploy 1
+      const expected = file.endsWith('web-services.yml') ? 7 : 2; // web: ci-gate 1 + deploy 6 · api/admin: ci-gate 1 + deploy 1
       assert.equal(deployIfs, expected);
       assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
       assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');

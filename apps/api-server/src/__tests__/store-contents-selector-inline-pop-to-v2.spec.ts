@@ -34,7 +34,6 @@ const stripComments = (s: string) =>
     .join('\n');
 
 const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
-const PH = join(REPO, 'services', 'web-pharmacy-hub', 'src');
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§1 selector — 인라인 POP 만들기 = POP V2 handoff', () => {
@@ -141,10 +140,6 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§5 boundary — KCos / PH / 공통 Core 무변경', () => {
-  it('PH 에 StoreContentsSelector / snapshot handoff 를 도입하지 않았다', () => {
-    const ph = stripComments(read(PH, 'App.tsx'));
-    expect(ph).not.toMatch(/StoreContentsSelector/);
-  });
 
   it('공통 handoff 계약·resolver 에 serviceKey 분기가 없다', () => {
     const handoff = stripComments(read(REPO, 'packages', 'store-ui-core', 'src', 'components', 'pop-v2', 'handoff.ts'));
