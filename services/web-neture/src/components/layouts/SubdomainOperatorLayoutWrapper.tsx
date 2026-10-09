@@ -23,12 +23,14 @@ type Area = 'admin' | 'operator';
 const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>>> = {
   supplier: {
     approvals: [
+      { label: '서비스 회원 관리', path: '/operator/service-members/supplier' },
       { label: '공급자 승인', path: '/operator/suppliers' },
       { label: '공급자 상태 관리', path: '/admin/supplier-governance' },
     ],
   },
-  funding: { approvals: [{ label: '유통참여형 펀딩', path: '/operator/market-trial' }] },
+  funding: { approvals: [{ label: '서비스 회원 관리', path: '/operator/service-members/funding' },{ label: '유통참여형 펀딩', path: '/operator/market-trial' }] },
   community: { approvals: [
+    { label: '서비스 회원 관리', path: '/operator/service-members/community' },
     { label: '커뮤니티 서비스 관리', path: '/admin/communities' },
     { label: '커뮤니티 개설 심사', path: '/operator/communities' },
   ] },

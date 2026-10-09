@@ -134,7 +134,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
 
   const filteredRoles = isAdmin
     ? assignableRoles
-    : assignableRoles.filter(r => !r.isAdminRole);
+    : assignableRoles.filter(r => !r.isAdminRole && !/(^|:)(admin|operator)$/.test(r.value));
   const availableRoles = filteredRoles.filter(r => !existingRoles.includes(r.value));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -472,7 +472,7 @@ export default function UserDetailPage({
                 </button>
               </>
             )}
-            {(lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
+            {isAdmin && (lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
               <button
                 onClick={() => handleStatusChange('suspended')}
                 disabled={actionLoading === 'status'}
@@ -481,7 +481,7 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {lifecycleStatus === 'suspended' && (
+            {isAdmin && lifecycleStatus === 'suspended' && (
               <button
                 onClick={handleReactivate}
                 disabled={actionLoading === 'reactivate'}
@@ -505,13 +505,13 @@ export default function UserDetailPage({
             >
               <Pencil className="w-4 h-4" />정보 수정
             </button>
-            <button
+            {isAdmin && (<button
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 ml-auto"
             >
               <Trash2 className="w-4 h-4" />삭제
-            </button>
+            </button>)}
           </div>
         </div>
       </section>
@@ -577,12 +577,12 @@ export default function UserDetailPage({
           <Shield className="w-4 h-4 text-slate-500" />
           <h2 className="text-base font-semibold text-slate-800">역할 (Role Assignments)</h2>
           <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
-          <button
+          {isAdmin && (<button
             onClick={() => setShowRoleModal(true)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs ${tc.btnBg} text-white rounded-lg`}
           >
             <Plus className="w-3.5 h-3.5" />역할 추가
-          </button>
+          </button>)}
         </div>
         {roles.length > 0 ? (
           <div className="overflow-x-auto">
@@ -613,7 +613,7 @@ export default function UserDetailPage({
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                     <td className="px-5 py-2.5">
                       <div className="flex items-center justify-end">
-                        {r.isActive && (isAdmin || !r.isAdminRole) && (
+                        {r.isActive && isAdmin && (!config.serviceKey || !/(^|:)(admin|operator)$/.test(r.role)) && (
                           actionLoading === `role-${r.role}` ? (
                             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                           ) : (
@@ -679,7 +679,7 @@ export default function UserDetailPage({
                                 <UserCheck className="w-4 h-4" />
                               </button>
                             )}
-                            {(m.status === 'pending' || m.status === 'active') && (
+                            {(m.status === 'pending' || (isAdmin && m.status === 'active')) && (
                               <button
                                 onClick={() => handleMembershipReject(m.id)}
                                 title="멤버십 거부"
@@ -707,7 +707,7 @@ export default function UserDetailPage({
         <RoleModal
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
-          isAdmin={isAdmin}
+          isAdmin={isAdmin && !config.serviceKey}
           apiAdapter={apiAdapter}
           theme={config.theme}
           onClose={() => setShowRoleModal(false)}

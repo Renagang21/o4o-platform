@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 /**
  * EditUserModal — Neture 회원정보 수정 모달 (thin wrapper)
  *
@@ -55,10 +56,12 @@ export default function EditUserModal({ userId, onClose, onSuccess }: {
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const { user } = useAuth();
+  const canChangeMembershipType = user?.roles?.some(role => role === 'neture:admin' || role === 'platform:super_admin') ?? false;
   return (
     <CommonEditUserModal
       userId={userId}
-      config={NETURE_CONFIG}
+      config={{ ...NETURE_CONFIG, canChangeMembershipType }}
       onClose={onClose}
       onSuccess={onSuccess}
     />

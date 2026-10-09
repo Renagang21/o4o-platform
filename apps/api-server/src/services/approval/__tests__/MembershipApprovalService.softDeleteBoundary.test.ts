@@ -70,7 +70,7 @@ function runQuery(sql: string, params: any[] = []): any {
   if (has(s, 'DELETE FROM role_assignments')) {
     const [userId, likePattern] = params;
     const prefix = String(likePattern).replace(/%$/, '');
-    const removed = db.roles.filter((r) => r.user_id === userId && String(r.role).startsWith(prefix));
+    const removed = db.roles.filter((r) => r.user_id === userId && String(r.role).startsWith(prefix) && (!s.includes('!~') || !/(^|:)(admin|operator|super_admin)$/.test(r.role)));
     db.roles = db.roles.filter((r) => !removed.includes(r));
     return driverShape(s, removed.map((r) => ({ id: r.id })));
   }
@@ -90,7 +90,7 @@ function runQuery(sql: string, params: any[] = []): any {
     const [userId, likePattern] = params;
     const prefix = String(likePattern).replace(/%$/, '');
     const affected = db.roles.filter(
-      (r) => r.user_id === userId && r.is_active === true && String(r.role).startsWith(prefix),
+      (r) => r.user_id === userId && r.is_active === true && String(r.role).startsWith(prefix) && (!s.includes('!~') || !/(^|:)(admin|operator|super_admin)$/.test(r.role)),
     );
     for (const r of affected) r.is_active = false;
     return driverShape(s, affected.map((r) => ({ id: r.id })));
@@ -370,4 +370,13 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
       expect(roleOrUndefined('ra-plat')?.is_active).toBe(true);
     });
   });
+});
+
+
+it.each(['soft', 'hard'] as const)('%s service removal preserves central operator designation', async mode => {
+  seed();
+  db.roles.push({ id: 'central-operator', user_id: 'u1', role: 'neture:operator', is_active: true });
+  const result = await service.deleteMember({ userId: 'u1', deletedBy: 'central-admin', isPlatformAdmin: true, serviceKeys: ['neture'], mode });
+  expect(result).toBe(true);
+  expect(db.roles.find(r => r.id === 'central-operator')?.is_active).toBe(true);
 });

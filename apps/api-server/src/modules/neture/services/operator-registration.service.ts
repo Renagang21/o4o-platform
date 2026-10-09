@@ -76,7 +76,7 @@ export class OperatorRegistrationService {
    * 가입 승인
    * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
    *   1. service_memberships.status → 'active'
-   *   2. users.status → 'ACTIVE' (pending/rejected 모두 처리)
+   *   2. 공통 users 상태는 유지 — 계정 복구는 중앙 계정 관리 전용
    *   3. (제거) role_assignment 생성 · supplier 자동 생성 — Neture 가입 승인은 연결 서비스 원장 · role 을
    *      만들지 않는다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4). 공급자는 공급자 신청 · 승인으로만.
    *
@@ -125,13 +125,7 @@ export class OperatorRegistrationService {
         [approvedBy, userId],
       );
 
-      // 3. users 상태 활성화 (camelCase columns)
-      await queryRunner.query(
-        `UPDATE users
-         SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'rejected')`,
-        [approvedBy, userId],
-      );
+      // Shared account recovery is central; service approval changes membership only.
 
       // 4. Neture 가입 승인은 **role 을 부여하지 않고 공급자도 만들지 않는다** (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E4).
       //   Neture 가입 승인 = 메인 AI 이용 + 연결 서비스 신청 자격. 공급자 · 내 매장(약국) · 세미프랜차이즈는

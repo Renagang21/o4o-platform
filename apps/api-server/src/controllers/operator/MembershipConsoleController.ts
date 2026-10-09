@@ -508,6 +508,7 @@ export class MembershipConsoleController {
       const membership = await approvalService.rejectMembership({
         membershipId,
         reason: reason || null,
+        adminServiceKeys: (req as any).memberAdminServiceKeys,
         isPlatformAdmin: scope.isPlatformAdmin,
         serviceKeys: scope.serviceKeys,
       });
@@ -594,6 +595,9 @@ export class MembershipConsoleController {
               serviceKeys: writeScope.serviceKeys,
             });
           }
+        } else if ((req as any).memberManagementApprovalOnly) {
+          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '가입 승인 이외의 활성화는 서비스 관리자만 가능합니다.' });
+          return;
         } else if (
           await approvalService.reactivateMembership({
             userId,
@@ -607,24 +611,12 @@ export class MembershipConsoleController {
           //   아래 users 화이트리스트 분기로 떨어졌고, 그 화이트리스트가 (정당하게)
           //   'suspended' 를 제외하므로 **200 + 아무 변화 없음** 이었다.
           //   재활성화의 canonical 경로는 이미 존재한다 — reactivateMembership
-          //   (membership + user + role_assignments atomic, POST /:userId/reactivate 와 동일).
+          //   (membership + ordinary roles atomic, POST /:userId/reactivate 와 동일).
           //   비활성화(suspended)의 역동작이므로 활성화 요청은 여기로 위임한다.
           //   경계는 그대로다: 비-platform-admin 은 writeScope.serviceKeys 안의 membership 만
           //   되살리고 users.status='suspended'(플랫폼 조치)는 건드리지 않는다.
         } else {
-          // No pending / reactivatable memberships — just activate user (idempotent)
-          // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-          //   가드 없이 활성화하면 **다른 서비스가 정지시킨 계정을 되살린다.**
-          //   MembershipApprovalService.approveMembership STEP2 와 동일한 status 화이트리스트를
-          //   적용해 'suspended'(플랫폼/타 서비스 정지)는 건드리지 않는다.
-          await AppDataSource.query(
-            `UPDATE users SET status = 'active', "isActive" = true,
-             "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
-             "updatedAt" = NOW()
-             WHERE id = $2
-               AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
-            [updatedBy, userId]
-          );
+          // Already active membership: preserve shared account state (idempotent).
         }
       } else if (status.toLowerCase() === 'suspended') {
         // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: service-level suspend via atomic transaction
@@ -664,6 +656,7 @@ export class MembershipConsoleController {
           const rejected = await approvalService.rejectMembership({
             membershipId: m.id,
             reason: req.body.reason || null,
+            adminServiceKeys: (req as any).memberAdminServiceKeys,
             isPlatformAdmin: writeScope.isPlatformAdmin,
             serviceKeys: writeScope.serviceKeys,
           });
@@ -804,6 +797,9 @@ export class MembershipConsoleController {
                   serviceKeys: writeScope.serviceKeys,
                 });
               }
+            } else if ((req as any).memberManagementApprovalOnly) {
+              results.push({ id: userId, status: 'failed', error: 'SERVICE_MEMBER_ADMIN_REQUIRED' });
+              continue;
             } else if (
               await approvalService.reactivateMembership({
                 userId,
@@ -815,16 +811,7 @@ export class MembershipConsoleController {
               // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
               //   단건 경로와 동일 — suspended/withdrawn 은 canonical reactivate 로 위임한다.
             } else {
-              // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-              //   단건 경로와 동일 가드 — 'suspended' 계정은 되살리지 않는다.
-              await AppDataSource.query(
-                `UPDATE users SET status = 'active', "isActive" = true,
-                 "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
-                 "updatedAt" = NOW()
-                 WHERE id = $2
-                   AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
-                [updatedBy, userId]
-              );
+              // Already active membership: preserve shared account state (idempotent).
             }
           } else if (targetStatus === 'suspended') {
             const result = await approvalService.suspendMembership({
@@ -855,6 +842,7 @@ export class MembershipConsoleController {
               const rejected = await approvalService.rejectMembership({
                 membershipId: m.id,
                 reason: req.body.reason || null,
+                adminServiceKeys: (req as any).memberAdminServiceKeys,
                 isPlatformAdmin: writeScope.isPlatformAdmin,
                 serviceKeys: writeScope.serviceKeys,
               });

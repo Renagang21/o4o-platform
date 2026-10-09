@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 /**
  * MemberManagementPage - KPA-a 회원 관리 (thin wrapper)
  *
@@ -205,6 +206,8 @@ async function fanOutStatusBatch(
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
+  const { user } = useAuth();
+  const canManageLifecycle = user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
   // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1:
   //   가입 신청서(KpaApplication) outer tab·deeplink(?tab=applications)·stats 제거 — dead flow.
   //   회원 승인 canonical 화면만 유지. (?tab=applications 딥링크는 아래 wrapper 가 무시하고 회원 목록 렌더.)
@@ -317,6 +320,7 @@ export default function MemberManagementPage() {
           Action Queue 상태 딥링크(?members_tab=status-suspended 등)를 읽어 해당 탭 자동 선택.
           공용 콘솔의 syncUrl opt-in(URL key=members_tab, 기본 false) 활성화만 — 공용 컴포넌트 무수정. */}
       <OperatorMembersConsolePage
+      canManageLifecycle={canManageLifecycle}
           serviceKey="kpa-society"
           client={client}
           syncUrl
@@ -343,7 +347,7 @@ export default function MemberManagementPage() {
           tableId="kpa-operator-members"
           drawerExtraSections={(u) => <KpaDrawerSections user={u as KpaUserData} />}
           renderEditModal={({ user, onClose, onSuccess }) => (
-            <KpaEditModalSlot user={user as KpaUserData} onClose={onClose} onSuccess={onSuccess} />
+            <KpaEditModalSlot canChangeMembershipType={canManageLifecycle} user={user as KpaUserData} onClose={onClose} onSuccess={onSuccess} />
           )}
           extraRowActions={[
             {
@@ -354,7 +358,7 @@ export default function MemberManagementPage() {
               divider: true,
               visible: (u) => {
                 const k = u as KpaUserData;
-                return k.status === 'active';
+                return canManageLifecycle && k.status === 'active';
               },
               confirm: {
                 title: '회원 정지',
@@ -378,7 +382,7 @@ export default function MemberManagementPage() {
               icon: <CheckCircle size={14} />,
               visible: (u) => {
                 const k = u as KpaUserData;
-                return k.status === 'suspended';
+                return canManageLifecycle && k.status === 'suspended';
               },
               onClick: async (u) => {
                 try {
@@ -390,7 +394,7 @@ export default function MemberManagementPage() {
               },
             },
           ]}
-          extraBulkActions={[
+          extraBulkActions={canManageLifecycle ? [
             {
               key: 'kpa-bulk-suspend',
               label: (n) => `정지 (${n})`,
@@ -399,7 +403,7 @@ export default function MemberManagementPage() {
               getTargetIds: (users) => users
                 .filter((u) => {
                   const k = u as KpaUserData;
-                  return k.status === 'active';
+                  return canManageLifecycle && k.status === 'active';
                 })
                 .map((u) => u.id),
               executeBatch: (ids) => fanOutStatusBatch(ids, 'suspended'),
@@ -418,7 +422,7 @@ export default function MemberManagementPage() {
               getTargetIds: (users) => users
                 .filter((u) => {
                   const k = u as KpaUserData;
-                  return k.status === 'suspended';
+                  return canManageLifecycle && k.status === 'suspended';
                 })
                 .map((u) => u.id),
               executeBatch: (ids) => fanOutStatusBatch(ids, 'active'),
@@ -448,7 +452,7 @@ export default function MemberManagementPage() {
                 variant: 'danger',
               },
             },
-          ]}
+          ] : []}
         />
     </div>
   );
@@ -457,11 +461,13 @@ export default function MemberManagementPage() {
 // ─── KpaEditModalSlot — super_admin / withdrawn guard 적용 ───
 
 function KpaEditModalSlot({
+  canChangeMembershipType,
   user,
   onClose,
   onSuccess,
 }: {
   user: KpaUserData;
+  canChangeMembershipType: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -501,6 +507,7 @@ function KpaEditModalSlot({
 
   return (
     <KpaEditUserModal
+      canChangeMembershipType={canChangeMembershipType}
       member={member}
       makeRequest={kpaEditModalMakeRequest}
       onClose={onClose}

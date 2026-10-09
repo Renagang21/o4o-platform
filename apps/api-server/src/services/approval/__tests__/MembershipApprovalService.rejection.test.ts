@@ -213,7 +213,7 @@ beforeEach(() => {
 });
 
 const reject = (membershipId: string, reason = '서류 미비', serviceKeys = ALL_KEYS) =>
-  service.rejectMembership({ membershipId, reason, isPlatformAdmin: false, serviceKeys });
+  service.rejectMembership({ membershipId, reason, isPlatformAdmin: false, serviceKeys, adminServiceKeys: serviceKeys });
 
 const approve = (membershipId: string, serviceKeys = ALL_KEYS) =>
   service.approveMembership({ membershipId, approvedBy: 'op-1', isPlatformAdmin: false, serviceKeys });
@@ -365,4 +365,12 @@ describe('재승인 정합성 (§4.3)', () => {
     expect(phRoles).toHaveLength(1);
     expect(phRoles[0].is_active).toBe(false);
   });
+});
+
+it('operator rejection cannot restrict an active member or touch other services', async () => {
+  const result = await service.rejectMembership({ membershipId: 'm-kpa', reason: 'fixture', isPlatformAdmin: false, serviceKeys: ['kpa-society'] });
+  expect(result).toBeNull();
+  expect(db.memberships.find(m => m.id === 'm-kpa')!.status).toBe('active');
+  expect(db.users[0].status).toBe('pending');
+  expect(rolledBack).toBe(true);
 });

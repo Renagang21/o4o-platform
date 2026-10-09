@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 /**
  * MembersPage — Pharmacy-Hub 회원 관리 (thin wrapper)
  *
@@ -95,8 +96,11 @@ const membersClient: MembersConsoleClient = {
 };
 
 export default function MembersPage() {
+  const { user } = useAuth();
+  const canManageLifecycle = user?.roles?.some(role => role === 'pharmacy-hub:admin' || role === 'platform:super_admin') ?? false;
   return (
     <OperatorMembersConsolePage
+      canManageLifecycle={canManageLifecycle}
       serviceKey={SERVICE_KEY}
       client={membersClient}
       // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:

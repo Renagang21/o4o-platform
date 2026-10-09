@@ -94,11 +94,11 @@ PR #374로 반영된 역할 회수·운영 scope·쓰기 경계는 유지하고 
 - [x] 최신 main 통합 및 중복/충돌 분류
 - [x] 서비스별 화면 → API → 역할 판정 → 데이터 경계 재조사
 - [x] 회원 목록·상세 조회의 서비스 범위 및 공통 상세·수정 소비처 정비
-- [ ] 현재 회원 관리 업무별 admin/operator 권한 비교와 정책 미정 항목 확인
-- [ ] 결정된 정책 적용 및 공통 계정과 서비스 가입 변경 분리 검증
-- [ ] 서비스별·역할별 회귀, 타입 검사, 영향 빌드/화면 검증
+- [x] 현재 회원 관리 업무별 admin/operator 권한 비교와 사용자 정책 확정
+- [x] 결정된 정책 적용 및 공통 계정과 서비스 가입 변경 분리 검증
+- [x] 서비스별·역할별 회귀, 타입 검사, 영향 빌드/화면 검증
 - [ ] PR 설명 최신화, commit/push, 최신 CI·리뷰 확인
-- [ ] 회원 관리 완료 후 개별 커뮤니티 운영자 후속 조사 항목 정리
+- [x] 회원 관리 구현 후 개별 커뮤니티 운영자 후속 조사 지시서 정리
 
 main 병합·배포는 새 PR 결과를 검토한 사용자의 통합 승인 후 진행한다. 새 권한 차이나 운영 DB 변경은 조사만으로 확정하지 않는다.
 
@@ -145,3 +145,49 @@ admin/operator 권한을 구분할 경우 버튼과 API guard를 함께 변경�
 - frozen install 재검증, dependency/lockfile 변경 없음.
 
 개별 커뮤니티 운영자 조사는 회원 관리 완료 후 진행한다. 이번 단계에서 콘텐츠·업무 운영으로 확대하지 않는다.
+
+
+## 후속 정책 확정·구현 (2026-10-09 사용자 답변)
+
+사용자는 operator의 회원 업무를 조회·승인·반려로, 정지·해제·서비스 탈퇴를 admin으로 확정했다.
+공통 프로필 수정은 서비스 운영자에게 유지하고 공통 계정 상태 복구만 중앙 계정 관리로 한정했다.
+위 조사 당시의 정책 미정 항목은 이 결정으로 대체한다.
+
+- 서버: 회원 lifecycle guard, 활성 회원 반려의 admin 판정, 잠긴 현재 상태 기반 KPA 심사 경계.
+- 계정: 공통 승인·복구, Neture 전용 승인, KPA 승인에서 users 활성 상태 쓰기 제거. 프로필 수정 유지.
+- 운영 권한: 가입 lifecycle이 중앙 운영 tier를 부여·복구·회수하지 않도록 분리. 비활성 가입의 현재 DB 접근 차단.
+- 화면: 공통 목록·상세의 admin lifecycle 버튼 및 서버 정책 정렬, operator 공통 프로필 편집 유지.
+- 소비처: Neture·KPA·Pharmacy-Hub 기존 화면 적용. Lecture·Supplier·Funding·Community에 서비스 가입 회원 콘솔 연결.
+- 서브도메인: 신규 회원 목록·상세를 해당 호스트 소유 경로에 등록. 기존 사업 운영 대표 진입은 유지.
+- 은퇴: K-Cosmetics workspace를 복구하지 않고 공통 API의 canonical key/role prefix 회귀만 유지.
+- DB migration·운영 데이터 변경·dependency/lockfile 변경 없음.
+
+권한 완료 기준: operator의 제한 업무 직접 API 요청 차단, 타 서비스 admin 권한 재사용 차단,
+승인/복구의 공통 계정 상태 불변, 중앙 회수 역할 미복구, 서비스 탈퇴의 중앙 운영자 지정 보존.
+실 사용자·운영 DB E2E는 수행하지 않는다. 로컬 테스트와 synthetic mock API 브라우저 검증을 구분해 보고한다.
+
+### 개별 커뮤니티 운영자 후속 조사 지시서
+
+회원 관리 정비 이후 별도 작업으로 조사한다. 이번 PR은 개별 커뮤니티 운영 기능을 변경하지 않는다.
+
+1. 중앙 service admin/operator 지정과 community_memberships의 개체 operator/admin을 구분한다.
+2. 개설 심사 화면·API, 개별 운영자 지정/변경/해제 화면·API, 그 역할의 실제 저장·접근 판정을 연결한다.
+3. 서비스 운영자와 개체 운영자의 회원 조회·승인·반려·정지·해제·탈퇴 업무를 실제 제공 기능으로 비교한다.
+4. 개체 운영자 해제 후 기존 로그인 접근, 여러 개체 운영, 타 개체 접근, 공통 계정 영향 여부를 확인한다.
+5. 정상/결함/중복·레거시/정책 미정으로 분류한 뒤 수정 계획을 작성한다. 정책은 조사만으로 확정하지 않는다.
+6. 회원 관리 외 콘텐츠·업무 운영은 별도 범위로 둔다.
+
+
+### 정책 반영 로컬 검증
+
+- API 회원 관리/승인/권한 Jest: 15 suites, 293 tests PASS. 별도 Neture integration 1 suite/3 tests는 기존 skip(운영 DB 미접속).
+- Neture 전용 가입 승인 회귀 13 tests에서 공통 users 상태 쓰기 0을 검증한다.
+- UI: 공통 상세 19, 공통 운영 UI 53, Neture 378, KPA 71, Lecture 2 tests PASS.
+- API·operator-core-ui·KPA·Pharmacy-Hub 타입 검사, Neture·Lecture·KPA production build PASS.
+- unsafe route 검사 1,163 files / 위반 0. frozen install 및 공통 패키지 빌드 PASS.
+- mock API browser: Supplier/Funding/Community/Lecture × admin/operator × desktop 1440/mobile 390 = 16 조합 PASS.
+  실제 목록·drawer·상세, operator 프로필 수정, 같은 서비스 admin의 정지/탈퇴 버튼을 확인했다.
+- 중앙 서비스 운영자 지정·변경·회수는 main PR #374의 구현/검증을 유지한다.
+
+현재 단계: 구현·로컬 검증 완료. commit/push 후 최신 CI 및 미해결 리뷰를 확인한다.
+main 통합·배포와 실제 역할 계정 smoke는 별도 통합 승인 이후 절차다.

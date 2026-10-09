@@ -282,11 +282,11 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
     );
   });
 
-  describe('prefixed 역할은 그대로 둔다', () => {
+  describe('service membership cannot restore centrally assigned operational roles', () => {
     it.each(['kpa:admin', 'cosmetics:operator', 'platform:super_admin'])('%s', async (role) => {
       seed('kpa-society', role, 'suspended', role);
       await reactivate();
-      expect(grantedRoles()).toEqual([role]);
+      expect(grantedRoles()).toEqual([]);
     });
   });
 });
