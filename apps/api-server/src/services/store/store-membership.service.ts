@@ -423,7 +423,12 @@ export async function removeStoreMember(
   const services = await linkedServiceKeys(dataSource, organizationId);
   for (const key of services) {
     const remaining: unknown[] = await dataSource.query(
-      `SELECT 1
+      key === 'kpa' ? `SELECT 1
+         FROM organization_members om
+        WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = $2
+          AND EXISTS (SELECT 1 FROM neture_pharmacy_memberships p
+                       WHERE p.organization_id = om.organization_id AND p.status = 'active')
+        LIMIT 1` : `SELECT 1
          FROM organization_members om
         WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = $2
           AND (
@@ -435,7 +440,7 @@ export async function removeStoreMember(
                           AND s.service_key = ANY($4::text[]) AND s.is_active = true)
           )
         LIMIT 1`,
-      [
+      key === 'kpa' ? [input.targetUserId, STORE_STAFF_ROLE] : [
         input.targetUserId,
         STORE_STAFF_ROLE,
         STORE_SERVICE_ORG_LINKAGE[key].enrollmentCodes,

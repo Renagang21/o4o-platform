@@ -101,8 +101,10 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: s
         .map((m) => ({ role: m.role }));
     }
     if (s.startsWith('SELECT 1 FROM organization_members om')) {
-      // 해제 뒤 "같은 서비스에 남은 매장이 있나" — 가짜에서는 linkage 를 참으로 보고 관계만 센다.
-      return members.filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1]).slice(0, 1).map(() => ({ ok: 1 }));
+      // Pharmacy access requires the current active ledger even when legacy linkage remains.
+      return members.filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1]
+        && (!s.includes('neture_pharmacy_memberships') || seed.activePharmacyOrganizations?.includes(m.organization_id)))
+        .slice(0, 1).map(() => ({ ok: 1 }));
     }
     if (s.startsWith('SELECT om.organization_id, o.name')) {
       return members
@@ -555,6 +557,7 @@ describe('M7 Role ∧ Relationship', () => {
     // 다른 매장에 아직 남아 있으면 → 회수하지 않는다(그쪽 접근까지 끊지 않는다).
     removeRoleMock.mockClear();
     const two = makeDs({
+      activePharmacyOrganizations: [ORG_A, ORG_B],
       members: [
         { organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
         { organization_id: ORG_B, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
@@ -562,5 +565,18 @@ describe('M7 Role ∧ Relationship', () => {
     });
     await removeStoreMember(two.ds, { ownerUserId: OWNER, targetUserId: STAFF });
     expect(removeRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('다른 매장에 옛 가입 관계만 남아 있으면 현재 pharmacy role을 유지하지 않는다', async () => {
+    asOwnerOf(ORG_A);
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
+    const { ds } = makeDs({
+      activePharmacyOrganizations: [ORG_A],
+      members: [ORG_A, ORG_B].map(organization_id => ({
+        organization_id, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null,
+      })),
+    });
+    await removeStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF });
+    expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
   });
 });
