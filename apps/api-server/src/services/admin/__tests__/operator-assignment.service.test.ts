@@ -94,17 +94,17 @@ describe('assign — 역할 부여', () => {
   it('Google 연결된 기존 사용자에게 role 과 membership 만 부여한다', async () => {
     const h = makeHarness({ user: USER, linked: LINKED });
 
-    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'pharmacy-hub', role: 'pharmacy-hub:operator', assignedBy: 'admin-1' });
+    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'kpa-society', role: 'kpa:operator', assignedBy: 'admin-1' });
 
     expect(r).toMatchObject({
       userId: 'user-1',
-      serviceKey: 'pharmacy-hub',
-      role: 'pharmacy-hub:operator',
+      serviceKey: 'kpa-society',
+      role: 'kpa:operator',
       rolePolicy: 'ASSIGNED',
       membershipPolicy: 'CREATED',
     });
     expect(assignRoleMock).toHaveBeenCalledWith(
-      { userId: 'user-1', role: 'pharmacy-hub:operator', assignedBy: 'admin-1' },
+      { userId: 'user-1', role: 'kpa:operator', assignedBy: 'admin-1' },
       expect.anything(),
     );
     expect(h.writes.users).toHaveLength(0);
@@ -123,7 +123,7 @@ describe('assign — 역할 부여', () => {
 
   it('없는 사용자는 404 USER_NOT_FOUND — 만들지 않는다', async () => {
     const h = makeHarness({ user: null });
-    await expect(h.service.assign({ userId: 'ghost', serviceKey: 'pharmacy-hub', role: 'pharmacy-hub:operator' }))
+    await expect(h.service.assign({ userId: 'ghost', serviceKey: 'kpa-society', role: 'kpa:operator' }))
       .rejects.toMatchObject({ code: 'USER_NOT_FOUND', statusCode: 404 });
     expect(h.writes.users).toHaveLength(0);
     expect(assignRoleMock).not.toHaveBeenCalled();
@@ -131,11 +131,20 @@ describe('assign — 역할 부여', () => {
 
   it('Google 연결이 없으면 409 GOOGLE_LINK_REQUIRED — 대신 연결해 주지 않는다', async () => {
     const h = makeHarness({ user: USER, linked: null });
-    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'pharmacy-hub', role: 'pharmacy-hub:operator' }))
+    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'kpa-society', role: 'kpa:operator' }))
       .rejects.toMatchObject({ code: 'GOOGLE_LINK_REQUIRED', statusCode: 409 });
     expect(h.writes.linkedAccounts).toHaveLength(0);
     expect(h.writes.credentials).toHaveLength(0);
     expect(assignRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('퇴역 PH 운영자 역할은 아무 원장도 쓰지 않고 거절한다', async () => {
+    const h = makeHarness({ user: USER, linked: LINKED });
+    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'pharmacy-hub', role: 'pharmacy-hub:operator' }))
+      .rejects.toMatchObject({ code: 'ROLE_NOT_ASSIGNABLE' });
+    expect(h.dataSource.transaction).not.toHaveBeenCalled();
+    expect(assignRoleMock).not.toHaveBeenCalled();
+    expect(h.writes.memberships).toHaveLength(0);
   });
 
   it('platform:super_admin 은 이 경로로 부여할 수 없다', async () => {
@@ -147,7 +156,7 @@ describe('assign — 역할 부여', () => {
 
   it('role 과 serviceKey 가 어긋나면 SERVICE_KEY_MISMATCH — 트랜잭션 전에 걸린다', async () => {
     const h = makeHarness({ user: USER, linked: LINKED });
-    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'pharmacy-hub', role: 'kpa:operator' }))
+    await expect(h.service.assign({ userId: 'user-1', serviceKey: 'neture', role: 'kpa:operator' }))
       .rejects.toMatchObject({ code: 'SERVICE_KEY_MISMATCH' });
     expect(h.dataSource.transaction).not.toHaveBeenCalled();
   });
@@ -156,11 +165,11 @@ describe('assign — 역할 부여', () => {
     const h = makeHarness({
       user: USER,
       linked: LINKED,
-      existingMembership: { userId: 'user-1', serviceKey: 'pharmacy-hub', status: 'pending' },
+      existingMembership: { userId: 'user-1', serviceKey: 'kpa-society', status: 'pending' },
     });
-    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'pharmacy-hub', role: 'pharmacy-hub:operator' });
+    const r = await h.service.assign({ userId: 'user-1', serviceKey: 'kpa-society', role: 'kpa:operator' });
     expect(h.writes.memberships).toHaveLength(0);
-    expect(r).toMatchObject({ membershipPolicy: 'KEEP_EXISTING_STATUS', membershipStatuses: { 'pharmacy-hub': 'pending' } });
+    expect(r).toMatchObject({ membershipPolicy: 'KEEP_EXISTING_STATUS', membershipStatuses: { 'kpa-society': 'pending' } });
   });
 });
 

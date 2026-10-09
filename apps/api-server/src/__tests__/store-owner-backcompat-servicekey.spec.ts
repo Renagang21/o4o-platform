@@ -58,9 +58,9 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   /**
    * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §5):
    *   약국 매장(`kpa`)은 JWT membership 사전 검사를 하지 않고 내 매장(약국) 신청 원장으로 판정한다.
-   *   membership 게이트 계약은 그 계약을 유지하는 서비스(cosmetics · pharmacy-hub)로 고정한다.
+   *   membership 게이트 계약은 그 계약을 유지하는 서비스(cosmetics)로 고정한다. PH는 퇴역해 항상 차단한다.
    */
-  const membershipGated = services.filter((s) => s !== 'kpa');
+  const membershipGated = services.filter((s) => s !== 'kpa' && s !== 'pharmacy-hub');
 
   it.each(membershipGated)('%s store_owner + 같은 서비스 active membership → PASS', async (svc) => {
     const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-' + svc, role: 'owner' }]]);
@@ -97,8 +97,8 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   });
 
   it('multi-service 계정이라도 현재 route 의 serviceKey 조직만 후보로 조회한다', async () => {
-    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-ph', role: 'owner' }]]);
-    const guard = createRequireStoreOwner(dataSource, 'pharmacy-hub');
+    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-cos', role: 'owner' }]]);
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const req: any = {
       user: {
         id: 'u1',
@@ -112,11 +112,12 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
     await guard(req, makeRes(), jest.fn());
 
-    expect(req.organizationId).toBe('org-ph');
-    // 조직 후보 조회 SQL 에 pharmacy-hub linkage 만 들어간다 (타 서비스 조직 fallback 금지)
+    expect(req.organizationId).toBe('org-cos');
+    // 조직 후보 조회 SQL 에 cosmetics linkage 만 들어간다 (타 서비스 조직 fallback 금지)
     const orgCall = dataSource.query.mock.calls[2];
     expect(orgCall[0]).toContain('organization_service_enrollments');
-    expect(JSON.stringify(orgCall[1])).toContain('pharmacy-hub');
+    expect(JSON.stringify(orgCall[1])).toContain('cosmetics');
+    expect(JSON.stringify(orgCall[1])).not.toContain('pharmacy-hub');
     expect(JSON.stringify(orgCall[1])).not.toContain('kpa');
   });
 

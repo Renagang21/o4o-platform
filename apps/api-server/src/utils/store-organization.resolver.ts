@@ -202,10 +202,62 @@ export async function findStoreOrganizationCandidates(
   }));
 }
 
+interface StoreRetirementIdentity {
+  retired_store_identity: boolean;
+  current_store_identity: boolean;
+}
+
+// Use the same statement snapshot for candidate relationships and service identity.
+const RETIREMENT_IDENTITY_PARAMETERS = [
+  STORE_SERVICE_ORG_LINKAGE['pharmacy-hub'].enrollmentCodes,
+  STORE_SERVICE_ORG_LINKAGE['pharmacy-hub'].slugKeys,
+  // Pharmacy approval comes only from npm, never legacy KPA enrollment or slug records.
+  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub' && key !== 'kpa').flatMap(([, value]) => value.enrollmentCodes))],
+  [...new Set(Object.entries(STORE_SERVICE_ORG_LINKAGE).filter(([key]) => key !== 'pharmacy-hub' && key !== 'kpa').flatMap(([, value]) => value.slugKeys))],
+];
+
+function storeRetirementIdentityProjection(
+  organization: 'om.organization_id' | 'organization_members.organization_id' | '$1',
+  firstParameter: 2 | 3,
+): string {
+  return `(EXISTS (
+             SELECT 1 FROM organization_service_enrollments e
+              WHERE e.organization_id = ${organization} AND e.service_code = ANY($${firstParameter}::text[])
+           ) OR EXISTS (
+             SELECT 1 FROM platform_store_slugs s
+              WHERE s.store_id = ${organization} AND s.service_key = ANY($${firstParameter + 1}::text[])
+           )) AS retired_store_identity,
+          (EXISTS (
+             SELECT 1 FROM neture_pharmacy_memberships npm
+              WHERE npm.organization_id = ${organization} AND npm.status = 'active'
+           ) OR EXISTS (
+             SELECT 1 FROM organization_service_enrollments e
+              WHERE e.organization_id = ${organization}
+                AND e.service_code = ANY($${firstParameter + 2}::text[]) AND e.status = 'active'
+           ) OR EXISTS (
+             SELECT 1 FROM platform_store_slugs s
+              WHERE s.store_id = ${organization}
+                AND s.service_key = ANY($${firstParameter + 3}::text[]) AND s.is_active = true
+           )) AS current_store_identity`;
+}
+
+function isCurrentStoreCandidate(row: StoreRetirementIdentity): boolean {
+  return !row.retired_store_identity || row.current_store_identity === true;
+}
+
+/** Shared PH-only organization boundary for public Store consumers, before reads or scan writes. */
+export async function isRetiredPharmacyHubOrganization(dataSource: DataSource, organizationId: string): Promise<boolean> {
+  const [identity]: StoreRetirementIdentity[] = await dataSource.query(
+    `SELECT ${storeRetirementIdentityProjection('$1', 2)}`,
+    [organizationId, ...RETIREMENT_IDENTITY_PARAMETERS],
+  );
+  return identity?.retired_store_identity === true && identity.current_store_identity !== true;
+}
+
 /**
  * 서비스 조건 없는 매장 조직 후보 raw 행.
  *
- * 기존 back-compat 경로가 쓰던 쿼리 그대로다(허용 집합 불변). 별도 함수로 노출해
+ * 기존 관계 후보에서 PH-only 퇴역 조직을 제외한다. 현재 매장 원장/연결이 함께 있으면 유지한다. 별도 함수로 노출해
  * `utils/buyer-organization.resolver.ts` 의 selection-validation 이 같은 SSOT 를 쓰게 한다
  * (WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1).
  */
@@ -218,15 +270,16 @@ async function findUnscopedStoreOrganizationRows(
             om.organization_id AS organization_id,
             om.role            AS role,
             om.is_primary      AS is_primary,
-            om.joined_at       AS joined_at
+            om.joined_at       AS joined_at,
+            ${storeRetirementIdentityProjection('om.organization_id', 3)}
        FROM organization_members om
       WHERE om.user_id = $1
         AND om.role = ANY($2::text[])
         AND om.left_at IS NULL
       ORDER BY om.organization_id, om.role`,
-    [userId, STORE_MEMBER_ROLES],
+    [userId, STORE_MEMBER_ROLES, ...RETIREMENT_IDENTITY_PARAMETERS],
   );
-  return rows as Array<{
+  return (rows as StoreRetirementIdentity[]).filter(isCurrentStoreCandidate) as Array<StoreRetirementIdentity & {
     organization_id: string;
     role: string;
     is_primary: boolean | null;
@@ -265,20 +318,21 @@ export async function findStoreMemberOrganizationCandidates(
 ): Promise<StoreOrganizationCandidate[]> {
   if (!userId) return [];
   const rows = (await dataSource.query(
-    `SELECT organization_id, role
+    `SELECT organization_id, role,
+            ${storeRetirementIdentityProjection('organization_members.organization_id', 2)}
        FROM organization_members
       WHERE user_id = $1 AND left_at IS NULL AND role = 'staff'
       ORDER BY is_primary DESC, joined_at ASC, organization_id ASC`,
-    [userId],
-  )) as Array<{ organization_id: string; role: string }>;
-  return rows.map((r) => ({ organizationId: r.organization_id, memberRole: r.role }));
+    [userId, ...RETIREMENT_IDENTITY_PARAMETERS],
+  )) as Array<StoreRetirementIdentity & { organization_id: string; role: string }>;
+  return rows.filter(isCurrentStoreCandidate).map((r) => ({ organizationId: r.organization_id, memberRole: r.role }));
 }
 
 /**
  * 매장 조직 확정.
  *
  * @param serviceKey 지정 시 해당 서비스에 등록된 조직만 후보가 된다.
- *                   미지정 시 back-compat — 허용 집합은 기존과 동일하되 선택이 결정적이다.
+ *                   미지정 시 현재 관계 후보에서 PH-only 조직은 제외하고 선택은 결정적으로 한다.
  * @param preferredOrganizationId 클라이언트가 고른 매장(`X-Store-Organization-Id`). **선택 힌트일 뿐 권한 근거가
  *                   아니다** — 위 후보 집합 안에 있을 때만 쓰이고, 밖이면 없는 것과 같다.
  */
@@ -325,7 +379,7 @@ export async function resolveStoreOrganization(
     };
   }
 
-  // back-compat: 서비스 조건 없음. 허용 집합 불변 + 선택만 결정적.
+  // 서비스 미지정: PH-only 퇴역 조직은 후보에서 제외하고 현재 후보의 선택은 결정적으로 한다.
   const list = await findUnscopedStoreOrganizationRows(dataSource, userId);
   if (list.length === 0) return NONE;
 

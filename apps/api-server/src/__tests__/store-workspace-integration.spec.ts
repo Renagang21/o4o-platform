@@ -5,7 +5,7 @@
  *   1. 대표 홈 "내 매장" 노출 서비스 = catalog `storeWorkspaceEnabled` ∩ store_owner role registry 파생
  *      (하드코딩 목록 drift 0 — neture / kpa-branch / cafe24-b2b 임의 포함 0)
  *   2. §21 합성 시나리오 매장 A: KPA active · KCos active · PH inactive
- *      → My Services 가 KPA + KCos 진입 가능, PH 는 inactive 로 명확 표시
+ *      → My Services는 현재 KPA 진입만 허용하고 퇴역 PH 진입은 제외
  *   3. 다른 조직 enrollment 가 섞이면 FAIL (fold 는 조직 단위 입력만 받는다)
  *
  * 순수 단위 테스트 — DB 접속 없음.
@@ -22,7 +22,7 @@ describe('listStoreCapableServices — catalog storeWorkspaceEnabled 파생 (WO 
   const list = listStoreCapableServices();
   const keys = list.map((s) => s.serviceKey);
 
-  it('kpa-society 만 대상이다 (K-Cosmetics · PharmacyHub 은퇴)', () => {
+  it('kpa-society는 대상이고 PH·K-Cosmetics는 퇴역했다', () => {
     expect(keys.sort()).toEqual(['kpa-society']);
   });
 
@@ -60,13 +60,13 @@ describe('My Services 합성 시나리오 매장 A (WO §21)', () => {
     { organization_id: ORG_A, service_code: 'pharmacy-hub', status: 'inactive' },
   ];
 
-  it('KPA 는 workspaceAvailable=true, 종료된 KCos 는 active 라도 workspaceAvailable=false, PH 는 inactive 로 구분된다', () => {
+  it('KPA 는 workspaceAvailable=true, 종료된 KCos 는 active 라도 workspaceAvailable=false, 퇴역 PH 는 진입을 만들지 않는다', () => {
     const services = foldEnrollmentsToStoreServices(ORG_A, rows);
     const byKey = Object.fromEntries(services.map((s) => [s.serviceKey, s]));
 
     expect(byKey['kpa-society']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: true, organizationId: ORG_A });
     expect(byKey['k-cosmetics']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: false, organizationId: ORG_A });
-    expect(byKey['pharmacy-hub']).toMatchObject({ enrollmentStatus: 'inactive', workspaceAvailable: false, organizationId: ORG_A });
+    expect(byKey['pharmacy-hub']).toBeUndefined();
 
     const shown = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable).map((s) => s.serviceKey);
     expect(shown).toEqual(['kpa-society']);

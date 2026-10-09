@@ -67,8 +67,6 @@ export const TERMS_PENDING_ALLOWLIST: ReadonlySet<string> = new Set([
   'GET /api/v1/auth/policy-acceptances',
   'POST /api/v1/auth/policy-acceptances',
   // ── 서비스별 가입 상태 조회 (제한 로그인 allowlist 와 동일 — 승인 대기 화면 유지) ──
-  'GET /api/v1/pharmacy-hub/join/status',
-  'GET /api/v1/pharmacy-hub/me/access',
   'GET /api/v1/kpa/me/membership',
   'GET /api/v1/cosmetics/members/me',
 ]);

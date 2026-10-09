@@ -697,6 +697,22 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
     //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
 
+    // WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1: PH API is unmounted.
+    // Keep completion handling for payments already recorded in the common ledger; no new PH payment producer remains.
+    try {
+
+      // WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1:
+      //   결제 완료 → 주문 paid 전이 → 공급자 fulfillment bridge.
+      //   serviceKey='pharmacy-hub' 구독이라 Neture 핸들러와 서로 간섭하지 않는다.
+      const { initializePharmacyHubPaymentHandler } = await import(
+        '../services/pharmacy-hub/PharmacyHubPaymentEventHandler.js'
+      );
+      initializePharmacyHubPaymentHandler(dataSource);
+      logger.info('✅ PharmacyHubPaymentEventHandler initialized');
+    } catch (pharmacyHubError) {
+      logger.error('Failed to initialize historical payment completion handler:', pharmacyHubError);
+    }
+
     // 27c. Register KPA Branch routes
     //      WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
     //      분회 209개를 동급 tenant 로 두는 단일 라우터. 분회별 백엔드를 만들지 않는다.

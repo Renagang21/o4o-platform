@@ -180,7 +180,7 @@ describe('B. generateHandoff', () => {
   ])('서비스 가입 상태 %j 와 무관하게 인증 이동 허용 · 가입 원장 변경 없음 (%s)', async (rows, code) => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'pharmacy-hub' }, 'https://neture.co.kr'), res);
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'kpa-society' }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
     expect(sqlCalls().join(' ')).not.toMatch(/INSERT INTO service_memberships|UPDATE service_memberships/);
   });
@@ -324,11 +324,11 @@ describe('C. exchangeHandoff', () => {
   });
 
   it('일반 서비스 토큰은 회귀 0 — neture.co.kr 에서 받은 kpa 토큰도 기존처럼 kpa membership 으로 판정', async () => {
-    consumed('pharmacy-hub', 'neture');
+    consumed('kpa-society', 'neture');
     findOne.mockResolvedValueOnce(KPA_ONLY_USER);
     query.mockResolvedValueOnce(KPA_ONLY_MEMBERSHIPS); // pharmacy-hub membership 없음
     const res = mockRes();
-    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacyhub.co.kr', undefined), res);
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacy.neture.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
     expect(generateTokens).toHaveBeenCalled();
   });

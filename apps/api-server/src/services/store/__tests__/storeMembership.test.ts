@@ -59,7 +59,7 @@ const OUTSIDER = 'outsider-1';
 type Row = Record<string, any>;
 
 /** organization_members · users 를 메모리로 둔 가짜 DataSource. SQL 모양으로 분기한다. */
-function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
+function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: string[]; activePharmacyOrganizations?: string[] } = {}) {
   const members: Row[] = seed.members ?? [];
   const users: Row[] = seed.users ?? [];
   const sql: string[] = [];
@@ -68,6 +68,12 @@ function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
 
+    if (s.startsWith('SELECT 1 WHERE EXISTS')) {
+      return seed.retiredOrganizations?.includes(p[0]) ? [{ linked: 1 }] : [];
+    }
+    if (s.startsWith('SELECT 1 FROM neture_pharmacy_memberships')) {
+      return seed.activePharmacyOrganizations?.includes(p[0]) ? [{ active: 1 }] : [];
+    }
     if (s.startsWith('SELECT organization_id, role FROM organization_members')) {
       return members
         .filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1])
@@ -95,8 +101,10 @@ function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
         .map((m) => ({ role: m.role }));
     }
     if (s.startsWith('SELECT 1 FROM organization_members om')) {
-      // 해제 뒤 "같은 서비스에 남은 매장이 있나" — 가짜에서는 linkage 를 참으로 보고 관계만 센다.
-      return members.filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1]).slice(0, 1).map(() => ({ ok: 1 }));
+      // Pharmacy access requires the current active ledger even when legacy linkage remains.
+      return members.filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1]
+        && (!s.includes('neture_pharmacy_memberships') || seed.activePharmacyOrganizations?.includes(m.organization_id)))
+        .slice(0, 1).map(() => ({ ok: 1 }));
     }
     if (s.startsWith('SELECT om.organization_id, o.name')) {
       return members
@@ -175,7 +183,7 @@ describe('M1·M2 접근 결정', () => {
 
   it("'staff' 는 member · 'invited' 는 none — 수락 전에는 매장이 보이지 않는다", async () => {
     asNotOwner();
-    const staff = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    const staff = makeDs({ activePharmacyOrganizations: [ORG_A], members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     await expect(resolveStoreAccessLevel(staff.ds, STAFF, 'kpa')).resolves.toMatchObject({
       level: 'member',
       organizationId: ORG_A,
@@ -207,7 +215,7 @@ describe('M1·M2 접근 결정', () => {
 describe('M2·M3 격리', () => {
   it('다른 매장 id 를 선택 힌트로 줘도 자기 매장 밖으로 나가지 않는다', async () => {
     asNotOwner();
-    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    const { ds } = makeDs({ activePharmacyOrganizations: [ORG_A], members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     // ORG_B 를 요청해도 후보에 없으므로 ORG_B 로 해석되지 않는다.
     const access = await resolveStoreAccessLevel(ds, STAFF, 'kpa', ORG_B);
     expect(access.organizationId).not.toBe(ORG_B);
@@ -226,7 +234,7 @@ describe('M2·M3 격리', () => {
 describe('M4 쓰기는 Owner 전용 · 조직은 요청이 고르지 않는다', () => {
   it('Member 는 초대할 수 없다', async () => {
     asNotOwner();
-    const { ds } = makeDs({
+    const { ds } = makeDs({ activePharmacyOrganizations: [ORG_A],
       members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }],
       users: [{ id: OUTSIDER, email: 'new@example.com' }],
     });
@@ -313,6 +321,34 @@ describe('M5 수락은 받은 본인만', () => {
     expect(members).toEqual([]);
   });
 
+  it('PH-only invitations are hidden while mixed and current invitations stay actionable without changing history', async () => {
+    const { ds, members } = makeDs({ activePharmacyOrganizations: [ORG_B], members: [
+      { organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null },
+      { organization_id: ORG_B, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null },
+    ] });
+    const original = JSON.parse(JSON.stringify(members));
+    linkedMock.mockImplementation(async (_ds: any, org: string, key: string) =>
+      key === 'pharmacy-hub' || (org === ORG_B && key === 'kpa'));
+    await expect(listMyInvitations(ds, STAFF)).resolves.toEqual([
+      { organizationId: ORG_B, organizationName: '테스트 매장' },
+    ]);
+    expect(members).toEqual(original);
+    linkedMock.mockImplementation(async (_ds: any, _org: string, key: string) => key === 'kpa');
+    expect(await listMyInvitations(ds, STAFF)).toHaveLength(2);
+  });
+
+  it('inactive PH history cannot return as an unscoped actionable invitation', async () => {
+    const { ds, members } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+    });
+    linkedMock.mockResolvedValue(false);
+    await expect(listMyInvitations(ds, STAFF)).resolves.toEqual([]);
+    await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+    expect(members[0].role).toBe(STORE_INVITED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+  });
+
   it('내가 받은 초대만 목록에 나온다', async () => {
     const { ds } = makeDs({
       members: [
@@ -323,6 +359,22 @@ describe('M5 수락은 받은 본인만', () => {
     await expect(listMyInvitations(ds, STAFF)).resolves.toEqual([
       { organizationId: ORG_A, organizationName: '테스트 매장' },
     ]);
+  });
+
+  it('current Store ledger keeps invitations actionable without franchise enrollment or slugs, despite PH history', async () => {
+    const { ds, members } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+      activePharmacyOrganizations: [ORG_A],
+    });
+    linkedMock.mockResolvedValue(false);
+    expect(await listMyInvitations(ds, STAFF)).toHaveLength(1);
+    expect(await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A })).toMatchObject({ services: ['kpa'] });
+    expect(members[0].role).toBe(STORE_STAFF_ROLE);
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'kpa:store_member' }));
+    asNotOwner();
+    expect(await resolveStoreAccessLevel(ds, STAFF, 'kpa')).toMatchObject({ level: 'member', organizationId: ORG_A });
   });
 });
 
@@ -381,7 +433,7 @@ describe('목록', () => {
 
   it('Member 는 구성원 목록을 보지 못한다', async () => {
     asNotOwner();
-    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    const { ds } = makeDs({ activePharmacyOrganizations: [ORG_A], members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     await expectCode(listStoreMembers(ds, STAFF, 'kpa'), 'STORE_OWNER_REQUIRED');
   });
 });
@@ -408,7 +460,7 @@ describe('M7 Role ∧ Relationship', () => {
   });
 
   it('수락이 role 을 발급한다 — 조직이 등록된 서비스만', async () => {
-    const { ds } = makeDs({
+    const { ds } = makeDs({ activePharmacyOrganizations: [ORG_A],
       members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
     });
     linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
@@ -418,6 +470,73 @@ describe('M7 Role ∧ Relationship', () => {
     expect(r.services).toEqual(['kpa']);
     expect(assignRoleMock).toHaveBeenCalledTimes(1);
     expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member' }));
+  });
+
+  it('현재 매장에 PH 과거 linkage가 함께 남아도 PH role을 새로 발급하지 않는다', async () => {
+    const { ds } = makeDs({ activePharmacyOrganizations: [ORG_A], members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa' || key === 'pharmacy-hub');
+    const result = await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A });
+    expect(result.services).toEqual(['kpa']);
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'kpa:store_member' }));
+  });
+
+  it('PH 전용 초대는 관계·role을 새로 활성화하지 않는다', async () => {
+    const { ds, sql } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'pharmacy-hub');
+    await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+    expect(sql.some((query: string) => query.startsWith('UPDATE'))).toBe(false);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('기존 PH staff 관계도 PH 매장 권한을 열지 않는다', async () => {
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    expect(await resolveStoreAccessLevel(ds, STAFF, 'pharmacy-hub')).toEqual({ level: 'none', organizationId: null, memberRole: null });
+  });
+
+  it('PH member role만 남으면 서비스 중립 매장 접근도 허용하지 않는다', async () => {
+    asNotOwner();
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    hasAnyRoleMock.mockImplementation(async (_user: string, roles: string[]) => roles.includes('pharmacy-hub:store_member'));
+    expect((await resolveStoreAccessLevel(ds, STAFF)).level).toBe('none');
+  });
+
+  it('a current member role and retired PH relationship cannot reopen a PH-only store', async () => {
+    asNotOwner();
+    linkedMock.mockResolvedValue(false);
+    const { ds } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+    });
+    expect((await resolveStoreAccessLevel(ds, STAFF, undefined, ORG_A)).level).toBe('none');
+  });
+
+  it('legacy KPA enrollment cannot authorize a PH organization without active current Store approval', async () => {
+    const { ds, members } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+      activePharmacyOrganizations: [],
+    });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa' || key === 'pharmacy-hub');
+    expect(await listMyInvitations(ds, STAFF)).toEqual([]);
+    await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+    expect(members[0].role).toBe(STORE_INVITED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+    members[0].role = STORE_STAFF_ROLE;
+    asNotOwner();
+    expect((await resolveStoreAccessLevel(ds, STAFF, undefined, ORG_A)).level).toBe('none');
+    expect((await resolveStoreAccessLevel(ds, STAFF, 'kpa', ORG_A)).level).toBe('none');
+  });
+
+  it('a retired selection hint cannot suppress access to an independent current Store', async () => {
+    asNotOwner();
+    linkedMock.mockResolvedValue(false);
+    const { ds } = makeDs({
+      members: [ORG_A, ORG_B].map(organization_id => ({ organization_id, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null })),
+      retiredOrganizations: [ORG_A],
+      activePharmacyOrganizations: [ORG_B],
+    });
+    expect(await resolveStoreAccessLevel(ds, STAFF, undefined, ORG_A)).toMatchObject({ level: 'member', organizationId: ORG_B });
   });
 
   it('초대가 없으면 role 도 발급되지 않는다', async () => {
@@ -431,13 +550,14 @@ describe('M7 Role ∧ Relationship', () => {
     linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
 
     // 이 매장 하나뿐 → 회수한다.
-    const only = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    const only = makeDs({ activePharmacyOrganizations: [ORG_A], members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     await removeStoreMember(only.ds, { ownerUserId: OWNER, targetUserId: STAFF });
     expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
 
     // 다른 매장에 아직 남아 있으면 → 회수하지 않는다(그쪽 접근까지 끊지 않는다).
     removeRoleMock.mockClear();
     const two = makeDs({
+      activePharmacyOrganizations: [ORG_A, ORG_B],
       members: [
         { organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
         { organization_id: ORG_B, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null },
@@ -445,5 +565,18 @@ describe('M7 Role ∧ Relationship', () => {
     });
     await removeStoreMember(two.ds, { ownerUserId: OWNER, targetUserId: STAFF });
     expect(removeRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('다른 매장에 옛 가입 관계만 남아 있으면 현재 pharmacy role을 유지하지 않는다', async () => {
+    asOwnerOf(ORG_A);
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa');
+    const { ds } = makeDs({
+      activePharmacyOrganizations: [ORG_A],
+      members: [ORG_A, ORG_B].map(organization_id => ({
+        organization_id, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null,
+      })),
+    });
+    await removeStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF });
+    expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
   });
 });

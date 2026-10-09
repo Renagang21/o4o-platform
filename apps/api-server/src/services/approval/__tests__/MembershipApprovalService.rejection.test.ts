@@ -306,6 +306,10 @@ describe('rejectMembership — KPA 동기화 (D2 부수 효과)', () => {
 });
 
 describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEMENT-PUBLISH-PREREQUISITES §4)', () => {
+  beforeEach(() => {
+    db.memberships[0].service_key = 'k-cosmetics';
+    db.memberships[0].role = 'cosmetics:store_owner';
+  });
   it('사업자정보가 누락되면 StoreOwnerBusinessInfoRequiredError 로 롤백하고 active role 을 만들지 않는다', async () => {
     db.users[0].businessInfo = { ...COMPLETE_BUSINESS_INFO, businessNumber: '' };
 
@@ -313,7 +317,7 @@ describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEME
 
     expect(rolledBack).toBe(true);
     expect(committed).toBe(false);
-    expect(db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner' && r.is_active)).toHaveLength(0);
+    expect(db.roles.filter((r) => r.role === 'cosmetics:store_owner' && r.is_active)).toHaveLength(0);
   });
 
   it('누락 항목을 missingFields 로 보고한다', async () => {
@@ -334,36 +338,40 @@ describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEME
 });
 
 describe('재승인 정합성 (§4.3)', () => {
+  beforeEach(() => {
+    db.memberships[0].service_key = 'k-cosmetics';
+    db.memberships[0].role = 'cosmetics:store_owner';
+  });
   it('rejected → approved 시 기존 role row 를 재활성화하고 중복 active row 를 만들지 않는다', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
 
     await reject('m-ph');
     const approved = await approve('m-ph');
 
     expect(approved!.status).toBe('active');
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
-    expect(phRoles).toHaveLength(1);
-    expect(phRoles[0].is_active).toBe(true);
-    expect(phRoles[0].id).toBe('ra-ph');
+    const currentRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
+    expect(currentRoles).toHaveLength(1);
+    expect(currentRoles[0].is_active).toBe(true);
+    expect(currentRoles[0].id).toBe('ra-ph');
   });
 
   it('기존 role row 가 없으면 생성한다', async () => {
     await approve('m-ph');
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
-    expect(phRoles).toHaveLength(1);
-    expect(phRoles[0].is_active).toBe(true);
+    const currentRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
+    expect(currentRoles).toHaveLength(1);
+    expect(currentRoles[0].is_active).toBe(true);
   });
 
   it('반려 → 승인 → 반려 를 반복해도 unique constraint 를 위반하지 않는다', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
 
     await reject('m-ph');
     await approve('m-ph');
     await reject('m-ph');
 
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
-    expect(phRoles).toHaveLength(1);
-    expect(phRoles[0].is_active).toBe(false);
+    const currentRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
+    expect(currentRoles).toHaveLength(1);
+    expect(currentRoles[0].is_active).toBe(false);
   });
 });
 

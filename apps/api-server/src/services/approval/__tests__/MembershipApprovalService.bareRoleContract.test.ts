@@ -2,7 +2,7 @@
  * WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9
  *
  * 멤버십 lifecycle 이 **접두어 없는 서비스 역할을 새로 만들지 않는다**는 계약을
- * 5개 서비스 전부에 대해 고정한다.
+ * 현재 3개 서비스의 역할 정규화와 PH 신규 승인 차단을 고정한다.
  *
  * 두 가지를 함께 본다.
  *
@@ -133,11 +133,10 @@ const COMPLETE_BUSINESS_INFO = {
   businessPhone: '02-000-0000',
 };
 
-/** 5개 서비스 canonical service_key → 기대 role prefix (security-core SSOT 와 같아야 한다) */
+/** 현재 3개 서비스 canonical service_key → 기대 role prefix (security-core SSOT 와 같아야 한다) */
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
   { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
   { serviceKey: 'neture', prefix: 'neture' },
 ];
 
@@ -197,7 +196,18 @@ const reactivate = () =>
     serviceKeys: [],
   });
 
-describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지 않는다 (5개 서비스)', () => {
+describe('퇴역 PH의 신규 가입 승인은 원장·역할을 변경하지 않는다', () => {
+  it.each(['pending', 'rejected'])('%s 가입도 활성화할 수 없다', async status => {
+    seed('pharmacy-hub', 'store_owner', 'pending');
+    db.memberships[0].status = status;
+    await expect(approve()).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+    expect(db.memberships[0].status).toBe(status);
+    expect(grantedRoles()).toEqual([]);
+    expect(queries.some(q => /^(UPDATE|INSERT)/i.test(q.sql))).toBe(false);
+  });
+});
+
+describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지 않는다 (현재 3개 서비스)', () => {
   describe.each(SERVICES)('$serviceKey', ({ serviceKey, prefix }) => {
     it.each(['member', 'store_owner'])(
       "legacy bare membership role '%s' 승인 → 자기 서비스 prefix 가 붙는다",

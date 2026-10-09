@@ -120,7 +120,7 @@ const service = new MembershipApprovalService();
 function seed(userStatus: string) {
   db = {
     memberships: [
-      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' },
+      { id: 'm-cos', user_id: 'u1', service_key: 'k-cosmetics', role: 'member', status: 'suspended' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'suspended' },
     ],
     roles: [{ id: 'ra-1', user_id: 'u1', role: 'member', is_active: false }],
@@ -137,7 +137,7 @@ const reactivateAsOperator = () =>
     userId: 'u1',
     reactivatedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['pharmacy-hub'],
+    serviceKeys: ['k-cosmetics'],
   });
 
 const reactivateAsPlatformAdmin = () =>
@@ -149,6 +149,36 @@ const reactivateAsPlatformAdmin = () =>
   });
 
 describe('reactivateMembership — 플랫폼 정지 경계', () => {
+  describe('PH 퇴역', () => {
+    it.each(['suspended', 'withdrawn'])('PH 명시 복구(%s)는 어떤 역할·회원·계정 쓰기도 하지 않는다', async status => {
+      seed('deleted');
+      db.memberships = [{ id: 'old-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy-hub:store_owner', status }];
+      await expect(service.reactivateMembership({ userId: 'u1', reactivatedBy: 'admin', isPlatformAdmin: true, serviceKeys: ['pharmacy-hub'] }))
+        .rejects.toMatchObject({ code: 'SERVICE_RETIRED' });
+      expect(db.memberships[0].status).toBe(status);
+      expect(user().status).toBe('deleted');
+      expect(queries.some(q => /^(UPDATE|INSERT)/i.test(q.sql))).toBe(false);
+    });
+
+    it('전체 복구에 현재 가입과 PH가 섞이면 현재 가입만 복구한다', async () => {
+      seed('deleted');
+      db.memberships.push({ id: 'old-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy-hub:store_owner', status: 'suspended' });
+      const result = await reactivateAsPlatformAdmin();
+      expect(result?.reactivatedMemberships).toBe(2);
+      expect(db.memberships.find(m => m.id === 'old-ph')?.status).toBe('suspended');
+      expect(queries.filter(q => q.sql.startsWith('UPDATE service_memberships'))[0].params[1]).toEqual(['m-cos', 'm-kpa']);
+      expect(queries.some(q => q.params.includes('pharmacy-hub:store_owner'))).toBe(false);
+    });
+
+    it('PH만 남은 전체 복구는 현재 계정/역할을 활성화하지 않는다', async () => {
+      seed('deleted');
+      db.memberships = [{ id: 'old-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy-hub:store_owner', status: 'withdrawn' }];
+      await expect(reactivateAsPlatformAdmin()).rejects.toMatchObject({ code: 'SERVICE_RETIRED' });
+      expect(user().status).toBe('deleted');
+      expect(queries.some(q => /^(UPDATE|INSERT)/i.test(q.sql))).toBe(false);
+    });
+  });
+
   describe('서비스 운영자', () => {
     it('플랫폼 정지(users.status=suspended)를 해제하지 못한다', async () => {
       seed('suspended');
@@ -168,7 +198,7 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 
       await reactivateAsOperator();
 
-      expect(db.memberships.find((m) => m.id === 'm-ph')!.status).toBe('active');
+      expect(db.memberships.find((m) => m.id === 'm-cos')!.status).toBe('active');
     });
 
     it('다른 서비스 membership 은 건드리지 않는다', async () => {
@@ -213,7 +243,7 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 
       await reactivateAsPlatformAdmin();
 
-      expect(db.memberships.find((m) => m.id === 'm-ph')!.status).toBe('active');
+      expect(db.memberships.find((m) => m.id === 'm-cos')!.status).toBe('active');
       expect(db.memberships.find((m) => m.id === 'm-kpa')!.status).toBe('active');
     });
   });

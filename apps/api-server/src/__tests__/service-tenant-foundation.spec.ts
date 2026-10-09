@@ -109,7 +109,7 @@ describe('Service Workspace metadata — identity 와 별도 축', () => {
 });
 
 describe('Store ↔ Service (1 Store : N Services)', () => {
-  it('Store A: 현행 active 서비스만 workspaceAvailable, 은퇴 서비스는 목록에 남되 false — 순서 결정적', async () => {
+  it('Store A: KPA는 이용 가능하고 퇴역 PH는 노출하지 않는다 — 순서 결정적', async () => {
     const { dataSource, calls } = makeDataSource([[memberRow(STORE_A)], STORE_A_ENROLLMENTS]);
 
     const r = await resolveStoreServices(dataSource, { userId: USER_X });
@@ -119,7 +119,6 @@ describe('Store ↔ Service (1 Store : N Services)', () => {
     expect(r.services.map((s) => [s.serviceKey, s.enrollmentStatus, s.workspaceAvailable])).toEqual([
       ['k-cosmetics', 'inactive', false],
       ['kpa-society', 'active', true],
-      ['pharmacy-hub', 'active', false],
     ]);
     expect(r.services.every((s) => s.organizationId === STORE_A)).toBe(true);
     // 1) organization_members 소유 후보 → 2) 그 조직으로 스코프된 enrollment 질의
@@ -213,10 +212,10 @@ describe('Service ↔ Store (1 Service : N Stores)', () => {
 
   it('includeInactive 면 inactive 매장도 구분되어 나온다', async () => {
     const { dataSource } = makeDataSource([[
-      { organization_id: STORE_A, service_code: 'pharmacy-hub', status: 'active' },
-      { organization_id: 'org-c', service_code: 'pharmacy-hub', status: 'inactive' },
+      { organization_id: STORE_A, service_code: 'kpa-society', status: 'active' },
+      { organization_id: 'org-c', service_code: 'kpa-society', status: 'inactive' },
     ]]);
-    const list = await listEnrolledStoreOrganizationIds(dataSource, 'pharmacy-hub', { includeInactive: true });
+    const list = await listEnrolledStoreOrganizationIds(dataSource, 'kpa-society', { includeInactive: true });
     expect(list).toEqual([
       { organizationId: STORE_A, enrollmentStatus: 'active' },
       { organizationId: 'org-c', enrollmentStatus: 'inactive' },
@@ -231,24 +230,22 @@ describe('Service ↔ Store (1 Service : N Stores)', () => {
 });
 
 describe('Operator ↔ Service (1 Operator : N Services)', () => {
-  it('User X: kpa:operator + pharmacy-hub:admin — 두 서비스 모두 canonical key 로 나온다', async () => {
+  it('User X: kpa:operator만 운영 workspace가 되며 퇴역 PH role은 제외된다', async () => {
     const { dataSource, calls } = makeDataSource([
       [{ role: 'kpa:operator' }, { role: 'pharmacy-hub:admin' }],
       [{ status: 'active' }], // kpa-society membership
-      [{ status: 'active' }], // pharmacy-hub membership
     ]);
 
     const list = await resolveOperatorServices(dataSource, USER_X);
 
     expect(list.map((s) => [s.serviceKey, s.scope, s.workspaceAvailable])).toEqual([
       ['kpa-society', 'operator', true],
-      ['pharmacy-hub', 'admin', false],
     ]);
     expect(norm(calls[0].sql)).toContain('role_assignments');
     expect(calls[0].params).toEqual([USER_X]);
     // membership 질의는 canonical key 로 (별칭 'kpa' 아님)
     expect(calls[1].params).toEqual([USER_X, 'kpa-society']);
-    expect(calls[2].params).toEqual([USER_X, 'pharmacy-hub']);
+    expect(calls).toHaveLength(2);
   });
 
   it('role 만 있고 membership 이 active 가 아니면 운영 서비스가 아니다 (membership guard 와 동일 정책)', async () => {

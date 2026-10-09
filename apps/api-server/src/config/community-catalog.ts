@@ -116,9 +116,9 @@ export function communityKeyForServiceEntry(serviceKey: string | null | undefine
   return O4O_COMMUNITIES.find((c) => c.entries.some((e) => e.serviceKey === k))?.key;
 }
 
-/** Stored forum identity survives retirement of its original web entry. */
+/** Forum 원장의 저장 코드는 퇴역한 웹 진입과 별개다. 기존 게시판의 커뮤니티 권한 판정에 사용한다. */
 export function communityKeyForForumStorageCode(storageCode: string | null | undefined): string | undefined {
-  const k = String(storageCode ?? '').trim();
-  if (!k) return undefined;
-  return O4O_COMMUNITIES.find(c => c.forumStorageCodes.includes(k))?.key;
+  const code = String(storageCode ?? '').trim();
+  if (!code) return undefined;
+  return O4O_COMMUNITIES.find(c => c.forumStorageCodes.includes(code))?.key;
 }

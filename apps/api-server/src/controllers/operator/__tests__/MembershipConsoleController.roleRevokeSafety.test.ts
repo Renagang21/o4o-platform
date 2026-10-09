@@ -515,8 +515,8 @@ describe('tier 제한 — 카탈로그 플래그 + 이름 규칙 이중 판정',
 });
 
 it.each(['assignMemberRole', 'removeMemberRole'] as const)('%s validates a bare role against its catalogue service, not a forged body serviceKey', async action => {
-  mockGetRoleByName.mockResolvedValue({ name: 'member', serviceKey: 'pharmacy-hub', roleKey: 'member', isAdminRole: false, isAssignable: true });
-  const request = makeReq(TARGET_ID, 'member', { isPlatformAdmin: false, serviceKeys: ['neture', 'pharmacy-hub'], rolePrefixes: ['neture', 'pharmacy-hub'] });
+  mockGetRoleByName.mockResolvedValue({ name: 'member', serviceKey: 'supplier', roleKey: 'member', isAdminRole: false, isAssignable: true });
+  const request = makeReq(TARGET_ID, 'member', { isPlatformAdmin: false, serviceKeys: ['neture', 'supplier'], rolePrefixes: ['neture', 'supplier'] });
   request.body = { role: 'member', serviceKey: 'neture' };
   request.memberAdminServiceKeys = ['neture'];
   const response = makeRes();

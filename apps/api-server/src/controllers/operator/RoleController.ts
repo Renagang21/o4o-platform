@@ -13,6 +13,7 @@ import {
 } from '@o4o/security-core';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
+import { PHARMACY_HUB_SERVICE_KEY, isPharmacyHubRole } from '../../utils/service-retirement.js';
 
 /**
  * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D4)
@@ -69,7 +70,8 @@ export class RoleController {
         roles = allRoles;
       }
 
-      res.json({ success: true, data: roles.map(r => r.toJSON()) });
+      // 할당 모달의 목록만 제외한다. 기존 할당 조회·회수는 별도 경로로 유지한다.
+      res.json({ success: true, data: roles.filter(r => r.serviceKey !== PHARMACY_HUB_SERVICE_KEY && !isPharmacyHubRole(r.name)).map(r => r.toJSON()) });
     } catch (error) {
       logger.error('[RoleController] getRoles error', {
         error: error instanceof Error ? error.message : String(error),
@@ -118,6 +120,10 @@ export class RoleController {
 
       if (!name || !displayName || !serviceKey || !roleKey) {
         res.status(400).json({ success: false, error: 'name, displayName, serviceKey, roleKey are required' });
+        return;
+      }
+      if (resolveCanonicalServiceKey(serviceKey) === PHARMACY_HUB_SERVICE_KEY || isPharmacyHubRole(name)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: '종료된 서비스의 역할은 생성할 수 없습니다.' });
         return;
       }
 

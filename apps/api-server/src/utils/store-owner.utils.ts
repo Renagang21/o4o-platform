@@ -53,21 +53,14 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
  * - kpa        : `kpa:store_owner` (약국 사업자 서비스 `kpa-society` = pharmacy.neture.co.kr 의 매장 경영자.
  *                `kpa` 는 legacy/internal role prefix 일 뿐 — KPA 분회(kpa.neture.co.kr · `kpa-branch`)와 무관)
  * - cosmetics  : `cosmetics:store_owner` (화장품 · 일반 소매 사업자 서비스 `k-cosmetics` = retail.neture.co.kr)
- * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
- *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
- *                W1(프로비저닝)이 organizations / organization_members(owner) /
- *                organization_service_enrollments / platform_store_slugs 를 생성해도
- *                이 registry 에 없으면 isStoreOwner() 가 role 게이트에서 종료되어
- *                organizationId 를 반환하지 못했다 (CHECK-PHARMACY-HUB-STORE-SUBJECT-
- *                PROVISIONING-V1 §8-5). 등록으로 공통 매장 API 진입을 복구한다.
+ * 퇴역 PH 역할은 과거 원장에 남아도 공통 매장 capability를 열지 않는다.
  */
-const STORE_OWNER_ROLES_BY_SERVICE = {
+const STORE_OWNER_ROLES_BY_SERVICE: Partial<Record<StoreOwnerServiceKey, readonly string[]>> = {
   // `neture:store_owner` = 내 매장(약국) 신청 승인 약국(WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1).
   //   `kpa` 매장 판정 자체는 아래 isStoreOwner 에서 내 매장(약국) 신청 원장으로 한다 — 이 목록은 role 기반 소비처용.
   kpa: ['kpa:store_owner', 'neture:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
-  'pharmacy-hub': ['pharmacy-hub:store_owner'],
-} as const;
+};
 
 /**
  * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
@@ -82,7 +75,7 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
  */
 const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
   STORE_OWNER_ROLES_BY_SERVICE,
-).flat();
+).flatMap((roles) => roles ?? []);
 
 /**
  * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 (§18):
@@ -103,7 +96,7 @@ export function listStoreCapableServices(): StoreCapableService[] {
   for (const prefix of Object.keys(STORE_OWNER_ROLES_BY_SERVICE) as StoreOwnerServiceKey[]) {
     const serviceKey = resolveCanonicalServiceKey(prefix);
     if (!getServiceWorkspaceCapability(serviceKey).storeWorkspaceEnabled) continue;
-    out.push({ serviceKey, rolePrefix: prefix, storeOwnerRole: STORE_OWNER_ROLES_BY_SERVICE[prefix][0] });
+    out.push({ serviceKey, rolePrefix: prefix, storeOwnerRole: STORE_OWNER_ROLES_BY_SERVICE[prefix]![0] });
   }
   return out;
 }
@@ -131,8 +124,16 @@ export async function isStoreOwner(
   preferredOrganizationId?: string | null,
 ): Promise<StoreOwnerCheckResult> {
   const allowedRoles: readonly string[] = serviceKey
-    ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
+    ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey] ?? []
     : ALL_STORE_OWNER_ROLES;
+
+  if (allowedRoles.length === 0) {
+    return {
+      isOwner: false, organizationId: null, memberRole: '',
+      resolution: { status: 'none', organizationId: null, memberRole: '', candidateCount: 0 },
+      pendingAgreement: null,
+    };
+  }
 
   // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7
   //   canonical 계약: **membership = 서비스에 들어갈 수 있느냐**, role = 그 안에서 무엇을
@@ -184,7 +185,7 @@ export async function isStoreOwner(
       )
     : await dataSource.query(
         `SELECT 1 FROM service_memberships
-         WHERE user_id = $1 AND status = 'active'
+         WHERE user_id = $1 AND status = 'active' AND service_key <> 'pharmacy-hub'
          LIMIT 1`,
         [userId]
       );
@@ -291,7 +292,7 @@ export function createRequireStoreOwner(
         });
         return;
       }
-      if (!memberships.some((m) => m.status === 'active')) {
+      if (!memberships.some((m) => m.status === 'active' && m.serviceKey !== 'pharmacy-hub')) {
         res.status(403).json({
           success: false,
           error: 'No active service membership. Active membership required.',

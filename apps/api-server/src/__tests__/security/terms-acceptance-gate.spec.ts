@@ -230,6 +230,47 @@ describe('checkSignupTermsDocument (§9)', () => {
 // ─────────────────────────────────────────────────────
 
 describe('PolicyAcceptanceService', () => {
+  it.each(['active', 'pending'])('퇴역 PH만 미동의인 %s 회원은 현재 API를 이용할 수 있고 동의 원장을 변경하지 않는다', async status => {
+    publishedRows = [publishedDoc(DOC_DRAFT, 'pharmacy-hub')];
+    membershipRows = [{ serviceKey: 'pharmacy-hub', status }];
+    const res = await request(makeApp()).get('/api/v1/kpa/forum/posts').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(200);
+    expect(await policyAcceptanceService.getPendingForUser(USER_ID)).toEqual([]);
+    expect(acceptedIds).toEqual([]);
+    expect(queryLog.some(q => q.includes('INSERT INTO user_policy_acceptances'))).toBe(false);
+    expect(queryLog.some(q => q.includes('UPDATE users'))).toBe(false);
+  });
+
+  it('PH와 현재 서비스를 함께 가입해도 현재 약관 동의는 계속 요구한다', async () => {
+    publishedRows = [publishedDoc(DOC_DRAFT, 'pharmacy-hub'), publishedDoc(DOC_KPA, 'kpa-society')];
+    membershipRows = [{ serviceKey: 'pharmacy-hub', status: 'active' }, { serviceKey: 'kpa-society', status: 'active' }];
+    const res = await request(makeApp()).get('/api/v1/kpa/forum/posts').set('Authorization', `Bearer ${makeToken()}`);
+    expect(res.status).toBe(428);
+    expect((await policyAcceptanceService.getPendingForUser(USER_ID)).map(p => p.serviceKey)).toEqual(['kpa-society']);
+    await policyAcceptanceService.recordAcceptance({ userId: USER_ID, serviceKey: 'kpa-society', policyDocumentId: DOC_KPA });
+    expect((await request(makeApp()).get('/api/v1/kpa/forum/posts').set('Authorization', `Bearer ${makeToken()}`)).status).toBe(200);
+    expect(acceptedIds).toEqual([DOC_KPA]);
+  });
+
+  it('PH 경영자 계약도 pending에서 제외하며 과거 역할로 새로운 동의를 쓰지 않는다', async () => {
+    publishedRows = [{ ...publishedDoc(DOC_DRAFT, 'pharmacy-hub'), document_type: 'store_owner_agreement' }];
+    membershipRows = [{ serviceKey: 'pharmacy-hub', status: 'active' }];
+    activeRoles = ['pharmacy-hub:store_owner'];
+    expect(await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(USER_ID)).toEqual([]);
+    const res = await request(makeApp()).post('/api/v1/auth/policy-acceptances')
+      .set('Authorization', `Bearer ${makeToken()}`)
+      .send({ serviceKey: 'pharmacy-hub', policyDocumentId: DOC_DRAFT, documentType: 'store_owner_agreement' });
+    expect(res.status).toBe(410);
+    expect(res.body.code).toBe('SERVICE_RETIRED');
+    expect(acceptedIds).toEqual([]);
+  });
+
+  it('PH 약관 동의의 서비스 직접 호출도 원장 쓰기 전에 거부한다', async () => {
+    await expect(policyAcceptanceService.recordAcceptance({ userId: USER_ID, serviceKey: 'pharmacy-hub', policyDocumentId: DOC_DRAFT }))
+      .rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+    expect(queryLog).toEqual([]);
+  });
+
   it('published terms 0 이면 acceptance 테이블을 조회하지 않는다 (§25 — migration 전 배포 안전)', async () => {
     membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
     const svc = new PolicyAcceptanceService(() => ({ query: fakeQuery } as any));

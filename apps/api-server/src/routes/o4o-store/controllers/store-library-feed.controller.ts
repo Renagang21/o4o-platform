@@ -43,7 +43,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
+import { resolveLegacyKpaMemberOrganization } from '../services/store-legacy-organization.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 
@@ -54,8 +54,7 @@ async function resolveDualOrgId(dataSource: DataSource, userId: string): Promise
   // kpa_members fallback. direct 작성/조회와 조회 일관성 유지를 위함.
   const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
   if (orgFromRa) return orgFromRa;
-  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
+  return resolveLegacyKpaMemberOrganization(dataSource, userId);
 }
 
 export function createStoreLibraryFeedController(

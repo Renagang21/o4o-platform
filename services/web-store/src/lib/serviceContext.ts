@@ -2,10 +2,10 @@
  * Service Context — Unified Store Workspace 의 2차 축 (WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4)
  *
  * 1차 축은 organizationId(선택된 매장)다. 그 매장이 등록한 서비스(enrollment)는 2차 축이며,
- * 백엔드 매장 API 는 여전히 서비스 mount(`/api/v1/kpa|pharmacy-hub/...`) 아래에 있으므로
+ * 백엔드 매장 API 는 여전히 서비스 mount(`/api/v1/kpa/...`) 아래에 있으므로
  * 화면은 "지금 어느 서비스 문맥으로 호출하는가"만 정한다. 서비스 전환은 workspace 안의 문맥 전환이며 handoff 가 아니다.
  *
- *   - 공통 매장 업무(내 매장): 매장의 enrollment 중 canonical 우선순위(KPA → PH)로 **1개**를 공통 문맥으로 쓴다.
+ *   - 공통 매장 업무(내 매장): 매장의 enrollment 중 canonical 우선순위(KPA)로 **1개**를 공통 문맥으로 쓴다.
  *     (KPA 가 공통 기능의 reference implementation 이다.)
  *   - K-Cosmetics(`k-cosmetics`)는 종료돼 이 workspace 의 서비스 문맥이 아니다 — 그 enrollment 는 업무공간 없는 서비스로
  *     표시만 된다(서버 API `/api/v1/cosmetics/*` 제거, WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
@@ -31,7 +31,7 @@ export const SERVICE_LABEL: Readonly<Record<UnifiedServiceKey, string>> = Object
   'kpa-society': 'KPA Society',
 });
 
-/** 공통 매장 업무의 문맥 우선순위 — KPA(reference) → PH */
+/** 공통 매장 업무의 문맥 우선순위 — KPA(reference) */
 export const COMMON_CONTEXT_PRIORITY: readonly UnifiedServiceKey[] = ['kpa-society'];
 
 export function isUnifiedServiceKey(v: unknown): v is UnifiedServiceKey {
@@ -60,7 +60,7 @@ export function pickCommonServiceContext(enrolled: readonly string[]): UnifiedSe
  * 서비스 지정 매장 화면(`/work/<serviceKey>/store/*`) — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-13
  *
  * 각 서비스의 매장 경영자용 `/store` 를 store.neture.co.kr 로 옮길 때, 공통 `/store/*` 화면이 우선순위
- * (KPA → PH)가 아니라 **진입한 서비스**의 API 로 동작해야 한다. 진입 시 서비스를 세션에 고정하고,
+ * (KPA)가 아니라 **진입한 서비스**의 API 로 동작해야 한다. 진입 시 서비스를 세션에 고정하고,
  * 화면 안의 `/store/...` 링크로 이동해도 같은 서비스가 유지되게 한다(링크 수정 불요).
  * 고정값은 그 매장의 활성 서비스일 때만 쓰인다(StoreContext 가 검증) — 서버 권한 판정은 그대로다.
  */

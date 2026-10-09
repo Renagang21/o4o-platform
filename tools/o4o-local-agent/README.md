@@ -174,6 +174,8 @@ PC 를 여러 대 연결해도 됩니다. **어느 PC 에서 실행할지는 O4O
 **업데이트**: 자동 업데이트가 없습니다. 새 코드로 바꾼 뒤 `node src/index.mjs run` 으로 다시 시작하면 local.db 가 v8 로 올라갑니다
 (시작 전 자동 백업). 업데이트하지 않은 0.1.0 agent 도 계속 동작하지만, 그 PC 의 업무 기억은 소유 주체로 나뉘지 않습니다.
 
+**Pharmacy Hub 퇴역:** PH root/www는 pairing Origin 허용 목록에서 제외했습니다. 이미 설치된 실행 사본도 이 변경이 반영된 코드로 갱신하고 재시작해야 합니다. PH 도메인 등록 종료 전에 모든 설치 PC에서 두 PH Origin의 `/health` 요청이 403인지 확인합니다. 실행 사본 갱신 순서와 확인 명령은 [PH 퇴역 WO §5](../../docs/work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md#5-운영-인프라-제거-절차)에 있습니다. 이 origin 수정은 `agentVersion` 문자열만으로 구분되지 않으므로 적용 commit과 실제 실행 사본을 확인합니다.
+
 **0.3.0 (WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1)** — 브라우저 작업을 화면 동작 하나씩이 아니라 **작업 단위**로 받습니다.
 관찰 · 같은 화면의 행동 묶음 · 저장된 절차 재생을 이 PC 가 이어서 실행하고, 화면이 예상과 다르거나(대상 없음 · 모호 · 다른 사이트 · 이동 결과 다름)
 로그인 · 비밀번호 · 주문/결제/제출 확정 단계면 그 자리에서 멈춰 O4O Assistant 에게 판단을 돌려줍니다. 각 단계는 예전과 같은 검사를 지납니다.

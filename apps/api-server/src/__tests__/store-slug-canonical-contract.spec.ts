@@ -91,6 +91,10 @@ describe('§4 slug 생성 규칙 ↔ validation 규칙 정합', () => {
   });
 });
 
+describe('§4 서비스 로컬 정규화 중복 제거', () => {
+
+});
+
 describe('§5 public store slug SSOT = platform_store_slugs', () => {
   it('cosmetics 신규 매장 생성 경로는 제거됐다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)', () => {
     // cosmetics_stores.slug 를 쓰던 생성 경로(routes/cosmetics/services/cosmetics-store.service.ts)가 API 와 함께 사라졌다.

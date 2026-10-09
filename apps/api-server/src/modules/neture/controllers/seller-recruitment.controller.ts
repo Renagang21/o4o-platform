@@ -102,6 +102,9 @@ export function createSellerRecruitmentController(deps: {
       if (!userId) return unauthorized(res);
       const result = await service.reopenRecruitment(req.params.recruitmentId, userId);
       if (!result.success) {
+        if (result.error === 'SERVICE_RETIRED') {
+          return res.status(410).json({ success: false, error: result.error, message: '종료된 서비스의 모집은 재개할 수 없습니다.' });
+        }
         return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '모집을 찾을 수 없습니다.' });
       }
       res.json({ success: true, data: result.data });
@@ -141,6 +144,7 @@ export function createSellerRecruitmentController(deps: {
         const map: Record<string, [number, string]> = {
           MASTER_ID_REQUIRED: [400, '제품 정보가 필요합니다.'],
           SERVICE_KEY_REQUIRED: [400, '모집 대상 서비스를 선택해 주세요.'],
+          SERVICE_RETIRED: [410, '종료된 서비스에는 모집을 생성할 수 없습니다.'],
           OFFER_NOT_FOUND: [404, '등록된 제품(공급 오퍼)을 찾을 수 없습니다.'],
           OFFER_NOT_PRIVATE: [400, '판매자 모집은 PRIVATE(판매자 제한) 유통 제품만 가능합니다. 제품을 PRIVATE 유통으로 설정한 뒤 다시 시도해 주세요.'],
           DRUG_SERVICE_NOT_PHARMACY_AUDIENCE: [400, '의약품·규제 상품은 약국 대상 서비스에만 모집할 수 있습니다.'],
@@ -186,6 +190,9 @@ export function createSellerRecruitmentController(deps: {
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       const msg = (error as Error).message;
+      if (msg === 'SERVICE_RETIRED') {
+        return res.status(410).json({ success: false, error: msg, message: '종료된 서비스의 모집에는 참여할 수 없습니다.' });
+      }
       if (msg === 'RECRUITMENT_NOT_FOUND') {
         return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '모집 공고를 찾을 수 없습니다.' });
       }
@@ -254,6 +261,10 @@ export function createSellerRecruitmentController(deps: {
 
   const decisionErrors = (res: Response, error: unknown, verb: string): void => {
     const msg = (error as Error).message;
+    if (msg === 'SERVICE_RETIRED') {
+      res.status(410).json({ success: false, error: msg, message: '종료된 서비스의 모집은 승인할 수 없습니다.' });
+      return;
+    }
     if (msg === 'APPLICATION_NOT_FOUND') {
       res.status(404).json({ success: false, error: 'NOT_FOUND', message: '신청을 찾을 수 없습니다.' });
       return;

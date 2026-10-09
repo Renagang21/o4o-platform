@@ -26,6 +26,7 @@ const codeOnly = (s: string) =>
     .join('\n');
 
 const KPA = join(REPO, 'services', 'web-kpa-society', 'src');
+// K-Cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 const CORE = join(REPO, 'packages', 'store-ui-core', 'src');
 const GUIDE = join(REPO, 'packages', 'shared-space-ui', 'src', 'guide', 'copy');
 
@@ -80,6 +81,8 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
     }
   });
 
+
+
   it('프론트 어디에도 legacy generate endpoint 호출이 없다', () => {
     const walk = (dir: string, out: string[] = []): string[] => {
       for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -89,6 +92,10 @@ describe('§2 frontend — legacy page/component/api 제거 · old route redirec
       }
       return out;
     };
+    const hits = [KPA]
+      .flatMap((d) => walk(d))
+      .filter((f) => /pharmacy\/pop\/(generate|source\/supplier-items)/.test(codeOnly(readFileSync(f, 'utf-8'))));
+    expect(hits).toEqual([]);
   });
 
   it('매장 메뉴 KPA · KCos 블록의 POP 항목은 pop-v2 다', () => {
@@ -132,6 +139,7 @@ describe('§4 preserve — store_pops HUB 축 · V2 · historical entity · sche
     expect(existsSync(join(SRC, 'services', 'store', 'store-pop.service.ts'))).toBe(true);
     expect(existsSync(join(SRC, 'routes', 'o4o-store', 'controllers', 'pop.controller.ts'))).toBe(true);
     expect(existsSync(join(SRC, 'routes', 'o4o-store', 'controllers', 'operator-pop.controller.ts'))).toBe(true);
+    expect(existsSync(join(SRC, 'controllers', 'pharmacy-hub', 'PharmacyHubStorePopController.ts'))).toBe(false);
     expect(read(SRC, 'routes', 'o4o-store', 'controllers', 'pop.controller.ts')).toMatch(/store-pop\.service\.js/);
   });
 

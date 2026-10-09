@@ -158,6 +158,8 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     expect(kpa.get('/operator/roles')).toBe('operations_management');
   });
 
+
+
   it.each([
     ['web-kpa-society', KPA_MENU],
   ] as const)('%s: dashboard 를 제외한 모든 항목이 정확히 한 도메인에 배치된다 (누락 0 · 중복 0)', (_svc, menu) => {
@@ -185,6 +187,14 @@ describe('메뉴 항목(route) 단위 도메인 분류 (WO §9 · §10)', () => 
     expect(c).toContain('resolveDomainGroupItems(menuItems, domainIAConfig)');
     expect(c).not.toMatch(/serviceKey\s*===/);
     expect(c).not.toMatch(/'kpa-society'|'k-cosmetics'|'pharmacy-hub'|'neture'/);
+  });
+
+  it('KPA 운영자는 서비스 전용 도메인 IA config 없이 표준 기본값을 쓴다', () => {
+        for (const w of [
+      'services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx',
+    ]) {
+      expect(code(w)).not.toContain('domainIAConfig=');
+    }
   });
 });
 
@@ -347,6 +357,7 @@ describe('Supplier → Service Operator 수신함 (WO §12)', () => {
     expect(c).toContain("authorRole: 'supplier'");
     expect(c).toContain('/cms/contents/${row.id}/status');
     expect(c).not.toMatch(/handoff_receipts|supplier_handoffs|workflow/i);
+    // 서비스 페이지는 자기 serviceKey 만 넘긴다
   });
 
   it('제공 측(SupplierContentService.submit) 계약은 그대로다 — KPA 만 kpa_approval_requests, 그 외는 cms 행이 수신함', () => {

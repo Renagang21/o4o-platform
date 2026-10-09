@@ -26,6 +26,8 @@
 
 import type { DataSource } from 'typeorm';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { PHARMACY_HUB_SERVICE_KEY } from '../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../utils/store-organization.resolver.js';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -132,6 +134,7 @@ export async function resolvePublicQrLanding(
   serviceKey: string | undefined,
   scan: QrScanMeta,
 ): Promise<QrResult<Record<string, unknown>>> {
+  if (serviceKey && resolveCanonicalServiceKey(serviceKey) === PHARMACY_HUB_SERVICE_KEY) return NOT_FOUND;
   const rows = await dataSource.query(
     `SELECT
        qr.id,
@@ -177,6 +180,16 @@ export async function resolvePublicQrLanding(
     return NOT_FOUND;
   }
 
+  // Enrollment-only and inactive PH history also close before recording a scan.
+  if (await isRetiredPharmacyHubOrganization(dataSource, qrData.organizationId)) return NOT_FOUND;
+  const allStoreRows: Array<{ slug: string; service_key: string; is_active: boolean }> = await dataSource.query(
+    `SELECT slug, service_key, is_active FROM platform_store_slugs
+     WHERE store_id = $1
+     ORDER BY created_at DESC`,
+    [qrData.organizationId],
+  );
+  const storeRows = allStoreRows.filter((r) => r.is_active !== false && r.service_key !== PHARMACY_HUB_SERVICE_KEY);
+
   // 5초 중복 방지: 같은 ipHash + qrCodeId
   //
   // WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1:
@@ -214,18 +227,7 @@ export async function resolvePublicQrLanding(
       console.error('[QR Scan Event] Insert failed:', err);
     });
 
-  // 매장(조직)은 서비스마다 slug 를 가질 수 있다(1 Store : N Services). storeSlug 는 종전대로 최신 slug.
-  const storeRows: Array<{ slug: string; service_key: string }> = await dataSource.query(
-    `SELECT slug, service_key FROM platform_store_slugs
-     WHERE store_id = $1 AND is_active = true
-     ORDER BY created_at DESC`,
-    [qrData.organizationId],
-  );
-  // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
-  //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·
-  //   중첩 QR 주소)은 서비스 축을 쓰므로, 매장이 **호출 호스트 서비스의 slug 를 하나도 갖지 않을 때만** 매장의
-  //   최신 slug 서비스 축을 쓴다(예: 옛 pharmacy-hub 매장 QR 을 pharmacy.neture.co.kr 에서 연다).
-  //   호출 서비스 slug 가 있으면(여러 서비스에 걸친 매장 포함) 종전과 같다.
+  // 현재 서비스 주소 중 호출 서비스가 있으면 그 축을 쓴다. PH 주소는 선택하지 않는다.
   const callerServiceKey = serviceKey || 'kpa';
   const callerCanonical = resolveCanonicalServiceKey(callerServiceKey);
   const hasCallerSlug = storeRows.some((r) => resolveCanonicalServiceKey(r.service_key) === callerCanonical);

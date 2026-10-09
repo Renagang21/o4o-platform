@@ -75,11 +75,9 @@ import { HOST_ORIGIN } from '../lib/hostProfile';
 
 // ─── 서비스 안내 (로그인 전) ────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
-// WO-O4O-NETURE-HOME-ENTRY-REFRESH-V1: 서비스 진입은 서브도메인 정본 URL
-// (CHECK-O4O-URL-FIRST-CENSUS-V1 CONFIRMED_DECISIONS · 배포 1 실측). 공급자·커뮤니티는
-// hostProfile 의 HOST_ORIGIN 을 재사용한다. 구 호스트(kpa-society.co.kr · k-cosmetics.site ·
-// pharmacyhub.co.kr)는 인쇄 QR 보존용으로 살아 있을 뿐 대표 홈의 진입 경로가 아니다.
-// '약국 경영'(PharmacyHub)은 약국 서비스에 흡수 · 신규 가입 서비스로 노출하지 않아 제거.
+// WO-O4O-NETURE-HOME-ENTRY-REFRESH-V1: 서비스 진입은 서브도메인 정본 URL이다.
+// 공급자·커뮤니티는 hostProfile의 HOST_ORIGIN을 재사용한다.
+// Pharmacy Hub는 웹·도메인·인증서 제거 대상이며 대표 홈의 진입 경로가 아니다.
 // 병원약국(/hospital)은 O4O 서비스 진입과 분리된 전문 서비스라 여기 두지 않는다.
 // 로그인 후에는 이 목록 대신 HomeEntryPanel(접근 가능한 기능 · 세션 인계 이동)을 보여준다.
 

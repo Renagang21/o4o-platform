@@ -18,6 +18,7 @@ import logger from '../../utils/logger.js';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
 import { demoAccountService } from '../auth/demo-account.service.js';
+import { PHARMACY_HUB_SERVICE_KEY, ServiceRetiredError } from '../../utils/service-retirement.js';
 
 /**
  * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
@@ -423,6 +424,7 @@ export class MembershipApprovalService {
       }
 
       const membership = selectResult[0] as ApproveResult;
+      if (membership.service_key === PHARMACY_HUB_SERVICE_KEY) throw new ServiceRetiredError();
       const userId = membership.user_id;
 
       logger.info('[APPROVAL][STEP0] membership locked', {
@@ -918,6 +920,7 @@ export class MembershipApprovalService {
     params: ReactivateParams
   ): Promise<ReactivateResult | null> {
     const { userId, reactivatedBy, isPlatformAdmin, serviceKeys } = params;
+    if (serviceKeys.includes(PHARMACY_HUB_SERVICE_KEY)) throw new ServiceRetiredError();
 
     // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다 — 판정 정본은 demo_accounts.user_id.
     await demoAccountService.assertNotDemoAccount(userId, queryRunner);
@@ -931,7 +934,7 @@ export class MembershipApprovalService {
         userId, reactivatedBy, isPlatformAdmin,
       });
 
-      const selectResult = isPlatformAdmin
+      const selectedMemberships = isPlatformAdmin
         ? await queryRunner.query(
             `SELECT id, user_id, service_key, role, status
              FROM service_memberships
@@ -947,7 +950,10 @@ export class MembershipApprovalService {
             [userId, serviceKeys]
           );
 
-      if (!selectResult || selectResult.length === 0) {
+      // 전체 계정 복구에서도 PH는 그대로 둔다. 현재 서비스 복구를 PH 원장으로 막지 않는다.
+      const selectResult = (selectedMemberships || []).filter((m: any) => m.service_key !== PHARMACY_HUB_SERVICE_KEY);
+      if (selectedMemberships?.length > 0 && selectResult.length === 0) throw new ServiceRetiredError();
+      if (selectResult.length === 0) {
         logger.warn('[REACTIVATE][STEP0] no reactivatable memberships found', {
           userId, isPlatformAdmin, serviceKeys,
         });

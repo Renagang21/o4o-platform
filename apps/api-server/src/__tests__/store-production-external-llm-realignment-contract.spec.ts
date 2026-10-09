@@ -123,7 +123,7 @@ describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (B) 공통 Vie
 
 describe('WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 — (C) TARGET_SPECIFIC 13 external LLM entry', () => {
   // 13 → 10: K-Cosmetics 3개(Blog · POP · 상품설명)는 앱 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-  it('활성 KPA census = 6', () => {
+  it('census = 6 (PH 퇴역 4개 제외)', () => {
     expect(ALL_TARGETS).toHaveLength(6);
     for (const rel of ALL_TARGETS) expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(true);
   });

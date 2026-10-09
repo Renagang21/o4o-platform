@@ -75,7 +75,7 @@ export const STORE_MEMBERSHIP_MANAGED_ROLES: readonly string[] = [STORE_INVITED_
  *   linkage(`STORE_SERVICE_ORG_LINKAGE`)가 `cafe24-b2b` 를 포함하므로, 그 조직에 초대받은 사람에게도
  *   발급할 role 이 있어야 한다. 없으면 수락이 관계만 `staff` 로 바꾸고 role 을 건너뛰어 **접근 0 ·
  *   재수락 불가**인 막다른 상태가 된다.
- *   정본: `docs/baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md` (Active) 가 4종을 명시한다.
+ *   PH 이름은 과거 회수 식별자로만 보존한다. 현재 접근·수락 발급은 PH를 제외한다.
  *   (WO-O4O-STORE-OWNER-RBAC-AND-SERVICE-SEMANTICS-FINAL-ALIGNMENT-V1 — 한 번 3종으로 줄였다가
  *    PR #288 리뷰로 되돌렸다. 과거 CHECK 는 ACTIVE 정본을 이기지 못한다.)
  */
@@ -86,9 +86,11 @@ export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey,
   'cafe24-b2b': 'cafe24-b2b:store_member',
 });
 
-const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.values(STORE_MEMBER_ROLE_BY_SERVICE);
+// PH role names remain available for historical revocation, but grant no current Store access.
+const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.entries(STORE_MEMBER_ROLE_BY_SERVICE)
+  .filter(([key]) => key !== 'pharmacy-hub').map(([, role]) => role);
 
-/** 이 조직이 매장으로 등록된 서비스들. 수락 시 발급할 role 과 해제 시 회수할 role 을 정한다. */
+/** 과거 PH를 포함한 조직 linkage. 수락 발급은 PH를 제외하고 회수는 과거 이름도 처리한다. */
 async function linkedServiceKeys(
   dataSource: DataSource,
   organizationId: string,
@@ -96,7 +98,30 @@ async function linkedServiceKeys(
   const keys = Object.keys(STORE_SERVICE_ORG_LINKAGE) as StoreOwnerServiceKey[];
   const linked: StoreOwnerServiceKey[] = [];
   for (const key of keys) {
-    if (await isOrganizationLinkedToService(dataSource, organizationId, key)) linked.push(key);
+    if (key === 'kpa') {
+      // Only the current Store ledger authorizes pharmacy access; legacy KPA linkage is not approval.
+      const current: unknown[] = await dataSource.query(
+        `SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
+        [organizationId],
+      );
+      if (current.length > 0) linked.push(key);
+    } else if (await isOrganizationLinkedToService(dataSource, organizationId, key)) {
+      linked.push(key);
+    } else if (key === 'pharmacy-hub') {
+      // Inactive PH records still identify a retired organization; they cannot become an unscoped store.
+      const linkage = STORE_SERVICE_ORG_LINKAGE[key];
+      const historical: unknown[] = await dataSource.query(
+        `SELECT 1 WHERE EXISTS (
+           SELECT 1 FROM organization_service_enrollments e
+            WHERE e.organization_id = $1 AND e.service_code = ANY($2::text[])
+         ) OR EXISTS (
+           SELECT 1 FROM platform_store_slugs s
+            WHERE s.store_id = $1 AND s.service_key = ANY($3::text[])
+         )`,
+        [organizationId, linkage.enrollmentCodes, linkage.slugKeys],
+      );
+      if (historical.length > 0) linked.push(key);
+    }
   }
   return linked;
 }
@@ -163,7 +188,7 @@ export async function resolveStoreAccessLevel(
   serviceKey?: StoreOwnerServiceKey,
   preferredOrganizationId?: string | null,
 ): Promise<StoreAccess> {
-  if (!userId) return { level: 'none', organizationId: null, memberRole: null };
+  if (!userId || serviceKey === 'pharmacy-hub') return { level: 'none', organizationId: null, memberRole: null };
 
   const owner = await isStoreOwner(dataSource, userId, serviceKey, preferredOrganizationId);
   if (owner.isOwner && owner.organizationId) {
@@ -186,18 +211,21 @@ export async function resolveStoreAccessLevel(
     return { level: 'none', organizationId: null, memberRole: null };
   }
 
+  const accessibleRows: typeof rows = [];
+  for (const row of rows) {
+    const linked = await linkedServiceKeys(dataSource, row.organization_id);
+    if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) continue;
+    if (serviceKey && !linked.includes(serviceKey)) continue;
+    accessibleRows.push(row);
+  }
   const preferred = preferredOrganizationId
-    ? rows.find((r) => r.organization_id === preferredOrganizationId)
+    ? accessibleRows.find((r) => r.organization_id === preferredOrganizationId)
     : undefined;
   // 선택 힌트는 **허용 후보 안에서만** 고른다 — 없는 조직을 요청하면 힌트를 버리고 기본 후보로 간다.
-  const candidates = preferred ? [preferred] : rows;
+  const candidates = preferred ? [preferred] : accessibleRows;
 
-  for (const row of candidates) {
-    if (serviceKey && !(await isOrganizationLinkedToService(dataSource, row.organization_id, serviceKey))) {
-      continue; // 업종 경계 — 다른 서비스의 매장이면 이 요청에서는 접근이 아니다
-    }
-    return { level: 'member', organizationId: row.organization_id, memberRole: row.role };
-  }
+  const member = candidates[0];
+  if (member) return { level: 'member', organizationId: member.organization_id, memberRole: member.role };
   return { level: 'none', organizationId: null, memberRole: null };
 }
 
@@ -263,6 +291,9 @@ export async function inviteStoreMember(
     input.serviceKey,
     input.preferredOrganizationId,
   );
+  const linked = await linkedServiceKeys(dataSource, organizationId);
+  // 서비스 미지정 경로에서도 PH만 연결된 과거 조직에 새 초대는 만들지 않는다.
+  if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) fail('STORE_NOT_RESOLVED', 403);
   const email = (input.email ?? '').trim().toLowerCase();
   const [user]: Array<{ id: string }> = await dataSource.query(
     `SELECT id FROM users WHERE lower(email) = $1 LIMIT 1`,
@@ -306,7 +337,14 @@ export async function listMyInvitations(
       ORDER BY om.joined_at ASC`,
     [userId, STORE_INVITED_ROLE],
   );
-  return rows.map((r) => ({ organizationId: r.organization_id, organizationName: r.name ?? '' }));
+  const invitations: Array<{ organizationId: string; organizationName: string }> = [];
+  for (const row of rows) {
+    const linked = await linkedServiceKeys(dataSource, row.organization_id);
+    // Only actionable invitations belong in this list; retain the historical invited row.
+    if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) continue;
+    invitations.push({ organizationId: row.organization_id, organizationName: row.name ?? '' });
+  }
+  return invitations;
 }
 
 /**
@@ -319,6 +357,9 @@ export async function acceptStoreInvitation(
   dataSource: DataSource,
   input: { userId: string; organizationId: string },
 ): Promise<{ organizationId: string; role: string; services: StoreOwnerServiceKey[] }> {
+  const linked = await linkedServiceKeys(dataSource, input.organizationId);
+  const services = linked.filter((key) => key !== 'pharmacy-hub');
+  if (linked.length > 0 && services.length === 0) fail('STORE_NOT_RESOLVED', 403);
   const result = await dataSource.query(
     `UPDATE organization_members
         SET role = $3, updated_at = now()
@@ -333,7 +374,6 @@ export async function acceptStoreInvitation(
   // 관계를 세운 **뒤에** 인가 role 을 발급한다. 이 조직이 매장으로 등록된 서비스만 대상이다.
   //   발급이 실패하면 관계만 남고 접근은 생기지 않는다(fail-closed) — 반대 순서면 role 만 남아
   //   관계 없는 권한이 떠돈다.
-  const services = await linkedServiceKeys(dataSource, input.organizationId);
   for (const key of services) {
     await roleAssignmentService.assignRole({
       userId: input.userId,
@@ -383,7 +423,12 @@ export async function removeStoreMember(
   const services = await linkedServiceKeys(dataSource, organizationId);
   for (const key of services) {
     const remaining: unknown[] = await dataSource.query(
-      `SELECT 1
+      key === 'kpa' ? `SELECT 1
+         FROM organization_members om
+        WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = $2
+          AND EXISTS (SELECT 1 FROM neture_pharmacy_memberships p
+                       WHERE p.organization_id = om.organization_id AND p.status = 'active')
+        LIMIT 1` : `SELECT 1
          FROM organization_members om
         WHERE om.user_id = $1 AND om.left_at IS NULL AND om.role = $2
           AND (
@@ -395,7 +440,7 @@ export async function removeStoreMember(
                           AND s.service_key = ANY($4::text[]) AND s.is_active = true)
           )
         LIMIT 1`,
-      [
+      key === 'kpa' ? [input.targetUserId, STORE_STAFF_ROLE] : [
         input.targetUserId,
         STORE_STAFF_ROLE,
         STORE_SERVICE_ORG_LINKAGE[key].enrollmentCodes,

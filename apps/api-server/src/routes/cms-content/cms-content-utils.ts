@@ -77,6 +77,11 @@ export function canonicalizeCmsServiceKey(serviceKey: string): string {
   return resolveCanonicalServiceKey(resolveRolePrefixFromCanonicalServiceKey(serviceKey));
 }
 
+/** Historical PH content remains readable, but its service no longer accepts mutations. */
+export function isRetiredCmsService(serviceKey: string | null | undefined): boolean {
+  return typeof serviceKey === 'string' && canonicalizeCmsServiceKey(serviceKey.trim()) === 'pharmacy-hub';
+}
+
 /**
  * CMS `serviceKey` 에 대응하는 **role prefix** 를 돌려준다.
  *

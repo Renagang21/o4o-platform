@@ -53,12 +53,10 @@ import { isPublicRecruitment } from '../../neture-pharmacy/services/recruitment-
  *   Legacy Partner 영역(`/partner/recruitment-applications`)은 은퇴했다 — fallback 도 매장 경로.
  */
 const STORE_RECRUITMENT_APPLICATIONS_ROUTE = '/store/commerce/recruitment-applications';
-const PHARMACY_HUB_RECRUITMENT_APPLICATIONS_ROUTE = '/store-owner/recruitment-applications';
+const RETIRED_RECRUITMENT_SERVICE_KEY = 'pharmacy-hub';
 
 export function resolveRecruitmentApplicationTargetUrl(serviceKey?: string): string {
   switch (serviceKey) {
-    case 'pharmacy-hub':
-      return PHARMACY_HUB_RECRUITMENT_APPLICATIONS_ROUTE;
     case 'kpa-society':
     case 'k-cosmetics':
     case 'cosmetics': // service-catalog canonical 은 'k-cosmetics' 이나 일부 경로가 'cosmetics' 사용
@@ -96,6 +94,10 @@ export class SellerRecruitmentService {
     if (filters?.publicOnly) where.semiFranchiseId = IsNull();
 
     let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
+    // 과거 모집/신청은 원장 조회에 남기되 public·Store 신규 참여 목록에서는 제외한다.
+    if (filters?.publicOnly || filters?.exposureStatus === ExposureStatus.APPROVED || filters?.storeOrganizationId !== undefined) {
+      recruitments = recruitments.filter((r) => r.serviceId !== RETIRED_RECRUITMENT_SERVICE_KEY);
+    }
     recruitments = recruitments.filter((r) => (!filters?.publicOnly || isPublicRecruitment(r))
       && (isPublicRecruitment(r) || !filters?.exposureStatus || r.exposureStatus === filters.exposureStatus));
     if (filters?.storeOrganizationId !== undefined) {
@@ -182,6 +184,9 @@ export class SellerRecruitmentService {
     if (serviceKey && recruitment.serviceId !== serviceKey) {
       return { success: false as const, error: 'SERVICE_MISMATCH' };
     }
+    if (recruitment.serviceId === RETIRED_RECRUITMENT_SERVICE_KEY && decision === ExposureStatus.APPROVED) {
+      return { success: false as const, error: 'SERVICE_RETIRED' };
+    }
     if (recruitment.exposureStatus === decision) {
       return { success: true as const, data: { id: recruitmentId, exposureStatus: decision, idempotent: true } };
     }
@@ -261,6 +266,7 @@ export class SellerRecruitmentService {
   async reopenRecruitment(recruitmentId: string, supplierUserId: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_FOUND' };
+    if (recruitment.serviceId === RETIRED_RECRUITMENT_SERVICE_KEY) return { success: false as const, error: 'SERVICE_RETIRED' };
     if (recruitment.status !== RecruitmentStatus.RECRUITING) {
       recruitment.status = RecruitmentStatus.RECRUITING;
       await this.recruitmentRepo.save(recruitment);
@@ -284,6 +290,8 @@ export class SellerRecruitmentService {
     const serviceKeys = [...new Set(rawKeys.map((k) => (k || '').trim()).filter(Boolean))];
     if (!masterId) return { success: false as const, error: 'MASTER_ID_REQUIRED' };
     if (serviceKeys.length === 0) return { success: false as const, error: 'SERVICE_KEY_REQUIRED' };
+    // 복수 요청도 전체 거절한다. PH를 걸러 일부 서비스를 생성하지 않는다.
+    if (serviceKeys.includes(RETIRED_RECRUITMENT_SERVICE_KEY)) return { success: false as const, error: 'SERVICE_RETIRED' };
 
     // offer 해소 (master_id + 이 사용자의 canonical 공급자 집합). PRIVATE·APPROVED 우선.
     // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: `ns.user_id = $2` → listOwnedSupplierIds.
@@ -364,6 +372,7 @@ export class SellerRecruitmentService {
   async createApplication(recruitmentId: string, applicantId: string, applicantName: string, storeOrganizationId?: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
+    if (recruitment.serviceId === RETIRED_RECRUITMENT_SERVICE_KEY) throw new Error('SERVICE_RETIRED');
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
     // 세미프랜차이즈 모집에만 노출 승인 조건을 적용한다.
     if (!isPublicRecruitment(recruitment) && recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
@@ -536,6 +545,7 @@ export class SellerRecruitmentService {
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.sellerId !== supplierUserId) throw new Error('NOT_RECRUITMENT_OWNER');
 
+    if (recruitment.serviceId === RETIRED_RECRUITMENT_SERVICE_KEY) throw new Error('SERVICE_RETIRED');
     application.status = ApplicationStatus.APPROVED;
     application.decidedAt = new Date();
     application.decidedBy = supplierUserId;

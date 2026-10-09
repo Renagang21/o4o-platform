@@ -181,32 +181,6 @@ export const O4O_SERVICES: O4OService[] = [
     workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
   /**
-   * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
-   *
-   * Pharmacy-Hub (파머시 허브) — 공급자와 약국 경영자를 직접 연결하는 O4O 약국 전문 서비스.
-   *
-   * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1:
-   *   joinEnabled false → true. 가입 신청 write-path(POST /api/v1/pharmacy-hub/join)와
-   *   운영자 승인 콘솔(/api/v1/pharmacy-hub/operator/memberships)이 연결되었다.
-   *   platform_services row 는 20270216000000-SeedPharmacyHubServiceAndRoles 에서 seed 한다.
-   *
-   * WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1:
-   *   joinEnabled true → false. 약국은 KPA Society(pharmacy.neture.co.kr)로 들어가며 Pharmacy-Hub 를
-   *   별도 신규 가입 서비스로 제시하지 않는다(대표 홈 「가입 가능한 서비스」 · 범용 `/auth/services/:key/join`).
-   *   기존 membership · handoff(active 판정) · 서비스 자체 route(`/api/v1/pharmacy-hub/*`)는 이 값을 보지 않으므로 그대로다.
-   *   domain 도 바꾸지 않는다 — 신규 canonical 호스트가 정해지지 않았다.
-   */
-  {
-    key: 'pharmacy-hub',
-    name: 'Pharmacy-Hub',
-    nameKo: '파머시 허브',
-    domain: 'pharmacyhub.co.kr',
-    description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
-    joinEnabled: false,
-    // STANDARD_CANDIDATE — 매장 linkage(pharmacy-hub) · pharmacy-hub:store_owner · pharmacy-hub:operator 존재. 자동 활성화 아님.
-    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
-  },
-  /**
    * WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 — Phase 1 Foundation
    *
    * 독립 O4O 강의 서비스. URL 은 Neture 브랜드 하위 도메인을 사용하지만

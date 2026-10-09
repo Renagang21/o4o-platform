@@ -87,7 +87,7 @@ export function createOperatorRecruitmentExposureController(_dataSource: DataSou
       const note = typeof req.body?.note === 'string' ? req.body.note : undefined;
       const result = await netureService.setRecruitmentExposure(req.params.id, userId, decision, note);
       if (!result.success) {
-        const status = result.error === 'RECRUITMENT_NOT_FOUND' ? 404 : 400;
+        const status = result.error === 'RECRUITMENT_NOT_FOUND' ? 404 : result.error === 'SERVICE_RETIRED' ? 410 : 400;
         res.status(status).json({ success: false, error: result.error });
         return;
       }

@@ -18,7 +18,7 @@
 | 워크플로 | 대상 |
 |---|---|
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
-| `deploy-web-services.yml` | 서비스별 웹 7종 (변경 감지 후 선별 배포) — `neture-web` · `kpa-society-web` · `lecture-web` · `hospital-pharmacy-web` · `store-web` · `kpa-branch-web` (`signage-player-web` 은 2026-10-05 배포 은퇴 · `k-cosmetics-web` 은 2026-10-06 배포 경로 · 앱 소스 은퇴 — Cloud Run 정리는 별도 작업) |
+| `deploy-web-services.yml` | 서비스별 웹 6종 (변경 감지 후 선별 배포) — `neture-web` · `kpa-society-web` · `lecture-web` · `hospital-pharmacy-web` · `store-web` · `kpa-branch-web` (`signage-player-web` 은 2026-10-05 배포 은퇴 · `k-cosmetics-web` 은 2026-10-06 배포 경로 · 앱 소스 은퇴 — Cloud Run 정리는 별도 작업) |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
 | `deploy-auto.yml` | **은퇴** (P3 cutover 2026-10-02) — 종전 자동 경로(태그 ref dispatch). workflow_run trigger 제거 · job `if: false` |
 | `delivery.yml` | **Unified Delivery** — main CI 완료 → 판정 → 위 deploy workflow 를 `workflow_call` 로 호출(태그 · dispatch 0) → serving SHA 확인 → commit status. **자동 배포의 유일한 진입점**(`DELIVERY_ENFORCE: 'true'` · P3 cutover 2026-10-02) |

@@ -15,6 +15,8 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import type { StoreBlock, TemplateProfile } from '../../../modules/store/types/store-template.js';
+import { PHARMACY_HUB_SERVICE_KEY } from '../../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../../utils/store-organization.resolver.js';
 
 // ============================================================================
 // Service Key Mapping (WO-O4O-STORE-SERVICEKEY-MAPPING-FIX-V1)
@@ -33,7 +35,7 @@ import type { StoreBlock, TemplateProfile } from '../../../modules/store/types/s
  *    태블릿·화면세트·공개 storefront 전 경로에서 service_scope_mismatch 로 떨어졌다).
  *   새 로컬 맵을 만들지 않고 security-core 의 SSOT
  *   (`ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY` = { kpa: 'kpa-society', cosmetics: 'k-cosmetics' })
- *   에서 파생한다. self-map 서비스(neture · pharmacy-hub)는 `[key]` 그대로다.
+ *   에서 파생한다. self-map 서비스(neture 등)는 `[key]` 그대로다.
  *
  * 게이트를 넓히지 않는다 — `kpa-groupbuy` · `k-cosmetics-event-offer` 같은
  * **다른 축의 파생 키는 포함하지 않는다**(기존 kpa 동작과 동일한 범위).
@@ -62,9 +64,14 @@ export async function resolvePublicStore(
   const slugService = new StoreSlugService(dataSource);
   const record = await slugService.findBySlug(slug);
 
+  if (record && (record.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, record.storeId))) {
+    res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+    return null;
+  }
+
   if (!record || !record.isActive) {
     const redirect = await slugService.findOldSlugRedirect(slug);
-    if (redirect) {
+    if (redirect && redirect.sourceServiceKey !== PHARMACY_HUB_SERVICE_KEY && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
       const newPath = req.originalUrl.replace(
         `/${encodeURIComponent(slug)}`,
         `/${encodeURIComponent(redirect.newSlug)}`,

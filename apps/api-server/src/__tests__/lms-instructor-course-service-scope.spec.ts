@@ -64,6 +64,14 @@ describe('LMS instructor 목록 — service scope (§10/§13)', () => {
       expect(lectureApi).not.toMatch(/serviceKey:\s*['"]/);
     });
 
+    it('PH / KPA 강사 client 는 삭제되었다 (§14)', () => {
+      for (const rel of [
+        'services/web-kpa-society/src/api/lms-instructor.ts',
+      ]) {
+        expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
+      }
+    });
+
     it('응답을 프런트에서 걸러내지 않는다 (client-side filtering 금지)', () => {
       expect(lectureApi).not.toMatch(/\.filter\([^)]*serviceKey/);
     });

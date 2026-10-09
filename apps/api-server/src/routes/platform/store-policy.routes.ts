@@ -30,6 +30,8 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { encrypt, decrypt, isEncryptionKeyConfigured } from '../../utils/crypto.js';
 import { isStoreOwner } from './store-policy.ownership.js';
+import { PHARMACY_HUB_SERVICE_KEY } from '../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../utils/store-organization.resolver.js';
 
 /**
  * Mask a string, showing only last 4 characters.
@@ -64,7 +66,8 @@ async function resolveAndAuthorize(
   const slugService = new StoreSlugService(dataSource);
   const slugRecord = await slugService.findBySlug(slug);
 
-  if (!slugRecord || !slugRecord.isActive) {
+  if (!slugRecord || !slugRecord.isActive || slugRecord.serviceKey === PHARMACY_HUB_SERVICE_KEY
+      || await isRetiredPharmacyHubOrganization(dataSource, slugRecord.storeId)) {
     res.status(404).json({
       success: false,
       error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -101,10 +104,14 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       const slugService = new StoreSlugService(dataSource);
       const slugRecord = await slugService.findBySlug(slug);
 
+      if (slugRecord && (slugRecord.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, slugRecord.storeId))) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
       if (!slugRecord || !slugRecord.isActive) {
         // WO-STORE-SLUG-REDIRECT-LAYER-V1: old slug → 301 redirect
         const redirect = await slugService.findOldSlugRedirect(slug);
-        if (redirect) {
+        if (redirect && redirect.sourceServiceKey !== PHARMACY_HUB_SERVICE_KEY && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
           const newPath = req.originalUrl.replace(
             `/${encodeURIComponent(slug)}`,
             `/${encodeURIComponent(redirect.newSlug)}`,
@@ -473,6 +480,10 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
 
       // Check if it's a current slug
       const current = await slugService.findBySlug(slug);
+      if (current && (current.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, current.storeId))) {
+        res.status(404).json({ success: false, error: { code: 'SLUG_NOT_FOUND', message: 'Slug not found' } });
+        return;
+      }
       if (current && current.isActive) {
         res.json({
           success: true,
@@ -483,7 +494,7 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
 
       // Check if it's an old slug with redirect
       const redirect = await slugService.findOldSlugRedirect(slug);
-      if (redirect) {
+      if (redirect && redirect.sourceServiceKey !== PHARMACY_HUB_SERVICE_KEY && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
         res.status(301).json({
           success: true,
           data: {

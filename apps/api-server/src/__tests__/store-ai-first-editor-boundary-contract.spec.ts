@@ -37,6 +37,8 @@ const STORE_DIRECT_CONSUMERS = [
   'services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreProductMultilingualContentPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
+  // K-Cosmetics Store — 앱(services/web-k-cosmetics) 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)
+  // PharmacyHub Store (/store-owner/*)
 ];
 
 /** Store 전용 공유 셸 — 셸 내부에서 false 고정 */

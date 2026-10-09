@@ -67,6 +67,9 @@ router.post(
     }
 
     try {
+      if (serviceKey === 'pharmacy-hub') {
+        throw new PolicyAcceptanceError('SERVICE_RETIRED', '종료된 서비스의 계약에는 동의할 수 없습니다.', 410);
+      }
       const isStoreAgreement = documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
       if (isStoreAgreement && serviceKey === 'kpa-society') {
         // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 약국 매장계약은 요구 판정(getPendingStoreOwnerAgreementsForUser)과
@@ -92,7 +95,6 @@ router.post(
         if (isStoreAgreement) {
           const roleByService: Record<string, string> = {
             'k-cosmetics': 'cosmetics:store_owner',
-            'pharmacy-hub': 'pharmacy-hub:store_owner',
           };
           const requiredRole = roleByService[serviceKey];
           if (!requiredRole) {
