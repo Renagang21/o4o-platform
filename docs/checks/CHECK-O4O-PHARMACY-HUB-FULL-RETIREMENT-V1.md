@@ -2,13 +2,13 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `240a2dfd42`(PR #372·#374) · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `8fa26f9293`(PR #372·#374·#375) · branch: `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 결과와 남은 실행
 
 | 구분 | 상태 | 근거 |
 |---|---|---|
-| 코드 제거 | 구현 완료 | PH 웹·API·Store PH 문맥·공급자 설정·가입·역할 신규 부여·CORS·배포 job 제거 |
+| 코드 제거 | 1차 main 반영·보완 PR 준비 | #375가 PH 웹·전용 API·배포 경로를 제거했고 #373이 공통 진입·신규 쓰기·원장 후속 처리·운영 삭제 인계를 보완 |
 | 로컬 검증 | PASS | API·웹 빌드와 관련 회귀 검증은 아래 §3 |
 | main 통합 | 대기 | PR required CI·리뷰 후 저장소 AGENTS §4-1(e)의 사용자 통합 승인 필요 |
 | 운영 배포 | 대기 | 배포 판정 `LEVEL_3`·`deploy_required=true`; main 통합과 별도 통제 배포 |
@@ -29,6 +29,7 @@
 - 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
 - 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
 - 공개 매장: PH slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
+- DB 공개 catalog: active PH 행도 익명·로그인 사용자 목록에서 제외한다. 현재 서비스의 가입 상태 표시와 전체 관리자의 catalog 이력 조회는 보존하며 DB write는 없다.
 - 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
 - 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
 - 운영 DB write·schema/migration 변경 없음. 상품의 기존 PH `service_keys`를 지워 기본 공급으로 전환하는 backfill이나 테스트 데이터 삭제 없음.
@@ -44,7 +45,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **231 suites · 4,359 tests PASS** · 235 suites 중 DB integration 4개 SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **232 suites · 4,363 tests PASS** · 236 suites 중 DB integration 4개 SKIP |
 | 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
@@ -62,6 +63,8 @@ PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec�
 현행 commerce DESIGN §16과 서브도메인 의미 정본 §2-2를 사용자 결정으로 갱신했다. PH 모델 baseline에는 대체된 기준을 명시했고 B2B 주문 계약에는 PH 신규 producer/API 퇴역과 기존 결제 완료·원장 조회 보존의 차이를 정정했다. 과거 WO·CHECK의 당시 배포 결과는 덮어쓰지 않는다. 이 CHECK는 실제 운영 삭제 완료를 주장하지 않는다.
 
 Store 접근 정본과 Store Owner RBAC §3.1/§3.1-A도 정정했다. PH 역할 이름·linkage가 원장/회수 규약에 남아 있어도 현재 접근·발급 목록에는 없다는 점을 명시한다.
+
+PH 모델 baseline은 표준 `상태: SUPERSEDED · 대체 문서 · 표기일` 상태 줄로 정정하고 본문을 과거 기록으로 보존했다. canonical index의 ACTIVE 행 변경은 AGENTS §8·색인 §0의 별도 WO 규칙에 따라 [문서 WO](https://github.com/Renagang21/o4o-platform/blob/c988cf53380eff25e5587a4fc79db247aa03aa48/docs/work-orders/WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1.md)·PR #380으로 준비했다. #373을 먼저 main에 반영하고 #380을 이어 통합한다. main PR #375의 당시 WO는 실행 기록으로 보존하며 그 QR 리다이렉트 서술을 현행 지시로 쓰지 않는다.
 
 ## 5. PR 리뷰와 전체 CI 보완
 
@@ -88,3 +91,9 @@ HEAD `42bd366674`의 CI Gate·SonarCloud는 통과했으나 재리뷰가 공통 
 HEAD `c0d1313ad7`은 CI Gate·SonarCloud·CodeQL을 통과했으나 재리뷰가 공개 Store 관심 요청·QR 스캔의 PH 신규 기록을 지적했다. 공통 공개 Store resolver가 active/inactive PH slug와 PH로 향하는 과거 주소를 404로 종료하도록 보완했다. 공개 QR resolver는 PH 전용 조직의 스캔 INSERT 전에 종료하며 PH 주소를 화면 해석 축에서 제외한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 관심 요청·QR 스캔은 유지한다. 실제 HTTP의 기록 차단·현재 서비스 보존과 명시적 PH 호출의 조회 차단을 검증하고 변경 소비처를 재검사한다. 최신 HEAD의 CI·리뷰는 이전 커밋의 성공으로 대체하지 않는다.
 
 공개 Store·QR 보완 후 변경 그래프·raw 소비처를 합친 API 235 suites에서 231 suites·4,359 tests가 통과했다. 기존 DB integration 4개(36건)는 SKIP했고 API type-check도 통과했다. 공개 HTTP 차단과 현재 서비스의 관심 요청·스캔 보존을 포함한 결과이며 실제 운영 DB·로그인·모바일 검증은 아니다.
+
+HEAD `b591ff85e0`의 재리뷰는 DB 기반 공개 catalog의 PH 링크와 PH 정본 상태 모순을 지적했다. 공개 목록에서 PH 키를 제외하고 익명·로그인 HTTP 응답, 현재 서비스 가입 상태, PH-only 목록, 관리자 원장 조회와 DB 쓰기 없음의 회귀를 추가했다. baseline은 표준 SUPERSEDED 표기로 정정하고 canonical index는 별도 PR #380으로 정렬한다.
+
+검토 중 main에 PH 1차 제거 PR #375(`8fa26f9293`)가 통합돼 이 작업과 40파일에서 충돌했다. 충돌을 대조하고 완전 퇴역의 공통 차단·현재 서비스 회귀 검증을 유지해 결합했다. 기존 주문의 PH 결제 완료 처리까지 1차 삭제에 포함돼 있었으므로 신규 producer 없이 역사적 완료 handler와 초기화는 보존한다. #375의 PH 홈 진입 제거·README와 당시 WO는 유지한다. 실제 main 변경은 이 세션에서 수행하지 않았으며 현재 보완은 #373의 승인·merge 대기다.
+
+PR #375 결합과 DB catalog 보완 후 API 236 suites에서 232 suites·4,363 tests 및 type-check가 통과했다. DB integration 4개(36건)는 SKIP했다. Neture 46 files·375 tests와 CI blocking Node 전체 332건도 재검증해 통과했다. 최신 커밋의 required CI·Sonar·Codex는 PR에서 확인한다.

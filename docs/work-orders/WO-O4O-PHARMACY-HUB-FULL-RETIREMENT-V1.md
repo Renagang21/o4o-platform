@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 근거: 사용자 명시 지시 — Pharmacy Hub의 경로·서버·도메인·인증서를 모두 제거한다.
-> 착수 main: `0f8535d6b1` · 검증 결합 main: `240a2dfd42` · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · 검증 결합 main: `8fa26f9293`(PR #375) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 확정 범위
 
@@ -37,12 +37,15 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 공통 역할 선택 목록과 부여 API는 전체 관리자에게도 PH prefix와 PH catalog 항목의 신규 부여를 거부한다. 기존 할당·역할 식별 조회와 회수는 유지한다. PH 가입의 승인·재활성화·active 전이는 거부하고, 전체 복구의 PH 원장은 제외해 현재 서비스 가입만 복구한다. 가입 거부·정지·탈퇴·회수는 유지한다.
 - 공통 `products/from-master` 생성도 PH 공급 키가 있으면 혼합 서비스 요청 전체를 거부한다. 기존 Offer의 PH 키와 후속 처리 원장은 그대로 둔다. 신규 입력에서 키를 지워 기본 공급으로 전환하지 않는다.
 - 공개 Store 조회도 PH slug와 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
+- DB 기반 공개 `platform-services` 목록도 active PH 행을 제외한다. 익명·로그인 사용자 모두 현재 서비스와 가입 상태만 보며 PH catalog 원장과 관리자 이력 조회는 보존한다. DB 갱신으로 숨기지 않는다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
 
 ## 4. 완료 경계
 
 DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다. 검증 결과를 첨부해 PR로 준비하고 main 통합은 저장소 `AGENTS.md` §4-1(e)의 사용자 승인 절차를 따른다. 실제 배포와 PH 운영 인프라 삭제 여부는 각각 별도 결과로 기록한다.
+
+검토 중 PR #375가 PH 웹·API·배포 경로의 1차 제거를 main에 반영했다. 이 작업 branch는 그 main과 결합해 공통 신규 쓰기·진입·원장 후속 처리와 운영 삭제 인계를 보완한다. main이나 다른 작업 branch의 이력은 바꾸지 않는다. PH 모델 상태 줄은 표준 SUPERSEDED 형식을 쓰고, canonical index 상태 변경은 별도 [문서 WO](https://github.com/Renagang21/o4o-platform/blob/c988cf53380eff25e5587a4fc79db247aa03aa48/docs/work-orders/WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1.md)·PR #380으로 준비한다. #373 후 #380 순서로 main에 반영한다.
 
 ## 5. 운영 인프라 제거 절차
 
@@ -109,6 +112,7 @@ DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다
 ```text
 Pharmacy Hub 완전 퇴역의 운영 삭제를 수행한다.
 먼저 PR #373의 main 반영·통제 배포와 Store/공급자/독립 약사 커뮤니티 정상 동작을 확인한다.
+정본 색인 정합 PR #380은 #373 후 main에 반영한다(문서-only, 별도 runtime 배포 없음).
 설치된 모든 Local Agent의 실제 실행 사본도 최신 코드로 갱신·재시작한다.
 PH root/www Origin의 /health 403과 Neture Origin 200을 확인하고 적용 SHA를 기록한다.
 설치 Agent의 PH origin 신뢰 제거를 확인하기 전에는 PH 도메인 등록을 종료하지 않는다.
