@@ -17,7 +17,7 @@
 
 ## 변경과 복구
 
-실제 URL map의 host rules를 확인하고 변경 전 fingerprint를 Compute API에 전달한다. 다른 운영 작업으로 map이 바뀌면 적용을 거절한다. HTTP 검증은 병렬 요청과 전체 120초 상한을 사용하고 workflow는 30분으로 복구 시간을 확보한다. 각 GCP write는 request ID를 보존하고, 같은 ID로 HTTP 재시도 후 operation ID를 기록하고 최대 5분 terminal 상태를 확인한다. 일시적 조회 실패도 재확인한다. 완료 불명 상태를 변경 없음으로 간주하지 않는다. 해당 경우 artifact의 operation/request ID로 운영자가 상태를 확인해야 한다.
+실제 URL map의 host rules를 확인하고 변경 전 fingerprint를 Compute API에 전달한다. 다른 운영 작업으로 map이 바뀌면 적용을 거절한다. HTTP 검증은 병렬 요청과 전체 120초 상한을 사용하고 workflow는 30분으로 복구 시간을 확보한다. 작업 시작에서 29분 deadline을 기록하고 write 직전 25분 이상 남지 않으면 적용을 거절한다. 각 GCP write는 request ID를 보존하고, 같은 ID로 HTTP 재시도 후 operation ID를 기록하고 최대 5분 terminal 상태를 확인한다. 일시적 조회 실패도 재확인한다. 완료 불명 상태를 변경 없음으로 간주하지 않는다. 해당 경우 artifact의 operation/request ID로 운영자가 상태를 확인해야 한다.
 
 변경 후 HTTP 검사 실패 시 현재 map이 이 작업의 초안과 일치할 때만 백업을 복원하고 재조회한다. 외부 변경이 있으면 자동 복구를 거절하고 수동 판단을 요구한다. backup artifact는 7일 보존된다.
 
@@ -25,4 +25,4 @@ PR #384 생성 후 GitHub API 접근이 가능해졌다. 현재 cloud executor�
 
 ## 검증
 
-QR 전환·복구·읽기 전용 경로 수집 node:test 15개와 기존 CI 스크립트 node:test 352개 통과. 두 workflow의 YAML parse·diff whitespace·문서 민감정보 검사 통과. QR 테스트는 blocking CI에도 연결한다. GCP URL map API 호출·실제 WIF 권한·운영 HTTP 응답·브라우저/실기기 검증은 아직 실행하지 않았다.
+QR 전환·복구·읽기 전용 경로 수집 node:test 16개와 기존 CI 스크립트 node:test 352개 통과. 두 workflow의 YAML parse·diff whitespace·문서 민감정보 검사 통과. QR 테스트는 blocking CI에도 연결한다. GCP URL map API 호출·실제 WIF 권한·운영 HTTP 응답·브라우저/실기기 검증은 아직 실행하지 않았다.

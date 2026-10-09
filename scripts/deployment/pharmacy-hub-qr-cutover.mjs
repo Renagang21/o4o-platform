@@ -84,7 +84,7 @@ export async function settleOperation(name, readOperation, { now = Date.now, sle
   throw error;
 }
 
-export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight }) {
+export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite }) {
   const before = await read();
   validateHosts(before);
   if (!before.fingerprint) throw new Error('Live fingerprint is required.');
@@ -98,6 +98,7 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
   await preflight?.(paths);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');
+  await beforeWrite?.();
   let changed = false;
   try {
     // replace must submit this fingerprint to the Compute API (optimistic lock).
@@ -141,6 +142,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const result = await runCutover({
     mode, probes: process.env.QR_PROBE_PATHS || (process.env.PROBE_OUTPUT ? await readFile(process.env.PROBE_OUTPUT, 'utf8') : ''),
     preflight: paths => verifyTargets(paths),
+    beforeWrite: () => {
+      const deadline = Number(process.env.CUTOVER_DEADLINE_MS);
+      // Bounded Compute retries/polls plus verification and rollback need at most 25 minutes.
+      if (!Number.isFinite(deadline) || Date.now() + 25 * 60000 > deadline) {
+        throw new Error('Insufficient workflow time remains for update, verification and rollback; no write submitted.');
+      }
+    },
     read: () => api(endpoint),
     save: (name, data) => writeFile(`${output}/${name}`, JSON.stringify(data, null, 2) + '\n', { mode: 0o600 }),
     validate: async draft => {

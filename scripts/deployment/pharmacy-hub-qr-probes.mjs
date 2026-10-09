@@ -31,7 +31,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const require = createRequire(new URL('../../apps/api-server/package.json', import.meta.url));
   const { Client } = require('pg');
   if (!process.env.DB_USERNAME || !process.env.DB_NAME || !process.env.PROBE_OUTPUT) throw new Error('Database configuration or output path is missing.');
-  const password = execFileSync('gcloud', ['secrets', 'versions', 'access', 'latest', '--secret=o4o-db-password', '--project=netureyoutube'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  const password = execFileSync('gcloud', ['secrets', 'versions', 'access', 'latest', '--secret=o4o-db-password', '--project=netureyoutube'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   const client = new Client({ host: '127.0.0.1', port: 55432, user: process.env.DB_USERNAME, database: process.env.DB_NAME, password, connectionTimeoutMillis: 15000, options: '-c default_transaction_read_only=on' });
   try {
     await client.connect();

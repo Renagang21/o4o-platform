@@ -58,6 +58,11 @@ test('unavailable Neture targets prevent any write', async () => {
   await assert.rejects(runCutover({ ...h.options, preflight: async () => { throw new Error('target unavailable'); } }), /target unavailable/);
   assert.equal(h.writes.length, 0);
 });
+test('insufficient remaining job budget rejects apply before submission', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, beforeWrite: async () => { throw new Error('budget exhausted'); } }), /budget exhausted/);
+  assert.equal(h.writes.length, 0);
+});
 test('transient operation-read failures are reconciled until terminal success', async () => {
   let calls = 0;
   let clock = 0;

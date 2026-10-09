@@ -36,6 +36,7 @@ jobs:
     steps:
       - name: Enforce production write gate
         run: |
+          echo "CUTOVER_DEADLINE_MS=$(( $(date +%s) * 1000 + 29 * 60 * 1000 ))" >> "$GITHUB_ENV"
           if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
             echo 'Production inventory requires main.'
             exit 1
