@@ -27,6 +27,7 @@
 import type { DataSource } from 'typeorm';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { PHARMACY_HUB_SERVICE_KEY } from '../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../utils/store-organization.resolver.js';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -179,7 +180,8 @@ export async function resolvePublicQrLanding(
     return NOT_FOUND;
   }
 
-  // QR은 조직 자산이다. PH 주소만 남은 조직은 스캔을 기록하기 전에 종료한다.
+  // Enrollment-only and inactive PH history also close before recording a scan.
+  if (await isRetiredPharmacyHubOrganization(dataSource, qrData.organizationId)) return NOT_FOUND;
   const allStoreRows: Array<{ slug: string; service_key: string; is_active: boolean }> = await dataSource.query(
     `SELECT slug, service_key, is_active FROM platform_store_slugs
      WHERE store_id = $1
@@ -187,7 +189,6 @@ export async function resolvePublicQrLanding(
     [qrData.organizationId],
   );
   const storeRows = allStoreRows.filter((r) => r.is_active !== false && r.service_key !== PHARMACY_HUB_SERVICE_KEY);
-  if (storeRows.length === 0 && allStoreRows.some((r) => r.service_key === PHARMACY_HUB_SERVICE_KEY)) return NOT_FOUND;
 
   // 5초 중복 방지: 같은 ipHash + qrCodeId
   //

@@ -31,6 +31,7 @@ import type { AuthRequest } from '../../types/auth.js';
 import { encrypt, decrypt, isEncryptionKeyConfigured } from '../../utils/crypto.js';
 import { isStoreOwner } from './store-policy.ownership.js';
 import { PHARMACY_HUB_SERVICE_KEY } from '../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../utils/store-organization.resolver.js';
 
 /**
  * Mask a string, showing only last 4 characters.
@@ -65,7 +66,8 @@ async function resolveAndAuthorize(
   const slugService = new StoreSlugService(dataSource);
   const slugRecord = await slugService.findBySlug(slug);
 
-  if (!slugRecord || !slugRecord.isActive || slugRecord.serviceKey === PHARMACY_HUB_SERVICE_KEY) {
+  if (!slugRecord || !slugRecord.isActive || slugRecord.serviceKey === PHARMACY_HUB_SERVICE_KEY
+      || await isRetiredPharmacyHubOrganization(dataSource, slugRecord.storeId)) {
     res.status(404).json({
       success: false,
       error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -102,7 +104,7 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       const slugService = new StoreSlugService(dataSource);
       const slugRecord = await slugService.findBySlug(slug);
 
-      if (slugRecord?.serviceKey === PHARMACY_HUB_SERVICE_KEY) {
+      if (slugRecord && (slugRecord.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, slugRecord.storeId))) {
         res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
         return;
       }
@@ -478,7 +480,7 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
 
       // Check if it's a current slug
       const current = await slugService.findBySlug(slug);
-      if (current?.serviceKey === PHARMACY_HUB_SERVICE_KEY) {
+      if (current && (current.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, current.storeId))) {
         res.status(404).json({ success: false, error: { code: 'SLUG_NOT_FOUND', message: 'Slug not found' } });
         return;
       }

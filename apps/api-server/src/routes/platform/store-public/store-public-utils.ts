@@ -16,6 +16,7 @@ import { OrganizationStore } from '../../../modules/store-core/entities/organiza
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import type { StoreBlock, TemplateProfile } from '../../../modules/store/types/store-template.js';
 import { PHARMACY_HUB_SERVICE_KEY } from '../../../utils/service-retirement.js';
+import { isRetiredPharmacyHubOrganization } from '../../../utils/store-organization.resolver.js';
 
 // ============================================================================
 // Service Key Mapping (WO-O4O-STORE-SERVICEKEY-MAPPING-FIX-V1)
@@ -63,7 +64,7 @@ export async function resolvePublicStore(
   const slugService = new StoreSlugService(dataSource);
   const record = await slugService.findBySlug(slug);
 
-  if (record?.serviceKey === PHARMACY_HUB_SERVICE_KEY) {
+  if (record && (record.serviceKey === PHARMACY_HUB_SERVICE_KEY || await isRetiredPharmacyHubOrganization(dataSource, record.storeId))) {
     res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
     return null;
   }

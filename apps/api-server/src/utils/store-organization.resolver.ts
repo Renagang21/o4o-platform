@@ -217,7 +217,7 @@ const RETIREMENT_IDENTITY_PARAMETERS = [
 ];
 
 function storeRetirementIdentityProjection(
-  organization: 'om.organization_id' | 'organization_members.organization_id',
+  organization: 'om.organization_id' | 'organization_members.organization_id' | '$1',
   firstParameter: 2 | 3,
 ): string {
   return `(EXISTS (
@@ -243,6 +243,15 @@ function storeRetirementIdentityProjection(
 
 function isCurrentStoreCandidate(row: StoreRetirementIdentity): boolean {
   return !row.retired_store_identity || row.current_store_identity === true;
+}
+
+/** Shared PH-only organization boundary for public Store consumers, before reads or scan writes. */
+export async function isRetiredPharmacyHubOrganization(dataSource: DataSource, organizationId: string): Promise<boolean> {
+  const [identity]: StoreRetirementIdentity[] = await dataSource.query(
+    `SELECT ${storeRetirementIdentityProjection('$1', 2)}`,
+    [organizationId, ...RETIREMENT_IDENTITY_PARAMETERS],
+  );
+  return identity?.retired_store_identity === true && identity.current_store_identity !== true;
 }
 
 /**

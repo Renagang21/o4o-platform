@@ -33,7 +33,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
+import { resolveLegacyKpaMemberOrganization } from '../services/store-legacy-organization.service.js';
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { isStoreOwner } from '../../../utils/store-owner.utils.js';
@@ -190,8 +190,7 @@ export function createStoreContentController(
         // organizationId: organization_members 우선, kpa_members fallback
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
 
         if (!organizationId) {
@@ -397,8 +396,7 @@ export function createStoreContentController(
         }
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
@@ -520,8 +518,7 @@ export function createStoreContentController(
         }
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
@@ -667,8 +664,7 @@ export function createStoreContentController(
   async function resolveDualOrgId(userId: string): Promise<string | null> {
     const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
     if (orgFromRa) return orgFromRa;
-    const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-    return member?.organization_id || null;
+    return resolveLegacyKpaMemberOrganization(dataSource, userId);
   }
 
   /**
@@ -745,8 +741,7 @@ export function createStoreContentController(
 
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
@@ -797,8 +792,7 @@ export function createStoreContentController(
 
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
@@ -858,8 +852,7 @@ export function createStoreContentController(
         }
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
@@ -941,8 +934,7 @@ export function createStoreContentController(
         }
         let organizationId: string | null = orgFromRa;
         if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
+          organizationId = await resolveLegacyKpaMemberOrganization(dataSource, userId);
         }
         if (!organizationId) {
           res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });

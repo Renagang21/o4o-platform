@@ -52,7 +52,10 @@ function makeDataSource(opts: {
   }>;
 }) {
   const queue = [...(opts.queryResults ?? [])];
-  const query = jest.fn(async () => (queue.length ? queue.shift() : []));
+  const query = jest.fn(async (sql: string) => {
+    if (sql.includes('AS retired_store_identity')) return [{ retired_store_identity: false, current_store_identity: true }];
+    return queue.length ? queue.shift() : [];
+  });
   const repo = {
     findOne: opts.repo?.findOne ?? jest.fn(async () => null),
     create: opts.repo?.create ?? jest.fn((v: any) => ({ ...v })),
@@ -449,6 +452,10 @@ describe('resolvePublicQrLanding — Screen Set 서비스 축은 매장 기준 (
 
   it('PH 전용 조직은 스캔·화면 해석 전에 종료한다', async () => {
     const { ds, query } = screenSetDs('pharmacy-hub');
+    const original = ds.query;
+    ds.query = jest.fn(async (sql: string, params?: unknown[]) => sql.includes('AS retired_store_identity')
+      ? [{ retired_store_identity: true, current_store_identity: false }]
+      : original(sql, params));
     expect(await resolvePublicQrLanding(ds, 's', 'kpa', scanMeta)).toMatchObject({ ok: false, status: 404 });
     expect(resolveScreenSetSections).not.toHaveBeenCalled();
     expect(query.mock.calls.some(c => String(c[0]).includes('INSERT INTO store_qr_scan_events'))).toBe(false);
