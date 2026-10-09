@@ -38,7 +38,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 // ─── Service-specific canonical role config (internal SSOT) ───────────────
 
-export type StoreOwnerServiceKey = 'kpa' | 'cosmetics' | 'pharmacy-hub';
+export type StoreOwnerServiceKey = 'kpa' | 'cosmetics';
 
 interface ServiceRoleConfig {
   storeOwner: string;
@@ -72,18 +72,6 @@ const SERVICE_ROLES: Record<StoreOwnerServiceKey, ServiceRoleConfig> = {
     //   현재 cosmetics 는 membershipStoreOwnerRole=null 이라 실사용 영향은 없었지만,
     //   membership 기반 판정을 켜는 순간 조용히 전원 차단되는 잠복 결함이므로 지금 맞춘다.
     membershipServiceKey: 'k-cosmetics',
-    membershipStoreOwnerRole: null,
-  },
-  // WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 (additive — 기존 3서비스 무영향)
-  //   role prefix 와 service_memberships.service_key 가 동일한 유일한 서비스다
-  //   (backend utils/store-owner.utils.ts STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY 와 동일 축).
-  //   membershipStoreOwnerRole=null — 매장 경영자 판정은 role_assignments 단일 소스.
-  //   가입 상태(active/pending/rejected) 판정은 서비스 wrapper 의 MembershipGate 가 담당한다.
-  'pharmacy-hub': {
-    storeOwner: 'pharmacy-hub:store_owner',
-    admin: 'pharmacy-hub:admin',
-    operator: 'pharmacy-hub:operator',
-    membershipServiceKey: 'pharmacy-hub',
     membershipStoreOwnerRole: null,
   },
 };

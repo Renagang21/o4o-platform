@@ -66,7 +66,6 @@ describe('LMS instructor 목록 — service scope (§10/§13)', () => {
 
     it('PH / KPA 강사 client 는 삭제되었다 (§14)', () => {
       for (const rel of [
-        'services/web-pharmacy-hub/src/api/lms.ts',
         'services/web-kpa-society/src/api/lms-instructor.ts',
       ]) {
         expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);

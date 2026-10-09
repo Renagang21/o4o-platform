@@ -1,7 +1,7 @@
 /**
  * Unified Store Workspace 진입(handoff) — 순수 규칙 (WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4)
  *
- * 세 서비스(KPA `/store` · KCos `/store` · PH `/store-owner`)의 매장 진입은 cutover 후
+ * KPA `/store` · KCos `/store`의 매장 진입은 cutover 후
  * `store.neture.co.kr` 통합 Store Workspace 로 handoff 된다. 이 파일은
  *   (1) cutover 플래그 해석 — 빌드 시 `VITE_UNIFIED_STORE_HANDOFF` 로 주입, 기본 OFF(기존 화면 그대로)
  *   (2) 서비스별 legacy 경로 → 통합 Workspace 경로 매핑(returnPath)
@@ -11,7 +11,7 @@
  *   `/`(홈) · `/store/*`(공통 기능 1회) · `/work/<serviceKey>/*`(서비스 종속) · `/hub/*` · `/services` · `/settings`
  */
 
-export type UnifiedStoreServiceKey = 'kpa-society' | 'k-cosmetics' | 'pharmacy-hub';
+export type UnifiedStoreServiceKey = 'kpa-society' | 'k-cosmetics';
 
 /** 빌드 플래그 해석 — 'true' | '1' 만 ON. 미설정·그 외 = OFF (프로덕션 기본은 기존 화면). */
 export function isUnifiedStoreHandoffEnabled(raw: unknown): boolean {
@@ -43,26 +43,7 @@ const RULES: Record<UnifiedStoreServiceKey, Rule[]> = {
     [/^\/store\/(marketing\/pop\/library|library\/product-descriptions)\/?$/, '/store/marketing/product-descriptions'],
     [/^\/store(\/.*)?$/, '/store$1'],
   ],
-  'pharmacy-hub': [
-    [/^\/store-owner\/workspace\/?$/, '/'],
-    [/^\/store-owner\/services\/?$/, '/services'],
-    [/^\/store-owner\/account\/?$/, '/settings'],
-    [/^\/store-hub(\/.*)?$/, '/hub$1'],
-    [/^\/store-owner\/products\/multilingual(\/.*)$/, '/store/products/multilingual$1'],
-    [/^\/store-owner\/multilingual-product-contents\/?$/, '/hub/multilingual-product-contents'],
-    [/^\/store-owner\/(products|cart|orders|payment)(\/.*)?$/, '/work/pharmacy-hub/$1$2'],
-    [/^\/store-owner\/local-products\/?$/, '/store/commerce/local-products'],
-    [/^\/store-owner\/tablets\/?$/, '/store/commerce/tablet-displays'],
-    [/^\/store-owner\/library\/resources\/?$/, '/store/library/resources'],
-    [/^\/store-owner\/library\/?$/, '/store/library/contents'],
-    [/^\/store-owner\/blog(\/.*)?$/, '/store/content/blog'],
-    [/^\/store-owner\/(qr|pop|pop-v2|product-descriptions)\/?$/, '/store/marketing/$1'],
-    [/^\/store-owner\/signage\/media\/?$/, '/store/marketing/signage/videos'],
-    [/^\/store-owner\/signage(\/.*)?$/, '/store/marketing/signage$1'],
-    [/^\/store-owner\/(handled-products|content|execution|analytics\/marketing|info)\/?$/, '/store/$1'],
-    [/^\/store-owner\/?$/, '/store'],
-    [/^\/store-owner(\/.*)?$/, '/store'],
-  ],
+
 };
 
 /**
@@ -71,6 +52,7 @@ const RULES: Record<UnifiedStoreServiceKey, Rule[]> = {
  */
 export function mapLegacyStorePathToUnified(serviceKey: UnifiedStoreServiceKey, pathname: string, search = ''): string {
   const rules = RULES[serviceKey];
+  if (!rules) throw new Error(`Unsupported store handoff service: ${serviceKey}`);
   for (const [pattern, replacement] of rules) {
     if (pattern.test(pathname)) {
       const mapped = pathname.replace(pattern, replacement).replace(/\/+$/, '') || '/';

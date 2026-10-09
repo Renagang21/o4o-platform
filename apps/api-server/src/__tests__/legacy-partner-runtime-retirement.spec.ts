@@ -151,7 +151,6 @@ describe('Seller Recruitment (판매자 모집) — Partner 가 아니므로 보
     for (const p of [
       'services/web-kpa-society/src/pages/pharmacy/SellerRecruitmentsBrowsePage.tsx',
       'services/web-kpa-society/src/pages/pharmacy/StoreRecruitmentApplicationsPage.tsx',
-      'services/web-pharmacy-hub/src/pages/store-owner/RecruitmentApplicationsPage.tsx',
       'services/web-neture/src/lib/api/supplier.ts',
     ]) {
       const c = code(p);

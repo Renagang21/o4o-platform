@@ -53,24 +53,8 @@ describe('mapLegacyStorePathToUnified — KCos', () => {
   });
 });
 
-describe('mapLegacyStorePathToUnified — PharmacyHub', () => {
-  const m = (p: string) => mapLegacyStorePathToUnified('pharmacy-hub', p);
-  it('공급 상품·장바구니·주문·결제는 /work/pharmacy-hub, 나머지는 공통', () => {
-    expect(m('/store-owner')).toBe('/store');
-    expect(m('/store-owner/products')).toBe('/work/pharmacy-hub/products');
-    expect(m('/store-owner/products/offer-1')).toBe('/work/pharmacy-hub/products/offer-1');
-    expect(m('/store-owner/cart')).toBe('/work/pharmacy-hub/cart');
-    expect(m('/store-owner/orders/o-1')).toBe('/work/pharmacy-hub/orders/o-1');
-    expect(m('/store-owner/payment/success')).toBe('/work/pharmacy-hub/payment/success');
-    expect(m('/store-owner/products/multilingual/listing/x')).toBe('/store/products/multilingual/listing/x');
-    expect(m('/store-owner/handled-products')).toBe('/store/handled-products');
-    expect(m('/store-owner/library')).toBe('/store/library/contents');
-    expect(m('/store-owner/blog/new')).toBe('/store/content/blog');
-    expect(m('/store-owner/signage/media')).toBe('/store/marketing/signage/videos');
-    expect(m('/store-owner/tablets')).toBe('/store/commerce/tablet-displays');
-    expect(m('/store-owner/account')).toBe('/settings');
-    expect(m('/store-owner/workspace')).toBe('/');
-    expect(m('/store-hub')).toBe('/hub');
-    expect(m('/store-owner/manuals/x')).toBe('/store'); // 통합 미제공 → 공통 홈 안전 착지
+describe('퇴역 서비스는 Store로 호환 이동하지 않는다', () => {
+  it('PH 경로를 내 매장 경로로 매핑하지 않는다', () => {
+    expect(() => mapLegacyStorePathToUnified('pharmacy-hub' as never, '/store-owner/orders')).toThrow('Unsupported store handoff service');
   });
 });

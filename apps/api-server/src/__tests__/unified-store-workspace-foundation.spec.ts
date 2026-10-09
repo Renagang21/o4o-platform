@@ -230,7 +230,6 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
   it('기존 서비스의 /store 라우트는 그대로다 (기능 이전 0)', () => {
     expect(readRepo('services/web-kpa-society/src/App.tsx')).toContain('<Route path="/store/workspace"');
-    expect(readRepo('services/web-pharmacy-hub/src/App.tsx')).toMatch(/\/store/);
   });
 
   it('deploy-web-services.yml 에 store-web 이 등록되어 있다', () => {
@@ -243,37 +242,31 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   });
 });
 
-describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 보존)', () => {
+describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 퇴역)', () => {
   const kpa = readRepo('services/web-kpa-society/src/App.tsx');
-  const phShell = readRepo('services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx');
-  const ph = readRepo('services/web-pharmacy-hub/src/App.tsx');
 
-  it('pharmacy는 옛 가드 전에 이전하고 PH는 기존 handoff 조건을 보존한다', () => {
+  it('pharmacy는 옛 가드 전에 내 매장으로 이전한다', () => {
     expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
     expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
     expect(norm(kpa)).toContain('<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>');
     expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
-    expect(phShell).toContain('UnifiedStoreHandoffGate');
-    expect(norm(phShell)).toContain('<PharmacyHubUnifiedStoreHandoff> <ShellLayout /> </PharmacyHubUnifiedStoreHandoff> </StoreOwnerGuard>');
   });
 
-  it('제외 표면: PH PG callback(/store-owner/payment · requireStoreOwnerRole=false) 과 송출 화면은 handoff 대상이 아니다', () => {
+  it('송출 화면은 handoff 대상이 아니다', () => {
     // requireStoreOwnerRole=false 분기는 MembershipGate → ShellLayout 직결(게이트 없음)
-    expect(norm(phShell)).toContain('<MembershipGate> <ShellLayout /> </MembershipGate>');
-    expect(ph).toContain('<Route path="/store-owner/payment" element={<StoreOwnerShell requireStoreOwnerRole={false} />}>');
     // 송출 화면은 layout wrapper(=게이트 포함) 없이 가드만
     expect(norm(kpa)).toContain('element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}');
   });
 
-  it("pharmacy 배포만 handoff를 활성화하고 PH는 기본 false를 보존한다", () => {
-    for (const svc of ['web-kpa-society', 'web-pharmacy-hub']) {
+  it("pharmacy 배포는 handoff를 활성화한다", () => {
+    for (const svc of ['web-kpa-society']) {
       const df = readRepo(`services/${svc}/Dockerfile`);
       expect(df).toContain(`ARG VITE_UNIFIED_STORE_HANDOFF=${svc === 'web-kpa-society' ? 'true' : 'false'}`);
       expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
     }
     const wf = readRepo('.github/workflows/deploy-web-services.yml');
     expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
-    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(1);
+    expect(wf).not.toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=${{ env.VITE_UNIFIED_STORE_HANDOFF }}');
     expect(wf).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
   });
 

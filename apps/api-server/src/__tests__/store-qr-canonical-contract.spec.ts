@@ -42,7 +42,6 @@ const CONTENT_SOURCE_MIGRATION =
   'apps/api-server/src/database/migrations/20270327000000-AddStoreQrContentSource.ts';
 const SHARED_VIEWER = 'packages/tablet-kiosk-core/src/PublicScreenSetViewer.tsx';
 const KPA_LANDING = 'services/web-kpa-society/src/pages/qr/QrLandingPage.tsx';
-const PH_LANDING = 'services/web-pharmacy-hub/src/pages/QrLandingPage.tsx';
 
 /** 분류 SQL 은 컬럼 이름만 받는 순수 문자열 생성기다. */
 const classifySql = () =>
@@ -262,7 +261,6 @@ describe('§7 screen_set 공개 랜딩 — KPA · PharmacyHub 동일 renderer', 
 
   it.each([
     ['KPA', KPA_LANDING],
-    ['PharmacyHub', PH_LANDING],
   ])('%s 공개 랜딩이 공통 뷰어를 소비한다 (사본 아님)', (_svc, file) => {
     const src = stripComments(read(file));
     expect(src).toContain("from '@o4o/tablet-kiosk-core'");
@@ -270,11 +268,5 @@ describe('§7 screen_set 공개 랜딩 — KPA · PharmacyHub 동일 renderer', 
     expect(src).toContain("landingType === 'screen_set'");
   });
 
-  it('PharmacyHub 가 screen_set 을 빈 준비 메시지로 처리하지 않는다', () => {
-    const src = stripComments(read(PH_LANDING));
-    const guard = src.indexOf("landingType === 'screen_set'");
-    const fallback = src.indexOf('표시할 내용이 아직 준비되지 않았습니다');
-    expect(guard).toBeGreaterThan(-1);
-    expect(fallback).toBeGreaterThan(guard);
-  });
+
 });

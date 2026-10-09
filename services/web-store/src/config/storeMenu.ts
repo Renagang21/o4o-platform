@@ -67,7 +67,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
  * Neture 약국 매장 메뉴 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §6)
  *
  * 약국은 매장 HUB 단계(취급 신청 → 승인 → 주문 가능) 없이 내 매장에서 바로 공급 상품을 주문한다.
- * `UNIFIED_STORE_CONFIG` 는 PharmacyHub 공통 문맥에도 쓰이므로 직접 바꾸지 않고,
+ * 공통 매장 메뉴와 약국 공급·주문 메뉴는 구분해 구성하고,
  * 약국(kpa-society) 문맥일 때만 `withPharmacyStoreMenu` 로 홈 바로 뒤에 붙인다.
  * subPath 는 pages/neture-pharmacy/shared.tsx 의 PHARMACY_STORE_PATHS 와 같다.
  */
@@ -115,20 +115,6 @@ export const SERVICE_WORK_CONFIGS: Readonly<Record<UnifiedServiceKey, StoreDashb
       ]},
       { label: '판매 채널 확장', items: [
         { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/sales-channels/foreign-visitor' },
-      ]},
-    ],
-  },
-  'pharmacy-hub': {
-    serviceKey: 'pharmacy-hub',
-    serviceName: 'PharmacyHub',
-    basePath: `${WORKSPACE_PATHS.serviceWork}/pharmacy-hub`,
-    enabledMenus: ['dashboard'],
-    menuSections: [
-      { label: '', items: [{ key: 'home', label: '홈', subPath: '' }] },
-      { label: '공급 상품 · 주문', items: [
-        { key: 'products', label: '공급 상품', subPath: '/products' },
-        { key: 'cart',     label: '장바구니', subPath: '/cart' },
-        { key: 'orders',   label: '주문',     subPath: '/orders' },
       ]},
     ],
   },

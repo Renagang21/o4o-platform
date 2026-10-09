@@ -134,11 +134,7 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       }
     });
 
-    it('Pharmacy-Hub 구매자 주문은 buyerId + serviceKey=pharmacy-hub 로 격리된다', () => {
-      const code = read('controllers/pharmacy-hub/PharmacyHubOrderController.ts');
-      expect(code).toContain('SERVICE_KEYS.PHARMACY_HUB');
-      expect(code).toContain('getBuyerId');
-    });
+
 
     it('구매자 주문 조회 키 집합은 단일 정의(buyer-order-service-scope)에서만 온다', () => {
       // 컨트롤러에 리터럴 배열이 되살아나면 event-offer 주문이 다시 목록에서 사라진다.
@@ -170,9 +166,9 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       expect(hard.filter((f) => !f.includes('fulfillment-service-scope'))).toEqual([]);
     });
 
-    it('공급자 직접 opt-in 경로는 allowlist 로만 열린다 (승인 축 우회 금지)', () => {
-      const code = read('modules/neture/controllers/supplier-service-delivery.controller.ts');
-      expect(code).toContain('isSupplierOptinServiceKey');
+    it('퇴역한 공급자 직접 opt-in 설정 경로는 다시 열리지 않는다', () => {
+      expect(fs.existsSync(path.join(SRC, 'modules/neture/controllers/supplier-service-delivery.controller.ts'))).toBe(false);
+      expect(read('modules/neture/neture.routes.ts')).not.toContain("router.use('/supplier/services'");
       const optin = read('modules/neture/constants/supplier-optin-services.ts');
       expect(optin).toContain('isApprovalEligibleServiceKey');
     });

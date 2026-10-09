@@ -43,7 +43,7 @@ import {
 } from '../../services/store/store-membership.service.js';
 
 /** 쿼리의 serviceKey 는 **허용 목록 안에서만** 받는다 — 모르는 값은 무시(서비스 중립 경로). */
-const SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub', 'cafe24-b2b'];
+const SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'cafe24-b2b'];
 function readServiceKey(req: Request): StoreOwnerServiceKey | undefined {
   const raw = typeof req.query.serviceKey === 'string' ? req.query.serviceKey : undefined;
   return raw && (SERVICE_KEYS as readonly string[]).includes(raw) ? (raw as StoreOwnerServiceKey) : undefined;

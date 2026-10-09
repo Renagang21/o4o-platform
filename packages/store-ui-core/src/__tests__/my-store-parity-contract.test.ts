@@ -14,7 +14,6 @@ import { resolve } from 'node:path';
 import {
   COSMETICS_STORE_CONFIG,
   KPA_SOCIETY_STORE_CONFIG,
-  PHARMACY_HUB_STORE_CONFIG,
   type StoreDashboardConfig,
 } from '../config/storeMenuConfig';
 
@@ -109,41 +108,8 @@ describe('기존 3서비스 메뉴 회귀 0', () => {
 
   it('판매자 모집 탐색은 KPA 에만 있다 (backend proxy 가 kpa-society 고정)', () => {
     expect(keys(KPA_SOCIETY_STORE_CONFIG)).toContain('seller-recruitments');
-    for (const c of [COSMETICS_STORE_CONFIG, PHARMACY_HUB_STORE_CONFIG]) {
+    for (const c of [COSMETICS_STORE_CONFIG]) {
       expect(keys(c)).not.toContain('seller-recruitments');
     }
-  });
-});
-
-describe('PharmacyHub 채택 결과 (§7·§8)', () => {
-  it('채택 4축이 /store-owner basePath 로 등록된다', () => {
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'product-descriptions')).toBe(
-      '/store-owner/product-descriptions',
-    );
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'recruitment-applications')).toBe(
-      '/store-owner/recruitment-applications',
-    );
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'analytics-marketing')).toBe(
-      '/store-owner/analytics/marketing',
-    );
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'signage-player')).toBe('/store-owner/signage/player');
-  });
-
-  it('사이니지 4축(재생 목록·동영상·편성·TV 재생)이 모두 등록된다 (#69·#70)', () => {
-    // 앞선 "미채택" 판정은 §8 에서 해소됐다 — 매장이 자기 동영상(`signage_media`)을 등록하고
-    // 발행한 재생 목록을 `signage_schedules` 로 편성하는 경로가 열렸다.
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'signage')).toBe('/store-owner/signage');
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'signage-media')).toBe('/store-owner/signage/media');
-    expect(pathOf(PHARMACY_HUB_STORE_CONFIG, 'signage-schedules')).toBe('/store-owner/signage/schedules');
-  });
-
-  it('KPA 전용 HQ 미디어 축(signage-videos)은 그대로 만들지 않는다', () => {
-    // '동영상' 은 매장 소유 미디어이지 HQ 방송 카탈로그가 아니다 — 두 축을 섞지 않는다.
-    expect(keys(PHARMACY_HUB_STORE_CONFIG)).not.toContain('signage-videos');
-  });
-
-  it('메뉴 key 는 서비스 안에서 유일하다', () => {
-    const k = keys(PHARMACY_HUB_STORE_CONFIG);
-    expect(new Set(k).size).toBe(k.length);
   });
 });

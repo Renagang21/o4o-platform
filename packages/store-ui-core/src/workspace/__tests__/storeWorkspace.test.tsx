@@ -13,7 +13,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   KPA_SOCIETY_STORE_CONFIG,
   COSMETICS_STORE_CONFIG,
-  PHARMACY_HUB_STORE_CONFIG,
 } from '../../config/storeMenuConfig';
 import {
   buildStoreWorkspaceTabs,
@@ -41,17 +40,11 @@ describe('resolveStoreWorkspacePaths', () => {
       myServices: '/store/services',
     });
     expect(resolveStoreWorkspacePaths(COSMETICS_STORE_CONFIG).home).toBe('/store/workspace');
-    expect(resolveStoreWorkspacePaths(PHARMACY_HUB_STORE_CONFIG)).toEqual({
-      home: '/store-owner/workspace',
-      myStore: '/store-owner',
-      storeHub: '/store-hub',
-      myServices: '/store-owner/services',
-    });
   });
 
   it('canonical serviceKey → 경로 (store workspace 없는 키는 null)', () => {
     expect(getStoreWorkspacePathsForService('kpa-society')?.myStore).toBe('/store');
-    expect(getStoreWorkspacePathsForService('pharmacy-hub')?.myStore).toBe('/store-owner');
+    expect(getStoreWorkspacePathsForService('pharmacy-hub')).toBeNull();
     expect(getStoreWorkspacePathsForService('neture')).toBeNull();
     expect(getStoreWorkspacePathsForService('kpa')).toBeNull(); // role prefix ≠ canonical key
   });

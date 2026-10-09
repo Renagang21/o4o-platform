@@ -33,7 +33,7 @@
 |---|---|---|---|---|---|---|
 | `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
 | `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | `kpa-society.co.kr/kpa/{분회}` |
-| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | 전체 약국 지원 세미프랜차이즈 사업 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
+| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | O4O 약국 경영지원 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
 | `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | `k-cosmetics.site` |
 | `store.neture.co.kr` | **약국 경영자 · 허가된 매장 사용자** | 약국 하나의 내 매장 · 가입한 복수 서비스 이용, 중간 HUB 없음 | **없음** (`store-workspace.ts`: catalog 서비스 아님) | 약국 신규 원장과 기존 서비스 역할은 §3에서 구분 | 자기 자신 | 각 서비스 앱의 `/store` · `/store-hub` |
 | `supplier.neture.co.kr` | 공급자 | 공급자 서비스 | `supplier` | `supplier:admin` · `supplier:operator` (운영자 범위) | 이용 가능한 공급·자료를 내 매장에 제공 | `neture.co.kr/supplier` |
@@ -54,7 +54,7 @@
 
 ### 2-2. PharmacyHub
 
-`pharmacyhub.co.kr` 에 새 독립 서비스를 만들지 않는다. 기능은 약국 서비스(`pharmacy.neture.co.kr`)로 흡수하는 방향이며(URL-FIRST §9 · §6-1 B안 수정), `pharmacy-hub` 키 · `pharmacy-hub:*` role 은 기존 QR · 오퍼 · 주문을 읽는 **호환 식별자로 보존**한다. 옛 호스트의 QR · 결제 복귀 경로는 안전한 목적지가 검증될 때까지 유지한다.
+**2026-10-09 사용자 결정**: Pharmacy Hub 웹·API·가입·운영자 지정·내 매장 PH 문맥·배포 경로·기존 도메인·인증서·인쇄 QR 주소는 모두 제거 대상이다. 302/301 호환 이전은 하지 않는다. `pharmacy.neture.co.kr`은 **O4O 약국 경영지원** 사업이고, 매장 실행 업무는 `store.neture.co.kr`, 독립 약사·사업 회원 포럼은 `community.neture.co.kr`이다. `pharmacy-hub` 키가 기존 주문·결제·커뮤니티 원장 조회에 남는 것은 데이터 식별자를 보존하기 위한 것이다. 신규 서비스 진입이나 새 PH 주문·결제·역할 부여를 허용하지 않는다. 이 결정은 과거 QR·호스트 보존 설명을 대체한다. 코드 반영·운영 배포·실제 서버/DNS/인증서 삭제 여부는 [퇴역 CHECK](../checks/CHECK-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)를 각각 확인한다.
 
 ---
 

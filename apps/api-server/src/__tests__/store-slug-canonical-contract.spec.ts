@@ -92,12 +92,7 @@ describe('§4 slug 생성 규칙 ↔ validation 규칙 정합', () => {
 });
 
 describe('§4 서비스 로컬 정규화 중복 제거', () => {
-  it('PharmacyHub slugBase 는 공통 generateSlugFromName 에 위임한다', () => {
-    const src = read('services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts');
-    expect(src).toMatch(/function slugBase\([^)]*\)[^{]*\{\s*const normalized = generateSlugFromName\(name\);/);
-    // 자체 문자 치환 규칙을 다시 들이지 않는다 (규칙 SSOT = 공통 유틸).
-    expect(src).not.toMatch(/replace\(\/\[_\s\]\+\/g/);
-  });
+
 });
 
 describe('§5 public store slug SSOT = platform_store_slugs', () => {

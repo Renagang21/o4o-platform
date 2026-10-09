@@ -122,8 +122,8 @@ function mockRes() {
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'ph-op@example.com',
-    roles: ['pharmacy-hub:operator'],
-    serviceKey: 'pharmacy-hub',
+    roles: ['kpa:operator'],
+    serviceKey: 'kpa-society',
     ...overrides,
   },
 });
@@ -223,10 +223,10 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
 
     expect(rec.users).toHaveLength(0);
     expect(rec.roles).toEqual([
-      expect.objectContaining({ userId: 'user-1', role: 'pharmacy-hub:operator', inTransaction: true }),
+      expect.objectContaining({ userId: 'user-1', role: 'kpa:operator', inTransaction: true }),
     ]);
     expect(rec.memberships).toHaveLength(1);
-    expect(rec.memberships[0]).toMatchObject({ serviceKey: 'pharmacy-hub', status: 'active', role: 'operator' });
+    expect(rec.memberships[0]).toMatchObject({ serviceKey: 'kpa-society', status: 'active', role: 'operator' });
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
@@ -247,7 +247,7 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
   it('기존 membership 은 상태를 승격하지 않고 그대로 보고한다', async () => {
     const rec = installDataSource({
       existingUser: EXISTING_USER,
-      existingMembership: { userId: 'user-1', serviceKey: 'pharmacy-hub', status: 'suspended' },
+      existingMembership: { userId: 'user-1', serviceKey: 'kpa-society', status: 'suspended' },
     });
     const res = mockRes();
 
@@ -256,7 +256,7 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
     expect(rec.memberships).toHaveLength(0); // 생성 0 — 기존 행을 건드리지 않는다
     expect(res.json.mock.calls[0][0]).toMatchObject({
       membershipPolicy: 'KEEP_EXISTING_STATUS',
-      membershipStatuses: { 'pharmacy-hub': 'suspended' },
+      membershipStatuses: { 'kpa-society': 'suspended' },
     });
   });
 });

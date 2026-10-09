@@ -86,9 +86,6 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       // WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C·§D (2026-09-23):
       //   '거래 상품 정보'(B2B 설명 편집) 와 '공급 오퍼'(안내 허브) 는 상품 목록으로 접힌다.
       //   B2B 설명은 상품 Drawer 에서, 유통 정책·서비스 대상은 상품 목록에서 직접 다룬다.
-      // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
-      //   Pharmacy-Hub 는 운영자 공급 승인이 없는 직접 opt-in 축 — 제공 설정은 Neture 에만 있다.
-      { label: '서비스 제공 설정', path: '/supplier/services/pharmacy-hub' },
       { label: '판매자 모집', path: '/supplier/recruitments' },
       { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
       { label: '이벤트 오퍼', path: '/supplier/event-offers' },

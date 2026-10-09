@@ -80,8 +80,5 @@ describe('KCos POP V2 canonical adoption', () => {
     expect(codeOnly(block('KPA_SOCIETY_STORE_CONFIG'))).toMatch(
       /key: 'pop',\s*label: 'POP',\s*subPath: '\/marketing\/pop-v2'/,
     );
-    expect(codeOnly(block('PHARMACY_HUB_STORE_CONFIG'))).toMatch(
-      /key: 'pop',\s*label: 'POP',\s*subPath: '\/pop'/,
-    );
   });
 });

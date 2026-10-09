@@ -5,7 +5,7 @@
  * 고정하는 것:
  *   ① 생성(Generation)  handoff · QR · 공개 랜딩은 canonical 호스트만 쓴다.
  *   ② 수용(Compatibility) 옛 호스트(인쇄 QR · 북마크)로 들어온 로그인도 같은 서비스 세션으로 판정한다.
- *   ③ Pharmacy-Hub 는 신규 가입 서비스로 제시하지 않지만 카탈로그 · handoff 대상에서 사라지지 않는다.
+ *   ③ Pharmacy-Hub 는 완전 퇴역해 카탈로그 · handoff · 세션 origin 대상에 없다.
  *   ④ kpa-branch 는 당시 DEFERRED 였고 WO-O4O-KPA-BRANCH-SERVICE-CATALOG-AND-HANDOFF-ALIGNMENT-V1 에서
  *      canonical kpa.neture.co.kr(basePath 없음)로 옮겼다 — 아래 마지막 describe.
  * DB · 네트워크 0.
@@ -56,7 +56,6 @@ describe('옛 호스트 수용 (session-origin)', () => {
     // 인쇄 QR · 북마크로 들어온 옛 호스트 — 종전 판정 그대로
     ['https://kpa-society.co.kr', 'kpa-society'],
     ['https://k-cosmetics.site', 'k-cosmetics'],
-    ['https://pharmacyhub.co.kr', 'pharmacy-hub'],
   ])('%s → %s', (origin, key) => {
     expect(resolveSessionServiceKey(origin)).toBe(key);
   });
@@ -73,14 +72,14 @@ describe('옛 호스트 수용 (session-origin)', () => {
 
 describe('Pharmacy-Hub 신규 가입 비노출', () => {
   it('joinEnabled=false · 가입 가능 목록에 없다', () => {
-    expect(getService('pharmacy-hub')?.joinEnabled).toBe(false);
+    expect(getService('pharmacy-hub')).toBeUndefined();
     expect(getJoinableServices().map((s) => s.key)).not.toContain('pharmacy-hub');
   });
 
-  it('카탈로그 · handoff 대상 origin 은 그대로다 (기존 회원 진입 보존)', () => {
-    expect(getService('pharmacy-hub')).toBeDefined();
-    expect(getServiceOrigin('pharmacy-hub')).toBe('https://pharmacyhub.co.kr');
-    expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(true);
+  it('카탈로그 · handoff · 세션 origin 에 퇴역 서비스가 없다', () => {
+    expect(getService('pharmacy-hub')).toBeUndefined();
+    expect(getServiceOrigin('pharmacy-hub')).toBeUndefined();
+    expect(resolveSessionServiceKey('https://pharmacyhub.co.kr')).toBeNull();
   });
 
   it('kpa-society 는 여전히 가입 가능하다', () => {

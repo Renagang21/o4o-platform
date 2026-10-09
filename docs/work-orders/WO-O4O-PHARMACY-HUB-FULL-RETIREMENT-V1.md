@@ -1,0 +1,86 @@
+# WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1
+
+> 작성일: 2026-10-09 · 상태: ACTIVE
+> 근거: 사용자 명시 지시 — Pharmacy Hub의 경로·서버·도메인·인증서를 모두 제거한다.
+> 기준: 최신 `origin/main` (`0f8535d6b1`) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
+
+## 1. 확정 범위
+
+PH는 퇴역한다. `pharmacy.neture.co.kr`은 **O4O 약국 경영지원** 사업이며 PH의 새 이름이나 호환 호스트가 아니다. 매장 실행 업무는 `store.neture.co.kr`, 독립 약사 커뮤니티와 사업 회원 포럼은 `community.neture.co.kr`이다.
+
+PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH 제공 설정·재배포 경로를 제거한다. PH의 도메인·인증서·인쇄 QR 주소도 제거 대상이며, 302/301 리다이렉트나 인쇄 QR 보존 경로를 만들지 않는다.
+
+기존 주문·결제·회원·콘텐츠의 DB 원장과 과거 migration은 삭제하거나 키를 바꾸지 않는다. 기존 공급자 주문 처리와 독립 커뮤니티의 포럼 저장 코드는 기능 이전 후에도 보존하는 데이터 식별자다. PH 전용 신규 주문이나 결제 경로를 유지하는 근거로 삼지 않는다. 상품의 PH 공급 키만 지워 기본 공급으로 새로 노출시키는 변경도 하지 않는다.
+
+## 2. 코드·문서 대조 후 ToDo
+
+| ID | 작업 | 방법·완료 조건 |
+|---|---|---|
+| R01 | PH 웹·API 제거 | `web-pharmacy-hub`, 전용 라우터·컨트롤러·scope·생성 코드 삭제; `/api/v1/pharmacy-hub` 미등록 |
+| R02 | 내 매장 PH 문맥 제거 | PH route·API adapter·메뉴·공개 origin·서비스 선택 분기 제거; 현재 약국 원장과 KPA 공통 구현은 유지 |
+| R03 | 신규 PH 진입 제거 | 서비스 catalog·CORS·운영자 부여 목록·공급자 PH 설정 경로 제거; 독립 약사 포럼의 저장 코드는 보존 |
+| R04 | PH 재배포 제거 | CD registry·workflow job·lockfile importer 정리; 다른 웹·API·병원약국 배포 유지 |
+| R05 | 운영 인프라 제거 준비·실행 | 실제 PH host rule·NEG·backend·Cloud Run·DNS·인증서 조사 후 PH 전용 자원만 제거; 공유 LB·IP·인증서의 다른 호스트 보호 |
+| R06 | 회귀 검증 | 변경 소비처 type-check/build, API focused tests, CD detector tests; PH 원장 조회·Store·공급자·커뮤니티 권한 보호 |
+| R07 | 문서 정합·인계 | 현행 DESIGN의 PH 도메인/QR 보존 계획 정정; CHECK에 코드 제거와 실제 운영 제거 상태를 구분해 기록 |
+
+## 3. 조사에서 확인한 의존성
+
+- PH 웹 165파일, PH 컨트롤러 23파일, PH 라우터 2파일과 전용 서비스가 남아 있다.
+- 내 매장은 아직 PH 공통 API 문맥을 선택할 수 있고, PH 결제 복귀 화면도 별도로 남아 있다. 이 참조부터 함께 제거한다.
+- 공급자 공통 주문 목록은 `pharmacy-hub` 원장 키를 조회해 기존 주문을 처리한다. 이 조회 집합에서 키를 빼면 기존 주문이 사라지므로 유지한다.
+- 독립 약사 커뮤니티는 `pharmacy-hub` 저장 코드의 글도 읽는다. 저장 코드는 유지하고 PH 웹 진입 metadata만 제거한다.
+- 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
+- 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
+
+## 4. 완료 경계
+
+DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다. 검증 결과를 첨부해 PR로 준비하고 main 통합은 저장소 `AGENTS.md` §4-1(e)의 사용자 승인 절차를 따른다. 실제 배포와 PH 운영 인프라 삭제 여부는 각각 별도 결과로 기록한다.
+
+## 5. 운영 인프라 제거 절차
+
+아래 이름은 과거 `CHECK-O4O-PHARMACY-HUB-OFFICIAL-DOMAIN-CONNECTION-V1`에서 확인한 후보이며, 현재 운영 조회로 확정한 목록이 아니다. GCP/Gabia 작업 권한이 있는 실행자가 현재 연결과 공유 여부를 조회한 뒤 수행한다. 사용자 지시는 PH 자원 제거를 포함한다. 자격증명을 저장소에 넣지 않는다.
+
+| 종류 | 과거 이름 | 삭제 전 확인 |
+|---|---|---|
+| PH Cloud Run | `pharmacy-hub-web` | 프로젝트 `netureyoutube`, 리전 `asia-northeast3`; 다른 도메인·NEG가 이 서비스를 쓰지 않음 |
+| Serverless NEG | `neg-pharmacy-hub-web` | PH Cloud Run만 가리킴; 다른 backend 참조 없음 |
+| Global backend | `backend-pharmacy-hub-web` | 모든 URL map에서 PH 외 참조 없음 |
+| Host rule·path matcher | `path-matcher-pharmacy-hub` | 공유 URL map `o4o-global-lb`의 PH 호스트만 제거; 다른 matcher·default backend 유지 |
+| 인증서 map entry | `cm-entry-pharmacyhub-root`, `cm-entry-pharmacyhub-www` | 공유 map `o4o-main-cert-map`에서 hostname이 PH root/www와 일치 |
+| 인증서 | `cm-cert-pharmacyhub` | SAN이 PH 도메인만 포함; 다른 map entry 참조 없음 |
+| DNS authorization | `dns-auth-pharmacyhub-root`, `dns-auth-pharmacyhub-www` | 다른 인증서 참조 없음 |
+| Gabia DNS·도메인 | PH root/www A 및 PH 인증용 CNAME | 권한 DNS를 재확인; 다른 도메인·공유 IP·DNS zone은 유지. PH 등록·갱신 종료도 registrar에서 처리 |
+
+1. API·Store·공급자 변경을 운영 반영하고 현재 Store QR·주문·공급자 후속 처리가 정상인지 확인한다. PH 신규 API·가입·설정이 없어야 한다. 운영 DB 원장 삭제는 포함하지 않는다.
+2. URL map·backend·NEG·Cloud Run·인증서 map/entry·certificate·DNS authorization의 현재 JSON을 비공개 작업 폴더에 저장한다. 과거 표와 다르면 현재 참조를 기준으로 목록을 수정한다. 새 URL map 초안은 다음으로 준비한다.
+
+   ```bash
+   gcloud compute url-maps describe o4o-global-lb --global --project netureyoutube --format=json > /tmp/ph-retirement-map.original.json
+   node scripts/deployment/pharmacy-hub-retirement.mjs /tmp/ph-retirement-map.original.json /tmp/ph-retirement-map.review.json
+   ```
+
+   스크립트는 PH 호스트만 제외하고 PH에만 쓰이던 matcher를 지운다. 공유 matcher·backend는 보고하고 보존한다. GCP를 호출하거나 삭제하지 않으며 출력 파일을 덮어쓰지 않는다. `unreferencedBackendCandidates`는 이 URL map 안에서만 미참조인 후보이므로 전체 프로젝트 참조를 다시 확인한다.
+3. 원본/초안의 diff에서 PH 외 변화가 없고 리다이렉트가 없음을 확인한다. 적용 직전 URL map을 다시 조회해 원본 fingerprint와 비교한다. 다른 실행자의 변경이 있으면 적용하지 않고 새 원본으로 초안을 다시 만든다.
+4. PH DNS A·인증용 CNAME 및 PH certificate map entry를 제거한다. 도메인 등록·갱신도 Gabia 계정에서 종료한다. 다른 서비스의 인증서 map이나 공용 IP를 지우지 않는다. DNS cache가 남아도 PH를 다른 서비스로 호환 이동시키지 않는다.
+5. 검토한 URL map을 적용한다. PH 외 호스트와 path matcher, default backend가 그대로인지 확인한다.
+
+   ```bash
+   gcloud compute url-maps import o4o-global-lb --global --project netureyoutube --source=/tmp/ph-retirement-map.review.json
+   ```
+
+6. 전체 참조가 0인 PH backend → NEG → Cloud Run을 제거한다. PH 전용 certificate → DNS authorization도 참조가 0일 때 제거한다. 현재 이름이 표와 일치할 때 사용하는 명령은 다음과 같다. 각 명령 사이에 실제 참조와 결과를 확인하며 한꺼번에 실행하지 않는다.
+
+   ```bash
+   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-root --map=o4o-main-cert-map --location=global --project=netureyoutube
+   gcloud certificate-manager maps entries delete cm-entry-pharmacyhub-www --map=o4o-main-cert-map --location=global --project=netureyoutube
+   gcloud compute backend-services delete backend-pharmacy-hub-web --global --project=netureyoutube
+   gcloud compute network-endpoint-groups delete neg-pharmacy-hub-web --region=asia-northeast3 --project=netureyoutube
+   gcloud run services delete pharmacy-hub-web --region=asia-northeast3 --project=netureyoutube
+   gcloud certificate-manager certificates delete cm-cert-pharmacyhub --location=global --project=netureyoutube
+   gcloud certificate-manager dns-authorizations delete dns-auth-pharmacyhub-root --location=global --project=netureyoutube
+   gcloud certificate-manager dns-authorizations delete dns-auth-pharmacyhub-www --location=global --project=netureyoutube
+   ```
+
+   앞의 map entry 2개는 4단계에서 이미 제거했다면 다시 실행하지 않는다. 삭제 명령은 실행 결과가 아니며 현재 환경에서는 수행하지 않았다.
+7. PH 서비스·NEG·backend·host rule·인증서/entry/auth·권한 DNS가 제거됐음을 각각 조회한다. 다른 Neture 서브도메인의 HTTPS와 Store QR·태블릿·사이니지·공급자 주문을 재검증한 뒤 CHECK에 실제 결과를 기록한다. 접근 권한이 없거나 공유 참조가 남은 항목은 완료로 표시하지 않는다.

@@ -39,12 +39,6 @@ const STORE_DIRECT_CONSUMERS = [
   'services/web-kpa-society/src/pages/pharmacy/StoreQrAiDescriptionPage.tsx',
   // K-Cosmetics Store — 앱(services/web-k-cosmetics) 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)
   // PharmacyHub Store (/store-owner/*)
-  'services/web-pharmacy-hub/src/pages/store-owner/BlogEditorPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/ContentPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/LibraryResourcesPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/PopPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/ProductDescriptionsPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/StoreProductMultilingualContentPage.tsx',
 ];
 
 /** Store 전용 공유 셸 — 셸 내부에서 false 고정 */
@@ -54,7 +48,6 @@ const STORE_ONLY_SHELL = 'packages/store-ui-core/src/components/ProductionMateri
 const TABLET_EDITOR = 'packages/tablet-screen-set-editor/src/index.tsx';
 const TABLET_STORE_CONSUMERS = [
   'services/web-kpa-society/src/pages/pharmacy/TabletScreenSetManager.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/TabletsPage.tsx',
 ];
 const TABLET_NON_STORE_CONSUMERS = [
   'services/web-kpa-society/src/pages/operator/tablet/OperatorTabletScreenSetsPage.tsx',
@@ -142,7 +135,6 @@ describe('WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1 — 공통 편집기 내부 A
     it('Store 영역에서 활성 RichTextEditor 소비처가 계약 목록 밖에 없다 (census drift 가드)', () => {
       const storeDirs = [
         'services/web-kpa-society/src/pages/pharmacy',
-        'services/web-pharmacy-hub/src/pages/store-owner',
       ];
       const found: string[] = [];
       for (const dir of storeDirs) {

@@ -116,18 +116,17 @@ describe('§18 staged scope guard — 내 범위만 커밋한다', () => {
 
 describe('§18 literal consumer census — raw-source 소비처를 놓치지 않는다', () => {
   it('수정 대상 파일 경로로 검색하면 raw-source spec 이 소비처로 잡힌다(§20 a0f8cc48c 재현)', () => {
-    const r = runNode(LITERAL_CENSUS, ['--source', 'services/web-pharmacy-hub/src/config/navigation.ts']);
+    const r = runNode(LITERAL_CENSUS, ['--source', 'services/web-store/src/lib/serviceContext.ts']);
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('RAW_SOURCE_CONTRACT');
-    // 이 spec 자신이 navigation.ts 를 readFileSync 하는 소비처다.
-    expect(r.stdout).toContain('pharmacy-hub-community-capability-adoption.spec.ts');
+    expect(r.stdout).toContain('store-service-scoped-owner-entry.spec.ts');
   });
 
   it('href 리터럴 검색은 실제 진입 UI 소비처를 ACTIVE_UI 로 분류한다', () => {
     const r = runNode(LITERAL_CENSUS, ["href: '/forum/request'"]);
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('ACTIVE_UI');
-    expect(r.stdout).toContain('services/web-pharmacy-hub/src/pages/forum/ForumHubPage.tsx');
+    expect(r.stdout).toContain('services/web-kpa-society/src/pages/forum/ForumHomePage.tsx');
   });
 
   it('소비처가 없으면 DEAD_REFERENCE 로 보고한다', () => {
