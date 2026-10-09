@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 기준 main: `0f8535d6b1` · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · branch: `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 결과와 남은 실행
 
@@ -37,6 +37,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
 | 변경 파일·raw-source 소비처 기반 API Jest | **151 suites · 3,158 tests PASS** |
+| 최신 main(PR #370) 반영 후 Neture Vitest | **45 files · 371 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
 | CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **330 tests PASS** · CI blocking Node 목록 전체 |
 | `git diff --check` | PASS |
