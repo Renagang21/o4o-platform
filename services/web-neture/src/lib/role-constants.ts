@@ -111,14 +111,14 @@ export const DASHBOARD_B2B_ROLES: string[] = [
 //   아래 값은 백엔드 `subdomain-operator-scope.ts` 의 scopeRoleMapping 과 같은 의미다:
 //     `{key}:operator` ← operator · admin      `{key}:admin` ← admin
 //   `platform:super_admin` 은 백엔드 platformBypass 와 같이 통과한다.
-//   `community` 는 `community:admin` 단일 계층이다(`community:operator` 는 만들지 않았다).
+//   `community` 도 Admin/Operator 계층을 사용하며 개체 운영 권한과는 구분한다.
 //   Neture 역할(`neture:admin` · `neture:operator`)은 **포함하지 않는다** — 다른 축이다.
 
 export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
 export type SubdomainOperatorLevel = 'admin' | 'operator';
 
 export function subdomainOperatorRoles(key: SubdomainOperatorKey, level: SubdomainOperatorLevel): string[] {
-  if (level === 'operator' && key !== 'community') {
+  if (level === 'operator') {
     return [`${key}:operator`, `${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
   }
   return [`${key}:admin`, NETURE_ROLES.PLATFORM_SUPER_ADMIN];
@@ -140,8 +140,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
-  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 은 community:admin 만 지정하고 이후는 이 화면이다.
+  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 전용 지정 업무는 이 화면에서 수행한다.
   { path: '/admin/communities', key: 'community', level: 'admin' },
+  { path: '/operator/communities', key: 'community', level: 'operator' },
 ]);
 
 const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>

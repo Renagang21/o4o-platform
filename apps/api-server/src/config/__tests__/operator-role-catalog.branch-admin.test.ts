@@ -70,8 +70,8 @@ describe('커뮤니티 — 전체 관리자만 만들고 전역 operator 는 만
     expect(ASSIGNABLE_OPERATOR_ROLES).toContain('community:admin');
   });
 
-  it('community:operator 는 **만들지 않았다** (개별 운영은 개체 역할로만)', () => {
-    expect(ASSIGNABLE_OPERATOR_ROLES).not.toContain('community:operator');
+  it('community:operator 를 community 서비스에 지정할 수 있다', () => {
+    expect(resolveOperatorRole('community:operator', 'community')).toEqual({ serviceKey: 'community', role: 'community:operator' });
   });
 
   it('platform:* 은 여전히 부여 대상이 아니다', () => {
