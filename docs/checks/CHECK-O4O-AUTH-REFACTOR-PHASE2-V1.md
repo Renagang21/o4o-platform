@@ -1,9 +1,11 @@
 # CHECK-O4O-AUTH-REFACTOR-PHASE2-V1
 
-> **작성일**: 2026-10-09 · **상태**: PR 검증 자료 · 운영 미적용
+> **작성일**: 2026-10-09 · **상태**: ACTIVE
 > **작업**: [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md) 단계 2
 > **PR**: [#378](https://github.com/Renagang21/o4o-platform/pull/378) — CI/review 현황은 PR의 최신 HEAD 기준
 > **branch**: `wo/auth-refactor-phase2` · **개발 기준 main**: `240a2dfd42f606f0067a5d290ed23c2ba514fece` · **승인 후 통합 기준 main**: `f1d86f4f21e97a7f5fd5f888b8524f9a3891a7f1`
+
+세션·비밀번호는 2026-10-09 운영 적용과 아래 smoke 검증을 마쳤다. 이 기록에 후속 가입·권한 회귀 자료도 이어서 기록한다.
 
 ## 변경과 보안 계약
 
@@ -102,3 +104,63 @@ Demo가 업무공간으로 이동하는 서비스는 원래 로그인 서브도�
 ## 문서 정합
 
 인증·서비스 가입 정본, Identity V3 갱신 안내, API 문서의 현재 session contract, WO의 단계 순서를 맞췄다. Phase 1 CHECK·과거 실행 기록·Frozen baseline은 보존했다. 로컬 확인·PR·main 통합·운영 배포 완료를 각각 구분한다.
+
+## 승인 후 운영 적용 · 2026-10-09
+
+PR [#378](https://github.com/Renagang21/o4o-platform/pull/378)은 main `03f97298560136883c10045794d2d26fa675fe3b`로 통합됐다. [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/37885883449) 성공 후 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/37886624466)를 한 번 실행했다. API의 `Run database migrations`와 전환 후 readiness 검사, 전체관리자와 Neture·Store·KPA-Society·Lecture·KPA-Branch 배포, 최종 serving SHA 보고 작업이 성공했다. API `/health/ready`도 200이다.
+
+배포 선택은 API·전체관리자와 유지 8개 origin을 담당하는 5개 앱이다. Hospital Pharmacy는 이 작업의 대상이 아니어서 선택하지 않았다. 전체 commit status의 `NOT_SELECTED`/pending은 그 별도 대상의 보류를 포함하며, 이번 선택 대상의 배포 실패로 해석하지 않는다. 다른 서비스·설정·secret을 임의 변경하지 않았다.
+
+- 운영 API: 유지 8개 origin × 두 Demo × 일반/refresh-only logout **32/32 PASS**. 폐기된 브라우저의 access/refresh는 401이고, 같은 origin의 다른 브라우저 및 다른 origin의 세션은 200으로 유지됐다. 검사 세션은 logout으로 정리했다.
+- 운영 Chromium PC(1440×900)·모바일(390×844): 유지 8개 × 두 Demo × 두 viewport, 실제 로그인·logout 버튼 **32/32 PASS**. 메인·공급자·Pharmacy 약국장 진입의 Store handoff를 완료한 뒤 원래 origin에서도 logout을 확인했다.
+- 동일한 32개 조합에서 저장된 access만 제거하고 실제 logout 버튼을 눌렀다. refresh credential로 서버 브라우저 폐기가 완료되고 원래 access/refresh가 모두 401인 **32/32 PASS**다. 실제 만료를 기다린 운영 테스트로 표현하지 않는다; 서명된 만료 access 자체의 검증은 앞서 기록한 격리 DB/browser 테스트다.
+- 운영 약국장 Demo의 약국 업무 API는 200이다. 공급자 Demo에 대한 `403 STORE_OWNER_REQUIRED`는 타인의 약국 업무를 차단하는 기대 결과이며 권한을 우회해 통과시키지 않았다.
+
+첫 browser 실행의 CA 신뢰 오류와 테스트 드라이버의 응답 envelope·비동기 이동/폐기 대기 가정을 고친 뒤 재실행했다. 실패 자료는 private 실행 공간에 보존했다. 환경의 공개 CA를 Chromium NSS에 등록했으며 TLS 검증을 끄지 않았다. 필요한 CA 초기화 helper와 `start_skill` 초안을 저장했으며, 초안 저장을 환경 게시로 보고하지 않는다. 이 검증을 위해 runtime 제품 코드를 추가 수정하지 않았다.
+
+운영 비밀번호 변경/reset은 공개 Demo의 금지 정책 때문에 실행하지 않았다. credential 변경·원자적 rollback·reset 일회성·전역 폐기의 실제 PostgreSQL 10건은 앞선 격리 검증이다. 실제 Google/Kakao OAuth, 전체관리자 실제 로그인, 상품·주문 전체 업무의 완료를 이 smoke 결과로 주장하지 않는다.
+
+## 가입·권한 회귀 · Phase 3
+
+**기준**: 배포된 main `03f97298560136883c10045794d2d26fa675fe3b` · 작업 branch `wo/auth-refactor-phase3`. 최신 모집단은 유지 사용자 origin 8개, runtime 웹 앱 5개, 전체관리자 및 API다. Phase 2 이후 runtime 수정 없이 기존 정책과 현재 코드의 일치 여부를 검사한다. Pharmacy-Hub는 최신 main에서 제거됐으며 되살리지 않는다.
+
+### 코드·자동 회귀
+
+| 검증 항목 | 실제 검사·결과 |
+|---|---|
+| 이메일·Google 공통 계정 가입 | EmailAuthService/GoogleAuthService: 계정·credential/provider 연결만 생성, membership·role·매장 자동 생성 없음, 동의·이메일 확인, 중복 가입·실패 rollback |
+| 서비스 미가입·승인 상태 | service catalog의 loginMembershipRequired는 현재 모두 false. 유지 origin에서 미가입은 공통 login 거부 사유가 아니며, pending/rejected/suspended/withdrawn의 보호 기능은 별도 membership/사업자 원장 gate가 판정 |
+| 메인 가입 완료 | main membership projection과 Neture 안내 화면: 정상 계정·확인된 이메일을 기준으로 하며 과거 pending/rejected 신청 원장을 승인 대기로 사용하지 않음 |
+| 약국장·공급자 | 약국 원장·조직 소유권과 공급자 관계를 사용. JWT role 문자열이나 타 서비스 active membership만으로 약국/사업장 접근을 만들지 않음 |
+| 정지·탈퇴·역할 회수 | membership read guard, 종료와 Identity 분리, 역할 편집/회수, account restriction·약관 gate 검증. 계정 탈퇴와 개별 서비스 탈퇴를 혼동하지 않음 |
+| 전체관리자·운영자 | password session의 전체관리자 접근 거부, 서비스/서브도메인 관리자·운영자 scope 분리, 캐시/JWT의 이전 권한만으로 통과시키지 않음 |
+| Demo 보호 | registry user_id 판정·비밀번호/소셜 연결 write guard. 일반 인증·원장 기반 접근을 사용하고 관리자 권한·가입 bypass를 추가하지 않음 |
+
+API Jest **21 suites / 483 tests PASS**: 가입·멤버십·역할 17 suites / 398건, 전체관리자 password·커뮤니티/서브도메인 scope·약관 4 suites / 85건이다.
+
+UI Vitest **11 files / 130 tests PASS**: Pharmacy 이용 gate 18건, Neture 가입/이메일 링크/메인 안내 17건, 공통 로그인·route guard·Google·Demo 버튼 54건, 서비스 이용·신청·서브도메인 운영자 경계 41건이다. 첫 실행의 작업 디렉터리와 config include 불일치는 root에서 config별 실제 파일을 지정해 해결했다. 0-test 실행은 검증에 포함하지 않는다.
+
+위 가입·Google identity·상태 변경 검증은 격리된 자동 회귀 테스트다. 실제 운영 사용자의 가입·승인·정지·탈퇴·역할을 변경하지 않았고 운영 SMTP/외부 OAuth 검증으로 보고하지 않는다. 새로운 runtime 결함이 확인되지 않아 인가 코드나 계약을 추가 변경하지 않았다.
+
+### 운영 PC·모바일 권한 검증
+
+운영 화면의 동일한 두 Demo 버튼을 새 browser context로 다시 누르고, 로그인한 원래 origin에서 read-only API의 권한을 검사한다. 전체관리자 목록 API는 두 Demo 모두 403 ROLE_REQUIRED, Demo 비밀번호 capability는 200/canManage=false다. 약국장 Demo는 약국 정보 200·공급자 상품 403 NO_SUPPLIER, 공급자 Demo는 약국 정보 403 STORE_OWNER_REQUIRED·본인 공급 상품 200을 기대한다. `error.code`와 최상위 `code`를 둘 다 읽으며 거절 응답을 로그인 실패로 해석하지 않는다. 각 검사는 실제 logout 버튼과 이전 token 401까지 포함한다.
+
+운영 유지 8개 × 두 Demo × PC/모바일 **32/32 PASS**이며 위 4개 endpoint 권한 판정 **128/128 PASS**다. 모든 조합에서 실제 logout·기존 access/refresh 401도 확인했다. 약국장 Demo의 연결된 약국 조직 존재와 공급자 Demo의 본인 상품 5건을 집계로 확인했으며, 실제 식별자·개인정보·응답 원문은 기록하지 않는다. 상품/주문 전체 기능 테스트나 테스트 데이터 전체 정리 완료를 뜻하지 않는다.
+
+| 서비스 | PC 약국장/공급자 | 모바일 약국장/공급자 |
+|---|---|---|
+| Neture | 2/2 PASS | 2/2 PASS |
+| Supplier | 2/2 PASS | 2/2 PASS |
+| Community | 2/2 PASS | 2/2 PASS |
+| Funding | 2/2 PASS | 2/2 PASS |
+| Pharmacy | 2/2 PASS | 2/2 PASS |
+| Store | 2/2 PASS | 2/2 PASS |
+| Study | 2/2 PASS | 2/2 PASS |
+| KPA-Branch | 2/2 PASS | 2/2 PASS |
+
+이번 후속 PR은 이 운영 적용/회귀 기록과 WO TODO만 갱신한다. runtime 변경이 없으므로 **DEPLOYMENT = NOT_APPLICABLE**이며 별도 production promote를 실행하지 않는다. PR의 최신 HEAD 필수 CI·review 상태를 확인하고 사용자 main 통합 승인 전 멈춘다.
+
+### 다음 단계
+
+가입·권한 회귀 다음은 카카오 로그인과 사용자 요청에 따른 명시적 계정 연결이다. 같은 이메일 자동 병합, 이미 다른 users.id에 연결된 provider의 자동 이동, 권한의 합집합은 허용하지 않는다. 실제 provider 자격정보·redirect와 연결 경로를 문서/코드 및 이용 가능한 운영 경로에서 먼저 조사한다. 별도 데이터 정리 TODO는 이번 권한 회귀 완료로 간주하지 않는다.
