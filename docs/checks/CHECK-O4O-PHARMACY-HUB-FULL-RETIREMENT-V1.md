@@ -1,0 +1,99 @@
+# CHECK-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1
+
+> 작성일: 2026-10-09 · 상태: ACTIVE
+> 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `8fa26f9293`(PR #372·#374·#375) · branch: `wo/pharmacy-hub-full-retirement-v1`
+
+## 1. 결과와 남은 실행
+
+| 구분 | 상태 | 근거 |
+|---|---|---|
+| 코드 제거 | 1차 main 반영·보완 PR 준비 | #375가 PH 웹·전용 API·배포 경로를 제거했고 #373이 공통 진입·신규 쓰기·원장 후속 처리·운영 삭제 인계를 보완 |
+| 로컬 검증 | PASS | API·웹 빌드와 관련 회귀 검증은 아래 §3 |
+| main 통합 | 대기 | PR required CI·리뷰 후 저장소 AGENTS §4-1(e)의 사용자 통합 승인 필요 |
+| 운영 배포 | 대기 | 배포 판정 `LEVEL_3`·`deploy_required=true`; main 통합과 별도 통제 배포 |
+| 실제 PH 인프라·도메인·인증서 삭제 | 로컬 인계·미실행 | 사용자가 로컬에서 수행한다고 결정. 이 환경의 credentials/secrets·outbound identity는 비어 있어 실제 조회·삭제 결과 없음. WO §5·§6의 절차와 인계문 사용 |
+| 설치 Local Agent 갱신 | 로컬 인계·미실행 | origin 차단 코드와 loopback HTTP 회귀 검증은 완료. 도메인 등록 종료 전에 설치 PC의 실제 실행 사본 갱신·재시작·차단 확인 필요 |
+| 운영 업무·모바일 smoke | 미실행 | 테스트 계정 로그인·실제 운영 배포 검증은 이 로컬 코드 검사에 포함하지 않음 |
+
+**코드 삭제가 Cloud Run·DNS·인증서 삭제를 뜻하지 않는다.** 과거 인쇄 QR·옛 호스트·인증서의 보존이나 리다이렉트는 폐기됐고, 삭제 대상 자체는 확정됐다. 접근 권한이 있는 운영 실행자가 [WO §5](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md#5-운영-인프라-제거-절차)의 최신 참조 조회·공유 자원 보호·삭제·확인 절차를 수행해야 전체 퇴역이 완료된다.
+
+## 2. 제거와 보존 경계
+
+- 삭제: `services/web-pharmacy-hub`, PH 전용 controllers/routes/scope/signup/provisioning/cart wrapper, Store의 `/work/pharmacy-hub`·결제 복귀·API adapter·메뉴, 공통 legacy PH handoff와 StoreOwnerGuard 설정, 공급자 PH 제공 설정의 API·화면.
+- 신규 진입 차단: 서비스 catalog·public origin·session origin·서비스 약관 범위·Store membership 대상·운영자 부여 목록·공급자 콘텐츠 제공 대상에서 PH 제거.
+- 공통 쓰기 차단: PH owner/member 역할로 공통 Store에 진입하거나 이용권 결제·활성화, 외국인 파트너/QR 자산, CMS 콘텐츠/슬롯을 생성·수정·전이할 수 없다. PH 역할은 과거 회수 식별자로만 남는다. 초대 수락은 PH role을 발급하지 않고 PH 전용 초대는 관계를 활성화하지 않는다. 과거 PH QR의 신규 scan event도 생성하지 않는다.
+- 공통 모집 차단: PH 모집 생성·재개·노출 승인·신규 신청·참여 승인은 410 `SERVICE_RETIRED`. 복수 생성 요청에 PH가 하나라도 있으면 전체 거절하며 public/Store 참여 목록에서도 제외한다. 과거 공급자/운영자 조회·마감·노출 반려·신청 반려/철회/해지는 보존한다.
+- 동의 판정: 과거 PH 이용약관·경영자 계약은 pending에서 제외하고 신규 승낙은 410으로 거부한다. PH 미동의가 현재 서비스 전체를 막지 않으며 현재 서비스 약관은 계속 요구한다. 약관·동의 원장 삭제나 동의 backfill은 없다.
+- Local Agent: PH root/www를 pairing origin에서 제거했다. 두 origin의 health/preflight/pair가 403으로 종료되고 Neture 정상 pairing은 유지된다. 설치 사본의 업데이트는 별도 로컬 실행이다.
+- 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
+- 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
+- 공개 매장: PH slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
+- DB 공개 catalog: active PH 행도 익명·로그인 사용자 목록에서 제외한다. 현재 서비스의 가입 상태 표시와 전체 관리자의 catalog 이력 조회는 보존하며 DB write는 없다.
+- 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
+- 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
+- 운영 DB write·schema/migration 변경 없음. 상품의 기존 PH `service_keys`를 지워 기본 공급으로 전환하는 backfill이나 테스트 데이터 삭제 없음.
+- `pharmacy.neture.co.kr`은 **O4O 약국 경영지원**, `store.neture.co.kr`은 매장 실행, `community.neture.co.kr`은 독립·사업 회원 커뮤니티다. 이 서비스를 제거하거나 PH로 통합하지 않는다.
+
+## 3. 검증
+
+Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 실행 결과이며 운영 smoke가 아니다.
+
+| 검증 | 결과 |
+|---|---|
+| API 의존성 `build:packages` | PASS |
+| API `@o4o/api-server type-check` | PASS |
+| Store·Neture(공급자 포함)·관리자 production build | PASS |
+| KPA 약국 경영지원 production build | PASS |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **232 suites · 4,363 tests PASS** · 236 suites 중 DB integration 4개 SKIP |
+| 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
+| 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
+| 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
+| 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
+| `store-ui-core` Vitest | **8 files · 121 tests PASS** |
+| CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **332 tests PASS** · CI blocking Node 목록 전체 |
+| Local Agent CI Node tests + PH origin 실제 loopback HTTP | **75 tests PASS** · native bridge·local DB·browser DOM·pairing 차단 |
+| `git diff --check` | PASS |
+| 문서 민감정보 검사 | PASS · 9 files · 패턴 0건 · 현행 docs 8개와 Agent README |
+
+PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec은 삭제했고, 여러 서비스가 공유하는 spec은 PH 사례만 제외했다. 현재 대상의 가입 상태 유지·권한 차단·조직 경계·공급자 원장·독립 약사 포럼 검증은 유지했다. 새 퇴역 spec은 PH origin/역할/Store 문맥/신규 콘텐츠 제공을 막고 현재 서비스 및 기존 원장 조회가 유지되는지 검사한다. URL map planner는 혼합 host rule·공유 matcher/backend·weighted backend·잘못된 matcher를 검증하며 PH를 다른 호스트로 리다이렉트하지 않는다.
+
+## 4. 문서 정합
+
+현행 commerce DESIGN §16과 서브도메인 의미 정본 §2-2를 사용자 결정으로 갱신했다. PH 모델 baseline에는 대체된 기준을 명시했고 B2B 주문 계약에는 PH 신규 producer/API 퇴역과 기존 결제 완료·원장 조회 보존의 차이를 정정했다. 과거 WO·CHECK의 당시 배포 결과는 덮어쓰지 않는다. 이 CHECK는 실제 운영 삭제 완료를 주장하지 않는다.
+
+Store 접근 정본과 Store Owner RBAC §3.1/§3.1-A도 정정했다. PH 역할 이름·linkage가 원장/회수 규약에 남아 있어도 현재 접근·발급 목록에는 없다는 점을 명시한다.
+
+PH 모델 baseline은 표준 `상태: SUPERSEDED · 대체 문서 · 표기일` 상태 줄로 정정하고 본문을 과거 기록으로 보존했다. canonical index의 ACTIVE 행 변경은 AGENTS §8·색인 §0의 별도 WO 규칙에 따라 [문서 WO](https://github.com/Renagang21/o4o-platform/blob/c988cf53380eff25e5587a4fc79db247aa03aa48/docs/work-orders/WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1.md)·PR #380으로 준비했다. #373을 먼저 main에 반영하고 #380을 이어 통합한다. main PR #375의 당시 WO는 실행 기록으로 보존하며 그 QR 리다이렉트 서술을 현행 지시로 쓰지 않는다.
+
+## 5. PR 리뷰와 전체 CI 보완
+
+첫 PR HEAD `b163163719`에서 Codex가 삭제된 PH 가이드·웹 파일을 읽는 공통 패키지 테스트 5개 파일을 지적했다. 해당 서비스 사례만 제거하고 KPA·Neture 및 공통 컴포넌트의 테스트는 유지했다. `shared-space-ui` 63건·`operator-core-ui` 43건이 통과했다. 첫 CI의 API 실패는 현재 catalog에서 빠진 PH를 활성 Store/운영자 대상으로 기대하던 fixture와 서브도메인 설명의 누락을 확인해 정정했다.
+
+추가 API 검증에서는 독립 약사 커뮤니티의 과거 PH 게시판 운영 권한이 끊어지는 실제 결함을 발견했다. `ForumControllerBase`가 게시판의 `service_code`를 웹 진입 목록에서 찾고 있었다. 원장 식별용 `communityKeyForForumStorageCode`를 catalog의 기존 `forumStorageCodes`로 구현하고 이 판정에서 사용한다. 퇴역 PH 웹 진입은 계속 없으며, 독립 약사 커뮤니티의 기존 PH 저장 게시판은 현재 community 운영 승인으로 판정한다. `legacy-community-closed-forum-operator.spec.ts`의 PH 사례는 삭제하지 않고 기존 글의 관리·다른 운영자 차단을 검증한다.
+
+보완의 확장 API 3,832건과 type-check가 통과했다. required CI/Codex 재검증 상태는 PR에서 확인한다. 첫 HEAD의 CI 실패를 최종 성공으로 표시하지 않는다.
+
+두 번째 HEAD `3f36b3b5d9`의 리뷰는 URL map 검증 테스트의 PH 호스트도 제거해야 한다고 지적했다. planner가 PH root/www/하위 호스트의 테스트를 함께 제거하고 다른 호스트의 테스트는 유지하도록 보완했다. 테스트의 기대 backend는 실제 라우팅 참조에서 제외한다. 신규 회귀 2건을 포함해 planner 8건과 blocking Node 검사 전체 332건을 검증했다. 이는 로컬 초안 생성 검증이며 실제 GCP import·삭제를 수행한 결과가 아니다.
+
+세 번째 HEAD `c1b5980367`은 CI Gate·SonarCloud·CodeQL을 통과했지만 리뷰가 공통 매장/CMS의 PH 신규 쓰기 잔여를 지적했다. UI 제거만으로 이 API들을 종료하지 못했던 문제를 보완했다. 직접 HTTP 호출에서 기존 PH 회원·운영자·전체 관리자도 PH 콘텐츠를 생성·수정·전이하지 못하고, 신규 이용권 결제/활성화·파트너·QR 생성도 차단되는지 검사한다. CMS 슬롯 GET·기존 이용권 GET은 유지한다. 현재 서비스의 owner/member·초대 수락과 PH 전용 초대/역할 발급 차단도 함께 검증한다. 이 보완 후 최신 커밋의 required CI/Codex를 다시 확인하며 이전 HEAD 성공으로 대체하지 않는다.
+
+검토 중 main에 PR #372·#374의 커뮤니티 운영자 권한 수정이 통합됐다. #374와 PH 제거가 `routes/operator/membership.routes.ts`에서 실제 충돌해, 두 정책을 함께 검증하기 위해 최신 main을 전용 작업 branch에 merge했다(원격 이력 재작성 없음). PH 역할은 허용 목록에서 제외하고 `community:admin`/`community:operator`, `injectOperatorServiceScope`와 새 회원 쓰기 범위 검사를 유지했다. main branch 자체와 운영 runtime은 변경하지 않았다. 이 결합 결과를 검증해 PR로 준비하며 실제 main 반영은 사용자 통합 승인 후 PR merge로만 수행한다.
+
+결합 후 API 4,180건·type-check, Neture 375건·production build, 관리자 운영자 지정 10건이 통과했다. DB가 필요한 `neture-pharmacy-commerce.integration`, `store-owner-termination.integration`, `forum-summary.integration` 3개 suite는 SKIP했다. 실제 운영 테스트 계정·모바일 smoke와 PH 인프라 삭제는 여전히 미실행이다.
+
+추가 리뷰에서는 Local Agent의 PH origin 신뢰, 공통 모집의 PH 신규 생성/참여, 과거 PH 약관이 현재 API 전체를 차단하는 문제가 확인됐다. PH origin을 제거하고 실제 loopback HTTP에서 nonce 발급·pairing·preflight 차단과 Neture pairing 유지를 검증했다. 모집은 생성·재개·노출/참여 승인·신규 신청을 차단하며 원장 조회·종결은 보존한다. 약관은 PH pending만 제외하고 현재 서비스의 428/승낙 후 통과를 유지한다. 전체 변경 소비처를 다시 실행해 API 4,197건과 type-check, CI Node 332건, Agent Node 75건이 통과했다. 최신 PR HEAD의 required CI·Codex 결과는 PR에서 확인하며 이전 HEAD의 성공으로 대체하지 않는다. WO §5·§6에는 설치 Agent의 수동 갱신·실행 사본 확인을 도메인 등록 종료의 선행조건으로 추가했다. 설치 PC 갱신·GCP/Gabia 삭제를 이 검증의 완료 항목으로 표시하지 않는다.
+
+HEAD `42bd366674`의 CI Gate·SonarCloud는 통과했으나 재리뷰가 공통 역할 부여·가입 재활성화·신규 Offer 입력을 지적했다. PH prefix와 catalog 항목은 전체 관리자에게도 신규 부여를 거부하고 역할 선택 목록에서 제외한다. PH 가입은 승인·재활성화·active 전이를 거부하며 전체 복구의 PH 원장은 건너뛴다. 직접 HTTP에서 오류가 410으로 전달되는지, 현재 서비스의 역할 부여·과거 PH 역할 조회/회수 및 거부·탈퇴가 유지되는지 검증한다. Offer 생성은 PH 키가 포함된 요청을 저장 전에 거부하며 과거 공급 키를 지우지 않는다. 현재 서비스의 상태 전이·사업자정보·정지 경계 검증은 유지하고, 퇴역 PH의 양수 전이를 요구하던 fixture는 현재 서비스 사례로 옮겼다. 이 보완의 최신 HEAD에서 required CI·Codex를 다시 확인한다.
+
+공통 관리·신규 Offer 보완 후 관련 그래프와 raw 소비처를 합친 API 233 suites를 실행했다. 229 suites·4,345 tests와 API type-check가 통과했고 DB integration 4개(36건)는 SKIP했다. 최신 PR HEAD의 CI·리뷰 결과와 실제 운영 실행은 별도로 확인한다.
+
+HEAD `c0d1313ad7`은 CI Gate·SonarCloud·CodeQL을 통과했으나 재리뷰가 공개 Store 관심 요청·QR 스캔의 PH 신규 기록을 지적했다. 공통 공개 Store resolver가 active/inactive PH slug와 PH로 향하는 과거 주소를 404로 종료하도록 보완했다. 공개 QR resolver는 PH 전용 조직의 스캔 INSERT 전에 종료하며 PH 주소를 화면 해석 축에서 제외한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 관심 요청·QR 스캔은 유지한다. 실제 HTTP의 기록 차단·현재 서비스 보존과 명시적 PH 호출의 조회 차단을 검증하고 변경 소비처를 재검사한다. 최신 HEAD의 CI·리뷰는 이전 커밋의 성공으로 대체하지 않는다.
+
+공개 Store·QR 보완 후 변경 그래프·raw 소비처를 합친 API 235 suites에서 231 suites·4,359 tests가 통과했다. 기존 DB integration 4개(36건)는 SKIP했고 API type-check도 통과했다. 공개 HTTP 차단과 현재 서비스의 관심 요청·스캔 보존을 포함한 결과이며 실제 운영 DB·로그인·모바일 검증은 아니다.
+
+HEAD `b591ff85e0`의 재리뷰는 DB 기반 공개 catalog의 PH 링크와 PH 정본 상태 모순을 지적했다. 공개 목록에서 PH 키를 제외하고 익명·로그인 HTTP 응답, 현재 서비스 가입 상태, PH-only 목록, 관리자 원장 조회와 DB 쓰기 없음의 회귀를 추가했다. baseline은 표준 SUPERSEDED 표기로 정정하고 canonical index는 별도 PR #380으로 정렬한다.
+
+검토 중 main에 PH 1차 제거 PR #375(`8fa26f9293`)가 통합돼 이 작업과 40파일에서 충돌했다. 충돌을 대조하고 완전 퇴역의 공통 차단·현재 서비스 회귀 검증을 유지해 결합했다. 기존 주문의 PH 결제 완료 처리까지 1차 삭제에 포함돼 있었으므로 신규 producer 없이 역사적 완료 handler와 초기화는 보존한다. #375의 PH 홈 진입 제거·README와 당시 WO는 유지한다. 실제 main 변경은 이 세션에서 수행하지 않았으며 현재 보완은 #373의 승인·merge 대기다.
+
+PR #375 결합과 DB catalog 보완 후 API 236 suites에서 232 suites·4,363 tests 및 type-check가 통과했다. DB integration 4개(36건)는 SKIP했다. Neture 46 files·375 tests와 CI blocking Node 전체 332건도 재검증해 통과했다. 최신 커밋의 required CI·Sonar·Codex는 PR에서 확인한다.

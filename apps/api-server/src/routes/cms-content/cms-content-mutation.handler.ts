@@ -30,6 +30,7 @@ import {
   canonicalizeCmsServiceKey,
   resolveCmsRolePrefix,
   isSameCmsService,
+  isRetiredCmsService,
 } from './cms-content-utils.js';
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 — 회원 저작 capability (config 축, 서비스 분기 없음)
 import {
@@ -61,7 +62,7 @@ async function authorizeCmsMutation(
   user: { id: string; roles?: string[] } | undefined,
   serviceKey: string | null | undefined,
 ): Promise<{ allowed: boolean; isPlatformAdmin: boolean }> {
-  if (!user) return { allowed: false, isPlatformAdmin: false };
+  if (!user || isRetiredCmsService(serviceKey)) return { allowed: false, isPlatformAdmin: false };
 
   // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
   //   platform admin 판정을 read 측과 **한 벌**로 공유한다 (근거를 두 곳에 두지 않는다).
@@ -330,6 +331,11 @@ export function createCmsContentMutationRoutes(deps: {
           success: false,
           error: { code: 'FORBIDDEN', message: 'Cannot change serviceKey without platform admin role' },
         });
+        return;
+      }
+
+      if (isRetiredCmsService(serviceKey)) {
+        res.status(403).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Retired service content cannot be created or moved' } });
         return;
       }
 

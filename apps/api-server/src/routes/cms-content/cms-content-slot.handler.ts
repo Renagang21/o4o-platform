@@ -28,6 +28,7 @@ import {
   resolveCmsServiceKeys,
   canonicalizeCmsServiceKey,
   isSameCmsService,
+  isRetiredCmsService,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
 
@@ -175,6 +176,7 @@ const requireSlotAccess = async (
  * - null serviceKey (global): admin only
  */
 function canManageServiceKey(access: SlotAccess, cmsServiceKey: string | null): boolean {
+  if (isRetiredCmsService(cmsServiceKey)) return false;
   if (access.isAdmin) return true;
   if (!cmsServiceKey) return false;
   return access.allowedCmsKeys.includes(cmsServiceKey);
@@ -438,6 +440,10 @@ export function createCmsContentSlotRoutes(deps: {
       }
 
       // WO-O4O-PROMOTION-SLOT-API-OPERATOR-V1: serviceKey scope check
+      if (isRetiredCmsService(serviceKey)) {
+        res.status(403).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Retired service slots cannot be created or assigned' } });
+        return;
+      }
       if (!access.isAdmin) {
         if (!serviceKey) {
           res.status(403).json({
@@ -609,6 +615,10 @@ export function createCmsContentSlotRoutes(deps: {
       if (slotKey !== undefined) slot.slotKey = slotKey;
       // legacy slot 을 alias 재전송으로 조용히 migration 하지 않는다 (§11: data migration 은 별도 판정).
       if (serviceKey !== undefined && !isSameCmsService(serviceKey, slot.serviceKey)) {
+        if (isRetiredCmsService(serviceKey)) {
+          res.status(403).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Slots cannot be moved to a retired service' } });
+          return;
+        }
         slot.serviceKey = serviceKey ? canonicalizeCmsServiceKey(String(serviceKey)) : null;
       }
       if (sortOrder !== undefined) slot.sortOrder = sortOrder;
@@ -730,6 +740,11 @@ export function createCmsContentSlotRoutes(deps: {
           success: false,
           error: { code: 'VALIDATION_ERROR', message: 'contents must be an array' },
         });
+        return;
+      }
+
+      if (isRetiredCmsService(serviceKey)) {
+        res.status(403).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Retired service slots cannot be assigned' } });
         return;
       }
 

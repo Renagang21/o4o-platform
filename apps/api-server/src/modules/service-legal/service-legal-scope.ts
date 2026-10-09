@@ -18,10 +18,6 @@ import {
   COSMETICS_SCOPE_CONFIG,
 } from '@o4o/security-core';
 import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-// WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1:
-//   PHARMACY_HUB_SCOPE_CONFIG 는 security-core(F1 Freeze) 가 아니라 api-server 로컬에 있다
-//   (pharmacy-hub-scope.middleware.ts 주석 참조). 여기서도 그 정의를 그대로 재사용한다 —
-//   legal 용 config 를 새로 만들면 권한 표가 둘로 갈라진다.
 import { LECTURE_SCOPE_CONFIG } from '../../middleware/lecture-scope.middleware.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 
@@ -30,9 +26,6 @@ export const SUPPORTED_LEGAL_SERVICE_KEYS = [
   'neture',
   'kpa-society',
   'k-cosmetics',
-  // WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1:
-  //   pharmacy-hub 는 공개 푸터를 가진 정식 서비스인데 이 집합에 없어
-  //   GET /public/services/pharmacy-hub/footer-legal 이 UNKNOWN_SERVICE 404 였다.
   'lecture',
 ] as const;
 

@@ -29,6 +29,7 @@ function makeDataSource(memberships: MembershipRow[], activeRoles: string[]) {
         const key = params[1] as string | undefined;
         return memberships
           .filter((m) => m.status === 'active' && (key === undefined || m.service_key === key))
+          .filter((m) => !sql.includes("service_key <> 'pharmacy-hub'") || m.service_key !== 'pharmacy-hub')
           .slice(0, 1)
           .map(() => ({ ok: 1 }));
       }
@@ -79,6 +80,12 @@ describe('isStoreOwner — membership 이 접근 게이트다 (cosmetics)', () =
 
     const allowed = makeDataSource([{ service_key: 'kpa-society', status: 'active' }], ['kpa:store_owner']);
     expect((await isStoreOwner(allowed, 'u1')).isOwner).toBe(true);
+  });
+
+  it('PH membership만 남으면 serviceKey 미지정 store_owner 판정도 열리지 않는다', async () => {
+    const ds = makeDataSource([{ service_key: 'pharmacy-hub', status: 'active' }], ['cosmetics:store_owner']);
+    expect((await isStoreOwner(ds, 'u1')).isOwner).toBe(false);
+    expect(ds.query.mock.calls.some((c: any[]) => String(c[0]).includes('role_assignments'))).toBe(false);
   });
 
   it('resolveStoreAccess 도 같은 게이트를 통과한다', async () => {

@@ -1,12 +1,10 @@
 /**
  * Service Legal — supported serviceKey 집합 계약 테스트
  *
- * WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1
+ * WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1
  *
- * PharmacyHub 푸터의 `GET /public/services/pharmacy-hub/footer-legal` 이
- * UNKNOWN_SERVICE 404 였던 원인은 이 집합에 'pharmacy-hub' 가 없었던 것 하나다.
  * 여기서 고정하는 계약:
- *   - pharmacy-hub 는 legal scope 대상이다 (404 재발 방지)
+ *   - pharmacy-hub 는 퇴역했으므로 legal scope 대상에서 제외
  *   - 기존 3서비스는 그대로 accept (회귀 방지)
  *   - 미지원/role-prefix 축 문자열은 여전히 reject (계약을 넓히지 않았다)
  */
@@ -17,7 +15,7 @@ import {
 } from '../service-legal-scope.js';
 
 describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
-  it('은퇴한 pharmacy-hub 관리 경로를 허용하지 않는다', () => {
+  it('퇴역 PH에는 legal 설정 경로를 열지 않는다', () => {
     expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(false);
   });
 
@@ -43,7 +41,7 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('lecture')).toBe(true);
   });
 
-  it('집합은 정확히 5개 canonical key 다 (의도치 않은 확장 감지)', () => {
+  it('집합은 정확히 4개 canonical key 다 (의도치 않은 확장 감지)', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',

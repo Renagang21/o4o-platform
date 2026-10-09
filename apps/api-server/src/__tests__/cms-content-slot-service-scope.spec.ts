@@ -15,11 +15,14 @@ jest.mock('../middleware/auth.middleware.js', () => ({
       req.user = { id: 'admin-1', roles: ['platform:super_admin'] };
     next();
   },
-  requireAuth: (_req: any, _res: any, next: any) => next(),
+  requireAuth: (req: any, _res: any, next: any) => {
+    if (req.headers['x-test-admin'] === '1') req.user = { id: 'admin-1', roles: ['platform:super_admin'] };
+    next();
+  },
 }));
 
 jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
-  roleAssignmentService: { hasAnyRole: jest.fn(async () => false) },
+  roleAssignmentService: { hasAnyRole: jest.fn(async (userId: string) => userId === 'admin-1') },
 }));
 
 jest.mock('../utils/logger.js', () => ({
@@ -55,6 +58,7 @@ const SLOTS = [
 ];
 
 let lastWhere: any = null;
+let saved: jest.Mock;
 
 function matchServiceKey(row: any, where: any): boolean {
   const sk = where?.serviceKey;
@@ -65,15 +69,22 @@ function matchServiceKey(row: any, where: any): boolean {
 
 function makeApp() {
   lastWhere = null;
+  saved = jest.fn();
   const dataSource: any = {
     getRepository: () => ({
       find: jest.fn(async ({ where }: any) => {
         lastWhere = where;
         return SLOTS.filter((s) => s.slotKey === where.slotKey && matchServiceKey(s, where));
       }),
+      findOne: jest.fn(async ({ where }: any) => {
+        const slot = SLOTS.find((s) => s.id === where.id);
+        return slot ? { ...slot } : null;
+      }),
+      save: saved,
     }),
   };
   const app = express();
+  app.use(express.json());
   app.use('/cms', createCmsContentSlotRoutes({ dataSource }));
   return app;
 }
@@ -108,5 +119,30 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
     expect(res.status).toBe(200);
     expect(res.body.meta.crossService).toBe(true);
     expect(res.body.data).toHaveLength(2);
+  });
+});
+
+describe('PH slot mutations retire while historical reads remain available', () => {
+  it('platform admin cannot create or assign a PH slot', async () => {
+    const app = makeApp();
+    expect((await request(app).post('/cms/slots').set('x-test-admin', '1')
+      .send({ slotKey: 'home-hero', contentId: 'c-2', serviceKey: 'pharmacy-hub' })).status).toBe(403);
+    expect((await request(app).put('/cms/slots/home-hero/contents').set('x-test-admin', '1')
+      .send({ contents: [], serviceKey: 'pharmacy-hub' })).status).toBe(403);
+    expect(saved).not.toHaveBeenCalled();
+  });
+
+  it('platform admin cannot edit or delete an existing PH slot', async () => {
+    const app = makeApp();
+    expect((await request(app).put('/cms/slots/s-2').set('x-test-admin', '1').send({ sortOrder: 10 })).status).toBe(403);
+    expect((await request(app).delete('/cms/slots/s-2').set('x-test-admin', '1')).status).toBe(403);
+    expect(saved).not.toHaveBeenCalled();
+  });
+
+  it('a current slot cannot be moved to PH', async () => {
+    const app = makeApp();
+    expect((await request(app).put('/cms/slots/s-1').set('x-test-admin', '1')
+      .send({ serviceKey: 'pharmacy-hub' })).status).toBe(403);
+    expect(saved).not.toHaveBeenCalled();
   });
 });

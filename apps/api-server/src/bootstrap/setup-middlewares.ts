@@ -53,9 +53,6 @@ export const getAllowedOrigins = (): string[] => {
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     // k-cosmetics.site · www — K-Cosmetics 종료로 제거(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
-    // WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1:
-    //   canonical 도메인은 platform_services.entry_url / Dockerfile VITE_SERVICE_URL 과 동일.
-    //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다.
     // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 1
     "https://study.neture.co.kr",
     // WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1:

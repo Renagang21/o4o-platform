@@ -92,14 +92,20 @@ describe('store-policy ownership — canonical axis', () => {
     await expect(isStoreOwner(dataSource, ORG_ID, 'cosmetics', 'user-1')).resolves.toBe(true);
   });
 
-  it('F. kpa / pharmacy-hub slug 도 같은 축으로 판정된다', async () => {
-    for (const serviceKey of ['kpa', 'pharmacy-hub']) {
+  it('F. kpa slug 도 같은 축으로 판정된다', async () => {
+    for (const serviceKey of ['kpa']) {
       const { dataSource } = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });
       await expect(isStoreOwner(dataSource, ORG_ID, serviceKey, 'user-1')).resolves.toBe(true);
 
       const other = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });
       await expect(isStoreOwner(other.dataSource, OTHER_ORG_ID, serviceKey, 'user-1')).resolves.toBe(false);
     }
+  });
+
+  it('퇴역 PH slug는 역할·조직 관계가 남아도 현재 매장 권한을 열지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });
+    await expect(isStoreOwner(dataSource, ORG_ID, 'pharmacy-hub', 'user-1')).resolves.toBe(false);
+    expect(calls).toHaveLength(0);
   });
 
   it('H. 매장 소유 축이 없는 서비스(neture)는 판정 대상이 아니다', async () => {

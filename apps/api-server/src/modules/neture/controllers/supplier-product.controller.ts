@@ -88,6 +88,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const result = await netureService.createSupplierOfferFromExistingMaster(supplierId, req.body ?? {});
       if (!result.success) {
         const statusCode = result.error === OfferErrorCode.SUPPLIER_NOT_ACTIVE ? 403
+          : result.error === 'SERVICE_RETIRED' ? 410
           : result.error === OfferErrorCode.MASTER_NOT_FOUND ? 404
           : result.error === OfferErrorCode.MASTER_NOT_ACTIVE ? 409
           : result.error === OfferErrorCode.MASTER_REGULATORY_TYPE_UNSUPPORTED ? 409

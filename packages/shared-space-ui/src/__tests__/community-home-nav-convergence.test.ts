@@ -24,7 +24,7 @@ const KPA_HEADER = 'services/web-kpa-society/src/components/KpaGlobalHeader.tsx'
 const KPA_FOOTER = 'services/web-kpa-society/src/components/Footer.tsx';
 
 describe('community home 공통 컨테이너 채택 (§8)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_HOME],] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_HOME]] as const) {
     it(`${name} 홈이 공통 CommunityServiceHome 을 소비한다`, () => {
       const src = read(path);
       expect(src).toContain("from '@o4o/shared-space-ui'");
@@ -51,7 +51,7 @@ describe('community home 공통 컨테이너 채택 (§8)', () => {
 });
 
 describe('primary nav 공통 조립기 채택 (§9)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_HEADER],] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_HEADER]] as const) {
     it(`${name} 헤더가 buildCommunityPrimaryNav 를 쓴다`, () => {
       const src = read(path);
       expect(src).toContain('buildCommunityPrimaryNav');
@@ -75,7 +75,7 @@ describe('primary nav 공통 조립기 채택 (§9)', () => {
 });
 
 describe('공개 푸터 공통 View 채택 (§14)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_FOOTER],] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_FOOTER]] as const) {
     it(`${name} 푸터가 공통 CommunitySiteFooter 를 쓴다`, () => {
       const src = read(path);
       expect(src).toContain('CommunitySiteFooter');
@@ -108,6 +108,8 @@ describe('공통 부품 service-neutral (§4)', () => {
     expect(src).not.toContain("serviceKey ===");
   });
 });
+
+
 
 describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
   const GONE = [

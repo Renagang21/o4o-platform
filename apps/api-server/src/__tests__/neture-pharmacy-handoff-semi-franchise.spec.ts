@@ -51,13 +51,19 @@ beforeEach(() => {
 });
 
 describe('authenticated entry does not grant service access', () => {
-  it.each(['kpa-society', 'pharmacy-hub', 'lecture'])('nonmember can move to %s introduction without membership writes', async (target) => {
+  it.each(['kpa-society', 'lecture'])('nonmember can move to %s introduction without membership writes', async (target) => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockHandoffRes();
     await HandoffController.generateHandoff(req({ targetServiceKey: target }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
     expect(sfQuery).not.toHaveBeenCalled();
     expect(sqlCalls().join(' ')).not.toMatch(/INSERT INTO service_memberships|UPDATE service_memberships/);
+  });
+  it('retired PH cannot be an authenticated handoff target', async () => {
+    const res = mockHandoffRes();
+    await HandoffController.generateHandoff(req({ targetServiceKey: 'pharmacy-hub' }, 'https://neture.co.kr'), res);
+    expect(res.statusCode).toBe(400);
+    expect(query).not.toHaveBeenCalled();
   });
   it.each([[[]], [[{ serviceKey: 'kpa-society', status: 'pending' }]], [[{ serviceKey: 'kpa-society', status: 'suspended' }]]])('exchange preserves actual memberships %j without elevation', async (memberships) => {
     query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]).mockResolvedValueOnce(memberships);

@@ -78,7 +78,6 @@ env:
   VITE_SERVICE_URL_NETURE: https://neture.co.kr
   # WO-O4O-SERVICE-CATALOG-CANONICAL-DOMAIN-AND-PH-JOIN-CLEANUP-V1: catalog canonical 정렬(옛 호스트는 수용 전용).
   VITE_SERVICE_URL_KPA_SOCIETY: https://pharmacy.neture.co.kr
-  # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
   VITE_API_URL_LECTURE: https://api.neture.co.kr
   VITE_SERVICE_URL_LECTURE: https://study.neture.co.kr
   VITE_API_URL_STORE: https://api.neture.co.kr
@@ -455,9 +454,6 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
-  # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
-  #   기존 4개 서비스 job 과 동일 구조. DNS(pharmacyhub.co.kr) 매핑은 이 WO 범위 밖 —
-  #   임시 Cloud Run URL 로 가입·승인 E2E 검증까지만 수행한다.
 
   deploy-lecture:
     needs: [detect-changes, ci-gate]

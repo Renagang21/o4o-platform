@@ -106,8 +106,6 @@ export const RESTRICTED_ALLOWLIST: ReadonlySet<string> = new Set([
   'GET /api/v1/auth/services',
 
   // ── 서비스별 가입 상태 · 반려 사유 조회 (§2.4 / §5-E) ──
-  'GET /api/v1/pharmacy-hub/join/status',
-  'GET /api/v1/pharmacy-hub/me/access',
   'GET /api/v1/kpa/me/membership',
   'GET /api/v1/cosmetics/members/me',
 ]);

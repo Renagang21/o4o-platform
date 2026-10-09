@@ -52,3 +52,9 @@ describe('mapLegacyStorePathToUnified — KCos', () => {
     expect(m('/store')).toBe('/store');
   });
 });
+
+describe('퇴역 서비스는 Store로 호환 이동하지 않는다', () => {
+  it('PH 경로를 내 매장 경로로 매핑하지 않는다', () => {
+    expect(() => mapLegacyStorePathToUnified('pharmacy-hub' as never, '/store-owner/orders')).toThrow('Unsupported store handoff service');
+  });
+});

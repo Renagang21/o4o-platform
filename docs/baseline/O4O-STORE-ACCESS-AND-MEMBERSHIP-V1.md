@@ -1,5 +1,7 @@
 # O4O-STORE-ACCESS-AND-MEMBERSHIP-V1
 
+> **2026-10-09 PH 완전 퇴역**: `pharmacy-hub:store_owner`·`pharmacy-hub:store_member`와 PH 조직 linkage는 과거 원장·역할 회수 식별자로만 보존한다. 현재 Store owner/member 게이트와 초대 수락의 PH role 신규 발급은 종료한다. PH 전용 초대는 수락해 관계를 활성화하지 않는다. 현재 매장의 초대 수락은 PH 과거 linkage를 제외한 서비스 role만 발급한다. 아래 PH 역할 이름을 포함한 옛 목록은 현재 접근 허용 목록이 아니다. 근거: [PH 완전 퇴역 WO](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md).
+
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **Status**: Active · **확정일**: 2026-10-03 · **갱신**: 2026-10-05 (§3-A 약국 자가 가입 제외)

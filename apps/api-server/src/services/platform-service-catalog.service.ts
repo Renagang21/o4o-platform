@@ -9,6 +9,7 @@
 import { Repository, DataSource } from 'typeorm';
 import { PlatformService } from '../entities/PlatformService.js';
 import type { PlatformServiceStatus } from '../entities/PlatformService.js';
+import { PHARMACY_HUB_SERVICE_KEY } from '../utils/service-retirement.js';
 
 export type MembershipStatus = 'active' | 'pending' | 'suspended' | undefined;
 
@@ -59,10 +60,10 @@ export class PlatformServiceCatalogService {
    * 매핑: active → 'approved', pending → 'applied', suspended → 'rejected'
    */
   async listVisibleServicesForUser(userId?: string): Promise<Array<PlatformService & { enrollmentStatus?: string }>> {
-    const services = await this.serviceRepo.find({
+    const services = (await this.serviceRepo.find({
       where: { status: 'active' as PlatformServiceStatus },
       order: { featuredOrder: 'ASC', name: 'ASC' },
-    });
+    })).filter((service) => service.code !== PHARMACY_HUB_SERVICE_KEY);
 
     if (!userId) {
       return services.map((s) => ({ ...s, enrollmentStatus: undefined }));

@@ -942,6 +942,9 @@ export class NetureOfferService {
     },
   ) {
     const { masterId, masterBarcode, isRegulated } = input;
+    if (input.serviceKeys?.some((key) => typeof key === 'string' && key.trim() === 'pharmacy-hub')) {
+      return { success: false, error: 'SERVICE_RETIRED', message: '종료된 서비스에는 공급 상품을 등록할 수 없습니다.' };
+    }
 
     // slug + offer entity
     const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;

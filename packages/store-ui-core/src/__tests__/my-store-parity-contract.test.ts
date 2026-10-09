@@ -108,7 +108,7 @@ describe('기존 3서비스 메뉴 회귀 0', () => {
 
   it('판매자 모집 탐색은 KPA 에만 있다 (backend proxy 가 kpa-society 고정)', () => {
     expect(keys(KPA_SOCIETY_STORE_CONFIG)).toContain('seller-recruitments');
-    for (const c of [COSMETICS_STORE_CONFIG,]) {
+    for (const c of [COSMETICS_STORE_CONFIG]) {
       expect(keys(c)).not.toContain('seller-recruitments');
     }
   });

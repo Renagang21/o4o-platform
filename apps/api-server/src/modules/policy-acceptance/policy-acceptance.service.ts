@@ -37,13 +37,13 @@ type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
 
 const PUBLISHED_TTL_MS = 60_000;
 const USER_OK_TTL_MS = 60_000;
+const RETIRED_POLICY_SERVICE_KEY = 'pharmacy-hub';
 export const STORE_OWNER_AGREEMENT_DOCUMENT_TYPE = 'store_owner_agreement' as const;
 export type MandatoryAgreementDocumentType = typeof REQUIRED_POLICY_DOCUMENT_TYPE | typeof STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
 const MANDATORY_AGREEMENT_TYPES: ReadonlySet<string> = new Set([REQUIRED_POLICY_DOCUMENT_TYPE, STORE_OWNER_AGREEMENT_DOCUMENT_TYPE]);
 const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
   'kpa-society': 'kpa:store_owner',
   'k-cosmetics': 'cosmetics:store_owner',
-  'pharmacy-hub': 'pharmacy-hub:store_owner',
 };
 
 /** 승낙 당시 본문 동일성 검증용 안정 hash (WO §5). 게시 도구 sha256 과 같은 입력(원문 그대로). */
@@ -173,7 +173,7 @@ export class PolicyAcceptanceService {
       cached = { at: now, docs: rows.map(toPublished) };
       this.publishedAgreementCache.set(STORE_OWNER_AGREEMENT_DOCUMENT_TYPE, cached);
     }
-    let published = cached.docs;
+    let published = cached.docs.filter((doc) => doc.serviceKey !== RETIRED_POLICY_SERVICE_KEY);
     if (serviceKey) published = published.filter((d) => d.serviceKey === serviceKey);
     if (published.length === 0) return [];
 
@@ -225,7 +225,8 @@ export class PolicyAcceptanceService {
    */
   async getPendingForUser(userId: string): Promise<PendingPolicyAcceptance[]> {
     if (!userId) return [];
-    const published = await this.listPublishedTerms();
+    // 퇴역 약관·동의 원장은 보존하되 현재 서비스 이용의 미동의 요구에는 포함하지 않는다.
+    const published = (await this.listPublishedTerms()).filter((doc) => doc.serviceKey !== RETIRED_POLICY_SERVICE_KEY);
     if (published.length === 0) return [];
 
     const okAt = this.userOkCache.get(userId);
@@ -308,6 +309,9 @@ export class PolicyAcceptanceService {
     }
     if (typeof serviceKey !== 'string' || serviceKey.length === 0) {
       throw new PolicyAcceptanceError('VALIDATION_ERROR', 'serviceKey 가 필요합니다.', 400);
+    }
+    if (serviceKey === RETIRED_POLICY_SERVICE_KEY) {
+      throw new PolicyAcceptanceError('SERVICE_RETIRED', '종료된 서비스의 계약에는 동의할 수 없습니다.', 410);
     }
 
     const rows = (await q.query(

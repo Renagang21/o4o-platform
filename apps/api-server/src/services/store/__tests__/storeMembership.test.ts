@@ -420,6 +420,35 @@ describe('M7 Role ∧ Relationship', () => {
     expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member' }));
   });
 
+  it('현재 매장에 PH 과거 linkage가 함께 남아도 PH role을 새로 발급하지 않는다', async () => {
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'kpa' || key === 'pharmacy-hub');
+    const result = await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A });
+    expect(result.services).toEqual(['kpa']);
+    expect(assignRoleMock).toHaveBeenCalledTimes(1);
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'kpa:store_member' }));
+  });
+
+  it('PH 전용 초대는 관계·role을 새로 활성화하지 않는다', async () => {
+    const { ds, sql } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+    linkedMock.mockImplementation(async (_ds: unknown, _org: string, key: string) => key === 'pharmacy-hub');
+    await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+    expect(sql.some((query: string) => query.startsWith('UPDATE'))).toBe(false);
+    expect(assignRoleMock).not.toHaveBeenCalled();
+  });
+
+  it('기존 PH staff 관계도 PH 매장 권한을 열지 않는다', async () => {
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    expect(await resolveStoreAccessLevel(ds, STAFF, 'pharmacy-hub')).toEqual({ level: 'none', organizationId: null, memberRole: null });
+  });
+
+  it('PH member role만 남으면 서비스 중립 매장 접근도 허용하지 않는다', async () => {
+    asNotOwner();
+    const { ds } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+    hasAnyRoleMock.mockImplementation(async (_user: string, roles: string[]) => roles.includes('pharmacy-hub:store_member'));
+    expect((await resolveStoreAccessLevel(ds, STAFF)).level).toBe('none');
+  });
+
   it('초대가 없으면 role 도 발급되지 않는다', async () => {
     const { ds } = makeDs();
     await expectCode(acceptStoreInvitation(ds, { userId: OUTSIDER, organizationId: ORG_A }), 'INVITATION_NOT_FOUND');

@@ -68,7 +68,7 @@ export function createServiceRecruitmentExposureProxyController(
         // serviceKey 고정 전달 → recruitment.serviceId 불일치 시 SERVICE_MISMATCH
         const result = await netureService.setRecruitmentExposure(req.params.id, userId, decision, note, serviceKey);
         if (!result.success) {
-          const code = result.error === 'RECRUITMENT_NOT_FOUND' ? 404 : result.error === 'SERVICE_MISMATCH' ? 403 : 400;
+          const code = result.error === 'RECRUITMENT_NOT_FOUND' ? 404 : result.error === 'SERVICE_MISMATCH' ? 403 : result.error === 'SERVICE_RETIRED' ? 410 : 400;
           res.status(code).json({ success: false, error: result.error });
           return;
         }

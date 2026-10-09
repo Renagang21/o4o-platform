@@ -26,7 +26,7 @@ describe('Phase 1 — CI gate 는 모든 배포 경로 앞에 있다', () => {
     });
   }
 
-  // web 6 — pharmacy-hub-web 배포 은퇴 · signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
+  // web 6 — signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
   //         k-cosmetics-web 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
   it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 6 · admin 1)', () => {
     assert.match(read(DEPLOY[0]), /build-and-deploy:[\s\S]*?needs: \[detect, ci-gate\]/);

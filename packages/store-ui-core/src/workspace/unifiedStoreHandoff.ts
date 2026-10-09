@@ -1,7 +1,7 @@
 /**
  * Unified Store Workspace 진입(handoff) — 순수 규칙 (WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-4)
  *
- * 세 서비스(KPA `/store` · KCos `/store` · PH `/store-owner`)의 매장 진입은 cutover 후
+ * KPA `/store` · KCos `/store`의 매장 진입은 cutover 후
  * `store.neture.co.kr` 통합 Store Workspace 로 handoff 된다. 이 파일은
  *   (1) cutover 플래그 해석 — 빌드 시 `VITE_UNIFIED_STORE_HANDOFF` 로 주입, 기본 OFF(기존 화면 그대로)
  *   (2) 서비스별 legacy 경로 → 통합 Workspace 경로 매핑(returnPath)
@@ -52,6 +52,7 @@ const RULES: Record<UnifiedStoreServiceKey, Rule[]> = {
  */
 export function mapLegacyStorePathToUnified(serviceKey: UnifiedStoreServiceKey, pathname: string, search = ''): string {
   const rules = RULES[serviceKey];
+  if (!rules) throw new Error(`Unsupported store handoff service: ${serviceKey}`);
   for (const [pattern, replacement] of rules) {
     if (pattern.test(pathname)) {
       const mapped = pathname.replace(pattern, replacement).replace(/\/+$/, '') || '/';

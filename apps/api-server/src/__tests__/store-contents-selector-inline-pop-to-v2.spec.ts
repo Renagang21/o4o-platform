@@ -141,6 +141,7 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
 // ─────────────────────────────────────────────────────────────────────────────
 describe('§5 boundary — KCos / PH / 공통 Core 무변경', () => {
 
+
   it('공통 handoff 계약·resolver 에 serviceKey 분기가 없다', () => {
     const handoff = stripComments(read(REPO, 'packages', 'store-ui-core', 'src', 'components', 'pop-v2', 'handoff.ts'));
     expect(handoff).not.toMatch(/serviceKey|'kpa'|'cosmetics'|'pharmacy-hub'/);

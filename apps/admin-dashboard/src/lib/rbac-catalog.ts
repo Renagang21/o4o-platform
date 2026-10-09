@@ -16,7 +16,7 @@ export const SERVICE_KEYS = [
   // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
   //   role prefix 이자 canonical service_key 가 동일한 서비스('pharmacy-hub').
   //   backend 는 이미 role·scope guard·Membership 을 갖추고 있었고 이 카탈로그만 비어 있었다.
-  'pharmacy-hub',
+  'pharmacy-hub', // Retired identity: display/revocation of existing assignments only.
   'lecture',
   // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
   //   약사회 분회 서비스. role prefix = canonical service_key = 'kpa-branch' (security-core self-map).
