@@ -1,29 +1,5 @@
-/**
- * StoreHandledProductsPage — 매장 경영활용 제품 (O4O 기반 제품, 읽기 조회 + 경영활용 정리)
- *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-UNIFIED-VIEW-V1 (선행)
- * WO-O4O-KPA-STORE-HANDLED-PRODUCTS-STANDARD-TABLE-V1: 표준 목록 UX(Toolbar+DataTable+Pagination)
- * WO-O4O-KPA-STORE-HANDLED-PRODUCT-DESCRIPTION-USAGE-POLICY-FIX-V1:
- *   O4O 상품 정보를 매장으로 복사하지 않고, 매장용(STORE) 상세설명서를 읽기 전용 직접 조회.
- *
- * WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1:
- *   - '매장 경영활용에서 제거' 액션 추가(1건/다건). 상품 정보 삭제가 아니라 매장↔제품 경영활용 연결 해제.
- *   - 이 화면에서의 '매장 직접 등록' 진입 폐기 → 등록 버튼·로컬 탭 제거. 이 화면 목록은 O4O 기반 제품만.
- *   - '승인 대기'(opl.status DEFAULT 'pending') = 유통 승인(Neture Distribution) 잔재. 이 화면엔 승인 절차
- *     없음(등록 즉시 is_active=true) → 상태 컬럼/승인 대기 표시 제거.
- *
- * WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1 (정책 주석 정정):
- *   위 '정책 폐기' 표현은 이 화면의 진입 정리를 뜻하며, store_local_products 자체의 폐기가 아니다.
- *   해당 데이터 축은 유효하다 — 상품 설명(StoreProductDescriptionsPage 100% 의존) / 태블릿
- *   진열(product_type='local') / QR / 다국어(targetKind='local') / handled-products UNION 소스.
- *   등록·수정 canonical 진입점 = 사이드바 '약국 상품·거래 > 매장 자체 상품'(/store/commerce/local-products).
- *   IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md
- *
- * WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1:
- *   header/설명 · 검색 · 총 건수 · loading/error/empty · table 기본 구조 ·
- *   제품명/분류/가격/수정일 표시 · pagination · row key 를 @o4o/store-ui-core 로 위임.
- *   KPA 고유(표준상품 추가 · 신규상품 요청 · 상세설명서 · 다국어 · QR · 다중선택 ActionBar)는
- *   slot/columns 로 그대로 유지한다. API·권한·route·제거 정책 변경 없음.
+/** 내 매장 제품: 주문 여부와 무관하게 O4O DB 기반·직접 등록 제품을 함께 관리한다.
+ * 상품 원장과 매장 소유권은 기존 API 계약을 유지한다. 공급 상품 주문과는 별개다.
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
@@ -45,6 +21,9 @@ import {
   type HandledProductsColumn,
 } from '@o4o/store-ui-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
+import { ProductFormModal } from './StoreLocalProductsPage';
+import { createLocalProduct, getLocalProduct, updateLocalProduct, type LocalProduct, type LocalProductInput } from '../../api/localProducts';
+import { useUnifiedStore } from '../../contexts/StoreContext';
 import { colors } from '../../styles/theme';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
@@ -52,7 +31,7 @@ import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './Store
 import { StoreProductQrModal, type StoreProductQrTarget } from './StoreProductQrModal';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
-// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청(제출·상태)
+// WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청(제출·상태)
 import { StoreNewProductRequestModal } from './StoreNewProductRequestModal';
 import { StoreProductRequestsListModal } from './StoreProductRequestsListModal';
 import type { StoreProductRequest } from '../../api/storeProductRequests';
@@ -63,7 +42,7 @@ const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
 const EMPTY_MESSAGE =
-  '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 표준 상품에서 추가’로 제품을 선택해 매장 경영활용 제품으로 등록할 수 있습니다.';
+  '등록한 제품이 없습니다. O4O 제품에서 찾아 등록하거나 매장에서 직접 등록할 수 있습니다.';
 
 // 행 키·배지·표시 포맷은 공통 계약(@o4o/store-ui-core)을 쓴다.
 // WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1
@@ -90,6 +69,11 @@ export default function StoreHandledProductsPage() {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [page, setPage] = useState(() => parsePage(searchParams.get('page')));
   const [limit, setLimit] = useState(() => parsePageSize(searchParams.get('limit')));
+  const { organizationId } = useUnifiedStore();
+  const source = searchParams.get('source') === 'local' ? 'local' : searchParams.get('source') === 'listing' ? 'listing' : 'all';
+  const [localForm, setLocalForm] = useState<{ product: LocalProduct | null } | null>(null);
+  const [localSaving, setLocalSaving] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [items, setItems] = useState<HandledProduct[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -138,8 +122,8 @@ export default function StoreHandledProductsPage() {
     setError(null);
     // 목록이 바뀌면 선택 초기화(서버 페이지네이션 — 선택은 현재 페이지 기준).
     setSelected(new Set());
-    // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 로컬(매장 직접 등록) 폐기 → O4O 기반 제품(listing)만 조회.
-    fetchHandledProducts({ page, limit, search: searchQuery || undefined, source: 'listing' })
+    // 매장 소유 제품 전체를 조회한다. 주문 이력과 등록 출처는 이용 자격이 아니다.
+    fetchHandledProducts({ page, limit, search: searchQuery || undefined, source })
       .then((d) => {
         if (cancelled) return;
         setItems(d.items);
@@ -154,9 +138,25 @@ export default function StoreHandledProductsPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, limit, searchQuery, reloadKey]);
+  }, [page, limit, searchQuery, reloadKey, source, organizationId]);
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
+  const saveLocal = async (input: LocalProductInput) => {
+    setLocalSaving(true); setLocalError(null);
+    try {
+      if (localForm?.product) await updateLocalProduct(localForm.product.id, input);
+      else await createLocalProduct(input);
+      setLocalForm(null); reload();
+      toast.success('내 매장 제품을 저장했습니다.');
+    } catch (e) { setLocalError(e instanceof Error ? e.message : '제품을 저장하지 못했습니다.'); }
+    finally { setLocalSaving(false); }
+  };
+  const editLocal = async (id: string) => {
+    try { setLocalError(null); setLocalForm({ product: await getLocalProduct(id) }); }
+    catch (e) { toast.error(e instanceof Error ? e.message : '제품을 불러오지 못했습니다.'); }
+  };
+  useEffect(() => { setLocalForm(null); setLocalError(null); }, [organizationId]);
+
 
   // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
   const [descProduct, setDescProduct] = useState<StoreDescriptionProduct | null>(null);
@@ -164,7 +164,7 @@ export default function StoreHandledProductsPage() {
   const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
-  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청 상태
+  // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청 상태
   const [showNewRequestModal, setShowNewRequestModal] = useState(false);
   const [editRequest, setEditRequest] = useState<StoreProductRequest | null>(null);
   const [showRequestsListModal, setShowRequestsListModal] = useState(false);
@@ -225,19 +225,19 @@ export default function StoreHandledProductsPage() {
   const selectedItems = useMemo(() => items.filter((it) => selected.has(rowKey(it))), [items, selected]);
   const singleSelected = selectedItems.length === 1 ? selectedItems[0] : null;
 
-  // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 매장 경영활용에서 제거(연결 해제) — 1건/다건.
+  // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 내 매장 제품에서 제거(연결 해제) — 1건/다건.
   const handleRemove = useCallback(async () => {
     if (selectedItems.length === 0 || removing) return;
     // WO-...-CATEGORY-COLUMN-V1: '연결 콘텐츠' 개념 제거 → 연결 콘텐츠 경고 문구 삭제(연결 해제 시 자료함/QR 미삭제는 유지).
     const msg =
-      '선택한 제품을 매장 경영활용 제품 목록에서 제거하시겠습니까?\nO4O 표준 상품 정보와 상세설명서·자료함 콘텐츠·QR은 삭제되지 않습니다.';
+      '선택한 제품을 내 매장 제품에서 제거하시겠습니까? 직접 등록 제품은 제품 정보가 삭제됩니다.\nO4O DB 원본과 자료함 콘텐츠·QR은 삭제되지 않습니다.';
     if (!window.confirm(msg)) return;
     setRemoving(true);
     try {
       const res = await removeHandledProducts(
         selectedItems.map((it) => ({ sourceType: it.sourceType, sourceId: it.sourceId })),
       );
-      if (res.removed > 0) toast.success(`${res.removed}개 제품을 매장 경영활용에서 제거했습니다.`);
+      if (res.removed > 0) toast.success(`${res.removed}개 제품을 내 매장 제품에서 제거했습니다.`);
       if (res.failed.length > 0) toast.error(`${res.failed.length}개 제품 제거에 실패했습니다.`);
       clearSelection();
       reload();
@@ -258,7 +258,7 @@ export default function StoreHandledProductsPage() {
       className: 'min-w-[240px]',
       render: (it) => <HandledProductNameCell name={it.name} imageUrl={it.imageUrl} />,
     },
-    { key: 'origin', header: '구분', render: () => <HandledProductBadge text="O4O 기반 제품" tone="blue" /> },
+    { key: 'origin', header: '등록 방식', render: (it) => <HandledProductBadge text={it.sourceType === 'local' ? '직접 등록' : 'O4O DB 기반'} tone={it.sourceType === 'local' ? 'gray' : 'blue'} /> },
     {
       key: 'classification',
       header: '분류',
@@ -283,40 +283,42 @@ export default function StoreHandledProductsPage() {
       <HandledProductsPageHeader
         breadcrumb={
           <>
-            <span>약국 상품·거래</span>
+            <span>매장 제품</span>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>매장 경영활용 제품</span>
+            <span style={{ color: colors.neutral700 }}>내 매장 제품</span>
           </>
         }
         icon={<Boxes size={20} style={{ color: colors.primary }} />}
-        title="매장 경영활용 제품"
+        title="내 매장 제품"
         description={
           <>
-            약국 경영에 활용할 O4O 제품을 확인·정리합니다.
+            O4O DB 기반 제품과 직접 등록 제품을 한곳에서 관리합니다. O4O 구매 이력 없이 등록·활용할 수 있습니다.
             실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다.
           </>
         }
         actions={
           <>
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
-              O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 매장 경영활용 제품으로 등록. */}
+              O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
             <Boxes size={14} />
-            O4O 표준 상품에서 추가
+            O4O 제품에서 찾아 등록
           </button>
           {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1):
               O4O DB 에 없는 신규 상품의 등록 요청(제출·상태). 기존 상품은 위 '표준 상품에서 추가'로. */}
+          <button onClick={() => { setLocalError(null); setLocalForm({ product: null }); }} style={styles.primaryBtn}>
+            <PlusCircle size={14} /> 직접 등록하기
+          </button>
+          <button onClick={() => navigate('/store/product-settings')} style={styles.refreshBtn}>제품 진열 설정</button>
           <button onClick={openNewRequest} style={styles.requestBtn}>
             <PlusCircle size={14} />
-            신규 상품 등록 요청
+            O4O DB 등록 요청
           </button>
           <button onClick={() => setShowRequestsListModal(true)} style={styles.refreshBtn}>
             <ClipboardList size={14} />
             내 등록 요청
           </button>
-          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 이 화면의 '매장 직접 등록' 버튼 제거(진입 정리).
-              WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: store_local_products 는 유효한 데이터 축이며
-              등록·수정은 '약국 상품·거래 > 매장 자체 상품' 메뉴에서 수행한다(이 화면에 버튼 재추가 금지). */}
+
           <button onClick={reload} style={styles.refreshBtn}>
             <RefreshCw size={14} />
             새로고침
@@ -325,6 +327,11 @@ export default function StoreHandledProductsPage() {
         }
       />
 
+      <nav aria-label="제품 등록 방식" className="flex flex-wrap gap-2 mb-4">
+        {([['all', '전체'], ['listing', 'O4O DB 기반'], ['local', '직접 등록']] as const).map(([key, label]) =>
+          <button key={key} type="button" aria-pressed={source === key} onClick={() => { setPage(1); patchParams({ source: key === 'all' ? null : key, page: null }); }} className={`rounded-lg border px-3 py-2 text-sm ${source === key ? 'bg-blue-50 border-blue-500 text-blue-700' : 'bg-white border-slate-200'}`}>{label}</button>
+        )}
+      </nav>
       {/* 검색: 입력 즉시 반영 + 서비스 소유 디바운스/URL 동기화 유지 */}
       <HandledProductsToolbar
         searchValue={searchInput}
@@ -362,14 +369,17 @@ export default function StoreHandledProductsPage() {
           {singleSelected && (
             <>
               {/* WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 복사 아님 — 매장용(STORE) 상세설명서 다국어 조회(읽기 전용). */}
-              <button
+              {singleSelected.sourceType === 'listing' && <button
                 type="button"
                 onClick={() => setDescProduct({ listingId: singleSelected.sourceId, name: singleSelected.name })}
                 style={styles.importBtn}
               >
                 <FileText size={13} />
                 매장용 상세설명서 보기
-              </button>
+              </button>}
+              {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => editLocal(singleSelected.sourceId)}>직접 등록 제품 수정</button>}
+              <button type="button" style={styles.importBtn} onClick={() => navigate(`/store/library/contents?create=1&pType=${singleSelected.sourceType}&pId=${encodeURIComponent(singleSelected.sourceId)}&pName=${encodeURIComponent(singleSelected.name)}`)}>콘텐츠 만들기</button>
+              <button type="button" style={styles.importBtn} onClick={() => navigate('/store/commerce/tablet-displays')}>태블릿에 활용</button>
               {/* WO-O4O-KPA-STORE-MULTILINGUAL-PRODUCT-CONTENT-ENTRY-LINK-V1: 기존 다국어 상품콘텐츠 저작 화면 진입점 연결.
                   handledProducts sourceType('local'|'listing')·sourceId 를 route param(targetKind·targetId)에 그대로 전달. */}
               <button
@@ -384,17 +394,17 @@ export default function StoreHandledProductsPage() {
                 <Languages size={13} />
                 다국어 콘텐츠
               </button>
-              {/* WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR 출력(다국어 무관 항상 사용). */}
-              <button type="button" onClick={() => openProductQr(singleSelected)} style={styles.mlcBtn}>
+              {/* O4O 제품은 제품 QR, 직접 등록 제품은 매장 콘텐츠를 통한 QR 제작. */}
+              <button type="button" onClick={() => singleSelected.sourceType === 'listing' ? openProductQr(singleSelected) : navigate(`/store/products/multilingual/local/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`)} style={styles.mlcBtn}>
                 <QrCode size={13} />
-                상품 QR 출력
+                {singleSelected.sourceType === 'listing' ? '상품 QR 출력' : '콘텐츠 QR 만들기'}
               </button>
             </>
           )}
-          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 매장 경영활용에서 제거(연결 해제, 원본 무접촉). 1건/다건 공통. */}
+          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 내 매장 제품에서 제거(연결 해제, 원본 무접촉). 1건/다건 공통. */}
           <button type="button" onClick={handleRemove} disabled={removing} style={styles.removeBtn}>
             {removing ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
-            매장 경영활용에서 제거
+            내 매장 제품에서 제거
           </button>
           <button type="button" onClick={clearSelection} style={styles.clearBtn}>
             <X size={13} />
@@ -421,7 +431,7 @@ export default function StoreHandledProductsPage() {
         onRegistered={reload}
       />
 
-      {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): 신규 상품 등록 요청 제출/재제출 */}
+      {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청 제출/재제출 */}
       <StoreNewProductRequestModal
         open={showNewRequestModal}
         editRequest={editRequest}
@@ -430,7 +440,7 @@ export default function StoreHandledProductsPage() {
         onAddExisting={() => setShowAddO4oModal(true)}
       />
 
-      {/* 내 신규 상품 등록 요청 목록·상태 */}
+      {/* 내 O4O DB 등록 요청 목록·상태 */}
       <StoreProductRequestsListModal
         open={showRequestsListModal}
         onClose={() => setShowRequestsListModal(false)}
@@ -452,9 +462,10 @@ export default function StoreHandledProductsPage() {
         onClose={() => setQrTarget(null)}
       />
 
+      {localForm && <ProductFormModal product={localForm.product} saving={localSaving} error={localError} onSave={saveLocal} onClose={() => { if (!localSaving) setLocalForm(null); }} onNavigateHub={() => navigate('/store/library/multilingual-product-contents')} />}
       <p style={styles.footnote}>
-        ※ 이 목록은 진열·콘텐츠·온라인 노출에 활용할 O4O 제품 풀입니다. 타블렛 진열·온라인 판매 등 채널별 설정은 각 채널 메뉴에서 관리합니다.
-        {' '}‘매장 경영활용에서 제거’는 매장과 제품의 경영활용 연결만 해제하며, O4O 표준 상품 정보·상세설명서·자료함 콘텐츠·QR은 삭제되지 않습니다.
+        ※ 등록 방식과 관계없이 제품을 QR·태블릿·콘텐츠 제작에 활용할 수 있습니다. 공급 상품 주문과는 별개입니다.
+        O4O DB 원본은 이 화면에서 수정하지 않습니다.
       </p>
     </div>
   );

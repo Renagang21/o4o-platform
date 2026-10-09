@@ -84,13 +84,13 @@ export default function StoreLocalProductsPage() {
     <StoreLocalProductsManager<LocalProduct, LocalProductInput>
       api={api}
       labels={{
-        title: '매장 자체 상품',
+        title: '직접 등록 제품',
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1 / -ENTRY-ALIGNMENT-V1:
         //   '매장 경영활용 제품'(/store/handled-products, 통합 읽기 조회)과 구분되는
-        //   store_local_products 등록·수정 원본 화면. 메뉴 라벨과 동일한 '매장 자체 상품'.
+        //   store_local_products 등록·수정 원본 화면. 메뉴 라벨과 동일한 '직접 등록 제품'.
         description:
           'O4O 제품이 아니더라도 매장이 직접 등록해 타블렛 전시·매장 안내·콘텐츠 제작 등 경영 활동에 활용하는 제품입니다. 결제/주문 시스템과 연결되지 않습니다.',
-        emptyTitle: '등록된 매장 자체 상품이 없습니다',
+        emptyTitle: '등록된 직접 등록 제품이 없습니다',
         emptyDescription: '매장 경영 활동에 활용할 제품을 등록해 보세요.',
       }}
       // 태블릿 진열 / 마케팅 자산 / POP 진입은 공통 기본 동작(=기존 KPA 경로)과 동일하다.
@@ -114,7 +114,7 @@ export default function StoreLocalProductsPage() {
 
 // ==================== Form Modal ====================
 
-function ProductFormModal({
+export function ProductFormModal({
   product,
   saving,
   error,
@@ -208,7 +208,7 @@ function ProductFormModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-slate-900">
-            {product ? '매장 자체 상품 수정' : '매장 자체 상품 등록'}
+            {product ? '직접 등록 제품 수정' : '직접 등록 제품 등록'}
           </h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5" />

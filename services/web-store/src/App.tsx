@@ -166,18 +166,20 @@ function storeChildRoutes() {
         <Route path="dashboard" element={<Navigate to={S} replace />} />
         <Route path="settings/layout" element={<Navigate to={`${S}/info`} replace />} />
         <Route path="settings/template" element={<Navigate to={`${S}/info`} replace />} />
+        <Route path="businesses" element={<Navigate to="/services" replace />} />
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
-        <Route path="my-products" element={<StoreOwnerOnly><StoreProductsManagerPage
-          title="내 매장 제품"
-          description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 태블릿, QR, 사이니지 등 매장 서비스에 활용합니다."
+        <Route path="my-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
+        <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
+        <Route path="product-settings" element={<StoreOwnerOnly><StoreProductsManagerPage
+          title="제품 진열 설정"
+          description="O4O DB 기반 제품의 표시 가격·설명·이미지·채널 노출을 관리합니다."
           registerButtonLabel="O4O 제품 취급 등록"
           infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 태블릿 전시, QR 안내, 사이니지 등에 연결해 활용할 수 있습니다."
           emptyTitle="취급 중인 O4O 제품이 없습니다"
           emptyDescription="O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주세요."
         /></StoreOwnerOnly>} />
-        <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
         <Route path="commerce/local-products" element={<StoreOwnerOnly><StoreLocalProductsPage /></StoreOwnerOnly>} />
         <Route path="products/multilingual/:targetKind/:targetId" element={<StoreOwnerOnly><StoreProductMultilingualContentPage /></StoreOwnerOnly>} />
         {/* 매장 경영지원 */}

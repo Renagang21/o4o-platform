@@ -37,6 +37,7 @@ export default function RootShell() {
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
   const navItems = ROOT_NAV_ITEMS;
+  const { organizationId } = useUnifiedStore();
   return <div className="site">
     <header className="header">
       <div className="header-left">
@@ -61,7 +62,7 @@ export default function RootShell() {
           : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}
       </div>
     </header>
-    <div className="content"><Outlet /></div>
+    <div className="content"><Outlet key={organizationId ?? 'no-store'} /></div>
     <footer className="footer">
       <div className="footer-links">
         <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>

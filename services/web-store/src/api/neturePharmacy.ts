@@ -146,7 +146,7 @@ export interface PharmacyOrder {
   createdAt: string;
   paidAt: string | null;
   supplierId: string | null;
-  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number }> | null;
+  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number; metadata?: { semiFranchiseKey?: string } }> | null;
   paymentGroupId: string | null;
   receiverKey: string | null;
   testPayment: boolean;

@@ -34,6 +34,7 @@ import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapsho
 import { StorePageShell } from '@o4o/store-ui-core';
 import { colors } from '../../styles/theme';
 import { stripHtml, blocksToText } from '../../utils/ai-clipboard';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
 // WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: list 영역 표준 테이블
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -305,8 +306,8 @@ export default function StoreLibraryResourcesPage() {
       labels={{
         // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
         //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
-        breadcrumbRoot: '약국 자료함',
-        pageTitle: '자료',
+        breadcrumbRoot: '내 자료함',
+        pageTitle: '파일 · 참고 자료',
         subtitle: (
           <>
             콘텐츠를 만들 때 참고할 원소스 자료를 보관합니다.
@@ -347,6 +348,7 @@ export default function StoreLibraryResourcesPage() {
       </div>
 
       {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: 카드 list → @o4o/ui DataTable */}
+      <StoreLibraryNavigation section="mine" />
       <DataTable<UnifiedResourceRow>
         rowSelection={{
           selectedRowKeys: Array.from(selected),
