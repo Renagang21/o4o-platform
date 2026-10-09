@@ -197,3 +197,18 @@ main 통합·배포와 실제 역할 계정 smoke는 별도 통합 승인 이후
 역할 소유 서비스를 위장하는 우회를 차단했다. namespaced role은 그 prefix를, bare role은
 실제 카탈로그의 canonical service key를 기준으로 admin 권한을 검증한다.
 관련 middleware/role controller 회귀 2 suites / 53 tests 및 API 타입 검사 PASS.
+
+
+### 최신 main 은퇴 정합 (PR #375 반영)
+
+검증 후 main이 `8fa26f9293`으로 이동하면서 Pharmacy-Hub 웹 앱·전용 API·배포 대상이 은퇴했다.
+통합은 같은 WO의 branch에서 수행했고 modify/delete 충돌은 main의 전체 앱 삭제를 유지했다.
+이 PR의 Pharmacy-Hub 화면 변경은 최종 diff에서 제거되며 서비스 또는 dependency를 복구하지 않는다.
+위 Pharmacy-Hub 타입 검사·화면 조사 기록은 은퇴 전 시점의 검증이다. 공통 API의 역사적 service key
+경계 회귀는 유지하며 현재 서비스 화면의 완료 근거로 사용하지 않는다.
+Neture·KPA·Lecture·Supplier·Funding·Community 소비처와 공통/API 경계를 최신 main 기준으로 재검증한다.
+
+
+최신 main 통합 후 검증: API 16 suites / 309 tests, Neture 46 files / 378 tests PASS.
+API 타입 검사, Neture·Lecture production build, frozen install PASS.
+unsafe routes 1,132 files / 위반 0. 기존 공통 UI·KPA 변경 경로는 main 은퇴 작업과 겹치지 않는다.

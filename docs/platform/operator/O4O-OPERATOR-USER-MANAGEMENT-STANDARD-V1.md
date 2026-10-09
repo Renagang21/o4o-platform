@@ -61,6 +61,7 @@
 서버 guard와 공통 목록·상세·편집 소비처에 같은 권한을 적용한다. 강의(`/operator/members`),
 공급자·펀딩·커뮤니티(`/operator/service-members/{serviceKey}`)도 공통 서비스 회원 콘솔을 사용한다.
 개별 커뮤니티의 회원·운영자는 이 서비스 가입 콘솔의 대상과 구분한다.
+K-Cosmetics·Pharmacy-Hub 웹 서비스는 은퇴했으므로 공통 API의 역사적 데이터 경계 회귀만 유지하고 화면을 복구하지 않는다.
 구현·검증 범위는 [경계 수정 WO](../../work-orders/WO-O4O-SERVICE-OPERATOR-MEMBERSHIP-BOUNDARY-FIX-V1.md)를 참조한다.
 
 ---
