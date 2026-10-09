@@ -13,7 +13,7 @@ access·refresh·handoff는 계정의 현재 `refreshTokenFamily`와 브라우�
 
 Store/KPA의 별도 fetch refresh는 auth-client coordinator를 사용한다. 같은 refresh token의 요청을 합치고, 로그아웃·다른 탭 token 삭제·새 로그인 뒤 늦게 도착한 응답은 버린다. 임시 network/DB 실패는 token을 지우지 않는다. cookie refresh의 JSON token 부재는 정상이며, 확정된 401만 화면 세션을 종료한다. 대기 요청은 실패·로그아웃 모두에서 종료된다.
 
-Neture 계정 보안 화면에 첫 비밀번호 추가·변경을 연결했다. 저장 후 재로그인을 안내하고 Demo/전체관리자 계정은 UI와 서버 모두 변경을 막는다. 전체관리자는 서버 검증 전 캐시로 보호 화면을 열지 않으며, AuthProvider와 API retry가 같은 cookie client를 사용한다. Zustand는 메모리 투영만 담당하고 별도의 저장·복원·token 소유자가 아니다. legacy API의 stale bearer 및 개발용 가짜 token도 제거했다.
+Neture 계정 보안 화면에 첫 비밀번호 추가·변경을 연결했다. 저장 후 재로그인을 안내하고 Demo/전체관리자 계정은 UI와 서버 모두 변경을 막는다. 전체관리자는 서버 검증 전 캐시로 보호 화면을 열지 않으며, AuthProvider·API retry·기존 화면의 패키지 singleton 직접 import가 같은 cookie client를 사용한다. Zustand는 메모리 투영만 담당하고 별도의 저장·복원·token 소유자가 아니다. legacy API의 stale bearer 및 개발용 가짜 token도 제거했다.
 
 최신 main의 커뮤니티 관리자·운영자 변경을 반영했다. 중앙 인증에서 최신 DB 역할을 읽는 계약을 유지하고 브라우저 폐기 검사도 함께 적용했다. 이전 epoch 컬럼과 claim은 호환 목적으로 남지만 logout 판정에는 사용하지 않는다. 관련 raw-source 테스트의 기대값도 현재 transaction 호출·세션 binding으로 갱신했다.
 
@@ -26,6 +26,8 @@ logout 요청은 현재 access/refresh credential을 캡처하고 로컬 상태�
 Store/Pharmacy fetch refresh는 API base 미설정 시 기존 `/api/v1`을 유지한다. 명시된 API base를 사용하며 서로 다른 서버를 같은 coordinator 요청으로 합치지 않는다. 두 서비스 × 설정/미설정 4건 PASS다.
 
 추가로 변경된 빌드에서 8개 서비스 × 두 Demo × PC/mobile **만료 access 상태의 실제 logout 버튼 32/32 PASS**다.
+
+전체관리자 package singleton 직접 소비처도 별도 client 생성 없이 같은 인스턴스를 사용함을 확인했다. 동일성 회귀와 최신 main 전체관리자 전체 345 tests·type-check·production build PASS다.
 
 추가 검증: cookie/body의 만료 access logout을 포함한 실제 PostgreSQL **10 tests PASS**, controller/서비스 경계까지 3 suites / 36 tests PASS. 영향 파일 ESLint error 0(기존 warning 2), API·auth-client 및 사용자 앱 재빌드 PASS.
 
@@ -67,7 +69,7 @@ symbol·endpoint·문구·수정 파일 경로 및 raw-source 소비처를 검�
 - API 전체 Jest 최초 실행: 422 suites / 7,274 tests PASS, 4 suites / 31 tests FAIL, 10 suites / 84 tests skipped. 실패 4개는 구형 테스트 session fixture 및 transaction 호출 문자열이었다. 해당 84건 재검증 PASS; 새 legacy token 재로그인 회귀도 포함했다. 최초 실행을 전체 PASS로 기록하지 않는다.
 - 최신 main 반영 뒤 중앙 인증·역할 회수·약관·restricted/token 경계: 5 suites / 112 tests PASS. workspace handoff 31 tests PASS.
 - 세션·이메일·Google·handoff 등 집중 검사: 10 suites / 235 tests 중 새 reset rollback fixture 1건 FAIL 후 fixture transaction 주입을 바로잡았다. 실제 PostgreSQL 8 tests 재실행 PASS; 나머지 227 tests PASS. reset token을 다시 사용할 수 있고 이전 비밀번호가 유지되는지 실제 DB로 검증했다.
-- auth-client 34, auth-context 16, auth-react 156, 최신 main Neture 375 tests PASS. 전체관리자 기존 340 + cookie session 2 tests PASS.
+- auth-client 34, auth-context 16, auth-react 156, 최신 main Neture 375 tests PASS. 최신 main 전체관리자 345 tests PASS(cookie owner/expiry/failure 검증 포함).
 - 전체 root type-check PASS. 공통 패키지·API·사용자 서비스 5개 앱·전체관리자 production build PASS. 기존 bundle-size 경고는 남는다.
 - lint ratchet PASS: 기존 error 46 / warning 998. 처음 발견한 이번 변경의 parsing/no-useless-catch 2건을 수정하고 재실행했다. error 0으로 보고하지 않는다.
 - 문서 sensitive 검사 PASS. main ruleset read-only 확인: PR 필수, required `CI Gate`, human approval 0, 삭제·non-fast-forward 금지. 기술 gate 통과와 사용자의 main 통합 승인은 별개다. 최신 CI/review 결과는 위 PR에서 확인한다.

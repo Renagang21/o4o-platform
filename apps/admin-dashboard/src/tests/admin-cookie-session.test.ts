@@ -2,11 +2,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { adminAuthClient } from '../lib/auth-client';
 import { unifiedApi } from '../api/unified-client';
+import { authClient as packageClient } from '@o4o/auth-client';
 
 vi.mock('react-hot-toast', () => ({ default: { error: vi.fn() } }));
 
 describe('whole-platform admin cookie authentication', () => {
   beforeEach(() => localStorage.clear());
+
+  it('uses the same cookie owner as existing screens importing the package singleton', () => {
+    expect(adminAuthClient).toBe(packageClient);
+    expect(adminAuthClient.getStrategy()).toBe('cookie');
+    expect(adminAuthClient.api.defaults.baseURL).toMatch(/\/api\/v1$/);
+  });
 
   it.each([200, 503])('cookie refresh %s uses the provider client and preserves cache on transient failure', async status => {
     const cache = JSON.stringify({ state: { user: { id: 'synthetic-admin' } } });
