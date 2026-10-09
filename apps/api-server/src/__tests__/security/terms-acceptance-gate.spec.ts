@@ -96,6 +96,10 @@ jest.mock('../../utils/token.utils.js', () => ({
   isServiceToken: () => false,
 }));
 
+jest.mock('../../modules/auth/services/role-assignment.service.js', () => ({
+  roleAssignmentService: { getRoleNames: jest.fn(async () => activeRoles) },
+}));
+
 import { requireAuth } from '../../common/middleware/auth/authentication.middleware.js';
 import {
   TERMS_PENDING_ALLOWLIST,
