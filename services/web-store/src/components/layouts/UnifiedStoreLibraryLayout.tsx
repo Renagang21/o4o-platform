@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { StoreLibraryNavigation } from '../StoreLibraryNavigation';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { RetiredServiceNotice, StoreAgreementGate, useRetiredOnlyStore } from './UnifiedStoreLayout';
@@ -14,8 +15,9 @@ export default function UnifiedStoreLibraryLayout() {
   const retiredOnly = useRetiredOnlyStore();
   if (retiredOnly) return <RetiredServiceNotice />;
   return <StoreAgreementGate serviceKey={commonServiceKey}>
+    <StoreLibraryNavigation section="sources" />
     <nav aria-label="이용 가능한 자료의 출처" className="flex flex-wrap gap-3 px-4 py-4">
-      <NavLink to={`${WORKSPACE_PATHS.myStore}/pharmacy/contents`}>사업 제공 콘텐츠</NavLink>
+      <NavLink to={`${WORKSPACE_PATHS.myStore}/pharmacy/contents`}>사업 제공 자료</NavLink>
       {SOURCES.map(([path, label]) => <NavLink key={path} to={`${WORKSPACE_PATHS.myStore}/library/${path}`}>{label}</NavLink>)}
       <NavLink to={`${WORKSPACE_PATHS.myStore}/library/contents`}>내 콘텐츠 · 사본</NavLink>
     </nav>
