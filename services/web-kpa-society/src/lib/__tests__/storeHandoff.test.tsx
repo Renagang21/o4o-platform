@@ -3,7 +3,11 @@ import { cleanup, render, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import HandoffPage from '../../../../web-store/src/pages/HandoffPage';
 
-vi.mock('@o4o/auth-client', () => ({ clearStoredTokens: vi.fn(), storeTokens: vi.fn() }));
+vi.mock('@o4o/auth-client', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@o4o/auth-client')>(),
+  clearStoredTokens: vi.fn(),
+  storeTokens: vi.fn(),
+}));
 vi.mock('../../../../web-store/src/lib/apiClient', () => ({ API_BASE_URL: 'https://api.neture.co.kr' }));
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState({}, '', '/'); });
 

@@ -62,3 +62,5 @@ main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 
 이전 커밋의 수동 전체 CI에서 서버 Jest 한 묶음이 실패했다. 상세 로그 저장소가 네트워크 허용 목록에 없어 실패 메시지만 확인했고 실패한 job 재실행을 요청했다. 최종 커밋의 CI와 Sonar 결과를 별도로 확인한다.
 
 약국 수신도 공통 HandoffEntryPage로 통합해 동일 receiver 복사본을 제거했다. 소비처는 Neture·분회·약국 3개다. 약국은 서버 승인 거절 메시지·신청 링크 해석을 callback으로 주입하며 기존 missing-token/network 문구와 spinner 없는 loading UI를 유지한다. 불완전한 exchange tokens 응답은 세션으로 저장하지 않는다. 약국 focused 3개 테스트로 정상 경로 차단·승인 안내·불완전 토큰 거절을 확인했다.
+
+최종 기능 커밋 `8fa9bb3f4c`의 SonarCloud Quality Gate PASS, 신규 중복률 1.1%. 다만 CI의 KPA 전체 테스트와 서버 Jest가 실패했다. KPA Store StrictMode 테스트의 auth-client mock에 새 교환 함수가 빠졌고, 서버 쿠키 경계 정적 계약은 공통화 후에도 각 화면에 URL 문자열이 직접 있어야 한다고 요구했다. mock은 실제 교환 함수를 유지하는 partial mock으로 수정했다. 정적 계약은 각 페이지→공통 receiver/transport export 연결을 검증하며 실제 transport·receiver와 모든 페이지에 credentials include가 없는지 검사한다. 서버의 쿠키 미발급 검증은 유지했다. KPA 전체 9 files / 74 tests, 해당 서버 계약 7개 PASS. 기능 코드는 추가 변경하지 않았다.
