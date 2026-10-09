@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCutover, parseProbes, verifyRedirects, validateHosts } from './pharmacy-hub-qr-cutover.mjs';
+import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation } from './pharmacy-hub-qr-cutover.mjs';
 
 const paths = ['/qr/active', '/tablet/store?tabletId=test&language=ko', '/multilingual-products/product?locale=ko', '/foreign-visitor/affiliate/active'];
 const original = () => ({
@@ -57,6 +57,24 @@ test('unavailable Neture targets prevent any write', async () => {
   const h = harness();
   await assert.rejects(runCutover({ ...h.options, preflight: async () => { throw new Error('target unavailable'); } }), /target unavailable/);
   assert.equal(h.writes.length, 0);
+});
+test('transient operation-read failures are reconciled until terminal success', async () => {
+  let calls = 0;
+  let clock = 0;
+  await settleOperation('operation-1', async name => {
+    assert.equal(name, 'operation-1');
+    if (++calls === 1) throw new Error('transient network failure');
+    return { status: calls === 2 ? 'RUNNING' : 'DONE' };
+  }, { now: () => clock, sleep: async ms => { clock += ms; } });
+  assert.equal(calls, 3);
+});
+test('pending server operation blocks unchanged-map assumptions and rollback', async () => {
+  const h = harness();
+  const pending = Object.assign(new Error('still pending'), { pendingOperation: true });
+  await assert.rejects(runCutover({ ...h.options, replace: async () => { throw pending; } }), /still pending/);
+  assert.equal(h.writes.length, 0);
+  let clock = 0;
+  await assert.rejects(settleOperation('pending', async () => ({ status: 'RUNNING' }), { now: () => clock, sleep: async ms => { clock += ms; }, timeoutMs: 4000 }), error => error.pendingOperation === true);
 });
 test('concurrent changes during verification prevent destructive rollback', async () => {
   const h = harness();

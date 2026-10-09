@@ -26,7 +26,7 @@ jobs:
     # Production inventory requires main; writes also require an explicit unfrozen state.
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
