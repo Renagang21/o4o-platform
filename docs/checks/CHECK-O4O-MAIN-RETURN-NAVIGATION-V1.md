@@ -60,3 +60,5 @@ main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 
 인증 클라이언트 34개, auth-react 156개, auth-utils 41개, Neture 전체 383개(최신 main 반영 후), Neture stale-token 3개, 약국 경로·승인 거절 2개 테스트 PASS. Neture·분회·약국·매장·강의 tsc/Vite build PASS. 최종 브라우저는 다섯 서비스의 desktop/mobile 경로 이동 20회 및 공통 오류 UI의 CSS·복귀 링크·가로 넘침 4회를 검증한다.
 
 이전 커밋의 수동 전체 CI에서 서버 Jest 한 묶음이 실패했다. 상세 로그 저장소가 네트워크 허용 목록에 없어 실패 메시지만 확인했고 실패한 job 재실행을 요청했다. 최종 커밋의 CI와 Sonar 결과를 별도로 확인한다.
+
+약국 수신도 공통 HandoffEntryPage로 통합해 동일 receiver 복사본을 제거했다. 소비처는 Neture·분회·약국 3개다. 약국은 서버 승인 거절 메시지·신청 링크 해석을 callback으로 주입하며 기존 missing-token/network 문구와 spinner 없는 loading UI를 유지한다. 불완전한 exchange tokens 응답은 세션으로 저장하지 않는다. 약국 focused 3개 테스트로 정상 경로 차단·승인 안내·불완전 토큰 거절을 확인했다.

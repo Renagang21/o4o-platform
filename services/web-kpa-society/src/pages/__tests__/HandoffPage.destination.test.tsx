@@ -30,3 +30,10 @@ it('preserves the server approval denial and application link', async () => {
   expect(screen.getByRole('link', { name: '약국 가입 상태 확인' }).getAttribute('href')).toBe('https://store.neture.co.kr/start-pharmacy');
   expect(replace).not.toHaveBeenCalled();
 });
+it('does not create a session from an exchange response without an access token', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, data: { tokens: {} } }) }));
+  render(<HandoffPage />);
+  await screen.findByText('서비스 이동에 실패했습니다.');
+  expect(replace).not.toHaveBeenCalled();
+  expect(localStorage.getItem('o4o_accessToken')).toBeNull();
+});

@@ -1,5 +1,3 @@
-import { exchangeHandoffToken } from '@o4o/auth-client';
-import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 /**
  * Service Handoff Page
  *
@@ -18,19 +16,11 @@ import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils
  * URL: /handoff?token={handoffToken}
  */
 
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { clearStoredTokens } from '@o4o/auth-client';
-import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
+import { HandoffEntryPage, type HandoffFailure } from '@o4o/auth-react';
+import { semiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
-// @o4o/auth-client SSOT token keys (token-storage.ts)
-const ACCESS_TOKEN_KEY = 'o4o_accessToken';
-const REFRESH_TOKEN_KEY = 'o4o_refreshToken';
-
-type HandoffStatus = 'loading' | 'success' | 'error';
-
-/** WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: 만료·실패 코드를 사용자 문구로 (다른 수신 페이지와 동일 표) */
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.',
   HANDOFF_TARGET_NO_MEMBERSHIP: '이 서비스에 가입되어 있지 않습니다.',
@@ -39,116 +29,20 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주세요.',
 };
 
-/**
- * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: `returnTo` 상대 경로 지원.
- * '/' 로 시작하는 단일 슬래시 경로만 허용 (open redirect 차단). 그 외는 홈.
- */
-
-
-export default function HandoffPage() {
-  const [status, setStatus] = useState<HandoffStatus>('loading');
-  const [error, setError] = useState<string>('');
-  const [accessLink, setAccessLink] = useState<SemiFranchiseAccessLink | null>(null);
-
-  // 낡은 토큰 선제 제거 — AuthProvider 의 passive effect(/auth/me) 보다 먼저 실행된다 (상단 주석).
-  useLayoutEffect(() => {
-    clearStoredTokens();
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const returnTo = resolveHandoffReturnTo(params.get('returnTo'), window.location.origin);
-
-    if (!token) {
-      setStatus('error');
-      setError('핸드오프 토큰이 없습니다.');
-      return;
-    }
-
-    const exchange = async () => {
-      try {
-        const response = await exchangeHandoffToken(API_BASE_URL, token);
-
-        const data = await response.json().catch(() => null);
-
-        if (response.ok && data?.success && data.data?.tokens) {
-          // Store tokens in localStorage (KPA Society uses localStorage strategy)
-          localStorage.setItem(ACCESS_TOKEN_KEY, data.data.tokens.accessToken);
-          localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
-          setStatus('success');
-          window.location.replace(buildHandoffDestination(returnTo, window.location.origin));
-        } else {
-          setStatus('error');
-          // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: Neture 약국 · 세미프랜차이즈 상태별 안내는 서버 문구 + 신청 링크
-          if (data?.serviceAccess && typeof data.error === 'string') {
-            setError(data.error);
-            setAccessLink(semiFranchiseAccessLink(data.serviceAccess.next));
-          } else {
-            setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');
-          }
-        }
-      } catch {
-        setStatus('error');
-        setError('네트워크 오류가 발생했습니다.');
-      }
-    };
-
-    exchange();
-  }, []);
-
-  if (status === 'loading') {
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <p style={styles.text}>서비스 이동 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === 'error') {
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <p style={styles.errorText}>{error}</p>
-          {accessLink && <p><a href={accessLink.href} style={styles.link}>{accessLink.label}</a></p>}
-          <a href="/login" style={styles.link}>로그인 페이지로 이동</a>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+function resolvePharmacyFailure(data: unknown): HandoffFailure | null {
+  if (!data || typeof data !== 'object') return null;
+  const response = data as { error?: unknown; serviceAccess?: { next?: string | null } };
+  if (!response.serviceAccess || typeof response.error !== 'string') return null;
+  return { message: response.error, link: semiFranchiseAccessLink(response.serviceAccess.next) ?? undefined };
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-  },
-  card: {
-    textAlign: 'center' as const,
-    padding: '40px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  },
-  text: {
-    fontSize: '16px',
-    color: '#333',
-  },
-  errorText: {
-    fontSize: '16px',
-    color: '#d32f2f',
-    marginBottom: '16px',
-  },
-  link: {
-    color: '#1976d2',
-    textDecoration: 'none',
-    fontSize: '14px',
-  },
-};
+export default function HandoffPage() {
+  return <HandoffEntryPage
+    apiBaseUrl={API_BASE_URL}
+    errorMessages={ERROR_MESSAGES}
+    resolveFailure={resolvePharmacyFailure}
+    showSpinner={false}
+    missingTokenMessage="핸드오프 토큰이 없습니다."
+    networkErrorMessage="네트워크 오류가 발생했습니다."
+  />;
+}
