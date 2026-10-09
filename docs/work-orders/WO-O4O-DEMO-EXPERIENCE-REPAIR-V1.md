@@ -1,5 +1,7 @@
 # WO-O4O-DEMO-EXPERIENCE-REPAIR-V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: ACTIVE · **작성일**: 2026-10-09 KST
 > **근거**: 사용자 지시 — 발견한 문제를 모두 해소하고 해결 방법 제시
 > **상위 작업**: [인증 리팩토링](WO-O4O-AUTH-REFACTOR-V1.md)
@@ -69,7 +71,7 @@ Pharmacy-Hub는 사용자 지정 삭제 대상이므로 인증·Demo 검증에�
 - [x] PR #365 CI·review 확인, main 통합, API·Neture 배포
 - [x] 기존 Actions WIF → Cloud SQL migration Job 실행 경로 재사용
 - [x] PR #367의 대상 한정 census·테스트 데이터 출처 확인·before/after 백업·transaction 복구
-- [x] 합성 약국 원장·조직 owner·약국 세미프랜차이즈 승인 연결, 업무 API 200 확인
+- [x] 합성 약국 원장·조직 owner·약국 약국 협력사업 승인 연결, 업무 API 200 확인
 - [x] 공급자 Demo 상품 5개 연결, 일반 자료 작성 API로 상품 안내 1개를 비공개 personal로 생성
 - [x] PR #367 main 통합, 승인된 L3 Promote의 migration·API 배포·serving SHA 검증
 - [x] 전체 유지 서비스에서 발견한 실제 상품 페이지 500 수정, 실제 PostgreSQL 7개와 기존 회귀 44개 통과

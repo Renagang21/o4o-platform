@@ -1,7 +1,9 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-08 (§0 · §2 · §3 · §4 · §5 · §6 현재 서비스 재배치 정책·사용자 결정·재대조 작업안) · 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 세미프랜차이즈 = 데이터 행 · 세미프랜차이즈 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-08 (§0 · §2 · §3 · §4 · §5 · §6 현재 서비스 재배치 정책·사용자 결정·재대조 작업안) · 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 약국 협력사업 = 데이터 행 · 약국 협력사업 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -11,10 +13,10 @@
 
 **2026-10-08 사용자 정정 — 현재 Neture 서비스 재배치 기준** ([전체 작업 ToDo](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)):
 
-- 약국 경영자의 약국과 내 매장은 하나다. 한 약국이 여러 세미프랜차이즈 서비스를 이용하며 그 제공 기능을 같은 내 매장에 적용한다. 서비스별 구획은 탭 등으로 표현한다. 별개 내 매장은 권한·자료·장바구니·주문을 독립적으로 관리한다.
-- 각 세미프랜차이즈는 독립된 약국 지원 사업자다. 혈당관리·협동조합 등 사업별 업무는 해당 사업에 맞게 개발한다. 공통 가입 식별과 권한 격리는 업무 표준화나 범용 개설 기능의 근거가 아니다.
+- 약국 경영자의 약국과 내 매장은 하나다. 한 약국이 여러 약국 협력사업 서비스를 이용하며 그 제공 기능을 같은 내 매장에 적용한다. 서비스별 구획은 탭 등으로 표현한다. 별개 내 매장은 권한·자료·장바구니·주문을 독립적으로 관리한다.
+- 각 약국 협력사업은 독립된 약국 지원 사업자다. 혈당관리·협동조합 등 사업별 업무는 해당 사업에 맞게 개발한다. 공통 가입 식별과 권한 격리는 업무 표준화나 범용 개설 기능의 근거가 아니다.
 - 각 서브도메인에는 해당 서비스의 관리자(=운영자)가 있고 자기 공간에서 업무를 관리한다. 공급자·펀딩·커뮤니티 관리도 각각 해당 호스트에 배치한다. 전체관리자는 admin.neture.co.kr에만 두며 서비스 관리 주체와 구분한다. 기존 role 문자열을 주소나 용어 변경 때문에 일괄 바꾸지 않는다.
-- 매장 HUB의 필요한 기능은 내 매장 공급 화면·자료함과 세미프랜차이즈 회원 커뮤니티에 배치한다. HUB는 이용 중간 단계로 두지 않는다. 과거 구현 기록의 HUB 화면 보존은 현재 완료 기준이 아니다.
+- 매장 HUB의 필요한 기능은 내 매장 공급 화면·자료함과 약국 협력사업 회원 커뮤니티에 배치한다. HUB는 이용 중간 단계로 두지 않는다. 과거 구현 기록의 HUB 화면 보존은 현재 완료 기준이 아니다.
 - community 공간은 독립 가입 커뮤니티와 사업 참여자 전용 커뮤니티를 함께 제공한다. 기존 약사 커뮤니티는 독립 가입으로 유지하고 pharmacy 사업 회원 포럼은 별도로 둔다. 두 공간의 식별·가입·게시글을 합치지 않는다. 사업자별 포럼 등은 해당 사업 참여 회원만 이용한다. 가입 정지·종료 시 제품 공급·회원 커뮤니티 참여를 차단하며 이미 가져온 사본은 매장 소유로 남는다.
 - 강좌는 커뮤니티에서 완전히 제거하고 독립 서비스 study.neture.co.kr로 이전한다. 강좌와 펀딩은 내 매장과 독립이며 Neture 메인에서 접근한다. 분회 연수 이력·학점은 강좌 서비스와 구분한다.
 - 전체 작업안은 초안 ToDo → 코드·문서 점검 → ToDo 수정 → 필요한 결정 논의 → 수정 ToDo 재점검 → 최종안 순서로 만든다. 문서 정비를 먼저 실행해 계획을 확정한 것으로 간주하지 않는다. 아래 역사적 구현 상태와 현행 정책은 구분한다.
@@ -90,7 +92,7 @@ Store Workspace
 - My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 같은 약국이 가입한 서비스의 기능은 내 매장 안에서 탭 등으로 구획하며, 서비스별 조건·출처·접근 권한을 유지한다. My Services (§4)는 가입 상태와 진입을 정리한다.
 - **주소 정합 (2026-10-08)**: 공통 주소는 `store.neture.co.kr`이며 현재 신규 가입은 약국 전용이다. 약국 경영자의 내 매장과 각 독립 사업자의 운영 공간을 구분한다 — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3. 아래 §3-1 은 서비스 앱 안 `/store` 기준의 2026-09-16 구현 기록이다. 현재 전체 이전 작업은 §0의 ToDo가 관리하며, 기존 주소 전환 근거는 `CHECK-O4O-URL-FIRST-CENSUS-V1` §21에서 대조한다.
 
-- **Neture 약국 매장 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 약국 매장 이용자에게는 **Store Hub 단계가 없다** — 내 매장이 이용 권한이 있는 상품 · 이벤트 · 모집 · 콘텐츠를 직접 판정해 보여주며, "Hub 진열 → 가져오기 → 취급 등록 → 주문" 을 주문 전제로 두지 않는다. 약국 매장 기본 게이트 = 내 매장(약국) 신청 · 승인 원장(`neture_pharmacy_memberships`, 2026-10-07 명칭 정정 — 과거 "Neture 기본 가입". Neture 메인 가입 `service_memberships('neture')` 과 다른 원장이며 신청 · 승인 전제로만 읽는다), 세미프랜차이즈(pharmacy 포함) = Service 가 아니라 **데이터 행**(`semi_franchises` · 약국 조직 단위 `semi_franchise_memberships`)이며 My Services 의 `organization_service_enrollments` 로 표현하지 않는다. 2026-10-08 재배치 branch에서 내 매장 자료함으로 기능을 이전하고 중복 HUB 화면을 제거했다. 옛 HUB 주소는 기능별 목적지로 연결하며 공통 API·Core는 유지한다. 기준: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §5 · §6.
+- **Neture 약국 매장 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 약국 매장 이용자에게는 **Store Hub 단계가 없다** — 내 매장이 이용 권한이 있는 상품 · 이벤트 · 모집 · 콘텐츠를 직접 판정해 보여주며, "Hub 진열 → 가져오기 → 취급 등록 → 주문" 을 주문 전제로 두지 않는다. 약국 매장 기본 게이트 = 내 매장(약국) 신청 · 승인 원장(`neture_pharmacy_memberships`, 2026-10-07 명칭 정정 — 과거 "Neture 기본 가입". Neture 메인 가입 `service_memberships('neture')` 과 다른 원장이며 신청 · 승인 전제로만 읽는다), 약국 협력사업(pharmacy 포함) = Service 가 아니라 **데이터 행**(`semi_franchises` · 약국 조직 단위 `semi_franchise_memberships`)이며 My Services 의 `organization_service_enrollments` 로 표현하지 않는다. 2026-10-08 재배치 branch에서 내 매장 자료함으로 기능을 이전하고 중복 HUB 화면을 제거했다. 옛 HUB 주소는 기능별 목적지로 연결하며 공통 API·Core는 유지한다. 기준: [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §5 · §6.
 
 ### 3-1. 구현 상태 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 · 2026-09-16)
 
@@ -114,7 +116,7 @@ My Services
 
 기존 Service Operator의 메뉴 분류 (2026-09-16 확정):
 
-각 세미프랜차이즈의 실제 업무·화면은 독립 사업에 맞게 개발한다. 아래 분류나 공통 UI를 재사용한다는 이유로 신규 사업의 기능과 운영 절차를 동일하게 만들지 않는다.
+각 약국 협력사업의 실제 업무·화면은 독립 사업에 맞게 개발한다. 아래 분류나 공통 UI를 재사용한다는 이유로 신규 사업의 기능과 운영 절차를 동일하게 만들지 않는다.
 
 ```text
 Home
@@ -161,7 +163,7 @@ Community Identity ≠ Service Identity
 community.neture.co.kr
 ├─ 독립 약사 커뮤니티 (pharmacy) — 개별 가입·승인 유지
 ├─ O4O 공통·개설 승인 커뮤니티 — 개별 가입·승인
-└─ 각 세미프랜차이즈 회원용 공간 — 해당 사업의 활성 가입
+└─ 각 약국 협력사업 회원용 공간 — 해당 사업의 활성 가입
 ```
 
 - 독립 커뮤니티는 `communities`·`community_memberships`를 사용한다. 정상 메인 계정·커뮤니티 active·개별 승인·해당 카탈로그 정책을 함께 확인한다. 약사 커뮤니티는 KPA/PH 서비스 가입을 추가로 요구하지 않는다. 기존 화장품 identity는 퇴역 잔여 계약에 따른 현재 scope를 유지하며 서비스를 복구하지 않는다.
@@ -191,7 +193,7 @@ My Services ──┘
 
 - 가져오기는 **Store 소유 독립 사본** 원칙을 유지한다 ([`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) §4 · `asset-copy-core`). 원본 변경이 사본에 전파되지 않는다.
 - 위 세 경로 밖의 유입(예: Supplier → 특정 Store 직접 전달)은 §2-2 로 제외한다.
-- **Neture 약국 매장 (2026-10-05)**: "Store Hub → My Store" 는 Hub 진열 화면을 거치지 않는다. 내 매장 자료함이 접근 가능한 콘텐츠(자체 · 일반 커뮤니티 · 가입 세미프랜차이즈 · 공급자)를 출처별로 직접 보여주고 기존 사본 API 를 그대로 호출한다(사본 · provenance 원칙 동일) — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
+- **Neture 약국 매장 (2026-10-05)**: "Store Hub → My Store" 는 Hub 진열 화면을 거치지 않는다. 내 매장 자료함이 접근 가능한 콘텐츠(자체 · 일반 커뮤니티 · 가입 약국 협력사업 · 공급자)를 출처별로 직접 보여주고 기존 사본 API 를 그대로 호출한다(사본 · provenance 원칙 동일) — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
 - 현행 출처 4종과 이 절의 3+1 경로의 대응 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §15 · 2026-09-16 확정, 코드 변경 없음 · 문서 판정만):
 
   | 3+1 경로 | 현행 출처 (`O4O-STORE-MENU-CANONICAL-TREE-V1` §5.1) | 물리 근거 (프로덕션 read-only, 2026-09-16) | 판정 |
