@@ -8,3 +8,10 @@ export function resolveHandoffReturnTo(raw: string | null, origin: string): stri
   const target = new URL(raw, origin);
   return target.origin === origin ? `${target.pathname}${target.search}${target.hash}` : '/';
 }
+
+/** Build the reload URL with a fixed origin, checking the service base as well. */
+export function buildHandoffDestination(path: string, origin: string, basename = ''): string {
+  const target = new URL(`${basename}${path}`, origin);
+  if (target.origin !== origin) throw new Error('Invalid handoff destination');
+  return `${origin}${target.pathname}${target.search}${target.hash}`;
+}

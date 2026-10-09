@@ -1,4 +1,4 @@
-import { resolveHandoffReturnTo } from '@o4o/auth-utils';
+import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 /**
  * Service Handoff Page
  *
@@ -79,12 +79,7 @@ export default function HandoffPage() {
           storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
           setStatus('success');
           // 전체 리로드 — AuthProvider 가 저장된 토큰으로 /auth/me 를 다시 읽게 한다.
-          const target = new URL(`${basename}${returnTo}`, window.location.origin);
-          if (target.origin !== window.location.origin) {
-            setStatus("error"); setError('이동 경로를 확인할 수 없습니다.');
-            return;
-          }
-          window.location.replace(`${window.location.origin}${target.pathname}${target.search}${target.hash}`);
+          window.location.replace(buildHandoffDestination(returnTo, window.location.origin, basename));
         } else {
           setStatus('error');
           setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');

@@ -1,4 +1,4 @@
-import { resolveHandoffReturnTo } from '@o4o/auth-utils';
+import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
@@ -38,12 +38,7 @@ export default function HandoffPage() {
         const tokens = data?.data?.tokens;
         if (response.ok && data?.success && tokens?.accessToken) {
           storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
-          const target = new URL(returnTo, window.location.origin);
-          if (target.origin !== window.location.origin) {
-            setError('이동 경로를 확인할 수 없습니다.');
-            return;
-          }
-          window.location.replace(`${window.location.origin}${target.pathname}${target.search}${target.hash}`);
+          window.location.replace(buildHandoffDestination(returnTo, window.location.origin));
           return;
         }
         setCode(typeof data?.code === 'string' ? data.code : '');

@@ -37,4 +37,4 @@ export {
 
 export { PUBLIC_DEMO_ACCOUNTS } from './demoAccounts.js';
 
-export { resolveHandoffReturnTo } from './resolveHandoffReturnTo.js';
+export { resolveHandoffReturnTo, buildHandoffDestination } from './resolveHandoffReturnTo.js';
