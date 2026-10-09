@@ -1,13 +1,11 @@
+import { resolveHandoffReturnTo } from '@o4o/auth-utils';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 
 export function resolveReturnTo(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
-  if (Array.from(raw).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) return '/';
-  const target = new URL(raw, window.location.origin);
-  return target.origin === window.location.origin ? `${target.pathname}${target.search}${target.hash}` : '/';
+  return resolveHandoffReturnTo(raw, window.location.origin);
 }
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다.',

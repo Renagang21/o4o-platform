@@ -42,3 +42,7 @@
 SonarCloud에서 기존 강의 handoff의 외부 이동 위험을 지적하여 제어문자 거절·동일 origin 검증·고정 origin 기반 URL 구성을 보완했다. 동일 취약 패턴을 Neture·분회·매장에서도 수정하고 3개 서비스의 경로 검사 회귀 테스트를 추가했다. 새로운 권한이나 인증 API를 추가하지 않았다.
 
 main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 이후 검증이 필요하다.
+
+## SonarCloud 중복 후속 수정
+
+네 handoff 화면의 동일 경로 검사로 신규 코드 중복률 25.8%가 발생하여 기존 `@o4o/auth-utils`에 순수 함수 `resolveHandoffReturnTo(raw, origin)`로 통합했다. 네 서비스만 새 함수를 소비하며 기존 export·권한·API 계약은 유지한다. `codePointAt()`으로 제어문자를 검사한다. auth-utils 전체 3 files / 39 tests, 네 서비스 tsc/Vite build, 기존 인계 경로·stale token focused tests를 재검증했다. 앞선 브라우저 32회 결과는 통합 전 검증이며 이번 중복 제거 후 브라우저 재실행으로 표기하지 않는다.

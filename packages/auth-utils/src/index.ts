@@ -36,3 +36,5 @@ export {
 //   password policy(WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1) 는 은퇴했다 — 검사할 비밀번호가 없다.
 
 export { PUBLIC_DEMO_ACCOUNTS } from './demoAccounts.js';
+
+export { resolveHandoffReturnTo } from './resolveHandoffReturnTo.js';

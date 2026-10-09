@@ -1,3 +1,4 @@
+import { resolveHandoffReturnTo } from '@o4o/auth-utils';
 /**
  * Service Handoff Page
  *
@@ -29,11 +30,7 @@ type HandoffStatus = 'loading' | 'success' | 'error';
 
 /** '/' 로 시작하는 단일 슬래시 상대 경로만 허용 (open redirect 차단). 그 외는 홈. */
 export function resolveReturnTo(raw: string | null): string {
-  if (!raw) return '/';
-  if (!raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
-  if (Array.from(raw).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) return '/';
-  const target = new URL(raw, window.location.origin);
-  return target.origin === window.location.origin ? `${target.pathname}${target.search}${target.hash}` : '/';
+  return resolveHandoffReturnTo(raw, window.location.origin);
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
