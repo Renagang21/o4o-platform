@@ -60,7 +60,7 @@ DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다
    node scripts/deployment/pharmacy-hub-retirement.mjs /tmp/ph-retirement-map.original.json /tmp/ph-retirement-map.review.json
    ```
 
-   스크립트는 PH 호스트만 제외하고 PH에만 쓰이던 matcher를 지운다. 공유 matcher·backend는 보고하고 보존한다. GCP를 호출하거나 삭제하지 않으며 출력 파일을 덮어쓰지 않는다. `unreferencedBackendCandidates`는 이 URL map 안에서만 미참조인 후보이므로 전체 프로젝트 참조를 다시 확인한다.
+   스크립트는 PH 호스트와 해당 호스트의 URL map 검증 테스트를 제외하고 PH에만 쓰이던 matcher를 지운다. 다른 호스트의 검증 테스트와 공유 matcher·backend는 보존한다. `removedTestHosts`로 제거한 검증 대상도 확인한다. 검증 테스트의 기대 backend는 실제 라우팅 참조로 세지 않는다. GCP를 호출하거나 삭제하지 않으며 출력 파일을 덮어쓰지 않는다. `unreferencedBackendCandidates`는 이 URL map 안에서만 미참조인 후보이므로 전체 프로젝트 참조를 다시 확인한다. import는 남은 URL map 검증 테스트를 실행하므로 실패하면 해당 구성을 적용하지 않는다.
 3. 원본/초안의 diff에서 PH 외 변화가 없고 리다이렉트가 없음을 확인한다. 적용 직전 URL map을 다시 조회해 원본 fingerprint와 비교한다. 다른 실행자의 변경이 있으면 적용하지 않고 새 원본으로 초안을 다시 만든다.
 4. PH DNS A·인증용 CNAME 및 PH certificate map entry를 제거한다. 도메인 등록·갱신도 Gabia 계정에서 종료한다. 다른 서비스의 인증서 map이나 공용 IP를 지우지 않는다. DNS cache가 남아도 PH를 다른 서비스로 호환 이동시키지 않는다.
 5. 검토한 URL map을 적용한다. PH 외 호스트와 path matcher, default backend가 그대로인지 확인한다.

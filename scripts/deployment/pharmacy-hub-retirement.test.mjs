@@ -34,6 +34,34 @@ test('a mixed host rule retains the other host and its shared matcher', () => {
   assert.equal(result.map.pathMatchers.length, 2);
 });
 
+test('PH validation tests are removed before import while other host tests remain unchanged', () => {
+  const input = fixture();
+  const storeTest = { host: 'store.neture.co.kr', path: '/qr', service: 'backend-store' };
+  input.tests = [
+    { host: 'pharmacyhub.co.kr', path: '/', service: 'backend-ph' },
+    { host: 'WWW.PHARMACYHUB.CO.KR', path: '/store', service: 'backend-ph' },
+    { host: 'legacy.pharmacyhub.co.kr', path: '/tablet', service: 'backend-ph' },
+    storeTest,
+  ];
+  const result = preparePharmacyHubRetirement(input);
+  assert.deepEqual(result.removedTestHosts, ['pharmacyhub.co.kr', 'WWW.PHARMACYHUB.CO.KR', 'legacy.pharmacyhub.co.kr']);
+  assert.deepEqual(result.map.tests, [storeTest]);
+  assert.deepEqual(result.unreferencedBackendCandidates, ['backend-ph']);
+  assert.equal(input.tests.length, 4);
+  assert.deepEqual(preparePharmacyHubRetirement(result.map).map, result.map);
+});
+
+test('validation expectations do not count as routing references and invalid tests fail closed', () => {
+  const input = fixture();
+  input.tests = [{ host: 'unrelated.example', path: '/', service: 'backend-ph' }];
+  const result = preparePharmacyHubRetirement(input);
+  assert.deepEqual(result.map.tests, input.tests);
+  assert.deepEqual(result.unreferencedBackendCandidates, ['backend-ph']);
+  assert.deepEqual(result.sharedBackendServices, []);
+  input.tests = {};
+  assert.throws(() => preparePharmacyHubRetirement(input), /tests must be an array/);
+});
+
 test('a PH backend referenced by remaining routing is not a deletion candidate', () => {
   const input = fixture();
   input.pathMatchers[1].defaultService = 'backend-ph';

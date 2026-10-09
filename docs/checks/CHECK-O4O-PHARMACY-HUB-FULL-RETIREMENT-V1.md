@@ -41,7 +41,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
 | 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
-| CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **330 tests PASS** · CI blocking Node 목록 전체 |
+| CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **332 tests PASS** · CI blocking Node 목록 전체 |
 | `git diff --check` | PASS |
 | 문서 민감정보 검사 | PASS · 6 files · 패턴 0건 |
 
@@ -58,3 +58,5 @@ PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec�
 추가 API 검증에서는 독립 약사 커뮤니티의 과거 PH 게시판 운영 권한이 끊어지는 실제 결함을 발견했다. `ForumControllerBase`가 게시판의 `service_code`를 웹 진입 목록에서 찾고 있었다. 원장 식별용 `communityKeyForForumStorageCode`를 catalog의 기존 `forumStorageCodes`로 구현하고 이 판정에서 사용한다. 퇴역 PH 웹 진입은 계속 없으며, 독립 약사 커뮤니티의 기존 PH 저장 게시판은 현재 community 운영 승인으로 판정한다. `legacy-community-closed-forum-operator.spec.ts`의 PH 사례는 삭제하지 않고 기존 글의 관리·다른 운영자 차단을 검증한다.
 
 보완의 확장 API 3,832건과 type-check가 통과했다. required CI/Codex 재검증 상태는 PR에서 확인한다. 첫 HEAD의 CI 실패를 최종 성공으로 표시하지 않는다.
+
+두 번째 HEAD `3f36b3b5d9`의 리뷰는 URL map 검증 테스트의 PH 호스트도 제거해야 한다고 지적했다. planner가 PH root/www/하위 호스트의 테스트를 함께 제거하고 다른 호스트의 테스트는 유지하도록 보완했다. 테스트의 기대 backend는 실제 라우팅 참조에서 제외한다. 신규 회귀 2건을 포함해 planner 8건과 blocking Node 검사 전체 332건을 검증했다. 이는 로컬 초안 생성 검증이며 실제 GCP import·삭제를 수행한 결과가 아니다.

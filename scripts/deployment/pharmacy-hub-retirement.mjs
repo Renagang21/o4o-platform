@@ -19,8 +19,17 @@ function backendReferences(value, out = new Set()) {
 
 export function preparePharmacyHubRetirement(input) {
   if (!Array.isArray(input.hostRules) || !Array.isArray(input.pathMatchers)) throw new Error('Exported URL map hostRules/pathMatchers are required.');
+  if (input.tests !== undefined && !Array.isArray(input.tests)) throw new Error('URL map tests must be an array.');
   const map = structuredClone(input);
   const removedHosts = [];
+  const removedTestHosts = [];
+  if (map.tests) {
+    map.tests = map.tests.filter(test => {
+      if (!isPharmacyHubHost(test.host)) return true;
+      removedTestHosts.push(test.host);
+      return false;
+    });
+  }
   const affectedMatchers = new Set();
   map.hostRules = map.hostRules.flatMap(rule => {
     if (!Array.isArray(rule.hosts) || !rule.pathMatcher) throw new Error('Invalid host rule.');
@@ -40,11 +49,13 @@ export function preparePharmacyHubRetirement(input) {
   const removedNames = new Set(removed.map(matcher => matcher.name));
   map.pathMatchers = map.pathMatchers.filter(matcher => !removedNames.has(matcher.name));
   const candidates = backendReferences(removed);
-  const retained = backendReferences(map);
+  // URL-map tests contain expected services, not live routing references.
+  const retained = backendReferences({ ...map, tests: undefined });
   for (const key of ['id', 'creationTimestamp', 'selfLink', 'fingerprint', 'kind']) delete map[key];
   return {
     map,
     removedHosts,
+    removedTestHosts,
     removedPathMatchers: [...removedNames],
     unreferencedBackendCandidates: [...candidates].filter(service => !retained.has(service)),
     sharedBackendServices: [...candidates].filter(service => retained.has(service)),
