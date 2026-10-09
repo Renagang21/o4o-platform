@@ -14,20 +14,11 @@
  *
  * 서비스 Operator는 개설 심사를 담당한다. 개별 커뮤니티 운영 권한은 membership으로만 판정한다.
  */
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
+import { createSubdomainOperatorScope } from './subdomain-operator-scope.js';
 
-export const COMMUNITY_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'community',
-  allowedRoles: ['community:admin', 'community:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture'],
-  // mapping 이 비면 allowedRoles 전체로 fallback 하므로 명시한다.
-  scopeRoleMapping: {
-    'community:admin': ['community:admin'],
-    'community:operator': ['community:operator', 'community:admin'],
-  },
-};
+const { config, guard } = createSubdomainOperatorScope('community', [
+  'kpa', 'neture', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture',
+]);
 
-export const requireCommunityServiceScope = createMembershipScopeGuard(COMMUNITY_SCOPE_CONFIG);
+export const COMMUNITY_SCOPE_CONFIG = config;
+export const requireCommunityServiceScope = guard;
