@@ -26,6 +26,8 @@
 - 공통 모집 차단: PH 모집 생성·재개·노출 승인·신규 신청·참여 승인은 410 `SERVICE_RETIRED`. 복수 생성 요청에 PH가 하나라도 있으면 전체 거절하며 public/Store 참여 목록에서도 제외한다. 과거 공급자/운영자 조회·마감·노출 반려·신청 반려/철회/해지는 보존한다.
 - 동의 판정: 과거 PH 이용약관·경영자 계약은 pending에서 제외하고 신규 승낙은 410으로 거부한다. PH 미동의가 현재 서비스 전체를 막지 않으며 현재 서비스 약관은 계속 요구한다. 약관·동의 원장 삭제나 동의 backfill은 없다.
 - Local Agent: PH root/www를 pairing origin에서 제거했다. 두 origin의 health/preflight/pair가 403으로 종료되고 Neture 정상 pairing은 유지된다. 설치 사본의 업데이트는 별도 로컬 실행이다.
+- 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
+- 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
 - 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
 - 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
 - 운영 DB write·schema/migration 변경 없음. 상품의 기존 PH `service_keys`를 지워 기본 공급으로 전환하는 backfill이나 테스트 데이터 삭제 없음.
@@ -41,7 +43,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **218 suites · 4,197 tests PASS** · 221 suites 중 DB integration 3개 SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **229 suites · 4,345 tests PASS** · 233 suites 중 DB integration 4개 SKIP |
 | 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
@@ -77,3 +79,7 @@ Store 접근 정본과 Store Owner RBAC §3.1/§3.1-A도 정정했다. PH 역할
 결합 후 API 4,180건·type-check, Neture 375건·production build, 관리자 운영자 지정 10건이 통과했다. DB가 필요한 `neture-pharmacy-commerce.integration`, `store-owner-termination.integration`, `forum-summary.integration` 3개 suite는 SKIP했다. 실제 운영 테스트 계정·모바일 smoke와 PH 인프라 삭제는 여전히 미실행이다.
 
 추가 리뷰에서는 Local Agent의 PH origin 신뢰, 공통 모집의 PH 신규 생성/참여, 과거 PH 약관이 현재 API 전체를 차단하는 문제가 확인됐다. PH origin을 제거하고 실제 loopback HTTP에서 nonce 발급·pairing·preflight 차단과 Neture pairing 유지를 검증했다. 모집은 생성·재개·노출/참여 승인·신규 신청을 차단하며 원장 조회·종결은 보존한다. 약관은 PH pending만 제외하고 현재 서비스의 428/승낙 후 통과를 유지한다. 전체 변경 소비처를 다시 실행해 API 4,197건과 type-check, CI Node 332건, Agent Node 75건이 통과했다. 최신 PR HEAD의 required CI·Codex 결과는 PR에서 확인하며 이전 HEAD의 성공으로 대체하지 않는다. WO §5·§6에는 설치 Agent의 수동 갱신·실행 사본 확인을 도메인 등록 종료의 선행조건으로 추가했다. 설치 PC 갱신·GCP/Gabia 삭제를 이 검증의 완료 항목으로 표시하지 않는다.
+
+HEAD `42bd366674`의 CI Gate·SonarCloud는 통과했으나 재리뷰가 공통 역할 부여·가입 재활성화·신규 Offer 입력을 지적했다. PH prefix와 catalog 항목은 전체 관리자에게도 신규 부여를 거부하고 역할 선택 목록에서 제외한다. PH 가입은 승인·재활성화·active 전이를 거부하며 전체 복구의 PH 원장은 건너뛴다. 직접 HTTP에서 오류가 410으로 전달되는지, 현재 서비스의 역할 부여·과거 PH 역할 조회/회수 및 거부·탈퇴가 유지되는지 검증한다. Offer 생성은 PH 키가 포함된 요청을 저장 전에 거부하며 과거 공급 키를 지우지 않는다. 현재 서비스의 상태 전이·사업자정보·정지 경계 검증은 유지하고, 퇴역 PH의 양수 전이를 요구하던 fixture는 현재 서비스 사례로 옮겼다. 이 보완의 최신 HEAD에서 required CI·Codex를 다시 확인한다.
+
+공통 관리·신규 Offer 보완 후 관련 그래프와 raw 소비처를 합친 API 233 suites를 실행했다. 229 suites·4,345 tests와 API type-check가 통과했고 DB integration 4개(36건)는 SKIP했다. 최신 PR HEAD의 CI·리뷰 결과와 실제 운영 실행은 별도로 확인한다.

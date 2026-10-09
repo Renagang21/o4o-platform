@@ -221,7 +221,7 @@ describe('§10 cross-service fan-out — 한 서비스 정지가 다른 서비�
 });
 
 describe('§12 active → suspended → active 왕복', () => {
-  it.each(SERVICES)('$serviceKey — 역할 구성이 정지 이전과 같아진다', async ({ serviceKey }) => {
+  it.each(SERVICES.filter(s => s.serviceKey !== 'pharmacy-hub'))('$serviceKey — 역할 구성이 정지 이전과 같아진다', async ({ serviceKey }) => {
     seedAllFive();
     const before = activeRoles();
     const rowsBefore = db.roles.length;
@@ -235,7 +235,7 @@ describe('§12 active → suspended → active 왕복', () => {
     expect(db.roles).toHaveLength(rowsBefore);
   });
 
-  it.each(SERVICES.filter((s) => s.serviceKey !== 'neture'))(
+  it.each(SERVICES.filter((s) => s.serviceKey !== 'neture' && s.serviceKey !== 'pharmacy-hub'))(
     '$serviceKey — store_owner 회수·복구가 서비스 간 대칭이다',
     async ({ serviceKey, prefix }) => {
       seedAllFive({ membershipRole: 'store_owner', pharmacyOwner: true });
@@ -286,7 +286,7 @@ describe('§12 active → suspended → active 왕복', () => {
 });
 
 describe('§11 admin tier — 복구가 권한을 만들어내지 않는다', () => {
-  it.each(SERVICES)(
+  it.each(SERVICES.filter(s => s.serviceKey !== 'pharmacy-hub'))(
     '$serviceKey — bare admin tier membership.role 은 복구해도 부여되지 않는다',
     async ({ serviceKey }) => {
       seedAllFive({ membershipRole: 'super_admin' });
@@ -306,8 +306,8 @@ describe('§11 admin tier — 복구가 권한을 만들어내지 않는다', ()
     seedAllFive();
     db.roles = []; // 정지 이전에 역할 row 가 하나도 없던 계정
 
-    await suspend(['pharmacy-hub']);
-    await reactivate(['pharmacy-hub']);
+    await suspend(['k-cosmetics']);
+    await reactivate(['k-cosmetics']);
 
     expect(db.roles).toHaveLength(0);
     expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);

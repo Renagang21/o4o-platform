@@ -111,6 +111,14 @@ beforeEach(() => {
 });
 
 describe('body 키 계약', () => {
+  it.each([['pharmacy-hub'], [' pharmacy-hub '], ['kpa-society', 'pharmacy-hub']])('퇴역 PH 키가 있으면 혼합 공급 요청도 저장하지 않는다: %j', async (...serviceKeys) => {
+    const { svc } = build();
+    const r = await svc.createSupplierOfferFromExistingMaster(SUPPLIER_ID, { masterId: MASTER_ID, serviceKeys });
+    expect(r).toMatchObject({ success: false, error: 'SERVICE_RETIRED' });
+    expect(state.saved).toHaveLength(0);
+    expect(state.approvalCalls).toHaveLength(0);
+  });
+
   it.each([
     ['barcode', { barcode: '880' }],
     ['name', { name: 'x' }],

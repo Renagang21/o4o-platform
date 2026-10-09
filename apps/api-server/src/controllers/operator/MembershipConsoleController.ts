@@ -34,6 +34,7 @@ import {
   SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
 } from '../../utils/role-revoke-safety.js';
 import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
+import { PHARMACY_HUB_SERVICE_KEY, ServiceRetiredError, isPharmacyHubRole, sendServiceRetiredResponse } from '../../utils/service-retirement.js';
 import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
@@ -463,6 +464,7 @@ export class MembershipConsoleController {
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
       if (sendDemoAccountForbidden(res, error)) return;
+      if (sendServiceRetiredResponse(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -551,6 +553,9 @@ export class MembershipConsoleController {
         res.status(400).json({ success: false, error: 'status is required' });
         return;
       }
+      if ((status === 'approved' || status === 'active') && writeScope.serviceKeys.includes(PHARMACY_HUB_SERVICE_KEY)) {
+        throw new ServiceRetiredError();
+      }
 
       if (!writeScope.isPlatformAdmin) {
         const hasAccess = await this.checkServiceBoundary(userId, writeScope.serviceKeys);
@@ -568,11 +573,11 @@ export class MembershipConsoleController {
         // (membership + user + role_assignments in single transaction)
         const pendingMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key <> 'pharmacy-hub'`,
               [userId]
             )
           : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2) AND service_key <> 'pharmacy-hub'`,
               [userId, writeScope.serviceKeys]
             );
 
@@ -709,6 +714,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
+      if (sendServiceRetiredResponse(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -756,6 +762,10 @@ export class MembershipConsoleController {
       const writeScope = this.resolveWriteScope(req, scope, res);
       if (!writeScope) return;
       const updatedBy = (req as any).user?.id || null;
+      if (targetStatus === 'approved' && writeScope.serviceKeys.includes(PHARMACY_HUB_SERVICE_KEY)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: '종료된 서비스의 가입은 활성화할 수 없습니다.' });
+        return;
+      }
       const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
       for (const userId of ids) {
@@ -778,11 +788,11 @@ export class MembershipConsoleController {
           if (targetStatus === 'approved') {
             const pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key <> 'pharmacy-hub'`,
                   [userId]
                 )
               : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2) AND service_key <> 'pharmacy-hub'`,
                   [userId, writeScope.serviceKeys]
                 );
 
@@ -938,6 +948,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
+      if (sendServiceRetiredResponse(res, error)) return;
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1297,6 +1308,10 @@ export class MembershipConsoleController {
         res.status(400).json({ success: false, error: 'role is required' });
         return;
       }
+      if (isPharmacyHubRole(role)) {
+        sendServiceRetiredResponse(res, new ServiceRetiredError());
+        return;
+      }
 
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
       if (await rejectDemoAccountTarget(res, userId)) return;
@@ -1322,6 +1337,10 @@ export class MembershipConsoleController {
       }
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
+        return;
+      }
+      if (roleEntity.serviceKey === PHARMACY_HUB_SERVICE_KEY || isPharmacyHubRole(roleEntity.name)) {
+        sendServiceRetiredResponse(res, new ServiceRetiredError());
         return;
       }
 
