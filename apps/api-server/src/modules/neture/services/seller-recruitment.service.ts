@@ -15,7 +15,8 @@
  *   참여 해지 = application.status=cancelled (decidedBy=공급자). 기존 bridge가 있는 신청만 bridge 정리.
  *
  * 흐름(E2E 계약):
- *   Supplier 모집 생성 → Service Operator 노출 승인 → Store browse/apply → Supplier approve/reject/terminate
+ *   일반 모집: Supplier 게시 → Store browse/apply → Supplier approve/reject/terminate
+ *   세미프랜차이즈 모집: 담당 사업의 노출 승인과 가입 조건을 추가 적용
  *
  * 물리 테이블명(seller_recruitments · seller_recruitment_applications)은 엔티티 파일의 상수가 격리한다.
  * 이 서비스의 raw SQL 은 상수 SELLER_RECRUITMENT_*_TABLE 만 사용한다.
@@ -40,7 +41,7 @@ import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 // CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 D1: 세미프랜차이즈 제공 모집은 그 가입 승인 후 신청
 import { DEFAULT_SEMI_FRANCHISE_KEY, PHARMACY_STORE_MEMBER_ROLES } from '../../neture-pharmacy/constants.js';
-import { PHARMACY_RECRUITMENT_SERVICE_KEYS } from '../../neture-pharmacy/services/recruitment-target.js';
+import { isPublicRecruitment } from '../../neture-pharmacy/services/recruitment-target.js';
 
 /**
  * WO-O4O-CROSSSERVICE-SELLER-RECRUITMENT-NOTIFICATION-TARGETURL-V1
@@ -85,17 +86,18 @@ export class SellerRecruitmentService {
   /**
    * 모집 목록 조회.
    * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1:
-   *  - exposureStatus 필터(public browse 는 컨트롤러에서 APPROVED 강제 → 미승인/반려 모집 미노출)
-   *  - serviceKey scope(serviceId 일치) — 누락 시 노출은 exposureStatus 게이트로만 제한
+   *  - 일반 공개 모집은 노출 승인과 무관하게 조회한다.
+   *  - serviceKey scope(serviceId 일치) — 지정 시 서비스별 모집으로 제한
    */
-  async getRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus; storeOrganizationId?: string }) {
+  async getRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus; storeOrganizationId?: string; publicOnly?: boolean }) {
     const where: Record<string, unknown> = {};
     if (filters?.status) where.status = filters.status;
     if (filters?.serviceKey) where.serviceId = filters.serviceKey;
-    if (filters?.exposureStatus) where.exposureStatus = filters.exposureStatus;
+    if (filters?.publicOnly) where.semiFranchiseId = IsNull();
 
     let recruitments = await this.recruitmentRepo.find({ where, order: { createdAt: 'DESC' } });
-    // 약국 문맥의 미지정 모집도 pharmacy 가입을 확인한다. 목록에서만 우회하지 않는다.
+    recruitments = recruitments.filter((r) => (!filters?.publicOnly || isPublicRecruitment(r))
+      && (isPublicRecruitment(r) || !filters?.exposureStatus || r.exposureStatus === filters.exposureStatus));
     if (filters?.storeOrganizationId !== undefined) {
       const memberships: Array<{ semi_franchise_id: string; key: string }> = filters.storeOrganizationId
         ? await AppDataSource.query(
@@ -107,10 +109,9 @@ export class SellerRecruitmentService {
           [filters.storeOrganizationId],
         ) : [];
       const activeIds = new Set(memberships.map((m) => m.semi_franchise_id));
-      const defaultActive = memberships.some((m) => m.key === DEFAULT_SEMI_FRANCHISE_KEY);
-      recruitments = recruitments.filter((r) => r.semiFranchiseId
-        ? activeIds.has(r.semiFranchiseId)
-        : PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(r.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number]) ? defaultActive : true);
+      const defaultActive = memberships.some(m => m.key === DEFAULT_SEMI_FRANCHISE_KEY);
+      recruitments = recruitments.filter((r) => Boolean(filters.storeOrganizationId)
+        && (isPublicRecruitment(r) || (r.semiFranchiseId ? activeIds.has(r.semiFranchiseId) : defaultActive)));
     }
     return recruitments.map((r) => ({
       id: r.id,
@@ -126,6 +127,8 @@ export class SellerRecruitmentService {
       serviceId: r.serviceId || '',
       imageUrl: r.imageUrl || '',
       status: r.status,
+      semiFranchiseId: r.semiFranchiseId,
+      recruitmentKind: isPublicRecruitment(r) ? 'public' : 'semi-franchise',
       exposureStatus: r.exposureStatus,
       createdAt: r.createdAt,
     }));
@@ -231,6 +234,8 @@ export class SellerRecruitmentService {
       commissionRate: Number(r.commissionRate),
       consumerPrice: Number(r.consumerPrice),
       status: r.status,
+      semiFranchiseId: r.semiFranchiseId,
+      recruitmentKind: isPublicRecruitment(r) ? 'public' : 'semi-franchise',
       exposureStatus: r.exposureStatus,
       exposureReviewedAt: r.exposureReviewedAt,
       exposureReviewedBy: r.exposureReviewedBy,
@@ -339,7 +344,7 @@ export class SellerRecruitmentService {
           shopUrl: input.shopUrl?.trim() || undefined,
           imageUrl: input.imageUrl?.trim() || undefined,
           status: RecruitmentStatus.RECRUITING,
-          exposureStatus: ExposureStatus.PENDING,
+          exposureStatus: ExposureStatus.APPROVED,
         });
         const saved = await repo.save(recruitment);
         out.push({ id: saved.id, serviceId: saved.serviceId, status: saved.status });
@@ -360,9 +365,9 @@ export class SellerRecruitmentService {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment) throw new Error('RECRUITMENT_NOT_FOUND');
     if (recruitment.status !== RecruitmentStatus.RECRUITING) throw new Error('RECRUITMENT_CLOSED');
-    // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 노출 승인되지 않은 모집은 신청 방어 차단
-    if (recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
-    if (recruitment.semiFranchiseId || PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(recruitment.serviceId as typeof PHARMACY_RECRUITMENT_SERVICE_KEYS[number])) {
+    // 세미프랜차이즈 모집에만 노출 승인 조건을 적용한다.
+    if (!isPublicRecruitment(recruitment) && recruitment.exposureStatus !== ExposureStatus.APPROVED) throw new Error('RECRUITMENT_NOT_EXPOSED');
+    if (!isPublicRecruitment(recruitment)) {
       if (!storeOrganizationId) throw new Error('STORE_CONTEXT_REQUIRED');
       const access = await AppDataSource.query(
         `SELECT sfm.id
@@ -496,6 +501,7 @@ export class SellerRecruitmentService {
         commissionRate: Number(recruitment.commissionRate),
         consumerPrice: Number(recruitment.consumerPrice),
         status: recruitment.status,
+        recruitmentKind: isPublicRecruitment(recruitment) ? 'public' : 'semi-franchise',
         exposureStatus: recruitment.exposureStatus,
         exposureReviewedAt: recruitment.exposureReviewedAt,
         exposureReviewedBy: recruitment.exposureReviewedBy,

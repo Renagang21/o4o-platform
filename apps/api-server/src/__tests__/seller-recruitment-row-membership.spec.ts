@@ -1,4 +1,4 @@
-/** 약국 미지정 모집은 pharmacy, 지정 모집은 해당 사업 가입이 필요하다. */
+/** 일반 공개 모집은 즉시 게시, 사업 모집은 승인·가입 조건을 유지한다. */
 jest.mock('../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
 jest.mock('../modules/neture/entities/index.js', () => ({
   SellerRecruitment: class {}, SellerRecruitmentApplication: class {},
@@ -33,8 +33,8 @@ describe('recruitment row membership', () => {
     (service as any)._applicationRepo = applicationRepo;
   });
 
-  it('미가입 약국은 미지정 모집을 포함한 모든 사업 모집을 볼 수 없다', async () => {
-    expect((await service.getRecruitments({ serviceKey: 'kpa-society', storeOrganizationId: 'org-a' })).map((r) => r.id)).toEqual([]);
+  it('미가입 매장도 일반 공개 모집을 볼 수 있다', async () => {
+    expect((await service.getRecruitments({ serviceKey: 'kpa-society', storeOrganizationId: 'org-a' })).map((r) => r.id)).toEqual(['legacy']);
     expect(query.mock.calls[0][1]).toEqual(['org-a']);
     expect(query.mock.calls[0][0]).toContain("npm.status = 'active'");
     expect(query.mock.calls[0][0]).toContain("sf.status = 'active'");
@@ -42,7 +42,7 @@ describe('recruitment row membership', () => {
   });
   it('membership in a different semi-franchise does not unlock pharmacy recruitment', async () => {
     query.mockResolvedValue([{ semi_franchise_id: 'sf-other' }]);
-    expect((await service.getRecruitments({ storeOrganizationId: 'org-a' })).map((r) => r.id)).toEqual(['other']);
+    expect((await service.getRecruitments({ storeOrganizationId: 'org-a' })).map((r) => r.id)).toEqual(['legacy', 'other']);
   });
   it('matching active membership unlocks exactly that row', async () => {
     query.mockResolvedValue([{ semi_franchise_id: 'sf-pharmacy', key: 'pharmacy' }]);
@@ -52,19 +52,32 @@ describe('recruitment row membership', () => {
     expect((await service.getRecruitments({ storeOrganizationId: '' })).map((r) => r.id)).toEqual([]);
     expect(query).not.toHaveBeenCalled();
   });
-  it('미지정 모집만 있어도 pharmacy 가입을 조회한다', async () => {
+  it('일반 공개 모집은 사업 가입 없이 조회한다', async () => {
     recruitmentRepo.find.mockResolvedValue([row('legacy', null)]);
-    expect(await service.getRecruitments({ storeOrganizationId: 'org-a' })).toHaveLength(0);
+    expect(await service.getRecruitments({ storeOrganizationId: 'org-a' })).toHaveLength(1);
     expect(query).toHaveBeenCalledTimes(1);
   });
   it('supplier/public listing without store scope retains its existing contract', async () => {
     expect(await service.getRecruitments({ serviceKey: 'kpa-society' })).toHaveLength(3);
     expect(query).not.toHaveBeenCalled();
   });
-  it('미지정 약국 모집에 직접 신청해도 pharmacy 가입이 필요하다', async () => {
-    recruitmentRepo.findOne.mockResolvedValue(row('legacy', null));
-    await expect(service.createApplication('legacy', 'user-a', 'Applicant', 'org-a')).rejects.toThrow('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
-    expect(query.mock.calls[0][1][1]).toBeNull();
+  it('공개 모집은 과거 노출 대기 상태라도 사업 가입 없이 신청할 수 있다', async () => {
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('legacy', null), exposureStatus: 'pending' });
+    await expect(service.createApplication('legacy', 'user-a', 'Applicant', 'org-a')).resolves.toMatchObject({ status: 'pending' });
+    expect(query).not.toHaveBeenCalled();
+    expect(applicationRepo.save).toHaveBeenCalled();
+  });
+  it('공개 조회는 세미프랜차이즈 모집을 노출하지 않는다', async () => {
+    expect((await service.getRecruitments({ publicOnly: true })).map(r => r.id)).toEqual(['legacy']);
+  });
+  it('지정 모집은 운영자의 노출 승인 전 신청할 수 없다', async () => {
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('other', 'sf-other'), exposureStatus: 'pending' });
+    await expect(service.createApplication('other', 'user-a', 'Applicant', 'org-a')).rejects.toThrow('RECRUITMENT_NOT_EXPOSED');
+    expect(applicationRepo.save).not.toHaveBeenCalled();
+  });
+  it('과거 대상 미지정 약국 모집에 공급가가 있으면 가입 조건을 유지한다', async () => {
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('legacy-priced', null), supplyUnitPrice: 100 });
+    await expect(service.createApplication('legacy-priced', 'user-a', 'Applicant', 'org-a')).rejects.toThrow('SEMI_FRANCHISE_MEMBERSHIP_REQUIRED');
     expect(applicationRepo.save).not.toHaveBeenCalled();
   });
   it('direct POST to semi-franchise recruitment rejects an unjoined applicant before writing', async () => {
@@ -182,7 +195,7 @@ describe('recruitment row membership', () => {
     expect(applicationRepo.save).not.toHaveBeenCalled();
   });
   it.each([{ status: 'closed', exposureStatus: 'approved' }, { status: 'recruiting', exposureStatus: 'pending' }])('existing exposure/status guards remain enforced: %j', async (state) => {
-    recruitmentRepo.findOne.mockResolvedValue({ ...row('legacy', null), ...state });
+    recruitmentRepo.findOne.mockResolvedValue({ ...row('targeted', 'sf-pharmacy'), ...state });
     await expect(service.createApplication('legacy', 'user-a', 'Applicant')).rejects.toThrow();
     expect(applicationRepo.save).not.toHaveBeenCalled();
   });

@@ -3,10 +3,10 @@
  *
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0, P1, P2-REORDER
  *
- * 핵심 개념: Neture는 주문 처리가 아닌 "운영 허브"
+ * 핵심 개념: 결제 완료 후 공급자의 최종 배송을 처리하는 운영 화면
  * - 서비스별 주문 현황을 한눈에 확인
  * - 필요한 서비스로 바로 이동
- * - 주문 처리는 각 서비스에서 수행
+ * - 결제는 공통 프로세스로 진행하고 공급자는 최종 배송을 수행
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -128,7 +128,7 @@ export default function SupplierOrdersPage() {
         <div>
           <h1 style={styles.title}>공급자 운영 허브</h1>
           <p style={styles.subtitle}>
-            서비스별 주문 현황을 확인하고, 필요한 서비스로 바로 이동합니다
+            결제된 주문을 확인하고 공급자의 최종 배송을 진행합니다
           </p>
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide" label="이용 안내" /></div>
         </div>
@@ -140,8 +140,8 @@ export default function SupplierOrdersPage() {
         <div>
           <p style={styles.infoCardText}>
             <strong>Neture는 공급자의 운영 허브입니다.</strong><br />
-            주문은 각 서비스에서 발생하며, 이곳에서는 서비스별 주문 현황을 한눈에 확인하고
-            필요한 서비스로 바로 이동할 수 있습니다.
+            각 서비스의 주문은 공통 결제 프로세스를 거칩니다. 공급자는 결제 완료 후
+            주문 확인, 배송 준비, 송장 등록과 배송 완료를 진행합니다.
           </p>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default function SupplierOrdersPage() {
             Neture 주문의 주문 확인 · 배송 준비 · 송장 등록 · 배송 완료를 처리합니다.
             <br />
             <span style={styles.fulfillNote}>
-              이벤트 오퍼 주문은 아래 "통합 주문 보기"에서 함께 확인할 수 있으며(읽기 전용), 배송 처리 통합은 후속 작업에서 다룹니다.
+              통합 주문 보기에서 주문별 배송 처리 가능 여부를 확인하고, 처리 가능한 주문은 배송 관리 화면으로 이동합니다.
             </span>
           </p>
         </div>
@@ -260,8 +260,8 @@ export default function SupplierOrdersPage() {
         <div style={styles.roleNoticeContent}>
           <span style={styles.roleNoticeBadge}>책임 분리</span>
           <p style={styles.roleNoticeText}>
-            <strong>Neture</strong>: 판매자 승인 및 운영 현황 확인 &nbsp;|&nbsp;
-            <strong>각 서비스</strong>: 주문 처리, 배송, 반품 관리
+            <strong>Neture</strong>: 판매자 승인, 주문 확인 및 최종 배송 &nbsp;|&nbsp;
+            <strong>각 서비스</strong>: 주문 발생 및 서비스별 운영
           </p>
         </div>
       </div>
@@ -510,7 +510,7 @@ function UnifiedOrdersSection({
 
       <p style={styles.unifiedFootnote}>
         이벤트 오퍼·서비스 주문은 checkout_orders 기반으로, 현재 화면에서는 확인만 가능합니다.
-        배송 처리·송장·정산 통합은 후속 작업에서 다룹니다.
+        결제 완료 후 배송 준비와 송장 등록을 진행합니다. 주문별 처리 가능 여부를 확인해 주세요.
       </p>
     </div>
   );

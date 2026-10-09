@@ -1,9 +1,9 @@
 /**
  * 취급매장 모집 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-6
  *
- *   GET  /api/v1/neture/pharmacy/recruitments             가입한 세미프랜차이즈의 진행 중 모집 + 내 약국 참여 상태
+ *   GET  /api/v1/neture/pharmacy/recruitments             일반 공개 모집 + 가입한 세미프랜차이즈의 모집 + 내 약국 참여 상태
  *   POST /api/v1/neture/pharmacy/recruitments/:id/apply   약국 조직 단위 참여 신청
- * 공급자가 참여를 승인하면 그 조건(공급 단가)으로 공급 상품의 `모집 참여` 경로에서 바로 주문할 수 있다.
+ * 사업 모집은 공급자 참여 승인 후 사업별 공급 조건을 적용한다. 일반 공개 모집은 별도 제품 승인 조건을 유지한다.
  */
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -45,7 +45,7 @@ export default function PharmacyRecruitmentsPage() {
     setMessage(null);
     try {
       await neturePharmacyApi.applyRecruitment(r.id);
-      setMessage(`${r.productName} 모집에 참여 신청했습니다. 공급자 승인 후 주문할 수 있습니다.`);
+      setMessage(`${r.productName} 모집에 참여 신청했습니다. 공급자의 참여 결정을 기다려 주세요.`);
       await load();
     } catch (e) {
       setError(pharmacyErrorMessage(e, '참여 신청에 실패했습니다.'));
@@ -57,7 +57,7 @@ export default function PharmacyRecruitmentsPage() {
   return (
     <PharmacyPage
       title="취급매장 모집"
-      description="가입한 세미프랜차이즈에서 공급자가 진행 중인 취급매장 모집입니다. 참여가 승인되면 공급 상품의 '모집 참여' 경로에서 주문할 수 있습니다."
+      description="공급자의 일반 공개 모집과 가입한 세미프랜차이즈의 모집을 확인합니다. 세미프랜차이즈 제품 등재와 공급에는 해당 사업의 승인 조건이 적용됩니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       {message && <Notice>{message}</Notice>}
@@ -67,7 +67,7 @@ export default function PharmacyRecruitmentsPage() {
       ) : rows.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
           <p>지금 참여할 수 있는 모집이 없습니다.</p>
-          <p className="mt-1">모집은 가입한 세미프랜차이즈 안에서만 보입니다. <Link className="underline" to={pharmacyStorePath('semiFranchises')}>세미프랜차이즈 보기</Link></p>
+          <p className="mt-1">일반 공개 모집은 바로 표시되며, 세미프랜차이즈 모집은 가입 조건이 적용됩니다. <Link className="underline" to={pharmacyStorePath('semiFranchises')}>세미프랜차이즈 보기</Link></p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -75,7 +75,7 @@ export default function PharmacyRecruitmentsPage() {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-600">
                 <th className="px-4 py-3 font-medium">제품</th>
-                <th className="px-4 py-3 font-medium">세미프랜차이즈</th>
+                <th className="px-4 py-3 font-medium">모집 구분</th>
                 <th className="px-4 py-3 font-medium">공급자</th>
                 <th className="px-4 py-3 text-right font-medium">공급 단가</th>
                 <th className="px-4 py-3 text-right font-medium">소비자가</th>
@@ -90,7 +90,7 @@ export default function PharmacyRecruitmentsPage() {
                 return (
                   <tr key={r.id} className="border-b border-gray-100 last:border-0">
                     <td className="px-4 py-3 font-medium text-gray-900">{r.productName}</td>
-                    <td className="px-4 py-3">{r.semiFranchiseName}</td>
+                    <td className="px-4 py-3">{r.semiFranchiseName || '일반 공개'}</td>
                     <td className="px-4 py-3">{r.supplierName}</td>
                     <td className="px-4 py-3 text-right">{formatWon(r.supplyUnitPrice)}</td>
                     <td className="px-4 py-3 text-right">{formatWon(r.consumerPrice)}</td>
