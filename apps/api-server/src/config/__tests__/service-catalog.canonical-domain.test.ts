@@ -77,10 +77,10 @@ describe('Pharmacy-Hub 신규 가입 비노출', () => {
     expect(getJoinableServices().map((s) => s.key)).not.toContain('pharmacy-hub');
   });
 
-  it('카탈로그 · handoff 대상 origin 은 그대로다 (기존 회원 진입 보존)', () => {
+  it('카탈로그 · handoff 대상 origin 은 그대로다 (이력 식별자 보존 · 업무공간 종료)', () => {
     expect(getService('pharmacy-hub')).toBeDefined();
     expect(getServiceOrigin('pharmacy-hub')).toBe('https://pharmacyhub.co.kr');
-    expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(true);
+    expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(false);
   });
 
   it('kpa-society 는 여전히 가입 가능하다', () => {

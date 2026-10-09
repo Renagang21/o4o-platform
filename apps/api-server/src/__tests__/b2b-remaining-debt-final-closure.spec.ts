@@ -7,7 +7,7 @@
  *   → service-agnostic B2B confirm → checkout_orders → buyer-order read
  *
  * 고정 대상:
- *   ① soft-delete 된 offer 가 3축(approval/optin/neture) 어디에서도 주문되지 않는다 (DF-6)
+ *   ① soft-delete 된 offer 가 현행 주문 축(approval/neture) 어디에서도 주문되지 않는다 (DF-6)
  *   ② catalog · orderable · 신청 자격 확인도 같은 soft-delete 게이트를 쓴다
  *   ③ 미승인 offer 차단 · 공급 축 오적용 차단
  *   ④ sourceType 축 혼합 오염 차단 (event_offer ↔ b2b/regular)
@@ -38,7 +38,6 @@ jest.mock('../utils/buyer-organization.resolver.js', () => ({
 
 import { NetureB2BCartCheckoutService } from '../services/cart/neture-b2b-cart-checkout.service.js';
 import { StoreB2BCartCheckoutService } from '../services/cart/store-b2b-cart-checkout.service.js';
-import { PharmacyHubCartCheckoutService } from '../services/cart/pharmacy-hub-cart-checkout.service.js';
 
 interface Captured {
   sql: string;
@@ -109,7 +108,6 @@ describe('① soft-delete 된 offer 는 어떤 공급 축에서도 주문되지 
   const cases: Array<[string, string, (ds: any) => { confirm: (s: any, i?: any) => Promise<any> }]> = [
     ['neture', 'neture', (ds) => new NetureB2BCartCheckoutService(ds)],
     ['kpa-society (approval)', 'kpa-society', (ds) => new StoreB2BCartCheckoutService(ds)],
-    ['pharmacy-hub (optin)', 'pharmacy-hub', (ds) => new PharmacyHubCartCheckoutService(ds) as any],
   ];
 
   it.each(cases)('%s 확정 쿼리는 삭제되지 않은 offer 만 본다', async (_label, serviceKey, make) => {

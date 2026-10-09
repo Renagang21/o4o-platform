@@ -39,7 +39,6 @@ const EXPECTED: Record<string, string[]> = {
   // routes/cosmetics/services/cosmetics-store.service.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거됐다.
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
-  'services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts': ['organizationId'],
   // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1:
   //   Cafe24 B2B 매장 회원 로그인 파일럿(WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1)이
   //   9번째 호출부를 추가하면서 이 census 등재를 빠뜨려 guard 가 red 였다.

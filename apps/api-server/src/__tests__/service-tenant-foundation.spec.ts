@@ -109,7 +109,7 @@ describe('Service Workspace metadata — identity 와 별도 축', () => {
 });
 
 describe('Store ↔ Service (1 Store : N Services)', () => {
-  it('Store A: active 2건은 workspaceAvailable, inactive 1건은 목록에 남되 false — 순서 결정적', async () => {
+  it('Store A: 현행 active 서비스만 workspaceAvailable, 은퇴 서비스는 목록에 남되 false — 순서 결정적', async () => {
     const { dataSource, calls } = makeDataSource([[memberRow(STORE_A)], STORE_A_ENROLLMENTS]);
 
     const r = await resolveStoreServices(dataSource, { userId: USER_X });
@@ -119,7 +119,7 @@ describe('Store ↔ Service (1 Store : N Services)', () => {
     expect(r.services.map((s) => [s.serviceKey, s.enrollmentStatus, s.workspaceAvailable])).toEqual([
       ['k-cosmetics', 'inactive', false],
       ['kpa-society', 'active', true],
-      ['pharmacy-hub', 'active', true],
+      ['pharmacy-hub', 'active', false],
     ]);
     expect(r.services.every((s) => s.organizationId === STORE_A)).toBe(true);
     // 1) organization_members 소유 후보 → 2) 그 조직으로 스코프된 enrollment 질의
@@ -242,7 +242,7 @@ describe('Operator ↔ Service (1 Operator : N Services)', () => {
 
     expect(list.map((s) => [s.serviceKey, s.scope, s.workspaceAvailable])).toEqual([
       ['kpa-society', 'operator', true],
-      ['pharmacy-hub', 'admin', true],
+      ['pharmacy-hub', 'admin', false],
     ]);
     expect(norm(calls[0].sql)).toContain('role_assignments');
     expect(calls[0].params).toEqual([USER_X]);

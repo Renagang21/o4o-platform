@@ -11,7 +11,7 @@
  *   `/`(홈) · `/store/*`(공통 기능 1회) · `/work/<serviceKey>/*`(서비스 종속) · `/hub/*` · `/services` · `/settings`
  */
 
-export type UnifiedStoreServiceKey = 'kpa-society' | 'k-cosmetics' | 'pharmacy-hub';
+export type UnifiedStoreServiceKey = 'kpa-society' | 'k-cosmetics';
 
 /** 빌드 플래그 해석 — 'true' | '1' 만 ON. 미설정·그 외 = OFF (프로덕션 기본은 기존 화면). */
 export function isUnifiedStoreHandoffEnabled(raw: unknown): boolean {
@@ -43,26 +43,7 @@ const RULES: Record<UnifiedStoreServiceKey, Rule[]> = {
     [/^\/store\/(marketing\/pop\/library|library\/product-descriptions)\/?$/, '/store/marketing/product-descriptions'],
     [/^\/store(\/.*)?$/, '/store$1'],
   ],
-  'pharmacy-hub': [
-    [/^\/store-owner\/workspace\/?$/, '/'],
-    [/^\/store-owner\/services\/?$/, '/services'],
-    [/^\/store-owner\/account\/?$/, '/settings'],
-    [/^\/store-hub(\/.*)?$/, '/hub$1'],
-    [/^\/store-owner\/products\/multilingual(\/.*)$/, '/store/products/multilingual$1'],
-    [/^\/store-owner\/multilingual-product-contents\/?$/, '/hub/multilingual-product-contents'],
-    [/^\/store-owner\/(products|cart|orders|payment)(\/.*)?$/, '/work/pharmacy-hub/$1$2'],
-    [/^\/store-owner\/local-products\/?$/, '/store/commerce/local-products'],
-    [/^\/store-owner\/tablets\/?$/, '/store/commerce/tablet-displays'],
-    [/^\/store-owner\/library\/resources\/?$/, '/store/library/resources'],
-    [/^\/store-owner\/library\/?$/, '/store/library/contents'],
-    [/^\/store-owner\/blog(\/.*)?$/, '/store/content/blog'],
-    [/^\/store-owner\/(qr|pop|pop-v2|product-descriptions)\/?$/, '/store/marketing/$1'],
-    [/^\/store-owner\/signage\/media\/?$/, '/store/marketing/signage/videos'],
-    [/^\/store-owner\/signage(\/.*)?$/, '/store/marketing/signage$1'],
-    [/^\/store-owner\/(handled-products|content|execution|analytics\/marketing|info)\/?$/, '/store/$1'],
-    [/^\/store-owner\/?$/, '/store'],
-    [/^\/store-owner(\/.*)?$/, '/store'],
-  ],
+
 };
 
 /**
