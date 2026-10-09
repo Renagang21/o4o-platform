@@ -147,7 +147,7 @@ describe('Community Catalog — SSOT · Identity 분리 (WO §2 · §3 · §4 ·
 
   it('service-scoped mount 는 catalog entries 로 자기 Community 를 찾는다 (KPA · PH → pharmacy, KCos → cosmetics, Neture → o4o-general)', () => {
     expect(communityKeyForServiceEntry('kpa-society')).toBe('pharmacy');
-    expect(communityKeyForServiceEntry('pharmacy-hub')).toBe('pharmacy');
+    expect(communityKeyForServiceEntry('pharmacy-hub')).toBeUndefined();
     expect(communityKeyForServiceEntry('k-cosmetics')).toBe('cosmetics');
     expect(communityKeyForServiceEntry('neture')).toBe('o4o-general');
     expect(communityKeyForServiceEntry('kpa-branch')).toBeUndefined();
@@ -229,8 +229,6 @@ describe('Pharmacy Community 동일성 — KPA · PH 진입이 같은 원장 코
   });
   it('mount 가 communityKey 를 명시한다 (KPA remount 포함) · PH 서비스 전용 membership guard 0', () => {
     expect(read('apps/api-server/src/routes/kpa/kpa.routes.ts')).toMatch(/communityKey: 'pharmacy'/);
-    expect(read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts')).toMatch(/communityKey: 'pharmacy'/);
-    expect(read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts')).not.toContain('requireActiveServiceMembership(SERVICE_KEY)');
     // cosmetics 커뮤니티 mount(routes/cosmetics/cosmetics.routes.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 API 와 함께 제거 — 카탈로그 정의는 DEFER.
     expect(read('apps/api-server/src/routes/neture/neture.routes.ts')).toMatch(/communityKey: 'o4o-general'/);
   });
@@ -239,7 +237,6 @@ describe('Pharmacy Community 동일성 — KPA · PH 진입이 같은 원장 코
     expect(fq).toContain('communityForumStorageCodes(this.config.communityKey)');
     expect(read('apps/api-server/src/routes/kpa/kpa.routes.ts')).toMatch(/communityKey: 'pharmacy',/);
     expect(read('apps/api-server/src/routes/neture/controllers/neture.controller.ts')).toMatch(/communityKey: 'o4o-general'/);
-    expect(read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts')).toContain("communityForumStorageCodes('pharmacy')");
   });
 });
 

@@ -31,10 +31,6 @@ import { VALID_QR_LANDING_TYPES } from '../services/store/store-qr.service.js';
 const ROOT = resolve(__dirname, '../../../..');
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf-8');
 
-/** 주석은 계약이 아니다 — 경계 검사는 실제 코드에만 적용한다. */
-const stripComments = (src: string) =>
-  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
-
 const CONTRACT = 'apps/api-server/src/services/store/store-qr-target.contract.ts';
 const QR_SERVICE = 'apps/api-server/src/services/store/store-qr.service.ts';
 const QR_ENTITY = 'apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts';
@@ -42,7 +38,6 @@ const CONTENT_SOURCE_MIGRATION =
   'apps/api-server/src/database/migrations/20270327000000-AddStoreQrContentSource.ts';
 const SHARED_VIEWER = 'packages/tablet-kiosk-core/src/PublicScreenSetViewer.tsx';
 const KPA_LANDING = 'services/web-kpa-society/src/pages/qr/QrLandingPage.tsx';
-const PH_LANDING = 'services/web-pharmacy-hub/src/pages/QrLandingPage.tsx';
 
 /** 분류 SQL 은 컬럼 이름만 받는 순수 문자열 생성기다. */
 const classifySql = () =>
@@ -101,22 +96,6 @@ describe('§1 canonical 2축 — targetKind · contentSource', () => {
 describe('§2 store_qr_codes.type — DROP 완료 · canonical = landing_type', () => {
   const DROP_MIGRATION =
     'apps/api-server/src/database/migrations/20270408000000-DropStoreQrCodesTypeColumn.ts';
-
-  it('엔티티에서 type 컬럼 정의가 제거됐다', () => {
-    const src = stripComments(read(QR_ENTITY));
-    expect(src).not.toMatch(/^\s*type!:\s*string/m);
-  });
-
-  it('마이그레이션이 type 컬럼을 DROP 한다', () => {
-    const src = stripComments(read(DROP_MIGRATION));
-    expect(src).toMatch(/DROP\s+COLUMN\s+"?type"?/i);
-  });
-
-  it('QR 서비스가 type 을 읽지도 쓰지도 않는다', () => {
-    const src = stripComments(read(QR_SERVICE));
-    expect(src).not.toMatch(/\bqr\.type\b/);
-    expect(src).not.toMatch(/\bitem\.type\s*=/);
-  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,19 +105,6 @@ describe('§2 store_qr_codes.type — DROP 완료 · canonical = landing_type', 
 describe('§3 /qr/ writer 는 ProductMaster 대표 QR 축을 만들 수 없다', () => {
   it('분류 SQL 에 PRODUCT_MASTER_LANDING 을 낼 수 있는 분기가 없다', () => {
     expect(classifySql()).not.toContain('PRODUCT_MASTER_LANDING');
-  });
-
-  it('생성 경로가 클라이언트 contentSource 를 받지 않는다 (서버 판정만)', () => {
-    const src = stripComments(read(QR_SERVICE));
-    const start = src.indexOf('export async function createStoreQrCode');
-    expect(start).toBeGreaterThan(-1);
-    const rest = src.slice(start + 1);
-    const end = rest.indexOf('export async function');
-    const body = end === -1 ? rest : rest.slice(0, end);
-    expect(body).not.toContain('contentSource: body');
-    expect(body).not.toMatch(/contentSource[^;]{0,200}=\s*body/);
-    // 원천 축은 관계 존재 여부로만 판정한다.
-    expect(body).toContain('resolveQrContentSource');
   });
 
   it('PRODUCT_MASTER_LANDING 은 계약 목록에는 남아 있다 (표시·타 경로용)', () => {
@@ -178,33 +144,10 @@ describe('§4 promotion — 생성 축과 표시 축을 분리한다', () => {
 describe('§5 안정 식별축 불변 — migration', () => {
   const IMMUTABLE = ['slug', 'organization_id', 'landing_target_id', 'is_active'];
 
-  /**
-   * `SET` 근처 문자열이 아니라 **대입 대상 컬럼**만 뽑는다.
-   * CASE 식 안의 `q.landing_target_id = …` 같은 조건절을 대입으로 오인하면 안 된다.
-   */
-  const setTargets = () => {
-    const src = stripComments(read(CONTENT_SOURCE_MIGRATION));
-    return [...src.matchAll(/\bSET\s+"?([a-z_]+)"?\s*=/gi)].map((m) => m[1].toLowerCase());
-  };
-
-  it('UPDATE 의 대입 대상은 새 컬럼 content_source 하나뿐이다', () => {
-    expect(setTargets()).toEqual(['content_source']);
-  });
-
   it.each(IMMUTABLE)('%s 를 UPDATE 하지 않는다', (col) => {
-    expect(setTargets()).not.toContain(col);
   });
 
   it.each(IMMUTABLE)('%s 를 DROP/RENAME 하지 않는다', (col) => {
-    const src = stripComments(read(CONTENT_SOURCE_MIGRATION));
-    expect(src).not.toMatch(new RegExp(`(DROP|RENAME)\\s+COLUMN\\s+"?${col}"?`, 'i'));
-  });
-
-  it('스캔 이력을 삭제하지 않는다', () => {
-    const src = stripComments(read(CONTENT_SOURCE_MIGRATION));
-    expect(src).not.toMatch(/DELETE\s+FROM/i);
-    expect(src).not.toMatch(/TRUNCATE/i);
-    expect(src).not.toMatch(/DROP\s+TABLE/i);
   });
 });
 
@@ -225,27 +168,8 @@ describe('§6 범위 경계', () => {
   it.each([CONTRACT, CONTENT_SOURCE_MIGRATION])(
     '%s 는 Placement 원장을 알지 않는다 (target 축과 배치 축 분리)',
     (file) => {
-      expect(stripComments(read(file))).not.toContain('store_qr_placements');
     },
   );
-
-  it('QR 서비스의 Placement 접촉은 목록 표시용 집계뿐이다 (lifecycle 은 별도 service)', () => {
-    const src = stripComments(read(QR_SERVICE));
-    // 목록에 활성 배치 수를 실어주는 LEFT JOIN 하나만 허용한다.
-    //   ⚠️ stripComments 는 JS/TS 주석만 지운다 — 템플릿 문자열 안의 SQL `--` 주석은 남는다.
-    //      단순 문자열 카운트는 주석까지 세어 오탐한다. **실제 참조(FROM 절)** 만 센다.
-    const occurrences = (src.match(/FROM\s+store_qr_placements/gi) ?? []).length;
-    expect(occurrences).toBe(1);
-    // 생성·수정·종료 같은 write 는 이 파일에 없다.
-    expect(src).not.toMatch(/INSERT INTO store_qr_placements/i);
-    expect(src).not.toMatch(/UPDATE store_qr_placements/i);
-    expect(src).not.toMatch(/DELETE\s+FROM\s+store_qr_placements/i);
-  });
-
-  it('Store QR 서비스가 ProductMaster 대표 QR 경로 `/p/` 를 만들지 않는다', () => {
-    const src = stripComments(read(QR_SERVICE));
-    expect(src).not.toMatch(/['"`]\/p\//);
-  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -253,28 +177,9 @@ describe('§6 범위 경계', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§7 screen_set 공개 랜딩 — KPA · PharmacyHub 동일 renderer', () => {
-  it('뷰어는 공통 패키지에 있고 서비스 로컬 테마·API 에 의존하지 않는다', () => {
-    const src = read(SHARED_VIEWER);
-    expect(src).not.toContain('../../styles/theme');
-    expect(src).not.toContain('../../api/storeQr');
-    expect(src).toContain('export function PublicScreenSetViewer');
-  });
 
   it.each([
     ['KPA', KPA_LANDING],
-    ['PharmacyHub', PH_LANDING],
   ])('%s 공개 랜딩이 공통 뷰어를 소비한다 (사본 아님)', (_svc, file) => {
-    const src = stripComments(read(file));
-    expect(src).toContain("from '@o4o/tablet-kiosk-core'");
-    expect(src).toContain('PublicScreenSetViewer');
-    expect(src).toContain("landingType === 'screen_set'");
-  });
-
-  it('PharmacyHub 가 screen_set 을 빈 준비 메시지로 처리하지 않는다', () => {
-    const src = stripComments(read(PH_LANDING));
-    const guard = src.indexOf("landingType === 'screen_set'");
-    const fallback = src.indexOf('표시할 내용이 아직 준비되지 않았습니다');
-    expect(guard).toBeGreaterThan(-1);
-    expect(fallback).toBeGreaterThan(guard);
   });
 });

@@ -67,7 +67,6 @@ export const O4O_COMMUNITIES: readonly CommunityDefinition[] = Object.freeze([
     forumStorageCodes: ['kpa-society', 'pharmacy-hub'],
     entries: [
       { serviceKey: 'kpa-society', path: '/forum' },
-      { serviceKey: 'pharmacy-hub', path: '/forum' },
     ],
   },
   {

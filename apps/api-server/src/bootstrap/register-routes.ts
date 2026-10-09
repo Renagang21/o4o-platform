@@ -101,7 +101,6 @@ import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.rout
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
 //   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
-import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
 // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
 import { createKpaBranchRoutes } from '../routes/kpa-branch/kpa-branch.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
@@ -697,24 +696,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   legacy `/api/v1/yaksa/*` 12 endpoint 는 production 소비처·내부 호출·운영 데이터가 모두 0으로
     //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
     //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
-
-    // 27b. Register Pharmacy-Hub routes (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
-    //      Foundation 범위: service-info / me-access / 역할별 scope ping 만.
-    try {
-      app.use('/api/v1/pharmacy-hub', createPharmacyHubRoutes());
-      logger.info('✅ Pharmacy-Hub routes registered at /api/v1/pharmacy-hub');
-
-      // WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1:
-      //   결제 완료 → 주문 paid 전이 → 공급자 fulfillment bridge.
-      //   serviceKey='pharmacy-hub' 구독이라 Neture 핸들러와 서로 간섭하지 않는다.
-      const { initializePharmacyHubPaymentHandler } = await import(
-        '../services/pharmacy-hub/PharmacyHubPaymentEventHandler.js'
-      );
-      initializePharmacyHubPaymentHandler(dataSource);
-      logger.info('✅ PharmacyHubPaymentEventHandler initialized');
-    } catch (pharmacyHubError) {
-      logger.error('Failed to register Pharmacy-Hub routes:', pharmacyHubError);
-    }
 
     // 27c. Register KPA Branch routes
     //      WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
