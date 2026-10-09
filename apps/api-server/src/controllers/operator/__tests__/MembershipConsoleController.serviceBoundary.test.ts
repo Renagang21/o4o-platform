@@ -8,7 +8,7 @@ jest.mock('../../../modules/auth/services/role.service.js', () => ({ roleService
 jest.mock('../../../services/auth/demo-account.service.js', () => ({ rejectDemoAccountTarget: jest.fn(async () => false) }));
 import { MembershipConsoleController } from '../MembershipConsoleController.js';
 const ID = '11111111-2222-4333-8444-555555555555';
-function req(body: any = {}, keys = ['neture', 'pharmacy-hub'], platform = false): any {
+function makeReq(body: any = {}, keys = ['neture', 'pharmacy-hub'], platform = false): any {
   return { body, query: {}, params: { userId: ID }, user: { id: 'actor' }, serviceScope: { serviceKeys: keys, rolePrefixes: keys, isPlatformAdmin: platform } };
 }
 function res(): any { const r: any = {}; r.status = jest.fn(() => r); r.json = jest.fn(() => r); return r; }
@@ -23,7 +23,7 @@ function primeMemberReads() {
 }
 
 async function readMembers(method: 'getMembers' | 'getMemberDetail', keys: string[], query: Record<string, string>, platform = false) {
-  const request = req({}, keys, platform);
+  const request = makeReq({}, keys, platform);
   request.query = query;
   const response = res();
   await new MembershipConsoleController()[method](request, response);
@@ -42,7 +42,13 @@ beforeEach(() => {
   jest.clearAllMocks();
   primeMemberReads();
 });
-describe('service membership boundaries', () => {
+describe.each([
+  { primary: 'neture', secondary: 'pharmacy-hub' },
+  { primary: 'community', secondary: 'kpa-society' },
+])('$primary service membership boundaries', ({ primary, secondary }) => {
+  function req(body: any = {}, keys = [primary, secondary], platform = false) {
+    return makeReq(body, keys, platform);
+  }
   it.each(['updateMemberStatus', 'batchUpdateStatus', 'reactivateMember'])('%s rejects an ambiguous service before DB writes', async (method) => {
     const r = req({ status: 'suspended', ids: [ID] }); const out = res();
     await (new MembershipConsoleController() as any)[method](r, out);
@@ -54,8 +60,7 @@ describe('service membership boundaries', () => {
   });
   it.each([
     { name: 'platform lifecycle needs one service', method: 'reactivateMember', body: {}, keys: [], platform: true, status: 400 },
-    { name: 'central detail needs an explicit scope', method: 'getMemberDetail', body: {}, keys: [], platform: true, status: 400 },
-    { name: 'reactivation cannot select an unowned service', method: 'reactivateMember', body: { serviceKey: 'lecture' }, keys: ['neture'], platform: false, status: 403 },
+    { name: 'reactivation cannot select an unowned service', method: 'reactivateMember', body: { serviceKey: 'lecture' }, keys: [primary], platform: false, status: 403 },
   ])('$name before any DB access', async ({ method, body, keys, platform, status }) => {
     const out = res();
     await (new MembershipConsoleController() as any)[method](req(body, keys, platform), out);
@@ -63,16 +68,16 @@ describe('service membership boundaries', () => {
     expect(mockQuery).not.toHaveBeenCalled();
   });
   it('selected reactivation never passes all owned services to approval', async () => {
-    const out = res(); await new MembershipConsoleController().reactivateMember(req({ serviceKey: 'neture' }), out);
-    expect(mockApproval.reactivateMembership).toHaveBeenCalledWith(expect.objectContaining({ serviceKeys: ['neture'], isPlatformAdmin: false }));
+    const out = res(); await new MembershipConsoleController().reactivateMember(req({ serviceKey: primary }), out);
+    expect(mockApproval.reactivateMembership).toHaveBeenCalledWith(expect.objectContaining({ serviceKeys: [primary], isPlatformAdmin: false }));
   });
   it('a sole service remains unambiguous', async () => {
-    await new MembershipConsoleController().reactivateMember(req({}, ['neture']), res());
-    expect(mockApproval.reactivateMembership).toHaveBeenCalledWith(expect.objectContaining({ serviceKeys: ['neture'] }));
+    await new MembershipConsoleController().reactivateMember(req({}, [primary]), res());
+    expect(mockApproval.reactivateMembership).toHaveBeenCalledWith(expect.objectContaining({ serviceKeys: [primary] }));
   });
   it.each([
-    { name: 'unowned membership service', body: { membershipRole: 'member', membershipServiceKey: 'pharmacy-hub', firstName: 'changed' }, keys: ['neture'], status: 403 },
-    { name: 'conflicting service selectors', body: { membershipRole: 'member', membershipServiceKey: 'neture', serviceKey: 'pharmacy-hub' }, keys: ['neture', 'pharmacy-hub'], status: 400 },
+    { name: 'unowned membership service', body: { membershipRole: 'member', membershipServiceKey: secondary, firstName: 'changed' }, keys: [primary], status: 403 },
+    { name: 'conflicting service selectors', body: { membershipRole: 'member', membershipServiceKey: primary, serviceKey: secondary }, keys: [primary, secondary], status: 400 },
   ])('rejects $name without a partial profile write', async ({ body, keys, status }) => {
     const out = res();
     await new MembershipConsoleController().updateMember(req(body, keys), out);
@@ -80,9 +85,17 @@ describe('service membership boundaries', () => {
     expect(mockQuery.mock.calls.some(([sql]) => /^UPDATE/.test(sql))).toBe(false);
   });
   it('membership type update uses the requested, authorized service', async () => {
-    await new MembershipConsoleController().updateMember(req({ membershipRole: 'member', membershipServiceKey: 'neture' }), res());
+    await new MembershipConsoleController().updateMember(req({ membershipRole: 'member', membershipServiceKey: primary }), res());
     const writes = mockQuery.mock.calls.filter(([sql]) => /^UPDATE service_memberships/.test(sql));
-    expect(writes).toHaveLength(1); expect(writes[0][1]).toEqual(['member', ID, 'neture']);
+    expect(writes).toHaveLength(1); expect(writes[0][1]).toEqual(['member', ID, primary]);
+  });
+});
+
+describe('canonical member read scopes', () => {
+  it('central detail needs an explicit scope before personal data access', async () => {
+    const out = await readMembers('getMemberDetail', [], {}, true);
+    expect(out.status).toHaveBeenCalledWith(400);
+    expect(mockQuery).not.toHaveBeenCalled();
   });
   it('detail scopes memberships and role query to the selected canonical service', async () => {
     await readMembers('getMemberDetail', ['neture', 'pharmacy-hub'], { serviceKey: 'neture' });

@@ -256,3 +256,10 @@ Lecture SiteShell 충돌은 서비스 회원 관리 링크와 새 서브도메�
 KPA의 반복 lifecycle 권한 거부는 동일 MemberInfoAbort 생성과 기존 catch에 수렴했다.
 KPA 화면·공통 controller의 소량 중복은 기존 업무별 맥락을 유지한다.
 관련 API 3 suites / 50 tests 및 API 타입 검사 PASS. 검사 설정·제외 규칙은 변경하지 않았다.
+
+1차 Sonar 재분석: 중복률 9.2% → 4.5%, 필수 CI Gate PASS.
+잔여 큰 중복은 Neture·Community 회원 write 계약 파일의 복사본이었다.
+Community 별도 파일을 공통 describe.each의 service dataset으로 통합했다.
+기존 Neture/read 26 + Community write 10 = 36개 사례를 유지하며,
+KPA 회귀 포함 3 suites / 60 tests PASS. 파일 제거는 테스트 사례 제거가 아니다.
+최종 Sonar·CI는 다음 PR HEAD 결과를 확인한다.
