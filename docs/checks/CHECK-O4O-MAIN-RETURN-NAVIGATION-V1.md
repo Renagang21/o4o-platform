@@ -52,3 +52,11 @@ main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 
 최종 URL 통합 뒤 필수 CI는 통과했지만 SonarCloud 중복률 3.4%로 기준을 넘었다. 서비스별 얇은 resolver wrapper도 제거하고 공통 함수를 직접 호출한다. 중복된 서비스별 순수 경로 테스트는 공통 auth-utils의 경로·Unicode·basename·외부 주소 차단 12개 테스트로 일원화했다. auth-utils 전체 41개와 Neture stale token 3개를 재검증한다.
 
 직접 호출 후 5.1%: Neture·분회는 기존 화면 대부분이 동일한 복사본이라 새 호출도 큰 중복 블록에 포함됐다. 두 화면의 인계 수신·상태 UI를 `auth-react/HandoffEntryPage`로 통합했다. 소비처는 Neture·분회 두 곳이며 API 주소·basename·오류 문구를 주입한다. 기존 export는 유지하며 약국·강의·매장 등 다른 auth-react 소비처에는 새 컴포넌트를 적용하지 않는다. layout effect의 낡은 토큰 선제 제거·쿠키 없는 공개 fetch·토큰 저장 뒤 전체 reload를 유지했다. auth-react 전체 11 files / 149 tests, Neture stale token 3개, Neture·분회 tsc/Vite build PASS. 최종 운영 산출물로 네 서비스 desktop/mobile 인계 이동 16회 재검증한다.
+
+## 최신 main 반영 및 최종 중복·경고 수정
+
+작업 브랜치에 최신 main을 merge하고 auth-react index의 신규 export 둘을 모두 유지했다. main 통합·배포는 하지 않았다. 기존 분리된 약국 화면의 스타일 객체와도 중복되어 공통 컴포넌트 스타일을 scoped CSS로 분리했다. 읽기 전용 props와 `void exchange()`로 Sonar 경고를 수정했다. 쿠키·refresh 없는 공개 fetch는 기존 auth-client의 `exchangeHandoffToken()`에 모아 공통 수신 UI·약국·매장·강의에서 사용한다. Account의 쿠키 기반 수신은 변경하지 않는다. 약국의 상대 경로에도 동일한 안전 검사·최종 origin 조립을 적용했으며 서버 승인 거절과 신청 링크는 그대로 유지한다.
+
+인증 클라이언트 34개, auth-react 156개, auth-utils 41개, Neture 전체 383개(최신 main 반영 후), Neture stale-token 3개, 약국 경로·승인 거절 2개 테스트 PASS. Neture·분회·약국·매장·강의 tsc/Vite build PASS. 최종 브라우저는 다섯 서비스의 desktop/mobile 경로 이동 20회 및 공통 오류 UI의 CSS·복귀 링크·가로 넘침 4회를 검증한다.
+
+이전 커밋의 수동 전체 CI에서 서버 Jest 한 묶음이 실패했다. 상세 로그 저장소가 네트워크 허용 목록에 없어 실패 메시지만 확인했고 실패한 job 재실행을 요청했다. 최종 커밋의 CI와 Sonar 결과를 별도로 확인한다.

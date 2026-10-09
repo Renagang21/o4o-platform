@@ -1,3 +1,4 @@
+import { exchangeHandoffToken } from '@o4o/auth-client';
 import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
@@ -26,12 +27,7 @@ export default function HandoffPage() {
     if (!token) { setError('이동 정보가 없습니다.'); return; }
     void (async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
-          // credentials 를 보내지 않는다 — 세션은 body 토큰(localStorage)으로만 복원한다.
-          // 쿠키를 받으면 `.neture.co.kr` 쿠키를 쓰는 admin 세션을 덮어쓴다 (CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1).
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
+        const response = await exchangeHandoffToken(API_BASE_URL, token);
         const data = await response.json().catch(() => null);
         const tokens = data?.data?.tokens;
         if (response.ok && data?.success && tokens?.accessToken) {

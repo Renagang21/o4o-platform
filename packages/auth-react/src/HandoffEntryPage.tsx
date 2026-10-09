@@ -1,7 +1,9 @@
+import { exchangeHandoffToken } from '@o4o/auth-client';
 /** Shared localStorage handoff receiver; clear stale tokens before parent session restore. */
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
+import './HandoffEntryPage.css';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
@@ -13,7 +15,7 @@ export interface HandoffEntryPageProps {
   errorMessages: Record<string, string>;
 }
 
-export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: HandoffEntryPageProps) {
+export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: Readonly<HandoffEntryPageProps>) {
   const [status, setStatus] = useState<HandoffStatus>('loading');
   const [error, setError] = useState<string>('');
 
@@ -35,13 +37,7 @@ export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: H
 
     const exchange = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/v1/auth/handoff/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          // credentials 를 보내지 않는다 — 세션은 body 토큰(localStorage)으로만 복원한다.
-          // 쿠키를 받으면 `.neture.co.kr` 쿠키를 쓰는 admin 세션을 덮어쓴다 (CHECK-O4O-URL-FIRST-CENSUS-V1 §19-1).
-          body: JSON.stringify({ token }),
-        });
+        const response = await exchangeHandoffToken(apiBaseUrl, token);
         const data = await response.json().catch(() => null);
 
         const tokens = data?.data?.tokens;
@@ -60,15 +56,15 @@ export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: H
       }
     };
 
-    exchange();
+    void exchange();
   }, [apiBaseUrl, basename, errorMessages]);
 
   if (status === 'loading') {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <div style={styles.spinner} />
-          <p style={styles.text}>서비스 이동 중...</p>
+      <div className="o4o-handoff-container">
+        <div className="o4o-handoff-card">
+          <div className="o4o-handoff-spinner" />
+          <p className="o4o-handoff-text">서비스 이동 중...</p>
         </div>
       </div>
     );
@@ -76,11 +72,11 @@ export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: H
 
   if (status === 'error') {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <p style={styles.errorText}>{error}</p>
-          <a href={`${basename}/login`} style={styles.link}>로그인 페이지로 이동</a>
-          <p><a href="https://neture.co.kr/" style={styles.link}>O4O 메인으로</a></p>
+      <div className="o4o-handoff-container">
+        <div className="o4o-handoff-card">
+          <p className="o4o-handoff-errorText">{error}</p>
+          <a href={`${basename}/login`} className="o4o-handoff-link">로그인 페이지로 이동</a>
+          <p><a href="https://neture.co.kr/" className="o4o-handoff-link">O4O 메인으로</a></p>
         </div>
       </div>
     );
@@ -88,43 +84,3 @@ export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages }: H
 
   return null;
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5',
-  },
-  card: {
-    textAlign: 'center' as const,
-    padding: '40px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  },
-  spinner: {
-    width: '40px',
-    height: '40px',
-    border: '4px solid #e0e0e0',
-    borderTop: '4px solid #1976d2',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-    margin: '0 auto 16px',
-  },
-  text: {
-    fontSize: '16px',
-    color: '#333',
-  },
-  errorText: {
-    fontSize: '16px',
-    color: '#d32f2f',
-    marginBottom: '16px',
-  },
-  link: {
-    color: '#1976d2',
-    textDecoration: 'none',
-    fontSize: '14px',
-  },
-};

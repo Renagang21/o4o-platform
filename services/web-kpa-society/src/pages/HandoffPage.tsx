@@ -1,3 +1,5 @@
+import { exchangeHandoffToken } from '@o4o/auth-client';
+import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 /**
  * Service Handoff Page
  *
@@ -41,11 +43,7 @@ const ERROR_MESSAGES: Record<string, string> = {
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: `returnTo` 상대 경로 지원.
  * '/' 로 시작하는 단일 슬래시 경로만 허용 (open redirect 차단). 그 외는 홈.
  */
-function resolveReturnTo(raw: string | null): string {
-  if (!raw) return '/';
-  if (!raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
-  return raw;
-}
+
 
 export default function HandoffPage() {
   const [status, setStatus] = useState<HandoffStatus>('loading');
@@ -60,7 +58,7 @@ export default function HandoffPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
-    const returnTo = resolveReturnTo(params.get('returnTo'));
+    const returnTo = resolveHandoffReturnTo(params.get('returnTo'), window.location.origin);
 
     if (!token) {
       setStatus('error');
@@ -70,11 +68,7 @@ export default function HandoffPage() {
 
     const exchange = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
+        const response = await exchangeHandoffToken(API_BASE_URL, token);
 
         const data = await response.json().catch(() => null);
 
@@ -83,7 +77,7 @@ export default function HandoffPage() {
           localStorage.setItem(ACCESS_TOKEN_KEY, data.data.tokens.accessToken);
           localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
           setStatus('success');
-          window.location.replace(returnTo);
+          window.location.replace(buildHandoffDestination(returnTo, window.location.origin));
         } else {
           setStatus('error');
           // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: Neture 약국 · 세미프랜차이즈 상태별 안내는 서버 문구 + 신청 링크
