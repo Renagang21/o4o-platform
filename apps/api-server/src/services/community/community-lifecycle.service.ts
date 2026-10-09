@@ -24,6 +24,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from '../auth/demo-account.service.js';
 import { assertNetureMainMembershipActive } from '../../modules/neture/services/neture-main-membership.js';
+import { independentCommunityKeyTaken } from './community-key-namespace.js';
 import { Community } from '../../entities/Community.js';
 import { CommunityMembership } from '../../entities/CommunityMembership.js';
 import { CommunityCreationRequest } from '../../entities/CommunityCreationRequest.js';
@@ -70,6 +71,7 @@ export function normalizeSlug(raw: unknown): string {
 
 /** 이미 쓰고 있거나 pending 신청이 잡고 있는 slug 인지. */
 async function slugTaken(m: EntityManager, slug: string): Promise<boolean> {
+  if (await independentCommunityKeyTaken(m, slug)) return true;
   const community = await m.getRepository(Community).findOne({ where: { slug } });
   if (community) return true;
   const pending = await m.getRepository(CommunityCreationRequest).findOne({
@@ -164,8 +166,9 @@ export class CommunityLifecycleService {
       }
 
       // 승인 직전 재검사 — pending 인 자기 자신은 제외하고 본다.
+      const businessTaken = await independentCommunityKeyTaken(m, request.desiredSlug);
       const existing = await m.getRepository(Community).findOne({ where: { slug: request.desiredSlug } });
-      if (existing) {
+      if (existing || businessTaken) {
         request.status = 'slug_conflict';
         request.reviewedByUserId = input.reviewerUserId;
         request.reviewedAt = new Date();

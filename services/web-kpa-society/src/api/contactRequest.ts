@@ -7,7 +7,7 @@
 
 import { apiClient } from './client';
 
-export type ContactRequestType = 'partner' | 'education';
+export type ContactRequestType = 'partner';
 export type ContactRequestStatus = 'pending' | 'reviewing' | 'done';
 
 export interface ContactRequestPayload {

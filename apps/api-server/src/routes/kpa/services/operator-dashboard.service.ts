@@ -28,6 +28,7 @@ import { SELLER_RECRUITMENT_TABLE } from '../../../modules/neture/entities/Selle
 import type { ContentQueryService } from '../../../modules/content/index.js';
 import type { SignageQueryService } from '../../../modules/signage/index.js';
 import type { ForumQueryService } from '../../../modules/forum/index.js';
+import { resolveCommunityWorkspace } from '../../../services/community/community-workspace.service.js';
 import type {
   OperatorDashboardConfig,
   KpiItem,
@@ -113,8 +114,10 @@ interface SecondaryCounts {
 async function fetchSummaryShape(
   dataSource: DataSource,
   services: KpaDashboardServices,
+  userId: string,
 ): Promise<SummaryShape> {
   const { contentService, signageService, forumService } = services;
+  const workspace = await resolveCommunityWorkspace(dataSource, { id: userId }, 'pharmacy');
 
   const [
     recentContent,
@@ -139,7 +142,7 @@ async function fetchSummaryShape(
   ] = await Promise.all([
     contentService.listForHome(['notice', 'news'], 5),
     signageService.listForHome(3, 3),
-    forumService.listRecentPosts(5),
+    workspace?.allowed ? forumService.listRecentPosts(5) : [],
     dataSource.query(`
       SELECT COUNT(*) as count FROM cms_contents
       WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'
@@ -152,10 +155,7 @@ async function fetchSummaryShape(
       SELECT COUNT(*) as count FROM signage_playlists
       WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL
     `),
-    dataSource.query(`
-      SELECT COUNT(*) as count FROM forum_post
-      WHERE status = 'publish' AND organization_id IS NULL
-    `),
+    workspace?.allowed ? forumService.countVisiblePosts() : 0,
     dataSource.query(`
       SELECT COUNT(*) as count FROM cms_contents
       WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'
@@ -172,10 +172,7 @@ async function fetchSummaryShape(
       SELECT COUNT(*) as count FROM signage_playlists
       WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL
     `),
-    dataSource.query(`
-      SELECT COUNT(*) AS count FROM forum_category_requests
-      WHERE status = 'pending' AND service_code = 'kpa-society'
-    `),
+    workspace?.canManage ? forumService.countPendingRequests() : 0,
     dataSource.query(`
       SELECT COUNT(*) AS count FROM kpa_approval_requests
       WHERE entity_type = 'instructor_qualification' AND status = 'pending'
@@ -230,8 +227,8 @@ async function fetchSummaryShape(
       recentPlaylists: signageHome.playlists as SummaryShape['signage']['recentPlaylists'],
     },
     forum: {
-      totalPosts: parseInt(forumPostTotalCount[0]?.count || '0', 10),
-      pendingRequests: parseInt(forumPendingRequestCount[0]?.count || '0', 10),
+      totalPosts: forumPostTotalCount,
+      pendingRequests: forumPendingRequestCount,
       recentPosts: recentPosts as SummaryShape['forum']['recentPosts'],
     },
     approval: {
@@ -667,11 +664,11 @@ function buildConfig(
 export async function buildKpaOperatorDashboardConfig(
   dataSource: DataSource,
   services: KpaDashboardServices,
-  _userId: string,
+  userId: string,
   isAdmin: boolean,
 ): Promise<OperatorDashboardConfig> {
   const [summary, secondary] = await Promise.all([
-    fetchSummaryShape(dataSource, services),
+    fetchSummaryShape(dataSource, services, userId),
     fetchSecondaryCounts(dataSource, isAdmin),
   ]);
   return buildConfig(summary, secondary, isAdmin);

@@ -29,6 +29,7 @@ import logger from '../../utils/logger.js';
 /** serviceKey → 표시 이름 (이메일 제목용). */
 const SERVICE_DISPLAY_NAME: Record<string, string> = {
   'k-cosmetics': 'K-Cosmetics',
+  lecture: 'O4O 강의',
 };
 
 /** HTML escape — 이메일 본문에 사용자 입력을 넣을 때 XSS/주입 방지. */
@@ -39,6 +40,7 @@ function esc(s: string): string {
 /** 본 공통 문의 API 가 받는 serviceKey → role prefix. (Neture/KPA 는 자체 경로 사용 → 제외) */
 const SERVICE_ROLE_PREFIX: Record<string, string> = {
   'k-cosmetics': 'cosmetics',
+  lecture: 'lecture',
 };
 
 const VALID_INQUIRY_TYPES = [
@@ -195,7 +197,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
                 //   admin/super_admin) 라 operator 수신자가 열 수 없었다(ROLE_MISMATCH).
                 //   문의 관리 canonical 화면은 operator 로 이관된
                 //   `/operator/contacts`(OperatorRoute = operator+admin+super_admin) 다.
-                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: '/operator/contacts' },
+                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: serviceKey === 'lecture' ? '/operator/contact' : '/operator/contacts' },
                 }),
               ),
             );
@@ -228,7 +230,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
               `</ul>`,
               `<p><strong>문의 내용</strong></p>`,
               `<pre style="white-space:pre-wrap;font-family:inherit">${esc(cleanMessage)}</pre>`,
-              `<p>운영자 관리 화면 &gt; 문의 관리(/admin/contact-inquiries)에서 확인·처리할 수 있습니다.</p>`,
+              `<p>운영자 관리 화면 &gt; 문의 관리(${serviceKey === 'lecture' ? '/operator/contact' : '/operator/collaboration-requests'})에서 확인·처리할 수 있습니다.</p>`,
             ].join('\n');
             const result = await emailService.sendEmail({
               to: settings.recipientEmails,

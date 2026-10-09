@@ -199,15 +199,23 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c8325ff52a7f74a3e76f06fb098c5aa08b5c1e800836fd8e3dccfa570820057b',
     fingerprintLineCount: 6155,
   },
+  // Fresh isolated PostgreSQL 15 baseline + incrementals 1..16; reviewed migration 17
+  // replaces the global applicant constraint with a legacy-only partial index. No production fingerprint adoption.
+  {
+    appliedThrough: 'AlignSellerRecruitmentApplicationIdentity1791477914134',
+    fingerprint: '515f8b4c82da92b5e8b94bc75ad90bccfa639454c2fbb2149a5ad72f8b69e93d',
+    fingerprintLineCount: 6154,
+  },
   // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — assistant_run_frames.understanding jsonb(nullable) + COMMENT.
   // 질문 대기 run 의 업무 이해 중 글 없는 구조(결과 형태 · 확정 경계)만 재개 구조(M5)와 같은 행 · 같은 수명에 둔다(목표 · 조건 글 저장 금지 · M13).
-  // baseline fresh bootstrap + incremental 1..17 을 격리 PostgreSQL 17(로컬 일회용 클러스터 127.0.0.1:55434 · trust)에서
-  // migration:run 으로 실제 적용해 산출: 운영 DB fingerprint 채택 아님. 컬럼 COMMENT 정정(글 없음)으로 종전 d77825df…(6157)에서 재산출 —
-  // 종전 값은 운영에 적용된 적 없다(미병합 PR). 직전 상태 c8325ff5…(6155)는 같은 실행의 PRE 단계가 재현.
+  // 운영 미적용 상태에서 main 의 17번(AlignSellerRecruitmentApplicationIdentity) 뒤로 epoch 재부여(1791349365734 → 1791498705173 · 내용 불변).
+  // baseline fresh bootstrap + incremental 1..18 을 격리 PostgreSQL 17(로컬 일회용 클러스터)에서 migrate.ts 로 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님. 같은 DB 에서 18번만 되돌려 17번 상태 515f8b4c…(6154) 재현 확인 · 새 DB 재실행 POST PASS.
+  // 종전 값 4e37812d…(6157 · 17번 이전 위치)은 운영에 적용된 적 없다(미병합 PR).
   {
-    appliedThrough: 'AddAssistantRunFrameUnderstanding1791349365734',
-    fingerprint: '4e37812dd66d051c1eb5f145e6012ac6f61e80632fe608e5f8b77cfc964c9a1e',
-    fingerprintLineCount: 6157,
+    appliedThrough: 'AddAssistantRunFrameUnderstanding1791498705173',
+    fingerprint: '7f231dc71310c35429905b7a51b4b19792014671ede95ebb300ea87efcef0ee2',
+    fingerprintLineCount: 6156,
   },
 ] as const;
 

@@ -3,7 +3,7 @@
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-08 (§1 · §2 · §3 현재 내 매장·사업별 개발·커뮤니티·HUB 재배치 정렬) · 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
 > **근거 WO/IR**: WO-O4O-SUBDOMAIN-SERVICE-SEMANTICS-DOCUMENT-ALIGNMENT-V1 · 주소 결정은 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) CONFIRMED_DECISIONS · §9 · §12 · §21-17
 
 **`*.neture.co.kr` 각 주소가 사업적으로 무엇이고 누구를 위한 것인가**를 정한다. 주소 · 내부 키 · role prefix 가 서로 다른 시기에 만들어져 이름만으로는 의미가 어긋나므로, 이름에서 의미를 추론하지 말고 이 표를 기준으로 읽는다.
@@ -16,9 +16,11 @@
 
 ## 1. 핵심 원칙
 
+**2026-10-08 현재 재배치 기준** ([코드·문서 대조 후 전체 작업안](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)): Store는 약국 경영자 한 명·약국 하나·내 매장 하나를 기준으로 하며, 같은 약국이 가입한 여러 세미프랜차이즈 기능을 한 내 매장에서 구획하여 이용한다. 각 세미프랜차이즈는 독립된 약국 지원 사업자로 업무가 다르며, 추가 사업은 해당 사업에 맞춰 개발한다. 주소나 공통 가입 식별을 공유한다고 표준 사업 기능을 강제하지 않는다. `study`와 `funding`은 내 매장과 무관한 독립 서비스로 메인에서 접근한다. 강좌는 커뮤니티에서 완전히 제거하고 `study`의 업무로 이전한다. `community`는 독립 커뮤니티와 사업 참여 회원 전용 커뮤니티의 공통 공간이다. 기존 약사 커뮤니티는 독립 가입으로 유지하고 pharmacy 사업 포럼은 별개로 둔다. 매장 HUB의 필요한 기능은 내 매장과 커뮤니티로 재배치하며 중간 HUB 화면은 제거한다. 아래 다업종·retail·HUB 표의 과거 설명은 이 기준 및 기존 퇴역 계약과 함께 읽는다. 신규 사업의 실제 기능이나 새 호스트 운영 완료를 주소 계획만으로 주장하지 않는다. 작업안은 초안 작성·대조·논의·수정 후 다시 대조하여 확정한다.
+
 1. **`kpa.neture.co.kr` 은 KPA 분회 서비스이며 약사 개인이 주 대상이다.** 약국(사업자) 서비스가 아니다.
-2. **`pharmacy.neture.co.kr` 과 `retail.neture.co.kr` 은 사업자를 대상으로 하는 세미프랜차이즈 운영 서비스다.** 각각 약국 사업자, 화장품 · 일반 소매 사업자가 대상이다.
-3. **`store.neture.co.kr` 은 공통 Store Workspace 이며** 약국 · 화장품 · 일반소매 등 하위 운영 영역을 가진다.
+2. **`pharmacy.neture.co.kr`은 전체 약국을 지원하는 세미프랜차이즈 사업의 공간이다.** 추가 세미프랜차이즈도 각각 독립된 약국 지원 사업자이며, 사업 특성에 맞게 개발한다. `retail.neture.co.kr`·K-Cosmetics는 기존 식별과 퇴역 계약을 대조할 대상이다.
+3. **`store.neture.co.kr`은 약국 경영자의 내 매장 공간이며 신규 가입은 약국 전용이다.** 한 약국이 가입한 여러 세미프랜차이즈의 기능을 같은 내 매장에서 이용한다.
 4. **`store.neture.co.kr` 은 serviceKey 를 가진 독립 서비스가 아니지만** 사업자 가입, Store Owner, 사업자가 허가한 Store Member 의 접근 모델을 가진다(§3).
 5. **`kpa:store_owner` 같은 legacy · internal role prefix 를 `kpa.neture.co.kr` 의 현재 서비스 의미와 동일시하지 않는다.** `kpa:*` 는 serviceKey `kpa-society`(= `pharmacy.neture.co.kr`)의 role prefix 다. 분회의 role prefix 는 `kpa-branch:*` 다.
 6. **role · serviceKey 이름과 현재 canonical URL 의미는 별개일 수 있다.** 이름을 바꾸는 일(rename)은 하지 않으며, 필요하면 별도 WO 로 다룬다.
@@ -29,24 +31,25 @@
 
 | 주소 | 주 대상 | 성격 | serviceKey (catalog) | role prefix | Store 연계 | 옛 주소 (보존) |
 |---|---|---|---|---|---|---|
-| `neture.co.kr` | 전체 | O4O 대표 진입 · Neture 공통 영역 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 없음 — 「내 매장」은 각 서비스 Store 로 가는 진입 목록일 뿐 | — |
+| `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
 | `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | `kpa-society.co.kr/kpa/{분회}` |
-| `pharmacy.neture.co.kr` | **약국 사업자** | 세미프랜차이즈 운영 서비스 — 서비스 운영자의 서비스 Hub · 사업자 운영 진입 | `kpa-society` | `kpa:*` | 있음 — 약국 운영 영역 | `kpa-society.co.kr` |
-| `retail.neture.co.kr` | **화장품 · 일반 소매 사업자** | 세미프랜차이즈 운영 서비스 — 서비스 Hub · 사업자 운영 진입 | `k-cosmetics` | `cosmetics:*` | 있음 — 화장품 · 소매 운영 영역 | `k-cosmetics.site` |
-| `store.neture.co.kr` | **사업자 · 사업자가 허가한 사용자** | 공통 Store Workspace — 사업자가 실제 매장을 운영하는 공간 | **없음** (`store-workspace.ts`: 서비스 아님) | 없음 (각 서비스의 `{prefix}:store_owner` 를 소비) | 자기 자신 | 각 서비스 앱의 `/store` · `/store-hub` |
-| `supplier.neture.co.kr` | 공급자 | 공급자 서비스 | `supplier` | `supplier:admin` · `supplier:operator` (운영자 범위) | Supplier → Store Hub 제공 경로 | `neture.co.kr/supplier` |
-| `funding.neture.co.kr` | 참여 매장 · 제품개발자 · 운영자 | 유통참여형 펀딩 (내부 `market-trial`) | `funding` | `funding:admin` · `funding:operator` (운영자 범위) | 매장이 참여 주체 | `neture.co.kr/market-trial` |
-| `community.neture.co.kr` | 커뮤니티 회원 | 독립 커뮤니티 — 서비스 가입과 **별도**인 커뮤니티 단위 가입(승인형). `/pharmacist` · `/retail` | `community` | `community:admin` | 없음 | 각 서비스의 `/forum` |
-| `admin.neture.co.kr` | 플랫폼 관리자 | 플랫폼 · 서비스 관리 영역. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
+| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | 전체 약국 지원 세미프랜차이즈 사업 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
+| `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | `k-cosmetics.site` |
+| `store.neture.co.kr` | **약국 경영자 · 허가된 매장 사용자** | 약국 하나의 내 매장 · 가입한 복수 서비스 이용, 중간 HUB 없음 | **없음** (`store-workspace.ts`: catalog 서비스 아님) | 약국 신규 원장과 기존 서비스 역할은 §3에서 구분 | 자기 자신 | 각 서비스 앱의 `/store` · `/store-hub` |
+| `supplier.neture.co.kr` | 공급자 | 공급자 서비스 | `supplier` | `supplier:admin` · `supplier:operator` (운영자 범위) | 이용 가능한 공급·자료를 내 매장에 제공 | `neture.co.kr/supplier` |
+| `study.neture.co.kr` | 강좌 이용자 · 운영자 | 강좌 · Neture 메인에서 접근 | `lecture` | catalog·해당 서비스 계약 참조 | 내 매장과 독립 | 기존 강좌 진입 |
+| `funding.neture.co.kr` | 펀딩 참여자 · 제품개발자 · 운영자 | 유통참여형 펀딩 (내부 `market-trial`) · Neture 메인에서 접근 | `funding` | `funding:admin` · `funding:operator` (운영자 범위) | 내 매장과 독립 | `neture.co.kr/market-trial` |
+| `community.neture.co.kr` | 일반 커뮤니티 회원 · 사업 참여 회원 | 독립 가입 커뮤니티와 세미프랜차이즈 회원 전용 공간을 함께 배치 | `community` | `community:admin` · 사업별 운영 권한은 해당 계약 참조 | 회원 전용 공간은 해당 사업 가입 자격 확인 | 각 서비스의 `/forum` |
+| `admin.neture.co.kr` | 전체관리자 | 플랫폼 전체 관리 전용. 각 서비스의 관리자(운영자)는 해당 서브도메인에 배치. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
 
 **세미프랜차이즈 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 세미프랜차이즈(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 내 매장(약국) 신청이나 `pharmacy` 세미프랜차이즈 가입의 근거가 아니며, 세미프랜차이즈를 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
 
-보조 주소: `study.neture.co.kr` = O4O 강의(`lecture`). `partner.neture.co.kr` = 주소 예약만(공급자 기능을 파트너로 되돌리지 않는다).
+보조 주소: `partner.neture.co.kr` = 주소 예약만(공급자 기능을 파트너로 되돌리지 않는다). 추가 세미프랜차이즈의 주소와 업무는 각 사업 기획에 따라 정하며, 공통 개설 템플릿으로 간주하지 않는다.
 
 ### 2-1. 사업자 실체와 운영자 범위는 다른 축이다
 
 - 공급자 **사업자 본인**의 접근은 serviceKey `supplier` 가 아니라 `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers` 가 판정한다(FROZEN, [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §7). `supplier:*` · `funding:*` · `community:admin` · `kpa-branch:admin` 은 그 영역을 **운영하는 쪽**의 범위다.
-- 약국 · 소매 서비스의 운영자는 각 서비스 호스트(`pharmacy` · `retail`)에서 일한다. 공급자 · 펀딩 · 커뮤니티 등 O4O 공통 운영은 `admin.neture.co.kr` 쪽이다(URL-FIRST §9).
+- **2026-10-08 사용자 결정**: 각 서브도메인의 관리자(=운영자)는 해당 서비스 호스트에서 일한다. 공급자·펀딩·커뮤니티 관리도 각각 `supplier`·`funding`·`community`에 배치한다. **전체관리자는 `admin.neture.co.kr`에만** 둔다. 과거 URL-FIRST §9의 공통 운영 배치 설명은 이 결정으로 대체한다. 화면의 /admin 이름과 전체관리자 권한은 별개이며 기존 role 문자열·서비스별 업무 권한을 일괄 합치거나 개명하지 않는다. 재배치 branch에서 해당 호스트로 연결하고, 매장 심사는 store, pharmacy 사업 운영은 pharmacy, 사업 등록·담당 지정과 플랫폼 계정 관리는 admin에 배치했다. 소유 게이트와 심사 운영 게이트를 구분하며 새 store serviceKey나 가입 원장을 만들지 않는다. 운영 적용 상태는 전체 재배치 CHECK를 따른다.
 - **일반 서비스 operator 와 `platform:super_admin` 을 혼동하지 않는다.** O4O 운영자에게 `platform:super_admin` 을 부여하지 않는다(URL-FIRST CONFIRMED_DECISIONS · §15).
 
 ### 2-2. PharmacyHub
@@ -57,20 +60,17 @@
 
 ## 3. Store — 공통 Store Workspace 와 접근 모델
 
-### 3-1. Hub 두 종류 (URL-FIRST §21-17)
+### 3-1. HUB 제거와 직접 이용
 
-| 이름 | 위치 | 누가 관리하나 | 의미 |
-|---|---|---|---|
-| **서비스 Hub** | `pharmacy.neture.co.kr` · `retail.neture.co.kr` 안 | 그 서비스의 운영자 | 서비스가 매장에 제공하는 운영 기능 |
-| **Store Hub** | `store.neture.co.kr/hub` | 사업자(매장) | 사업자가 참여한 서비스들의 Hub 를 모아 자기 매장을 운영하는 공통 공간 |
+사업자의 운영 공간과 약국 이용 공간은 구분한다. 약국은 내 매장에서 이용 가능한 공급·이벤트·모집을 직접 확인하고 주문하며, 자료는 출처별 자료함에서 활용한다. 별도 HUB 선택·취급 등록을 거치지 않는다. 가입자 교류는 community의 해당 독립·사업 공간에서 이용한다.
 
-같은 화면 · 같은 서비스 문맥으로 간주하지 않는다. 옛 주소 전환에서 서비스 Hub 는 Store Hub 로 넘어가지 않는다.
+`store`의 `/hub/*`·`/store-hub/*`와 pharmacy의 옛 HUB 주소는 기능별 새 주소에 연결하는 adapter다. 사업 콘텐츠는 `/store/pharmacy/contents`, 일반 자료는 `/store/library/*`, 공급은 `/store/pharmacy/supply`를 사용한다. 중간 HUB 홈과 중복 화면은 제거했다. 공통 콘텐츠 API와 기존 출처·Copy 권한은 보존한다.
 
-약국 매장 이용자에게는 Store Hub 를 별도 단계로 두지 않는다(2026-10-05) — 내 매장이 이용 권한이 있는 항목을 직접 보여준다. `store.neture.co.kr/hub` 코드는 이 트랙에서 지우지 않았다(K-Cosmetics 퇴역 결정 2026-10-05 — 제거 범위는 퇴역 작업) — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §6.
+이 내용은 현재 재배치 branch의 구현이다. 통합·배포·운영 검증 상태는 [CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)에 기록한다.
 
 ### 3-2. 하위 운영 영역
 
-`store.neture.co.kr` 안은 업종 · 서비스 영역으로 나뉜다. 현재 경로는 `/work/:serviceKey/*`(예: `/work/kpa-society/store/*` = 약국, `/work/k-cosmetics/store/*` = 화장품 · 소매)이며, 한 매장이 여러 서비스에 참여할 수 있다(1 Store : N Services — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §3).
+현재 신규 약국의 내 매장은 하나이며, 가입한 서비스별 기능을 탭 등으로 구획한다. 한 매장이 여러 서비스에 참여하는 구조다(1 Store : N Services — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §3). 기존 `/work/:serviceKey/*` 경로(예: `/work/kpa-society/store/*`, `/work/k-cosmetics/store/*`)는 기존 서비스 앱 연결의 구현 기록이며, 여러 약국을 한 내 매장으로 합치는 근거가 아니다.
 
 ### 3-3. 접근 모델 — 서비스가 아니어도 가입 · 소유 · 허가 구조는 있다
 
@@ -92,7 +92,9 @@ store business/domain scope      — 그 매장의 어느 운영 영역(약국 �
 owner/member permission          — 그 안에서 무엇을 할 수 있는가
 ```
 
-**현재 runtime (참고 · 변경하지 않음)**: Store Owner 판정 = `role_assignments` 의 `{prefix}:store_owner` ([`O4O-STORE-OWNER-RBAC-STANDARD-V1`](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md)) + 해당 서비스 active membership. 매장(조직) 해석 = `organization_members` 활성 역할 `owner` · `admin` · `manager` (`store-organization.resolver.ts` `STORE_MEMBER_ROLES`). 사업자가 사용자를 초대 · 허가하는 Store Member 흐름과 Store 단위 사업자 가입은 **아직 없다** — 이 절은 방향만 정하고 구현은 후속 인증 WO 다.
+**현재 약국 신청·승인**: 별도 `neture_pharmacy_memberships`와 약국 조직의 관계를 사용한다. KPA 서비스 가입·역할을 신규 약국 자격으로 치환하지 않는다. 승인 이후에도 pharmacy 등 세미프랜차이즈는 각각 가입한다 — [인증·가입 정본](O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [약국 commerce 설계](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §3.
+
+**기존 서비스 앱 runtime (과거 접근 모델의 참고)**: Store Owner 판정 = `role_assignments` 의 `{prefix}:store_owner` ([`O4O-STORE-OWNER-RBAC-STANDARD-V1`](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md)) + 해당 서비스 active membership. 매장(조직) 해석 = `organization_members` 활성 역할 `owner` · `admin` · `manager` (`store-organization.resolver.ts` `STORE_MEMBER_ROLES`). Store Member 초대·허가 흐름은 별도 조사 대상이다. 이 모델을 새 약국 신청 원장이나 세미프랜차이즈 가입 대신 사용하지 않는다.
 
 ---
 

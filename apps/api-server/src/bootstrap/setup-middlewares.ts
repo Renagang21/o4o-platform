@@ -68,7 +68,6 @@ export const getAllowedOrigins = (): string[] => {
     //   funding.neture.co.kr 은 위에 이미 있다. partner 는 주소 예약만이라 등록하지 않는다.
     "https://supplier.neture.co.kr",
     "https://pharmacy.neture.co.kr",
-    "https://retail.neture.co.kr",
     "https://kpa.neture.co.kr",
     "https://community.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)

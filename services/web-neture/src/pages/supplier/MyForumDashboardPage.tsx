@@ -7,7 +7,7 @@
  *
  * Neture 고유 (유지):
  *   - basePath 가 /supplier/* 다 (공급자 공간 소속).
- *   - 폐쇄형 회원 관리 동선이 없다 → memberManageHref 미지정으로 노출하지 않는다.
+ *   - 기존 공급자 화면은 폐쇄형 회원 관리 동선을 노출하지 않는다. 회원 공간은 basePath가 있을 때만 제공한다.
  *   - 공급자 셸 안에 들어가므로 컨테이너 여백을 셸에 맡긴다(max-w-4xl only).
  */
 
@@ -18,16 +18,17 @@ import {
   NETURE_FORUM_OWNER_THEME,
 } from '@/services/forumOwnerAdapter';
 
-export default function MyForumDashboardPage() {
+export default function MyForumDashboardPage({ basePath }: { basePath?: string } = {}) {
   return (
     <ForumOwnerDashboard
       api={netureForumOwnerApi}
       theme={NETURE_FORUM_OWNER_THEME}
       containerClassName="max-w-4xl"
       links={{
-        forumHomeHref: '/supplier/forum',
-        requestFormHref: '/supplier/forum/request-category',
-        forumHref: (slug) => `/supplier/forum?category=${slug}`,
+        forumHomeHref: basePath ?? '/supplier/forum',
+        requestFormHref: basePath ? `${basePath}/request` : '/supplier/forum/request-category',
+        forumHref: (slug) => basePath ? `${basePath}/posts?board=${encodeURIComponent(slug)}` : `/supplier/forum?category=${slug}`,
+        ...(basePath ? { memberManageHref: (id: string) => `${basePath}/owned/${id}/members` } : {}),
       }}
       headerSlot={
         <div className="mb-6">

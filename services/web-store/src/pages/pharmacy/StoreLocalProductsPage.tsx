@@ -103,7 +103,7 @@ export default function StoreLocalProductsPage() {
           saving={saving}
           error={error}
           mlcSummary={product ? mlcSummary.get(product.id) : undefined}
-          onNavigateHub={() => navigate('/hub/multilingual-product-contents')}
+          onNavigateHub={() => navigate('/store/library/multilingual-product-contents')}
           onSave={onSave}
           onClose={onClose}
         />

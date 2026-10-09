@@ -49,6 +49,7 @@ const MIN_CONTENT_LENGTH = 5;
 // ============================================================================
 
 interface ForumWritePageProps {
+  communityLabel?: string;
   categorySlug?: string;
   backPath?: string;
   /** URL segment for post detail: 'post' (default) or 'article' (community) */
@@ -56,6 +57,7 @@ interface ForumWritePageProps {
 }
 
 export function ForumWritePage({
+  communityLabel,
   categorySlug = 'neture-forum',
   backPath,
   postSegment = 'post',
@@ -277,16 +279,16 @@ export function ForumWritePage({
       <nav style={styles.breadcrumb}>
         <Link to="/" style={styles.breadcrumbLink}>홈</Link>
         <span style={styles.breadcrumbDivider}>/</span>
-        <Link to="/forum" style={styles.breadcrumbLink}>포럼</Link>
+        <Link to={backPath || '/forum'} style={styles.breadcrumbLink}>포럼</Link>
         <span style={styles.breadcrumbDivider}>/</span>
         <span style={styles.breadcrumbCurrent}>{isEditMode ? '수정' : '글쓰기'}</span>
       </nav>
 
       {/* Page Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>{isEditMode ? '게시글 수정' : '의견 남기기'}</h1>
+        <h1 style={styles.title}>{isEditMode ? '게시글 수정' : communityLabel ? `${communityLabel} 글 작성` : '의견 남기기'}</h1>
         <p style={styles.description}>
-          {isEditMode ? '게시글 내용을 수정합니다.' : 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.'}
+          {isEditMode ? '게시글 내용을 수정합니다.' : communityLabel ? '회원들과 나눌 소식과 자료를 작성해 주세요.' : 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.'}
         </p>
         {!isEditMode && targetForum && (
           <p style={styles.targetForum}>등록 포럼: <strong>{targetForum.name}</strong></p>
@@ -294,13 +296,13 @@ export function ForumWritePage({
       </header>
 
       {/* Notice Banner */}
-      <div style={styles.noticeBanner}>
+      {!communityLabel && <div style={styles.noticeBanner}>
         <p style={styles.noticeText}>
           이 포럼은 상품 홍보나 고객 문의를 위한 공간이 아닙니다.
           <br />
           구조에 대한 질문·의견·제안을 환영합니다.
         </p>
-      </div>
+      </div>}
 
       {/* Error Message */}
       {error && (

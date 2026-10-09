@@ -9,6 +9,7 @@
  */
 
 import { Request, Response } from 'express';
+import { ForumControllerBase } from './ForumControllerBase.js';
 import { AppDataSource } from '../../database/connection.js';
 import { ForumMembershipService } from '../../routes/kpa/services/forum-membership.service.js';
 
@@ -24,9 +25,12 @@ function sendResult(res: Response, result: { data?: any; error?: { status: numbe
   res.json({ success: true, data: result.data });
 }
 
-export class ForumMembershipController {
+export class ForumMembershipController extends ForumControllerBase {
   /** POST /categories/:id/join-requests — 가입 신청 */
   async requestJoin(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().requestJoin(req.params.id, user);
@@ -35,6 +39,9 @@ export class ForumMembershipController {
 
   /** GET /categories/:id/join-requests — 대기 중 신청 목록 (owner only) */
   async listJoinRequests(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().listPendingJoinRequests(req.params.id, user);
@@ -43,6 +50,9 @@ export class ForumMembershipController {
 
   /** POST /categories/:id/join-requests/:requestId/approve — 승인 (owner only) */
   async approveJoin(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().approveJoin(req.params.id, req.params.requestId, user);
@@ -51,6 +61,9 @@ export class ForumMembershipController {
 
   /** POST /categories/:id/join-requests/:requestId/reject — 거절 (owner only) */
   async rejectJoin(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().rejectJoin(
@@ -64,6 +77,9 @@ export class ForumMembershipController {
 
   /** GET /categories/:id/members — 회원 목록 (owner only) */
   async listMembers(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().listMembers(req.params.id, user);
@@ -72,6 +88,9 @@ export class ForumMembershipController {
 
   /** DELETE /categories/:id/members/:userId — 회원 제거 (owner only) */
   async removeMember(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
     const result = await getService().removeMember(req.params.id, req.params.userId, user);
@@ -80,6 +99,9 @@ export class ForumMembershipController {
 
   /** GET /categories/:id/membership-status — 내 멤버십 상태 */
   async getMembershipStatus(req: Request, res: Response): Promise<void> {
+    if (!await this.isForumInServiceScope(req.params.id, this.getForumContext(req))) {
+      res.status(404).json({ success: false, error: 'Forum not found' }); return;
+    }
     const user = (req as any).user;
     if (!user) {
       res.json({ success: true, data: { isMember: false, role: null, pendingRequest: false } });

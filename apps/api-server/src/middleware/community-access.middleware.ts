@@ -13,14 +13,13 @@
  */
 import type { RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
-import { resolveCommunityAccess } from '../utils/community-access.resolver.js';
-import { resolveSemiFranchiseCommunityAccess } from '../modules/neture-pharmacy/services/semi-franchise-community-access.js';
+import { resolveCommunityWorkspace } from '../services/community/community-workspace.service.js';
 
 /**
  * 판정은 두 조건을 **모두** 본다.
  *
  * ① 참여 자격 — community catalog 의 participation policy. 서비스별 분기가 없다:
- *      pharmacy     = kpa-society OR pharmacy-hub active membership
+ *      pharmacy     = independent approved pharmacist community
  *      cosmetics    = k-cosmetics active membership
  *      o4o-general  = authenticated O4O user (Neture membership 불요)
  *    자격이 없으면 애초에 가입 대상이 아니다.
@@ -41,45 +40,13 @@ export function requireCommunityAccess(communityKey: string): RequestHandler {
       return;
     }
 
-    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §7): 세미프랜차이즈 커뮤니티는 별도 가입 없이
-    //   그 세미프랜차이즈 가입(active) 약국 조직의 매장 운영자만. community_memberships 를 보거나 만들지 않는다.
     try {
-      const sf = await resolveSemiFranchiseCommunityAccess(AppDataSource, user.id, communityKey);
-      if (sf.semiFranchise) {
-        if (sf.allowed) {
-          next();
-          return;
-        }
-        res.status(403).json({
+      const workspace = await resolveCommunityWorkspace(AppDataSource, user, communityKey);
+      if (!workspace?.allowed) {
+        res.status(workspace ? 403 : 404).json({
           success: false,
-          error: '이 세미프랜차이즈에 가입 승인된 약국만 이용할 수 있습니다.',
-          code: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED',
-        });
-        return;
-      }
-    } catch (error) {
-      next(error);
-      return;
-    }
-
-    const access = resolveCommunityAccess(user, communityKey);
-    if (!access.allowed && access.reason !== 'AUTH_REQUIRED') {
-      res.status(403).json({
-        success: false,
-        error: `Participation in community '${communityKey}' requires eligible service membership.`,
-        code: 'COMMUNITY_ACCESS_DENIED',
-        reason: access.reason,
-      });
-      return;
-    }
-
-    try {
-      const approved = await hasApprovedCommunityMembership(communityKey, user.id);
-      if (!approved) {
-        res.status(403).json({
-          success: false,
-          error: '이 커뮤니티에 가입 승인된 사용자만 이용할 수 있습니다.',
-          code: 'COMMUNITY_MEMBERSHIP_REQUIRED',
+          error: '이 커뮤니티의 가입 상태를 확인해 주세요.',
+          code: workspace?.reason ?? 'COMMUNITY_NOT_FOUND',
         });
         return;
       }

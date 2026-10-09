@@ -13,7 +13,7 @@
  *
  * WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §8-2 (2026-09-21):
  *   handoff 대상은 두 종류 — SERVICE(targetServiceKey · 기존 로직 불변) / WORKSPACE(targetWorkspace='store').
- *   Store workspace handoff 는 특정 서비스 membership 이 아니라 "Store 접근 가능 organization ≥ 1" 로 판단하고,
+ *   Store workspace handoff 는 접근 가능한 매장 또는 확인된 메인 계정으로 로그인만 전달하고,
  *   exchange 는 store.neture.co.kr origin 에서만 허용한다. 가짜 serviceKey('store') 는 쓰지 않는다.
  *
  * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1:
@@ -223,13 +223,13 @@ export class HandoffController extends BaseController {
     if (hasWorkspaceTarget) {
       try {
         const stores = await resolveAccessibleStores(AppDataSource, user.id);
-        if (stores.length === 0) {
+        if (stores.length === 0 && await getNetureMainMembershipStatus(AppDataSource, user.id) !== 'active') {
           logger.warn('[Handoff] Blocked generation — no accessible store organization', {
             userId: user.id,
             targetWorkspace: STORE_WORKSPACE_KEY,
             reason: 'no_store',
           });
-          return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
+          return BaseController.error(res, '메인 계정 확인 또는 내 매장 가입이 필요합니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
         }
 
         const source = await resolveVerifiedHandoffSource(req, user.id);
@@ -427,13 +427,13 @@ export class HandoffController extends BaseController {
           return BaseController.error(res, 'Handoff token is invalid or expired', 401, 'HANDOFF_TOKEN_INVALID');
         }
         const stores = await resolveAccessibleStores(AppDataSource, user.id);
-        if (stores.length === 0) {
+        if (stores.length === 0 && await getNetureMainMembershipStatus(AppDataSource, user.id) !== 'active') {
           logger.warn('[Handoff] Blocked exchange — no accessible store organization', {
             userId: user.id,
             targetWorkspace: payload.targetWorkspace,
             reason: 'no_store',
           });
-          return BaseController.error(res, '접근 가능한 매장이 없습니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
+          return BaseController.error(res, '메인 계정 확인 또는 내 매장 가입이 필요합니다.', 403, 'HANDOFF_TARGET_NO_MEMBERSHIP');
         }
         return HandoffController.issueHandoffSession(req, res, user, roles, memberships, {
           targetWorkspace: payload.targetWorkspace,

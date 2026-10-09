@@ -83,6 +83,8 @@ export interface ServiceForumRouterOptions {
    * (`communityKeyForServiceEntry`). Community 가 아닌 서비스 mount 는 종전 serviceCode 경계 그대로.
    */
   context: ForumContext;
+  /** Resolves an approved DB community before every endpoint, including directory/stats. */
+  resolveContext?: RequestHandler;
   /**
    * 쓰기(작성/수정/삭제/댓글/좋아요) 경로에 추가로 적용할 guard.
    * Community 컨텍스트에서는 `requireCommunityAccess(communityKey)` 가 항상 먼저 적용되고, 여기 guard 는 그 뒤에 온다.
@@ -98,7 +100,7 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   const context: ForumContext = communityKey ? { ...options.context, communityKey } : options.context;
   const communityGuards: RequestHandler[] = communityKey ? [requireCommunityAccess(communityKey)] : [];
 
-  const router: Router = Router();
+  const router: Router = Router({ mergeParams: true });
   const postController = new ForumPostController();
   const forumDirectoryController = new ForumDirectoryController();
   const commentController = new ForumCommentController();
@@ -107,7 +109,10 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
 
   // optionalAuth 가 먼저 실행돼야 컨텍스트 해석 시점에 userId 를 쓸 수 있다.
   router.use(optionalAuth as any);
-  router.use(forumContextMiddleware(context));
+  router.use(options.resolveContext ?? forumContextMiddleware(context));
+  // Static community aliases must protect every endpoint, including directory,
+  // stats, board ownership and closed-board membership administration.
+  if (communityKey) router.use(...communityGuards);
 
   const write: RequestHandler[] = [authenticate as any, ...communityGuards, ...writeGuards];
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (V7): **읽기도 같은 가입 승인 검사**를 지난다.

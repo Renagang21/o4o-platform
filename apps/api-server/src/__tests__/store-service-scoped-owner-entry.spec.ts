@@ -138,15 +138,15 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     expect(layout).toContain('return !effectiveServiceKey && hasOnlyRetiredWorkspaces(services);');
     expect(layout).toContain('data-testid="store-retired-service"');
     expect(layout).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
-    // /hub 도 같은 판정 — HUB 조회가 KPA fallback 으로 나가지 않는다. 상단 nav 의 HUB 도 숨긴다.
-    expect(read('services/web-store/src/components/layouts/UnifiedHubLayout.tsx')).toContain('if (useRetiredOnlyStore()) return <RetiredServiceNotice />;');
-    expect(read('services/web-store/src/components/RootShell.tsx')).toContain("effectiveServiceKey === 'kpa-society' || retiredOnly");
+    // 옛 HUB는 자료함·공급 화면으로 이동하며 자료함도 종료 서비스 판정을 유지한다.
+    expect(read('services/web-store/src/components/layouts/UnifiedStoreLibraryLayout.tsx')).toContain('if (retiredOnly) return <RetiredServiceNotice />;');
+    expect(read('services/web-store/src/config/workspace.ts')).not.toContain("key: 'store-hub'");
     // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
     expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
   });
 });
 
-describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로는 handoff 하지 않는다(§21-18 · §21-19)', () => {
+describe('옛 주소 전환 범위 — HUB는 기능별 이전, 공개·기기 경로는 보존', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
 
   /** 한 줄 또는 여러 줄에 걸친 <Route path=P ...> 선언의 element 영역 */
@@ -158,14 +158,15 @@ describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로�
     return src.slice(open, end + 1);
   };
 
-  it('서비스 Hub(/store-hub)는 handoff gate 밖', () => {
-    expect(routeDecl(kpa, 'path="/store-hub" element=')).not.toContain('UnifiedStoreHandoff');
+  it('옛 HUB는 가입 상태를 목적지에서 판정하며 내 매장 기능으로 항상 이전한다', () => {
+    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
+    expect(kpa).toContain("'/store/pharmacy/supply'");
+    expect(kpa).toContain('`/store/library/${resource}`');
   });
 
-  it('매장 경영자 /store 와 workspace/services 는 여전히 handoff gate 안(플래그로만 동작)', () => {
-    expect(kpa).toContain('<Route path="/store" element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
-    expect(kpa).toContain('<Route element={<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreWorkspaceWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>}>');
-    expect((kpa.match(/<KpaUnifiedStoreHandoff>/g) ?? []).length).toBe(2);
+  it('내 매장·업무공간 handoff가 옛 KPA guard보다 먼저 동작한다', () => {
+    expect(kpa).toContain('<Route path="/store" element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
+    expect(kpa).toContain('<Route element={<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>}>');
   });
 
   it('공개 · 기기 경로는 /store gate 밖의 최상위 절대 경로로 선언돼 있다', () => {
@@ -177,15 +178,17 @@ describe('옛 주소 전환 범위 — 서비스 Hub · 공개 · 기기 경로�
   });
 });
 
-describe('KPA 앱 — 매장 handoff 는 서비스 지정 경로로(플래그 기본 꺼짐 유지)', () => {
+describe('KPA 앱 — 매장 handoff는 서비스 경로로, pharmacy 배포만 활성화', () => {
   const kpa = read('services/web-kpa-society/src/App.tsx');
   it('handoff api 는 toKpaScopedStorePath 를 거친다', () => {
-    expect(kpa).toContain('api={kpaStoreHandoffApi}');
+    expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
     expect(kpa).toContain('toKpaScopedStorePath(returnPath)');
     expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
   });
-  it("배포 workflow 의 플래그는 여전히 'false'", () => {
-    expect(read('.github/workflows/deploy-web-services.yml')).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
+  it('배포 workflow는 pharmacy 앱만 명시적으로 활성화하고 다른 서비스 기본값은 보존한다', () => {
+    const deployment = read('.github/workflows/deploy-web-services.yml');
+    expect(deployment).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
+    expect(deployment).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
   });
 });
 

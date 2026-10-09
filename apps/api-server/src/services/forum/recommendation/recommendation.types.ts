@@ -166,6 +166,8 @@ export interface ScoreBreakdown {
  * Recommendation query options
  */
 export interface RecommendationOptions {
+  /** Server-derived generic Forum visibility boundary; never accepted from query params. */
+  excludeScopedCommunities?: boolean;
   /** Maximum number of recommendations */
   limit?: number;
   /** Recommendation scope */

@@ -11,6 +11,7 @@
  */
 import { DEFAULT_SEMI_FRANCHISE_KEY, SEMI_FRANCHISE_EVENT_SERVICE_KEY, type SupplyKind } from '../constants.js';
 import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
+import { recruitmentTargetMatch } from './recruitment-target.js';
 
 type Exec = { query: (sql: string, params?: unknown[]) => Promise<any[]> };
 
@@ -89,7 +90,7 @@ const ACCESS_CTE = `
     SELECT 'recruitment', sr.id, b.*, sf.key, sf.name, sf.payment_receiver_key, sr.supply_unit_price,
            NULL, NULL, NULL, NULL, NULL, NULL, NULL
       FROM seller_recruitments sr
-      JOIN my_sf sf ON sf.id = sr.semi_franchise_id
+      JOIN my_sf sf ON ${recruitmentTargetMatch()}
       JOIN base b ON b.master_id::text = sr.product_id AND b.supplier_user_id::text = sr.seller_id
       JOIN seller_recruitment_applications sra
         ON sra.recruitment_id = sr.id AND sra.applicant_organization_id = $1 AND sra.status = 'approved'

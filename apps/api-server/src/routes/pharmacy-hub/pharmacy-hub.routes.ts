@@ -37,6 +37,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
 import { optionalAuth } from '../../middleware/auth.middleware.js';
+import { resolveCommunityWorkspace } from '../../services/community/community-workspace.service.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
@@ -602,13 +603,12 @@ export function createPharmacyHubRoutes(): Router {
   // Forum Routes - /api/v1/pharmacy-hub/forum/*
   // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
   //   serviceCode 는 RBAC prefix('pharmacy-hub'), scope 는 커뮤니티(조직 비귀속).
-  //   쓰기는 Pharmacy-Hub 활성 멤버십 보유자만 — mount 단계에서 차단한다.
+  //   읽기·쓰기는 독립 약사 커뮤니티의 현재 승인으로 mount 단계에서 판정한다.
   // ===========================================================================
   // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
   //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface 다 — KPA `/kpa/forum` 과 같은 Community.
-  //   읽기 경계 = catalog forumStorageCodes(kpa-society + pharmacy-hub), 쓰기 자격 = kpa-society OR
-  //   pharmacy-hub active membership (requireCommunityAccess). 서비스 membership 전용 guard 는 제거 —
-  //   PH 별도 약사 Community = 0. 운영 governance(승인·중재)는 pharmacy-hub service_code 그대로.
+  //   저장 경계 = catalog forumStorageCodes(kpa-society + pharmacy-hub), 이용 자격 = 독립 커뮤니티 승인.
+  //   pharmacy 사업 가입과 별개다. PH 별도 약사 Community = 0; 기존 운영 guard는 유지한다.
   router.use(
     '/forum',
     createServiceForumRouter({
@@ -652,7 +652,11 @@ export function createPharmacyHubRoutes(): Router {
       const items: LatestItem[] = [];
       const tasks: Promise<void>[] = [];
 
-      if (filterType === 'all' || filterType === 'forum') {
+      const user = (req as any).user;
+      const mayReadForum = (filterType === 'all' || filterType === 'forum') && user?.id
+        ? (await resolveCommunityWorkspace(AppDataSource, user, 'pharmacy'))?.allowed === true
+        : false;
+      if (mayReadForum) {
         tasks.push(
           (async () => {
             const rows: any[] = await AppDataSource.query(

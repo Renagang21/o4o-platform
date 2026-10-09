@@ -16,6 +16,7 @@ import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
 import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
+import { CATALOG_FORUM_STORAGE_CODES, communityKeyForServiceEntry } from '../../config/community-catalog.js';
 
 /**
  * ForumControllerBase
@@ -54,6 +55,44 @@ export class ForumControllerBase {
   }
 
   /**
+   * Apply organization/scope filter to a ForumCategoryRequest query.
+   */
+  protected applyForumContextFilter(
+    qb: any,
+    alias: string,
+    ctx: ReturnType<typeof this.getForumContext>,
+  ): void {
+    if (!ctx) return;
+    // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+    //   forum 원장은 service_code 컬럼을 직접 가지므로 EXISTS 없이 직접 비교한다.
+    //   아래 scope 분기들이 early return 하므로 반드시 그 앞에 AND 로 붙인다.
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
+    const codes = this.getContextForumCodes(ctx);
+    if (ctx.excludeScopedCommunities) {
+      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%' AND ${alias}.serviceCode NOT IN (:...ctxExcludedCommunityCodes)`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+      if (!codes) return;
+    }
+    if (codes) {
+      qb.andWhere(`${alias}.serviceCode IN (:...ctxForumCodes)`, { ctxForumCodes: codes.length ? codes : ['__none__'] });
+    }
+    if (ctx.scope === 'demo') {
+      qb.andWhere('1 = 0');
+      return;
+    }
+    if (ctx.scope === 'community') {
+      qb.andWhere(`${alias}.organizationId IS NULL`);
+      return;
+    }
+    if (ctx.scope === 'organization' && ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+      return;
+    }
+    if (ctx.organizationId) {
+      qb.andWhere(`${alias}.organizationId = :ctxOrgId`, { ctxOrgId: ctx.organizationId });
+    }
+  }
+
+  /**
    * Apply scope-aware filter to a QueryBuilder.
    *
    * WO-FORUM-SCOPE-SEPARATION-V1: scope-based filtering
@@ -88,6 +127,7 @@ export class ForumControllerBase {
     // service key, so the conversion SSOT (@o4o/security-core) is used here.
     // No forum-local mapping table is introduced.
     this.applyServiceScope(qb, alias, ctx);
+    if (ctx.excludeScopedCommunities && !ctx.serviceCode && !ctx.communityKey) return;
 
     // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
     // /demo/forum should not show community content
@@ -136,7 +176,11 @@ export class ForumControllerBase {
     ctx: ForumContext | undefined,
   ): void {
     const codes = this.getContextForumCodes(ctx);
+    if (ctx?.excludeScopedCommunities) {
+      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = ${alias}.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+    }
     if (!codes) return; // generic/admin route — 무필터 현행 유지
+    if (!codes.length) { qb.andWhere('1 = 0'); return; }
 
     qb.andWhere(
       `EXISTS (
@@ -171,6 +215,7 @@ export class ForumControllerBase {
    * 미등록 communityKey 는 빈 배열 → 모든 경계 판정이 fail-closed (아무것도 보이지 않음).
    */
   protected getContextForumCodes(ctx: ForumContext | undefined): string[] | undefined {
+    if (ctx?.forumStorageCodes) return ctx.forumStorageCodes;
     const communityKey = ctx?.communityKey?.trim();
     if (communityKey) return communityForumStorageCodes(communityKey);
     const prefix = ctx?.serviceCode?.trim();
@@ -188,6 +233,12 @@ export class ForumControllerBase {
     ctx: ForumContext | undefined,
   ): Promise<boolean> {
     const codes = this.getContextForumCodes(ctx);
+    if (ctx?.excludeScopedCommunities && forumId) {
+      const rows = await AppDataSource.query(
+        `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code NOT LIKE 'sf:%' AND service_code NOT LIKE 'community:%' AND NOT (service_code = ANY($2::text[]))`, [forumId, CATALOG_FORUM_STORAGE_CODES],
+      );
+      if (!rows.length) return false;
+    }
     if (!codes) return true;
     if (!forumId || codes.length === 0) return false;
 
@@ -293,6 +344,7 @@ export class ForumControllerBase {
   protected async hasForumModerationOverride(
     forumId: string | null | undefined,
     userRoles: string[],
+    userId?: string,
   ): Promise<boolean> {
     if (!forumId) return false;
     if (isPlatformAdmin(userRoles)) return true;
@@ -301,6 +353,20 @@ export class ForumControllerBase {
       [forumId],
     );
     if (!forum || !forum.service_code) return false;
+    const legacyCommunityKey = communityKeyForServiceEntry(forum.service_code);
+    if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
+      const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
+        `SELECT community_key AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
+         UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forum.service_code],
+      );
+      if (!rows[0]) return false;
+      const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
+      const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
+      if (workspace?.allowed && workspace.canManage) return true;
+      // New UUID spaces have no service-role fallback. Historical service
+      // governance remains behind the mount's current community approval gate.
+      if (!legacyCommunityKey) return false;
+    }
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(forum.service_code);
     return rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false;
   }
@@ -329,12 +395,7 @@ export class ForumControllerBase {
     // Admin / operator bypass — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S3)
     // Platform admin/super_admin bypass globally; service operators/admins bypass
     // ONLY for closed forums belonging to their own service (no cross-service bypass).
-    const rolePrefix = forum.service_code
-      ? resolveRolePrefixFromCanonicalServiceKey(forum.service_code)
-      : null;
-    const bypass =
-      isPlatformAdmin(userRoles) ||
-      (rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false);
+    const bypass = await this.hasForumModerationOverride(forumId, userRoles, userId);
     if (bypass) {
       return { allowed: true, forumType: 'closed' };
     }

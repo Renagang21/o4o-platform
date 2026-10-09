@@ -319,7 +319,7 @@ export function StoreOrderWorktablePage() {
         setOrderError(failed.join(' / '));
       } else {
         setShowConfirmModal(false);
-        navigate('/hub/cart');
+        navigate('/store/pharmacy/cart');
       }
     } catch (e) {
       setOrderError((e as { message?: string })?.message || '장바구니 조회에 실패했습니다.');
@@ -708,7 +708,7 @@ export function StoreOrderWorktablePage() {
                     닫기
                   </button>
                   <button
-                    onClick={() => { setShowConfirmModal(false); navigate('/hub/cart'); }}
+                    onClick={() => { setShowConfirmModal(false); navigate('/store/pharmacy/cart'); }}
                     style={S.modalSecondaryBtn}
                   >
                     장바구니 보기

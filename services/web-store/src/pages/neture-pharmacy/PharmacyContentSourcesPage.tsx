@@ -19,8 +19,8 @@ const STORE_LIBRARY_PATH = `${WORKSPACE_PATHS.myStore}/library/contents`;
 
 /** 다른 콘텐츠 출처 — 기존 화면으로 이동만 한다. */
 const OTHER_SOURCES: Array<{ key: string; title: string; description: string; to: string }> = [
-  { key: 'hub-content', title: '일반 커뮤니티 · 운영자 콘텐츠', description: '매장 HUB 콘텐츠 라이브러리에서 가져올 수 있습니다.', to: `${WORKSPACE_PATHS.storeHub}/content` },
-  { key: 'supplier-library', title: '공급자 자료', description: '공급자가 제공한 자료를 매장 HUB 에서 확인합니다.', to: `${WORKSPACE_PATHS.storeHub}/supplier-library` },
+  { key: 'hub-content', title: '일반 커뮤니티 · 운영자 콘텐츠', description: '내 매장의 일반 콘텐츠 자료에서 사본을 만들 수 있습니다.', to: `${WORKSPACE_PATHS.library}/content` },
+  { key: 'supplier-library', title: '공급자 자료', description: '공급자의 공개 자료를 읽을 수 있습니다.', to: `${WORKSPACE_PATHS.library}/supplier-library` },
   { key: 'store-library', title: '내 매장 자료함', description: '가져온 사본과 직접 만든 콘텐츠를 관리합니다.', to: STORE_LIBRARY_PATH },
 ];
 
@@ -34,7 +34,7 @@ function ContentBody({ body }: { body: string | null }) {
 
 export default function PharmacyContentSourcesPage() {
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
-  const [sf, setSf] = useState('');
+  const [sf, setSf] = useState(() => new URLSearchParams(window.location.search).get('business') || '');
   const [qInput, setQInput] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);

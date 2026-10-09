@@ -13,6 +13,7 @@
  * 5. Admin/Operator (/operator/*) - OperatorLayoutWrapper: 관리자 전용
  */
 
+import './lib/api/neturePharmacy';
 import { lazy, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
@@ -36,7 +37,7 @@ import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute, SubdomainOperatorRoute } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute, SubdomainOperatorRoute } from './components/auth/RoleGuard';
 import { RegisterRedirect } from './components/auth/RegisterRedirect';
 import SubdomainOperatorLayoutWrapper from './components/layouts/SubdomainOperatorLayoutWrapper';
 import { ADMIN_ROLES } from './lib/role-constants';
@@ -62,6 +63,7 @@ import {
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
+import CommunityWorkspacePage from './pages/community/CommunityWorkspacePage';
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
 
 // ============================================================================
@@ -317,15 +319,8 @@ const ServiceLegalSettingsPage = lazy(() => import('./pages/admin/ServiceLegalSe
 // WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
 const ServiceContactSettingsPage = lazy(() => import('./pages/admin/ServiceContactSettingsPage'));
 // WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
-const ServiceAudiencePolicyPage = lazy(() => import('./pages/admin/ServiceAudiencePolicyPage'));
 // WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1: platform-admin section landing
-const PlatformAdminLandingPage = lazy(() => import('./pages/admin/platform/PlatformAdminLandingPage'));
 // WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1: platform section layout + 계정/서비스 페이지
-const PlatformSectionLayout = lazy(() => import('./pages/admin/platform/PlatformSectionLayout'));
-const PlatformAccountsPage = lazy(() => import('./pages/admin/platform/PlatformAccountsPage'));
-const PlatformServicesPage = lazy(() => import('./pages/admin/platform/PlatformServicesPage'));
-const PlatformUsersPage = lazy(() => import('./pages/admin/platform/PlatformUsersPage'));
-const PlatformRolesPage = lazy(() => import('./pages/admin/platform/PlatformRolesPage'));
 
 // Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
@@ -733,6 +728,15 @@ function App() {
               {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierLandingPage />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
+              <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />
+              <Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage />} />
+              <Route path="/communities/:communityKey/forum/posts" element={<CommunityWorkspacePage view="posts" />} />
+              <Route path="/communities/:communityKey/forum/write" element={<CommunityWorkspacePage view="write" />} />
+              <Route path="/communities/:communityKey/forum/post/:slug" element={<CommunityWorkspacePage view="post" />} />
+              <Route path="/communities/:communityKey/forum/my-posts" element={<CommunityWorkspacePage view="mine" />} />
+              <Route path="/communities/:communityKey/forum/request" element={<CommunityWorkspacePage view="request" />} />
+              <Route path="/communities/:communityKey/forum/owned" element={<CommunityWorkspacePage view="owned" />} />
+              <Route path="/communities/:communityKey/forum/owned/:forumId/members" element={<CommunityWorkspacePage view="members" />} />
               <Route path="/community" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
@@ -1092,36 +1096,8 @@ function App() {
               {/* WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1 */}
               <Route path="/admin/settings/contact" element={<ServiceContactSettingsPage />} />
               {/* WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 */}
-              <Route path="/admin/settings/service-audience" element={<ServiceAudiencePolicyPage />} />
               {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 세미프랜차이즈 관리 (neture:admin) */}
               <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
-            </Route>
-
-            {/* ================================================================
-                Platform Admin Section (/admin/platform/*)
-                WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1 (Phased B)
-                guard = platform:super_admin (PlatformRoute) — neture:admin 단독 차단.
-                Neture 서비스 admin(/admin) sidebar/layout 과 분리된 platform surface.
-                Tier 1(운영자/역할/서비스 대상 정책)은 이동하지 않음(landing 안내만).
-            ================================================================ */}
-            <Route
-              path="/admin/platform"
-              element={
-                <PlatformRoute>
-                  <PlatformSectionLayout />
-                </PlatformRoute>
-              }
-            >
-              <Route index element={<PlatformAdminLandingPage />} />
-              {/* WO-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1 */}
-              <Route path="accounts" element={<PlatformAccountsPage />} />
-              <Route path="services" element={<PlatformServicesPage />} />
-              {/* WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1 */}
-              <Route path="users" element={<PlatformUsersPage />} />
-              {/* WO-O4O-PLATFORM-ROLES-MENU-MIGRATION-V1 */}
-              <Route path="roles" element={<PlatformRolesPage />} />
-              {/* WO-O4O-PLATFORM-SERVICE-AUDIENCE-POLICY-MIGRATION-V1: 서비스 대상 정책 platform 이동 */}
-              <Route path="service-audience" element={<ServiceAudiencePolicyPage />} />
             </Route>
 
             {/* ================================================================

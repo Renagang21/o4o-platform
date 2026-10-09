@@ -9,6 +9,7 @@
  * 승인 전이면 `NETURE_MEMBERSHIP_REQUIRED` 로 거절되고 이 화면은 Neture 가입 안내 링크를 붙인다.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { api } from '../../lib/apiClient';
 import { RefreshCw } from 'lucide-react';
 import { PLATFORM_ORIGIN } from '../../config/workspace';
 import { neturePharmacyApi, pharmacyErrorCode, pharmacyErrorMessage, type SemiFranchiseRow } from '../../api/neturePharmacy';
@@ -63,6 +64,18 @@ export default function SemiFranchisesPage() {
     }
   };
 
+  const enterCommunity = async (row: SemiFranchiseRow) => {
+    if (!row.communityKey) return;
+    setBusyKey(row.key); setError(null);
+    try {
+      const response = await api.post('/auth/handoff', { targetServiceKey: 'community', returnPath: `/communities/${encodeURIComponent(row.communityKey)}/forum` });
+      const href = response.data?.data?.targetUrl;
+      const target = new URL(href);
+      if (target.origin !== 'https://community.neture.co.kr' || target.pathname !== '/handoff') throw new Error('Invalid target');
+      window.location.assign(href);
+    } catch { setError('커뮤니티로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); }
+  };
+
   return (
     <PharmacyPage
       title="세미프랜차이즈"
@@ -109,7 +122,7 @@ export default function SemiFranchisesPage() {
                       {r.decidedAt ? ` · 처리 ${formatDate(r.decidedAt)}` : ''}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      {!r.communityKey ? '-' : st === 'active' ? `이용 가능 (커뮤니티: ${r.communityKey})` : '가입 승인 후 이용'}
+                      {!r.communityKey ? '-' : st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>회원 커뮤니티</button> : '가입 승인 후 이용'}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {canApply && (

@@ -25,6 +25,10 @@ jest.mock('../../database/connection.js', () => ({
       queries.push({ sql, params });
       if (dbError) throw dbError;
       const [slug, userId] = params as [string, string];
+      if (/FROM semi_franchises/.test(sql)) return semiFranchiseCommunities.has(slug) ? [{ id: slug, key: slug, name: slug, status: 'active' }] : [];
+      if (/FROM users u/.test(sql)) return [{ account_status: 'active', account_active: true, email_verified: true }];
+      if (/FROM communities WHERE slug/.test(sql)) return [{ id: slug, name: slug, status: 'active' }];
+      if (/SELECT status, role FROM community_memberships/.test(sql)) return approved.has(`${slug}:${userId}`) ? [{ status: 'active', role: 'member' }] : [];
       return approved.has(`${slug}:${userId}`) ? [{ ok: 1 }] : [];
     },
   },
@@ -107,15 +111,9 @@ describe('V7 게시글 경계 = 가입 승인', () => {
     expect(queries).toHaveLength(0);
   });
 
-  it('참여 자격 자체가 없으면 종전 코드(COMMUNITY_ACCESS_DENIED)를 유지한다', async () => {
-    const { status, code, body } = await run(PHARMACY, { id: MEMBER, ineligible: true });
-    expect({ status, code, reason: body.reason }).toEqual({
-      status: 403,
-      code: 'COMMUNITY_ACCESS_DENIED',
-      reason: 'SERVICE_MEMBERSHIP_REQUIRED',
-    });
-    // 자격이 없으면 가입 조회까지 가지 않는다.
-    expect(queries).toHaveLength(0);
+  it('참여 자격이 없으면 가입 원장이 있어도 통과하지 않는다', async () => {
+    const { passed, status } = await run(PHARMACY, { id: MEMBER, ineligible: true });
+    expect({ passed, status }).toEqual({ passed: false, status: 403 });
   });
 
   it('DB 오류는 **통과로 바뀌지 않는다** — next(error) 로 넘긴다', async () => {

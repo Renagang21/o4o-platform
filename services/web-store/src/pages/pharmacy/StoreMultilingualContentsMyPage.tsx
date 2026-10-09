@@ -76,7 +76,7 @@ export function StoreMultilingualContentsMyPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
       <header className="flex items-center gap-3 pb-5 border-b-2 border-slate-200">
-        <button onClick={() => navigate('/hub/multilingual-product-contents')} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500" title="HUB 목록">
+        <button onClick={() => navigate('/store/library/multilingual-product-contents')} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500" title="제공 자료 목록">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
@@ -98,7 +98,7 @@ export function StoreMultilingualContentsMyPage() {
         ) : groups.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400">
             아직 가져온 다국어 콘텐츠가 없습니다.
-            <button onClick={() => navigate('/hub/multilingual-product-contents')} className="ml-1 text-blue-600 hover:underline">HUB 에서 가져오기</button>
+            <button onClick={() => navigate('/store/library/multilingual-product-contents')} className="ml-1 text-blue-600 hover:underline">제공 자료에서 가져오기</button>
           </div>
         ) : (
           <div className="space-y-3">

@@ -43,8 +43,8 @@ export function createContactRequestHandler(dataSource: DataSource): RequestHand
 
     // ── Validation ──────────────────────────────────────────────────────────
     const errors: string[] = [];
-    if (!type || !['partner', 'education'].includes(type)) {
-      errors.push('유효하지 않은 문의 유형입니다. (partner | education)');
+    if (!type || type !== 'partner') {
+      errors.push('유효하지 않은 문의 유형입니다. (partner)');
     }
     if (!name || name.trim().length < 2) {
       errors.push('이름은 2자 이상이어야 합니다.');
@@ -166,7 +166,7 @@ export function updateContactRequestStatusHandler(dataSource: DataSource): Reque
     }
 
     const entity = await repo().findOne({
-      where: { id, service_key: 'kpa-society' },
+      where: { id, service_key: 'kpa-society', type: 'partner' },
     });
     if (!entity) {
       return res.status(404).json({ success: false, error: '문의를 찾을 수 없습니다.', code: 'NOT_FOUND' });
@@ -193,6 +193,7 @@ export function listContactRequestsHandler(dataSource: DataSource): RequestHandl
     const qb = repo()
       .createQueryBuilder('cr')
       .where('cr.service_key = :sk', { sk: 'kpa-society' })
+      .andWhere('cr.type = :ownedType', { ownedType: 'partner' })
       .orderBy('cr.createdAt', 'DESC')
       .skip(skip)
       .take(limit);

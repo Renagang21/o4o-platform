@@ -111,7 +111,7 @@ function buildListQuery(params?: HubListParams): string {
 
 /**
  * 운영자 원본 목록(검색 + 템플릿 필터) — 배열 반환(호환).
- * StoreHubLatestFeed(최근 소수만 사용)가 이 배열 계약을 소비하므로 유지한다.
+ * 내 매장 자료함이 이 배열 계약을 소비한다.
  * 전체 목록·페이지네이션은 listOperatorTemplatesPaged 를 사용한다.
  */
 export async function listOperatorTemplates(params?: { q?: string; templateKey?: string }): Promise<OperatorTemplateListItem[]> {

@@ -9,9 +9,10 @@
  */
 
 import { Request, Response } from 'express';
+import { ForumControllerBase } from './ForumControllerBase.js';
 import { forumAIService } from '../../services/forum/ForumAIService.js';
 
-export class ForumAIController {
+export class ForumAIController extends ForumControllerBase {
   /**
    * GET /api/v1/forum/posts/:id/ai
    * Get AI metadata for a post
@@ -19,6 +20,11 @@ export class ForumAIController {
   async getAIMetadata(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const ctx = this.getForumContext(req);
+      if (ctx && !(await this.resolveForumPostInServiceScope(id, ctx))) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
 
       const aiMeta = await forumAIService.getAIMetadata(id);
 
@@ -52,6 +58,11 @@ export class ForumAIController {
   async processPost(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const ctx = this.getForumContext(req);
+      if (ctx && !(await this.resolveForumPostInServiceScope(id, ctx))) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
       const user = (req as any).user;
 
       // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Require auth + operator role
@@ -92,6 +103,11 @@ export class ForumAIController {
   async regenerate(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const ctx = this.getForumContext(req);
+      if (ctx && !(await this.resolveForumPostInServiceScope(id, ctx))) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
       const user = (req as any).user;
 
       if (!user?.id) {
@@ -133,6 +149,11 @@ export class ForumAIController {
   async applyTags(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const ctx = this.getForumContext(req);
+      if (ctx && !(await this.resolveForumPostInServiceScope(id, ctx))) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
       const user = (req as any).user;
       const { tags } = req.body; // Optional: specific tags to apply
 

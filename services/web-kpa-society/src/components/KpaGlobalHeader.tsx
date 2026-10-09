@@ -93,7 +93,7 @@ export function KpaGlobalHeader() {
     base: KPA_BASE_NAV,
     contextual: KPA_CONTEXTUAL_NAV,
     conditions: { storeOwner: isStoreOwner },
-    trailing: [KPA_SERVICE_GUIDE_NAV_ITEM, KPA_ABOUT_NAV_ITEM],
+    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: 'pharmacy 사업 운영', href: '/operator/semi-franchises' }] : []), KPA_SERVICE_GUIDE_NAV_ITEM, KPA_ABOUT_NAV_ITEM],
     guestTrailing: [KPA_CONTACT_NAV_ITEM],
     isAuthenticated: !!user,
   });

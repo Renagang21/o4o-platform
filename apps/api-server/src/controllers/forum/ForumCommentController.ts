@@ -308,7 +308,7 @@ export class ForumCommentController extends ForumControllerBase {
       const comment = resolved.comment;
 
       // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-only; platform admin governance override
-      if (comment.authorId !== userId && !isPlatformAdmin(userRoles)) {
+      if (comment.authorId !== userId && !isPlatformAdmin(userRoles) && !this.getForumContext(req)?.communityOperator) {
         res.status(403).json({ success: false, error: 'Permission denied' });
         return;
       }

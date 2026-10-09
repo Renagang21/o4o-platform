@@ -23,6 +23,12 @@ describe('KPA 매장 경영자 /store → store.neture.co.kr/work/kpa-society/st
     expect(entry('/store/services')).toBe('/services');
   });
 
+  it('제공 자료는 실제 공통 자료함 경로를 유지하고 기존 매장 자료는 서비스 경로를 유지한다', () => {
+    expect(toKpaScopedStorePath('/store/library/content?source=supplier#top')).toBe('/store/library/content?source=supplier#top');
+    expect(toKpaScopedStorePath('/store/library/supplier-library')).toBe('/store/library/supplier-library');
+    expect(toKpaScopedStorePath('/store/library/contents')).toBe('/work/kpa-society/store/library/contents');
+  });
+
   it('접두만 같은 경로는 바꾸지 않는다', () => {
     expect(toKpaScopedStorePath('/store-hub')).toBe('/store-hub');
     expect(toKpaScopedStorePath('/stores')).toBe('/stores');

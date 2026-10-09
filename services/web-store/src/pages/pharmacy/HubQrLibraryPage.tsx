@@ -1,5 +1,5 @@
 /**
- * HubQrLibraryPage — 매장 HUB QR 진열 + 매장으로 가져오기
+ * HubQrLibraryPage — 제공 자료 QR 진열 + 매장으로 가져오기
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
  *   KPA·K-Cosmetics 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
@@ -8,11 +8,11 @@
  *   backend · API 계약 무변경.
  *
  * 데이터 흐름 (변경 없음):
- *   - HUB 목록: hubContentApi.list({ sourceDomain: 'qr' })
+ *   - 제공 자료 목록: hubContentApi.list({ sourceDomain: 'qr' })
  *   - 단건 가져가기: importOperatorQr(slug, sourceId)
  *   - 일괄 가져가기: 단건 endpoint fan-out (신규 backend 없음)
  *
- * HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+ * 제공 자료 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
  */
 
 import { useCallback } from 'react';
@@ -44,7 +44,7 @@ export function HubQrLibraryPage() {
     resolveStoreSlug: getStoreSlug,
     importOne: (storeSlug, id) => importOperatorQr(storeSlug, id),
     messages: {
-      loadError: 'HUB QR 을 불러올 수 없습니다',
+      loadError: '제공 QR 자료를 불러올 수 없습니다',
       storeMissing: '매장 정보를 확인할 수 없습니다',
       storeMissingBatchError: '매장 정보 미연결',
       importSuccess: (result) =>
@@ -59,7 +59,7 @@ export function HubQrLibraryPage() {
     <HubImportLibraryView
       core={hub}
       accent="blue"
-      title="매장 HUB QR-code"
+      title="제공 자료 QR-code"
       description="KPA 운영자가 발행한 QR 템플릿을 선택해 가져가거나(매장별 slug 새로 발급), 내 약국용 QR-code 를 직접 만드세요."
       tableId="store-hub-qr"
       titleIcon={<QrCode className="w-3.5 h-3.5" />}

@@ -45,6 +45,8 @@ export const menuPermissions: MenuPermission[] = [
   //   deny-by-default 전환에 따라 'dashboard' 도 명시적인 설정을 갖는다.
   //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
   //   노출 범위는 변하지 않고 선언만 명시화된다.
+  { menuId: 'platform-account-governance', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'semi-franchise-registry', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'dashboard',
     roles: [...PLATFORM_ADMIN_ROLES]

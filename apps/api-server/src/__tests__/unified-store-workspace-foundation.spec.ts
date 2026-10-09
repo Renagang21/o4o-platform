@@ -222,9 +222,9 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
     expect(readRepo('services/web-store/src/lib/storeSelection.ts')).toContain('sessionStorage');
   });
 
-  it('root nav 는 상위 6개뿐이다', () => {
+  it('root nav는 HUB를 제외한 상위 5개다', () => {
     const keys = [...workspace.matchAll(/key: '([a-z-]+)', label:/g)].map((m) => m[1]);
-    expect(keys).toEqual(['home', 'my-store', 'service-work', 'store-hub', 'my-services', 'settings']);
+    expect(keys).toEqual(['home', 'my-store', 'service-work', 'my-services', 'settings']);
   });
 
   // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
@@ -243,19 +243,17 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
   });
 });
 
-describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handoff (플래그 게이트 · 기본 OFF)', () => {
+describe('기존 매장 진입 → 내 매장 handoff (pharmacy 활성화 · PH 보존)', () => {
   const kpa = readRepo('services/web-kpa-society/src/App.tsx');
   const phShell = readRepo('services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx');
   const ph = readRepo('services/web-pharmacy-hub/src/App.tsx');
 
-  it('두 서비스(KPA · PH) 모두 기존 가드 안쪽에 UnifiedStoreHandoffGate 를 두고 VITE_UNIFIED_STORE_HANDOFF 로만 켠다', () => {
-    for (const src of [kpa, phShell]) {
-      expect(src).toContain('UnifiedStoreHandoffGate');
-      expect(src).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
-    }
-    expect(norm(kpa)).toContain('<PharmacyGuard><KpaUnifiedStoreHandoff><KpaStoreLayoutWrapper /></KpaUnifiedStoreHandoff></PharmacyGuard>');
-    // 서비스 Hub(/store-hub)는 매장 Hub 로 handoff 하지 않는다 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-17 · §21-18 (사용자 결정 2026-09-26)
-    expect(norm(kpa)).toContain('<HubGuard><PharmacyHubLayout /></HubGuard>');
+  it('pharmacy는 옛 가드 전에 이전하고 PH는 기존 handoff 조건을 보존한다', () => {
+    expect(kpa).toContain('kpaStoreHandoffApi.resolveWorkspaceEntryUrl(returnPath)');
+    expect(kpa).toContain('isUnifiedStoreHandoffEnabled(import.meta.env.VITE_UNIFIED_STORE_HANDOFF)');
+    expect(norm(kpa)).toContain('<KpaUnifiedStoreHandoff><PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard></KpaUnifiedStoreHandoff>');
+    expect(kpa).toContain('<Route path="/store-hub/*" element={<KpaUnifiedStoreHandoff force />} />');
+    expect(phShell).toContain('UnifiedStoreHandoffGate');
     expect(norm(phShell)).toContain('<PharmacyHubUnifiedStoreHandoff> <ShellLayout /> </PharmacyHubUnifiedStoreHandoff> </StoreOwnerGuard>');
   });
 
@@ -267,15 +265,16 @@ describe('§8-4 기존 서비스 매장 진입 → 통합 Store Workspace handof
     expect(norm(kpa)).toContain('element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}');
   });
 
-  it("빌드 플래그는 두 Dockerfile 과 workflow 에 기본 'false' 로 고정된다 (cutover = workflow 한 줄)", () => {
+  it("pharmacy 배포만 handoff를 활성화하고 PH는 기본 false를 보존한다", () => {
     for (const svc of ['web-kpa-society', 'web-pharmacy-hub']) {
       const df = readRepo(`services/${svc}/Dockerfile`);
-      expect(df).toContain('ARG VITE_UNIFIED_STORE_HANDOFF=false');
+      expect(df).toContain(`ARG VITE_UNIFIED_STORE_HANDOFF=${svc === 'web-kpa-society' ? 'true' : 'false'}`);
       expect(df).toContain('ENV VITE_UNIFIED_STORE_HANDOFF=$VITE_UNIFIED_STORE_HANDOFF');
     }
     const wf = readRepo('.github/workflows/deploy-web-services.yml');
     expect(wf).toContain("VITE_UNIFIED_STORE_HANDOFF: 'false'");
-    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(2);
+    expect(wf.match(/--build-arg VITE_UNIFIED_STORE_HANDOFF=\$\{\{ env\.VITE_UNIFIED_STORE_HANDOFF \}\}/g)?.length).toBe(1);
+    expect(wf).toContain('--build-arg VITE_UNIFIED_STORE_HANDOFF=true');
   });
 
   it('handoff 발급은 같은 POST /auth/handoff 의 targetWorkspace=store 분기다 (신규 엔드포인트 0 · 가짜 serviceKey 0)', () => {

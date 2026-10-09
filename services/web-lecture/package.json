@@ -16,6 +16,7 @@
     "@o4o/content-editor": "workspace:*",
     "@o4o/lms-client": "workspace:*",
     "@o4o/lms-ui": "workspace:*",
+    "@o4o/operator-core-ui": "workspace:*",
     "@o4o/shared-space-ui": "workspace:*",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -26,6 +27,9 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3",
     "vite": "^7.2.4"
   }

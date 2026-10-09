@@ -697,7 +697,7 @@ export function StoreQRPage() {
             <Sparkles size={14} />
             AI 설명 QR 만들기
           </Link>
-          <Link to="/hub/qr" style={styles.hubImportBtn}>
+          <Link to="/store/library/qr" style={styles.hubImportBtn}>
             <Download size={14} />
             매장 HUB에서 가져오기
           </Link>
@@ -1035,7 +1035,7 @@ export function StoreQRPage() {
               내 자료 또는 외부 URL로 새 QR 코드를 만들 수 있습니다.
             </p>
             <div style={styles.emptyCtaRow}>
-              <Link to="/hub/qr" style={styles.emptyCtaPrimary}>
+              <Link to="/store/library/qr" style={styles.emptyCtaPrimary}>
                 <Download size={14} />
                 매장 HUB에서 QR 가져오기
               </Link>

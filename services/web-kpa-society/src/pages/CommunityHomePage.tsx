@@ -237,7 +237,7 @@ export function CommunityHomePage() {
             },
             {
               title: '커뮤니티 참여자',
-              description: '정보 · 경험 · 강의 · 콘텐츠 활용',
+              description: '정보 · 경험 · 콘텐츠 활용',
               href: '/guide/for/member',
               icon: <span className={iconCls}><Users size={24} /></span>,
             },
@@ -282,7 +282,7 @@ export function CommunityHomePage() {
         //   목적지(/guide/usage)는 CTA 에 그대로 남아 있어 접근 경로가 사라지지 않는다.
         usageItems: [
           { title: 'O4O 개요', description: 'O4O 서비스 구조와 O4O 약국의 역할', href: '/guide/intro' },
-          { title: '기능별 이용 방법', description: '포럼, 강의, 자료실, 매장 기능 구성', href: '/guide/features' },
+          { title: '기능별 이용 방법', description: '포럼, 자료실, 매장 기능 구성', href: '/guide/features' },
         ],
       }}
     />
