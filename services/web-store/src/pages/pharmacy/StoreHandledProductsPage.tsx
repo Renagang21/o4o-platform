@@ -2,7 +2,7 @@
  * 상품 원장과 매장 소유권은 기존 API 계약을 유지한다. 공급 상품 주문과는 별개다.
  */
 
-import { STORE_PRODUCT_NAME } from '../../config/productTerminology';
+import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
@@ -42,8 +42,7 @@ const PAGE_SIZE_OPTIONS = [20, 50, 100] as const;
 const DEFAULT_PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 
-const EMPTY_MESSAGE =
-  '등록한 제품이 없습니다. O4O 제품에서 찾아 등록하거나 매장에서 직접 등록할 수 있습니다.';
+const EMPTY_MESSAGE = STORE_PRODUCT_MESSAGES.empty;
 
 // 행 키·배지·표시 포맷은 공통 계약(@o4o/store-ui-core)을 쓴다.
 // WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1
@@ -230,9 +229,7 @@ export default function StoreHandledProductsPage() {
   const handleRemove = useCallback(async () => {
     if (selectedItems.length === 0 || removing) return;
     // WO-...-CATEGORY-COLUMN-V1: '연결 콘텐츠' 개념 제거 → 연결 콘텐츠 경고 문구 삭제(연결 해제 시 자료함/QR 미삭제는 유지).
-    const msg =
-      '선택한 제품을 내 매장 제품에서 제거하시겠습니까? 직접 등록 제품은 제품 정보가 삭제됩니다.\nO4O DB 원본과 자료함 콘텐츠·QR은 삭제되지 않습니다.';
-    if (!window.confirm(msg)) return;
+    if (!window.confirm(STORE_PRODUCT_MESSAGES.remove)) return;
     setRemoving(true);
     try {
       const res = await removeHandledProducts(
@@ -465,7 +462,7 @@ export default function StoreHandledProductsPage() {
 
       {localForm && <ProductFormModal product={localForm.product} saving={localSaving} error={localError} onSave={saveLocal} onClose={() => { if (!localSaving) setLocalForm(null); }} onNavigateHub={() => navigate('/store/library/multilingual-product-contents')} />}
       <p style={styles.footnote}>
-        ※ 등록 방식과 관계없이 제품을 QR·태블릿·콘텐츠 제작에 활용할 수 있습니다. 공급 상품 주문과는 별개입니다.
+        {STORE_PRODUCT_MESSAGES.usage}
         O4O DB 원본은 이 화면에서 수정하지 않습니다.
       </p>
     </div>
