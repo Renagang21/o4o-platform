@@ -25,4 +25,6 @@ PR #384 생성 후 GitHub API 접근이 가능해졌다. 현재 cloud executor�
 
 ## 검증
 
+2026-10-09: PR #384는 CI Gate 통과 및 두 review finding 해결 후 `ac27c38c6005f2464a13ed74a3d604a642412482`로 병합됐다. `plan` dispatch는 job-level env에서 지원하지 않는 `runner.temp` context 때문에 HTTP 422로 거절됐으며 운영 실행·변경은 없었다. 동일 WO의 연속 수정으로 사용자 지정 worktree를 유지하고 최신 main 기준 `wo/pharmacyhub-qr-runtime-paths`를 생성했다. 임시 경로는 첫 step에서 `RUNNER_TEMP`를 통해 GITHUB_ENV에 전달하도록 수정한다.
+
 QR 전환·복구·읽기 전용 경로 수집 node:test 16개와 기존 CI 스크립트 node:test 352개 통과. 두 workflow의 YAML parse·diff whitespace·문서 민감정보 검사 통과. QR 테스트는 blocking CI에도 연결한다. GCP URL map API 호출·실제 WIF 권한·운영 HTTP 응답·브라우저/실기기 검증은 아직 실행하지 않았다.
