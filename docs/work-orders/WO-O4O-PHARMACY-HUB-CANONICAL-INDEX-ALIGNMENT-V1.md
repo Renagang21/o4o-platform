@@ -3,7 +3,10 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-10-09
 > **근거**: 사용자 확정 PH 완전 퇴역 · PR #373의 정본 정합 리뷰 · `AGENTS.md` §8 및 `CANONICAL-INDEX.md` §0
-> **기준 main**: `8fa26f9293` · **branch**: `wo/pharmacy-hub-canonical-index-alignment-v1`
+> **착수 main**: `8fa26f9293` · **검토 main**: `03f9729856`
+> **검토 base**: PR #373 branch `wo/pharmacy-hub-full-retirement-v1`의 `8d72542589` · **branch**: `wo/pharmacy-hub-canonical-index-alignment-v1`
+
+**선행조건 상태:** PR #373은 아직 OPEN이며 main에 반영되지 않았다. 검토 base와의 branch 결합은 main 통합이 아니다. 선행 PR merge 후에만 이 PR의 base를 main으로 변경하고 그 실제 main SHA·최신 문서 검증 결과를 기록한다.
 
 ## 1. 목적과 범위
 

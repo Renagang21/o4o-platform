@@ -165,7 +165,17 @@ export class EmailAuthController extends BaseController {
     const { currentPassword, newPassword } = req.body as PasswordSetRequestDto;
     try {
       await emailAuthService.setPasswordForUser(String(userId), { currentPassword, newPassword });
+      authenticationService.clearAuthCookies(req, res);
       return BaseController.ok(res, { message: '비밀번호를 저장했습니다.' });
+    } catch (error) {
+      return EmailAuthController.handleError(res, error, 'set');
+    }
+  }
+
+  static async passwordStatus(req: AuthRequest, res: Response): Promise<any> {
+    if (!req.user?.id) return BaseController.unauthorized(res);
+    try {
+      return BaseController.ok(res, await emailAuthService.getPasswordStatus(String(req.user.id)));
     } catch (error) {
       return EmailAuthController.handleError(res, error, 'set');
     }
@@ -207,6 +217,9 @@ export class EmailAuthController extends BaseController {
         // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
         ...(error.serviceAccess ? { serviceAccess: error.serviceAccess } : {}),
       });
+    }
+    if (err.code === 'SESSION_CHANGED_RETRY_LOGIN') {
+      return BaseController.error(res, err.message, 409, err.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {
       const accountStatus = resolveExposableAccountStatus(err.details?.status);

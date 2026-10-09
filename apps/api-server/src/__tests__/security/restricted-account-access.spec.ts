@@ -25,6 +25,7 @@ let currentUser: any = null;
 
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
+    manager: { query: async () => [{ live: 1 }] },
     getRepository: () => ({
       findOne: async () => currentUser,
     }),
@@ -52,7 +53,7 @@ import {
 import { UserStatus } from '../../types/auth.js';
 
 function makeToken(payload: Record<string, unknown>): string {
-  return Buffer.from(JSON.stringify(payload), 'utf8').toString('base64');
+  return Buffer.from(JSON.stringify({ serviceKey: 'neture', sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family', ...payload }), 'utf8').toString('base64');
 }
 
 /**
@@ -75,6 +76,7 @@ function setUser(status: string, isActive = true) {
     isActive,
     roles: [],
     memberships: [],
+    refreshTokenFamily: 'user-family',
   };
 }
 

@@ -11,6 +11,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import * as ts from 'typescript';
 
 const REPO = path.resolve(__dirname, '../../../..');
 const SRC = path.resolve(__dirname, '..');
@@ -203,14 +204,46 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       expect(hits(/v1\(\s*[`'"]\/ecommerce\//)).toEqual([]);
     });
 
-    // WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1:
-    //   Event Offer 는 특가 판매로 확정되어 payment-first 축에 편입됐다. 승인축 B2B 와 함께
-    //   `store-b2b` 공용 결제 축을 쓰므로 live producer 는 4종이다(baseline §3).
-    it('살아 있는 payment producer serviceKey 는 4종이다', () => {
-      expect(hits(/['"`]neture-b2b['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]pharmacy-hub['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]store-b2b['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]store-service-subscription['"`]/).length).toBeGreaterThan(0);
+    it('PaymentCore 신규 producer는 3종이며 prepare 호출은 PH를 만들지 않는다', () => {
+      const expected = [
+        ['apps/api-server/src/routes/neture/controllers/neture-b2b-payment.controller.ts', 'NETURE_B2B_SOURCE_SERVICE', 'neture-b2b'],
+        ['apps/api-server/src/services/payment/b2b/b2b-payment-controller.factory.ts', 'STORE_B2B_PAYMENT_SERVICE_KEY', 'store-b2b'],
+        ['apps/api-server/src/modules/store-entitlement/store-entitlement.routes.ts', 'STORE_SUBSCRIPTION_SOURCE_SERVICE', 'store-service-subscription'],
+      ];
+      const producers = ALL_FILES.filter(f => !/(__tests__|\.(test|spec)\.)/.test(f))
+        .filter(f => /new\s+PaymentCoreService\s*\(/.test(stripComments(codeOf(f)))).map(rel);
+      expect(producers.sort()).toEqual(expected.map(([file]) => file).sort());
+
+      for (const [file, identifier, serviceKey] of expected) {
+        const code = codeOf(path.join(REPO, file));
+        const source = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true);
+        const emitted: string[] = [];
+        const visit = (node: ts.Node): void => {
+          if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)
+            && node.expression.name.text === 'prepare' && node.arguments[0] && ts.isObjectLiteralExpression(node.arguments[0])) {
+            const field = node.arguments[0].properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(source) === 'sourceService');
+            expect(field).toBeDefined();
+            if (field && ts.isPropertyAssignment(field)) emitted.push(field.initializer.getText(source));
+          }
+          ts.forEachChild(node, visit);
+        };
+        visit(source);
+        expect(emitted.length).toBeGreaterThan(0);
+        expect([...new Set(emitted)]).toEqual([identifier]);
+        const definition = identifier === 'STORE_B2B_PAYMENT_SERVICE_KEY'
+          ? read('services/payment/b2b/store-b2b-payment.constants.ts') : code;
+        expect(definition).toContain(`${identifier} = '${serviceKey}'`);
+      }
+    });
+
+    it('PH는 신규 producer 없이 과거 결제 완료 consumer로만 보존한다', () => {
+      const handler = stripComments(read('services/pharmacy-hub/PharmacyHubPaymentEventHandler.ts'));
+      expect(handler).toContain('paymentEventHub.onPaymentCompleted(');
+      expect(handler).toContain('PHARMACY_HUB_PAYMENT_SERVICE_KEY');
+      expect(handler).not.toMatch(/new\s+PaymentCoreService|\.prepare\(/);
+      expect(read('bootstrap/register-routes.ts')).toContain('initializePharmacyHubPaymentHandler(dataSource)');
+      expect(read('bootstrap/register-routes.ts')).not.toContain('createPharmacyHubRoutes');
+      expect(fs.existsSync(path.join(SRC, 'controllers/pharmacy-hub/PharmacyHubPaymentController.ts'))).toBe(false);
     });
 
     it('은퇴한 소비자 commerce 410 코드가 유지된다', () => {

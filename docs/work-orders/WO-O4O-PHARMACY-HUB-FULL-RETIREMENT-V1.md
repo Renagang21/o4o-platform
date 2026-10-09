@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 근거: 사용자 명시 지시 — Pharmacy Hub의 경로·서버·도메인·인증서를 모두 제거한다.
-> 착수 main: `0f8535d6b1` · 검증 결합 main: `8fa26f9293`(PR #375) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · 검증 결합 main: `03f9729856`(PR #375·#378·#379) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 확정 범위
 
@@ -38,6 +38,8 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 공통 `products/from-master` 생성도 PH 공급 키가 있으면 혼합 서비스 요청 전체를 거부한다. 기존 Offer의 PH 키와 후속 처리 원장은 그대로 둔다. 신규 입력에서 키를 지워 기본 공급으로 전환하지 않는다.
 - 공개 Store 조회도 PH slug와 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
 - DB 기반 공개 `platform-services` 목록도 active PH 행을 제외한다. 익명·로그인 사용자 모두 현재 서비스와 가입 상태만 보며 PH catalog 원장과 관리자 이력 조회는 보존한다. DB 갱신으로 숨기지 않는다.
+- 공통 구성원 API는 명시적 PH 요청을 서비스 미지정으로 강등하지 않는다. 서비스 미지정 초대도 PH만 연결된 과거 조직이면 생성 전에 거부하며 현재 서비스와 PH 이력이 함께 있는 매장의 초대는 유지한다. PaymentCore 신규 producer 3종과 역사적 PH 완료 consumer 보존은 별도 회귀로 검증한다.
+- Sonar 중복률 보완은 PH·Neture·Store B2B의 선택된 주문 후속 처리에 한정한다. 상태 전이·bridge·실패 기록만 API Extension 함수로 공유하고 세 consumer의 구독 키·주문 선택·멱등성과 PaymentCore/PG/DB 계약은 유지한다. 공유 모듈 변경 규칙에 따라 세 소비처와 raw-source 계약·실제 이벤트 회귀를 함께 검증한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
 
@@ -46,6 +48,8 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다. 검증 결과를 첨부해 PR로 준비하고 main 통합은 저장소 `AGENTS.md` §4-1(e)의 사용자 승인 절차를 따른다. 실제 배포와 PH 운영 인프라 삭제 여부는 각각 별도 결과로 기록한다.
 
 검토 중 PR #375가 PH 웹·API·배포 경로의 1차 제거를 main에 반영했다. 이 작업 branch는 그 main과 결합해 공통 신규 쓰기·진입·원장 후속 처리와 운영 삭제 인계를 보완한다. main이나 다른 작업 branch의 이력은 바꾸지 않는다. PH 모델 상태 줄은 표준 SUPERSEDED 형식을 쓰고, canonical index 상태 변경은 별도 [문서 WO](https://github.com/Renagang21/o4o-platform/blob/c988cf53380eff25e5587a4fc79db247aa03aa48/docs/work-orders/WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1.md)·PR #380으로 준비한다. #373 후 #380 순서로 main에 반영한다.
+
+main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실제 충돌이 발생해 전용 branch에서 결합했다. 일반 공개 모집의 직접 노출·신청과 세미프랜차이즈 모집의 가입·노출 판정을 유지하면서 PH만 신규 참여 목록에서 제외한다. 인증 세션/로그아웃 변경을 되돌리지 않으며 관련 API·웹 회귀를 재검증한다. main 자체는 변경하지 않는다.
 
 ## 5. 운영 인프라 제거 절차
 

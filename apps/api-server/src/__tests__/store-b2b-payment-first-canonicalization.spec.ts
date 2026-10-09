@@ -106,8 +106,10 @@ describe('§2-E 공통 B2B payment 계약', () => {
   it('handler 는 payment.completed 를 구독해 paid 전이 후 bridge 한다', () => {
     expect(handler).toContain('onPaymentCompleted');
     expect(handler).toContain('STORE_B2B_PAYMENT_SERVICE_KEY');
-    expect(handler).toContain('CheckoutPaymentStatus.PAID');
-    expect(handler).toContain('bridgeCheckoutOrderToNetureFulfillment');
+    expect(handler).toContain('transitionCheckoutPaymentAndBridge(order, event, this.orderRepository, this.bridgeService, logPrefix)');
+    const completion = read('apps/api-server/src/services/payment/checkout-payment-completion.ts');
+    expect(completion).toContain('CheckoutPaymentStatus.PAID');
+    expect(completion).toContain('bridgeCheckoutOrderToNetureFulfillment');
   });
 
   it('handler 는 재고를 추가 차감하지 않는다 (Event Offer 원자 확보 보존)', () => {

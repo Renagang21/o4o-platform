@@ -1,5 +1,7 @@
 # O4O Platform Identity Architecture V3 — Privacy · Identity Target Model
 
+> **2026-10-09 세션 구현 갱신**: 인증 리팩터링 단계 2는 일반 logout의 브라우저 ID와 비밀번호 보안 이벤트의 계정 세대를 분리한다. access·refresh·handoff가 같은 DB 폐기 판정을 사용하고, 비밀번호 저장과 세대 회전은 원자적으로 수행한다. 구형 claim 없는 토큰은 재로그인이 필요하다. 기존 세션 epoch 설명은 호환 필드의 역사적 설명이며 현재 logout 판정 축은 `session_id`다. [단계 2 검증](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md)에서 main·배포 상태를 구분한다.
+
 > **2026-10-08 정책 갱신**: [인증·서비스 가입 정본](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)의 카카오 로그인 추가, 사용자용 전체 로그아웃 제외, 비밀번호 변경·재설정 후 전역 세션 무효화, 전체관리자 용어가 현행 정책이다. 아래의 카카오 로그인 제외와 사용자용 logout-all 서술은 해당 범위에서 대체됐다. 카카오 메시징 채널과 로그인 Identity는 별개이며, 이메일 자동 병합 금지와 전체관리자 Google 전용 경계는 유지한다. 구현 완료는 [단계별 WO](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md)에서 확인한다.
 
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.

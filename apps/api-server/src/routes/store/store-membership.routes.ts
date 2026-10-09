@@ -27,6 +27,7 @@ import type { AuthRequest } from '../../types/auth.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
+import { PHARMACY_HUB_SERVICE_KEY } from '../../utils/service-retirement.js';
 import {
   StoreEnrollmentError,
   enrollStoreBusiness,
@@ -48,6 +49,16 @@ function readServiceKey(req: Request): StoreOwnerServiceKey | undefined {
   const raw = typeof req.query.serviceKey === 'string' ? req.query.serviceKey : undefined;
   return raw && (SERVICE_KEYS as readonly string[]).includes(raw) ? (raw as StoreOwnerServiceKey) : undefined;
 }
+
+// 명시적인 PH 요청을 서비스 미지정 요청으로 바꾸지 않는다. 현재 역할을 함께 가진 사용자도 동일하다.
+const rejectRetiredServiceKey: RequestHandler = (req, res, next) => {
+  const requested = Array.isArray(req.query.serviceKey) ? req.query.serviceKey : [req.query.serviceKey];
+  if (requested.some((value) => typeof value === 'string' && value.trim() === PHARMACY_HUB_SERVICE_KEY)) {
+    res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: '종료된 서비스입니다.' });
+    return;
+  }
+  next();
+};
 
 const sessionUserId = (req: Request): string => ((req as AuthRequest).user?.id as string) ?? '';
 
@@ -98,6 +109,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
   router.get(
     '/membership',
     requireAuth,
+    rejectRetiredServiceKey,
     asyncHandler(async (req: Request, res: Response) => {
       const access = await resolveStoreAccessLevel(
         dataSource,
@@ -112,6 +124,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
   router.get(
     '/members',
     requireAuth,
+    rejectRetiredServiceKey,
     asyncHandler(async (req: Request, res: Response) => {
       try {
         const data = await listStoreMembers(
@@ -130,6 +143,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
   router.post(
     '/members/invite',
     requireAuth,
+    rejectRetiredServiceKey,
     asyncHandler(async (req: Request, res: Response) => {
       const email = typeof req.body?.email === 'string' ? req.body.email : '';
       if (!email.trim()) {
@@ -153,6 +167,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
   router.delete(
     '/members/:userId',
     requireAuth,
+    rejectRetiredServiceKey,
     asyncHandler(async (req: Request, res: Response) => {
       try {
         const data = await removeStoreMember(dataSource, {

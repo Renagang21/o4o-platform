@@ -505,3 +505,24 @@ describe('useServiceAuth — 약관 acceptance', () => {
     expect(hook.result.current.user).toBeNull();
   });
 });
+
+
+describe('late session restore cannot undo logout', () => {
+  it('ignores a /auth/me success that arrives after logout', async () => {
+    let finish!: (value: unknown) => void;
+    const client = makeClient(); client.api.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const { hook } = setup({ token: 'valid-token', client });
+    await waitFor(() => expect(client.api.get).toHaveBeenCalled());
+    await act(async () => { await hook.result.current.logout(); });
+    await act(async () => { finish({ data: { data: { user: API_USER } } }); });
+    expect(hook.result.current.isAuthenticated).toBe(false); expect(hook.result.current.user).toBeNull();
+  });
+  it('ignores a /auth/me success after the token-cleared event', async () => {
+    let finish!: (value: unknown) => void;
+    const client = makeClient(); client.api.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const { hook } = setup({ token: 'valid-token', client });
+    await waitFor(() => expect(client.api.get).toHaveBeenCalled());
+    await act(async () => { window.dispatchEvent(new Event(AUTH_TOKEN_CLEARED_EVENT)); finish({ data: { data: { user: API_USER } } }); });
+    expect(hook.result.current.user).toBeNull();
+  });
+});

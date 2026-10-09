@@ -91,10 +91,10 @@ class PasswordCredentialService {
    * 원문이 저장된 해시와 일치하는가. 수단이 없거나 원문이 72바이트를 넘으면 false.
    * 수단이 없어도 같은 비용의 compare 를 한 번 수행한다(시간 차이로 수단 보유를 드러내지 않는다).
    */
-  async verifyPassword(userId: string | null, plain: string): Promise<boolean> {
+  async verifyPassword(userId: string | null, plain: string, manager?: Queryable): Promise<boolean> {
     let hash: string | null = null;
     if (userId) {
-      const rows: Array<{ password_hash: string }> = await (await this.resolveDb()).query(
+      const rows: Array<{ password_hash: string }> = await (await this.resolveDb(manager)).query(
         `SELECT password_hash FROM user_password_credentials WHERE user_id = $1`,
         [userId],
       );

@@ -11,6 +11,7 @@ jest.mock('../database/connection.js', () => ({
     manager: {
       query: (...args: unknown[]) => {
         const sql = String(args[0] ?? '');
+        if (/browser_session_revocations/i.test(sql)) return Promise.resolve([{ '?column?': 1 }]);
         if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
         return query(...args);
       },
@@ -24,7 +25,7 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
 jest.mock('../utils/token.utils.js', () => ({
   generateTokens: (...a: unknown[]) => generateTokens(...a),
-  verifyAccessToken: () => null,
+  verifyAccessToken: () => ({ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }),
 }));
 jest.mock('../services/auth/auth-context.helper.js', () => ({
   readUserMembershipsWithMainAccess: (id: string) => query(`SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`, [id]), persistRefreshTokenFamily: jest.fn(async () => undefined) }));
@@ -37,7 +38,7 @@ import { HandoffController } from '../modules/auth/controllers/handoff.controlle
 
 const uuid = '11111111-2222-4333-8444-555555555555';
 const USER = { id: 'user-1', email: 'u@example.test', name: 'U', isActive: true, status: 'active', refreshTokenFamily: 'fam-1' };
-const req = (body: Record<string, unknown>, origin: string, user: unknown = USER) => mockHandoffReq(body, origin, { user });
+const req = (body: Record<string, unknown>, origin: string, user: unknown = USER) => mockHandoffReq(body, origin, { user, accessToken: 'fixture-access' });
 const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 const sqlCalls = () => query.mock.calls.map((c) => norm(String(c[0])));
 
@@ -66,7 +67,7 @@ describe('authenticated entry does not grant service access', () => {
     expect(query).not.toHaveBeenCalled();
   });
   it.each([[[]], [[{ serviceKey: 'kpa-society', status: 'pending' }]], [[{ serviceKey: 'kpa-society', status: 'suspended' }]]])('exchange preserves actual memberships %j without elevation', async (memberships) => {
-    query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]).mockResolvedValueOnce(memberships);
+    query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]).mockResolvedValueOnce(memberships);
     findOne.mockResolvedValue(USER);
     const res = mockHandoffRes();
     await HandoffController.exchangeHandoff(req({ token: uuid }, 'https://pharmacy.neture.co.kr'), res);
@@ -75,7 +76,7 @@ describe('authenticated entry does not grant service access', () => {
     expect(res.body.data.user.roles).toEqual([]);
   });
   it('account suspension still blocks exchange', async () => {
-    query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]);
     findOne.mockResolvedValue({ ...USER, status: 'suspended' });
     const res = mockHandoffRes();
     await HandoffController.exchangeHandoff(req({ token: uuid }, 'https://pharmacy.neture.co.kr'), res);

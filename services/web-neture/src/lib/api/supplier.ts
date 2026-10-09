@@ -1607,6 +1607,8 @@ export const supplierRegulatedCategoryApi = {
 export type RecruitmentExposureStatus = 'pending' | 'approved' | 'rejected';
 
 export interface SupplierRecruitment {
+  recruitmentKind: 'public' | 'semi-franchise';
+  semiFranchiseId?: string | null;
   id: string;
   productId: string;
   productName: string;
@@ -1641,6 +1643,7 @@ export interface RecruitmentApplication {
 
 export interface RecruitmentDetail {
   recruitment: {
+    recruitmentKind: 'public' | 'semi-franchise';
     id: string;
     productId: string;
     productName: string;

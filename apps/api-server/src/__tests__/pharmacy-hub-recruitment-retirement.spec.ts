@@ -94,6 +94,18 @@ it('PH is excluded from public and Store browse while historical review reads re
   expect((await mockService.getRecruitmentsForExposureReview({ serviceKey: 'pharmacy-hub' })).map(r => r.id)).toContain('retired');
 });
 
+it('general public recruitment remains visible without exposure approval while PH stays hidden', async () => {
+  recruitmentRepo.find.mockResolvedValue([
+    { ...retired, exposureStatus: 'pending' },
+    { ...current, exposureStatus: 'pending' },
+    { ...current, id: 'business-only', semiFranchiseId: 'business', exposureStatus: 'pending' },
+  ]);
+  const res = await request(makeApp()).get('/seller/recruitments');
+  expect(res.status).toBe(200);
+  expect(res.body.data.map((r: any) => r.id)).toEqual(['current']);
+  expect((await mockService.getRecruitments({ storeOrganizationId: 'org', exposureStatus: 'approved' })).map(r => r.id)).toEqual(['current']);
+});
+
 it.each(['/seller/applications', '/seller/applications/application/approve'])('PH cannot create or approve a new participation through %s', async url => {
   const res = await request(makeApp()).post(url).send({ recruitmentId: 'retired' });
   expect(res.status).toBe(410);

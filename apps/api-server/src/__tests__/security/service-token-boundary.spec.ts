@@ -28,6 +28,7 @@ process.env.JWT_ISSUER = 'o4o-platform-test';
 process.env.JWT_AUDIENCE = 'o4o-clients-test';
 
 const EXISTING_USER_ID = '22222222-2222-2222-2222-222222222222';
+const sessionClaims = { serviceKey: 'neture', sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' };
 
 // ─────────────────────────────────────────────────────
 // Harness
@@ -41,10 +42,12 @@ const existingUser = {
   roles: [],
   memberships: [],
   linkedAccounts: [],
+  refreshTokenFamily: sessionClaims.tokenFamily,
 };
 
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
+    manager: { query: async (_sql: string, params: string[]) => params[0] === EXISTING_USER_ID && params[3] === sessionClaims.tokenFamily ? [{ live: 1 }] : [] },
     getRepository: () => ({
       // requireAuth 가 payload.userId 로 조회한다 — 실재 users.id 를 아는 공격자를 흉내낸다.
       findOne: async ({ where }: { where: { id: string } }) =>
@@ -241,19 +244,28 @@ describe('requireAuth — tokenType 경계', () => {
 
   it('[Negative 5 · 회귀] generateAccessToken 으로 발급한 사용자 토큰은 통과한다', async () => {
     const app = makeGuardedApp();
-    const token = tokenUtils.generateAccessToken(existingUser as any, ['user']);
+    const token = tokenUtils.generateAccessToken(existingUser as any, ['user'], 'neture.co.kr', [], sessionClaims);
     const res = await request(app).get('/api/v1/protected').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body.reached).toBe(true);
     expect(res.body.userId).toBe(EXISTING_USER_ID);
   });
 
-  it('[회귀] tokenType 이 없는 구형 사용자 토큰은 기존 규약대로 사용자 토큰으로 취급한다', async () => {
+  it('[회귀] 유효한 세션의 tokenType 생략은 사용자 토큰으로 취급한다', async () => {
     const app = makeGuardedApp();
-    const token = signWithAccessSecret({ userId: EXISTING_USER_ID, sub: EXISTING_USER_ID, role: 'user' });
+    const token = signWithAccessSecret({ userId: EXISTING_USER_ID, sub: EXISTING_USER_ID, role: 'user', ...sessionClaims });
     const res = await request(app).get('/api/v1/protected').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body.reached).toBe(true);
+  });
+});
+
+describe('legacy browser session claims', () => {
+  it('세션 ID 없는 배포 전 토큰은 재로그인이 필요하다', async () => {
+    const token = signWithAccessSecret({ userId: EXISTING_USER_ID, tokenType: 'user' });
+    const res = await request(makeGuardedApp()).get('/api/v1/protected').set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(401);
+    expect(res.body.code).toBe('SESSION_REVOKED');
   });
 });
 
@@ -269,7 +281,7 @@ describe('optionalAuth — service 토큰은 비로그인 취급', () => {
 
   it('[회귀] 사용자 토큰은 req.user 가 붙는다', async () => {
     const app = makeGuardedApp();
-    const token = tokenUtils.generateAccessToken(existingUser as any, ['user']);
+    const token = tokenUtils.generateAccessToken(existingUser as any, ['user'], 'neture.co.kr', [], sessionClaims);
     const res = await request(app).get('/api/v1/public').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body.authenticated).toBe(true);
