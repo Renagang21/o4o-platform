@@ -235,3 +235,47 @@ describe('AuthClient cookie refresh and late login', () => {
     expect(localStorage.getItem('o4o_accessToken')).toBeNull();
   });
 });
+
+describe('logout with expired access credentials', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('uses the captured refresh credential to revoke the same browser without restoring storage', async () => {
+    loggedIn();
+    const { client, handlers, calls } = makeClient();
+    let attempts = 0;
+    handlers['/auth/logout'] = config => {
+      expect((config.headers as any).Authorization).toBe(attempts === 0 ? 'Bearer old-access' : 'Bearer logout-access');
+      return attempts++ === 0 ? { status: 401 } : { status: 200 };
+    };
+    handlers['/auth/refresh'] = config => {
+      expect(JSON.parse(config.data as string).refreshToken).toBe('old-refresh');
+      expect(localStorage.getItem('o4o_refreshToken')).toBeNull();
+      return okRefresh('logout-access', 'logout-refresh');
+    };
+    await client.logout();
+    expect(calls).toEqual(['POST /auth/logout', 'POST /auth/refresh', 'POST /auth/logout']);
+    expect(localStorage.getItem('o4o_accessToken')).toBeNull();
+    expect(localStorage.getItem('o4o_refreshToken')).toBeNull();
+  });
+
+  it('a newer login during logout is neither refreshed nor cleared/revoked', async () => {
+    loggedIn();
+    const { client, handlers, pending } = makeClient();
+    let attempts = 0;
+    handlers['/auth/logout'] = config => {
+      expect((config.headers as any).Authorization).not.toBe('Bearer new-login-access');
+      return attempts++ === 0 ? 'defer' : { status: 200 };
+    };
+    handlers['/auth/refresh'] = config => {
+      expect(JSON.parse(config.data as string).refreshToken).toBe('old-refresh');
+      return okRefresh('logout-access', 'logout-refresh');
+    };
+    const logout = client.logout();
+    await vi.waitFor(() => expect(pending['/auth/logout']?.length).toBe(1));
+    loggedIn('new-login-access', 'new-login-refresh');
+    pending['/auth/logout'][0].resolve({ status: 401 });
+    await logout;
+    expect(localStorage.getItem('o4o_accessToken')).toBe('new-login-access');
+    expect(localStorage.getItem('o4o_refreshToken')).toBe('new-login-refresh');
+  });
+});

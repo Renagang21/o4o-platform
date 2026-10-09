@@ -4,7 +4,7 @@
  * Split from auth.controller.ts (WO-O4O-AUTH-CONTROLLER-SPLIT-V1)
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
@@ -15,7 +15,36 @@ import { verifyAccessToken } from '../../../utils/token.utils.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import { isCrossOriginRequest } from './auth-helpers.js';
 
+const INVALID_SESSION_CODES = new Set([
+  'NO_REFRESH_TOKEN', 'REFRESH_TOKEN_INVALID', 'REFRESH_TOKEN_EXPIRED', 'USER_NOT_FOUND',
+  'TOKEN_FAMILY_REVOKED', 'TOKEN_FAMILY_MISMATCH', 'SERVICE_SESSION_REVOKED',
+  'ACCOUNT_NOT_ACTIVE', 'PASSWORD_SESSION_NOT_ALLOWED',
+]);
+
 export class AuthSessionController extends BaseController {
+  /** Authenticate logout from this request's refresh snapshot if access has expired.
+   * The following requireAuth still checks current user/role/browser state. No
+   * refreshed credentials are returned, stored, or written to cookies.
+   */
+  static async prepareLogoutAuth(req: Request, res: Response, next: NextFunction): Promise<any> {
+    const token = extractToken(req);
+    if (token && verifyAccessToken(token)) return next();
+    const refreshToken = req.body?.refreshToken || req.cookies?.refreshToken;
+    if (!refreshToken) return next();
+    try {
+      const tokens = await authenticationService.refreshTokens(refreshToken);
+      req.headers.authorization = `Bearer ${tokens.accessToken}`;
+      return next();
+    } catch (failure) {
+      const code = (failure as { code?: string }).code;
+      if (code && INVALID_SESSION_CODES.has(code)) {
+        authenticationService.clearAuthCookies(req, res);
+        return res.status(401).json({ success: false, code, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', retryable: false });
+      }
+      return res.status(503).json({ success: false, code: 'AUTH_SERVICE_UNAVAILABLE', error: '서버 세션 종료를 잠시 처리할 수 없습니다. 다시 시도해 주세요.', retryable: true });
+    }
+  }
+
   /**
    * POST /api/v1/auth/logout
    * Logout current session
@@ -136,11 +165,7 @@ export class AuthSessionController extends BaseController {
       monitoringMetrics.recordAuthFailure(error.code || 'REFRESH_TOKEN_INVALID');
 
       const errorCode = error.code || 'AUTH_SERVICE_UNAVAILABLE';
-      const invalidSession = new Set([
-        'NO_REFRESH_TOKEN', 'REFRESH_TOKEN_INVALID', 'REFRESH_TOKEN_EXPIRED', 'USER_NOT_FOUND',
-        'TOKEN_FAMILY_REVOKED', 'TOKEN_FAMILY_MISMATCH', 'SERVICE_SESSION_REVOKED',
-        'ACCOUNT_NOT_ACTIVE', 'PASSWORD_SESSION_NOT_ALLOWED',
-      ]).has(errorCode);
+      const invalidSession = INVALID_SESSION_CODES.has(errorCode);
       if (!invalidSession) {
         return res.status(503).json({ success: false, error: '인증 서비스를 잠시 사용할 수 없습니다. 다시 시도해 주세요.',
           code: 'AUTH_SERVICE_UNAVAILABLE', retryable: true });

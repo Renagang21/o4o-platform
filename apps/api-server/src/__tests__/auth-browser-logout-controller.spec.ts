@@ -8,6 +8,26 @@ const SESSION = '00000000-0000-4000-8000-000000000001';
 const req = (body = {}, origin = 'https://neture.co.kr') => ({ body, user: { id: 'fixture-user' }, headers: { authorization: 'Bearer fixture' }, cookies: {}, get: () => origin } as any);
 beforeEach(() => { jest.clearAllMocks(); logout.mockResolvedValue(undefined); verifyAccessToken.mockReturnValue({ serviceKey: 'neture', sessionId: SESSION }); });
 describe('browser logout and refresh HTTP contract', () => {
+  it('authenticates expired access using the cookie refresh snapshot without publishing fresh credentials', async () => {
+    verifyAccessToken.mockReturnValueOnce(null);
+    refreshTokens.mockResolvedValueOnce({ accessToken: 'internal-access', refreshToken: 'internal-refresh' });
+    const request = req(); request.cookies.refreshToken = 'captured-cookie-refresh';
+    const next = jest.fn(); const res = mockHandoffRes();
+    await AuthSessionController.prepareLogoutAuth(request, res, next);
+    expect(refreshTokens).toHaveBeenCalledWith('captured-cookie-refresh');
+    expect(request.headers.authorization).toBe('Bearer internal-access');
+    expect(next).toHaveBeenCalledTimes(1); expect(clearAuthCookies).not.toHaveBeenCalled();
+  });
+  it('does not replace a valid signed access scope with a forged refresh body', async () => {
+    const next = jest.fn(); await AuthSessionController.prepareLogoutAuth(req({ refreshToken: 'unrelated' }), mockHandoffRes(), next);
+    expect(next).toHaveBeenCalled(); expect(refreshTokens).not.toHaveBeenCalled();
+  });
+  it('failed logout authentication is retryable and never bypasses requireAuth', async () => {
+    verifyAccessToken.mockReturnValueOnce(null); refreshTokens.mockRejectedValueOnce(new Error('DB outage'));
+    const next = jest.fn(); const res = mockHandoffRes();
+    await AuthSessionController.prepareLogoutAuth(req({ refreshToken: 'captured' }), res, next);
+    expect(next).not.toHaveBeenCalled(); expect(res.statusCode).toBe(503); expect(clearAuthCookies).not.toHaveBeenCalled();
+  });
   it('uses signed scope/identity and ignores a forged body logout target', async () => {
     const res = mockHandoffRes(); await AuthSessionController.logout(req({ serviceKey: 'supplier', sessionId: 'other-session' }), res);
     expect(logout).toHaveBeenCalledWith('fixture-user', 'neture', SESSION);

@@ -148,6 +148,7 @@ router.post(
 // POST /api/v1/auth/logout - Logout current session
 router.post(
   '/logout',
+  asyncHandler(AuthSessionController.prepareLogoutAuth),
   requireAuth,
   asyncHandler(AuthSessionController.logout)
 );

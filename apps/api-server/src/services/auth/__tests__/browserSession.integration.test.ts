@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import jwt from 'jsonwebtoken';
 import { DataSource } from 'typeorm';
 import { User } from '../../../entities/User.js';
 
@@ -31,6 +32,7 @@ import { isBrowserSessionLive } from '../browser-session.service.js';
 import { requireAuth } from '../../../common/middleware/auth/authentication.middleware.js';
 import { handoffTokenService } from '../../handoff-token.service.js';
 import { HandoffController } from '../../../modules/auth/controllers/handoff.controller.js';
+import { AuthSessionController } from '../../../modules/auth/controllers/auth-session.controller.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { mockHandoffRes } from '../../../__tests__/support/handoff-http.js';
 
@@ -109,6 +111,25 @@ integration('browser and password boundary (isolated PostgreSQL)', () => {
     await reload(); const fresh = (await issue()).tokens;
     expect((await protectedRequest(fresh.accessToken)).status).toBe(200);
     expect((await protectedRequest(a.accessToken)).status).toBe(401);
+  });
+  it.each(['cookie', 'body'])('expired access can revoke its browser through the request %s refresh snapshot', async source => {
+    const old = (await issue()).tokens; await reload(); const other = (await issue()).tokens;
+    const claims = tokenUtils.verifyAccessToken(old.accessToken)!;
+    const expired = jwt.sign({ ...claims, exp: Math.floor(Date.now() / 1000) - 1 }, process.env.JWT_SECRET!);
+    const req: any = { body: source === 'body' ? { refreshToken: old.refreshToken } : {},
+      cookies: source === 'cookie' ? { refreshToken: old.refreshToken } : {},
+      headers: { authorization: `Bearer ${expired}` }, method: 'POST', originalUrl: '/api/v1/auth/logout', get: () => 'https://neture.co.kr' };
+    const response = mockHandoffRes(); const prepared = jest.fn();
+    await AuthSessionController.prepareLogoutAuth(req, response, prepared);
+    expect(prepared).toHaveBeenCalled();
+    const authenticated = jest.fn(); await requireAuth(req, response, authenticated);
+    expect(authenticated).toHaveBeenCalled();
+    // The controller's cookie cleanup is transport-only; use the real revocation service.
+    const recovered = tokenUtils.verifyAccessToken(req.headers.authorization.slice(7))!;
+    expect(recovered.sessionId).toBe(claims.sessionId);
+    await sessions.logout(user.id, recovered.serviceKey!, recovered.sessionId!);
+    await expect(sessions.refreshTokens(old.refreshToken)).rejects.toMatchObject({ code: 'SERVICE_SESSION_REVOKED' });
+    expect((await protectedRequest(other.accessToken)).status).toBe(200);
   });
   it('reset is one-use and immediately denies access/refresh/handoff before any expiry', async () => {
     const old = (await issue()).tokens; await reload(); const pending = await pendingHandoff(old); const reset = randomUUID();

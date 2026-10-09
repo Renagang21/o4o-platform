@@ -131,6 +131,8 @@ export class AuthClient {
           // Skip refresh for auth endpoints - 401 from login/register/refresh is expected
           const requestUrl = originalRequest?.url || '';
           if (requestUrl.includes('/auth/refresh') ||
+              requestUrl.includes('/auth/logout') ||
+              requestUrl.includes('/auth/email/login') ||
               // WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google login/signup 401 은 ID token 거절이다.
               requestUrl.includes('/auth/google/')) {
             return Promise.reject(error);
@@ -398,10 +400,21 @@ export class AuthClient {
    */
   async logout(): Promise<void> {
     const token = this.strategy === 'localStorage' ? getAccessToken() : null;
+    const refreshToken = this.strategy === 'localStorage' ? getRefreshToken() : null;
     if (this.strategy === 'localStorage') this.endLocalSession();
     else { this.sessionGeneration += 1; this.rejectRefreshSubscribers(); }
-    // Local logout has already completed; preserve any server revocation failure.
-    await this.api.post('/auth/logout', {}, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+    try {
+      await this.api.post('/auth/logout', refreshToken ? { refreshToken } : {}, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+    } catch (failure) {
+      if ((failure as { response?: { status?: number } }).response?.status !== 401 || !refreshToken) throw failure;
+      // The access token may have expired. Authenticate with the captured refresh
+      // credential without storing it, then revoke that same browser ID. Never
+      // refresh/revoke a newer login that appeared while logout was in flight.
+      const refreshed = await this.api.post('/auth/refresh', { refreshToken, includeLegacyTokens: true });
+      const accessToken = extractTokensFromResponse(refreshed.data).accessToken;
+      if (!accessToken) throw new Error('Logout refresh response is missing an access token');
+      await this.api.post('/auth/logout', {}, { headers: { Authorization: `Bearer ${accessToken}` } });
+    }
   }
 
   /**
