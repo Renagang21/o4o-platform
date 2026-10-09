@@ -15,7 +15,7 @@
 
 1. 사용자 결정과 PR #373의 현행 DESIGN §16·PH baseline 상태 줄을 대조한다.
 2. 색인의 PH 행과 최종 갱신 이력을 정정하고 링크·민감정보·diff를 검사한다.
-3. 별도 문서 PR로 준비한다. **PR #373을 먼저 main에 반영한 뒤 이 문서 PR을 통합한다.** #373의 DESIGN §16과 표준 SUPERSEDED 표기를 이 문서 PR의 선행조건으로 둔다.
+3. 별도 문서 PR로 준비한다. **PR #373을 먼저 main에 반영한 뒤 이 문서 PR을 통합한다.** #373의 DESIGN §16과 표준 SUPERSEDED 표기를 이 문서 PR의 선행조건으로 둔다. 검토 중에는 #373 branch를 base로 두고 그 변경을 결합해 새 정본과 상태 줄을 함께 검토한다. #373 main 반영 후 base를 main으로 변경하고 최신 main의 문서 diff·required CI를 확인한 뒤 통합한다. 이 PR을 #373 branch에 먼저 merge하지 않는다.
 
 이 WO의 PR 준비는 main 반영·실제 PH 인프라 삭제 완료를 뜻하지 않는다. main 통합은 `AGENTS.md` §4-1(e)의 사용자 승인 후 PR merge로 수행한다. 배포 판정은 문서-only `NOT_APPLICABLE`이다.
 
