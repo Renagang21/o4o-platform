@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 근거: 사용자 명시 지시 — Pharmacy Hub의 경로·서버·도메인·인증서를 모두 제거한다.
-> 착수 main: `0f8535d6b1` · 검증 결합 main: `8fa26f9293`(PR #375) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · 검증 결합 main: `03f9729856`(PR #375·#378·#379) · 전용 branch `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 확정 범위
 
@@ -48,6 +48,8 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 DB write·schema 변경 없음. PH 이외의 서비스를 삭제하지 않는다. 검증 결과를 첨부해 PR로 준비하고 main 통합은 저장소 `AGENTS.md` §4-1(e)의 사용자 승인 절차를 따른다. 실제 배포와 PH 운영 인프라 삭제 여부는 각각 별도 결과로 기록한다.
 
 검토 중 PR #375가 PH 웹·API·배포 경로의 1차 제거를 main에 반영했다. 이 작업 branch는 그 main과 결합해 공통 신규 쓰기·진입·원장 후속 처리와 운영 삭제 인계를 보완한다. main이나 다른 작업 branch의 이력은 바꾸지 않는다. PH 모델 상태 줄은 표준 SUPERSEDED 형식을 쓰고, canonical index 상태 변경은 별도 [문서 WO](https://github.com/Renagang21/o4o-platform/blob/c988cf53380eff25e5587a4fc79db247aa03aa48/docs/work-orders/WO-O4O-PHARMACY-HUB-CANONICAL-INDEX-ALIGNMENT-V1.md)·PR #380으로 준비한다. #373 후 #380 순서로 main에 반영한다.
+
+main PR #378·#379의 인증·공급자 수정과 모집 목록 코드에서 실제 충돌이 발생해 전용 branch에서 결합했다. 일반 공개 모집의 직접 노출·신청과 세미프랜차이즈 모집의 가입·노출 판정을 유지하면서 PH만 신규 참여 목록에서 제외한다. 인증 세션/로그아웃 변경을 되돌리지 않으며 관련 API·웹 회귀를 재검증한다. main 자체는 변경하지 않는다.
 
 ## 5. 운영 인프라 제거 절차
 

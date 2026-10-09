@@ -12,7 +12,7 @@ const findOne = jest.fn();
 const verifyAccessToken = jest.fn();
 
 jest.mock('../../../database/connection.js', () => ({
-  AppDataSource: { getRepository: () => ({ findOne }) },
+  AppDataSource: { getRepository: () => ({ findOne }), manager: { query: jest.fn(async () => [{ '?column?': 1 }]) } },
 }));
 jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: { getRoleNames },
@@ -21,7 +21,10 @@ jest.mock('../../../modules/policy-acceptance/policy-acceptance.service.js', () 
   policyAcceptanceService: { getEnforcedPendingForUser: jest.fn(async () => []) },
 }));
 jest.mock('../../../utils/token.utils.js', () => ({
-  verifyAccessToken: (t: string) => verifyAccessToken(t),
+  verifyAccessToken: (t: string) => {
+    const payload = verifyAccessToken(t);
+    return payload ? { serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', ...payload } : payload;
+  },
   isServiceToken: () => false,
 }));
 jest.mock('../../middleware/auth/auth-context.helpers.js', () => ({
@@ -40,7 +43,7 @@ function mockRes() {
   return res;
 }
 
-const USER = { id: 'u1', isActive: true, status: 'active' };
+const USER = { refreshTokenFamily: 'family-1', id: 'u1', isActive: true, status: 'active' };
 
 describe('비밀번호 세션 관리자 경계', () => {
   beforeEach(() => {
@@ -57,7 +60,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B2 비밀번호 세션 + platform 역할 → 403', async () => {
-    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
     getRoleNames.mockResolvedValue(['platform:super_admin']);
     const res = mockRes();
     const next = jest.fn();
@@ -68,7 +71,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B2b 비밀번호 세션 + 일반 역할 → 통과', async () => {
-    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
     getRoleNames.mockResolvedValue([]);
     const next = jest.fn();
     const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
@@ -78,7 +81,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B3 역할 조회 실패 → fail-closed 403', async () => {
-    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'neture' });
     getRoleNames.mockRejectedValue(new Error('db down'));
     const res = mockRes();
     const next = jest.fn();
@@ -88,7 +91,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B4 Google 세션도 DB 역할을 다시 읽는다', async () => {
-    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', serviceKey: 'admin', roles: ['platform:super_admin'] });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', serviceKey: 'admin', roles: ['platform:super_admin'] });
     getRoleNames.mockResolvedValue([]);
     const next = jest.fn();
     await requireAuth({ method: 'GET', originalUrl: '/x', headers: {} } as any, mockRes(), next);
@@ -97,7 +100,7 @@ describe('비밀번호 세션 관리자 경계', () => {
   });
 
   it('B5 optionalAuth — 걸리는 비밀번호 세션은 비로그인 취급', async () => {
-    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'admin' });
+    verifyAccessToken.mockReturnValue({ sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', userId: 'u1', tokenType: 'user', authMethod: 'password', serviceKey: 'admin' });
     getRoleNames.mockResolvedValue([]);
     const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
     const next = jest.fn();

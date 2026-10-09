@@ -22,6 +22,8 @@ import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
 import LocalAgentCard from '../../components/mypage/LocalAgentCard';
+import { PasswordSecuritySettings } from '@o4o/auth-react';
+import { authClient } from '../../lib/apiClient';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -75,6 +77,7 @@ export default function MySettingsPage() {
         notify={{ success: toast.success, error: toast.error }}
         onLogout={logout}
       />
+      <PasswordSecuritySettings client={authClient} notify={{ success: toast.success }} onSessionEnded={() => openLoginModal('/mypage/settings')} />
     </MyPageLayout>
   );
 }

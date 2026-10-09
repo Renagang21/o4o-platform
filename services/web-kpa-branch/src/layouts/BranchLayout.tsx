@@ -171,7 +171,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
             <span className="text-lg font-semibold text-gray-900">{site?.title ?? site?.branchName ?? '분회 홈페이지'}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료
+            {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료
                 WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: O4O 홈은 로그인 여부와 무관하게 보인다 (KPA 정체성은 그대로, 작은 유틸리티). */}
             <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isAuthLoading} className="o4o-home-link" />
             {isAuthenticated ? (

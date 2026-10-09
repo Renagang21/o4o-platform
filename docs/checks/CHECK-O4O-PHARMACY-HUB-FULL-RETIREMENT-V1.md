@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `8fa26f9293`(PR #372·#374·#375) · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `03f9729856`(PR #372·#374·#375·#378·#379) · branch: `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 결과와 남은 실행
 
@@ -46,9 +46,11 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **234 suites · 4,395 tests PASS** · 238 suites 중 DB integration 4개(36건) SKIP |
-| 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
-| 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **236 suites · 4,422 tests PASS** · 242 suites 중 DB integration 6개(48건) SKIP |
+| 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
+| 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
+| 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
+| 최신 main 결합 관리자 cookie session Vitest | **1 file · 3 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
 | 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
@@ -104,3 +106,7 @@ HEAD `29e91ffaf6`의 CI는 통과했으나 재리뷰가 명시적 PH 구성원 �
 같은 HEAD의 SonarCloud는 새 코드 중복률 6.1%(기준 3% 이하)로 실패했다. PH 완료 handler를 1차 main 제거 뒤 보존하는 과정에서 기존 Neture·Store B2B의 상태 전이/bridge·실패 처리 복제가 새 코드로 분류됐다. 세 Extension consumer가 선택한 주문의 후속 처리만 `checkout-payment-completion.ts`로 공유한다. 각 서비스의 이벤트 구독 키·주문 선택·그룹/단일 조회·중복 이벤트 판정은 유지하며 PaymentCore·PG·DB 계약을 바꾸지 않는다. 실제 세 consumer의 이벤트를 호출해 created/pending의 paid 전이, 중복 처리, 이미 paid의 bridge 재시도, 취소 보존, 실패한 bridge의 paid 보존, 후속 실패 이벤트의 paid 불변과 다른 source 배제를 검증한다. 최신 Sonar의 성공 여부는 이 로컬 검사와 별도로 확인한다.
 
 명시적 구성원 요청·결제 consumer 공유 보완 후 변경 그래프와 raw 소비처를 합친 API 238 suites에서 234 suites·4,395 tests 및 API type-check가 통과했다. DB integration 4개(36건)는 SKIP했다. 세 결제 consumer의 실제 이벤트 회귀도 포함한다. 이 결과는 로컬 코드 검증이며 최신 PR HEAD의 required CI·Sonar·Codex와 운영 실행을 대신하지 않는다.
+
+main PR #378·#379의 공급자/인증 수정과 모집 목록의 실제 충돌을 확인하고 작업 branch에서 결합했다. 일반 공개 모집은 운영자 노출 승인 없이 유지하고 세미프랜차이즈 조건도 보존한다. PH는 두 목록에서 계속 제외하며 과거 원장 조회·종결은 유지한다. 인증 세션/로그아웃 변경을 되돌리지 않고 새 이벤트/가입 판정과 관련 API·웹 회귀를 다시 검증한다. 실제 main 통합은 아직 승인 대기다.
+
+PR #378·#379 결합 후 API 242 suites에서 236 suites·4,422 tests와 type-check가 통과했다. DB integration 6개(48건)는 SKIP했으며 기존 4개 외에 main이 추가한 browser session·supplier phase1 integration이 포함된다. Neture 46 files·375 tests와 production build, 인증 공통 패키지 34/16/156건 및 관리자 cookie session 3건도 통과했다. 신규 일반 공개 모집 회귀는 PH를 제외하면서 노출 승인 없이 현재 모집이 보이는지 확인한다. 최신 remote CI·Sonar·Codex는 이 결합 커밋에서 다시 확인한다.

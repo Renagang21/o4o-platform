@@ -15,7 +15,7 @@
 
 ## 단계와 TODO
 
-각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 이번 클라우드는 setup 스킬에 따라 이미 격리된 checkout을 사용하며 `wo/auth-refactor-phase1`에서 작업한다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
+각 단계는 별도 PR로 검증·push한다. main 통합은 사용자 승인 후 진행하고, 다음 단계는 최신 main의 소비처를 다시 조사한다. 이번 클라우드는 setup 스킬에 따라 이미 격리된 checkout을 사용하며 단계 1은 `wo/auth-refactor-phase1`, 단계 2는 최신 main 기반 `wo/auth-refactor-phase2`에서 작업한다. 다른 세션의 checkout/index/runtime은 변경하지 않는다.
 
 ### 1. 정책·공개 로그아웃 계약 정리
 
@@ -26,19 +26,32 @@
 - [x] 공개 `/auth/logout-all` 제거, 비밀번호 재설정의 내부 보안 폐기 유지
 - [x] 영향 범위 테스트·타입 검사·lint·화면 smoke
 - [x] commit·push·PR용 변경과 검증 자료 준비
-- [ ] 필수 CI·review 확인 및 main 통합 (통합은 사용자 승인 후)
+- [x] 필수 CI·review 확인 및 main 통합 (PR #361, 후속 Demo 복구 PR은 별도 기록)
 
 ### 2. 세션·비밀번호
 
-- [ ] 현재 일반 logout이 `(user_id, service_key)` epoch를 올려 같은 서비스의 다른 기기까지 종료하는 동작을 브라우저 세션 단위로 교체
-- [ ] access token도 폐기 상태를 확인하여 비밀번호 변경·재설정 후 즉시 거부
-- [ ] refresh·handoff가 세션 폐기를 우회하지 못하도록 같은 판정 사용
-- [ ] Store/KPA 별도 refresh 경로를 공통 coordinator로 수렴; logout·재로그인 중 늦게 도착한 응답 차단
-- [ ] 공통 계정 보안 UI에 첫 비밀번호 추가·기존 비밀번호 변경 구현; Demo 계정 변경 차단
-- [ ] 전체관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
-- [ ] 서비스별 일반 logout, 다른 기기 유지, 비밀번호 변경·reset 전역 폐기 회귀 검증
+- [x] 현재 일반 logout이 `(user_id, service_key)` epoch를 올려 같은 서비스의 다른 기기까지 종료하는 동작을 브라우저 세션 단위로 교체
+- [x] access token도 폐기 상태를 확인하여 비밀번호 변경·재설정 후 즉시 거부
+- [x] refresh·handoff가 세션 폐기를 우회하지 못하도록 같은 판정 사용
+- [x] Store/KPA 별도 refresh 경로를 공통 coordinator로 수렴; logout·재로그인 중 늦게 도착한 응답 차단
+- [x] 공통 계정 보안 UI에 첫 비밀번호 추가·기존 비밀번호 변경 구현; Demo 계정 변경 차단
+- [x] 전체관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
+- [x] 서비스별 일반 logout, 다른 기기 유지, 비밀번호 변경·reset 전역 폐기 회귀 검증
 
-### 3. 카카오 로그인·명시적 연결
+- [ ] 단계 2 PR 필수 CI·review, main 통합 승인 및 운영 적용
+- [ ] 단계 2 배포 후 유지 서비스 8개 PC·모바일 운영 smoke (격리 검증과 별개)
+
+### 3. 가입·권한 회귀 테스트
+
+- [ ] 최신 main 기준 가입·로그인·서비스 이용 자격·조직 소유권·role 소비처 재조사
+- [ ] 이메일·Google 계정 가입이 서비스 membership·역할·매장을 자동 생성하지 않는지 검증
+- [ ] 미가입·pending·rejected·suspended·withdrawn 상태와 승인 전후 접근 검증
+- [ ] 약국장·공급자 Demo 데이터 연결, 매장 원장 기반 권한 및 가입 우회 방지 검증
+- [ ] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
+- [ ] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
+- [ ] 검증 자료·수정·commit·push·PR 및 사용자 승인 후 main 통합
+
+### 4. 카카오 로그인·명시적 연결
 
 - [ ] 카카오 앱 설정·redirect origin·서버 자격정보 존재 확인 (값은 환경 설정에서만 관리)
 - [ ] 서버 검증 OAuth code 교환, state/PKCE·일회 사용·redirect 검증과 카카오 ID 기반 조회
@@ -51,7 +64,7 @@
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
 
-### 4. 테스트 데이터 연결·정리
+### 5. 테스트 데이터 연결·정리
 
 - [ ] 실제 대상 DB와 접속 경로 확인; 격리 로컬 DB와 기존 데이터 DB를 혼동하지 않음
 - [ ] 계정·가입·역할·소유권·콘텐츠·상품·주문·FK 목록 조사 및 disposition 작성
@@ -72,3 +85,6 @@
 체크된 TODO와 실제 검증 결과만 완료로 보고한다. 각 PR은 이번 변경 미커밋 0건, 작업 branch push, 필수 CI 및 review blocker 확인 후 integration-ready로 보고하고 main merge 승인 전 멈춘다. 후속 단계 TODO를 완료로 간주하지 않는다.
 
 단계 1 로컬 검증 결과: [CHECK-O4O-AUTH-REFACTOR-PHASE1-V1](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE1-V1.md).
+
+
+단계 2 검증 결과: [CHECK-O4O-AUTH-REFACTOR-PHASE2-V1](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md). 사용자 지정 순서(2026-10-09)는 세션·비밀번호 → 가입·권한 회귀 → 카카오·계정 연결이다. 데이터 연결 확인은 각 단계의 Demo 검증에 포함하고, 별도 정리 TODO를 선행 완료로 간주하지 않는다.
