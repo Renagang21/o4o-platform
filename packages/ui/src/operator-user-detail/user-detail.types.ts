@@ -146,6 +146,7 @@ export interface UserDetailPageProps {
 
 export interface EditUserModalProps {
   userId: string;
+  serviceKey?: string;
   apiAdapter: UserDetailApiAdapter;
   theme: 'primary' | 'blue';
   onClose: () => void;

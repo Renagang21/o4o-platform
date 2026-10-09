@@ -719,6 +719,7 @@ export default function UserDetailPage({
       {showEditModal && (
         <EditUserModal
           userId={user.id}
+          serviceKey={config.serviceKey}
           apiAdapter={apiAdapter}
           theme={config.theme}
           onClose={() => setShowEditModal(false)}

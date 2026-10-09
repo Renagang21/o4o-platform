@@ -82,6 +82,24 @@ describe('service membership boundaries', () => {
     const membership = mockQuery.mock.calls.find(([sql]) => sql.includes('SELECT id, user_id, service_key'))!;
     expect(membership[1]).toEqual([[ID], ['neture']]);
   });
+  it.each([['kpa-society', 'kpa'], ['k-cosmetics', 'cosmetics']])('maps %s to catalog prefix %s for bare roles in list and detail', async (serviceKey, prefix) => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
+      if (sql.includes('COUNT(*)')) return [{ total: 1 }];
+      if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID }];
+      return [];
+    });
+    const r = req({}, [serviceKey]); r.query.serviceKey = serviceKey;
+    const controller = new MembershipConsoleController();
+    await controller.getMembers(r, res());
+    await controller.getMemberDetail(r, res());
+    const roleCalls = mockQuery.mock.calls.filter(([sql]) => sql.includes('FROM role_assignments'));
+    expect(roleCalls).toHaveLength(2);
+    for (const [, params] of roleCalls) {
+      expect(params[1]).toEqual([`${prefix}:%`]);
+      expect(params[2]).toEqual([prefix]);
+    }
+  });
   it('detail cannot select an unowned service', async () => {
     mockQuery.mockResolvedValue([]); const r = req({}, ['neture']); r.query.serviceKey = 'lecture'; const out = res();
     await new MembershipConsoleController().getMemberDetail(r, out);

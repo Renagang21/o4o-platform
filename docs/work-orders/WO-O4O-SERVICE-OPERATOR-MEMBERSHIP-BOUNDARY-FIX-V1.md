@@ -1,6 +1,6 @@
 # 서비스 운영자·회원 관리 경계 수정 TODO
 
-> **상태**: ACTIVE
+> **상태**: IMPLEMENTED (PR CI·통합 상태는 PR 최신 HEAD 참조)
 > **작성일**: 2026-10-09 · **최종 갱신**: 2026-10-09
 > **근거 WO/IR**: 사용자 구현·push 지시 및 [1차 조사](../investigations/IR-O4O-SERVICE-OPERATOR-AND-MEMBERSHIP-FIRST-INVESTIGATION-V1.md)
 
@@ -21,7 +21,7 @@
 - [x] 역할 해제·강등·다중 서비스·범위 외 수정 회귀 테스트
 - [x] 관련 테스트·타입 검사·공통 패키지 빌드·문서 정합 검증
 - [x] 변경 범위 점검·커밋·작업 브랜치 push·PR 준비
-- [ ] PR의 required CI 및 review blocker 확인
+- [x] PR의 required CI 확인·리뷰 지적 수정 (최종 결과는 PR 최신 HEAD 참조)
 
 ## 소비처와 추가 조사 결과
 
@@ -68,3 +68,20 @@ main 병합·배포는 실행하지 않는다. PR required check는 현재 rules
 PR: [#371](https://github.com/Renagang21/o4o-platform/pull/371).
 코드 커밋 `ce84c6ddc6`은 최신 main `0f8535d6b1` 기준으로 작업 브랜치에 push되었다.
 로컬 검증은 완료했으며, 최종 PR CI·review 상태는 실행 후 확인한다.
+
+## PR 리뷰 후 추가 수정
+
+자동 리뷰 P1: 상세 내부 수정 모달의 추가 조회에도 `serviceKey`를 전달했다.
+중앙 all-services 상세는 모달에서도 명시 `all=true`를 사용한다.
+기존 테스트의 모달 mock을 제거하여 실제 상세 → 정보 수정 클릭 → 추가 조회와
+서비스 선택 변경을 검증했다(`packages/ui`: 14 tests PASS).
+
+자동 리뷰 P2: `kpa-society`/`k-cosmetics`는 membership canonical key와
+역할 카탈로그 prefix가 다르므로 bare role 비교에 SSOT 역매핑 prefix를 전달했다.
+목록·상세의 두 소비처 회귀를 추가했다(회원 경계 Jest: 15 tests PASS).
+공통 UI/API 타입 검사 및 공통 UI 재빌드 PASS.
+
+원격 최초 실행에서 Admin·영향 서비스 웹 빌드·CodeQL·문서 검사가 PASS했고,
+후속 코드 수정 커밋은 최신 HEAD에 대한 필수 CI를 다시 실행한다.
+배포 위험 판정은 `LEVEL_3`(인증·권한 변경)이므로 이후 API 배포는 통제 배포 대상이다.
+이 문서는 구현·검증 실행 기록이며 최종 CI 상태는 위 PR을 기준으로 확인한다.

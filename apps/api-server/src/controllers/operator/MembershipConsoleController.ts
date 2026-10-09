@@ -224,7 +224,7 @@ export class MembershipConsoleController {
            AND ($2::text[] IS NULL OR ra.role LIKE ANY($2)
                 OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          GROUP BY ra.user_id`,
-        [userIds, resolved.serviceKeys === null ? null : resolved.serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), resolved.serviceKeys]
+        [userIds, resolved.serviceKeys === null ? null : resolved.serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), resolved.serviceKeys === null ? null : resolved.serviceKeys.map(resolveRolePrefixFromCanonicalServiceKey)]
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
@@ -373,7 +373,7 @@ export class MembershipConsoleController {
          WHERE ra.user_id = $1
            AND ($2::text[] IS NULL OR ra.role LIKE ANY($2) OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          ORDER BY ra.is_active DESC, ra.created_at DESC`,
-        [userId, serviceKeys === null ? null : serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), serviceKeys]
+        [userId, serviceKeys === null ? null : serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), serviceKeys === null ? null : serviceKeys.map(resolveRolePrefixFromCanonicalServiceKey)]
       );
 
       // Fetch service_memberships (scoped by service)

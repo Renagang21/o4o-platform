@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import type { EditUserModalProps, BusinessInfoData } from './user-detail.types';
 
-export default function EditUserModal({ userId, apiAdapter, theme, onClose, onSuccess }: EditUserModalProps) {
+export default function EditUserModal({ userId, serviceKey, apiAdapter, theme, onClose, onSuccess }: EditUserModalProps) {
   const ringColor = theme === 'blue' ? 'focus:ring-blue-500' : 'focus:ring-primary-500';
   const btnBg = theme === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-primary-600 hover:bg-primary-700';
   const loaderColor = theme === 'blue' ? 'text-blue-600' : 'text-primary-600';
@@ -40,7 +40,7 @@ export default function EditUserModal({ userId, apiAdapter, theme, onClose, onSu
   useEffect(() => {
     (async () => {
       try {
-        const data = await apiAdapter.get(`/operator/members/${userId}`);
+        const data = await apiAdapter.get(`/operator/members/${userId}?${serviceKey ? `serviceKey=${encodeURIComponent(serviceKey)}` : 'all=true'}`);
         const u = data.user;
         const biz: BusinessInfoData = u.businessInfo || {};
         const hasBiz = !!(biz.businessName || u.company);
@@ -64,7 +64,7 @@ export default function EditUserModal({ userId, apiAdapter, theme, onClose, onSu
         setLoading(false);
       }
     })();
-  }, [userId, apiAdapter]);
+  }, [userId, apiAdapter, serviceKey]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
