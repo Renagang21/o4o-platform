@@ -14,6 +14,7 @@ export default function SettingsPage() {
     <ul className="option-list" data-testid="settings-list">
       <li><Link className="option" to={`${WORKSPACE_PATHS.myStore}/info`}><span className="option-name">매장 정보</span><span className="option-meta">매장명 · 주소 · 연락처 · 공개 slug</span></Link></li>
       {stores.length > 1 && <li><Link className="option" to={WORKSPACE_PATHS.select}><span className="option-name">매장 전환</span><span className="option-meta">접근 가능한 매장 {stores.length}개</span></Link></li>}
+      <li><Link className="option" to={WORKSPACE_PATHS.serviceWork}><span className="option-name">서비스별 업무 도구</span><span className="option-meta">기존 업무 기능</span></Link></li>
       <li><a className="option" href={PLATFORM_ORIGIN}><span className="option-name">계정 · 약관</span><span className="option-meta">neture.co.kr 에서 관리</span></a></li>
     </ul>
   </section></main>;

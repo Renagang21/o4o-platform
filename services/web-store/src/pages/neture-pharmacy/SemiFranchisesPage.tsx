@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 /**
  * 세미프랜차이즈 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-2 · §7
  *
@@ -78,8 +79,8 @@ export default function SemiFranchisesPage() {
 
   return (
     <PharmacyPage
-      title="세미프랜차이즈"
-      description="세미프랜차이즈에 가입하면 그 세미프랜차이즈의 공급 상품 · 이벤트 · 취급매장 모집을 이용할 수 있습니다. 가입은 담당 운영자가 승인합니다."
+      title="이용 사업 · 가입 관리"
+      description="각 세미프랜차이즈의 가입 상태·조건을 확인하고 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       {message && <Notice>{message}</Notice>}
@@ -112,7 +113,11 @@ export default function SemiFranchisesPage() {
                 const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
                   <tr key={r.key} className="border-b border-gray-100 last:border-0" data-testid={`semi-franchise-${r.key}`}>
-                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{r.name}{st === 'active' && <div className="mt-2 flex flex-wrap gap-3 text-xs font-normal text-emerald-700">
+                      <Link to={`/store/pharmacy/supply?source=${encodeURIComponent(`sf:${r.key}`)}`}>공급 상품</Link>
+                      <Link to={`/store/pharmacy/contents?business=${encodeURIComponent(r.key)}`}>자료 가져오기</Link>
+                      <Link to={`/store/pharmacy/orders?business=${encodeURIComponent(r.key)}`}>주문 내역</Link>
+                    </div>}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
                     <td className="px-4 py-3">
                       {st ? <StatusBadge status={st} /> : <span className="text-gray-400">미가입</span>}
                       {r.reason && <p className="mt-1 text-xs text-gray-500">사유: {r.reason}</p>}
