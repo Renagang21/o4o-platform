@@ -3,7 +3,7 @@
 > **작성일**: 2026-10-09 · **상태**: PR 검증 자료 · 운영 미적용
 > **작업**: [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md) 단계 2
 > **PR**: [#378](https://github.com/Renagang21/o4o-platform/pull/378) — CI/review 현황은 PR의 최신 HEAD 기준
-> **branch**: `wo/auth-refactor-phase2` · **기준 main**: `240a2dfd42f606f0067a5d290ed23c2ba514fece`
+> **branch**: `wo/auth-refactor-phase2` · **개발 기준 main**: `240a2dfd42f606f0067a5d290ed23c2ba514fece` · **승인 후 통합 기준 main**: `8fa26f92934c0d19d7f69d33a24d57ef01682161`
 
 ## 변경과 보안 계약
 
@@ -57,7 +57,7 @@ Store/Pharmacy fetch refresh는 API base 미설정 시 기존 `/api/v1`을 유�
 | 전체관리자 | cookie client·서버 검증·메모리 projection·API retry; 타입 검사·build·Vitest |
 | API login/refresh/handoff/password | 실제 PostgreSQL·Jest·raw-source 소비처 검사 |
 | operator/account/store 등의 간접 소비처 | 전체 root type-check, 기존 API 회귀 및 최신 DB 역할 테스트 |
-| Pharmacy-Hub | 삭제 대상으로 유지 8개 운영 검증에서 제외; 남은 소스 타입 검사는 root 검사에 포함 |
+| Pharmacy-Hub | 삭제 대상으로 유지 8개 운영 검증에서 제외; 승인 후 최신 main의 PR #375 소스·배포 대상 삭제를 통합 |
 | Hospital Pharmacy | 공통 인증 runtime 소비 없음; 범위 확대 없음 |
 
 symbol·endpoint·문구·수정 파일 경로 및 raw-source 소비처를 검색했다. `bumpServiceSessionEpoch`·`isSessionScopeLive`는 일반 logout/refresh/handoff의 활성 소비처가 없다. 제거된 `persistRefreshTokenFamily`는 이를 호출하지 않는지 확인하는 테스트 mock/negative assertion에만 남는다. 폐기된 service-token 발급 경로는 복구하지 않았다. 별도 WebSocket/guest 식별자는 사용자 브라우저 ID 계약으로 변경하지 않는다.
@@ -97,7 +97,7 @@ Demo가 업무공간으로 이동하는 서비스는 원래 로그인 서브도�
 
 ## 후속·통합 기록
 
-main 통합·운영 migration·배포는 미실행이다. PR 필수 CI·Codex blocker·미해결 thread·main 대비 위치를 현재 HEAD 기준으로 확인한 뒤 사용자 승인 전 멈춘다. 다음 단계는 가입·권한 회귀, 그 다음 카카오·명시적 연결이다. 자동 이메일 병합과 기존 두 계정의 자동 이동은 구현하지 않는다.
+2026-10-09 사용자가 main 통합·배포 진행을 승인했다. 최신 main `8fa26f92934c0d19d7f69d33a24d57ef01682161`의 Pharmacy-Hub 삭제(PR #375)를 작업 branch에 merge했으며 인증 수정 경로와 중복·충돌은 없었다. 갱신된 HEAD의 필수 CI 확인 후 PR merge와 운영 migration·배포를 진행한다. 이 기록 시점에는 운영 미적용이다. 다음 단계는 가입·권한 회귀, 그 다음 카카오·명시적 연결이다. 자동 이메일 병합과 기존 두 계정의 자동 이동은 구현하지 않는다.
 
 ## 문서 정합
 
