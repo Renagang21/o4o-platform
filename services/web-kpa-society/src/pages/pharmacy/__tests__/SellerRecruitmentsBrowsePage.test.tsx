@@ -21,7 +21,10 @@ describe('판매자 모집 게시 구분', () => {
     expect(screen.getByText('일반 공개 모집')).toBeTruthy();
     expect(screen.queryByText(/서비스 운영자가 승인한/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '공개 제품' }));
-    expect(within(screen.getByRole('dialog')).getByText('일반 공개 모집')).toBeTruthy();
+    const dialog = within(screen.getByRole('dialog'));
+    expect(dialog.getByText('일반 공개 모집')).toBeTruthy();
+    expect(dialog.getByText('1,000원')).toBeTruthy();
+    expect(dialog.getByText('0%')).toBeTruthy();
   });
   it('함께 표시된 사업 모집은 공개 모집과 구분한다', async () => {
     mocks.get.mockResolvedValue({ data: [recruitment('공개 제품', 'public', 'pending'), recruitment('사업 제품', 'semi-franchise', 'approved')] });

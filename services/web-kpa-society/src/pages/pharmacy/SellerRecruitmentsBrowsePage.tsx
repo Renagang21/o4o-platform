@@ -296,11 +296,18 @@ export default function SellerRecruitmentsBrowsePage() {
                 )}
               </div>
               <dl className="flex-1 space-y-1.5 text-sm">
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">모집 구분</dt><dd className="text-gray-800">{recruitmentLabel(detail.recruitmentKind)}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">제조사</dt><dd className="text-gray-800">{detail.manufacturer || '-'}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">공급자</dt><dd className="text-gray-800">{detail.sellerName}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">소비자가</dt><dd className="font-medium text-gray-900">{formatPrice(detail.consumerPrice)}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">수수료</dt><dd className="text-gray-800">{detail.commissionRate}%</dd></div>
+                {[
+                  { label: '모집 구분', value: recruitmentLabel(detail.recruitmentKind) },
+                  { label: '제조사', value: detail.manufacturer || '-' },
+                  { label: '공급자', value: detail.sellerName },
+                  { label: '소비자가', value: formatPrice(detail.consumerPrice) },
+                  { label: '수수료', value: `${detail.commissionRate}%` },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex gap-2">
+                    <dt className="w-20 shrink-0 text-gray-500">{label}</dt>
+                    <dd className={label === '소비자가' ? 'font-medium text-gray-900' : 'text-gray-800'}>{value}</dd>
+                  </div>
+                ))}
                 {detail.shopUrl && (
                   <div className="flex gap-2">
                     <dt className="w-20 shrink-0 text-gray-500">몰 URL</dt>
