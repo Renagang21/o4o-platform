@@ -23,6 +23,7 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
+import { transitionCheckoutPaymentAndBridge, markCheckoutPaymentFailed } from '../payment/checkout-payment-completion.js';
 import {
   paymentEventHub,
   PaymentCompletedEvent,
@@ -30,8 +31,6 @@ import {
 } from '../payment/PaymentEventHub.js';
 import {
   CheckoutOrder,
-  CheckoutOrderStatus,
-  CheckoutPaymentStatus,
 } from '../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../utils/logger.js';
 import { CheckoutFulfillmentBridgeService } from './checkout-fulfillment-bridge.service.js';
@@ -137,52 +136,7 @@ export class NetureB2bCheckoutPaymentEventHandler {
     event: PaymentCompletedEvent,
     logPrefix: string,
   ): Promise<void> {
-    if (
-      order.status === CheckoutOrderStatus.CREATED ||
-      order.status === CheckoutOrderStatus.PENDING_PAYMENT
-    ) {
-      order.status = CheckoutOrderStatus.PAID;
-      order.paymentStatus = CheckoutPaymentStatus.PAID;
-      order.paymentMethod = event.paymentMethod;
-      order.paidAt = event.approvedAt;
-      await this.orderRepository.save(order);
-      logger.info(`${logPrefix} Order marked paid`, {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-      });
-    } else if (order.status !== CheckoutOrderStatus.PAID) {
-      // cancelled/refunded → 전이·bridge 금지
-      logger.warn(`${logPrefix} Order not in payable state`, {
-        orderId: order.id,
-        status: order.status,
-      });
-      return;
-    }
-    // 이미 PAID 면 전이는 skip(idempotent)하되 bridge 는 재시도(bridge 자체 idempotent).
-
-    // WO-O4O-CHECKOUT-ORDER-TO-NETURE-FULFILLMENT-BRIDGE-V1 (P2c):
-    // 결제 완료 후 공급자 fulfillment 로 bridge (best-effort — 실패해도 paid 유지, 공급자 미노출).
-    try {
-      const result = await this.bridgeService.bridgeCheckoutOrderToNetureFulfillment({
-        checkoutOrderId: order.id,
-      });
-      if (result.bridged) {
-        logger.info(`${logPrefix} bridged to neture fulfillment`, {
-          orderId: order.id,
-          netureOrderId: result.netureOrderId,
-        });
-      } else {
-        logger.warn(`${logPrefix} bridge skipped`, {
-          orderId: order.id,
-          reason: result.skippedReason,
-        });
-      }
-    } catch (bridgeErr) {
-      logger.error(`${logPrefix} bridge error (order remains paid, supplier hidden)`, {
-        orderId: order.id,
-        error: bridgeErr instanceof Error ? bridgeErr.message : 'Unknown error',
-      });
-    }
+    await transitionCheckoutPaymentAndBridge(order, event, this.orderRepository, this.bridgeService, logPrefix);
   }
 
   private async handlePaymentFailed(event: PaymentFailedEvent): Promise<void> {
@@ -200,17 +154,7 @@ export class NetureB2bCheckoutPaymentEventHandler {
                 .getMany()
             ).filter((o) => this.isNetureB2bOrder(o));
       for (const order of targets) {
-        if (
-          order.status === CheckoutOrderStatus.CREATED ||
-          order.status === CheckoutOrderStatus.PENDING_PAYMENT
-        ) {
-          order.paymentStatus = CheckoutPaymentStatus.FAILED;
-          await this.orderRepository.save(order);
-          logger.info(`${logPrefix} paymentStatus set to FAILED`, {
-            orderId: order.id,
-            errorCode: event.errorCode,
-          });
-        }
+        await markCheckoutPaymentFailed(order, event, this.orderRepository, logPrefix);
       }
     } catch (error) {
       logger.error(`${logPrefix} Processing failed`, {

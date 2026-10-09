@@ -27,6 +27,7 @@
 - 동의 판정: 과거 PH 이용약관·경영자 계약은 pending에서 제외하고 신규 승낙은 410으로 거부한다. PH 미동의가 현재 서비스 전체를 막지 않으며 현재 서비스 약관은 계속 요구한다. 약관·동의 원장 삭제나 동의 backfill은 없다.
 - Local Agent: PH root/www를 pairing origin에서 제거했다. 두 origin의 health/preflight/pair가 403으로 종료되고 Neture 정상 pairing은 유지된다. 설치 사본의 업데이트는 별도 로컬 실행이다.
 - 공통 관리: 전체 관리자도 PH 역할 선택·부여·신규 정의 생성과 PH 가입 승인·재활성화·active 전이를 할 수 없다. 과거 역할 식별 조회·회수·가입 거부/정지/탈퇴는 유지한다. 전체 복구에 PH와 현재 가입이 섞여 있으면 현재 가입만 복구한다.
+- 매장 구성원 요청: 명시적 PH `serviceKey`를 서비스 미지정으로 바꾸지 않고 410으로 거부한다. PH·현재 역할을 함께 가진 사용자, 반복 query·공백 입력도 동일하다. 서비스 미지정 초대도 PH 전용 조직이면 생성 전에 거부하며 현재 linkage와 PH 이력이 함께 있는 매장의 초대는 유지한다.
 - 공통 공급: `products/from-master` 신규 Offer 생성은 PH 공급 키가 포함된 혼합 요청도 저장 전에 거부한다. 과거 Offer 키를 삭제하거나 기본 공급으로 바꾸지 않는다.
 - 공개 매장: PH slug·PH로 향하는 과거 slug 리다이렉트는 404로 종료해 관심 요청을 저장하지 않는다. PH 전용 조직의 QR은 스캔 이벤트 기록 전에 종료한다. PH 원장과 현재 서비스 주소가 함께 있으면 현재 Store 요청·QR은 계속 처리한다.
 - DB 공개 catalog: active PH 행도 익명·로그인 사용자 목록에서 제외한다. 현재 서비스의 가입 상태 표시와 전체 관리자의 catalog 이력 조회는 보존하며 DB write는 없다.
@@ -45,7 +46,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **232 suites · 4,363 tests PASS** · 236 suites 중 DB integration 4개 SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **234 suites · 4,395 tests PASS** · 238 suites 중 DB integration 4개(36건) SKIP |
 | 최신 main(PR #372·#374) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 최신 main 결합 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
@@ -97,3 +98,9 @@ HEAD `b591ff85e0`의 재리뷰는 DB 기반 공개 catalog의 PH 링크와 PH �
 검토 중 main에 PH 1차 제거 PR #375(`8fa26f9293`)가 통합돼 이 작업과 40파일에서 충돌했다. 충돌을 대조하고 완전 퇴역의 공통 차단·현재 서비스 회귀 검증을 유지해 결합했다. 기존 주문의 PH 결제 완료 처리까지 1차 삭제에 포함돼 있었으므로 신규 producer 없이 역사적 완료 handler와 초기화는 보존한다. #375의 PH 홈 진입 제거·README와 당시 WO는 유지한다. 실제 main 변경은 이 세션에서 수행하지 않았으며 현재 보완은 #373의 승인·merge 대기다.
 
 PR #375 결합과 DB catalog 보완 후 API 236 suites에서 232 suites·4,363 tests 및 type-check가 통과했다. DB integration 4개(36건)는 SKIP했다. Neture 46 files·375 tests와 CI blocking Node 전체 332건도 재검증해 통과했다. 최신 커밋의 required CI·Sonar·Codex는 PR에서 확인한다.
+
+HEAD `29e91ffaf6`의 CI는 통과했으나 재리뷰가 명시적 PH 구성원 요청의 서비스 미지정 강등과 PaymentCore producer 회귀 검사의 낡은 4종 단언을 지적했다. 구성원 resolver 호출 전에 명시적 PH 요청을 차단하고, PH 전용 조직의 신규 초대도 서비스 미지정 여부와 무관하게 거부한다. 현재 서비스·PH 이력 혼합 매장의 정상 초대와 과거 역할 회수 검증은 유지한다. 결제 검사에서는 실코드의 PaymentCore producer 생성 지점 3개와 prepare의 sourceService를 확인하고, 역사적 PH 완료 consumer의 구독·초기화 보존을 별도 검사한다. 저장소 전체의 PH 문자열 존재를 신규 producer가 살아 있다는 증거로 쓰지 않는다.
+
+같은 HEAD의 SonarCloud는 새 코드 중복률 6.1%(기준 3% 이하)로 실패했다. PH 완료 handler를 1차 main 제거 뒤 보존하는 과정에서 기존 Neture·Store B2B의 상태 전이/bridge·실패 처리 복제가 새 코드로 분류됐다. 세 Extension consumer가 선택한 주문의 후속 처리만 `checkout-payment-completion.ts`로 공유한다. 각 서비스의 이벤트 구독 키·주문 선택·그룹/단일 조회·중복 이벤트 판정은 유지하며 PaymentCore·PG·DB 계약을 바꾸지 않는다. 실제 세 consumer의 이벤트를 호출해 created/pending의 paid 전이, 중복 처리, 이미 paid의 bridge 재시도, 취소 보존, 실패한 bridge의 paid 보존, 후속 실패 이벤트의 paid 불변과 다른 source 배제를 검증한다. 최신 Sonar의 성공 여부는 이 로컬 검사와 별도로 확인한다.
+
+명시적 구성원 요청·결제 consumer 공유 보완 후 변경 그래프와 raw 소비처를 합친 API 238 suites에서 234 suites·4,395 tests 및 API type-check가 통과했다. DB integration 4개(36건)는 SKIP했다. 세 결제 consumer의 실제 이벤트 회귀도 포함한다. 이 결과는 로컬 코드 검증이며 최신 PR HEAD의 required CI·Sonar·Codex와 운영 실행을 대신하지 않는다.

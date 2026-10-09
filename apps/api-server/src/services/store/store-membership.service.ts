@@ -265,6 +265,9 @@ export async function inviteStoreMember(
     input.serviceKey,
     input.preferredOrganizationId,
   );
+  const linked = await linkedServiceKeys(dataSource, organizationId);
+  // 서비스 미지정 경로에서도 PH만 연결된 과거 조직에 새 초대는 만들지 않는다.
+  if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) fail('STORE_NOT_RESOLVED', 403);
   const email = (input.email ?? '').trim().toLowerCase();
   const [user]: Array<{ id: string }> = await dataSource.query(
     `SELECT id FROM users WHERE lower(email) = $1 LIMIT 1`,

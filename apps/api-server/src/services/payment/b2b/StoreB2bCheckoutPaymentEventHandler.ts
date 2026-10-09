@@ -16,6 +16,7 @@
  *     `organization_product_listings` 를 `FOR UPDATE` 로 잠그고 이미 원자 확보했다(§2-I).
  */
 import { DataSource, Repository } from 'typeorm';
+import { transitionCheckoutPaymentAndBridge, markCheckoutPaymentFailed } from '../checkout-payment-completion.js';
 import {
   paymentEventHub,
   PaymentCompletedEvent,
@@ -23,8 +24,6 @@ import {
 } from '../PaymentEventHub.js';
 import {
   CheckoutOrder,
-  CheckoutOrderStatus,
-  CheckoutPaymentStatus,
 } from '../../../entities/checkout/CheckoutOrder.entity.js';
 import logger from '../../../utils/logger.js';
 import { CheckoutFulfillmentBridgeService } from '../../neture/checkout-fulfillment-bridge.service.js';
@@ -123,42 +122,7 @@ export class StoreB2bCheckoutPaymentEventHandler {
     event: PaymentCompletedEvent,
     logPrefix: string,
   ): Promise<void> {
-    if (
-      order.status === CheckoutOrderStatus.CREATED ||
-      order.status === CheckoutOrderStatus.PENDING_PAYMENT
-    ) {
-      order.status = CheckoutOrderStatus.PAID;
-      order.paymentStatus = CheckoutPaymentStatus.PAID;
-      order.paymentMethod = event.paymentMethod;
-      order.paidAt = event.approvedAt;
-      await this.orderRepository.save(order);
-      logger.info(`${logPrefix} Order marked paid`, {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-      });
-    } else if (order.status !== CheckoutOrderStatus.PAID) {
-      logger.warn(`${logPrefix} Order not in payable state`, { orderId: order.id, status: order.status });
-      return;
-    }
-
-    try {
-      const result = await this.bridgeService.bridgeCheckoutOrderToNetureFulfillment({
-        checkoutOrderId: order.id,
-      });
-      if (result.bridged) {
-        logger.info(`${logPrefix} bridged to neture fulfillment`, {
-          orderId: order.id,
-          netureOrderId: result.netureOrderId,
-        });
-      } else {
-        logger.warn(`${logPrefix} bridge skipped`, { orderId: order.id, reason: result.skippedReason });
-      }
-    } catch (bridgeErr) {
-      logger.error(`${logPrefix} bridge error (order remains paid, supplier hidden)`, {
-        orderId: order.id,
-        error: bridgeErr instanceof Error ? bridgeErr.message : 'Unknown error',
-      });
-    }
+    await transitionCheckoutPaymentAndBridge(order, event, this.orderRepository, this.bridgeService, logPrefix);
   }
 
   private async handlePaymentFailed(event: PaymentFailedEvent): Promise<void> {
@@ -175,17 +139,7 @@ export class StoreB2bCheckoutPaymentEventHandler {
                 .getMany()
             ).filter((o) => this.isStoreB2bOrder(o));
       for (const order of targets) {
-        if (
-          order.status === CheckoutOrderStatus.CREATED ||
-          order.status === CheckoutOrderStatus.PENDING_PAYMENT
-        ) {
-          order.paymentStatus = CheckoutPaymentStatus.FAILED;
-          await this.orderRepository.save(order);
-          logger.info(`${logPrefix} paymentStatus set to FAILED`, {
-            orderId: order.id,
-            errorCode: event.errorCode,
-          });
-        }
+        await markCheckoutPaymentFailed(order, event, this.orderRepository, logPrefix);
       }
     } catch (error) {
       logger.error(`${logPrefix} Processing failed`, {
