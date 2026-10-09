@@ -53,7 +53,7 @@ function mount(at: string) {
         <Route element={<SubdomainOperatorRoute serviceKey="funding" level="operator"><Outlet /></SubdomainOperatorRoute>}>
           <Route path="/operator/market-trial" element={<div data-testid="funding" />} />
         </Route>
-        <Route element={<SubdomainOperatorRoute serviceKey="community" level="operator"><Outlet /></SubdomainOperatorRoute>}>
+        <Route element={<SubdomainOperatorRoute serviceKey="community" level="admin"><Outlet /></SubdomainOperatorRoute>}>
           <Route path="/admin/communities" element={<div data-testid="community-admin" />} />
         </Route>
         <Route element={<AdminRoute><Outlet /></AdminRoute>}>
@@ -99,7 +99,6 @@ const MATRIX: Array<[string, string[], Array<[string, string]>, Screen[]]> = [
   ['membership 이 active 가 아니면 막힌다 (pending)', ['supplier:operator'], [['supplier', 'pending']], []],
   ['다른 서비스 membership 으로는 대신할 수 없다 (supplier 역할 + funding membership)', ['supplier:admin'], [['funding', 'active']], []],
   // 권한 경계 정리: 커뮤니티 서비스 관리(개설 심사 · 개별 커뮤니티 운영자 지정)는 community:admin 의 자기 서비스 화면이다.
-  ['community:operator + community → 서비스 조회', ['community:operator'], [['community', 'active']], ['community']],
   ['community:admin + community → 커뮤니티 서비스 관리만', ['community:admin'], [['community', 'active']], ['community']],
   ['community:admin 이어도 community membership pending → 막힌다', ['community:admin'], [['community', 'pending']], []],
   ['Neture 관리자는 커뮤니티 서비스 관리를 대신 열 수 없다', ['neture:admin'], [['neture', 'active'], ['community', 'active']], ['netureAdmin', 'netureOperator']],
@@ -126,7 +125,7 @@ describe('서브도메인 운영자 화면 guard', () => {
 });
 
 describe('역할 표 — 백엔드 scopeRoleMapping 과 같은 의미', () => {
-  it('admin ⊃ operator · community도 admin/operator 계층 · neture 역할 미포함', () => {
+  it('admin ⊃ operator · community 도 Admin/Operator 분리 · neture 역할 미포함', () => {
     expect(subdomainOperatorRoles('supplier', 'admin')).toEqual(['supplier:admin', 'platform:super_admin']);
     expect(subdomainOperatorRoles('funding', 'operator')).toEqual(['funding:operator', 'funding:admin', 'platform:super_admin']);
     expect(subdomainOperatorRoles('community', 'operator')).toEqual(['community:operator', 'community:admin', 'platform:super_admin']);
@@ -227,8 +226,8 @@ describe('App.tsx 배선 (정적)', () => {
     }
   });
 
-  it('커뮤니티 현황 화면은 community operator 이상 블록에 있다', () => {
-    const block = blockOf('<SubdomainOperatorRoute serviceKey="community" level="operator">');
+  it('커뮤니티 서비스 관리 화면은 community:admin 블록 안에만 있다', () => {
+    const block = blockOf('<SubdomainOperatorRoute serviceKey="community" level="admin">');
     expect(block).toContain('path="/admin/communities"');
     expect(app.split('path="/admin/communities"').length - 1).toBe(1);
   });

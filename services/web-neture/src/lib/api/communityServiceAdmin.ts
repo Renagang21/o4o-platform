@@ -1,10 +1,10 @@
 /**
  * 커뮤니티 서비스 관리자(`community:admin`) API — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
  *
- * Admin은 서비스 admin/operator를 지정한다. 그 이후의
+ * Admin은 서비스 Admin/Operator를 지정한다. 그 이후의
  *   - 커뮤니티 개설 신청 심사(`/communities/requests*`)
  *   - 개별 커뮤니티 운영자 지정·해제(`/communities/admin/communities*`) — 그 커뮤니티의 승인된 회원 중에서
- * 는 커뮤니티 서비스 운영자가 이 화면에서 한다. 조회는 operator 이상, 구조 변경은 admin 전용 backend guard로 판정한다.
+ * 는 커뮤니티 서비스 운영자가 이 화면에서 한다. 개설 심사는 서비스 Admin/Operator, 개별 운영자 지정은 서비스 Admin만 허용하며 실제 경계는 backend가 판정한다.
  *
  * 조회 실패를 빈 목록으로 삼키지 않는다: 실패는 throw 하고 화면이 오류 상태를 표시한다.
  */

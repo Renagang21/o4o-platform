@@ -36,7 +36,7 @@ const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.free
   // 기존 공급자 포럼 주소는 아래 community adapter 가 먼저 처리한다.
   supplier: ['/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
   funding: ['/market-trial', '/operator/market-trial', '/admin/market-trial'],
-  community: ['/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
+  community: ['/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
 });
 
 /**

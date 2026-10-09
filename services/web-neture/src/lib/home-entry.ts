@@ -524,7 +524,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
     //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
     //   카드를 만들지 않는다(dead link 0).
-    //   community admin/operator 모두 현황 화면으로 진입하며 구조 변경은 admin만 허용한다.
+    //   community 는 Admin(`/admin/communities`)과 Operator(`/operator/communities`)로 구분한다.
     const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');

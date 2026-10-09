@@ -294,7 +294,7 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'community.neture.co.kr',
     description: '직역·관심 단위로 정보와 경험을 나누는 커뮤니티 서비스',
     joinEnabled: false,
-    // 매장 축 없음. community:admin/operator 서비스 Operator Workspace는 존재.
+    // 매장 축 없음. 전체 관리자(community:admin) Operator Workspace 는 존재.
     workspace: OPERATOR_ONLY_WORKSPACE,
   },
   /**

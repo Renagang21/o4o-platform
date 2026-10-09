@@ -120,16 +120,3 @@ describe('applyAdminRoleEdit — 해제 안전장치', () => {
     expect(removeRole).not.toHaveBeenCalled();
   });
 });
-
-it('central admin-to-operator change removes admin with the same revocation safeguards', async () => {
-  getRoleNames.mockResolvedValue(['community:admin']);
-  const result = await applyAdminRoleEdit('u1', ['community:operator'], SUPER);
-  expect(result.remove).toEqual(['community:admin']);
-  expect(revokeWithLock).toHaveBeenCalledWith({}, 'u1', 'community:admin', { allowLastAdmin: true });
-  expect(assignRole).toHaveBeenCalledWith({ userId: 'u1', role: 'community:operator' }, undefined);
-});
-it('central community operator revocation uses role removal', async () => {
-  getRoleNames.mockResolvedValue(['community:operator']);
-  await applyAdminRoleEdit('u1', [], SUPER);
-  expect(removeRole).toHaveBeenCalledWith('u1', 'community:operator');
-});

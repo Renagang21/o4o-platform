@@ -10,25 +10,15 @@
  *   requireCommunityServiceScope 커뮤니티 **서비스 전체** 권한 — `role_assignments`
  *
  * 개설 신청 심사는 아직 어떤 커뮤니티에도 속하지 않은 요청을 다루므로 개체 경계로 판정할 수
- * 없다. 그래서 서비스 전체 역할(`community:admin`)이 심사한다.
+ * 없다. 그래서 서비스 전체 역할(`community:operator` 또는 `community:admin`)이 심사한다.
  *
- * 서비스 admin은 개설 심사·개체 운영자 지정, operator는 서비스 운영 현황 조회를 담당한다.
- * 어느 서비스 역할도 개별 community_memberships 운영자 경계를 우회하지 않는다.
+ * 서비스 Operator는 개설 심사를 담당한다. 개별 커뮤니티 운영 권한은 membership으로만 판정한다.
  */
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
+import { createSubdomainOperatorScope } from './subdomain-operator-scope.js';
 
-export const COMMUNITY_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'community',
-  allowedRoles: ['community:admin', 'community:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture'],
-  // mapping 이 비면 allowedRoles 전체로 fallback 하므로 명시한다.
-  scopeRoleMapping: {
-    'community:admin': ['community:admin'],
-    'community:operator': ['community:operator', 'community:admin'],
-  },
-};
+const { config, guard } = createSubdomainOperatorScope('community', [
+  'kpa', 'neture', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture',
+]);
 
-export const requireCommunityServiceScope = createMembershipScopeGuard(COMMUNITY_SCOPE_CONFIG);
+export const COMMUNITY_SCOPE_CONFIG = config;
+export const requireCommunityServiceScope = guard;

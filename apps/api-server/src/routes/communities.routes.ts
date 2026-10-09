@@ -11,9 +11,9 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *
  *   POST /requests                             개설 신청 (slug 검사 1회차)
  *   GET  /requests/mine                        내 신청 이력 (slug_conflict 재신청 안내 도달점)
- *   GET  /requests                             승인 대기 목록        — community:admin
- *   POST /requests/:requestId/approve          개설 승인 (검사 2회차) — community:admin
- *   POST /requests/:requestId/reject           개설 거절             — community:admin
+ *   GET  /requests                             승인 대기 목록        — community:operator 이상
+ *   POST /requests/:requestId/approve          개설 승인 (검사 2회차) — community:operator 이상
+ *   POST /requests/:requestId/reject           개설 거절             — community:operator 이상
  *   GET  /operating                            내가 운영하는 커뮤니티 (가입 심사 화면 진입 목록)
  *   POST /:communitySlug/join                  가입 신청 (승인형 하나)
  *   GET  /:communitySlug/memberships           가입 신청·회원 목록    — 그 커뮤니티 operator
@@ -21,7 +21,7 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *   POST /:communitySlug/memberships/:membershipId/reject   가입 거절 — 그 커뮤니티 operator
  *
  * 두 심사 주체가 **다른 축**이라는 점이 요점이다:
- *   개설 심사 = 아직 어떤 커뮤니티에도 속하지 않은 요청 -> 서비스 전체 역할 `community:admin`
+ *   개설 심사 = 아직 어떤 커뮤니티에도 속하지 않은 요청 -> 서비스 전체 역할 `community:operator` 이상
  *   가입 심사 = 그 커뮤니티 안의 일 -> 개체 운영자 (`requireCommunityScope('operator')`)
  * 개설 승인으로 만들어지는 첫 운영자는 **개체 운영자일 뿐** 서비스 전체 역할을 받지 않는다.
  *
@@ -114,7 +114,7 @@ export function createCommunitiesRoutes(
   );
 
   // ── 개별 커뮤니티 운영자 지정·해제 (커뮤니티 서비스 운영자) ──────────────
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — Admin 은 서비스 운영자(community:admin)만 지정한다.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — Admin 은 서비스 Admin/Operator를 지정한다.
   //   개별 커뮤니티 운영자(community_memberships.role)는 서비스 운영자가 각 커뮤니티의 승인된 회원 중에서
   //   지정·해제한다. 가입 승인 자체는 여전히 개체 운영자(operatorOnly) 경로다.
   //   `/:communitySlug/...` 파라미터 라우트보다 먼저 등록한다.
@@ -127,7 +127,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/admin/communities',
-    ...serviceOperatorOnly,
+    ...serviceAdminOnly,
     asyncHandler(async (_req, res) => {
       res.json({ success: true, data: { communities: await designation().listCommunities() } });
     }),
@@ -135,7 +135,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/admin/communities/:communityId/members',
-    ...serviceOperatorOnly,
+    ...serviceAdminOnly,
     asyncHandler(async (req, res) => {
       try {
         res.json({ success: true, data: await designation().listMembers(req.params.communityId) });
@@ -217,7 +217,7 @@ export function createCommunitiesRoutes(
 
   router.post(
     '/requests/:requestId/approve',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (req, res) => {
       const reviewerUserId = requesterId(req as AuthRequest, res);
       if (!reviewerUserId) return;
@@ -236,7 +236,7 @@ export function createCommunitiesRoutes(
 
   router.post(
     '/requests/:requestId/reject',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (req, res) => {
       const reviewerUserId = requesterId(req as AuthRequest, res);
       if (!reviewerUserId) return;

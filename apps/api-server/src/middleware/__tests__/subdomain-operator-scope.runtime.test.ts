@@ -66,7 +66,6 @@ const ROUTES: Record<string, RequestHandler> = {
   // 종전 neture:operator 였다 — governance 만 옮겨 두면 목록은 보이고 승인은 안 된다.
   supplierOperator: requireSupplierScope('supplier:operator') as RequestHandler, // /neture/operator/suppliers*
   fundingOperator: requireFundingScope('funding:operator') as RequestHandler, // /neture/operator/market-trial/*
-  communityOperator: requireCommunityServiceScope('community:operator') as RequestHandler,
   communityAdmin: requireCommunityServiceScope('community:admin') as RequestHandler, // /communities/requests*
   netureAdmin: requireNetureScope('neture:admin') as RequestHandler,
   netureOperator: requireNetureScope('neture:operator') as RequestHandler,
@@ -82,7 +81,6 @@ const NONE = {
   supplierAdmin: false,
   supplierOperator: false,
   fundingOperator: false,
-  communityOperator: false,
   communityAdmin: false,
   netureAdmin: false,
   netureOperator: false,
@@ -108,13 +106,8 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
     expect(await matrix({ roles: ['funding:admin'], memberships: [['funding', 'active']] })).toEqual({ ...NONE, fundingOperator: true });
   });
 
-  it('community:operator는 현황 조회만 통과하고 구조 변경·다른 서비스는 차단된다', async () => {
-    expect(await matrix({ roles: ['community:operator'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityOperator: true });
-    expect(await passes(ROUTES.communityOperator, { roles: ['community:operator'], memberships: [['community', 'suspended']] })).toBe(false);
-    expect(await passes(ROUTES.communityOperator, { roles: [], memberships: [['community', 'active']] })).toBe(false);
-  });
   it('community:admin + community membership 만 → 커뮤니티 개설 심사만', async () => {
-    expect(await matrix({ roles: ['community:admin'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityAdmin: true, communityOperator: true });
+    expect(await matrix({ roles: ['community:admin'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityAdmin: true });
   });
 
   it('Neture 관리자·운영자 역할만 → Neture 운영만 · 세 서브도메인 영역 X', async () => {
@@ -158,7 +151,7 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
       supplierAdmin: true,
       supplierOperator: true,
       fundingOperator: true,
-      communityAdmin: true, communityOperator: true,
+      communityAdmin: true,
       netureAdmin: true,
       netureOperator: true,
     });
@@ -167,5 +160,27 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
   it('platform:super_admin → 서브도메인 세 영역 통과 (platformBypass)', async () => {
     const m = await matrix({ roles: ['platform:super_admin'], memberships: [] });
     expect([m.supplierAdmin, m.supplierOperator, m.fundingOperator, m.communityAdmin]).toEqual([true, true, true, true]);
+  });
+});
+
+
+describe('커뮤니티 Admin / Operator 분리', () => {
+  const review = requireCommunityServiceScope('community:operator') as RequestHandler;
+  const designation = requireCommunityServiceScope('community:admin') as RequestHandler;
+  it('Operator는 개설 심사를 허용하고 운영자 지정은 거부한다', async () => {
+    const persona: Persona = { roles: ['community:operator'], memberships: [['community', 'active']] };
+    expect(await passes(review, persona)).toBe(true);
+    expect(await passes(designation, persona)).toBe(false);
+  });
+  it('Admin은 두 업무를 수행한다', async () => {
+    const persona: Persona = { roles: ['community:admin'], memberships: [['community', 'active']] };
+    expect(await passes(review, persona)).toBe(true);
+    expect(await passes(designation, persona)).toBe(true);
+  });
+  it.each(['pending', 'suspended', 'rejected'])('%s 서비스 회원은 Operator여도 거부한다', async (status) => {
+    expect(await passes(review, { roles: ['community:operator'], memberships: [['community', status]] })).toBe(false);
+  });
+  it('다른 서비스 회원 자격은 대신할 수 없다', async () => {
+    expect(await passes(review, { roles: ['community:operator'], memberships: [['neture', 'active']] })).toBe(false);
   });
 });

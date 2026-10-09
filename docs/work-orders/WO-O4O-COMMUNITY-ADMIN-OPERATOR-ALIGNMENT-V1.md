@@ -50,14 +50,14 @@
 | 실제 현재 기능 | service admin | service operator | 개체 operator |
 |---|---|---|---|
 | 서비스 커뮤니티·active 회원·개설 신청 현황 조회 | 허용 | 허용 | 서비스 역할 없으면 불가 |
-| 개설 승인·거절 | 허용 | 차단 | 불가 |
+| 개설 승인·거절 | 허용 | 허용 | 서비스 역할 없으면 불가 |
 | 개별 커뮤니티 운영자 지정·해제 | 허용 | 차단 | 서비스 역할 없으면 불가 |
 | 개별 가입 승인·내부 운영 | 별도 개체 지정 필요 | 별도 개체 지정 필요 | 해당 개체만 |
 | 공통 서비스 회원관리 API | 기존 허용 | 다른 서비스와 동일한 운영 scope로 허용 | 서비스 역할 없으면 불가 |
 
 공통 회원관리 역할 등급의 세부 업무 차이는 선행 회원관리 작업의 미정 정책을 유지한다.
-전체 admin/operator 계층은 같은 scopeRoleMapping으로 명시하고, POST 구조 변경 가드는 admin을 유지한다.
-신규 route·콘텐츠 관리 기능·개체 권한 우회는 추가하지 않는다.
+전체 admin/operator 계층은 같은 scopeRoleMapping으로 명시한다. 개설 심사는 operator도 허용하며 개체 운영자 지정·해제는 admin만 허용한다.
+main PR #372의 operator 전용 route를 보존한다. 콘텐츠 관리 기능·개체 권한 우회는 추가하지 않는다.
 
 ## 로컬 검증 기록
 
@@ -119,3 +119,14 @@ CI 결과는 저장소 PR 최신 HEAD 기준으로 보고하며 main 통합은 �
 - community 쓰기 경계 및 기존 역할 회수 안전성 Jest 2 suites / 34 tests PASS, API 타입 검사 PASS.
 
 전달 PR: https://github.com/Renagang21/o4o-platform/pull/374
+
+## 최신 main PR #372 통합
+
+최종 CI 확인 중 동일 영역의 PR #372가 main `70f9355935`에 병합되었다.
+중앙 역할 카탈로그·서비스 화면·guard·route·정본은 main 구현을 보존해 충돌을 해소했다.
+최종 역할 정책은 admin의 개체 운영자 지정·해제, admin/operator의 개설 신청 심사다.
+operator는 main의 `/operator/communities` 심사 화면을 사용한다.
+앞선 조회 전용 operator UI 및 모의 browser smoke 기록은 통합 전 구현의 검증이며 최종 정책을 뜻하지 않는다.
+이 PR의 추가 결과는 최신 DB 역할에 따른 회수·운영 scope 제한·회원 변경 서비스 경계와 회귀 테스트다.
+
+main 통합 후 재검증: API Jest 6 suites / 103 tests, 중앙 지정 Vitest 2 files / 10 tests, Neture 역할·guard·메뉴·홈 진입 Vitest 4 files / 69 tests PASS.

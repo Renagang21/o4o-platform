@@ -111,7 +111,7 @@ export const DASHBOARD_B2B_ROLES: string[] = [
 //   아래 값은 백엔드 `subdomain-operator-scope.ts` 의 scopeRoleMapping 과 같은 의미다:
 //     `{key}:operator` ← operator · admin      `{key}:admin` ← admin
 //   `platform:super_admin` 은 백엔드 platformBypass 와 같이 통과한다.
-//   community도 admin ⊃ operator이며 개별 커뮤니티 역할과는 별도다.
+//   `community` 도 Admin/Operator 계층을 사용하며 개체 운영 권한과는 구분한다.
 //   Neture 역할(`neture:admin` · `neture:operator`)은 **포함하지 않는다** — 다른 축이다.
 
 export type SubdomainOperatorKey = 'supplier' | 'funding' | 'community';
@@ -140,8 +140,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },
   { path: '/operator/market-trial', key: 'funding', level: 'operator' },
-  // 공통 현황 화면 — 구조 변경 동작은 화면 내부와 API에서 admin으로 제한한다.
-  { path: '/admin/communities', key: 'community', level: 'operator' },
+  // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 전용 지정 업무는 이 화면에서 수행한다.
+  { path: '/admin/communities', key: 'community', level: 'admin' },
+  { path: '/operator/communities', key: 'community', level: 'operator' },
 ]);
 
 const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>

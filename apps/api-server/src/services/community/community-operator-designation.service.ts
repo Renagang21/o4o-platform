@@ -2,7 +2,7 @@
  * 개별 커뮤니티 운영자 지정·해제 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 원칙: Admin은 서비스 admin/operator를 지정한다. 개별 커뮤니티 운영자는
+ * 원칙: Admin 은 서비스 운영자(`community:admin`)만 지정한다. 개별 커뮤니티 운영자는
  * `community_memberships.role` 의 **개체 역할**이고, 커뮤니티 서비스 운영자가 각 커뮤니티의
  * **승인된(active) 회원 중에서** 지정·해제한다. 서비스 전역 역할은 만들지 않는다(role_assignments 무변경).
  *

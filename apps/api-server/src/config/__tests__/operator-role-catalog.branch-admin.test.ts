@@ -65,13 +65,13 @@ describe('V6 — 기존 분회 경계가 그대로다', () => {
   });
 });
 
-describe('커뮤니티 — 서비스 admin/operator와 개체 역할 분리', () => {
+describe('커뮤니티 — 전체 관리자만 만들고 전역 operator 는 만들지 않는다', () => {
   it('community:admin 은 지정 가능하다', () => {
     expect(ASSIGNABLE_OPERATOR_ROLES).toContain('community:admin');
   });
 
-  it('community:operator도 중앙 지정 가능한 서비스 역할이다', () => {
-    expect(resolveOperatorRole('community:operator', 'community')).toEqual({ role: 'community:operator', serviceKey: 'community' });
+  it('community:operator 를 community 서비스에 지정할 수 있다', () => {
+    expect(resolveOperatorRole('community:operator', 'community')).toEqual({ serviceKey: 'community', role: 'community:operator' });
   });
 
   it('platform:* 은 여전히 부여 대상이 아니다', () => {

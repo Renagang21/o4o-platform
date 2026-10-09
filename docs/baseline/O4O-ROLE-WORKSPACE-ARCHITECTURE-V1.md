@@ -170,7 +170,7 @@ community.neture.co.kr
 - 목록·access·게시판 경계는 `resolveCommunityWorkspace`가 현재 DB 상태를 읽어 판정한다. 카탈로그(`community-catalog.ts`)는 기존 공간의 표시·정책·저장 코드 adapter를 제공한다. 새 독립 DB 커뮤니티 개설을 고정 카탈로그에 등록해야 이용할 수 있는 구조로 만들지 않는다.
 - **Forum Core는 하나다.** 기존 약사 게시판은 `kpa-society`·`pharmacy-hub`, 공통 게시판은 `neture` 코드를 보존한다. 신규 공간은 `community:<UUID>`·`sf:<UUID>`를 사용한다. 기존 저장 범위와 역할 이름을 변경하거나 백필하지 않는다.
 - `/communities/:key/forum`는 기존 Forum router/controller를 재사용해 글·댓글·좋아요·게시판 개설/심사·소유 게시판 회원 관리·담당 운영자의 중재를 제공한다. 서버가 저장 범위와 관리 가능 여부를 정하며 클라이언트 serviceCode를 권한으로 신뢰하지 않는다. 일반 공개 Forum API에서 신규 회원 공간을 열람할 수 없다.
-- **참여 자격과 운영 권한은 구분한다.** 독립 커뮤니티 가입 심사는 기존 개체 운영자, 개설/운영자 지정은 `community:admin`, 서비스 운영 현황 조회는 `community:admin`·`community:operator`, 사업 포럼 관리는 해당 사업 담당자가 수행한다. 다른 사업이나 플랫폼 전체 권한을 합성하지 않는다.
+- **참여 자격과 운영 권한은 구분한다.** 독립 커뮤니티 가입 심사는 기존 개체 운영자, 사업 포럼 관리는 해당 사업 담당자가 수행한다. 사용자 결정(2026-10-09)에 따라 community 서비스 역할을 `community:admin`(Admin)과 `community:operator`(Operator)로 분리한다. admin.neture.co.kr에서 두 역할을 지정하며 개설 신청 심사는 Admin/Operator 모두, 개별 커뮤니티 운영자 지정·해제는 Admin만 수행한다. 서비스 역할은 개별 커뮤니티 가입 승인이나 중재 권한을 대신하지 않는다. 다른 사업이나 플랫폼 전체 권한을 합성하지 않는다.
 - 콘텐츠·자료는 현행 출처·Copy 계약을 유지한다. 강좌·학습·강사·강좌 문의는 study의 독립 서비스이며 커뮤니티 capability에 넣지 않는다. 분회 연수 이력·학점·자격 업무는 분회에 남긴다.
 - Community → My Store는 §6의 독립 사본 계약을 사용한다. 사업 가입 정지 후 기존 사본을 회수하지 않고 신규 원본·공급·포럼만 차단한다.
 - 현재 branch의 구현·로컬 검증과 운영 배포·업무 확인은 [CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)에 각각 기록한다.

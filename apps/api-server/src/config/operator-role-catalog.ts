@@ -34,7 +34,8 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   // `kpa-branch:operator`(개별 분회 운영자)는 **여기서 부여하지 않는다** — 대상 분회는 branch_memberships 로
   //   정해지는 개체 운영자이고, 지정·해제는 분회 서비스 관리자(kpa-branch:admin)가 분회 서비스 화면에서 한다
   //   (`/kpa-branch/admin/branches/:branchId/operators`). Admin 은 서비스 범위 운영자만 지정한다.
-  // 서비스 전체 admin/operator와 개별 community_memberships 역할은 별도 축이다.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 커뮤니티 전체 관리자(개설 신청 승인). 개별 커뮤니티 운영은
+  //   community_memberships 의 개체 역할로만 하며 서비스 Operator는 개설 심사만 담당한다.
   'community:admin',
   'community:operator',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.

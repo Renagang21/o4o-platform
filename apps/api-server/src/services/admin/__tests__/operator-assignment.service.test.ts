@@ -191,12 +191,3 @@ describe('searchCandidates — 사람을 고르기 위한 검색', () => {
     expect(h.qb.limit).toHaveBeenCalledWith(50);
   });
 });
-
-it.each(['community:admin', 'community:operator'])('centrally assigns %s with community membership', async (role) => {
-  const h = makeHarness({ user: USER, linked: LINKED });
-  const result = await h.service.assign({ userId: USER.id, serviceKey: 'community', role });
-  expect(result.role).toBe(role);
-  expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: USER.id, role }), expect.anything());
-  expect(h.writes.memberships).toEqual([expect.objectContaining({ serviceKey: 'community', status: 'active' })]);
-  expect(h.writes.users).toEqual([]);
-});
