@@ -1,7 +1,8 @@
 # CHECK-O4O-AUTH-REFACTOR-PHASE2-V1
 
-> **작성일**: 2026-10-09 · **상태**: PR 준비 · 운영 미적용
+> **작성일**: 2026-10-09 · **상태**: PR 검증 자료 · 운영 미적용
 > **작업**: [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md) 단계 2
+> **PR**: [#378](https://github.com/Renagang21/o4o-platform/pull/378) — CI/review 현황은 PR의 최신 HEAD 기준
 > **branch**: `wo/auth-refactor-phase2` · **기준 main**: `240a2dfd42f606f0067a5d290ed23c2ba514fece`
 
 ## 변경과 보안 계약
@@ -54,10 +55,10 @@ symbol·endpoint·문구·수정 파일 경로 및 raw-source 소비처를 검�
 - API 전체 Jest 최초 실행: 422 suites / 7,274 tests PASS, 4 suites / 31 tests FAIL, 10 suites / 84 tests skipped. 실패 4개는 구형 테스트 session fixture 및 transaction 호출 문자열이었다. 해당 84건 재검증 PASS; 새 legacy token 재로그인 회귀도 포함했다. 최초 실행을 전체 PASS로 기록하지 않는다.
 - 최신 main 반영 뒤 중앙 인증·역할 회수·약관·restricted/token 경계: 5 suites / 112 tests PASS. workspace handoff 31 tests PASS.
 - 세션·이메일·Google·handoff 등 집중 검사: 10 suites / 235 tests 중 새 reset rollback fixture 1건 FAIL 후 fixture transaction 주입을 바로잡았다. 실제 PostgreSQL 8 tests 재실행 PASS; 나머지 227 tests PASS. reset token을 다시 사용할 수 있고 이전 비밀번호가 유지되는지 실제 DB로 검증했다.
-- auth-client 28, auth-context 16, auth-react 156 tests PASS. 전체관리자 기존 340 + cookie session 2 tests PASS.
+- auth-client 28, auth-context 16, auth-react 156, 최신 main Neture 375 tests PASS. 전체관리자 기존 340 + cookie session 2 tests PASS.
 - 전체 root type-check PASS. 공통 패키지·API·사용자 서비스 5개 앱·전체관리자 production build PASS. 기존 bundle-size 경고는 남는다.
 - lint ratchet PASS: 기존 error 46 / warning 998. 처음 발견한 이번 변경의 parsing/no-useless-catch 2건을 수정하고 재실행했다. error 0으로 보고하지 않는다.
-- 문서 sensitive 검사·최종 PR CI/review 상태는 push 뒤 아래 통합 기록에 추가한다.
+- 문서 sensitive 검사 PASS. main ruleset read-only 확인: PR 필수, required `CI Gate`, human approval 0, 삭제·non-fast-forward 금지. 기술 gate 통과와 사용자의 main 통합 승인은 별개다. 최신 CI/review 결과는 위 PR에서 확인한다.
 
 ### PC·모바일 smoke의 범위
 
