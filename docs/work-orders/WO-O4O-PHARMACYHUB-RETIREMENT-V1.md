@@ -27,3 +27,5 @@ Store·Neture build, API production TypeScript check 통과. 변경 API spec 27�
 ## PR #375 CI 후속 수정
 
 첫 PR CI는 Code Quality Check와 API Jest 3개 shard에서 실패했다. 제거 전 웹 배포 job 수를 기대하던 gate 테스트, 삭제된 PH checkout import·slug provisioning census, PH 업무공간 활성화 기대값을 현행 은퇴 상태에 맞춘다. 공통 QR의 migration·원장 경계·KPA renderer 검증은 보존한다. 최신 `origin/main`의 커뮤니티 권한 변경을 전용 branch에 통합한다. 실제 원격 CI PASS 확인 전 병합하지 않는다.
+
+후속 검증: frontend type check·API 전체 type check·lint ratchet 통과, CI 스크립트 352 tests·변경 API 9 suites/144 tests·공통 운영자 UI 43 tests 통과. API Jest 3-shard 전수 실행은 426 suites 중 416 passed/1 failed/9 skipped, 7,089 tests passed/1 failed/77 skipped였다. 실패는 PH 웹 진입 제거가 보존 폐쇄 포럼의 community 운영권 판정에 영향을 준 회귀다. 원장 저장 코드에서 community를 해석하도록 수정했고, 해당 보안 계약과 community catalog 2 suites/42 tests 재실행이 통과했다. 전수 실행 전체를 수정 후 다시 실행한 것은 아니며 실제 원격 CI 결과는 별도 확인해야 한다. 문서 민감정보 검사 3,796 files/0 violations.
