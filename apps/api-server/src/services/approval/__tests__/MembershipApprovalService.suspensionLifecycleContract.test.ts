@@ -313,3 +313,23 @@ describe('§11 admin tier — 복구가 권한을 만들어내지 않는다', ()
     expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
   });
 });
+
+
+it('service suspension preserves centrally assigned operator roles while blocking membership', async () => {
+  seedAllFive();
+  db.memberships.find(m => m.service_key === 'pharmacy-hub')!.role = 'pharmacy-hub:operator';
+  db.roles.push({ id: 'central-operator', user_id: db.users[0].id, role: 'pharmacy-hub:operator', is_active: true });
+  await suspend(['pharmacy-hub']);
+  expect(statusOf('pharmacy-hub')).toBe('suspended');
+  expect(activeRoles()).toContain('pharmacy-hub:operator');
+  expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'pharmacy-hub:operator')).toBe(false);
+});
+
+it('a corrupt membership type cannot suspend a role belonging to another service', async () => {
+  seedAllFive({ extraRoles: ['lecture:member'] });
+  db.memberships.find(m => m.service_key === 'kpa-society')!.role = 'lecture:member';
+  await suspend(['kpa-society']);
+  expect(statusOf('kpa-society')).toBe('suspended');
+  expect(activeRoles()).toContain('lecture:member');
+  expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'lecture:member')).toBe(false);
+});

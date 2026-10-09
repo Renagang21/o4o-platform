@@ -5,17 +5,17 @@
  *
  * Responsibilities:
  * - Membership approve/reject/delete as atomic transactions
- * - membership + user + role_assignments 3-table consistency
+ * - membership + ordinary role consistency; shared account state is preserved
  * - Structured logging for all state transitions
  *
  * Rules:
  * - All write operations run inside a single transaction
  * - Controller MUST NOT contain DB logic — only this service
- * - approve = membership active + user ACTIVE + role granted (all-or-nothing)
+ * - approve = membership active + ordinary role granted (atomic; no shared account activation)
  */
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
 import { demoAccountService } from '../auth/demo-account.service.js';
 import { PHARMACY_HUB_SERVICE_KEY, ServiceRetiredError } from '../../utils/service-retirement.js';
@@ -78,8 +78,15 @@ function normalizeReturningRows<T = any>(result: unknown): T[] {
 export interface RejectParams {
   membershipId: string;
   reason: string | null;
+  /** Active member rejection is an administrative restriction, not an application decision. */
+  adminServiceKeys?: string[];
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+}
+
+/** Application rejection is open to operators; an active member requires its service admin. */
+function canRejectServiceMembership(membership: Pick<ApproveResult, 'status' | 'service_key'>, params: RejectParams): boolean {
+  return membership.status !== 'active' || params.isPlatformAdmin || params.adminServiceKeys?.includes(membership.service_key) === true;
 }
 
 export interface DeleteMemberParams {
@@ -187,6 +194,7 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
   if (!role.includes(':') && BARE_ROLE_NORMALIZATION_TARGETS.includes(role)) {
     return `${resolveRolePrefixFromCanonicalServiceKey(serviceKey)}:${role}`;
   }
+  if (role.includes(':') && resolveCanonicalServiceKey(role.split(':')[0]) !== resolveCanonicalServiceKey(serviceKey)) return null;
   return role;
 }
 
@@ -204,29 +212,9 @@ function isNetureConnectedServiceRole(serviceKey: string, role: string | null | 
   return serviceKey === 'neture' && !!role && NETURE_CONNECTED_SERVICE_ROLES.has(role);
 }
 
-/**
- * 접두어 없는 admin tier 역할 판정 (WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9)
- *
- * `service_memberships.role` 에는 legacy 표기로 prefix 없는 `admin` · `operator` · `super_admin`
- * 이 실재한다(2026-08-24 프로덕션 census: kpa-society/admin 1/operator 1 ·
- * platform/super_admin 2). 승인·재활성화 STEP3 은 이 값을 그대로 부여하므로 그대로 두면
- *
- *   ① 서비스 축이 없는 **전역** admin tier 역할이 새로 생기고
- *   ② `super_admin` 은 로그인 경로가 `platform:super_admin` 과 동등하게 취급하므로
- *      (`auth-login.service.ts` PLATFORM_ADMIN_ROLES) 멤버십 재활성화만으로 플랫폼 관리자가 된다.
- *
- * 부여만 막는다(회수는 그대로). admin·operator 부여는 플랫폼 관리자 전용 경로의 책임이며
- * (WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1), Neture 가입 승인도 이미 같은
- * 이유로 승격을 거부한다(`operator-registration.service.ts` ROLE_PROMOTION_NOT_ALLOWED).
- *
- * prefixed admin tier(`kpa:admin` 등)는 대상이 아니다 — 정지 시 내려간 역할을 되살리는
- * 정상 lifecycle 이라 막으면 suspend↔reactivate 대칭이 깨진다.
- *
- * 추측 변환도 하지 않는다. bare 값에 서비스 prefix 를 붙이는 것은 권한 확대이므로
- * 부여를 **건너뛰기만** 한다(멤버십 상태 전이는 그대로 진행).
- */
-function isBareAdminTierRole(role: string): boolean {
-  return !role.includes(':') && isAdminTierRoleName(role);
+/** Central operator assignments are independent of service membership lifecycle. */
+function isOperationalRole(role: string): boolean {
+  return isAdminTierRoleName(role);
 }
 
 export class StoreOwnerBusinessInfoRequiredError extends Error {
@@ -383,6 +371,7 @@ export class MembershipApprovalService {
     userId: string,
     role: string
   ): Promise<number> {
+    if (isOperationalRole(role)) return 0;
     const updated = normalizeReturningRows(
       await queryRunner.query(
         `UPDATE role_assignments SET is_active = false, updated_at = NOW()
@@ -395,7 +384,7 @@ export class MembershipApprovalService {
   }
 
   /**
-   * Approve a service membership (atomic: membership + user + role_assignment)
+   * Approve a service membership (atomic: membership + ordinary role_assignment)
    * Returns the approved membership row, or null if not found.
    */
   async approveMembership(params: ApproveParams): Promise<ApproveResult | null> {
@@ -471,20 +460,12 @@ export class MembershipApprovalService {
         [approvedBy, membershipId]
       );
 
-      // STEP2: Activate user account (idempotent)
-      logger.info('[APPROVAL][STEP2] user UPDATE', { userId });
-
-      await queryRunner.query(
-        `UPDATE users SET status = 'active', "isActive" = true,
-         "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
-        [approvedBy, userId]
-      );
+      // Service approval never restores the shared account. Central account management owns that state.
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
       const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
-      if (isBareAdminTierRole(memberRole)) {
-        logger.warn('[APPROVAL][STEP3] bare admin-tier role grant SKIPPED', {
+      if (!memberRole || isOperationalRole(memberRole)) {
+        logger.warn('[APPROVAL][STEP3] out-of-scope or central operator role grant SKIPPED', {
           userId,
           role: memberRole,
           serviceKey: membership.service_key,
@@ -638,6 +619,11 @@ export class MembershipApprovalService {
       const membership = selectResult[0] as ApproveResult;
       const userId = membership.user_id;
       const statusBefore = membership.status;
+      if (!canRejectServiceMembership(membership, params)) {
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+
 
       logger.info('[REJECTION][STEP0] membership locked', {
         membershipId: membership.id,
@@ -832,7 +818,7 @@ export class MembershipApprovalService {
         // 해당 서비스만 차단하며 연결 서비스 역할을 회수하지 않는다.
         if (isNetureConnectedServiceRole(membership.service_key, grantedRole)
           || (membership.service_key === 'kpa-society' && grantedRole === 'kpa:store_owner')) continue;
-        if (grantedRole) {
+        if (grantedRole && !isOperationalRole(grantedRole)) {
           const affected = await this.deactivateRoleAssignment(queryRunner, userId, grantedRole);
           logger.info('[SUSPEND][STEP2] role DEACTIVATE', { userId, role: grantedRole, affected });
           deactivatedRoles.push(grantedRole);
@@ -895,7 +881,7 @@ export class MembershipApprovalService {
   }
 
   /**
-   * Reactivate suspended memberships for a user (atomic: membership + user + role_assignment).
+   * Reactivate suspended memberships for a user (atomic: membership + ordinary role_assignment).
    * WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
    * Returns result with counts, or null if no suspended memberships found.
    */
@@ -991,35 +977,14 @@ export class MembershipApprovalService {
         [reactivatedBy, membershipIds]
       );
 
-      // STEP2: Activate user account (idempotent)
-      //
-      // WO-O4O-MEMBERSHIP-REACTIVATION-PLATFORM-SUSPENSION-BOUNDARY-V1:
-      //   users.status='suspended' 를 기록하는 경로는 admin API 뿐이다
-      //   (AdminUserController:376·425, UserManagementController:205).
-      //   즉 users 축의 'suspended' 는 **플랫폼 조치**이며, 서비스 운영자의 재활성화가 이를
-      //   해제하면 "서비스 운영자는 자기 서비스 Membership 만 통제한다" 경계가
-      //   반대 방향으로 뚫린다(WO-...-REJECTION-CROSS-SERVICE-ISOLATION-V1 의 대칭 결함).
-      //
-      //   'deleted' 는 서비스 운영자도 호출할 수 있는 deleteMember(mode='soft') 의 역동작이므로
-      //   운영자 복구 대상으로 남긴다 — WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1 의
-      //   "suspend / soft-delete 모두 이 canonical 경로로 되돌린다" 계약 보존.
-      //   (soft-delete 자체가 users 전역을 쓰는 문제는 withdrawn/delete 의미 감사에서 다룬다.)
-      const liftableUserStatuses = isPlatformAdmin ? ['suspended', 'deleted'] : ['deleted'];
-
-      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId, isPlatformAdmin, liftableUserStatuses });
-
-      await queryRunner.query(
-        `UPDATE users SET status = 'active', "isActive" = true, "updatedAt" = NOW()
-         WHERE id = $1 AND status = ANY($2)`,
-        [userId, liftableUserStatuses]
-      );
+      // Service reactivation restores membership/roles only; shared account state is preserved.
 
       // STEP3: Reactivate role_assignments for each membership role
       const reactivatedRoles: string[] = [];
       for (const membership of selectResult) {
         const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
-        if (isBareAdminTierRole(memberRole)) {
-          logger.warn('[REACTIVATE][STEP3] bare admin-tier role grant SKIPPED', {
+        if (!memberRole || isOperationalRole(memberRole)) {
+          logger.warn('[REACTIVATE][STEP3] out-of-scope or central operator role grant SKIPPED', {
             userId,
             role: memberRole,
             serviceKey: membership.service_key,
@@ -1222,7 +1187,8 @@ export class MembershipApprovalService {
 
         await queryRunner.query(
           `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-           WHERE user_id = $1 AND role LIKE $2 AND is_active = true`,
+           WHERE user_id = $1 AND role LIKE $2 AND is_active = true
+             AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`,
           [userId, `${prefix}%`]
         );
         deactivatedRoles.push(prefix);
@@ -1429,7 +1395,8 @@ export class MembershipApprovalService {
 
         for (const prefix of hardPrefixes) {
           await queryRunner.query(
-            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE $2`,
+            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE $2
+             AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`,
             [userId, `${prefix}%`]
           );
         }
@@ -1522,7 +1489,8 @@ export class MembershipApprovalService {
         for (const prefix of prefixesToClean) {
           await queryRunner.query(
             `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-             WHERE user_id = $1 AND role LIKE $2 AND is_active = true`,
+             WHERE user_id = $1 AND role LIKE $2 AND is_active = true
+             AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`,
             [userId, `${prefix}%`]
           );
         }

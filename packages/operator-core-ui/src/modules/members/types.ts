@@ -192,6 +192,8 @@ export interface MembersBulkActionConfig {
 // ─── Wrapper Props ───────────────────────────────────────────
 
 export interface OperatorMembersConsolePageProps {
+  /** Restriction, restoration and withdrawal require the service admin. */
+  canManageLifecycle?: boolean;
   /** Canonical service key (neture / k-cosmetics). */
   serviceKey: string;
   /** Service-side API client. */

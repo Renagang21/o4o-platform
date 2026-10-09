@@ -1,3 +1,4 @@
+import ServiceMembersPage from './pages/operator/ServiceMembersPage';
 /**
  * Neture - o4o 플랫폼 기반 서비스
  *
@@ -1127,6 +1128,8 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
               <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/service-members/supplier" element={<ServiceMembersPage serviceKey="supplier" />} />
+              <Route path="/operator/service-members/supplier/:id" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
             <Route element={
@@ -1136,6 +1139,8 @@ function App() {
             }>
               {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
+              <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1144,6 +1149,8 @@ function App() {
                 <SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />
               </SubdomainOperatorRoute>
             }>
+              <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
+              <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
             </Route>
             <Route element={

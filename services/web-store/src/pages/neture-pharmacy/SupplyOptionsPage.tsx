@@ -8,7 +8,7 @@
  * 같은 제품의 여러 공급 경로를 그대로 나열한다 — 가격 비교 · 최저가 강조 · 자동 선택을 하지 않는다.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import {
   neturePharmacyApi,
@@ -16,6 +16,7 @@ import {
   type SemiFranchiseRow,
   type SupplyOption,
 } from '../../api/neturePharmacy';
+import { BusinessTabs } from '../../components/BusinessTabs';
 import { Notice, PharmacyPage, SUPPLY_KIND_LABEL, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 
 const TABS: ReadonlyArray<{ source: string; label: string }> = [
@@ -45,7 +46,9 @@ function Conditions({ o }: { o: SupplyOption }) {
 }
 
 export default function SupplyOptionsPage() {
-  const [source, setSource] = useState(() => new URLSearchParams(window.location.search).get('source') || 'all');
+  const [params, setParams] = useSearchParams();
+  const source = params.get('source') || 'all';
+  const setSource = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); p.set('source', value); return p; }); };
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -106,7 +109,6 @@ export default function SupplyOptionsPage() {
   };
 
   const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const sfSelected = source.startsWith('sf:') ? source : '';
 
   return (
     <PharmacyPage
@@ -114,6 +116,7 @@ export default function SupplyOptionsPage() {
       description="가입한 세미프랜차이즈에서 지금 주문할 수 있는 공급 상품입니다. 같은 제품도 공급 경로마다 조건과 단가가 다를 수 있으니 확인 후 선택하세요."
       actions={<Link className={btn.secondary} to={pharmacyStorePath('cart')}>장바구니 보기</Link>}
     >
+      <BusinessTabs businesses={franchises} value={source.startsWith('sf:') ? source.slice(3) : ''} onChange={key => { setSource(key ? `sf:${key}` : 'all'); setPage(1); }} />
       <div className="mb-4 flex flex-wrap items-center gap-2" role="tablist" aria-label="공급 경로">
         {TABS.map((t) => (
           <button
@@ -127,15 +130,7 @@ export default function SupplyOptionsPage() {
             {t.label}
           </button>
         ))}
-        <select
-          aria-label="세미프랜차이즈별 보기"
-          value={sfSelected}
-          onChange={(e) => choose(e.target.value || 'all')}
-          className="rounded-lg border border-slate-200 px-2 py-1 text-sm"
-        >
-          <option value="">세미프랜차이즈별 보기</option>
-          {franchises.map((f) => <option key={f.key} value={`sf:${f.key}`}>{f.name}</option>)}
-        </select>
+
       </div>
 
       <form className="mb-4 flex max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); setQuery(q.trim()); setPage(1); }}>

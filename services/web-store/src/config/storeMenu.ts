@@ -25,8 +25,6 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '매장 제품', items: [
       { key: 'my-products',      label: '내 매장 제품',       subPath: '/my-products' },
-      { key: 'handled-products', label: '매장 경영활용 제품', subPath: '/handled-products' },
-      { key: 'local-products',   label: '매장 자체 상품',     subPath: '/commerce/local-products' },
     ]},
     { label: '매장 경영지원', items: [
       { key: 'product-descriptions', label: '상품 설명',       subPath: '/marketing/product-descriptions' },
@@ -40,9 +38,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'store-execution', label: '실행 현황', subPath: '/execution' },
     ]},
     { label: '매장 자료함', items: [
-      { key: 'library-contents',  label: '콘텐츠', subPath: '/library/contents' },
-      { key: 'library-resources', label: '자료',   subPath: '/library/resources' },
-      { key: 'store-assets',      label: '매장 콘텐츠', subPath: '/content' },
+      { key: 'library-contents', label: '내 자료함', subPath: '/library/contents' },
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
@@ -78,11 +74,11 @@ export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['men
     { key: 'pharmacy-orders',       label: '주문 내역',       subPath: '/pharmacy/orders' },
     { key: 'pharmacy-recruitments', label: '취급매장 모집',   subPath: '/pharmacy/recruitments' },
   ]},
-  { label: '콘텐츠', items: [
-    { key: 'pharmacy-contents', label: '이용 가능 콘텐츠', subPath: '/pharmacy/contents' },
+  { label: '자료 가져오기', items: [
+    { key: 'pharmacy-contents', label: '자료 가져오기', subPath: '/pharmacy/contents' },
   ]},
   { label: '가입', items: [
-    { key: 'pharmacy-semi-franchises', label: '세미프랜차이즈', subPath: '/pharmacy/semi-franchises' },
+    { key: 'pharmacy-semi-franchises', label: '이용 사업 · 가입 관리', subPath: '/businesses' },
     { key: 'pharmacy-membership',      label: '내 매장 신청',   subPath: '/pharmacy/membership' },
   ]},
 ];

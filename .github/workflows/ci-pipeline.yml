@@ -553,6 +553,9 @@ jobs:
         echo "🔨 dependency closure: ${FILTERS[*]}"
         pnpm "${FILTERS[@]}" run build
         for d in "${DIRS[@]}"; do
+          if [[ "$d" == "services/web-store" ]]; then
+            pnpm --filter store-web test
+          fi
           echo "::group::vite build ${d}"
           start=$(date +%s)
           (cd "$d" && npx vite build --outDir "$RUNNER_TEMP/web-build/$(basename "$d")" --emptyOutDir)

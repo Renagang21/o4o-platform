@@ -98,9 +98,15 @@ async function assertNotDemoMember(manager: KpaMemberResolveRunner, userId: stri
   }
 }
 
+/** Common denial for membership lifecycle operations reserved to the service admin. */
+function memberAdminRequired(): MemberInfoAbort {
+  return new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '서비스 관리자 권한이 필요합니다.');
+}
+
 async function resolveKpaMemberByAnyId(
   manager: KpaMemberResolveRunner,
   id: string,
+  applicationOnly = false,
 ): Promise<{ member: KpaMember; ensured: boolean }> {
   // 1) kpa_members.id
   const byMemberId = await manager.findMember({ id });
@@ -122,6 +128,9 @@ async function resolveKpaMemberByAnyId(
     throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
   }
   const sm = smRows[0];
+  if (applicationOnly && !['pending', 'rejected'].includes(sm.status)) {
+    throw memberAdminRequired();
+  }
   await assertNotDemoMember(manager, sm.user_id);
 
   // 3) 같은 user 의 kpa_members row (sm.id ≠ km.id 인 경우 포함)
@@ -654,11 +663,17 @@ export function createMemberController(
         //   (service_memberships 만 존재)의 상태 변경이 항상 404 였다.
         //   PATCH /:id/info 와 동일한 skeleton ensure 정책으로 수렴한다.
         const warnings: string[] = [];
+        const newStatus = req.body.status;
+        const canAdministerMembers = req.user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
+        if (!canAdministerMembers && !['active', 'rejected'].includes(newStatus)) {
+          throw memberAdminRequired();
+        }
         let resolvedMember: { member: KpaMember; ensured: boolean };
         try {
           resolvedMember = await resolveKpaMemberByAnyId(
             resolveRunnerFromDataSource(dataSource),
             req.params.id,
+            !canAdministerMembers,
           );
         } catch (resolveError) {
           if (resolveError instanceof MemberInfoAbort) {
@@ -673,7 +688,11 @@ export function createMemberController(
         if (resolvedMember.ensured) warnings.push(KPA_MEMBER_ENSURED_WARNING);
 
         const oldStatus = member.status;
-        const newStatus = req.body.status;
+        const applicationDecision = (oldStatus === 'pending' || oldStatus === 'rejected') && ['active', 'rejected'].includes(newStatus);
+        if (!canAdministerMembers && !applicationDecision) {
+          throw memberAdminRequired();
+        }
+
         member.status = newStatus;
 
         // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
@@ -720,9 +739,19 @@ export function createMemberController(
         //   (동일 manager 이므로 FOR UPDATE 행 잠금도 같은 transaction 안에서 성립).
         //   상태 의미 · 권한 규칙 · 응답 계약은 변경하지 않는다.
         // ============================================================
-        const isApprovalTransition = oldStatus === 'pending' && newStatus === 'active';
+        const isApprovalTransition = ['pending', 'rejected'].includes(oldStatus) && newStatus === 'active';
 
         const saved = await dataSource.transaction(async (manager) => {
+          if (!canAdministerMembers) {
+            const [current] = await manager.query(
+              `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society' FOR UPDATE`,
+              [member.user_id],
+            );
+            if (!current || !['pending', 'rejected'].includes(current.status) || !['active', 'rejected'].includes(newStatus)) {
+              throw memberAdminRequired();
+            }
+          }
+
           if (!isApprovalTransition) {
             const approvalService = new MembershipApprovalService();
             if (newStatus === 'suspended' || newStatus === 'rejected') {
@@ -744,7 +773,7 @@ export function createMemberController(
                 serviceKeys: ['kpa-society'],
                 manager,
               });
-            } else if (oldStatus === 'suspended' && newStatus === 'active') {
+            } else if (['suspended', 'withdrawn'].includes(oldStatus) && newStatus === 'active') {
               // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
               await approvalService.reactivateMembership({
                 userId: member.user_id,
@@ -762,15 +791,7 @@ export function createMemberController(
           if (isApprovalTransition) {
             // ============================================================
             // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1 + WO-KPA-A-ROLE-CLEANUP-V1
-            // users.status/isActive via raw SQL (ESM rule compliance)
-            // kpa:pharmacist / kpa:student role 할당 제거 — profile 기반 전환
-            // ============================================================
-            await manager.query(
-              `UPDATE users
-               SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
-               WHERE id = $1`,
-              [member.user_id, req.user!.id]
-            );
+            // Shared account state is managed centrally, not by service membership approval.
             // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: 약사/약대생만 처리
             const mType = member.membership_type;
             if (mType === 'student' || mType === 'pharmacy_student_member') {
@@ -801,7 +822,7 @@ export function createMemberController(
             await manager.query(
               `UPDATE service_memberships
                SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
-               WHERE user_id = $1 AND service_key = 'kpa-society' AND status = 'pending'`,
+               WHERE user_id = $1 AND service_key = 'kpa-society' AND status IN ('pending', 'rejected')`,
               [member.user_id, req.user!.id]
             );
           }
@@ -922,7 +943,7 @@ export function createMemberController(
                   suspendedDate: decidedAt,
                 });
                 console.error(`[KPA Email] Suspension sent to ${recipientEmail} (member: ${member.id})`);
-              } else if (oldStatus === 'suspended' && newStatus === 'active') {
+              } else if (['suspended', 'withdrawn'].includes(oldStatus) && newStatus === 'active') {
                 await emailService.sendAccountReactivationEmail(recipientEmail, {
                   userName: recipientName,
                   reactivatedDate: decidedAt,
@@ -942,6 +963,11 @@ export function createMemberController(
           ...(warnings.length > 0 ? { warnings } : {}),
         });
       } catch (error: any) {
+        if (error instanceof MemberInfoAbort) {
+          res.status(error.status).json({ error: { code: error.code, message: error.message } });
+          return;
+        }
+
         console.error('Failed to update member status:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -1195,6 +1221,10 @@ export function createMemberController(
 
           // kpa_members 필드 업데이트
           const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
+          if (membership_type && membership_type !== member.membership_type
+            && !(req as any).user?.roles?.some((role: string) => role === 'kpa:admin' || role === 'platform:super_admin')) {
+            throw new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '회원 유형 변경은 서비스 관리자만 가능합니다.');
+          }
           if (membership_type && validMembershipTypes.includes(membership_type)) {
             changes.membership_type = membership_type;
             member.membership_type = membership_type;
@@ -1452,7 +1482,7 @@ export function createMemberController(
   router.delete(
     '/:id',
     requireAuth,
-    requireScope('kpa:operator'),   // soft delete는 operator 허용; hard delete는 아래에서 admin 체크
+    requireScope('kpa:admin'), // Service withdrawal/removal is admin-only.
     param('id').isUUID(),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
@@ -1595,7 +1625,8 @@ export function createMemberController(
 
           // role_assignments: kpa: prefix 역할만 삭제
           await queryRunner.query(
-            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE 'kpa:%'`,
+            `DELETE FROM role_assignments WHERE user_id = $1 AND role LIKE 'kpa:%'
+               AND LOWER(TRIM(role)) !~ '(^|:)(admin|operator|super_admin)$'`,
             [member.user_id]
           );
 

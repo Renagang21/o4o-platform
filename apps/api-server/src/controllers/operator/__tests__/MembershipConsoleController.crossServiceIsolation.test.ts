@@ -251,13 +251,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       await controller.updateMemberStatus(makeReq('approved'), res);
 
-      const writes = usersWrites();
-      expect(writes).toHaveLength(1);
-      // 활성화 방향만 허용 — 비활성화는 없어야 한다
-      expect(writes[0]).not.toMatch(/"isActive" = false/);
-      // approveMembership STEP2 와 동일한 화이트리스트 → 'suspended' 제외
-      expect(writes[0]).toContain("status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')");
-      expect(writes[0]).not.toContain("'suspended'");
+      expect(usersWrites()).toEqual([]);
     });
   });
 

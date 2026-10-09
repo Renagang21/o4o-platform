@@ -223,9 +223,10 @@ describe('services/web-store 조립 계층 (WO §3-①·⑥)', () => {
     expect(readRepo('services/web-store/src/lib/storeSelection.ts')).toContain('sessionStorage');
   });
 
-  it('root nav는 HUB를 제외한 상위 5개다', () => {
+  it('root nav는 홈·내 매장·이용 사업·설정이며 기존 업무 도구는 설정에서 접근한다', () => {
     const keys = [...workspace.matchAll(/key: '([a-z-]+)', label:/g)].map((m) => m[1]);
-    expect(keys).toEqual(['home', 'my-store', 'service-work', 'my-services', 'settings']);
+    expect(keys).toEqual(['home', 'my-store', 'my-services', 'settings']);
+    expect(readRepo('services/web-store/src/pages/SettingsPage.tsx')).toContain('to={WORKSPACE_PATHS.serviceWork}');
   });
 
   // K-Cosmetics 앱은 퇴역 삭제(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1) — 남은 두 서비스만 본다.
