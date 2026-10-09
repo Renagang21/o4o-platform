@@ -55,5 +55,5 @@ export default function HandoffPage() {
     })();
   }, []);
   if (!error) return <main className="center-card"><section className="card"><h1>{BRAND.name}</h1><p>매장 업무공간으로 이동 중...</p></section></main>;
-  return <main className="center-card"><section className="card"><h1>이동 실패</h1><p>{error}</p><a className="button-link" href={PLATFORM_ORIGIN}>Neture로 돌아가기</a></section></main>;
+  return <main className="center-card"><section className="card"><h1>이동 실패</h1><p>{error}</p><a className="button-link" href={PLATFORM_ORIGIN}>O4O 메인으로</a></section></main>;
 }

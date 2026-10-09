@@ -111,6 +111,7 @@ export default function HandoffPage() {
         <div style={styles.card}>
           <p style={styles.errorText}>{error}</p>
           <a href={`${basename}/login`} style={styles.link}>로그인 페이지로 이동</a>
+          <p><a href="https://neture.co.kr/" style={styles.link}>O4O 메인으로</a></p>
         </div>
       </div>
     );

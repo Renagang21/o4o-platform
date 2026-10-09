@@ -56,13 +56,14 @@ export default function HandoffPage() {
       <div className="actions">
         <a className="button-link" href={backToPublic ? returnTo : '/courses'}>{backToPublic ? '보던 화면으로 돌아가기' : '공개 강의 둘러보기'}</a>
         <a className="secondary-link" href={INQUIRY_URL}>이용 문의하기</a>
+        <a className="secondary-link" href="https://neture.co.kr/">O4O 메인으로</a>
       </div>
     </section></main>;
   }
   return <main className="center-card"><section className="card"><h1>서비스 이동 실패</h1><p>{error}</p>
     <div className="actions">
       {code === 'HANDOFF_TOKEN_INVALID' && <a className="button-link" href={`/login?returnTo=${encodeURIComponent(returnTo)}`}>다시 로그인</a>}
-      <a className={code === 'HANDOFF_TOKEN_INVALID' ? 'secondary-link' : 'button-link'} href="https://neture.co.kr">Neture로 돌아가기</a>
+      <a className={code === 'HANDOFF_TOKEN_INVALID' ? 'secondary-link' : 'button-link'} href="https://neture.co.kr">O4O 메인으로</a>
     </div>
   </section></main>;
 }

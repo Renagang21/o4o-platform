@@ -145,7 +145,7 @@ export function PolicyAcceptanceGate({
         <p style={S.eyebrow}>{serviceName ? `${serviceName} · ` : ''}{agreementLabel} 동의</p>
         <h1 id="policy-acceptance-title" style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</h1>
         <p style={S.lead}>
-          {leadText ?? `서비스를 계속 이용하려면 아래 ${agreementLabel}을(를) 확인하고 동의해야 합니다. 동의하기 전까지는 계약 열람, 문의, 로그아웃만 이용할 수 있습니다.`}
+          {leadText ?? `서비스를 계속 이용하려면 아래 ${agreementLabel}을(를) 확인하고 동의해야 합니다. 동의하기 전까지는 계약 열람, 문의, O4O 메인 복귀, 로그아웃만 이용할 수 있습니다.`}
           {services.length > 1 && (
             <> 이 약관은 회원님이 가입한 {services.join(' · ')} 서비스에 공통으로 적용되며, 한 번의 동의로 함께 처리됩니다.</>
           )}
@@ -192,6 +192,8 @@ export function PolicyAcceptanceGate({
           <button type="button" style={S.secondary} onClick={() => { void onLogout(); }} disabled={submitting}>
             로그아웃
           </button>
+          {/* Pending terms block handoff; public return does not accept terms or end the session. */}
+          <a href="https://neture.co.kr/" style={S.secondary}>O4O 메인으로</a>
           {termsPath && (
             <a href={termsPath} target="_blank" rel="noopener noreferrer" style={S.link}>
               약관 전문 새 탭에서 보기
