@@ -99,6 +99,7 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
       expect(touches('semi_franchise_memberships')).toBe(false);
       // Neture 원장만 active 로 바꾼다
       expect(touches("UPDATE service_memberships")).toBe(true);
+      expect(touches("UPDATE users")).toBe(false);
       expect(state.committed).toBe(true);
       expect(state.rolledBack).toBe(false);
     },

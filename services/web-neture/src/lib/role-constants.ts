@@ -143,6 +143,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   // 개설 심사 · 개별 커뮤니티 운영자 지정 — Admin 전용 지정 업무는 이 화면에서 수행한다.
   { path: '/admin/communities', key: 'community', level: 'admin' },
   { path: '/operator/communities', key: 'community', level: 'operator' },
+  { path: '/operator/service-members/supplier', key: 'supplier', level: 'operator' },
+  { path: '/operator/service-members/funding', key: 'funding', level: 'operator' },
+  { path: '/operator/service-members/community', key: 'community', level: 'operator' },
 ]);
 
 const hasAny = (roles: readonly string[] | undefined | null, allowed: string[]) =>

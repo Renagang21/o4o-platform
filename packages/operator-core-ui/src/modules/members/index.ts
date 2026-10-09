@@ -48,3 +48,5 @@ export type {
 // WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1
 export { OperatorMemberSoftDeleteFlow } from './OperatorMemberSoftDeleteFlow';
 export type { OperatorMemberSoftDeleteFlowProps } from './OperatorMemberSoftDeleteFlow';
+
+export { ServiceMembersWorkspace } from './ServiceMembersWorkspace';

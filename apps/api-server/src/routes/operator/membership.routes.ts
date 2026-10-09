@@ -9,6 +9,7 @@
 import { Router } from 'express';
 import { MembershipConsoleController } from '../../controllers/operator/MembershipConsoleController.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
+import { memberManagementPolicy, requireActiveOperatorScope } from '../../middleware/member-management-policy.middleware.js';
 import { injectOperatorServiceScope } from '../../utils/serviceScope.js';
 
 const router: Router = Router();
@@ -47,6 +48,8 @@ router.use(requireRole([
   'funding:admin', 'funding:operator',
 ]));
 router.use(injectOperatorServiceScope);
+router.use(requireActiveOperatorScope);
+router.use(memberManagementPolicy);
 
 // Member list with memberships + roles
 router.get('/', controller.getMembers);

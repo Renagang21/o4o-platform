@@ -153,6 +153,7 @@ export function OperatorMembersConsolePage({
   syncUrl = false,
   // WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
   consoleMode = 'members',
+  canManageLifecycle = false,
   rejectReason,
   fullDetailHref,
 }: OperatorMembersConsolePageProps) {
@@ -161,7 +162,7 @@ export function OperatorMembersConsolePage({
 
   /** 각 affordance 는 승인 전용 모드 + client/slot 존재 여부로 함께 결정한다. */
   const canEdit = !isApprovalOnly && !!renderEditModal;
-  const canDelete = !isApprovalOnly && !!renderDeleteFlow;
+  const canDelete = canManageLifecycle && !isApprovalOnly && !!renderDeleteFlow;
   const canBulk = !isApprovalOnly && !!client.batchUpdateStatus;
   const showStats = !isApprovalOnly && !!client.stats;
   const getPrimaryRole = useMemo(
@@ -667,7 +668,7 @@ export function OperatorMembersConsolePage({
         disabled: isLoading,
       });
     }
-    if (u.status === 'active' || u.status === 'approved') {
+    if (canManageLifecycle && (u.status === 'active' || u.status === 'approved')) {
       actions.push({
         label: '비활성화',
         onClick: () => handleStatusChange(u.id, 'suspended', u.status, u),
@@ -676,7 +677,7 @@ export function OperatorMembersConsolePage({
         disabled: isLoading,
       });
     }
-    if (u.status === 'suspended') {
+    if (canManageLifecycle && u.status === 'suspended') {
       actions.push({
         label: '활성화',
         onClick: () => handleStatusChange(u.id, 'approved', u.status, u),
@@ -687,7 +688,7 @@ export function OperatorMembersConsolePage({
     }
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUser, actionLoading, isApprovalOnly, rejectReason, rejectReasonText]);
+  }, [selectedUser, actionLoading, isApprovalOnly, canManageLifecycle, rejectReason, rejectReasonText]);
 
   // ─── Render ─────────────────────────────────────────────────
 
@@ -1018,7 +1019,7 @@ export function OperatorMembersConsolePage({
         })}
 
       {/* Delete Flow — service-provided slot */}
-      {deleteTarget &&
+      {canManageLifecycle && deleteTarget &&
         renderDeleteFlow &&
         renderDeleteFlow({
           user: deleteTarget,
