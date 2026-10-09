@@ -48,3 +48,42 @@ before/after와 최신 의존 관계를 확인한 후 승인된 migration 경로
 CI·merge·배포·운영 결과는 아래에 실제 실행 후 추가한다. 같은 서브도메인의 다른 브라우저
 refresh 폐기 문제는 별도 세션 변경이 필요하며 이 migration으로 해결되지 않는다.
 Pharmacy-Hub는 사용자 지정 삭제 대상이라 smoke에서 제외한다. 유지하는 약국 서비스는 포함한다.
+
+## 2026-10-09 KST — 실제 통합·운영 복구·배포
+
+- PR #365 main merge `3e7f44c38cee7aa2eacf069d5eedcdf07c7bbaad` 및
+  [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/37859526883) 성공으로 API·Neture 진입 수정 배포.
+- PR #367 main merge `67a1ac4449206146f451609f53d5273d0dd557d3`, main CI 성공.
+  L3 migration 승인 경로의 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/37861774781)가
+  database migrations·revision readiness·traffic switch·serving SHA 검증을 모두 통과했다.
+  운영 복구와 API 배포는 실제 실행됐다. 앞 절의 대기 상태는 작성 당시 기록이다.
+- 운영 Demo 버튼으로 확인한 매장 후보 1개, 약국 capabilities/info 모두 200.
+  메인 매장 Demo가 Store로 이동해 `403 STORE_OWNER_REQUIRED` 재현 없이 업무 API를 이용했다.
+- 공급자 Demo의 재사용 상품 offer 5개 확인. 샘플 자료 출처가 비어 있어 기존 일반
+  공급자 자료 작성 API로 해당 상품의 안내 문서 1개를 비공개 personal로 만들었다(201).
+  다른 공급자의 비공개 자료를 복사하지 않았다.
+
+## 2026-10-09 KST — 전체 서비스 smoke 중 발견한 회귀
+
+유지하는 사용자 서비스 8개(Neture·공급자·커뮤니티·펀딩·약국·Store·강의·약사회 분회)의
+로그인 화면에서 두 Demo 버튼을 확인했다. 전체관리자는 공개 Demo 대상이 아니다.
+
+공급자 상품 API는 query 없는 조회에서 5건·200이었지만 실제 UI가 사용하는
+`GET /api/v1/neture/supplier/products?page=1&limit=20`에서는 500이었다.
+재사용 master의 tags에 과거 객체와 배열이 혼재하며 completeness SQL이 객체에도
+`jsonb_array_length`를 호출했다. 배열 타입을 CASE로 확인한 뒤 길이를 계산하도록 최소 수정한다.
+원본 master·가격·승인·공개 정책은 변경하지 않는다.
+
+약국 Demo의 첫 테스트는 handoff 완료 대기 시간 부족으로 실패했다. 실제 추가 추적에서는
+workspace handoff 발급·교환 모두 200, Store의 KPA 업무 경로로 이동, 업무 API 200을 확인했다.
+테스트를 실제 이동·인증 완료까지 기다리도록 보완하며 별도 frontend 수정은 하지 않는다.
+
+공급자 수정의 로컬 검증: 실제 격리 PostgreSQL에서 객체·문자열·JSON null·SQL NULL·빈 배열·
+비어 있지 않은 배열의 페이지 조회와 completeness 정렬/필터 등 7개 검증 통과.
+기존 master 직접 연결 회귀 44개와 합계 51개 통과. 명시 fixture port 없는 CI에서는
+DB 통합 7개가 skipped이며 로컬 실행 결과와 구분한다. API type-check 통과.
+
+추가 수정은 onboarding skill의 기존 격리 checkout 예외에 따라 별도 worktree 없이 최신 main의
+`wo/auth-demo-smoke-regressions`에서 작업한다. 사용자가 승인한 통합·배포 범위의 발견 회귀이며,
+필수 CI·review와 최신 main 확인 후 PR merge 경로를 사용한다. 수정 배포와 PC·모바일 전체
+서비스 최종 결과는 실제 실행 후 덧붙인다. 현재 전체 PASS로 판정하지 않는다.
