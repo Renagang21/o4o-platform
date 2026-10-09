@@ -20,7 +20,8 @@
 - [x] 공통 상세·수정 화면의 serviceKey 전달 정비
 - [x] 역할 해제·강등·다중 서비스·범위 외 수정 회귀 테스트
 - [x] 관련 테스트·타입 검사·공통 패키지 빌드·문서 정합 검증
-- [ ] 변경 범위 점검·커밋·작업 브랜치 push·PR 준비
+- [x] 변경 범위 점검·커밋·작업 브랜치 push·PR 준비
+- [ ] PR의 required CI 및 review blocker 확인
 
 ## 소비처와 추가 조사 결과
 
@@ -63,3 +64,7 @@ Neture 빌드의 기존 Browserslist·chunk 크기 경고는 빌드를 차단하
 작업 브랜치: `wo/service-operator-membership-plan`.
 main 병합·배포는 실행하지 않는다. PR required check는 현재 ruleset의 `CI Gate`다.
 작업 worktree는 PR 미병합 상태에서 KEEP한다.
+
+PR: [#371](https://github.com/Renagang21/o4o-platform/pull/371).
+코드 커밋 `ce84c6ddc6`은 최신 main `0f8535d6b1` 기준으로 작업 브랜치에 push되었다.
+로컬 검증은 완료했으며, 최종 PR CI·review 상태는 실행 후 확인한다.
