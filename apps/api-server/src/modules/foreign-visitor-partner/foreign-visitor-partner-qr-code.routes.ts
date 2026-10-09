@@ -34,10 +34,8 @@ import { ForeignVisitorPartnerQrCodeService } from './foreign-visitor-partner-qr
 import { ForeignVisitorPartnerQrScanEventService, hashWithSalt } from './foreign-visitor-partner-qr-scan-event.service.js';
 import { FOREIGN_VISITOR_QR_STATUSES, type ForeignVisitorQrStatus } from './foreign-visitor-partner-qr-code.entity.js';
 
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-//   serviceKey allowlist 확장만으로 PharmacyHub 를 수용한다 (분기·복제 없음).
-//   원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 — 기존 3서비스 동작 불변.
-const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub'];
+// 퇴역 PH를 공통 QR capability로 다시 열지 않는다.
+const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics'];
 const GATE_PLAN_CODE = 'FOREIGN_VISITOR_SALES_SUPPORT' as const;
 
 function isValidStatus(v: unknown): v is ForeignVisitorQrStatus {
@@ -285,7 +283,7 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
         return res.status(404).json({ success: false, error: 'Not found', code: 'AFFILIATE_QR_NOT_FOUND' });
       }
       const qr = await qrService.resolvePublicByShortCode(shortCode);
-      if (!qr) {
+      if (!qr || qr.serviceKey === 'pharmacy-hub') {
         return res.status(404).json({ success: false, error: 'Not found', code: 'AFFILIATE_QR_NOT_FOUND' });
       }
       // 조직명(storeName) + store slug — 공개 landing 표시/연결용(둘 다 graceful, 없으면 null).

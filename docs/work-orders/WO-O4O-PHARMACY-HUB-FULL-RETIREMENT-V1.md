@@ -18,7 +18,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 |---|---|---|
 | R01 | PH 웹·API 제거 | `web-pharmacy-hub`, 전용 라우터·컨트롤러·scope·생성 코드 삭제; `/api/v1/pharmacy-hub` 미등록 |
 | R02 | 내 매장 PH 문맥 제거 | PH route·API adapter·메뉴·공개 origin·서비스 선택 분기 제거; 현재 약국 원장과 KPA 공통 구현은 유지 |
-| R03 | 신규 PH 진입 제거 | 서비스 catalog·CORS·운영자 부여 목록·공급자 PH 설정 경로 제거; 독립 약사 포럼의 저장 코드는 보존 |
+| R03 | 신규 PH 진입·공통 쓰기 제거 | 서비스 catalog·CORS·운영자 부여·공급자 PH 설정 제거; 공통 Store owner/member·이용권·QR·CMS 쓰기에서도 PH 차단. 독립 약사 포럼 저장 코드·기존 주문 후속 처리 보존 |
 | R04 | PH 재배포 제거 | CD registry·workflow job·lockfile importer 정리; 다른 웹·API·병원약국 배포 유지 |
 | R05 | 운영 인프라 제거 준비·실행 | 실제 PH host rule·NEG·backend·Cloud Run·DNS·인증서 조사 후 PH 전용 자원만 제거; 공유 LB·IP·인증서의 다른 호스트 보호 |
 | R06 | 회귀 검증 | 변경 소비처 type-check/build, API focused tests, CD detector tests; PH 원장 조회·Store·공급자·커뮤니티 권한 보호 |
@@ -30,6 +30,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 내 매장은 아직 PH 공통 API 문맥을 선택할 수 있고, PH 결제 복귀 화면도 별도로 남아 있다. 이 참조부터 함께 제거한다.
 - 공급자 공통 주문 목록은 `pharmacy-hub` 원장 키를 조회해 기존 주문을 처리한다. 이 조회 집합에서 키를 빼면 기존 주문이 사라지므로 유지한다.
 - 독립 약사 커뮤니티는 `pharmacy-hub` 저장 코드의 글도 읽는다. 저장 코드는 유지하고 PH 웹 진입 metadata만 제거한다.
+- 공통 이용권 결제·외국인 파트너·QR과 CMS가 과거 PH 역할/가입으로 신규 쓰기를 허용하고 있었다. 공통 Store owner/member 접근과 PH 역할 발급, PH 이용권 결제·활성화·자산 생성·CMS 생성/수정/상태 전이/슬롯 쓰기를 차단한다. 기존 이용권·CMS GET과 공급자 주문 원장 조회는 유지한다. 현재 매장에 PH 과거 linkage가 함께 남아도 PH 역할은 발급하지 않으며 PH 전용 초대는 활성화하지 않는다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
 

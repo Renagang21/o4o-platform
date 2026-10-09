@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · 검토 중 main: `70f9355935`(PR #372) · branch: `wo/pharmacy-hub-full-retirement-v1`
 
 ## 1. 결과와 남은 실행
 
@@ -21,6 +21,7 @@
 
 - 삭제: `services/web-pharmacy-hub`, PH 전용 controllers/routes/scope/signup/provisioning/cart wrapper, Store의 `/work/pharmacy-hub`·결제 복귀·API adapter·메뉴, 공통 legacy PH handoff와 StoreOwnerGuard 설정, 공급자 PH 제공 설정의 API·화면.
 - 신규 진입 차단: 서비스 catalog·public origin·session origin·서비스 약관 범위·Store membership 대상·운영자 부여 목록·공급자 콘텐츠 제공 대상에서 PH 제거.
+- 공통 쓰기 차단: PH owner/member 역할로 공통 Store에 진입하거나 이용권 결제·활성화, 외국인 파트너/QR 자산, CMS 콘텐츠/슬롯을 생성·수정·전이할 수 없다. PH 역할은 과거 회수 식별자로만 남는다. 초대 수락은 PH role을 발급하지 않고 PH 전용 초대는 관계를 활성화하지 않는다. 과거 PH QR의 신규 scan event도 생성하지 않는다.
 - 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
 - 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
 - 운영 DB write·schema/migration 변경 없음. 상품의 기존 PH `service_keys`를 지워 기본 공급으로 전환하는 backfill이나 테스트 데이터 삭제 없음.
@@ -36,20 +37,22 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·추가 PH 참조·리뷰 보완 API Jest | **196 suites · 3,832 tests PASS** · 198 suites 중 DB integration 2개 SKIP |
+| 변경 소비처·추가 PH 참조·공통 쓰기/권한 리뷰 보완 API Jest | **213 suites · 4,128 tests PASS** · 216 suites 중 DB integration 3개 SKIP |
 | 최신 main(PR #370) 반영 후 Neture Vitest | **45 files · 371 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
 | 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
 | CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **332 tests PASS** · CI blocking Node 목록 전체 |
 | `git diff --check` | PASS |
-| 문서 민감정보 검사 | PASS · 6 files · 패턴 0건 |
+| 문서 민감정보 검사 | PASS · 8 files · 패턴 0건 |
 
 PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec은 삭제했고, 여러 서비스가 공유하는 spec은 PH 사례만 제외했다. 현재 대상의 가입 상태 유지·권한 차단·조직 경계·공급자 원장·독립 약사 포럼 검증은 유지했다. 새 퇴역 spec은 PH origin/역할/Store 문맥/신규 콘텐츠 제공을 막고 현재 서비스 및 기존 원장 조회가 유지되는지 검사한다. URL map planner는 혼합 host rule·공유 matcher/backend·weighted backend·잘못된 matcher를 검증하며 PH를 다른 호스트로 리다이렉트하지 않는다.
 
 ## 4. 문서 정합
 
 현행 commerce DESIGN §16과 서브도메인 의미 정본 §2-2를 사용자 결정으로 갱신했다. PH 모델 baseline에는 대체된 기준을 명시했고 B2B 주문 계약에는 PH 신규 producer/API 퇴역과 기존 결제 완료·원장 조회 보존의 차이를 정정했다. 과거 WO·CHECK의 당시 배포 결과는 덮어쓰지 않는다. 이 CHECK는 실제 운영 삭제 완료를 주장하지 않는다.
+
+Store 접근 정본과 Store Owner RBAC §3.1/§3.1-A도 정정했다. PH 역할 이름·linkage가 원장/회수 규약에 남아 있어도 현재 접근·발급 목록에는 없다는 점을 명시한다.
 
 ## 5. PR 리뷰와 전체 CI 보완
 
@@ -60,3 +63,7 @@ PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec�
 보완의 확장 API 3,832건과 type-check가 통과했다. required CI/Codex 재검증 상태는 PR에서 확인한다. 첫 HEAD의 CI 실패를 최종 성공으로 표시하지 않는다.
 
 두 번째 HEAD `3f36b3b5d9`의 리뷰는 URL map 검증 테스트의 PH 호스트도 제거해야 한다고 지적했다. planner가 PH root/www/하위 호스트의 테스트를 함께 제거하고 다른 호스트의 테스트는 유지하도록 보완했다. 테스트의 기대 backend는 실제 라우팅 참조에서 제외한다. 신규 회귀 2건을 포함해 planner 8건과 blocking Node 검사 전체 332건을 검증했다. 이는 로컬 초안 생성 검증이며 실제 GCP import·삭제를 수행한 결과가 아니다.
+
+세 번째 HEAD `c1b5980367`은 CI Gate·SonarCloud·CodeQL을 통과했지만 리뷰가 공통 매장/CMS의 PH 신규 쓰기 잔여를 지적했다. UI 제거만으로 이 API들을 종료하지 못했던 문제를 보완했다. 직접 HTTP 호출에서 기존 PH 회원·운영자·전체 관리자도 PH 콘텐츠를 생성·수정·전이하지 못하고, 신규 이용권 결제/활성화·파트너·QR 생성도 차단되는지 검사한다. CMS 슬롯 GET·기존 이용권 GET은 유지한다. 현재 서비스의 owner/member·초대 수락과 PH 전용 초대/역할 발급 차단도 함께 검증한다. 이 보완 후 최신 커밋의 required CI/Codex를 다시 확인하며 이전 HEAD 성공으로 대체하지 않는다.
+
+검토 중 main에 PR #372의 커뮤니티 운영자 분리가 통합됐다. `git merge-tree --write-tree HEAD origin/main`으로 충돌 없는 결합을 확인했다. 작업 branch를 자동으로 main과 합치지 않으며 사용자 통합 승인 후 최신 main을 merge하고 필요한 검증을 다시 수행한다.

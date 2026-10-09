@@ -26,10 +26,8 @@ import {
   type ForeignVisitorPartnerStatus,
 } from './foreign-visitor-partner.entity.js';
 
-// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
-//   serviceKey allowlist 확장만으로 PharmacyHub 를 수용한다 (분기·복제 없음).
-//   원장/권한 해석은 공통 isStoreOwner(serviceKey) 그대로 — 기존 3서비스 동작 불변.
-const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub'];
+// 퇴역 PH를 공통 매장 capability로 다시 열지 않는다.
+const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'cosmetics'];
 const GATE_PLAN_CODE = 'FOREIGN_VISITOR_SALES_SUPPORT' as const;
 
 function isValidType(v: unknown): v is ForeignVisitorPartnerType {

@@ -25,10 +25,6 @@ router.use(requireRole([
   'neture:admin', 'neture:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa:admin', 'kpa:operator',
-  // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
-  //   공통 API 는 이미 service scope 로 격리되는데 allowlist 에만 pharmacy-hub 가 빠져 있었다.
-  //   (injectServiceScope 가 'pharmacy-hub' 를 self-map 하므로 데이터 경계는 그대로다.)
-  'pharmacy-hub:admin', 'pharmacy-hub:operator',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §7:
   //   study.neture.co.kr(= `lecture`) 와 커뮤니티에는 가입 승인 경로가 없었다. 두 서비스도
   //   service_memberships 로 가입을 판정하는데 이 allowlist 에만 빠져 있어서, 자기 서비스의

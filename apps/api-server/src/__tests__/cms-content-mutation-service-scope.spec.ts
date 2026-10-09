@@ -23,7 +23,10 @@ import request from 'supertest';
 jest.mock('../middleware/auth.middleware.js', () => ({
   requireAuth: (req: any, _res: any, next: any) => {
     const roles = req.headers['x-test-roles'];
-    if (typeof roles === 'string') req.user = { id: 'u-1', roles: roles ? roles.split(',') : [] };
+    if (typeof roles === 'string') req.user = {
+      id: 'u-1', roles: roles ? roles.split(',') : [],
+      memberships: [{ serviceKey: 'pharmacy-hub', status: 'active' }],
+    };
     next();
   },
 }));
@@ -183,11 +186,11 @@ describe('§10 create 계약 — 신규 row 는 canonical service key 로 저장
     expect(saved.serviceKey).toBe('k-cosmetics');
   });
 
-  it('self-map 서비스(PH)는 그대로 저장된다 (회귀 0)', async () => {
-    expect((await post(PH_OP, { serviceKey: 'pharmacy-hub', type: 'notice', title: 't' })).status).toBe(201);
-    expect(saved.serviceKey).toBe('pharmacy-hub');
-    expect((await post(PH_OP, { serviceKey: 'pharmacy-hub', type: 'knowledge', title: 't' })).status).toBe(201);
-    expect(saved.serviceKey).toBe('pharmacy-hub');
+  it.each([PH_OP, 'pharmacy-hub:admin', PLATFORM_ADMIN, ''])('퇴역 PH에는 %s 역할·활성 회원이어도 신규 콘텐츠를 저장하지 않는다', async (roles) => {
+    for (const type of ['notice', 'knowledge']) {
+      expect((await post(roles, { serviceKey: 'pharmacy-hub', type, title: 't' })).status).toBe(403);
+      expect(saved).toBeNull();
+    }
   });
 
   it('platform admin 이 legacy 축으로 보내도 canonical 로 수렴한다', async () => {
@@ -236,7 +239,7 @@ describe('§11 service ownership 이전', () => {
 });
 
 describe('§13 platform admin 계약 유지', () => {
-  it.each(['kpa-canon', 'kpa-legacy', 'ph2', 'kcos-canon', 'global'])(
+  it.each(['kpa-canon', 'kpa-legacy', 'kcos-canon', 'global'])(
     'cross-service PUT %s → 200',
     async (id) => {
       expect((await put(id, PLATFORM_ADMIN)).status).toBe(200);
@@ -244,14 +247,26 @@ describe('§13 platform admin 계약 유지', () => {
   );
 
   it('cross-service lifecycle → 200', async () => {
-    expect((await patchStatus('ph2', PLATFORM_ADMIN)).status).toBe(200);
+    expect((await patchStatus('kcos-canon', PLATFORM_ADMIN)).status).toBe(200);
   });
 
   it('platform admin 은 serviceKey 를 타 서비스로 이전할 수 있다 (canonical 저장)', async () => {
-    const res = await put('ph2', PLATFORM_ADMIN, { title: 't', serviceKey: 'kpa' });
+    const res = await put('kcos-canon', PLATFORM_ADMIN, { title: 't', serviceKey: 'kpa' });
     expect(res.status).toBe(200);
     expect(saved.serviceKey).toBe('kpa-society');
   });
+
+  it('platform admin도 기존 콘텐츠를 퇴역 PH로 옮길 수 없다', async () => {
+    expect((await put('kpa-canon', PLATFORM_ADMIN, { serviceKey: 'pharmacy-hub' })).status).toBe(403);
+    expect(saved).toBeNull();
+  });
+});
+
+it.each([PH_OP, 'pharmacy-hub:admin', PLATFORM_ADMIN, ''])('퇴역 PH 원장은 %s 역할·활성 회원도 수정·전이할 수 없다', async (roles) => {
+  expect((await put('ph2', roles)).status).toBe(403);
+  expect(saved).toBeNull();
+  expect((await patchStatus('ph2', roles)).status).toBe(403);
+  expect(transitioned).toBeNull();
 });
 
 describe('비인가 / 비인증 계약 유지', () => {

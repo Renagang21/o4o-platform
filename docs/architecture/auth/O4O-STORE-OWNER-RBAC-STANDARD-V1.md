@@ -1,6 +1,6 @@
 # O4O STORE OWNER RBAC STANDARD V1
 
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (내부 모순 정합 — 접근 판정은 Role ∧ Relationship([STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)), `role_assignments` 는 Authorization SSOT 로 유지. §2.1 · §4 · §5 · §8 에 `2026-10-04 정합` 주석)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-09 (PH runtime owner/member capability·신규 발급 퇴역. 과거 원장·역할 회수 식별자는 유지. 접근 정본은 [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md))
 
 ## 1. 목적
 
@@ -49,17 +49,13 @@ store_owner는 매장 운영 기능을 사용할 수 있는 권한이다.
 
 ### 3.1 서비스별 store_owner
 
-공통 role 게이트(`isStoreOwner()`)가 아는 role 은 **이 3종이 전부**다 —
+공통 role 게이트(`isStoreOwner()`)의 현재 등록은 아래 2개 서비스이며, 약국은 `neture:store_owner`와 내 매장 신청 원장도 사용한다.
 런타임 정본은 `apps/api-server/src/utils/store-owner.utils.ts` 의 `STORE_OWNER_ROLES_BY_SERVICE` 다.
 
 - `kpa:store_owner`
 - `cosmetics:store_owner`
-- `pharmacy-hub:store_owner`
 
-`pharmacy-hub:store_owner` 는 2026-10-04 이 목록에 합류한 것이 아니라 **처음부터 registry 에 있었고**
-이 문서만 2종으로 적고 있었다(§3.4 각주에만 언급). 등록 누락은 실제로 사고가 된 적이 있다 —
-registry 에 없으면 `isStoreOwner()` 가 role 게이트에서 끝나 `organizationId` 를 돌려주지 못해
-공통 매장 API 진입이 막힌다(`CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1` §8-5).
+2026-10-09 PH 완전 퇴역으로 `pharmacy-hub:store_owner`를 runtime registry에서 제거했다. 과거 역할·조직 원장은 남기지만 현재 매장 권한이나 서비스 중립 매장 진입의 근거로 쓰지 않는다.
 
 **`cafe24-b2b:store_owner` 는 여기 없다.** 그 role 은 실재하고 Cafe24 프로비저닝이 부여하지만,
 Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 들어가 공통 role 게이트를 거치지
@@ -72,10 +68,11 @@ Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 �
 
 - `kpa:store_member`
 - `cosmetics:store_member`
-- `pharmacy-hub:store_member`
 - `cafe24-b2b:store_member`
 
-**owner 게이트(3종)보다 하나 많다.** 초대·수락은 serviceKey 를 파라미터로 받는 **서비스 중립
+`pharmacy-hub:store_member`는 과거 역할 회수 식별자로만 보존하며 현재 접근이나 신규 발급을 허용하지 않는다. PH 전용 초대는 관계를 활성화하지 않고, 현재 매장의 초대 수락은 PH 과거 linkage를 제외한다.
+
+**owner 게이트(2개 서비스)보다 하나 많다.** 초대·수락은 serviceKey 를 파라미터로 받는 **서비스 중립
 표면**이고, 조직↔서비스 linkage(`STORE_SERVICE_ORG_LINKAGE`)가 `cafe24-b2b` 를 포함하기 때문이다.
 그 조직에 초대받은 사람에게 발급할 role 이 없으면 수락이 관계만 `'staff'` 로 바꾸고 role 을 건너뛰어
 **접근 0 · 재수락 불가**인 막다른 상태가 된다.
@@ -84,9 +81,9 @@ Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 �
 
 | 목록 | 범위 | 기준 |
 |---|---|---|
-| `STORE_OWNER_ROLES_BY_SERVICE` (3) | 공통 role 게이트가 아는 owner role | `isStoreOwner()` 를 거치는 서비스만. cafe24-b2b 는 HMAC 쿠키 세션이라 제외 |
-| `STORE_MEMBER_ROLE_BY_SERVICE` (4) | 초대 수락이 발급하는 member role | 조직↔서비스 linkage 가 있는 서비스 전부 |
-| `ENROLLABLE_SERVICE_KEYS` (3) | 자가 가입 가능 업종 | 외부 로그인 전용 채널(cafe24-b2b) 제외 |
+| `STORE_OWNER_ROLES_BY_SERVICE` (2개 서비스) | 공통 role 게이트가 아는 owner role | PH 퇴역; cafe24-b2b는 HMAC 쿠키 세션이라 제외 |
+| `STORE_MEMBER_ROLE_BY_SERVICE` (과거 PH 포함 4) | member role 이름과 회수 식별자 | 현재 접근·신규 발급은 PH를 제외한 3개 서비스만 |
+| `ENROLLABLE_SERVICE_KEYS` (0) | 자가 가입 가능 업종 | 약국은 내 매장 신청·승인 경로, 나머지 업종 신규 자가 가입은 종료 |
 
 런타임: `services/store/store-membership.service.ts` · `store-enrollment.service.ts`.
 초대 수락이 발급하고, 같은 서비스에 남은 매장이 없을 때만 회수한다.
@@ -125,7 +122,7 @@ role prefix 는 **내부 서비스 범위 이름**이며 현재 주소의 사업
 |---|---|---|
 | `kpa:store_owner` | `kpa-society` | 약국 사업자 서비스(`pharmacy.neture.co.kr`)의 매장 경영자. **KPA 분회(`kpa.neture.co.kr`, 약사 개인 대상)와 무관** |
 | `cosmetics:store_owner` | `k-cosmetics` | 화장품 · 일반 소매 사업자 서비스(`retail.neture.co.kr`)의 매장 경영자 |
-| `pharmacy-hub:store_owner` | `pharmacy-hub` | 호환 식별자로 보존된 PharmacyHub 매장 경영자 (런타임 registry 에 3.1 과 함께 등록됨 — `store-owner.utils.ts` `STORE_OWNER_ROLES_BY_SERVICE`) |
+| `pharmacy-hub:store_owner` | `pharmacy-hub` | 과거 원장·역할 회수 식별자. PH 퇴역으로 현재 runtime 매장 접근 불가 |
 
 role 문자열은 바꾸지 않는다. 매장 운영 공간 자체는 공통 Store Workspace(`store.neture.co.kr`)이며 serviceKey 를 갖지 않는다.
 
@@ -163,7 +160,7 @@ role_assignments.role IN ({service}:store_owner)
 
 승인 전에는 store_owner 권한을 가지지 않는다.
 
-> (2026-10-04 정합) 위 운영자 승인 경로 외에 현행 부여 경로가 더 있다 — `store.neture.co.kr` **사업자 자가 가입**(`kpa` · `cosmetics` · `pharmacy-hub`, 운영자 승인 없이 본인 신청 → `organization_members(owner)` → enrollment → `service_memberships` → `role_assignments`)과 PharmacyHub · Cafe24 B2B 프로비저닝. 모두 공용 helper `organizationOpsService.ensureOrganizationWithOwnerAndService()` 를 쓴다. 정본: [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) §3-A. "role 이 생기기 전에는 store_owner 권한이 없다" 는 원칙은 유효하다.
+> (2026-10-09 정합) 약국은 내 매장 신청·운영자 승인과 해당 조직 관계로 판정한다. 업종 자가 가입 목록은 비어 있고 PH 프로비저닝은 퇴역했다. Cafe24 B2B의 별도 인증 경계는 유지한다. 정본: [STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) §3-A.
 
 ---
 
