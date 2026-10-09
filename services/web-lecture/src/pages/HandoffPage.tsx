@@ -3,9 +3,11 @@ import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 
-function resolveReturnTo(raw: string | null): string {
+export function resolveReturnTo(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
-  return raw;
+  if (Array.from(raw).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127 || char === '\\')) return '/';
+  const target = new URL(raw, window.location.origin);
+  return target.origin === window.location.origin ? `${target.pathname}${target.search}${target.hash}` : '/';
 }
 const ERROR_MESSAGES: Record<string, string> = {
   HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다.',
@@ -38,7 +40,12 @@ export default function HandoffPage() {
         const tokens = data?.data?.tokens;
         if (response.ok && data?.success && tokens?.accessToken) {
           storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
-          window.location.replace(returnTo);
+          const target = new URL(returnTo, window.location.origin);
+          if (target.origin !== window.location.origin) {
+            setError('이동 경로를 확인할 수 없습니다.');
+            return;
+          }
+          window.location.replace(`${window.location.origin}${target.pathname}${target.search}${target.hash}`);
           return;
         }
         setCode(typeof data?.code === 'string' ? data.code : '');
