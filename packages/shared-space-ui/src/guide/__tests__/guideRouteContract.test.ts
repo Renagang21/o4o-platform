@@ -89,7 +89,6 @@ const SERVICES: Svc[] = [
   // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1. copy 파일(copy/k-cosmetics.ts)도 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
-  { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
 ];
 
 const IGNORE = /^\/(types|api|http)/;

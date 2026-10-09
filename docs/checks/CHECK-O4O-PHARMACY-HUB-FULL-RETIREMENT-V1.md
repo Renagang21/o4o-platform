@@ -12,7 +12,7 @@
 | 로컬 검증 | PASS | API·웹 빌드와 관련 회귀 검증은 아래 §3 |
 | main 통합 | 대기 | PR required CI·리뷰 후 저장소 AGENTS §4-1(e)의 사용자 통합 승인 필요 |
 | 운영 배포 | 대기 | 배포 판정 `LEVEL_3`·`deploy_required=true`; main 통합과 별도 통제 배포 |
-| 실제 PH 인프라·도메인·인증서 삭제 | 미실행 | 환경 상태의 credentials/secrets·outbound identity가 비어 있고 GCP/Gabia 접근 경로가 없다. 현재 운영 리소스 조회·삭제 결과 없음 |
+| 실제 PH 인프라·도메인·인증서 삭제 | 로컬 인계·미실행 | 사용자가 로컬에서 수행한다고 결정. 이 환경의 credentials/secrets·outbound identity는 비어 있어 실제 조회·삭제 결과 없음. WO §5·§6의 절차와 인계문 사용 |
 | 운영 업무·모바일 smoke | 미실행 | 테스트 계정 로그인·실제 운영 배포 검증은 이 로컬 코드 검사에 포함하지 않음 |
 
 **코드 삭제가 Cloud Run·DNS·인증서 삭제를 뜻하지 않는다.** 과거 인쇄 QR·옛 호스트·인증서의 보존이나 리다이렉트는 폐기됐고, 삭제 대상 자체는 확정됐다. 접근 권한이 있는 운영 실행자가 [WO §5](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md#5-운영-인프라-제거-절차)의 최신 참조 조회·공유 자원 보호·삭제·확인 절차를 수행해야 전체 퇴역이 완료된다.
@@ -36,8 +36,10 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 파일·raw-source 소비처 기반 API Jest | **151 suites · 3,158 tests PASS** |
+| 변경 소비처·추가 PH 참조·리뷰 보완 API Jest | **196 suites · 3,832 tests PASS** · 198 suites 중 DB integration 2개 SKIP |
 | 최신 main(PR #370) 반영 후 Neture Vitest | **45 files · 371 tests PASS** |
+| 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
+| 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
 | CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **330 tests PASS** · CI blocking Node 목록 전체 |
 | `git diff --check` | PASS |
@@ -48,3 +50,11 @@ PH 원본 파일의 존재와 가입 성공을 기대하던 퇴역 전용 spec�
 ## 4. 문서 정합
 
 현행 commerce DESIGN §16과 서브도메인 의미 정본 §2-2를 사용자 결정으로 갱신했다. PH 모델 baseline에는 대체된 기준을 명시했고 B2B 주문 계약에는 PH 신규 producer/API 퇴역과 기존 결제 완료·원장 조회 보존의 차이를 정정했다. 과거 WO·CHECK의 당시 배포 결과는 덮어쓰지 않는다. 이 CHECK는 실제 운영 삭제 완료를 주장하지 않는다.
+
+## 5. PR 리뷰와 전체 CI 보완
+
+첫 PR HEAD `b163163719`에서 Codex가 삭제된 PH 가이드·웹 파일을 읽는 공통 패키지 테스트 5개 파일을 지적했다. 해당 서비스 사례만 제거하고 KPA·Neture 및 공통 컴포넌트의 테스트는 유지했다. `shared-space-ui` 63건·`operator-core-ui` 43건이 통과했다. 첫 CI의 API 실패는 현재 catalog에서 빠진 PH를 활성 Store/운영자 대상으로 기대하던 fixture와 서브도메인 설명의 누락을 확인해 정정했다.
+
+추가 API 검증에서는 독립 약사 커뮤니티의 과거 PH 게시판 운영 권한이 끊어지는 실제 결함을 발견했다. `ForumControllerBase`가 게시판의 `service_code`를 웹 진입 목록에서 찾고 있었다. 원장 식별용 `communityKeyForForumStorageCode`를 catalog의 기존 `forumStorageCodes`로 구현하고 이 판정에서 사용한다. 퇴역 PH 웹 진입은 계속 없으며, 독립 약사 커뮤니티의 기존 PH 저장 게시판은 현재 community 운영 승인으로 판정한다. `legacy-community-closed-forum-operator.spec.ts`의 PH 사례는 삭제하지 않고 기존 글의 관리·다른 운영자 차단을 검증한다.
+
+보완의 확장 API 3,832건과 type-check가 통과했다. required CI/Codex 재검증 상태는 PR에서 확인한다. 첫 HEAD의 CI 실패를 최종 성공으로 표시하지 않는다.

@@ -20,14 +20,11 @@ const stripComments = (src: string) =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 const KPA_HOME = 'services/web-kpa-society/src/pages/CommunityHomePage.tsx';
-const PH_HOME = 'services/web-pharmacy-hub/src/pages/community/CommunityHomePage.tsx';
 const KPA_HEADER = 'services/web-kpa-society/src/components/KpaGlobalHeader.tsx';
-const PH_HEADER = 'services/web-pharmacy-hub/src/components/PharmacyHubGlobalHeader.tsx';
 const KPA_FOOTER = 'services/web-kpa-society/src/components/Footer.tsx';
-const PH_FOOTER = 'services/web-pharmacy-hub/src/components/Footer.tsx';
 
 describe('community home 공통 컨테이너 채택 (§8)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_HOME], ['Pharmacy-Hub', PH_HOME]] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_HOME]] as const) {
     it(`${name} 홈이 공통 CommunityServiceHome 을 소비한다`, () => {
       const src = read(path);
       expect(src).toContain("from '@o4o/shared-space-ui'");
@@ -54,7 +51,7 @@ describe('community home 공통 컨테이너 채택 (§8)', () => {
 });
 
 describe('primary nav 공통 조립기 채택 (§9)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_HEADER], ['Pharmacy-Hub', PH_HEADER]] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_HEADER]] as const) {
     it(`${name} 헤더가 buildCommunityPrimaryNav 를 쓴다`, () => {
       const src = read(path);
       expect(src).toContain('buildCommunityPrimaryNav');
@@ -78,7 +75,7 @@ describe('primary nav 공통 조립기 채택 (§9)', () => {
 });
 
 describe('공개 푸터 공통 View 채택 (§14)', () => {
-  for (const [name, path] of [['KPA-Society', KPA_FOOTER], ['Pharmacy-Hub', PH_FOOTER]] as const) {
+  for (const [name, path] of [['KPA-Society', KPA_FOOTER]] as const) {
     it(`${name} 푸터가 공통 CommunitySiteFooter 를 쓴다`, () => {
       const src = read(path);
       expect(src).toContain('CommunitySiteFooter');
@@ -112,22 +109,7 @@ describe('공통 부품 service-neutral (§4)', () => {
   });
 });
 
-describe('PharmacyHub 홈 canonical 수렴 (§10·§12)', () => {
-  const app = read('services/web-pharmacy-hub/src/App.tsx');
 
-  it('서비스 루트 `/` 가 커뮤니티 홈이다', () => {
-    expect(app).toContain('<Route path="/" element={<CommunityHomePage />} />');
-  });
-
-  it('`/community` 는 canonical 홈으로 redirect 된다 (중복 홈 0)', () => {
-    expect(app).toContain('<Route path="/community" element={<Navigate to="/" replace />} />');
-  });
-
-  it('서비스 소개형 HomePage 는 폐기됐다', () => {
-    expect(existsSync(resolve(ROOT, 'services/web-pharmacy-hub/src/pages/HomePage.tsx'))).toBe(false);
-    expect(app).not.toContain("from './pages/HomePage'");
-  });
-});
 
 describe('KPA 지부·분회·데모 잔재 재발 방지 (§3)', () => {
   const GONE = [

@@ -3,7 +3,7 @@ jest.mock('../../../../services/web-store/src/lib/apiClient', () => ({ API_BASE_
 import { getJoinableServices, getService, getServiceOrigin, getServicePublicOrigin } from '../config/service-catalog';
 import { resolveSessionServiceKey } from '../utils/session-origin';
 import { resolveOperatorRole } from '../config/operator-role-catalog';
-import { getCommunityDefinition, communityKeyForServiceEntry } from '../config/community-catalog';
+import { getCommunityDefinition, communityKeyForServiceEntry, communityKeyForForumStorageCode } from '../config/community-catalog';
 import { listSupplierContentHandoffTargets } from '../modules/neture/constants/supplier-content-handoff-targets';
 import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS } from '../modules/neture/constants/fulfillment-service-scope';
 import { isUnifiedServiceKey, pickCommonServiceContext, SERVICE_API_PREFIX } from '../../../../services/web-store/src/lib/serviceContext';
@@ -36,6 +36,7 @@ describe('Pharmacy Hub retirement', () => {
     expect(SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS).toContain('pharmacy-hub');
     expect(getCommunityDefinition('pharmacy')?.forumStorageCodes).toContain('pharmacy-hub');
     expect(communityKeyForServiceEntry('pharmacy-hub')).toBeUndefined();
+    expect(communityKeyForForumStorageCode('pharmacy-hub')).toBe('pharmacy');
   });
 
   it('current Store and independent service origins and operator scopes remain intact', () => {

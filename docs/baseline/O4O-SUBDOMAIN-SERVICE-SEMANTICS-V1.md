@@ -33,7 +33,7 @@
 |---|---|---|---|---|---|---|
 | `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
 | `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | `kpa-society.co.kr/kpa/{분회}` |
-| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | O4O 약국 경영지원 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
+| `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | O4O 약국 경영지원(전체 약국 대상 세미프랜차이즈) · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
 | `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | `k-cosmetics.site` |
 | `store.neture.co.kr` | **약국 경영자 · 허가된 매장 사용자** | 약국 하나의 내 매장 · 가입한 복수 서비스 이용, 중간 HUB 없음 | **없음** (`store-workspace.ts`: catalog 서비스 아님) | 약국 신규 원장과 기존 서비스 역할은 §3에서 구분 | 자기 자신 | 각 서비스 앱의 `/store` · `/store-hub` |
 | `supplier.neture.co.kr` | 공급자 | 공급자 서비스 | `supplier` | `supplier:admin` · `supplier:operator` (운영자 범위) | 이용 가능한 공급·자료를 내 매장에 제공 | `neture.co.kr/supplier` |
