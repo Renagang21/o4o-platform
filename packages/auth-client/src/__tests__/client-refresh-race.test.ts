@@ -16,8 +16,8 @@ import { AuthClient } from '../client';
 
 type Deferred = { resolve: (r: Partial<AxiosResponse>) => void; reject: (e: unknown) => void };
 
-function makeClient() {
-  const client = new AuthClient('http://api.test', { strategy: 'localStorage' });
+function makeClient(strategy: 'localStorage' | 'cookie' = 'localStorage') {
+  const client = new AuthClient('http://api.test', { strategy });
   const calls: string[] = [];
   const pending: Record<string, Deferred[]> = {};
   const handlers: Record<string, (config: AxiosRequestConfig) => Partial<AxiosResponse> | 'defer'> = {};
@@ -189,5 +189,93 @@ describe('AuthClient 401 interceptor — localStorage 전략', () => {
     pending['/auth/refresh'][0].resolve({ status: 401, data: { code: 'TOKEN_EXPIRED' } });
     await expect(inflight).rejects.toBeTruthy();
     expect(cleared).toBe(0);
+  });
+});
+
+
+describe('AuthClient cookie refresh and late login', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('cookie-only refresh success retries without requiring JSON tokens', async () => {
+    const {client, handlers, calls} = makeClient('cookie');
+    let count = 0;
+    handlers['/auth/me'] = () => count++ === 0 ? {status:401} : {status:200};
+    handlers['/auth/refresh'] = () => ({status:200, data:{success:true, data:{expiresIn:900}}});
+    await expect(client.api.get('/auth/me')).resolves.toMatchObject({status:200});
+    expect(calls).toEqual(['GET /auth/me','POST /auth/refresh','GET /auth/me']);
+    expect(localStorage.getItem('o4o_accessToken')).toBeNull();
+  });
+
+  it.each([401,503])('cookie refresh %s settles queued requests; only 401 ends the session', async status => {
+    const {client, handlers, pending, calls} = makeClient('cookie');
+    const cleared = vi.fn(); window.addEventListener('auth:token-cleared', cleared);
+    try {
+      handlers['/auth/me'] = () => ({status:401});
+      handlers['/other'] = () => ({status:401});
+      handlers['/auth/refresh'] = () => 'defer';
+      const first = client.api.get('/auth/me').catch(error => error);
+      await vi.waitFor(() => expect(pending['/auth/refresh']?.length).toBe(1));
+      const second = client.api.get('/other').catch(error => error);
+      await vi.waitFor(() => expect(calls).toContain('GET /other'));
+      pending['/auth/refresh'][0].resolve({status, data:{code:status===503?'AUTH_SERVICE_UNAVAILABLE':'TOKEN_FAMILY_MISMATCH'}});
+      expect((await first).response.status).toBe(status);
+      expect((await second).response.status).toBe(401);
+      expect(cleared).toHaveBeenCalledTimes(status===401?1:0);
+    } finally { window.removeEventListener('auth:token-cleared', cleared); }
+  });
+
+  it('late email login after logout cannot restore tokens', async () => {
+    const {client, handlers, pending} = makeClient();
+    handlers['/auth/email/login'] = () => 'defer';
+    const login = client.loginWithEmail('synthetic@example.test','synthetic-password').catch(error => error);
+    await vi.waitFor(() => expect(pending['/auth/email/login']?.length).toBe(1));
+    await client.logout();
+    pending['/auth/email/login'][0].resolve({status:200,data:{success:true,data:{user:{id:'synthetic'},tokens:{accessToken:'late',refreshToken:'late-refresh'}}}});
+    expect((await login).message).toMatch(/session changed/);
+    expect(localStorage.getItem('o4o_accessToken')).toBeNull();
+  });
+});
+
+describe('logout with expired access credentials', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('uses the captured refresh credential to revoke the same browser without restoring storage', async () => {
+    loggedIn();
+    const { client, handlers, calls } = makeClient();
+    let attempts = 0;
+    handlers['/auth/logout'] = config => {
+      expect((config.headers as any).Authorization).toBe(attempts === 0 ? 'Bearer old-access' : 'Bearer logout-access');
+      return attempts++ === 0 ? { status: 401 } : { status: 200 };
+    };
+    handlers['/auth/refresh'] = config => {
+      expect(JSON.parse(config.data as string).refreshToken).toBe('old-refresh');
+      expect(localStorage.getItem('o4o_refreshToken')).toBeNull();
+      return okRefresh('logout-access', 'logout-refresh');
+    };
+    await client.logout();
+    expect(calls).toEqual(['POST /auth/logout', 'POST /auth/refresh', 'POST /auth/logout']);
+    expect(localStorage.getItem('o4o_accessToken')).toBeNull();
+    expect(localStorage.getItem('o4o_refreshToken')).toBeNull();
+  });
+
+  it('a newer login during logout is neither refreshed nor cleared/revoked', async () => {
+    loggedIn();
+    const { client, handlers, pending } = makeClient();
+    let attempts = 0;
+    handlers['/auth/logout'] = config => {
+      expect((config.headers as any).Authorization).not.toBe('Bearer new-login-access');
+      return attempts++ === 0 ? 'defer' : { status: 200 };
+    };
+    handlers['/auth/refresh'] = config => {
+      expect(JSON.parse(config.data as string).refreshToken).toBe('old-refresh');
+      return okRefresh('logout-access', 'logout-refresh');
+    };
+    const logout = client.logout();
+    await vi.waitFor(() => expect(pending['/auth/logout']?.length).toBe(1));
+    loggedIn('new-login-access', 'new-login-refresh');
+    pending['/auth/logout'][0].resolve({ status: 401 });
+    await logout;
+    expect(localStorage.getItem('o4o_accessToken')).toBe('new-login-access');
+    expect(localStorage.getItem('o4o_refreshToken')).toBe('new-login-refresh');
   });
 });

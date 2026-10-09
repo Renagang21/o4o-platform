@@ -81,6 +81,7 @@ export interface EditUserModalConfig {
    * e.g. 'neture' | 'k-cosmetics'
    */
   serviceKey: string;
+  canChangeMembershipType?: boolean;
   /**
    * 서비스별 API 어댑터.
    * 각 서비스의 authClient/api 인스턴스를 감싸 메서드·URL 규칙을 흡수한다.
@@ -142,6 +143,7 @@ export interface CommonEditUserModalProps {
 export function CommonEditUserModal({ userId, config, onClose, onSuccess }: CommonEditUserModalProps) {
   const {
     serviceKey,
+    canChangeMembershipType = false,
     makeRequest,
     membershipRoleOptions,
     adminRoleOptions,
@@ -194,7 +196,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
     }
     (async () => {
       try {
-        const data = await makeRequest('GET', `/operator/members/${userId}`) as any;
+        const data = await makeRequest('GET', `/operator/members/${userId}?serviceKey=${encodeURIComponent(serviceKey)}`) as any;
         const u = data.user;
 
         // membership role
@@ -293,7 +295,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         nickname: form.nickname,
         phone: form.phone,
       };
-      if (membershipRole !== originalMembershipRole) {
+      if (canChangeMembershipType && membershipRole !== originalMembershipRole) {
         payload.membershipRole = membershipRole;
         payload.membershipServiceKey = serviceKey;
       }
@@ -381,7 +383,8 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
             {/* 회원 유형 */}
             <div className="pt-3 border-t">
               <h4 className="text-sm font-semibold text-slate-700 mb-3">회원 유형</h4>
-              <select value={membershipRole} onChange={(e) => setMembershipRole(e.target.value)} className={inputCls}>
+              <select disabled={!canChangeMembershipType} value={membershipRole} onChange={(e) => setMembershipRole(e.target.value)} className={inputCls}>
+                {!membershipRoleOptions.some(opt => opt.value === membershipRole) && <option value={membershipRole}>{membershipRole || '일반 회원'}</option>}
                 {membershipRoleOptions.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}

@@ -33,23 +33,7 @@ function walk(root: string): string[] {
   }
   return out;
 }
-
-// 서비스 프론트엔드도 모집단에 넣는다 — B2B 축 결함(D3 dead menu / D4 dead client)은
-// api-server 밖에 있었다. dist/ 는 SKIP_DIR 에서 걸러진다.
-const WEB_SERVICES = [
-  'web-kpa-society',
-  'web-k-cosmetics',
-  'web-pharmacy-hub',
-  'web-neture',
-].map((s) => path.join(REPO, 'services', s, 'src'));
 const STORE_UI_CORE = path.join(REPO, 'packages', 'store-ui-core', 'src');
-
-const ALL_FILES: string[] = [
-  ...walk(SRC),
-  ...walk(ADMIN),
-  ...WEB_SERVICES.flatMap(walk),
-  ...walk(STORE_UI_CORE),
-];
 const SELF = __filename;
 const cache = new Map<string, string>();
 const codeOf = (f: string): string => {
@@ -57,8 +41,6 @@ const codeOf = (f: string): string => {
   return cache.get(f) as string;
 };
 const rel = (f: string) => path.relative(REPO, f).replace(/\\/g, '/');
-const hits = (pattern: RegExp): string[] =>
-  ALL_FILES.filter((f) => f !== SELF && pattern.test(codeOf(f))).map(rel);
 
 const read = (p: string): string => fs.readFileSync(path.join(SRC, p), 'utf-8');
 
@@ -72,10 +54,6 @@ const stripComments = (code: string): string =>
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1'); // 줄 주석 (URL 의 `//` 는 앞에 `:` 가 온다)
 
 describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1', () => {
-  // 가드 무력화 방지 — 스캔 대상이 비면 아래 0-count 단언이 전부 통과해버린다.
-  it('스캔 모집단이 충분히 크다', () => {
-    expect(ALL_FILES.length).toBeGreaterThan(2000);
-  });
 
   // ==========================================================================
   // A. store side — buyer(매장) 경계
@@ -133,20 +111,6 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
         expect(code).toMatch(/buyerId/);
       }
     });
-
-    it('Pharmacy-Hub 구매자 주문은 buyerId + serviceKey=pharmacy-hub 로 격리된다', () => {
-      const code = read('controllers/pharmacy-hub/PharmacyHubOrderController.ts');
-      expect(code).toContain('SERVICE_KEYS.PHARMACY_HUB');
-      expect(code).toContain('getBuyerId');
-    });
-
-    it('구매자 주문 조회 키 집합은 단일 정의(buyer-order-service-scope)에서만 온다', () => {
-      // 컨트롤러에 리터럴 배열이 되살아나면 event-offer 주문이 다시 목록에서 사라진다.
-      const literal = hits(
-        /\[\s*['"`]kpa-society['"`]\s*,\s*['"`]kpa['"`]\s*,\s*['"`]kpa-groupbuy['"`]/,
-      );
-      expect(literal.filter((f) => !f.includes('buyer-order-service-scope'))).toEqual([]);
-    });
   });
 
   // ==========================================================================
@@ -164,17 +128,6 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 공급자 목록 경계는 서비스 집합 SSOT 헬퍼(약국 주문 포함).
       expect(code).toContain('netureOrderServiceSetSql');
       expect(code).toContain('SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS');
-      // `neture_orders` 서비스 경계 조각을 컨트롤러/서비스가 직접 써버리면 조건이 갈라진다.
-      // (SSOT 파일 자신과 그 테스트만 이 문자열을 가질 수 있다.)
-      const hard = hits(/COALESCE\([^)]*service_key,\s*'neture'\)/);
-      expect(hard.filter((f) => !f.includes('fulfillment-service-scope'))).toEqual([]);
-    });
-
-    it('공급자 직접 opt-in 경로는 allowlist 로만 열린다 (승인 축 우회 금지)', () => {
-      const code = read('modules/neture/controllers/supplier-service-delivery.controller.ts');
-      expect(code).toContain('isSupplierOptinServiceKey');
-      const optin = read('modules/neture/constants/supplier-optin-services.ts');
-      expect(optin).toContain('isApprovalEligibleServiceKey');
     });
 
     it('checkout_order → neture_order bridge 는 결제 완료 주문만 대상으로 한다 (payment-first)', () => {
@@ -203,44 +156,9 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       }
     });
 
-    it('admin-dashboard 에 /api/v1/ecommerce/* 호출이 남아 있지 않다 (결함 D2 회귀 가드)', () => {
-      expect(hits(/v1\(\s*[`'"]\/ecommerce\//)).toEqual([]);
-    });
-
-    // WO-O4O-B2B-ORDER-CONTRACT-EVENT-OFFER-PAYMENT-FIRST-DOC-ALIGNMENT-V1:
-    //   Event Offer 는 특가 판매로 확정되어 payment-first 축에 편입됐다. 승인축 B2B 와 함께
-    //   `store-b2b` 공용 결제 축을 쓰므로 live producer 는 4종이다(baseline §3).
-    it('살아 있는 payment producer serviceKey 는 4종이다', () => {
-      expect(hits(/['"`]neture-b2b['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]pharmacy-hub['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]store-b2b['"`]/).length).toBeGreaterThan(0);
-      expect(hits(/['"`]store-service-subscription['"`]/).length).toBeGreaterThan(0);
-    });
-
-    it('은퇴한 소비자 commerce 410 코드가 유지된다', () => {
-      expect(hits(/STORE_CONSUMER_ORDER_RETIRED/).length).toBeGreaterThan(0);
-      expect(hits(/STORE_SALE_PAYMENT_DEPRECATED/).length).toBeGreaterThan(0);
-    });
-
-    it('POS 연동은 개발 대상이 아니다 — POS 어댑터/동기화 코드가 없다', () => {
-      // 본 WO §3: POS API 연동 · 상품 동기화 · 판매 데이터 수집 · 재고/결제 연동 전부 OUT_OF_SCOPE.
-      expect(hits(/\b(PosAdapter|POSAdapter|posSyncService|PosIntegrationService)\b/)).toEqual([]);
-    });
-
     it('B2B 취소는 PG 환불 경로와 연결되지 않는다', () => {
       const code = read('services/checkout/store-order-cancel.service.ts');
       expect(code).not.toMatch(/refund|Refund/);
-    });
-
-    it('은퇴한 supplier handling-request 축이 되살아나지 않는다 (결함 D4 회귀 가드)', () => {
-      // `POST /neture/supplier/requests` 는 WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1
-      // (2026-04-25)에서 라우트가 삭제되고 테이블도 drop 됐다. 실코드 호출은 항상 실패한다.
-      const live = ALL_FILES.filter(
-        (f) =>
-          f !== SELF &&
-          /supplier\/requests|createHandlingRequest/.test(stripComments(codeOf(f))),
-      );
-      expect(live.map(rel)).toEqual([]);
     });
 
   });

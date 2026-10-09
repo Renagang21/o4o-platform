@@ -37,6 +37,7 @@ export default function RootShell() {
   // 상단 로그인도 원래 경로를 보존한다(§21-19 운영 실측에서 발견 — 본문 카드만 보존하고 있었다)
   const { pathname, search, hash } = useLocation();
   const navItems = ROOT_NAV_ITEMS;
+  const { organizationId } = useUnifiedStore();
   return <div className="site">
     <header className="header">
       <div className="header-left">
@@ -54,14 +55,14 @@ export default function RootShell() {
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}
       <div className="header-actions">
-        {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
+        {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
         <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" />
         {isAuthenticated
           ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button>
           : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}
       </div>
     </header>
-    <div className="content"><Outlet /></div>
+    <div className="content"><Outlet key={organizationId ?? 'no-store'} /></div>
     <footer className="footer">
       <div className="footer-links">
         <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>

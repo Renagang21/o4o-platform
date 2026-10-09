@@ -39,8 +39,9 @@ describe('Supplier → Service Operator handoff targets (WO §10)', () => {
     }
   });
 
-  it('kpa-society · pharmacy-hub 가 대상이다 — 운영 종료된 k-cosmetics 는 제외', () => {
-    expect(keys).toEqual(expect.arrayContaining(['kpa-society', 'pharmacy-hub']));
+  it('kpa-society 만 대상이다 — 운영 종료된 K-Cosmetics · PharmacyHub 는 제외', () => {
+    expect(keys).toEqual(['kpa-society']);
+    expect(keys).not.toContain('pharmacy-hub');
     expect(keys).not.toContain('k-cosmetics');
   });
 

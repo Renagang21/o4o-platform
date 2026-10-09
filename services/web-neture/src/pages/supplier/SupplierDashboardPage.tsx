@@ -180,6 +180,7 @@ export default function SupplierDashboardPage() {
   const [eventOfferStats, setEventOfferStats] = useState<SupplierEventOfferStats | null>(null);
 
   // 지표 분석 (Copilot SQL 집계)
+  const [metricsFailed, setMetricsFailed] = useState(false);
   const [performance, setPerformance] = useState<ProductPerformanceItem[]>([]);
   const [distribution, setDistribution] = useState<DistributionItem[]>([]);
   const [trending, setTrending] = useState<TrendingProductItem[]>([]);
@@ -269,9 +270,14 @@ export default function SupplierDashboardPage() {
     setOpsFailed({ orders: ordersFailed, inventory: inventoryFailed, settlements: settlementsFailed });
 
     // 지표 분석 — fire-and-forget (SQL 집계 · 내부 LLM 호출 없음)
-    supplierCopilotApi.getProductPerformance().then(setPerformance).catch(() => {});
-    supplierCopilotApi.getDistribution().then(setDistribution).catch(() => {});
-    supplierCopilotApi.getTrendingProducts().then(setTrending).catch(() => {});
+    setMetricsFailed(false);
+    Promise.all([
+      supplierCopilotApi.getProductPerformance(),
+      supplierCopilotApi.getDistribution(),
+      supplierCopilotApi.getTrendingProducts(),
+    ]).then(([products, stores, growth]) => {
+      setPerformance(products); setDistribution(stores); setTrending(growth);
+    }).catch(() => setMetricsFailed(true));
 
     setLoading(false);
   }, []);
@@ -742,7 +748,8 @@ export default function SupplierDashboardPage() {
           {aiOpen ? <ChevronUp size={18} className="text-slate-400 shrink-0" /> : <ChevronDown size={18} className="text-slate-400 shrink-0" />}
         </button>
 
-        {aiOpen && (
+        {aiOpen && metricsFailed && <p role="alert" className="px-6 pb-6 text-sm text-red-600">지표를 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.</p>}
+        {aiOpen && !metricsFailed && (
           <div className="px-6 pb-6 space-y-6">
             {/* 상품 성과 + 매장 확산 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

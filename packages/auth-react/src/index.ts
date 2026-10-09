@@ -57,3 +57,5 @@ export type { DemoLoginButtonsProps } from './DemoLoginButtons';
 
 export { HandoffEntryPage } from './HandoffEntryPage';
 export type { HandoffEntryPageProps } from './HandoffEntryPage';
+export { PasswordSecuritySettings } from './PasswordSecuritySettings';
+export type { PasswordSecuritySettingsProps } from './PasswordSecuritySettings';

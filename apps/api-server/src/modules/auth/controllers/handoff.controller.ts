@@ -2,7 +2,7 @@
  * Handoff Controller
  *
  * WO-O4O-SERVICE-HANDOFF-ARCHITECTURE-V1
- * Cross-service SSO handoff via Redis-based single-use tokens.
+ * Cross-service SSO handoff via PostgreSQL single-use tokens.
  *
  * WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1 (2026-05-24):
  *   Identity V2 §7.2 해석 A 충족 — generateHandoff / exchangeHandoff 양쪽 모두
@@ -19,7 +19,7 @@
  * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1:
  *   대표 진입(targetServiceKey === REPRESENTATIVE_ENTRY_SERVICE_KEY) 만 membership 검사 대신
  *   활성 계정 + 대표 진입 origin 고정 + returnTo '/' 고정으로 판정한다. 다른 서비스 대상은 불변.
- *   모든 대상 공통: 폐기된 세션(refreshTokenFamily null)은 발급·교환 모두 401 HANDOFF_SESSION_REVOKED.
+ *   모든 대상 공통: 폐기된 출발 브라우저 세션 또는 오래된 계정 보안 세대은 발급·교환 모두 401 HANDOFF_SESSION_REVOKED.
  *
  * Endpoints:
  * - POST /api/v1/auth/handoff       — Generate handoff token (requireAuth)
@@ -36,7 +36,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
-import { persistRefreshTokenFamily, readUserMembershipsWithMainAccess } from '../../../services/auth/auth-context.helper.js';
+import { readUserMembershipsWithMainAccess } from '../../../services/auth/auth-context.helper.js';
 import {
   isPasswordSessionAllowed,
   PASSWORD_SESSION_NOT_ALLOWED_CODE,
@@ -50,37 +50,13 @@ import { isRepresentativeEntryTarget, isRepresentativeEntryExchangeOrigin } from
 import { resolveAccountAccess } from '../../../common/auth/account-access.policy.js';
 import {
   INITIAL_SESSION_EPOCH,
-  isSessionScopeLive,
   readServiceSessionEpoch,
 } from '../../../services/auth/service-session-epoch.js';
 import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
 import { verifyAccessToken } from '../../../utils/token.utils.js';
 import logger from '../../../utils/logger.js';
-/**
- * WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1 §6 — 폐기된 세션의 handoff 부활 차단.
- *
- * 보안 세션 폐기 / family mismatch 는 `users.refreshTokenFamily` 를 null 로 만든다. 그 뒤에도 남은
- * access token(최대 15분)으로 handoff 를 발급·교환하면 exchange 가 새 family 를 만들어 세션이 되살아났다.
- * 모든 로그인 경로는 family 를 기록하므로(`persistRefreshTokenFamily` 계약) null family = 종료된 세션이다.
- *
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 서비스 하나의 `logout` 은 더 이상 family 를
- * 비우지 않는다(다른 서비스 세션 유지). 따라서 여기서 막는 "폐기된 세션"은 보안 세션 폐기 · 도난 판정
- * 두 경우이며, 한 서비스에서 로그아웃한 뒤 다른 서비스로 handoff 하는 것은 **정상 동작**이다.
- */
-/**
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 서비스 단위 로그아웃의 옆길 차단.
- *
- * §8 은 refresh 경로만 막았다. 남은 구멍은 **긴 세션을 새로 만들어 주는 경로**였다:
- *
- *   ① 로그아웃 뒤에도 남은 access token(최대 15분)으로 handoff 를 새로 발급받을 수 있었다
- *   ② 로그아웃 **전에** 받아 둔 handoff 토큰을 로그아웃 뒤 TTL(60초) 안에 교환할 수 있었다
- *
- * 둘 다 "이미 로그아웃된 A 의 오래된 인증으로 시작한 이동" 이다. 반면 **살아 있는 B 세션에서
- * A 로 가는 이동은 정상**이므로 막지 않는다 — 판정 기준은 출발 서비스의 세대 하나다.
- *
- * `requireAuth` 에 넣지 않는다: 모든 API 요청에 DB 조회를 더하면 Core 경로 비용이 요청마다
- * 늘고, 막아야 하는 것은 짧은 인증으로 **긴 세션을 새로 만드는 일**이다.
- */
+import { isBrowserSessionLive } from '../../../services/auth/browser-session.service.js';
+/** Handoff issuance and exchange use the same browser/account revocation check as requireAuth. */
 const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
 
 /**
@@ -106,12 +82,14 @@ function readCallerScope(req: Request): {
   serviceKey: string | null;
   sessionEpoch?: number;
   authMethod: HandoffAuthMethod;
+  sessionId?: string;
+  tokenFamily?: string;
 } {
   const token = extractToken(req as never);
   const payload = token ? verifyAccessToken(token) : null;
   const authMethod: HandoffAuthMethod = payload && payload.authMethod !== 'password' ? 'google' : 'password';
   if (payload?.serviceKey) {
-    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch, authMethod };
+    return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch, authMethod, sessionId: payload.sessionId, tokenFamily: payload.tokenFamily };
   }
   return { serviceKey: null, sessionEpoch: undefined, authMethod };
 }
@@ -121,10 +99,8 @@ function readCallerScope(req: Request): {
  *
  * 값의 출처가 핵심이다:
  *   serviceKey    토큰이 증명한 서비스 — **Origin 주장으로 바꿀 수 없다**
- *   sessionEpoch  **토큰의 세대** (발급 시점의 현재 세대가 아니다).
- *                 현재 세대를 적으면 검사와 기록 사이에 로그아웃이 끼었을 때 원장에 새 세대가
- *                 적혀, 이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
- *                 claim 이 없는 토큰은 검사를 통과했다는 사실이 "폐기 기록 0" 을 뜻하므로 초기 세대다.
+ *   sessionId · tokenFamily: 출발 토큰의 서명된 브라우저/계정 세대.
+ *   Origin 주장이나 현재 세대로 대체하지 않는다. 이전 claim 없는 토큰은 재로그인이 필요하다.
  *
  * **발급 직전에** 부른다: 잘못된 입력(알 수 없는 대상 등)에 DB 를 쓰지 않고, 검사와 기록 사이
  * 간격도 가장 좁다.
@@ -132,11 +108,11 @@ function readCallerScope(req: Request): {
 async function resolveVerifiedHandoffSource(
   req: Request,
   userId: string,
-): Promise<{ serviceKey: string; sessionEpoch: number; authMethod: HandoffAuthMethod } | null> {
+): Promise<{ serviceKey: string; sessionEpoch: number; authMethod: HandoffAuthMethod; sessionId?: string; tokenFamily?: string } | null> {
   // claim 이 없는 배포 전 토큰도 **건너뛰지 않는다** — 건너뛰면 만료 전 최대 15분 동안
   // 로그아웃된 서비스의 인증으로 긴 세션을 얻을 수 있다(4차 리뷰 지적).
   const scope = readCallerScope(req);
-  if (!(await isSessionScopeLive(userId, scope.serviceKey, scope.sessionEpoch))) {
+  if (!(await isBrowserSessionLive(userId, scope))) {
     logger.warn('[Handoff] Blocked generation — service session revoked', {
       userId,
       serviceKey: scope.serviceKey ?? 'UNKNOWN_SCOPE',
@@ -145,6 +121,8 @@ async function resolveVerifiedHandoffSource(
   }
   return {
     serviceKey: scope.serviceKey ?? 'unknown',
+    sessionId: scope.sessionId,
+    tokenFamily: scope.tokenFamily,
     sessionEpoch: scope.sessionEpoch ?? INITIAL_SESSION_EPOCH,
     authMethod: scope.authMethod,
   };
@@ -175,7 +153,7 @@ export class HandoffController extends BaseController {
    * POST /api/v1/auth/handoff
    *
    * Generate a handoff token for cross-service navigation.
-   * Requires authentication. The token is stored in Redis (60s TTL, single-use).
+   * Requires authentication. The token is stored in PostgreSQL (60s TTL, single-use).
    */
   static async generateHandoff(req: Request, res: Response): Promise<any> {
     const { targetServiceKey, targetWorkspace, returnPath } = req.body;
@@ -190,7 +168,7 @@ export class HandoffController extends BaseController {
     }
 
     // 위 검사는 **사용자 전체** family 만 본다 — 서비스 하나의 로그아웃은 그 값을 유지하므로
-    // 여기서 출발 서비스의 세대를 따로 본다. 그러지 않으면 로그아웃된 서비스의 남은
+    // 여기서 출발 브라우저 세션을 따로 본다. 그러지 않으면 로그아웃된 서비스의 남은
     // access token 으로 수명이 긴 세션을 새로 얻는다.
 
     // §8-2: 대상 종류는 정확히 하나 — targetServiceKey(SERVICE) 또는 targetWorkspace(WORKSPACE)
@@ -242,6 +220,8 @@ export class HandoffController extends BaseController {
           { kind: 'workspace', targetWorkspace: STORE_WORKSPACE_KEY },
           source.sessionEpoch,
           source.authMethod,
+          source.sessionId,
+          source.tokenFamily,
         );
         const targetUrl =
           `${STORE_WORKSPACE_ORIGIN}/handoff?token=${handoffToken}` +
@@ -286,6 +266,8 @@ export class HandoffController extends BaseController {
           targetService.key,
           source.sessionEpoch,
           source.authMethod,
+          source.sessionId,
+          source.tokenFamily,
         );
         const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
         return BaseController.ok(res, {
@@ -314,6 +296,8 @@ export class HandoffController extends BaseController {
         targetServiceKey,
         source.sessionEpoch,
         source.authMethod,
+        source.sessionId,
+        source.tokenFamily,
       );
 
       // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
@@ -394,13 +378,11 @@ export class HandoffController extends BaseController {
       //   `sourceSessionEpoch` 가 null = 이 컬럼 이전 발급분이므로 판정에서 제외한다(TTL 60초).
       //   `sourceServiceKey === 'unknown'` = 발급 때 범위를 못 정한 경우 → 최대 세대 규칙을 따른다.
       if (
-        payload.sourceSessionEpoch !== null &&
-        payload.sourceSessionEpoch !== undefined &&
-        !(await isSessionScopeLive(
-          user.id,
-          payload.sourceServiceKey === 'unknown' ? null : payload.sourceServiceKey,
-          payload.sourceSessionEpoch,
-        ))
+        !(await isBrowserSessionLive(user.id, {
+          serviceKey: payload.sourceServiceKey,
+          sessionId: payload.sourceSessionId,
+          tokenFamily: payload.sourceTokenFamily,
+        }, user.refreshTokenFamily))
       ) {
         logger.warn('[Handoff] Blocked exchange — source service session revoked', {
           userId: user.id,
@@ -521,7 +503,7 @@ export class HandoffController extends BaseController {
       sessionEpoch,
       authMethod,
     );
-    await persistRefreshTokenFamily(user.id, tokens.refreshToken);
+    // Handoff never writes a family: password revocation racing the exchange must win.
 
     // 6. Tokens in body only (localStorage-strategy services). No Set-Cookie — see class doc above.
     return BaseController.ok(res, {

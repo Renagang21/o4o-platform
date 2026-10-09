@@ -87,8 +87,8 @@ export interface PharmacyRecruitment {
   supplyUnitPrice: number | string | null;
   consumerPrice: number | string | null;
   createdAt: string;
-  semiFranchiseKey: string;
-  semiFranchiseName: string;
+  semiFranchiseKey: string | null;
+  semiFranchiseName: string | null;
   applicationId: string | null;
   applicationStatus: string | null;
 }
@@ -146,7 +146,7 @@ export interface PharmacyOrder {
   createdAt: string;
   paidAt: string | null;
   supplierId: string | null;
-  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number }> | null;
+  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number; metadata?: { semiFranchiseKey?: string } }> | null;
   paymentGroupId: string | null;
   receiverKey: string | null;
   testPayment: boolean;

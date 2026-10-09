@@ -32,6 +32,7 @@ import StoreInvitationsPage from './pages/StoreInvitationsPage';
 import StoreEnrollmentPage from './pages/StoreEnrollmentPage';
 import MyServicesPage from './pages/MyServicesPage';
 import SettingsPage from './pages/SettingsPage';
+import { STORE_PRODUCT_SETTINGS_LABELS } from './config/productTerminology';
 import { WORKSPACE_PATHS } from './config/workspace';
 import { PHARMACY_STORE_PATHS, PharmacyContextOnly } from './pages/neture-pharmacy/shared';
 
@@ -92,8 +93,6 @@ const ForeignVisitorPartnersPage = named(() => import('./pages/pharmacy/ForeignV
 const ForeignVisitorPartnerQrCodesPage = named(() => import('./pages/pharmacy/ForeignVisitorPartnerQrCodesPage'), 'ForeignVisitorPartnerQrCodesPage');
 
 // ── 서비스 업무: PharmacyHub ─────────────────────────────────────────────────
-const PhPaymentSuccessPage = lazy(() => import('./services/ph/pages/PaymentSuccessPage'));
-const PhPaymentFailPage = lazy(() => import('./services/ph/pages/PaymentFailPage'));
 
 // ── 매장 HUB ─────────────────────────────────────────────────────────────────
 const HubSignageLibraryPage = named(() => import('./pages/pharmacy/HubSignageLibraryPage'), 'HubSignageLibraryPage');
@@ -166,18 +165,15 @@ function storeChildRoutes() {
         <Route path="dashboard" element={<Navigate to={S} replace />} />
         <Route path="settings/layout" element={<Navigate to={`${S}/info`} replace />} />
         <Route path="settings/template" element={<Navigate to={`${S}/info`} replace />} />
+        <Route path="businesses" element={<Navigate to="/services" replace />} />
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
-        <Route path="my-products" element={<StoreOwnerOnly><StoreProductsManagerPage
-          title="내 매장 제품"
-          description="O4O 제품 중 매장이 취급 등록한 제품을 관리합니다. 태블릿, QR, 사이니지 등 매장 서비스에 활용합니다."
-          registerButtonLabel="O4O 제품 취급 등록"
-          infoText="O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 태블릿 전시, QR 안내, 사이니지 등에 연결해 활용할 수 있습니다."
-          emptyTitle="취급 중인 O4O 제품이 없습니다"
-          emptyDescription="O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주세요."
-        /></StoreOwnerOnly>} />
+        <Route path="my-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
         <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
+        <Route path="product-settings" element={<StoreOwnerOnly><StoreProductsManagerPage
+          {...STORE_PRODUCT_SETTINGS_LABELS}
+        /></StoreOwnerOnly>} />
         <Route path="commerce/local-products" element={<StoreOwnerOnly><StoreLocalProductsPage /></StoreOwnerOnly>} />
         <Route path="products/multilingual/:targetKind/:targetId" element={<StoreOwnerOnly><StoreProductMultilingualContentPage /></StoreOwnerOnly>} />
         {/* 매장 경영지원 */}
@@ -299,20 +295,6 @@ export default function App() {
         <Route path="sales-channels/foreign-visitor/payment/fail" element={<ForeignVisitorSalesSupportPaymentFailPage />} />
         <Route path="sales-channels/foreign-visitor/partners" element={<ForeignVisitorPartnersPage />} />
         <Route path="sales-channels/foreign-visitor/partners/:partnerId/qr-codes" element={<ForeignVisitorPartnerQrCodesPage />} />
-        <Route path="*" element={NotFound} />
-      </Route>
-      <Route path={`${W}/pharmacy-hub`} element={gated(<ServiceWorkLayout />)}>
-        <Route index element={<ServiceWorkHomePage />} />
-        {/* WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: Pharmacy-Hub 주문 화면 은퇴 — 약국 주문은 Neture 약국 매장(공급 상품 · 장바구니 · 주문).
-            PG 결제 복귀(success · fail)는 옛 결제 확인 · 기록 경로라 유지한다. */}
-        <Route path="products" element={<Navigate to={`${S}${PP.supply}`} replace />} />
-        <Route path="products/:offerId" element={<Navigate to={`${S}${PP.supply}`} replace />} />
-        <Route path="cart" element={<Navigate to={`${S}${PP.cart}`} replace />} />
-        <Route path="orders" element={<Navigate to={`${S}${PP.orders}`} replace />} />
-        <Route path="orders/:orderId" element={<Navigate to={`${S}${PP.orders}`} replace />} />
-        <Route path="payment" element={<Navigate to={`${S}${PP.orders}`} replace />} />
-        <Route path="payment/success" element={<PhPaymentSuccessPage />} />
-        <Route path="payment/fail" element={<PhPaymentFailPage />} />
         <Route path="*" element={NotFound} />
       </Route>
 

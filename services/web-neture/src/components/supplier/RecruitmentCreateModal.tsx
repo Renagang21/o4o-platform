@@ -77,7 +77,7 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
           <div>
             <div className="text-sm font-medium text-slate-800">{product.name}</div>
             <p className="text-xs text-slate-400 mt-0.5">
-              제품을 취급할 약국/매장 판매자를 모집합니다. 모집 승인 시 해당 판매자가 제품을 주문할 수 있게 됩니다.
+              제품을 취급할 약국/매장 판매자를 모집합니다. 공개 모집은 게시 즉시 내 매장에 안내됩니다. 제품 등재와 공급 승인 조건은 별도로 적용됩니다.
             </p>
           </div>
 
@@ -120,7 +120,7 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
             <p className="mt-1 text-xs text-slate-400">
               {isRegulated
                 ? '의약품·규제 상품은 약국 대상 서비스(KPA)에만 모집할 수 있습니다.'
-                : '여러 서비스를 선택하면 서비스별로 모집이 생성되며, 운영자 노출 승인도 서비스별로 진행됩니다.'}
+                : '여러 서비스를 선택하면 서비스별로 일반 공개 모집이 생성됩니다. 운영자 노출 승인은 필요하지 않습니다.'}
             </p>
           </div>
 

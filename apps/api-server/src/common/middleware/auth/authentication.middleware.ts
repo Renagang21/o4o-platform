@@ -31,6 +31,7 @@ import {
   PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
 } from '../../auth/password-session.policy.js';
 import type { AccessTokenPayload } from '../../../types/auth.js';
+import { isBrowserSessionLive } from '../../../services/auth/browser-session.service.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -257,6 +258,10 @@ export const requireAuth = async (
       });
     }
 
+    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily))) {
+      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', code: 'SESSION_REVOKED' });
+    }
+
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
     // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
@@ -359,7 +364,8 @@ export const optionalAuth = async (
       }
     }
 
-    if (user && user.isActive && optionalAllowed && passwordSessionAllowed) {
+    if (user && user.isActive && optionalAllowed && passwordSessionAllowed &&
+        await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily)) {
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
       req.user = user;
     }
@@ -447,6 +453,10 @@ export const requirePlatformUser = async (
         error: 'User account is inactive',
         code: 'USER_INACTIVE',
       });
+    }
+
+    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily))) {
+      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', code: 'SESSION_REVOKED' });
     }
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny

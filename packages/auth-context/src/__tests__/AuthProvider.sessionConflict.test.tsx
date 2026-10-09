@@ -130,8 +130,8 @@ describe('AuthProvider — 세션 사용자 교체', () => {
     client.api.get.mockResolvedValueOnce(statusOf(A));
 
     renderWith(client);
-    await waitFor(() => expect(client.api.get).toHaveBeenCalledTimes(1));
-    expect(seen?.user?.id).toBe('user-a');
+    await waitFor(() => expect(seen?.user?.id).toBe('user-a'));
+    await act(async () => {});
 
     client.api.get.mockResolvedValueOnce(statusOf(B));
     await act(async () => {
@@ -142,4 +142,36 @@ describe('AuthProvider — 세션 사용자 교체', () => {
     expect(seen?.user).toBeNull();
     expect(client.logout).not.toHaveBeenCalled();
   });
+});
+
+
+describe('server-owned initial identity', () => {
+  it('does not authenticate a cached identity before the server confirms it', async () => {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ state: { user: A, isAuthenticated: true } }));
+    let finish!: (value: unknown) => void; const client = makeClient();
+    client.api.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    renderWith(client); expect(seen?.isAuthenticated).toBe(false); expect(seen?.isLoading).toBe(true);
+    await act(async () => { finish(statusOf(A)); });
+    await waitFor(() => expect(seen?.user?.id).toBe('user-a'));
+  });
+  it('late cookie status response cannot restore a logged-out user', async () => {
+    let finish!: (value: unknown) => void; const client = makeClient();
+    client.api.get.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    client.logout.mockResolvedValue(undefined); renderWith(client);
+    await act(async () => { seen!.logout(); finish(statusOf(A)); });
+    expect(seen?.isAuthenticated).toBe(false); expect(seen?.isLoading).toBe(false);
+  });
+});
+
+
+it('token-cleared event invalidates a pending status response', async () => {
+  const client = makeClient();
+  let resolveStatus!: (value: unknown) => void;
+  client.api.get.mockImplementation(() => new Promise(resolve => {resolveStatus = resolve;}));
+  renderWith(client);
+  await waitFor(() => expect(client.api.get).toHaveBeenCalled());
+  act(() => window.dispatchEvent(new Event('auth:token-cleared')));
+  await act(async () => resolveStatus(statusOf(A)));
+  expect(seen?.user).toBeNull();
+  expect(seen?.isLoading).toBe(false);
 });

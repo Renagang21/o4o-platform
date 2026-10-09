@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-context';
-import { AuthClient } from '@o4o/auth-client';
+import { adminAuthClient as ssoClient } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -45,41 +45,13 @@ import { PlatformRoutes } from '@/routes/platform.routes';
 import { O4OProductDbRoutes } from '@/routes/o4o-product-db.routes';
 import { TestRoutes } from '@/routes/test.routes';
 
-// SSO 클라이언트 인스턴스 생성
-// Phase 6-7: Cookie Auth Primary - /api/v1 suffix required for auth endpoints
-const getAuthApiUrl = () => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
-  // Ensure /api/v1 suffix for auth endpoints
-  if (baseUrl.endsWith('/api/v1')) return baseUrl;
-  if (baseUrl.endsWith('/api')) return `${baseUrl}/v1`;
-  if (baseUrl.endsWith('/')) return `${baseUrl}api/v1`;
-  return `${baseUrl}/api/v1`;
-};
-
-const ssoClient = new AuthClient(getAuthApiUrl(), { strategy: 'cookie' });
-
-/**
- * AuthStoreSync - AuthProvider ↔ zustand authStore 동기화
- *
- * 문제: AuthProvider(@o4o/auth-context)와 zustand authStore가 동일한
- * localStorage 키(admin-auth-storage)를 사용하여 충돌 발생.
- * AuthProvider가 세션 만료로 키를 삭제해도 zustand persist가 재기록하여
- * 무한 리다이렉트 루프 발생.
- *
- * 해결: AuthProvider의 인증 상태를 zustand store에 동기화하여
- * 양쪽이 항상 일관된 상태를 유지하도록 함.
- */
+/** Project verified provider state into legacy policy consumers; never persist or restore it. */
 function AuthStoreSync() {
-  const { isAuthenticated, user } = useAuthContext();
-  const zustandAuth = useAuthStore();
-
+  const { user, isLoading } = useAuthContext();
+  const sync = useAuthStore(state => state.sync);
   useEffect(() => {
-    // AuthProvider가 미인증 상태인데 zustand은 인증 상태 → zustand 정리
-    if (!isAuthenticated && zustandAuth.isAuthenticated) {
-      zustandAuth.logout();
-    }
-  }, [isAuthenticated, zustandAuth.isAuthenticated]);
-
+    sync(user as Parameters<typeof sync>[0], isLoading);
+  }, [user, isLoading, sync]);
   return null;
 }
 

@@ -17,8 +17,8 @@ import {
 } from '../service-legal-scope.js';
 
 describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
-  it('pharmacy-hub 를 legal 서비스로 받아들인다 (footer-legal 404 원인 제거)', () => {
-    expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(true);
+  it('은퇴한 pharmacy-hub 관리 경로를 허용하지 않는다', () => {
+    expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(false);
   });
 
   it('기존 3서비스는 그대로 accept 된다 (회귀 없음)', () => {
@@ -49,7 +49,6 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
       'kpa-society',
       'lecture',
       'neture',
-      'pharmacy-hub',
     ]);
   });
 });

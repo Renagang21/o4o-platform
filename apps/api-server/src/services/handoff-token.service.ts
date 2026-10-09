@@ -42,14 +42,10 @@ export interface HandoffTokenPayload {
   /** WORKSPACE HANDOFF 일 때만 존재 */
   targetWorkspace?: HandoffWorkspace;
   createdAt: string;
-  /**
-   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차):
-   * 발급 시점의 **출발 서비스 세대**. 교환 시 현재 세대와 비교해 "발급 뒤 그 서비스에서
-   * 로그아웃했는가" 를 판정한다. `created_at` 시각 비교를 쓰지 않는 이유는 §8 과 같다 —
-   * 초 단위 값으로는 같은 초의 선후를 알 수 없다.
-   * 이 컬럼이 없던 시절 발급분은 `null` 이다(판정에서 제외).
-   */
+  /** Compatibility epoch; exchange validates sourceSessionId and sourceTokenFamily. */
   sourceSessionEpoch?: number | null;
+  sourceSessionId?: string | null;
+  sourceTokenFamily?: string | null;
   /**
    * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (최종 보완 1):
    * 발급 시점에 서버가 검증한 **출발 세션의 인증 수단**. 교환 세션은 이 값을 승계한다.
@@ -95,6 +91,8 @@ class HandoffTokenService {
     target: string | HandoffTarget,
     sourceSessionEpoch?: number | null,
     sourceAuthMethod: HandoffAuthMethod = 'password',
+    sourceSessionId?: string,
+    sourceTokenFamily?: string,
   ): Promise<string> {
     const resolved: HandoffTarget =
       typeof target === 'string' ? { kind: 'service', targetServiceKey: target } : target;
@@ -122,8 +120,8 @@ class HandoffTokenService {
       //   이미 로그아웃된 인증으로 시작한 handoff 가 교환에서 통과한다.
       `INSERT INTO handoff_tokens
          (user_id, source_service_key, target_service_key, target_workspace, expires_at, source_session_epoch,
-          source_auth_method)
-       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval, $6, $7)
+          source_auth_method, source_session_id, source_token_family)
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' seconds')::interval, $6, $7, $8, $9)
        RETURNING id`,
       [
         userId,
@@ -133,6 +131,8 @@ class HandoffTokenService {
         String(this.TOKEN_TTL),
         sourceSessionEpoch ?? null,
         readHandoffAuthMethod(sourceAuthMethod),
+        sourceSessionId ?? null,
+        sourceTokenFamily ?? null,
       ],
     );
 
@@ -145,7 +145,6 @@ class HandoffTokenService {
     void this.pruneExpired();
 
     logger.info('[Handoff] Token generated', {
-      tokenId,
       userId,
       sourceServiceKey,
       targetServiceKey,
@@ -166,7 +165,7 @@ class HandoffTokenService {
   async exchangeToken(tokenId: string): Promise<HandoffTokenPayload | null> {
     // UUID 가 아니면 캐스팅 에러가 나므로 사전 차단
     if (!/^[0-9a-fA-F-]{36}$/.test(tokenId)) {
-      logger.warn('[Handoff] Malformed token', { tokenId });
+      logger.warn('[Handoff] Malformed token');
       return null;
     }
 
@@ -178,7 +177,7 @@ class HandoffTokenService {
           AND consumed_at IS NULL
           AND expires_at > now()
         RETURNING user_id, source_service_key, target_service_key, target_workspace, created_at,
-                  source_session_epoch, source_auth_method`,
+                  source_session_epoch, source_auth_method, source_session_id, source_token_family`,
       [tokenId],
     );
 
@@ -187,7 +186,7 @@ class HandoffTokenService {
     const row = rows?.[0];
 
     if (!row) {
-      logger.warn('[Handoff] Token not found, expired, or already used', { tokenId });
+      logger.warn('[Handoff] Token not found, expired, or already used');
       return null;
     }
 
@@ -205,6 +204,8 @@ class HandoffTokenService {
             ? null
             : Number(row.source_session_epoch),
       sourceAuthMethod: readHandoffAuthMethod(row.source_auth_method),
+      sourceSessionId: row.source_session_id ?? null,
+      sourceTokenFamily: row.source_token_family ?? null,
     };
     // 두 형태 중 정확히 하나 (DB CHECK) — 행 그대로 payload 에 반영한다
     if (row.target_service_key) {
@@ -212,12 +213,11 @@ class HandoffTokenService {
     } else if (isHandoffWorkspace(row.target_workspace)) {
       payload.targetWorkspace = row.target_workspace;
     } else {
-      logger.warn('[Handoff] Token row has no valid target kind', { tokenId });
+      logger.warn('[Handoff] Token row has no valid target kind');
       return null;
     }
 
     logger.info('[Handoff] Token exchanged', {
-      tokenId,
       userId: payload.userId,
       targetServiceKey: payload.targetServiceKey,
       targetWorkspace: payload.targetWorkspace,

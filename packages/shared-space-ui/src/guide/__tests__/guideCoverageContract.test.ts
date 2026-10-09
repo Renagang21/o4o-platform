@@ -78,7 +78,6 @@ const SERVICES: Svc[] = [
   { key: 'kpa', dir: 'services/web-kpa-society', copy: 'kpa.ts' },
   // k-cosmetics 앱(services/web-k-cosmetics)은 퇴역 삭제 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
-  { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
 ];
 
 function copySource(svc: Svc): string {
@@ -148,10 +147,5 @@ describe('Guide coverage contract', () => {
     },
   );
 
-  it('PharmacyHub — 기존 Guide route 세트가 유지된다(회귀 방지)', () => {
-    const mounted = new Set(guideRoutesOf(SERVICES.find((s) => s.key === 'pharmacy-hub')!));
-    for (const r of ['/service-guide', '/guide', '/guide/intro', '/guide/usage', '/guide/features']) {
-      expect(mounted.has(r)).toBe(true);
-    }
-  });
+
 });

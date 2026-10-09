@@ -1,3 +1,4 @@
+import ServiceMembersPage from './pages/operator/ServiceMembersPage';
 /**
  * Neture - o4o 플랫폼 기반 서비스
  *
@@ -229,7 +230,6 @@ const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBul
 //   허브가 가리키던 서비스 제공 설정·판매자 모집·펀딩·이벤트 오퍼는 사이드바에 직접 항목이 있다.
 // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
 //   공급자 직접 opt-in 서비스(Pharmacy-Hub) 제공 설정 — Pharmacy-Hub 에는 공급자 shell 이 없다.
-const SupplierServiceDeliveryPage = lazy(() => import('./pages/supplier/SupplierServiceDeliveryPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
 const SupplierRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierRecruitmentsPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
@@ -857,7 +857,6 @@ function App() {
               <Route path="/supplier/products/bulk" element={<SupplierBulkRegisterPage />} />
               {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §C */}
               <Route path="/supplier/supply-offers" element={<Navigate to="/supplier/products" replace />} />
-              <Route path="/supplier/services/:serviceKey" element={<SupplierServiceDeliveryPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1 */}
               <Route path="/supplier/recruitments" element={<SupplierRecruitmentsPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1 */}
@@ -1129,6 +1128,8 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
               <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
+              <Route path="/operator/service-members/supplier" element={<ServiceMembersPage serviceKey="supplier" />} />
+              <Route path="/operator/service-members/supplier/:id" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
             <Route element={
@@ -1138,6 +1139,8 @@ function App() {
             }>
               {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
+              <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
+              <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1146,6 +1149,8 @@ function App() {
                 <SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />
               </SubdomainOperatorRoute>
             }>
+              <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
+              <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
             </Route>
             <Route element={

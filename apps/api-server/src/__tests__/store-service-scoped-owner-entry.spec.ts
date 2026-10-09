@@ -125,7 +125,7 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
   });
 
   it('k-cosmetics 는 더 이상 web-store 의 서비스 문맥이 아니다', () => {
-    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';");
+    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society';");
     expect(layout).not.toContain("'k-cosmetics':");
     expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });
@@ -141,8 +141,8 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     // 옛 HUB는 자료함·공급 화면으로 이동하며 자료함도 종료 서비스 판정을 유지한다.
     expect(read('services/web-store/src/components/layouts/UnifiedStoreLibraryLayout.tsx')).toContain('if (retiredOnly) return <RetiredServiceNotice />;');
     expect(read('services/web-store/src/config/workspace.ts')).not.toContain("key: 'store-hub'");
-    // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
-    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
+    // 홈은 내부 서비스 수 대신 매장 경영 활동을 표시한다.
+    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const retiredOnly = useRetiredOnlyStore();');
   });
 });
 

@@ -227,6 +227,7 @@ export default function UsersManagementPage() {
   //   `supplier:operator` + supplier membership active 를 요구한다. 둘 중 하나라도 없으면 호출하지 않고(403 을 '—' 로
   //   삼키지 않는다) 공급자 컬럼 · CTA 도 그리지 않는다. Neture 역할로 대신 열지 않는다.
   const { user } = useAuth();
+  const canManageLifecycle = user?.roles?.some(role => role === 'neture:admin' || role === 'platform:super_admin') ?? false;
   const canSeeSupplierConsole = canSeeSubdomainOperatorPath(user, '/operator/suppliers');
   const [supplierStatusMap, setSupplierStatusMap] = useState<
     Map<string, { status: string; companyName?: string }>
@@ -270,6 +271,7 @@ export default function UsersManagementPage() {
       canOpenSupplierConsole={canSeeSupplierConsole}
     />
     <OperatorMembersConsolePage
+      canManageLifecycle={canManageLifecycle}
       serviceKey="neture"
       client={netureMembersClient}
       serverSort
@@ -362,7 +364,7 @@ export default function UsersManagementPage() {
       /* WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
          정지/복원/탈퇴 처리 bulk 작업. 승인/거절은 별도 RegistrationRequestsPage 트랙이므로 제외.
          bulk hard delete 는 추가하지 않음 (admin 단건 정책 유지). */
-      extraBulkActions={[
+      extraBulkActions={canManageLifecycle ? [
         {
           key: 'bulk-suspend',
           label: (n) => `정지 (${n})`,
@@ -424,7 +426,7 @@ export default function UsersManagementPage() {
           },
           confirm: { title: '일괄 탈퇴 처리', message: '선택한 회원을 탈퇴(비활성) 처리합니다.', confirmText: '탈퇴 처리', variant: 'danger' },
         },
-      ]}
+      ] : []}
     />
     </>
   );
