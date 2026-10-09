@@ -400,12 +400,8 @@ export class AuthClient {
     const token = this.strategy === 'localStorage' ? getAccessToken() : null;
     if (this.strategy === 'localStorage') this.endLocalSession();
     else { this.sessionGeneration += 1; this.rejectRefreshSubscribers(); }
-    try {
-      await this.api.post('/auth/logout', {}, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
-    } catch (error) {
-      // Surface server revocation failure; local logout has already completed.
-      throw error;
-    }
+    // Local logout has already completed; preserve any server revocation failure.
+    await this.api.post('/auth/logout', {}, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
   }
 
   /**

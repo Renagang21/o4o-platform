@@ -1,5 +1,14 @@
 # Authentication API Documentation
 
+> **Current session contract (2026-10-09, auth refactor phase 2):** Active routes use `/api/v1/auth`. The older examples below are historical; they do not define the current session API. Main integration and production rollout are tracked in [phase 2 verification](../../../docs/checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md).
+>
+> - `POST /api/v1/auth/logout` revokes only the signed current browser/session ID for its service. The body cannot select another service or browser. Another browser and another service stay signed in. Failed server revocation returns `500 LOGOUT_REVOCATION_FAILED`.
+> - `GET /api/v1/auth/password` returns `{success:true,data:{hasPassword,canManage}}`. `POST /api/v1/auth/password` accepts `{currentPassword?,newPassword}`; the current password is required when one already exists. Demo and whole-platform admin accounts cannot manage passwords.
+> - `POST /api/v1/auth/password/reset` accepts `{token,newPassword}`. Password save, reset-token consumption and account security generation rotation commit together. All previously issued access/refresh/pending handoff credentials are then rejected immediately. The client clears its local session and asks for login again.
+> - `POST /api/v1/auth/refresh` prefers an explicit body refresh token over a cookie. Local-storage clients send `{refreshToken,includeLegacyTokens:true}` and read `data.tokens`. Cookie clients use credentials and need no JSON tokens. Invalid sessions return non-retryable `401`; infrastructure failures return retryable `503 AUTH_SERVICE_UNAVAILABLE` without clearing cookies.
+> - Tokens must contain signed `serviceKey`, `sessionId` and `tokenFamily`. Refresh preserves these; login/handoff receive a new browser ID. Pre-deployment tokens lacking the binding require one fresh login.
+
+
 ## Overview
 
 The O4O Platform provides a unified authentication system that supports multiple authentication methods:

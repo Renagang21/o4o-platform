@@ -58,10 +58,10 @@ jest.mock('../modules/auth/services/role-assignment.service.js', () => ({
 }));
 const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', expiresIn: 900 }));
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차): handoff 발급이 access token 의
-//   세션 귀속(serviceKey · sessionEpoch)을 읽는다. 여기 기본값은 **claim 없는 토큰** 이므로
-//   판정에서 제외되고 기존 계약이 그대로 검증된다. 귀속을 보는 시나리오는 전용 spec
+//   브라우저 귀속과 계정 세대(serviceKey · sessionId · tokenFamily)를 읽는다.
+//   유효한 기본 세션으로 기존 workspace 계약을 검증한다. 폐기 시나리오는 전용 spec
 //   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
-const verifyAccessToken = jest.fn((_token: string): unknown => { userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' });
+const verifyAccessToken = jest.fn((_token: string): unknown => ({ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }));
 jest.mock('../utils/token.utils.js', () => ({
   generateTokens: (...a: unknown[]) => generateTokens(...a),
   verifyAccessToken: (t: string) => { const claims = verifyAccessToken(t); return claims ? { ...{ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }, ...(claims as object) } : null; },
