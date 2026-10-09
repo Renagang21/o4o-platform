@@ -47,16 +47,17 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **248 suites · 4,594 tests PASS** · 254 suites 중 DB integration 6개(48건) SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **249 suites · 4,663 tests PASS** · 255 suites 중 DB integration 6개(48건) SKIP |
 | 현재 Store 원장 기준 구성원 해제 보완 | **1 suite · 36 tests PASS**, API type-check PASS; 다른 현재 매장 관계의 role 유지·legacy 관계만 남은 경우 회수 검증 |
-| 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
+| 최신 main `01a47e6d4c` 결합 후 Store Vitest | **1 file · 9 tests PASS** |
+| 최신 main `01a47e6d4c` 결합 후 Neture Vitest | **46 files · 379 tests PASS** |
 | 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
 | 최신 main 결합 관리자 cookie session Vitest | **1 file · 3 tests PASS** |
 | 공유 guide/community `shared-space-ui` Vitest | **8 files · 63 tests PASS** |
-| 공통 운영 `operator-core-ui` Vitest | **4 files · 43 tests PASS** |
+| 공통 운영 `operator-core-ui` Vitest | **6 files · 50 tests PASS** |
 | `store-ui-core` Vitest | **8 files · 121 tests PASS** |
-| 공유 `@o4o/ui` Vitest | **1 file · 10 tests PASS** |
+| 공유 `@o4o/ui` Vitest | **2 files · 19 tests PASS** |
 | CD detector/risk/workflow/orchestration + PH URL map planner Node tests | **332 tests PASS** · CI blocking Node 목록 전체 |
 | Local Agent CI Node tests + PH origin 실제 loopback HTTP | **75 tests PASS** · native bridge·local DB·browser DOM·pairing 차단 |
 | `git diff --check` | PASS |
@@ -133,3 +134,5 @@ HEAD `eafdd9b838`의 CI Gate는 통과했고 최신 리뷰가 PH 이력과 함�
 HEAD `0a181a9d42`의 재리뷰는 slug 생성 실패로 PH enrollment만 남은 조직도 공개 QR에서 차단해야 한다고 지적했다. owner/staff 후보와 같은 조직 식별 projection을 재사용하는 `isRetiredPharmacyHubOrganization`으로 PH enrollment·active/inactive slug와 현재 매장 원장을 함께 판정한다. QR은 스캔 INSERT 전에 종료하며 공개 Store 관심 요청·정책·slug 조회도 이 판정을 공유한다. current Store 승인 원장이 있으면 PH 이력·주소 부재와 관계없이 현재 QR을 사용할 수 있다. 옛 KPA 조직 fallback의 자료 편집·조회에도 같은 판정을 적용해 PH 전용 조직을 다시 열지 않으며 현재 조직 우선·기존 현재 관계의 편집·빈 자료함 응답 계약은 유지한다. 이 보완을 포함한 API 254 suites에서 248 suites·4,594 tests와 type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. PH enrollment-only·inactive 원장·legacy KPA 주소·현재 승인된 매장·원장 보존·실제 자료 편집의 저장 차단을 검증한 결과다. 최신 보완 커밋의 CI·Sonar·Codex와 실제 운영 삭제는 별도 확인 대상이다.
 
 HEAD `6c113e343a`의 SonarCloud는 통과했으며 새 코드 중복률은 1.7%, Security Hotspot은 0이었다. Codex는 현재 매장 원장으로 등록된 직원의 다른 매장 관계도 해제 시 같은 원장으로 확인해야 한다고 지적했다. KPA role의 남은 관계는 active `neture_pharmacy_memberships`로 확인하며 legacy enrollment/slug만 남은 관계는 현재 role을 유지하지 않는다. 독립 매장의 유효한 직원 관계가 남으면 role을 유지하는 회귀와 옛 관계만 남으면 회수하는 회귀를 포함해 구성원 36건·API type-check를 통과했다. 이 HEAD의 전체 CI는 API Jest 1/3에서 실패했으므로 로컬 검증이나 이전 CI 성공으로 통합 가능 상태를 선언하지 않는다. 최신 보완 커밋의 전체 CI·리뷰는 별도 확인 대상이다.
+
+HEAD `002e3bb3b0`의 Codex 리뷰는 완료됐고 미해결 지적은 없었으나 전체 CI는 API Jest 1/3에서 다시 실패했다. 이 branch 자체의 같은 구간은 144 suites·2,641 tests가 통과했고 DB integration 3개(12건)는 SKIP했다. CI가 사용하는 main `01a47e6d4c`와의 결합을 별도 snapshot에서 재현한 결과, main의 새 catalog 권한 회귀가 PH 신규 역할 부여를 정상 서비스의 권한 거부(403)로 기대해 실제 퇴역 응답(410)과 충돌했다. 이 결합 문제를 수정하기 위해 자기 branch에 최신 main을 결합하고 해당 회귀의 대상만 현재 `supplier`로 바꿨다. catalog의 실제 서비스와 body의 위조 서비스 불일치 검증 및 PH 역할 부여 차단 회귀는 그대로 유지했다. 변경 consumer와 main의 변경 API 회귀를 합친 255 suites에서 249 suites·4,663 tests 및 type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. 역할 catalog/PH 차단 2 suites·36건, Store 9건, Neture 379건, 공통 운영 UI 50건, 공통 UI 19건도 통과했다. main의 화면·인증·운영자/가입 경계 수정을 되돌리지 않았으며 main 자체의 merge·배포·운영 인프라 삭제는 수행하지 않았다. 최종 보완 HEAD의 required CI·SonarCloud·Codex는 PR에서 다시 확인한다.
