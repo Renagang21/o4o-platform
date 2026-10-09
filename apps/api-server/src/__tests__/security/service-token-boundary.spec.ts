@@ -67,6 +67,10 @@ jest.mock('../../services/authentication.service.js', () => ({
 }));
 
 import * as tokenUtils from '../../utils/token.utils.js';
+jest.mock('../../modules/auth/services/role-assignment.service.js', () => ({
+  roleAssignmentService: { getRoleNames: jest.fn(async () => []) },
+}));
+
 import { requireAuth, optionalAuth } from '../../common/middleware/auth/authentication.middleware.js';
 import guestAuthRoutes from '../../modules/auth/routes/guest-auth.routes.js';
 

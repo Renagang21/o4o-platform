@@ -1,6 +1,6 @@
 # O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
 
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (본문 정합 — 운영자 비밀번호 변경 은퇴 · 목록 route · GlucoseView 은퇴 반영. 회원관리 API 표준 §4.4~§8 은 `apps/api-server/src/routes/operator/membership.routes.ts` 와 일치)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-09 (본문 정합 — 운영자 비밀번호 변경 은퇴 · 목록 route · GlucoseView 은퇴 반영. 회원관리 API 표준 §4.4~§8 은 `apps/api-server/src/routes/operator/membership.routes.ts` 와 일치)
 > (2026-10-04 정합) **운영자의 회원 비밀번호 변경은 은퇴했다** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`([CHECK](../../checks/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md): admin/operator password 변경 surface 0 · PasswordModal 제거). 이후 도입된 이메일 · 비밀번호 로그인([CHECK](../../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md))은 **사용자 본인**의 인증 수단(가입 · 재설정 · 로그인 상태 `POST /auth/password`)이며 Admin 화면 · `platform:*` 세션은 Google 전용이다. 운영자가 대신 바꾸는 비밀번호 경로는 없다. 아래 §3.2 · §4.2 · §6.1 의 비밀번호 항목은 무효.
 
 > **O4O 운영자 회원관리 표준 v1**
@@ -21,6 +21,27 @@
 - 역할 관리
 - 멤버십 승인/거절
 - 상태 관리
+
+---
+
+### 1.1 서비스 권한·데이터 경계 (2026-10-09 정합)
+
+인증 시 활성·유효한 `role_assignments`를 다시 읽어 역할 해제·강등을 기존 로그인에서도
+다음 요청부터 반영한다. 조회 실패 시 이전 JWT 역할로 허용하지 않는다.
+회원관리 API의 서비스 범위는 해당 서비스의 `admin`/`operator` 지정으로 판정하며,
+일반 회원·매장 역할이나 서비스 가입만으로 다른 서비스 회원관리 권한을 주지 않는다.
+
+목록·상세의 회원 가입 정보와 역할은 요청한 `serviceKey` 범위로 반환한다.
+플랫폼 관리자의 전 서비스 조회는 기존 명시 `all=true` 계약을 유지한다.
+회원 유형·상태·일괄 상태·복구·탈퇴 변경은 한 서비스로 한정한다.
+서비스 권한이 하나이면 생략된 키를 그 서비스로 해석할 수 있으나,
+다중 서비스 운영자와 플랫폼 관리자는 대상 `serviceKey`를 명시해야 한다.
+탈퇴는 기존 계약대로 권한 개수와 무관하게 명시 키가 필요하다.
+회원 유형의 `membershipServiceKey`도 같은 권한·소속 검증을 받는다.
+
+공통 계정 수정·복구 및 `admin`과 `operator`의 추가 권한 차이는 이번 수정에서
+정책으로 확정하지 않는다. 구현·검증 범위는
+[경계 수정 WO](../../work-orders/WO-O4O-SERVICE-OPERATOR-MEMBERSHIP-BOUNDARY-FIX-V1.md)를 참조한다.
 
 ---
 

@@ -194,7 +194,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
     }
     (async () => {
       try {
-        const data = await makeRequest('GET', `/operator/members/${userId}`) as any;
+        const data = await makeRequest('GET', `/operator/members/${userId}?serviceKey=${encodeURIComponent(serviceKey)}`) as any;
         const u = data.user;
 
         // membership role

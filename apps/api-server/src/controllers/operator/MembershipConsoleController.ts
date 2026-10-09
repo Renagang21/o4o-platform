@@ -7,6 +7,7 @@
  */
 import { Request, Response } from 'express';
 import { In } from 'typeorm';
+import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
@@ -76,43 +77,26 @@ export class MembershipConsoleController {
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
   //   changeMemberServicePassword 는 은퇴했다 (service_credentials write-path).
 
-  /**
-   * Service boundary check — non-platform-admin can only access users in their service scope
-   */
-  /**
-   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (lifecycle fan-out 경계)
-   *
-   * 원칙: "서비스 운영자의 회원 상태 변경은 해당 serviceKey 의 membership 에만 영향을 줘야 한다."
-   *
-   * 기존 write 경로(updateMemberStatus / batchUpdateStatus / reactivateMember)는
-   * `scope.serviceKeys`(= 운영자가 보유한 **모든** 서비스)를 그대로 MembershipApprovalService 에
-   * 넘겼다. 다중 서비스 operator 나 platform admin 이 한 콘솔에서 정지/재활성화하면
-   * 같은 사용자의 **다른 서비스 membership 과 role_assignments 까지** 함께 바뀐다.
-   * 읽기 경로는 이미 `resolveOperatorScope` 로 좁혀져 있어 축이 어긋나 있었다.
-   *
-   * 교정: write 요청도 명시 serviceKey(body 우선, query fallback)로 좁힌다.
-   *   - service operator : 보유 scope 안이면 그 키 하나로 축소, 밖이면 빈 scope (권한 확대 불가)
-   *   - platform admin   : 지정한 키 하나로 축소 (scope 필터가 실제 적용되도록 flag 도 내린다)
-   *   - serviceKey 미지정: 종전 동작 유지 (하위 호환 — 미채택 클라이언트 보호)
-   *
-   * users.status(플랫폼 축)는 이 helper 로 바뀌지 않는다 — 기존 계약 그대로다.
-   */
+  /** Resolve one authorized service for a user-ID-based mutation. */
   private resolveWriteScope(
     req: Request,
     scope: ServiceScope,
-  ): { isPlatformAdmin: boolean; serviceKeys: string[] } {
-    const raw = (req.body && (req.body as any).serviceKey) ?? (req.query as any)?.serviceKey;
+    res: Response,
+  ): { isPlatformAdmin: boolean; serviceKeys: string[] } | null {
+    const raw = req.body?.serviceKey ?? req.query?.serviceKey;
     const sk = typeof raw === 'string' ? raw.trim() : '';
-    if (!sk || sk === 'all') {
-      return { isPlatformAdmin: scope.isPlatformAdmin, serviceKeys: scope.serviceKeys };
+    // A sole service is unambiguous. Never infer all services or platform-wide writes.
+    const serviceKey = raw === undefined && !scope.isPlatformAdmin && scope.serviceKeys.length === 1
+      ? scope.serviceKeys[0] : sk;
+    if (!serviceKey || serviceKey === 'all') {
+      res.status(400).json({ success: false, code: 'SERVICE_KEY_REQUIRED', error: '대상 서비스 한 개를 지정해야 합니다.' });
+      return null;
     }
-    if (scope.isPlatformAdmin) {
-      return { isPlatformAdmin: false, serviceKeys: [sk] };
+    if (!scope.isPlatformAdmin && !scope.serviceKeys.includes(serviceKey)) {
+      res.status(403).json({ success: false, code: 'SERVICE_SCOPE_FORBIDDEN', error: '해당 서비스에 대한 권한이 없습니다.' });
+      return null;
     }
-    return {
-      isPlatformAdmin: false,
-      serviceKeys: scope.serviceKeys.includes(sk) ? [sk] : [],
-    };
+    return { isPlatformAdmin: false, serviceKeys: [serviceKey] };
   }
 
   private async checkServiceBoundary(userId: string, serviceKeys: string[]): Promise<boolean> {
@@ -233,11 +217,14 @@ export class MembershipConsoleController {
 
       // Batch fetch role_assignments
       const roleRows = await AppDataSource.query(
-        `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles
-         FROM role_assignments
-         WHERE user_id = ANY($1) AND is_active = true
-         GROUP BY user_id`,
-        [userIds]
+        `SELECT ra.user_id, ARRAY_AGG(ra.role ORDER BY ra.role) as roles
+         FROM role_assignments ra
+         LEFT JOIN roles r ON ra.role = r.name
+         WHERE ra.user_id = ANY($1) AND ra.is_active = true
+           AND ($2::text[] IS NULL OR ra.role LIKE ANY($2)
+                OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
+         GROUP BY ra.user_id`,
+        [userIds, resolved.serviceKeys === null ? null : resolved.serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), resolved.serviceKeys]
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
@@ -245,7 +232,7 @@ export class MembershipConsoleController {
       }
 
       // Batch fetch service_memberships (scoped by service)
-      const membershipRows = scope.isPlatformAdmin
+      const membershipRows = resolved.serviceKeys === null
         ? await AppDataSource.query(
             `SELECT id, user_id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at
              FROM service_memberships
@@ -258,7 +245,7 @@ export class MembershipConsoleController {
              FROM service_memberships
              WHERE user_id = ANY($1) AND service_key = ANY($2)
              ORDER BY created_at DESC`,
-            [userIds, scope.serviceKeys]
+            [userIds, resolved.serviceKeys]
           );
       const membershipMap: Record<string, any[]> = {};
       for (const row of membershipRows) {
@@ -341,6 +328,10 @@ export class MembershipConsoleController {
   getMemberDetail = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) { res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE); return; }
+      if (resolved.crossService) logCrossServiceQuery(req);
+      const serviceKeys = resolved.serviceKeys;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -348,8 +339,8 @@ export class MembershipConsoleController {
       }
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary check
-      if (!scope.isPlatformAdmin) {
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+      if (serviceKeys !== null) {
+        const hasAccess = await this.checkServiceBoundary(userId, serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -380,12 +371,13 @@ export class MembershipConsoleController {
          FROM role_assignments ra
          LEFT JOIN roles r ON ra.role = r.name
          WHERE ra.user_id = $1
+           AND ($2::text[] IS NULL OR ra.role LIKE ANY($2) OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          ORDER BY ra.is_active DESC, ra.created_at DESC`,
-        [userId]
+        [userId, serviceKeys === null ? null : serviceKeys.map(k => `${resolveRolePrefixFromCanonicalServiceKey(k)}:%`), serviceKeys]
       );
 
       // Fetch service_memberships (scoped by service)
-      const membershipRows = scope.isPlatformAdmin
+      const membershipRows = serviceKeys === null
         ? await AppDataSource.query(
             `SELECT id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at, updated_at
              FROM service_memberships
@@ -398,7 +390,7 @@ export class MembershipConsoleController {
              FROM service_memberships
              WHERE user_id = $1 AND service_key = ANY($2)
              ORDER BY created_at DESC`,
-            [userId, scope.serviceKeys]
+            [userId, serviceKeys]
           );
 
       res.json({
@@ -554,7 +546,8 @@ export class MembershipConsoleController {
   updateMemberStatus = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -769,7 +762,8 @@ export class MembershipConsoleController {
       }
 
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const updatedBy = (req as any).user?.id || null;
       const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
@@ -904,7 +898,8 @@ export class MembershipConsoleController {
   reactivateMember = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -994,6 +989,25 @@ export class MembershipConsoleController {
         }
       }
 
+      // Validate the selected membership service before any membership/profile write.
+      let membershipServiceKey: string | undefined;
+      if (membershipRole && typeof membershipRole === 'string') {
+        const explicit = req.body.membershipServiceKey;
+        if (explicit !== undefined && req.body.serviceKey !== undefined && explicit !== req.body.serviceKey) {
+          res.status(400).json({ success: false, code: 'SERVICE_KEY_MISMATCH', error: '서비스 지정이 일치하지 않습니다.' });
+          return;
+        }
+        const writeScope = this.resolveWriteScope(
+          { ...req, body: { ...req.body, serviceKey: explicit ?? req.body.serviceKey } } as Request, scope, res,
+        );
+        if (!writeScope) return;
+        membershipServiceKey = writeScope.serviceKeys[0];
+        if (!(await this.checkServiceBoundary(userId, [membershipServiceKey]))) {
+          res.status(404).json({ success: false, error: 'Membership not found' });
+          return;
+        }
+      }
+
       // 0. Membership role update (service_memberships.role)
       if (membershipRole && typeof membershipRole === 'string') {
         // WO-O4O-MEMBER-ROLE-WRITE-PATH-HARDENING-V1:
@@ -1011,7 +1025,7 @@ export class MembershipConsoleController {
         // Demo 계정 보호(정책 §8 role 변경): 회원 유형 변경도 write **전에** 막는다.
         if (await rejectDemoAccountTarget(res, userId)) return;
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
-        const serviceKey = req.body.membershipServiceKey || scope.serviceKeys[0];
+        const serviceKey = membershipServiceKey;
         if (serviceKey) {
           await AppDataSource.query(
             `UPDATE service_memberships SET role = $1, updated_at = NOW()
@@ -1233,7 +1247,8 @@ export class MembershipConsoleController {
 
       // 보유 범위 검증은 다른 write 경로와 같은 규칙(`resolveWriteScope`)에 맡긴다.
       //   platform admin → [명시 키] · 서비스 운영자 → 보유한 키일 때만 [명시 키], 아니면 []
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       if (writeScope.serviceKeys.length !== 1 || writeScope.serviceKeys[0] !== targetServiceKey) {
         res.status(403).json({
           success: false,

@@ -220,7 +220,7 @@ export default function UserDetailPage({
     setLoading(true);
     setError('');
     try {
-      const data = await apiAdapter.get(`/operator/members/${id}`);
+      const data = await apiAdapter.get(`/operator/members/${id}?${config.serviceKey ? `serviceKey=${encodeURIComponent(config.serviceKey)}` : 'all=true'}`);
       setUser(data.user);
       setRoles(data.roles || []);
       setMemberships(data.memberships || []);
@@ -229,7 +229,7 @@ export default function UserDetailPage({
     } finally {
       setLoading(false);
     }
-  }, [id, apiAdapter]);
+  }, [id, apiAdapter, config.serviceKey]);
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
