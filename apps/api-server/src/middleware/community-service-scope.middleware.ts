@@ -12,22 +12,22 @@
  * 개설 신청 심사는 아직 어떤 커뮤니티에도 속하지 않은 요청을 다루므로 개체 경계로 판정할 수
  * 없다. 그래서 서비스 전체 역할(`community:admin`)이 심사한다.
  *
- * `community:operator` 를 **만들지 않았다**. 개별 커뮤니티 운영은 개체 역할(operator
- * membership)로만 하며, 전역 operator 를 두면 A 커뮤니티 운영자가 B 커뮤니티를 운영하게 된다
- * (분회에서 `kpa-branch:operator` 가 전역 역할이어서 생긴 문제와 같다 — WO §5).
+ * 서비스 admin은 개설 심사·개체 운영자 지정, operator는 서비스 운영 현황 조회를 담당한다.
+ * 어느 서비스 역할도 개별 community_memberships 운영자 경계를 우회하지 않는다.
  */
 import type { ServiceScopeGuardConfig } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
 
 export const COMMUNITY_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   serviceKey: 'community',
-  allowedRoles: ['community:admin'],
+  allowedRoles: ['community:admin', 'community:operator'],
   platformBypass: true,
   legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'pharmacy-hub', 'lms', 'lecture'],
   // mapping 이 비면 allowedRoles 전체로 fallback 하므로 명시한다.
   scopeRoleMapping: {
     'community:admin': ['community:admin'],
+    'community:operator': ['community:operator', 'community:admin'],
   },
 };
 

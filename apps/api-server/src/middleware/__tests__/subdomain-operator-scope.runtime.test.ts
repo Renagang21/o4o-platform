@@ -66,6 +66,7 @@ const ROUTES: Record<string, RequestHandler> = {
   // 종전 neture:operator 였다 — governance 만 옮겨 두면 목록은 보이고 승인은 안 된다.
   supplierOperator: requireSupplierScope('supplier:operator') as RequestHandler, // /neture/operator/suppliers*
   fundingOperator: requireFundingScope('funding:operator') as RequestHandler, // /neture/operator/market-trial/*
+  communityOperator: requireCommunityServiceScope('community:operator') as RequestHandler,
   communityAdmin: requireCommunityServiceScope('community:admin') as RequestHandler, // /communities/requests*
   netureAdmin: requireNetureScope('neture:admin') as RequestHandler,
   netureOperator: requireNetureScope('neture:operator') as RequestHandler,
@@ -81,6 +82,7 @@ const NONE = {
   supplierAdmin: false,
   supplierOperator: false,
   fundingOperator: false,
+  communityOperator: false,
   communityAdmin: false,
   netureAdmin: false,
   netureOperator: false,
@@ -106,8 +108,13 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
     expect(await matrix({ roles: ['funding:admin'], memberships: [['funding', 'active']] })).toEqual({ ...NONE, fundingOperator: true });
   });
 
+  it('community:operator는 현황 조회만 통과하고 구조 변경·다른 서비스는 차단된다', async () => {
+    expect(await matrix({ roles: ['community:operator'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityOperator: true });
+    expect(await passes(ROUTES.communityOperator, { roles: ['community:operator'], memberships: [['community', 'suspended']] })).toBe(false);
+    expect(await passes(ROUTES.communityOperator, { roles: [], memberships: [['community', 'active']] })).toBe(false);
+  });
   it('community:admin + community membership 만 → 커뮤니티 개설 심사만', async () => {
-    expect(await matrix({ roles: ['community:admin'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityAdmin: true });
+    expect(await matrix({ roles: ['community:admin'], memberships: [['community', 'active']] })).toEqual({ ...NONE, communityAdmin: true, communityOperator: true });
   });
 
   it('Neture 관리자·운영자 역할만 → Neture 운영만 · 세 서브도메인 영역 X', async () => {
@@ -151,7 +158,7 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
       supplierAdmin: true,
       supplierOperator: true,
       fundingOperator: true,
-      communityAdmin: true,
+      communityAdmin: true, communityOperator: true,
       netureAdmin: true,
       netureOperator: true,
     });

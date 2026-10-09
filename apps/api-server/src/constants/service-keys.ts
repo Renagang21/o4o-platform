@@ -45,7 +45,7 @@ export const SERVICE_KEYS = {
    *
    * 개별 커뮤니티는 `communities` 개체이고, 이 키는 그 **위의 서비스 축**이다
    * (진입 자격 · 전체 관리자 `community:admin`). 개별 커뮤니티 운영은 개체 역할
-   * (`community_memberships.role='operator'`)이며 서비스 전역 operator 역할은 없다.
+   * (`community_memberships.role='operator'`)이며 서비스 admin/operator 역할과 별도다.
    */
   COMMUNITY: 'community',
   /**

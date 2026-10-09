@@ -208,6 +208,12 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
 
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리): community:admin 은 자기 서비스 화면
   //   (개설 심사 · 개별 커뮤니티 운영자 지정) 하나를 본다.
+  it('community:operator → 현황 화면 메뉴', () => {
+    signIn(['community:operator'], active('community'));
+    render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />);
+    expect(menuPaths()).toEqual(['/admin/communities']);
+  });
+
   it('community:admin → 커뮤니티 서비스 관리 항목', () => {
     signIn(['community:admin'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);

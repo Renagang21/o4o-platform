@@ -1,14 +1,16 @@
 /**
- * CommunityServiceAdminPage — 커뮤니티 서비스 관리 (community:admin)
+ * CommunityServiceAdminPage — 커뮤니티 서비스 관리 (community:admin / community:operator)
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
- * Admin(admin.neture.co.kr)은 서비스 운영자(`community:admin`)만 지정한다. 그 다음 업무는 이 화면이다:
+ * Admin(admin.neture.co.kr)은 서비스 admin/operator를 지정한다. 그 다음 업무는 이 화면이다:
  *   - 커뮤니티 개설 신청 심사 (승인 · 거절)
  *   - 개별 커뮤니티 운영자 지정·해제 — 그 커뮤니티의 승인된(active) 회원 중에서.
  *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 운영자는 해제되지 않는다.
- * 화면 guard 는 `SubdomainOperatorRoute serviceKey="community" level="admin"` 이고 실제 경계는 backend 다.
+ * 화면 guard 는 `SubdomainOperatorRoute serviceKey="community" level="operator"` 이고 실제 경계는 backend 다.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { subdomainOperatorRoles } from '../../lib/role-constants';
 import {
   approveCreationRequest,
   communityAdminErrorMessage,
@@ -32,7 +34,7 @@ const SERVICE_STATUS_LABEL: Record<string, string> = {
   withdrawn: '탈퇴',
 };
 
-function CreationRequestsPanel() {
+function CreationRequestsPanel({ canManage }: { canManage: boolean }) {
   const [rows, setRows] = useState<CommunityCreationRequestRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -99,7 +101,7 @@ function CreationRequestsPanel() {
                 <th className="py-2">이름</th>
                 <th className="py-2">주소</th>
                 <th className="py-2">신청일</th>
-                <th className="py-2 text-right">처리</th>
+                {canManage && <th className="py-2 text-right">처리</th>}
               </tr>
             </thead>
             <tbody>
@@ -111,7 +113,7 @@ function CreationRequestsPanel() {
                   </td>
                   <td className="py-2 text-slate-600">{r.desiredSlug}</td>
                   <td className="py-2 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
-                  <td className="py-2 text-right whitespace-nowrap">
+                  {canManage && <td className="py-2 text-right whitespace-nowrap">
                     <button
                       type="button"
                       disabled={busyId === r.id}
@@ -128,7 +130,7 @@ function CreationRequestsPanel() {
                     >
                       거절
                     </button>
-                  </td>
+                  </td>}
                 </tr>
               ))}
             </tbody>
@@ -141,7 +143,7 @@ function CreationRequestsPanel() {
   );
 }
 
-function CommunityOperatorsPanel() {
+function CommunityOperatorsPanel({ canManage }: { canManage: boolean }) {
   const [communities, setCommunities] = useState<CommunityAdminRow[] | null>(null);
   const [communityId, setCommunityId] = useState('');
   const [members, setMembers] = useState<CommunityMemberRow[] | null>(null);
@@ -219,7 +221,7 @@ function CommunityOperatorsPanel() {
                 <th className="py-2">이메일</th>
                 <th className="py-2">서비스 이용</th>
                 <th className="py-2">역할</th>
-                <th className="py-2 text-right">처리</th>
+                {canManage && <th className="py-2 text-right">처리</th>}
               </tr>
             </thead>
             <tbody>
@@ -234,7 +236,7 @@ function CommunityOperatorsPanel() {
                       {m.serviceMembershipStatus ? SERVICE_STATUS_LABEL[m.serviceMembershipStatus] ?? m.serviceMembershipStatus : '미가입'}
                     </td>
                     <td className="py-2 text-slate-800">{isOperator ? '운영자' : '회원'}</td>
-                    <td className="py-2 text-right">
+                    {canManage && <td className="py-2 text-right">
                       <button
                         type="button"
                         disabled={busyId === m.membershipId || !canPromote}
@@ -245,7 +247,7 @@ function CommunityOperatorsPanel() {
                       >
                         {isOperator ? '해제' : '운영자 지정'}
                       </button>
-                    </td>
+                    </td>}
                   </tr>
                 );
               })}
@@ -260,18 +262,22 @@ function CommunityOperatorsPanel() {
 }
 
 export default function CommunityServiceAdminPage() {
+  const { user } = useAuth();
+  const canManage = (user?.roles ?? []).some(role => subdomainOperatorRoles('community', 'admin').includes(role));
   const [tab, setTab] = useState<Tab>('operators');
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-xl font-bold text-slate-900">커뮤니티 서비스 관리</h1>
       <p className="mt-1 text-xs text-slate-500">
-        커뮤니티 개설 심사와 개별 커뮤니티 운영자 지정은 커뮤니티 서비스 운영자가 이 화면에서 처리합니다.
+        {canManage
+          ? '개설 심사와 개별 커뮤니티 운영자 지정은 서비스 관리자가 처리합니다.'
+          : '서비스 운영 현황을 조회합니다. 개설 심사와 운영자 지정은 서비스 관리자에게 요청하세요.'}
       </p>
       <div className="mt-6 flex gap-4 border-b border-slate-200 text-sm">
         {(
           [
-            ['operators', '커뮤니티 운영자 지정'],
-            ['requests', '개설 신청 심사'],
+            ['operators', canManage ? '커뮤니티 운영자 지정' : '커뮤니티 운영 현황'],
+            ['requests', canManage ? '개설 신청 심사' : '개설 신청 현황'],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -286,7 +292,7 @@ export default function CommunityServiceAdminPage() {
           </button>
         ))}
       </div>
-      {tab === 'operators' ? <CommunityOperatorsPanel /> : <CreationRequestsPanel />}
+      {tab === 'operators' ? <CommunityOperatorsPanel canManage={canManage} /> : <CreationRequestsPanel canManage={canManage} />}
     </div>
   );
 }

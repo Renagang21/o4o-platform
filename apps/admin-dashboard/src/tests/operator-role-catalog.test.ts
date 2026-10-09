@@ -34,6 +34,11 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
     expect(ASSIGNABLE_ROLE_VALUES).toEqual(readServerRoles());
   });
 
+  it('커뮤니티 서비스는 admin/operator 두 역할을 선택할 수 있다', () => {
+    expect(ASSIGNABLE_ROLES.community.map(r => r.value)).toEqual(['community:admin', 'community:operator']);
+    expect(findRoleOption('community:operator')?.label).toBe('Operator');
+  });
+
   it('platform:* 은 부여 대상이 아니다 (platform:super_admin 신규 부여 기능 없음)', () => {
     expect(ASSIGNABLE_ROLE_VALUES.some((r) => r.startsWith('platform:'))).toBe(false);
     expect(REGISTRABLE_SERVICE_KEYS).not.toContain('platform');

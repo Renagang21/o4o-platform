@@ -10,8 +10,8 @@
  *      실수가 조용히 들어온다 — mapping 이 비면 `allowedRoles` 전체로 fallback 한다.
  * 그래서 구성을 한 곳에서 만든다.
  *
- * **커뮤니티는 이 팩토리를 쓰지 않는다.** `community` 는 `admin` 하나뿐이고(개별 커뮤니티
- * 운영은 개체 역할이라 전역 operator 를 만들지 않았다) 계층이 다르다.
+ * 커뮤니티는 별도 config에서 같은 admin ⊃ operator 계층을 사용한다.
+ * 개별 커뮤니티 운영 권한은 community_memberships로 따로 판정한다.
  */
 import type { ServiceKey, ServiceScopeGuardConfig } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';

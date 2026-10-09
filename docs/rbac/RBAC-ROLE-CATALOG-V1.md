@@ -72,11 +72,12 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | ~~`glucoseview:`~~ | 글루코스뷰 — **은퇴**(2026-10-06 정정: service catalog · security-core · runtime 에 없음) | ~~`glucoseview:admin`, `glucoseview:operator`~~ — 부여 금지 |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
 | `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner` |
+| `community:` | 커뮤니티 서비스 | `community:admin`, `community:operator` — 중앙 지정. 서비스 운영 현황 조회는 operator 이상, 개설 심사·개별 운영자 지정은 admin. 개체 운영권은 `community_memberships.role`로 별도 판정. 정비 [WO](../work-orders/WO-O4O-COMMUNITY-ADMIN-OPERATOR-ALIGNMENT-V1.md) |
 | `lecture:` | O4O 강의 | `lecture:admin`, `lecture:operator`, `lecture:instructor` — 일반 학습자는 role 없이 `service_memberships('lecture')` |
 
 #### Admin ⊃ Operator 계층
 
-KPA · Neture · K-Cosmetics · Pharmacy-Hub · Lecture 는 admin ⊃ operator 계층을 `scopeRoleMapping` 으로 **명시**한다.
+KPA · Neture · K-Cosmetics · Pharmacy-Hub · Lecture · Community는 admin ⊃ operator 계층을 `scopeRoleMapping` 으로 **명시**한다.
 Lecture의 `instructor`는 운영 계층과 별도 capability이며 admin/operator가 대신하지 않는다.
 
 ```text

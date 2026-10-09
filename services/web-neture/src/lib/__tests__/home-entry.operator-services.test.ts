@@ -164,4 +164,9 @@ describe('buildHomeEntryModel — supplier · funding · community 운영 카드
       ['operator:community:admin', { kind: 'internal', to: '/admin/communities' }],
     ]);
   });
+  it('community operator → 서비스 현황 화면 (내부 이동)', () => {
+    const m = buildHomeEntryModel(user(['community:operator']), data([op('community', 'operator', 'none')]));
+    expect(operatorGroup(m)!.items.map((i) => i.action)).toEqual([{ kind: 'internal', to: '/admin/communities' }]);
+  });
+
 });

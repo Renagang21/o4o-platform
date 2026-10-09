@@ -101,6 +101,7 @@ export function createCommunitiesRoutes(
   // 개체 운영자 경계: slug -> 행 확인 -> active 가입 -> role='operator'
   const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];
   // 서비스 전체 심사 경계
+  const serviceOperatorOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:operator')];
   const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin')];
 
   router.get(
@@ -126,7 +127,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/admin/communities',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (_req, res) => {
       res.json({ success: true, data: { communities: await designation().listCommunities() } });
     }),
@@ -134,7 +135,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/admin/communities/:communityId/members',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (req, res) => {
       try {
         res.json({ success: true, data: await designation().listMembers(req.params.communityId) });
@@ -208,7 +209,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/requests',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (_req, res) => {
       res.json({ success: true, data: { requests: await lifecycle().listPendingCreationRequests() } });
     }),

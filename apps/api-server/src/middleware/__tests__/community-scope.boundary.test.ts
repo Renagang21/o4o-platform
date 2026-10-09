@@ -92,8 +92,9 @@ const makeReq = (slug: string, userId?: string) =>
   ({ params: { communitySlug: slug }, user: userId ? { id: userId } : undefined }) as any;
 
 /** resolve → scope 를 순서대로 태우고 최종 통과 여부를 돌려준다. */
-async function run(slug: string, userId: string | undefined, level: 'member' | 'operator') {
+async function run(slug: string, userId: string | undefined, level: 'member' | 'operator', roles: string[] = []) {
   const req = makeReq(slug, userId);
+  if (req.user) req.user.roles = roles;
   const res = makeRes();
   let resolved = false;
   await (resolveCommunity as any)(req, res, () => {
@@ -189,4 +190,10 @@ describe('커뮤니티 개체 경계', () => {
     expect(code).not.toMatch(/community:admin/);
     expect(code).not.toMatch(/platform:super_admin/);
   });
+});
+
+it.each(['community:admin', 'community:operator'])('%s does not turn an ordinary entity member into an individual operator', async role => {
+  const { passed, res } = await run('alpha', MEMBER_A, 'operator', [role]);
+  expect(passed).toBe(false);
+  expect(res.status).toHaveBeenCalledWith(403);
 });

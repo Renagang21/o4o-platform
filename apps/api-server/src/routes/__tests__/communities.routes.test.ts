@@ -92,7 +92,7 @@ describe('개설 — 서비스 전체 역할이 심사한다', () => {
     ['POST', '/requests/:requestId/approve'],
     ['POST', '/requests/:requestId/reject'],
   ])('%s %s 는 community:admin 이 심사한다', (method, path) => {
-    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
+    expect(find(method, path).guards).toEqual(['authenticate', method === 'GET' ? 'serviceScope:community:operator' : 'serviceScope:community:admin']);
   });
 
   it('개설 심사 경로에는 **개체 가드가 붙지 않는다** (첫 커뮤니티를 만들 수 있어야 한다)', () => {
@@ -194,7 +194,7 @@ describe('개별 커뮤니티 운영자 지정·해제 — 커뮤니티 서비�
     ['GET', '/admin/communities/:communityId/members'],
     ['POST', '/admin/communities/:communityId/members/:membershipId/role'],
   ])('%s %s 는 서비스 전체 가드만 쓴다 (개체 가드 없음)', (method, p) => {
-    expect(find(method, p).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
+    expect(find(method, p).guards).toEqual(['authenticate', method === 'GET' ? 'serviceScope:community:operator' : 'serviceScope:community:admin']);
   });
 
   it('파라미터 라우트(/:communitySlug/...)보다 먼저 등록된다', () => {
