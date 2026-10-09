@@ -13,7 +13,7 @@ it.each([['DELETE', '/u', {}], ['POST', '/u/reactivate', {}], ['PATCH', '/u/stat
   const { res, next } = check(method, path, body);
   expect(res.status).toHaveBeenCalledWith(403); expect(next).not.toHaveBeenCalled();
 });
-it.each([['PATCH', '/m/approve', {}], ['PATCH', '/m/reject', {}], ['GET', '/u', {}], ['PUT', '/u', { nickname: 'fixture' }], ['PATCH', '/u/status', { status: 'approved' }]])('operator retains %s %s', (method, path, body) => {
+it.each([['PATCH', '/m/approve', {}], ['PATCH', '/m/reject', {}], ['GET', '/u', {}], ['GET', '/roles', {}], ['PUT', '/u', { nickname: 'fixture' }], ['PATCH', '/u/status', { status: 'approved' }]])('operator retains %s %s', (method, path, body) => {
   const { req, next } = check(method, path, body);
   expect(next).toHaveBeenCalledTimes(1); expect(req.memberManagementApprovalOnly).toBe(true);
 });

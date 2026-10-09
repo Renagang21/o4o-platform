@@ -212,3 +212,11 @@ Neture·KPA·Lecture·Supplier·Funding·Community 소비처와 공통/API 경�
 최신 main 통합 후 검증: API 16 suites / 309 tests, Neture 46 files / 378 tests PASS.
 API 타입 검사, Neture·Lecture production build, frozen install PASS.
 unsafe routes 1,132 files / 위반 0. 기존 공통 UI·KPA 변경 경로는 main 은퇴 작업과 겹치지 않는다.
+
+
+추가 경계 검증: operator의 역할 목록 GET은 유지하고 역할 변경만 admin으로 제한한다.
+다른 서비스 prefix의 회원 유형 저장은 거부하며, legacy 오염 값이 남아 있어도
+승인·복구·정지가 다른 서비스의 role_assignments를 변경하지 않도록 공통 lifecycle 매핑을 제한한다.
+운영 데이터 정리는 수행하지 않으며 새 호환 역할이나 변환 테이블을 만들지 않는다.
+
+최종 추가 경계까지 포함한 API 회귀: 16 suites / 314 tests PASS. API 타입 검사 PASS.

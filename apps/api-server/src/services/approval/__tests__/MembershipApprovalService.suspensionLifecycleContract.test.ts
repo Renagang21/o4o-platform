@@ -324,3 +324,12 @@ it('service suspension preserves centrally assigned operator roles while blockin
   expect(activeRoles()).toContain('pharmacy-hub:operator');
   expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'pharmacy-hub:operator')).toBe(false);
 });
+
+it('a corrupt membership type cannot suspend a role belonging to another service', async () => {
+  seedAllFive({ extraRoles: ['lecture:member'] });
+  db.memberships.find(m => m.service_key === 'kpa-society')!.role = 'lecture:member';
+  await suspend(['kpa-society']);
+  expect(statusOf('kpa-society')).toBe('suspended');
+  expect(activeRoles()).toContain('lecture:member');
+  expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'lecture:member')).toBe(false);
+});

@@ -47,7 +47,7 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
     || (req.method === 'POST' && req.path.endsWith('/reactivate'))
     || (req.path.endsWith('/status') || req.path === '/batch-status') && !['approved', 'active', 'rejected'].includes(status)
     || req.method === 'PUT' && req.body?.membershipRole !== undefined
-    || req.path.endsWith('/roles');
+    || req.method === 'POST' && req.path.endsWith('/roles');
   if (adminAction && !admin) {
     res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '해당 서비스 관리자 권한이 필요합니다.' });
     return;

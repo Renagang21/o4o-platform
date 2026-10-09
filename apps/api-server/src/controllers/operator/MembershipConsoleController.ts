@@ -1010,6 +1010,10 @@ export class MembershipConsoleController {
           });
           return;
         }
+        if (membershipRole.includes(':') && resolveCanonicalServiceKey(membershipRole.split(':')[0]) !== membershipServiceKey) {
+          res.status(400).json({ success: false, code: 'INVALID_MEMBERSHIP_ROLE', error: '다른 서비스의 회원 유형은 저장할 수 없습니다.' });
+          return;
+        }
         // Demo 계정 보호(정책 §8 role 변경): 회원 유형 변경도 write **전에** 막는다.
         if (await rejectDemoAccountTarget(res, userId)) return;
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용

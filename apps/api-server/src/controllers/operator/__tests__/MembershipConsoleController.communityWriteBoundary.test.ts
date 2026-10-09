@@ -63,3 +63,11 @@ describe('service membership boundaries', () => {
   });
 
 });
+
+
+it('membership type cannot carry another service role into approval or suspension', async () => {
+  const out = res();
+  await new MembershipConsoleController().updateMember(req({ membershipRole: 'neture:member', membershipServiceKey: 'community' }), out);
+  expect(out.status).toHaveBeenCalledWith(400);
+  expect(mockQuery.mock.calls.some(([sql]) => /^UPDATE/.test(sql))).toBe(false);
+});

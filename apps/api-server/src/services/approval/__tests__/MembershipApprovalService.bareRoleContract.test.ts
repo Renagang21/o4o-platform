@@ -303,3 +303,11 @@ describe('role_assignments write 는 정본 유일성 규칙을 대상으로 한
     expect(insert!.sql).not.toContain('unique_active_role_per_user');
   });
 });
+
+
+it.each(['pending', 'suspended'])('a legacy foreign-service membership role cannot grant or restore that foreign role (%s)', async status => {
+  seed('kpa-society', 'lecture:member', status, status === 'suspended' ? 'lecture:member' : null);
+  if (status === 'pending') await approve(); else await reactivate();
+  expect(db.memberships[0].status).toBe('active');
+  expect(grantedRoles()).toEqual([]);
+});

@@ -15,7 +15,7 @@
  */
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
 import { demoAccountService } from '../auth/demo-account.service.js';
 
@@ -188,6 +188,7 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
   if (!role.includes(':') && BARE_ROLE_NORMALIZATION_TARGETS.includes(role)) {
     return `${resolveRolePrefixFromCanonicalServiceKey(serviceKey)}:${role}`;
   }
+  if (role.includes(':') && resolveCanonicalServiceKey(role.split(':')[0]) !== resolveCanonicalServiceKey(serviceKey)) return null;
   return role;
 }
 
@@ -456,8 +457,8 @@ export class MembershipApprovalService {
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
       const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
-      if (isOperationalRole(memberRole)) {
-        logger.warn('[APPROVAL][STEP3] central operator role grant SKIPPED', {
+      if (!memberRole || isOperationalRole(memberRole)) {
+        logger.warn('[APPROVAL][STEP3] out-of-scope or central operator role grant SKIPPED', {
           userId,
           role: memberRole,
           serviceKey: membership.service_key,
@@ -971,8 +972,8 @@ export class MembershipApprovalService {
       const reactivatedRoles: string[] = [];
       for (const membership of selectResult) {
         const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
-        if (isOperationalRole(memberRole)) {
-          logger.warn('[REACTIVATE][STEP3] central operator role grant SKIPPED', {
+        if (!memberRole || isOperationalRole(memberRole)) {
+          logger.warn('[REACTIVATE][STEP3] out-of-scope or central operator role grant SKIPPED', {
             userId,
             role: memberRole,
             serviceKey: membership.service_key,
