@@ -166,3 +166,11 @@ UI Vitest **11 files / 130 tests PASS**: Pharmacy 이용 gate 18건, Neture 가�
 ### 다음 단계
 
 가입·권한 회귀 다음은 카카오 로그인과 사용자 요청에 따른 명시적 계정 연결이다. 같은 이메일 자동 병합, 이미 다른 users.id에 연결된 provider의 자동 이동, 권한의 합집합은 허용하지 않는다. 실제 provider 자격정보·redirect와 연결 경로를 문서/코드 및 이용 가능한 운영 경로에서 먼저 조사한다. 별도 데이터 정리 TODO는 이번 권한 회귀 완료로 간주하지 않는다.
+
+### 문서 정합 드리프트 · OPEN
+
+자동 리뷰 [P2](https://github.com/Renagang21/o4o-platform/pull/382#discussion_r4226968089)가 지적한 `Identity V3`의 로그인 가입 게이트 문구를 확인했다. ACTIVE인 [Identity V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) §7의 기존 본문에는 `kpa-society`·`k-cosmetics`가 로그인 시 membership을 요구한다고 남아 있다. 현행 [인증·서비스 가입 정본](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)의 **계정과 서비스 가입** 절은 서비스 미가입을 login 거부로 처리하지 않는다고 명시하며, 최신 catalog의 loginMembershipRequired=false 및 위 회귀 검사와 일치한다. 따라서 모든 ACTIVE 문서가 이미 일치한다고 판단하지 않는다.
+
+현행 실행은 사용자가 확정한 공통 로그인/서비스 이용 자격 분리와 후자의 가입 정책을 따른다. 보호 API의 active membership·조직/사업자 관계 검사, 서비스별 승인, 전체관리자 Google 전용 경계는 유지한다. 이전 문구를 근거로 로그인 차단이나 퇴역 K-Cosmetics를 복구하지 않는다.
+
+**미완료 후속**: Identity V3의 해당 문구·연결 참조를 현행 정본과 정렬하는 별도 문서 작업. AGENTS §8에 따라 이 기록-only PR에서 기존 canonical/Frozen 본문을 임의로 다시 쓰지 않는다. WO에 정정 TODO를 유지하며, 이번 회귀 통과를 이 문서 정정 완료로 간주하지 않는다.

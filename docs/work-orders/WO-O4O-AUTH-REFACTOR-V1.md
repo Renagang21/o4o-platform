@@ -51,6 +51,7 @@
 - [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
 - [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
 - [ ] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합
+- [ ] 별도 문서 정합 작업: Identity V3의 과거 kpa-society/k-cosmetics 로그인 membership 필수 문구를 현행 공통 로그인 정책과 정렬 (CHECK의 OPEN 드리프트; Frozen 본문 임의 수정 없음)
 
 ### 4. 카카오 로그인·명시적 연결
 
