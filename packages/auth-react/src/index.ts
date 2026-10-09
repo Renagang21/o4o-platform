@@ -54,3 +54,6 @@ export type { RoleSelection } from './useRoleSelection';
 
 export { DemoLoginButtons } from './DemoLoginButtons';
 export type { DemoLoginButtonsProps } from './DemoLoginButtons';
+
+export { HandoffEntryPage } from './HandoffEntryPage';
+export type { HandoffEntryPageProps } from './HandoffEntryPage';

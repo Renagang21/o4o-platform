@@ -50,3 +50,5 @@ main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 
 1차 함수 통합 뒤 SonarCloud 중복률은 14.2%로 감소했지만 기준을 넘었다. 최종 URL 조립·동일 origin 검사도 `buildHandoffDestination()`으로 통합하고, 분회 basename 유지·외부 URL 및 잘못된 basename 거절 테스트를 추가했다.
 
 최종 URL 통합 뒤 필수 CI는 통과했지만 SonarCloud 중복률 3.4%로 기준을 넘었다. 서비스별 얇은 resolver wrapper도 제거하고 공통 함수를 직접 호출한다. 중복된 서비스별 순수 경로 테스트는 공통 auth-utils의 경로·Unicode·basename·외부 주소 차단 12개 테스트로 일원화했다. auth-utils 전체 41개와 Neture stale token 3개를 재검증한다.
+
+직접 호출 후 5.1%: Neture·분회는 기존 화면 대부분이 동일한 복사본이라 새 호출도 큰 중복 블록에 포함됐다. 두 화면의 인계 수신·상태 UI를 `auth-react/HandoffEntryPage`로 통합했다. 소비처는 Neture·분회 두 곳이며 API 주소·basename·오류 문구를 주입한다. 기존 export는 유지하며 약국·강의·매장 등 다른 auth-react 소비처에는 새 컴포넌트를 적용하지 않는다. layout effect의 낡은 토큰 선제 제거·쿠키 없는 공개 fetch·토큰 저장 뒤 전체 reload를 유지했다. auth-react 전체 11 files / 149 tests, Neture stale token 3개, Neture·분회 tsc/Vite build PASS. 최종 운영 산출물로 네 서비스 desktop/mobile 인계 이동 16회 재검증한다.
