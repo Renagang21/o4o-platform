@@ -160,3 +160,24 @@ it('membership console scope only includes services with an actual operator assi
   injectOperatorServiceScope(req, mockRes(), jest.fn());
   expect(req.serviceScope.serviceKeys).toEqual(['neture']);
 });
+
+it('community demotion/revocation uses current roles with the same admin token', async () => {
+  findOne.mockResolvedValue({ ...USER });
+  verifyAccessToken.mockReturnValue({ userId: 'u1', roles: ['community:admin', 'kpa:store_owner'], memberships: [{ serviceKey: 'community', status: 'active' }, { serviceKey: 'kpa-society', status: 'active' }] });
+  const guard = createServiceScopeGuard({ serviceKey: 'community', allowedRoles: ['community:admin', 'community:operator'], platformBypass: true, legacyRoles: [], blockedServicePrefixes: [], scopeRoleMapping: { 'community:admin': ['community:admin'], 'community:operator': ['community:operator', 'community:admin'] } });
+  const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+  getRoleNames.mockResolvedValue(['community:operator', 'kpa:store_owner']);
+  await requireAuth(req, mockRes(), jest.fn());
+  const denied = jest.fn(); const allowed = jest.fn();
+  guard('community:admin')(req, mockRes(), denied);
+  guard('community:operator')(req, mockRes(), allowed);
+  expect(denied).not.toHaveBeenCalled(); expect(allowed).toHaveBeenCalledTimes(1);
+  injectOperatorServiceScope(req, mockRes(), jest.fn());
+  expect(req.serviceScope.serviceKeys).toEqual(['community']);
+  getRoleNames.mockResolvedValue(['kpa:store_owner']);
+  await requireAuth(req, mockRes(), jest.fn());
+  const revoked = jest.fn(); guard('community:operator')(req, mockRes(), revoked);
+  expect(revoked).not.toHaveBeenCalled();
+  injectOperatorServiceScope(req, mockRes(), jest.fn());
+  expect(req.serviceScope.serviceKeys).toEqual([]);
+});

@@ -58,27 +58,27 @@ const service = (key: string, nameKo: string, domain: string): EntryService =>
 
 /**
  * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 진입은 `GET /communities` 목록에서 온다.
- * 약사(kpa-society 진입) · 허브(pharmacy-hub 진입) 두 Community 참여 가능 → 「내 업무 공간 › 커뮤니티」 handoff 버튼 2개
+ * 약사(kpa-society 진입) · 허브(lecture 진입) 두 Community 참여 가능 → 「내 업무 공간 › 커뮤니티」 handoff 버튼 2개
  * (K-Cosmetics 는 운영 종료로 커뮤니티 진입이 없다 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1)
  */
 const data = {
   services: [
     service('neture', 'Neture', 'neture.co.kr'),
     service('kpa-society', 'KPA Society', 'kpa-society.co.kr'),
-    service('pharmacy-hub', 'Pharmacy Hub', 'pharmacy-hub.co.kr'),
+    service('lecture', 'O4O 강의', 'lecture.co.kr'),
   ],
   stores: [],
   branches: [],
   communities: [
-    { communityKey: 'pharmacy', name: '약사 커뮤니티', canParticipate: true, reason: null, entries: [{ serviceKey: 'kpa-society', path: '/forum' }, { serviceKey: 'pharmacy-hub', path: '/forum' }] },
-    { communityKey: 'hub', name: '허브 커뮤니티', canParticipate: true, reason: null, entries: [{ serviceKey: 'pharmacy-hub', path: '/forum' }] },
+    { communityKey: 'pharmacy', name: '약사 커뮤니티', canParticipate: true, reason: null, entries: [{ serviceKey: 'kpa-society', path: '/forum' }, { serviceKey: 'lecture', path: '/forum' }] },
+    { communityKey: 'hub', name: '학습 커뮤니티', canParticipate: true, reason: null, entries: [{ serviceKey: 'lecture', path: '/forum' }] },
   ],
 } as unknown as HomeEntryData;
 
 const KPA = '약사 커뮤니티';
-const PH = '허브 커뮤니티';
+const PH = '학습 커뮤니티';
 
-/** 버튼 접근성 이름 = 라벨 (+ 보조 정보 — 약사 커뮤니티는 진입 surface 가 둘이라 "KPA Society에서 참여" 가 붙는다) */
+/** 버튼 접근성 이름 = 라벨 (+ 보조 정보 — 약사 커뮤니티는 진입 surface 가 둘이라 "O4O 약국 경영지원에서 참여" 가 붙는다) */
 function handoffButton(label: string) {
   return screen.getByRole('button', { name: (name) => name === label || name.startsWith(`${label} `) }) as HTMLButtonElement;
 }
@@ -153,7 +153,7 @@ describe('HomeEntryPanel — 뒤로가기(bfcache) 후 이동 중 상태 해제'
     firePageShow(true);
 
     await userEvent.click(handoffButton(PH));
-    await waitFor(() => expect(assign).toHaveBeenLastCalledWith('https://pharmacy-hub.test/'));
+    await waitFor(() => expect(assign).toHaveBeenLastCalledWith('https://lecture.test/'));
     firePageShow(true);
 
     await userEvent.click(handoffButton(KPA));
@@ -180,10 +180,10 @@ describe('HomeEntryPanel — 뒤로가기(bfcache) 후 이동 중 상태 해제'
     expect(handoffButton(KPA).disabled).toBe(false);
     expect(screen.queryByRole('alert')).toBeNull();
 
-    apiPost.mockImplementationOnce(() => resolved('https://pharmacy-hub.test/fresh'));
+    apiPost.mockImplementationOnce(() => resolved('https://lecture.test/fresh'));
     await userEvent.click(handoffButton(PH));
     await waitFor(() => expect(assign).toHaveBeenCalledTimes(1));
-    expect(assign).toHaveBeenCalledWith('https://pharmacy-hub.test/fresh');
+    expect(assign).toHaveBeenCalledWith('https://lecture.test/fresh');
   });
 
   it('복원 이전에 시작된 요청이 늦게 실패해도 오류 안내를 띄우지 않는다', async () => {

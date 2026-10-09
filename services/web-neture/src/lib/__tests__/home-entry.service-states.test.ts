@@ -138,8 +138,7 @@ describe('buildHomeEntryModel — 매장 카드 = Store Workspace Home', () => {
     const store = m.groups.find((g) => g.id === 'store')!;
     expect(store.title).toBe('매장');
     expect(store.items.map((i) => [i.label, i.note, i.action])).toEqual([
-      ['매장 A', 'KPA Society', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' }],
-      ['매장 A', 'Pharmacy Hub', { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/store-owner/workspace' }],
+      ['매장 A', undefined, { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' }],
     ]);
     // 매장 HUB · 내 매장 최상위 그룹 없음 · "/store-hub" 직접 진입 없음 · "내 매장" 라벨 없음
     expect(m.groups.map((g) => g.id)).toEqual(['community', 'store', 'supplier', 'operator']);

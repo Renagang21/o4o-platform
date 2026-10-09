@@ -1142,6 +1142,13 @@ function App() {
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
             <Route element={
+              <SubdomainOperatorRoute serviceKey="community" level="operator">
+                <SubdomainOperatorLayoutWrapper serviceKey="community" area="operator" />
+              </SubdomainOperatorRoute>
+            }>
+              <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
+            </Route>
+            <Route element={
               <SubdomainOperatorRoute serviceKey="community" level="admin">
                 <SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />
               </SubdomainOperatorRoute>

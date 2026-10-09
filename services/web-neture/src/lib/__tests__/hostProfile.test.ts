@@ -66,7 +66,7 @@ describe('community 호스트', () => {
     expect(decideHost('community', loc('/')).kind).toBe('stay');
   });
   it('독립 약사 커뮤니티 진입과 가입·운영은 커뮤니티 호스트 소유', () => {
-    for (const p of ['/pharmacist', '/communities/pharmacy/forum/posts', '/mypage/communities', '/admin/communities']) {
+    for (const p of ['/pharmacist', '/communities/pharmacy/forum/posts', '/mypage/communities', '/admin/communities', '/operator/communities']) {
       expect(decideHost('community', loc(p))).toEqual({ kind: 'stay' });
     }
   });
@@ -105,7 +105,7 @@ describe('운영 기능의 소유 호스트', () => {
     for (const [path, origin] of [
       ['/operator/suppliers', 'supplier'], ['/admin/supplier-governance', 'supplier'],
       ['/operator/market-trial/requests', 'funding'], ['/admin/market-trial', 'funding'],
-      ['/admin/communities', 'community'], ['/mypage/communities', 'community'],
+      ['/admin/communities', 'community'], ['/operator/communities', 'community'], ['/mypage/communities', 'community'],
     ]) {
       expect(decideHost('main', loc(path, '?page=2', '#review'))).toEqual({
         kind: 'external', href: `https://${origin}.neture.co.kr${path}?page=2#review`,

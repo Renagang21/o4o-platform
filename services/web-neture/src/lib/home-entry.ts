@@ -225,9 +225,9 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
 
 /**
  * 운영 종료된 서비스 — membership · community catalog 가 남아 있어도 대표 홈에서 그 서비스 호스트로 가는
- * 진입(커뮤니티 · 내 서비스)을 만들지 않는다. service identity · catalog 정리는 후속 범위다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+ * 진입(커뮤니티 · 매장 · 운영 · 내 서비스 · 가입)을 만들지 않는다. service identity · catalog 정리는 후속 범위다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
  */
-const RETIRED_SERVICE_KEYS: ReadonlySet<string> = new Set(['k-cosmetics']);
+const RETIRED_SERVICE_KEYS: ReadonlySet<string> = new Set(['k-cosmetics', 'pharmacy-hub']);
 
 /** role prefix → canonical service key (role_assignments 의 prefix 는 service_key 와 다르다) */
 export const STATUS_LABELS: Record<string, string> = {
@@ -430,7 +430,7 @@ const hasAnyRole = (roles: string[], set: string[]) => roles.some((r) => set.inc
 export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryModel {
   const roles = user.roles ?? [];
   const byKey = new Map(data.services.map((s) => [s.key, s]));
-  const nameOf = (key: string) => byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
+  const nameOf = (key: string) => key === 'kpa-society' ? 'O4O 약국 경영지원' : byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
   const isActive = (key: string) => byKey.get(key)?.membership?.status === 'active';
   const isPlatformAdmin = hasAnyRole(roles, PLATFORM_ROLES);
 
@@ -467,6 +467,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   //   "매장 HUB" 는 Store Workspace 안의 탭이므로 대표 홈에 별도 진입을 두지 않는다.
   const store: EntryItem[] = [];
   for (const s of data.stores) {
+    if (RETIRED_SERVICE_KEYS.has(s.serviceKey)) continue;
     // 약국은 API가 승인 원장·조직 관계로 확정한 매장이다. KPA 개인 가입을
     // UI에서 추가 요구하지 않는다. 다른 서비스의 가입 판정은 유지한다.
     if (s.serviceKey !== 'kpa-society' && !isActive(s.serviceKey)) continue;
@@ -502,6 +503,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   for (const svc of data.operatorServices ?? []) {
     if (!svc.workspaceAvailable) continue;
     const key = svc.serviceKey;
+    if (RETIRED_SERVICE_KEYS.has(key)) continue;
     const note = svc.scope === 'admin' ? '관리자' : undefined;
     const label = byKey.has(key) ? nameOf(key) : svc.serviceName;
     if (key === 'neture') {
@@ -522,7 +524,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
     //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
     //   카드를 만들지 않는다(dead link 0).
-    //   community 는 admin 단일 계층 — `/admin/communities`(개설 심사 · 커뮤니티 운영자 지정).
+    //   community 는 Admin(`/admin/communities`)과 Operator(`/operator/communities`)로 구분한다.
     const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
@@ -592,6 +594,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     statusItems.push({ id: `status:neture-${svcKey}`, serviceName: info.name, status, statusLabel: SERVICE_STATUS_LABELS[status], guide });
   }
   for (const svc of data.services) {
+    if (svc.key === 'pharmacy-hub') continue;
     const status = svc.membership?.status;
     if (!status || status === 'active') continue;
     const paths = SERVICE_PATHS[svc.key];
@@ -621,6 +624,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     });
   }
   for (const svc of data.services) {
+    if (RETIRED_SERVICE_KEYS.has(svc.key)) continue;
     if (svc.membership) continue;
     if (!svc.joinEnabled) continue;
     const join = SERVICE_PATHS[svc.key]?.join;

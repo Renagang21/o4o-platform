@@ -28,7 +28,10 @@ const SCOPED_MENU: Readonly<Record<SubdomainOperatorKey, Partial<Record<Operator
     ],
   },
   funding: { approvals: [{ label: '유통참여형 펀딩', path: '/operator/market-trial' }] },
-  community: { approvals: [{ label: '커뮤니티 서비스 관리', path: '/admin/communities' }] },
+  community: { approvals: [
+    { label: '커뮤니티 서비스 관리', path: '/admin/communities' },
+    { label: '커뮤니티 개설 심사', path: '/operator/communities' },
+  ] },
 };
 
 export default function SubdomainOperatorLayoutWrapper({

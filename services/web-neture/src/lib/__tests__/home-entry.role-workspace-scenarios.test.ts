@@ -64,10 +64,10 @@ describe('내 업무 공간 — 4 카드 고정 구조', () => {
     expect(m.groups.map((g) => g.title)).toEqual(['커뮤니티', '매장', '공급자', '서비스 운영']);
   });
 
-  it('커뮤니티 라벨은 Catalog canonical 이름만 — "Neture 커뮤니티 / KPA Society 커뮤니티 / Pharmacy-Hub 커뮤니티" 없음', () => {
+  it('커뮤니티 라벨은 Catalog canonical 이름만 — "Neture 커뮤니티 / O4O 약국 경영지원 커뮤니티 / Pharmacy-Hub 커뮤니티" 없음', () => {
     const m = buildHomeEntryModel(user(), base());
     expect(card(m, 'community').items.map((i) => i.label)).toEqual(['O4O 공통 커뮤니티', '약사 커뮤니티']);
-    expect(labels(m).some((l) => /Neture 커뮤니티|KPA Society 커뮤니티|Pharmacy-?Hub 커뮤니티|파머시 허브 커뮤니티/i.test(l))).toBe(false);
+    expect(labels(m).some((l) => /Neture 커뮤니티|O4O 약국 경영지원 커뮤니티|Pharmacy-?Hub 커뮤니티|파머시 허브 커뮤니티/i.test(l))).toBe(false);
   });
 });
 
@@ -88,7 +88,7 @@ describe('시나리오', () => {
     expect(labels(m).some((l) => /매장 HUB|내 매장/.test(l))).toBe(false);
   });
 
-  it('매장 경영자(복수 매장 · 복수 서비스): 매장마다 버튼 · 서비스 이름은 보조 정보로만', () => {
+  it('매장 경영자: 삭제 대상 PH 매장을 제외하고 약국 업무만 표시', () => {
     const m = buildHomeEntryModel(
       user(),
       base({
@@ -100,8 +100,7 @@ describe('시나리오', () => {
       }),
     );
     expect(card(m, 'store').items.map((i) => [i.label, i.note, (i.action as { returnPath?: string }).returnPath])).toEqual([
-      ['테스트 약국', 'KPA Society', '/store/workspace'],
-      ['테스트 허브약국', 'Pharmacy Hub', '/store-owner/workspace'],
+      ['테스트 약국', undefined, '/store/workspace'],
     ]);
   });
 
@@ -116,13 +115,13 @@ describe('시나리오', () => {
   it('단일 서비스 운영자: 서비스 운영 카드 버튼 1개 = 서비스 이름 → /operator', () => {
     const m = buildHomeEntryModel(user(['kpa:operator']), base({ operatorServices: [op('kpa-society')] }));
     expect(card(m, 'operator').items).toEqual([
-      { id: 'operator:kpa-society:operator', label: 'KPA Society', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' } },
+      { id: 'operator:kpa-society:operator', label: 'O4O 약국 경영지원', note: undefined, action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/operator' } },
     ]);
   });
 
-  it('복수 서비스 운영자: 서비스별 버튼 (프런트 role 파싱 없음 — 목록에 없는 서비스는 role 이 있어도 없음)', () => {
+  it('복수 서비스 운영자: 삭제 대상 PH의 운영 진입 제외', () => {
     const m = buildHomeEntryModel(user(['kpa:operator', 'cosmetics:operator', 'pharmacy-hub:operator']), base({ operatorServices: [op('kpa-society'), op('pharmacy-hub')] }));
-    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['KPA Society', 'Pharmacy Hub']);
+    expect(card(m, 'operator').items.map((i) => i.label)).toEqual(['O4O 약국 경영지원']);
   });
 
   it('플랫폼 관리자: "플랫폼 관리" 별도 · 4 카드에는 섞이지 않음 · 공급자 카드는 bypass 로 열리지 않음', () => {
@@ -144,7 +143,7 @@ describe('시나리오', () => {
     expect(activeCards(m)).toEqual(['community', 'store', 'supplier', 'operator']);
     expect(card(m, 'store').items.map((i) => i.label)).toEqual(['테스트 약국']);
     expect(card(m, 'supplier').items.map((i) => i.label)).toEqual(['공급자 업무']);
-    expect(card(m, 'operator').items.map((i) => [i.label, i.note])).toEqual([['KPA Society', '관리자']]);
+    expect(card(m, 'operator').items.map((i) => [i.label, i.note])).toEqual([['O4O 약국 경영지원', '관리자']]);
     expect(m.platformAdmin?.label).toBe('플랫폼 관리');
     // 항목 id 는 전부 유일 (같은 데이터가 두 카드에 실리지 않는다)
     const ids = [...m.groups.flatMap((g) => g.items.map((i) => i.id)), m.platformAdmin!.id, ...m.myServices.map((i) => i.id)];

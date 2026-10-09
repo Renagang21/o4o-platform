@@ -381,7 +381,7 @@ describe('Community Core 재사용 · 복제 0 · 새 membership 테이블 0 (WO
     // lifecycle write 는 무인증으로 열려 있지 않다 — 모든 POST 가 authenticate 로 시작한다.
     const posts = r.match(/router\.post\([\s\S]{0,120}/g) ?? [];
     expect(posts.length).toBeGreaterThan(0);
-    for (const p of posts) expect(p).toMatch(/authenticate|serviceAdminOnly|operatorOnly/);
+    for (const p of posts) expect(p).toMatch(/authenticate|serviceAdminOnly|serviceOperatorOnly|operatorOnly/);
 
     // mount 는 여러 줄로 쓰여 있을 수 있다 — 형식이 아니라 사실을 본다.
     const registry = code('apps/api-server/src/bootstrap/register-routes.ts').replace(/\s+/g, ' ');

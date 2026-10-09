@@ -49,11 +49,11 @@ const group = (m: ReturnType<typeof buildHomeEntryModel>) => {
 };
 
 describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
-  it('Scenario B: PH 만 가입한 회원 → 약사 커뮤니티는 PH surface 로, KPA membership 을 만들지 않는다', () => {
+  it('Scenario B: PH 가입 이력과 무관하게 활성 커뮤니티 진입만 유지한다', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY, GENERAL, { ...COSMETICS, canParticipate: false, reason: 'SERVICE_MEMBERSHIP_REQUIRED' }], { 'pharmacy-hub': 'active' }));
     const g = group(m)!;
     expect(g.items.map((i) => [i.id, i.label, i.action])).toEqual([
-      ['community:pharmacy', '약사 커뮤니티', { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/forum' }],
+      ['community:pharmacy', '약사 커뮤니티', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }],
       ['community:o4o-general', 'O4O 공통 커뮤니티', { kind: 'internal', to: '/community' }],
     ]);
     expect(g.items.some((i) => i.id === 'community:cosmetics')).toBe(false);
@@ -74,14 +74,14 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
       .map((i) => i.action as { serviceKey?: string })
       .filter((a) => a.serviceKey === 'k-cosmetics');
     expect(handoffs).toEqual([]);
-    expect(m.myServices.map((i) => i.id)).toEqual(['svc:pharmacy-hub']);
+    expect(m.myServices.map((i) => i.id)).toEqual([]);
   });
 
   it('운영 종료 서비스 surface 만 빠진다 — 다른 surface 가 남은 Community 는 그 surface 로 들어간다', () => {
     const MIXED: EntryCommunity = { ...PHARMACY, entries: [{ serviceKey: 'k-cosmetics', path: '/forum' }, ...PHARMACY.entries] };
     const m = buildHomeEntryModel(user(), data([MIXED], { 'k-cosmetics': 'active', 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     expect(group(m)!.items.map((i) => [i.id, i.action, i.note])).toEqual([
-      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, 'KPA Society에서 참여'],
+      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, undefined],
     ]);
   });
 
@@ -104,6 +104,6 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY], { 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     const items = group(m)!.items.filter((i) => i.id.startsWith('community:pharmacy'));
     expect(items).toHaveLength(1);
-    expect(items[0].note).toBe('KPA Society에서 참여');
+    expect(items[0].note).toBeUndefined();
   });
 });
