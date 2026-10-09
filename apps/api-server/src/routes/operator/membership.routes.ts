@@ -9,7 +9,7 @@
 import { Router } from 'express';
 import { MembershipConsoleController } from '../../controllers/operator/MembershipConsoleController.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
-import { injectServiceScope } from '../../utils/serviceScope.js';
+import { injectOperatorServiceScope } from '../../utils/serviceScope.js';
 
 const router: Router = Router();
 const controller = new MembershipConsoleController();
@@ -27,7 +27,7 @@ router.use(requireRole([
   'kpa:admin', 'kpa:operator',
   // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
   //   공통 API 는 이미 service scope 로 격리되는데 allowlist 에만 pharmacy-hub 가 빠져 있었다.
-  //   (injectServiceScope 가 'pharmacy-hub' 를 self-map 하므로 데이터 경계는 그대로다.)
+  //   (injectOperatorServiceScope 가 'pharmacy-hub' 를 self-map 하므로 데이터 경계는 그대로다.)
   'pharmacy-hub:admin', 'pharmacy-hub:operator',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §7:
   //   study.neture.co.kr(= `lecture`) 와 커뮤니티에는 가입 승인 경로가 없었다. 두 서비스도
@@ -46,7 +46,7 @@ router.use(requireRole([
   'supplier:admin', 'supplier:operator',
   'funding:admin', 'funding:operator',
 ]));
-router.use(injectServiceScope);
+router.use(injectOperatorServiceScope);
 
 // Member list with memberships + roles
 router.get('/', controller.getMembers);
