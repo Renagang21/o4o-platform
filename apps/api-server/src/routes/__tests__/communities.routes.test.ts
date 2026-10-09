@@ -91,8 +91,8 @@ describe('개설 — 서비스 전체 역할이 심사한다', () => {
     ['GET', '/requests'],
     ['POST', '/requests/:requestId/approve'],
     ['POST', '/requests/:requestId/reject'],
-  ])('%s %s 는 community:admin 이 심사한다', (method, path) => {
-    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
+  ])('%s %s 는 서비스 Operator 이상이 심사한다', (method, path) => {
+    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:operator']);
   });
 
   it('개설 심사 경로에는 **개체 가드가 붙지 않는다** (첫 커뮤니티를 만들 수 있어야 한다)', () => {

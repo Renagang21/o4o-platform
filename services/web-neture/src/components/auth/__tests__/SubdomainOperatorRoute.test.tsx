@@ -125,10 +125,10 @@ describe('서브도메인 운영자 화면 guard', () => {
 });
 
 describe('역할 표 — 백엔드 scopeRoleMapping 과 같은 의미', () => {
-  it('admin ⊃ operator · community 는 admin 단일 계층 · neture 역할 미포함', () => {
+  it('admin ⊃ operator · community 도 Admin/Operator 분리 · neture 역할 미포함', () => {
     expect(subdomainOperatorRoles('supplier', 'admin')).toEqual(['supplier:admin', 'platform:super_admin']);
     expect(subdomainOperatorRoles('funding', 'operator')).toEqual(['funding:operator', 'funding:admin', 'platform:super_admin']);
-    expect(subdomainOperatorRoles('community', 'operator')).toEqual(['community:admin', 'platform:super_admin']);
+    expect(subdomainOperatorRoles('community', 'operator')).toEqual(['community:operator', 'community:admin', 'platform:super_admin']);
     for (const r of [...subdomainOperatorRoles('supplier', 'admin'), ...subdomainOperatorRoles('funding', 'operator')]) {
       expect(r.startsWith('neture:')).toBe(false);
     }

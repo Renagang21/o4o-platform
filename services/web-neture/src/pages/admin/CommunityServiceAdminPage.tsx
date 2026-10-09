@@ -2,7 +2,7 @@
  * CommunityServiceAdminPage — 커뮤니티 서비스 관리 (community:admin)
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
- * Admin(admin.neture.co.kr)은 서비스 운영자(`community:admin`)만 지정한다. 그 다음 업무는 이 화면이다:
+ * Admin(admin.neture.co.kr)은 서비스 Admin(`community:admin`)과 Operator(`community:operator`)를 지정한다. 그 다음 업무는 이 화면이다:
  *   - 커뮤니티 개설 신청 심사 (승인 · 거절)
  *   - 개별 커뮤니티 운영자 지정·해제 — 그 커뮤니티의 승인된(active) 회원 중에서.
  *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 운영자는 해제되지 않는다.
@@ -259,13 +259,15 @@ function CommunityOperatorsPanel() {
   );
 }
 
-export default function CommunityServiceAdminPage() {
-  const [tab, setTab] = useState<Tab>('operators');
+export default function CommunityServiceAdminPage({ operatorOnly = false }: { operatorOnly?: boolean }) {
+  const [tab, setTab] = useState<Tab>(operatorOnly ? 'requests' : 'operators');
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-xl font-bold text-slate-900">커뮤니티 서비스 관리</h1>
       <p className="mt-1 text-xs text-slate-500">
-        커뮤니티 개설 심사와 개별 커뮤니티 운영자 지정은 커뮤니티 서비스 운영자가 이 화면에서 처리합니다.
+        {operatorOnly
+          ? '커뮤니티 개설 신청을 심사합니다.'
+          : '커뮤니티 개설 신청을 심사하고 개별 커뮤니티 운영자를 지정합니다.'}
       </p>
       <div className="mt-6 flex gap-4 border-b border-slate-200 text-sm">
         {(
@@ -273,7 +275,7 @@ export default function CommunityServiceAdminPage() {
             ['operators', '커뮤니티 운영자 지정'],
             ['requests', '개설 신청 심사'],
           ] as const
-        ).map(([key, label]) => (
+        ).filter(([key]) => !operatorOnly || key === 'requests').map(([key, label]) => (
           <button
             key={key}
             type="button"
@@ -286,7 +288,7 @@ export default function CommunityServiceAdminPage() {
           </button>
         ))}
       </div>
-      {tab === 'operators' ? <CommunityOperatorsPanel /> : <CreationRequestsPanel />}
+      {!operatorOnly && tab === 'operators' ? <CommunityOperatorsPanel /> : <CreationRequestsPanel />}
     </div>
   );
 }
