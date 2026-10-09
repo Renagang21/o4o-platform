@@ -9,7 +9,7 @@ export default function HomePage() {
   const { organizationName, effectiveServiceKey } = useUnifiedStore();
   // 약국 문맥은 매장 HUB 단계 없이 내 매장에서 바로 공급 상품을 주문한다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §6).
   const pharmacy = effectiveServiceKey === 'kpa-society';
-  // 내 서비스와 같은 기준 — 이 앱이 열 수 있는 업무공간만 센다(종료 서비스 제외).
+  // 종료된 서비스의 자료 진입은 계속 차단한다.
   const retiredOnly = useRetiredOnlyStore();
   return <main className="page"><section className="hero">
     <span className="eyebrow">Unified Store Workspace</span>

@@ -2,16 +2,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import StoreHandledProductsPage from '../pharmacy/StoreHandledProductsPage';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import MyServicesPage from '../MyServicesPage';
 import SupplyOptionsPage from '../neture-pharmacy/SupplyOptionsPage';
 import PharmacyContentSourcesPage from '../neture-pharmacy/PharmacyContentSourcesPage';
 import PharmacyOrdersPage from '../neture-pharmacy/PharmacyOrdersPage';
 
 const mocks = vi.hoisted(() => ({
-  products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
+  serviceKey: 'kpa-society', products: vi.fn(), create: vi.fn(), update: vi.fn(), single: vi.fn(),
   businesses: vi.fn(), supply: vi.fn(), contents: vi.fn(), orders: vi.fn(), copy: vi.fn(),
 }));
-vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: 'store-a', effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: 'store-a', effectiveServiceKey: mocks.serviceKey }) }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: { id: 'user-a' } }) }));
 vi.mock('../../api/handledProducts', () => ({ fetchHandledProducts: mocks.products, removeHandledProducts: vi.fn() }));
 vi.mock('../../api/localProducts', () => ({ createLocalProduct: mocks.create, updateLocalProduct: mocks.update, getLocalProduct: mocks.single }));
@@ -36,7 +37,7 @@ const businesses = [
 ];
 function mount(node: React.ReactNode, path = '/') { return render(<MemoryRouter initialEntries={[path]}>{node}</MemoryRouter>); }
 beforeEach(() => {
-  cleanup(); vi.clearAllMocks();
+  cleanup(); vi.clearAllMocks(); mocks.serviceKey = 'kpa-society';
   mocks.products.mockResolvedValue({ items: [], pagination: { total: 0 } });
   mocks.create.mockResolvedValue({ id: 'local-new' });
   mocks.businesses.mockResolvedValue(businesses);
@@ -46,6 +47,16 @@ beforeEach(() => {
 });
 
 describe('내 매장 경영지원', () => {
+  it('약국 문맥에서 자료 가져오기 입구를 제공한다', () => {
+    mount(<StoreLibraryNavigation section="mine" />);
+    expect(screen.getByRole('link', { name: '자료 가져오기' }).getAttribute('href')).toBe('/store/pharmacy/contents');
+  });
+  it('PharmacyHub 문맥에서는 약국 전용 자료 입구를 숨기고 내 자료함 기능을 보존한다', () => {
+    mocks.serviceKey = 'pharmacy-hub';
+    mount(<StoreLibraryNavigation section="mine" />);
+    expect(screen.queryByRole('link', { name: '자료 가져오기' })).toBeNull();
+    expect(screen.getByRole('link', { name: '파일 · 참고 자료' })).toBeTruthy();
+  });
   it('구매 이력 없이 두 등록 방식의 제품을 조회하고 직접 등록 후 같은 목록을 갱신한다', async () => {
     mount(<StoreHandledProductsPage />, '/store/my-products');
     await waitFor(() => expect(mocks.products).toHaveBeenCalledWith(expect.objectContaining({ source: 'all' })));

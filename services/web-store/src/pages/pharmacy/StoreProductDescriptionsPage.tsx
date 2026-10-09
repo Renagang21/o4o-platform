@@ -26,6 +26,7 @@
  * Backend: store_local_products (Display Domain, organization_id 격리).
  */
 
+import { DIRECT_PRODUCT_DESCRIPTION_LABELS } from '../../config/productTerminology';
 import {
   StoreProductDescriptionsView,
   type StoreProductDescriptionsApi,
@@ -91,11 +92,7 @@ export default function StoreProductDescriptionsPage() {
           </>
         ),
         // WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 메뉴 라벨 '직접 등록 제품'과 정렬
-        sidebarTitle: (count) => `직접 등록 제품 (${count})`,
-        listErrorFallback: '직접 등록 제품을 불러오지 못했습니다.',
-        listErrorText: '직접 등록 제품을 불러오지 못했습니다.',
-        emptyText: '등록된 직접 등록 제품이 없습니다.',
-        emptyLinkText: '직접 등록 제품 등록하기',
+        ...DIRECT_PRODUCT_DESCRIPTION_LABELS,
         saveSuccessToast: '상품 설명이 저장되었습니다',
         placeholderExisting: '저장된 상품 상세설명을 수정하세요.',
         placeholderFallback: '상품 상세설명을 작성하세요.',

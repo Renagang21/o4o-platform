@@ -1,10 +1,10 @@
 import type { SemiFranchiseRow } from '../api/neturePharmacy';
 
-export function BusinessTabs({ businesses, value, onChange }: {
+export function BusinessTabs({ businesses, value, onChange }: Readonly<{
   businesses: Pick<SemiFranchiseRow, 'key' | 'name'>[];
   value: string;
   onChange: (key: string) => void;
-}) {
+}>) {
   return <nav aria-label="사업별 보기" className="mb-4 flex flex-wrap gap-2">
     {[{ key: '', name: '전체' }, ...businesses].map(b =>
       <button type="button" key={b.key} aria-pressed={value === b.key} onClick={() => onChange(b.key)}
