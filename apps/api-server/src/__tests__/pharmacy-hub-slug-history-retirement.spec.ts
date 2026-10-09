@@ -15,7 +15,7 @@ import { createStorePublicTabletRoutes } from '../routes/platform/store-public/s
 import { createStorePolicyRoutes } from '../routes/platform/store-policy.routes.js';
 
 let sourceServiceKey: string;
-let targetServiceKey: string;
+let currentSlugs: Array<{ slug: string; serviceKey: string; isActive: boolean }>;
 let activeRetiredSlug: boolean;
 let slugRepo: any;
 let save: jest.Mock;
@@ -23,7 +23,7 @@ let query: jest.Mock;
 
 function makeDataSource(): any {
   slugRepo = { findOne: jest.fn(async ({ where }: any) => {
-    if (where.storeId) return { slug: 'current-store', serviceKey: targetServiceKey, isActive: true };
+    if (where.storeId) return currentSlugs.find(row => row.serviceKey === where.serviceKey && row.isActive === where.isActive) ?? null;
     return activeRetiredSlug ? { storeId: 'org', serviceKey: 'pharmacy-hub', isActive: true } : null;
   }) };
   const historyRepo = { findOne: jest.fn(async () => ({ storeId: 'org', serviceKey: sourceServiceKey, oldSlug: 'old-store' })) };
@@ -47,14 +47,14 @@ function makeApp() {
 
 beforeEach(() => {
   sourceServiceKey = 'pharmacy-hub';
-  targetServiceKey = 'kpa';
+  currentSlugs = [{ slug: 'legacy-ph', serviceKey: 'pharmacy-hub', isActive: true }, { slug: 'current-store', serviceKey: 'kpa', isActive: true }];
   activeRetiredSlug = false;
 });
 
-it('the real helper keeps PH history provenance even when the current store address belongs to KPA', async () => {
+it('the real helper keeps PH history provenance when the same organization also has a KPA address', async () => {
   const service = new StoreSlugService(makeDataSource());
   expect(await service.findOldSlugRedirect('old-store')).toEqual({
-    newSlug: 'current-store', serviceKey: 'kpa', sourceServiceKey: 'pharmacy-hub',
+    newSlug: 'legacy-ph', serviceKey: 'pharmacy-hub', sourceServiceKey: 'pharmacy-hub',
   });
 });
 
@@ -90,9 +90,23 @@ it('current-service history redirects still work in the tablet, policy and slug 
   expect(save).not.toHaveBeenCalled();
 });
 
-it('current history cannot redirect to a retired destination', async () => {
+it('current history cannot redirect to another service when its current address is absent', async () => {
   sourceServiceKey = 'kpa';
-  targetServiceKey = 'pharmacy-hub';
+  currentSlugs = currentSlugs.filter(row => row.serviceKey === 'pharmacy-hub');
+  const res = await request(makeApp()).get('/api/v1/stores/resolve/old-store');
+  expect(res.status).toBe(404);
+});
+
+
+it('retired history does not fall back to another current service after its PH address disappears', async () => {
+  currentSlugs = currentSlugs.filter(row => row.serviceKey === 'kpa');
+  const res = await request(makeApp()).get('/api/v1/stores/resolve/old-store');
+  expect(res.status).toBe(404);
+});
+
+it('inactive current addresses never become a redirect destination', async () => {
+  sourceServiceKey = 'kpa';
+  currentSlugs.find(row => row.serviceKey === 'kpa')!.isActive = false;
   const res = await request(makeApp()).get('/api/v1/stores/resolve/old-store');
   expect(res.status).toBe(404);
 });

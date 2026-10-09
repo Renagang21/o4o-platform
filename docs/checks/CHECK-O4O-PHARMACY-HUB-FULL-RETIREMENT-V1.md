@@ -46,7 +46,7 @@ Node 22.18.0 · pnpm 10.25.0 · frozen/offline install. 아래는 실제 로컬 
 | API `@o4o/api-server type-check` | PASS |
 | Store·Neture(공급자 포함)·관리자 production build | PASS |
 | KPA 약국 경영지원 production build | PASS |
-| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **237 suites · 4,430 tests PASS** · 243 suites 중 DB integration 6개(48건) SKIP |
+| 변경 소비처·공통 쓰기/권한·모집·동의 판정·최신 main 결합 API Jest | **238 suites · 4,442 tests PASS** · 244 suites 중 DB integration 6개(48건) SKIP |
 | 최신 main(PR #378·#379) 결합 후 Neture Vitest | **46 files · 375 tests PASS** |
 | 관리자 운영자 지정 Vitest | **2 files · 10 tests PASS** |
 | 최신 main 결합 인증 공통 패키지 Vitest | auth-client **34** · auth-context **16** · auth-react **156** tests PASS |
@@ -115,3 +115,9 @@ PR #378·#379 결합 후 API 242 suites에서 236 suites·4,422 tests와 type-ch
 HEAD `5ab28af7d8`의 늦게 완료된 리뷰는 과거 slug의 출처와 공유 역할 화면의 PH 선택지를 지적했다. `StoreSlugService.findOldSlugRedirect`가 현재 행의 서비스만 반환하던 문제를 sourceServiceKey metadata로 보완한다. 현재 target 계약과 DB 원장은 유지하고 공개 Store·정책 조회·slug resolver의 모든 소비처에서 PH source/target을 차단한다. mock 반환값 대신 실제 helper를 호출하는 HTTP 회귀로 PH 이력과 현재 KPA 주소가 섞인 경우 및 현재 서비스의 정상 redirect를 검증한다. 공통 역할 관리 화면의 PH 필터도 제거하며 admin-dashboard·Neture·KPA wrapper와 raw-source 소비처를 확인했다. 과거 역할의 표시·회수는 유지한다.
 
 slug 출처·공유 역할 UI 보완 후 API 243 suites에서 237 suites·4,430 tests 및 API type-check가 통과했다. DB integration 6개(48건)는 SKIP했다. 실제 history helper를 호출한 공개 HTTP를 포함한 관련 5 suites·56건, @o4o/ui 기존 회귀 10건, platform-core/UI 패키지 build 및 admin-dashboard·Neture·KPA production build가 통과했다. 신규 source metadata는 모든 runtime 소비처에 적용했고 기존 target 형태·원장 계약은 유지한다. 최신 커밋의 CI·Sonar·Codex를 다시 확인하며 이전 HEAD 결과를 최종 결과로 쓰지 않는다.
+
+HEAD `8d72542589`의 늦게 완료된 리뷰는 실제 PH 콘텐츠를 현재/전역 슬롯에 새로 배치하는 우회와 수락 불가능한 PH-only 초대 노출을 지적했다. 슬롯 생성·벌크 배치·현재 슬롯의 자료 교체/재노출은 조회한 콘텐츠의 serviceKey를 검사하며 PH 원본은 거부한다. 현재 scoped 자료는 슬롯의 canonical service와 일치해야 하고 현재 global 자료·관리자 global 슬롯 계약은 유지한다. 이미 내 매장에 복사된 현재 서비스 자료는 과거 PH 출처 metadata가 있어도 사용 가능하다. 벌크의 PH 혼합 요청은 기존 슬롯 삭제 전에 전체 거부한다. 초대 목록은 수락과 동일한 조직 linkage 판정을 적용해 PH-only를 제외하고 혼합/현재 조직 초대는 유지한다. inactive PH linkage도 퇴역 식별로만 읽어 무스코프 수락으로 복구하지 않는다. 초대·자료 원장 삭제/상태 backfill은 없다.
+
+HEAD `8cabb2c5a2`의 CI Gate·SonarCloud는 통과했다. 최신 리뷰는 현재 slug 선택도 원래 history 서비스와 활성 상태로 한정해야 한다고 지적했다. StoreSlugService는 같은 조직의 PH 주소를 KPA redirect 대상으로 임의 선택하지 않으며 다른 서비스로 fallback하지 않는다. 실제 helper fixture가 PH/KPA 활성 주소를 함께 제공하도록 고쳐 현재 서비스 redirect·PH 주소 부재·현재 주소 inactive 사례를 검증한다. 슬롯/초대 보완과 함께 최신 커밋의 required CI·Sonar·Codex를 다시 확인한다.
+
+슬롯 원본·초대 목록·서비스별 slug 대상 보완을 모두 포함한 API 244 suites에서 238 suites·4,442 tests가 통과했다. DB integration 6개(48건)는 SKIP했다. API type-check와 platform-core build도 통과했다. current/global 자료·현재 서비스로 복사된 PH 출처 자료·현재/혼합 조직 초대·원장 보존과 실제 history helper의 서비스별 active 선택을 함께 검증한 결과다. 최신 PR 커밋의 required CI·Sonar·Codex는 별도 remote gate다.

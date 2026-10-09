@@ -273,9 +273,9 @@ export class StoreSlugService {
       return null;
     }
 
-    // Get current slug for this store
+    // Each service keeps its own active address, even when the organization is shared.
     const currentSlug = await this.slugRepo.findOne({
-      where: { storeId: history.storeId },
+      where: { storeId: history.storeId, serviceKey: history.serviceKey as StoreSlugServiceKey, isActive: true },
     });
 
     if (!currentSlug) {

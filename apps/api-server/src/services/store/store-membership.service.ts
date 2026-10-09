@@ -98,7 +98,23 @@ async function linkedServiceKeys(
   const keys = Object.keys(STORE_SERVICE_ORG_LINKAGE) as StoreOwnerServiceKey[];
   const linked: StoreOwnerServiceKey[] = [];
   for (const key of keys) {
-    if (await isOrganizationLinkedToService(dataSource, organizationId, key)) linked.push(key);
+    if (await isOrganizationLinkedToService(dataSource, organizationId, key)) {
+      linked.push(key);
+    } else if (key === 'pharmacy-hub') {
+      // Inactive PH records still identify a retired organization; they cannot become an unscoped store.
+      const linkage = STORE_SERVICE_ORG_LINKAGE[key];
+      const historical: unknown[] = await dataSource.query(
+        `SELECT 1 WHERE EXISTS (
+           SELECT 1 FROM organization_service_enrollments e
+            WHERE e.organization_id = $1 AND e.service_code = ANY($2::text[])
+         ) OR EXISTS (
+           SELECT 1 FROM platform_store_slugs s
+            WHERE s.store_id = $1 AND s.service_key = ANY($3::text[])
+         )`,
+        [organizationId, linkage.enrollmentCodes, linkage.slugKeys],
+      );
+      if (historical.length > 0) linked.push(key);
+    }
   }
   return linked;
 }
@@ -311,7 +327,14 @@ export async function listMyInvitations(
       ORDER BY om.joined_at ASC`,
     [userId, STORE_INVITED_ROLE],
   );
-  return rows.map((r) => ({ organizationId: r.organization_id, organizationName: r.name ?? '' }));
+  const invitations: Array<{ organizationId: string; organizationName: string }> = [];
+  for (const row of rows) {
+    const linked = await linkedServiceKeys(dataSource, row.organization_id);
+    // Only actionable invitations belong in this list; retain the historical invited row.
+    if (linked.length > 0 && linked.every((key) => key === 'pharmacy-hub')) continue;
+    invitations.push({ organizationId: row.organization_id, organizationName: row.name ?? '' });
+  }
+  return invitations;
 }
 
 /**

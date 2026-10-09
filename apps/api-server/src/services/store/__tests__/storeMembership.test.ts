@@ -59,7 +59,7 @@ const OUTSIDER = 'outsider-1';
 type Row = Record<string, any>;
 
 /** organization_members · users 를 메모리로 둔 가짜 DataSource. SQL 모양으로 분기한다. */
-function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
+function makeDs(seed: { members?: Row[]; users?: Row[]; retiredOrganizations?: string[] } = {}) {
   const members: Row[] = seed.members ?? [];
   const users: Row[] = seed.users ?? [];
   const sql: string[] = [];
@@ -68,6 +68,9 @@ function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
 
+    if (s.startsWith('SELECT 1 WHERE EXISTS')) {
+      return seed.retiredOrganizations?.includes(p[0]) ? [{ linked: 1 }] : [];
+    }
     if (s.startsWith('SELECT organization_id, role FROM organization_members')) {
       return members
         .filter((m) => m.user_id === p[0] && m.left_at == null && m.role === p[1])
@@ -311,6 +314,34 @@ describe('M5 수락은 받은 본인만', () => {
     const { ds, members } = makeDs();
     await expectCode(acceptStoreInvitation(ds, { userId: OUTSIDER, organizationId: ORG_A }), 'INVITATION_NOT_FOUND');
     expect(members).toEqual([]);
+  });
+
+  it('PH-only invitations are hidden while mixed and current invitations stay actionable without changing history', async () => {
+    const { ds, members } = makeDs({ members: [
+      { organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null },
+      { organization_id: ORG_B, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null },
+    ] });
+    const original = JSON.parse(JSON.stringify(members));
+    linkedMock.mockImplementation(async (_ds: any, org: string, key: string) =>
+      key === 'pharmacy-hub' || (org === ORG_B && key === 'kpa'));
+    await expect(listMyInvitations(ds, STAFF)).resolves.toEqual([
+      { organizationId: ORG_B, organizationName: '테스트 매장' },
+    ]);
+    expect(members).toEqual(original);
+    linkedMock.mockImplementation(async (_ds: any, _org: string, key: string) => key === 'kpa');
+    expect(await listMyInvitations(ds, STAFF)).toHaveLength(2);
+  });
+
+  it('inactive PH history cannot return as an unscoped actionable invitation', async () => {
+    const { ds, members } = makeDs({
+      members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }],
+      retiredOrganizations: [ORG_A],
+    });
+    linkedMock.mockResolvedValue(false);
+    await expect(listMyInvitations(ds, STAFF)).resolves.toEqual([]);
+    await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+    expect(members[0].role).toBe(STORE_INVITED_ROLE);
+    expect(assignRoleMock).not.toHaveBeenCalled();
   });
 
   it('내가 받은 초대만 목록에 나온다', async () => {
