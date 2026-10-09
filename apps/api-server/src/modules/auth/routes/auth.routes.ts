@@ -135,6 +135,7 @@ router.patch(
 );
 
 // POST /api/v1/auth/password - 로그인 사용자의 비밀번호 설정·변경 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
+router.get('/password', requireAuth, asyncHandler(EmailAuthController.passwordStatus));
 router.post(
   '/password',
   requireJsonBody,

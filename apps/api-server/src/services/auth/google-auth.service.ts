@@ -10,7 +10,7 @@ import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone
  *   - Identity Key 는 Google `sub`(외부) 와 `users.id`(내부) 뿐이다. email 은 lookup 키가 아니다.
  *   - **email 로 users / linked_accounts 를 조회하지 않는다** (자동 병합 금지 · AST guard G2).
  *     email UNIQUE 충돌은 사전 조회 없이 DB 23505 를 `EMAIL_IN_USE` 로 매핑한다.
- *   - Google 전용 JWT 없음 — `generateTokensWithContext` / `persistRefreshTokenFamily` 재사용, JWT sub = users.id.
+ *   - Google 전용 JWT 없음 — `generateTokensWithContext` 재사용, JWT sub = users.id.
  *   - signup 은 role_assignments · service_memberships · service_credentials 를 **만들지 않는다**.
  *   - linked_accounts 에 email/displayName/profileImage/providerData 스냅샷을 쓰지 않는다(picture 미저장).
  *   - users.name = NULL. (password 컬럼은 Phase B-1 에서 선언째 사라졌다 — 쓰지 않는다.)
@@ -56,6 +56,8 @@ import {
 } from './google-identity.service.js';
 import {
   generateTokensWithContext,
+  freshenUserContext,
+  type UserContext,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import {
@@ -184,6 +186,7 @@ export interface GoogleAuthSession {
 export type SessionIssuer = (
   user: User,
   sessionServiceKey?: string | null,
+  context?: UserContext,
 ) => Promise<{
   tokens: AuthTokens;
   roles: string[];
@@ -194,6 +197,7 @@ export interface GoogleAuthServiceDeps {
   identity?: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   issueSession?: SessionIssuer;
+  readContext?: (userId: string) => Promise<UserContext>;
   /** Admin bootstrap 게이트 — 테스트에서 주입. 기본값은 요청마다 env 를 다시 읽는다. */
   /** 세미프랜차이즈 이용 자격 조회. 기본값은 `defaultSemiFranchiseAccessResolver`. */
   resolveSemiFranchiseAccess?: SemiFranchiseAccessResolver;
@@ -211,15 +215,17 @@ export class GoogleAuthService {
   private readonly identity: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   private readonly _dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   private readonly issueSession: SessionIssuer;
+  private readonly readContext: (userId: string) => Promise<UserContext>;
   private readonly resolveSemiFranchiseAccess: SemiFranchiseAccessResolver;
 
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
     this.resolveSemiFranchiseAccess = deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
+    this.readContext = deps.readContext ?? freshenUserContext;
     this.issueSession =
       deps.issueSession ??
-      ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey));
+      ((user, sessionServiceKey, context) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, null, context));
   }
 
   /** env 는 요청 시점에 읽는다 — 플래그 제거(폐쇄)가 재배포 없이도 즉시 반영되도록. */
@@ -409,10 +415,10 @@ export class GoogleAuthService {
     isNewUser: boolean,
     loginMembershipGateKey?: string | null,
   ): Promise<GoogleAuthSession> {
-    const { tokens, roles, memberships } = await this.issueSession(user, meta.sessionServiceKey ?? null);
+    const { roles, memberships } = await this.readContext(user.id);
 
     // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 인증 성공 뒤 서비스 이용 자격.
-    //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 발급한 토큰은 쓰기 전에 버린다.
+    //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 세션 발급과 family 기록 전에 판정한다.
     //   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 서비스는 Neture 기본 ∧ 세미프랜차이즈 active 도 통과.
     const access = await evaluateServiceLoginAccess(
       this.resolveSemiFranchiseAccess, user.id, loginMembershipGateKey, roles, memberships,
@@ -422,14 +428,13 @@ export class GoogleAuthService {
       throw new GoogleAuthError(SERVICE_NOT_MEMBER_CODE, serviceNotMemberMessage(access.serviceAccess), access.serviceAccess);
     }
 
-    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    const { tokens } = await this.issueSession(user, meta.sessionServiceKey ?? null, { roles, memberships });
     await this.userRepository.update(
       { id: user.id },
       {
         // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: loginAttempts/lockedUntil 리셋 제거 —
         //   password 로그인이 없으므로 증가시키는 주체가 없고, 두 컬럼은 B-2 에서 DROP 된다.
         lastLoginAt: new Date(),
-        ...(tokenFamily && { refreshTokenFamily: tokenFamily }),
       },
     );
 

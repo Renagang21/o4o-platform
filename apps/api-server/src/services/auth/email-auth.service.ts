@@ -20,7 +20,7 @@
  *      링크는 토큰을 query 가 아닌 **fragment(`#token=`)** 에 싣는다 — fragment 는 HTTP 요청에 실리지 않아
  *      웹 서버 · Cloud Run 요청 로그에 남지 않는다. 화면이 fragment 에서 읽어 JSON body 로 보낸다.
  *   ⑤ 확인 메일이 가는 곳만 확인된 주소다. 로그인은 `users.isEmailVerified=true` 일 때만 발급한다.
- *   ⑥ 비밀번호 재설정은 `revokeAllSessions` 을 호출해 전역 폐기(`refreshTokenFamily=null`)를 한다.
+ *   ⑥ 비밀번호 재설정은 `revokeAllSessions` 을 호출해 전역 세대 회전을 비밀번호 저장과 같은 transaction에서 수행한다.
  */
 import crypto from 'crypto';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -56,7 +56,7 @@ import {
 } from '../../common/auth/service-login-eligibility.policy.js';
 import type { SemiFranchiseAccessDetails } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
 import { getServiceOrigin } from '../../config/service-catalog.js';
-import { generateTokensWithContext, injectRolesIntoPublicData } from './auth-context.helper.js';
+import { generateTokensWithContext, injectRolesIntoPublicData, freshenUserContext, type UserContext } from './auth-context.helper.js';
 import { passwordCredentialService } from './password-credential.service.js';
 // Demo 보호 — 판정 정본은 demo_accounts.user_id 하나다(이메일 문자열 비교 금지).
 import {
@@ -239,6 +239,7 @@ export type PasswordStore = Pick<typeof passwordCredentialService, 'hasPassword'
 export type PasswordSessionIssuer = (
   user: User,
   sessionServiceKey: string | null,
+  context?: UserContext,
 ) => Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string; role?: string }[] }>;
 
 export interface EmailAuthServiceDeps {
@@ -246,8 +247,9 @@ export interface EmailAuthServiceDeps {
   passwords?: PasswordStore;
   mailer?: MailSender;
   issueSession?: PasswordSessionIssuer;
+  readContext?: (userId: string) => Promise<UserContext>;
   /** 보안 이벤트에 대한 전역 세션 폐기. 기본값은 `authenticationService.revokeAllSessions`. */
-  revokeAllSessions?: (userId: string) => Promise<void>;
+  revokeAllSessions?: (userId: string, manager?: EntityManager) => Promise<void>;
   /** 역할 이름 조회. 기본값은 `roleAssignmentService.getRoleNames`. */
   readRoles?: (userId: string) => Promise<string[]>;
   now?: () => Date;
@@ -267,8 +269,9 @@ export class EmailAuthService {
   private readonly passwords: PasswordStore;
   private readonly _mailer?: MailSender;
   private readonly issueSession: PasswordSessionIssuer;
+  private readonly readContext: (userId: string) => Promise<UserContext>;
   private readonly now: () => Date;
-  private readonly revokeAllSessions: (userId: string) => Promise<void>;
+  private readonly revokeAllSessions: (userId: string, manager?: EntityManager) => Promise<void>;
   private readonly readRoles: (userId: string) => Promise<string[]>;
   private readonly resolveSemiFranchiseAccess: SemiFranchiseAccessResolver;
 
@@ -276,16 +279,17 @@ export class EmailAuthService {
     this._dataSource = deps.dataSource;
     this.passwords = deps.passwords ?? passwordCredentialService;
     this._mailer = deps.mailer;
+    this.readContext = deps.readContext ?? freshenUserContext;
     this.issueSession =
       deps.issueSession ??
-      ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, 'password'));
+      ((user, sessionServiceKey, context) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, 'password', context));
     this.now = deps.now ?? (() => new Date());
     this.resolveSemiFranchiseAccess = deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
     this.revokeAllSessions =
       deps.revokeAllSessions ??
-      (async (userId) => {
+      (async (userId, manager) => {
         const { authenticationService } = await import('../authentication.service.js');
-        await authenticationService.revokeAllSessions(userId);
+        await authenticationService.revokeAllSessions(userId, manager);
       });
     this.readRoles =
       deps.readRoles ??
@@ -470,14 +474,14 @@ export class EmailAuthService {
       throw new EmailAuthError('EMAIL_NOT_VERIFIED', undefined, { canResend: true });
     }
 
-    const { tokens, roles, memberships } = await this.issueSession(user, input.sessionServiceKey ?? null);
+    const { roles, memberships } = await this.readContext(user.id);
     if (!isPasswordSessionAllowed(input.sessionServiceKey ?? null, roles)) {
-      // 발급한 토큰은 쿠키·응답에 싣지 않고 버린다(DB 쓰기 전이므로 family 도 남지 않는다).
+      // 세션을 발급하기 전에 자격을 판정한다.
       this.logActivity(user.id, input, false, 'password_session_not_allowed').catch(() => {});
       throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
     }
     // 인증은 성공했다 — 이제 서비스 이용 자격만 본다(INVALID_CREDENTIALS 와 다른 응답).
-    //   발급한 토큰은 위와 같이 버린다(DB 쓰기 전).
+    //   자격이 거절되면 family를 기록하지 않는다.
     //   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 서비스는 Neture 기본 ∧ 세미프랜차이즈 active 도 통과.
     const access = await evaluateServiceLoginAccess(
       this.resolveSemiFranchiseAccess, user.id, input.loginMembershipGateKey, roles, memberships,
@@ -489,10 +493,10 @@ export class EmailAuthService {
       );
     }
 
-    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    const { tokens } = await this.issueSession(user, input.sessionServiceKey ?? null, { roles, memberships });
     await this.dataSource.getRepository(User).update(
       { id: user.id },
-      { lastLoginAt: this.now(), ...(tokenFamily && { refreshTokenFamily: tokenFamily }) },
+      { lastLoginAt: this.now(), },
     );
     this.logActivity(user.id, input, true).catch(() => {});
 
@@ -547,20 +551,16 @@ export class EmailAuthService {
         violations,
       });
     }
-    const row = await this.consumeToken('reset', plainToken);
-    if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-    // forgot 이 Demo 토큰을 만들지 않지만, 과거에 발급된 토큰이 남아 있을 수 있다 — 여기서도 막는다.
-    if (await demoAccountService.isDemoAccount(row.user_id, this.dataSource)) throw new EmailAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
-    if (hasPlatformRole(await this.readRoles(row.user_id))) throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
-    // 재설정은 기존 수단의 교체만 한다 — 수단이 없는 계정에 첫 비밀번호를 만들지 않는다(forgot 의 발급 조건과 같은 축의
-    //   2차 방어. 정책 변경 전에 발급된 토큰 · 다른 경로로 생긴 토큰도 막는다). 세션 폐기보다 먼저 거절한다.
-    if (!(await this.passwords.hasPassword(row.user_id))) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
-
-    // 전역 폐기는 `revokeAllSessions` 한 경로만 한다(auth-token-session.service). 폐기를 **먼저** 한다 —
-    // 뒤의 저장이 실패해도 "비밀번호는 그대로인데 세션만 끊긴" 안전한 쪽으로 남는다.
-    await this.revokeAllSessions(row.user_id);
     await this.dataSource.transaction(async (manager) => {
+      const row = await this.consumeToken('reset', plainToken, manager);
+      if (!row) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
+      await manager.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [row.user_id]);
+      if (await demoAccountService.isDemoAccount(row.user_id, manager)) throw new EmailAuthError(DEMO_ACCOUNT_FORBIDDEN_CODE);
+      if (hasPlatformRole(await this.readRoles(row.user_id))) throw new EmailAuthError(PASSWORD_SESSION_NOT_ALLOWED_CODE);
+      // Reset can only replace an existing credential, never add the first password.
+      if (!(await this.passwords.hasPassword(row.user_id, manager))) throw new EmailAuthError('INVALID_OR_EXPIRED_TOKEN');
       await this.passwords.setPassword(row.user_id, newPassword, manager);
+      await this.revokeAllSessions(row.user_id, manager);
       await manager.getRepository(User).update({ id: row.user_id }, { isEmailVerified: true });
     });
   }
@@ -569,8 +569,7 @@ export class EmailAuthService {
    * POST /auth/password — 로그인한 사용자의 비밀번호 설정·변경.
    * Google 로만 가입한 사용자도 비밀번호 수단을 **추가**할 수 있다(같은 users.id — 병합이 아니다).
    * 첫 비밀번호 추가는 **이 경로(로그인 상태)뿐**이다 — forgot/reset 은 기존 수단의 복구 전용(2026-10-01 정책 변경).
-   * 현재 변경 경로는 전역 폐기를 하지 않는다. WO-O4O-AUTH-REFACTOR-V1 단계 2에서
-   * 변경·재설정 모두 기존 access/refresh/handoff 세션을 폐기하도록 교체한다.
+   * 비밀번호 저장과 전역 access/refresh/handoff 폐기를 같은 트랜잭션으로 처리한다.
    */
   async setPasswordForUser(userId: string, input: { currentPassword?: string; newPassword: string }): Promise<void> {
     // Demo 계정의 비밀번호는 공개 credential 이고 고정이다 — 로그인했더라도 바꿀 수 없다.
@@ -584,13 +583,23 @@ export class EmailAuthService {
         violations,
       });
     }
-    if (await this.passwords.hasPassword(userId)) {
-      if (!input.currentPassword) throw new EmailAuthError('CURRENT_PASSWORD_REQUIRED');
-      if (!(await this.passwords.verifyPassword(userId, input.currentPassword))) {
-        throw new EmailAuthError('CURRENT_PASSWORD_MISMATCH');
+    await this.dataSource.transaction(async (manager) => {
+      await manager.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
+      if (await this.passwords.hasPassword(userId, manager)) {
+        if (!input.currentPassword) throw new EmailAuthError('CURRENT_PASSWORD_REQUIRED');
+        if (!(await this.passwords.verifyPassword(userId, input.currentPassword, manager))) {
+          throw new EmailAuthError('CURRENT_PASSWORD_MISMATCH');
+        }
       }
-    }
-    await this.passwords.setPassword(userId, input.newPassword);
+      await this.passwords.setPassword(userId, input.newPassword, manager);
+      await this.revokeAllSessions(userId, manager);
+    });
+  }
+
+  async getPasswordStatus(userId: string): Promise<{ hasPassword: boolean; canManage: boolean }> {
+    const forbidden = await demoAccountService.isDemoAccount(userId, this.dataSource) ||
+      hasPlatformRole(await this.readRoles(userId));
+    return { hasPassword: await this.passwords.hasPassword(userId), canManage: !forbidden };
   }
 
   // ── 아이디 찾기 ─────────────────────────────────────────────────────────
@@ -654,11 +663,12 @@ export class EmailAuthService {
   private async consumeToken(
     kind: TokenKind,
     plainToken: string,
+    manager?: Queryable,
   ): Promise<{ user_id: string; email: string } | null> {
     if (typeof plainToken !== 'string' || plainToken.length < 20 || plainToken.length > 200) return null;
     const table = TOKEN_TABLE[kind];
     const returning = kind === 'verification' ? 'user_id, email' : `user_id, '' AS email`;
-    const result: unknown = await this.dataSource.query(
+    const result: unknown = await (manager ?? this.dataSource).query(
       `UPDATE ${table} SET consumed_at = now()
         WHERE token_hash = $1 AND consumed_at IS NULL AND expires_at > now()
         RETURNING ${returning}`,

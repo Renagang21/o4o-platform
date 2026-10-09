@@ -10,6 +10,8 @@ import type { AuthRequest } from '../../../common/middleware/auth.middleware.js'
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import logger from '../../../utils/logger.js';
+import { extractToken } from '../../../common/middleware/auth/auth-context.helpers.js';
+import { verifyAccessToken } from '../../../utils/token.utils.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import { isCrossOriginRequest } from './auth-helpers.js';
 
@@ -23,11 +25,18 @@ export class AuthSessionController extends BaseController {
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
     //   **요청 origin 의 서비스 세션만** 서버에서 무효화한다. 본문 값을 믿지 않는다 —
     //   클라이언트가 serviceKey 를 지정할 수 있으면 남의 서비스 세션을 끊을 수 있다.
-    const serviceKey = resolveSessionServiceKey(req.get('origin'));
+    const token = extractToken(req);
+    const payload = token ? verifyAccessToken(token) : null;
+    const serviceKey = payload?.serviceKey;
+    const sessionId = payload?.sessionId;
+    const originService = resolveSessionServiceKey(req.get('origin'));
+    if (!serviceKey || !sessionId || (originService && originService !== serviceKey)) {
+      return BaseController.error(res, '다시 로그인한 뒤 로그아웃해 주세요.', 401, 'SESSION_SCOPE_INVALID');
+    }
 
     try {
       if (userId) {
-        await authenticationService.logout(userId, serviceKey);
+        await authenticationService.logout(userId, serviceKey, sessionId);
       }
 
       authenticationService.clearAuthCookies(req, res);
@@ -35,7 +44,7 @@ export class AuthSessionController extends BaseController {
       return BaseController.ok(res, {
         message: 'Logout successful',
         // 서버측 무효화가 실제로 일어났는지 프런트·검증이 구분할 수 있게 밝힌다.
-        scope: serviceKey ? { serviceKey, serverRevoked: true } : { serviceKey: null, serverRevoked: false },
+        scope: { serviceKey, serverRevoked: true, currentBrowserOnly: true },
       });
     } catch (error: any) {
       logger.error('[AuthSessionController.logout] Logout error', {
@@ -66,14 +75,14 @@ export class AuthSessionController extends BaseController {
    * Refresh access token
    *
    * === Phase 2.5: Unified Error Response ===
-   * All refresh failures return 401 with specific error codes.
-   * Frontend should NOT retry on these errors - redirect to login instead.
+   * Invalid sessions return 401; infrastructure failures return retryable 503.
+   * Frontend keeps the current session on transient failures.
    *
    * Error codes:
    * - NO_REFRESH_TOKEN: Token not provided in request
    * - REFRESH_TOKEN_INVALID: Token malformed, signature invalid, or from different server
    * - REFRESH_TOKEN_EXPIRED: Token has expired
-   * - TOKEN_FAMILY_MISMATCH: Token rotation detected (possible theft)
+   * - TOKEN_FAMILY_MISMATCH: Old account security generation
    * - USER_NOT_FOUND: User does not exist or is inactive
    *
    * Response format:
@@ -81,7 +90,7 @@ export class AuthSessionController extends BaseController {
    * - Error: { success: false, error: "message", code: "ERROR_CODE", retryable: false }
    */
   static async refresh(req: Request, res: Response): Promise<any> {
-    const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+    const refreshToken = req.body?.refreshToken || req.cookies?.refreshToken;
 
     if (!refreshToken) {
       authenticationService.clearAuthCookies(req, res);
@@ -126,12 +135,17 @@ export class AuthSessionController extends BaseController {
       // WO-O4O-MONITORING-IMPLEMENTATION-V1: Auth failure metric
       monitoringMetrics.recordAuthFailure(error.code || 'REFRESH_TOKEN_INVALID');
 
-      // Phase 2.5: Always clear cookies on refresh failure
+      const errorCode = error.code || 'AUTH_SERVICE_UNAVAILABLE';
+      const invalidSession = new Set([
+        'NO_REFRESH_TOKEN', 'REFRESH_TOKEN_INVALID', 'REFRESH_TOKEN_EXPIRED', 'USER_NOT_FOUND',
+        'TOKEN_FAMILY_REVOKED', 'TOKEN_FAMILY_MISMATCH', 'SERVICE_SESSION_REVOKED',
+        'ACCOUNT_NOT_ACTIVE', 'PASSWORD_SESSION_NOT_ALLOWED',
+      ]).has(errorCode);
+      if (!invalidSession) {
+        return res.status(503).json({ success: false, error: '인증 서비스를 잠시 사용할 수 없습니다. 다시 시도해 주세요.',
+          code: 'AUTH_SERVICE_UNAVAILABLE', retryable: true });
+      }
       authenticationService.clearAuthCookies(req, res);
-
-      // Phase 2.5: Return specific error code for FE handling
-      // All these errors are non-retryable - frontend should redirect to login
-      const errorCode = error.code || 'REFRESH_TOKEN_INVALID';
       return res.status(401).json({
         success: false,
         error: error.message || 'Invalid or expired refresh token',

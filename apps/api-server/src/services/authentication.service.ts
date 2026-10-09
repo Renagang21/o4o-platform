@@ -74,12 +74,12 @@ export class AuthenticationService {
    *   `serviceKey` 는 **요청 origin 에서 파생**된 값이다(클라이언트 입력 아님).
    *   없으면 서버측 무효화를 하지 않는다 — 범위를 모르는 채 전역으로 넓히지 않는다.
    */
-  async logout(userId: string, serviceKey?: string | null): Promise<void> {
-    return this.tokenSessionService.logout(userId, serviceKey);
+  async logout(userId: string, serviceKey: string, sessionId: string): Promise<void> {
+    return this.tokenSessionService.logout(userId, serviceKey, sessionId);
   }
 
-  async revokeAllSessions(userId: string): Promise<void> {
-    return this.tokenSessionService.revokeAllSessions(userId);
+  async revokeAllSessions(userId: string, manager?: Pick<import('typeorm').EntityManager, 'query'>): Promise<void> {
+    return this.tokenSessionService.revokeAllSessions(userId, manager);
   }
 
   setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {

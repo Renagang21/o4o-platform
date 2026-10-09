@@ -1,3 +1,4 @@
+import { refreshStoredSession } from './refresh-coordinator.js';
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type {
   AuthResponse,
@@ -111,7 +112,7 @@ export class AuthClient {
     this.api.interceptors.request.use((config: any) => {
       if (this.strategy === 'localStorage') {
         const token = getAccessToken();
-        if (token) {
+        if (token && !config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${token}`;
         }
       }
@@ -169,49 +170,29 @@ export class AuthClient {
           // Capture current access token before refresh attempt.
           // If a concurrent login stores a new token while this refresh is in flight,
           // the catch block should NOT clear the newly stored token.
-          const tokenBeforeRefresh = this.strategy === 'localStorage' ? getAccessToken() : null;
           const generationAtStart = this.sessionGeneration;
 
           try {
             // Phase 6-7: Cookie Auth Primary
-            // For cookie strategy, refresh token is sent via cookie automatically
-            // For localStorage strategy, send refresh token in body
-            const refreshPayload = this.strategy === 'localStorage'
-              ? { refreshToken: getRefreshToken(), includeLegacyTokens: true }
-              : {}; // Cookie strategy sends refresh token via cookie
-
-            const response = await this.api.post('/auth/refresh', refreshPayload);
-
-            // WO-NETURE-AUTH-TOKEN-FAMILY-MISMATCH-FIX-V1:
-            // Use shared helper to correctly unwrap BaseController.ok() response
-            const { accessToken, refreshToken: newRefreshToken } = extractTokensFromResponse(response.data);
-
-            if (!accessToken) {
-              // Refresh endpoint returned 200 but no usable token — treat as failure
-              console.warn('[AuthClient] Refresh succeeded but no accessToken in response');
-              if (this.strategy === 'localStorage' && !this.isSessionEndedSince(generationAtStart)) {
-                this.sessionGeneration += 1;
-                clearAllTokens();
-              }
-              this.rejectRefreshSubscribers();
-              return Promise.reject(new Error('Refresh response missing accessToken'));
+            let accessToken: string | null;
+            if (this.strategy === 'localStorage') {
+              accessToken = await refreshStoredSession(this.baseURL, async (refreshToken) => {
+                const response = await this.api.post('/auth/refresh', { refreshToken, includeLegacyTokens: true });
+                return response.data;
+              });
+            } else {
+              // Cookie-only success need not expose tokens in the JSON body.
+              await this.api.post('/auth/refresh', {});
+              accessToken = 'cookie-session-refreshed';
             }
-
-            // WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1:
-            // refresh 가 진행되는 사이 로그아웃이 일어났으면(같은 탭: 세대 증가 · 다른 탭: storage 의
-            // refresh token 삭제) 늦게 도착한 이 응답으로 로그인을 되살리지 않는다.
-            if (this.strategy === 'localStorage' && this.isSessionEndedSince(generationAtStart)) {
+            if (!accessToken) {
+              throw new Error(this.isSessionEndedSince(generationAtStart)
+                ? 'Refresh response discarded: session ended during refresh'
+                : 'Refresh response discarded or missing tokens');
+            }
+            if (this.sessionGeneration !== generationAtStart) {
               this.rejectRefreshSubscribers();
               return Promise.reject(new Error('Refresh response discarded: session ended during refresh'));
-            }
-
-            // Phase 6-7: Only update localStorage for localStorage strategy
-            if (this.strategy === 'localStorage') {
-              setAccessToken(accessToken);
-              if (newRefreshToken) {
-                setRefreshToken(newRefreshToken);
-              }
-              updateAuthStorage(accessToken, newRefreshToken);
             }
 
             // Notify subscribers
@@ -224,38 +205,14 @@ export class AuthClient {
             }
             return this.api.request(originalRequest);
           } catch (refreshError) {
-            // Refresh failed, clear tokens
-            if (this.strategy === 'localStorage') {
-              // WO-NETURE-TOKEN-RACE-FIX-V1:
-              // Only clear tokens if no concurrent login stored a new one while refresh was in flight.
-              // Comparing current token to the one captured before refresh prevents wiping a fresh login token.
-              const currentToken = getAccessToken();
-              const freshLoginOccurred = tokenBeforeRefresh !== currentToken && currentToken !== null;
-              if (this.isSessionEndedSince(generationAtStart)) {
-                // 이미 로그아웃된 세션 — 다시 지우거나 이벤트를 내지 않는다 (대기 요청만 종료)
-                this.rejectRefreshSubscribers();
-              } else if (!freshLoginOccurred) {
-                this.sessionGeneration += 1;
-                clearAllTokens();
-                this.rejectRefreshSubscribers();
-                // Notify React layer (AuthContext) to set user=null.
-                // auth:token-cleared is already handled by AuthContext.tsx listener.
-                // Using window.dispatchEvent (not localStorage event) so it only affects
-                // the current tab — no cross-tab side-effects.
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('auth:token-cleared'));
-                }
-              }
-            }
-
-            // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
-            // window.location.href = '/login' 제거 — 하드 리다이렉트가 React 상태 초기화 → 무한 루프 유발
-            // 토큰만 정리하고 reject → React 레이어(AuthContext)에서 user=null 처리
-            const errorData = (refreshError as any)?.response?.data;
-            if (errorData?.code === 'TOKEN_EXPIRED') {
-              console.warn('Session expired. Tokens cleared.');
-            } else {
-              console.warn('Authentication failed. Tokens cleared.');
+            this.rejectRefreshSubscribers();
+            const status = (refreshError as { response?: { status?: number } })?.response?.status;
+            // Local tokens/events are owned by the coordinator. Cookie sessions
+            // end only on definitive rejection, never on a network/DB outage.
+            if (this.strategy === 'cookie' && generationAtStart === this.sessionGeneration &&
+                (status === 401 || status === 403)) {
+              this.sessionGeneration += 1;
+              if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:token-cleared'));
             }
 
             return Promise.reject(refreshError);
@@ -279,11 +236,13 @@ export class AuthClient {
    * 클라이언트는 idToken(+serviceKey) 외에 어떤 identity 필드도 보내지 않는다.
    */
   async loginWithGoogle(idToken: string, options: { serviceKey?: string } = {}): Promise<GoogleAuthResponse> {
+    const generation = ++this.sessionGeneration;
     const response = await this.api.post('/auth/google/login', {
       idToken,
       ...(options.serviceKey && { serviceKey: options.serviceKey }),
       ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
     });
+    if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
   }
 
@@ -292,11 +251,13 @@ export class AuthClient {
    * Google ID token + 약관/개인정보(+마케팅) 동의 → POST /auth/google/signup → 계정 생성 + 세션.
    */
   async signupWithGoogle(idToken: string, consents: GoogleSignupConsents): Promise<GoogleAuthResponse> {
+    const generation = ++this.sessionGeneration;
     const response = await this.api.post('/auth/google/signup', {
       idToken,
       consents,
       ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
     });
+    if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
   }
 
@@ -306,11 +267,13 @@ export class AuthClient {
 
   /** POST /auth/email/login — 확인된 이메일 계정 → 세션. 실패는 axios 오류로 전파(code: INVALID_CREDENTIALS · EMAIL_NOT_VERIFIED …). */
   async loginWithEmail(email: string, password: string): Promise<GoogleAuthResponse> {
+    const generation = ++this.sessionGeneration;
     const response = await this.api.post('/auth/email/login', {
       email,
       password,
       ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
     });
+    if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
   }
 
@@ -338,9 +301,24 @@ export class AuthClient {
     return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
   }
 
+  async getPasswordStatus(): Promise<{ hasPassword: boolean; canManage: boolean }> {
+    const response = await this.api.get('/auth/password');
+    return response.data.data;
+  }
+
+  async setPassword(input: { currentPassword?: string; newPassword: string }): Promise<void> {
+    await this.api.post('/auth/password', input);
+    if (this.strategy === 'localStorage') this.endLocalSession();
+    else { this.sessionGeneration += 1; this.rejectRefreshSubscribers(); }
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:token-cleared'));
+  }
+
   /** POST /auth/password/reset — 새 비밀번호 저장 + 모든 기기 로그아웃. */
   async resetPassword(token: string, newPassword: string): Promise<EmailAuthNotice> {
     const response = await this.api.post('/auth/password/reset', { token, newPassword });
+    if (this.strategy === 'localStorage') this.endLocalSession();
+    else { this.sessionGeneration += 1; this.rejectRefreshSubscribers(); }
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:token-cleared'));
     return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
   }
 
@@ -419,17 +397,14 @@ export class AuthClient {
    * - localStorage strategy: Clear localStorage tokens
    */
   async logout(): Promise<void> {
+    const token = this.strategy === 'localStorage' ? getAccessToken() : null;
+    if (this.strategy === 'localStorage') this.endLocalSession();
+    else { this.sessionGeneration += 1; this.rejectRefreshSubscribers(); }
     try {
-      await this.api.post('/auth/logout', {});
+      await this.api.post('/auth/logout', {}, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
     } catch (error) {
-      // Even if logout fails (e.g., token expired), continue with local cleanup
-      // This is normal if token expired
-    } finally {
-      // Phase 6-7: Clear localStorage tokens for localStorage strategy
-      // For cookie strategy, server handles cookie clearing
-      if (this.strategy === 'localStorage') {
-        this.endLocalSession();
-      }
+      // Surface server revocation failure; local logout has already completed.
+      throw error;
     }
   }
 
@@ -446,7 +421,7 @@ export class AuthClient {
 
   /** refresh 시작 이후 세션이 끝났는가 — 같은 탭(세대) 또는 다른 탭(storage 의 refresh token 삭제) */
   private isSessionEndedSince(generationAtStart: number): boolean {
-    return this.sessionGeneration !== generationAtStart || getRefreshToken() === null;
+    return this.sessionGeneration !== generationAtStart || (this.strategy === 'localStorage' && getRefreshToken() === null);
   }
 
   private rejectRefreshSubscribers(): void {

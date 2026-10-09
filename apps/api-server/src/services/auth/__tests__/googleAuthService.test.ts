@@ -167,11 +167,12 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     svc = new GoogleAuthService({
       identity,
       dataSource: ds as any,
-      issueSession: async (user) => ({
-        tokens: tokenUtils.generateTokens(user, [], 'neture.co.kr', []),
-        roles: sessionRoles,
-        memberships: sessionMemberships,
-      }),
+      readContext: async () => ({ roles: sessionRoles, memberships: sessionMemberships }),
+      issueSession: async (user) => {
+        const tokens = tokenUtils.generateTokens(user, [], 'neture.co.kr', [], user.refreshTokenFamily, 'neture');
+        user.refreshTokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+        return { tokens, roles: sessionRoles, memberships: sessionMemberships };
+      },
       resolveSemiFranchiseAccess: semiFranchiseResolver,
     });
   };
