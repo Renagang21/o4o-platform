@@ -7,7 +7,7 @@
  *   → service-agnostic B2B confirm → checkout_orders → buyer-order read
  *
  * 고정 대상:
- *   ① soft-delete 된 offer 가 3축(approval/optin/neture) 어디에서도 주문되지 않는다 (DF-6)
+ *   ① soft-delete 된 offer 가 현행 주문 축(approval/neture) 어디에서도 주문되지 않는다 (DF-6)
  *   ② catalog · orderable · 신청 자격 확인도 같은 soft-delete 게이트를 쓴다
  *   ③ 미승인 offer 차단 · 공급 축 오적용 차단
  *   ④ sourceType 축 혼합 오염 차단 (event_offer ↔ b2b/regular)

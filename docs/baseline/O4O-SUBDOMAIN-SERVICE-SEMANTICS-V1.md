@@ -1,5 +1,7 @@
 # O4O 서브도메인 · 서비스 의미 정본
 
+> **2026-10-09 1차 제거 기록:** PharmacyHub 전용 앱·API·배포 경로의 1차 제거는 PR #375와 [당시 WO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-V1.md)에서 확인한다. 현행 완전 퇴역 기준은 아래 §2-2와 [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §16](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)을 따른다. 기존 식별자와 운영 데이터는 보존하며 실제 인프라 삭제는 별도 실행이다.
+
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **상태**: ACTIVE

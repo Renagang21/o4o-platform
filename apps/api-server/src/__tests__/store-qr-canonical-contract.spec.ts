@@ -251,7 +251,7 @@ describe('§6 범위 경계', () => {
 // §7 screen_set 공개 뷰어 = 공용 1개
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('§7 screen_set 공개 랜딩 — KPA · PharmacyHub 동일 renderer', () => {
+describe('§7 screen_set 공개 랜딩 — KPA 공통 renderer', () => {
   it('뷰어는 공통 패키지에 있고 서비스 로컬 테마·API 에 의존하지 않는다', () => {
     const src = read(SHARED_VIEWER);
     expect(src).not.toContain('../../styles/theme');
