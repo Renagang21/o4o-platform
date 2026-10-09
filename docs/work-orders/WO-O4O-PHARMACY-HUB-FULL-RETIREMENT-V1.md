@@ -18,7 +18,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 |---|---|---|
 | R01 | PH 웹·API 제거 | `web-pharmacy-hub`, 전용 라우터·컨트롤러·scope·생성 코드 삭제; `/api/v1/pharmacy-hub` 미등록 |
 | R02 | 내 매장 PH 문맥 제거 | PH route·API adapter·메뉴·공개 origin·서비스 선택 분기 제거; 현재 약국 원장과 KPA 공통 구현은 유지 |
-| R03 | 신규 PH 진입·공통 쓰기 제거 | catalog·CORS·Local Agent origin·운영자 부여·공급자 PH 설정 제거; Store·이용권·QR·CMS·모집·Offer 신규 쓰기와 PH 가입 승인/재활성화·공통 역할 부여 차단. PH 약관은 현재 동의 요구에서 제외. 독립 약사 포럼 저장 코드·기존 주문 후속 처리 보존 |
+| R03 | 신규 PH 진입·공통 쓰기 제거 | catalog·CORS·Local Agent origin·운영자 부여·공급자 PH 설정 제거; Store·이용권·QR·CMS·모집·Offer 신규 쓰기와 PH 가입 승인/재활성화·공통 역할 부여 차단. 공개 PH slug의 관심 요청·PH 전용 조직의 QR 스캔도 기록 전에 차단. PH 약관은 현재 동의 요구에서 제외. 독립 약사 포럼 저장 코드·기존 주문 후속 처리 보존 |
 | R04 | PH 재배포 제거 | CD registry·workflow job·lockfile importer 정리; 다른 웹·API·병원약국 배포 유지 |
 | R05 | 운영 인프라 제거 준비·실행 | 실제 PH host rule·NEG·backend·Cloud Run·DNS·인증서 조사 후 PH 전용 자원만 제거; 공유 LB·IP·인증서의 다른 호스트 보호 |
 | R06 | 회귀 검증 | 변경 소비처 type-check/build, API focused tests, CD detector tests; PH 원장 조회·Store·공급자·커뮤니티 권한 보호 |
@@ -36,6 +36,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 과거 PH membership과 약관이 남아 있으면 현재 서비스까지 428 동의 게이트에 걸렸다. PH 이용약관·경영자 계약은 pending에서 제외하고 PH 신규 승낙 쓰기는 거부한다. 현재 서비스 약관 동의 요구와 과거 동의 원장은 유지한다.
 - 공통 역할 선택 목록과 부여 API는 전체 관리자에게도 PH prefix와 PH catalog 항목의 신규 부여를 거부한다. 기존 할당·역할 식별 조회와 회수는 유지한다. PH 가입의 승인·재활성화·active 전이는 거부하고, 전체 복구의 PH 원장은 제외해 현재 서비스 가입만 복구한다. 가입 거부·정지·탈퇴·회수는 유지한다.
 - 공통 `products/from-master` 생성도 PH 공급 키가 있으면 혼합 서비스 요청 전체를 거부한다. 기존 Offer의 PH 키와 후속 처리 원장은 그대로 둔다. 신규 입력에서 키를 지워 기본 공급으로 전환하지 않는다.
+- 공개 Store 조회도 PH slug와 PH로 향하는 과거 slug 리다이렉트를 404로 종료한다. PH 전용 조직의 공개 QR은 스캔 이벤트를 기록하기 전에 종료한다. 같은 조직에 현재 서비스 주소가 있으면 PH 주소를 제외하고 현재 Store 관심 요청·QR을 처리한다. active/inactive PH 주소와 혼합 원장을 실제 HTTP 회귀로 검증한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
 - 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
 

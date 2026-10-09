@@ -15,6 +15,7 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import type { StoreBlock, TemplateProfile } from '../../../modules/store/types/store-template.js';
+import { PHARMACY_HUB_SERVICE_KEY } from '../../../utils/service-retirement.js';
 
 // ============================================================================
 // Service Key Mapping (WO-O4O-STORE-SERVICEKEY-MAPPING-FIX-V1)
@@ -62,9 +63,14 @@ export async function resolvePublicStore(
   const slugService = new StoreSlugService(dataSource);
   const record = await slugService.findBySlug(slug);
 
+  if (record?.serviceKey === PHARMACY_HUB_SERVICE_KEY) {
+    res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+    return null;
+  }
+
   if (!record || !record.isActive) {
     const redirect = await slugService.findOldSlugRedirect(slug);
-    if (redirect) {
+    if (redirect && redirect.serviceKey !== PHARMACY_HUB_SERVICE_KEY) {
       const newPath = req.originalUrl.replace(
         `/${encodeURIComponent(slug)}`,
         `/${encodeURIComponent(redirect.newSlug)}`,
