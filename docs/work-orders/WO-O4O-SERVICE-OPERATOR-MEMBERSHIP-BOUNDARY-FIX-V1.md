@@ -91,9 +91,9 @@ PR: [#371](https://github.com/Renagang21/o4o-platform/pull/371).
 사용자 지시: 회원 관리 후속 단계를 전부 순서대로 진행한다. 기존 WO/PR #371의 연속 단계로 같은 전용 worktree·branch를 유지한다.
 PR #374로 반영된 역할 회수·운영 scope·쓰기 경계는 유지하고 중복 변경을 제거한다.
 
-- [ ] 최신 main 통합 및 중복/충돌 분류
-- [ ] 서비스별 화면 → API → 역할 판정 → 데이터 경계 재조사
-- [ ] 회원 목록·상세 조회의 서비스 범위 및 공통 상세·수정 소비처 정비
+- [x] 최신 main 통합 및 중복/충돌 분류
+- [x] 서비스별 화면 → API → 역할 판정 → 데이터 경계 재조사
+- [x] 회원 목록·상세 조회의 서비스 범위 및 공통 상세·수정 소비처 정비
 - [ ] 현재 회원 관리 업무별 admin/operator 권한 비교와 정책 미정 항목 확인
 - [ ] 결정된 정책 적용 및 공통 계정과 서비스 가입 변경 분리 검증
 - [ ] 서비스별·역할별 회귀, 타입 검사, 영향 빌드/화면 검증
@@ -101,3 +101,47 @@ PR #374로 반영된 역할 회수·운영 scope·쓰기 경계는 유지하고 
 - [ ] 회원 관리 완료 후 개별 커뮤니티 운영자 후속 조사 항목 정리
 
 main 병합·배포는 새 PR 결과를 검토한 사용자의 통합 승인 후 진행한다. 새 권한 차이나 운영 DB 변경은 조사만으로 확정하지 않는다.
+
+## 후속 1차 조사·수정 계획
+
+main `240a2dfd42`의 인증·scope·회원 쓰기 보완을 통합했다. 인증 테스트의 추가 community 회수 회귀를 보존했다.
+PR의 남은 코드 차이는 목록/상세에서 선택 서비스의 가입 정보·역할만 반환하고, 공통 상세/편집 화면이 같은 serviceKey로 조회하는 부분이다.
+KPA·Cosmetics의 canonical membership key와 role prefix 차이는 security-core 역매핑을 사용한다.
+
+| 서비스 | 현재 회원 관리 화면·API | 처리 |
+|---|---|---|
+| Neture | 공통 목록·상세 + 가입 승인 전용 API | 공통 조회 경계 적용, 전용 승인 공통 계정 쓰기는 정책 결정 대상 |
+| Pharmacy-Hub | 공통 회원 목록·상세 + 별도 가입 신청 관리 | 공통 조회 경계 적용, 승인 서비스 공통 계정 쓰기는 정책 결정 대상 |
+| KPA Society | 공통 상세 + 전용 회원 목록·정보·상태 변경 | 공통 상세 경계 적용, 전용 정보/상태의 공통 계정 쓰기는 추가 적용 대상 |
+| K-Cosmetics | 공통 API·편집 소비처 잔재, workspace 은퇴 | 역할 prefix 매핑 회귀 유지, 은퇴 화면 복구 금지 |
+| KPA Branch | 서비스 가입 승인과 분회 membership 관리 분리 | 기존 전용 승인 경계 유지, 승인 서비스 공통 계정 쓰기는 정책 결정 대상 |
+| Community | 서비스 admin/operator 개설 심사·개체 운영자 지정, 개체 회원 조회 | main 역할 정책 유지, 서비스 가입 회원 콘솔과 개체 회원 관리 구분 필요 |
+| Lecture | 강의·강사·수료 운영 화면, 일반 서비스 회원관리 화면 없음 | 일반 회원 콘솔 소비처 보완 TODO |
+| Supplier/Funding | 사업 운영 화면, 자가 가입 비활성, 공통 회원 API 허용 | 운영자 지정으로 생성된 가입 포함 여부·일반 회원 콘솔 보완 TODO |
+
+정상 유지: 중앙만 운영 tier를 지정·회수, 일반 계정 유지형 역할 해제, 선택 서비스의 상태 변경·탈퇴.
+수정 완료: 공통 목록·상세의 타 서비스 가입/역할 노출, 실제 편집 모달의 serviceKey 누락.
+정책 결정 후 적용: admin/operator 회원 업무 차이, 서비스 승인/재활성화의 users 상태 복구, 서비스 회원 편집의 공통 프로필 수정.
+
+### 결정이 필요한 실제 쓰기 경로
+
+- `MembershipApprovalService.approveMembership`: 서비스 가입 승인 시 users status/isActive도 활성화. Pharmacy-Hub·분회·공통 API가 사용.
+- `MembershipApprovalService.reactivateMembership`: 서비스 재활성화 시 deleted 계정 복구, 플랫폼 권한에는 suspended 복구도 허용.
+- `MembershipConsoleController`: 상태 단건/일괄 활성화 fallback에서 공통 users UPDATE.
+- `neture/services/operator-registration.service.ts`: 전용 가입 승인에서 공통 users UPDATE.
+- `kpa/controllers/member.controller.ts`: 승인 시 계정 활성화 및 회원 정보 변경에서 users name/nickname/businessInfo 쓰기.
+- 공통 상세의 정보 수정·공통 목록 편집 모달: 이름·연락처·사업자 정보와 서비스 회원 유형을 같은 화면에서 편집.
+
+공통 계정 상태·프로필을 중앙으로 한정할 경우 서버 차단과 함께 서비스 모달을 가입 정보 편집으로 바꿔야 한다.
+일부 공통 API만 고치면 전용 Neture/KPA 승인·편집 경로가 남으므로 해당 소비처까지 함께 정비한다.
+admin/operator 권한을 구분할 경우 버튼과 API guard를 함께 변경하며 장기 제한 등의 임의 정책을 만들지 않는다.
+정책 질문은 사용자에게 전달했으며 답변 전에는 이러한 쓰기 정책을 변경하지 않는다.
+
+### 최신 로컬 검증
+
+- 회원 조회·쓰기·회수 경계 Jest 5 suites / 83 tests PASS. 8개 서비스 role prefix 및 플랫폼 all=true 경계 포함.
+- 공통 상세 UI Vitest 2 files / 14 tests, 공통 운영 UI Vitest 5 files / 47 tests PASS.
+- 공통 패키지 전체 빌드, API·공통 UI·operator-core-ui 타입 검사 PASS.
+- frozen install 재검증, dependency/lockfile 변경 없음.
+
+개별 커뮤니티 운영자 조사는 회원 관리 완료 후 진행한다. 이번 단계에서 콘텐츠·업무 운영으로 확대하지 않는다.

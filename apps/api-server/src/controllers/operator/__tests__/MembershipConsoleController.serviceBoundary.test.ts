@@ -106,3 +106,32 @@ describe('service membership boundaries', () => {
     expect(out.status).toHaveBeenCalledWith(404); expect(mockQuery).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('membership read isolation on latest main', () => {
+  it.each([['neture', 'neture'], ['pharmacy-hub', 'pharmacy-hub'], ['kpa-society', 'kpa'], ['k-cosmetics', 'cosmetics'], ['community', 'community'], ['lecture', 'lecture'], ['supplier', 'supplier'], ['funding', 'funding']])('limits %s detail data to its role prefix %s', async (serviceKey, prefix) => {
+    const r = req({}, [serviceKey, 'other-service']); r.query.serviceKey = serviceKey;
+    await new MembershipConsoleController().getMemberDetail(r, res());
+    const roleQuery = mockQuery.mock.calls.find(([sql]) => sql.includes('FROM role_assignments'))!;
+    expect(roleQuery[1]).toEqual([ID, [`${prefix}:%`], [prefix]]);
+    const memberships = mockQuery.mock.calls.find(([sql]) => sql.includes('SELECT id, service_key'))!;
+    expect(memberships[1]).toEqual([ID, [serviceKey]]);
+  });
+  it('requires an explicit central detail scope before reading personal data', async () => {
+    const out = res(); await new MembershipConsoleController().getMemberDetail(req({}, [], true), out);
+    expect(out.status).toHaveBeenCalledWith(400); expect(mockQuery).not.toHaveBeenCalled();
+  });
+  it('keeps the explicit platform all-services view', async () => {
+    const r = req({}, [], true); r.query.all = 'true';
+    await new MembershipConsoleController().getMemberDetail(r, res());
+    const roleQuery = mockQuery.mock.calls.find(([sql]) => sql.includes('FROM role_assignments'))!;
+    expect(roleQuery[1]).toEqual([ID, null, null]);
+    const memberships = mockQuery.mock.calls.find(([sql]) => sql.includes('SELECT id, service_key'))!;
+    expect(memberships[1]).toEqual([ID]);
+  });
+  it('returns no personal data when the target has no selected-service membership', async () => {
+    mockQuery.mockResolvedValue([]); const r = req(); r.query.serviceKey = 'neture'; const out = res();
+    await new MembershipConsoleController().getMemberDetail(r, out);
+    expect(out.status).toHaveBeenCalledWith(404); expect(mockQuery).toHaveBeenCalledTimes(1);
+    expect(out.json).toHaveBeenCalledWith({ success: false, error: 'User not found' });
+  });
+});
