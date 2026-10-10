@@ -26,3 +26,5 @@
 배포 준비 판정: `origin/main..HEAD` 기준 LEVEL_3, 대상 API·admin·Neture·약국·강의·내 매장·분회·병원 약품 앱. 실제 배포는 main 병합 뒤 serving SHA를 기준으로 Delivery가 다시 판정하며, LEVEL_3이면 승인된 main SHA로 promote를 실행한다.
 
 Sonar 지적 보완: 게시판 조회·본문 표시를 분리해 함수 복잡도를 낮추고, 상태 표시를 output 요소로 정비했다. 버튼 타입, 읽기 전용 props 및 중복 import도 수정했다. 약국·Neture·인증 테스트와 타입 검사, 네 서비스 production build, 브라우저 20회 검증을 다시 통과했다. 기존 매장 선택·가입·승인 가드는 유지하며 복수 매장의 임의 선택이나 권한 부여는 하지 않는다.
+
+최종 리뷰의 P1(SQL 스키마 불일치)을 수정했다. 가입 조건은 semi_franchises의 컬럼이 아니라 연결 organizations.metadata의 registrationConditions에서 읽는다. 기존 사업 서비스와 동일한 저장 위치로 맞추고, 조회 SQL의 저장 위치 및 잘못된 컬럼 재도입 방지 회귀 검증을 추가해 Node 22 Jest 2 tests PASS를 확인했다.
