@@ -499,3 +499,51 @@ SupplierServiceEntry 및 MarketTrialHubPage가 `/` → `/login?returnUrl=...`로
 
 기록 PR 리뷰 P2 후속: 상위 리팩터링 WO 단계 4의 acceptance 구현 TODO도 완료로 정렬했다.
 compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로 순환은 별도 OPEN으로 분리했다.
+
+## 2026-10-10 남은 인증 TODO — 실제 OAuth 실행 매트릭스
+
+이 절의 실제 외부 인증 항목은 **OPEN**이다. 합성 provider 응답·로컬 테스트로 완료 처리하지 않는다.
+다음 구현 PR은 로그인 경로와 검증안 push 범위이며 통합·배포 뒤 실제 브라우저에서 실행한다.
+유지 8개 서비스는 PC·모바일로 확인한다. study는 Neture 계정 진입, 전체관리자는 별도 Google 전용
+검증 대상으로 구분한다. 모든 항목은 test 계정/승인된 본인 계정으로 실행하며 결과에는 문구 및
+도메인·경로만 남긴다. OAuth query/fragment, 토큰, 이메일·전화번호·실명은 기록하지 않는다.
+
+| 케이스 | 시작·조작 | 합격 조건 | 상태 |
+| --- | --- | --- | --- |
+| Google·카카오 신규 가입 | 미연결 외부 계정 인증 → 추가 정보 → 현재 약관·개인정보 동의 → 제출 | 계정 생성 1회, 입력 상태 유지, 확인 필요 시 메일 안내, 확인 후 로그인, 같은 정책 gate 반복 없음 | OPEN |
+| 기존 로그인 | 연결된 Google·카카오 각각 로그인, 페이지 새로고침 | 연결 계정으로 인증; origin 세션 복구; 업무 권한은 기존 membership에 한정 | OPEN |
+| 취소·거절 | provider 동의 취소, 추가 정보 취소 | 로그인 상태 생성 없음; 재시작 가능; 공급자·펀딩 경로 순환 없음 | OPEN |
+| 이메일 소유 확인 | 미확인 이메일 가입 → 확인 링크, 만료/재사용 링크 | 확인 전 권한 상승 없음; 유효 링크만 확인; 만료/재사용은 명확한 안내 | OPEN |
+| 명시적 연결 | 이메일 회원 로그인 → 계정 설정 → Google·카카오 연결 → 외부 재인증 | 같은 O4O 회원에 수단 추가; 이메일 일치만으로 자동 연결/계정 병합 없음 | OPEN |
+| 연결 충돌 | 이미 다른 회원에 연결된 외부 계정으로 연결 시도 | 충돌 안내; 두 회원과 기존 수단·권한 보존 | OPEN |
+| 해제·마지막 수단 | 여러 수단 중 하나 해제, 유일 수단 해제 시도 | 가능 수단만 해제; 마지막 로그인 수단 거부; 다음 로그인 확인 | OPEN |
+| 소유자 반복 약관 사례 | 본인 카카오 인증 → 추가 정보 적용 | 제출 후 예상 다음 단계, 현재 정책 pending 없음; 새 정책이면 한 번의 정당한 재동의 | OPEN |
+| 전체관리자 경계 | admin에서 Google 및 다른 로그인 진입 | 승인된 Google 관리자만 접근; 카카오·이메일·Demo 관리자 진입 거부 | OPEN |
+
+실제 본인 카카오 가입이 아직 완료되지 않았다면 기존 회원 로그인·연결 테스트와 섞지 않는다.
+이메일 확인은 실제 수신 확인을 별도 기록하며 fixture의 mailSent 응답으로 대체하지 않는다.
+법률/정책 변경안은 [DRAFT 검토안](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md)에
+제시했다. 승인 전 게시 본문·version·effective date는 변경하지 않았다.
+
+
+### 이번 로컬 구현·검증 결과
+
+LoginRedirect를 독립 컴포넌트로 추출했다. 미로그인 공급자·펀딩은 `/login`에서 모달을 열고 머문다.
+닫은 뒤 로그인하기로 재진입한다. 실제 SupplierServiceEntry/MarketTrialHubPage의 홈 인증 가드는
+유지한다. main/community의 공개 홈 진입, 복구 중 이동 보류, 안전한 로그인 후 복귀 경로와 callback
+fragment 보존은 기존 계약을 유지한다. shared auth/API·DB·권한·게시 정책 변경은 없다.
+
+| 검증 | 결과 | 범위 |
+| --- | --- | --- |
+| Neture 진입/모달 단위 테스트 | 24 PASS | LoginRedirect 11, email modal 5, Demo modal 8; 실제 공급자·펀딩 홈 컴포넌트 포함 |
+| 약관 조회·gate 단위 테스트 | 15 PASS | SignupTermsAgreement 8, PolicyAcceptanceGate 7. 서버 pending 갱신 후 서비스 복귀·반복 gate 없음 추가 |
+| Neture production build | PASS | TypeScript + Vite; 기존 큰 chunk 경고 있음 |
+| 전체 frontend type-check | PASS | 소비처 전체 타입 검증 |
+| PC/mobile 가입·약관 UI | 24/24 PASS | main/supplier/funding/community × 두 화면 × success/lookup-retry/stale-version. 추가 정보 유지·재동의·메일 안내·제출 경로 안정 |
+| PC/mobile 보호 홈·로그인 UI | 12/12 PASS | supplier/funding × 두 화면 × 홈/직접 login/카카오 취소; fragment 소비 및 모달 닫기/재열기 |
+
+브라우저는 현재 로컬 production bundle을 해당 origin으로 제공하고 API/provider 응답만 fixture로
+대체했다. 실제 인증·가입·메일 발송·운영 DB 변경·운영 배포 검증이 아니다. 첫 화면 검증에서는
+커뮤니티 목록 fixture 누락으로 커뮤니티 PC 2건이 실패한 뒤 실행을 중단했다. 실제 API 구조의
+communities 배열을 추가한 독립 전체 재실행이 24/24 PASS다. 운영 장애로 해석하지 않는다.
+기존 기록의 운영 실패나 실제 OAuth OPEN은 이 로컬 성공으로 제거하지 않는다.

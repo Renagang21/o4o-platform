@@ -7,6 +7,7 @@
  *       문서 id 불일치(stale) → 동의 불가 · 체크 전 동의 버튼 비활성 · 체크 후 onAccept 호출 · 실패 문구 표시.
  */
 
+import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -111,4 +112,25 @@ describe('PolicyAcceptanceGate', () => {
     await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('현재 적용 중인 약관이 아닙니다.'));
     expect(screen.queryByTestId('app-shell')).toBeNull();
   });
+  it('동의 후 갱신된 pending이 비면 서비스로 복귀하고 약관을 다시 표시하지 않는다', async () => {
+    const loadPolicy = vi.fn(async () => DOC);
+    const accepted = vi.fn();
+    function UpdatedSession() {
+      const [pending, setPending] = useState(PENDING);
+      return <PolicyAcceptanceGate pending={pending} loadPolicy={loadPolicy}
+        onAccept={async () => { accepted(); setPending([]); return { success: true }; }}
+        onLogout={() => {}} allowPaths={[]} serviceName="Fixture" termsPath="/terms">
+        <div data-testid="accepted-service">서비스 화면</div>
+      </PolicyAcceptanceGate>;
+    }
+    render(<MemoryRouter initialEntries={['/dashboard']}><UpdatedSession /></MemoryRouter>);
+    await waitFor(() => screen.getByTestId('policy-acceptance-content'));
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+    await waitFor(() => expect(screen.getByTestId('accepted-service')).toBeTruthy());
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(accepted).toHaveBeenCalledTimes(1);
+    expect(loadPolicy).toHaveBeenCalledTimes(1);
+  });
+
 });
