@@ -184,3 +184,47 @@ API 및 웹 6개 SUCCESS. 정확한 검증 경계·실패와 재실행은 CHECK�
 - [ ] 승인된 새 이용약관·개인정보 처리방침 본문과 version 게시. 기존 공개 정책 내용은 이번 변경에서 수정하지 않음.
 
 기존 동일 WO branch는 배포 검증 기록과 실제 OAuth/경로 후속 때문에 KEEP한다.
+
+## 2026-10-10 남은 인증 작업 — TODO 조사·보완 후 실행
+
+사용자 지시: TODO 작성 → 최신 코드·정본 검증 → TODO 보완 → 구현·검증 → push.
+동일 WO의 연속 Phase로 보존한 격리 checkout/branch를 유지한다. 기준 main은 `88f63e5992`다.
+위 날짜별 배포 기록은 당시 결과이며, 아래 목록이 이번 후속 작업의 완료 계약이다.
+
+| ID | 실행할 TODO | 완료 근거 / 경계 |
+| --- | --- | --- |
+| AUTH-R1 | 공급자·펀딩의 미로그인 `/login` ↔ `/` 순환 해소 | 홈의 인증 보호 유지; 로그인 진입에 머물고 modal 닫기·다시 열기, 세션 복구, 안전한 목적지 복귀, OAuth fragment 일회 소비를 확인 |
+| AUTH-R2 | 실제 OAuth 검증 준비 및 수행 분리 | Google/Kakao 가입·기존 로그인·취소·이메일 확인·명시적 연결·충돌·마지막 수단 보호를 실행 가능한 매트릭스로 보완. 소유자 브라우저의 실제 외부 인증은 배포 후 별도 실행 |
+| AUTH-R3 | 추가 정보 제출 후 약관 반복 조사·회귀 | 새 가입의 published 약관 reference 제출 및 현재 version 동의 후 gate 통과, 확인 메일 안내 유지, stale version 재동의·입력 보존을 확인. 기존 사용자 운영 사례는 별도 OPEN |
+| AUTH-R4 | 이용약관·개인정보 처리방침 수정 검토안 | 게시 v1과 현행 서비스/인증 수단을 대조해 수정할 조문·추천 문구·검토 질문·게시 순서를 제시. 실제 본문/version 게시·보유기간 변경은 포함하지 않음 |
+| AUTH-R5 | 검증 후 TODO 정합 및 commit·push·PR | 실행한 검증과 fixture/실제 인증의 경계를 기록; latest head CI·review·미해결 스레드 확인. main 통합·배포는 별도 단계 |
+
+### 코드·문서 조사로 보완한 조건
+
+- `LoginRedirect`는 모든 미로그인 호스트를 `/`로 보내지만 `SupplierServiceEntry`와
+  `MarketTrialHubPage`는 미로그인 홈을 `/login`으로 되돌린다. 두 보호 홈의 인가 조건을
+  제거하지 않고 로그인 진입의 목적지를 보완한다. Neture·community의 공개 홈 진입은 함께 회귀한다.
+- 이메일·이름·개인 모바일은 가입 정책의 필수 입력이다. SMS 본인 인증을 추가하거나
+  Google/Kakao 이메일 동일성으로 자동 병합하지 않는다. 전체관리자는 Google 전용이다.
+- `TermsAcceptanceGate`는 서버의 pending 문서 상태를 공통 `PolicyAcceptanceGate`에 전달한다.
+  정상 가입 acceptance 저장은 이미 PR #407에서 수정·배포됐다. 남은 route 문제를 새 DB 보정으로 처리하지 않는다.
+- 게시 v1에 남은 K-Cosmetics·PharmacyHub와 현행 도메인/표시명은 수정 검토 대상이다.
+  신규 OAuth 제공자에 대해 코드가 실제 읽고 저장하는 항목과 제3자 제공/위탁/국외 이전의 법적 분류를 구분한다.
+
+### 이번 Phase 실행 상태
+
+- [x] AUTH-R1~R5 TODO 작성 및 최신 코드·정본으로 보완.
+- [x] AUTH-R1 로그인 진입 코드 수정·회귀.
+- [x] AUTH-R2 실제 OAuth 검증 매트릭스 준비. 실제 외부 인증 수행은 별도 OPEN.
+- [x] AUTH-R3 로컬 추가 정보/약관 회귀. 기존 사용자 운영 사례는 별도 OPEN.
+- [x] AUTH-R4 정책 조문 수정 검토안 작성. 사용자 검토·본문/version 게시는 별도 OPEN.
+- [x] AUTH-R5 검증 기록·TODO 갱신 및 commit·push·PR. 최신 CI/review 판정은 PR에서 추적.
+
+
+현재 실행 결과: 로그인 진입·모달·게시 약관 관련 단위 회귀 39 PASS, Neture build 및 전체 frontend
+타입 검사 PASS. PC/mobile 로컬 production bundle은 가입/약관 24건 및 보호 홈·직접 로그인·카카오
+취소·모달 닫기/재열기 12건 PASS. API/provider 응답은 fixture이며 운영 계정 생성·DB 수정은 없다.
+실제 OAuth와 기존 소유자 반복 약관 사례, 정책 검토·새 버전 게시, main 통합·배포는 OPEN이다.
+검토할 조문과 질문은 [정책 변경 검토안](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md),
+실제 브라우저 실행 목록과 검증 범위는 [CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)
+의 2026-10-10 남은 인증 절을 참조한다. AUTH-R5의 CI/review 완료 여부는 PR 최신 head 결과로 확인한다.
