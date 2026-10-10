@@ -15,7 +15,8 @@
 - [x] 정상·결함·레거시·정책 미정으로 판정하고 TODO 수정
 - [x] 수정 TODO에 따라 승인된 정책의 구현 결함과 관련 문서 정비
 - [x] 역할·커뮤니티·서비스 경계 및 회귀 검증
-- [ ] 범위 점검·커밋·push·PR 검증
+- [x] 범위 점검·커밋·push
+- [ ] PR CI/review 최종 확인
 
 ## 경계
 
@@ -47,7 +48,8 @@
 - [x] 현행 권한·운영자 공백 복구 절차와 정책 미정 사항 문서 정합
 - [x] 기존 역할·커뮤니티·서비스 경계 테스트 및 API 타입 검사
 - [x] 정적 guard·민감정보·diff·staged 범위 점검
-- [ ] 커밋·push·PR CI/review 확인
+- [x] 커밋·push
+- [ ] PR CI/review 최종 확인
 
 새 DB 구조나 역할 추가 없이 확정된 정책의 승인 시점 결함을 수정한다.
 실제 운영 DB·계정 변경 및 main 병합·배포는 수행하지 않는다.
@@ -71,3 +73,5 @@
 
 작업 branch는 `wo/community-operator-next`이며 push 후 PR CI/review 상태를 별도로 확인한다.
 main 통합·배포 없이 작업 checkout을 KEEP한다.
+
+코드 커밋 `6df45c5939`를 최신 main `0f66555b4f` 위에 충돌 없이 올려 원격 작업 branch에 push했다. PR 검증 결과는 PR 최신 HEAD의 실제 checks와 review를 기준으로 한다.
