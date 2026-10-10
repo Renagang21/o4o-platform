@@ -69,6 +69,15 @@ describe('중앙 개별 역할 지정', () => {
     await act(async () => release({ data: { success: true, data: { members: [{ ...candidate, name: '이전 회원' }] } } }));
     expect(screen.queryByText('이전 회원')).toBeNull(); expect(screen.getByText('새 회원')).toBeTruthy();
   });
+  it('선택 전 목록 조회 실패 후 재조회가 성공하면 오류를 지운다', async () => {
+    get.mockRejectedValueOnce(new Error('목록 실패'));
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    await screen.findByRole('alert');
+    fireEvent.click(screen.getByRole('button', { name: '다시 조회' }));
+    await screen.findByRole('option', { name: /테스트 커뮤니티/ });
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('button', { name: '다시 조회' })).toBeNull();
+  });
   it('역할 변경 중 선택과 다른 행을 잠그고 실패 후 재조회한다', async () => {
     let fail!: (e: Error) => void;
     post.mockImplementation(() => new Promise((_, reject) => { fail = reject; }));

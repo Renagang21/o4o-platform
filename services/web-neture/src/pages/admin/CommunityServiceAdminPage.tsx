@@ -244,7 +244,7 @@ function CommunityOperatorsPanel() {
         마지막 유효 Admin은 해제하거나 Operator로 내릴 수 없습니다.
       </p>
       {notice && <p role="status" className="mt-3 text-green-700">{notice}</p>}
-      {error && <div><p role="alert" className="mt-3 text-red-600">{error}</p><button type="button" className="min-h-11 rounded border px-3 py-2" disabled={busyId !== null} onClick={() => { loadCommunities(); loadMembers(); }}>다시 조회</button></div>}
+      {error && <div><p role="alert" className="mt-3 text-red-600">{error}</p><button type="button" className="min-h-11 rounded border px-3 py-2" disabled={busyId !== null} onClick={() => { setError(null); loadCommunities(); loadMembers(); }}>다시 조회</button></div>}
       {!communityId ? null : members === null && !error ? (
         <p className="mt-4 text-slate-500">불러오는 중입니다…</p>
       ) : members && members.length > 0 ? (

@@ -15,7 +15,7 @@
 | 항목 | 결과 |
 | --- | --- |
 | frozen dependency install / 공통 packages build | 통과 |
-| 관련 Vitest 9개 파일 | 67개 테스트 통과 |
+| 관련 Vitest 9개 파일 | 68개 테스트 통과 |
 | 변경 코드 ESLint | 오류·경고 0 |
 | Neture production build (TypeScript + Vite) | 통과, 기존 chunk 크기 안내 존재 |
 | unsafe route guard | 1,149개 파일, 위반 0 |
@@ -41,3 +41,5 @@
 ## 후속 범위
 
 회원 검색·페이지 조회, 신고·숨김·복원, 게시판 owner 승계, 커뮤니티 생명주기 설정, 공개 열람 계약, 이력·삭제 보존 정책은 별도 조사·정책 결정 후 진행한다.
+
+PR 리뷰 후 최초 커뮤니티 목록 실패의 재조회 오류 초기화를 보완하고 회귀 테스트를 추가했다. WO 상태는 문서 lifecycle에 맞춰 COMPLETED로 정리했다.
