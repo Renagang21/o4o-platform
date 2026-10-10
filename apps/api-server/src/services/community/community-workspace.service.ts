@@ -18,6 +18,8 @@ export interface CommunityWorkspace {
   canManage: boolean;
   canJoin: boolean;
   membershipStatus: string | null;
+  /** Independent community state; business/catalog adapters have no community row. */
+  communityStatus: string | null;
   reason: string | null;
   forumStorageCodes: string[];
 }
@@ -41,7 +43,7 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
        WHERE sfo.semi_franchise_id = $1 AND sfo.user_id = $2 AND sfo.revoked_at IS NULL`, [sf.id, user!.id],
     ) : [];
     return { communityKey: key, name: sf.name, kind: 'semi-franchise', businessKey: sf.key, allowed: access.allowed,
-      canManage: operators.length > 0, canJoin: false, membershipStatus: access.allowed ? 'active' : null,
+      canManage: operators.length > 0, canJoin: false, membershipStatus: access.allowed ? 'active' : null, communityStatus: null,
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
       forumStorageCodes: [`sf:${sf.id}`] };
   }
@@ -60,6 +62,7 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
   return { communityKey: key, name: community?.name ?? definition!.name, kind: 'independent', allowed: !!allowed,
     canManage: !!serviceOperator || !!service, canJoin: !serviceOperator && eligible && community?.status === 'active' && policyAllowed && !['pending','active','suspended'].includes(membership?.status),
     membershipStatus: membership?.status ?? null,
+    communityStatus: community?.status ?? null,
     reason: allowed ? null : !user?.id ? 'AUTH_REQUIRED' : !eligible ? 'NETURE_MEMBERSHIP_REQUIRED' : 'COMMUNITY_MEMBERSHIP_REQUIRED',
     forumStorageCodes: definition ? [...definition.forumStorageCodes] : community ? [`community:${community.id}`] : [] };
 }

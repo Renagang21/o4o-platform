@@ -315,6 +315,19 @@ export function createCommunitiesRoutes(
     }),
   );
 
+  router.post('/:communitySlug/leave', apiLimiter, authenticate, resolveCommunity,
+    asyncHandler(async (req, res) => {
+      const actorUserId = requesterId(req as AuthRequest, res);
+      if (!actorUserId) return;
+      try {
+        const data = await new CommunityMemberManagementService(AppDataSource).withdrawSelf({
+          communityId: req.community!.id, actorUserId,
+        });
+        res.json({ success: true, data });
+      } catch (error) { if (!sendLifecycleError(res, error)) throw error; }
+    }),
+  );
+
   router.get(
     '/:communitySlug/memberships',
     ...operatorOnly,

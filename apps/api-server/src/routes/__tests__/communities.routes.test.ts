@@ -51,6 +51,7 @@ jest.mock('../../services/auth/auth-context.helper.js', () => ({
 import express from 'express';
 import request from 'supertest';
 import { CommunityLifecycleService } from '../../services/community/community-lifecycle.service.js';
+import { CommunityMemberManagementService } from '../../services/community/community-member-management.service.js';
 import { NetureMainMembershipRequiredError } from '../../modules/neture/services/neture-main-membership.js';
 import { createCommunitiesRoutes } from '../communities.routes.js';
 
@@ -244,4 +245,26 @@ it.each(['suspend','restore','withdraw'])('%s는 admin guard와 인증을 요구
 it('회원 이력도 admin guard로 한정한다', () => {
   expect(find('GET','/:communitySlug/memberships/:membershipId/history').guards)
     .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});
+
+describe('본인 탈퇴 route', () => {
+  afterEach(() => jest.restoreAllMocks());
+  it('인증과 커뮤니티 확인을 요구하고 관리자 권한은 요구하지 않는다', () => {
+    expect(find('POST', '/:communitySlug/leave').guards).toEqual(['authenticate', 'resolveCommunity']);
+  });
+  it('클라이언트 대상 ID·역할을 무시하고 세션 사용자만 전달한다', async () => {
+    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf').mockResolvedValue({ changed: true, status: 'withdrawn' });
+    const app = express(); app.use(express.json());
+    app.use((req, _res, next) => { Object.assign(req, { user: { id: 'self' }, community: { id: 'a' } }); next(); });
+    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    const response = await request(app).post('/fixture/leave').send({ userId: 'other', membershipId: 'other', role: 'admin' });
+    expect(response.status).toBe(200);
+    expect(leave).toHaveBeenCalledWith({ communityId: 'a', actorUserId: 'self' });
+  });
+  it('세션 사용자가 없으면 401이고 변경하지 않는다', async () => {
+    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf');
+    const app = express(); app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    expect((await request(app).post('/fixture/leave')).status).toBe(401);
+    expect(leave).not.toHaveBeenCalled();
+  });
 });
