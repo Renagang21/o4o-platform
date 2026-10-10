@@ -46,3 +46,7 @@
 사용자의 재검색 지시에 따라 기본 checkout·작업 clone·workspace 임시 검증 스크립트·로컬 설정 후보를 재조사했다. 과거 운영자 이메일과 로그인 검증 기록은 발견했으나 현재 로그인 자격정보는 확인되지 않았다. `CHECK-O4O-BOUNDARY-POLICY-OPERATIONAL-SMOKE-V1`에는 기본 seed 비밀번호로 운영 로그인이 401이었던 기록이 있다. `scripts/verify/verify-ai-content-modal.mjs`는 `TEST_EMAIL`·`TEST_PASSWORD` 환경변수를 요구하며 값을 내장하지 않는다. 현재 해당 환경변수는 설정되어 있지 않다. 기존 workspace 브라우저 검증 스크립트는 mock 인증용이다. demo 계정은 운영자 권한이 없는 별도 계정이므로 대체하지 않는다.
 
 현재 실행 환경의 workspace·임시 조사 checkout·home·mount 경로를 다시 검색했으나 해당 파일은 발견되지 않았다. 사용자 PC에만 있다는 이전 추정은 철회한다. 파일을 생성한 클라우드 환경과 현재 환경이 같은지, 이전 작업 산출물에 보존되었는지는 미확인이다.
+
+## 첨부 파일 확보 후 확인
+
+사용자가 첨부한 파일을 현재 검증 checkout과 기준 checkout의 `docs/local/TEST-ACCOUNTS.local.md`에 권한 0600으로 저장했다. 두 파일 모두 Git 제외 상태를 확인했다. 공통 admin/operator 항목은 Google 아이디만 제공하며 운영자 비밀번호·인증된 세션은 포함하지 않는다. 운영 계정 Google 인증은 사용자 인증 절차가 필요하므로 로그인 후 역할별 검증은 아직 미실행이다. 공급자·약국 계정 정보로 공통 운영자를 대체하지 않는다. 실제 아이디와 다른 자격정보는 이 기록에 복사하지 않는다.
