@@ -16,6 +16,22 @@ on:
         description: 'Canonical Store Demo ownership relink; plan first, apply with matching digest'
         type: boolean
         default: false
+      demo_cleanup:
+        description: 'Delete explicitly reviewed obsolete test stores; preserve canonical store and all identities'
+        type: boolean
+        default: false
+      cleanup_keep:
+        description: 'Original canonical store ID SHA256 fingerprint to retain'
+        type: string
+        required: false
+      cleanup_targets:
+        description: 'Reviewed obsolete store ID SHA256 fingerprints, comma-separated'
+        type: string
+        required: false
+      cleanup_digest:
+        description: 'Matching before-image digest from read-only deletion plan'
+        type: string
+        required: false
       relink_targets:
         description: 'Reviewed SHA256 store ID fingerprints, comma-separated; omit only for discovery'
         type: string
@@ -39,13 +55,16 @@ concurrency:
 
 jobs:
   cutover:
-    if: (inputs.demo_census != true && inputs.demo_relink != true) || github.triggering_actor == github.repository_owner
+    if: (inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true) || github.triggering_actor == github.repository_owner
     # Production inventory requires main; writes also require an explicit unfrozen state.
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
+      DEMO_CENSUS_FLAG: ${{ inputs.demo_census }}
+      DEMO_RELINK_FLAG: ${{ inputs.demo_relink }}
+      DEMO_CLEANUP_FLAG: ${{ inputs.demo_cleanup }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
     steps:
@@ -58,11 +77,15 @@ jobs:
             echo 'Production inventory requires main.'
             exit 1
           fi
-          if [ "${{ inputs.demo_census }}" = 'true' ] && [ "${{ inputs.demo_relink }}" = 'true' ]; then
+          demo_count=0
+          for flag in "$DEMO_CENSUS_FLAG" "$DEMO_RELINK_FLAG" "$DEMO_CLEANUP_FLAG"; do
+            if [ "$flag" = 'true' ]; then demo_count=$((demo_count + 1)); fi
+          done
+          if [ "$demo_count" -gt 1 ]; then
             echo 'Choose only one Demo operation.'
             exit 1
           fi
-          if [ "${{ inputs.demo_census }}" = 'true' ] && [ "$CUTOVER_MODE" != 'plan' ]; then
+          if [ "$DEMO_CENSUS_FLAG" = 'true' ] && [ "$CUTOVER_MODE" != 'plan' ]; then
             echo 'Demo census only supports read-only plan.'
             exit 1
           fi
@@ -79,7 +102,7 @@ jobs:
           build-packages: 'false'
           strict-lockfile: 'true'
       - name: Test cutover safety
-        run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs
+        run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs scripts/deployment/demo-store-cleanup.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
@@ -89,7 +112,7 @@ jobs:
           project_id: netureyoutube
           skip_install: true
       - name: Start authenticated Cloud SQL proxy for read-only inventory
-        if: inputs.demo_census == true || inputs.demo_relink == true || inputs.probe_paths == ''
+        if: inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || inputs.probe_paths == ''
         run: |
           docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
             --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
@@ -112,7 +135,7 @@ jobs:
             process.exit(1);
           '
       - name: Collect existing active public paths without database writes
-        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.probe_paths == ''
+        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.probe_paths == ''
         env:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
@@ -132,11 +155,21 @@ jobs:
           DEMO_RELINK_DIGEST: ${{ inputs.relink_digest }}
           DEMO_RELINK_TARGETS: ${{ inputs.relink_targets }}
         run: node scripts/deployment/demo-store-relink.mjs
+      - name: Plan or apply obsolete test store cleanup
+        if: inputs.demo_cleanup == true
+        env:
+          DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
+          DB_NAME: ${{ secrets.GCP_DB_NAME }}
+          DEMO_CLEANUP_MODE: ${{ inputs.mode }}
+          DEMO_CLEANUP_KEEP: ${{ inputs.cleanup_keep }}
+          DEMO_CLEANUP_TARGETS: ${{ inputs.cleanup_targets }}
+          DEMO_CLEANUP_DIGEST: ${{ inputs.cleanup_digest }}
+        run: node scripts/deployment/demo-store-cleanup.mjs
       - name: Inventory, validate, optionally apply and verify
-        if: inputs.demo_census != true && inputs.demo_relink != true
+        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true
         run: node scripts/deployment/pharmacy-hub-qr-cutover.mjs
       - name: Save backup and verification evidence
-        if: always() && inputs.demo_census != true && inputs.demo_relink != true
+        if: always() && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true
         uses: actions/upload-artifact@v4
         with:
           name: pharmacyhub-url-map-${{ github.run_id }}
