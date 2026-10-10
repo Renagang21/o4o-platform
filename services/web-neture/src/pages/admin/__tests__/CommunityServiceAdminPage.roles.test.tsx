@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
@@ -11,10 +11,16 @@ vi.mock('../../../lib/api/communityServiceAdmin', () => ({
   setCommunityMemberRole: vi.fn(),
   communityAdminErrorMessage: vi.fn(),
 }));
-import { listAdminCommunities, listCreationRequests } from '../../../lib/api/communityServiceAdmin';
+import { listAdminCommunities, listCommunityMembers, listCreationRequests, setCommunityMemberRole } from '../../../lib/api/communityServiceAdmin';
 import CommunityServiceAdminPage from '../CommunityServiceAdminPage';
 
-afterEach(() => { cleanup(); vi.clearAllMocks(); });
+beforeEach(() => {
+  vi.resetAllMocks();
+  vi.mocked(listAdminCommunities).mockResolvedValue([]);
+  vi.mocked(listCommunityMembers).mockResolvedValue([]);
+  vi.mocked(listCreationRequests).mockResolvedValue([]);
+});
+afterEach(() => { cleanup(); });
 
 describe('커뮤니티 서비스 업무 분리', () => {
   it('Operator는 개설 신청만 조회하고 운영자 지정 탭은 없다', async () => {
@@ -42,5 +48,29 @@ describe('관리 조회 탭 전환', () => {
     expect(screen.getByText('심사 대기 중인 개설 신청이 없습니다.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '커뮤니티 운영자 지정', exact: true }));
     await waitFor(() => expect(listAdminCommunities).toHaveBeenCalledTimes(2));
+  });
+
+  it('탭 복귀 후 새 목록에서 개별 admin/operator/member 역할을 조회하며 역할은 변경하지 않는다', async () => {
+    vi.mocked(listAdminCommunities).mockResolvedValue([
+      { id: 'c1', slug: 'fixture', name: '테스트 커뮤니티', status: 'active', operatorCount: 2, memberCount: 3 },
+    ]);
+    vi.mocked(listCommunityMembers).mockResolvedValue(['admin', 'operator', 'member'].map((role, index) => ({
+      membershipId: `m${index}`, userId: `u${index}`, name: `회원 ${index}`, email: null,
+      role: role as 'admin' | 'operator' | 'member', membershipStatus: 'active', serviceMembershipStatus: 'active',
+    })));
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
+    expect((await screen.findByLabelText('회원 0 역할') as HTMLSelectElement).value).toBe('admin');
+    expect((screen.getByLabelText('회원 1 역할') as HTMLSelectElement).value).toBe('operator');
+    expect((screen.getByLabelText('회원 2 역할') as HTMLSelectElement).value).toBe('member');
+    fireEvent.click(screen.getByRole('button', { name: '개설 신청 심사', exact: true }));
+    await screen.findByText('심사 대기 중인 개설 신청이 없습니다.');
+    fireEvent.click(screen.getByRole('button', { name: '커뮤니티 운영자 지정', exact: true }));
+    const selection = await screen.findByLabelText('커뮤니티 선택');
+    expect((selection as HTMLSelectElement).value).toBe('');
+    fireEvent.change(selection, { target: { value: 'c1' } });
+    await screen.findByLabelText('회원 0 역할');
+    expect(listCommunityMembers).toHaveBeenNthCalledWith(2, 'c1');
+    expect(setCommunityMemberRole).not.toHaveBeenCalled();
   });
 });
