@@ -14,6 +14,10 @@ import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import {
   approveJoinRequest,
+  changeCommunityMember,
+  listCommunityMemberHistory,
+  type CommunityMembershipChange,
+  type JoinRequestStatus,
   canApproveJoin,
   communityOperatorErrorMessage,
   listJoinRequests,
@@ -36,6 +40,8 @@ function JoinRequestsPanel({
   community,
   onChanged,
 }: Readonly<{ community: OperatedCommunity; onChanged: () => void }>) {
+  const [history, setHistory] = useState<CommunityMembershipChange[] | null>(null);
+  const [status, setStatus] = useState<JoinRequestStatus>('pending');
   const [rows, setRows] = useState<JoinRequestRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -44,27 +50,29 @@ function JoinRequestsPanel({
   const load = useCallback(() => {
     setRows(null);
     setError(null);
-    listJoinRequests(community.slug, 'pending')
+    listJoinRequests(community.slug, status)
       .then(setRows)
       .catch((e) => setError(communityOperatorErrorMessage(e, '가입 신청 목록을 불러오지 못했습니다.')));
-  }, [community.slug]);
+  }, [community.slug, status]);
 
   useEffect(load, [load]);
 
-  const act = async (row: JoinRequestRow, kind: 'approve' | 'reject') => {
+  const act = async (row: JoinRequestRow, kind: 'approve' | 'reject' | 'suspend' | 'restore' | 'withdraw') => {
     let reason: string | null = null;
-    if (kind === 'reject') {
-      const input = window.prompt('거절 사유를 입력하세요(선택).');
+    if (kind !== 'approve') {
+      const input = window.prompt(kind === 'reject' ? '거절 사유를 입력하세요(선택).' : '처리 사유를 입력하세요. 개인정보는 입력하지 마세요.');
       if (input === null) return;
       reason = input.trim() || null;
+      if (kind !== 'reject' && !reason) { setError('처리 사유를 입력하세요.'); return; }
     }
     setBusyId(row.id);
     setNotice(null);
     setError(null);
     try {
       if (kind === 'approve') await approveJoinRequest(community.slug, row.id);
-      else await rejectJoinRequest(community.slug, row.id, reason);
-      setNotice(kind === 'approve' ? `${row.name ?? '신청자'} 님의 가입을 승인했습니다.` : '가입 신청을 거절했습니다.');
+      else if (kind === 'reject') await rejectJoinRequest(community.slug, row.id, reason);
+      else await changeCommunityMember(community.slug, row.id, kind, reason!);
+      setNotice(kind === 'approve' ? `${row.name ?? '신청자'} 님의 가입을 승인했습니다.` : kind === 'reject' ? '가입 신청을 거절했습니다.' : '회원 상태를 변경했습니다.');
       load();
       onChanged();
     } catch (e) {
@@ -74,8 +82,29 @@ function JoinRequestsPanel({
     }
   };
 
+  const showHistory = async (row: JoinRequestRow) => {
+    setError(null);
+    try { setHistory(await listCommunityMemberHistory(community.slug, row.id)); }
+    catch (e) { setError(communityOperatorErrorMessage(e, '변경 이력을 불러오지 못했습니다.')); }
+  };
+
   return (
     <section className="mt-4 text-sm">
+      <label className="block text-xs text-gray-600">회원 상태
+        <select aria-label="회원 상태" value={status} onChange={e => setStatus(e.target.value as JoinRequestStatus)} className="ml-2 rounded border px-2 py-1">
+          <option value="pending">가입 대기</option><option value="active">활성</option>
+          <option value="suspended">정지</option><option value="rejected">반려</option><option value="withdrawn">탈퇴</option>
+        </select>
+      </label>
+      {history && <div className="mt-3 rounded border p-3">
+        <div className="flex justify-between"><strong>회원 변경 이력 (최근 50건)</strong><button type="button" onClick={() => setHistory(null)}>닫기</button></div>
+        {history.length === 0 && <p>변경 이력이 없습니다.</p>}
+        {history.map(h => <p key={h.id} className="mt-2 text-xs">
+          {new Date(h.created_at).toLocaleString('ko-KR')} · {h.actor_name ?? '시스템'} ·
+          {h.before_role ?? '-'} → {h.after_role} · {h.before_status ?? '-'} → {h.after_status}
+          {h.reason && <span className="block">{h.reason}</span>}
+        </p>)}
+      </div>}
       {notice && <p className="mt-2 text-green-700">{notice}</p>}
       {error && <p className="mt-2 text-red-600">{error}</p>}
       {rows === null && !error && <p className="mt-3 text-gray-500">불러오는 중입니다…</p>}
@@ -87,7 +116,7 @@ function JoinRequestsPanel({
                 <th className="py-2">이름</th>
                 <th className="py-2">이메일</th>
                 <th className="py-2">서비스 이용</th>
-                <th className="py-2">신청일</th>
+                <th className="py-2">역할</th><th className="py-2">신청일</th>
                 <th className="py-2 text-right">처리</th>
               </tr>
             </thead>
@@ -99,8 +128,10 @@ function JoinRequestsPanel({
                   <td className="py-2 text-gray-600">
                     {r.serviceMembershipStatus ? SERVICE_STATUS_LABEL[r.serviceMembershipStatus] ?? r.serviceMembershipStatus : '미가입'}
                   </td>
+                  <td className="py-2">{r.role === 'admin' ? 'Admin' : r.role === 'operator' ? 'Operator' : '회원'}</td>
                   <td className="py-2 text-gray-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td className="whitespace-nowrap py-2 text-right">
+                    {r.status === 'pending' && (<>
                     <button
                       type="button"
                       disabled={busyId === r.id || !canApproveJoin(r)}
@@ -118,6 +149,14 @@ function JoinRequestsPanel({
                     >
                       거절
                     </button>
+                    </>)}
+                    {community.canRestrictMembers && <button type="button" className="ml-2 rounded border px-3 py-1 text-xs" onClick={() => showHistory(r)}>이력</button>}
+                    {community.canRestrictMembers && (r.status === 'active' || r.status === 'suspended') && (<>
+                      <button type="button" disabled={busyId === r.id} onClick={() => act(r, r.status === 'active' ? 'suspend' : 'restore')}
+                        className="rounded border px-3 py-1 text-xs disabled:opacity-50">{r.status === 'active' ? '정지' : '정지 해제'}</button>
+                      <button type="button" disabled={busyId === r.id} onClick={() => act(r, 'withdraw')}
+                        className="ml-2 rounded border border-red-300 px-3 py-1 text-xs text-red-700 disabled:opacity-50">커뮤니티 탈퇴</button>
+                    </>)}
                   </td>
                 </tr>
               ))}
@@ -125,7 +164,7 @@ function JoinRequestsPanel({
           </table>
         </div>
       )}
-      {rows?.length === 0 && <p className="mt-3 text-gray-500">심사 대기 중인 가입 신청이 없습니다.</p>}
+      {rows?.length === 0 && <p className="mt-3 text-gray-500">해당 상태의 회원이 없습니다.</p>}
     </section>
   );
 }
@@ -153,8 +192,8 @@ export default function MyCommunityOperatorPage() {
 
   const layout = (children: ReactNode, roles: readonly string[] = []) => (
     <MyPageLayout
-      title="커뮤니티 가입 심사"
-      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '커뮤니티 가입 심사' }]}
+      title="커뮤니티 회원 관리"
+      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '커뮤니티 회원 관리' }]}
       width="wide"
       navItems={getNetureMyPageNavItems(roles)}
     >
@@ -166,7 +205,7 @@ export default function MyCommunityOperatorPage() {
   if (!isAuthenticated || !user) {
     return layout(
       <MyPageAuthRequired
-        description="커뮤니티 가입 심사는 로그인 후 이용할 수 있습니다."
+        description="커뮤니티 회원 관리는 로그인 후 이용할 수 있습니다."
         actionLabel="로그인"
         onAction={() => openLoginModal('/mypage/communities')}
       />,

@@ -48,6 +48,10 @@ jest.mock('../../services/auth/auth-context.helper.js', () => ({
   freshenUserContext: async () => ({ roles: [], memberships: [] }),
 }));
 
+import express from 'express';
+import request from 'supertest';
+import { CommunityLifecycleService } from '../../services/community/community-lifecycle.service.js';
+import { NetureMainMembershipRequiredError } from '../../modules/neture/services/neture-main-membership.js';
 import { createCommunitiesRoutes } from '../communities.routes.js';
 
 const optionalAuth = mark('optionalAuth');
@@ -204,4 +208,40 @@ describe('개별 커뮤니티 운영자 지정·해제 — 커뮤니티 서비�
     expect(first).toBeGreaterThan(-1);
     expect(first).toBeLessThan(slug);
   });
+});
+
+
+describe('메인 자격 오류 HTTP 응답', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each([
+    ['requestCreation', '/requests', 403],
+    ['requestJoin', '/example/join', 403],
+    ['approveCreation', '/requests/request-id/approve', 409],
+    ['approveJoin', '/example/memberships/member-id/approve', 409],
+  ] as const)('%s는 자격 오류를 %s에서 %s로 전달한다', async (method, url, status) => {
+    jest.spyOn(CommunityLifecycleService.prototype, method).mockRejectedValue(
+      new NetureMainMembershipRequiredError('suspended', '신청자의 이용 자격을 확인해 주세요.', status),
+    );
+    const app = express();
+    app.use(express.json());
+    app.use((req, _res, next) => {
+      Object.assign(req, { user: { id: 'reviewer-id' }, community: { id: 'community-id' } });
+      next();
+    });
+    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    const response = await request(app).post(url).send({ desiredSlug: 'example', name: 'Example' });
+    expect(response.status).toBe(status);
+    expect(response.body).toEqual({ success: false, error: '신청자의 이용 자격을 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
+  });
+});
+
+
+it.each(['suspend','restore','withdraw'])('%s는 admin guard와 인증을 요구한다', action => {
+  expect(find('POST', `/:communitySlug/memberships/:membershipId/${action}`).guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});
+it('회원 이력도 admin guard로 한정한다', () => {
+  expect(find('GET','/:communitySlug/memberships/:membershipId/history').guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
 });

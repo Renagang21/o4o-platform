@@ -526,3 +526,32 @@ describe('late session restore cannot undo logout', () => {
     expect(hook.result.current.user).toBeNull();
   });
 });
+
+
+describe('foreground access recheck', () => {
+  it.each([undefined, 503])('temporary failure (%s) rejects and keeps the current session for retry', async (status) => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    const failure = { response: status ? { status } : undefined };
+    client.api.get.mockRejectedValueOnce(failure);
+    await act(async () => { await expect(hook.result.current.refreshForAccess()).rejects.toBe(failure); });
+    expect(hook.result.current.user?.id).toBe('u-1');
+    client.api.get.mockResolvedValueOnce({ data: { data: { user: { ...API_USER, roles: ['community:admin'] } } } });
+    await act(async () => { await hook.result.current.refreshForAccess(); });
+    expect(hook.result.current.user?.roles).toEqual(['community:admin']);
+  });
+  it('401 clears the expired session', async () => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    client.api.get.mockRejectedValueOnce({ response: { status: 401 } });
+    await act(async () => { await hook.result.current.refreshForAccess(); });
+    expect(hook.result.current.isAuthenticated).toBe(false);
+  });
+  it('background refresh retains its existing failure behavior', async () => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    client.api.get.mockRejectedValueOnce(new Error('network fixture'));
+    await act(async () => { await hook.result.current.refresh(); });
+    expect(hook.result.current.user).toBeNull();
+  });
+});

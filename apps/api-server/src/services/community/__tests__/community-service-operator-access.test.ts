@@ -3,13 +3,13 @@ import { hasCommunityServiceOperator } from '../community-service-operator-acces
 import { resolveCommunityWorkspace } from '../community-workspace.service.js';
 
 function executor(role: string | null, serviceStatus = 'active', accountStatus = 'active', communityStatus = 'active') {
-  const query = jest.fn(async (sql: string) => {
+  const query = jest.fn(async (sql: string, params: unknown[] = []) => {
     if (sql.includes('FROM users u')) return [{ account_status: accountStatus, account_active: true, email_verified: true }];
     if (sql.includes('FROM role_assignments ra')) {
       expect(sql).toContain("ra.role IN ('community:admin', 'community:operator')");
       expect(sql).toContain('ra.is_active = true');
       expect(sql).toContain("sm.service_key = 'community' AND sm.status = 'active'");
-      return serviceStatus === 'active' && ['community:admin', 'community:operator'].includes(role ?? '') ? [{ exists: 1 }] : [];
+      return serviceStatus === 'active' && ['community:admin', 'community:operator'].includes(role ?? '') && (!params[1] || role === 'community:admin') ? [{ exists: 1 }] : [];
     }
     if (sql.includes('FROM communities')) return [{ id: 'c1', name: 'Example', status: communityStatus }];
     return [];
@@ -24,7 +24,7 @@ describe('중앙 지정 커뮤니티 서비스 역할', () => {
     const space = await resolveCommunityWorkspace(exec, { id: 'u1' }, 'example');
     expect(space).toMatchObject({ allowed: true, canManage: true, canJoin: false, membershipStatus: null });
   });
-  it.each([null, 'neture:admin', 'neture:operator', 'supplier:admin'])('%s는 커뮤니티 운영을 열지 않는다', async role => {
+  it.each([null, 'platform:super_admin', 'neture:admin', 'neture:operator', 'supplier:admin'])('%s는 커뮤니티 운영을 열지 않는다', async role => {
     const space = await resolveCommunityWorkspace(executor(role), { id: 'u1' }, 'example');
     expect(space).toMatchObject({ allowed: false, canManage: false });
   });
