@@ -145,13 +145,13 @@ async function verifyParentOwnership(client,state,edges) {
 async function verifyLogicalCoverage(client,state,columns,edges) {
   // Unmodelled UUID soft references must stop deletion, including non-public schemas.
   const ids=[...new Set([...state.rows.values()].flatMap(rows=>[...rows.values()].map(row=>row.id).filter(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id))))];
-  for (const column of columns.filter(c=>c.udt_name==='uuid' && c.column_name!=='id' && (!directOrganizationColumn(c.table_name,c.column_name) || (c.table_name==='role_assignments' && c.column_name==='scope_id')))) {
+  for (const column of columns.filter(c=>(c.udt_name==='uuid' || (['text','varchar'].includes(c.udt_name) && /(_id|Id)$/.test(c.column_name))) && c.column_name!=='id' && (!directOrganizationColumn(c.table_name,c.column_name) || (c.table_name==='role_assignments' && c.column_name==='scope_id')))) {
     if (!(column.table_name==='role_assignments' && column.column_name==='scope_id') && edges.some(e=>e.child===column.table_name && e.child_columns.includes(column.column_name))) continue;
-    const matches=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(column.table_name)} t WHERE t.${quoteIdentifier(column.column_name)}=ANY($1::uuid[])`,[ids])).rows;
+    const matches=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(column.table_name)} t WHERE t.${quoteIdentifier(column.column_name)}=ANY($1)`,[ids])).rows;
     if (matches.some(({row})=>!state.rows.get(column.table_name)?.has(rowKey(column.table_name,row,state.keys.get(column.table_name))))) throw new CleanupStop('Unmodelled UUID logical reference requires disposition');
   }
 }
-async function buildGraph(client,roots) {
+async function readGraphMetadata(client) {
   const columns=(await client.query(metadataSql.columns)).rows;
   const keys=(await client.query(metadataSql.keys)).rows.sort((a,b)=>a.table_name.localeCompare(b.table_name,'en'));
   const edges=(await client.query(metadataSql.edges)).rows;
@@ -162,36 +162,52 @@ async function buildGraph(client,roots) {
     if (!edges.some(e=>e.parent==='organizations' && e.child===column.table_name && e.child_columns.includes(column.column_name))) edges.push({child:column.table_name,parent:'organizations',action:'c',child_columns:[column.column_name],parent_columns:['id']});
   }
   edges.sort((a,b)=>stableJson(a).localeCompare(stableJson(b),'en'));
+  return {columns,keys,edges};
+}
+function graphOrganizationColumns(columns,edges) {
   const organizationColumns=new Map();
   for (const column of columns.filter(c=>directOrganizationColumn(c.table_name,c.column_name))) organizationColumns.set(column.table_name,[...(organizationColumns.get(column.table_name) || []),column.column_name]);
   for (const edge of edges.filter(e=>e.parent==='organizations' && e.child!=='organizations')) {
     if (edge.parent_columns.length!==1 || edge.parent_columns[0]!=='id') throw new CleanupStop('Non-ID organization reference requires explicit review');
     organizationColumns.set(edge.child,[...(organizationColumns.get(edge.child) || []),...edge.child_columns]);
   }
-  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),organizationColumns,targetIds:new Set(roots.map(x=>x.id))};
-  addRows(state,'organizations',roots);
+  return organizationColumns;
+}
+async function seedLogicalRows(client,state,columns) {
   // Include logical store ownership even where legacy schemas have no FK.
   const scopes=columns.filter(x=>directOrganizationColumn(x.table_name,x.column_name) && x.table_name!=='organizations');
   for (const scope of scopes) {
     const rows=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(scope.table_name)} t WHERE t.${quoteIdentifier(scope.column_name)}=ANY($1)${scope.table_name==='role_assignments' && scope.column_name==='scope_id' ? " AND t.scope_type='organization'" : ''}`,[[...state.targetIds]])).rows.map(x=>x.row);
     addRows(state,scope.table_name,rows);
   }
+}
+async function expandGraph(client,state,edges) {
   let changed=true;let passes=0;
   while (changed) {
     if (++passes>50) throw new CleanupStop('Dependency graph expansion limit');
     const results=await Promise.all(edges.map(edge=>expandEdge(client,state,edge)));changed=results.some(Boolean);
     if ([...state.rows.values()].reduce((n,m)=>n+m.size,0)>10000) throw new CleanupStop('Deletion row limit');
   }
-  await verifyParentOwnership(client,state,edges);
-  await verifyLogicalCoverage(client,state,columns,edges);
-  const affected=[...state.rows.keys()];
+}
+async function verifyTablePolicies(client,affected) {
   const restricted=(await client.query(`SELECT count(*)::int AS count FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace WHERE (CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END)=ANY($1::text[]) AND (r.relrowsecurity OR r.relkind<>'r')`,[affected])).rows[0];
   if (restricted.count) throw new CleanupStop('RLS or partitioned deletion requires explicit review');
   const triggers=(await client.query(`SELECT count(*)::int AS count FROM pg_trigger g JOIN pg_class r ON r.oid=g.tgrelid JOIN pg_namespace n ON n.oid=r.relnamespace WHERE (CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END)=ANY($1::text[]) AND NOT g.tgisinternal AND g.tgenabled<>'D' AND (g.tgtype & 8)<>0`,[affected])).rows[0];
   if (triggers.count) throw new CleanupStop('Custom delete trigger requires explicit review');
+}
+async function buildGraph(client,roots) {
+  const {columns,keys,edges}=await readGraphMetadata(client);
+  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),organizationColumns:graphOrganizationColumns(columns,edges),targetIds:new Set(roots.map(x=>x.id))};
+  addRows(state,'organizations',roots);
+  await seedLogicalRows(client,state,columns);
+  await expandGraph(client,state,edges);
+  await verifyParentOwnership(client,state,edges);
+  await verifyLogicalCoverage(client,state,columns,edges);
+  const affected=[...state.rows.keys()];
+  await verifyTablePolicies(client,affected);
   const order=deletionOrder(affected,edges.filter(e=>state.rows.has(e.parent)&&state.rows.has(e.child)));
   const tables=order.map(table=>({table,keys:state.keys.get(table),rows:[...state.rows.get(table).values()].sort((a,b)=>rowKey(table,a,state.keys.get(table)).localeCompare(rowKey(table,b,state.keys.get(table)),'en'))}));
-  return { tables,edges,columns,keys };
+  return {tables,edges,columns,keys};
 }
 export async function removeTable(client,table) {
   for (let offset=0;offset<table.rows.length;offset+=100) {
