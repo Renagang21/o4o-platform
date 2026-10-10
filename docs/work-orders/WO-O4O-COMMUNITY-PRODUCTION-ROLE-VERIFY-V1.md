@@ -50,3 +50,7 @@
 ## 첨부 파일 확보 후 확인
 
 사용자가 첨부한 파일을 현재 검증 checkout과 기준 checkout의 `docs/local/TEST-ACCOUNTS.local.md`에 권한 0600으로 저장했다. 두 파일 모두 Git 제외 상태를 확인했다. 공통 admin/operator 항목은 Google 아이디만 제공하며 운영자 비밀번호·인증된 세션은 포함하지 않는다. 운영 계정 Google 인증은 사용자 인증 절차가 필요하므로 로그인 후 역할별 검증은 아직 미실행이다. 공급자·약국 계정 정보로 공통 운영자를 대체하지 않는다. 실제 아이디와 다른 자격정보는 이 기록에 복사하지 않는다.
+
+## 실제 Playwright 운영 로그인 화면 검증
+
+Chromium으로 운영 커뮤니티 로그인 화면을 desktop 1440 및 mobile 390에서 열었다. 모두 HTTP 200이고 pageerror는 없었으며 이메일 로그인 입력이 렌더되었다. Google 버튼은 로드되지 않았고 화면에 `Google Identity Services script failed to load`가 표시됐다. `accounts.google.com` 요청은 `net::ERR_TUNNEL_CONNECTION_FAILED`, 별도 HTTPS 확인은 proxy tunnel 403이었다. 이는 현재 클라우드의 외부 연결 제한이며 일반 사용자의 브라우저에서도 동일하다고 단정하지 않는다. Google 네트워크 허용 추가 초안 저장은 `draft_not_editable`로 거절되어 저장·적용 모두 미완료다. 인증 후 권한 검증은 여전히 미실행이다.
