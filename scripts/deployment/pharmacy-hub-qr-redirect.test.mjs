@@ -10,6 +10,8 @@ test('full host retirement removes all PH backend routes but preserves other mat
   assert.doesNotMatch(JSON.stringify(retired), /ph-old-service|backend-pharmacy-hub-web/);
   assert.equal(retired.defaultUrlRedirect.hostRedirect, 'pharmacy.neture.co.kr');
   assert.equal(retired.defaultUrlRedirect.stripQuery, false);
+  assert.equal(retired.defaultUrlRedirect.httpsRedirect, undefined);
+  assert.equal(retired.pathRules[0].urlRedirect.httpsRedirect, undefined);
   assert.equal(retired.defaultUrlRedirect.redirectResponseCode, 'FOUND');
   assert.deepEqual(prepareHostRetirement(prepareQrRedirect(original)), draft);
 });
@@ -26,7 +28,7 @@ test('302 changes only the four printed-QR routes, preserving the old server and
   assert.deepEqual(draft.pathMatchers[1].pathRules[0], original.pathMatchers[1].pathRules[0]);
   const rule = draft.pathMatchers[1].pathRules[1];
   assert.deepEqual(rule.paths, printedQrPaths);
-  assert.deepEqual(rule.urlRedirect, { hostRedirect: 'pharmacy.neture.co.kr', httpsRedirect: true, redirectResponseCode: 'FOUND', stripQuery: false });
+  assert.deepEqual(rule.urlRedirect, { hostRedirect: 'pharmacy.neture.co.kr', redirectResponseCode: 'FOUND', stripQuery: false });
   assert.equal(original.pathMatchers[1].pathRules.length, 1);
 });
 test('conflicting, missing or already retired routes fail before producing an import draft', () => {

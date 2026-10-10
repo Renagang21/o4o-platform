@@ -14,7 +14,9 @@ export function prepareHostRetirement(input) {
   delete matcher.defaultService;
   delete matcher.defaultUrlRedirect;
   delete matcher.pathRules;
-  matcher.defaultUrlRedirect = { hostRedirect: 'pharmacy.neture.co.kr', httpsRedirect: true, redirectResponseCode: 'FOUND', stripQuery: false };
+  // This application URL map belongs to TargetHttpsProxy. HTTP-to-HTTPS
+  // enforcement remains in the separate HTTP redirect map.
+  matcher.defaultUrlRedirect = { hostRedirect: 'pharmacy.neture.co.kr', redirectResponseCode: 'FOUND', stripQuery: false };
   matcher.pathRules = [{ paths: ['/terms', '/terms/'], urlRedirect: { ...matcher.defaultUrlRedirect, pathRedirect: '/policy' } }];
   for (const key of ['id', 'creationTimestamp', 'selfLink', 'fingerprint', 'kind']) delete map[key];
   return map;
@@ -28,7 +30,7 @@ export function prepareQrRedirect(input) {
   const existing = matcher.pathRules ?? [];
   if (existing.some(r => r.paths?.some(p => printedQrPaths.includes(p) || p === '/*'))) throw new Error('Existing QR or catch-all rule requires manual review.');
   matcher.pathRules = [...existing, { paths: printedQrPaths, urlRedirect: {
-    hostRedirect: 'pharmacy.neture.co.kr', httpsRedirect: true, redirectResponseCode: 'FOUND', stripQuery: false,
+    hostRedirect: 'pharmacy.neture.co.kr', redirectResponseCode: 'FOUND', stripQuery: false,
   } }];
   // Export-only API fields are not accepted on import. Keep all actual routing and host rules.
   for (const key of ['id', 'creationTimestamp', 'selfLink', 'fingerprint', 'kind']) delete map[key];

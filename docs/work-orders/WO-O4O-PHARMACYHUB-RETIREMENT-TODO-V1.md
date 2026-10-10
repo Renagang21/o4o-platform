@@ -60,3 +60,5 @@ SPA 검증 보강: QR은 읽기 전용 DB inventory로 활성 경로를 수집�
 스캔 원장 리뷰 대응: 자동 QR 공개 API 호출은 제거했다. QR 데이터 확인은 기존 READ ONLY transaction inventory이며 자동 HTTP 요청은 정적 웹/리다이렉트에 한정한다. 태블릿 공개 데이터 API 검증은 유지한다. QR 브라우저 콘텐츠 및 실물 스캔 확인은 아직 미실행이다.
 
 한글 slug 리뷰 대응: URL.pathname의 tablet slug를 decode 후 한 번 encode하여 원문·이미 percent-encoded 입력 모두 같은 공개 API 경로로 검증한다. 양쪽 입력과 tabletId 유지 회귀 테스트를 추가했다.
+
+HTTPS proxy 리뷰 대응: `o4o-global-lb`는 HTTPS proxy의 application map이므로 redirect에서 `httpsRedirect: true`를 제거했다(전체 호스트·약관·기존 4경로 초안 모두). HTTPS 요청의 scheme은 유지한다. HTTP→HTTPS는 기존 별도 `neture-https-frontend-redirect` map이 담당하며 이를 수정하지 않는다. 인프라 근거: `docs/checks/WO-O4O-GCP-PRELAUNCH-COST-MINIMIZATION-CENSUS-V1-CHECK.md` 및 `WO-O4O-GCLB-REMOVE-UNUSED-FORWARDING-RULES-V1-CHECK.md`.
