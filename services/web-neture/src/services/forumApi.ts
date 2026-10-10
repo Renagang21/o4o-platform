@@ -1091,3 +1091,8 @@ export async function fetchMyForumPosts(params: {
     total: body.totalCount ?? body.pagination?.total ?? rows.length,
   };
 }
+
+/** Independent community moderation. Explicit scope prevents navigation changing the target. */
+export async function pinCommunityForumPost(communityKey: string, postId: string, pin: boolean): Promise<void> {
+  await api.patch(`/communities/${encodeURIComponent(communityKey)}/forum/posts/${encodeURIComponent(postId)}/pin`, { pin });
+}

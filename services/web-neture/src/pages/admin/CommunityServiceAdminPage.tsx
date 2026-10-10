@@ -8,8 +8,9 @@
  *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 유효 Admin은 해제되지 않는다.
  * 화면 guard 는 `SubdomainOperatorRoute serviceKey="community" level="admin"` 이고 실제 경계는 backend 다.
  */
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { Link } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   approveCreationRequest,
   communityAdminErrorMessage,
@@ -38,21 +39,30 @@ function CreationRequestsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const processing = useRef(false);
+  const beginList = useLatestRequest('creation');
+  const beginAction = useLatestRequest('creation');
 
   const load = useCallback(() => {
+    const current = beginList();
     setRows(null);
     setError(null);
     listCreationRequests()
-      .then(setRows)
-      .catch((e) => setError(communityAdminErrorMessage(e, '개설 신청 목록을 불러오지 못했습니다.')));
-  }, []);
+      .then(list => { if (current()) setRows(list); })
+      .catch(e => { if (current()) setError(communityAdminErrorMessage(e, '개설 신청 목록을 불러오지 못했습니다.')); });
+  }, [beginList]);
   useEffect(load, [load]);
 
   const approve = async (r: CommunityCreationRequestRow) => {
+    if (processing.current) return;
+    processing.current = true;
+    const current = beginAction();
     setBusyId(r.id);
     setNotice(null);
+    setError(null);
     try {
       const result = await approveCreationRequest(r.id);
+      if (!current()) return;
       setNotice(
         result?.outcome === 'slug_conflict'
           ? `주소(${r.desiredSlug})가 이미 사용 중이라 신청자에게 재신청을 요청했습니다.`
@@ -60,36 +70,44 @@ function CreationRequestsPanel() {
       );
       load();
     } catch (e) {
-      setError(communityAdminErrorMessage(e, '개설 승인에 실패했습니다.'));
+      if (current()) setError(communityAdminErrorMessage(e, '개설 승인에 실패했습니다.'));
     } finally {
-      setBusyId(null);
+      processing.current = false;
+      if (current()) setBusyId(null);
     }
   };
 
   const reject = async (r: CommunityCreationRequestRow) => {
+    if (processing.current) return;
     const reason = window.prompt('거절 사유를 입력하세요.');
     if (reason === null) return;
     if (!reason.trim()) {
       setError('거절 사유가 필요합니다.');
       return;
     }
+    if (processing.current) return;
+    processing.current = true;
+    const current = beginAction();
     setBusyId(r.id);
     setNotice(null);
+    setError(null);
     try {
       await rejectCreationRequest(r.id, reason.trim());
+      if (!current()) return;
       setNotice('개설 신청을 거절했습니다.');
       load();
     } catch (e) {
-      setError(communityAdminErrorMessage(e, '개설 거절에 실패했습니다.'));
+      if (current()) setError(communityAdminErrorMessage(e, '개설 거절에 실패했습니다.'));
     } finally {
-      setBusyId(null);
+      processing.current = false;
+      if (current()) setBusyId(null);
     }
   };
 
   return (
     <section className="mt-6 text-sm">
-      {notice && <p className="mb-3 text-green-700">{notice}</p>}
-      {error && <p className="mb-3 text-red-600">{error}</p>}
+      {notice && <p role="status" className="mb-3 text-green-700">{notice}</p>}
+      {error && <div><p role="alert" className="mb-3 text-red-600">{error}</p><button type="button" className="min-h-11 rounded border px-3 py-2" disabled={busyId !== null} onClick={load}>다시 조회</button></div>}
       {rows === null && !error ? (
         <p className="text-slate-500">불러오는 중입니다…</p>
       ) : rows && rows.length > 0 ? (
@@ -115,7 +133,7 @@ function CreationRequestsPanel() {
                   <td className="py-2 text-right whitespace-nowrap">
                     <button
                       type="button"
-                      disabled={busyId === r.id}
+                      disabled={busyId !== null}
                       onClick={() => approve(r)}
                       className="rounded bg-slate-900 px-3 py-1 text-xs text-white disabled:opacity-50"
                     >
@@ -123,7 +141,7 @@ function CreationRequestsPanel() {
                     </button>
                     <button
                       type="button"
-                      disabled={busyId === r.id}
+                      disabled={busyId !== null}
                       onClick={() => reject(r)}
                       className="ml-2 rounded border border-slate-300 px-3 py-1 text-xs text-slate-700 disabled:opacity-50"
                     >
@@ -149,25 +167,32 @@ function CommunityOperatorsPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const processing = useRef(false);
+  const beginCommunities = useLatestRequest('communities');
+  const beginMembers = useLatestRequest(communityId);
+  const beginAction = useLatestRequest(communityId);
 
   const loadCommunities = useCallback(() => {
+    const current = beginCommunities();
     listAdminCommunities()
-      .then(setCommunities)
-      .catch((e) => setError(communityAdminErrorMessage(e, '커뮤니티 목록을 불러오지 못했습니다.')));
-  }, []);
+      .then(list => { if (current()) setCommunities(list); })
+      .catch(e => { if (current()) setError(communityAdminErrorMessage(e, '커뮤니티 목록을 불러오지 못했습니다.')); });
+  }, [beginCommunities]);
   useEffect(loadCommunities, [loadCommunities]);
 
   const loadMembers = useCallback(() => {
+    const current = beginMembers();
     setMembers(null);
     if (!communityId) return;
     setError(null);
     listCommunityMembers(communityId)
-      .then(setMembers)
-      .catch((e) => setError(communityAdminErrorMessage(e, '커뮤니티 회원을 불러오지 못했습니다.')));
-  }, [communityId]);
+      .then(list => { if (current()) setMembers(list); })
+      .catch(e => { if (current()) setError(communityAdminErrorMessage(e, '커뮤니티 회원을 불러오지 못했습니다.')); });
+  }, [communityId, beginMembers]);
   useEffect(loadMembers, [loadMembers]);
 
   const toggle = async (m: CommunityMemberRow, next: CommunityMemberRow['role']) => {
+    if (processing.current) return;
     if (next !== 'member' && !m.designationEligibility?.eligible) {
       setError(m.designationEligibility?.message || '지정 자격을 확인할 수 없습니다. 커뮤니티를 다시 선택해 주세요.');
       return;
@@ -175,19 +200,23 @@ function CommunityOperatorsPanel() {
     const reason = window.prompt('역할 변경 사유를 입력하세요. 개인정보는 입력하지 마세요.');
     if (reason === null) return;
     if (!reason.trim()) { setError('역할 변경 사유를 입력하세요.'); return; }
+    processing.current = true;
+    const current = beginAction();
     setBusyId(m.membershipId);
     setNotice(null);
     setError(null);
     try {
       await setCommunityMemberRole(communityId, m.membershipId, next, reason.trim());
+      if (!current()) return;
       const who = m.name ?? m.email ?? '회원';
       setNotice(next !== 'member' ? `${who} 님을 커뮤니티 운영자로 지정했습니다.` : `${who} 님의 운영자 지정을 해제했습니다.`);
       loadMembers();
       loadCommunities();
     } catch (e) {
-      setError(communityAdminErrorMessage(e, next === 'operator' ? '운영자 지정에 실패했습니다.' : '운영자 해제에 실패했습니다.'));
+      if (current()) setError(communityAdminErrorMessage(e, next === 'member' ? '운영자 해제에 실패했습니다.' : '운영자 지정에 실패했습니다.'));
     } finally {
-      setBusyId(null);
+      processing.current = false;
+      if (current()) setBusyId(null);
     }
   };
 
@@ -199,7 +228,8 @@ function CommunityOperatorsPanel() {
       <select
         id="community-select"
         value={communityId}
-        onChange={(e) => setCommunityId(e.target.value)}
+        disabled={busyId !== null}
+        onChange={(e) => { setMembers(null); setNotice(null); setError(null); setCommunityId(e.target.value); }}
         className="mt-1 w-full max-w-sm rounded border border-slate-300 px-2 py-1"
       >
         <option value="">커뮤니티를 선택하세요</option>
@@ -213,8 +243,8 @@ function CommunityOperatorsPanel() {
         운영자는 그 커뮤니티의 승인된 회원 중에서만 지정합니다. 커뮤니티 서비스 이용이 정상이 아닌 회원은 지정할 수 없고,
         마지막 유효 Admin은 해제하거나 Operator로 내릴 수 없습니다.
       </p>
-      {notice && <p className="mt-3 text-green-700">{notice}</p>}
-      {error && <p className="mt-3 text-red-600">{error}</p>}
+      {notice && <p role="status" className="mt-3 text-green-700">{notice}</p>}
+      {error && <div><p role="alert" className="mt-3 text-red-600">{error}</p><button type="button" className="min-h-11 rounded border px-3 py-2" disabled={busyId !== null} onClick={() => { loadCommunities(); loadMembers(); }}>다시 조회</button></div>}
       {!communityId ? null : members === null && !error ? (
         <p className="mt-4 text-slate-500">불러오는 중입니다…</p>
       ) : members && members.length > 0 ? (
@@ -249,7 +279,7 @@ function CommunityOperatorsPanel() {
                     </td>
                     <td className="py-2 text-right">
                       <select aria-label={`${m.name ?? '회원'} 역할`} value={m.role}
-                        disabled={busyId === m.membershipId}
+                        disabled={busyId !== null}
                         onChange={(e) => toggle(m, e.target.value as CommunityMemberRow['role'])}
                         className="rounded border border-slate-300 px-2 py-1 text-xs disabled:opacity-50">
                         <option value="member">회원</option>
