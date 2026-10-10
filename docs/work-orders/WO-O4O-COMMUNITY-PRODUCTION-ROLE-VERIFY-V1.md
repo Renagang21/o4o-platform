@@ -1,9 +1,11 @@
 # 개별 커뮤니티 운영 권한 최종 검증 TODO
 
-> 상태: 조사 중 · 작성일: 2026-10-10
+> 상태: 에이전트 확인·인계 문서 완료 / 사용자 인증 후 운영 검증 대기 · 작성일: 2026-10-10
 > 근거: 사용자 운영 검증 지시, 공통 운영자 계정 사용 승인
 
 ## 초기 TODO
+
+아래 초기 목록과 조사 단계의 계정 미확보 기록은 단계 이력이다. 현재 파일은 확보했으며 Google 인증·테스트 대상 구성은 미완료다. 최종 실행 상태와 사용자 직접 테스트는 문서 마지막 절을 따른다.
 
 - [x] 검증 TODO 작성
 - [ ] 배포 SHA·서비스 응답·현재 문서와 route 확인
@@ -23,7 +25,7 @@
 
 ## 조사 후 수정 TODO
 
-현재 클라우드에는 `docs/local/TEST-ACCOUNTS.local.md`가 없으며 환경 Secret과 outbound identity도 설정되어 있지 않다. 공통 운영자 계정 사용은 승인되었으나 로그인 정보와 검증 대상은 아직 확인되지 않았다.
+조사 당시 클라우드에는 `docs/local/TEST-ACCOUNTS.local.md`가 없었으며 환경 Secret과 outbound identity도 설정되어 있지 않았다. 이후 첨부 파일을 확보했지만 인증된 운영자 세션과 테스트 대상은 아직 확인되지 않았다.
 
 - [x] 최신 main 기준 별도 작업공간에서 배포 코드·검증 경계 조사
 - [x] 병합 커밋 `b29c0d46cb`의 production 상태 `DEPLOYED` 확인
@@ -54,3 +56,18 @@
 ## 실제 Playwright 운영 로그인 화면 검증
 
 Chromium으로 운영 커뮤니티 로그인 화면을 desktop 1440 및 mobile 390에서 열었다. 모두 HTTP 200이고 pageerror는 없었으며 이메일 로그인 입력이 렌더되었다. Google 버튼은 로드되지 않았고 화면에 `Google Identity Services script failed to load`가 표시됐다. `accounts.google.com` 요청은 `net::ERR_TUNNEL_CONNECTION_FAILED`, 별도 HTTPS 확인은 proxy tunnel 403이었다. 이는 현재 클라우드의 외부 연결 제한이며 일반 사용자의 브라우저에서도 동일하다고 단정하지 않는다. Google 네트워크 허용 추가 초안 저장은 `draft_not_editable`로 거절되어 저장·적용 모두 미완료다. 인증 후 권한 검증은 여전히 미실행이다.
+
+## 사용자 직접 테스트 인계 — 최종 TODO
+
+사용자가 진행 불가 항목을 남겨두고 문서 push 후 직접 테스트하기로 했다.
+
+- [x] 테스트 계정 원본 확보·Git 제외 확인
+- [x] 운영 응답·비로그인 접근 차단 확인
+- [x] 실제 Playwright desktop/mobile 로그인 화면 확인
+- [x] Google 네트워크 차단 및 설정 저장 실패 원인 기록
+- [x] 역할 중첩·테스트 데이터·복구 조건을 포함한 [직접 테스트 체크리스트](../checks/CHECK-O4O-COMMUNITY-MANUAL-PRODUCTION-VERIFY-V1.md) 작성
+- [ ] 사용자 Google 로그인·역할별 테스트 조건 구성
+- [ ] 사용자 직접 권한·제재·회수·격리·마지막 admin·전환 검증
+- [ ] 사용자 테스트 결과 기록·상태 복구 확인
+
+미실행 항목은 실패 또는 PASS로 바꾸지 않았다. 이번 문서 push는 운영 권한 검증 전체 완료를 의미하지 않는다. 운영 계정·회원 상태 변경은 수행하지 않았다.
