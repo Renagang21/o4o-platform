@@ -331,14 +331,14 @@ export const optionalAuth = async (
       payload.authMethod, payload.serviceKey, user?.roles ?? [],
     );
 
-    if (user && user.isActive && optionalAllowed && sessionMethodAllowed &&
+    if (user?.isActive && optionalAllowed && sessionMethodAllowed &&
         await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily)) {
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
       req.user = user;
     }
 
     next();
-  } catch (error) {
+  } catch {
     // Continue without authentication on error
     next();
   }

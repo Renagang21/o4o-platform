@@ -107,3 +107,11 @@ GitHub check annotation의 catch 이름·optional chain·테스트 assertion 지
 API build PASS, 수정 파일 ESLint error 0(기존 unused catch 경고 1개), diff check PASS.
 외부 SonarCloud 재검증 결과와 main·배포의 최신 상태는 PR에서 확인한다. 위 로컬 통과로 외부
 Quality Gate나 운영 적용 완료를 대신하지 않는다.
+
+첫 정리 후 필수 CI가 다시 통과했으나 SonarCloud 중복률은 3.4%였다. 문자열·숫자 리터럴을
+정규화한 100-token/10-line 로컬 비교에서 변경 코드의 일치는 `expected-schema-states.ts`의
+선언형 지문 배열에서만 발견했다. 해당 배열은 migration guard C22가 문자 그대로의 객체,
+순서·SHA 형식·지문 유일성을 강제하므로 형태를 바꿔 중복을 피하지 않는다. 이 파일만 Sonar
+copy detection에서 제외하고 소스·보안 분석과 C22는 유지한다. 외부 최신 결과는 PR에서 확인한다.
+최종 보정 후 같은 focused 125건·API build 재통과, runtime ESLint error/warning 0,
+migration contract **21 PASS / 0 FAIL**(C22의 20개 incremental 등록 포함)을 확인했다.
