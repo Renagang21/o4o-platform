@@ -11,7 +11,8 @@
  *     요청      `authentication.middleware` — 비밀번호 세션이 `platform:*` 역할을 가진 계정이면 거절
  *               (역할은 JWT 가 아니라 DB `role_assignments` 에서 다시 읽는다 — 발급 뒤 부여를 잡는다)
  *
- *   "비밀번호 세션" = 토큰 claim `authMethod: 'password'`. Google 세션에는 claim 이 없다.
+ *   WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1: Google 세션도 google 표식을 명시한다.
+ *   전체관리자 경계는 isSessionAuthMethodAllowed의 Google 긍정 판정을 사용한다.
  */
 import { ADMIN_SURFACE_KEY } from '../../utils/session-origin.js';
 
@@ -36,4 +37,24 @@ export function isPasswordSessionAllowed(
 ): boolean {
   if (sessionServiceKey === ADMIN_SURFACE_KEY) return false;
   return !hasPlatformRole(roles);
+}
+
+/** Only an explicitly Google-authenticated session may reach the admin surface/platform account. */
+export function isSessionAuthMethodAllowed(
+  authMethod: unknown,
+  sessionServiceKey: string | null | undefined,
+  roles: readonly string[] | null | undefined,
+): boolean {
+  return authMethod === 'google' || isPasswordSessionAllowed(sessionServiceKey, roles);
+}
+
+export const GOOGLE_SESSION_REQUIRED_CODE = 'GOOGLE_SESSION_REQUIRED';
+export const GOOGLE_SESSION_REQUIRED_MESSAGE =
+  '전체관리자 계정은 Google로 다시 로그인해 주세요.';
+
+/** Preserve the password error contract; every other unproven method has its own error. */
+export function sessionAuthMethodError(authMethod: unknown): { code: string; message: string } {
+  return authMethod === 'password'
+    ? { code: PASSWORD_SESSION_NOT_ALLOWED_CODE, message: PASSWORD_SESSION_NOT_ALLOWED_MESSAGE }
+    : { code: GOOGLE_SESSION_REQUIRED_CODE, message: GOOGLE_SESSION_REQUIRED_MESSAGE };
 }

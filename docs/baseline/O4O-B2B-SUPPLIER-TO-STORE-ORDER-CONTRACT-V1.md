@@ -1,5 +1,7 @@
 # O4O B2B Supplier → Store Order Contract V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **Status**: Active · **Type**: Canonical Order Contract
 > **Effective**: 2026-08-26
 > **WO**: `WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1`
@@ -457,7 +459,7 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 `apps/api-server/src/services/cart/offer-exposure-strategy.ts`.
 §8 불변식 S2 의 공급 축을 confirm 에서 집행하는 지점이다.
 
-> Axis D(Neture 약국 매장)는 이 strategy 를 쓰지 않는다 — 노출 판정이 serviceKey 가 아니라 세미프랜차이즈 데이터 행 · 공급 제안 기준이라 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 모듈이 분기점이다(2026-10-05 명시 예외). 아래 3개 strategy 는 무변경.
+> Axis D(Neture 약국 매장)는 이 strategy 를 쓰지 않는다 — 노출 판정이 serviceKey 가 아니라 약국 협력사업 데이터 행 · 공급 제안 기준이라 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 모듈이 분기점이다(2026-10-05 명시 예외). 아래 3개 strategy 는 무변경.
 
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|

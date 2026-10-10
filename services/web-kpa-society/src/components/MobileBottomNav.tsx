@@ -19,7 +19,7 @@
  *   재사용(모바일에서는 상단 utility 숨김). 한 번에 하나의 시트만 open.
  */
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { Home, Building2, Bell, User, LogIn } from 'lucide-react';
 import {
   useNotifications,
@@ -70,6 +70,7 @@ function isPharmacyActive(pathname: string): boolean {
 // 커뮤니티 active 판정
 function isCommunityActive(pathname: string): boolean {
   return (
+    pathname.startsWith('/businesses') ||
     pathname === '/' ||
     pathname.startsWith('/forum') ||
     pathname.startsWith('/resources')
@@ -80,6 +81,8 @@ export function MobileBottomNav() {
   const { user, logout } = useAuth();
   const { openLoginModal } = useAuthModal();
   const { pathname } = useLocation();
+  const businessMatch = useMatch('/businesses/:businessKey/*');
+  const participantPath = `/businesses/${encodeURIComponent(businessMatch?.params.businessKey ?? 'pharmacy')}/participation`;
   const navigate = useNavigate();
 
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
@@ -117,7 +120,7 @@ export function MobileBottomNav() {
   // 비로그인: 커뮤니티 + 로그인 우선 노출
   if (!user) {
     const guestItems: MobileBottomNavItem[] = [
-      { key: 'community', label: '커뮤니티', icon: Home, to: '/', active: isCommunity },
+      { key: 'community', label: '참여자 공간', icon: Home, to: participantPath, active: isCommunity },
       { key: 'login', label: '로그인', icon: LogIn, onClick: openLoginModal, emphasis: true },
     ];
     return <MobileBottomNavCore items={guestItems} activeColor={ACTIVE_COLOR} />;
@@ -125,7 +128,7 @@ export function MobileBottomNav() {
 
   // 로그인: 커뮤니티 / 약국 경영 / 알림 / 내정보
   const items: MobileBottomNavItem[] = [
-    { key: 'community', label: '커뮤니티', icon: Home, to: '/', active: isCommunity },
+    { key: 'community', label: '참여자 공간', icon: Home, to: participantPath, active: isCommunity },
     { key: 'pharmacy', label: '약국 경영', icon: Building2, onClick: handlePharmacyTab, active: isPharmacy },
     {
       key: 'notif',

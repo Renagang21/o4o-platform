@@ -1,3 +1,10 @@
+import BusinessWorkspace from './pages/business/BusinessWorkspace';
+import BusinessParticipationPage from './pages/business/BusinessParticipationPage';
+import BusinessMaterialsPage from './pages/business/BusinessMaterialsPage';
+import BusinessToolsPage from './pages/business/BusinessToolsPage';
+import BusinessForumPage, { BusinessForumBoundary } from './pages/business/BusinessForumPage';
+import BusinessForumManagementPage from './pages/business/BusinessForumManagementPage';
+import { O4OHomeButton } from '@o4o/auth-react';
 import { RoleGuard } from './components/auth/RoleGuard';
 import { authClient as pharmacyManagementAuthClient } from './contexts/AuthContext';
 import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
@@ -125,7 +132,6 @@ const GuideForOperatorPage = lazy(() => import('./pages/guide/GuideForOperatorPa
 const GuideForMemberPage = lazy(() => import('./pages/guide/GuideForMemberPage').then(m => ({ default: m.GuideForMemberPage })));
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
-import { CommunityHomePage } from './pages/CommunityHomePage';
 // 최신 활동 전체 보기 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1)
 const HomeLatestPage = lazy(() => import('./pages/HomeLatestPage').then(m => ({ default: m.HomeLatestPage })));
 
@@ -260,7 +266,6 @@ const WorkDisplayPage = lazy(() => import('./pages/work/WorkDisplayPage').then(m
 const WorkCommunityPage = lazy(() => import('./pages/work/WorkCommunityPage').then(m => ({ default: m.WorkCommunityPage })));
 
 // AuthGate는 정적 유지 (Guard)
-import { AuthGate } from './components/auth/AuthGate';
 // ActivitySetupPage / PendingApprovalPage — Phase 2 lazy
 const ActivitySetupPage = lazy(() => import('./pages/ActivitySetupPage').then(m => ({ default: m.ActivitySetupPage })));
 const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').then(m => ({ default: m.PendingApprovalPage })));
@@ -371,6 +376,7 @@ function PostLoginRedirect() {
     if (onLoginSuccess) { didRedirectRef.current = true; return; }
     // 이미 workspace 경로에 있으면 중복 이동 금지
     if (
+      location.pathname.startsWith('/businesses') ||
       location.pathname.startsWith('/store') ||
       location.pathname.startsWith('/operator') ||
       location.pathname.startsWith('/admin')
@@ -421,7 +427,7 @@ function LoginRoute() {
     openLoginModal();
   }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate, isAuthenticated, isLoading]);
 
-  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
+  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">약국 협력사업을 이용하려면 로그인해 주세요.</p></Layout>;
 }
 
 /**
@@ -435,7 +441,7 @@ function RegisterRoute() {
     openRegisterModal();
   }, [openRegisterModal]);
 
-  return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
+  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">약국 협력사업을 이용하려면 로그인해 주세요.</p></Layout>;
 }
 
 /**
@@ -764,7 +770,24 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<AuthGate><Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout></AuthGate>} />
+          <Route path="/" element={<Navigate to="/businesses/pharmacy/participation" replace />} />
+          <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace /></Layout>}>
+            <Route index element={<Navigate to="participation" replace />} />
+            <Route path="participation" element={<BusinessParticipationPage />} />
+            <Route path="materials" element={<BusinessMaterialsPage />} />
+            <Route path="tools" element={<BusinessToolsPage />} />
+            <Route path="forum" element={<BusinessForumBoundary />}>
+              <Route index element={<BusinessForumPage />} />
+              <Route path="posts" element={<BusinessForumPage />} />
+              <Route path="write" element={<BusinessForumPage view="write" />} />
+              <Route path="post/:slug" element={<BusinessForumPage view="post" />} />
+              <Route path="my-posts" element={<BusinessForumPage view="mine" />} />
+              <Route path="request" element={<BusinessForumManagementPage view="request" />} />
+              <Route path="owned" element={<BusinessForumManagementPage view="owned" />} />
+              <Route path="owned/:forumId/members" element={<BusinessForumManagementPage view="members" />} />
+              <Route path="manage" element={<BusinessForumManagementPage view="manage" />} />
+            </Route>
+          </Route>
 
           {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
           <Route path="/setup-activity" element={<ActivitySetupPage />} />
@@ -1254,8 +1277,10 @@ function App() {
  * 선행: WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1 (404 = minimal nav)
  */
 function NotFoundPage() {
+  const { isAuthenticated, isLoading } = useAuth();
   return (
     <NotFound>
+      <O4OHomeButton api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />
       <Link to="/forum" className="text-slate-500 no-underline hover:underline">
         커뮤니티
       </Link>

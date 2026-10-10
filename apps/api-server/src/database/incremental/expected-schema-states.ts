@@ -219,6 +219,13 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '49e6d7b2a2558750f52b42add1865a42495a6650d344ba916e0f464cba98dab0',
     fingerprintLineCount: 6176,
   },
+  // Isolated PostgreSQL 15: baseline + incrementals 1..20. The handoff CHECK alone
+  // admits Kakao; down restores state 19 and re-up restores this exact fingerprint.
+  {
+    appliedThrough: 'AllowKakaoHandoffAuthMethod1791527589096',
+    fingerprint: 'ee4c646d687460947bbb6f0fe0da6006075d1cbf4f1638c8fed588e554e2c68a',
+    fingerprintLineCount: 6176,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

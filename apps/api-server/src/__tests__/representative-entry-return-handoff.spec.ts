@@ -239,7 +239,7 @@ describe('C. exchangeHandoff', () => {
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
       //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
       //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, null);
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, 'google');
       expect(persistRefreshTokenFamily).not.toHaveBeenCalled();
       // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0.
       //   세션 세대 조회는 이 spec 에서 connection double 의 `manager` 가 직접 답하므로 여기 집계에
