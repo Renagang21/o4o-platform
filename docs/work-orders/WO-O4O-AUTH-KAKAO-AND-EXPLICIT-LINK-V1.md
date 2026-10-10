@@ -107,6 +107,23 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 - [x] 카카오 실제 UI 시작·provider 로그인 화면 redirect 요청 4/4 확인. 계정 소유자 인증·token 교환 완료와 구분.
 - [x] 사용자 오류 경로가 고정 callback이며 code의 `--`가 차단 원인임을 확인(원문 값 저장 없음). 합성 callback 입력으로 전역 SQL 문자 오탐 재현; code뿐 아니라 generated state/flow token과 Google ID token의 같은 문자 가능성도 확인.
 - [x] 등록된 소셜 method/path/field의 제한된 형식·길이만 문자 휴리스틱에서 제외. 다른 필드·경로의 검사, origin·일회용 hash flow·binding·provider 검증 유지. 수정 전 새 회귀 11 FAIL/13 PASS → 수정 후 관련 3 suites/79 PASS; type-check·lint·API build PASS.
-- [ ] 오류 수정 PR의 required CI·review 확인 → 사용자 main 통합 승인 → API 배포 → 실제 소유자 가입·로그인·연결 재검증.
+- [x] 오류 수정 PR #401 required CI·review blocker 0 확인 → 사용자 main 통합 승인 → main `73cd907d20` → API-only Promote #38035112556 SUCCESS. post-merge CI #38034473790·CodeQL #38034473752 PASS; 운영 callback 합성 입력·Demo 재검증 PASS.
+- [ ] 실제 소유자 가입·로그인·연결 재검증. callback 수정 배포와 외부 계정 인증 완료는 구분.
 - [ ] 실제 취소 callback의 브라우저 복귀 재검증. 시작 4건은 성공했지만 초기 harness의 취소 UI는 1건 HTTP 400/3건 transport failure였으며, 진단용 같은 binding의 직접 GET은 303이었다. 원인을 임의 확정하거나 취소 성공으로 계산하지 않음.
 - [ ] 후속 개인정보 처리방침: 사용자 제보의 읽기 어려운 표시 방식과 리팩터링 전 내용을 조사해 수정안 작성·검토. 동의 UI와 정책 문서/API 소비처를 함께 확인하고 승인된 정책 내용으로 갱신.
+
+## 2026-10-10 홈 카카오 버튼 미노출 후속
+
+동일 WO의 연속 Phase로 기존 격리 checkout·branch를 유지하고 main `1652a59045`를 반영한다.
+사용자 화면 origin은 지원 도메인 `https://neture.co.kr/`로 확인했다. 운영 새 browser context의
+홈 modal 및 `/login` × PC/mobile 4/4는 enabled=true·버튼 visible이었다. 사용자 브라우저의
+실제 응답/캐시 상태를 확인하지 않았으므로 장애 원인을 캐시나 네트워크로 확정하지 않는다.
+
+- [x] 공통 `KakaoContinue`의 조회 실패 catch 무표시 및 지연 중 숨김 경로 확인. 새 회귀 수정 전 4 FAIL/1 PASS.
+- [x] 로딩 상태·10초 응답 제한·오류 안내·명시적 조회 재시도 추가. 명시적 enabled=false 숨김 유지, 이전 응답·unmount timer 무효화; 재시도는 읽기만 수행.
+- [x] auth-react 15 files/174 PASS, Neture 모달 2 files/13 PASS, 전체 frontend type-check·대상 lint·Neture/Store build PASS.
+- [x] 로컬 실제 Neture 홈 modal·Store LoginMethods × PC/mobile × 실패/지연/미설정 12/12 PASS. 합성 config fixture이며 운영 OAuth 성공으로 확장하지 않음.
+- [ ] 새 PR required CI·review → 사용자 main 통합 승인 → 해당 웹 배포 → 사용자 버튼 미노출 및 실제 OAuth 재검증.
+
+소비처 매트릭스·최초 browser harness 조건 오류와 정정은 CHECK에 기록한다. 개인정보 처리방침
+표시/내용 수정 및 실제 계정 연결은 이 UI 복구 변경의 완료 항목이 아니다.

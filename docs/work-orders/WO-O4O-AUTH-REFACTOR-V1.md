@@ -67,7 +67,8 @@
 - [x] 동일 이메일 자동 병합 금지 로컬 회귀
 - [x] PR #392 main `26b98a33c1` 통합·Promote #38019828704 운영 배포; 배포 후 실제 Demo 32/32 PASS (외부 OAuth 검증과 구분)
 - [ ] 카카오 운영 설정 활성화 후 실제 Google/Kakao 실접속·명시적 연결 PC/mobile smoke (실제 소유자 인증 필요)
-- [ ] 운영 가입의 `Invalid request / invalid characters` 차단 수정: 합성 OAuth code로 재현, 제한된 소셜 opaque 필드 처리·79 PASS 로컬 검증 완료. 수정 PR 통합·배포 후 실제 소유자 가입 재검증 필요.
+- [x] 운영 callback의 `Invalid request / invalid characters` 차단 수정: PR #401 main `73cd907d20` 통합, API-only Promote #38035112556 SUCCESS. 합성 opaque code/state는 401 flow 검증까지 전달, 다른 SQL 필드는 400 거절 유지. 실제 소유자 가입 완료와 구분.
+- [ ] 홈 로그인 창의 카카오 버튼 미노출: 지원 origin 확인; 설정 조회 실패·지연을 조용히 숨기는 공통 UI 수정·재시도 로컬 검증 완료. 새 PR 통합·웹 배포 및 사용자 화면 재검증 필요. 사용자 브라우저의 실제 조회 실패 원인은 미확정.
 - [ ] 후속 개인정보 처리방침 표시·내용 정합: 읽기 어려운 화면과 리팩터링 전 내용을 조사해 사용자 검토 후 갱신.
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
@@ -116,3 +117,10 @@ enabled=true, 전체관리자 false, 실제 Demo 32/32·Demo 변경 차단 2/2 P
 실제 소유자의 가입 시도는 문자 검사 오류가 보고돼 완료되지 않았다. 위 가입 차단 수정과
 취소 callback 브라우저 복귀, 실제 계정 연결 검증은 OPEN이다. 이전 enabled=false·리소스
 조회 실패 서술은 당시 관측이며 최신 설정 상태로 사용하지 않는다.
+
+후속 PR #401은 main `73cd907d20` 통합·필수 CI 및 CodeQL PASS, API-only Promote
+#38035112556 SUCCESS다. 운영 API 17/17, Demo PC/mobile 32/32, Demo 변경 차단 2/2 PASS.
+취소 callback 303 뒤 복귀 주소를 UI에서 수동 따라가기 4/4 PASS이며 native API 탐색 및
+실제 소유자 가입·로그인·명시적 연결 완료를 뜻하지 않는다. 이후 사용자의 메인 홈 로그인 창
+카카오 버튼 미노출 제보를 별도 TODO로 유지한다. 공통 설정 조회 실패·지연의 안내/재시도
+수정은 로컬 auth-react 174·Neture 모달 13·UI fixture 12 PASS; 아직 웹 배포 결과가 아니다.

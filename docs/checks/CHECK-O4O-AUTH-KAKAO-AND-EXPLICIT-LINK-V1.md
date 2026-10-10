@@ -283,3 +283,58 @@ redaction·Kakao identity와 합쳐 3 suites/79 PASS, API type-check·대상 lin
 이는 로컬 수정 결과이며 운영 오류 해결 완료가 아니다. 수정 PR의 CI/review·main 승인·
 배포 후 실제 가입·취소·명시적 연결을 재검증한다. 개인정보 처리방침 표시 및 이전 내용은
 사용자가 요청한 후속 조사·수정 TODO로 남겼다.
+
+## 2026-10-10 PR #401 통합·API 배포 및 홈 버튼 후속
+
+PR #401은 사용자 승인 후 main `73cd907d20`에 통합했다. post-merge CI #38034473790 및
+CodeQL #38034473752 PASS. Delivery #38035024444는 API LEVEL_3로 배포 보류했고,
+정상 통제 경로 Promote #38035112556를 같은 SHA·services=api로 실행해 SUCCESS다.
+정식 migration Job·revision readiness·traffic 전환·전환 후 health·serving SHA report PASS,
+production status는 DEPLOYED/api다. 웹/전체관리자는 SKIPPED, force/break-glass 태그/새 schema/IAM 변경 없음.
+
+운영 API 17/17 PASS: 합성 `--`/`sp_`/`xp_` code와 `--` state는 문자 오탐 400 대신
+401 SOCIAL_FLOW_INVALID로 거부됐다. 무관한 필드의 SQL은 400 차단 유지. 유지 8 origin
+enabled=true/전체관리자 false. 실제 Demo PC/mobile × 8 origin × 두 역할 32/32 PASS,
+매장 경영자 context 16/16 200·공급자 products 16/16 200·반대 역할/전체관리자 403,
+logout 후 access/refresh 32/32 401, 별도 Store session 유지 2건 200. Demo 변경 차단 2/2 PASS.
+실제 UI start/provider 302/callback 취소 303 뒤 복귀 주소를 UI에서 수동 따라가기 4/4 PASS.
+native API 브라우저 탐색과 실제 외부 소유자 가입/로그인/연결 완료는 계속 OPEN이다.
+
+사용자가 이후 홈 로그인 창에서 카카오 버튼 미노출을 제보했다. origin은 `https://neture.co.kr/`다.
+새 브라우저의 홈 modal와 `/login` × PC/mobile 4/4는 config 200/enabled=true/버튼 visible이었다.
+사용자 브라우저의 실제 요청 실패나 오래된 bundle은 확인하지 않았으므로 원인을 단정하지 않는다.
+클라우드 Google script load 실패를 실제 사용자 Google 장애나 성공으로 계산하지 않는다.
+
+### Shared Module Change Verification — Kakao config 복구
+
+변경 모듈: `packages/auth-react/src/KakaoContinue.tsx`. config 조회 실패 catch가 오류를
+표시하지 않고 초기 enabled=false를 유지하며 지연 중에도 컴포넌트가 비어 있던 결함이다.
+조회 중 상태, 10초 응답 제한, 실패/잘못된 응답 안내, 사용자가 누르는 읽기 전용 재시도를 추가한다.
+서버가 명시적으로 enabled=false라고 답한 경우의 버튼 숨김과 실제 provider/flow 검증은 유지한다.
+늦은 이전 조회 결과는 새 조회 상태를 덮어쓰지 않고 unmount 시 timer를 해제한다.
+
+| 소비처 | 사용/영향 | route·role·capability 영향 | 검증 |
+|---|---|---|---|
+| Neture·supplier·community·funding | 같은 Neture bundle의 modal 및 `/login`, 직접 사용 | origin/returnTo 보존, 정책/권한 변경 없음 | Neture 홈 modal PC/mobile fixture·모달 회귀·type-check/build PASS |
+| Store | LoginMethods를 통해 사용 | 로그인 route/returnTo·role 변경 없음 | PC/mobile fixture·type-check/build PASS |
+| Pharmacy (KPA Society) | LoginMethods를 통해 사용 | origin·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
+| KPA Branch | LoginMethods 로그인·join 사용 | route·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
+| Lecture/Study | 자체 KakaoContinue 사용 없음, Neture 계정센터 경유 | gateway 보존 | symbol/route 검색·전체 frontend type-check PASS |
+| 전체관리자·그 밖의 auth-react 사용 앱 | KakaoContinue runtime 사용 없음 | Google 전용/기존 인가 보존 | import·symbol·path 검색, 전체 frontend type-check PASS |
+| 삭제 대상 Pharmacy-Hub/K-Cosmetics | 복구 없음 | 은퇴 계약 보존 | 신규 경로/사용처 추가 없음 |
+
+raw-source 파일 경로 검사와 symbol/label/endpoint 검색을 함께 수행했다. 기존 UI tests가 실제
+소비처이며 새 config 회귀를 추가했다. 변경 전 새 5건은 4 FAIL/1 PASS; 변경 후 새 6/6 및
+auth-react 전체 15 files/174 PASS. Neture modal 2 files/13 PASS, frontend type-check 및
+대상 ESLint PASS. Neture·Store 실제 build PASS(기존 chunk size 경고).
+
+로컬 실제 UI + 합성 read-only config 장애 주입은 Neture 홈 modal/Store LoginMethods ×
+PC/mobile × 실패 재시도/지연 재시도/명시적 미설정 12/12 PASS, 인증 쓰기 요청 0이다.
+첫 browser harness는 개발 StrictMode의 두 초기 조회 중 하나만 실패시켜 검사 조건이 맞지
+않았다. 초기 조회 전체에 장애를 주고 사용자 재시도 이후만 정상 응답하도록 정정했다.
+이는 초기 실패를 숨기는 assertion 완화가 아니라 fault 주입 시점 정정이며, timeout·복구 및
+미설정 숨김 단언은 유지했다. Store package 필터도 실제 이름 `store-web`으로 실행해 build를 확인했다.
+
+위 결과는 로컬 UI 변경 검증이다. 새 PR 통합·웹 배포, 사용자 화면 원인 확인 및 실제
+소유자 OAuth는 대기한다. API 수정 배포를 웹 복구 배포로 혼동하지 않는다. 개인정보 처리방침
+가독성·이전 내용은 후속 TODO로 유지한다.
