@@ -234,3 +234,52 @@ PR #396 통합 준비에서 최신 main `b9f0a920cb`를 동일 WO 브랜치에 m
 변경을 보존했다. main 대비 변경은 CHECK·WO 세 문서뿐이며 이 기록의 Delivery 분류는
 문서 전용 `NOT_APPLICABLE`이다. Kakao 활성화를 위한 새 운영 배포와 실제 소유자 OAuth
 검증은 별도이며, PR #392의 기존 운영 배포 결과를 후속 main 전체의 배포로 확장하지 않는다.
+
+## 운영 Kakao 설정 활성화 및 문자 검사 오류 (2026-10-10)
+
+사용자 화면에서 고정 callback 등록·GitHub 변수 이름·Secret Manager resource와 runtime의
+secret-level 접근자 저장을 확인했다. WIF metadata #38028872708 SUCCESS의 상세 로그에서
+예정 resource 존재를 확인했으며 값·version은 읽지 않았다. API-only verified 설정 배포
+[#38029009245](https://github.com/Renagang21/o4o-platform/actions/runs/38029009245)는
+main 포함 SHA `2a92ce24cf227694df46bde9a5b5a0f7668137d1`의 고정 deploy tag로 실행했다.
+CI gate, 정식 migration Job, revision readiness, traffic 전환, 전환 후 health step 모두 SUCCESS다.
+admin/web 배포와 force_deploy는 실행하지 않았다. 배포 job 상세 로그의 새 storage host는
+proxy 차단으로 미조회이며 단계 결과와 공개 API 응답을 근거로 판정했다.
+
+| 운영 확인 | 결과 | 한계 |
+|---|---|---|
+| `/health/ready` | HTTP 200 | 전환 후 공개 LB 경로 |
+| Kakao config | 유지 8개 origin HTTP 200 / enabled=true; 전체관리자 enabled=false | 구성 활성화이며 Client Secret의 provider 교환 성공은 아님 |
+| 비인증 social accounts | HTTP 401 | 인증 우회 없음 |
+| 실제 Demo UI | PC/mobile × 8 origin × 두 역할 32/32 PASS | TLS 검증된 실제 요청; credentials/tokens 출력 없음 |
+| 역할·logout | 매장 경영자 context 16/16 HTTP 200, 공급자 products 16/16 HTTP 200; 반대 역할 403; logout access/refresh 32/32 HTTP 401 | 별도로 생성한 Store 세션 유지 후 테스트 생성 세션만 정리 |
+| Neture Demo 변경 거절 | 두 역할 2/2 PASS | 소셜 수단 canManage=false·재인증 변경 금지·설정 안내 |
+| Kakao 시작 UI | Neture·Lecture 계정센터 × PC/mobile 4/4 HTTP 200; provider authorize 302 → accounts.kakao.com | 소유자 로그인·신규 가입·code 교환 완료를 뜻하지 않음 |
+| 취소 callback 브라우저 복귀 | OPEN | 최초 4건 중 1건 HTTP 400/3건 transport failure; 직접 요청 진단은 303. 원인과 실제 브라우저 완료 미확정 |
+
+첫 Demo harness가 Lecture 화면에 자체 카카오 버튼을 기대해 4건 timeout을 냈다.
+코드·문서의 계정센터 진입 계약으로 검사 조건을 정정하고 Lecture 4/4 재실행했다.
+다른 7개 서비스 28/28과 합쳐 중복 없는 32건의 실제 로그인·역할·logout 결과를 확인했다.
+이를 실제 OAuth 전체 통과로 확장하지 않는다.
+
+사용자 실제 가입 시도에서 `Invalid request / Your request contains invalid characters`가
+보고됐다. 합성 callback code의 영숫자 입력은 HTTP 401 SOCIAL_FLOW_INVALID, `--` 포함
+입력은 flow 검증 전에 HTTP 400 문자 오류로 재현했다. 사용자가 알려준 오류 주소에서 고정 callback 경로와 code의 `--` 문자 유형을 확인해
+동일 원인을 확정했다. 실제 code/state 값은 파일·로그·문서에 저장하지 않았다. 카카오
+동의 이후 callback 차단이며 O4O 계정 생성 성공을 뜻하지 않는다.
+
+`securityMiddleware.ts`는 등록된 GET Kakao callback의 query code/state와 지정된 POST
+소셜 proof·signup·link route의 body token/code/idToken만 형식·길이가 맞을 때 SQL 문자
+휴리스틱에서 제외한다. 원본 입력은 그대로 전달한다. flow는 hash·parameter binding,
+provider code는 URL-encoded 전송, ID token은 서명 검증으로 처리한다. origin·purpose·
+cookie binding·expiry·일회성·provider ownership 검증과 다른 필드·경로의 검사는 유지한다.
+retired Passport 경로 예외는 복구하지 않았다.
+
+운영 bootstrap의 security-before-body-parser 순서는 변경하지 않았다. GET query는 그 순서로도
+검증했으며 POST body 사례는 parser가 앞선 조립에서도 같은 opaque 계약을 유지하는 회귀다.
+최초 middleware 행동 회귀 24건은 수정 전 11 FAIL/13 PASS였다. 운영 parser 순서의
+입력 보존 사례를 추가한 최종 25건은 수정 후 25/25 PASS다. 기존 로그
+redaction·Kakao identity와 합쳐 3 suites/79 PASS, API type-check·대상 lint·API build PASS.
+이는 로컬 수정 결과이며 운영 오류 해결 완료가 아니다. 수정 PR의 CI/review·main 승인·
+배포 후 실제 가입·취소·명시적 연결을 재검증한다. 개인정보 처리방침 표시 및 이전 내용은
+사용자가 요청한 후속 조사·수정 TODO로 남겼다.
