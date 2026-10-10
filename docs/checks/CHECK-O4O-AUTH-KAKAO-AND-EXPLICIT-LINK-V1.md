@@ -342,3 +342,48 @@ PC/mobile × 실패 재시도/지연 재시도/명시적 미설정 12/12 PASS, �
 사용자는 로그인 창을 닫고 새로고침한 뒤 "이제 버튼이 보임"이라고 확인했다. 새 UI 수정은
 아직 미배포이므로 이 관측을 새 코드의 운영 효과나 캐시 원인 확정으로 계산하지 않는다.
 사용자 화면의 버튼 가시성은 확인됐고, 새로 시작하는 실제 OAuth 가입/로그인 결과는 대기한다.
+
+## 2026-10-10 PR #403 통합·웹 배포 후 검증
+
+사용자 승인 후 PR #403을 main `82742b84e8`에 통합했다. post-merge CI #38039051314 및
+CodeQL #38039051297 SUCCESS, required CI Gate PASS다. Delivery #38039592334는 LEVEL_3로
+보류했고 정상 Promote #38039708401을 동일 SHA로 실행해 SUCCESS다. 전체관리자와 웹
+Neture·KPA Society·Lecture·Store·KPA Branch의 build/push·새 revision 검증·traffic 전환·
+전환 후 serving SHA report가 통과했다. production status는 위 6개 대상 DEPLOYED다.
+API 배포·migration·schema·키/IAM 변경·force/break-glass는 실행하지 않았다.
+
+| 배포 후 검증 | 결과 | 검증 경계 |
+|---|---|---|
+| 유지 8개 origin × PC/mobile 화면 진입 | 16/16 PASS | 카카오 config 200/true; Lecture는 Neture 계정센터 진입 링크, 다른 7곳은 버튼 가시성 |
+| Neture 홈 modal·Store × PC/mobile × config 실패/지연/명시적 미설정 | 12/12 PASS | 읽기 전용 조회에 합성 장애 주입, 재시도는 실제 운영 200/true로 복구; 명시적 false는 숨김; 인증 쓰기 0 |
+| 공개 API/전체관리자 진입 | 12/12 PASS | 유지 8 origin config true·전체관리자 false, ready 200·비인증 계정 조회 401·전체관리자 로그인 화면 200 |
+| 유지 8개 origin × PC/mobile × 두 역할 Demo UI | 32/32 PASS | 실제 공개 Demo 버튼으로 로그인·Neture 목적지 이동 및 각 서비스 세션 확인 |
+| 업무 역할·세션 폐기 | 매장 경영자 context 16/16 200·공급자 products 16/16 200; 반대 역할/전체관리자 403; logout 후 access/refresh 32/32 401 | Demo 소셜/비밀번호 변경 불가, 별도 Store 세션 유지 2건 200; 테스트가 만든 세션만 정리 |
+
+화면 16건과 config 장애 12건의 합계가 28/28이며 Demo 32건과 별개다. 브라우저 요청은
+정상 TLS 검증을 수행하는 `route.fetch`로 운영 upstream에 전달했다. 인증서 검증 우회 없음.
+합성 config 장애는 실제 운영 장애나 소유자 OAuth 성공으로 계산하지 않는다. GitHub artifact
+다운로드 redirect는 proxy 403으로 미조회이며 workflow jobs/steps와 commit status를 배포 근거로 썼다.
+검증 중 이후 main에 통합된 별도 운영자 진입 변경은 이번 배포 SHA/검증 결과에 포함하지 않는다.
+
+### 실제 소유자 가입 화면·약관 후속
+
+사용자는 카카오 인증 후 추가 정보를 입력하고 적용했을 때 이용약관 화면으로 이동했다고
+보고했다. 단순 약관 링크 클릭으로 가정하지 않는다. canonical 가입 정책·UI/DTO/backend는
+최초 가입에 이메일·이름·개인 모바일을 요구하며 별도 ID/비밀번호 생성과 SMS 본인 인증은 없다.
+이 필수 항목 계약은 PR #403에서 바꾸지 않았다.
+
+코드의 signup submit은 기본 동작을 막고 API를 호출하며 응답은 session 또는 verify-email이다.
+가입 API에 `/terms` redirect는 없다. LoginModal의 저장된 returnUrl 복귀와 별도
+`pendingPolicyAcceptances`/`TermsAcceptanceGate` 경로, 가입의 `tosAcceptedAt` 기록과
+서비스 membership 기반 `user_policy_acceptances` 계약을 후속 조사한다. 실제 사용자
+membership/pending 상태를 조회하지 않았으므로 제보의 원인으로 확정하지 않는다.
+가입 입력/버튼 표시와 checkbox label 내부 약관 링크도 수정안 대상이다.
+
+- [ ] 추가 정보 제출·로그인·가입 완료 후 목적지와 약관 요구를 코드/브라우저로 재현하고 수정.
+- [ ] 가입 입력/버튼 가독성, 별도 약관 내용 보기 및 동의, 입력 상태 보존을 검토·구현.
+- [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스 명칭과 리팩터링 이전 내용을 현행 서비스 기준으로 정리하고 사용자 검토 후 새 정책 버전 게시.
+- [ ] 실제 소유자 Google/Kakao 가입·로그인·명시적 연결·취소·충돌 PC/mobile 검증.
+
+정책 본문/버전은 이번에 수정·게시하지 않았다. 실제 소유자 가입/계정 연결 완료와 약관
+반복 문제는 OPEN이다. 전체관리자 Google 전용 및 동일 이메일 자동 병합 금지는 유지한다.

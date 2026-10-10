@@ -123,7 +123,8 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 - [x] 로딩 상태·10초 응답 제한·오류 안내·명시적 조회 재시도 추가. 명시적 enabled=false 숨김 유지, 이전 응답·unmount timer 무효화; 재시도는 읽기만 수행.
 - [x] auth-react 15 files/174 PASS, Neture 모달 2 files/13 PASS, 전체 frontend type-check·대상 lint·Neture/Store build PASS.
 - [x] 로컬 실제 Neture 홈 modal·Store LoginMethods × PC/mobile × 실패/지연/미설정 12/12 PASS. 합성 config fixture이며 운영 OAuth 성공으로 확장하지 않음.
-- [ ] 새 PR required CI·review → 사용자 main 통합 승인 → 해당 웹 배포 → 사용자 버튼 미노출 및 실제 OAuth 재검증.
+- [x] PR #403 required CI·review 확인 → 사용자 승인 → main `82742b84e8` 통합 → Promote #38039708401 웹 6개 대상 배포 SUCCESS. post-merge CI/CodeQL PASS; 화면 16·config 장애/재시도 12·공개 API 12·Demo 32건 PASS.
+- [ ] 실제 소유자 가입·로그인·명시적 연결 완료 및 추가 정보 적용 후 약관 화면 이동 재현·수정. 설정 UI 복구 배포와 구분.
 
 소비처 매트릭스·최초 browser harness 조건 오류와 정정은 CHECK에 기록한다. 개인정보 처리방침
 표시/내용 수정 및 실제 계정 연결은 이 UI 복구 변경의 완료 항목이 아니다.
@@ -131,3 +132,19 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 사용자 후속 확인: 새로고침 뒤 홈 카카오 버튼이 보인다. 새 UI는 아직 미배포이며 실제
 조회 실패 원인은 미확정이다. 현재 사용자 버튼 가시성 확인과 PR 웹 배포 후 회귀 및
 실제 OAuth 완료를 구분한다.
+
+## 2026-10-10 PR #403 배포 완료 및 가입/약관 후속
+
+위 미배포 서술은 당시 관측이다. 이제 PR #403의 main 통합·웹 배포·운영 회귀는 완료했다.
+API/migration/IAM 변경 없이 전체관리자 및 웹 5개를 정상 Promote로 배포했다.
+세부 결과는 [CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md#2026-10-10-pr-403-통합웹-배포-후-검증)를 따른다.
+검증 기록은 같은 WO의 연속 Phase이며 세 문서만 변경한다. 기존 branch/checkout은
+실제 소유자 인증과 가입·약관 후속이 남아 KEEP한다.
+
+- [x] 공개 Demo 버튼으로 유지 8개 origin × PC/mobile × 두 역할 32/32 확인: 매장 경영자 업무 16/16 200·공급자 업무 16/16 200, 반대 역할/전체관리자 거절, Demo 변경 차단, logout access/refresh 401 및 별도 Store 세션 유지.
+- [x] 최초 가입의 이메일·이름·모바일 필수 계약 확인. 별도 ID/비밀번호 생성·SMS 본인 인증 없음; PR #403에서 계약 변경 없음.
+- [x] signup submit/API의 직접 `/terms` redirect 부재, 저장된 returnUrl 복귀 및 별도 pending policy gate를 코드로 조사. 실제 제보 원인은 미확정.
+- [ ] 추가 정보 적용 후 목적지·약관 gate를 재현하고 중복/반복을 수정. 실제 사용자 상태 미조회이며 원인을 단정하지 않음.
+- [ ] 공통 가입 입력·버튼 표시, 약관 내용 보기/동의 분리 및 입력 상태 보존 수정안 구현·검증.
+- [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스·이전 내용 정리안 작성 → 사용자 검토 → 승인된 새 정책 버전 게시. 이번 기록 변경에서는 본문/버전 미수정.
+- [ ] 실제 소유자 Google/Kakao 가입·로그인·연결·취소·충돌 PC/mobile 검증.
