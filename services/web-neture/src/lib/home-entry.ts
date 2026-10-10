@@ -289,7 +289,10 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
     //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
     //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
-    api.get('/communities').catch(() => null),
+    api.get('/communities').catch((error: unknown) => {
+      if ((error as { response?: { status?: number } })?.response?.status === 404) return null;
+      throw error;
+    }),
   ]);
   const services = servicesRes.data?.data?.services;
   const entry = entryRes.data?.data;

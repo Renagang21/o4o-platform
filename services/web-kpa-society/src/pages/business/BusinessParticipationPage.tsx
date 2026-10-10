@@ -17,12 +17,13 @@ export default function BusinessParticipationPage() {
   useEffect(() => {
     let alive = true;
     setLoading(true); setError(''); setMembership(null); setAccepted(false);
+    if (access?.canManage) { setLoading(false); return; }
     businessApi.get<BusinessMembership[]>(`${pharmacyApiBase}/semi-franchises`)
       .then(rows => { if (alive) setMembership(rows.find(row => row.key === business.key) ?? null); })
       .catch(e => { if (alive) setError(businessError(e)); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [business.key, version]);
+  }, [business.key, access?.canManage, version]);
   const apply = async () => {
     if (!accepted || busy || !membership) return;
     setBusy(true); setError('');

@@ -10,12 +10,15 @@
  * WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
  *   복제 마크업을 공통 @o4o/ui NotFound 로 교체.
  *
- * 이 화면은 API 를 호출하지 않는다. 레이아웃(NetureLayout 등)에도 속하지 않는다 —
- * 레이아웃이 요구하는 컨텍스트(인증·역할)가 없는 경로에서도 항상 렌더돼야 하기 때문이다.
+ * 업무 접근 가드 없이 안내하며, 메인 복귀를 선택할 때만 현재 계정의 인증을 인계한다.
  */
 
 import { NotFound } from '@o4o/ui';
+import { O4OHomeButton } from '@o4o/auth-react';
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../lib/apiClient';
 
 export default function NotFoundPage() {
-  return <NotFound />;
+  const { isAuthenticated, isLoading } = useAuth();
+  return <NotFound><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></NotFound>;
 }

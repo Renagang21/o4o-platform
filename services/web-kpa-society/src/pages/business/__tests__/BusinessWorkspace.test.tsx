@@ -64,6 +64,12 @@ describe('사업 서비스의 참가자 공간', () => {
       acceptedConditions: true, conditions: '참여 조건', note: '',
     }));
   });
+  it('담당 운영자에게 약국 소유자 전용 가입 조회를 요구하지 않는다', async () => {
+    mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, canManage: true } : business));
+    mount('/businesses/pharmacy/participation'); expect(await screen.findByText('이 사업의 담당 운영자입니다.')).toBeTruthy();
+    expect(screen.getByRole('link', { name: '사업 운영 · 가입 심사' })).toBeTruthy();
+    expect(mocks.get.mock.calls.some(([path]) => path.endsWith('/semi-franchises'))).toBe(false);
+  });
   it('미승인 사용자는 사업 자료 API를 호출하지 않는다', async () => {
     mount('/businesses/pharmacy/materials'); expect(await screen.findByText('사업 참여 승인 후 자료를 이용할 수 있습니다.')).toBeTruthy();
     expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
