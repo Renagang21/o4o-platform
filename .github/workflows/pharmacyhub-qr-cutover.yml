@@ -25,7 +25,7 @@ on:
         type: string
         required: false
       probe_paths:
-        description: '(optional) four active relative paths; leave empty to collect from the read-only production inventory'
+        description: '(optional) real QR and tablet paths; other families optional; blank collects read-only inventory'
         type: string
         required: false
 
