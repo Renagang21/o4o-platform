@@ -44,6 +44,7 @@ export type LifecycleErrorCode =
   | 'MEMBERSHIP_NOT_FOUND'
   | 'MEMBERSHIP_NOT_PENDING'
   | 'SERVICE_MEMBERSHIP_SUSPENDED'
+  | 'SERVICE_MEMBERSHIP_NOT_ACTIVE'
   | 'REQUEST_FORBIDDEN'
   | typeof DEMO_ACCOUNT_FORBIDDEN_CODE;
 
@@ -177,8 +178,8 @@ export class CommunityLifecycleService {
         return { outcome: 'slug_conflict' as const, slug: request.desiredSlug };
       }
 
-      // 정지된 신청자를 개설 승인으로 되살리지 않는다 — 커뮤니티를 만들기 전에 판정한다.
-      await assertNotSuspended(m, request.requesterUserId, '신청자');
+      // 최초 가입만 생성하고 기존 서비스 처분은 유지한다. 개체를 만들기 전에 잠근다.
+      await ensureServiceMembership(m, request.requesterUserId);
 
       const community = await m.getRepository(Community).save(
         m.getRepository(Community).create({
@@ -203,9 +204,6 @@ export class CommunityLifecycleService {
           approvedAt: new Date(),
         }),
       );
-
-      // 진입 자격(가입). 없으면 자기 커뮤니티 관리 화면에서 막힌다(V8).
-      await ensureServiceMembership(m, request.requesterUserId);
 
       request.status = 'approved';
       request.reviewedByUserId = input.reviewerUserId;
@@ -255,15 +253,12 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityMembership);
       const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
-      // 정지된 가입자를 가입 승인으로 되살리지 않는다 — 신청은 pending 으로 남고 거절할 수 있다.
-      await assertNotSuspended(m, membership.userId, '신청자');
+      // 기존 서비스 처분을 개별 승인으로 해제하지 않는다. 실패하면 신청은 pending 으로 남는다.
+      await ensureServiceMembership(m, membership.userId);
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;
       membership.approvedAt = new Date();
-      const saved = await repo.save(membership);
-
-      await ensureServiceMembership(m, membership.userId);
-      return saved;
+      return repo.save(membership);
     });
   }
 
@@ -323,7 +318,7 @@ export class CommunityLifecycleService {
    * 가입 심사 화면용 목록 — 그 커뮤니티 행만, 신청자 이름 · **가린 이메일** · 서비스 가입 상태와 함께.
    *
    * 심사자는 서비스 전체 관리자가 아니라 **개체 운영자**(같은 커뮤니티의 회원)다. 신청자를 알아볼 만큼만
-   * 보여 주고 이메일 원문은 주지 않는다. `serviceMembershipStatus='suspended'` 면 승인은 409 로 막힌다.
+   * 보여 주고 이메일 원문은 주지 않는다. 기존 서비스 가입이 비활성이면 승인은 409 로 막힌다.
    */
   async listMembershipsForReview(input: {
     communityId: string;
@@ -418,37 +413,28 @@ export function maskEmail(email: unknown): string | null {
 }
 
 /**
- * 커뮤니티 서비스 가입이 정지(suspended)면 승인하지 않는다.
- *
- * `ensureServiceMembership` 은 active 로 upsert 한다. 정지 행을 그대로 두면 가입·개설 승인이
- * **정지 처분을 되살리는 우회 경로**가 된다. 운영자 지정 경로(SERVICE_MEMBERSHIP_NOT_ACTIVE)와 같은 방향이다.
- */
-async function assertNotSuspended(m: EntityManager, userId: string, who: string): Promise<void> {
-  const rows: Array<{ status: string }> = await m.query(
-    `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-    [userId, COMMUNITY_SERVICE_KEY],
-  );
-  if (rows?.[0]?.status === 'suspended') {
-    throw new CommunityLifecycleError(
-      'SERVICE_MEMBERSHIP_SUSPENDED',
-      `${who}의 커뮤니티 서비스 이용이 정지된 상태라 승인할 수 없습니다. 거절하거나 정지를 먼저 해소하세요.`,
-      409,
-    );
-  }
-}
-
-/**
- * `service_memberships('community')` 를 active 로 만든다(없으면 생성).
- *
- * **이것은 가입이지 운영 권한이 아니다.** 새 `community` 서비스 키에 가입 검사가 붙으므로,
- * 이 행이 없으면 개체 운영자여도 화면 진입에서 막힌다(V8). 역할은 여전히 개체 단위다.
+ * 최초 서비스 가입만 생성한다. 기존 pending/반려/정지/탈퇴 상태의 변경은
+ * 서비스 회원 관리에서 수행하며 개별 커뮤니티 승인으로 복구하지 않는다.
+ * 충돌 시 UPDATE 하지 않고 현재 행을 잠가 확인하므로 동시 정지를 덮어쓰지 않는다.
+ * 호출자는 같은 트랜잭션에서 이 확인 후 개설/가입 승인을 저장한다.
  */
 async function ensureServiceMembership(m: EntityManager, userId: string): Promise<void> {
   await m.query(
     `INSERT INTO service_memberships (user_id, service_key, status, created_at, updated_at)
      VALUES ($1, $2, 'active', NOW(), NOW())
-     ON CONFLICT (user_id, service_key)
-     DO UPDATE SET status = 'active', updated_at = NOW()`,
+     ON CONFLICT (user_id, service_key) DO NOTHING`,
     [userId, COMMUNITY_SERVICE_KEY],
+  );
+  const rows: Array<{ status: string }> = await m.query(
+    `SELECT status FROM service_memberships
+      WHERE user_id = $1 AND service_key = $2 FOR UPDATE`,
+    [userId, COMMUNITY_SERVICE_KEY],
+  );
+  const status = rows?.[0]?.status;
+  if (status === 'active') return;
+  throw new CommunityLifecycleError(
+    status === 'suspended' ? 'SERVICE_MEMBERSHIP_SUSPENDED' : 'SERVICE_MEMBERSHIP_NOT_ACTIVE',
+    '신청자의 커뮤니티 서비스 가입이 활성 상태가 아닙니다. 서비스 회원 관리에서 처리한 뒤 승인해 주세요.',
+    409,
   );
 }

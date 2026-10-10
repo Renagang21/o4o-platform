@@ -1,6 +1,32 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { collectProbes, queries } from './pharmacy-hub-qr-probes.mjs';
+import { collectProbes, queries, safeInventoryError, readPassword } from './pharmacy-hub-qr-probes.mjs';
+
+test('failed secret subprocess never exposes captured output or original stack', () => {
+  assert.throws(() => readPassword(() => {
+    throw Object.assign(new Error('private secret'), { stdout: 'private password', stderr: 'private details' });
+  }), error => {
+    assert.match(error.message, /stage=read-secret; code=UNKNOWN/);
+    assert.doesNotMatch(error.stack, /private/);
+    assert.equal(error.stdout, undefined);
+    return true;
+  });
+});
+
+test('rollback failure preserves the failed query and network code', async () => {
+  await assert.rejects(collectProbes({ query: async sql => {
+    if (queries.includes(sql)) throw Object.assign(new Error('private row'), { code: 'ECONNRESET' });
+    if (sql === 'ROLLBACK') throw new Error('private rollback');
+    return { rows: [] };
+  } }), /stage=query-1; code=ECONNRESET/);
+});
+
+test('diagnostics expose only a known code and fixed stage, never database error contents', () => {
+  const error = { code: '28P01', message: 'private credential', detail: 'private row', stack: 'private stack' };
+  assert.match(safeInventoryError(error, 'connect').message, /stage=connect; code=28P01/);
+  assert.doesNotMatch(safeInventoryError(error, 'connect').stack, /private/);
+  assert.match(safeInventoryError({ code: 'private credential' }, 'connect').message, /code=UNKNOWN/);
+});
 test('collects only existing active paths in a rolled-back read-only transaction', async () => {
   const statements = [];
   let index = 0;
