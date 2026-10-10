@@ -41,6 +41,8 @@
 
 ## 자격정보 재조사
 
-사용자 스크린샷으로 원본 경로 `docs/local/TEST-ACCOUNTS.local.md`와 문서 제목 `O4O Platform — 테스트 계정 (Identity V2 구조)`를 확인했다. 이 경로는 gitignore 대상이므로 사용자 로컬 파일은 클라우드 clone에 자동 전달되지 않는다. SETUP과 AGENTS에 발견·확보 절차를 보강했다. 현재 클라우드에는 해당 파일 내용이 없어 인증 후 검증은 아직 대기 중이다.
+사용자 스크린샷으로 원본 경로 `docs/local/TEST-ACCOUNTS.local.md`와 문서 제목 `O4O Platform — 테스트 계정 (Identity V2 구조)`를 확인했다. 사용자는 이 파일을 클라우드에서 만들었다고 확인했다. 이 경로는 gitignore 대상이므로 파일이 생성된 클라우드와 현재 실행 환경이 달라졌다면 Git clone만으로 복원되지 않는다. SETUP과 AGENTS에 발견·확보 절차를 보강했다. 현재 클라우드에는 해당 파일 내용이 없어 인증 후 검증은 아직 대기 중이다.
 
 사용자의 재검색 지시에 따라 기본 checkout·작업 clone·workspace 임시 검증 스크립트·로컬 설정 후보를 재조사했다. 과거 운영자 이메일과 로그인 검증 기록은 발견했으나 현재 로그인 자격정보는 확인되지 않았다. `CHECK-O4O-BOUNDARY-POLICY-OPERATIONAL-SMOKE-V1`에는 기본 seed 비밀번호로 운영 로그인이 401이었던 기록이 있다. `scripts/verify/verify-ai-content-modal.mjs`는 `TEST_EMAIL`·`TEST_PASSWORD` 환경변수를 요구하며 값을 내장하지 않는다. 현재 해당 환경변수는 설정되어 있지 않다. 기존 workspace 브라우저 검증 스크립트는 mock 인증용이다. demo 계정은 운영자 권한이 없는 별도 계정이므로 대체하지 않는다.
+
+현재 실행 환경의 workspace·임시 조사 checkout·home·mount 경로를 다시 검색했으나 해당 파일은 발견되지 않았다. 사용자 PC에만 있다는 이전 추정은 철회한다. 파일을 생성한 클라우드 환경과 현재 환경이 같은지, 이전 작업 산출물에 보존되었는지는 미확인이다.
