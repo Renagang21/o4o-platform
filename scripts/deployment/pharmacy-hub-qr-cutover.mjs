@@ -30,11 +30,13 @@ export function validateHosts(map) {
 
 export function parseProbes(raw) {
   const paths = raw.split(/\r?\n/).map(p => p.trim()).filter(Boolean);
-  if (paths.length !== printedQrPaths.length) throw new Error('Supply one real active path for each of the four QR route families.');
+  if (paths.length < 2 || paths.length > printedQrPaths.length) throw new Error('Supply real QR and tablet paths, with optional multilingual and affiliate paths.');
   for (const prefix of printedQrPaths.map(p => p.slice(0, -1))) {
-    if (paths.filter(p => p.startsWith(prefix)).length !== 1) throw new Error('Each QR route family must appear exactly once.');
+    const count = paths.filter(p => p.startsWith(prefix)).length;
+    if (count > 1 || (['/qr/', '/tablet/'].includes(prefix) && count !== 1)) throw new Error('QR and tablet are required; each family may appear at most once.');
   }
   for (const p of paths) {
+    if (!printedQrPaths.some(pattern => p.startsWith(pattern.slice(0, -1)))) throw new Error('Unknown QR route family.');
     const url = new URL(p, `https://${newHost}`);
     if (url.host !== newHost || !p.startsWith('/') || p.includes('\\') || url.hash || url.username || url.password || /[\s<>]/.test(p) || /(?:^|\/)\.{1,2}(?:\/|\?|$)|%2e|%2f|%5c/i.test(p)) {
       throw new Error('Probe must be a relative public path without credentials or fragments.');
@@ -42,6 +44,12 @@ export function parseProbes(raw) {
     if (!url.pathname.split('/').at(-1)) throw new Error('Probe requires a real slug or public key.');
   }
   return paths;
+}
+
+export function missingFamilyRuleProbes(paths) {
+  return ['/multilingual-products/', '/foreign-visitor/affiliate/']
+    .filter(prefix => !paths.some(path => path.startsWith(prefix)))
+    .map(prefix => `${prefix}__ph_retirement_rule_check__?ruleCheck=1`);
 }
 
 export async function verifyTargets(paths, request = fetch, signal) {
@@ -53,9 +61,9 @@ export async function verifyTargets(paths, request = fetch, signal) {
   }));
 }
 
-export async function verifyRedirects(paths, request = fetch, signal) {
+export async function verifyRedirects(paths, request = fetch, signal, rulePaths = []) {
   await verifyTargets(paths, request, signal);
-  await Promise.all(paths.map(async path => {
+  await Promise.all([...paths, ...rulePaths].map(async path => {
     const target = new URL(path, `https://${newHost}`).href;
     await Promise.all(oldHosts.map(async host => {
       const response = await request(new URL(path, `https://${host}`).href, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
@@ -95,6 +103,7 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
   if (mode === 'plan') return { mode, applied: false };
   if (mode !== 'apply') throw new Error('Unknown cutover mode.');
   const paths = parseProbes(probes);
+  const rulePaths = missingFamilyRuleProbes(paths);
   await preflight?.(paths);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');
@@ -104,11 +113,11 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
     // replace must submit this fingerprint to the Compute API (optimistic lock).
     changed = true; // includes uncertain network outcomes after submission
     await replace(draft, before.fingerprint);
-    await verify(paths);
+    await verify(paths, rulePaths);
     const after = await read();
     if (!isDeepStrictEqual(clean(after), draft)) throw new Error('URL map changed during verification.');
     await save('after.json', after);
-    return { mode, applied: true, httpVerified: true };
+    return { mode, applied: true, httpVerified: true, activeFamiliesVerified: paths.length, ruleOnlyFamiliesVerified: rulePaths.length };
   } catch (error) {
     if (error.pendingOperation) throw error; // never infer no write from an unchanged map while update may be pending
     if (changed) {
@@ -184,11 +193,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       await writeFile(`${output}/operation-${requestId}.json`, JSON.stringify({ requestId, operation: operation.name }), { mode: 0o600 });
       await settleOperation(operation.name, name => api(`https://compute.googleapis.com/compute/v1/projects/${project}/global/operations/${name}`));
     },
-    verify: async paths => {
+    verify: async (paths, rulePaths) => {
       // Allow load balancer propagation; each probe attempt is bounded.
       const signal = AbortSignal.timeout(120000);
       for (let attempt = 0; attempt < 6; attempt++) {
-        try { await verifyRedirects(paths, fetch, signal); return; } catch (error) {
+        try { await verifyRedirects(paths, fetch, signal, rulePaths); return; } catch (error) {
           if (attempt === 5 || signal.aborted) throw error;
           await new Promise(resolve => setTimeout(resolve, 10000));
         }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError } from './pharmacy-hub-qr-cutover.mjs';
+import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
 
 test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
   const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
@@ -46,6 +46,39 @@ test('apply preserves unrelated configuration and checks real paths', async () =
   assert.equal(h.writes.length, 1);
   assert.deepEqual(h.writes[0].hostRules, original().hostRules);
   assert.equal(h.writes[0].pathMatchers[0].defaultService, 'backend-pharmacy-hub-web');
+});
+test('retirement applies with real QR and tablet and checks absent families as rules only', async () => {
+  const h = harness();
+  const active = paths.slice(0, 2);
+  const rules = missingFamilyRuleProbes(active);
+  const requests = [];
+  const result = await runCutover({ ...h.options, probes: active.join('\n'),
+    verify: async (actual, rulePaths) => {
+      assert.deepEqual(actual, active);
+      assert.deepEqual(rulePaths, rules);
+      await verifyRedirects(actual, async url => {
+        const u = new URL(url); requests.push(u);
+        if (u.host === 'pharmacy.neture.co.kr') return new Response(null, { status: 200 });
+        return new Response(null, { status: 302, headers: { location: `https://pharmacy.neture.co.kr${u.pathname}${u.search}` } });
+      }, undefined, rulePaths);
+    } });
+  assert.equal(result.activeFamiliesVerified, 2);
+  assert.equal(result.ruleOnlyFamiliesVerified, 2);
+  assert.equal(requests.filter(u => u.host === 'pharmacy.neture.co.kr').length, 2);
+  assert.equal(requests.filter(u => u.host !== 'pharmacy.neture.co.kr').length, 8);
+  assert.equal(h.writes.length, 1);
+});
+test('failed missing-family redirect rule still triggers verified rollback', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, probes: paths.slice(0, 2).join('\n'), verify: async () => {
+    await verifyRedirects(paths.slice(0, 2), async url => {
+      const u = new URL(url);
+      if (u.host === 'pharmacy.neture.co.kr') return new Response(null, { status: 200 });
+      if (u.pathname.includes('__ph_retirement_rule_check__')) return new Response(null, { status: 404 });
+      return new Response(null, { status: 302, headers: { location: `https://pharmacy.neture.co.kr${u.pathname}${u.search}` } });
+    }, undefined, missingFamilyRuleProbes(paths.slice(0, 2)));
+  } }), /302 redirect/);
+  assert.equal(h.writes.length, 2);
 });
 test('verification failure restores and verifies the original configuration', async () => {
   const h = harness();
@@ -101,6 +134,9 @@ test('unrelated hosts and missing active probe families fail closed', () => {
   assert.throws(() => parseProbes(paths.slice(1).join('\n')));
   assert.throws(() => parseProbes(paths.map(p => p.startsWith('/qr/') ? '//outside.example/qr/x' : p).join('\n')));
   assert.deepEqual(parseProbes(paths.join('\n')), paths);
+  assert.deepEqual(parseProbes(paths.slice(0, 2).join('\n')), paths.slice(0, 2));
+  assert.throws(() => parseProbes([paths[0], paths[1], paths[0]].join('\n')));
+  assert.throws(() => parseProbes([paths[0], paths[1], '/other/x'].join('\n')));
 });
 test('both root and www must return 302 with the original path and query intact', async () => {
   let calls = 0;
