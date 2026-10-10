@@ -1,3 +1,4 @@
+import { recordSignupTerms, type SignupTermsReference } from './signup-policy.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * EmailAuthService — 이메일·비밀번호 가입 · 확인 · 로그인 · 재설정 · 아이디 찾기
@@ -159,11 +160,12 @@ export interface EmailAuthRequestMeta {
 }
 
 export interface EmailSignupInput extends EmailAuthRequestMeta {
+  policyServiceKey?: string;
   email: string;
   password: string;
   name: string;
   phone: string;
-  consents: { terms: boolean; privacy: boolean; marketing?: boolean };
+  consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference };
 }
 
 export interface EmailLoginInput extends EmailAuthRequestMeta {
@@ -380,6 +382,7 @@ export class EmailAuthService {
         throw error;
       }
       await this.passwords.setPassword(created.id, input.password, manager);
+      await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
       return created;
     });
 

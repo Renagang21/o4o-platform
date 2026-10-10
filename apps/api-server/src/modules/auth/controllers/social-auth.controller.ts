@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 import type { Request, Response } from 'express';
 import { timingSafeEqual } from 'node:crypto';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
@@ -18,6 +19,7 @@ export class SocialAuthController extends BaseController {
   private static async respond(res:Response,operation:()=>Promise<unknown>):Promise<unknown> {
     res.set('Cache-Control','no-store');
     try {return await operation();}catch(error){
+      if(error instanceof PolicyAcceptanceError)return BaseController.error(res,error.message,error.httpStatus,error.code);
       if(error instanceof SocialAuthError)return res.status(error.statusCode).json({success:false,error:error.message,code:error.code,...(error.serviceAccess?{serviceAccess:error.serviceAccess}:{})});
       if(error instanceof GoogleIdTokenError)return BaseController.unauthorized(res,'Google 인증을 다시 진행해 주세요.',error.code);
       // Never emit error messages/stacks from provider HTTP calls, queries or credential comparisons.

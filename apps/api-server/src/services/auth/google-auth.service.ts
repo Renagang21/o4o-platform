@@ -1,3 +1,4 @@
+import { recordSignupTerms, type SignupTermsReference } from './signup-policy.service.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
@@ -137,6 +138,7 @@ export class GoogleAuthError extends Error {
 }
 
 export interface GoogleSignupConsents {
+  termsPolicy?: SignupTermsReference;
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
@@ -169,6 +171,7 @@ export interface GoogleLoginInput extends GoogleAuthRequestMeta {
 }
 
 export interface GoogleSignupInput extends GoogleAuthRequestMeta {
+  policyServiceKey?: string;
   idToken: string;
   consents: GoogleSignupConsents;
 }
@@ -293,7 +296,11 @@ export class GoogleAuthService {
 
     if (typeof input.consents.name !== 'string' || !input.consents.name.trim() || input.consents.name.trim().length > 100) throw new GoogleAuthError('INVALID_NAME');
     if (!isPhoneShapeValid(input.consents.phone)) throw new GoogleAuthError('INVALID_PHONE');
-    const user = await this.dataSource.transaction((manager) => this.createGoogleUser(manager, identity, input.consents));
+    const user = await this.dataSource.transaction(async (manager) => {
+      const created = await this.createGoogleUser(manager, identity, input.consents);
+      await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
+      return created;
+    });
 
     return this.establishSession(user, input, true);
   }

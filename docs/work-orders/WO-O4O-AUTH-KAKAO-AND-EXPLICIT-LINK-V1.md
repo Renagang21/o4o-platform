@@ -123,7 +123,8 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 - [x] 로딩 상태·10초 응답 제한·오류 안내·명시적 조회 재시도 추가. 명시적 enabled=false 숨김 유지, 이전 응답·unmount timer 무효화; 재시도는 읽기만 수행.
 - [x] auth-react 15 files/174 PASS, Neture 모달 2 files/13 PASS, 전체 frontend type-check·대상 lint·Neture/Store build PASS.
 - [x] 로컬 실제 Neture 홈 modal·Store LoginMethods × PC/mobile × 실패/지연/미설정 12/12 PASS. 합성 config fixture이며 운영 OAuth 성공으로 확장하지 않음.
-- [ ] 새 PR required CI·review → 사용자 main 통합 승인 → 해당 웹 배포 → 사용자 버튼 미노출 및 실제 OAuth 재검증.
+- [x] PR #403 required CI·review 확인 → 사용자 승인 → main `82742b84e8` 통합 → Promote #38039708401 웹 6개 대상 배포 SUCCESS. post-merge CI/CodeQL PASS; 화면 16·config 장애/재시도 12·공개 API 12·Demo 32건 PASS.
+- [ ] 실제 소유자 가입·로그인·명시적 연결 완료 및 추가 정보 적용 후 약관 화면 이동 재현·수정. 설정 UI 복구 배포와 구분.
 
 소비처 매트릭스·최초 browser harness 조건 오류와 정정은 CHECK에 기록한다. 개인정보 처리방침
 표시/내용 수정 및 실제 계정 연결은 이 UI 복구 변경의 완료 항목이 아니다.
@@ -131,3 +132,40 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 사용자 후속 확인: 새로고침 뒤 홈 카카오 버튼이 보인다. 새 UI는 아직 미배포이며 실제
 조회 실패 원인은 미확정이다. 현재 사용자 버튼 가시성 확인과 PR 웹 배포 후 회귀 및
 실제 OAuth 완료를 구분한다.
+
+## 2026-10-10 PR #403 배포 완료 및 가입/약관 후속
+
+위 미배포 서술은 당시 관측이다. 이제 PR #403의 main 통합·웹 배포·운영 회귀는 완료했다.
+API/migration/IAM 변경 없이 전체관리자 및 웹 5개를 정상 Promote로 배포했다.
+세부 결과는 [CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md#2026-10-10-pr-403-통합웹-배포-후-검증)를 따른다.
+검증 기록은 같은 WO의 연속 Phase이며 세 문서만 변경한다. 기존 branch/checkout은
+실제 소유자 인증과 가입·약관 후속이 남아 KEEP한다.
+
+- [x] 공개 Demo 버튼으로 유지 8개 origin × PC/mobile × 두 역할 32/32 확인: 매장 경영자 업무 16/16 200·공급자 업무 16/16 200, 반대 역할/전체관리자 거절, Demo 변경 차단, logout access/refresh 401 및 별도 Store 세션 유지.
+- [x] 최초 가입의 이메일·이름·모바일 필수 계약 확인. 별도 ID/비밀번호 생성·SMS 본인 인증 없음; PR #403에서 계약 변경 없음.
+- [x] signup submit/API의 직접 `/terms` redirect 부재와 returnUrl·pending policy gate 조사. Neture `TermsAcceptanceGate`는 공통 `PolicyAcceptanceGate` wrapper다.
+- [x] P1 canonical 위반 확정: 카카오 UI/client/DTO에 published 문서 ID/version이 없고 signup transaction은 `tosAcceptedAt`만 기록하며 `user_policy_acceptances` 저장을 누락. 실제 제보된 화면 이동의 직접 원인 확인과 별개인 구현 blocker다.
+- [x] P1 코드/격리 검증: 카카오·이메일·Google published 약관 ID/version 전달·서버 재검증·user/provider/credential 생성과 원자적인 acceptance 저장. 이전 버전/게시 변경/다른 서비스/저장 실패 rollback, 신규 acceptance의 pending 판정 확인. 서비스 membership/권한 자동 생성 없음. main 통합·운영 검증은 아래 별도 TODO.
+- [ ] 추가 정보 적용 후 목적지·약관 gate를 재현하고 중복/반복을 수정. 실제 사용자 상태 미조회이며 원인을 단정하지 않음.
+- [x] 공통 가입 입력·버튼 표시, 약관 내용 보기/동의 분리 및 입력 상태 보존 구현·로컬 PC/mobile 검증. 정책 본문은 변경하지 않음.
+- [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스·이전 내용 정리안 작성 → 사용자 검토 → 승인된 새 정책 버전 게시. 이번 기록 변경에서는 본문/버전 미수정.
+- [ ] 실제 소유자 Google/Kakao 가입·로그인·연결·취소·충돌 PC/mobile 검증.
+
+## 2026-10-10 가입 약관 acceptance P1 구현
+
+동일 WO의 연속 Phase로 기존 격리 checkout/branch를 유지한다. 기존 기록 PR #407을
+실제 가입 약관 수정까지 확장한다. 구현은 정본의 ID/version 재검증 및 원자 저장 계약을 따른다.
+
+- [x] 카카오 외 이메일/Google 동일 누락 확인 및 공통 서버 저장 helper 연결.
+- [x] 공개 읽기 `/auth/signup/terms`: 현재 게시 문서 ID/version 제공; origin catalog로 적용 약관 선택, 임의 body serviceKey 거부. Society는 Society 약관, 나머지 지원 가입 origin은 Neture 계정센터 약관. 전체관리자/은퇴/미등록 origin 거부.
+- [x] signup transaction에서 현재 게시/type/service/version 확인 후 acceptance에 hash·시각 저장. 문서 row lock을 유지하며 실패 시 계정·provider/password·카카오 일회 grant를 함께 rollback. 기존 operator 초대의 `createGoogleUser`는 공개 가입과 별도 계약 유지.
+- [x] 약관 로딩/오류/10초 제한/읽기 재시도 및 동의 비활성화; 버전 변경 시 재조회·재동의, 입력값 보존. 내용 링크와 체크박스 분리, 새 창 표시.
+- [x] API 단위/격리 PostgreSQL·공통 React/client·실제 로컬 웹 build PC/mobile 검증. 상세 수치·최초 fixture 정정은 CHECK 참조.
+- [ ] 최신 PR head의 required CI/review 및 사용자 승인 후 main 통합·API/웹 배포. 기존 웹은 새 필수 termsPolicy를 보내지 않으므로 API/웹 연속 배포가 필요하며, 전환 중 구 웹의 가입은 fail-closed다.
+- [ ] 배포 후 유지 8개 origin × PC/mobile regression 및 실제 소유자 가입/로그인/연결/취소. 합성 API/provider 검증을 실제 OAuth 완료로 계산하지 않음.
+- [ ] 실제 사용자 추가 정보 제출 후 이동 원인의 운영 재검증. 원자 저장 누락 수정만으로 사용자 사례 해결을 확정하지 않음.
+- [ ] 승인된 새 약관/개인정보 처리방침 본문 및 버전 게시; 이전 정책 내용 정리안 검토.
+
+최신 구현 리뷰 P2 후속: 공개 client/React의 termsPolicy 및 가입 약관 loader를 필수 타입으로 정렬했다.
+직접 compiler fixture에서 정상 계약 0 오류, 누락 7건 모두 TS2741 예상 오류를 확인했다.
+소비처 타입 검사·회귀 및 새 head CI/review 후 승인된 main 통합/배포를 이어간다.
