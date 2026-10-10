@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { collectDemoStoreCensus, queries } from './demo-store-census.mjs';
+import { collectDemoStoreCensus, queries, scopedCountQuery } from './demo-store-census.mjs';
 
 function fakeClient(overrides = {}) {
   const calls = [];
@@ -14,7 +14,7 @@ function fakeClient(overrides = {}) {
       { table_name: 'store_assets', column_name: 'organization_id' },
       { table_name: 'store_assets', column_name: 'created_by' },
     ] };
-    if (sql.startsWith('SELECT count(*)')) return { rows: [{ count: 15 }] };
+    if (sql.startsWith('WITH demo_orgs')) return { rows: [{ count: 15, store_demo_count: 10, supplier_demo_count: 0, unlinked_to_demo_count: 5 }] };
     return { rows: [] };
   } };
   return { client, calls };
@@ -24,11 +24,11 @@ test('inventory is one rolled-back read-only transaction and counts each table o
   const { client, calls } = fakeClient();
   const result = await collectDemoStoreCensus(client);
   assert.equal(result.readOnly, true);
-  assert.deepEqual(result.tableCounts, [{ table: 'store_assets', count: 15 }]);
+  assert.deepEqual(result.tableCounts, [{ table: 'store_assets', count: 15, store_demo_count: 10, supplier_demo_count: 0, unlinked_to_demo_count: 5 }]);
   assert.equal(calls[0], 'BEGIN READ ONLY');
   assert.equal(calls.at(-1), 'ROLLBACK');
-  assert.equal(calls.filter(sql => sql.startsWith('SELECT count(*)')).length, 1);
-  assert.ok(calls.every(sql => /^(SELECT|BEGIN READ ONLY|SET LOCAL|ROLLBACK)/.test(sql)));
+  assert.equal(calls.filter(sql => sql.startsWith('WITH demo_orgs')).length, 1);
+  assert.ok(calls.every(sql => /^(SELECT|WITH demo_orgs|BEGIN READ ONLY|SET LOCAL|ROLLBACK)/.test(sql)));
 });
 
 test('missing, duplicated or ambiguous canonical Demo registry fails before other census queries', async () => {
@@ -69,4 +69,27 @@ test('rollback failure aborts output rather than reporting a successful census',
     return { rows: [] };
   } });
   await assert.rejects(collectDemoStoreCensus(client), /stage=demo-rollback; code=ECONNRESET/);
+});
+
+test('supplier products and materials traverse canonical supplier identities and organizations', () => {
+  for (const table of ['supplier_product_offers','neture_supplier_library_items']) {
+    const sql = scopedCountQuery(table, ['supplier_id']);
+    assert.match(sql, /FROM neture_suppliers s/);
+    assert.match(sql, /t\.supplier_id::text IN \(SELECT id::text FROM demo_suppliers\)/);
+    assert.match(sql, /s\.organization_id IN/);
+    assert.match(sql, /supplier_demo_count/);
+    assert.match(sql, /unlinked_to_demo_count/);
+  }
+  assert.match(queries.columns, /supplier_product_offers/);
+  assert.match(queries.columns, /neture_supplier_library_items/);
+  assert.match(queries.foreignKeys, /neture_suppliers/);
+});
+
+test('store assets count Demo user/organization scope separately from global totals', () => {
+  const sql = scopedCountQuery('store_assets', ['organization_id','created_by']);
+  assert.match(sql, /demo_orgs WHERE demo_type='STORE_OWNER'/);
+  assert.match(sql, /t\."created_by"::text IN/);
+  assert.match(sql, /store_demo_count/);
+  assert.match(sql, /unlinked_to_demo_count/);
+  assert.doesNotMatch(scopedCountQuery('store_assets',['service_key;DELETE']), /DELETE/);
 });

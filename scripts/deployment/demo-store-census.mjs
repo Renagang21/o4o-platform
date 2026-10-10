@@ -15,18 +15,57 @@ export const queries = {
     WHERE table_schema='public'
       AND (left(table_name,6)='store_' OR left(table_name,4)='kpa_'
         OR table_name IN ('organization_members','organizations','neture_pharmacy_memberships',
-          'role_assignments','service_memberships'))
+          'role_assignments','service_memberships','neture_suppliers',
+          'supplier_product_offers','neture_supplier_library_items'))
       AND column_name IN ('organization_id','store_id','user_id','created_by_user_id',
-        'created_by','owner_id','applicant_user_id','service_key')
+        'created_by','owner_id','applicant_user_id','service_key','supplier_id')
     ORDER BY table_name, column_name`,
   foreignKeys: `SELECT source.relname AS source_table, target.relname AS target_table,
       pg_get_constraintdef(c.oid) AS definition
     FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
       JOIN pg_namespace n ON n.oid=source.relnamespace
       JOIN pg_class target ON target.oid=c.confrelid
-    WHERE c.contype='f' AND n.nspname='public' AND target.relname IN ('users','organizations')
+    WHERE c.contype='f' AND n.nspname='public' AND target.relname IN ('users','organizations','neture_suppliers')
     ORDER BY source.relname, target.relname, c.conname`,
 };
+
+
+// Registry IDs remain inside SQL; joining through memberships preserves organization boundaries.
+export function scopedCountQuery(table, columns) {
+  if (!/^[a-z][a-z0-9_]*$/.test(table)) throw new Error('Unsupported table identifier');
+  const userColumns = new Set(['user_id','created_by_user_id','created_by','owner_id','applicant_user_id']);
+  function predicate(demoType) {
+    const conditions = [];
+    for (const column of columns) {
+      if (column === 'organization_id' || column === 'store_id') {
+        conditions.push(`t."${column}"::text IN (SELECT organization_id::text FROM demo_orgs WHERE demo_type='${demoType}')`);
+      } else if (userColumns.has(column)) {
+        conditions.push(`t."${column}"::text IN (SELECT user_id::text FROM demo_accounts WHERE is_active AND demo_type='${demoType}')`);
+      } else if (column === 'supplier_id' && demoType === 'SUPPLIER') {
+        conditions.push('t.supplier_id::text IN (SELECT id::text FROM demo_suppliers)');
+      }
+    }
+    if (table === 'neture_suppliers' && demoType === 'SUPPLIER') {
+      conditions.push('t.id::text IN (SELECT id::text FROM demo_suppliers)');
+    }
+    return conditions.length ? `COALESCE((${conditions.join(' OR ')}), false)` : 'false';
+  }
+  const store = predicate('STORE_OWNER');
+  const supplier = predicate('SUPPLIER');
+  return `WITH demo_orgs AS (
+    SELECT DISTINCT m.organization_id,d.demo_type FROM organization_members m
+      JOIN demo_accounts d ON d.user_id=m.user_id AND d.is_active
+    WHERE m.left_at IS NULL AND m.role IN ('owner','admin','manager')
+  ), demo_suppliers AS (
+    SELECT s.id FROM neture_suppliers s WHERE
+      s.user_id IN (SELECT user_id FROM demo_accounts WHERE is_active AND demo_type='SUPPLIER')
+      OR s.organization_id IN (SELECT organization_id FROM demo_orgs WHERE demo_type='SUPPLIER')
+  ) SELECT count(*)::int AS count,
+      count(*) FILTER (WHERE ${store})::int AS store_demo_count,
+      count(*) FILTER (WHERE ${supplier})::int AS supplier_demo_count,
+      count(*) FILTER (WHERE NOT (${store} OR ${supplier}))::int AS unlinked_to_demo_count
+    FROM "${table}" t`;
+}
 
 export async function collectDemoStoreCensus(client) {
   await client.query('BEGIN READ ONLY');
@@ -43,9 +82,9 @@ export async function collectDemoStoreCensus(client) {
     const foreignKeys = (await client.query(queries.foreignKeys)).rows;
     const tableCounts = [];
     for (const table of new Set(relationshipColumns.map(row => row.table_name))) {
-      if (!/^[a-z][a-z0-9_]*$/.test(table)) throw new Error('Unsupported table identifier');
-      const result = await client.query(`SELECT count(*)::int AS count FROM "${table}"`);
-      tableCounts.push({ table, count: result.rows[0].count });
+      const columns = relationshipColumns.filter(row => row.table_name === table).map(row => row.column_name);
+      const result = await client.query(scopedCountQuery(table, columns));
+      tableCounts.push({ table, ...result.rows[0] });
     }
     // Aggregates/schema metadata only; no user/organization IDs, names or row contents.
     return { readOnly: true, demos, organizations, memberships, relationshipColumns, foreignKeys, tableCounts };
