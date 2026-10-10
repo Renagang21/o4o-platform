@@ -496,3 +496,6 @@ SupplierServiceEntry 및 MarketTrialHubPage가 `/` → `/login?returnUrl=...`로
 실제 소유자의 Google/Kakao 가입·로그인·연결·취소와 추가 정보 적용 후 약관 gate 재확인은 OPEN.
 정책 본문/version 1의 이전 서비스 내용 정리·새 버전 검토·게시는 이번 배포에서 수행하지 않았다.
 동일 WO 연속 배포 검증 기록과 남은 OAuth/경로 후속 때문에 기존 branch/workspace는 KEEP한다.
+
+기록 PR 리뷰 P2 후속: 상위 리팩터링 WO 단계 4의 acceptance 구현 TODO도 완료로 정렬했다.
+compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로 순환은 별도 OPEN으로 분리했다.

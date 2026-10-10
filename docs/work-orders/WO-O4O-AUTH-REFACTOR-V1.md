@@ -69,7 +69,8 @@
 - [ ] 카카오 운영 설정 활성화 후 실제 Google/Kakao 실접속·명시적 연결 PC/mobile smoke (실제 소유자 인증 필요)
 - [x] 운영 callback의 `Invalid request / invalid characters` 차단 수정: PR #401 main `73cd907d20` 통합, API-only Promote #38035112556 SUCCESS. 합성 opaque code/state는 401 flow 검증까지 전달, 다른 SQL 필드는 400 거절 유지. 실제 소유자 가입 완료와 구분.
 - [x] 홈 카카오 config 조회 복구 UI: PR #403 main `82742b84e8` 통합·Promote #38039708401 웹 6개 배포 SUCCESS. 유지 8 origin PC/mobile 화면 16·config 장애/재시도 12·공개 API 12·Demo 32건 PASS. 사용자 브라우저 최초 조회 실패 원인은 미확정이며 실제 소유자 가입 완료와 구분.
-- [ ] P1 가입 acceptance 누락 수정: 카카오 UI/client/DTO의 published 문서 ID/version과 signup transaction의 `user_policy_acceptances` 저장 부재를 canonical 위반으로 확정. ID/version 재검증·원자적 저장·rollback/gate 회귀 및 이메일/Google 동일 계약 전수 조사 필요. 실제 제보된 약관 화면 이동의 직접 원인은 별도 재현·확인하고 가입 UI 가독성/입력 보존도 검증.
+- [x] P1 가입 acceptance 누락 수정: 카카오·이메일·Google의 published 문서 ID/version 전달·재검증 및 signup transaction의 `user_policy_acceptances` 원자적 저장 구현. rollback/pending 판정·공통 입력/동의 UI 회귀 검증, PR #407 통합·API/웹 배포 완료. 실제 소유자 약관 화면 이동 원인·OAuth 완료는 아래 별도 OPEN 항목으로 유지.
+- [ ] 공급자·펀딩의 미로그인 `/login` ↔ `/` 순환 수정 및 PC/mobile 가입/Demo 회귀. 실제 소유자 추가 정보 적용 후 약관 gate 재확인은 별도 실행.
 - [ ] 후속 개인정보 처리방침 표시·내용 정합: 읽기 어려운 화면과 리팩터링 전 내용을 조사해 사용자 검토 후 갱신.
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
