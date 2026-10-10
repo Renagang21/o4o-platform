@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {validateTargets,quoteIdentifier,rowKey,deletionOrder,runStoreCleanup} from './demo-store-cleanup.mjs';
+import {validateTargets,quoteIdentifier,rowKey,deletionOrder,runStoreCleanup,quoteTable,batchDeleteStatement,directOrganizationColumn,logicalEdges,removeTable} from './demo-store-cleanup.mjs';
 const keep='1'.repeat(64),target='2'.repeat(64);
 test('apply requires exact nonempty targets; retained store cannot be a target',()=>{
   assert.throws(()=>validateTargets(keep,[],true));assert.throws(()=>validateTargets(keep,[keep],true));
@@ -19,4 +19,25 @@ test('foreign-key dependency deletion is child first, not alphabetical',()=>{
 });
 test('invalid apply request is rejected before opening a transaction',async()=>{
   let calls=0;await assert.rejects(runStoreCleanup({query:async()=>{calls++;}},{apply:true,keep}));assert.equal(calls,0);
+});
+
+test('cross-schema SQL is qualified, without arbitrary identifier interpolation',()=>{
+  assert.equal(quoteTable('cosmetics.cosmetics_stores'),'"cosmetics"."cosmetics_stores"');assert.throws(()=>quoteTable('a.b.c'));
+  assert.equal(quoteTable('users'),'"public"."users"');
+});
+test('logical ownership covers camelCase/scope and does not confuse cosmetics store IDs with organization IDs',()=>{
+  assert.equal(directOrganizationColumn('signage_playlists','organizationId'),true);
+  assert.equal(directOrganizationColumn('role_assignments','scope_id'),true);
+  assert.equal(directOrganizationColumn('cosmetics.cosmetics_store_listings','store_id'),false);
+  assert.ok(logicalEdges.some(([child,column,parent])=>child==='signage_playlist_items' && column==='playlistId' && parent==='signage_playlists'));
+});
+test('typed compound PK deletion batches parameter values and never casts indexed columns to text',()=>{
+  const statement=batchDeleteStatement({table:'cosmetics.items',keys:['store_id','id']},[{store_id:'a',id:1},{store_id:'b',id:2}]);
+  assert.equal(statement.sql,'DELETE FROM "cosmetics"."items" WHERE ("store_id","id") IN (($1,$2),($3,$4))');
+  assert.deepEqual(statement.args,['a',1,'b',2]);assert.doesNotMatch(statement.sql,/::text/);
+});
+test('native PK deletes use bounded batches and abort unexpected affected row counts',async()=>{
+  const calls=[];const table={table:'items',keys:['id'],rows:Array.from({length:205},(_,id)=>({id}))};
+  await removeTable({query:async(sql,args)=>{calls.push(args.length);return {rowCount:args.length};}},table);
+  assert.deepEqual(calls,[100,100,5]);await assert.rejects(removeTable({query:async()=>({rowCount:0})},table));
 });

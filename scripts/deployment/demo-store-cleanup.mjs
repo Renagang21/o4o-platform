@@ -13,6 +13,35 @@ export function quoteIdentifier(value) {
   if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) throw new CleanupStop('Unsupported identifier');
   return `"${value}"`;
 }
+export function quoteTable(table) {
+  const parts=table.split('.');
+  if (parts.length>2) throw new CleanupStop('Unsupported qualified table');
+  if (parts.length===1) parts.unshift('public');
+  return parts.map(quoteIdentifier).join('.');
+}
+export const logicalEdges = [
+  ['signage_playlist_items','playlistId','signage_playlists'],
+  ['signage_playlist_items','mediaId','signage_media'],
+  ['store_playlist_items','playlist_id','store_playlists'],
+  ['store_tablet_displays','tablet_id','store_tablets'],
+  ['store_tablet_screen_blocks','screen_set_id','store_tablet_screen_sets'],
+  ['organization_product_channels','product_listing_id','organization_product_listings'],
+  ['store_multilingual_product_content_pages','group_id','store_multilingual_product_content_groups'],
+  ['cosmetics.cosmetics_store_playlists','store_id','cosmetics.cosmetics_stores'],
+  ['cosmetics.cosmetics_store_listings','store_id','cosmetics.cosmetics_stores'],
+  ['cosmetics.cosmetics_store_members','store_id','cosmetics.cosmetics_stores'],
+  ['cosmetics.cosmetics_store_playlist_items','playlist_id','cosmetics.cosmetics_store_playlists'],
+];
+export function directOrganizationColumn(table,column) {
+  return ['organization_id','organizationId','target_organization_id'].includes(column) ||
+    (!table.startsWith('cosmetics.') && ['store_id','storeId'].includes(column)) ||
+    (table==='role_assignments' && column==='scope_id');
+}
+export function batchDeleteStatement(table,rows) {
+  const columns=table.keys.map(quoteIdentifier).join(',');const args=[];
+  const tuples=rows.map(row=>'('+table.keys.map(k=>{args.push(row[k]);return '$'+args.length;}).join(',')+')');
+  return {sql:`DELETE FROM ${quoteTable(table.table)} WHERE (${columns}) IN (${tuples.join(',')})`,args};
+}
 export function validateTargets(keep, targets, apply) {
   if (!/^[a-f0-9]{64}$/.test(keep)) throw new CleanupStop('Explicit original store fingerprint required');
   if (targets.some(x => !/^[a-f0-9]{64}$/.test(x)) || new Set(targets).size !== targets.length || targets.includes(keep)) throw new CleanupStop('Invalid deletion targets');
@@ -33,18 +62,18 @@ export function deletionOrder(tables, edges) {
   return result;
 }
 const metadataSql = {
-  columns: `SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position`,
-  keys: `SELECT r.relname AS table_name,array_agg(a.attname::text ORDER BY k.ordinality) AS columns
+  columns: `SELECT CASE WHEN table_schema='public' THEN table_name ELSE table_schema||'.'||table_name END AS table_name,column_name,udt_name FROM information_schema.columns WHERE table_schema NOT IN ('pg_catalog','information_schema') AND table_schema NOT LIKE 'pg_%' ORDER BY table_schema,table_name,ordinal_position`,
+  keys: `SELECT CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END AS table_name,array_agg(a.attname::text ORDER BY k.ordinality) AS columns
     FROM pg_constraint c JOIN pg_class r ON r.oid=c.conrelid JOIN pg_namespace n ON n.oid=r.relnamespace
     CROSS JOIN LATERAL unnest(c.conkey) WITH ORDINALITY k(attnum,ordinality) JOIN pg_attribute a ON a.attrelid=r.oid AND a.attnum=k.attnum
-    WHERE c.contype='p' AND n.nspname='public' GROUP BY r.relname`,
-  edges: `SELECT s.relname AS child,t.relname AS parent,c.confdeltype AS action,
+    WHERE c.contype='p' AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%' GROUP BY n.nspname,r.relname`,
+  edges: `SELECT CASE WHEN sn.nspname='public' THEN s.relname ELSE sn.nspname||'.'||s.relname END AS child,CASE WHEN tn.nspname='public' THEN t.relname ELSE tn.nspname||'.'||t.relname END AS parent,c.confdeltype AS action,
     array_agg(sa.attname::text ORDER BY k.ordinality) AS child_columns,array_agg(ta.attname::text ORDER BY k.ordinality) AS parent_columns
     FROM pg_constraint c JOIN pg_class s ON s.oid=c.conrelid JOIN pg_class t ON t.oid=c.confrelid
     JOIN pg_namespace sn ON sn.oid=s.relnamespace JOIN pg_namespace tn ON tn.oid=t.relnamespace
     CROSS JOIN LATERAL unnest(c.conkey,c.confkey) WITH ORDINALITY k(skey,tkey,ordinality)
     JOIN pg_attribute sa ON sa.attrelid=s.oid AND sa.attnum=k.skey JOIN pg_attribute ta ON ta.attrelid=t.oid AND ta.attnum=k.tkey
-    WHERE c.contype='f' AND sn.nspname='public' AND tn.nspname='public' GROUP BY c.oid,s.relname,t.relname,c.confdeltype`,
+    WHERE c.contype='f' AND sn.nspname NOT IN ('pg_catalog','information_schema') AND sn.nspname NOT LIKE 'pg_%' AND tn.nspname NOT IN ('pg_catalog','information_schema') AND tn.nspname NOT LIKE 'pg_%' GROUP BY c.oid,sn.nspname,tn.nspname,s.relname,t.relname,c.confdeltype`,
 };
 async function inventory(client, keep, targets) {
   const demos = (await client.query(`SELECT demo_type,user_id FROM demo_accounts WHERE is_active`)).rows;
@@ -68,7 +97,7 @@ function guardRow(table,row,state) {
   const targetIds=state.targetIds;
   if (['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots'].includes(table)) throw new CleanupStop('Protected entity referenced by deletion');
   if (table==='organizations' && !targetIds.has(row.id)) throw new CleanupStop('Retained organization dependency');
-  for (const key of new Set(['organization_id','store_id',...(state.organizationColumns.get(table) || [])])) {
+  for (const key of new Set(state.organizationColumns.get(table) || [])) {
     if (row[key] != null && !targetIds.has(String(row[key]))) throw new CleanupStop('Shared retained-store row requires explicit disposition');
   }
 }
@@ -84,8 +113,9 @@ function addRows(state,table,rows) {
   return added;
 }
 async function selectRows(client,table,columns,values) {
-  const clause=columns.map((c,i)=>`t.${quoteIdentifier(c)}::text=$${i+1}`).join(' AND ');
-  return (await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteIdentifier(table)} t WHERE ${clause}`,values.map(String))).rows.map(x=>x.row);
+  const base=columns.map((c,i)=>`t.${quoteIdentifier(c)}=$${i+1}`).join(' AND ');
+  const clause=base+(table==='role_assignments' && columns.includes('scope_id') ? " AND t.scope_type='organization'" : '');
+  return (await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(table)} t WHERE ${clause}`,values)).rows.map(x=>x.row);
 }
 async function expandEdge(client,state,edge) {
   const parents=state.rows.get(edge.parent);if (!parents) return false;
@@ -94,16 +124,46 @@ async function expandEdge(client,state,edge) {
     const children=await selectRows(client,edge.child,edge.child_columns,edge.parent_columns.map(c=>row[c]));
     if (!children.length) continue;
     if (edge.child===edge.parent) throw new CleanupStop('Self-referencing deletion requires explicit ordering');
-    if (edge.action==='n' || edge.action==='d') throw new CleanupStop('SET NULL/DEFAULT dependency needs explicit recovery disposition');
+    if (edge.action==='n' || edge.action==='d') {
+      if (children.some(child=>!state.rows.get(edge.child)?.has(rowKey(edge.child,child,state.keys.get(edge.child))))) throw new CleanupStop('SET NULL/DEFAULT dependency needs explicit recovery disposition');
+      continue;
+    }
     if (addRows(state,edge.child,children)) added=true;
   }
   return added;
 }
+async function verifyParentOwnership(client,state,edges) {
+  for (const edge of edges.filter(e=>state.organizationColumns.has(e.parent))) {
+    const children=state.rows.get(edge.child);if (!children) continue;
+    for (const row of children.values()) {
+      const values=edge.child_columns.map(c=>row[c]);if (values.some(v=>v==null)) continue;
+      const parents=await selectRows(client,edge.parent,edge.parent_columns,values);
+      for (const parent of parents) guardRow(edge.parent,parent,state);
+    }
+  }
+}
+async function verifyLogicalCoverage(client,state,columns,edges) {
+  // Unmodelled UUID soft references must stop deletion, including non-public schemas.
+  const ids=[...new Set([...state.rows.values()].flatMap(rows=>[...rows.values()].map(row=>row.id).filter(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id))))];
+  for (const column of columns.filter(c=>c.udt_name==='uuid' && c.column_name!=='id' && (!directOrganizationColumn(c.table_name,c.column_name) || (c.table_name==='role_assignments' && c.column_name==='scope_id')))) {
+    if (!(column.table_name==='role_assignments' && column.column_name==='scope_id') && edges.some(e=>e.child===column.table_name && e.child_columns.includes(column.column_name))) continue;
+    const matches=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(column.table_name)} t WHERE t.${quoteIdentifier(column.column_name)}=ANY($1::uuid[])`,[ids])).rows;
+    if (matches.some(({row})=>!state.rows.get(column.table_name)?.has(rowKey(column.table_name,row,state.keys.get(column.table_name))))) throw new CleanupStop('Unmodelled UUID logical reference requires disposition');
+  }
+}
 async function buildGraph(client,roots) {
   const columns=(await client.query(metadataSql.columns)).rows;
-  const keys=(await client.query(metadataSql.keys)).rows;
+  const keys=(await client.query(metadataSql.keys)).rows.sort((a,b)=>a.table_name.localeCompare(b.table_name,'en'));
   const edges=(await client.query(metadataSql.edges)).rows;
+  for (const [child,column,parent] of logicalEdges) {
+    if (columns.some(c=>c.table_name===child && c.column_name===column) && keys.some(k=>k.table_name===parent && k.columns.includes('id'))) edges.push({child,parent,action:'c',child_columns:[column],parent_columns:['id']});
+  }
+  for (const column of columns.filter(c=>directOrganizationColumn(c.table_name,c.column_name) && c.table_name!=='organizations')) {
+    if (!edges.some(e=>e.parent==='organizations' && e.child===column.table_name && e.child_columns.includes(column.column_name))) edges.push({child:column.table_name,parent:'organizations',action:'c',child_columns:[column.column_name],parent_columns:['id']});
+  }
+  edges.sort((a,b)=>stableJson(a).localeCompare(stableJson(b),'en'));
   const organizationColumns=new Map();
+  for (const column of columns.filter(c=>directOrganizationColumn(c.table_name,c.column_name))) organizationColumns.set(column.table_name,[...(organizationColumns.get(column.table_name) || []),column.column_name]);
   for (const edge of edges.filter(e=>e.parent==='organizations' && e.child!=='organizations')) {
     if (edge.parent_columns.length!==1 || edge.parent_columns[0]!=='id') throw new CleanupStop('Non-ID organization reference requires explicit review');
     organizationColumns.set(edge.child,[...(organizationColumns.get(edge.child) || []),...edge.child_columns]);
@@ -111,9 +171,9 @@ async function buildGraph(client,roots) {
   const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),organizationColumns,targetIds:new Set(roots.map(x=>x.id))};
   addRows(state,'organizations',roots);
   // Include logical store ownership even where legacy schemas have no FK.
-  const scopes=columns.filter(x=>['organization_id','store_id','target_organization_id'].includes(x.column_name) && x.table_name!=='organizations');
+  const scopes=columns.filter(x=>directOrganizationColumn(x.table_name,x.column_name) && x.table_name!=='organizations');
   for (const scope of scopes) {
-    const rows=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteIdentifier(scope.table_name)} t WHERE t.${quoteIdentifier(scope.column_name)}::text=ANY($1::text[])`,[[...state.targetIds]])).rows.map(x=>x.row);
+    const rows=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(scope.table_name)} t WHERE t.${quoteIdentifier(scope.column_name)}=ANY($1)${scope.table_name==='role_assignments' && scope.column_name==='scope_id' ? " AND t.scope_type='organization'" : ''}`,[[...state.targetIds]])).rows.map(x=>x.row);
     addRows(state,scope.table_name,rows);
   }
   let changed=true;let passes=0;
@@ -122,22 +182,22 @@ async function buildGraph(client,roots) {
     const results=await Promise.all(edges.map(edge=>expandEdge(client,state,edge)));changed=results.some(Boolean);
     if ([...state.rows.values()].reduce((n,m)=>n+m.size,0)>10000) throw new CleanupStop('Deletion row limit');
   }
+  await verifyParentOwnership(client,state,edges);
+  await verifyLogicalCoverage(client,state,columns,edges);
   const affected=[...state.rows.keys()];
-  const restricted=(await client.query(`SELECT count(*)::int AS count FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace WHERE n.nspname='public' AND r.relname=ANY($1::text[]) AND (r.relrowsecurity OR r.relkind<>'r')`,[affected])).rows[0];
+  const restricted=(await client.query(`SELECT count(*)::int AS count FROM pg_class r JOIN pg_namespace n ON n.oid=r.relnamespace WHERE (CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END)=ANY($1::text[]) AND (r.relrowsecurity OR r.relkind<>'r')`,[affected])).rows[0];
   if (restricted.count) throw new CleanupStop('RLS or partitioned deletion requires explicit review');
-  const external=(await client.query(`SELECT count(*)::int AS count FROM pg_constraint c JOIN pg_class p ON p.oid=c.confrelid JOIN pg_namespace pn ON pn.oid=p.relnamespace JOIN pg_class ch ON ch.oid=c.conrelid JOIN pg_namespace cn ON cn.oid=ch.relnamespace WHERE c.contype='f' AND pn.nspname='public' AND p.relname=ANY($1::text[]) AND cn.nspname<>'public'`,[affected])).rows[0];
-  if (external.count) throw new CleanupStop('Cross-schema deletion requires explicit review');
-  const triggers=(await client.query(`SELECT count(*)::int AS count FROM pg_trigger g JOIN pg_class r ON r.oid=g.tgrelid JOIN pg_namespace n ON n.oid=r.relnamespace WHERE n.nspname='public' AND r.relname=ANY($1::text[]) AND NOT g.tgisinternal AND g.tgenabled<>'D' AND (g.tgtype & 8)<>0`,[affected])).rows[0];
+  const triggers=(await client.query(`SELECT count(*)::int AS count FROM pg_trigger g JOIN pg_class r ON r.oid=g.tgrelid JOIN pg_namespace n ON n.oid=r.relnamespace WHERE (CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END)=ANY($1::text[]) AND NOT g.tgisinternal AND g.tgenabled<>'D' AND (g.tgtype & 8)<>0`,[affected])).rows[0];
   if (triggers.count) throw new CleanupStop('Custom delete trigger requires explicit review');
   const order=deletionOrder(affected,edges.filter(e=>state.rows.has(e.parent)&&state.rows.has(e.child)));
   const tables=order.map(table=>({table,keys:state.keys.get(table),rows:[...state.rows.get(table).values()].sort((a,b)=>rowKey(table,a,state.keys.get(table)).localeCompare(rowKey(table,b,state.keys.get(table)),'en'))}));
   return { tables,edges,columns,keys };
 }
-async function removeTable(client,table) {
-  for (const row of table.rows) {
-    const clause=table.keys.map((k,i)=>`${quoteIdentifier(k)}::text=$${i+1}`).join(' AND ');
-    const result=await client.query(`DELETE FROM ${quoteIdentifier(table.table)} WHERE ${clause}`,table.keys.map(k=>String(row[k])));
-    if (result.rowCount!==1) throw new CleanupStop('Deletion population changed');
+export async function removeTable(client,table) {
+  for (let offset=0;offset<table.rows.length;offset+=100) {
+    const rows=table.rows.slice(offset,offset+100);const statement=batchDeleteStatement(table,rows);
+    const result=await client.query(statement.sql,statement.args);
+    if (result.rowCount!==rows.length) throw new CleanupStop('Deletion population changed');
   }
 }
 async function executeDeletion(client,plan,digest,expected) {
