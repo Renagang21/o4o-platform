@@ -1,8 +1,5 @@
 # RBAC-CANONICAL-STATE-V1
 
-> **PharmacyHub 폐기 예외 (2026-10-10 사용자 명시 승인):** [현행 PH 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)이 이 문서의 PH 가입·역할 부여·membership 소비·전용 데이터 보존 계약을 대체한다. PH는 재가입·재발급·재사용 대상이 아니다. PH 전용 귀속·FK·타 서비스 소비처 확인 후 제거하며 다른 서비스의 공용 데이터·Neture 매장/QR 및 migration 이력은 보존한다. 공통 RBAC 구조·타 서비스 권한·Freeze 경계는 변경하지 않는다. 아래 PH 모델은 이전 구조 기록이며 실제 삭제 완료를 뜻하지 않는다.
-
-
 > O4O RBAC 구조 — Phase3-E 완료 후 canonical 상태
 >
 > Status: Active

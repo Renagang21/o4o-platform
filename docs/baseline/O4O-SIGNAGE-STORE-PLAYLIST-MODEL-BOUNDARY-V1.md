@@ -1,8 +1,5 @@
 # O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1
 
-> **PharmacyHub 폐기 예외 (2026-10-10 사용자 명시 승인):** [현행 PH 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)이 이 문서의 PH 전용 활성 서비스·주문/결제 축·extension·공통 모듈 소비·전용 데이터 보존 서술을 대체한다. PH 축은 퇴역 잔여이며 복구·신규 생성 대상이 아니다. PH 전용 데이터는 현재 schema·FK·타 서비스 소비처로 귀속을 확정한 후 삭제한다. `checkout_orders`·`neture_orders`·결제·조직 등 공용 테이블과 타 서비스 원장은 통째로 삭제하지 않는다. Neture 약국 및 인쇄 QR 연결은 유지한다. 공통 주문/B2B/Core/Freeze 계약은 변경하지 않으며 아래 PH 구현 설명은 이전 구조 기록이다. 운영 삭제 완료를 뜻하지 않는다.
-
-
 > **유형:** Baseline (경계 고정 / 통합 금지선)
 > **WO:** `WO-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-KEEP-LEGACY-V1`
 > **선행 조사:** [`IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1`](../investigations/IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1.md)
