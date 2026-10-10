@@ -1,5 +1,8 @@
 # O4O STORE OWNER RBAC STANDARD V1
 
+> **PharmacyHub 폐기 예외 (2026-10-10 사용자 명시 승인):** [현행 PH 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)이 PH 전용 데이터·service key·role의 보존 지침을 대체한다. PH 전용 귀속·FK·타 서비스 소비처 확인 후 제거하며 다른 서비스의 공용 식별자·데이터와 Neture 매장/QR은 보존한다. 인쇄 QR 연결용 PH 도메인·DNS·인증서는 유지하고 Neture 약국으로 리다이렉트한다. 아래의 PH 보존 서술은 이전 단계 기준이며 삭제 완료나 모든 공용 참조 삭제를 뜻하지 않는다.
+
+
 > **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (내부 모순 정합 — 접근 판정은 Role ∧ Relationship([STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)), `role_assignments` 는 Authorization SSOT 로 유지. §2.1 · §4 · §5 · §8 에 `2026-10-04 정합` 주석)
 
 ## 1. 목적

@@ -1,5 +1,8 @@
 # O4O 서브도메인 · 서비스 의미 정본
 
+> **PharmacyHub 폐기 예외 (2026-10-10 사용자 명시 승인):** [현행 PH 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)이 PH 전용 데이터·service key·role의 보존 지침을 대체한다. PH 전용 귀속·FK·타 서비스 소비처 확인 후 제거하며 다른 서비스의 공용 식별자·데이터와 Neture 매장/QR은 보존한다. 인쇄 QR 연결용 PH 도메인·DNS·인증서는 유지하고 Neture 약국으로 리다이렉트한다. 아래의 PH 보존 서술은 이전 단계 기준이며 삭제 완료나 모든 공용 참조 삭제를 뜻하지 않는다.
+
+
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **2026-10-09 실행 갱신:** PharmacyHub 전용 앱·API·배포 경로 제거는 [WO-O4O-PHARMACYHUB-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-V1.md)이 현재 실행 범위다. 기존 식별자와 운영 데이터는 보존하며 운영 인프라 정리는 아직 미실행이다.
