@@ -55,4 +55,6 @@ Commerce/공통 소비처 대조: B2B 주문·checkout stable의 PH 축은 퇴�
 
 약관 연결 리뷰 대응: PH `/terms`와 `/terms/`는 Neture 약국 `/policy`로 별도 302 전환하고 query를 유지한다. 다른 PH 경로는 기존 path/query를 보존한다. apply 검증은 두 옛 호스트의 약관 Location 및 Neture `/policy` HTTP 200도 요구하며 실패 시 기존 map으로 복구한다. 앱 변경·별도 앱 배포는 필요하지 않다.
 
-SPA 검증 보강: 실제 QR/tablet HTML 200 외에 프런트가 사용하는 공개 API(`kpa/qr/public/:slug`, `stores/:slug/tablet/products`·tabletId 유지)의 HTTP 200·JSON success/data를 apply 전후에 확인한다. HTML fallback·누락 데이터·API 실패는 전환 성공으로 처리하지 않고 원문 응답/매장 정보는 로그에 쓰지 않는다. 이는 공개 데이터 연결 확인이며 브라우저 화면·실물 QR 스캔 검증 완료를 뜻하지 않는다.
+SPA 검증 보강: QR은 읽기 전용 DB inventory로 활성 경로를 수집하고 HTML 200·302 Location을 확인한다. QR 공개 API(`kpa/qr/public/:slug`)는 실제 scan 원장을 쓰므로 자동 검증에서 호출하지 않는다. 태블릿은 HTML 200 외에 프런트가 사용하는 공개 API(`stores/:slug/tablet/products`·tabletId 유지)의 HTTP 200·JSON success/data를 apply 전후에 확인한다. HTML fallback·누락 데이터·API 실패는 전환 성공으로 처리하지 않고 원문 응답/매장 정보는 로그에 쓰지 않는다. 이는 공개 데이터 연결 확인이며 브라우저 화면·실물 QR 스캔 검증 완료를 뜻하지 않는다.
+
+스캔 원장 리뷰 대응: 자동 QR 공개 API 호출은 제거했다. QR 데이터 확인은 기존 READ ONLY transaction inventory이며 자동 HTTP 요청은 정적 웹/리다이렉트에 한정한다. 태블릿 공개 데이터 API 검증은 유지한다. QR 브라우저 콘텐츠 및 실물 스캔 확인은 아직 미실행이다.

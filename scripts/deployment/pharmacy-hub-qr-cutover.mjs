@@ -64,7 +64,8 @@ export async function verifyTargets(paths, request = fetch, signal) {
 export async function verifyPublicData(paths, request = fetch, signal) {
   const targets = paths.flatMap(path => {
     const source = new URL(path, `https://${newHost}`);
-    if (source.pathname.startsWith('/qr/')) return [`https://api.neture.co.kr/api/v1/kpa/qr/public/${encodeURIComponent(source.pathname.slice(4))}`];
+    // QR landing GET records scans. Its active path is verified by the read-only
+    // database inventory; never call that API from automated cutover probes.
     if (!source.pathname.startsWith('/tablet/')) return [];
     const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(source.pathname.slice(8))}/tablet/products`);
     if (source.searchParams.has('tabletId')) target.searchParams.set('tabletId', source.searchParams.get('tabletId'));
@@ -74,11 +75,11 @@ export async function verifyPublicData(paths, request = fetch, signal) {
     const response = await request(target, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
     if (response.status !== 200) {
       await response.body?.cancel();
-      throw new Error('Public QR/tablet API did not return HTTP 200.');
+      throw new Error('Public tablet API did not return HTTP 200.');
     }
     let payload;
-    try { payload = await response.json(); } catch { throw new Error('Public QR/tablet API did not return JSON.'); }
-    if (payload?.success !== true || payload.data == null || typeof payload.data !== 'object') throw new Error('Public QR/tablet API did not return successful data.');
+    try { payload = await response.json(); } catch { throw new Error('Public tablet API did not return JSON.'); }
+    if (payload?.success !== true || payload.data == null || typeof payload.data !== 'object') throw new Error('Public tablet API did not return successful data.');
     // Never log public content, store identities or API error payloads.
   }));
 }

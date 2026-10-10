@@ -189,16 +189,17 @@ test('full retirement verifies terms alias, query preservation and destination a
   await assert.rejects(verifyRedirects(paths.slice(0, 2), request('target'), undefined, rules), /HTTP 200/);
 });
 
-test('public API checks reject missing data hidden behind HTTP 200 SPA pages', async () => {
+test('tablet API checks reject missing data and never call the scan-writing QR API', async () => {
   const seen = [];
   await verifyPublicData(paths.slice(0, 2), async url => {
     seen.push(new URL(url));
     return Response.json({ success: true, data: url.includes('/tablet/') ? [] : { title: 'test' } });
   });
-  assert.equal(seen[0].pathname, '/api/v1/kpa/qr/public/active');
-  assert.equal(seen[1].pathname, '/api/v1/stores/store/tablet/products');
-  assert.equal(seen[1].searchParams.get('tabletId'), 'test');
-  assert.equal(seen[1].host, 'api.neture.co.kr');
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].pathname, '/api/v1/stores/store/tablet/products');
+  assert.equal(seen[0].searchParams.get('tabletId'), 'test');
+  assert.equal(seen[0].host, 'api.neture.co.kr');
+  await verifyPublicData(['/qr/active'], async () => { throw new Error('QR API must not be called'); });
   await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => Response.json({ success: false, error: { message: 'private row' } })), /successful data/);
   await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response('<html>SPA</html>')), /return JSON/);
   await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response(null, { status: 404 })), /HTTP 200/);
