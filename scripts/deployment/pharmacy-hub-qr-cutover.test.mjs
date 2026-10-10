@@ -44,6 +44,7 @@ test('full-host apply detaches PH backend and verifies root and non-QR redirects
   await runCutover({ ...h.options, retireHost: true, probes: paths.slice(0, 2).join('\n'), verify: async (_paths, rules) => {
     assert.ok(rules.includes('/'));
     assert.ok(rules.includes('/__ph_retirement_host_check__?ruleCheck=1'));
+    assert.deepEqual(rules.filter(rule => typeof rule === 'object').map(rule => rule.target), ['/policy?ruleCheck=1', '/policy?ruleCheck=1']);
   } });
   assert.equal(h.writes[0].pathMatchers[0].defaultService, undefined);
   assert.equal(h.writes[0].pathMatchers[0].defaultUrlRedirect.hostRedirect, 'pharmacy.neture.co.kr');
@@ -172,4 +173,18 @@ test('plan never depends on a private inventory file; apply still loads it', asy
   await assert.rejects(loadProbes('apply', '', '/missing/inventory', unavailable), /inventory unavailable/);
   assert.equal(await loadProbes('apply', '/qr/active\n/tablet/store', '/missing/inventory', unavailable), '/qr/active\n/tablet/store');
   assert.equal(await loadProbes('apply', '', '/private/inventory', async () => '/qr/active\n/tablet/store'), '/qr/active\n/tablet/store');
+});
+
+test('full retirement verifies terms alias, query preservation and destination availability', async () => {
+  const rules = [{ path: '/terms?language=ko', target: '/policy?language=ko', verifyTarget: true }];
+  const request = badAlias => async url => {
+    const u = new URL(url);
+    if (u.host === 'pharmacy.neture.co.kr') return new Response(null, { status: u.pathname === '/policy' && badAlias === 'target' ? 404 : 200 });
+    u.host = 'pharmacy.neture.co.kr';
+    if (u.pathname === '/terms' && badAlias !== 'alias') u.pathname = '/policy';
+    return new Response(null, { status: 302, headers: { location: u.href } });
+  };
+  await verifyRedirects(paths.slice(0, 2), request(), undefined, rules);
+  await assert.rejects(verifyRedirects(paths.slice(0, 2), request('alias'), undefined, rules), /302 redirect/);
+  await assert.rejects(verifyRedirects(paths.slice(0, 2), request('target'), undefined, rules), /HTTP 200/);
 });

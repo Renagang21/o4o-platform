@@ -62,9 +62,10 @@ export async function verifyTargets(paths, request = fetch, signal) {
 }
 
 export async function verifyRedirects(paths, request = fetch, signal, rulePaths = []) {
-  await verifyTargets(paths, request, signal);
-  await Promise.all([...paths, ...rulePaths].map(async path => {
-    const target = new URL(path, `https://${newHost}`).href;
+  const checks = [...paths, ...rulePaths].map(check => typeof check === 'string' ? { path: check, target: check } : check);
+  await verifyTargets([...paths, ...checks.filter(check => check.verifyTarget).map(check => check.target)], request, signal);
+  await Promise.all(checks.map(async ({ path, target: targetPath }) => {
+    const target = new URL(targetPath, `https://${newHost}`).href;
     await Promise.all(oldHosts.map(async host => {
       const response = await request(new URL(path, `https://${host}`).href, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
       const location = response.headers.get('location');
@@ -108,7 +109,10 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
   if (mode === 'plan') return { mode, applied: false };
   if (mode !== 'apply') throw new Error('Unknown cutover mode.');
   const paths = parseProbes(probes);
-  const rulePaths = [...missingFamilyRuleProbes(paths), ...(retireHost ? ['/', '/__ph_retirement_host_check__?ruleCheck=1'] : [])];
+  const rulePaths = [...missingFamilyRuleProbes(paths), ...(retireHost ? ['/', '/__ph_retirement_host_check__?ruleCheck=1',
+    { path: '/terms?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
+    { path: '/terms/?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
+  ] : [])];
   await preflight?.(paths);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');

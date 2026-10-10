@@ -15,6 +15,7 @@ export function prepareHostRetirement(input) {
   delete matcher.defaultUrlRedirect;
   delete matcher.pathRules;
   matcher.defaultUrlRedirect = { hostRedirect: 'pharmacy.neture.co.kr', httpsRedirect: true, redirectResponseCode: 'FOUND', stripQuery: false };
+  matcher.pathRules = [{ paths: ['/terms', '/terms/'], urlRedirect: { ...matcher.defaultUrlRedirect, pathRedirect: '/policy' } }];
   for (const key of ['id', 'creationTimestamp', 'selfLink', 'fingerprint', 'kind']) delete map[key];
   return map;
 }

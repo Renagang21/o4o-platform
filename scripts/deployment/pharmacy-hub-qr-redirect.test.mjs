@@ -6,7 +6,8 @@ test('full host retirement removes all PH backend routes but preserves other mat
   assert.deepEqual(draft.pathMatchers[0], original.pathMatchers[0]);
   const retired = draft.pathMatchers[1];
   assert.equal(retired.defaultService, undefined);
-  assert.equal(retired.pathRules, undefined);
+  assert.deepEqual(retired.pathRules, [{ paths: ['/terms', '/terms/'], urlRedirect: { ...retired.defaultUrlRedirect, pathRedirect: '/policy' } }]);
+  assert.doesNotMatch(JSON.stringify(retired), /ph-old-service|backend-pharmacy-hub-web/);
   assert.equal(retired.defaultUrlRedirect.hostRedirect, 'pharmacy.neture.co.kr');
   assert.equal(retired.defaultUrlRedirect.stripQuery, false);
   assert.equal(retired.defaultUrlRedirect.redirectResponseCode, 'FOUND');
