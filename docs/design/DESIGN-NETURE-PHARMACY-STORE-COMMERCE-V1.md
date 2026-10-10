@@ -224,6 +224,9 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 ## 5. 내 매장 기본 게이트 (대체)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 - 약국 매장 API(`/api/v1/kpa/...` 의 매장 controller 들 — 사이니지 · QR · 태블릿 · 자체 콘텐츠 · 매장 정보 등)는 공통 유틸 `isStoreOwner(ds, userId, 'kpa')` · `createRequireStoreOwner(ds, 'kpa')` 로 판정한다.
 - **변경 (구현 `91155708c`)**: `kpa` 키의 판정을 "kpa-society active membership ∧ `kpa:store_owner` role ∧ kpa-society 연결 조직" 에서 **"사용자가 owner/admin/manager 인 조직 중 `neture_pharmacy_memberships.status='active'` 인 조직"** 으로 대체한다. 매장 경영자 계약 게이트 · ambiguous 409 · 선택 매장 헤더 규칙은 그대로.
   - 약국 협력사업(pharmacy 포함) 미가입이어도 내 매장 기본 기능 이용 가능 → WO §3-1 충족.
@@ -245,6 +248,9 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 - 이 branch의 구현·로컬 검증이며 운영 적용 여부는 [전체 재배치 CHECK](../checks/CHECK-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)에 구분한다.
 
 ### 6-1. 내 매장 운영 화면과 업무 흐름 (2026-10-09)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 사용자 승인으로 제품의 범위와 등록 방식, 사업 가입과 내부 서비스 문맥을 구분한다. 제품 구매 이력은 매장 경영 활용의 조건이 아니다.
 
@@ -269,6 +275,9 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 
 ## 7. 커뮤니티
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 - `community.neture.co.kr`은 독립 가입 커뮤니티와 사업 참여 회원용 커뮤니티의 공통 이용 공간이다. 강좌는 study의 독립 업무이며 커뮤니티 capability·개설 문의·회원 안내에서 분리한다.
 - **독립 약사 커뮤니티**: `communityKey=pharmacy`를 보존한다. 별도의 `community_memberships` 승인과 정상 메인 계정을 확인하며, KPA/PH 서비스 가입을 추가로 요구하지 않는다. 기존 게시판 코드는 `kpa-society`·`pharmacy-hub` 합집합으로 보존한다.
@@ -316,6 +325,9 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 ### 8-4. 공급자 주문 처리
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 - 공급자 목록 · KPI · unified 의 서비스 필터를 `COALESCE(o.service_key,'neture') = 'neture'` 에서 **공급자 가시 서비스 집합**(`fulfillment-service-scope.ts` 상수 1곳: `neture` · `neture-pharmacy` · `kpa-society` · `kpa-groupbuy` · `pharmacy-hub`)으로 바꾼다. 공급자 격리(`spo.supplier_id = 요청 공급자`)는 그대로.
 - bridge 가 `sellerOrganizationId` · 약국명 · 배송지 · `testPayment` 를 `neture_orders` 로 승계 → 공급자가 구매 약국을 식별한다.
 - 준비 · 배송 · 배송 완료 흐름과 배송 완료 시 SPO 재고 차감(`updateOrderStatus`)은 그대로.
@@ -358,6 +370,9 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 ---
 
 ## 12. 테스트 데이터 초기화 범위 (실행은 사용자 승인 후)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 | 대상 | 처리 |
 |---|---|
@@ -449,9 +464,15 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ## 16. pharmacy-hub 기능 정리 (유지 · 이전 · 폐지)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 PharmacyHub(`pharmacyhub.co.kr`, serviceKey `pharmacy-hub`)는 Neture 약국 매장으로 흡수한다. 이 PR 은 **신규 진입과 commerce 흐름만** 옮기고, 서버 · 도메인 · 인증서와 공개 QR/태블릿 경로는 운영 검증 전까지 보존한다.
 
 ### 16-1. 분류
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 | 구분 | 대상 | 처리 (이 PR) |
 |---|---|---|
@@ -473,6 +494,9 @@ PH 고정 spec(`service-catalog.canonical-domain.test.ts` · `service-public-ori
 - 로컬 검증: 같은 PH QR slug 를 두 공개 API 로 열어 product · link 결과 동일, KPA 앱 `/qr/:slug` · `/tablet/:slug` 렌더.
 
 ### 16-3. QR 두 가지 — 따로 관리한다
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 **(A) 착지 URL 이 pharmacyhub.co.kr 인 link QR 4행 — 비활성 E2E 테스트 데이터** (운영 읽기 확인 2026-10-05)
 
@@ -507,12 +531,18 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 
 ### 16-4. 인프라 삭제 인계 조건 (웹 서비스 정비 트랙)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 1. PR #308 main 통합 · 배포 후 새 호스트에서 콘텐츠 자료함 · 공급 주문 · QR(product · screen_set · link) · 다국어 상품 · 제휴 QR 운영 검증.
 2. §16-7 1단계 리다이렉트 적용 · 검증(인쇄 QR 경로 보존). 이후에도 **pharmacyhub.co.kr 도메인 · DNS · 인증서는 리다이렉트를 위해 계속 유지**한다(인쇄 QR 이 남아 있는 한).
 3. 남은 PH `CREATED` 결제 정리 · 진행 중 PH opt-in 주문 종료 확인(§16-5) · 이용 안내 문구 이전(§16-6, 운영자 편집).
 4. 그 뒤 §16-7 2단계(호스트 전체 리다이렉트) → PH web 서버(`pharmacy-hub-web`) · PH 고정 spec 정리. 도메인 · 인증서 해지는 인쇄 QR 폐기 판단 이후 별도.
 
 ### 16-5. 공급자 opt-in 배송 (PH 전용) — 조사 결과
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 | 항목 | 내용 |
 |---|---|
@@ -538,6 +568,9 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 
 ### 16-6. 이용 안내 · 소식 · 안내 문구 · 제품 설명서 — 조사 결과
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 새 호스트 `pharmacy.neture.co.kr` = `web-kpa-society`(serviceKey `kpa-society`).
 
 | PH 콘텐츠 | 현재 (PH) | 새 호스트 대응 | 권장 위치 · 필요한 변경 |
@@ -559,6 +592,9 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 | 제품 설명서 목록 | 새 기능 없이 기존 경로 안내(위 표) |
 
 ### 16-7. 인쇄 QR 경로 보존 리다이렉트 — 구현안 (운영 적용 안 함)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 `node scripts/deployment/pharmacy-hub-qr-redirect.mjs exported-map.json review-map.json`은 실제 URL map export를 입력받아 검토할 302 초안을 새 파일로 만든다. 외부 API를 호출하지 않는다. 다른 host/route와 PH default backend를 보존하고 충돌·예상하지 못한 rule은 차단한다. 현재 운영 URL map export·실제 QR 검증·외부 적용은 미실행이다.
 

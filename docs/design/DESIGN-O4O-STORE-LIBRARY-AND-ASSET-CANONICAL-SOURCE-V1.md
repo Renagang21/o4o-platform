@@ -67,6 +67,9 @@ kpa_store_asset_controls    KPA 가 그 위에 얹은 게시/채널/본사 강�
 
 ## 3. 조직 해석 계약 (서비스별 mount 규칙)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 ```text
 서비스 route  →  서비스 전용 controller(조직 결정만)  →  공용 service(검증·SQL)
 ```

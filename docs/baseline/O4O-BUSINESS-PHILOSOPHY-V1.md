@@ -11,6 +11,9 @@ O4O(Online for Offline) Platform의 핵심 사업 철학을 정의한다.
 
 ## 적용 범위
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 O4O Platform 전체 서비스 — canonical service catalog(`platform_services`)에 등재된 서비스 전부 (2026-09 현재 Neture · KPA-Society · K-Cosmetics · Pharmacy-Hub 등). 개별 서비스명은 catalog 가 정본이며 이 문서는 목록을 고정하지 않는다.
 
 ## 핵심 철학
@@ -39,6 +42,9 @@ O4O 의 참여 주체는 **역할별 업무공간**(ROLE-WORKSPACE-ARCHITECTURE 
 공급자 콘텐츠의 유입은 온라인 제공 경로(Supplier → Store Hub · Supplier → Service Operator)로 한정되며, 제공 이후의 검토 · 편집 · 발행은 운영자 또는 매장의 업무다. 공급자 책임은 제공에서 끝난다.
 
 ### §4. 서비스별 특성은 같은 철학 위에 있다
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 catalog 에 등재된 각 서비스(Neture · KPA-Society · K-Cosmetics · Pharmacy-Hub 등)는 각각 다른 도메인을 다루지만,
 **동일한 O4O 철학(오프라인 실행력 강화, 역할별 업무공간 협력 구조) 위에서 운영된다.**
