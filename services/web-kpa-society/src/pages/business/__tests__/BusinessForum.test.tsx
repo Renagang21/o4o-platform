@@ -1,21 +1,22 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
-const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
+const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner' } }), authClient: { api: transport } }));
 vi.mock('@o4o/shared-space-ui', async importOriginal => ({
   ...await importOriginal<typeof import('@o4o/shared-space-ui')>(),
   ForumWriteForm: ({ onSubmit }: { onSubmit: (payload: unknown) => void }) => <button onClick={() => onSubmit({ title: '사업 게시글', editorHtml: '<p>본문</p>' })}>작성 완료</button>,
 }));
 import BusinessForumPage from '../BusinessForumPage';
-const mount = (view: 'write' | 'posts' | 'mine', path = '/community') => render(<MemoryRouter initialEntries={[path]}><Routes>
-  <Route element={<Outlet context={{ business: { key: 'pharmacy', communityKey: 'business-only' }, access: { allowed: true, canManage: false } }} />}>
+const mount = (view: 'write' | 'posts' | 'mine' | 'post', path = '/community', canManage = false) => render(<MemoryRouter initialEntries={[path]}><Routes>
+  <Route element={<Outlet context={{ business: { key: 'pharmacy', communityKey: 'business-only' }, access: { allowed: true, canManage } }} />}>
     <Route path="/community" element={<BusinessForumPage view={view} />} />
+    <Route path="/community/post/:slug" element={<BusinessForumPage view={view} />} />
     <Route path="/community/my-posts" element={<p>내 글 화면</p>} />
   </Route>
 </Routes></MemoryRouter>);
 beforeEach(() => {
-  transport.get.mockReset(); transport.post.mockReset();
+  transport.get.mockReset(); transport.post.mockReset(); transport.patch.mockReset();
   transport.get.mockImplementation(async (path: string) => ({ data: { data: path.endsWith('/categories') ? [{ id: 'business-board', slug: 'members', name: '사업 게시판', forumType: 'open' }] : [], pagination: { totalPages: 1 } } }));
 });
 afterEach(cleanup);
@@ -44,4 +45,24 @@ it('닫힌 게시판의 접근 거부를 0건으로 처리하지 않고 기존 �
   mount('posts', '/community?category=closed-board'); expect(await screen.findByRole('alert')).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: '게시판 가입 신청' }));
   await waitFor(() => expect(transport.post).toHaveBeenCalledWith('/communities/business-only/forum/categories/closed-board/join-requests', {}));
+});
+
+it.each([false, true])('담당 운영자는 해당 사업 공지 고정 상태를 전환한다 (고정=%s)', async pinned => {
+  let isPinned = pinned;
+  transport.get.mockImplementation(async (path: string) => ({ data: { data: path.endsWith('/comments') ? [] : {
+    id: 'post-a', title: '사업 안내', content: '<p>안내 본문</p>', authorId: 'other', isPinned, createdAt: '2026-10-11T00:00:00Z', likeCount: 0, allowComments: false,
+  } } }));
+  transport.patch.mockImplementation(async () => { isPinned = !isPinned; return { data: { data: { isPinned } } }; });
+  mount('post', '/community/post/notice', true);
+  fireEvent.click(await screen.findByRole('button', { name: pinned ? '공지 해제' : '공지로 고정' }));
+  await waitFor(() => expect(transport.patch).toHaveBeenCalledWith('/communities/business-only/forum/posts/post-a/pin', { pin: !pinned }));
+  expect(await screen.findByRole('button', { name: pinned ? '공지로 고정' : '공지 해제' })).toBeTruthy();
+});
+it.each([false, true])('일반 참여자는 공지 상태를 변경할 수 없다 (고정=%s)', async isPinned => {
+  transport.get.mockImplementation(async (path: string) => ({ data: { data: path.endsWith('/comments') ? [] : {
+    id: 'post-a', title: '사업 안내', content: '<p>안내 본문</p>', authorId: 'owner', isPinned, createdAt: '2026-10-11T00:00:00Z', likeCount: 0, allowComments: false,
+  } } }));
+  mount('post', '/community/post/notice'); await screen.findByText('사업 안내');
+  expect(screen.queryByRole('button', { name: /공지 해제|공지로 고정/ })).toBeNull();
+  expect(transport.patch).not.toHaveBeenCalled();
 });
