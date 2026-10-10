@@ -29,7 +29,7 @@ describe('central community roles: SQL-backed validity decisions', () => {
       CREATE TABLE community_memberships (community_id TEXT, user_id TEXT, status TEXT, role TEXT);
       CREATE TABLE semi_franchises (id TEXT, key TEXT, name TEXT, status TEXT, community_key TEXT);
       INSERT INTO users VALUES ('u1', 'active', true, true), ('u2', 'active', true, true);
-      INSERT INTO service_memberships VALUES ('u1', 'community', 'active');
+      INSERT INTO service_memberships VALUES ('u1', 'community', 'active'), ('u2', 'community', 'active');
       INSERT INTO communities VALUES ('c1', 'fixture-one', 'First', 'active'), ('c2', 'fixture-two', 'Second', 'active');
     `);
     exec = {
@@ -103,8 +103,12 @@ describe('central community roles: SQL-backed validity decisions', () => {
     });
   });
 
-  it('cannot use another user’s valid role or an inactive assignment', async () => {
+  it('cannot use another user’s otherwise valid central role', async () => {
     assign('community:admin', BEFORE, null, true, 'u2');
+    expect(await hasCommunityServiceOperator(exec, 'u1')).toBe(false);
+  });
+
+  it('cannot use an inactive assignment within its validity window', async () => {
     assign('community:operator', BEFORE, null, false);
     expect(await hasCommunityServiceOperator(exec, 'u1')).toBe(false);
   });
