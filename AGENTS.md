@@ -150,7 +150,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   `DEPLOYMENT = REQUIRED | AUTOMATIC | MANUAL/GATED | NOT_APPLICABLE` 을 판정한다.
 - 문서-only 처럼 Delivery 가 배포를 skip 하는 작업은 `NOT_APPLICABLE` 로 기록하고 배포 완료를 기다리지 않는다.
   배포가 필요한 작업의 closure 는 해당 WO 의 현재 배포 · 검증 정책을 따른다.
-- **정상적인 배포 실행도 별도 사용자 승인을 요구하지 않는다.** LEVEL 3의 promote 실행은 현재 기술 gate와 실행 계정 권한을 확인하고 진행한다. 새 DB 변경 · 데이터 삭제 · 배포 인프라 변경 등의 미승인 위험 범위는 §5를 따른다. freeze · CI · ref · 계정 권한 경계를 우회하지 않는다.
+- **정상적인 배포 실행도 별도 사용자 승인을 요구하지 않는다.** LEVEL 3의 promote 실행은 현재 기술 gate와 실행 계정 권한을 확인하고 진행한다. migration 포함 promote는 운영 DB write/DDL을 수반하므로, 해당 실행이 명시적으로 승인되지 않았다면 dispatch 전에 §5의 사용자 확인을 받는다. 새 DB 변경 · 데이터 삭제 · 배포 인프라 변경 등의 미승인 위험 범위는 §5를 따른다. freeze · CI · ref · 계정 권한 경계를 우회하지 않는다.
 - 과거 운영 방식 · 플래그(`DEPLOY_FREEZE` · `DEPLOY_ENABLED` 등)를 현재 사실 확인 없이 재사용하지 않는다.
 
 **(g) 공유 Mutable Resource — serialized**
