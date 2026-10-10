@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import type { EntityManager } from 'typeorm';
 import { hasCommunityServiceOperator } from '../community-service-operator-access.js';
 import { resolveCommunityWorkspace } from '../community-workspace.service.js';
 import { CommunityLifecycleService } from '../community-lifecycle.service.js';
@@ -15,7 +16,7 @@ const AFTER = '2026-10-10 12:00:01';
 describe('central community roles: SQL-backed validity decisions', () => {
   let db: any;
   let now: string;
-  let exec: { query: (sql: string, params?: unknown[]) => Promise<any[]> };
+  let exec: Pick<EntityManager, 'query'>;
 
   beforeEach(() => {
     now = NOW;
@@ -33,13 +34,13 @@ describe('central community roles: SQL-backed validity decisions', () => {
       INSERT INTO communities VALUES ('c1', 'fixture-one', 'First', 'active'), ('c2', 'fixture-two', 'Second', 'active');
     `);
     exec = {
-      async query(sql, params = []) {
+      async query<T = any>(sql: string, params: unknown[] = []): Promise<T> {
         const bindings = Object.fromEntries(params.map((value, i) => [String(i + 1), value]));
         return db.prepare(sql.replace(/COUNT\(\*\)::int/g, 'COUNT(*)')).all(bindings).map((row: any) => {
           if ('account_active' in row) row.account_active = !!row.account_active;
           if ('email_verified' in row) row.email_verified = !!row.email_verified;
           return row;
-        });
+        }) as T;
       },
     };
   });
