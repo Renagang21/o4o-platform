@@ -75,3 +75,29 @@
 main 통합·배포 없이 작업 checkout을 KEEP한다.
 
 코드 커밋 `6df45c5939`를 최신 main `0f66555b4f` 위에 충돌 없이 올려 원격 작업 branch에 push했다. PR 검증 결과는 PR 최신 HEAD의 실제 checks와 review를 기준으로 한다.
+
+## 사용자 범위 추가와 2차 TODO
+
+사용자가 개별 admin/operator와 회원 제재 기능도 이번에 설계하도록 지정했다.
+앞선 결함 수정은 유지하고 [개별 회원 관리 설계안](../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)을 추가한다.
+새 기능은 설계와 런타임 구현을 구분한다.
+
+- [x] 현재 entity·DB CHECK 제약·scope 조기 통과·workspace canManage 및 UI 타입 조사
+- [x] 개별 admin/operator·중앙 서비스 역할 권한표 설계
+- [x] 정지·해제·탈퇴 상태 전이와 다른 원장 불변 경계 설계
+- [x] 마지막 유효 admin 보호·중앙 복구·동시 처리 설계
+- [x] 변경 이력·migration·기존 역할 전환안 및 영향 소비처 정리
+- [ ] 권한표와 기존 operator 전환 정책 사용자 확인
+- [x] 설계 문서 검증·커밋
+- [ ] 설계 문서 원격 push 확인
+
+### 설계 이후 별도 구현 TODO
+
+- [ ] 자기 탈퇴 범위·이력 보존/열람 정책 확정
+- [ ] 새 역할·상태·이력 migration 및 테스트 DB 전환 검증
+- [ ] guard·지정 API·제재 lifecycle·이력 원자성 구현
+- [ ] 운영자 지정·회원 관리 화면 정비와 desktop/mobile 검증
+- [ ] 역할별 API·기존 로그인·다른 원장 불변·동시성 검증
+- [ ] 운영 migration 적용 승인·main 병합·배포·실계정 검증
+
+이 후속 구현을 이번 승인 자격 수정의 완료로 간주하지 않는다.
