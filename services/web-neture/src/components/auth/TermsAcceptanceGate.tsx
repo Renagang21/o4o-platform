@@ -9,6 +9,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 import { PolicyAcceptanceGate } from '@o4o/shared-space-ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { loadPolicy } from '../../pages/legal/PolicyDocumentPage';
@@ -23,7 +24,8 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       loadPolicy={loadPolicy}
       onAccept={acceptPendingPolicies}
       onLogout={logout}
-      allowPaths={ALLOW_PATHS}
+      // The representative home renders public content only while terms are pending.
+      allowPaths={CURRENT_HOST_PROFILE === 'main' ? [...ALLOW_PATHS, '/'] : ALLOW_PATHS}
       serviceName="Neture"
       termsPath="/terms"
     >

@@ -30,8 +30,8 @@ const STORE_ORIGIN = 'https://store.neture.co.kr';
 const ACCESS_LINKS: Record<string, SemiFranchiseAccessLink> = {
   apply_pharmacy: { label: '내 매장(약국) 신청', href: `${STORE_ORIGIN}/start-pharmacy` },
   pharmacy_pending: { label: '약국 가입 상태 확인', href: `${STORE_ORIGIN}/start-pharmacy` },
-  apply_semi_franchise: { label: '세미프랜차이즈 가입 신청', href: `${STORE_ORIGIN}/store/pharmacy/semi-franchises` },
-  semi_franchise_pending: { label: '세미프랜차이즈 가입 상태 확인', href: `${STORE_ORIGIN}/store/pharmacy/semi-franchises` },
+  apply_semi_franchise: { label: '약국 협력사업 참여 신청', href: '/businesses/pharmacy/participation' },
+  semi_franchise_pending: { label: '사업 참여 상태 확인', href: '/businesses/pharmacy/participation' },
 };
 
 export function semiFranchiseAccessLink(next: string | null | undefined): SemiFranchiseAccessLink | null {

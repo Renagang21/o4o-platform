@@ -11,7 +11,7 @@
  *   - 사용자 드롭다운 메뉴 구성
  */
 
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useMatch, Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
@@ -25,9 +25,6 @@ import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
-  KPA_SERVICE_GUIDE_NAV_ITEM,
-  KPA_ABOUT_NAV_ITEM,
-  KPA_CONTACT_NAV_ITEM,
   KPA_CONTEXTUAL_NAV,
 } from '../config/navigation';
 import { creditApi } from '../api/credit';
@@ -40,6 +37,8 @@ export function KpaGlobalHeader() {
   const { user, logout, isLoading } = useAuth();
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
+  const businessMatch = useMatch('/businesses/:businessKey/*');
+  const businessKey = encodeURIComponent(businessMatch?.params.businessKey ?? 'pharmacy');
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
   // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
@@ -90,11 +89,11 @@ export function KpaGlobalHeader() {
   //   조립 순서(base → 역할 → 안내 → 비로그인 전용)를 공통 buildCommunityPrimaryNav 로 이관.
   //   항목·노출 조건은 config/navigation.ts 소유 그대로다.
   const computedNav = buildCommunityPrimaryNav({
-    base: KPA_BASE_NAV,
+    base: KPA_BASE_NAV.map(item => ({ ...item, href: item.href.replace('/businesses/pharmacy/', `/businesses/${businessKey}/`) })),
     contextual: KPA_CONTEXTUAL_NAV,
     conditions: { storeOwner: isStoreOwner },
-    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: 'pharmacy 사업 운영', href: '/operator/semi-franchises' }] : []), KPA_SERVICE_GUIDE_NAV_ITEM, KPA_ABOUT_NAV_ITEM],
-    guestTrailing: [KPA_CONTACT_NAV_ITEM],
+    trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
+    guestTrailing: [],
     isAuthenticated: !!user,
   });
 

@@ -53,7 +53,29 @@ describe('HandoffPage — exchange 는 credentials 없이 호출한다', () => {
     expect(fs.existsSync(file)).toBe(true);
     const src = codeOnly(fs.readFileSync(file, 'utf-8'));
 
-    expect(src).toContain('/auth/handoff/exchange');
+    if (src.includes('HandoffEntryPage')) {
+      expect(src).toMatch(/import\s*\{[^}]*HandoffEntryPage[^}]*\}\s*from\s*['"]@o4o\/auth-react['"]/);
+      expect(src).toMatch(/<HandoffEntryPage\b/);
+    } else {
+      expect(src).toMatch(/exchangeHandoffToken\s*\(/);
+      expect(src).toContain("from '@o4o/auth-client'");
+    }
     expect(src).not.toMatch(/credentials\s*:\s*['"]include['"]/);
+  });
+});
+
+// A shared receiver still delegates to the same public, cookie-free transport.
+describe('shared handoff delegation preserves the cookie boundary', () => {
+  it('receiver and public exports connect to the transport with no cookie opt-in', () => {
+    const read = (rel: string) => codeOnly(fs.readFileSync(path.join(REPO, rel), 'utf-8'));
+    const receiver = read('packages/auth-react/src/HandoffEntryPage.tsx');
+    const transport = read('packages/auth-client/src/exchangeHandoffToken.ts');
+    expect(read('packages/auth-react/src/index.ts')).toContain("export { HandoffEntryPage } from './HandoffEntryPage'");
+    expect(receiver).toMatch(/exchangeHandoffToken\s*\(/);
+    expect(receiver).toContain("from '@o4o/auth-client'");
+    expect(read('packages/auth-client/src/index.ts')).toContain("export { exchangeHandoffToken } from './exchangeHandoffToken.js'");
+    expect(transport).toContain('/auth/handoff/exchange');
+    expect(transport).toMatch(/return\s+fetch\s*\(/);
+    for (const source of [receiver, transport]) expect(source).not.toMatch(/credentials\s*:\s*['"]include['"]/);
   });
 });
