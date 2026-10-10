@@ -34,6 +34,18 @@ export interface EmailSettings {
   };
 }
 
+interface SettingsResponse<T> {
+  success: boolean;
+  data: T;
+}
+
+function unwrapSettings<T>(response: SettingsResponse<T>): T {
+  if (!response?.success || !response.data || typeof response.data !== 'object' || Array.isArray(response.data)) {
+    throw new Error('설정 응답을 확인할 수 없습니다. 다시 시도해주세요.');
+  }
+  return response.data;
+}
+
 class SettingsService {
   // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
   //   backend 는 `/api/v1/settings/:type` (type = general | email | …) 뿐이다.
@@ -44,24 +56,24 @@ class SettingsService {
 
   // General Settings
   async getGeneralSettings(): Promise<GeneralSettings> {
-    const response = await unifiedApi.raw.get<GeneralSettings>(apiEndpoints.settings.general);
-    return response.data;
+    const response = await unifiedApi.raw.get<SettingsResponse<GeneralSettings>>(apiEndpoints.settings.general);
+    return unwrapSettings(response.data);
   }
 
   async updateGeneralSettings(settings: Partial<GeneralSettings>): Promise<GeneralSettings> {
-    const response = await unifiedApi.raw.put<GeneralSettings>(apiEndpoints.settings.general, settings);
-    return response.data;
+    const response = await unifiedApi.raw.put<SettingsResponse<GeneralSettings>>(apiEndpoints.settings.general, settings);
+    return unwrapSettings(response.data);
   }
 
   // Email Settings
   async getEmailSettings(): Promise<EmailSettings> {
-    const response = await unifiedApi.raw.get<EmailSettings>(apiEndpoints.settings.email);
-    return response.data;
+    const response = await unifiedApi.raw.get<SettingsResponse<EmailSettings>>(apiEndpoints.settings.email);
+    return unwrapSettings(response.data);
   }
 
   async updateEmailSettings(settings: Partial<EmailSettings>): Promise<EmailSettings> {
-    const response = await unifiedApi.raw.put<EmailSettings>(apiEndpoints.settings.email, settings);
-    return response.data;
+    const response = await unifiedApi.raw.put<SettingsResponse<EmailSettings>>(apiEndpoints.settings.email, settings);
+    return unwrapSettings(response.data);
   }
 }
 
