@@ -53,3 +53,10 @@
 ## legacy 담당 전달 사항
 
 제거 범위는 `/work/kpa-society/store/*`와 PharmacyHub commerce다. 공통 `/store/*`의 제품·자료함·QR/태블릿 기능 및 선택 매장 헤더를 함께 제거하지 않는다. 주소 정리 후 제품 제작 문맥(`pType`, `pId`, `pName`), 자료함 편집·게시 경로, 매장 선택 복원에 영향을 주는지 확인해 결과를 공유해 달라. 실제 제거 구현은 별도 담당이 수행한다.
+
+## PR #386 CI 후속 정리 (2026-10-10)
+
+- 최초 커밋의 CI Gate는 통과했으나 SonarCloud 신규 코드 중복률 4.5%(기준 3% 이하)로 실패했다.
+- store 서비스 내부 `storeProductFetch`에 제품 API의 인증 재시도·최초 매장 헤더 보존을 모았다. JSON/QR 응답 처리와 각 API 오류 계약은 기존 호출부에 유지한다. 공유 Core·서버 정책은 변경하지 않는다.
+- 본문·메서드 보존과 인증 갱신 실패 시 재전송하지 않는 검증을 추가했다. store-web 22개 테스트, TypeScript/Vite 빌드, 변경 파일 ESLint, diff 검증 PASS.
+- 같은 WO의 review finding 처리이므로 기존 `wo/store-workflow-audit` 브랜치를 유지한다. push 이후 SonarCloud 결과를 별도로 확인한다.

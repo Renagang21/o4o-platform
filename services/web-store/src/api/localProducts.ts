@@ -11,9 +11,7 @@
  * Local Products are Display Domain only — NOT Commerce Objects.
  */
 
-import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
-import { getAccessToken } from '../contexts/AuthContext';
-import { tryRefreshToken } from './token-refresh';
+import { storeProductFetch } from './storeProductFetch';
 import { apiV1Service } from '../lib/serviceContext';
 
 // Unified Store: base 는 요청 시점의 서비스 문맥에서 만든다 (KPA 의 module 상수 `/api/v1/kpa/store` 대신)
@@ -80,25 +78,10 @@ export interface LocalProductListResponse {
 // ==================== Helpers ====================
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = getAccessToken();
-  const headers = captureStoreOrganizationHeaders({
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
+  const response = await storeProductFetch(url, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', ...options.headers },
   });
-
-  let response = await fetch(url, { ...options, headers });
-
-  if (response.status === 401) {
-    const newToken = await tryRefreshToken();
-    if (newToken) {
-      headers.set('Authorization', `Bearer ${newToken}`);
-      response = await fetch(url, {
-        ...options,
-        headers,
-      });
-    }
-  }
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({ message: 'Network error' }));
