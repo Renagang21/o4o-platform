@@ -75,3 +75,31 @@ describe('사업 서비스의 참가자 공간', () => {
     expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
   });
 });
+
+
+describe('게시판 미개설 사업의 권한', () => {
+  it('승인된 참가자는 게시판 연결 없이도 사업 자료를 조회한다', async () => {
+    mocks.get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/businesses/pharmacy')) return response({ ...business, communityKey: 'business:pharmacy' });
+      if (path.endsWith('/communities/business%3Apharmacy/access')) return response({ ...access, allowed: true });
+      if (path.endsWith('/store/contents')) return response({ items: [], total: 0 });
+      throw new Error(`Unexpected request ${path}`);
+    });
+    mount('/businesses/pharmacy/materials');
+    expect(await screen.findByText('등록된 자료가 없습니다.')).toBeTruthy();
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 } });
+    expect(screen.queryByText('사업 참여 승인 후 자료를 이용할 수 있습니다.')).toBeNull();
+  });
+  it('미승인 참가자의 자료 접근은 게시판 미개설 상태에서도 차단한다', async () => {
+    mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? access : { ...business, communityKey: 'business:pharmacy' }));
+    mount('/businesses/pharmacy/materials');
+    expect(await screen.findByText('사업 참여 승인 후 자료를 이용할 수 있습니다.')).toBeTruthy();
+    expect(mocks.get.mock.calls.some(([path]) => path.includes('/store/contents'))).toBe(false);
+  });
+  it('담당 운영자는 게시판 연결 없이 운영 화면을 이용하고 소유자 전용 조회를 하지 않는다', async () => {
+    mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, canManage: true } : { ...business, communityKey: 'business:pharmacy' }));
+    mount('/businesses/pharmacy/participation');
+    expect(await screen.findByText('이 사업의 담당 운영자입니다.')).toBeTruthy();
+    expect(mocks.get.mock.calls.some(([path]) => path.endsWith('/semi-franchises'))).toBe(false);
+  });
+});
