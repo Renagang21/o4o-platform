@@ -132,7 +132,11 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [x] 실제 PostgreSQL 역할 전환·원장 불변·이력 rollback·동시 보호 검증
 - [x] API 타입 검사 및 Neture production build
 - [x] 회원 관리 UI Vitest 및 desktop/mobile mock API browser smoke
-- [ ] 최신 main 통합 후 최종 회귀·push·PR latest HEAD CI 확인
+- [x] 최신 main 통합 후 최종 로컬 회귀
+- [ ] 최종 커밋 push·PR latest HEAD CI 확인
 
 자기 탈퇴와 이력 보존 기간/자동 삭제는 이번 admin 관리 탈퇴 구현과 별도 정책으로 남긴다.
 운영 migration·main 병합·배포는 push 완료 이후의 별도 승인 범위다.
+
+최신 main `2a8b80cf24`를 충돌 없이 통합했다. 플랫폼 전역 bypass만으로 개별 역할 지정 권한을 얻지 않도록 명시 community 서비스 admin 판정을 추가했다.
+최종 검증은 [CHECK](../checks/CHECK-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)에 기록했다. 이전 단계의 정책/구현 대기 기록은 단계 이력이며 현재 구현 상태는 이 절과 CHECK를 따른다.

@@ -1,3 +1,4 @@
+import { hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
 import { CommunityMemberManagementService, type CommunityMemberAction } from '../services/community/community-member-management.service.js';
 import { CommunityMembershipMutationError } from '../services/community/community-membership-mutations.js';
 import { forumRequestService } from '../services/forum/ForumRequestService.js';
@@ -109,7 +110,17 @@ export function createCommunitiesRoutes(
   const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];
   // 서비스 전체 심사 경계
   const serviceOperatorOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:operator')];
-  const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin')];
+  const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin'),
+    asyncHandler(async (req, res, next) => {
+      // Entity designation belongs to explicitly assigned service admins; generic
+      // platform bypass must not turn a central account into an entity operator.
+      if (!await hasCommunityServiceAdmin(AppDataSource, (req as AuthRequest).user!.id)) {
+        res.status(403).json({ success: false, code: 'COMMUNITY_SERVICE_ADMIN_REQUIRED', error: '지정된 커뮤니티 서비스 admin만 역할을 관리할 수 있습니다.' });
+        return;
+      }
+      next();
+    }),
+  ];
 
   router.get(
     '/',

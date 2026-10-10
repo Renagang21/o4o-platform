@@ -150,3 +150,5 @@ migration은 기존 개별 operator 행만 admin으로 전환하고 가입 상�
 구버전 개별 운영 경로가 새 revision 서빙 전까지 일시 차단된다. 유지보수 시간과 새 revision의 성공·실패 복구 절차를 함께 검토한다.
 새 revision 배포가 실패하면 이전 operator-only 코드로 자동 data rollback하지 않고 중앙 서비스 운영자 경로와 검토된 forward 수정으로 복구한다.
 이번 작업은 코드·문서 push까지이며 이 운영 절차를 실행하지 않는다.
+
+개별 역할 지정 경로에는 공통 플랫폼 bypass 외에 명시 community 서비스 admin 판정을 추가했다. 플랫폼 계정이라는 이유만으로 개별 역할 지정 권한을 합성하지 않는다.

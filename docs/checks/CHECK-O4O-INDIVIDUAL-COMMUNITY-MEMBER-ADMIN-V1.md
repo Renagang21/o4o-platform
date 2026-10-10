@@ -27,7 +27,20 @@ canonical bootstrap과 기존 incremental 전체를 재현한 이전 지문은 6
 ## UI와 검증 한계
 
 Chromium desktop 1440×1000 / mobile 390×844에서 모의 API를 사용했다.
-회원 상태 필터, admin 정지 요청·응답 표시·정지 해제 버튼, operator 제재 버튼 차단을 확인했다.
+회원 상태 필터, admin 정지 요청·응답 표시·정지 해제 버튼, operator 제재 버튼 차단 및 중앙 개별 Admin 선택·사유·지정 요청을 확인했다.
 UI 호출 검증과 실제 PostgreSQL 서비스 검증은 별도 실행이며, 실제 로그인부터 DB까지 연결된 E2E로 보고하지 않는다.
 운영 DB 전환과 배포 승인·실계정 smoke는 미수행이다.
 최종 Jest/Vitest/build/CI 결과는 PR 최신 HEAD와 TODO 검증 절을 기준으로 한다.
+
+## 최종 로컬 검증
+
+- 최신 main `2a8b80cf24` 통합 후 API Jest 7 suites / 168 tests PASS.
+- 플랫폼 bypass 차단 보완 후 관련 2 suites / 49 tests PASS (위 집합과 중복, 플랫폼 역할 회귀 1개 추가).
+- Neture Vitest 2 files / 20 tests PASS.
+- API 타입 검사·auth-client 재빌드·Neture production build PASS.
+- PostgreSQL 실제 동시성·원장 경계 13 checks 및 별도 migration 전환 검증 PASS.
+- Browser desktop/mobile에서 admin·operator·중앙 역할 지정 6개 시나리오 PASS (mock API).
+- migration contract 21 checks / 실패 0, historical source 544개 불변, 문서 민감정보·unsafe route·diff/staged scope 검사 PASS.
+
+작업 branch는 `wo/community-operator-next`, PR은 [#412](https://github.com/Renagang21/o4o-platform/pull/412)다.
+CI·Sonar·review의 최종 상태는 PR 최신 HEAD 기준으로 확인한다.

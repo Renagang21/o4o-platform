@@ -24,7 +24,7 @@ describe('중앙 지정 커뮤니티 서비스 역할', () => {
     const space = await resolveCommunityWorkspace(exec, { id: 'u1' }, 'example');
     expect(space).toMatchObject({ allowed: true, canManage: true, canJoin: false, membershipStatus: null });
   });
-  it.each([null, 'neture:admin', 'neture:operator', 'supplier:admin'])('%s는 커뮤니티 운영을 열지 않는다', async role => {
+  it.each([null, 'platform:super_admin', 'neture:admin', 'neture:operator', 'supplier:admin'])('%s는 커뮤니티 운영을 열지 않는다', async role => {
     const space = await resolveCommunityWorkspace(executor(role), { id: 'u1' }, 'example');
     expect(space).toMatchObject({ allowed: false, canManage: false });
   });
