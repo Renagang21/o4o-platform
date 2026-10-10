@@ -61,6 +61,28 @@ export async function verifyTargets(paths, request = fetch, signal) {
   }));
 }
 
+export async function verifyPublicData(paths, request = fetch, signal) {
+  const targets = paths.flatMap(path => {
+    const source = new URL(path, `https://${newHost}`);
+    if (source.pathname.startsWith('/qr/')) return [`https://api.neture.co.kr/api/v1/kpa/qr/public/${encodeURIComponent(source.pathname.slice(4))}`];
+    if (!source.pathname.startsWith('/tablet/')) return [];
+    const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(source.pathname.slice(8))}/tablet/products`);
+    if (source.searchParams.has('tabletId')) target.searchParams.set('tabletId', source.searchParams.get('tabletId'));
+    return [target.href];
+  });
+  await Promise.all(targets.map(async target => {
+    const response = await request(target, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
+    if (response.status !== 200) {
+      await response.body?.cancel();
+      throw new Error('Public QR/tablet API did not return HTTP 200.');
+    }
+    let payload;
+    try { payload = await response.json(); } catch { throw new Error('Public QR/tablet API did not return JSON.'); }
+    if (payload?.success !== true || payload.data == null || typeof payload.data !== 'object') throw new Error('Public QR/tablet API did not return successful data.');
+    // Never log public content, store identities or API error payloads.
+  }));
+}
+
 export async function verifyRedirects(paths, request = fetch, signal, rulePaths = []) {
   const checks = [...paths, ...rulePaths].map(check => typeof check === 'string' ? { path: check, target: check } : check);
   await verifyTargets([...paths, ...checks.filter(check => check.verifyTarget).map(check => check.target)], request, signal);
@@ -171,7 +193,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const result = await runCutover({
     retireHost: process.env.RETIRE_PH_HOST === 'true',
     mode, probes: await loadProbes(mode, process.env.QR_PROBE_PATHS, process.env.PROBE_OUTPUT),
-    preflight: paths => verifyTargets(paths),
+    preflight: async paths => { await verifyTargets(paths); await verifyPublicData(paths); },
     beforeWrite: () => {
       const deadline = Number(process.env.CUTOVER_DEADLINE_MS);
       // Bounded Compute retries/polls plus verification and rollback need at most 25 minutes.
@@ -207,7 +229,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       // Allow load balancer propagation; each probe attempt is bounded.
       const signal = AbortSignal.timeout(120000);
       for (let attempt = 0; attempt < 6; attempt++) {
-        try { await verifyRedirects(paths, fetch, signal, rulePaths); return; } catch (error) {
+        try { await verifyRedirects(paths, fetch, signal, rulePaths); await verifyPublicData(paths, fetch, signal); return; } catch (error) {
           if (attempt === 5 || signal.aborted) throw error;
           await new Promise(resolve => setTimeout(resolve, 10000));
         }

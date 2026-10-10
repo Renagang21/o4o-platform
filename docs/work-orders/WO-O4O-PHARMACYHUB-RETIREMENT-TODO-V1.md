@@ -54,3 +54,5 @@
 Commerce/공통 소비처 대조: B2B 주문·checkout stable의 PH 축은 퇴역 잔여로 정렬했다. distribution freeze·supplier boundary·store content/signage/POP·commonization/operator/header에도 PH 폐기 예외를 반영하고 공통 계약은 유지했다. 공용 checkout/fulfillment/결제 테이블 통째 삭제는 금지하며 PH 전용 행 귀속을 조사한다. 개인정보/감사기록의 법정 보유 대상 여부도 분리 확인하며 서비스 폐기를 보유기간 면제로 해석하지 않는다.
 
 약관 연결 리뷰 대응: PH `/terms`와 `/terms/`는 Neture 약국 `/policy`로 별도 302 전환하고 query를 유지한다. 다른 PH 경로는 기존 path/query를 보존한다. apply 검증은 두 옛 호스트의 약관 Location 및 Neture `/policy` HTTP 200도 요구하며 실패 시 기존 map으로 복구한다. 앱 변경·별도 앱 배포는 필요하지 않다.
+
+SPA 검증 보강: 실제 QR/tablet HTML 200 외에 프런트가 사용하는 공개 API(`kpa/qr/public/:slug`, `stores/:slug/tablet/products`·tabletId 유지)의 HTTP 200·JSON success/data를 apply 전후에 확인한다. HTML fallback·누락 데이터·API 실패는 전환 성공으로 처리하지 않고 원문 응답/매장 정보는 로그에 쓰지 않는다. 이는 공개 데이터 연결 확인이며 브라우저 화면·실물 QR 스캔 검증 완료를 뜻하지 않는다.
