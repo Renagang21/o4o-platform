@@ -61,7 +61,8 @@ F10/F11 본문, `users`/`service_memberships`/`role_assignments` 구조는 변�
 - [x] 관련 단위·실제 PG 통합·build/type-check/lint, production bundle 가입 UI PC/모바일 8건 (API/provider mock).
 - [x] 사용자 승인 후 PR #392 main `26b98a33c1` 통합; exact-head CI/review 및 post-merge CI #38019181483·CodeQL PASS. Promote #38019828704 API·전체관리자·웹 5개 운영 배포 SUCCESS.
 - [x] 배포 후 유지 8개 origin × PC/mobile × 매장 경영자/공급자 Demo 32/32 PASS; 신규 소셜 계정 조회의 Demo 변경 차단, 업무 역할 경계, access/refresh 로그아웃 폐기와 다른 origin 세션 유지 확인.
-- [ ] 운영 Kakao 앱·REST ID·client secret ON·callback 등록·Secret Manager binding 확인 후 실제 로그인/가입/handoff PC·모바일 smoke.
+- [x] 운영 앱·REST ID·고정 callback·Secret Manager binding·runtime 접근자 구성 확인; API 설정 배포 #38029009245 후 유지 8개 origin enabled=true, 전체관리자 false.
+- [ ] 실제 Client Secret/provider code 교환·로그인/가입/handoff PC·모바일 smoke. 사용자의 가입 시도에서 전역 SQL 문자 검사 오류가 보고돼 수정·재배포 후 재검증 필요.
 - [ ] main Sonar 비필수 Quality Gate 실패 범위 조사: PR 분석은 PASS, main 분석 hotspot 76건·중복률 14.2%·신뢰성/보안 E. 복원 후 허용 도메인 포함을 확인했으나 공개 API는 원격 HTTP 403; 상세 영향은 미확인. 접근 가능 후 인증 변경 영향부터 확인.
 
 ## 4-C. Google·카카오 명시적 계정 연결
@@ -75,7 +76,7 @@ F10/F11 본문, `users`/`service_memberships`/`role_assignments` 구조는 변�
 - [ ] 실제 Google/Kakao 재인증·연결·취소·충돌 PC/모바일 smoke (실제 소유자 인증 필요).
 - [ ] 두 기존 users.id 병합이 필요하면 별도 충돌 계획·사용자 검토.
 
-## 환경·검증 경계
+## 환경·검증 경계 (PR #392/396 당시 관측)
 
 `cloud-environment-onboarding:setup`으로 준비한 격리 checkout/toolchain을 재사용한다. 현재 공식
 Kakao REST 접근은 HTTP 200이다. 실행 환경에 GCP identity/Kakao credential binding은 없으며,
@@ -95,3 +96,17 @@ Job·API revision 검증·traffic 전환과 전체관리자/웹 배포가 성공
 새 로그 저장소 host의 proxy 차단으로 이번 세부 원인은 미확인이다. 정확한 host 추가는 환경
 초안에 저장했으며 게시·접근 반영은 별도다. 기존 앱·리소스 조사는 권한과 로그 확인 후 이어간다.
 PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대상이 아니다.
+
+## 2026-10-10 운영 활성화 후 오류 수정 TODO
+
+동일 WO의 연속 Phase로 기존 격리 checkout·branch를 유지한다. API 설정 배포는 완료했으나
+실제 소유자 가입 성공으로 보고하지 않는다. 설정 배포 이후의 관측은 아래 및 CHECK를 따른다.
+
+- [x] API-only verified 배포 #38029009245 (`2a92ce24cf`): CI·정식 migration Job·revision readiness·traffic 전환·전환 후 health PASS.
+- [x] 실제 Demo PC/mobile 32/32 및 Neture Demo 변경 차단 2/2 PASS. Lecture는 문서대로 Neture 계정센터 진입을 검증하며 자체 카카오 버튼을 요구하지 않음.
+- [x] 카카오 실제 UI 시작·provider 로그인 화면 redirect 요청 4/4 확인. 계정 소유자 인증·token 교환 완료와 구분.
+- [x] 합성 callback 입력으로 `--` 포함 OAuth code의 전역 SQL 문자 오탐 재현; code뿐 아니라 generated state/flow token과 Google ID token의 같은 문자 가능성도 확인.
+- [x] 등록된 소셜 method/path/field의 제한된 형식·길이만 문자 휴리스틱에서 제외. 다른 필드·경로의 검사, origin·일회용 hash flow·binding·provider 검증 유지. 수정 전 새 회귀 11 FAIL/13 PASS → 수정 후 관련 3 suites/79 PASS; type-check·lint·API build PASS.
+- [ ] 오류 수정 PR의 required CI·review 확인 → 사용자 main 통합 승인 → API 배포 → 실제 소유자 가입·로그인·연결 재검증.
+- [ ] 실제 취소 callback의 브라우저 복귀 재검증. 시작 4건은 성공했지만 초기 harness의 취소 UI는 1건 HTTP 400/3건 transport failure였으며, 진단용 같은 binding의 직접 GET은 303이었다. 원인을 임의 확정하거나 취소 성공으로 계산하지 않음.
+- [ ] 후속 개인정보 처리방침: 사용자 제보의 읽기 어려운 표시 방식과 리팩터링 전 내용을 조사해 수정안 작성·검토. 동의 UI와 정책 문서/API 소비처를 함께 확인하고 승인된 정책 내용으로 갱신.

@@ -57,7 +57,7 @@
 
 문서·코드 조사로 구체화한 TODO와 하위 PR 순서는 [카카오·명시적 연결 WO](WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다. 4-A는 세션 수단·전체관리자 경계, 4-B는 카카오 OAuth, 4-C는 재인증 기반 계정 연결이다. 기존 Google 세션의 claim 부재 및 handoff의 Google 추정부터 해소한다.
 
-- [ ] 카카오 앱 설정·redirect origin·서버 자격정보 존재 확인 (값은 환경 설정에서만 관리)
+- [x] 카카오 앱·고정 callback·서버 Secret Manager binding·runtime 접근 권한 확인 및 API 설정 활성화 (#38029009245, 비밀값 기록 없음)
 - [x] 서버 검증 REST code 교환, 브라우저에 바인딩한 state·일회 사용·redirect 검증과 카카오 ID 기반 조회 (PKCE 지원은 단정하지 않음)
 - [x] 카카오 확인 이메일이 없으면 O4O 이메일 확인 수행; 공통 이름·모바일·약관 가입 정책 적용
 - [x] `authMethod`를 Google/password/Kakao로 명시; 전체관리자 경계는 Google 긍정 판정
@@ -67,6 +67,8 @@
 - [x] 동일 이메일 자동 병합 금지 로컬 회귀
 - [x] PR #392 main `26b98a33c1` 통합·Promote #38019828704 운영 배포; 배포 후 실제 Demo 32/32 PASS (외부 OAuth 검증과 구분)
 - [ ] 카카오 운영 설정 활성화 후 실제 Google/Kakao 실접속·명시적 연결 PC/mobile smoke (실제 소유자 인증 필요)
+- [ ] 운영 가입의 `Invalid request / invalid characters` 차단 수정: 합성 OAuth code로 재현, 제한된 소셜 opaque 필드 처리·79 PASS 로컬 검증 완료. 수정 PR 통합·배포 후 실제 소유자 가입 재검증 필요.
+- [ ] 후속 개인정보 처리방침 표시·내용 정합: 읽기 어려운 화면과 리팩터링 전 내용을 조사해 사용자 검토 후 갱신.
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
 
@@ -84,7 +86,7 @@
 
 본 대화의 승인은 위 인증 API/shared contract, 세션 및 provider 제약에 필요한 migration 코드, 테스트 seed·연결·정리 코드를 단계별로 구현하는 근거다. F10/F11 예외는 해당 인증 수단·세션 처리에 한정하고, `role_assignments` SSOT와 서비스 가입·조직·권한 분리는 유지한다. Frozen 문서 본문은 임의로 재작성하지 않는다.
 
-기존 테스트 데이터 정리도 승인됐으나, 연결 가능한 대상 DB 확인과 복구 가능한 대상 계획 없이 삭제하지 않는다. 운영 배포/migration은 PR 통합 이후 현재 Delivery 정책을 따른다. 현재 환경에는 기존 데이터 DB 및 카카오 자격정보 binding이 없으므로 실제 데이터 정리·외부 OAuth smoke는 아직 실행할 수 없다. 비밀번호·토큰·실제 계정 정보는 문서에 기록하지 않는다.
+기존 테스트 데이터 정리도 승인됐으나, 연결 가능한 대상 DB 확인과 복구 가능한 대상 계획 없이 삭제하지 않는다. 운영 배포/migration은 PR 통합 이후 현재 Delivery 정책을 따른다. 현재 cloud의 직접 DB/GCP 자격정보와 별개로 운영 설정은 승인된 WIF workflow로 반영한다. 실제 데이터 정리는 대상 DB·복구 계획 확인이 필요하고, 외부 OAuth는 실제 소유자 인증 및 아래 운영 오류 수정·재배포 후 검증이 필요하다. 비밀번호·토큰·실제 계정 정보는 문서에 기록하지 않는다.
 
 ## 완료 판단
 
@@ -97,7 +99,7 @@
 
 단계 3: 같은 CHECK의 [가입·권한 회귀](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md#가입권한-회귀--phase-3)에 API 483건·UI 130건과 운영 8개 서비스 PC/모바일 32건의 결과를 기록했다. 이 후속은 기록-only이며 추가 배포 대상이 아니다. 실제 카카오 OAuth와 계정 연결·데이터 정리는 후속 TODO다.
 
-## 2026-10-10 단계 4 진행
+## 2026-10-10 단계 4 진행 (PR #392 배포 당시 및 후속 관측)
 
 4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체관리자·웹 배포 성공.
 4-B/4-C PR #392는 사용자 승인 후 main `26b98a33c1`에 통합했다. post-merge CI #38019181483와
@@ -108,3 +110,9 @@ CodeQL PASS, Promote #38019828704 API migration·전체관리자·웹 5개 배�
 `secretmanager.secrets.list` 권한 부족으로 미확인이다. 앱/키 연결과 실제 Google/Kakao 로그인·
 가입·재인증·명시적 연결, 전체관리자 실제 Google 재로그인은 OPEN으로 유지한다.
 검증: [카카오·명시적 연결 CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md).
+
+후속 설정 배포 #38029009245는 API-only verified SUCCESS다. 유지 8개 origin Kakao
+enabled=true, 전체관리자 false, 실제 Demo 32/32·Demo 변경 차단 2/2 PASS를 확인했다.
+실제 소유자의 가입 시도는 문자 검사 오류가 보고돼 완료되지 않았다. 위 가입 차단 수정과
+취소 callback 브라우저 복귀, 실제 계정 연결 검증은 OPEN이다. 이전 enabled=false·리소스
+조회 실패 서술은 당시 관측이며 최신 설정 상태로 사용하지 않는다.
