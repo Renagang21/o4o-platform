@@ -18,6 +18,15 @@ function executor(role: string | null, serviceStatus = 'active', accountStatus =
 }
 
 describe('중앙 지정 커뮤니티 서비스 역할', () => {
+  it.each(['active', 'suspended'])('가입이 active여도 workspace는 커뮤니티 상태 %s를 별도로 반환한다', async communityStatus => {
+    const exec = executor(null, 'active', 'active', communityStatus);
+    const original = exec.query.getMockImplementation()!;
+    exec.query.mockImplementation(async (sql, params) => sql.includes('FROM community_memberships')
+      ? [{ status: 'active', role: 'member' }] as never
+      : original(sql, params));
+    const space = await resolveCommunityWorkspace(exec, { id: 'u1' }, 'example');
+    expect(space).toMatchObject({ communityStatus, membershipStatus: 'active', allowed: communityStatus === 'active' });
+  });
   it.each(['community:admin', 'community:operator'])('%s는 개별 가입 없이 운영한다', async role => {
     const exec = executor(role);
     expect(await hasCommunityServiceOperator(exec, 'u1')).toBe(true);
