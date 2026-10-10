@@ -14,6 +14,8 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   //   서비스별 LoginPage/LoginModal 이 자체 안내(서비스명/신청 링크)를 추가로 노출하므로
   //   여기서는 비밀번호 오류와 명확히 구분되는 generic fallback 만 제공한다.
   SERVICE_NOT_MEMBER: '이 서비스에 가입되어 있지 않습니다. 가입 또는 이용 신청 후 로그인할 수 있습니다.',
+  GOOGLE_SESSION_REQUIRED: '전체관리자 계정은 Google로 다시 로그인해 주세요.',
+  PASSWORD_SESSION_NOT_ALLOWED: '전체관리자 계정은 Google로 다시 로그인해 주세요.',
   INTERNAL_ERROR: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
 };
 
