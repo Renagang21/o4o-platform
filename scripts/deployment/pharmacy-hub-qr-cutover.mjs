@@ -154,7 +154,7 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
     { path: '/terms?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
     { path: '/terms/?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
   ] : [])];
-  await preflight?.(paths);
+  await preflight?.([...paths, ...rulePaths.filter(rule => typeof rule === 'object' && rule.verifyTarget).map(rule => rule.target)]);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');
   await beforeWrite?.();

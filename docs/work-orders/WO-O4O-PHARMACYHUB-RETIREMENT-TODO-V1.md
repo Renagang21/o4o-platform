@@ -64,3 +64,5 @@ SPA 검증 보강: QR은 읽기 전용 DB inventory로 활성 경로를 수집�
 HTTPS proxy 리뷰 대응: `o4o-global-lb`는 HTTPS proxy의 application map이므로 redirect에서 `httpsRedirect: true`를 제거했다(전체 호스트·약관·기존 4경로 초안 모두). HTTPS 요청의 scheme은 유지한다. HTTP→HTTPS는 기존 별도 `neture-https-frontend-redirect` map이 담당하며 이를 수정하지 않는다. 인프라 근거: `docs/checks/WO-O4O-GCP-PRELAUNCH-COST-MINIMIZATION-CENSUS-V1-CHECK.md` 및 `WO-O4O-GCLB-REMOVE-UNUSED-FORWARDING-RULES-V1-CHECK.md`.
 
 읽기 전용 QR payload 리뷰 대응: 기존 공개 QR API의 HEAD는 GET과 동일한 resolver/error status를 사용하되 scan INSERT를 건너뛴다. 일반 GET의 스캔 기록은 유지한다. 자동 검증은 먼저 slug 없는 기존 namespace의 HEAD 응답에서 지원 헤더를 확인하며, 지원이 없는 이전 API에는 실제 QR HEAD를 보내지 않고 apply 전에 중단한다. API 배포 후 실제 QR HEAD의 200·JSON content type 및 태블릿 JSON 데이터를 apply 전후에 확인한다. 새 debug/진단 HTTP route는 추가하지 않는다. 실제 API 배포·운영 전환은 아직 미실행이다. 다른 운영 작업 종료 후 이 세션이 URL map 변경을 단독 진행한다는 사용자 확인을 받았다.
+
+2026-10-11 재리뷰 대응: 약관 `/policy` 목적지를 apply preflight에도 포함하여 불가용 시 URL map update 전에 중단한다. Frozen `NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`에 넣었던 PH override는 이 혼합 PR에서 제외하고 origin/main 본문을 보존한다. 사용자 승인된 PH 폐기 정책의 Frozen 계약 변경은 canonical-index 정합과 함께 별도 문서 작업 #427에서 처리한다. 본 PR은 Frozen 변경 완료를 뜻하지 않는다.

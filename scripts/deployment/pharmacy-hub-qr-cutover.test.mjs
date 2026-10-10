@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyPublicData, loadProbes, runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
+import { verifyTargets, verifyPublicData, loadProbes, runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
 
 test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
   const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
@@ -247,4 +247,14 @@ test('QR HEAD resolves raw and encoded slugs and rejects missing data or HTML', 
   await assert.rejects(verifyPublicData(['/qr/active'], async () => new Response(null, {
     headers: { 'x-qr-read-only-head': '1', 'content-type': 'text/html' },
   })), /successful landing data/);
+});
+
+
+test('unavailable policy destination blocks full-host apply before any write', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, retireHost: true, preflight: async targets => {
+    assert.ok(targets.includes('/policy?ruleCheck=1'));
+    await verifyTargets(targets, async url => new Response(null, { status: new URL(url).pathname === '/policy' ? 404 : 200 }));
+  } }), /HTTP 200/);
+  assert.equal(h.writes.length, 0);
 });
