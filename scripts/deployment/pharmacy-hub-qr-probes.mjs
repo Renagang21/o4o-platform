@@ -69,7 +69,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     await writeFile(process.env.PROBE_OUTPUT, paths.join('\n'), { mode: 0o600 });
     console.log(JSON.stringify({ readOnly: true, foundFamilies: paths.length, requiredFamilies: 4 }));
   } catch (error) {
-    if (stage === 'inventory' && error.message.startsWith('Read-only QR inventory failed: stage=query-')) throw error;
+    if (stage === 'inventory' && /^Read-only QR inventory failed: stage=(query-[1-4]|rollback); code=/.test(error.message)) throw error;
     throw safeInventoryError(error, stage);
   } finally {
     await client.end();
