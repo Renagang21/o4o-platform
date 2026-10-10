@@ -39,6 +39,7 @@ export function KpaGlobalHeader() {
   const navigate = useNavigate();
   const businessMatch = useMatch('/businesses/:businessKey/*');
   const businessKey = encodeURIComponent(businessMatch?.params.businessKey ?? 'pharmacy');
+  // The business workspace owns its task navigation; the header retains account/store utilities.
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
   // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
@@ -89,7 +90,7 @@ export function KpaGlobalHeader() {
   //   조립 순서(base → 역할 → 안내 → 비로그인 전용)를 공통 buildCommunityPrimaryNav 로 이관.
   //   항목·노출 조건은 config/navigation.ts 소유 그대로다.
   const computedNav = buildCommunityPrimaryNav({
-    base: KPA_BASE_NAV.map(item => ({ ...item, href: item.href.replace('/businesses/pharmacy/', `/businesses/${businessKey}/`) })),
+    base: (businessMatch ? [] : KPA_BASE_NAV).map(item => ({ ...item, href: item.href.replace('/businesses/pharmacy/', `/businesses/${businessKey}/`) })),
     contextual: KPA_CONTEXTUAL_NAV,
     conditions: { storeOwner: isStoreOwner },
     trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],

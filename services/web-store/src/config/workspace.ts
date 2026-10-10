@@ -50,7 +50,6 @@ export interface RootNavItem {
 }
 
 export const ROOT_NAV_ITEMS: readonly RootNavItem[] = [
-  { key: 'home', label: '홈', to: WORKSPACE_PATHS.home, end: true },
   { key: 'my-store', label: '내 매장', to: WORKSPACE_PATHS.myStore, end: false },
   { key: 'my-services', label: '이용 사업', to: WORKSPACE_PATHS.myServices, end: true },
   { key: 'settings', label: '설정', to: WORKSPACE_PATHS.settings, end: false },

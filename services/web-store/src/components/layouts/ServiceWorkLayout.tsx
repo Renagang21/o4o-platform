@@ -9,7 +9,7 @@
  *   - `key={serviceKey}` 로 서비스가 바뀌면 하위 트리를 다시 mount 한다(이전 서비스 데이터 잔존 방지).
  */
 import { useEffect } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Navigate, Link, useLocation, useParams } from 'react-router-dom';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { SERVICE_WORK_CONFIGS } from '../../config/storeMenu';
 import { WORKSPACE_PATHS } from '../../config/workspace';
@@ -90,27 +90,6 @@ export function ServiceWorkHomePage() {
   const serviceKey = useWorkServiceKey();
   if (!isUnifiedServiceKey(serviceKey)) return null;
   const config = SERVICE_WORK_CONFIGS[serviceKey];
-  const sections = (config.menuSections ?? []).filter((s) => s.label);
-  return (
-    <div className="space-y-6" data-testid={`service-work-home-${serviceKey}`}>
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">{config.serviceName} 서비스 업무</h1>
-        <p className="text-sm text-slate-500 mt-1">이 서비스에서만 쓰는 업무입니다. 매장 공통 업무는 내 매장에서 처리합니다.</p>
-      </header>
-      {sections.map((section) => (
-        <section key={section.label} className="bg-white border border-slate-200 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-500 mb-3">{section.label}</h2>
-          <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {section.items.map((item) => (
-              <li key={item.key}>
-                <Link to={`${config.basePath}${item.subPath}`} className="block rounded-lg border border-slate-200 px-4 py-3 text-sm font-medium text-slate-800 hover:border-slate-400">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
-  );
+  const firstTask = (config.menuSections ?? []).flatMap(section => section.items).find(item => item.subPath);
+  return firstTask ? <Navigate to={`${config.basePath}${firstTask.subPath}`} replace /> : null;
 }

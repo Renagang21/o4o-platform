@@ -21,7 +21,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard'],
   menuSections: [
     { label: '', items: [
-      { key: 'home', label: '홈', subPath: '' },
+      { key: 'home', label: '업무 현황', subPath: '' },
     ]},
     { label: '매장 제품', items: [
       { key: 'my-products',      label: '내 매장 제품',       subPath: '/my-products' },
@@ -96,7 +96,6 @@ export const SERVICE_WORK_CONFIGS: Readonly<Record<UnifiedServiceKey, StoreDashb
     basePath: `${WORKSPACE_PATHS.serviceWork}/kpa-society`,
     enabledMenus: ['dashboard'],
     menuSections: [
-      { label: '', items: [{ key: 'home', label: '홈', subPath: '' }] },
       { label: 'O4O 제품 · 거래', items: [
         { key: 'products',                 label: 'O4O 제품',       subPath: '/commerce/products' },
         { key: 'order-worktable',          label: '발주 작업대',    subPath: '/commerce/order-worktable' },

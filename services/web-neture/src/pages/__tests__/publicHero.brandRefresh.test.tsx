@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const auth = vi.hoisted(() => ({ isAuthenticated: false }));
 const openLoginModal = vi.hoisted(() => vi.fn());
@@ -28,6 +28,7 @@ vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: {
 
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
+import { getTrials } from '../../api/trial';
 import { MarketTrialHubPage } from '../market-trial/MarketTrialHubPage';
 
 const renderAt = (ui: ReactNode) => render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -70,15 +71,22 @@ describe('community `/`', () => {
 });
 
 describe('funding `/`', () => {
-  it('확정 Hero 문구 · 주 CTA = 이 화면의 모집 중 목록 · 보조 = 이용 방법', async () => {
+  it('비로그인은 목록 API 호출 전에 로그인으로 이동한다', async () => {
+    vi.mocked(getTrials).mockClear();
+    render(<MemoryRouter initialEntries={['/market-trial?status=recruiting']}><Routes>
+      <Route path="/market-trial" element={<MarketTrialHubPage />} />
+      <Route path="/login" element={<h1>로그인</h1>} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByRole('heading', { name: '로그인' })).toBeTruthy();
+    expect(getTrials).not.toHaveBeenCalled();
+  });
+
+  it('로그인 후 소개 배너 없이 모집 목록으로 진입한다', async () => {
+    auth.isAuthenticated = true;
     renderAt(<MarketTrialHubPage />);
-    expect(h1Text()).toBe('제품의 가능성을유통 참여로 연결합니다');
-    expect(screen.getByTestId('funding-hero-primary').getAttribute('href')).toBe('#market-trial-recruiting');
-    expect(document.getElementById('market-trial-recruiting')).not.toBeNull();
-    expect(screen.getByRole('link', { name: '이용 방법' }).getAttribute('href')).toBe('/guide/features/market-trial');
-    // 모집이 없으면 빈 상태를 그대로 보여준다 (가짜 콘텐츠 없음)
+    expect(h1Text()).toBe('유통참여형 펀딩');
+    expect(screen.queryByTestId('funding-hero-primary')).toBeNull();
+    expect(screen.queryByRole('link', { name: '이용 방법' })).toBeNull();
     expect(await screen.findByText('현재 모집 중인 유통참여형 펀딩이 없습니다')).toBeTruthy();
-    // 은퇴 서비스명 문구 없음
-    expect(document.body.textContent).not.toMatch(/K-Cosmetics|KPA-a/);
   });
 });

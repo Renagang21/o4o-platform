@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const authState = { user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] } as { id: string; email: string; name: string; roles: string[] } | null };
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user }) }));
@@ -76,4 +76,10 @@ describe('ServiceApplyPanel', () => {
     expect(screen.getByTestId('service-apply-supplier-none')).toBeTruthy();
     expect(screen.queryByRole('link')).toBeNull();
   });
+
+  it('공급자 진입에서 승인된 서비스는 기존 guard가 있는 업무 주소로 이동한다', async () => {
+   statesResult.states = st('active');
+   render(<MemoryRouter><Routes><Route path="/" element={<ServiceApplyPanel service="supplier" enterWorkspace />} /><Route path="/supplier/dashboard" element={<h1>공급자 업무</h1>} /></Routes></MemoryRouter>);
+   expect(await screen.findByRole('heading', { name: '공급자 업무' })).toBeTruthy();
+ });
 });
