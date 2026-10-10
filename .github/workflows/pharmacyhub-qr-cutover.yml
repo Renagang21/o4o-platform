@@ -12,6 +12,10 @@ on:
         description: "Read-only canonical Demo/store relationship census; no QR operation"
         type: boolean
         default: false
+      retire_host:
+        description: 'Retire all PH host routes; remove PH backend references, preserve path/query to Neture'
+        type: boolean
+        default: false
       demo_relink:
         description: 'Canonical Store Demo ownership relink; plan first, apply with matching digest'
         type: boolean
@@ -55,18 +59,20 @@ concurrency:
 
 jobs:
   cutover:
-    if: (inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true) || github.triggering_actor == github.repository_owner
     # Production inventory requires main; writes also require an explicit unfrozen state.
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 30
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
+      RETIRE_PH_HOST: ${{ inputs.retire_host }}
       DEMO_CENSUS_FLAG: ${{ inputs.demo_census }}
       DEMO_RELINK_FLAG: ${{ inputs.demo_relink }}
       DEMO_CLEANUP_FLAG: ${{ inputs.demo_cleanup }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
+      WORKFLOW_ACTOR: ${{ github.triggering_actor }}
+      REPOSITORY_OWNER: ${{ github.repository_owner }}
     steps:
       - name: Enforce production write gate
         run: |
@@ -81,8 +87,16 @@ jobs:
           for flag in "$DEMO_CENSUS_FLAG" "$DEMO_RELINK_FLAG" "$DEMO_CLEANUP_FLAG"; do
             if [ "$flag" = 'true' ]; then demo_count=$((demo_count + 1)); fi
           done
+          if [ "$RETIRE_PH_HOST" = 'true' ] && [ "$demo_count" -gt 0 ]; then
+            echo 'Host retirement cannot be combined with Demo operations.'
+            exit 1
+          fi
           if [ "$demo_count" -gt 1 ]; then
             echo 'Choose only one Demo operation.'
+            exit 1
+          fi
+          if [ "$demo_count" -gt 0 ] && [ "$WORKFLOW_ACTOR" != "$REPOSITORY_OWNER" ]; then
+            echo 'Demo operations require the repository owner.'
             exit 1
           fi
           if [ "$DEMO_CENSUS_FLAG" = 'true' ] && [ "$CUTOVER_MODE" != 'plan' ]; then
@@ -112,7 +126,7 @@ jobs:
           project_id: netureyoutube
           skip_install: true
       - name: Start authenticated Cloud SQL proxy for read-only inventory
-        if: inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || inputs.probe_paths == ''
+        if: inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan'))
         run: |
           docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
             --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
@@ -135,7 +149,7 @@ jobs:
             process.exit(1);
           '
       - name: Collect existing active public paths without database writes
-        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.probe_paths == ''
+        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
         env:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}

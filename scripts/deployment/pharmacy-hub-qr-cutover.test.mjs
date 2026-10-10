@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
+import { verifyTargets, verifyPublicData, loadProbes, runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
 
 test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
   const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
@@ -38,6 +38,22 @@ test('plan validates and saves a backup without making a write', async () => {
   await runCutover({ ...h.options, mode: 'plan', probes: '' });
   assert.equal(h.writes.length, 0);
   assert.deepEqual(h.saved.map(s => s.name), ['before.json', 'draft.json']);
+});
+test('full-host apply detaches PH backend and verifies root and non-QR redirects', async () => {
+  const h = harness();
+  await runCutover({ ...h.options, retireHost: true, probes: paths.slice(0, 2).join('\n'), verify: async (_paths, rules) => {
+    assert.ok(rules.includes('/'));
+    assert.ok(rules.includes('/__ph_retirement_host_check__?ruleCheck=1'));
+    assert.deepEqual(rules.filter(rule => typeof rule === 'object').map(rule => rule.target), ['/policy?ruleCheck=1', '/policy?ruleCheck=1']);
+  } });
+  assert.equal(h.writes[0].pathMatchers[0].defaultService, undefined);
+  assert.equal(h.writes[0].pathMatchers[0].defaultUrlRedirect.hostRedirect, 'pharmacy.neture.co.kr');
+});
+test('failed full-host verification restores PH backend before deletion is possible', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, retireHost: true, verify: async () => { throw new Error('host check failed'); } }), /host check failed/);
+  assert.equal(h.writes.at(-1).pathMatchers[0].defaultService, 'backend-pharmacy-hub-web');
+  assert.equal(h.saved.at(-1).name, 'rollback.json');
 });
 test('apply preserves unrelated configuration and checks real paths', async () => {
   const h = harness();
@@ -149,4 +165,96 @@ test('both root and www must return 302 with the original path and query intact'
   assert.equal(calls, 12);
   await assert.rejects(verifyRedirects(paths, async () => new Response(null, { status: 200 })), /302 redirect/);
   await assert.rejects(verifyRedirects(paths, async () => new Response(null, { status: 404 })), /HTTP 200/);
+});
+
+test('plan never depends on a private inventory file; apply still loads it', async () => {
+  const unavailable = async () => { throw new Error('inventory unavailable'); };
+  assert.equal(await loadProbes('plan', '', '/missing/inventory', unavailable), '');
+  await assert.rejects(loadProbes('apply', '', '/missing/inventory', unavailable), /inventory unavailable/);
+  assert.equal(await loadProbes('apply', '/qr/active\n/tablet/store', '/missing/inventory', unavailable), '/qr/active\n/tablet/store');
+  assert.equal(await loadProbes('apply', '', '/private/inventory', async () => '/qr/active\n/tablet/store'), '/qr/active\n/tablet/store');
+});
+
+test('full retirement verifies terms alias, query preservation and destination availability', async () => {
+  const rules = [{ path: '/terms?language=ko', target: '/policy?language=ko', verifyTarget: true }];
+  const request = badAlias => async url => {
+    const u = new URL(url);
+    if (u.host === 'pharmacy.neture.co.kr') return new Response(null, { status: u.pathname === '/policy' && badAlias === 'target' ? 404 : 200 });
+    u.host = 'pharmacy.neture.co.kr';
+    if (u.pathname === '/terms' && badAlias !== 'alias') u.pathname = '/policy';
+    return new Response(null, { status: 302, headers: { location: u.href } });
+  };
+  await verifyRedirects(paths.slice(0, 2), request(), undefined, rules);
+  await assert.rejects(verifyRedirects(paths.slice(0, 2), request('alias'), undefined, rules), /302 redirect/);
+  await assert.rejects(verifyRedirects(paths.slice(0, 2), request('target'), undefined, rules), /HTTP 200/);
+});
+
+test('tablet API checks reject missing data', async () => {
+  const seen = [];
+  await verifyPublicData(paths.slice(1, 2), async url => {
+    seen.push(new URL(url));
+    return Response.json({ success: true, data: url.includes('/tablet/') ? [] : { title: 'test' } });
+  });
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].pathname, '/api/v1/stores/store/tablet/products');
+  assert.equal(seen[0].searchParams.get('tabletId'), 'test');
+  assert.equal(seen[0].host, 'api.neture.co.kr');
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => Response.json({ success: false, error: { message: 'private row' } })), /successful data/);
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => new Response('<html>SPA</html>')), /return JSON/);
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => new Response(null, { status: 404 })), /HTTP 200/);
+});
+
+test('tablet API resolves raw and already encoded Korean slugs exactly once', async () => {
+  const slug = '테스트약국';
+  for (const path of [`/tablet/${slug}`, `/tablet/${encodeURIComponent(slug)}`]) {
+    await verifyPublicData([`${path}?tabletId=test`], async url => {
+      const target = new URL(url);
+      assert.equal(decodeURIComponent(target.pathname.split('/')[4]), slug);
+      assert.equal(target.searchParams.get('tabletId'), 'test');
+      return Response.json({ success: true, data: [] });
+    });
+  }
+});
+
+
+test('QR checks require deployed read-only HEAD support before resolving any slug', async () => {
+  const requests = [];
+  await assert.rejects(verifyPublicData(['/qr/active'], async (url, options) => {
+    requests.push(url);
+    assert.equal(options.method, 'HEAD');
+    return new Response(null, { status: 404 });
+  }), /not deployed/);
+  assert.deepEqual(requests, ['https://api.neture.co.kr/api/v1/kpa/qr/public']);
+});
+
+test('QR HEAD resolves raw and encoded slugs and rejects missing data or HTML', async () => {
+  for (const slug of ['active', '테스트', encodeURIComponent('테스트')]) {
+    const seen = [];
+    await verifyPublicData([`/qr/${slug}`], async (url, options) => {
+      seen.push(url);
+      assert.equal(options.method, 'HEAD');
+      return new Response(null, { status: url.endsWith('/public') ? 404 : 200,
+        headers: { 'x-qr-read-only-head': '1', 'content-type': 'application/json' } });
+    });
+    assert.equal(decodeURIComponent(new URL(seen[1]).pathname.split('/').at(-1)), decodeURIComponent(slug));
+  }
+  for (const status of [404, 410, 500]) {
+    await assert.rejects(verifyPublicData(['/qr/missing'], async url => new Response(null, {
+      status: url.endsWith('/public') ? 404 : status,
+      headers: { 'x-qr-read-only-head': '1', 'content-type': 'application/json' },
+    })), /successful landing data/);
+  }
+  await assert.rejects(verifyPublicData(['/qr/active'], async () => new Response(null, {
+    headers: { 'x-qr-read-only-head': '1', 'content-type': 'text/html' },
+  })), /successful landing data/);
+});
+
+
+test('unavailable policy destination blocks full-host apply before any write', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, retireHost: true, preflight: async targets => {
+    assert.ok(targets.includes('/policy?ruleCheck=1'));
+    await verifyTargets(targets, async url => new Response(null, { status: new URL(url).pathname === '/policy' ? 404 : 200 }));
+  } }), /HTTP 200/);
+  assert.equal(h.writes.length, 0);
 });
