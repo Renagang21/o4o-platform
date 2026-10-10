@@ -43,8 +43,8 @@ export default function BusinessParticipationPage() {
   };
   return <section className="rounded-xl border bg-white p-6">
     <h2 className="text-lg font-semibold">참여 신청 · 이용 상태</h2>
-    {loading && <p role="status" className="mt-4">가입 상태를 확인하고 있습니다…</p>}
-    {error && <div className="mt-4"><p role="alert">{error}</p><button className="mt-3 text-blue-700" onClick={() => setVersion(n => n + 1)}>다시 확인</button><a href="https://store.neture.co.kr/start-pharmacy" className="ml-4 text-blue-700">내 매장 신청 · 승인 상태 확인</a></div>}
+    {loading && <output aria-live="polite" className="mt-4">가입 상태를 확인하고 있습니다…</output>}
+    {error && <div className="mt-4"><p role="alert">{error}</p><button type="button" className="mt-3 text-blue-700" onClick={() => setVersion(n => n + 1)}>다시 확인</button><a href="https://store.neture.co.kr/start-pharmacy" className="ml-4 text-blue-700">내 매장 신청 · 승인 상태 확인</a></div>}
     {!loading && !error && <>
       <p className="my-4">{access?.canManage ? '이 사업의 담당 운영자입니다.' : STATUS[membership?.membershipStatus ?? ''] ?? '아직 참여 신청하지 않았습니다.'}</p>
       {membership?.reason && <p className="mb-4">처리 사유: {membership.reason}</p>}
@@ -52,10 +52,10 @@ export default function BusinessParticipationPage() {
       {membership && !['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <div className="space-y-4">
         <label className="block"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mr-2" />참여 조건을 확인했습니다.</label>
         <label className="block">추가 신청 내용 (선택)<textarea value={note} maxLength={2000} onChange={e => setNote(e.target.value)} className="mt-2 block w-full rounded border p-3" /></label>
-        <button disabled={!accepted || busy} onClick={apply} className="rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '신청 중…' : '참여 신청'}</button>
+        <button type="button" disabled={!accepted || busy} onClick={apply} className="rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '신청 중…' : '참여 신청'}</button>
       </div>}
       {!membership && !access?.canManage && <a href="https://store.neture.co.kr/start-pharmacy" className="text-blue-700">내 매장(약국) 신청 · 승인 상태 확인</a>}
-      {membership && ['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <button disabled={busy} onClick={withdraw} className="mt-4 mr-4 text-red-700">{membership.membershipStatus === 'pending' ? '신청 취소' : '탈퇴'}</button>}
+      {membership && ['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <button type="button" disabled={busy} onClick={withdraw} className="mt-4 mr-4 text-red-700">{membership.membershipStatus === 'pending' ? '신청 취소' : '탈퇴'}</button>}
       {access?.allowed && <Link to={`${businessBase(business.key)}/forum`} className="mt-4 inline-block text-blue-700">참여자 게시판 이용하기 →</Link>}
       {access?.canManage && <Link to="/operator/semi-franchises" className="ml-4 text-blue-700">사업 운영 · 가입 심사</Link>}
     </>}

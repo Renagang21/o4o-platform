@@ -1,7 +1,6 @@
-import { exchangeHandoffToken } from '@o4o/auth-client';
 /** Shared localStorage handoff receiver; clear stale tokens before parent session restore. */
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
+import { clearStoredTokens, exchangeHandoffToken, storeTokens } from '@o4o/auth-client';
 import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 import './HandoffEntryPage.css';
 

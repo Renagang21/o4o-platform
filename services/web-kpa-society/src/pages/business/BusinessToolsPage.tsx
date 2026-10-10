@@ -17,7 +17,7 @@ export default function BusinessToolsPage() {
   return <section><h2 className="text-lg font-semibold">업무 도구</h2>
     {error && <p role="alert" className="mt-4">{error}</p>}
     <ul className="mt-4 space-y-4">
-      <li><button disabled={busy} className="text-blue-700" onClick={enterStore}>내 매장 업무 · 자료함 · 태블릿 · 사이니지</button></li>
+      <li><button type="button" disabled={busy} className="text-blue-700" onClick={enterStore}>내 매장 업무 · 자료함 · 태블릿 · 사이니지</button></li>
       <li><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O AI 업무 시작" className="o4o-home-link" /></li>
       {access.canManage && <li><a className="text-blue-700" href="/operator/semi-franchises">사업 운영 · 참여 약국 관리</a></li>}
     </ul>

@@ -28,10 +28,10 @@ export default function BusinessWorkspace() {
     })();
     return () => { alive = false; };
   }, [businessKey, user?.id, isLoading, retry]);
-  if (isLoading) return <p className="p-6" role="status">로그인 상태를 확인하고 있습니다…</p>;
+  if (isLoading) return <output className="p-6" aria-live="polite">로그인 상태를 확인하고 있습니다…</output>;
   if (!user) return <Navigate to={`/login?returnTo=${encodeURIComponent(location.pathname + location.search)}`} state={{ from: location.pathname + location.search }} replace />;
-  if (error) return <section className="p-6"><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)}>다시 시도</button></section>;
-  if (!state || state.loadedFor !== `${user.id}:${businessKey}`) return <p className="p-6" role="status">사업 정보를 확인하고 있습니다…</p>;
+  if (error) return <section className="p-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)}>다시 시도</button></section>;
+  if (state?.loadedFor !== `${user.id}:${businessKey}`) return <output className="p-6" aria-live="polite">사업 정보를 확인하고 있습니다…</output>;
   const base = businessBase(businessKey);
   return <div className="mx-auto max-w-6xl px-4 py-6">
     <h1 className="text-2xl font-semibold">{state.business.name}</h1>

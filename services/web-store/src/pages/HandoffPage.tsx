@@ -1,4 +1,3 @@
-import { exchangeHandoffToken } from '@o4o/auth-client';
 import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 /**
  * Workspace handoff 수신 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-④
@@ -10,7 +9,7 @@ import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils
  * "접근 가능한 매장(organization)" 이다. 가짜 serviceKey 로 우회하지 않는다.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
+import { clearStoredTokens, exchangeHandoffToken, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { BRAND, PLATFORM_ORIGIN } from '../config/workspace';
 

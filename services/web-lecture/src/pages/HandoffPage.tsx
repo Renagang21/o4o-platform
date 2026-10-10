@@ -1,7 +1,6 @@
-import { exchangeHandoffToken } from '@o4o/auth-client';
 import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { clearStoredTokens, storeTokens } from '@o4o/auth-client';
+import { clearStoredTokens, exchangeHandoffToken, storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
 import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 

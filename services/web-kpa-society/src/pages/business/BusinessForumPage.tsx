@@ -3,9 +3,10 @@ import { Link, Outlet, useNavigate, useParams, useSearchParams } from 'react-rou
 import { ForumListTemplate, ForumWriteForm, type ForumListItem, type ForumWriteFormPayload } from '@o4o/shared-space-ui';
 import { CommentSection, ForumBlockRenderer } from '@o4o/forum-core/public-ui';
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/utils';
-import type { ForumPostResponse, ForumCommentResponse, ForumCategoryResponse, ForumListResponse } from '@o4o/types/forum';
+import type { ForumPostResponse, ForumCommentResponse, ForumCategoryResponse } from '@o4o/types/forum';
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
+import { loadBusinessForumData, type ForumView } from './forumData';
 import { businessApi, businessBase, businessError, communityApiBase } from './api';
 
 export function BusinessForumBoundary() {
@@ -24,7 +25,7 @@ export function BusinessForumBoundary() {
   </section>;
 }
 
-export default function BusinessForumPage({ view = 'posts' }: { view?: 'posts' | 'post' | 'write' | 'mine' }) {
+export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: ForumView }>) {
   const { business, access } = useBusiness();
   const { user } = useAuth();
   const { slug } = useParams();
@@ -52,29 +53,14 @@ export default function BusinessForumPage({ view = 'posts' }: { view?: 'posts' |
   useEffect(() => {
     let alive = true;
     setError(''); setLoading(true); setPost(null); setPosts([]); setComments([]); setCategories([]);
-    void (async () => {
-      try {
-        if (view === 'post' || (view === 'write' && editId)) {
-          const target = await businessApi.get<ForumPostResponse>(`${apiBase}/posts/${encodeURIComponent(editId || slug || '')}`);
-          const replies = view === 'post' ? (await authClient.api.get(`${apiBase}/posts/${target.id}/comments`, { params: { limit: commentLimit } })).data as ForumListResponse<ForumCommentResponse> : null;
-          if (alive) { setPost(target); setComments(replies?.data ?? []); setCommentTotal(replies?.totalCount ?? 0); }
-        } else {
-          const boards = await businessApi.get<ForumCategoryResponse[]>(`${apiBase}/categories`);
-          if (alive) setCategories(boards);
-          if (view !== 'write') {
-            const response = await authClient.api.get(`${apiBase}/posts`, { params: { page, limit: 20, category: category || boards.find(board => board.slug === boardSlug)?.id || undefined, author: view === 'mine' ? 'me' : undefined } });
-            const data = response.data as ForumListResponse<ForumPostResponse>;
-            if (alive) {
-              setTotalPages(data.pagination?.totalPages || 1);
-              setPosts(data.data.map(item => ({ id: item.id, title: item.title, postType: item.type as ForumListItem['postType'],
-                authorName: item.author?.nickname || item.author?.name || '참여자', createdAt: item.createdAt,
-                commentCount: item.commentCount, likeCount: item.likeCount, isPinned: item.isPinned, routeTo: `${base}/post/${encodeURIComponent(item.slug)}` })));
-            }
-          }
-        }
-      } catch (e) { if (alive) setError(businessError(e)); }
-      finally { if (alive) setLoading(false); }
-    })();
+    void loadBusinessForumData({ apiBase, base, view, slug, editId, page, category, boardSlug, commentLimit },
+      boards => { if (alive) setCategories(boards); })
+      .then(data => {
+        if (!alive) return;
+        setPost(data.post ?? null); setComments(data.comments ?? []); setCommentTotal(data.commentTotal ?? 0);
+        setPosts(data.posts ?? []); setTotalPages(data.totalPages ?? 1);
+      }).catch(e => { if (alive) setError(businessError(e)); })
+      .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [apiBase, base, view, slug, editId, page, category, boardSlug, user?.id, version, commentLimit]);
 
@@ -100,42 +86,60 @@ export default function BusinessForumPage({ view = 'posts' }: { view?: 'posts' |
     finally { setBusy(false); }
   };
 
-  if (loading) return <p role="status">게시판을 불러오고 있습니다…</p>;
-  if (error && !post && (view === 'post' || editId)) return <div><p role="alert">{error}</p><button onClick={() => setVersion(n => n + 1)}>다시 시도</button></div>;
+  if (loading) return <output aria-live="polite">게시판을 불러오고 있습니다…</output>;
+  if (error && !post && (view === 'post' || editId)) return <div><p role="alert">{error}</p><button type="button" onClick={() => setVersion(n => n + 1)}>다시 시도</button></div>;
   if (view === 'write') return <div>
     {error && <p role="alert">{error}</p>}
     {!editId && <label className="mb-4 block">게시판 <select className="ml-3 rounded border p-2" value={category || categories[0]?.id || ''} onChange={e => setParams({ category: e.target.value })}>
       {categories.map(board => <option key={board.id} value={board.id}>{board.name}</option>)}
     </select></label>}
-    {(!editId || post) && <ForumWriteForm key={post?.id ?? category} initialTitle={post?.title} initialContentHtml={typeof post?.content === 'string' ? post.content : post?.content ? blocksToHtml(post.content) : ''}
+    {(!editId || post) && <ForumWriteForm key={post?.id ?? category} initialTitle={post?.title} initialContentHtml={postContentHtml(post?.content)}
       onSubmit={submit} onCancel={() => navigate(base)} onInvalid={() => setError('제목과 내용을 입력해 주세요.')} />}
   </div>;
-  if (view === 'post' && post) return <article className="rounded-xl border bg-white p-6">
-    {error && <p role="alert">{error}</p>}
-    <h2 className="text-xl font-semibold">{post.title}</h2><p className="my-3 text-sm text-slate-500">{post.author?.nickname || post.author?.name || '참여자'} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}</p>
-    <ForumBlockRenderer content={typeof post.content === 'string' ? htmlToBlocks(post.content) : post.content} />
-    <div className="my-5 flex gap-4 text-sm text-blue-700">
-      <button disabled={busy} onClick={() => void mutate(() => businessApi.post(`${apiBase}/posts/${post.id}/like`, {}))}>좋아요 {post.likeCount}</button>
-      {post.authorId === user?.id && <Link to={`${base}/write?edit=${encodeURIComponent(post.id)}`}>수정</Link>}
-      {(post.authorId === user?.id || access?.canManage) && <button disabled={busy} onClick={() => { if (window.confirm('이 게시글을 삭제하시겠습니까?')) void mutate(async () => { await authClient.api.delete(`${apiBase}/posts/${post.id}`); navigate(base); }); }}>삭제</button>}
-      <Link to={base}>목록</Link>
-    </div>
-    <fieldset disabled={busy}><CommentSection comments={comments.map(comment => ({ id: comment.id, content: htmlToBlocks(comment.content), authorId: comment.authorId,
-      authorName: comment.author?.nickname || comment.author?.name || '참여자', createdAt: comment.createdAt, likeCount: comment.likeCount,
-      parentId: comment.parentId ?? undefined, canEdit: comment.authorId === user?.id, canDelete: comment.authorId === user?.id || access?.canManage }))}
-      totalCount={commentTotal} hasMore={comments.length < commentTotal} onLoadMore={() => setCommentLimit(n => n + 20)} currentUserId={user?.id} isLoggedIn isLocked={post.isLocked} allowComments={post.allowComments}
-      onSubmit={(content, parentId) => void mutate(() => businessApi.post(`${apiBase}/comments`, { postId: post.id, content, parentId }))}
-      onEdit={(id, content) => void mutate(() => authClient.api.put(`${apiBase}/comments/${id}`, { content }))}
-      onDelete={id => { if (window.confirm('이 댓글을 삭제하시겠습니까?')) void mutate(() => authClient.api.delete(`${apiBase}/comments/${id}`)); }} /></fieldset>
-  </article>;
+  if (view === 'post' && post) return <BusinessPostArticle post={post} comments={comments} commentTotal={commentTotal}
+    userId={user?.id} canManage={access?.canManage === true} apiBase={apiBase} base={base} busy={busy} error={error}
+    mutate={mutate} loadMore={() => setCommentLimit(n => n + 20)} />;
   return <div>
     <h2 className="mb-4 text-lg font-semibold">{view === 'mine' ? '내가 쓴 글' : '참여자 게시글'}</h2>
     <label className="mb-4 block">게시판 <select className="ml-3 rounded border p-2" value={category} onChange={e => setParams({ category: e.target.value })}>
       <option value="">전체</option>{categories.map(board => <option key={board.id} value={board.id}>{board.name}</option>)}
     </select></label>
-    {selectedBoard?.forumType === 'closed' && <div className="mb-4 rounded-lg border p-4"><p>이 게시판은 별도 가입 승인이 필요합니다.</p><button disabled={busy} onClick={() => void mutate(async () => { await businessApi.post(`${apiBase}/categories/${encodeURIComponent(selectedBoard.id)}/join-requests`, {}); setNotice('게시판 가입 신청을 접수했습니다.'); })} className="mt-2 text-blue-700">게시판 가입 신청</button></div>}
-    {notice && <p role="status" className="mb-4">{notice}</p>}
+    {selectedBoard?.forumType === 'closed' && <div className="mb-4 rounded-lg border p-4"><p>이 게시판은 별도 가입 승인이 필요합니다.</p><button type="button" disabled={busy} onClick={() => void mutate(async () => { await businessApi.post(`${apiBase}/categories/${encodeURIComponent(selectedBoard.id)}/join-requests`, {}); setNotice('게시판 가입 신청을 접수했습니다.'); })} className="mt-2 text-blue-700">게시판 가입 신청</button></div>}
+    {notice && <output aria-live="polite" className="mb-4">{notice}</output>}
     <ForumListTemplate posts={posts} currentPage={page} totalPages={totalPages} onPageChange={n => setParams(previous => { const next = new URLSearchParams(previous); next.set('page', String(n)); return next; })}
       onPostClick={item => navigate(item.routeTo)} error={error} onRetry={() => setVersion(n => n + 1)} />
   </div>;
+}
+
+
+function postContentHtml(content: ForumPostResponse['content'] | undefined): string {
+  if (!content) return '';
+  return typeof content === 'string' ? content : blocksToHtml(content);
+}
+
+interface PostArticleProps {
+  post: ForumPostResponse; comments: ForumCommentResponse[]; commentTotal: number; userId?: string; canManage: boolean;
+  apiBase: string; base: string; busy: boolean; error: string;
+  mutate: (action: () => Promise<unknown>) => Promise<void>; loadMore: () => void;
+}
+function BusinessPostArticle({ post, comments, commentTotal, userId, canManage, apiBase, base, busy, error, mutate, loadMore }: Readonly<PostArticleProps>) {
+  const navigate = useNavigate();
+  return <article className="rounded-xl border bg-white p-6">
+    {error && <p role="alert">{error}</p>}
+    <h2 className="text-xl font-semibold">{post.title}</h2><p className="my-3 text-sm text-slate-500">{post.author?.nickname || post.author?.name || '참여자'} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}</p>
+    <ForumBlockRenderer content={typeof post.content === 'string' ? htmlToBlocks(post.content) : post.content} />
+    <div className="my-5 flex gap-4 text-sm text-blue-700">
+      <button type="button" disabled={busy} onClick={() => void mutate(() => businessApi.post(`${apiBase}/posts/${post.id}/like`, {}))}>좋아요 {post.likeCount}</button>
+      {post.authorId === userId && <Link to={`${base}/write?edit=${encodeURIComponent(post.id)}`}>수정</Link>}
+      {(post.authorId === userId || canManage) && <button type="button" disabled={busy} onClick={() => { if (window.confirm('이 게시글을 삭제하시겠습니까?')) void mutate(async () => { await authClient.api.delete(`${apiBase}/posts/${post.id}`); navigate(base); }); }}>삭제</button>}
+      <Link to={base}>목록</Link>
+    </div>
+    <fieldset disabled={busy}><CommentSection comments={comments.map(comment => ({ id: comment.id, content: htmlToBlocks(comment.content), authorId: comment.authorId,
+      authorName: comment.author?.nickname || comment.author?.name || '참여자', createdAt: comment.createdAt, likeCount: comment.likeCount,
+      parentId: comment.parentId ?? undefined, canEdit: comment.authorId === userId, canDelete: comment.authorId === userId || canManage }))}
+      totalCount={commentTotal} hasMore={comments.length < commentTotal} onLoadMore={loadMore} currentUserId={userId} isLoggedIn isLocked={post.isLocked} allowComments={post.allowComments}
+      onSubmit={(content, parentId) => void mutate(() => businessApi.post(`${apiBase}/comments`, { postId: post.id, content, parentId }))}
+      onEdit={(id, content) => void mutate(() => authClient.api.put(`${apiBase}/comments/${id}`, { content }))}
+      onDelete={id => { if (window.confirm('이 댓글을 삭제하시겠습니까?')) void mutate(() => authClient.api.delete(`${apiBase}/comments/${id}`)); }} /></fieldset>
+  </article>;
 }

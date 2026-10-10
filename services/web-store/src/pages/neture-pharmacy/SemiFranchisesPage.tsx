@@ -107,6 +107,7 @@ export default function SemiFranchisesPage() {
             <tbody>
               {rows.map((r) => {
                 const st = r.membershipStatus;
+                const participantStatus = r.communityKey ? '가입 승인 후 이용' : '-';
                 const canApply = !st || st === 'rejected' || st === 'terminated';
                 const canWithdraw = st === 'pending' || st === 'active' || st === 'suspended';
                 return (
@@ -125,7 +126,7 @@ export default function SemiFranchisesPage() {
                       {r.decidedAt ? ` · 처리 ${formatDate(r.decidedAt)}` : ''}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      {!r.communityKey ? '-' : st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : '가입 승인 후 이용'}
+                      {r.communityKey && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {canApply && (

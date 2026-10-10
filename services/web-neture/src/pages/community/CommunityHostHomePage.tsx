@@ -20,8 +20,8 @@ export default function CommunityHostHomePage() {
   }, [user?.id, retry]);
   return <div className="mx-auto max-w-6xl px-4 py-8">
     <h1 className="text-2xl font-semibold">커뮤니티 · 단체활동</h1>
-    {loading && <p role="status" className="mt-6">커뮤니티 목록을 확인하고 있습니다…</p>}
-    {error && <div className="mt-6"><p role="alert">{error}</p><button onClick={() => setRetry(n => n + 1)} className="mt-3 text-blue-700">다시 시도</button></div>}
+    {loading && <output aria-live="polite" className="mt-6">커뮤니티 목록을 확인하고 있습니다…</output>}
+    {error && <div className="mt-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)} className="mt-3 text-blue-700">다시 시도</button></div>}
     <ul className="mt-6 divide-y border-y">
       {rows.filter(c => c.kind === 'independent').map(c => <li key={c.communityKey}>
         <Link to={`/communities/${encodeURIComponent(c.communityKey)}/forum`} className="flex justify-between gap-4 py-4">

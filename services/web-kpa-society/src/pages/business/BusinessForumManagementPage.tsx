@@ -5,7 +5,7 @@ import { authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import { businessApi, businessBase, businessError, communityApiBase } from './api';
 
-export default function BusinessForumManagementPage({ view }: { view: 'request' | 'owned' | 'members' | 'manage' }) {
+export default function BusinessForumManagementPage({ view }: Readonly<{ view: 'request' | 'owned' | 'members' | 'manage' }>) {
   const { business, access } = useBusiness();
   const { forumId } = useParams();
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function BusinessForumManagementPage({ view }: { view: 'request' 
     forumHref: slug => `${base}/posts?board=${encodeURIComponent(slug)}`, memberManageHref: id => `${base}/owned/${id}/members` }} />;
 }
 
-function BusinessBoardReview({ apiBase }: { apiBase: string }) {
+function BusinessBoardReview({ apiBase }: Readonly<{ apiBase: string }>) {
   const [rows, setRows] = useState<Array<{ id: string; name: string; requesterName: string }>>([]);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
@@ -50,13 +50,13 @@ function BusinessBoardReview({ apiBase }: { apiBase: string }) {
     {error && <p role="alert">{error}</p>}
     <form className="my-4 flex flex-wrap gap-3" onSubmit={event => { event.preventDefault(); void act(async () => { await businessApi.post(`${apiBase}/boards`, { name }); setName(''); }); }}>
       <label>새 게시판 이름 <input value={name} maxLength={100} onChange={e => setName(e.target.value)} className="ml-2 rounded border p-2" /></label>
-      <button disabled={busy || !name.trim()} className="text-blue-700">게시판 만들기</button>
+      <button type="submit" disabled={busy || !name.trim()} className="text-blue-700">게시판 만들기</button>
     </form>
     <h3 className="font-semibold">개설 신청 심사</h3>
-    {loading && <p role="status">신청 목록을 확인하고 있습니다…</p>}
+    {loading && <output aria-live="polite">신청 목록을 확인하고 있습니다…</output>}
     {rows.map(row => <div key={row.id} className="my-4 flex flex-wrap gap-4">
       <span>{row.name} · {row.requesterName}</span>
-      {(['approve', 'reject'] as const).map(action => <button key={action} disabled={busy} onClick={() => void act(() => authClient.api.patch(`${apiBase}/board-requests/${row.id}`, { action }))}>{action === 'approve' ? '승인' : '반려'}</button>)}
+      {(['approve', 'reject'] as const).map(action => <button type="button" key={action} disabled={busy} onClick={() => void act(() => authClient.api.patch(`${apiBase}/board-requests/${row.id}`, { action }))}>{action === 'approve' ? '승인' : '반려'}</button>)}
     </div>)}
     {!loading && !rows.length && !error && <p className="mt-3">대기 중인 신청이 없습니다.</p>}
   </section>;
