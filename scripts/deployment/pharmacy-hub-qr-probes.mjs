@@ -68,7 +68,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     stage = 'write-private-probe-file';
     await writeFile(process.env.PROBE_OUTPUT, paths.join('\n'), { mode: 0o600 });
     const families = Object.fromEntries(['qr', 'tablet', 'multilingual-products', 'foreign-visitor/affiliate'].map(family => [family, paths.some(path => path.startsWith(`/${family}/`))]));
-    console.log(JSON.stringify({ readOnly: true, foundFamilies: paths.length, requiredFamilies: 4, families }));
+    console.log(JSON.stringify({ readOnly: true, foundFamilies: paths.length, requiredActiveFamilies: ['qr', 'tablet'], redirectRuleFamilies: 4, families }));
   } catch (error) {
     if (stage === 'inventory' && /^Read-only QR inventory failed: stage=(query-[1-4]|rollback); code=/.test(error.message)) throw error;
     throw safeInventoryError(error, stage);

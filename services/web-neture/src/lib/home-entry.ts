@@ -10,7 +10,7 @@
  *   - 매장 카드: 서비스별 "매장 HUB / 내 매장" 반복 나열 없음. 버튼 = **매장 하나**(매장 이름) →
  *     그 매장의 Store Workspace Home (`<basePath>/workspace`). Home / My Store / Store Hub / My Services
  *     선택은 Store Workspace 안에서 한다. 서비스 이름은 매장이 여럿일 때만 보조 정보.
- *   - 공급자 카드: 공급자 서비스 이용 상태 active 만. 관리자 bypass 로 개인 업무 공간처럼 노출하지 않는다.
+ *   - 공급자 카드: 개인 업무는 공급자 active만, 운영자는 기존 공급자 관리 화면 진입을 별도로 표시한다.
  *   - 서비스 운영 카드: `GET /work-scope/operator-services` 목록만 (platformBypass 는 목록에 없다).
  *   - Platform Admin(`platform:super_admin`) 은 4 업무 공간과 섞지 않고 `platformAdmin`(플랫폼 관리) 로 분리한다.
  *
@@ -419,7 +419,8 @@ export async function openServiceEntry(serviceKey: string, returnPath?: string):
  */
 export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string> {
   const data = await fetchHomeEntryData();
-  const items = buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [];
+  const items = (buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [])
+    .filter((item) => item.action.kind === 'handoff');
   const only = items.length === 1 ? items[0].action : null;
   if (!only || only.kind !== 'handoff') throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
   return resolveServiceEntryUrl(only.serviceKey, only.returnPath);
@@ -546,6 +547,19 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     const id = `operator:${key}:${svc.scope}`;
     if (operator.some((o) => o.id === id)) continue;
     operator.push({ id, label, note, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
+  }
+
+  // 운영 진입은 개인 공급자/매장 자격과 구분한다. 서버가 확정한 운영 목록과
+  // 기존 platform 예외만 사용하고 개인 데이터 접근 guard는 변경하지 않는다.
+  const supplierScope = data.operatorServices?.find((s) => s.serviceKey === 'supplier' && s.workspaceAvailable)?.scope;
+  if (supplierScope || isPlatformAdmin) {
+    const level = supplierScope ?? 'admin';
+    const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => s.key === 'supplier' && s.level === level);
+    if (screen) supplier.push({ id: 'supplier:management', label: '공급자 관리', action: { kind: 'internal', to: screen.path } });
+  }
+  const netureOperator = data.operatorServices?.some((s) => s.serviceKey === 'neture' && s.workspaceAvailable);
+  if (netureOperator || isPlatformAdmin) {
+    store.push({ id: 'store:management', label: '내 매장 신청 심사', action: { kind: 'internal', to: '/operator/pharmacy-memberships' } });
   }
 
   const itemsOf: Record<WorkspaceKey, EntryItem[]> = { community, store, supplier, operator };

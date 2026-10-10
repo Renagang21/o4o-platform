@@ -10,7 +10,9 @@
  * RoleGuard:  하위 호환. allowedRoles 단순 체크
  */
 
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { CommunityAccessDenied } from './CommunityAccessDenied';
 import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
@@ -49,6 +51,49 @@ const BaseGuard = createRouteGuard({
   deniedRedirect: '/',
   MembershipGate,
 });
+
+// Community service management must recheck the server snapshot on entry.
+// Central role assignments can change in the separate platform-admin origin.
+const CommunityGuard = createRouteGuard({
+  useAuth,
+  renderLoading: () => <p role="status" className="p-8">커뮤니티 운영 권한을 확인하고 있습니다…</p>,
+  renderDenied: () => <CommunityAccessDenied />,
+  MembershipGate,
+});
+
+function CommunityOperatorRoute({ children, level, fallback }: {
+  children: ReactNode; level: SubdomainOperatorLevel; fallback: string;
+}) {
+  const { user, isAuthenticated, refreshAuth } = useAuth();
+  const location = useLocation();
+  const userId = user?.id;
+  const key = `${userId ?? ''}:${location.pathname}`;
+  const [verified, setVerified] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
+  const recheck = useCallback(async () => {
+    await refreshAuth();
+    setFailed(null);
+    setVerified(key);
+  }, [refreshAuth, key]);
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return;
+    let active = true;
+    void refreshAuth().then(() => {
+      if (active) { setFailed(null); setVerified(key); }
+    }).catch(() => { if (active) setFailed(key); });
+    return () => { active = false; };
+  }, [key, userId, isAuthenticated, refreshAuth]);
+  if (isAuthenticated && failed === key) {
+    return <CommunityAccessDenied verificationFailed onRecheck={recheck} />;
+  }
+  if (isAuthenticated && verified !== key) {
+    return <p role="status" className="p-8">커뮤니티 운영 권한을 확인하고 있습니다…</p>;
+  }
+  return <CommunityGuard allowedRoles={subdomainOperatorRoles('community', level)}
+    enforceMembership membershipServiceKey="community" fallback={fallback}>
+    {children}
+  </CommunityGuard>;
+}
 
 // ─── RouteGuard (통합 컴포넌트) ───
 
@@ -197,6 +242,9 @@ export function SubdomainOperatorRoute({
   level,
   fallback = '/login',
 }: Omit<LegacyGuardProps, 'allowedRoles'> & { serviceKey: SubdomainOperatorKey; level: SubdomainOperatorLevel }) {
+  if (serviceKey === 'community') {
+    return <CommunityOperatorRoute level={level} fallback={fallback}>{children}</CommunityOperatorRoute>;
+  }
   return (
     <RouteGuard
       allowedRoles={subdomainOperatorRoles(serviceKey, level)}

@@ -74,3 +74,15 @@ describe('resolveSingleStoreWorkspaceUrl', () => {
     expect(post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/forum' });
   });
 });
+
+it('관리 링크는 단일 매장 자동 진입을 늘리거나 없는 매장을 선택하게 하지 않는다', async () => {
+  const operator = { ...user, roles: ['platform:super_admin'] };
+  respond([store('org-1')]);
+  post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
+  await expect(resolveSingleStoreWorkspaceUrl(operator)).resolves.toBe('https://store.example/handoff?token=1');
+  expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
+  post.mockClear();
+  respond([]);
+  await expect(resolveSingleStoreWorkspaceUrl(operator)).rejects.toBeInstanceOf(ServiceEntryError);
+  expect(post).not.toHaveBeenCalled();
+});

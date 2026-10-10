@@ -67,7 +67,10 @@
 - [x] 동일 이메일 자동 병합 금지 로컬 회귀
 - [x] PR #392 main `26b98a33c1` 통합·Promote #38019828704 운영 배포; 배포 후 실제 Demo 32/32 PASS (외부 OAuth 검증과 구분)
 - [ ] 카카오 운영 설정 활성화 후 실제 Google/Kakao 실접속·명시적 연결 PC/mobile smoke (실제 소유자 인증 필요)
-- [ ] 운영 가입의 `Invalid request / invalid characters` 차단 수정: 합성 OAuth code로 재현, 제한된 소셜 opaque 필드 처리·79 PASS 로컬 검증 완료. 수정 PR 통합·배포 후 실제 소유자 가입 재검증 필요.
+- [x] 운영 callback의 `Invalid request / invalid characters` 차단 수정: PR #401 main `73cd907d20` 통합, API-only Promote #38035112556 SUCCESS. 합성 opaque code/state는 401 flow 검증까지 전달, 다른 SQL 필드는 400 거절 유지. 실제 소유자 가입 완료와 구분.
+- [x] 홈 카카오 config 조회 복구 UI: PR #403 main `82742b84e8` 통합·Promote #38039708401 웹 6개 배포 SUCCESS. 유지 8 origin PC/mobile 화면 16·config 장애/재시도 12·공개 API 12·Demo 32건 PASS. 사용자 브라우저 최초 조회 실패 원인은 미확정이며 실제 소유자 가입 완료와 구분.
+- [x] P1 가입 acceptance 누락 수정: 카카오·이메일·Google의 published 문서 ID/version 전달·재검증 및 signup transaction의 `user_policy_acceptances` 원자적 저장 구현. rollback/pending 판정·공통 입력/동의 UI 회귀 검증, PR #407 통합·API/웹 배포 완료. 실제 소유자 약관 화면 이동 원인·OAuth 완료는 아래 별도 OPEN 항목으로 유지.
+- [ ] 공급자·펀딩의 미로그인 `/login` ↔ `/` 순환 수정 및 PC/mobile 가입/Demo 회귀. 실제 소유자 추가 정보 적용 후 약관 gate 재확인은 별도 실행.
 - [ ] 후속 개인정보 처리방침 표시·내용 정합: 읽기 어려운 화면과 리팩터링 전 내용을 조사해 사용자 검토 후 갱신.
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
@@ -116,3 +119,48 @@ enabled=true, 전체관리자 false, 실제 Demo 32/32·Demo 변경 차단 2/2 P
 실제 소유자의 가입 시도는 문자 검사 오류가 보고돼 완료되지 않았다. 위 가입 차단 수정과
 취소 callback 브라우저 복귀, 실제 계정 연결 검증은 OPEN이다. 이전 enabled=false·리소스
 조회 실패 서술은 당시 관측이며 최신 설정 상태로 사용하지 않는다.
+
+후속 PR #401은 main `73cd907d20` 통합·필수 CI 및 CodeQL PASS, API-only Promote
+#38035112556 SUCCESS다. 운영 API 17/17, Demo PC/mobile 32/32, Demo 변경 차단 2/2 PASS.
+취소 callback 303 뒤 복귀 주소를 UI에서 수동 따라가기 4/4 PASS이며 native API 탐색 및
+실제 소유자 가입·로그인·명시적 연결 완료를 뜻하지 않는다. 이후 사용자의 메인 홈 로그인 창
+카카오 버튼 미노출 제보를 별도 TODO로 유지한다. 공통 설정 조회 실패·지연의 안내/재시도
+수정은 로컬 auth-react 174·Neture 모달 13·UI fixture 12 PASS; 아직 웹 배포 결과가 아니다.
+
+사용자는 이후 새로고침 뒤 카카오 버튼 가시성을 확인했다. 새 웹 변경 배포 전의 관측이다.
+버튼의 현재 미노출은 해소됐지만 조회 복구 UI 배포·실제 OAuth 완료 TODO는 유지한다.
+
+후속 PR #403은 사용자 승인 후 main `82742b84e8`에 통합했고 post-merge CI/CodeQL PASS,
+Promote #38039708401 웹 6개 대상 SUCCESS다. API/migration/IAM 변경 없음. 운영 화면 28/28,
+공개 점검 12/12, 실제 Demo UI 32/32 PASS이며 업무 역할·logout 및 다른 origin 세션 유지도 확인했다.
+위 미배포 서술은 과거 관측이며 조회 복구 UI 배포 TODO는 이제 완료다. 실제 소유자 인증·
+추가 정보 적용 후 약관 반복 및 정책 표시/내용 갱신은 계속 OPEN이다. 최초 가입 필수
+이메일·이름·개인 모바일 계약은 확인했으며 별도 ID/비밀번호 생성·SMS 본인 인증은 없다.
+검증 기록과 후속 TODO는 카카오 CHECK/하위 WO를 따른다. 정책 본문/버전은 이번에 바꾸지 않았다.
+
+검증 기록 리뷰 후 카카오 가입의 published 약관 ID/version 검증·원자적인 acceptance 저장
+누락을 P1 구현 blocker로 확정했다. 이를 미확정 조사 후보로만 두지 않으며 실제 소유자
+가입 완료 판정 전에 우선 수정·검증한다. Neture wrapper `TermsAcceptanceGate`와 공통
+`PolicyAcceptanceGate`를 구분한다. 사용자 화면 이동의 직접 원인을 확인한 것으로 확대하지 않는다.
+
+## 2026-10-10 가입 약관 P1 후속 구현
+
+카카오·이메일·Google 가입이 현재 게시 약관 ID/version을 전달하고 계정/인증 수단 생성과
+동일 transaction에 acceptance를 저장하도록 수정했다. origin에서 적용 약관을 결정하며
+membership/권한 자동 생성 및 동일 이메일 자동 연결은 허용하지 않는다. 약관 조회 실패·버전
+변경 시 가입을 차단하고 재조회/재동의하며 입력값은 보존한다. 내용 보기와 동의는 분리했다.
+
+구현·격리 검증 완료와 main 통합/운영 배포/실제 OAuth 완료를 구분한다. 하위 WO/CHECK의
+수정 TODO 및 소비처 매트릭스를 따른다. 기존 기록 PR #407을 구현 범위로 확장하며 새 runtime
+범위의 통합은 required CI/review와 사용자 승인 후 진행한다. 정책 본문/버전 게시는 별도 OPEN이다.
+
+
+## 2026-10-10 PR #407 운영 배포 결과
+
+PR #407은 최신 리뷰 지적 수정·required CI 후 main `2a8b80cf24`에 통합했다.
+post-merge CI/CodeQL PASS, Promote #38049884263 API 먼저 및 웹 6개 SUCCESS.
+운영 게시 약관 API 9/9 PASS. 실제 Demo 최초 30/32 PASS 후 시간 초과 2건 각각 재실행 PASS.
+배포 가입 화면 합성 검증 최초 13/16 PASS이며 공급자·펀딩의 기존 `/login` ↔ `/` 순환을
+추가 진단 및 코드에서 확인해 후속 TODO로 추가했다. 실제 OAuth 및 새 정책 본문 게시는 OPEN.
+후속 작업은 하위 카카오 WO와 CHECK의 배포 검증 절을 따른다. 최초 실패와 실제 계정 검증의
+한계를 기록하며 이후 main의 별도 변경을 이번 배포 성공에 포함하지 않는다.

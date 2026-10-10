@@ -283,3 +283,267 @@ redaction·Kakao identity와 합쳐 3 suites/79 PASS, API type-check·대상 lin
 이는 로컬 수정 결과이며 운영 오류 해결 완료가 아니다. 수정 PR의 CI/review·main 승인·
 배포 후 실제 가입·취소·명시적 연결을 재검증한다. 개인정보 처리방침 표시 및 이전 내용은
 사용자가 요청한 후속 조사·수정 TODO로 남겼다.
+
+## 2026-10-10 PR #401 통합·API 배포 및 홈 버튼 후속
+
+PR #401은 사용자 승인 후 main `73cd907d20`에 통합했다. post-merge CI #38034473790 및
+CodeQL #38034473752 PASS. Delivery #38035024444는 API LEVEL_3로 배포 보류했고,
+정상 통제 경로 Promote #38035112556를 같은 SHA·services=api로 실행해 SUCCESS다.
+정식 migration Job·revision readiness·traffic 전환·전환 후 health·serving SHA report PASS,
+production status는 DEPLOYED/api다. 웹/전체관리자는 SKIPPED, force/break-glass 태그/새 schema/IAM 변경 없음.
+
+운영 API 17/17 PASS: 합성 `--`/`sp_`/`xp_` code와 `--` state는 문자 오탐 400 대신
+401 SOCIAL_FLOW_INVALID로 거부됐다. 무관한 필드의 SQL은 400 차단 유지. 유지 8 origin
+enabled=true/전체관리자 false. 실제 Demo PC/mobile × 8 origin × 두 역할 32/32 PASS,
+매장 경영자 context 16/16 200·공급자 products 16/16 200·반대 역할/전체관리자 403,
+logout 후 access/refresh 32/32 401, 별도 Store session 유지 2건 200. Demo 변경 차단 2/2 PASS.
+실제 UI start/provider 302/callback 취소 303 뒤 복귀 주소를 UI에서 수동 따라가기 4/4 PASS.
+native API 브라우저 탐색과 실제 외부 소유자 가입/로그인/연결 완료는 계속 OPEN이다.
+
+사용자가 이후 홈 로그인 창에서 카카오 버튼 미노출을 제보했다. origin은 `https://neture.co.kr/`다.
+새 브라우저의 홈 modal와 `/login` × PC/mobile 4/4는 config 200/enabled=true/버튼 visible이었다.
+사용자 브라우저의 실제 요청 실패나 오래된 bundle은 확인하지 않았으므로 원인을 단정하지 않는다.
+클라우드 Google script load 실패를 실제 사용자 Google 장애나 성공으로 계산하지 않는다.
+
+### Shared Module Change Verification — Kakao config 복구
+
+변경 모듈: `packages/auth-react/src/KakaoContinue.tsx`. config 조회 실패 catch가 오류를
+표시하지 않고 초기 enabled=false를 유지하며 지연 중에도 컴포넌트가 비어 있던 결함이다.
+조회 중 상태, 10초 응답 제한, 실패/잘못된 응답 안내, 사용자가 누르는 읽기 전용 재시도를 추가한다.
+서버가 명시적으로 enabled=false라고 답한 경우의 버튼 숨김과 실제 provider/flow 검증은 유지한다.
+늦은 이전 조회 결과는 새 조회 상태를 덮어쓰지 않고 unmount 시 timer를 해제한다.
+
+| 소비처 | 사용/영향 | route·role·capability 영향 | 검증 |
+|---|---|---|---|
+| Neture·supplier·community·funding | 같은 Neture bundle의 modal 및 `/login`, 직접 사용 | origin/returnTo 보존, 정책/권한 변경 없음 | Neture 홈 modal PC/mobile fixture·모달 회귀·type-check/build PASS |
+| Store | LoginMethods를 통해 사용 | 로그인 route/returnTo·role 변경 없음 | PC/mobile fixture·type-check/build PASS |
+| Pharmacy (KPA Society) | LoginMethods를 통해 사용 | origin·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
+| KPA Branch | LoginMethods 로그인·join 사용 | route·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
+| Lecture/Study | 자체 KakaoContinue 사용 없음, Neture 계정센터 경유 | gateway 보존 | symbol/route 검색·전체 frontend type-check PASS |
+| 전체관리자·그 밖의 auth-react 사용 앱 | KakaoContinue runtime 사용 없음 | Google 전용/기존 인가 보존 | import·symbol·path 검색, 전체 frontend type-check PASS |
+| 삭제 대상 Pharmacy-Hub/K-Cosmetics | 복구 없음 | 은퇴 계약 보존 | 신규 경로/사용처 추가 없음 |
+
+raw-source 파일 경로 검사와 symbol/label/endpoint 검색을 함께 수행했다. 기존 UI tests가 실제
+소비처이며 새 config 회귀를 추가했다. 변경 전 새 5건은 4 FAIL/1 PASS; 변경 후 새 6/6 및
+auth-react 전체 15 files/174 PASS. Neture modal 2 files/13 PASS, frontend type-check 및
+대상 ESLint PASS. Neture·Store 실제 build PASS(기존 chunk size 경고).
+
+로컬 실제 UI + 합성 read-only config 장애 주입은 Neture 홈 modal/Store LoginMethods ×
+PC/mobile × 실패 재시도/지연 재시도/명시적 미설정 12/12 PASS, 인증 쓰기 요청 0이다.
+첫 browser harness는 개발 StrictMode의 두 초기 조회 중 하나만 실패시켜 검사 조건이 맞지
+않았다. 초기 조회 전체에 장애를 주고 사용자 재시도 이후만 정상 응답하도록 정정했다.
+이는 초기 실패를 숨기는 assertion 완화가 아니라 fault 주입 시점 정정이며, timeout·복구 및
+미설정 숨김 단언은 유지했다. Store package 필터도 실제 이름 `store-web`으로 실행해 build를 확인했다.
+
+위 결과는 로컬 UI 변경 검증이다. 새 PR 통합·웹 배포, 사용자 화면 원인 확인 및 실제
+소유자 OAuth는 대기한다. API 수정 배포를 웹 복구 배포로 혼동하지 않는다. 개인정보 처리방침
+가독성·이전 내용은 후속 TODO로 유지한다.
+
+사용자는 로그인 창을 닫고 새로고침한 뒤 "이제 버튼이 보임"이라고 확인했다. 새 UI 수정은
+아직 미배포이므로 이 관측을 새 코드의 운영 효과나 캐시 원인 확정으로 계산하지 않는다.
+사용자 화면의 버튼 가시성은 확인됐고, 새로 시작하는 실제 OAuth 가입/로그인 결과는 대기한다.
+
+## 2026-10-10 PR #403 통합·웹 배포 후 검증
+
+사용자 승인 후 PR #403을 main `82742b84e8`에 통합했다. post-merge CI #38039051314 및
+CodeQL #38039051297 SUCCESS, required CI Gate PASS다. Delivery #38039592334는 LEVEL_3로
+보류했고 정상 Promote #38039708401을 동일 SHA로 실행해 SUCCESS다. 전체관리자와 웹
+Neture·KPA Society·Lecture·Store·KPA Branch의 build/push·새 revision 검증·traffic 전환·
+전환 후 serving SHA report가 통과했다. production status는 위 6개 대상 DEPLOYED다.
+API 배포·migration·schema·키/IAM 변경·force/break-glass는 실행하지 않았다.
+
+| 배포 후 검증 | 결과 | 검증 경계 |
+|---|---|---|
+| 유지 8개 origin × PC/mobile 화면 진입 | 16/16 PASS | 카카오 config 200/true; Lecture는 Neture 계정센터 진입 링크, 다른 7곳은 버튼 가시성 |
+| Neture 홈 modal·Store × PC/mobile × config 실패/지연/명시적 미설정 | 12/12 PASS | 읽기 전용 조회에 합성 장애 주입, 재시도는 실제 운영 200/true로 복구; 명시적 false는 숨김; 인증 쓰기 0 |
+| 공개 API/전체관리자 진입 | 12/12 PASS | 유지 8 origin config true·전체관리자 false, ready 200·비인증 계정 조회 401·전체관리자 로그인 화면 200 |
+| 유지 8개 origin × PC/mobile × 두 역할 Demo UI | 32/32 PASS | 실제 공개 Demo 버튼으로 로그인·Neture 목적지 이동 및 각 서비스 세션 확인 |
+| 업무 역할·세션 폐기 | 매장 경영자 context 16/16 200·공급자 products 16/16 200; 반대 역할/전체관리자 403; logout 후 access/refresh 32/32 401 | Demo 소셜/비밀번호 변경 불가, 별도 Store 세션 유지 2건 200; 테스트가 만든 세션만 정리 |
+
+화면 16건과 config 장애 12건의 합계가 28/28이며 Demo 32건과 별개다. 브라우저 요청은
+정상 TLS 검증을 수행하는 `route.fetch`로 운영 upstream에 전달했다. 인증서 검증 우회 없음.
+합성 config 장애는 실제 운영 장애나 소유자 OAuth 성공으로 계산하지 않는다. GitHub artifact
+다운로드 redirect는 proxy 403으로 미조회이며 workflow jobs/steps와 commit status를 배포 근거로 썼다.
+검증 중 이후 main에 통합된 별도 운영자 진입 변경은 이번 배포 SHA/검증 결과에 포함하지 않는다.
+
+### 실제 소유자 가입 화면·약관 후속
+
+사용자는 카카오 인증 후 추가 정보를 입력하고 적용했을 때 이용약관 화면으로 이동했다고
+보고했다. 단순 약관 링크 클릭으로 가정하지 않는다. canonical 가입 정책·UI/DTO/backend는
+최초 가입에 이메일·이름·개인 모바일을 요구하며 별도 ID/비밀번호 생성과 SMS 본인 인증은 없다.
+이 필수 항목 계약은 PR #403에서 바꾸지 않았다.
+
+코드의 signup submit은 기본 동작을 막고 API를 호출하며 응답은 session 또는 verify-email이다.
+가입 API에 `/terms` redirect는 없다. LoginModal의 저장된 returnUrl 복귀와 별도
+`pendingPolicyAcceptances` 경로를 조사했다. Neture의 `TermsAcceptanceGate`는 공통
+`PolicyAcceptanceGate`(`@o4o/shared-space-ui`)를 조립하는 실제 wrapper다.
+
+**P1 구현 blocker — 신규 카카오 가입의 버전별 약관 승낙 누락**: ACTIVE
+[통합약관 정본](../baseline/O4O-INTEGRATED-TERMS-OF-SERVICE-V1.0.md)의 버전 추적 계약과
+[가입 정렬 WO §9–10](../work-orders/WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md#9-신규-회원가입)은
+현재 published 문서 ID/version 검증 및 가입과 원자적인 acceptance 저장을 요구한다.
+그러나 `KakaoContinue`/`KakaoSignupRequest`/`SocialSignupDto`에는 해당 입력이 없고
+`KakaoAuthService.signup` transaction은 `tosAcceptedAt`만 기록하며
+`user_policy_acceptances`를 저장하지 않는다. 이는 코드로 확인된 canonical 위반이며
+단순 미확정 조사 후보가 아니다. 서비스 membership이 있고 해당 승낙이 없으면 재동의
+gate의 대상이 될 수 있다. 실제 사용자 membership/pending 상태를 조회하지 않았으므로
+이 결함이 제보된 `/terms` 화면 이동의 직접 원인인지는 별도로 확인해야 한다.
+가입 입력/버튼 표시와 checkbox label 내부 약관 링크도 수정안 대상이다.
+
+- [ ] P1: 공통 카카오 가입 UI/client/DTO/API에 published 문서 ID/version을 전달·서버 재검증하고, user/provider 생성과 동일 transaction에서 acceptance 저장. 누락/이전 버전·게시 변경·저장 실패 rollback 및 가입 후 gate 회귀 검증; 가입이 서비스 membership/권한을 자동 생성하지 않는 현행 계약 유지.
+- [ ] 동일 이메일/Google 가입 소비처의 published 약관 승낙 계약 누락도 전수 조사하고 같은 기준으로 수정 범위 확정.
+- [ ] 추가 정보 제출·로그인·가입 완료 후 목적지와 약관 요구를 코드/브라우저로 재현하고 수정.
+- [ ] 가입 입력/버튼 가독성, 별도 약관 내용 보기 및 동의, 입력 상태 보존을 검토·구현.
+- [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스 명칭과 리팩터링 이전 내용을 현행 서비스 기준으로 정리하고 사용자 검토 후 새 정책 버전 게시.
+- [ ] 실제 소유자 Google/Kakao 가입·로그인·명시적 연결·취소·충돌 PC/mobile 검증.
+
+정책 본문/버전은 이번에 수정·게시하지 않았다. 실제 소유자 가입/계정 연결 완료와 약관
+반복 문제는 OPEN이다. 전체관리자 Google 전용 및 동일 이메일 자동 병합 금지는 유지한다.
+
+## 2026-10-10 signup 약관 원자 저장 및 공통 UI 검증
+
+기준 main `3d10c6a907`을 자기 branch에 반영한 동일 WO 연속 Phase다. PR #407의 기록 범위를
+카카오·이메일·Google 공개 가입 수정까지 확장한다. DEPLOYMENT = MANUAL/GATED.
+
+### 계약과 소비처
+
+`GET /auth/signup/terms`는 no-store 공개 읽기이며 서버가 origin catalog에서 적용 약관을 결정한다.
+카카오는 서버에 바인딩된 signup flow의 service_key를 사용한다. 요청 body의 serviceKey/userId/roles는
+DTO에서 거부한다. 현재 published terms ID/version을 재검증하고 기존 acceptance service가 본문 hash를
+계산해 계정/provider/password와 같은 transaction에 기록한다. row lock은 commit까지 유지한다.
+일회 카카오 grant도 실패 시 소비되지 않는다. 역할/membership/조직 자동 생성은 추가하지 않았다.
+operator 초대의 별도 `createGoogleUser` 및 전체관리자 Google-only 계약은 공개 가입으로 전환하지 않았다.
+
+| 소비처 | 적용/확인 |
+|---|---|
+| auth-client / auth-react GoogleContinue·KakaoContinue·EmailSignupForm | 약관 조회·ID/version 전달 및 공통 SignupTermsAgreement; 모듈/경로/리터럴 census, React/client 회귀 |
+| Neture 홈 modal·계정센터 EmailAuthPages | 실제 client loader 주입; PC/mobile 로컬 웹 번들 확인 |
+| Supplier / Community / Funding | Neture 공통 bundle/계정센터 소비; 공통 코드 적용 |
+| Store LoginMethods | 실제 client loader 주입; PC/mobile 로컬 웹 번들 확인 |
+| KPA Society LoginModal | Society 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
+| KPA Branch LoginPage / JoinPage | 계정센터 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
+| Lecture/Study gateway | 기존 Neture 계정센터 사용; 자체 소셜 가입 UI 추가 없음 |
+| 전체관리자 및 operator invite | 공개 signup 대상 아님; Google-only 및 초대 생성 경로 유지 |
+| 은퇴 K-Cosmetics / Pharmacy-Hub | 재활성화 없음; 신규 공개 가입 origin 거부 |
+
+공통 UI는 약관을 못 읽으면 동의/제출을 차단한다. 10초 제한·명시적 read-only retry·늦은 응답/unmount
+무효화를 적용한다. 내용 보기 링크는 동의 label 밖에서 새 창을 연다. stale policy 응답에는 약관을 다시
+읽고 재동의해야 하며 이름/연락처 입력을 유지한다. 공개 정책 본문/버전은 수정하지 않았다.
+
+### 로컬 결과
+
+- API 관련 기존 unit/DTO 127 PASS + signup policy 33 PASS(실제 격리 PostgreSQL 15 포함) + 기존 social integration 18 PASS = 서로 다른 테스트 178 PASS. provider proof/token/mail은 fixture/mock이며 운영 인증이 아니다.
+- 실제 PostgreSQL에서 각 세 가입의 문서/version/hash, membership/role 생성 0, 누락/불일치/타 서비스/게시 변경/acceptance DB 오류에 따른 전체 rollback 검증. 저장 acceptance에 대한 순수 pending 판정까지 확인했으며 운영 사용자 gate 상태 조회는 미실행.
+- auth-react 16 files/182 PASS; auth-client 5 files/40 PASS. 조회 실패/retry/timeout/늦은 응답/재동의 및 기존 인증 회귀 포함.
+- 전체 frontend 및 API type-check PASS; API/Neture/Store production build PASS; 대상 lint 0 errors(기존 auth-client unused 경고 2건).
+- Neture/Store production build × PC/mobile × 정상/조회 실패 후 retry/stale version 12/12 PASS. 합성 provider/API; version 재전달·입력 보존·이메일 확인 안내·제출 전후 같은 페이지 유지 확인.
+- 최초 브라우저 harness는 Neture `/login` 진입이 홈 modal로 정규화되는 기존 동작을 무시하고 `/login`을 고정 기대해 Neture 6건 FAIL이었다. 가입 form이 열린 현재 경로와 제출 후 경로를 비교하도록 정정 후 12/12 PASS; 약관 이동 장애 재현으로 계산하지 않는다.
+- 기존 social integration용 최소 fixture schema가 linked_accounts 시각 컬럼/FK cascade를 누락해 2 FAIL/16 PASS, 보완 중 1 FAIL/17 PASS였다. 전용 로컬 fixture만 보완 후 18/18 PASS; 운영 schema 및 migration 변경 없음.
+
+### 배포 및 OPEN
+
+기존 웹은 termsPolicy를 보내지 않으므로 API 변경을 독립 완료로 보지 않는다. main 승인 후 API 및
+해당 공통 웹 bundle을 연속 배포하고, 이전 웹의 가입 차단/새 웹의 약관 조회/가입을 재확인해야 한다.
+조회나 버전 검증 실패를 과거 tosAcceptedAt만으로 허용하지 않는다. 새 DB migration은 없다.
+
+실제 소유자의 추가 정보 제출 후 이동 원인은 운영 사용자/session 상태를 조회하지 않아 미확정이다.
+원자 저장 결함 수정과 합성 화면의 성공을 실제 Google/Kakao 가입·로그인·연결·취소 성공으로
+확장하지 않는다. 유지 8개 운영 PC/mobile 회귀, 실제 OAuth, 승인된 새 정책 본문 게시는 OPEN이다.
+
+### 최신 구현 리뷰 후 공유 타입 보완
+
+Codex가 `1c8670214d`에서 P2로 공개 가입의 termsPolicy 및 getSignupTerms loader가 선택형인
+타입 계약을 지적했다. 서버 DTO는 이미 필수였으므로 공유 client/React 가입 타입과 Google/Kakao/
+Email 가입 loader도 필수로 맞췄다. React의 약관 참조는 client의 SignupTermsReference를 재사용한다.
+모든 실제 서비스 loader는 이미 연결되어 있으며 해당 공통 mock/요청 fixture도 새 계약에 맞췄다.
+
+직접 TypeScript compiler fixture에서 완전한 세 가입 요청 및 loader는 오류 0으로 컴파일됐다.
+참조/loader를 뺀 7개 fixture는 각각 TS2741 오류가 발생해 의도한 누락 거부를 확인했다(예상 오류이며
+정상 테스트 실패로 계산하지 않음). 공통 React 182·client 40 PASS 및 소비처 전체 frontend type-check를
+재검증 PASS. 운영 API는 이 검토 시점 health 200·Kakao enabled=true이며 신규 배포 완료와 구분한다.
+
+
+## 2026-10-10 PR #407 통합·API/웹 배포 및 운영 검증
+
+사용자 승인 후 최신 구현의 Codex P2 타입 계약 지적을 수정했다. 최신 head `9d63a8b9b8`
+재리뷰는 추가 지적 없음, 미해결 스레드 0, PR CI #38048683407 PASS였다. main의 별도
+Demo relink 도구 변경을 확인·반영했으며 해당 DB 복구 workflow는 이번 작업에서 실행하지 않았다.
+PR #407은 main `2a8b80cf24`에 통합됐다. post-merge CI #38049243981 및 CodeQL
+#38049243931 PASS. Delivery #38049797025는 인증 변경을 HELD_LEVEL_3로 보류했다.
+승인된 정확한 SHA의 Promote #38049884263은 SUCCESS이며 API 먼저, 이어서 admin·neture·
+kpa-society·lecture·store·kpa-branch 웹 6개를 배포했다. API migration 단계, 새 리비전 readiness,
+traffic 전환 및 전환 후 검증 PASS; 새 migration/schema 변경은 없다. 최종 production 상태는
+DEPLOYED다. 검증 중 이후 main에 통합된 별도 커뮤니티 권한 변경은 이 배포 SHA의 결과에 포함하지 않는다.
+
+| 운영 검증 | 결과 | 범위와 제한 |
+| --- | --- | --- |
+| 게시 가입 약관 API | 9/9 PASS | 유지 8개 origin의 현재 게시 문서/version·정책별 URL·no-store 및 전체관리자 가입 origin 거부 |
+| 실제 Demo 버튼 PC/mobile × 8개 origin × 2역할 | 최초 30/32 PASS, 실패 2건 각각 재실행 PASS | 실제 이메일 로그인·me·업무 API 역할 경계·전체관리자 거부·Demo 소셜/비밀번호 변경 차단·UI logout 및 access/refresh 폐기. Neture의 Store handoff 세션은 원래 origin logout 뒤 유지 |
+| 배포된 가입 UI PC/mobile × 8개 origin | 최초 13/16 PASS, 경로 안정성 3 FAIL | 실제 게시 약관 API·배포 bundle; provider complete와 가입 제출만 합성 응답, 계정 생성 없음. 실제 OAuth 완료 근거가 아님 |
+| 공급자·펀딩 가입 UI 추가 진단 | 경로 순환 재현 | 각각 PC/mobile에서 문서/version 일치·제출 1회·이메일 확인 안내는 확인. `/login`과 `/`가 순환해 경로 안정성 FAIL; 약관 페이지 이동으로 오인하지 않음 |
+
+Demo 최초 실패는 공급자 PC의 UI logout 대기와 펀딩 모바일의 refresh 요청 시간 초과였다.
+둘 다 같은 조건의 독립 세션 재실행에서 전체 시나리오 PASS. 원인을 확정하거나 최초 실패를
+지우지 않으며 단일 최초 전체 실행이 32/32 PASS였다고 보고하지 않는다. 매장 경영자의 업무 API는
+200이고 공급자에게 반환되는 STORE_OWNER_REQUIRED 403은 의도한 반대 역할 경계다.
+
+가입 UI 경로 순환은 기존 Neture LoginRedirect가 `/login` → `/`로 보내고, 미로그인
+SupplierServiceEntry 및 MarketTrialHubPage가 `/` → `/login?returnUrl=...`로 되돌리는 코드와
+일치한다. 합성 제출 전후 경로 검사에서 최초 3건 실패, 두 도메인 PC/mobile 추가 진단에서도
+재현했다. 가입 acceptance의 원자 저장 수정으로 이 기존 route 상호작용까지 해결했다고 보지 않는다.
+미로그인 두 도메인의 진입 경로를 안정화하고 callback 보존·Demo·logout을 다시 검증할 후속 TODO다.
+
+실제 소유자의 Google/Kakao 가입·로그인·연결·취소와 추가 정보 적용 후 약관 gate 재확인은 OPEN.
+정책 본문/version 1의 이전 서비스 내용 정리·새 버전 검토·게시는 이번 배포에서 수행하지 않았다.
+동일 WO 연속 배포 검증 기록과 남은 OAuth/경로 후속 때문에 기존 branch/workspace는 KEEP한다.
+
+기록 PR 리뷰 P2 후속: 상위 리팩터링 WO 단계 4의 acceptance 구현 TODO도 완료로 정렬했다.
+compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로 순환은 별도 OPEN으로 분리했다.
+
+## 2026-10-10 남은 인증 TODO — 실제 OAuth 실행 매트릭스
+
+이 절의 실제 외부 인증 항목은 **OPEN**이다. 합성 provider 응답·로컬 테스트로 완료 처리하지 않는다.
+다음 구현 PR은 로그인 경로와 검증안 push 범위이며 통합·배포 뒤 실제 브라우저에서 실행한다.
+유지 8개 서비스는 PC·모바일로 확인한다. study는 Neture 계정 진입, 전체관리자는 별도 Google 전용
+검증 대상으로 구분한다. 모든 항목은 test 계정/승인된 본인 계정으로 실행하며 결과에는 문구 및
+도메인·경로만 남긴다. OAuth query/fragment, 토큰, 이메일·전화번호·실명은 기록하지 않는다.
+
+| 케이스 | 시작·조작 | 합격 조건 | 상태 |
+| --- | --- | --- | --- |
+| Google·카카오 신규 가입 | 미연결 외부 계정 인증 → 추가 정보 → 현재 약관·개인정보 동의 → 제출 | 계정 생성 1회, 입력 상태 유지, 확인 필요 시 메일 안내, 확인 후 로그인, 같은 정책 gate 반복 없음 | OPEN |
+| 기존 로그인 | 연결된 Google·카카오 각각 로그인, 페이지 새로고침 | 연결 계정으로 인증; origin 세션 복구; 업무 권한은 기존 membership에 한정 | OPEN |
+| 취소·거절 | provider 동의 취소, 추가 정보 취소 | 로그인 상태 생성 없음; 재시작 가능; 공급자·펀딩 경로 순환 없음 | OPEN |
+| 이메일 소유 확인 | 미확인 이메일 가입 → 확인 링크, 만료/재사용 링크 | 확인 전 권한 상승 없음; 유효 링크만 확인; 만료/재사용은 명확한 안내 | OPEN |
+| 명시적 연결 | 이메일 회원 로그인 → 계정 설정 → Google·카카오 연결 → 외부 재인증 | 같은 O4O 회원에 수단 추가; 이메일 일치만으로 자동 연결/계정 병합 없음 | OPEN |
+| 연결 충돌 | 이미 다른 회원에 연결된 외부 계정으로 연결 시도 | 충돌 안내; 두 회원과 기존 수단·권한 보존 | OPEN |
+| 해제·마지막 수단 | 여러 수단 중 하나 해제, 유일 수단 해제 시도 | 가능 수단만 해제; 마지막 로그인 수단 거부; 다음 로그인 확인 | OPEN |
+| 소유자 반복 약관 사례 | 본인 카카오 인증 → 추가 정보 적용 | 제출 후 예상 다음 단계, 현재 정책 pending 없음; 새 정책이면 한 번의 정당한 재동의 | OPEN |
+| 전체관리자 경계 | admin에서 Google 및 다른 로그인 진입 | 승인된 Google 관리자만 접근; 카카오·이메일·Demo 관리자 진입 거부 | OPEN |
+
+실제 본인 카카오 가입이 아직 완료되지 않았다면 기존 회원 로그인·연결 테스트와 섞지 않는다.
+이메일 확인은 실제 수신 확인을 별도 기록하며 fixture의 mailSent 응답으로 대체하지 않는다.
+법률/정책 변경안은 [DRAFT 검토안](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md)에
+제시했다. 승인 전 게시 본문·version·effective date는 변경하지 않았다.
+
+
+### 이번 로컬 구현·검증 결과
+
+LoginRedirect를 독립 컴포넌트로 추출했다. 미로그인 공급자·펀딩은 `/login`에서 모달을 열고 머문다.
+닫은 뒤 로그인하기로 재진입한다. 실제 SupplierServiceEntry/MarketTrialHubPage의 홈 인증 가드는
+유지한다. main/community의 공개 홈 진입, 복구 중 이동 보류, 안전한 로그인 후 복귀 경로와 callback
+fragment 보존은 기존 계약을 유지한다. shared auth/API·DB·권한·게시 정책 변경은 없다.
+
+| 검증 | 결과 | 범위 |
+| --- | --- | --- |
+| Neture 진입/모달 단위 테스트 | 24 PASS | LoginRedirect 11, email modal 5, Demo modal 8; 실제 공급자·펀딩 홈 컴포넌트 포함 |
+| 약관 조회·gate 단위 테스트 | 15 PASS | SignupTermsAgreement 8, PolicyAcceptanceGate 7. 서버 pending 갱신 후 서비스 복귀·반복 gate 없음 추가 |
+| Neture production build | PASS | TypeScript + Vite; 기존 큰 chunk 경고 있음 |
+| 전체 frontend type-check | PASS | 소비처 전체 타입 검증 |
+| PC/mobile 가입·약관 UI | 24/24 PASS | main/supplier/funding/community × 두 화면 × success/lookup-retry/stale-version. 추가 정보 유지·재동의·메일 안내·제출 경로 안정 |
+| PC/mobile 보호 홈·로그인 UI | 12/12 PASS | supplier/funding × 두 화면 × 홈/직접 login/카카오 취소; fragment 소비 및 모달 닫기/재열기 |
+
+브라우저는 현재 로컬 production bundle을 해당 origin으로 제공하고 API/provider 응답만 fixture로
+대체했다. 실제 인증·가입·메일 발송·운영 DB 변경·운영 배포 검증이 아니다. 첫 화면 검증에서는
+커뮤니티 목록 fixture 누락으로 커뮤니티 PC 2건이 실패한 뒤 실행을 중단했다. 실제 API 구조의
+communities 배열을 추가한 독립 전체 재실행이 24/24 PASS다. 운영 장애로 해석하지 않는다.
+기존 기록의 운영 실패나 실제 OAuth OPEN은 이 로컬 성공으로 제거하지 않는다.

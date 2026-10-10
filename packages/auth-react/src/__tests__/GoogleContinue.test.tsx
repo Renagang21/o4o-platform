@@ -1,3 +1,4 @@
+const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
 /**
  * <GoogleContinue /> 회귀검증 — WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D)
  *
@@ -34,6 +35,7 @@ const USER = { id: 'u-1' };
 
 function mount(overrides: Partial<Parameters<typeof GoogleContinue>[0]> = {}) {
   const props = {
+    getSignupTerms: vi.fn(async () => TERMS),
     getConfig: vi.fn(async () => ({ enabled: true, clientId: 'public-client-id' })),
     loginWithGoogle: vi.fn(async () => ({ success: true, user: USER })),
     signupWithGoogle: vi.fn(async () => ({ success: true, user: USER })),
@@ -47,23 +49,27 @@ function mount(overrides: Partial<Parameters<typeof GoogleContinue>[0]> = {}) {
 
 describe('GoogleContinue — 준비 상태', () => {
   it('allowlist 가 비어 있으면(enabled=false) 버튼 대신 "준비 중" 을 보여주고 GIS 를 로드하지 않는다', async () => {
-    mount({ getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });
+    mount({ getSignupTerms: vi.fn(async () => TERMS),
+      getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });
     await screen.findByTestId('google-continue-disabled');
     expect(renderGoogleButton).not.toHaveBeenCalled();
   });
 
   it('config 조회 실패도 "준비 중" 으로 안전하게 떨어진다', async () => {
-    mount({ getConfig: vi.fn(async () => { throw new Error('network'); }) });
+    mount({ getSignupTerms: vi.fn(async () => TERMS),
+      getConfig: vi.fn(async () => { throw new Error('network'); }) });
     await screen.findByTestId('google-continue-disabled');
   });
 
   it('hint 는 버튼이 보일 때만 렌더한다 — 준비 중 · config 실패에는 없다', async () => {
-    mount({ hint: '처음이신가요?', getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });
+    mount({ hint: '처음이신가요?', getSignupTerms: vi.fn(async () => TERMS),
+      getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });
     await screen.findByTestId('google-continue-disabled');
     expect(screen.queryByTestId('google-continue-hint')).toBeNull();
     cleanup();
 
-    mount({ hint: '처음이신가요?', getConfig: vi.fn(async () => { throw new Error('network'); }) });
+    mount({ hint: '처음이신가요?', getSignupTerms: vi.fn(async () => TERMS),
+      getConfig: vi.fn(async () => { throw new Error('network'); }) });
     await screen.findByTestId('google-continue-disabled');
     expect(screen.queryByTestId('google-continue-hint')).toBeNull();
     cleanup();
@@ -115,7 +121,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
-    await screen.findByRole('alert');
+    expect((screen.getByRole('button', { name: '동의하고 계정 만들기' }) as HTMLButtonElement).disabled).toBe(true);
     expect(p.signupWithGoogle).not.toHaveBeenCalled();
     expect(p.onSuccess).not.toHaveBeenCalled();
   });
@@ -136,7 +142,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
     await waitFor(() => expect(p.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678' });
+    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
   });
 
   it('signup 이 EMAIL_IN_USE 로 실패하면 onError 에 code 를 전달하고 동의 화면에 머문다 (자동 연결 없음)', async () => {
@@ -181,7 +187,8 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
 
   function makeProps(over: Partial<Parameters<typeof GoogleContinue>[0]> = {}) {
     return {
-      getConfig: vi.fn(async () => ({ enabled: true, clientId: 'public-client-id' })),
+      getSignupTerms: vi.fn(async () => TERMS),
+    getConfig: vi.fn(async () => ({ enabled: true, clientId: 'public-client-id' })),
       loginWithGoogle: vi.fn(async () => SIGNUP_REQUIRED),
       signupWithGoogle: vi.fn(async () => ({ success: true, user: USER })),
       onSuccess: vi.fn(),
@@ -221,7 +228,7 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await waitFor(() => expect(third.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678' });
+    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
     expect(first.signupWithGoogle).not.toHaveBeenCalled();
   });
 

@@ -1,15 +1,40 @@
 # PharmacyHub QR redirect cutover
 
-> 상태: ACTIVE · 2026-10-09 · 범위: 기존 인쇄 QR 경로 전환 도구 · 실제 운영 적용 미실행
+> 상태: ACTIVE · 최종 갱신: 2026-10-10 · 범위: 기존 인쇄 QR 경로 전환 도구 · plan 성공 · 실제 운영 적용 미실행
 
 사용자 승인: PharmacyHub QR을 Neture 약국으로 전환하고 push까지 진행한다. 지정된 `/workspace/o4o-pharmacyhub-retirement` worktree에서 최신 `origin/main` 기준 새 branch `wo/pharmacyhub-qr-cutover`를 사용한다. 기존 제거 PR #375는 병합 완료됐으며 사용자가 Delivery green을 보고했다.
+
+## 현재 운영 검증 결과 — 2026-10-10
+
+[PharmacyHub QR Cutover run 38047926623](https://github.com/Renagang21/o4o-platform/actions/runs/38047926623)은 `main`의 `847ee5d6bda405358ac42234b2551898df343048`에서 `mode=plan`으로 실행해 SUCCESS로 완료됐다. WIF 인증, Secret Manager 접근, Cloud SQL 연결, 읽기 전용 DB 경로 조회, URL map 조회·초안 검증을 통과했다. 최종 결과는 `{"mode":"plan","applied":false}`다.
+
+| 경로 종류 | 활성 조회 결과 |
+|---|---|
+| `/qr/` | 발견 |
+| `/tablet/` | 발견 |
+| `/multilingual-products/` | 미발견 |
+| `/foreign-visitor/affiliate/` | 미발견 |
+
+활성 경로는 요구되는 4종 중 2종이다. 미발견은 현재 조회 조건에 맞는 대상이 없다는 뜻이며 인쇄 QR·과거 데이터·전체 운영 사용이 없다는 판정은 아니다. 두 종류의 운영 여부와 적용·검증 범위를 확정하기 전에는 `apply`를 실행하지 않는다.
+
+운영자는 WIF 허용 workflow 추가, DB password secret 한정 accessor, `roles/cloudsql.client`, custom role `pharmacyHubQrPlan`(`compute.urlMaps.get`, `compute.urlMaps.validate`, `compute.backendServices.use`)을 적용했다. 마지막 권한 추가 후 검증 POST 403이 해소됐다. URL map update 권한 확보·실제 적용·HTTP 리다이렉트·브라우저/실기기 스캔 검증은 완료한 것으로 보고하지 않는다. DB write, Cloud Run·DNS·인증서 삭제는 실행하지 않았다.
+
+동일 WO의 결과 기록 phase로 사용자 지정 worktree를 재사용하고 최신 main에서 `wo/pharmacyhub-qr-plan-result-docs`를 생성했다. 아래 초기 준비·실패 기록은 당시 상태를 보존하며 현재 성공 판정은 이 절을 따른다.
+
+## 현재 폐기 범위 보정 — 2026-10-10
+
+사용자는 PharmacyHub가 전혀 사용되지 않으며 폐기하는 서비스임을 확인하고, 네 경로 리다이렉트·존재하는 QR/태블릿 실데이터 검증·나머지 두 경로 규칙 검사로 범위를 변경했다. [폐기 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)가 현재 작업 기준이다. 위 plan 당시의 네 활성 probe 요구와 미발견 운영 집계 선행 조건은 현재 apply 조건으로 사용하지 않는다. PR #416은 닫았으며 census는 반영하지 않는다.
+
+apply는 실제 QR·tablet을 필수로 요구하고 다국어·제휴 실데이터는 선택이다. 미발견 다국어·제휴는 `__ph_retirement_rule_check__?ruleCheck=1` 상대 경로로 root·www의 302와 path/query를 보존한 Location만 검사한다. 이 경로는 실데이터가 아니며 Neture 목적지 HTTP 200·콘텐츠/렌더 검증을 주장하지 않는다. 실제 probe만 Neture HTTP 200을 요구하고 결과에는 active/rule-only 검증 수를 구분한다. fingerprint·동시 변경 차단·시간 상한·검증 실패 롤백은 유지한다.
+
+이번 구현·push는 운영 apply·전체 호스트 전환·Cloud Run 제거·DB 삭제를 실행하지 않는다. PH default backend를 보존하므로 삭제 전 전체 호스트 리다이렉트로 backend 참조 해제가 필요하다. 도메인·DNS·인증서는 계속 유지한다.
 
 ## 실행
 
 `PharmacyHub QR Cutover` workflow는 기존 GitHub Actions WIF·service account를 재사용한다. GCP IAM 권한은 추가하지 않는다. 해당 identity에 URL map read·validate·update 권한이 없으면 작업은 실패하며 운영자가 권한을 확인해야 한다.
 
 1. PR 병합 후 Actions에서 `mode=plan` 실행. 현재 URL map 백업·초안 artifact와 검증 결과 확인.
-2. `probe_paths`는 비워 둔다. production Environment의 기존 DB secret 이름, Cloud SQL Auth Proxy와 Secret Manager를 통해 실제 활성 PH 대상의 경로를 읽기 전용 transaction에서 수집한다. DB write·schema 변경은 없고 값은 공개 로그·artifact에 출력하지 않는다. 필요한 권한이 없으면 실패하고 IAM을 임의 변경하지 않는다. 네 종류가 모두 존재하지 않으면 `apply`는 변경 전에 중단한다. `plan`은 존재하는 종류의 개수만 보고한다.
+2. `probe_paths`는 비워 둔다. production Environment의 기존 DB secret 이름, Cloud SQL Auth Proxy와 Secret Manager를 통해 실제 활성 PH 대상의 경로를 읽기 전용 transaction에서 수집한다. DB write·schema 변경은 없고 값은 공개 로그·artifact에 출력하지 않는다. 필요한 권한이 없으면 실패하고 IAM을 임의 변경하지 않는다. 실제 QR·tablet이 없으면 apply 전에 중단한다. 다국어·제휴 미발견은 규칙 검사로 대체한다.
 3. `main`에서 `mode=apply` 실행. `DEPLOY_FREEZE`가 정확히 `false`여야 한다. root·www 모두 경로와 쿼리를 유지하며 302로 `pharmacy.neture.co.kr`에 연결되고 목적지는 HTTP 200이어야 한다. 선택적으로 검증된 네 상대 경로를 직접 제공할 수도 있다.
 4. 실기기 스캔·매장/상품 화면·스캔 원장 증가는 별도 운영 검증. HTTP 200만으로 SPA의 실제 데이터·렌더가 정상이라고 주장하지 않는다.
 

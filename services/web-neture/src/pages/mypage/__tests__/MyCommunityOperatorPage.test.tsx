@@ -165,6 +165,27 @@ describe('MyCommunityOperatorPage', () => {
     expect(await screen.findByText('인증이 필요합니다.')).toBeTruthy();
     expect(screen.queryByText('운영자로 지정된 커뮤니티가 없습니다.')).toBeNull();
   });
+
+  it.each([true, false])('제재 권한 %s: 활성 회원은 admin만 정지한다', async canRestrictMembers => {
+    get.mockImplementation((url: string, options?: { params?: { status?: string } }) => {
+      if (url === '/communities/operating') return ok({ communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2, canRestrictMembers }] });
+      return ok({ memberships: options?.params?.status === 'active' ? [{ ...pendingRows[0], name: '활성회원', status: 'active' }] : pendingRows });
+    });
+    mount(); await screen.findByText('홍길동');
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'active' } });
+    await screen.findByText('활성회원');
+    expect(screen.queryByRole('button', { name: '승인' })).toBeNull();
+    if (!canRestrictMembers) {
+      expect(screen.queryByRole('button', { name: '정지', exact: true })).toBeNull();
+      expect(screen.queryByRole('button', { name: '커뮤니티 탈퇴' })).toBeNull();
+      return;
+    }
+    const prompt = vi.spyOn(window, 'prompt').mockReturnValue('회원 관리 사유');
+    fireEvent.click(screen.getByRole('button', { name: '정지', exact: true }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/suspend', { reason: '회원 관리 사유' }));
+    expect(await screen.findByText('회원 상태를 변경했습니다.')).toBeTruthy(); prompt.mockRestore();
+  });
+
 });
 
 describe('canApproveJoin', () => {

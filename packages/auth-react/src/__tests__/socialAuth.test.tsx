@@ -1,3 +1,4 @@
+const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, renderHook, act } from '@testing-library/react';
 let callback: any = null; let credential: ((value: string) => void) | undefined;
@@ -7,18 +8,18 @@ import { SocialAccountConnections } from '../SocialAccountConnections';
 import { useServiceAuth } from '../useServiceAuth';
 beforeEach(()=>{callback=null;credential=undefined;});afterEach(cleanup);
 it('hides unconfigured Kakao and rejects no normal login method',async()=>{
- render(<KakaoContinue client={{getKakaoAuthConfig:async()=>({enabled:false}),startKakaoLogin:vi.fn()}} loginWithKakao={vi.fn()} signupWithKakao={vi.fn()} onSuccess={vi.fn()} />);
+ render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:false}),startKakaoLogin:vi.fn()}} loginWithKakao={vi.fn()} signupWithKakao={vi.fn()} onSuccess={vi.fn()} />);
  await waitFor(()=>expect(screen.queryByRole('button',{name:'카카오로 계속하기'})).toBeNull());
 });
 it('Kakao callback signup requires explicit consent, then shows email verification without logging in',async()=>{
  callback={token:'state',code:'code',kind:'kakao-login',cancelled:false};const success=vi.fn();const signup=vi.fn(async()=>({success:false,nextStep:'verify-email' as const,mailSent:true}));
- render(<KakaoContinue client={{getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={success} />);
- await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01000000000'}});
+ render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={success} />);
+ await screen.findByRole('link',{name:'내용 보기 · 버전 1'});await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01000000000'}});
  fireEvent.click(screen.getByLabelText(/이용약관/));fireEvent.click(screen.getByLabelText(/개인정보 처리방침/));fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
- await screen.findByText(/확인 메일을 보냈습니다/);expect(signup).toHaveBeenCalledWith('ticket',expect.objectContaining({consents:{terms:true,privacy:true,marketing:false}}));expect(success).not.toHaveBeenCalled();
+ await screen.findByText(/확인 메일을 보냈습니다/);expect(signup).toHaveBeenCalledWith('ticket',expect.objectContaining({consents:{terms:true,privacy:true,marketing:false,termsPolicy:{policyDocumentId:TERMS.policyDocumentId,version:TERMS.version}}}));expect(success).not.toHaveBeenCalled();
 });
 it('cancelled OAuth never exchanges code',async()=>{
- callback={token:'state',kind:'kakao-login',cancelled:true};const login=vi.fn();render(<KakaoContinue client={{getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={login} signupWithKakao={vi.fn()} onSuccess={vi.fn()} />);await screen.findByText(/인증을 취소/);expect(login).not.toHaveBeenCalled();
+ callback={token:'state',kind:'kakao-login',cancelled:true};const login=vi.fn();render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={login} signupWithKakao={vi.fn()} onSuccess={vi.fn()} />);await screen.findByText(/인증을 취소/);expect(login).not.toHaveBeenCalled();
 });
 it('Demo shows status and cannot start reauthentication or linking',async()=>{
  const client={getSocialAccounts:async()=>({providers:[],hasPassword:true,canManage:false,googleEnabled:true,kakaoEnabled:true}),reauthenticateSocialPassword:vi.fn()} as any;

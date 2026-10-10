@@ -1,3 +1,5 @@
+import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
+import PharmacyLegacyRedirect, { LegacyAwareBusinessWorkspace } from './pages/business/PharmacyLegacyRedirect';
 import BusinessWorkspace from './pages/business/BusinessWorkspace';
 import BusinessParticipationPage from './pages/business/BusinessParticipationPage';
 import BusinessMaterialsPage from './pages/business/BusinessMaterialsPage';
@@ -10,7 +12,7 @@ import { authClient as pharmacyManagementAuthClient } from './contexts/AuthConte
 import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { BrowserRouter, Routes, Route, Navigate, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { toKpaScopedStorePath } from './lib/unifiedStoreScope';
-import { useEffect, useMemo, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -32,7 +34,7 @@ import { TermsAcceptanceGate } from './components/auth/TermsAcceptanceGate';
 import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
-import { getKpaPostLoginRoute } from './config/dashboard';
+import PostLoginRedirect from './components/PostLoginRedirect';
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: RegisterModal(email+password 가입) 은 은퇴했다.
 //   가입은 로그인 모달의 'Google 로 계속하기' 하나가 겸한다.
 // WO-O4O-AUTH-REFRESH-TOKEN-FAMILY-CONTINUITY-AND-HANDOFF-STALE-TOKEN-GUARD-V1: 정적 import —
@@ -326,72 +328,6 @@ const SERVICE_NAME = 'O4O 약국';
 
 // ServiceUserProtectedRoute removed — WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1
 // Service User 인증 제거, Platform User 단일 인증으로 통합
-
-/**
- * WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1
- * WO-O4O-KPA-POST-LOGIN-PRIMARY-ROUTE-FIX-V1
- *
- * 로그인 직후 운영 역할(kpa:admin / kpa:operator / platform:super_admin) 보유자만
- * 자동으로 해당 워크스페이스(/admin, /operator)로 이동시키는 fallback.
- *
- * LoginModal.tsx 에서 login() 반환값으로 즉시 redirect 를 시도하지만,
- * KPA context 가 비동기 로딩되는 경우 이 컴포넌트가 fallback 으로 처리한다.
- *
- * 동작:
- *   - isAuthenticated: false → true 전환 감지 (로그인 이벤트)
- *   - isKpaContextLoaded: true 대기 (fetchKpaContext 완료 확인)
- *   - getKpaPostLoginRoute() 결과가 null 이면 현재 화면 유지 (커뮤니티 철학)
- *   - 강사 / 약국 경영자 / 일반 회원은 자동 이동하지 않고 메인/커뮤니티 유지
- *     (강사 대시보드·약국 운영은 메뉴에서 직접 진입)
- */
-function PostLoginRedirect() {
-  const { user, isAuthenticated, isKpaContextLoaded } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { onLoginSuccess } = useAuthModal();
-
-  // 직전 인증 상태를 ref로 추적 (state 변화로 재렌더 방지)
-  const wasAuthenticatedRef = useRef(isAuthenticated);
-  const didRedirectRef = useRef(false);
-  // WO-O4O-KPA-LOGIN-REFETCH-MINIMIZE-V1:
-  // user 객체를 ref로 유지 — Phase 2 참조 변경으로 인한 불필요한 effect 재실행 방지.
-  // isKpaContextLoaded=true 시점에 user는 항상 최신값 보장.
-  const userRef = useRef(user);
-  userRef.current = user;
-
-  useEffect(() => {
-    const justLoggedIn = !wasAuthenticatedRef.current && isAuthenticated;
-    wasAuthenticatedRef.current = isAuthenticated;
-    if (!isAuthenticated) {
-      // 로그아웃: ref 초기화
-      didRedirectRef.current = false;
-      return;
-    }
-    // 방금 로그인 → context 로딩 완료 대기
-    if (!justLoggedIn && !didRedirectRef.current) return;
-    if (!isKpaContextLoaded || !userRef.current) return;
-    if (didRedirectRef.current) return;
-
-    // 명시적 returnTo/onLoginSuccess 콜백: LoginModal에서 이미 처리
-    if (onLoginSuccess) { didRedirectRef.current = true; return; }
-    // 이미 workspace 경로에 있으면 중복 이동 금지
-    if (
-      location.pathname.startsWith('/businesses') ||
-      location.pathname.startsWith('/store') ||
-      location.pathname.startsWith('/operator') ||
-      location.pathname.startsWith('/admin')
-    ) { didRedirectRef.current = true; return; }
-
-    // WO-O4O-KPA-DASHBOARD-REDIRECT-UNIFICATION-V1: PRIORITY+MAP 기반 redirect
-    const targetRoute = getKpaPostLoginRoute(userRef.current);
-    didRedirectRef.current = true;
-    if (targetRoute) {
-      navigate(targetRoute, { replace: true });
-    }
-  }, [isAuthenticated, isKpaContextLoaded, navigate, location.pathname, onLoginSuccess]);
-
-  return null;
-}
 
 /**
  * WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1
@@ -770,8 +706,25 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<Navigate to="/businesses/pharmacy/participation" replace />} />
-          <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace /></Layout>}>
+          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout /></Layout>}>
+            <Route path="/" element={<PharmacyMemberHomePage />} />
+            <Route path="/my/participation" element={<BusinessParticipationPage />} />
+            <Route path="/materials" element={<BusinessMaterialsPage />} />
+            <Route path="/tools" element={<BusinessToolsPage />} />
+            <Route path="/community" element={<BusinessForumBoundary />}>
+              <Route index element={<BusinessForumPage />} />
+              <Route path="posts" element={<BusinessForumPage />} />
+              <Route path="write" element={<BusinessForumPage view="write" />} />
+              <Route path="post/:slug" element={<BusinessForumPage view="post" />} />
+              <Route path="my-posts" element={<BusinessForumPage view="mine" />} />
+              <Route path="request" element={<BusinessForumManagementPage view="request" />} />
+              <Route path="owned" element={<BusinessForumManagementPage view="owned" />} />
+              <Route path="owned/:forumId/members" element={<BusinessForumManagementPage view="members" />} />
+              <Route path="manage" element={<BusinessForumManagementPage view="manage" />} />
+            </Route>
+          </Route>
+          <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
+          <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
             <Route index element={<Navigate to="participation" replace />} />
             <Route path="participation" element={<BusinessParticipationPage />} />
             <Route path="materials" element={<BusinessMaterialsPage />} />
@@ -795,7 +748,6 @@ function App() {
 
           {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
           <Route path="/home/latest" element={<Layout serviceName={SERVICE_NAME}><HomeLatestPage /></Layout>} />
-          <Route path="/community" element={<Navigate to="/" replace />} />
           {/* /library/content → / 리다이렉트 (WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 제거) */}
           <Route path="/library/content" element={<Navigate to="/" replace />} />
 

@@ -3,15 +3,15 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
 const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner' } }), authClient: { api: transport } }));
-vi.mock('@o4o/shared-space-ui', () => ({
+vi.mock('@o4o/shared-space-ui', async importOriginal => ({
+  ...await importOriginal<typeof import('@o4o/shared-space-ui')>(),
   ForumWriteForm: ({ onSubmit }: { onSubmit: (payload: unknown) => void }) => <button onClick={() => onSubmit({ title: '사업 게시글', editorHtml: '<p>본문</p>' })}>작성 완료</button>,
-  ForumListTemplate: ({ posts, error }: { posts: Array<{ id: string; title: string }>; error: string }) => <div>{error && <p role="alert">{error}</p>}{posts.map(post => <p key={post.id}>{post.title}</p>)}</div>,
 }));
 import BusinessForumPage from '../BusinessForumPage';
-const mount = (view: 'write' | 'posts' | 'mine', path = '/businesses/pharmacy/forum') => render(<MemoryRouter initialEntries={[path]}><Routes>
+const mount = (view: 'write' | 'posts' | 'mine', path = '/community') => render(<MemoryRouter initialEntries={[path]}><Routes>
   <Route element={<Outlet context={{ business: { key: 'pharmacy', communityKey: 'business-only' }, access: { allowed: true, canManage: false } }} />}>
-    <Route path="/businesses/pharmacy/forum" element={<BusinessForumPage view={view} />} />
-    <Route path="/businesses/pharmacy/forum/my-posts" element={<p>내 글 화면</p>} />
+    <Route path="/community" element={<BusinessForumPage view={view} />} />
+    <Route path="/community/my-posts" element={<p>내 글 화면</p>} />
   </Route>
 </Routes></MemoryRouter>);
 beforeEach(() => {
@@ -41,7 +41,7 @@ it('닫힌 게시판의 접근 거부를 0건으로 처리하지 않고 기존 �
     if (path.endsWith('/categories')) return { data: { data: [{ id: 'closed-board', slug: 'closed', name: '닫힌 게시판', forumType: 'closed' }] } };
     throw { response: { data: { error: '가입 승인이 필요합니다.' } } };
   }); transport.post.mockResolvedValue({ data: { data: {} } });
-  mount('posts', '/businesses/pharmacy/forum?category=closed-board'); expect(await screen.findByRole('alert')).toBeTruthy();
+  mount('posts', '/community?category=closed-board'); expect(await screen.findByRole('alert')).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: '게시판 가입 신청' }));
   await waitFor(() => expect(transport.post).toHaveBeenCalledWith('/communities/business-only/forum/categories/closed-board/join-requests', {}));
 });

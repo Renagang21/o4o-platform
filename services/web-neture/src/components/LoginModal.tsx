@@ -191,6 +191,8 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
             </div>
           </div>
           <button
+            type="button"
+            aria-label="로그인 창 닫기"
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -219,6 +221,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   returnTo={returnUrl ?? '/'}
                   onSuccess={handleLoginSuccess} />
                 <GoogleContinue<User>
+                  getSignupTerms={() => authClient.getSignupTerms()}
                   getConfig={getGoogleAuthConfig}
                   loginWithGoogle={loginWithGoogle}
                   signupWithGoogle={signupWithGoogle}

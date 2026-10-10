@@ -127,7 +127,9 @@ describe('시나리오', () => {
   it('플랫폼 관리자: "플랫폼 관리" 별도 · 4 카드에는 섞이지 않음 · 공급자 카드는 bypass 로 열리지 않음', () => {
     const m = buildHomeEntryModel(user(['platform:super_admin']), base());
     expect(m.platformAdmin).toEqual({ id: 'platform:admin', label: '플랫폼 관리', action: { kind: 'internal', to: '/admin' } });
-    expect(activeCards(m)).toEqual(['community']);
+    expect(activeCards(m)).toEqual(['community', 'store', 'supplier']);
+    expect(card(m, 'supplier').items.map((i) => i.label)).toEqual(['공급자 관리']);
+    expect(card(m, 'store').items.map((i) => i.label)).toEqual(['내 매장 신청 심사']);
     expect(labels(m).some((l) => /관리자/.test(l))).toBe(false);
   });
 
@@ -141,8 +143,8 @@ describe('시나리오', () => {
       }),
     );
     expect(activeCards(m)).toEqual(['community', 'store', 'supplier', 'operator']);
-    expect(card(m, 'store').items.map((i) => i.label)).toEqual(['테스트 약국']);
-    expect(card(m, 'supplier').items.map((i) => i.label)).toEqual(['공급자 업무']);
+    expect(card(m, 'store').items.map((i) => i.label)).toEqual(['테스트 약국', '내 매장 신청 심사']);
+    expect(card(m, 'supplier').items.map((i) => i.label)).toEqual(['공급자 업무', '공급자 관리']);
     expect(card(m, 'operator').items.map((i) => [i.label, i.note])).toEqual([['O4O 약국 경영지원', '관리자']]);
     expect(m.platformAdmin?.label).toBe('플랫폼 관리');
     // 항목 id 는 전부 유일 (같은 데이터가 두 카드에 실리지 않는다)

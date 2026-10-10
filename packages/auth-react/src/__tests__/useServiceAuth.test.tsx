@@ -264,11 +264,11 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
 
     let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.signupWithGoogle('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
+      result = await hook.result.current.signupWithGoogle('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
     });
 
     expect(result.success).toBe(true);
-    expect(signupWithGoogle).toHaveBeenCalledWith('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
+    expect(signupWithGoogle).toHaveBeenCalledWith('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
     expect(hook.result.current.isAuthenticated).toBe(true);
     expect(onAuthenticated).toHaveBeenCalledTimes(1);
   });
@@ -284,7 +284,7 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
 
     let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.signupWithGoogle('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true });
+      result = await hook.result.current.signupWithGoogle('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true });
     });
 
     expect(result.success).toBe(false);
@@ -523,6 +523,35 @@ describe('late session restore cannot undo logout', () => {
     const { hook } = setup({ token: 'valid-token', client });
     await waitFor(() => expect(client.api.get).toHaveBeenCalled());
     await act(async () => { window.dispatchEvent(new Event(AUTH_TOKEN_CLEARED_EVENT)); finish({ data: { data: { user: API_USER } } }); });
+    expect(hook.result.current.user).toBeNull();
+  });
+});
+
+
+describe('foreground access recheck', () => {
+  it.each([undefined, 503])('temporary failure (%s) rejects and keeps the current session for retry', async (status) => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    const failure = { response: status ? { status } : undefined };
+    client.api.get.mockRejectedValueOnce(failure);
+    await act(async () => { await expect(hook.result.current.refreshForAccess()).rejects.toBe(failure); });
+    expect(hook.result.current.user?.id).toBe('u-1');
+    client.api.get.mockResolvedValueOnce({ data: { data: { user: { ...API_USER, roles: ['community:admin'] } } } });
+    await act(async () => { await hook.result.current.refreshForAccess(); });
+    expect(hook.result.current.user?.roles).toEqual(['community:admin']);
+  });
+  it('401 clears the expired session', async () => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    client.api.get.mockRejectedValueOnce({ response: { status: 401 } });
+    await act(async () => { await hook.result.current.refreshForAccess(); });
+    expect(hook.result.current.isAuthenticated).toBe(false);
+  });
+  it('background refresh retains its existing failure behavior', async () => {
+    const { hook, client } = setup({ token: 'fixture-token' });
+    await waitFor(() => expect(hook.result.current.user?.id).toBe('u-1'));
+    client.api.get.mockRejectedValueOnce(new Error('network fixture'));
+    await act(async () => { await hook.result.current.refresh(); });
     expect(hook.result.current.user).toBeNull();
   });
 });
