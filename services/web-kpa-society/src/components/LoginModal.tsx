@@ -152,6 +152,7 @@ export default function LoginModal() {
             onEmailFailure={(result: AuthLoginResult<User>) => showNotMember(result)}
             kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: new URLSearchParams(window.location.search).get('returnTo') ?? '/' }}
           google={{
+              getSignupTerms: () => authClient.getSignupTerms(),
               getConfig: getGoogleAuthConfig,
               loginWithGoogle,
               signupWithGoogle,

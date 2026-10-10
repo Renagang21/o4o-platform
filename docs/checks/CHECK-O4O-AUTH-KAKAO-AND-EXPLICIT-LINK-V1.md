@@ -399,3 +399,53 @@ gate의 대상이 될 수 있다. 실제 사용자 membership/pending 상태를 
 
 정책 본문/버전은 이번에 수정·게시하지 않았다. 실제 소유자 가입/계정 연결 완료와 약관
 반복 문제는 OPEN이다. 전체관리자 Google 전용 및 동일 이메일 자동 병합 금지는 유지한다.
+
+## 2026-10-10 signup 약관 원자 저장 및 공통 UI 검증
+
+기준 main `3d10c6a907`을 자기 branch에 반영한 동일 WO 연속 Phase다. PR #407의 기록 범위를
+카카오·이메일·Google 공개 가입 수정까지 확장한다. DEPLOYMENT = MANUAL/GATED.
+
+### 계약과 소비처
+
+`GET /auth/signup/terms`는 no-store 공개 읽기이며 서버가 origin catalog에서 적용 약관을 결정한다.
+카카오는 서버에 바인딩된 signup flow의 service_key를 사용한다. 요청 body의 serviceKey/userId/roles는
+DTO에서 거부한다. 현재 published terms ID/version을 재검증하고 기존 acceptance service가 본문 hash를
+계산해 계정/provider/password와 같은 transaction에 기록한다. row lock은 commit까지 유지한다.
+일회 카카오 grant도 실패 시 소비되지 않는다. 역할/membership/조직 자동 생성은 추가하지 않았다.
+operator 초대의 별도 `createGoogleUser` 및 전체관리자 Google-only 계약은 공개 가입으로 전환하지 않았다.
+
+| 소비처 | 적용/확인 |
+|---|---|
+| auth-client / auth-react GoogleContinue·KakaoContinue·EmailSignupForm | 약관 조회·ID/version 전달 및 공통 SignupTermsAgreement; 모듈/경로/리터럴 census, React/client 회귀 |
+| Neture 홈 modal·계정센터 EmailAuthPages | 실제 client loader 주입; PC/mobile 로컬 웹 번들 확인 |
+| Supplier / Community / Funding | Neture 공통 bundle/계정센터 소비; 공통 코드 적용 |
+| Store LoginMethods | 실제 client loader 주입; PC/mobile 로컬 웹 번들 확인 |
+| KPA Society LoginModal | Society 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
+| KPA Branch LoginPage / JoinPage | 계정센터 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
+| Lecture/Study gateway | 기존 Neture 계정센터 사용; 자체 소셜 가입 UI 추가 없음 |
+| 전체관리자 및 operator invite | 공개 signup 대상 아님; Google-only 및 초대 생성 경로 유지 |
+| 은퇴 K-Cosmetics / Pharmacy-Hub | 재활성화 없음; 신규 공개 가입 origin 거부 |
+
+공통 UI는 약관을 못 읽으면 동의/제출을 차단한다. 10초 제한·명시적 read-only retry·늦은 응답/unmount
+무효화를 적용한다. 내용 보기 링크는 동의 label 밖에서 새 창을 연다. stale policy 응답에는 약관을 다시
+읽고 재동의해야 하며 이름/연락처 입력을 유지한다. 공개 정책 본문/버전은 수정하지 않았다.
+
+### 로컬 결과
+
+- API 관련 기존 unit/DTO 127 PASS + signup policy 33 PASS(실제 격리 PostgreSQL 15 포함) + 기존 social integration 18 PASS = 서로 다른 테스트 178 PASS. provider proof/token/mail은 fixture/mock이며 운영 인증이 아니다.
+- 실제 PostgreSQL에서 각 세 가입의 문서/version/hash, membership/role 생성 0, 누락/불일치/타 서비스/게시 변경/acceptance DB 오류에 따른 전체 rollback 검증. 저장 acceptance에 대한 순수 pending 판정까지 확인했으며 운영 사용자 gate 상태 조회는 미실행.
+- auth-react 16 files/182 PASS; auth-client 5 files/40 PASS. 조회 실패/retry/timeout/늦은 응답/재동의 및 기존 인증 회귀 포함.
+- 전체 frontend 및 API type-check PASS; API/Neture/Store production build PASS; 대상 lint 0 errors(기존 auth-client unused 경고 2건).
+- Neture/Store production build × PC/mobile × 정상/조회 실패 후 retry/stale version 12/12 PASS. 합성 provider/API; version 재전달·입력 보존·이메일 확인 안내·제출 전후 같은 페이지 유지 확인.
+- 최초 브라우저 harness는 Neture `/login` 진입이 홈 modal로 정규화되는 기존 동작을 무시하고 `/login`을 고정 기대해 Neture 6건 FAIL이었다. 가입 form이 열린 현재 경로와 제출 후 경로를 비교하도록 정정 후 12/12 PASS; 약관 이동 장애 재현으로 계산하지 않는다.
+- 기존 social integration용 최소 fixture schema가 linked_accounts 시각 컬럼/FK cascade를 누락해 2 FAIL/16 PASS, 보완 중 1 FAIL/17 PASS였다. 전용 로컬 fixture만 보완 후 18/18 PASS; 운영 schema 및 migration 변경 없음.
+
+### 배포 및 OPEN
+
+기존 웹은 termsPolicy를 보내지 않으므로 API 변경을 독립 완료로 보지 않는다. main 승인 후 API 및
+해당 공통 웹 bundle을 연속 배포하고, 이전 웹의 가입 차단/새 웹의 약관 조회/가입을 재확인해야 한다.
+조회나 버전 검증 실패를 과거 tosAcceptedAt만으로 허용하지 않는다. 새 DB migration은 없다.
+
+실제 소유자의 추가 정보 제출 후 이동 원인은 운영 사용자/session 상태를 조회하지 않아 미확정이다.
+원자 저장 결함 수정과 합성 화면의 성공을 실제 Google/Kakao 가입·로그인·연결·취소 성공으로
+확장하지 않는다. 유지 8개 운영 PC/mobile 회귀, 실제 OAuth, 승인된 새 정책 본문 게시는 OPEN이다.

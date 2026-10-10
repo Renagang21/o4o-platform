@@ -58,6 +58,7 @@ export interface AuthServiceAccess {
 
 /** POST /auth/google/signup 동의 항목(@o4o/auth-client `GoogleSignupConsents` 와 동일 형태). */
 export interface GoogleSignupConsents {
+  termsPolicy?: { policyDocumentId: string; version: number };
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;

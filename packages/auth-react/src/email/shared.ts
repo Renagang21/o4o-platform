@@ -6,10 +6,11 @@
  * 서비스명 조건문 없음. 서버 오류 문구는 서버가 한국어로 확정해 보내므로(EmailAuthError) 그대로 보여준다.
  */
 import type { CSSProperties, MouseEvent } from 'react';
-import type { EmailAuthNotice, EmailSignupRequest } from '@o4o/auth-client';
+import type { EmailAuthNotice, EmailSignupRequest, SignupTermsDocument } from '@o4o/auth-client';
 
 /** 이 UI 가 요구하는 authClient 표면(@o4o/auth-client 인스턴스가 충족). */
 export interface EmailAuthApi {
+  getSignupTerms?(): Promise<SignupTermsDocument>;
   signupWithEmail(request: EmailSignupRequest): Promise<EmailAuthNotice>;
   verifyEmail(token: string): Promise<EmailAuthNotice>;
   resendVerificationEmail(email: string): Promise<EmailAuthNotice>;

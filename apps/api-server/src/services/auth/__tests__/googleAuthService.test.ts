@@ -91,6 +91,9 @@ function makeDataSource(store: Store) {
         },
         // 가입 시 대소문자만 다른 기존 주소 확인(`lower(email) = $1`) — 그 외 raw SQL 은 쓰지 않는다.
         query: jest.fn(async (sql: string, params: unknown[]) => {
+          if (/FROM service_policy_documents/.test(sql)) return [{ id: '11111111-1111-4111-8111-111111111111', service_key: 'neture', document_type: 'terms', version: 1, title: 'Fixture terms', content: 'Fixture agreement', status: 'published' }];
+          if (/INSERT INTO user_policy_acceptances/.test(sql)) return [{ id: 'acceptance-fixture' }];
+          if (/UPDATE users SET tos_accepted_at/.test(sql)) return [];
           // Demo 계정 판정(`demo_accounts` JOIN `users`) — 판정 정본은 user_id 다.
           if (/FROM demo_accounts/.test(sql)) {
             const target = String(params[0]);
@@ -133,8 +136,8 @@ function identityFor(map: Record<string, Partial<VerifiedGoogleIdentity> | Googl
   };
 }
 
-const META = { ipAddress: '127.0.0.1', userAgent: 'jest' };
-const CONSENTS = { name: '테스트회원', phone: '01012345678', terms: true, privacy: true };
+const META = { policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'jest' };
+const CONSENTS = { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true };
 
 function seedUser(store: Store, over: Row = {}): Row {
   const u = Object.assign(new User(), {
@@ -460,7 +463,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
 
   it('login · 클라이언트가 보낸 email/sub/role 은 계약에 없다 — 입력은 idToken(+serviceKey)뿐', () => {
     // 타입 계약 고정: 컴파일 타임 검증. 런타임은 validateDto(forbidNonWhitelisted) 가 담당.
-    const input: Parameters<GoogleAuthService['login']>[0] = { idToken: 't', serviceKey: 'neture', ...META };
+    const { policyServiceKey: _signupPolicyKey, ...loginMeta } = META;
+    const input: Parameters<GoogleAuthService['login']>[0] = { idToken: 't', serviceKey: 'neture', ...loginMeta };
     expect(Object.keys(input).sort()).toEqual(['idToken', 'ipAddress', 'serviceKey', 'userAgent']);
   });
   // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1

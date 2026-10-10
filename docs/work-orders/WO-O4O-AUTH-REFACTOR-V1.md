@@ -141,3 +141,14 @@ Promote #38039708401 웹 6개 대상 SUCCESS다. API/migration/IAM 변경 없음
 누락을 P1 구현 blocker로 확정했다. 이를 미확정 조사 후보로만 두지 않으며 실제 소유자
 가입 완료 판정 전에 우선 수정·검증한다. Neture wrapper `TermsAcceptanceGate`와 공통
 `PolicyAcceptanceGate`를 구분한다. 사용자 화면 이동의 직접 원인을 확인한 것으로 확대하지 않는다.
+
+## 2026-10-10 가입 약관 P1 후속 구현
+
+카카오·이메일·Google 가입이 현재 게시 약관 ID/version을 전달하고 계정/인증 수단 생성과
+동일 transaction에 acceptance를 저장하도록 수정했다. origin에서 적용 약관을 결정하며
+membership/권한 자동 생성 및 동일 이메일 자동 연결은 허용하지 않는다. 약관 조회 실패·버전
+변경 시 가입을 차단하고 재조회/재동의하며 입력값은 보존한다. 내용 보기와 동의는 분리했다.
+
+구현·격리 검증 완료와 main 통합/운영 배포/실제 OAuth 완료를 구분한다. 하위 WO/CHECK의
+수정 TODO 및 소비처 매트릭스를 따른다. 기존 기록 PR #407을 구현 범위로 확장하며 새 runtime
+범위의 통합은 required CI/review와 사용자 승인 후 진행한다. 정책 본문/버전 게시는 별도 OPEN이다.

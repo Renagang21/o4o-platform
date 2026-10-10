@@ -1,3 +1,5 @@
+import { signupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Email Auth Controller: 이메일·비밀번호 가입 · 확인 · 로그인 · 재설정 · 아이디 찾기
@@ -53,7 +55,7 @@ export class EmailAuthController extends BaseController {
   static async signup(req: Request, res: Response): Promise<any> {
     const body = req.body as EmailSignupRequestDto;
     try {
-      const result = await emailAuthService.signup({ ...body, ...meta(req) });
+      const result = await emailAuthService.signup({ ...body, ...meta(req), policyServiceKey: signupPolicyKeyFromOrigin(req.get('origin')) });
       return BaseController.created(res, {
         message: '확인 메일을 보냈습니다. 메일의 링크를 열면 가입이 완료됩니다.',
         maskedEmail: result.maskedEmail,
@@ -208,6 +210,7 @@ export class EmailAuthController extends BaseController {
     const err = error as Error & { code?: string; details?: { status?: unknown } };
     if (op === 'login') monitoringMetrics.recordAuthFailure(err.code || 'UNKNOWN');
 
+    if (error instanceof PolicyAcceptanceError) return BaseController.error(res, error.message, error.httpStatus, error.code);
     if (error instanceof EmailAuthError) {
       return res.status(error.statusCode).json({
         success: false,

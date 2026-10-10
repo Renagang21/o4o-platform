@@ -1,3 +1,4 @@
+const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
 /**
  * 이메일·비밀번호 공통 UI + useServiceAuth.loginWithEmail 회귀검증
  * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
@@ -80,7 +81,7 @@ describe('EmailLoginForm', () => {
   });
 });
 
-describe('EmailSignupForm', () => {
+describe('EmailSignupForm', async () => {
   function fill(overrides: Partial<Record<'email' | 'name' | 'phone' | 'pw' | 'confirm', string>> = {}) {
     fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'), { target: { value: overrides.email ?? 'new@x.com' } });
     fireEvent.change(screen.getByLabelText('이름'), { target: { value: overrides.name ?? '홍길동' } });
@@ -93,8 +94,9 @@ describe('EmailSignupForm', () => {
   it('필수 약관 전까지 제출 불가 → 동의 후 가입 → 확인 메일 안내', async () => {
     const signup = vi.fn(async () => ({ maskedEmail: 'n**@x.com', mailSent: true }));
     render(
-      <EmailSignupForm api={{ signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" links={{ login: '/login' }} />,
+      <EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" links={{ login: '/login' }} />,
     );
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill();
     expect(submit().disabled).toBe(true);
     const boxes = screen.getAllByRole('checkbox');
@@ -111,12 +113,13 @@ describe('EmailSignupForm', () => {
       name: '홍길동',
       phone: '01012345678',
       password: GOOD_PASSWORD,
-      consents: { terms: true, privacy: true, marketing: false },
+      consents: { terms: true, privacy: true, marketing: false, termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } },
     });
   });
 
-  it('정책 위반 · 확인 불일치 → 안내 + 제출 불가', () => {
-    render(<EmailSignupForm api={{ signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+  it('정책 위반 · 확인 불일치 → 안내 + 제출 불가', async () => {
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill({ pw: 'abcd1234', confirm: 'abcd1235' });
     screen.getAllByRole('checkbox').slice(0, 2).forEach((b) => fireEvent.click(b));
     expect(screen.getByText(/특수기호 포함/).textContent).toContain('✕');
@@ -124,20 +127,23 @@ describe('EmailSignupForm', () => {
     expect(submit().disabled).toBe(true);
   });
 
-  it('한글은 특수기호가 아니고 72바이트 초과는 제출 불가', () => {
-    render(<EmailSignupForm api={{ signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+  it('한글은 특수기호가 아니고 72바이트 초과는 제출 불가', async () => {
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
     screen.getAllByRole('checkbox').slice(0, 2).forEach((b) => fireEvent.click(b));
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill({ pw: 'abcdef1가', confirm: 'abcdef1가' });
     expect(screen.getByText(/특수기호 포함/).textContent).toContain('✕');
     expect(submit().disabled).toBe(true);
     const tooLong = 'a1!' + '가'.repeat(24);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill({ pw: tooLong, confirm: tooLong });
     expect(screen.getByText(/72바이트 이하/).textContent).toContain('✕');
     expect(submit().disabled).toBe(true);
   });
 
-  it('대소문자 요구 없음 — 소문자만으로 통과', () => {
-    render(<EmailSignupForm api={{ signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+  it('대소문자 요구 없음 — 소문자만으로 통과', async () => {
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill({ pw: 'abcd123!', confirm: 'abcd123!' });
     screen.getAllByRole('checkbox').slice(0, 2).forEach((b) => fireEvent.click(b));
     expect(submit().disabled).toBe(false);
@@ -148,7 +154,8 @@ describe('EmailSignupForm', () => {
     const signup = vi.fn(async () => {
       throw axiosError(409, { success: false, error: msg, code: 'EMAIL_IN_USE' });
     });
-    render(<EmailSignupForm api={{ signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/t" privacyHref="/p" />);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
     fill();
     screen.getAllByRole('checkbox').slice(0, 2).forEach((b) => fireEvent.click(b));
     fireEvent.click(submit());
