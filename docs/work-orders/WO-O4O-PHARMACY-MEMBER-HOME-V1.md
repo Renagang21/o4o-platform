@@ -81,3 +81,7 @@
 AuthModalContext 소비처는 LoginModal·LoginRoute/RegisterRoute·Header·MobileBottomNav·계정 및 자료/게시판 로그인 유도이며 기존 열기/닫기/콜백 인터페이스를 유지한다. 공통 패키지와 다른 서비스 인증 컨텍스트는 변경하지 않는다.
 
 P1 보완은 실제 AuthModalProvider·LoginModal·fallback을 함께 실행해 콜백 제거와 인증 완료가 겹치는 일반 회원/운영자의 `/mypage/profile` 복귀를 확인했다. 로그인 완료 표시는 모달 종료 후 유지하고 다음 모달 열기에서 초기화한다. 일반 회원 세션 복원은 현재 상세 URL을 유지하며, 처리되지 않은 운영자 fallback은 지연 컨텍스트를 기다린다. 보완 후 120 tests·서비스 빌드·PC/모바일 10상황을 다시 통과했다.
+
+## 최신 main 인증 변경과의 통합 확인
+
+PR #407의 가입 약관 로딩 변경이 main에 들어와 공개된 작업 branch에서 `origin/main`을 merge했다(기준 main `2a8b80cf2`, merge commit `813fe0e02`). LoginModal의 기존 `getSignupTermsConfig` 주입과 이번 목적지 처리 완료 표시를 모두 유지한다. auth-client를 다시 빌드하고 약국 서비스 120 tests 및 auth-react 공통 인증 16 파일·182 tests를 통과했다. 서비스 빌드·PC/모바일 10상황도 최신 인증 변경을 반영한 소스로 재검증했다. API·공통 패키지 변경은 이미 main에 반영된 기반 변경이며 이번 PR의 main 대비 변경 범위에는 포함하지 않는다.
