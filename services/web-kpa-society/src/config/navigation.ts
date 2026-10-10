@@ -22,7 +22,11 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
-  { label: '커뮤니티', href: 'https://community.neture.co.kr' },
+  { label: '참여 신청', href: '/businesses/pharmacy/participation' },
+  { label: '사업 자료', href: '/businesses/pharmacy/materials' },
+  { label: '참여자 게시판', href: '/businesses/pharmacy/forum' },
+  { label: '업무 도구', href: '/businesses/pharmacy/tools' },
+  { label: 'Contact Us', href: '/contact' },
 ];
 
 // WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: 서비스 안내 단일 진입점 (커뮤니티 중심 공개 안내)
@@ -63,39 +67,10 @@ export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
  * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: 옛 "약사회" 그룹. /about 은 O4O 약국 서비스 소개다
  * (약사회 조직 페이지 아님) — 그룹 · 링크 모두 서비스 브랜드로 표시한다.
  */
-const PHARMACY_FOOTER_ABOUT_SECTION: { title: string; links: GlobalHeaderNavItem[] } = {
-  title: 'O4O 약국',
-  links: [
-    { label: '서비스 소개', href: '/about' },
-    { label: '협업 문의', href: '/contact' },
-  ],
-};
-
 export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
-  {
-    title: '서비스',
-    links: [
-      { label: '포럼', href: '/forum' },
-      { label: '콘텐츠', href: '/content' },
-      { label: '디지털사이니지', href: '/signage' },
-      { label: '자료실', href: '/resources' },
-    ],
-  },
-  {
-    title: '이용 안내',
-    links: [
-      { label: '서비스 안내', href: '/service-guide' },
-      { label: '이용 가이드', href: '/guide/intro' },
-      { label: '기능별 이용 방법', href: '/guide/features' },
-    ],
-  },
-  PHARMACY_FOOTER_ABOUT_SECTION,
-  {
-    title: '약관',
-    links: [
-      // WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1: KPA 약관 route 는 /policy 다(/terms 아님).
-      { label: '이용약관', href: '/policy' },
-      { label: '개인정보처리방침', href: '/privacy' },
-    ],
-  },
+  { title: '약국 협력사업', links: KPA_BASE_NAV },
+  { title: '약관', links: [
+    { label: '이용약관', href: '/policy' },
+    { label: '개인정보처리방침', href: '/privacy' },
+  ] },
 ];

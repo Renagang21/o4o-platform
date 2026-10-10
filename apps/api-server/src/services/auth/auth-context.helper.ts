@@ -80,7 +80,7 @@ export async function generateTokensWithContext(
     reuseFamily,
     serviceKey ?? 'neture',
     sessionEpoch,
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: Google 경로는 넘기지 않는다(claim 부재).
+    // Preserve the issuer's verified authentication method; never infer it from linked accounts.
     authMethod ?? null,
   );
   return { tokens, ...ctx };

@@ -50,10 +50,12 @@
 - [x] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
 - [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
 - [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
-- [ ] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합
+- [x] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합 (`2002214684`, 통합 후 CI #37892227465 PASS)
 - [ ] 별도 문서 정합 작업: Identity V3의 과거 kpa-society/k-cosmetics 로그인 membership 필수 문구를 현행 공통 로그인 정책과 정렬 (CHECK의 OPEN 드리프트; Frozen 본문 임의 수정 없음)
 
 ### 4. 카카오 로그인·명시적 연결
+
+문서·코드 조사로 구체화한 TODO와 하위 PR 순서는 [카카오·명시적 연결 WO](WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다. 4-A는 세션 수단·전체관리자 경계, 4-B는 카카오 OAuth, 4-C는 재인증 기반 계정 연결이다. 기존 Google 세션의 claim 부재 및 handoff의 Google 추정부터 해소한다.
 
 - [ ] 카카오 앱 설정·redirect origin·서버 자격정보 존재 확인 (값은 환경 설정에서만 관리)
 - [ ] 서버 검증 OAuth code 교환, state/PKCE·일회 사용·redirect 검증과 카카오 ID 기반 조회

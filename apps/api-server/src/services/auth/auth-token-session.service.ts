@@ -11,9 +11,8 @@ import { resolveAccountAccess } from '../../common/auth/account-access.policy.js
 import logger from '../../utils/logger.js';
 import { isBrowserSessionLive, revokeBrowserSession } from './browser-session.service.js';
 import {
-  isPasswordSessionAllowed,
-  PASSWORD_SESSION_NOT_ALLOWED_CODE,
-  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+  isSessionAuthMethodAllowed,
+  sessionAuthMethodError,
 } from '../../common/auth/password-session.policy.js';
 
 /**
@@ -137,13 +136,10 @@ export class AuthTokenSessionService {
     // Only a password security event rotates that family; no refresh/handoff writes it.
     const ctx = await freshenUserContext(user.id);
 
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션은 관리자 경계 밖에서만 산다.
-    //   발급 뒤 `platform:*` 역할이 붙었으면 회전으로 연장하지 않는다(Google 로 다시 로그인).
-    if (payload.authMethod === 'password' && !isPasswordSessionAllowed(payload.serviceKey, ctx.roles)) {
-      logger.warn('[refreshTokens] password session rejected by admin boundary', { userId: user.id });
-      const error = new Error(PASSWORD_SESSION_NOT_ALLOWED_MESSAGE) as Error & { code: string };
-      error.code = PASSWORD_SESSION_NOT_ALLOWED_CODE;
-      throw error;
+    // Do not promote missing/Kakao/password markers to Google during refresh.
+    if (!isSessionAuthMethodAllowed(payload.authMethod, payload.serviceKey, ctx.roles)) {
+      const rejection = sessionAuthMethodError(payload.authMethod);
+      throw Object.assign(new Error(rejection.message), { code: rejection.code });
     }
 
     // Preserve signed scope and compatibility epoch without rereading either.

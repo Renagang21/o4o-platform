@@ -19,6 +19,7 @@
 import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
+  O4OHomeButton,
   GoogleContinue,
   EmailSignupForm,
   VerifyEmailView,
@@ -32,6 +33,7 @@ import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
   return (
     <div className="min-h-screen bg-gray-50 flex items-start sm:items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -42,7 +44,9 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle?: str
             {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
           </div>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-6">{children}
+          <div className="mt-6"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
+        </div>
       </div>
     </div>
   );

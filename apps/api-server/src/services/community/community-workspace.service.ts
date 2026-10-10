@@ -11,6 +11,8 @@ export interface CommunityWorkspace {
   communityKey: string;
   name: string;
   kind: 'independent' | 'semi-franchise';
+  /** Business identity for service-owned participant navigation; storage codes stay unchanged. */
+  businessKey?: string;
   allowed: boolean;
   canManage: boolean;
   canJoin: boolean;
@@ -30,7 +32,7 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
        JOIN role_assignments ra ON ra.user_id = sfo.user_id AND ra.is_active = true AND ra.role IN ('neture:operator','neture:admin')
        WHERE sfo.semi_franchise_id = $1 AND sfo.user_id = $2 AND sfo.revoked_at IS NULL`, [sf.id, user!.id],
     ) : [];
-    return { communityKey: key, name: sf.name, kind: 'semi-franchise', allowed: access.allowed,
+    return { communityKey: key, name: sf.name, kind: 'semi-franchise', businessKey: sf.key, allowed: access.allowed,
       canManage: operators.length > 0, canJoin: false, membershipStatus: access.allowed ? 'active' : null,
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
       forumStorageCodes: [`sf:${sf.id}`] };

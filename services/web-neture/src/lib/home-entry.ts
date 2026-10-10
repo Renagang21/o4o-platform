@@ -110,6 +110,8 @@ export interface EntryCommunity {
   communityKey: string;
   name: string;
   canParticipate: boolean;
+  kind?: 'independent' | 'semi-franchise';
+  businessKey?: string;
   reason: string | null;
   /** 진입 surface — Community 하나에 여러 URL 이 있을 수 있다 (같은 Community 데이터) */
   entries: { serviceKey: string; path: string }[];
@@ -287,13 +289,20 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
     //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
     //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
-    api.get('/communities').catch(() => null),
+    api.get('/communities').catch((error: unknown) => {
+      if ((error as { response?: { status?: number } })?.response?.status === 404) return null;
+      throw error;
+    }),
   ]);
   const services = servicesRes.data?.data?.services;
   const entry = entryRes.data?.data;
   const operatorServices = operatorRes.data?.data?.services;
   const communitiesRaw = communitiesRes?.data?.data?.communities;
-  const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
+  const communities: EntryCommunity[] = Array.isArray(communitiesRaw) ? communitiesRaw.map(c => ({
+    ...c,
+    canParticipate: typeof c.allowed === 'boolean' ? c.allowed : c.canParticipate === true,
+    entries: Array.isArray(c.entries) ? c.entries : [{ serviceKey: 'community', path: `/communities/${encodeURIComponent(c.communityKey)}/forum` }],
+  })) : [];
   if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
     throw new Error('bad response');
   }
@@ -441,7 +450,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   //   운영 종료 서비스의 surface 는 진입 후보에서 뺀다 — 남는 surface 가 없으면 카드도 없다.
   const community: EntryItem[] = [];
   for (const c of data.communities ?? []) {
-    if (!c.canParticipate || !Array.isArray(c.entries)) continue;
+    if (c.kind === 'semi-franchise' || !c.canParticipate || !Array.isArray(c.entries)) continue;
     const entries = c.entries.filter((e) => !RETIRED_SERVICE_KEYS.has(e.serviceKey));
     if (entries.length === 0) continue;
     const entry =
@@ -549,6 +558,11 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
+  for (const business of data.communities ?? []) {
+    if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
+    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`,
+      action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` } });
+  }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
     const info = NETURE_SERVICE_INFO[svcKey];

@@ -9,6 +9,7 @@
  */
 
 import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
+import type { HostProfile } from '../lib/hostProfile';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
@@ -20,11 +21,26 @@ import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 //   `/` 가 O4O 공통 Home 으로 바뀌면서 기존 Neture 커뮤니티 홈은 `/community` 로 이동했다.
 //   route 있는 실기능을 nav 에서 숨기지 않는다(CLAUDE.md Shared Module Change Rule) → 항목 추가.
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
-  { label: 'Home', href: '/' },
-  { label: '커뮤니티', href: '/community' },
-  { label: '이용 안내', href: '/guide' },
+  { label: '전체 서비스', href: '/' },
   { label: 'Contact Us', href: '/contact' },
 ];
+
+export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[] {
+  if (profile === 'community') return [
+    { label: '커뮤니티 · 단체활동', href: '/' },
+    { label: '개설 신청 · 운영', href: '/mypage/communities' },
+  ];
+  if (profile === 'funding') return [
+    { label: '유통참여형 펀딩', href: '/market-trial' },
+    { label: 'Contact Us', href: '/contact' },
+  ];
+  if (profile === 'supplier') return [
+    { label: '신청 · 이용 상태', href: '/' },
+    { label: '공급자 업무', href: '/supplier/dashboard' },
+    { label: 'Contact Us', href: '/contact' },
+  ];
+  return NETURE_PUBLIC_NAV;
+}
 
 // ─── Contextual Nav ──────────────────────────────────────���───────────────────
 // 역할 조건에 따라 노출
