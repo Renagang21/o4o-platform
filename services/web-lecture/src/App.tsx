@@ -1,5 +1,5 @@
 import OperatorMembersPage from './pages/operator/OperatorMembersPage';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { ToastProvider } from './components/Toast';

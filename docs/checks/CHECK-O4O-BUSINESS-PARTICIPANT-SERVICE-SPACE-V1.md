@@ -17,6 +17,7 @@
 - 내 매장 Vitest: 1 file / 9 tests PASS. 강의 Vitest: 1 file / 2 tests PASS.
 - API focused Jest: 커뮤니티 경로 가드·기존 사업 규칙 48 tests, 사업 identity/원장 보존 2 tests, 최소 사업 정보 조회 2 tests PASS.
 - production 산출물 브라우저: 1280px/390px × 승인 대기/승인 완료 4회 PASS. 사업 내부 게시판, 미승인 게시글 조회 0회, 가로 넘침 없음, 대표 홈 인증 인계 1회 확인. 실제 운영 계정·운영 API를 사용하지 않은 모의 세션 검증이다.
+- 추가 비로그인 브라우저: 약국·커뮤니티·내 매장·강의 × 1280px/390px 8회 PASS. 로그인 창 내부 복귀 포함, 인증 인계 POST 없이 대표 홈으로 직접 이동하며 가로 넘침 없음. 강의 root의 최초 진입 오류를 발견해 Navigate import를 보완하고 재검증했다.
 - 약국·Neture·내 매장·강의 TypeScript 및 production Vite build PASS. API TypeScript PASS.
 
 로컬 의존성은 기존 환경을 재사용했다. API typecheck는 저장소 권장 Node 22.18.0에서도 확인했다. DB 변경·운영 계정 변경·운영 데이터 조회는 수행하지 않았다. CI 및 운영 검증 결과는 후속 기록으로 구분한다.
