@@ -24,7 +24,7 @@ const PLATFORM_TERMS_URL = 'https://neture.co.kr/terms';
 const PLATFORM_PRIVACY_URL = 'https://neture.co.kr/privacy';
 
 export default function JoinPage() {
-  const { user, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { user, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, loginWithKakao, signupWithKakao, getGoogleAuthConfig } = useAuth();
   const [licenseNumber, setLicenseNumber] = useState('');
   const [activityType, setActivityType] = useState('');
   const [tos, setTos] = useState(false);
@@ -86,7 +86,8 @@ export default function JoinPage() {
             loginWithEmail={loginWithEmail}
             api={authClient}
             onSuccess={() => setError(null)}
-            google={{
+            kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: '/join' }}
+          google={{
               getConfig: getGoogleAuthConfig,
               loginWithGoogle,
               signupWithGoogle,

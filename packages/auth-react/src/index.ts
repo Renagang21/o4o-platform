@@ -61,3 +61,7 @@ export { PasswordSecuritySettings } from './PasswordSecuritySettings';
 export type { PasswordSecuritySettingsProps } from './PasswordSecuritySettings';
 
 export { requestServiceHandoff } from './serviceHandoff.js';
+export { KakaoContinue } from './KakaoContinue';
+export type { KakaoContinueProps } from './KakaoContinue';
+
+export { SocialAccountConnections } from './SocialAccountConnections';

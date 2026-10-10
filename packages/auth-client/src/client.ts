@@ -7,6 +7,7 @@ import type {
   GoogleSignupConsents,
   EmailSignupRequest,
   EmailAuthNotice,
+  SocialProof, SocialGrant, SocialProvider, SocialAccountsStatus, KakaoSignupRequest, KakaoAuthResponse,
 } from './types.js';
 import {
   getAccessToken,
@@ -134,7 +135,7 @@ export class AuthClient {
               requestUrl.includes('/auth/logout') ||
               requestUrl.includes('/auth/email/login') ||
               // WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google login/signup 401 은 ID token 거절이다.
-              requestUrl.includes('/auth/google/')) {
+              requestUrl.includes('/auth/google/') || requestUrl.includes('/auth/social/')) {
             return Promise.reject(error);
           }
 
@@ -262,6 +263,36 @@ export class AuthClient {
     if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
   }
+
+  /** Flow binding is HttpOnly even when normal sessions use localStorage. */
+  private async socialPost<T>(path: string, body: unknown): Promise<T> {
+    const response = await this.api.post(`/auth/social/${path}`, body, { withCredentials: true });
+    return response.data.data as T;
+  }
+  async getKakaoAuthConfig(): Promise<{ enabled: boolean }> {
+    const response = await this.api.get('/auth/social/kakao/config');
+    return response.data.data;
+  }
+  startKakaoLogin(returnTo = '/'): Promise<SocialGrant> { return this.socialPost('kakao/start', { returnTo }); }
+  private async kakaoSession(path: string, body: unknown): Promise<KakaoAuthResponse> {
+    const generation = ++this.sessionGeneration;
+    const data = await this.socialPost<KakaoAuthResponse>(path, {
+      ...body as object, ...(this.strategy === 'localStorage' && { includeLegacyTokens: true }),
+    });
+    if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
+    return data.nextStep ? { ...data, success: true } : this.adoptSessionResponse({ success: true, data });
+  }
+  loginWithKakao(proof: SocialProof): Promise<KakaoAuthResponse> { return this.kakaoSession('kakao/complete', { token: proof.token, code: proof.code }); }
+  signupWithKakao(token: string, input: KakaoSignupRequest): Promise<KakaoAuthResponse> { return this.kakaoSession('kakao/signup', { token, ...input }); }
+  async getSocialAccounts(): Promise<SocialAccountsStatus> {
+    const response = await this.api.get('/auth/social/accounts'); return response.data.data;
+  }
+  reauthenticateSocialPassword(password: string): Promise<SocialGrant> { return this.socialPost('reauth/password', { password }); }
+  startSocialReauthentication(provider: SocialProvider, returnTo: string): Promise<SocialGrant> { return this.socialPost('reauth/start', { provider, returnTo }); }
+  completeSocialReauthentication(proof: SocialProof): Promise<SocialGrant> { return this.socialPost('reauth/complete', { token: proof.token, code: proof.code, idToken: proof.idToken }); }
+  startSocialLink(token: string, provider: SocialProvider, returnTo: string): Promise<SocialGrant> { return this.socialPost('link/start', { token, provider, returnTo }); }
+  verifySocialLink(proof: SocialProof): Promise<SocialGrant> { return this.socialPost('link/verify', { token: proof.token, code: proof.code, idToken: proof.idToken }); }
+  confirmSocialLink(token: string): Promise<{ linked: boolean }> { return this.socialPost('link/confirm', { token, confirm: true }); }
 
   // ── WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일·비밀번호 ──────────────────────────
   //   옛 `login(email,password)` 의 부활이 아니다 — 새 경로 `/auth/email/*` · `/auth/password/*` 이며

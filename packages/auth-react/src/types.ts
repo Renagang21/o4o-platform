@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * @o4o/auth-react — 공통 계약 타입
  *
@@ -10,6 +11,8 @@
 /** 로그인 결과 — Neture 방식(result object)으로 통일. 절대 throw 하지 않는다. */
 export interface AuthLoginResult<TUser> {
   success: boolean;
+  nextStep?: 'signup' | 'verify-email';
+  signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
   /** 사용자에게 보여줄 문구(resolveAuthError 산출). 성공 시 undefined. */
   error?: string;
   /**
@@ -75,6 +78,8 @@ export interface AuthClientLike {
    * 은퇴한 `login(email+password)`(service_credentials 기반)의 부활이 아니다 — 단일 user_password_credentials 경로다.
    */
   loginWithEmail?(email: string, password: string): Promise<unknown>;
+  loginWithKakao?(proof: SocialProof): Promise<unknown>;
+  signupWithKakao?(token: string, input: KakaoSignupRequest): Promise<unknown>;
   logout(): Promise<unknown>;
   api: {
     get(url: string): Promise<{ data: unknown }>;
@@ -157,6 +162,8 @@ export interface ServiceAuthCore<TUser> {
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<TUser>>;
   /** WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(인증 완료 이메일만). */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<TUser>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<TUser>>;
   logout: () => Promise<void>;
   /** 세션 재확인(기존 KPA `checkAuth` 와 동일 의미). */
   refresh: () => Promise<void>;

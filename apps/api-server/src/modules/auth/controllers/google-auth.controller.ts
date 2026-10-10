@@ -93,7 +93,7 @@ export class GoogleAuthController extends BaseController {
   //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
   //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
-  private static async respondWithSession(
+  static async respondWithSession(
     req: Request,
     res: Response,
     session: GoogleAuthSession,

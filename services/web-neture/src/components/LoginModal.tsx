@@ -16,7 +16,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { O4OHomeButton, GoogleContinue, EmailLoginForm } from '@o4o/auth-react';
+import { O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginForm } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
@@ -52,7 +52,7 @@ const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS;
 
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
   //   서비스 미가입(SERVICE_NOT_MEMBER) 차단은 인증 실패와 시각적으로 구분한다.
@@ -215,6 +215,9 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
               {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 — 미등록이면 약관 동의 → 계정 생성 */}
               <div className="mb-4">
+                <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+                  returnTo={returnUrl ?? '/'}
+                  onSuccess={handleLoginSuccess} />
                 <GoogleContinue<User>
                   getConfig={getGoogleAuthConfig}
                   loginWithGoogle={loginWithGoogle}
