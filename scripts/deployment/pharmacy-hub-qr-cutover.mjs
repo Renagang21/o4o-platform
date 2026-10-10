@@ -67,7 +67,7 @@ export async function verifyPublicData(paths, request = fetch, signal) {
     // QR landing GET records scans. Its active path is verified by the read-only
     // database inventory; never call that API from automated cutover probes.
     if (!source.pathname.startsWith('/tablet/')) return [];
-    const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(source.pathname.slice(8))}/tablet/products`);
+    const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(decodeURIComponent(source.pathname.slice(8)))}/tablet/products`);
     if (source.searchParams.has('tabletId')) target.searchParams.set('tabletId', source.searchParams.get('tabletId'));
     return [target.href];
   });

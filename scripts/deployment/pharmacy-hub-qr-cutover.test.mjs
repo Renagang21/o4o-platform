@@ -204,3 +204,15 @@ test('tablet API checks reject missing data and never call the scan-writing QR A
   await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response('<html>SPA</html>')), /return JSON/);
   await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response(null, { status: 404 })), /HTTP 200/);
 });
+
+test('tablet API resolves raw and already encoded Korean slugs exactly once', async () => {
+  const slug = '테스트약국';
+  for (const path of [`/tablet/${slug}`, `/tablet/${encodeURIComponent(slug)}`]) {
+    await verifyPublicData([`${path}?tabletId=test`], async url => {
+      const target = new URL(url);
+      assert.equal(decodeURIComponent(target.pathname.split('/')[4]), slug);
+      assert.equal(target.searchParams.get('tabletId'), 'test');
+      return Response.json({ success: true, data: [] });
+    });
+  }
+});
