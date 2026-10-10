@@ -131,3 +131,10 @@ admin/workspace 특별 호스트는 정확한 호스트만 허용한다. 로그�
 사용하므로 별도 소셜 전용 scope를 만들지 않는다. 4 suites 94 PASS, 해당 runtime lint error/warning 0.
 배포 config 시험 4건도 기존 blocking node:test CI 단계에 연결했다 (관련 workflow 회귀 109 PASS).
 브라우저 자체의 third-party cookie 차단 설정은 별개이며 실제 OAuth/device 검증은 OPEN이다.
+
+공유 resolver의 raw-source 소비처도 재검증했다. Lecture origin 계약은 로컬 변수 이름 대신
+study→lecture / neture→neture / 위조 suffix→null의 실제 판정을 확인하며 substring 매칭 금지는
+유지한다. 해당 7건과 deploy-risk 36건 PASS. 실제 Chromium 쿠키 정책 synthetic 시험에서는
+cross-site Lax binding 미전달 / Secure None 전달을 확인했다. 외부 OAuth나 운영 키를 사용한
+시험이 아니다. 최신 main을 반영한 모든 웹 bundle의 가입 UI 8/8, Neture 세션/returnTo 2/2를
+재확인했다.
