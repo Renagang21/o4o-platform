@@ -23,6 +23,8 @@
 
 ## 현재 폐기 범위 보정 — 2026-10-10
 
+전체 제거 후속 phase: `retire_host=true`는 PH matcher의 default backend와 pathRules를 제거하고 전체 호스트를 Neture 약국으로 302 리다이렉트한다. 다른 matcher/host와 인증서·DNS는 유지한다. 실제 QR·tablet 외에 root·일반 경로도 규칙 검증하며 실패 시 이전 map을 복구한다. 도구는 Cloud Run이나 DB 데이터를 삭제하지 않는다. 전용 데이터 삭제에 대한 사용자 승인과 대상/FK 조사·Cloud Run 제거 체크리스트는 [완전 제거 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)를 따른다. 운영 실행은 아직 미실행이다.
+
 사용자는 PharmacyHub가 전혀 사용되지 않으며 폐기하는 서비스임을 확인하고, 네 경로 리다이렉트·존재하는 QR/태블릿 실데이터 검증·나머지 두 경로 규칙 검사로 범위를 변경했다. [폐기 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)가 현재 작업 기준이다. 위 plan 당시의 네 활성 probe 요구와 미발견 운영 집계 선행 조건은 현재 apply 조건으로 사용하지 않는다. PR #416은 닫았으며 census는 반영하지 않는다.
 
 apply는 실제 QR·tablet을 필수로 요구하고 다국어·제휴 실데이터는 선택이다. 미발견 다국어·제휴는 `__ph_retirement_rule_check__?ruleCheck=1` 상대 경로로 root·www의 302와 path/query를 보존한 Location만 검사한다. 이 경로는 실데이터가 아니며 Neture 목적지 HTTP 200·콘텐츠/렌더 검증을 주장하지 않는다. 실제 probe만 Neture HTTP 200을 요구하고 결과에는 active/rule-only 검증 수를 구분한다. fingerprint·동시 변경 차단·시간 상한·검증 실패 롤백은 유지한다.

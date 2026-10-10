@@ -12,6 +12,10 @@ on:
         description: "Read-only canonical Demo/store relationship census; no QR operation"
         type: boolean
         default: false
+      retire_host:
+        description: 'Retire all PH host routes; remove PH backend references, preserve path/query to Neture'
+        type: boolean
+        default: false
       demo_relink:
         description: 'Canonical Store Demo ownership relink; plan first, apply with matching digest'
         type: boolean
@@ -46,6 +50,7 @@ jobs:
     timeout-minutes: 30
     env:
       CUTOVER_MODE: ${{ inputs.mode }}
+      RETIRE_PH_HOST: ${{ inputs.retire_host }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
     steps:

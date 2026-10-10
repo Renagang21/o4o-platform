@@ -39,6 +39,21 @@ test('plan validates and saves a backup without making a write', async () => {
   assert.equal(h.writes.length, 0);
   assert.deepEqual(h.saved.map(s => s.name), ['before.json', 'draft.json']);
 });
+test('full-host apply detaches PH backend and verifies root and non-QR redirects', async () => {
+  const h = harness();
+  await runCutover({ ...h.options, retireHost: true, probes: paths.slice(0, 2).join('\n'), verify: async (_paths, rules) => {
+    assert.ok(rules.includes('/'));
+    assert.ok(rules.includes('/__ph_retirement_host_check__?ruleCheck=1'));
+  } });
+  assert.equal(h.writes[0].pathMatchers[0].defaultService, undefined);
+  assert.equal(h.writes[0].pathMatchers[0].defaultUrlRedirect.hostRedirect, 'pharmacy.neture.co.kr');
+});
+test('failed full-host verification restores PH backend before deletion is possible', async () => {
+  const h = harness();
+  await assert.rejects(runCutover({ ...h.options, retireHost: true, verify: async () => { throw new Error('host check failed'); } }), /host check failed/);
+  assert.equal(h.writes.at(-1).pathMatchers[0].defaultService, 'backend-pharmacy-hub-web');
+  assert.equal(h.saved.at(-1).name, 'rollback.json');
+});
 test('apply preserves unrelated configuration and checks real paths', async () => {
   const h = harness();
   const result = await runCutover({ ...h.options, verify: async actual => assert.deepEqual(actual, paths) });

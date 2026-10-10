@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { randomUUID } from 'node:crypto';
-import { prepareQrRedirect, printedQrPaths } from './pharmacy-hub-qr-redirect.mjs';
+import { prepareQrRedirect, prepareHostRetirement, printedQrPaths } from './pharmacy-hub-qr-redirect.mjs';
 
 const project = 'netureyoutube';
 const mapName = 'o4o-global-lb';
@@ -92,18 +92,18 @@ export async function settleOperation(name, readOperation, { now = Date.now, sle
   throw error;
 }
 
-export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite }) {
+export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite, retireHost = false }) {
   const before = await read();
   validateHosts(before);
   if (!before.fingerprint) throw new Error('Live fingerprint is required.');
-  const draft = prepareQrRedirect(before);
+  const draft = retireHost ? prepareHostRetirement(before) : prepareQrRedirect(before);
   await save('before.json', before);
   await save('draft.json', draft);
   await validate(draft);
   if (mode === 'plan') return { mode, applied: false };
   if (mode !== 'apply') throw new Error('Unknown cutover mode.');
   const paths = parseProbes(probes);
-  const rulePaths = missingFamilyRuleProbes(paths);
+  const rulePaths = [...missingFamilyRuleProbes(paths), ...(retireHost ? ['/', '/__ph_retirement_host_check__?ruleCheck=1'] : [])];
   await preflight?.(paths);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');
@@ -160,6 +160,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   };
   await mkdir(output, { recursive: true, mode: 0o700 });
   const result = await runCutover({
+    retireHost: process.env.RETIRE_PH_HOST === 'true',
     mode, probes: process.env.QR_PROBE_PATHS || (process.env.PROBE_OUTPUT ? await readFile(process.env.PROBE_OUTPUT, 'utf8') : ''),
     preflight: paths => verifyTargets(paths),
     beforeWrite: () => {

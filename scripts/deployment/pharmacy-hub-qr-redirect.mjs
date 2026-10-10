@@ -4,6 +4,20 @@ import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 
 export const printedQrPaths = ['/qr/*', '/tablet/*', '/multilingual-products/*', '/foreign-visitor/affiliate/*'];
+export function prepareHostRetirement(input) {
+  const map = structuredClone(input);
+  const matchers = map.pathMatchers?.filter(m => m.name === 'path-matcher-pharmacy-hub') ?? [];
+  if (matchers.length !== 1) throw new Error('Exactly one PharmacyHub path matcher is required.');
+  const matcher = matchers[0];
+  if (matcher.routeRules?.length || matcher.defaultRouteAction) throw new Error('Unexpected advanced routing; review before retirement.');
+  if (!matcher.defaultService && !matcher.defaultUrlRedirect) throw new Error('Missing PharmacyHub default route.');
+  delete matcher.defaultService;
+  delete matcher.defaultUrlRedirect;
+  delete matcher.pathRules;
+  matcher.defaultUrlRedirect = { hostRedirect: 'pharmacy.neture.co.kr', httpsRedirect: true, redirectResponseCode: 'FOUND', stripQuery: false };
+  for (const key of ['id', 'creationTimestamp', 'selfLink', 'fingerprint', 'kind']) delete map[key];
+  return map;
+}
 export function prepareQrRedirect(input) {
   const map = structuredClone(input);
   const matchers = map.pathMatchers?.filter(m => m.name === 'path-matcher-pharmacy-hub') ?? [];
