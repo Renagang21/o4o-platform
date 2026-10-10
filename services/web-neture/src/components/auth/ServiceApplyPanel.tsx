@@ -22,7 +22,7 @@
  */
 
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
@@ -39,7 +39,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   NETURE_MEMBERSHIP_REQUIRED: 'Neture 가입 승인 후 공급자 서비스를 신청할 수 있습니다. 대표 홈에서 가입 상태를 확인해 주세요.',
 };
 
-export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
+export function ServiceApplyPanel({ service, enterWorkspace = false }: { service: ServiceKey; enterWorkspace?: boolean }) {
   const { user, isAuthenticated } = useAuth();
   const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
@@ -75,6 +75,7 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   );
 
   if (status === 'active') {
+    if (enterWorkspace) return <Navigate to={info.work} replace />;
     return (
       <div className={box} data-testid={`service-apply-${service}-active`}>
         {header}

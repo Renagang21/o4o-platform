@@ -22,3 +22,7 @@
 
 @tailwind components;
 @tailwind utilities;
+
+.work-menu { position: relative; }
+.work-menu summary { cursor: pointer; }
+.work-menu > nav { position: absolute; right: 0; z-index: 20; min-width: 160px; padding: 12px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px #0001; display: flex; flex-direction: column; gap: 12px; }

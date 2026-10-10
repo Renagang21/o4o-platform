@@ -49,7 +49,7 @@ export function RetiredServiceNotice() {
     <main className="center-card"><section className="card" data-testid="store-retired-service">
       <h1>이 매장의 서비스 업무공간이 종료되었습니다</h1>
       <p className="muted">이 매장이 가입한 서비스는 더 이상 매장 업무 화면을 제공하지 않습니다.</p>
-      <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+      <Link className="button-link" to={WORKSPACE_PATHS.myServices}>이용 사업 확인</Link>
     </section></main>
   );
 }
@@ -171,7 +171,7 @@ export function ServiceRoleOnly({ serviceKey, roles, children }: { serviceKey: U
     <main className="center-card"><section className="card" data-testid="store-owner-only">
       <h1>매장 경영자만 이용할 수 있습니다</h1>
       <p>이 화면은 {SERVICE_LABEL[serviceKey]} 매장 경영자 권한이 필요합니다.</p>
-      <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+      <Link className="button-link" to={WORKSPACE_PATHS.myServices}>이용 사업 확인</Link>
     </section></main>
   );
 }
@@ -189,7 +189,7 @@ export function StoreOwnerOnly({ children }: { children: ReactNode }) {
     <main className="center-card"><section className="card" data-testid="store-owner-only">
       <h1>매장 경영자만 이용할 수 있습니다</h1>
       <p>이 화면은 {SERVICE_LABEL[effectiveServiceKey]} 매장 경영자 권한이 필요합니다.</p>
-      <Link className="button-link" to={WORKSPACE_PATHS.home}>홈으로</Link>
+      <Link className="button-link" to={WORKSPACE_PATHS.myServices}>이용 사업 확인</Link>
     </section></main>
   );
 }

@@ -1,3 +1,4 @@
+import PartnerServicePage from './pages/PartnerServicePage';
 import ServiceMembersPage from './pages/operator/ServiceMembersPage';
 /**
  * Neture - o4o 플랫폼 기반 서비스
@@ -718,7 +719,10 @@ function App() {
                 NetureLayout 밖에 배치한다. 기존 Neture 커뮤니티 홈은 /community.
             ================================================================ */}
             {/* 서브도메인(supplier · funding · community)에서는 `/` 가 각 호스트 대표 화면이다(아래 NetureLayout 안). */}
-            {CURRENT_HOST_PROFILE === 'main' && <Route path="/" element={<O4OHomePage />} />}
+            {CURRENT_HOST_PROFILE === 'main' && <>
+              <Route path="/" element={<O4OHomePage />} />
+              <Route path="/services/partner" element={<PartnerServicePage />} />
+            </>}
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)

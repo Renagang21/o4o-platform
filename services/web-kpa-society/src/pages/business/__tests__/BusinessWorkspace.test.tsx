@@ -38,11 +38,13 @@ describe('사업 서비스의 참가자 공간', () => {
     mount('/businesses/pharmacy/forum');
     expect(await screen.findByText('사업 참여 승인 후 게시판을 이용할 수 있습니다.')).toBeTruthy();
     expect(screen.queryByText('게시판 데이터 화면')).toBeNull();
+    expect(screen.getByRole('status').textContent).toContain('참여 신청·승인 상태');
     expect(mocks.get.mock.calls.every(([path]) => !path.includes('/forum/posts'))).toBe(true);
   });
   it('승인 사용자는 해당 사업의 게시판을 이용한다', async () => {
     mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true } : business));
     mount('/businesses/pharmacy/forum'); expect(await screen.findByText('게시판 데이터 화면')).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toContain('참여 승인 · 이용 가능');
   });
   it('사업과 게시판의 소속이 다르면 내용을 표시하지 않는다', async () => {
     mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, businessKey: 'other' } : business));

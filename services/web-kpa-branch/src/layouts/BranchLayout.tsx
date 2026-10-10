@@ -89,7 +89,6 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     key: 'public',
     label: null,
     items: [
-      { to: basePath || '/', label: '홈', end: true },
       { to: `${basePath}/notices`, label: '공지' },
       { to: `${basePath}/events`, label: '행사' },
       { to: `${basePath}/resources`, label: '자료실' },

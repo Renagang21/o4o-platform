@@ -76,7 +76,8 @@ export function NetureGlobalHeader() {
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
   //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
   //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
-  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier });
+  const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
+  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
@@ -90,7 +91,7 @@ export function NetureGlobalHeader() {
   return (
     <GlobalHeader
       brand={CURRENT_HOST_PROFILE === 'main' ? NETURE_HEADER_BRAND : { ...NETURE_HEADER_BRAND, name: { supplier: '공급자', funding: '유통참여형 펀딩', community: '커뮤니티' }[CURRENT_HOST_PROFILE], subtitle: '' }}
-      publicNav={getServicePublicNav(CURRENT_HOST_PROFILE)}
+      publicNav={publicNav}
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
