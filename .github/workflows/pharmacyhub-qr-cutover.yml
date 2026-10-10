@@ -16,6 +16,10 @@ on:
         description: 'Canonical Store Demo ownership relink; plan first, apply with matching digest'
         type: boolean
         default: false
+      relink_targets:
+        description: 'Reviewed SHA256 store ID fingerprints, comma-separated; omit only for discovery'
+        type: string
+        required: false
       relink_digest:
         description: 'Exact digest from the read-only store relink plan; required for apply'
         type: string
@@ -126,6 +130,7 @@ jobs:
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
           DEMO_RELINK_MODE: ${{ inputs.mode }}
           DEMO_RELINK_DIGEST: ${{ inputs.relink_digest }}
+          DEMO_RELINK_TARGETS: ${{ inputs.relink_targets }}
         run: node scripts/deployment/demo-store-relink.mjs
       - name: Inventory, validate, optionally apply and verify
         if: inputs.demo_census != true && inputs.demo_relink != true
