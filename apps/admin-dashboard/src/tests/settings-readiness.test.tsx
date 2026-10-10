@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,8 +12,8 @@ vi.mock('../api/unified-client', () => ({ unifiedApi: { raw: { get: vi.fn(), put
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 const get = vi.mocked(unifiedApi.raw.get);
 const put = vi.mocked(unifiedApi.raw.put);
-const email = { provider: 'smtp', smtpHost: 'smtp.example.invalid', smtpPort: 587,
-  smtpUser: 'synthetic-user', smtpSecure: false, fromEmail: 'sender@example.invalid', fromName: 'Fixture' };
+const email = { smtpHost: 'smtp.example.invalid', smtpPort: 587,
+  smtpUser: 'synthetic-user', smtpPassword: randomUUID(), smtpSecure: false, fromEmail: 'sender@example.invalid', fromName: 'Fixture' };
 const reply = (data: unknown) => ({ data: { success: true, data } });
 const renderAi = () => render(<MemoryRouter><AppServices /></MemoryRouter>);
 
@@ -48,7 +49,7 @@ describe('email settings workflow', () => {
     render(<EmailSettings />);
     const host = await screen.findByDisplayValue(email.smtpHost);
     fireEvent.change(host, { target: { value: 'edited.example.invalid' } });
-    // Exercise the submit handler directly; no secret fixture is needed.
+    expect(screen.getByLabelText(/SMTP 비밀번호/)).toHaveValue(email.smtpPassword);
     fireEvent.submit(host.closest('form')!);
     await screen.findByDisplayValue(saved.smtpHost);
     expect(put).toHaveBeenCalledWith('/v1/settings/email', { ...email, smtpHost: 'edited.example.invalid' });

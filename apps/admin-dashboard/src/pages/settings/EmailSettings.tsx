@@ -185,16 +185,16 @@ const EmailSettings: FC = () => {
           </div>
 
           <div>
-            <label htmlFor="smtpPass" className="o4o-label">
+            <label htmlFor="smtpPassword" className="o4o-label">
               SMTP 비밀번호 <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
-                id="smtpPass"
-                name="smtpPass"
-                value={settings.smtpPass || ''}
-                onChange={(e) => handleInputChange('smtpPass', e.target.value)}
+                id="smtpPassword"
+                name="smtpPassword"
+                value={settings.smtpPassword || ''}
+                onChange={(e) => handleInputChange('smtpPassword', e.target.value)}
                 className="o4o-input pr-10"
                 placeholder="••••••••"
                 required

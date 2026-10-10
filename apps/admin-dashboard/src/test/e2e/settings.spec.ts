@@ -3,9 +3,9 @@ import { randomUUID } from 'node:crypto';
 
 /** Browser fixtures exercise the UI contract, not Google OAuth or a live backend. */
 async function mockApi(page: Page, roles: string[] | null = ['platform:super_admin']) {
-  let email = { provider: 'smtp', smtpHost: 'smtp.example.invalid', smtpPort: 587,
-    smtpUser: 'fixture-user', smtpPass: randomUUID(), smtpSecure: false,
-    fromEmail: 'sender@example.invalid', fromName: 'Fixture', templates: {} };
+  let email = { smtpHost: 'smtp.example.invalid', smtpPort: 587,
+    smtpUser: 'fixture-user', smtpPassword: randomUUID(), smtpSecure: false,
+    fromEmail: 'sender@example.invalid', fromName: 'Fixture' };
   let failRead = false;
   let failSave = false;
   let failModels = false;
@@ -45,7 +45,7 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
     // Never let test requests reach production or an unmocked backend.
     return json({ success: false, error: 'Unmocked test API' }, 404);
   });
-  return { writes, setReadFailure: (value: boolean) => { failRead = value; },
+  return { writes, password: email.smtpPassword, setReadFailure: (value: boolean) => { failRead = value; },
     setSaveFailure: (value: boolean) => { failSave = value; },
     setModelsFailure: (value: boolean) => { failModels = value; } };
 }
@@ -59,16 +59,20 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       await page.goto('/settings/email');
       const host = page.getByLabel('SMTP 호스트', { exact: false });
       await expect(host).toHaveValue('smtp.example.invalid');
+      await expect(page.getByLabel('SMTP 비밀번호', { exact: false })).toHaveValue(api.password);
       await expect(page.getByText(/자동 적용되지 않습니다/)).toBeVisible();
       await host.fill('edited.example.invalid');
       await page.getByRole('button', { name: '설정 저장', exact: true }).click();
       await expect(page.getByText(/SMTP 설정을 DB에 저장했습니다/)).toBeVisible();
       expect(api.writes).toHaveLength(1);
       expect(api.writes[0].smtpHost).toBe('edited.example.invalid');
+      expect(api.writes[0].smtpPassword).toBe(api.password);
+      expect(api.writes[0]).not.toHaveProperty('smtpPass');
       expect(api.writes[0]).not.toHaveProperty('success');
       expect(api.writes[0]).not.toHaveProperty('data');
       await page.reload();
       await expect(host).toHaveValue('edited.example.invalid');
+      await expect(page.getByLabel('SMTP 비밀번호', { exact: false })).toHaveValue(api.password);
     });
 
     test('failed read blocks saving until a successful retry', async ({ page }) => {
