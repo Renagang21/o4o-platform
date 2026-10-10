@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { collectRetirementInventory, collectCloudInventory, countQuery, retiredKeys } from './pharmacy-hub-retirement-inventory.mjs';
+import { collectRetirementInventory, collectCloudInventory, countQuery, jsonScopeQuery, retiredKeys } from './pharmacy-hub-retirement-inventory.mjs';
 
 test('census is read-only, reports counts/schema, retains protected identities', async () => {
   const statements=[];
@@ -48,10 +48,11 @@ test('cloud census calls read operations only and excludes Run credentials',()=>
   const result=collectCloudInventory((cmd,args)=>{
     calls.push(args);
     if(args[0]==='run')return JSON.stringify({metadata:{name:'pharmacy-hub-web'},spec:{secret:'private credential'}});
+    if(args.includes('describe'))return JSON.stringify({name:'map',pathMatchers:[]});
     if(args[1]==='url-maps')return JSON.stringify([{name:'map',hostRules:[],pathMatchers:[],secret:'private credential'}]);
     return '[]';
   });
-  assert.equal(calls.length,4);
+  assert.equal(calls.length,5);
   assert.equal(calls.every(a=>a.includes('list')||a.includes('describe')),true);
   assert.equal(JSON.stringify(result).includes('private credential'),false);
   assert.deepEqual(result.resources.runService,{name:'pharmacy-hub-web',present:true});
@@ -59,7 +60,32 @@ test('cloud census calls read operations only and excludes Run credentials',()=>
 
 test('permission failures contain only safe permission names',()=>{
   const result=collectCloudInventory(()=>{throw {stderr:'PERMISSION_DENIED compute.backendServices.list private password',output:'private password'};});
-  assert.equal(result.blockers.length,4);
+  assert.equal(result.blockers.length,5);
   assert.equal(JSON.stringify(result).includes('private password'),false);
   assert.deepEqual(result.blockers[0].permissions,['compute.backendServices.list']);
+});
+
+
+test('checkout metadata scopes are counted and included in FK review',async()=>{
+  const client={query:async(sql,args)=>{
+    if(sql.includes('information_schema.columns'))return {rows:[{table_name:'checkout_orders',column_name:'metadata',data_type:'jsonb',udt_name:'jsonb'}]};
+    if(sql.includes('count(*)')) {assert.match(sql,/metadata"->>'serviceKey'/);assert.match(sql,/metadata"->>'source'/);assert.deepEqual(args,[retiredKeys]);return {rows:[{count:'3'}]};}
+    if(sql.includes('pg_constraint')){assert.deepEqual(args,[['checkout_orders']]);return {rows:[]};}
+    return {rows:[]};
+  }};
+  const result=await collectRetirementInventory(client);
+  assert.equal(result.scopeCounts[0].table,'checkout_orders');
+  assert.equal(result.scopeCounts[0].count,'3');
+  assert.throws(()=>jsonScopeQuery('checkout_orders','metadata; DROP'),/identifier/);
+});
+
+test('HTTP/DNS census uses synthetic paths and reports no addresses or Location contents',async()=>{
+  const {collectHttpInventory}=await import('./pharmacy-hub-retirement-inventory.mjs');
+  const result=await collectHttpInventory(async()=>new Response(null,{status:301,headers:{location:'https://private.example/secret-path?secret=value'}}),async()=>['test-address']);
+  assert.equal(result.checks.length,12);
+  assert.equal(result.dns.every(d=>d.matchesApiAddress),true);
+  assert.equal(JSON.stringify(result).includes('test-address'),false);
+  assert.equal(JSON.stringify(result).includes('secret-path'),false);
+  assert.equal(result.checks[0].status,301);
+  assert.equal(result.checks[0].hostMatch,false);
 });

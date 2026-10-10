@@ -2,6 +2,7 @@
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { resolve4 } from 'node:dns/promises';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
 
 const identifiers = value => {
@@ -18,6 +19,12 @@ export function countQuery(table, column, array = false) {
     ? `EXISTS (SELECT 1 FROM unnest(${field}) v WHERE v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')`
     : `${field}::text = ANY($1::text[]) OR left(${field}::text,13) = 'pharmacy-hub:'`;
   return `SELECT count(*)::text AS count FROM public.${identifiers(table)} WHERE ${predicate}`;
+}
+
+export function jsonScopeQuery(table, column) {
+  const field=identifiers(column);
+  const clauses=['serviceKey','service_key','source','sourceService'].map(key=>`${field}->>'${key}' = ANY($1::text[])`);
+  return `SELECT count(*)::text AS count FROM public.${identifiers(table)} WHERE ${clauses.join(' OR ')}`;
 }
 
 export async function collectRetirementInventory(client) {
@@ -41,6 +48,10 @@ export async function collectRetirementInventory(client) {
       const { rows } = await client.query(countQuery(c.table_name,c.column_name,['_text','_varchar'].includes(c.udt_name)), [retiredKeys]);
       if (rows[0].count !== '0') scopeCounts.push({ table:c.table_name, column:c.column_name, count:rows[0].count });
     }
+    for (const c of columns.filter(c => c.column_name==='metadata' && ['json','jsonb'].includes(c.data_type))) {
+      const { rows }=await client.query(jsonScopeQuery(c.table_name,c.column_name),[retiredKeys]);
+      if(rows[0].count!=='0')scopeCounts.push({table:c.table_name,column:`${c.column_name}.{serviceKey,service_key,source,sourceService}`,count:rows[0].count});
+    }
     const targets = [...new Set([...dedicated,...scopeCounts.map(c => c.table)])];
     const { rows: foreignKeys } = await client.query(`SELECT source.relname AS source_table,target.relname AS target_table,
         pg_get_constraintdef(c.oid) AS definition
@@ -63,6 +74,7 @@ export async function collectRetirementInventory(client) {
 export function collectCloudInventory(run = execFileSync) {
   const project='netureyoutube', region='asia-northeast3';
   const checks=[
+    ['applicationMap',['compute','url-maps','describe','o4o-global-lb']],
     ['urlMaps',['compute','url-maps','list']],
     ['backends',['compute','backend-services','list']],
     ['negs',['compute','network-endpoint-groups','list']],
@@ -72,7 +84,9 @@ export function collectCloudInventory(run = execFileSync) {
   for (const [key,args] of checks) {
     try {
       const value=JSON.parse(run('gcloud',[...args,`--project=${project}`,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-      if (key==='urlMaps') {
+      if(key==='applicationMap') {
+        result.resources.applicationMap={name:value.name,phMatchers:(value.pathMatchers??[]).filter(m=>m.name==='path-matcher-pharmacy-hub')};
+      } else if (key==='urlMaps') {
         result.resources.urlMaps=value.map(map=>({name:map.name,region:map.region??'global',
           phReferences:JSON.stringify(map).includes('backend-pharmacy-hub-web'),
           phHostRules:(map.hostRules??[]).filter(r=>r.hosts?.some(h=>['pharmacyhub.co.kr','www.pharmacyhub.co.kr'].includes(h))),
@@ -93,6 +107,29 @@ export function collectCloudInventory(run = execFileSync) {
   return result;
 }
 
+export async function collectHttpInventory(request=fetch,resolve=resolve4) {
+  const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
+  const paths=['/','/qr/__ph_retirement_rule_check__?ruleCheck=1','/tablet/__ph_retirement_rule_check__?ruleCheck=1','/multilingual-products/__ph_retirement_rule_check__?ruleCheck=1','/foreign-visitor/affiliate/__ph_retirement_rule_check__?ruleCheck=1','/terms?ruleCheck=1'];
+  const result={readOnly:true,dns:[],checks:[]};
+  let apiAddresses=[];
+  try { apiAddresses=await resolve('api.neture.co.kr'); } catch { /* diagnostic only */ }
+  for(const host of hosts) {
+    try { const addresses=await resolve(host);result.dns.push({host,addressCount:addresses.length,matchesApiAddress:apiAddresses.length?addresses.some(a=>apiAddresses.includes(a)):null}); }
+    catch { result.dns.push({host,error:'DNS_UNAVAILABLE'}); }
+    for(const path of paths) {
+      try {
+        const response=await request(`https://${host}${path}`,{redirect:'manual',signal:AbortSignal.timeout(15000)});
+        await response.body?.cancel();
+        const location=response.headers.get('location');
+        const target=location?new URL(location,`https://${host}`):null;
+        const expected=new URL(path.startsWith('/terms')?path.replace('/terms','/policy'):path,'https://pharmacy.neture.co.kr');
+        result.checks.push({host,family:path.split('?')[0],status:response.status,locationPresent:!!location,hostMatch:target?.host===expected.host,pathMatch:target?.pathname===expected.pathname,queryMatch:target?.search===expected.search,schemeMatch:target?.protocol===expected.protocol});
+      } catch { result.checks.push({host,family:path.split('?')[0],error:'HTTPS_UNAVAILABLE'}); }
+    }
+  }
+  return result;
+}
+
 if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
   let client;
   try {
@@ -101,7 +138,7 @@ if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
     const { Client }=require('pg');
     client=new Client({host:'127.0.0.1',port:55432,user:process.env.DB_USERNAME,database:process.env.DB_NAME,password:readPassword(),connectionTimeoutMillis:15000,options:'-c default_transaction_read_only=on'});
     await client.connect();
-    console.log(JSON.stringify({database:await collectRetirementInventory(client),cloud:collectCloudInventory()}));
+    console.log(JSON.stringify({database:await collectRetirementInventory(client),cloud:collectCloudInventory(),http:await collectHttpInventory()}));
   } catch(error) {
     console.error(safeInventoryError(error,'retirement-census').message);
     process.exitCode=1;

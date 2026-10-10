@@ -258,3 +258,11 @@ test('unavailable policy destination blocks full-host apply before any write', a
   } }), /HTTP 200/);
   assert.equal(h.writes.length, 0);
 });
+
+
+test('redirect failures identify host/family/status without private paths or query values',async()=>{
+  await assert.rejects(verifyRedirects(['/qr/private-identity?token=private-value'],async url=>{
+    if(new URL(url).host==='pharmacy.neture.co.kr')return new Response(null,{status:200});
+    return new Response(null,{status:301,headers:{location:'https://pharmacy.neture.co.kr/qr/other-private?token=other-secret'}});
+  }),error=>error.message.includes('status=301')&&error.message.includes('family=/qr/*')&&error.message.includes('pathMatch=false')&&!/private|secret|token=/.test(error.message));
+});

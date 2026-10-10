@@ -88,3 +88,7 @@ Canonical 문서 작업 경계 정정: ACTIVE/FROZEN 여부와 관계없이 기�
 - [ ] resource/schema/scoped-row census push·CI·review·main 통합 후 운영 read-only 실행.
 - [ ] census 결과로 전용 자원/FK/데이터 삭제 계획 확정 및 실행.
 - [ ] PH 활성 참조 정리와 별도 정본 작업 #427.
+
+운영 apply `38096187400`은 실제 QR/tablet 2종을 읽기 전용으로 발견하고 preflight를 통과했으나 옛 호스트의 302/path/query HTTP 검증에서 실패했다. 변경 도구는 기존 URL map을 복구·대조한 뒤 원래 검증 오류로 종료했다. Cloud Run/backend/데이터 삭제는 수행하지 않았다. 리다이렉트 검증의 실패 호스트·경로 종류·HTTP status·Location 일치 여부를 식별자 없는 진단으로 보강한다. 후속 census는 현재 PH matcher와 DNS 주소 일치 여부·고정 synthetic 경로 HTTPS 결과를 읽기 전용으로 확인해 복구 상태 및 DNS/라우팅 원인을 조사한다. 실제 IP/Location/DB 행 원문은 보고하지 않는다.
+
+PR #438 리뷰 대응: `checkout_orders.metadata.serviceKey/source` 등 JSON/JSONB scope를 명시적으로 집계하고 해당 테이블을 FK 조사 집합에 포함했다. scalar/array scope와 JSONB scope는 겹칠 수 있으므로 건수를 합산해 삭제 총량으로 해석하지 않는다. 조사 도구 안전 테스트 7개, 리다이렉트 안전 진단 회귀 포함 focused tests 통과.
