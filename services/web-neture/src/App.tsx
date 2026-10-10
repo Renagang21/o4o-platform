@@ -43,7 +43,7 @@ import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute, SubdomainOperatorR
 import { RegisterRedirect } from './components/auth/RegisterRedirect';
 import SubdomainOperatorLayoutWrapper from './components/layouts/SubdomainOperatorLayoutWrapper';
 import { ADMIN_ROLES } from './lib/role-constants';
-import { resolveLoginReturnPath } from './lib/loginReturnPath';
+import { LoginRedirect } from './components/auth/LoginRedirect';
 import HostBoundary from './components/HostBoundary';
 import { CURRENT_HOST_PROFILE } from './lib/hostProfile';
 
@@ -613,27 +613,6 @@ function ModalRenderer() {
       />
     </>
   );
-}
-
-// /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
-function LoginRedirect() {
-  const { openLoginModal } = useLoginModal();
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
-
-  const returnUrl = resolveLoginReturnPath(location.state, location.search);
-
-  // WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 이미 로그인했으면 모달 없이 목적지로.
-  useEffect(() => {
-    if (isLoading || isAuthenticated) return;
-    openLoginModal(returnUrl || undefined);
-  }, [openLoginModal, returnUrl, isAuthenticated, isLoading]);
-
-  if (isLoading) return null; // 세션 확인 전에는 이동하지 않는다(이동하면 모달을 열 기회가 사라진다)
-  if (isAuthenticated) return <Navigate to={returnUrl || '/'} replace />;
-  // Preserve the callback fragment until the opened modal consumes and clears it.
-  const kakaoHash = new URLSearchParams(location.hash.slice(1)).get('social_kind') === 'kakao-login' ? location.hash : '';
-  return <Navigate to={{ pathname: '/', hash: kakaoHash }} replace />;
 }
 
 // /register 는 components/auth/RegisterRedirect — 비로그인에게만 가입(=로그인) 모달을 연다
