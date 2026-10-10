@@ -8,6 +8,7 @@
  *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 운영자는 해제되지 않는다.
  * 화면 guard 는 `SubdomainOperatorRoute serviceKey="community" level="admin"` 이고 실제 경계는 backend 다.
  */
+import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import {
   approveCreationRequest,
@@ -269,6 +270,9 @@ export default function CommunityServiceAdminPage({ operatorOnly = false }: { op
           ? '커뮤니티 개설 신청을 심사합니다.'
           : '커뮤니티 개설 신청을 심사하고 개별 커뮤니티 운영자를 지정합니다.'}
       </p>
+      <Link to="/mypage/communities" className="mt-4 inline-block text-sm text-blue-700 underline">
+        커뮤니티 가입 신청·회원 관리
+      </Link>
       <div className="mt-6 flex gap-4 border-b border-slate-200 text-sm">
         {(
           [

@@ -1,3 +1,4 @@
+import { hasCommunityServiceOperator } from './community-service-operator-access.js';
 import { randomUUID } from 'node:crypto';
 import type { EntityManager } from 'typeorm';
 import { getCommunityDefinition, listActiveCommunities } from '../../config/community-catalog.js';
@@ -51,12 +52,13 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
     'SELECT status, role FROM community_memberships WHERE community_id = $1 AND user_id = $2', [community.id, user.id],
   ) : [];
   const policyAllowed = !definition || resolveCommunityAccess(user, key).allowed;
-  const allowed = eligible && community?.status === 'active' && membership?.status === 'active' && policyAllowed;
+  const serviceOperator = eligible && community?.status === 'active' && await hasCommunityServiceOperator(exec, user!.id);
+  const allowed = serviceOperator || eligible && community?.status === 'active' && membership?.status === 'active' && policyAllowed;
   const [service] = allowed && membership?.role === 'operator' ? await exec.query(
     "SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = 'community' AND status = 'active'", [user!.id],
   ) : [];
   return { communityKey: key, name: community?.name ?? definition!.name, kind: 'independent', allowed: !!allowed,
-    canManage: !!service, canJoin: eligible && community?.status === 'active' && policyAllowed && !['pending','active'].includes(membership?.status),
+    canManage: !!serviceOperator || !!service, canJoin: !serviceOperator && eligible && community?.status === 'active' && policyAllowed && !['pending','active'].includes(membership?.status),
     membershipStatus: membership?.status ?? null,
     reason: allowed ? null : !user?.id ? 'AUTH_REQUIRED' : !eligible ? 'NETURE_MEMBERSHIP_REQUIRED' : 'COMMUNITY_MEMBERSHIP_REQUIRED',
     forumStorageCodes: definition ? [...definition.forumStorageCodes] : community ? [`community:${community.id}`] : [] };

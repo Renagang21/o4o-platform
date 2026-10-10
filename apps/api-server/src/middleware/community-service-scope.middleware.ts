@@ -12,7 +12,7 @@
  * 개설 신청 심사는 아직 어떤 커뮤니티에도 속하지 않은 요청을 다루므로 개체 경계로 판정할 수
  * 없다. 그래서 서비스 전체 역할(`community:operator` 또는 `community:admin`)이 심사한다.
  *
- * 서비스 Operator는 개설 심사를 담당한다. 개별 커뮤니티 운영 권한은 membership으로만 판정한다.
+ * 서비스 Admin/Operator는 개설 심사와 독립 커뮤니티 운영을 담당한다. 개체 운영자 역할도 유지한다.
  */
 import { createSubdomainOperatorScope } from './subdomain-operator-scope.js';
 
