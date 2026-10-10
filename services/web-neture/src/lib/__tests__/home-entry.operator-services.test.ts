@@ -153,3 +153,14 @@ describe('buildHomeEntryModel — supplier · funding · community 운영 카드
     ]);
   });
 });
+
+it('supplier operator는 승인 콘솔로 진입하며 운영 목록에 없는 역할과 비활성 workspace는 카드에 노출하지 않는다', () => {
+  const groups = (roles: string[], services: EntryOperatorService[]) => buildHomeEntryModel(user(roles), data(services)).groups;
+  const supplier = groups(['supplier:operator'], [op('supplier')]).find(g => g.id === 'supplier')!;
+  expect(supplier.items).toEqual([{ id: 'supplier:management', label: '공급자 관리', action: { kind: 'internal', to: '/operator/suppliers' } }]);
+  for (const services of [[], [op('supplier', 'operator', 'standard', false)]]) {
+    const model = groups(['supplier:operator', 'neture:operator'], services);
+    expect(model.find(g => g.id === 'supplier')!.items).toHaveLength(0);
+    expect(model.find(g => g.id === 'store')!.items).toHaveLength(0);
+  }
+});

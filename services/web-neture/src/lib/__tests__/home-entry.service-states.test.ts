@@ -94,7 +94,7 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
   // 대표 홈 공급자 카드는 실제 이용 상태 active 만. (서버 guard 의 운영 목적 통과는 그대로 — UI 노출만 분리)
   it('관리자(neture:admin · platform:super_admin)라도 공급자 서비스가 active 가 아니면 공급자 업무 진입이 없다', () => {
     expect(groupIds(buildHomeEntryModel(user(['neture:admin']), data({})))).not.toContain('supplier');
-    expect(groupIds(buildHomeEntryModel(user(['platform:super_admin']), data({})))).not.toContain('supplier');
+    expect(buildHomeEntryModel(user(['platform:super_admin']), data({})).groups.find(g => g.id === 'supplier')!.items.map(i => i.label)).toEqual(['공급자 관리']);
     // 실제 공급자이기도 한 관리자는 진입이 있다
     const m = buildHomeEntryModel(user(['platform:super_admin']), data({ supplier: { status: 'active', source: 'neture_suppliers' } }));
     expect(groupIds(m)).toContain('supplier');
