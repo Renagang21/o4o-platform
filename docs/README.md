@@ -22,6 +22,8 @@
 
 AI 코딩 에이전트는 [`/CLAUDE.md`](../CLAUDE.md) 또는 [`/AGENTS.md`](../AGENTS.md) 가 진입점이다.
 
+Admin 운영 기능을 직접 확인할 때는 [Google 로그인·SMTP 발송·AI 호출 테스트](guides/admin/ADMIN-OPERATIONS-SMOKE-TEST.md)를 참고한다.
+
 ---
 
 ## 2. 이 폴더의 두 종류 문서
