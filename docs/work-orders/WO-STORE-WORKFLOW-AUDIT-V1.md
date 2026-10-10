@@ -60,3 +60,5 @@
 - store 서비스 내부 `storeProductFetch`에 제품 API의 인증 재시도·최초 매장 헤더 보존을 모았다. JSON/QR 응답 처리와 각 API 오류 계약은 기존 호출부에 유지한다. 공유 Core·서버 정책은 변경하지 않는다.
 - 본문·메서드 보존과 인증 갱신 실패 시 재전송하지 않는 검증을 추가했다. store-web 22개 테스트, TypeScript/Vite 빌드, 변경 파일 ESLint, diff 검증 PASS.
 - 같은 WO의 review finding 처리이므로 기존 `wo/store-workflow-audit` 브랜치를 유지한다. push 이후 SonarCloud 결과를 별도로 확인한다.
+
+- `051db07b4`의 신규 중복률은 3.9%로 여전히 기준을 초과했다. 공급 상품·자료 가져오기 화면의 목록 상태 관리를 `useLatestList`로 모아 이전 응답 무시·실패 시 자료 제거·새로고침 동작을 보존했다. 22개 테스트, 빌드, 변경 파일 ESLint PASS.

@@ -6,7 +6,7 @@
  * 어떤 콘텐츠를 볼 수 있는지는 서버 판정이다(가입 상태 · 게시 상태). 화면은 응답을 그대로 보여준다.
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
  */
-import { useLatestRequest } from '../../hooks/useLatestRequest';
+import { useLatestList } from '../../hooks/useLatestList';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
@@ -16,6 +16,8 @@ import { WORKSPACE_PATHS } from '../../config/workspace';
 import { BusinessTabs } from '../../components/BusinessTabs';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
+
+const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '콘텐츠 목록을 불러오지 못했습니다.');
 
 const PAGE_SIZE = 20;
 const STORE_LIBRARY_PATH = `${WORKSPACE_PATHS.myStore}/library/contents`;
@@ -43,10 +45,6 @@ export default function PharmacyContentSourcesPage() {
   const [qInput, setQInput] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
-  const [items, setItems] = useState<SemiFranchiseContent[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -57,27 +55,9 @@ export default function PharmacyContentSourcesPage() {
       .catch(() => setFranchises([]));
   }, []);
 
-  const { begin, invalidate } = useLatestRequest();
-  const load = useCallback(async () => {
-    const isCurrent = begin();
-    setItems([]);
-    setTotal(0);
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
-      if (!isCurrent()) return;
-      setItems(res.items);
-      setTotal(res.total);
-    } catch (e) {
-      if (!isCurrent()) return;
-      setError(pharmacyErrorMessage(e, '콘텐츠 목록을 불러오지 못했습니다.'));
-    } finally {
-      if (isCurrent()) setLoading(false);
-    }
-  }, [sf, q, page, begin]);
+  const fetchList = useCallback(() => neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE }), [sf, q, page]);
+  const { items, total, loading, error, setError, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
 
-  useEffect(() => { void load(); return invalidate; }, [load, invalidate]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
