@@ -214,6 +214,7 @@ jobs:
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
         scripts/ci/__tests__/cloud-run-env.test.mjs
+        scripts/ci/__tests__/kakao-config-workflow.test.mjs
         scripts/ci/__tests__/deploy-workflow-gates.test.mjs
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs

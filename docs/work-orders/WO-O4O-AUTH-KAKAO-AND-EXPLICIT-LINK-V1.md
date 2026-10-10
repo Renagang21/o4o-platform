@@ -44,7 +44,8 @@ F10/F11 본문, `users`/`service_memberships`/`role_assignments` 구조는 변�
 - [x] [CHECK](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE4A-V1.md)와 TODO를 로컬 실제 결과로 갱신; commit·push·PR 준비.
 - [x] 사용자 승인 후 PR #387 main 통합 `7a11f7d201`; 통합 후 CI #38011262475 PASS, CodeQL PASS. 비필수 Sonar 중복률 실패는 OPEN으로 기록.
 - [x] Promote #38011885470 성공: API migration·revision 검증·traffic 전환, 전체관리자·웹 5개 배포.
-- [ ] 유지 8개 서비스 PC/모바일 운영 smoke 마무리 및 실제 Google 전체관리자 재로그인 (실제 계정 인증은 미실행).
+- [x] 유지 8개 서비스 PC/모바일 Demo 32/32 PASS, Neture 실제 업무 목적지 이동 4/4 PASS.
+- [ ] 실제 Google 전체관리자 재로그인 (실제 소유자 인증은 미실행).
 
 ## 4-B. 카카오 로그인·가입
 

@@ -34,7 +34,8 @@ export function safeSocialReturnTo(value: unknown): string {
   if(!decoded.startsWith('/')||decoded.startsWith('//')||decoded.includes('\\')||Array.from(decoded).some(char=>char.charCodeAt(0)<32||char.charCodeAt(0)===127))throw invalidSocialFlow();
   return value;
 }
-const cookieOptions=()=>({httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax' as const,
+const cookieOptions=()=>({httpOnly:true,secure:process.env.NODE_ENV==='production',// Match the existing production credential cookie contract for maintained cross-site legacy origins.
+  sameSite:process.env.NODE_ENV==='production'?'none' as const:'lax' as const,
   path:'/api/v1/auth/social',maxAge:5*60*1000});
 export function setSocialBinding(res:Response,grant:{token:string;binding:string}):void {
   res.cookie(socialCookieName(grant.token),grant.binding,cookieOptions());

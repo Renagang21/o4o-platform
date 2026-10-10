@@ -115,3 +115,18 @@ Quality Gate나 운영 적용 완료를 대신하지 않는다.
 copy detection에서 제외하고 소스·보안 분석과 C22는 유지한다. 외부 최신 결과는 PR에서 확인한다.
 최종 보정 후 같은 focused 125건·API build 재통과, runtime ESLint error/warning 0,
 migration contract **21 PASS / 0 FAIL**(C22의 20개 incremental 등록 포함)을 확인했다.
+
+## 2026-10-10 사용자 승인 후 통합·운영 적용
+
+PR #387은 main `7a11f7d2018fae7eb827a066762291298ccb2d87`로 통합했다. 필수 CI Gate·CodeQL과
+통합 후 CI #38011262475 PASS. 비필수 SonarCloud는 registry 중복률 3.4% 실패가 남아 OPEN이며,
+추가 exclusions가 실제 외부 분석에 적용됐다고 보지 않는다. ruleset을 우회하지 않았다.
+
+Promote #38011885470 SUCCESS: API migration·new revision/0% smoke·traffic 전환, admin 및
+neture/kpa-society/lecture/store/kpa-branch 웹 배포 완료. production commit status SUCCESS.
+배포 후 유지 8개 origin × PC/mobile × 두 Demo **32/32 PASS**. 실제 화면 버튼·로그아웃,
+access/refresh 폐기, 관리자 거절을 확인했다. Neture 실제 Store Workspace/공급자 목적지와
+매장 경영자 store context 200/공급자 STORE_OWNER_REQUIRED 경계도 확인했다. 상세 범위와
+harness 재검증 이유는 [후속 CHECK](CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)에 기록했다.
+실제 Google 전체관리자 재로그인은 OPEN이다. 후속 Kakao/계정 연결 구현은 PR #392이며
+이번 배포에 포함되지 않았다. 위 통합 전 기록의 미실행 상태는 이 후속 결과로 갱신한다.

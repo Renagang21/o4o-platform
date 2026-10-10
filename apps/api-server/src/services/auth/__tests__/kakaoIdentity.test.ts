@@ -1,7 +1,8 @@
 jest.mock('../../../database/connection.js',()=>({AppDataSource:{getRepository:jest.fn()}}));
 import { loadKakaoIdentityConfig, KAKAO_CALLBACK_PATH } from '../../../config/kakao-identity.config.js';
 import { KakaoIdentityService, parseKakaoIdentity } from '../kakao-identity.service.js';
-import { safeSocialReturnTo, socialOrigin } from '../../../modules/auth/controllers/social-auth.helpers.js';
+import { safeSocialReturnTo, socialOrigin, setSocialBinding, clearSocialBinding } from '../../../modules/auth/controllers/social-auth.helpers.js';
+import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { GoogleIdentityService } from '../google-identity.service.js';
 import { redactSensitive } from '../../../utils/security-log-redaction.js';
 const config=()=>({clientId:'synthetic-client',clientSecret:'synthetic-secret',redirectUri:'https://api.neture.co.kr'+KAKAO_CALLBACK_PATH,enabled:true});
@@ -30,6 +31,21 @@ describe('Kakao confidential REST and social boundaries',()=>{
   expect(safeSocialReturnTo('/mypage/settings?x=1')).toBe('/mypage/settings?x=1');
   for(const origin of ['https://admin.neture.co.kr','https://neture.co.kr.attacker.invalid','https://neture.co.kr/path','null'])expect(()=>socialOrigin({get:()=>origin} as any)).toThrow();
   expect(socialOrigin({get:()=> 'https://supplier.neture.co.kr'} as any).serviceKey).toBe('supplier');
+ });
+ it.each([['https://www.neture.co.kr','neture'],['https://kpa-society.co.kr','kpa-society'],['https://www.kpa-society.co.kr','kpa-society']])('maintained alias %s uses the same login/link/logout scope', (origin,key)=>{
+  expect(socialOrigin({get:()=>origin} as any)).toEqual({origin,serviceKey:key});
+  expect(resolveSessionServiceKey(origin)).toBe(key);
+ });
+ it.each(['https://www.neture.co.kr.attacker.invalid','https://www.admin.neture.co.kr','https://www.unknown.invalid'])('alias normalization does not admit forged/special host %s',origin=>{
+  expect(()=>socialOrigin({get:()=>origin} as any)).toThrow();expect(resolveSessionServiceKey(origin)).toBeNull();
+ });
+ it('cross-site binding cookies are host-only HttpOnly Secure SameSite=None and clearing preserves scope',()=>{
+  const previous=process.env.NODE_ENV;process.env.NODE_ENV='production';
+  try {const res={cookie:jest.fn(),clearCookie:jest.fn()};const grant={token:'synthetic-token',binding:'synthetic-binding'};
+   setSocialBinding(res as any,grant);clearSocialBinding(res as any,grant.token);
+   const options=res.cookie.mock.calls[0][2];expect(options).toMatchObject({httpOnly:true,secure:true,sameSite:'none',path:'/api/v1/auth/social',maxAge:300000});expect(options).not.toHaveProperty('domain');
+   expect(res.clearCookie.mock.calls[0][0]).toBe(res.cookie.mock.calls[0][0]);expect(res.clearCookie.mock.calls[0][1]).toMatchObject({httpOnly:true,secure:true,sameSite:'none',path:'/api/v1/auth/social'});
+  }finally{if(previous===undefined)delete process.env.NODE_ENV;else process.env.NODE_ENV=previous;}
  });
  it('redacts OAuth credentials from structured diagnostics',()=>{expect(redactSensitive({code:'x',state:'y',nonce:'z'})).toEqual({code:'[REDACTED]',state:'[REDACTED]',nonce:'[REDACTED]'});});
 });

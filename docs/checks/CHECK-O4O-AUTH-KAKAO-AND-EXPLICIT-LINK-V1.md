@@ -35,18 +35,21 @@ Kakao UI는 추가하지 않는다. 은퇴 서비스의 코드 존재를 운영 
 
 | 검증 | 결과 | 범위/한계 |
 |---|---|---|
+| review 보정 회귀 | 4 suites / 94 PASS | cross-site cookie 속성·www/legacy origin·기존 로그아웃 범위·실제 PG |
 | API Kakao/Google identity·password session focused | 3 suites / 73 PASS | 서명 검증 challenge·고정 callback·외부 오류 비노출 |
 | 실제 PG15 social flow/link/signup | 18 PASS | browser binding·TTL·replay·동시 충돌·원자성·로그아웃/password family·Demo·동일 이메일 |
 | 최종 수정 후 Kakao identity + 실제 PG | 2 suites / 48 PASS | 신규 서비스 접근 gate 포함 소스 재검증; provider/SMTP/session issuer 일부 mock |
 | auth-client | 5 files / 40 PASS | callback fragment·pending tab·proof 직렬화·one-use 401 재시도 없음 |
-| auth-react | 13 files / 162 PASS | 가입 동의·미인증 이메일 무세션·Demo·재인증/확인 순서 |
-| Neture | 46 files / 379 PASS + return path focused 6 PASS | 새로운 returnTo·unsafe redirect 포함 |
-| KPA Society | 8 files / 71 PASS | 기존 로그인/가입 회귀 |
+| auth-react | 14 files / 168 PASS (최신 main 반영 후) | 가입 동의·미인증 이메일 무세션·Demo·재인증/확인 순서 |
+| Neture | 47 files / 388 PASS (최신 main 반영 후) | 새로운 returnTo·unsafe redirect 포함 |
+| KPA Society | 11 files / 86 PASS (최신 main 반영 후) | 기존 로그인/가입 회귀 |
 | KPA Branch | 3 files / 34 PASS | login/join 회귀 |
 | API 및 웹 5개 build | PASS | Node22.18·pnpm10.25; 기존 chunk size 경고 |
 | Neture/Store/KPA Society/KPA Branch type-check | PASS | 모든 수정 wrapper |
+| auth raw-source 계약 | 6 suites / 110 PASS | 새 Kakao config 한 곳만 허용; password 입력 공통 컴포넌트 재사용, legacy 경로 금지 유지 |
 | 수정 runtime ESLint | error 0 | 기존 warning 6개, 신규 warning 0 |
 | production bundle 가입 UI PC/mobile | 8/8 PASS | provider/API mock, 실제 OAuth 아님; 분회 local preview는 `/kpa/` public base 사용 |
+| Neture callback 세션·returnTo | 2/2 PASS | production bundle PC/mobile + mock session, settings 복귀·fragment 제거·1회 소비 |
 | 배포 Kakao optional config Bash | 4 PASS | unset fail-closed·partial fail·고정 callback·resource reference·입력 injection 차단 |
 | migration contract | 21 PASS / 0 FAIL | C22 21개 incremental 및 정확한 지문 |
 | 정식 migration runner | PASS, repeat pending/executed 0 | 별도 빈 격리 PG DB, 전체 baseline+21개 |
@@ -91,3 +94,40 @@ GitHub secret/variable metadata 조회는 403이었다. 부재로 단정하거�
 
 문서 정합: 실행 중 WO/TODO의 로컬 구현과 운영 완료를 구분했다. Identity V3의 과거 카카오 제한과
 MYPAGE의 오래된 password UI 서술은 후속 정합 TODO다. Frozen 본문·canonical index 변경 없음.
+
+## 4-A 운영 배포 후 회귀 (2026-10-10)
+
+선행 PR #387 main `7a11f7d2018fae7eb827a066762291298ccb2d87`에 대해
+[Promote #38011885470](https://github.com/Renagang21/o4o-platform/actions/runs/38011885470)
+SUCCESS, API migration·0% revision smoke·traffic 전환과 전체관리자/웹 5개 배포를 확인했다.
+전체관리자 실제 Google 재로그인은 소유자 인증 없이 수행하지 않았다.
+
+Neture/supplier/community/funding/pharmacy/store/study/kpa × PC 1440/mobile 390 × 매장 경영자/공급자
+**32/32 PASS**. 로그인 화면의 실제 Demo 버튼 → email login 200 → me 200 → admin 403
+ROLE_REQUIRED → 화면 로그아웃 200 → 기존 access/refresh 401을 확인했다. Neture의 매장 Demo는
+Store Workspace 홈으로 실제 handoff·대상 세션 저장, 공급자 Demo는 supplier dashboard 이동을
+PC/mobile 모두 확인했다. Neture/Study 8건에서는 추가로 Demo password canManage=false,
+매장 경영자 pharmacy store context 200 / supplier products 403 NO_SUPPLIER, 공급자 반대
+products 200 / store context 403 STORE_OWNER_REQUIRED을 확인했다.
+
+최초 harness 실패 8건은 Neture menuitem 버튼 선택과 Study full-page reload 전에 응답 body를
+읽는 방식 때문이었다. Neture 실제 button 선택, upstream 응답을 fulfill 전에 메모리로 캡처하는
+방식으로 수정해 해당 사례만 재검증했다. Neture handoff 목적지는 `/store/…`가 아닌 실제 공통
+Store Workspace `/`를 확인했다. 실패를 운영 성공으로 간주하지 않고 수정 후 결과로 대체했다.
+추가 session isolation 1건에서는 Neture 로그아웃 후 Store 세션 me 200 유지와 source access/refresh 401을 확인하고 각 테스트 세션만 정리했다.
+TLS는 route.fetch의 기본 검증을 사용했고 전역 인증서 저장소 변경·TLS 검증 해제는 하지 않았다.
+
+PR #387의 필수 CI Gate·CodeQL·통합 후 CI는 PASS다. 비필수 SonarCloud 중복률 3.4% 실패는
+OPEN이다. expected-schema-states의 선언형 registry는 C22 계약을 유지했으며 exclusions 설정이
+실제 외부 분석에 적용됐다고 주장하지 않는다. 후속 #392의 실제 CI/review 상태는 PR에서 확인한다.
+
+## PR #392 review 보정
+
+Codex의 P2 두 건(www/legacy origin)을 확인해 수정했다. binding cookie는 기존 production
+credential cookie와 동일하게 HttpOnly·Secure·SameSite=None을 사용하고 API host-only/path scope를
+유지한다. JSON·CORS·state·origin·browser binding 검증을 유지하며 secret을 JS에 노출하지 않는다.
+`resolveSessionServiceKey`는 catalog의 기존 서비스/legacy domain에 한해 www alias를 정규화한다.
+admin/workspace 특별 호스트는 정확한 호스트만 허용한다. 로그인·link·로그아웃 판정이 같은 함수를
+사용하므로 별도 소셜 전용 scope를 만들지 않는다. 4 suites 94 PASS, 해당 runtime lint error/warning 0.
+배포 config 시험 4건도 기존 blocking node:test CI 단계에 연결했다 (관련 workflow 회귀 109 PASS).
+브라우저 자체의 third-party cookie 차단 설정은 별개이며 실제 OAuth/device 검증은 OPEN이다.
