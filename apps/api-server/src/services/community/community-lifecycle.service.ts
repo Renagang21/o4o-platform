@@ -24,7 +24,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from '../auth/demo-account.service.js';
-import { assertNetureMainMembershipActive } from '../../modules/neture/services/neture-main-membership.js';
+import { assertNetureMainMembershipActive, NETURE_MAIN_SERVICE_KEY } from '../../modules/neture/services/neture-main-membership.js';
 import { independentCommunityKeyTaken } from './community-key-namespace.js';
 import { Community } from '../../entities/Community.js';
 import { CommunityMembership } from '../../entities/CommunityMembership.js';
@@ -160,7 +160,7 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const reqRepo = m.getRepository(CommunityCreationRequest);
       const request = await loadPendingRequest(m, input.requestId);
-      await assertNetureMainMembershipActive(m, request.requesterUserId, 'applicant');
+      await assertApplicantMainActive(m, request.requesterUserId);
 
       // Demo 계정에 개체 운영자 role 을 주지 않는다 — 신청 행 갱신을 포함한 어떤 write 보다 먼저
       // (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 판정 정본 demo_accounts.user_id).
@@ -256,7 +256,7 @@ export class CommunityLifecycleService {
       const repo = m.getRepository(CommunityMembership);
       const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
       // 기존 서비스 처분을 개별 승인으로 해제하지 않는다. 실패하면 신청은 pending 으로 남는다.
-      await assertNetureMainMembershipActive(m, membership.userId, 'applicant');
+      await assertApplicantMainActive(m, membership.userId);
       await ensureServiceMembership(m, membership.userId);
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;
@@ -422,6 +422,20 @@ export function maskEmail(email: unknown): string | null {
   if (typeof email !== 'string' || !email.includes('@')) return null;
   const [local, domain] = email.split('@');
   return `${local.slice(0, 2)}***@${domain}`;
+}
+
+/** Approval holds main-account locks until the entity writes commit.
+ * Lock users first: the service_memberships FK also makes insertion of a missing
+ * main row wait. Existing main suspension/withdrawal updates wait on the second
+ * lock; changes committed before either lock are read by the eligibility check.
+ */
+async function assertApplicantMainActive(m: EntityManager, userId: string): Promise<void> {
+  await m.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
+  await m.query(
+    'SELECT user_id FROM service_memberships WHERE user_id = $1 AND service_key = $2 FOR UPDATE',
+    [userId, NETURE_MAIN_SERVICE_KEY],
+  );
+  await assertNetureMainMembershipActive(m, userId, 'applicant');
 }
 
 /**

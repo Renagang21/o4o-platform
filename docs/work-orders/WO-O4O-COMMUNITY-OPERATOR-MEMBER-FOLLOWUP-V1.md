@@ -89,7 +89,7 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [x] 변경 이력·migration·기존 역할 전환안 및 영향 소비처 정리
 - [ ] 권한표와 기존 operator 전환 정책 사용자 확인
 - [x] 설계 문서 검증·커밋
-- [ ] 설계 문서 원격 push 확인
+- [x] 설계 문서 원격 push 확인
 
 ### 설계 이후 별도 구현 TODO
 
@@ -101,3 +101,13 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [ ] 운영 migration 적용 승인·main 병합·배포·실계정 검증
 
 이 후속 구현을 이번 승인 자격 수정의 완료로 간주하지 않는다.
+
+## PR 리뷰 보완 TODO
+
+- [x] P2: 자격 SELECT와 승인 쓰기 사이 동시 정지 간격 제거 — 승인 트랜잭션에서 users → neture service_memberships 순서로 FOR UPDATE 후 판정. users FK 참조 삽입도 사용자 잠금 동안 대기한다.
+- [x] 보완 후 자격·승인·권한 회귀 및 API 타입 검사 재실행
+- [ ] 리뷰 보완 코드 push와 PR 최신 HEAD 검증
+
+잠금 대기 후 먼저 커밋된 정지를 읽는 모의 회귀를 추가한다. 실제 PostgreSQL 잠금 스케줄링은 이 환경에 로컬 서버가 없어 검증하지 않았다.
+
+리뷰 보완 후 Jest 5 suites / 129 tests 및 API 타입 검사 PASS. 정적 검사도 재실행했다. 설계 문서는 `b4c73611fd`에 push되어 있으며 권한표·기존 역할 전환 질문은 아직 미확정이다. PR 최신 HEAD CI/review 결과는 PR을 기준으로 확인한다.

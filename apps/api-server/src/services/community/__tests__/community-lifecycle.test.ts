@@ -23,6 +23,7 @@ const db: {
 let beforeServiceLock: (() => void) | undefined;
 let mainRow: Row | null;
 let mainLookupFails = false;
+let beforeApplicantLock: (() => void) | undefined;
 let seq = 0;
 const uid = () => `id-${++seq}`;
 
@@ -35,6 +36,11 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
+    if (/SELECT id FROM users.*FOR UPDATE/i.test(sql)) {
+      beforeApplicantLock?.();
+      beforeApplicantLock = undefined;
+      return [];
+    }
     if (/FROM users u/i.test(sql)) {
       if (mainLookupFails) throw new Error('main lookup unavailable');
       return mainRow ? [mainRow] : [];
@@ -91,6 +97,7 @@ beforeEach(() => {
   db.demoLookupFails = false;
   mainRow = { account_status: 'active', account_active: true, email_verified: true };
   mainLookupFails = false;
+  beforeApplicantLock = undefined;
   seq = 0;
   beforeServiceLock = undefined;
 });
@@ -454,4 +461,20 @@ describe('승인 시점 신청자 메인 자격', () => {
     await expect(service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER })).rejects.toThrow('main lookup unavailable');
     expect(JSON.stringify(db)).toBe(before);
   });
+});
+
+
+it.each(['creation', 'join'])('%s: 잠금 대기 중 먼저 완료된 메인 정지를 다시 읽고 승인을 막는다', async (kind) => {
+  const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+  const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+  const before = JSON.stringify(db);
+  // The fixture models the result visible after waiting for another transaction.
+  // PostgreSQL row-lock scheduling itself requires separate integration coverage.
+  beforeApplicantLock = () => { mainRow!.account_status = 'suspended'; };
+  const approve = kind === 'creation'
+    ? service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER })
+    : service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER });
+  await expect(approve).rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED', httpStatus: 409 });
+  expect(beforeApplicantLock).toBeUndefined();
+  expect(JSON.stringify(db)).toBe(before);
 });
