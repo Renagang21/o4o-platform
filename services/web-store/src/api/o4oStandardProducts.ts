@@ -11,7 +11,7 @@
  *   POST /api/v1/store/products/list    — master 기반 등록 (offer_id=NULL, idempotent)
  */
 
-import { storeScopedFetch } from './storeScopedFetch';
+import { storeJsonFetch } from './storeJsonFetch';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store/products`;
@@ -45,15 +45,10 @@ export interface O4oStandardProductsResult {
 export { buildProductVariantLabel } from '../utils/productVariantLabel';
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await storeScopedFetch(url, options, 'application/json');
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({ message: 'Network error' }));
-    const err: any = new Error(body?.error?.message || body.error || body.message || `HTTP ${response.status}`);
-    err.status = response.status;
-    err.code = body?.error?.code;
-    throw err;
-  }
-  return response.json();
+  return storeJsonFetch<T>(url, options, (body, status) => Object.assign(
+    new Error(body?.error?.message || body.error || body.message || `HTTP ${status}`),
+    { status, code: body?.error?.code },
+  ));
 }
 
 /** O4O 표준 상품(ProductMaster) 검색. 빈 q 는 전체 목록(이름순). */

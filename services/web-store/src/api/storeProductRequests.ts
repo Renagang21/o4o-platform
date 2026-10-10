@@ -12,7 +12,7 @@
  *   PUT  /api/v1/store/product-requests/:id  — 보완 요청 건 수정 재제출
  */
 
-import { storeScopedFetch } from './storeScopedFetch';
+import { storeJsonFetch } from './storeJsonFetch';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store/product-requests`;
@@ -64,16 +64,10 @@ export interface StoreRequestApiError extends Error {
 }
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await storeScopedFetch(url, options, 'application/json');
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({ error: { message: 'Network error' } }));
-    const err: StoreRequestApiError = new Error(body?.error?.message || body?.error || body?.message || `HTTP ${response.status}`);
-    err.status = response.status;
-    err.code = body?.error?.code;
-    err.data = body?.data ?? null;
-    throw err;
-  }
-  return response.json();
+  return storeJsonFetch<T>(url, options, (body, status) => Object.assign(
+    new Error(body?.error?.message || body?.error || body?.message || `HTTP ${status}`),
+    { status, code: body?.error?.code, data: body?.data ?? null },
+  ));
 }
 
 export async function listProductRequests(params: { page?: number; limit?: number } = {}): Promise<StoreProductRequestsResult> {

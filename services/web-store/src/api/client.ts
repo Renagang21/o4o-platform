@@ -8,7 +8,8 @@
  */
 
 import { getAccessToken } from '@o4o/auth-client';
-import { tryRefreshToken } from './token-refresh';
+import { storeScopedFetch } from './storeScopedFetch';
+import { readStoreJson } from './storeJsonFetch';
 import { apiV1Base, apiV1Service } from '../lib/serviceContext';
 import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
 
@@ -29,88 +30,50 @@ export class ApiClient {
 
   private buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
     const url = new URL(`${this.resolveBase()}${endpoint}`, window.location.origin);
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
-          url.searchParams.append(key, String(value));
-        }
-      });
+    for (const [key, value] of Object.entries(params ?? {})) {
+      if (value !== undefined) url.searchParams.append(key, String(value));
     }
     return url.toString();
   }
 
+  private captureHeaders(extra?: HeadersInit): Headers {
+    const headers = new Headers({ 'Content-Type': 'application/json' });
+    const token = getAccessToken();
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+    new Headers(extra).forEach((value, name) => headers.set(name, value));
+    return captureStoreOrganizationHeaders(headers);
+  }
+
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { params, timeout, ...fetchOptions } = options;
-    const url = this.buildUrl(endpoint, params);
-
-    // Cross-domain auth: Add Authorization header with Bearer token
-    const token = getAccessToken();
-    const headers = captureStoreOrganizationHeaders({
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    });
-
-    // WO-O4O-FORUM-POST-EDIT-SAVE-STABILITY-FIX-V1: AbortController timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout ?? DEFAULT_TIMEOUT);
-
+    const target = this.buildUrl(endpoint, params);
+    const captured = this.captureHeaders(options.headers);
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), timeout ?? DEFAULT_TIMEOUT);
+    const request = { ...fetchOptions, headers: captured, signal: abort.signal };
     try {
-      // Retry on 404 for GET requests (Cloud Run cold start: routes not yet registered)
-      const maxRetries = fetchOptions.method === 'GET' ? 2 : 0;
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        // WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1:
-        // credentials 제거 — authClient(localStorage 전략)와 동일하게 Bearer 토큰만 사용
-        const response = await fetch(url, {
-          ...fetchOptions,
-          headers,
-          signal: controller.signal,
-        });
-
-        if (response.status === 404 && attempt < maxRetries) {
-          await new Promise(r => setTimeout(r, 500));
+      const retries = fetchOptions.method === 'GET' ? 2 : 0;
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        // This client historically reports the original 401 if its replay fails.
+        const response = await storeScopedFetch(target, request, undefined, { retainOriginalOnRetryFailure: true, injectAccessToken: false });
+        if (response.status === 404 && attempt < retries) {
+          await new Promise(resolve => setTimeout(resolve, 500));
           continue;
         }
-
-        if (!response.ok) {
-          // 401: 토큰 갱신 후 재시도
-          if (response.status === 401) {
-            const newToken = await tryRefreshToken();
-            if (newToken) {
-              const retryHeaders = new Headers(headers);
-              retryHeaders.set('Authorization', `Bearer ${newToken}`);
-              const retryResponse = await fetch(url, {
-                ...fetchOptions,
-                headers: retryHeaders,
-                signal: controller.signal,
-              });
-              if (retryResponse.ok) return retryResponse.json() as Promise<T>;
-            }
-          }
-
-          const body = await response.json().catch(() => ({ message: 'Network error' }));
-          const errorMsg = body.error?.message || body.message || (typeof body.error === 'string' ? body.error : null) || `HTTP error! status: ${response.status}`;
-          const error: any = new Error(errorMsg);
-          error.status = response.status;
-          error.code = body.error?.code || body.code;
-          error.data = body.data;
-          throw error;
-        }
-
-        return response.json();
+        if (response.ok) return response.json();
+        return await readStoreJson<T>(response, (body, status) => {
+          const message = body.error?.message || body.message || (typeof body.error === 'string' ? body.error : null) || `HTTP error! status: ${status}`;
+          return Object.assign(new Error(message), { status, code: body.error?.code || body.code, data: body.data });
+        });
       }
-
       throw new Error('Request failed after retries');
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        const timeoutError: any = new Error('요청 시간이 초과되었습니다. 다시 시도해 주세요.');
-        timeoutError.status = 408;
-        timeoutError.code = 'REQUEST_TIMEOUT';
-        throw timeoutError;
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw Object.assign(new Error('요청 시간이 초과되었습니다. 다시 시도해 주세요.'), { status: 408, code: 'REQUEST_TIMEOUT' });
       }
-      throw err;
+      throw error;
     } finally {
-      clearTimeout(timeoutId);
+      clearTimeout(timer);
     }
   }
 

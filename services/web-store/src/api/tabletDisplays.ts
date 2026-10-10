@@ -7,7 +7,7 @@
  * Manages tablet device display configurations (supplier + local products).
  */
 
-import { storeScopedFetch } from './storeScopedFetch';
+import { storeJsonFetch } from './storeJsonFetch';
 import type { LocalProduct } from './localProducts';
 
 /**
@@ -63,18 +63,7 @@ export interface ProductPool {
 
 // ==================== Helpers ====================
 
-async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const response = await storeScopedFetch(url, options, 'application/json');
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({ message: 'Network error' }));
-    const error: any = new Error(body.error || body.message || `HTTP ${response.status}`);
-    error.status = response.status;
-    error.code = body.code;
-    throw error;
-  }
-
-  return response.json();
-}
+const request = storeJsonFetch;
 
 // ==================== 운영자 공통 대기 영상 (WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1) ====================
 

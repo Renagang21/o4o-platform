@@ -42,6 +42,35 @@ describe('shared request store scope', () => {
     expect(seen[1].body).toBe(seen[0].body);
     expect(new Headers(seen[1].headers).get('Authorization')).toBe('Bearer synthetic-refreshed');
   });
+  it('query filters retain false and zero, omit undefined, and preserve endpoint parameters', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}'));
+    vi.stubGlobal('fetch', fetchMock);
+    await new ApiClient(() => 'https://api.example').get('/test?existing=kept', { zero: 0, enabled: false, absent: undefined });
+    const url = new URL(fetchMock.mock.calls[0][0]);
+    expect(url.searchParams.get('existing')).toBe('kept');
+    expect(url.searchParams.get('zero')).toBe('0');
+    expect(url.searchParams.get('enabled')).toBe('false');
+    expect(url.searchParams.has('absent')).toBe(false);
+  });
+  it('the common client retains its original 401 error when a replay also fails', async () => {
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(new Response('{"error":{"message":"original denial","code":"ORIGINAL"}}', { status: 401 }))
+      .mockResolvedValueOnce(new Response('{"message":"replay conflict"}', { status: 409 })));
+    await expect(new ApiClient(() => 'https://api.example').post('/test', {})).rejects.toMatchObject({
+      message: 'original denial', status: 401, code: 'ORIGINAL',
+    });
+  });
+  it('the common client keeps its timeout error contract', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('fetch', vi.fn((_url, options) => new Promise((_resolve, reject) => {
+      options.signal.addEventListener('abort', () => reject(new DOMException('synthetic abort', 'AbortError')), { once: true });
+    })));
+    try {
+      const denied = expect(new ApiClient(() => 'https://api.example').post('/test', {})).rejects.toMatchObject({ status: 408, code: 'REQUEST_TIMEOUT' });
+      await vi.advanceTimersByTimeAsync(30_000);
+      await denied;
+    } finally { vi.useRealTimers(); }
+  });
   it('failed refresh does not replay a write', async () => {
     mocks.refresh.mockResolvedValueOnce(null);
     const fetchMock = vi.fn().mockResolvedValue(new Response('{"error":{"message":"denied"}}', { status: 401 }));

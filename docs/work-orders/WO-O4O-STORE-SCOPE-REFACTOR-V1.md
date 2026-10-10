@@ -61,12 +61,14 @@ Frozen `asset-copy-core`의 callback에는 Request가 없다. Core 서명 변경
 - web-store TypeScript·Vite build: PASS.
 - asset-copy-core: 4 suites / 64 tests PASS.
 - API: 5 suites / 96 tests PASS(조직 판정·동시 요청·복사·작성·편집·게시·기존 소비처 계약).
-- web-store: 4 suites / 37 tests PASS(재시도 매장·본문·multipart·오류 및 화면 회귀).
+- web-store: 4 suites / 40 tests PASS(재시도 매장·본문·multipart·오류 및 화면 회귀).
 - 변경 TypeScript 파일 focused ESLint·diff check·문서 민감정보 검사: PASS.
 - PR: [#434](https://github.com/Renagang21/o4o-platform/pull/434), push 완료. 생성 시 main과 MERGEABLE.
 - 최초 원격 CI Gate·전체 API Jest 3 shards·앱 빌드·품질 검사·CodeQL: PASS. 최초 코드 리뷰 지적 없음.
 - 최초 SonarCloud: 새 코드 중복률 7.8%(기준 3%)로 FAIL. 콘텐츠 7개 소유권·조직 오류 분기를 공통 함수로 추출하고 기존 메시지를 보존했다. 사본 고정 config·resolver는 한 번 생성하고 요청별 선택 closure만 새로 연결한다. 인증 사용자·조직 없음·빈 목록·ID 검증·번역 소유 콘텐츠 조회도 같은 응답을 유지하는 공통 함수로 정리했다. 이후 로컬 API 96 tests·API build·focused lint는 다시 PASS. 문자열을 구분하는 controller-only 검사와 SonarCloud는 결과가 달랐다. 이후 재분석도 7.9%로 FAIL하여, 문자열을 무시한 API 전체 비교에서 게시·채널 제어/경영자 확인/번역 소유 조회의 남은 반복을 확정했다. 인증 사용자·게시 조직 핸들러와 번역 소유 조회를 공통화하고, 순수 검증·조회 함수는 파일 scope로 옮겼다(Sonar 주석 2건 반영). 최종 로컬 API 96 tests·API build·focused lint는 PASS, 문자열을 무시한 전체 API 비교에서 변경 줄과 겹치는 clone 0건이다. 이 수치는 SonarCloud를 대체하지 않는다.
-- 최신 commit의 원격 CI·SonarCloud·CodeQL: 재검증 대상. PR 링크에서 최신 상태를 확인한다.
+- 서버 정리 `ce9c0c13d`의 CI Gate·전체 API Jest 3 shards·품질 검사·앱 빌드·CodeQL: PASS. SonarCloud: PASS, 중복률 0.4%, 새 issue·Security Hotspot 0건.
+- 추가 프런트 공통화: JSON 응답 reader와 오류 factory를 재사용하고 ApiClient도 공통 전송에 연결했다. 인증 재시도 실패 시 최초 401 오류, 408 timeout, 쿼리 false/0/undefined 처리를 회귀 검증했다. web-store 40 tests·빌드·type-check·focused lint PASS.
+- 프런트 후속 commit의 원격 CI·SonarCloud·CodeQL: push 후 최신 결과를 PR 링크에서 확인한다.
 - 운영 DB write·main 통합·배포: 미실행.
 
 WORKTREE_DISPOSITION: `wo/store-scope-refactor` / base `261cddc961f29f3d3ca71db9c23ffd2d226d154f` / KEEP(main 미통합).
