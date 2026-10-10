@@ -143,7 +143,9 @@ API/migration/IAM 변경 없이 전체관리자 및 웹 5개를 정상 Promote�
 
 - [x] 공개 Demo 버튼으로 유지 8개 origin × PC/mobile × 두 역할 32/32 확인: 매장 경영자 업무 16/16 200·공급자 업무 16/16 200, 반대 역할/전체관리자 거절, Demo 변경 차단, logout access/refresh 401 및 별도 Store 세션 유지.
 - [x] 최초 가입의 이메일·이름·모바일 필수 계약 확인. 별도 ID/비밀번호 생성·SMS 본인 인증 없음; PR #403에서 계약 변경 없음.
-- [x] signup submit/API의 직접 `/terms` redirect 부재, 저장된 returnUrl 복귀 및 별도 pending policy gate를 코드로 조사. 실제 제보 원인은 미확정.
+- [x] signup submit/API의 직접 `/terms` redirect 부재와 returnUrl·pending policy gate 조사. Neture `TermsAcceptanceGate`는 공통 `PolicyAcceptanceGate` wrapper다.
+- [x] P1 canonical 위반 확정: 카카오 UI/client/DTO에 published 문서 ID/version이 없고 signup transaction은 `tosAcceptedAt`만 기록하며 `user_policy_acceptances` 저장을 누락. 실제 제보된 화면 이동의 직접 원인 확인과 별개인 구현 blocker다.
+- [ ] P1 우선 수정: published 약관 ID/version 전달·서버 재검증·user/provider 생성과 원자적인 acceptance 저장, 이전 버전/게시 변경/저장 실패 rollback 및 가입 후 gate 회귀 검증. 서비스 membership/권한 자동 생성 금지 유지; 이메일/Google 공통 가입의 동일 누락도 전수 조사.
 - [ ] 추가 정보 적용 후 목적지·약관 gate를 재현하고 중복/반복을 수정. 실제 사용자 상태 미조회이며 원인을 단정하지 않음.
 - [ ] 공통 가입 입력·버튼 표시, 약관 내용 보기/동의 분리 및 입력 상태 보존 수정안 구현·검증.
 - [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스·이전 내용 정리안 작성 → 사용자 검토 → 승인된 새 정책 버전 게시. 이번 기록 변경에서는 본문/버전 미수정.

@@ -375,11 +375,23 @@ API 배포·migration·schema·키/IAM 변경·force/break-glass는 실행하지
 
 코드의 signup submit은 기본 동작을 막고 API를 호출하며 응답은 session 또는 verify-email이다.
 가입 API에 `/terms` redirect는 없다. LoginModal의 저장된 returnUrl 복귀와 별도
-`pendingPolicyAcceptances`/`TermsAcceptanceGate` 경로, 가입의 `tosAcceptedAt` 기록과
-서비스 membership 기반 `user_policy_acceptances` 계약을 후속 조사한다. 실제 사용자
-membership/pending 상태를 조회하지 않았으므로 제보의 원인으로 확정하지 않는다.
+`pendingPolicyAcceptances` 경로를 조사했다. Neture의 `TermsAcceptanceGate`는 공통
+`PolicyAcceptanceGate`(`@o4o/shared-space-ui`)를 조립하는 실제 wrapper다.
+
+**P1 구현 blocker — 신규 카카오 가입의 버전별 약관 승낙 누락**: ACTIVE
+[통합약관 정본](../baseline/O4O-INTEGRATED-TERMS-OF-SERVICE-V1.0.md)의 버전 추적 계약과
+[가입 정렬 WO §9–10](../work-orders/WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1.md#9-신규-회원가입)은
+현재 published 문서 ID/version 검증 및 가입과 원자적인 acceptance 저장을 요구한다.
+그러나 `KakaoContinue`/`KakaoSignupRequest`/`SocialSignupDto`에는 해당 입력이 없고
+`KakaoAuthService.signup` transaction은 `tosAcceptedAt`만 기록하며
+`user_policy_acceptances`를 저장하지 않는다. 이는 코드로 확인된 canonical 위반이며
+단순 미확정 조사 후보가 아니다. 서비스 membership이 있고 해당 승낙이 없으면 재동의
+gate의 대상이 될 수 있다. 실제 사용자 membership/pending 상태를 조회하지 않았으므로
+이 결함이 제보된 `/terms` 화면 이동의 직접 원인인지는 별도로 확인해야 한다.
 가입 입력/버튼 표시와 checkbox label 내부 약관 링크도 수정안 대상이다.
 
+- [ ] P1: 공통 카카오 가입 UI/client/DTO/API에 published 문서 ID/version을 전달·서버 재검증하고, user/provider 생성과 동일 transaction에서 acceptance 저장. 누락/이전 버전·게시 변경·저장 실패 rollback 및 가입 후 gate 회귀 검증; 가입이 서비스 membership/권한을 자동 생성하지 않는 현행 계약 유지.
+- [ ] 동일 이메일/Google 가입 소비처의 published 약관 승낙 계약 누락도 전수 조사하고 같은 기준으로 수정 범위 확정.
 - [ ] 추가 정보 제출·로그인·가입 완료 후 목적지와 약관 요구를 코드/브라우저로 재현하고 수정.
 - [ ] 가입 입력/버튼 가독성, 별도 약관 내용 보기 및 동의, 입력 상태 보존을 검토·구현.
 - [ ] 공개 약관·개인정보 처리방침 version 1의 은퇴 서비스 명칭과 리팩터링 이전 내용을 현행 서비스 기준으로 정리하고 사용자 검토 후 새 정책 버전 게시.
