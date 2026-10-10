@@ -143,14 +143,23 @@ async function verifyParentOwnership(client,state,edges) {
     }
   }
 }
-async function verifyLogicalCoverage(client,state,columns,edges) {
+export async function verifyLogicalCoverage(client,state,columns,edges) {
   // Unmodelled UUID soft references must stop deletion, including non-public schemas.
   const ids=[...new Set([...state.rows.values()].flatMap(rows=>[...rows.values()].map(row=>row.id).filter(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id))))];
+  const references=[];
   for (const column of columns.filter(c=>(c.udt_name==='uuid' || (['text','varchar'].includes(c.udt_name) && /(_id|Id)$/.test(c.column_name))) && c.column_name!=='id' && (!directOrganizationColumn(c.table_name,c.column_name) || (c.table_name==='role_assignments' && c.column_name==='scope_id')))) {
     if (!(column.table_name==='role_assignments' && column.column_name==='scope_id') && edges.some(e=>e.child===column.table_name && e.child_columns.includes(column.column_name))) continue;
     const matches=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(column.table_name)} t WHERE t.${quoteIdentifier(column.column_name)}=ANY($1)`,[ids])).rows;
-    if (matches.some(({row})=>!state.rows.get(column.table_name)?.has(rowKey(column.table_name,row,state.keys.get(column.table_name))))) throw new CleanupStop('Unmodelled UUID logical reference requires disposition');
+    const selected=state.rows.get(column.table_name);
+    const remaining=matches.filter(({row})=>!selected?.has(rowKey(column.table_name,row,state.keys.get(column.table_name))));
+    if (!remaining.length) continue;
+    // Report schema metadata and counts only; never serialize production rows or IDs.
+    const values=new Set(remaining.map(({row})=>row[column.column_name]));
+    const referencedTables=[...state.rows].filter(([,rows])=>[...rows.values()].some(row=>values.has(row.id))).map(([table])=>table).sort((a,b)=>a.localeCompare(b,'en'));
+    referencedTables.forEach(quoteTable);
+    references.push({table:column.table_name,column:column.column_name,count:remaining.length,referencedTables});
   }
+  if (references.length) throw new CleanupStop('Unmodelled UUID logical reference requires disposition: '+JSON.stringify({references}));
 }
 async function readGraphMetadata(client) {
   const columns=(await client.query(metadataSql.columns)).rows;
