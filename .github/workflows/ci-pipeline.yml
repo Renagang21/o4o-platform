@@ -214,6 +214,7 @@ jobs:
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
         scripts/ci/__tests__/cloud-run-env.test.mjs
+        scripts/ci/__tests__/kakao-config-workflow.test.mjs
         scripts/ci/__tests__/deploy-workflow-gates.test.mjs
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
@@ -225,6 +226,9 @@ jobs:
     # Node 22.18.0 에서 `node --test <dir>` 는 실패하므로 파일을 명시한다(실측 확인).
     # WO-O4O-BROWSER-DOM-CONTROL-V0 §54: Chrome Extension / Native Bridge 계약 사본 대조와 DOM relay ·
     # host 라우팅 · content-script 소스 잠금을 같은 runner 로 blocking 검증한다(의존성 0, 파일 명시).
+    - name: Run tests (PharmacyHub QR cutover safety)
+      run: node --test scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs
+
     - name: Run tests (o4o-local-agent node:test)
       run: node --test tools/o4o-local-agent/test/local-db.test.mjs tools/o4o-local-agent/test/native-bridge.test.mjs tools/o4o-local-agent/test/browser-dom.test.mjs
 

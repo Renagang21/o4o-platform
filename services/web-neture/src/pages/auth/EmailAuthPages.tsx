@@ -19,7 +19,8 @@
 import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
-  GoogleContinue,
+  O4OHomeButton,
+  GoogleContinue, KakaoContinue,
   EmailSignupForm,
   VerifyEmailView,
   FindLoginIdForm,
@@ -32,6 +33,7 @@ import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
 
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
   return (
     <div className="min-h-screen bg-gray-50 flex items-start sm:items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -42,7 +44,9 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle?: str
             {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
           </div>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-6">{children}
+          <div className="mt-6"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
+        </div>
       </div>
     </div>
   );
@@ -85,7 +89,7 @@ function useOneTimeToken(): string | null {
 }
 
 export function SignupPage() {
-  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const links = useAuthLinks();
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
@@ -102,6 +106,9 @@ export function SignupPage() {
       </div>
 
       {/* 미등록 Google 계정은 이 버튼에서 약관 동의 → 계정 생성까지 간다(로그인 모달과 같은 계약). */}
+      <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+        returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
+        onSuccess={() => { navigate('/', { replace: true }); }} />
       <GoogleContinue<User>
         getConfig={getGoogleAuthConfig}
         loginWithGoogle={loginWithGoogle}

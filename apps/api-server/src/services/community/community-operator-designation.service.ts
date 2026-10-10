@@ -2,17 +2,18 @@
  * 개별 커뮤니티 운영자 지정·해제 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 원칙: Admin 은 서비스 운영자(`community:admin`)만 지정한다. 개별 커뮤니티 운영자는
- * `community_memberships.role` 의 **개체 역할**이고, 커뮤니티 서비스 운영자가 각 커뮤니티의
+ * 원칙: 중앙 관리자는 서비스 Admin/Operator 를 지정한다. 개별 커뮤니티 운영자는
+ * `community_memberships.role` 의 **개체 역할**이고, 커뮤니티 서비스 Admin 이 각 커뮤니티의
  * **승인된(active) 회원 중에서** 지정·해제한다. 서비스 전역 역할은 만들지 않는다(role_assignments 무변경).
  *
  * 고정하는 것
  *   - 대상은 그 커뮤니티의 active 가입 행뿐이다(pending · rejected · 다른 커뮤니티 행 → 409 / 404)
  *   - 서비스 membership(`community`)이 active 가 아닌 회원은 운영자로 올리지 않는다 — 진입 자격이 없으면
  *     운영자여도 화면에 들어갈 수 없다(V8). 여기서 되살리지 않는다.
- *   - 마지막 운영자는 내리지 않는다 — 커뮤니티가 운영자 없이 남으면 가입 승인이 멈춘다.
+ *   - 메인과 커뮤니티 서비스 이용이 가능한 마지막 운영자는 내리지 않는다.
  *     같은 커뮤니티의 운영자 행을 `FOR UPDATE` 로 잠그고 판정·UPDATE 를 한 트랜잭션에서 한다.
  */
+import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { COMMUNITY_SERVICE_KEY } from './community-lifecycle.service.js';
 import {
   demoAccountService,
@@ -130,7 +131,7 @@ export class CommunityOperatorDesignationService {
       const locked: Array<{ id: string; user_id: string; role: string; status: string }> = await m.query(
         `SELECT id, user_id, role, status FROM community_memberships
           WHERE community_id = $1 AND (id = $2 OR (role = 'operator' AND status = 'active'))
-          FOR UPDATE`,
+          ORDER BY id FOR UPDATE`,
         [input.communityId, input.membershipId],
       );
       const target = locked.find((r) => r.id === input.membershipId);
@@ -151,27 +152,32 @@ export class CommunityOperatorDesignationService {
         throw new CommunityOperatorDesignationError(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
       }
 
-      if (input.role === 'operator') {
-        const sm = await m.query(
-          `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-          [target.user_id, COMMUNITY_SERVICE_KEY],
+      // 개체 역할만 남은 정지/탈퇴 운영자는 마지막 운영자 보호의 대체자가 아니다.
+      const candidates = input.role === 'operator'
+        ? [target]
+        : locked.filter((r) => r.id !== target.id && r.role === 'operator' && r.status === 'active');
+      const memberships: Array<{ user_id: string; status: string }> = await m.query(
+        `SELECT user_id, status FROM service_memberships
+          WHERE user_id = ANY($1::uuid[]) AND service_key = $2
+          ORDER BY user_id FOR UPDATE`,
+        [candidates.map((r) => r.user_id), COMMUNITY_SERVICE_KEY],
+      );
+      let eligible = false;
+      for (const candidate of candidates) {
+        if (!memberships.some((row) => row.user_id === candidate.user_id && row.status === 'active')) continue;
+        if (await getNetureMainMembershipStatus(m, candidate.user_id) === 'active') {
+          eligible = true;
+          break;
+        }
+      }
+      if (!eligible) {
+        throw new CommunityOperatorDesignationError(
+          409,
+          input.role === 'operator' ? 'SERVICE_MEMBERSHIP_NOT_ACTIVE' : 'LAST_OPERATOR_PROTECTED',
+          input.role === 'operator'
+            ? '메인 계정과 커뮤니티 서비스 가입이 활성 상태인 회원만 운영자로 지정할 수 있습니다.'
+            : '운영 가능한 마지막 커뮤니티 운영자는 해제할 수 없습니다. 다른 운영자를 먼저 지정하세요.',
         );
-        if (sm?.[0]?.status !== 'active') {
-          throw new CommunityOperatorDesignationError(
-            409,
-            'SERVICE_MEMBERSHIP_NOT_ACTIVE',
-            '커뮤니티 서비스 가입이 active 가 아닌 회원은 운영자로 지정할 수 없습니다.',
-          );
-        }
-      } else {
-        const others = locked.filter((r) => r.id !== target.id && r.role === 'operator' && r.status === 'active');
-        if (others.length === 0) {
-          throw new CommunityOperatorDesignationError(
-            409,
-            'LAST_OPERATOR_PROTECTED',
-            '마지막 커뮤니티 운영자는 해제할 수 없습니다. 다른 운영자를 먼저 지정하세요.',
-          );
-        }
       }
 
       await m.query(

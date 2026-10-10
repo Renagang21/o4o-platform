@@ -1,15 +1,17 @@
 # DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-09 (§6-1 내 매장 제품·자료함·사업 탭·조회/매장 경계) · 2026-10-08 (사업별 개발·한 약국 복수 서비스·전체 ToDo · §3 이메일 확인 기반 메인 자격·모집 기준 · §4 실제 모듈·필터 · §6 HUB 재배치 · §7 커뮤니티 배치) · 2026-10-07 (명칭 정정 "기본 가입" → "내 매장(약국) 신청" · 매장 표식의 `service_memberships('neture')` ensure 제거 ·  당시 수동 메인 승인 전제 — 2026-10-08 이메일 확인 기준으로 정정 · §3-3 공급자 승인의 Neture 결합 제거 · §13 이관 표 ensure 취소선 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) · 2026-10-06 (§17 운영 전환 호환 — 인덱스 2단계 · pharmacy 호스트 이용 자격 · §13 인증·가입 트랙 인계 계약 · §14 K-Cosmetics 퇴역 반영 · §15 미완료 범위 · 구현 결정 반영)
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](../work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) 단계 1-7 · 입력 [`IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1`](../investigations/IR-NETURE-PHARMACY-STORE-COMMERCE-STEP1-CENSUS-V1.md)
 
-Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 세미프랜차이즈 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
+Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국) 신청 · 약국 협력사업 가입 · 복수 공급 제안 · 선택 제안 주문 · 테스트 결제** 를 구현하기 위한 확정 설계다. IR 의 "사용자 판단 필요" 항목 중 기술 항목은 여기서 근거와 함께 확정한다(WO 단계 1 "보류" 절의 마지막 항목). 사업 판단 항목은 §11 에 남긴다.
 
 설계 원칙:
 
-- **대체, 누적 아님.** Neture 약국 흐름의 이용 자격은 새 내 매장(약국) 신청 · 세미프랜차이즈 가입 · 대상 약국 조건으로 **판정한다**. 과거 축(`kpa-society` service membership · `kpa:store_owner` · `offer_service_approvals(kpa-society)` · `distribution_type` · `allowed_seller_ids`)을 AND 로 덧붙이지 않는다. 그 축들은 다른 서비스 흐름을 위해 **코드와 데이터를 보존**하되 Neture 약국 흐름의 판정에는 쓰지 않는다.
-- **세미프랜차이즈의 공통 식별은 serviceKey 가 아니라 데이터 행이다.** 각 사업자는 독립적으로 약국을 지원하며, 혈당관리의 무료 혈당기 사업·협동조합의 협력 사업처럼 업무는 사업별로 개발한다. 가입 식별·담당 사업 격리·기존 공급 계약을 공유한다는 이유로 사업 기능을 표준화하거나 모든 신규 사업을 행 등록만으로 완성한다고 가정하지 않는다.
+- **대체, 누적 아님.** Neture 약국 흐름의 이용 자격은 새 내 매장(약국) 신청 · 약국 협력사업 가입 · 대상 약국 조건으로 **판정한다**. 과거 축(`kpa-society` service membership · `kpa:store_owner` · `offer_service_approvals(kpa-society)` · `distribution_type` · `allowed_seller_ids`)을 AND 로 덧붙이지 않는다. 그 축들은 다른 서비스 흐름을 위해 **코드와 데이터를 보존**하되 Neture 약국 흐름의 판정에는 쓰지 않는다.
+- **약국 협력사업의 공통 식별은 serviceKey 가 아니라 데이터 행이다.** 각 사업자는 독립적으로 약국을 지원하며, 혈당관리의 무료 혈당기 사업·협동조합의 협력 사업처럼 업무는 사업별로 개발한다. 가입 식별·담당 사업 격리·기존 공급 계약을 공유한다는 이유로 사업 기능을 표준화하거나 모든 신규 사업을 행 등록만으로 완성한다고 가정하지 않는다.
 - **관리자(=운영자)는 해당 서브도메인에 배치한다**(2026-10-08 사용자 결정). pharmacy 사업 관리와 store의 약국 신청 검토를 구분하고, 공급자·펀딩·커뮤니티 관리도 각 서비스 호스트에서 제공한다. 전체관리자는 `admin.neture.co.kr`에만 둔다. 아래 `neture:operator`·`neture:admin`은 현재 구현 식별이며 호스트 이전의 기능별 권한 정합은 전체 작업안 T03에서 처리한다.
 - **경영자 한 명·약국 하나·내 매장 하나**를 기준으로 한다(2026-10-08 사용자 정정). 같은 약국이 pharmacy·혈당관리·협동조합 등 여러 서비스에 가입해 한 내 매장에서 이용하며 서비스별 구획은 탭 등으로 표현할 수 있다. 사용자당 여러 약국 신규 가입을 확장하지 않는다. 별개 내 매장의 데이터와 권한은 각각 독립적이다. 전체 연속 작업은 초안 ToDo를 코드·문서에 대조하고, 필요한 논의·수정 후 재대조한 [서비스 재배치 작업안](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)을 따른다.
 - **재고 · 이벤트 수량 · 구매 한도 · 예약 · 차감 · 복원 로직은 함수 그대로 재사용한다.** 새로 짜지 않는다.
@@ -24,20 +26,20 @@ Neture 약국 서비스의 **약국별 하나의 내 매장 · 내 매장(약국
 |---|---|---|---|
 | R1 | 약국 조직 ↔ 내 매장 | `organizations` 행 1개 = 약국 = 내 매장 (기존 정의) | 같은 행. 별도 store 테이블 없음 |
 | R2 | 약국 조직 ↔ 내 매장(약국) 신청 | **신규** `neture_pharmacy_memberships` | `organization_id UNIQUE` → 약국 1 : 내 매장(약국) 신청 1 : 매장 1. 사용자당 owner 약국 1개(앱 검사) · 진행 중 사업자번호 중복 금지(부분 UNIQUE) |
-| R3 | 약국 조직 ↔ 세미프랜차이즈 가입 | **신규** `semi_franchise_memberships` | `UNIQUE(semi_franchise_id, organization_id)`. 한 약국 N 세미프랜차이즈. 재신청은 같은 행을 `pending` 으로 되돌린다 |
-| R4 | 운영자 ↔ 담당 세미프랜차이즈 | **신규** `semi_franchise_operators` | `UNIQUE(semi_franchise_id, user_id) WHERE revoked_at IS NULL`. 판정 = `neture:operator` role ∧ 활성 담당 행 |
+| R3 | 약국 조직 ↔ 약국 협력사업 가입 | **신규** `semi_franchise_memberships` | `UNIQUE(semi_franchise_id, organization_id)`. 한 약국 N 약국 협력사업. 재신청은 같은 행을 `pending` 으로 되돌린다 |
+| R4 | 운영자 ↔ 담당 약국 협력사업 | **신규** `semi_franchise_operators` | `UNIQUE(semi_franchise_id, user_id) WHERE revoked_at IS NULL`. 판정 = `neture:operator` role ∧ 활성 담당 행 |
 | R5 | 제품 ↔ 복수 공급 제안 | 제품 = `supplier_product_offers`(SPO, 공급자 × master 1행 · 설명 · 재고 · 기본가 유지) → **신규** `supply_proposals`(SPO 하위 N행, 가격 · 대상 · 승인만) | SPO unique 유지(CHECK 판정 A). 제안은 unique 없음 |
-| R6 | 제안 ↔ 대상 | `supply_proposals.semi_franchise_id`(필수) + `target_organization_id`(선택, 개별 약국) | 개별 약국 대상도 그 세미프랜차이즈 가입 active 필요 |
+| R6 | 제안 ↔ 대상 | `supply_proposals.semi_franchise_id`(필수) + `target_organization_id`(선택, 개별 약국) | 개별 약국 대상도 그 약국 협력사업 가입 active 필요 |
 | R7 | 제안 ↔ 주문 항목 | `store_cart_items.supply_proposal_id` · `seller_recruitment_id`(신규 컬럼) + 기존 `event_offer_id` → `checkout_orders.items[].metadata` 스냅샷 | 주문 항목은 jsonb 스냅샷(별도 item 테이블 없음, 기존 구조) |
 | R8 | 주문 · 결제 ↔ 수취 주체 | `semi_franchises.payment_receiver_key`(NULL = 미확정) → `checkout_orders.metadata.receiverKey` · `o4o_payments.metadata.receiverKey` | 수취 주체가 다른 주문은 같은 `paymentGroupId` 에 넣지 않는다 |
 
 공급 경로 4종(주문 항목의 `supplyKind`):
 
-| supplyKind | 원장 | 대상 세미프랜차이즈 | 단가 | 승인 |
+| supplyKind | 원장 | 대상 약국 협력사업 | 단가 | 승인 |
 |---|---|---|---|---|
 | `default` | SPO (공급처 미지정 = `service_keys` 비어 있음) | `pharmacy` 고정 | `spo.price_general` | 제품 등록 승인(Neture 운영자)만 |
-| `proposal` | `supply_proposals` | 제안의 `semi_franchise_id` | `proposal.unit_price` | 제품 등록 승인 + 대상 세미프랜차이즈 담당 운영자 승인 |
-| `event` | `organization_product_listings`(`service_key='neture-event-offer'`, `source_type='event-offer'`) | 이벤트 행의 `organization_id` = 세미프랜차이즈 운영 조직 | `opl.event_price` | 대상 세미프랜차이즈 담당 운영자 승인 |
+| `proposal` | `supply_proposals` | 제안의 `semi_franchise_id` | `proposal.unit_price` | 제품 등록 승인 + 대상 약국 협력사업 담당 운영자 승인 |
+| `event` | `organization_product_listings`(`service_key='neture-event-offer'`, `source_type='event-offer'`) | 이벤트 행의 `organization_id` = 약국 협력사업 운영 조직 | `opl.event_price` | 대상 약국 협력사업 담당 운영자 승인 |
 | `recruitment` | `seller_recruitments` + 조직 단위 `seller_recruitment_applications` | 모집의 `semi_franchise_id` | `recruitment.supply_unit_price` | 운영자 조건 승인(`exposure_status`) + 공급자 참여 승인 |
 
 ---
@@ -93,7 +95,7 @@ supply_proposals
 | `seller_recruitments` | `+ semi_franchise_id uuid NULL`, `+ supply_unit_price int NULL` | 모집의 대상 경로 · 모집 공급 조건 가격(IR B §4) |
 | `seller_recruitment_applications` | `+ applicant_organization_id uuid NULL` + `UNIQUE (recruitment_id, applicant_organization_id) WHERE applicant_organization_id IS NOT NULL` | 참여 단위 = 약국 조직(WO §3-6) |
 | `organization_product_listings` | ~~`idx_org_listing_unique_v2` 를 부분 UNIQUE 로 교체~~ → **이 migration 에서는 바꾸지 않는다(전체 UNIQUE 유지, §17-1 1단계)**. 부분 UNIQUE 교체는 별도 2단계 migration | 구버전 API 의 `ON CONFLICT (organization_id, service_key, offer_id)` 가 부분 인덱스를 추론하지 못해 실패 → 배포 중 · 롤백 시 구버전과 호환되지 않는다. 이벤트 재신청 · 같은 제품 복수 이벤트는 2단계 전까지 API 가 명시 거절(409) |
-| `seller_recruitments` | UNIQUE 를 `(product_id, seller_id, service_id, semi_franchise_id) NULLS NOT DISTINCT` 로 | 세미프랜차이즈별 모집 1건. 기존 행(semi_franchise_id NULL) 유일성 동일 |
+| `seller_recruitments` | UNIQUE 를 `(product_id, seller_id, service_id, semi_franchise_id) NULLS NOT DISTINCT` 로 | 약국 협력사업별 모집 1건. 기존 행(semi_franchise_id NULL) 유일성 동일 |
 
 재배치 보완 migration `AlignSellerRecruitmentApplicationIdentity1791477914134`는 기존 약국 조직 UNIQUE를 유지하고, 사용자 UNIQUE를 `applicant_organization_id IS NULL`인 신청에만 적용한다. 직접 신청 API도 같은 조직으로 중복을 확인한다. 한 약국의 경영자·내 매장은 하나이며, 담당자가 접근할 수 있는 다른 약국은 각각 독립 조직으로 처리한다. 이 변경은 소유 조직을 추가하거나 합치지 않는다. 조직별 신청이 같은 사용자를 공유하면 `down()`은 데이터를 삭제하지 않고 사용자 UNIQUE 복원을 차단한다. 운영 적용은 검토한 migration/배포 경로로 수행하고 이벤트 2단계 수동 인덱스와 구분한다.
 
@@ -124,11 +126,11 @@ supply_proposals
 ```
 
 - `kpa-society` 가입 · `kpa_members` · `kpa_pharmacist_profiles` 를 자격 근거로 읽지 않는다(재해석 금지). 기존 가입자를 자동 전환하지 않는다.
-- 기본 승인은 어떤 세미프랜차이즈 가입도 만들지 않는다.
-- 내 매장(약국) 승인 · 반려 · 정지 · 재활성화는 Neture 가입 원장(`service_memberships` 'neture')을 만들거나 바꾸지 않는다. 거꾸로 Neture 메인 자격 충족 · 재활성화도 내 매장 · 세미프랜차이즈 · 공급자 원장과 역할을 만들거나 복구하지 않는다(원장 분리 기록 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md), 현행 자격은 위 정본).
+- 기본 승인은 어떤 약국 협력사업 가입도 만들지 않는다.
+- 내 매장(약국) 승인 · 반려 · 정지 · 재활성화는 Neture 가입 원장(`service_memberships` 'neture')을 만들거나 바꾸지 않는다. 거꾸로 Neture 메인 자격 충족 · 재활성화도 내 매장 · 약국 협력사업 · 공급자 원장과 역할을 만들거나 복구하지 않는다(원장 분리 기록 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md), 현행 자격은 위 정본).
 - 상태 전이: `pending→active|rejected`, `active→suspended|terminated`, `suspended→active|terminated`, `rejected|terminated→pending`(재신청, 같은 행).
 
-### 3-2. 세미프랜차이즈 가입 (R3) · 운영자 담당 (R4)
+### 3-2. 약국 협력사업 가입 (R3) · 운영자 담당 (R4)
 
 ```text
 약국(내 매장(약국) 신청 active) → POST /api/v1/neture/pharmacy/semi-franchises/:key/apply      (pending)
@@ -143,8 +145,8 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 ```
 
 - `pharmacy` 도 같은 절차다(자동 가입 없음).
-- 세미프랜차이즈 운영자는 약국 자격을 독립적으로 확인할 수 있도록 신청 목록에 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장(약국) 신청 상태를 함께 보여준다.
-- 운영 role 은 기존 `neture:operator` 를 재사용한다(새 role 없음 → F9 role 추가 절차 불필요). "어느 세미프랜차이즈인가" 는 담당 행이 정한다. `role_assignments.scope_id` 는 쓰지 않는다(부분 유니크 때문에 불가 — IR A §3-3).
+- 약국 협력사업 운영자는 약국 자격을 독립적으로 확인할 수 있도록 신청 목록에 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장(약국) 신청 상태를 함께 보여준다.
+- 운영 role 은 기존 `neture:operator` 를 재사용한다(새 role 없음 → F9 role 추가 절차 불필요). "어느 약국 협력사업인가" 는 담당 행이 정한다. `role_assignments.scope_id` 는 쓰지 않는다(부분 유니크 때문에 불가 — IR A §3-3).
 
 ### 3-3. 공급자 · 제품 등록 (현행 유지 + 결함 1건 수정)
 
@@ -164,33 +166,33 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
  → POST .../:id/approve | reject {reason} | end {reason}
 ```
 
-- 제안 가격 수정 경로를 두지 않는다. 같은 제품 · 같은 세미프랜차이즈 복수 제안 허용.
-- 개별 약국 대상 제안: 대상 약국이 그 세미프랜차이즈 가입 active 일 때만 노출 · 주문.
+- 제안 가격 수정 경로를 두지 않는다. 같은 제품 · 같은 약국 협력사업 복수 제안 허용.
+- 개별 약국 대상 제안: 대상 약국이 그 약국 협력사업 가입 active 일 때만 노출 · 주문.
 - 제안 반려 · 종료는 제품(SPO) 상태에 연쇄하지 않는다.
 
 ### 3-5. 이벤트
 
 ```text
 공급자 → POST /api/v1/neture/supplier/semi-franchise-events {offerId, semiFranchiseKey, eventPrice, startAt, endAt, totalQuantity?, perStoreLimit?, perOrderLimit?}
-         → OPL(organization_id = 세미프랜차이즈 운영 조직, service_key='neture-event-offer', source_type='event-offer', status='pending')
+         → OPL(organization_id = 약국 협력사업 운영 조직, service_key='neture-event-offer', source_type='event-offer', status='pending')
          · eventPrice ≤ spo.price_general, 기간 필수(기존 createListing 규칙)
        → POST .../:id/cancel   (status='canceled', is_active=false — 삭제 · 종료)
 담당 운영자 → GET .../semi-franchises/:key/events?status=  ·  POST .../events/:id/{approve|reject|cancel}
 ```
 
-- 가격 수정 경로 없음. 재신청 = 새 행 · 같은 제품 복수 승인 이벤트 공존 — **§17-1 2단계(부분 인덱스) 이후**. 1단계에서는 같은 세미프랜차이즈 · 같은 offer 의 두 번째 이벤트 신청을 `409 EVENT_REAPPLY_NOT_YET_SUPPORTED` 로 명시 거절한다.
+- 가격 수정 경로 없음. 재신청 = 새 행 · 같은 제품 복수 승인 이벤트 공존 — **§17-1 2단계(부분 인덱스) 이후**. 1단계에서는 같은 약국 협력사업 · 같은 offer 의 두 번째 이벤트 신청을 `409 EVENT_REAPPLY_NOT_YET_SUPPORTED` 로 명시 거절한다.
 - 종료는 단방향: Neture 이벤트에는 visibility 토글이 없다. KPA `groupbuy-admin/:id/visibility` 의 canceled→approved 되돌림은 **수정**한다(종료된 행은 되살리지 않음 — 승인 우회 제거).
 - 주문은 OPL 을 jsonb 로만 참조하므로 취소해도 주문 기록이 손상되지 않는다(현행).
 - 수량 · 한도 · 예약 · 복원은 `reserveEventOfferListing` · `incrementListingQuantity` · `STORE_ORDERED_QTY_SQL` 을 그대로 호출한다.
 
 ### 3-6. 취급매장 모집
 
-**현재 약국 모집 기준(2026-10-08)**: 세미프랜차이즈가 지정돼 있으면 해당 사업 가입을, 미지정이면 pharmacy 가입을 확인한다. 목록과 참여 신청은 같은 판정을 사용하며 기존 KPA 테스트 데이터 보존용 우회를 추가하지 않는다. 미지정 모집을 보존하는 기존 `SellerRecruitmentService`와 지정 사업을 조회하는 새 경로의 현재 차이는 [전체 작업안](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md) §3·T05에서 생성·목록·신청·승인 후 공급까지 정렬할 항목이며, 여기서 구현 완료로 주장하지 않는다.
+**현재 약국 모집 기준(2026-10-08)**: 약국 협력사업이 지정돼 있으면 해당 사업 가입을, 미지정이면 pharmacy 가입을 확인한다. 목록과 참여 신청은 같은 판정을 사용하며 기존 KPA 테스트 데이터 보존용 우회를 추가하지 않는다. 미지정 모집을 보존하는 기존 `SellerRecruitmentService`와 지정 사업을 조회하는 새 경로의 현재 차이는 [전체 작업안](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md) §3·T05에서 생성·목록·신청·승인 후 공급까지 정렬할 항목이며, 여기서 구현 완료로 주장하지 않는다.
 
 ```text
 공급자 → POST /api/v1/neture/supplier/seller-recruitments {..., semiFranchiseKey, supplyUnitPrice}   (기존 생성 경로에 2필드)
-담당 운영자 → 조건 승인 = 기존 exposure_status 승인 (재승인 반복 없음) — 담당 세미프랜차이즈만
-약국(그 세미프랜차이즈 가입 active) → 신청 시 applicant_organization_id = 내 약국 조직
+담당 운영자 → 조건 승인 = 기존 exposure_status 승인 (재승인 반복 없음) — 담당 약국 협력사업만
+약국(그 약국 협력사업 가입 active) → 신청 시 applicant_organization_id = 내 약국 조직
 공급자 → 참여 승인(기존 approveApplication) → 승인 약국은 바로 주문(supplyKind='recruitment', 단가 = supply_unit_price)
 ```
 
@@ -207,13 +209,13 @@ Neture 관리자          → POST /api/v1/neture/admin/semi-franchises         
 
 | 경로 | 추가 조건 |
 |---|---|
-| default | `cardinality(spo.service_keys)=0` ∧ 약국의 `pharmacy` 세미프랜차이즈 가입 active |
-| proposal | `sp.status='approved'` ∧ 세미프랜차이즈 `status='active'` ∧ 약국의 해당 세미프랜차이즈 가입 active ∧ (`target_organization_id IS NULL` ∨ = 약국) |
-| event | OPL `service_key='neture-event-offer'` ∧ `status='approved'` ∧ `is_active` ∧ 기간 내 ∧ 운영 조직 → 세미프랜차이즈 active ∧ 약국 가입 active |
-| recruitment | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 세미프랜차이즈 가입 active ∧ `supply_unit_price IS NOT NULL` |
+| default | `cardinality(spo.service_keys)=0` ∧ 약국의 `pharmacy` 약국 협력사업 가입 active |
+| proposal | `sp.status='approved'` ∧ 약국 협력사업 `status='active'` ∧ 약국의 해당 약국 협력사업 가입 active ∧ (`target_organization_id IS NULL` ∨ = 약국) |
+| event | OPL `service_key='neture-event-offer'` ∧ `status='approved'` ∧ `is_active` ∧ 기간 내 ∧ 운영 조직 → 약국 협력사업 active ∧ 약국 가입 active |
+| recruitment | `exposure_status='approved'` ∧ `status='recruiting'` ∧ 약국 조직의 application `approved` ∧ 약국 협력사업 가입 active ∧ `supply_unit_price IS NOT NULL` |
 
-- 미가입 · 미승인 · 정지 · 종료 세미프랜차이즈 항목은 전체 탭 · 검색 · 상세 · 주문 API 어디에도 나오지 않는다(상세는 404 `SUPPLY_OPTION_NOT_AVAILABLE`).
-- 출처 탭·세미프랜차이즈 필터(`source=all|default|proposal|event|recruitment|sf:<key>`)는 접근 집합을 만든 **뒤** 거른다. 기존 통합 조회·필터와 회귀 테스트의 실제 범위를 먼저 확인한 뒤 필요한 화면 구획과 검증을 보완한다.
+- 미가입 · 미승인 · 정지 · 종료 약국 협력사업 항목은 전체 탭 · 검색 · 상세 · 주문 API 어디에도 나오지 않는다(상세는 404 `SUPPLY_OPTION_NOT_AVAILABLE`).
+- 출처 탭·약국 협력사업 필터(`source=all|default|proposal|event|recruitment|sf:<key>`)는 접근 집합을 만든 **뒤** 거른다. 기존 통합 조회·필터와 회귀 테스트의 실제 범위를 먼저 확인한 뒤 필요한 화면 구획과 검증을 보완한다.
 - 가격 비교 · 최저가 자동 선택 · 경고 없음. 응답은 공급 경로 · 공급자 · 조건 · 단가를 그대로 보여준다.
 
 API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET .../supply-options/:kind/:id`.
@@ -224,10 +226,10 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 
 - 약국 매장 API(`/api/v1/kpa/...` 의 매장 controller 들 — 사이니지 · QR · 태블릿 · 자체 콘텐츠 · 매장 정보 등)는 공통 유틸 `isStoreOwner(ds, userId, 'kpa')` · `createRequireStoreOwner(ds, 'kpa')` 로 판정한다.
 - **변경 (구현 `91155708c`)**: `kpa` 키의 판정을 "kpa-society active membership ∧ `kpa:store_owner` role ∧ kpa-society 연결 조직" 에서 **"사용자가 owner/admin/manager 인 조직 중 `neture_pharmacy_memberships.status='active'` 인 조직"** 으로 대체한다. 매장 경영자 계약 게이트 · ambiguous 409 · 선택 매장 헤더 규칙은 그대로.
-  - 세미프랜차이즈(pharmacy 포함) 미가입이어도 내 매장 기본 기능 이용 가능 → WO §3-1 충족.
+  - 약국 협력사업(pharmacy 포함) 미가입이어도 내 매장 기본 기능 이용 가능 → WO §3-1 충족.
   - `cosmetics` · `pharmacy-hub` 키의 판정은 변경 없음.
 - 같은 기준을 `resolveWorkScopeStore`(kpa-society membership 선검사 제거) · 매장 경영자 계약 게이트(`getPendingStoreOwnerAgreementsForUser` — kpa-society 계약은 원장 active 약국에 요구)에도 적용한다. 매장 목록(`accessible-stores`)은 조직 owner 관계만 보므로 그대로 나온다.
-- **매장 표식(구현 결정)**: 매장 판정은 원장이지만, JWT role 로 화면 · 콘텐츠 사본(F3 `asset-copy-core` allowedRoles)을 여는 기존 소비처가 있어 내 매장(약국) 신청 승인 · 재활성 시 표식을 붙이고 정지 · 종료 시 거둔다 — role `neture:store_owner`(신규. ~~`service_memberships('neture')` ensure 동반~~ — 2026-10-07 제거: 내 매장(약국) 승인은 Neture 원장을 만들지 않는다, CHECK §10 E1), `organization_service_enrollments('kpa-society')`(매장의 약국 업무 영역 = web-store 서비스 문맥, 세미프랜차이즈 가입이 아님), `platform_store_slugs('kpa')`(공개 주소). `service_memberships('neture')` 는 공급자 축과 공유될 수 있어 정지 시 건드리지 않는다. 표식 동기화 실패는 원장 판정에 영향이 없다.
+- **매장 표식(구현 결정)**: 매장 판정은 원장이지만, JWT role 로 화면 · 콘텐츠 사본(F3 `asset-copy-core` allowedRoles)을 여는 기존 소비처가 있어 내 매장(약국) 신청 승인 · 재활성 시 표식을 붙이고 정지 · 종료 시 거둔다 — role `neture:store_owner`(신규. ~~`service_memberships('neture')` ensure 동반~~ — 2026-10-07 제거: 내 매장(약국) 승인은 Neture 원장을 만들지 않는다, CHECK §10 E1), `organization_service_enrollments('kpa-society')`(매장의 약국 업무 영역 = web-store 서비스 문맥, 약국 협력사업 가입이 아님), `platform_store_slugs('kpa')`(공개 주소). `service_memberships('neture')` 는 공급자 축과 공유될 수 있어 정지 시 건드리지 않는다. 표식 동기화 실패는 원장 판정에 영향이 없다.
 - 승인 우회 차단: `POST /api/v1/store/enrollment` 의 `ENROLLABLE_SERVICE_KEYS` 에서 `kpa` 제거(약국 매장은 내 매장(약국) 신청으로만).
 - KPA 회원 승인 시 매장 프로비저닝(`ensureKpaStoreOrganization`, member.controller 2곳)은 새 게이트에서 매장 권한을 주지 않는다(실효 없음). 호출 제거는 KPA 운영 콘솔 흐름 · F10 승인 엔진 kpa 분기와 얽혀 있어 **별도 정리 WO** 로 남긴다.
 
@@ -298,7 +300,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
    - item metadata: `supplyKind`, `supplyProposalId` | `eventOfferId`+`productListingId` | `sellerRecruitmentId`, `semiFranchiseKey`, `unitPrice`, `conditions`(기간 · 한도 스냅샷). `productId` = SPO id(공급자 스코프 계약).
 6. 확정된 행만 장바구니에서 삭제.
 
-`receiverKey = semi_franchises.payment_receiver_key ?? 'undetermined:' || key`. 미확정 수취 주체는 세미프랜차이즈마다 따로 묶는다(서로 같은 수취 주체인지 모르므로 합치지 않는다).
+`receiverKey = semi_franchises.payment_receiver_key ?? 'undetermined:' || key`. 미확정 수취 주체는 약국 협력사업마다 따로 묶는다(서로 같은 수취 주체인지 모르므로 합치지 않는다).
 
 ### 8-3. 결제 (PG 독립 · 테스트 결제)
 
@@ -326,7 +328,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 | 구분 | 대상 |
 |---|---|
 | **유지(그대로 호출)** | SPO 재고 검사 · 배송 완료 차감 · 취소 해제, `reserveEventOfferListing` · `incrementListingQuantity` · `STORE_ORDERED_QTY_SQL`, 결제 전 취소 복원, 수량 1..1000 기존 검사(D2), 공급자 가입 승인, 제품 등록 승인(운영자), 공급자 계좌 정보, `checkoutService.createOrder()` |
-| **대체(Neture 약국 흐름의 판정 근거 교체)** | 매장 기본 게이트(`kpa` 키) → 내 매장(약국) 신청 원장 · 상품 노출 판정(PUBLIC/SERVICE/PRIVATE · OSA kpa-society · `allowed_seller_ids`) → §4 · 모집 참여 사용자 → 조직 · 커뮤니티 별도 가입 → 세미프랜차이즈 가입 상태 · 이벤트 운영 조직 LIMIT 1 → 세미프랜차이즈 운영 조직 |
+| **대체(Neture 약국 흐름의 판정 근거 교체)** | 매장 기본 게이트(`kpa` 키) → 내 매장(약국) 신청 원장 · 상품 노출 판정(PUBLIC/SERVICE/PRIVATE · OSA kpa-society · `allowed_seller_ids`) → §4 · 모집 참여 사용자 → 조직 · 커뮤니티 별도 가입 → 약국 협력사업 가입 상태 · 이벤트 운영 조직 LIMIT 1 → 약국 협력사업 운영 조직 |
 | **수정(결함)** | 공급처 미지정 제품 승인 불가 · 이벤트 재신청 불가 · visibility 승인 우회 · 공급자 목록 service_key 고정 · 장바구니 이벤트 주문 한도 집계 누락(D3 — `productListingId` 연결, 기준은 사용자 유지) · 결제 대응 · 금액 · 멱등 결함(Neture 약국 결제 경로) |
 | **제거(약국 문맥만)** | web-store 약국 HUB 메뉴 · 진입 · apply 주문 전제, `/store/enrollment` 의 `kpa`, KPA 회원 승인 시 매장 프로비저닝 |
 | **이번 범위에서 미변경(다른 흐름 · 퇴역 작업 소관)** | OSA · OSP · `product_approvals` · PUBLIC 자동 확산 · `allowed_seller_ids` · KPA/KCos/PH 결제 컨트롤러 3벌 · `/hub/*` 라우트 · 서비스 앱 `/store-hub` · `/api/v1/hub/contents`. K-Cosmetics 전용 부분의 제거는 퇴역 작업(§14) |
@@ -341,13 +343,13 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 | F8 §7 Checkout Guard | Neture 약국 주문은 §4 판정 + 별도 확정 서비스(`neture_pharmacy_cart`). 기존 3개 strategy 는 무변경 |
 | B2B-ORDER-CONTRACT §13-2 (strategy 가 유일한 서비스 분기점) | Neture 약국 축은 strategy 대신 §4 SSOT 모듈을 쓴다 |
 | F3 Store Layer | `isStoreOwner` 의 `kpa` 키 판정만 교체. 공통 Core 패키지 Public API 무변경 |
-| ROLE-WORKSPACE §5 (커뮤니티 policy 2종) | 세미프랜차이즈 커뮤니티 판정 추가 |
+| ROLE-WORKSPACE §5 (커뮤니티 policy 2종) | 약국 협력사업 커뮤니티 판정 추가 |
 
 ---
 
 ## 11. 대기 · 사용자 결정 항목
 
-- **D1 결제 수취 주체 · 실제 PG**: 미확정. 구조(`payment_receiver_key` · receiver 단위 결제 묶음)와 테스트 결제만 구현. 세미프랜차이즈 운영자를 수취 주체로 간주하지 않는다. 실제 PG 연결은 대기.
+- **D1 결제 수취 주체 · 실제 PG**: 미확정. 구조(`payment_receiver_key` · receiver 단위 결제 묶음)와 테스트 결제만 구현. 약국 협력사업 운영자를 수취 주체로 간주하지 않는다. 실제 PG 연결은 대기.
 - **D2 수량 1..1000**: 기존 검사 유지(결정 완료 — 대기 항목 아님).
 - **D3 이벤트 한도 기준**: 사용자 기준 유지(결정 완료). 장바구니 주문 집계 누락만 참조 키 연결로 수정.
 - production 에서 테스트 결제를 켜려면 `NETURE_PHARMACY_PAYMENT_MODE=test` env 설정이 필요하다(인프라 변경 = 사용자 승인).
@@ -383,7 +385,7 @@ API: `GET /api/v1/neture/pharmacy/store/supply-options?source=&q=&page=` · `GET
 | 약국 조직(= 내 매장) 생성 · owner 관계 · 재신청 시 표시 정보 갱신 | `services/pharmacy-store-link.ts` `createPharmacyStoreOrganization` · `updatePharmacyStoreProfile` | **Store** | 계약 함수(아래) |
 | 약국 업무 영역 enrollment(`kpa-society`) · 매장 공개 주소 slug(`kpa`) 연결 · 해제 | `pharmacy-store-link.ts` `activatePharmacyStore` · `deactivatePharmacyStore` | **Store** | 계약 함수(아래) |
 | 매장 접근 판정 · 매장 목록 | `utils/store-organization.resolver.ts`(`kpa` 후보) · `utils/store-owner.utils.ts` · `utils/service-tenant.resolver.ts`(`accessible-stores`) | **Store** | 원장 `status='active'` 를 읽는다 |
-| 세미프랜차이즈 가입 · 공급 제안 · 이벤트 · 모집 · 장바구니 · 주문 · 결제 · 커뮤니티 접근 | 나머지 services · 라우트 · 화면 | **Store/Commerce** | 유지 |
+| 약국 협력사업 가입 · 공급 제안 · 이벤트 · 모집 · 장바구니 · 주문 · 결제 · 커뮤니티 접근 | 나머지 services · 라우트 · 화면 | **Store/Commerce** | 유지 |
 
 **Store 가 제공하는 계약 (`pharmacy-store-link.ts`)**
 
@@ -411,14 +413,14 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 ## 15. 콘텐츠 자료함 · 미완료 범위
 
-### 15-1. 세미프랜차이즈 콘텐츠 자료함 (TODO 3-3 — 구현 완료)
+### 15-1. 약국 협력사업 콘텐츠 자료함 (TODO 3-3 — 구현 완료)
 
-- 원장 `semi_franchise_contents`(같은 migration): 세미프랜차이즈 담당 운영자가 작성 · 게시(draft → published ↔ archived). 공통 콘텐츠 Core(`cms_contents` · `/api/v1/hub/contents`, F4 · F5)는 바꾸지 않았다 — `cms_contents` 는 serviceKey 공개 조회 경로가 있어 가입 약국 한정 콘텐츠를 담을 수 없다.
-- 열람 · 사본 판정: 콘텐츠 published ∧ 세미프랜차이즈 active ∧ **약국 조직의 해당 세미프랜차이즈 가입 active**(§4 와 같은 가입 기준). 볼 수 없으면 404(존재 비노출). 정지 · 종료 · 미가입 즉시 차단.
+- 원장 `semi_franchise_contents`(같은 migration): 약국 협력사업 담당 운영자가 작성 · 게시(draft → published ↔ archived). 공통 콘텐츠 Core(`cms_contents` · `/api/v1/hub/contents`, F4 · F5)는 바꾸지 않았다 — `cms_contents` 는 serviceKey 공개 조회 경로가 있어 가입 약국 한정 콘텐츠를 담을 수 없다.
+- 열람 · 사본 판정: 콘텐츠 published ∧ 약국 협력사업 active ∧ **약국 조직의 해당 약국 협력사업 가입 active**(§4 와 같은 가입 기준). 볼 수 없으면 404(존재 비노출). 정지 · 종료 · 미가입 즉시 차단.
 - 사본: 기존 공개 API `AssetCopyService.copyResolved()` → `o4o_asset_snapshots(asset_type='content', source_service='semi-franchise')`. 사본은 매장 소유 독립 사본 — 원본 수정 · 보관이 사본에 전파되지 않는다. 이후 편집 · 채널 게시는 기존 매장 자료함 경로 그대로.
-- 출처별 자료함: 매장 자료함 피드 source `franchise` 추가(`store-library-feed.controller.ts`) — 전체 · 운영자 제공 · 커뮤니티 가져옴 · **세미프랜차이즈** · 내가 만든 콘텐츠. 공급자 공개 자료는 내 매장 `/store/library/supplier-library`에서 직접 열람한다.
+- 출처별 자료함: 매장 자료함 피드 source `franchise` 추가(`store-library-feed.controller.ts`) — 전체 · 운영자 제공 · 커뮤니티 가져옴 · **약국 협력사업** · 내가 만든 콘텐츠. 공급자 공개 자료는 내 매장 `/store/library/supplier-library`에서 직접 열람한다.
 - API: 약국 `GET /api/v1/neture/pharmacy/store/contents(?sf,q)` · `GET …/:id` · `POST …/:id/copy` / 담당 운영자 `GET|POST /api/v1/neture/operator/semi-franchises/:key/contents` · `GET|PATCH …/:id` · `POST …/:id/{publish|archive}`.
-- 화면: web-store `/store/pharmacy/contents`(이용 가능 콘텐츠) · 매장 자료함 "세미프랜차이즈" 탭 / pharmacy.neture.co.kr 담당 사업 운영의 "콘텐츠" 탭 · 작성 · 수정.
+- 화면: web-store `/store/pharmacy/contents`(이용 가능 콘텐츠) · 매장 자료함 "약국 협력사업" 탭 / pharmacy.neture.co.kr 담당 사업 운영의 "콘텐츠" 탭 · 작성 · 수정.
 - 검증: 통합 테스트(게시 전 비노출 · 가입 약국만 · 사본 독립성 · 보관 · 정지 차단) + 로컬 브라우저(운영자 작성 · 게시 → 약국 목록 · 사본 → 자료함 탭) — CHECK 문서.
 
 ### 15-2. 현재 구현과 운영 대기 (2026-10-08)
@@ -438,7 +440,7 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 
 | 구분 | 항목 |
 |---|---|
-| **이 PR 에서 완료** (코드 · 테스트 · 로컬 검증) | 내 매장(약국) 신청 · 세미프랜차이즈 · 공급 제안 · 이벤트 · 모집 · 장바구니(조직 단위) · 주문 · 테스트 결제 · 공급자 처리 · 콘텐츠 자료함(§15-1) · 커뮤니티 접근 판정 · PH 신규 가입 은퇴 · PH commerce 화면 이전 · QR 착지 이전 준비(§16-2) · 리다이렉트 구현안(§16-7) |
+| **이 PR 에서 완료** (코드 · 테스트 · 로컬 검증) | 내 매장(약국) 신청 · 약국 협력사업 · 공급 제안 · 이벤트 · 모집 · 장바구니(조직 단위) · 주문 · 테스트 결제 · 공급자 처리 · 콘텐츠 자료함(§15-1) · 커뮤니티 접근 판정 · PH 신규 가입 은퇴 · PH commerce 화면 이전 · QR 착지 이전 준비(§16-2) · 리다이렉트 구현안(§16-7) |
 | **운영 적용 대기** (사용자 승인) | main 통합 · migration · 배포 · `NETURE_PHARMACY_PAYMENT_MODE=test` · 운영 검증 · 테스트 데이터 초기화(§12) · QR link 4행 처리(§16-3 A) · 실제 PG(D1) |
 | **결정 완료 (2026-10-06)** | PH opt-in 은 새로 만들지 않음 · 신규 시작 종료(§16-5) · 이용 안내 → 기존 `/guide/*`, 소식 → 홈 공지, PH 안내 문구 관리 폐지(§16-6) |
 | **다른 트랙 인계** | 커뮤니티 게시판 → 공통 Forum 트랙(`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`) · KPA 매장 생성 코드 제거 → 인증 · 가입 트랙(`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1` §4) · 리다이렉트 적용 · PH 인프라 정리 → 웹 서비스 정비 트랙(§16-4 · §16-7) |
@@ -517,7 +519,7 @@ UPDATE store_qr_codes SET landing_target_id = 'https://pharmacy.neture.co.kr/', 
 | 현재 기능 | 공급자가 자기 제품(SPO)마다 PH 공급을 켜고 끈다. 켜면 `supplier_product_offers.service_keys` 에 `pharmacy-hub` 추가 + 선택적 서비스 단가 `offer_service_prices`. **운영자 승인 없이** PH 매장 진열에 즉시 노출(노출 게이트가 `approval_status` 를 보지 않음). 주문은 PH 장바구니 → `checkout_orders(source=pharmacy_hub_cart)` → bridge `neture_orders(service_key='pharmacy-hub')` → 공급자 처리(수락 · 발송) |
 | 화면 · API | web-neture 공급자 "서비스 제공 설정" `/supplier/services/pharmacy-hub` · API `/neture/supplier/services/:serviceKey/products · orders` (`SUPPLIER_OPTIN_SERVICE_KEYS=['pharmacy-hub']` 만 허용) |
 | 이용 대상 | 공급자(설정 · 주문 처리) → PH 약국(진열 · 주문). PH 운영자 개입 없음 |
-| Neture 대체 가능 여부 | **배송 · 주문 처리는 대체됨**(같은 공급자 배송 정책 · bridge · 공통 공급자 주문 목록). **노출 방식은 대체 안 됨**: 기본 공급은 운영자 제품 승인 + `service_keys` 빈 제품 + 일반가, 공급 제안은 공급자 단가 지정이 되지만 세미프랜차이즈 담당 운영자 승인이 필요. "공급자 혼자 켜는 즉시 노출 · 서비스 단가" 는 없다 |
+| Neture 대체 가능 여부 | **배송 · 주문 처리는 대체됨**(같은 공급자 배송 정책 · bridge · 공통 공급자 주문 목록). **노출 방식은 대체 안 됨**: 기본 공급은 운영자 제품 승인 + `service_keys` 빈 제품 + 일반가, 공급 제안은 공급자 단가 지정이 되지만 약국 협력사업 담당 운영자 승인이 필요. "공급자 혼자 켜는 즉시 노출 · 서비스 단가" 는 없다 |
 | 주의 | opt-in 제품은 `service_keys` 가 비어 있지 않아 Neture 기본 공급에 안 보인다. PH 은퇴 때 `pharmacy-hub` 키를 지우면 APPROVED · 다른 키 없는 제품이 **기본 공급으로 새로 노출**될 수 있다 — 대상 제품 확인 후 정리 |
 
 **권장**: 공급자 자가 노출은 Neture 약국 모델(운영자 승인 기반)과 맞지 않으므로 **새로 만들지 않는다**. 서비스 단가가 필요한 제품은 공급 제안(공급자 단가 + 담당 운영자 승인), 일반가면 기본 공급(제품 등록 승인)으로 안내한다. 필요한 변경: 공급자 "서비스 제공 설정" 화면에 Neture 약국 경로 안내 · PH 은퇴 시점에 opt-in 메뉴 숨김 · 진행 중 PH 주문 처리 경로 유지. 데이터 정리(`service_keys` 의 `pharmacy-hub` · `offer_service_prices`)는 PH 주문 종료 후 영향 제품 목록(dry-run)으로.
@@ -623,8 +625,8 @@ pathRules:
 
 ### 17-2. pharmacy.neture.co.kr 이용 자격
 
-- 판정: **같은 약국 조직에서 내 매장(약국) 신청 active ∧ pharmacy 세미프랜차이즈 가입 active**, 사용자는 그 조직 owner/admin/manager(`left_at IS NULL`). SSOT = `modules/neture-pharmacy/services/semi-franchise-service-access.ts`. 카탈로그 `semiFranchiseAccessKey`(kpa-society → `pharmacy`) 로 대상 서비스를 정한다.
+- 판정: **같은 약국 조직에서 내 매장(약국) 신청 active ∧ pharmacy 약국 협력사업 가입 active**, 사용자는 그 조직 owner/admin/manager(`left_at IS NULL`). SSOT = `modules/neture-pharmacy/services/semi-franchise-service-access.ts`. 카탈로그 `semiFranchiseAccessKey`(kpa-society → `pharmacy`) 로 대상 서비스를 정한다.
 - 적용 지점(같은 판정): 이메일 · Google 직접 로그인 · handoff 발급 · handoff 교환 · 화면 게이트(`MembershipGate` → `GET /neture/pharmacy/service-access/:serviceKey`).
-- kpa-society `service_memberships` 가 active 이면 기존 경로 그대로(세미프랜차이즈 조회 0). 기존 kpa-society 가입 · `kpa:store_owner` 를 Neture 자격으로 **재해석하지 않는다**. 판정은 membership · role 을 만들지 않는다(읽기만).
+- kpa-society `service_memberships` 가 active 이면 기존 경로 그대로(약국 협력사업 조회 0). 기존 kpa-society 가입 · `kpa:store_owner` 를 Neture 자격으로 **재해석하지 않는다**. 판정은 membership · role 을 만들지 않는다(읽기만).
 - 미충족은 상태별 `next`(`apply_pharmacy` · `pharmacy_pending` · `pharmacy_suspended` · `apply_semi_franchise` · `semi_franchise_pending` · `semi_franchise_suspended`) + 안내 문구 + 신청 링크(store.neture.co.kr `/start-pharmacy` · `/store/pharmacy/semi-franchises`, 정지는 링크 없음).
 - 포럼은 사업 서비스 가입과 구분한다. 옛 pharmacy `/forum/*`는 community의 독립 약사 커뮤니티로 연결하며, 사업 회원 포럼은 별도 community_key와 해당 사업 가입을 검사한다(§7).

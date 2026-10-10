@@ -21,6 +21,11 @@ vi.mock('../../components/auth/ServiceApplyPanel', () => ({
 }));
 vi.mock('../../api/trial', () => ({ getTrials: vi.fn(async () => []), getMyParticipations: vi.fn(async () => []) }));
 
+vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: { data: { communities: [
+  { communityKey: 'pharmacy', name: '약사 커뮤니티', kind: 'independent', allowed: false },
+  { communityKey: 'business', name: '사업 회원 게시판', kind: 'semi-franchise', allowed: true },
+] } } })) } }));
+
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
 import { MarketTrialHubPage } from '../market-trial/MarketTrialHubPage';
@@ -56,10 +61,11 @@ describe('supplier `/`', () => {
 });
 
 describe('community `/`', () => {
-  it('확정 Hero 문구 · 주 CTA = 독립 약사 커뮤니티', () => {
+  it('서비스 소개 없이 독립 커뮤니티 목록으로 시작하고 사업 게시판을 섞지 않는다', async () => {
     renderAt(<CommunityHostHomePage />);
-    expect(h1Text()).toBe('현장의 경험과 정보를함께 나눕니다');
-    expect(screen.getByTestId('community-hero-primary').getAttribute('href')).toBe('/communities/pharmacy/forum');
+    expect(h1Text()).toBe('커뮤니티 · 단체활동');
+    expect((await screen.findByRole('link', { name: /약사 커뮤니티/ })).getAttribute('href')).toBe('/communities/pharmacy/forum');
+    expect(screen.queryByText('사업 회원 게시판')).toBeNull();
   });
 });
 

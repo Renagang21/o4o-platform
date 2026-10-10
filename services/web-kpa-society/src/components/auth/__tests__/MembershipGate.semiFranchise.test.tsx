@@ -64,7 +64,7 @@ describe('MembershipGate — 세미프랜차이즈 자격', () => {
     get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', next: 'apply_semi_franchise', message: '세미프랜차이즈 가입을 신청해 주세요.' }));
     renderGate();
     expect(await screen.findByText('세미프랜차이즈 가입을 신청해 주세요.')).toBeTruthy();
-    expect(screen.getByRole('button', { name: '세미프랜차이즈 가입 신청' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '약국 협력사업 참여 신청' })).toBeTruthy();
     expect(screen.queryByText('보호된 화면')).toBeNull();
   });
 
@@ -111,8 +111,8 @@ describe('semiFranchiseAccess helper', () => {
   it.each([
     ['apply_pharmacy', 'https://store.neture.co.kr/start-pharmacy'],
     ['pharmacy_pending', 'https://store.neture.co.kr/start-pharmacy'],
-    ['apply_semi_franchise', 'https://store.neture.co.kr/store/pharmacy/semi-franchises'],
-    ['semi_franchise_pending', 'https://store.neture.co.kr/store/pharmacy/semi-franchises'],
+    ['apply_semi_franchise', '/businesses/pharmacy/participation'],
+    ['semi_franchise_pending', '/businesses/pharmacy/participation'],
   ])('%s → %s', (next, href) => {
     expect(semiFranchiseAccessLink(next)?.href).toBe(href);
   });

@@ -20,3 +20,6 @@ export * from './rbac.js';
 
 // React hooks
 export * from './hooks.js';
+
+export { exchangeHandoffToken } from './exchangeHandoffToken.js';
+export * from './social-redirect.js';

@@ -11,7 +11,7 @@ import { readReturnTo } from '../lib/returnTo';
  * Google authorized origin 에 이 앱의 origin 이 등록돼 있어야 Google 버튼이 동작한다(외부 콘솔 · 사용자 승인 항목).
  */
 export default function LoginPage() {
-  const { isAuthenticated, loginWithEmail, loginWithGoogle, signupWithGoogle } = useAuth();
+  const { isAuthenticated, loginWithEmail, loginWithGoogle, signupWithGoogle, loginWithKakao, signupWithKakao } = useAuth();
   const navigate = useNavigate();
   // 원래 경로 보존(§21-14) — 같은 앱 경로만
   const next = readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home;
@@ -23,7 +23,8 @@ export default function LoginPage() {
       loginWithEmail={loginWithEmail}
       api={authClient}
       onSuccess={() => navigate(next, { replace: true })}
-      google={{
+      kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: next }}
+          google={{
         getConfig: () => authClient.getGoogleAuthConfig(),
         loginWithGoogle,
         signupWithGoogle,

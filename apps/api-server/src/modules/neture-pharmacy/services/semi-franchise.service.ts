@@ -53,7 +53,7 @@ export class SemiFranchiseService {
 
   /** 운영 중인 세미프랜차이즈 목록 + 이 약국의 가입 상태 */
   async listForPharmacy(organizationId: string) {
-    return this.dataSource.query(
+    const rows = await this.dataSource.query<Array<{ key: string; communityKey: string | null; [field: string]: unknown }>>(
       `SELECT sf.key, sf.name, sf.community_key AS "communityKey", (SELECT metadata->>'registrationConditions' FROM organizations WHERE id = sf.organization_id) AS "registrationConditions",
               sfm.id AS "membershipId", sfm.status AS "membershipStatus", sfm.reason, sfm.applied_at AS "appliedAt",
               sfm.decided_at AS "decidedAt"
@@ -64,6 +64,7 @@ export class SemiFranchiseService {
         ORDER BY (sf.key = 'pharmacy') DESC, sf.name, sf.key`,
       [organizationId],
     );
+    return rows.map(row => ({ ...row, communityKey: row.communityKey || `business:${row.key}` }));
   }
 
   async apply(organizationId: string, userId: string, key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}) {

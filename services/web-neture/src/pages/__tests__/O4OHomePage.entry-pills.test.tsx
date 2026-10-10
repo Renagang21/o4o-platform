@@ -19,6 +19,7 @@ const auth = {
   isAuthenticated: false,
   isLoading: false,
   logout: vi.fn(),
+  pendingPolicyAcceptances: [] as unknown[],
 };
 const openLoginModal = vi.fn();
 const openRegisterModal = vi.fn();
@@ -57,7 +58,7 @@ const linksOf = (navName: string) =>
 const before = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
 beforeEach(() => {
-  Object.assign(auth, { user: null, isAuthenticated: false, isLoading: false });
+  Object.assign(auth, { user: null, isAuthenticated: false, isLoading: false, pendingPolicyAcceptances: [] });
   openLoginModal.mockClear();
   openRegisterModal.mockClear();
   try {
@@ -191,4 +192,14 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
     fireEvent.click(screen.getByTestId('automation-intro-dismiss'));
     expect(screen.queryByTestId('automation-intro')).toBeNull();
   });
+});
+
+ it("약관 미동의 로그인 사용자는 공개 홈으로 돌아오며 개인 업무·AI를 실행하지 않는다", () => {
+  Object.assign(auth, { user: { id: "synthetic", name: "샘플", email: "sample@example.test", roles: [] }, isAuthenticated: true, pendingPolicyAcceptances: [{}] });
+  mount();
+  expect(screen.getByRole("navigation", { name: "주요 서비스" })).toBeTruthy();
+  expect(screen.queryByTestId("entry-panel")).toBeNull();
+  expect(screen.queryByTestId("home-composer")).toBeNull();
+  expect(screen.queryByTestId("home-google-start")).toBeNull();
+  expect(screen.getByRole("link", { name: "약관 동의하기" }).getAttribute("href")).toBe("/mypage");
 });

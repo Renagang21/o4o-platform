@@ -48,10 +48,10 @@ describe('browser logout and refresh HTTP contract', () => {
     expect([res.statusCode, res.body.code, res.body.retryable]).toEqual([503, 'AUTH_SERVICE_UNAVAILABLE', true]);
     expect(clearAuthCookies).not.toHaveBeenCalled();
   });
-  it('a revoked refresh is nonretryable and clears cookies', async () => {
-    refreshTokens.mockRejectedValueOnce(Object.assign(new Error('ended'), { code: 'SERVICE_SESSION_REVOKED' })); const res = mockHandoffRes();
+  it.each(['SERVICE_SESSION_REVOKED', 'GOOGLE_SESSION_REQUIRED'])('%s refresh rejection is nonretryable and clears cookies', async (code) => {
+    refreshTokens.mockRejectedValueOnce(Object.assign(new Error('ended'), { code })); const res = mockHandoffRes();
     await AuthSessionController.refresh(req({ refreshToken: 'fixture-refresh' }), res);
-    expect([res.statusCode, res.body.code, res.body.retryable]).toEqual([401, 'SERVICE_SESSION_REVOKED', false]);
+    expect([res.statusCode, res.body.code, res.body.retryable]).toEqual([401, code, false]);
     expect(clearAuthCookies).toHaveBeenCalled();
   });
   it('an explicit bearer-client refresh wins over an unrelated legacy cookie', async () => {

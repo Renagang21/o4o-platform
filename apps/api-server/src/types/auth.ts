@@ -133,11 +133,10 @@ export type TokenType = 'user' | 'service' | 'guest';
 /**
  * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 — 세션을 **어떤 수단으로** 발급했는가.
  *
- * 비밀번호 세션에만 `'password'` 를 싣는다. claim 이 없으면 Google(또는 이 WO 이전) 세션이다.
- * 관리자 경계의 판정 축이다: 비밀번호 세션은 `platform:*` 역할 경로에서 서버가 거절한다
- * (`authentication.middleware.ts` 의 enforcePasswordSessionBoundary). 화면 숨김이 아니다.
+ * WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1: 검증한 로그인 수단을 명시한다.
+ * 전체관리자 경계는 정확히 'google' 인 세션만 허용한다. 누락/미지 값은 Google 증거가 아니다.
  */
-export type SessionAuthMethod = 'password';
+export type SessionAuthMethod = 'google' | 'password' | 'kakao';
 
 export interface AccessTokenPayload {
   /** Browser session identity; absent legacy tokens require re-login. */

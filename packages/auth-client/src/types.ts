@@ -139,3 +139,13 @@ export const GOOGLE_SIGNUP_REQUIRED_CODE = 'GOOGLE_SIGNUP_REQUIRED';
 
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
 //   GoogleLinkStatus / GoogleLinkResult 는 은퇴했다(명시 연결 경로와 함께).
+
+/** Kakao tickets never represent a session; only a returned user/session can be adopted. */
+export type SocialProvider = 'google' | 'kakao';
+export interface SocialProof { token: string; idToken?: string; code?: string }
+export interface SocialGrant { token: string; nonce?: string; authorizationUrl?: string; provider?: SocialProvider }
+export interface KakaoSignupRequest { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean } }
+export interface KakaoAuthResponse extends GoogleAuthResponse {
+  nextStep?: 'signup' | 'verify-email'; signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
+}
+export interface SocialAccountsStatus { providers: SocialProvider[]; hasPassword: boolean; canManage: boolean; googleEnabled: boolean; kakaoEnabled: boolean }

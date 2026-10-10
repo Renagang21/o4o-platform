@@ -76,6 +76,9 @@ export type MigrationClass = new () => MigrationInterface;
 /** Append only. Order must match ascending epoch. */
 import { RepairCanonicalDemoExperience1791501198171 } from '../migrations/1791501198171-RepairCanonicalDemoExperience.js';
 import { CreateBrowserSessionRevocations1791509600000 } from '../migrations/1791509600000-CreateBrowserSessionRevocations.js';
+import { AllowKakaoHandoffAuthMethod1791527589096 } from '../migrations/1791527589096-AllowKakaoHandoffAuthMethod.js';
+
+import { CreateSocialAuthFlows1791592932097 } from '../migrations/1791592932097-CreateSocialAuthFlows.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -97,6 +100,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AlignSellerRecruitmentApplicationIdentity1791477914134,
   RepairCanonicalDemoExperience1791501198171,
   CreateBrowserSessionRevocations1791509600000,
+  AllowKakaoHandoffAuthMethod1791527589096,
+  CreateSocialAuthFlows1791592932097,
 ];
 
 export function incrementalMigrationNames(): string[] {

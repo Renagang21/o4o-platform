@@ -1,0 +1,70 @@
+# CHECK-O4O-MAIN-RETURN-NAVIGATION-V1
+
+> **상태**: ACTIVE
+> **작성일**: 2026-10-09 · **최종 갱신**: 2026-10-09
+> **근거**: 사용자 직접 요청 — 각 서비스의 O4O 메인 복귀 경로 정비
+
+## 변경
+
+- 분회 서비스: 로그인·가입 신청·내 분회·서비스 관리 독립 화면, 분회 없음·도메인 해석 실패, 인증 인계 실패에 메인 복귀 제공.
+- Neture: 이메일 가입·확인·아이디/비밀번호 찾기·재설정 공통 카드, 서비스 진입 실패/미가입/로그인 안내, 승인 대기, 인계 실패에 복귀 제공.
+- 강의·매장: 인계 실패의 복귀 문구 정렬, 강의 이용 자격 거절에도 복귀 제공.
+- 병원 약품 앱: 메인을 새 탭으로 열어 원래 탭의 로컬 파일 연결·업무 상태 유지. 모바일 메뉴 줄바꿈 보완.
+- 공통 약관 화면: dialog 내부에 공개 메인 복귀 링크 제공. 동의·로그아웃·업무 접근 조건은 변경하지 않음.
+
+## 인증·공통 소비처
+
+일반 로그인 상태의 복귀는 기존 `O4OHomeButton`과 `/auth/handoff`를 사용한다. 약관 미동의는 서버 `TERMS_PENDING_ALLOWLIST`에 handoff가 없으므로 공개 대표 홈 링크로 돌아간다. 동의 기록이나 토큰을 변경하지 않고, 목적지에서 로그인 상태가 유지된다고 보장하지 않는다. 인계 실패 화면도 공개 링크를 사용한다.
+
+`PolicyAcceptanceGate` 소비처 전수 확인: Neture·약국·강의·매장·은퇴 대상 Pharmacy Hub의 약관 wrapper 및 `StoreOwnerAgreementGate`. 공통 인터페이스·승낙 로직 변경 없음. Neture 대표 호스트의 `/`만 공개 홈 예외로 허용하고, 미동의 세션에서는 개인화 조회·업무 패널·AI 입력 대신 공개 서비스를 표시한다. 다른 업무 경로와 형제 서브도메인은 계속 차단한다. 은퇴 대상의 코드 삭제·기능 확장은 하지 않았다. 공통 dialog 내부 링크라 모바일·보조기술에서도 동의 화면의 일부로 탐색할 수 있다.
+
+## 검증
+
+- Neture·약국·강의·매장·분회·병원 약품 앱: tsc 및 Vite build 6개 PASS.
+- Neture: 48 files / 382 tests PASS.
+- shared-space-ui: 8 files / 85 tests PASS. 링크가 dialog 안에 있고 동의·로그아웃을 호출하지 않는 회귀 검증 포함.
+- 분회: 3 files / 34 tests PASS.
+- 병원 약품: 1 file / 20 tests PASS.
+- 강의: 2 files / 10 tests PASS. 외부 주소·제어문자·역슬래시를 거절하고 최종 이동 origin을 검증하는 8개 회귀 테스트 포함.
+- auth-react 기존 복귀 동작: 1 file / 19 tests PASS.
+- 로컬 브라우저: 병원·분회 로그인·없는 분회·Neture 가입·Neture/강의 인계 실패 × 1280/390px = 12회 PASS. 실제 복귀 클릭, 가로 넘침 없음, pageerror 0. 병원은 새 탭과 원래 업무 탭 유지 확인.
+- 강의 약관 미동의 synthetic 세션 × 1280/390px = 2회 PASS. 동의 dialog 유지, 업무 shell 미렌더, 공개 복귀 클릭, handoff·승낙 POST 0회, 넘침·pageerror 없음.
+- 자동 리뷰 P1: Neture 미동의 세션이 같은 origin의 동의 화면으로 되돌아가는 루프를 수정. 대표 공개 홈 예외와 공개 렌더링을 연결하고 `/mypage`에서 동의 화면 복귀 확인. Neture synthetic 세션 × 1280/390px = 2회 PASS, handoff·승낙 POST 0회. 총 브라우저 16회.
+- 강의 인증 인계 성공 후 이동: 제어문자 입력과 정상 내부 경로 × 1280/390px = 4회 PASS. 잘못된 경로는 홈으로, 정상 경로는 검색·앵커까지 유지하며 외부 요청 0회. Neture·분회·매장에서도 같은 두 경로를 desktop/mobile로 12회 추가 검증하여 최종 브라우저 총 32회 PASS. 분회 성공 이동은 StrictMode 개발 재실행 영향을 제외하기 위해 production preview로 확인했다.
+- API와 메인 목적지는 로컬 브라우저에서 synthetic 응답으로 통제했다. 실제 운영 계정·DB 변경·운영 배포 검증은 하지 않았다.
+
+초기 환경 검증에서 pnpm launcher의 저장소 경로 권한 문제와 선행 패키지 산출물 누락을 확인했다. 설치된 pinned 도구로 동일한 tsc/Vite 명령을 실행하고, 작업공간의 누락 산출물을 빌드하여 검증했다. 의존성·lockfile·배포 설정은 변경하지 않았다.
+
+## 범위와 문서 정합
+
+기존 일반 헤더의 `O4O 홈`은 유지한다. 이번 변경은 복귀 누락·실패 안내 보완이며 서비스명·메뉴 순서·소개 영역 제거는 별도 트랙이다. 서비스 소개는 legacy 제거 agent의 담당으로 남겼다. 기존 디자인·권한·서비스 계약 정본의 수정 사항은 없다.
+
+SonarCloud에서 기존 강의 handoff의 외부 이동 위험을 지적하여 제어문자 거절·동일 origin 검증·고정 origin 기반 URL 구성을 보완했다. 동일 취약 패턴을 Neture·분회·매장에서도 수정하고 3개 서비스의 경로 검사 회귀 테스트를 추가했다. 새로운 권한이나 인증 API를 추가하지 않았다.
+
+main 통합·운영 배포 전 기록이며 배포는 Delivery 판정과 통합 이후 검증이 필요하다.
+
+## SonarCloud 중복 후속 수정
+
+네 handoff 화면의 동일 경로 검사로 신규 코드 중복률 25.8%가 발생하여 기존 `@o4o/auth-utils`에 순수 함수 `resolveHandoffReturnTo(raw, origin)`로 통합했다. 네 서비스만 새 함수를 소비하며 기존 export·권한·API 계약은 유지한다. `codePointAt()`으로 제어문자를 검사한다. auth-utils 전체 3 files / 41 tests, 네 서비스 tsc/Vite build, 기존 인계 경로·stale token focused tests를 재검증했다. 앞선 브라우저 32회 결과는 통합 전 검증이며 이번 중복 제거 후 브라우저 재실행으로 표기하지 않는다.
+
+1차 함수 통합 뒤 SonarCloud 중복률은 14.2%로 감소했지만 기준을 넘었다. 최종 URL 조립·동일 origin 검사도 `buildHandoffDestination()`으로 통합하고, 분회 basename 유지·외부 URL 및 잘못된 basename 거절 테스트를 추가했다.
+
+최종 URL 통합 뒤 필수 CI는 통과했지만 SonarCloud 중복률 3.4%로 기준을 넘었다. 서비스별 얇은 resolver wrapper도 제거하고 공통 함수를 직접 호출한다. 중복된 서비스별 순수 경로 테스트는 공통 auth-utils의 경로·Unicode·basename·외부 주소 차단 12개 테스트로 일원화했다. auth-utils 전체 41개와 Neture stale token 3개를 재검증한다.
+
+직접 호출 후 5.1%: Neture·분회는 기존 화면 대부분이 동일한 복사본이라 새 호출도 큰 중복 블록에 포함됐다. 두 화면의 인계 수신·상태 UI를 `auth-react/HandoffEntryPage`로 통합했다. 소비처는 Neture·분회 두 곳이며 API 주소·basename·오류 문구를 주입한다. 기존 export는 유지하며 약국·강의·매장 등 다른 auth-react 소비처에는 새 컴포넌트를 적용하지 않는다. layout effect의 낡은 토큰 선제 제거·쿠키 없는 공개 fetch·토큰 저장 뒤 전체 reload를 유지했다. auth-react 전체 11 files / 149 tests, Neture stale token 3개, Neture·분회 tsc/Vite build PASS. 최종 운영 산출물로 네 서비스 desktop/mobile 인계 이동 16회 재검증한다.
+
+## 최신 main 반영 및 최종 중복·경고 수정
+
+작업 브랜치에 최신 main을 merge하고 auth-react index의 신규 export 둘을 모두 유지했다. main 통합·배포는 하지 않았다. 기존 분리된 약국 화면의 스타일 객체와도 중복되어 공통 컴포넌트 스타일을 scoped CSS로 분리했다. 읽기 전용 props와 `void exchange()`로 Sonar 경고를 수정했다. 쿠키·refresh 없는 공개 fetch는 기존 auth-client의 `exchangeHandoffToken()`에 모아 공통 수신 UI·약국·매장·강의에서 사용한다. Account의 쿠키 기반 수신은 변경하지 않는다. 약국의 상대 경로에도 동일한 안전 검사·최종 origin 조립을 적용했으며 서버 승인 거절과 신청 링크는 그대로 유지한다.
+
+인증 클라이언트 34개, auth-react 156개, auth-utils 41개, Neture 전체 383개(최신 main 반영 후), Neture stale-token 3개, 약국 경로·승인 거절 2개 테스트 PASS. Neture·분회·약국·매장·강의 tsc/Vite build PASS. 최종 브라우저는 다섯 서비스의 desktop/mobile 경로 이동 20회 및 공통 오류 UI의 CSS·복귀 링크·가로 넘침 4회를 검증한다.
+
+이전 커밋의 수동 전체 CI에서 서버 Jest 한 묶음이 실패했다. 상세 로그 저장소가 네트워크 허용 목록에 없어 실패 메시지만 확인했고 실패한 job 재실행을 요청했다. 최종 커밋의 CI와 Sonar 결과를 별도로 확인한다.
+
+약국 수신도 공통 HandoffEntryPage로 통합해 동일 receiver 복사본을 제거했다. 소비처는 Neture·분회·약국 3개다. 약국은 서버 승인 거절 메시지·신청 링크 해석을 callback으로 주입하며 기존 missing-token/network 문구와 spinner 없는 loading UI를 유지한다. 불완전한 exchange tokens 응답은 세션으로 저장하지 않는다. 약국 focused 3개 테스트로 정상 경로 차단·승인 안내·불완전 토큰 거절을 확인했다.
+
+최종 기능 커밋 `8fa9bb3f4c`의 SonarCloud Quality Gate PASS, 신규 중복률 1.1%. 다만 CI의 KPA 전체 테스트와 서버 Jest가 실패했다. KPA Store StrictMode 테스트의 auth-client mock에 새 교환 함수가 빠졌고, 서버 쿠키 경계 정적 계약은 공통화 후에도 각 화면에 URL 문자열이 직접 있어야 한다고 요구했다. mock은 실제 교환 함수를 유지하는 partial mock으로 수정했다. 정적 계약은 각 페이지→공통 receiver/transport export 연결을 검증하며 실제 transport·receiver와 모든 페이지에 credentials include가 없는지 검사한다. 서버의 쿠키 미발급 검증은 유지했다. KPA 전체 9 files / 74 tests, 해당 서버 계약 7개 PASS. 기능 코드는 추가 변경하지 않았다.
+
+## 2026-10-10 사업 서비스 공간 정비와 함께 반영 준비
+
+PR #376이 미병합이라 위 복귀 변경은 운영에 적용되지 않은 상태였다. 공통 버튼의 표시를 `O4O 메인으로`로 변경하고 약국 사업 내부 화면에도 표준 Layout/GlobalHeader를 적용한다. 사업→내 매장 이동과 구 사업 게시판→사업 서비스 이동도 인증 인계를 사용한다. 이번 범위와 로컬 검증은 [사업 참여자 공간 CHECK](CHECK-O4O-BUSINESS-PARTICIPANT-SERVICE-SPACE-V1.md)에 기록하며, main 병합·운영 반영과 혼동하지 않는다.

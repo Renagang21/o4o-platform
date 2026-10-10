@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * Auth Context
  *
@@ -128,6 +129,8 @@ interface AuthContextType {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<User>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
@@ -319,6 +322,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithGoogle: core.loginWithGoogle,
         loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
+        loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
         logout,
         checkAuth,

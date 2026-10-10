@@ -33,10 +33,10 @@ describe('주소별 사업 의미 (§2)', () => {
     expect(r).not.toContain('`kpa:*`');
   });
 
-  it('pharmacy.neture.co.kr = 약국 사업자 대상 세미프랜차이즈 운영 · role prefix kpa:*', () => {
+  it('pharmacy.neture.co.kr = 약국 사업자 대상 약국 협력사업 운영 · role prefix kpa:*', () => {
     const r = row('pharmacy.neture.co.kr');
     expect(r).toContain('약국 사업자');
-    expect(r).toContain('세미프랜차이즈');
+    expect(r).toContain('약국 협력사업');
     expect(r).toContain('`kpa-society`');
     expect(r).toContain('`kpa:*`');
   });

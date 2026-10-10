@@ -55,11 +55,11 @@ export interface HandoffTokenPayload {
 }
 
 /** handoff 원장에 남기는 인증 수단. DB CHECK(`chk_handoff_source_auth_method`)와 1:1. */
-export type HandoffAuthMethod = 'google' | 'password';
+export type HandoffAuthMethod = 'google' | 'password' | 'kakao';
 
-/** 원장 값 → 인증 수단. 'google' 로 명시된 경우만 Google, 나머지(NULL · 알 수 없는 값)는 password. */
+/** Preserve explicit methods. Legacy NULL/unknown stays restricted as password, never Google. */
 export function readHandoffAuthMethod(value: unknown): HandoffAuthMethod {
-  return value === 'google' ? 'google' : 'password';
+  return value === 'google' || value === 'kakao' ? value : 'password';
 }
 
 export type HandoffTarget =

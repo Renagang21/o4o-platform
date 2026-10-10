@@ -5,7 +5,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 기준
  *
- *   모든 O4O 사용자의 로그인 수단 = Google 하나
+ *   은퇴 당시 Google-only 경로 정리. 현행 이메일/Kakao 새 구현은 명시적 예외만 허용
  *   Google sub = external identity · users.id = internal identity
  *
  * 이 spec 은 **제거한 것들이 조용히 되살아나지 않는 것**을 고정한다. 각 항목은 IR 에서
@@ -90,8 +90,9 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/\/api\/v1\/social\//)).toEqual([]);
     });
 
-    it('Kakao / Naver 로그인 설정', () => {
-      expect(offenders(/\b(KAKAO|NAVER)_CLIENT_(ID|SECRET)\b/)).toEqual([]);
+    it('새 confidential Kakao 설정 한 곳만 허용하고 Naver/legacy 설정은 금지', () => {
+      expect(offenders(/\bKAKAO_CLIENT_(ID|SECRET)\b/).map(f => f.split(path.sep).join('/'))).toEqual(['config/kakao-identity.config.ts']);
+      expect(offenders(/\bNAVER_CLIENT_(ID|SECRET)\b/)).toEqual([]);
       expect(offenders(/socialAuthConfig/)).toEqual([]);
     });
 

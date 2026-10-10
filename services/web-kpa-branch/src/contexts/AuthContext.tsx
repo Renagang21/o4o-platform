@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * AuthContext — KPA Branch
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -37,6 +38,8 @@ interface AuthContextValue {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<BranchUser>>;
   /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<BranchUser>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<BranchUser>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<BranchUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<BranchUser>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
@@ -81,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginWithGoogle: core.loginWithGoogle,
         loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
+        loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
         logout: () => {
           void core.logout();

@@ -1,0 +1,62 @@
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { redirectToKakao, takeSocialCallback, type AuthClient, type SocialProof, type KakaoSignupRequest } from '@o4o/auth-client';
+import type { AuthLoginResult } from './types';
+export interface KakaoContinueProps<TUser = unknown> {
+  client: Pick<AuthClient, 'getKakaoAuthConfig' | 'startKakaoLogin'>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<TUser>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<TUser>>;
+  onSuccess: (user: TUser) => void;
+  onError?: (result: AuthLoginResult<TUser>) => void;
+  returnTo?: string;
+  termsHref?: string; privacyHref?: string;
+}
+export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
+  const ref = useRef(props); ref.current = props;
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [ticket, setTicket] = useState<string>();
+  const [email, setEmail] = useState(''); const [name, setName] = useState(''); const [phone, setPhone] = useState('');
+  const [terms, setTerms] = useState(false); const [privacy, setPrivacy] = useState(false); const [marketing, setMarketing] = useState(false);
+  const mounted = useRef(true); const consumed = useRef(false);
+  useEffect(() => { mounted.current = true; let cancelled = false; void ref.current.client.getKakaoAuthConfig().then(c => { if (!cancelled) setEnabled(c.enabled); }).catch(() => {}); return () => { mounted.current = false; cancelled = true; }; }, []);
+  const finish = useCallback((result: AuthLoginResult<TUser>) => {
+    if (!mounted.current) return;
+    setBusy(false);
+    if (result.success && result.user) { ref.current.onSuccess(result.user); return; }
+    if (result.nextStep === 'signup' && result.signupTicket) { setTicket(result.signupTicket); setEmail(result.email ?? ''); return; }
+    if (result.nextStep === 'verify-email') { setTicket(undefined); setMessage(result.mailSent ? '확인 메일을 보냈습니다. 이메일을 확인한 뒤 카카오로 다시 로그인해 주세요.' : '확인 메일을 보내지 못했습니다. 잠시 후 카카오로 다시 로그인해 주세요.'); return; }
+    setMessage(result.error ?? '인증을 다시 시작해 주세요.'); ref.current.onError?.(result);
+  }, []);
+  useLayoutEffect(() => {
+    if (consumed.current) return; consumed.current = true;
+    try {
+      const callback = takeSocialCallback(['kakao-login']);
+      if (!callback) return;
+      if (callback.cancelled) { setMessage('카카오 인증을 취소했습니다.'); return; }
+      setBusy(true); void ref.current.loginWithKakao(callback).then(finish);
+    } catch { setMessage('카카오 인증이 만료되었거나 올바르지 않습니다. 다시 시작해 주세요.'); }
+  }, [finish]);
+  async function start() {
+    setMessage(''); setBusy(true);
+    try { redirectToKakao(await ref.current.client.startKakaoLogin(ref.current.returnTo ?? '/'), 'kakao-login'); }
+    catch { setBusy(false); setMessage('카카오 인증을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.'); }
+  }
+  return <div data-testid="kakao-continue" style={{ display: 'grid', gap: 10 }}>
+    {enabled && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
+    {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
+    {ticket && <form onSubmit={e => { e.preventDefault(); setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing } }).then(finish); }} style={{ display: 'grid', gap: 10 }}>
+      <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>
+      <label>이메일<input type="email" autoComplete="email" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <label>이름<input autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>
+      <label>개인 휴대전화<input type="tel" autoComplete="tel" required maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></label>
+      <p>휴대전화 본인 인증은 수행하지 않습니다. 이메일 소유 확인이 필요하면 확인 메일을 보냅니다.</p>
+      <label><input type="checkbox" required checked={terms} onChange={e => setTerms(e.target.checked)} /><a href={props.termsHref ?? 'https://neture.co.kr/terms'} target="_blank" rel="noreferrer">이용약관</a> 동의 (필수)</label>
+      <label><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} /><a href={props.privacyHref ?? 'https://neture.co.kr/privacy'} target="_blank" rel="noreferrer">개인정보 처리방침</a> 동의 (필수)</label>
+      <label><input type="checkbox" checked={marketing} onChange={e => setMarketing(e.target.checked)} />마케팅 정보 수신 동의 (선택)</label>
+      <button type="submit" disabled={busy}>동의하고 계정 만들기</button>
+      <button type="button" disabled={busy} onClick={() => { setTicket(undefined); setMessage(''); }}>취소</button>
+    </form>}
+    {message && <p role="alert">{message}</p>}
+  </div>;
+}
