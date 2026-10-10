@@ -14,13 +14,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, Outlet } from 'react-router-dom';
 
 type U = { id: string; email: string; name: string; roles: string[]; memberships: { serviceKey: string; status: string }[] };
 const authState: { user: U | null } = { user: null };
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user, isLoading: false }),
+  useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user, isLoading: false, refreshAuth: async () => {} }),
 }));
 
 import { SubdomainOperatorRoute, AdminRoute, OperatorRoute } from '../RoleGuard';
@@ -67,8 +67,8 @@ function mount(at: string) {
   );
 }
 
-const sees = (at: string, id: string) => {
-  mount(at);
+const sees = async (at: string, id: string) => {
+  await act(async () => { mount(at); });
   const found = screen.queryByTestId(id) !== null;
   cleanup();
   return found;
@@ -107,20 +107,23 @@ const MATRIX: Array<[string, string[], Array<[string, string]>, Screen[]]> = [
 describe('서브도메인 운영자 화면 guard', () => {
   afterEach(() => cleanup());
 
-  it.each(MATRIX)('%s', (_label, roles, memberships, expected) => {
+  it.each(MATRIX)('%s', async (_label, roles, memberships, expected) => {
     authState.user = user(roles, memberships);
-    const opened = (Object.keys(SCREENS) as Screen[]).filter((k) => sees(...SCREENS[k]));
+    const opened: Screen[] = [];
+    for (const k of Object.keys(SCREENS) as Screen[]) {
+      if (await sees(...SCREENS[k])) opened.push(k);
+    }
     expect(opened).toEqual(expected);
   });
 
-  it('platform:super_admin 은 서브도메인 화면 세 곳을 통과한다 (백엔드 platformBypass 와 같음)', () => {
+  it('platform:super_admin 은 서브도메인 화면 세 곳을 통과한다 (백엔드 platformBypass 와 같음)', async () => {
     authState.user = user(['platform:super_admin'], []);
-    for (const k of ['governance', 'approvals', 'funding', 'community'] as const) expect(sees(...SCREENS[k])).toBe(true);
+    for (const k of ['governance', 'approvals', 'funding', 'community'] as const) expect(await sees(...SCREENS[k])).toBe(true);
   });
 
-  it('비로그인 → 로그인 화면', () => {
+  it('비로그인 → 로그인 화면', async () => {
     authState.user = null;
-    expect(sees('/admin/supplier-governance', 'login')).toBe(true);
+    expect(await sees('/admin/supplier-governance', 'login')).toBe(true);
   });
 });
 
