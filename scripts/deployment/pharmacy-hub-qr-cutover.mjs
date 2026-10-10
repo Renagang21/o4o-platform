@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { randomUUID } from 'node:crypto';
-import { prepareQrRedirect, printedQrPaths } from './pharmacy-hub-qr-redirect.mjs';
+import { prepareQrRedirect, prepareHostRetirement, printedQrPaths } from './pharmacy-hub-qr-redirect.mjs';
 
 const project = 'netureyoutube';
 const mapName = 'o4o-global-lb';
@@ -61,10 +61,52 @@ export async function verifyTargets(paths, request = fetch, signal) {
   }));
 }
 
+export async function verifyPublicData(paths, request = fetch, signal) {
+  const qrPaths = paths.filter(path => new URL(path, `https://${newHost}`).pathname.startsWith('/qr/'));
+  const qrBase = 'https://api.neture.co.kr/api/v1/kpa/qr/public';
+  const head = async url => {
+    const response = await request(url, { method: 'HEAD', redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
+    await response.body?.cancel();
+    return response;
+  };
+  if (qrPaths.length) {
+    // Old servers implement HEAD via GET and record scans. Check the slug-less
+    // namespace first: it cannot match the scan-writing /:slug handler.
+    const capability = await head(qrBase);
+    if (capability.headers.get('x-qr-read-only-head') !== '1') throw new Error('Read-only QR HEAD support is not deployed.');
+    await Promise.all(qrPaths.map(async path => {
+      const slug = new URL(path, `https://${newHost}`).pathname.slice(4);
+      const response = await head(`${qrBase}/${encodeURIComponent(decodeURIComponent(slug))}`);
+      if (response.headers.get('x-qr-read-only-head') !== '1' || response.status !== 200 || !/^application\/json(?:;|$)/i.test(response.headers.get('content-type') ?? '')) {
+        throw new Error('Read-only QR API did not resolve successful landing data.');
+      }
+    }));
+  }
+  const targets = paths.flatMap(path => {
+    const source = new URL(path, `https://${newHost}`);
+    if (!source.pathname.startsWith('/tablet/')) return [];
+    const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(decodeURIComponent(source.pathname.slice(8)))}/tablet/products`);
+    if (source.searchParams.has('tabletId')) target.searchParams.set('tabletId', source.searchParams.get('tabletId'));
+    return [target.href];
+  });
+  await Promise.all(targets.map(async target => {
+    const response = await request(target, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
+    if (response.status !== 200) {
+      await response.body?.cancel();
+      throw new Error('Public tablet API did not return HTTP 200.');
+    }
+    let payload;
+    try { payload = await response.json(); } catch { throw new Error('Public tablet API did not return JSON.'); }
+    if (payload?.success !== true || payload.data == null || typeof payload.data !== 'object') throw new Error('Public tablet API did not return successful data.');
+    // Never log public content, store identities or API error payloads.
+  }));
+}
+
 export async function verifyRedirects(paths, request = fetch, signal, rulePaths = []) {
-  await verifyTargets(paths, request, signal);
-  await Promise.all([...paths, ...rulePaths].map(async path => {
-    const target = new URL(path, `https://${newHost}`).href;
+  const checks = [...paths, ...rulePaths].map(check => typeof check === 'string' ? { path: check, target: check } : check);
+  await verifyTargets([...paths, ...checks.filter(check => check.verifyTarget).map(check => check.target)], request, signal);
+  await Promise.all(checks.map(async ({ path, target: targetPath }) => {
+    const target = new URL(targetPath, `https://${newHost}`).href;
     await Promise.all(oldHosts.map(async host => {
       const response = await request(new URL(path, `https://${host}`).href, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
       const location = response.headers.get('location');
@@ -92,19 +134,27 @@ export async function settleOperation(name, readOperation, { now = Date.now, sle
   throw error;
 }
 
-export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite }) {
+export async function loadProbes(mode, raw, file, read = readFile) {
+  if (mode === 'plan') return '';
+  return raw || (file ? await read(file, 'utf8') : '');
+}
+
+export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite, retireHost = false }) {
   const before = await read();
   validateHosts(before);
   if (!before.fingerprint) throw new Error('Live fingerprint is required.');
-  const draft = prepareQrRedirect(before);
+  const draft = retireHost ? prepareHostRetirement(before) : prepareQrRedirect(before);
   await save('before.json', before);
   await save('draft.json', draft);
   await validate(draft);
   if (mode === 'plan') return { mode, applied: false };
   if (mode !== 'apply') throw new Error('Unknown cutover mode.');
   const paths = parseProbes(probes);
-  const rulePaths = missingFamilyRuleProbes(paths);
-  await preflight?.(paths);
+  const rulePaths = [...missingFamilyRuleProbes(paths), ...(retireHost ? ['/', '/__ph_retirement_host_check__?ruleCheck=1',
+    { path: '/terms?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
+    { path: '/terms/?ruleCheck=1', target: '/policy?ruleCheck=1', verifyTarget: true },
+  ] : [])];
+  await preflight?.([...paths, ...rulePaths.filter(rule => typeof rule === 'object' && rule.verifyTarget).map(rule => rule.target)]);
   const current = await read();
   if (current.fingerprint !== before.fingerprint) throw new Error('URL map changed after inventory.');
   await beforeWrite?.();
@@ -160,8 +210,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   };
   await mkdir(output, { recursive: true, mode: 0o700 });
   const result = await runCutover({
-    mode, probes: process.env.QR_PROBE_PATHS || (process.env.PROBE_OUTPUT ? await readFile(process.env.PROBE_OUTPUT, 'utf8') : ''),
-    preflight: paths => verifyTargets(paths),
+    retireHost: process.env.RETIRE_PH_HOST === 'true',
+    mode, probes: await loadProbes(mode, process.env.QR_PROBE_PATHS, process.env.PROBE_OUTPUT),
+    preflight: async paths => { await verifyTargets(paths); await verifyPublicData(paths); },
     beforeWrite: () => {
       const deadline = Number(process.env.CUTOVER_DEADLINE_MS);
       // Bounded Compute retries/polls plus verification and rollback need at most 25 minutes.
@@ -197,7 +248,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       // Allow load balancer propagation; each probe attempt is bounded.
       const signal = AbortSignal.timeout(120000);
       for (let attempt = 0; attempt < 6; attempt++) {
-        try { await verifyRedirects(paths, fetch, signal, rulePaths); return; } catch (error) {
+        try { await verifyRedirects(paths, fetch, signal, rulePaths); await verifyPublicData(paths, fetch, signal); return; } catch (error) {
           if (attempt === 5 || signal.aborted) throw error;
           await new Promise(resolve => setTimeout(resolve, 10000));
         }
