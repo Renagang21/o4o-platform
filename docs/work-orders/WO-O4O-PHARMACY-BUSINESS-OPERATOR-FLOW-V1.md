@@ -52,3 +52,13 @@
 
 - [검증 기록](../checks/CHECK-O4O-PHARMACY-BUSINESS-OPERATOR-FLOW-V1.md): 테스트 43개, 두 서비스 빌드, desktop/mobile mock browser 및 직접 테스트 항목.
 - 근거 정본: [서비스 발견·용어](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md), [약국 사업 설계](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md). 정책·원장·API 계약 변경 없음.
+
+### 병합·배포 요청 후 추가 TODO — 2026-10-11
+
+- [x] 병합 전 CI·Codex 리뷰·main 위치 확인
+- [x] 비약국 사업의 약국 전용 자료 관리 링크와 종료 사업 게시판 링크 수정
+- [x] 두 경계 회귀 테스트 추가·45개 통과
+- [ ] 최신 HEAD CI 통과 후 PR main 병합
+- [ ] Delivery 판정·대상 서비스 배포·서빙 SHA 확인
+
+사용자가 main 병합·배포를 명시적으로 요청했다. 구현 완료와 운영 로그인 검증 완료를 구분한다.

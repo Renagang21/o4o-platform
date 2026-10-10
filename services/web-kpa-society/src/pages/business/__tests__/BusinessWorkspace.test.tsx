@@ -125,3 +125,13 @@ it('담당 운영자에게만 해당 사업의 게시판 운영과 자료 관리
   expect(within(await screen.findByRole('navigation', { name: '담당 사업 운영' })).getByRole('link', { name: '게시판 운영' }).getAttribute('href')).toBe('/community/manage');
   expect(screen.getByRole('link', { name: '사업 자료 관리' }).getAttribute('href')).toBe('/operator/semi-franchises?key=pharmacy&tab=contents');
 });
+
+it('비약국 담당 사업에 약국 전용 자료 관리 링크를 노출하지 않는다', async () => {
+  mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access')
+    ? { ...access, businessKey: 'other', allowed: true, canManage: true }
+    : { ...business, key: 'other', communityKey: 'business:other' }));
+  mount('/businesses/other/forum');
+  const nav = await screen.findByRole('navigation', { name: '담당 사업 운영' });
+  expect(within(nav).getByRole('link', { name: '게시판 운영' }).getAttribute('href')).toBe('/businesses/other/forum/manage');
+  expect(within(nav).queryByRole('link', { name: '사업 자료 관리' })).toBeNull();
+});

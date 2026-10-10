@@ -18,3 +18,11 @@ it.each([false, true])('서비스별 게시판 주소를 사용하며 약국 사
   expect(screen.getByRole('heading', { name: '담당 약국 협력사업' })).toBeTruthy();
   expect(screen.queryByRole('option', { name: /다른 사업/ }) !== null).toBe(!pharmacy);
 });
+
+it('종료된 담당 사업에 접근 불가 게시판 링크를 제공하지 않는다', async () => {
+  vi.spyOn(api, 'listAssignedSemiFranchises').mockResolvedValue([{ ...businesses[0], status: 'closed' }]);
+  vi.spyOn(api, 'listSfMemberships').mockResolvedValue([]);
+  render(<MemoryRouter><OperatorSemiFranchisePage /></MemoryRouter>);
+  await screen.findByRole('heading', { name: '담당 약국 협력사업' });
+  expect(screen.queryByRole('link', { name: '참여자 게시판' })).toBeNull();
+});
