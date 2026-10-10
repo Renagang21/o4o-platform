@@ -161,7 +161,7 @@ API/migration/IAM 변경 없이 전체관리자 및 웹 5개를 정상 Promote�
 - [x] signup transaction에서 현재 게시/type/service/version 확인 후 acceptance에 hash·시각 저장. 문서 row lock을 유지하며 실패 시 계정·provider/password·카카오 일회 grant를 함께 rollback. 기존 operator 초대의 `createGoogleUser`는 공개 가입과 별도 계약 유지.
 - [x] 약관 로딩/오류/10초 제한/읽기 재시도 및 동의 비활성화; 버전 변경 시 재조회·재동의, 입력값 보존. 내용 링크와 체크박스 분리, 새 창 표시.
 - [x] API 단위/격리 PostgreSQL·공통 React/client·실제 로컬 웹 build PC/mobile 검증. 상세 수치·최초 fixture 정정은 CHECK 참조.
-- [ ] 최신 PR head의 required CI/review 및 사용자 승인 후 main 통합·API/웹 배포. 기존 웹은 새 필수 termsPolicy를 보내지 않으므로 API/웹 연속 배포가 필요하며, 전환 중 구 웹의 가입은 fail-closed다.
+- [x] 최신 PR head의 required CI/review 및 사용자 승인 후 main 통합·API/웹 배포. 기존 웹은 새 필수 termsPolicy를 보내지 않으므로 API/웹 연속 배포가 필요하며, 전환 중 구 웹의 가입은 fail-closed다.
 - [ ] 배포 후 유지 8개 origin × PC/mobile regression 및 실제 소유자 가입/로그인/연결/취소. 합성 API/provider 검증을 실제 OAuth 완료로 계산하지 않음.
 - [ ] 실제 사용자 추가 정보 제출 후 이동 원인의 운영 재검증. 원자 저장 누락 수정만으로 사용자 사례 해결을 확정하지 않음.
 - [ ] 승인된 새 약관/개인정보 처리방침 본문 및 버전 게시; 이전 정책 내용 정리안 검토.
@@ -169,3 +169,18 @@ API/migration/IAM 변경 없이 전체관리자 및 웹 5개를 정상 Promote�
 최신 구현 리뷰 P2 후속: 공개 client/React의 termsPolicy 및 가입 약관 loader를 필수 타입으로 정렬했다.
 직접 compiler fixture에서 정상 계약 0 오류, 누락 7건 모두 TS2741 예상 오류를 확인했다.
 소비처 타입 검사·회귀 및 새 head CI/review 후 승인된 main 통합/배포를 이어간다.
+
+
+## 2026-10-10 PR #407 배포 검증 후 TODO 정합
+
+PR #407 main `2a8b80cf24` 통합, post-merge CI/CodeQL PASS, Promote #38049884263
+API 및 웹 6개 SUCCESS. 정확한 검증 경계·실패와 재실행은 CHECK의 같은 날짜 배포 절을 따른다.
+
+- [x] 운영 게시 약관 API 9/9 확인(유지 origin 8개 + 전체관리자 거부).
+- [x] 실제 Demo 32개 PC/mobile 시나리오 수행. 최초 30/32 PASS, UI/요청 시간 초과 2건 각각 재실행 PASS. 최초 전체 실행 32/32 PASS로 표현하지 않음.
+- [x] 배포된 가입 화면 16건 및 공급자/펀딩 추가 진단. 최초 13/16 PASS; 두 도메인의 `/login` ↔ `/` 순환 발견. 합성 OAuth/가입 응답이며 실제 계정 생성 없음.
+- [ ] 공급자·펀딩 미로그인 홈과 LoginRedirect의 경로 순환 수정. callback fragment 보존·입력/동의 유지·가입 안내·Demo·logout PC/mobile 재검증. 약관 문서/version 제출은 추가 진단에서 일치함.
+- [ ] 실제 소유자 Google/Kakao 가입·로그인·명시적 연결·취소 및 추가 정보 제출 후 약관 gate 재확인.
+- [ ] 승인된 새 이용약관·개인정보 처리방침 본문과 version 게시. 기존 공개 정책 내용은 이번 변경에서 수정하지 않음.
+
+기존 동일 WO branch는 배포 검증 기록과 실제 OAuth/경로 후속 때문에 KEEP한다.

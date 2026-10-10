@@ -152,3 +152,14 @@ membership/권한 자동 생성 및 동일 이메일 자동 연결은 허용하�
 구현·격리 검증 완료와 main 통합/운영 배포/실제 OAuth 완료를 구분한다. 하위 WO/CHECK의
 수정 TODO 및 소비처 매트릭스를 따른다. 기존 기록 PR #407을 구현 범위로 확장하며 새 runtime
 범위의 통합은 required CI/review와 사용자 승인 후 진행한다. 정책 본문/버전 게시는 별도 OPEN이다.
+
+
+## 2026-10-10 PR #407 운영 배포 결과
+
+PR #407은 최신 리뷰 지적 수정·required CI 후 main `2a8b80cf24`에 통합했다.
+post-merge CI/CodeQL PASS, Promote #38049884263 API 먼저 및 웹 6개 SUCCESS.
+운영 게시 약관 API 9/9 PASS. 실제 Demo 최초 30/32 PASS 후 시간 초과 2건 각각 재실행 PASS.
+배포 가입 화면 합성 검증 최초 13/16 PASS이며 공급자·펀딩의 기존 `/login` ↔ `/` 순환을
+추가 진단 및 코드에서 확인해 후속 TODO로 추가했다. 실제 OAuth 및 새 정책 본문 게시는 OPEN.
+후속 작업은 하위 카카오 WO와 CHECK의 배포 검증 절을 따른다. 최초 실패와 실제 계정 검증의
+한계를 기록하며 이후 main의 별도 변경을 이번 배포 성공에 포함하지 않는다.
