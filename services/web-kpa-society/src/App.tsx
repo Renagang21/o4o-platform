@@ -1,3 +1,5 @@
+import PharmacyMemberHomePage from './pages/business/PharmacyMemberHomePage';
+import PharmacyLegacyRedirect, { LegacyAwareBusinessWorkspace } from './pages/business/PharmacyLegacyRedirect';
 import BusinessWorkspace from './pages/business/BusinessWorkspace';
 import BusinessParticipationPage from './pages/business/BusinessParticipationPage';
 import BusinessMaterialsPage from './pages/business/BusinessMaterialsPage';
@@ -340,9 +342,8 @@ const SERVICE_NAME = 'O4O 약국';
  * 동작:
  *   - isAuthenticated: false → true 전환 감지 (로그인 이벤트)
  *   - isKpaContextLoaded: true 대기 (fetchKpaContext 완료 확인)
- *   - getKpaPostLoginRoute() 결과가 null 이면 현재 화면 유지 (커뮤니티 철학)
- *   - 강사 / 약국 경영자 / 일반 회원은 자동 이동하지 않고 메인/커뮤니티 유지
- *     (강사 대시보드·약국 운영은 메뉴에서 직접 진입)
+ *   - 일반 회원·약국 경영자의 기본 로그인은 회원 초기화면(/)으로 이동
+ *   - 명시적 returnTo는 보존하고 내 매장 실행은 사용자가 선택한다
  */
 function PostLoginRedirect() {
   const { user, isAuthenticated, isKpaContextLoaded } = useAuth();
@@ -377,6 +378,9 @@ function PostLoginRedirect() {
     // 이미 workspace 경로에 있으면 중복 이동 금지
     if (
       location.pathname.startsWith('/businesses') ||
+      location.pathname === '/community' || location.pathname.startsWith('/community/') ||
+      location.pathname === '/materials' || location.pathname === '/tools' ||
+      location.pathname === '/my/participation' ||
       location.pathname.startsWith('/store') ||
       location.pathname.startsWith('/operator') ||
       location.pathname.startsWith('/admin')
@@ -770,8 +774,25 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<Navigate to="/businesses/pharmacy/participation" replace />} />
-          <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace /></Layout>}>
+          <Route element={<Layout serviceName={SERVICE_NAME}><BusinessWorkspace defaultBusinessKey="pharmacy" memberLayout /></Layout>}>
+            <Route path="/" element={<PharmacyMemberHomePage />} />
+            <Route path="/my/participation" element={<BusinessParticipationPage />} />
+            <Route path="/materials" element={<BusinessMaterialsPage />} />
+            <Route path="/tools" element={<BusinessToolsPage />} />
+            <Route path="/community" element={<BusinessForumBoundary />}>
+              <Route index element={<BusinessForumPage />} />
+              <Route path="posts" element={<BusinessForumPage />} />
+              <Route path="write" element={<BusinessForumPage view="write" />} />
+              <Route path="post/:slug" element={<BusinessForumPage view="post" />} />
+              <Route path="my-posts" element={<BusinessForumPage view="mine" />} />
+              <Route path="request" element={<BusinessForumManagementPage view="request" />} />
+              <Route path="owned" element={<BusinessForumManagementPage view="owned" />} />
+              <Route path="owned/:forumId/members" element={<BusinessForumManagementPage view="members" />} />
+              <Route path="manage" element={<BusinessForumManagementPage view="manage" />} />
+            </Route>
+          </Route>
+          <Route path="/businesses/pharmacy/*" element={<PharmacyLegacyRedirect />} />
+          <Route path="/businesses/:businessKey" element={<Layout serviceName={SERVICE_NAME}><LegacyAwareBusinessWorkspace /></Layout>}>
             <Route index element={<Navigate to="participation" replace />} />
             <Route path="participation" element={<BusinessParticipationPage />} />
             <Route path="materials" element={<BusinessMaterialsPage />} />
@@ -795,7 +816,6 @@ function App() {
 
           {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
           <Route path="/home/latest" element={<Layout serviceName={SERVICE_NAME}><HomeLatestPage /></Layout>} />
-          <Route path="/community" element={<Navigate to="/" replace />} />
           {/* /library/content → / 리다이렉트 (WO-KPA-CONTENT-HUB-REMOVAL-V1: /content 제거) */}
           <Route path="/library/content" element={<Navigate to="/" replace />} />
 

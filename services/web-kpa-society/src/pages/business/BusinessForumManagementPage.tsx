@@ -3,14 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ForumRequestForm, ForumOwnerDashboard, ForumOwnerMemberManagement, createCommunityForumOwnerAdapters } from '@o4o/shared-space-ui';
 import { authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
-import { businessApi, businessBase, businessError, communityApiBase } from './api';
+import { businessApi, businessPath, businessError, communityApiBase } from './api';
 
 export default function BusinessForumManagementPage({ view }: Readonly<{ view: 'request' | 'owned' | 'members' | 'manage' }>) {
   const { business, access } = useBusiness();
   const { forumId } = useParams();
   const navigate = useNavigate();
   const apiBase = communityApiBase(business.communityKey!);
-  const base = `${businessBase(business.key)}/forum`;
+  const base = businessPath(business.key, 'forum');
   const adapters = useMemo(() => createCommunityForumOwnerAdapters(authClient.api, business.communityKey!), [business.communityKey]);
   if (view === 'request') return <ForumRequestForm title="참여자 게시판 개설 신청" backTo={base} theme="blue"
     onSubmit={async payload => {

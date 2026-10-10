@@ -66,7 +66,7 @@ export default function LoginModal() {
         onLoginSuccess();
         return;
       }
-      // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
+      // WO-O4O-PHARMACY-MEMBER-HOME-V1: 회원 초기화면·운영 역할별 기본 진입
       // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
       const redirectTo = getKpaPostLoginRoute(loggedInUser);
       if (redirectTo) {

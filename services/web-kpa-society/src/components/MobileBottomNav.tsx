@@ -10,7 +10,7 @@
  * md 미만(768px 이하) 에서만 표시 (md:hidden). 웹 헤더/메뉴 구조에 영향 없음.
  *
  * 비로그인: 커뮤니티 + 로그인 버튼 (로그인 우선 노출)
- * 로그인:   커뮤니티 / 약국 경영 / 알림 / 내정보
+ * 로그인:   커뮤니티 / 알림 / 내정보
  *
  * WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
  *   '내정보' 탭 = 사용자 프로필 메뉴(bottom sheet). 사이트 nav(상단 햄버거)와 분리.
@@ -20,7 +20,7 @@
  */
 
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
-import { Home, Building2, Bell, User, LogIn } from 'lucide-react';
+import { Home, Bell, User, LogIn } from 'lucide-react';
 import {
   useNotifications,
   NotificationSheet,
@@ -51,27 +51,14 @@ const ACTIVE_COLOR = '#2563eb';
 /** KPA 배지 위치/굵기 (공통 기본값과 다른 부분만 — 기존 UX 보존). */
 const BADGE_STYLE: React.CSSProperties = { top: -6, fontWeight: 600 };
 
-// 약국 경영 active 판정: /mobile/pharmacy(compat), /pharmacy, /store-hub, /store (slug 경로 제외)
-// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §19: Store Workspace(/store/workspace · /store/services) 포함
-function isPharmacyActive(pathname: string): boolean {
-  if (pathname === '/mobile/pharmacy') return true;
-  if (pathname.startsWith('/pharmacy')) return true;
-  if (pathname.startsWith('/store-hub')) return true;
-  // /store/slug (매장 퍼블릭 페이지) 제외: /store 자체 또는 /store/dashboard 등만 포함
-  if (pathname === '/store' || pathname.startsWith('/store/')) {
-    // /store/:slug 공개 페이지 제외 — slug 라우트는 영문 소문자+하이픈 패턴
-    const afterStore = pathname.slice('/store/'.length);
-    const isSlug = afterStore.length > 0 && !afterStore.includes('/') && !/^(workspace|services|dashboard|info|marketing|commerce|analytics|my-products|library|channels|content|billing|settings|requests|qr|pop|signage)/.test(afterStore);
-    return !isSlug;
-  }
-  return false;
-}
-
 // 커뮤니티 active 판정
 function isCommunityActive(pathname: string): boolean {
   return (
     pathname.startsWith('/businesses') ||
     pathname === '/' ||
+    pathname.startsWith('/community') ||
+    pathname.startsWith('/materials') ||
+    pathname.startsWith('/my/participation') ||
     pathname.startsWith('/forum') ||
     pathname.startsWith('/resources')
   );
@@ -82,7 +69,8 @@ export function MobileBottomNav() {
   const { openLoginModal } = useAuthModal();
   const { pathname } = useLocation();
   const businessMatch = useMatch('/businesses/:businessKey/*');
-  const participantPath = `/businesses/${encodeURIComponent(businessMatch?.params.businessKey ?? 'pharmacy')}/participation`;
+  const participantPath = businessMatch && businessMatch.params.businessKey !== 'pharmacy'
+    ? `/businesses/${encodeURIComponent(businessMatch.params.businessKey!)}/participation` : '/';
   const navigate = useNavigate();
 
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
@@ -91,13 +79,6 @@ export function MobileBottomNav() {
   const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: 'kpa-society' });
 
   const isCommunity = isCommunityActive(pathname);
-  const isPharmacy = isPharmacyActive(pathname);
-
-  function handlePharmacyTab() {
-    // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: 모바일 진입점 = Store Workspace Home (동일 상위 구조)
-    if (!isPharmacy) navigate('/store/workspace');
-  }
-
   function handleNotifTab() {
     if (openSheet === 'notif') return closeSheet();
     open('notif');
@@ -120,16 +101,15 @@ export function MobileBottomNav() {
   // 비로그인: 커뮤니티 + 로그인 우선 노출
   if (!user) {
     const guestItems: MobileBottomNavItem[] = [
-      { key: 'community', label: '참여자 공간', icon: Home, to: participantPath, active: isCommunity },
+      { key: 'community', label: '커뮤니티', icon: Home, to: participantPath, active: isCommunity },
       { key: 'login', label: '로그인', icon: LogIn, onClick: openLoginModal, emphasis: true },
     ];
     return <MobileBottomNavCore items={guestItems} activeColor={ACTIVE_COLOR} />;
   }
 
-  // 로그인: 커뮤니티 / 약국 경영 / 알림 / 내정보
+  // 로그인: 커뮤니티 / 알림 / 내정보
   const items: MobileBottomNavItem[] = [
-    { key: 'community', label: '참여자 공간', icon: Home, to: participantPath, active: isCommunity },
-    { key: 'pharmacy', label: '약국 경영', icon: Building2, onClick: handlePharmacyTab, active: isPharmacy },
+    { key: 'community', label: '커뮤니티', icon: Home, to: participantPath, active: isCommunity },
     {
       key: 'notif',
       label: '알림',

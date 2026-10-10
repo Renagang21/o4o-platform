@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBusiness } from './BusinessWorkspace';
-import { businessApi, businessBase, businessError, pharmacyApiBase, type BusinessMembership } from './api';
+import { businessApi, businessPath, businessError, pharmacyApiBase, type BusinessMembership } from './api';
 
 const STATUS: Record<string, string> = { active: '참여 중', pending: '승인 대기', rejected: '신청 반려', suspended: '이용 정지', terminated: '탈퇴' };
 
@@ -56,7 +56,7 @@ export default function BusinessParticipationPage() {
       </div>}
       {!membership && !access?.canManage && <a href="https://store.neture.co.kr/start-pharmacy" className="text-blue-700">내 매장(약국) 신청 · 승인 상태 확인</a>}
       {membership && ['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <button type="button" disabled={busy} onClick={withdraw} className="mt-4 mr-4 text-red-700">{membership.membershipStatus === 'pending' ? '신청 취소' : '탈퇴'}</button>}
-      {access?.allowed && <Link to={`${businessBase(business.key)}/forum`} className="mt-4 inline-block text-blue-700">참여자 게시판 이용하기 →</Link>}
+      {access?.allowed && <Link to={businessPath(business.key, 'forum')} className="mt-4 inline-block text-blue-700">참여자 게시판 이용하기 →</Link>}
       {access?.canManage && <Link to="/operator/semi-franchises" className="ml-4 text-blue-700">사업 운영 · 가입 심사</Link>}
     </>}
   </section>;
