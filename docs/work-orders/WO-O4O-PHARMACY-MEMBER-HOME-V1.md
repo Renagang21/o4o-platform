@@ -1,6 +1,6 @@
 # 약국 경영지원 회원 초기화면 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 지시 — 프랜차이즈 가맹점 UI 조사·비교 후 초기화면 정비, TODO 작성 → 문서·코드 조사 보완 → 전체 작업·push.
 
@@ -69,7 +69,7 @@
 - [PR #414](https://github.com/Renagang21/o4o-platform/pull/414)를 제출하고 `wo/pharmacy-member-home`에 구현 커밋 `90bbd331f9f894d16742b430004f4719e8174973`을 push했다. 작업 중 들어온 main 변경은 QR/DB 재연결 운영 스크립트이며 화면·패키지와 겹치지 않았다. push 전에 최신 main `0f66555b4fb5e49cda5c4c789151d3fb840cfdef`에 정렬했고 검증한 앱 소스의 동일성을 확인했다.
 - GitHub CI·자동 리뷰의 최종 상태는 PR #414의 최신 HEAD checks·리뷰 스레드에서 확인한다. 제출 후 정적 검사·문서 검사·약국 운영 빌드·관리자 앱 빌드·CodeQL 통과를 확인했다. 변하는 GitHub 결과를 이 기록에 최종 상태로 고정하지 않는다. main 병합·운영 배포는 미수행이며 운영 반영에는 Pharmacy 프런트엔드 배포가 필요하다.
 
-## 작업공간 유지
+## 구현·push 당시 작업공간 판정
 
 `/workspace/o4o-wt/pharmacy-member-home` · `wo/pharmacy-member-home`은 main 미통합 상태이므로 **KEEP**한다. 이전 작업공간은 삭제하지 않았다. 운영 배포 전이며 새 화면은 branch에만 존재한다.
 
@@ -85,3 +85,32 @@ P1 보완은 실제 AuthModalProvider·LoginModal·fallback을 함께 실행해 
 ## 최신 main 인증 변경과의 통합 확인
 
 PR #407의 가입 약관 로딩 변경이 main에 들어와 공개된 작업 branch에서 `origin/main`을 merge했다(기준 main `2a8b80cf2`, merge commit `813fe0e02`). LoginModal의 기존 `getSignupTermsConfig` 주입과 이번 목적지 처리 완료 표시를 모두 유지한다. auth-client를 다시 빌드하고 약국 서비스 120 tests 및 auth-react 공통 인증 16 파일·182 tests를 통과했다. 서비스 빌드·PC/모바일 10상황도 최신 인증 변경을 반영한 소스로 재검증했다. API·공통 패키지 변경은 이미 main에 반영된 기반 변경이며 이번 PR의 main 대비 변경 범위에는 포함하지 않는다.
+
+## main 통합·배포 Phase TODO
+
+사용자 후속 지시 `MAIN 병합 배포`에 따라 같은 WO와 전용 branch에서 통합·배포·문서 종료를 이어간다. 앞선 구현·push 기록은 당시 상태로 보존한다.
+
+- [x] 최신 main 동기화·충돌 및 인증 영향 확인·필요한 재검증·push.
+- [x] 최신 HEAD의 CI Gate·리뷰 스레드·main 규칙 확인 후 PR #414 병합.
+- [x] 병합 commit의 main CI와 Delivery 판정을 확인하고 Pharmacy 프런트엔드 운영 배포.
+- [x] 운영 serving SHA·실제 비로그인 진입·배포된 PC/모바일 UI를 확인.
+- [x] 정본·색인의 운영 반영 상태와 이번 WO 종료 기록을 정비·push·통합.
+
+최신 main `b29c0d46c`를 공개 branch에 merge한 `f2d3e7bc8`에서 약국 120 tests·공통 인증 186 tests·서비스 빌드·PC/모바일 합성 10상황이 통과했다. 공통 인증 첫 동시 실행은 약관 링크 대기 한 건이 실패했으며 동시 실행 수를 줄인 전체 재검증은 통과했다. [최종 PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38052267604)가 통과했고 두 리뷰 스레드는 해결됐다. PR #414는 2026-10-10 main commit `c3d81b8b3b9961762763fb0b049a1de670c9ceab`으로 병합됐다. 운영 DB write·migration과 다른 세션의 배포는 이번 작업 범위에 포함하지 않는다.
+
+
+## 운영 배포·검증 완료
+
+- [병합 후 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38052798484) PASS. 판정 중 문서 PR #415가 main에 들어와 기존 Delivery는 `SUPERSEDED`로 종료됐다. 최신 main `3bf6b9828e0e83bc9d67744cb5ed1295c2e67209`과 구현 병합 commit 사이의 변경은 문서 3개뿐이며 약국 코드·공통 패키지는 동일하다. [최신 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38053360152)도 PASS.
+- [최신 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38053474270)는 로그인 표현·목적지 처리 파일을 `LEVEL_3`로 판정했다. 사용자 배포 승인에 따라 `promote.yml`에 최신 SHA와 `services=kpa-society`를 전달했다. 앞선 다른 세션의 배포가 완료된 것을 확인하고 실행했다.
+- [Promote 38053501667](https://github.com/Renagang21/o4o-platform/actions/runs/38053501667) SUCCESS. 계획은 `deploy_api=false`, `web_parallel=[kpa-society]`이며 API·다른 웹·관리자 배포는 skip됐다. 신규 revision 검증 후 트래픽 전환·serving SHA 재확인이 성공했다. serving commit은 `3bf6b9828e0e83bc9d67744cb5ed1295c2e67209`이며 GitHub `production` 상태는 `DEPLOYED · deploy: kpa-society` success다. 전체 플랫폼을 다시 배포한 결과가 아니다.
+- 운영 번들 PC 1440·모바일 390에서 회원·승인 대기·운영자·비로그인·조회 오류 10상황 PASS. 루트 Hero·공지·게시글·자료, 직접 상세·자료 열기, 이전 상세 URL의 query/hash 보존, 매장 handoff 실패·재시도·목적지, 메뉴·가로 넘침·pageerror를 확인했다. 회원·API·handoff는 합성 fixture이며 실제 운영 계정·소속·세션 교환 검증과 구분한다.
+- 운영 HTML의 HTTP 200과 취득된 운영 코드에서 루트·게시글·자료·이전 참여 주소의 비로그인 로그인 이동 및 `returnTo`, PC·모바일 배치를 8상황 확인했다. 이전 참여 주소는 `/my/participation`으로 먼저 정규화된다. 배포 전에는 루트가 이전 참여 상태 주소로 이어져 기대값 검증이 실패했고, 배포 후 루트의 로그인 복귀 주소는 `/`로 통과했다.
+- 이 클라우드의 Chromium은 운영 HTTPS에서 프록시 CA 신뢰 오류가 났다. 제공된 CA의 사용자 신뢰 저장소 등록은 자동 승인 검토가 광범위한 신뢰 변경이라는 이유로 거부했다. 인증서 저장소·TLS 예외 설정은 변경하지 않았다. 운영 HTML·JS·CSS는 기존 시스템 신뢰를 사용하는 curl로 TLS를 검증해 취득하고 그대로 격리 Chromium에 제공했다. 외부 파일의 TLS 검증과 UI 실행을 분리한 검증이며, Chromium이 직접 운영 TLS를 검증한 결과는 아니다.
+- 문서 정합: 대표 홈 정본과 색인의 회원 초기화면 운영 미반영 표기를 실제 배포 근거로 정비했다. 기존 구현·push·PR 리뷰 기록은 당시 시점으로 보존했다. 이 종료 정비는 문서만 변경하므로 추가 runtime 배포는 `NOT_APPLICABLE`이다. 문서 종료 PR의 checks·병합 결과는 GitHub에서 확인한다.
+
+## 종료 작업공간 판정
+
+동일 WO의 배포·문서 종료 Phase를 `wo/pharmacy-member-home`에서 이어갔다. 다른 작업공간·branch와 이전 클라우드 작업공간은 삭제하지 않았다.
+
+`WORKTREE_DISPOSITION`: **KEEP** — 운영 검증 helper와 합성 화면의 재현에 이 worktree의 dependency 경로가 필요하여 보존한다. 구현 PR #414 main 통합·CI PASS·Pharmacy DEPLOYED·합성 UI smoke PASS. 실제 운영 테스트 계정 SSOT는 없어 실계정 검증은 미수행이다. 종료 문서는 같은 branch에 push하고 문서 PR로 main에 통합한다.
