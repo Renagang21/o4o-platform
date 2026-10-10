@@ -25,6 +25,47 @@ export function readPassword(run = execFileSync) {
   }
 }
 
+export const censusQueries = {
+  multilingual: `SELECT count(*)::int AS ph_total,
+    count(*) FILTER (WHERE q.status = 'archived')::int AS archived,
+    count(*) FILTER (WHERE q.public_key IS NOT NULL)::int AS public_key_present,
+    count(*) FILTER (WHERE EXISTS (SELECT 1 FROM store_multilingual_product_content_pages p WHERE p.group_id = q.id AND p.status = 'published'))::int AS published_page_present,
+    count(*) FILTER (WHERE q.public_key IS NOT NULL AND q.status <> 'archived' AND ${phOrg} AND EXISTS (SELECT 1 FROM store_multilingual_product_content_pages p WHERE p.group_id = q.id AND p.status = 'published'))::int AS probe_eligible
+    FROM store_multilingual_product_content_groups q WHERE EXISTS (SELECT 1 FROM platform_store_slugs s WHERE s.store_id = q.organization_id AND s.service_key = 'pharmacy-hub')`,
+  multilingualQrReferences: `SELECT count(*)::int AS ph_total, count(*) FILTER (WHERE q.is_active = true)::int AS active
+    FROM store_qr_codes q WHERE q.landing_target_id LIKE '%/multilingual-products/%' AND EXISTS (SELECT 1 FROM platform_store_slugs s WHERE s.store_id = q.organization_id AND s.service_key = 'pharmacy-hub')`,
+  affiliate: `SELECT count(*)::int AS ph_total,
+    count(*) FILTER (WHERE q.deleted_at IS NOT NULL)::int AS deleted,
+    count(*) FILTER (WHERE q.status = 'ACTIVE' AND q.deleted_at IS NULL)::int AS active_status,
+    count(*) FILTER (WHERE q.status = 'ACTIVE' AND q.deleted_at IS NULL AND (q.valid_from IS NULL OR q.valid_from <= now()) AND (q.valid_to IS NULL OR q.valid_to >= now()))::int AS probe_eligible
+    FROM foreign_visitor_partner_qr_codes q WHERE q.service_key = 'pharmacy-hub'`,
+  affiliateScans: `SELECT count(*)::int AS recent_90_days FROM foreign_visitor_partner_qr_scan_events WHERE service_key = 'pharmacy-hub' AND created_at >= now() - interval '90 days'`,
+};
+
+export async function collectCensus(client) {
+  const census = {};
+  await client.query('BEGIN READ ONLY');
+  let originalError;
+  try {
+    await client.query("SET LOCAL statement_timeout = '10s'");
+    for (const [family, sql] of Object.entries(censusQueries)) {
+      const result = await client.query(sql);
+      census[family] = Object.fromEntries(Object.entries(result.rows[0]).map(([name, count]) => {
+        if (!Number.isSafeInteger(count) || count < 0) throw new Error('Invalid aggregate');
+        return [name, count];
+      }));
+    }
+    return census;
+  } catch (error) {
+    originalError = safeInventoryError(error, 'family-census');
+    throw originalError;
+  } finally {
+    try { await client.query('ROLLBACK'); } catch (error) {
+      if (!originalError) throw safeInventoryError(error, 'rollback');
+    }
+  }
+}
+
 export async function collectProbes(client) {
   const paths = [];
   await client.query('BEGIN READ ONLY');
@@ -65,6 +106,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     await client.connect();
     stage = 'inventory';
     const paths = await collectProbes(client);
+    stage = 'family-census';
+    const census = await collectCensus(client);
+    console.log(JSON.stringify({ readOnly: true, census }));
     stage = 'write-private-probe-file';
     await writeFile(process.env.PROBE_OUTPUT, paths.join('\n'), { mode: 0o600 });
     const families = Object.fromEntries(['qr', 'tablet', 'multilingual-products', 'foreign-visitor/affiliate'].map(family => [family, paths.some(path => path.startsWith(`/${family}/`))]));

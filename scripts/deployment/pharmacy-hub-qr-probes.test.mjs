@@ -1,6 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { collectProbes, queries, safeInventoryError, readPassword } from './pharmacy-hub-qr-probes.mjs';
+import { collectCensus, censusQueries } from './pharmacy-hub-qr-probes.mjs';
+
+test('census returns aggregate counts only and rolls back its read-only transaction', async () => {
+  const calls = [];
+  const result = await collectCensus({ query: async sql => {
+    calls.push(sql);
+    return { rows: [{ ph_total: 0 }] };
+  } });
+  assert.equal(calls[0], 'BEGIN READ ONLY');
+  assert.equal(calls.at(-1), 'ROLLBACK');
+  assert.deepEqual(Object.keys(result), Object.keys(censusQueries));
+  assert.ok(Object.values(censusQueries).every(sql => sql.startsWith('SELECT ') && /count\(\*\)/.test(sql)));
+});
+
+test('census rejects unexpected non-count data without leaking it', async () => {
+  await assert.rejects(collectCensus({ query: async () => ({ rows: [{ ph_total: 'private row' }] }) }), error => {
+    assert.doesNotMatch(error.stack, /private/);
+    return true;
+  });
+});
 
 test('failed secret subprocess never exposes captured output or original stack', () => {
   assert.throws(() => readPassword(() => {

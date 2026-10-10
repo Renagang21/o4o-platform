@@ -42,6 +42,8 @@ PR #384 생성 후 GitHub API 접근이 가능해졌다. 현재 cloud executor�
 
 ## 검증
 
+2026-10-10: 미발견 2종의 운영 여부를 확정하기 위한 읽기 전용 census를 준비했다. 다국어는 과거/비활성 PH slug 연결까지 포함한 전체·archived·public key·published page·현재 probe 조건 건수와 PH 다국어 QR 참조/활성 건수를 조회한다. 제휴는 PH 전체·삭제·ACTIVE 상태·유효기간 포함 probe 조건과 최근 90일 스캔 건수를 확인한다. SELECT count 집계만 로그에 남기고 실제 경로·매장·상품·개인 데이터는 출력하지 않는다. 10초 statement timeout과 READ ONLY/ROLLBACK을 유지한다. 과거 PH slug 연결이 없는 매장의 귀속, 90일 이전 유입, 인쇄물 존재까지 이 집계로 확정하지 않는다. 운영 census는 아직 실행하지 않았고 미사용 판정도 내리지 않았다. 동일 WO의 연속 조사 phase로 지정 worktree를 재사용하고 최신 main에서 `wo/pharmacyhub-qr-missing-family-census`를 생성했다.
+
 2026-10-10: 운영자가 Cloud SQL client와 URL map get/validate 전용 역할을 추가했다. run `38029492922`에서 읽기 전용 DB 조회 성공(4종 중 2종), URL map GET 성공, validate POST 403을 확인했다. 운영자가 전달한 Troubleshooter 판정은 `compute.urlMaps.validate=GRANTED`다. 추가 IAM을 추측으로 부여하지 않는다. 동일 WO 진단 branch `wo/pharmacyhub-qr-api-diagnostics`는 지정 worktree에서 최신 main 기준으로 준비했다. API 오류의 허용된 permission/reason만 출력하고 QR 종류별 존재 여부만 기록한다. 원본 오류·credential·실제 public path는 로그에 출력하지 않는다. apply는 미실행이다.
 
 PR #394는 CI 통과 후 병합됐으나 최종 조회에서 새 미해결 리뷰가 발견됐다. 조회 결과를 확인하기 전에 병합 명령을 실행한 절차 오류로 기록한다. 운영 plan은 실행하지 않고 동일 WO의 후속 branch `wo/pharmacyhub-qr-safe-secret-errors`를 최신 main에서 준비했다. secret 조회 subprocess의 실패 출력은 안전한 `read-secret` 오류로 대체하며, rollback 실패가 기존 query 단계와 오류 코드를 덮어쓰지 않도록 보존한다. 지정 worktree 재사용은 동일 WO 연속 수정 예외다.
