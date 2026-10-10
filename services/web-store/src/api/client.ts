@@ -10,6 +10,7 @@
 import { getAccessToken } from '@o4o/auth-client';
 import { tryRefreshToken } from './token-refresh';
 import { apiV1Base, apiV1Service } from '../lib/serviceContext';
+import { captureStoreOrganizationHeaders } from '../lib/storeOrganizationHeader';
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -44,11 +45,11 @@ export class ApiClient {
 
     // Cross-domain auth: Add Authorization header with Bearer token
     const token = getAccessToken();
-    const headers: HeadersInit = {
+    const headers = captureStoreOrganizationHeaders({
       'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` }),
       ...options.headers,
-    };
+    });
 
     // WO-O4O-FORUM-POST-EDIT-SAVE-STABILITY-FIX-V1: AbortController timeout
     const controller = new AbortController();
@@ -76,9 +77,11 @@ export class ApiClient {
           if (response.status === 401) {
             const newToken = await tryRefreshToken();
             if (newToken) {
+              const retryHeaders = new Headers(headers);
+              retryHeaders.set('Authorization', `Bearer ${newToken}`);
               const retryResponse = await fetch(url, {
                 ...fetchOptions,
-                headers: { ...headers, 'Authorization': `Bearer ${newToken}` },
+                headers: retryHeaders,
                 signal: controller.signal,
               });
               if (retryResponse.ok) return retryResponse.json() as Promise<T>;

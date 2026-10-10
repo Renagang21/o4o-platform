@@ -11,8 +11,7 @@
  *   POST /api/v1/store/products/list    — master 기반 등록 (offer_id=NULL, idempotent)
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
-import { tryRefreshToken } from './token-refresh';
+import { storeScopedFetch } from './storeScopedFetch';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store/products`;
@@ -46,19 +45,7 @@ export interface O4oStandardProductsResult {
 export { buildProductVariantLabel } from '../utils/productVariantLabel';
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = getAccessToken();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...(options.headers as Record<string, string> | undefined),
-  };
-  let response = await fetch(url, { ...options, headers });
-  if (response.status === 401) {
-    const newToken = await tryRefreshToken();
-    if (newToken) {
-      response = await fetch(url, { ...options, headers: { ...headers, Authorization: `Bearer ${newToken}` } });
-    }
-  }
+  const response = await storeScopedFetch(url, options, 'application/json');
   if (!response.ok) {
     const body = await response.json().catch(() => ({ message: 'Network error' }));
     const err: any = new Error(body?.error?.message || body.error || body.message || `HTTP ${response.status}`);

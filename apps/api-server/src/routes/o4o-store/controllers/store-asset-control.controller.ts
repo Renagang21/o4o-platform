@@ -18,28 +18,19 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import { KpaStoreAssetControl } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AssetPublishStatus, ChannelMap } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 const VALID_STATUSES: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
 
 // store-library-feed.controller 와 동일한 dual resolution:
-// role_assignments(isStoreOwner) 우선 → KpaMember fallback.
+// 선택 매장 판정; 선택값 없는 기존 KPA membership 경로만 호환.
 // 두 컨트롤러가 동일한 organizationId를 사용해야 snapshot scope 정합이 유지된다.
-async function resolveOrgId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-  if (orgFromRa) return orgFromRa;
-  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
 
 export function createStoreAssetControlController(
   dataSource: DataSource,
@@ -71,7 +62,7 @@ export function createStoreAssetControlController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.json({
             success: true,
@@ -217,7 +208,7 @@ export function createStoreAssetControlController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({
             success: false,
@@ -323,7 +314,7 @@ export function createStoreAssetControlController(
           return;
         }
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(403).json({
             success: false,

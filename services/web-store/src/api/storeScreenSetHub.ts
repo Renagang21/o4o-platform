@@ -15,8 +15,7 @@
  * 기존 매장 Screen Set 규칙(withQrLink lazy ensure)으로 관리된다.
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
-import { tryRefreshToken } from './token-refresh';
+import { storeScopedFetch } from './storeScopedFetch';
 import type { ScreenBlock, ScreenSet } from './tabletDisplays';
 import { apiV1Service } from '../lib/serviceContext';
 
@@ -35,19 +34,7 @@ const BASE = () => `${apiV1Service()}/store/screen-set-hub`;
  * (authClient.api 는 이 경로에 토큰을 붙이지 않아 401 → 명시 Bearer + 401 refresh 재시도.)
  */
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = getAccessToken();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
-  };
-  let response = await fetch(url, { ...options, headers });
-  if (response.status === 401) {
-    const newToken = await tryRefreshToken();
-    if (newToken) {
-      response = await fetch(url, { ...options, headers: { ...headers, Authorization: `Bearer ${newToken}` } });
-    }
-  }
+  const response = await storeScopedFetch(url, options, 'application/json');
   if (!response.ok) {
     const body = await response.json().catch(() => ({ message: 'Network error' }));
     const error: any = new Error(body.error || body.message || `HTTP ${response.status}`);

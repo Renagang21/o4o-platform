@@ -43,20 +43,12 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
-async function resolveDualOrgId(dataSource: DataSource, userId: string): Promise<string | null> {
-  // store-content.controller 와 동일: organization_members(role_assignments) 우선,
-  // kpa_members fallback. direct 작성/조회와 조회 일관성 유지를 위함.
-  const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-  if (orgFromRa) return orgFromRa;
-  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
 
 export function createStoreLibraryFeedController(
   dataSource: DataSource,
@@ -76,7 +68,7 @@ export function createStoreLibraryFeedController(
           return;
         }
 
-        const organizationId = await resolveDualOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.json({
             success: true,
@@ -412,7 +404,7 @@ export function createStoreLibraryFeedController(
           return;
         }
 
-        const organizationId = await resolveDualOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
           return;

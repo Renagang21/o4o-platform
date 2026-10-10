@@ -12,8 +12,7 @@
  *   PUT  /api/v1/store/product-requests/:id  — 보완 요청 건 수정 재제출
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
-import { tryRefreshToken } from './token-refresh';
+import { storeScopedFetch } from './storeScopedFetch';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store/product-requests`;
@@ -65,19 +64,7 @@ export interface StoreRequestApiError extends Error {
 }
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = getAccessToken();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...(options.headers as Record<string, string> | undefined),
-  };
-  let response = await fetch(url, { ...options, headers });
-  if (response.status === 401) {
-    const newToken = await tryRefreshToken();
-    if (newToken) {
-      response = await fetch(url, { ...options, headers: { ...headers, Authorization: `Bearer ${newToken}` } });
-    }
-  }
+  const response = await storeScopedFetch(url, options, 'application/json');
   if (!response.ok) {
     const body = await response.json().catch(() => ({ error: { message: 'Network error' } }));
     const err: StoreRequestApiError = new Error(body?.error?.message || body?.error || body?.message || `HTTP ${response.status}`);
