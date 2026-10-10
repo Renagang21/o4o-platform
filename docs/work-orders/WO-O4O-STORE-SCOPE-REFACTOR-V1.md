@@ -10,7 +10,8 @@
 - [x] 인증 갱신·재시도 중 매장 전환의 요청 범위를 조사하고 수정한다.
 - [x] 옛 매장 경로와 대형 화면 중복의 소비처를 대조한다.
 - [x] 조사 결과로 이번 구현 범위와 후속 TODO를 보정한다.
-- [ ] 회귀 검증·빌드·CI와 문서 정합을 확인하고 commit·push한다.
+- [x] 회귀 검증·빌드와 문서 정합을 확인하고 commit·push한다.
+- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다.
 
 ## 기준과 안전 경계
 
@@ -28,7 +29,8 @@
 - [x] API Client의 인증 갱신 및 GET 404 재시도에서 최초 요청 매장을 고정한다.
 - [x] 상품·상품 요청·태블릿·Screen Set 가져오기·미디어의 인증 재시도를 공통 전송 함수로 모은다.
 - [x] multipart 본문과 개별 API의 응답·오류 계약을 유지한다.
-- [ ] 회귀 테스트·빌드 결과를 확정하고 branch를 push하여 PR의 최신 CI를 확인한다.
+- [x] 회귀 테스트·빌드 결과를 확정하고 branch를 push한다.
+- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다.
 
 ### 확정한 결함과 수정
 
@@ -61,7 +63,8 @@ Frozen `asset-copy-core`의 callback에는 Request가 없다. Core 서명 변경
 - API: 5 suites / 90 tests PASS(조직 판정·동시 요청·복사·작성·편집·게시·기존 소비처 계약).
 - web-store: 4 suites / 37 tests PASS(재시도 매장·본문·multipart·오류 및 화면 회귀).
 - 변경 TypeScript 파일 focused ESLint·diff check·문서 민감정보 검사: PASS.
-- PR의 최신 CI·SonarCloud·CodeQL: push 후 확인한다.
+- PR: [#434](https://github.com/Renagang21/o4o-platform/pull/434), push 완료. 생성 시 main과 MERGEABLE.
+- PR의 최신 CI·SonarCloud·CodeQL: 진행 중. 이 항목은 원격 실행 결과로 확인하며 완료 추정하지 않는다.
 - 운영 DB write·main 통합·배포: 미실행.
 
 WORKTREE_DISPOSITION: `wo/store-scope-refactor` / base `261cddc961f29f3d3ca71db9c23ffd2d226d154f` / KEEP(main 미통합).
