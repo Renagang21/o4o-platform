@@ -154,6 +154,7 @@ build·Code Quality·CodeQL·Sonar PASS, 기존 Codex 두 finding 수정 및 미
 | 운영 확인 | 결과 | 근거/한계 |
 |---|---|---|
 | post-merge CI Pipeline | SUCCESS | [#38019181483](https://github.com/Renagang21/o4o-platform/actions/runs/38019181483), CI Gate·CodeQL PASS |
+| post-merge main Sonar (비필수) | FAIL / OPEN | hotspot 76건, new-code 중복률 14.2%, 신뢰성/보안 등급 E; PR 분석 PASS와 구분 |
 | Delivery 위험도 판정 | HELD_LEVEL_3 | migration/인증 변경의 자동 배포 차단 유지 |
 | 사용자 승인 Promote | SUCCESS | [#38019828704](https://github.com/Renagang21/o4o-platform/actions/runs/38019828704), 승인된 정확한 main SHA |
 | API | SUCCESS | migration 21 포함 승인 이미지의 정식 migration Job, traffic 0% revision smoke, traffic 전환·전환 후 검증; readiness HTTP 200 |
@@ -190,6 +191,19 @@ IAM 변경·새 앱/secret 생성은 수행하지 않았다.
 callback 등록, GitHub KAKAO_CLIENT_ID 및 Secret Manager resource 이름 binding을 확인해야 한다.
 실제 로그인·가입·이메일 확인·handoff·Google/Kakao 현재 계정 재인증·최종 명시적 연결과
 취소/충돌, 전체관리자 실제 Google 재로그인은 OPEN이다.
+
+### main Sonar 분석 OPEN
+
+통합 후 별도 main Sonar check `114122064212`의 Quality Gate 실패를 확인했다.
+표시 조건은 Security Hotspots 76건, new-code 중복률 14.2%(기준 3%), 신뢰성·보안 등급 E다.
+이는 exact-head PR 분석 PASS와 별개의 main 분석이다. hotspot 수를 확정 취약점 수로
+해석하거나 이번 인증 변경/기존 코드에 귀속시키지 않는다. 적용 직전 실제 ruleset의 필수 검사는
+CI Gate이고, 정식 CI·CodeQL·verified production 배포·운영 회귀는 위 결과대로 통과했다.
+
+상세 이슈·hotspot·분석 revision을 확인하기 위해 공개 Sonar API 조회를 시도했으나 현재
+`sonarcloud.io` proxy tunnel 403이다. 기존 설정을 보존하고 이 정확한 도메인을 환경 초안에
+추가했다. 초안 저장 후에도 실제 조회는 403이므로 상세 원인·인증 변경 영향은 미확인이다.
+접근 반영 후 범위를 조사해야 하며 분석 설정/규칙을 완화하거나 무관한 코드를 수정하지 않았다.
 
 상세 로그 조회의 초기 proxy 403은 exact storage host를 초안에 추가한 뒤 실제 HTTP 200으로
 재확인했다. setup 초안에는 두 log storage host와 TLS 검증을 유지하는 시작 안내를 저장했다.

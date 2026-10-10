@@ -62,6 +62,7 @@ F10/F11 본문, `users`/`service_memberships`/`role_assignments` 구조는 변�
 - [x] 사용자 승인 후 PR #392 main `26b98a33c1` 통합; exact-head CI/review 및 post-merge CI #38019181483·CodeQL PASS. Promote #38019828704 API·전체관리자·웹 5개 운영 배포 SUCCESS.
 - [x] 배포 후 유지 8개 origin × PC/mobile × 매장 경영자/공급자 Demo 32/32 PASS; 신규 소셜 계정 조회의 Demo 변경 차단, 업무 역할 경계, access/refresh 로그아웃 폐기와 다른 origin 세션 유지 확인.
 - [ ] 운영 Kakao 앱·REST ID·client secret ON·callback 등록·Secret Manager binding 확인 후 실제 로그인/가입/handoff PC·모바일 smoke.
+- [ ] main Sonar 비필수 Quality Gate 실패 범위 조사: PR 분석은 PASS, main 분석 hotspot 76건·중복률 14.2%·신뢰성/보안 E. 상세 API는 현재 proxy 403으로 미확인; 접근 반영 후 인증 변경 영향부터 확인.
 
 ## 4-C. Google·카카오 명시적 계정 연결
 
