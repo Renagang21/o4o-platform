@@ -1,11 +1,11 @@
 /**
- * OperatorSemiFranchisePage — 담당 세미프랜차이즈 (/operator/semi-franchises)
+ * OperatorSemiFranchisePage — 담당 약국 협력사업 (/operator/semi-franchises)
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · DESIGN §3-2 · §3-4 · §3-5 · §3-6
- *   담당 지정된 세미프랜차이즈만 보인다(담당 관계는 API 가 판정 — 아니면 403).
+ *   담당 지정된 약국 협력사업만 보인다(담당 관계는 API 가 판정 — 아니면 403).
  *   탭: 가입 신청 / 공급 제안 / 이벤트 / 모집 조건 / 콘텐츠.
  *   콘텐츠: 운영자가 작성 · 게시. 게시본은 활성 가입 약국만 열람하고 매장 사본으로 복사한다.
- *   ?key=&tab= 쿼리로 세미프랜차이즈 · 탭을 지정해 진입할 수 있다(콘텐츠 작성 화면 복귀용).
+ *   ?key=&tab= 쿼리로 약국 협력사업 · 탭을 지정해 진입할 수 있다(콘텐츠 작성 화면 복귀용).
  *   가입 신청 목록은 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장 신청 상태를 함께 보여준다.
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
@@ -127,7 +127,10 @@ const RECRUITMENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject'; 
   ],
 };
 
-export default function OperatorSemiFranchisePage({ businessKey }: { businessKey?: string } = {}) {
+export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
+  businessKey?: string;
+  forumHref?: (business: SemiFranchise) => string;
+} = {}) {
   const [searchParams] = useSearchParams();
   const queryTab = searchParams.get('tab');
   const initialTab: Tab = isTab(queryTab) ? queryTab : 'memberships';
@@ -215,18 +218,19 @@ export default function OperatorSemiFranchisePage({ businessKey }: { businessKey
   if (franchises.length === 0) {
     return (
       <div className="space-y-4 p-6">
-        <PageHeader title="담당 세미프랜차이즈" />
+        <PageHeader title="담당 약국 협력사업" />
         <Message message={message} />
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          담당으로 지정된 세미프랜차이즈가 없습니다. Neture 관리자에게 담당 지정을 요청하세요.
+          담당으로 지정된 약국 협력사업이 없습니다. Neture 관리자에게 담당 지정을 요청하세요.
         </div>
       </div>
     );
   }
 
+  const currentBusiness = franchises.find(f => f.key === sfKey);
   return (
     <div className="space-y-4 p-6">
-      <PageHeader title="담당 세미프랜차이즈" description="담당으로 지정된 세미프랜차이즈의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.">
+      <PageHeader title="담당 약국 협력사업" description="담당으로 지정된 약국 협력사업의 가입 · 공급 제안 · 이벤트 · 모집 조건 · 콘텐츠를 처리합니다.">
         <select
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           value={sfKey}
@@ -240,7 +244,11 @@ export default function OperatorSemiFranchisePage({ businessKey }: { businessKey
         </select>
       </PageHeader>
 
-      <div className="flex gap-1 border-b border-gray-200">
+      {currentBusiness && <nav aria-label="담당 사업 커뮤니티" className="flex flex-wrap gap-3 rounded-lg border bg-white p-4 text-sm text-primary-700">
+        <Link to={forumHref?.(currentBusiness) ?? `/communities/${encodeURIComponent(currentBusiness.community_key || `business:${sfKey}`)}/forum`}>참여자 게시판</Link>
+        <p className="text-gray-600">회원 안내는 참여자 게시판의 공지로, 배포 자료는 콘텐츠 탭에서 관리합니다.</p>
+      </nav>}
+      <div className="flex flex-wrap gap-1 border-b border-gray-200">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -262,7 +270,7 @@ export default function OperatorSemiFranchisePage({ businessKey }: { businessKey
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
-            <li>게시된 콘텐츠는 이 세미프랜차이즈에 활성 가입한 약국에만 보입니다.</li>
+            <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>
           </ul>
@@ -366,7 +374,7 @@ export default function OperatorSemiFranchisePage({ businessKey }: { businessKey
                       {formatWon(p.unitPrice)}
                       {p.priceGeneral !== null && <div className="text-xs text-gray-500">공급가 {formatWon(p.priceGeneral)}</div>}
                     </td>
-                    <td className={TD}>{p.targetOrganizationName || '세미프랜차이즈 전체'}</td>
+                    <td className={TD}>{p.targetOrganizationName || '약국 협력사업 전체'}</td>
                     <td className={TD}>{p.note || '-'}</td>
                     <td className={TD}>
                       <StatusBadge status={p.status} />

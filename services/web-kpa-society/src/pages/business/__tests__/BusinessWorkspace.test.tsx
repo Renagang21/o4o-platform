@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), user: { id: 'owner' } as { id: string } | null }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: mocks.get, post: mocks.post } } }));
@@ -117,4 +117,11 @@ describe('게시판 미개설 사업의 권한', () => {
     expect(await screen.findByText('이 사업의 담당 운영자입니다.')).toBeTruthy();
     expect(mocks.get.mock.calls.some(([path]) => path.endsWith('/semi-franchises'))).toBe(false);
   });
+});
+
+it('담당 운영자에게만 해당 사업의 게시판 운영과 자료 관리 진입을 제공한다', async () => {
+  mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, canManage: true } : business));
+  mount('/businesses/pharmacy/forum');
+  expect(within(await screen.findByRole('navigation', { name: '담당 사업 운영' })).getByRole('link', { name: '게시판 운영' }).getAttribute('href')).toBe('/community/manage');
+  expect(screen.getByRole('link', { name: '사업 자료 관리' }).getAttribute('href')).toBe('/operator/semi-franchises?key=pharmacy&tab=contents');
 });
