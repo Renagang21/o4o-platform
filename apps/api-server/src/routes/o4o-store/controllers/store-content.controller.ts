@@ -32,11 +32,10 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, type Repository } from 'typeorm';
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
-import type { AuthRequest } from '../../../types/auth.js';
 import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
-import { resolveKpaContentAccess, resolveKpaContentOrganization } from './kpa-content-organization.js';
+import { readContentUserId, requireContentOrganization, resolveKpaContentAccess } from './kpa-content-organization.js';
 import { ContentTranslationService } from '../../../modules/store-ai/services/content-ai-translation.service.js';
 import type { TranslationLocale } from '@o4o/ai-prompts/store';
 import {
@@ -86,6 +85,19 @@ export function createStoreContentController(
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
+
+  function validateDirectContentId(id: string, res: Response): boolean {
+    if (UUID_RE.test(id)) return true;
+    res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+    return false;
+  }
+
+  async function findTranslationContent(repo: Repository<KpaStoreContent>, id: string, organizationId: string, res: Response) {
+    const content = await repo.findOne({ where: { id, organization_id: organizationId, source_type: 'direct' } });
+    if (!content) res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+    return content;
+  }
+
 
   async function requireContentOwner(
     req: Request,
@@ -143,19 +155,12 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         // 선택 매장 판정; 선택값 없는 기존 KPA membership 경로만 호환
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const contents = await listStoreContents(dataSource, organizationId);
         res.json({ success: true, data: contents });
@@ -185,12 +190,8 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         // WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1:
         // 기존 KPA 매장 소유권·계약 판정과 요청 선택 조직을 함께 확인
@@ -231,12 +232,8 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         const sourceType = req.query.sourceType as string;
         const sourceId = req.query.sourceId as string;
@@ -249,11 +246,8 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
         //   source_type / snapshot_id 를 함께 반환 → 프론트가 편집 경로(direct vs snapshot)를 판별.
@@ -308,22 +302,15 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const listingId = req.query.listingId as string;
         if (!listingId || !UUID_RE.test(listingId)) {
           res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'listingId는 유효한 UUID 여야 합니다.' } });
           return;
         }
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
         // org → listing 소유 + master_id 확인 (서버가 관계를 직접 검증)
         const resolved = await resolveProductForLink(organizationId, 'listing', listingId);
         if (!resolved.ok) {
@@ -378,12 +365,8 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         // 쓰기 = store owner 권한 (POST / 와 동일)
         const organizationId = await requireContentOwner(req, res, userId,
           '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
@@ -491,12 +474,8 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         // 쓰기 = store owner 권한 (import 와 동일)
         const organizationId = await requireContentOwner(req, res, userId,
           '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
@@ -645,23 +624,13 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const result = await getDirectContent(dataSource, organizationId, id);
         if (!result.ok) {
@@ -687,17 +656,10 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
         // store owner 권한 확인 (RBAC SSOT)
         const organizationId = await requireContentOwner(req, res, userId,
@@ -729,17 +691,10 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
         const organizationId = await requireContentOwner(req, res, userId,
           '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.',
@@ -775,17 +730,10 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
         const locale = (req.body as { locale?: string })?.locale as TranslationLocale;
         if (!locale || !TRANSLATION_LOCALES.includes(locale)) {
           res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
@@ -798,13 +746,8 @@ export function createStoreContentController(
         if (!organizationId) return;
 
         const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
-          return;
-        }
+        const content = await findTranslationContent(repo, id, organizationId, res);
+        if (!content) return;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const html = typeof cj.html === 'string' ? cj.html : '';
@@ -849,17 +792,10 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
         const { id, locale } = req.params as { id: string; locale: string };
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
         if (!TRANSLATION_LOCALES.includes(locale as TranslationLocale)) {
           res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
           return;
@@ -871,13 +807,8 @@ export function createStoreContentController(
         if (!organizationId) return;
 
         const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
-          return;
-        }
+        const content = await findTranslationContent(repo, id, organizationId, res);
+        if (!content) return;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const translations = (cj.translations && typeof cj.translations === 'object')
@@ -926,21 +857,14 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
         //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
         //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
 
@@ -1015,21 +939,14 @@ export function createStoreContentController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
         //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
         //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
         const { title, contentJson, productRef } = req.body as {

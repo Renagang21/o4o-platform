@@ -60,12 +60,12 @@ Frozen `asset-copy-core`의 callback에는 Request가 없다. Core 서명 변경
 - API build: PASS.
 - web-store TypeScript·Vite build: PASS.
 - asset-copy-core: 4 suites / 64 tests PASS.
-- API: 5 suites / 90 tests PASS(조직 판정·동시 요청·복사·작성·편집·게시·기존 소비처 계약).
+- API: 5 suites / 96 tests PASS(조직 판정·동시 요청·복사·작성·편집·게시·기존 소비처 계약).
 - web-store: 4 suites / 37 tests PASS(재시도 매장·본문·multipart·오류 및 화면 회귀).
 - 변경 TypeScript 파일 focused ESLint·diff check·문서 민감정보 검사: PASS.
 - PR: [#434](https://github.com/Renagang21/o4o-platform/pull/434), push 완료. 생성 시 main과 MERGEABLE.
 - 최초 원격 CI Gate·전체 API Jest 3 shards·앱 빌드·품질 검사·CodeQL: PASS. 최초 코드 리뷰 지적 없음.
-- 최초 SonarCloud: 새 코드 중복률 7.8%(기준 3%)로 FAIL. 콘텐츠 7개 소유권·조직 오류 분기를 공통 함수로 추출하고 기존 메시지를 보존했다. 사본 고정 config·resolver는 한 번 생성하고 요청별 선택 closure만 새로 연결한다. 이후 로컬 API 90 tests·API build·focused lint는 다시 PASS.
+- 최초 SonarCloud: 새 코드 중복률 7.8%(기준 3%)로 FAIL. 콘텐츠 7개 소유권·조직 오류 분기를 공통 함수로 추출하고 기존 메시지를 보존했다. 사본 고정 config·resolver는 한 번 생성하고 요청별 선택 closure만 새로 연결한다. 인증 사용자·조직 없음·빈 목록·ID 검증·번역 소유 콘텐츠 조회도 같은 응답을 유지하는 공통 함수로 정리했다. 이후 로컬 API 96 tests·API build·focused lint는 다시 PASS. 로컬 token 중복 검사에서는 변경 줄과 겹치는 clone 0건이며 SonarCloud 수치를 대체하지 않는다.
 - 최신 commit의 원격 CI·SonarCloud·CodeQL: 재검증 대상. PR 링크에서 최신 상태를 확인한다.
 - 운영 DB write·main 통합·배포: 미실행.
 

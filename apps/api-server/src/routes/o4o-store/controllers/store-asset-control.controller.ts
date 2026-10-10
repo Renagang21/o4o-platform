@@ -20,9 +20,8 @@ import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { KpaStoreAssetControl } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AssetPublishStatus, ChannelMap } from '../../kpa/entities/kpa-store-asset-control.entity.js';
-import type { AuthRequest } from '../../../types/auth.js';
 import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
-import { resolveKpaContentOrganization } from './kpa-content-organization.js';
+import { sendEmptyContentPage, readContentUserId, requireContentOrganization, resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -52,22 +51,12 @@ export function createStoreAssetControlController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({
-            success: true,
-            data: { items: [], total: 0, page: 1, limit: 20, totalPages: 1 },
-          });
+          sendEmptyContentPage(res);
           return;
         }
 
@@ -198,24 +187,11 @@ export function createStoreAssetControlController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'NO_ORGANIZATION', message: 'User has no KPA organization membership' },
-          });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
         const { status } = req.body as { status?: string };
@@ -304,24 +280,11 @@ export function createStoreAssetControlController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
-        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'NO_ORGANIZATION', message: 'User has no KPA organization membership' },
-          });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
         const { channelMap } = req.body as { channelMap?: ChannelMap };

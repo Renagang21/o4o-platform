@@ -43,9 +43,8 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import type { AuthRequest } from '../../../types/auth.js';
 import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
-import { resolveKpaContentOrganization } from './kpa-content-organization.js';
+import { sendEmptyContentPage, readContentUserId, resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -61,19 +60,12 @@ export function createStoreLibraryFeedController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({
-            success: true,
-            data: { items: [], total: 0, page: 1, limit: 20, totalPages: 1 },
-          });
+          sendEmptyContentPage(res);
           return;
         }
 
@@ -389,12 +381,8 @@ export function createStoreLibraryFeedController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         const contentId = typeof req.params.id === 'string' ? req.params.id.trim() : '';
         // UUID 형식 가드 — soft-ref varchar 비교(store_qr_codes)에서 임의 문자열 유입 차단.

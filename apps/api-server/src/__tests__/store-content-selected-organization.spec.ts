@@ -35,9 +35,9 @@ function database() {
   });
   return { ds: { getRepository: jest.fn(() => repo), query } as any, repo, query };
 }
-function appFor(ds: any) {
+function appFor(ds: any, authenticated = true) {
   const app = express(); app.use(express.json());
-  const auth: express.RequestHandler = (req: any, _res, next) => { req.user = { id: 'synthetic-user', roles: ['neture:store_owner'] }; next(); };
+  const auth: express.RequestHandler = (req: any, _res, next) => { if (authenticated) req.user = { id: 'synthetic-user', roles: ['neture:store_owner'] }; next(); };
   app.use('/assets', createAssetSnapshotController(ds, auth));
   app.use('/contents', createStoreContentController(ds, auth));
   app.use('/library', createStoreLibraryFeedController(ds, auth));
@@ -114,6 +114,28 @@ describe('content organization selection', () => {
     const denied = await request(appFor(ds)).post('/contents').set('X-Store-Organization-Id', B).send({ title: 'synthetic' });
     expect(denied.status).toBe(403);
     expect(createDirectContent).not.toHaveBeenCalled();
+  });
+  it.each(['/contents', '/library/contents', '/controls'])('missing user remains unauthorized on %s', async path => {
+    const { ds, query } = database();
+    const denied = await request(appFor(ds, false)).get(path).set('X-Store-Organization-Id', B);
+    expect(denied.status).toBe(401);
+    expect(denied.body.error.code).toBe('UNAUTHORIZED');
+    expect(owner).not.toHaveBeenCalled(); expect(query).not.toHaveBeenCalled();
+  });
+  it('invalid direct IDs retain the original validation response before organization lookup', async () => {
+    const { ds } = database();
+    const invalid = await request(appFor(ds)).put('/contents/direct/invalid').send({ title: 'synthetic' });
+    expect(invalid.status).toBe(400);
+    expect(invalid.body.error).toEqual({ code: 'INVALID_ID', message: 'Invalid content ID' });
+    expect(owner).not.toHaveBeenCalled();
+  });
+  it.each(['translate', 'translations/en'])('missing owned translation content remains 404 on %s', async path => {
+    const { ds, repo } = database(); repo.findOne.mockResolvedValue(null);
+    const call = path === 'translate' ? request(appFor(ds)).post(`/contents/direct/${A}/${path}`) : request(appFor(ds)).put(`/contents/direct/${A}/${path}`);
+    const absent = await call.set('X-Store-Organization-Id', B).send({ locale: 'en' });
+    expect(absent.status).toBe(404);
+    expect(absent.body.error.code).toBe('NOT_FOUND');
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: A, organization_id: B, source_type: 'direct' } });
   });
   it('foreign selections cannot write or fall back on any content adapter', async () => {
     const { ds, query, repo } = database(); const app = appFor(ds);
