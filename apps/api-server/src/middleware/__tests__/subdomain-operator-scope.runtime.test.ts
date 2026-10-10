@@ -184,3 +184,12 @@ describe('커뮤니티 Admin / Operator 분리', () => {
     expect(await passes(review, { roles: ['community:operator'], memberships: [['neture', 'active']] })).toBe(false);
   });
 });
+
+
+describe('커뮤니티 조회 권한의 일반 회원 경계', () => {
+  it.each([{ roles: [] }, { roles: ['neture:store_owner'] }, { roles: ['neture:supplier'] }])('활성 community 소속만으로는 관리 조회가 허용되지 않는다: %j', async ({ roles }) => {
+    const persona: Persona = { roles, memberships: [['community', 'active']] };
+    expect(await passes(requireCommunityServiceScope('community:operator') as RequestHandler, persona)).toBe(false);
+    expect(await passes(requireCommunityServiceScope('community:admin') as RequestHandler, persona)).toBe(false);
+  });
+});
