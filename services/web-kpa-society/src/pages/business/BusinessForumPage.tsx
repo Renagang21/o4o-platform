@@ -7,19 +7,24 @@ import type { ForumPostResponse, ForumCommentResponse, ForumCategoryResponse } f
 import { useAuth, authClient } from '../../contexts/AuthContext';
 import { useBusiness } from './BusinessWorkspace';
 import { loadBusinessForumData, type ForumView } from './forumData';
-import { businessApi, businessBase, businessError, communityApiBase } from './api';
+import { businessApi, businessPath, businessError, communityApiBase } from './api';
 
 export function BusinessForumBoundary() {
   const context = useBusiness();
   const { business, access } = context;
   if (!business.communityKey) return <p>참여자 게시판이 아직 개설되지 않았습니다.</p>;
-  if (!access?.allowed) return <section><p>사업 참여 승인 후 게시판을 이용할 수 있습니다.</p><Link className="text-blue-700" to={`${businessBase(business.key)}/participation`}>참여 신청 · 상태 확인</Link></section>;
-  const base = `${businessBase(business.key)}/forum`;
+  if (!access?.allowed) return <section><p>사업 참여 승인 후 게시판을 이용할 수 있습니다.</p><Link className="text-blue-700" to={businessPath(business.key, 'participation')}>참여 신청 · 상태 확인</Link></section>;
+  const base = businessPath(business.key, 'forum');
   return <section>
     <nav aria-label="참여자 게시판" className="mb-5 flex flex-wrap gap-4 text-sm text-blue-700">
-      <Link to={base}>게시글</Link><Link to={`${base}/write`}>글쓰기</Link><Link to={`${base}/my-posts`}>내 글</Link><Link to={`${base}/owned`}>내 게시판 · 신청</Link>
-      <Link to={`${base}/request`}>게시판 개설 신청</Link>
-      {access.canManage && <Link to={`${base}/manage`}>게시판 운영</Link>}
+      <Link to={base}>게시글</Link><Link to={`${base}/write`}>글쓰기</Link><Link to={`${base}/my-posts`}>내 글</Link>
+      <details className="ml-auto"><summary className="cursor-pointer">게시판 관리</summary>
+        <div className="mt-3 flex flex-wrap gap-4">
+          <Link to={`${base}/owned`}>내 게시판 · 신청</Link>
+          <Link to={`${base}/request`}>게시판 개설 신청</Link>
+          {access.canManage && <Link to={`${base}/manage`}>게시판 운영</Link>}
+        </div>
+      </details>
     </nav>
     <Outlet context={context} />
   </section>;
@@ -31,7 +36,7 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
   const { slug } = useParams();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const base = `${businessBase(business.key)}/forum`;
+  const base = businessPath(business.key, 'forum');
   const apiBase = `${communityApiBase(business.communityKey!)}/forum`;
   const page = Math.max(1, Number(params.get('page')) || 1);
   const category = params.get('category') || '';

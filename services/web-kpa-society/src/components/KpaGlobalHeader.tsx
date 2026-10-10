@@ -16,7 +16,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
-import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
@@ -25,7 +24,6 @@ import { authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
-  KPA_CONTEXTUAL_NAV,
 } from '../config/navigation';
 import { creditApi } from '../api/credit';
 import { PHARMACY_HEADER_BRAND } from '../config/brand';
@@ -38,7 +36,6 @@ export function KpaGlobalHeader() {
   const { openLoginModal, openRegisterModal } = useAuthModal();
   const navigate = useNavigate();
   const businessMatch = useMatch('/businesses/:businessKey/*');
-  const businessKey = encodeURIComponent(businessMatch?.params.businessKey ?? 'pharmacy');
   // The business workspace owns its task navigation; the header retains account/store utilities.
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
@@ -73,26 +70,11 @@ export function KpaGlobalHeader() {
     [navigate],
   );
 
-  // 역할 판정 — 프로필 메뉴 역할은 KpaUserMenuItems(SSOT)가 자체 판정.
-  // 여기서는 nav 조합(약국 HUB 등)에 필요한 isStoreOwner 만 산출한다.
-  // WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
-  //   내 약국 + 운영 허브 모두 store_owner role 기준으로 통일.
-  //   HubGuard/PharmacyGuard/StoreHubPage CTA 가 모두 isStoreOwnerDual 단일 SSOT 사용 — header도 동일.
-  //   (이전: 운영 허브만 activityType=='pharmacy_owner' fallback 보유 → 메뉴 보이지만 진입 시 guard redirect)
-  const isStoreOwner = isStoreOwnerDual(user?.roles ?? [], 'kpa:store_owner', user?.isStoreOwner);
-
-  // WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1: 상태별 통합 nav 조합
-  // 비로그인: 커뮤니티 / 서비스 안내 / About / Contact
-  // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / 서비스 안내 / About
-  // WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: contextual 항목 뒤, About 앞에 "서비스 안내" 삽입.
-  // KPA 는 operator/admin 전체 노출 정책을 적용하지 않는다 (showAll 미주입 — 기존 동작 보존).
-  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §9:
-  //   조립 순서(base → 역할 → 안내 → 비로그인 전용)를 공통 buildCommunityPrimaryNav 로 이관.
-  //   항목·노출 조건은 config/navigation.ts 소유 그대로다.
+  // Generic business workspaces retain their own navigation; pharmacy uses the header once.
   const computedNav = buildCommunityPrimaryNav({
-    base: (businessMatch ? [] : KPA_BASE_NAV).map(item => ({ ...item, href: item.href.replace('/businesses/pharmacy/', `/businesses/${businessKey}/`) })),
-    contextual: KPA_CONTEXTUAL_NAV,
-    conditions: { storeOwner: isStoreOwner },
+    base: businessMatch ? [] : KPA_BASE_NAV,
+    contextual: [],
+    conditions: {},
     trailing: [...((user?.roles ?? []).some(r => r === 'neture:operator' || r === 'neture:admin' || r === 'platform:super_admin') ? [{ label: '사업 운영', href: '/operator/semi-franchises' }] : [])],
     guestTrailing: [],
     isAuthenticated: !!user,

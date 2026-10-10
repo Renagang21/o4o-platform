@@ -78,7 +78,7 @@ describe('공개 footer · /about 메타 — legacy "약사회" 브랜드 없음
     expect(text).not.toMatch(/약사회/);
     const about = KPA_FOOTER_SECTIONS.flatMap((s) => s.links).find((l) => l.href === '/about');
     expect(about).toBeUndefined();
-    expect(KPA_FOOTER_SECTIONS.flatMap(s => s.links).some(l => l.href === '/businesses/pharmacy/forum')).toBe(true);
+    expect(KPA_FOOTER_SECTIONS.flatMap(s => s.links).some(l => l.href === '/community')).toBe(true);
   });
 
   it('/about 메타 description 에 대한약사회 없음', () => {

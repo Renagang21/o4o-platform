@@ -27,7 +27,7 @@ import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/se
 export default function LoginModal() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
-  const { activeModal, closeModal, onLoginSuccess } = useAuthModal();
+  const { activeModal, closeModal, onLoginSuccess, markLoginNavigationHandled } = useAuthModal();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
   const [isNotMember, setIsNotMember] = useState(false);
@@ -61,12 +61,13 @@ export default function LoginModal() {
   /** 로그인 성공 후처리: 모달 닫기 → 콜백 또는 역할 기반 진입 화면. */
   const finishLogin = (loggedInUser: User) => {
     try {
+      markLoginNavigationHandled();
       closeModal();
       if (onLoginSuccess) {
         onLoginSuccess();
         return;
       }
-      // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
+      // WO-O4O-PHARMACY-MEMBER-HOME-V1: 회원 초기화면·운영 역할별 기본 진입
       // 매핑 SSOT: config/dashboard.ts (getKpaPostLoginRoute / KPA_DASHBOARD_MAP).
       const redirectTo = getKpaPostLoginRoute(loggedInUser);
       if (redirectTo) {

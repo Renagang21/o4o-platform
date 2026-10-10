@@ -30,6 +30,19 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe('사업 서비스의 참가자 공간', () => {
+  it('다른 사업 키는 기존 사업 경로·정보·자료 범위를 유지한다', async () => {
+    mocks.get.mockImplementation(async (path: string) => {
+      if (path.endsWith('/businesses/other')) return response({ ...business, key: 'other', name: '다른 사업', communityKey: 'business:other' });
+      if (path.endsWith('/access')) return response({ ...access, businessKey: 'other', allowed: true });
+      if (path.endsWith('/store/contents')) return response({ items: [], total: 0 });
+      throw new Error(`Unexpected request ${path}`);
+    });
+    mount('/businesses/other/materials');
+    expect(await screen.findByText('등록된 자료가 없습니다.')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '다른 사업' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '참여자 게시판' }).getAttribute('href')).toBe('/businesses/other/forum');
+    expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'other', page: 1, limit: 20 } });
+  });
   it('미로그인은 신청도 로그인 진입으로 보내고 자원 조회를 하지 않는다', async () => {
     mocks.user = null; mount('/businesses/pharmacy/participation');
     expect(await screen.findByText('로그인 화면')).toBeTruthy(); expect(mocks.get).not.toHaveBeenCalled();
