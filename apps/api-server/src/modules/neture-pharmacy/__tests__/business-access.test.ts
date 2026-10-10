@@ -1,12 +1,12 @@
+import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { getBusinessInfo } from '../services/business-info.js';
 import { resolveSemiFranchiseBusinessAccess, resolveSemiFranchiseCommunityAccess } from '../services/semi-franchise-community-access.js';
 
 const sf = { id: 'immutable-business-id', key: 'pharmacy', status: 'active' };
-function executor(allowed: boolean, operator = false) {
+function executor(allowed: boolean) {
   return { query: jest.fn(async (sql: string, _params: unknown[]) => {
     if (sql.includes('SELECT sf.key, sf.name')) return [{ key: sf.key, name: '사업', communityKey: null }];
     if (sql.includes('SELECT id, key, status')) return [sf];
-    if (sql.includes('JOIN semi_franchises sf ON')) return operator ? [{ ok: 1 }] : [];
     if (sql.includes('WHERE EXISTS')) return allowed ? [{ ok: 1 }] : [];
     throw new Error('Unexpected query');
   }) };
@@ -36,4 +36,21 @@ describe('business access independently of forum configuration', () => {
     expect(await getBusinessInfo(exec, 'pharmacy')).toMatchObject({ communityKey: 'business:pharmacy' });
     expect(exec.query.mock.calls.every(([sql]) => !/\b(INSERT|UPDATE|DELETE)\b/i.test(sql))).toBe(true);
   });
+});
+
+
+it('the store participant entry gets a usable address without changing membership or persisted configuration', async () => {
+  const rows = [
+    { key: 'pharmacy', communityKey: null, membershipStatus: 'active' },
+    { key: 'other', communityKey: 'existing-forum', membershipStatus: 'pending' },
+  ];
+  const query = jest.fn(async () => rows);
+  const result = await new SemiFranchiseService({ query } as never).listForPharmacy('owned-organization');
+  expect(result).toEqual([
+    { ...rows[0], communityKey: 'business:pharmacy' },
+    rows[1],
+  ]);
+  expect(rows[0].communityKey).toBeNull();
+  expect(query).toHaveBeenCalledWith(expect.any(String), ['owned-organization']);
+  expect(query).toHaveBeenCalledTimes(1);
 });

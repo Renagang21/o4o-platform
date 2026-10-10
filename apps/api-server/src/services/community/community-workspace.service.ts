@@ -23,6 +23,7 @@ export interface CommunityWorkspace {
 
 /** Existing pharmacist forums retain their ledger. New spaces use immutable UUIDs (varchar(50)). */
 export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAccessUser | null, key: string): Promise<CommunityWorkspace | null> {
+  if (typeof key !== 'string' || !key) return null;
   const byBusinessKey = key.startsWith('business:');
   const [sf] = await exec.query(byBusinessKey
     ? 'SELECT id, key, name, status FROM semi_franchises WHERE key = $1'

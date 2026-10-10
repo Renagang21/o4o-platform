@@ -55,3 +55,45 @@ it('does not use historical service roles as a fallback for a UUID business work
   expect(await new Access().moderate(['kpa:operator', 'neture:operator'])).toBe(false);
   expect(workspace).toHaveBeenCalledWith(AppDataSource, expect.anything(), 'other-business');
 });
+
+
+describe('business UUID forum without legacy community linkage', () => {
+  let isMember: boolean;
+  beforeEach(() => {
+    isMember = false;
+    storageCode = 'sf:00000000-0000-0000-0000-000000000001';
+    query.mockImplementation(async (sql: string) => {
+      if (sql.includes('FROM forum_category_requests')) return [{ id: 'board', forum_type: 'closed', requester_id: 'another-user', service_code: storageCode }];
+      if (sql.includes('FROM semi_franchises')) {
+        expect(sql).toContain("COALESCE(NULLIF(community_key, ''), 'business:' || key)");
+        return [{ key: 'business:pharmacy' }];
+      }
+      if (sql.includes('FROM forum_category_members')) return isMember ? [{ role: 'member' }] : [];
+      return [];
+    });
+  });
+  it('members still read closed boards without a null-key exception or moderation grant', async () => {
+    isMember = true; workspace.mockResolvedValue({ allowed: true, canManage: false });
+    expect(await new Access().read('participant', ['user'])).toEqual({ allowed: true, forumType: 'closed' });
+    expect(await new Access().moderate(['neture:operator'])).toBe(false);
+    expect(workspace).toHaveBeenCalledWith(AppDataSource, expect.anything(), 'business:pharmacy');
+  });
+  it('assigned business operators keep closed-board read and pin/moderation access', async () => {
+    workspace.mockResolvedValue({ allowed: true, canManage: true });
+    expect(await new Access().read('operator', ['neture:operator'])).toEqual({ allowed: true, forumType: 'closed' });
+    expect(await new Access().moderate(['neture:operator'])).toBe(true);
+  });
+  it('unrelated operators remain denied', async () => {
+    workspace.mockResolvedValue({ allowed: false, canManage: false });
+    expect(await new Access().read('outsider', ['neture:operator'])).toEqual({ allowed: false, forumType: 'closed' });
+    expect(await new Access().moderate(['neture:operator'])).toBe(false);
+  });
+  it('a missing reverse identity fails closed without throwing or service-role fallback', async () => {
+    query.mockImplementation(async (sql: string) => sql.includes('FROM forum_category_requests')
+      ? [{ id: 'board', forum_type: 'closed', requester_id: 'another-user', service_code: storageCode }]
+      : sql.includes('FROM semi_franchises') ? [{ key: null }] : []);
+    expect(await new Access().read('outsider', ['neture:operator'])).toEqual({ allowed: false, forumType: 'closed' });
+    expect(await new Access().moderate(['neture:operator'])).toBe(false);
+    expect(workspace).not.toHaveBeenCalled();
+  });
+});
