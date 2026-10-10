@@ -72,3 +72,17 @@ main 통합은 검증된 PR 결과를 보고한 뒤 사용자 통합 승인에 �
 로그인 닫기 이름과 실행 기록을 후속 commit으로 보완한다. 최종 HEAD의 required checks·리뷰·mergeability는 PR #425의 최신 상태를 기준으로 확인한다. PR #423의 로그인 route 변경과 이 PR은 겹치는 source 파일이 없어 통합 시 두 변경을 함께 유지할 수 있다. 이번 단계의 main 병합·운영 배포는 미진행이며 별도 사용자 통합 승인에 따른다.
 
 WORKTREE_DISPOSITION: `wo/frontend-login-and-member-ui`는 PR·통합·운영 검증 때문에 KEEP한다. 기존 작업공간/branch는 보존한다.
+
+## 사용자 승인 후 통합·운영 배포 Phase
+
+2026-10-10 사용자가 main 병합·운영 배포를 명시적으로 승인했다. 같은 WO의 연속 Phase로 기존 전용 branch를 사용한다.
+
+- [x] 최신 main·ruleset·PR head·required CI·리뷰를 확인한다. 두 PR은 CI Gate 및 보안 검사 통과, 미해결 스레드 0건이다.
+- [x] 로그인 PR #423을 main에 병합한다: `913b642ceb525a75631b2ee37613d92e3b859053`.
+- [x] 해당 main을 #425 branch에 normal merge한다. source 충돌은 없으며 다른 작업공간을 변경하지 않았다.
+- [ ] 결합 source focused 검증·빌드 후 push하고 새 HEAD required CI를 확인한다.
+- [ ] PR #425 main 병합 및 post-merge CI를 확인한다.
+- [ ] Delivery 판정·공유 배포 실행 상태 확인 후 Neture 및 약국 웹을 운영에 배포한다.
+- [ ] 실제 운영 bundle의 PC/mobile 로그인·회원 게시판·자료·내 매장 연결을 검증하고 종료 기록을 남긴다.
+
+조사 보완: 배포 대상은 `neture,kpa-society`이며 API·DB·인증 정책 발행은 포함하지 않는다. 배포 설정 변수의 직접 조회는 integration 권한으로 HTTP 403이므로 Delivery/Promote의 현재 fail-closed gate와 실행 결과로 확인한다. 설정을 변경하거나 gate를 우회하지 않는다. 최종 배포·검증 결과는 GitHub PR·Actions 및 작업공간 인계 기록에서 추적한다.
