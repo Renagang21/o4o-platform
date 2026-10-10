@@ -69,70 +69,28 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe('로그인 전 — O4O 이해 → 서비스 발견 → Google 로 시작', () => {
-  it('O4O 소개 문구가 AI 입력보다 먼저 나온다', () => {
+describe('로그인 전 — AI 우선 및 공개 전체 탐색', () => {
+  it('AI 입력 → 전체 서비스 → 소식 순서로 표시한다', () => {
     mount();
-    const intro = screen.getByText(/오프라인 매장의 활동으로 연결합니다/);
-    expect(before(intro, screen.getByTestId('home-composer'))).toBe(true);
-    expect(screen.queryByText('무엇을 도와드릴까요?', { selector: 'p' })).toBeNull();
+    expect(before(screen.getByTestId('home-composer'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
+    expect(before(screen.getByRole('heading', { name: '전체 서비스' }), screen.getByTestId('news'))).toBe(true);
   });
 
-  it('순서: 소개 → 주요 서비스 → 함께 이용하는 서비스 → O4O AI → 소식', () => {
+  it('5분류의 정본 서비스 주소를 노출하고 은퇴 호스트를 제외한다', () => {
     mount();
-    const order = [
-      screen.getByText(/오프라인 매장의 활동으로 연결합니다/),
-      screen.getByRole('navigation', { name: '주요 서비스' }),
-      screen.getByRole('navigation', { name: '함께 이용하는 서비스' }),
-      screen.getByRole('heading', { name: 'O4O AI' }),
-      screen.getByTestId('home-composer'),
-      screen.getByTestId('news'),
-    ];
-    for (let i = 0; i < order.length - 1; i += 1) expect(before(order[i], order[i + 1])).toBe(true);
-  });
-
-  // 리테일(retail.neture.co.kr)은 K-Cosmetics 공개 서비스 종료로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-  it('주요 서비스 2개 — 설명형 · 서브도메인 정본 URL · 새 탭', () => {
-    mount();
-    const links = linksOf('주요 서비스');
-    expect(links.map((l) => l.href)).toEqual([
-      'https://pharmacy.neture.co.kr/',
-      'https://supplier.neture.co.kr',
+    const groups = ['약국 협력사업 참여', '약국 경영·공급 활동', '커뮤니티·단체활동', '제품·유통 사업 참여', '기타'];
+    const links = groups.flatMap(linksOf);
+    expect(links.map(l => l.href)).toEqual([
+      'https://pharmacy.neture.co.kr/', 'https://store.neture.co.kr/', 'https://supplier.neture.co.kr',
+      'https://community.neture.co.kr', 'https://kpa.neture.co.kr/', 'https://study.neture.co.kr/',
+      'https://funding.neture.co.kr/', '/services/partner', '/hospital',
     ]);
-    ['O4O 약국 경영지원', '공급자'].forEach((label, i) => {
-      expect(links[i].text.startsWith(label)).toBe(true);
-      expect(links[i].text).toContain(i === 0 ? 'O4O를 이용하는 약국 내 업무를 지원하는 약국 개설자 서비스' : '공급자 서비스');
-    });
-    for (const l of links) {
-      expect(l.target).toBe('_blank');
-      expect(l.rel).toContain('noopener');
+    for (const link of links.filter(l => l.href.startsWith('https:'))) {
+      expect(link.target).toBe('_blank'); expect(link.rel).toContain('noopener');
     }
-  });
-
-  it('함께 이용하는 서비스 3개 — 커뮤니티 · 강의 · 유통참여형 펀딩 (보조 진입)', () => {
-    mount();
-    expect(linksOf('함께 이용하는 서비스').map((l) => l.href)).toEqual([
-      'https://community.neture.co.kr',
-      'https://study.neture.co.kr/',
-      'https://funding.neture.co.kr/',
-    ]);
-    const text = linksOf('함께 이용하는 서비스').map((l) => l.text).join(' ');
-    expect(text).toContain('커뮤니티');
-    expect(text).toContain('강의');
-    expect(text).toContain('유통참여형 펀딩');
-    // 동적 사실을 정적 문구로 박지 않는다
-    for (const claim of ['지금 참여', '모집 중', '지금 학습', '수강하세요']) expect(text).not.toContain(claim);
-  });
-
-  it('구 호스트 · 하위경로 · 은퇴 진입 · 병원약국 · 내 매장 · 「화장품」 분류명을 노출하지 않는다', () => {
-    mount();
-    const hrefs = [...linksOf('주요 서비스'), ...linksOf('함께 이용하는 서비스')].map((l) => l.href);
-    for (const bad of ['kpa-society.co.kr', 'k-cosmetics.site', 'pharmacyhub.co.kr', '/hospital', 'partner', 'store.neture.co.kr']) {
-      expect(hrefs.some((h) => h.includes(bad))).toBe(false);
+    for (const host of ['retail.neture.co.kr', 'pharmacyhub.co.kr', 'partner.neture.co.kr']) {
+      expect(links.some(l => l.href.includes(host))).toBe(false);
     }
-    expect(hrefs).not.toContain('/supplier');
-    expect(hrefs).not.toContain('/community');
-    expect(screen.queryByText('약국 경영')).toBeNull();
-    expect(screen.queryByText('화장품')).toBeNull();
   });
 
   it('Google 시작 CTA 하나 · 우상단 로그인 하나 — 회원가입 버튼 없음 (같은 Google 흐름)', () => {
@@ -179,10 +137,11 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
     expect(screen.getAllByTestId('home-composer')).toHaveLength(1);
   });
 
-  it('공개 소개 · 서비스 안내 · Google 시작은 보이지 않는다', () => {
+  it('공개 전체 목록은 개인 업무와 별도로 유지하며 로그인 CTA는 숨긴다', () => {
     mount();
     expect(screen.queryByText(/오프라인 매장의 활동으로 연결합니다/)).toBeNull();
-    expect(screen.queryByRole('navigation', { name: '주요 서비스' })).toBeNull();
+    expect(screen.getByRole('heading', { name: '전체 서비스' })).toBeTruthy();
+    expect(before(screen.getByTestId('entry-panel'), screen.getByRole('heading', { name: '전체 서비스' }))).toBe(true);
     expect(screen.queryByTestId('home-google-start')).toBeNull();
   });
 
@@ -197,7 +156,7 @@ describe('로그인 후 — AI + 내 업무 시작 (구조 불변)', () => {
  it("약관 미동의 로그인 사용자는 공개 홈으로 돌아오며 개인 업무·AI를 실행하지 않는다", () => {
   Object.assign(auth, { user: { id: "synthetic", name: "샘플", email: "sample@example.test", roles: [] }, isAuthenticated: true, pendingPolicyAcceptances: [{}] });
   mount();
-  expect(screen.getByRole("navigation", { name: "주요 서비스" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "전체 서비스" })).toBeTruthy();
   expect(screen.queryByTestId("entry-panel")).toBeNull();
   expect(screen.queryByTestId("home-composer")).toBeNull();
   expect(screen.queryByTestId("home-google-start")).toBeNull();
