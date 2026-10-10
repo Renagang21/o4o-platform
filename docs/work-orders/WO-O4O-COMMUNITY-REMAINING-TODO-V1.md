@@ -79,7 +79,9 @@
 
 ### 2번: PR #404 정리
 
-기존 담당 worktree에서 최신 main `261cddc961`을 merge 방식으로 반영했다. 기존 테스트는 서비스 운영 권한 경계를 유지하며, 개별 admin/operator/member 계약에 맞춰 탭 복귀 후 커뮤니티·회원 목록 재조회와 역할 변경 요청 없음 검증을 보강했다. API 가드 Jest 37건, Neture 화면 Vitest 6건 및 변경 테스트 ESLint가 통과했다. 구현 코드·운영 계정·DB 변경은 없다. 커밋 `eb2f69b4be`를 [PR #404](https://github.com/Renagang21/o4o-platform/pull/404)에 push했다. 최신 HEAD의 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38088469168) 필수 CI Gate·전체 검사와 [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/38088469216)이 성공했다. 확인 시점 MERGEABLE/CLEAN이며 등록된 review·미해결 thread는 없다. main 병합과 배포는 아직 수행하지 않았다. 테스트만 추가하므로 재배포 대상이 아니다.
+기존 담당 worktree에서 main `261cddc961`을 merge 방식으로 반영했다. 기존 테스트는 서비스 운영 권한 경계를 유지하며, 개별 admin/operator/member 계약에 맞춰 탭 복귀 후 커뮤니티·회원 목록 재조회와 역할 변경 요청 없음 검증을 보강했다. API 가드 Jest 37건, Neture 화면 Vitest 6건 및 변경 테스트 ESLint가 통과했다. 구현 코드·운영 계정·DB 변경은 없다. 커밋 `eb2f69b4be`를 [PR #404](https://github.com/Renagang21/o4o-platform/pull/404)에 push했고 당시 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38088469168) 필수 CI Gate·전체 검사와 [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/38088469216)이 성공했다.
+
+2026-10-11 사용자의 main 통합·배포 지시에 따라 main `359dedcc26`과 다시 동기화했다. 최종 HEAD `94a5f0609a`의 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38090347595) 전체 검사·필수 CI Gate 및 CodeQL 성공, 최신 Codex 자동 리뷰의 주요 문제 없음과 미해결 thread 0을 확인한 뒤 main에 병합했다(`c1ce8efca2`). API 가드 37건·화면 6건도 재검증했다. 병합 후 CI는 진행 중이며 테스트 전용 변경 자체는 운영 재배포 대상이 아니다.
 
 ### 3번: 자기 탈퇴·이력 정책 확인
 
@@ -106,3 +108,11 @@
 - 소스·정본·TODO를 [PR #431](https://github.com/Renagang21/o4o-platform/pull/431)에서 검토한다. 최신 소스 HEAD의 필수 CI와 review는 PR에서 확인한다. main 통합·운영 배포 전이며 worktree/branch는 KEEP이다. API·Neture 변경이므로 운영 반영 시 두 대상의 배포가 필요하다.
 
 후속 잔여 범위: 공개 항목 분류·저장 계약 및 비로그인 열람, 이력 보존 기간 확정과 자동 삭제, 위 두 PR의 main 통합. 이번에 확정한 정책은 기존 이력 보존이며 자동 삭제를 포함하지 않는다.
+
+### 통합 전 자동 리뷰 보완 (2026-10-11)
+
+PR #431 구현 HEAD `8db329465e`의 Codex 자동 리뷰에서 P2 두 건을 확인해 수정했다. 후보 목록은 Demo 여부·메인 계정·서비스 가입을 한 목록 SQL에서 함께 조회하고 기존 메인 자격의 순수 판정 함수를 재사용한다. 회원 1,000명도 커뮤니티 확인과 목록 조회 두 SQL로 끝나며 행별 추가 쿼리·동시 connection 요청·행 잠금은 없다. 실제 지정 트랜잭션의 자격 재확인은 유지한다.
+
+workspace 응답에 독립 커뮤니티의 `communityStatus`를 추가하고, 화면은 커뮤니티와 본인 개별 가입이 모두 active일 때만 탈퇴를 노출한다. 커뮤니티 상태가 누락된 이전 응답·비활성 커뮤니티는 탈퇴를 노출하지 않는다. 서비스·메인 자격으로 열람이 제한된 경우에도 활성 커뮤니티의 본인 활성 가입 탈퇴 정책은 유지한다.
+
+관련 API Jest 61건과 탈퇴 화면/workspace Vitest 13건, 변경 파일 ESLint PASS. 단건/목록 메인 자격의 동일 정책 12개 사례, 대량 후보의 고정 쿼리 수, 비활성 커뮤니티·응답 누락의 버튼 숨김 및 탈퇴 후 재조회를 검증했다. 전체 최신 CI·자동 리뷰·운영 배포는 아래 후속 완료 기록에서 확인한다.

@@ -15,7 +15,7 @@
  */
 import { hasEligibleCommunityMembership, protectLastCommunityAdmin, recordCommunityMembershipChange } from './community-membership-mutations.js';
 import { COMMUNITY_SERVICE_KEY } from './community-lifecycle.service.js';
-import { getNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES } from '../../modules/neture/services/neture-main-membership.js';
+import { resolveNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES, NETURE_MAIN_SERVICE_KEY, type NetureMainMembershipRow } from '../../modules/neture/services/neture-main-membership.js';
 import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
@@ -100,17 +100,20 @@ export class CommunityOperatorDesignationService {
     const community = await this.requireCommunity(this.db, communityId);
     const rows = await this.db.query(
       `SELECT cm.id AS membership_id, cm.user_id, cm.role, cm.status, u.name AS user_name, u.email AS user_email,
-              sm.status AS service_status
+              sm.status AS service_status, u.status AS account_status, u."isActive" AS account_active,
+              u."isEmailVerified" AS email_verified, main_sm.status AS membership_status,
+              EXISTS (SELECT 1 FROM demo_accounts da WHERE da.user_id = cm.user_id AND da.is_active) AS is_demo_account
          FROM community_memberships cm
          JOIN users u ON u.id = cm.user_id
          LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
+         LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
         WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')
         ORDER BY (cm.role IN ('admin', 'operator')) DESC, u.name ASC NULLS LAST`,
-      [communityId, COMMUNITY_SERVICE_KEY],
+      [communityId, COMMUNITY_SERVICE_KEY, NETURE_MAIN_SERVICE_KEY],
     );
     return {
       community,
-      members: await Promise.all(rows.map(async (r: any) => ({
+      members: rows.map((r: any) => ({
         membershipId: r.membership_id,
         userId: r.user_id,
         name: r.user_name,
@@ -118,16 +121,16 @@ export class CommunityOperatorDesignationService {
         role: ['admin', 'operator'].includes(r.role) ? r.role : 'member',
         serviceMembershipStatus: r.service_status,
         membershipStatus: r.status,
-        designationEligibility: await this.designationEligibility(r),
-      }))),
+        designationEligibility: this.designationEligibility(r),
+      })),
     };
   }
 
   /** 조회 안내만 제공한다. 실제 지정은 setRole의 트랜잭션에서 다시 판정한다. */
-  private async designationEligibility(row: { user_id: string; status: string; service_status: string | null }): Promise<CommunityDesignationEligibility> {
+  private designationEligibility(row: NetureMainMembershipRow & { status: string; service_status: string | null; is_demo_account: boolean }): CommunityDesignationEligibility {
     if (row.status !== 'active') return { eligible: false, code: 'MEMBERSHIP_NOT_ACTIVE', message: '개별 커뮤니티 가입이 활성 상태여야 지정할 수 있습니다.' };
-    if (await demoAccountService.isDemoAccount(row.user_id, this.db)) return { eligible: false, code: 'DEMO_ACCOUNT_FORBIDDEN', message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE };
-    const mainStatus = await getNetureMainMembershipStatus(this.db, row.user_id);
+    if (row.is_demo_account) return { eligible: false, code: 'DEMO_ACCOUNT_FORBIDDEN', message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE };
+    const mainStatus = resolveNetureMainMembershipStatus(row);
     if (mainStatus !== 'active') return { eligible: false, code: 'MAIN_MEMBERSHIP_NOT_ACTIVE', message: NETURE_MAIN_MEMBERSHIP_MESSAGES[mainStatus] };
     if (row.service_status !== 'active') return { eligible: false, code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE', message: '커뮤니티 서비스 가입이 활성 상태여야 지정할 수 있습니다.' };
     return { eligible: true, code: null, message: null };

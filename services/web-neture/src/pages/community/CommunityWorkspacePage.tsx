@@ -23,6 +23,7 @@ export interface CommunityWorkspace {
   canManage: boolean;
   canJoin: boolean;
   membershipStatus: string | null;
+  communityStatus?: string | null;
   reason: string | null;
 }
 
@@ -112,7 +113,7 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
       {view === 'owned' && <MyForumDashboardPage basePath={basePath} />}
       {view === 'members' && <CommunityForumMembersPage basePath={basePath} />}
     </>}
-    {isAuthenticated && workspace?.kind === 'independent' && workspace.membershipStatus === 'active' &&
+    {isAuthenticated && workspace?.kind === 'independent' && workspace.communityStatus === 'active' && workspace.membershipStatus === 'active' &&
       <CommunitySelfWithdrawal key={communityKey} communityKey={communityKey} name={workspace.name} onWithdrawn={() => {
         setNotice('이 커뮤니티의 개별 가입을 탈퇴했습니다.');
         setWorkspace(null); setVersion(v => v + 1);

@@ -27,15 +27,22 @@ const tx = {
   query: async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
+    if (s.startsWith('SELECT cm.id AS membership_id')) {
+      if (demoLookupFails) throw new Error('db down');
+      expect(p).toEqual([C1, 'community', 'neture']);
+      expect(s).toContain('da.is_active');
+      return rows.filter(r => r.community_id === p[0] && ['active', 'suspended'].includes(r.status)).map(r => ({
+        membership_id: r.id, user_id: r.user_id, role: r.role, status: r.status,
+        user_name: '테스트 회원', user_email: null, service_status: service[r.user_id] ?? null,
+        account_status: 'active', account_active: true, email_verified: mainStatus[r.user_id] !== 'pending',
+        membership_status: mainStatus[r.user_id], is_demo_account: demoUsers.includes(r.user_id),
+      }));
+    }
     if (s.includes('FROM demo_accounts')) {
       if (demoLookupFails) throw new Error('db down');
       return demoUsers.includes(p[0]) ? [{ '?column?': 1 }] : [];
     }
     if (s.startsWith('SELECT id, name FROM communities')) return [C1, C2].includes(p[0]) ? [{ id: p[0], name: 'c' }] : [];
-    if (s.startsWith('SELECT cm.id AS membership_id')) return rows.filter(r => r.community_id === p[0] && ['active', 'suspended'].includes(r.status)).map(r => ({
-      membership_id: r.id, user_id: r.user_id, role: r.role, status: r.status,
-      user_name: '테스트 회원', user_email: null, service_status: service[r.user_id] ?? null,
-    }));
     if (s.startsWith('SELECT id, user_id, role, status FROM community_memberships')) {
       expect(s).toContain('FOR UPDATE');
       return rows.filter((r) => r.community_id === p[0] && (r.id === p[1] || (r.role === 'admin' && r.status === 'active')));
@@ -164,6 +171,18 @@ it('메인 이용이 정지된 회원은 운영자로 지정하지 않는다', a
 });
 
 describe('서버 지정 후보 자격 안내', () => {
+  it('회원 수가 늘어도 조회는 두 쿼리로 끝나고 행 잠금·쓰기 없이 자격을 판정한다', async () => {
+    rows = Array.from({ length: 1000 }, (_, i) => ({ id: `m${i}`, community_id: C1, user_id: `u${i}`, role: 'member', status: 'active' }));
+    service = Object.fromEntries(rows.map(r => [r.user_id, 'active']));
+    demoUsers = ['u1']; mainStatus['u2'] = 'suspended';
+    const { members } = await svc().listMembers(C1);
+    expect(members).toHaveLength(1000);
+    expect(sql).toHaveLength(2);
+    expect(sql.every(s => s.startsWith('SELECT') && !s.includes('FOR UPDATE'))).toBe(true);
+    expect(members[0].designationEligibility.eligible).toBe(true);
+    expect(members[1].designationEligibility.code).toBe('DEMO_ACCOUNT_FORBIDDEN');
+    expect(members[2].designationEligibility.code).toBe('MAIN_MEMBERSHIP_NOT_ACTIVE');
+  });
   it.each([
     ['개별 가입 정지', 'MEMBERSHIP_NOT_ACTIVE', () => { rows.find(r => r.id === M_MEM)!.status = 'suspended'; }],
     ['Demo 계정', 'DEMO_ACCOUNT_FORBIDDEN', () => { demoUsers = ['u-mem']; }],
