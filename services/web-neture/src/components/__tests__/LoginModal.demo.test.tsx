@@ -20,7 +20,7 @@ vi.mock('../../contexts', () => ({
     getGoogleAuthConfig: vi.fn(async () => ({ enabled: false, clientId: null })),
   }),
 }));
-vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn() }, api: {} }));
+vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn(), getKakaoAuthConfig: vi.fn(async () => ({ enabled: false })) }, api: {} }));
 const resolveSingleStoreWorkspaceUrl = vi.fn<(u: unknown) => Promise<string>>();
 vi.mock('../../lib/home-entry', () => ({
   resolveSingleStoreWorkspaceUrl: (u: unknown) => resolveSingleStoreWorkspaceUrl(u),

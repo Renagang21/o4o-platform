@@ -22,3 +22,4 @@ export * from './rbac.js';
 export * from './hooks.js';
 
 export { exchangeHandoffToken } from './exchangeHandoffToken.js';
+export * from './social-redirect.js';

@@ -22,7 +22,7 @@ function safeReturnPath(raw: unknown): string {
 }
 
 export default function LoginPage() {
-  const { isAuthenticated, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithEmail, loginWithGoogle, signupWithGoogle, loginWithKakao, signupWithKakao, getGoogleAuthConfig } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -39,6 +39,7 @@ export default function LoginPage() {
           loginWithEmail={loginWithEmail}
           api={authClient}
           onSuccess={() => navigate(returnPath, { replace: true })}
+          kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: returnPath }}
           google={{
             getConfig: getGoogleAuthConfig,
             loginWithGoogle,

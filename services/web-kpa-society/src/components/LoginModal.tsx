@@ -26,7 +26,7 @@ import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/se
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const { activeModal, closeModal, onLoginSuccess } = useAuthModal();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
@@ -150,7 +150,8 @@ export default function LoginModal() {
             api={authClient}
             onSuccess={(loggedInUser) => { setError(null); setIsNotMember(false); setAccessLink(null); finishLogin(loggedInUser); }}
             onEmailFailure={(result: AuthLoginResult<User>) => showNotMember(result)}
-            google={{
+            kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: new URLSearchParams(window.location.search).get('returnTo') ?? '/' }}
+          google={{
               getConfig: getGoogleAuthConfig,
               loginWithGoogle,
               signupWithGoogle,

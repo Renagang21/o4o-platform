@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * AuthContext - 인증 및 역할 관리
  *
@@ -52,6 +53,8 @@ interface AuthContextType {
    */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<User>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => void;
@@ -135,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginWithEmail: core.loginWithEmail,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,
+        loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
         logout: core.logout,
         switchRole,

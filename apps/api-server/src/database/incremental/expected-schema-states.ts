@@ -226,6 +226,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'ee4c646d687460947bbb6f0fe0da6006075d1cbf4f1638c8fed588e554e2c68a',
     fingerprintLineCount: 6176,
   },
+  // Isolated PostgreSQL 15: state 20 -> social proofs/identity constraints -> down/up exact reproduction.
+  {
+    appliedThrough: 'CreateSocialAuthFlows1791592932097',
+    fingerprint: 'fbfbdec4d389108b2324d679c154bf9ed5766dac6c4f2d74cfa57186343348f3',
+    fingerprintLineCount: 6199,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

@@ -430,7 +430,8 @@ export class EmailAuthService {
     return { maskedEmail: maskLoginEmail(user.email) };
   }
 
-  private async sendVerificationMail(user: User, sessionServiceKey: string | null): Promise<boolean> {
+  /** Social callers must first prove the linked provider identity; this does not open an HTTP route. */
+  async sendVerificationMail(user: User, sessionServiceKey: string | null): Promise<boolean> {
     const plain = await this.issueToken('verification', user.id, VERIFICATION_TOKEN_TTL_MS, normalizeLoginEmail(user.email));
     const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email#token=${encodeURIComponent(plain)}`;
     try {

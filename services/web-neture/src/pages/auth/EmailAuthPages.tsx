@@ -20,7 +20,7 @@ import { useLayoutEffect, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
-  GoogleContinue,
+  GoogleContinue, KakaoContinue,
   EmailSignupForm,
   VerifyEmailView,
   FindLoginIdForm,
@@ -89,7 +89,7 @@ function useOneTimeToken(): string | null {
 }
 
 export function SignupPage() {
-  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const links = useAuthLinks();
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
@@ -106,6 +106,9 @@ export function SignupPage() {
       </div>
 
       {/* 미등록 Google 계정은 이 버튼에서 약관 동의 → 계정 생성까지 간다(로그인 모달과 같은 계약). */}
+      <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+        returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
+        onSuccess={() => { navigate('/', { replace: true }); }} />
       <GoogleContinue<User>
         getConfig={getGoogleAuthConfig}
         loginWithGoogle={loginWithGoogle}

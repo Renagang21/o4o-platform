@@ -14,6 +14,7 @@
  * **서비스명 조건문을 두지 않는다.** 차이는 전부 `ServiceAuthConfig` 주입으로 표현한다.
  */
 
+import type { SocialProof, KakaoSignupRequest, KakaoAuthResponse } from '@o4o/auth-client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseAuthResponse, resolveAuthError, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import type {
@@ -155,8 +156,9 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       const generation = ++sessionGeneration.current;
       setIsLoading(true);
       try {
-        const result = (await request()) as { user?: unknown };
+        const result = (await request()) as KakaoAuthResponse;
         if (generation !== sessionGeneration.current) return { success: false, error: '로그인이 취소되었습니다. 다시 시도해 주세요.' };
+        if (result.nextStep === 'signup' || result.nextStep === 'verify-email') return { success: false, nextStep: result.nextStep, signupTicket: result.signupTicket, email: result.email, maskedEmail: result.maskedEmail, mailSent: result.mailSent };
         const apiUser = result?.user as Record<string, unknown> | undefined;
         if (!apiUser) {
           return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
@@ -232,6 +234,13 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     [adoptSession, authClient],
   );
 
+  const loginWithKakao = useCallback((proof: SocialProof): Promise<AuthLoginResult<TUser>> =>
+    authClient.loginWithKakao ? adoptSession(() => authClient.loginWithKakao!(proof), '카카오 로그인에 실패했습니다.', true)
+      : Promise.resolve({ success: false, error: '카카오 로그인은 준비 중입니다.' }), [adoptSession, authClient]);
+  const signupWithKakao = useCallback((token: string, input: KakaoSignupRequest): Promise<AuthLoginResult<TUser>> =>
+    authClient.signupWithKakao ? adoptSession(() => authClient.signupWithKakao!(token, input), '카카오 가입에 실패했습니다.', true)
+      : Promise.resolve({ success: false, error: '카카오 가입은 준비 중입니다.' }), [adoptSession, authClient]);
+
   const logout = useCallback(async () => {
     sessionGeneration.current += 1;
     setPendingPolicyAcceptances([]); setUser(null);
@@ -285,6 +294,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     acceptPendingPolicies,
     loginWithGoogle,
     signupWithGoogle,
+    loginWithKakao, signupWithKakao,
     loginWithEmail,
     logout,
     refresh,
