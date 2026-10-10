@@ -18,34 +18,39 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
 import { KpaStoreAssetControl } from '../../kpa/entities/kpa-store-asset-control.entity.js';
 import type { AssetPublishStatus, ChannelMap } from '../../kpa/entities/kpa-store-asset-control.entity.js';
-import type { AuthRequest } from '../../../types/auth.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { sendEmptyContentPage, readContentUserId, requireContentOrganization, resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 const VALID_STATUSES: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
 
 // store-library-feed.controller 와 동일한 dual resolution:
-// role_assignments(isStoreOwner) 우선 → KpaMember fallback.
+// 선택 매장 판정; 선택값 없는 기존 KPA membership 경로만 호환.
 // 두 컨트롤러가 동일한 organizationId를 사용해야 snapshot scope 정합이 유지된다.
-async function resolveOrgId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-  if (orgFromRa) return orgFromRa;
-  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
 
 export function createStoreAssetControlController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
+
+  function withAssetOrganization(handler: (req: Request, res: Response, organizationId: string) => Promise<void>): AuthMiddleware {
+    return async (req, res) => {
+      try {
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
+        if (!organizationId) return;
+        await handler(req, res, organizationId);
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    };
+  }
+
 
   /**
    * GET /store-assets
@@ -61,22 +66,12 @@ export function createStoreAssetControlController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
-        const organizationId = await resolveOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({
-            success: true,
-            data: { items: [], total: 0, page: 1, limit: 20, totalPages: 1 },
-          });
+          sendEmptyContentPage(res);
           return;
         }
 
@@ -205,27 +200,8 @@ export function createStoreAssetControlController(
   router.patch(
     '/:snapshotId/publish',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withAssetOrganization(async (req: Request, res: Response, organizationId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
-
-        const organizationId = await resolveOrgId(dataSource, userId);
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'NO_ORGANIZATION', message: 'User has no KPA organization membership' },
-          });
-          return;
-        }
-
         const { snapshotId } = req.params;
         const { status } = req.body as { status?: string };
 
@@ -298,7 +274,7 @@ export function createStoreAssetControlController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -311,27 +287,8 @@ export function createStoreAssetControlController(
   router.patch(
     '/:snapshotId/channel',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withAssetOrganization(async (req: Request, res: Response, organizationId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
-
-        const organizationId = await resolveOrgId(dataSource, userId);
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'NO_ORGANIZATION', message: 'User has no KPA organization membership' },
-          });
-          return;
-        }
-
         const { snapshotId } = req.params;
         const { channelMap } = req.body as { channelMap?: ChannelMap };
 
@@ -398,7 +355,7 @@ export function createStoreAssetControlController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   return router;
