@@ -37,6 +37,21 @@ export function createStoreAssetControlController(
 ): Router {
   const router = Router();
 
+  function withAssetOrganization(handler: (req: Request, res: Response, organizationId: string) => Promise<void>): AuthMiddleware {
+    return async (req, res) => {
+      try {
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
+        if (!organizationId) return;
+        await handler(req, res, organizationId);
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    };
+  }
+
+
   /**
    * GET /store-assets
    *
@@ -185,14 +200,8 @@ export function createStoreAssetControlController(
   router.patch(
     '/:snapshotId/publish',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withAssetOrganization(async (req: Request, res: Response, organizationId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
-
-        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
-        if (!organizationId) return;
-
         const { snapshotId } = req.params;
         const { status } = req.body as { status?: string };
 
@@ -265,7 +274,7 @@ export function createStoreAssetControlController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -278,14 +287,8 @@ export function createStoreAssetControlController(
   router.patch(
     '/:snapshotId/channel',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withAssetOrganization(async (req: Request, res: Response, organizationId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
-
-        const organizationId = await requireContentOrganization(dataSource, userId, req, res, 'NO_ORGANIZATION', 'User has no KPA organization membership');
-        if (!organizationId) return;
-
         const { snapshotId } = req.params;
         const { channelMap } = req.body as { channelMap?: ChannelMap };
 
@@ -352,7 +355,7 @@ export function createStoreAssetControlController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   return router;

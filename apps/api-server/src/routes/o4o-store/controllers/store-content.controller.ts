@@ -80,24 +80,36 @@ function sendContentFailure(res: Response, result: ContentResult<unknown>): void
   });
 }
 
+function validateDirectContentId(id: string, res: Response): boolean {
+  if (UUID_RE.test(id)) return true;
+  res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+  return false;
+}
+
+async function findTranslationContent(repo: Repository<KpaStoreContent>, id: string, organizationId: string, res: Response) {
+  const content = await repo.findOne({ where: { id, organization_id: organizationId, source_type: 'direct' } });
+  if (!content) res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+  return content;
+}
+
+
+function withContentUser(handler: (req: Request, res: Response, userId: string) => Promise<void>): AuthMiddleware {
+  return async (req, res) => {
+    try {
+      const userId = readContentUserId(req, res);
+      if (!userId) return;
+      await handler(req, res, userId);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  };
+}
+
 export function createStoreContentController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
-
-  function validateDirectContentId(id: string, res: Response): boolean {
-    if (UUID_RE.test(id)) return true;
-    res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-    return false;
-  }
-
-  async function findTranslationContent(repo: Repository<KpaStoreContent>, id: string, organizationId: string, res: Response) {
-    const content = await repo.findOne({ where: { id, organization_id: organizationId, source_type: 'direct' } });
-    if (!content) res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
-    return content;
-  }
-
 
   async function requireContentOwner(
     req: Request,
@@ -116,6 +128,14 @@ export function createStoreContentController(
       return null;
     }
     return access.organizationId;
+  }
+
+  async function requireTranslationContent(req: Request, res: Response, userId: string, id: string, ownerMessage: string) {
+    const organizationId = await requireContentOwner(req, res, userId, ownerMessage);
+    if (!organizationId) return null;
+    const repo = dataSource.getRepository(KpaStoreContent);
+    const content = await findTranslationContent(repo, id, organizationId, res);
+    return content ? { repo, content } : null;
   }
 
   const translationService = new ContentTranslationService(dataSource);
@@ -153,10 +173,8 @@ export function createStoreContentController(
   router.get(
     '/',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
 
         // 선택 매장 판정; 선택값 없는 기존 KPA membership 경로만 호환
         const organizationId = await requireContentOrganization(dataSource, userId, req, res);
@@ -167,7 +185,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -188,10 +206,8 @@ export function createStoreContentController(
   router.post(
     '/',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
 
         // WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1:
         // 기존 KPA 매장 소유권·계약 판정과 요청 선택 조직을 함께 확인
@@ -216,7 +232,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -230,10 +246,8 @@ export function createStoreContentController(
   router.get(
     '/by-product',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
 
         const sourceType = req.query.sourceType as string;
         const sourceId = req.query.sourceId as string;
@@ -280,7 +294,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -300,10 +314,8 @@ export function createStoreContentController(
   router.get(
     '/b2c-descriptions',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const listingId = req.query.listingId as string;
         if (!listingId || !UUID_RE.test(listingId)) {
           res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'listingId는 유효한 UUID 여야 합니다.' } });
@@ -352,7 +364,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -363,10 +375,8 @@ export function createStoreContentController(
   router.post(
     '/import-b2c-description',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         // 쓰기 = store owner 권한 (POST / 와 동일)
         const organizationId = await requireContentOwner(req, res, userId,
           '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
@@ -454,7 +464,7 @@ export function createStoreContentController(
         }
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -472,10 +482,8 @@ export function createStoreContentController(
   router.post(
     '/:id/reimport-source',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         // 쓰기 = store owner 권한 (import 와 동일)
         const organizationId = await requireContentOwner(req, res, userId,
           '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
@@ -605,7 +613,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -622,10 +630,8 @@ export function createStoreContentController(
   router.get(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const { id } = req.params;
         if (!validateDirectContentId(id, res)) return;
 
@@ -642,7 +648,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -654,10 +660,8 @@ export function createStoreContentController(
   router.put(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const { id } = req.params;
         if (!validateDirectContentId(id, res)) return;
 
@@ -678,7 +682,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -689,10 +693,8 @@ export function createStoreContentController(
   router.delete(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const { id } = req.params;
         if (!validateDirectContentId(id, res)) return;
 
@@ -711,7 +713,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -728,10 +730,8 @@ export function createStoreContentController(
   router.post(
     '/direct/:id/translate',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const { id } = req.params;
         if (!validateDirectContentId(id, res)) return;
         const locale = (req.body as { locale?: string })?.locale as TranslationLocale;
@@ -740,14 +740,9 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await requireContentOwner(req, res, userId,
-          '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.',
-        );
-        if (!organizationId) return;
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await findTranslationContent(repo, id, organizationId, res);
-        if (!content) return;
+        const owned = await requireTranslationContent(req, res, userId, id, '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.');
+        if (!owned) return;
+        const { repo, content } = owned;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const html = typeof cj.html === 'string' ? cj.html : '';
@@ -780,7 +775,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -790,10 +785,8 @@ export function createStoreContentController(
   router.put(
     '/direct/:id/translations/:locale',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
         const { id, locale } = req.params as { id: string; locale: string };
         if (!validateDirectContentId(id, res)) return;
         if (!TRANSLATION_LOCALES.includes(locale as TranslationLocale)) {
@@ -801,14 +794,9 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await requireContentOwner(req, res, userId,
-          '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.',
-        );
-        if (!organizationId) return;
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await findTranslationContent(repo, id, organizationId, res);
-        if (!content) return;
+        const owned = await requireTranslationContent(req, res, userId, id, '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.');
+        if (!owned) return;
+        const { repo, content } = owned;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const translations = (cj.translations && typeof cj.translations === 'object')
@@ -831,7 +819,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // (제거됨) POST /store-contents/:id/share-to-hub
@@ -855,10 +843,8 @@ export function createStoreContentController(
   router.get(
     '/:snapshotId',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
         //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
@@ -922,7 +908,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -937,10 +923,8 @@ export function createStoreContentController(
   router.put(
     '/:snapshotId',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const userId = readContentUserId(req, res);
-        if (!userId) return;
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
         //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
@@ -1021,7 +1005,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   return router;
