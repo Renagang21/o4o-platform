@@ -73,11 +73,12 @@ describe('og:url · canonical', () => {
 });
 
 describe('공개 footer · /about 메타 — legacy "약사회" 브랜드 없음 (WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1)', () => {
-  it('footer 링크 그룹 · 라벨에 약사회 없음, /about 은 서비스 소개로 남는다', () => {
+  it('footer 는 업무 메뉴와 약관만 제공하고 서비스 소개를 노출하지 않는다', () => {
     const text = KPA_FOOTER_SECTIONS.flatMap((s) => [s.title, ...s.links.map((l) => l.label)]).join(' ');
     expect(text).not.toMatch(/약사회/);
     const about = KPA_FOOTER_SECTIONS.flatMap((s) => s.links).find((l) => l.href === '/about');
-    expect(about?.label).toBe('서비스 소개');
+    expect(about).toBeUndefined();
+    expect(KPA_FOOTER_SECTIONS.flatMap(s => s.links).some(l => l.href === '/businesses/pharmacy/forum')).toBe(true);
   });
 
   it('/about 메타 description 에 대한약사회 없음', () => {

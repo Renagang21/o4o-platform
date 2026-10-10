@@ -1,5 +1,7 @@
 # Neture Distribution Engine v1 — Freeze Declaration
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **Status:** Frozen (Beta-Operational)
 > **Freeze Date:** 2026-02-27
 > **Version:** v1.0
@@ -89,7 +91,7 @@ Supplier INACTIVE / Product REJECTED
 
 REVOKED/REJECTED는 자동 차단.
 
-> **Neture 약국 매장 주문 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 이 3계층 가드는 기존 축(Neture B2B · 승인축 · PharmacyHub)에 그대로 적용된다. Neture 약국 매장 주문(`neture_pharmacy_cart`)은 가드 조건을 바꾸지 않고 별도 확정 서비스가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 이용 판정(기본 가입 · 세미프랜차이즈 가입 · 승인된 공급 제안 · 대상 약국)을 주문 확정 시 다시 수행한다.
+> **Neture 약국 매장 주문 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 이 3계층 가드는 기존 축(Neture B2B · 승인축 · PharmacyHub)에 그대로 적용된다. Neture 약국 매장 주문(`neture_pharmacy_cart`)은 가드 조건을 바꾸지 않고 별도 확정 서비스가 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 이용 판정(기본 가입 · 약국 협력사업 가입 · 승인된 공급 제안 · 대상 약국)을 주문 확정 시 다시 수행한다.
 
 ---
 

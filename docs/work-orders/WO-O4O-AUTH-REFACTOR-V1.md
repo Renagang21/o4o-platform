@@ -50,19 +50,22 @@
 - [x] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
 - [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
 - [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
-- [ ] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합
+- [x] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합 (`2002214684`, 통합 후 CI #37892227465 PASS)
 - [ ] 별도 문서 정합 작업: Identity V3의 과거 kpa-society/k-cosmetics 로그인 membership 필수 문구를 현행 공통 로그인 정책과 정렬 (CHECK의 OPEN 드리프트; Frozen 본문 임의 수정 없음)
 
 ### 4. 카카오 로그인·명시적 연결
 
+문서·코드 조사로 구체화한 TODO와 하위 PR 순서는 [카카오·명시적 연결 WO](WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다. 4-A는 세션 수단·전체관리자 경계, 4-B는 카카오 OAuth, 4-C는 재인증 기반 계정 연결이다. 기존 Google 세션의 claim 부재 및 handoff의 Google 추정부터 해소한다.
+
 - [ ] 카카오 앱 설정·redirect origin·서버 자격정보 존재 확인 (값은 환경 설정에서만 관리)
-- [ ] 서버 검증 OAuth code 교환, state/PKCE·일회 사용·redirect 검증과 카카오 ID 기반 조회
-- [ ] 카카오 확인 이메일이 없으면 O4O 이메일 확인 수행; 공통 이름·모바일·약관 가입 정책 적용
-- [ ] `authMethod`를 Google/password/Kakao로 명시; 전체관리자 경계는 Google 긍정 판정
-- [ ] 공통 로그인 컴포넌트와 각 서비스·handoff에 카카오 방식 연결
-- [ ] 기존 계정 재인증 + 외부 계정 인증을 거친 명시적 연결; Demo 소셜 연결 차단
-- [ ] provider uniqueness 및 동시 연결 충돌·실패 rollback·마지막 로그인 수단 보호 검증
-- [ ] 동일 이메일 자동 병합 금지 회귀 및 소셜 실접속 smoke
+- [x] 서버 검증 REST code 교환, 브라우저에 바인딩한 state·일회 사용·redirect 검증과 카카오 ID 기반 조회 (PKCE 지원은 단정하지 않음)
+- [x] 카카오 확인 이메일이 없으면 O4O 이메일 확인 수행; 공통 이름·모바일·약관 가입 정책 적용
+- [x] `authMethod`를 Google/password/Kakao로 명시; 전체관리자 경계는 Google 긍정 판정
+- [x] 공통 로그인 컴포넌트와 각 서비스·handoff에 카카오 방식 연결
+- [x] 기존 계정 재인증 + 외부 계정 인증을 거친 명시적 연결; Demo 소셜 연결 차단
+- [x] provider uniqueness 및 동시 연결 충돌·실패 rollback·마지막 로그인 수단 보호 검증
+- [x] 동일 이메일 자동 병합 금지 로컬 회귀
+- [ ] 후속 PR main 통합·배포 및 실제 Google/Kakao 실접속 smoke
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
 
@@ -92,3 +95,10 @@
 단계 2 검증 결과: [CHECK-O4O-AUTH-REFACTOR-PHASE2-V1](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md). 사용자 지정 순서(2026-10-09)는 세션·비밀번호 → 가입·권한 회귀 → 카카오·계정 연결이다. 데이터 연결 확인은 각 단계의 Demo 검증에 포함하고, 별도 정리 TODO를 선행 완료로 간주하지 않는다.
 
 단계 3: 같은 CHECK의 [가입·권한 회귀](../checks/CHECK-O4O-AUTH-REFACTOR-PHASE2-V1.md#가입권한-회귀--phase-3)에 API 483건·UI 130건과 운영 8개 서비스 PC/모바일 32건의 결과를 기록했다. 이 후속은 기록-only이며 추가 배포 대상이 아니다. 실제 카카오 OAuth와 계정 연결·데이터 정리는 후속 TODO다.
+
+## 2026-10-10 단계 4 진행
+
+4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체관리자·웹 배포 성공.
+4-B/4-C는 사용자 지시로 일회용 증명 원장을 공유하는 후속 PR로 구현·로컬 검증했다.
+운영 키/앱 설정, 실제 OAuth, 새 PR main 승인·배포는 완료와 구분한다.
+검증: [카카오·명시적 연결 CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md).

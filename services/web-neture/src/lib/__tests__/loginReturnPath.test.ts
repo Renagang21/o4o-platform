@@ -32,3 +32,9 @@ describe('resolveLoginReturnPath', () => {
     expect(isSafeReturnPath(42)).toBe(false);
   });
 });
+
+it('Kakao callback uses the common returnTo without losing the account or handoff destination', () => {
+  expect(resolveLoginReturnPath(null, '?returnTo=%2Fmypage%2Fsettings')).toBe('/mypage/settings');
+  expect(resolveLoginReturnPath(null, '?returnTo=%2Fservice-entry%2Flecture%3FreturnPath%3D%252Fcourses')).toBe('/service-entry/lecture?returnPath=%2Fcourses');
+  expect(resolveLoginReturnPath(null, '?returnTo=%2F%2Fattacker.invalid')).toBeUndefined();
+});

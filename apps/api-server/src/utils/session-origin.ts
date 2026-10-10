@@ -49,6 +49,9 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
   }
   if (host === STORE_WORKSPACE_HOST.toLowerCase()) return STORE_WORKSPACE_KEY;
   if (ADMIN_HOSTS.includes(host)) return ADMIN_SURFACE_KEY;
+  // Supported www service aliases share the catalog's session scope; arbitrary hosts remain unknown.
+  // Keep admin/workspace special hosts exact, before this catalog-only normalization.
+  const catalogHost = host.startsWith('www.') ? host.slice(4) : host;
   // canonical `domain` 과 수용 전용 `legacyDomains` 를 같은 서비스로 본다 — 옛 호스트(인쇄 QR · 북마크)로
   // 들어온 로그인도 같은 서비스 세션이다. 판정은 host 만 본다(path 무시): kpa-society.co.kr 은 kpa-society 의
   // 옛 호스트이고 그 아래 `/kpa/*` 는 옛 분회 공용 경로지만 여기서는 kpa-society 다. 분회 세션은 canonical
@@ -57,8 +60,8 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
   return (
     O4O_SERVICES.find(
       (svc) =>
-        svc.domain.toLowerCase() === host ||
-        (svc.legacyDomains ?? []).some((legacy) => legacy.toLowerCase() === host),
+        svc.domain.toLowerCase() === catalogHost ||
+        (svc.legacyDomains ?? []).some((legacy) => legacy.toLowerCase() === catalogHost),
     )?.key ?? null
   );
 }

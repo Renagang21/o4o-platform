@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * store-web AuthContext — 새 인증 방식을 만들지 않는다(@o4o/auth-react `useServiceAuth` 재사용).
  * 차이는 단 하나: **serviceKey 를 넘기지 않는다.** Store Workspace 는 서비스가 아니므로
@@ -35,6 +36,8 @@ interface AuthContextValue {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<StoreUser>>;
   /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 범위는 서버가 Origin 으로 정한다). */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<StoreUser>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<StoreUser>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<StoreUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<StoreUser>>;
   pendingPolicyAcceptances: PendingPolicyAcceptance[];
   acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
@@ -62,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithGoogle: core.loginWithGoogle,
     loginWithEmail: core.loginWithEmail,
     signupWithGoogle: core.signupWithGoogle,
+        loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
     pendingPolicyAcceptances: core.pendingPolicyAcceptances,
     acceptPendingPolicies: core.acceptPendingPolicies,
   }}>{children}</AuthContext.Provider>;

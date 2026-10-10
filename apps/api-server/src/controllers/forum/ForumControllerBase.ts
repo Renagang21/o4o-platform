@@ -356,10 +356,10 @@ export class ForumControllerBase {
     const legacyCommunityKey = communityKeyForForumStorageCode(forum.service_code);
     if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
       const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
-        `SELECT community_key AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
+        `SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
          UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forum.service_code],
       );
-      if (!rows[0]) return false;
+      if (typeof rows[0]?.key !== 'string' || !rows[0].key) return false;
       const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
       const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
       if (workspace?.allowed && workspace.canManage) return true;

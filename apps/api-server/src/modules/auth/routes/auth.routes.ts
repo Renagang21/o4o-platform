@@ -23,6 +23,8 @@ import {
 import { HandoffController } from '../controllers/handoff.controller.js';
 import { GoogleAuthController } from '../controllers/google-auth.controller.js';
 import { EmailAuthController } from '../controllers/email-auth.controller.js';
+import { SocialAuthController } from '../controllers/social-auth.controller.js';
+import { SocialStartDto,SocialProviderStartDto,SocialLinkStartDto,SocialProofDto,SocialSignupDto,SocialPasswordReauthDto,SocialConfirmDto } from '../dto/social-auth.dto.js';
 import {
   validateDto,
 } from '../../../common/middleware/validation.middleware.js';
@@ -54,6 +56,21 @@ import {
 import { requireJsonBody } from '../../../middleware/require-json-body.middleware.js';
 
 const router: IRouter = Router();
+
+// CORE_CHANGE: WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1 (user-approved phase 4).
+// New browser-bound routes. Retired /google/link and legacy passport routes stay retired.
+router.get('/social/kakao/config',asyncHandler(SocialAuthController.config));
+router.post('/social/kakao/start',requireJsonBody,emailTokenLimiter,validateDto(SocialStartDto),asyncHandler(SocialAuthController.startLogin));
+router.get('/social/kakao/callback',asyncHandler(SocialAuthController.callback));
+router.post('/social/kakao/complete',requireJsonBody,emailLoginLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.completeLogin));
+router.post('/social/kakao/signup',requireJsonBody,emailSignupLimiter,validateDto(SocialSignupDto),asyncHandler(SocialAuthController.signup));
+router.get('/social/accounts',requireAuth,asyncHandler(SocialAuthController.accounts));
+router.post('/social/reauth/password',requireJsonBody,requireAuth,emailLoginLimiter,validateDto(SocialPasswordReauthDto),asyncHandler(SocialAuthController.reauthenticatePassword));
+router.post('/social/reauth/start',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialProviderStartDto),asyncHandler(SocialAuthController.startReauthentication));
+router.post('/social/reauth/complete',requireJsonBody,requireAuth,emailLoginLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.completeReauthentication));
+router.post('/social/link/start',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialLinkStartDto),asyncHandler(SocialAuthController.startLink));
+router.post('/social/link/verify',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.verifyLink));
+router.post('/social/link/confirm',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialConfirmDto),asyncHandler(SocialAuthController.confirmLink));
 
 /**
  * ========================================

@@ -188,7 +188,7 @@ describe('B. HandoffTokenService — 두 형태 · 같은 원자 consume', () =>
   });
 
   it("수단은 호출자가 넘긴 값만 적는다 — 'google' · 'password' · 그 밖의 값은 password", async () => {
-    for (const [given, stored] of [['google', 'google'], ['password', 'password'], ['GOOGLE', 'password']] as const) {
+    for (const [given, stored] of [['google', 'google'], ['password', 'password'], ['kakao', 'kakao'], ['GOOGLE', 'password']] as const) {
       query.mockReset();
       query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
       await handoffTokenService.generateToken('user-1', 'neture', 'kpa-society', 0, given as any);
@@ -310,7 +310,9 @@ describe('C-2. generateHandoff — 출발 세션 수단을 원장에 적는다',
   beforeEach(() => {
     verifyAccessToken.mockImplementation((t: string) => {
       if (t === 'PW-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0, authMethod: 'password' };
-      if (t === 'GOOGLE-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0 };
+      if (t === 'GOOGLE-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0, authMethod: 'google' };
+      if (t === 'KAKAO-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0, authMethod: 'kakao' };
+      if (t === 'LEGACY-SESSION') return { userId: 'user-1', serviceKey: 'neture', sessionEpoch: 0 };
       return null;
     });
   });
@@ -333,12 +335,20 @@ describe('C-2. generateHandoff — 출발 세션 수단을 원장에 적는다',
     expect(linkedAccountsQuery).not.toHaveBeenCalled();
   });
 
-  it("Google 세션(authMethod claim 없음) → 원장 'google'", async () => {
+  it("Google 세션(authMethod google) → 원장 'google'", async () => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
     await HandoffController.generateHandoff(sessionReq({ targetServiceKey: 'kpa-society' }, 'GOOGLE-SESSION'), res);
     expect(res.statusCode).toBe(200);
     expect(inserted()?.[1][6]).toBe('google');
+  });
+
+  it.each([['KAKAO-SESSION', 'kakao'], ['LEGACY-SESSION', 'password']])('preserves %s without inferring Google from an absent/password marker', async (token, expected) => {
+    query.mockImplementation(async (sql: string) => /INSERT INTO handoff_tokens/i.test(sql) ? [{ id: uuid }] : []);
+    const res = mockRes();
+    await HandoffController.generateHandoff(sessionReq({ targetServiceKey: 'neture', authMethod: 'google' }, token), res);
+    expect(res.statusCode).toBe(200);
+    expect(inserted()?.[1][6]).toBe(expected);
   });
 
   it("검증되지 않는 토큰 · body 의 authMethod 주장 → 발급 거절 (fail-closed)", async () => {
@@ -361,7 +371,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
   const consumedWorkspace = () =>
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'kpa-society', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: null, target_workspace: 'store', created_at: new Date(0), source_auth_method: 'google' }], 1]);
   // 기본 = Google 세션 출발(종전 계약: claim 없음 = null). 수단별 시나리오는 인자로 바꾼다.
-  const consumedService = (authMethod: 'google' | 'password' | null = 'google') =>
+  const consumedService = (authMethod: 'google' | 'password' | 'kakao' | null = 'google') =>
     query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', target_workspace: null, created_at: new Date(0), source_auth_method: authMethod }], 1]);
   const memberships = [{ serviceKey: 'kpa-society', status: 'active' }];
 
@@ -392,7 +402,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 끝 두 인자 = 이 세션이 속한 대상과
     //   그 대상의 **현재 세대**. WORKSPACE handoff 는 서비스가 아니므로 workspace 키를 쓴다.
     //   세대를 새기지 않으면 그 대상에서 로그아웃한 뒤 재발급된 토큰까지 거절된다.
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0, null);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'store', 0, 'google');
     expect(persistRefreshTokenFamily).not.toHaveBeenCalled();
     // exchange 는 쿠키를 내리지 않는다 — body 토큰만(URL-FIRST-CENSUS §19-1 · §21-2).
     //   이미 배포된 HandoffPage 가 credentials:'include' 로 호출해도 저장될 쿠키가 없다.
@@ -443,7 +453,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(res.body.data).not.toHaveProperty('targetWorkspace');
     // SERVICE handoff 는 대상 서비스 키와 그 서비스의 세대를 새긴다 —
     //   그 서비스 로그아웃이 이 토큰을 지목할 수 있어야 한다.
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, null);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['store_owner'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'google');
     expect(resolveAccessibleStores).not.toHaveBeenCalled();
   });
 
@@ -493,7 +503,7 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'password');
   });
 
-  it("원장 'google' + platform 역할 → Google 세션 그대로 (claim 없음)", async () => {
+  it("원장 'google' + platform 역할 → Google 세션 그대로 (명시적 claim)", async () => {
     consumedService('google');
     findOne.mockResolvedValueOnce(USER);
     query.mockResolvedValueOnce(memberships);
@@ -501,7 +511,21 @@ describe('D. exchangeHandoff — origin 고정 · organization 재검증 · serv
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://kpa-society.co.kr', undefined), res);
     expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, null);
+    expect(generateTokens).toHaveBeenCalledWith(USER, ['platform:super_admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'google');
+  });
+
+  it.each([false, true])('Kakao exchange preserves the method; platform account=%s', async (platform) => {
+    consumedService('kakao'); findOne.mockResolvedValueOnce(USER); query.mockResolvedValueOnce(memberships);
+    jest.mocked(roleAssignmentService.getRoleNames).mockResolvedValueOnce(platform ? ['platform:super_admin'] : ['kpa-society:admin']);
+    const res = mockRes();
+    await HandoffController.exchangeHandoff(mockReq({ token: uuid, authMethod: 'google' }, 'https://kpa-society.co.kr', undefined), res);
+    if (platform) {
+      expect([res.statusCode, res.body.code]).toEqual([403, 'GOOGLE_SESSION_REQUIRED']);
+      expect(generateTokens).not.toHaveBeenCalled();
+    } else {
+      expect(res.statusCode).toBe(200);
+      expect(generateTokens).toHaveBeenCalledWith(USER, ['kpa-society:admin'], 'neture.co.kr', memberships, 'fam-1', 'kpa-society', 0, 'kakao');
+    }
   });
 
   it('service 토큰 + pending → 로그인 허용, 서비스 승인은 유지', async () => {

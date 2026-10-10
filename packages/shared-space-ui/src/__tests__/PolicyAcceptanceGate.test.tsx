@@ -66,7 +66,14 @@ describe('PolicyAcceptanceGate', () => {
   });
 
   it('pending 이 있으면 children 을 그리지 않고 약관 전문을 불러온다 (닫기 없음)', async () => {
-    renderGate({});
+    const { onAccept, onLogout } = renderGate({});
+    const home = screen.getByRole('link', { name: 'O4O 메인으로' });
+    expect(home.getAttribute('href')).toBe('https://neture.co.kr/');
+    expect(screen.getByRole('dialog').contains(home)).toBe(true);
+    home.addEventListener("click", (event) => event.preventDefault(), { once: true });
+    fireEvent.click(home);
+    expect(onAccept).not.toHaveBeenCalled();
+    expect(onLogout).not.toHaveBeenCalled();
     expect(screen.queryByTestId('app-shell')).toBeNull();
     await waitFor(() => expect(screen.getByTestId('policy-acceptance-content').textContent).toContain('제1조 목적'));
     expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe('true');

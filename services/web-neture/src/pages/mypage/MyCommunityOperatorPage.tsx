@@ -81,7 +81,7 @@ function JoinRequestsPanel({
       {rows === null && !error && <p className="mt-3 text-gray-500">불러오는 중입니다…</p>}
       {rows && rows.length > 0 && (
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full min-w-[600px] border-collapse">
             <thead>
               <tr className="border-b border-gray-200 text-left text-xs text-gray-500">
                 <th className="py-2">이름</th>
@@ -104,7 +104,7 @@ function JoinRequestsPanel({
                     <button
                       type="button"
                       disabled={busyId === r.id || !canApproveJoin(r)}
-                      title={canApproveJoin(r) ? undefined : '서비스 이용이 정지된 신청자는 승인할 수 없습니다.'}
+                      title={canApproveJoin(r) ? undefined : '서비스 가입이 비활성 상태입니다. 서비스 회원 관리에서 처리한 뒤 승인해 주세요.'}
                       onClick={() => act(r, 'approve')}
                       className="rounded bg-primary-600 px-3 py-1 text-xs text-white disabled:opacity-50"
                     >
@@ -178,7 +178,7 @@ export default function MyCommunityOperatorPage() {
   return layout(
     <div className="text-sm">
       <p className="text-xs text-gray-500">
-        담당 커뮤니티의 가입 신청을 심사합니다. 중앙에서 지정한 커뮤니티 서비스 Admin/Operator는 전체 독립 커뮤니티를 관리합니다. 서비스 이용이 정지된 신청자는 승인되지 않습니다.
+        담당 커뮤니티의 가입 신청을 심사합니다. 중앙에서 지정한 커뮤니티 서비스 Admin/Operator는 전체 독립 커뮤니티를 관리합니다. 최초 서비스 가입은 승인과 함께 생성하며, 기존 서비스 가입이 비활성 상태인 신청자는 서비스 회원 관리에서 먼저 처리해야 합니다.
       </p>
       {error && <p className="mt-3 text-red-600">{error}</p>}
       {communities === null && !error && <p className="mt-4 text-gray-500">불러오는 중입니다…</p>}

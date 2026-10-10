@@ -183,10 +183,12 @@ const AUTOMATION_INTRO_SEEN_KEY = 'neture:automation:intro-seen:v1';
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function O4OHomePage() {
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout, pendingPolicyAcceptances } = useAuth();
   const { openLoginModal } = useLoginModal();
   // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
-  const entry = useHomeEntry(isAuthenticated && !!user);
+  const hasPendingTerms = (pendingPolicyAcceptances?.length ?? 0) > 0;
+  const canUseHomeWorkspace = isAuthenticated && !!user && !hasPendingTerms;
+  const entry = useHomeEntry(canUseHomeWorkspace);
   // Phase 3 연결점 — 현재 업무 컨텍스트를 그대로 AI 요청에 싣는다.
   // 서버가 membership·매장을 다시 확정하므로 여기 값은 권한 근거가 아니다.
   const { workScope, isResolvingStore } = useWorkScope();
@@ -399,7 +401,7 @@ export default function O4OHomePage() {
   const ATTACH_ICON = { image: ImageIcon, document: FileText, spreadsheet: Table2 } as const;
 
   // FIRST_USE_GUIDANCE — 로그인 후에만 보인다(로그인 전에는 O4O 소개 · 서비스 발견을 가리지 않는다).
-  const introBanner = isAuthenticated && user ? (
+  const introBanner = canUseHomeWorkspace ? (
     <>
       {/*
         FIRST_USE_GUIDANCE — WO-O4O-COMMON-AUTOMATION-CORE-USER-COLLABORATION-AND-QUESTION-FLOW-V1 §2·§4·§6.
@@ -754,7 +756,7 @@ export default function O4OHomePage() {
         )}
       </div>
 
-      {isAuthenticated && user ? (
+      {canUseHomeWorkspace ? (
         /* 로그인 후 = AI + 내 업무 시작 (WO-O4O-NETURE-PUBLIC-HOME-IA-REFRESH-V1 — 구조 불변) */
         <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24">
           <h1 className="m-0 text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">O4O</h1>
@@ -766,7 +768,7 @@ export default function O4OHomePage() {
           ) : (
             <>
               {introBanner}
-              {composerArea}
+              {hasPendingTerms ? null : composerArea}
             </>
           )}
 
@@ -805,7 +807,7 @@ export default function O4OHomePage() {
             <p className="mt-3 mb-0 max-w-md text-sm leading-relaxed text-slate-500">
               약국 · 전문매장 · 공급자가 정보를 나누고 실제 매장에서 활용할 수 있도록 연결합니다.
             </p>
-            {!authLoading && (
+            {!authLoading && !hasPendingTerms && (
               <button
                 type="button"
                 onClick={() => openLoginModal()}
@@ -816,6 +818,7 @@ export default function O4OHomePage() {
                 로그인하고 시작하기
               </button>
             )}
+            {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
           </section>
 
           <div className="mt-14 flex w-full flex-col items-center">
@@ -830,7 +833,7 @@ export default function O4OHomePage() {
           <section aria-labelledby="home-ai-title" className="mt-14 flex w-full max-w-xl flex-col items-center text-center">
             <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O AI</h2>
             <p className="mt-2 mb-0 text-sm leading-relaxed text-slate-500">질문하거나 필요한 업무를 요청할 수 있습니다.</p>
-            {composerArea}
+            {hasPendingTerms ? null : composerArea}
           </section>
 
           {/* 공개 소식 — 실제 글이 있을 때만(0건이면 빈 섹션을 두지 않는다). 로딩 · 오류는 그대로 보인다. */}

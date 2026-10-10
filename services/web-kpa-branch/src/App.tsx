@@ -42,8 +42,10 @@
  * 프론트 라우트는 UX 안내이며 권한 판정 근거가 아니다.
  * 실제 경계는 backend 의 requireKpaBranchScope + resolveBranch + requireBranchScope 가 강제한다.
  */
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { O4OHomeButton } from '@o4o/auth-react';
+import { authClient } from './lib/apiClient';
 import { TenantProvider, useTenant, detectBasename } from './lib/tenant';
 import { BranchLayout } from './layouts/BranchLayout';
 import DirectoryPage from './pages/DirectoryPage';
@@ -112,7 +114,17 @@ function BranchBySlug() {
   return <BranchSection slug={branchSlug} basePath={`/${branchSlug}`} />;
 }
 
+function StandaloneReturnNavigation() {
+  const { pathname } = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
+  if (!["/login", "/join", "/me", "/service-admin"].includes(pathname)) return null;
+  return <nav aria-label="대표 홈 복귀" className="border-b border-gray-200 px-4 py-3">
+    <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" />
+  </nav>;
+}
+
 function AppRoutes() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { isCustomDomain, hostBranch, isLoading, error } = useTenant();
 
   if (isCustomDomain) {
@@ -124,6 +136,7 @@ function AppRoutes() {
         <div className="p-10 text-center">
           <p className="text-lg font-semibold text-gray-900">분회를 찾을 수 없습니다</p>
           <p className="mt-2 text-sm text-gray-500">{error ?? '도메인 연결이 아직 완료되지 않았습니다.'}</p>
+          <div className="mt-4"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
         </div>
       );
     }
@@ -170,6 +183,7 @@ export default function App() {
     <BrowserRouter basename={basename}>
       <AuthProvider>
         <TenantProvider>
+          <StandaloneReturnNavigation />
           <AppRoutes />
         </TenantProvider>
       </AuthProvider>

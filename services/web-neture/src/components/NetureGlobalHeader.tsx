@@ -24,9 +24,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { DEMO_NOTICE } from '../lib/demoAccounts';
 import {
-  NETURE_PUBLIC_NAV,
+  getServicePublicNav,
   NETURE_CONTEXTUAL_NAV,
 } from '../config/navigation';
+import { CURRENT_HOST_PROFILE } from '../lib/hostProfile';
 import { NetureUserMenuItems } from './NetureUserMenu';
 import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
 // ─── Brand ───────────────────────────────────────────────────────────────────
@@ -88,8 +89,8 @@ export function NetureGlobalHeader() {
 
   return (
     <GlobalHeader
-      brand={NETURE_HEADER_BRAND}
-      publicNav={NETURE_PUBLIC_NAV}
+      brand={CURRENT_HOST_PROFILE === 'main' ? NETURE_HEADER_BRAND : { ...NETURE_HEADER_BRAND, name: { supplier: '공급자', funding: '유통참여형 펀딩', community: '커뮤니티' }[CURRENT_HOST_PROFILE], subtitle: '' }}
+      publicNav={getServicePublicNav(CURRENT_HOST_PROFILE)}
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}

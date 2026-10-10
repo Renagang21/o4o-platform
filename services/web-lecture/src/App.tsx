@@ -1,5 +1,5 @@
 import OperatorMembersPage from './pages/operator/OperatorMembersPage';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { ToastProvider } from './components/Toast';
@@ -7,7 +7,6 @@ import AccessGate from './components/AccessGate';
 import SiteShell from './components/SiteShell';
 import ContactPage from './pages/ContactPage';
 import OperatorContactPage from './pages/operator/OperatorContactPage';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
@@ -38,7 +37,7 @@ export default function App() {
   return <BrowserRouter><AuthProvider><ToastProvider><TermsAcceptanceGate><Routes>
     <Route path="/handoff" element={<HandoffPage />} />
     <Route element={<SiteShell />}>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<Navigate to="/courses" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />

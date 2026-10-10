@@ -4,7 +4,7 @@ import type { EntityManager } from 'typeorm';
 import { getCommunityDefinition, listActiveCommunities } from '../../config/community-catalog.js';
 import { resolveCommunityAccess, type CommunityAccessUser } from '../../utils/community-access.resolver.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
-import { resolveSemiFranchiseCommunityAccess } from '../../modules/neture-pharmacy/services/semi-franchise-community-access.js';
+import { resolveSemiFranchiseBusinessAccess, resolveSemiFranchiseCommunityAccess } from '../../modules/neture-pharmacy/services/semi-franchise-community-access.js';
 
 type Exec = { query: EntityManager['query'] };
 
@@ -12,6 +12,8 @@ export interface CommunityWorkspace {
   communityKey: string;
   name: string;
   kind: 'independent' | 'semi-franchise';
+  /** Business identity for service-owned participant navigation; storage codes stay unchanged. */
+  businessKey?: string;
   allowed: boolean;
   canManage: boolean;
   canJoin: boolean;
@@ -22,16 +24,23 @@ export interface CommunityWorkspace {
 
 /** Existing pharmacist forums retain their ledger. New spaces use immutable UUIDs (varchar(50)). */
 export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAccessUser | null, key: string): Promise<CommunityWorkspace | null> {
-  const [sf] = await exec.query('SELECT id, key, name, status FROM semi_franchises WHERE community_key = $1', [key]);
+  if (typeof key !== 'string' || !key) return null;
+  const byBusinessKey = key.startsWith('business:');
+  const [sf] = await exec.query(byBusinessKey
+    ? 'SELECT id, key, name, status FROM semi_franchises WHERE key = $1'
+    : 'SELECT id, key, name, status FROM semi_franchises WHERE community_key = $1', [byBusinessKey ? key.slice('business:'.length) : key]);
+  if (byBusinessKey && !sf) return null;
   const eligible = !!user?.id && (await getNetureMainMembershipStatus(exec, user.id)) === 'active';
   if (sf) {
-    const access = await resolveSemiFranchiseCommunityAccess(exec, user?.id, key);
+    const access = byBusinessKey
+      ? await resolveSemiFranchiseBusinessAccess(exec, user?.id, sf.key)
+      : await resolveSemiFranchiseCommunityAccess(exec, user?.id, key);
     const operators = eligible && sf.status === 'active' ? await exec.query(
       `SELECT 1 FROM semi_franchise_operators sfo
        JOIN role_assignments ra ON ra.user_id = sfo.user_id AND ra.is_active = true AND ra.role IN ('neture:operator','neture:admin')
        WHERE sfo.semi_franchise_id = $1 AND sfo.user_id = $2 AND sfo.revoked_at IS NULL`, [sf.id, user!.id],
     ) : [];
-    return { communityKey: key, name: sf.name, kind: 'semi-franchise', allowed: access.allowed,
+    return { communityKey: key, name: sf.name, kind: 'semi-franchise', businessKey: sf.key, allowed: access.allowed,
       canManage: operators.length > 0, canJoin: false, membershipStatus: access.allowed ? 'active' : null,
       reason: access.allowed ? null : user?.id ? 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED' : 'AUTH_REQUIRED',
       forumStorageCodes: [`sf:${sf.id}`] };
@@ -56,7 +65,7 @@ export async function resolveCommunityWorkspace(exec: Exec, user: CommunityAcces
 }
 
 export async function listCommunityWorkspaces(exec: Exec, user: CommunityAccessUser | null): Promise<CommunityWorkspace[]> {
-  const rows = await exec.query("SELECT slug AS key FROM communities WHERE status = 'active' UNION SELECT community_key AS key FROM semi_franchises WHERE community_key IS NOT NULL AND status = 'active'");
+  const rows = await exec.query("SELECT slug AS key FROM communities WHERE status = 'active' UNION SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE status = 'active'");
   const keys = new Set([...listActiveCommunities().map(c => c.key), ...rows.map(r => r.key)]);
   const result: CommunityWorkspace[] = [];
   for (const key of keys) {

@@ -38,6 +38,7 @@ import {
   type MembershipAction,
   type SupplyKind,
 } from './constants.js';
+import { getBusinessInfo } from './services/business-info.js';
 import { PharmacyMembershipService } from './services/pharmacy-membership.service.js';
 import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provisioner.js';
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
@@ -171,6 +172,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     paymentMode: payments.mode(),
   })));
 
+  // Application surface: authentication only; membership still gates every business resource.
+  router.get('/pharmacy/businesses/:key', requireAuth, handle(async (req) => getBusinessInfo(dataSource, req.params.key)));
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
     semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));
