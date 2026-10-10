@@ -21,6 +21,8 @@ const db: {
 } = { communities: [], requests: [], memberships: [], serviceMemberships: [], roleWrites: [], demoUsers: [], demoLookupFails: false };
 
 let beforeServiceLock: (() => void) | undefined;
+let mainRow: Row | null;
+let mainLookupFails = false;
 let seq = 0;
 const uid = () => `id-${++seq}`;
 
@@ -33,7 +35,10 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
-    if (/FROM users u/i.test(sql)) return [{ account_status: 'active', account_active: true, email_verified: true }];
+    if (/FROM users u/i.test(sql)) {
+      if (mainLookupFails) throw new Error('main lookup unavailable');
+      return mainRow ? [mainRow] : [];
+    }
     if (/SELECT nickname FROM users/i.test(sql)) return [{ nickname: '테스트 닉네임' }];
     if (/FROM demo_accounts/i.test(sql)) {
       if (db.demoLookupFails) throw new Error('db down');
@@ -84,6 +89,8 @@ beforeEach(() => {
   db.roleWrites = [];
   db.demoUsers = [];
   db.demoLookupFails = false;
+  mainRow = { account_status: 'active', account_active: true, email_verified: true };
+  mainLookupFails = false;
   seq = 0;
   beforeServiceLock = undefined;
 });
@@ -410,5 +417,41 @@ describe('거절 — 승인과 같은 주체가, 자격은 만들지 않고', ()
     await service.rejectJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
     const again = await service.requestJoin({ communityId: 'c1', userId: JOINER });
     expect(again.status).toBe('pending');
+  });
+});
+
+
+describe('승인 시점 신청자 메인 자격', () => {
+  const cases: Array<[string, Row | null, string]> = [
+    ['계정 정지', { account_status: 'suspended', account_active: true, email_verified: true }, 'suspended'],
+    ['계정 비활성', { account_status: 'active', account_active: false, email_verified: true }, 'suspended'],
+    ['이메일 미확인', { account_status: 'active', account_active: true, email_verified: false }, 'pending'],
+    ['메인 가입 해지', { account_status: 'active', account_active: true, email_verified: true, membership_status: 'withdrawn' }, 'withdrawn'],
+    ['계정 없음', null, 'none'],
+  ];
+
+  it.each(cases)('%s이면 개설과 가입 모두 쓰기 전에 거절한다', async (_label, row, status) => {
+    const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    db.serviceMemberships.push({ user_id: JOINER, service_key: 'other-service', status: 'active' });
+    const before = JSON.stringify(db);
+    mainRow = row;
+    for (const approve of [
+      () => service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER }),
+      () => service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER }),
+    ]) {
+      await expect(approve()).rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED', httpStatus: 409, membershipStatus: status });
+      expect(JSON.stringify(db)).toBe(before);
+    }
+  });
+
+  it('조회 실패 시 승인하지 않고 신청을 보존한다', async () => {
+    const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    const before = JSON.stringify(db);
+    mainLookupFails = true;
+    await expect(service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER })).rejects.toThrow('main lookup unavailable');
+    await expect(service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER })).rejects.toThrow('main lookup unavailable');
+    expect(JSON.stringify(db)).toBe(before);
   });
 });

@@ -160,6 +160,7 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const reqRepo = m.getRepository(CommunityCreationRequest);
       const request = await loadPendingRequest(m, input.requestId);
+      await assertNetureMainMembershipActive(m, request.requesterUserId, 'applicant');
 
       // Demo 계정에 개체 운영자 role 을 주지 않는다 — 신청 행 갱신을 포함한 어떤 write 보다 먼저
       // (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 판정 정본 demo_accounts.user_id).
@@ -255,6 +256,7 @@ export class CommunityLifecycleService {
       const repo = m.getRepository(CommunityMembership);
       const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
       // 기존 서비스 처분을 개별 승인으로 해제하지 않는다. 실패하면 신청은 pending 으로 남는다.
+      await assertNetureMainMembershipActive(m, membership.userId, 'applicant');
       await ensureServiceMembership(m, membership.userId);
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;

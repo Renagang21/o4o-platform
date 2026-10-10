@@ -34,6 +34,7 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *   - 비로그인도 200 으로 목록을 돌려주되 canParticipate=false · reason=AUTH_REQUIRED (공개 read 정책과 분리).
  */
 
+import { NetureMainMembershipRequiredError } from '../modules/neture/services/neture-main-membership.js';
 import { createServiceForumRouter } from './forum/service-forum.routes.js';
 import { listCommunityWorkspaces, resolveCommunityWorkspace, createCommunityBoard } from '../services/community/community-workspace.service.js';
 import { Router, type RequestHandler, type Response } from 'express';
@@ -66,6 +67,10 @@ async function currentCommunityUser(req: AuthRequest): Promise<CommunityAccessUs
 
 /** lifecycle 오류를 응답으로 옮긴다 — 라우트마다 분기를 복제하지 않는다. */
 function sendLifecycleError(res: Response, error: unknown): boolean {
+  if (error instanceof NetureMainMembershipRequiredError) {
+    res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
+    return true;
+  }
   if (!(error instanceof CommunityLifecycleError)) return false;
   res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
   return true;
