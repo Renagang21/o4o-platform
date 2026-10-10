@@ -1,5 +1,5 @@
 /**
- * SemiFranchiseContentFormPage — 세미프랜차이즈 콘텐츠 작성 · 수정
+ * SemiFranchiseContentFormPage — 약국 협력사업 콘텐츠 작성 · 수정
  *   /operator/semi-franchises/:key/contents/new
  *   /operator/semi-franchises/:key/contents/:id/edit
  *
@@ -98,8 +98,8 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
   return (
     <div className="max-w-4xl space-y-4 p-6">
       <PageHeader
-        title={isEdit ? '세미프랜차이즈 콘텐츠 수정' : '세미프랜차이즈 콘텐츠 작성'}
-        description={current ? `${current.semiFranchiseName} (${current.semiFranchiseKey})` : `세미프랜차이즈: ${key}`}
+        title={isEdit ? '약국 협력사업 콘텐츠 수정' : '약국 협력사업 콘텐츠 작성'}
+        description={current ? `${current.semiFranchiseName} (${current.semiFranchiseKey})` : `약국 협력사업: ${key}`}
       >
         <Link to={listPath} className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
           목록으로
@@ -110,7 +110,7 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
         <ul className="list-disc space-y-1 pl-5">
           <li>새 콘텐츠는 초안으로 저장됩니다. 게시는 목록(콘텐츠 탭)에서 따로 처리합니다.</li>
           <li>게시 중인 콘텐츠를 수정하면 약국 화면의 원본에는 바로 반영됩니다.</li>
-          <li>게시된 콘텐츠는 이 세미프랜차이즈에 활성 가입한 약국에만 보입니다.</li>
+          <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
           <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이미 만든 매장 사본은 약국 소유의 독립 사본이라 이후 수정이 반영되지 않습니다.</li>
         </ul>
       </div>
