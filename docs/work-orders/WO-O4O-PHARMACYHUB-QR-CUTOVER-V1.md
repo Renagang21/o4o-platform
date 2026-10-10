@@ -1,8 +1,25 @@
 # PharmacyHub QR redirect cutover
 
-> 상태: ACTIVE · 2026-10-09 · 범위: 기존 인쇄 QR 경로 전환 도구 · 실제 운영 적용 미실행
+> 상태: ACTIVE · 최종 갱신: 2026-10-10 · 범위: 기존 인쇄 QR 경로 전환 도구 · plan 성공 · 실제 운영 적용 미실행
 
 사용자 승인: PharmacyHub QR을 Neture 약국으로 전환하고 push까지 진행한다. 지정된 `/workspace/o4o-pharmacyhub-retirement` worktree에서 최신 `origin/main` 기준 새 branch `wo/pharmacyhub-qr-cutover`를 사용한다. 기존 제거 PR #375는 병합 완료됐으며 사용자가 Delivery green을 보고했다.
+
+## 현재 운영 검증 결과 — 2026-10-10
+
+[PharmacyHub QR Cutover run 38047926623](https://github.com/Renagang21/o4o-platform/actions/runs/38047926623)은 `main`의 `847ee5d6bda405358ac42234b2551898df343048`에서 `mode=plan`으로 실행해 SUCCESS로 완료됐다. WIF 인증, Secret Manager 접근, Cloud SQL 연결, 읽기 전용 DB 경로 조회, URL map 조회·초안 검증을 통과했다. 최종 결과는 `{"mode":"plan","applied":false}`다.
+
+| 경로 종류 | 활성 조회 결과 |
+|---|---|
+| `/qr/` | 발견 |
+| `/tablet/` | 발견 |
+| `/multilingual-products/` | 미발견 |
+| `/foreign-visitor/affiliate/` | 미발견 |
+
+활성 경로는 요구되는 4종 중 2종이다. 미발견은 현재 조회 조건에 맞는 대상이 없다는 뜻이며 인쇄 QR·과거 데이터·전체 운영 사용이 없다는 판정은 아니다. 두 종류의 운영 여부와 적용·검증 범위를 확정하기 전에는 `apply`를 실행하지 않는다.
+
+운영자는 WIF 허용 workflow 추가, DB password secret 한정 accessor, `roles/cloudsql.client`, custom role `pharmacyHubQrPlan`(`compute.urlMaps.get`, `compute.urlMaps.validate`, `compute.backendServices.use`)을 적용했다. 마지막 권한 추가 후 검증 POST 403이 해소됐다. URL map update 권한 확보·실제 적용·HTTP 리다이렉트·브라우저/실기기 스캔 검증은 완료한 것으로 보고하지 않는다. DB write, Cloud Run·DNS·인증서 삭제는 실행하지 않았다.
+
+동일 WO의 결과 기록 phase로 사용자 지정 worktree를 재사용하고 최신 main에서 `wo/pharmacyhub-qr-plan-result-docs`를 생성했다. 아래 초기 준비·실패 기록은 당시 상태를 보존하며 현재 성공 판정은 이 절을 따른다.
 
 ## 실행
 
