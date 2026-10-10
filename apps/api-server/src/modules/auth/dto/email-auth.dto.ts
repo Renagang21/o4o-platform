@@ -1,3 +1,4 @@
+import { SignupTermsReferenceDto } from './signup-terms.dto.js';
 import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -10,6 +11,11 @@ import { Type } from 'class-transformer';
  */
 
 export class EmailSignupConsentsDto {
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => SignupTermsReferenceDto)
+  termsPolicy!: SignupTermsReferenceDto;
+
   @IsBoolean()
   terms!: boolean;
 

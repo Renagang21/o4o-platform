@@ -25,6 +25,7 @@ export default function LoginPage() {
       onSuccess={() => navigate(next, { replace: true })}
       kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: next }}
           google={{
+              getSignupTerms: () => authClient.getSignupTerms(),
         getConfig: () => authClient.getGoogleAuthConfig(),
         loginWithGoogle,
         signupWithGoogle,

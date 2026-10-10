@@ -88,6 +88,7 @@ export default function JoinPage() {
             onSuccess={() => setError(null)}
             kakao={{ client: authClient, loginWithKakao, signupWithKakao, returnTo: '/join' }}
           google={{
+              getSignupTerms: () => authClient.getSignupTerms(),
               getConfig: getGoogleAuthConfig,
               loginWithGoogle,
               signupWithGoogle,

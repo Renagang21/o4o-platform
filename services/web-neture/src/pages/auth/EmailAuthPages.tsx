@@ -110,7 +110,8 @@ export function SignupPage() {
         returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
         onSuccess={() => { navigate('/', { replace: true }); }} />
       <GoogleContinue<User>
-        getConfig={getGoogleAuthConfig}
+        getSignupTerms={() => authClient.getSignupTerms()}
+                  getConfig={getGoogleAuthConfig}
         loginWithGoogle={loginWithGoogle}
         signupWithGoogle={signupWithGoogle}
         onStart={() => setGoogleError(null)}

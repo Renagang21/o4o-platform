@@ -5,6 +5,7 @@ import type {
   GoogleAuthResponse,
   GoogleAuthConfig,
   GoogleSignupConsents,
+  SignupTermsDocument,
   EmailSignupRequest,
   EmailAuthNotice,
   SocialProof, SocialGrant, SocialProvider, SocialAccountsStatus, KakaoSignupRequest, KakaoAuthResponse,
@@ -262,6 +263,12 @@ export class AuthClient {
     });
     if (generation !== this.sessionGeneration) throw new Error('Login response discarded: session changed');
     return this.adoptSessionResponse(response.data as { success?: boolean; data?: any });
+  }
+
+  /** Current signup agreement selected by the server from the request origin. */
+  async getSignupTerms(): Promise<SignupTermsDocument> {
+    const response = await this.api.get('/auth/signup/terms');
+    return response.data.data;
   }
 
   /** Flow binding is HttpOnly even when normal sessions use localStorage. */

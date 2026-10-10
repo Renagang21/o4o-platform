@@ -14,13 +14,18 @@ import { SocialLinkService, type SocialLinkContext } from '../social-link.servic
 import { passwordCredentialService } from '../password-credential.service.js';
 import { revokeBrowserSession } from '../browser-session.service.js';
 import { CreateSocialAuthFlows1791592932097 } from '../../../database/migrations/1791592932097-CreateSocialAuthFlows.js';
+const termsPolicy = { policyDocumentId: randomUUID(), version: 1 };
 const port = Number(process.env.O4O_AUTH_SESSION_TEST_PORT);
 const integration = Number.isInteger(port) && port > 1024 && ![5432,5442].includes(port) ? describe : describe.skip;
 integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
   let owner: SocialLinkContext; let other: string; let flows: SocialFlowService; let links: SocialLinkService;
   const password = 'SyntheticFixture123!'; const origin = 'https://neture.co.kr';
-  beforeAll(async () => { db = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username: 'o4o_fixture', database: 'o4o_auth_phase2_test', entities: [], synchronize: false, logging: false }); await db.initialize(); });
-  afterAll(async () => { if (db?.isInitialized) await db.destroy(); });
+  beforeAll(async () => { db = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username: 'o4o_fixture', database: 'o4o_auth_phase2_test', entities: [], synchronize: false, logging: false }); await db.initialize();
+    await db.query(`CREATE TABLE IF NOT EXISTS service_policy_documents (id uuid PRIMARY KEY, service_key text NOT NULL, document_type text NOT NULL, version integer NOT NULL, title text NOT NULL, content text NOT NULL, status text NOT NULL, published_at timestamptz DEFAULT now());
+      CREATE TABLE IF NOT EXISTS user_policy_acceptances (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid REFERENCES users(id) ON DELETE CASCADE, service_key text NOT NULL, policy_document_id uuid REFERENCES service_policy_documents(id), document_type text NOT NULL, version integer NOT NULL, content_hash text NOT NULL, acceptance_kind text NOT NULL, accepted_at timestamptz NOT NULL, UNIQUE(user_id,service_key,policy_document_id))`);
+    await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,status,published_at) VALUES($1,'neture','terms',1,'Fixture terms','Fixture agreement','published',now())",[termsPolicy.policyDocumentId]);
+  });
+  afterAll(async () => { if (db?.isInitialized) { await db.query('DELETE FROM service_policy_documents WHERE id=$1',[termsPolicy.policyDocumentId]); await db.destroy(); } });
   beforeEach(async () => {
     const family = randomUUID();
     const rows = await db.query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified","refreshTokenFamily") VALUES ($1,'Social fixture','active',true,true,$2) RETURNING id`, [`${randomUUID()}@fixture.invalid`,family]);
@@ -104,7 +109,7 @@ integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
     });
     return new KakaoAuthService({getRepository:(entity:any)=>repo(entity,db),transaction:(callback:any)=>db.transaction(manager=>callback({query:manager.query.bind(manager),getRepository:(entity:any)=>repo(entity,manager)}))} as any,{exchangeCode:async()=>identity},flows);
   }
-  const signupInput = () => ({email:`${randomUUID()}@fixture.invalid`,name:'Synthetic signup',phone:'01000000000',consents:{terms:true,privacy:true}});
+  const signupInput = () => ({email:`${randomUUID()}@fixture.invalid`,name:'Synthetic signup',phone:'01000000000',consents:{terms:true,privacy:true,termsPolicy}});
   async function signupGrant(identity:object) {return flows.create('kakao-signup','kakao',origin,'neture',identity);}
   async function removeSignup(email:string){await db.query('DELETE FROM users WHERE email=$1',[email]);}
   it.each([false,true])('signup requires O4O email verification when provider verification=%s and never creates a session for an unverified address',async verified=>{

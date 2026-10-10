@@ -219,6 +219,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   returnTo={returnUrl ?? '/'}
                   onSuccess={handleLoginSuccess} />
                 <GoogleContinue<User>
+                  getSignupTerms={() => authClient.getSignupTerms()}
                   getConfig={getGoogleAuthConfig}
                   loginWithGoogle={loginWithGoogle}
                   signupWithGoogle={signupWithGoogle}
