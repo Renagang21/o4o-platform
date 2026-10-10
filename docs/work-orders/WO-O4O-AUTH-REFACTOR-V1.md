@@ -99,6 +99,11 @@
 ## 2026-10-10 단계 4 진행
 
 4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체관리자·웹 배포 성공.
-4-B/4-C는 사용자 지시로 일회용 증명 원장을 공유하는 후속 PR로 구현·로컬 검증했다.
-운영 키/앱 설정, 실제 OAuth, 새 PR main 승인·배포는 완료와 구분한다.
+4-B/4-C PR #392는 사용자 승인 후 main `26b98a33c1`에 통합했다. post-merge CI #38019181483와
+CodeQL PASS, Promote #38019828704 API migration·전체관리자·웹 5개 배포 SUCCESS.
+배포 후 유지 8개 origin × PC/mobile × 두 Demo 역할 32/32 PASS; 약국 업무의 매장 경영자 200,
+공급자 업무 200, 반대 역할 거절, Demo 소셜/비밀번호 변경 불가, 로그아웃 access/refresh 401 확인.
+운영 Kakao config는 8개 origin 모두 `enabled=false`다. 기존 Secret Manager 리소스 조회는
+`secretmanager.secrets.list` 권한 부족으로 미확인이다. 앱/키 연결과 실제 Google/Kakao 로그인·
+가입·재인증·명시적 연결, 전체관리자 실제 Google 재로그인은 OPEN으로 유지한다.
 검증: [카카오·명시적 연결 CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md).

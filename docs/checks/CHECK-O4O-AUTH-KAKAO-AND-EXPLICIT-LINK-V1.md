@@ -1,6 +1,6 @@
 # CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1
 
-> 2026-10-10 · WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1 · 4-B/4-C 구현·로컬 검증
+> 2026-10-10 · WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1 · 4-B/4-C 구현·로컬/운영 검증
 > DEPLOYMENT = MANUAL/GATED. 실제 OAuth·운영 적용과 mock/격리 검증을 구분한다.
 
 ## 구현과 정책
@@ -87,10 +87,11 @@ DB rollback은 현존 identity/flow를 확인한 별도 절차로 판단한다.
 6. 실제 소유자 Google/Kakao 로그인·가입·이메일 확인·service-entry/handoff·재인증·연결 확인·
    취소·기존 다른 사용자 연결 충돌을 8개 유지 origin의 PC/mobile에서 확인한다.
 
-현재 운영 app/key 존재와 등록 상태는 **미확인**이다. 현재 cloud에 GCP/Kakao binding이 없고
-GitHub secret/variable metadata 조회는 403이었다. 부재로 단정하거나 새 앱/secret을 중복 생성하지
-않는다. feature branch에서는 main-only WIF 경계를 우회해 metadata workflow를 실행하지 않는다.
-실제 Google/Kakao 소유자 인증과 전체관리자 재로그인은 **미실행**이다.
+기존 운영 app/key 존재와 등록 상태는 **미확인**이다. 초기 cloud에는 GCP/Kakao binding이 없고
+GitHub secret/variable metadata 조회는 403이었다. 이후 승인된 main WIF에서 실제 metadata를
+조회한 결과와 운영 배포·회귀는 아래 PR #392 기록을 따른다. 권한 부족을 부재로 단정하거나
+새 앱/secret을 중복 생성하지 않는다. 실제 Google/Kakao 소유자 인증과 전체관리자 재로그인은
+**미실행**이며, Demo·mock 검증을 실제 외부 OAuth의 증거로 사용하지 않는다.
 
 문서 정합: 실행 중 WO/TODO의 로컬 구현과 운영 완료를 구분했다. Identity V3의 과거 카카오 제한과
 MYPAGE의 오래된 password UI 서술은 후속 정합 TODO다. Frozen 본문·canonical index 변경 없음.
@@ -138,3 +139,61 @@ study→lecture / neture→neture / 위조 suffix→null의 실제 판정을 확
 cross-site Lax binding 미전달 / Secure None 전달을 확인했다. 외부 OAuth나 운영 키를 사용한
 시험이 아니다. 최신 main을 반영한 모든 웹 bundle의 가입 UI 8/8, Neture 세션/returnTo 2/2를
 재확인했다.
+
+
+## PR #392 운영 통합·배포·회귀 (2026-10-10)
+
+사용자의 명시적 승인 후 [PR #392](https://github.com/Renagang21/o4o-platform/pull/392)를
+main `26b98a33c182e5de9f9e6df2ce9a6a6fb5696bc4`에 merge했다. 최신 main `3364d0837a`를
+공개 작업 branch에 merge한 exact head `0535183bc2`에서 required CI Gate·API Jest 3개·웹/전체관리자
+build·Code Quality·CodeQL·Sonar PASS, 기존 Codex 두 finding 수정 및 미해결 thread 0을 확인했다.
+로컬 추가 회귀는 Kakao identity/logout 54건, 최신 main 업무/커뮤니티 46건, Neture 395건,
+격리 PG15 social flow/link/signup 18건 PASS다. PG를 지정하지 않은 첫 재실행은 SKIP이었고,
+그 뒤 포트 55437의 실제 격리 DB로 18건을 실행·정리하고 DB를 중지했다.
+
+| 운영 확인 | 결과 | 근거/한계 |
+|---|---|---|
+| post-merge CI Pipeline | SUCCESS | [#38019181483](https://github.com/Renagang21/o4o-platform/actions/runs/38019181483), CI Gate·CodeQL PASS |
+| Delivery 위험도 판정 | HELD_LEVEL_3 | migration/인증 변경의 자동 배포 차단 유지 |
+| 사용자 승인 Promote | SUCCESS | [#38019828704](https://github.com/Renagang21/o4o-platform/actions/runs/38019828704), 승인된 정확한 main SHA |
+| API | SUCCESS | migration 21 포함 승인 이미지의 정식 migration Job, traffic 0% revision smoke, traffic 전환·전환 후 검증; readiness HTTP 200 |
+| 전체관리자 + 웹 5개 | SUCCESS | 선택된 deploy job 7개 전체 SUCCESS; 선택하지 않은 deploy job 25개는 SKIPPED |
+| 최종 serving SHA / production status | DEPLOYED | api/admin/neture/kpa-society/lecture/store/kpa-branch 모두 확인 |
+| 유지 8개 origin Demo PC/mobile | 32/32 PASS | 실제 로그인 화면 버튼; 실제 upstream HTTP, provider/API mock 없음 |
+| 신규 social accounts Demo 경계 | 32/32 PASS | HTTP 200 / canManage=false; 계정 연결·수단 변경 실행 없음 |
+| Demo 실제 소셜 변경 진입 차단 | 2/2 PASS | Neture 두 역할에서 잘못된 임의 password로 재인증 요청 → 403 DEMO_ACCOUNT_FORBIDDEN; 연결 권한 발급/비밀번호 변경 없음 |
+| 신규 설정 UI·Kakao 비활성 UI | 2/2 PASS | Neture 실제 설정 화면의 Demo 변경 불가 안내와 Kakao 버튼 미노출 확인 |
+| 약국 업무·공급자 업무 | 16 + 16 PASS | 매장 경영자 store context 200, 공급자 products 200; 반대 역할은 각각 403 STORE_OWNER_REQUIRED / NO_SUPPLIER |
+| 전체관리자·비밀번호 경계 | 32/32 PASS | Demo admin 403 ROLE_REQUIRED, password canManage=false |
+| UI 로그아웃과 보안 폐기 | 32/32 PASS | logout 200 후 이전 access/refresh 모두 401; Neture 매장 Demo 두 viewport에서 Store 세션은 200 유지 |
+| Kakao public config | 8/8 HTTP 200 | 현재 enabled=false; 실제 Kakao 활성화/성공을 뜻하지 않음 |
+| 비인증 social accounts | HTTP 401 AUTH_REQUIRED | 신규 보호 route 운영 등록 확인 |
+
+브라우저는 PC 1440×900/mobile 390×844, Neture/supplier/community/funding/pharmacy/store/study/kpa,
+매장 경영자·공급자 조합이다. 실제 Chromium의 TLS 검증을 끄지 않고 정상 CA/proxy를 사용하는
+route.fetch 응답을 화면에 전달했다. 로그인 응답은 navigation 전에 메모리에서만 보관하며,
+검증에서 만든 세션만 정리했다. 계정 정보·토큰·응답 원문은 공개 기록에 넣지 않는다.
+이 32건은 Demo 로그인·handoff·역할·소셜 상태·로그아웃 회귀이며 모든 업무 기능이나 실제
+Google/Kakao OAuth를 완료했다는 판정이 아니다. 별도 Pharmacy-Hub UI를 유지 서비스로 복원하지 않았다.
+
+### 기존 Kakao 설정 조사와 남은 조건
+
+main [WIF metadata smoke #38019189395](https://github.com/Renagang21/o4o-platform/actions/runs/38019189395)는
+GCP 인증·Cloud Run 조회 PASS, Kakao metadata 단계 FAIL이다. 당시 API revision에는
+KAKAO_CLIENT_ID/KAKAO_CLIENT_SECRET/KAKAO_REDIRECT_URI 이름이 없었고, Secret Manager 목록은
+`secretmanager.secrets.list` 권한 부족으로 조회하지 못했다. 기존 리소스/앱 부재로 판정하지 않는다.
+운영 배포 후 공개 config도 8개 origin에서 enabled=false다. 비밀값·secret version 접근이나
+IAM 변경·새 앱/secret 생성은 수행하지 않았다.
+
+사용자에게 metadata 조회 역할 `roles/secretmanager.viewer` 추가 경로를 안내했다. 권한 추가의
+완료 확인 후 같은 read-only 조회를 재실행한다. 이후 기존 앱의 REST ID/client secret ON/고정
+callback 등록, GitHub KAKAO_CLIENT_ID 및 Secret Manager resource 이름 binding을 확인해야 한다.
+실제 로그인·가입·이메일 확인·handoff·Google/Kakao 현재 계정 재인증·최종 명시적 연결과
+취소/충돌, 전체관리자 실제 Google 재로그인은 OPEN이다.
+
+상세 로그 조회의 초기 proxy 403은 exact storage host를 초안에 추가한 뒤 실제 HTTP 200으로
+재확인했다. setup 초안에는 두 log storage host와 TLS 검증을 유지하는 시작 안내를 저장했다.
+초안 저장·실제 HTTP 접근·환경 게시 여부는 서로 다른 관측이다. 게시 완료로 단정하지 않는다.
+
+문서 정합: 상위 WO와 4-B/4-C TODO의 main/배포 미실행 설명을 실제 결과로 정정했다.
+운영 코드 배포, Kakao 설정 활성화, 실제 외부 OAuth 완료를 각각 구분하고 기존 OPEN을 유지한다.
