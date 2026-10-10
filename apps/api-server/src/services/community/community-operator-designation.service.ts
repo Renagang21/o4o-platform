@@ -15,6 +15,7 @@
  */
 import { hasEligibleCommunityMembership, protectLastCommunityAdmin, recordCommunityMembershipChange } from './community-membership-mutations.js';
 import { COMMUNITY_SERVICE_KEY } from './community-lifecycle.service.js';
+import { getNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES } from '../../modules/neture/services/neture-main-membership.js';
 import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
@@ -22,6 +23,11 @@ import {
 } from '../auth/demo-account.service.js';
 
 export type CommunityMemberRole = 'admin' | 'operator' | 'member';
+export type CommunityDesignationEligibility = {
+  eligible: boolean;
+  code: 'MEMBERSHIP_NOT_ACTIVE' | 'DEMO_ACCOUNT_FORBIDDEN' | 'MAIN_MEMBERSHIP_NOT_ACTIVE' | 'SERVICE_MEMBERSHIP_NOT_ACTIVE' | null;
+  message: string | null;
+};
 
 export interface CommunityOperatorTx {
   query: (sql: string, params?: unknown[]) => Promise<any>;
@@ -88,6 +94,7 @@ export class CommunityOperatorDesignationService {
       role: CommunityMemberRole;
       serviceMembershipStatus: string | null;
       membershipStatus: string;
+      designationEligibility: CommunityDesignationEligibility;
     }>;
   }> {
     const community = await this.requireCommunity(this.db, communityId);
@@ -103,7 +110,7 @@ export class CommunityOperatorDesignationService {
     );
     return {
       community,
-      members: rows.map((r: any) => ({
+      members: await Promise.all(rows.map(async (r: any) => ({
         membershipId: r.membership_id,
         userId: r.user_id,
         name: r.user_name,
@@ -111,8 +118,19 @@ export class CommunityOperatorDesignationService {
         role: ['admin', 'operator'].includes(r.role) ? r.role : 'member',
         serviceMembershipStatus: r.service_status,
         membershipStatus: r.status,
-      })),
+        designationEligibility: await this.designationEligibility(r),
+      }))),
     };
+  }
+
+  /** 조회 안내만 제공한다. 실제 지정은 setRole의 트랜잭션에서 다시 판정한다. */
+  private async designationEligibility(row: { user_id: string; status: string; service_status: string | null }): Promise<CommunityDesignationEligibility> {
+    if (row.status !== 'active') return { eligible: false, code: 'MEMBERSHIP_NOT_ACTIVE', message: '개별 커뮤니티 가입이 활성 상태여야 지정할 수 있습니다.' };
+    if (await demoAccountService.isDemoAccount(row.user_id, this.db)) return { eligible: false, code: 'DEMO_ACCOUNT_FORBIDDEN', message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE };
+    const mainStatus = await getNetureMainMembershipStatus(this.db, row.user_id);
+    if (mainStatus !== 'active') return { eligible: false, code: 'MAIN_MEMBERSHIP_NOT_ACTIVE', message: NETURE_MAIN_MEMBERSHIP_MESSAGES[mainStatus] };
+    if (row.service_status !== 'active') return { eligible: false, code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE', message: '커뮤니티 서비스 가입이 활성 상태여야 지정할 수 있습니다.' };
+    return { eligible: true, code: null, message: null };
   }
 
   /** 운영자 지정(role IN ('admin','operator')) · 해제(role='member'). */

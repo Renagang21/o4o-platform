@@ -39,6 +39,12 @@ export interface CommunityMemberRow {
   role: 'admin' | 'operator' | 'member';
   serviceMembershipStatus: string | null;
   membershipStatus: string;
+  /** 이전 API 응답에는 없을 수 있다. 누락 시 화면은 승격을 차단한다. */
+  designationEligibility?: {
+    eligible: boolean;
+    code: string | null;
+    message: string | null;
+  };
 }
 
 export async function listCreationRequests(): Promise<CommunityCreationRequestRow[]> {
