@@ -70,3 +70,5 @@ HTTPS proxy 리뷰 대응: `o4o-global-lb`는 HTTPS proxy의 application map이�
 Frozen 문서 전체 대조: Supplier 정본도 ACTIVE (FROZEN)이므로 PH override를 본 PR에서 제외하고 origin/main 본문으로 복원했다. Distribution·Supplier 두 Frozen 정본의 PH 판정 변경은 별도 문서 작업 #427로 묶는다. 변경된 문서의 상태 선언과 canonical index를 모두 대조했으며 나머지 변경 대상은 Frozen 정본이 아니다.
 
 Canonical 문서 작업 경계 정정: ACTIVE/FROZEN 여부와 관계없이 기준 문서의 PH 정책 판정 변경 전체를 별도 canonical 작업 #427로 분리했다. 본 PR에서 architecture·baseline·RBAC 정본은 모두 origin/main과 동일하게 복원했다. 앞선 정렬 기록은 branch에서 검토한 단계 이력이며 canonical 통합 완료를 뜻하지 않는다. 사용자 승인된 PH 완전 폐기 정책의 정본 적용과 index 정합은 후속 문서 PR에서 함께 처리한다. 본 PR의 변경은 전환 코드·읽기 전용 검증·실행 기록이며 운영 삭제는 아직 미실행이다.
+
+- 2026-10-11 리뷰 대응: workflow job-level skip을 제거하고 인증 이전 gate에서 입력 조합 및 Demo 소유자 권한을 명시적으로 검증한다. 비소유자 잘못된 조합도 실패하며 운영 자원에 접근하지 않는다. gate 5개 조합 검증 통과.

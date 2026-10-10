@@ -59,7 +59,6 @@ concurrency:
 
 jobs:
   cutover:
-    if: (inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true) || github.triggering_actor == github.repository_owner
     # Production inventory requires main; writes also require an explicit unfrozen state.
     runs-on: ubuntu-latest
     environment: production
@@ -72,6 +71,8 @@ jobs:
       DEMO_CLEANUP_FLAG: ${{ inputs.demo_cleanup }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
+      WORKFLOW_ACTOR: ${{ github.triggering_actor }}
+      REPOSITORY_OWNER: ${{ github.repository_owner }}
     steps:
       - name: Enforce production write gate
         run: |
@@ -92,6 +93,10 @@ jobs:
           fi
           if [ "$demo_count" -gt 1 ]; then
             echo 'Choose only one Demo operation.'
+            exit 1
+          fi
+          if [ "$demo_count" -gt 0 ] && [ "$WORKFLOW_ACTOR" != "$REPOSITORY_OWNER" ]; then
+            echo 'Demo operations require the repository owner.'
             exit 1
           fi
           if [ "$DEMO_CENSUS_FLAG" = 'true' ] && [ "$CUTOVER_MODE" != 'plan' ]; then
