@@ -31,6 +31,14 @@ describe('중앙 지정 커뮤니티 서비스 역할', () => {
   it.each(['suspended', 'withdrawn', 'pending'])('서비스 상태 %s는 거부한다', async status => {
     expect(await hasCommunityServiceOperator(executor('community:operator', status), 'u1')).toBe(false);
   });
+  it('중앙 운영 권한은 현재 유효 기간 안의 역할만 조회한다', async () => {
+    const exec = executor('community:operator');
+    await hasCommunityServiceOperator(exec, 'u1');
+    const call = exec.query.mock.calls.find(([sql]) => sql.includes('FROM role_assignments ra'));
+    expect(call).toBeDefined();
+    expect(call![0]).toContain('ra.valid_from <= CURRENT_TIMESTAMP');
+    expect(call![0]).toContain('(ra.valid_until IS NULL OR ra.valid_until >= CURRENT_TIMESTAMP)');
+  });
   it('중앙 운영자의 심사 목록은 활성 독립 커뮤니티를 조회한다', async () => {
     const exec = executor('community:operator');
     const service = new CommunityLifecycleService(exec as never);
