@@ -12,14 +12,38 @@ export interface KakaoContinueProps<TUser = unknown> {
 }
 export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
   const ref = useRef(props); ref.current = props;
-  const [enabled, setEnabled] = useState(false);
+  const [configState, setConfigState] = useState<'loading' | 'enabled' | 'disabled' | 'error'>('loading');
+  const [configAttempt, setConfigAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [ticket, setTicket] = useState<string>();
   const [email, setEmail] = useState(''); const [name, setName] = useState(''); const [phone, setPhone] = useState('');
   const [terms, setTerms] = useState(false); const [privacy, setPrivacy] = useState(false); const [marketing, setMarketing] = useState(false);
   const mounted = useRef(true); const consumed = useRef(false);
-  useEffect(() => { mounted.current = true; let cancelled = false; void ref.current.client.getKakaoAuthConfig().then(c => { if (!cancelled) setEnabled(c.enabled); }).catch(() => {}); return () => { mounted.current = false; cancelled = true; }; }, []);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  useEffect(() => {
+    let active = true;
+    setConfigState('loading');
+    // A slow or failed public lookup must not silently remove a login method.
+    const deadline = setTimeout(() => {
+      if (!active) return;
+      active = false;
+      setConfigState('error');
+    }, 10_000);
+    void ref.current.client.getKakaoAuthConfig().then(config => {
+      if (!active) return;
+      if (typeof config?.enabled !== 'boolean') throw new Error('Invalid Kakao configuration response');
+      active = false;
+      clearTimeout(deadline);
+      setConfigState(config.enabled ? 'enabled' : 'disabled');
+    }).catch(() => {
+      if (!active) return;
+      active = false;
+      clearTimeout(deadline);
+      setConfigState('error');
+    });
+    return () => { active = false; clearTimeout(deadline); };
+  }, [configAttempt]);
   const finish = useCallback((result: AuthLoginResult<TUser>) => {
     if (!mounted.current) return;
     setBusy(false);
@@ -43,7 +67,12 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     catch { setBusy(false); setMessage('카카오 인증을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.'); }
   }
   return <div data-testid="kakao-continue" style={{ display: 'grid', gap: 10 }}>
-    {enabled && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
+    {configState === 'loading' && !ticket && <p role="status">카카오 로그인을 불러오고 있습니다…</p>}
+    {configState === 'error' && !ticket && <>
+      <p role="alert">카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.</p>
+      <button type="button" disabled={busy} onClick={() => setConfigAttempt(attempt => attempt + 1)}>카카오 로그인 다시 불러오기</button>
+    </>}
+    {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
     {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
     {ticket && <form onSubmit={e => { e.preventDefault(); setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing } }).then(finish); }} style={{ display: 'grid', gap: 10 }}>
       <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>
