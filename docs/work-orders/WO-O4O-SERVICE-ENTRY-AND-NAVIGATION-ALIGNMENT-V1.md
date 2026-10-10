@@ -54,3 +54,7 @@ PC 1440px·모바일 390px에서 협력사업 메뉴·승인 상태, 분회 콘�
 ## PR 리뷰 보완
 
 PR #402의 Codex 리뷰 2건을 보완했다. 병원 `/hospital`은 별도 앱이므로 SPA Link 대신 문서 탐색 링크를 사용한다. 종료 서비스 매장의 안내는 `/`로 돌아가는 대신 이용 사업(`/services`) 확인으로 연결해 반복 진입을 끊는다. 각각 SPA catch-all 미진입과 종료 안내 탈출 경로를 회귀 테스트로 확인했다.
+
+## API 계약 테스트 보완
+
+CI API Jest에서 이전 Home 메뉴·소개 화면을 고정하던 source 계약 단언을 발견했다. `unified-store-workspace-foundation.spec.ts`의 root nav 기대값과 `store-service-scoped-owner-entry.spec.ts`의 루트 진입 단언을 새 정책에 맞게 갱신했다. 조직 선택·종료 서비스·role guard 단언은 유지했다. 두 관련 suite의 43개 테스트 통과. API 구현·DB 계약 수정은 없다.

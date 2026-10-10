@@ -141,8 +141,8 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     // 옛 HUB는 자료함·공급 화면으로 이동하며 자료함도 종료 서비스 판정을 유지한다.
     expect(read('services/web-store/src/components/layouts/UnifiedStoreLibraryLayout.tsx')).toContain('if (retiredOnly) return <RetiredServiceNotice />;');
     expect(read('services/web-store/src/config/workspace.ts')).not.toContain("key: 'store-hub'");
-    // 홈은 내부 서비스 수 대신 매장 경영 활동을 표시한다.
-    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const retiredOnly = useRetiredOnlyStore();');
+    // 대표 루트는 소개 없이 위의 종료 판정을 유지하는 실제 내 매장 화면으로 이동한다.
+    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('to={WORKSPACE_PATHS.myStore}');
   });
 });
 
