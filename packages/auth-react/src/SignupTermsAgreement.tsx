@@ -3,7 +3,7 @@ import type { SignupTermsDocument } from '@o4o/auth-client';
 import { styles } from './email/shared';
 
 export function SignupTermsAgreement({ load, checked, onChecked, onDocument, reloadKey = 0 }: {
-  load?: () => Promise<SignupTermsDocument>;
+  load: () => Promise<SignupTermsDocument>;
   checked: boolean;
   onChecked: (checked: boolean) => void;
   onDocument: (document: SignupTermsDocument | null) => void;

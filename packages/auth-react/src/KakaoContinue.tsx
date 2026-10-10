@@ -5,7 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { redirectToKakao, takeSocialCallback, type AuthClient, type SocialProof, type KakaoSignupRequest } from '@o4o/auth-client';
 import type { AuthLoginResult } from './types';
 export interface KakaoContinueProps<TUser = unknown> {
-  client: Pick<AuthClient, 'getKakaoAuthConfig' | 'startKakaoLogin'> & Partial<Pick<AuthClient, 'getSignupTerms'>>;
+  client: Pick<AuthClient, 'getKakaoAuthConfig' | 'startKakaoLogin' | 'getSignupTerms'>;
   loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<TUser>>;
   signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<TUser>>;
   onSuccess: (user: TUser) => void;
@@ -86,7 +86,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
       <label style={styles.field}>이름<input style={styles.input} autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>
       <label style={styles.field}>개인 휴대전화<input style={styles.input} type="tel" autoComplete="tel" required maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></label>
       <p>휴대전화 본인 인증은 수행하지 않습니다. 이메일 소유 확인이 필요하면 확인 메일을 보냅니다.</p>
-      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
       <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label><a style={styles.link} href={props.privacyHref ?? 'https://neture.co.kr/privacy'} target="_blank" rel="noreferrer">내용 보기</a></div>
       <label><input type="checkbox" checked={marketing} onChange={e => setMarketing(e.target.checked)} />마케팅 정보 수신 동의 (선택)</label>
       <button type="submit" style={styles.primaryBtn} disabled={busy || !policy || !terms || !privacy}>동의하고 계정 만들기</button>

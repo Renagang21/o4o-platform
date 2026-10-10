@@ -10,7 +10,7 @@ import type { EmailAuthNotice, EmailSignupRequest, SignupTermsDocument } from '@
 
 /** 이 UI 가 요구하는 authClient 표면(@o4o/auth-client 인스턴스가 충족). */
 export interface EmailAuthApi {
-  getSignupTerms?(): Promise<SignupTermsDocument>;
+  getSignupTerms(): Promise<SignupTermsDocument>;
   signupWithEmail(request: EmailSignupRequest): Promise<EmailAuthNotice>;
   verifyEmail(token: string): Promise<EmailAuthNotice>;
   resendVerificationEmail(email: string): Promise<EmailAuthNotice>;

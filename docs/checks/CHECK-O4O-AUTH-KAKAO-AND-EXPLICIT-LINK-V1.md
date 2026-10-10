@@ -449,3 +449,15 @@ operator 초대의 별도 `createGoogleUser` 및 전체관리자 Google-only 계
 실제 소유자의 추가 정보 제출 후 이동 원인은 운영 사용자/session 상태를 조회하지 않아 미확정이다.
 원자 저장 결함 수정과 합성 화면의 성공을 실제 Google/Kakao 가입·로그인·연결·취소 성공으로
 확장하지 않는다. 유지 8개 운영 PC/mobile 회귀, 실제 OAuth, 승인된 새 정책 본문 게시는 OPEN이다.
+
+### 최신 구현 리뷰 후 공유 타입 보완
+
+Codex가 `1c8670214d`에서 P2로 공개 가입의 termsPolicy 및 getSignupTerms loader가 선택형인
+타입 계약을 지적했다. 서버 DTO는 이미 필수였으므로 공유 client/React 가입 타입과 Google/Kakao/
+Email 가입 loader도 필수로 맞췄다. React의 약관 참조는 client의 SignupTermsReference를 재사용한다.
+모든 실제 서비스 loader는 이미 연결되어 있으며 해당 공통 mock/요청 fixture도 새 계약에 맞췄다.
+
+직접 TypeScript compiler fixture에서 완전한 세 가입 요청 및 loader는 오류 0으로 컴파일됐다.
+참조/loader를 뺀 7개 fixture는 각각 TS2741 오류가 발생해 의도한 누락 거부를 확인했다(예상 오류이며
+정상 테스트 실패로 계산하지 않음). 공통 React 182·client 40 PASS 및 소비처 전체 frontend type-check를
+재검증 PASS. 운영 API는 이 검토 시점 health 200·Kakao enabled=true이며 신규 배포 완료와 구분한다.

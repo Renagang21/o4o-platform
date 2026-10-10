@@ -1,4 +1,4 @@
-import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
+import type { SocialProof, KakaoSignupRequest, SignupTermsReference } from '@o4o/auth-client';
 /**
  * @o4o/auth-react — 공통 계약 타입
  *
@@ -58,7 +58,7 @@ export interface AuthServiceAccess {
 
 /** POST /auth/google/signup 동의 항목(@o4o/auth-client `GoogleSignupConsents` 와 동일 형태). */
 export interface GoogleSignupConsents {
-  termsPolicy?: { policyDocumentId: string; version: number };
+  termsPolicy: SignupTermsReference;
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;

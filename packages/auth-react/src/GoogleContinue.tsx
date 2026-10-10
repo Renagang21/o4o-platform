@@ -25,7 +25,7 @@ import type { AuthLoginResult, AuthServiceAccess, GoogleSignupConsents } from '.
 export interface GoogleContinueProps<TUser = unknown> {
   /** `authClient.getGoogleAuthConfig` — 공개 Client ID 조회. */
   getConfig: () => Promise<GoogleAuthConfig>;
-  getSignupTerms?: () => Promise<SignupTermsDocument>;
+  getSignupTerms: () => Promise<SignupTermsDocument>;
   /** `useServiceAuth().loginWithGoogle` */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<TUser>>;
   /** `useServiceAuth().signupWithGoogle` */
