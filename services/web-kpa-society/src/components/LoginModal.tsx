@@ -18,7 +18,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
-import { LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
+import { O4OHomeButton, LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
 import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
@@ -26,7 +26,7 @@ import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/se
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig } = useAuth();
+  const { isAuthenticated, isLoading, loginWithGoogle, loginWithEmail, signupWithGoogle, getGoogleAuthConfig } = useAuth();
   const { activeModal, closeModal, onLoginSuccess } = useAuthModal();
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단은 일반 오류와 분리 표시
@@ -160,6 +160,7 @@ export default function LoginModal() {
               privacyHref: '/privacy',
             }}
           />
+          <div className="mt-5 border-t pt-4"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></div>
         </div>
       </div>
     </div>

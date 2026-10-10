@@ -107,3 +107,14 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     expect(items[0].note).toBeUndefined();
   });
 });
+
+describe('사업 참여자 공간은 해당 사업 서비스로 진입한다', () => {
+  it('공통 커뮤니티 목록에 섞지 않고 서버 허용된 사업만 내 서비스에서 연결한다', () => {
+    const business: EntryCommunity = { communityKey: 'members', businessKey: 'pharmacy', kind: 'semi-franchise',
+      name: '약국 협력사업', canParticipate: true, reason: null, entries: [{ serviceKey: 'community', path: '/communities/members/forum' }] };
+    const model = buildHomeEntryModel(user(), data([GENERAL, business, { ...business, businessKey: 'blocked', canParticipate: false }], {}));
+    expect(model.groups.find(g => g.id === 'community')!.items.map(item => item.id)).toEqual(['community:o4o-general']);
+    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/businesses/pharmacy/forum' });
+    expect(model.myServices.some(item => item.id === 'business:blocked')).toBe(false);
+  });
+});

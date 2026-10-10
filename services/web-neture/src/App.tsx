@@ -63,6 +63,7 @@ import {
 } from './pages/community';
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
+import SupplierServiceEntry from './pages/SupplierServiceEntry';
 import SupplierLandingPage from './pages/SupplierLandingPage';
 import CommunityWorkspacePage from './pages/community/CommunityWorkspacePage';
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
@@ -725,7 +726,7 @@ function App() {
               {/* WO-O4O-COMMON-HOME-PHASE1-V1: `/` 에 있던 CommunityPage 를 이동.
                   페이지 자체는 복제하지 않고 같은 컴포넌트를 그대로 사용한다. */}
               {/* 서브도메인 대표 화면 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-10 */}
-              {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierLandingPage />} />}
+              {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierServiceEntry />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />

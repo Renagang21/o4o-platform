@@ -110,6 +110,8 @@ export interface EntryCommunity {
   communityKey: string;
   name: string;
   canParticipate: boolean;
+  kind?: 'independent' | 'semi-franchise';
+  businessKey?: string;
   reason: string | null;
   /** 진입 surface — Community 하나에 여러 URL 이 있을 수 있다 (같은 Community 데이터) */
   entries: { serviceKey: string; path: string }[];
@@ -293,7 +295,11 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
   const entry = entryRes.data?.data;
   const operatorServices = operatorRes.data?.data?.services;
   const communitiesRaw = communitiesRes?.data?.data?.communities;
-  const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
+  const communities: EntryCommunity[] = Array.isArray(communitiesRaw) ? communitiesRaw.map(c => ({
+    ...c,
+    canParticipate: typeof c.allowed === 'boolean' ? c.allowed : c.canParticipate === true,
+    entries: Array.isArray(c.entries) ? c.entries : [{ serviceKey: 'community', path: `/communities/${encodeURIComponent(c.communityKey)}/forum` }],
+  })) : [];
   if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
     throw new Error('bad response');
   }
@@ -441,7 +447,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   //   운영 종료 서비스의 surface 는 진입 후보에서 뺀다 — 남는 surface 가 없으면 카드도 없다.
   const community: EntryItem[] = [];
   for (const c of data.communities ?? []) {
-    if (!c.canParticipate || !Array.isArray(c.entries)) continue;
+    if (c.kind === 'semi-franchise' || !c.canParticipate || !Array.isArray(c.entries)) continue;
     const entries = c.entries.filter((e) => !RETIRED_SERVICE_KEYS.has(e.serviceKey));
     if (entries.length === 0) continue;
     const entry =
@@ -549,6 +555,11 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
+  for (const business of data.communities ?? []) {
+    if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
+    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`,
+      action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` } });
+  }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
     const info = NETURE_SERVICE_INFO[svcKey];

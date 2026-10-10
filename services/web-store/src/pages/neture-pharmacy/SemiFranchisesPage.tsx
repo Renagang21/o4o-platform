@@ -1,11 +1,12 @@
+import { requestServiceHandoff } from '@o4o/auth-react';
 import { Link } from 'react-router-dom';
 /**
- * 세미프랜차이즈 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-2 · §7
+ * 약국 협력사업 — DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-2 · §7
  *
  *   GET  /api/v1/neture/pharmacy/semi-franchises              목록 + 내 약국의 가입 상태
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/apply   가입 신청(pending) — `pharmacy` 도 같은 절차
  *   POST /api/v1/neture/pharmacy/semi-franchises/:key/withdraw 탈퇴(terminated)
- * 승인 · 반려 · 정지는 그 세미프랜차이즈 담당 운영자가 한다. 커뮤니티는 가입 active 일 때만 열린다(서버 판정).
+ * 승인 · 반려 · 정지는 그 약국 협력사업 담당 운영자가 한다. 커뮤니티는 가입 active 일 때만 열린다(서버 판정).
  * 신청 · 승인 시 서버는 Neture 가입 승인(active)을 직접 확인한다(CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E2) —
  * 승인 전이면 `NETURE_MEMBERSHIP_REQUIRED` 로 거절되고 이 화면은 Neture 가입 안내 링크를 붙인다.
  */
@@ -30,7 +31,7 @@ export default function SemiFranchisesPage() {
     try {
       setRows(await neturePharmacyApi.listSemiFranchises());
     } catch (e) {
-      setError(pharmacyErrorMessage(e, '세미프랜차이즈 목록을 불러오지 못했습니다.'));
+      setError(pharmacyErrorMessage(e, '약국 협력사업 목록을 불러오지 못했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -41,7 +42,7 @@ export default function SemiFranchisesPage() {
   const act = async (row: SemiFranchiseRow, action: 'apply' | 'withdraw') => {
     const confirmText = row.membershipStatus === 'pending'
       ? `${row.name} 가입 신청을 취소하시겠습니까?`
-      : `${row.name} 에서 탈퇴하시겠습니까? 탈퇴하면 이 세미프랜차이즈의 공급 상품을 주문할 수 없습니다.`;
+      : `${row.name} 에서 탈퇴하시겠습니까? 탈퇴하면 이 약국 협력사업의 공급 상품을 주문할 수 없습니다.`;
     if (action === 'withdraw' && !window.confirm(confirmText)) return;
     setBusyKey(row.key);
     setError(null);
@@ -69,18 +70,15 @@ export default function SemiFranchisesPage() {
     if (!row.communityKey) return;
     setBusyKey(row.key); setError(null);
     try {
-      const response = await api.post('/auth/handoff', { targetServiceKey: 'community', returnPath: `/communities/${encodeURIComponent(row.communityKey)}/forum` });
-      const href = response.data?.data?.targetUrl;
-      const target = new URL(href);
-      if (target.origin !== 'https://community.neture.co.kr' || target.pathname !== '/handoff') throw new Error('Invalid target');
+      const href = await requestServiceHandoff(api, { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `/businesses/${encodeURIComponent(row.key)}/forum` });
       window.location.assign(href);
-    } catch { setError('커뮤니티로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); }
+    } catch { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); }
   };
 
   return (
     <PharmacyPage
       title="이용 사업 · 가입 관리"
-      description="각 세미프랜차이즈의 가입 상태·조건을 확인하고 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
+      description="각 약국 협력사업의 가입 상태·조건을 확인하고 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       {message && <Notice>{message}</Notice>}
@@ -93,16 +91,16 @@ export default function SemiFranchisesPage() {
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
       ) : rows.length === 0 ? (
-        <p className="py-12 text-center text-gray-500">가입할 수 있는 세미프랜차이즈가 없습니다.</p>
+        <p className="py-12 text-center text-gray-500">가입할 수 있는 약국 협력사업가 없습니다.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-600">
-                <th className="px-4 py-3 font-medium">세미프랜차이즈</th>
+                <th className="px-4 py-3 font-medium">약국 협력사업</th>
                 <th className="px-4 py-3 font-medium">가입 상태</th>
                 <th className="px-4 py-3 font-medium">신청 · 처리</th>
-                <th className="px-4 py-3 font-medium">커뮤니티</th>
+                <th className="px-4 py-3 font-medium">참여자 공간</th>
                 <th className="px-4 py-3 text-center font-medium">작업</th>
               </tr>
             </thead>
@@ -127,7 +125,7 @@ export default function SemiFranchisesPage() {
                       {r.decidedAt ? ` · 처리 ${formatDate(r.decidedAt)}` : ''}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      {!r.communityKey ? '-' : st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>회원 커뮤니티</button> : '가입 승인 후 이용'}
+                      {!r.communityKey ? '-' : st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : '가입 승인 후 이용'}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {canApply && (
