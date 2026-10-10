@@ -1,10 +1,12 @@
 # KPA Society 서비스 구조 기준 문서
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **문서 성격**: 헌법 문서 (Constitution)
 > **최종 수정**: 2026-09-17 (v1.1 — Community Identity · 데모 서비스 제거 완료 반영, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)
 > **버전**: 1.1
 > **정합 기준**: 역할별 업무공간 · Community Identity 는 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §1 · §3 · §5 가 상위 정본이다. 본 문서의 "3개 서비스" 는 `kpa-society.co.kr` 도메인 안의 **화면 영역 구분**이며 catalog Service Identity(`kpa-society` · `kpa-branch`)나 Community Identity(`pharmacy`)를 대체하지 않는다.
-> **호스트 정합 (2026-10-03)**: 본문의 `kpa-society.co.kr` 은 이 앱(`kpa-society`)의 **옛 주소**다. 현재 주소 의미는 [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) 가 정한다 — 이 앱 = `pharmacy.neture.co.kr`(약국 사업자 대상 세미프랜차이즈 운영 서비스) · 분회 서비스(§3.2) = 별도 앱 `kpa-branch` 의 `kpa.neture.co.kr/{분회}`(약사 개인 대상) · 커뮤니티 영역(§3.1)의 독립 주소 = `community.neture.co.kr/pharmacist`. 본문의 영역 구분 · 원칙은 그대로 유효하다.
+> **호스트 정합 (2026-10-03)**: 본문의 `kpa-society.co.kr` 은 이 앱(`kpa-society`)의 **옛 주소**다. 현재 주소 의미는 [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) 가 정한다 — 이 앱 = `pharmacy.neture.co.kr`(약국 사업자 대상 약국 협력사업 운영 서비스) · 분회 서비스(§3.2) = 별도 앱 `kpa-branch` 의 `kpa.neture.co.kr/{분회}`(약사 개인 대상) · 커뮤니티 영역(§3.1)의 독립 주소 = `community.neture.co.kr/pharmacist`. 본문의 영역 구분 · 원칙은 그대로 유효하다.
 
 ---
 
