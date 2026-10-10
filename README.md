@@ -131,7 +131,8 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 - **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(Delivery 가 reusable workflow 에 직접 전달 · 태그 · dispatch 없음).
   API 가 함께 바뀌면 API 를 먼저 배포하고 성공을 확인한 뒤 프런트를 배포합니다. API 가 차단되면 프런트도 보류됩니다.
   main 에 더 새 commit 이 있으면 그 commit 의 cycle 이 누적 변경을 처리합니다.
-- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 기술 gate 확인 → `promote.yml` 1회 (별도 사용자 승인 불필요) (commit status `production` 에 명령이 적힌다).
+- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 기술 gate 확인 → `promote.yml` 1회 (일반 배포는 별도 사용자 승인 불필요, commit status `production` 에 명령이 적힌다).
+  migration 포함 promote는 운영 DB write/DDL을 수행하므로, 해당 migration 실행이 명시적으로 승인되지 않았다면 dispatch 전에 사용자 확인을 받습니다.
   `deploy/*` 태그 → 해당 workflow 수동 dispatch 는 break-glass 로만 남습니다.
   deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
 - DB 마이그레이션은 API 배포가 실행합니다
