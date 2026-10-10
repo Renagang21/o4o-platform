@@ -17,6 +17,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { toast } from '@o4o/error-handling';
 
 /** Inline media query hook */
@@ -38,6 +39,7 @@ function useMediaQuery(query: string): boolean {
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   fetchForumPostBySlug,
+  pinCommunityForumPost,
   fetchForumComments,
   createForumComment,
   updateForumComment,
@@ -121,6 +123,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   const [post, setPost] = useState<ForumPost | null>(null);
   const [comments, setComments] = useState<DisplayComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadedScope, setLoadedScope] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,6 +133,53 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const actionMenuRef = useRef<HTMLDivElement>(null);
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinNeedsRefresh, setPinNeedsRefresh] = useState(false);
+  const [pinNotice, setPinNotice] = useState<string | null>(null);
+  const [pinError, setPinError] = useState<string | null>(null);
+  const pinProcessing = useRef(false);
+  const beginLoad = useLatestRequest(`${basePath}:${slug}`);
+  const beginPin = useLatestRequest(`${basePath}:${slug}:${canModerate}`);
+  const communityKey = /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(basePath)?.[1];
+  useEffect(() => {
+    pinProcessing.current = false;
+    setPinBusy(false); setPinNeedsRefresh(false); setPinNotice(null); setPinError(null);
+  }, [basePath, slug, canModerate]);
+
+  const refreshPinnedPost = async (current: () => boolean) => {
+    const response = await fetchForumPostBySlug(slug!);
+    if (!current()) return;
+    if (!response?.success || !response.data) throw new Error('공지 처리는 완료됐지만 게시글을 다시 불러오지 못했습니다.');
+    setPost(response.data); setPinNeedsRefresh(false);
+  };
+
+  const retryPinRefresh = async () => {
+    if (pinProcessing.current) return;
+    pinProcessing.current = true;
+    const current = beginPin();
+    setPinBusy(true); setPinError(null);
+    try { await refreshPinnedPost(current); }
+    catch { if (current()) setPinError('게시글을 다시 불러오지 못했습니다. 다시 조회해 주세요.'); }
+    finally { if (current()) { pinProcessing.current = false; setPinBusy(false); } }
+  };
+
+  const handlePin = async () => {
+    if (!post || !communityKey || !canModerate || pinProcessing.current || pinNeedsRefresh) return;
+    pinProcessing.current = true;
+    const current = beginPin();
+    setPinBusy(true); setPinNotice(null); setPinError(null);
+    try {
+      await pinCommunityForumPost(communityKey, post.id, !post.isPinned);
+      if (!current()) return;
+      setPinNeedsRefresh(true);
+      setPinNotice(post.isPinned ? '공지를 해제했습니다.' : '공지로 고정했습니다.');
+      await refreshPinnedPost(current);
+    } catch (e) {
+      if (current()) setPinError((e as { response?: { data?: { error?: string } } }).response?.data?.error || (e instanceof Error ? e.message : '공지 변경에 실패했습니다.'));
+    } finally {
+      if (current()) { pinProcessing.current = false; setPinBusy(false); }
+    }
+  };
 
   const currentUserId = user?.id;
   const isAdmin = !basePath.startsWith('/communities/') && (user?.roles?.some(r => r === 'neture:admin' || r === 'platform:super_admin') ?? false);
@@ -147,18 +197,23 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   }, [showActionMenu]);
 
   useEffect(() => {
+    const current = beginLoad();
     async function loadPost() {
       if (!slug) {
         setError('게시글을 찾을 수 없습니다.');
+        setLoadedScope(`${basePath}:${slug}`);
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
+      setPost(null);
+      setComments([]);
       setError(null);
 
       try {
         const response = await fetchForumPostBySlug(slug);
+        if (!current()) return;
 
         if (!response || !response.data) {
           setError('게시글을 찾을 수 없습니다.');
@@ -171,22 +226,22 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
 
         // Fetch comments
         const commentsResponse = await fetchForumComments(response.data.id);
-        if (commentsResponse.success) {
+        if (current() && commentsResponse.success) {
           setComments(commentsResponse.data.map(toDisplayComment));
         }
       } catch (err) {
         console.error('Error loading post:', err);
-        setError('게시글을 불러오지 못했습니다.');
+        if (current()) setError('게시글을 불러오지 못했습니다.');
       } finally {
-        setIsLoading(false);
+        if (current()) { setLoadedScope(`${basePath}:${slug}`); setIsLoading(false); }
       }
     }
 
     loadPost();
-  }, [slug]);
+  }, [slug, basePath, beginLoad]);
 
   const handleDeletePost = async () => {
-    if (!post || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (pinProcessing.current || !post || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
     const result = await deleteForumPost(post.id);
     if (result.success) {
       navigate(basePath);
@@ -246,7 +301,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
     setIsSubmitting(false);
   };
 
-  if (isLoading) {
+  if (isLoading || loadedScope !== `${basePath}:${slug}`) {
     return (
       <div style={styles.container}>
         <ForumDetailSkeletonState />
@@ -288,6 +343,9 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
       </nav>
 
       {/* Post Header — 공통 ForumPostHeader + Neture 고유 badge/action slot */}
+      {pinNotice && <p role="status">{pinNotice}</p>}
+      {pinError && <p role="alert">{pinError}</p>}
+      {pinNeedsRefresh && <button type="button" disabled={pinBusy} onClick={() => void retryPinRefresh()}>공지 상태 다시 조회</button>}
       <ForumPostHeader
         title={post.title}
         authorName={authorName}
@@ -316,6 +374,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
                 </button>
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
+                    {communityKey && canModerate && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                     {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
@@ -332,6 +391,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
             ) : (
               /* Desktop: inline actions */
               <>
+                {communityKey && canModerate && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                 {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
                 <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
               </>

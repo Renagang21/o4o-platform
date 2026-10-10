@@ -8,7 +8,7 @@
  *   - 비로그인은 목록을 부르지 않는다
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
@@ -184,6 +184,45 @@ describe('MyCommunityOperatorPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '정지', exact: true }));
     await waitFor(() => expect(post).toHaveBeenCalledWith('/communities/alpha/memberships/m1/suspend', { reason: '회원 관리 사유' }));
     expect(await screen.findByText('회원 상태를 변경했습니다.')).toBeTruthy(); prompt.mockRestore();
+  });
+
+  it('상태를 변경하면 늦게 도착한 이전 필터 결과를 표시하지 않는다', async () => {
+    let release!: (value: unknown) => void;
+    const pending = new Promise(resolve => { release = resolve; });
+    get.mockImplementation((url: string, config?: { params?: { status?: string } }) => url.endsWith('/operating') ? ok({ communities: [{ id: 'c1', slug: 'fixture', name: '커뮤니티', pendingCount: 1, canRestrictMembers: true }] })
+      : config?.params?.status === 'pending' ? pending : ok({ memberships: [{ ...pendingRows[0], status: 'active', name: '활성 회원' }] }));
+    mount(); fireEvent.change(await screen.findByLabelText('회원 상태'), { target: { value: 'active' } });
+    await screen.findByText('활성 회원');
+    await act(async () => release({ data: { success: true, data: { memberships: pendingRows } } }));
+    expect(screen.queryByText(pendingRows[0].name)).toBeNull(); expect(screen.getByText('활성 회원')).toBeTruthy();
+  });
+  it('다른 행의 중복 처리를 막고 상태 변경을 잠근다', async () => {
+    let release!: (value: unknown) => void;
+    post.mockImplementation(() => new Promise(resolve => { release = resolve; }));
+    get.mockImplementation((url: string) => url.endsWith('/operating') ? ok({ communities: [{ id: 'c1', slug: 'fixture', name: '커뮤니티', pendingCount: 2, canRestrictMembers: true }] })
+      : ok({ memberships: pendingRows.map(row => ({ ...row, serviceMembershipStatus: 'active' })) }));
+    mount(); const buttons = await screen.findAllByRole('button', { name: '승인' });
+    fireEvent.click(buttons[0]); fireEvent.click(buttons[1]); expect(post).toHaveBeenCalledTimes(1);
+    expect((screen.getByLabelText('회원 상태') as HTMLSelectElement).disabled).toBe(true);
+    await act(async () => release({ data: { success: true, data: {} } }));
+    await screen.findByRole('status');
+  });
+  it('조회 실패는 오류와 재시도를 제공한다', async () => {
+    get.mockRejectedValueOnce(new Error('목록 조회 실패'));
+    mount(); await screen.findByRole('alert');
+    fireEvent.click(screen.getByRole('button', { name: '다시 조회' }));
+    expect(await screen.findByLabelText('회원 상태')).toBeTruthy();
+  });
+
+  it('다른 상태로 이동하면 이전 회원의 늦은 이력 응답을 표시하지 않는다', async () => {
+    let release!: (value: unknown) => void;
+    const history = new Promise(resolve => { release = resolve; });
+    get.mockImplementation((url: string) => url.endsWith('/operating') ? ok({ communities: [{ id: 'c1', slug: 'fixture', name: '커뮤니티', pendingCount: 0, canRestrictMembers: true }] })
+      : url.endsWith('/history') ? history : ok({ memberships: [{ ...pendingRows[0], status: 'active' }] }));
+    mount(); fireEvent.click(await screen.findByRole('button', { name: '이력' }));
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'suspended' } });
+    await act(async () => release({ data: { success: true, data: { changes: [{ id: 'h1', created_at: '2026-10-11T00:00:00Z', reason: '이전 이력', after_role: 'member', after_status: 'active' }] } } }));
+    expect(screen.queryByText('이전 이력')).toBeNull();
   });
 
 });
