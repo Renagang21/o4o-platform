@@ -46,6 +46,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  /** 서버의 최신 역할·서비스 소속을 다시 조회한다. */
+  refreshAuth: () => Promise<void>;
   /**
    * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 에서 은퇴한 것은 서비스별 service_credentials 비밀번호다.
    * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호는 단일 user_password_credentials
@@ -135,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
+        refreshAuth: core.refreshForAccess,
         loginWithEmail: core.loginWithEmail,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,

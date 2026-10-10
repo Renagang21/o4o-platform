@@ -94,7 +94,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   const cfgRef = useRef(config);
   cfgRef.current = config;
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (throwOnTransientError = false) => {
     const generation = sessionGeneration.current;
     const cfg = cfgRef.current;
     if (!cfg.getAccessToken()) {
@@ -112,11 +112,16 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         setUser(built);
         cfg.onAuthenticated?.(built);
       } else {
+        if (throwOnTransientError) throw new Error('Invalid auth user response');
         setPendingPolicyAcceptances([]);
         setUser(null);
       }
-    } catch {
+    } catch (error) {
       if (generation !== sessionGeneration.current) return;
+      // Access rechecks distinguish a temporary transport/server failure from an
+      // invalid session. Existing background refresh keeps its previous behavior.
+      const { status } = readErrorResponse(error);
+      if (throwOnTransientError && status !== 401 && status !== 403) throw error;
       // 세션 없음/만료 — 비로그인 상태로 진행(정상 경로).
       setPendingPolicyAcceptances([]);
       setUser(null);
@@ -124,6 +129,8 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       setIsLoading(false);
     }
   }, []);
+
+  const refreshForAccess = useCallback(() => refresh(true), [refresh]);
 
   useEffect(() => {
     void refresh();
@@ -298,6 +305,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     loginWithEmail,
     logout,
     refresh,
+    refreshForAccess,
     setUser,
   };
 }
