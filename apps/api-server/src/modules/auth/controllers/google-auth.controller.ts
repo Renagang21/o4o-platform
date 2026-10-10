@@ -1,3 +1,5 @@
+import { signupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Google Auth Controller: Google-only Signup/Login endpoints
@@ -74,6 +76,7 @@ export class GoogleAuthController extends BaseController {
     const { idToken, consents, includeLegacyTokens } = req.body as GoogleSignupRequestDto;
     try {
       const session = await googleAuthService.signup({
+        policyServiceKey: signupPolicyKeyFromOrigin(req.get('origin')),
         idToken,
         consents,
         ipAddress: getTrustedClientIp(req),
@@ -135,6 +138,7 @@ export class GoogleAuthController extends BaseController {
     const err = error as Error & { code?: string; reason?: string; statusCode?: number; details?: { status?: unknown } };
     monitoringMetrics.recordAuthFailure(err.code || 'UNKNOWN');
 
+    if (error instanceof PolicyAcceptanceError) return BaseController.error(res, error.message, error.httpStatus, error.code);
     if (error instanceof GoogleIdTokenError) {
       // reason 은 로그에만 — 클라이언트에는 단일 code 로 응답한다(allowlist 상태 노출 최소화).
       logger.warn(`[GoogleAuthController.${op}] ID token rejected`, { reason: error.reason });

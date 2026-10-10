@@ -71,6 +71,9 @@ function makeHarness(
 
   const query = jest.fn(async (q: string, p: any[] = []) => {
     sql.push({ q, p });
+    if (/FROM service_policy_documents/.test(q)) return [{ id: '11111111-1111-4111-8111-111111111111', service_key: 'neture', document_type: 'terms', version: 1, title: 'Fixture terms', content: 'Fixture agreement', status: 'published' }];
+    if (/INSERT INTO user_policy_acceptances/.test(q)) return [{ id: 'acceptance-fixture' }];
+    if (/UPDATE users SET tos_accepted_at/.test(q)) return [];
     const s = q.replace(/\s+/g, ' ').trim();
     // WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1: Demo 보호 판정(demo_accounts).
     //   기본은 'Demo 아님'(빈 배열). Demo 를 흉내 내려면 store.demoUserIds 에 넣는다.
@@ -252,14 +255,14 @@ function makeHarness(
   };
 }
 
-const META = { ipAddress: '127.0.0.1', userAgent: 'jest', sessionServiceKey: 'neture' };
+const META = { policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'jest', sessionServiceKey: 'neture' };
 const GOOD_PW = 'abcd1234!';
 const signupInput = (over: Partial<Record<string, any>> = {}) => ({
   email: 'New.User@Example.com',
   password: GOOD_PW,
   name: '홍길동',
   phone: '010-1234-5678',
-  consents: { terms: true, privacy: true },
+  consents: { terms: true, privacy: true, termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 } },
   ...META,
   ...over,
 });

@@ -1,3 +1,6 @@
+import { SignupTermsAgreement } from './SignupTermsAgreement';
+import { styles } from './email/shared';
+import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
  * <GoogleContinue /> — 공통 "Google로 계속하기" 진입 UI
  * WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 (WO-2D)
@@ -22,6 +25,7 @@ import type { AuthLoginResult, AuthServiceAccess, GoogleSignupConsents } from '.
 export interface GoogleContinueProps<TUser = unknown> {
   /** `authClient.getGoogleAuthConfig` — 공개 Client ID 조회. */
   getConfig: () => Promise<GoogleAuthConfig>;
+  getSignupTerms: () => Promise<SignupTermsDocument>;
   /** `useServiceAuth().loginWithGoogle` */
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<TUser>>;
   /** `useServiceAuth().signupWithGoogle` */
@@ -62,16 +66,18 @@ const ghostBtn: CSSProperties = {
 
 export function GoogleContinue<TUser = unknown>({
   getConfig,
+  getSignupTerms,
   loginWithGoogle,
   signupWithGoogle,
   onSuccess,
   onError,
   onStart,
-  termsHref = '/terms',
   privacyHref = '/privacy',
   hint,
   className,
 }: GoogleContinueProps<TUser>) {
+  const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
+  const [policyReload, setPolicyReload] = useState(0);
   const [stage, setStage] = useState<Stage>({ kind: 'loading' });
   const [message, setMessage] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);
@@ -155,7 +161,7 @@ export function GoogleContinue<TUser = unknown>({
   /** consent → signup */
   const submitSignup = useCallback(async () => {
     if (stage.kind !== 'consent') return;
-    if (!terms || !privacy) {
+    if (!policy || !terms || !privacy) {
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
@@ -165,16 +171,17 @@ export function GoogleContinue<TUser = unknown>({
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits, termsPolicy: { policyDocumentId: policy.policyDocumentId, version: policy.version } });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
       callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });
       return;
     }
+    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
     fail(result);
     // ID token 은 짧게 유효 — 동의 화면으로 되돌려 재시도를 허용한다(EMAIL_IN_USE 등은 메시지로 안내).
     setStage({ kind: 'consent', idToken });
-  }, [stage, terms, privacy, marketing, phone, name, fail]);
+  }, [stage, terms, privacy, marketing, phone, name, policy, fail]);
 
   return (
     <div className={className} style={box} data-testid="google-continue">
@@ -196,22 +203,19 @@ export function GoogleContinue<TUser = unknown>({
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
             처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주세요.
           </p>
-          <label>이름 (필수)<input type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
-          <label>개인 휴대전화 (필수)<input type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
+          <label style={styles.field}>이름 (필수)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
+          <label style={styles.field}>개인 휴대전화 (필수)<input style={styles.input} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
           <p style={muted}>연락처를 등록합니다. 휴대전화 본인 인증을 수행하는 것은 아닙니다.</p>
-          <label style={checkRow}>
-            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
-            <span><a href={termsHref} target="_blank" rel="noreferrer">이용약관</a>에 동의합니다. (필수)</span>
-          </label>
-          <label style={checkRow}>
-            <input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} />
-            <span><a href={privacyHref} target="_blank" rel="noreferrer">개인정보 처리방침</a>에 동의합니다. (필수)</span>
-          </label>
+          <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <label style={checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
+            <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+          </div>
           <label style={checkRow}>
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
             <span>마케팅 정보 수신에 동의합니다. (선택)</span>
           </label>
-          <button type="button" style={primaryBtn} onClick={() => { void submitSignup(); }}>
+          <button type="button" disabled={!policy || !terms || !privacy} style={primaryBtn} onClick={() => { void submitSignup(); }}>
             동의하고 계정 만들기
           </button>
           <button type="button" style={ghostBtn} onClick={() => { setMessage(null); void loadConfig(); }}>
