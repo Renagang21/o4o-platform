@@ -42,7 +42,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 구현 요청이면 승인된 안전 범위 안에서 불필요한 중간 승인 없이 완료까지 진행한다.
 - 이미 명시적으로 승인된 변경 범위를 같은 이유로 기계적으로 다시 승인받지 않는다.
   승인된 범위 안의 조사 · 수정 · 검증 · review finding 처리 · 스레드 정리 · 상태 조회는 스스로 판단해 진행한다.
-  사용자에게 올리는 것은 새 정책 · 위험 범위 판단과 main 통합 승인뿐이다(§4-1(e) · §5).
+  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 정상적인 push · main PR 병합 · 배포는 별도 승인 없이 진행한다.
 - 새롭게 발견된 범위 확대나 미승인 위험 변경은 해당 변경 전에 중지하고 보고한다.
 - 범위 밖 문제는 임의 수정하지 않고 보고한다. 무관한 build/test 실패도 임의로 고치지 않는다.
 - 기존 코드 패턴을 우선하고 과도한 추상화·리팩터링을 피한다. 코딩 컨벤션은 [README.md](README.md)를 따른다.
@@ -120,11 +120,11 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 앞서갔다고 **자동으로 merge · rebase · reset · cherry-pick 하지 않는다.** 충돌 여부 · 통합 필요성 · 현재 통합 정책을
   먼저 확인한다. 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
 
-**(e) main 통합 — PR merge · 사용자 승인 후**
+**(e) main 통합 — PR merge · 기술 gate 충족 후**
 
 ```text
 작업 → 검증 → PR → required CI PASS → Codex blocker 없음   = integration-ready
-→ 결과 보고 · STOP → 사용자 "main 통합 진행" → PR merge → post-merge 확인
+→ PR merge → post-merge 확인 → 현재 Delivery 정책에 따른 배포 · 검증 → 결과 보고
 ```
 
 - **기술 gate 는 실제 `main` ruleset 이다.** 설정값은 이 문서에 고정하지 않고 통합 직전 read-only 로 확인한다
@@ -132,8 +132,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   삭제 · non-fast-forward 금지 · **필수 human approval 0** · admin bypass 가능. 합의 규칙: [README — 기여](README.md#기여).
 - **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.**
   owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
-- **integration-ready 여도 자동으로 merge 하지 않는다.** 상태(HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker)를
-  보고하고 STOP 한다. 작업을 지시한 사용자가 명시적으로 "main 통합 진행" 을 승인한 뒤에만 merge 한다.
+- **integration-ready 이면 별도 사용자 승인 없이 PR merge 를 진행한다.** HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 확인한다. 사용자가 조사 전용 또는 push까지만 등 종료 범위를 명시한 경우는 그 범위를 따른다.
 - **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
   보안 · 권한 · DB · 공통 Core 변경, 또는 사용자가 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
   서로의 상시 승인자가 되지 않는다.
@@ -151,6 +150,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   `DEPLOYMENT = REQUIRED | AUTOMATIC | MANUAL/GATED | NOT_APPLICABLE` 을 판정한다.
 - 문서-only 처럼 Delivery 가 배포를 skip 하는 작업은 `NOT_APPLICABLE` 로 기록하고 배포 완료를 기다리지 않는다.
   배포가 필요한 작업의 closure 는 해당 WO 의 현재 배포 · 검증 정책을 따른다.
+- **정상적인 배포 실행도 별도 사용자 승인을 요구하지 않는다.** LEVEL 3의 promote 실행은 현재 기술 gate와 실행 계정 권한을 확인하고 진행한다. 새 DB 변경 · 데이터 삭제 · 배포 인프라 변경 등의 미승인 위험 범위는 §5를 따른다. freeze · CI · ref · 계정 권한 경계를 우회하지 않는다.
 - 과거 운영 방식 · 플래그(`DEPLOY_FREEZE` · `DEPLOY_ENABLED` 등)를 현재 사실 확인 없이 재사용하지 않는다.
 
 **(g) 공유 Mutable Resource — serialized**
@@ -176,7 +176,7 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 
 ```text
 최신 origin/main → 전용 worktree + branch → 작업 → 검증 → commit / push → PR → CI · Codex
-→ 보고 · STOP → 사용자 승인 → main 통합(PR merge) → post-merge CI
+→ main 통합(PR merge) → post-merge CI
 → (필요 시) deploy / smoke → 종료 정리(아래) → 트랙 종료
 ```
 
@@ -201,7 +201,7 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
    그 밖의 상황에서 강제 삭제(`-D`)는 하지 않는다.
 
 - 판정은 `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN` 이다. 1~4 를 모두 통과한 `SAFE_TO_REMOVE` 는 별도 승인 없이 5~7 까지 진행한다
-  (main 통합 승인이 트랙 종료를 포함한다). `KEEP` / `UNCERTAIN` 이면 삭제하지 않고 이유를 보고한다.
+  (정상적인 작업 완료 범위에 트랙 종료를 포함한다). `KEEP` / `UNCERTAIN` 이면 삭제하지 않고 이유를 보고한다.
 - **다른 세션 · 다른 PC 가 만든 worktree / branch 는 정리 대상이 아니다** — 판정만 보고한다.
 
 **(j) 완료 보고**
@@ -234,8 +234,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
   공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
 - commit/push를 수행하는 작업의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋이 작업 branch 에 push 되고 PR 이 integration-ready**(§4-1(e))이다.
-  **작업 완료와 main 통합은 별개다** — 완료 조건을 채우려고 main 에 먼저 merge 하지 않는다. 사용자가 통합을 승인해 merge 한 경우에만
-  `git merge-base --is-ancestor HEAD origin/main` 으로 포함을 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+  이 조건은 통합 준비 상태이며 별도 승인 대기 종료점이 아니다. 기술 gate를 충족하면 PR merge · post-merge 확인 · 필요한 배포 검증까지 진행한다. 사용자가 push까지만 등 범위를 제한하면 그 지시를 따른다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 
 ## 5. 위험 변경 / 사용자 확인
 
