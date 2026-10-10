@@ -42,6 +42,9 @@ V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들
 
 ### 결정 순서 (바꾸지 않는다)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 ```text
 1. 세션 사용자        userId 는 세션에서만. body/query 의 userId 는 받지 않는다
 2. 조직 확정          Owner = isStoreOwner() 가 해석한 조직
@@ -95,6 +98,9 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 ---
 
 ## 3-A. 사업자 가입 (자가 가입)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 로그인한 사용자가 `store.neture.co.kr` 에서 직접 매장을 연다.
 

@@ -111,7 +111,7 @@
 | [SIGNAGE-APPROVAL-ARCHITECTURE-V1](architecture/SIGNAGE-APPROVAL-ARCHITECTURE-V1.md) | Signage 상태 모델 — **Operator 직접 게시가 정본**(2026-10-06 판정 확정): `draft → active` · `active` 로 생성 허용, Admin 승인 불필요. `pending` 승인 흐름은 서비스별 선택 정책. 상태 전이 SSOT = 코드 `ALLOWED_STATUS_TRANSITIONS` | ACTIVE |
 | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) | Neture 도메인 아키텍처 (공급자 화면 canonical) | FROZEN |
 | [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) | **K-Cosmetics 퇴역 잔여 계약** (2026-10-07) — 퇴역 결정(2026-10-05) · 운영 runtime 제거 완료(1차-A 웹 앱 · 1차-B `/api/v1/cosmetics` · web-store 화면 · admin) 뒤 남은 잔여(catalog identity · `SERVICE_KEYS` · `cosmetics:*` roles · DB 스키마 · migration · Event Offer/B2B · 공통 구조 identity)에만 적용. 규칙 4개: 제거된 runtime 재생성 금지 · 잔여 구조 고정(새 테이블 · Core FK · 개인정보 필드 · 전용 기능 추가 금지) · 정리 승인 경계 · 주문 데이터는 B2B 원장. 구 COSMETICS-DOMAIN-RULES 를 대체. 잔여 정리 완료 시 OBSOLETE | ACTIVE |
-| [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 capability · supplier 역할 없음 | ACTIVE |
+| [O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1](baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | PharmacyHub 완전 폐기 정책 — 운영·가입·역할·공급/결제 축과 전용 자원/데이터 제거, 인쇄 QR 연결·공용/Neture 데이터 보호. ACTIVE는 폐기 정책의 효력이며 서비스 운영 상태가 아님 (2026-10-11 · #427) | ACTIVE |
 | [EVENT-OFFER-COMMON-DOMAIN-V1](baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md) | Event Offer 공통 도메인 | ACTIVE |
 | [EVENT-OFFER-STORE-INTEGRATION-V1](baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md) | Event Offer Store 통합 | ACTIVE |
 | [EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1](baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md) | Event Offer 에서의 Neture 역할 구분 | ACTIVE |

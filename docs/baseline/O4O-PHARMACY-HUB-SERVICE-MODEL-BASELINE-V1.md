@@ -1,5 +1,28 @@
 # O4O Pharmacy-Hub Service Model Baseline V1
 
+> **상태**: ACTIVE — PharmacyHub 완전 폐기 정책. 서비스 운영 ACTIVE가 아니다.
+> **확정일**: 2026-10-11 · **승인 근거**: 사용자의 PharmacyHub 전면 제거·재사용 없음·전용 데이터 제거 지시.
+> **문서 작업**: #427. 아래 현행 정책은 이 문서의 이전 서비스 모델 전체와 연결된 정본의 PH 전용 계약을 대체한다. 공통·Neture 계약은 변경하지 않는다.
+
+## 현행 정책: PharmacyHub 완전 폐기
+
+1. **서비스와 기능**: PharmacyHub 앱·API·CI/CD·전용 Cloud Run/backend·가입·업무공간·operator capability·공급 opt-in·cart/checkout/payment producer를 제거한다. 재활성화·새 가입·역할 발급·서비스 복구를 하지 않는다. 현행 공통화·parity·Freeze의 유지/확장 대상으로 PH를 포함하지 않는다.
+2. **식별자와 권한**: `pharmacy-hub` 서비스 등록, PH namespace의 membership/role/권한·호환 adapter를 제거 대상으로 삼는다. 옛 식별자를 공통 resolver·등록 목록에 남긴 사실은 현행 운영 근거가 아니다. Neture 및 다른 서비스의 가입·역할·권한은 유지한다.
+3. **공급과 결제**: PH 직접 opt-in·`pharmacy_hub_cart` producer·PH 주문/결제 표면은 폐기한다. 공용 offer/checkout/payment/fulfillment/콘텐츠 테이블 전체를 지우지 않는다. `service_keys`에서 PH만 제거해 빈 배열의 기본 공급 의미로 상품이 새로 노출되지 않도록 현행 소비처와 노출 계약을 확인한다. Neture B2B·Store B2B·Neture 약국·구독 및 공통 PaymentCore/Freeze 계약은 그대로다.
+4. **데이터**: PH 전용 데이터는 재사용을 위해 보관하지 않고 삭제한다. 실제 schema/FK·전용 귀속·타 서비스 소비처를 확인한 뒤 계획을 고정하고 transaction 단위로 삭제·잔여 검증한다. 공용 조직/사용자/상품/약사 자격/Neture 데이터는 PH 표기만으로 삭제하지 않는다. 법정 보유 대상은 별도 확인하며 서비스 폐기를 보유기간 면제로 해석하지 않는다. 과거 migration과 migration history는 보존하고 다시 실행하지 않는다.
+5. **인쇄 QR 연결**: `pharmacyhub.co.kr`·`www.pharmacyhub.co.kr`의 도메인·DNS·인증서는 Neture 약국 리다이렉트에 필요한 연결 자원으로 유지한다. `/qr/*`, `/tablet/*`, `/multilingual-products/*`, `/foreign-visitor/affiliate/*`와 기타 호스트 경로는 Neture 약국으로 302 전환해 path/query를 보존한다. `/terms`·`/terms/`는 `/policy`로 전환한다. 실제 QR/tablet은 동작을 검증하고 없는 나머지 경로는 규칙을 검증한다. 인쇄 QR/Neture가 사용하는 공용 식별자와 연결은 삭제하지 않는다. 필요한 귀속 이전은 명시적인 이전·검증 후 수행한다.
+6. **완료 경계**: 정책 확정·코드 push·main 병합·API 배포는 운영 삭제 완료와 다르다. 전체 호스트 전환·검증 후 PH backend 참조를 제거하고 전용 Cloud Run을 삭제한다. 현행 실행 상태와 blocker는 [폐기 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 기록한다. 이 문서 작업은 운영 전환·데이터 삭제를 실행하지 않는다.
+
+## 대체 범위와 우선순위
+
+연결 문서에서 PH를 운영 중인 서비스·공통화 대상으로 열거하거나 가입/role/opt-in/checkout/parity를 유지하도록 한 **PH 전용 판정만** 위 1~6항으로 대체한다. 해당 절의 다른 서비스와 공통 계약은 그대로 유효하다. Frozen Distribution의 PH checkout 적용 축, Frozen Supplier의 PH 소비처 역시 이 승인된 별도 정본 작업으로 부분 대체하며 Neture/Common B2B/Core/Freeze는 유지한다. 각 연결 문서의 관련 절에도 부분 대체를 표기한다.
+
+## 이전 서비스 계약 — SUPERSEDED 이력
+
+아래 원문은 폐기 전 구조의 설명·감사 이력이다. 그 안의 ACTIVE·최종·유효·보존·가입/역할 발급·호환 유지 문구를 현행 PH 정책으로 적용하지 않는다. 아래에서 참조하는 공통·다른 서비스 문서의 비-PH 계약은 해당 정본을 따른다.
+
+---
+
 > **2026-10-09 실행 갱신:** PharmacyHub 전용 앱·API·배포 경로 제거는 [WO-O4O-PHARMACYHUB-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-V1.md)이 현재 실행 범위다. 기존 식별자와 운영 데이터는 보존하며 운영 인프라 정리는 아직 미실행이다.
 
 > **상태**: ACTIVE · **제정일**: 2026-08-21

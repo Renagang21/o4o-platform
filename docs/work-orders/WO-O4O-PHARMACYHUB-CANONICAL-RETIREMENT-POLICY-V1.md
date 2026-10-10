@@ -1,0 +1,11 @@
+# PharmacyHub canonical retirement policy alignment
+
+> 상태: REVIEW · 작성일: 2026-10-11 · 별도 정본 작업: #427
+
+사용자는 PharmacyHub 전면 제거·재사용 없음·전용 데이터 제거를 승인했다. 동일 폐기 WO의 문서 phase로 사용자 지정 worktree를 유지하고 최신 main에서 `wo/pharmacyhub-retirement-canonical`를 생성했다. PR #422의 구현 작업과 분리하여 정본 정책·index만 정렬한다.
+
+PH 서비스 baseline의 현행 1~6항이 이전 PH 서비스 모델을 대체한다. 연결된 role workspace·subdomain·Store access/owner RBAC·RBAC catalog/state·B2B/checkout·content/signage/POP·commonization/operator/header의 PH 관련 절에도 부분 대체를 명시한다. Frozen Distribution·Supplier는 승인된 PH 계약만 부분 대체하고 Neture/Common/Core/Freeze는 보존한다. canonical index의 ACTIVE는 폐기 정책의 효력이며 서비스 운영을 뜻하지 않는다.
+
+기존 본문·과거 실행 기록은 보존하며 PH 운영/가입/역할/opt-in/parity를 현행 의무로 적용하지 않는 우선순위를 관련 절에 표기했다. 공용 조직·사용자·Neture 데이터·인쇄 QR 연결·migration history 및 법정 보유 판단을 보호한다. PH 전용 데이터는 실제 귀속/FK·타 서비스 소비처 확인 후 삭제하는 정책이다.
+
+18개 기존 정본의 원문 보존·추가 링크·code fence 대조, docs 민감정보 검사·whitespace 검사가 통과했다. 이 문서 PR은 운영 URL map·Cloud Run·DB를 변경하지 않으며 운영 삭제 완료를 뜻하지 않는다. 최신 실행 결과는 기존 폐기 TODO 및 운영 workflow에서 추적한다.

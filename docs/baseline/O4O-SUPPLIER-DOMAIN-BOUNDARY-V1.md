@@ -80,6 +80,9 @@ Supplier
 
 ## 4. Distribution 판정 SSOT
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 > **Supplier 가 고른 노출 범위(`is_public` · `service_keys` · `allowed_seller_ids`)에 필요한 서비스 운영자의 승인(`offer_service_approvals`)이 더해져 공급 가능이 결정된다.**
 
 | 필드 | 성격 | 의미 |

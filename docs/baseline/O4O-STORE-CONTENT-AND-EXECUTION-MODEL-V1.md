@@ -6,6 +6,9 @@
 
 ## 0. 이 문서의 위치
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 O4O 의 매장 Content · Tablet · QR 구현은 여러 시기에 걸쳐 누적됐다(`store_tablet_displays` → Screen Set → 코너×콘텐츠 → `content_list`, `store_qr_codes` ↔ `product_landings`). 본 문서는 그 누적을 **하나의 canonical 개념 모델**로 고정한다.
 
 **상위 문서 (충돌 시 우선):**
@@ -130,6 +133,9 @@ Tablet 등 Execution 매체에서 **개별 상품을 표시**할 때의 해석 �
 
 ### 4-1. 계약
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 - **A ≠ B.** 편집이 곧 적용이 아니다. 적용은 명시적 운영 행위다.
 - **KPA-Society 와 PharmacyHub 는 A·B·C 모두 동일 계약**이다.
 - **현재의 메뉴명·페이지 구조·화면 분할은 canonical 정의가 아니라 구현 세부사항**이다. 본 문서는 3단계의 존재와 분리만 고정한다.
@@ -208,6 +214,9 @@ Content  x  Placement  x  Store/Corner  x  Period
 
 ## 9. KPA / PharmacyHub parity
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 > **KPA-Society와 PharmacyHub의 My Store 사용자 경험과 Content / Tablet / QR 실행 모델은 동일하다. 서비스 차이는 operator capability 및 service adapter/config 범위에 둔다.**
 
 따라서:
@@ -219,6 +228,9 @@ Content  x  Placement  x  Store/Corner  x  Period
 ---
 
 ## 10. 개발 우선순위 (고정)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 | Phase | 내용 |
 |:---:|---|
