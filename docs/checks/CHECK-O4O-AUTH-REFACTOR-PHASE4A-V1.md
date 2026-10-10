@@ -94,3 +94,16 @@ API 배포, 전체관리자 재로그인·유지 8개 서비스 PC/모바일 운
 
 문서 정합: 상위 WO의 PR #382 통합 완료를 반영했다. Identity V3의 과거 로그인 게이트·카카오 금지,
 MYPAGE의 이전 password UI 미구현 서술은 후속 문서 정합 대상으로 추적한다. Frozen 본문 임의 변경 없음.
+
+## 2026-10-10 통합 전 추가 검증
+
+사용자가 PR #387 main 통합·배포를 승인했다. 기존 HEAD의 필수 CI는 통과했으나 뒤에 완료된
+SonarCloud는 새 코드 중복률 4.8%로 실패했다. 최신 main을 작업 branch에 merge하고,
+`requirePlatformUser`의 service-token 403은 유지한 채 공통 사용자 인증을 `requireAuth`로 위임했다.
+세션·현재 DB 역할·계정 상태·약관 판정을 복제하지 않으며 guest 토큰도 사용자 인증을 통과하지 않는다.
+GitHub check annotation의 catch 이름·optional chain·테스트 assertion 지적도 수정했다.
+
+영향받는 관리자/사용자 세션·service token·제한 계정·약관·인가 focused 회귀 5개 suite **125 PASS**,
+API build PASS, 수정 파일 ESLint error 0(기존 unused catch 경고 1개), diff check PASS.
+외부 SonarCloud 재검증 결과와 main·배포의 최신 상태는 PR에서 확인한다. 위 로컬 통과로 외부
+Quality Gate나 운영 적용 완료를 대신하지 않는다.

@@ -10,6 +10,7 @@
 const getRoleNames = jest.fn();
 const findOne = jest.fn();
 const verifyAccessToken = jest.fn();
+const isServiceToken = jest.fn(() => false);
 
 jest.mock('../../../database/connection.js', () => ({
   AppDataSource: { getRepository: () => ({ findOne }), manager: { query: jest.fn(async () => [{ '?column?': 1 }]) } },
@@ -25,7 +26,7 @@ jest.mock('../../../utils/token.utils.js', () => ({
     const payload = verifyAccessToken(t);
     return payload ? { serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'family-1', ...payload } : payload;
   },
-  isServiceToken: () => false,
+  isServiceToken: (token: string) => isServiceToken(token),
 }));
 jest.mock('../../middleware/auth/auth-context.helpers.js', () => ({
   extractToken: () => 'tok',
@@ -44,6 +45,30 @@ function mockRes() {
 }
 
 const USER = { refreshTokenFamily: 'family-1', id: 'u1', isActive: true, status: 'active' };
+
+describe('platform entry shares the human authentication boundary', () => {
+  beforeEach(() => { jest.clearAllMocks(); isServiceToken.mockReturnValue(false); });
+  afterEach(() => { isServiceToken.mockReturnValue(false); });
+  it('retains the explicit service-token 403 without loading a user', async () => {
+    isServiceToken.mockReturnValue(true);
+    const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+    const res = mockRes(); const next = jest.fn();
+    await requirePlatformUser(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_TOKEN_NOT_ALLOWED' }));
+    expect(findOne).not.toHaveBeenCalled(); expect(next).not.toHaveBeenCalled();
+  });
+  it('does not authenticate a guest token as a human platform user', async () => {
+    verifyAccessToken.mockReturnValue({ userId: 'u1', tokenType: 'guest', authMethod: 'google' });
+    const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
+    const res = mockRes(); const next = jest.fn();
+    await requirePlatformUser(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'TOKEN_TYPE_NOT_ALLOWED' }));
+    expect(findOne).not.toHaveBeenCalled(); expect(req.user).toBeUndefined();
+    expect(next).not.toHaveBeenCalled();
+  });
+});
 
 describe('Google-positive admin boundary for current and legacy methods', () => {
   const cases = [
@@ -73,7 +98,7 @@ describe('Google-positive admin boundary for current and legacy methods', () => 
       const req: any = { method: 'GET', originalUrl: '/x', headers: {} };
       const res = mockRes(); const next = jest.fn();
       await authenticate(req, res, next);
-      expect(next.mock.calls.length).toBe(allowed ? 1 : 0);
+      expect(next.mock.calls).toHaveLength(allowed ? 1 : 0);
       if (!allowed) {
         expect(res.status).toHaveBeenCalledWith(403);
         expect(res.json.mock.calls[0][0].code).toBe(authMethod === 'password' ? 'PASSWORD_SESSION_NOT_ALLOWED' : 'GOOGLE_SESSION_REQUIRED');

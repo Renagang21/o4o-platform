@@ -135,9 +135,9 @@ async function enforceSessionAuthMethodBoundary(
 ): Promise<boolean> {
   try {
     user.roles = await roleAssignmentService.getRoleNames(user.id);
-  } catch (failure) {
+  } catch (error_) {
     // Preserve the password error contract; all other lookup failures reach the outer 401 handler.
-    if (payload.authMethod !== 'password') throw failure;
+    if (payload.authMethod !== 'password') throw error_;
     const error = sessionAuthMethodError(payload.authMethod);
     res.status(403).json({ success: false, error: error.message, code: error.code });
     return true;
@@ -324,7 +324,7 @@ export const optionalAuth = async (
       (optionalAccess === 'restricted' && isRestrictedRequestAllowed(req.method, req.originalUrl));
 
     // A session failing the Google-positive boundary is anonymous on optional routes.
-    if (user && user.isActive && optionalAllowed) {
+    if (user?.isActive && optionalAllowed) {
       user.roles = await roleAssignmentService.getRoleNames(user.id);
     }
     const sessionMethodAllowed = isSessionAuthMethodAllowed(
@@ -388,53 +388,8 @@ export const requirePlatformUser = async (
       });
     }
 
-    // Continue with standard platform user auth
-    const payload = verifyAccessToken(token);
-
-    if (!payload) {
-      return res.status(401).json({
-        success: false,
-        error: 'Access token is invalid or has expired',
-        code: 'INVALID_TOKEN',
-      });
-    }
-
-    // Get user from database
-    const userRepo = AppDataSource.getRepository(User);
-    const user = await userRepo.findOne({
-      where: { id: payload.userId },
-      relations: ['linkedAccounts'],
-    });
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'User account not found or has been deactivated',
-        code: 'INVALID_USER',
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        error: 'User account is inactive',
-        code: 'USER_INACTIVE',
-      });
-    }
-
-    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily))) {
-      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', code: 'SESSION_REVOKED' });
-    }
-
-    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
-    if (enforceAccountAccess(req, res, user)) return;
-    // Auth phase 4-A: fresh roles + explicit Google evidence for admin/platform accounts.
-    if (await enforceSessionAuthMethodBoundary(req, res, user, payload)) return;
-    // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
-    if (await enforceTermsAcceptance(req, res, user)) return;
-
-    req.user = user;
-    next();
+    // Keep the service-token 403 above, then share the complete human/session/account boundary.
+    return requireAuth(req, res, next);
   } catch (error) {
     logger.error('[requirePlatformUser] Token verification failed', {
       error: error instanceof Error ? error.message : String(error),
