@@ -12,6 +12,26 @@ const transitions: Record<CommunityMemberAction, { from: string[]; to: string }>
 
 export class CommunityMemberManagementService {
   constructor(private readonly db: Pick<DataSource, 'transaction'>) {}
+  /** 본인 개별 가입만 종료한다. 관리자 제재 권한·대상 ID를 받지 않는다. */
+  async withdrawSelf(input: { communityId: string; actorUserId: string }) {
+    if (!input.actorUserId) throw new CommunityMembershipMutationError(401, 'AUTH_REQUIRED', '로그인이 필요합니다.');
+    return this.db.transaction(async m => {
+      const communities = await m.query("SELECT id FROM communities WHERE id = $1 AND status = 'active' FOR UPDATE", [input.communityId]);
+      if (!communities.length) throw new CommunityMembershipMutationError(404, 'COMMUNITY_NOT_FOUND', '커뮤니티를 찾을 수 없습니다.');
+      const [target] = await m.query('SELECT id, user_id, role, status FROM community_memberships WHERE community_id = $1 AND user_id = $2 FOR UPDATE', [input.communityId, input.actorUserId]);
+      if (!target) throw new CommunityMembershipMutationError(404, 'MEMBERSHIP_NOT_FOUND', '본인의 가입 행을 찾을 수 없습니다.');
+      if (target.status === 'withdrawn') return { changed: false, status: 'withdrawn' };
+      if (target.status !== 'active') throw new CommunityMembershipMutationError(409, 'INVALID_MEMBERSHIP_TRANSITION', '활성 가입만 직접 탈퇴할 수 있습니다. 정지·신청 상태는 운영자에게 문의하세요.');
+      if (await demoAccountService.isDemoAccount(target.user_id, m)) throw new CommunityMembershipMutationError(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
+      if (target.role === 'admin') await protectLastCommunityAdmin(m, input.communityId, target.id);
+      await m.query('UPDATE community_memberships SET status = $1, role = $2, updated_at = NOW() WHERE id = $3 AND community_id = $4', ['withdrawn', 'member', target.id, input.communityId]);
+      await recordCommunityMembershipChange(m, {
+        ...input, membershipId: target.id, action: 'withdraw', reason: '본인 탈퇴',
+        beforeRole: target.role, afterRole: 'member', beforeStatus: target.status, afterStatus: 'withdrawn',
+      });
+      return { changed: true, status: 'withdrawn' };
+    });
+  }
   async change(input: { communityId: string; membershipId: string; actorUserId: string; action: CommunityMemberAction; reason: string }) {
     const transition = transitions[input.action];
     if (!transition) throw new CommunityMembershipMutationError(400, 'INVALID_ACTION', '지원하지 않는 회원 처리입니다.');

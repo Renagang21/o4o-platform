@@ -12,7 +12,7 @@ describe('중앙 개별 역할 지정', () => {
     get.mockReset(); post.mockReset();
     vi.spyOn(window, 'prompt').mockReturnValue('역할 변경 사유');
     get.mockImplementation((url: string) => url.endsWith('/members')
-      ? ok({ members: [{ membershipId: 'm1', userId: 'u1', name: '테스트 회원', email: null, role: 'member', membershipStatus: 'active', serviceMembershipStatus: 'active' }] })
+      ? ok({ members: [{ membershipId: 'm1', userId: 'u1', name: '테스트 회원', email: null, role: 'member', membershipStatus: 'active', serviceMembershipStatus: 'active', designationEligibility: { eligible: true, code: null, message: null } }] })
       : ok({ communities: [{ id: 'c1', name: '테스트 커뮤니티', slug: 'fixture', status: 'active', operatorCount: 1, memberCount: 2 }] }));
     post.mockImplementation(() => ok({}));
   });
@@ -30,5 +30,29 @@ describe('중앙 개별 역할 지정', () => {
     fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
     fireEvent.change(await screen.findByLabelText('테스트 회원 역할'), { target: { value: 'operator' } });
     expect(await screen.findByText('운영 가능한 마지막 admin은 변경할 수 없습니다.')).toBeTruthy();
+  });
+  it('서비스 가입이 active여도 서버가 메인 자격 미충족을 알리면 지정하지 않는다', async () => {
+    get.mockImplementation((url: string) => url.endsWith('/members')
+      ? ok({ members: [{ membershipId: 'm1', userId: 'u1', name: '테스트 회원', email: null, role: 'member', membershipStatus: 'active', serviceMembershipStatus: 'active', designationEligibility: { eligible: false, code: 'MAIN_MEMBERSHIP_NOT_ACTIVE', message: '이메일 확인 또는 계정 상태 확인이 필요합니다.' } }] })
+      : ok({ communities: [{ id: 'c1', name: '테스트 커뮤니티', slug: 'fixture', status: 'active', operatorCount: 1, memberCount: 2 }] }));
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
+    expect(await screen.findByText('이메일 확인 또는 계정 상태 확인이 필요합니다.')).toBeTruthy();
+    const select = await screen.findByLabelText('테스트 회원 역할');
+    expect((select.querySelector('option[value="operator"]') as HTMLOptionElement).disabled).toBe(true);
+    expect((select.querySelector('option[value="admin"]') as HTMLOptionElement).disabled).toBe(true);
+    fireEvent.change(select, { target: { value: 'admin' } });
+    expect(post).not.toHaveBeenCalled();
+  });
+  it('자격 정보가 없는 응답은 추측으로 지정 버튼을 열지 않는다', async () => {
+    get.mockImplementation((url: string) => url.endsWith('/members')
+      ? ok({ members: [{ membershipId: 'm1', userId: 'u1', name: '테스트 회원', email: null, role: 'member', membershipStatus: 'active', serviceMembershipStatus: 'active' }] })
+      : ok({ communities: [{ id: 'c1', name: '테스트 커뮤니티', slug: 'fixture', status: 'active', operatorCount: 1, memberCount: 2 }] }));
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
+    const select = await screen.findByLabelText('테스트 회원 역할');
+    fireEvent.change(select, { target: { value: 'operator' } });
+    expect(post).not.toHaveBeenCalled();
+    expect(screen.getAllByText('지정 자격을 확인할 수 없습니다. 커뮤니티를 다시 선택해 주세요.').length).toBeGreaterThan(0);
   });
 });

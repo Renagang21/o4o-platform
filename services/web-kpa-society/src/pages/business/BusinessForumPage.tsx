@@ -135,12 +135,15 @@ function BusinessPostArticle({ post, comments, commentTotal, userId, canManage, 
   const navigate = useNavigate();
   return <article className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
     {error && <p role="alert">{error}</p>}
-    <h2 className="break-words text-2xl font-bold leading-snug text-slate-900">{post.title}</h2><p className="my-3 text-sm text-slate-500">{post.author?.nickname || post.author?.name || '참여자'} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}</p>
+    <h2 className="break-words text-2xl font-bold leading-snug text-slate-900">{post.isPinned && <span className="mr-2 rounded bg-blue-100 px-2 py-1 text-sm text-blue-800">공지</span>}{post.title}</h2><p className="my-3 text-sm text-slate-500">{post.author?.nickname || post.author?.name || '참여자'} · {new Date(post.createdAt).toLocaleDateString('ko-KR')}</p>
     <div className="min-w-0 break-words leading-8 [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"><ForumBlockRenderer content={typeof post.content === 'string' ? htmlToBlocks(post.content) : post.content} /></div>
     <div className="my-6 flex flex-wrap items-center gap-3 border-y border-slate-100 py-4 text-sm text-blue-700">
       <button className="min-h-11 rounded-lg border border-slate-200 bg-white px-4 py-2 disabled:opacity-50" type="button" disabled={busy} onClick={() => void mutate(() => businessApi.post(`${apiBase}/posts/${post.id}/like`, {}))}>좋아요 {post.likeCount}</button>
       {post.authorId === userId && <Link className="inline-flex min-h-11 items-center rounded-lg border px-4 py-2" to={`${base}/write?edit=${encodeURIComponent(post.id)}`}>수정</Link>}
       {(post.authorId === userId || canManage) && <button className="min-h-11 rounded-lg border border-slate-200 bg-white px-4 py-2 disabled:opacity-50" type="button" disabled={busy} onClick={() => { if (window.confirm('이 게시글을 삭제하시겠습니까?')) void mutate(async () => { await authClient.api.delete(`${apiBase}/posts/${post.id}`); navigate(base); }); }}>삭제</button>}
+      {canManage && <button className="min-h-11 rounded-lg border border-slate-200 bg-white px-4 py-2 disabled:opacity-50" type="button" disabled={busy} onClick={() => void mutate(() => authClient.api.patch(`${apiBase}/posts/${post.id}/pin`, { pin: !post.isPinned }))}>
+        {post.isPinned ? '공지 해제' : '공지로 고정'}
+      </button>}
       <Link className="inline-flex min-h-11 items-center rounded-lg border px-4 py-2" to={base}>목록</Link>
     </div>
     <fieldset disabled={busy}><CommentSection comments={comments.map(comment => ({ id: comment.id, content: htmlToBlocks(comment.content), authorId: comment.authorId,

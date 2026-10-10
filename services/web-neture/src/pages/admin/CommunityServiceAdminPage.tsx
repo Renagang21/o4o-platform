@@ -168,6 +168,10 @@ function CommunityOperatorsPanel() {
   useEffect(loadMembers, [loadMembers]);
 
   const toggle = async (m: CommunityMemberRow, next: CommunityMemberRow['role']) => {
+    if (next !== 'member' && !m.designationEligibility?.eligible) {
+      setError(m.designationEligibility?.message || '지정 자격을 확인할 수 없습니다. 커뮤니티를 다시 선택해 주세요.');
+      return;
+    }
     const reason = window.prompt('역할 변경 사유를 입력하세요. 개인정보는 입력하지 마세요.');
     if (reason === null) return;
     if (!reason.trim()) { setError('역할 변경 사유를 입력하세요.'); return; }
@@ -228,7 +232,7 @@ function CommunityOperatorsPanel() {
             <tbody>
               {members.map((m) => {
                 const isOperator = m.role !== 'member';
-                const canPromote = m.membershipStatus === 'active' && m.serviceMembershipStatus === 'active';
+                const canPromote = m.designationEligibility?.eligible === true;
                 return (
                   <tr key={m.membershipId} className="border-b border-slate-100">
                     <td className="py-2 text-slate-800">{m.name ?? '-'}</td>
@@ -237,7 +241,12 @@ function CommunityOperatorsPanel() {
                       {m.serviceMembershipStatus ? SERVICE_STATUS_LABEL[m.serviceMembershipStatus] ?? m.serviceMembershipStatus : '미가입'}
                       {m.membershipStatus === 'suspended' && <span className="block text-red-600">개별 가입 정지</span>}
                     </td>
-                    <td className="py-2 text-slate-800">{m.role === 'admin' ? 'Admin' : isOperator ? 'Operator' : '회원'}</td>
+                    <td className="py-2 text-slate-800">
+                      {m.role === 'admin' ? 'Admin' : isOperator ? 'Operator' : '회원'}
+                      {!canPromote && <p className="mt-1 max-w-xs text-xs text-amber-800">
+                        {m.designationEligibility?.message || '지정 자격을 확인할 수 없습니다. 커뮤니티를 다시 선택해 주세요.'}
+                      </p>}
+                    </td>
                     <td className="py-2 text-right">
                       <select aria-label={`${m.name ?? '회원'} 역할`} value={m.role}
                         disabled={busyId === m.membershipId}
