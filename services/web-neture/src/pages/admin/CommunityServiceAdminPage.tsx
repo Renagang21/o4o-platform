@@ -5,7 +5,7 @@
  * Admin(admin.neture.co.kr)은 서비스 Admin(`community:admin`)과 Operator(`community:operator`)를 지정한다. 그 다음 업무는 이 화면이다:
  *   - 커뮤니티 개설 신청 심사 (승인 · 거절)
  *   - 개별 커뮤니티 운영자 지정·해제 — 그 커뮤니티의 승인된(active) 회원 중에서.
- *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 운영자는 해제되지 않는다.
+ *     서비스 전역 역할이 아니라 `community_memberships.role` 이다. 마지막 유효 Admin은 해제되지 않는다.
  * 화면 guard 는 `SubdomainOperatorRoute serviceKey="community" level="admin"` 이고 실제 경계는 backend 다.
  */
 import { Link } from 'react-router-dom';
@@ -94,7 +94,7 @@ function CreationRequestsPanel() {
         <p className="text-slate-500">불러오는 중입니다…</p>
       ) : rows && rows.length > 0 ? (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full min-w-[600px] border-collapse">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
                 <th className="py-2">이름</th>
@@ -167,15 +167,17 @@ function CommunityOperatorsPanel() {
   }, [communityId]);
   useEffect(loadMembers, [loadMembers]);
 
-  const toggle = async (m: CommunityMemberRow) => {
-    const next = m.role === 'operator' ? 'member' : 'operator';
+  const toggle = async (m: CommunityMemberRow, next: CommunityMemberRow['role']) => {
+    const reason = window.prompt('역할 변경 사유를 입력하세요. 개인정보는 입력하지 마세요.');
+    if (reason === null) return;
+    if (!reason.trim()) { setError('역할 변경 사유를 입력하세요.'); return; }
     setBusyId(m.membershipId);
     setNotice(null);
     setError(null);
     try {
-      await setCommunityMemberRole(communityId, m.membershipId, next);
+      await setCommunityMemberRole(communityId, m.membershipId, next, reason.trim());
       const who = m.name ?? m.email ?? '회원';
-      setNotice(next === 'operator' ? `${who} 님을 커뮤니티 운영자로 지정했습니다.` : `${who} 님의 운영자 지정을 해제했습니다.`);
+      setNotice(next !== 'member' ? `${who} 님을 커뮤니티 운영자로 지정했습니다.` : `${who} 님의 운영자 지정을 해제했습니다.`);
       loadMembers();
       loadCommunities();
     } catch (e) {
@@ -205,7 +207,7 @@ function CommunityOperatorsPanel() {
       </select>
       <p className="mt-2 text-xs text-slate-400">
         운영자는 그 커뮤니티의 승인된 회원 중에서만 지정합니다. 커뮤니티 서비스 이용이 정상이 아닌 회원은 지정할 수 없고,
-        마지막 운영자는 해제할 수 없습니다.
+        마지막 유효 Admin은 해제하거나 Operator로 내릴 수 없습니다.
       </p>
       {notice && <p className="mt-3 text-green-700">{notice}</p>}
       {error && <p className="mt-3 text-red-600">{error}</p>}
@@ -213,7 +215,7 @@ function CommunityOperatorsPanel() {
         <p className="mt-4 text-slate-500">불러오는 중입니다…</p>
       ) : members && members.length > 0 ? (
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full min-w-[600px] border-collapse">
             <thead>
               <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
                 <th className="py-2">이름</th>
@@ -225,27 +227,26 @@ function CommunityOperatorsPanel() {
             </thead>
             <tbody>
               {members.map((m) => {
-                const isOperator = m.role === 'operator';
-                const canPromote = isOperator || m.serviceMembershipStatus === 'active';
+                const isOperator = m.role !== 'member';
+                const canPromote = m.membershipStatus === 'active' && m.serviceMembershipStatus === 'active';
                 return (
                   <tr key={m.membershipId} className="border-b border-slate-100">
                     <td className="py-2 text-slate-800">{m.name ?? '-'}</td>
                     <td className="py-2 text-slate-600">{m.email ?? '-'}</td>
                     <td className="py-2 text-slate-600">
                       {m.serviceMembershipStatus ? SERVICE_STATUS_LABEL[m.serviceMembershipStatus] ?? m.serviceMembershipStatus : '미가입'}
+                      {m.membershipStatus === 'suspended' && <span className="block text-red-600">개별 가입 정지</span>}
                     </td>
-                    <td className="py-2 text-slate-800">{isOperator ? '운영자' : '회원'}</td>
+                    <td className="py-2 text-slate-800">{m.role === 'admin' ? 'Admin' : isOperator ? 'Operator' : '회원'}</td>
                     <td className="py-2 text-right">
-                      <button
-                        type="button"
-                        disabled={busyId === m.membershipId || !canPromote}
-                        onClick={() => toggle(m)}
-                        className={`rounded px-3 py-1 text-xs disabled:opacity-50 ${
-                          isOperator ? 'border border-slate-300 text-slate-700' : 'bg-slate-900 text-white'
-                        }`}
-                      >
-                        {isOperator ? '해제' : '운영자 지정'}
-                      </button>
+                      <select aria-label={`${m.name ?? '회원'} 역할`} value={m.role}
+                        disabled={busyId === m.membershipId}
+                        onChange={(e) => toggle(m, e.target.value as CommunityMemberRow['role'])}
+                        className="rounded border border-slate-300 px-2 py-1 text-xs disabled:opacity-50">
+                        <option value="member">회원</option>
+                        <option value="operator" disabled={!canPromote}>Operator</option>
+                        <option value="admin" disabled={!canPromote}>Admin</option>
+                      </select>
                     </td>
                   </tr>
                 );
