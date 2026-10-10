@@ -9,6 +9,11 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
   let failRead = false;
   let failSave = false;
   let failModels = false;
+  let failPolicy = false;
+  let failPolicySave = false;
+  const policyWrites: Record<string, unknown>[] = [];
+  let policy = { freeDailyLimit: 17, paidDailyLimit: 130, aiEnabled: false, defaultModel: 'fixture-model',
+    systemPrompt: 'Saved prompt', updatedAt: '2026-10-10T00:00:00Z' };
   const writes: Record<string, unknown>[] = [];
   await page.route((url) => url.pathname.startsWith('/api/'), async (route) => {
     const request = route.request();
@@ -35,17 +40,27 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
     }
     if (path === '/api/ai/models') {
       if (failModels) return json({ success: false }, 500);
-      return json({ success: true, data: { current: 'fixture-model',
+      return json({ success: true, data: { current: 'fixture-model', source: 'static', fetchedAt: null, canonical: 'fixture-model',
         models: [{ id: 'fixture-model', displayName: 'Fixture Model', inputTokenLimit: 4096 }] } });
     }
-    if (path === '/api/ai/policy') return json({ success: true, data: {
-      freeDailyLimit: 10, paidDailyLimit: 100, aiEnabled: true, defaultModel: 'fixture-model',
-      systemPrompt: null, updatedAt: '2026-10-10T00:00:00Z',
-    } });
+    if (path === '/api/ai/policy') {
+      if (request.method() === 'PUT') {
+        const body = request.postDataJSON();
+        policyWrites.push(body);
+        if (failPolicySave) return json({ success: false });
+        policy = { ...policy, ...body };
+        return json({ success: true, data: policy });
+      }
+      if (failPolicy) return json({ success: false }, 500);
+      return json({ success: true, data: policy });
+    }
     // Never let test requests reach production or an unmocked backend.
     return json({ success: false, error: 'Unmocked test API' }, 404);
   });
-  return { writes, password: email.smtpPassword, setReadFailure: (value: boolean) => { failRead = value; },
+  return { writes, policyWrites,
+    setPolicyFailure: (value: boolean) => { failPolicy = value; },
+    setPolicySaveFailure: (value: boolean) => { failPolicySave = value; },
+    password: email.smtpPassword, setReadFailure: (value: boolean) => { failRead = value; },
     setSaveFailure: (value: boolean) => { failSave = value; },
     setModelsFailure: (value: boolean) => { failModels = value; } };
 }
@@ -100,6 +115,30 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       await expect(page.getByText('SMTP 설정 저장에 실패했습니다.')).toBeVisible();
       await expect(host).toHaveValue('edited.example.invalid');
       await expect(page.getByText(/SMTP 설정을 DB에 저장했습니다/)).toHaveCount(0);
+    });
+
+    test('AI policy blocks failed reads and recovers save failures without losing edits', async ({ page }) => {
+      const api = await mockApi(page);
+      api.setPolicyFailure(true);
+      await page.goto('/settings/ai-query');
+      await expect(page.getByText(/저장된 AI 정책을 불러오지 못했습니다/)).toBeVisible();
+      await expect(page.getByRole('button', { name: '설정 저장', exact: true })).toBeDisabled();
+      expect(api.policyWrites).toHaveLength(0);
+      api.setPolicyFailure(false);
+      await page.getByRole('button', { name: '다시 불러오기', exact: true }).click();
+      const prompt = page.locator('textarea');
+      await expect(prompt).toHaveValue('Saved prompt');
+      await prompt.fill('Edited prompt');
+      api.setPolicySaveFailure(true);
+      await page.getByRole('button', { name: '설정 저장', exact: true }).click();
+      await expect(page.getByText('AI 정책 저장에 실패했습니다.')).toBeVisible();
+      await expect(prompt).toHaveValue('Edited prompt');
+      api.setPolicySaveFailure(false);
+      await page.getByRole('button', { name: '설정 저장', exact: true }).click();
+      await expect(page.getByText('AI 정책이 저장되었습니다.')).toBeVisible();
+      await page.reload();
+      await expect(prompt).toHaveValue('Edited prompt');
+      expect(api.policyWrites).toHaveLength(2);
     });
 
     test('AI models recover after retry and the policy editor is reachable', async ({ page }) => {
