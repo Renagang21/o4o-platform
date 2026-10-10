@@ -6,7 +6,13 @@
 
 ## 1. 확정 범위
 
-PH는 퇴역한다. `pharmacy.neture.co.kr`은 **O4O 약국 경영지원** 사업이며 PH의 새 이름이나 호환 호스트가 아니다. 매장 실행 업무는 `store.neture.co.kr`, 독립 약사 커뮤니티와 사업 회원 포럼은 `community.neture.co.kr`이다.
+PH(`pharmacyhub.co.kr` · `www.pharmacyhub.co.kr`)는 퇴역한다. 아래 세 서비스는 유지하며 어느 것도 PH의 새 이름이나 호환 호스트가 아니다.
+
+- `pharmacy.neture.co.kr` — **약국 모임 단위 경영지원**(약국 협력사업 · 세미프랜차이즈). 사용자용 명칭은 "O4O 약국 경영지원"([서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)).
+- `store.neture.co.kr` — **개별 약국 경영지원**(내 매장 · 매장 실행 업무).
+- `community.neture.co.kr` — 독립 약사 커뮤니티와 사업 회원 포럼.
+
+PH 퇴역을 "약국 경영지원이 모두 store로 이전됐다"로 읽지 않는다(2026-10-10 사용자 정정).
 
 PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH 제공 설정·재배포 경로를 제거한다. PH의 도메인·인증서·인쇄 QR 주소도 제거 대상이며, 302/301 리다이렉트나 인쇄 QR 보존 경로를 만들지 않는다.
 
@@ -43,7 +49,7 @@ PH 웹 앱·API·가입·운영자 지정·내 매장 PH 문맥·공급자 PH �
 - 서비스 미지정 매장 조직 판정도 PH 전용 조직을 후보에서 제외한다. 현재 서비스 역할·가입이 있어도 과거 PH 관계나 선택 헤더만으로 자료·진열·구매 조직·직원 접근이 PH 조직으로 향하지 않는다. 약국의 현재 근거는 내 매장 원장(active)뿐이며 옛 KPA enrollment/slug는 인정하지 않는다. 현재 내 매장 원장만 있는 조직은 세미프랜차이즈 가입·slug 없이 유지하며, PH 이력이 함께 있어도 초대 목록·수락·현재 member 접근을 유지한다.
 - Sonar 중복률 보완은 PH·Neture·Store B2B의 선택된 주문 후속 처리에 한정한다. 상태 전이·bridge·실패 기록만 API Extension 함수로 공유하고 세 consumer의 구독 키·주문 선택·멱등성과 PaymentCore/PG/DB 계약은 유지한다. 공유 모듈 변경 규칙에 따라 세 소비처와 raw-source 계약·실제 이벤트 회귀를 함께 검증한다.
 - 현행 DESIGN §16은 인쇄 QR·옛 도메인·인증서 보존을 요구해 사용자 확정 지시와 충돌한다. 현행 설계 절만 정정하고 과거 WO/CHECK는 당시 기록으로 보존한다.
-- 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다.
+- 현재 환경에는 `gcloud`가 없고 GCP 작업용 credential이 제공된 사실도 확인되지 않았다. 실제 운영 자원 삭제를 코드 삭제나 초안 준비로 완료 처리하지 않는다. 운영 인프라 상태는 read-only 조회가 가능한 접근 경로부터 확인한다. (2026-10-10: `gcloud`가 있는 로컬 PC에서 read-only로 현재 자원·참조를 확인했다 — [CHECK §6](../checks/CHECK-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md). 삭제는 미실행.)
 
 ## 4. 완료 경계
 

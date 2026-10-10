@@ -2,7 +2,7 @@
 
 > 작성일: 2026-10-09 · 상태: ACTIVE
 > 작업: [WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACY-HUB-FULL-RETIREMENT-V1.md)
-> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `03f9729856`(PR #372·#374·#375·#378·#379) · branch: `wo/pharmacy-hub-full-retirement-v1`
+> 착수 main: `0f8535d6b1` · PR 준비 기준 main: `3d5f4349ad` · main 결합 기준: `03f9729856`(PR #372·#374·#375·#378·#379) · branch: `wo/pharmacy-hub-full-retirement-v1` · **최신 main 결합: `82599e911`(merge `4cd6fc5ee`, 2026-10-10)**
 
 ## 1. 결과와 남은 실행
 
@@ -12,7 +12,7 @@
 | 로컬 검증 | PASS | API·웹 빌드와 관련 회귀 검증은 아래 §3 |
 | main 통합 | 대기 | PR required CI·리뷰 후 저장소 AGENTS §4-1(e)의 사용자 통합 승인 필요 |
 | 운영 배포 | 대기 | 배포 판정 `LEVEL_3`·`deploy_required=true`; main 통합과 별도 통제 배포 |
-| 실제 PH 인프라·도메인·인증서 삭제 | 로컬 인계·미실행 | 사용자가 로컬에서 수행한다고 결정. 이 환경의 credentials/secrets·outbound identity는 비어 있어 실제 조회·삭제 결과 없음. WO §5·§6의 절차와 인계문 사용 |
+| 실제 PH 인프라·도메인·인증서 삭제 | 로컬 인계·미실행 | 사용자가 로컬에서 수행한다고 결정. 이 환경의 credentials/secrets·outbound identity는 비어 있어 실제 조회·삭제 결과 없음. WO §5·§6의 절차와 인계문 사용. **2026-10-10 로컬 PC read-only 조회로 현재 자원·참조를 확인(§6) — 삭제는 여전히 미실행** |
 | 설치 Local Agent 갱신 | 로컬 인계·미실행 | origin 차단 코드와 loopback HTTP 회귀 검증은 완료. 도메인 등록 종료 전에 설치 PC의 실제 실행 사본 갱신·재시작·차단 확인 필요 |
 | 운영 업무·모바일 smoke | 미실행 | 테스트 계정 로그인·실제 운영 배포 검증은 이 로컬 코드 검사에 포함하지 않음 |
 
@@ -35,7 +35,7 @@
 - 재배포 제거: 웹 CD 등록/job/env/summary와 lockfile의 PH importer 제거. PH 앱 삭제 diff를 배포 detector의 비실행 경로로 처리해 unknown-path 전체 배포 fallback을 막는다. 남은 웹 배포 job은 6개이며 병원약국 job을 유지한다.
 - 유지: 기존 PH 주문의 공급자 공통 조회·후속 처리 service key, 이미 기록된 PH 결제 완료 이벤트 handler, 독립 약사 커뮤니티의 PH 저장 코드. 기존 role 표시·회수와 DB/migration의 과거 식별은 남긴다. 신규 PH 서비스나 호환 웹/API를 열기 위한 코드가 아니다.
 - 운영 DB write·schema/migration 변경 없음. 상품의 기존 PH `service_keys`를 지워 기본 공급으로 전환하는 backfill이나 테스트 데이터 삭제 없음.
-- `pharmacy.neture.co.kr`은 **O4O 약국 경영지원**, `store.neture.co.kr`은 매장 실행, `community.neture.co.kr`은 독립·사업 회원 커뮤니티다. 이 서비스를 제거하거나 PH로 통합하지 않는다.
+- `pharmacy.neture.co.kr`은 **약국 모임 단위 경영지원**(약국 협력사업 · 세미프랜차이즈, 사용자용 명칭 "O4O 약국 경영지원"), `store.neture.co.kr`은 **개별 약국 경영지원**(내 매장 · 매장 실행), `community.neture.co.kr`은 독립·사업 회원 커뮤니티다. 이 서비스를 제거하거나 PH로 통합하지 않는다. PH 퇴역은 "약국 경영지원이 모두 store로 이전됐다"는 뜻이 아니다(2026-10-10 사용자 정정).
 
 ## 3. 검증
 
@@ -138,3 +138,52 @@ HEAD `6c113e343a`의 SonarCloud는 통과했으며 새 코드 중복률은 1.7%,
 HEAD `002e3bb3b0`의 Codex 리뷰는 완료됐고 미해결 지적은 없었으나 전체 CI는 API Jest 1/3에서 다시 실패했다. 이 branch 자체의 같은 구간은 144 suites·2,641 tests가 통과했고 DB integration 3개(12건)는 SKIP했다. CI가 사용하는 main `01a47e6d4c`와의 결합을 별도 snapshot에서 재현한 결과, main의 새 catalog 권한 회귀가 PH 신규 역할 부여를 정상 서비스의 권한 거부(403)로 기대해 실제 퇴역 응답(410)과 충돌했다. 이 결합 문제를 수정하기 위해 자기 branch에 최신 main을 결합하고 해당 회귀의 대상만 현재 `supplier`로 바꿨다. catalog의 실제 서비스와 body의 위조 서비스 불일치 검증 및 PH 역할 부여 차단 회귀는 그대로 유지했다. 변경 consumer와 main의 변경 API 회귀를 합친 255 suites에서 249 suites·4,663 tests 및 type-check가 통과했고 DB integration 6개(48건)는 SKIP했다. 역할 catalog/PH 차단 2 suites·36건, Store 9건, Neture 379건, 공통 운영 UI 50건, 공통 UI 19건도 통과했다. main의 화면·인증·운영자/가입 경계 수정을 되돌리지 않았으며 main 자체의 merge·배포·운영 인프라 삭제는 수행하지 않았다. 최종 보완 HEAD의 required CI·SonarCloud·Codex는 PR에서 다시 확인한다.
 
 HEAD `ce315b3c27`의 검사 중 main에 PH 인쇄 QR 보존 작업 PR #384·#388이 통합됐다(`57be2f2604`). CI의 새 PH cutover 검사는 이 branch가 이미 폐기한 `pharmacy-hub-qr-redirect.mjs`를 import해 Code Quality Check가 실패했으며 같은 Node 명령으로 module 부재를 재현했다. 사용자 확정 방침은 PH 경로·도메인·인증서의 완전 삭제이므로 redirect를 복구하지 않는다. 해당 main을 자기 branch에 결합한 뒤 PH 전용 cutover workflow·전환/복구·DB 경로 수집 도구와 검사 4파일·전용 CI step을 제거했다. cutover WO는 당시 기록을 유지하며 SUPERSEDED로 정정하고 로컬 인계문에도 plan/apply를 실행하지 않도록 반영했다. 현재 Store·Local Agent·공유 URL map 삭제 초안의 검증은 유지했으며 CI blocking Node+planner 332건과 API 정합 5 suites·84건이 통과했다. 실제 workflow·GCP·DB를 실행하거나 main을 변경하지 않았다. 최종 보완 HEAD의 CI·SonarCloud·Codex는 PR에서 확인한다.
+
+## 6. 로컬 PC 운영 자원 조회 (2026-10-10 02:04Z · 11:04 KST · read-only)
+
+§1·WO §3 의 "이 환경에서는 조회 불가" 기록은 클라우드 작업 환경의 당시 사실이라 그대로 둔다. 이후 `gcloud` 가 있는 로컬 PC(프로젝트 `netureyoutube`)에서 **조회만** 수행했다. 삭제 · 변경 · import 는 하지 않았다. WO §5 표의 과거 이름은 현재 이름과 모두 일치한다.
+
+| 종류 | 현재 이름 | 조회 결과 | PH 전용 여부 |
+|---|---|---|---|
+| Cloud Run | `pharmacy-hub-web` (asia-northeast3) | 운영 중 · latest ready revision `pharmacy-hub-web-00293-laj` · traffic 100% · 이미지 태그 `7202a56b7` | 이 서비스를 가리키는 NEG 는 아래 1개뿐 |
+| Serverless NEG | `neg-pharmacy-hub-web` | `cloudRun.service=pharmacy-hub-web` | 이 NEG 를 쓰는 backend 는 `backend-pharmacy-hub-web` 1개뿐 |
+| Global backend | `backend-pharmacy-hub-web` | group = `neg-pharmacy-hub-web` | URL map 참조: `o4o-global-lb` 1곳(`path-matcher-pharmacy-hub` default) · `neture-https-frontend-redirect` 0 |
+| Host rule · matcher | `pharmacyhub.co.kr` · `www.pharmacyhub.co.kr` → `path-matcher-pharmacy-hub` | 다른 host 가 이 matcher 를 쓰지 않음 · PH host 대상 URL map 검증 테스트 0 | 예 |
+| 인증서 map | `o4o-main-cert-map` (map 1개) | entry `cm-entry-pharmacyhub-root`(pharmacyhub.co.kr) · `cm-entry-pharmacyhub-www`(www.pharmacyhub.co.kr) | entry 2개만 PH · map 자체는 공유(보존) |
+| 인증서 | `cm-cert-pharmacyhub` | SAN = PH root/www 만 · 만료 2026-12-26 · 참조 entry 2개(위 PH entry) | 예 |
+| DNS authorization | `dns-auth-pharmacyhub-root` · `dns-auth-pharmacyhub-www` | `cm-cert-pharmacyhub` 만 참조 | 예 |
+| 실제 응답 | `https://pharmacyhub.co.kr/` · `https://www.pharmacyhub.co.kr/` | 200 · "Pharmacy-Hub 파머시 허브" | — |
+
+- 결론: WO §5 의 삭제 후보 전부가 현재도 존재하고 PH 전용이다. 공유 자원은 `o4o-global-lb`(PH host rule · matcher 만 제거 대상) · `o4o-main-cert-map`(PH entry 2개만 제거 대상) · 공용 IP 다.
+- 운영 PH 웹은 #375 이전 이미지로 계속 응답한다(코드 삭제 ≠ 서버 삭제). 삭제 순서 · 참조 재확인은 WO §5 를 따르고, 실행 직전에 다시 조회한다(이 표는 조회 시점 스냅샷).
+- gabia 권한 DNS · 도메인 등록 상태와 설치 Local Agent 현황은 이 조회에 포함되지 않는다.
+
+## 7. 최신 main `82599e911` 결합 (2026-10-10 · merge `4cd6fc5ee`)
+
+PR 이 `mergeable=false(dirty)` 였다. 직전 결합(`57be2f260`) 뒤 main 이 27커밋(#376 main-return · #387 인증 리팩터 · #389 약국 협력사업 용어 · #390 진입 정책 등) 전진했고, 문서 2건이 충돌했다. 자기 branch 에 main 을 merge 했다(rebase · force push 없음).
+
+| 충돌 파일 | 해소 |
+|---|---|
+| `docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md` | main 의 "약국 협력사업" 용어 정비 노트와 PH 1차 제거 기록을 함께 유지. `pharmacy` 행 = main 용어 + 약국 모임 단위 경영지원(세미프랜차이즈) · Pharmacy Hub 아님. §2-2 에 유지 3서비스와 PH 퇴역 대상(`pharmacyhub.co.kr` · `www`)을 구분 |
+| `docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md` §16 | main 이 바꾼 것은 옛 §16(인쇄 QR · 도메인 보존 계획 — 사용자 결정으로 폐기) 본문의 용어 1곳뿐이라 PR 의 완전 퇴역 §16 을 채택. 서두를 3서비스 구분 · main 용어로 정정 |
+
+**서비스 구분 (2026-10-10 사용자 정정)** — `pharmacy.neture.co.kr` = 약국 모임 단위 경영지원(약국 협력사업 · 세미프랜차이즈, 사용자용 명칭 "O4O 약국 경영지원"), `store.neture.co.kr` = 개별 약국 경영지원(내 매장), `community.neture.co.kr` = 독립 커뮤니티 — 모두 유지. 퇴역 대상은 `pharmacyhub.co.kr` · `www.pharmacyhub.co.kr` 뿐. "약국 경영지원이 모두 store 로 이전됐다"는 해석은 이 구분으로 정정했다(WO §1 · 이 CHECK §2 · 위 두 문서).
+
+양쪽이 함께 고친 코드 파일 `services/web-neture/src/pages/O4OHomePage.tsx` 는 자동 merge 됐고 PH 진입 0 을 유지한다. main 이 새로 넣은 PH 문자열은 문서 서술뿐이다.
+
+**유지 서비스 영향 (정적 확인)**: main 대비 순수 변경에서 `services/web-kpa-society`(pharmacy.neture) 변경 0 · service catalog 는 `pharmacy-hub` 항목만 제거(`kpa-society` · `community` 유지) · 커뮤니티 catalog 는 `forumStorageCodes: ['kpa-society','pharmacy-hub']` 유지(독립 약사 커뮤니티의 과거 PH 게시판) · migration · schema · entity 변경 0.
+
+| 검증 (merge `4cd6fc5ee` · Node 24 · pnpm 10.27 · frozen install) | 결과 |
+|---|---|
+| `build:packages` | PASS |
+| API `type-check` | PASS (error 0) |
+| API Jest 전체 | **433 suites PASS · 12 SKIP(DB integration) / 445 · 7,327 tests PASS · 95 SKIP · 실패 0** |
+| CI blocking Node(detect-affected · deploy-risk · ci-gate · rollout · env · workflow gates/diff · orchestrate · PH URL map planner) | **332 / 332 PASS** |
+| Local Agent Node(local-db · native-bridge · browser-dom · local-server) | **75 / 75 PASS** |
+| migration identity Node | 26 / 26 PASS |
+| production build | web-neture · web-kpa-society(pharmacy.neture) · store-web · kpa-branch-web · admin-dashboard — 전부 PASS |
+| Vitest (CI 와 같은 `--config` 방식) | web-neture 47 files · 387 · web-kpa-society 11 · 86 · store-web 1 · 9 · admin 17 · 345 · store-ui-core 8 · 121 · shared-space-ui 9 · 64 · operator-core-ui 6 · 50 · ui 2 · 19 · auth-react 13 · 162 · auth-client 4 · 34 · auth-context 2 · 16 · auth-utils 3 · 43 — 전부 PASS |
+| `git diff --check` · 문서 민감정보 검사 | PASS |
+| `deploy-risk --base origin/main --head HEAD` | `LEVEL_3` · `deploy_required=true` · affected `api,admin,neture,kpa-society,lecture,store` (rbac · auth-backend · payment 규칙) — merge 후 통제 배포(promote) |
+
+로컬 검증이며 운영 smoke 가 아니다. 이 결합 HEAD 의 required CI · SonarCloud · Codex 는 PR 에서 다시 확인한다. main merge · 배포 · 인프라 삭제는 수행하지 않았다.
