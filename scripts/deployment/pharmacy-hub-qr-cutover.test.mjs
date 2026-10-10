@@ -1,6 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation } from './pharmacy-hub-qr-cutover.mjs';
+import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError } from './pharmacy-hub-qr-cutover.mjs';
+
+test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
+  const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
+  assert.match(error.message, /permissions=compute.backendServices.use; reasons=forbidden/);
+  assert.doesNotMatch(error.stack, /private/);
+});
 
 const paths = ['/qr/active', '/tablet/store?tabletId=test&language=ko', '/multilingual-products/product?locale=ko', '/foreign-visitor/affiliate/active'];
 const original = () => ({

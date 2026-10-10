@@ -126,6 +126,14 @@ export async function runCutover({ mode, probes, read, validate, replace, verify
   }
 }
 
+export function safeComputeError(method, status, payload) {
+  const known = new Set(['compute.urlMaps.get', 'compute.urlMaps.validate', 'compute.urlMaps.use', 'compute.urlMaps.update', 'compute.backendServices.use', 'compute.backendBuckets.use', 'serviceusage.services.use']);
+  const candidates = JSON.stringify(payload ?? {}).match(/(?:compute|serviceusage)\.[A-Za-z]+\.[A-Za-z]+/g) ?? [];
+  const permissions = [...new Set(candidates.filter(value => known.has(value)))];
+  const reasons = (payload?.error?.errors ?? []).map(item => item.reason).filter(value => ['forbidden', 'insufficientPermissions', 'accessNotConfigured', 'invalid', 'rateLimitExceeded'].includes(value));
+  return new Error(`Compute API ${method} failed (HTTP ${status}); permissions=${permissions.join(',') || 'unknown'}; reasons=${reasons.join(',') || 'unknown'}.`);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const mode = process.env.CUTOVER_MODE ?? 'plan';
   const output = process.env.CUTOVER_OUTPUT ?? '/tmp/pharmacyhub-qr-cutover';
@@ -135,7 +143,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(60000),
     });
-    if (!response.ok) throw new Error(`Compute API ${method} failed (HTTP ${response.status}).`);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      throw safeComputeError(method, response.status, payload);
+    }
     return response.json();
   };
   await mkdir(output, { recursive: true, mode: 0o700 });
