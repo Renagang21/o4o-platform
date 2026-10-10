@@ -1,6 +1,6 @@
 # 대표 홈 정본 구현 상태 정비 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 요청 — 대표 홈 정본문서의 과거 ‘화면 미적용’ 표기 정비.
 
@@ -12,7 +12,7 @@
 - [x] 2. 현재 코드·정본·PR 및 배포 기록을 조사하고 TODO 보완.
 - [x] 3. 대표 홈 정본의 미적용·후속 구현 표현과 정본 색인의 요약 정비.
 - [x] 4. 문서 링크·민감정보·diff·변경 범위 검사.
-- [ ] 5. 전용 branch commit·push·PR 및 required CI 확인.
+- [x] 5. 전용 branch commit·push·PR 및 required CI 확인.
 
 ## 조사 보완
 
@@ -28,3 +28,9 @@
 ## 검증
 
 변경 문서 3개의 민감정보 검사 0건, 정본·WO의 상대 문서 링크 5개 유효, `git diff --check` 통과. 정본 상태 `ACTIVE`, 서비스 분류·가입·승인 정책과 기술 식별자를 보존했다. 문서-only 작업이므로 런타임 테스트·추가 운영 배포는 수행하지 않는다.
+
+## 제출 결과
+
+`wo/home-discovery-doc-status`에 commit·push하고 [PR #409](https://github.com/Renagang21/o4o-platform/pull/409)를 만들었다. 구현 상태 정비 commit `623e50f2cbe52b10018077fdb1721d009530b54f`의 [CI 38043520125](https://github.com/Renagang21/o4o-platform/actions/runs/38043520125)에서 Docs Fast·문서 민감정보 검사·CI Gate가 모두 통과했고 미해결 review thread는 0건이다. 본 WO의 완료는 문서 정비·검증·제출 범위를 뜻하며 main 병합은 아직 수행하지 않았다.
+
+문서 정합: 대표 홈 정본·색인의 미적용 표기를 main 반영·운영 배포 사실에 맞췄다. 준비 중 사업 및 미검증 범위는 유지한다. 전용 worktree는 PR 병합 전이므로 `KEEP`이며 이전 작업공간은 보존한다.
