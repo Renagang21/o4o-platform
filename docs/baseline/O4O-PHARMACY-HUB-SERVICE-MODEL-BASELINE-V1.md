@@ -2,6 +2,8 @@
 
 > **현재 정책 (2026-10-10 사용자 명시 승인):** PharmacyHub는 완전 폐기하며 재사용하지 않는다. PH 전용 운영 데이터도 삭제 대상이다. 삭제 전 현재 schema·FK·타 서비스 소비처로 전용 귀속을 확정한다. 공용 사용자·조직·상품·결제·콘텐츠 및 Neture 매장/QR 데이터는 보존한다. 인쇄 QR 연결용 도메인·DNS·인증서는 유지하고 Neture 약국으로 리다이렉트한다. 실행은 [완전 제거 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)를 따른다. 아래의 기존 PH 역할·가입·식별자 보존 모델은 과거 구조 설명이며 PH 전용 서비스·데이터 보존 의무로 적용하지 않는다. 운영 삭제 완료를 의미하지 않는다.
 
+이 폐기 예외는 현재 사용자 명시 지시를 근거로 PH 서비스 모델·서브도메인·역할 업무공간·Store owner RBAC·Store access/membership·RBAC role catalog/canonical state의 PH 전용 계약에 함께 적용한다. 관련 문서의 이전 PH 서비스 활성·가입·역할 부여·보존 서술은 서비스 복구 근거로 사용하지 않는다. 타 서비스의 사업·권한·데이터 보존 계약과 공통 Core/Freeze 경계는 변경하지 않는다.
+
 > **이전 단계 기록 (현재 범위로 대체됨) — 2026-10-09 실행 갱신:** PharmacyHub 전용 앱·API·배포 경로 제거는 [WO-O4O-PHARMACYHUB-RETIREMENT-V1](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-V1.md)이 현재 실행 범위다. 기존 식별자와 운영 데이터는 보존하며 운영 인프라 정리는 아직 미실행이다.
 
 > **상태**: ACTIVE · **제정일**: 2026-08-21

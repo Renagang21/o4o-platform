@@ -48,3 +48,5 @@
 전체 호스트 plan은 Cloud SQL proxy·운영 경로 inventory·private probe 파일 읽기를 건너뛰며 URL map 조회·검증만 수행한다. apply는 실제 QR/tablet 경로 검증을 유지한다. 현재 사용자 승인에 따라 서비스 baseline의 PH 전용 데이터 보존 계약을 완전 폐기 정책으로 정렬했고 기존 WO는 이전 단계 기록으로 유지했다. 공용·Neture 데이터는 제외한다. 사용자 제공 IAM 결과에서 URL map update·global operation 조회 권한 추가를 확인했다. 실제 plan/apply 결과는 후속 실행으로 확인한다.
 
 재리뷰 대응: 서브도메인·역할 업무공간·Store owner RBAC 정본에도 PH 전용 완전 폐기 예외를 정렬했다. 다른 서비스 정책은 유지한다. retire_host와 Demo census/relink/cleanup 동시 선택은 첫 gate에서 거부하여 PH 전환 미실행을 성공으로 보고하지 않는다.
+
+최종 정책 대조: Store access/membership·RBAC role catalog·RBAC canonical state의 PH 가입/역할 재발급 계약에도 폐기 예외를 반영했다. 공통 RBAC/Freeze 및 다른 서비스 계약은 유지한다. PH 폐기 예외가 적용되는 정본 집합을 서비스 baseline에 명시했다.
