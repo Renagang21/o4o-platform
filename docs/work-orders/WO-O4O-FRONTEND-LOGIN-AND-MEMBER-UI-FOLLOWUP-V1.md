@@ -13,11 +13,14 @@
 - [x] 인증 복구·취소·목적지 복귀·가입/콜백 흐름 및 대표 홈·커뮤니티 인증 진입의 회귀를 확인한다.
 - [x] 약국 게시글 목록·상세·작성·사업 자료를 회원 초기화면의 카드·간격·버튼·상태 안내에 맞춘다. 공통 UI 패키지와 API 계약을 변경하지 않는다.
 - [x] PC·모바일에서 첫 화면→게시판·자료·내 매장과 운영 관리 진입을 확인한다. 합성 API/공개 체험/실제 소유자 계정의 검증 범위를 구분한다.
-- [ ] 테스트·빌드·문서 검사, 변경 범위별 commit·push, PR CI·리뷰 확인을 완료한다.
+- [x] 테스트·빌드·문서 검사 후 구현 commit·push와 PR #425 제출을 완료한다.
+- [x] 구현 PR의 required CI와 리뷰 blocker를 확인한다. 최종 보완 HEAD도 push 후 같은 gate를 확인한다.
 
 ## 조사 결과와 경계
 
 [대표 홈 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)은 공급자·펀딩에 로그인 진입을 요구하며 커뮤니티·강의에는 공개 진입을 허용한다. [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)의 개인 업무/서비스 운영 분리를 유지한다.
+
+로그인 모달의 닫기 버튼에는 접근성 이름이 없어 검증 도구와 화면 읽기에서 구분하기 어려웠다. `type="button"`과 `aria-label="로그인 창 닫기"`를 추가한다.
 
 Neture 앱은 대표 홈·공급자·펀딩·커뮤니티 4 host가 공유한다. `LoginRedirect`는 비로그인 사용자의 모달을 열고 `/`로 이동하지만 공급자·펀딩의 `/`는 다시 `/login`으로 보낸다. 이 두 host에서만 안정적인 로그인 화면을 유지하고, 대표 홈·커뮤니티의 기존 공개 첫 화면 위 모달을 유지한다. 체험 계정 목적지 이동과 명시적 복귀를 함께 검증한다. 이메일 입력·동의·Kakao callback fragment 처리는 기존 모달이 담당한다.
 
@@ -30,7 +33,7 @@ Neture 앱은 대표 홈·공급자·펀딩·커뮤니티 4 host가 공유한다
 - 다른 서비스 내부 표·폼·모바일 UI 전수 정비와 `GLOBAL-HEADER-STANDARD-V1`의 은퇴 서비스 목록 정합은 별도 범위로 남긴다.
 - 대표 홈 PR #402와 약국 회원 초기화면 PR #414의 구현·배포는 완료됐으며 과거 WO의 미완료 체크박스를 현재 잔여 구현으로 해석하지 않는다.
 
-조사 중 [인증 PR #423](https://github.com/Renagang21/o4o-platform/pull/423)의 동일 로그인 수정과 CI 통과를 확인했다. 독립적으로 만든 인증 초안은 push 범위에서 제외하고, 해당 PR의 정확한 source HEAD `b45e3429259c7986f5d7c878bf22614b0e231f5c`를 현재 개발 작업공간에 임시 적용해 빌드·검증한 뒤 source를 원복했다. 다른 작업공간/branch는 수정하지 않았다. 이번 PR은 약국 내부 UI와 이 실행 기록만 포함한다.
+조사 중 [인증 PR #423](https://github.com/Renagang21/o4o-platform/pull/423)의 동일 로그인 수정과 CI 통과를 확인했다. 독립적으로 만든 인증 초안은 push 범위에서 제외하고, 해당 PR의 정확한 source HEAD `b45e3429259c7986f5d7c878bf22614b0e231f5c`를 현재 개발 작업공간에 임시 적용해 빌드·검증한 뒤 source를 원복했다. 다른 작업공간/branch는 수정하지 않았다. 이번 PR은 약국 내부 UI, 검증 중 확인한 로그인 닫기 버튼의 접근성 이름과 이 실행 기록을 포함한다. 로그인 route 수정은 PR #423에 유지하며 인증 흐름은 변경하지 않는다.
 
 main 통합은 검증된 PR 결과를 보고한 뒤 사용자 통합 승인에 따른다. 이번 단계의 배포는 미진행이다.
 
@@ -42,6 +45,7 @@ main 통합은 검증된 PR 결과를 보고한 뒤 사용자 통합 승인에 �
 | 약국 서비스 전체 Vitest | 16 files / 125 tests PASS | 기존 초기화면·목적지·사업 승인·매장 경계와 추가 자료 검증 |
 | 약국 게시판·자료 최종 focused | 2 files / 9 tests PASS | 공통 폼 mock 정비 이후 재확인 |
 | 공통 auth-react | 16 files / 186 tests PASS | 변경 없음; 로그인 검증에 사용하는 공통 인증 회귀 |
+| 로그인 닫기 이름 보완 후 기존 모달 focused | 2 files / 13 tests PASS | 이메일 5·체험 8; Neture 최종 타입·빌드·ESLint도 PASS |
 | PR #423 정확한 source focused | 2 files / 19 tests PASS | 로그인 진입 11·체험 모달 8 |
 | 타입·빌드 | 약국 및 PR #423 Neture PASS | frozen install 및 소비 패키지 사전 빌드; 기존 Browserslist/큰 chunk 경고 |
 | 변경 파일 ESLint·diff·문서 민감정보 검사 | PASS | 신규 오류 없음 |
@@ -59,3 +63,12 @@ main 통합은 검증된 PR 결과를 보고한 뒤 사용자 통합 승인에 �
 ## 문서 정합
 
 대표 홈·회원 초기화면은 구현·운영 반영 상태를 유지한다. 로그인 오류는 아직 main/운영에 반영되지 않은 PR #423과 연결하며 이번 약국 내부 UI 또한 push와 운영 배포를 구분한다. 공지 조회 범위·정책 발행·글로벌 헤더 은퇴 목록은 별도 후속 과제로 남겼다.
+
+
+## push·통합 준비 기록
+
+[PR #425](https://github.com/Renagang21/o4o-platform/pull/425) 초기 구현 HEAD `6b2e636a6d60896a0ff103999e330aab75992bf3`의 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38058655610), CI Gate·CodeQL·SonarCloud가 통과했으며 확인 시 리뷰 스레드는 0건이다. 최신 main `538c221f3`의 차이는 별도 배포 도구 3개 파일뿐이며 약국·Neture·소비 패키지 source는 같아 normal merge 후 push했다.
+
+로그인 닫기 이름과 실행 기록을 후속 commit으로 보완한다. 최종 HEAD의 required checks·리뷰·mergeability는 PR #425의 최신 상태를 기준으로 확인한다. PR #423의 로그인 route 변경과 이 PR은 겹치는 source 파일이 없어 통합 시 두 변경을 함께 유지할 수 있다. 이번 단계의 main 병합·운영 배포는 미진행이며 별도 사용자 통합 승인에 따른다.
+
+WORKTREE_DISPOSITION: `wo/frontend-login-and-member-ui`는 PR·통합·운영 검증 때문에 KEEP한다. 기존 작업공간/branch는 보존한다.
