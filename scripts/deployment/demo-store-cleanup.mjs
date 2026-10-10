@@ -93,9 +93,10 @@ async function inventory(client, keep, targets) {
     FROM users`)).rows[0];
   return { owner,keeper,roots,candidates,accounts };
 }
+const protectedTables=new Set(['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots']);
 function guardRow(table,row,state) {
   const targetIds=state.targetIds;
-  if (['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots'].includes(table)) throw new CleanupStop('Protected entity referenced by deletion');
+  if (protectedTables.has(table)) throw new CleanupStop('Protected entity referenced by deletion');
   if (table==='organizations' && !targetIds.has(row.id)) throw new CleanupStop('Retained organization dependency');
   for (const key of new Set(state.organizationColumns.get(table) || [])) {
     if (row[key] != null && !targetIds.has(String(row[key]))) throw new CleanupStop('Shared retained-store row requires explicit disposition');
@@ -133,7 +134,7 @@ async function expandEdge(client,state,edge) {
   return added;
 }
 async function verifyParentOwnership(client,state,edges) {
-  for (const edge of edges.filter(e=>state.organizationColumns.has(e.parent))) {
+  for (const edge of edges.filter(e=>state.organizationColumns.has(e.parent) && !protectedTables.has(e.parent))) {
     const children=state.rows.get(edge.child);if (!children) continue;
     for (const row of children.values()) {
       const values=edge.child_columns.map(c=>row[c]);if (values.some(v=>v==null)) continue;
