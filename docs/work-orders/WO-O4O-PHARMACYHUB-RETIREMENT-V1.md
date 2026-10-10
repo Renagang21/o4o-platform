@@ -1,5 +1,7 @@
 # PharmacyHub retirement
 
+> **후속 범위 (2026-10-10):** 사용자가 PH 완전 폐기와 전용 데이터 삭제를 명시 승인했다. 현행 정책은 [서비스 baseline의 현재 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md), 실행 범위는 [완전 제거 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)를 따른다. 아래 주문·membership·forum 식별자 보존은 이전 단계 기록이다. PH 전용 귀속·FK·타 서비스 영향 확인 후 삭제하며 공용 데이터·Neture QR 및 migration 이력은 보존한다.
+
 > 상태: ACTIVE · 2026-10-09 · 실행 승인: 전용 앱·API·배포 경로 제거 및 운영 정리
 
 PharmacyHub 독립 실행 경로를 제거한다. 약국 업무의 현행 경로는 Neture 약국과 공통 매장 업무공간이다.
