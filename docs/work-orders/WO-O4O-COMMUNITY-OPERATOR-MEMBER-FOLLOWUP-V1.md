@@ -16,7 +16,7 @@
 - [x] 수정 TODO에 따라 승인된 정책의 구현 결함과 관련 문서 정비
 - [x] 역할·커뮤니티·서비스 경계 및 회귀 검증
 - [x] 범위 점검·커밋·push
-- [ ] PR CI/review 최종 확인
+- [x] PR CI/review 최종 확인
 
 ## 경계
 
@@ -49,7 +49,7 @@
 - [x] 기존 역할·커뮤니티·서비스 경계 테스트 및 API 타입 검사
 - [x] 정적 guard·민감정보·diff·staged 범위 점검
 - [x] 커밋·push
-- [ ] PR CI/review 최종 확인
+- [x] PR CI/review 최종 확인
 
 새 DB 구조나 역할 추가 없이 확정된 정책의 승인 시점 결함을 수정한다.
 실제 운영 DB·계정 변경 및 main 병합·배포는 수행하지 않는다.
@@ -107,7 +107,7 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [x] P2: 자격 SELECT와 승인 쓰기 사이 동시 정지 간격 제거 — 승인 트랜잭션에서 users → neture service_memberships 순서로 FOR UPDATE 후 판정. users FK 참조 삽입도 사용자 잠금 동안 대기한다.
 - [x] 보완 후 자격·승인·권한 회귀 및 API 타입 검사 재실행
 - [x] 리뷰 보완 코드 push
-- [ ] PR 최신 HEAD 검증
+- [x] PR 최신 HEAD 검증
 
 잠금 대기 후 먼저 커밋된 정지를 읽는 모의 회귀를 추가한다. 실제 PostgreSQL 잠금 스케줄링은 이 환경에 로컬 서버가 없어 검증하지 않았다.
 
@@ -133,10 +133,12 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [x] API 타입 검사 및 Neture production build
 - [x] 회원 관리 UI Vitest 및 desktop/mobile mock API browser smoke
 - [x] 최신 main 통합 후 최종 로컬 회귀
-- [ ] 최종 커밋 push·PR latest HEAD CI 확인
+- [x] 구현 커밋 push·PR latest HEAD CI 확인
 
 자기 탈퇴와 이력 보존 기간/자동 삭제는 이번 admin 관리 탈퇴 구현과 별도 정책으로 남긴다.
 운영 migration·main 병합·배포는 push 완료 이후의 별도 승인 범위다.
 
 최신 main `2a8b80cf24`를 충돌 없이 통합했다. 플랫폼 전역 bypass만으로 개별 역할 지정 권한을 얻지 않도록 명시 community 서비스 admin 판정을 추가했다.
 최종 검증은 [CHECK](../checks/CHECK-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)에 기록했다. 이전 단계의 정책/구현 대기 기록은 단계 이력이며 현재 구현 상태는 이 절과 CHECK를 따른다.
+
+구현 HEAD `b898a354488894f1ceeb41cde4c22f21057d0668`의 GitHub API Jest 3개 shard, 화면 빌드, Code Quality, CodeQL, CI Gate, SonarCloud Code Analysis가 모두 SUCCESS였다. 승인 잠금 리뷰 스레드도 해결되었다. 이 완료 기록 이후 문서만 변경된 최종 HEAD의 checks는 [PR #412](https://github.com/Renagang21/o4o-platform/pull/412)에서 확인한다.
