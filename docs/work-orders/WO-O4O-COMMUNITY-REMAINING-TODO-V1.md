@@ -14,7 +14,7 @@
 - [x] 열린 회귀 테스트 PR #404의 현재 역할 계약과 정합 범위 조사. 최신 main 적응·재검증·병합은 별도 미실행.
 - [x] 문서·코드 조사 결과로 위 TODO의 실행 범위와 선행 조건 보완.
 - [x] 실행 가능한 작은 화면 개선 구현·회귀 테스트·desktop/mobile 검증.
-- [ ] 문서 정합·commit/push·PR·required CI 및 review 확인.
+- [x] 문서 정합·commit/push·PR·required CI 및 review 확인 — 이번 화면 구현 결과는 §5, 후속 미실행 항목은 §4 참조.
 
 ## 2. 완료된 선행 작업
 
@@ -46,7 +46,7 @@
 - [x] 처리 중 중복 요청 차단 및 커뮤니티 전환 후 이전 응답 격리.
 - [x] 성공 후 재조회 실패, 취소, 처리 실패, 커뮤니티 전환 회귀 검증.
 - [x] Neture build 및 desktop/mobile 브라우저 검증.
-- [ ] 문서 정합·push·PR·required CI/review 확인 후 통합 준비 보고.
+- [x] 문서 정합·push·PR·required CI/review 확인 후 통합 준비 — 구현 HEAD의 결과와 최종 문서 HEAD의 확인 경로는 §5 참조.
 
 초기 UI 검증은 격리 fixture를 사용한다. 운영 DB·실계정 역할 변경은 하지 않는다. 역할 정본 §5의 branch/운영 대기 표현은 PR #412의 main 반영·API/Neture Promote 성공 근거로 정정했다. 단계 이력 문서를 소급 재작성하지 않는다.
 
@@ -58,5 +58,9 @@
 - 변경 화면·회귀 테스트 ESLint, 문서 민감정보 검사, `git diff --check`: PASS.
 
 소스·정본·TODO만 변경했다. dependency/lockfile·API·DB·역할 계약은 변경하지 않았다. required CI/review는 PR 최신 HEAD를 기준으로 확인한다. main 통합·운영 배포는 이 작업의 검증 결과와 분리한다.
+
+구현 커밋 `a647982b70779e78db1399d7b2a8529bb17293f8`은 [PR #424](https://github.com/Renagang21/o4o-platform/pull/424)에 push했다. [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38057825750)의 API Jest 3개 묶음·Code Quality·웹/관리자 빌드·필수 CI Gate와 CodeQL/Guard 분석이 통과했다. 확인 시점에 등록된 review와 미해결 review thread는 없었다. 이후 완료 기록만 변경한 문서 HEAD의 checks는 PR에서 확인하며, 소스 변경이나 운영 반영을 뜻하지 않는다.
+
+작업공간: `wo/community-review-ux` / `/workspace/o4o-wt/community-review-ux`. main 미병합이므로 KEEP하며 다른 작업공간은 수정·정리하지 않는다. 1차 심사 화면 개선은 구현·검증 완료, 전체 후속 TODO는 정책/계약 및 통합이 남아 ACTIVE다.
 
 공개 항목의 저장/판정 계약, 정확한 후보 자격 응답, 자기 탈퇴·이력 보존 정책 및 #404 통합은 아직 실행하지 않았다. 앞선 표의 선행 조건과 현재 단계 결과를 별도로 유지한다.
