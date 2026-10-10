@@ -189,9 +189,9 @@ test('full retirement verifies terms alias, query preservation and destination a
   await assert.rejects(verifyRedirects(paths.slice(0, 2), request('target'), undefined, rules), /HTTP 200/);
 });
 
-test('tablet API checks reject missing data and never call the scan-writing QR API', async () => {
+test('tablet API checks reject missing data', async () => {
   const seen = [];
-  await verifyPublicData(paths.slice(0, 2), async url => {
+  await verifyPublicData(paths.slice(1, 2), async url => {
     seen.push(new URL(url));
     return Response.json({ success: true, data: url.includes('/tablet/') ? [] : { title: 'test' } });
   });
@@ -199,10 +199,9 @@ test('tablet API checks reject missing data and never call the scan-writing QR A
   assert.equal(seen[0].pathname, '/api/v1/stores/store/tablet/products');
   assert.equal(seen[0].searchParams.get('tabletId'), 'test');
   assert.equal(seen[0].host, 'api.neture.co.kr');
-  await verifyPublicData(['/qr/active'], async () => { throw new Error('QR API must not be called'); });
-  await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => Response.json({ success: false, error: { message: 'private row' } })), /successful data/);
-  await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response('<html>SPA</html>')), /return JSON/);
-  await assert.rejects(verifyPublicData(paths.slice(0, 2), async () => new Response(null, { status: 404 })), /HTTP 200/);
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => Response.json({ success: false, error: { message: 'private row' } })), /successful data/);
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => new Response('<html>SPA</html>')), /return JSON/);
+  await assert.rejects(verifyPublicData(paths.slice(1, 2), async () => new Response(null, { status: 404 })), /HTTP 200/);
 });
 
 test('tablet API resolves raw and already encoded Korean slugs exactly once', async () => {
@@ -215,4 +214,37 @@ test('tablet API resolves raw and already encoded Korean slugs exactly once', as
       return Response.json({ success: true, data: [] });
     });
   }
+});
+
+
+test('QR checks require deployed read-only HEAD support before resolving any slug', async () => {
+  const requests = [];
+  await assert.rejects(verifyPublicData(['/qr/active'], async (url, options) => {
+    requests.push(url);
+    assert.equal(options.method, 'HEAD');
+    return new Response(null, { status: 404 });
+  }), /not deployed/);
+  assert.deepEqual(requests, ['https://api.neture.co.kr/api/v1/kpa/qr/public']);
+});
+
+test('QR HEAD resolves raw and encoded slugs and rejects missing data or HTML', async () => {
+  for (const slug of ['active', '테스트', encodeURIComponent('테스트')]) {
+    const seen = [];
+    await verifyPublicData([`/qr/${slug}`], async (url, options) => {
+      seen.push(url);
+      assert.equal(options.method, 'HEAD');
+      return new Response(null, { status: url.endsWith('/public') ? 404 : 200,
+        headers: { 'x-qr-read-only-head': '1', 'content-type': 'application/json' } });
+    });
+    assert.equal(decodeURIComponent(new URL(seen[1]).pathname.split('/').at(-1)), decodeURIComponent(slug));
+  }
+  for (const status of [404, 410, 500]) {
+    await assert.rejects(verifyPublicData(['/qr/missing'], async url => new Response(null, {
+      status: url.endsWith('/public') ? 404 : status,
+      headers: { 'x-qr-read-only-head': '1', 'content-type': 'application/json' },
+    })), /successful landing data/);
+  }
+  await assert.rejects(verifyPublicData(['/qr/active'], async () => new Response(null, {
+    headers: { 'x-qr-read-only-head': '1', 'content-type': 'text/html' },
+  })), /successful landing data/);
 });

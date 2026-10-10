@@ -62,10 +62,28 @@ export async function verifyTargets(paths, request = fetch, signal) {
 }
 
 export async function verifyPublicData(paths, request = fetch, signal) {
+  const qrPaths = paths.filter(path => new URL(path, `https://${newHost}`).pathname.startsWith('/qr/'));
+  const qrBase = 'https://api.neture.co.kr/api/v1/kpa/qr/public';
+  const head = async url => {
+    const response = await request(url, { method: 'HEAD', redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
+    await response.body?.cancel();
+    return response;
+  };
+  if (qrPaths.length) {
+    // Old servers implement HEAD via GET and record scans. Check the slug-less
+    // namespace first: it cannot match the scan-writing /:slug handler.
+    const capability = await head(qrBase);
+    if (capability.headers.get('x-qr-read-only-head') !== '1') throw new Error('Read-only QR HEAD support is not deployed.');
+    await Promise.all(qrPaths.map(async path => {
+      const slug = new URL(path, `https://${newHost}`).pathname.slice(4);
+      const response = await head(`${qrBase}/${encodeURIComponent(decodeURIComponent(slug))}`);
+      if (response.headers.get('x-qr-read-only-head') !== '1' || response.status !== 200 || !/^application\/json(?:;|$)/i.test(response.headers.get('content-type') ?? '')) {
+        throw new Error('Read-only QR API did not resolve successful landing data.');
+      }
+    }));
+  }
   const targets = paths.flatMap(path => {
     const source = new URL(path, `https://${newHost}`);
-    // QR landing GET records scans. Its active path is verified by the read-only
-    // database inventory; never call that API from automated cutover probes.
     if (!source.pathname.startsWith('/tablet/')) return [];
     const target = new URL(`https://api.neture.co.kr/api/v1/stores/${encodeURIComponent(decodeURIComponent(source.pathname.slice(8)))}/tablet/products`);
     if (source.searchParams.has('tabletId')) target.searchParams.set('tabletId', source.searchParams.get('tabletId'));
