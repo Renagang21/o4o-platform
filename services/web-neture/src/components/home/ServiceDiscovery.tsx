@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HOST_ORIGIN } from '../../lib/hostProfile';
 
-type Service = { label: string; href: string; preparing?: never } | { label: string; preparing: true; href?: never };
+type Service = { label: string; href: string; documentNavigation?: boolean; preparing?: never } | { label: string; preparing: true; href?: never };
 const groups: { title: string; services: Service[] }[] = [
   { title: '약국 협력사업 참여', services: [
     { label: 'O4O 약국 경영지원', href: 'https://pharmacy.neture.co.kr/' },
@@ -24,7 +24,7 @@ const groups: { title: string; services: Service[] }[] = [
   ] },
   { title: '기타', services: [
     { label: 'O4O Partner', href: '/services/partner' },
-    { label: '병원·약품 파일 도구', href: '/hospital' },
+    { label: '병원·약품 파일 도구', href: '/hospital', documentNavigation: true },
   ] },
 ];
 
@@ -46,7 +46,7 @@ export default function ServiceDiscovery() {
         {group.services.map(service => <li key={service.label}>
           {service.preparing ? <button type="button" className={card} aria-haspopup="dialog" onClick={event => { trigger.current = event.currentTarget; setSelected(service.label); }}>
             <span className="font-medium">{service.label}</span><span className="text-sm text-slate-500">준비 중 · 안내 보기</span>
-          </button> : service.href.startsWith('/') ? <Link className={card} to={service.href}>
+          </button> : service.href.startsWith('/') && !service.documentNavigation ? <Link className={card} to={service.href}>
             <span className="font-medium">{service.label}</span><span className="text-sm text-slate-500">{service.label === 'O4O Partner' ? '준비 중 · 서비스 알아보기' : '도구 열기 →'}</span>
           </Link> : <a className={card} href={service.href} target="_blank" rel="noopener noreferrer">
             <span className="font-medium">{service.label}</span><span className="text-sm text-slate-500">서비스로 이동 ↗</span>

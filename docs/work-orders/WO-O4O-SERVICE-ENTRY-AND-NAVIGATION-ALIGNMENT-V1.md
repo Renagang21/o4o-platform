@@ -43,10 +43,14 @@
 
 ## 검증 및 한계
 
-web-neture 전체 396개, KPA business/menu 관련 89개, store 관련 22개, branch 35개, lecture 4개 테스트를 실행했다. 변경 후 펀딩 비로그인 조회 차단·공급자 승인 진입·참여 상태를 focused test로 재검증했다. 5개 앱 build 통과. 변경 파일 lint 오류 0; 기존 dependency/unused-variable 경고는 남아 있다.
+web-neture 전체 396개, KPA business/menu 관련 89개, store 관련 23개, branch 35개, lecture 4개 테스트를 실행했다. 변경 후 펀딩 비로그인 조회 차단·공급자 승인 진입·참여 상태를 focused test로 재검증했다. 5개 앱 build 통과. 변경 파일 lint 오류 0; 기존 dependency/unused-variable 경고는 남아 있다.
 
 PC 1440px·모바일 390px에서 협력사업 메뉴·승인 상태, 분회 콘텐츠 첫 화면, 공개 강의 진입·문의, 내 매장·펀딩 로그인 경계를 확인했다. 브라우저는 로컬 실행 앱과 합성 API fixture를 사용한다. 운영 데이터·실계정 인계·실제 승인 처리는 이 검증의 범위가 아니다. 클라우드 환경 Publish 성공과 운영 코드 배포는 별개다.
 
 ## 문서 정합
 
 대표 홈 정본의 화면 미적용 표기는 현재 main·운영 상태에는 유효하며 작업 branch 구현은 PR에서 별도 기록한다. GLOBAL-HEADER의 과거 은퇴 서비스 범위와 SETUP의 일부 사전 빌드 설명 차이는 이번 범위에서 수정하지 않는다.
+
+## PR 리뷰 보완
+
+PR #402의 Codex 리뷰 2건을 보완했다. 병원 `/hospital`은 별도 앱이므로 SPA Link 대신 문서 탐색 링크를 사용한다. 종료 서비스 매장의 안내는 `/`로 돌아가는 대신 이용 사업(`/services`) 확인으로 연결해 반복 진입을 끊는다. 각각 SPA catch-all 미진입과 종료 안내 탈출 경로를 회귀 테스트로 확인했다.

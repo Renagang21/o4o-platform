@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ServiceDiscovery from '../home/ServiceDiscovery';
 import PartnerServicePage from '../../pages/PartnerServicePage';
 
@@ -34,4 +34,15 @@ describe('준비 중 서비스 안내', () => {
     expect(screen.getByRole('link', { name: 'Contact Us' }).getAttribute('href')).toBe('/contact');
     expect(screen.queryByRole('button', { name: /가입/ })).toBeNull();
   });
+});
+
+it('병원 별도 앱은 SPA catch-all 대신 문서 탐색 링크로 연다', () => {
+  render(<MemoryRouter><Routes><Route path="/" element={<ServiceDiscovery />} /><Route path="/hospital" element={<h1>잘못된 SPA 경로</h1>} /></Routes></MemoryRouter>);
+  const hospital = screen.getByRole('link', { name: /병원·약품 파일 도구/ });
+  expect(hospital.getAttribute('href')).toBe('/hospital');
+  // Cancel jsdom document navigation after the router would have intercepted it.
+  document.addEventListener('click', event => event.preventDefault(), { once: true });
+  fireEvent.click(hospital);
+  expect(screen.queryByRole('heading', { name: '잘못된 SPA 경로' })).toBeNull();
+  expect(screen.getByRole('heading', { name: '전체 서비스' })).toBeTruthy();
 });
