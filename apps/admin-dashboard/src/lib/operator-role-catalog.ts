@@ -55,7 +55,7 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
       label: 'Admin',
       description: '커뮤니티 개설 심사 · 개별 커뮤니티 운영자 지정',
     },
-    { value: 'community:operator', label: 'Operator', description: '커뮤니티 개설 신청 심사' },
+    { value: 'community:operator', label: 'Operator', description: '커뮤니티 개설·가입 신청 심사 · 게시판 운영' },
   ],
   supplier: [
     {
