@@ -8,8 +8,7 @@
  * Header 내부 하드코딩 금지.
  */
 
-import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
-import { kpaConfig } from '@o4o/operator-ux-core';
+import type { GlobalHeaderNavItem } from '@o4o/ui';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 로그인 상태와 무관하게 항상 노출. About은 마지막에 위치.
@@ -22,10 +21,9 @@ import { kpaConfig } from '@o4o/operator-ux-core';
 export const LECTURE_SERVICE_URL = 'https://study.neture.co.kr';
 
 export const KPA_BASE_NAV: GlobalHeaderNavItem[] = [
-  { label: '참여 신청', href: '/businesses/pharmacy/participation' },
-  { label: '사업 자료', href: '/businesses/pharmacy/materials' },
-  { label: '참여자 게시판', href: '/businesses/pharmacy/forum' },
-  { label: '업무 도구', href: '/businesses/pharmacy/tools' },
+  { label: '커뮤니티', href: '/' },
+  { label: '회원 게시글', href: '/community' },
+  { label: '사업 자료', href: '/materials' },
   { label: 'Contact Us', href: '/contact' },
 ];
 
@@ -34,23 +32,8 @@ export const KPA_SERVICE_GUIDE_NAV_ITEM: GlobalHeaderNavItem = { label: '서비�
 export const KPA_ABOUT_NAV_ITEM: GlobalHeaderNavItem = { label: 'About', href: '/about' };
 export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', href: '/contact' };
 
-// ─── Contextual Nav ──────────────────────────────────────────────────────────
-// 역할 조건에 따라 노출 (서비스에서 필터링 후 전달)
-// KPA: 내 약국 우선 — 매장 경영자에게 내 매장이 먼저 보임
-
-// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
-//   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
-export type KpaContextualNavItem = ContextualNavItem<'storeOwner' | 'operator' | 'admin'>;
-
-// WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
-//   두 메뉴 모두 store_owner role 기준으로 통일.
-//   기존 '운영 허브'의 activityType=='pharmacy_owner' fallback 제거 — HubGuard/PharmacyGuard/
-//   StoreHubPage CTA 가 모두 role 기반(isStoreOwnerDual)이므로 menu 노출도 동일 기준으로 정합.
-//   선언만 한 사용자(activityType=pharmacy_owner, role 미부여)에게 메뉴 노출 후 클릭 시
-//   guard redirect 되는 UX 함정 제거.
-export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
-  { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
-];
+// 내 매장은 회원 초기화면의 업무 바로가기·계정 메뉴에서 제공한다.
+// 콘텐츠 메뉴에 매장 실행 업무를 섞지 않는다.
 
 // ─── Footer Nav ──────────────────────────────────────────────────────────────
 

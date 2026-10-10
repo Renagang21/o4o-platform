@@ -38,6 +38,11 @@ export const businessApi = {
   },
 };
 export const businessBase = (key: string) => `/businesses/${encodeURIComponent(key)}`;
+export type BusinessSection = 'participation' | 'materials' | 'forum' | 'tools';
+/** Public pharmacy URLs differ from the server-owned business/community identifiers. */
+export const businessPath = (key: string, section: BusinessSection): string => key === 'pharmacy'
+  ? { participation: '/my/participation', materials: '/materials', forum: '/community', tools: '/tools' }[section]
+  : `${businessBase(key)}/${section}`;
 export const communityApiBase = (key: string) => `/communities/${encodeURIComponent(key)}`;
 export const pharmacyApiBase = '/neture/pharmacy';
 

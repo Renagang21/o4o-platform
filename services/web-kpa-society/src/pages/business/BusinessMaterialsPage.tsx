@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import { useBusiness } from './BusinessWorkspace';
 import { businessApi, businessError, pharmacyApiBase, type BusinessContent } from './api';
 
 export default function BusinessMaterialsPage() {
   const { business, access } = useBusiness();
+  const [params] = useSearchParams();
   const [items, setItems] = useState<BusinessContent[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function BusinessMaterialsPage() {
     {error && <div><p role="alert">{error}</p><button type="button" onClick={() => setVersion(n => n + 1)}>다시 시도</button></div>}
     {loading && <output aria-live="polite">자료를 불러오고 있습니다…</output>}
     {!loading && !error && !items.length && <p className="mt-4">등록된 자료가 없습니다.</p>}
-    {items.map(item => <details key={item.id} className="my-4 rounded-xl border bg-white p-5">
+    {items.map(item => <details key={item.id} open={params.get('content') === item.id || undefined} className="my-4 rounded-xl border bg-white p-5">
       <summary className="cursor-pointer font-semibold">{item.title}</summary>
       {item.summary && <p className="my-3 text-slate-600">{item.summary}</p>}
       {item.body && <ContentRenderer html={item.body} />}

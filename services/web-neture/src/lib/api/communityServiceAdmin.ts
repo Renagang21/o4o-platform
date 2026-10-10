@@ -36,8 +36,9 @@ export interface CommunityMemberRow {
   userId: string;
   name: string | null;
   email: string | null;
-  role: 'operator' | 'member';
+  role: 'admin' | 'operator' | 'member';
   serviceMembershipStatus: string | null;
+  membershipStatus: string;
 }
 
 export async function listCreationRequests(): Promise<CommunityCreationRequestRow[]> {
@@ -69,11 +70,12 @@ export async function listCommunityMembers(communityId: string): Promise<Communi
 export async function setCommunityMemberRole(
   communityId: string,
   membershipId: string,
-  role: 'operator' | 'member',
+  role: 'admin' | 'operator' | 'member',
+  reason: string,
 ): Promise<void> {
   await api.post(
     `${BASE}/admin/communities/${encodeURIComponent(communityId)}/members/${encodeURIComponent(membershipId)}/role`,
-    { role },
+    { role, reason },
   );
 }
 

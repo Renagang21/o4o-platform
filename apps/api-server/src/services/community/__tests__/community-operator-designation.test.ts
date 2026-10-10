@@ -34,15 +34,18 @@ const tx = {
     if (s.startsWith('SELECT id, name FROM communities')) return [C1, C2].includes(p[0]) ? [{ id: p[0], name: 'c' }] : [];
     if (s.startsWith('SELECT id, user_id, role, status FROM community_memberships')) {
       expect(s).toContain('FOR UPDATE');
-      return rows.filter((r) => r.community_id === p[0] && (r.id === p[1] || (r.role === 'operator' && r.status === 'active')));
+      return rows.filter((r) => r.community_id === p[0] && (r.id === p[1] || (r.role === 'admin' && r.status === 'active')));
     }
-    if (s.startsWith('SELECT user_id, status FROM service_memberships')) {
+    if (s.startsWith('SELECT id FROM users')) return [];
+    if (s.startsWith('SELECT service_key, status FROM service_memberships')) {
       expect(s).toContain('FOR UPDATE');
-      return p[0].filter((id: string) => service[id]).map((id: string) => ({ user_id: id, status: service[id] }));
+      return service[p[0]] ? [{ service_key: 'community', status: service[p[0]] }] : [];
     }
+    if (s.startsWith('SELECT id, user_id FROM community_memberships')) return rows.filter(r => r.community_id === p[0] && r.id !== p[1] && r.role === 'admin' && r.status === 'active');
+    if (s.startsWith('INSERT INTO community_membership_changes')) return [];
     if (s.includes('FROM users u')) return [{ account_status: 'active', account_active: true, email_verified: true, membership_status: mainStatus[p[0]] }];
     if (s.startsWith('UPDATE community_memberships')) {
-      const r = rows.find((x) => x.id === p[1] && x.community_id === p[2] && x.status === 'active');
+      const r = rows.find((x) => x.id === p[1] && x.community_id === p[2] );
       if (r) r.role = p[0];
       return [];
     }
@@ -55,7 +58,7 @@ const svc = () => new CommunityOperatorDesignationService(runner);
 beforeEach(() => {
   sql.length = 0;
   rows = [
-    { id: M_OP, community_id: C1, user_id: 'u-op', role: 'operator', status: 'active' },
+    { id: M_OP, community_id: C1, user_id: 'u-op', role: 'admin', status: 'active' },
     { id: M_MEM, community_id: C1, user_id: 'u-mem', role: 'member', status: 'active' },
     { id: M_PEND, community_id: C1, user_id: 'u-pend', role: 'member', status: 'pending' },
   ];
@@ -68,11 +71,11 @@ beforeEach(() => {
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 — Demo 의 개체 role 은 고정
 it.each([
   ['지정', M_MEM, 'u-mem', 'operator', 'member'],
-  ['해제', M_OP, 'u-op', 'member', 'operator'],
+  ['해제', M_OP, 'u-op', 'member', 'admin'],
 ])('Demo 계정 %s → 403 · UPDATE 0', async (_label, membershipId, userId, role, before) => {
-  rows.push({ id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', community_id: C1, user_id: 'u-op2', role: 'operator', status: 'active' });
+  rows.push({ id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', community_id: C1, user_id: 'u-op2', role: 'admin', status: 'active' });
   demoUsers = [userId];
-  await expect(svc().setRole({ communityId: C1, membershipId, role: role as any })).rejects.toMatchObject({
+  await expect(svc().setRole({ communityId: C1, membershipId, role: role as any, actorUserId: 'u-actor', reason: '역할 변경 사유' })).rejects.toMatchObject({
     statusCode: 403,
     code: 'DEMO_ACCOUNT_FORBIDDEN',
   });
@@ -82,12 +85,12 @@ it.each([
 
 it('Demo 조회가 실패하면 바꾸지 않는다 (fail-closed)', async () => {
   demoLookupFails = true;
-  await expect(svc().setRole({ communityId: C1, membershipId: M_MEM, role: 'operator' })).rejects.toThrow('db down');
+  await expect(svc().setRole({ communityId: C1, membershipId: M_MEM, role: 'operator', actorUserId: 'u-actor', reason: '역할 변경 사유' })).rejects.toThrow('db down');
   expect(rows.find((r) => r.id === M_MEM)!.role).toBe('member');
   expect(sql.some((s) => s.startsWith('UPDATE'))).toBe(false);
 });
 
-const set = (communityId: string, membershipId: string, role: any) => svc().setRole({ communityId, membershipId, role });
+const set = (communityId: string, membershipId: string, role: any) => svc().setRole({ communityId, membershipId, role, actorUserId: 'u-actor', reason: '역할 변경 사유' });
 
 it('active 회원을 운영자로 지정한다 — role_assignments 는 건드리지 않는다', async () => {
   await expect(set(C1, M_MEM, 'operator')).resolves.toEqual({ membershipId: M_MEM, role: 'operator', changed: true });
@@ -96,13 +99,13 @@ it('active 회원을 운영자로 지정한다 — role_assignments 는 건드�
 });
 
 it('운영자가 둘 이상이면 해제할 수 있다', async () => {
-  rows.find((r) => r.id === M_MEM)!.role = 'operator';
+  rows.find((r) => r.id === M_MEM)!.role = 'admin';
   await expect(set(C1, M_OP, 'member')).resolves.toMatchObject({ changed: true });
 });
 
 it('마지막 운영자는 해제할 수 없다', async () => {
-  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ statusCode: 409, code: 'LAST_OPERATOR_PROTECTED' });
-  expect(rows.find((r) => r.id === M_OP)!.role).toBe('operator');
+  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ statusCode: 409, code: 'LAST_ADMIN_PROTECTED' });
+  expect(rows.find((r) => r.id === M_OP)!.role).toBe('admin');
 });
 
 it('가입 대기(pending) 행은 지정할 수 없다', async () => {
@@ -120,12 +123,12 @@ it.each(['pending', 'suspended', undefined])('서비스 membership %s → 운영
   expect(sql.some((s) => s.startsWith('UPDATE'))).toBe(false);
 });
 
-it('role 값은 operator/member 만', async () => {
-  await expect(set(C1, M_MEM, 'admin')).rejects.toMatchObject({ statusCode: 400, code: 'INVALID_ROLE' });
+it('role 값은 admin/operator/member 만', async () => {
+  await expect(set(C1, M_MEM, 'owner')).rejects.toMatchObject({ statusCode: 400, code: 'INVALID_ROLE' });
 });
 
 it('같은 역할이면 쓰지 않는다(멱등)', async () => {
-  await expect(set(C1, M_OP, 'operator')).resolves.toMatchObject({ changed: false });
+  await expect(set(C1, M_OP, 'admin')).resolves.toMatchObject({ changed: false });
   expect(sql.some((s) => s.startsWith('UPDATE'))).toBe(false);
 });
 
@@ -137,21 +140,32 @@ it('없는 커뮤니티 → 404', async () => {
 
 // 대체자는 실제 운영 화면 접근 자격을 가진 같은 커뮤니티 운영자여야 한다.
 it.each(['suspended', 'withdrawn', 'pending', undefined])('다른 운영자의 서비스 가입이 %s 이면 마지막 운영자를 해제하지 않는다', async (status) => {
-  rows.find((r) => r.id === M_MEM)!.role = 'operator';
+  rows.find((r) => r.id === M_MEM)!.role = 'admin';
   if (status) service['u-mem'] = status;
   else delete service['u-mem'];
-  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ code: 'LAST_OPERATOR_PROTECTED' });
-  expect(rows.find((r) => r.id === M_OP)!.role).toBe('operator');
+  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ code: 'LAST_ADMIN_PROTECTED' });
+  expect(rows.find((r) => r.id === M_OP)!.role).toBe('admin');
 });
 
 it.each(['suspended', 'withdrawn'])('다른 운영자의 메인 이용이 %s 이면 마지막 운영자를 해제하지 않는다', async (status) => {
-  rows.find((r) => r.id === M_MEM)!.role = 'operator';
+  rows.find((r) => r.id === M_MEM)!.role = 'admin';
   mainStatus['u-mem'] = status;
-  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ code: 'LAST_OPERATOR_PROTECTED' });
+  await expect(set(C1, M_OP, 'member')).rejects.toMatchObject({ code: 'LAST_ADMIN_PROTECTED' });
 });
 
 it('메인 이용이 정지된 회원은 운영자로 지정하지 않는다', async () => {
   mainStatus['u-mem'] = 'suspended';
   await expect(set(C1, M_MEM, 'operator')).rejects.toMatchObject({ code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE' });
   expect(rows.find((r) => r.id === M_MEM)!.role).toBe('member');
+});
+
+
+it('operator가 남아 있어도 마지막 admin을 operator로 내릴 수 없다', async () => {
+  rows.find(r => r.id === M_MEM)!.role = 'operator';
+  await expect(set(C1,M_OP,'operator')).rejects.toMatchObject({ code: 'LAST_ADMIN_PROTECTED' });
+});
+it('비활성 개별 역할은 상태 복구 없이 회수할 수 있다', async () => {
+  rows.find(r => r.id === M_OP)!.status = 'suspended';
+  await expect(set(C1,M_OP,'member')).resolves.toMatchObject({ changed: true });
+  expect(rows.find(r => r.id === M_OP)).toMatchObject({ role:'member', status:'suspended' });
 });
