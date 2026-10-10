@@ -1,8 +1,8 @@
 # 프론트엔드 로그인·약국 내부 UI 후속 작업
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
-> **범위**: 기존 인증 PR 검증, 약국 회원 내부 UI 정비, 이용 흐름 검증·push
+> **범위**: 기존 인증 PR 검증, 약국 회원 내부 UI 정비, 이용 흐름 검증·push·사용자 승인 후 main 통합/운영 배포
 
 ## 보완한 TODO
 
@@ -80,9 +80,41 @@ WORKTREE_DISPOSITION: `wo/frontend-login-and-member-ui`는 PR·통합·운영 �
 - [x] 최신 main·ruleset·PR head·required CI·리뷰를 확인한다. 두 PR은 CI Gate 및 보안 검사 통과, 미해결 스레드 0건이다.
 - [x] 로그인 PR #423을 main에 병합한다: `913b642ceb525a75631b2ee37613d92e3b859053`.
 - [x] 해당 main을 #425 branch에 normal merge한다. source 충돌은 없으며 다른 작업공간을 변경하지 않았다.
-- [ ] 결합 source focused 검증·빌드 후 push하고 새 HEAD required CI를 확인한다.
-- [ ] PR #425 main 병합 및 post-merge CI를 확인한다.
-- [ ] Delivery 판정·공유 배포 실행 상태 확인 후 Neture 및 약국 웹을 운영에 배포한다.
-- [ ] 실제 운영 bundle의 PC/mobile 로그인·회원 게시판·자료·내 매장 연결을 검증하고 종료 기록을 남긴다.
+- [x] 결합 source focused 검증·빌드 후 push하고 새 HEAD required CI를 확인한다.
+- [x] PR #425 main 병합 및 post-merge CI를 확인한다.
+- [x] Delivery 판정·공유 배포 실행 상태 확인 후 Neture 및 약국 웹을 운영에 배포한다.
+- [x] 실제 운영 bundle의 PC/mobile 로그인·회원 게시판·자료·내 매장 연결을 검증하고 종료 기록을 남긴다.
 
 조사 보완: 배포 대상은 `neture,kpa-society`이며 API·DB·인증 정책 발행은 포함하지 않는다. 배포 설정 변수의 직접 조회는 integration 권한으로 HTTP 403이므로 Delivery/Promote의 현재 fail-closed gate와 실행 결과로 확인한다. 설정을 변경하거나 gate를 우회하지 않는다. 최종 배포·검증 결과는 GitHub PR·Actions 및 작업공간 인계 기록에서 추적한다.
+
+## 운영 배포·종료 결과 — 2026-10-10
+
+앞선 절의 미병합·미배포 표기는 당시 구현 단계 기록이다. 사용자 승인 후 두 PR의 main 병합과 이번 UI의 운영 반영을 완료했다. 기존 기록을 현재 미완료 상태로 해석하지 않는다.
+
+- 로그인 [PR #423](https://github.com/Renagang21/o4o-platform/pull/423): main `913b642ceb525a75631b2ee37613d92e3b859053`. 다른 세션의 [Neture Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38062388825)는 해당 source를 포함한 `7fd08d308`의 `DEPLOYED`를 확인했다.
+- 내부 UI [PR #425](https://github.com/Renagang21/o4o-platform/pull/425): 최종 HEAD `78b0bb6ef7846a6f511d9deb640735d9f1dc2c55`의 [PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38062143097), CI Gate·CodeQL·SonarCloud PASS 및 미해결 리뷰 0건 확인 후 main `e0e7e6b413b42f43bc21d052cbc0245001560221`에 병합했다.
+- [병합 후 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38062849400): SUCCESS. 추가 main 문서 변경은 normal merge했고 결합 source의 로그인 19·약국 9 focused tests, 두 앱 타입/빌드와 PC/mobile 회귀가 통과했다.
+- [운영 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38063471945): SUCCESS. `ci_green=true`, `frozen=false`, `head_is_target=true`를 확인하고 `neture,kpa-society`만 LEVEL_2 자동 배포했다. 최종 serving SHA report와 commit status가 `DEPLOYED · deploy: neture,kpa-society` SUCCESS다. 두 서비스의 단일 리비전 100% serving SHA가 승인된 target과 일치해야 report가 성공하는 기존 gate를 통과했다. API·DB·다른 웹·정책 발행은 배포하지 않았다.
+
+### 실제 운영 화면 검증
+
+운영 HTML/JS/CSS를 정상 TLS 검증을 유지하는 curl로 읽어 해당 origin의 브라우저에 제공했다. API 검증은 실제 운영 endpoint를 사용하며, 합성 권한/응답 검증은 별도로 구분했다. 인증 정보·응답 원문·실제 이용자 화면을 저장하지 않았고 사업 데이터를 작성하지 않았다.
+
+| 운영 source PC1440/mobile390 검증 | 결과 | API 범위 |
+| --- | --- | --- |
+| 대표 홈·커뮤니티·공급자·펀딩 로그인 | 8/8 PASS | 실제 공개 API; 진입 안정·입력 유지·이름 있는 닫기·가로 넘침 |
+| 공급자·펀딩 공개 체험 | 4/4 PASS | 실제 로그인·인증 콘텐츠·생성한 세션 로그아웃 각각 200 |
+| 약국 공개 매장 체험 | 2/2 PASS | 실제 로그인·게시판/자료 조회·내 매장 handoff 및 exchange·접근 가능 매장 조회 200. Store `/store` 도착과 두 origin의 생성 세션 로그아웃 200 |
+| 약국 회원·미승인·운영자·비로그인·조회 실패 | 10/10 PASS | 합성 API; 새 목록/상세/작성 취소·자료·이전 URL 복귀·권한 경계·화면 상태 |
+| 공급자 관리·내 매장 신청 심사 진입 | 2/2 PASS | 합성 운영자 권한/응답; 실제 운영 Neture·Supplier·Store bundle의 기존 관리 화면 도착 |
+| 공급자·펀딩 가입·Kakao callback | 4/4 PASS | 합성 API; 동의·callback 일회 소비·확인 메일 안내. 실제 OAuth/가입/메일 수신 아님 |
+
+30개 PC/mobile 시나리오가 통과했고 브라우저 화면 오류·가로 넘침은 없었다. 공개 체험은 정본이 의도적으로 노출한 기능 자체의 검증이며, 없는 일반 운영자·소유자 테스트 계정을 대체하지 않는다. 현재 작업공간과 기준 checkout 모두 `docs/local/TEST-ACCOUNTS.local.md`가 없다. 실제 계정/OAuth/메일 수신, 공지 조회 계약 확장, 정책 발행과 타 서비스 전수 정비는 앞선 별도 후속 과제로 유지한다.
+
+운영 배포 중 main에 추가된 PR #424는 별도 커뮤니티 심사 UI 작업이다. 이 closure에서는 해당 변경을 보존하며 이번 로그인·약국 UI의 최초 운영 target/검증 결과를 기록한다. 후속 Delivery의 누적 변경 처리와 이번 배포 결과를 혼동하지 않는다.
+
+### 문서 정합·작업공간
+
+이 WO의 상태와 통합/배포 TODO를 실제 완료 결과로 갱신했다. 정본의 사업 정책·권한 계약·다른 WO의 실행 기록은 수정하지 않는다. 클라우드는 게시 source configuration이 있고 spec/observed spec `25`가 일치하며 observations current·failure null이다. 이번 Phase에서 클라우드 설정 저장·추가 게시를 수행하지 않았으며 Git push와 운영 배포와 구분한다.
+
+WORKTREE_DISPOSITION: `wo/frontend-login-and-member-ui`는 동일 WO의 종료 문서 Phase에 계속 사용한다. 운영 재검증 helper가 이 worktree의 Playwright 의존성을 참조하므로 KEEP한다. 기존 다른 작업공간/branch는 정리 대상이 아니다. 종료 문서 PR 통합 후 clean·main 포함·CI 상태를 인계 기록에서 최종 확인한다.
