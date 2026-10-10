@@ -58,6 +58,6 @@ test('selected rows and modelled FK references do not become false diagnostic bl
   const state={rows:new Map([['organizations',new Map([['root',{id}]])],['links',new Map([[rowKey('links',row,['id']),row]])]]),keys:new Map([['links',['id']]])};
   const column={table_name:'links',column_name:'target_id',udt_name:'uuid'};
   const client={query:async()=>({rows:[{row}]})};
-  await verifyLogicalCoverage(client,state,[column],[]);
-  await verifyLogicalCoverage({query:async()=>{throw new Error('Known FK should not be queried');}},state,[column],[{child:'links',child_columns:['target_id']}]);
+  await assert.doesNotReject(verifyLogicalCoverage(client,state,[column],[]));
+  await assert.doesNotReject(verifyLogicalCoverage({query:async()=>{throw new Error('Known FK should not be queried');}},state,[column],[{child:'links',child_columns:['target_id']}]));
 });

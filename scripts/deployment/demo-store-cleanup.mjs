@@ -155,7 +155,7 @@ export async function verifyLogicalCoverage(client,state,columns,edges) {
     if (!remaining.length) continue;
     // Report schema metadata and counts only; never serialize production rows or IDs.
     const values=new Set(remaining.map(({row})=>row[column.column_name]));
-    const referencedTables=[...state.rows].filter(([,rows])=>[...rows.values()].some(row=>values.has(row.id))).map(([table])=>table).sort();
+    const referencedTables=[...state.rows].filter(([,rows])=>[...rows.values()].some(row=>values.has(row.id))).map(([table])=>table).sort((a,b)=>a.localeCompare(b,'en'));
     referencedTables.forEach(quoteTable);
     references.push({table:column.table_name,column:column.column_name,count:remaining.length,referencedTables});
   }
