@@ -9,7 +9,11 @@ export const STORE_INVENTORY_CUTOFF = '2026-10-10T10:14:01Z';
 
 export function stableJson(value) {
   if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
-  if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
+  if (value && typeof value === 'object') {
+    const entries = Object.keys(value).sort((a, b) => a.localeCompare(b, 'en'))
+      .map(key => JSON.stringify(key) + ':' + stableJson(value[key]));
+    return '{' + entries.join(',') + '}';
+  }
   return JSON.stringify(value);
 }
 
@@ -43,13 +47,13 @@ export async function storeRelinkPlan(client, apply = false, targetFingerprints 
   const byOrg = new Map(members.map(row => [row.organization_id, row]));
   const changes = organizations.filter(org => {
     const member = byOrg.get(org.id);
-    return org.created_by_user_id !== userId || !member || member.role !== 'owner' || member.left_at !== null;
+    return org.created_by_user_id !== userId || member?.role !== 'owner' || member?.left_at !== null;
   });
   const before = {
     provenance: { authorization: 'user-declared-existing-test-data-2026-10-10',
       canonicalPolicy: 'O4O-CANONICAL-DEMO-ACCOUNTS-V1 section 14', inventoryRun: '38044110792' },
     inventoryCutoff: STORE_INVENTORY_CUTOFF,
-    targetFingerprints: organizations.map(row => storeFingerprint(row.id)).sort(), userId, organizations, members,
+    targetFingerprints: organizations.map(row => storeFingerprint(row.id)).sort((a, b) => a.localeCompare(b, 'en')), userId, organizations, members,
   };
   const digest = createHash('sha256').update(stableJson(before)).digest('hex');
   return { before, ids, changes, digest, requiresVerifiedTargets: !selected.size };
@@ -61,6 +65,27 @@ export async function verifyStoreRelink(client, plan) {
       AND m.role='owner' AND m.left_at IS NULL
     WHERE o.id=ANY($1::uuid[]) AND o.created_by_user_id=$2`, [plan.ids, plan.before.userId]);
   if (result.rows[0].count !== plan.ids.length) throw new Error('Store relink verification failed');
+}
+
+async function applyStoreRelink(client, plan, expectedDigest) {
+  if (!/^[a-f0-9]{64}$/.test(expectedDigest) || plan.digest !== expectedDigest) throw new Error('Before-image digest changed; re-plan');
+  const backup = await client.query(`SELECT to_regclass('public.canonical_demo_repair_snapshots') IS NOT NULL AS ready`);
+  if (!backup.rows[0].ready) throw new Error('Existing recovery table missing');
+  // Full before-images remain in the existing DB audit table, never in CI artifacts/logs.
+  const audit = await client.query(`INSERT INTO canonical_demo_repair_snapshots (migration,snapshot)
+    VALUES ($1,$2::jsonb) RETURNING id`, [`store-relink-${plan.digest}`, JSON.stringify({ before: plan.before })]);
+  await client.query(`UPDATE organizations SET created_by_user_id=$2
+    WHERE id=ANY($1::uuid[]) AND created_by_user_id IS DISTINCT FROM $2`, [plan.ids, plan.before.userId]);
+  await client.query(`INSERT INTO organization_members (organization_id,user_id,role,is_primary)
+    SELECT id,$2,'owner',false FROM organizations WHERE id=ANY($1::uuid[])
+    ON CONFLICT (organization_id,user_id) DO UPDATE
+      SET role='owner',left_at=NULL,updated_at=now()
+      WHERE organization_members.role IS DISTINCT FROM 'owner' OR organization_members.left_at IS NOT NULL`, [plan.ids, plan.before.userId]);
+  await verifyStoreRelink(client, plan);
+  const afterMembers = (await client.query(`SELECT to_jsonb(m) AS row FROM organization_members m
+    WHERE m.organization_id=ANY($1::uuid[]) AND m.user_id=$2 ORDER BY m.organization_id`, [plan.ids, plan.before.userId])).rows.map(row => row.row);
+  await client.query(`UPDATE canonical_demo_repair_snapshots SET snapshot=snapshot || $2::jsonb WHERE id=$1`,
+    [audit.rows[0].id, JSON.stringify({ after_members: afterMembers, verified_stores: plan.ids.length })]);
 }
 
 export async function runStoreRelink(client, { apply = false, expectedDigest = '', targetFingerprints = [] } = {}) {
@@ -80,24 +105,7 @@ export async function runStoreRelink(client, { apply = false, expectedDigest = '
         storesNeedingRelink: plan.changes.length, digest: plan.digest,
         targetFingerprints: plan.before.targetFingerprints, provenance: plan.before.provenance };
     if (apply && plan.changes.length) {
-      if (!/^[a-f0-9]{64}$/.test(expectedDigest) || plan.digest !== expectedDigest) throw new Error('Before-image digest changed; re-plan');
-      const backup = await client.query(`SELECT to_regclass('public.canonical_demo_repair_snapshots') IS NOT NULL AS ready`);
-      if (!backup.rows[0].ready) throw new Error('Existing recovery table missing');
-      // Full before-images remain in the existing DB audit table, never in CI artifacts/logs.
-      const audit = await client.query(`INSERT INTO canonical_demo_repair_snapshots (migration,snapshot)
-        VALUES ($1,$2::jsonb) RETURNING id`, [`store-relink-${plan.digest}`, JSON.stringify({ before: plan.before })]);
-      await client.query(`UPDATE organizations SET created_by_user_id=$2
-        WHERE id=ANY($1::uuid[]) AND created_by_user_id IS DISTINCT FROM $2`, [plan.ids, plan.before.userId]);
-      await client.query(`INSERT INTO organization_members (organization_id,user_id,role,is_primary)
-        SELECT id,$2,'owner',false FROM organizations WHERE id=ANY($1::uuid[])
-        ON CONFLICT (organization_id,user_id) DO UPDATE
-          SET role='owner',left_at=NULL,updated_at=now()
-          WHERE organization_members.role IS DISTINCT FROM 'owner' OR organization_members.left_at IS NOT NULL`, [plan.ids, plan.before.userId]);
-      await verifyStoreRelink(client, plan);
-      const afterMembers = (await client.query(`SELECT to_jsonb(m) AS row FROM organization_members m
-        WHERE m.organization_id=ANY($1::uuid[]) AND m.user_id=$2 ORDER BY m.organization_id`, [plan.ids, plan.before.userId])).rows.map(row => row.row);
-      await client.query(`UPDATE canonical_demo_repair_snapshots SET snapshot=snapshot || $2::jsonb WHERE id=$1`,
-        [audit.rows[0].id, JSON.stringify({ after_members: afterMembers, verified_stores: plan.ids.length })]);
+      await applyStoreRelink(client, plan, expectedDigest);
     } else if (apply) {
       await verifyStoreRelink(client, plan);
     }
