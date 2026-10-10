@@ -1,3 +1,5 @@
+import { CommunityMemberManagementService, type CommunityMemberAction } from '../services/community/community-member-management.service.js';
+import { CommunityMembershipMutationError } from '../services/community/community-membership-mutations.js';
 import { forumRequestService } from '../services/forum/ForumRequestService.js';
 /**
  * Communities — Community Catalog read contract (service-neutral)
@@ -71,7 +73,7 @@ function sendLifecycleError(res: Response, error: unknown): boolean {
     res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
     return true;
   }
-  if (!(error instanceof CommunityLifecycleError)) return false;
+  if (!(error instanceof CommunityLifecycleError) && !(error instanceof CommunityMembershipMutationError)) return false;
   res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
   return true;
 }
@@ -90,7 +92,7 @@ function requesterId(req: AuthRequest, res: Response): string | null {
   return id;
 }
 
-const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'withdrawn'] as const;
+const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'suspended', 'withdrawn'] as const;
 type MembershipStatus = (typeof MEMBERSHIP_STATUSES)[number];
 
 const bodyOf = (req: { body?: unknown }): Record<string, unknown> =>
@@ -125,7 +127,7 @@ export function createCommunitiesRoutes(
   //   `/:communitySlug/...` 파라미터 라우트보다 먼저 등록한다.
   const designation = () => new CommunityOperatorDesignationService(AppDataSource);
   const sendDesignationError = (res: Response, error: unknown): boolean => {
-    if (!(error instanceof CommunityOperatorDesignationError)) return false;
+    if (!(error instanceof CommunityOperatorDesignationError)) return sendLifecycleError(res, error);
     res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
     return true;
   };
@@ -158,7 +160,9 @@ export function createCommunitiesRoutes(
         const data = await designation().setRole({
           communityId: req.params.communityId,
           membershipId: req.params.membershipId,
-          role: trimmed(bodyOf(req).role) as 'operator' | 'member',
+          role: trimmed(bodyOf(req).role) as 'admin' | 'operator' | 'member',
+          actorUserId: (req as AuthRequest).user!.id,
+          reason: trimmed(bodyOf(req).reason),
         });
         res.json({ success: true, data });
       } catch (error) {
@@ -364,6 +368,36 @@ export function createCommunitiesRoutes(
       }
     }),
   );
+
+  router.get('/:communitySlug/memberships/:membershipId/history',
+    apiLimiter, authenticate, resolveCommunity, requireCommunityScope('admin'),
+    asyncHandler(async (req, res) => {
+      const ids = [req.community!.id, String(req.params.membershipId)];
+      const target = await AppDataSource.query('SELECT id FROM community_memberships WHERE community_id = $1 AND id = $2', ids);
+      if (!target.length) { res.status(404).json({ success: false, code: 'MEMBERSHIP_NOT_FOUND', error: '가입 행을 찾을 수 없습니다.' }); return; }
+      const changes = await AppDataSource.query(`SELECT h.id, h.action, h.before_role, h.after_role, h.before_status, h.after_status,
+        h.reason, h.created_at, u.name AS actor_name FROM community_membership_changes h
+        LEFT JOIN users u ON u.id = h.actor_user_id WHERE h.community_id = $1 AND h.membership_id = $2
+        ORDER BY h.created_at DESC, h.id DESC LIMIT 50`, ids);
+      res.json({ success: true, data: { changes } });
+    }),
+  );
+
+  for (const action of ['suspend', 'restore', 'withdraw'] as const) {
+    router.post(`/:communitySlug/memberships/:membershipId/${action}`,
+      apiLimiter, authenticate, resolveCommunity, requireCommunityScope('admin'),
+      asyncHandler(async (req, res) => {
+        try {
+          const data = await new CommunityMemberManagementService(AppDataSource).change({
+            communityId: req.community!.id, membershipId: String(req.params.membershipId),
+            actorUserId: (req as AuthRequest).user!.id, action: action as CommunityMemberAction,
+            reason: trimmed(bodyOf(req).reason),
+          });
+          res.json({ success: true, data });
+        } catch (error) { if (!sendLifecycleError(res, error)) throw error; }
+      }),
+    );
+  }
 
   // Forum creation requests keep the existing state machine and historical storage codes.
   // Scope is always resolved on the server, never from client serviceCode/organizationId.

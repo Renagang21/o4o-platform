@@ -173,7 +173,7 @@ describe('개설 승인 — 검사 2회차', () => {
 
     expect(out.outcome).toBe('created');
     const m = membershipOf(REQUESTER)!;
-    expect({ role: m.role, status: m.status }).toEqual({ role: 'operator', status: 'active' });
+    expect({ role: m.role, status: m.status }).toEqual({ role: 'admin', status: 'active' });
     expect(r.status).toBe('approved');
   });
 
@@ -369,16 +369,17 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
     const calls: Array<{ sql: string; params: unknown[] }> = [];
     const svc = new CommunityLifecycleService({
       query: async (sql: string, params: unknown[]) => {
+        if (sql.includes('FROM users u')) return [{ account_status: 'active', account_active: true, email_verified: true }];
         if (!sql.includes('SELECT c.id, c.slug, c.name')) return [];
         calls.push({ sql, params });
         return [{ id: 'c1', slug: 'alpha', name: 'Alpha', pending_count: 2 }];
       },
     } as any);
     const out = await svc.listOperatedCommunities('u-op');
-    expect(out).toEqual([{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2 }]);
+    expect(out).toEqual([{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2, canRestrictMembers: false }]);
     const sql = calls[0].sql.replace(/\s+/g, ' ');
     expect(calls[0].params).toEqual(['u-op', COMMUNITY_SERVICE_KEY]);
-    expect(sql).toMatch(/cm\.user_id = \$1 AND cm\.status = 'active' AND cm\.role = 'operator' AND c\.status = 'active'/);
+    expect(sql).toMatch(/cm\.user_id = \$1 AND cm\.status = 'active' AND cm\.role IN \('admin', 'operator'\) AND c\.status = 'active'/);
     expect(sql).toMatch(/sm\.service_key = \$2 AND sm\.status = 'active'/);
   });
 });
@@ -477,4 +478,11 @@ it.each(['creation', 'join'])('%s: 잠금 대기 중 먼저 완료된 메인 정
   await expect(approve).rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED', httpStatus: 409 });
   expect(beforeApplicantLock).toBeUndefined();
   expect(JSON.stringify(db)).toBe(before);
+});
+
+
+it('메인 이용이 정지되면 개별 admin 행이 남아도 운영 목록을 반환하지 않는다', async () => {
+  const query = jest.fn(async () => [{ account_status:'suspended', account_active:true, email_verified:true }]);
+  expect(await new CommunityLifecycleService({query} as any).listOperatedCommunities('admin')).toEqual([]);
+  expect(query).toHaveBeenCalledTimes(1);
 });

@@ -15,14 +15,15 @@ const store: {
   communities: Array<{ id: string; slug: string; name: string; status: string }>;
   memberships: Array<{ id: string; communityId: string; userId: string; role: string; status: string }>;
   centralOperators: string[];
+  centralAdmins: string[];
   serviceMemberships: Array<{ userId: string; status: string }>;
-} = { communities: [], memberships: [], serviceMemberships: [], centralOperators: [] };
+} = { communities: [], memberships: [], serviceMemberships: [], centralOperators: [], centralAdmins: [] };
 
 jest.mock('../../database/connection.js', () => ({
   AppDataSource: {
     // 운영자 수준의 서비스 가입 조회만 흉내낸다 (service_key 는 'community' 고정).
     query: async (_sql: string, params: string[]) =>
-      /FROM role_assignments ra/.test(_sql) ? (store.centralOperators.includes(params[0]) && store.serviceMemberships.some(s => s.userId === params[0] && s.status === 'active') ? [{ exists: 1 }] : []) : /FROM users u/.test(_sql) ? [{ account_status: 'active', account_active: true, email_verified: true }] : params[1] === 'community'
+      /FROM role_assignments ra/.test(_sql) ? ((params[1] ? store.centralAdmins : store.centralOperators).includes(params[0]) && store.serviceMemberships.some(s => s.userId === params[0] && s.status === 'active') ? [{ exists: 1 }] : []) : /FROM users u/.test(_sql) ? [{ account_status: 'active', account_active: true, email_verified: true }] : params[1] === 'community'
         ? store.serviceMemberships.filter((s) => s.userId === params[0]).map((s) => ({ status: s.status }))
         : [],
     getRepository: (entity: { name?: string }) => {
@@ -63,6 +64,7 @@ const WITHDRAWN_A = 'u-withdrawn-operator-a';
 
 function seed() {
   store.centralOperators = [];
+  store.centralAdmins = [];
   store.communities = [
     { id: C_A, slug: 'alpha', name: 'Alpha', status: 'active' },
     { id: C_B, slug: 'beta', name: 'Beta', status: 'active' },
@@ -94,7 +96,7 @@ const makeReq = (slug: string, userId?: string) =>
   ({ params: { communitySlug: slug }, user: userId ? { id: userId } : undefined }) as any;
 
 /** resolve → scope 를 순서대로 태우고 최종 통과 여부를 돌려준다. */
-async function run(slug: string, userId: string | undefined, level: 'member' | 'operator') {
+async function run(slug: string, userId: string | undefined, level: 'member' | 'operator' | 'admin') {
   const req = makeReq(slug, userId);
   const res = makeRes();
   let resolved = false;
@@ -210,5 +212,26 @@ describe('중앙 커뮤니티 운영자 지정', () => {
     store.centralOperators = ['u-central'];
     store.serviceMemberships.push({ userId: 'u-central', status: 'suspended' });
     expect((await run('alpha', 'u-central', 'operator')).passed).toBe(false);
+  });
+});
+
+
+describe('admin 전용 회원 제재 경계', () => {
+  beforeEach(seed);
+  it('개별 operator는 심사만, admin은 제재까지 가능하며 강등은 다음 요청부터 반영한다', async () => {
+    expect((await run('alpha', OPERATOR_A, 'admin')).passed).toBe(false);
+    store.memberships[0].role = 'admin';
+    expect((await run('alpha', OPERATOR_A, 'admin')).passed).toBe(true);
+    expect((await run('beta', OPERATOR_A, 'admin')).passed).toBe(false);
+    store.memberships[0].role = 'operator';
+    expect((await run('alpha', OPERATOR_A, 'admin')).passed).toBe(false);
+  });
+  it('중앙 service operator의 조기 통과는 admin 제재를 허용하지 않는다', async () => {
+    store.centralOperators = ['u-central'];
+    store.serviceMemberships.push({ userId: 'u-central', status: 'active' });
+    expect((await run('alpha', 'u-central', 'operator')).passed).toBe(true);
+    expect((await run('alpha', 'u-central', 'admin')).passed).toBe(false);
+    store.centralAdmins = ['u-central'];
+    expect((await run('alpha', 'u-central', 'admin')).passed).toBe(true);
   });
 });

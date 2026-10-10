@@ -1,6 +1,6 @@
 # 개별 커뮤니티 운영자·회원 관리 후속 TODO
 
-> **상태**: ACTIVE
+> **상태**: IMPLEMENTED (운영 적용·배포 미수행)
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 TODO → 문서·코드 조사 → TODO 수정 → 개발·push 지시
 
@@ -94,10 +94,10 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 ### 설계 이후 별도 구현 TODO
 
 - [ ] 자기 탈퇴 범위·이력 보존/열람 정책 확정
-- [ ] 새 역할·상태·이력 migration 및 테스트 DB 전환 검증
-- [ ] guard·지정 API·제재 lifecycle·이력 원자성 구현
-- [ ] 운영자 지정·회원 관리 화면 정비와 desktop/mobile 검증
-- [ ] 역할별 API·기존 로그인·다른 원장 불변·동시성 검증
+- [x] 새 역할·상태·이력 migration 및 테스트 DB 전환 검증
+- [x] guard·지정 API·제재 lifecycle·이력 원자성 구현
+- [x] 운영자 지정·회원 관리 화면 정비와 desktop/mobile 검증
+- [x] 역할별 API·기존 로그인·다른 원장 불변·동시성 검증
 - [ ] 운영 migration 적용 승인·main 병합·배포·실계정 검증
 
 이 후속 구현을 이번 승인 자격 수정의 완료로 간주하지 않는다.
@@ -120,3 +120,19 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 설계 상태를 DESIGNED로 갱신하고 역할 정본과 회원 관리 표준에는 런타임 구현 대기로 반영했다.
 새 기능 런타임 개발·migration은 아직 수행하지 않았으며 위 설계 이후 구현 TODO로 추적한다.
 권한 유효기간 SQL 회귀 1 suite / 18 tests도 추가 실행하여 PASS했다.
+
+## 확정 정책에 따른 런타임 구현 결과
+
+초기 설계 대기 기록 이후 사용자가 권한·기존 역할 전환을 확정하여 원래 개발·push 요청에 이어 구현했다.
+개별 admin/operator, admin 전용 제재, 역할·심사·제재 이력, UI 상태 필터·역할 선택·이력 조회를 구현했다.
+운영자 공백은 중앙 서비스 admin의 적격 후임 지정과 기존 중앙 심사 경로로 복구한다.
+신규 migration은 기준 bootstrap + 21 기존 incremental 이후 적용하며 지문은 6218행 / `30be348978adb3aa0b5b0c378517b232ee36038c6bdbbdac70780d3c8f86f4bb`다.
+
+- [x] 확정 개별 역할·제재 정책의 코드·문서 구현
+- [x] 실제 PostgreSQL 역할 전환·원장 불변·이력 rollback·동시 보호 검증
+- [x] API 타입 검사 및 Neture production build
+- [x] 회원 관리 UI Vitest 및 desktop/mobile mock API browser smoke
+- [ ] 최신 main 통합 후 최종 회귀·push·PR latest HEAD CI 확인
+
+자기 탈퇴와 이력 보존 기간/자동 삭제는 이번 admin 관리 탈퇴 구현과 별도 정책으로 남긴다.
+운영 migration·main 병합·배포는 push 완료 이후의 별도 승인 범위다.

@@ -235,3 +235,13 @@ describe('메인 자격 오류 HTTP 응답', () => {
     expect(response.body).toEqual({ success: false, error: '신청자의 이용 자격을 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
   });
 });
+
+
+it.each(['suspend','restore','withdraw'])('%s는 admin guard와 인증을 요구한다', action => {
+  expect(find('POST', `/:communitySlug/memberships/:membershipId/${action}`).guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});
+it('회원 이력도 admin guard로 한정한다', () => {
+  expect(find('GET','/:communitySlug/memberships/:membershipId/history').guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});

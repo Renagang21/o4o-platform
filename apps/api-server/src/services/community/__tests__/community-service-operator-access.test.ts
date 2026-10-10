@@ -3,13 +3,13 @@ import { hasCommunityServiceOperator } from '../community-service-operator-acces
 import { resolveCommunityWorkspace } from '../community-workspace.service.js';
 
 function executor(role: string | null, serviceStatus = 'active', accountStatus = 'active', communityStatus = 'active') {
-  const query = jest.fn(async (sql: string) => {
+  const query = jest.fn(async (sql: string, params: unknown[] = []) => {
     if (sql.includes('FROM users u')) return [{ account_status: accountStatus, account_active: true, email_verified: true }];
     if (sql.includes('FROM role_assignments ra')) {
       expect(sql).toContain("ra.role IN ('community:admin', 'community:operator')");
       expect(sql).toContain('ra.is_active = true');
       expect(sql).toContain("sm.service_key = 'community' AND sm.status = 'active'");
-      return serviceStatus === 'active' && ['community:admin', 'community:operator'].includes(role ?? '') ? [{ exists: 1 }] : [];
+      return serviceStatus === 'active' && ['community:admin', 'community:operator'].includes(role ?? '') && (!params[1] || role === 'community:admin') ? [{ exists: 1 }] : [];
     }
     if (sql.includes('FROM communities')) return [{ id: 'c1', name: 'Example', status: communityStatus }];
     return [];

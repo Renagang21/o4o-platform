@@ -8,7 +8,7 @@
  *   승인된 **일반 회원도 같은 `community_id`** 를 갖는다. ID 만 비교하면 회원이
  *   가입 승인 · 게시글 중재 같은 **운영 기능을 통과**한다.
  *   그래서 판정은 세 조건을 모두 본다 — 개체 일치 · `status='active'` ·
- *   (운영자를 요구할 때) `role='operator'`.
+ *   (운영자를 요구할 때) `role IN ('admin','operator')`.
  *
  * 분회(`kpa-branch-scope.middleware.ts`)와 같은 형태다. 다른 점은 분회가
  * `branch_memberships` 하나로 소속만 보는 반면, 커뮤니티는 **같은 테이블 안에서
@@ -17,7 +17,7 @@
  * 중앙 지정된 community Admin/Operator는 활성 서비스 소속과 현재 DB 역할을 확인해 운영한다.
  * 서비스 운영자는 해당 서비스의 활성 독립 커뮤니티를 관리한다. 다른 서비스 역할은 적용하지 않는다.
  */
-import { hasCommunityServiceOperator } from '../services/community/community-service-operator-access.js';
+import { hasCommunityServiceOperator, hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
 import { getNetureMainMembershipStatus } from '../modules/neture/services/neture-main-membership.js';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
@@ -34,7 +34,7 @@ declare global {
   }
 }
 
-export type CommunityScopeLevel = 'member' | 'operator';
+export type CommunityScopeLevel = 'member' | 'operator' | 'admin';
 
 export const COMMUNITY_NOT_FOUND = 'COMMUNITY_NOT_FOUND';
 export const COMMUNITY_MEMBERSHIP_REQUIRED = 'COMMUNITY_MEMBERSHIP_REQUIRED';
@@ -78,7 +78,7 @@ export const resolveCommunity: RequestHandler = async (req: Request, res: Respon
  * 개체 경계. `resolveCommunity` 다음에 쓴다.
  *
  *   level='member'    active 가입자만 (게시글 읽기·작성)
- *   level='operator'  active + role='operator' + 커뮤니티 서비스 가입 active (가입 승인 · 중재)
+ *   level='operator'  active + role IN ('admin','operator') + 커뮤니티 서비스 가입 active (가입 승인 · 중재)
  *
  * 운영자 수준은 서비스 가입(`service_memberships('community')`)도 본다. 서비스 이용이 정지된
  * 계정이 개체 행만 남아 있다고 심사 권한을 쓰면 안 된다(운영자 지정 경로와 같은 규칙).
@@ -104,7 +104,7 @@ export function requireCommunityScope(level: CommunityScopeLevel): RequestHandle
         res.status(403).json({ success: false, error: '메인 계정의 이메일 확인과 이용 상태를 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
         return;
       }
-      if (req.community.status === 'active' && await hasCommunityServiceOperator(AppDataSource, user.id)) {
+      if (req.community.status === 'active' && await (level === 'admin' ? hasCommunityServiceAdmin : hasCommunityServiceOperator)(AppDataSource, user.id)) {
         next();
         return;
       }
@@ -123,17 +123,17 @@ export function requireCommunityScope(level: CommunityScopeLevel): RequestHandle
       }
 
       // ③ 운영자 요구 시 역할
-      if (level === 'operator' && membership.role !== 'operator') {
+      if ((level === 'admin' && membership.role !== 'admin') || (level === 'operator' && !['admin', 'operator'].includes(membership.role))) {
         res.status(403).json({
           success: false,
           error: '이 커뮤니티의 운영자만 할 수 있습니다.',
-          code: COMMUNITY_OPERATOR_REQUIRED,
+          code: level === 'admin' ? 'COMMUNITY_ADMIN_REQUIRED' : COMMUNITY_OPERATOR_REQUIRED,
         });
         return;
       }
 
       // ④ 운영자 요구 시 서비스 가입 — 정지·탈퇴·미가입 계정은 개체 운영 기능을 쓸 수 없다.
-      if (level === 'operator') {
+      if (level !== 'member') {
         const sm: Array<{ status: string }> = await AppDataSource.query(
           `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
           [user.id, COMMUNITY_SERVICE_KEY],

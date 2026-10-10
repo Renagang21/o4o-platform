@@ -1,12 +1,12 @@
 # 개별 커뮤니티 admin/operator 및 회원 제재 설계
 
-> **상태**: DESIGNED · 권한·기존 역할 전환 정책 확정 · 런타임 구현 대기
+> **상태**: IMPLEMENTED · 작업 branch 구현·로컬 검증 · 운영 적용 대기
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 개별 admin/operator·회원 제재 설계 지시 · [후속 TODO](../work-orders/WO-O4O-COMMUNITY-OPERATOR-MEMBER-FOLLOWUP-V1.md)
 
 ## 1. 설계와 현재 구현의 구분
 
-이 문서는 개발 가능한 설계안이다. 새 역할·상태·API·migration이 이미 구현됐다는 뜻이 아니다.
+이 문서의 확정 설계를 작업 branch 코드와 migration에 반영했다. 운영 migration과 배포는 수행하지 않았다.
 현행 역할과 중앙 서비스 권한은 [역할 정본](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5,
 [서비스 회원 관리 표준](../platform/operator/O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1.md) §1.1을 따른다.
 사용자가 아래 권한표와 기존 operator → admin 전환을 확정했다. 정본에는 구현 대기 정책으로 반영하며 현행 코드 동작과 구분한다.
@@ -71,7 +71,7 @@ admin을 둘 이상 둘 수 있으며 단일 사용자로 제한하지 않는다
 ## 5. API·권한 판정
 
 기존 개별 심사 route를 유지하고 서버에서 현재 역할을 판정한다.
-새 제재 route 제안은 다음과 같다(미구현):
+구현된 제재 route는 다음과 같다:
 
 - POST /api/v1/communities/:communitySlug/memberships/:membershipId/suspend
 - POST /api/v1/communities/:communitySlug/memberships/:membershipId/restore
@@ -114,7 +114,7 @@ community_id, membership_id, actor_user_id, action, before/after role·status, r
 확정된 기존 operator → admin 전환은 기존 운영 담당을 보존하며 신규 admin 권한을 부여하는 정책 변경이다.
 서비스 역할이나 다른 공간 역할은 전환하지 않는다.
 불필요한 legacy operator alias를 추가하지 않는다. 실제 CHECK 제약과 데이터 전환은 검토된 새 migration으로 수행한다.
-이 단계에서는 migration 실행이나 운영 데이터를 변경하지 않는다.
+운영 migration은 실행하지 않는다. 격리 PostgreSQL 15에서 전체 기준 스키마·incremental replay, 기존 역할 전환 및 실제 동시성을 검증했다.
 
 ## 8. 영향 소비처와 완료 기준
 
@@ -133,3 +133,20 @@ operator 제재 403, A 역할의 B 제재 403/404, 마지막 admin 변경 409,
 A 제재의 B·서비스·공통 계정 불변, 동시 마지막 admin 변경 한 건 거절,
 이력 저장 실패 시 상태 rollback, 정지 해제로 탈퇴·중앙 역할 회수 우회 금지를 확인한다.
 실계정·실제 PostgreSQL 동시성 검증은 코드 단위 테스트와 별도로 수행한다.
+
+## 9. 구현·배포 경계
+
+작업 branch에 역할·상태, admin guard, 제재·이력 API, 중앙 역할 선택 및 회원 상태별 화면을 구현했다.
+역할 변경과 제재는 사유를 필수로 받고 actor·시각·before/after를 같은 트랜잭션으로 보존한다.
+이력 조회는 해당 커뮤니티 admin 또는 서비스 admin 전용이며 최근 50건을 반환한다.
+자기 탈퇴 API와 자동 이력 삭제는 도입하지 않았다. 해당 정책은 별도 결정 대상이다.
+
+migration은 기존 개별 operator 행만 admin으로 전환하고 가입 상태·다른 원장을 보존한다.
+기존 CHECK 제약을 확장하고 이력을 만들며 기존 historical migration은 수정하지 않는다.
+전환 후 down은 이력이나 새 역할·상태가 사용 중이면 거절하고 검토된 forward repair를 요구한다.
+
+배포 전에는 운영 DB의 역할 전환을 포함한 migration 적용 승인이 필요하다.
+현재 배포 방식은 migration을 새 API revision보다 먼저 적용하므로, 전환된 admin을 인식하지 못하는
+구버전 개별 운영 경로가 새 revision 서빙 전까지 일시 차단된다. 유지보수 시간과 새 revision의 성공·실패 복구 절차를 함께 검토한다.
+새 revision 배포가 실패하면 이전 operator-only 코드로 자동 data rollback하지 않고 중앙 서비스 운영자 경로와 검토된 forward 수정으로 복구한다.
+이번 작업은 코드·문서 push까지이며 이 운영 절차를 실행하지 않는다.

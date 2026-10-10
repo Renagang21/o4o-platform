@@ -3,7 +3,7 @@
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
  *
  * 커뮤니티 서비스 관리자(`community:admin`)가 아니라 **그 커뮤니티의 운영자**
- * (`community_memberships.role='operator'` · active)가 자기 커뮤니티의 가입 신청만 심사한다.
+ * (`community_memberships.role IN ('admin','operator')` · active)가 자기 커뮤니티의 가입 신청만 심사한다.
  * 실제 경계는 backend `resolveCommunity` → `requireCommunityScope('operator')` 다
  * (개체 일치 · 개체 가입 active · 운영자 역할 · 커뮤니티 서비스 가입 active).
  *
@@ -18,14 +18,15 @@ export interface OperatedCommunity {
   slug: string;
   name: string;
   pendingCount: number;
+  canRestrictMembers: boolean;
 }
 
-export type JoinRequestStatus = 'pending' | 'active' | 'rejected' | 'withdrawn';
+export type JoinRequestStatus = 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
 
 export interface JoinRequestRow {
   id: string;
   userId: string;
-  role: 'operator' | 'member';
+  role: 'admin' | 'operator' | 'member';
   status: JoinRequestStatus;
   createdAt: string;
   name: string | null;
@@ -63,4 +64,18 @@ export function canApproveJoin(row: Pick<JoinRequestRow, 'status' | 'serviceMemb
 export function communityOperatorErrorMessage(e: unknown, fallback: string): string {
   const d = (e as { response?: { data?: { error?: unknown } } })?.response?.data;
   return typeof d?.error === 'string' ? d.error : fallback;
+}
+
+export async function changeCommunityMember(slug: string, membershipId: string, action: 'suspend' | 'restore' | 'withdraw', reason: string): Promise<void> {
+  await api.post(`${BASE}/${encodeURIComponent(slug)}/memberships/${encodeURIComponent(membershipId)}/${action}`, { reason });
+}
+
+export interface CommunityMembershipChange {
+  id: string; action: string; before_role: string | null; after_role: string;
+  before_status: string | null; after_status: string; reason: string | null;
+  created_at: string; actor_name: string | null;
+}
+export async function listCommunityMemberHistory(slug: string, membershipId: string): Promise<CommunityMembershipChange[]> {
+  const res = await api.get(`${BASE}/${encodeURIComponent(slug)}/memberships/${encodeURIComponent(membershipId)}/history`);
+  return res.data?.data?.changes ?? [];
 }

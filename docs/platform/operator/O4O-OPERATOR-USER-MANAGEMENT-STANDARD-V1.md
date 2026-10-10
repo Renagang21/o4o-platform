@@ -1,6 +1,6 @@
 # O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
 
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-09 (본문 정합 — 운영자 비밀번호 변경 은퇴 · 목록 route · GlucoseView 은퇴 반영. 회원관리 API 표준 §4.4~§8 은 `apps/api-server/src/routes/operator/membership.routes.ts` 와 일치)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-10 (본문 정합 — 운영자 비밀번호 변경 은퇴 · 목록 route · GlucoseView 은퇴 반영. 회원관리 API 표준 §4.4~§8 은 `apps/api-server/src/routes/operator/membership.routes.ts` 와 일치)
 > (2026-10-04 정합) **운영자의 회원 비밀번호 변경은 은퇴했다** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`([CHECK](../../checks/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md): admin/operator password 변경 surface 0 · PasswordModal 제거). 이후 도입된 이메일 · 비밀번호 로그인([CHECK](../../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md))은 **사용자 본인**의 인증 수단(가입 · 재설정 · 로그인 상태 `POST /auth/password`)이며 Admin 화면 · `platform:*` 세션은 Google 전용이다. 운영자가 대신 바꾸는 비밀번호 경로는 없다. 아래 §3.2 · §4.2 · §6.1 의 비밀번호 항목은 무효.
 
 > **O4O 운영자 회원관리 표준 v1**
@@ -68,8 +68,8 @@
 
 운영 가능한 개별 운영자가 없어도 중앙에서 지정한 활성 `community:admin/operator`는 메인·서비스 자격을 확인한 뒤 활성 독립 커뮤니티 가입 심사를 수행한다(역할 정본 §5). 서비스 admin은 적격 active 개체 회원을 후임 운영자로 지정할 수 있다. 적격 회원이 없으면 공통 계정 상태는 중앙 계정 관리에서, 서비스 상태는 해당 서비스 회원 관리에서 먼저 처리하고 가입 심사·지정을 진행한다. 개별 지정이나 승인이 계정·서비스 처분을 복구하지 않는다.
 
-개별 운영자 지정·해제는 `community:admin`이 담당한다. 지정 후보와 해제 후 남을 운영자는 메인 이용 자격과 `community` 서비스 가입이 활성 상태여야 한다. 이 보호는 역할 해제 시점의 판정이며 중앙 계정 관리나 서비스 정지 자체를 금지하지 않는다.
-사용자 확정 개별 커뮤니티 정비 정책(2026-10-10 · 구현 대기): 개별 operator는 조회·승인·반려, 개별 admin은 정지·해제·커뮤니티 탈퇴를 담당한다. 기존 개별 operator는 admin으로 전환하고 두 역할의 지정·회수는 community 서비스 admin 전용이다. 새 개별 제재는 해당 커뮤니티 가입에만 적용한다. 현행 runtime은 아직 operator/member이므로 [확정 설계와 구현 TODO](../../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)를 구분하여 따른다.
+개별 운영자 지정·해제는 `community:admin`이 담당한다. 지정 후보와 해제 후 남을 유효 admin은 메인 이용 자격과 `community` 서비스 가입이 활성 상태여야 한다. 이 보호는 역할 해제 시점의 판정이며 중앙 계정 관리나 서비스 정지 자체를 금지하지 않는다.
+사용자 확정 개별 커뮤니티 정비 정책(2026-10-10 · branch 구현 완료 · 운영 적용 대기): 개별 operator는 조회·승인·반려, 개별 admin은 정지·해제·커뮤니티 탈퇴를 담당한다. 기존 개별 operator는 admin으로 전환하고 두 역할의 지정·회수는 community 서비스 admin 전용이다. 새 개별 제재는 해당 커뮤니티 가입에만 적용한다. 현행 runtime은 아직 operator/member이므로 [확정 설계와 구현 TODO](../../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)를 구분하여 따른다.
 
 K-Cosmetics·Pharmacy-Hub 웹 서비스는 은퇴했으므로 공통 API의 역사적 데이터 경계 회귀만 유지하고 화면을 복구하지 않는다.
 구현·검증 범위는 [경계 수정 WO](../../work-orders/WO-O4O-SERVICE-OPERATOR-MEMBERSHIP-BOUNDARY-FIX-V1.md)를 참조한다.
@@ -483,3 +483,13 @@ WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
 
 *확정: 2026-03-18*
 *상태: 표준 v1 확정*
+
+
+### 개별 회원 관리 구현 (2026-10-10 · 미배포)
+
+개별 admin/operator는 심사하고 admin만 정지·해제·관리 탈퇴한다. 서비스 admin/operator의 심사 범위는 유지하며 제재는 서비스 admin만 허용한다.
+서비스 admin이 두 개별 역할을 지정·회수한다. 지정은 active 개별 가입과 메인·서비스 자격을 확인하고, 비활성 역할 회수는 가입 상태를 복구하지 않는다.
+마지막 유효 admin의 강등·회수·정지·탈퇴는 보호한다. 커뮤니티 행 잠금과 최신 DB 판정으로 동일 커뮤니티의 동시 변경을 직렬화한다.
+변경 이력은 actor·시각·사유·before/after를 상태·역할 변경과 같은 트랜잭션에 남기며 이력 저장 실패는 변경도 rollback한다.
+정지 회원은 재가입 신청으로 우회할 수 없고 탈퇴 회원은 다시 pending/member로 신청해야 한다.
+운영 DB 전환과 배포는 [개별 설계](../../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md) §9를 따른다.

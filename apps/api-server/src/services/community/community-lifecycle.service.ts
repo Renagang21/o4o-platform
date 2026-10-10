@@ -1,4 +1,5 @@
-import { hasCommunityServiceOperator } from './community-service-operator-access.js';
+import { recordCommunityMembershipChange } from './community-membership-mutations.js';
+import { hasCommunityServiceOperator, hasCommunityServiceAdmin } from './community-service-operator-access.js';
 /**
  * Community Lifecycle — 개설 신청 · 승인 · 가입
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3-2
@@ -24,7 +25,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from '../auth/demo-account.service.js';
-import { assertNetureMainMembershipActive, NETURE_MAIN_SERVICE_KEY } from '../../modules/neture/services/neture-main-membership.js';
+import { assertNetureMainMembershipActive, getNetureMainMembershipStatus, NETURE_MAIN_SERVICE_KEY } from '../../modules/neture/services/neture-main-membership.js';
 import { independentCommunityKeyTaken } from './community-key-namespace.js';
 import { Community } from '../../entities/Community.js';
 import { CommunityMembership } from '../../entities/CommunityMembership.js';
@@ -196,16 +197,18 @@ export class CommunityLifecycleService {
       );
 
       // 신청자가 **그 커뮤니티의** 첫 운영자가 된다 — 서비스 전체 역할은 주지 않는다.
-      await m.getRepository(CommunityMembership).save(
+      const initialAdmin = await m.getRepository(CommunityMembership).save(
         m.getRepository(CommunityMembership).create({
           communityId: community.id,
           userId: request.requesterUserId,
-          role: 'operator',
+          role: 'admin',
           status: 'active',
           approvedByUserId: input.reviewerUserId,
           approvedAt: new Date(),
         }),
       );
+
+      await recordCommunityMembershipChange(m, { communityId: community.id, membershipId: initialAdmin.id, actorUserId: input.reviewerUserId, action: 'create', beforeRole: null, afterRole: 'admin', beforeStatus: null, afterStatus: 'active' });
 
       request.status = 'approved';
       request.reviewedByUserId = input.reviewerUserId;
@@ -227,7 +230,7 @@ export class CommunityLifecycleService {
       const existing = await repo.findOne({
         where: { communityId: input.communityId, userId: input.userId },
       });
-      if (existing && (existing.status === 'active' || existing.status === 'pending')) {
+      if (existing && ['active', 'pending', 'suspended'].includes(existing.status)) {
         throw new CommunityLifecycleError('ALREADY_MEMBER', '이미 가입했거나 승인 대기 중입니다.', 409);
       }
       if (existing) {
@@ -258,6 +261,7 @@ export class CommunityLifecycleService {
       // 기존 서비스 처분을 개별 승인으로 해제하지 않는다. 실패하면 신청은 pending 으로 남는다.
       await assertApplicantMainActive(m, membership.userId);
       await ensureServiceMembership(m, membership.userId);
+      await recordCommunityMembershipChange(m, { communityId: input.communityId, membershipId: membership.id, actorUserId: input.reviewerUserId, action: 'approve', beforeRole: membership.role, afterRole: membership.role, beforeStatus: membership.status, afterStatus: 'active' });
       membership.status = 'active';
       membership.approvedByUserId = input.reviewerUserId;
       membership.approvedAt = new Date();
@@ -374,8 +378,10 @@ export class CommunityLifecycleService {
    * 아니면 빈 목록이다(심사 경로가 어차피 403 이므로 화면에 들이지 않는다).
    */
   async listOperatedCommunities(userId: string): Promise<
-    Array<{ id: string; slug: string; name: string; pendingCount: number }>
+    Array<{ id: string; slug: string; name: string; pendingCount: number; canRestrictMembers: boolean }>
   > {
+    if (await getNetureMainMembershipStatus(this.dataSource, userId) !== 'active') return [];
+    const canRestrictMembers = await hasCommunityServiceAdmin(this.dataSource, userId);
     if (await hasCommunityServiceOperator(this.dataSource, userId)) {
       const rows: any[] = await this.dataSource.query(
         `SELECT c.id, c.slug, c.name,
@@ -383,20 +389,20 @@ export class CommunityLifecycleService {
              WHERE p.community_id = c.id AND p.status = 'pending') AS pending_count
          FROM communities c WHERE c.status = 'active' ORDER BY c.name ASC`,
       );
-      return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0) }));
+      return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0), canRestrictMembers }));
     }
     const rows: any[] = await this.dataSource.query(
-      `SELECT c.id, c.slug, c.name,
+      `SELECT c.id, c.slug, c.name, cm.role,
               (SELECT COUNT(*)::int FROM community_memberships p
                 WHERE p.community_id = c.id AND p.status = 'pending') AS pending_count
          FROM community_memberships cm
          JOIN communities c ON c.id = cm.community_id
          JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2 AND sm.status = 'active'
-        WHERE cm.user_id = $1 AND cm.status = 'active' AND cm.role = 'operator' AND c.status = 'active'
+        WHERE cm.user_id = $1 AND cm.status = 'active' AND cm.role IN ('admin', 'operator') AND c.status = 'active'
         ORDER BY c.name ASC`,
       [userId, COMMUNITY_SERVICE_KEY],
     );
-    return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0) }));
+    return rows.map((r) => ({ id: r.id, slug: r.slug, name: r.name, pendingCount: Number(r.pending_count ?? 0), canRestrictMembers: r.role === 'admin' }));
   }
 
   /** 가입 거절 — 승인과 같은 개체 운영자가 한다. */
@@ -409,6 +415,8 @@ export class CommunityLifecycleService {
     return this.dataSource.transaction(async (m) => {
       const repo = m.getRepository(CommunityMembership);
       const membership = await loadPendingMembership(m, input.communityId, input.membershipId);
+      await recordCommunityMembershipChange(m, { communityId: input.communityId, membershipId: membership.id, actorUserId: input.reviewerUserId, action: 'reject', beforeRole: membership.role, afterRole: membership.role, beforeStatus: membership.status, afterStatus: 'rejected', reason: input.reason?.slice(0, 1000) });
+      membership.approvedAt = new Date();
       membership.status = 'rejected';
       membership.approvedByUserId = input.reviewerUserId;
       // 거절은 service_memberships 를 만들지 않는다.
