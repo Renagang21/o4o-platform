@@ -69,7 +69,8 @@ export function scopedCountQuery(table, columns) {
 
 export async function collectDemoStoreCensus(client) {
   await client.query('BEGIN READ ONLY');
-  let originalError;
+  let failure;
+  let census;
   try {
     await client.query("SET LOCAL statement_timeout='15s'");
     const demos = (await client.query(queries.demos)).rows;
@@ -80,24 +81,25 @@ export async function collectDemoStoreCensus(client) {
     const memberships = (await client.query(queries.memberships)).rows;
     const relationshipColumns = (await client.query(queries.columns)).rows;
     const foreignKeys = (await client.query(queries.foreignKeys)).rows;
-    const tableCounts = [];
-    for (const table of new Set(relationshipColumns.map(row => row.table_name))) {
+    const tables = [...new Set(relationshipColumns.map(row => row.table_name))];
+    // pg uses one connection, so queued counts stay inside this transaction.
+    const tableCounts = await Promise.all(tables.map(async table => {
       const columns = relationshipColumns.filter(row => row.table_name === table).map(row => row.column_name);
       const result = await client.query(scopedCountQuery(table, columns));
-      tableCounts.push({ table, ...result.rows[0] });
-    }
+      return { table, ...result.rows[0] };
+    }));
     // Aggregates/schema metadata only; no user/organization IDs, names or row contents.
-    return { readOnly: true, demos, organizations, memberships, relationshipColumns, foreignKeys, tableCounts };
+    census = { readOnly: true, demos, organizations, memberships, relationshipColumns, foreignKeys, tableCounts };
   } catch (error) {
-    originalError = error;
-    throw safeInventoryError(error, 'demo-census');
-  } finally {
-    try {
-      await client.query('ROLLBACK');
-    } catch (error) {
-      if (!originalError) throw safeInventoryError(error, 'demo-rollback');
-    }
+    failure = safeInventoryError(error, 'demo-census');
   }
+  try {
+    await client.query('ROLLBACK');
+  } catch (error) {
+    failure ??= safeInventoryError(error, 'demo-rollback');
+  }
+  if (failure) throw failure;
+  return census;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
