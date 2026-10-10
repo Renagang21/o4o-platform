@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: core.isAuthenticated,
         isLoading: core.isLoading,
-        refreshAuth: core.refresh,
+        refreshAuth: core.refreshForAccess,
         loginWithEmail: core.loginWithEmail,
         loginWithGoogle: core.loginWithGoogle,
         signupWithGoogle: core.signupWithGoogle,

@@ -167,6 +167,8 @@ export interface ServiceAuthCore<TUser> {
   logout: () => Promise<void>;
   /** 세션 재확인(기존 KPA `checkAuth` 와 동일 의미). */
   refresh: () => Promise<void>;
+  /** Foreground permission recheck: transient errors reject without clearing the session. */
+  refreshForAccess: () => Promise<void>;
   /** 서비스 고유 액션이 사용자 상태를 갱신해야 할 때(예: KPA me-context merge). */
   setUser: React.Dispatch<React.SetStateAction<TUser | null>>;
 }

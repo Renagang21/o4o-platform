@@ -10,7 +10,7 @@
  * RoleGuard:  하위 호환. allowedRoles 단순 체크
  */
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { CommunityAccessDenied } from './CommunityAccessDenied';
 import { createRouteGuard } from '@o4o/auth-react';
@@ -69,12 +69,23 @@ function CommunityOperatorRoute({ children, level, fallback }: {
   const userId = user?.id;
   const key = `${userId ?? ''}:${location.pathname}`;
   const [verified, setVerified] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
+  const recheck = useCallback(async () => {
+    await refreshAuth();
+    setFailed(null);
+    setVerified(key);
+  }, [refreshAuth, key]);
   useEffect(() => {
     if (!isAuthenticated || !userId) return;
     let active = true;
-    void refreshAuth().finally(() => { if (active) setVerified(key); });
+    void refreshAuth().then(() => {
+      if (active) { setFailed(null); setVerified(key); }
+    }).catch(() => { if (active) setFailed(key); });
     return () => { active = false; };
   }, [key, userId, isAuthenticated, refreshAuth]);
+  if (isAuthenticated && failed === key) {
+    return <CommunityAccessDenied verificationFailed onRecheck={recheck} />;
+  }
   if (isAuthenticated && verified !== key) {
     return <p role="status" className="p-8">커뮤니티 운영 권한을 확인하고 있습니다…</p>;
   }

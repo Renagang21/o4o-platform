@@ -16,7 +16,7 @@ let serverUser: User;
 const requests = vi.fn();
 function Harness({ initial, level = 'admin' }: { initial: User; level?: 'admin' | 'operator' }) {
   const [user, setUser] = useState(initial);
-  const refreshAuth = useCallback(async () => { requests(); setUser(serverUser); }, []);
+  const refreshAuth = useCallback(async () => { await requests(); setUser(serverUser); }, []);
   const auth = { user, isAuthenticated: true, isLoading: false, refreshAuth } as Auth;
   return <Context.Provider value={auth}><MemoryRouter initialEntries={['/admin/communities']}>
     <SubdomainOperatorRoute serviceKey="community" level={level}><p>관리 목록</p></SubdomainOperatorRoute>
@@ -24,7 +24,7 @@ function Harness({ initial, level = 'admin' }: { initial: User; level?: 'admin' 
 }
 beforeEach(() => {
   vi.mocked(useAuth).mockImplementation(() => useContext(Context)!);
-  requests.mockClear();
+  requests.mockReset();
 });
 afterEach(cleanup);
 
@@ -68,5 +68,27 @@ describe('community 관리 진입 시 최신 역할 확인', () => {
     fireEvent.click(screen.getByRole('button', { name: '권한 다시 확인' }));
     await screen.findByText('관리 목록');
     expect(requests).toHaveBeenCalledTimes(2);
+  });
+});
+
+
+describe('community recheck failure recovery', () => {
+  it('initial network failure does not open the page using stale Admin roles', async () => {
+    serverUser = viewer(['community:admin']);
+    requests.mockRejectedValueOnce(new Error('temporary failure'));
+    render(<Harness initial={serverUser} />);
+    await screen.findByText('권한을 확인하지 못했습니다');
+    expect(screen.queryByText('관리 목록')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '권한 다시 확인' }));
+    await screen.findByText('관리 목록');
+  });
+  it('button recheck failure shows retry guidance rather than a success notice', async () => {
+    serverUser = viewer([]);
+    render(<Harness initial={serverUser} />);
+    await screen.findByRole('button', { name: '권한 다시 확인' });
+    requests.mockRejectedValueOnce(new Error('temporary failure'));
+    fireEvent.click(screen.getByRole('button', { name: '권한 다시 확인' }));
+    await screen.findByText('권한을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    expect(screen.queryByText('관리 목록')).toBeNull();
   });
 });
