@@ -92,6 +92,11 @@ export async function settleOperation(name, readOperation, { now = Date.now, sle
   throw error;
 }
 
+export async function loadProbes(mode, raw, file, read = readFile) {
+  if (mode === 'plan') return '';
+  return raw || (file ? await read(file, 'utf8') : '');
+}
+
 export async function runCutover({ mode, probes, read, validate, replace, verify, save, preflight, beforeWrite, retireHost = false }) {
   const before = await read();
   validateHosts(before);
@@ -161,7 +166,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   await mkdir(output, { recursive: true, mode: 0o700 });
   const result = await runCutover({
     retireHost: process.env.RETIRE_PH_HOST === 'true',
-    mode, probes: process.env.QR_PROBE_PATHS || (process.env.PROBE_OUTPUT ? await readFile(process.env.PROBE_OUTPUT, 'utf8') : ''),
+    mode, probes: await loadProbes(mode, process.env.QR_PROBE_PATHS, process.env.PROBE_OUTPUT),
     preflight: paths => verifyTargets(paths),
     beforeWrite: () => {
       const deadline = Number(process.env.CUTOVER_DEADLINE_MS);

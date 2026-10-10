@@ -42,3 +42,7 @@
 - [ ] PH 전용 데이터 삭제는 사용자 승인 완료. 전용 귀속·FK·타 서비스 영향 확인 후 수행하며 실제 실행은 아직 하지 않음.
 
 사용자 지정 worktree는 동일 폐기 WO의 연속 phase로 재사용하고 최신 main 기준 `wo/pharmacyhub-qr-retirement-validation`에서 수행한다. 과거 집계·네 probe 필수 기록은 당시 기록이며 현재 범위는 이 TODO를 따른다.
+
+## PR #422 리뷰 대응
+
+전체 호스트 plan은 Cloud SQL proxy·운영 경로 inventory·private probe 파일 읽기를 건너뛰며 URL map 조회·검증만 수행한다. apply는 실제 QR/tablet 경로 검증을 유지한다. 현재 사용자 승인에 따라 서비스 baseline의 PH 전용 데이터 보존 계약을 완전 폐기 정책으로 정렬했고 기존 WO는 이전 단계 기록으로 유지했다. 공용·Neture 데이터는 제외한다. 사용자 제공 IAM 결과에서 URL map update·global operation 조회 권한 추가를 확인했다. 실제 plan/apply 결과는 후속 실행으로 확인한다.

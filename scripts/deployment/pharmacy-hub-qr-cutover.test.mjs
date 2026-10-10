@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
+import { loadProbes, runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
 
 test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
   const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
@@ -164,4 +164,12 @@ test('both root and www must return 302 with the original path and query intact'
   assert.equal(calls, 12);
   await assert.rejects(verifyRedirects(paths, async () => new Response(null, { status: 200 })), /302 redirect/);
   await assert.rejects(verifyRedirects(paths, async () => new Response(null, { status: 404 })), /HTTP 200/);
+});
+
+test('plan never depends on a private inventory file; apply still loads it', async () => {
+  const unavailable = async () => { throw new Error('inventory unavailable'); };
+  assert.equal(await loadProbes('plan', '', '/missing/inventory', unavailable), '');
+  await assert.rejects(loadProbes('apply', '', '/missing/inventory', unavailable), /inventory unavailable/);
+  assert.equal(await loadProbes('apply', '/qr/active\n/tablet/store', '/missing/inventory', unavailable), '/qr/active\n/tablet/store');
+  assert.equal(await loadProbes('apply', '', '/private/inventory', async () => '/qr/active\n/tablet/store'), '/qr/active\n/tablet/store');
 });

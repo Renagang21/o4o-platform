@@ -94,7 +94,7 @@ jobs:
           project_id: netureyoutube
           skip_install: true
       - name: Start authenticated Cloud SQL proxy for read-only inventory
-        if: inputs.demo_census == true || inputs.demo_relink == true || inputs.probe_paths == ''
+        if: inputs.demo_census == true || inputs.demo_relink == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan'))
         run: |
           docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
             --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
@@ -117,7 +117,7 @@ jobs:
             process.exit(1);
           '
       - name: Collect existing active public paths without database writes
-        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.probe_paths == ''
+        if: inputs.demo_census != true && inputs.demo_relink != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
         env:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
