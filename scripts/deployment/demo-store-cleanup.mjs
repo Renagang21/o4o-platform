@@ -64,17 +64,18 @@ async function inventory(client, keep, targets) {
     FROM users`)).rows[0];
   return { owner,keeper,roots,candidates,accounts };
 }
-function guardRow(table,row,targetIds) {
+function guardRow(table,row,state) {
+  const targetIds=state.targetIds;
   if (['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots'].includes(table)) throw new CleanupStop('Protected entity referenced by deletion');
   if (table==='organizations' && !targetIds.has(row.id)) throw new CleanupStop('Retained organization dependency');
-  for (const key of ['organization_id','store_id']) {
+  for (const key of new Set(['organization_id','store_id',...(state.organizationColumns.get(table) || [])])) {
     if (row[key] != null && !targetIds.has(String(row[key]))) throw new CleanupStop('Shared retained-store row requires explicit disposition');
   }
 }
 function addRows(state,table,rows) {
   const target=state.rows.get(table) || new Map();let added=false;
   for (const row of rows) {
-    guardRow(table,row,state.targetIds);
+    guardRow(table,row,state);
     const key=rowKey(table,row,state.keys.get(table));
     if (!target.has(key)) {target.set(key,row);added=true;}
   }
@@ -102,7 +103,12 @@ async function buildGraph(client,roots) {
   const columns=(await client.query(metadataSql.columns)).rows;
   const keys=(await client.query(metadataSql.keys)).rows;
   const edges=(await client.query(metadataSql.edges)).rows;
-  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),targetIds:new Set(roots.map(x=>x.id))};
+  const organizationColumns=new Map();
+  for (const edge of edges.filter(e=>e.parent==='organizations' && e.child!=='organizations')) {
+    if (edge.parent_columns.length!==1 || edge.parent_columns[0]!=='id') throw new CleanupStop('Non-ID organization reference requires explicit review');
+    organizationColumns.set(edge.child,[...(organizationColumns.get(edge.child) || []),...edge.child_columns]);
+  }
+  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),organizationColumns,targetIds:new Set(roots.map(x=>x.id))};
   addRows(state,'organizations',roots);
   // Include logical store ownership even where legacy schemas have no FK.
   const scopes=columns.filter(x=>['organization_id','store_id','target_organization_id'].includes(x.column_name) && x.table_name!=='organizations');
