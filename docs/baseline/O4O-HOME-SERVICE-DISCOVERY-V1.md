@@ -86,3 +86,5 @@
 검증 기준은 로그인 전후 전체 목록 노출, AI 첫 화면 배치, 세 사업 팝업, Partner 설명 페이지·메인 복귀·문의 링크, 모바일·키보드 접근, 준비 중 항목의 가입/업무 권한 미생성이다. 서비스별 Home 제거·공개 커뮤니티/강의 접근·항목별 이용 자격·로그인 요구·Contact Us 배치도 검증한다. 코드·운영 반영 완료는 후속 PR과 검증 결과로 별도 기록한다.
 
 관련 정본: [서브도메인 의미](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md), [역할·업무공간](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [인증·가입](O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md).
+
+사업 참여자 공간은 community_key 설정을 가입 자격으로 취급하지 않는다. 기존 연결 주소가 없으면 `business:<businessKey>`를 서버에서 해당 사업의 `sf:<UUID>` 원장에 해석하여 같은 승인·소속·운영자 조건을 적용한다. 게시판 개설은 이 공간에서 명시적으로 신청·처리하며 기본 주소 조회가 DB 생성이나 자동 승인을 수행하지 않는다.
