@@ -279,6 +279,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - route / menu / layout 변경은 desktop·mobile을 각각 확인한다.
   신규 route는 메뉴 진입·직접 URL과 기존 route 회귀를 확인한다.
 - 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`다(로컬 전용).
+  파일 위치·새 clone/클라우드에서 누락되는 이유·확보 절차는 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
+  현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed/Demo 계정으로 대체하지 않는다.
   운영 계정 사용과 자격증명의 코드·문서·커밋 복사를 금지한다.
 - 중간·완료 보고는 **한국어**로 작성하고 파일명·route·API·command·commit SHA 등 기술 식별자는 원문 유지한다.
 - 긴 diff 대신 변경 / 검증 / 미해결 / Git 상태 중심으로 보고한다.
