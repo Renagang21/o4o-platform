@@ -25,6 +25,8 @@ PR #384 생성 후 GitHub API 접근이 가능해졌다. 현재 cloud executor�
 
 ## 검증
 
+2026-10-10: 운영자가 WIF provider에 QR workflow를 추가하고 DB password secret 한정 accessor binding을 적용했다. run `38015058829`는 WIF·proxy 시작 후 읽기 전용 inventory에서 실패했다. 기존 catch가 연결/SQL 원인을 숨겨 이 시점의 DB 연결 성공·schema 일치를 주장할 수 없다. 동일 WO의 진단 phase는 최신 main에서 `wo/pharmacyhub-qr-inventory-diagnostics`를 생성하고 지정 worktree를 재사용한다. 오류 원문 대신 실패 단계와 허용된 오류 코드만 출력하며 실제 credential·row·SQL 원문은 출력하지 않는다. 운영 리다이렉트 적용은 미실행이다.
+
 2026-10-09: PR #384는 CI Gate 통과 및 두 review finding 해결 후 `ac27c38c6005f2464a13ed74a3d604a642412482`로 병합됐다. `plan` dispatch는 job-level env에서 지원하지 않는 `runner.temp` context 때문에 HTTP 422로 거절됐으며 운영 실행·변경은 없었다. 동일 WO의 연속 수정으로 사용자 지정 worktree를 유지하고 최신 main 기준 `wo/pharmacyhub-qr-runtime-paths`를 생성했다. 임시 경로는 첫 step에서 `RUNNER_TEMP`를 통해 GITHUB_ENV에 전달하도록 수정한다.
 
 QR 전환·복구·읽기 전용 경로 수집 node:test 16개와 기존 CI 스크립트 node:test 352개 통과. 두 workflow의 YAML parse·diff whitespace·문서 민감정보 검사 통과. QR 테스트는 blocking CI에도 연결한다. GCP URL map API 호출·실제 WIF 권한·운영 HTTP 응답·브라우저/실기기 검증은 아직 실행하지 않았다.
