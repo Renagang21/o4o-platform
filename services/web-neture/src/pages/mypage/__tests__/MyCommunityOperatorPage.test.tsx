@@ -106,6 +106,19 @@ describe('MyCommunityOperatorPage', () => {
     expect(rejectButtons[1].disabled).toBe(false);
   });
 
+  it.each(['withdrawn', 'rejected', 'pending'])('서비스 %s 신청자는 승인 버튼을 막고 거절은 허용한다', async (status) => {
+    get.mockImplementation((url: string) => {
+      if (url === '/communities/operating') return ok({ communities: [{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 1 }] });
+      return ok({ memberships: [{ ...pendingRows[0], serviceMembershipStatus: status }] });
+    });
+    mount();
+    await screen.findByText('홍길동');
+    const approve = screen.getByRole('button', { name: '승인' }) as HTMLButtonElement;
+    expect(approve.disabled).toBe(true);
+    expect(approve.title).toContain('서비스 회원 관리');
+    expect((screen.getByRole('button', { name: '거절' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
   it('승인은 그 커뮤니티 slug 의 개체 경로로 나간다', async () => {
     mount();
     fireEvent.click((await screen.findAllByRole('button', { name: '승인' }))[0]);
@@ -155,10 +168,15 @@ describe('MyCommunityOperatorPage', () => {
 });
 
 describe('canApproveJoin', () => {
-  it('pending 이고 정지가 아닐 때만', () => {
+  it('pending 이고 최초 가입 또는 활성 서비스 회원일 때만', () => {
     expect(canApproveJoin({ status: 'pending', serviceMembershipStatus: 'active' })).toBe(true);
     expect(canApproveJoin({ status: 'pending', serviceMembershipStatus: null })).toBe(true);
     expect(canApproveJoin({ status: 'pending', serviceMembershipStatus: 'suspended' })).toBe(false);
     expect(canApproveJoin({ status: 'active', serviceMembershipStatus: 'active' })).toBe(false);
   });
+});
+
+// 최초 가입과 기존 서비스 회원 재활성화는 구분한다.
+it.each(['withdrawn', 'rejected', 'pending', 'suspended'])('서비스 %s 신청자는 승인할 수 없다', (status) => {
+  expect(canApproveJoin({ status: 'pending', serviceMembershipStatus: status })).toBe(false);
 });

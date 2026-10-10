@@ -56,7 +56,7 @@ export async function rejectJoinRequest(slug: string, membershipId: string, reas
 
 /** 심사 대상 행에서 승인 버튼을 열어도 되는가 — 판정은 backend, 이것은 안내용. */
 export function canApproveJoin(row: Pick<JoinRequestRow, 'status' | 'serviceMembershipStatus'>): boolean {
-  return row.status === 'pending' && row.serviceMembershipStatus !== 'suspended';
+  return row.status === 'pending' && (row.serviceMembershipStatus === null || row.serviceMembershipStatus === 'active');
 }
 
 /** 백엔드 오류 메시지 — `{ success:false, error, code }` 표준. */
