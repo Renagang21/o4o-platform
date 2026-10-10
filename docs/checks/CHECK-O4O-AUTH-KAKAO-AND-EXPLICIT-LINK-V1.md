@@ -211,3 +211,26 @@ CI Gate이고, 정식 CI·CodeQL·verified production 배포·운영 회귀는 �
 
 문서 정합: 상위 WO와 4-B/4-C TODO의 main/배포 미실행 설명을 실제 결과로 정정했다.
 운영 코드 배포, Kakao 설정 활성화, 실제 외부 OAuth 완료를 각각 구분하고 기존 OPEN을 유지한다.
+
+### 후속 환경·조회 재확인 (2026-10-10)
+
+동일 WO의 준비된 격리 checkout과 도구가 복원됐다. 실행 환경 revision 12의 현재 설정에는
+앞서 추가한 두 로그 저장소 도메인과 `sonarcloud.io`가 포함돼 있고, 설정 읽기의 draft는
+없는 상태였다. network 관측은 `unknown`이므로 정책 적용을 `enforced`로 단정하지 않는다.
+Neture 홈과 API Kakao config의 HTTPS 요청은 HTTP 200으로 확인했다.
+
+Sonar dashboard와 공개 API는 이번 조회에서 proxy tunnel 오류 대신 원격 HTTP 403의
+HTML 오류 응답을 반환했다. 이전 tunnel 403과 구분하며 도메인 추가만으로 상세 분석이
+가능해졌다고 판단하지 않는다. main 분석의 구체적인 인증 변경 영향은 계속 OPEN이다.
+
+main WIF metadata 재조회 [#38024302858](https://github.com/Renagang21/o4o-platform/actions/runs/38024302858)는
+GCP 인증·project/Cloud Run 조회 SUCCESS, Kakao metadata 단계 FAIL이다. 상세 로그의
+redirect host `productionresultssa14.blob.core.windows.net`는 proxy tunnel 403으로 차단돼
+이번 실패의 세부 이유는 아직 미확인이다. 이전에 확인한 목록 조회 권한 거절과 동일 원인으로
+단정하지 않으며, 리소스 부재·IAM 권한 추가 완료도 주장하지 않는다. 기존 설정을 보존하고
+해당 host만 새 환경 초안에 추가했다. 저장은 확인했으나 새 초안의 게시·접근 반영은 미확인이다.
+
+PR #396 통합 준비에서 최신 main `b9f0a920cb`를 동일 WO 브랜치에 merge해 기존 커뮤니티
+변경을 보존했다. main 대비 변경은 CHECK·WO 세 문서뿐이며 이 기록의 Delivery 분류는
+문서 전용 `NOT_APPLICABLE`이다. Kakao 활성화를 위한 새 운영 배포와 실제 소유자 OAuth
+검증은 별도이며, PR #392의 기존 운영 배포 결과를 후속 main 전체의 배포로 확장하지 않는다.

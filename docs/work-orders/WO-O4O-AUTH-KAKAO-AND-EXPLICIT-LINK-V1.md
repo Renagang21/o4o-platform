@@ -62,7 +62,7 @@ F10/F11 본문, `users`/`service_memberships`/`role_assignments` 구조는 변�
 - [x] 사용자 승인 후 PR #392 main `26b98a33c1` 통합; exact-head CI/review 및 post-merge CI #38019181483·CodeQL PASS. Promote #38019828704 API·전체관리자·웹 5개 운영 배포 SUCCESS.
 - [x] 배포 후 유지 8개 origin × PC/mobile × 매장 경영자/공급자 Demo 32/32 PASS; 신규 소셜 계정 조회의 Demo 변경 차단, 업무 역할 경계, access/refresh 로그아웃 폐기와 다른 origin 세션 유지 확인.
 - [ ] 운영 Kakao 앱·REST ID·client secret ON·callback 등록·Secret Manager binding 확인 후 실제 로그인/가입/handoff PC·모바일 smoke.
-- [ ] main Sonar 비필수 Quality Gate 실패 범위 조사: PR 분석은 PASS, main 분석 hotspot 76건·중복률 14.2%·신뢰성/보안 E. 상세 API는 현재 proxy 403으로 미확인; 접근 반영 후 인증 변경 영향부터 확인.
+- [ ] main Sonar 비필수 Quality Gate 실패 범위 조사: PR 분석은 PASS, main 분석 hotspot 76건·중복률 14.2%·신뢰성/보안 E. 복원 후 허용 도메인 포함을 확인했으나 공개 API는 원격 HTTP 403; 상세 영향은 미확인. 접근 가능 후 인증 변경 영향부터 확인.
 
 ## 4-C. Google·카카오 명시적 계정 연결
 
@@ -90,3 +90,8 @@ Kakao REST 접근은 HTTP 200이다. 실행 환경에 GCP identity/Kakao credent
 Job·API revision 검증·traffic 전환과 전체관리자/웹 배포가 성공했다. 기존 Kakao 리소스 조회 권한,
 앱/키 binding·callback 등록, 실제 Google/Kakao 소유자 인증·연결 smoke는 OPEN이다.
 검증 상세와 OPEN 조건은 [CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다.
+
+후속 WIF metadata #38024302858 역시 인증·Cloud Run 조회 SUCCESS 후 Kakao metadata FAIL이다.
+새 로그 저장소 host의 proxy 차단으로 이번 세부 원인은 미확인이다. 정확한 host 추가는 환경
+초안에 저장했으며 게시·접근 반영은 별도다. 기존 앱·리소스 조사는 권한과 로그 확인 후 이어간다.
+PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대상이 아니다.
