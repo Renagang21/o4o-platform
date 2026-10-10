@@ -27,7 +27,7 @@
 
 | 문서 | 역할 | 상태 |
 |---|---|---|
-| [O4O-HOME-SERVICE-DISCOVERY-V1](baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) | 대표 홈 탐색 정책 · 약국 협력사업 표준 용어 · AI 우선 · 용도별 전체 서비스 · Partner 소개 · 준비 중 안내 · Contact Us (2026-10-10, 대표 홈 PR #402 운영 반영·회원 초기화면 PR #414 구현/운영 미반영) | ACTIVE |
+| [O4O-HOME-SERVICE-DISCOVERY-V1](baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) | 대표 홈 탐색 정책 · 약국 협력사업 표준 용어 · AI 우선 · 용도별 전체 서비스 · Partner 소개 · 준비 중 안내 · Contact Us (2026-10-10, 대표 홈 PR #402·회원 초기화면 PR #414 main 및 운영 반영) | ACTIVE |
 | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **사용자 역할별 업무공간 Architecture SSOT** (2026-09-15) — Community / Store / Supplier / Service Operator 4 업무공간 · 공급·자료의 내 매장 직접 이용(HUB 제거) · Service Operator 공식 경로 · 1 Store : N Services · My Services · Community Workspace(Community Identity ≠ Service Identity · 카탈로그/DB 커뮤니티와 별도 사업 회원 포럼 · Industry Community 폐기) · Store 콘텐츠 유입 3+1 경로 · **Legacy Partner = FULL RETIREMENT** · 리팩터링 실행 규칙(§9). 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 아래 PHILOSOPHY 와 충돌하면 **이 문서가 우선** (§8). Preflight: [IR](ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) | ACTIVE |
 | [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
 | [O4O-STORE-COMMERCE-BOUNDARY-V1](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | 매장 commerce 경계 SSOT — 소비자→매장 O4O commerce 없음 · 판매 실행 = 외부 POS·외부 채널 · legacy commerce 판정 규칙 · 개발 금지선 · **§15 사업 모델 변경 절차**. cart · checkout · orders · payments · refund · PG · POS · tablet · QR 작업 전 **코드보다 먼저 읽는다** | ACTIVE |
