@@ -2,6 +2,7 @@
 
 > **상태**: ACTIVE
 > **작성일**: 2026-10-10
+> **갱신일**: 2026-10-11
 > **근거**: 사용자 요청 — TODO 제작 → 문서·코드 대조 및 보완 → 실행
 > **관련 정본**: [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5 · [서비스 발견·진입](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) §5
 
@@ -61,6 +62,17 @@
 
 구현 커밋 `a647982b70779e78db1399d7b2a8529bb17293f8`은 [PR #424](https://github.com/Renagang21/o4o-platform/pull/424)에 push했다. [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38057825750)의 API Jest 3개 묶음·Code Quality·웹/관리자 빌드·필수 CI Gate와 CodeQL/Guard 분석이 통과했다. 확인 시점에 등록된 review와 미해결 review thread는 없었다. 이후 완료 기록만 변경한 문서 HEAD의 checks는 PR에서 확인하며, 소스 변경이나 운영 반영을 뜻하지 않는다.
 
-작업공간: `wo/community-review-ux` / `/workspace/o4o-wt/community-review-ux`. main 미병합이므로 KEEP하며 다른 작업공간은 수정·정리하지 않는다. 1차 심사 화면 개선은 구현·검증 완료, 전체 후속 TODO는 정책/계약 및 통합이 남아 ACTIVE다.
+1차 심사 화면 개선은 [PR #424](https://github.com/Renagang21/o4o-platform/pull/424)로 main에 병합했다(`8d2ead6e92b189a86d1a4fc6b83517bf95ac774f`). 병합 후 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38063581241)의 필수 CI Gate와 CodeQL이 통과했고, [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38064207250)의 Neture 실제 배포와 serving SHA report가 성공했다. commit status `production`은 `DEPLOYED · deploy: neture`다. 공개 운영 HTML·JavaScript HTTP 200 및 개선 문구 반영을 확인했다. 사용자 PC의 Google 세션으로 승인·반려를 실행한 검증을 뜻하지 않는다.
+
+작업공간 `wo/community-review-ux` / `/workspace/o4o-wt/community-review-ux`는 main 포함·clean·잔여 프로세스 없음 확인 후 정리했다. 해당 로컬·원격 branch도 삭제했다. 다른 작업공간은 보존했다. 이전의 main 미병합·KEEP 판정은 위 완료 결과로 갱신한다. 전체 후속 TODO는 아래 미실행 항목이 있어 ACTIVE를 유지한다.
 
 공개 항목의 저장/판정 계약, 정확한 후보 자격 응답, 자기 탈퇴·이력 보존 정책 및 #404 통합은 아직 실행하지 않았다. 앞선 표의 선행 조건과 현재 단계 결과를 별도로 유지한다.
+
+## 6. 후속 실행 순서 (2026-10-11 사용자 지정)
+
+1. TODO 문서 상태 갱신 — §5의 main 병합·배포·작업공간 정리 근거 반영 완료.
+2. 회귀 테스트 PR #404 정리 — 최신 main의 개별 역할 계약과 대조·수정·재검증.
+3. 자기 탈퇴·이력 관리 — 기존 관리자 탈퇴와 자기 탈퇴를 구분하고, 미확정 보존·삭제 정책을 확인한 뒤 실행.
+4. 운영자 후보 자격 안내 — 서버 자격 판정 근거와 응답·화면을 일치시켜 안내.
+
+공개 항목의 비로그인 열람은 이번 후속 실행 순서에 포함하지 않는다. 정책 조사 결과·미실행 범위·각 단계 검증은 아래에 추가하며, 앞선 검증 기록을 소급 변경하지 않는다.
