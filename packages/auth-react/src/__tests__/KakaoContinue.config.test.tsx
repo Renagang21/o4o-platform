@@ -11,7 +11,7 @@ function deferred<T>() {
 }
 function setup(getKakaoAuthConfig: () => Promise<{ enabled: boolean }>) {
   const methods = handlers();
-  const view = render(<KakaoContinue client={{ getKakaoAuthConfig, startKakaoLogin: methods.startKakaoLogin }} {...methods} />);
+  const view = render(<KakaoContinue client={{ getSignupTerms: async () => ({ policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' }), getKakaoAuthConfig, startKakaoLogin: methods.startKakaoLogin }} {...methods} />);
   return { ...methods, ...view };
 }
 

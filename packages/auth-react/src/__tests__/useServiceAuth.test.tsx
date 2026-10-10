@@ -264,11 +264,11 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
 
     let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.signupWithGoogle('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
+      result = await hook.result.current.signupWithGoogle('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
     });
 
     expect(result.success).toBe(true);
-    expect(signupWithGoogle).toHaveBeenCalledWith('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
+    expect(signupWithGoogle).toHaveBeenCalledWith('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true, marketing: false });
     expect(hook.result.current.isAuthenticated).toBe(true);
     expect(onAuthenticated).toHaveBeenCalledTimes(1);
   });
@@ -284,7 +284,7 @@ describe('useServiceAuth — Google 로그인/가입 (WO-O4O-GOOGLE-ONLY-SIGNUP-
 
     let result!: Awaited<ReturnType<typeof hook.result.current.signupWithGoogle>>;
     await act(async () => {
-      result = await hook.result.current.signupWithGoogle('id-token', { name: '테스트회원', phone: '01012345678', terms: true, privacy: true });
+      result = await hook.result.current.signupWithGoogle('id-token', { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, name: '테스트회원', phone: '01012345678', terms: true, privacy: true });
     });
 
     expect(result.success).toBe(false);

@@ -1,3 +1,4 @@
+import { SignupTermsController } from '../controllers/signup-terms.controller.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Core Routes: google login/signup/link, refresh, status, logout, handoff
@@ -115,6 +116,7 @@ router.post(
 // POST /api/v1/auth/password/reset   - { token, newPassword } → 새 비밀번호 + 전역 세션 폐기
 // POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내 (IP · 입력값 기준 제한 둘 다)
 // 모두 JSON 본문만 받는다(requireJsonBody) — 교차 사이트 form 요청 방어
+router.get('/signup/terms', asyncHandler(SignupTermsController.get));
 router.post('/email/signup', requireJsonBody, emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
 router.post('/email/verify', requireJsonBody, emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
 router.post('/email/resend', requireJsonBody, emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.resend));
