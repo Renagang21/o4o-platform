@@ -31,16 +31,15 @@ import { getNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES } from '
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
-import { handoffTokenService } from '../../../services/handoff-token.service.js';
+import { handoffTokenService, readHandoffAuthMethod } from '../../../services/handoff-token.service.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { readUserMembershipsWithMainAccess } from '../../../services/auth/auth-context.helper.js';
 import {
-  isPasswordSessionAllowed,
-  PASSWORD_SESSION_NOT_ALLOWED_CODE,
-  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+  isSessionAuthMethodAllowed,
+  sessionAuthMethodError,
 } from '../../../common/auth/password-session.policy.js';
 import { REPRESENTATIVE_ENTRY_SERVICE_KEY, getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import { STORE_WORKSPACE_KEY, STORE_WORKSPACE_ORIGIN, isStoreWorkspaceExchangeOrigin } from '../../../config/store-workspace.js';
@@ -74,8 +73,8 @@ const SERVICE_SESSION_REVOKED_CODE = 'SERVICE_SESSION_REVOKED';
  * 그래서 claim 없는 토큰은 null 로 두어 refresh 와 같은 **사용자 전체 최대 세대** 규칙을 따른다.
  *
  *   authMethod    WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 (최종 보완 1): 검증된 토큰의 `authMethod`
- *                 claim. 'password' 면 password, claim 이 없는 검증된 토큰은 Google 세션이다
- *                 (refresh 와 같은 해석). 토큰을 검증하지 못하면 password 로 둔다(fail-closed).
+ *                 claim. Google/password/Kakao를 명시적으로 승계한다. 누락·미지 값은
+ *                 기존 원장 호환을 위해 제한된 password 표식으로 보관하며 Google로 승격하지 않는다.
  *                 body · Origin · 계정의 Google 연결 여부로 정하지 않는다.
  */
 function readCallerScope(req: Request): {
@@ -87,7 +86,7 @@ function readCallerScope(req: Request): {
 } {
   const token = extractToken(req as never);
   const payload = token ? verifyAccessToken(token) : null;
-  const authMethod: HandoffAuthMethod = payload && payload.authMethod !== 'password' ? 'google' : 'password';
+  const authMethod: HandoffAuthMethod = readHandoffAuthMethod(payload?.authMethod);
   if (payload?.serviceKey) {
     return { serviceKey: payload.serviceKey, sessionEpoch: payload.sessionEpoch, authMethod, sessionId: payload.sessionId, tokenFamily: payload.tokenFamily };
   }
@@ -486,11 +485,11 @@ export class HandoffController extends BaseController {
     //   수단은 발급 시점에 검증된 access token claim 에서 온 값이다. 교환 시점의 Google 연결 여부 ·
     //   역할로 다시 추정하지 않는다 — 그 사이 Google 이 연결되거나 역할이 붙어도 비밀번호 세션이
     //   Google 세션으로 승격되지 않는다. NULL(컬럼 이전 발급분)은 원장 읽기에서 password 로 온다.
-    //   비밀번호 세션이면 **지금의 역할**로 관리자 경계(Admin 화면 · platform:*)를 다시 본다.
-    const authMethod = sourceAuthMethod === 'google' ? null : ('password' as const);
-    if (authMethod === 'password' && !isPasswordSessionAllowed(sessionServiceKey, roles)) {
-      logger.warn('[Handoff] Blocked exchange — password session admin boundary', { userId: user.id });
-      return BaseController.error(res, PASSWORD_SESSION_NOT_ALLOWED_MESSAGE, 403, PASSWORD_SESSION_NOT_ALLOWED_CODE);
+    //   **지금의 역할**로 Google 긍정 관리자 경계(Admin 화면 · platform:*)를 다시 본다.
+    const authMethod = sourceAuthMethod;
+    if (!isSessionAuthMethodAllowed(authMethod, sessionServiceKey, roles)) {
+      const error = sessionAuthMethodError(authMethod);
+      return BaseController.error(res, error.message, 403, error.code);
     }
 
     const tokens = tokenUtils.generateTokens(
