@@ -109,6 +109,8 @@ export interface QrScanMeta {
   referer: string | null;
   /** 원문 IP 가 아니라 해시. 개인식별 값을 저장하지 않는다. */
   ipHash: string | null;
+  /** HEAD resolves the same payload without recording a browser scan. */
+  recordScan?: boolean;
 }
 
 export interface PublicQrLandingResult {
@@ -191,28 +193,30 @@ export async function resolvePublicQrLanding(
   //   ipHash 가 null 이면(신뢰 가능한 IP 미확보) `ip_hash = NULL` 이 참이 되지 않아 중복 방지가
   //   걸리지 않고 매 스캔이 기록된다 — 식별자 없이 중복 판정을 할 수 없으므로 기존 의도를
   //   그대로 둔다(본 수정으로 바뀐 동작이 아니다).
-  dataSource
-    .query(
-      `INSERT INTO store_qr_scan_events
-         (organization_id, qr_code_id, device_type, user_agent, referer, ip_hash)
-       SELECT $1, $2, $3, $4, $5, $6::text
-       WHERE NOT EXISTS (
-         SELECT 1 FROM store_qr_scan_events
-         WHERE qr_code_id = $2 AND ip_hash = $6::text
-           AND created_at > NOW() - INTERVAL '5 seconds'
-       )`,
-      [
-        qrData.organizationId,
-        qrData.id,
-        scan.deviceType,
-        scan.userAgent,
-        scan.referer,
-        scan.ipHash,
-      ],
-    )
-    .catch((err: unknown) => {
-      console.error('[QR Scan Event] Insert failed:', err);
-    });
+  if (scan.recordScan !== false) {
+    dataSource
+      .query(
+        `INSERT INTO store_qr_scan_events
+           (organization_id, qr_code_id, device_type, user_agent, referer, ip_hash)
+         SELECT $1, $2, $3, $4, $5, $6::text
+         WHERE NOT EXISTS (
+           SELECT 1 FROM store_qr_scan_events
+           WHERE qr_code_id = $2 AND ip_hash = $6::text
+             AND created_at > NOW() - INTERVAL '5 seconds'
+         )`,
+        [
+          qrData.organizationId,
+          qrData.id,
+          scan.deviceType,
+          scan.userAgent,
+          scan.referer,
+          scan.ipHash,
+        ],
+      )
+      .catch((err: unknown) => {
+        console.error('[QR Scan Event] Insert failed:', err);
+      });
+  }
 
   // 매장(조직)은 서비스마다 slug 를 가질 수 있다(1 Store : N Services). storeSlug 는 종전대로 최신 slug.
   const storeRows: Array<{ slug: string; service_key: string }> = await dataSource.query(

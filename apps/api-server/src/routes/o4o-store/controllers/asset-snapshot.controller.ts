@@ -17,53 +17,34 @@
  *
  * Uses Core Controller Factory with KPA-specific config:
  * - Roles: kpa:admin, kpa:operator, kpa:pharmacist, kpa:store_owner
- * - Org: KpaMember.organization_id
+ * - Org: selected authorized store, with legacy KPA membership fallback
  * - Resolver: KpaAssetResolver (CmsContent + signage_media + lms_courses + kpa_contents content/resource + blog placeholder)
  * - Asset types: cms, signage, lesson, content, resource, blog (placeholder)
  */
 
 import type { RequestHandler } from 'express';
-import type { Router } from 'express';
+import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { createAssetCopyController } from '@o4o/asset-copy-core';
+import { createAssetCopyController, type AssetCopyControllerConfig } from '@o4o/asset-copy-core';
 import { KpaAssetResolver } from '../../../modules/asset-snapshot/resolvers/kpa-asset.resolver.js';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = RequestHandler;
-
-/**
- * Resolve KPA organization ID — store-library-feed.controller 와 동일한 dual-resolution 전략.
- * WO-O4O-CONTENT-TO-STORE-LIBRARY-COPY-FIX-V1:
- *   store_owner의 경우 약국 org ID(organization_members)를 우선 반환하여
- *   store-library-feed 의 조회 org ID 와 일치시킨다.
- *   admin/operator 등 store_owner 가 아닌 경우 kpa_members fallback.
- */
-async function resolveKpaOrgId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const { organizationId: pharmacyOrgId } = await isStoreOwner(dataSource, userId, 'kpa');
-  if (pharmacyOrgId) return pharmacyOrgId;
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
 
 export function createAssetSnapshotController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
 ): Router {
-  return createAssetCopyController(dataSource, requireAuth, {
+  const config: Omit<AssetCopyControllerConfig, 'resolveOrgId'> = {
     // WO-O4O-ASSET-SNAPSHOT-COPY-STORE-OWNER-ALIGN-V1: kpa:store_owner 추가.
     // 매장 단위 자료함은 store_owner가 canonical principal. 동일 controller가 cms/signage/lesson/
     // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
-    //   가져온다. 조직은 resolveKpaOrgId → isStoreOwner('kpa')(내 매장(약국) 신청 원장)가 확정한다.
+    //   가져온다. 조직은 선택 매장을 반영하는 KPA 어댑터와 내 매장 신청 원장이 확정한다.
     allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),
-    resolveOrgId: resolveKpaOrgId,
     noOrgErrorCode: 'NO_ORGANIZATION',
     noOrgMessage: 'User has no KPA organization membership',
     // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
@@ -96,5 +77,17 @@ export function createAssetSnapshotController(
     //   차단 타입을 목록에서 빼지 않는 이유 — 빼면 기존 사본의 조회가 400 으로 깨진다
     //   (예: StoreLibraryResourcesPage 의 GET /assets?type=resource). lesson 선례와 동일.
     allowedAssetTypes: ['cms', 'signage', 'content', 'resource', 'blog', 'pop', 'qr'],
+  };
+  const router = Router();
+  // The frozen Core callback has no Request parameter. Keep this request's
+  // selection in its own adapter closure, never in module/user-level state.
+  router.use((req, res, next) => {
+    const preferred = readPreferredStoreOrganizationId(req);
+    const scoped = createAssetCopyController(dataSource, requireAuth, {
+      ...config,
+      resolveOrgId: (ds, userId) => resolveKpaContentOrganization(ds, userId, preferred),
+    });
+    scoped(req, res, next);
   });
+  return router;
 }

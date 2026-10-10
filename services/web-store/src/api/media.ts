@@ -7,8 +7,7 @@
  * 엔드포인트: /api/v1/platform/media-library (KPA namespace 밖)
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
-import { tryRefreshToken } from './token-refresh';
+import { storeScopedFetch } from './storeScopedFetch';
 
 const PLATFORM_BASE = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api/v1`
@@ -37,24 +36,8 @@ async function platformFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = getAccessToken();
-  const headers: HeadersInit = {
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
-  };
-
   const url = `${PLATFORM_BASE}${path}`;
-  let response = await fetch(url, { ...options, headers });
-
-  if (response.status === 401) {
-    const newToken = await tryRefreshToken();
-    if (newToken) {
-      response = await fetch(url, {
-        ...options,
-        headers: { ...headers, Authorization: `Bearer ${newToken}` },
-      });
-    }
-  }
+  const response = await storeScopedFetch(url, options);
 
   return response.json() as Promise<T>;
 }

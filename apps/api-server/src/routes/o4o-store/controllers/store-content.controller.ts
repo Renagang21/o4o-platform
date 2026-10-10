@@ -18,7 +18,7 @@
  *
  * 권한 정책:
  *   POST / (direct 생성) — role_assignments.kpa:store_owner REQUIRED (RBAC SSOT)
- *   기타 — org membership (resolveOrgId, kpa_members 기반)
+ *   기타 — 선택 매장 판정, 선택값 없는 기존 KPA membership 호환
  *
  * Endpoints:
  *   GET /store-contents                    — 내 매장 콘텐츠 목록
@@ -32,11 +32,10 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
+import { DataSource, type Repository } from 'typeorm';
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
-import type { AuthRequest } from '../../../types/auth.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { readContentUserId, requireContentOrganization, resolveKpaContentAccess } from './kpa-content-organization.js';
 import { ContentTranslationService } from '../../../modules/store-ai/services/content-ai-translation.service.js';
 import type { TranslationLocale } from '@o4o/ai-prompts/store';
 import {
@@ -81,11 +80,64 @@ function sendContentFailure(res: Response, result: ContentResult<unknown>): void
   });
 }
 
+function validateDirectContentId(id: string, res: Response): boolean {
+  if (UUID_RE.test(id)) return true;
+  res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
+  return false;
+}
+
+async function findTranslationContent(repo: Repository<KpaStoreContent>, id: string, organizationId: string, res: Response) {
+  const content = await repo.findOne({ where: { id, organization_id: organizationId, source_type: 'direct' } });
+  if (!content) res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+  return content;
+}
+
+
+function withContentUser(handler: (req: Request, res: Response, userId: string) => Promise<void>): AuthMiddleware {
+  return async (req, res) => {
+    try {
+      const userId = readContentUserId(req, res);
+      if (!userId) return;
+      await handler(req, res, userId);
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+    }
+  };
+}
+
 export function createStoreContentController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
+
+  async function requireContentOwner(
+    req: Request,
+    res: Response,
+    userId: string,
+    ownerMessage: string,
+    noOrgMessage = '매장 조직 정보를 찾을 수 없습니다.',
+  ): Promise<string | null> {
+    const access = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
+    if (!access.isOwner) {
+      res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: ownerMessage } });
+      return null;
+    }
+    if (!access.organizationId) {
+      res.status(403).json({ success: false, error: { code: 'NO_ORG', message: noOrgMessage } });
+      return null;
+    }
+    return access.organizationId;
+  }
+
+  async function requireTranslationContent(req: Request, res: Response, userId: string, id: string, ownerMessage: string) {
+    const organizationId = await requireContentOwner(req, res, userId, ownerMessage);
+    if (!organizationId) return null;
+    const repo = dataSource.getRepository(KpaStoreContent);
+    const content = await findTranslationContent(repo, id, organizationId, res);
+    return content ? { repo, content } : null;
+  }
+
   const translationService = new ContentTranslationService(dataSource);
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -121,28 +173,19 @@ export function createStoreContentController(
   router.get(
     '/',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
 
-        // organization_members 우선, kpa_members fallback (POST와 동일)
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        // 선택 매장 판정; 선택값 없는 기존 KPA membership 경로만 호환
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const contents = await listStoreContents(dataSource, organizationId);
         res.json({ success: true, data: contents });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -155,55 +198,24 @@ export function createStoreContentController(
    * AI 생성 결과, 직접 작성, 붙여넣기 등 모든 비-스냅샷 경로에서 사용.
    * 매장 내부 전용 — published-assets 공개 렌더링 대상 아님.
    *
-   * 권한: role_assignments.kpa:store_owner REQUIRED (RBAC SSOT)
-   *   1차: isStoreOwner('kpa') → role_assignments 확인
-   *   2차: organizationId → organization_members 우선, kpa_members fallback
+   * 권한: KPA 매장 접근 정본의 기존 소유권·계약 판정.
+   * 선택 매장과 판정 조직이 일치해야 하며 복수 매장 미선택은 차단한다.
    *
    * Body: { title: string, contentJson: unknown }
    */
   router.post(
     '/',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
 
         // WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1:
-        // role_assignments에 kpa:store_owner 있는지 확인 (RBAC SSOT)
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({
-            success: false,
-            error: {
-              code: 'STORE_OWNER_REQUIRED',
-              message: '매장 경영자(kpa:store_owner)만 내 매장 콘텐츠를 저장할 수 있습니다.',
-            },
-          });
-          return;
-        }
-
-        // organizationId: organization_members 우선, kpa_members fallback
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: {
-              code: 'NO_ORG',
-              message: '매장 조직 정보를 찾을 수 없습니다. 매장 등록 후 다시 시도해 주세요.',
-            },
-          });
-          return;
-        }
+        // 기존 KPA 매장 소유권·계약 판정과 요청 선택 조직을 함께 확인
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 내 매장 콘텐츠를 저장할 수 있습니다.',
+          '매장 조직 정보를 찾을 수 없습니다. 매장 등록 후 다시 시도해 주세요.',
+        );
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
         //   productRef 는 optional. 저장 전 형식/제품 org 스코프 검증(서비스 내부).
@@ -220,7 +232,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -234,14 +246,8 @@ export function createStoreContentController(
   router.get(
     '/by-product',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
 
         const sourceType = req.query.sourceType as string;
         const sourceId = req.query.sourceId as string;
@@ -254,11 +260,8 @@ export function createStoreContentController(
           return;
         }
 
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1:
         //   source_type / snapshot_id 를 함께 반환 → 프론트가 편집 경로(direct vs snapshot)를 판별.
@@ -291,7 +294,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -311,24 +314,15 @@ export function createStoreContentController(
   router.get(
     '/b2c-descriptions',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const listingId = req.query.listingId as string;
         if (!listingId || !UUID_RE.test(listingId)) {
           res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'listingId는 유효한 UUID 여야 합니다.' } });
           return;
         }
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
         // org → listing 소유 + master_id 확인 (서버가 관계를 직접 검증)
         const resolved = await resolveProductForLink(organizationId, 'listing', listingId);
         if (!resolved.ok) {
@@ -370,7 +364,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -381,29 +375,13 @@ export function createStoreContentController(
   router.post(
     '/import-b2c-description',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         // 쓰기 = store owner 권한 (POST / 와 동일)
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
-          return;
-        }
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const { listingId, descriptionId } = req.body as { listingId?: string; descriptionId?: string };
         if (!listingId || !UUID_RE.test(listingId) || !descriptionId || !UUID_RE.test(descriptionId)) {
@@ -486,7 +464,7 @@ export function createStoreContentController(
         }
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -504,29 +482,13 @@ export function createStoreContentController(
   router.post(
     '/:id/reimport-source',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         // 쓰기 = store owner 권한 (import 와 동일)
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
-          return;
-        }
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const contentId = req.params.id;
         if (!contentId || !UUID_RE.test(contentId)) {
@@ -651,7 +613,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -660,45 +622,21 @@ export function createStoreContentController(
   // ─────────────────────────────────────────────────────────────────────────
 
   /**
-   * POST에서 사용하는 것과 동일한 이중 org 해석:
-   * organization_members (isStoreOwner) 우선, kpa_members fallback.
-   * direct 콘텐츠는 이 경로로 저장되므로 조회도 동일 소스를 사용해야 한다.
-   */
-  async function resolveDualOrgId(userId: string): Promise<string | null> {
-    const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-    if (orgFromRa) return orgFromRa;
-    const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-    return member?.organization_id || null;
-  }
-
-  /**
    * GET /store-contents/direct/:id
    *
    * source_type='direct' 콘텐츠 상세 조회.
-   * organization ownership 확인: organization_members 우선, kpa_members fallback.
+   * 조직 판정은 자료함과 동일한 선택 매장 KPA 어댑터를 사용한다.
    */
   router.get(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const result = await getDirectContent(dataSource, organizationId, id);
         if (!result.ok) {
@@ -710,7 +648,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -722,36 +660,16 @@ export function createStoreContentController(
   router.put(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
         // store owner 권한 확인 (RBAC SSOT)
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
-          return;
-        }
-
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증(서비스 내부).
         const result = await updateDirectContent(dataSource, organizationId, userId, id, req.body);
@@ -764,7 +682,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -775,35 +693,15 @@ export function createStoreContentController(
   router.delete(
     '/direct/:id',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
 
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.' } });
-          return;
-        }
-
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const result = await deleteDirectContent(dataSource, organizationId, id);
         if (!result.ok) {
@@ -815,7 +713,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -832,48 +730,19 @@ export function createStoreContentController(
   router.post(
     '/direct/:id/translate',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const { id } = req.params;
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
         const locale = (req.body as { locale?: string })?.locale as TranslationLocale;
         if (!locale || !TRANSLATION_LOCALES.includes(locale)) {
           res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
           return;
         }
 
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.' } });
-          return;
-        }
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
-          return;
-        }
+        const owned = await requireTranslationContent(req, res, userId, id, '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.');
+        if (!owned) return;
+        const { repo, content } = owned;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const html = typeof cj.html === 'string' ? cj.html : '';
@@ -906,7 +775,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   /**
@@ -916,47 +785,18 @@ export function createStoreContentController(
   router.put(
     '/direct/:id/translations/:locale',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
         const { id, locale } = req.params as { id: string; locale: string };
-        if (!UUID_RE.test(id)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid content ID' } });
-          return;
-        }
+        if (!validateDirectContentId(id, res)) return;
         if (!TRANSLATION_LOCALES.includes(locale as TranslationLocale)) {
           res.status(400).json({ success: false, error: { code: 'INVALID_LOCALE', message: `locale must be one of ${TRANSLATION_LOCALES.join(', ')}` } });
           return;
         }
 
-        const { isOwner, organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
-          return;
-        }
-        let organizationId: string | null = orgFromRa;
-        if (!organizationId) {
-          const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-          organizationId = member?.organization_id || null;
-        }
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
-          return;
-        }
+        const owned = await requireTranslationContent(req, res, userId, id, '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.');
+        if (!owned) return;
+        const { repo, content } = owned;
 
         const cj = (content.content_json ?? {}) as Record<string, unknown>;
         const translations = (cj.translations && typeof cj.translations === 'object')
@@ -979,7 +819,7 @@ export function createStoreContentController(
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
-    },
+    }),
   );
 
   // (제거됨) POST /store-contents/:id/share-to-hub
@@ -1003,23 +843,14 @@ export function createStoreContentController(
   router.get(
     '/:snapshotId',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
-        //   org 해석을 목록/POST 와 동일하게 resolveDualOrgId(organization_members 우선, kpa_members fallback)로 통일.
+        //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
         //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
 
@@ -1077,7 +908,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   /**
@@ -1092,23 +923,14 @@ export function createStoreContentController(
   router.put(
     '/:snapshotId',
     requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
+    withContentUser(async (req: Request, res: Response, userId: string): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
 
         // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-SINGLE-EDIT-V1:
-        //   org 해석을 목록/POST 와 동일하게 resolveDualOrgId(organization_members 우선, kpa_members fallback)로 통일.
+        //   org 해석을 목록/POST 와 동일하게 선택 매장 KPA 어댑터(선택값 없는 legacy membership 호환)로 통일.
         //   기존 resolveOrgId(kpa_members only)는 store_owner(organization_members)만 있는 매장에서 404 유발.
-        const organizationId = await resolveDualOrgId(userId);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: 'No organization membership' } });
-          return;
-        }
+        const organizationId = await requireContentOrganization(dataSource, userId, req, res);
+        if (!organizationId) return;
 
         const { snapshotId } = req.params;
         const { title, contentJson, productRef } = req.body as {
@@ -1183,7 +1005,7 @@ export function createStoreContentController(
           error: { code: 'INTERNAL_ERROR', message: error.message },
         });
       }
-    },
+    }),
   );
 
   return router;

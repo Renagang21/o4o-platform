@@ -299,6 +299,17 @@ describe('resolvePublicQrLanding', () => {
     expect(insert?.[1]).toContain('h');
   });
 
+  it('read-only HEAD resolves landing data without inserting a scan', async () => {
+    const { ds, query } = makeDataSource({ queryResults: [
+      [{ id: 'q', landingType: 'link', landingTargetId: 'https://x', isActive: true, organizationId: ORG, slug: 's' }],
+      [{ slug: 'store-slug' }],
+    ] });
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', { ...scan, recordScan: false });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.storeSlug).toBe('store-slug');
+    expect(query.mock.calls.some((call: any[]) => /INSERT|UPDATE|DELETE/i.test(call[0]))).toBe(false);
+  });
+
   // ── WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1 회귀 가드 ──
   //
   // 이 INSERT 는 fire-and-forget 이라 실패해도 랜딩 응답이 200 으로 나간다.

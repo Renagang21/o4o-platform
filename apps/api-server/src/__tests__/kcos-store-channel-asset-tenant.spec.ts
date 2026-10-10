@@ -33,7 +33,9 @@ describe('§2 backend — KPA 마운트는 변경되지 않았다', () => {
   });
   it('store-asset-control.controller 는 여전히 KPA 계약이다', () => {
     const c = codeLines(read('apps/api-server/src/routes/o4o-store/controllers/store-asset-control.controller.ts'));
-    expect(c).toMatch(/isStoreOwner\(dataSource,\s*userId,\s*'kpa'\)/);
+    expect(c).toMatch(/resolveKpaContentOrganization\(dataSource,\s*userId,\s*readPreferredStoreOrganizationId\(req\)\)/);
+    const resolver = codeLines(read('apps/api-server/src/routes/o4o-store/controllers/kpa-content-organization.ts'));
+    expect(resolver).toMatch(/isStoreOwner\(dataSource,\s*userId,\s*'kpa',\s*preferred/);
     expect(c).toMatch(/kpa_store_asset_controls/);
   });
 });
