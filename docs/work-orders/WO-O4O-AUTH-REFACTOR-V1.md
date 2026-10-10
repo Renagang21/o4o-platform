@@ -65,7 +65,8 @@
 - [x] 기존 계정 재인증 + 외부 계정 인증을 거친 명시적 연결; Demo 소셜 연결 차단
 - [x] provider uniqueness 및 동시 연결 충돌·실패 rollback·마지막 로그인 수단 보호 검증
 - [x] 동일 이메일 자동 병합 금지 로컬 회귀
-- [ ] 후속 PR main 통합·배포 및 실제 Google/Kakao 실접속 smoke
+- [x] PR #392 main `26b98a33c1` 통합·Promote #38019828704 운영 배포; 배포 후 실제 Demo 32/32 PASS (외부 OAuth 검증과 구분)
+- [ ] 카카오 운영 설정 활성화 후 실제 Google/Kakao 실접속·명시적 연결 PC/mobile smoke (실제 소유자 인증 필요)
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
 
@@ -99,6 +100,11 @@
 ## 2026-10-10 단계 4 진행
 
 4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체관리자·웹 배포 성공.
-4-B/4-C는 사용자 지시로 일회용 증명 원장을 공유하는 후속 PR로 구현·로컬 검증했다.
-운영 키/앱 설정, 실제 OAuth, 새 PR main 승인·배포는 완료와 구분한다.
+4-B/4-C PR #392는 사용자 승인 후 main `26b98a33c1`에 통합했다. post-merge CI #38019181483와
+CodeQL PASS, Promote #38019828704 API migration·전체관리자·웹 5개 배포 SUCCESS.
+배포 후 유지 8개 origin × PC/mobile × 두 Demo 역할 32/32 PASS; 약국 업무의 매장 경영자 200,
+공급자 업무 200, 반대 역할 거절, Demo 소셜/비밀번호 변경 불가, 로그아웃 access/refresh 401 확인.
+운영 Kakao config는 8개 origin 모두 `enabled=false`다. 기존 Secret Manager 리소스 조회는
+`secretmanager.secrets.list` 권한 부족으로 미확인이다. 앱/키 연결과 실제 Google/Kakao 로그인·
+가입·재인증·명시적 연결, 전체관리자 실제 Google 재로그인은 OPEN으로 유지한다.
 검증: [카카오·명시적 연결 CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md).
