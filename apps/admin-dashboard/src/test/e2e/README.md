@@ -1,4 +1,4 @@
-# Admin 설정 브라우저 테스트
+# Admin 설정·CMS 미리보기 브라우저 테스트
 
 현재 Admin의 Google 전용 로그인·플랫폼 관리자 진입 경계와 설정 화면을 Playwright로 검사한다.
 제거된 Customizer와 이메일·비밀번호 로그인 전제의 테스트를 대체한다.
@@ -18,6 +18,11 @@
 - 미인증 사용자의 Google 전용 로그인 화면 이동.
 
 서버 응답 봉투와 잘못된 응답 거부는 `src/tests/settings-readiness.test.tsx`에서도 검사한다.
+
+`cms-preview.spec.ts`는 공개 `/preview/:slug` 직접 진입의 404 안내 → 재시도 → fixture 미리보기 표시를
+Desktop·Mobile에서 검사한다. 현재 서버에 CMS View 조회 API가 구현됐다는 증거가 아니다.
+URL 정규화·slug 인코딩·빈/잘못된 응답·권한 실패·요청 취소와 늦은 응답 차단은
+`src/tests/cms-preview-readiness.test.tsx`에서 검사한다. 현행 비공개 콘텐츠 API로의 fallback은 없다.
 
 ## 실행
 
