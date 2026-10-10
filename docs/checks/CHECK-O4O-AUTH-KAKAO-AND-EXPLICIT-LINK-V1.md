@@ -264,8 +264,9 @@ proxy 차단으로 미조회이며 단계 결과와 공개 API 응답을 근거�
 
 사용자 실제 가입 시도에서 `Invalid request / Your request contains invalid characters`가
 보고됐다. 합성 callback code의 영숫자 입력은 HTTP 401 SOCIAL_FLOW_INVALID, `--` 포함
-입력은 flow 검증 전에 HTTP 400 문자 오류로 재현했다. 실제 사용자 code/state 값은
-수집하지 않았으며 정확한 실패 경로·필드와 다른 가입 단계의 성공을 추정하지 않는다.
+입력은 flow 검증 전에 HTTP 400 문자 오류로 재현했다. 사용자가 알려준 오류 주소에서 고정 callback 경로와 code의 `--` 문자 유형을 확인해
+동일 원인을 확정했다. 실제 code/state 값은 파일·로그·문서에 저장하지 않았다. 카카오
+동의 이후 callback 차단이며 O4O 계정 생성 성공을 뜻하지 않는다.
 
 `securityMiddleware.ts`는 등록된 GET Kakao callback의 query code/state와 지정된 POST
 소셜 proof·signup·link route의 body token/code/idToken만 형식·길이가 맞을 때 SQL 문자

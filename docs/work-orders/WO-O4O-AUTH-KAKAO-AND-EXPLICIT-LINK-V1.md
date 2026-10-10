@@ -105,7 +105,7 @@ PR #396은 검증 기록 세 문서의 통합이며 추가 런타임 배포 대�
 - [x] API-only verified 배포 #38029009245 (`2a92ce24cf`): CI·정식 migration Job·revision readiness·traffic 전환·전환 후 health PASS.
 - [x] 실제 Demo PC/mobile 32/32 및 Neture Demo 변경 차단 2/2 PASS. Lecture는 문서대로 Neture 계정센터 진입을 검증하며 자체 카카오 버튼을 요구하지 않음.
 - [x] 카카오 실제 UI 시작·provider 로그인 화면 redirect 요청 4/4 확인. 계정 소유자 인증·token 교환 완료와 구분.
-- [x] 합성 callback 입력으로 `--` 포함 OAuth code의 전역 SQL 문자 오탐 재현; code뿐 아니라 generated state/flow token과 Google ID token의 같은 문자 가능성도 확인.
+- [x] 사용자 오류 경로가 고정 callback이며 code의 `--`가 차단 원인임을 확인(원문 값 저장 없음). 합성 callback 입력으로 전역 SQL 문자 오탐 재현; code뿐 아니라 generated state/flow token과 Google ID token의 같은 문자 가능성도 확인.
 - [x] 등록된 소셜 method/path/field의 제한된 형식·길이만 문자 휴리스틱에서 제외. 다른 필드·경로의 검사, origin·일회용 hash flow·binding·provider 검증 유지. 수정 전 새 회귀 11 FAIL/13 PASS → 수정 후 관련 3 suites/79 PASS; type-check·lint·API build PASS.
 - [ ] 오류 수정 PR의 required CI·review 확인 → 사용자 main 통합 승인 → API 배포 → 실제 소유자 가입·로그인·연결 재검증.
 - [ ] 실제 취소 callback의 브라우저 복귀 재검증. 시작 4건은 성공했지만 초기 harness의 취소 UI는 1건 HTTP 400/3건 transport failure였으며, 진단용 같은 binding의 직접 GET은 303이었다. 원인을 임의 확정하거나 취소 성공으로 계산하지 않음.
