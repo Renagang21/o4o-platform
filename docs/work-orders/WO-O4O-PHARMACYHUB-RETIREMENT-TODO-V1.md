@@ -50,3 +50,5 @@
 재리뷰 대응: 서브도메인·역할 업무공간·Store owner RBAC 정본에도 PH 전용 완전 폐기 예외를 정렬했다. 다른 서비스 정책은 유지한다. retire_host와 Demo census/relink/cleanup 동시 선택은 첫 gate에서 거부하여 PH 전환 미실행을 성공으로 보고하지 않는다.
 
 최종 정책 대조: Store access/membership·RBAC role catalog·RBAC canonical state의 PH 가입/역할 재발급 계약에도 폐기 예외를 반영했다. 공통 RBAC/Freeze 및 다른 서비스 계약은 유지한다. PH 폐기 예외가 적용되는 정본 집합을 서비스 baseline에 명시했다.
+
+Commerce/공통 소비처 대조: B2B 주문·checkout stable의 PH 축은 퇴역 잔여로 정렬했다. distribution freeze·supplier boundary·store content/signage/POP·commonization/operator/header에도 PH 폐기 예외를 반영하고 공통 계약은 유지했다. 공용 checkout/fulfillment/결제 테이블 통째 삭제는 금지하며 PH 전용 행 귀속을 조사한다. 개인정보/감사기록의 법정 보유 대상 여부도 분리 확인하며 서비스 폐기를 보유기간 면제로 해석하지 않는다.
