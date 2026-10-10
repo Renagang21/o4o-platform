@@ -461,3 +461,41 @@ Email 가입 loader도 필수로 맞췄다. React의 약관 참조는 client의 
 참조/loader를 뺀 7개 fixture는 각각 TS2741 오류가 발생해 의도한 누락 거부를 확인했다(예상 오류이며
 정상 테스트 실패로 계산하지 않음). 공통 React 182·client 40 PASS 및 소비처 전체 frontend type-check를
 재검증 PASS. 운영 API는 이 검토 시점 health 200·Kakao enabled=true이며 신규 배포 완료와 구분한다.
+
+
+## 2026-10-10 PR #407 통합·API/웹 배포 및 운영 검증
+
+사용자 승인 후 최신 구현의 Codex P2 타입 계약 지적을 수정했다. 최신 head `9d63a8b9b8`
+재리뷰는 추가 지적 없음, 미해결 스레드 0, PR CI #38048683407 PASS였다. main의 별도
+Demo relink 도구 변경을 확인·반영했으며 해당 DB 복구 workflow는 이번 작업에서 실행하지 않았다.
+PR #407은 main `2a8b80cf24`에 통합됐다. post-merge CI #38049243981 및 CodeQL
+#38049243931 PASS. Delivery #38049797025는 인증 변경을 HELD_LEVEL_3로 보류했다.
+승인된 정확한 SHA의 Promote #38049884263은 SUCCESS이며 API 먼저, 이어서 admin·neture·
+kpa-society·lecture·store·kpa-branch 웹 6개를 배포했다. API migration 단계, 새 리비전 readiness,
+traffic 전환 및 전환 후 검증 PASS; 새 migration/schema 변경은 없다. 최종 production 상태는
+DEPLOYED다. 검증 중 이후 main에 통합된 별도 커뮤니티 권한 변경은 이 배포 SHA의 결과에 포함하지 않는다.
+
+| 운영 검증 | 결과 | 범위와 제한 |
+| --- | --- | --- |
+| 게시 가입 약관 API | 9/9 PASS | 유지 8개 origin의 현재 게시 문서/version·정책별 URL·no-store 및 전체관리자 가입 origin 거부 |
+| 실제 Demo 버튼 PC/mobile × 8개 origin × 2역할 | 최초 30/32 PASS, 실패 2건 각각 재실행 PASS | 실제 이메일 로그인·me·업무 API 역할 경계·전체관리자 거부·Demo 소셜/비밀번호 변경 차단·UI logout 및 access/refresh 폐기. Neture의 Store handoff 세션은 원래 origin logout 뒤 유지 |
+| 배포된 가입 UI PC/mobile × 8개 origin | 최초 13/16 PASS, 경로 안정성 3 FAIL | 실제 게시 약관 API·배포 bundle; provider complete와 가입 제출만 합성 응답, 계정 생성 없음. 실제 OAuth 완료 근거가 아님 |
+| 공급자·펀딩 가입 UI 추가 진단 | 경로 순환 재현 | 각각 PC/mobile에서 문서/version 일치·제출 1회·이메일 확인 안내는 확인. `/login`과 `/`가 순환해 경로 안정성 FAIL; 약관 페이지 이동으로 오인하지 않음 |
+
+Demo 최초 실패는 공급자 PC의 UI logout 대기와 펀딩 모바일의 refresh 요청 시간 초과였다.
+둘 다 같은 조건의 독립 세션 재실행에서 전체 시나리오 PASS. 원인을 확정하거나 최초 실패를
+지우지 않으며 단일 최초 전체 실행이 32/32 PASS였다고 보고하지 않는다. 매장 경영자의 업무 API는
+200이고 공급자에게 반환되는 STORE_OWNER_REQUIRED 403은 의도한 반대 역할 경계다.
+
+가입 UI 경로 순환은 기존 Neture LoginRedirect가 `/login` → `/`로 보내고, 미로그인
+SupplierServiceEntry 및 MarketTrialHubPage가 `/` → `/login?returnUrl=...`로 되돌리는 코드와
+일치한다. 합성 제출 전후 경로 검사에서 최초 3건 실패, 두 도메인 PC/mobile 추가 진단에서도
+재현했다. 가입 acceptance의 원자 저장 수정으로 이 기존 route 상호작용까지 해결했다고 보지 않는다.
+미로그인 두 도메인의 진입 경로를 안정화하고 callback 보존·Demo·logout을 다시 검증할 후속 TODO다.
+
+실제 소유자의 Google/Kakao 가입·로그인·연결·취소와 추가 정보 적용 후 약관 gate 재확인은 OPEN.
+정책 본문/version 1의 이전 서비스 내용 정리·새 버전 검토·게시는 이번 배포에서 수행하지 않았다.
+동일 WO 연속 배포 검증 기록과 남은 OAuth/경로 후속 때문에 기존 branch/workspace는 KEEP한다.
+
+기록 PR 리뷰 P2 후속: 상위 리팩터링 WO 단계 4의 acceptance 구현 TODO도 완료로 정렬했다.
+compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로 순환은 별도 OPEN으로 분리했다.
