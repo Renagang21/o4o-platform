@@ -25,6 +25,8 @@ PR #384 생성 후 GitHub API 접근이 가능해졌다. 현재 cloud executor�
 
 ## 검증
 
+PR #394는 CI 통과 후 병합됐으나 최종 조회에서 새 미해결 리뷰가 발견됐다. 조회 결과를 확인하기 전에 병합 명령을 실행한 절차 오류로 기록한다. 운영 plan은 실행하지 않고 동일 WO의 후속 branch `wo/pharmacyhub-qr-safe-secret-errors`를 최신 main에서 준비했다. secret 조회 subprocess의 실패 출력은 안전한 `read-secret` 오류로 대체하며, rollback 실패가 기존 query 단계와 오류 코드를 덮어쓰지 않도록 보존한다. 지정 worktree 재사용은 동일 WO 연속 수정 예외다.
+
 2026-10-10: 운영자가 WIF provider에 QR workflow를 추가하고 DB password secret 한정 accessor binding을 적용했다. run `38015058829`는 WIF·proxy 시작 후 읽기 전용 inventory에서 실패했다. 기존 catch가 연결/SQL 원인을 숨겨 이 시점의 DB 연결 성공·schema 일치를 주장할 수 없다. 동일 WO의 진단 phase는 최신 main에서 `wo/pharmacyhub-qr-inventory-diagnostics`를 생성하고 지정 worktree를 재사용한다. 오류 원문 대신 실패 단계와 허용된 오류 코드만 출력하며 실제 credential·row·SQL 원문은 출력하지 않는다. 운영 리다이렉트 적용은 미실행이다.
 
 2026-10-09: PR #384는 CI Gate 통과 및 두 review finding 해결 후 `ac27c38c6005f2464a13ed74a3d604a642412482`로 병합됐다. `plan` dispatch는 job-level env에서 지원하지 않는 `runner.temp` context 때문에 HTTP 422로 거절됐으며 운영 실행·변경은 없었다. 동일 WO의 연속 수정으로 사용자 지정 worktree를 유지하고 최신 main 기준 `wo/pharmacyhub-qr-runtime-paths`를 생성했다. 임시 경로는 첫 step에서 `RUNNER_TEMP`를 통해 GITHUB_ENV에 전달하도록 수정한다.
