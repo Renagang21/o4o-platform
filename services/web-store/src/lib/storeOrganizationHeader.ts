@@ -23,6 +23,16 @@ export function getActiveStoreOrganizationId(): string | null {
   return activeStoreOrganizationId;
 }
 
+/** 최초 요청의 매장을 고정해 토큰 갱신 재시도에도 같은 매장을 사용한다. */
+export function captureStoreOrganizationHeaders(headers: HeadersInit): Headers {
+  const captured = new Headers(headers);
+  const orgId = getActiveStoreOrganizationId();
+  if (orgId && !captured.has(STORE_ORGANIZATION_HEADER)) {
+    captured.set(STORE_ORGANIZATION_HEADER, orgId);
+  }
+  return captured;
+}
+
 function isApiUrl(url: string): boolean {
   return url === API_BASE_URL || url.startsWith(`${API_BASE_URL}/`);
 }

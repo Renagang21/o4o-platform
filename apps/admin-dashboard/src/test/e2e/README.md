@@ -1,197 +1,51 @@
-# Customizer E2E Tests
+# Admin 설정·CMS 미리보기 브라우저 테스트
 
-End-to-end tests for the O4O Platform Customizer using Playwright.
+현재 Admin의 Google 전용 로그인·플랫폼 관리자 진입 경계와 설정 화면을 Playwright로 검사한다.
+제거된 Customizer와 이메일·비밀번호 로그인 전제의 테스트를 대체한다.
 
-## Test Coverage
+## 범위
 
-### Core Scenarios (`customizer.spec.ts`)
-1. **Color Change Flow** - Customizer → Preview → Frontend
-2. **General Section** - Scroll-to-top, Buttons, Breadcrumbs
-3. **Legacy Migration** - Automatic migration from v0.0.0 → v1.0.0
-4. **Header/Footer Builder** - Layout changes, content updates
-5. **Data Persistence** - Settings persistence after reload, `_meta.lastModified` updates
+`settings.spec.ts`는 브라우저의 API 요청을 fixture 응답으로 대체한다. 인증 상태는
+`/api/v1/auth/status`의 합성 사용자 응답으로 복원하며 실제 쿠키·OAuth 인증을 수행하지 않는다.
+미등록 API 요청도 차단하므로 운영 API·DB·메일 발송·Google 로그인에 접근하지 않는다.
+실계정 OAuth 검증이나 서버 저장 검증의 증거로 사용하지 않는다.
 
-### Error Cases (`customizer-errors.spec.ts`)
-- **Authentication (401)** - Redirect to login, unauthorized handling
-- **Network Errors (500)** - Server errors, timeouts, offline mode
-- **Validation Errors (400)** - Invalid color format, required fields, number ranges
-- **Fallback Behavior** - Default settings, missing sections, corrupted storage
-- **Edge Cases** - Concurrent saves, race conditions, large data
+- Desktop(1280×800) · Mobile(390×844): 이메일 설정 조회 → 수정 → 저장 → 새로고침 후 재조회.
+- 조회 실패 시 수정·저장 차단과 재조회 복구.
+- 저장 실패 알림과 편집 값 유지.
+- AI 모델 조회 실패 → 재조회, 실제 정책 편집 화면으로 이동.
+- 서비스 역할의 플랫폼 설정 진입 거부.
+- 미인증 사용자의 Google 전용 로그인 화면 이동.
 
-### Performance Tests
-- API response time < 200ms
-- Customizer load time < 1s
-- Preview update delay < 100ms
+서버 응답 봉투와 잘못된 응답 거부는 `src/tests/settings-readiness.test.tsx`에서도 검사한다.
 
-## Browser Support
-- ✅ Chromium (Desktop Chrome)
-- ✅ Firefox (Desktop Firefox)
-- ✅ WebKit (Desktop Safari)
+`cms-preview.spec.ts`는 공개 `/preview/:slug` 직접 진입의 404 안내 → 재시도 → fixture 미리보기 표시를
+Desktop·Mobile에서 검사한다. 현재 서버에 CMS View 조회 API가 구현됐다는 증거가 아니다.
+URL 정규화·slug 인코딩·빈/잘못된 응답·권한 실패·요청 취소와 늦은 응답 차단은
+`src/tests/cms-preview-readiness.test.tsx`에서 검사한다. 현행 비공개 콘텐츠 API로의 fallback은 없다.
 
-## Prerequisites
+## 실행
 
-1. **Environment Setup**
-   ```bash
-   # Install Playwright browsers (if not already installed)
-   npx playwright install
-   ```
+저장소 루트에서 [SETUP.md](../../../../../SETUP.md)의 기준 도구를 활성화한 뒤:
 
-2. **Test User Credentials**
-   Set environment variables for authentication:
-   ```bash
-   export E2E_TEST_EMAIL="test@example.com"
-   export E2E_TEST_PASSWORD="<test-account-password>"
-   ```
-
-   Or create a `.env.test` file in the admin-dashboard root:
-   ```env
-   E2E_TEST_EMAIL=test@example.com
-   E2E_TEST_PASSWORD=<test-account-password>
-   ```
-
-3. **Dev Server Running**
-   The tests automatically start the dev server, but you can also run it manually:
-   ```bash
-   npm run dev
-   ```
-
-## Running Tests
-
-### All Tests
 ```bash
-# From admin-dashboard directory
-npm run test:e2e
-
-# Or with Playwright CLI
-npx playwright test
+pnpm install --frozen-lockfile --verify-store-integrity=true
+pnpm --filter '@o4o/admin-dashboard^...' run build
+cd apps/admin-dashboard
+pnpm exec playwright install chromium
+pnpm exec playwright test --project=chromium --workers=1
 ```
 
-### Specific Test File
+머신에 Chromium이 이미 설치돼 있으면 다운로드 대신 해당 실행 파일을 지정할 수 있다:
+
 ```bash
-# Core scenarios only
-npx playwright test customizer.spec.ts
-
-# Error cases only
-npx playwright test customizer-errors.spec.ts
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium pnpm exec playwright test --project=chromium --workers=1
 ```
 
-### Specific Browser
-```bash
-# Chromium only
-npx playwright test --project=chromium
+테스트는 전용 dev server(`127.0.0.1:3101`)를 시작한다. 포트가 사용 중이면 다른 프로세스를 재사용하지 않고 실패한다.
+기존 개발 서버와 독립적으로 실행하며, shared package 빌드가 먼저 필요하다.
+Firefox·WebKit 프로젝트는 해당 Playwright 브라우저를 설치한 경우 추가로 실행할 수 있다.
+계정 비밀번호와 auth-state 파일은 필요하지 않다.
 
-# Firefox only
-npx playwright test --project=firefox
-
-# WebKit (Safari) only
-npx playwright test --project=webkit
-```
-
-### Debug Mode
-```bash
-# Run with UI
-npx playwright test --ui
-
-# Run with debugger
-npx playwright test --debug
-
-# Run headed (visible browser)
-npx playwright test --headed
-```
-
-### Watch Mode
-```bash
-npx playwright test --watch
-```
-
-## CI/CD Integration
-
-The tests are configured for CI with:
-- Automatic retry on failure (2 retries in CI)
-- HTML report generation
-- Trace collection on first retry
-- Single worker in CI (to avoid race conditions)
-
-### GitHub Actions Example
-```yaml
-- name: Install dependencies
-  run: npm ci
-
-- name: Install Playwright browsers
-  run: npx playwright install --with-deps
-
-- name: Run E2E tests
-  run: npm run test:e2e
-  env:
-    E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
-    E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
-    CI: true
-
-- name: Upload test results
-  if: always()
-  uses: actions/upload-artifact@v3
-  with:
-    name: playwright-report
-    path: playwright-report/
-```
-
-## Test Structure
-
-### Global Setup (`global-setup.ts`)
-- Authenticates test user
-- Saves auth state to `auth-state.json`
-- Runs once before all tests
-
-### Global Teardown (`global-teardown.ts`)
-- Cleans up auth state file
-- Runs once after all tests
-
-### Test Organization
-```
-src/test/e2e/
-├── README.md                    # This file
-├── global-setup.ts              # Authentication setup
-├── global-teardown.ts           # Cleanup
-├── customizer.spec.ts           # Core scenarios (5 test suites)
-└── customizer-errors.spec.ts    # Error cases (5 test suites)
-```
-
-## Troubleshooting
-
-### Authentication Fails
-- Verify test user credentials exist in database
-- Check `E2E_TEST_EMAIL` and `E2E_TEST_PASSWORD` environment variables
-- Manually test login at `http://localhost:3001/login`
-
-### Tests Timeout
-- Increase timeout in `playwright.config.ts`:
-  ```ts
-  use: {
-    timeout: 30000, // 30 seconds per test
-  }
-  ```
-- Check if dev server started successfully
-- Verify API server is running on correct port
-
-### Preview Frame Not Found
-- Some tests expect an iframe preview - if not implemented, tests will log warnings but continue
-- Update selectors in tests to match your preview implementation
-
-### Flaky Tests
-- Use `test.setTimeout(60000)` for slow operations
-- Add more specific waits: `await page.waitForLoadState('networkidle')`
-- Use `test.describe.serial()` for tests that must run in order
-
-## Performance Benchmarks
-
-Expected performance (from Day 4 requirements):
-- ✅ API response: **< 200ms**
-- ✅ Customizer load: **< 1000ms**
-- ✅ Preview update: **< 100ms** (debounced)
-
-## Additional Resources
-
-- [Playwright Documentation](https://playwright.dev/docs/intro)
-- [O4O Platform Architecture](../../../README.md)
-- [Customizer Migration Guide](../../../../../../api-server/MIGRATION_GUIDE.md)
-- [Naming Convention](../../../../pages/appearance/astra-customizer/NAMING_CONVENTION.md)
+결과는 Playwright의 성공·실패·skip 수로 판단한다. 화면 선택자를 찾지 못하거나 인증 초기화가
+실패했는데 성공으로 처리하는 fallback은 두지 않는다. trace·스크린샷은 실패 진단용 생성 산출물이다.

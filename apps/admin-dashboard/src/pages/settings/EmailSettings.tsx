@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Mail, Eye, EyeOff } from 'lucide-react';
 import { settingsService, EmailSettings as EmailSettingsType } from '@/api/settings';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 
 /**
  * 이메일(SMTP) 설정 — backend `GET/PUT /api/v1/settings/email` 만 존재한다.
@@ -9,8 +9,9 @@ import { useToast } from '@/hooks/use-toast';
  * (WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 §7·§8 REMOVE_BROKEN_UI).
  */
 const EmailSettings: FC = () => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState<Partial<EmailSettingsType>>({
     provider: 'smtp',
@@ -29,11 +30,11 @@ const EmailSettings: FC = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
+      setLoadError(null);
       const data = await settingsService.getEmailSettings();
       setSettings(data);
-    } catch (error) {
-      // Error log removed
-      // 에러 시 기본값 유지
+    } catch {
+      setLoadError('저장된 이메일 설정을 불러오지 못했습니다. 다시 불러온 뒤 수정해주세요.');
     } finally {
       setLoading(false);
     }
@@ -41,32 +42,23 @@ const EmailSettings: FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || saving || loadError) return;
     
     // 필수 필드 검증
     if (!settings.smtpHost || !settings.smtpPort || !settings.smtpUser || !settings.fromEmail) {
-      toast({
-        title: '오류',
-        description: '모든 필수 항목을 입력해주세요.',
-        variant: 'destructive',
-      });
+      toast.error('모든 필수 항목을 입력해주세요.');
       return;
     }
 
     try {
-      setLoading(true);
-      await settingsService.updateEmailSettings(settings);
-      toast({
-        title: '성공',
-        description: 'SMTP 설정이 저장되었습니다.',
-      });
-    } catch (error) {
-      toast({
-        title: '오류',
-        description: 'SMTP 설정 저장에 실패했습니다.',
-        variant: 'destructive',
-      });
+      setSaving(true);
+      const saved = await settingsService.updateEmailSettings(settings);
+      setSettings(saved);
+      toast.success('SMTP 설정을 DB에 저장했습니다. 실제 메일 발송 설정은 운영 환경에서 별도로 적용해야 합니다.');
+    } catch {
+      toast.error('SMTP 설정 저장에 실패했습니다.');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -87,22 +79,36 @@ const EmailSettings: FC = () => {
             <div>
               <h2 className="text-xl font-semibold text-o4o-text-primary">이메일 설정</h2>
               <p className="text-sm text-o4o-text-secondary mt-1">
-                O4O 플랫폼 전체에서 이메일을 발송하기 위한 SMTP 설정을 구성합니다.
+                SMTP 설정을 DB에 보관합니다. 실제 메일 발송 설정은 운영 환경에서 별도로 적용합니다.
               </p>
             </div>
           </div>
         </div>
       </div>
 
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        이 화면에서 저장한 값은 실제 발송기에 자동 적용되지 않습니다. 실제 메일 발송은 서버에 설정된
+        별도 SMTP 설정을 사용합니다. 설정 저장은 발송 연결 확인을 의미하지 않습니다.
+      </div>
+
+      {loading && <p role="status">저장된 이메일 설정을 불러오는 중입니다.</p>}
+      {loadError && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <p>{loadError}</p>
+          <button type="button" onClick={loadSettings} className="mt-2 underline">다시 불러오기</button>
+        </div>
+      )}
+
       {/* SMTP Settings Form */}
       <form onSubmit={handleSubmit} className="o4o-card">
+        <fieldset disabled={loading || saving || !!loadError}>
         <div className="o4o-card-header">
           <h3 className="o4o-card-title">SMTP 서버 설정</h3>
         </div>
         <div className="o4o-card-body space-y-6">
           {/* SMTP Host */}
           <div>
-            <label className="o4o-label">
+            <label htmlFor="smtpHost" className="o4o-label">
               SMTP 호스트 <span className="text-red-500">*</span>
             </label>
             <input
@@ -123,7 +129,7 @@ const EmailSettings: FC = () => {
           {/* SMTP Port & Secure */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="o4o-label">
+              <label htmlFor="smtpPort" className="o4o-label">
                 SMTP 포트 <span className="text-red-500">*</span>
               </label>
               <input
@@ -141,7 +147,7 @@ const EmailSettings: FC = () => {
               </p>
             </div>
             <div>
-              <label className="o4o-label">암호화</label>
+              <label htmlFor="smtpSecure" className="o4o-label">암호화</label>
               <select
                 id="smtpSecure"
                 name="smtpSecure"
@@ -160,7 +166,7 @@ const EmailSettings: FC = () => {
 
           {/* SMTP Authentication */}
           <div>
-            <label className="o4o-label">
+            <label htmlFor="smtpUser" className="o4o-label">
               SMTP 사용자명 <span className="text-red-500">*</span>
             </label>
             <input
@@ -179,16 +185,16 @@ const EmailSettings: FC = () => {
           </div>
 
           <div>
-            <label className="o4o-label">
+            <label htmlFor="smtpPassword" className="o4o-label">
               SMTP 비밀번호 <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
-                id="smtpPass"
-                name="smtpPass"
-                value={settings.smtpPass || ''}
-                onChange={(e) => handleInputChange('smtpPass', e.target.value)}
+                id="smtpPassword"
+                name="smtpPassword"
+                value={settings.smtpPassword || ''}
+                onChange={(e) => handleInputChange('smtpPassword', e.target.value)}
                 className="o4o-input pr-10"
                 placeholder="••••••••"
                 required
@@ -212,7 +218,7 @@ const EmailSettings: FC = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="o4o-label">
+                <label htmlFor="fromEmail" className="o4o-label">
                   발신자 이메일 <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -231,7 +237,7 @@ const EmailSettings: FC = () => {
               </div>
 
               <div>
-                <label className="o4o-label">발신자 이름</label>
+                <label htmlFor="fromName" className="o4o-label">발신자 이름</label>
                 <input
                   type="text"
                   id="fromName"
@@ -252,13 +258,14 @@ const EmailSettings: FC = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || saving || !!loadError}
               className="o4o-button-primary"
             >
-              {loading ? '저장 중...' : '설정 저장'}
+              {saving ? '저장 중...' : '설정 저장'}
             </button>
           </div>
         </div>
+        </fieldset>
       </form>
 
       {/* Common SMTP Settings Help */}
