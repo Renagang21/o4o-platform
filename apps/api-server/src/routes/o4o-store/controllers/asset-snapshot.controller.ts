@@ -25,7 +25,7 @@
 import type { RequestHandler } from 'express';
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { createAssetCopyController } from '@o4o/asset-copy-core';
+import { createAssetCopyController, type AssetCopyControllerConfig } from '@o4o/asset-copy-core';
 import { KpaAssetResolver } from '../../../modules/asset-snapshot/resolvers/kpa-asset.resolver.js';
 import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
 import { resolveKpaContentOrganization } from './kpa-content-organization.js';
@@ -36,53 +36,56 @@ export function createAssetSnapshotController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
 ): Router {
+  const config: Omit<AssetCopyControllerConfig, 'resolveOrgId'> = {
+    // WO-O4O-ASSET-SNAPSHOT-COPY-STORE-OWNER-ALIGN-V1: kpa:store_owner 추가.
+    // 매장 단위 자료함은 store_owner가 canonical principal. 동일 controller가 cms/signage/lesson/
+    // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
+    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
+    //   가져온다. 조직은 선택 매장을 반영하는 KPA 어댑터와 내 매장 신청 원장이 확정한다.
+    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner'],
+    sourceService: 'kpa',
+    resolver: new KpaAssetResolver(dataSource),
+    noOrgErrorCode: 'NO_ORGANIZATION',
+    noOrgMessage: 'User has no KPA organization membership',
+    // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
+    //   Resolver가 is_deleted=false 만 통과시킨다.
+    // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
+    // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실 신규 복사 차단.
+    //   'resource' 를 allowedAssetTypes 에서 빼지 않는 이유 — 이 목록은 copy 뿐 아니라
+    //   목록 조회(GET /assets?type=)에도 쓰여서, 제거하면 기존에 가져간 자료 사본을 보는
+    //   StoreLibraryResourcesPage(/store/library/resources) 가 400 으로 깨진다.
+    //   따라서 차단은 KpaAssetResolver 에서 수행한다(resource 분기 제거 → 404 SOURCE_NOT_FOUND).
+    //   기존 사본은 삭제하지 않고 그대로 조회·사용 가능하다.
+    // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: 'blog' assetType 등록 (Phase 1 Placeholder).
+    //   현재 resolveBlog 는 null 반환 — Phase 2 schema 확장 후 활성화.
+    // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' assetType 등록 (Phase 1 Placeholder).
+    //   store_pops entity 는 신설됐으나 resolvePop 은 null 반환 — Phase 2 후속에서 실 구현.
+    //   외부 caller 가 'pop' assetType 으로 요청 시 controller 통과하되 source 미발견
+    //   (SOURCE_NOT_FOUND) 으로 처리된다.
+    // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 (2026-05-24): 'qr' assetType 등록 (Phase 1 Placeholder).
+    //   operator_qr_templates entity 신설됐으나 resolveQr 은 null 반환 — Phase 2 후속.
+    //   QR 은 본 trace 에서는 자료함 사본 흐름 (asset-snapshot copy) 대신 직접 import endpoint
+    //   (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음. allowedAssetTypes
+    //   등록은 추후 자료함 통합 시 옵션으로 열어두는 의미.
+    // CHECK-O4O-LMS-KPA-LESSON-SNAPSHOT-CREATION-REMOVAL-V1: 'lesson' 제거 — 신규 lesson snapshot
+    //   생성 경로를 닫는다. 기존 row / store-assets?type=lesson 조회 호환은 별도 경로로 유지.
+    // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1 — 계약 정합:
+    //   아래 목록은 **copy + 목록 조회(GET /assets?type=) 양쪽에 쓰이는 allowlist** 다.
+    //   실제 "신규 사본 생성"이 가능한 타입은 resolver 분기가 있는 3종뿐이다.
+    //     신규 생성 가능 : cms · content · signage      (콘텐츠 · 디지털사이니지 정책 범위)
+    //     생성 차단(404) : resource · blog · pop · qr   (resolver 분기 없음 → SOURCE_NOT_FOUND)
+    //   차단 타입을 목록에서 빼지 않는 이유 — 빼면 기존 사본의 조회가 400 으로 깨진다
+    //   (예: StoreLibraryResourcesPage 의 GET /assets?type=resource). lesson 선례와 동일.
+    allowedAssetTypes: ['cms', 'signage', 'content', 'resource', 'blog', 'pop', 'qr'],
+  };
   const router = Router();
   // The frozen Core callback has no Request parameter. Keep this request's
   // selection in its own adapter closure, never in module/user-level state.
   router.use((req, res, next) => {
     const preferred = readPreferredStoreOrganizationId(req);
     const scoped = createAssetCopyController(dataSource, requireAuth, {
-      // WO-O4O-ASSET-SNAPSHOT-COPY-STORE-OWNER-ALIGN-V1: kpa:store_owner 추가.
-      // 매장 단위 자료함은 store_owner가 canonical principal. 동일 controller가 cms/signage/lesson/
-      // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
-      // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
-      //   가져온다. 조직은 선택 매장을 반영하는 KPA 어댑터와 내 매장 신청 원장이 확정한다.
-      allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner'],
-      sourceService: 'kpa',
-      resolver: new KpaAssetResolver(dataSource),
+      ...config,
       resolveOrgId: (ds, userId) => resolveKpaContentOrganization(ds, userId, preferred),
-      noOrgErrorCode: 'NO_ORGANIZATION',
-      noOrgMessage: 'User has no KPA organization membership',
-      // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
-      //   Resolver가 is_deleted=false 만 통과시킨다.
-      // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
-      // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실 신규 복사 차단.
-      //   'resource' 를 allowedAssetTypes 에서 빼지 않는 이유 — 이 목록은 copy 뿐 아니라
-      //   목록 조회(GET /assets?type=)에도 쓰여서, 제거하면 기존에 가져간 자료 사본을 보는
-      //   StoreLibraryResourcesPage(/store/library/resources) 가 400 으로 깨진다.
-      //   따라서 차단은 KpaAssetResolver 에서 수행한다(resource 분기 제거 → 404 SOURCE_NOT_FOUND).
-      //   기존 사본은 삭제하지 않고 그대로 조회·사용 가능하다.
-      // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: 'blog' assetType 등록 (Phase 1 Placeholder).
-      //   현재 resolveBlog 는 null 반환 — Phase 2 schema 확장 후 활성화.
-      // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' assetType 등록 (Phase 1 Placeholder).
-      //   store_pops entity 는 신설됐으나 resolvePop 은 null 반환 — Phase 2 후속에서 실 구현.
-      //   외부 caller 가 'pop' assetType 으로 요청 시 controller 통과하되 source 미발견
-      //   (SOURCE_NOT_FOUND) 으로 처리된다.
-      // WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 (2026-05-24): 'qr' assetType 등록 (Phase 1 Placeholder).
-      //   operator_qr_templates entity 신설됐으나 resolveQr 은 null 반환 — Phase 2 후속.
-      //   QR 은 본 trace 에서는 자료함 사본 흐름 (asset-snapshot copy) 대신 직접 import endpoint
-      //   (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음. allowedAssetTypes
-      //   등록은 추후 자료함 통합 시 옵션으로 열어두는 의미.
-      // CHECK-O4O-LMS-KPA-LESSON-SNAPSHOT-CREATION-REMOVAL-V1: 'lesson' 제거 — 신규 lesson snapshot
-      //   생성 경로를 닫는다. 기존 row / store-assets?type=lesson 조회 호환은 별도 경로로 유지.
-      // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1 — 계약 정합:
-      //   아래 목록은 **copy + 목록 조회(GET /assets?type=) 양쪽에 쓰이는 allowlist** 다.
-      //   실제 "신규 사본 생성"이 가능한 타입은 resolver 분기가 있는 3종뿐이다.
-      //     신규 생성 가능 : cms · content · signage      (콘텐츠 · 디지털사이니지 정책 범위)
-      //     생성 차단(404) : resource · blog · pop · qr   (resolver 분기 없음 → SOURCE_NOT_FOUND)
-      //   차단 타입을 목록에서 빼지 않는 이유 — 빼면 기존 사본의 조회가 400 으로 깨진다
-      //   (예: StoreLibraryResourcesPage 의 GET /assets?type=resource). lesson 선례와 동일.
-      allowedAssetTypes: ['cms', 'signage', 'content', 'resource', 'blog', 'pop', 'qr'],
     });
     scoped(req, res, next);
   });

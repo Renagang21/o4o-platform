@@ -11,7 +11,7 @@
 - [x] 옛 매장 경로와 대형 화면 중복의 소비처를 대조한다.
 - [x] 조사 결과로 이번 구현 범위와 후속 TODO를 보정한다.
 - [x] 회귀 검증·빌드와 문서 정합을 확인하고 commit·push한다.
-- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다.
+- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다(Sonar 중복률 보정 후 재검증).
 
 ## 기준과 안전 경계
 
@@ -30,7 +30,7 @@
 - [x] 상품·상품 요청·태블릿·Screen Set 가져오기·미디어의 인증 재시도를 공통 전송 함수로 모은다.
 - [x] multipart 본문과 개별 API의 응답·오류 계약을 유지한다.
 - [x] 회귀 테스트·빌드 결과를 확정하고 branch를 push한다.
-- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다.
+- [ ] PR의 최신 CI·SonarCloud·CodeQL과 리뷰 blocker를 확인한다(Sonar 중복률 보정 후 재검증).
 
 ### 확정한 결함과 수정
 
@@ -64,7 +64,9 @@ Frozen `asset-copy-core`의 callback에는 Request가 없다. Core 서명 변경
 - web-store: 4 suites / 37 tests PASS(재시도 매장·본문·multipart·오류 및 화면 회귀).
 - 변경 TypeScript 파일 focused ESLint·diff check·문서 민감정보 검사: PASS.
 - PR: [#434](https://github.com/Renagang21/o4o-platform/pull/434), push 완료. 생성 시 main과 MERGEABLE.
-- PR의 최신 CI·SonarCloud·CodeQL: 진행 중. 이 항목은 원격 실행 결과로 확인하며 완료 추정하지 않는다.
+- 최초 원격 CI Gate·전체 API Jest 3 shards·앱 빌드·품질 검사·CodeQL: PASS. 최초 코드 리뷰 지적 없음.
+- 최초 SonarCloud: 새 코드 중복률 7.8%(기준 3%)로 FAIL. 콘텐츠 7개 소유권·조직 오류 분기를 공통 함수로 추출하고 기존 메시지를 보존했다. 사본 고정 config·resolver는 한 번 생성하고 요청별 선택 closure만 새로 연결한다. 이후 로컬 API 90 tests·API build·focused lint는 다시 PASS.
+- 최신 commit의 원격 CI·SonarCloud·CodeQL: 재검증 대상. PR 링크에서 최신 상태를 확인한다.
 - 운영 DB write·main 통합·배포: 미실행.
 
 WORKTREE_DISPOSITION: `wo/store-scope-refactor` / base `261cddc961f29f3d3ca71db9c23ffd2d226d154f` / KEEP(main 미통합).

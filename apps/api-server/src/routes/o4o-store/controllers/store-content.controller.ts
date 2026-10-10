@@ -86,6 +86,26 @@ export function createStoreContentController(
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
+
+  async function requireContentOwner(
+    req: Request,
+    res: Response,
+    userId: string,
+    ownerMessage: string,
+    noOrgMessage = '매장 조직 정보를 찾을 수 없습니다.',
+  ): Promise<string | null> {
+    const access = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
+    if (!access.isOwner) {
+      res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: ownerMessage } });
+      return null;
+    }
+    if (!access.organizationId) {
+      res.status(403).json({ success: false, error: { code: 'NO_ORG', message: noOrgMessage } });
+      return null;
+    }
+    return access.organizationId;
+  }
+
   const translationService = new ContentTranslationService(dataSource);
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -174,31 +194,11 @@ export function createStoreContentController(
 
         // WO-O4O-KPA-STORE-CONTENT-STORE-OWNER-GUARD-FIX-V1:
         // 기존 KPA 매장 소유권·계약 판정과 요청 선택 조직을 함께 확인
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({
-            success: false,
-            error: {
-              code: 'STORE_OWNER_REQUIRED',
-              message: '매장 경영자(kpa:store_owner)만 내 매장 콘텐츠를 저장할 수 있습니다.',
-            },
-          });
-          return;
-        }
-
-        // organizationId는 위 선택 매장 소유권 판정과 동일한 조직이다.
-        const organizationId = orgFromRa;
-
-        if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: {
-              code: 'NO_ORG',
-              message: '매장 조직 정보를 찾을 수 없습니다. 매장 등록 후 다시 시도해 주세요.',
-            },
-          });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 내 매장 콘텐츠를 저장할 수 있습니다.',
+          '매장 조직 정보를 찾을 수 없습니다. 매장 등록 후 다시 시도해 주세요.',
+        );
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
         //   productRef 는 optional. 저장 전 형식/제품 org 스코프 검증(서비스 내부).
@@ -385,16 +385,10 @@ export function createStoreContentController(
           return;
         }
         // 쓰기 = store owner 권한 (POST / 와 동일)
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
-          return;
-        }
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const { listingId, descriptionId } = req.body as { listingId?: string; descriptionId?: string };
         if (!listingId || !UUID_RE.test(listingId) || !descriptionId || !UUID_RE.test(descriptionId)) {
@@ -504,16 +498,10 @@ export function createStoreContentController(
           return;
         }
         // 쓰기 = store owner 권한 (import 와 동일)
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.' } });
-          return;
-        }
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 가져올 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const contentId = req.params.id;
         if (!contentId || !UUID_RE.test(contentId)) {
@@ -712,17 +700,10 @@ export function createStoreContentController(
         }
 
         // store owner 권한 확인 (RBAC SSOT)
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
-          return;
-        }
-
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증(서비스 내부).
         const result = await updateDirectContent(dataSource, organizationId, userId, id, req.body);
@@ -760,17 +741,10 @@ export function createStoreContentController(
           return;
         }
 
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.' } });
-          return;
-        }
-
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 삭제할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const result = await deleteDirectContent(dataSource, organizationId, id);
         if (!result.ok) {
@@ -818,16 +792,10 @@ export function createStoreContentController(
           return;
         }
 
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.' } });
-          return;
-        }
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 번역할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const repo = dataSource.getRepository(KpaStoreContent);
         const content = await repo.findOne({
@@ -897,16 +865,10 @@ export function createStoreContentController(
           return;
         }
 
-        const { isOwner, organizationId: orgFromRa } = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-        if (!isOwner) {
-          res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.' } });
-          return;
-        }
-        const organizationId = orgFromRa;
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORG', message: '매장 조직 정보를 찾을 수 없습니다.' } });
-          return;
-        }
+        const organizationId = await requireContentOwner(req, res, userId,
+          '매장 경영자(kpa:store_owner)만 수정할 수 있습니다.',
+        );
+        if (!organizationId) return;
 
         const repo = dataSource.getRepository(KpaStoreContent);
         const content = await repo.findOne({
