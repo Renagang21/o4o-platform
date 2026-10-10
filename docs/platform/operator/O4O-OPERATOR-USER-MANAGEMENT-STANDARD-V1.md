@@ -69,6 +69,8 @@
 운영 가능한 개별 운영자가 없어도 중앙에서 지정한 활성 `community:admin/operator`는 메인·서비스 자격을 확인한 뒤 활성 독립 커뮤니티 가입 심사를 수행한다(역할 정본 §5). 서비스 admin은 적격 active 개체 회원을 후임 운영자로 지정할 수 있다. 적격 회원이 없으면 공통 계정 상태는 중앙 계정 관리에서, 서비스 상태는 해당 서비스 회원 관리에서 먼저 처리하고 가입 심사·지정을 진행한다. 개별 지정이나 승인이 계정·서비스 처분을 복구하지 않는다.
 
 개별 운영자 지정·해제는 `community:admin`이 담당한다. 지정 후보와 해제 후 남을 운영자는 메인 이용 자격과 `community` 서비스 가입이 활성 상태여야 한다. 이 보호는 역할 해제 시점의 판정이며 중앙 계정 관리나 서비스 정지 자체를 금지하지 않는다.
+사용자 확정 개별 커뮤니티 정비 정책(2026-10-10 · 구현 대기): 개별 operator는 조회·승인·반려, 개별 admin은 정지·해제·커뮤니티 탈퇴를 담당한다. 기존 개별 operator는 admin으로 전환하고 두 역할의 지정·회수는 community 서비스 admin 전용이다. 새 개별 제재는 해당 커뮤니티 가입에만 적용한다. 현행 runtime은 아직 operator/member이므로 [확정 설계와 구현 TODO](../../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md)를 구분하여 따른다.
+
 K-Cosmetics·Pharmacy-Hub 웹 서비스는 은퇴했으므로 공통 API의 역사적 데이터 경계 회귀만 유지하고 화면을 복구하지 않는다.
 구현·검증 범위는 [경계 수정 WO](../../work-orders/WO-O4O-SERVICE-OPERATOR-MEMBERSHIP-BOUNDARY-FIX-V1.md)를 참조한다.
 

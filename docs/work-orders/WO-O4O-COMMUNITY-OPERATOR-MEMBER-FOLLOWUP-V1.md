@@ -87,7 +87,7 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 - [x] 정지·해제·탈퇴 상태 전이와 다른 원장 불변 경계 설계
 - [x] 마지막 유효 admin 보호·중앙 복구·동시 처리 설계
 - [x] 변경 이력·migration·기존 역할 전환안 및 영향 소비처 정리
-- [ ] 권한표와 기존 operator 전환 정책 사용자 확인
+- [x] 권한표와 기존 operator 전환 정책 사용자 확인
 - [x] 설계 문서 검증·커밋
 - [x] 설계 문서 원격 push 확인
 
@@ -106,8 +106,17 @@ main 통합·배포 없이 작업 checkout을 KEEP한다.
 
 - [x] P2: 자격 SELECT와 승인 쓰기 사이 동시 정지 간격 제거 — 승인 트랜잭션에서 users → neture service_memberships 순서로 FOR UPDATE 후 판정. users FK 참조 삽입도 사용자 잠금 동안 대기한다.
 - [x] 보완 후 자격·승인·권한 회귀 및 API 타입 검사 재실행
-- [ ] 리뷰 보완 코드 push와 PR 최신 HEAD 검증
+- [x] 리뷰 보완 코드 push
+- [ ] PR 최신 HEAD 검증
 
 잠금 대기 후 먼저 커밋된 정지를 읽는 모의 회귀를 추가한다. 실제 PostgreSQL 잠금 스케줄링은 이 환경에 로컬 서버가 없어 검증하지 않았다.
 
-리뷰 보완 후 Jest 5 suites / 129 tests 및 API 타입 검사 PASS. 정적 검사도 재실행했다. 설계 문서는 `b4c73611fd`에 push되어 있으며 권한표·기존 역할 전환 질문은 아직 미확정이다. PR 최신 HEAD CI/review 결과는 PR을 기준으로 확인한다.
+리뷰 보완 후 Jest 5 suites / 129 tests 및 API 타입 검사 PASS. 정적 검사도 재실행했다. 설계 문서는 `b4c73611fd`에 push되어 있으며 권한표·기존 역할 전환은 후속 사용자 답변으로 확정했다. PR 최신 HEAD CI/review 결과는 PR을 기준으로 확인한다.
+
+## 설계 정책 확정
+
+사용자가 개별 operator 조회·승인·반려 / admin 정지·해제·탈퇴,
+기존 개별 operator → admin 전환, 지정·회수는 community 서비스 admin 전용으로 확정했다.
+설계 상태를 DESIGNED로 갱신하고 역할 정본과 회원 관리 표준에는 런타임 구현 대기로 반영했다.
+새 기능 런타임 개발·migration은 아직 수행하지 않았으며 위 설계 이후 구현 TODO로 추적한다.
+권한 유효기간 SQL 회귀 1 suite / 18 tests도 추가 실행하여 PASS했다.

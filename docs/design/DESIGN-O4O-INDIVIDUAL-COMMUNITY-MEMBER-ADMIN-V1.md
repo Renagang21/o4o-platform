@@ -1,6 +1,6 @@
 # 개별 커뮤니티 admin/operator 및 회원 제재 설계
 
-> **상태**: DRAFT · 정책 확인 및 구현 대기
+> **상태**: DESIGNED · 권한·기존 역할 전환 정책 확정 · 런타임 구현 대기
 > **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
 > **근거 WO/IR**: 사용자 개별 admin/operator·회원 제재 설계 지시 · [후속 TODO](../work-orders/WO-O4O-COMMUNITY-OPERATOR-MEMBER-FOLLOWUP-V1.md)
 
@@ -9,7 +9,7 @@
 이 문서는 개발 가능한 설계안이다. 새 역할·상태·API·migration이 이미 구현됐다는 뜻이 아니다.
 현행 역할과 중앙 서비스 권한은 [역할 정본](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5,
 [서비스 회원 관리 표준](../platform/operator/O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1.md) §1.1을 따른다.
-확정 전에는 정본의 현행 정책을 변경하지 않는다.
+사용자가 아래 권한표와 기존 operator → admin 전환을 확정했다. 정본에는 구현 대기 정책으로 반영하며 현행 코드 동작과 구분한다.
 
 현재 `CommunityMembership.ts`와 `1790400000000-CreateCommunityDomain.ts`는
 role을 operator/member, status를 pending/active/rejected/withdrawn으로 제한한다.
@@ -30,7 +30,7 @@ role을 operator/member, status를 pending/active/rejected/withdrawn으로 제�
 | 공통 계정 활성 상태 복구 | 차단 | 차단 | 차단 | 차단 |
 | community 서비스 가입 상태 변경 | 별도 서비스 권한 필요 | 별도 서비스 권한 필요 | 서비스 회원 콘솔 | 기존 서비스 정책 적용 |
 
-권한 표의 새 제재 권한과 기존 operator → admin 전환은 사용자 정책 확인 대상이다.
+권한 표의 제재 권한과 기존 operator → admin 전환은 사용자 확정 정책(2026-10-10)이다.
 회원 조회·승인·반려는 기존 서비스 역할의 개별 심사 권한을 유지한다.
 공통 프로필 수정은 기존 서비스 회원 콘솔에서 유지하며 개별 커뮤니티 화면에 새 수정 경로를 만들지 않는다.
 사업 회원 포럼과 게시판 소유자/게시판 회원 권한은 이 설계의 대상이 아니다.
@@ -104,14 +104,14 @@ community_id, membership_id, actor_user_id, action, before/after role·status, r
 
 ## 7. 전환과 구현 순서
 
-1. 권한 표·기존 operator 전환 정책·자기 탈퇴 범위·이력 보존 정책 확정.
+1. 권한 표·기존 operator 전환은 확정 완료. 자기 탈퇴 범위·이력 보존 정책은 구현 전에 별도 확인.
 2. 타입·CHECK 제약·이력 migration 작성과 rollback/data 영향 검토.
 3. 모든 개별 역할 소비처를 admin/operator 인식 및 admin 제재 경계로 정비.
 4. lifecycle 제재 API·이력 원자성·마지막 admin 보호 구현.
 5. 운영자 지정 UI를 3역할 선택으로 변경하고 가입 화면에 권한별 제재 버튼 추가.
 6. 테스트 DB에서 migration·역할 전환 검증 후 운영 적용 절차를 별도 승인.
 
-기존 operator를 admin으로 전환하는 안은 기존 운영 담당을 보존하며 신규 admin 권한을 부여하는 정책 변경이다.
+확정된 기존 operator → admin 전환은 기존 운영 담당을 보존하며 신규 admin 권한을 부여하는 정책 변경이다.
 서비스 역할이나 다른 공간 역할은 전환하지 않는다.
 불필요한 legacy operator alias를 추가하지 않는다. 실제 CHECK 제약과 데이터 전환은 검토된 새 migration으로 수행한다.
 이 단계에서는 migration 실행이나 운영 데이터를 변경하지 않는다.
