@@ -81,7 +81,7 @@ describe('EmailLoginForm', () => {
   });
 });
 
-describe('EmailSignupForm', async () => {
+describe('EmailSignupForm', () => {
   function fill(overrides: Partial<Record<'email' | 'name' | 'phone' | 'pw' | 'confirm', string>> = {}) {
     fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'), { target: { value: overrides.email ?? 'new@x.com' } });
     fireEvent.change(screen.getByLabelText('이름'), { target: { value: overrides.name ?? '홍길동' } });
