@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('../../../lib/api/communityServiceAdmin', () => ({
   listCreationRequests: vi.fn().mockResolvedValue([]),
@@ -29,5 +29,18 @@ describe('커뮤니티 서비스 업무 분리', () => {
     render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
     await waitFor(() => expect(listAdminCommunities).toHaveBeenCalledOnce());
     expect(listCreationRequests).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('관리 조회 탭 전환', () => {
+  it('Admin은 개설 심사로 이동했다가 운영자 목록으로 돌아갈 수 있다', async () => {
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    await waitFor(() => expect(listAdminCommunities).toHaveBeenCalledOnce());
+    fireEvent.click(screen.getByRole('button', { name: '개설 신청 심사', exact: true }));
+    await waitFor(() => expect(listCreationRequests).toHaveBeenCalledOnce());
+    expect(screen.getByText('심사 대기 중인 개설 신청이 없습니다.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '커뮤니티 운영자 지정', exact: true }));
+    await waitFor(() => expect(listAdminCommunities).toHaveBeenCalledTimes(2));
   });
 });
