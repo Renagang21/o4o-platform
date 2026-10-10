@@ -1,5 +1,6 @@
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
+import CommunitySelfWithdrawal from './CommunitySelfWithdrawal';
 import MyPostsPage from '../forum/MyPostsPage';
 import ForumRequestPage from '../forum/ForumRequestPage';
 import MyForumDashboardPage from '../supplier/MyForumDashboardPage';
@@ -36,7 +37,9 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
   const [boardName, setBoardName] = useState('');
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
+  const [notice, setNotice] = useState('');
   const basePath = `/communities/${encodeURIComponent(communityKey)}/forum`;
+  useEffect(() => { setNotice(''); }, [communityKey, user?.id]);
   useEffect(() => {
     let active = true;
     setWorkspace(null); setError('');
@@ -82,6 +85,7 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
   };
   return <div className="max-w-6xl mx-auto px-4 py-8">
     <Link to="/" className="text-sm text-blue-700">커뮤니티 목록</Link>
+    {notice && <p role="status" className="my-4 text-green-700">{notice}</p>}
     {error && <p role="alert" className="my-4 text-red-700">{error}</p>}
     {!workspace && !error && <p className="my-4">불러오는 중입니다…</p>}
     {workspace && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
@@ -108,5 +112,10 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
       {view === 'owned' && <MyForumDashboardPage basePath={basePath} />}
       {view === 'members' && <CommunityForumMembersPage basePath={basePath} />}
     </>}
+    {isAuthenticated && workspace?.kind === 'independent' && workspace.membershipStatus === 'active' &&
+      <CommunitySelfWithdrawal key={communityKey} communityKey={communityKey} name={workspace.name} onWithdrawn={() => {
+        setNotice('이 커뮤니티의 개별 가입을 탈퇴했습니다.');
+        setWorkspace(null); setVersion(v => v + 1);
+      }} />}
   </div>;
 }
