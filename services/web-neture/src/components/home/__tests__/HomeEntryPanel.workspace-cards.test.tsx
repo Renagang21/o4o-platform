@@ -111,3 +111,15 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     expect(within(my).queryByRole('link', { name: /공급자 업무/ })).toBeNull();
   });
 });
+
+it('소속 매장·개인 공급자 자격이 없는 운영자도 각 카드에서 기존 운영 화면으로 진입한다', () => {
+  renderPanel(user(['neture:admin', 'supplier:admin']), data({
+    stores: [],
+    operatorServices: ['neture', 'supplier'].map(serviceKey => ({ serviceKey, serviceName: serviceKey, scope: 'admin', workspaceMode: 'standard', workspaceAvailable: true })),
+  }));
+  expect(within(cards()[1]).getByRole('link', { name: '내 매장 신청 심사' }).getAttribute('href')).toBe('/operator/pharmacy-memberships');
+  expect(within(cards()[2]).getByRole('link', { name: '공급자 관리' }).getAttribute('href')).toBe('/admin/supplier-governance');
+  expect(within(cards()[1]).queryByText('이용 중인 항목이 없습니다.')).toBeNull();
+  expect(within(cards()[2]).queryByText('이용 중인 항목이 없습니다.')).toBeNull();
+  expect(within(cards()[2]).queryByRole('link', { name: '공급자 업무' })).toBeNull();
+});
