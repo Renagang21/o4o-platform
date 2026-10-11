@@ -337,3 +337,9 @@ catalog의 Store-capable 서비스만, 공급자는 기존 canonical resolver의
 게시 정책 본문 read 경로는 catalog의 canonical 서비스에 연결하고 관리 write·법정정보 scope는
 유지했다. 조회 신규 7건과 기존 legal scope 6건이 통과했으며 고유 서버 회귀는 292건이다.
 정책 관리 권한 연결·실제 신규 본문 게시/공고는 후속 TODO이며 이번 read 보완으로 완료 처리하지 않는다.
+
+
+Store 문서별 전문 링크 리뷰도 보완했다. Neture 공통 문서 링크만 공통 주소를 사용하며 서비스
+전문 경로가 미정이면 링크를 생략하고 실제 문서 본문은 표시한다. Store 소비처 1건 및 새 production
+bundle PC/mobile 6건이 통과했다. UI 회귀 302건/서버 292건/로컬 합성 화면 42건이며 운영 검증과
+구분한다. 동일 WO 연속 Phase로 최신 HEAD CI/review까지 확인하며 push/PR 경계를 유지한다.

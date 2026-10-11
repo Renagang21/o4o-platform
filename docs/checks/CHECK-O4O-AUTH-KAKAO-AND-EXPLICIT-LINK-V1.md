@@ -729,3 +729,14 @@ PENDING, 복수 후보 중 업무 자격, INACTIVE, 관계 없음 및 경고가 
 
 Store/원장/공개 조회 보완 후 API 타입·changed lint·API build 및 docs 민감정보 guard가 모두 통과했다.
 최종 CI·전체 재리뷰는 이 후속 HEAD에서 확인하며 실제 서비스 원장 쓰기/정책 게시를 수행하지 않았다.
+
+
+### Store 서비스 문서의 잘못된 전문 링크 제거
+
+Store의 단일 Neture termsPath 전달을 제거했다. 공통 계정 문서는 공통 URL을 새 탭으로 열고,
+서비스별 전문 경로가 확정되지 않은 문서는 전문 링크를 생략하며 각각의 본문/ID/version을 표시한다.
+실제 Store 소비처 DOM 회귀 1건과 Store type/build PASS다. 새로운 Store production bundle에서
+PC/mobile × 정상 승낙/버전 변경/조회 실패 6건을 검증했고 KPA 문서가 Neture 전문 링크로 안내되지
+않는 것도 확인했다. 합성 API/provider/user이며 실제 OAuth/운영 DB 쓰기는 없다. 고유 UI 회귀는
+302건, 서버 292건이며 PC/mobile 로컬 검증은 기존 36 + Store 6 = 42건이다. PG 18 SKIP와 실제
+운영/서비스 원장 검증 OPEN은 유지한다. 이번에 시작한 preview 프로세스는 검증 후 종료했다.
