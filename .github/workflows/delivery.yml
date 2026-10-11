@@ -51,12 +51,11 @@ on:
         required: false
         default: ''
 
-# 최상위 production 작업은 공통 잠금·queue:max로 직렬화한다. 진행 중/대기 중 다른 요청을 새 요청이 취소하지 않는다.
-# Promote가 부모 잠금을 보유하면 Delivery는 run별 child group을 사용해 재취득 교착을 피한다.
+# 자동 경로는 한 번에 한 판정 — 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체된다(새 target 의 누적 diff 가 이전 것을 포함).
+# promote 호출 · 수동 판정은 자동 경로의 대기열을 밀어내지 않도록 별도 group (promote.yml 은 자체 group 을 갖는다).
 concurrency:
-  group: ${{ startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/promote.yml@') && format('delivery-{0}', github.run_id) || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/delivery.yml@') && 'o4o-production-mutation' || format('unsupported-delivery-{0}', github.run_id) }}
+  group: ${{ github.event_name == 'workflow_run' && 'delivery-production' || format('delivery-{0}', github.run_id) }}
   cancel-in-progress: false
-  queue: max
 
 permissions:
   contents: read
@@ -92,14 +91,6 @@ jobs:
     env:
       TARGET_SHA: ${{ github.event.workflow_run.head_sha || inputs.target_sha }}
     steps:
-      - name: Validate production lock caller
-        shell: bash
-        run: |
-          case "$GITHUB_WORKFLOW_REF" in
-            Renagang21/o4o-platform/.github/workflows/delivery.yml@* | Renagang21/o4o-platform/.github/workflows/promote.yml@*) ;;
-            *) echo "::error::Unsupported caller for production lock ownership"; exit 1 ;;
-          esac
-
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.TARGET_SHA }}

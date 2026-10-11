@@ -102,10 +102,8 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     });
   }
 
-  it('web child concurrency 는 서비스 입력별 group, direct root 는 공통 잠금', () => {
-    const wf = read(DEPLOY[1]);
-    assert.match(wf, /format\('deploy-web-\{0\}', inputs\.service \|\| 'all'\)/);
-    assert.match(wf, /&& 'o4o-production-mutation'/);
+  it('web concurrency 는 서비스 입력별 group', () => {
+    assert.match(read(DEPLOY[1]), /group: deploy-web-\$\{\{ inputs\.service \|\| 'all' \}\}/);
   });
 
   it('api migrate_only 도 freeze 가 적용된다', () => {
@@ -175,11 +173,9 @@ describe('Unified Delivery — delivery.yml · promote.yml', () => {
     assert.match(wf, /ARGS\+=\(--shadow --dry-run true\)/);
   });
 
-  it('자동 Delivery와 Promote는 공통 root 잠금 · reusable Delivery는 부모 잠금 재취득 없음', () => {
-    assert.match(wf, /promote\.yml@'\) && format\('delivery-\{0\}', github\.run_id\)/);
-    assert.match(wf, /delivery\.yml@'\) && 'o4o-production-mutation'/);
-    assert.match(promote, /concurrency:\n\s+group: o4o-production-mutation\n\s+cancel-in-progress: false\n\s+queue: max/);
-    assert.match(wf, /cancel-in-progress: false\n\s+queue: max/);
+  it('자동 경로는 한 번에 한 판정 · promote 는 별도 group (자동 대기열을 밀어내지 않는다)', () => {
+    assert.match(wf, /group: \$\{\{ github\.event_name == 'workflow_run' && 'delivery-production' \|\| format\('delivery-\{0\}', github\.run_id\) \}\}/);
+    assert.match(promote, /concurrency:\n\s+group: promote-production\n\s+cancel-in-progress: false/);
   });
 
   it('promote: 입력은 SHA 하나(필수) — delivery 를 mode=promote 로 호출, 태그 · dispatch 0', () => {

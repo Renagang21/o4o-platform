@@ -206,3 +206,7 @@ CI `38136277948`은 기존 배포 gate 테스트 두 곳이 과거 concurrency �
 ### WIF 일시 차단 적용 확인 — 2026-10-11
 
 사용자가 새 인증 정책 변경을 승인하고 로컬 IAM 관리자로 기존 provider 조건을 저장소 밖에 백업했다. provider update 성공 및 describe 결과 기존 조건 전체 뒤에 `&& false`가 붙었음을 확인했다. 과거 태그/이전 main 재실행을 포함한 신규 WIF 인증은 현재 차단된다. 기존 run에 이미 발급된 자격증명은 별도 종료 확인 대상이며 차단과 동시에 폐기된 것으로 주장하지 않는다. 최신 main 반영·필수 CI·리뷰 완료 후 PR #475를 병합하고, 새 main SHA의 PharmacyHub workflow만 인증하도록 로컬 IAM 관리자가 제한 조건을 적용한다. read-only plan 성공 이후 남은 Cloud Run 제거·QR 재검증을 진행하고 원래 조건으로 복구한다. 아직 새 main SHA 제한·Cloud Run 삭제·DB 삭제는 실행하지 않았다.
+
+### 최종 범위 정리 — PR #475 P2 대응
+
+공통 `queue: max`가 오래된 자동 Delivery를 누적시켜 최신 배포를 지연시키는 P2 지적을 수용했다. 전체 서비스의 concurrency/caller 변경과 이에 종속된 테스트 변경을 철회하고 기존 main의 배포 coalescing/child group 동작을 보존한다. 앞선 공통 잠금 설계와 26/110 테스트 기록은 당시 검증 이력이며 최종 구현이 아니다. 최종 구현은 불완전 Actions inventory의 제한된 전체-sweep 재조회, writer/metadata 오류 우선 차단, 해당 자원 테스트의 required CI 연결과 비동기 옵션 대기 수정이다. 실제 PH 삭제 창은 승인·적용된 외부 WIF 인증 차단 및 병합 후 단일 main SHA/PH workflow 제한으로 격리한다. status 조회만으로 원자적 잠금을 구현했다고 주장하지 않는다. 새 P1/P2는 이 외부 제한과 범위 축소로 대응하며, 제한 적용·새 plan 성공 전 apply는 금지한다.

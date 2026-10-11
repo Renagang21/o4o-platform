@@ -15,10 +15,9 @@ name: Deploy API Server (Cloud Run)
 # - See: apps/api-server/src/database/migration-config.ts
 
 concurrency:
-  # Direct 실행은 공통 production 잠금. Delivery/Promote 아래에서는 부모가 잠금을 보유하므로 기존 서비스별 child group.
-  group: ${{ (startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/delivery.yml@') || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/promote.yml@')) && 'deploy-api-production' || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/deploy-api.yml@') && 'o4o-production-mutation' || format('unsupported-deploy-api-{0}', github.run_id) }}
+  # 서비스 단위 1개 rollout — 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체 (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 §18)
+  group: deploy-api-production
   cancel-in-progress: false
-  queue: max
 
 on:
   # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴. 자동 배포는 `deploy-auto.yml`(main CI 성공 → 위험 판정 →
@@ -152,14 +151,6 @@ jobs:
       reason: ${{ steps.scope.outputs.reason }}
 
     steps:
-    - name: Validate production lock caller
-      shell: bash
-      run: |
-        case "$GITHUB_WORKFLOW_REF" in
-          Renagang21/o4o-platform/.github/workflows/deploy-api.yml@* | Renagang21/o4o-platform/.github/workflows/delivery.yml@* | Renagang21/o4o-platform/.github/workflows/promote.yml@*) ;;
-          *) echo "::error::Unsupported caller for production lock ownership"; exit 1 ;;
-        esac
-
     - uses: actions/checkout@v6
       with:
         # push batch 전체(before..after)를 봐야 한다 — 마지막 commit 만 보면
