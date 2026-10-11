@@ -134,3 +134,13 @@ read-only census [38101012970](https://github.com/Renagang21/o4o-platform/action
 5. 공용 코드의 PH admission/role grant/opt-in/catalog/commerce 호환 잔재 제거와 보안 deny 목록·migration 이력 보존을 구분해 검증 → PR/CI/리뷰/병합/필요한 API 배포. Offer service_keys에서 PH를 뺀 결과 빈 배열이 되어 상품이 새로 노출되지 않도록 보호.
 
 실제 QR 전환·Cloud Run/backend/NEG·DB 삭제는 아직 미완료다. 워크트리는 운영 후속 작업과 blocker가 남아 KEEP이며 기존 `/workspace/o4o-platform`의 work branch는 변경하지 않았다.
+
+## 조회 권한 해소 및 전환 재검증 — 2026-10-11
+
+사용자가 네 read 권한을 추가한 뒤 census [38117381901](https://github.com/Renagang21/o4o-platform/actions/runs/38117381901)은 SUCCESS이며 Cloud blockers는 0이다. HTTPS proxy `o4o-global-lb-target-proxy-2`는 실제 `o4o-global-lb`를 사용한다. PH backend 참조는 이 map 하나이며 `backend-pharmacy-hub-web` → `neg-pharmacy-hub-web` → `pharmacy-hub-web` 전용 연결을 확인했다. 다른 backend의 이 NEG 참조는 발견되지 않았다. 옛 두 호스트는 아직 HTTP 200·Location 없음이다.
+
+전체 호스트 plan [38117520110](https://github.com/Renagang21/o4o-platform/actions/runs/38117520110)은 SUCCESS(`applied=false`). 다른 운영 workflow 실행이 없음을 확인한 뒤 apply [38117605410](https://github.com/Renagang21/o4o-platform/actions/runs/38117605410)을 실행했으나 www QR의 HTTP 200·Location 없음으로 실패했다. Cloud Run/backend/NEG/DB 삭제는 실행하지 않았다. rollback 이후 census [38118536052](https://github.com/Renagang21/o4o-platform/actions/runs/38118536052)은 SUCCESS이며 PH matcher가 기존 backend로 복구됐고 Cloud blockers 0·Cloud Run 존재·옛 두 호스트 HTTP 200임을 재확인했다.
+
+기존 검증은 최대 6회/10초 간격으로 약 50초 뒤 실패할 수 있었다. Compute operation DONE과 frontend 반영은 구분해야 하므로 동일 엄격 검증을 최대 5분까지 반복하도록 보강한다. 반영 지연은 아직 확정 원인이 아니며, 이 검증으로 확인한다. timeout 이후에는 기존 fingerprint·동시 변경 차단·검증된 rollback을 유지하고 workflow의 변경 전 25분 잔여 시간 gate도 유지한다. 지연 후 성공·기한 만료 rollback·이미 취소된 검증 회귀를 포함해 focused tests 52개 PASS다.
+
+동일 WO의 연속 phase로 사용자 지정 worktree를 재사용하며 branch는 `wo/pharmacyhub-retirement-propagation`, base는 최신 main `4f75e2563a`다. 운영 전환은 성공으로 보고하지 않으며 자원·데이터 제거는 여전히 미완료다.
