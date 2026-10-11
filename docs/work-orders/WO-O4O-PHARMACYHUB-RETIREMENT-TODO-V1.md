@@ -98,3 +98,8 @@ PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sou
 추가 census 범위/진단 리뷰: 등록된 pharmacy-hub-event-offer 키도 정확한 PH namespace 집계에 포함한다. 잘못된 Location은 별도 파싱 실패로 처리해 HTTP status와 Location 존재 여부를 보존하며 네트워크 장애로 오진하거나 원문 Location을 출력하지 않는다.
 
 서비스 범위 컬럼 전수 대조: 명시적 scope 목록 외에도 schema의 모든 호환 text/text-array service 명칭 컬럼을 후보 집계한다. handoff_tokens.source_service_key/target_service_key와 seller_recruitments.service_id의 PH 건수/FK 포함 회귀를 추가했다. UUID service_id가 PH 문자열과 일치하지 않는 경우의 실제 귀속은 FK 관계로 별도 조사하며 이 후보 census로 삭제를 승인하지 않는다.
+
+
+## 운영 census 진단 후속 — 2026-10-11
+
+PR #438은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main `498ccbd9ea`로 병합했다. read-only census `38099121451`은 DB 단계에서 실패했으나 이미 정제된 오류의 code를 CLI에서 다시 정제하며 UNKNOWN으로 잃는 결함을 확인했다. 알려진 오류 code만 유지하며 DB 실패 시에도 독립 Cloud/DNS/HTTPS 진단은 수집하고 실행 상태는 실패로 유지한다. 원문 SQL 오류·credential·행 데이터는 계속 출력하지 않는다. 같은 폐기 WO의 연속 phase로 사용자 지정 worktree와 최신 main 기준 `wo/pharmacyhub-retirement-census-diagnostics`를 사용한다. 운영 변경·Cloud Run·데이터 삭제는 미실행이다.

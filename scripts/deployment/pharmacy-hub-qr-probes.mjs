@@ -14,7 +14,7 @@ export const queries = [
 export function safeInventoryError(error, stage) {
   const allowed = new Set(['28P01', '28000', '42501', '42P01', '42703', '42883', '57014', '53300', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']);
   const code = allowed.has(error?.code) ? error.code : 'UNKNOWN';
-  return new Error(`Read-only QR inventory failed: stage=${stage}; code=${code}. No credentials or row contents logged.`);
+  return Object.assign(new Error(`Read-only QR inventory failed: stage=${stage}; code=${code}. No credentials or row contents logged.`), { code });
 }
 
 export function readPassword(run = execFileSync) {
