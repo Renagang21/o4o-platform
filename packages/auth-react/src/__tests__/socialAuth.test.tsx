@@ -36,3 +36,13 @@ it('signup/email verification notices never authenticate the shared context',asy
  await act(async()=>{expect(await result.current.loginWithKakao({token:'t',code:'c'})).toMatchObject({success:false,nextStep:'signup'});});
  await act(async()=>{expect(await result.current.signupWithKakao('t',{} as any)).toMatchObject({success:false,nextStep:'verify-email'});});expect(result.current.isAuthenticated).toBe(false);expect(authenticated).not.toHaveBeenCalled();
 });
+
+it('Kakao signup hides privacy links until the server supplies the policy owner', async () => {
+  callback={token:'state',kind:'kakao-login'};
+  let resolve!: (doc: typeof TERMS) => void;
+  render(<KakaoContinue client={{getSignupTerms:()=>new Promise(r=>{resolve=r;}),getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={vi.fn()} onSuccess={vi.fn()} privacyHref="/privacy" />);
+  await screen.findByText(/계정을 만들려면/);
+  expect(screen.queryByRole('link',{name:'내용 보기'})).toBeNull();
+  await act(async()=>{const doc={...TERMS,privacyHref:'https://pharmacy.neture.co.kr/privacy'};resolve(doc);});
+  expect((await screen.findByRole('link',{name:'내용 보기'})).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
+});

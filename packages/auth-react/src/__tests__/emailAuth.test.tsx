@@ -265,3 +265,12 @@ describe('useServiceAuth.loginWithEmail', () => {
     expect(r.success).toBe(false);
   });
 });
+
+it('email signup hides privacy links until the server supplies the policy owner', async () => {
+  let resolve!: (doc: typeof TERMS) => void;
+  render(<EmailSignupForm api={{ getSignupTerms: () => new Promise(r => { resolve = r; }), signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} privacyHref="/privacy" />);
+  await waitFor(() => expect(resolve).toBeTypeOf('function'));
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+  await act(async () => { const doc = { ...TERMS, privacyHref: 'https://pharmacy.neture.co.kr/privacy' }; resolve(doc); });
+  expect((await screen.findByRole('link', { name: '개인정보 처리방침 내용 보기' })).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
+});

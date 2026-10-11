@@ -159,7 +159,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <label style={styles.checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
-          <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+          {policy && <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>}
         </div>
         <label style={styles.checkRow}>
           <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
