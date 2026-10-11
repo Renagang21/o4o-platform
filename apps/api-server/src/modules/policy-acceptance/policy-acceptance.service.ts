@@ -34,7 +34,7 @@ import {
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
 import { demoAccountService } from '../../services/auth/demo-account.service.js';
-import { resolveSupplierForUser, SUPPLIER_WORK_MEMBER_ROLES } from '../neture/middleware/supplier-context.resolver.js';
+import { resolveSupplierForUser, hasSupplierRuntimeRelation } from '../neture/middleware/supplier-context.resolver.js';
 import { resolveSemiFranchiseServiceAccess } from '../neture-pharmacy/services/semi-franchise-service-access.js';
 import { PHARMACY_STORE_MEMBER_ROLES } from '../neture-pharmacy/constants.js';
 import { getService } from '../../config/service-catalog.js';
@@ -243,6 +243,23 @@ export class PolicyAcceptanceService {
       }));
   }
 
+  private async hasDynamicPolicyRelation(userId: string, published: PublishedTermsDocument[], q: Queryable): Promise<boolean> {
+    const hasSupplierPolicy = published.some(d => d.serviceKey === 'supplier');
+    const hasPharmacyPolicy = published.some(d => !!getService(d.serviceKey)?.semiFranchiseAccessKey);
+    // Probe current relations, not approval status. A newly added relation invalidates the hot path immediately.
+    // Unrelated accounts retain the empty-result cache without repeated membership/access resolver queries.
+    const [supplierRelated, relationRows] = await Promise.all([
+      hasSupplierPolicy ? hasSupplierRuntimeRelation(q, userId) : false,
+      hasPharmacyPolicy ? q.query(
+      `SELECT /* policy_dynamic_relation */
+        EXISTS (SELECT 1 FROM organization_members om WHERE om.user_id = $1 AND om.left_at IS NULL
+          AND om.role = ANY($2::text[])) AS related`,
+      [userId, PHARMACY_STORE_MEMBER_ROLES],
+    ) as Promise<{ related: boolean }[]> : [],
+    ]);
+    return supplierRelated || relationRows.some(row => row.related);
+  }
+
   /**
    * **raw pending** — 약관 데이터 기준 미승낙 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회).
    * 서비스 접근 강제에는 이것이 아니라 `getEnforcedPendingForUser` 를 쓴다 (Demo 예외 반영).
@@ -254,21 +271,8 @@ export class PolicyAcceptanceService {
 
     const q = this.db();
     const hasSupplierPolicy = published.some(d => d.serviceKey === 'supplier');
-    const hasPharmacyPolicy = published.some(d => !!getService(d.serviceKey)?.semiFranchiseAccessKey);
-    // Probe current relations, not approval status. A newly added relation invalidates the hot path immediately.
-    // Unrelated accounts retain the empty-result cache without repeated membership/access resolver queries.
-    const relationRows = hasSupplierPolicy || hasPharmacyPolicy ? await q.query(
-      `SELECT /* policy_dynamic_relation */
-        EXISTS (SELECT 1 FROM organization_members om WHERE om.user_id = $1 AND om.left_at IS NULL
-          AND om.role = ANY($2::text[]))
-        OR ($3::boolean AND EXISTS (SELECT 1 FROM neture_suppliers s WHERE s.user_id = $1)) AS related`,
-      [userId, [...new Set([
-        ...(hasPharmacyPolicy ? PHARMACY_STORE_MEMBER_ROLES : []),
-        ...(hasSupplierPolicy ? SUPPLIER_WORK_MEMBER_ROLES : []),
-      ])], hasSupplierPolicy],
-    ) as { related: boolean }[] : [];
-    const dynamicSubjects = relationRows.some(row => row.related);
-    const policyKey = published.map(d => `${d.id}:${d.version}:${d.slug ?? ''}`).sort().join('|');
+    const dynamicSubjects = await this.hasDynamicPolicyRelation(userId, published, q);
+    const policyKey = published.map(d => `${d.id}:${d.version}:${d.slug ?? ''}`).sort((a, b) => a.localeCompare(b)).join('|');
     const cached = this.userOkCache.get(userId);
     if (!dynamicSubjects && cached?.policyKey === policyKey && Date.now() - cached.at < USER_OK_TTL_MS) return [];
 

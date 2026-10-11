@@ -18,6 +18,7 @@ vi.mock("../../lib/api/communityOperator", () => ({
   listOperatedCommunities: () => Promise.resolve([]),
 }));
 vi.mock("../../lib/apiClient", () => ({ api: { get } }));
+vi.mock("../../contexts/AuthContext", () => ({ useAuth: () => ({ logout: vi.fn() }) }));
 afterEach(cleanup);
 beforeEach(() => {
   get.mockReset();

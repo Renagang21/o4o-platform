@@ -191,3 +191,18 @@ describe('문서 소유 서비스와 전문 링크의 일치', () => {
     for (const key of keys) expect(screen.getByText(`${key} body`)).toBeTruthy();
   });
 });
+
+it('복수 패널의 inline gate는 서로 다른 제목을 가진 비모달 region이며 무관한 화면은 유지한다', async () => {
+  const props = { loadPolicy: async () => DOC, onAccept: async () => ({ success: true }), onLogout: () => {} };
+  render(<MemoryRouter><p>계속 이용 가능한 패널</p>{[1, 2].map(key =>
+    <PolicyAcceptanceGate key={key} inline {...props} pending={PENDING}>{null}</PolicyAcceptanceGate>
+  )}</MemoryRouter>);
+  await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(2));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(screen.getByText('계속 이용 가능한 패널')).toBeTruthy();
+  const regions = screen.getAllByRole('region', { name: 'O4O 통합 서비스 이용약관에 동의해 주세요' });
+  const ids = regions.map(region => region.getAttribute('aria-labelledby'));
+  expect(new Set(ids).size).toBe(2);
+  for (const region of regions) expect(region.getAttribute('aria-modal')).toBeNull();
+  expect(screen.getAllByRole('heading', { level: 2, name: 'O4O 통합 서비스 이용약관에 동의해 주세요' })).toHaveLength(2);
+});

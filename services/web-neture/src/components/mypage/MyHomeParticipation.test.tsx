@@ -8,15 +8,17 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import type { HomeEntryData } from "../../lib/home-entry";
-const { get, resolveServiceEntryUrl } = vi.hoisted(() => ({
+const { get, post, resolveServiceEntryUrl } = vi.hoisted(() => ({
   get: vi.fn(),
+  post: vi.fn(),
   resolveServiceEntryUrl: vi.fn(),
 }));
 vi.mock("../../lib/apiClient", () => ({
-  api: { get },
+  api: { get, post },
   API_BASE_URL: "https://api.example.test",
 }));
 vi.mock("../../lib/home-entry", () => ({ resolveServiceEntryUrl }));
+vi.mock("../../contexts/AuthContext", () => ({ useAuth: () => ({ logout: vi.fn() }) }));
 vi.mock("../../lib/api/communityOperator", () => ({
   listOperatedCommunities: vi.fn(),
 }));
@@ -75,6 +77,7 @@ const app = (
 );
 beforeEach(() => {
   get.mockReset();
+  post.mockReset();
   resolveServiceEntryUrl.mockReset();
   get.mockImplementation((path: string) =>
     Promise.resolve(path.includes("lms") ? studyResponse() : fundingResponse()),
@@ -265,4 +268,73 @@ it("invalidates pending moves on back navigation and account changes", async () 
   finish("https://evil.test/handoff?token=fixture");
   await Promise.resolve();
   expect(screen.queryByText(/Study로 이동하지 못했습니다/)).toBeNull();
+});
+
+
+const pendingTerms = { serviceKey: "lecture", documentType: "terms", policyDocumentId: "11111111-1111-4111-8111-111111111111", version: 2, title: "Study fixture terms" };
+const blocked = (pending = [pendingTerms]) => ({ response: { status: 428, data: { code: "TERMS_ACCEPTANCE_REQUIRED", pendingPolicyAcceptances: pending } } });
+const publicTerms = (version = 2) => ({ data: { data: { id: pendingTerms.policyDocumentId, serviceKey: "lecture", documentType: "terms", version, title: "Study fixture terms", content: "Study fixture body" } } });
+it("a Study 428 presents only a resource gate, accepts its exact document, and resumes the history while Funding stays available", async () => {
+  let accepted = false;
+  get.mockImplementation((path: string) => {
+    if (path.includes("/public/")) return Promise.resolve(publicTerms());
+    if (path.includes("lms")) return accepted ? Promise.resolve(studyResponse()) : Promise.reject(blocked());
+    return Promise.resolve(fundingResponse());
+  });
+  post.mockImplementation(async () => { accepted = true; return { data: { success: true } }; });
+  render(app());
+  await screen.findByText("Study fixture body");
+  expect(await screen.findByText("펀딩 first")).toBeTruthy();
+  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(screen.getByRole("button", { name: "동의하고 계속하기" }));
+  await screen.findByText("수강 first");
+  expect(post).toHaveBeenCalledWith("/auth/policy-acceptances", { serviceKey: "lecture", policyDocumentId: pendingTerms.policyDocumentId, version: 2 });
+});
+it.each(["changed", "unavailable", "malformed"])("Study %s policy response blocks acceptance and leaves Funding usable", async scenario => {
+  get.mockImplementation((path: string) => {
+    if (path.includes("/public/")) return scenario === "unavailable" ? Promise.reject(new Error("Unavailable")) : Promise.resolve(publicTerms(3));
+    if (path.includes("lms")) return Promise.reject(scenario === "malformed" ? blocked([{ ...pendingTerms, version: 0 }]) : blocked());
+    return Promise.resolve(fundingResponse());
+  });
+  render(app());
+  await screen.findByText("펀딩 first");
+  if (scenario === "malformed") await screen.findByText(/정보를 불러오지 못했습니다/);
+  else {
+    const button = await screen.findByRole("button", { name: "동의하고 계속하기" });
+    expect((button as HTMLButtonElement).disabled).toBe(true);
+  }
+  expect(post).not.toHaveBeenCalled();
+});
+it("Funding 428 is handled by the same resource boundary while Study remains readable", async () => {
+  const funding = { ...pendingTerms, serviceKey: "funding", title: "Funding fixture terms" };
+  let accepted = false;
+  get.mockImplementation((path: string) => {
+    if (path.includes("/public/")) return Promise.resolve({ data: { data: { ...publicTerms().data.data, serviceKey: "funding", title: funding.title } } });
+    if (path.includes("lms")) return Promise.resolve(studyResponse());
+    return accepted ? Promise.resolve(fundingResponse()) : Promise.reject(blocked([funding]));
+  });
+  post.mockImplementation(async () => { accepted = true; return { data: { success: true } }; });
+  render(app());
+  await screen.findByText("Study fixture body");
+  expect(await screen.findByText("수강 first")).toBeTruthy();
+  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(screen.getByRole("button", { name: "동의하고 계속하기" }));
+  await screen.findByText("펀딩 first");
+  expect(post).toHaveBeenCalledWith("/auth/policy-acceptances", { serviceKey: "funding", policyDocumentId: funding.policyDocumentId, version: 2 });
+});
+it("a stale submission reloads the protected resource and requires the new version again", async () => {
+  let version = 2;
+  get.mockImplementation((path: string) => {
+    if (path.includes("/public/")) return Promise.resolve(publicTerms(version));
+    if (path.includes("lms")) return Promise.reject(blocked([{ ...pendingTerms, version }]));
+    return Promise.resolve(fundingResponse());
+  });
+  post.mockImplementation(async () => { version = 3; throw new Error("POLICY_VERSION_MISMATCH"); });
+  render(app());
+  await screen.findByText("Study fixture body");
+  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(screen.getByRole("button", { name: "동의하고 계속하기" }));
+  await screen.findByText(/v3/);
+  expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(false);
+  expect(post).toHaveBeenCalledTimes(1);
 });

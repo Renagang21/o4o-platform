@@ -835,3 +835,30 @@ published 표식 추가·제거·일반 slug 변경, draft 표식 추가·제거
 새 공통 draft의 표식 유지·본문 편집 1건은 정상이다. 신규 6건 포함 2 suites 25 PASS다.
 고유 서버 329건/UI 304건, 모의 PC/mobile 48건/PG 39 SKIP 및 실제 공고·게시 OPEN을
 유지한다. API build/lint/docs guard/diff check PASS, 최신 HEAD CI/review를 확인한다.
+
+
+### My Home의 교차 서비스 428과 최종 CI 보완
+
+Neture 세션의 /auth/me에 무관한 lecture pending을 추가하지 않는다. My Home 공통 resource
+hook이 보호 API의 428/TERMS_ACCEPTANCE_REQUIRED를 문서 목록으로 보존하고 해당 패널에서
+공통 gate를 표시한다. 승낙은 정확한 ID/version으로 제출하고 같은 resource를 다시 조회한다.
+강의·펀딩 및 동일 hook 소비처에 적용하며 주변 패널은 유지한다. malformed 응답은 일반 조회
+실패로 처리해 제출하지 않는다. account/resource 교체 시 늦은 응답을 버리는 계약도 유지한다.
+
+패널용 gate는 비모달 region이며 복수 제목 ID를 구분한다. My Home 2 files 23 PASS, 공통 UI
+9 files 73 PASS다. 이전 고유 UI 304 + 기존 집계에 없던 My Home 23 + 공통 신규 1 = 328건이다.
+초기 버튼 기대 문구와 제목 selector 범위 오기를 정정한 재실행 결과다. 새 production bundle의
+PC/mobile × 강의/펀딩 × 승낙/버전 변경/조회 실패 12 PASS이며 기존 48을 포함한 고유 모의
+화면 검증은 60건이다. 초기 브라우저 locator가 합성 문서의 영어 제목을 찾지 못한 것을 정정했다.
+모든 외부 요청을 fixture로 처리했고 실제 OAuth/운영 DB 쓰기는 없다. 시작한 preview는 종료했다.
+
+직전 HEAD CI에서 공급자 경계 검사가 실패했다. 로컬 동일 shard 실행으로 정책 서비스의
+legacy supplier 직접 조회를 재현하고 cache 후보 조회를 canonical resolver로 옮겼다. 정책
+서비스는 직접 legacy 조회하지 않는다. API focused 5 suites 187 PASS(보안/raw/provider 128,
+기존 supplier resolver 18, 경계 41)다. 인증·정책 고유 서버 회귀 329건과 추가 경계 41건을
+구분하며 일반 shard의 다른 회귀를 이 집계에 섞지 않는다. SonarCloud가 지적한 판정 함수
+복잡도는 후보 조회 helper로 분리하고 문자열 fingerprint 정렬에 localeCompare를 지정했다.
+
+API·Neture build(타입 포함), changed lint, docs 민감정보 guard, diff check PASS다. 최신 HEAD
+CI·review를 다시 확인한다. PG 39 SKIP, 실제 외부 인증/서비스 신청 원장·조건 기록/개인정보
+version 증빙/8개 서비스 운영 상태 검증/30일 공고·게시 OPEN과 push/PR 종료 범위는 유지한다.

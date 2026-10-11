@@ -382,3 +382,13 @@ slug=neture-account-terms 문서가 실제 게시된 뒤에만 membership 없는
 표식을 지정해 기존 동의 ID를 공통 계약으로 재분류하지 않는다. 실제 PUT 신규 6건 포함
 관련 25 PASS, 고유 서버 329건/UI 304건이다. 실제 공고/게시/운영 검증 OPEN과 push/PR
 종료 경계를 유지하며 최신 HEAD CI/review를 확인한다.
+
+
+My Home의 cross-service API 428은 해당 패널의 inline policy gate에 전달하고 승낙 후 조회를
+재개한다. Neture 전체 pending에 무관 서비스 문서를 넣지 않으며 원장/역할·서비스 가입을
+만들지 않는다. My Home 23/공통 UI 73 PASS, 고유 UI 328건이다. 새 production bundle의
+PC/mobile 12건 포함 모의 화면 60건이며 실제 OAuth/운영 검증과 구분한다.
+직전 CI의 supplier 경계 실패는 로컬 재현 후 canonical resolver로 후보 조회를 이동했다.
+관련 API 187 PASS, 인증·정책 고유 329 + 추가 supplier 경계 41을 분리 기록한다. SonarCloud
+지적의 복잡도/정렬도 보완했다. 최신 push HEAD CI/review를 확인하며 실제 공고/게시 OPEN과
+이번 push/PR 범위를 유지한다.

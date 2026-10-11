@@ -15,7 +15,7 @@
  * 실제 HTTP 호출은 service 측에서 주입한다(loadPolicy · onAccept · onLogout). 화면을 복사하지 않는다.
  */
 
-import { type CSSProperties, type ReactNode, useEffect, useState } from 'react';
+import { type CSSProperties, type ReactNode, useEffect, useId, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { PolicyDocumentDto } from './PolicyDocumentViewer';
 
@@ -49,6 +49,8 @@ export interface PolicyAcceptanceGateProps {
   leadText?: string;
   /** 필수 체크박스 문구. */
   checkboxText?: string;
+  /** Resource-local region; keeps surrounding panels available and does not declare a modal. */
+  inline?: boolean;
   children: ReactNode;
 }
 
@@ -87,9 +89,12 @@ export function PolicyAcceptanceGate({
   agreementLabel = '이용약관',
   leadText,
   checkboxText,
+  inline = false,
   children,
 }: PolicyAcceptanceGateProps) {
   const location = useLocation();
+  const titleId = useId();
+  const Heading = inline ? 'h2' : 'h1';
   const first = pending[0];
   const bypass = pending.length === 0 || allowPaths.includes(location.pathname);
 
@@ -145,10 +150,10 @@ export function PolicyAcceptanceGate({
   };
 
   return (
-    <div style={S.wrap} role="dialog" aria-modal="true" aria-labelledby="policy-acceptance-title">
+    <div style={inline ? { ...S.wrap, minHeight: 0, padding: 0 } : S.wrap} role={inline ? 'region' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId}>
       <div style={S.card}>
         <p style={S.eyebrow}>{serviceName ? `${serviceName} · ` : ''}{agreementLabel} 동의</p>
-        <h1 id="policy-acceptance-title" style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</h1>
+        <Heading id={titleId} style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</Heading>
         <p style={S.lead}>
           {leadText ?? `서비스를 계속 이용하려면 아래 ${agreementLabel}을(를) 확인하고 동의해야 합니다. 동의하기 전까지는 계약 열람, 문의, O4O 메인 복귀, 로그아웃만 이용할 수 있습니다.`}
           {pending.length > 1 && <> 공통 계정 약관과 해당 서비스 약관을 각각 확인해 주세요.</>}

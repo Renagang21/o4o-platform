@@ -202,3 +202,14 @@ Google·카카오 제출이 같은 전환 판정을 사용하며 게시 후 오�
 관계 없는 사용자 캐시는 게시 문서 ID/version/slug 집합이 같을 때 재사용해 membership/원장
 전체 조회를 반복하지 않는다. 관계 확인용 DB 조회 1건은 남으며 published 문서 최대 60초 지연은
 유지한다. 실제 공고 증빙·30일 경과·정책 게시 및 신청 snapshot TODO는 그대로 OPEN이다.
+
+
+My Home은 다른 서비스의 보호 API를 조회할 수 있다. 그 API의 428 pending은 공통 로그인
+상태에 합쳐 Neture 전체를 막지 않고 해당 resource 패널에 전달한다. 공통 PolicyAcceptanceGate의
+inline region에서 문서별 본문/ID/version을 확인하고 승낙 후 원래 resource를 다시 조회한다.
+무관한 패널은 유지하며 버전 경합·조회 실패·불완전 응답은 승낙을 열지 않는다. 패널 gate는
+modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/조건 snapshot 연결 TODO는 유지한다.
+
+원장 cache 후보 중 legacy supplier 조회는 canonical supplier resolver에만 둔다. 약국 및
+공급자 후보의 EXISTS를 독립 조회하므로 하나의 정책 유형이면 1건, 두 유형이면 최대 2건이다.
+후보 probe는 업무 권한 판정이 아니고 실제 resolver가 자격을 확인한다. published TTL 60초는 유지한다.
