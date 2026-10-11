@@ -714,3 +714,28 @@ describe('혼합 소비 Neture API는 서명된 서비스 세션 범위를 유�
     }
   });
 });
+
+
+describe('공급자 심사 경로는 Express의 슬래시/대소문자 매칭과 일치한다', () => {
+  it.each(['approve', 'reject', 'terminate'])('%s의 후행 슬래시 및 대문자 경로도 supplier 약관을 요구한다', async action => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'supplier')];
+    membershipRows = [{ serviceKey: 'supplier', status: 'active' }];
+    acceptedIds = [DOC_NETURE];
+    const app = express();
+    app.post(`/api/v1/neture/seller-recruitment/applications/:id/${action}`, requireAuth as any, (_req, res) => res.json({ reached: true }));
+    const path = `/api/v1/neture/seller-recruitment/applications/fixture/${action}`;
+    const variants = [`${path}/?serviceKey=neture`, `${path.toUpperCase()}/`];
+    for (const variant of variants) {
+      const denied = await request(app).post(variant).set('Authorization', `Bearer ${makeToken()}`);
+      expect(denied.status).toBe(428);
+      expect(denied.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual(['supplier']);
+    }
+    acceptedIds.push(DOC_KPA);
+    policyAcceptanceService.invalidateAll();
+    for (const variant of variants) {
+      const accepted = await request(app).post(variant).set('Authorization', `Bearer ${makeToken()}`);
+      expect(accepted.status).toBe(200);
+      expect(accepted.body.reached).toBe(true);
+    }
+  });
+});

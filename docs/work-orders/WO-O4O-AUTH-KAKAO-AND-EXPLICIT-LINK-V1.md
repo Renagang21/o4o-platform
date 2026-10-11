@@ -303,3 +303,10 @@ Google 증거·계정/세션 상태·기존 role guard와 일반 서비스 세�
 유지하고, 전용 관리 및 supplier 모집 심사 동작만 실제 controller 권한 경계로 소유 범위를
 지정한다. 신규 회귀 7건을 포함한 보안/기존 계약 74건 및 API 타입/lint가 통과했다.
 실제 서비스 신청 원장·조건 snapshot과 30일 공고/시행은 이번 구현 PASS로 완료 처리하지 않는다.
+
+
+후행 slash는 기존 normalizeRequestPath가 처리하므로 리뷰의 해당 재현 가정을 정정했다.
+Express 실제 route의 slash 및 uppercase supplier 동작을 검증하고 owner의 대소문자를 맞췄다.
+date 입력 시행일은 한국 달력 날짜(Asia/Seoul)로 비교하며 한국 자정 및 오전 게시 경계를 보완했다.
+신규 11건 포함 관련 4 suites/94 PASS이며 숫자 날짜 key 보완 뒤 게시/lifecycle 17건을 재확인했다.
+이 변경은 실제 공고나 30일 공고 증빙을 대신하지 않는다. 최종 CI·재리뷰는 후속 HEAD에서 확인한다.

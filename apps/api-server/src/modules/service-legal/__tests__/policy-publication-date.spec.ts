@@ -47,3 +47,16 @@ describe('게시 전 시행일 방어 — 기존 published를 보존', () => {
     expect(doc.status).toBe('draft');
   });
 });
+
+
+it('한국 시행일 자정에는 controller가 새 문서를 게시한다(UTC로는 전날)', async () => {
+  jest.useFakeTimers({ doNotFake: ['hrtime', 'nextTick', 'performance', 'queueMicrotask', 'setImmediate', 'clearImmediate', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+  jest.setSystemTime(new Date('2026-11-09T15:00:00Z'));
+  try {
+    const { app, repo, execute } = harness(new Date('2026-11-10'));
+    const res = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+    expect(res.status).toBe(200);
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'published' }));
+  } finally { jest.useRealTimers(); }
+});

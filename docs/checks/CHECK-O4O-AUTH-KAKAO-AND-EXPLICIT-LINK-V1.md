@@ -658,3 +658,20 @@ supplier 전용으로 묶지 않는다.
 두 세션의 다른 pending 판정 2건이다. 보안 70 + raw-source 4 = 74 PASS, API 타입/lint PASS.
 이번 고유 API 회귀는 227건, UI 301건, 로컬 PC/mobile 36건이다. HTTP fixture는 공통 middleware
 검증이며 실제 신청 DB의 rollback·조건 snapshot 검증은 별도 TODO다.
+
+
+### 경로 정규화 및 한국 시행일 경계
+
+후행 슬래시 리뷰 지적은 재현되지 않았다. 기존 normalizeRequestPath가 이미 후행 slash를 제거한다.
+실제 Express post route에서 approve/reject/terminate의 slash+query 변형이 supplier pending일 때
+428, 승낙 뒤 200임을 확인했다. 추가로 Express 기본 대소문자 매칭과 owner 판정이 다르지 않도록
+owner 판정 경로를 소문자로 정렬했고 uppercase 변형도 같은 결과를 확인했다(신규 3건).
+
+관리 UI의 시행일은 date 입력이다. 게시 방어를 Asia/Seoul 달력 날짜 비교로 변경했다.
+한국 시행일 직전 거부, 한국 자정/당일 오전/당일 말/다음날 허용, legacy null 및 invalid date를
+확인했고 한국 자정(UTC로 전날)에 controller가 게시하는 HTTP 회귀도 추가했다(신규 8건).
+이 날짜 판정은 30일 공고의 실행/증빙이나 자동 예약 게시가 아니다.
+
+보안·raw-source·lifecycle·게시 controller 4 suites, 94 PASS. 숫자 날짜 key 보완 뒤 lifecycle/게시
+17건도 재확인했다. 추가 11건을 포함해 고유 서버 회귀는 238건, UI 301건이다. 로컬 PC/mobile
+36건의 합성 API/provider 범위와 PG 통합/실제 OAuth·운영 검증 OPEN은 유지한다.

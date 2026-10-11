@@ -47,14 +47,23 @@ export function resolveServicePolicyLifecycle(
   return 'draft';
 }
 
-/** Current publish is immediate activation, not a notice/scheduling operation. */
+const policyDateFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+});
+function policyCalendarDay(date: Date): number {
+  const parts = policyDateFormatter.formatToParts(date);
+  const value = (type: string) => Number(parts.find(part => part.type === type)!.value);
+  return value('year') * 10000 + value('month') * 100 + value('day');
+}
+
+/** Effective date is a Korean calendar date (admin date input), not an intraday activation timestamp. */
 export function assertPolicyEffectiveForPublication(effectiveDate: Date | string | null, now = new Date()): void {
   if (effectiveDate === null) return; // Existing documents without an effective date retain their contract.
   const date = new Date(effectiveDate);
   if (!Number.isFinite(date.getTime())) {
     throw new ServicePolicyLifecycleError('POLICY_EFFECTIVE_DATE_INVALID', '유효한 시행일이 필요합니다.', 400);
   }
-  if (date.getTime() > now.getTime()) {
+  if (policyCalendarDay(date) > policyCalendarDay(now)) {
     throw new ServicePolicyLifecycleError('POLICY_NOT_YET_EFFECTIVE', '공고 중인 문서는 시행일 이후 게시해 주세요.');
   }
 }

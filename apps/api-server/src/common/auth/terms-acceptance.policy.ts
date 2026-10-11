@@ -185,7 +185,8 @@ export function selectPendingPoliciesForRequest(
   sessionServiceKey?: string | null,
   rawUrl?: string,
 ): PendingPolicyAcceptance[] {
-  const path = normalizeRequestPath(rawUrl);
+  // Express routes are case-insensitive by default; ownership must match the same literals.
+  const path = normalizeRequestPath(rawUrl)?.toLowerCase();
   const owners: ReadonlyArray<readonly [string, string]> = [
     ['/api/v1/kpa-branch', 'kpa-branch'],
     ['/api/v1/kpa', 'kpa-society'],
