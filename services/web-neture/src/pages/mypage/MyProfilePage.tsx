@@ -48,7 +48,7 @@ export default function MyProfilePage() {
       <MyPageLayout title="프로필" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
-          description="마이페이지를 이용하려면 로그인해주세요."
+          description="My Home을 이용하려면 로그인해주세요."
           onAction={() => openLoginModal('/mypage/profile')}
         />
       </MyPageLayout>
@@ -97,7 +97,7 @@ export default function MyProfilePage() {
       navItems={getNetureMyPageNavItems(user.roles)}
       breadcrumb={[
         { label: '홈', href: '/' },
-        { label: '마이페이지', href: '/mypage' },
+        { label: 'My Home', href: '/mypage' },
         { label: '프로필' },
       ]}
     >

@@ -1,181 +1,176 @@
-/**
- * MyPageHub - 마이페이지 (계정 중심 허브)
- *
- * WO-O4O-NETURE-MYPAGE-SPLIT-V1
- * WO-MYPAGE-IA-RESTRUCTURE-V1
- * WO-O4O-NETURE-MYPAGE-KPA-CANONICAL-REALIGNMENT-V1
- * WO-O4O-NETURE-MYPAGE-KPA-UI-STRUCTURE-ALIGNMENT-V1
- *
- * KPA-Society MyDashboardPage 구조 기준 정렬:
- *   - 프로필 요약 카드 (avatar 대형, 이름, 이메일, 역할 배지, 프로필 수정 버튼)
- *   - 최근 활동 섹션 (빈 상태)
- *   - 하단 아이콘형 바로가기 메뉴
- * 공급자 업무 메뉴(상품/주문/정산 등)는 /supplier 대시보드에서 접근.
- *
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 개별 커뮤니티 운영자에게만 "커뮤니티 가입 심사"
- * 바로가기를 보인다. 운영자는 서비스 역할이 아니라 개체 행이라 roles 로 판정할 수 없어
- * `GET /communities/operating` 결과로 판정한다(조회 실패 시 카드를 숨길 뿐, 권한 판정은 backend).
- */
-
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserCog, MessageSquare, Building2, Settings, UsersRound } from 'lucide-react';
-import { useAuth, getNetureDashboardRoute, getNetureRoleLabel } from '../../contexts';
-import { useLoginModal } from '../../contexts/LoginModalContext';
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   MyPageLayout,
-  QuickActionsSection,
-  RoleBadgeGroup,
   MyPageAuthRequired,
   MyPageLoadingState,
-  MyPageUserSummary,
-  MyPageEntryCardGrid,
-  MyPageActivityFeed,
-  MembershipStatusBadge,
-} from '@o4o/account-ui';
-import { getServiceMembershipStatus } from '../../lib/membershipGate';
-import { SUPPLIER_ONLY_ROLES } from '../../lib/role-constants';
-import { getNetureMyPageNavItems } from './navItems';
-import { listOperatedCommunities } from '../../lib/api/communityOperator';
+} from "@o4o/account-ui";
+import { MY_HOME_SOURCES, MyHomeButton } from "@o4o/auth-react";
+import { useAuth } from "../../contexts";
+import { useLoginModal } from "../../contexts/LoginModalContext";
+import { api } from "../../lib/apiClient";
+import { useHomeEntry, buildHomeEntryModel } from "../../lib/home-entry";
+import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
+import HomeEntryPanel from "../../components/home/HomeEntryPanel";
+import { getNetureMyPageNavItems } from "./navItems";
+import {
+  MyHomeActivity,
+  MyHomeManagement,
+  MyHomeNotifications,
+  ResourceNotice,
+} from "../../components/mypage/MyHomePanels";
 
-export default function MyPageHub() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const { openLoginModal } = useLoginModal();
-  const navigate = useNavigate();
-  const [operatesCommunity, setOperatesCommunity] = useState(false);
-
+type View = "overview" | "services" | "activity" | "management";
+const TITLES: Record<View, string> = {
+  overview: "모아보기",
+  services: "참여 서비스",
+  activity: "커뮤니티 활동",
+  management: "경영 현황",
+};
+function MyHomeContent({ view }: { view: View }) {
+  const { user } = useAuth();
+  const { search } = useLocation();
+  const entry = useHomeEntry(!!user, user?.id);
+  const requestedSource = new URLSearchParams(search).get("from") ?? "";
+  let sourceKey = requestedSource;
+  if (!Object.prototype.hasOwnProperty.call(MY_HOME_SOURCES, sourceKey)) {
+    try {
+      const previous = JSON.parse(
+        sessionStorage.getItem("o4o_my_home_source") ?? "null",
+      );
+      sourceKey = previous?.accountId === user?.id ? previous.sourceKey : "";
+    } catch {
+      sourceKey = "";
+    }
+  }
+  const source = Object.prototype.hasOwnProperty.call(
+    MY_HOME_SOURCES,
+    sourceKey,
+  )
+    ? MY_HOME_SOURCES[sourceKey]
+    : undefined;
   useEffect(() => {
-    if (!isAuthenticated) return;
-    let alive = true;
-    listOperatedCommunities()
-      .then((list) => alive && setOperatesCommunity(list.length > 0))
-      .catch(() => alive && setOperatesCommunity(false));
-    return () => {
-      alive = false;
-    };
-  }, [isAuthenticated]);
+    if (!source || !user) return;
+    try {
+      sessionStorage.setItem(
+        "o4o_my_home_source",
+        JSON.stringify({ accountId: user.id, sourceKey }),
+      );
+    } catch {
+      /* Optional return context. */
+    }
+  }, [source, sourceKey, user?.id]);
 
-  /**
-   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
-   *   /mypage/* 에는 route guard 가 없어 auth bootstrap 중에도 미인증 분기가 먼저 렌더됐다.
-   *   그 결과 로그인한 사용자에게 "로그인이 필요합니다" 가 수 초간 노출됐다.
-   *   로딩은 미인증 분기보다 먼저, Shell 안에서 렌더한다.
-   */
-  if (isLoading) {
-    return (
-      <MyPageLayout title="마이페이지" width="wide" navItems={getNetureMyPageNavItems([])}>
-        <MyPageLoadingState message="마이페이지를 불러오는 중..." />
-      </MyPageLayout>
-    );
-  }
-
-  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
-  // 손으로 만든 로그인 안내를 공통 컴포넌트로 수렴하고, 안내 화면에서도 헤더를 유지한다.
-  // 로그인은 Neture 고유의 모달 흐름을 그대로 쓴다.
-  if (!isAuthenticated || !user) {
-    return (
-      <MyPageLayout
-        title="마이페이지"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
-        width="wide"
-        navItems={getNetureMyPageNavItems([])}
-      >
-        <MyPageAuthRequired
-          description="마이페이지를 이용하려면 로그인해주세요."
-          actionLabel="로그인"
-          onAction={() => openLoginModal('/mypage')}
+  if (!user) return null;
+  const model = entry.data && buildHomeEntryModel(user, entry.data);
+  return (
+    <>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-slate-600">
+          {user.name}님의 서비스와 활동을 한곳에서 확인하세요.
+        </p>
+        {source && (
+          <a className="text-sm text-blue-700 underline" href={source.origin}>
+            {source.label}로 돌아가기
+          </a>
+        )}
+      </div>
+      {view === "overview" ? (
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                to: "/mypage/services",
+                title: "참여 서비스",
+                value: model
+                  ? `${model.myServices.length}개 서비스 · 이용 상태 확인`
+                  : "이용 상태 확인",
+              },
+              {
+                to: "/mypage/activity",
+                title: "커뮤니티 활동",
+                value: "내가 작성한 글 모아보기",
+              },
+              {
+                to: "/mypage/management",
+                title: "경영 현황",
+                value: entry.data
+                  ? `${new Set(entry.data.stores.map((store) => store.organizationId)).size}개 매장 · 방문 통계`
+                  : "내 매장 방문 통계",
+              },
+            ].map((card) => (
+              <Link
+                key={card.to}
+                to={card.to}
+                className="rounded-2xl border border-slate-200 bg-white p-5 no-underline hover:border-blue-400"
+              >
+                <h2 className="font-semibold text-slate-900">{card.title}</h2>
+                <p className="mt-2 text-sm text-slate-600">{card.value}</p>
+              </Link>
+            ))}
+          </div>
+          {entry.error && <ResourceNotice error reload={entry.reload} />}
+          <MyHomeNotifications accountId={user.id} />
+          <div className="flex flex-wrap gap-4 text-sm">
+            <Link to="/mypage/profile" className="text-blue-700 underline">
+              프로필 수정
+            </Link>
+            <Link to="/mypage/settings" className="text-blue-700 underline">
+              계정 설정
+            </Link>
+          </div>
+        </div>
+      ) : view === "services" ? (
+        <HomeEntryPanel
+          user={user}
+          data={entry.data}
+          loading={entry.loading}
+          error={entry.error}
+          onReload={entry.reload}
         />
-      </MyPageLayout>
-    );
-  }
-
-  const dashboardPath = getNetureDashboardRoute(user.roles);
-  const roleLabel = getNetureRoleLabel(user.roles);
-  const hasDashboard = dashboardPath !== '/';
-  // 역할 판정은 Neture 기존 SSOT(role-constants)만 사용한다 — 인라인 문자열 비교 제거.
-  const isSupplier = user.roles.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
+      ) : !entry.data ? (
+        <ResourceNotice error={!!entry.error} reload={entry.reload} />
+      ) : view === "activity" ? (
+        <MyHomeActivity accountId={user.id} data={entry.data} />
+      ) : (
+        <MyHomeManagement accountId={user.id} data={entry.data} />
+      )}
+    </>
+  );
+}
+export default function MyPageHub({ view = "overview" }: { view?: View }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { openLoginModal } = useLoginModal();
+  const location = useLocation();
   return (
     <MyPageLayout
-      title="마이페이지"
-      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+      title="My Home"
+      subtitle={TITLES[view]}
+      breadcrumb={[{ label: "홈", href: "/" }, { label: "My Home" }]}
       width="wide"
-      navItems={getNetureMyPageNavItems(user.roles)}
-      userSummary={
-        /* 공통 요약 카드 — 서비스 색은 배지 포인트 컬러로만 유지한다. */
-        <MyPageUserSummary
-          initial="👤"
-          name={user.name}
-          email={user.email}
-          actionHref="/mypage/profile"
-          badges={
-            <div className="flex items-center gap-2 flex-wrap">
-              <RoleBadgeGroup
-                badges={[
-                  { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
-                  /**
-                   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
-                   *   공급자 계정은 roleLabel 자체가 '공급자' 라 같은 배지가 두 번 찍혔다.
-                   *   보조 배지는 roleLabel 이 '공급자' 가 아닐 때만 덧붙인다.
-                   */
-                  ...(isSupplier && roleLabel !== '공급자'
-                    ? [{ key: 'supplier', label: '공급자', tone: 'slate' as const, variant: 'soft' as const }]
-                    : []),
-                ]}
-                size="md"
-              />
-              {/* 서비스 가입 상태 — service_memberships.status 축
-                  (WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1) */}
-              <MembershipStatusBadge status={getServiceMembershipStatus(user)} size="md" />
-            </div>
-          }
-        />
-      }
+      navItems={getNetureMyPageNavItems(user?.roles)}
     >
-
-      {/* 최근 활동 — 공통 MyPageActivityFeed
-          (WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1 §8)
-          Neture 는 아직 개인 활동 원장 소비 계약이 없어 빈 목록을 넘긴다.
-          활동 API 신설은 이번 범위 밖(WO §12·§13)이며, 계약이 생기면
-          items 만 채우면 된다 — 화면 골격은 더 손대지 않는다. */}
-      <MyPageActivityFeed items={[]} />
-
-      {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) — 공통 MyPageEntryCardGrid */}
-      <MyPageEntryCardGrid
-        items={[
-          { key: 'profile', title: '프로필', href: '/mypage/profile', icon: <UserCog className="w-5 h-5" /> },
-          { key: 'forum', title: '포럼', href: '/forum', icon: <MessageSquare className="w-5 h-5" /> },
-          {
-            key: 'business-profile',
-            title: '사업자 정보',
-            href: '/mypage/business-profile',
-            icon: <Building2 className="w-5 h-5" />,
-            visible: isSupplier,
-          },
-          {
-            key: 'community-operator',
-            title: '커뮤니티 가입 심사',
-            href: '/mypage/communities',
-            icon: <UsersRound className="w-5 h-5" />,
-            visible: operatesCommunity,
-          },
-          { key: 'settings', title: '설정', href: '/mypage/settings', icon: <Settings className="w-5 h-5" /> },
-        ]}
-      />
-
-      {/* 대시보드 바로가기 + 로그아웃 */}
-      <QuickActionsSection
-        dashboardPath={dashboardPath}
-        dashboardLabel={`${roleLabel} 대시보드`}
-        showDashboard={hasDashboard}
-        onLogout={handleLogout}
-        logoutLabel="O4O 로그아웃"
-      />
+      {isLoading ? (
+        <MyPageLoadingState message="My Home을 불러오는 중…" />
+      ) : !isAuthenticated || !user ? (
+        <MyPageAuthRequired
+          description="My Home을 이용하려면 로그인해 주세요."
+          onAction={() => openLoginModal(location.pathname + location.search)}
+        />
+      ) : CURRENT_HOST_PROFILE !== "main" ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <p className="mb-4">
+            모든 서비스의 My Home은 대표 홈에서 함께 이용합니다.
+          </p>
+          <MyHomeButton accountId={user?.id}
+            api={api}
+            isAuthenticated
+            className="text-blue-700 underline"
+          />
+        </section>
+      ) : (
+        <MyHomeContent key={user.id} view={view} />
+      )}
     </MyPageLayout>
   );
 }

@@ -54,3 +54,8 @@
 ## 적용 관계
 
 이 문서는 이전 문서의 메인 수동 승인 대기, Store 다업종 신규 가입, KPA 승인에 따른 매장 자동 생성·복구, 특정 서비스의 미가입 로그인 거부 서술을 대체한다. 위 추가 정책의 변경 범위 외에는 기존 역할 격리·개별 서비스 승인 계약을 유지한다. 유료화 시점·무료 기간·무료 종료 후 기능과 데이터 처리는 미정이며 이번 구현에 결제 제한을 추가하지 않는다.
+
+
+### My Home 대표 진입 목적지 (2026-10-11)
+
+[My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)의 공통 진입은 `targetServiceKey=neture`의 기존 대표 진입 세션 전달을 사용한다. 허용 `returnPath`는 `/`, `/mypage`, `/mypage?from=`의 열거된 `store`, `study`, `community`, `funding`, `supplier`, `pharmacy`, `kpa`, `admin`뿐이다. 임의 계정/관리 경로·외부 origin·추가 query를 허용하지 않는다. 활성 계정·검증된 세션·교환 origin·토큰 소비·폐기 조건은 그대로 적용하며 서비스 membership이나 역할을 만들지 않는다. `from`은 복귀 안내용이며 인증·권한 판정에 사용하지 않는다. [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 소스·로컬 검증 완료, 운영 배포 대기다.

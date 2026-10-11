@@ -408,7 +408,7 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 |------|----------|------|
 | `/store` | `STORE-LAYER-ARCHITECTURE.md` | KPA · K-Cos (Neture 부분 · PharmacyHub 미채택) |
 | `/operator` | `OPERATOR-DASHBOARD-STANDARD-V1.md` | KPA · K-Cos · Neture (PharmacyHub 미채택) |
-| My Home (기존 `/mypage` 등) | [My Home 정본](../baseline/O4O-MY-HOME-CANONICAL-V1.md) · [계정 관리 계약](../baseline/O4O-MYPAGE-CANONICAL-V1.md) | 사용자용 명칭·개인 통합 공간·공통 직접 진입 정책 확정(2026-10-11). 다중 화면·경영 통계·헤더 반영은 구현 대기, 기존 route·컴포넌트 식별자는 유지 |
+| My Home (기존 `/mypage` 등) | [My Home 정본](../baseline/O4O-MY-HOME-CANONICAL-V1.md) · [계정 관리 계약](../baseline/O4O-MYPAGE-CANONICAL-V1.md) | 사용자용 명칭·개인 통합 공간·공통 직접 진입 정책 확정(2026-10-11). 다중 화면·QR 경영 통계·헤더 반영은 [구현 WO](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 로컬 검증 완료·운영 배포 대기, 기존 route·컴포넌트 식별자는 유지 |
 
 > §9.0 "미조사 = 공백" 원칙에 따라 추정으로 채우지 않는다.
 

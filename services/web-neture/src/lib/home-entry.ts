@@ -320,8 +320,9 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
  * 로그인 상태에서만 조회한다. 어느 한쪽이라도 실패하면 전체를 error 로 둔다 —
  * 부분 데이터로 "미가입" 처럼 보이는 화면을 만들지 않기 위해서다.
  */
-export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
+export function useHomeEntry(enabled: boolean, accountId?: string): UseHomeEntryResult {
   const [data, setData] = useState<HomeEntryData | null>(null);
+  const [loadedAccount, setLoadedAccount] = useState<string | undefined>(accountId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -329,6 +330,7 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
+    setLoadedAccount(accountId);
     if (!enabled) {
       setData(null);
       setError(null);
@@ -336,12 +338,14 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
       return;
     }
     let cancelled = false;
+    setData(null);
     setLoading(true);
     setError(null);
     (async () => {
       try {
         const next = await fetchHomeEntryData();
         if (cancelled) return;
+        setLoadedAccount(accountId);
         setData(next);
       } catch {
         if (cancelled) return;
@@ -354,9 +358,9 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     return () => {
       cancelled = true;
     };
-  }, [enabled, tick]);
+  }, [enabled, accountId, tick]);
 
-  return { data, loading, error, reload };
+  return { data: loadedAccount === accountId ? data : null, loading: enabled && loadedAccount !== accountId || loading, error, reload };
 }
 
 // ─── 서비스 이동 ──────────────────────────────────────────────────────────────

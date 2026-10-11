@@ -50,7 +50,7 @@ export default function MySettingsPage() {
       <MyPageLayout title="설정" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
-          description="마이페이지를 이용하려면 로그인해주세요."
+          description="My Home을 이용하려면 로그인해주세요."
           onAction={() => openLoginModal('/mypage/settings')}
         />
       </MyPageLayout>
@@ -65,7 +65,7 @@ export default function MySettingsPage() {
       navItems={getNetureMyPageNavItems(user.roles)}
       breadcrumb={[
         { label: '홈', href: '/' },
-        { label: '마이페이지', href: '/mypage' },
+        { label: 'My Home', href: '/mypage' },
         { label: '설정' },
       ]}
     >
