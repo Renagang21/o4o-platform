@@ -1,5 +1,7 @@
 # CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1`
 > 작업일: 2026-07-30 · 브랜치: `main`
 
@@ -289,7 +291,7 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 
 - 역할 보유 계정 `[REDACTED_EMAIL_B]` 은 `service_memberships(pharmacy-hub, active, store_owner)` +
   `role_assignments('pharmacy-hub:store_owner')` 를 모두 갖고 있으나, **프로덕션 비밀번호가
-  `docs/local/TEST-ACCOUNTS.local.md` 값과 불일치**해 로그인이 401 `INVALID_CREDENTIALS` 이다
+  `docs/local/TEST-ACCOUNT.txt` 값과 불일치**해 로그인이 401 `INVALID_CREDENTIALS` 이다
   (직전 WO `WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1 §4-3` 에서 확인된 동일 사유).
 - 대신 다음으로 대체 검증했다:
   - **쿼리 정확성**: 노출 게이트 SQL 을 프로덕션에 직접 실행해 반환 집합(1건·적용단가 9,900)을 확인

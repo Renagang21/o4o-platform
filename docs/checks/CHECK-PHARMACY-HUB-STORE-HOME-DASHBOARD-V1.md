@@ -1,5 +1,7 @@
 # CHECK — WO-PHARMACY-HUB-STORE-HOME-DASHBOARD-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 매장 경영 홈(`/store-owner`)을 실제 사용 가능한 매장 대시보드로 보완한다.
 > W3 공통 셸·기존 B2B 기능은 그대로 두고, 이미 존재하는 매장·장바구니·주문 데이터를 요약한다.
 
@@ -160,7 +162,7 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 · Deploy Web Services run `30966228918` **success** (`deploy-pharmacy-hub` 만 빌드, 타 4서비스 skipped)
 
 브라우저: Playwright(실브라우저) · https://pharmacyhub.co.kr · 계정 `[REDACTED_EMAIL_B]`
-(테스트 계정 SSOT `docs/local/TEST-ACCOUNTS.local.md`)
+(테스트 계정 SSOT `docs/local/TEST-ACCOUNT.txt`)
 
 | # | 항목 | 결과 |
 |:-:|------|:---:|

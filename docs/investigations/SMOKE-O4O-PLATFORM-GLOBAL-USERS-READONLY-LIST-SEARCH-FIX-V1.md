@@ -1,5 +1,7 @@
 # SMOKE-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-SEARCH-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **대상 WO:** WO-O4O-PLATFORM-USERS-SEARCH-COMPANY-FIELD-FIX-V1
 > **유형:** 운영 배포 후 재검증 (API 직접 호출). GET only — 운영 데이터 변경 없음.
 > **판정: PASS** — search 500 해소(존재값 결과 / 없는값 empty), PII 투영·status/role 필터·pagination 무회귀.
@@ -15,7 +17,7 @@
 ## 2. 검증 계정
 
 - `[REDACTED_EMAIL_A]` (roles 에 `platform:super_admin` 포함). httpOnly 쿠키 인증.
-- pure 비-platform 계정 부재 → negative guard 미검증(코드상 PlatformRoute+requireRole). 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(gitignore) transient 사용 — 본 문서 미기재.
+- pure 비-platform 계정 부재 → negative guard 미검증(코드상 PlatformRoute+requireRole). 자격증명은 `docs/local/TEST-ACCOUNT.txt`(gitignore) transient 사용 — 본 문서 미기재.
 
 ## 3. 검증 결과 (`GET /api/v1/admin/platform-users`)
 

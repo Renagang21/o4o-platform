@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-APPSTORE-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **일자**: 2026-08-21
 - **대상**: `/api/v1/appstore/*` 전체 API 의 인증·인가 경계 전수조사 및 하드닝
 - **판정**: `MISSING_AUTH` 확정 → 하드닝 완료
@@ -198,7 +200,7 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 | `GET /appstore/modules` | **403** |
 | `GET /admin/apps/market` (대조군) | **403** — 두 API 가 동일하게 `platform:super_admin` 을 요구함을 확인 |
 
-**허용(200) 경로 실측은 수행하지 못했다.** `docs/local/TEST-ACCOUNTS.local.md` 에
+**허용(200) 경로 실측은 수행하지 못했다.** `docs/local/TEST-ACCOUNT.txt` 에
 `platform:super_admin` 자격증명이 없어 프로덕션에서 super_admin 성공 경로를 확인할 수 없었다.
 해당 경로는 jest 계약 테스트(`platform:super_admin` → `GET /modules` 200)로만 검증했다.
 또한 §15 지침대로 실제 active app 의 install/uninstall write 는 프로덕션에서 수행하지 않았다.

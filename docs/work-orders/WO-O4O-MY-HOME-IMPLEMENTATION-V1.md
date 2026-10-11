@@ -5,6 +5,16 @@
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
 > **DEPLOYMENT**: MANUAL/GATED → DEPLOYED · 실제 Delivery HELD_LEVEL_3 후 정상 promote 완료. 후속 배포 상태 문서 Phase는 NOT_APPLICABLE.
 
+## 연속 문서 Phase: 사용자 제공 테스트 계정 파일 (2026-10-11)
+
+사용자가 첨부한 `TEST-ACCOUNT.txt`를 `docs/local/TEST-ACCOUNT.txt`에 원문 그대로 배치한다.
+사용자의 문서 전체 변경 지시를 근거로 AGENTS·CLAUDE·SETUP·정본 색인과 과거 기록의 계정 파일 참조 이름도 통일한다.
+과거 기록의 실행 결과·날짜는 유지하고 파일 참조 이름만 정규화한다. 삭제된 과거 계정 관리 파일은 복원하지 않는다.
+이전 빈 입력 양식은 제거하고 새 파일의 Git 추적 제외 및 첨부 동일성을 확인한다.
+리뷰에서 확인한 실행 소비처의 기본 경로와 오류 안내도 새 이름으로 정합한다. 검증 스크립트의 TTS·가입 승인 등 실제 상태 변경은 실행하지 않는다. 과거 참조 문서에는 파일명 정규화 주석을 추가하고 GitHub에서 없는 로컬 파일 링크는 경로 안내로 표시한다.
+파일 확보로 이전 누락 사유는 해소됐으며 실제 인증 검증 결과는 별도로 기록한다.
+같은 미완료 My Home WO의 연속 문서 Phase로 전용 branch를 유지한다. **DEPLOYMENT = NOT_APPLICABLE**이다.
+
 ## 구현
 
 - 대표 개인 공간은 `neture.co.kr/mypage`다. 기존 `/mypage/profile`, `/mypage/settings`, 사업자 정보·커뮤니티 운영자 경로를 유지한다.

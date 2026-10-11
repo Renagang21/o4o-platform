@@ -1,5 +1,7 @@
 # WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1 — CHECK (R2)
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작성일**: 2026-08-14
 - **선행 회차**: [1회차 CHECK](WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1-CHECK.md) — Neture·PharmacyHub 를 **CONDITIONAL** 로 남기고 종료했다.
   본 R2 는 그 잔여(write E2E 미수행 2서비스)를 닫고 전 서비스를 재검증한 기록이다.
@@ -9,7 +11,7 @@
   - 표시 메뉴는 **사이드바 접이식 그룹을 하나씩 펼쳐 DOM 에서 수집**한 뒤 전수 방문
   - 모든 방문은 `page.goto` 직접 진입(= deep link · 전체 문서 로드)
   - 계측: `fetch` + `XMLHttpRequest` 후킹 + `window.error` / `unhandledrejection`
-  - 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(git 추적 제외) 에서 런타임에 읽는다. 본 문서에 값 없음.
+  - 자격증명은 `docs/local/TEST-ACCOUNT.txt`(git 추적 제외) 에서 런타임에 읽는다. 본 문서에 값 없음.
 
 ---
 

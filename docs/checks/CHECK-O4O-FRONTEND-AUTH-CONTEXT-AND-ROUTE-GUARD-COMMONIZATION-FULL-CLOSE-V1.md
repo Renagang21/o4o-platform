@@ -1,5 +1,7 @@
 # CHECK — 인증 컨텍스트 · 라우트 가드 공통화 최종 마감
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1`
 - **일자**: 2026-08-12
 - **대상**: `kpa-society` / `neture` / `k-cosmetics` / `pharmacy-hub` (4개 서비스)
@@ -112,7 +114,7 @@ Pharmacy-Hub 는 일반 역할 가드를 갖고 있지 않다. 보호 경로는
 | 보호 라우트 · 역할 · 리다이렉트 | `createRouteGuard` 판정 순서 무변경 — 회귀 테스트 21건 유지 |
 | 플랫폼 관리자 / 서비스 운영자 경계 | 판정 술어·역할 상수 무변경 (`isAdminOrAbove` / `isOperatorOrAbove` / MembershipGate bypass 동일) |
 
-**브라우저 smoke 는 이번 CHECK 에 포함하지 않았다.** 배포 후 5개 서비스 로그인·새로고침 세션 복원·보호 라우트 접근을 실제 브라우저로 확인해야 최종 종료다(계정은 `docs/local/TEST-ACCOUNTS.local.md`).
+**브라우저 smoke 는 이번 CHECK 에 포함하지 않았다.** 배포 후 5개 서비스 로그인·새로고침 세션 복원·보호 라우트 접근을 실제 브라우저로 확인해야 최종 종료다(계정은 `docs/local/TEST-ACCOUNT.txt`).
 
 ## 8. 중복 감소량
 

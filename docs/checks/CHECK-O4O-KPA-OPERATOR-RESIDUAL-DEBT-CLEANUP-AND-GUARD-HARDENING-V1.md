@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 KPA 운영자 콘솔 종료 감사([IR-O4O-KPA-OPERATOR-TRACK-FINAL-CLOSEOUT-AND-RESIDUAL-DEBT-AUDIT-V1](../ir/IR-O4O-KPA-OPERATOR-TRACK-FINAL-CLOSEOUT-AND-RESIDUAL-DEBT-AUDIT-V1.md), 판정 PASS_WITH_DEBT)에서 확인된 잔여 기술부채 마감.
 
 - **작업 WO**: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1
@@ -116,7 +118,7 @@ dead entity(0행·live route/controller/frontend/repository 소비처 0). `o4o_a
 | 6 | `kpa:admin`(Cookie) | `GET /operator/actions` | 200 | **200** ✓ |
 | 7 | 인증·비운영 scope | `GET /operator/actions` | 403 | **미실행**(사유 하단) |
 
-- 로그인 계정 = `[REDACTED_EMAIL_A]`(JWT roles = `kpa:admin`·`kpa:operator` 포함, `kpa-society` membership `admin`/active). 이 계정은 전 scope 보유 → **7번(403 scope-denial) 을 직접 실증할 비운영 KPA 계정이 없음**. `TEST-ACCOUNTS.local.md` 의 약국 경영자(`[REDACTED_EMAIL_B]`)는 현재 `INVALID_CREDENTIALS`(자격증명 drift — 문서 갱신 권장).
+- 로그인 계정 = `[REDACTED_EMAIL_A]`(JWT roles = `kpa:admin`·`kpa:operator` 포함, `kpa-society` membership `admin`/active). 이 계정은 전 scope 보유 → **7번(403 scope-denial) 을 직접 실증할 비운영 KPA 계정이 없음**. `TEST-ACCOUNT.txt` 의 약국 경영자(`[REDACTED_EMAIL_B]`)는 현재 `INVALID_CREDENTIALS`(자격증명 drift — 문서 갱신 권장).
 - **7번 보증 근거**: action-queue 는 이제 sibling operator-summary 라우터([kpa.routes.ts:251](../../apps/api-server/src/routes/kpa/kpa.routes.ts))와 **동일한 `requireKpaScope('kpa:operator')` 미들웨어**로 보호된다. summary 는 비로그인 401·admin 200 이 action-queue 와 완전 일치(위 표 4·§10) → 동일 미들웨어이므로 인증-비운영 계정의 scope-denial(403) 동작도 summary 와 동일함이 구조적으로 보증된다.
 - `POST /dismiss` body 없는 요청은 Cloud Run 프론트에서 411(Length Required) 로 앱 계층 도달 전 차단 — body 부여 시 401 확인(표 2).
 

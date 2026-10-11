@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1`
 > 일자: 2026-07-29
 > 대상: KPA-Society / K-Cosmetics (2 서비스 동시 정렬)
@@ -271,7 +273,7 @@ rg "ai-contents|pop_short|pop_long|/products/.*/pop/" services/web-*/src
 ## 17. 프로덕션 smoke — **PASS (3 서비스 전부, 실제 저장까지)**
 
 배포: commit `77abcfde2` → `Deploy API Server (Cloud Run)` ✅ success / `Deploy Web Services (Cloud Run)` ✅ success.
-검증: Playwright headless, 계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 env 주입(하드코딩·출력 없음).
+검증: Playwright headless, 계정은 `docs/local/TEST-ACCOUNT.txt` 에서 env 주입(하드코딩·출력 없음).
 테스트 상품: 매장 자체 상품 `후시딘연고(퓨시드산나트륨)` (`cd3a2b29-…`).
 
 ### KPA — `https://kpa-society.co.kr`

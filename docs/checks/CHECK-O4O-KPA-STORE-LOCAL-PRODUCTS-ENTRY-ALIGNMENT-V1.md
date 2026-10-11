@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 매장 자체 상품(`store_local_products`) 등록·수정 진입점 복원 및 잔재 정합
 > WO: `WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1`
 > 선행 IR: [IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1](../investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md)
@@ -212,7 +214,7 @@ Playwright(headless Chromium) 실브라우저 · 프로덕션 · 약국 경영�
 
 ### 7.4 K-Cosmetics
 
-매장주 테스트 계정이 `TEST-ACCOUNTS.local.md` 에 없어 브라우저 smoke 미수행.
+매장주 테스트 계정이 `TEST-ACCOUNT.txt` 에 없어 브라우저 smoke 미수행.
 `git diff` 상 KCos 블록 변경 0 + `npx tsc --noEmit` PASS 로 정적 검증 대체.
 
 ### 7.5 관측 (범위 외)

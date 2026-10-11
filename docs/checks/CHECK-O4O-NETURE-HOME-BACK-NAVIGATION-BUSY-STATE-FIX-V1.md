@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1
 > **일자**: 2026-09-15
 > **범위**: Neture 대표 홈(로그인 후) 서비스 진입 버튼 — 서비스 이동 후 브라우저 뒤로가기(bfcache 복원)로 돌아왔을 때 「이동 중」 상태가 남는 결함 수정
@@ -44,7 +46,7 @@
 
 - 도구: Playwright Chromium(headed). **Playwright 는 기본 스위치 `--disable-back-forward-cache` 로 Chromium 을 띄우므로**(`playwright-core/lib/server/chromium/chromiumSwitches.js`) MCP 브라우저의 뒤로가기는 항상 fresh load 였다(`window` 리스너 소실 · `pageshow` 미관측). 본 검증은 `ignoreDefaultArgs: ['--disable-back-forward-cache']` 로 별도 기동해 **실제 bfcache 복원**을 재현했다. 스크립트는 세션 scratchpad(`bfcache-check.mjs`) — 저장소에 추가하지 않음.
 - bfcache 복원 판정: 이동 전 `window.addEventListener('pageshow')` 로 심은 리스너가 뒤로가기 후에도 살아 있고 `persisted: true` 를 기록하면 복원, 리스너가 사라졌으면 단순 재로드.
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 Neture 운영자 계정(kpa-society · pharmacy-hub · cosmetics · kpa-branch 회원 보유). 운영 회원 상태 변경 없음.
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 Neture 운영자 계정(kpa-society · pharmacy-hub · cosmetics · kpa-branch 회원 보유). 운영 회원 상태 변경 없음.
 
 ### 수정 전 재현 (운영, 2026-09-15 01:2x UTC, 배포 전 번들)
 

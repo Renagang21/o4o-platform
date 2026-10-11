@@ -1,5 +1,7 @@
 # SMOKE-O4O-STANDARD-LIST-PHASE1-REFERENCE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **유형:** Browser smoke (Playwright, headless chromium 1.57)
 > **검증 일시:** 2026-06-17
 > **최종 판정:** **PASS** (실행 가능한 전 항목 통과 — prod 데이터 변경이 필요한 일부 항목만 설계상 미실행, 비차단)
@@ -29,7 +31,7 @@
 | 항목 | 처리 |
 |------|------|
 | Chrome profile lock | **해소** — persistent profile(`~/.playwright-o4o-profile`) 미존재 확인 → ephemeral context(`chromium.launch()` + 새 context)로 실행하여 profile lock 회피. 실행 중 프로세스는 VS Code `msedgewebview2` 뿐(Playwright 락 아님). |
-| 자격증명 | SSOT(`docs/local/TEST-ACCOUNTS.local.md`)를 **런타임에 스크립트가 파싱** — 하드코딩/로그/커밋 출력 없음. 통합 운영자 계정(`[REDACTED_EMAIL_A]`) 사용. |
+| 자격증명 | SSOT(`docs/local/TEST-ACCOUNT.txt`)를 **런타임에 스크립트가 파싱** — 하드코딩/로그/커밋 출력 없음. 통합 운영자 계정(`[REDACTED_EMAIL_A]`) 사용. |
 
 > smoke 스크립트는 `c:\tmp\smoke-phase1.mjs` (repo 외부, 미커밋). 비밀번호 literal 없음(SSOT 런타임 파싱).
 

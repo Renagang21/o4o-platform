@@ -1,5 +1,7 @@
 # CHECK — O4O 운영자 실제 로그인 credential 복구 및 최종 production E2E V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-OPERATOR-REAL-LOGIN-CREDENTIAL-RECOVERY-AND-FINAL-PRODUCTION-E2E-V1`
 - **작성일**: 2026-08-18
 - **검증 환경**: production (실제 브라우저 · 토큰 주입 없음)
@@ -29,7 +31,7 @@ WO 의 "완료 선언하지 말고 차단 원인을 보고한다" 조항은 차�
 ## 1. 계정·credential 상태 조사 (WO 1단계)
 
 - 운영자 계정: `[REDACTED_EMAIL_A]` / user id `cfd2a5e7-db28-4842-bd5c-4814cba49ca5` / status `active`
-- credential SSOT: `docs/local/TEST-ACCOUNTS.local.md` (gitignored — 본 문서에 비밀번호를 기록하지 않는다)
+- credential SSOT: `docs/local/TEST-ACCOUNT.txt` (gitignored — 본 문서에 비밀번호를 기록하지 않는다)
 - 보유 role (`/auth/status` 실측):
 
 ```

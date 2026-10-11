@@ -1,5 +1,7 @@
 # CHECK — 매장 소비자 결제 O4O 제외 배포 후 운영 smoke (PASS)
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **대상:** `WO-O4O-STORE-SALE-CHECKOUT-UI-ENTRY-REMOVAL-V1`(frontend) + `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1`(backend) 묶음 배포 검증
 **일자:** 2026-06-21
 **성격:** 배포 + 운영 read-only smoke. 코드 변경 0(본 문서 docs-only).
@@ -53,7 +55,7 @@ PASS — 소비자→매장 O4O Toss 결제 경로가 프론트(POS 안내)·백
 ## 6. 무변경 확인
 
 - 본 smoke 코드/DB/route/데이터 변경 0. 실제 Toss 결제/confirm/환불 미실행. dummy body 는 410(앞단)으로 결제 생성 없음.
-- 자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`) env 주입 — 로그/문서 미출력.
+- 자격증명 SSOT(`docs/local/TEST-ACCOUNT.txt`) env 주입 — 로그/문서 미출력.
 
 ## 7. 후속
 

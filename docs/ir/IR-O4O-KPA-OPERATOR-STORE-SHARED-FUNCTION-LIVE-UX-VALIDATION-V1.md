@@ -1,10 +1,12 @@
 # IR-O4O-KPA-OPERATOR-STORE-SHARED-FUNCTION-LIVE-UX-VALIDATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **유형:** Live 운영 브라우저 보완 조사 IR. 코드/DB/API/UI **무변경**. 본 문서 1개만 산출.
 > **상위:** [`IR-O4O-KPA-OPERATOR-STORE-SHARED-FUNCTION-PARITY-AUDIT-V1`](IR-O4O-KPA-OPERATOR-STORE-SHARED-FUNCTION-PARITY-AUDIT-V1.md) (정적 코드 조사)
 > **작성일:** 2026-06-27
 > **검증 방식:** 배포 운영 사이트 `https://kpa-society.co.kr` 에 **read-only** 자동화(Playwright 1.57) 로 로그인 후 라우트별 사이드바 메뉴명·페이지 제목·버튼명·빈화면 문구·상태 탭을 추출. **생성·수정·삭제 없음**(네비게이션 + DOM 읽기만).
-> **계정:** 운영자 `[REDACTED_EMAIL_A]`(kpa:admin+operator), 약국 `[REDACTED_EMAIL_B]`(약국 경영자) — SSOT `docs/local/TEST-ACCOUNTS.local.md`, 자격증명 env 주입(문서 미기재).
+> **계정:** 운영자 `[REDACTED_EMAIL_A]`(kpa:admin+operator), 약국 `[REDACTED_EMAIL_B]`(약국 경영자) — SSOT `docs/local/TEST-ACCOUNT.txt`, 자격증명 env 주입(문서 미기재).
 > **결론 요약:** 정적 조사의 3영역 모델이 **운영 화면에서 그대로 확인**됨. 추가로 정적 조사가 못 본 **사용자 노출 문자열 불일치**가 다수 실측됨 — (1) 상태 라벨 3종 분기, (2) "만들기" 동사 3종 분기, (3) 운영자 사이드바 그룹 **영문** vs 매장 **국문**, (4) "콘텐츠 허브" 명칭 충돌, (5) 빈화면 문구 분기. **명칭/문구 통일(P1)이 가장 체감 큰 1순위**임을 실측 근거로 확정. 테이블 ListColumnDef 수렴은 양쪽 다 탭·컬럼이 있어 **체감 효과 낮음 → 후순위** 확인.
 
 ---

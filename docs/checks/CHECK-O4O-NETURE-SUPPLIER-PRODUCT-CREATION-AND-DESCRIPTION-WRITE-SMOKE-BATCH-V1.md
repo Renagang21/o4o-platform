@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-PRODUCT-CREATION-AND-DESCRIPTION-WRITE-SMOKE-BATCH-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATION-AND-DESCRIPTION-WRITE-SMOKE-BATCH-V1
 - **작업일**: 2026-08-12
 - **판정**: **PASS_WITH_HOLD** — 상품 등록 · 설명서 draft 저장 · 검수요청 · 현황 반영은 실데이터로 통과. **상품 수정 저장은 백엔드 계약 불일치로 실패(HOLD)**, 수정요청·재요청은 operator 조작 필요(HOLD).
@@ -20,7 +22,7 @@
 | 계정 | `[REDACTED_EMAIL_B]` (Neture 공급자2 · 테스트공급자) |
 | 조직 | (주)네뚜레 공급자 테스트 (supplier / owner) |
 | 로그인 | **UI 정상 로그인 성공** → `/supplier/dashboard` |
-| SSOT | `docs/local/TEST-ACCOUNTS.local.md` (git 추적 제외) |
+| SSOT | `docs/local/TEST-ACCOUNT.txt` (git 추적 제외) |
 
 > **선행 CHECK 정정**: `CHECK-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1` §2-1 은
 > 이 계정의 Neture 로그인이 401 이라 "토큰 주입 우회"를 썼다고 기록했으나, 본 배치에서 **UI 로그인이 정상 동작**했다.

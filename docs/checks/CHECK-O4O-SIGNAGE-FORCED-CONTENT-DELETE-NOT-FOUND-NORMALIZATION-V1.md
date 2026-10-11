@@ -1,5 +1,7 @@
 # CHECK — Signage HQ Forced Content 삭제 NOT_FOUND 정규화
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-SIGNAGE-FORCED-CONTENT-DELETE-NOT-FOUND-NORMALIZATION-V1`
 - **작성일**: 2026-08-21
 - **기준 commit**: `2ea6cd81f` (worktree 생성 시점) → 최종 `4a3550360` (코드)
@@ -307,7 +309,7 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
    Signage 의 다른 리소스는 repository 계층을 갖는다. 계층 정합은 별도 WO 후보
    (본 WO 는 "가장 작은 계층에서 수정" 원칙에 따라 계층 신설을 하지 않았다).
 4. **`[REDACTED_EMAIL_A]` 의 kpa-society service credential 불일치** (§9) — 검증 계정
-   환경 문제. 코드 결함 아님. `docs/local/TEST-ACCOUNTS.local.md` 갱신 또는 credential
+   환경 문제. 코드 결함 아님. `docs/local/TEST-ACCOUNT.txt` 갱신 또는 credential
    재설정이 필요하며 본 WO 범위 밖이다.
 
 ---

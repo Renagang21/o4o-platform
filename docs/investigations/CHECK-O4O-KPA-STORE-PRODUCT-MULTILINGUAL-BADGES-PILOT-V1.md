@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 WO: **WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1**
 작업 제목: KPA 매장 상품 다국어 콘텐츠 연결 상태 배지 파일럿
 
@@ -100,7 +102,7 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 - 매장 취급 상품 → UI 비활성화 (목록 0건)
 - 운영자 그룹 → UI 보관(archived) 처리 (HUB 비노출)
 
-> 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 약국 경영자 password 가 실제와 불일치(`[REDACTED — rotated]` → 실제 체험계정 `[REDACTED — rotated]`). 별도 갱신 권장.
+> 참고: `docs/local/TEST-ACCOUNT.txt` 의 KPA 약국 경영자 password 가 실제와 불일치(`[REDACTED — rotated]` → 실제 체험계정 `[REDACTED — rotated]`). 별도 갱신 권장.
 
 ## 6. 최종 판정
 

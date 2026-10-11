@@ -1,5 +1,7 @@
 # CHECK-O4O-MY-STORE-L2-CREDENTIAL-AND-PRODUCTION-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **대상 WO**: WO-O4O-MY-STORE-L2-CREDENTIAL-AND-PRODUCTION-SMOKE-V1
 **선행 CHECK**: [`CHECK-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1`](CHECK-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1.md) §7-1 미검증 3항목
 **작성일**: 2026-08-13
@@ -234,7 +236,7 @@ FAIL:                    0
 | 결과 실측 | 4 서비스 재로그인 전부 `ACCOUNT_NOT_ACTIVE` 로 차단 확인 |
 | DB 상태 | `users.status = suspended` ×2 |
 | 자격정보 | 로컬에만 보관. CHECK·커밋·리포트에 비밀번호 미기록 |
-| 문서화 | `docs/local/TEST-ACCOUNTS.local.md` §7 에 계정·org·재사용 절차 기록 (gitignored, 비밀번호 literal 미기록) |
+| 문서화 | `docs/local/TEST-ACCOUNT.txt` §7 에 계정·org·재사용 절차 기록 (gitignored, 비밀번호 literal 미기록) |
 
 ---
 
@@ -265,7 +267,7 @@ FAIL:                    0
 ## 11. 코드 변경
 
 **없음.** 이번 WO 에서 수정이 필요한 결함이 발견되지 않았다.
-산출물은 본 CHECK 문서와 로컬 `TEST-ACCOUNTS.local.md` §7(gitignored) 갱신뿐이다.
+산출물은 본 CHECK 문서와 로컬 `TEST-ACCOUNT.txt` §7(gitignored) 갱신뿐이다.
 
 ---
 

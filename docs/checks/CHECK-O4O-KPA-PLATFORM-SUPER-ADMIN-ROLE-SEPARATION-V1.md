@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-PLATFORM-SUPER-ADMIN-ROLE-SEPARATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 WO: `WO-O4O-KPA-PLATFORM-SUPER-ADMIN-ROLE-SEPARATION-V1`
 일시: 2026-07-25 (KST) · 대상: 프로덕션 RBAC (`role_assignments`)
 
@@ -39,12 +41,12 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 
 ### 2-A. 왜 "로그인 가능"을 확인하지 못했나
 
-- `super-admin@o4o.com` 의 비밀번호는 **자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)
+- `super-admin@o4o.com` 의 비밀번호는 **자격증명 SSOT(`docs/local/TEST-ACCOUNT.txt`, CLAUDE.md §15)
   에 등재되어 있지 않다.** 해당 문서는 sohae2100 / renagang21 / [REDACTED_EMAIL_C] 3계정만 관리한다.
 - 코드상 시드 값은 `BOOTSTRAP_PASSWORD = process.env.SEED_BOOTSTRAP_PASSWORD || '[REDACTED]'`
   (`20260927100000-BootstrapCanonicalSeedAccounts.ts:39`). 프로덕션 생성 시점에 env 가 설정되었는지
   **로컬에서 알 수 없어**, fallback 값이 유효하다고 단정할 수 없다.
-- 해당 평문은 `TEST-ACCOUNTS.local.md` 가 이미 **보안 cleanup 대상**으로 지정한 항목이다
+- 해당 평문은 `TEST-ACCOUNT.txt` 가 이미 **보안 cleanup 대상**으로 지정한 항목이다
   (`WO-O4O-MIGRATION-PLAINTEXT-CREDENTIAL-CLEANUP-V1`). 정상 운영 자격증명 경로가 아니다.
 - 실제 로그인 probe 시도는 **세션 안전장치(classifier)에 의해 차단**되었고, 우회하지 않았다.
 
@@ -150,7 +152,7 @@ WO 검증 항목 중 다음은 권한 제거를 전제하므로 수행하지 않
 
 아래 중 하나가 충족되면 제거를 안전하게 수행할 수 있다.
 
-1. **`super-admin@o4o.com` 의 유효 비밀번호를 `TEST-ACCOUNTS.local.md` 에 등재** (또는 사용자가 직접
+1. **`super-admin@o4o.com` 의 유효 비밀번호를 `TEST-ACCOUNT.txt` 에 등재** (또는 사용자가 직접
    로그인 성공을 확인). 그 뒤 `admin.neture.co.kr` 접근까지 확인되면 §2 중지 조건이 해소된다.
 2. **또는** 사용자 본인 소유의 별도 플랫폼 관리자 계정을 지정(신규 발급은 별도 승인 필요).
 3. 권장 선행 안전장치: `removeMemberRole` 에 **최후 platform admin 보호 가드**(마지막 1명 제거 차단)
