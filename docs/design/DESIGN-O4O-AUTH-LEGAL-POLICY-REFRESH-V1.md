@@ -150,3 +150,8 @@ session scope를 유지한다. 실제 전용 management prefix와 공급자 모�
 signed session scope를 유지하고 이미지 mutation·private supplier library·supplier hub trigger는
 공급자 정책을 요구한다. Neture 관리자 hub trigger는 Neture 범위다. 클라이언트 method/serviceKey
 값은 판정 근거가 아니다. 실제 원장·조건 snapshot 검증과 공고/정책 게시의 OPEN은 유지한다.
+
+
+KPA 하위 supplier mount는 일반 KPA 서비스보다 먼저 공급자 소유로 판정한다. 정책 소유 범위
+검사는 guard helper 이름뿐 아니라 실제 공급자 identity 조회와 등록 경로를 함께 대조한다.
+서비스별 신청 원장·조건 snapshot 및 운영 검증 OPEN은 이 API gate 회귀로 대체하지 않는다.

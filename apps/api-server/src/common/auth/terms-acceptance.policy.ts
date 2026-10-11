@@ -190,6 +190,7 @@ export function selectPendingPoliciesForRequest(
   const path = normalizeRequestPath(rawUrl)?.toLowerCase();
   const owners: ReadonlyArray<readonly [string, string]> = [
     ['/api/v1/kpa-branch', 'kpa-branch'],
+    ['/api/v1/kpa/supplier', 'supplier'],
     ['/api/v1/kpa', 'kpa-society'],
     ['/api/v1/cosmetics', 'k-cosmetics'],
     ['/api/v1/lms', 'lecture'],

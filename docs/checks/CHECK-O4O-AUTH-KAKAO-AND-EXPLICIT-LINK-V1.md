@@ -690,3 +690,13 @@ hub trigger 두 동작은 Neture 범위이며 public library는 기존 비인증
 회귀는 248건, UI 301건이며 PC/mobile 로컬 합성 API/provider 검증 36건의 범위는 그대로다.
 실제 서비스 원장·조건 snapshot, PG 통합, 실제 OAuth 및 운영 smoke의 OPEN은 유지한다.
 이 후속 변경도 동일 WO의 push/PR 범위이고 최신 HEAD의 CI·재리뷰로 통합 준비 상태를 확인한다.
+
+
+### KPA 하위 공급자 mount 우선순위
+
+KPA의 supplier 하위 API는 일반 KPA보다 먼저 supplier로 판정한다. 실제 supplier identity를
+소비하는 제안·자료 제출·signage media/캠페인/보고·screen-set 6개 mount를 대조하고 공통
+Neture 약관만 승낙한 공급자가 해당 정책을 우회하지 못하도록 했다. 각 HTTP fixture에서
+pending일 때 428 및 supplier 승낙 뒤 200을 확인했다. 관련 3 suites 101건 PASS다.
+이 middleware 검증은 실제 콘텐츠/제안 원장 쓰기나 운영 smoke가 아니다. 신규 6건 포함 고유
+서버 회귀는 254건, UI 301건, 로컬 PC/mobile 합성 검증 36건이며 기존 OPEN은 유지한다.

@@ -318,3 +318,9 @@ date 입력 시행일은 한국 달력 날짜(Asia/Seoul)로 비교하며 한국
 신규 10건 포함 보안/raw-source/provider 95건 및 API 타입/lint가 통과했다. 고유 서버 회귀는
 248건, UI 301건이며 실제 OAuth·운영 DB·30일 공고/시행은 완료 처리하지 않는다.
 동일 WO 연속 Phase이며 push/PR 종료 경계와 최신 HEAD의 CI·리뷰 확인 조건을 유지한다.
+
+
+KPA supplier mount도 일반 KPA보다 먼저 판정한다. 기존 active-supplier helper 검색뿐 아니라
+실제 supplier identity 조회 소비처·등록 route를 대조했다. 제안/자료/signage/screen-set의 신규
+6건 포함 관련 101건이 통과했다. 고유 서버 회귀 254건, UI 301건이며 실제 운영 검증과
+공고/정책 게시를 완료 처리하지 않는다. 최신 HEAD push/CI/review로 이번 Phase를 종료한다.

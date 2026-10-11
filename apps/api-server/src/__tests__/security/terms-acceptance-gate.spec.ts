@@ -638,6 +638,12 @@ describe('실제 서비스 소유 mount의 약관 enforcement', () => {
     ['post', '/api/v1/neture/hub/trigger/auto-product', 'supplier'],
     ['post', '/api/v1/neture/hub/trigger/refresh-settlement', 'supplier'],
     ['post', '/api/v1/neture/hub/trigger/ai-refresh', 'supplier'],
+    ['post', '/api/v1/kpa/supplier/event-offers', 'supplier'],
+    ['post', '/api/v1/kpa/supplier/content-submissions', 'supplier'],
+    ['post', '/api/v1/kpa/supplier/signage/media', 'supplier'],
+    ['post', '/api/v1/kpa/supplier/signage/campaign-requests', 'supplier'],
+    ['get', '/api/v1/kpa/supplier/signage/reports', 'supplier'],
+    ['post', '/api/v1/kpa/supplier/screen-sets', 'supplier'],
   ])('%s %s는 다른 세션 범위로 서비스 pending을 제거하지 않는다', async (method, path, serviceKey) => {
     publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, serviceKey)];
     membershipRows = [{ serviceKey, status: 'active' }];
