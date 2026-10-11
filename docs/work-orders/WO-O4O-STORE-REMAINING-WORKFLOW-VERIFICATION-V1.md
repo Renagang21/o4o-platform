@@ -105,3 +105,5 @@ QR 조회의 `store_execution_assets` JOIN은 활성 여부와 ID만 확인하�
 ## QR 수정 통합 후 배포 차단
 
 PR #483은 필수 CI와 Codex review finding 0을 확인하고 main `b4d428d606a6a9c29804b08c046a209b8880d843`에 통합했다. main 사후 CI 38141731196·CodeQL 38141731191도 성공했다. 그러나 자동 Delivery 38142342005가 GCP WIF 신원 조건에서 인증 거절됐으며 API build·migration·rollout은 모두 미실행이다. 따라서 위 QR 운영 배포 TODO는 열린 상태다. 이 작업에서 provider·OIDC·배포 workflow는 바꾸지 않았고 현재 provider metadata를 조회할 관리자 연결이 없어 정확한 불일치 조건은 미확정이다. 기존 운영 API의 read-only HEAD smoke 3개는 PASS이며 새 수정의 운영 반영 증거로 해석하지 않는다.
+
+후속 main PR #475의 [PH 퇴역 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 사용자 승인으로 WIF 기존 조건 뒤의 `&& false`를 적용한 격리 창이 기록돼 있다. QR 배포는 해당 PH 작업의 종료·원래 조건 복구 후 재개하며 이 제한을 우회하거나 임의 해제하지 않는다. 상세 근거와 결과 기록 main 통합 보류·worktree KEEP은 QR 소유 경계 WO에 기록한다.

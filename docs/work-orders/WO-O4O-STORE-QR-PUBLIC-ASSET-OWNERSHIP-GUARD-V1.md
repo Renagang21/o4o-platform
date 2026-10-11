@@ -63,8 +63,14 @@ main 사후 CI 38141731196과 CodeQL 38141731191은 성공했다. 자동 Deliver
 
 이 작업은 WIF provider·OIDC 설정·배포 workflow를 변경하지 않았다. 같은 Delivery의 이전 run 38138235844는 2026-10-11 12:11 UTC에 WIF 인증이 성공했으며, 별도 read-only GCP WIF Auth Smoke 38141409234도 현재 같은 신원 조건 거절로 실패했다. 어떤 provider 조건이 달라졌는지는 현재 GCP 측 metadata를 읽지 못했으므로 확정하지 않는다. main에 해당 workflow 변경이 없다는 사실만으로 원인을 GitHub/GCP 중 하나로 단정하지 않는다.
 
-GitHub OIDC subject 설정은 기본 subject이고 executor의 outbound identity manifest에는 connection이 0개다. inherited Google credential 변수와 경로의 존재는 관리자 접근 증거가 아니다. 실제 credential 파일 값은 읽거나 출력하지 않았다. 현재 provider metadata를 조회할 관리자 연결을 확인한 뒤 정확한 조건 불일치를 해결해야 하며, 다른 허용 workflow/새 키/완화된 조건으로 인증 경계를 우회하지 않는다. 설정 변경 없이 동일 인증 재실행도 하지 않았다.
+GitHub OIDC subject 설정은 기본 subject이고 executor의 outbound identity manifest에는 connection이 0개다. inherited Google credential 변수와 경로의 존재는 관리자 접근 증거가 아니다. 실제 credential 파일 값은 읽거나 출력하지 않았다. 이전 조사 단계에서는 현재 provider metadata를 조회할 관리자 연결이 없어 조건 불일치를 확정하지 못했다. 아래 최신 main의 승인된 격리 기록을 확인한 뒤에는 그 작업의 종료·원래 조건 복구를 기다린다., 다른 허용 workflow/새 키/완화된 조건으로 인증 경계를 우회하지 않는다. 설정 변경 없이 동일 인증 재실행도 하지 않았다.
 
 배포 실패 후 TLS 검증을 유지한 무인증 HEAD smoke 3개는 PASS다: `/health/ready` 200, slug 없는 QR namespace 404 + read-only HEAD marker, 존재하지 않는 임의 QR slug 404 + marker/no-store. HEAD body는 모두 0 bytes이며 QR scan 쓰기를 요청하지 않았다. 이 결과는 기존 운영 서비스의 준비 상태·HEAD 계약 확인이지 새 QR 수정이 운영에 반영됐다는 증거가 아니다.
 
 환경의 기존 install 설정은 유지하고, 사용한 workspace 내 pnpm cache/data 설정 및 이 차단·계정 기준을 start_skill draft에 저장했다. draft 저장은 환경 게시나 GCP provider 변경이 아니다. 이 WO는 배포 TODO 때문에 ACTIVE이며 자체 worktree/branch 판정은 KEEP이다. parent의 운영 원본 편집·두 업무 매장·물리 기기 TODO도 미완료다.
+
+### 최신 main에서 확인한 승인된 WIF 격리 창
+
+후속 fetch에서 PR #475의 main `a3462a0256877b641e433e7e9630173540dd8137`을 확인했다. [PH 퇴역 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)의 “WIF 일시 차단 적용 확인”은 사용자가 provider 기존 조건 뒤의 `&& false` 추가를 승인했고 로컬 IAM 관리자가 update/describe로 적용을 확인했다고 기록한다. 이후 검증된 main SHA의 PH workflow만 일시 허용해 남은 자원 정리를 끝내고 원래 조건을 복구하는 순서다. 이는 다른 작업의 승인된 공유 운영 격리이며 이번 작업이 임의 해제하거나 별도 credential/허용 workflow로 회피할 대상이 아니다.
+
+이 기록과 현재 두 인증 실패가 일치한다. 이 세션이 GCP provider를 직접 describe한 것은 아니며 관리자 연결 요구로 PH 작업의 복구 절차를 대체하지 않는다. PH 세션에서 격리 종료·원래 조건 복구를 확인한 뒤 최신 main의 CI/freeze/Delivery risk 및 동시 운영 작업 상태를 재확인해 QR 배포를 재개한다. 고정 main SHA를 사용하는 PH 실행 창에서 임의 main 통합으로 대상 SHA를 바꾸지 않도록, 이번 추가 결과 문서는 branch에 push해 보존하고 그 창의 종료 전 main 통합은 보류한다. 배포 TODO는 ACTIVE·worktree는 KEEP이다.
