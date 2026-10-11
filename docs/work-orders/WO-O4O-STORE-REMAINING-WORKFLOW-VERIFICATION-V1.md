@@ -50,7 +50,7 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 - [x] desktop/mobile 실제 메뉴 링크 진입 및 데이터 API 검증
 - [x] 현재 resolver/Core로 원본 변경·재복사·2개 로컬 조직 격리 검증
 - [x] 로컬 검증 실행 도구를 저장소에 보관
-- [ ] 필수 CI·리뷰·main 통합 및 사후 확인
+- [x] 필수 CI·리뷰·main 통합 및 사후 확인
 - [ ] 운영 검증 전용 원본 변경 후 사본 유지 확인
 - [ ] 정상 승인 업무 매장 두 곳 간 전환·작성·게시 확인
 - [ ] 기존 16개 테스트 조직의 차단 참조 처리 및 전체 정리
@@ -79,3 +79,5 @@ PR #470의 두 P1 finding(원격 proxy socket을 로컬로 오인할 가능성, 
 ## main 통합 기록
 
 PR #470은 최신 head의 CI 38128964948, SonarCloud 및 CodeQL 38128964933을 통과했고 두 P1 스레드의 보완·해결을 확인했다. main merge commit은 `c8903e1b8a013c8d6424af727bd75aa3ec8cf2ca`다. 동일 WO 결과 기록 Phase는 기존 전용 worktree/branch를 이어 사용한다. 검증 도구와 문서만 변경하므로 DEPLOYMENT = NOT_APPLICABLE이다.
+
+main 사후 CI 38129545596과 CodeQL 38129545592도 PASS다. main 포함을 확인했으며 동일 WO 기록 Phase의 문서 PR #472로 결과와 기존 조직 정리의 차단 원인을 동기화한다. 전체 WO 상태는 미완료 운영·기기 TODO 때문에 ACTIVE로 유지한다.
