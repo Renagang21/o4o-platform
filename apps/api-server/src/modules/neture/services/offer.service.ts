@@ -1,3 +1,6 @@
+import { SupplierOfferReadService } from './supplier-offer-read.service.js';
+import { AdminOfferReadService } from './admin-offer-read.service.js';
+import { OperatorOfferReadService } from './operator-offer-read.service.js';
 import { Repository, In } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
@@ -141,6 +144,21 @@ function assertPharmacyOnlyServiceKeys(
  * Extracted from NetureService (WO-O4O-NETURE-SERVICE-SPLIT-V1).
  */
 export class NetureOfferService {
+  private _supplierOfferReadService?: SupplierOfferReadService;
+  private get supplierOfferReadService(): SupplierOfferReadService {
+    return this._supplierOfferReadService ??= new SupplierOfferReadService();
+  }
+
+  private _adminOfferReadService?: AdminOfferReadService;
+  private get adminOfferReadService(): AdminOfferReadService {
+    return this._adminOfferReadService ??= new AdminOfferReadService();
+  }
+
+  private _operatorOfferReadService?: OperatorOfferReadService;
+  private get operatorOfferReadService(): OperatorOfferReadService {
+    return this._operatorOfferReadService ??= new OperatorOfferReadService();
+  }
+
   // Lazy repositories
   private _offerRepo?: Repository<SupplierProductOffer>;
   private _supplierRepo?: Repository<NetureSupplier>;
@@ -160,37 +178,8 @@ export class NetureOfferService {
   }
 
   constructor(private readonly catalogService: NetureCatalogService) {}
-
-  // ==================== Admin: Product Management (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1) ====================
-
-  /**
-   * GET /admin/products/pending — 승인 대기 상품 목록
-   */
   async getPendingProducts(): Promise<Array<{ id: string; supplierName: string; supplierId: string; distributionType: OfferDistributionType; createdAt: Date; approvalStatus: OfferApprovalStatus }>> {
-    try {
-      const offers = await this.offerRepo.find({
-        where: { approvalStatus: OfferApprovalStatus.PENDING },
-        relations: ['supplier', 'master'],
-        order: { createdAt: 'ASC' },
-      });
-
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
-
-      return offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.name || '',
-        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-        supplierId: o.supplierId,
-        isPublic: o.isPublic,
-        distributionType: o.distributionType,
-        createdAt: o.createdAt,
-        approvalStatus: o.approvalStatus,
-      }));
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching pending offers:', error);
-      throw error;
-    }
+    return this.adminOfferReadService.getPendingProducts();
   }
 
   /**
@@ -557,67 +546,11 @@ export class NetureOfferService {
     );
     return result;
   }
-
-  /**
-   * GET /admin/products — 전체 상품 목록 (필터)
-   */
   async getAllProducts(
     filters?: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus },
   ) {
-    try {
-      const where: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus } = {};
-      if (filters?.supplierId) where.supplierId = filters.supplierId;
-      if (filters?.distributionType) where.distributionType = filters.distributionType;
-      if (filters?.isActive !== undefined) where.isActive = filters.isActive;
-      if (filters?.approvalStatus) where.approvalStatus = filters.approvalStatus;
-
-      const offers = await this.offerRepo.find({
-        where,
-        relations: ['supplier', 'master'],
-        order: { createdAt: 'DESC' },
-      });
-
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
-
-      return offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.name || '',
-        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-        supplierId: o.supplierId,
-        isPublic: o.isPublic,
-        distributionType: o.distributionType,
-        isActive: o.isActive,
-        approvalStatus: o.approvalStatus,
-        priceGeneral: o.priceGeneral,
-        priceGold: o.priceGold,
-        pricePlatinum: o.pricePlatinum,
-        consumerReferencePrice: o.consumerReferencePrice,
-        consumerShortDescription: o.consumerShortDescription,
-        consumerDetailDescription: o.consumerDetailDescription,
-        businessShortDescription: o.businessShortDescription,
-        businessDetailDescription: o.businessDetailDescription,
-        createdAt: o.createdAt,
-      }));
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching all offers:', error);
-      throw error;
-    }
+    return this.adminOfferReadService.getAllProducts(filters);
   }
-
-  /**
-   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
-   *
-   * getAllProducts 의 pagination/search/sort 지원 변형.
-   * 기존 getAllProducts(array 반환)은 operator 측 소비처(operator-product-approval.controller)가
-   * 있어 그대로 유지하고, admin list 표준화를 위한 신규 진입점만 additive 로 추가한다.
-   *
-   * - page/limit 미전달 시: 전량 반환(legacy 동작 보존). pagination meta 는 controller 에서 전체 기준 구성.
-   * - page/limit 전달 시: skip/take 적용 (limit 상한 100).
-   * - search: master.name ILIKE. supplierName 은 organizations enrichment 값이라 V1 검색 제외.
-   * - sortBy: whitelist 외 값은 createdAt fallback. sortOrder 비정상값은 DESC fallback.
-   * - relations 는 to-one 만 join 하므로 getManyAndCount 의 total 이 정확하다.
-   */
   async getAllProductsPaged(options?: {
     supplierId?: string;
     distributionType?: OfferDistributionType;
@@ -628,211 +561,18 @@ export class NetureOfferService {
     sortOrder?: string;
     page?: number;
     limit?: number;
-  }): Promise<{ items: Array<Record<string, unknown>>; total: number }> {
-    try {
-      // sortBy whitelist — DB 컬럼만 허용 (supplierName/category 는 enrichment/relation 이라 V1 제외)
-      const SORT_WHITELIST: Record<string, string> = {
-        createdAt: 'offer.createdAt',
-        approvalStatus: 'offer.approvalStatus',
-        distributionType: 'offer.distributionType',
-        priceGeneral: 'offer.priceGeneral',
-        isActive: 'offer.isActive',
-      };
-
-      const qb = this.offerRepo
-        .createQueryBuilder('offer')
-        .leftJoinAndSelect('offer.supplier', 'supplier')
-        .leftJoinAndSelect('offer.master', 'master')
-        .leftJoinAndSelect('master.category', 'category');
-
-      if (options?.supplierId) qb.andWhere('offer.supplierId = :supplierId', { supplierId: options.supplierId });
-      if (options?.distributionType) qb.andWhere('offer.distributionType = :distributionType', { distributionType: options.distributionType });
-      if (options?.isActive !== undefined) qb.andWhere('offer.isActive = :isActive', { isActive: options.isActive });
-      if (options?.approvalStatus) qb.andWhere('offer.approvalStatus = :approvalStatus', { approvalStatus: options.approvalStatus });
-
-      const search = options?.search?.trim();
-      if (search) qb.andWhere('master.name ILIKE :search', { search: `%${search}%` });
-
-      const sortColumn = (options?.sortBy && SORT_WHITELIST[options.sortBy]) || SORT_WHITELIST.createdAt;
-      const sortDir: 'ASC' | 'DESC' = String(options?.sortOrder || '').toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-      qb.orderBy(sortColumn, sortDir);
-
-      // page/limit 전달 시에만 pagination 적용 (legacy 전량 조회 보존)
-      if (options?.page !== undefined || options?.limit !== undefined) {
-        const page = Math.max(1, Math.floor(options?.page ?? 1));
-        const limit = Math.min(100, Math.max(1, Math.floor(options?.limit ?? 20)));
-        qb.skip((page - 1) * limit).take(limit);
-      }
-
-      const [offers, total] = await qb.getManyAndCount();
-
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean) as NetureSupplier[]);
-
-      const items = offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.name || '',
-        // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1: field contract 정합 (additive)
-        //   frontend AdminProduct 는 marketingName/category 를 기대 — master.name / master.category.name 로 매핑.
-        marketingName: o.master?.name || '',
-        category: o.master?.category?.name || null,
-        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-        supplierId: o.supplierId,
-        isPublic: o.isPublic,
-        distributionType: o.distributionType,
-        isActive: o.isActive,
-        approvalStatus: o.approvalStatus,
-        priceGeneral: o.priceGeneral,
-        priceGold: o.priceGold,
-        pricePlatinum: o.pricePlatinum,
-        consumerReferencePrice: o.consumerReferencePrice,
-        consumerShortDescription: o.consumerShortDescription,
-        consumerDetailDescription: o.consumerDetailDescription,
-        businessShortDescription: o.businessShortDescription,
-        businessDetailDescription: o.businessDetailDescription,
-        createdAt: o.createdAt,
-      }));
-
-      return { items, total };
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching paged offers:', error);
-      throw error;
-    }
+  }): Promise<{ items: Array<Record<string, unknown>>; total: number }>{
+    return this.adminOfferReadService.getAllProductsPaged(options);
   }
-
-  /**
-   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
-   *
-   * 승인 상태별 전체 집계 — pagination 도입 후 client 전량 집계(KPI 4카드) 대체용.
-   * 공통 필터(supplierId/distributionType/isActive)만 수용하고, 전체 approvalStatus 기준으로 집계한다.
-   */
   async getProductsSummary(filters?: {
     supplierId?: string;
     distributionType?: OfferDistributionType;
     isActive?: boolean;
-  }): Promise<{ total: number; pending: number; approved: number; rejected: number }> {
-    try {
-      const qb = this.offerRepo
-        .createQueryBuilder('offer')
-        .select('offer.approvalStatus', 'status')
-        .addSelect('COUNT(*)', 'count')
-        .groupBy('offer.approvalStatus');
-
-      if (filters?.supplierId) qb.andWhere('offer.supplierId = :supplierId', { supplierId: filters.supplierId });
-      if (filters?.distributionType) qb.andWhere('offer.distributionType = :distributionType', { distributionType: filters.distributionType });
-      if (filters?.isActive !== undefined) qb.andWhere('offer.isActive = :isActive', { isActive: filters.isActive });
-
-      const rows: Array<{ status: string; count: string }> = await qb.getRawMany();
-
-      const summary = { total: 0, pending: 0, approved: 0, rejected: 0 };
-      for (const r of rows) {
-        const n = parseInt(r.count, 10) || 0;
-        summary.total += n;
-        if (r.status === OfferApprovalStatus.PENDING) summary.pending = n;
-        else if (r.status === OfferApprovalStatus.APPROVED) summary.approved = n;
-        else if (r.status === OfferApprovalStatus.REJECTED) summary.rejected = n;
-      }
-      return summary;
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching products summary:', error);
-      throw error;
-    }
+  }): Promise<{ total: number; pending: number; approved: number; rejected: number }>{
+    return this.adminOfferReadService.getProductsSummary(filters);
   }
-
-  // ==================== Supplier Products ====================
-
-  /**
-   * GET /supplier/products - 공급자의 제품 목록
-   */
   async getSupplierProducts(supplierId: string) {
-    try {
-      const offers = await this.offerRepo.find({
-        where: { supplierId },
-        relations: ['master', 'master.category', 'master.brand'],
-        order: { createdAt: 'DESC' },
-      });
-
-      // v2 product_approvals — offer_id 기준
-      const pendingCountRows: Array<{ offer_id: string; cnt: number }> = await AppDataSource.query(
-        `SELECT pa.offer_id, COUNT(*)::int AS cnt
-         FROM product_approvals pa
-         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'pending'
-         GROUP BY pa.offer_id`,
-        [supplierId],
-      );
-      const pendingMap = new Map(pendingCountRows.map((r) => [r.offer_id, r.cnt]));
-
-      const serviceCountRows: Array<{ offer_id: string; cnt: number }> = await AppDataSource.query(
-        `SELECT pa.offer_id, COUNT(DISTINCT pa.service_key)::int AS cnt
-         FROM product_approvals pa
-         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
-         GROUP BY pa.offer_id`,
-        [supplierId],
-      );
-      const serviceMap = new Map(serviceCountRows.map((r) => [r.offer_id, r.cnt]));
-
-      // Primary images for each master
-      const masterIds = offers.map((o) => o.masterId).filter(Boolean);
-      const imageMap = new Map<string, string>();
-      if (masterIds.length > 0) {
-        const imageRows: Array<{ master_id: string; image_url: string }> = await AppDataSource.query(
-          `SELECT master_id, image_url FROM product_images WHERE is_primary = true AND master_id = ANY($1::uuid[])`,
-          [masterIds],
-        );
-        for (const row of imageRows) {
-          imageMap.set(row.master_id, row.image_url);
-        }
-      }
-
-      return offers.map((o) => {
-        const activeServiceCount = serviceMap.get(o.id) || 0;
-        const pendingRequestCount = pendingMap.get(o.id) || 0;
-        const productName = o.master?.name || o.master?.regulatoryName || '';
-
-        const purpose = NetureOfferService.derivePurpose(o.isActive, activeServiceCount);
-
-        return {
-          id: o.id,
-          masterId: o.masterId,
-          name: productName,
-          masterName: productName,
-          category: o.master?.category?.name || '',
-          isActive: o.isActive,
-          purpose,
-          distributionType: o.distributionType,
-          allowedSellerIds: o.allowedSellerIds,
-          approvalStatus: o.approvalStatus,
-          priceGeneral: o.priceGeneral,
-          priceGold: o.priceGold,
-          pricePlatinum: o.pricePlatinum,
-          consumerReferencePrice: o.consumerReferencePrice,
-          // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
-          consumerShortDescription: o.consumerShortDescription,
-          consumerDetailDescription: o.consumerDetailDescription,
-          businessShortDescription: o.businessShortDescription,
-          businessDetailDescription: o.businessDetailDescription,
-          pendingRequestCount,
-          activeServiceCount,
-          createdAt: o.createdAt,
-          updatedAt: o.updatedAt,
-          barcode: o.master?.barcode || '',
-          brandName: o.master?.brand?.name || o.master?.brandName || null,
-          categoryName: o.master?.category?.name || null,
-          specification: o.master?.specification || null,
-          // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: additional Master fields
-          originCountry: o.master?.originCountry || null,
-          tags: o.master?.tags || [],
-          categoryId: o.master?.categoryId || null,
-          brandId: o.master?.brandId || null,
-          primaryImageUrl: imageMap.get(o.masterId) || null,
-        };
-      });
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching supplier offers:', error);
-      throw error;
-    }
+    return this.supplierOfferReadService.getSupplierProducts(supplierId);
   }
 
   // ==================== (은퇴) createSupplierOffer / validateCreateInput / resolveProductMetadata ====================
@@ -1698,147 +1438,6 @@ export class NetureOfferService {
       throw error;
     }
   }
-
-  // ==================== Paginated Supplier Products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
-
-  // WO-NETURE-COMPLETENESS-V2: 10-item × 10pts inline score (Offer + Master fields)
-  private static readonly COMPLETENESS_EXPR = `(
-    CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 10 ELSE 0 END
-    + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id AND deleted_at IS NULL) THEN 10 ELSE 0 END
-    + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 10 ELSE 0 END
-    + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 10 ELSE 0 END
-    + CASE WHEN spo.distribution_type IS NOT NULL THEN 10 ELSE 0 END
-    + CASE WHEN pm.category_id IS NOT NULL THEN 10 ELSE 0 END
-    + CASE WHEN pm.brand_id IS NOT NULL THEN 10 ELSE 0 END
-    + CASE WHEN jsonb_typeof(pm.tags) = 'array'
-        THEN CASE WHEN jsonb_array_length(pm.tags) > 0 THEN 10 ELSE 0 END
-        ELSE 0 END
-    + CASE WHEN spo.business_short_description IS NOT NULL AND spo.business_short_description != '' THEN 10 ELSE 0 END
-    + CASE WHEN spo.business_detail_description IS NOT NULL AND spo.business_detail_description != '' THEN 10 ELSE 0 END
-  )`;
-
-  /** Phase 3B: offer 상태로부터 purpose 파생 */
-  private static derivePurpose(
-    isActive: boolean,
-    activeServiceCount: number,
-  ): 'ACTIVE_SALES' | 'APPLICATION' | 'CATALOG' {
-    if (isActive && activeServiceCount > 0) return 'ACTIVE_SALES';
-    if (isActive) return 'APPLICATION';
-    return 'CATALOG';
-  }
-
-  /** Phase 3B: approvalStatus + completenessScore로부터 completenessStatus 파생 */
-  private static deriveCompletenessStatus(
-    approvalStatus: string,
-    completenessScore: number,
-  ): 'APPROVED' | 'READY' | 'INCOMPLETE' | 'DRAFT' {
-    if (approvalStatus === 'approved') return 'APPROVED';
-    if (completenessScore >= 70) return 'READY';
-    if (completenessScore > 0) return 'INCOMPLETE';
-    return 'DRAFT';
-  }
-
-  /** Phase 3A: WHERE 조건 + 페이징/정렬 파라미터 빌드 */
-  private buildPaginatedWhereClause(
-    supplierId: string,
-    options: {
-      page?: number;
-      limit?: number;
-      keyword?: string;
-      distributionType?: string;
-      isActive?: string;
-      sort?: string;
-      order?: string;
-      hasImage?: string;
-      hasDescription?: string;
-      barcodeSource?: string;
-      completenessStatus?: string;
-      serviceApprovalStatus?: string;
-    },
-  ) {
-    const page = Math.max(1, Number(options.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(options.limit) || 50));
-    const offset = (page - 1) * limit;
-    const keyword = options.keyword?.trim() || '';
-    const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-
-    const validSortFields: Record<string, string> = {
-      createdAt: 'spo.created_at',
-      priceGeneral: 'spo.price_general',
-      name: 'pm.name',
-      completeness: NetureOfferService.COMPLETENESS_EXPR,
-    };
-    const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
-
-    // Build WHERE conditions (soft 삭제 제외)
-    const conditions: string[] = ['spo.supplier_id = $1', 'spo.deleted_at IS NULL'];
-    const params: any[] = [supplierId];
-    let idx = 2;
-
-    if (keyword) {
-      conditions.push(`(pm.name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx})`);
-      params.push(`%${keyword}%`);
-      idx++;
-    }
-    if (options.distributionType) {
-      conditions.push(`spo.distribution_type = $${idx}`);
-      params.push(options.distributionType);
-      idx++;
-    }
-    if (options.isActive === 'true' || options.isActive === 'false') {
-      conditions.push(`spo.is_active = $${idx}`);
-      params.push(options.isActive === 'true');
-      idx++;
-    }
-    if (options.hasImage === 'true') {
-      conditions.push(`EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id AND deleted_at IS NULL)`);
-    } else if (options.hasImage === 'false') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id AND deleted_at IS NULL)`);
-    }
-    if (options.hasDescription === 'true') {
-      conditions.push(`spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != ''`);
-    } else if (options.hasDescription === 'false') {
-      conditions.push(`(spo.consumer_short_description IS NULL OR spo.consumer_short_description = '')`);
-    }
-    if (options.barcodeSource) {
-      conditions.push(`pm.barcode_source = $${idx}`);
-      params.push(options.barcodeSource);
-      idx++;
-    }
-    if (options.completenessStatus === 'DRAFT') {
-      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} = 0`);
-    } else if (options.completenessStatus === 'INCOMPLETE') {
-      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} > 0 AND ${NetureOfferService.COMPLETENESS_EXPR} < 70`);
-    } else if (options.completenessStatus === 'READY') {
-      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 70`);
-    }
-
-    // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: service approval status filter
-    if (options.serviceApprovalStatus === 'unrequested') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
-    } else if (options.serviceApprovalStatus === 'pending') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
-    } else if (options.serviceApprovalStatus === 'approved') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`);
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
-    } else if (options.serviceApprovalStatus === 'rejected') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')`);
-    }
-
-    const where = conditions.join(' AND ');
-
-    return { page, limit, offset, sortField, sortOrder, where, params, idx };
-  }
-
-  /** Phase 3A: 페이지네이션 쿼리 결과 행 → DTO 매핑 (purpose + completenessStatus 파생) */
-  private mapPaginatedRow(r: any) {
-    return {
-      ...r,
-      purpose: NetureOfferService.derivePurpose(r.isActive, r.activeServiceCount),
-      completenessStatus: NetureOfferService.deriveCompletenessStatus(r.approvalStatus, r.completenessScore || 0),
-    };
-  }
-
   async getSupplierProductsPaginated(
     supplierId: string,
     options: {
@@ -1856,111 +1455,8 @@ export class NetureOfferService {
       serviceApprovalStatus?: string;
     } = {},
   ) {
-    const q = this.buildPaginatedWhereClause(supplierId, options);
-
-    const [countResult, rows] = await Promise.all([
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         WHERE ${q.where}`,
-        q.params,
-      ),
-      AppDataSource.query(
-        `SELECT
-           spo.id, spo.master_id AS "masterId", spo.is_active AS "isActive",
-           spo.is_public AS "isPublic",
-           spo.is_featured AS "isFeatured",
-           spo.distribution_type AS "distributionType",
-           spo.allowed_seller_ids AS "allowedSellerIds",
-           spo.approval_status AS "approvalStatus",
-           spo.price_general AS "priceGeneral",
-           spo.price_gold AS "priceGold",
-           spo.price_platinum AS "pricePlatinum",
-           spo.consumer_reference_price AS "consumerReferencePrice",
-           spo.consumer_short_description AS "consumerShortDescription",
-           spo.consumer_detail_description AS "consumerDetailDescription",
-           spo.business_short_description AS "businessShortDescription",
-           spo.business_detail_description AS "businessDetailDescription",
-           spo.service_keys AS "serviceKeys",
-           spo.stock_quantity AS "stockQuantity",
-           spo.created_at AS "createdAt",
-           spo.updated_at AS "updatedAt",
-           pm.tags,
-           pm.name AS "masterName",
-           pm.barcode,
-           pm.specification,
-           pm.origin_country AS "originCountry",
-           pm.category_id AS "categoryId",
-           pm.brand_id AS "brandId",
-           pm.regulatory_type AS "regulatoryType",
-           pm.drug_category AS "drugCategory",
-           pm.regulatory_name AS "regulatoryName",
-           pm.mfds_permit_number AS "mfdsPermitNumber",
-           pm.manufacturer_name AS "manufacturerName",
-           COALESCE(pm.name, pm.regulatory_name, '') AS name,
-           pc.name AS "categoryName",
-           COALESCE(b.name, pm.brand_name) AS "brandName",
-           pi_img.image_url AS "primaryImageUrl",
-           COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
-           COALESCE(active.cnt, 0)::int AS "activeServiceCount",
-           svc_appr.approvals AS "serviceApprovals",
-           kpa_review.status AS "kpaReviewStatus",
-           kpa_review.reason AS "kpaReviewReason",
-           ${NetureOfferService.COMPLETENESS_EXPR} AS "completenessScore"
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN product_categories pc ON pc.id = pm.category_id
-         LEFT JOIN brands b ON b.id = pm.brand_id
-         LEFT JOIN LATERAL (
-           SELECT image_url FROM product_images
-           WHERE master_id = pm.id AND is_primary = true LIMIT 1
-         ) pi_img ON true
-         LEFT JOIN LATERAL (
-           SELECT COUNT(*)::int AS cnt FROM product_approvals
-           WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'pending'
-         ) pending ON true
-         LEFT JOIN LATERAL (
-           SELECT COUNT(DISTINCT service_key)::int AS cnt FROM product_approvals
-           WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'approved'
-         ) active ON true
-         LEFT JOIN LATERAL (
-           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status, 'reason', osa.reason)), '[]'::json) AS approvals
-           FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
-         ) svc_appr ON true
-         LEFT JOIN LATERAL (
-           SELECT pa.approval_status AS status, pa.reason
-           FROM product_approvals pa
-           WHERE pa.offer_id = spo.id AND pa.service_key = 'kpa-society' AND pa.approval_type = 'service'
-           LIMIT 1
-         ) kpa_review ON true
-         WHERE ${q.where}
-         ORDER BY pm.id, ${q.sortField} ${q.sortOrder}
-         LIMIT $${q.idx} OFFSET $${q.idx + 1}`,
-        [...q.params, q.limit, q.offset],
-      ),
-    ]);
-
-    const total = countResult[0]?.total || 0;
-    const data = rows.map((r: any) => this.mapPaginatedRow(r));
-
-    return {
-      data,
-      pagination: { page: q.page, limit: q.limit, total, totalPages: Math.ceil(total / q.limit) },
-    };
+    return this.supplierOfferReadService.getSupplierProductsPaginated(supplierId, options);
   }
-
-  // ==================== Approval Tab Counts (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1) ====================
-
-  // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1:
-  // total = unrequested + pending + approved + rejected
-  /**
-   * 공급자 상품 승인 상태별 카운트.
-   *
-   * WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1:
-   * 탭 카운트도 rows 쿼리와 동일한 보조 필터(검색어/이미지/설명/바코드/완성도 등)를
-   * 적용하도록 수정. serviceApprovalStatus는 제외 — 5개 탭을 한 쿼리로 모두 계산.
-   */
   async getSupplierProductApprovalCounts(
     supplierId: string,
     options: {
@@ -1973,36 +1469,7 @@ export class NetureOfferService {
       completenessStatus?: string;
     } = {},
   ) {
-    // serviceApprovalStatus는 카운트 계산에 사용하지 않음 (FILTER로 5개 동시 집계)
-    const q = this.buildPaginatedWhereClause(supplierId, {
-      ...options,
-      serviceApprovalStatus: undefined,
-    });
-
-    const rows: Array<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
-      `SELECT
-         COUNT(*)::int AS total,
-         COUNT(*) FILTER (WHERE NOT EXISTS (
-           SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
-         ))::int AS unrequested,
-         COUNT(*) FILTER (WHERE EXISTS (
-           SELECT 1 FROM offer_service_approvals osa
-           WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
-         ))::int AS pending,
-         COUNT(*) FILTER (WHERE
-           NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')
-           AND EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
-         )::int AS approved,
-         COUNT(*) FILTER (WHERE EXISTS (
-           SELECT 1 FROM offer_service_approvals osa
-           WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
-         ))::int AS rejected
-       FROM supplier_product_offers spo
-       JOIN product_masters pm ON pm.id = spo.master_id
-       WHERE ${q.where}`,
-      q.params,
-    );
-    return rows[0] || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
+    return this.supplierOfferReadService.getSupplierProductApprovalCounts(supplierId, options);
   }
 
   // ==================== Batch Update (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
@@ -2151,105 +1618,9 @@ export class NetureOfferService {
     logger.info(`[OfferService] bulkDeleteOffers(soft): supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
     return { deleted, failed };
   }
-
-  // ==================== Operator Supply Dashboard ====================
-
   async getOperatorSupplyProducts(operatorUserId: string) {
-    try {
-      // 1. 활성 PUBLIC + SERVICE Offer 조회 (Tier 1 + Tier 2)
-      const allOffers = await this.offerRepo.find({
-        where: { isActive: true, distributionType: In([OfferDistributionType.PUBLIC, OfferDistributionType.SERVICE]) },
-        relations: ['supplier', 'master'],
-        order: { createdAt: 'DESC' },
-      });
-
-      // Supplier ACTIVE 검증 (Tier 공통)
-      const activeOffers = allOffers.filter((o) => o.supplier?.status === SupplierStatus.ACTIVE);
-
-      // v2 product_approvals — offer_id 기준
-      const myApprovals: Array<{ offer_id: string; supplier_id: string; status: string; id: string; reason: string | null }> = await AppDataSource.query(
-        `SELECT pa.offer_id, spo.supplier_id, pa.approval_status AS status, pa.id, pa.reason
-         FROM product_approvals pa
-         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE pa.organization_id = $1 AND pa.approval_type IN ('private', 'service')`,
-        [operatorUserId],
-      );
-
-      // offerId → 가장 관련성 높은 요청 상태 매핑
-      const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
-      for (const req of myApprovals) {
-        const key = `${req.supplier_id}:${req.offer_id}`;
-        const existing = requestMap.get(key);
-        if (!existing ||
-            req.status === 'pending' ||
-            req.status === 'approved') {
-          requestMap.set(key, {
-            status: req.status,
-            requestId: req.id,
-            rejectReason: req.reason || undefined,
-          });
-        }
-      }
-
-      // 머지하여 반환
-      // 이미지 조회 (masterId → primaryImageUrl)
-      const masterIds = [...new Set(activeOffers.map((o) => o.masterId).filter(Boolean))];
-      const imageMap = new Map<string, string>();
-      if (masterIds.length > 0) {
-        const images: Array<{ master_id: string; image_url: string }> = await AppDataSource.query(
-          `SELECT master_id, image_url FROM product_images WHERE master_id = ANY($1) AND is_primary = true`,
-          [masterIds],
-        );
-        for (const img of images) imageMap.set(img.master_id, img.image_url);
-      }
-
-      // 카테고리 조회
-      const categoryIds = [...new Set(activeOffers.map((o) => o.master?.categoryId).filter(Boolean))];
-      const categoryMap = new Map<string, string>();
-      if (categoryIds.length > 0) {
-        const cats: Array<{ id: string; name: string }> = await AppDataSource.query(
-          `SELECT id, name FROM product_categories WHERE id = ANY($1)`,
-          [categoryIds],
-        );
-        for (const c of cats) categoryMap.set(c.id, c.name);
-      }
-
-      const orgNameMap = await this.getOrgNameMap(activeOffers.map((o) => o.supplier).filter(Boolean));
-      return activeOffers.map((o) => {
-        const key = `${o.supplierId}:${o.id}`;
-        const request = requestMap.get(key);
-        return {
-          id: o.id,
-          masterId: o.masterId,
-          name: o.master?.name || o.master?.regulatoryName || '',
-          distributionType: o.distributionType,
-          supplierId: o.supplierId,
-          supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-          supplyStatus: request?.status || 'available',
-          requestId: request?.requestId || null,
-          rejectReason: request?.rejectReason || null,
-          priceGeneral: o.priceGeneral ?? null,
-          consumerReferencePrice: o.consumerReferencePrice ?? null,
-          approvalStatus: o.approvalStatus || null,
-          barcode: o.master?.barcode || null,
-          specification: o.master?.specification || null,
-          category: o.master?.categoryId ? categoryMap.get(o.master.categoryId) || null : null,
-          primaryImageUrl: imageMap.get(o.masterId) || null,
-        };
-      });
-    } catch (error) {
-      logger.error('[NetureOfferService] Error fetching operator supply products:', error);
-      throw error;
-    }
+    return this.operatorOfferReadService.getOperatorSupplyProducts(operatorUserId);
   }
-
-  // ==================== Operator All-Offers View ====================
-
-  /**
-   * WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
-   * 전체 등록 상품 조회 (isActive/distributionType 필터 없음)
-   * 운영자가 플랫폼에 등록된 모든 offer를 모니터링하기 위한 용도
-   */
   async getAllRegisteredOffers(options: {
     page?: number;
     limit?: number;
@@ -2262,201 +1633,6 @@ export class NetureOfferService {
     sort?: string;
     order?: string;
   } = {}) {
-    const page = Math.max(1, Number(options.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(options.limit) || 50));
-    const offset = (page - 1) * limit;
-    const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-
-    const validSortFields: Record<string, string> = {
-      createdAt: 'spo.created_at',
-      priceGeneral: 'spo.price_general',
-      name: 'pm.name',
-    };
-    const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
-
-    // WHERE 조건 (deleted_at IS NULL 만 기본)
-    const conditions: string[] = ['spo.deleted_at IS NULL'];
-    const params: any[] = [];
-    let idx = 1;
-
-    if (options.keyword?.trim()) {
-      conditions.push(`(pm.name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR o.name ILIKE $${idx})`);
-      params.push(`%${options.keyword.trim()}%`);
-      idx++;
-    }
-    if (options.distributionType) {
-      conditions.push(`spo.distribution_type = $${idx}`);
-      params.push(options.distributionType);
-      idx++;
-    }
-    if (options.isActive === 'true' || options.isActive === 'false') {
-      conditions.push(`spo.is_active = $${idx}`);
-      params.push(options.isActive === 'true');
-      idx++;
-    }
-    // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
-    // 승인 상태 필터도 SSOT(offer_service_approvals) 기준으로 통일.
-    // 기존 spo.approval_status는 submit 경로가 갱신하지 않아 실제 상태와 다를 수 있음.
-    if (options.approvalStatus === 'PENDING') {
-      conditions.push(
-        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`,
-      );
-    } else if (options.approvalStatus === 'APPROVED') {
-      conditions.push(
-        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
-         AND NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`,
-      );
-    } else if (options.approvalStatus === 'REJECTED') {
-      conditions.push(
-        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')
-         AND NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`,
-      );
-    }
-    if (options.category?.trim()) {
-      conditions.push(`pc.name ILIKE $${idx}`);
-      params.push(`%${options.category.trim()}%`);
-      idx++;
-    }
-    if (options.regulatoryType) {
-      conditions.push(`pm.regulatory_type = $${idx}`);
-      params.push(options.regulatoryType);
-      idx++;
-    }
-
-    const where = conditions.join(' AND ');
-
-    const [countResult, rows, kpiResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-         LEFT JOIN organizations o ON o.id = ns.organization_id
-         LEFT JOIN product_categories pc ON pc.id = pm.category_id
-         WHERE ${where}`,
-        params,
-      ),
-      AppDataSource.query(
-        `SELECT
-           spo.id, spo.master_id AS "masterId",
-           spo.is_active AS "isActive",
-           spo.distribution_type AS "distributionType",
-           spo.approval_status AS "approvalStatus",
-           spo.price_general AS "priceGeneral",
-           spo.consumer_reference_price AS "consumerReferencePrice",
-           spo.supplier_id AS "supplierId",
-           spo.created_at AS "createdAt",
-           spo.consumer_short_description AS "consumerShortDescription",
-           spo.consumer_detail_description AS "consumerDetailDescription",
-           spo.business_short_description AS "businessShortDescription",
-           spo.business_detail_description AS "businessDetailDescription",
-           pm.tags,
-           COALESCE(pm.name, pm.regulatory_name, '') AS name,
-           pm.barcode,
-           pm.specification,
-           pm.category_id AS "categoryId",
-           pc.name AS "categoryName",
-           pm.regulatory_type AS "regulatoryType",
-           pm.drug_category AS "drugCategory",
-           COALESCE(b.name, pm.brand_name) AS "brandName",
-           o.name AS "supplierName",
-           ns.status AS "supplierStatus",
-           pi_img.image_url AS "primaryImageUrl",
-           svc_appr.approvals AS "serviceApprovals"
-         FROM supplier_product_offers spo
-         JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-         LEFT JOIN organizations o ON o.id = ns.organization_id
-         LEFT JOIN product_categories pc ON pc.id = pm.category_id
-         LEFT JOIN brands b ON b.id = pm.brand_id
-         LEFT JOIN LATERAL (
-           SELECT image_url FROM product_images
-           WHERE master_id = pm.id AND is_primary = true LIMIT 1
-         ) pi_img ON true
-         LEFT JOIN LATERAL (
-           SELECT COALESCE(json_agg(json_build_object('id', osa.id, 'serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
-           FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
-         ) svc_appr ON true
-         WHERE ${where}
-         ORDER BY ${sortField} ${sortOrder}
-         LIMIT $${idx} OFFSET $${idx + 1}`,
-        [...params, limit, offset],
-      ),
-      // KPI 집계 (필터 무관 전체 대상)
-      // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
-      // 승인 KPI는 SSOT인 offer_service_approvals 테이블을 기준으로 집계해야 한다.
-      // 기존 spo.approval_status는 파생 필드이며 submit 경로가 갱신하지 않아 stale 상태.
-      // 정의:
-      //   approvalPending  = 서비스 승인 레코드 중 하나라도 pending 인 offer 수
-      //   approvalApproved = offer의 모든 서비스 승인 레코드가 approved (1건 이상 존재)인 offer 수
-      //   approvalRejected = 서비스 승인 레코드 중 하나라도 rejected 이면서 pending 은 없는 offer 수
-      //   approvalNone     = offer_service_approvals 레코드가 하나도 없는 offer 수 (참고 — 현재 KPI 카드에는 미노출)
-      AppDataSource.query(
-        `SELECT
-           COUNT(*)::int AS total,
-           COUNT(*) FILTER (WHERE spo.is_active = true)::int AS active,
-           COUNT(*) FILTER (WHERE spo.is_active = false)::int AS inactive,
-           COUNT(*) FILTER (WHERE spo.distribution_type = 'PUBLIC')::int AS "distPublic",
-           COUNT(*) FILTER (WHERE spo.distribution_type = 'SERVICE')::int AS "distService",
-           COUNT(*) FILTER (WHERE spo.distribution_type = 'PRIVATE')::int AS "distPrivate",
-           COUNT(*) FILTER (WHERE EXISTS (
-             SELECT 1 FROM offer_service_approvals osa
-             WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
-           ))::int AS "approvalPending",
-           COUNT(*) FILTER (WHERE
-             EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
-             AND NOT EXISTS (
-               SELECT 1 FROM offer_service_approvals osa
-               WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved'
-             )
-           )::int AS "approvalApproved",
-           COUNT(*) FILTER (WHERE
-             EXISTS (
-               SELECT 1 FROM offer_service_approvals osa
-               WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
-             )
-             AND NOT EXISTS (
-               SELECT 1 FROM offer_service_approvals osa
-               WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
-             )
-           )::int AS "approvalRejected"
-         FROM supplier_product_offers spo
-         WHERE spo.deleted_at IS NULL`,
-      ),
-    ]);
-
-    const total = countResult[0]?.total || 0;
-    const kpi = kpiResult[0] || {};
-
-    return {
-      data: rows,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      kpi: {
-        total: kpi.total || 0,
-        active: kpi.active || 0,
-        inactive: kpi.inactive || 0,
-        distPublic: kpi.distPublic || 0,
-        distService: kpi.distService || 0,
-        distPrivate: kpi.distPrivate || 0,
-        approvalPending: kpi.approvalPending || 0,
-        approvalApproved: kpi.approvalApproved || 0,
-        approvalRejected: kpi.approvalRejected || 0,
-      },
-    };
-  }
-
-  // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-C: batch org name lookup
-  private async getOrgNameMap(suppliers: NetureSupplier[]): Promise<Map<string, string>> {
-    const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
-    const map = new Map<string, string>();
-    if (orgIds.length === 0) return map;
-    try {
-      const rows: Array<{ id: string; name: string }> = await AppDataSource.query(
-        `SELECT id, name FROM organizations WHERE id = ANY($1)`,
-        [orgIds],
-      );
-      for (const r of rows) map.set(r.id, r.name);
-    } catch { /* non-fatal */ }
-    return map;
+    return this.operatorOfferReadService.getAllRegisteredOffers(options);
   }
 }
