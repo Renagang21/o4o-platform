@@ -62,8 +62,8 @@ export async function referenceAudit(client, columns, roots) {
     for (const { column_name: name, udt_name: type } of fields) {
       const column = quoteIdentifier(name);
       if (type === 'uuid') predicates.push(`${column} = ANY($1::uuid[])`);
-      else if (['text','varchar','bpchar'].includes(type)) predicates.push(`${column}::text ILIKE ANY($2::text[])`);
-      else if (['json','jsonb','_uuid','_text','_varchar','_bpchar','_json','_jsonb'].includes(type)) predicates.push(`${column}::text ILIKE ANY($2::text[])`);
+      else if (['text','varchar','bpchar'].includes(type)) predicates.push(`${column}::text COLLATE pg_catalog."C" ILIKE ANY($2::text[])`);
+      else if (['json','jsonb','_uuid','_text','_varchar','_bpchar','_json','_jsonb'].includes(type)) predicates.push(`${column}::text COLLATE pg_catalog."C" ILIKE ANY($2::text[])`);
     }
     if (!predicates.length) continue;
     const own = roots.find(x => table === 'public.' + x.table);
