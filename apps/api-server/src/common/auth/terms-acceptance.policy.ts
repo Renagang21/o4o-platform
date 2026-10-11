@@ -13,7 +13,7 @@
  *
  * ── 판정 규칙 ────────────────────────────────────────────────────────────────
  * Neture 공통 계정 terms는 물리 membership 없이 요구한다. 서비스 terms는 active/pending
- * membership에 대해서만 요구한다. 게시 문서·기존 승낙 ID/version/hash를 그대로 보존한다.
+ * membership 또는 실제 공급자 원장의 업무 자격에 요구한다. 게시 문서·기존 승낙 ID/version/hash를 그대로 보존한다.
  * 요청 차단은 공통 terms와 요청 서비스의 pending에만 적용한다. 가입·승인·role은 생성하지 않는다.
  * 전체관리자 업무 경로는 기존 별도 role guard와 게이트 예외를 유지한다.
  *
@@ -23,6 +23,7 @@
  */
 
 import { normalizeRequestPath } from './account-access.policy.js';
+import { getServiceWorkspaceCapability } from '../../config/service-catalog.js';
 
 export const TERMS_ACCEPTANCE_REQUIRED_CODE = 'TERMS_ACCEPTANCE_REQUIRED';
 export const TERMS_ACCEPTANCE_REQUIRED_MESSAGE = '서비스 이용약관에 동의한 뒤 이용할 수 있습니다.';
@@ -223,5 +224,9 @@ export function selectPendingPoliciesForRequest(
   const netureManagementAction = verb === 'POST' && path && /^\/api\/v1\/neture\/hub\/trigger\/(approve-supplier|audit-review)$/.test(path);
   const service = supplierMutation ? 'supplier' : netureManagementAction ? 'neture' : (owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
     ?? sessionServiceKey);
+  // Store is a workspace, not a policy service. Expose enrolled store-capable services so its gate can accept them.
+  if (service === 'store') {
+    return pending.filter(p => p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || getServiceWorkspaceCapability(p.serviceKey).storeWorkspaceEnabled);
+  }
   return pending.filter(p => !service || p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || p.serviceKey === service);
 }

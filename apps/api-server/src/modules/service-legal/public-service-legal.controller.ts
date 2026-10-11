@@ -23,6 +23,7 @@ import { ServiceLegalProfile } from './entities/ServiceLegalProfile.entity.js';
 import { ServicePolicyDocument } from './entities/ServicePolicyDocument.entity.js';
 import { toPublicLegalProfile, toPublicPolicyDocument } from './service-legal.mapper.js';
 import { isSupportedLegalServiceKey } from './service-legal-scope.js';
+import { getService } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
 
 export function createPublicServiceLegalController(dataSource: DataSource): Router {
@@ -30,9 +31,9 @@ export function createPublicServiceLegalController(dataSource: DataSource): Rout
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
 
-  function guardServiceKey(req: Request, res: Response): string | null {
+  function guardServiceKey(req: Request, res: Response, allowCatalogPolicy = false): string | null {
     const { serviceKey } = req.params;
-    if (!serviceKey || !isSupportedLegalServiceKey(serviceKey)) {
+    if (!serviceKey || (!isSupportedLegalServiceKey(serviceKey) && !(allowCatalogPolicy && getService(serviceKey)))) {
       res.status(404).json({
         success: false,
         error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' },
@@ -61,7 +62,8 @@ export function createPublicServiceLegalController(dataSource: DataSource): Rout
 
   // ── GET /:serviceKey/policies/:documentType (최신 published) ──
   router.get('/:serviceKey/policies/:documentType', async (req: Request, res: Response) => {
-    const serviceKey = guardServiceKey(req, res);
+    // Read only already-published documents for canonical services; management scopes are unchanged.
+    const serviceKey = guardServiceKey(req, res, true);
     if (!serviceKey) return;
     const { documentType } = req.params;
     try {

@@ -32,6 +32,8 @@ let currentUser: any = null;
 let publishedRows: any[] = [];
 /** service_memberships rows for USER_ID */
 let membershipRows: any[] = [];
+let supplierCandidateRows: any[] = [];
+let legacySupplierRows: any[] = [];
 /** user_policy_acceptances policy_document_id set for USER_ID */
 let acceptedIds: string[] = [];
 let queryShouldThrow = false;
@@ -60,6 +62,8 @@ async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
     return publishedRows.filter(ofType);
   }
   if (q.includes('FROM neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ '?column?': 1 }] : [];
+  if (q.includes('JOIN neture_suppliers s')) return supplierCandidateRows;
+  if (q.includes('FROM neture_suppliers WHERE user_id')) return legacySupplierRows;
   // isStoreOwner('kpa') → resolveStoreOrganization 의 원장 기반 매장 후보
   if (q.includes('JOIN neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ organization_id: 'org-pharmacy', role: 'owner' }] : [];
   if (q.includes('FROM role_assignments')) {
@@ -139,6 +143,8 @@ beforeEach(() => {
   currentUser = { id: USER_ID, status: 'active', isActive: true, roles: [], memberships: [], refreshTokenFamily: 'user-family' };
   publishedRows = [];
   membershipRows = [];
+  supplierCandidateRows = [];
+  legacySupplierRows = [];
   acceptedIds = [];
   queryShouldThrow = false;
   demoUserIds = [];
@@ -778,5 +784,53 @@ describe('공급자 이미지 변경과 공용 조회의 method 경계', () => {
     acceptedIds.push(DOC_KPA);
     policyAcceptanceService.invalidateAll();
     expect((await (request(app) as any)[method](path).set('Authorization', auth)).status).toBe(200);
+  });
+});
+
+
+describe('Store 업무공간과 실제 공급자 원장 약관 대상', () => {
+  it('Store 세션은 가입한 Store-capable 서비스 문서를 표시하고 승낙하며 무관한 공급자 pending은 제외한다', async () => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'kpa-society'), publishedDoc(DOC_PRIVACY, 'supplier')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }, { serviceKey: 'supplier', status: 'active' }];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken('store')}`;
+    const pending = await request(app).get('/api/v1/auth/policy-acceptances').set('Authorization', auth);
+    expect(pending.body.data.pending.map((p: any) => p.serviceKey)).toEqual(['neture', 'kpa-society']);
+    expect((await policyAcceptanceService.getEnforcedPendingForUser(USER_ID, 'store')).map(p => p.serviceKey)).toEqual(['neture', 'kpa-society']);
+    for (const [serviceKey, policyDocumentId] of [['neture', DOC_NETURE], ['kpa-society', DOC_KPA]]) {
+      expect((await request(app).post('/api/v1/auth/policy-acceptances').set('Authorization', auth)
+        .send({ serviceKey, policyDocumentId, version: 1 })).status).toBe(200);
+    }
+    expect(await policyAcceptanceService.getEnforcedPendingForUser(USER_ID, 'store')).toEqual([]);
+    expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(200);
+    expect((await policyAcceptanceService.getPendingForUser(USER_ID)).map(p => p.serviceKey)).toEqual(['supplier']);
+  });
+
+  it.each([
+    ['canonical active', ['ACTIVE'], [], true],
+    ['canonical pending', ['PENDING'], [], true],
+    ['multiple canonical suppliers', ['INACTIVE', 'ACTIVE'], [], true],
+    ['canonical inactive', ['INACTIVE'], [], false],
+    ['no supplier relation', [], [], false],
+    ['legacy compatibility supplier', [], ['ACTIVE'], true],
+  ])('%s: supplier 운영자 membership 없이 실제 원장 기준으로 pending과 승낙 자격이 일치한다', async (_label, statuses, legacyStatuses, eligible) => {
+    supplierCandidateRows = (statuses as string[]).map((status, i) => ({ supplier_id: `fixture-supplier-${i}`, organization_id: `fixture-org-${i}`, status, organization_name: 'Fixture' }));
+    legacySupplierRows = (legacyStatuses as string[]).map(status => ({ id: 'fixture-legacy', organization_id: null, status }));
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'supplier')];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken('supplier')}`;
+    const before = await request(app).get('/api/v1/auth/policy-acceptances').set('Authorization', auth);
+    expect(before.body.data.pending.map((p: any) => p.serviceKey)).toEqual(eligible ? ['supplier'] : []);
+    if (eligible) expect((await request(app).post('/api/v1/neture/products/fixture/images').set('Authorization', auth)).status).toBe(428);
+    const accepted = await request(app).post('/api/v1/auth/policy-acceptances').set('Authorization', auth)
+      .send({ serviceKey: 'supplier', policyDocumentId: DOC_KPA, version: 1 });
+    expect(accepted.status).toBe(eligible ? 200 : 403);
+    expect(membershipRows).toEqual([]);
+    expect(queryLog.some(q => /^INSERT INTO (service_memberships|organization_members)/.test(q))).toBe(false);
+    if (eligible) {
+      expect(accepted.body.data.pending).toEqual([]);
+      expect((await request(app).post('/api/v1/neture/products/fixture/images').set('Authorization', auth)).status).toBe(200);
+    } else expect(acceptedIds).toEqual([DOC_NETURE]);
   });
 });

@@ -33,6 +33,7 @@ import {
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
 import { demoAccountService } from '../../services/auth/demo-account.service.js';
+import { resolveSupplierForUser } from '../neture/middleware/supplier-context.resolver.js';
 import logger from '../../utils/logger.js';
 
 type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
@@ -107,6 +108,14 @@ export class PolicyAcceptanceService {
 
   invalidateUser(userId: string): void {
     this.userOkCache.delete(userId);
+  }
+
+  /** Supplier business eligibility uses the existing canonical resolver, independently of operator memberships. */
+  async isSupplierPolicySubject(userId: string, q: Queryable = this.db()): Promise<boolean> {
+    const resolution = await resolveSupplierForUser(q as DataSource, userId, null);
+    const eligible = (status: string) => status === 'ACTIVE' || status === 'PENDING';
+    if (resolution.kind === 'resolved') return eligible(resolution.status);
+    return resolution.kind === 'context_required' && resolution.candidates.some(candidate => eligible(candidate.status));
   }
 
   async listPublishedTerms(force = false): Promise<PublishedTermsDocument[]> {
@@ -242,6 +251,10 @@ export class PolicyAcceptanceService {
       { serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' },
       ...memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status)),
     ];
+    if (published.some(d => d.serviceKey === 'supplier') && !relevant.some(m => m.serviceKey === 'supplier')
+      && await this.isSupplierPolicySubject(userId, q)) {
+      relevant.push({ serviceKey: 'supplier', status: 'active' });
+    }
     const requiredIds = published
       .filter((d) => relevant.some((m) => m.serviceKey === d.serviceKey))
       .map((d) => d.id);

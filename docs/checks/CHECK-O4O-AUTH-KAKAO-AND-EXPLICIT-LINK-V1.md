@@ -700,3 +700,32 @@ Neture 약관만 승낙한 공급자가 해당 정책을 우회하지 못하도�
 pending일 때 428 및 supplier 승낙 뒤 200을 확인했다. 관련 3 suites 101건 PASS다.
 이 middleware 검증은 실제 콘텐츠/제안 원장 쓰기나 운영 smoke가 아니다. 신규 6건 포함 고유
 서버 회귀는 254건, UI 301건, 로컬 PC/mobile 합성 검증 36건이며 기존 OPEN은 유지한다.
+
+
+### Store 업무공간 노출 및 실제 공급자 자격 일치
+
+Store signed scope의 공통 pending은 현재 Store-capable 서비스의 자격 기반 문서를 노출한다.
+GET pending·승낙·공통 enforced pending과 KPA API 해소를 검증했으며, 무관한 공급자 pending은
+raw에 남아 있어도 Store를 막지 않는다. 새 서비스 키/가입/역할을 만들지 않는다.
+
+실제 공급자 약관 대상과 승낙 자격은 기존 canonical supplier resolver를 함께 사용한다. ACTIVE,
+PENDING, 복수 후보 중 업무 자격, INACTIVE, 관계 없음 및 경고가 있는 legacy compatibility를
+검증했다. 운영자 membership 없이 pending→428→승낙→해소가 가능하고 무자격 승낙은 403이다.
+기존 resolver의 owner/left_at/type 및 복수/foreign context 경계 18건도 이번 검증에 포함했다.
+
+신규 정책 경계 7건 포함 관련 4 suites 126 PASS다. 초기 타입 검사의 resolver 인자 누락을
+수정해 null context로 명시했고 변경 후 보안/resolver 2 suites 114건을 재검증했다.
+이번 검증의 고유 서버 회귀는 기존 254 + 신규 7 + 추가 resolver 18 = 279건, UI 301건이다.
+로컬 PC/mobile 합성 36건 및 실제 OAuth/PG/운영 검증 OPEN은 유지한다. 원장 read는 합성 fixture이며
+운영 원장 쓰기나 서비스 신청 조건 snapshot/rollback 검증을 실행한 것이 아니다.
+
+
+공개 정책 본문 조회도 대조했다. 관리 scope의 4개 key만 받던 정책 GET은 catalog의 canonical
+서비스에 대해 이미 published인 문서를 읽도록 연결했다. supplier/funding/community/kpa-branch
+조회, store·미등록 key 거부, 미게시 404와 법정정보 scope 비확대를 확인했다(신규 7건).
+기존 관리 legal scope 6건도 PASS다. 관리 작성/게시 권한은 그대로이며 후속 TODO다.
+추가 13건 포함 고유 서버 회귀는 292건, UI 301건이다. 공개 조회는 합성 fixture이고 정책 게시나
+공고를 실행하지 않았다. 이번 Phase 검증과 실제 신규 정책의 게시 준비 완료를 구분한다.
+
+Store/원장/공개 조회 보완 후 API 타입·changed lint·API build 및 docs 민감정보 guard가 모두 통과했다.
+최종 CI·전체 재리뷰는 이 후속 HEAD에서 확인하며 실제 서비스 원장 쓰기/정책 게시를 수행하지 않았다.

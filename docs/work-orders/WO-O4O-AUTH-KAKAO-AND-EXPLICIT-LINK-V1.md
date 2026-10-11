@@ -324,3 +324,16 @@ KPA supplier mount도 일반 KPA보다 먼저 판정한다. 기존 active-suppli
 실제 supplier identity 조회 소비처·등록 route를 대조했다. 제안/자료/signage/screen-set의 신규
 6건 포함 관련 101건이 통과했다. 고유 서버 회귀 254건, UI 301건이며 실제 운영 검증과
 공고/정책 게시를 완료 처리하지 않는다. 최신 HEAD push/CI/review로 이번 Phase를 종료한다.
+
+
+재리뷰의 Store 서비스 약관 표시 deadlock과 실제 공급자 자격 공백을 보완했다. Store는 현재
+catalog의 Store-capable 서비스만, 공급자는 기존 canonical resolver의 업무 자격을 사용한다.
+무관 서비스 차단·membership/role 생성 없이 pending과 승낙 자격을 일치시켰다. 신규 7건 포함
+관련 4 suites 126 PASS, resolver context 인자를 명시한 뒤 보안/resolver 114건을 재확인했다.
+추가 resolver 18건을 포함한 고유 서버 회귀는 279건, UI 301건이다. 실제 원장/조건 snapshot,
+운영 검증 및 30일 공고·시행 OPEN과 이번 push/PR 종료 범위는 유지한다.
+
+
+게시 정책 본문 read 경로는 catalog의 canonical 서비스에 연결하고 관리 write·법정정보 scope는
+유지했다. 조회 신규 7건과 기존 legal scope 6건이 통과했으며 고유 서버 회귀는 292건이다.
+정책 관리 권한 연결·실제 신규 본문 게시/공고는 후속 TODO이며 이번 read 보완으로 완료 처리하지 않는다.
