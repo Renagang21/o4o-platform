@@ -7,7 +7,7 @@
 
 
 > **작성일**: 2026-04-17
-> **최종 갱신**: 2026-10-11 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·운영 배포, 인증 운영 검증 대기) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **최종 갱신**: 2026-10-11 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·운영 배포, 실제 인증 검증 사용자 제외) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
 > **범위**: kpa-society, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
@@ -604,4 +604,4 @@ serviceNavigation
 
 ## My Home 구현 상태 (2026-10-11)
 
-[구현 WO](../../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md) 및 [CHECK](../../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 공통 인증 헤더의 My Home 직접 진입과 Neture·KPA 모바일 고정 항목을 구현·로컬 검증했다. 대표 목적지는 `neture.co.kr/mypage`이며 독립 서비스에서는 세션 handoff를 사용한다. 두 행 모바일 진입을 담도록 공통 GlobalHeader는 고정 높이 대신 최소 높이를 사용한다. PR #449의 main 통합과 promote 배포가 완료됐으며 최종 서빙 SHA 확인을 통과했다. 공개 화면의 PC·모바일 검증은 완료했고, 테스트 계정 문서 부재로 로그인한 사용자의 운영 진입 검증은 대기 중이다.
+[구현 WO](../../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md) 및 [CHECK](../../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 공통 인증 헤더의 My Home 직접 진입과 Neture·KPA 모바일 고정 항목을 구현·로컬 검증했다. 대표 목적지는 `neture.co.kr/mypage`이며 독립 서비스에서는 세션 handoff를 사용한다. 두 행 모바일 진입을 담도록 공통 GlobalHeader는 고정 높이 대신 최소 높이를 사용한다. PR #449의 main 통합과 promote 배포가 완료됐으며 최종 서빙 SHA 확인을 통과했다. 공개 화면의 PC·모바일 검증은 완료했다. 후속 본 작업에서 제공된 `docs/local/TEST-ACCOUNT.txt`를 확인했으며, 두 이메일 계정의 현재 로그인 거절 뒤 사용자가 이메일 리팩터링 예정·검증 제외를 명시했다. 현재 실제 인증 검증은 SKIPPED_BY_USER다. 헤더의 기존 운영 반영과 PR #484 본문 개선의 배포 상태는 구분하며 최신 결과는 구현 CHECK를 따른다.

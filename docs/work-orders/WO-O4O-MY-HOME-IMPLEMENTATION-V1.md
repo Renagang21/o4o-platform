@@ -88,3 +88,11 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 - 제공 파일의 2개 계정은 현재 이메일 로그인에서 `401 INVALID_CREDENTIALS`로 거절됐다. 사용자가 이메일 전체 리팩터링 예정이므로 건너뛰라고 명시해 이번 실계정 smoke를 **SKIPPED_BY_USER**로 확정한다. 이전 Phase의 계정 문서 미확보 이력과 현재 상태를 구분한다.
 
 Neture 전체 568개·공통 My Home 진입 10개·Study 헤더 2개와 PC/375/320px 로컬 Chromium fixture 39개를 통과했다. 세부 증거와 구현 PR·main·Delivery 결과는 CHECK와 TODO에 이어 기록한다. 정본 설명은 소스 PR과 분리된 문서 정합 Phase에서 반영한다.
+
+### 본 작업 통합·정본 정합의 연속 Phase
+
+리뷰 P1을 반영해 사업 상세·더 보기 링크를 참여 서비스로 연결하고 서비스 조회의 QR 통계 미호출 회귀를 추가했다. 수정 후 Neture 569개·타입 포함 build·PC/375/320px fixture 39개 PASS. 최종 [PR #484 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)의 required CI Gate·API 세 묶음·품질·웹/Admin build와 CodeQL·Guard를 확인한 뒤 main `ec7a21d59db197ae573420645c858e772424b006`에 정상 병합했다. 리뷰 P1 해결·미해결 스레드 0·source main 포함 차이 0이다.
+
+동일 미완료 WO의 별도 문서 정합 Phase로 정본 §6의 실제 데이터·화면 배치·일반 회원·원본 이동과 색인의 현재 상태를 갱신한다. 기존 사용자 관련 문서 수정·My Home 구현·배포 지시 범위이며 새로운 사업 정책·원장·권한 결정이 아니다. 기존 branch/worktree를 유지한다. 문서-only 변경의 DEPLOYMENT는 NOT_APPLICABLE이며 소스 PR #484의 운영 배포 의무는 유지한다.
+
+사용자 재확인 요청으로 현재 main에서 실행한 [WIF 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528)도 13:41 UTC provider attribute condition에 의해 거절됐다. 원래 인증 조건 복구를 사용자에게 요청했다. 신규 소스의 DEPLOYMENT는 AUTOMATIC, 현재 운영 반영은 미완료다. 실제 이메일 검증은 사용자 지시에 따른 SKIPPED_BY_USER로 기록하며 인증 PASS나 배포 blocker로 취급하지 않는다. main CI·Delivery·서빙·운영 번들 확인의 실제 결과는 CHECK와 TODO에 이어 기록한다.

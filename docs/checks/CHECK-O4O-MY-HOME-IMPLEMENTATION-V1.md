@@ -209,3 +209,15 @@ API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b18786
 PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정본 §2와의 차이를 지적했다. 상세 10건과 원본 업무 이동을 참여 서비스에 배치하고 요약의 더 보기 링크도 `/mypage/services`로 수정했다. 경영 현황은 사업 요약 최대 3건과 QR 통계·추이를 유지한다. 선택 매장은 같은 계정의 승인 매장 목록과 대조해 화면 사이에서 유지한다. 참여 서비스에서 QR 통계를 호출하지 않는 회귀를 추가했고 수정 후 Neture 전체 **569개 PASS**다. `/tmp/my-home-completion-review-vitest.log`에 근거를 보존한다.
 
 직전 main `b4d428d606a6a9c29804b08c046a209b8880d843`의 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38142342005)는 Google Cloud 인증 단계에서 실패하고 실제 배포와 최종 Report는 SKIPPED였다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 최신 main의 PharmacyHub retirement TODO는 사용자가 승인·적용한 WIF 일시 차단을 기록한다. 이 환경 조건의 원래 인증 복구가 현재 배포 전제이며 CI/freeze/WIF를 우회하거나 해당 provider를 임의 수정하지 않는다. 사용자에게 복구 후 알려 달라고 요청하고 구현 검증·PR 작업을 계속한다.
+
+### 본 작업 최종 소스 검증·main 통합
+
+- P1 수정 후 Neture **67파일·569개 PASS**, 타입 포함 production build PASS, PC/375/320px Chromium fixture **39개 PASS**. 로그는 `/tmp/my-home-completion-review-vitest.log`, `/tmp/my-home-completion-review-build.log`, `/tmp/my-home-completion-review-playwright.log`다. 현재 소스의 모바일 참여 서비스·PC 경영 현황 화면과 가로 넘침을 확인했다.
+- [PR #484](https://github.com/Renagang21/o4o-platform/pull/484)의 최종 HEAD `131ee3cb30384feecd554b3d665a5738736dbf4d` [CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)는 required CI Gate·API 세 묶음·품질·웹/Admin build PASS, CodeQL·Guard PASS. 리뷰 P1 반영·미해결 스레드 0. 이전 PR HEAD CI는 최종 gate 근거로 쓰지 않았다.
+- 2026-10-11 13:40 UTC main `ec7a21d59db197ae573420645c858e772424b006`에 정상 squash merge했다. 통합 전 실제 ruleset의 PR·CI Gate·human approval 0을 확인했고 admin bypass·main 직접 push·force push를 사용하지 않았다. 진행 중인 직전 Delivery가 종료된 후 통합했다. 공급자 API main 변경은 정상 merge로 반영했으며 My Home 소스·사용 조회 API 입력 차이 0. main 포함 source 경로 diff 0.
+
+### 사용자 요청에 따른 최신 WIF 재확인
+
+사용자가 인증 상태를 다시 확인하라고 요청해 현재 main의 기존 `gcp-wif-auth-smoke.yml`을 `kakao_metadata=false`로 새로 실행했다. [run 38144147528](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528), job `114483877967`은 Authenticate to Google Cloud(WIF)에서 실패했다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 13:41 UTC의 새 검증이며 과거 실패만 재인용한 결과가 아니다. credential/token/secret version·운영 데이터에 접근하거나 출력하지 않았고 배포·revision·DB·provider 변경 0이다.
+
+현재 GitHub API·fetch·push는 정상이다. 이 클라우드에 별도 GCP outbound identity는 없어 사용자 IAM 조건을 직접 변경할 권한을 추정하지 않는다. PharmacyHub 정리 작업의 원래 WIF 조건 복구 여부를 사용자에게 다시 확인 요청했다. 이 상태에서 신규 운영 배포·서빙 Report·운영 번들 검증은 완료로 기록하지 않는다.

@@ -1,6 +1,6 @@
 # My Home 본 작업 TODO
 
-> **상태**: ACTIVE · 코드·정본 대조 후 보완 완료, 구현 진행
+> **상태**: ACTIVE · 구현·main 통합 완료, 배포 전제 확인 중
 > **작성일**: 2026-10-11
 > **근거**: 사용자 TODO 작성 → 코드·문서 검증 → TODO 보완 → 구현·배포 완료 지시
 > **연속 WO**: [My Home 구현](WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
@@ -46,7 +46,8 @@ main 반영·운영 배포·배포 후 검증을 구분하며, 외부 조건 때
 - [x] 기존 참여·커뮤니티·QR·대표 홈·공통 진입 회귀, 전체 Neture 테스트·build
 - [x] PC·375/320px 브라우저에서 신규 동선·일반 회원·복수 매장·오류·직접 경로 검증
 - [x] 실제 인증 제외: 이메일 리팩터링 예정·건너뛰라는 사용자 지시에 따라 SKIPPED_BY_USER. 인증 PASS를 의미하지 않음
-- [ ] 구현 PR 기술 gate·main 병합·자동 Delivery·배포 후 확인
+- [x] 구현 PR 기술 gate·main 병합
+- [ ] main 사후 CI·자동 Delivery·배포 후 확인
 - [ ] 별도 문서 정합 Phase에서 정본·WO·CHECK·TODO의 실제 결과 갱신
 
 이번 구현의 예상 배포 대상은 Neture다. 소스 변경과 정본 설명 변경은 별도 PR로 분리하되 하나의 연속 WO와 보완 TODO로 완료까지 이어간다.
@@ -66,3 +67,9 @@ PR #484의 P1은 정본 §2와 실제 상세 기록 위치의 차이를 지적�
 참여 서비스의 사업 조회에서 QR 통계 API를 호출하지 않는 회귀를 추가했다. 기존 검증과 수정 후 재검증은 CHECK에서 구분한다.
 
 운영 배포는 현재 다른 PharmacyHub 정리 작업의 승인된 WIF 일시 차단에 의존한다. 원래 인증 조건 복구 전에 정상 Delivery를 성공했다고 표시하지 않는다.
+
+### 본 작업 통합·현재 배포 전제
+
+[PR #484](https://github.com/Renagang21/o4o-platform/pull/484)는 최종 HEAD `131ee3cb30384feecd554b3d665a5738736dbf4d`의 [필수 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)·CodeQL과 P1 처리·미해결 스레드 0을 확인한 뒤 main `ec7a21d59db197ae573420645c858e772424b006`에 병합했다. 최신 main의 공급자 API 변경은 자기 branch에 정상 merge로 반영했으며 My Home 소스·사용 조회 API는 변경되지 않았다. source 경로의 main 포함 차이 0을 확인했다.
+
+수정 후 Neture 67파일·569개, 타입 포함 production build와 PC/375/320px 로컬 fixture 39개 PASS다. 사용자 재확인 요청으로 현재 main의 [WIF 인증 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528)을 새로 실행했으나 2026-10-11 13:41 UTC에도 `unauthorized_client`·attribute condition 거절이었다. GitHub fetch/push·API 인증은 정상이며 GCP 조건이 배포 전제다. provider·freeze·workflow·DB를 임의 수정하지 않고 원래 조건 복구를 요청했다. main CI와 실제 자동 Delivery·운영 확인 결과를 이 절에 이어 기록한다.
