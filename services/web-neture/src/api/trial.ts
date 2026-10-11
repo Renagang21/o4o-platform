@@ -448,16 +448,20 @@ export async function rejectTrialFirst(trialId: string, reason: string): Promise
  * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 참여자 목록 JSON (인라인 표시)
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1: 필터 지원 추가
  */
+export interface ParticipantFilters {
+  rewardType?: 'product' | 'cash';
+  rewardStatus?: 'pending' | 'fulfilled';
+  paymentStatus?: PaymentStatus;
+}
+
 export async function getOperatorTrialParticipants(
   trialId: string,
-  filters?: {
-    rewardType?: 'product' | 'cash';
-    rewardStatus?: 'pending' | 'fulfilled';
-  },
+  filters?: ParticipantFilters,
 ): Promise<ParticipantListResponse> {
   const params = new URLSearchParams();
   if (filters?.rewardType) params.append('rewardType', filters.rewardType);
   if (filters?.rewardStatus) params.append('rewardStatus', filters.rewardStatus);
+  if (filters?.paymentStatus) params.append('paymentStatus', filters.paymentStatus);
   const qs = params.toString();
   const { data } = await api.get(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants${qs ? `?${qs}` : ''}`,
@@ -568,16 +572,21 @@ export async function updateTrialStatus(trialId: string, status: TrialStatus): P
 /**
  * WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1: 참여자 CSV 다운로드
  */
-export async function exportParticipantsCSV(trialId: string): Promise<void> {
+export async function exportParticipantsCSV(trialId: string, filters?: ParticipantFilters): Promise<void> {
+  const params = new URLSearchParams();
+  for (const [field, value] of Object.entries(filters || {})) if (value) params.set(field, value);
+  const query = params.toString();
   const response = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export`,
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export${query ? `?${query}` : ''}`,
     { responseType: 'blob' },
   );
   const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
   const url = window.URL.createObjectURL(blob);
   const disposition = response.headers['content-disposition'] || '';
-  const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
-  const filename = filenameMatch ? filenameMatch[1] : `market-trial-${trialId}-participants.csv`;
+  const utf8Name = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  const fallback = disposition.match(/filename="([^"]+)"/i);
+  let filename = fallback?.[1] || `market-trial-${trialId}-participants.csv`;
+  if (utf8Name) { try { filename = decodeURIComponent(utf8Name[1]); } catch { /* Use ASCII fallback. */ } }
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
