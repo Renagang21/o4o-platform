@@ -1,9 +1,9 @@
 # My Home 다중 화면 · 서비스 공통 진입 구현
 
-> **상태**: IN_PROGRESS · 구현·로컬 검증 완료 / PR #449 CI 진행 / main 통합·운영 배포 대기
+> **상태**: DEPLOYED · 구현·main 통합·공개 운영 검증 완료 / 인증 운영 검증 대기
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
-> **DEPLOYMENT**: MANUAL/GATED · 인증 handoff 목적지 계약 변경으로 LEVEL 3 예상. 실제 Delivery 판정을 확인해야 한다.
+> **DEPLOYMENT**: MANUAL/GATED → DEPLOYED · 실제 Delivery HELD_LEVEL_3 후 정상 promote 완료. 후속 배포 상태 문서 Phase는 NOT_APPLICABLE.
 
 ## 구현
 
@@ -32,4 +32,4 @@
 
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
-초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. 현재 원격 branch 업로드 완료, required CI·리뷰·main 통합·Delivery/promote·운영 검증을 진행한다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
+초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. PR #449와 required CI를 통과해 main에 통합했으며, `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`의 promote 배포와 최종 서빙 SHA·공개 운영 검증이 완료됐다. 세부 run·기존 테스트 재실행 근거는 CHECK에 기록했다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.

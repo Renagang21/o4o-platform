@@ -1,6 +1,6 @@
 # O4O My Home 명칭 · 역할 · 진입 정본
 
-> **상태**: ACTIVE · 정책 확정 / 구현·로컬 검증 완료 / main 통합·운영 배포 대기
+> **상태**: ACTIVE · 정책 확정 / main 통합·운영 배포 완료 / 인증 운영 검증 대기
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **근거 WO/IR**: [WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1](../work-orders/WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1.md) · 사용자 My Home 명칭 확정 및 관련 문서 정비 지시
 > **범위**: 개인 통합 공간의 사용자용 명칭, 정보구조, 공통 진입, 내 매장과의 관계. 구현·검증 근거는 아래 실행 문서로 구분한다.
@@ -55,13 +55,13 @@ My Home을 `web-account`로 이전하거나 그 앱의 금지 기능을 해제�
 
 ## 6. 구현 상태와 검증 기준
 
-[구현 WO](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)와 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 현재 소스·로컬 검증 상태를 기록한다. 모아보기(`/mypage`), 참여 서비스(`/mypage/services`), 커뮤니티 활동(`/mypage/activity`), 경영 현황(`/mypage/management`), 계정 설정(`/mypage/settings`)을 제공한다. `/mypage/profile`과 공급자 사업자 정보·커뮤니티 운영자 화면은 계정·업무 하위 기능으로 유지한다.
+[구현 WO](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)와 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 소스·로컬 검증·main 통합·운영 배포 상태를 기록한다. 모아보기(`/mypage`), 참여 서비스(`/mypage/services`), 커뮤니티 활동(`/mypage/activity`), 경영 현황(`/mypage/management`), 계정 설정(`/mypage/settings`)을 제공한다. `/mypage/profile`과 공급자 사업자 정보·커뮤니티 운영자 화면은 계정·업무 하위 기능으로 유지한다.
 
 대표 메인에서는 O4O AI 아래에 My Home 요약·전체보기·업무 바로가기를 두고 전체 서비스 탐색을 이어서 제공한다. 공통 헤더와 기존 Neture·KPA 하단 탐색에서 같은 대표 공간으로 진입한다. 서비스 복귀 맥락은 고정 origin만 사용하며 권한을 바꾸지 않는다.
 
 현재 데이터 범위는 본인 서비스 이용 상태·최근 알림 5건·접근 가능한 커뮤니티의 작성 글·선택한 승인 매장의 QR 통계다. QR 통계는 기존 `/kpa/pharmacy/analytics/marketing`의 오늘·최근 7일·누적 방문·활성 QR·최근 14일 일별 기록을 사용하며, 서버가 선택 organizationId의 소유권을 다시 판정한다. 매출·POS·사업 성과·댓글·학습 진도·펀딩 이력을 통합 집계하는 기능은 아직 제공하지 않는다. 원래 서비스로 이어간다.
 
-PC·375/320px 모바일 로컬 fixture 검증은 완료했으나 PR·main 통합·운영 배포·실제 인증 이동 검증은 네트워크 차단으로 미완료다. 다음을 운영에서도 확인해야 한다.
+PR #449를 main에 병합하고 `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`를 운영에 배포했다(2026-10-11). PC·375/320px 모바일 로컬 fixture 검증과 운영 공개 화면 검증은 통과했다. 지정된 테스트 계정 문서가 없어 실제 로그인 후 인증 이동·개인 데이터 검증은 미실행이다. 아래 항목은 로컬 회귀 검증을 통과했으며 실제 계정으로도 확인해야 한다.
 
 1. 일반 회원·매장 경영자의 PC·모바일에서 `My Home` 표기와 직접 진입이 일치하는가?
 2. 대표 홈·독립 서비스·내 매장에서 개인 공간으로 이동하고 원래 업무로 돌아갈 수 있는가?

@@ -19,11 +19,11 @@
 
 ## My Home과 계정 관리
 
-개인 통합 공간의 명칭은 **My Home**이다. 참여 서비스·커뮤니티 활동·권한 있는 매장의 경영 현황을 모아 보고 계정 설정으로 연결하며, 로그인 후 공통 헤더에서 직접 진입한다. 구성·진입은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. 공통 계정은 기존대로 `neture.co.kr`에서 관리한다. My Home 진입이나 서비스 카드 노출은 다른 서비스의 가입·승인·조직·역할을 생성하지 않는다. 이번 문서 정비로 인증·로그인·handoff·세션 폐기 계약을 바꾸거나 화면 구현 완료를 주장하지 않는다.
+개인 통합 공간의 명칭은 **My Home**이다. 참여 서비스·커뮤니티 활동·권한 있는 매장의 경영 현황을 모아 보고 계정 설정으로 연결하며, 로그인 후 공통 헤더에서 직접 진입한다. 구성·진입은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. 공통 계정은 기존대로 `neture.co.kr`에서 관리한다. My Home 진입이나 서비스 카드 노출은 다른 서비스의 가입·승인·조직·역할을 생성하지 않는다. 계정·membership·role 원장과 로그인·세션 폐기 조건을 유지한다. My Home의 대표 진입 returnPath 허용 범위는 아래 절에 명시하며 운영 반영·검증 근거는 구현 CHECK를 따른다.
 
 ## 공통 개인 정보
 
-가입에는 이름과 개인 모바일 번호를 받는다. 모바일 번호는 일반 사업장 전화와 별개이고, 이 단계에서 SMS 본인 인증을 주장하지 않는다. 커뮤니티 가입에는 닉네임이 필요하며 My Home의 계정 설정에서 내 프로필로 연결한다. 현재 프로필 편집 경로는 유지하며 My Home 화면 반영은 후속 구현이다. 공통 개인 정보는 서브도메인마다 재등록하지 않는다.
+가입에는 이름과 개인 모바일 번호를 받는다. 모바일 번호는 일반 사업장 전화와 별개이고, 이 단계에서 SMS 본인 인증을 주장하지 않는다. 커뮤니티 가입에는 닉네임이 필요하며 My Home의 계정 설정에서 내 프로필로 연결한다. 현재 프로필 편집 경로는 유지하며 구현된 My Home 계정 설정에서 연결한다. 공통 개인 정보는 서브도메인마다 재등록하지 않는다.
 
 ## 사업자와 약국
 
@@ -58,4 +58,4 @@
 
 ### My Home 대표 진입 목적지 (2026-10-11)
 
-[My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)의 공통 진입은 `targetServiceKey=neture`의 기존 대표 진입 세션 전달을 사용한다. 허용 `returnPath`는 `/`, `/mypage`, `/mypage?from=`의 열거된 `store`, `study`, `community`, `funding`, `supplier`, `pharmacy`, `kpa`, `admin`뿐이다. 임의 계정/관리 경로·외부 origin·추가 query를 허용하지 않는다. 활성 계정·검증된 세션·교환 origin·토큰 소비·폐기 조건은 그대로 적용하며 서비스 membership이나 역할을 만들지 않는다. `from`은 복귀 안내용이며 인증·권한 판정에 사용하지 않는다. [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 소스·로컬 검증 완료, 운영 배포 대기다.
+[My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)의 공통 진입은 `targetServiceKey=neture`의 기존 대표 진입 세션 전달을 사용한다. 허용 `returnPath`는 `/`, `/mypage`, `/mypage?from=`의 열거된 `store`, `study`, `community`, `funding`, `supplier`, `pharmacy`, `kpa`, `admin`뿐이다. 임의 계정/관리 경로·외부 origin·추가 query를 허용하지 않는다. 활성 계정·검증된 세션·교환 origin·토큰 소비·폐기 조건은 그대로 적용하며 서비스 membership이나 역할을 만들지 않는다. `from`은 복귀 안내용이며 인증·권한 판정에 사용하지 않는다. [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 소스·로컬 검증·운영 배포 완료다. 실제 계정의 운영 handoff 검증은 테스트 계정 문서 부재로 대기 중이다.

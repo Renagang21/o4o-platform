@@ -29,3 +29,5 @@
 
 
 후속 실행: 사용자 배포 지시에 따른 [My Home 구현 WO](WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)에서 같은 작업 branch의 연속 Phase로 화면·진입·실제 데이터를 구현했다. 위 문서-only 검증 기록은 당시 Phase의 결과이며 이후 구현·배포 상태는 후속 WO/CHECK를 따른다.
+
+2026-10-11 후속 상태: 문서·구현을 PR #449로 main에 통합하고 정상 promote 배포를 완료했다. 위 문서-only Phase의 당시 결과는 보존한다. 로그인 운영 검증은 테스트 계정 문서 부재로 남아 있으며 최신 근거는 구현 WO/CHECK를 따른다.

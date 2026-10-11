@@ -27,7 +27,7 @@
 
 | 문서 | 역할 | 상태 |
 |---|---|---|
-| [O4O-MY-HOME-CANONICAL-V1](baseline/O4O-MY-HOME-CANONICAL-V1.md) | **My Home 개인 통합 공간 정본** — 명칭 · 참여 서비스·커뮤니티 활동·경영 통계·계정 설정 · 다중 화면 · 로그인 후 공통 헤더 직접 진입 · User 기준 My Home / Store 기준 내 매장 구분. 정책 확정·구현·로컬 검증 완료, main 통합·운영 배포 대기(2026-10-11) | ACTIVE |
+| [O4O-MY-HOME-CANONICAL-V1](baseline/O4O-MY-HOME-CANONICAL-V1.md) | **My Home 개인 통합 공간 정본** — 명칭 · 참여 서비스·커뮤니티 활동·경영 통계·계정 설정 · 다중 화면 · 로그인 후 공통 헤더 직접 진입 · User 기준 My Home / Store 기준 내 매장 구분. 정책 확정·main 통합·운영 배포 완료, 인증 운영 검증 대기(2026-10-11) | ACTIVE |
 | [O4O-HOME-SERVICE-DISCOVERY-V1](baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) | 대표 홈 탐색 정책 · My Home 개인 공간과의 구분 · 약국 협력사업 표준 용어 · AI 우선 · 용도별 전체 서비스 · Partner 소개 · 준비 중 안내 · Contact Us (2026-10-10, 대표 홈 PR #402·회원 초기화면 PR #414 main 및 운영 반영) | ACTIVE |
 | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **사용자 역할별 업무공간 Architecture SSOT** (2026-09-15) — Community / Store / Supplier / Service Operator 4 업무공간 · My Home 개인 통합 공간과 내 매장 관계 · 공급·자료의 내 매장 직접 이용(HUB 제거) · Service Operator 공식 경로 · 1 Store : N Services · My Services · Community Workspace(Community Identity ≠ Service Identity · 카탈로그/DB 커뮤니티와 별도 사업 회원 포럼 · Industry Community 폐기) · Store 콘텐츠 유입 3+1 경로 · **Legacy Partner = FULL RETIREMENT** · 리팩터링 실행 규칙(§9). 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 아래 PHILOSOPHY 와 충돌하면 **이 문서가 우선** (§8). Preflight: [IR](ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) | ACTIVE |
 | [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
@@ -118,7 +118,7 @@
 | [EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1](baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md) | Event Offer 에서의 Neture 역할 구분 | ACTIVE |
 | [EventOffer-Operation-Policy](event-offer/EventOffer-Operation-Policy.md) | Event Offer 운영 기준 — 승인 계약은 EVENT-OFFER-COMMON-DOMAIN(`pending → approved`) 기준으로 정합(2026-10-04) | ACTIVE |
 | [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md) | 모든 신규 화면은 Design Core v1.0 — 독자 디자인 시스템 금지 | ACTIVE |
-| [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 · My Home 공통 직접 진입(2026-10-11 정책 확정·소스 구현·로컬 검증 완료, 운영 배포 대기) | ACTIVE |
+| [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 · My Home 공통 직접 진입(2026-10-11 정책 확정·운영 배포 완료, 인증 운영 검증 대기) | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
 | [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | 리스트 6 유형 분류 · URL 규약 — 리스트 정비 시 유형 분류 선행 | ACTIVE |
 | [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui` | ACTIVE |
