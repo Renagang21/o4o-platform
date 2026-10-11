@@ -31,3 +31,5 @@ main/CI/review·운영 배포·공개 read-only smoke는 통합 WO에 최종 기
 자동 리뷰 보완: raw SQL의 날짜 컬럼을 Entity의 실제 `created_at`으로 정정하고 응답 이름은 `createdAt` alias로 유지한다. 목록/상세·운영자 chooser에 실제 ForumPost decorator metadata의 물리 컬럼과 query reference를 대조하는 회귀를 추가한다. 격리 PostgreSQL 15에서 공개 조건·직접 ID·철회·JSON 갱신을 실행했으며 운영 DB 조회/변경과 구분한다. 최종 전체 SELECT/ORDER 실행 검증과 재검증 결과는 통합 WO에 기록한다.
 
 공개 설정 선택 목록은 승인된 열린 게시판별 최근100개 LATERAL 조회다. 커뮤니티 전체 상한이나 폐쇄 게시판의 대량 글이 다른 게시판 후보를 가리지 않도록 한다. 실제 PostgreSQL에서 게시판별 상한·다른 열린 게시판의 오래된 글·폐쇄 글 대량 제외를 검증한다.
+
+최근 후보에서 밀린 기존 선택은 목록 밖 개별 보기/선택 해제 UI로 관리한다. 한 글만 제외한 저장 payload와 다른 선택 보존을 회귀로 검증하며, 삭제/draft 등 현재 조회 불가한 ID도 해제할 수 있다. 저장 전 실제 공개 철회가 완료된 것처럼 표시하지 않는다.

@@ -43,6 +43,19 @@ describe('explicit public read screens', () => {
     await screen.findByText('선택한 공개 범위를 저장했습니다.');
     expect(mocks.put).toHaveBeenCalledWith('/communities/fixture/boards/board/public-read', { mode: 'selected', postIds: [post.id] });
   });
+  it('revokes an individual aged-out selection while preserving the other selections', async () => {
+    mocks.get.mockResolvedValue({ data: { data: { boards: [{ id: 'board', name: '샘플 게시판', forumType: 'open', publicRead: { mode: 'selected', postIds: [post.id, 'old-aged-out', 'other-aged-out'] } }], posts: [{ ...post, forumId: 'board' }] } } });
+    mocks.put.mockResolvedValue({});
+    render(<MemoryRouter><Manager communityKey="fixture" /></MemoryRouter>); fireEvent.click(screen.getByText('운영자 · 비로그인 공개 설정'));
+    const link = await screen.findByRole('link', { name: '목록 밖 선택 글 1 보기' });
+    expect(link.getAttribute('href')).toBe('/communities/fixture/public/post/old-aged-out');
+    fireEvent.click(screen.getByRole('button', { name: '목록 밖 선택 글 1 선택 해제' }));
+    expect(screen.queryByRole('link', { name: '목록 밖 선택 글 2 보기' })).toBeNull();
+    expect(screen.getByRole('checkbox', { name: post.title }).getAttribute('checked')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '공개 설정 저장' }));
+    await screen.findByText('선택한 공개 범위를 저장했습니다.');
+    expect(mocks.put).toHaveBeenCalledWith('/communities/fixture/boards/board/public-read', { mode: 'selected', postIds: [post.id, 'other-aged-out'] });
+  });
   it('failed operator save preserves selection for a retry', async () => {
     mocks.get.mockResolvedValue({ data: { data: { boards: [{ id: 'board', name: '샘플 게시판', forumType: 'open', publicRead: { mode: 'private' } }], posts: [] } } });
     mocks.put.mockRejectedValueOnce(new Error('fixture failure')).mockResolvedValueOnce({});

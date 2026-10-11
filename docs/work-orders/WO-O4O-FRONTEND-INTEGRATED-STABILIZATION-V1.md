@@ -114,3 +114,7 @@ HEAD `71c1604ba`의 자동 리뷰 P1은 raw SQL 날짜 컬럼의 Entity 매핑 �
 PH 연계 최신 관측: [QR Cutover 38119869917](https://github.com/Renagang21/o4o-platform/actions/runs/38119869917)은 SUCCESS이고 artifact after.json은 두 옛 호스트 matcher의 backend 연결 없이 pharmacy.neture.co.kr FOUND redirect 및 stripQuery=false를 확인했다. 이는 과거 rollback census 이후의 URL map 적용 증거다. 담당 자원 제거 PR #459는 별도 작업이며 전용 Cloud Run/backend/NEG·DB 귀속/FK/법정 보존 판단과 삭제 완료로 해석하지 않는다. 현재 클라우드는 spec/observed 37, current·running·failure 없음을 재확인했고 설정 재저장/게시 변경은 필요하지 않다.
 
 공개 설정 chooser의 커뮤니티 전체 LIMIT 1000이 다른 게시판의 글을 밀어낼 수 있다는 P2도 반영한다. 열린 게시판별 LATERAL 조회로 최근 100개를 각각 선택하며 폐쇄 게시판을 선택 목록에서 제외한다. 고정/최근 공지 정책과 별개로 공개 선택은 최대100개다. 기존 선택 ID는 화면 목록 밖에 있어도 유지하고 서버는 저장 시 게시 상태·같은 게시판·조직 경계를 다시 검증한다.
+
+후속 P1 보완: 최근100개 목록 밖의 기존 선택은 삭제 없이 유지하되, 개별 글 보기·선택 해제 컨트롤을 추가해 해당 글만 철회할 수 있게 한다. 선택 해제 후 저장하면 해당 ID를 제외하고 다른 선택을 보존한다. 삭제/draft 전환 등으로 보기 불가한 기존 ID도 개별 해제할 수 있다. 해당 회귀를 추가하고 운영 DB 변경 없이 검증한다.
+
+공개 설정 UI 5 tests 및 최종 Neture build PASS. 목록 밖 선택의 보기/개별 해제/저장 payload를 실제 번들 PC1440·mobile390/320 3개 fixture에서도 확인했다. 원래 선택의 보존과 의도적인 개별 철회를 구분한다.

@@ -14,6 +14,7 @@ function BoardSetting({ communityKey, board, posts }: { communityKey: string; bo
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const closed = board.forumType !== 'open';
+  const unlistedIds = ids.filter(id => !posts.some(post => post.id === id));
   async function save() {
     setBusy(true); setMessage(''); setError('');
     try {
@@ -39,7 +40,15 @@ function BoardSetting({ communityKey, board, posts }: { communityKey: string; bo
           <input type="checkbox" className="mt-1 shrink-0" checked={ids.includes(post.id)} onChange={e => setIds(old => e.target.checked ? [...old, post.id] : old.filter(id => id !== post.id))} />{post.title}
         </label></li>)}</ul>
         {!posts.length && <p className="text-sm text-slate-500">선택할 게시글이 없습니다.</p>}
-        <p className="mt-2 text-xs text-slate-500">선택 {ids.length}개 · 최근 게시된 글에서 선택합니다. 기존 선택은 목록에 없어도 유지됩니다.</p>
+        {unlistedIds.length > 0 && <div className="mt-3 rounded border bg-slate-50 p-3">
+          <p className="text-sm text-slate-600">최근 목록 밖의 기존 선택도 개별 해제할 수 있습니다. 선택을 해제한 뒤 공개 설정을 저장하면 공개가 철회됩니다.</p>
+          <ul className="mt-2 space-y-2">{unlistedIds.map((id, index) => <li key={id} className="flex flex-wrap items-center gap-3 text-sm">
+            <Link to={`/communities/${encodeURIComponent(communityKey)}/public/post/${encodeURIComponent(id)}`} target="_blank" rel="noopener noreferrer" className="text-blue-700">목록 밖 선택 글 {index + 1} 보기</Link>
+            <button type="button" aria-label={`목록 밖 선택 글 ${index + 1} 선택 해제`} onClick={() => { setIds(old => old.filter(value => value !== id)); setMessage(''); }} className="min-h-11 text-red-700">선택 해제</button>
+          </li>)}</ul>
+          <p className="mt-2 text-xs text-slate-500">삭제되었거나 비공개로 변경된 글은 보기 링크에서 열리지 않을 수 있습니다.</p>
+        </div>}
+        <p className="mt-2 text-xs text-slate-500">선택 {ids.length}개 · 최근 게시된 글에서 선택합니다. 기존 선택은 목록 밖에서도 확인·해제할 수 있습니다.</p>
       </div>}
     <button type="button" onClick={() => void save()} className="mt-4 min-h-11 rounded bg-blue-700 px-4 py-2 text-sm text-white">{busy ? '저장 중…' : '공개 설정 저장'}</button>
     {message && <p role="status" className="mt-3 text-sm text-green-700">{message}</p>}
