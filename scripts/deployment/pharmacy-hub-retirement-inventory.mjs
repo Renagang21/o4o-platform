@@ -84,6 +84,7 @@ export function collectCloudInventory(run = spawnSync) {
   const project='netureyoutube', region='asia-northeast3';
   const checks=[
     ['applicationMap',['compute','url-maps','describe','o4o-global-lb']],
+    ['httpsProxy',['compute','target-https-proxies','describe','o4o-global-lb-target-proxy-2']],
     ['urlMaps',['compute','url-maps','list']],
     ['backends',['compute','backend-services','list']],
     ['negs',['compute','network-endpoint-groups','list']],
@@ -101,6 +102,8 @@ export function collectCloudInventory(run = spawnSync) {
       const value=JSON.parse(typeof output === 'string' ? output : output.stdout);
       if(key==='applicationMap') {
         result.resources.applicationMap={name:value.name,phMatchers:(value.pathMatchers??[]).filter(m=>m.name==='path-matcher-pharmacy-hub')};
+      } else if (key==='httpsProxy') {
+        result.resources.httpsProxy={name:value.name,urlMap:value.urlMap};
       } else if (key==='urlMaps') {
         result.resources.urlMaps=value.map(map=>({name:map.name,region:map.region??'global',
           phReferences:JSON.stringify(map).includes('backend-pharmacy-hub-web'),
