@@ -5,6 +5,7 @@
 > **상태**: ACTIVE
 > **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
+> **현재 본 작업 결과**: PR #484 main·사후 CI PASS, 신규 Delivery는 WIF 조건 거절·운영 반영 미완료. 문서 PR #489 draft. 실제 인증 smoke는 SKIPPED_BY_USER. 아래 이전 Phase의 배포·계정 상태와 구분한다.
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB 직접 접속·실제 계정 로그인 없음. 운영 공개 HTTP·브라우저 검증과 정상 배포 workflow 수행.
 
 ## 연속 문서 Phase: 테스트 계정 파일 확보·이름 통일 (2026-10-11)
@@ -234,6 +235,8 @@ PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정�
 PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 draft로 유지한다. 이 보류는 새 승인 요구가 아니라 다른 작업의 격리 창과 실제 GCP 조건 거절에 따른 배포 전제다. 원래 조건 복구·PH 창 종료가 확인되면 최신 main·CI·freeze·동시 운영 작업·serving 차이/risk를 다시 확인하고 정상 Delivery를 이어간다. 인증 제한·freeze·CI·ref를 우회하거나 provider를 임의 변경하지 않았다. TLS 검증을 유지하는 운영 번들 수집/fixture 설정은 `/tmp/my-home-deployed-assets.py`와 `/tmp/my-home-completion-deployed-fixture`에 준비했으며 실행하지 않았다.
 
 ## WORKTREE_DISPOSITION — 본 작업 현재 판정
+
+문서 PR #489의 P2는 WO 상단의 과거 초기 구현 promote 완료 요약이 현재 상태로 읽힐 수 있음을 지적했다. WO 헤더에 현재 PR #484의 자동 배포 미완료와 문서 draft 상태를 명시하고 과거 기록은 이전 Phase로 한정했다. CHECK 헤더도 현재 결과를 표시한다. 초기 promote 기록·SHA·당시 결과는 보존하며 신규 배포 PASS로 재사용하지 않는다.
 
 - worktree: `/workspace/o4o-wt/my-home-document-alignment` · branch: `wo/my-home-document-alignment`
 - main integration: 구현 #484 완료, 정본 문서 #489 draft · CI: 최종 구현 PR/main PASS, 문서 최종 HEAD 재확인

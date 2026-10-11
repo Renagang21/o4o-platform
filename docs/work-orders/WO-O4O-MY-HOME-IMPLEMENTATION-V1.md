@@ -3,7 +3,8 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
-> **DEPLOYMENT**: MANUAL/GATED → DEPLOYED · 실제 Delivery HELD_LEVEL_3 후 정상 promote 완료. 후속 배포 상태 문서 Phase는 NOT_APPLICABLE.
+> **DEPLOYMENT (현재 본 작업 PR #484)**: AUTOMATIC · main·사후 CI PASS, 정상 Delivery는 WIF 조건 거절. 신규 운영 반영·서빙 검증은 미완료. 문서-only Phase는 NOT_APPLICABLE이며 PR #489는 PH 고정 SHA 창을 보존해 draft로 유지한다.
+> **이전 초기 구현 Phase의 배포 기록**: MANUAL/GATED → DEPLOYED · 당시 Delivery HELD_LEVEL_3 후 정상 promote 완료. 해당 결과 확정 문서 Phase는 NOT_APPLICABLE. 현재 본 작업의 배포 완료를 의미하지 않는다.
 
 ## 연속 문서 Phase: 사용자 제공 테스트 계정 파일 (2026-10-11)
 
