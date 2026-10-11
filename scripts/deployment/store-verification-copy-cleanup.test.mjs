@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { fingerprint, validateScope, validateCopy, runVerificationCopyCleanup } from './store-verification-copy-cleanup.mjs';
+import { fingerprint, validateScope, validateCopy, runVerificationCopyCleanup, referenceAudit } from './store-verification-copy-cleanup.mjs';
 
 const ids = {
   owner: '11111111-1111-4111-8111-111111111111', organization: '22222222-2222-4222-8222-222222222222',
@@ -43,6 +43,18 @@ test('requires the actual verification edit, owner and narrow creation window', 
   for (const time of ['2026-10-10T00:00:00Z', '2026-10-11T00:26:00Z', 'invalid']) {
     assert.throws(() => validateCopy({ ...snapshot, created_at: time }, [edit], [control], ids.owner, options), /verification edit/);
   }
+});
+
+test('reports reference scan SQLSTATE and table fingerprint without private diagnostics', async () => {
+  const tables = ['o4o_asset_snapshots', 'kpa_store_contents', 'kpa_store_asset_controls'];
+  const columns = tables.map(table_name => ({ table_schema: 'public', table_name, column_name: 'id', udt_name: 'uuid' }));
+  const client = { async query() { throw Object.assign(new Error('private query and row contents'), { code: '57014', detail: 'private diagnostic' }); } };
+  await assert.rejects(referenceAudit(client, columns, tables.map((table, i) => ({ table, row: [snapshot, edit, control][i] }))), error => {
+    assert.match(error.message, /code=57014/);
+    assert.ok(error.message.includes(fingerprint('public.o4o_asset_snapshots').slice(0, 16)));
+    assert.doesNotMatch(error.message, /private|o4o_asset_snapshots/);
+    return true;
+  });
 });
 
 // Optional locally isolated PostgreSQL proves the transaction, catalog probes and actual rollback behavior.
