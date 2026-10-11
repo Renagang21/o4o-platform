@@ -10,7 +10,7 @@
  *   POST /   → { serviceKey, policyDocumentId, version? }         (본인 · allowlist 경로)
  *              → { accepted: { serviceKey, policyDocumentId, version, created }, pending: [...] }
  *
- * 검증(서버 재확인): 현재 사용자 · 서비스 약관은 해당 membership(active|pending) 또는 실제 공급자 자격, Neture 공통 약관은 계정 인증 · 문서 유형 ·
+ * 검증(서버 재확인): 현재 사용자 · 서비스 약관은 해당 membership(active|pending) 또는 실제 사업 원장 자격, Neture 공통 약관은 계정 인증 · 문서 유형 ·
  * published · 그 서비스의 현재 적용 약관 · (버전 일치). 클라이언트가 임의 문서를 승낙시킬 수 없다.
  */
 
@@ -85,7 +85,9 @@ router.post(
         const membershipAllowed = isStoreAgreement ? status === 'active' : !!status && REQUIRED_MEMBERSHIP_STATUSES.has(status);
         const supplierAllowed = !isStoreAgreement && serviceKey === 'supplier'
           && !membershipAllowed && await policyAcceptanceService.isSupplierPolicySubject(userId);
-        if (!membershipAllowed && !supplierAllowed) {
+        const ledgerAllowed = !isStoreAgreement && !membershipAllowed && !supplierAllowed
+          && await policyAcceptanceService.isLedgerServicePolicySubject(userId, serviceKey);
+        if (!membershipAllowed && !supplierAllowed && !ledgerAllowed) {
           return res.status(403).json({
             success: false,
             error: '해당 서비스의 유효한 회원자격이 필요합니다.',

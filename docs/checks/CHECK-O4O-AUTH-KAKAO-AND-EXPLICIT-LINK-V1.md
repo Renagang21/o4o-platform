@@ -757,3 +757,24 @@ Store만 보완한 뒤 Neture 소비처에 동일한 전문 링크 문제가 남
 로컬 화면 검증은 48건(기존 36 + Store 6 + Neture 복수 문서 6), UI 회귀 304건, 서버 292건이다.
 반복 재검증은 고유 합계에 더하지 않는다. 합성 API/provider/user 범위이며 실제 OAuth/PG/운영
 검증 OPEN은 유지한다. 시작한 preview들은 종료했으며 최종 CI/review는 후속 HEAD에서 확인한다.
+
+
+### membership 없는 약국 서비스 원장의 정책 자격
+
+카탈로그 semiFranchiseAccessKey와 기존 resolveSemiFranchiseServiceAccess를 pending 산출 및
+승낙 검증에 함께 적용했다. 약국 승인만으로 서비스 가입으로 보지 않으며 같은 조직의 기본 약국
+신청 active ∧ 해당 세미프랜차이즈 가입 active인 실제 업무 자격이 필요하다. 기존 operator/legacy
+membership 자격과 실제 사업자 원장은 합치지 않고 각각의 계약을 재사용한다.
+
+동일 조직 두 승인, 복수 조직 중 자격 있는 조직, 서로 다른 조직에 흩어진 승인, 기본 승인만,
+기본/사업 가입 대기 및 정지, 관계 없음의 신규 9건을 확인했다. membership 없이 Store 응답에
+서비스 문서 노출→KPA API 428→승낙→해소가 가능하며 미자격 승낙은 403이다. 기존 resolver의
+owner/admin/manager, left_at, 계정 활성·이메일 확인·Neture 정지 경계 SQL을 그대로 사용한다.
+서비스 가입/역할·원장 승인 상태를 만들거나 수정하지 않는다.
+
+보안/raw-source/provider/supplier resolver/공개 조회/legal scope 6 suites 148 PASS다.
+고유 서버 회귀는 301건, UI 304건이며 PC/mobile 합성 검증 48건의 범위는 유지한다.
+실제 신청 원장 쓰기·조건 snapshot/rollback, 실제 OAuth/PG/운영 검증 및 공고/게시 OPEN은
+이 gate 자격 보완으로 완료 처리하지 않는다. 최신 후속 HEAD의 CI/review까지 확인한다.
+
+약국 서비스 원장 보완 후 API 타입·changed lint·API build·docs 민감정보 guard도 PASS다.

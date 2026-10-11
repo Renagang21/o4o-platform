@@ -34,6 +34,7 @@ let publishedRows: any[] = [];
 let membershipRows: any[] = [];
 let supplierCandidateRows: any[] = [];
 let legacySupplierRows: any[] = [];
+let semiFranchiseRows: any[] = [];
 /** user_policy_acceptances policy_document_id set for USER_ID */
 let acceptedIds: string[] = [];
 let queryShouldThrow = false;
@@ -62,6 +63,7 @@ async function fakeQuery(sql: string, params: any[] = []): Promise<any> {
     return publishedRows.filter(ofType);
   }
   if (q.includes('FROM neture_pharmacy_memberships')) return ledgerStoreOwner ? [{ '?column?': 1 }] : [];
+  if (q.includes('LEFT JOIN semi_franchises')) return semiFranchiseRows;
   if (q.includes('JOIN neture_suppliers s')) return supplierCandidateRows;
   if (q.includes('FROM neture_suppliers WHERE user_id')) return legacySupplierRows;
   // isStoreOwner('kpa') → resolveStoreOrganization 의 원장 기반 매장 후보
@@ -145,6 +147,7 @@ beforeEach(() => {
   membershipRows = [];
   supplierCandidateRows = [];
   legacySupplierRows = [];
+  semiFranchiseRows = [];
   acceptedIds = [];
   queryShouldThrow = false;
   demoUserIds = [];
@@ -831,6 +834,43 @@ describe('Store 업무공간과 실제 공급자 원장 약관 대상', () => {
     if (eligible) {
       expect(accepted.body.data.pending).toEqual([]);
       expect((await request(app).post('/api/v1/neture/products/fixture/images').set('Authorization', auth)).status).toBe(200);
+    } else expect(acceptedIds).toEqual([DOC_NETURE]);
+  });
+});
+
+
+describe('Store/KPA 약관의 실제 세미프랜차이즈 자격', () => {
+  it.each([
+    ['same organization active', [{ basic: 'active', semi: 'active' }], true],
+    ['one qualified among multiple organizations', [{ basic: 'pending', semi: null }, { basic: 'active', semi: 'active' }], true],
+    ['approvals split across organizations', [{ basic: 'active', semi: 'suspended' }, { basic: 'suspended', semi: 'active' }], false],
+    ['pharmacy approval alone', [{ basic: 'active', semi: null }], false],
+    ['pharmacy pending', [{ basic: 'pending', semi: 'active' }], false],
+    ['semi-franchise pending', [{ basic: 'active', semi: 'pending' }], false],
+    ['pharmacy suspended', [{ basic: 'suspended', semi: 'active' }], false],
+    ['semi-franchise suspended', [{ basic: 'active', semi: 'suspended' }], false],
+    ['no related organization', [], false],
+  ])('%s: membership 없이 pending과 승낙은 실제 서비스 접근 자격을 함께 사용한다', async (_label, rows, eligible) => {
+    semiFranchiseRows = rows as any[];
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'kpa-society')];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken('store')}`;
+    const pending = await request(app).get('/api/v1/auth/policy-acceptances').set('Authorization', auth);
+    expect(pending.body.data.pending.map((p: any) => p.serviceKey)).toEqual(eligible ? ['kpa-society'] : []);
+    if (eligible) expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(428);
+    const accepted = await request(app).post('/api/v1/auth/policy-acceptances').set('Authorization', auth)
+      .send({ serviceKey: 'kpa-society', policyDocumentId: DOC_KPA, version: 1 });
+    expect(accepted.status).toBe(eligible ? 200 : 403);
+    expect(membershipRows).toEqual([]);
+    expect(queryLog.some(q => /^INSERT INTO (service_memberships|organization_members)/.test(q))).toBe(false);
+    const accessQuery = queryLog.find(q => q.includes('LEFT JOIN semi_franchises'))!;
+    expect(accessQuery).toContain('om.left_at IS NULL');
+    expect(accessQuery).toContain('om.role = ANY');
+    expect(accessQuery).toContain('"isEmailVerified" = true');
+    if (eligible) {
+      expect(accepted.body.data.pending).toEqual([]);
+      expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(200);
     } else expect(acceptedIds).toEqual([DOC_NETURE]);
   });
 });

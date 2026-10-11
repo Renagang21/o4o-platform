@@ -34,6 +34,8 @@ import {
 } from '../../common/auth/terms-acceptance.policy.js';
 import { demoAccountService } from '../../services/auth/demo-account.service.js';
 import { resolveSupplierForUser } from '../neture/middleware/supplier-context.resolver.js';
+import { resolveSemiFranchiseServiceAccess } from '../neture-pharmacy/services/semi-franchise-service-access.js';
+import { getService } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
 
 type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
@@ -116,6 +118,13 @@ export class PolicyAcceptanceService {
     const eligible = (status: string) => status === 'ACTIVE' || status === 'PENDING';
     if (resolution.kind === 'resolved') return eligible(resolution.status);
     return resolution.kind === 'context_required' && resolution.candidates.some(candidate => eligible(candidate.status));
+  }
+
+  /** Reuse the catalog-backed service-access contract; pharmacy approval alone is not service enrollment. */
+  async isLedgerServicePolicySubject(userId: string, serviceKey: string, q: Queryable = this.db()): Promise<boolean> {
+    const accessKey = getService(serviceKey)?.semiFranchiseAccessKey;
+    if (!accessKey) return false;
+    return (await resolveSemiFranchiseServiceAccess(q, userId, accessKey)).allowed;
   }
 
   async listPublishedTerms(force = false): Promise<PublishedTermsDocument[]> {
@@ -254,6 +263,11 @@ export class PolicyAcceptanceService {
     if (published.some(d => d.serviceKey === 'supplier') && !relevant.some(m => m.serviceKey === 'supplier')
       && await this.isSupplierPolicySubject(userId, q)) {
       relevant.push({ serviceKey: 'supplier', status: 'active' });
+    }
+    for (const { serviceKey } of published) {
+      if (!relevant.some(m => m.serviceKey === serviceKey) && await this.isLedgerServicePolicySubject(userId, serviceKey, q)) {
+        relevant.push({ serviceKey, status: 'active' });
+      }
     }
     const requiredIds = published
       .filter((d) => relevant.some((m) => m.serviceKey === d.serviceKey))

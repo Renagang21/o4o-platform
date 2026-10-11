@@ -350,3 +350,11 @@ termsServiceKey는 실제 약관 페이지 조회 key이며 Neture/KPA/lecture �
 공통 UI 72건/Store 1건, 해당 4개 앱 타입 포함 build와 lint, 새 3개 bundle PC/mobile 18건이
 통과했다. 신규 복수 서비스 경계 포함 고유 로컬 화면 48건/UI 304건/서버 292건이며 실제 운영
 검증 OPEN과 동일 WO push/PR 종료 경계는 유지한다. 최신 HEAD CI/review를 확인한다.
+
+
+KPA 약국 사업자는 서비스 membership 없이 실제 승인 원장으로 접근하므로 카탈로그의
+semiFranchiseAccessKey와 기존 서비스 접근 resolver를 pending·승낙 자격에 재사용했다.
+약국 승인만으로 서비스 가입으로 간주하지 않고 동일 조직의 기본/사업 가입 active가 필요하다.
+신규 9건 포함 6 suites 148 PASS다. 고유 서버 301건/UI 304건/로컬 합성 화면 48건이며
+membership/role 생성과 원장 변경은 없다. 기존 신청 snapshot/운영 검증 및 공고/게시 OPEN과
+동일 WO push/PR 범위는 유지한다. 최신 HEAD CI/review를 확인한다.
