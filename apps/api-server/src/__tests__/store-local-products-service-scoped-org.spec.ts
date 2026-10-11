@@ -30,16 +30,17 @@ jest.mock('../middleware/auth.middleware.js', () => ({
 }));
 
 import { createStoreLocalProductRoutes } from '../routes/platform/store-local-product.routes.js';
+import { createStoreHandledProductsRoutes } from '../routes/platform/store-handled-products.routes.js';
 import { resolveStoreAccess } from '../utils/store-owner.utils.js';
 import type { StoreOwnerServiceKey } from '../utils/store-organization.resolver.js';
 
 let CURRENT_USER = 'user-multi';
 let CURRENT_ROLES: string[] = ['kpa:store_owner', 'cosmetics:store_owner'];
 
-const ORG_KPA = 'org-kpa';
+const ORG_KPA = '11111111-1111-4111-8111-111111111111';
 const ORG_COS = 'org-cos';
 const ORG_GP = 'org-gp';
-const ORG_NETURE = 'org-neture';
+const ORG_NETURE = '22222222-2222-4222-8222-222222222222';
 
 interface Membership {
   organizationId: string;
@@ -305,5 +306,72 @@ describe('local-products — mount 계약', () => {
   it('J. 서비스 중립 mount 는 back-compat 로 유지된다', () => {
     const text = fs.readFileSync(path.join(src, 'bootstrap/register-routes.ts'), 'utf8');
     expect(text).toContain("app.use('/api/v1/store', createStoreLocalProductRoutes(dataSource))");
+  });
+});
+
+
+describe('local-products — explicit selected organization guard', () => {
+  const productId = '33333333-3333-4333-8333-333333333333';
+  it('matching selected store keeps the existing product list', async () => {
+    const { dataSource, listOrgParams } = makeDataSource();
+    const res = await request(makeApp(dataSource, 'kpa')).get('/store/local-products')
+      .set('x-store-organization-id', ORG_KPA);
+    expect(res.status).toBe(200);
+    expect(res.body.data.total).toBe(8);
+    expect(listOrgParams.every(id => id === ORG_KPA)).toBe(true);
+  });
+  it('ignored selection cannot return the single approved store products', async () => {
+    const { dataSource, listOrgParams } = makeDataSource();
+    const res = await request(makeApp(dataSource, 'kpa')).get('/store/local-products')
+      .set('x-store-organization-id', ORG_NETURE);
+    expect(res.status).toBe(200);
+    expect(res.body.data.items).toEqual([]);
+    expect(res.body.data.total).toBe(0);
+    expect(listOrgParams).toHaveLength(0);
+  });
+  it.each(['get', 'post', 'put', 'delete'] as const)(
+    '%s with a mismatched selection cannot query or mutate a product', async method => {
+      const { dataSource, listOrgParams } = makeDataSource();
+      const endpoint = method === 'post' ? '/store/local-products' : `/store/local-products/${productId}`;
+      const res = await request(makeApp(dataSource, 'kpa'))[method](endpoint)
+        .set('x-store-organization-id', ORG_NETURE).send({ name: 'synthetic product' });
+      expect(res.status).toBe(403);
+      expect(res.body.code).toBe('FORBIDDEN');
+      expect(listOrgParams).toHaveLength(0);
+      expect(dataSource.query.mock.calls.every(([sql]: [string]) => !sql.includes('store_local_products'))).toBe(true);
+    },
+  );
+});
+
+
+describe('products — multiple approved stores and handled-product selection', () => {
+  it('two approved stores require selection; an explicit second store never queries the first', async () => {
+    memberships = MEMBERSHIPS.map(m => m.organizationId === ORG_NETURE ? { ...m, pharmacyLedger: 'active' as const } : m);
+    const { dataSource, listOrgParams } = makeDataSource();
+    const app = makeApp(dataSource, 'kpa');
+    const ambiguous = await request(app).get('/store/local-products');
+    expect(ambiguous.body.data.items).toEqual([]);
+    expect(listOrgParams).toHaveLength(0);
+    const selected = await request(app).get('/store/local-products').set('x-store-organization-id', ORG_NETURE);
+    expect(selected.status).toBe(200);
+    expect(listOrgParams.length).toBeGreaterThan(0);
+    expect(listOrgParams.every(id => id === ORG_NETURE)).toBe(true);
+  });
+  it.each([
+    ['get', '/store/handled-products', 200],
+    ['post', '/store/handled-products/remove', 403],
+    ['get', '/store/handled-products/qr', 403],
+    ['get', '/store/handled-products/qr/export', 403],
+  ] as const)('%s %s cannot fall back from the explicitly selected store', async (method, endpoint, status) => {
+    const { dataSource } = makeDataSource();
+    const app = express();
+    app.use(express.json());
+    app.use('/store', createStoreHandledProductsRoutes(dataSource));
+    const res = await request(app)[method](endpoint).set('x-store-organization-id', ORG_NETURE)
+      .send({ items: [{ sourceType: 'local', sourceId: '33333333-3333-4333-8333-333333333333' }] });
+    expect(res.status).toBe(status);
+    if (status === 200) expect(res.body.data.items).toEqual([]);
+    else expect(res.body.code).toBe('FORBIDDEN');
+    expect(dataSource.query.mock.calls.every(([sql]: [string]) => !/store_local_products|organization_product_listings/.test(sql))).toBe(true);
   });
 });
