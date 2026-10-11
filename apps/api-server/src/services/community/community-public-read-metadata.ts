@@ -14,7 +14,10 @@ const PROOF_VERSION = 'operator-v1';
 function digest(communityKey: string, boardId: string, setting: Designation, secret: string) {
   // Domain separation; a proof cannot move to another community/board or change scope.
   const message = JSON.stringify([PROOF_VERSION, communityKey, boardId.toLowerCase(), setting.mode,
-    [...setting.postIds].sort(), setting.designatedBy, setting.designatedAt]);
+    [...setting.postIds].sort((left, right) => {
+      if (left === right) return 0;
+      return left < right ? -1 : 1;
+    }), setting.designatedBy, setting.designatedAt]);
   return createHmac('sha256', secret).update('o4o/community-public-read/v1\0').update(message).digest();
 }
 
