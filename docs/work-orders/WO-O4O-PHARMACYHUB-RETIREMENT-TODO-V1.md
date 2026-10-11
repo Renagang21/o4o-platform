@@ -144,3 +144,11 @@ read-only census [38101012970](https://github.com/Renagang21/o4o-platform/action
 기존 검증은 최대 6회/10초 간격으로 약 50초 뒤 실패할 수 있었다. Compute operation DONE과 frontend 반영은 구분해야 하므로 동일 엄격 검증을 최대 5분까지 반복하도록 보강한다. 반영 지연은 아직 확정 원인이 아니며, 이 검증으로 확인한다. timeout 이후에는 기존 fingerprint·동시 변경 차단·검증된 rollback을 유지하고 workflow의 변경 전 25분 잔여 시간 gate도 유지한다. 지연 후 성공·기한 만료 rollback·이미 취소된 검증 회귀를 포함해 focused tests 52개 PASS다.
 
 동일 WO의 연속 phase로 사용자 지정 worktree를 재사용하며 branch는 `wo/pharmacyhub-retirement-propagation`, base는 최신 main `4f75e2563a`다. 운영 전환은 성공으로 보고하지 않으며 자원·데이터 제거는 여전히 미완료다.
+
+## 전체 호스트 전환 성공 및 자원 제거 phase — 2026-10-11
+
+PR #456은 최신 main 반영 후 필수 CI·최신 Codex 리뷰 통과로 main `ffa4403ddf`에 병합했다. main 후속 CI [38119674074](https://github.com/Renagang21/o4o-platform/actions/runs/38119674074)도 SUCCESS다. 새 plan `38119686512` SUCCESS 후 다른 API Delivery 진행을 확인해 초기 apply `38119756522`를 checkout 단계에서 취소했다. GCP 인증/운영 단계는 실행되지 않았다. 다른 Delivery 완료 후 단독 재실행한 [38119869917](https://github.com/Renagang21/o4o-platform/actions/runs/38119869917)은 SUCCESS(`applied=true`, `httpVerified=true`, `activeFamiliesVerified=2`, `ruleOnlyFamiliesVerified=6`). 실제 QR/tablet 2종과 나머지 규칙/전체 호스트·약관 경로를 확인했다. 앱 재배포는 NOT_APPLICABLE이며 실제 URL map 전환 완료다.
+
+다음 대상은 `backend-pharmacy-hub-web` → `neg-pharmacy-hub-web` → `pharmacy-hub-web` 세 자원이다. 동일 WO의 연속 phase로 지정 worktree의 최신 main 기반 `wo/pharmacyhub-resource-retirement`을 사용한다. `resource_retirement=true`의 standalone owner plan/apply 경로를 추가한다. complete URL map/backend/NEG 참조 조회, 두 옛 호스트의 12개 HTTP 규칙, 실제 QR/tablet read-only HEAD/API 검증, fixed-target 의존 순서 삭제, 매 삭제 전 재조회·시간 gate·삭제 후 부재 확인을 적용한다. 부분 삭제는 성공으로 보고하지 않고 다음 read-only plan에서 남은 고정 대상만 재개한다.
+
+plan은 현재 Actions principal의 backend/NEG/Cloud Run 삭제 및 operation 조회 권한도 read-only `testIamPermissions`로 확인한다. 누락 시 apply는 삭제 전 차단된다. 도메인·DNS·인증서와 운영 DB는 이 도구의 삭제 대상이 아니다. 기존 Demo/copy 정리와 혼합 실행을 인증 전에 거부한다. 자원/DB 삭제는 아직 실행하지 않았으며 기존 DB/FK·법정 보유·공용/Neture 데이터 보호 TODO는 계속 유효하다.
