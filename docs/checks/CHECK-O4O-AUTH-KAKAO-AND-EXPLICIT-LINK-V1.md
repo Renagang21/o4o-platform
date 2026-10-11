@@ -740,3 +740,20 @@ PC/mobile × 정상 승낙/버전 변경/조회 실패 6건을 검증했고 KPA 
 않는 것도 확인했다. 합성 API/provider/user이며 실제 OAuth/운영 DB 쓰기는 없다. 고유 UI 회귀는
 302건, 서버 292건이며 PC/mobile 로컬 검증은 기존 36 + Store 6 = 42건이다. PG 18 SKIP와 실제
 운영/서비스 원장 검증 OPEN은 유지한다. 이번에 시작한 preview 프로세스는 검증 후 종료했다.
+
+
+### 공통 gate의 전문 링크 소유 서비스 명시
+
+Store만 보완한 뒤 Neture 소비처에 동일한 전문 링크 문제가 남았음을 재리뷰로 확인했다.
+공통 gate에 termsServiceKey를 추가해 termsPath가 실제로 조회하는 서비스의 terms 문서에만
+링크를 표시한다. Neture/kpa-society/lecture 약관 페이지의 실제 조회 key를 대조해 세 소비처를
+연결했다. 다른 서비스의 전문 경로는 임의 추정하지 않고 본문만 표시하며 공통 Neture 주소는 유지한다.
+
+복수 Neture/supplier/community/funding 문서 및 supplier 단독 pending 신규 2건, 기존 KPA 전문
+링크 유지까지 확인했다. 초기 vitest config 확장자 오기 및 전문 링크 기대값에 포함된 메인 링크를
+정정한 재실행은 공통 UI 9 files/72 PASS, Store 소비처 1 PASS다. Neture/약국/Store/강의
+타입 포함 build와 changed lint PASS다. 새 Neture/약국/Store production bundle의 PC/mobile
+정상 승낙/버전 변경/조회 실패 18건도 PASS다. 새 Neture 복수 서비스 경계 6건을 추가한 고유
+로컬 화면 검증은 48건(기존 36 + Store 6 + Neture 복수 문서 6), UI 회귀 304건, 서버 292건이다.
+반복 재검증은 고유 합계에 더하지 않는다. 합성 API/provider/user 범위이며 실제 OAuth/PG/운영
+검증 OPEN은 유지한다. 시작한 preview들은 종료했으며 최종 CI/review는 후속 HEAD에서 확인한다.

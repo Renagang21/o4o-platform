@@ -49,6 +49,7 @@ function renderGate(opts: {
         allowPaths={['/policy', '/privacy']}
         serviceName="KPA Society"
         termsPath="/policy"
+        termsServiceKey="kpa-society"
       >
         <div data-testid="app-shell">서비스 화면</div>
       </PolicyAcceptanceGate>
@@ -77,6 +78,7 @@ describe('PolicyAcceptanceGate', () => {
     expect(onLogout).not.toHaveBeenCalled();
     expect(screen.queryByTestId('app-shell')).toBeNull();
     await waitFor(() => expect(screen.getByTestId('policy-acceptance-content').textContent).toContain('제1조 목적'));
+    expect(screen.getByRole('link', { name: 'O4O 통합 서비스 이용약관 전문 새 탭에서 보기' }).getAttribute('href')).toBe('/policy');
     expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe('true');
     expect(screen.queryByRole('button', { name: /닫기/ })).toBeNull();
     expect(screen.getByRole('button', { name: '로그아웃' })).toBeTruthy();
@@ -173,4 +175,19 @@ it('일부 승낙 후 pending 목록이 줄어도 이전 본문 인덱스로 접
   view.rerender(<MemoryRouter><PolicyAcceptanceGate {...props} pending={[second]}><span>서비스</span></PolicyAcceptanceGate></MemoryRouter>);
   await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(1));
   expect(screen.getByRole('dialog').textContent).toContain('계정 약관');
+});
+
+
+describe('문서 소유 서비스와 전문 링크의 일치', () => {
+  it.each([{ keys: ['neture', 'supplier', 'community', 'funding'] }, { keys: ['supplier'] }])('%j: Neture 전문 링크를 다른 서비스 본문에 재사용하지 않는다', async ({ keys }) => {
+    const pending = keys.map(serviceKey => ({ ...PENDING[0], serviceKey, policyDocumentId: `${serviceKey}-doc`, title: `${serviceKey} terms` }));
+    render(<MemoryRouter><PolicyAcceptanceGate pending={pending}
+      loadPolicy={async serviceKey => ({ ...DOC, serviceKey, id: `${serviceKey}-doc`, title: `${serviceKey} terms`, content: `${serviceKey} body` })}
+      termsPath="/terms" termsServiceKey="neture" onAccept={async () => ({ success: true })} onLogout={() => {}}><span>app</span></PolicyAcceptanceGate></MemoryRouter>);
+    await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(keys.length));
+    const links = screen.queryAllByRole('link', { name: /전문 새 탭에서 보기/ });
+    expect(links).toHaveLength(keys.includes('neture') ? 1 : 0);
+    if (links.length) expect(links[0].getAttribute('href')).toBe('https://neture.co.kr/terms');
+    for (const key of keys) expect(screen.getByText(`${key} body`)).toBeTruthy();
+  });
 });

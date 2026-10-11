@@ -173,3 +173,9 @@ Store 세션 키는 서비스가 아니라 공통 업무공간 맥락이다. 공
 Store의 여러 pending 문서에 Neture 공통 전문 URL 하나를 공유하지 않는다. 공통 계정 문서는
 공통 URL, 서비스별 전문 경로가 미확정인 문서는 링크를 생략하고 각각의 본문을 표시한다.
 서비스별 정책 본문/전문 경로와 관리 scope 확정 TODO는 남아 있다.
+
+
+전문 링크 소유 판정은 소비처별 관례가 아니라 공통 gate의 termsServiceKey 계약으로 확인한다.
+termsPath의 실제 조회 key와 일치하는 terms 문서만 링크를 표시한다. Neture/KPA/lecture 소비처를
+해당 약관 페이지와 대조했으며 경로 미정인 supplier/community/funding 등은 본문을 표시하고 링크를
+임의 추정하지 않는다. 서비스별 본문/전문 경로와 정책 관리 권한 확정 TODO는 여전히 남아 있다.

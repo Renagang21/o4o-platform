@@ -343,3 +343,10 @@ Store 문서별 전문 링크 리뷰도 보완했다. Neture 공통 문서 링�
 전문 경로가 미정이면 링크를 생략하고 실제 문서 본문은 표시한다. Store 소비처 1건 및 새 production
 bundle PC/mobile 6건이 통과했다. UI 회귀 302건/서버 292건/로컬 합성 화면 42건이며 운영 검증과
 구분한다. 동일 WO 연속 Phase로 최신 HEAD CI/review까지 확인하며 push/PR 경계를 유지한다.
+
+
+전문 링크 소유 판정을 공통 gate로 올려 Store 외 Neture 소비처의 같은 문제도 해소했다.
+termsServiceKey는 실제 약관 페이지 조회 key이며 Neture/KPA/lecture 소비처를 대조해 연결했다.
+공통 UI 72건/Store 1건, 해당 4개 앱 타입 포함 build와 lint, 새 3개 bundle PC/mobile 18건이
+통과했다. 신규 복수 서비스 경계 포함 고유 로컬 화면 48건/UI 304건/서버 292건이며 실제 운영
+검증 OPEN과 동일 WO push/PR 종료 경계는 유지한다. 최신 HEAD CI/review를 확인한다.

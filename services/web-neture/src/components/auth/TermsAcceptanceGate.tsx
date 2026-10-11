@@ -28,6 +28,7 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       allowPaths={CURRENT_HOST_PROFILE === 'main' ? [...ALLOW_PATHS, '/'] : ALLOW_PATHS}
       serviceName="Neture"
       termsPath="/terms"
+      termsServiceKey="neture"
     >
       {children}
     </PolicyAcceptanceGate>

@@ -41,6 +41,8 @@ export interface PolicyAcceptanceGateProps {
   serviceName?: string;
   /** 약관 전문 페이지 경로(새 탭 링크). 예: '/terms' · KPA 는 '/policy' */
   termsPath?: string;
+  /** termsPath가 실제로 조회하는 서비스 키. 일치하는 terms 문서에만 링크를 표시한다. */
+  termsServiceKey?: string;
   /** 화면 문구용 계약명. 기본 '이용약관'. */
   agreementLabel?: string;
   /** 기본 안내문을 대체할 문구. */
@@ -81,6 +83,7 @@ export function PolicyAcceptanceGate({
   allowPaths = [],
   serviceName,
   termsPath,
+  termsServiceKey,
   agreementLabel = '이용약관',
   leadText,
   checkboxText,
@@ -163,7 +166,7 @@ export function PolicyAcceptanceGate({
               {fmtDate(doc.effectiveDate) ? ` · 시행일 ${fmtDate(doc.effectiveDate)}` : ''}
             </h2>
             <div style={S.doc} data-testid="policy-acceptance-content">{doc.content}</div>
-            {(termsPath || (doc.serviceKey === 'neture' && doc.documentType === 'terms')) && (
+            {((termsPath && doc.serviceKey === termsServiceKey && doc.documentType === 'terms') || (doc.serviceKey === 'neture' && doc.documentType === 'terms')) && (
               <a href={doc.serviceKey === 'neture' && doc.documentType === 'terms' ? 'https://neture.co.kr/terms' : termsPath}
                 target="_blank" rel="noopener noreferrer" style={S.link}>
                 {doc.title} 전문 새 탭에서 보기
