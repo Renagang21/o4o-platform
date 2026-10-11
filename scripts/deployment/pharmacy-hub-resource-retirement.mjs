@@ -16,6 +16,11 @@ const negLink = `https://www.googleapis.com/compute/v1/projects/${project}/regio
 export const deletionPermissions = ['compute.backendServices.delete', 'compute.networkEndpointGroups.delete',
   'compute.globalOperations.get', 'compute.regionOperations.get', 'run.services.delete'];
 const knownPermissions = new Set([...deletionPermissions, 'run.services.list', 'iam.serviceAccounts.getAccessToken']);
+const permissionsByTarget = new Map([
+  [backend, ['compute.backendServices.delete', 'compute.globalOperations.get']],
+  [neg, ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get']],
+  [service, ['run.services.delete']],
+]);
 
 function run(args, timeout = 15000) {
   const result = spawnSync('gcloud', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout });
@@ -76,9 +81,7 @@ export async function retireResources({ mode, read, permissions, verify, remove,
   let targets = await read();
   const initialTargets = new Set(targets);
   const requiredPermissions = deletionPermissions.filter(permission =>
-    (targets.includes(backend) && ['compute.backendServices.delete', 'compute.globalOperations.get'].includes(permission))
-    || (targets.includes(neg) && ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get'].includes(permission))
-    || (targets.includes(service) && permission === 'run.services.delete'));
+    targets.some(target => permissionsByTarget.get(target)?.includes(permission)));
   const missingPermissions = requiredPermissions.filter(permission => !allowed.includes(permission));
   await verify(); // Actual QR/tablet data and Neture targets, without recording QR scans.
   const plan = { mode, applied: false, targets, requiredPermissions, missingPermissions, httpVerified: true };
