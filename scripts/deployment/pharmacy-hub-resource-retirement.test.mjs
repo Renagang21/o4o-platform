@@ -32,7 +32,7 @@ test('production gate checks later pages and fails closed on incomplete inventor
     workflow_runs: page === 1 ? Array.from({ length: 100 }, (_, index) => ({ id: index + 100, path: '.github/workflows/ci-pipeline.yml', status: 'queued' }))
       : [{ id: 12, path: '.github/workflows/delivery.yml', status: 'queued' }],
   })), /write gate blocked/);
-  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [] })), /incomplete/);
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [] }), async () => {}), /status=.*expected=1; returned=0/);
   await assert.rejects(assertProductionIdle(undefined, async () => assert.fail('must not query')), /identity/);
 });
 
@@ -166,4 +166,74 @@ test('workflow rejects mixed resource operations, foreign actors and frozen writ
     assert.equal(execute({ CUTOVER_MODE: 'apply', DEPLOY_FREEZE: 'true' }), 1);
     assert.equal(execute({ GITHUB_REF: 'refs/heads/another-branch' }), 1);
   } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+test('count/list disagreement is retried read-only while writers and malformed metadata still block', async () => {
+  const calls = new Map(); let pauses = 0;
+  await assertProductionIdle(10, async status => {
+    const count = (calls.get(status) ?? 0) + 1; calls.set(status, count);
+    return count === 1 ? { total_count: 1, workflow_runs: [] } : { total_count: 0, workflow_runs: [] };
+  }, async ms => { assert.equal(ms, 2000); pauses++; });
+  assert.equal(pauses, 1);
+  for (const count of calls.values()) assert.equal(count, 2);
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [
+    { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' },
+  ] }), async () => assert.fail('a known writer must not be retried')), /write gate blocked/);
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: '1', workflow_runs: [] }),
+    async () => assert.fail('malformed metadata must not be retried')), /incomplete/);
+});
+
+test('pagination drift restarts at page one so a shifted writer is not missed', async () => {
+  let starts = 0;
+  const ci = () => Array.from({ length: 100 }, (_, index) => ({ id: index + 100, path: '.github/workflows/ci-pipeline.yml', status: 'queued' }));
+  await assert.rejects(assertProductionIdle(10, async (status, page) => {
+    if (status !== 'queued') return { total_count: 0, workflow_runs: [] };
+    if (page === 1) {
+      starts++;
+      const runs = ci();
+      if (starts > 1) runs[99] = { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' };
+      return { total_count: starts === 1 ? 101 : 100, workflow_runs: runs };
+    }
+    return { total_count: 100, workflow_runs: [] };
+  }, async () => {}), /write gate blocked/);
+  assert.equal(starts, 2);
+});
+
+test('a writer on a count-mismatched page blocks immediately before any retry or status transition', async () => {
+  let queuedCalls = 0;
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status !== 'queued') return { total_count: 0, workflow_runs: [] };
+    queuedCalls++;
+    return queuedCalls === 1 ? { total_count: 0, workflow_runs: [
+      { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' },
+    ] } : { total_count: 0, workflow_runs: [] };
+  }, async () => assert.fail('a returned writer must not be retried')), /write gate blocked/);
+  assert.equal(queuedCalls, 1);
+});
+
+test('any count retry restarts every status so an unseen queued-to-running writer is blocked', async () => {
+  let runningReads = 0; let queuedReads = 0;
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status === 'in_progress') {
+      runningReads++;
+      return runningReads === 1 ? { total_count: 0, workflow_runs: [] } : { total_count: 1, workflow_runs: [
+        { id: 12, path: '.github/workflows/delivery.yml', status: 'in_progress' },
+      ] };
+    }
+    if (status === 'queued') {
+      queuedReads++;
+      return { total_count: queuedReads === 1 ? 1 : 0, workflow_runs: [] };
+    }
+    return { total_count: 0, workflow_runs: [] };
+  }, async () => {}), /write gate blocked/);
+  assert.equal(runningReads, 2);
+});
+test('a known writer in another branch takes precedence over retryable count drift', async () => {
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status === 'queued') return { total_count: 1, workflow_runs: [] };
+    if (status === 'in_progress') return { total_count: 1, workflow_runs: [
+      { id: 12, path: '.github/workflows/delivery.yml', status: 'in_progress' },
+    ] };
+    return { total_count: 0, workflow_runs: [] };
+  }, async () => assert.fail('known writer must not be hidden by count drift')), /write gate blocked/);
 });
