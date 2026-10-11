@@ -174,7 +174,7 @@ test('count/list disagreement is retried read-only while writers and malformed m
     const count = (calls.get(status) ?? 0) + 1; calls.set(status, count);
     return count === 1 ? { total_count: 1, workflow_runs: [] } : { total_count: 0, workflow_runs: [] };
   }, async ms => { assert.equal(ms, 2000); pauses++; });
-  assert.equal(pauses, 5);
+  assert.equal(pauses, 1);
   for (const count of calls.values()) assert.equal(count, 2);
   await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [
     { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' },
@@ -209,4 +209,31 @@ test('a writer on a count-mismatched page blocks immediately before any retry or
     ] } : { total_count: 0, workflow_runs: [] };
   }, async () => assert.fail('a returned writer must not be retried')), /write gate blocked/);
   assert.equal(queuedCalls, 1);
+});
+
+test('any count retry restarts every status so an unseen queued-to-running writer is blocked', async () => {
+  let runningReads = 0; let queuedReads = 0;
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status === 'in_progress') {
+      runningReads++;
+      return runningReads === 1 ? { total_count: 0, workflow_runs: [] } : { total_count: 1, workflow_runs: [
+        { id: 12, path: '.github/workflows/delivery.yml', status: 'in_progress' },
+      ] };
+    }
+    if (status === 'queued') {
+      queuedReads++;
+      return { total_count: queuedReads === 1 ? 1 : 0, workflow_runs: [] };
+    }
+    return { total_count: 0, workflow_runs: [] };
+  }, async () => {}), /write gate blocked/);
+  assert.equal(runningReads, 2);
+});
+test('a known writer in another branch takes precedence over retryable count drift', async () => {
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status === 'queued') return { total_count: 1, workflow_runs: [] };
+    if (status === 'in_progress') return { total_count: 1, workflow_runs: [
+      { id: 12, path: '.github/workflows/delivery.yml', status: 'in_progress' },
+    ] };
+    return { total_count: 0, workflow_runs: [] };
+  }, async () => assert.fail('known writer must not be hidden by count drift')), /write gate blocked/);
 });

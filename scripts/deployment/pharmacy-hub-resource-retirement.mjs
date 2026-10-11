@@ -62,21 +62,29 @@ async function readProductionStatusOnce(runId, list, status) {
   throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
 }
 
-async function readProductionStatus(runId, list, status, pause, attempt = 0) {
+async function readProductionSweep(runId, list) {
+  const results = await Promise.allSettled(activeStatuses.map(status => readProductionStatusOnce(runId, list, status)));
+  const failures = results.filter(result => result.status === 'rejected').map(result => result.reason);
+  // A count disagreement must never hide another branch's known writer or invalid metadata.
+  const fatal = failures.find(error => !(error instanceof InventoryCountError));
+  if (fatal) throw fatal;
+  if (failures.length) throw failures[0];
+}
+
+async function readProductionSweepWithRetry(runId, list, pause, attempt = 0) {
   try {
-    await readProductionStatusOnce(runId, list, status);
+    await readProductionSweep(runId, list);
   } catch (error) {
-    // Restart at page one: active runs may move between pages while counts change.
+    // Restart every status and page: queued runs may become in_progress during the pause.
     if (!(error instanceof InventoryCountError) || attempt === 2) throw error;
     await pause(2000);
-    await readProductionStatus(runId, list, status, pause, attempt + 1);
+    await readProductionSweepWithRetry(runId, list, pause, attempt + 1);
   }
 }
 
 export async function assertProductionIdle(runId, list, pause = ms => new Promise(resolve => setTimeout(resolve, ms))) {
   if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
-  // Include queued/manual-waiting deliveries; do not infer an idle runtime from running jobs alone.
-  await Promise.all(activeStatuses.map(status => readProductionStatus(runId, list, status, pause)));
+  await readProductionSweepWithRetry(runId, list, pause);
 }
 
 async function checkProductionGate() {
