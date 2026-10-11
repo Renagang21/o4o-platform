@@ -47,8 +47,10 @@ main 반영·운영 배포·배포 후 검증을 구분하며, 외부 조건 때
 - [x] PC·375/320px 브라우저에서 신규 동선·일반 회원·복수 매장·오류·직접 경로 검증
 - [x] 실제 인증 제외: 이메일 리팩터링 예정·건너뛰라는 사용자 지시에 따라 SKIPPED_BY_USER. 인증 PASS를 의미하지 않음
 - [x] 구현 PR 기술 gate·main 병합
-- [ ] main 사후 CI·자동 Delivery·배포 후 확인
-- [ ] 별도 문서 정합 Phase에서 정본·WO·CHECK·TODO의 실제 결과 갱신
+- [x] main 사후 CI·CodeQL 확인
+- [ ] 자동 Delivery·배포 후 확인
+- [x] 별도 문서 정합 Phase에서 정본·WO·CHECK·TODO의 실제 결과 갱신
+- [ ] 문서 PR #489 main 병합 — PH 고정 SHA 창 종료 후
 
 이번 구현의 예상 배포 대상은 Neture다. 소스 변경과 정본 설명 변경은 별도 PR로 분리하되 하나의 연속 WO와 보완 TODO로 완료까지 이어간다.
 
@@ -73,3 +75,5 @@ PR #484의 P1은 정본 §2와 실제 상세 기록 위치의 차이를 지적�
 [PR #484](https://github.com/Renagang21/o4o-platform/pull/484)는 최종 HEAD `131ee3cb30384feecd554b3d665a5738736dbf4d`의 [필수 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)·CodeQL과 P1 처리·미해결 스레드 0을 확인한 뒤 main `ec7a21d59db197ae573420645c858e772424b006`에 병합했다. 최신 main의 공급자 API 변경은 자기 branch에 정상 merge로 반영했으며 My Home 소스·사용 조회 API는 변경되지 않았다. source 경로의 main 포함 차이 0을 확인했다.
 
 수정 후 Neture 67파일·569개, 타입 포함 production build와 PC/375/320px 로컬 fixture 39개 PASS다. 사용자 재확인 요청으로 현재 main의 [WIF 인증 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528)을 새로 실행했으나 2026-10-11 13:41 UTC에도 `unauthorized_client`·attribute condition 거절이었다. GitHub fetch/push·API 인증은 정상이며 GCP 조건이 배포 전제다. provider·freeze·workflow·DB를 임의 수정하지 않고 원래 조건 복구를 요청했다. main CI와 실제 자동 Delivery·운영 확인 결과를 이 절에 이어 기록한다.
+
+[main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38144099865)·CodeQL PASS. 같은 SHA의 [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38144718455)는 GCP 인증 실패이며 API/Web/Admin/Report는 SKIPPED다. [PH 정리 workflow](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943)는 같은 SHA에서 WIF 인증을 통과하고 고정 인프라 정리 단계에서 실패했다. 해당 작업의 원래 조건 복구 완료로 해석하지 않는다. PH 고정 SHA 창을 보존하도록 [문서 PR #489](https://github.com/Renagang21/o4o-platform/pull/489)는 draft로 유지한다. 문서 구현·검증 완료와 main 통합을 구분한다. 원래 WIF 조건 복구·PH 창 종료 뒤 최신 main/CI/freeze/직렬화/risk를 확인하고 정상 배포·운영 검증을 이어간다.

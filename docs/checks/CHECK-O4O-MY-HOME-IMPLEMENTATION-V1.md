@@ -221,3 +221,22 @@ PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정�
 사용자가 인증 상태를 다시 확인하라고 요청해 현재 main의 기존 `gcp-wif-auth-smoke.yml`을 `kakao_metadata=false`로 새로 실행했다. [run 38144147528](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528), job `114483877967`은 Authenticate to Google Cloud(WIF)에서 실패했다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 13:41 UTC의 새 검증이며 과거 실패만 재인용한 결과가 아니다. credential/token/secret version·운영 데이터에 접근하거나 출력하지 않았고 배포·revision·DB·provider 변경 0이다.
 
 현재 GitHub API·fetch·push는 정상이다. 이 클라우드에 별도 GCP outbound identity는 없어 사용자 IAM 조건을 직접 변경할 권한을 추정하지 않는다. PharmacyHub 정리 작업의 원래 WIF 조건 복구 여부를 사용자에게 다시 확인 요청했다. 이 상태에서 신규 운영 배포·서빙 Report·운영 번들 검증은 완료로 기록하지 않는다.
+
+### 본 작업 사후 CI·Delivery·현재 PH 격리 창
+
+| 항목 | 현재 실제 결과 |
+|---|---|
+| [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38144099865) | 구현 SHA `ec7a21d59db197ae573420645c858e772424b006`의 전체 CI·required Gate PASS, CodeQL PASS |
+| [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38144718455) | job `114485556659`의 GCP 인증에서 동일 `unauthorized_client`·attribute condition 거절. API/Web/Admin/Report SKIPPED, 신규 runtime 배포·서빙·운영 번들 검증 미실행 |
+| [PH 정리 workflow](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943) | 같은 SHA의 WIF auth PASS·고정 인프라 정리 단계 FAIL. 현재 인증이 PH 작업에는 허용되고 정상 Delivery에는 거절됨을 확인. 다른 작업의 삭제·복구 결과를 추정하거나 해당 작업을 수정/취소하지 않음 |
+| [문서 PR #489](https://github.com/Renagang21/o4o-platform/pull/489) | 정본·색인·현재 인증 제외·실제 구현/배포 상태 6문서 정합. 첫 HEAD `fe2d1c0fc2a107108dbb903c73cac7b004da6873`의 [Docs Fast·required CI Gate](https://github.com/Renagang21/o4o-platform/actions/runs/38144416967) PASS·미해결 스레드 0. 후속 실제 결과 추가 후 최종 HEAD CI로 대체 확인 |
+
+PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 draft로 유지한다. 이 보류는 새 승인 요구가 아니라 다른 작업의 격리 창과 실제 GCP 조건 거절에 따른 배포 전제다. 원래 조건 복구·PH 창 종료가 확인되면 최신 main·CI·freeze·동시 운영 작업·serving 차이/risk를 다시 확인하고 정상 Delivery를 이어간다. 인증 제한·freeze·CI·ref를 우회하거나 provider를 임의 변경하지 않았다. TLS 검증을 유지하는 운영 번들 수집/fixture 설정은 `/tmp/my-home-deployed-assets.py`와 `/tmp/my-home-completion-deployed-fixture`에 준비했으며 실행하지 않았다.
+
+## WORKTREE_DISPOSITION — 본 작업 현재 판정
+
+- worktree: `/workspace/o4o-wt/my-home-document-alignment` · branch: `wo/my-home-document-alignment`
+- main integration: 구현 #484 완료, 정본 문서 #489 draft · CI: 최종 구현 PR/main PASS, 문서 최종 HEAD 재확인
+- deployment: AUTOMATIC, WIF 조건 거절로 미완료 · smoke: LOCAL 39 PASS, DEPLOYED-BUNDLE/실서빙 미실행, AUTHENTICATED SKIPPED_BY_USER
+- source main 포함: diff 0 · 타 checkout 수정/branch 전환 없음 · 계정 파일은 로컬 ignored `docs/local/TEST-ACCOUNT.txt`에 보존
+- verdict: **KEEP** — PH 고정 SHA 창 종료·원래 인증 복구 이후 문서 main 통합·배포·운영 확인이 남아 있다. 제공 계정 파일과 로컬 검증 증거를 삭제하지 않는다.

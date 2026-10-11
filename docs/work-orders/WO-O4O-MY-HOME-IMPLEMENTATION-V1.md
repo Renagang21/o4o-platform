@@ -96,3 +96,5 @@ Neture 전체 568개·공통 My Home 진입 10개·Study 헤더 2개와 PC/375/3
 동일 미완료 WO의 별도 문서 정합 Phase로 정본 §6의 실제 데이터·화면 배치·일반 회원·원본 이동과 색인의 현재 상태를 갱신한다. 기존 사용자 관련 문서 수정·My Home 구현·배포 지시 범위이며 새로운 사업 정책·원장·권한 결정이 아니다. 기존 branch/worktree를 유지한다. 문서-only 변경의 DEPLOYMENT는 NOT_APPLICABLE이며 소스 PR #484의 운영 배포 의무는 유지한다.
 
 사용자 재확인 요청으로 현재 main에서 실행한 [WIF 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528)도 13:41 UTC provider attribute condition에 의해 거절됐다. 원래 인증 조건 복구를 사용자에게 요청했다. 신규 소스의 DEPLOYMENT는 AUTOMATIC, 현재 운영 반영은 미완료다. 실제 이메일 검증은 사용자 지시에 따른 SKIPPED_BY_USER로 기록하며 인증 PASS나 배포 blocker로 취급하지 않는다. main CI·Delivery·서빙·운영 번들 확인의 실제 결과는 CHECK와 TODO에 이어 기록한다.
+
+구현 SHA의 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38144099865)·CodeQL PASS를 확인했다. [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38144718455)는 GCP 인증 조건 거절로 실패했으며 실제 배포·서빙 Report는 SKIPPED다. 같은 SHA의 PH 정리 workflow는 인증을 통과했으나 고정 인프라 정리 단계에서 실패했다. 현재 PH에 제한된 인증 창의 종료·원래 조건 복구는 미확인이다. 문서 [PR #489](https://github.com/Renagang21/o4o-platform/pull/489)는 고정 SHA 보존을 위해 draft로 유지하며 첫 문서 required CI·Docs Fast PASS, 최신 결과 추가 후 재확인한다. My Home 전체 작업은 배포·운영 확인까지 미완료로 유지한다.
