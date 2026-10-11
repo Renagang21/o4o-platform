@@ -1,6 +1,40 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyTargets, verifyPublicData, loadProbes, runCutover, parseProbes, verifyRedirects, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
+import { verifyTargets, verifyPublicData, loadProbes, runCutover, parseProbes, verifyRedirects, verifyPropagation, validateHosts, settleOperation, safeComputeError, missingFamilyRuleProbes } from './pharmacy-hub-qr-cutover.mjs';
+
+test('propagation verification can succeed after the previous six-attempt window', async () => {
+  let clock = 0;
+  let attempts = 0;
+  await verifyPropagation(async signal => {
+    assert.equal(signal.aborted, false);
+    attempts++;
+    if (clock < 120000) throw new Error('old frontend response');
+  }, { now: () => clock, sleep: async ms => { clock += ms; } });
+  assert.equal(clock, 120000);
+  assert.equal(attempts, 13);
+});
+
+test('persistent propagation failure reaches its deadline and triggers verified rollback', async () => {
+  const h = harness();
+  let clock = 0;
+  const failure = new Error('host check failed');
+  await assert.rejects(runCutover({ ...h.options, retireHost: true,
+    verify: () => verifyPropagation(async () => { throw failure; }, {
+      now: () => clock, sleep: async ms => { clock += ms; }, timeoutMs: 25000,
+    }),
+  }), error => error === failure);
+  assert.equal(clock, 25000);
+  assert.equal(h.writes.length, 2);
+  assert.equal(h.saved.at(-1).name, 'rollback.json');
+});
+
+test('aborted propagation verification does not start another probe', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  await assert.rejects(verifyPropagation(async () => { assert.fail('probe must not start'); }, {
+    signal: controller.signal,
+  }), /deadline expired/);
+});
 
 test('API diagnostics retain known permissions but discard raw messages and metadata', () => {
   const error = safeComputeError('POST', 403, { error: { message: 'private token compute.backendServices.use private row', errors: [{ reason: 'forbidden' }], details: [{ metadata: { secret: 'private credential' } }] } });
