@@ -194,3 +194,11 @@ status sweep 자체도 작업 상태 이동과 원자적이지 않다는 지적�
 알려진 caller 경로는 현재 repository의 direct workflow/Delivery/Promote다. 지원되지 않는 reusable caller는 detect/classify의 checkout·GCP 인증 전 gate에서 실패시키므로 잠금 소유권을 추정한 하위 호출이 진행되지 않는다. freeze·owner·CI·ref·WIF 규칙은 유지하며 IAM 수정·새 workflow 경로는 필요 없다. 실제 YAML expression을 해석해 direct root 공통 잠금, Promote/Delivery 중첩 호출의 ancestor 잠금 비재취득, 알 수 없는 caller의 pre-auth 실패를 검증했다. 자원/직렬화 안전 테스트 26 PASS이며 이 파일을 일반 required CI에도 연결한다.
 
 GitHub concurrency는 `cancel-in-progress: false`, `queue: max`로 active 작업과 기존 pending 요청을 새 요청이 대체 취소하지 않게 한다. 공식 GitHub.com 지원 문서([queue 규칙](https://github.com/github/docs/blob/main/data/reusables/actions/actions-group-concurrency.md), [fpt/ghec 지원 범위](https://github.com/github/docs/blob/main/data/features/actions-nga.yml))에 따라 최대 100 pending 요청을 보존한다. 지원되지 않는 caller는 별도 run별 group에서 pre-auth 실패시켜 ancestor 잠금 대기 교착도 피한다. 운영 dispatch는 여전히 다른 실행·대기 작업이 없는 단독 창에서 진행한다. 이미 시작한 이전 버전 workflow에는 새 잠금이 소급 적용되지 않으므로 main 반영 후 기존 버전의 모든 알려진 운영 run이 종료됐는지 직접 상태 확인·drain한 뒤 PH apply를 재개한다. 현재 main의 공식 경로에 대한 직렬화이며 오래된 deployment tag의 과거 정의를 자동 변경한 것으로 주장하지 않는다. 업무 앱 재배포는 NOT_APPLICABLE, workflow 설정은 main 반영으로 새 실행에 적용된다. Cloud Run·PH DB 제거는 아직 미완료다.
+
+### 추가 검증 및 외부 인증 경계 blocker
+
+읽기 전용 plan [38134188272](https://github.com/Renagang21/o4o-platform/actions/runs/38134188272)은 SUCCESS이며 남은 자원은 `pharmacy-hub-web` 하나, `missingPermissions=[]`, `httpVerified=true`다. 다른 Demo 작업 `38134169210`도 종료했다. 아직 새 apply는 제출하지 않았다.
+
+CI `38136277948`은 기존 배포 gate 테스트 두 곳이 과거 concurrency 문자열을 요구해서 실패했다. 서비스별 child group 유지와 direct root 공통 잠금, Promote 부모 아래 Delivery의 잠금 비재취득, `queue: max`를 검사하도록 갱신했다. 해당 gate 및 자원 안전 테스트 합계 110 PASS다.
+
+추가 P1: 이전 `deploy/*` 태그 또는 이전 workflow 실행의 재실행은 과거 YAML을 쓰므로 main의 잠금만으로 완전히 차단되지 않는다. 이미 생성된 run drain과 사용자 단독 작업 합의만으로 기술적 차단이 완료됐다고 주장하지 않는다. PH 삭제 창에서는 WIF provider의 기존 조건을 보존한 채 main ref와 잠금이 포함된 특정 main workflow SHA만 인증하도록 외부 IAM 경계를 일시 제한해야 한다. `assertion.ref == 'refs/heads/main'`만 추가하면 과거 main 실행의 rerun이 통과하므로 충분하지 않다. root `workflow_sha`와 called `job_workflow_sha` 모두 동일한 검증된 main SHA로 제한하고, 기존 자격증명을 받은 run도 종료·만료됐는지 확인한다. 실제 provider 변경은 IAM 관리 권한이 있는 사용자가 수행하며, 복구할 원래 조건은 로컬에 보관한다. 이후 새 plan 인증 성공과 다른 production 실행 차단을 확인하기 전에는 apply하지 않는다. 현재 이 외부 인증 경계는 적용 전이며 P1을 해결했다고 기록하지 않는다.
