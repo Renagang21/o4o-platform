@@ -22,18 +22,18 @@ QR·태블릿 **관리 화면**을 브라우저로 확인했다. 실제 QR 스�
 
 ## 재현 가능한 로컬 사본 검증
 
-`scripts/verification/store-copy-independence.local.mjs`는 현재 KPA resolver를 실행하고 실제 `AssetCopyService`·CMS/Snapshot entity를 격리 PostgreSQL database에서 사용한다. 명시적인 로컬 Unix socket이 없으면 연결 전에 실패한다. 무작위 이름의 자기 database만 생성·삭제하며 운영 연결 설정을 사용하지 않는다. Core·schema/migration·API 계약·dependency 변경은 없다.
+`scripts/verification/store-copy-independence.local.mjs`는 현재 KPA resolver를 실행하고 실제 `AssetCopyService`·CMS/Snapshot entity를 격리 PostgreSQL database에서 사용한다. 명시적인 로컬 Unix socket이 없으면 연결 전에 실패한다. DDL 전에 서버 system identifier와 로컬 control file, backend PID와 로컬 postmaster, 실제 socket 설정을 대조한다. 새 fixture 연결에서도 같은 서버임을 재확인한 뒤 extension/schema를 생성한다. 무작위 이름의 자기 database만 생성·삭제하며 운영 연결 설정을 사용하지 않는다. Core·schema/migration·API 계약·dependency 변경은 없다.
 
 실제 SQL로 6개 PASS: A/B 독립 복사, 원본 수정 후 기존 두 사본 불변, A 편집 후 원본/B 불변, 실제 Core 조직별 목록 격리·교차 수정 차단, 새 복사에 새 원본 버전 반영, 원본 archived 전환 후 신규 복사 차단 및 기존 사본 유지. A/B는 로컬 fixture 조직이며 정상 운영 매장 두 곳의 인증·업무 흐름을 증명하지 않는다.
 
-SETUP에 따른 의존성 설치 및 `asset-copy-core`·`cms-core` 빌드 후 실행한다.
+SETUP에 따른 의존성 설치 후 실행한다. Linux 로컬 PostgreSQL의 control file/process 조회와 테스트 DB 생성 권한이 필요하다. 검증 대상 Core·CMS entity·KPA resolver는 현재 checkout source를 임시 디렉터리에 컴파일해 사용하며 기존 dist는 읽지 않는다.
 
 ```sh
 LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
   node scripts/verification/store-copy-independence.local.mjs
 ```
 
-별도 worktree는 `LOCAL_COPY_INSTALLED_ROOT`로 설치된 기준 checkout을 지정할 수 있다. Core source와 CMS entity source의 byte 일치를 확인한 경우에만 빌드 산출물을 재사용한다. `LOCAL_COPY_PG_USER`는 로컬 DB 사용자 선택, `LOCAL_COPY_RESULT_FILE`은 결과 JSON 경로다. 비밀번호·운영 DB URL을 입력받지 않는다.
+별도 worktree는 `LOCAL_COPY_INSTALLED_ROOT`로 의존성이 설치된 기준 checkout을 지정할 수 있다. 이는 pg·typeorm·TypeScript 의존성 선택용이며 검증할 프로젝트 source와 dist 선택용이 아니다. `LOCAL_COPY_PG_USER`는 로컬 DB 사용자 선택, `LOCAL_COPY_RESULT_FILE`은 결과 JSON 경로다. 비밀번호·운영 DB URL을 입력받지 않는다. 확인되지 않은 SQL proxy socket은 실제 연결 후 DDL 0건으로 차단되고, 설치 root의 stale dist를 의도적으로 오류 코드로 바꾼 격리 fixture에서도 현재 source의 6개 검증만 실행됨을 확인했다. 기존 설치 파일은 수정하지 않았다.
 
 ## 운영 조건과 기존 미완료 작업
 
@@ -57,3 +57,8 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 - [ ] 실제 QR 스캔·태블릿 기기 출력 확인
 
 이번 완료 범위는 브라우저와 로컬 계약 검증이다. 운영 원본 변경·두 정상 매장·전체 조직 정리·물리 기기는 열린 TODO로 유지한다. DEPLOYMENT = NOT_APPLICABLE: 검증 도구·기록만 변경한다.
+
+
+## 자동 리뷰 보완
+
+PR #470의 두 P1 finding(원격 proxy socket을 로컬로 오인할 가능성, stale dist 재사용)을 반영했다. 단순 경로/소스 일치 비교 대신 실제 로컬 서버 identity를 DDL 전에 확인하고, 검증 코드 전체를 현재 source에서 컴파일한다. 보완한 실제 SQL 6개와 proxy 차단·stale artifact 비사용 검증이 통과했다.
