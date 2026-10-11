@@ -184,6 +184,7 @@ export function selectPendingPoliciesForRequest(
   pending: ReadonlyArray<PendingPolicyAcceptance>,
   sessionServiceKey?: string | null,
   rawUrl?: string,
+  method?: string,
 ): PendingPolicyAcceptance[] {
   // Express routes are case-insensitive by default; ownership must match the same literals.
   const path = normalizeRequestPath(rawUrl)?.toLowerCase();
@@ -200,6 +201,7 @@ export function selectPendingPoliciesForRequest(
     ['/api/v1/neture/admin/suppliers', 'supplier'],
     ['/api/v1/neture/supplier', 'supplier'],
     ['/api/v1/neture/seller-recruitment/recruitments', 'supplier'],
+    ['/api/v1/neture/library', 'supplier'],
     ['/api/v1/neture/operator', 'neture'],
     ['/api/v1/neture/admin', 'neture'],
     ['/api/v1/supplier', 'supplier'],
@@ -208,9 +210,17 @@ export function selectPendingPoliciesForRequest(
     ['/api/v1/funding', 'funding'],
     ['/api/market-trial', 'funding'],
   ];
-  // Applications are mixed: store mine/cancel use session scope; supplier review/termination owns these actions.
-  const supplierApplicationAction = path && /^\/api\/v1\/neture\/seller-recruitment\/applications\/[^/]+\/(approve|reject|terminate)$/.test(path);
-  const service = supplierApplicationAction ? 'supplier' : (owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
+  // Mixed routes retain signed scope for reads/store actions; only server-owned mutation methods override it.
+  const verb = method?.toUpperCase();
+  const supplierMutation = path && (
+    (verb === 'POST' && /^\/api\/v1\/neture\/seller-recruitment\/applications\/[^/]+\/(approve|reject|terminate)$/.test(path))
+    || (verb === 'POST' && /^\/api\/v1\/neture\/products\/[^/]+\/images(?:\/from-url)?$/.test(path))
+    || (verb === 'PATCH' && /^\/api\/v1\/neture\/products\/images\/[^/]+\/primary$/.test(path))
+    || (verb === 'DELETE' && /^\/api\/v1\/neture\/products\/images\/[^/]+$/.test(path))
+    || (verb === 'POST' && /^\/api\/v1\/neture\/hub\/trigger\/(review-pending|auto-product|refresh-settlement|ai-refresh)$/.test(path))
+  );
+  const netureManagementAction = verb === 'POST' && path && /^\/api\/v1\/neture\/hub\/trigger\/(approve-supplier|audit-review)$/.test(path);
+  const service = supplierMutation ? 'supplier' : netureManagementAction ? 'neture' : (owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
     ?? sessionServiceKey);
   return pending.filter(p => !service || p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || p.serviceKey === service);
 }

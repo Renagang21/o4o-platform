@@ -144,3 +144,9 @@ session scope를 유지한다. 실제 전용 management prefix와 공급자 모�
 게시 방어의 날짜 비교는 한국 시행일 자정과 UTC 날짜의 차이를 검증했다. 공급자 모집 심사
 경로는 기존 후행 slash 정규화와 Express 기본 대소문자 매칭을 적용해 요청 변형으로 범위를
 바꾸지 않는다. 실제 공고·게시와 서비스 신청 원장 검증의 OPEN은 그대로 유지한다.
+
+
+공용 API 아래 공급자 전용 변경은 서버 HTTP 메서드와 경로를 함께 판정한다. 상품 이미지 조회는
+signed session scope를 유지하고 이미지 mutation·private supplier library·supplier hub trigger는
+공급자 정책을 요구한다. Neture 관리자 hub trigger는 Neture 범위다. 클라이언트 method/serviceKey
+값은 판정 근거가 아니다. 실제 원장·조건 snapshot 검증과 공고/정책 게시의 OPEN은 유지한다.

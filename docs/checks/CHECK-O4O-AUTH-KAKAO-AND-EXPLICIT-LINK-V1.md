@@ -675,3 +675,18 @@ owner 판정 경로를 소문자로 정렬했고 uppercase 변형도 같은 결�
 보안·raw-source·lifecycle·게시 controller 4 suites, 94 PASS. 숫자 날짜 key 보완 뒤 lifecycle/게시
 17건도 재확인했다. 추가 11건을 포함해 고유 서버 회귀는 238건, UI 301건이다. 로컬 PC/mobile
 36건의 합성 API/provider 범위와 PG 통합/실제 OAuth·운영 검증 OPEN은 유지한다.
+
+
+### 공급자 변경 API의 HTTP 메서드 소유 범위
+
+공용 상품 이미지 GET은 signed session scope를 유지하고, 공급자 전용 이미지 업로드·URL 등록·
+대표 지정·삭제는 실제 POST/PATCH/DELETE 메서드로 supplier pending을 요구한다. body의 method나
+serviceKey로 이 판정을 바꾸지 못한다. 실제 requireActiveSupplier/requireSupplierScope 및 공급자
+조회 소비처를 대조해 private library와 hub trigger의 공급자 self 동작도 연결했다. Neture 관리자
+hub trigger 두 동작은 Neture 범위이며 public library는 기존 비인증 경로 그대로다.
+
+신규 10건을 포함해 보안 83 + raw-source 4 + provider 8 = 95 PASS, API 타입/lint PASS다.
+관리자 hub trigger와 공용 이미지 GET의 순수 판정도 기존 경계 테스트에 포함했다. 이번 고유 서버
+회귀는 248건, UI 301건이며 PC/mobile 로컬 합성 API/provider 검증 36건의 범위는 그대로다.
+실제 서비스 원장·조건 snapshot, PG 통합, 실제 OAuth 및 운영 smoke의 OPEN은 유지한다.
+이 후속 변경도 동일 WO의 push/PR 범위이고 최신 HEAD의 CI·재리뷰로 통합 준비 상태를 확인한다.

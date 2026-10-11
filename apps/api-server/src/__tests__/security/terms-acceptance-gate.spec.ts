@@ -612,35 +612,45 @@ describe('공통 계정·서비스별 약관 범위', () => {
     expect(selectPendingPoliciesForRequest(items, undefined, '/api/v1/users/me')).toEqual(items);
     expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/neture/supplier/copilot/query').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
     expect(selectPendingPoliciesForRequest(items, 'supplier', '/api/v1/neture/supplier/spot-policies').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
+    for (const action of ['approve-supplier', 'audit-review']) {
+      expect(selectPendingPoliciesForRequest(items, 'supplier', `/api/v1/neture/hub/trigger/${action}`, 'POST').map(p => p.serviceKey)).toEqual(['neture']);
+    }
+    expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/neture/products/fixture/images', 'GET').map(p => p.serviceKey)).toEqual(['neture']);
   });
 });
 
 
 describe('실제 서비스 소유 mount의 약관 enforcement', () => {
   it.each([
-    ['/api/v1/neture/operator/market-trial/fixture', 'funding'],
-    ['/api/v1/neture/operator/suppliers/pending', 'supplier'],
-    ['/api/v1/neture/admin/suppliers/governance', 'supplier'],
-    ['/api/market-trial/fixture/join', 'funding'],
-    ['/api/v1/communities/fixture/members', 'community'],
-    ['/api/v1/neture/seller-recruitment/recruitments/mine', 'supplier'],
-    ['/api/v1/neture/seller-recruitment/recruitments/fixture/close', 'supplier'],
-    ['/api/v1/neture/seller-recruitment/applications/fixture/approve', 'supplier'],
-    ['/api/v1/neture/seller-recruitment/applications/fixture/reject', 'supplier'],
-    ['/api/v1/neture/seller-recruitment/applications/fixture/terminate', 'supplier'],
-  ])('%s는 다른 세션 범위로 서비스 pending을 제거하지 않는다', async (path, serviceKey) => {
+    ['get', '/api/v1/neture/operator/market-trial/fixture', 'funding'],
+    ['get', '/api/v1/neture/operator/suppliers/pending', 'supplier'],
+    ['get', '/api/v1/neture/admin/suppliers/governance', 'supplier'],
+    ['post', '/api/market-trial/fixture/join', 'funding'],
+    ['get', '/api/v1/communities/fixture/members', 'community'],
+    ['get', '/api/v1/neture/seller-recruitment/recruitments/mine', 'supplier'],
+    ['patch', '/api/v1/neture/seller-recruitment/recruitments/fixture/close', 'supplier'],
+    ['post', '/api/v1/neture/seller-recruitment/applications/fixture/approve', 'supplier'],
+    ['post', '/api/v1/neture/seller-recruitment/applications/fixture/reject', 'supplier'],
+    ['post', '/api/v1/neture/seller-recruitment/applications/fixture/terminate', 'supplier'],
+    ['get', '/api/v1/neture/library/handoff-targets', 'supplier'],
+    ['post', '/api/v1/neture/library/fixture/handoff', 'supplier'],
+    ['post', '/api/v1/neture/hub/trigger/review-pending', 'supplier'],
+    ['post', '/api/v1/neture/hub/trigger/auto-product', 'supplier'],
+    ['post', '/api/v1/neture/hub/trigger/refresh-settlement', 'supplier'],
+    ['post', '/api/v1/neture/hub/trigger/ai-refresh', 'supplier'],
+  ])('%s %s는 다른 세션 범위로 서비스 pending을 제거하지 않는다', async (method, path, serviceKey) => {
     publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, serviceKey)];
     membershipRows = [{ serviceKey, status: 'active' }];
     acceptedIds = [DOC_NETURE];
     const app = makeApp();
     const auth = `Bearer ${makeToken('neture')}`;
     expect((await request(app).get('/api/v1/neture/profile').set('Authorization', auth)).status).toBe(200);
-    const denied = await request(app).get(path).set('Authorization', auth);
+    const denied = await (request(app) as any)[method](path).set('Authorization', auth);
     expect(denied.status).toBe(428);
     expect(denied.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual([serviceKey]);
     acceptedIds.push(DOC_KPA);
     policyAcceptanceService.invalidateAll();
-    expect((await request(app).get(path).set('Authorization', auth)).status).toBe(200);
+    expect((await (request(app) as any)[method](path).set('Authorization', auth)).status).toBe(200);
   });
 
   it.each(['/api/v1/neture/operator/suppliers-other', '/api/v1/neture/operator/market-trial-other'])('%s는 비슷한 이름만으로 하위 서비스가 되지 않는다', path => {
@@ -737,5 +747,30 @@ describe('공급자 심사 경로는 Express의 슬래시/대소문자 매칭과
       expect(accepted.status).toBe(200);
       expect(accepted.body.reached).toBe(true);
     }
+  });
+});
+
+
+describe('공급자 이미지 변경과 공용 조회의 method 경계', () => {
+  it.each([
+    ['post', '/api/v1/neture/products/fixture/images'],
+    ['post', '/api/v1/neture/products/fixture/images/from-url'],
+    ['patch', '/api/v1/neture/products/images/fixture/primary'],
+    ['delete', '/api/v1/neture/products/images/fixture'],
+  ])('%s %s 변경은 supplier pending을 요구하고 공용 GET은 그대로 허용한다', async (method, path) => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'supplier')];
+    membershipRows = [{ serviceKey: 'supplier', status: 'active' }];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken()}`;
+    expect((await request(app).get('/api/v1/neture/products/fixture/images').set('Authorization', auth)).status).toBe(200);
+    for (const variant of [path, `${path.toUpperCase()}/`]) {
+      const denied = await (request(app) as any)[method](variant).set('Authorization', auth).send({ method: 'GET', serviceKey: 'neture' });
+      expect(denied.status).toBe(428);
+      expect(denied.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual(['supplier']);
+    }
+    acceptedIds.push(DOC_KPA);
+    policyAcceptanceService.invalidateAll();
+    expect((await (request(app) as any)[method](path).set('Authorization', auth)).status).toBe(200);
   });
 });

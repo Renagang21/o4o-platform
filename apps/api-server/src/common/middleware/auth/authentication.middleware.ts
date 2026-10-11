@@ -107,7 +107,7 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
   let pending;
   try {
     // 공통 계정과 요청 서비스의 pending만 적용한다. 서명된 세션 범위와 서버 경로를 사용하며 Demo 예외를 유지한다.
-    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id, req.sessionServiceKey, req.originalUrl);
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id, req.sessionServiceKey, req.originalUrl, req.method);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,

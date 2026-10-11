@@ -272,8 +272,8 @@ export class PolicyAcceptanceService {
    * 강제 대상이 아니다. acceptance 를 만들거나 raw 상태를 바꾸지 않는다 — 여기서만 []로 본다.
    * raw pending 이 없으면 Demo 조회도 하지 않는다. Demo 조회가 실패하면 예외를 열지 않고 raw 를 돌려준다.
    */
-  async getEnforcedPendingForUser(userId: string, sessionServiceKey?: string | null, rawUrl?: string): Promise<PendingPolicyAcceptance[]> {
-    const pending = selectPendingPoliciesForRequest(await this.getPendingForUser(userId), sessionServiceKey, rawUrl);
+  async getEnforcedPendingForUser(userId: string, sessionServiceKey?: string | null, rawUrl?: string, method?: string): Promise<PendingPolicyAcceptance[]> {
+    const pending = selectPendingPoliciesForRequest(await this.getPendingForUser(userId), sessionServiceKey, rawUrl, method);
     if (pending.length === 0) return pending;
     try {
       if (await demoAccountService.isDemoAccount(userId, this.db())) return [];
