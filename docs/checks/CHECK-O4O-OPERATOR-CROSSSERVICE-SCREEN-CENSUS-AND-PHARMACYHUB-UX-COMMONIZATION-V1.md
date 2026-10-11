@@ -1,5 +1,7 @@
 # CHECK-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1
 > **작업일**: 2026-08-13 · **브랜치**: `work/operator-commonization-v1` · **상태**: 완료
 
@@ -112,7 +114,7 @@ Pharmacy-Hub 백엔드 운영자 endpoint 는 4개(`GET` 목록 / `GET :id` / `P
 ## 5. 브라우저 검증 (§4)
 
 빌드는 `VITE_API_BASE_URL=https://api.neture.co.kr` 로 하고 `vite preview` 로 기동했다
-(PH 5173 / KPA 5174 / KCos 5175 / Neture 5176). 로그인은 `docs/local/TEST-ACCOUNTS.local.md` 계정.
+(PH 5173 / KPA 5174 / KCos 5175 / Neture 5176). 로그인은 `docs/local/TEST-ACCOUNT.txt` 계정.
 
 | 항목 | 결과 |
 |---|---|

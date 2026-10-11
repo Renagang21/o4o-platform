@@ -1,5 +1,7 @@
 # WO-O4O-OPERATOR-COMMONIZATION-MAIN-INTEGRATION-AND-PRODUCTION-VALIDATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태**: 핸드오프 (미착수) · **작성일**: 2026-08-14
 > **선행**: `work/operator-commonization-v1` 작업 완료 (최종 commit `1446396d3`)
 > **후속**: Store Hub(`work/commonization-store-hub`) 동일 방식 main 통합
@@ -47,7 +49,7 @@ Operator 공통화는 **main 반영이 끝난 뒤에야** production baseline �
    - PharmacyHub dashboard / membership
    - JS exception / white screen / dead link 0 확인
 
-   가능하면 **실제 계정 로그인**으로 검증한다 (`docs/local/TEST-ACCOUNTS.local.md` 참조).
+   가능하면 **실제 계정 로그인**으로 검증한다 (`docs/local/TEST-ACCOUNT.txt` 참조).
    credential 이 없으면 그 사실과 우회 방법을 보고에 명확히 기록한다.
 
 ## 4. 제외 범위

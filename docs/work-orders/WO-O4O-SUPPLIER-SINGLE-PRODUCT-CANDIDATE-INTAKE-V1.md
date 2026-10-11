@@ -1,5 +1,7 @@
 # WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태:** READY FOR EXECUTION · HANDOFF ONLY · 구현 WO (등록일 2026-09-18 · 실행 착수는 별도 명시 지시)
 > **기준 코드:** `origin/main` `cc287d3ee`(Promotion Core Foundation) 이후 — 접수 시점 `3a41a04fe`
 > **목적:** 공급자가 **신규 제품 후보 1건**을 `ProductCandidate` 로 안전하게 제출하는 **서버 경로**를 추가한다. `ProductMaster` · `ProductIdentifier` · `SupplierProductOffer` · 기존 단건 등록 UI 는 **접촉 0** 인 additive backend foundation 이다
@@ -241,7 +243,7 @@ rawPayload = {
 | bulk 불변 | `git diff origin/main -- apps/api-server/src/modules/neture/controllers/supplier-product.controller.ts` | 변경 0 또는 `BULK_FORBIDDEN_KEYS` import 교체 hunk 1개만 |
 | 무접촉 증명 | `git diff --stat origin/main -- apps/api-server/src/modules/neture/promotion apps/api-server/src/modules/neture/drug-import apps/api-server/src/modules/neture/services/offer.service.ts apps/api-server/src/modules/neture/services/catalog.service.ts apps/api-server/src/modules/neture/services/product-candidate.service.ts services/web-neture apps/admin-dashboard` | 0 files |
 | 빌드 · 정적 | `pnpm --filter @o4o/api-server build` · `test` · `lint:no-fix` | 전부 성공(무관한 기존 실패는 원문 보고) |
-| 프로덕션 smoke | 배포 후 · ACTIVE **테스트** 공급자 계정(`docs/local/TEST-ACCOUNTS.local.md`) · 쿠키 인증 curl → `https://api.neture.co.kr/api/v1/neture/supplier/product-candidates` (1) `name`+13자리 바코드 1건 → 201 (2) `name` 만 1건 → 201 · `identifierType null` (3) `name` 빈 값 → 400 (4) body 에 `supplierId` 주입 → 400 `FORBIDDEN_FIELD` · 이어서 read-only SELECT: `product_candidates`(2 row · `candidate_status='pending'` · `source_type='supplier_web'` · `source_label='neture-supplier-single'` · `raw_payload->>'supplierId'` = 테스트 공급자 id · (1) 의 `identifier_type='EAN13'` · `normalized_identifier_value`) · `product_masters` · `product_identifiers` · `supplier_product_offers` **count 전후 동일** · 운영자 화면 `/operator/product-candidates` 에서 2건이 "공급자" 로 보임 | 전부 확인. 생성한 테스트 후보 2건은 운영자 `POST /:id/archive`(기존 액션)로 정리하거나 그대로 두고 ID 를 CHECK 에 기록. **DELETE 금지**. 계정이 없으면 PENDING 사유 명시 — PASS 로 쓰지 않는다 |
+| 프로덕션 smoke | 배포 후 · ACTIVE **테스트** 공급자 계정(`docs/local/TEST-ACCOUNT.txt`) · 쿠키 인증 curl → `https://api.neture.co.kr/api/v1/neture/supplier/product-candidates` (1) `name`+13자리 바코드 1건 → 201 (2) `name` 만 1건 → 201 · `identifierType null` (3) `name` 빈 값 → 400 (4) body 에 `supplierId` 주입 → 400 `FORBIDDEN_FIELD` · 이어서 read-only SELECT: `product_candidates`(2 row · `candidate_status='pending'` · `source_type='supplier_web'` · `source_label='neture-supplier-single'` · `raw_payload->>'supplierId'` = 테스트 공급자 id · (1) 의 `identifier_type='EAN13'` · `normalized_identifier_value`) · `product_masters` · `product_identifiers` · `supplier_product_offers` **count 전후 동일** · 운영자 화면 `/operator/product-candidates` 에서 2건이 "공급자" 로 보임 | 전부 확인. 생성한 테스트 후보 2건은 운영자 `POST /:id/archive`(기존 액션)로 정리하거나 그대로 두고 ID 를 CHECK 에 기록. **DELETE 금지**. 계정이 없으면 PENDING 사유 명시 — PASS 로 쓰지 않는다 |
 
 ## 6.2 Git
 

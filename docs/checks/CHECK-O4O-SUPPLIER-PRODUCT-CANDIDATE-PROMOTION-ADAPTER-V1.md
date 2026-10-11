@@ -1,5 +1,7 @@
 # CHECK-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: [`WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1`](../work-orders/WO-O4O-SUPPLIER-PRODUCT-CANDIDATE-PROMOTION-ADAPTER-V1.md)
 > **선행**: ① [`CHECK-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1`](CHECK-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1.md) · ② [`CHECK-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1`](CHECK-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1.md) §9
 > **기준 코드**: `origin/main` `f256c9715` 위에 커밋 (WO 는 `9d2c334df` 시점 작성 · reset/rebase 없음 · 타 세션 커밋 보존)
@@ -178,7 +180,7 @@ git diff --stat origin/main~1 f299fb1de -- \
 
 인증 불가 사유(실측 · 비밀번호 값은 기록하지 않음):
 
-1. `platform:super_admin` 문서 계정 `[REDACTED_EMAIL_D]` — 로그인 `401 INVALID_USER`. read-only 확인 결과 `users.password IS NULL`(2D Google-only 전환 · 2C reset 이후) → 비밀번호 로그인 경로 자체가 없다. `docs/local/TEST-ACCOUNTS.local.md` L15 의 L1 비밀번호 행은 **stale**(로컬 미추적 파일 · 이 WO 는 수정하지 않음 · 사용자에게 보고).
+1. `platform:super_admin` 문서 계정 `[REDACTED_EMAIL_D]` — 로그인 `401 INVALID_USER`. read-only 확인 결과 `users.password IS NULL`(2D Google-only 전환 · 2C reset 이후) → 비밀번호 로그인 경로 자체가 없다. `docs/local/TEST-ACCOUNT.txt` L15 의 L1 비밀번호 행은 **stale**(로컬 미추적 파일 · 이 WO 는 수정하지 않음 · 사용자에게 보고).
 2. 사용자 본인 계정 `[REDACTED_EMAIL_A]`(`serviceKey=neture`) — 로그인 200. 그러나 토큰 roles 에 `platform:super_admin` 이 포함돼 있어 (c) 403 검증 계정으로 부적합하고, 어떤 요청이든 route 앞의 전역 gate 가 **`428 TERMS_ACCEPTANCE_REQUIRED`**(pending 4 서비스 약관)를 반환한다. 약관 동의는 사용자 본인의 법적 행위이자 프로덕션 write 이므로 대행하지 않았다 → 이 계정으로 (a)(b) 도 실행하지 않음.
 
 재실행 조건: 사용자가 `[REDACTED_EMAIL_A]` 으로 약관 동의를 마치면 (a)(b) 는 같은 계정으로 즉시 실행 가능(예상 400/404 · write 0). (c) 는 `neture:operator`/`neture:admin` **만** 가진 계정이 있어야 한다(현재 users 2건뿐).

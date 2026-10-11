@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-ADMIN-AUTHORIZATION-ROLE-ROUTE-API-CONSISTENCY-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 감사 본문: [O4O-ADMIN-AUTHORIZATION-ROLE-ROUTE-API-CONSISTENCY-AUDIT-V1.md](../audits/O4O-ADMIN-AUTHORIZATION-ROLE-ROUTE-API-CONSISTENCY-AUDIT-V1.md)
 > 판정: **CRITICAL_ACCESS_RISK**
 > 일자: 2026-08-03
@@ -129,7 +131,7 @@ guard: `requireAdmin` 6 · `requireRole` 27 · `require*Scope` 3 · **없음 1**
 
 ## ⑭ 테스트 계정 실측 범위
 
-- `docs/local/TEST-ACCOUNTS.local.md` **존재 확인** — 파일 존재 여부와 줄 수(50)만 확인, **내용 미출력**
+- `docs/local/TEST-ACCOUNT.txt` **존재 확인** — 파일 존재 여부와 줄 수(50)만 확인, **내용 미출력**
 - `platform:admin` / `platform:super_admin` 문자열 **미검색** → 플랫폼 관리자 테스트 계정 미등록
 - 로그인 실측 **0회** — 이번 감사는 전부 **비로그인 + 정적 분석**으로 수행
 - 역할 부여·변경 **0건**

@@ -1,5 +1,7 @@
 # CHECK — My Page Activity/이력 5서비스 census·공통화
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO 정본**: [`docs/work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-ACTIVITY-HISTORY-COMMONIZATION-V1.md`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-ACTIVITY-HISTORY-COMMONIZATION-V1.md)
 > **작성일**: 2026-08-20 · **상태**: ACTIVE
 > **결론 요약**: **코드 변경 0건.** 5서비스 어디에도 Activity/History 전용 화면·route 가 없고, Activity feed 를 렌더하는 2서비스(KPA·Neture)는 **이미 공통 `MyPageActivityFeed` 를 소비**한다. 따라서 `VIEW_DUPLICATED = 0` · `CORE_ONLY = 0` 은 **착수 시점에 이미 충족**되어 있었고, 수렴할 중복이 존재하지 않는다. §24(없는 기능 신설 금지)·§16(신규 Activity backend 계약 금지)에 따라 **census 와 `NOT_IMPLEMENTED` 판정이 본 WO 의 산출물**이다.
@@ -309,7 +311,7 @@ export interface MyPageActivityItem {
 
 ## 18. production browser (§28·§30)
 
-Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNTS.local.md` SSOT).
+Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNT.txt` SSOT).
 
 | 항목 | 결과 |
 |---|---|

@@ -1,5 +1,7 @@
 # 내 매장 잔여 업무 흐름 검증
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 상태: ACTIVE
 > 작성일: 2026-10-11 · 최종 갱신: 2026-10-11
 > 근거: [실제 계정 CHECK](../checks/CHECK-O4O-STORE-REAL-WORKFLOW-VERIFICATION-V1.md)
@@ -7,7 +9,7 @@
 
 ## 이번 실행
 
-계정은 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md`가 지정한 canonical Store Owner를 사용했다. 이전 private 생성 기록의 유지 매장 A를 선택했다. 새 계정·매장·자격·운영 콘텐츠를 만들거나 기존 업무 데이터·권한을 변경하지 않았다. 실제 운영 API는 로그인과 기존 자료 조회에 사용했고, 원본 변경 실험은 격리 로컬 PostgreSQL에서 실행했다.
+계정은 로컬 전용 `docs/local/TEST-ACCOUNT.txt`가 지정한 canonical Store Owner를 사용했다. 이전 private 생성 기록의 유지 매장 A를 선택했다. 새 계정·매장·자격·운영 콘텐츠를 만들거나 기존 업무 데이터·권한을 변경하지 않았다. 실제 운영 API는 로그인과 기존 자료 조회에 사용했고, 원본 변경 실험은 격리 로컬 PostgreSQL에서 실행했다.
 
 현재 서비스 정본에 따라 `pharmacy.neture.co.kr`에서 로그인하고 `store.neture.co.kr`의 통합 내 매장 화면으로 handoff했다. Chromium·Playwright를 사용했으며 TLS 검증을 유지했다. 최초 분회 host의 TLS 실패는 업무 화면 결과와 구분하며 약국 업무 host로 바로잡았다.
 

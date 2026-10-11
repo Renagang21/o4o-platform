@@ -1,5 +1,7 @@
 # CHECK-O4O-IDENTITY-V2-SERVICE-CREDENTIAL-PASSWORD-HASH-DRIFT-AUDIT-AND-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-IDENTITY-V2-SERVICE-CREDENTIAL-PASSWORD-HASH-DRIFT-AUDIT-AND-FIX-V1`
 > 대상: `serviceKey` 를 포함한 로그인만 401 이 되는 원인 확정 + `users.password` ↔ `service_credentials.password_hash` 계약 복구
 > 브랜치: `fix/identity-v2-service-credential-password-hash` (worktree `C:/tmp/o4o-identity-v2`, `origin/main` = `daf4f5f37` 기준)
@@ -208,7 +210,7 @@ DB 기본값 `true` 가 남는다. 실측에서 `reason='invalid_password'` 인 
 2. 메일 링크로 새 비밀번호 설정
    → `passwordResetService` 가 **해당 서비스 credential 만** 갱신 (`users.password` 무영향)
 3. 4개 서비스에 대해 반복 (kpa-society / k-cosmetics / neture / pharmacy-hub)
-4. `docs/local/TEST-ACCOUNTS.local.md` 를 **서비스별 비밀번호 컬럼 구조로 갱신**
+4. `docs/local/TEST-ACCOUNT.txt` 를 **서비스별 비밀번호 컬럼 구조로 갱신**
    — 현재 문서는 5개 서비스에 단일 비밀번호를 기재하고 있어 구조 자체가 계약과 어긋난다
 5. 그 뒤 Auth 공통화 브랜치에서 실제 로그인 E2E 수행 → CHECK §4-1 3번 항목 갱신
 

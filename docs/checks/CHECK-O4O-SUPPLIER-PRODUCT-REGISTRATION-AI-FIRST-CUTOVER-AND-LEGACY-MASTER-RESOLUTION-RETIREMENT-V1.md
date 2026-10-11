@@ -1,5 +1,7 @@
 # CHECK-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO:** [`WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1`](../work-orders/WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1.md) (`883fec96b`)
 > **실행일:** 2026-09-22 · **기준 `origin/main` 착수 시점:** `a2e89bf85` → 커밋 직전 `6581dc821`
 > **커밋:** backend `dc1c9f542` · web-neture `34ed4acd1` · CHECK(본 문서) 후속 커밋
@@ -104,7 +106,7 @@ Candidate 는 **ProductMaster 를 쓰지 않는다.** 공급자 입력은 Candid
 - **API 미인증(write 0):** `POST …/supplier/products/from-master` 401 · `…/product-candidates` 401 · `…/products/bulk-candidates` 401 · legacy `…/products` 401 · 존재하지 않는 경로도 401 → `/supplier` 라우터 레벨 `requireAuth` 가 route 매칭보다 앞서므로 **미인증으로는 legacy 404 를 구분할 수 없음**. 404 는 컨트롤러 테스트(활성 공급자 → 404)로 고정.
 - **web-neture 배포 bundle:** `index-DNZz2MPx.js` 에 `products/from-master` · `product-candidates` 각 3회, legacy `POST /neture/supplier/products` 호출 0(남은 `/neture/supplier/products` 문자열은 `getProducts` GET 목록 · `approval-counts`·`batch`·`bulk`·`submit-approval` 등 기존 경로) · `SupplierProductCreatePage-CoPoVE4N.js` 에 "제품 정보 검토 요청 완료" 포함 · `SupplierProductFromMasterPage-FyAaCh2Z.js` 배포 확인 · `/supplier/products/from-master` 200.
 - **read-only 계수(before=after · write 0):** `supplier_product_offers` 22 · `product_masters` 272,040 · `product_candidates` 394,495 · `product_images(source='candidate_promotion')` 0.
-- **인증 UI smoke: PENDING.** 공급자 표준 test 계정(`docs/local/TEST-ACCOUNTS.local.md`)은 `POST /auth/login serviceKey=neture` 가 `SERVICE_NOT_MEMBER` — Identity 재정렬(9/21) 이후 Google-only 전환 상태로 판단되며 이 세션은 Google OAuth 를 수행할 수 없다. 또한 실제 Offer/Candidate 생성은 운영 write 승인 대상이므로 미수행. 재개 조건: Google 인증 가능한 ACTIVE 공급자 계정 + write 승인.
+- **인증 UI smoke: PENDING.** 공급자 표준 test 계정(`docs/local/TEST-ACCOUNT.txt`)은 `POST /auth/login serviceKey=neture` 가 `SERVICE_NOT_MEMBER` — Identity 재정렬(9/21) 이후 Google-only 전환 상태로 판단되며 이 세션은 Google OAuth 를 수행할 수 없다. 또한 실제 Offer/Candidate 생성은 운영 write 승인 대상이므로 미수행. 재개 조건: Google 인증 가능한 ACTIVE 공급자 계정 + write 승인.
 
 ## 7. 중지 조건 발동 여부
 

@@ -1,5 +1,7 @@
 # CHECK-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1`
 - **선행 WO**: `WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1` (공개 강의 목록 read boundary)
 - **선행 CHECK**: [`CHECK-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1.md`](CHECK-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1.md)
@@ -284,7 +286,7 @@ courseId 만 알면 write 도 가능했다).
 | KPA-Society | `/lms` → 상세 | `200 /kpa/lms/courses?status=published` n=3 keys=`["kpa-society"]` · `200 /kpa/lms/courses/:id` · `200 .../lessons` | PASS — 혼입 0 |
 | K-Cosmetics | `/lms` | `200 /lms/courses?serviceKey=k-cosmetics&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" (이전에는 KPA 강의 노출) |
 
-### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNTS.local.md` KPA operator)
+### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNT.txt` KPA operator)
 
 | 단계 | 호출 | 결과 |
 |---|---|---|

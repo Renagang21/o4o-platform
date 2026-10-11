@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: My Page 전체 트랙 최종 검증 공백 2건 해소 + `FINAL CLOSED`
 * **선행 상태**
@@ -596,7 +598,7 @@ services/web-pharmacy-hub/src/pages/JoinStatusPage.tsx
 
 ### E. §4 테스트 계정 — 기대치를 낮게 잡을 것
 
-`docs/local/TEST-ACCOUNTS.local.md` 에 `pending`/`rejected` 라벨이 붙은 전용 계정은 확인되지 않았다. 선행 FINAL AUDIT 도 같은 이유로 미검증으로 남겼다. 따라서 **§7-B(정적 3단 증거) 경로가 현실적인 기본값**이다.
+`docs/local/TEST-ACCOUNT.txt` 에 `pending`/`rejected` 라벨이 붙은 전용 계정은 확인되지 않았다. 선행 FINAL AUDIT 도 같은 이유로 미검증으로 남겼다. 따라서 **§7-B(정적 3단 증거) 경로가 현실적인 기본값**이다.
 
 §16 이 "새 테스트 계정 생성"을 중지 조건으로 명시했고 §6 이 상태 변경을 전부 금지했으므로, **검증을 위해 계정을 만들거나 상태를 바꾸지 말 것.** §7-B 는 §7-A 의 열등한 대체재가 아니라 원문이 허용한 **동등한 PASS 경로**다.
 

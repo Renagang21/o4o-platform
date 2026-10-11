@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-PRODUCT-WRITE-SMOKE-RETRY-AND-CLOSEOUT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: WO-O4O-NETURE-SUPPLIER-PRODUCT-WRITE-SMOKE-RETRY-AND-CLOSEOUT-V1
 - **일자**: 2026-08-12
 - **판정**: **PASS (코드 변경 0건 — 실데이터 smoke 로 직전 HOLD 7항목 전부 CLOSE)**
@@ -28,7 +30,7 @@
 
 > 직전 WO 의 "비밀번호 불일치" 판정은 오진이었다. 원인은 **serviceKey 없는 로그인 API 호출**이며,
 > serviceKey 없는 curl 401 을 계정 실패로 판정하지 않는다. 비밀번호 원문은 본 문서에 기록하지 않는다
-> (SSOT = `docs/local/TEST-ACCOUNTS.local.md`, gitignored).
+> (SSOT = `docs/local/TEST-ACCOUNT.txt`, gitignored).
 
 ## 3. 신규 상품 등록 — PASS
 

@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1`
 > 성격: 프론트 — 태블릿 콘텐츠 제작 화면 1단계(템플릿 선택) + 상시 결과 미리보기.
 > Date: 2026-07-15
@@ -84,7 +86,7 @@ lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]   → 왼쪽 ≈57.4% / �
 
 ## 8. 브라우저 실측 (배포본 · PASS)
 
-`https://kpa-society.co.kr` · 약국 경영자 계정(SSOT=`docs/local/TEST-ACCOUNTS.local.md`, env 주입) · Playwright 1.57 · viewport 1600×1000.
+`https://kpa-society.co.kr` · 약국 경영자 계정(SSOT=`docs/local/TEST-ACCOUNT.txt`, env 주입) · Playwright 1.57 · viewport 1600×1000.
 
 | 검증 항목 | 결과 |
 |-----------|------|

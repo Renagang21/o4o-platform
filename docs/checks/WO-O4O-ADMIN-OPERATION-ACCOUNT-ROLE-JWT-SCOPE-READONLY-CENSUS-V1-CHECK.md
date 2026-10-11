@@ -1,5 +1,7 @@
 # WO-O4O-ADMIN-OPERATION-ACCOUNT-ROLE-JWT-SCOPE-READONLY-CENSUS-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 관리자 운영 계정·역할·JWT scope 전달 경로 read-only census (후속 순서 8번)
 
 **완료 판정: `PASS_WITH_FOLLOWUP`**
@@ -377,7 +379,7 @@ WO 지시대로 위 경로를 **하나도 호출하지 않았다.**
 | `dropshipping:*` scope | **0** | **불가** | 동일 |
 | `pending` 상태 (restricted) | 1 | 가능 | 제한 로그인 경계 검증용 |
 
-> 계정 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 확인한다. 본 CHECK 에는 이메일·비밀번호·UUID 를 기록하지 않는다.
+> 계정 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 확인한다. 본 CHECK 에는 이메일·비밀번호·UUID 를 기록하지 않는다.
 
 ---
 

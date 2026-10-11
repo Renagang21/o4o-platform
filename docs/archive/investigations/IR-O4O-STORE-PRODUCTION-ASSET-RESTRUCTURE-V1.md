@@ -1,5 +1,7 @@
 # IR-O4O-STORE-PRODUCTION-ASSET-RESTRUCTURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 내 매장의 매장 이용 자료 제작 흐름을 **매장 제작 자료 중심 구조**로 전환하기 위한
 > 현 상태 조사 및 개편 설계 보고서 (코드 변경 없음, 조사만 수행)
 
@@ -312,7 +314,7 @@ interface ProductionTypeCard {
 ### Phase 5 — 브라우저 검증
 
 - Playwright 자동화 또는 수동 smoke test
-- 검증 계정: `docs/local/TEST-ACCOUNTS.local.md` SSOT 참조
+- 검증 계정: `docs/local/TEST-ACCOUNT.txt` SSOT 참조
 
 ---
 

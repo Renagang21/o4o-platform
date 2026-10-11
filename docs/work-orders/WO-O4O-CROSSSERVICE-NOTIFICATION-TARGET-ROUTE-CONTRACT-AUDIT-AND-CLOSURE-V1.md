@@ -1,5 +1,7 @@
 # WO-O4O-CROSSSERVICE-NOTIFICATION-TARGET-ROUTE-CONTRACT-AUDIT-AND-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: Notification producer → consumer route 계약 전수감사 + 잘못된 target 교정 + Notifications 트랙 FINAL CLOSE
 * **선행 상태**
@@ -918,7 +920,7 @@ PH 는 `/mypage` 가 없고 `/account` · `/store-owner/account` 축이다 — t
 
 * 로그인 API 는 **`serviceKey` 필수**. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 된다.
 * K-Cosmetics 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
-* PH 로그인 화면 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 만 신뢰한다 (CLAUDE.md §15).
+* PH 로그인 화면 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 만 신뢰한다 (CLAUDE.md §15).
 * 배포 후 stale chunk 로 구버전이 보일 수 있다 — 캐시 버스트 후 재확인.
 * **선행 4트랙 모두, 정적 분석은 통과했으나 실제 브라우저에서만 결함이 드러났다.** §18·§19 는 스냅샷이 아니라 실제 이동 결과와 네트워크 응답으로 판정한다.
 * 선행 WO 검증 시 **모든 테스트 계정의 `unreadCount = 0`** 이었다. §18 의 "target 알림이 production 데이터에 없다면 3단 증거로 대체" 조항이 실제로 발동할 가능성이 높다 — 그 경우 이유를 CHECK 에 명시하라.

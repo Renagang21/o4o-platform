@@ -1,5 +1,7 @@
 # IR-O4O-KPA-STORE-PRODUCTION-AI-EDITOR-REUSE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 커뮤니티 강좌·콘텐츠에서 이미 구현된 AI 편집 기능을 조사하고,
 > 이를 **내 자료함 > 매장 제작 자료** 의 POP / QR / 블로그 / 상품 상세설명 제작 흐름에
 > 재사용할 수 있는지를 검토하는 조사 보고서 (코드 변경 없음).
@@ -322,7 +324,7 @@ export type OutputType =
 ### Phase 5 — 브라우저 검증
 
 - 4유형 × productid 유/무 = 8 케이스 smoke test
-- 검증 계정: [docs/local/TEST-ACCOUNTS.local.md](docs/local/TEST-ACCOUNTS.local.md) SSOT
+- 검증 계정: `docs/local/TEST-ACCOUNT.txt` SSOT
 - AI quota 한도 모니터링
 
 ---
@@ -349,7 +351,7 @@ export type OutputType =
 | Store Production Material Canonical | [docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md](docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) |
 | Boundary Policy (organizationId 필수) | [docs/architecture/O4O-BOUNDARY-POLICY-V1.md](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
 | Role Policy & Guard Baseline | [docs/baseline/ROLE-POLICY-AND-GUARD-V1.md](docs/baseline/ROLE-POLICY-AND-GUARD-V1.md) |
-| Test Accounts SSOT | [docs/local/TEST-ACCOUNTS.local.md](docs/local/TEST-ACCOUNTS.local.md) |
+| Test Accounts SSOT | `docs/local/TEST-ACCOUNT.txt` |
 
 ---
 

@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: My Page `Requests / 신청·승인 내역` 기능 census → 공통화 → 5서비스 adoption → production 검증
 * **선행 완료**
@@ -735,4 +737,4 @@ Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지 — /mypa
 
 검증 도메인 주의: K-Cosmetics 정본은 **`k-cosmetics.site`** 다. `k-cosmetics.co.kr` 은 플랫폼과 무관한 외부 쇼핑몰이므로 검증에 사용하지 않는다.
 
-인증 주의: PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login 을 사용한다. 자격증명은 코드·스크립트·CHECK·Git·shell history·로그 어디에도 평문으로 남기지 않는다.
+인증 주의: PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login 을 사용한다. 자격증명은 코드·스크립트·CHECK·Git·shell history·로그 어디에도 평문으로 남기지 않는다.

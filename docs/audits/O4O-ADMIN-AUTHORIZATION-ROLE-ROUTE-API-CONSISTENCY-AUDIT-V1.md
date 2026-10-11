@@ -1,5 +1,7 @@
 # O4O Admin Dashboard 인증·권한 정합성 전수 감사 V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-ADMIN-AUTHORIZATION-ROLE-ROUTE-API-CONSISTENCY-AUDIT-V1`
 > 성격: **read-only 감사** — 소스 변경 0 / 배포 0 / 운영 DB write 0
 > 일자: 2026-08-03
@@ -336,7 +338,7 @@ E-5 만 §5 의 공용 guard 결함과 지점을 공유한다.
 
 ### 테스트 계정 현황
 
-`docs/local/TEST-ACCOUNTS.local.md` **존재 확인**(파일 존재 여부와 줄 수만 확인, 내용 미출력).
+`docs/local/TEST-ACCOUNT.txt` **존재 확인**(파일 존재 여부와 줄 수만 확인, 내용 미출력).
 `platform:admin` / `platform:super_admin` 문자열은 검색되지 않았다 →
 **플랫폼 관리자 역할 테스트 계정이 문서에 등록돼 있지 않다.**
 이는 코드 결함이 아니라 **검증 기반 부족(P4)** 으로 별도 기록한다.

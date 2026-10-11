@@ -1,5 +1,7 @@
 # CHECK-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1`
 > 작업일: 2026-08-13
 > worktree: `C:\tmp\o4o-agent-e-operator-common` · 브랜치: `work/operator-commonization-v1`
@@ -125,7 +127,7 @@ backend 가 강제**한다 — 기존과 동일한 구조다. 권한 체계는 �
 ### 5-2. 검증하지 못한 것 (명시)
 
 - **공급자 role 을 가진 계정의 상품 목록 정상 로드는 검증하지 못했다.**
-  `docs/local/TEST-ACCOUNTS.local.md` 에 Pharmacy-Hub **공급자 계정이 없다**(operator/admin/store_owner 3종만 존재).
+  `docs/local/TEST-ACCOUNT.txt` 에 Pharmacy-Hub **공급자 계정이 없다**(operator/admin/store_owner 3종만 존재).
   role 부여는 운영 데이터 write 이자 권한 체계 변경이라 본 WO 범위 밖이다.
 - 상품 제공 시작/중지 등 **write 동작은 실행하지 않았다** (역할 없음 + 되돌릴 수 없는 운영 write).
 - 단, 상품 페이지 컴포넌트·API 호출 코드는 **무변경**이며 셸 편입은 라우트 중첩만 바꾼다.

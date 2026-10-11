@@ -1,5 +1,7 @@
 # IR — KPA-Society 운영자 콘솔 잔여 업무 동선 · 화면 갭 재조사
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > IR-O4O-KPA-OPERATOR-REMAINING-WORKFLOW-AND-SCREEN-GAPS-AUDIT-V1
 > 작업일: 2026-07-27
 > 상태: **조사 완료 (read-only) — 코드 지도 + 실브라우저 순회 + 정적 코드 추적 병행**
@@ -126,7 +128,7 @@
 |------|------|:---:|:---:|------|
 | sohae2100 | kpa:admin / kpa:operator | **PASS(라이브)** | PASS | 정상 운영자 접근 |
 | renagang21 | store owner | **DENY(라이브)** — `/operator` → "접근 권한이 없습니다 · 운영자(Operator) 권한 필요" | 403 | 프론트/백엔드 모두 차단 확인 |
-| renariver21 | platform:super_admin | (정적) PASS | PASS | **미확인 — `docs/local/TEST-ACCOUNTS.local.md` 미등재로 라이브 불가** |
+| renariver21 | platform:super_admin | (정적) PASS | PASS | **미확인 — `docs/local/TEST-ACCOUNT.txt` 미등재로 라이브 불가** |
 
 - 프론트(kpa:* + super_admin 만 허용, 더 엄격) vs 백엔드(교차 서비스 operator 도 허용) 비대칭 존재하나 **프론트가 더 엄격 → 보안 개방 아님**(측정값, 본 IR 변경 대상 아님).
 - **중지 항목:** renariver21 라이브 검증은 자격증명 부재로 불가. 은폐하지 않고 기록 — 필요조건 = SSOT 계정 등록.

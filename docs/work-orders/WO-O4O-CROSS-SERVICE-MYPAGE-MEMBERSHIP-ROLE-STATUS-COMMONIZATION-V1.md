@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: My Page `Membership / 회원·역할 상태` 기능 census → 공통화 → 5서비스 adoption → production 검증
 * **선행 완료**
@@ -901,7 +903,7 @@ kpa_pharmacist_profiles = 자격(Qualification)
 
 * 로그인 API 는 **`serviceKey` 필수**. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 된다. "UI 는 되는데 curl 만 401" 이면 이 원인이다.
 * K-Cosmetics 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
-* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 만 신뢰한다 (CLAUDE.md §15).
+* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 만 신뢰한다 (CLAUDE.md §15).
 * 배포 후 stale chunk 로 구버전이 보일 수 있다 — 캐시 버스트 후 재확인.
 * Requests 트랙에서 실제 브라우저 검증으로만 잡힌 결함이 2건 있었다 (raw enum 노출 · 같은 신청의 label 불일치). §26 은 스냅샷이 아니라 **실제 렌더 문자열**을 판정한다.
 

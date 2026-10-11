@@ -1,5 +1,7 @@
 # CHECK — 신규 분회 개통 운영 절차 · 체크리스트 · 관리자 UX 점검
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-KPA-BRANCH-NEW-TENANT-ONBOARDING-OPERATIONS-V1`
 - **일자**: 2026-09-11
 - **판정**: **`NEW_BRANCH_ONBOARDING_READY`** (조건부 — §9 한계 3건은 READY 판정을 막지 않는다)
@@ -175,7 +177,7 @@
 ## 9. 한계 · 보고
 
 1. **sohae2100 = `platform:super_admin` 겸** — 운영자 스코프 403 증명이 bypass 로 불가(②-e). 순수 운영자 스코프는 W13/pilot 선례로 대체.
-2. **회원 로그인 smoke 생략** — `renagang@gmail.co` 비밀번호가 `TEST-ACCOUNTS.local.md` 에 없고 관리자 재설정 API 도 없다(auth 모듈 `forgot-password/reset-password` self-service 만). 정책대로 임의 변경하지 않았다. 문서에 항목이 추가되면 `w18_rehearsal.mjs` ⑥-b~d 가 자동 실행된다.
+2. **회원 로그인 smoke 생략** — `renagang@gmail.co` 비밀번호가 `TEST-ACCOUNT.txt` 에 없고 관리자 재설정 API 도 없다(auth 모듈 `forgot-password/reset-password` self-service 만). 정책대로 임의 변경하지 않았다. 문서에 항목이 추가되면 `w18_rehearsal.mjs` ⑥-b~d 가 자동 실행된다.
 3. **영구 tenant 부작용(구조적)** — `branch_memberships` 는 append-only 라 pilot 이력이 3→5행(두 계정 joined_at 갱신). `renagang@gmail.co` 의 `kpa_pharmacist_profiles` 가 전입 시 `promoteFromUser` 로 **0→1 생성**(멱등·canonical 동작). 삭제하지 않는다.
 4. `POST /kpa-branch/join` 은 리허설에서 실행하지 않았다(users/credential 생성 금지).
 5. 테스트 분회 `test-branch-onboarding`(`03112efd-…`) 은 unpublished 로 유지 — 용도: 신규 분회 개통 절차 검증 tenant. `o4o-pilot` = 상시 기능/회귀 tenant. 사용 중 분회 폐지·비활성화 API 부재는 별도 운영수명주기 후속 후보.

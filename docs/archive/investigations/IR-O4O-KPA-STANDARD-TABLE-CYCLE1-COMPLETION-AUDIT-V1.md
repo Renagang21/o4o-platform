@@ -1,5 +1,7 @@
 # IR-O4O-KPA-STANDARD-TABLE-CYCLE1-COMPLETION-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **조사 일자**: 2026-05-26  
 > **목적**: KPA 표준 테이블 정비 1차 사이클 완료 상태 고정  
 > **결과**: 코드 변경 없음 (완료 상태 기록 전용)
@@ -127,8 +129,8 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 
 ### R2 — Production smoke 계정 정합성
 
-- `TEST-ACCOUNTS.local.md` 계정과 production 실제 잠금 상태 불일치 가능성
-- admin 계정 잠금 해제 후 `TEST-ACCOUNTS.local.md` 재확인 권장
+- `TEST-ACCOUNT.txt` 계정과 production 실제 잠금 상태 불일치 가능성
+- admin 계정 잠금 해제 후 `TEST-ACCOUNT.txt` 재확인 권장
 
 ### R3 — K-Cosmetics 이식 미진행
 

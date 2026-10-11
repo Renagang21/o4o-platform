@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-NAVER-ONLINE-SALES-INTEGRATION-PILOT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: [`WO-O4O-KPA-NAVER-ONLINE-SALES-INTEGRATION-PILOT-V1`](../work-orders/WO-O4O-KPA-NAVER-ONLINE-SALES-INTEGRATION-PILOT-V1.md)
 > **선행**: [`CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1`](CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1.md) (`843dce7ad`)
 > **상태**: **PARTIAL / 중지 보고** — 조사·매핑·가드·adapter 완료, **상품 1건 E2E 미수행**
@@ -314,7 +316,7 @@ CREATE TABLE external_channel_product_links (
 **중지 사유 (WO §5 해당)**
 
 1. **자격정보 부재** — 네이버 스마트스토어 판매자 계정 및 커머스 API센터 애플리케이션이
-   발급되지 않았다. `docs/local/TEST-ACCOUNTS.local.md` 에도 네이버 항목이 없다.
+   발급되지 않았다. `docs/local/TEST-ACCOUNT.txt` 에도 네이버 항목이 없다.
    (CLAUDE.md 중지 조건: "실제 계정 · 자격정보 · 외부 서비스 승인 필요")
 2. **IP 화이트리스트 미해소** — 자격정보를 받아도 Cloud Run 정적 egress IP 없이는 호출 불가.
    Cloud NAT 구성은 인프라 변경이라 별도 승인 대상.

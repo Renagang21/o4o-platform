@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - 작성일: 2026-08-21
 - 대상: KPA-Society / K-Cosmetics / Neture / PharmacyHub
 - 커밋: `7387109bf` (D1~D3) · `b89115e0a` + `82e54ff21` (D4) · 본 CHECK 커밋은 §9
@@ -84,7 +86,7 @@ K-Cos E2E 의 복구 단계에서 발견. k-cosmetics membership 의 `role` 컬�
 ### 6-2. 프로덕션 브라우저 write E2E
 
 공통 흐름: `회원 목록 → 회원 상세 → deep link + 새로고침 → active→suspended → suspended→active → 역할 조회 → 부여 → 회수 → 원복`.
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 의 서비스 운영자 계정, 대상은 안전한 E2E fixture 만 사용했다.
+계정은 `docs/local/TEST-ACCOUNT.txt` 의 서비스 운영자 계정, 대상은 안전한 E2E fixture 만 사용했다.
 
 #### PharmacyHub — PASS
 fixture `E2E 약사회원` (pharmacy-hub membership 단독).
