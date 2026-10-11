@@ -1,6 +1,6 @@
 # PharmacyHub canonical retirement policy alignment
 
-> 상태: REVIEW · 작성일: 2026-10-11 · 별도 정본 작업: #427
+> 상태: ACTIVE · 작성일: 2026-10-11 · 별도 정본 작업: #427
 
 사용자는 PharmacyHub 전면 제거·재사용 없음·전용 데이터 제거를 승인했다. 동일 폐기 WO의 문서 phase로 사용자 지정 worktree를 유지하고 최신 main에서 `wo/pharmacyhub-retirement-canonical`를 생성했다. PR #422의 구현 작업과 분리하여 정본 정책·index만 정렬한다.
 
