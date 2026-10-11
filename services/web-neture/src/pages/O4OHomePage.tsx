@@ -41,7 +41,7 @@ export default function O4OHomePage() {
   // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
   const hasPendingTerms = (pendingPolicyAcceptances?.length ?? 0) > 0;
   const canUseHomeWorkspace = isAuthenticated && !!user && !hasPendingTerms;
-  const entry = useHomeEntry(canUseHomeWorkspace);
+  const entry = useHomeEntry(canUseHomeWorkspace, user?.id);
   // Phase 3 연결점 — 현재 업무 컨텍스트를 그대로 AI 요청에 싣는다.
   // 서버가 membership·매장을 다시 확정하므로 여기 값은 권한 근거가 아니다.
   const { workScope, isResolvingStore } = useWorkScope();
@@ -547,7 +547,8 @@ export default function O4OHomePage() {
           WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4:
           로그인 전 = 로그인 하나(Google — 가입 겸용) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
           모바일도 같은 메뉴(작은 계정 메뉴). */}
-      <div className="flex justify-end px-4 py-4 text-sm sm:px-6">
+      <div className="flex items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
+        {isAuthenticated && user && <Link to="/mypage" className="font-medium text-slate-800 no-underline">My Home</Link>}
         {isAuthenticated && user ? (
           <div className="relative" ref={accountMenuRef}>
             <button
@@ -580,7 +581,7 @@ export default function O4OHomePage() {
                   className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 no-underline hover:bg-slate-50"
                 >
                   <UserCircle className="h-4 w-4" />
-                  내 정보
+                  My Home
                 </Link>
                 <button
                   type="button"
@@ -630,6 +631,7 @@ export default function O4OHomePage() {
 
           {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
           <HomeEntryPanel
+            summary
             user={user}
             data={entry.data}
             loading={entry.loading}

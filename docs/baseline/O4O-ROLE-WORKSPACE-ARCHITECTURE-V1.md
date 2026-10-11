@@ -6,7 +6,7 @@
 > **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-08 (§0 · §2 · §3 · §4 · §5 · §6 현재 서비스 재배치 정책·사용자 결정·재대조 작업안) · 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 약국 협력사업 = 데이터 행 · 약국 협력사업 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-10-11 (My Home 개인 통합 공간·내 매장 관계 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`) · 2026-10-08 (§0 · §2 · §3 · §4 · §5 · §6 현재 서비스 재배치 정책·사용자 결정·재대조 작업안) · 2026-10-05 (§3 · §5 · §6 Neture 약국 매장 — Store Hub 단계 없음 · 약국 협력사업 = 데이터 행 · 약국 협력사업 커뮤니티 판정) · 2026-09-17 (§8 PHILOSOPHY · STORE-MENU-CANONICAL-TREE 정정 완료 · §9-1 8단계 Final Census 완료 — `ROLE_WORKSPACE_REFACTOR = CLOSED`) · 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -20,6 +20,7 @@
 **2026-10-08 사용자 정정 — 현재 Neture 서비스 재배치 기준** ([전체 작업 ToDo](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)):
 
 - 약국 경영자의 약국과 내 매장은 하나다. 한 약국이 여러 약국 협력사업 서비스를 이용하며 그 제공 기능을 같은 내 매장에 적용한다. 서비스별 구획은 탭 등으로 표현한다. 별개 내 매장은 권한·자료·장바구니·주문을 독립적으로 관리한다.
+- 개인 통합 공간은 **My Home**이다. 사람 기준으로 독립 서비스 참여·커뮤니티 활동·권한 있는 매장의 경영 통계와 계정 설정을 모아 보고 여러 화면으로 구성한다. 로그인 후 공통 헤더에 직접 진입을 제공한다. 일반 회원도 이용하며 실제 매장 운영은 내 매장, 각 사업의 참여 업무는 해당 사업 공간에 유지한다. 명칭·구성·진입은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. 문서 확정과 화면 구현·배포 완료는 구분한다.
 - 각 약국 협력사업은 독립된 약국 지원 사업자다. 혈당관리·협동조합 등 사업별 업무는 해당 사업에 맞게 개발한다. 공통 가입 식별과 권한 격리는 업무 표준화나 범용 개설 기능의 근거가 아니다.
 - 각 서브도메인에는 해당 서비스의 관리자(=운영자)가 있고 자기 공간에서 업무를 관리한다. 공급자·펀딩·커뮤니티 관리도 각각 해당 호스트에 배치한다. 전체관리자는 admin.neture.co.kr에만 두며 서비스 관리 주체와 구분한다. 기존 role 문자열을 주소나 용어 변경 때문에 일괄 바꾸지 않는다.
 - 매장 HUB의 필요한 기능은 내 매장 공급 화면·자료함과 약국 협력사업 회원 커뮤니티에 배치한다. HUB는 이용 중간 단계로 두지 않는다. 과거 구현 기록의 HUB 화면 보존은 현재 완료 기준이 아니다.
@@ -114,6 +115,8 @@ Store Workspace
 ---
 
 ## 4. My Services / Service Workspace
+
+**My Home과의 구분**: 이 절의 My Services는 Store의 가입 서비스·업무 진입 목록이다. My Home의 참여 서비스는 User 기준의 서비스·커뮤니티·사업 참여 요약이다. 같은 목록·가입 원장으로 합치지 않으며 study·funding·community를 내 매장 하위 기능으로 편입하지 않는다. 경영 통계 확인은 My Home에서도 제공하되 실제 운영 업무와 매장별 권한 경계는 유지한다.
 
 ```text
 My Services

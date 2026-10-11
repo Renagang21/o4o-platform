@@ -402,11 +402,13 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 > **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
 
 
+**2026-10-11 문서 정합** (`WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`): 개인 통합 공간은 My Home이다. 아래 My Home 행은 현행 정책을 가리키며, §9.1~§9.2 등의 과거 adoption 실측이나 공통화 완료 기록을 다시 검증했다는 의미가 아니다.
+
 | 영역 | 표준 문서 | 적용 |
 |------|----------|------|
 | `/store` | `STORE-LAYER-ARCHITECTURE.md` | KPA · K-Cos (Neture 부분 · PharmacyHub 미채택) |
 | `/operator` | `OPERATOR-DASHBOARD-STANDARD-V1.md` | KPA · K-Cos · Neture (PharmacyHub 미채택) |
-| `/mypage` | (별도 표준 문서 미정) | 서비스별 운영, 향후 표준화 검토 |
+| My Home (기존 `/mypage` 등) | [My Home 정본](../baseline/O4O-MY-HOME-CANONICAL-V1.md) · [계정 관리 계약](../baseline/O4O-MYPAGE-CANONICAL-V1.md) | 사용자용 명칭·개인 통합 공간·공통 직접 진입 정책 확정(2026-10-11). 다중 화면·QR 경영 통계·헤더 반영은 [구현 WO](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 로컬 검증·운영 배포 완료·인증 운영 검증 대기, 기존 route·컴포넌트 식별자는 유지 |
 
 > §9.0 "미조사 = 공백" 원칙에 따라 추정으로 채우지 않는다.
 

@@ -3,7 +3,7 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 const auth = vi.hoisted(() => ({ user: null as null | { roles: string[]; memberships: {serviceKey:string;status:string}[] }, isAuthenticated: false, isLoading: false, logout: vi.fn() }));
 vi.mock('../contexts/AuthContext',()=>({useAuth:()=>auth}));
-vi.mock('@o4o/auth-react',()=>({O4OHomeButton:()=> <a href="https://neture.co.kr/">O4O 메인으로</a>,O4O_LOGOUT_LABEL:'로그아웃'}));
+vi.mock('@o4o/auth-react',()=>({MyHomeButton:({isAuthenticated}:{isAuthenticated:boolean})=>isAuthenticated ? <button>My Home</button> : null,O4OHomeButton:()=> <a href="https://neture.co.kr/">O4O 메인으로</a>,O4O_LOGOUT_LABEL:'로그아웃'}));
 vi.mock('@o4o/shared-space-ui',()=>({PublicLegalFooterInfo:()=>null}));
 vi.mock('../lib/apiClient',()=>({authClient:{api:{}}}));
 vi.mock('../lib/footerLegal',()=>({loadFooterLegal:vi.fn()}));

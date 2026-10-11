@@ -203,7 +203,7 @@ Phase 1 IR 의 REVIEW-1~7 은 [IR Phase 1 §7](../investigations/IR-O4O-PRIVACY-
 | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | 충돌 없음 — Service Identity(카탈로그) · Community Identity 는 본 문서의 User Identity 와 다른 축. `1 Store : N Services` 유지 |
 | [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) | 충돌 없음 — 보유기간은 그 문서, 구조는 본 문서 |
 | [`USER-DOMAIN-SSOT-V1`](../baseline/USER-DOMAIN-SSOT-V1.md) | `users = Identity SSOT` · `service_memberships = SSOT` 유지. `users.password` 컬럼 나열은 2026-09-24 DROP 반영으로 정정 완료 · 이메일·비밀번호 수단 축(2026-09-29)도 같은 문서 §0 에 기록 |
-| [`O4O-MYPAGE-CANONICAL-V1`](../baseline/O4O-MYPAGE-CANONICAL-V1.md) · [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) §3-3 | 서비스별 비밀번호 변경 UI/권한(V2 근거)은 2026-09-23 은퇴로 소멸. MYPAGE 는 계정 단위 비밀번호(`POST /auth/password` · forgot/reset, 2026-09-29)로 정정됨 — OPERATOR-DASHBOARD §3-3 은 별도 확인 대상 |
+| [`O4O-MYPAGE-CANONICAL-V1`](../baseline/O4O-MYPAGE-CANONICAL-V1.md) · [`OPERATOR-DASHBOARD-STANDARD-V1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) §3-3 | 서비스별 비밀번호 변경 UI/권한(V2 근거)은 2026-09-23 은퇴로 소멸. My Home의 계정 설정은 [개인 공간 정본](../baseline/O4O-MY-HOME-CANONICAL-V1.md)(2026-10-11, 화면 운영 반영·인증 운영 검증은 구현 CHECK 참조)을 따르며 계정 단위 비밀번호(`POST /auth/password` · forgot/reset, 2026-09-29)로 정정됨 — OPERATOR-DASHBOARD §3-3 은 별도 확인 대상 |
 
 ## 15. 문서 계층
 

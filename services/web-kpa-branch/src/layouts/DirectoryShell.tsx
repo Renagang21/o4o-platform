@@ -8,7 +8,7 @@
  */
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { BRAND } from '../config/service';
@@ -21,7 +21,7 @@ const NAV = [
 ];
 
 export default function DirectoryShell({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <header className="border-b border-gray-200" data-testid="directory-header">
@@ -33,7 +33,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
             <span className="text-lg font-semibold text-gray-900">{BRAND.nameKo}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />
+            <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
             {!isLoading && (isAuthenticated ? (
               <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">{O4O_LOGOUT_LABEL}</button>
             ) : (

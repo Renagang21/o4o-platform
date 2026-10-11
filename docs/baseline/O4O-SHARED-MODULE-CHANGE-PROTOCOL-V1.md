@@ -10,7 +10,7 @@
 > **모든 소비처에 동시에 영향을 미친다.** 한 서비스에서 먼저 드러난 문제라도 공통 정책
 > 문제인지 먼저 판단한다.
 
-- **작성일:** 2026-06-05
+- **작성일:** 2026-06-05 · **최종 갱신:** 2026-10-11 (My Home 소비 범위 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`)
 - **분류:** Baseline (Standard) — 개발 운영 기준
 - **버전:** V1
 - **상태:** Active
@@ -33,7 +33,7 @@
 - store / pharmacy store
 - forum
 - store-hub
-- mypage
+- My Home (기존 `/mypage` 등 개인 공간)
 - shared UI packages
 - core packages
 - extension packages
@@ -42,6 +42,8 @@
 먼저 문제가 드러났지만, 실제 원인은 KPA 개별 문제가 아니라 **3개 서비스 공통 capability
 filtering 정책 문제**였다 (§8 Case Study). 같은 클래스의 문제는 `/store`, `/forum`,
 `/store-hub`, `/operator`, `/admin`, `/mypage`, `core+extension` 구조에서도 반복될 수 있다.
+
+개인 통합 공간의 사용자용 이름·역할·공통 진입은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. 공통 개인 공간 수정 시 일반 회원과 매장 경영자, 독립 서비스와 내 매장의 소비처를 함께 확인한다.
 
 본 문서는 그 반복을 막기 위한 **절차 기준**이다. 코드 기능 수정 기준이 아니라 개발 운영 기준이다.
 
@@ -97,7 +99,7 @@ filtering 정책 문제**였다 (§8 Case Study). 같은 클래스의 문제는 
 ```text
 1. 이 파일이 어느 서비스에서 import 되는가?
 2. KPA / K-Cosmetics / Neture / PharmacyHub 중 어디가 소비하는가?
-3. admin / operator / store / forum / store-hub / mypage 중 어디에 영향이 있는가?
+3. admin / operator / store / forum / store-hub / My Home(기존 `/mypage`) 중 어디에 영향이 있는가?
 4. core package인지 extension package인지 확인했는가?
 5. 서비스별 wrapper가 별도로 있는가?
 6. 서비스별 route 차이가 있는가?
@@ -300,11 +302,13 @@ core+extension 구조는 별도 기준을 둔다 (CLAUDE.md §App 계층 `Core �
    - service admin wrappers
    - platform admin vs service admin 차이
 
-6. /mypage
-   - MyPageLayout
-   - account-ui
+6. My Home (기존 /mypage 등)
+   - MyPageLayout · account-ui (기술 식별자 유지)
    - profile/status/role display
    - service membership boundary
+   - 독립 서비스의 개인 공간 복귀·공통 헤더 직접 진입
+   - 개인 활동과 매장 경영 통계의 소유·조회 권한 경계
+   - 정책 기준: O4O-MY-HOME-CANONICAL-V1
 
 7. content manager
    - CmsContentManager

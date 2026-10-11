@@ -4,7 +4,7 @@ import { Menu, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'luc
 import { useNavigate } from 'react-router-dom';
 import { useAuth, buildAccountDisplayInfo } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
-import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { api } from '@/api/base';
 import {
   DropdownMenu,
@@ -123,6 +123,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
         {/* Right side */}
         <div className="flex items-center gap-4">
           {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지 · 권한 확대 없음) */}
+          <MyHomeButton accountId={user?.id === undefined ? undefined : String(user.id)} api={api} isAuthenticated={!!user} className="text-sm font-medium" />
           <O4OHomeButton
             api={api}
             isAuthenticated={!!user}

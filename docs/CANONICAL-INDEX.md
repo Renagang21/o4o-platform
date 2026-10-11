@@ -1,7 +1,7 @@
 # O4O Canonical Document Index
 
 > **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
-> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-11 (PharmacyHub 완전 폐기 정책 · 종전 법적 게시 범위 정합 — `WO-O4O-PHARMACYHUB-CANONICAL-RETIREMENT-POLICY-V1`) · 2026-10-10 (§1 대표 홈 운영 반영·회원 초기화면 구현 상태 정합 — `WO-O4O-PHARMACY-MEMBER-HOME-V1`) · 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES SUPERSEDED → 새 K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1(§5 ACTIVE), 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
+> **작성일**: 2026-09-12 · **최종 갱신**: 2026-10-11 (My Home 정본 등재 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`) · 2026-10-11 (PharmacyHub 완전 폐기 정책 · 종전 법적 게시 범위 정합 — `WO-O4O-PHARMACYHUB-CANONICAL-RETIREMENT-POLICY-V1`) · 2026-10-10 (§1 대표 홈 운영 반영·회원 초기화면 구현 상태 정합 — `WO-O4O-PHARMACY-MEMBER-HOME-V1`) · 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES SUPERSEDED → 새 K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1(§5 ACTIVE), 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
 ## 0. 이 색인의 규칙
 
@@ -27,8 +27,9 @@
 
 | 문서 | 역할 | 상태 |
 |---|---|---|
-| [O4O-HOME-SERVICE-DISCOVERY-V1](baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) | 대표 홈 탐색 정책 · 약국 협력사업 표준 용어 · AI 우선 · 용도별 전체 서비스 · Partner 소개 · 준비 중 안내 · Contact Us (2026-10-10, 대표 홈 PR #402·회원 초기화면 PR #414 main 및 운영 반영) | ACTIVE |
-| [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **사용자 역할별 업무공간 Architecture SSOT** (2026-09-15) — Community / Store / Supplier / Service Operator 4 업무공간 · 공급·자료의 내 매장 직접 이용(HUB 제거) · Service Operator 공식 경로 · 1 Store : N Services · My Services · Community Workspace(Community Identity ≠ Service Identity · 카탈로그/DB 커뮤니티와 별도 사업 회원 포럼 · Industry Community 폐기) · Store 콘텐츠 유입 3+1 경로 · **Legacy Partner = FULL RETIREMENT** · 리팩터링 실행 규칙(§9). 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 아래 PHILOSOPHY 와 충돌하면 **이 문서가 우선** (§8). Preflight: [IR](ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) | ACTIVE |
+| [O4O-MY-HOME-CANONICAL-V1](baseline/O4O-MY-HOME-CANONICAL-V1.md) | **My Home 개인 통합 공간 정본** — 명칭 · 참여 서비스·커뮤니티 활동·경영 통계·계정 설정 · 다중 화면 · 로그인 후 공통 헤더 직접 진입 · User 기준 My Home / Store 기준 내 매장 구분. 정책 확정·main 통합·운영 배포 완료, 인증 운영 검증 대기(2026-10-11) | ACTIVE |
+| [O4O-HOME-SERVICE-DISCOVERY-V1](baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) | 대표 홈 탐색 정책 · My Home 개인 공간과의 구분 · 약국 협력사업 표준 용어 · AI 우선 · 용도별 전체 서비스 · Partner 소개 · 준비 중 안내 · Contact Us (2026-10-10, 대표 홈 PR #402·회원 초기화면 PR #414 main 및 운영 반영) | ACTIVE |
+| [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) | **사용자 역할별 업무공간 Architecture SSOT** (2026-09-15) — Community / Store / Supplier / Service Operator 4 업무공간 · My Home 개인 통합 공간과 내 매장 관계 · 공급·자료의 내 매장 직접 이용(HUB 제거) · Service Operator 공식 경로 · 1 Store : N Services · My Services · Community Workspace(Community Identity ≠ Service Identity · 카탈로그/DB 커뮤니티와 별도 사업 회원 포럼 · Industry Community 폐기) · Store 콘텐츠 유입 3+1 경로 · **Legacy Partner = FULL RETIREMENT** · 리팩터링 실행 규칙(§9). 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 아래 PHILOSOPHY 와 충돌하면 **이 문서가 우선** (§8). Preflight: [IR](ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) | ACTIVE |
 | [O4O-BUSINESS-PHILOSOPHY-V1](baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | 사업 철학 SSOT — 공급자 / 운영사업자 / 매장 정의, HUB 철학, AI 역할, Drift 방지. ROLE-WORKSPACE-ARCHITECTURE 와 동급(역할 경계 · 업무공간 · 콘텐츠 유입 경로는 그 문서 우선). 종전 충돌 절(§3 · §4 · §7 · 주의사항) 은 2026-09-17 Final Census 로 본문 정렬 완료 | ACTIVE |
 | [O4O-STORE-COMMERCE-BOUNDARY-V1](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | 매장 commerce 경계 SSOT — 소비자→매장 O4O commerce 없음 · 판매 실행 = 외부 POS·외부 채널 · legacy commerce 판정 규칙 · 개발 금지선 · **§15 사업 모델 변경 절차**. cart · checkout · orders · payments · refund · PG · POS · tablet · QR 작업 전 **코드보다 먼저 읽는다** | ACTIVE |
 | [O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | 공급자→매장 B2B 주문 정본 — `store_cart_items → checkout_orders` 수렴, actor · ownership · serviceKey · lifecycle · 취소 계약. 위 문서의 B2B 축 쌍 | ACTIVE |
@@ -117,7 +118,7 @@
 | [EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1](baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md) | Event Offer 에서의 Neture 역할 구분 | ACTIVE |
 | [EventOffer-Operation-Policy](event-offer/EventOffer-Operation-Policy.md) | Event Offer 운영 기준 — 승인 계약은 EVENT-OFFER-COMMON-DOMAIN(`pending → approved`) 기준으로 정합(2026-10-04) | ACTIVE |
 | [DESIGN-CORE-GOVERNANCE](rules/DESIGN-CORE-GOVERNANCE.md) | 모든 신규 화면은 Design Core v1.0 — 독자 디자인 시스템 금지 | ACTIVE |
-| [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 | ACTIVE |
+| [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 · My Home 공통 직접 진입(2026-10-11 정책 확정·운영 배포 완료, 인증 운영 검증 대기) | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
 | [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | 리스트 6 유형 분류 · URL 규약 — 리스트 정비 시 유형 분류 선행 | ACTIVE |
 | [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui` | ACTIVE |

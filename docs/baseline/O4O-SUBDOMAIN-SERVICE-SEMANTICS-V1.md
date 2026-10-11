@@ -13,7 +13,7 @@
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-08 (§1 · §2 · §3 현재 내 매장·사업별 개발·커뮤니티·HUB 재배치 정렬) · 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
+> **작성일**: 2026-10-03 · **최종 갱신**: 2026-10-11 (My Home 명칭·공통 개인 공간 진입 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`) · 2026-10-08 (§1 · §2 · §3 현재 내 매장·사업별 개발·커뮤니티·HUB 재배치 정렬) · 2026-10-07 (§4 kpa-branch catalog canonical `kpa.neture.co.kr` 이전 반영)
 > **근거 WO/IR**: WO-O4O-SUBDOMAIN-SERVICE-SEMANTICS-DOCUMENT-ALIGNMENT-V1 · 주소 결정은 [`CHECK-O4O-URL-FIRST-CENSUS-V1`](../checks/CHECK-O4O-URL-FIRST-CENSUS-V1.md) CONFIRMED_DECISIONS · §9 · §12 · §21-17
 
 **`*.neture.co.kr` 각 주소가 사업적으로 무엇이고 누구를 위한 것인가**를 정한다. 주소 · 내부 키 · role prefix 가 서로 다른 시기에 만들어져 이름만으로는 의미가 어긋나므로, 이름에서 의미를 추론하지 말고 이 표를 기준으로 읽는다.
@@ -25,6 +25,8 @@
 ---
 
 ## 1. 핵심 원칙
+
+**2026-10-11 개인 공간 결정**: 개인 통합 공간의 이름은 **My Home**이다. 대표 홈과 독립 서비스의 로그인 후 공통 헤더에 직접 진입을 제공하고, 매장 업무 권한이 있는 사용자는 My Home과 내 매장을 구분해 이용한다. 참여·커뮤니티 활동·경영 통계·계정 설정은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다. My Home은 사용자용 공간 명칭이며 새 서브도메인·serviceKey·role을 만드는 결정이 아니다. 기존 기술 경로를 유지해 공통 진입과 다중 화면을 운영에 반영했다(2026-10-11). 실제 로그인 검증의 제한은 [구현 CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)를 따른다.
 
 **2026-10-08 현재 재배치 기준** ([코드·문서 대조 후 전체 작업안](../work-orders/WO-O4O-NETURE-SERVICE-REALIGNMENT-V1.md)): Store는 약국 경영자 한 명·약국 하나·내 매장 하나를 기준으로 하며, 같은 약국이 가입한 여러 약국 협력사업 기능을 한 내 매장에서 구획하여 이용한다. 각 약국 협력사업은 독립된 약국 지원 사업자로 업무가 다르며, 추가 사업은 해당 사업에 맞춰 개발한다. 주소나 공통 가입 식별을 공유한다고 표준 사업 기능을 강제하지 않는다. `study`와 `funding`은 내 매장과 무관한 독립 서비스로 메인에서 접근한다. 강좌는 커뮤니티에서 완전히 제거하고 `study`의 업무로 이전한다. `community`는 독립 커뮤니티와 사업 참여 회원 전용 커뮤니티의 공통 공간이다. 기존 약사 커뮤니티는 독립 가입으로 유지하고 pharmacy 사업 포럼은 별개로 둔다. 매장 HUB의 필요한 기능은 내 매장과 커뮤니티로 재배치하며 중간 HUB 화면은 제거한다. 아래 다업종·retail·HUB 표의 과거 설명은 이 기준 및 기존 퇴역 계약과 함께 읽는다. 신규 사업의 실제 기능이나 새 호스트 운영 완료를 주소 계획만으로 주장하지 않는다. 작업안은 초안 작성·대조·논의·수정 후 다시 대조하여 확정한다.
 
@@ -41,7 +43,7 @@
 
 | 주소 | 주 대상 | 성격 | serviceKey (catalog) | role prefix | Store 연계 | 옛 주소 (보존) |
 |---|---|---|---|---|---|---|
-| `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
+| `neture.co.kr` | 전체 | O4O 대표 진입 · 공통 계정 · My Home 개인 공간 진입(운영 배포 완료, 인증 운영 검증 대기) · 강좌·펀딩 등 서비스 진입 · 공개 가이드. `/hospital`(병원약국 공개 화면) · `/cafe24` 유지 | `neture` (대표 진입) · `cafe24-b2b` | `neture:*` | 「내 매장」 업무는 Store 공간에서 이용 | — |
 | `kpa.neture.co.kr/{분회}` | **약사 개인** | KPA 분회 서비스 — 분회 가입 · 회원 · 분회 운영 | `kpa-branch` | `kpa-branch:*` | **없음** (분회 tenant 축은 `kpa_organizations` · `branch_memberships`) | `kpa-society.co.kr/kpa/{분회}` |
 | `pharmacy.neture.co.kr` | **약국 사업자 · 해당 사업 운영자** | 전체 약국 지원 약국 협력사업 사업 · 사업자 운영 공간 | `kpa-society` | `kpa:*` | 가입 서비스 기능을 내 매장에서 이용 | `kpa-society.co.kr` |
 | `retail.neture.co.kr` | 기존 화장품 · 소매 사업자 영역 | K-Cosmetics 퇴역 계약과 현재 소비처 대조 대상 | `k-cosmetics` | `cosmetics:*` | 과거 연계의 정리 여부 확인 | `k-cosmetics.site` |

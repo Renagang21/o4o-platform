@@ -20,7 +20,7 @@
  */
 
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
-import { Home, Bell, User, LogIn } from 'lucide-react';
+import { Home, Bell, User, LogIn, LayoutDashboard } from 'lucide-react';
 import {
   useNotifications,
   NotificationSheet,
@@ -30,7 +30,7 @@ import {
   useMobileBottomNavSheet,
 } from '@o4o/account-ui';
 import type { NotificationItem, MobileBottomNavItem } from '@o4o/account-ui';
-import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { useMyHomeReturn, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth, authClient } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { notificationsApi } from '../api/notifications';
@@ -65,13 +65,14 @@ function isCommunityActive(pathname: string): boolean {
 }
 
 export function MobileBottomNav() {
-  const { user, logout } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const { openLoginModal } = useAuthModal();
   const { pathname } = useLocation();
   const businessMatch = useMatch('/businesses/:businessKey/*');
   const participantPath = businessMatch && businessMatch.params.businessKey !== 'pharmacy'
     ? `/businesses/${encodeURIComponent(businessMatch.params.businessKey!)}/participation` : '/';
   const navigate = useNavigate();
+  const myHome = useMyHomeReturn({ accountId: user?.id, api: authClient.api, isAuthenticated: !!user, authLoading: isLoading });
 
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
 
@@ -109,6 +110,7 @@ export function MobileBottomNav() {
 
   // 로그인: 커뮤니티 / 알림 / 내정보
   const items: MobileBottomNavItem[] = [
+    { key: 'my-home', label: myHome.busy ? '이동 중…' : 'My Home', ariaLabel: 'My Home', icon: LayoutDashboard, onClick: () => { closeSheet(); void myHome.go(); } },
     { key: 'community', label: '커뮤니티', icon: Home, to: participantPath, active: isCommunity },
     {
       key: 'notif',
@@ -134,6 +136,7 @@ export function MobileBottomNav() {
 
   return (
     <MobileBottomNavCore items={items} activeColor={ACTIVE_COLOR}>
+      {myHome.error && <p role="alert" className="fixed bottom-20 left-4 right-4 z-50 rounded-lg bg-red-50 p-3 text-sm text-red-700">{myHome.error}</p>}
       {openSheet !== 'none' && <MobileBottomNavBackdrop onClick={closeSheet} />}
 
       {/* 알림 시트 — 공통 NotificationSheet (WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1) */}

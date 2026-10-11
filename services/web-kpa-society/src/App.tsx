@@ -6,7 +6,7 @@ import BusinessMaterialsPage from './pages/business/BusinessMaterialsPage';
 import BusinessToolsPage from './pages/business/BusinessToolsPage';
 import BusinessForumPage, { BusinessForumBoundary } from './pages/business/BusinessForumPage';
 import BusinessForumManagementPage from './pages/business/BusinessForumManagementPage';
-import { O4OHomeButton } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton } from '@o4o/auth-react';
 import { RoleGuard } from './components/auth/RoleGuard';
 import { authClient as pharmacyManagementAuthClient } from './contexts/AuthContext';
 import { OperatorSemiFranchisePage, SemiFranchiseContentFormPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
@@ -1229,10 +1229,10 @@ function App() {
  * 선행: WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1 (404 = minimal nav)
  */
 function NotFoundPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   return (
     <NotFound>
-      <O4OHomeButton api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />
+      <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={pharmacyManagementAuthClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
       <Link to="/forum" className="text-slate-500 no-underline hover:underline">
         커뮤니티
       </Link>

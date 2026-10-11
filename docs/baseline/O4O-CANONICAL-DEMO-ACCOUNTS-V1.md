@@ -275,11 +275,11 @@ Demo 계정으로 `/signup` → 확인 메일 → verify → forgot/reset 메일
 ## 20. 기존 Google 사용자의 비밀번호 추가
 
 ```text
-Google 로그인 → MyPage / Account Security → password credential 추가
+Google 로그인 → My Home / 계정 설정 → password credential 추가
 ```
 
 `forgot/reset` 으로 **첫** credential 을 만들지 않는다.
-서버 API 는 있고 **UI 는 아직 없다** — 별도 작업으로 연결한다.
+서버 API 는 있고 **UI 는 아직 없다** — 별도 작업으로 연결한다. 개인 공간 명칭은 [My Home 정본](O4O-MY-HOME-CANONICAL-V1.md)을 따른다(2026-10-11 문서 정비). 이 경로 표기는 UI 구현·배포 완료를 뜻하지 않는다.
 
 ## 21. Partner / Influencer
 
