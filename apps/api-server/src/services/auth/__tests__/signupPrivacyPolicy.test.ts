@@ -6,3 +6,7 @@ it('accepts only the matching marked common privacy version', async () => { expe
 it('retains legacy signup disclosure until the common terms marker is activated', async () => { const old = { ...privacy, version: 1, slug: 'legacy-privacy' }; expect(await readSignupPrivacyPolicy({ query: jest.fn().mockResolvedValue([old]) }, { ...terms, slug: 'legacy-terms', version: 1 })).toEqual(old); });
 
 it('preserves the pharmacy privacy owner before the common rollout', async () => { const q = { query: jest.fn().mockResolvedValue([{ ...privacy, service_key: 'kpa-society', version: 1, slug: 'legacy-privacy' }]) }; const old = { ...terms, serviceKey: 'kpa-society', slug: 'legacy-terms', version: 1 }; const doc = await readSignupPrivacyPolicy(q, old); expect(doc?.service_key).toBe('kpa-society'); expect(q.query).toHaveBeenCalledWith(expect.any(String), ['kpa-society', 'privacy']); });
+
+it.each([null, { ...terms, slug: 'legacy-terms', version: 1 }, { ...terms, version: 1 }])('blocks privacy-first rollout before exposing a mixed policy set: %j', async term => {
+  await expect(readSignupPrivacyPolicy({ query: jest.fn().mockResolvedValue([privacy]) }, term)).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE');
+});

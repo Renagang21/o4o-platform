@@ -54,15 +54,18 @@ export async function recordSignupTerms(userId: string, serviceKey: string, refe
 export async function recordSignupPrivacy(userId: string, reference: SignupTermsReference | undefined, manager: EntityManager, serviceKey = 'neture'): Promise<void> {
   // Old clients remain compatible until the marked common policy rollout. Never manufacture a privacy version for them.
   const terms = await policyAcceptanceService.getPublishedTermsForService(serviceKey, manager);
-  if (!reference && !isCommonAccountTermsDocument(terms)) return;
+  // Even legacy clients must not bypass a privacy-first partial common rollout.
   await readSignupPrivacyPolicy(manager, terms);
+  if (!reference && !isCommonAccountTermsDocument(terms)) return;
   await recordPublishedPolicyEvidence(manager, userId, serviceKey, 'privacy', reference);
 }
 
 /** A marked account rollout requires a matching privacy document, never legacy privacy. */
 export async function readSignupPrivacyPolicy(q: Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>, terms: PublishedTermsDocument | null) {
   const privacy = await readCurrentPolicyDocument(q, terms?.serviceKey ?? 'neture', 'privacy');
-  if (isCommonAccountTermsDocument(terms) && (!privacy || privacy.slug !== 'neture-account-privacy'
+  const commonTerms = isCommonAccountTermsDocument(terms);
+  const commonPrivacy = privacy?.service_key === 'neture' && privacy.slug === 'neture-account-privacy';
+  if ((commonTerms || commonPrivacy) && (!commonTerms || !privacy || !commonPrivacy
     || Number(privacy.version) !== Number(terms?.version) || Number(privacy.version) < 2
     || !privacy.title?.trim() || !privacy.content?.trim())) {
     throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '공통 약관과 개인정보 처리방침을 함께 준비하고 있습니다.', 503);

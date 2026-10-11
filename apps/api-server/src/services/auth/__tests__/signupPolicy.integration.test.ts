@@ -93,6 +93,12 @@ integration('signup agreement atomicity (dedicated loopback PostgreSQL)', () => 
     await expect(signup(provider, { policyDocumentId: documentId, version: 2 }, { policyDocumentId: privacyId, version: 1 })).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE');
     for (const table of ['users', 'linked_accounts', 'user_password_credentials', 'user_policy_acceptances']) expect(await db.query(`SELECT * FROM ${table}`)).toHaveLength(0);
   });
+  it.each(['email', 'google', 'kakao'].flatMap(provider => [true, false].map(withReference => ({ provider, withReference }))))('$provider blocks privacy-first rollout (privacy reference: $withReference) without partial identities', async ({ provider, withReference }) => {
+    const privacyId = randomUUID();
+    await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,slug,status) VALUES($1,'neture','privacy',2,'Privacy fixture notice','Account privacy fixture body','neture-account-privacy','published')", [privacyId]);
+    await expect(signup(provider, { policyDocumentId: documentId, version: 1 }, withReference ? { policyDocumentId: privacyId, version: 2 } : undefined)).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE');
+    for (const table of ['users', 'linked_accounts', 'user_password_credentials', 'user_policy_acceptances']) expect(await db.query(`SELECT * FROM ${table}`)).toHaveLength(0);
+  });
   it.each(['email', 'google', 'kakao'])('%s records a separate privacy acknowledgement with its exact version and hash', async provider => {
     const privacyId = randomUUID();
     await db.query("UPDATE service_policy_documents SET version=2,slug='neture-account-terms' WHERE id=$1", [documentId]);
