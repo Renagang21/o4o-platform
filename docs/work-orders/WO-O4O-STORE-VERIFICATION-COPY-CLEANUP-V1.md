@@ -53,3 +53,11 @@ PR #452는 필수 CI·CodeQL과 미해결 리뷰 blocker 없음 확인 후 main 
 보완 검토에서 고정 길이 문자·JSON/JSONB 배열의 참조도 native 배열 조사 목록에 포함했다. 격리된 PostgreSQL에서 이 3가지 배열의 외부 참조가 plan/apply를 차단하는 실제 SQL 검증을 추가했다. 삭제 대상 확장이나 운영 schema 변경은 없다.
 
 UUID 단독값뿐 아니라 경로·본문에 포함된 UUID 문자열도 scalar text 조사에서 차단하도록 보완했다. 실제 PostgreSQL의 embedded text 참조 테스트를 추가해 정규 UUID·대소문자·JSON 및 배열 참조와 함께 검증했다. 최초 Code Quality Check의 기존 커뮤니티 관리자 UI 테스트 1개 실패는 같은 UI 코드의 main/이전 CI 통과와 구분해서 기록하며, 해당 UI 코드는 이 WO에서 수정하지 않는다.
+
+## 두 번째 운영 plan의 문자열 비교 보완
+
+PR #455는 최신 필수 CI·CodeQL·SonarCloud를 통과해 main `a80aaee27`에 통합됐고 post-merge CI 38121679346도 PASS다. 운영 read-only plan 38122285609는 `shared_product_descriptions` 참조 조사에서 SQLSTATE `57014`로 실패했다. table fingerprint를 저장소의 공개 구조명과 대조해 위치를 확인했다. apply는 실행하지 않았고 삭제는 0행이다.
+
+UUID의 유효 문자는 ASCII다. 전체 table·column 조사 범위와 60초 statement/5초 lock 제한을 유지하면서 text·JSON·배열 문자열의 UUID 비교에 명시적인 `pg_catalog."C"` collation을 사용한다. 다국어 본문에 포함된 대문자 UUID도 실제 PostgreSQL 테스트로 확인한다. 해당 table이나 다른 참조를 조사에서 제외하지 않는다. 같은 WO의 운영 성능 보완 Phase이며 Core·API·schema·credential 변경은 없다.
+
+기존 커뮤니티 관리자 UI 테스트가 실패했던 CI 38119852347은 source 수정 없이 attempt 2에서 PASS했다. 이번 WO는 해당 UI 코드를 수정하지 않았다.
