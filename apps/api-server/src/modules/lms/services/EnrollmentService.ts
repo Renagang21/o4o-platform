@@ -1,5 +1,5 @@
 import { isCourseInServiceScope } from '../utils/lms-service-scope.js';
-import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
@@ -142,6 +142,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
         newStatus: reactivateStatus,
         requiresApproval: reactivateCourse?.requiresApproval ?? false,
       });
+      if (course.serviceKey === 'lecture') await recordEnrollmentApplication(manager, data.userId, 'lecture', { type: 'course_enrollment', id: reactivated.id, resourceId: data.courseId }, policies);
       return reactivated;
     }
 
@@ -199,6 +200,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
       courseId: data.courseId
     });
 
+    if (course.serviceKey === 'lecture') await recordEnrollmentApplication(manager, data.userId, 'lecture', { type: 'course_enrollment', id: saved.id, resourceId: data.courseId }, policies);
     return saved;
     });
   }

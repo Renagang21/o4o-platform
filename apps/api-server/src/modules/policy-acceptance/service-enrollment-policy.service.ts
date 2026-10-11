@@ -12,7 +12,11 @@ export function isEnrollmentPolicySlug(serviceKey: string, documentType: string,
 export async function getEnrollmentPolicies(q: Pick<EntityManager, 'query'>, serviceKey: string): Promise<CurrentPolicyDocument[]> {
   if (!ENROLLMENT_POLICY_SERVICES.has(serviceKey)) throw new PolicyAcceptanceError('UNKNOWN_SERVICE', '지원하지 않는 서비스입니다.', 404);
   const docs = await Promise.all(['terms', 'privacy'].map(type => readCurrentPolicyDocument(q, serviceKey, type as 'terms' | 'privacy')));
-  return docs.filter((doc): doc is CurrentPolicyDocument => !!doc && isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug));
+  const marked = docs.filter((doc): doc is CurrentPolicyDocument => !!doc && isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug));
+  if (marked.length && (marked.length !== 2 || Number(marked[0].version) < 2 || marked[0].version !== marked[1].version)) {
+    throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '서비스 약관과 개인정보 안내를 함께 준비하고 있습니다. 잠시 후 다시 확인해 주세요.', 503);
+  }
+  return marked;
 }
 
 /** Published service documents apply only to this explicit application, inside its transaction. */
@@ -35,7 +39,7 @@ export async function recordEnrollmentPolicies(m: Pick<EntityManager, 'query'>, 
 /** Append an application-specific audit association, without rewriting old agreements. */
 export async function recordEnrollmentApplication(m: Pick<EntityManager, 'query'>, userId: string, serviceKey: string,
   application: { type: string; id: string; resourceId?: string; conditions?: Record<string, unknown> }, policies: PolicyEvidence[]): Promise<void> {
-  if (policies.length === 0) return; // Legacy applications have no fabricated policy evidence.
+  if (policies.length === 0 && !application.conditions) return; // Never fabricate legacy policy evidence; explicit conditions can still have an audit.
   await m.query(`INSERT INTO action_logs (service_key, user_id, action_key, source, status, meta)
     VALUES ($1, $2, 'service:application_policy', 'manual', 'success', $3::jsonb)`,
   [serviceKey, userId, JSON.stringify({ application, policies })]);

@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '../modules/policy-acceptance/service-enrollment-policy.service.js';
 import { PolicyAcceptanceError } from '../modules/policy-acceptance/policy-acceptance.service.js';
 import { parseCommunityMemberListQuery, CommunityMemberListQueryError } from '../services/community/community-member-list-query.js';
 import { hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
@@ -209,7 +210,7 @@ export function createCommunitiesRoutes(
           desiredSlug: String(body.slug ?? ''),
           name,
           description: typeof body.description === 'string' ? body.description : null,
-          policyReferences: body.policyReferences,
+          policyReferences: body.policyReferences as EnrollmentPolicyReference[] | undefined,
         });
         res.status(201).json({ success: true, data: created });
       } catch (error) {
@@ -316,7 +317,7 @@ export function createCommunitiesRoutes(
         const membership = await lifecycle().requestJoin({ communityId: req.community!.id, userId, policyReferences: req.body?.policyReferences });
         res.status(201).json({ success: true, data: membership });
       } catch (error) {
-        if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
+        if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
         if (!sendLifecycleError(res, error)) throw error;
       }
     }),

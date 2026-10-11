@@ -278,8 +278,8 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
           }
           // The account marker belongs to a newly created row, including after unpublish/restore.
           if (slugChanged && (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) || isEnrollmentPolicySlug(doc.service_key, doc.document_type, normalizeStr(slug)))) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_MARKER_IMMUTABLE', '서비스 신청 정책 표식은 새 문서 등록 시에만 지정할 수 있습니다.');
-          if (slugChanged && doc.service_key === 'neture' && doc.document_type === 'terms'
-            && (doc.slug === COMMON_ACCOUNT_TERMS_SLUG || normalizeStr(slug) === COMMON_ACCOUNT_TERMS_SLUG)) {
+          if (slugChanged && doc.service_key === 'neture' && ['terms', 'privacy'].includes(doc.document_type)
+            && (doc.slug === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy') || normalizeStr(slug) === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy'))) {
             throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_MARKER_IMMUTABLE', '공통 계정 약관 표식은 새 문서 등록 시에만 지정할 수 있습니다.', 409);
           }
           if (title !== undefined) {
@@ -348,7 +348,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
             if ([doc.title, doc.content].some(value => typeof value !== 'string' || value.trim().length === 0)) {
               throw new ServicePolicyLifecycleError('POLICY_DISPLAY_FIELDS_REQUIRED', '게시할 정책 문서의 제목과 본문을 입력해 주세요.', 400);
             }
-            if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG
+            if (doc.service_key === 'neture' && ['terms', 'privacy'].includes(doc.document_type) && doc.slug === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy')
               && (doc.version < 2 || !doc.effective_date)) {
               throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_NOT_READY', '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.', 400);
             }

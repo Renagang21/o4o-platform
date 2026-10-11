@@ -1,8 +1,8 @@
-import type { EntityManager } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 import { resolveSessionServiceKey } from '../../utils/session-origin.js';
 import { policyAcceptanceService, PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
-import { isCommonAccountTermsDocument } from '../../common/auth/terms-acceptance.policy.js';
-import { recordPublishedPolicyEvidence } from '../../modules/policy-acceptance/policy-document-evidence.service.js';
+import { isCommonAccountTermsDocument, type PublishedTermsDocument } from '../../common/auth/terms-acceptance.policy.js';
+import { readCurrentPolicyDocument, recordPublishedPolicyEvidence } from '../../modules/policy-acceptance/policy-document-evidence.service.js';
 
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 
@@ -53,6 +53,19 @@ export async function recordSignupTerms(userId: string, serviceKey: string, refe
 
 export async function recordSignupPrivacy(userId: string, reference: SignupTermsReference | undefined, manager: EntityManager): Promise<void> {
   // Old clients remain compatible until the marked common policy rollout. Never manufacture a privacy version for them.
-  if (!reference && !isCommonAccountTermsDocument(await policyAcceptanceService.getPublishedTermsForService('neture', manager))) return;
+  const terms = await policyAcceptanceService.getPublishedTermsForService('neture', manager);
+  if (!reference && !isCommonAccountTermsDocument(terms)) return;
+  await readSignupPrivacyPolicy(manager, terms);
   await recordPublishedPolicyEvidence(manager, userId, 'neture', 'privacy', reference);
+}
+
+/** A marked account rollout requires a matching privacy document, never legacy privacy. */
+export async function readSignupPrivacyPolicy(q: Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>, terms: PublishedTermsDocument | null) {
+  const privacy = await readCurrentPolicyDocument(q, 'neture', 'privacy');
+  if (isCommonAccountTermsDocument(terms) && (!privacy || privacy.slug !== 'neture-account-privacy'
+    || Number(privacy.version) !== Number(terms?.version) || Number(privacy.version) < 2
+    || !privacy.title?.trim() || !privacy.content?.trim())) {
+    throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '공통 약관과 개인정보 처리방침을 함께 준비하고 있습니다.', 503);
+  }
+  return privacy;
 }

@@ -1,4 +1,4 @@
-import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { businessCommunityKeyTaken } from '../../../services/community/community-key-namespace.js';
 /**
  * 세미프랜차이즈 = 데이터 행 (DESIGN §1 R3 · R4 · §3-2)
@@ -80,11 +80,14 @@ export class SemiFranchiseService {
       if ((application.conditions ?? '') !== (sf.registration_conditions ?? ''))
         throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
       const policies = key === 'pharmacy' ? await recordEnrollmentPolicies(m, userId, 'kpa-society', application.policyReferences) : [];
-      const saveApplication = () => m.query(
+      const saveApplication = async (membershipId: string) => {
+        if (key === 'pharmacy') await recordEnrollmentApplication(m, userId, 'kpa-society', { type: 'pharmacy_business_application', id: membershipId, resourceId: sf.id, conditions: { conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null } }, policies);
+        return m.query(
         `UPDATE organizations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{semiFranchiseApplications}',
           COALESCE(metadata->'semiFranchiseApplications', '{}'::jsonb) || jsonb_build_object($2::text, $3::jsonb)) WHERE id = $1`,
         [organizationId, key, JSON.stringify({ conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null, appliedBy: userId, appliedAt: new Date().toISOString(), applicationPolicies: policies })],
       );
+      };
       const [existing] = await m.query(
         `SELECT id, status FROM semi_franchise_memberships
           WHERE semi_franchise_id = $1 AND organization_id = $2 FOR UPDATE`,
@@ -101,7 +104,7 @@ export class SemiFranchiseService {
             WHERE id = $1 RETURNING id, status`,
           [existing.id, userId],
         ));
-        await saveApplication();
+        await saveApplication(row.id);
         return row;
       }
       const [row] = await m.query(
@@ -109,7 +112,7 @@ export class SemiFranchiseService {
          VALUES ($1, $2, 'pending', $3) RETURNING id, status`,
         [sf.id, organizationId, userId],
       );
-      await saveApplication();
+      await saveApplication(row.id);
       return row;
     });
   }

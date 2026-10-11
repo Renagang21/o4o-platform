@@ -1,4 +1,4 @@
-import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * 내 매장(약국) 신청 · 승인 원장 (약국 1 = 원장 1 행 = 조직 1 = 내 매장 1)
  *
@@ -168,6 +168,7 @@ export class PharmacyMembershipService {
           RETURNING ${SELECT_COLUMNS}`,
           [existing.id, input.pharmacyName, input.businessNumber, input.pharmacistLicenseNumber],
         ));
+        await recordEnrollmentApplication(m, userId, 'kpa-society', { type: 'pharmacy_application', id: row.id, resourceId: existing.organization_id }, policies);
         return row;
       }
 
@@ -181,6 +182,7 @@ export class PharmacyMembershipService {
          RETURNING ${SELECT_COLUMNS.replace(/npm\./g, '')}`,
         [organizationId, userId, input.pharmacyName, input.businessNumber, input.pharmacistLicenseNumber],
       );
+      await recordEnrollmentApplication(m, userId, 'kpa-society', { type: 'pharmacy_application', id: row.id, resourceId: organizationId }, policies);
       return row;
     });
   }

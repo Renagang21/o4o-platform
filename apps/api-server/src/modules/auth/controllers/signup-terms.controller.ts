@@ -1,10 +1,8 @@
 import type { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { policyAcceptanceService, PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
-import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { resolveSignupPolicyKeyFromOrigin, readSignupPrivacyPolicy } from '../../../services/auth/signup-policy.service.js';
 import { AppDataSource } from '../../../database/connection.js';
-import { readCurrentPolicyDocument } from '../../policy-acceptance/policy-document-evidence.service.js';
-import { isCommonAccountTermsDocument } from '../../../common/auth/terms-acceptance.policy.js';
 
 export class SignupTermsController extends BaseController {
   static async get(req: Request, res: Response) {
@@ -13,10 +11,7 @@ export class SignupTermsController extends BaseController {
       const serviceKey = await resolveSignupPolicyKeyFromOrigin(req.get('origin'));
       const doc = await policyAcceptanceService.getPublishedTermsForService(serviceKey);
       if (!doc) return BaseController.error(res, '게시된 이용약관을 불러올 수 없습니다.', 503, 'POLICY_UNAVAILABLE');
-      const privacy = await readCurrentPolicyDocument(AppDataSource, 'neture', 'privacy');
-      if ((!privacy || !privacy.title?.trim() || !privacy.content?.trim()) && isCommonAccountTermsDocument(doc)) {
-        return BaseController.error(res, '게시된 개인정보 처리방침을 불러올 수 없습니다.', 503, 'POLICY_UNAVAILABLE');
-      }
+      const privacy = await readSignupPrivacyPolicy(AppDataSource, doc);
       return BaseController.ok(res, {
         policyDocumentId: doc.id, version: doc.version, title: doc.title,
         termsHref: serviceKey === 'neture' ? 'https://neture.co.kr/terms' : 'https://pharmacy.neture.co.kr/policy',

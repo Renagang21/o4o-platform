@@ -1,0 +1,6 @@
+import { readSignupPrivacyPolicy } from '../signup-policy.service.js';
+const terms = { id: 'terms', serviceKey: 'neture', documentType: 'terms', version: 2, title: 'Account terms', contentHash: 'hash', slug: 'neture-account-terms' };
+const privacy = { id: 'privacy', service_key: 'neture', document_type: 'privacy', version: 2, title: 'Privacy', content: 'Privacy body', slug: 'neture-account-privacy' };
+it.each([null, { ...privacy, version: 1 }, { ...privacy, slug: 'legacy-privacy' }, { ...privacy, version: 3 }])('blocks incomplete/mismatched common policy rollout: %j', async doc => { const q = { query: jest.fn().mockResolvedValue(doc ? [doc] : []) }; await expect(readSignupPrivacyPolicy(q, terms)).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE'); });
+it('accepts only the matching marked common privacy version', async () => { expect(await readSignupPrivacyPolicy({ query: jest.fn().mockResolvedValue([privacy]) }, terms)).toEqual(privacy); });
+it('retains legacy signup disclosure until the common terms marker is activated', async () => { const old = { ...privacy, version: 1, slug: 'legacy-privacy' }; expect(await readSignupPrivacyPolicy({ query: jest.fn().mockResolvedValue([old]) }, { ...terms, slug: 'legacy-terms', version: 1 })).toEqual(old); });

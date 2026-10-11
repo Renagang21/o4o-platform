@@ -264,3 +264,21 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
 실제 Google·카카오 본인 인증은 사용자가 진행한다. 공개 Demo와 합성 상태 테스트를 실제 외부 OAuth,
 운영 미가입·대기·반려·정지·탈퇴 전체 계정의 검증으로 대체하지 않는다. 운영 상태 계정은 로컬 SSOT가
 있을 때만 해당 검증을 수행한다. 30일 대기 항목은 코드·공고 배포와 구분해 남긴다.
+
+
+### 전체 review 보완 — 부분 게시·재신청·배포 자산
+
+- 서비스 terms/privacy는 같은 새 version의 명시 표식이 둘 다 준비돼야 신청에 사용한다.
+  하나만 게시되거나 version이 다르면 조회·신청 모두 503으로 중지한다. 공통 신규 가입도 marked
+  terms와 같은 version의 `neture-account-privacy`만 사용하며 legacy privacy로 가입하지 않는다.
+  게시 요청은 서비스 lock으로 직렬화하고, 중간 상태에서 부분 증빙이 저장되지 않는다.
+- 시행 시 terms/privacy의 새 ID·같은 version·확정된 시행일을 준비하고 개인정보 문서 → 약관 순서로
+  게시한다. 두 문서가 준비될 때까지 신청 중지 상태이며 API 조회로 준비 완료를 확인한다.
+- 약국 기본·약국 사업·강의 재신청도 기존 행 metadata의 현재 snapshot과 별개로 append-only
+  action_logs에 신청 ID와 해당 증빙을 저장한다. 약국 사업의 당시 조건·선택 설명을 함께 보존한다.
+  조건만 확인한 legacy 신청은 policy 배열이 빈 조건 감사이며, 약관 동의를 허위 생성하지 않는다.
+- 공개 전문은 Docker가 복사하는 `services/web-neture/src/content/legal/` 안에 둔다. 세 개 정본 초안의
+  공개 부분과 자산이 일치하는 검증을 추가했고 내부 게시 대조·DRAFT metadata는 자산에서 제외했다.
+  Docker·CI 배포 설정을 수정하거나 docs 전체를 production 이미지에 복사하지 않는다.
+- 커뮤니티 정책 오류는 기존 lifecycle 응답과 같은 top-level code·문자열 error로 반환해 문서 재조회와
+  화면 표시가 정상 작동한다. 커뮤니티 개설 요청의 untrusted 참조도 저장 서비스에서 검증한다.
