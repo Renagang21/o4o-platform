@@ -8,6 +8,8 @@ import { parseProbes, verifyTargets, verifyPublicData } from './pharmacy-hub-qr-
 class ResourceDiagnosticError extends Error {}
 
 const project = 'netureyoutube';
+// ubuntu-latest's preinstalled Cloud SDK; never resolve an executable from checkout-writable PATH entries.
+const gcloud = '/usr/bin/gcloud';
 const region = 'asia-northeast3';
 const backend = 'backend-pharmacy-hub-web';
 const neg = 'neg-pharmacy-hub-web';
@@ -21,7 +23,7 @@ const permissionsByTarget = new Map([
   [neg, ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get']],
   [service, ['run.services.delete']],
 ]);
-const productionWorkflows = new Set(['delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);
+const productionWorkflows = new Set(['promote.yml', 'delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);
 const activeStatuses = ['in_progress', 'queued', 'pending', 'waiting', 'requested'];
 
 function checkProductionRuns(result, runId, page) {
@@ -32,8 +34,13 @@ function checkProductionRuns(result, runId, page) {
   for (const other of result.workflow_runs) {
     if (String(other.id) === String(runId) || other.status === 'completed') continue;
     if (typeof other.path !== 'string') throw new ResourceDiagnosticError('Production run path is unavailable; no deletion submitted.');
-    const name = other.path.split('@')[0].split('/').at(-1);
-    if (productionWorkflows.has(name)) throw new ResourceDiagnosticError(`Production write gate blocked: workflow=${name}; run=${Number(other.id)}.`);
+    const references = other.referenced_workflows ?? [];
+    if (!Array.isArray(references) || references.some(item => typeof item.path !== 'string')) {
+      throw new ResourceDiagnosticError('Referenced production workflow inventory is incomplete; no deletion submitted.');
+    }
+    const paths = [other.path, ...references.map(item => item.path)];
+    const name = paths.map(path => path.split('@')[0].split('/').at(-1)).find(path => productionWorkflows.has(path));
+    if (name) throw new ResourceDiagnosticError(`Production write gate blocked: workflow=${name}; run=${Number(other.id)}.`);
   }
 }
 
@@ -64,7 +71,7 @@ async function checkProductionGate() {
 }
 
 function run(args, timeout = 15000) {
-  const result = spawnSync('gcloud', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout });
+  const result = spawnSync(gcloud, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout });
   if (result.status !== 0 || /Some requests did not succeed|required.*permission|PERMISSION_DENIED|Forbidden/i.test(result.stderr ?? '')) {
     const permissions = [...new Set(((result.stderr ?? '').match(/(?:compute|run|iam)\.[A-Za-z]+\.[A-Za-z]+/g) ?? []).filter(value => knownPermissions.has(value)))];
     throw new ResourceDiagnosticError(`PH resource command not confirmed; permissions=${permissions.join(',') || 'unknown'}. Run read-only plan before retry.`);
@@ -84,7 +91,7 @@ async function readPermissions() {
 }
 
 function readCloud() {
-  const cloud = collectCloudInventory((command, args, options) => spawnSync(command, args, { ...options, timeout: 15000 }));
+  const cloud = collectCloudInventory((_command, args, options) => spawnSync(gcloud, args, { ...options, timeout: 15000 }));
   const services = JSON.parse(run(['run', 'services', 'list', `--project=${project}`, `--region=${region}`,
     `--filter=metadata.name=${service}`, '--format=json(metadata.name)']));
   const runPresent = services.some(item => item.metadata?.name === service);
@@ -120,10 +127,24 @@ function assertExpectedResources(targets, expected) {
   if (targets.some(item => !expected.has(item))) throw new ResourceDiagnosticError('PH resources appeared after inventory; rerun standalone plan.');
 }
 
-export async function retireResources({ mode, read, permissions, verify, remove, beforeWrite = () => {} }) {
+async function retireOne(target, { read, verify, remove, beforeWrite }, expectedTargets) {
+  // Dependencies require serial deletes; each subsequent phase rechecks the actual state.
+  const targets = await read();
+  assertExpectedResources(targets, expectedTargets);
+  await verify();
+  if (!targets.includes(target)) return;
+  await beforeWrite();
+  await remove(target);
+  const after = await read();
+  if (after.includes(target)) throw new ResourceDiagnosticError(`PH resource deletion not confirmed: ${target}.`);
+  expectedTargets.delete(target);
+  assertExpectedResources(after, expectedTargets);
+}
+
+export async function retireResources({ mode, read, permissions, verify, remove, beforeWrite = async () => {} }) {
   if (!['plan', 'apply'].includes(mode)) throw new ResourceDiagnosticError('Unknown PH resource mode.');
   const allowed = await permissions();
-  let targets = await read();
+  const targets = await read();
   const expectedTargets = new Set(targets);
   const requiredPermissions = deletionPermissions.filter(permission =>
     targets.some(target => permissionsByTarget.get(target)?.includes(permission)));
@@ -132,19 +153,8 @@ export async function retireResources({ mode, read, permissions, verify, remove,
   const plan = { mode, applied: false, targets, requiredPermissions, missingPermissions, httpVerified: true };
   if (mode === 'plan') return plan;
   if (missingPermissions.length) throw new ResourceDiagnosticError(`PH resource deletion blocked; permissions=${missingPermissions.join(',')}.`);
-  for (const target of [backend, neg, service]) {
-    // Fresh complete references + HTTP checks immediately before each irreversible delete.
-    targets = await read();
-    assertExpectedResources(targets, expectedTargets);
-    await verify();
-    if (!targets.includes(target)) continue; // Resume safely after a partial deletion.
-    await beforeWrite();
-    await remove(target);
-    const after = await read();
-    if (after.includes(target)) throw new ResourceDiagnosticError(`PH resource deletion not confirmed: ${target}.`);
-    expectedTargets.delete(target);
-    assertExpectedResources(after, expectedTargets);
-  }
+  await [backend, neg, service].reduce((previous, target) => previous.then(() =>
+    retireOne(target, { read, verify, remove, beforeWrite }, expectedTargets)), Promise.resolve());
   await verify();
   if ((await read()).length) throw new ResourceDiagnosticError('PH resource deletion is incomplete.');
   return { mode, applied: true, targets: [], httpVerified: true, databaseWrites: false };

@@ -10,13 +10,22 @@ test('production gate allows its own run and read-only CI but blocks running and
   const self = { id: 10, path: '.github/workflows/pharmacyhub-qr-cutover.yml', status: 'in_progress' };
   const ci = { id: 11, path: '.github/workflows/ci-pipeline.yml', status: 'in_progress' };
   await assertProductionIdle(10, async () => ({ total_count: 2, workflow_runs: [self, ci] }));
-  for (const workflow of ['delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']) {
+  for (const workflow of ['promote.yml', 'delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']) {
     for (const status of ['in_progress', 'queued', 'pending', 'waiting', 'requested']) {
       await assert.rejects(assertProductionIdle(10, async queried => queried === status
         ? { total_count: 1, workflow_runs: [{ id: 12, path: `.github/workflows/${workflow}`, status }] }
         : { total_count: 0, workflow_runs: [] }), /write gate blocked/);
     }
   }
+});
+test('a different caller referencing a production reusable workflow is blocked', async () => {
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [{
+    id: 12, path: '.github/workflows/another-caller.yml', status: 'in_progress',
+    referenced_workflows: [{ path: 'Renagang21/o4o-platform/.github/workflows/delivery.yml@refs/heads/main' }],
+  }] })), /write gate blocked/);
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [{
+    id: 12, path: '.github/workflows/another-caller.yml', status: 'in_progress', referenced_workflows: [{}],
+  }] })), /inventory is incomplete/);
 });
 test('production gate checks later pages and fails closed on incomplete inventory or missing identity', async () => {
   await assert.rejects(assertProductionIdle(10, async (_status, page) => ({ total_count: 101,
