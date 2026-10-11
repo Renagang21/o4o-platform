@@ -7,7 +7,8 @@ import logger from '../../../utils/logger.js';
 export class SupplierOfferReadService {
   private _offerRepo?: Repository<SupplierProductOffer>;
   private get offerRepo(): Repository<SupplierProductOffer> {
-    return this._offerRepo ??= AppDataSource.getRepository(SupplierProductOffer);
+    if (!this._offerRepo) this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
+    return this._offerRepo;
   }
 
 
@@ -394,16 +395,7 @@ export class SupplierOfferReadService {
     }
 
     // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: service approval status filter
-    if (options.serviceApprovalStatus === 'unrequested') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
-    } else if (options.serviceApprovalStatus === 'pending') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
-    } else if (options.serviceApprovalStatus === 'approved') {
-      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`);
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
-    } else if (options.serviceApprovalStatus === 'rejected') {
-      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')`);
-    }
+    conditions.push(...this.serviceApprovalConditions(options.serviceApprovalStatus));
 
     const where = conditions.join(' AND ');
 
@@ -419,4 +411,22 @@ export class SupplierOfferReadService {
       completenessStatus: SupplierOfferReadService.deriveCompletenessStatus(r.approvalStatus, r.completenessScore || 0),
     };
   }
+
+  private serviceApprovalConditions(status: string | undefined): string[] {
+    const conditions: string[] = [];
+    if (status === 'unrequested') {
+      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
+    } else if (status === 'pending') {
+      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
+    } else if (status === 'approved') {
+      conditions.push(
+        `NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`,
+        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`,
+      );
+    } else if (status === 'rejected') {
+      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')`);
+    }
+    return conditions;
+  }
+
 }

@@ -1,13 +1,15 @@
+import { getOfferOrganizationNames } from './offer-read-enrichment.js';
 import { Repository, In } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
-import { NetureSupplier, SupplierProductOffer, OfferDistributionType, SupplierStatus } from '../entities/index.js';
+import { SupplierProductOffer, OfferDistributionType, SupplierStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
 /** Existing offer queries; write workflows remain in NetureOfferService. */
 export class OperatorOfferReadService {
   private _offerRepo?: Repository<SupplierProductOffer>;
   private get offerRepo(): Repository<SupplierProductOffer> {
-    return this._offerRepo ??= AppDataSource.getRepository(SupplierProductOffer);
+    if (!this._offerRepo) this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
+    return this._offerRepo;
   }
 
 
@@ -73,7 +75,7 @@ export class OperatorOfferReadService {
         for (const c of cats) categoryMap.set(c.id, c.name);
       }
 
-      const orgNameMap = await this.getOrgNameMap(activeOffers.map((o) => o.supplier).filter(Boolean));
+      const orgNameMap = await getOfferOrganizationNames(activeOffers.map((o) => o.supplier).filter(Boolean));
       return activeOffers.map((o) => {
         const key = `${o.supplierId}:${o.id}`;
         const request = requestMap.get(key);
@@ -303,21 +305,5 @@ export class OperatorOfferReadService {
         approvalRejected: kpi.approvalRejected || 0,
       },
     };
-  }
-
-
-  // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-C: batch org name lookup
-  private async getOrgNameMap(suppliers: NetureSupplier[]): Promise<Map<string, string>> {
-    const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
-    const map = new Map<string, string>();
-    if (orgIds.length === 0) return map;
-    try {
-      const rows: Array<{ id: string; name: string }> = await AppDataSource.query(
-        `SELECT id, name FROM organizations WHERE id = ANY($1)`,
-        [orgIds],
-      );
-      for (const r of rows) map.set(r.id, r.name);
-    } catch { /* non-fatal */ }
-    return map;
   }
 }

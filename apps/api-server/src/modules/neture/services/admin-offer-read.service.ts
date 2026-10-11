@@ -1,3 +1,4 @@
+import { getOfferOrganizationNames, mapAdminOffer } from './offer-read-enrichment.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from '../entities/index.js';
@@ -7,7 +8,8 @@ import logger from '../../../utils/logger.js';
 export class AdminOfferReadService {
   private _offerRepo?: Repository<SupplierProductOffer>;
   private get offerRepo(): Repository<SupplierProductOffer> {
-    return this._offerRepo ??= AppDataSource.getRepository(SupplierProductOffer);
+    if (!this._offerRepo) this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
+    return this._offerRepo;
   }
 
 
@@ -24,7 +26,7 @@ export class AdminOfferReadService {
         order: { createdAt: 'ASC' },
       });
 
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
+      const orgNameMap = await getOfferOrganizationNames(offers.map((o) => o.supplier).filter(Boolean));
 
       return offers.map((o) => ({
         id: o.id,
@@ -63,28 +65,9 @@ export class AdminOfferReadService {
         order: { createdAt: 'DESC' },
       });
 
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
+      const orgNameMap = await getOfferOrganizationNames(offers.map((o) => o.supplier).filter(Boolean));
 
-      return offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.name || '',
-        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-        supplierId: o.supplierId,
-        isPublic: o.isPublic,
-        distributionType: o.distributionType,
-        isActive: o.isActive,
-        approvalStatus: o.approvalStatus,
-        priceGeneral: o.priceGeneral,
-        priceGold: o.priceGold,
-        pricePlatinum: o.pricePlatinum,
-        consumerReferencePrice: o.consumerReferencePrice,
-        consumerShortDescription: o.consumerShortDescription,
-        consumerDetailDescription: o.consumerDetailDescription,
-        businessShortDescription: o.businessShortDescription,
-        businessDetailDescription: o.businessDetailDescription,
-        createdAt: o.createdAt,
-      }));
+      return offers.map((o) => mapAdminOffer(o, orgNameMap));
     } catch (error) {
       logger.error('[NetureOfferService] Error fetching all offers:', error);
       throw error;
@@ -153,31 +136,12 @@ export class AdminOfferReadService {
 
       const [offers, total] = await qb.getManyAndCount();
 
-      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean) as NetureSupplier[]);
+      const orgNameMap = await getOfferOrganizationNames(offers.map((o) => o.supplier).filter(Boolean) as NetureSupplier[]);
 
       const items = offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.name || '',
-        // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1: field contract 정합 (additive)
-        //   frontend AdminProduct 는 marketingName/category 를 기대 — master.name / master.category.name 로 매핑.
+        ...mapAdminOffer(o, orgNameMap),
         marketingName: o.master?.name || '',
         category: o.master?.category?.name || null,
-        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
-        supplierId: o.supplierId,
-        isPublic: o.isPublic,
-        distributionType: o.distributionType,
-        isActive: o.isActive,
-        approvalStatus: o.approvalStatus,
-        priceGeneral: o.priceGeneral,
-        priceGold: o.priceGold,
-        pricePlatinum: o.pricePlatinum,
-        consumerReferencePrice: o.consumerReferencePrice,
-        consumerShortDescription: o.consumerShortDescription,
-        consumerDetailDescription: o.consumerDetailDescription,
-        businessShortDescription: o.businessShortDescription,
-        businessDetailDescription: o.businessDetailDescription,
-        createdAt: o.createdAt,
       }));
 
       return { items, total };
@@ -214,7 +178,7 @@ export class AdminOfferReadService {
 
       const summary = { total: 0, pending: 0, approved: 0, rejected: 0 };
       for (const r of rows) {
-        const n = parseInt(r.count, 10) || 0;
+        const n = Number.parseInt(r.count, 10) || 0;
         summary.total += n;
         if (r.status === OfferApprovalStatus.PENDING) summary.pending = n;
         else if (r.status === OfferApprovalStatus.APPROVED) summary.approved = n;
@@ -225,21 +189,5 @@ export class AdminOfferReadService {
       logger.error('[NetureOfferService] Error fetching products summary:', error);
       throw error;
     }
-  }
-
-
-  // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-C: batch org name lookup
-  private async getOrgNameMap(suppliers: NetureSupplier[]): Promise<Map<string, string>> {
-    const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
-    const map = new Map<string, string>();
-    if (orgIds.length === 0) return map;
-    try {
-      const rows: Array<{ id: string; name: string }> = await AppDataSource.query(
-        `SELECT id, name FROM organizations WHERE id = ANY($1)`,
-        [orgIds],
-      );
-      for (const r of rows) map.set(r.id, r.name);
-    } catch { /* non-fatal */ }
-    return map;
   }
 }

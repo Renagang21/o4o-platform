@@ -146,17 +146,20 @@ function assertPharmacyOnlyServiceKeys(
 export class NetureOfferService {
   private _supplierOfferReadService?: SupplierOfferReadService;
   private get supplierOfferReadService(): SupplierOfferReadService {
-    return this._supplierOfferReadService ??= new SupplierOfferReadService();
+    if (!this._supplierOfferReadService) this._supplierOfferReadService = new SupplierOfferReadService();
+    return this._supplierOfferReadService;
   }
 
   private _adminOfferReadService?: AdminOfferReadService;
   private get adminOfferReadService(): AdminOfferReadService {
-    return this._adminOfferReadService ??= new AdminOfferReadService();
+    if (!this._adminOfferReadService) this._adminOfferReadService = new AdminOfferReadService();
+    return this._adminOfferReadService;
   }
 
   private _operatorOfferReadService?: OperatorOfferReadService;
   private get operatorOfferReadService(): OperatorOfferReadService {
-    return this._operatorOfferReadService ??= new OperatorOfferReadService();
+    if (!this._operatorOfferReadService) this._operatorOfferReadService = new OperatorOfferReadService();
+    return this._operatorOfferReadService;
   }
 
   // Lazy repositories

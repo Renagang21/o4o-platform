@@ -13,7 +13,10 @@ qb.getManyAndCount = jest.fn();
 qb.getRawMany = jest.fn();
 const createQueryBuilder = jest.fn(() => qb);
 const fixture = { id: 'offer-fixture', supplierId: 'supplier-fixture', masterId: 'master-fixture', isActive: true,
-  isPublic: false, distributionType: 'PRIVATE', approvalStatus: 'PENDING', priceGeneral: 100,
+  isPublic: false, distributionType: 'PRIVATE', approvalStatus: 'PENDING', priceGeneral: 100, priceGold: 90, pricePlatinum: 80,
+  consumerReferencePrice: 200, consumerShortDescription: 'Fixture short', consumerDetailDescription: 'Fixture detail',
+  businessShortDescription: 'Fixture B2B short', businessDetailDescription: 'Fixture B2B detail',
+  createdAt: new Date('2026-01-01T00:00:00Z'),
   supplier: { organizationId: 'organization-fixture', status: 'ACTIVE' },
   master: { name: 'Fixture product', barcode: 'fixture-barcode', categoryId: 'category-fixture',
     category: { name: 'Fixture category' }, brand: { name: 'Fixture brand' } } };
@@ -177,10 +180,32 @@ it.each(delegation)('%s delegates exact arguments and preserves result identity'
     expect(AppDataSource.getRepository).not.toHaveBeenCalled(); expect(query).not.toHaveBeenCalled();
   } finally { spy.mockRestore(); }
 });
-it.each(['supplier-offer-read.service.ts', 'admin-offer-read.service.ts', 'operator-offer-read.service.ts'])(
+it.each(['supplier-offer-read.service.ts', 'admin-offer-read.service.ts', 'operator-offer-read.service.ts', 'offer-read-enrichment.ts'])(
   '%s remains a read-only implementation and cannot write ProductMaster', (file) => {
     const src = readFileSync(join(__dirname, '..', file), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
     expect(src).not.toMatch(/\.(save|update|insert|delete|softDelete|remove|createQueryRunner)\s*\(/);
     expect(src).not.toMatch(/\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|ALTER\s+TABLE|DROP\s+TABLE)\b/i);
     expect(src).not.toContain('resolveOrCreateMaster('); expect(src).not.toContain('updateProductMaster(');
   });
+
+const adminDto = {
+  id: 'offer-fixture', masterId: 'master-fixture', masterName: 'Fixture product',
+  supplierName: 'Fixture organization', supplierId: 'supplier-fixture', isPublic: false,
+  distributionType: 'PRIVATE', isActive: true, approvalStatus: 'PENDING',
+  priceGeneral: 100, priceGold: 90, pricePlatinum: 80, consumerReferencePrice: 200,
+  consumerShortDescription: 'Fixture short', consumerDetailDescription: 'Fixture detail',
+  businessShortDescription: 'Fixture B2B short', businessDetailDescription: 'Fixture B2B detail',
+  createdAt: new Date('2026-01-01T00:00:00Z'),
+};
+it('admin all-list complete DTO preserves every field and value', async () => {
+  query.mockResolvedValue([{ id: 'organization-fixture', name: 'Fixture organization' }]);
+  expect(await service.getAllProducts()).toStrictEqual([adminDto]);
+});
+it('admin paged complete DTO adds only marketingName and category', async () => {
+  query.mockResolvedValue([{ id: 'organization-fixture', name: 'Fixture organization' }]);
+  expect(await service.getAllProductsPaged()).toStrictEqual({ items: [{ ...adminDto, marketingName: 'Fixture product', category: 'Fixture category' }], total: 1 });
+});
+it('admin pending complete DTO retains its narrower response fields', async () => {
+  query.mockResolvedValue([{ id: 'organization-fixture', name: 'Fixture organization' }]);
+  expect(await service.getPendingProducts()).toStrictEqual([{ id: 'offer-fixture', masterId: 'master-fixture', masterName: 'Fixture product', supplierName: 'Fixture organization', supplierId: 'supplier-fixture', isPublic: false, distributionType: 'PRIVATE', createdAt: new Date('2026-01-01T00:00:00Z'), approvalStatus: 'PENDING' }]);
+});

@@ -63,3 +63,14 @@ PR·CI·운영 배포·smoke 결과는 최종 외부 결과 artifact에 기록�
 - API 의존성 빌드·tsc --noEmit·대상 ESLint·문서 민감정보·diff 검사 PASS.
 - 이동 멤버 16개(조직명 helper의 두 역할 사본 포함), 남은 repository/write 멤버 18개 모두 AST 동등성 PASS. 공개 메서드 모집단 동일. static 클래스 참조명만 정규화했다.
 - 실 PostgreSQL fixture 검증은 미실행이며 동일 SQL의 코드 비교와 mock 행동 검증을 실DB 검증으로 표시하지 않는다.
+
+## PR 품질 검사 보완
+
+첫 전체 CI는 통과했으나 Sonar가 이동 코드의 신규 중복률 7.6%(기준3%)와 기존 필터 함수 복잡도16(기준15)을 지적했다.
+관리자 전체/페이지 DTO 공통 필드와 조직명 enrichment를 41줄의 전용 read helper로 묶고 승인 필터 분기를 private helper로 옮겼다.
+새 범용 repository/framework나 품질 검사 예외는 추가하지 않았다. lazy 초기화와 Number.parseInt 표기도 정리했다.
+
+이 보완은 최초 문자/AST 동일 이동과 구분한다. DTO 매핑 2개·필터 builder만 helper 추출로 본문이 달라졌다.
+원본 모놀리스에 관리자 전체 DTO strict 검사3개를 먼저 적용해 PASS(선택 외56개는 skipped) 확인했다.
+최종59개 신규 검사 및 기존 보호 포함11 suites /235 tests PASS. 타입·lint PASS.
+SQL 호출/바인딩32개와 SQL fragment/ORM 표현식81개 모두 동일하고 남은 write/repository 멤버18개 및 공개 메서드 모집단도 동일하다.
