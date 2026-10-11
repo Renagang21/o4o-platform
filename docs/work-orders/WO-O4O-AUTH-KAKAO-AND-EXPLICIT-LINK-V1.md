@@ -392,3 +392,10 @@ PC/mobile 12건 포함 모의 화면 60건이며 실제 OAuth/운영 검증과 �
 관련 API 187 PASS, 인증·정책 고유 329 + 추가 supplier 경계 41을 분리 기록한다. SonarCloud
 지적의 복잡도/정렬도 보완했다. 최신 push HEAD CI/review를 확인하며 실제 공고/게시 OPEN과
 이번 push/PR 범위를 유지한다.
+
+
+제목/본문의 runtime 문자열·비어 있지 않음도 공통 gate에서 확인한다. ID/version이 일치해도
+본문이 누락되거나 표시 불가능하면 제출하지 않는다. 신규 10건 포함 공통 UI 83/My Home 23
+PASS, 고유 유관 UI 338건이다. 새 bundle PC/mobile 16건 중 신규 누락 경계 4건을 더한 모의
+화면 합계는 64건이며 실제 OAuth/운영 검증으로 보지 않는다. own preview 종료·port closure를
+확인했고 최신 push HEAD의 CI/review로 이번 Phase를 마무리한다. 실제 공고/게시 OPEN은 유지한다.

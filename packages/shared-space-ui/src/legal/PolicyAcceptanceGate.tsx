@@ -77,6 +77,11 @@ function fmtDate(iso: string | null | undefined): string | null {
   try { return new Date(iso).toLocaleDateString('ko-KR'); } catch { return null; }
 }
 
+function hasPolicyDisplayFields(doc: PolicyDocumentDto): boolean {
+  return typeof doc.title === 'string' && doc.title.trim().length > 0
+    && typeof doc.content === 'string' && doc.content.trim().length > 0;
+}
+
 export function PolicyAcceptanceGate({
   pending,
   loadPolicy,
@@ -118,6 +123,7 @@ export function PolicyAcceptanceGate({
         if (cancelled) return;
         if (results.some(result => !result)) { setDocs([]); setStatus('empty'); return; }
         const loaded = results as Array<PolicyDocumentDto & { id?: string }>;
+        if (!loaded.every(hasPolicyDisplayFields)) { setStatus('error'); return; }
         setDocs(loaded);
         const matches = loaded.every((result, i) => result.id === pending[i].policyDocumentId
           && result.version === pending[i].version && result.serviceKey === pending[i].serviceKey
@@ -133,7 +139,7 @@ export function PolicyAcceptanceGate({
   if (bypass) return <>{children}</>;
 
   const displayedMatches = docs.length === pending.length && docs.every((doc, i) =>
-    doc.id === pending[i].policyDocumentId && doc.version === pending[i].version
+    hasPolicyDisplayFields(doc) && doc.id === pending[i].policyDocumentId && doc.version === pending[i].version
       && doc.serviceKey === pending[i].serviceKey && doc.documentType === pending[i].documentType);
   const canSubmit = status === 'ok' && displayedMatches && checked && !submitting;
 

@@ -206,3 +206,25 @@ it('복수 패널의 inline gate는 서로 다른 제목을 가진 비모달 reg
   for (const region of regions) expect(region.getAttribute('aria-modal')).toBeNull();
   expect(screen.getAllByRole('heading', { level: 2, name: 'O4O 통합 서비스 이용약관에 동의해 주세요' })).toHaveLength(2);
 });
+
+it.each([
+  { content: undefined }, { content: null }, { content: 123 }, { content: { body: 'not text' } },
+  { content: '' }, { content: '   ' }, { title: undefined }, { title: '' }, { title: 123 },
+])('%j: 식별 필드가 일치해도 표시할 제목/본문이 없는 응답은 승낙을 열지 않는다', async fields => {
+  const { onAccept } = renderGate({ doc: { ...DOC, ...fields } as any });
+  await screen.findByText(/약관을 불러오지 못했습니다/);
+  expect(screen.queryByTestId('policy-acceptance-content')).toBeNull();
+  expect((screen.getByRole('checkbox') as HTMLInputElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+  expect(onAccept).not.toHaveBeenCalled();
+});
+it('복수 문서 중 뒤 문서의 본문이 누락돼도 전체 승낙을 차단한다', async () => {
+  const second = { ...PENDING[0], serviceKey: 'neture', policyDocumentId: 'neture-doc' };
+  const onAccept = vi.fn(async () => ({ success: true }));
+  render(<MemoryRouter><PolicyAcceptanceGate pending={[...PENDING, second]}
+    loadPolicy={async key => key === 'neture' ? { ...DOC, ...second, id: second.policyDocumentId, content: undefined } as any : DOC}
+    onAccept={onAccept} onLogout={() => {}}>{null}</PolicyAcceptanceGate></MemoryRouter>);
+  await screen.findByText(/약관을 불러오지 못했습니다/);
+  fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+  expect(onAccept).not.toHaveBeenCalled();
+});

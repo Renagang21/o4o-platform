@@ -862,3 +862,18 @@ legacy supplier 직접 조회를 재현하고 cache 후보 조회를 canonical r
 API·Neture build(타입 포함), changed lint, docs 민감정보 guard, diff check PASS다. 최신 HEAD
 CI·review를 다시 확인한다. PG 39 SKIP, 실제 외부 인증/서비스 신청 원장·조건 기록/개인정보
 version 증빙/8개 서비스 운영 상태 검증/30일 공고·게시 OPEN과 push/PR 종료 범위는 유지한다.
+
+
+### 정책 본문의 runtime 표시 계약
+
+공통 gate는 ID/version·서비스/유형뿐 아니라 title/content가 빈 문자열이 아닌지 확인한다.
+식별 필드가 같아도 본문 누락/null/숫자/객체/빈 문자열/공백, 제목 누락/빈 문자열/숫자는
+승낙을 열지 않는다. 복수 문서의 뒤 문서가 불완전해도 전체 제출을 막는다. 신규 10건 포함
+공통 UI 9 files 83 PASS와 My Home 23 PASS다. 고유 유관 UI는 328+10=338건이다.
+
+새 Neture production bundle PC/mobile × 강의/펀딩 × 승낙/버전 변경/조회 실패/본문 누락
+16 PASS다. 기존 60건 중 My Home 12건은 재검증이므로 더하지 않고 신규 본문 누락 4건만
+추가해 고유 모의 화면 64건이다. 외부 요청 fixture 및 실제 OAuth/DB 쓰기 없음의 경계는 유지한다.
+Neture 타입 포함 build·changed lint·docs guard·diff check PASS다. own preview PID를 확인해
+종료하고 4391 port가 닫힌 것도 확인했다. 서버 회귀/PG SKIP 수와 실제 공고/게시 OPEN은 그대로다.
+최신 HEAD push 뒤 CI/review를 확인한다.

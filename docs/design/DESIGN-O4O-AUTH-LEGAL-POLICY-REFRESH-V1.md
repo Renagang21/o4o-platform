@@ -213,3 +213,7 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
 원장 cache 후보 중 legacy supplier 조회는 canonical supplier resolver에만 둔다. 약국 및
 공급자 후보의 EXISTS를 독립 조회하므로 하나의 정책 유형이면 1건, 두 유형이면 최대 2건이다.
 후보 probe는 업무 권한 판정이 아니고 실제 resolver가 자격을 확인한다. published TTL 60초는 유지한다.
+
+
+표시 문서 확인은 식별자만 일치한다고 완료 처리하지 않는다. 공통 gate는 runtime의 title/content가
+빈 문자열이 아닌지 확인한다. 본문 누락·타입 불일치·공백뿐인 응답은 표시/승낙을 열지 않는다.
