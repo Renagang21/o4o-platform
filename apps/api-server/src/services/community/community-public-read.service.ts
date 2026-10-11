@@ -1,7 +1,7 @@
 import type { EntityManager } from 'typeorm';
 import { resolveCommunityWorkspace, type CommunityWorkspace } from './community-workspace.service.js';
 import type { CommunityAccessUser } from '../../utils/community-access.resolver.js';
-import { PUBLIC_READ_KEY } from './community-public-read-metadata.js';
+import { PUBLIC_READ_KEY, signPublicReadDesignation, hasAuthenticPublicReadDesignation } from './community-public-read-metadata.js';
 
 type Exec = Pick<EntityManager, 'query'>;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -36,8 +36,18 @@ async function workspace(exec: Exec, key: string, user: CommunityAccessUser | nu
   return value;
 }
 
+async function verifiedPublicBoards(exec: Exec, value: CommunityWorkspace) {
+  const rows = await exec.query(`SELECT id, metadata->'${PUBLIC_READ_KEY}' AS "designation"
+    FROM forum_category_requests WHERE service_code = ANY($1::text[]) AND organization_id IS NULL
+      AND status = 'completed' AND forum_type = 'open'
+      AND metadata->'${PUBLIC_READ_KEY}'->>'mode' IN ('board','selected')`, [value.forumStorageCodes]);
+  return rows.filter((row: { id: string; designation: unknown }) =>
+    hasAuthenticPublicReadDesignation(value.communityKey, row.id, row.designation, process.env.JWT_SECRET))
+    .map((row: { id: string }) => row.id);
+}
+
 // This predicate is identical for list and direct UUID/slug detail. No role bypass.
-const PUBLIC_POST = `b.service_code = ANY($1::text[])
+const PUBLIC_POST = `b.service_code = ANY($1::text[]) AND b.id = ANY($2::uuid[])
   AND b.organization_id IS NULL AND b.status = 'completed' AND b.forum_type = 'open'
   AND p.organization_id IS NULL AND p.is_organization_exclusive = false AND p.status = 'publish'
   AND ((b.metadata->'${PUBLIC_READ_KEY}'->>'mode') = 'board'
@@ -51,19 +61,23 @@ const publicFields = (p: Record<string, unknown>) => ({ id: p.id, slug: p.slug, 
 
 export async function listPublicCommunityPosts(exec: Exec, key: string, page: number) {
   const value = await workspace(exec, key, null);
+  const boardIds = await verifiedPublicBoards(exec, value);
+  if (!boardIds.length) return { name: value.name, items: [], hasNext: false, page };
   const items = await exec.query(`SELECT ${PUBLIC_FIELDS}
     FROM forum_post p JOIN forum_category_requests b ON b.id = p.forum_id
     WHERE ${PUBLIC_POST} ORDER BY p."isPinned" DESC, p.created_at DESC, p.id
-    LIMIT 21 OFFSET $2`, [value.forumStorageCodes, (page - 1) * 20]);
+    LIMIT 21 OFFSET $3`, [value.forumStorageCodes, boardIds, (page - 1) * 20]);
   return { name: value.name, items: items.slice(0, 20).map(publicFields), hasNext: items.length > 20, page };
 }
 
 export async function getPublicCommunityPost(exec: Exec, key: string, idOrSlug: string) {
   const value = await workspace(exec, key, null);
+  const boardIds = await verifiedPublicBoards(exec, value);
+  if (!boardIds.length) throw new CommunityPublicReadError(404, 'PUBLIC_POST_NOT_FOUND', '공개된 게시글을 찾을 수 없습니다.');
   const [post] = await exec.query(`SELECT ${PUBLIC_FIELDS}, p.content
     FROM forum_post p JOIN forum_category_requests b ON b.id = p.forum_id
-    WHERE ${PUBLIC_POST} AND ${UUID.test(idOrSlug) ? 'p.id = $2::uuid' : 'p.slug = $2'} LIMIT 1`,
-  [value.forumStorageCodes, idOrSlug]);
+    WHERE ${PUBLIC_POST} AND ${UUID.test(idOrSlug) ? 'p.id = $3::uuid' : 'p.slug = $3'} LIMIT 1`,
+  [value.forumStorageCodes, boardIds, idOrSlug]);
   if (!post) throw new CommunityPublicReadError(404, 'PUBLIC_POST_NOT_FOUND', '공개된 게시글을 찾을 수 없습니다.');
   return { name: value.name, post: { ...publicFields(post), content: post.content } };
 }
@@ -85,7 +99,10 @@ export async function listCommunityPublicReadSettings(exec: Exec, key: string, u
     WHERE b.service_code = ANY($1::text[]) AND b.status = 'completed' AND b.organization_id IS NULL
       AND b.forum_type = 'open'
     ORDER BY b.id, p.created_at DESC, p.id`, [value.forumStorageCodes]);
-  return { boards, posts };
+  return { boards: boards.map((board: { id: string; forumType: string; publicRead: unknown }) => ({ ...board,
+    publicRead: board.forumType === 'open' && hasAuthenticPublicReadDesignation(value.communityKey, board.id, board.publicRead, process.env.JWT_SECRET)
+      ? board.publicRead : { mode: 'private', postIds: [] },
+  })), posts };
 }
 
 /** Call inside a transaction. Scope and row locks precede any metadata change. */
@@ -108,7 +125,13 @@ export async function setCommunityPublicRead(exec: Exec, key: string, user: Comm
       throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_POST_IDS', '게시판 안의 게시된 글만 공개할 수 있습니다.');
     }
   }
-  const setting = { ...selection, designatedBy: user.id, designatedAt: new Date().toISOString() };
+  const designation = { ...selection, designatedBy: user.id, designatedAt: new Date().toISOString() };
+  // Existing production JWT signing material; no new credential or insecure fallback.
+  const signingKey = process.env.JWT_SECRET;
+  if (selection.mode !== 'private' && !signingKey?.trim()) {
+    throw new CommunityPublicReadError(503, 'PUBLIC_READ_UNAVAILABLE', '공개 설정을 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+  }
+  const setting = signingKey?.trim() ? signPublicReadDesignation(value.communityKey, boardId, designation, signingKey) : designation;
   await exec.query(`UPDATE forum_category_requests SET metadata =
     jsonb_set(COALESCE(metadata, '{}'::jsonb), '{${PUBLIC_READ_KEY}}', $2::jsonb, true), updated_at = NOW()
     WHERE id = $1::uuid`, [boardId, JSON.stringify(setting)]);

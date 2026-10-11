@@ -14,6 +14,8 @@
 | createServiceForumRouter → `/communities/:key/forum` | 회원 workspace gate 그대로. 사업 홈만 isPinned=true limit3 및 isPinned=false type=announcement limit5 전송 | 기존 member mount API 회귀, Pharmacy 회원 홈 16 tests, PC/390/320 fixture |
 | createServiceForumRouter → funding forum (main #451 통합) | 해당 펀딩의 현재 개설자/운영자/승인 참여자만 기존 scoped forum 이용. 새 optional query가 이용 자격/종료 쓰기 guard를 바꾸지 않음 | funding forum 기존 route 회귀 및 CI 전체 API shards |
 | ForumRequestService → generic forum request/operator 심사·communities 게시판 신청 | 신청/create 및 pending/revision update는 공개 지정 예약 metadata 키 제거. 승인된 게시판 owner update는 원래 metadata 수정 없음. 같은 serviceCode/소유자/상태 guard 유지 | metadata 예약 키 제거 및 원본 불변 회귀, API build·기존 mount 회귀 |
+| ForumDirectoryController → generic/KPA/Neture/community/funding owner 관리 | 설명/아이콘은 허용 필드만 partial update. 삭제 요청은 현재 JSON에 lifecycle 키만 병합해 운영자의 최신 공개 철회·상태를 보존 | owner stale entity 2 회귀, 실제 PostgreSQL stale proof replay 거부 |
+| 공통 operator-forum.routes → 서비스별 운영 router | 정보 수정은 name/description/tags만 partial update. 단건/일괄 삭제 심사·직접 비활성/재활성은 lifecycle 키를 원자 병합하며 공개 예약 키는 제외 | API build·literal 소비처 조사·현재 JSON 병합 및 서비스 격리 SQL 회귀 |
 | KPA local ForumRequestService | 별도 원장/서비스이며 공통 파일 변경의 직접 소비처 아님 | import 검색으로 확인, 변경 0 |
 | communities guest router | active independent/open completed board/published non-org posts만 운영자 designation으로 공개. 사업 회원 공간 excluded. 목록/UUID/slug 상세 같은 SQL predicate·response whitelist | 공개 API 18 tests: private/closed/draft/교차 게시판/일반 회원/guest 쓰기·댓글/비활성/페이지 범위 |
 | communities 관리 router/UI | fresh user와 현재 workspace canManage 필요. transaction 안 scope·게시판 row lock·선택 글 validation 후 예약 JSON 키만 변경 | 운영 저장/실패 재시도/폐쇄 선택 제한 및 guest·member denied 회귀 |
@@ -33,3 +35,13 @@ main/CI/review·운영 배포·공개 read-only smoke는 통합 WO에 최종 기
 공개 설정 선택 목록은 승인된 열린 게시판별 최근100개 LATERAL 조회다. 커뮤니티 전체 상한이나 폐쇄 게시판의 대량 글이 다른 게시판 후보를 가리지 않도록 한다. 실제 PostgreSQL에서 게시판별 상한·다른 열린 게시판의 오래된 글·폐쇄 글 대량 제외를 검증한다.
 
 최근 후보에서 밀린 기존 선택은 목록 밖 개별 보기/선택 해제 UI로 관리한다. 한 글만 제외한 저장 payload와 다른 선택 보존을 회귀로 검증하며, 삭제/draft 등 현재 조회 불가한 ID도 해제할 수 있다. 저장 전 실제 공개 철회가 완료된 것처럼 표시하지 않는다.
+
+## 운영자 지정의 출처 검증 (후속 P1)
+
+과거 신청 metadata의 예약 키는 운영자의 공개 지정 증거로 신뢰하지 않는다. 운영자 전용 저장 경로가 기존 서버 `JWT_SECRET`으로 communityKey·boardId·mode·postIds·지정자·지정시각을 함께 HMAC 서명한 설정만 공개 조건에 포함한다. 서명 누락/변조/다른 게시판·커뮤니티에서 복사한 설정은 private로 처리하며 별도 backfill은 하지 않는다. 기존 서버 키 누락은 공개 저장 503·열람 private이며 철회 저장은 계속 가능하다. 서버 키가 교체되면 기존 지정도 private가 되어 운영자의 재지정이 필요하다. 응답에서 서명·작성자 개인정보·원장 metadata는 공개하지 않는다.
+
+설명 수정/삭제 요청/운영 심사가 오래된 전체 Entity·JSON을 save하면 이미 철회한 유효 서명이 복원될 수 있어, 허용 필드 partial update와 현재 JSON의 제한된 원자 병합으로 바꾼다. 공개 예약 키는 이 병합 patch에서 제거되며 상태 변경은 명시적 활성/비활성 전이에만 포함한다. owner 및 operator 권한·서비스 scope·audit contract는 유지한다.
+
+최종 focused API 6 suites 109 tests PASS. 격리 PostgreSQL 15에서 실제 service/HMAC/원자 병합 helper를 실행해 unsigned legacy·복사/변조 서명·타 scope 거부, list/detail/date alias, 게시판별 chooser, 철회 후 stale proof 재주입 거부·기타 metadata 보존을 확인했다. 합성 임시 테이블 transaction rollback 후 해당 격리 DB만 종료했으며 운영 DB 쓰기는 없었다.
+
+후속 API build·변경 파일 ESLint PASS. 추가로 공통 controller의 raw-source 소비 계약을 포함하는 community catalog/access 31 tests PASS. 문서 민감정보 검사 3852 files 0건 및 diff whitespace 검사 PASS.

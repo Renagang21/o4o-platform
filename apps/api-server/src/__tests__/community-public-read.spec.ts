@@ -5,14 +5,17 @@ import request from 'supertest';
 import { resolveCommunityWorkspace } from '../services/community/community-workspace.service.js';
 import { createCommunityPublicReadRoutes } from '../routes/community-public-read.routes.js';
 import { parsePublicReadInput, setCommunityPublicRead } from '../services/community/community-public-read.service.js';
-import { PUBLIC_READ_KEY, withoutPublicReadDesignation } from '../services/community/community-public-read-metadata.js';
+import { PUBLIC_READ_KEY, withoutPublicReadDesignation, signPublicReadDesignation, hasAuthenticPublicReadDesignation, mergeForumMetadataPatch } from '../services/community/community-public-read-metadata.js';
 
 jest.mock('../services/community/community-workspace.service.js', () => ({ resolveCommunityWorkspace: jest.fn() }));
 jest.mock('../database/connection.js', () => ({ AppDataSource: {
-  query: (...args: unknown[]) => query(...args), transaction: (run: (m: unknown) => unknown) => run({ query }),
+  query: (...args: unknown[]) => String(args[0]).includes('AS "designation"') ? candidateQuery(...args) : query(...args), transaction: (run: (m: unknown) => unknown) => run({ query }),
 } }));
 jest.mock('../middleware/rateLimiter.js', () => ({ apiLimiter: (_req: unknown, _res: unknown, next: () => void) => next() }));
 const query = jest.fn();
+const candidateQuery = jest.fn();
+const fixtureSecret = 'fixture-only-public-read-signing-key';
+const previousSecret = process.env.JWT_SECRET;
 const boardId = '11111111-1111-4111-8111-111111111111';
 const postId = '22222222-2222-4222-8222-222222222222';
 const actor = { id: 'fixture-operator' };
@@ -21,7 +24,13 @@ const active = { communityKey: 'fixture', name: '공개 테스트', kind: 'indep
 const authenticate: express.RequestHandler = (req, res, next) => req.headers['x-fixture-operator'] ? next() : void res.sendStatus(401);
 const app = express().use(express.json()).use('/communities', createCommunityPublicReadRoutes(authenticate, async () => actor));
 
-beforeEach(() => { query.mockReset(); (resolveCommunityWorkspace as jest.Mock).mockReset().mockResolvedValue(active); });
+const designation = { mode: 'board' as const, postIds: [], designatedBy: actor.id, designatedAt: '2026-10-11T00:00:00.000Z' };
+beforeEach(() => {
+  process.env.JWT_SECRET = fixtureSecret;
+  query.mockReset(); candidateQuery.mockReset().mockResolvedValue([{ id: boardId, designation: signPublicReadDesignation('fixture', boardId, designation, fixtureSecret) }]);
+  (resolveCommunityWorkspace as jest.Mock).mockReset().mockResolvedValue(active);
+});
+afterAll(() => { if (previousSecret === undefined) delete process.env.JWT_SECRET; else process.env.JWT_SECRET = previousSecret; });
 
 describe('explicit public content read boundary', () => {
   it('guest list and direct detail share the private/draft/closed/org/service boundary and exclude identity/metadata', async () => {
@@ -48,6 +57,7 @@ describe('explicit public content read boundary', () => {
       expect(sql).toContain("= 'selected'");
       expect(sql).toContain('? p.id::text');
       expect(params[0]).toEqual(active.forumStorageCodes);
+      expect(params[1]).toEqual([boardId]);
     }
     expect(resolveCommunityWorkspace).toHaveBeenCalledWith(expect.anything(), null, 'fixture');
   });
@@ -74,7 +84,7 @@ describe('explicit public content read boundary', () => {
     query.mockResolvedValue(Array.from({ length: 21 }, (_, n) => ({ id: `${n}`, title: '샘플' })));
     const r = await request(app).get('/communities/fixture/public/posts?page=2');
     expect(r.body.data.items).toHaveLength(20); expect(r.body.data.hasNext).toBe(true);
-    expect(query.mock.calls[0][1][1]).toBe(20);
+    expect(query.mock.calls[0][1][2]).toBe(20);
   });
 
   it('guest reads expose no write/comments/members routes; management requires authentication', async () => {
@@ -114,6 +124,7 @@ describe('operator designation preserves member boundaries', () => {
     expect(query.mock.calls[0][1]).toEqual([boardId, active.forumStorageCodes]);
     expect(query.mock.calls[2][0]).toContain('jsonb_set(COALESCE(metadata');
     expect(JSON.parse(query.mock.calls[2][1][1])).toMatchObject({ mode: 'selected', postIds: [postId], designatedBy: actor.id });
+    expect(hasAuthenticPublicReadDesignation('fixture', boardId, JSON.parse(query.mock.calls[2][1][1]), fixtureSecret)).toBe(true);
     query.mockReset().mockResolvedValueOnce([{ id: boardId, forumType: 'closed' }]).mockResolvedValueOnce([]);
     await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'private' })).resolves.toEqual({ mode: 'private', postIds: [] });
   });
@@ -139,4 +150,59 @@ it('operator post chooser uses the physical date column and keeps the response a
   expect(sql).toContain('ORDER BY created_at DESC, id LIMIT 100');
   expect(sql).toContain("b.forum_type = 'open'");
   expect(sql).not.toContain('LIMIT 1000');
+});
+
+describe('operator provenance of stored public settings', () => {
+  it.each([{ ...designation }, { ...designation, mode: { toString: 'invalid' }, proofVersion: 'operator-v1', proof: '0'.repeat(64) }, { ...designation, proofVersion: 'operator-v1', proof: '0'.repeat(64) }])('historical applicant-controlled setting never reaches post queries: %j', async setting => {
+    candidateQuery.mockResolvedValue([{ id: boardId, designation: setting }]);
+    const list = await request(app).get('/communities/fixture/public/posts').expect(200);
+    expect(list.body.data.items).toEqual([]);
+    await request(app).get(`/communities/fixture/public/posts/${postId}`).expect(404);
+    expect(query).not.toHaveBeenCalled();
+  });
+  it('rejects copied scope and tampering with mode, IDs or actor', async () => {
+    const signed = signPublicReadDesignation('fixture', boardId, designation, fixtureSecret);
+    expect(hasAuthenticPublicReadDesignation('other', boardId, signed, fixtureSecret)).toBe(false);
+    expect(hasAuthenticPublicReadDesignation('fixture', postId, signed, fixtureSecret)).toBe(false);
+    for (const changes of [{ mode: 'selected', postIds: [postId] }, { designatedBy: 'other' }, { designatedAt: '2027-01-01' }]) {
+      expect(hasAuthenticPublicReadDesignation('fixture', boardId, { ...signed, ...changes }, fixtureSecret)).toBe(false);
+    }
+    expect(hasAuthenticPublicReadDesignation('fixture', boardId, signed, 'different-fixture-key')).toBe(false);
+  });
+  it('fails closed without signing material and permits revocation without it', async () => {
+    delete process.env.JWT_SECRET;
+    expect((await request(app).get('/communities/fixture/public/posts')).body.data.items).toEqual([]);
+    expect(query).not.toHaveBeenCalled();
+    query.mockResolvedValueOnce([{ id: boardId, forumType: 'open' }]);
+    await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'board' })).rejects.toMatchObject({ status: 503 });
+    expect(query).toHaveBeenCalledTimes(1);
+    query.mockReset().mockResolvedValueOnce([{ id: boardId, forumType: 'open' }]).mockResolvedValueOnce([]);
+    await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'private' })).resolves.toEqual({ mode: 'private', postIds: [] });
+  });
+  it('operator settings show unsigned historical values as private', async () => {
+    query.mockResolvedValueOnce([{ id: boardId, name: '샘플', forumType: 'open', publicRead: designation }]).mockResolvedValueOnce([]);
+    const result = await request(app).get('/communities/fixture/public-read-settings').set('x-fixture-operator', 'yes').expect(200);
+    expect(result.body.data.boards[0].publicRead).toEqual({ mode: 'private', postIds: [] });
+  });
+});
+
+
+describe('ordinary forum lifecycle metadata updates', () => {
+  it('merges only a parameterized patch with current metadata and drops a replayed public proof', async () => {
+    const oldPublic = signPublicReadDesignation('fixture', boardId, designation, fixtureSecret);
+    await mergeForumMetadataPatch({ query }, boardId, 'community:fixture', {
+      deleteRequestStatus: 'pending', [PUBLIC_READ_KEY]: oldPublic,
+    });
+    const [sql, values] = query.mock.calls[0];
+    expect(sql).toContain("COALESCE(metadata, '{}'::jsonb) || $3::jsonb");
+    expect(sql).toContain('WHERE id = $1::uuid AND service_code = $2');
+    expect(sql).not.toContain('status =');
+    expect(values).toEqual([boardId, 'community:fixture', JSON.stringify({ deleteRequestStatus: 'pending' })]);
+    expect(oldPublic.mode).toBe('board');
+  });
+  it.each(['archived', 'completed'] as const)('changes status only on the explicit lifecycle transition %s', async status => {
+    await mergeForumMetadataPatch({ query }, boardId, 'community:fixture', { reviewedBy: actor.id }, status);
+    expect(query.mock.calls[0][0]).toContain('status = $4');
+    expect(query.mock.calls[0][1]).toEqual([boardId, 'community:fixture', JSON.stringify({ reviewedBy: actor.id }), status]);
+  });
 });

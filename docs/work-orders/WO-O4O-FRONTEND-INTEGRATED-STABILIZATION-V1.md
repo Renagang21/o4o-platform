@@ -126,3 +126,13 @@ main #460 공급자 책임 분리·#455 점검 스크립트·#461 My Home 참여
 PR #458의 이전 HEAD 전체 CI는 통과했으나 리뷰에서 발견한 목록 밖 개별 철회를 보완했으므로 최종 HEAD의 required CI·자동 리뷰를 다시 수행한다. 이 절 시점의 push/main/배포는 완료로 표기하지 않으며 실제 결과를 후속 기록한다. 대표 홈 정본의 과거 화면 미적용 표기는 이미 main에서 #402 구현·배포 완료 상태로 정비되어 있어 중복 수정하지 않는다.
 
 실계정 사용자 테스트는 T13에서 운영자 공급자/내 매장 관리, Google/Kakao, My Home 실제 Study/Funding/커뮤니티/선택 매장 데이터와 서비스 이동, 약국 회원 홈, 공개 설정/철회를 확인한다. 이전 공간은 식별·보존 확인과 사용자 최종 테스트 전에 삭제하지 않는다. 현재 worktree는 같은 미완료 WO의 연속 phase이며 KEEP이다.
+
+## 7. 최종 공개 지정 출처·철회 보완 (PR #458 후속 P1)
+
+과거 신청자가 넣을 수 있었던 공개 예약 metadata를 신뢰하지 않도록 기존 서버 키의 HMAC 출처 검증을 추가했다. 운영자 저장 경로만 대상 커뮤니티/게시판/공개 범위를 서명하며 unsigned legacy·복사·변조 값은 private다. 새 secret/schema/migration/backfill 없이 기존 배포의 `JWT_SECRET`을 사용한다. 키 변경 시 재지정 원칙을 역할별 업무공간 정본에 반영했다.
+
+게시판 설명/삭제 요청·운영자 심사가 공개 철회 직전에 읽은 Entity의 오래된 유효 서명을 되살리지 않도록 허용 필드 partial update 및 현재 JSON의 lifecycle patch 원자 병합으로 변경했다. 공개 예약 키는 일반 병합에서 제외한다. 공통 controller/operator의 직접·간접 소비처를 CHECK에 보완했다.
+
+focused API 6 suites 109 tests PASS 및 격리 PostgreSQL 실제 소스 실행에서 출처 검증·타 scope/closed/draft/org 거부·공지 날짜 alias·게시판별 chooser·철회/stale proof replay 거부·기타 metadata 보존 PASS. 운영 DB 설정 저장·이력 삭제·법률 게시·새 migration은 실행하지 않았다. 최종 push·CI·review·main/배포는 후속 실제 결과로 기록하며 사용자 검증은 T13에 유지한다.
+
+후속 API build·변경 파일 ESLint PASS. 추가로 공통 controller의 raw-source 소비 계약을 포함하는 community catalog/access 31 tests PASS. 문서 민감정보 검사 3852 files 0건 및 diff whitespace 검사 PASS.
