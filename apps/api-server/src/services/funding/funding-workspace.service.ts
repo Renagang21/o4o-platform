@@ -62,7 +62,6 @@ export class FundingWorkspaceService {
       trial.statusHistory = [...fundingHistory(trial), this.event(trial, creator ? 'creator_progress' : 'operator_progress', actor, next)];
       trial.status = next;
       await m.getRepository(MarketTrial).save(trial);
-      if (next === TrialStatus.OUTCOME_CONFIRMING) await m.query(`UPDATE market_trial_participants SET "settlementStatus" = 'choice_pending' WHERE "marketTrialId" = $1 AND COALESCE("settlementStatus", 'pending') = 'pending'`, [id]);
       return trial;
     });
   }

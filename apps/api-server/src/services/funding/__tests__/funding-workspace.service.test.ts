@@ -81,13 +81,11 @@ describe('funding review and dedicated forum lifecycle', () => {
     await h.service.review(ID, REVIEWER, true);
     await expect(h.service.review(ID, REVIEWER, true)).rejects.toMatchObject({ status: 409 });
   });
-  it('enforces creator ownership and changes status plus existing participant choice state in one transaction', async () => {
+  it('enforces creator ownership and changes project progress without mutating participant financial records', async () => {
     const h = harness({ status: TrialStatus.DEVELOPMENT });
     await expect(h.service.changeStatus(ID, 'other', TrialStatus.OUTCOME_CONFIRMING, true)).rejects.toMatchObject({ status: 403 });
     await h.service.changeStatus(ID, CREATOR, TrialStatus.OUTCOME_CONFIRMING, true);
-    const cascade = h.queries.find(q => q.sql.startsWith('UPDATE market_trial_participants'));
-    expect(cascade?.args).toEqual([ID]);
-    expect(cascade?.sql).toContain("COALESCE(\"settlementStatus\", 'pending') = 'pending'");
+    expect(h.queries.some(q => /UPDATE market_trial_participants|settlementStatus|paymentStatus/.test(q.sql))).toBe(false);
     expect(h.read().statusHistory[0]).toMatchObject({ reason: 'creator_progress', to: 'outcome_confirming' });
     await expect(h.service.changeStatus(ID, CREATOR, TrialStatus.DEVELOPMENT, true)).rejects.toMatchObject({ status: 409 });
   });

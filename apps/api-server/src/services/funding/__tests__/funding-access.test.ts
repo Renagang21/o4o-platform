@@ -56,3 +56,17 @@ it('keeps historical user-owned funding eligible without assigning an arbitrary 
   expect(await isFundingCreator(ds, trial, 'actor')).toBe(true);
   expect(supplier).toHaveBeenCalledWith(ds, 'actor', null);
 });
+
+it.each(['creator', 'operator', 'participant'])('keeps proven closed legacy funding readable by %s without settlement or approval backfill', async role => {
+  trial.status = TrialStatus.CLOSED;
+  trial.statusHistory = [{ from: 'fulfilled', to: 'closed', at: '2026-10-11T00:00:00Z', reason: 'creator_progress', auto: false }];
+  if (role === 'creator') trial.supplierId = 'actor';
+  operator = role === 'operator';
+  participant = member = role === 'participant';
+  expect(await resolveFundingAccess(ds, ID, 'actor')).toMatchObject({ canRead: true, canWrite: false });
+});
+it('keeps ambiguous closed legacy funding unavailable even to a board member', async () => {
+  trial.status = TrialStatus.CLOSED; trial.statusHistory = [];
+  participant = member = true;
+  expect(await resolveFundingAccess(ds, ID, 'actor')).toMatchObject({ canRead: false, canWrite: false });
+});

@@ -21,14 +21,14 @@ export function fundingReview(trial: Pick<MarketTrial, 'statusHistory' | 'status
     forumPending: trial.status === TrialStatus.SUBMITTED && last?.reason === 'funding_approved',
   };
 }
-export function fundingWasApproved(trial: Pick<MarketTrial, 'statusHistory' | 'status'>): boolean {
-  return fundingReview(trial).reviewStatus === 'approved' || FUNDING_ACTIVE_STATUSES.includes(trial.status);
+export function fundingWasApproved(trial: Pick<MarketTrial, 'statusHistory' | 'status'> & Partial<Pick<MarketTrial, 'closeReason'>>): boolean {
+  return fundingReview(trial).reviewStatus === 'approved' || isFundingPublic(trial);
 }
 export function fundingOwnerContext(trial: Pick<MarketTrial, 'statusHistory'>) {
   return fundingHistory(trial).find(e => e.reason === 'funding_created');
 }
 
-export function isFundingPublic(trial: Pick<MarketTrial, 'status' | 'statusHistory' | 'closeReason'>): boolean {
+export function isFundingPublic(trial: Pick<MarketTrial, 'status' | 'statusHistory'> & Partial<Pick<MarketTrial, 'closeReason'>>): boolean {
   if (FUNDING_ACTIVE_STATUSES.includes(trial.status)) return true;
   return trial.status === TrialStatus.CLOSED && (trial.closeReason?.startsWith('auto_') === true || fundingHistory(trial).some(e => e.reason === 'funding_approved' || FUNDING_ACTIVE_STATUSES.includes(e.from as TrialStatus)));
 }
