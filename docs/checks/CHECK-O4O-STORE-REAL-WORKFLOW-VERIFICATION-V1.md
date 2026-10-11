@@ -73,6 +73,8 @@
 
 정리 범위의 한계: `asset-copy-core`의 `deleteById`는 snapshot 행만 삭제하며 편집 자료·게시 제어의 종속 정리를 하지 않는다. 기존 migration/entity에서도 해당 연결의 cascade를 확인하지 못했다. 불완전한 삭제로 orphan을 만들지 않고 새 검증 사본을 hidden으로 유지했다. 사본·편집 자료·게시 제어의 완전 정리는 미완료다. 검증 식별 정보는 작업 공간의 private 기록에만 보관하며 공개 문서에는 넣지 않는다. 상품은 표준 API 규칙에 따라 비활성 행으로 남는다.
 
+[검증 사본 정리 WO](../work-orders/WO-O4O-STORE-VERIFICATION-COPY-CLEANUP-V1.md)에서 이번 사본만 대상으로 하는 CLI와 운영 연결 제안을 준비한다. 일반 삭제 API/Core 수정과 기존 자료 일괄 삭제는 범위 밖이다. 실제 운영 정리 결과가 확인되기 전에는 위 완전 정리 TODO를 완료 처리하지 않는다.
+
 ## 상품 선택 경계 수정 후속
 
 [WO-O4O-STORE-PRODUCT-SELECTION-GUARD-V1](../work-orders/WO-O4O-STORE-PRODUCT-SELECTION-GUARD-V1.md)에서 자체 상품·취급 상품 어댑터의 명시 선택 일치 확인을 구현했다. 최종 로컬 관련 테스트 72개·API build·focused lint PASS. PR #442 main 통합과 필수 PR CI PASS를 확인했다. 위 운영 실패 기록은 당시 결과로 유지하며, 운영 해결 판정은 해당 수정의 배포 후 읽기 재현 결과로 확정한다.
