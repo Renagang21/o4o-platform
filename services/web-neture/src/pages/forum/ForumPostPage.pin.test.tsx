@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Link, MemoryRouter, Route, Routes } from 'react-router-dom';
-const mocks = vi.hoisted(() => ({ fetch: vi.fn(), pin: vi.fn(), comments: vi.fn() }));
-vi.mock('../../contexts', () => ({ useAuth: () => ({ user: { id: 'operator', roles: ['user'] }, isAuthenticated: true }), useLoginModal: () => ({ openLoginModal: vi.fn() }) }));
+const mocks = vi.hoisted(() => ({ fetch: vi.fn(), pin: vi.fn(), comments: vi.fn(), roles: ['user'] as string[] }));
+vi.mock('../../contexts', () => ({ useAuth: () => ({ user: { id: 'operator', roles: mocks.roles }, isAuthenticated: true }), useLoginModal: () => ({ openLoginModal: vi.fn() }) }));
 vi.mock('../../services/forumApi', async original => ({
   ...await original<typeof import('../../services/forumApi')>(),
   fetchForumPostBySlug: mocks.fetch, pinCommunityForumPost: mocks.pin, fetchForumComments: mocks.comments,
@@ -12,6 +12,7 @@ const post = { id: 'post-a', slug: 'notice', title: '참여자 안내', content:
 const mount = (canModerate = true, basePath = '/communities/fixture/forum') => render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Link to={`${basePath}/post/next`}>다른 글</Link><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate={canModerate} />} /></Routes></MemoryRouter>);
 beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', { configurable: true, value: () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }) });
+  mocks.roles = ['user'];
   mocks.fetch.mockReset(); mocks.pin.mockReset(); mocks.comments.mockReset();
   mocks.fetch.mockResolvedValue({ success: true, data: post }); mocks.comments.mockResolvedValue({ success: true, data: [] });
 });
@@ -55,4 +56,31 @@ it('공지 변경 중 다른 글로 이동하면 이전 응답을 새 글에 적
   fireEvent.click(screen.getByRole('link', { name: '다른 글' })); await screen.findByText('다음 안내');
   await act(async () => release());
   expect(screen.queryByText('공지로 고정했습니다.')).toBeNull(); expect(screen.getByText('다음 안내')).toBeTruthy();
+});
+
+
+it('funding notices use the explicit project pin adapter and closed projects expose no mutations', async () => {
+  const pin = vi.fn().mockResolvedValue(undefined);
+  const basePath = '/market-trial/project/forum';
+  const view = render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate pinPost={pin} />} /></Routes></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '공지로 고정' }));
+  await act(async () => {}); expect(pin).toHaveBeenCalledWith('post-a', true); expect(mocks.pin).not.toHaveBeenCalled();
+  view.unmount();
+  render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate readOnly pinPost={pin} />} /></Routes></MemoryRouter>);
+  await screen.findByText('참여자 안내'); expect(screen.queryByRole('button', { name: '공지로 고정' })).toBeNull(); expect(screen.queryByPlaceholderText('댓글을 입력하세요...')).toBeNull();
+});
+
+it.each(['neture:admin', 'platform:super_admin'])('uses explicit funding moderation instead of client role %s for another author', async role => {
+  mocks.roles = [role];
+  mount(false, '/market-trial/project/forum');
+  await screen.findByText('참여자 안내');
+  expect(screen.queryByRole('button', { name: '수정', exact: true })).toBeNull();
+  expect(screen.queryByRole('button', { name: '삭제', exact: true })).toBeNull();
+});
+it('preserves existing Neture forum admin controls', async () => {
+  mocks.roles = ['neture:admin'];
+  mount(false, '/forum');
+  await screen.findByText('참여자 안내');
+  expect(screen.getByRole('button', { name: '수정', exact: true })).toBeTruthy();
+  expect(screen.getByRole('button', { name: '삭제', exact: true })).toBeTruthy();
 });

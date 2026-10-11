@@ -53,7 +53,7 @@ describe('funding 호스트', () => {
     expect(decideHost('funding', loc('/market-trial/my')).kind).toBe('stay');
     expect(decideHost('funding', loc('/supplier/market-trial/3'))).toEqual({
       kind: 'external',
-      href: 'https://neture.co.kr/supplier/market-trial/3',
+      href: 'https://funding.neture.co.kr/market-trial/manage/3',
     });
   });
 });
@@ -154,4 +154,10 @@ it.each(['supplier', 'funding', 'community'] as const)('%s member list/detail re
     expect(decideHost(profile, { pathname, search: '', hash: '' })).toEqual({ kind: 'stay' });
     expect(decideHost('main', { pathname, search: '?page=2', hash: '' })).toEqual({ kind: 'external', href: `https://${profile}.neture.co.kr${pathname}?page=2` });
   }
+});
+
+
+it.each(['main', 'supplier', 'funding', 'community'] as const)('%s preserves old creator URLs and routes directly to funding', profile => {
+  expect(decideHost(profile, loc('/supplier/market-trial/new', '?from=nav', '#form'))).toEqual({ kind: 'external', href: 'https://funding.neture.co.kr/market-trial/manage/new?from=nav#form' });
+  if (profile === 'funding') for (const path of ['/market-trial/manage/new', '/market-trial/manage/project/edit', '/market-trial/project/forum/write']) expect(decideHost(profile, loc(path))).toEqual({ kind: 'stay' });
 });

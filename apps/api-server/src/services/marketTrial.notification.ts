@@ -74,7 +74,7 @@ async function safeCreate(payload: MarketTrialNotificationPayload): Promise<Noti
 }
 
 function supplierDeepLink(trialId: string): string {
-  return `/supplier/market-trial/${trialId}`;
+  return `/market-trial/manage/${trialId}`;
 }
 
 function publicDeepLink(trialId: string): string {

@@ -1,5 +1,6 @@
 import { DataSource, type QueryRunner } from 'typeorm';
 import { SupplierUnifiedOrderService } from '../supplier-unified-order.service.js';
+import { SupplierCopilotService } from '../supplier-copilot.service.js';
 
 // Explicit disposable loopback DB only. Never load application .env or production credentials.
 const port = Number(process.env.O4O_SUPPLIER_ORDER_TEST_PORT);
@@ -10,7 +11,7 @@ const offerId = '20000000-0000-0000-0000-000000000001';
 const otherSupplierId = '10000000-0000-0000-0000-000000000002';
 const id = (n: number) => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
 
-integration('supplier unified orders (isolated PostgreSQL)', () => {
+integration('supplier order and product reads (isolated PostgreSQL)', () => {
   let ds: DataSource;
   let q: QueryRunner;
   let service: SupplierUnifiedOrderService;
@@ -26,7 +27,8 @@ integration('supplier unified orders (isolated PostgreSQL)', () => {
     // All fixtures and DDL are rolled back. This is a dedicated empty database.
     await q.query(`
       CREATE SCHEMA neture;
-      CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY, supplier_id uuid);
+      CREATE TABLE product_masters(id uuid PRIMARY KEY, name text);
+      CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY, supplier_id uuid, master_id uuid);
       CREATE TABLE neture_orders(id uuid PRIMARY KEY, order_number text, status text,
         total_amount numeric, shipping_fee numeric, final_amount numeric, orderer_name text,
         created_at timestamptz, updated_at timestamptz, service_key text, metadata jsonb);
@@ -37,9 +39,9 @@ integration('supplier unified orders (isolated PostgreSQL)', () => {
       CREATE TABLE checkout_orders(id uuid PRIMARY KEY, "orderNumber" text, metadata jsonb,
         status text, "paymentStatus" text, subtotal numeric, "shippingFee" numeric,
         "totalAmount" numeric, items jsonb, "buyerId" uuid, "sellerOrganizationId" uuid,
-        "createdAt" timestamptz, "updatedAt" timestamptz, "supplierId" uuid);
+        "createdAt" timestamptz, "updatedAt" timestamptz, "supplierId" varchar(100));
     `);
-    await q.query('INSERT INTO supplier_product_offers VALUES ($1,$2)', [offerId, supplierId]);
+    await q.query('INSERT INTO supplier_product_offers(id,supplier_id) VALUES ($1,$2)', [offerId, supplierId]);
     service = new SupplierUnifiedOrderService({ query: (sql: string, params: unknown[]) => q.query(sql, params) } as unknown as DataSource);
   });
   afterEach(async () => {
@@ -86,7 +88,7 @@ integration('supplier unified orders (isolated PostgreSQL)', () => {
     await checkout(105, 'paid', otherSupplierId);
     await checkout(106, 'paid', supplierId, 'excluded-service');
     // A Neture order whose item belongs to a different supplier must not leak either.
-    await q.query('INSERT INTO supplier_product_offers VALUES ($1,$2)', [id(900), otherSupplierId]);
+    await q.query('INSERT INTO supplier_product_offers(id,supplier_id) VALUES ($1,$2)', [id(900), otherSupplierId]);
     await q.query(`INSERT INTO neture_orders SELECT $1,order_number,status,total_amount,shipping_fee,
       final_amount,orderer_name,created_at,updated_at,'neture','{}'::jsonb FROM neture_orders WHERE id=$2`, [id(901),id(1)]);
     await q.query(`INSERT INTO neture.neture_order_items VALUES ($1,$2,'Other fixture item',1,12.5,12.5)`, [id(901),id(900)]);
@@ -131,4 +133,61 @@ integration('supplier unified orders (isolated PostgreSQL)', () => {
     expect((await service.listUnifiedOrders(supplierId, { page: 1, limit: 20, source: 'neture' })).meta.total).toBe(1);
     await expect(service.listUnifiedOrders(supplierId, { page: 1, limit: 20 })).rejects.toThrow();
   });
+
+  it('uses the entity/migration supplier identifier types in the fixture', async () => {
+    const types = await q.query(`SELECT table_name, data_type, character_maximum_length
+      FROM information_schema.columns WHERE table_schema='public'
+      AND ((table_name='checkout_orders' AND column_name='supplierId')
+        OR (table_name='supplier_product_offers' AND column_name='supplier_id'))
+      ORDER BY table_name`);
+    expect(types).toEqual([
+      { table_name: 'checkout_orders', data_type: 'character varying', character_maximum_length: 100 },
+      { table_name: 'supplier_product_offers', data_type: 'uuid', character_maximum_length: null },
+    ]);
+  });
+
+  const productReads = () => new SupplierCopilotService({
+    query: (sql: string, params: unknown[]) => q.query(sql, params),
+  } as unknown as DataSource);
+
+  it.each(['getProductPerformance', 'getTrendingProducts'] as const)(
+    '%s returns a successful empty result with mixed identifier types', async (method) => {
+      expect(await productReads()[method](supplierId)).toEqual([]);
+    });
+
+  async function productMetricsFixture() {
+    const masterId = id(950);
+    await q.query('INSERT INTO product_masters VALUES ($1,$2)', [masterId, 'Fixture product']);
+    await q.query('UPDATE supplier_product_offers SET master_id=$1 WHERE id=$2', [masterId, offerId]);
+    // The foreign order deliberately references our offer: order owner must still exclude it.
+    for (const [n, owner, payment, status, days, amount] of [
+      [201, supplierId, 'paid', 'created', 2, 20],
+      [202, supplierId, 'paid', 'created', 3, 30],
+      [203, supplierId, 'paid', 'created', 10, 10],
+      [204, otherSupplierId, 'paid', 'created', 2, 900],
+      [205, supplierId, 'pending', 'created', 2, 900],
+      [206, supplierId, 'paid', 'cancelled', 2, 900],
+      [207, supplierId, 'paid', 'refunded', 2, 900],
+    ] as const) {
+      await q.query(`INSERT INTO checkout_orders(id, "supplierId", "paymentStatus", status, items, "createdAt")
+        VALUES ($1,$2,$3,$4,$5::jsonb,CURRENT_DATE - $6::int * INTERVAL '1 day')`,
+      [id(n), owner, payment, status, JSON.stringify([{ productId: offerId, subtotal: amount }]), days]);
+    }
+    return masterId;
+  }
+
+  it('product performance excludes foreign, unpaid, cancelled and refunded orders', async () => {
+    const masterId = await productMetricsFixture();
+    expect(await productReads().getProductPerformance(supplierId)).toEqual([
+      { productId: masterId, productName: 'Fixture product', orders: 3, revenue: 60, qrScans: 0 },
+    ]);
+  });
+
+  it('product trends preserve period counts and exclude foreign or ineligible orders', async () => {
+    await productMetricsFixture();
+    expect(await productReads().getTrendingProducts(supplierId)).toEqual([
+      { productName: 'Fixture product', currentOrders: 2, previousOrders: 1, growthRate: 100 },
+    ]);
+  });
+
 });

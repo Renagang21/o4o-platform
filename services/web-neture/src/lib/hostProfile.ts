@@ -107,6 +107,12 @@ export function decideHost(
   const { pathname, search, hash } = location;
   const suffix = `${pathname}${search}${hash}`;
 
+  // Funding work has one host; old supplier URLs are narrow aliases.
+  if (matchesPrefix(pathname, '/supplier/market-trial')) {
+    const tail = pathname.slice('/supplier/market-trial'.length);
+    return { kind: 'external', href: `${HOST_ORIGIN.funding}/market-trial/manage${tail}${search}${hash}` };
+  }
+
   // Preserve old forum addresses while the community owns the actual workspace.
   const generalBase = '/communities/o4o-general/forum';
   let forumPath: string | null = null;

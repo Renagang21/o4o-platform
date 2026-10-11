@@ -9,8 +9,6 @@
  */
 
 import { Router } from 'express';
-import { Response } from 'express';
-import { AuthRequest } from '../types/auth.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { requireFundingScope } from '../middleware/funding-service-scope.middleware.js';
@@ -32,6 +30,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.use(apiLimiter as any);
   router.use(requireAuth as any);
   router.use(requireFundingScope('funding:operator') as any);
+  router.use(MarketTrialOperatorController.requireCurrentOperator);
 
   router.get('/', MarketTrialOperatorController.listAll);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: aggregate KPI (literal path — must precede /:id)
@@ -39,85 +38,6 @@ export function createNetureOperatorTrialRoutes(): Router {
   // WO-MONITOR-1: 포럼 연계 실패 조회/resolve (리터럴 경로 — /:id 보다 앞에 위치)
   router.get('/forum-sync-failures', MarketTrialOperatorController.listForumSyncFailures);
   router.patch('/forum-sync-failures/:failureId/resolve', MarketTrialOperatorController.resolveForumSyncFailure);
-  // WO-MARKET-TRIAL-PRODUCT-LINK-SEARCH-UI-V1: 상품 검색 (전환 모달용)
-  router.get('/products/search', async (req: AuthRequest, res: Response) => {
-    try {
-      const ds = (MarketTrialOperatorController as any).dataSource;
-      if (!ds) return res.status(500).json({ success: false, message: 'DataSource not initialized' });
-
-      const keyword = (req.query.keyword as string)?.trim() || '';
-      const supplierUserId = req.query.supplierUserId as string | undefined;
-      const page = Math.max(1, Number(req.query.page) || 1);
-      const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 20));
-      const offset = (page - 1) * limit;
-
-      const conditions: string[] = ['spo.deleted_at IS NULL'];
-      const params: unknown[] = [];
-      let idx = 1;
-
-      if (keyword) {
-        conditions.push(`(COALESCE(pm.name, pm.regulatory_name, '') ILIKE $${idx})`);
-        params.push(`%${keyword}%`);
-        idx++;
-      }
-      if (supplierUserId) {
-        // WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 운영자 필터도 canonical 관계
-        //   (organization_members owner) 로 공급자를 찾는다. legacy user_id 는 owner 가 없는 공급자에 한해 유지.
-        conditions.push(`(ns.organization_id IN (
-            SELECT om.organization_id FROM organization_members om
-             WHERE om.user_id = $${idx} AND om.left_at IS NULL AND om.role = 'owner')
-          OR (ns.user_id = $${idx} AND NOT EXISTS (
-            SELECT 1 FROM organization_members om2
-             WHERE om2.organization_id = ns.organization_id AND om2.left_at IS NULL AND om2.role = 'owner')))`);
-        params.push(supplierUserId);
-        idx++;
-      }
-
-      const where = conditions.join(' AND ');
-
-      const [countRows, rows]: [Array<{ total: number }>, Array<{
-        id: string; name: string; supplierName: string;
-        categoryName: string; regulatoryType: string; isActive: boolean; createdAt: string;
-      }>] = await Promise.all([
-        ds.query(
-          `SELECT COUNT(*)::int AS total
-           FROM supplier_product_offers spo
-           JOIN product_masters pm ON pm.id = spo.master_id
-           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-           WHERE ${where}`,
-          params,
-        ),
-        ds.query(
-          `SELECT
-             spo.id,
-             COALESCE(pm.name, pm.regulatory_name, '') AS name,
-             COALESCE(o.name, '') AS "supplierName",
-             COALESCE(pc.name, '') AS "categoryName",
-             COALESCE(pm.regulatory_type, '') AS "regulatoryType",
-             spo.is_active AS "isActive",
-             spo.created_at AS "createdAt"
-           FROM supplier_product_offers spo
-           JOIN product_masters pm ON pm.id = spo.master_id
-           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-           LEFT JOIN organizations o ON o.id = ns.organization_id
-           LEFT JOIN product_categories pc ON pc.id = pm.category_id
-           WHERE ${where}
-           ORDER BY spo.created_at DESC
-           LIMIT $${idx} OFFSET $${idx + 1}`,
-          [...params, limit, offset],
-        ),
-      ]);
-
-      res.json({
-        success: true,
-        data: rows,
-        meta: { total: countRows[0]?.total ?? 0, page, limit },
-      });
-    } catch (error) {
-      console.error('Product search error:', error);
-      res.status(500).json({ success: false, message: 'Failed to search products' });
-    }
-  });
   router.get('/:id', MarketTrialOperatorController.getDetail);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1: per-trial KPI
   router.get('/:id/kpi', MarketTrialOperatorController.getTrialKpi);
