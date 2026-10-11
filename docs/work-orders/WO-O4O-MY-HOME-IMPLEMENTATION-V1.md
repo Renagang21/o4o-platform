@@ -43,6 +43,10 @@
 
 이번 Phase의 실제 검증·통합·배포 결과는 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)의 연속 Phase 절에서 확인한다. 이전 PR #449의 결과를 이번 변경의 검증으로 대체하지 않는다.
 
+연속 Phase는 PR #461로 main에 병합했다. PR의 최종 HEAD와 merge SHA `43fbe5bf7d2ad66b817317de2d3c90585694bfe5`의 main CI, 보안·품질 검사가 통과했다. main에 문서 변경만 추가되어 기존 Delivery는 `SUPERSEDED`가 되었고, 소스 차이 0·최신 CI PASS·migration 변경 0을 확인한 뒤 `65d55ca7ba12672f6f4e3e1f47e965a848c607c9`로 정상 Promote를 실행했다. API·Admin·Neture·Pharmacy/KPA·Study·Store의 배포와 최종 서빙 Report가 성공했으며 production status는 `DEPLOYED`다.
+
+Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과했다. 배포 후 실제 HTTPS HTML/JS의 새 기능 포함·공개 페이지 6개/API ready 200·개인 API 비로그인 401을 확인했고, 운영 번들로 1440/375/320px fixture 18개도 통과했다. Chromium의 직접 운영 HTTPS 접속은 클라우드 인증서 신뢰 오류가 남아, TLS 검증을 유지한 curl로 운영 자원을 받아 로컬 origin에서 브라우저 검증을 수행했다. 실제 계정·업무 데이터는 사용하지 않았다. 지정 계정 문서 미확보로 인증 운영 smoke는 계속 남아 있으며 WO/worktree를 보존한다.
+
 ## 검증과 남은 단계
 
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
