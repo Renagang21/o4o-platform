@@ -210,3 +210,11 @@ CI `38136277948`은 기존 배포 gate 테스트 두 곳이 과거 concurrency �
 ### 최종 범위 정리 — PR #475 P2 대응
 
 공통 `queue: max`가 오래된 자동 Delivery를 누적시켜 최신 배포를 지연시키는 P2 지적을 수용했다. 전체 서비스의 concurrency/caller 변경과 이에 종속된 테스트 변경을 철회하고 기존 main의 배포 coalescing/child group 동작을 보존한다. 앞선 공통 잠금 설계와 26/110 테스트 기록은 당시 검증 이력이며 최종 구현이 아니다. 최종 구현은 불완전 Actions inventory의 제한된 전체-sweep 재조회, writer/metadata 오류 우선 차단, 해당 자원 테스트의 required CI 연결과 비동기 옵션 대기 수정이다. 실제 PH 삭제 창은 승인·적용된 외부 WIF 인증 차단 및 병합 후 단일 main SHA/PH workflow 제한으로 격리한다. status 조회만으로 원자적 잠금을 구현했다고 주장하지 않는다. 새 P1/P2는 이 외부 제한과 범위 축소로 대응하며, 제한 적용·새 plan 성공 전 apply는 금지한다.
+
+## 잔여 활성 경로 0건 대응 — 2026-10-11
+
+PR #475는 main a3462a0256에 병합됐고 main 후속 CI 38142397450 SUCCESS를 확인했다. 이후 main ec7a21d59d로 이동해 사용자가 WIF의 root/called workflow SHA 제한을 동일 SHA로 갱신했다. 해당 main CI 38144099865도 SUCCESS다. PH workflow 및 삭제 스크립트는 그 사이 변경되지 않았다.
+
+읽기 전용 resource plan [38144701943](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943)은 인증/DB 조회에 성공했지만 삭제 검증 단계에서 실패했다. private probe 수집의 요약은 네 종류 모두 false, foundFamilies=0이다. 실데이터가 없는 상황에서도 기존 parseProbes가 QR/tablet 두 종류를 필수 요구해 중단했다. 추가 read-only census [38144858219](https://github.com/Renagang21/o4o-platform/actions/runs/38144858219)은 SUCCESS이며 실제 삭제는 제출하지 않았다.
+
+동일 WO 연속 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-resource-empty-probes에서 보강한다. 자원 폐기 entrypoint만 active-family 필수를 해제한다. 일반 QR cutover는 기존 strict 기본값을 유지한다. 남아 있는 공개 경로는 동일 검증하고, 없을 때는 독립적인 12개 전체 호스트/경로/query/스킴 리다이렉트 검사와 자원 참조/권한/시간/동시 writer 차단을 모두 유지한다. 결과의 activeFamiliesVerified가 0이면 실제 데이터 검증 성공으로 보고하지 않는다. 빈 경로/단일 잔여 family/잘못된 URL·중복 경로 차단 회귀를 포함해 focused tests 53 PASS. CI·리뷰·병합 후 새 main SHA로 WIF를 제한해 plan → 잔여 Cloud Run 제거 → 재검증 → 원래 인증 조건 복구 순으로 진행한다. Cloud Run 및 PH-only DB 정리는 아직 미완료다.

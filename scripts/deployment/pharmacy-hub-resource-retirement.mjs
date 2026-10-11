@@ -192,7 +192,9 @@ export async function retireResources({ mode, read, permissions, verify, remove,
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const paths = parseProbes(process.env.QR_PROBE_PATHS || await readFile(process.env.PROBE_OUTPUT, 'utf8'));
+    // Retirement may have no active PH data. Keep all route validation and the
+    // independent twelve host redirect checks; verify any paths that still exist.
+    const paths = parseProbes(process.env.QR_PROBE_PATHS || await readFile(process.env.PROBE_OUTPUT, 'utf8'), { requireActiveFamilies: false });
     const result = await retireResources({
       mode: process.env.CUTOVER_MODE ?? 'plan', permissions: readPermissions,
       read: async () => inspectResources(readCloud(), await collectHttpInventory()),
@@ -215,7 +217,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         run([...args, `--project=${project}`, '--quiet'], 90000);
       },
     });
-    console.log(JSON.stringify(result));
+    console.log(JSON.stringify({ ...result, activeFamiliesVerified: paths.length }));
   } catch (error) {
     // Helpers only emit fixed diagnostics and allowlisted permission/resource names.
     console.error(error instanceof ResourceDiagnosticError ? error.message : 'PH resource retirement failed; check read-only inventory and public QR/tablet readiness.');
