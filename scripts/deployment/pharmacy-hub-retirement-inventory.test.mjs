@@ -125,3 +125,20 @@ test('Event Offer is an exact retired namespace and malformed Location retains H
   assert.equal(result.checks[0].error,undefined);
   assert.equal(JSON.stringify(result).includes('invalid-private'),false);
 });
+
+
+test('service namespace discovery includes handoff source/target and seller service IDs',async()=>{
+  const columns=[
+    {table_name:'handoff_tokens',column_name:'source_service_key',data_type:'text',udt_name:'text'},
+    {table_name:'handoff_tokens',column_name:'target_service_key',data_type:'text',udt_name:'text'},
+    {table_name:'seller_recruitments',column_name:'service_id',data_type:'character varying',udt_name:'varchar'},
+  ];
+  const client={query:async(sql,args)=>{
+    if(sql.includes('information_schema.columns'))return {rows:columns};
+    if(sql.includes('count(*)')){assert.deepEqual(args,[retiredKeys]);return {rows:[{count:'1'}]};}
+    if(sql.includes('pg_constraint')){assert.deepEqual(args,[['handoff_tokens','seller_recruitments']]);return {rows:[]};}
+    return {rows:[]};
+  }};
+  const result=await collectRetirementInventory(client);
+  assert.deepEqual(result.scopeCounts.map(c=>c.column),columns.map(c=>c.column_name));
+});

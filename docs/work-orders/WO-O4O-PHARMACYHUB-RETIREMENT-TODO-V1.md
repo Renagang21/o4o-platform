@@ -96,3 +96,5 @@ PR #438 리뷰 대응: `checkout_orders.metadata.serviceKey/source` 등 JSON/JSO
 PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sourceService/sourceModule/serviceKeys/scopeKey도 안전한 식별자 quoting과 함께 집계한다. cms_contents.serviceKey의 PH 건수/FK 포함 회귀를 추가했다. SonarCloud 지적의 finally 내부 throw를 제거하고 원래 query 오류를 보존하는 rollback 처리로 정리했다. HTTPS/DNS 진단은 독립 요청을 bounded timeout으로 병렬 조회하고 진단 helper를 분리했다. 관련 focused tests 42개가 통과했다. 이 환경의 직접 DNS는 권한 요청 후에도 ECONNREFUSED이므로 실제 DNS/HTTPS 판정은 Actions census 결과를 따른다.
 
 추가 census 범위/진단 리뷰: 등록된 pharmacy-hub-event-offer 키도 정확한 PH namespace 집계에 포함한다. 잘못된 Location은 별도 파싱 실패로 처리해 HTTP status와 Location 존재 여부를 보존하며 네트워크 장애로 오진하거나 원문 Location을 출력하지 않는다.
+
+서비스 범위 컬럼 전수 대조: 명시적 scope 목록 외에도 schema의 모든 호환 text/text-array service 명칭 컬럼을 후보 집계한다. handoff_tokens.source_service_key/target_service_key와 seller_recruitments.service_id의 PH 건수/FK 포함 회귀를 추가했다. UUID service_id가 PH 문자열과 일치하지 않는 경우의 실제 귀속은 FK 관계로 별도 조사하며 이 후보 census로 삭제를 승인하지 않는다.

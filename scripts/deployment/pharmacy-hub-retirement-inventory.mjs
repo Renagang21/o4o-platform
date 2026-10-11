@@ -45,7 +45,7 @@ export async function collectRetirementInventory(client) {
       dedicatedTables.push({ table, count: rows[0].count, columns: columns.filter(c => c.table_name === table).map(c => ({ name: c.column_name, type: c.data_type })) });
     }
     const scopeCounts = [];
-    for (const c of columns.filter(c => scopes.has(c.column_name) && (['text','character varying','character','USER-DEFINED'].includes(c.data_type) || ['_text','_varchar'].includes(c.udt_name)))) {
+    for (const c of columns.filter(c => (scopes.has(c.column_name) || /service/i.test(c.column_name)) && (['text','character varying','character','USER-DEFINED'].includes(c.data_type) || ['_text','_varchar'].includes(c.udt_name)))) {
       const { rows } = await client.query(countQuery(c.table_name,c.column_name,['_text','_varchar'].includes(c.udt_name)), [retiredKeys]);
       if (rows[0].count !== '0') scopeCounts.push({ table:c.table_name, column:c.column_name, count:rows[0].count });
     }
