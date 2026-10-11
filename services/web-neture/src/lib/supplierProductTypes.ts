@@ -115,7 +115,7 @@ export const SUPPLIER_OFFER_ACTION_META: Record<SupplierOfferAction, { label: st
   // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 제품 행에서 모집 생성 modal (path 없이 ready, 모달로 처리)
   recruit: { label: '판매자 모집 연결', ready: true },
   event: { label: '이벤트 오퍼 연결', path: '/supplier/event-offers', ready: true },
-  funding: { label: '유통참여형 펀딩 연결', path: '/supplier/market-trial/new', ready: true },
+  funding: { label: '펀딩 서비스에서 개설', path: '/market-trial/manage/new', ready: true },
 };
 
 /**
@@ -143,7 +143,7 @@ export function getAllowedOfferActions(
   const regulatoryType = typeof arg === 'object' && arg !== null ? arg.regulatoryType : arg;
   const reg = (regulatoryType || '').trim().toUpperCase();
   if (reg === 'DRUG') return { restricted: true, actions: [] };
-  return { restricted: false, actions: ['supply', 'recruit', 'event', 'funding'] };
+  return { restricted: false, actions: ['supply', 'recruit', 'event'] };
 }
 
 /* ------------------------------------------------------------------ */
@@ -259,6 +259,7 @@ export interface OfferActionProductContext {
 export function buildOfferActionUrl(action: SupplierOfferAction, product: OfferActionProductContext): string | null {
   const meta = SUPPLIER_OFFER_ACTION_META[action];
   if (!meta.ready || !meta.path) return null;
+  if (action === 'funding') return meta.path;
   const p = new URLSearchParams();
   p.set('supplierProductId', product.id);
   if (product.masterId) p.set('masterId', product.masterId);

@@ -44,7 +44,7 @@ export interface Trial {
   id: string;
   title: string;
   // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1 / DISPLAY-V2:
-  // 공급자가 등록 상품 기준으로 개설한 펀딩의 soft 참조. 없으면 둘 다 null.
+  // 참고한 등록 제품의 optional legacy reference. 주문·가격·개설 조건이 아니다.
   productId?: string | null;
   product?: TrialProductRef | null;
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
@@ -57,6 +57,9 @@ export interface Trial {
   supplierId: string;
   supplierName?: string;
   status: TrialStatus;
+  reviewStatus?: string;
+  reviewReason?: string | null;
+  forumPending?: boolean;
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
     description: string;
@@ -89,8 +92,10 @@ export interface Trial {
 }
 
 export interface OperatorTrial extends Trial {
+  forumReady?: boolean;
   forumLink?: {
-    forumPostId: string;
+    forumPostId?: string;
+    forumId?: string;
     slug: string | null;
     url: string;
   } | null;
@@ -209,6 +214,7 @@ export interface TrialResultsSummary {
 }
 
 export interface TrialResults {
+  forum?: { id: string; slug: string } | null;
   trial: Trial;
   summary: TrialResultsSummary;
   forumPostId: string | null;
@@ -337,7 +343,7 @@ export async function saveSettlementChoice(
 // ============================================================================
 
 export async function createTrial(payload: CreateTrialPayload): Promise<Trial> {
-  const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload);
+  const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload, fundingOrganizationConfig());
   return data.data || data;
 }
 
@@ -353,7 +359,7 @@ export async function submitTrial(trialId: string): Promise<Trial> {
 }
 
 export async function getMyTrials(): Promise<Trial[]> {
-  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my`);
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my`, fundingOrganizationConfig());
   return data.data || data;
 }
 
@@ -641,7 +647,7 @@ export async function resolveForumSyncFailure(
  */
 export async function retryTrialForumSync(
   trialId: string,
-): Promise<{ status: 'created' | 'already_linked'; forumPostId: string }> {
+): Promise<{ status: 'created' | 'already_linked'; forumId: string }> {
   const { data } = await api.post(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/forum-sync/retry`,
   );
@@ -709,4 +715,28 @@ export async function getOperatorTrialKpi(trialId: string): Promise<MarketTrialD
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/kpi`,
   );
   return data.data || data;
+}
+
+const FUNDING_ORGANIZATION_KEY = 'funding_supplier_org';
+export function selectFundingOrganization(id: string) { if (id) window.sessionStorage.setItem(FUNDING_ORGANIZATION_KEY, id); else window.sessionStorage.removeItem(FUNDING_ORGANIZATION_KEY); }
+function fundingOrganizationConfig() {
+  const id = typeof window === 'undefined' ? null : window.sessionStorage.getItem(FUNDING_ORGANIZATION_KEY);
+  return id ? { headers: { 'x-organization-id': id } } : {};
+}
+export async function getFundingCreatorEligibility() {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/creator-eligibility`, fundingOrganizationConfig());
+  return data.data;
+}
+export async function changeFundingCreatorStatus(id: string, status: TrialStatus) {
+  const { data } = await api.patch(`${API_BASE_URL}/api/market-trial/${id}/creator-status`, { status });
+  return data.data;
+}
+export async function getFundingCreatorParticipants(id: string): Promise<{ id: string; name: string; paymentStatus: string }[]> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/creator-participants`);
+  return data.data;
+}
+export interface FundingForumAccess { forum: { id: string; slug: string } | null; canRead: boolean; canWrite: boolean; canManage: boolean; canModerate: boolean; member: boolean; participant: boolean; }
+export async function getFundingForumAccess(id: string): Promise<FundingForumAccess> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/forum-access`);
+  return data.data;
 }

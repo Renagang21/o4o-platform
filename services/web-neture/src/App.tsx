@@ -125,6 +125,8 @@ import MyCommunityOperatorPage from './pages/mypage/MyCommunityOperatorPage';
 import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
+import { FundingCreatorLayout } from './pages/funding/FundingCreatorLayout';
+import { FundingForumLayout, FundingForumList, FundingForumPost, FundingForumWrite, FundingForumMembers } from './pages/funding/FundingForumSpace';
 import ForumHubPage from './pages/forum/ForumHubPage';
 // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
 import ForumMyPostsPage from './pages/forum/MyPostsPage';
@@ -151,17 +153,17 @@ const MyHandledProductsPage = lazy(() =>
 );
 
 // Supplier Market Trial (WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1)
-const SupplierTrialCreatePage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialCreatePage }))
+const FundingCreatePage = lazy(() =>
+  import('./pages/funding').then((m) => ({ default: m.FundingCreatePage }))
 );
-const SupplierTrialListPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialListPage }))
+const FundingListPage = lazy(() =>
+  import('./pages/funding').then((m) => ({ default: m.FundingListPage }))
 );
-const SupplierTrialDetailPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialDetailPage }))
+const FundingDetailPage = lazy(() =>
+  import('./pages/funding').then((m) => ({ default: m.FundingDetailPage }))
 );
-const SupplierTrialEditPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialEditPage }))
+const FundingEditPage = lazy(() =>
+  import('./pages/funding').then((m) => ({ default: m.FundingEditPage }))
 );
 
 // Participant Market Trial (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1)
@@ -765,6 +767,18 @@ function App() {
               <Route path="/resources" element={<NetureResourcesPage />} />
 
               {/* Market Trial Participant (WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1) */}
+              <Route path="/market-trial/manage" element={<FundingCreatorLayout />}>
+                <Route index element={<FundingListPage />} />
+                <Route path="new" element={<FundingCreatePage />} />
+                <Route path=":id" element={<FundingDetailPage />} />
+                <Route path=":id/edit" element={<FundingEditPage />} />
+              </Route>
+              <Route path="/market-trial/:id/forum" element={<FundingForumLayout />}>
+                <Route index element={<FundingForumList />} />
+                <Route path="post/:slug" element={<FundingForumPost />} />
+                <Route path="write" element={<FundingForumWrite />} />
+                <Route path="members" element={<FundingForumMembers />} />
+              </Route>
               <Route path="/market-trial" element={<MarketTrialHubPage />} />
               <Route path="/market-trial/my" element={<MyParticipationsPage />} />
               <Route path="/market-trial/:id" element={<MarketTrialDetailPage />} />
@@ -880,10 +894,6 @@ function App() {
               <Route path="/supplier/supply-proposals" element={<SupplierSupplyProposalsPage />} />
               <Route path="/supplier/semi-franchise-events" element={<SupplierSemiFranchiseEventsPage />} />
               <Route path="/supplier/semi-franchise-recruitments" element={<SupplierSemiFranchiseRecruitmentsPage />} />
-              <Route path="/supplier/market-trial" element={<SupplierTrialListPage />} />
-              <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
-              <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
-              <Route path="/supplier/market-trial/:id/edit" element={<SupplierTrialEditPage />} />
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /supplier/signage/manage 제거 (Neture signage 미대상) */}
               {/* WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1:
                   공급자 소유 사이니지(canonical 아님) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감. */}
