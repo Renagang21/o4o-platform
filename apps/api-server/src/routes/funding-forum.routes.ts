@@ -20,6 +20,8 @@ export function createFundingForumRoutes(): Router {
       const category = /^\/categories\/([^/]+)/.exec(req.path)?.[1];
       if (category && !['mine', 'popular'].includes(category) && category !== access.forum.id) { res.status(404).json({ success: false, message: '포럼을 찾을 수 없습니다.' }); return; }
       const isMembershipAction = /^\/categories\/[^/]+\/(join-requests|membership-status)(?:\/|$)/.test(req.path);
+      const isMemberManagementRead = req.method === 'GET' && /^\/categories\/[^/]+\/(members|join-requests)$/.test(req.path);
+      if (isMemberManagementRead && !access.creator) { res.status(403).json({ success: false, message: '현재 개설자만 포럼 회원 명단을 조회할 수 있습니다.' }); return; }
       if (!access.canRead && !isMembershipAction) { res.status(403).json({ success: false, message: '포럼 이용 승인이 필요합니다.' }); return; }
       if (!['GET', 'HEAD'].includes(req.method) && !access.canWrite && !isMembershipAction) { res.status(403).json({ success: false, message: '종료된 펀딩은 읽기 전용입니다.' }); return; }
       // Membership operations never reopen a closed project.

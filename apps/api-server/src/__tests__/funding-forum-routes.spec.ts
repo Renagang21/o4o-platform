@@ -52,3 +52,8 @@ it('fails closed after account/role revocation and for unrelated users', async (
   await request(app).get(path('/posts')).expect(403);
   await request(app).post(path(`/categories/${BOARD}/join-requests`)).expect(403);
 });
+
+it.each(['members', 'join-requests'])('does not reuse a retained forum owner row to read %s after creator qualification is lost', async section => {
+  // Can read as a participant; the old board owner row is not creator authority.
+  await request(app).get(path(`/categories/${BOARD}/${section}`)).expect(403);
+});
