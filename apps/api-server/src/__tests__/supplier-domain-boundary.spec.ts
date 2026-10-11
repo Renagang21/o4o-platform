@@ -118,7 +118,14 @@ describe('§2 Products — ProductMaster 는 플랫폼 SSOT', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§3 Distribution — distribution_type 은 파생 표기다', () => {
-  const offer = stripComments(read(OFFER_SVC));
+  const offer = [
+    OFFER_SVC,
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-write.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-distribution.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'offer-lifecycle.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'offer-write-policy.ts'),
+  ].map((rel) => stripComments(read(rel))).join('\n');
 
   it('파생 규칙이 단일 함수로 존재한다', () => {
     expect(offer).toContain('function deriveDistributionType(');

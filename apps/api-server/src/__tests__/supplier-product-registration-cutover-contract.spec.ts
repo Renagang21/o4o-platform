@@ -34,7 +34,15 @@ const TYPES = `${NETURE}/promotion/product-promotion.types.ts`;
 
 const WEB = 'services/web-neture/src';
 
-const offerSrc = stripComments(read(OFFER_SERVICE));
+// Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
+const offerSrc = [
+  OFFER_SERVICE,
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-write.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-distribution.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'offer-lifecycle.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'offer-write-policy.ts'),
+].map((rel) => stripComments(read(rel))).join('\n');
 const controllerSrc = stripComments(read(CONTROLLER));
 
 function walk(dir: string, pred: (name: string) => boolean, out: string[] = []): string[] {
