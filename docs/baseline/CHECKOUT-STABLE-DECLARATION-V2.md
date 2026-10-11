@@ -1,5 +1,8 @@
 # CHECKOUT-STABLE-DECLARATION-V2 — B2B Checkout · PaymentCore Stable 범위
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **상태**: ACTIVE · **작성일**: 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`
 > **대체**: [`CHECKOUT-STABLE-DECLARATION-V1`](CHECKOUT-STABLE-DECLARATION-V1.md)(2026-02-24, SUPERSEDED · 본문 보존)
 > **상위 정본**: [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)
@@ -19,6 +22,9 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 
 ### 2-1. B2B checkout 계약
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점**(`apps/api-server/src/services/checkout.service.ts`). 독립 `*_orders` · `*_payments` 테이블을 만들지 않는다(`scripts/check-forbidden-tables.mjs`).
 - 현행 내부 주문 경로 = 공급자 → 매장 B2B 5축 — event-offer · **승인축 B2B**(KPA Society · K-Cosmetics 승인 상품 — K-Cosmetics 는 퇴역 결정 · 운영 runtime 제거로 **live 축이 아니다**(결제 경로 없음 · 공통 cart 경로는 `k-cosmetics` 를 410 `SERVICE_RETIRED` 로 닫음). 남은 `k-cosmetics` B2B 범위는 퇴역 잔여로 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 가 다룬다(2026-10-07 정정), `/store/cart/:serviceKey/checkout-confirm-b2b` → `StoreB2BCartCheckoutService`, order source `store_b2b_cart`) · Neture B2B · PharmacyHub · **Neture 약국 매장**(B2B 계약 Axis D, `/neture/pharmacy/cart/checkout` → `PharmacyCartService`, `service_key='neture-pharmacy'` · order source `neture_pharmacy_cart`) — 모두 `store_cart_items` → `checkoutService.createOrder()` → `checkout_orders`. 주문 축의 세부 계약은 [B2B 계약](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 이 정본이다.
 - **payment-first**: UNPAID 주문은 공급자 fulfillment · 배송 · 정산 대상이 아니다. `checkout_order` 의 paid 전이는 결제 완료 처리로만 일어난다(route 가 직접 조작하지 않는다) — PaymentCore 경로는 결제 완료 이벤트(§2-3), Neture 약국 매장은 아래 테스트 결제 confirm 트랜잭션 안에서다.
@@ -37,6 +43,9 @@ V1 은 `channel_type='B2C'` 매장 storefront 의 소비자 checkout → 결제 
 | **새 PG · 새 payment engine · 새 payment table · 새 상태머신 금지** — 결제는 PaymentCore 를 재사용한다 | `b2b-payment-controller.factory.ts` 절대 기준 |
 
 ### 2-3. 결제 이벤트 처리
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 - B2B handler(`StoreB2bCheckoutPaymentEventHandler` · `NetureB2bCheckoutPaymentEventHandler` · `PharmacyHubPaymentEventHandler`)는 `payment.completed` 를 받아 `checkout_order` 를 paid 로 전이한다.
 - 취소 · 환불 이벤트를 받는 handler 는 현재 만들 수 없다(위 §2-2 — hub 미전달). 필요해지면 publisher 변경을 포함한 별도 WO 로 한다.

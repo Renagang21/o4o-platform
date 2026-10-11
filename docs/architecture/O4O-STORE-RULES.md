@@ -1,5 +1,8 @@
 # O4O Store & Order Guardrails Rules (Mandatory)
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **CLAUDE.md §4 (E-commerce Core) · §5 (O4O Store & Order) 의 상세 규칙** (구 §19-21에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
 > **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (유효 규칙 = `checkoutService.createOrder()` 단일 지점 · `*_orders`/`*_payments` 금지 · Store Template. Tourism · `OrderType` · 런타임 Guard · 소비자 주문 controller 서술은 아래 `2026-10-04 정합` 주석으로 사실 정정)
@@ -176,6 +179,9 @@ const BLOCKED_ORDER_TYPES = [
 | 독립 주문 테이블 | **금지** |
 
 ### 3.2 Reference Implementation
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 활성 주문 경로·capability 추가·parity/향후 구현·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH 기능을 유지/확장/복구하지 않는다. 공용 QR 계약·인쇄 QR 연결·Neture와 다른 서비스 기능·법정 보유 판단은 유지한다. 아래 PH 구조/구현 표기는 폐기 전 이력이다.
+
 
 | 매장 | OrderType | 상태 |
 |------|-----------|------|

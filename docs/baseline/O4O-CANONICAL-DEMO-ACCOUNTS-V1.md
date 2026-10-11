@@ -105,7 +105,7 @@ frontend 전용 보호가 아니라 **서버 정책**이어야 한다.
 | Google 계정 연결 | **구현** | `google-auth.service.ts` `createGoogleUser` — 403 (`EMAIL_IN_USE` 로 뭉개지 않는다) |
 | platform role 획득 · 관리자 전환 | **기존 보호로 충족** | `POST /admin/platform-accounts/:id/super-admin` 은 Google 연결을 요구한다(`GOOGLE_LINK_REQUIRED`) — Demo 는 연결이 없다 |
 | 이메일 변경 | **구현** (2026-10-02) | `AdminUserController.updateUser` · `UserManagementController.updateUser` — email 이 바뀌는 요청이면 write **전** 403 |
-| role 변경 | **구현** (2026-10-02) | Admin `updateUser`(roles) · `updateUserRoles` · `revokeRoleAssignment` · `platform-accounts.routes` · `operator-assignment.service` · membership console/approval(KPA · 분회 · PharmacyHub) · KPA member · 분회 운영자 지정/해제 · 분회 생성 승인 · Neture 운영자 등록 승인/반려 · Cosmetics 매장 신청 심사 · LMS 강사 · `auth-account.controller` · 커뮤니티 개체 운영자 지정/해제(`setRole`) · 커뮤니티 개설 승인(`approveCreation`) |
+| role 변경 | **구현** (2026-10-02) | Admin `updateUser`(roles) · `updateUserRoles` · `revokeRoleAssignment` · `platform-accounts.routes` · `operator-assignment.service` · membership console/approval(KPA · 분회 · 종전 PharmacyHub — 폐기된 구현 이력이며 복구 대상 아님) · KPA member · 분회 운영자 지정/해제 · 분회 생성 승인 · Neture 운영자 등록 승인/반려 · Cosmetics 매장 신청 심사 · LMS 강사 · `auth-account.controller` · 커뮤니티 개체 운영자 지정/해제(`setRole`) · 커뮤니티 개설 승인(`approveCreation`) |
 | ownership 해제 · 변경 | **구현** (2026-10-02) | membership `withdraw` · `deleteMember` · 매장 경영자 해지 `createCase`/`terminateCase`/`purgeCase` · Neture 공급자 승인/반려/비활성화/재활성화(user_id 또는 owner 조직 경유) |
 
 로그인은 막지 않는다 — 체험 입구이므로 비밀번호 로그인은 그대로 된다.

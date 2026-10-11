@@ -1,5 +1,7 @@
 # O4O MyPage Canonical V1
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 사용자 승인에 따른 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)이 본문 전체의 PharmacyHub/PH 운영·경로 보존·후속 UI 구현 의무를 대체한다. Locked 상태의 공통 Option D·다른 서비스 계정 계약은 유지한다. PH `/account`·`/store-owner/account`·가입·계정 UI는 복구하지 않으며 종전 구현은 이력이다. 실행 범위는 [폐기 정책 WO](../work-orders/WO-O4O-PHARMACYHUB-CANONICAL-RETIREMENT-POLICY-V1.md)를 따른다.
+
 > **Baseline — 계정 관리 UI 의 canonical 위치 고정 문서.**
 >
 > 본 문서는 [IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1](../investigations/IR-O4O-MYPAGE-VS-ACCOUNT-CENTER-CANONICAL-V1.md) 의 **Option D** 채택을 baseline 으로 승격하여, 향후 web-account 에 비밀번호 / 프로필 / 서비스별 기능을 과도하게 추가하는 drift 를 방지한다.
@@ -133,6 +135,8 @@
 → **현재 구현이 본 baseline 과 100% 정합.** baseline 채택으로 인한 즉시 코드 변경 없음.
 
 ### 5.1 Pharmacy-Hub 축 (2026-08-19 추가 — 구현 사실 기록)
+
+> **SUPERSEDED — PH 이력:** 아래 현재 구현·canonical route·제거/redirect 금지·후속 구현 서술은 종전 계약이며 완전 폐기로 대체됐다. 운영 유지·복구 근거로 사용하지 않는다.
 
 본 baseline V1 작성(2026-05-24) 시점에는 3 service(KPA / K-Cos / Neture)만 존재했다.
 이후 신설된 **Pharmacy-Hub** 는 `/mypage` 축을 만들지 않고 **`/account`** 를 개인 계정
