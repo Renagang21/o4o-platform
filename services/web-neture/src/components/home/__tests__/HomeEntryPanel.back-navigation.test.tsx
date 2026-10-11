@@ -121,6 +121,25 @@ function renderPanel() {
 const resolved = (url: string) => Promise.resolve({ data: { success: true, data: { targetUrl: url } } });
 
 describe('HomeEntryPanel — 뒤로가기(bfcache) 후 이동 중 상태 해제', () => {
+  it('discards a pending workspace handoff when the account changes', async () => {
+    let release!: (value: unknown) => void;
+    apiPost.mockImplementationOnce(() => new Promise(r => { release = r; }));
+    const { rerender } = renderPanel();
+    await userEvent.click(handoffButton(KPA));
+    rerender(<MemoryRouter><HomeEntryPanel user={{ ...user, id: 'u2' }} data={data} loading={false} error={null} onReload={() => {}} /></MemoryRouter>);
+    await act(async () => { release({ data: { success: true, data: { targetUrl: 'https://study.neture.co.kr/stale' } } }); });
+    expect(assign).not.toHaveBeenCalled();
+    expect(handoffButton(KPA).disabled).toBe(false);
+  });
+  it('discards a pending workspace handoff after leaving the page', async () => {
+    let release!: (value: unknown) => void;
+    apiPost.mockImplementationOnce(() => new Promise(r => { release = r; }));
+    const { unmount } = renderPanel();
+    await userEvent.click(handoffButton(KPA));
+    unmount();
+    await act(async () => { release({ data: { success: true, data: { targetUrl: 'https://study.neture.co.kr/stale' } } }); });
+    expect(assign).not.toHaveBeenCalled();
+  });
   it('이동 성공 후 busy 가 남고, pageshow(persisted) 에서 풀려 같은 서비스로 재이동할 수 있다', async () => {
     apiPost.mockImplementation(() => resolved('https://kpa-society.co.kr/?h=1'));
     renderPanel();
