@@ -135,3 +135,23 @@ PharmacyHub와 K-Cosmetics는 현재 폐기/퇴역 정책이 우선이므로 운
 - 기존 COMPLETED WO/CHECK 및 정본은 수정하지 않았다. 과거 폐기 서비스까지 조사하던 전수 감사 WO의 목록을 현행 서비스 모집단으로 재사용하지 않는다.
 - 문서 링크·민감정보·diff 검사, 문서-only PR의 필수 CI 및 최신 review를 확인한다. 배포 판정은 `DEPLOYMENT=NOT_APPLICABLE`이다.
 - 이 문서는 서비스별 구현 TODO가 남아 있으므로 **ACTIVE**를 유지한다. 기록 PR 통합은 전체 서비스 개발 완료를 뜻하지 않는다.
+
+
+## 7. 개발 실행 — 사용자 진행 지시 (2026-10-11)
+
+상위 계획 PR #481 반영 뒤 사용자가 이 TODO를 기반으로 작업 진행을 지시했다. 같은 WO의 연속 실행으로 기존 독립 clone/branch `wo/service-operator-roadmap`를 유지한다. 게시 후 main 동기화는 정상 merge로 진행하며 완료된 과거 WO/CHECK는 수정하지 않는다. 이번 실행 기준 main은 `cb85731ca940b5957068cfb46ab239ecbcd680d8`이다. §2·§6의 코드 무변경/문서-only 표기는 앞선 계획 기록 단계의 범위이며 이 실행 단계의 코드 개발을 제한하지 않는다.
+
+실행 TODO:
+
+- [x] T00: 현행 7개 서비스의 메뉴·route·scope·업무 원장과 다른 트랙을 대조해 역할/업무 소유권 표 기록
+- [x] T01~T07: 추가 조사에서 확인한 결함과 정책 미정을 나누고 수정 TODO 확정
+- [x] 수정 TODO에 따라 서비스별 업무 흐름 코드 개발 (F01/F02/P01/S01/L01/B01)
+- [x] 필요한 API/웹 회귀·빌드·desktop/mobile fixture browser 검증
+- [x] 사용자 직접 테스트와 미실행 정책 항목을 CHECK에 기록
+- [x] 구현·검증 변경 push (PR #487)
+- [ ] 최종 HEAD 필수 CI·review·정상 main 병합·post-merge CI 확인
+- [ ] 필요한 서비스 배포·서빙 확인 (PH 퇴역 WIF 인증 제한 해제 및 정상 Delivery gate 확인 필요)
+
+신규 schema·migration·운영 DB 테스트 write·새 금융/제재 정책·미정 workspace 신설 없이 현재 업무를 정비한다. 새 정책이 필요한 항목은 구체적인 조사 근거와 결정안을 남기고 독립적으로 진행 가능한 결함부터 수정한다.
+
+수정 TODO와 서비스별 정적 조사/공유 소비처는 [실행 CHECK](../checks/CHECK-O4O-SERVICE-OPERATOR-WORKFLOWS-V1.md)에 기록했다. F01/F02 → P01 → S01 → 기존 커뮤니티 회귀 → L01 → B01 → 호스트/메뉴 회귀 순으로 진행한다. §4의 전체 업무 검증은 이 결함 수정이나 정적 조사만으로 전부 완료 체크하지 않는다. 신규 정책 미정과 실계정 검증은 계속 추적한다.
