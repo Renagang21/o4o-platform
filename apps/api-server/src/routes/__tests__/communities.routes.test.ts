@@ -1,3 +1,4 @@
+import * as communityServiceAccess from '../../services/community/community-service-operator-access.js';
 /**
  * 커뮤니티 개설·가입 경로 배선 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3
  *
@@ -266,5 +267,31 @@ describe('본인 탈퇴 route', () => {
     const app = express(); app.use(createCommunitiesRoutes(optionalAuth, authenticate));
     expect((await request(app).post('/fixture/leave')).status).toBe(401);
     expect(leave).not.toHaveBeenCalled();
+  });
+});
+
+describe('회원 검색 및 페이지 HTTP 계약', () => {
+  afterEach(() => jest.restoreAllMocks());
+  const app = () => {
+    const instance = express();
+    instance.use((req, _res, next) => { Object.assign(req, { user: { id: 'service-admin' }, community: { id: 'scoped-community' } }); next(); });
+    instance.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    return instance;
+  };
+  it.each(['/example/memberships', '/admin/communities/example/members'])('%s validates query before database list access', async url => {
+    jest.spyOn(communityServiceAccess, 'hasCommunityServiceAdmin').mockResolvedValue(true);
+    const { CommunityOperatorDesignationService } = await import('../../services/community/community-operator-designation.service.js');
+    const review = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview');
+    const designation = jest.spyOn(CommunityOperatorDesignationService.prototype, 'listMembers');
+    const response = await request(app()).get(url).query({ pageSize: 101 });
+    expect(response.status).toBe(400); expect(response.body.code).toBe('INVALID_QUERY');
+    expect(review).not.toHaveBeenCalled(); expect(designation).not.toHaveBeenCalled();
+  });
+  it('review uses the resolved community identity and returns page metadata', async () => {
+    const pagination = { page: 2, pageSize: 20, total: 21, totalPages: 2 };
+    const list = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview').mockResolvedValue({ memberships: [], pagination });
+    const response = await request(app()).get('/example/memberships').query({ status: 'active', q: ' 회원 ', page: 2 });
+    expect(response.status).toBe(200); expect(response.body.data.pagination).toEqual(pagination);
+    expect(list).toHaveBeenCalledWith({ communityId: 'scoped-community', query: { q: '회원', status: 'active', page: 2, pageSize: 20 } });
   });
 });

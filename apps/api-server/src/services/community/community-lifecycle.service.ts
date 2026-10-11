@@ -1,3 +1,4 @@
+import { communityMemberListFilter, communityMemberPagination, DEFAULT_MEMBER_LIST_QUERY, type CommunityMemberListQuery } from './community-member-list-query.js';
 import { recordCommunityMembershipChange } from './community-membership-mutations.js';
 import { hasCommunityServiceOperator, hasCommunityServiceAdmin } from './community-service-operator-access.js';
 /**
@@ -330,8 +331,8 @@ export class CommunityLifecycleService {
   async listMembershipsForReview(input: {
     communityId: string;
     status?: CommunityMembership['status'];
-  }): Promise<
-    Array<{
+    query?: CommunityMemberListQuery;
+  }): Promise<{ pagination: ReturnType<typeof communityMemberPagination>; memberships: Array<{
       id: string;
       userId: string;
       role: string;
@@ -340,25 +341,26 @@ export class CommunityLifecycleService {
       name: string | null;
       emailMasked: string | null;
       serviceMembershipStatus: string | null;
-    }>
-  > {
+    }> }> {
     const params: unknown[] = [input.communityId, COMMUNITY_SERVICE_KEY];
-    let statusFilter = '';
-    if (input.status) {
-      params.push(input.status);
-      statusFilter = ` AND cm.status = $3`;
-    }
+    const query = input.query ?? { ...DEFAULT_MEMBER_LIST_QUERY, status: input.status };
+    const filter = communityMemberListFilter(params, query);
+    const from = `FROM community_memberships cm
+         LEFT JOIN users u ON u.id = cm.user_id
+         LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
+        WHERE cm.community_id = $1${filter}`;
+    const counts = await this.dataSource.query(`SELECT COUNT(*)::int AS total ${from}`, params);
+    const pagination = communityMemberPagination(Number(counts[0]?.total ?? 0), query);
+    const pageParams = [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
     const rows: any[] = await this.dataSource.query(
       `SELECT cm.id, cm.user_id, cm.role, cm.status, cm.created_at,
               u.name AS user_name, u.email AS user_email, sm.status AS service_status
-         FROM community_memberships cm
-         LEFT JOIN users u ON u.id = cm.user_id
-         LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
-        WHERE cm.community_id = $1${statusFilter}
-        ORDER BY cm.created_at ASC`,
-      params,
+         ${from}
+        ORDER BY cm.created_at ASC, cm.id ASC
+        LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`,
+      pageParams,
     );
-    return rows.map((r) => ({
+    return { pagination, memberships: rows.map((r) => ({
       id: r.id,
       userId: r.user_id,
       role: r.role,
@@ -367,7 +369,7 @@ export class CommunityLifecycleService {
       name: r.user_name ?? null,
       emailMasked: maskEmail(r.user_email),
       serviceMembershipStatus: r.service_status ?? null,
-    }));
+    })) };
   }
 
   /**

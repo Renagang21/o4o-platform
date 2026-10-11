@@ -1,3 +1,4 @@
+import { communityMemberListFilter, communityMemberPagination, DEFAULT_MEMBER_LIST_QUERY, type CommunityMemberListQuery } from './community-member-list-query.js';
 /**
  * 개별 커뮤니티 운영자 지정·해제 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
@@ -84,7 +85,8 @@ export class CommunityOperatorDesignationService {
   }
 
   /** 그 커뮤니티의 승인된(active) 회원 — 지정 후보와 현재 운영자. */
-  async listMembers(communityId: string): Promise<{
+  async listMembers(communityId: string, query: CommunityMemberListQuery = DEFAULT_MEMBER_LIST_QUERY): Promise<{
+    pagination: ReturnType<typeof communityMemberPagination>;
     community: { id: string; name: string };
     members: Array<{
       membershipId: string;
@@ -98,6 +100,15 @@ export class CommunityOperatorDesignationService {
     }>;
   }> {
     const community = await this.requireCommunity(this.db, communityId);
+    const params: unknown[] = [communityId, COMMUNITY_SERVICE_KEY, NETURE_MAIN_SERVICE_KEY];
+    const filter = communityMemberListFilter(params, query);
+    const counts = await this.db.query(`SELECT COUNT(*)::int AS total FROM community_memberships cm
+      JOIN users u ON u.id = cm.user_id
+      LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
+      LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
+      WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}`, params);
+    const pagination = communityMemberPagination(Number(counts[0]?.total ?? 0), query);
+    const pageParams = [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
     const rows = await this.db.query(
       `SELECT cm.id AS membership_id, cm.user_id, cm.role, cm.status, u.name AS user_name, u.email AS user_email,
               sm.status AS service_status, u.status AS account_status, u."isActive" AS account_active,
@@ -107,12 +118,13 @@ export class CommunityOperatorDesignationService {
          JOIN users u ON u.id = cm.user_id
          LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
          LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
-        WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')
-        ORDER BY (cm.role IN ('admin', 'operator')) DESC, u.name ASC NULLS LAST`,
-      [communityId, COMMUNITY_SERVICE_KEY, NETURE_MAIN_SERVICE_KEY],
+        WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}
+        ORDER BY (cm.role IN ('admin', 'operator')) DESC, u.name ASC NULLS LAST, cm.id ASC
+        LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`,
+      pageParams,
     );
     return {
-      community,
+      community, pagination,
       members: rows.map((r: any) => ({
         membershipId: r.membership_id,
         userId: r.user_id,

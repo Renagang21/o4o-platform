@@ -92,7 +92,7 @@ describe('MyCommunityOperatorPage', () => {
     mount();
     await screen.findByText('홍길동');
     expect(get).toHaveBeenCalledWith('/communities/operating');
-    expect(get).toHaveBeenCalledWith('/communities/alpha/memberships', { params: { status: 'pending' } });
+    expect(get).toHaveBeenCalledWith('/communities/alpha/memberships', { params: { status: 'pending', q: '', page: 1, pageSize: 20 } });
     expect(screen.getByText('ho***@example.com')).toBeTruthy();
   });
 
@@ -225,6 +225,67 @@ describe('MyCommunityOperatorPage', () => {
     expect(screen.queryByText('이전 이력')).toBeNull();
   });
 
+  it('다음 페이지와 이름 검색·상태·크기 변경을 서버에 전달하고 첫 페이지로 돌아간다', async () => {
+    const initial = get.getMockImplementation()!;
+    get.mockImplementation((url: string, config: { params?: { q?: string; page?: number; pageSize?: number; status?: string } } = {}) => {
+      if (!url.endsWith('/memberships')) return initial(url);
+      const { page = 1, pageSize = 20, q = '', status } = config.params!;
+      return ok({ memberships: [{ ...pendingRows[0], name: `${q || '회원'}-${page}`, status }], pagination: { page, pageSize, total: 41, totalPages: Math.ceil(41 / pageSize) } });
+    });
+    mount(); await screen.findByText('회원-1');
+    fireEvent.click(screen.getByRole('button', { name: '다음 페이지' }));
+    await screen.findByText('회원-2');
+    fireEvent.change(screen.getByLabelText('이름 검색'), { target: { value: ' 대상 ' } });
+    fireEvent.click(screen.getByRole('button', { name: '검색', exact: true }));
+    await screen.findByText('대상-1');
+    expect(get).toHaveBeenLastCalledWith('/communities/alpha/memberships', { params: { q: '대상', page: 1, pageSize: 20, status: 'pending' } });
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'active' } });
+    await waitFor(() => expect(get).toHaveBeenLastCalledWith('/communities/alpha/memberships', { params: { q: '대상', page: 1, pageSize: 20, status: 'active' } }));
+    fireEvent.change(screen.getByLabelText('페이지 크기'), { target: { value: '50' } });
+    await screen.findByText('총 41명 · 1 / 1 페이지');
+    expect((screen.getByRole('button', { name: '다음 페이지' }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: '검색 초기화' }));
+    await screen.findByText('회원-1');
+  });
+
+  it('이전 검색의 늦은 응답을 무시한다', async () => {
+    let release!: (result: unknown) => void;
+    const previous = new Promise(resolve => { release = resolve; });
+    const initial = get.getMockImplementation()!;
+    get.mockImplementation((url: string, config: { params?: { q?: string } } = {}) => {
+      if (!url.endsWith('/memberships')) return initial(url);
+      if (config.params?.q === '이전') return previous;
+      return ok({ memberships: [{ ...pendingRows[0], name: config.params?.q || '초기 회원' }] });
+    });
+    mount(); await screen.findByText('초기 회원');
+    for (const q of ['이전', '현재']) { fireEvent.change(screen.getByLabelText('이름 검색'), { target: { value: q } }); fireEvent.click(screen.getByRole('button', { name: '검색', exact: true })); }
+    await screen.findByText('현재');
+    await act(async () => release({ data: { data: { memberships: [{ ...pendingRows[0], name: '늦은 회원' }] } } }));
+    expect(screen.queryByText('늦은 회원')).toBeNull();
+  });
+
+
+  it('마지막 페이지의 승인 후 현재 검색을 유지하며 유효 페이지로 이동한다', async () => {
+    let total = 21;
+    const initial = get.getMockImplementation()!;
+    get.mockImplementation((url: string, config: { params?: { q?: string; page?: number } } = {}) => {
+      if (!url.endsWith('/memberships')) return initial(url);
+      const page = Math.min(config.params?.page || 1, Math.ceil(total / 20));
+      return ok({ memberships: [{ ...pendingRows[0], name: `검색 회원-${page}` }], pagination: { page, pageSize: 20, total, totalPages: Math.ceil(total / 20) } });
+    });
+    post.mockImplementation(() => { total = 20; return ok({}); });
+    mount(); await screen.findByText('검색 회원-1');
+    fireEvent.change(screen.getByLabelText('이름 검색'), { target: { value: '검색' } });
+    fireEvent.click(screen.getByRole('button', { name: '검색', exact: true }));
+    await waitFor(() => expect(get).toHaveBeenLastCalledWith('/communities/alpha/memberships', { params: { q: '검색', status: 'pending', page: 1, pageSize: 20 } }));
+    await screen.findByText('검색 회원-1');
+    fireEvent.click(screen.getByRole('button', { name: '다음 페이지' })); await screen.findByText('검색 회원-2');
+    fireEvent.click(screen.getByRole('button', { name: '승인' }));
+    await screen.findByText('총 20명 · 1 / 1 페이지');
+    expect((screen.getByLabelText('이름 검색') as HTMLInputElement).value).toBe('검색');
+    expect(screen.queryByText('검색 회원-2')).toBeNull();
+  });
+
 });
 
 describe('canApproveJoin', () => {
@@ -239,4 +300,5 @@ describe('canApproveJoin', () => {
 // 최초 가입과 기존 서비스 회원 재활성화는 구분한다.
 it.each(['withdrawn', 'rejected', 'pending', 'suspended'])('서비스 %s 신청자는 승인할 수 없다', (status) => {
   expect(canApproveJoin({ status: 'pending', serviceMembershipStatus: status })).toBe(false);
+
 });
