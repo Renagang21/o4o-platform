@@ -161,3 +161,21 @@ test('database failure still reports independent read-only cloud and HTTP eviden
   assert.equal(result.http.checks[0].status, 301);
   assert.doesNotMatch(JSON.stringify(result), /private SQL|secret/);
 });
+
+
+test('successful gcloud exit with a permission warning cannot prove no resources', () => {
+  const result = collectCloudInventory(() => ({ status: 0, stdout: '[]', stderr: "WARNING: Some requests did not succeed. Required 'compute.urlMaps.list' permission private details" }));
+  assert.equal(result.blockers.length, 5);
+  assert.equal(Object.keys(result.resources).length, 0);
+  assert.deepEqual(result.blockers[0].permissions, ['compute.urlMaps.list']);
+  assert.doesNotMatch(JSON.stringify(result), /private details/);
+});
+
+test('scope query failure identifies only validated schema and SQLSTATE', async () => {
+  const client = { query: async sql => {
+    if (sql.includes('information_schema')) return { rows: [{ table_name: 'service_catalog', column_name: 'service_key', data_type: 'text', udt_name: 'text' }] };
+    if (sql.includes('count(*)')) throw Object.assign(new Error('private SQL row'), { code: '22P02' });
+    return { rows: [] };
+  } };
+  await assert.rejects(collectRetirementInventory(client), error => /retirement-scope:service_catalog.service_key; code=22P02/.test(error.message) && !error.stack.includes('private'));
+});
