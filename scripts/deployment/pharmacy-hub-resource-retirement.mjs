@@ -74,6 +74,7 @@ export async function retireResources({ mode, read, permissions, verify, remove,
   if (!['plan', 'apply'].includes(mode)) throw new ResourceDiagnosticError('Unknown PH resource mode.');
   const allowed = await permissions();
   let targets = await read();
+  const initialTargets = new Set(targets);
   const requiredPermissions = deletionPermissions.filter(permission =>
     (targets.includes(backend) && ['compute.backendServices.delete', 'compute.globalOperations.get'].includes(permission))
     || (targets.includes(neg) && ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get'].includes(permission))
@@ -86,6 +87,7 @@ export async function retireResources({ mode, read, permissions, verify, remove,
   for (const target of [backend, neg, service]) {
     // Fresh complete references + HTTP checks immediately before each irreversible delete.
     targets = await read();
+    if (targets.some(item => !initialTargets.has(item))) throw new ResourceDiagnosticError('PH resources appeared after inventory; rerun standalone plan.');
     await verify();
     if (!targets.includes(target)) continue; // Resume safely after a partial deletion.
     beforeWrite();

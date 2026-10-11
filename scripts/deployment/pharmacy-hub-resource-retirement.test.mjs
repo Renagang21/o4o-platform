@@ -94,6 +94,11 @@ test('a resumed retirement needs permissions only for remaining resources', asyn
   await retireResources({ ...h.options, permissions: async () => [] });
   assert.deepEqual(h.removed, [targets[2]]);
 });
+test('resources appearing after the initial plan are preserved', async () => {
+  const h = harness(); let reads = 0;
+  await assert.rejects(retireResources({ ...h.options, read: async () => ++reads === 1 ? [targets[2]] : targets }), /appeared after inventory/);
+  assert.deepEqual(h.removed, []);
+});
 
 test('workflow rejects mixed resource operations, foreign actors and frozen writes before authentication', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/pharmacyhub-qr-cutover.yml', import.meta.url), 'utf8');
