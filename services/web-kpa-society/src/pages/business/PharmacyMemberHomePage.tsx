@@ -10,6 +10,7 @@ import { businessApi, businessError, businessPath, communityApiBase, pharmacyApi
 interface LoadedSection<T> { scope: string; data: T[]; error: string; loading: boolean }
 const pending = <T,>(scope: string): LoadedSection<T> => ({ scope, data: [], error: '', loading: true });
 const isNotice = (post: ForumPostResponse) => post.isPinned || post.type === 'announcement';
+const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type === 'announcement';
 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
@@ -52,7 +53,7 @@ export default function PharmacyMemberHomePage() {
   const materialsPath = businessPath(business.key, 'materials');
   const membershipPath = businessPath(business.key, 'participation');
   const pinnedNotices = currentNotices.data.filter(post => post.isPinned).slice(0, 3);
-  const recentNotices = currentNotices.data.filter(post => !post.isPinned && post.type === 'announcement').slice(0, 5);
+  const recentNotices = currentNotices.data.filter(isRecentNotice).slice(0, 5);
   const conversations = currentPosts.data.filter(post => !isNotice(post)).slice(0, 5);
   return <div className="space-y-6">
     <section aria-labelledby="member-home-title" className="overflow-hidden rounded-2xl bg-slate-900 text-white">
