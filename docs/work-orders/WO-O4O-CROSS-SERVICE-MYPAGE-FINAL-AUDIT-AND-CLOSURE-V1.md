@@ -1100,7 +1100,7 @@ A 가 아니면 손대지 않는다.
 
 ### K. 검증 계정 · 도메인
 
-* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md` (CLAUDE.md §15) — 자격증명을 코드·문서·CHECK 에 적지 말 것
+* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNT.txt` (CLAUDE.md §15) — 자격증명을 코드·문서·CHECK 에 적지 말 것
 * KCos 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 외부 쇼핑몰)
 * 로그인 API 는 **serviceKey 필수** — 없으면 정상 계정도 401. "UI 는 되는데 curl 만 401"이면 이 원인
 * API 실 진입점은 `api.neture.co.kr` (run.app 직접 URL 은 `/health` 까지 404)

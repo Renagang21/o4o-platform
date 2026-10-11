@@ -32,7 +32,7 @@
 | KPA | "약국 경영자" ([REDACTED_EMAIL_B] / **`[REDACTED — rotated]`**) | "🧪 체험용 약국 경영자 계정" + 비번 **`[REDACTED — rotated]`로 수정** |
 | KCos | (autofill 없음) | "🧪 체험용 매장 경영자 계정" ([REDACTED_EMAIL_B] / `[REDACTED — rotated]`) **신규 추가** |
 
-- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNTS.local.md) 기준 renagang21 현재 비번 = `[REDACTED — rotated]`(2026-06-06 reset). KPA가 박고 있던 `[REDACTED — rotated]`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
+- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNT.txt) 기준 renagang21 현재 비번 = `[REDACTED — rotated]`(2026-06-06 reset). KPA가 박고 있던 `[REDACTED — rotated]`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
 
 ## 5. 보안 판단 (사용자 결정 기록)
 - 이 계정은 여러 사람이 함께 쓰도록 **임시 제공하는 공용 체험 계정**이며 곧 제거 예정. 사용자 결정에 따라 **비밀번호 하드코딩 제거/별도 demo 계정 생성/rotation은 본 WO 범위 밖**.

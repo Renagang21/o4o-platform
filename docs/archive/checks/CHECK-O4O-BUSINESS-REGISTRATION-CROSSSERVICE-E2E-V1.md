@@ -7,7 +7,7 @@
   - `https://k-cosmetics.site`
   - `https://neture.co.kr`
 **검증 도구 (예정)**: Playwright (chromium 1.57.0, headless 기본) + 필요 시 curl / API 직접 호출
-**자격증명 SSOT**: [`docs/local/TEST-ACCOUNTS.local.md`](../local/TEST-ACCOUNTS.local.md) — env vars 로 주입, 평문 하드코딩 금지
+**자격증명 SSOT**: [`docs/local/TEST-ACCOUNT.txt`](../local/TEST-ACCOUNT.txt) — env vars 로 주입, 평문 하드코딩 금지
 
 > CLAUDE.md 의 앱 개발 시 작업 규칙(§1 / §8 / §15)에 따라 작성된 **통합 브라우저 검증 CHECK 준비 요청서**.
 
@@ -417,7 +417,7 @@ operator/admin 화면에서 확인 불가능한 경우
 | `@playwright/test` v1.57.0 | ✅ 설치됨 ([apps/admin-dashboard/package.json](../../apps/admin-dashboard/package.json)) |
 | Chromium 143 | ✅ 설치됨 (`C:\Users\sohae\AppData\Local\ms-playwright\chromium-1200`) |
 | Firefox / WebKit | ⚠️ 미설치 — auth-runtime config(chromium-only)에는 무관, 필요 시 `npx playwright install firefox webkit` |
-| `docs/local/TEST-ACCOUNTS.local.md` | ✅ 존재 (67줄) |
+| `docs/local/TEST-ACCOUNT.txt` | ✅ 존재 (67줄) |
 | 4서비스 도달성 (HTTP 200) | ✅ neture.co.kr / kpa-society.co.kr / k-cosmetics.site |
 | `gcloud` CLI (DB read-only 검증용) | ✅ 사용 가능 — CLAUDE.md §0 |
 

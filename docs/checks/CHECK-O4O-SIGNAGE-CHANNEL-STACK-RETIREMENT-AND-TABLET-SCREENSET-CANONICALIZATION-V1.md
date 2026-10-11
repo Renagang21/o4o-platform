@@ -264,7 +264,7 @@ https://www.youtube.com/embed/{videoId}?autoplay=1&mute=1&loop=1&playlist={video
 숨기지 않고 기록한다. **이번 변경 때문이 아니라 자격증명 문제로 막혔다.**
 
 ```text
-막힌 이유: docs/local/TEST-ACCOUNTS.local.md §2 — 모든 (계정 × 서비스) L2 credential 이 unknown.
+막힌 이유: docs/local/TEST-ACCOUNT.txt §2 — 모든 (계정 × 서비스) L2 credential 이 unknown.
            서비스 웹 로그인이 전 서비스에서 불가하다.
            문서가 허용하는 우회(L1 토큰 주입)는 "로그인 자체의 검증에는 쓸 수 없다" 고 §4-2 가 명시한다.
 확인한 것: L1 API 로그인 200 · GET /api/v1/store/tablets 200 (계약 살아 있음)

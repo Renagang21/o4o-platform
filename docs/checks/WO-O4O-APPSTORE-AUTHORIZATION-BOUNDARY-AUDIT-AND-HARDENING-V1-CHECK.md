@@ -198,7 +198,7 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 | `GET /appstore/modules` | **403** |
 | `GET /admin/apps/market` (대조군) | **403** — 두 API 가 동일하게 `platform:super_admin` 을 요구함을 확인 |
 
-**허용(200) 경로 실측은 수행하지 못했다.** `docs/local/TEST-ACCOUNTS.local.md` 에
+**허용(200) 경로 실측은 수행하지 못했다.** `docs/local/TEST-ACCOUNT.txt` 에
 `platform:super_admin` 자격증명이 없어 프로덕션에서 super_admin 성공 경로를 확인할 수 없었다.
 해당 경로는 jest 계약 테스트(`platform:super_admin` → `GET /modules` 200)로만 검증했다.
 또한 §15 지침대로 실제 active app 의 install/uninstall write 는 프로덕션에서 수행하지 않았다.

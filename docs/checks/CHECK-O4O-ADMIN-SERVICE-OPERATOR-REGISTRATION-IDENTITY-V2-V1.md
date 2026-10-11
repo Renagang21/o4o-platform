@@ -91,7 +91,7 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 ## 4. 프로덕션 실측 (2026-08-10, read-only + 브라우저)
 
 배포된 화면에서 관리자가 Pharmacy-Hub 운영자를 실제로 등록한 뒤 실측한 결과다.
-**자격증명 값은 이 문서에 기록하지 않는다** (SSOT = `docs/local/TEST-ACCOUNTS.local.md`, git 추적 제외).
+**자격증명 값은 이 문서에 기록하지 않는다** (SSOT = `docs/local/TEST-ACCOUNT.txt`, git 추적 제외).
 
 ### 4-1. 등록 결과 — DB read-only
 
@@ -146,7 +146,7 @@ localStorage(`o4o_accessToken`) 경로로 전달된다(공통 auth 클라이언�
 ## 5. 미검증 · 제한 사항
 
 - WO 검증 항목은 **전부 실측 완료**했다(§4-2·§4-2-1·§4-3).
-  Pharmacy-Hub 테스트 계정은 `docs/local/TEST-ACCOUNTS.local.md`(git 추적 제외)에 등록되어 있으며
+  Pharmacy-Hub 테스트 계정은 `docs/local/TEST-ACCOUNT.txt`(git 추적 제외)에 등록되어 있으며
   **자격증명 값은 본 문서·커밋에 기록하지 않는다.**
 - 실패 주입에 의한 부분 생성 0 은 **트랜잭션 stub 단위 테스트**로 검증했다(실 DB 롤백 관측 아님).
   프로덕션에서는 §4-1 의 "최근 24h write = credential 1건" 으로 잔여물 없음만 확인했다.

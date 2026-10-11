@@ -377,7 +377,7 @@ WO 지시대로 위 경로를 **하나도 호출하지 않았다.**
 | `dropshipping:*` scope | **0** | **불가** | 동일 |
 | `pending` 상태 (restricted) | 1 | 가능 | 제한 로그인 경계 검증용 |
 
-> 계정 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 확인한다. 본 CHECK 에는 이메일·비밀번호·UUID 를 기록하지 않는다.
+> 계정 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 확인한다. 본 CHECK 에는 이메일·비밀번호·UUID 를 기록하지 않는다.
 
 ---
 

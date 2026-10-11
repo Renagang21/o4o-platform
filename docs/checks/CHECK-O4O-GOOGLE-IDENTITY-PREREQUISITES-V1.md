@@ -142,7 +142,7 @@ WO-2A: COMPLETE  (§6-C 운영 200 로그인 실측: N/A 종결 2026-09-18 — �
 
 ## 9. Production auth regression (§6-C · read-only · 계정 생성 0)
 
-smoke 계정 = `docs/local/TEST-ACCOUNTS.local.md`(git 미추적) · 비밀번호 미기록. 요청은 status code 만 기록.
+smoke 계정 = `docs/local/TEST-ACCOUNT.txt`(git 미추적) · 비밀번호 미기록. 요청은 status code 만 기록.
 
 | # | 시나리오 | 결과 | 판정 |
 |---|---|---|---|

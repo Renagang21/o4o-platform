@@ -214,7 +214,7 @@ BEFORE       : is_active = true       (전체 20행 스냅샷 기록)
 # 게이트
 cd services/web-kpa-society && npx tsc --noEmit -p tsconfig.json && npm run build
 
-# 프로덕션 실증 (자격증명은 env 주입, docs/local/TEST-ACCOUNTS.local.md 참조)
+# 프로덕션 실증 (자격증명은 env 주입, docs/local/TEST-ACCOUNT.txt 참조)
 KPA_EMAIL=... KPA_PASSWORD=... node <scratchpad>/kpa-smoke-pass3.mjs   # 진열 토글 write + 원복
 KPA_EMAIL=... KPA_PASSWORD=... node <scratchpad>/kpa-smoke-pass4.mjs   # 채널 엔드포인트 A/B
 

@@ -273,7 +273,7 @@ Kakao 관련 `users.kakao_open_chat_url` · `kakao_channel_url` 은 **삭제 후
 | L | Relationship 전환 후보 | ✅ §4-2 |
 | M | 외부 전송 | ✅ §6 |
 | N | AI prompt 입력 | ✅ §6 (다른 세션 dirty 파일 없음 — 작업트리 clean) |
-| O | seed/test/env | ✅ §7-1 #7·#8 (`docs/local/TEST-ACCOUNTS.local.md` 미열람 유지) |
+| O | seed/test/env | ✅ §7-1 #7·#8 (`docs/local/TEST-ACCOUNT.txt` 미열람 유지) |
 
 ## 11. 정책 추가결정 필요 (REVIEW 10)
 

@@ -84,7 +84,7 @@ K-Cos E2E 의 복구 단계에서 발견. k-cosmetics membership 의 `role` 컬�
 ### 6-2. 프로덕션 브라우저 write E2E
 
 공통 흐름: `회원 목록 → 회원 상세 → deep link + 새로고침 → active→suspended → suspended→active → 역할 조회 → 부여 → 회수 → 원복`.
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 의 서비스 운영자 계정, 대상은 안전한 E2E fixture 만 사용했다.
+계정은 `docs/local/TEST-ACCOUNT.txt` 의 서비스 운영자 계정, 대상은 안전한 E2E fixture 만 사용했다.
 
 #### PharmacyHub — PASS
 fixture `E2E 약사회원` (pharmacy-hub membership 단독).

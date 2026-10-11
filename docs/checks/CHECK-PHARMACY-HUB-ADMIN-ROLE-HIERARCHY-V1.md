@@ -103,7 +103,7 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 
 ## 6. 브라우저 smoke
 
-> 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 가 SSOT 다.
+> 자격증명은 `docs/local/TEST-ACCOUNT.txt` (gitignored) 가 SSOT 다.
 > **본 문서에 아이디·비밀번호를 기록하지 않는다.**
 
 배포: `Deploy API Server` · `Deploy Admin Dashboard` · `Deploy Web Services` 3종 모두 **success** (commit `c0de0d814`).
@@ -158,7 +158,7 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 | `roles` 카탈로그 | operator · store_owner · supplier | 동일 (**admin 없음** — §2 별도 WO) |
 
 > `pharmacy-hub:admin` 부여는 **사용자가 직접 수행**했다. 본 세션은 프로덕션 write 를 한 건도 하지 않았다.
-> 계정 아이디·비밀번호는 본 문서에 기록하지 않는다 — SSOT 는 `docs/local/TEST-ACCOUNTS.local.md` (gitignored).
+> 계정 아이디·비밀번호는 본 문서에 기록하지 않는다 — SSOT 는 `docs/local/TEST-ACCOUNT.txt` (gitignored).
 
 ### 6-4. `/admin/ping` 제거 후 재배포 · 재smoke
 

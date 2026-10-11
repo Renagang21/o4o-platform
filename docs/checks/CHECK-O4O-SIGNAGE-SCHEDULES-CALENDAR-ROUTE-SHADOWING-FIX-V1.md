@@ -19,7 +19,7 @@ Express 는 등록 순서로 매칭한다. static path 가 같은 prefix 의 dyn
 
 ## 2. 수정 전 재현 (production, `api.neture.co.kr`)
 
-로그인 계정은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 의 매장 계정. DB write 0 · 조회만.
+로그인 계정은 `docs/local/TEST-ACCOUNT.txt` (gitignored) 의 매장 계정. DB write 0 · 조회만.
 
 | serviceKey | 요청 | 결과 |
 |---|---|---|

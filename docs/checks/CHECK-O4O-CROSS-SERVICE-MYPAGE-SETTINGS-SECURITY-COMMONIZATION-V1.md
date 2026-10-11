@@ -197,7 +197,7 @@ KPA 의 과거 "계정 탈퇴" mock 은 `WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V
 
 ## 16. production browser 검증
 
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login (PH 데모 채우기 버튼 미사용). 자격증명은 본 문서·코드·로그에 기록하지 않는다.
+계정은 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login (PH 데모 채우기 버튼 미사용). 자격증명은 본 문서·코드·로그에 기록하지 않는다.
 
 | 판정 기준 | 결과 |
 |---|:--:|

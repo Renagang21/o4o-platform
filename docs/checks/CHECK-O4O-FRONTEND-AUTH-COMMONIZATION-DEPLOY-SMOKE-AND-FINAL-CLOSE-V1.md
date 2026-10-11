@@ -23,7 +23,7 @@
 
 ## 2. 브라우저 smoke 결과 (프로덕션 실접속)
 
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 기준. 자격증명 값은 본 문서에 기록하지 않는다.
+계정은 `docs/local/TEST-ACCOUNT.txt` 기준. 자격증명 값은 본 문서에 기록하지 않는다.
 
 | # | 확인 항목 | KPA | Neture | K-Cos | PH |
 | --- | --- | :--: | :--: | :--: | :--: |

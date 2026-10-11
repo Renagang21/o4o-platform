@@ -624,7 +624,7 @@ Neture 공개 Footer 가 이미 쓰고 있다. **새로 만들 것이 없다.**
 
 ### G. §11.2 인증 — supplier/partner/operator 는 공개 route 가 아니다
 
-- 세 shell 모두 role guard 뒤에 있다. 계정은 CLAUDE.md §15 / `docs/local/TEST-ACCOUNTS.local.md` 를 따른다(Neture 공급자 smoke 계정 `renagang21`).
+- 세 shell 모두 role guard 뒤에 있다. 계정은 CLAUDE.md §15 / `docs/local/TEST-ACCOUNT.txt` 를 따른다(Neture 공급자 smoke 계정 `renagang21`).
 - 로그인 API 는 **serviceKey 가 없으면 401** 이다. UI 로그인은 항상 보내므로 문제되지 않지만 curl 검증 시 주의한다.
 - 진입 못 한 shell 은 **어느 것을 왜 못 했는지, 대신 무엇을 정적으로 확인했는지**를 CHECK 에 적는다(§11.2). 미검증을 PASS 로 쓰지 않는다.
 - 프로덕션 미배포면 preview smoke 와 production 미확인을 **구분해서** 적는다.

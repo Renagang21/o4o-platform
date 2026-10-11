@@ -79,7 +79,7 @@ KCos 에는 일반 콘텐츠 제작 화면이 없다(제작 자료 셸만) → K
 ### 6-3 브라우저 smoke — **PENDING_USER_VERIFICATION**
 
 - WO §검증의 smoke(“ChatGPT로 작업” → 안내 복사 → 붙여넣기 → 편집기 반영 → 저장)는 **매장 경영자 로그인이 전제**다.
-- 같은 날 WO1 CHECK §6 에서 `docs/local/TEST-ACCOUNTS.local.md` 의 store-owner 계정으로 KPA·PH 로그인 API 가 `401 INVALID_USER`, 보조 계정은 KPA `403` lockout 으로 실패했고(WO1 CHECK `c996691c0`), 이 WO 는 auth 를 고치지 않는 범위이며 재시도는 lockout 위험만 키우므로 **추가 로그인 시도 없이** 미검증으로 둔다.
+- 같은 날 WO1 CHECK §6 에서 `docs/local/TEST-ACCOUNT.txt` 의 store-owner 계정으로 KPA·PH 로그인 API 가 `401 INVALID_USER`, 보조 계정은 KPA `403` lockout 으로 실패했고(WO1 CHECK `c996691c0`), 이 WO 는 auth 를 고치지 않는 범위이며 재시도는 lockout 위험만 키우므로 **추가 로그인 시도 없이** 미검증으로 둔다.
 - 재개 방법: 유효한 store-owner 계정으로 KPA `/pharmacy/store/contents/direct/new`(직접 작성) · 자료함 “가져와서 만들기” 모달 · PH `/store-owner/content` · KCos 제작 자료 편집 화면에서 ① 패널 라벨 `ChatGPT로 작업` ② 추가 요청 입력 후 “안내 복사” → 클립보드에 `[결과 조건]` 포함 ③ HTML 붙여넣기 → 편집기 본문 즉시 반영 ④ 기존 저장 버튼 저장 → 저장값 = 붙여넣은 HTML 을 확인하면 §7 `STORE_LLM_RESULT_TO_EDITOR` 브라우저 열을 PASS 로 갱신한다.
 - 로그인이 필요 없는 확인(배포 bundle 문자열)은 6-2 로 대체했다. 빌드·bundle 확인만으로 UI 동작을 PASS 로 적지 않는다.
 

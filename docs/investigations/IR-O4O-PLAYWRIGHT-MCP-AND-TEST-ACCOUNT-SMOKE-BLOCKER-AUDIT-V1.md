@@ -1,7 +1,7 @@
 # IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1
 
 > **조사 + 환경 정합성 확인 (Investigation).** 서비스 기능 코드/UI/API/DB 변경 없음.
-> 허용 범위 내 로컬 전용 문서(`TEST-ACCOUNTS.local.md`, gitignored) 검증 노트만 정정.
+> 허용 범위 내 로컬 전용 문서(`TEST-ACCOUNT.txt`, gitignored) 검증 노트만 정정.
 > CLAUDE.md 앱 개발 규칙(조사 → 문제확정 → 최소 수정 → 검증 → 종료).
 
 | 항목 | 값 |
@@ -118,7 +118,7 @@
 ## 7. 코드 수정 여부
 
 - **서비스 기능 코드/UI/API/DB 변경: 없음.**
-- 문서만 수정: `docs/local/TEST-ACCOUNTS.local.md` (gitignored, 로컬 전용) — renagang21 비번 정정(3곳 + env 예시) + K-Cosmetics store_owner 부재 주의 블록 추가.
+- 문서만 수정: `docs/local/TEST-ACCOUNT.txt` (gitignored, 로컬 전용) — renagang21 비번 정정(3곳 + env 예시) + K-Cosmetics store_owner 부재 주의 블록 추가.
 - 신규 IR 문서 생성: 본 파일.
 - `~/.claude.json` 변경: **없음** (설정이 이미 정상 — §3-2 버전 고정은 제안만).
 
@@ -137,7 +137,7 @@
 ## 부록: 조사 산출물
 
 - **서비스 코드 수정 없음.**
-- 수정 문서: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용, commit 대상 아님)
+- 수정 문서: `docs/local/TEST-ACCOUNT.txt` (로컬 전용, commit 대상 아님)
 - 생성 문서: 본 IR
 - probe 방법: 프로덕션 `/api/v1/auth/login` read-only 호출(역할/코드만 추출), `npx @playwright/mcp --help` 실행, `~/.claude.json`·`.npmrc` 정적 분석
 - commit/push: 미수행

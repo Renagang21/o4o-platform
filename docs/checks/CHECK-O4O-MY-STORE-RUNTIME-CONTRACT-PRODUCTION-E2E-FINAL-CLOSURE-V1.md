@@ -101,7 +101,7 @@ probe 결과: ACCOUNT_NOT_ACTIVE   (INVALID_CREDENTIALS 아님)
 
 ### 3-2. 조치 — 문서화된 재사용 절차
 
-`TEST-ACCOUNTS.local.md §7` 의 절차대로 **canonical `PATCH /api/v1/admin/users/{id}/status`** 로
+`TEST-ACCOUNT.txt §7` 의 절차대로 **canonical `PATCH /api/v1/admin/users/{id}/status`** 로
 검증 전용 계정 2개만 `approved` 로 되돌렸다 (사용자 승인). HTTP 200 ×2.
 
 ```text
@@ -406,7 +406,7 @@ Deploy API Server · Deploy Web Services · Deploy Admin Dashboard · CodeQL 모
 
 ## A-3. 인증 — 우회 조성 없음
 
-계정 `[REDACTED_EMAIL_B]` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNTS.local.md`).
+계정 `[REDACTED_EMAIL_B]` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNT.txt`).
 **임시 계정 생성 0 · self-grant 0 · role 변경 0 · membership 생성 0 · DB 직접 수정 0.**
 
 발급 토큰의 roles 에 `kpa:store_owner` · `cosmetics:store_owner`
@@ -490,7 +490,7 @@ MY STORE RUNTIME CONTRACT PRODUCTION E2E = CLOSED
 
 ## A-6. 잔여 — 문서 fixture drift (코드 아님)
 
-`docs/local/TEST-ACCOUNTS.local.md` (gitignored) 실측 불일치 2건. **본 WO 범위 밖이라 수정하지 않고 보고만 한다.**
+`docs/local/TEST-ACCOUNT.txt` (gitignored) 실측 불일치 2건. **본 WO 범위 밖이라 수정하지 않고 보고만 한다.**
 
 1. K-Cosmetics serviceKey 표기가 `cosmetics` 로 되어 있으나 실제 membership 은 `k-cosmetics`.
 2. `[REDACTED_EMAIL_B]` 의 pharmacy-hub 서비스 credential 이 문서 값과 불일치 (401).
@@ -511,4 +511,4 @@ production DB net change = 0
 ## 문서 정합
 
 발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
-→ `TEST-ACCOUNTS.local.md` fixture 정정 (A-6). gitignored 로컬 문서이므로 별도 항목으로 남긴다.
+→ `TEST-ACCOUNT.txt` fixture 정정 (A-6). gitignored 로컬 문서이므로 별도 항목으로 남긴다.

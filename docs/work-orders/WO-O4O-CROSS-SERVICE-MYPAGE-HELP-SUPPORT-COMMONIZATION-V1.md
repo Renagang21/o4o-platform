@@ -1033,6 +1033,6 @@ KPA `GET/PATCH /operator/contact-requests` 는 실제 운영자 화면 계약이
 
 ### M. 검증 계정 · 도메인
 
-* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md` (CLAUDE.md §15)
+* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNT.txt` (CLAUDE.md §15)
 * KCos 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 외부 쇼핑몰)
 * PH 는 `/mypage` 가 없고 `/account` · `/store-owner/account` 축이다 — §24 adoption 판정 시 "route 가 없다"를 곧바로 `NOT_IMPLEMENTED` 로 적기 전에 `/account` 축을 확인할 것

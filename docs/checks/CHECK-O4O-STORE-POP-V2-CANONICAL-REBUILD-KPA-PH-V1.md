@@ -320,5 +320,5 @@ KPA · PH 양측 production HTTP E2E 가 모두 통과했고, migration · 배�
 console/4xx · fixture 정리까지 확인됐다. POP Placement 는 §7 대로 본 WO 범위 밖(NOT_STARTED)이며,
 기존 POP retire 와 `resolvePop` placeholder 제거도 별도 정리 WO 로 넘긴다.
 
-검증 자격증명 주의: `docs/local/TEST-ACCOUNTS.local.md` (git 미추적) 의 `pharmacy-hub` 비밀번호를
+검증 자격증명 주의: `docs/local/TEST-ACCOUNT.txt` (git 미추적) 의 `pharmacy-hub` 비밀번호를
 2026-09-10 실측값으로 갱신했다. 코드 · 커밋 · 본 문서에는 비밀번호를 남기지 않았다.

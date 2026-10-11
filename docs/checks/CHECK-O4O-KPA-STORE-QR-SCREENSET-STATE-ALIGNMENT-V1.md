@@ -316,7 +316,7 @@ M-1 은 미반영(§6 참조).
 
 1차에서는 문서의 두 계정이 모두 실패해 인증 E2E 를 중지했다
 (`[REDACTED_EMAIL_C]` 403 `ACCOUNT_NOT_ACTIVE` / `[REDACTED_EMAIL_A]` 401 `INVALID_CREDENTIALS`).
-사용자가 `docs/local/TEST-ACCOUNTS.local.md` 를 갱신해 `[REDACTED_EMAIL_B]` 로 **로그인 성공**,
+사용자가 `docs/local/TEST-ACCOUNT.txt` 를 갱신해 `[REDACTED_EMAIL_B]` 로 **로그인 성공**,
 아래 A-6 · A-7 로 인증 E2E 를 완료했다.
 
 로그인 직후 확인(중지 조건 점검):

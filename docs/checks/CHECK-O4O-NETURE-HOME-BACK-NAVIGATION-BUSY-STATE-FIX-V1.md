@@ -44,7 +44,7 @@
 
 - 도구: Playwright Chromium(headed). **Playwright 는 기본 스위치 `--disable-back-forward-cache` 로 Chromium 을 띄우므로**(`playwright-core/lib/server/chromium/chromiumSwitches.js`) MCP 브라우저의 뒤로가기는 항상 fresh load 였다(`window` 리스너 소실 · `pageshow` 미관측). 본 검증은 `ignoreDefaultArgs: ['--disable-back-forward-cache']` 로 별도 기동해 **실제 bfcache 복원**을 재현했다. 스크립트는 세션 scratchpad(`bfcache-check.mjs`) — 저장소에 추가하지 않음.
 - bfcache 복원 판정: 이동 전 `window.addEventListener('pageshow')` 로 심은 리스너가 뒤로가기 후에도 살아 있고 `persisted: true` 를 기록하면 복원, 리스너가 사라졌으면 단순 재로드.
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 Neture 운영자 계정(kpa-society · pharmacy-hub · cosmetics · kpa-branch 회원 보유). 운영 회원 상태 변경 없음.
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 Neture 운영자 계정(kpa-society · pharmacy-hub · cosmetics · kpa-branch 회원 보유). 운영 회원 상태 변경 없음.
 
 ### 수정 전 재현 (운영, 2026-09-15 01:2x UTC, 배포 전 번들)
 

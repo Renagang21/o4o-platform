@@ -41,7 +41,7 @@
 | 분석 가드 "먼저 제품 유형(의약품/비의약품)을 선택" | ✅ 1 |
 
 ## 6. 운영 브라우저 smoke (Playwright read-only, 데이터 생성 없음)
-- 계정: Neture 공급자 (SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 문서 미기재).
+- 계정: Neture 공급자 (SSOT `docs/local/TEST-ACCOUNT.txt`, env 주입 — 문서 미기재).
 - 경로: `https://neture.co.kr/supplier/products/import-assistant`
 
 | 확인 | 결과 |

@@ -164,7 +164,7 @@ WO §7 순서를 그대로 따랐다.
 | `o4o-core-api` | Ready True |
 | `GET /health` | **200** — `status: alive`, env production, version 0.5.0 |
 | `GET /health/database` | **200** — `status: healthy`, pingMs 4, activeConnections 10, longRunningQueries 0 |
-| 로그인 smoke | **200 · `success: true`** (`serviceKey=neture`, 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 조회 — 문서에 기록하지 않음) |
+| 로그인 smoke | **200 · `success: true`** (`serviceKey=neture`, 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 조회 — 문서에 기록하지 않음) |
 | `severity>=ERROR` 신규 (삭제 시각 이후) | **0건** |
 | LB `httpRequest.status>=500` 신규 | **0건** |
 | LB / TLS / image / startup 관련 신규 오류 | **0건** |

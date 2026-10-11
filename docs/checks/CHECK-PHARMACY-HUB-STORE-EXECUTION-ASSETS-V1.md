@@ -206,7 +206,7 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 
 ### 5-7. 인증 사용자 실측 (2026-08-08, 자격증명 갱신 후 재수행)
 
-`docs/local/TEST-ACCOUNTS.local.md` 갱신으로 **`pharmacy-hub:store_owner` 계정을 확보**했다.
+`docs/local/TEST-ACCOUNT.txt` 갱신으로 **`pharmacy-hub:store_owner` 계정을 확보**했다.
 `[REDACTED_EMAIL_B]` — PH membership `active`, roleType `store_owner`(2026-07-30 승인),
 `entryPoints.storeOwner=true`. §5-6 의 BLOCKED 는 아래 범위에서 해소됐다.
 
@@ -336,7 +336,7 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 | `[REDACTED_EMAIL_C]` | `403 ACCOUNT_NOT_ACTIVE` |
 | `[REDACTED_EMAIL_B]` | SSOT 문서에 이미 **무효** 로 기록됨 (2026-08-03 정정) |
 
-더 근본적으로, `docs/local/TEST-ACCOUNTS.local.md` 의 역할 인벤토리상
+더 근본적으로, `docs/local/TEST-ACCOUNT.txt` 의 역할 인벤토리상
 **`pharmacy-hub:store_owner` 를 가진 계정이 하나도 없다.**
 `sohae2100` = `pharmacy-hub:operator`, `sohae21` = `pharmacy-hub:supplier` 뿐이다.
 즉 비밀번호를 되살려도 **PH 매장 경영자 화면에는 진입할 수 없다.**

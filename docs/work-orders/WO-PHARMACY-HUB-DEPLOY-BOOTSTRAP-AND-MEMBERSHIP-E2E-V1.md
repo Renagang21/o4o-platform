@@ -148,7 +148,7 @@ write-path 규약과 일치한다 — `MembershipApprovalService` 가 이 값을
 
 | 항목 | 차단 사유 |
 |------|-----------|
-| 약국 경영자 **브라우저** 진입 | `[REDACTED_EMAIL_B]` 프로덕션 비밀번호가 `TEST-ACCOUNTS.local.md` 값과 불일치 → `401 INVALID_CREDENTIALS`. 문서 45행이 "서비스 시작 전 비번 변경 대상"으로 표기한 계정이며, 문서가 갱신되지 않은 것으로 보인다. 셸 개입 없이 파일 payload 로 재시도해도 동일. 계정 잠금 로직은 없고 `SERVICE_NOT_MEMBER` 와 구분된 코드이므로 bcrypt 불일치 확정. **서버 측 역할 부여(`pharmacy-hub:store_owner` active)는 확인됨** — 사용자 측 진입만 미검증. |
+| 약국 경영자 **브라우저** 진입 | `[REDACTED_EMAIL_B]` 프로덕션 비밀번호가 `TEST-ACCOUNT.txt` 값과 불일치 → `401 INVALID_CREDENTIALS`. 문서 45행이 "서비스 시작 전 비번 변경 대상"으로 표기한 계정이며, 문서가 갱신되지 않은 것으로 보인다. 셸 개입 없이 파일 payload 로 재시도해도 동일. 계정 잠금 로직은 없고 `SERVICE_NOT_MEMBER` 와 구분된 코드이므로 bcrypt 불일치 확정. **서버 측 역할 부여(`pharmacy-hub:store_owner` active)는 확인됨** — 사용자 측 진입만 미검증. |
 | 반려 사유 표시 | 두 신청을 모두 승인해 pending 이 없다. 반려 경로 검증에는 제3 신원이 필요하다. |
 
 ### 4-4. 검증 중 발생한 데이터 blemish

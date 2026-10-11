@@ -90,7 +90,7 @@ commit `eda5e182b` — 4 files, +65/−7. **권한·API·schema·정책 변경 0
 ## 5. 실브라우저 smoke 결과
 
 - **환경**: `https://neture.co.kr` (프로덕션), 배포 후
-- **계정**: Neture 공급자2 (`docs/local/TEST-ACCOUNTS.local.md` — (주)네뚜레 공급자 테스트 / supplier owner). 자격증명은 본 문서에 기재하지 않는다.
+- **계정**: Neture 공급자2 (`docs/local/TEST-ACCOUNT.txt` — (주)네뚜레 공급자 테스트 / supplier owner). 자격증명은 본 문서에 기재하지 않는다.
 - **방법**: route 별 이동 후 `main` 렌더 확인 + console `error` 수집 + `/api/` 응답 4xx·5xx 수집
 
 ### 5-1. 필수 route (WO §8)

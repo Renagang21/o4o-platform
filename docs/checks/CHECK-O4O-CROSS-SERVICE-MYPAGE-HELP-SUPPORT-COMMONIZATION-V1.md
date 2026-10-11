@@ -253,7 +253,7 @@ adoption 대상 공통 자산이 생성되지 않았으므로 5서비스 모두 
 ## 17. production browser
 
 전부 프로덕션 실측 (`kpa-society.co.kr` · `www.k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`).
-로그인 계정은 §15 SSOT (`docs/local/TEST-ACCOUNTS.local.md`) 기준. KPA·KCos·Neture = 관리자/운영자 계정, PH = 약국 경영자 계정(승인됨).
+로그인 계정은 §15 SSOT (`docs/local/TEST-ACCOUNT.txt`) 기준. KPA·KCos·Neture = 관리자/운영자 계정, PH = 약국 경영자 계정(승인됨).
 
 ### 실측 중 정정된 사전 가설
 

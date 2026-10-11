@@ -137,7 +137,7 @@ git diff --stat (기존 파일): 22 files changed, 350 insertions(+), 6661 delet
 
 ### 5-1. 로그인 검증 여부 — **미검증 (명시)**
 
-`docs/local/TEST-ACCOUNTS.local.md` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
+`docs/local/TEST-ACCOUNT.txt` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
 웹 로그인 E2E 를 수행할 수 없다. 같은 문서 §4-2 가 허용한 **L1 토큰 주입 우회**로 UI 만 검증했다.
 
 > **로그인 E2E 미검증** — 토큰 주입은 로그인 성공이 아니다. 로그인 자체는 이번에도 검증되지 않았다.

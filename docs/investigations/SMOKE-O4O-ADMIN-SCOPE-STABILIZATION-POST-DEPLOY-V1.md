@@ -5,7 +5,7 @@
 > **선행**: `CHECK-O4O-ADMIN-SCOPE-STABILIZATION-CLOSURE-V1` (5f2f54ff9)
 > **검증 일시**: 2026-06-16
 > **도구**: Playwright 1.57.0 (headless chromium), curl
-> **계정**: 통합 운영자 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`, admin+operator 동시 보유) — 자격증명 미기재(정책 준수)
+> **계정**: 통합 운영자 계정(SSOT `docs/local/TEST-ACCOUNT.txt`, admin+operator 동시 보유) — 자격증명 미기재(정책 준수)
 > **판정: ✅ PASS** (검증 가능 항목 전부 정상. 일부 항목은 계정/운영데이터 제약으로 미수행 — §6 명시)
 
 ---

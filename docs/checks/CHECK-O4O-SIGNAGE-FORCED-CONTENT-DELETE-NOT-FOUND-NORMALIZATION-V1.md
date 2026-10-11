@@ -307,7 +307,7 @@ if (affected === 0 || rows.length === 0) { /* 기존 404 분기 */ }
    Signage 의 다른 리소스는 repository 계층을 갖는다. 계층 정합은 별도 WO 후보
    (본 WO 는 "가장 작은 계층에서 수정" 원칙에 따라 계층 신설을 하지 않았다).
 4. **`[REDACTED_EMAIL_A]` 의 kpa-society service credential 불일치** (§9) — 검증 계정
-   환경 문제. 코드 결함 아님. `docs/local/TEST-ACCOUNTS.local.md` 갱신 또는 credential
+   환경 문제. 코드 결함 아님. `docs/local/TEST-ACCOUNT.txt` 갱신 또는 credential
    재설정이 필요하며 본 WO 범위 밖이다.
 
 ---

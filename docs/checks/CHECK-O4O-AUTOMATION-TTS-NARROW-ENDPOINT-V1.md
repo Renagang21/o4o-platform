@@ -26,7 +26,7 @@
 | [`tts-narration.controller.ts`](../../apps/api-server/src/modules/automation/controllers/tts-narration.controller.ts) | `POST /automation/tts` · guard `[authenticate, requireMediaPlatformAdmin]` (VIDEO Job 과 동일) · 응답 `audio/mpeg|audio/wav` + `X-Tts-Provider/Model/Voice/Format` · `Cache-Control: private, no-store` |
 | [`register-routes.ts`](../../apps/api-server/src/bootstrap/register-routes.ts) 29d-7 | `/api/v1/platform` 에 mount |
 | [`automation-tts-narration.spec.ts`](../../apps/api-server/src/__tests__/automation-tts-narration.spec.ts) | jest 10/10 PASS (allowlist·prototype 키 차단·검증·503 미설정·OpenAI 요청형·Gemini 헤더/WAV·no-audio·401/429/네트워크 → 502) |
-| [`tts_ab_cut1.py`](../../scripts/media/minerock600-pilot/ep01/tts_ab_cut1.py) | 로컬 smoke 클라이언트 — 자격은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 · token 미출력 · `[CUT1]` 추출 · ffprobe duration · Gemini wav → 청취용 mp3 사본(ffmpeg, 원본 보존) |
+| [`tts_ab_cut1.py`](../../scripts/media/minerock600-pilot/ep01/tts_ab_cut1.py) | 로컬 smoke 클라이언트 — 자격은 `docs/local/TEST-ACCOUNT.txt` 에서만 · token 미출력 · `[CUT1]` 추출 · ffprobe duration · Gemini wav → 청취용 mp3 사본(ffmpeg, 원본 보존) |
 
 오류 코드: `TTS_INVALID_PROVIDER / TTS_TEXT_REQUIRED / TTS_TEXT_TOO_LONG / TTS_INVALID_FORMAT / TTS_INVALID_VOICE / TTS_INVALID_STYLE / TTS_STYLE_TOO_LONG`(400) · `TTS_PROVIDER_NOT_CONFIGURED`(503) · `TTS_PROVIDER_RATE_LIMITED / TTS_PROVIDER_FAILED / TTS_PROVIDER_UNREACHABLE / TTS_PROVIDER_NO_AUDIO`(502).
 

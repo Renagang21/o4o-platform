@@ -71,7 +71,7 @@ jest 가 고정하는 계약: lookup 무효 404 `PAIRING_CODE_INVALID` · claim 
 - CI Pipeline 은 뒤이은 다른 세션 push(`e393c2f52`) 의 concurrency 로 취소됨(본 변경의 실패 아님). `c12f8c746` CI Pipeline · CodeQL 은 통과.
 
 ### 4-3. 실 태블릿 시나리오 (§23) — Playwright 태블릿 뷰포트 · 프로덕션
-스크립트: [`scripts/e2e/store-tablet-location-content-runtime.e2e.mjs`](../../scripts/e2e/store-tablet-location-content-runtime.e2e.mjs) (`KPA_EMAIL` / `KPA_PASS` / `OUT_DIR` 환경변수 · 자격증명 미포함). PC 컨텍스트 1440×900 + 태블릿 컨텍스트 1280×800(hasTouch · 별도 브라우저 프로필) · `https://kpa-society.co.kr` · 테스트 약국(`docs/local/TEST-ACCOUNTS.local.md` 약국 경영자).
+스크립트: [`scripts/e2e/store-tablet-location-content-runtime.e2e.mjs`](../../scripts/e2e/store-tablet-location-content-runtime.e2e.mjs) (`KPA_EMAIL` / `KPA_PASS` / `OUT_DIR` 환경변수 · 자격증명 미포함). PC 컨텍스트 1440×900 + 태블릿 컨텍스트 1280×800(hasTouch · 별도 브라우저 프로필) · `https://kpa-society.co.kr` · 테스트 약국(`docs/local/TEST-ACCOUNT.txt` 약국 경영자).
 
 | # | 단계 | 결과 |
 |---|---|---|

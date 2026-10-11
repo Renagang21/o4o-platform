@@ -6,7 +6,7 @@
 - **작성일**: 2026-08-14
 - **대상 서비스**: KPA-Society · K-Cosmetics · Pharmacy-Hub (4개)
 - **검증 방식**: 프로덕션 실브라우저(Playwright chromium) 실로그인 · desktop(1440×900) + mobile(390×844, iPhone UA, isMobile/hasTouch)
-- **검증 계정**: `docs/local/TEST-ACCOUNTS.local.md` 매장 경영자 계정 (SSOT)
+- **검증 계정**: `docs/local/TEST-ACCOUNT.txt` 매장 경영자 계정 (SSOT)
 
 > **결론 먼저 (최종)**: 4개 서비스 모두 `로그인 → Store Hub 진입 → 상품 탐색 → 상세(또는 계약상 대체)
 > → 신청/가져오기 → 장바구니 → 주문 진입` 을 desktop·mobile 양쪽에서 통과한다.

@@ -901,7 +901,7 @@ kpa_pharmacist_profiles = 자격(Qualification)
 
 * 로그인 API 는 **`serviceKey` 필수**. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 된다. "UI 는 되는데 curl 만 401" 이면 이 원인이다.
 * K-Cosmetics 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
-* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 만 신뢰한다 (CLAUDE.md §15).
+* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 만 신뢰한다 (CLAUDE.md §15).
 * 배포 후 stale chunk 로 구버전이 보일 수 있다 — 캐시 버스트 후 재확인.
 * Requests 트랙에서 실제 브라우저 검증으로만 잡힌 결함이 2건 있었다 (raw enum 노출 · 같은 신청의 label 불일치). §26 은 스냅샷이 아니라 **실제 렌더 문자열**을 판정한다.
 

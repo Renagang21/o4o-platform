@@ -144,7 +144,7 @@ apps/api-server                             → 무변경
 ```
 
 **실브라우저 검증은 하지 않았다.** 다중 후보 상황을 재현하려면 관리 범위가 2개 이상인
-운영자 계정이 필요한데 `docs/local/TEST-ACCOUNTS.local.md` 기준으로 확보하지 못했다.
+운영자 계정이 필요한데 `docs/local/TEST-ACCOUNT.txt` 기준으로 확보하지 못했다.
 대신 컴포넌트를 실제 DOM(jsdom)에 렌더해 클릭·선택·제출까지 수행하고 전송 payload 를 단언했다.
 
 ---

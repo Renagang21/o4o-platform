@@ -12,7 +12,7 @@
 - **판정: Case F (실제 공급 활성화 2단계 대기) 확정 — 단, 두 PENDING row 모두 테스트 계정**.
 - 2 row 모두 `service_memberships.status='active'` (가입 승인 완료), `neture_suppliers.status='PENDING'` + `approved_at=NULL` (공급 활성화 단계 미수행) 의 정상 two-step 흐름 상태.
 - **stale legacy 데이터 아님** (Case D 기각): user_status='active', organization_id 정상 연동, created_at 최근 (각 2026-05-24, 2026-05-30).
-- 다만 **두 row 모두 테스트 계정** ([REDACTED_EMAIL_C]=쓰리라이프존, [REDACTED_EMAIL_B]=테스트공급자 — TEST-ACCOUNTS.local.md SSOT 일치) 이라 운영자의 "실제 처리 대기는 없다" 인식과 일치하지 않음. 이는 **데이터 무결성 문제가 아닌 UX/운영 정책 문제**.
+- 다만 **두 row 모두 테스트 계정** ([REDACTED_EMAIL_C]=쓰리라이프존, [REDACTED_EMAIL_B]=테스트공급자 — TEST-ACCOUNT.txt SSOT 일치) 이라 운영자의 "실제 처리 대기는 없다" 인식과 일치하지 않음. 이는 **데이터 무결성 문제가 아닌 UX/운영 정책 문제**.
 - 따라서 후속 분기는 **F-track (operator visibility 보강)** 가 정답. 동시에 부차적으로 **테스트 계정의 supplier 활성화 처리 흐름**도 명확히 해야 미래 시점에도 동일 false alarm 방지 가능.
 
 ---
@@ -57,7 +57,7 @@ ORDER BY ns.created_at;
 - 두 row 모두 `approved_at IS NULL` 이고 `updated_at = created_at` → 생성 이후 한 번도 supplier-side 활성화 처리되지 않은 상태
 - `user_status='active'` → users 행은 정상
 - `organization_id` 정상 연동 → 가입 승인 트랜잭션이 정상 종료된 결과
-- 두 이메일 모두 [docs/local/TEST-ACCOUNTS.local.md](../local/TEST-ACCOUNTS.local.md) 에 등록된 **Neture 공급자 테스트 계정**:
+- 두 이메일 모두 [docs/local/TEST-ACCOUNT.txt](../local/TEST-ACCOUNT.txt) 에 등록된 **Neture 공급자 테스트 계정**:
   - [REDACTED_EMAIL_C] — "Neture 공급자" / 쓰리라이프존
   - [REDACTED_EMAIL_B] — "Neture 공급자2" / 테스트공급자
 

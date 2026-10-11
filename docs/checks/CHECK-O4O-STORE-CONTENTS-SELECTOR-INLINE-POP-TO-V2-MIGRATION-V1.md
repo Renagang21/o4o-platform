@@ -104,7 +104,7 @@ state.popV2Handoff = { sourceKind:'content', origin:'direct'|'library'|'snapshot
 
 ## 7. Production E2E — API (read-only, 2026-09-11)
 
-계정 `ren***`(KPA · serviceKey `kpa-society`), 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 런타임 파싱.
+계정 `ren***`(KPA · serviceKey `kpa-society`), 자격증명은 `docs/local/TEST-ACCOUNT.txt` 런타임 파싱.
 
 ```text
 GET /kpa/pharmacy/pop-v2/sources/contents            → 200  n=37  {library:15, direct:15, snapshot:7}

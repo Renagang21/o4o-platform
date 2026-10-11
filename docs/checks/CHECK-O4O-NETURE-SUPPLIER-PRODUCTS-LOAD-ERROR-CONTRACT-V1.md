@@ -166,7 +166,7 @@ export const SUPPLIER_PRODUCTS_LOAD_FAILED = 'SUPPLIER_PRODUCTS_LOAD_FAILED';
 **텔레메트리**: page error **0** · mutation(POST/PUT/DELETE) 요청 **0**.
 console error 는 **주입한 500 자체**에 대한 브라우저 기본 로그뿐이며, 정상 시나리오(A·B·E)에서는 0.
 
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서 스크립트가 직접 읽고 명령행·로그에 남기지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서 스크립트가 직접 읽고 명령행·로그에 남기지 않았다.
 
 ## 8. 반응형 결과
 

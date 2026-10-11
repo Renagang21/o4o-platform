@@ -24,7 +24,7 @@ Chromium 이 이미 설치되어 있었다** (`node_modules/playwright`, `ms-pla
 | 공개 URL | `https://neture.co.kr/p/:publicKey` (`ProductLandingPage`) |
 | 브라우저 | Chromium (Playwright, headless) |
 | viewport | mobile `390×844` · tablet `768×1024` · desktop `1440×900` |
-| 계정 | `docs/local/TEST-ACCOUNTS.local.md` Neture 운영자 — 값은 **환경변수 주입**, 로그·문서·커밋에 미포함 |
+| 계정 | `docs/local/TEST-ACCOUNT.txt` Neture 운영자 — 값은 **환경변수 주입**, 로그·문서·커밋에 미포함 |
 | 기준 HEAD | `76c035e4c` |
 | DB 접근 | `SELECT` 만 (publicKey·제품명 조회) — **write 0** |
 

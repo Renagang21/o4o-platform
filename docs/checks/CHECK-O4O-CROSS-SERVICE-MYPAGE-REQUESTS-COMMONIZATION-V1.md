@@ -198,7 +198,7 @@ desktop 1440×900 · mobile 390×844 실측.
 ## 14. production browser (§22 · §24)
 
 배포: `Deploy Web Services (Cloud Run)` run `32223244341` (`3da990215`) — 7 job 전부 `success`.
-로그인은 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login (PH 데모 계정 버튼 미사용).
+로그인은 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login (PH 데모 계정 버튼 미사용).
 
 | 서비스 | 결과 | 관측 |
 |---|---|---|

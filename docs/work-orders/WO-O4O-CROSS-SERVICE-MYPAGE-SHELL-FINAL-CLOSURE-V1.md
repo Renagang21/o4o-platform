@@ -96,7 +96,7 @@ PharmacyHub 정상 테스트 계정
 
 stale demo password 버튼은 검증 수단으로 사용하지 않는다.
 
-기존 안전한 로그인 세션 또는 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login을 사용한다.
+기존 안전한 로그인 세션 또는 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login을 사용한다.
 
 자격증명을:
 

@@ -78,7 +78,7 @@ console error / page error / 연락처-API 4xx·5xx = **전 서비스 0**.
 ## 9. 검증 방식 / 비범위
 
 - 검증: gh/gcloud 배포 확인 + 프로덕션 read-only API + Playwright headless(chromium) 렌더/로그 수집. 운영 데이터 변경 0(가입 제출·저장 미실행 — 렌더/조회만, 정보수정도 저장 미클릭).
-- 자격증명: SSOT(`docs/local/TEST-ACCOUNTS.local.md`) env 주입 — 로그/문서 미출력.
+- 자격증명: SSOT(`docs/local/TEST-ACCOUNT.txt`) env 주입 — 로그/문서 미출력.
 - 비범위: 코드 수정 / K-Cosmetics store-dashboard 500 수정 / Neture supplier profile surfacing / operator 표시 / 배포 외 기능 변경.
 
 ---

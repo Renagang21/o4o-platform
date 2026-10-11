@@ -169,7 +169,7 @@ children  ← 폼 본문(ForumWriteForm)
 **배포** — commit `009051388` · workflow run `32326205830` "Deploy Web Services (Cloud Run)" **success**
 (`deploy-k-cosmetics: success` · 전체 job success). 백엔드/마이그레이션 변경 없음.
 
-**계정** — `docs/local/TEST-ACCOUNTS.local.md` 의 K-Cosmetics 운영자 계정. 자격증명은 문서/코드에 기록하지 않는다.
+**계정** — `docs/local/TEST-ACCOUNT.txt` 의 K-Cosmetics 운영자 계정. 자격증명은 문서/코드에 기록하지 않는다.
 **원칙** — 운영 데이터 write 0건. 게시글 생성/수정 submit 은 수행하지 않고 렌더 · selector · validation · cancel 만 확인했다.
 
 | # | service | viewport | 대상 | 결과 |

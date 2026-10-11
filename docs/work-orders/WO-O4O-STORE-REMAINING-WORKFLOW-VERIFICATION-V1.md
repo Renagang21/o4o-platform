@@ -7,7 +7,7 @@
 
 ## 이번 실행
 
-계정은 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md`가 지정한 canonical Store Owner를 사용했다. 이전 private 생성 기록의 유지 매장 A를 선택했다. 새 계정·매장·자격·운영 콘텐츠를 만들거나 기존 업무 데이터·권한을 변경하지 않았다. 실제 운영 API는 로그인과 기존 자료 조회에 사용했고, 원본 변경 실험은 격리 로컬 PostgreSQL에서 실행했다.
+계정은 로컬 전용 `docs/local/TEST-ACCOUNT.txt`가 지정한 canonical Store Owner를 사용했다. 이전 private 생성 기록의 유지 매장 A를 선택했다. 새 계정·매장·자격·운영 콘텐츠를 만들거나 기존 업무 데이터·권한을 변경하지 않았다. 실제 운영 API는 로그인과 기존 자료 조회에 사용했고, 원본 변경 실험은 격리 로컬 PostgreSQL에서 실행했다.
 
 현재 서비스 정본에 따라 `pharmacy.neture.co.kr`에서 로그인하고 `store.neture.co.kr`의 통합 내 매장 화면으로 handoff했다. Chromium·Playwright를 사용했으며 TLS 검증을 유지했다. 최초 분회 host의 TLS 실패는 업무 화면 결과와 구분하며 약국 업무 host로 바로잡았다.
 

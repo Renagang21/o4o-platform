@@ -132,7 +132,7 @@ routes/lms-marketing.routes.tsx:39            주석
 ## 8. 실브라우저 smoke 결과
 
 **환경**: Playwright(chromium, headless) · `https://admin.neture.co.kr` · 배포 리비전 `01100-f5f`
-**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — `docs/local/TEST-ACCOUNTS.local.md` §4-3
+**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — `docs/local/TEST-ACCOUNT.txt` §4-3
 **로그인**: `POST /api/v1/auth/login` → **200**, `/home` 착지, 콘솔 에러 0 (토큰 주입 우회 아님, 정식 폼 로그인)
 
 | 대상 | 최종 URL | 화면 | 콘솔 에러 | 비-2xx API | `/pharmacy/qr/*` |
@@ -153,7 +153,7 @@ routes/lms-marketing.routes.tsx:39            주석
 GET /api/v1/kpa/store/assets?page=1&limit=50   →  403
 ```
 
-- smoke 계정 `renariver21` 의 membership 은 **`platform` 단일**이다 (`docs/local/TEST-ACCOUNTS.local.md` §4-3).
+- smoke 계정 `renariver21` 의 membership 은 **`platform` 단일**이다 (`docs/local/TEST-ACCOUNT.txt` §4-3).
   KPA scope 자원에 403 이 나는 것은 **계정 권한 범위**에 따른 결과다.
 - 본 변경은 **어떤 route 도 참조하지 않던 프런트 파일 3개의 삭제뿐**이며, 공용 모듈·guard·API 계약을 건드리지 않았다.
 - 403 을 반환한 api-server 는 **재배포되지 않았다** (`o4o-core-api-03268-cq2`, 07:00 배포 — 본 변경 이전).

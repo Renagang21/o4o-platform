@@ -735,4 +735,4 @@ Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지 — /mypa
 
 검증 도메인 주의: K-Cosmetics 정본은 **`k-cosmetics.site`** 다. `k-cosmetics.co.kr` 은 플랫폼과 무관한 외부 쇼핑몰이므로 검증에 사용하지 않는다.
 
-인증 주의: PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login 을 사용한다. 자격증명은 코드·스크립트·CHECK·Git·shell history·로그 어디에도 평문으로 남기지 않는다.
+인증 주의: PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login 을 사용한다. 자격증명은 코드·스크립트·CHECK·Git·shell history·로그 어디에도 평문으로 남기지 않는다.

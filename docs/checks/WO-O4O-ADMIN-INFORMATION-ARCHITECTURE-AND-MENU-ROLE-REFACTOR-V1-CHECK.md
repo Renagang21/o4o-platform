@@ -68,7 +68,7 @@ endpoint 의 응답**:
 `adminRouteAccess.ts` 의 `matchesRequiredRole` 이 요구 집합에 `admin` 이 있으면 **모든 서비스 접두
 `:admin`/`:operator` 역할**을 통과시키므로, 이 floor 를 좁히는 것이 "플랫폼 관리자 전용"의 마지막 조각이다.
 
-**지금 좁히면 실제 잠금 사고가 난다.** `docs/local/TEST-ACCOUNTS.local.md` §3 (2026-08-09 DB 실측):
+**지금 좁히면 실제 잠금 사고가 난다.** `docs/local/TEST-ACCOUNT.txt` §3 (2026-08-09 DB 실측):
 
 | 계정 | 보유 role | floor 축소 시 |
 |---|---|---|

@@ -109,7 +109,7 @@ WORKTREE_DISPOSITION: `wo/frontend-login-and-member-ui`는 PR·통합·운영 �
 | 공급자 관리·내 매장 신청 심사 진입 | 2/2 PASS | 합성 운영자 권한/응답; 실제 운영 Neture·Supplier·Store bundle의 기존 관리 화면 도착 |
 | 공급자·펀딩 가입·Kakao callback | 4/4 PASS | 합성 API; 동의·callback 일회 소비·확인 메일 안내. 실제 OAuth/가입/메일 수신 아님 |
 
-30개 PC/mobile 시나리오가 통과했고 브라우저 화면 오류·가로 넘침은 없었다. 공개 체험은 정본이 의도적으로 노출한 기능 자체의 검증이며, 없는 일반 운영자·소유자 테스트 계정을 대체하지 않는다. 현재 작업공간과 기준 checkout 모두 `docs/local/TEST-ACCOUNTS.local.md`가 없다. 실제 계정/OAuth/메일 수신, 공지 조회 계약 확장, 정책 발행과 타 서비스 전수 정비는 앞선 별도 후속 과제로 유지한다.
+30개 PC/mobile 시나리오가 통과했고 브라우저 화면 오류·가로 넘침은 없었다. 공개 체험은 정본이 의도적으로 노출한 기능 자체의 검증이며, 없는 일반 운영자·소유자 테스트 계정을 대체하지 않는다. 현재 작업공간과 기준 checkout 모두 `docs/local/TEST-ACCOUNT.txt`가 없다. 실제 계정/OAuth/메일 수신, 공지 조회 계약 확장, 정책 발행과 타 서비스 전수 정비는 앞선 별도 후속 과제로 유지한다.
 
 운영 배포 중 main에 추가된 PR #424는 별도 커뮤니티 심사 UI 작업이다. 이 closure에서는 해당 변경을 보존하며 이번 로그인·약국 UI의 최초 운영 target/검증 결과를 기록한다. 후속 Delivery의 누적 변경 처리와 이번 배포 결과를 혼동하지 않는다.
 

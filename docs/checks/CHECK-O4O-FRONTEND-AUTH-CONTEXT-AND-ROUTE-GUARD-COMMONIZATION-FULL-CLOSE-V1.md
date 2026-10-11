@@ -112,7 +112,7 @@ Pharmacy-Hub 는 일반 역할 가드를 갖고 있지 않다. 보호 경로는
 | 보호 라우트 · 역할 · 리다이렉트 | `createRouteGuard` 판정 순서 무변경 — 회귀 테스트 21건 유지 |
 | 플랫폼 관리자 / 서비스 운영자 경계 | 판정 술어·역할 상수 무변경 (`isAdminOrAbove` / `isOperatorOrAbove` / MembershipGate bypass 동일) |
 
-**브라우저 smoke 는 이번 CHECK 에 포함하지 않았다.** 배포 후 5개 서비스 로그인·새로고침 세션 복원·보호 라우트 접근을 실제 브라우저로 확인해야 최종 종료다(계정은 `docs/local/TEST-ACCOUNTS.local.md`).
+**브라우저 smoke 는 이번 CHECK 에 포함하지 않았다.** 배포 후 5개 서비스 로그인·새로고침 세션 복원·보호 라우트 접근을 실제 브라우저로 확인해야 최종 종료다(계정은 `docs/local/TEST-ACCOUNT.txt`).
 
 ## 8. 중복 감소량
 

@@ -20,7 +20,7 @@
 | 계정 | `[REDACTED_EMAIL_B]` (Neture 공급자2 · 테스트공급자) |
 | 조직 | (주)네뚜레 공급자 테스트 (supplier / owner) |
 | 로그인 | **UI 정상 로그인 성공** → `/supplier/dashboard` |
-| SSOT | `docs/local/TEST-ACCOUNTS.local.md` (git 추적 제외) |
+| SSOT | `docs/local/TEST-ACCOUNT.txt` (git 추적 제외) |
 
 > **선행 CHECK 정정**: `CHECK-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1` §2-1 은
 > 이 계정의 Neture 로그인이 401 이라 "토큰 주입 우회"를 썼다고 기록했으나, 본 배치에서 **UI 로그인이 정상 동작**했다.

@@ -160,7 +160,7 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 · Deploy Web Services run `30966228918` **success** (`deploy-pharmacy-hub` 만 빌드, 타 4서비스 skipped)
 
 브라우저: Playwright(실브라우저) · https://pharmacyhub.co.kr · 계정 `[REDACTED_EMAIL_B]`
-(테스트 계정 SSOT `docs/local/TEST-ACCOUNTS.local.md`)
+(테스트 계정 SSOT `docs/local/TEST-ACCOUNT.txt`)
 
 | # | 항목 | 결과 |
 |:-:|------|:---:|

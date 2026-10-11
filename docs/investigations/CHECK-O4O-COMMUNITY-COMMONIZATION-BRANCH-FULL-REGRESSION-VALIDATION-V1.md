@@ -81,7 +81,7 @@
 
 ### 3-5. Browser smoke — 부분 수행
 
-로그인: KPA-society operator 계정 (`docs/local/TEST-ACCOUNTS.local.md` 런타임 참조, 하드코딩 0).
+로그인: KPA-society operator 계정 (`docs/local/TEST-ACCOUNT.txt` 런타임 참조, 하드코딩 0).
 뷰포트: desktop 1440×900 + mobile 390×844.
 
 | 항목 | 결과 |

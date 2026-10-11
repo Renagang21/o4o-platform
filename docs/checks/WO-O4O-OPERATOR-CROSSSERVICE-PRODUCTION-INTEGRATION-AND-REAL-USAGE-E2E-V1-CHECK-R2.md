@@ -9,7 +9,7 @@
   - 표시 메뉴는 **사이드바 접이식 그룹을 하나씩 펼쳐 DOM 에서 수집**한 뒤 전수 방문
   - 모든 방문은 `page.goto` 직접 진입(= deep link · 전체 문서 로드)
   - 계측: `fetch` + `XMLHttpRequest` 후킹 + `window.error` / `unhandledrejection`
-  - 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(git 추적 제외) 에서 런타임에 읽는다. 본 문서에 값 없음.
+  - 자격증명은 `docs/local/TEST-ACCOUNT.txt`(git 추적 제외) 에서 런타임에 읽는다. 본 문서에 값 없음.
 
 ---
 

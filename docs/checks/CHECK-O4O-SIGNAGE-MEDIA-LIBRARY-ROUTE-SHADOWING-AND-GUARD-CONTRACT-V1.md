@@ -22,7 +22,7 @@
 
 ## 2. 수정 전 재현 (production, `api.neture.co.kr`)
 
-로그인 계정은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 의 매장 계정. **DB write 0 · 조회만.**
+로그인 계정은 `docs/local/TEST-ACCOUNT.txt` (gitignored) 의 매장 계정. **DB write 0 · 조회만.**
 
 | serviceKey | 요청 | 결과 |
 |---|---|---|
@@ -283,7 +283,7 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 ## 12. Production 검증 (배포 후)
 
 - 배포: commit `42bdf122f` → GitHub Actions run `32343552278` **success** → Cloud Run revision **`o4o-core-api-03409-8f2`** (100% traffic).
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 매장 계정 (store_owner). **전 요청 GET · production DB write 0.**
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 매장 계정 (store_owner). **전 요청 GET · production DB write 0.**
 
 | serviceKey | 요청 | 결과 |
 |---|---|---|

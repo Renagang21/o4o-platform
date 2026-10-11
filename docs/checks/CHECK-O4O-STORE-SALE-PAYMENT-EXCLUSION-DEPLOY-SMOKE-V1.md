@@ -53,7 +53,7 @@ PASS — 소비자→매장 O4O Toss 결제 경로가 프론트(POS 안내)·백
 ## 6. 무변경 확인
 
 - 본 smoke 코드/DB/route/데이터 변경 0. 실제 Toss 결제/confirm/환불 미실행. dummy body 는 410(앞단)으로 결제 생성 없음.
-- 자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`) env 주입 — 로그/문서 미출력.
+- 자격증명 SSOT(`docs/local/TEST-ACCOUNT.txt`) env 주입 — 로그/문서 미출력.
 
 ## 7. 후속
 

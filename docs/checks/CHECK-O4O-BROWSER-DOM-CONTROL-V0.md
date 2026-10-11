@@ -181,7 +181,7 @@ submit form · 외부 링크(kpa-society) · 내부 링크 · 60행 표 · 주�
 |---|---|
 | 배포 | `44bdc3767` → `o4o-core-api-03620-2js`(100 %, 아래 smoke 실측 리비전) · `c4ddac38c` → `o4o-core-api-03622-6tt`. 두 commit 모두 CI Pipeline · CodeQL · Deploy API success |
 | 경로 | Chromium(unpacked 확장) 의 `neture.co.kr` 세션 → `POST api.neture.co.kr/api/ai/home-chat` → Tool Router → `local_agent_commands` → **실 폴링 agent**(`index.mjs run`, 이 PC pairing 기존) → relay → native host → 확장 → 등재 탭 content script |
-| 로그인 | Neture 웹 폼은 L2 자격을 요구해(테스트 계정 unknown) `TEST-ACCOUNTS.local.md` §4-2 L1 채널로 세션 생성 |
+| 로그인 | Neture 웹 폼은 L2 자격을 요구해(테스트 계정 unknown) `TEST-ACCOUNT.txt` §4-2 L1 채널로 세션 생성 |
 
 ### 10-1. positive (§50)
 

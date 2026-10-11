@@ -20,7 +20,7 @@ UI 범위만 구현했다. **프로덕션 역할 변경 0 · DB write 0 · migra
 
 ## 1. 새 전용 계정 로그인 — **미확인 (중지 조건 1 해당)**
 
-- `[REDACTED_EMAIL_D]` 의 비밀번호가 자격증명 SSOT(`docs/local/TEST-ACCOUNTS.local.md`, CLAUDE.md §15)에 **미등재**다.
+- `[REDACTED_EMAIL_D]` 의 비밀번호가 자격증명 SSOT(`docs/local/TEST-ACCOUNT.txt`, CLAUDE.md §15)에 **미등재**다.
   해당 문서는 `sohae2100` / `renagang21` / `[REDACTED_EMAIL_C]` 3계정만 관리한다.
 - 따라서 WO 가 선행으로 요구한 "새 전용 계정 로그인·복구 가능성 확인"과 `platform:super_admin` 기능 smoke 를
   **수행할 수 없었다.** 자격증명 추측·probe 는 시도하지 않았다.
@@ -150,7 +150,7 @@ typecheck 기준선은 변경분을 `git stash` 후 재측정해 동일 4건임�
    `system-settings`/`integrations`/`tools`/`import-export`/`database` 를 보지 못하는 은폐 해소.
    **legacy 제거의 선행 조건**이기도 하다(이것 없이 legacy 를 걷어내면 해당 메뉴 접근자가 0이 된다).
    frontend 전용·additive 변경이라 위험 낮음.
-2. `[REDACTED_EMAIL_D]` 자격증명을 `TEST-ACCOUNTS.local.md` 에 등재 → §1 게이트 해소.
+2. `[REDACTED_EMAIL_D]` 자격증명을 `TEST-ACCOUNT.txt` 에 등재 → §1 게이트 해소.
 3. 1·2 완료 후 cutover 재시도(부트스트랩 이전 → sohae2100 제거 → legacy 정리) 순서로 수행.
 4. `removeMemberRole` 최후 platform admin 보호 가드
    (`CHECK-O4O-KPA-PLATFORM-SUPER-ADMIN-ROLE-SEPARATION-V1 §9` 와 동일 권고).

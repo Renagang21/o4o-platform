@@ -409,7 +409,7 @@ pages/services/PharmacyServicePage.tsx
 ```
 
 → 이 4개의 실제 route 를 `App.tsx` 에서 확인한 뒤 그중 하나 이상으로 진입한다.
-→ 프로덕션 KPA 도메인은 `docs/local/TEST-ACCOUNTS.local.md` 와 CLAUDE.md §15 를 따른다. 공개 페이지이므로 로그인은 불필요할 가능성이 높다.
+→ 프로덕션 KPA 도메인은 `docs/local/TEST-ACCOUNT.txt` 와 CLAUDE.md §15 를 따른다. 공개 페이지이므로 로그인은 불필요할 가능성이 높다.
 → 배포 전이라 프로덕션에 반영되지 않았다면 그 사실 자체를 사유로 CHECK 에 적는다(§9 마지막 문단). **미검증을 PASS 로 쓰지 않는다.**
 
 ### G. §6.3 — 손대면 안 되는 것

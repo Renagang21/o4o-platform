@@ -116,7 +116,7 @@ console exception 없음
 중복 save 없음
 ```
 
-production write는 `docs/local/TEST-ACCOUNTS.local.md`의 테스트 계정에 한정한다.
+production write는 `docs/local/TEST-ACCOUNT.txt`의 테스트 계정에 한정한다.
 
 ---
 

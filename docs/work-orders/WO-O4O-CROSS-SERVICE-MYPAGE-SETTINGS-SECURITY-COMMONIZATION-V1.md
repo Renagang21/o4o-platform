@@ -788,6 +788,6 @@ Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지 — /mypa
 
 인증 주의:
 
-- PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNTS.local.md` 기준 interactive login 을 사용한다.
+- PharmacyHub 로그인 화면의 **데모 계정 채우기 버튼은 stale password** 라 401 이 난다. 검증 수단으로 사용하지 않고 `docs/local/TEST-ACCOUNT.txt` 기준 interactive login 을 사용한다.
 - **로그인 API 는 `serviceKey` 가 필수**다. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 난다. "UI 는 되는데 curl 만 401" 이면 이 원인이다.
 - 자격증명은 코드·스크립트·CHECK·Git·shell history·로그 어디에도 평문으로 남기지 않는다 (§24 포함).

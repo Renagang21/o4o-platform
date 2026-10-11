@@ -122,7 +122,7 @@ serviceKey 처리 실패를 INVALID_CREDENTIALS로 반환하지 말 것
 
 ## 6. 테스트 계정 문서 구조 문제
 
-`docs/local/TEST-ACCOUNTS.local.md` 는 **계정당 비밀번호 1개**를 기재한다. 이는 L2 credential 계약과
+`docs/local/TEST-ACCOUNT.txt` 는 **계정당 비밀번호 1개**를 기재한다. 이는 L2 credential 계약과
 구조적으로 어긋난다 — 실제로는 `(계정 × 서비스)` 마다 비밀번호가 다를 수 있다.
 
 본 세션 실측: `[REDACTED_EMAIL_C]` 은 `serviceKey` 없는 로그인조차 401(문서값 불일치),
@@ -157,7 +157,7 @@ typecheck / build / 배포: **미실행** (코드 변경 0건이라 대상 없�
 | **A** | 관리자 비밀번호 재설정 | **현행 의미 유지 + 명시.** 서비스별 credential 이 있는 경우 **해당 서비스 로그인 비밀번호가 바뀌지 않을 수 있음**을 응답·UI 에 표시한다. credential 자체는 변경하지 않는다 |
 | **B** | 서비스별 비밀번호 분리 | **유지.** `users.password` fallback 으로 되돌리지 않는다 |
 | **C** | `account_activities.success` 오기록 | **별도 WO 로 분리** |
-| **D** | `TEST-ACCOUNTS.local.md` | **서비스별 비밀번호 컬럼 구조로 개편** |
+| **D** | `TEST-ACCOUNT.txt` | **서비스별 비밀번호 컬럼 구조로 개편** |
 
 ### 8-1. 절대 하지 않을 것 (확정)
 

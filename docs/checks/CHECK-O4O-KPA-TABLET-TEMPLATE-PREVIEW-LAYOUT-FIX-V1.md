@@ -84,7 +84,7 @@ lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]   → 왼쪽 ≈57.4% / �
 
 ## 8. 브라우저 실측 (배포본 · PASS)
 
-`https://kpa-society.co.kr` · 약국 경영자 계정(SSOT=`docs/local/TEST-ACCOUNTS.local.md`, env 주입) · Playwright 1.57 · viewport 1600×1000.
+`https://kpa-society.co.kr` · 약국 경영자 계정(SSOT=`docs/local/TEST-ACCOUNT.txt`, env 주입) · Playwright 1.57 · viewport 1600×1000.
 
 | 검증 항목 | 결과 |
 |-----------|------|

@@ -71,7 +71,7 @@ SPD 스키마/마이그레이션 (없음)
 - push `a58b95175` → GitHub Actions "Deploy Web Services (Cloud Run)" run `29180091023` **success** → `neture-web-01256-v8j` (2026-07-12T04:44Z) 롤포워드.
 
 ### 5.3 라이브 브라우저 스모크 (Playwright, 임시 userDataDir, 자격증명 env 주입)
-대상: `https://neture.co.kr`. 테스트 계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT.
+대상: `https://neture.co.kr`. 테스트 계정은 `docs/local/TEST-ACCOUNT.txt` SSOT.
 
 | 계정 | 상태 | heading | 분기 | 사이드바 진입점 | 정책문구 | SUPPLIER_STORE 미노출 | 콘솔오류 |
 |------|------|:------:|------|:------:|:------:|:------:|:------:|

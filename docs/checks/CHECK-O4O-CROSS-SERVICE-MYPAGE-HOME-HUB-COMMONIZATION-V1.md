@@ -162,7 +162,7 @@ export 는 `packages/account-ui/src/index.ts` 에 WO 주석과 함께 추가.
 
 ## 12. production browser 검증
 
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 기준. **본 문서에 자격증명을 남기지 않는다.**
+계정은 `docs/local/TEST-ACCOUNT.txt` 기준. **본 문서에 자격증명을 남기지 않는다.**
 
 | 서비스 | URL | desktop | mobile | 비고 |
 |---|---|:---:|:---:|---|

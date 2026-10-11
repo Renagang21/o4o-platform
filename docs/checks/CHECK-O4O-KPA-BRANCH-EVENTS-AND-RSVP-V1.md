@@ -218,7 +218,7 @@ API 로 현재 상태를 확인하니 `published` 였다. 실제로 `cancelled` 
 1. **행사 생성·게시·취소·RSVP 전 과정을 제품 API 로 통과**시켰다. 신고기간처럼 SQL 로
    상태를 만든 부분이 없다 (W3~W9 와 달리 이 도메인은 기간 게이트가 없다).
 2. 검증 계정 2개는 실사용 계정이다 (`sohae2100` · `renagang21`). 프로덕션에 전용 테스트
-   계정이 없어 SSOT(`docs/local/TEST-ACCOUNTS.local.md`) 등재 계정을 썼다.
+   계정이 없어 SSOT(`docs/local/TEST-ACCOUNT.txt`) 등재 계정을 썼다.
 3. 한글 payload 는 UTF-8 파일 + `--data-binary @file` 로 보냈다 (W5·W6·W9 와 같은 도구 함정).
 4. `status` 필터에 정의되지 않은 값이 오면 무시하고 전체를 반환한다 (W4~W9 와 같은 판단).
 

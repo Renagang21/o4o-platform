@@ -126,7 +126,7 @@
 |------|------|:---:|:---:|------|
 | sohae2100 | kpa:admin / kpa:operator | **PASS(라이브)** | PASS | 정상 운영자 접근 |
 | renagang21 | store owner | **DENY(라이브)** — `/operator` → "접근 권한이 없습니다 · 운영자(Operator) 권한 필요" | 403 | 프론트/백엔드 모두 차단 확인 |
-| renariver21 | platform:super_admin | (정적) PASS | PASS | **미확인 — `docs/local/TEST-ACCOUNTS.local.md` 미등재로 라이브 불가** |
+| renariver21 | platform:super_admin | (정적) PASS | PASS | **미확인 — `docs/local/TEST-ACCOUNT.txt` 미등재로 라이브 불가** |
 
 - 프론트(kpa:* + super_admin 만 허용, 더 엄격) vs 백엔드(교차 서비스 operator 도 허용) 비대칭 존재하나 **프론트가 더 엄격 → 보안 개방 아님**(측정값, 본 IR 변경 대상 아님).
 - **중지 항목:** renariver21 라이브 검증은 자격증명 부재로 불가. 은폐하지 않고 기록 — 필요조건 = SSOT 계정 등록.

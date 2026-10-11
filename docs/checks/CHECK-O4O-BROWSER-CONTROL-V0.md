@@ -204,7 +204,7 @@ neture.co.kr (실브라우저 · 로그인 · /mypage/settings [이 PC 연결] �
 
 이 PC 는 이번이 첫 연결이라 One-click Pairing 부터 실측했다(`이 PC 연결됨` · agent 로그
 `이 PC 가 연결되었습니다`). 로그인은 Neture 웹 폼이 L2 자격을 요구해(테스트 계정 L2 unknown)
-`TEST-ACCOUNTS.local.md` §4-2 의 L1 채널로 세션을 만들었다 — Home 화면과 설정 화면은
+`TEST-ACCOUNT.txt` §4-2 의 L1 채널로 세션을 만들었다 — Home 화면과 설정 화면은
 role gate 가 없어 이 채널이 유효하다.
 
 ### 12-2. 사용자 UX smoke (§40) — 실측 답변

@@ -212,7 +212,7 @@ available_stock <= low_stock_threshold → low_stock (재고 부족)
 | job | `detect-changes` success · `deploy-neture` **success** (타 3서비스 skipped) |
 | Cloud Run revision | `neture-web-01310-ml6` |
 
-검증 계정: Neture 공급자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md`) — 자격정보 비기재.
+검증 계정: Neture 공급자 테스트 계정 (`docs/local/TEST-ACCOUNT.txt`) — 자격정보 비기재.
 
 ### Desktop 1440×900 — PASS
 

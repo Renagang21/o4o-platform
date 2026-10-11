@@ -217,7 +217,7 @@ dual-key 조직에서 canonical 결정적 선택 / PUBLIC 자동확산의 legacy
 ## 12. production smoke (배포 후 실측, 2026-08-18)
 
 배포: `Deploy API Server (Cloud Run)` run `32110523343` = **success** (commit `0beb2bb18`).
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 참조 (값 미기록).
+계정은 `docs/local/TEST-ACCOUNT.txt` 참조 (값 미기록).
 
 ### K-Cosmetics store-owner
 

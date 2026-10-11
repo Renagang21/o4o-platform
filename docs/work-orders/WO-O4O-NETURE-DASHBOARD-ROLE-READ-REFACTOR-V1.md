@@ -53,7 +53,7 @@ web-neture dashboard API와 Hub가 공급자 요약을 소비한다. 기존 impo
 
 환경 설정 스킬의 worktree 생성 제한에 따라 독립 clone/branch에서 작업한다.
 기준 checkout과 기존 survey worktree는 변경하지 않는다.
-운영 계정 정본 `docs/local/TEST-ACCOUNTS.local.md`는 작업·기준 checkout에 없다.
+운영 계정 정본 `docs/local/TEST-ACCOUNT.txt`는 작업·기준 checkout에 없다.
 관리자·매장 실제 계정 smoke는 미실행으로 구분한다. 이전 세션에서 사용자가 승인한 공개 공급자
 Demo 체험은 공급자 read-only 검증에만 사용하며 실제 관리자·매장 계정을 대체하지 않는다.
 운영 응답 원문·개인정보·token을 기록하지 않는다.

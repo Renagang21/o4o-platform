@@ -34,7 +34,7 @@ Signage API 의 resource id path parameter 에 **UUID 형식이 아닌 값**이 
 ## 3. 수정 전 재현 (production, read-only)
 
 대상: `https://api.neture.co.kr/api/signage/kpa-society/...` (revision 배포 전)
-계정: KPA store owner / KPA operator (자격증명은 `docs/local/TEST-ACCOUNTS.local.md` — 본 문서에 기록하지 않는다)
+계정: KPA store owner / KPA operator (자격증명은 `docs/local/TEST-ACCOUNT.txt` — 본 문서에 기록하지 않는다)
 
 | 요청 | 수정 전 | 실제 원인 |
 |---|---|---|

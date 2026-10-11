@@ -181,7 +181,7 @@ static IP 관련 후속 삭제 후보 **없음**.
 | `o4o-core-api` Ready | ✅ |
 | `GET /health` | **200** |
 | `GET /health/database` | **healthy** (PostgreSQL 15.17, pingMs 2, activeConnections 10, longRunningQueries 0) |
-| 로그인 smoke | **200 · `success: true`** (`POST /api/v1/auth/login`, `serviceKey: neture`, 계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT) |
+| 로그인 smoke | **200 · `success: true`** (`POST /api/v1/auth/login`, `serviceKey: neture`, 계정은 `docs/local/TEST-ACCOUNT.txt` SSOT) |
 | TLS / redirect error | 0 |
 | LB connection 관련 신규 5xx | **0** — LB 로그의 503 2건은 §7 의 **본 검증용 curl 이 삭제된 IP 를 친 것**(`retriable_error`) |
 

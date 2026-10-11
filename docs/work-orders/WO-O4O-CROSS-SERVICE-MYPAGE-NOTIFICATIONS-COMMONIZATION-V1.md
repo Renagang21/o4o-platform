@@ -928,7 +928,7 @@ KPA `listMyRequests` 의 `catch { return [] }` 가 Requests 트랙 followup 으�
 
 * 로그인 API 는 **`serviceKey` 필수**. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 된다. "UI 는 되는데 curl 만 401" 이면 이 원인이다.
 * K-Cosmetics 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
-* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 만 신뢰한다 (CLAUDE.md §15).
+* PH 로그인 화면의 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 만 신뢰한다 (CLAUDE.md §15).
 * 배포 후 stale chunk 로 구버전이 보일 수 있다 — 캐시 버스트 후 재확인.
 * **선행 3트랙 모두, 정적 분석으로는 통과했으나 실제 브라우저 렌더 문자열에서만 결함이 드러났다** (raw enum 노출 · 같은 신청의 label 불일치 · role 사전 키 접두 불일치). §24 는 스냅샷이 아니라 실제 렌더 문자열과 실제 네트워크 응답으로 판정한다.
 * §20 read write 를 수행했다면 **어느 계정의 어떤 알림인지**를 CHECK 에 남긴다. 삭제는 하지 않는다.

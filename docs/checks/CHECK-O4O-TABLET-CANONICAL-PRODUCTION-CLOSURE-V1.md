@@ -50,7 +50,7 @@ Cloud Run revision: `o4o-core-api` **`03545` → `03546-wjg`**, `kpa-society-web
 
 ## 4. Browser E2E (production)
 
-인증은 `TEST-ACCOUNTS.local.md §4-2` 의 L1 토큰 주입을 썼다(서비스 웹 로그인은 §2 자격이
+인증은 `TEST-ACCOUNT.txt §4-2` 의 L1 토큰 주입을 썼다(서비스 웹 로그인은 §2 자격이
 unknown 이라 불가). 문서 규정대로 **"로그인 자체" 는 이 회차의 검증 대상이 아니다.**
 
 | # | 시나리오 | 결과 | 실측 |

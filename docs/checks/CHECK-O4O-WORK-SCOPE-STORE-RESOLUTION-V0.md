@@ -284,7 +284,7 @@ web-neture 에는 넣지 않았다(§22).
 
 - 배포: `Deploy API Server (Cloud Run)` success · `Deploy Web Services (Cloud Run)` success · CodeQL success (commit `fe5dced51`)
 - 대상: `https://api.neture.co.kr/api/v1/work-scope/store-resolution`
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 L1 자격 (`kpa:store_owner` 보유). 자격증명은 env 주입, 문서·로그에 기록하지 않는다.
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 L1 자격 (`kpa:store_owner` 보유). 자격증명은 env 주입, 문서·로그에 기록하지 않는다.
 - **전부 read-only GET. DB write 0.**
 
 | 요청 | 응답 | 기대 일치 |

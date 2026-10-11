@@ -27,7 +27,7 @@ KCos 의 canonical 축은 MEMBERSHIP·ENROLLMENT·LISTING 모두 `k-cosmetics` �
 
 ## 2. 재현 (§3) — production, 수정 전
 
-계정: KCos 매장 계정 (`docs/local/TEST-ACCOUNTS.local.md`, 자격증명 미기재).
+계정: KCos 매장 계정 (`docs/local/TEST-ACCOUNT.txt`, 자격증명 미기재).
 로그인 `POST /api/v1/auth/login` · `serviceKey='k-cosmetics'` · 200 · httpOnly cookie.
 `role_assignments`(is_active) = `cosmetics:store_owner`, `kpa:store_owner`,
 `pharmacy-hub:store_owner`.

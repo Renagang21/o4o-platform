@@ -257,7 +257,7 @@ JS 예외 0 · white screen 0 · dead link 0.
 
 ### 8-1. 로그인 E2E 미검증
 
-`docs/local/TEST-ACCOUNTS.local.md` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
+`docs/local/TEST-ACCOUNT.txt` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
 웹 로그인 폼 자체는 검증하지 못했다. 같은 문서 §4-2 가 허용한 **L1 토큰 주입 우회**로 UI 를 검증했다.
 
 > 토큰 주입은 로그인 성공이 아니다. **로그인 E2E 는 이번에도 미검증**이다.

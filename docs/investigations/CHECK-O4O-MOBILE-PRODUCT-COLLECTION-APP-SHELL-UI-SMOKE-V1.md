@@ -111,7 +111,7 @@ npx expo start          # QR → Expo Go(실기기) 또는 a(에뮬레이터)
 12. Metro 콘솔에 red box / warning 없는지
 ```
 
-> 계정: `docs/local/TEST-ACCOUNTS.local.md` (SSOT). 제출 시 disposable 데이터는 상세/목록에서 확인 후 운영자 검토 큐에 노이즈가 되지 않도록 `[SMOKE]` 표기 권장(아카이브 API 는 현재 UI 미노출).
+> 계정: `docs/local/TEST-ACCOUNT.txt` (SSOT). 제출 시 disposable 데이터는 상세/목록에서 확인 후 운영자 검토 큐에 노이즈가 되지 않도록 `[SMOKE]` 표기 권장(아카이브 API 는 현재 UI 미노출).
 
 ---
 

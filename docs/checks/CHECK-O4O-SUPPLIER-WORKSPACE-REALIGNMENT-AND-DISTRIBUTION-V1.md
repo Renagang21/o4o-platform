@@ -116,7 +116,7 @@
 
 ### 4-1. Production smoke (배포 de728b3e6 후 · 읽기 전용 · 2026-09-16)
 
-공급자 표준 계정(`docs/local/TEST-ACCOUNTS.local.md` · supplier-6967ebe0)으로 API · 브라우저 확인. 쓰기 호출 0 (handoff 는 유효하지 않은 대상으로 400 거부만 확인).
+공급자 표준 계정(`docs/local/TEST-ACCOUNT.txt` · supplier-6967ebe0)으로 API · 브라우저 확인. 쓰기 호출 0 (handoff 는 유효하지 않은 대상으로 400 거부만 확인).
 
 | 항목 | 결과 |
 |---|---|

@@ -4,7 +4,7 @@
 - **작성일**: 2026-08-14
 - **대상 서비스**: KPA-Society · K-Cosmetics · Pharmacy-Hub (4개)
 - **검증 방식**: 프로덕션 실브라우저(Playwright chromium) 실로그인 · desktop(1440×900) + mobile(390×844, iPhone UA, isMobile/hasTouch)
-- **검증 계정**: `docs/local/TEST-ACCOUNTS.local.md` (SSOT) — 매장 경영자 · 운영자 · 공급자
+- **검증 계정**: `docs/local/TEST-ACCOUNT.txt` (SSOT) — 매장 경영자 · 운영자 · 공급자
 - **선행 문서**: [CHECK-O4O-STORE-HUB-ALL-SERVICES-PRODUCTION-ADOPTION-AND-E2E-V1](CHECK-O4O-STORE-HUB-ALL-SERVICES-PRODUCTION-ADOPTION-AND-E2E-V1.md)
 
 > **결론 먼저**: 선행 WO 의 blocker B1 · B2(공급 카탈로그 0건)를

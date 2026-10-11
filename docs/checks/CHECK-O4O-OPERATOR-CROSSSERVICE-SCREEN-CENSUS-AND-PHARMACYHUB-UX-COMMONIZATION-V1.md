@@ -112,7 +112,7 @@ Pharmacy-Hub 백엔드 운영자 endpoint 는 4개(`GET` 목록 / `GET :id` / `P
 ## 5. 브라우저 검증 (§4)
 
 빌드는 `VITE_API_BASE_URL=https://api.neture.co.kr` 로 하고 `vite preview` 로 기동했다
-(PH 5173 / KPA 5174 / KCos 5175 / Neture 5176). 로그인은 `docs/local/TEST-ACCOUNTS.local.md` 계정.
+(PH 5173 / KPA 5174 / KCos 5175 / Neture 5176). 로그인은 `docs/local/TEST-ACCOUNT.txt` 계정.
 
 | 항목 | 결과 |
 |---|---|

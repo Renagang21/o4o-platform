@@ -322,7 +322,7 @@ export type OutputType =
 ### Phase 5 — 브라우저 검증
 
 - 4유형 × productid 유/무 = 8 케이스 smoke test
-- 검증 계정: [docs/local/TEST-ACCOUNTS.local.md](docs/local/TEST-ACCOUNTS.local.md) SSOT
+- 검증 계정: [docs/local/TEST-ACCOUNT.txt](docs/local/TEST-ACCOUNT.txt) SSOT
 - AI quota 한도 모니터링
 
 ---
@@ -349,7 +349,7 @@ export type OutputType =
 | Store Production Material Canonical | [docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md](docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) |
 | Boundary Policy (organizationId 필수) | [docs/architecture/O4O-BOUNDARY-POLICY-V1.md](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
 | Role Policy & Guard Baseline | [docs/baseline/ROLE-POLICY-AND-GUARD-V1.md](docs/baseline/ROLE-POLICY-AND-GUARD-V1.md) |
-| Test Accounts SSOT | [docs/local/TEST-ACCOUNTS.local.md](docs/local/TEST-ACCOUNTS.local.md) |
+| Test Accounts SSOT | [docs/local/TEST-ACCOUNT.txt](docs/local/TEST-ACCOUNT.txt) |
 
 ---
 

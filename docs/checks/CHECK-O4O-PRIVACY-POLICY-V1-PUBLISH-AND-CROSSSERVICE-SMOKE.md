@@ -31,7 +31,7 @@
 
 | 단계 | 호출 |
 |---|---|
-| 로그인 | `POST /api/v1/auth/login` `{email,password,serviceKey}` — 서비스별 L2 credential (`sohae2100` admin, 값은 `docs/local/TEST-ACCOUNTS.local.md` 만) |
+| 로그인 | `POST /api/v1/auth/login` `{email,password,serviceKey}` — 서비스별 L2 credential (`sohae2100` admin, 값은 `docs/local/TEST-ACCOUNT.txt` 만) |
 | 사전 census | `GET /api/v1/admin/services/{key}/policies?documentType=privacy` |
 | draft 생성 | `POST /api/v1/admin/services/{key}/policies` `{documentType:'privacy',title,slug:'privacy',content,version:1,effectiveDate:'2026-09-17',changeReason}` → 201 · status 항상 `draft` |
 | 내용 검증 | `GET /api/v1/admin/services/{key}/policies/{id}` → content sha256 = 로컬 sha256 |

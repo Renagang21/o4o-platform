@@ -243,7 +243,7 @@ Core 에 추가한 것은 개의 **구조화된 override** 뿐이고, 기본값�
 
 ### 7-1. 브라우저 smoke (WO §6) — **수행함**
 
-**프로덕션 계정 로그인은 불가하다.** `docs/local/TEST-ACCOUNTS.local.md` §2·§4 기준
+**프로덕션 계정 로그인은 불가하다.** `docs/local/TEST-ACCOUNT.txt` §2·§4 기준
 모든 (계정 × 서비스) L2 credential 이 `unknown / needs verification` 이며, 문서가
 "서비스 웹 로그인(모든 서비스) ❌ 불가" 로 명시한다. 추측 대입은 금지다.
 
@@ -355,4 +355,4 @@ L2 credential 해소 후 프로덕션 계정 smoke 로 확인이 필요하다. *
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 
 - 별도 WO 제안: **L2 service credential 해소 후 내 매장 7화면 프로덕션 계정 smoke**
-  (§7-1 미검증 3항목). `docs/local/TEST-ACCOUNTS.local.md` §2-1 절차 선행 필요.
+  (§7-1 미검증 3항목). `docs/local/TEST-ACCOUNT.txt` §2-1 절차 선행 필요.

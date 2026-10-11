@@ -152,7 +152,7 @@ main-site 전용 secret·IAM 은 존재하지 않았다. 삭제 대상 없음.
 | LB 5xx (30m) | **0** |
 | auth smoke (쿠키 자 사용) | login 200 · `/auth/me` 200 · `/auth/services` 200 · `/auth/logout` 200 — **4/4 PASS** |
 
-삭제 전 baseline 과 동일 → **회귀 없음**. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 참조했고 어디에도 기록하지 않았다.
+삭제 전 baseline 과 동일 → **회귀 없음**. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 참조했고 어디에도 기록하지 않았다.
 
 ---
 

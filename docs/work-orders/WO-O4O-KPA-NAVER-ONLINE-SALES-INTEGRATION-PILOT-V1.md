@@ -63,7 +63,7 @@ O4O B2C 상품 (기존 원장)
 
 ### 2-3. 상품 1건 실제 E2E
 
-- 네이버 판매자 계정 연결 (자격정보는 `docs/local/TEST-ACCOUNTS.local.md` SSOT · 코드/문서/커밋에 하드코딩 금지)
+- 네이버 판매자 계정 연결 (자격정보는 `docs/local/TEST-ACCOUNT.txt` SSOT · 코드/문서/커밋에 하드코딩 금지)
 - O4O B2C 상품 **1건** 선택 → eligibility 통과 확인
 - 네이버 등록 → `externalProductId` 저장
 - 상태 조회 1회

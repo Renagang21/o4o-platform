@@ -129,7 +129,7 @@ guard: `requireAdmin` 6 · `requireRole` 27 · `require*Scope` 3 · **없음 1**
 
 ## ⑭ 테스트 계정 실측 범위
 
-- `docs/local/TEST-ACCOUNTS.local.md` **존재 확인** — 파일 존재 여부와 줄 수(50)만 확인, **내용 미출력**
+- `docs/local/TEST-ACCOUNT.txt` **존재 확인** — 파일 존재 여부와 줄 수(50)만 확인, **내용 미출력**
 - `platform:admin` / `platform:super_admin` 문자열 **미검색** → 플랫폼 관리자 테스트 계정 미등록
 - 로그인 실측 **0회** — 이번 감사는 전부 **비로그인 + 정적 분석**으로 수행
 - 역할 부여·변경 **0건**

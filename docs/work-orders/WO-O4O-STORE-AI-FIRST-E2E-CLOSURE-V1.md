@@ -18,7 +18,7 @@
 
 로그인 가능한 **store-owner(매장 경영자) 계정**이 필요하다. 현재 불가 사유:
 
-- `docs/local/TEST-ACCOUNTS.local.md` §7 내 매장 smoke 전용 계정 2개 = `suspended`(smoke 종료 후 비활성화, 2026-08-13).
+- `docs/local/TEST-ACCOUNT.txt` §7 내 매장 smoke 전용 계정 2개 = `suspended`(smoke 종료 후 비활성화, 2026-08-13).
 - `renagang21` = Google-only 계정(`users.password` NULL) → 폼 로그인 불가.
 - WO1 CHECK 실측: store-owner 계정 KPA·PH `401 INVALID_USER`, 보조 계정 KPA `403` lockout. 이후 users reset 으로 테스트 계정 0.
 

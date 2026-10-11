@@ -55,7 +55,7 @@
 | legacy 기능 보존 | ✅ (접이식 고급 설정으로 이동, 삭제 아님) |
 | 모바일/태블릿 폭 | 반응형 클래스 유지(`grid`, `min-h-[44px]` 터치 타깃) |
 
-> 배포 후 브라우저 스모크(약국 계정 `renagang21`, SSOT=`docs/local/TEST-ACCOUNTS.local.md`): 탭 전환 / 코너 교체(적용·해제) / 콘텐츠 목록·수정·보관 / 고급 설정 접이 동작을 실측 권장(성공·실패 toast + API success/error 확인).
+> 배포 후 브라우저 스모크(약국 계정 `renagang21`, SSOT=`docs/local/TEST-ACCOUNT.txt`): 탭 전환 / 코너 교체(적용·해제) / 콘텐츠 목록·수정·보관 / 고급 설정 접이 동작을 실측 권장(성공·실패 toast + API success/error 확인).
 
 ## 다음 단계 (병렬 가능)
 

@@ -128,7 +128,7 @@
 
 - Neture 는 계정 역할에 따라 `/` 가 각각 `/supplier/dashboard`, `/admin` 으로 리다이렉트되어 홈 탭이 비활성으로 관측되는데, 이는 **기존 라우팅 동작**이며 active 로직 정상(게스트 `/` 에서 홈/커뮤니티 탭 active 확인).
 
-검증 계정: `docs/local/TEST-ACCOUNTS.local.md` (KPA `sohae2100@…`, KCos/Neture `renagang21@…`).
+검증 계정: `docs/local/TEST-ACCOUNT.txt` (KPA `sohae2100@…`, KCos/Neture `renagang21@…`).
 
 ---
 

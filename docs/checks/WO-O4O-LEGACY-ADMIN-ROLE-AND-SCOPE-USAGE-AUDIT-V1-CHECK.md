@@ -449,7 +449,7 @@ JWT (access, 15분)
 | `user.permissions` 공급 | **0** | 미변경 |
 | `pnpm-lock.yaml` | **미변경** | — |
 | dropshipping 은퇴 작업 개입 | **0** | §6 |
-| 자격증명 · 토큰 출력 | **0** | 로그인 수행 없음. `TEST-ACCOUNTS.local.md` 미열람. `apps/api-server/.env` 미열람·미수정 |
+| 자격증명 · 토큰 출력 | **0** | 로그인 수행 없음. `TEST-ACCOUNT.txt` 미열람. `apps/api-server/.env` 미열람·미수정 |
 | 개인정보 기록 | **0** | 본 CHECK 에 이름·이메일·전화번호·사용자 UUID 없음 |
 | 타 세션 작업물 | **열람 0 · 수정 0 · stage 0** | §2-3 |
 

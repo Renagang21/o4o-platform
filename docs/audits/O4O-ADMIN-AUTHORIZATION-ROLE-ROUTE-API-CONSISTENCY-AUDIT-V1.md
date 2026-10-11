@@ -336,7 +336,7 @@ E-5 만 §5 의 공용 guard 결함과 지점을 공유한다.
 
 ### 테스트 계정 현황
 
-`docs/local/TEST-ACCOUNTS.local.md` **존재 확인**(파일 존재 여부와 줄 수만 확인, 내용 미출력).
+`docs/local/TEST-ACCOUNT.txt` **존재 확인**(파일 존재 여부와 줄 수만 확인, 내용 미출력).
 `platform:admin` / `platform:super_admin` 문자열은 검색되지 않았다 →
 **플랫폼 관리자 역할 테스트 계정이 문서에 등록돼 있지 않다.**
 이는 코드 결함이 아니라 **검증 기반 부족(P4)** 으로 별도 기록한다.

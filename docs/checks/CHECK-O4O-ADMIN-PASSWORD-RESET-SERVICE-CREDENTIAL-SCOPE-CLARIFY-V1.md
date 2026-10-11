@@ -181,7 +181,7 @@ platform-accounts.routes.ts : ADMIN_ACCESS_ROLES → platform:super_admin
 users.routes.ts:32          : const ADMIN_ROLES = ['platform:super_admin']
 ```
 
-DB 실측(read-only): `platform:super_admin` 보유 계정 **2개**, 그중 `TEST-ACCOUNTS.local.md` 의
+DB 실측(read-only): `platform:super_admin` 보유 계정 **2개**, 그중 `TEST-ACCOUNT.txt` 의
 테스트 계정은 **0개**.
 
 - 비밀번호 **추측·대입은 하지 않았다** — 계정 잠금(5회/30분) 유발이자 부적절한 행위다.

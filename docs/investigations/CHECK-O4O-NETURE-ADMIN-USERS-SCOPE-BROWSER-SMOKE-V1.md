@@ -180,7 +180,7 @@ if (!scope.isPlatformAdmin) {
 | 우선순위 | 항목 |
 |---------|------|
 | 권장 | Neture web 브라우저 직접 접속 후 화면 렌더 결과(탭 카운트 UI 표기, 리스트 행 표시, 모바일 레이아웃) 사용자 관측 후 사진/메모 공유 |
-| 권장 | `TEST-ACCOUNTS.local.md` (CLAUDE.md §15 SSOT) 신설 — 본 검증에서 부재로 인증 절차가 사용자 수동 입력에 의존했음 |
+| 권장 | `TEST-ACCOUNT.txt` (CLAUDE.md §15 SSOT) 신설 — 본 검증에서 부재로 인증 절차가 사용자 수동 입력에 의존했음 |
 | 후속 IR | `IR-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-V1` — backend platform admin "무필터" 분기의 정책 정합 검토 |
 | 데이터 보강 시 재검증 | supplier/partner/seller 탭 동작 — Neture supplier/partner/seller role 보유자 발생 시점 |
 

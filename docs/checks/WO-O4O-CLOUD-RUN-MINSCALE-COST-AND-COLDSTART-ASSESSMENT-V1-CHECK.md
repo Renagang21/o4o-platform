@@ -324,7 +324,7 @@ HTTP status 는 **5회 × 5요청 = 25건 모두 200**. 에러·timeout **0건**
 | `POST /api/v1/auth/login` (serviceKey `neture`) | **로그인** | 0.297 s | — | ✅ 200 |
 | `GET /health` (warm 재요청) | 재확인 | 0.094 s | 0.008 s | ✅ |
 
-- 로그인은 `docs/local/TEST-ACCOUNTS.local.md` SSOT 계정(Neture 공급자2)으로 수행했고 **5회 모두 200**. 자격증명은 스크립트가 문서에서 직접 읽었으며 저장소·로그 어디에도 기록하지 않았다.
+- 로그인은 `docs/local/TEST-ACCOUNT.txt` SSOT 계정(Neture 공급자2)으로 수행했고 **5회 모두 200**. 자격증명은 스크립트가 문서에서 직접 읽었으며 저장소·로그 어디에도 기록하지 않았다.
 - **핵심**: cold start 비용은 **첫 요청 1건에만** 부과되고, 그 뒤 로그인·DB·API 는 전부 warm 수준이다. 즉 "느려지는 것"이 아니라 "특정 1명이 8~14초를 기다리는" 형태다.
 
 ### 사용자 영향 규모

@@ -180,7 +180,7 @@ WO-O4O-SERVICE-LEGAL-PHARMACY-HUB-SCOPE-EXTENSION-V1
 
 ### 7-1. 차단 사실
 
-`docs/local/TEST-ACCOUNTS.local.md`(SSOT) 실측:
+`docs/local/TEST-ACCOUNT.txt`(SSOT) 실측:
 
 | 자격 계층 | 상태 |
 |---|---|
@@ -269,7 +269,7 @@ PATCH /api/v1/admin/users/3f5582bc…/status {"status":"approved"}  → 200
 PATCH /api/v1/admin/users/972ede50…/status {"status":"approved"}  → 200
 ```
 
-자격은 `docs/local/TEST-ACCOUNTS.local.md §4-3` 의 `platform:super_admin` 계정 사용.
+자격은 `docs/local/TEST-ACCOUNT.txt §4-3` 의 `platform:super_admin` 계정 사용.
 **비밀번호는 어디에도 출력·기록하지 않았다.**
 
 ### 10-3. production 실로그인 E2E 결과 (desktop, 실제 브라우저)

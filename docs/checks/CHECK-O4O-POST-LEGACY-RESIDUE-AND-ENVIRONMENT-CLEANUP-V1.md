@@ -184,7 +184,7 @@ const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV =
 
 기능 작업은 중단 없이 완주했다.
 
-`docs/local/TEST-ACCOUNTS.local.md` 에 검증 상태 메모를 추가했다. 이 문서는 `.gitignore:139` 로 **추적 제외**이며 **커밋되지 않는다.** 자격증명·토큰은 보고서·문서·커밋 어디에도 기록하지 않았다.
+`docs/local/TEST-ACCOUNT.txt` 에 검증 상태 메모를 추가했다. 이 문서는 `.gitignore:139` 로 **추적 제외**이며 **커밋되지 않는다.** 자격증명·토큰은 보고서·문서·커밋 어디에도 기록하지 않았다.
 
 ---
 

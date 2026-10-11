@@ -120,7 +120,7 @@ DB enum 이 아니라 **화면 표시용 파생 값**이다. 새 컬럼 · 새 e
 ## 6. 프로덕션 브라우저 E2E (§19)
 
 로컬 dev 서버(빌드 산출물 동일 소스)를 **프로덕션 API(`api.neture.co.kr`)** 에 붙여
-실제 매장 데이터로 검증했다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서
+실제 매장 데이터로 검증했다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서
 런타임에 읽었고 **어떤 파일 · 문서 · 커밋에도 기록하지 않았다.**
 
 ### 6-1. KPA — 테스트 약국 (`/store/execution`)
@@ -296,7 +296,7 @@ read-only 로 보이는 것은 결함이 아니라 **정본 테이블이 갈린 
 - **발견 1건** — 설계 §5-3(POP/Signage placeholder 유지) 과 본 WO(placeholder 금지)의 충돌.
   WO 가 우선하며 §3-1 에 편차로 기록했다. 설계 문서 본문은 **수정하지 않았다** (CLAUDE.md §16-4:
   기준 문서의 내용·판정 변경은 별도 WO).
-- 참고 — `docs/local/TEST-ACCOUNTS.local.md` 의 `pharmacy-hub:store_owner` 행이 드리프트되어
+- 참고 — `docs/local/TEST-ACCOUNT.txt` 의 `pharmacy-hub:store_owner` 행이 드리프트되어
   401 이 난다(§6-2). 로컬 전용 · git 미추적 문서이며 범위 밖이라 **보고만 한다.**
 
 ---

@@ -103,7 +103,7 @@ legacy 전용 backend 는 `store-pop.controller.ts` 이며 이것은 제거했�
 ## 5. Production smoke (step 14)
 
 배포: Deploy Web Services · Deploy API Server · Deploy Admin Dashboard · CodeQL 모두 **success** (commit `cb964ad9c`). API revision `o4o-core-api-03613-rbr`.
-계정 `ren***`(약국 경영자 · KCos store_owner · PH store_owner), 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 런타임 parse. headless Chrome(Playwright) + API 직접 호출.
+계정 `ren***`(약국 경영자 · KCos store_owner · PH store_owner), 자격증명은 `docs/local/TEST-ACCOUNT.txt` 런타임 parse. headless Chrome(Playwright) + API 직접 호출.
 
 ### 5-1. 브라우저 (KPA `kpa-society.co.kr` · KCos `k-cosmetics.site`)
 

@@ -84,7 +84,7 @@ COPY packages/auth-react/ ./packages/auth-react/               # source 단계�
 ### 4-3. 실브라우저 인증 · 권한 smoke
 
 dev 서버(`vite --port 3000`) + 프로덕션 API `https://api.neture.co.kr`, 계정은
-`docs/local/TEST-ACCOUNTS.local.md` 참조 (자격증명은 본 문서에 기재하지 않는다).
+`docs/local/TEST-ACCOUNT.txt` 참조 (자격증명은 본 문서에 기재하지 않는다).
 
 | 서비스 | 미인증 보호경로 차단 | 로그인 | returnUrl/역할 redirect | 권한 차단 | 로그아웃 후 재차단 | console error |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -97,7 +97,7 @@ dev 서버(`vite --port 3000`) + 프로덕션 API `https://api.neture.co.kr`, �
 이번 변경 파일 목록에 `/store` 레이아웃·페이지 컴포넌트가 **없고**(변경은 AuthContext / RoleGuard / LoginModal 뿐),
 가드는 `Navigate`·children 만 렌더하므로 **본 변경과 무관한 기존 마크업 문제**로 판단한다. 인증 흐름에는 영향이 없다.
 
-**Pharmacy-Hub 제한 사항 (숨기지 않고 명시)**: `TEST-ACCOUNTS.local.md` 에 Pharmacy-Hub 계정이 없다.
+**Pharmacy-Hub 제한 사항 (숨기지 않고 명시)**: `TEST-ACCOUNT.txt` 에 Pharmacy-Hub 계정이 없다.
 Identity V2 는 서비스별 자격증명이므로 타 서비스 계정으로는 로그인되지 않는다(실측 401 `INVALID_CREDENTIALS`).
 따라서 **로그인 성공 이후 세션·가드 동선은 실브라우저로 검증하지 못했다.**
 검증된 것은 ① 미인증 보호경로 차단 ② 401 응답이 새 result-object 경로를 통해 한국어 안내로 정상 표면화

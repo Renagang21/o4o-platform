@@ -152,4 +152,4 @@
 | KPA `/operator/members` → 더보기 → 비밀번호 변경 (`[REDACTED_EMAIL]`) | **PASS** — "대상 서비스 **KPA-Society** / 이 서비스의 로그인 비밀번호만 변경됩니다" 표시. 수정 전에는 후보 0 안내였다. |
 | 동상 (`[REDACTED_EMAIL_B]`) | **PASS** — 동일하게 KPA-Society 자동 확정 |
 | 실제 비밀번호 제출 | **수행하지 않음.** 후보 확정까지만 확인했고 `변경` 은 누르지 않았다(운영 데이터 write 회피). |
-| `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |
+| `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNT.txt` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |

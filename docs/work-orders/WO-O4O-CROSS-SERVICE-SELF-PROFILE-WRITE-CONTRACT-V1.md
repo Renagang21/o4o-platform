@@ -538,7 +538,7 @@ operator 대리 수정 API 변경
 허용 범위:
 
 ```text
-docs/local/TEST-ACCOUNTS.local.md 에 정의된 테스트 계정
+docs/local/TEST-ACCOUNT.txt 에 정의된 테스트 계정
 + 본인 ACCOUNT_CORE 필드 (canonical allowlist 로 확정된 필드만)
 + 기능 검증에 필요한 최소 변경
 + 검증 직후 원복

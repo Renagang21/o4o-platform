@@ -31,7 +31,7 @@ $ git status --porcelain
 
 Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 (`packages/auth-react/src/useServiceAuth.ts:94` → `services/web-neture/src/contexts/AuthContext.tsx:62`).
-→ **L2 서비스 자격**으로 판정되는데, `docs/local/TEST-ACCOUNTS.local.md §2` 기준 전 계정이 `unknown` 이다.
+→ **L2 서비스 자격**으로 판정되는데, `docs/local/TEST-ACCOUNT.txt §2` 기준 전 계정이 `unknown` 이다.
 
 실측 (2026-08-10, read-only):
 
@@ -48,7 +48,7 @@ Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 
 ### 2-2. 사용한 채널 — 문서화된 L1 토큰 주입 우회
 
-`TEST-ACCOUNTS.local.md §4-2` 에 명시된 우회로를 사용했다.
+`TEST-ACCOUNT.txt §4-2` 에 명시된 우회로를 사용했다.
 
 ```text
 계정   [REDACTED_EMAIL_B]

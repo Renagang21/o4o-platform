@@ -72,7 +72,7 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 | 항목 | 상태 |
 |---|---|
 | 5개 operator 콘솔 도달성 | ✅ 전부 HTTP 200 (`kpa-society.co.kr` · `k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`) |
-| **웹 폼 로그인** | ❌ **불가** — 웹 폼은 `serviceKey` 를 보내 L2(`service_credentials`) 로 판정되는데, `docs/local/TEST-ACCOUNTS.local.md §2` 기준 **(계정 × 5서비스) L2 비밀번호가 전부 unknown** |
+| **웹 폼 로그인** | ❌ **불가** — 웹 폼은 `serviceKey` 를 보내 L2(`service_credentials`) 로 판정되는데, `docs/local/TEST-ACCOUNT.txt §2` 기준 **(계정 × 5서비스) L2 비밀번호가 전부 unknown** |
 | 실제 사용한 채널 | L1(`serviceKey` 없음) 로그인 → accessToken 획득 → `localStorage` 주입 (TEST-ACCOUNTS §124-132 문서화된 우회) |
 | 계정 | `[REDACTED_EMAIL_A]` (L1 200, 비밀번호는 env 주입 — 본 문서·로그에 미기록) |
 | production write | 0건 (조회 · select-all 토글만. 저장/승인/삭제 미실행) |
@@ -501,4 +501,4 @@ KPA 식 operator 매장 관리를 대칭으로 넣는 것은 baseline §5 REMOVE
 1. KPA `/operator/members` 회원 1건 이름 인코딩 깨짐 (`◆◆◆◆◆`)
 3. Neture `/operator/forum-delete` 와 `/operator/forum-delete-requests` 가 동일 컴포넌트 (중복 진입점)
 4. K-Cosmetics 운영 분석: 4개 서비스가 보유한 업무인데 route·page 부재
-5. `docs/local/TEST-ACCOUNTS.local.md §2` — 5서비스 × 3계정 L2 비밀번호 전부 unknown → 웹 폼 로그인 검증이 구조적으로 막혀 있음
+5. `docs/local/TEST-ACCOUNT.txt §2` — 5서비스 × 3계정 L2 비밀번호 전부 unknown → 웹 폼 로그인 검증이 구조적으로 막혀 있음

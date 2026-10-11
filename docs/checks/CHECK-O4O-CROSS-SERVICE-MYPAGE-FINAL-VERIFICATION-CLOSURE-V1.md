@@ -25,7 +25,7 @@
 
 ## 2. pending / rejected 테스트 계정 census
 
-SSOT = `docs/local/TEST-ACCOUNTS.local.md` (자격증명은 본 문서에 적지 않는다).
+SSOT = `docs/local/TEST-ACCOUNT.txt` (자격증명은 본 문서에 적지 않는다).
 
 | 서비스 | membership status `pending` 계정 | `rejected` 계정 |
 |---|:---:|:---:|

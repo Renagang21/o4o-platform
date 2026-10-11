@@ -159,7 +159,7 @@ git diff --stat (기존 파일): 30 files changed, 678 insertions(+), 5891 delet
 
 ### 8-2. 브라우저 smoke
 
-> ⚠️ **로그인 자체는 검증하지 못했다.** `docs/local/TEST-ACCOUNTS.local.md` §2 기준
+> ⚠️ **로그인 자체는 검증하지 못했다.** `docs/local/TEST-ACCOUNT.txt` §2 기준
 > **4서비스 전부 L2 service credential 이 unknown** 이라 웹 로그인이 불가하다.
 > 같은 문서 §4-2 가 허용한 **L1 토큰 주입 우회**로 UI 만 검증했다. 토큰 주입은 로그인 성공이 아니다.
 

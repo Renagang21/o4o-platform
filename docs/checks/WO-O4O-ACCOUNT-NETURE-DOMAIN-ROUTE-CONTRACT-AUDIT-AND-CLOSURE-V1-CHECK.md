@@ -329,7 +329,7 @@ NEG 의 target 이던 Cloud Run **`o4o-main-site` 는 삭제하지 않았다** �
 | `GET /api/v1/auth/services` | `success: true` — 5서비스(neture / kpa-society / k-cosmetics / pharmacy-hub / kpa-branch), **account 없음** |
 | `POST /api/v1/auth/logout` | `success: true` **200** |
 
-> 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` (SSOT) 에서 스크립트로 읽어 사용했고 로그·문서 어디에도 기록하지 않았다.
+> 자격증명은 `docs/local/TEST-ACCOUNT.txt` (SSOT) 에서 스크립트로 읽어 사용했고 로그·문서 어디에도 기록하지 않았다.
 
 ### 11-3. 인프라 정합
 

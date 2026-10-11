@@ -47,7 +47,7 @@ Operator 공통화는 **main 반영이 끝난 뒤에야** production baseline �
    - PharmacyHub dashboard / membership
    - JS exception / white screen / dead link 0 확인
 
-   가능하면 **실제 계정 로그인**으로 검증한다 (`docs/local/TEST-ACCOUNTS.local.md` 참조).
+   가능하면 **실제 계정 로그인**으로 검증한다 (`docs/local/TEST-ACCOUNT.txt` 참조).
    credential 이 없으면 그 사실과 우회 방법을 보고에 명확히 기록한다.
 
 ## 4. 제외 범위

@@ -201,7 +201,7 @@ export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
 | 서비스 | 결과 |
 |---|---|
 | KPA | KPA WO 범위에서 수행 · 배포 후 프로덕션 E2E 는 `KPA_POST_DEPLOY_E2E_PENDING` |
-| K-Cosmetics | **`E2E_BLOCKED_AUTH`** — `docs/local/TEST-ACCOUNTS.local.md` 에 KCos store_owner 프로덕션 credential 없음. 우회 credential 생성하지 않았다. |
+| K-Cosmetics | **`E2E_BLOCKED_AUTH`** — `docs/local/TEST-ACCOUNT.txt` 에 KCos store_owner 프로덕션 credential 없음. 우회 credential 생성하지 않았다. |
 | PharmacyHub | 코드 변경 0 (계약 보존 확인만) |
 
 → 변경된 두 서비스는 라우트·조직 해석·응답 계약을 **스텁 DataSource 기반 회귀 테스트 10건**으로 고정했고, 실 브라우저 E2E 는 credential 확보 시점으로 미룬다. 이를 PASS 로 위장하지 않는다.

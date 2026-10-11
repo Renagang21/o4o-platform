@@ -181,7 +181,7 @@ CLAUDE.md 실행 원칙의 중지 조건을 그대로 따른다. 특히 본 WO �
        → 저장 → 새로고침 → 저장값 유지
 ```
 
-대상: KPA-Society / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md`).
+대상: KPA-Society / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNT.txt`).
 
 ### 6-2. 확인 항목
 

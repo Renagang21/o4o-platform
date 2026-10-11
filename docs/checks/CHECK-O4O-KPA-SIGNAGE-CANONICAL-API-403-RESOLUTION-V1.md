@@ -27,7 +27,7 @@ KPA signage 프론트 3개 화면이 `X-Organization-Id` 로 **약사회 회원 
 
 | 항목 | 값 |
 |---|---|
-| 계정 | KPA 약국 경영자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md`, 자격증명 미기재) |
+| 계정 | KPA 약국 경영자 테스트 계정 (`docs/local/TEST-ACCOUNT.txt`, 자격증명 미기재) |
 | 로그인 | `POST /api/v1/auth/login` · `serviceKey='kpa-society'` · 200 · 인증은 httpOnly cookie(`accessToken`/`refreshToken`) |
 | roles | `kpa:store_owner`, `cosmetics:store_owner`, `pharmacy-hub:store_owner`, `lms:instructor` 외 |
 | service_memberships | `kpa-society=active`, `platform=active`, `pharmacy-hub=active`, `k-cosmetics=active`, `neture=active`, `kpa-branch=active` |

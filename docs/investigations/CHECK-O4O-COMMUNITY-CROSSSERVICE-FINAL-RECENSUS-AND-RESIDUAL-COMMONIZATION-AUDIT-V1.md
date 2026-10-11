@@ -409,7 +409,7 @@ N 이 295 로 같은 것은 우연이 아니라 **같은 6축 프레임(Forum 18
 ## 14. Production browser smoke (§17)
 
 배포 commit `ed7d6ed17` (Deploy Web Services / Deploy API Server 모두 success) 기준, 실제 브라우저(Chromium)로 로그인 후 순회했다.
-계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT 를 런타임 env 로만 주입했고 스크립트·저장소 어디에도 기록하지 않았다.
+계정은 `docs/local/TEST-ACCOUNT.txt` SSOT 를 런타임 env 로만 주입했고 스크립트·저장소 어디에도 기록하지 않았다.
 측정 항목: 문서 status / body innerText 길이(white screen) / console error / pageerror / 4xx·5xx 응답 / 390px 폭 가로 overflow.
 
 ### 14-1. 서비스별 결과

@@ -182,7 +182,7 @@ web-neture 안에 두었다(공유 패키지 변경은 전 서비스 재빌드 +
 | 10 | `/supplier/products` (하위 route) | PASS — `접근 권한이 없습니다`. smoke 계정이 supplier 역할이 아니어서 나오는 **기존 역할 가드 동작**이며 `/` 로 튕기지 않음 |
 | 11 | `/handoff` | PASS — `/handoff` 유지(외부 복귀 처리 화면), `/` 로 덮어쓰지 않음 |
 
-smoke 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 Neture admin/operator 계정 (자격정보 본 문서 미기재).
+smoke 계정: `docs/local/TEST-ACCOUNT.txt` 의 Neture admin/operator 계정 (자격정보 본 문서 미기재).
 
 ---
 

@@ -4,7 +4,7 @@
 - **작성일**: 2026-08-12
 - **판정**: **PASS** — 비밀번호 갱신 불필요. 원인은 자격증명이 아니라 **로그인 호출 방식(`serviceKey` 누락)** 이었다.
 
-> 비밀번호 원문은 이 문서에 기록하지 않는다. SSOT 는 `docs/local/TEST-ACCOUNTS.local.md` (git 미추적).
+> 비밀번호 원문은 이 문서에 기록하지 않는다. SSOT 는 `docs/local/TEST-ACCOUNT.txt` (git 미추적).
 
 ---
 
@@ -30,7 +30,7 @@
 | `serviceKey` 있음 + row 없음 | `users.password` (V1 fallback) |
 | **`serviceKey` 없음** | `users.password` (V1 fallback) |
 
-`docs/local/TEST-ACCOUNTS.local.md` 의 비밀번호는 **서비스별 credential** 값이다.
+`docs/local/TEST-ACCOUNT.txt` 의 비밀번호는 **서비스별 credential** 값이다.
 직전 WO 에서 `serviceKey` 없이 `POST /api/v1/auth/login` 을 호출했기 때문에 `users.password` 와
 대조되어 401 `INVALID_CREDENTIALS` 가 났다. **계정·비밀번호 문제가 아니었다.**
 
@@ -100,7 +100,7 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 
 ## 7. 로컬 문서 갱신 여부
 
-`docs/local/TEST-ACCOUNTS.local.md` (git 미추적) 갱신:
+`docs/local/TEST-ACCOUNT.txt` (git 미추적) 갱신:
 
 - 직전 WO 가 남긴 "비밀번호 불일치" 메모를 **오해로 정정**
 - `serviceKey` 필수 규칙과 검증 대상 해시 표, curl 예시(❌/✅) 추가

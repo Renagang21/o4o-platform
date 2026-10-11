@@ -214,7 +214,7 @@ Start date · End date · Loading... · "Failed" · Scheduled · Expired · 커�
 ### 9-4. 프로덕션 검증 C — 실브라우저 smoke (2차 세션)
 
 MCP 대신 **로컬 Playwright(chromium headless)** 로 실제 로그인 → 라우트 → 폼 조작까지 수행했다.
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 읽고 스크립트·로그에 하드코딩하지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 읽고 스크립트·로그에 하드코딩하지 않았다.
 
 검증 계정: `Neture 공급자`(sohae21) / `Neture 공급자2`(renagang21) **2개 계정 모두 동일 결과**.
 

@@ -201,7 +201,7 @@ retire 방식은 §12 지시대로 **404(라우트 미등록)** 를 택했다 �
 | `/health` | 200 |
 | `/health/database` | `status: healthy` (pingMs 4) |
 
-> `platform:super_admin` 자격증명이 `TEST-ACCOUNTS.local.md` 에 없어
+> `platform:super_admin` 자격증명이 `TEST-ACCOUNT.txt` 에 없어
 > `/admin/apps` 의 **허용(200) 경로는 production 에서 검증하지 못했다.** 401/403 차단만 확인했다.
 > §14 지시대로 production 에서 실제 install/uninstall write 는 수행하지 않았다.
 

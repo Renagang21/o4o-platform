@@ -214,7 +214,7 @@ resolveAssociationValues('fee.category')
 ### 제약 기록
 
 1. **검증 계정 2개는 실사용 계정이다** (`sohae2100` · `renagang21`). 프로덕션에 전용 테스트
-   계정이 없어 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에 등재된 계정을 썼다.
+   계정이 없어 SSOT(`docs/local/TEST-ACCOUNT.txt`)에 등재된 계정을 썼다.
    두 계정의 `kpa_members.fee_category` 는 검증 중에만 값을 가졌고 NULL 로 복귀했다.
 2. **`kpa_members.fee_category` 폴백 경로는 단독으로 실측하지 못했다.** 부과 후에는
    두 계정 모두 원장 행을 가져 우선순위상 ledger 가 이겼다. 폴백은 코드 경로와

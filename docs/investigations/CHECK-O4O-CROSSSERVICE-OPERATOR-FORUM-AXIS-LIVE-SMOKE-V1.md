@@ -5,7 +5,7 @@
 > - 일자: 2026-06-16
 > - 대상: KPA-Society / K-Cosmetics operator 화면 (deployed)
 > - 검증 커밋: `b7c41195`(forum-categories) 포함된 배포 — Web Services deploy run `27622907554`(sha `a4e93fc1e`, success) 기준
-> - 도구: Playwright(chromium, headless), 운영자 통합 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 비기재)
+> - 도구: Playwright(chromium, headless), 운영자 통합 계정(SSOT `docs/local/TEST-ACCOUNT.txt`, env 주입 — 자격증명 비기재)
 >
 > ## 판정: **PASS** (3서비스)
 

@@ -312,7 +312,7 @@ interface ProductionTypeCard {
 ### Phase 5 — 브라우저 검증
 
 - Playwright 자동화 또는 수동 smoke test
-- 검증 계정: `docs/local/TEST-ACCOUNTS.local.md` SSOT 참조
+- 검증 계정: `docs/local/TEST-ACCOUNT.txt` SSOT 참조
 
 ---
 

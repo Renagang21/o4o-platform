@@ -111,7 +111,7 @@
 
 ## 7. 프로덕션 실 화면 검증
 
-> 2026-09-14, `2464f2494` 배포(Deploy API Server `34817728071` · Deploy Web Services `34817728081` 모두 success) 후 Playwright 실 브라우저로 확인. 계정은 `docs/local/TEST-ACCOUNTS.local.md` 로스터만 사용했고 **회원 상태 · 역할은 변경하지 않았다.** 캡처: `neture-home-anon.png` · `neture-home-store-owner.png` · `neture-home-operator.png` · `neture-home-mobile.png` (Playwright 출력 디렉터리, 저장소 미포함).
+> 2026-09-14, `2464f2494` 배포(Deploy API Server `34817728071` · Deploy Web Services `34817728081` 모두 success) 후 Playwright 실 브라우저로 확인. 계정은 `docs/local/TEST-ACCOUNT.txt` 로스터만 사용했고 **회원 상태 · 역할은 변경하지 않았다.** 캡처: `neture-home-anon.png` · `neture-home-store-owner.png` · `neture-home-operator.png` · `neture-home-mobile.png` (Playwright 출력 디렉터리, 저장소 미포함).
 
 | # | 시나리오 (WO §7) | 결과 |
 |---|---|---|

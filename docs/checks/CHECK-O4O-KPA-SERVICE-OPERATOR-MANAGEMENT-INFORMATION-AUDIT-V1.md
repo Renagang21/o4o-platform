@@ -2,7 +2,7 @@
 
 WO: `WO-O4O-KPA-SERVICE-OPERATOR-MANAGEMENT-INFORMATION-AUDIT-V1`
 검증 일시: 2026-07-25 (KST) · 대상: https://kpa-society.co.kr (프로덕션)
-검증 역할: KPA 관리자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md`) — 자격정보 비기재
+검증 역할: KPA 관리자 테스트 계정 (`docs/local/TEST-ACCOUNT.txt`) — 자격정보 비기재
 
 ---
 

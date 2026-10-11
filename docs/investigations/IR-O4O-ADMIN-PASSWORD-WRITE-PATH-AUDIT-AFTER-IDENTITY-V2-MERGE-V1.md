@@ -179,7 +179,7 @@ git 변경 = 본 IR 문서 1건
 ```
 
 조사 방법: 최신 main 정적 정독(Read/Grep). 프로덕션 API·DB 호출 없음.
-`docs/local/TEST-ACCOUNTS.local.md` 는 **존재만 확인**했고 내용을 열지 않았다.
+`docs/local/TEST-ACCOUNT.txt` 는 **존재만 확인**했고 내용을 열지 않았다.
 
 ---
 

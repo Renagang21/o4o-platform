@@ -15,7 +15,7 @@ Neture B2B canonical end-to-end positive smoke 를 위한 테스트 공급자 �
 
 ## 2. 테스트 자원 (운영 데이터와 구분 — `[E2E_TEST]` / 수동 정리 대상)
 
-> ⚠️ **자격증명은 본 문서(git 추적)에 평문 기록하지 않는다** (CLAUDE.md §15 / no-secrets 정책 우선 — WO §8 의 평문 허용 문구는 미적용). 비밀번호는 SSOT `docs/local/TEST-ACCOUNTS.local.md`(gitignore) 참조.
+> ⚠️ **자격증명은 본 문서(git 추적)에 평문 기록하지 않는다** (CLAUDE.md §15 / no-secrets 정책 우선 — WO §8 의 평문 허용 문구는 미적용). 비밀번호는 SSOT `docs/local/TEST-ACCOUNT.txt`(gitignore) 참조.
 
 | 자원 | id / 값 | 비고 |
 |------|---------|------|

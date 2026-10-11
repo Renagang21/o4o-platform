@@ -17,7 +17,7 @@
 - `[REDACTED_EMAIL_A]` (통합 admin). 로그인 응답 roles 10개에 **`platform:super_admin` 포함** 확인 → platform guard 통과 계정.
 - httpOnly 쿠키 인증(body 토큰 없음) — 쿠키 jar 로 검증.
 - **pure neture:admin-only / pure platform-only 계정 부재** → negative guard runtime 미검증(코드상 PlatformRoute+requireRole, accounts/services 동형).
-- ⚠️ 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(gitignore) 에서 transient 사용 — 본 문서 미기재.
+- ⚠️ 자격증명은 `docs/local/TEST-ACCOUNT.txt`(gitignore) 에서 transient 사용 — 본 문서 미기재.
 
 ## 3. 검증 결과 (API: `GET /api/v1/admin/platform-users`)
 

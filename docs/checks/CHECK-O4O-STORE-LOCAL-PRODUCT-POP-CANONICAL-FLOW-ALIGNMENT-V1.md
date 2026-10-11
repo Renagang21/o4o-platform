@@ -271,7 +271,7 @@ rg "ai-contents|pop_short|pop_long|/products/.*/pop/" services/web-*/src
 ## 17. 프로덕션 smoke — **PASS (3 서비스 전부, 실제 저장까지)**
 
 배포: commit `77abcfde2` → `Deploy API Server (Cloud Run)` ✅ success / `Deploy Web Services (Cloud Run)` ✅ success.
-검증: Playwright headless, 계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 env 주입(하드코딩·출력 없음).
+검증: Playwright headless, 계정은 `docs/local/TEST-ACCOUNT.txt` 에서 env 주입(하드코딩·출력 없음).
 테스트 상품: 매장 자체 상품 `후시딘연고(퓨시드산나트륨)` (`cd3a2b29-…`).
 
 ### KPA — `https://kpa-society.co.kr`

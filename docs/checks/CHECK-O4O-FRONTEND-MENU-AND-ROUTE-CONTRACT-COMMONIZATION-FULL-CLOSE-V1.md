@@ -104,7 +104,7 @@ filterContextualNav<TCondition>(items, conditions, { showAll? }): GlobalHeaderNa
 
 ### 6-2. 역할별 브라우저 smoke (프로덕션, Playwright)
 
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 를 참조했다. 자격증명 값은 본 문서에 기록하지 않는다.
+계정은 `docs/local/TEST-ACCOUNT.txt` 를 참조했다. 자격증명 값은 본 문서에 기록하지 않는다.
 
 | 서비스 | 역할 | 확인 내용 | 결과 |
 |---|---|---|---|

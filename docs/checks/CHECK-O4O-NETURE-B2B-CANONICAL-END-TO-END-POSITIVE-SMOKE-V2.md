@@ -43,7 +43,7 @@
 - legacy `/neture/seller/orders` → 410 retired(P2e). canonical buyer 경로만 사용.
 
 ## 6. 자격증명 주의 (SSOT 정합)
-- **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNTS.local.md 는 gitignore, 본 CHECK 에서 미수정.)
+- **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNT.txt 는 gitignore, 본 CHECK 에서 미수정.)
 
 ## 7. 생성 자원 / 정리 대상 (§17)
 | 자원 | id |
@@ -61,7 +61,7 @@
 ## 9. 남은 GAP · 후속
 - **Toss sandbox 결제 완료 1건**(Phase 4~6) → 브라우저로 `/store/payment?paymentGroupId=pg_690147fb...` 결제 후 confirm→paid→bridge→supplier unified view 노출 확인(SMOKE-V3 또는 수동).
 - `IR-O4O-API-SERVER-ORPHANED-SRC-MIGRATIONS-AUDIT-V1`(src/migrations 잔여 38개 — 동일 미적용 위험), `IR-O4O-NETURE-B2B-PRIVATE-OFFER-APPROVAL-GATE-AUDIT-V1`.
-- TEST-ACCOUNTS.local.md 약국경영자 비밀번호 행 갱신(로컬).
+- TEST-ACCOUNT.txt 약국경영자 비밀번호 행 갱신(로컬).
 
 ---
 

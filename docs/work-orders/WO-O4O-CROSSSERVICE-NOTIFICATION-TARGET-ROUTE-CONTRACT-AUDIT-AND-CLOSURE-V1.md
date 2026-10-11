@@ -918,7 +918,7 @@ PH 는 `/mypage` 가 없고 `/account` · `/store-owner/account` 축이다 — t
 
 * 로그인 API 는 **`serviceKey` 필수**. 없으면 `users.password` 로 검증돼 정상 계정도 401 이 된다.
 * K-Cosmetics 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
-* PH 로그인 화면 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 만 신뢰한다 (CLAUDE.md §15).
+* PH 로그인 화면 데모 버튼 비밀번호는 stale 하다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 만 신뢰한다 (CLAUDE.md §15).
 * 배포 후 stale chunk 로 구버전이 보일 수 있다 — 캐시 버스트 후 재확인.
 * **선행 4트랙 모두, 정적 분석은 통과했으나 실제 브라우저에서만 결함이 드러났다.** §18·§19 는 스냅샷이 아니라 실제 이동 결과와 네트워크 응답으로 판정한다.
 * 선행 WO 검증 시 **모든 테스트 계정의 `unreadCount = 0`** 이었다. §18 의 "target 알림이 production 데이터에 없다면 3단 증거로 대체" 조항이 실제로 발동할 가능성이 높다 — 그 경우 이유를 CHECK 에 명시하라.

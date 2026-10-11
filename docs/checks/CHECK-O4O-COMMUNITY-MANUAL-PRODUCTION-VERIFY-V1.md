@@ -14,7 +14,7 @@
 
 ## 준비
 
-1. 비공개 `docs/local/TEST-ACCOUNTS.local.md`의 공통 운영자 Google 계정으로 로그인한다. 계정 정보를 결과 문서에 복사하지 않는다.
+1. 비공개 `docs/local/TEST-ACCOUNT.txt`의 공통 운영자 Google 계정으로 로그인한다. 계정 정보를 결과 문서에 복사하지 않는다.
 2. `admin.neture.co.kr`에서 중앙 서비스 역할을 확인한다. 서비스 역할 `community:admin/operator`와 개별 커뮤니티 역할 `admin/operator/member`는 별개다.
 3. 테스트 커뮤니티 A/B와 테스트 회원을 사용한다. 승인·반려에는 각각 별도의 pending 가입이 필요하고, 탈퇴에는 일회용 가입이 필요하다. 기존 회원과 운영 커뮤니티 최후 admin을 대상으로 검증하지 않는다.
 4. 별도 브라우저 프로필 또는 시크릿 창으로 중앙 서비스 admin, 개별 admin, 개별 operator, 일반 회원을 구분한다. 공통 계정에 `community:admin`이 있으면 개별 operator로 낮춰도 중앙 권한이 남으므로 operator 제한을 검증할 수 없다. 중앙 권한 없는 별도 테스트 계정을 사용한다.

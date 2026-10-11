@@ -210,4 +210,4 @@ WO-O4O-SERVICE-LEGAL-CONTENT-PUBLICATION-V1  (법무 승인 선행 필요)
 | [`CHECK-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1.md`](../checks/CHECK-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1.md) | 잔여 404·인증·legal 정리 + Neture `/operator` 복귀 수정 |
 | [`CHECK-O4O-OPERATOR-REAL-LOGIN-CREDENTIAL-RECOVERY-AND-FINAL-PRODUCTION-E2E-V1.md`](../checks/CHECK-O4O-OPERATOR-REAL-LOGIN-CREDENTIAL-RECOVERY-AND-FINAL-PRODUCTION-E2E-V1.md) | 운영자 실제 로그인 · production E2E |
 | `apps/api-server/src/modules/service-legal/` | `public-service-legal.controller.ts` · `admin-service-legal.controller.ts` · `service-legal-scope.ts` |
-| `docs/local/TEST-ACCOUNTS.local.md` | 검증 계정 SSOT (gitignored, commit 금지) |
+| `docs/local/TEST-ACCOUNT.txt` | 검증 계정 SSOT (gitignored, commit 금지) |

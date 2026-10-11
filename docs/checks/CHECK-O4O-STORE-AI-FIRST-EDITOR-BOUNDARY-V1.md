@@ -102,7 +102,7 @@ NON_STORE_CONSUMERS (prop 미지정)          = 23 파일 · 기본 true 유지
 
 **판정: `PENDING_USER_VERIFICATION` — 테스트 계정 로그인 불가로 Store 편집 화면 smoke 미수행.**
 
-| 시도 | 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`) | 결과 |
+| 시도 | 계정(SSOT `docs/local/TEST-ACCOUNT.txt`) | 결과 |
 |---|---|---|
 | `kpa-society.co.kr/login` | `kpa-society:store_owner` `[REDACTED_EMAIL_B]` | `POST /api/v1/auth/login` **401** `INVALID_USER`("User account not found or has been deactivated" · UI "등록되지 않은 이메일입니다") |
 | `kpa-society.co.kr/login` | `[REDACTED_EMAIL_A]`(KPA 행) | **403** "로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다"(lockout) — 추가 시도 중단 |

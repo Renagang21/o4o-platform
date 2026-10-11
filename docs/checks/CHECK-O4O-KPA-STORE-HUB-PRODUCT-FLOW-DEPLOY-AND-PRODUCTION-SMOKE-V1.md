@@ -360,7 +360,7 @@ cd apps/api-server && npx jest --testPathPattern="store-hub-product-apply-gate" 
 # 2) KPA typecheck
 cd services/web-kpa-society && npx tsc --noEmit -p tsconfig.json
 
-# 3) 프로덕션 브라우저 smoke (자격증명은 env 주입, docs/local/TEST-ACCOUNTS.local.md 참조)
+# 3) 프로덕션 브라우저 smoke (자격증명은 env 주입, docs/local/TEST-ACCOUNT.txt 참조)
 KPA_EMAIL=... KPA_PASSWORD=... node <scratchpad>/kpa-store-hub-smoke.mjs
 
 # 4) 프로덕션 DB read-only 확인

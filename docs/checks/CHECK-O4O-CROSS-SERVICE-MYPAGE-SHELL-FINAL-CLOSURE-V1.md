@@ -24,7 +24,7 @@
 
 **CLOSED.**
 
-- 로그인 수단: PH 로그인 화면의 **데모 계정 채우기 버튼을 사용하지 않고**(stale password → 401), `docs/local/TEST-ACCOUNTS.local.md` 의 `pharmacy-hub:store_owner` 계정으로 브라우저 interactive 로그인. 자격증명은 코드·스크립트·CHECK·Git·shell history 어디에도 남기지 않았다.
+- 로그인 수단: PH 로그인 화면의 **데모 계정 채우기 버튼을 사용하지 않고**(stale password → 401), `docs/local/TEST-ACCOUNT.txt` 의 `pharmacy-hub:store_owner` 계정으로 브라우저 interactive 로그인. 자격증명은 코드·스크립트·CHECK·Git·shell history 어디에도 남기지 않았다.
 - `EXTERNAL_BLOCKER` 없음 — 정상 로그인 성공.
 
 ---

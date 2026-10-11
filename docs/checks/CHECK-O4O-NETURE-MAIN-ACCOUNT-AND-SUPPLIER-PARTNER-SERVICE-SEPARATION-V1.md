@@ -102,7 +102,7 @@
 
 ## 4. 실 화면 검증 (운영, 배포 후)
 
-- 방법: Playwright(node 스크립트, 독립 context · bfcache 기본 비활성 스위치 제거) 로 `https://neture.co.kr` 운영 화면 실행. 계정은 `docs/local/TEST-ACCOUNTS.local.md` 의 공급자 승인(ACTIVE) 계정 · 관리자(neture:admin) 계정. **운영 회원 상태는 변경하지 않았고 신청 폼은 제출하지 않았다.**
+- 방법: Playwright(node 스크립트, 독립 context · bfcache 기본 비활성 스위치 제거) 로 `https://neture.co.kr` 운영 화면 실행. 계정은 `docs/local/TEST-ACCOUNT.txt` 의 공급자 승인(ACTIVE) 계정 · 관리자(neture:admin) 계정. **운영 회원 상태는 변경하지 않았고 신청 폼은 제출하지 않았다.**
 - 캡처: `01-prelogin-desktop/mobile` · `02-supplier-home-desktop` · `02-supplier-home-account-menu` · `02-supplier-home-mobile-menu` · `03-supplier-dashboard` · `04-partner-gate-none` · `05-partner-landing-apply` · `05-supplier-landing-active` · `06-after-logout-tab2` · `06-after-logout-tab1-crosstab` · `07-supplier-landing-header-logout` · `08-back-after-logout` · `09-operator-partners` · `10-admin-partner-dashboard` (세션 스크래치, 저장소 미포함).
 
 ### 4-1. 상태별 결과

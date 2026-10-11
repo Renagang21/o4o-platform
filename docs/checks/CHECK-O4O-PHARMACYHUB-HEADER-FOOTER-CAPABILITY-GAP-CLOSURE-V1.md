@@ -227,7 +227,7 @@ Playwright 실브라우저, 대상 `https://pharmacyhub.co.kr` (프로덕션).
 
 - Cloud Run `pharmacy-hub-web` latestReady = `pharmacy-hub-web-00129-jfw`, ready 시각 `2026-08-21T04:27:25Z`.
 - PharmacyHub·공통 패키지 관련 최종 커밋 `4e883b970` (`2026-08-21T04:24:26Z`) 보다 나중에 배포된 리비전이므로, 위 smoke 는 현재 main 코드의 프로덕션 결과다.
-- 검증 계정은 [`docs/local/TEST-ACCOUNTS.local.md`](../local/TEST-ACCOUNTS.local.md) (SSOT) 를 사용했고 본 문서에 자격증명을 기록하지 않는다.
+- 검증 계정은 [`docs/local/TEST-ACCOUNT.txt`](../local/TEST-ACCOUNT.txt) (SSOT) 를 사용했고 본 문서에 자격증명을 기록하지 않는다.
 
 ## 17. census 최종 분류 갱신
 

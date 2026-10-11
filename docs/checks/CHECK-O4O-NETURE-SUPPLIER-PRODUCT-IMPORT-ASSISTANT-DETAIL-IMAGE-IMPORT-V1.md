@@ -116,7 +116,7 @@ fixture(로고/상세/lazy/srcset/중복/썸네일동일/1×1픽셀/아이콘/sv
 
 ### 브라우저 smoke (배포 후 라이브 — `neture.co.kr`, 공급자 계정) — **PASS**
 - 배포: `deploy-web-services.yml` run `28306748960` → `deploy-neture` 성공(2m12s), 타 서비스 정상 skip. 커밋 `71491e37e` 라이브 반영.
-- 검증 방식: Playwright(headless chromium), 자격증명은 gitignored SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 런타임 주입(하드코딩/로그 노출 없음). fixture HTML(상세 본문 텍스트 + 갤러리 이미지: 정상 2 + lazy `data-src` 1 + `width/height` 1 + 썸네일중복 1 + URL중복 1 + logo 1 + 1×1 픽셀 1).
+- 검증 방식: Playwright(headless chromium), 자격증명은 gitignored SSOT(`docs/local/TEST-ACCOUNT.txt`)에서 런타임 주입(하드코딩/로그 노출 없음). fixture HTML(상세 본문 텍스트 + 갤러리 이미지: 정상 2 + lazy `data-src` 1 + `width/height` 1 + 썸네일중복 1 + URL중복 1 + logo 1 + 1×1 픽셀 1).
 
 | # | 항목 | 결과 |
 |---|------|------|

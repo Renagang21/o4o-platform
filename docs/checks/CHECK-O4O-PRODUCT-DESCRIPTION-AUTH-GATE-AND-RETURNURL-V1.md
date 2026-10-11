@@ -75,7 +75,7 @@
 
 ## 9. 프로덕션 실브라우저 smoke (Playwright headless, 2026-07-12)
 
-대상: `https://neture.co.kr/p/<pilot key>`(HFF 파일럿 master `38a9d3e4…`, STORE canonical ko+en). 자격증명은 로컬 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 런타임 주입(env), 커밋·기록 안 함.
+대상: `https://neture.co.kr/p/<pilot key>`(HFF 파일럿 master `38a9d3e4…`, STORE canonical ko+en). 자격증명은 로컬 SSOT(`docs/local/TEST-ACCOUNT.txt`)에서 런타임 주입(env), 커밋·기록 안 함.
 
 | # | 시나리오 | 결과 |
 |---|---|---|

@@ -3,7 +3,7 @@
 > **결과: 완료** — 테스트 계정 문서를 `계정 하나 = 비밀번호 하나` → **`계정 × serviceKey credential`** 구조로 개편.
 > **작성일:** 2026-08-09
 > **근거:** `CHECK-O4O-AUTH-SERVICEKEY-LOGIN-INVALID-CREDENTIALS-P0-V1` §8 **결정 D**
-> **대상 문서:** `docs/local/TEST-ACCOUNTS.local.md` — **gitignored(추적 제외), 본 커밋에 포함되지 않음**
+> **대상 문서:** `docs/local/TEST-ACCOUNT.txt` — **gitignored(추적 제외), 본 커밋에 포함되지 않음**
 > **자격증명 0** — 본 CHECK 에는 비밀번호·해시를 적지 않는다.
 
 ---
@@ -134,7 +134,7 @@ admin-dashboard 관리자 계정 설정 · 운영자 관리 화면
 
 ```
 코드 변경 0 · migration 0 · DB write 0 · 배포 0 · 권한(role) 변경 0 · 계정 비밀번호 재설정 0
-docs/local/TEST-ACCOUNTS.local.md 개편 — gitignored 이므로 커밋 대상 아님
+docs/local/TEST-ACCOUNT.txt 개편 — gitignored 이므로 커밋 대상 아님
 git 변경 = 본 CHECK 1건 + 선행 CHECK 정정 1건 (자격증명 미포함)
 ```
 

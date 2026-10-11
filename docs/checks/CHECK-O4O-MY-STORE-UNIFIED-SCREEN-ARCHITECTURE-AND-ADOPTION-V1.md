@@ -155,7 +155,7 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 ## 10. 배포 후 브라우저 검증 (§13)
 
 - **검증 시각**: 2026-08-19 · **배포 커밋**: `69dfb6f53` (Deploy Web Services (Cloud Run) = success)
-- **계정**: 매장 경영자 계정 1개 (`docs/local/TEST-ACCOUNTS.local.md`) — 자격증명은 어떤 산출물에도 기록하지 않았다.
+- **계정**: 매장 경영자 계정 1개 (`docs/local/TEST-ACCOUNT.txt`) — 자격증명은 어떤 산출물에도 기록하지 않았다.
 - **방식**: Playwright chromium (headless), 실제 프로덕션 도메인 로그인 → 각 서비스 메뉴 config 의 **전 항목** 순회.
 
 | 서비스 | 도메인 | 메뉴 항목 | desktop 1440 | mobile 390 |

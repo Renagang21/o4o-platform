@@ -234,7 +234,7 @@ FAIL:                    0
 | 결과 실측 | 4 서비스 재로그인 전부 `ACCOUNT_NOT_ACTIVE` 로 차단 확인 |
 | DB 상태 | `users.status = suspended` ×2 |
 | 자격정보 | 로컬에만 보관. CHECK·커밋·리포트에 비밀번호 미기록 |
-| 문서화 | `docs/local/TEST-ACCOUNTS.local.md` §7 에 계정·org·재사용 절차 기록 (gitignored, 비밀번호 literal 미기록) |
+| 문서화 | `docs/local/TEST-ACCOUNT.txt` §7 에 계정·org·재사용 절차 기록 (gitignored, 비밀번호 literal 미기록) |
 
 ---
 
@@ -265,7 +265,7 @@ FAIL:                    0
 ## 11. 코드 변경
 
 **없음.** 이번 WO 에서 수정이 필요한 결함이 발견되지 않았다.
-산출물은 본 CHECK 문서와 로컬 `TEST-ACCOUNTS.local.md` §7(gitignored) 갱신뿐이다.
+산출물은 본 CHECK 문서와 로컬 `TEST-ACCOUNT.txt` §7(gitignored) 갱신뿐이다.
 
 ---
 

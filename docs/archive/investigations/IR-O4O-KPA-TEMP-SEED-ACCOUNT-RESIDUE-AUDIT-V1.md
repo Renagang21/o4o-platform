@@ -13,7 +13,7 @@
   - [CHECK-O4O-KPA-SEED-ACCOUNT-STATUS-SQL-V1](CHECK-O4O-KPA-SEED-ACCOUNT-STATUS-SQL-V1.md) — recreate 권고 **폐기**
 - **SSOT 참조:**
   - `CLAUDE.md §15` Browser Verification Test Accounts — "**자격증명 하드코딩 금지** — 시드 스크립트·테스트 코드·CI 어디에도 이 문서의 비밀번호를 박지 말 것. 발견 시 즉시 제거."
-  - `docs/local/TEST-ACCOUNTS.local.md` — 테스트 계정 SSOT (gitignored)
+  - `docs/local/TEST-ACCOUNT.txt` — 테스트 계정 SSOT (gitignored)
   - Memory: `project_test_account_cleanup_policy` — `xxxx@o4o.com` 임시 계정은 삭제 상태가 정상, 재생성 금지
 - **버전:** V1
 
@@ -30,7 +30,7 @@
 | **A 삭제** (코드/시드/엔드포인트) | **9** | runtime/build 영향, 운영 위험 |
 | **B 문서 정정** (recreate · 부재=오류 표현) | **7+** | docs/IR/CHECK 와 reset plan |
 | **C historical 유지** (legacy dead code, IR archive) | **2** | dropped columns 참조 → 자연 무효화. 별도 cleanup 불필요 |
-| **D 운영 검증 계정 전환** (QA 시나리오용) | **2** | `TEST-ACCOUNTS.local.md` SSOT 로 이전 |
+| **D 운영 검증 계정 전환** (QA 시나리오용) | **2** | `TEST-ACCOUNT.txt` SSOT 로 이전 |
 
 ---
 
@@ -131,7 +131,7 @@ Grep "[REDACTED]"
 | # | 파일 | 위반 내용 | 분류 |
 |---|------|----------|:----:|
 | C1 | [`scripts/verify/verify-ai-content-modal.mjs:14-15`](scripts/verify/verify-ai-content-modal.mjs#L14-L15) | `TEST_EMAIL='phamacy1@o4o.com'`, `TEST_PASSWORD='[REDACTED]'` | **A 삭제** (또는 env var 화) |
-| C2 | [`e2e/registration-approval-login.spec.ts:13,102,161,221,298`](e2e/registration-approval-login.spec.ts) | `TEST_USER` email + `operatorPassword: '[REDACTED]'` 다중 위치 | **D 전환** (TEST-ACCOUNTS.local.md SSOT 로) |
+| C2 | [`e2e/registration-approval-login.spec.ts:13,102,161,221,298`](e2e/registration-approval-login.spec.ts) | `TEST_USER` email + `operatorPassword: '[REDACTED]'` 다중 위치 | **D 전환** (TEST-ACCOUNT.txt SSOT 로) |
 | C3 | `scripts/care-data-accumulation-test.{mjs,py,sh}` | `[REDACTED]` 패턴 (미상세 검증, 동일 카테고리 추정) | A/D 결정 후 처리 |
 | C4 | `scripts/care-e2e-operation-test-v2.mjs` | 동일 | A/D 결정 후 처리 |
 
@@ -185,7 +185,7 @@ Grep "[REDACTED]"
 | **A 삭제** | runtime/build 영향, 또는 보안 위협 → 즉시 제거 | **9** | A1(Bootstrap), A2(seed-test-accounts endpoint), A5-7(phamacy1 migrations), C1(verify script), E1-2(LoginPage 평문) |
 | **B 문서 정정** | 잘못된 가정 (부재=오류, 복구 필요) | **7+** | B1-3(reset plan), B4-6(이전 IR/CHECK 두 건 + DATA-AUDIT 1 건) |
 | **C historical 유지** | dropped columns 의존으로 자연 무효, 또는 audit 시점 기록 | **2** | A4, A8 + 8 개 IR/CHECK 문서 (audit trail) |
-| **D 운영 검증 계정 전환** | QA 시나리오 유지하되 SSOT 로 이전 | **2+** | C2(e2e spec) — `docs/local/TEST-ACCOUNTS.local.md` 참조 |
+| **D 운영 검증 계정 전환** | QA 시나리오 유지하되 SSOT 로 이전 | **2+** | C2(e2e spec) — `docs/local/TEST-ACCOUNT.txt` 참조 |
 
 ---
 

@@ -139,7 +139,7 @@ WO 중지 조건: "consumer 가 남아 있는데 route 제거가 필요함".
 
 ## 8. Production E2E (2026-09-11 · `api.neture.co.kr` · 배포 전 baseline vs 배포 후)
 
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 런타임에만 읽었다 (코드·문서·커밋 기록 0). 응답은 status · error code · 건수만 기록.
+계정은 `docs/local/TEST-ACCOUNT.txt` 에서 런타임에만 읽었다 (코드·문서·커밋 기록 0). 응답은 status · error code · 건수만 기록.
 
 ### 8-1. 같은 계정 cross-service tenant 테스트 — `renagang21` (KPA 약국 + PH 약국 + KCos 뷰티샵 + Neture 공급자 조직 보유)
 

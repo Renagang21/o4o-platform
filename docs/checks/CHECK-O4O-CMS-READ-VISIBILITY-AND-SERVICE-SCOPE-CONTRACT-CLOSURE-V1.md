@@ -399,7 +399,7 @@ HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
 행: "인증된 비-platform-admin(일반 관리자·서비스 회원) + serviceKey 생략 → 400"
 ```
 
-프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNTS.local.md` 기준 **verified 계정은
+프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNT.txt` 기준 **verified 계정은
 `renariver21`(platform:super_admin) 하나뿐**이고 나머지 L2 는 전부 `unknown`,
 내 매장 검증 계정 2건은 `suspended` 다. 재활성화는 **프로덕션 write** 라 이 WO 가 금지한다.
 
@@ -470,7 +470,7 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 ### BLOCKED 해소 — §10-3 의 미실측 1건을 이번에 실측
 
 §10-3 은 “인증된 비-platform-admin + `serviceKey` 생략 → 400” 을 **계정 근거 부재로 BLOCKED** 처리했다.
-이번에 `docs/local/TEST-ACCOUNTS.local.md` §1 의 **verified L1 자격 2건**으로 실측했다 (read-only, write 0).
+이번에 `docs/local/TEST-ACCOUNT.txt` §1 의 **verified L1 자격 2건**으로 실측했다 (read-only, write 0).
 
 | 계정 성격 (역할 요약) | `/cms/contents` 생략 | `/cms/stats` 생략 | `?serviceKey=kpa-society` |
 |---|---|---|---|

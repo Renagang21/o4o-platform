@@ -57,7 +57,7 @@ kpa-branch 는 pharmacy-hub 선례와 동일한 **thin per-service join wrapper*
 | ⑦ | branch operator 비밀번호 변경 권한이 자기 서비스로 닫힘 | **PASS** | `GET /api/v1/operator/members` → **403 `ROLE_REQUIRED`**. allow-list(`platform:super_admin`,`neture:*`,`cosmetics:*`,`kpa:*`)에 `kpa-branch:*` 없음 |
 | ⑧ | KPA Society / Neture / K-Cosmetics 회귀 없음 | **PASS** | 비밀번호 변경 전·후 및 fixture 정리 후 로그인 매트릭스 전부 200 |
 
-**미실행 1건**: `/admin/service-members` 승인 PATCH 의 런타임 확인. 현재 `kpa-branch:admin` 보유 계정이 없고, `platform:super_admin` 계정(`[REDACTED_EMAIL_D]`, `super-admin@o4o.com`)의 비밀번호가 `docs/local/TEST-ACCOUNTS.local.md` 에 없다. 승인 로직은 기존 `MembershipApprovalService` 를 그대로 위임하므로 신규 로직이 아니며, 첫 실운영 분회 운영자 지정 시 확인한다.
+**미실행 1건**: `/admin/service-members` 승인 PATCH 의 런타임 확인. 현재 `kpa-branch:admin` 보유 계정이 없고, `platform:super_admin` 계정(`[REDACTED_EMAIL_D]`, `super-admin@o4o.com`)의 비밀번호가 `docs/local/TEST-ACCOUNT.txt` 에 없다. 승인 로직은 기존 `MembershipApprovalService` 를 그대로 위임하므로 신규 로직이 아니며, 첫 실운영 분회 운영자 지정 시 확인한다.
 
 ## 6. fixture 정리
 

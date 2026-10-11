@@ -596,7 +596,7 @@ services/web-pharmacy-hub/src/pages/JoinStatusPage.tsx
 
 ### E. §4 테스트 계정 — 기대치를 낮게 잡을 것
 
-`docs/local/TEST-ACCOUNTS.local.md` 에 `pending`/`rejected` 라벨이 붙은 전용 계정은 확인되지 않았다. 선행 FINAL AUDIT 도 같은 이유로 미검증으로 남겼다. 따라서 **§7-B(정적 3단 증거) 경로가 현실적인 기본값**이다.
+`docs/local/TEST-ACCOUNT.txt` 에 `pending`/`rejected` 라벨이 붙은 전용 계정은 확인되지 않았다. 선행 FINAL AUDIT 도 같은 이유로 미검증으로 남겼다. 따라서 **§7-B(정적 3단 증거) 경로가 현실적인 기본값**이다.
 
 §16 이 "새 테스트 계정 생성"을 중지 조건으로 명시했고 §6 이 상태 변경을 전부 금지했으므로, **검증을 위해 계정을 만들거나 상태를 바꾸지 말 것.** §7-B 는 §7-A 의 열등한 대체재가 아니라 원문이 허용한 **동등한 PASS 경로**다.
 

@@ -1228,7 +1228,7 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 
 #### 4. 운영 검증 절차 (배포 후 · 플래그 false)
 
-계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNTS.local.md` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
+계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNT.txt` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
 
 | # | 항목 | KPA | K-Cosmetics |
 |---|---|---|---|

@@ -175,7 +175,7 @@
 ## 9. 한계 · 보고
 
 1. **sohae2100 = `platform:super_admin` 겸** — 운영자 스코프 403 증명이 bypass 로 불가(②-e). 순수 운영자 스코프는 W13/pilot 선례로 대체.
-2. **회원 로그인 smoke 생략** — `renagang@gmail.co` 비밀번호가 `TEST-ACCOUNTS.local.md` 에 없고 관리자 재설정 API 도 없다(auth 모듈 `forgot-password/reset-password` self-service 만). 정책대로 임의 변경하지 않았다. 문서에 항목이 추가되면 `w18_rehearsal.mjs` ⑥-b~d 가 자동 실행된다.
+2. **회원 로그인 smoke 생략** — `renagang@gmail.co` 비밀번호가 `TEST-ACCOUNT.txt` 에 없고 관리자 재설정 API 도 없다(auth 모듈 `forgot-password/reset-password` self-service 만). 정책대로 임의 변경하지 않았다. 문서에 항목이 추가되면 `w18_rehearsal.mjs` ⑥-b~d 가 자동 실행된다.
 3. **영구 tenant 부작용(구조적)** — `branch_memberships` 는 append-only 라 pilot 이력이 3→5행(두 계정 joined_at 갱신). `renagang@gmail.co` 의 `kpa_pharmacist_profiles` 가 전입 시 `promoteFromUser` 로 **0→1 생성**(멱등·canonical 동작). 삭제하지 않는다.
 4. `POST /kpa-branch/join` 은 리허설에서 실행하지 않았다(users/credential 생성 금지).
 5. 테스트 분회 `test-branch-onboarding`(`03112efd-…`) 은 unpublished 로 유지 — 용도: 신규 분회 개통 절차 검증 tenant. `o4o-pilot` = 상시 기능/회귀 tenant. 사용 중 분회 폐지·비활성화 API 부재는 별도 운영수명주기 후속 후보.

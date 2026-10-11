@@ -216,7 +216,7 @@ CLAUDE.md §8 "API 직접 호출(curl) ✅" 채널. **전용 테스트 매장**(
 | 6 | 권한 — 토큰 없음 | `PATCH` (no auth) | **401** ✅ |
 | 7 | 검증 — 타입 오류 | `PATCH {applyTemplateDefaults:"yes"}` | **400 VALIDATION_ERROR** ✅ |
 
-> **부수 발견(본 WO 무관):** `docs/local/TEST-ACCOUNTS.local.md` 의 **약국 경영자 `[REDACTED_EMAIL_B]` 비밀번호가 stale**
+> **부수 발견(본 WO 무관):** `docs/local/TEST-ACCOUNT.txt` 의 **약국 경영자 `[REDACTED_EMAIL_B]` 비밀번호가 stale**
 > (프로덕션 로그인 401 `INVALID_CREDENTIALS`). 같은 매장의 다른 owner 계정(`[REDACTED_EMAIL_C]`)은 정상 로그인되어
 > smoke 는 그 계정으로 수행했다. 로컬 SSOT 문서 갱신 필요.
 

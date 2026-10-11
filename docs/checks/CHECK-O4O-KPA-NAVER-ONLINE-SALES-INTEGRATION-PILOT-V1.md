@@ -314,7 +314,7 @@ CREATE TABLE external_channel_product_links (
 **중지 사유 (WO §5 해당)**
 
 1. **자격정보 부재** — 네이버 스마트스토어 판매자 계정 및 커머스 API센터 애플리케이션이
-   발급되지 않았다. `docs/local/TEST-ACCOUNTS.local.md` 에도 네이버 항목이 없다.
+   발급되지 않았다. `docs/local/TEST-ACCOUNT.txt` 에도 네이버 항목이 없다.
    (CLAUDE.md 중지 조건: "실제 계정 · 자격정보 · 외부 서비스 승인 필요")
 2. **IP 화이트리스트 미해소** — 자격정보를 받아도 Cloud Run 정적 egress IP 없이는 호출 불가.
    Cloud NAT 구성은 인프라 변경이라 별도 승인 대상.

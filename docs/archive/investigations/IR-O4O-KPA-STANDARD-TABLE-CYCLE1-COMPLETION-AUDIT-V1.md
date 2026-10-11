@@ -127,8 +127,8 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 
 ### R2 — Production smoke 계정 정합성
 
-- `TEST-ACCOUNTS.local.md` 계정과 production 실제 잠금 상태 불일치 가능성
-- admin 계정 잠금 해제 후 `TEST-ACCOUNTS.local.md` 재확인 권장
+- `TEST-ACCOUNT.txt` 계정과 production 실제 잠금 상태 불일치 가능성
+- admin 계정 잠금 해제 후 `TEST-ACCOUNT.txt` 재확인 권장
 
 ### R3 — K-Cosmetics 이식 미진행
 

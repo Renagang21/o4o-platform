@@ -169,7 +169,7 @@
 ## 10. Production browser smoke (§9/§10) — 실측
 
 수행: 2026-08-19, 배포 완료(Deploy Web Services / Cloud Run, sha `3e801ec69`) 이후.
-도구: Playwright chromium headless (repo 내장), 계정 = `docs/local/TEST-ACCOUNTS.local.md` 의 매장 계정(자격증명은 이 문서에 적지 않는다).
+도구: Playwright chromium headless (repo 내장), 계정 = `docs/local/TEST-ACCOUNT.txt` 의 매장 계정(자격증명은 이 문서에 적지 않는다).
 호스트: KPA `kpa-society.co.kr` PH `pharmacyhub.co.kr` · KCos `k-cosmetics-web-...run.app`
 (`k-cosmetics.co.kr` 은 Cafe24 쇼핑몰 도메인이라 앱 진입점이 아니다 — 검증 호스트 주의).
 

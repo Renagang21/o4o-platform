@@ -100,7 +100,7 @@ QR 관련 문구 미사용 (후속 단계 안내만 약하게 표기).
 - 매장 취급 상품 → UI 비활성화 (목록 0건)
 - 운영자 그룹 → UI 보관(archived) 처리 (HUB 비노출)
 
-> 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 약국 경영자 password 가 실제와 불일치(`[REDACTED — rotated]` → 실제 체험계정 `[REDACTED — rotated]`). 별도 갱신 권장.
+> 참고: `docs/local/TEST-ACCOUNT.txt` 의 KPA 약국 경영자 password 가 실제와 불일치(`[REDACTED — rotated]` → 실제 체험계정 `[REDACTED — rotated]`). 별도 갱신 권장.
 
 ## 6. 최종 판정
 

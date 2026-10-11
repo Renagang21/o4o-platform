@@ -76,7 +76,7 @@
 
 ### 8-3. 검증 역할
 
-- Neture 공급자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md` 의 "Neture 공급자")
+- Neture 공급자 테스트 계정 (`docs/local/TEST-ACCOUNT.txt` 의 "Neture 공급자")
 - 로그인 성공 → `/supplier/dashboard` 자동 진입
 - **자격정보(아이디/비밀번호) 본 문서 비기재 확인** — 스크린샷 미첨부
 

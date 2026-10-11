@@ -176,7 +176,7 @@ INSERT INTO platform_store_slugs (id, slug, store_id, service_key, is_active, cr
 | K-Cosmetics 로그인 → store-hub | `login(serviceKey=k-cosmetics)` 200 / `overview` 200 `data:null` / `capabilities` 403 `STORE_OWNER_REQUIRED` |
 | 다른 서비스 영향 | 없음 (kpa·pharmacy-hub 회귀 0) |
 
-> KCos smoke 결과는 `docs/local/TEST-ACCOUNTS.local.md` 에 **이번 작업 이전부터 기록된 baseline 과 동일**하다
+> KCos smoke 결과는 `docs/local/TEST-ACCOUNT.txt` 에 **이번 작업 이전부터 기록된 baseline 과 동일**하다
 > (해당 문서: "K-Cosmetics 매장 스코프 검증에 현재 사용 가능한 store_owner 계정은 없다").
 > 즉 이번 정리로 인한 회귀가 아니며, store_owner 해석은 slug 가 아니라 `organization_service_enrollments` 축을 쓰므로 slug 삭제의 영향을 받지 않는다.
 

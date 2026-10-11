@@ -28,7 +28,7 @@
 
 > 직전 WO 의 "비밀번호 불일치" 판정은 오진이었다. 원인은 **serviceKey 없는 로그인 API 호출**이며,
 > serviceKey 없는 curl 401 을 계정 실패로 판정하지 않는다. 비밀번호 원문은 본 문서에 기록하지 않는다
-> (SSOT = `docs/local/TEST-ACCOUNTS.local.md`, gitignored).
+> (SSOT = `docs/local/TEST-ACCOUNT.txt`, gitignored).
 
 ## 3. 신규 상품 등록 — PASS
 

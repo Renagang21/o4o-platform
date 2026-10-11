@@ -194,7 +194,7 @@ backend 변경 0 → `apps/api-server` 전체 build 불필요. DB migration **�
 ## 9-1. 배포 · 브라우저 smoke (§14)
 
 - CI `Deploy Web Services (Cloud Run)` run `32322639212` — 7 job 전부 success (kpa-society · neture · k-cosmetics · kpa-branch · pharmacy-hub)
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 운영자 계정 (실 로그인, 권한 없는 계정 강제 접근 테스트 없음)
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 운영자 계정 (실 로그인, 권한 없는 계정 강제 접근 테스트 없음)
 
 | 화면 | 결과 |
 |---|---|

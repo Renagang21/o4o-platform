@@ -150,7 +150,7 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 ## 10. pending/rejected UX
 
 - 5서비스 모두 승인 상태를 `MembershipStatusBadge` 또는 동등 배지로 표기하며, 프로덕션 검증 계정은 전부 `승인됨` 이었다.
-- **pending / rejected 계정의 실제 프로덕션 렌더는 검증하지 못했다.** 해당 상태의 테스트 계정이 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에 없고, §24(production write = 0)에 따라 상태를 만들지 않았다. → **미확인**, backlog B7.
+- **pending / rejected 계정의 실제 프로덕션 렌더는 검증하지 못했다.** 해당 상태의 테스트 계정이 SSOT(`docs/local/TEST-ACCOUNT.txt`)에 없고, §24(production write = 0)에 따라 상태를 만들지 않았다. → **미확인**, backlog B7.
 
 > **2026-08-21 후속 해소 (WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1 §7-B)**: pending/rejected 상태 테스트 계정은 재확인 결과에도 존재하지 않았고, 후속 WO 역시 계정 생성·상태 변경을 금지했다. 대신 WO §7-B 가 정한 **3단 정적 계약 증거(guard·렌더 분기·status normalizer)** 를 5서비스 전체에서 실코드로 확인해 **동등 PASS** 판정을 받았다. 위 원 기록(당시 미확인)은 그대로 둔다.
 

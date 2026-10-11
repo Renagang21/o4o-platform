@@ -37,7 +37,7 @@
   - Store Ops: `organizationId`
   - Commerce: `storeId`
 - UUID 단독 조회, raw SQL string interpolation, domain primary boundary 누락, `serviceKey` spoofing, cross-domain JOIN은 금지 또는 명시 WO 예외 대상이다.
-- 브라우저 검증 전 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`이다.
+- 브라우저 검증 전 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNT.txt`이다.
 
 ## 3. 기존 AGENTS.md의 보강 필요 지점
 

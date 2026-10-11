@@ -83,7 +83,7 @@
   .env.example (루트, 추적)      : 공통 예제
   apps/api-server/env.example    : API 서버 예제 (PostgreSQL, DB_*)
   .env / .env.local / ... : .gitignore 85-90 로 전부 미추적
-  docs/local/*.local.md   : .gitignore 139 로 미추적 (TEST-ACCOUNTS.local.md, mfds-api-key.local.md)
+  docs/local/*.local.md   : .gitignore 139 로 미추적 (TEST-ACCOUNT.txt, mfds-api-key.local.md)
 
 [Claude Code]
   CLAUDE.md (추적, 470L) — 헌법

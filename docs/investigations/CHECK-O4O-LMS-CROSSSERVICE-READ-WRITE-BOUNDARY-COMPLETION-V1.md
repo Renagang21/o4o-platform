@@ -284,7 +284,7 @@ courseId 만 알면 write 도 가능했다).
 | KPA-Society | `/lms` → 상세 | `200 /kpa/lms/courses?status=published` n=3 keys=`["kpa-society"]` · `200 /kpa/lms/courses/:id` · `200 .../lessons` | PASS — 혼입 0 |
 | K-Cosmetics | `/lms` | `200 /lms/courses?serviceKey=k-cosmetics&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" (이전에는 KPA 강의 노출) |
 
-### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNTS.local.md` KPA operator)
+### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNT.txt` KPA operator)
 
 | 단계 | 호출 | 결과 |
 |---|---|---|

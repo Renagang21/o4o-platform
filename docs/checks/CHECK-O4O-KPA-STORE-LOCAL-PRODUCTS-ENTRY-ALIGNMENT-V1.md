@@ -212,7 +212,7 @@ Playwright(headless Chromium) 실브라우저 · 프로덕션 · 약국 경영�
 
 ### 7.4 K-Cosmetics
 
-매장주 테스트 계정이 `TEST-ACCOUNTS.local.md` 에 없어 브라우저 smoke 미수행.
+매장주 테스트 계정이 `TEST-ACCOUNT.txt` 에 없어 브라우저 smoke 미수행.
 `git diff` 상 KCos 블록 변경 0 + `npx tsc --noEmit` PASS 로 정적 검증 대체.
 
 ### 7.5 관측 (범위 외)

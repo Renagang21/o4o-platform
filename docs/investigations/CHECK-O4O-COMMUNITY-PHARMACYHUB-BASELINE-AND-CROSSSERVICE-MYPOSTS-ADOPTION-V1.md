@@ -143,7 +143,7 @@
 ## 7. Production browser smoke (§17)
 
 실행: Playwright(headless Chromium) · desktop 1440x900 / mobile 390x844 · 실 계정 로그인 후 접속.
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 읽어 환경변수로 주입(스크립트에 하드코딩 없음).
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 읽어 환경변수로 주입(스크립트에 하드코딩 없음).
 
 ### 7-1. PharmacyHub 전 동선 (commit `23d795c5e` 배포 후 재측정)
 

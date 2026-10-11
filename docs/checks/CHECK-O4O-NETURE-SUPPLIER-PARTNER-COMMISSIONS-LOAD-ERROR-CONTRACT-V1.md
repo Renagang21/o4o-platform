@@ -204,7 +204,7 @@ API(`api.neture.co.kr`)는 실제 프로덕션을 그대로 사용했다. 오리
 **텔레메트리**: page error 0 · 주입분 외 4xx/5xx 0 · mutation 요청 0.
 console error 2건은 **주입한 500 자체**에 대한 브라우저 기본 로그이며 결함이 아니다(정상 시나리오 A·D 에서는 0).
 
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서 스크립트가 직접 읽고, 명령행·로그에 남기지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서 스크립트가 직접 읽고, 명령행·로그에 남기지 않았다.
 
 ## 11. 반응형 (오류 카드)
 

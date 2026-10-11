@@ -22,7 +22,7 @@ Signage 는 My Store 축에서 **클라이언트가 organization 을 지정**하
 
 ## 2. 수정 전 재현 (프로덕션, DB write 0)
 
-계정: KPA 매장 소유 계정(자격정보는 `docs/local/TEST-ACCOUNTS.local.md`, 본 문서에 기재하지 않음)
+계정: KPA 매장 소유 계정(자격정보는 `docs/local/TEST-ACCOUNT.txt`, 본 문서에 기재하지 않음)
 엔드포인트: `/schedules`(store 전용) · `/media` · `/playlists`(operator-or-store)
 
 | # | organization | 귀속 | 수정 전 | 기대 |

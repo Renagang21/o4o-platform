@@ -309,7 +309,7 @@ export interface MyPageActivityItem {
 
 ## 18. production browser (§28·§30)
 
-Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNTS.local.md` SSOT).
+Playwright MCP · 프로덕션 실계정(`docs/local/TEST-ACCOUNT.txt` SSOT).
 
 | 항목 | 결과 |
 |---|---|

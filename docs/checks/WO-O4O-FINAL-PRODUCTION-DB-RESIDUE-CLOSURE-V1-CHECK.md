@@ -265,7 +265,7 @@ post-commit 재조회 결과 `app_registry` = **2 rows**:
 
 > 서비스별(KPA · Neture · PharmacyHub · K-Cosmetics) 대표 read-only endpoint 는 **미실측**이다.
 > 무인증 공개 read 경로를 특정하지 못했고(추정 경로 4건 전부 404), 서비스 웹 로그인 자격은
-> `TEST-ACCOUNTS.local.md` §2 기준 전부 unknown 이다. 다만 네 서비스는 모두 동일한 `o4o-core-api`
+> `TEST-ACCOUNT.txt` §2 기준 전부 unknown 이다. 다만 네 서비스는 모두 동일한 `o4o-core-api`
 > 리비전을 공유하며 그 health · DB · 인증 · `app_registry` 소비 경로가 위와 같이 PASS 다.
 
 ### 10-3. Production logs (WO §26)

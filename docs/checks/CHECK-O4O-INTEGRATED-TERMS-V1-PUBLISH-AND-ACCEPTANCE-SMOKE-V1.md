@@ -36,7 +36,7 @@
 
 | 단계 | 호출 | 결과 |
 |---|---|---|
-| 로그인 | `POST /api/v1/auth/login` `{email,password,serviceKey,includeLegacyTokens:true}` — 서비스별 L2 admin credential(값은 `docs/local/TEST-ACCOUNTS.local.md` 만) | 4/4 200 · `data.tokens.accessToken` |
+| 로그인 | `POST /api/v1/auth/login` `{email,password,serviceKey,includeLegacyTokens:true}` — 서비스별 L2 admin credential(값은 `docs/local/TEST-ACCOUNT.txt` 만) | 4/4 200 · `data.tokens.accessToken` |
 | 사전 census | `GET /api/v1/admin/services/{key}/policies?documentType=terms` | 4/4 기존 `terms` row 0 |
 | draft | `POST /api/v1/admin/services/{key}/policies` `{documentType:'terms',title:'O4O 통합 서비스 이용약관',slug:'terms',content,version:1,effectiveDate:'2026-09-17',changeReason}` | 4/4 201 `draft` |
 | readback | `GET …/policies/{id}` → content sha256 | 4/4 로컬 sha 일치 |

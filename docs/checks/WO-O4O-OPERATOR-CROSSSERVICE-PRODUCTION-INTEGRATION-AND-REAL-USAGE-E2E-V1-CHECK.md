@@ -4,7 +4,7 @@
 - **대상**: KPA-Society / K-Cosmetics / Neture / PharmacyHub (공식 3서비스)
 - **검증 방식**: 프로덕션 도메인, 실제 계정 로그인부터 시작한 브라우저(Playwright chromium) 전수 순회
   - desktop 1440×900 · mobile 390×844 · 새로고침 · deep link 직접 진입 · 실 API 응답 수집
-  - 자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(git 추적 제외) 참조. 본 문서에 값 기록 없음.
+  - 자격증명은 `docs/local/TEST-ACCOUNT.txt`(git 추적 제외) 참조. 본 문서에 값 기록 없음.
 
 ---
 
