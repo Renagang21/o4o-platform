@@ -111,8 +111,12 @@ export async function verifyRedirects(paths, request = fetch, signal, rulePaths 
       const response = await request(new URL(path, `https://${host}`).href, { redirect: 'manual', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000) });
       const location = response.headers.get('location');
       await response.body?.cancel();
-      if (response.status !== 302 || !location || new URL(location, `https://${host}`).href !== target) {
-        throw new Error('Old host did not preserve path and query in a 302 redirect.');
+      let observed=null;
+      try { if(location) observed=new URL(location,`https://${host}`); } catch { /* no raw Location in errors */ }
+      if (response.status !== 302 || observed?.href !== target) {
+        const expected=new URL(target);
+        const family=printedQrPaths.find(pattern=>path.startsWith(pattern.slice(0,-1)))??(path.startsWith('/terms')?'terms':'other');
+        throw new Error(`Old host did not preserve path and query in a 302 redirect: host=${host}; family=${family}; status=${response.status}; locationPresent=${!!location}; hostMatch=${observed?.host===expected.host}; pathMatch=${observed?.pathname===expected.pathname}; queryMatch=${observed?.search===expected.search}; schemeMatch=${observed?.protocol===expected.protocol}.`);
       }
     }));
   }));
