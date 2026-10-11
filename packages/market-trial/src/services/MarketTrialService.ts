@@ -22,6 +22,7 @@ import {
 export interface CreateTrialDto {
   supplierId: string;
   supplierName?: string;
+  initialHistory?: MarketTrial['statusHistory'];
   /**
    * Optional ProductMaster reference — WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1
    * 공급자 제품 목록에서 선택한 상품(ProductMaster id, = 목록 masterId)으로 펀딩 개설 시 soft 참조.
@@ -238,6 +239,7 @@ export class MarketTrialService {
       fundingEndAt: dto.fundingEndAt,
       trialPeriodDays: dto.trialPeriodDays,
       status: TrialStatus.DRAFT,
+      statusHistory: dto.initialHistory ?? [],
     });
 
     return this.trialRepo.save(trial);
@@ -246,31 +248,39 @@ export class MarketTrialService {
   /**
    * Submit trial for operator review (DRAFT → SUBMITTED)
    */
-  async submitTrial(trialId: string, supplierId: string): Promise<MarketTrial> {
-    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
-    if (!trial) {
-      throw new Error('Market Trial not found');
-    }
-    if (trial.supplierId !== supplierId) {
-      throw new Error('Not authorized to submit this trial');
-    }
-    if (trial.status !== TrialStatus.DRAFT) {
-      throw new Error('Only DRAFT trials can be submitted');
-    }
-    trial.status = TrialStatus.SUBMITTED;
-    return this.trialRepo.save(trial);
+  submitTrial(trialId: string, supplierId: string): Promise<MarketTrial> {
+    return this.dataSource.transaction(async manager => {
+      const repo = manager.getRepository(MarketTrial);
+      const trial = await repo.findOne({ where: { id: trialId }, lock: { mode: 'pessimistic_write' } });
+      if (!trial) throw new Error('Market Trial not found');
+      if (trial.supplierId !== supplierId) throw new Error('Not authorized to submit this trial');
+      if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be submitted');
+      const event = { from: trial.status, to: TrialStatus.SUBMITTED, at: new Date().toISOString(), reason: 'funding_submitted', auto: false, actorUserId: supplierId };
+      trial.statusHistory = [...(trial.statusHistory ?? []), event];
+      trial.status = TrialStatus.SUBMITTED;
+      return repo.save(trial);
+    });
   }
 
   /**
    * Update a DRAFT trial (supplier only)
    * WO-MARKET-TRIAL-EDIT-FLOW-V1
    */
-  async updateTrial(trialId: string, supplierId: string, dto: UpdateTrialDto): Promise<MarketTrial> {
-    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
-    if (!trial) throw new Error('Market Trial not found');
-    if (trial.supplierId !== supplierId) throw new Error('Not authorized to edit this trial');
-    if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be edited');
+  updateTrial(trialId: string, supplierId: string, dto: UpdateTrialDto): Promise<MarketTrial> {
+    return this.dataSource.transaction(async manager => {
+      const repo = manager.getRepository(MarketTrial);
+      const trial = await repo.findOne({ where: { id: trialId }, lock: { mode: 'pessimistic_write' } });
+      if (!trial) throw new Error('Market Trial not found');
+      if (trial.supplierId !== supplierId) throw new Error('Not authorized to edit this trial');
+      if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be edited');
 
+      this.applyDraftChanges(trial, dto);
+
+      return repo.save(trial);
+    });
+  }
+
+  private applyDraftChanges(trial: MarketTrial, dto: UpdateTrialDto) {
     if (dto.title !== undefined) trial.title = dto.title;
     if (dto.oneLiner !== undefined) trial.oneLiner = dto.oneLiner || null;
     if (dto.videoUrl !== undefined) trial.videoUrl = dto.videoUrl || null;
@@ -285,7 +295,6 @@ export class MarketTrialService {
     if (dto.fundingEndAt !== undefined) trial.fundingEndAt = dto.fundingEndAt;
     if (dto.trialPeriodDays !== undefined) trial.trialPeriodDays = dto.trialPeriodDays;
 
-    return this.trialRepo.save(trial);
   }
 
   /**

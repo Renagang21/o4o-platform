@@ -267,34 +267,40 @@ shipmentId는 생성하지 않는다.
 
 ## 14. 화면 기준
 
-### 공급자 화면
+### 개설자 화면 (2026-10-11 사용자 지시 반영)
+
+펀딩 개설 주체는 활성 공급자이며 실무 공간은 `funding.neture.co.kr`이다. 공급자 호스트의 기존 링크는 펀딩 업무공간으로 연결한다. 개설자 자격은 공급자 업무 자격으로 판정하고, 펀딩 서비스 운영자 역할과 구분한다.
 
 ```
 유통참여형 펀딩 목록 · 신규 펀딩 콘텐츠 작성 · 임시저장 · 게시 요청
 상세 보기 · 수정 · 참여 현황 확인 · 참여자 목록 확인 · 마감 처리
 ```
 
-예상 경로:
+현행 개설자 경로:
 
 ```
-/supplier/market-trials
-/supplier/market-trials/new
-/supplier/market-trials/:id
-/supplier/market-trials/:id/edit
+/market-trial/manage
+/market-trial/manage/new
+/market-trial/manage/:id
+/market-trial/manage/:id/edit
 ```
 
-### Neture 운영자 화면
+개설 신청 → 펀딩 서비스 운영자 심사 → 승인 후 펀딩 전용 폐쇄형 포럼 개설 → 개설자 진행 운영 순서다. 반려는 사유를 보존하고 편집 가능한 초안으로 복귀한다. 포럼 생성 실패 시 승인 이력은 보존하되 모집을 시작하지 않고 운영자가 재시도한다. 초안·심사 중 내용은 공개 목록과 직접 상세 조회에서 차단한다.
+
+전용 포럼은 `/market-trial/:id/forum`이며 개설자가 공지·참여자 포럼 승인·제거를 담당한다. 포럼 승인과 입금 확인은 별도이고, 펀딩 참여·오프라인 입금·처리 기록을 포럼 회원 변경으로 수정하지 않는다. 종료된 펀딩 포럼은 읽기 전용이다.
+
+### 펀딩 서비스 운영자 화면
 
 ```
 펀딩 콘텐츠 목록 확인 · 상세 검수 · 게시 승인 · 반려 · 비공개 처리
 참여 현황 확인 · 마감 상태 확인
 ```
 
-예상 경로:
+현행 경로 (`funding.neture.co.kr`):
 
 ```
-/operator/market-trials
-/operator/market-trials/:id
+/operator/market-trial
+/operator/market-trial/:id
 ```
 
 ### 참여자 화면

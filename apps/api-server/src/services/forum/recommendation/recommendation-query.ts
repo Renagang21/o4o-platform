@@ -28,7 +28,7 @@ import {
 
 function applyPublicCommunityBoundary(qb: SelectQueryBuilder<ForumPost>, options: RecommendationOptions): void {
   if (options.excludeScopedCommunities) {
-    qb.andWhere("EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = post.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))", { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+    qb.andWhere("EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = post.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT LIKE 'funding:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))", { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
   }
 }
 

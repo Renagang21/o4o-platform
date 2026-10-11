@@ -80,6 +80,7 @@ import organizationRoutes from '../routes/organization.routes.js';
 //   `/api/v1/membership` (@o4o/membership-yaksa) mount 와 그 관리자 guard 제거.
 //   약사회 전용 회원 자격 도메인이며 다른 운영 서비스 소비처가 없다.
 import marketTrialRoutes from '../routes/market-trial.routes.js';
+import { createFundingForumRoutes } from '../routes/funding-forum.routes.js';
 import aiQueryRoutes from '../routes/ai-query.routes.js';
 import aiProxyRoutes from '../routes/ai-proxy.routes.js';
 import aiAdminRoutes from '../routes/ai-admin.routes.js';
@@ -421,6 +422,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     // 22. Register Market Trial routes (Phase L-1)
     MarketTrialController.setDataSource(dataSource);
+    app.use('/api/v1/funding/:id/forum', createFundingForumRoutes());
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
 

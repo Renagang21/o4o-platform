@@ -479,7 +479,7 @@ export function MarketTrialDetailPage() {
       </section>
 
       {/* 포럼 토론 (WO-NETURE-MARKET-TRIAL-PAGE-SEPARATION-AND-HOME-RESTRUCTURE-V1) */}
-      {trial.forumPostId && (
+      {(
         <section style={s.forumBox}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
@@ -491,10 +491,10 @@ export function MarketTrialDetailPage() {
               </p>
             </div>
             <Link
-              to={`/forum/post/${trial.forumPostId}`}
+              to={`/market-trial/${trial.id}/forum`}
               style={s.forumLink}
             >
-              포럼 글 보기 →
+              펀딩 포럼 이용 →
             </Link>
           </div>
         </section>

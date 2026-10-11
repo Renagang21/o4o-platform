@@ -22,3 +22,12 @@ it('공지 변경은 현재 주소가 달라져도 명시된 커뮤니티와 글
   await pinCommunityForumPost('fixture', 'post-a', true);
   expect(patch).toHaveBeenCalledWith('/communities/fixture/forum/posts/post-a/pin', { pin: true });
 });
+
+
+it('funding posts always use the exact project API, even with mock mode enabled', async () => {
+  const id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+  window.history.replaceState({}, '', `/market-trial/${id}/forum`);
+  get.mockResolvedValue({ data: { success: true, data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } } });
+  await fetchForumPosts({ page: 1 });
+  expect(get).toHaveBeenCalledWith(`/funding/${id}/forum/posts?page=1`);
+});
