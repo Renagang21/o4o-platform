@@ -34,7 +34,7 @@ const REWARD_LABELS: Record<string, string> = {
 };
 
 export function MarketTrialHubPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const location = useLocation();
   const [trials, setTrials] = useState<Trial[]>([]);
   const [participationMap, setParticipationMap] = useState<Map<string, MyParticipationSummary>>(new Map());
@@ -42,38 +42,40 @@ export function MarketTrialHubPage() {
   // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
   // 조회 실패를 setTrials([]) 로 삼켜 "현재 모집 중인 유통참여형 펀딩이 없습니다" 로 위장했다.
   const [loadError, setLoadError] = useState(false);
+  const [participationError, setParticipationError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) return;
     let active = true;
     const fetchData = async () => {
+      setIsLoading(true);
       setLoadError(false);
-      try {
-        const [trialsData, partData] = await Promise.all([
-          getTrials(),
-          isAuthenticated ? getMyParticipations().catch(() => []) : Promise.resolve([] as MyParticipationSummary[]),
-        ]);
-        if (!active) return;
-        setTrials(Array.isArray(trialsData) ? trialsData : []);
-        if (partData.length > 0) {
-          const map = new Map<string, MyParticipationSummary>();
-          for (const p of partData) {
-            map.set(p.trialId, p);
-          }
-          setParticipationMap(map);
-        }
-      } catch {
-        if (active) setLoadError(true);
-      } finally {
-        if (active) setIsLoading(false);
+      setParticipationError(false);
+      setTrials([]);
+      setParticipationMap(new Map());
+      const [trialsResult, participationResult] = await Promise.allSettled([
+        getTrials(),
+        getMyParticipations(),
+      ]);
+      if (!active) return;
+      if (trialsResult.status === 'fulfilled' && Array.isArray(trialsResult.value)) {
+        setTrials(trialsResult.value);
+      } else {
+        setLoadError(true);
       }
+      if (participationResult.status === 'fulfilled' && Array.isArray(participationResult.value)) {
+        setParticipationMap(new Map(participationResult.value.map((p) => [p.trialId, p])));
+      } else {
+        setParticipationError(true);
+      }
+      setIsLoading(false);
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [isAuthenticated, authLoading, reloadKey]);
+  }, [isAuthenticated, authLoading, user?.id, reloadKey]);
 
   const recruiting = trials.filter((t) => getDisplayGroup(t.status) === 'recruiting');
   const activeTrials = trials.filter((t) => getDisplayGroup(t.status) === 'active');
@@ -86,6 +88,15 @@ export function MarketTrialHubPage() {
     <>
     <div style={s.container}>
       <h1 className="mb-6 text-2xl font-semibold">유통참여형 펀딩</h1>
+      {participationError && !isLoading && (
+        <LoadError
+          className="mb-6"
+          compact
+          title="내 참여 내역을 불러오지 못했습니다."
+          description={loadError ? '참여 여부는 다시 조회해 주세요.' : '모집 목록은 볼 수 있습니다. 참여 여부는 다시 조회해 주세요.'}
+          onRetry={() => setReloadKey((k) => k + 1)}
+        />
+      )}
       {/* 3. 내가 참여한 유통참여형 펀딩 */}
       {isAuthenticated && myTrials.length > 0 && (
         <Section title="내가 참여한 유통참여형 펀딩" count={myTrials.length} accentColor="#7C3AED">
@@ -106,7 +117,7 @@ export function MarketTrialHubPage() {
       )}
 
       {/* 4. 모집 중 */}
-      <Section id="market-trial-recruiting" title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
+      <Section id="market-trial-recruiting" title="모집 중" count={isLoading || loadError ? undefined : recruiting.length} accentColor="#059669" isLoading={isLoading}>
         {loadError ? (
           <LoadError compact onRetry={() => setReloadKey((k) => k + 1)} />
         ) : recruiting.length > 0 ? (
@@ -193,7 +204,7 @@ function Section({
 }: {
   id?: string;
   title: string;
-  count: number;
+  count?: number;
   accentColor: string;
   isLoading?: boolean;
   children: React.ReactNode;
@@ -203,7 +214,7 @@ function Section({
       <div style={s.sectionHeader}>
         <div style={{ width: '4px', height: '20px', borderRadius: '2px', backgroundColor: accentColor }} />
         <h2 style={s.sectionTitle}>{title}</h2>
-        <span
+        {count != null && <span
           style={{
             fontSize: '0.75rem',
             fontWeight: 600,
@@ -214,7 +225,7 @@ function Section({
           }}
         >
           {count}
-        </span>
+        </span>}
       </div>
       {isLoading ? (
         <div style={s.loading}>불러오는 중...</div>

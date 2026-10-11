@@ -234,3 +234,9 @@ html[data-service="kpa"] {
   .card{padding:24px}
   .card>h1{font-size:20px}
 }
+
+/* Keep long store names and setting descriptions within the selected workspace. */
+.option-name,.option-meta{min-width:0;overflow-wrap:anywhere}
+@media(max-width:720px){
+  .option{align-items:flex-start;flex-direction:column;gap:6px}
+}
