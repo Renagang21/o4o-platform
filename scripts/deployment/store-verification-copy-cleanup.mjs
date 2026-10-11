@@ -63,7 +63,7 @@ export async function referenceAudit(client, columns, roots) {
       const column = quoteIdentifier(name);
       if (type === 'uuid') predicates.push(`${column} = ANY($1::uuid[])`);
       else if (['text','varchar','bpchar'].includes(type)) predicates.push(`${column}::text ILIKE ANY($1::text[])`);
-      else if (['json','jsonb','_uuid','_text','_varchar'].includes(type)) predicates.push(`${column}::text ILIKE ANY($2::text[])`);
+      else if (['json','jsonb','_uuid','_text','_varchar','_bpchar','_json','_jsonb'].includes(type)) predicates.push(`${column}::text ILIKE ANY($2::text[])`);
     }
     if (!predicates.length) continue;
     const own = roots.find(x => table === 'public.' + x.table);

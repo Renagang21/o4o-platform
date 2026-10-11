@@ -120,6 +120,9 @@ test('PostgreSQL cleanup integration', { skip: !databaseUrl }, async t => {
       ['UUID','ref uuid','($1::uuid)',ids.snapshot], ['uppercase text','ref text','($1::text)',ids.snapshot.toUpperCase()],
       ['nested JSON','ref jsonb','($1::jsonb)',JSON.stringify({ nested: { selected: ids.snapshot } })],
       ['UUID array','ref uuid[]','($1::uuid[])',[ids.edit]],
+      ['fixed text array','ref character(36)[]','($1::character(36)[])',[ids.control.toUpperCase()]],
+      ['JSON array','ref json[]','($1::json[])',[JSON.stringify({ selected: ids.snapshot })]],
+      ['JSONB array','ref jsonb[]','($1::jsonb[])',[JSON.stringify({ selected: ids.edit })]],
     ]) await scenario(`unknown ${kind} references block plan/apply without leaking values`, async () => {
       await client.query('CREATE SCHEMA extra; CREATE TABLE extra.links (' + ddl + ')');
       await client.query('INSERT INTO extra.links VALUES ' + insert, [value]);

@@ -49,3 +49,5 @@ AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이�
 ## 운영 plan 최초 실행과 제한 조정
 
 PR #452는 필수 CI·CodeQL과 미해결 리뷰 blocker 없음 확인 후 main `1ef602d63`에 통합했다. 운영 read-only plan 38117865729는 SQLSTATE `57014`(statement timeout)로 실패했다. apply는 실행하지 않았고 삭제는 0행이다. 전체 참조 조사를 생략하지 않고 statement 제한을 15초에서 60초로 조정한다. 실패한 table은 SHA256의 앞 16자리로 구분해 데이터 원문이나 schema 식별자를 추가로 노출하지 않는다. 5초 lock 제한·정확한 digest·3행 범위·복구 및 보존 확인은 유지한다. 같은 WO의 보완 Phase로 기존 작업 worktree에서 새 연속 branch를 사용한다.
+
+보완 검토에서 고정 길이 문자·JSON/JSONB 배열의 참조도 native 배열 조사 목록에 포함했다. 격리된 PostgreSQL에서 이 3가지 배열의 외부 참조가 plan/apply를 차단하는 실제 SQL 검증을 추가했다. 삭제 대상 확장이나 운영 schema 변경은 없다.
