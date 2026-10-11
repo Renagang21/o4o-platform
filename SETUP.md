@@ -19,6 +19,30 @@
 계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정이나 공개 Demo 계정으로 임의 대체하거나
 비밀번호를 추측하지 않습니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
 
+### 원본 PC의 위치 단서와 클라우드 확인 결과 (2026-10-11)
+
+문서 조사에서 확인한 상대 경로는 `docs/local/TEST-ACCOUNTS.local.md`다. 아래 두 위치는 과거 문서의
+Windows 저장소 루트에 이 상대 경로를 결합한 **확인 후보**이며, 원본 PC의 현재 파일 존재를 확인한 결과는 아니다.
+공개 문서에는 개인 Windows 사용자 이름 대신 `%USERPROFILE%`을 사용한다.
+
+| 원본 PC에서 확인할 후보 | 위치 근거 |
+|---|---|
+| `%USERPROFILE%\coding\o4o-platform\docs\local\TEST-ACCOUNTS.local.md` | [Codex 환경 조사](docs/investigations/CHECK-CODEX-ENV-SETUP-V1.md) §1의 저장소 루트, §2의 계정 문서 경로 |
+| `%USERPROFILE%\o4o-platform\docs\local\TEST-ACCOUNTS.local.md` | [운영 DB 잔여 조사](docs/checks/WO-O4O-FINAL-PRODUCTION-DB-RESIDUE-CLOSURE-V1-CHECK.md)의 당시 작업 경로 |
+
+[계정 문서 정비 기록](docs/checks/CHECK-O4O-TEST-ACCOUNTS-IDENTITY-V2-SERVICE-CREDENTIAL-DOCUMENTATION-V1.md)과
+[브라우저 검증 조사](docs/investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md)는
+이 로컬 전용 문서를 실제로 갱신한 이력을 남긴다. 과거 사용 이력이 현재 로그인 가능 여부를 보장하지는 않는다.
+
+이번 클라우드의 작업·기준 checkout 및 접근 가능한 `/workspace`, `/tmp`, `/mnt`, `/media`, `/home`에서
+해당 파일과 이름이 유사한 사본을 찾지 못했다. 접근 제한 디렉터리와 연결되지 않은 원본 PC는 확인 범위에 포함되지 않는다.
+현재 Git refs의 추적 파일·경로 이력에도 원본이 없으므로 `git pull`로 가져올 수 없다.
+
+원본 PC에서 위 후보의 파일을 확인한 뒤 승인된 비공개 전달 또는 환경 Secret 연결로 제공한다.
+클라우드에 파일로 연결하는 경우 작업 checkout의 `docs/local/TEST-ACCOUNTS.local.md`를 사용하고,
+파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNTS.local.md`를 확인한다. 값은 문서·로그·커밋에 복사하지 않는다.
+조사 범위와 남은 검증은 [My Home CHECK](docs/checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md#테스트-계정-원본-위치-조사-2026-10-11)에 기록한다.
+
 ## 1. 필수 도구
 
 | 도구 | 버전 | 확인 | 필요한 사람 |

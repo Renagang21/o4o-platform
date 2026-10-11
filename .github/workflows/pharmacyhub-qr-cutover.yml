@@ -28,6 +28,26 @@ on:
         description: 'Delete explicitly reviewed obsolete test stores; preserve canonical store and all identities'
         type: boolean
         default: false
+      copy_cleanup:
+        description: 'Reviewed hidden workflow-verification CMS copy only; no general asset deletion'
+        type: boolean
+        default: false
+      copy_snapshot:
+        description: 'Reviewed verification snapshot ID SHA256 fingerprint'
+        type: string
+        required: false
+      copy_organization:
+        description: 'Owning canonical test store ID SHA256 fingerprint'
+        type: string
+        required: false
+      copy_marker:
+        description: 'Verification marker SHA256 fingerprint from private creation record'
+        type: string
+        required: false
+      copy_digest:
+        description: 'Exact before-image digest from standalone read-only copy plan'
+        type: string
+        required: false
       cleanup_keep:
         description: 'Original canonical store ID SHA256 fingerprint to retain'
         type: string
@@ -74,6 +94,7 @@ jobs:
       DEMO_CENSUS_FLAG: ${{ inputs.demo_census }}
       DEMO_RELINK_FLAG: ${{ inputs.demo_relink }}
       DEMO_CLEANUP_FLAG: ${{ inputs.demo_cleanup }}
+      COPY_CLEANUP_FLAG: ${{ inputs.copy_cleanup }}
       QR_PROBE_PATHS: ${{ inputs.probe_paths }}
       DEPLOY_FREEZE: ${{ vars.DEPLOY_FREEZE }}
       WORKFLOW_ACTOR: ${{ github.triggering_actor }}
@@ -89,7 +110,7 @@ jobs:
             exit 1
           fi
           demo_count=0
-          for flag in "$DEMO_CENSUS_FLAG" "$DEMO_RELINK_FLAG" "$DEMO_CLEANUP_FLAG"; do
+          for flag in "$DEMO_CENSUS_FLAG" "$DEMO_RELINK_FLAG" "$DEMO_CLEANUP_FLAG" "$COPY_CLEANUP_FLAG"; do
             if [ "$flag" = 'true' ]; then demo_count=$((demo_count + 1)); fi
           done
           if [ "$RETIRE_PH_HOST" = 'true' ] && [ "$demo_count" -gt 0 ]; then
@@ -127,7 +148,7 @@ jobs:
           build-packages: 'false'
           strict-lockfile: 'true'
       - name: Test cutover safety
-        run: node --test scripts/deployment/pharmacy-hub-retirement-inventory.test.mjs scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs scripts/deployment/demo-store-cleanup.test.mjs
+        run: node --test scripts/deployment/pharmacy-hub-retirement-inventory.test.mjs scripts/deployment/pharmacy-hub-qr-redirect.test.mjs scripts/deployment/pharmacy-hub-qr-cutover.test.mjs scripts/deployment/pharmacy-hub-qr-probes.test.mjs scripts/deployment/demo-store-census.test.mjs scripts/deployment/demo-store-relink.test.mjs scripts/deployment/demo-store-cleanup.test.mjs scripts/deployment/store-verification-copy-cleanup.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
@@ -137,7 +158,7 @@ jobs:
           project_id: netureyoutube
           skip_install: true
       - name: Start authenticated Cloud SQL proxy for read-only inventory
-        if: inputs.retirement_inventory == true || inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan'))
+        if: inputs.retirement_inventory == true || inputs.demo_census == true || inputs.demo_relink == true || inputs.demo_cleanup == true || inputs.copy_cleanup == true || (inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan'))
         run: |
           docker run -d --rm --user "$(id -u):$(id -g)" --name pharmacyhub-qr-sql-proxy --network host \
             --mount "type=bind,src=$GOOGLE_APPLICATION_CREDENTIALS,dst=/credentials.json,readonly" \
@@ -160,7 +181,7 @@ jobs:
             process.exit(1);
           '
       - name: Collect existing active public paths without database writes
-        if: inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
+        if: inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.probe_paths == '' && !(inputs.retire_host == true && inputs.mode == 'plan')
         env:
           DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
           DB_NAME: ${{ secrets.GCP_DB_NAME }}
@@ -196,11 +217,22 @@ jobs:
           DEMO_CLEANUP_TARGETS: ${{ inputs.cleanup_targets }}
           DEMO_CLEANUP_DIGEST: ${{ inputs.cleanup_digest }}
         run: node scripts/deployment/demo-store-cleanup.mjs
+      - name: Plan or apply one reviewed workflow-verification copy cleanup
+        if: inputs.copy_cleanup == true
+        env:
+          DB_USERNAME: ${{ secrets.GCP_DB_USERNAME }}
+          DB_NAME: ${{ secrets.GCP_DB_NAME }}
+          COPY_CLEANUP_MODE: ${{ inputs.mode }}
+          COPY_CLEANUP_TARGET: ${{ inputs.copy_snapshot }}
+          COPY_CLEANUP_ORGANIZATION: ${{ inputs.copy_organization }}
+          COPY_CLEANUP_MARKER: ${{ inputs.copy_marker }}
+          COPY_CLEANUP_DIGEST: ${{ inputs.copy_digest }}
+        run: node scripts/deployment/store-verification-copy-cleanup.mjs
       - name: Inventory, validate, optionally apply and verify
-        if: inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true
+        if: inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true
         run: node scripts/deployment/pharmacy-hub-qr-cutover.mjs
       - name: Save backup and verification evidence
-        if: always() && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true
+        if: always() && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true
         uses: actions/upload-artifact@v4
         with:
           name: pharmacyhub-url-map-${{ github.run_id }}
