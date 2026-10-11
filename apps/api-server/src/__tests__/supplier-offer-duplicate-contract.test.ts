@@ -18,10 +18,10 @@ import { join } from 'path';
 // offer.service 의 import 체인에만 걸리는 의존이라 virtual mock 으로 끊는다(공용 jest 설정 무변경).
 jest.mock('@o4o/ai-prompts/store', () => ({ PRODUCT_CONTENT_PROMPTS: {} }), { virtual: true });
 
-import { NetureOfferService } from '../modules/neture/services/offer.service.js';
+import { SupplierOfferRegistrationService } from '../modules/neture/services/supplier-offer-registration.service.js';
 
 /** private 헬퍼 접근 (런타임에는 일반 메서드) */
-const svc = () => Object.create(NetureOfferService.prototype) as any;
+const svc = () => Object.create(SupplierOfferRegistrationService.prototype) as any;
 
 function withOfferRepo(found: { id: string; deletedAt: Date | null } | null) {
   const s = svc();
@@ -118,7 +118,7 @@ describe('asOfferDuplicateViolation — 23505 fallback (경쟁 상태)', () => {
 
 describe('source contract', () => {
   const serviceSrc = () =>
-    readFileSync(join(__dirname, '..', 'modules', 'neture', 'services', 'offer.service.ts'), 'utf8');
+    readFileSync(join(__dirname, '..', 'modules', 'neture', 'services', 'supplier-offer-registration.service.ts'), 'utf8');
   const controllerSrc = () =>
     readFileSync(join(__dirname, '..', 'modules', 'neture', 'controllers', 'supplier-product.controller.ts'), 'utf8');
 
