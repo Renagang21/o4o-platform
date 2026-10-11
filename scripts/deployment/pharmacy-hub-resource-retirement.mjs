@@ -194,7 +194,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     // Retirement may have no active PH data. Keep all route validation and the
     // independent twelve host redirect checks; verify any paths that still exist.
-    const paths = parseProbes(process.env.QR_PROBE_PATHS || await readFile(process.env.PROBE_OUTPUT, 'utf8'), { requireActiveFamilies: false });
+    const supplied = process.env.QR_PROBE_PATHS;
+    const paths = parseProbes(supplied || await readFile(process.env.PROBE_OUTPUT, 'utf8'), { requireActiveFamilies: Boolean(supplied) });
     const result = await retireResources({
       mode: process.env.CUTOVER_MODE ?? 'plan', permissions: readPermissions,
       read: async () => inspectResources(readCloud(), await collectHttpInventory()),
