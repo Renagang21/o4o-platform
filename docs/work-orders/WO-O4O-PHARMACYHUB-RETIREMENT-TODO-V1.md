@@ -202,3 +202,7 @@ GitHub concurrency는 `cancel-in-progress: false`, `queue: max`로 active 작업
 CI `38136277948`은 기존 배포 gate 테스트 두 곳이 과거 concurrency 문자열을 요구해서 실패했다. 서비스별 child group 유지와 direct root 공통 잠금, Promote 부모 아래 Delivery의 잠금 비재취득, `queue: max`를 검사하도록 갱신했다. 해당 gate 및 자원 안전 테스트 합계 110 PASS다.
 
 추가 P1: 이전 `deploy/*` 태그 또는 이전 workflow 실행의 재실행은 과거 YAML을 쓰므로 main의 잠금만으로 완전히 차단되지 않는다. 이미 생성된 run drain과 사용자 단독 작업 합의만으로 기술적 차단이 완료됐다고 주장하지 않는다. PH 삭제 창에서는 WIF provider의 기존 조건을 보존한 채 main ref와 잠금이 포함된 특정 main workflow SHA만 인증하도록 외부 IAM 경계를 일시 제한해야 한다. `assertion.ref == 'refs/heads/main'`만 추가하면 과거 main 실행의 rerun이 통과하므로 충분하지 않다. root `workflow_sha`와 called `job_workflow_sha` 모두 동일한 검증된 main SHA로 제한하고, 기존 자격증명을 받은 run도 종료·만료됐는지 확인한다. 실제 provider 변경은 IAM 관리 권한이 있는 사용자가 수행하며, 복구할 원래 조건은 로컬에 보관한다. 이후 새 plan 인증 성공과 다른 production 실행 차단을 확인하기 전에는 apply하지 않는다. 현재 이 외부 인증 경계는 적용 전이며 P1을 해결했다고 기록하지 않는다.
+
+### WIF 일시 차단 적용 확인 — 2026-10-11
+
+사용자가 새 인증 정책 변경을 승인하고 로컬 IAM 관리자로 기존 provider 조건을 저장소 밖에 백업했다. provider update 성공 및 describe 결과 기존 조건 전체 뒤에 `&& false`가 붙었음을 확인했다. 과거 태그/이전 main 재실행을 포함한 신규 WIF 인증은 현재 차단된다. 기존 run에 이미 발급된 자격증명은 별도 종료 확인 대상이며 차단과 동시에 폐기된 것으로 주장하지 않는다. 최신 main 반영·필수 CI·리뷰 완료 후 PR #475를 병합하고, 새 main SHA의 PharmacyHub workflow만 인증하도록 로컬 IAM 관리자가 제한 조건을 적용한다. read-only plan 성공 이후 남은 Cloud Run 제거·QR 재검증을 진행하고 원래 조건으로 복구한다. 아직 새 main SHA 제한·Cloud Run 삭제·DB 삭제는 실행하지 않았다.
