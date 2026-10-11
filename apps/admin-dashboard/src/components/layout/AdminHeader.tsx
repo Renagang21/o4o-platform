@@ -123,7 +123,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
         {/* Right side */}
         <div className="flex items-center gap-4">
           {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지 · 권한 확대 없음) */}
-          <MyHomeButton accountId={user?.id} api={api} isAuthenticated={!!user} className="text-sm font-medium" />
+          <MyHomeButton accountId={user?.id === undefined ? undefined : String(user.id)} api={api} isAuthenticated={!!user} className="text-sm font-medium" />
           <O4OHomeButton
             api={api}
             isAuthenticated={!!user}

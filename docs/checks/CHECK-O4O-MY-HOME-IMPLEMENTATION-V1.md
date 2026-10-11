@@ -1,6 +1,6 @@
 # My Home 구현 검증
 
-> **상태**: IN_PROGRESS · LOCAL_VERIFIED / PR·배포 접근 차단
+> **상태**: IN_PROGRESS · LOCAL_VERIFIED / PR #449 CI 검증 중
 > **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB·실제 계정 접근 없음.
@@ -21,7 +21,7 @@
 
 ## 결과
 
-- 공유 패키지 빌드, Neture·Pharmacy/KPA·Store·Study·분회 production build(타입 검사 포함), Admin bundle 및 별도 전체 타입 검사: PASS.
+- 공유 패키지 빌드, Neture·Pharmacy/KPA·Store·Study·분회 production build(타입 검사 포함), Admin bundle 및 별도 전체 타입 검사: PASS. CI의 fresh 공통 선언 타입 검사에서 Admin ID의 string/number 호환성을 확인하여 진입 맥락 ID를 문자열로 정규화했다.
 - API `tsconfig.build.json` 전체 타입 검사: PASS.
 - auth-react 전체 196개, Neture 전체 492개: PASS.
 - Pharmacy/KPA 131개, Store 40개, Study 4개, 분회 35개, UI 19개, shared-space community navigation 19개: PASS.
@@ -35,6 +35,7 @@
 ## 배포 상태
 
 - `DEPLOYMENT = MANUAL/GATED` 예상: 인증 handoff 코드가 포함되어 LEVEL 3. 실제 서버의 Delivery 판정·운영 서빙 SHA는 아직 조회하지 못했다.
-- 클라우드 정책의 `api.github.com` CONNECT 403으로 GitHub API 접근 불가. 운영 도메인도 허용 목록에 없고, 환경 설정 초안은 게시 대기다.
-- PR·required CI·Codex review·ruleset·main merge·promote·운영 PC/모바일 smoke: **미완료**. main 직접 push나 gate 우회는 하지 않았다.
+- 초기 GitHub API·운영 호스트 접근 차단 이후 재시도에서 PR #449 생성·ruleset·CI 조회와 운영 홈페이지·API ready 조회가 성공했다. 현재 인증 계정은 저장소 소유자다. Actions variable 조회는 integration 403이므로 freeze 판정은 배포 workflow의 실제 gate를 따른다.
+- PR #449 생성·원격 branch SHA 일치·main ruleset 확인 완료. required `CI Gate`·Codex blocker·main merge·promote·운영 PC/모바일 smoke는 진행 중이다. main 직접 push나 gate 우회는 하지 않았다.
+- `docs/local/TEST-ACCOUNTS.local.md`가 작업·기준 checkout 모두에 없어 인증된 운영 화면 smoke는 계정 문서 확보 전 미실행이다. 공개 Demo/예전 seed 계정으로 대체하지 않는다.
 - 작업 branch와 worktree는 후속 통합을 위해 **KEEP**. 최종 배포·closure 이전에는 제거하지 않는다.

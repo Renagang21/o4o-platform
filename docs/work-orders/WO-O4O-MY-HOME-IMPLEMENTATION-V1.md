@@ -1,6 +1,6 @@
 # My Home 다중 화면 · 서비스 공통 진입 구현
 
-> **상태**: IN_PROGRESS · 구현·로컬 검증 완료 / PR·main 통합·운영 배포 차단
+> **상태**: IN_PROGRESS · 구현·로컬 검증 완료 / PR #449 CI 진행 / main 통합·운영 배포 대기
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
 > **DEPLOYMENT**: MANUAL/GATED · 인증 handoff 목적지 계약 변경으로 LEVEL 3 예상. 실제 Delivery 판정을 확인해야 한다.
@@ -32,4 +32,4 @@
 
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
-현재 클라우드 네트워크 정책이 GitHub API와 운영 호스트를 차단한다. 허용 도메인 환경 설정 초안을 저장했으나 아직 게시·적용되지 않았다. PR 생성·CI/ruleset 조회·merge·promote·운영 smoke는 미완료이며 우회하지 않는다. 이 차단이 해소되기 전 운영 배포 완료로 종료하지 않는다.
+초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. 현재 원격 branch 업로드 완료, required CI·리뷰·main 통합·Delivery/promote·운영 검증을 진행한다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
