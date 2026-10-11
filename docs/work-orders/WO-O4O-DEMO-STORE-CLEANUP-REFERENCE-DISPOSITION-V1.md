@@ -1,6 +1,6 @@
 # 테스트 매장 정리의 참조 삭제·보존 규칙
 
-> 상태: ACTIVE
+> 상태: COMPLETED
 > 작성일: 2026-10-11 · 최종 갱신: 2026-10-11
 > 근거: [잔여 업무 검증](WO-O4O-STORE-REMAINING-WORKFLOW-VERIFICATION-V1.md)
 > 범위: 기존 정리 CLI의 주문 소유 참조·감사 이력·상품 출처 처리
@@ -34,10 +34,10 @@ KPA 역할 정본 §7은 감사 이력의 보존을 요구한다. B2B 주문 계
 - [x] 정본·producer·기존 참조 차단 조사
 - [x] 소유 참조와 역사적 보존 규칙 구현
 - [x] 단위·실제 PostgreSQL 검증
-- [ ] PR required CI·리뷰·main 통합·사후 확인
-- [ ] 운영 read-only plan에서 정확한 16개 후보와 전체 영향 확인
-- [ ] 적격 plan·동일 digest·공유 runtime 직렬화 확인 후 승인 범위 apply
-- [ ] 실제 테스트 계정의 접근 가능 매장 1개 및 유지 관계·계정 검증
+- [x] PR required CI·리뷰·main 통합·사후 확인
+- [x] 운영 read-only plan에서 정확한 16개 후보와 전체 영향 확인
+- [x] 적격 plan·동일 digest·공유 runtime 직렬화 확인 후 승인 범위 apply
+- [x] 실제 테스트 계정의 접근 가능 매장 1개 및 유지 관계·계정 검증
 
 운영의 출처 discriminator/identity가 위 조건을 충족한다고 가정하지 않는다. 운영 plan에서 추가 차단이 있으면 그 근거를 확인하고 보완한다. CLI·테스트·기록만 변경하므로 서비스 배포는 NOT_APPLICABLE이며, 운영 데이터 정리 실행과 구분한다.
 
@@ -48,3 +48,26 @@ PR #476은 main `7aad4eed9689f0515889e3a4f5a1ff260d94ee67`에 통합됐고 PR CI
 main read-only plan 38132747331은 기존 네 컬럼의 참조를 처리한 뒤 `checkout_order_logs.orderId` 14행의 미모델링 참조로 중단됐다. apply·삭제는 0건이다. OrderLog entity는 주문 상태 변경·운영자 감사·분쟁 이력을 기록하며 물리 schema의 orderId에는 cascade FK가 없다. 매장 약관 정본의 운영·보안로그 보존 경계에 따라 실제 삭제 graph의 checkout_orders에 일치하는 역사적 orderId만 보존한다. checkout_order_logs도 보호 대상으로 두고 전체 before-image/digest/recovery/post-delete 불변 검증에 포함한다. 다른 ID·테이블·컬럼은 보존 예외로 확장하지 않는다.
 
 같은 전용 worktree/branch를 동일 WO 보완 Phase에 이어 사용한다. 보완된 로컬 SQL 6개와 안전 검사 33개가 PASS이며 운영 재plan은 최신 코드의 기술 gate와 main 통합 후 실행한다.
+
+## 운영 완료 및 사후 확인
+
+PR #477은 main `abdbe8894d069554a54afbd8513c8034bdaf27cb`에 반영됐고 최신 PR CI 38133579365, main 사후 CI 38134168847 및 CodeQL 38134168871 PASS다. 같은 WO의 결과 기록 Phase도 기존 전용 worktree/branch를 이어 사용한다.
+
+- 운영 read-only plan **38134169210 SUCCESS**: 정확한 16개 조직, 32개 테이블·352행의 정리 범위, 보존 이력 17행 확인.
+- 운영 apply **38135279630 SUCCESS**: plan과 동일 digest·테이블/수량·보존 이력·계정 수. 기존 복구 테이블에 before-image를 저장하고 정리 후 원본 유지 조직·사용자 수·보존 행 불변을 검증해 commit했다. 실행 head는 `bd95b0ec21945904df73ed1007486132726eda00`이며 CLI와 workflow 및 직접 import source가 검증한 #477 코드와 동일함을 확인했다.
+- 실행 전 다른 운영 인프라 작업의 종료와 Delivery의 실행 job skip을 확인했다. apply 동안 다른 배포·운영 변경 작업이 없음을 다시 확인했다. 기존 main ref·owner·freeze gate를 유지했다.
+- 사후 read-only discovery **38136199586 SUCCESS**: 기존 cutoff 안의 삭제 후보 0개, 유지 매장 원래 primary owner 관계 확인, 사용자 5개·활성 Demo 2개·운영자/관리자 2개 유지.
+- 실제 계정 API: 접근 가능 매장 **17개 → 1개**, 유지 매장 A 존재·서비스 판정 200/resolved·활성 KPA 업무 연결 1개. 공급자 로그인·본인 조회 200 및 기존 공급자 role 확인.
+- desktop 1440px / mobile 390px 브라우저 **20개 PASS**: 로그인·handoff, 단일 매장 A 자동 선택, 내 매장·자료함·자체 상품·QR·태블릿 관리 직접 경로, 자료함·QR·태블릿 메뉴 클릭. 대상 API 200, 기록된 API/화면 오류 0.
+
+| 보존한 역사적 참조 | 행 수 |
+|---|---:|
+| checkout_order_logs | 14 |
+| kpa_operator_audit_logs | 2 |
+| 유지 매장의 organization_product_listings 출처 기록 | 1 |
+
+단일 매장은 StoreContext의 effectiveId 규칙으로 자동 선택된다. sessionStorage에 명시 선택값을 쓰지 않는 것은 정상 동작이다. 브라우저 검증은 접근 목록의 유일한 A, 서버 store-services의 resolved/A 응답, 실제 X-Store-Organization-Id 헤더의 A 일치로 확인했다. 처음 저장값을 비교한 검사만을 선택 실패나 제품 버그로 해석하지 않는다.
+
+초기 브라우저 TLS 오류는 이번 턴의 기존 NSS 신뢰 DB 접근을 허용한 후 해결됐다. CA 추가·TLS 검증 비활성화 없이 기존 환경 CA로 다시 검증했다. 실제 QR 스캔·물리 태블릿 출력은 이번 결과에 포함하지 않는다. 운영 원본 변경·두 정상 매장·물리 기기 TODO는 상위 잔여 검증 WO에 유지한다.
+
+계정·조직 식별자·원문 응답·private 실행 기록은 공개 문서에 넣지 않았다. 서비스 배포는 NOT_APPLICABLE이며 위 운영 데이터 apply는 실제 실행·검증 완료다.
