@@ -70,3 +70,10 @@ GET/PATCH에서 같은 연락처·주문조건 응답 필드를 전용 함수로
 
 중복 보정 후 신규 동작 15건 + Supplier Domain/Identity 계약 68건 = 3 suites / 83 tests PASS.
 기존 다른 계약 66건을 포함한 서로 다른 총 검증은 149건이다.
+
+추가 정밀 조사: token 기반 중복 탐지에서 `NetureService.updateSupplierProfile`과 새 Business 서비스의
+입력 타입 선언 중복 41줄/185 tokens를 확인했다. 기존 facade도 `Parameters<NetureSupplierService['updateSupplierProfile']>[1]`로
+동일 타입을 재사용하도록 보정했다. 런타임 메서드 본문·요청 필드·화이트리스트 변경은 없다.
+
+입력 타입 보정 후 API 타입·해당 facade lint PASS. AST로 기존 입력 필드/타입과 런타임 본문 동일 확인.
+로컬 token 중복 검사에서 새 Business 파일 관련 clone 0건 확인 (SonarCloud 실제 결과와 구분).
