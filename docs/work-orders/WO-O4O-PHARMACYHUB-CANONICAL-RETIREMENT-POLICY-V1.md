@@ -13,3 +13,5 @@ PH 서비스 baseline의 현행 1~6항이 이전 PH 서비스 모델을 대체�
 색인의 연결 정본을 추가 대조하여 사업 철학·Neture 약국 설계·shared module protocol·Store library/execution 설계·현행 refactoring 상태에도 PH 부분 폐기를 정렬했다. CLAUDE 진입점의 살아 있는 B2B 경로 목록에서는 은퇴 PH 축을 제외한다. Privacy/통합약관 게시 원문·과거 CHECK/IR/WO는 변경하지 않으며 이전 PH 데이터에 적용되는 법정 보유·동의 증빙 의무는 계속 유효하다. 문서 작업을 실제 게시 약관의 개정/재게시로 해석하지 않는다.
 
 PR #439 리뷰 대응: ACTIVE Store Rules의 PH live B2B 표기와 QR Active Design의 PH capability/parity 후속 구현 계약에도 부분 폐기 표기를 추가했다. 공용 QR 구현/분석 계약과 인쇄 QR 연결은 그대로 유지한다.
+
+ACTIVE 색인 전체 재대조: KPA Society Service Structure와 o4o-common-structure의 PH forum/원장 adapter 계약, content metadata/Hub template/운영 scripts inventory의 PH 적용·실행 표기도 폐기 정책으로 정렬했다. Privacy/보유정책/통합약관에는 PH의 과거 서비스 표기가 현재 운영을 뜻하지 않는 저장소 메타만 추가했으며, render-policy-plain 결과가 기존 HEAD와 byte-identical임을 3개 문서에서 확인했다. 법정 보유·동의/거래 증빙 계약과 게시 원문/과거 기록은 변경하지 않는다. Home discovery는 이미 PH 은퇴를 명시하며 KPA branch의 PH prefix 접근 거부는 보안 경계이므로 유지한다.

@@ -314,6 +314,9 @@ return <LmsHubTemplate config={config} />;
 
 ### 7.1 현재 적용 현황
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH forum route/원장 adapter·Hub template 채택·활성 serviceKey 예시·프로비저닝 CLI 실행/유지 계약은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 새 소비처/구현/프로비저닝 대상이 아니며 PH 경로·등록/호환 참조를 제거한다. 공용 KPA/약사 커뮤니티·콘텐츠 모델·다른 서비스·인쇄 QR 연결은 보존하고 데이터 삭제는 전용 귀속/FK·타 서비스 소비처 확인 후 수행한다. 아래 PH 구조는 폐기 전 이력이다.
+
+
 | Template | KPA Society | K-Cosmetics |
 | ---------- | :-----------: | :-----------: |
 | **ContentHub** | `pharmacy/HubContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` |
@@ -395,6 +398,9 @@ return <{Domain}HubTemplate config={config} />;
 3. KPA 구조 변경 시 공통 구조 문서와 함께 검토한다
 
 ### 9.2 KPA 참조 파일 목록
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH forum route/원장 adapter·Hub template 채택·활성 serviceKey 예시·프로비저닝 CLI 실행/유지 계약은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 새 소비처/구현/프로비저닝 대상이 아니며 PH 경로·등록/호환 참조를 제거한다. 공용 KPA/약사 커뮤니티·콘텐츠 모델·다른 서비스·인쇄 QR 연결은 보존하고 데이터 삭제는 전용 귀속/FK·타 서비스 소비처 확인 후 수행한다. 아래 PH 구조는 폐기 전 이력이다.
+
 
 | 도메인 | KPA 파일 | 라우트 |
 |--------|---------|--------|
