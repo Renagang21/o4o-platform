@@ -1,3 +1,4 @@
+import { communityMemberPage, type CommunityMemberListOptions, type CommunityMemberPage } from './communityMemberList';
 /**
  * 개별 커뮤니티 운영자 — 가입 신청 심사 API
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
@@ -40,9 +41,9 @@ export async function listOperatedCommunities(): Promise<OperatedCommunity[]> {
   return res.data?.data?.communities ?? [];
 }
 
-export async function listJoinRequests(slug: string, status: JoinRequestStatus = 'pending'): Promise<JoinRequestRow[]> {
-  const res = await api.get(`${BASE}/${encodeURIComponent(slug)}/memberships`, { params: { status } });
-  return res.data?.data?.memberships ?? [];
+export async function listJoinRequests(slug: string, status: JoinRequestStatus = 'pending', options: CommunityMemberListOptions = {}): Promise<CommunityMemberPage<JoinRequestRow>> {
+  const res = await api.get(`${BASE}/${encodeURIComponent(slug)}/memberships`, { params: { ...options, status } });
+  return communityMemberPage<JoinRequestRow>(res.data?.data?.memberships ?? [], res.data?.data?.pagination);
 }
 
 export async function approveJoinRequest(slug: string, membershipId: string): Promise<void> {

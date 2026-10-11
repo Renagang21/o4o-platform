@@ -1,3 +1,4 @@
+import { parseCommunityMemberListQuery, CommunityMemberListQueryError } from '../services/community/community-member-list-query.js';
 import { hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
 import { CommunityMemberManagementService, type CommunityMemberAction } from '../services/community/community-member-management.service.js';
 import { CommunityMembershipMutationError } from '../services/community/community-membership-mutations.js';
@@ -94,7 +95,6 @@ function requesterId(req: AuthRequest, res: Response): string | null {
 }
 
 const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'suspended', 'withdrawn'] as const;
-type MembershipStatus = (typeof MEMBERSHIP_STATUSES)[number];
 
 const bodyOf = (req: { body?: unknown }): Record<string, unknown> =>
   (req.body ?? {}) as Record<string, unknown>;
@@ -156,8 +156,9 @@ export function createCommunitiesRoutes(
     ...serviceAdminOnly,
     asyncHandler(async (req, res) => {
       try {
-        res.json({ success: true, data: await designation().listMembers(req.params.communityId) });
+        res.json({ success: true, data: await designation().listMembers(req.params.communityId, parseCommunityMemberListQuery(req.query, ['active', 'suspended'])) });
       } catch (error) {
+        if (error instanceof CommunityMemberListQueryError) { res.status(400).json({ success: false, error: error.message, code: error.code }); return; }
         if (!sendDesignationError(res, error)) throw error;
       }
     }),
@@ -332,21 +333,15 @@ export function createCommunitiesRoutes(
     '/:communitySlug/memberships',
     ...operatorOnly,
     asyncHandler(async (req, res) => {
-      const raw = req.query.status;
-      const status = typeof raw === 'string' && raw ? raw : undefined;
-      if (status && !MEMBERSHIP_STATUSES.includes(status as MembershipStatus)) {
-        res.status(400).json({ success: false, error: '알 수 없는 가입 상태입니다.', code: 'INVALID_STATUS' });
-        return;
+      try {
+        const query = parseCommunityMemberListQuery(req.query, MEMBERSHIP_STATUSES);
+        res.json({ success: true, data: await lifecycle().listMembershipsForReview({
+          communityId: req.community!.id, query,
+        }) });
+      } catch (error) {
+        if (!(error instanceof CommunityMemberListQueryError)) throw error;
+        res.status(400).json({ success: false, error: error.message, code: error.code });
       }
-      res.json({
-        success: true,
-        data: {
-          memberships: await lifecycle().listMembershipsForReview({
-            communityId: req.community!.id,
-            status: status as MembershipStatus | undefined,
-          }),
-        },
-      });
     }),
   );
 

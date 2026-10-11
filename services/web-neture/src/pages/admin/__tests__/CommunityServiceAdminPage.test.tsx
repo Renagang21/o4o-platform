@@ -110,4 +110,23 @@ describe('중앙 개별 역할 지정', () => {
     expect(screen.queryByText(/첫 신청.*개설했습니다/)).toBeNull();
   });
 
+  it('지정 후보 검색과 상태·페이지를 적용하고 커뮤니티 변경 시 검색을 초기화한다', async () => {
+    get.mockImplementation((url: string, config: { params?: { q?: string; page?: number; pageSize?: number; status?: string } } = {}) => {
+      if (!url.endsWith('/members')) return ok({ communities: [{ id: 'c1', name: '첫 커뮤니티' }, { id: 'c2', name: '둘째 커뮤니티' }] });
+      const { page = 1, pageSize = 20, q = '' } = config.params!;
+      return ok({ members: [{ membershipId: 'm1', userId: 'u1', role: 'member', name: `${q || '회원'}-${page}`, membershipStatus: 'active', designationEligibility: { eligible: true } }], pagination: { page, pageSize, total: 21, totalPages: 2 } });
+    });
+    render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
+    await screen.findByText('회원-1');
+    fireEvent.click(screen.getByRole('button', { name: '다음 페이지' })); await screen.findByText('회원-2');
+    fireEvent.change(screen.getByLabelText('이름 검색'), { target: { value: '후보' } });
+    fireEvent.click(screen.getByRole('button', { name: '검색', exact: true })); await screen.findByText('후보-1');
+    fireEvent.change(screen.getByLabelText('회원 상태'), { target: { value: 'suspended' } });
+    await waitFor(() => expect(get).toHaveBeenLastCalledWith('/communities/admin/communities/c1/members', { params: { q: '후보', status: 'suspended', page: 1, pageSize: 20 } }));
+    fireEvent.change(screen.getByLabelText('커뮤니티 선택'), { target: { value: 'c2' } }); await screen.findByText('회원-1');
+    expect((screen.getByLabelText('이름 검색') as HTMLInputElement).value).toBe('');
+    expect(get).toHaveBeenLastCalledWith('/communities/admin/communities/c2/members', { params: { q: '', status: undefined, page: 1, pageSize: 20 } });
+  });
+
 });

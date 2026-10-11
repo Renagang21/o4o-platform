@@ -1,3 +1,5 @@
+import { CommunityMemberListControls } from '../../components/community/CommunityMemberListControls';
+import type { CommunityMemberPagination } from '../../lib/api/communityMemberList';
 /**
  * CommunityServiceAdminPage — 커뮤니티 서비스 관리 (community:admin)
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
@@ -163,13 +165,18 @@ function CreationRequestsPanel() {
 function CommunityOperatorsPanel() {
   const [communities, setCommunities] = useState<CommunityAdminRow[] | null>(null);
   const [communityId, setCommunityId] = useState('');
+  const [q, setQ] = useState('');
+  const [status, setStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState<CommunityMemberPagination | null>(null);
   const [members, setMembers] = useState<CommunityMemberRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const processing = useRef(false);
   const beginCommunities = useLatestRequest('communities');
-  const beginMembers = useLatestRequest(communityId);
+  const beginMembers = useLatestRequest(`${communityId}:${q}:${status}:${page}:${pageSize}`);
   const beginAction = useLatestRequest(communityId);
 
   const loadCommunities = useCallback(() => {
@@ -185,10 +192,10 @@ function CommunityOperatorsPanel() {
     setMembers(null);
     if (!communityId) return;
     setError(null);
-    listCommunityMembers(communityId)
-      .then(list => { if (current()) setMembers(list); })
+    listCommunityMembers(communityId, { q, status: status || undefined, page, pageSize })
+      .then(result => { if (current()) { setMembers(result.rows); setPagination(result.pagination); setPage(result.pagination.page); } })
       .catch(e => { if (current()) setError(communityAdminErrorMessage(e, '커뮤니티 회원을 불러오지 못했습니다.')); });
-  }, [communityId, beginMembers]);
+  }, [communityId, q, status, page, pageSize, beginMembers]);
   useEffect(loadMembers, [loadMembers]);
 
   const toggle = async (m: CommunityMemberRow, next: CommunityMemberRow['role']) => {
@@ -229,7 +236,7 @@ function CommunityOperatorsPanel() {
         id="community-select"
         value={communityId}
         disabled={busyId !== null}
-        onChange={(e) => { setMembers(null); setNotice(null); setError(null); setCommunityId(e.target.value); }}
+        onChange={(e) => { setMembers(null); setNotice(null); setError(null); setQ(''); setStatus(''); setPage(1); setPagination(null); setCommunityId(e.target.value); }}
         className="mt-1 w-full max-w-sm rounded border border-slate-300 px-2 py-1"
       >
         <option value="">커뮤니티를 선택하세요</option>
@@ -243,6 +250,11 @@ function CommunityOperatorsPanel() {
         운영자는 그 커뮤니티의 승인된 회원 중에서만 지정합니다. 커뮤니티 서비스 이용이 정상이 아닌 회원은 지정할 수 없고,
         마지막 유효 Admin은 해제하거나 Operator로 내릴 수 없습니다.
       </p>
+      {communityId && <CommunityMemberListControls q={q} status={status} pageSize={pageSize} pagination={pagination}
+        busy={busyId !== null} loading={members === null}
+        statuses={[{ value: '', label: '활성·정지 전체' }, { value: 'active', label: '활성' }, { value: 'suspended', label: '정지' }]}
+        onFilter={filter => { if (processing.current) return; setMembers(null); setPagination(null); setNotice(null); setQ(filter.q); setStatus(filter.status); setPageSize(filter.pageSize); setPage(1); if (filter.q === q && filter.status === status && filter.pageSize === pageSize && page === 1) loadMembers(); }}
+        onPage={next => { if (processing.current) return; setMembers(null); setNotice(null); setPage(next); }} />}
       {notice && <p role="status" className="mt-3 text-green-700">{notice}</p>}
       {error && <div><p role="alert" className="mt-3 text-red-600">{error}</p><button type="button" className="min-h-11 rounded border px-3 py-2" disabled={busyId !== null} onClick={() => { setError(null); loadCommunities(); loadMembers(); }}>다시 조회</button></div>}
       {!communityId ? null : members === null && !error ? (
