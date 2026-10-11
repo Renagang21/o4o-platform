@@ -1,5 +1,7 @@
 # CHECK-O4O-PRIVACY-POLICY-V1-PUBLISH-AND-CROSSSERVICE-SMOKE
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태**: PASS · **검증일**: 2026-09-17 · **WO**: `WO-O4O-PRIVACY-POLICY-V1-PUBLISH-AND-CROSSSERVICE-SMOKE`
 > **기준 원문(SSOT)**: [`docs/baseline/O4O-PRIVACY-POLICY-V1.0.md`](../baseline/O4O-PRIVACY-POLICY-V1.0.md) (c2f9ddc1a)
 > **런타임 SSOT**: 본문 = `service_policy_documents`(privacy / published) · Footer 책임자 = `service_legal_profiles`(이번 WO 수정 0)

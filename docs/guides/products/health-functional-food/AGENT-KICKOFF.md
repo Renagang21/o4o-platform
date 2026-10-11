@@ -1,5 +1,7 @@
 # AGENT KICKOFF — 건강기능식품 매장용 설명서 제작 (식약처 기반 · DB 저장)
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **다른 작업 공간(세션/컴퓨터)에서 이 작업을 시작할 때, 이 문서를 맨 처음 읽으세요.**
 > 함께 볼 것: **[examples/](../../../../apps/api-server/src/scripts/data/product-descriptions/health-functional-food/examples/)** (정본 형식·반응형 예제) · **[PROCESSED-LEDGER.md](PROCESSED-LEDGER.md)** (처리 원장).
 > **규칙 SSOT(HFF-R01~R10)는 [HFF-DESCRIPTION-RULES-SSOT-V1.md](HFF-DESCRIPTION-RULES-SSOT-V1.md).** (과거 general-food R1~R10 참조는 일반식품 Legacy 전환으로 폐기됨.)
@@ -111,7 +113,7 @@
 > 1. **1차 게이트(내용 확인)** — 한국어 본문을 사람에게 보여주고 확정받는다(§작업순서 4). 확인 없이 저장 API 호출 금지.
 > 2. **2차 게이트(승인 저장)** — 확정된 내용만 아래 저장(canonical 승격)으로 진행한다. 저장은 admin 인증 경로이며, 승인 없이 임의 canonical 저장을 하지 않는다.
 
-**자격증명**: admin `[REDACTED_EMAIL_A]`(neture:admin), 비번은 **SSOT([docs/local/TEST-ACCOUNT.txt](../../../local/TEST-ACCOUNT.txt))에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
+**자격증명**: admin `[REDACTED_EMAIL_A]`(neture:admin), 비번은 **SSOT(`../../../local/TEST-ACCOUNT.txt`)에서 런타임 read** — 로그/커밋 노출 금지. host=`o4o-core-api` Cloud Run.
 
 1. 로그인 → `POST /api/v1/auth/login` `{email,password,includeLegacyTokens:true}` → `data.tokens.accessToken`.
 2. master 등록(바코드 없이) → `POST /api/v1/admin/o4o-product-db/masters` `{name, regulatoryType:'건강기능식품', specification, originCountry, tags}` → `data.id` (barcode=NULL, 정체성=UUID).

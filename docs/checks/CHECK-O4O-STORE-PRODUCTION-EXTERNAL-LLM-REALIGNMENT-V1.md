@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: [`WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1`](../work-orders/WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1.md) · **실행일**: 2026-09-18 · **base**: `origin/main` `0457843df`(착수) → 코드 commit `3a41a04fe`
 > **판정**: **COMPLETE_WITH_SMOKE_PENDING** — 구현 · vitest 119 · jest 143 · 3 서비스 build · 배포 3 서비스 success · bundle 반영(KPA 6 · KCos 3 · PH 4) 확인 · CI green(`35355797605`) · 브라우저 smoke = store-owner 테스트 계정 로그인 불가 blocker 지속 → PENDING_USER_VERIFICATION(§7)
 

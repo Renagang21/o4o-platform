@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-B2B-CANONICAL-END-TO-END-POSITIVE-SMOKE-V2
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > `o4o_payments` production 적용 후 Neture B2B canonical buyer flow 재검증(positive smoke).
 > **결과: PASS (prepare 까지 실데이터 성공 — V1 blocker 해소). Toss 결제 완료~bridge~supplier 노출은 interactive Toss sandbox 부재로 DEFERRED.**
 > 상위: `CHECK-O4O-NETURE-B2B-CANONICAL-END-TO-END-POSITIVE-SMOKE-V1` · `CHECK-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1` — 2026-06-12

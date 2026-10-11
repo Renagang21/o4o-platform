@@ -3,7 +3,7 @@ MINEROCK600 EP01 — CUT1 TTS A/B 테스트 (WO-O4O-AUTOMATION-TTS-NARROW-ENDPOI
 
 O4O 서버의 narrow TTS endpoint(POST /api/v1/platform/automation/tts) 를 호출한다.
 - provider 키는 서버에 있는 것을 그대로 사용한다. 이 PC 로 API key 를 가져오지 않고, 출력·기록하지 않는다.
-- 로그인 자격은 docs/local/TEST-ACCOUNTS.local.md(git 미추적) 에서만 읽고, 토큰·비밀번호를 출력하지 않는다.
+- 로그인 자격은 docs/local/TEST-ACCOUNT.txt(git 미추적) 에서만 읽고, 토큰·비밀번호를 출력하지 않는다.
   (또는 O4O_ACCESS_TOKEN 환경변수로 이미 발급된 Bearer token 을 넘길 수 있다.)
 - narration-ko.txt 의 [CUT1] 블록만 생성. 음성 속도 변경·후처리 없음. Gemini 는 서버가 WAV 로 돌려주며
   청취 편의용 mp3 사본만 ffmpeg 로 만든다(원본 wav 보존).
@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 OUT = Path(r"C:\tmp\minerock600-pilot\ep01\narration-test")
-ACCOUNTS = Path(os.environ.get("O4O_TEST_ACCOUNTS_FILE") or REPO / "docs/local/TEST-ACCOUNTS.local.md")  # worktree 에서는 env 로 메인 체크아웃 경로 지정
+ACCOUNTS = Path(os.environ.get("O4O_TEST_ACCOUNTS_FILE") or REPO / "docs/local/TEST-ACCOUNT.txt")  # worktree 에서는 env 로 메인 체크아웃 경로 지정
 STYLE = ("30~40대 한국 여성 약사가 손님에게 설명하는 톤. 차분하고 신뢰감 있게, 광고 성우처럼 과장하지 않고, "
          "자연스러운 속도로. 고유명사 '미네락 육백' 은 또박또박.")
 
@@ -49,7 +49,7 @@ def login(api: str) -> str:
     acct = ACCOUNTS.read_text(encoding="utf-8")
     m = re.search(r"admin\.neture\.co\.kr 관리자 \(super_admin\)\s*\n아이디\s*:\s*(\S+)\s*\n페스워드\s*:\s*(\S+)", acct)
     if not m:
-        sys.exit("TEST-ACCOUNTS.local.md 에서 super_admin 항목을 찾지 못함")
+        sys.exit("TEST-ACCOUNT.txt 에서 super_admin 항목을 찾지 못함")
     st, data, _ = post(f"{api}/auth/login",
                        {}, {"email": m.group(1), "password": m.group(2), "serviceKey": "neture", "includeLegacyTokens": True})
     if st != 200:

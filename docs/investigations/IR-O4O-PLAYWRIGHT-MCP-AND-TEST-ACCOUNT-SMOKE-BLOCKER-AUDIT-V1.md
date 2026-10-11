@@ -1,5 +1,7 @@
 # IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **조사 + 환경 정합성 확인 (Investigation).** 서비스 기능 코드/UI/API/DB 변경 없음.
 > 허용 범위 내 로컬 전용 문서(`TEST-ACCOUNT.txt`, gitignored) 검증 노트만 정정.
 > CLAUDE.md 앱 개발 규칙(조사 → 문제확정 → 최소 수정 → 검증 → 종료).

@@ -1,5 +1,7 @@
 # IR-O4O-NETURE-OPERATOR-AUTH-SMOKE-BLOCKER-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **목적**: `WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1`(commit cd5d10017) 완료 후 남은
 > 인증 브라우저 smoke 블로커를 조사한다.
 > **성격**: read-only 조사 (코드/UI/API/DB/migration/운영데이터/테스트계정/commit 없음). 로그인 probe·read-only API/DB probe·Playwright 노출/점유 확인만 수행.

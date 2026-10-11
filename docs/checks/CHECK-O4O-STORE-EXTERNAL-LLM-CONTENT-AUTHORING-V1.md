@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: [`WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1`](../work-orders/WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1.md) · **실행일**: 2026-09-18 · **base**: `origin/main` `a5d56fd04`
 > **판정**: COMPLETE_WITH_SMOKE_PENDING — 구현·단위/계약 테스트·5 빌드 PASS · 배포 `35302730513` 3 서비스 success · bundle 반영 확인 · 브라우저 smoke = 테스트 계정 로그인 불가 → PENDING_USER_VERIFICATION(§6)
 

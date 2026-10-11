@@ -1,5 +1,7 @@
 # CHECK-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1 — 영상 제작용 TTS narrow endpoint · EP01 CUT1 A/B smoke
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: `WO-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1` (사용자 지시 2026-09-15, 채팅) — 기존 O4O 서버의 OpenAI/Gemini key 를 재사용하는 얇은 TTS endpoint. 프로덕션 key 를 로컬로 반입하지 않는다.
 > **상태**: **CLOSED_WITH_PARTIAL_SMOKE** — endpoint 배포·동작 PASS · Gemini CUT1 생성 PASS · OpenAI CUT1 은 provider 측 크레딧 소진(`insufficient_quota`)으로 FAIL → **사용자 판단 대기(OpenAI 결제 or Gemini 단독 채택)**
 > **선행/관련**: [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](../baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) §2 (TTS = O4O Assembly 축의 제작 실행 기능) · [CHECK-…-EP01-GENERATION-V1](CHECK-O4O-MINEROCK600-EP01-GENERATION-V1.md) · [EP01-GENERATION-RUNBOOK-V1](../media-pilot/minerock600/EP01-GENERATION-RUNBOOK-V1.md)

@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
 > **일자**: 2026-09-15
 > **범위**: `neture.co.kr` 대표 홈(O4O 계정 · 로그인 · 회원가입 · 내 정보 · `O4O 로그아웃`) 과 공급자 · 파트너 **서비스**(각각 독립된 신청 · 승인 · 이용 상태) 의 분리. 서비스 이탈 ≠ 대표 로그아웃. 서버 권한은 서비스별 이용 상태로 판정.

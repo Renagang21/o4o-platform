@@ -1,5 +1,7 @@
 # CHECK-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **검증 보고서** — [`WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1`](../work-orders/WO-O4O-GOOGLE-IDENTITY-PREREQUISITES-V1.md) (Identity V3 Phase 2-A · F10 auth-core 명시적 예외) 실행 기록.
 > **코드 commit:** `ae2e7fe32` · **정본:** [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`IR …EXECUTION-PLAN-V1`](../investigations/IR-O4O-GOOGLE-IDENTITY-MIGRATION-EXECUTION-PLAN-V1.md)(APPROVED)
 > **원칙 준수:** Google 로그인/가입/연결 runtime 0 · `linking_sessions` 미생성 · `users.email` 불변 · **production 개인정보/credential 값 변경 0** · 개인정보 실값 조회 0(count-only).

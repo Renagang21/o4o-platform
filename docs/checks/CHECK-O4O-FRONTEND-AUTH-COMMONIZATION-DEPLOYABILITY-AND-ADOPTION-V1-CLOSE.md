@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-FRONTEND-AUTH-COMMONIZATION-DEPLOYABILITY-AND-ADOPTION-V1 (최종 종료 검증)
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: [`WO-O4O-FRONTEND-AUTH-COMMONIZATION-DEPLOYABILITY-AND-ADOPTION-V1`](../work-orders/WO-O4O-FRONTEND-AUTH-COMMONIZATION-DEPLOYABILITY-AND-ADOPTION-V1.md)
 - **선행 CHECK (2026-08-10, 구현 기록)**: [`CHECK-...-V1.md`](CHECK-O4O-FRONTEND-AUTH-COMMONIZATION-DEPLOYABILITY-AND-ADOPTION-V1.md)
 - **실행일**: 2026-08-12
@@ -78,7 +80,7 @@
 
 ## 7. 프로덕션 인증 · 권한 smoke (실 브라우저)
 
-계정은 [`docs/local/TEST-ACCOUNT.txt`](../local/TEST-ACCOUNT.txt) 참조 — 본 문서에 값 미기록.
+계정은 `../local/TEST-ACCOUNT.txt` 참조 — 본 문서에 값 미기록.
 
 | 서비스 | 로그인 | 로그아웃 | 미인증 401 처리 | 권한 차단 | serviceKey 근거 |
 |---|---|---|---|---|---|

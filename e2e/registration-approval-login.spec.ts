@@ -5,7 +5,7 @@
  *
  * 자격증명 정책 (WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1):
  *   평문 credential 하드코딩 금지. 모든 자격증명은 env vars 로 주입.
- *   자격증명 SSOT: `docs/local/TEST-ACCOUNTS.local.md`.
+ *   자격증명 SSOT: `docs/local/TEST-ACCOUNT.txt`.
  *
  *   필수 env vars:
  *     E2E_TEST_USER_EMAIL / E2E_TEST_USER_PASSWORD          (가입할 사용자)
@@ -23,7 +23,7 @@ mkdirSync(SCREENSHOT_DIR, { recursive: true });
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) {
-    console.error(`${name} env var required. See docs/local/TEST-ACCOUNTS.local.md.`);
+    console.error(`${name} env var required. See docs/local/TEST-ACCOUNT.txt.`);
     process.exit(1);
   }
   return v;

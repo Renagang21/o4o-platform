@@ -1,5 +1,7 @@
 # WO-O4O-KPA-NAVER-ONLINE-SALES-INTEGRATION-PILOT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **선행**: [`CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1`](../checks/CHECK-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1.md) (자체 storefront 철거 완료 · `843dce7ad`)
 > **트랙**: KPA 자체몰 폐기 → 외부 판매 채널 대체 (네이버 → 쿠팡 → 공통 Online Sales 모듈 추출)
 > **성격**: 조사 + 파일럿 구현 (한 작업으로 묶는다. 조사 IR 을 별도로 분리하지 않는다)

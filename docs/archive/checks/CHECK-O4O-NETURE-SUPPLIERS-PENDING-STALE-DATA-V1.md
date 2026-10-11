@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIERS-PENDING-STALE-DATA-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > Verification — read-only DB SELECT. **코드 수정 없음, DB 수정 없음.**
 > 일자: 2026-05-30
 > 선행 IR: [IR-O4O-NETURE-OPERATOR-DASHBOARD-DATA-ACCURACY-AUDIT-V1](IR-O4O-NETURE-OPERATOR-DASHBOARD-DATA-ACCURACY-AUDIT-V1.md)
@@ -57,7 +59,7 @@ ORDER BY ns.created_at;
 - 두 row 모두 `approved_at IS NULL` 이고 `updated_at = created_at` → 생성 이후 한 번도 supplier-side 활성화 처리되지 않은 상태
 - `user_status='active'` → users 행은 정상
 - `organization_id` 정상 연동 → 가입 승인 트랜잭션이 정상 종료된 결과
-- 두 이메일 모두 [docs/local/TEST-ACCOUNT.txt](../local/TEST-ACCOUNT.txt) 에 등록된 **Neture 공급자 테스트 계정**:
+- 두 이메일 모두 `../local/TEST-ACCOUNT.txt` 에 등록된 **Neture 공급자 테스트 계정**:
   - [REDACTED_EMAIL_C] — "Neture 공급자" / 쓰리라이프존
   - [REDACTED_EMAIL_B] — "Neture 공급자2" / 테스트공급자
 
