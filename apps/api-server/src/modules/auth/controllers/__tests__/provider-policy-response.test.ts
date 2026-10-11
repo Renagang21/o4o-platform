@@ -2,7 +2,7 @@ import { selectPendingPoliciesForRequest } from '../../../../common/auth/terms-a
 
 const mockSession = () => ({ user: { id: 'synthetic-user', name: 'Fixture' }, tokens: { accessToken: 'synthetic', refreshToken: 'synthetic', expiresIn: 900 }, isNewUser: false });
 let mockDemo = false;
-const mockPending = ['neture', 'kpa-society'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'Fixture terms' }));
+const mockPending = ['neture', 'kpa-society'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'Fixture terms', accountPolicy: serviceKey === 'neture' }));
 jest.mock('../../../../services/auth/google-auth.service.js', () => ({ googleAuthService: { login: async () => mockSession(), signup: async () => mockSession() }, GoogleAuthError: class extends Error {} }));
 jest.mock('../../../../services/auth/kakao-auth.service.js', () => ({ kakaoAuthService: { login: async () => mockSession(), signup: async () => mockSession() } }));
 jest.mock('../../../../services/authentication.service.js', () => ({ authenticationService: { setAuthCookies: jest.fn() } }));

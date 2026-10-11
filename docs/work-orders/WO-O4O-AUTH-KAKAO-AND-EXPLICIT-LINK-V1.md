@@ -368,3 +368,11 @@ slug=neture-account-terms 문서가 실제 게시된 뒤에만 membership 없는
 48건의 경계는 유지한다. PG signup/social 18건과 sessionAuthMethod 21건은 총 39 SKIP다.
 30일 공고는 시작하지 않았고 실제 공고일·시행일은 미정이다.
 이번 동일 WO 작업은 push/PR 범위이며 최신 HEAD CI/review를 확인한다. main 통합·배포·DB 게시는 없다.
+
+
+최신 리뷰에서 기존 Neture 서비스 pending의 전역 선택과 전 사용자 cache 비활성화를 추가
+보완했다. 새 공통 문서만 accountPolicy로 전역 선택하며 기존 Neture 문서는 요청 범위에 둔다.
+현재 조직/legacy 공급자 관계를 EXISTS로 확인하고 관계 없는 사용자는 기존 빈 결과 cache를
+활용한다. 관계 생성/승인 직후 기존 resolver 판정은 유지한다. 신규 4건 포함 관련 128 PASS,
+고유 서버 323건/UI 304건이다. 모의 화면 48건·PG 39 SKIP·실제 공고/게시 OPEN·push/PR
+종료 경계는 유지하며 최신 HEAD CI/review까지 확인한다.

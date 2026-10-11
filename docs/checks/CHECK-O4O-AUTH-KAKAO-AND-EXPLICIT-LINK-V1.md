@@ -805,3 +805,22 @@ signup/social integration 18건은 DB 연결이 없어 SKIP이며, 이번 함께
 
 이메일·Google 기존 서비스 회귀 117 PASS도 재확인했다(고유 319건에 이미 포함, 중복 합산 없음).
 API build(실제 tsc)·타입 검사·changed lint·docs 민감정보 guard·diff check PASS다.
+
+
+### 기존 Neture 서비스 pending 범위와 사용자별 캐시 후보 분리
+
+합성 공통 requirement뿐 아니라 요청별 선택도 새 published 문서의 accountPolicy 표식을
+따른다. 기존 미표식 Neture 약관은 일반 서비스 약관이므로 Neture membership이 있더라도
+KPA/lecture 세션·전용 API를 막지 않는다. Neture 자체 요청의 기존 약관 요구는 유지한다.
+
+카탈로그에 원장 서비스가 있다는 이유만으로 모든 사용자 캐시를 제거하지 않는다. 매 요청
+organization_members의 현재 업무 관계 및 필요한 legacy supplier 관계를 EXISTS로 확인한다.
+관계가 없는 계정은 빈 결과 cache를 재사용하며 membership/원장 resolver 조회를 반복하지 않는다.
+새 관계가 생기면 다음 요청에서 cache를 건너뛴다. 관계가 있는 계정은 승인 상태를 기존 resolver로
+확인한다. 이 EXISTS는 권한을 부여하는 판정이 아니며 기존 role constants를 재사용한다.
+관계 확인 DB 조회 1건과 관계 있는 계정의 전체 조회 부담은 유지한다.
+
+신규 무관 서비스 2건·관계 없는 cache 2건과 기존 승인 변경 회귀를 포함한 3 suites 128 PASS다.
+고유 서버 323건/UI 304건, 로컬 PC/mobile 모의 48건이며 PG 39 SKIP 경계를 유지한다.
+API build·changed lint·docs 민감정보 guard·diff check PASS다. 실제 공고/시행·정책 게시·운영
+검증은 하지 않았으며 최신 HEAD CI/review를 확인한다.

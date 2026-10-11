@@ -34,8 +34,9 @@ import {
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
 import { demoAccountService } from '../../services/auth/demo-account.service.js';
-import { resolveSupplierForUser } from '../neture/middleware/supplier-context.resolver.js';
+import { resolveSupplierForUser, SUPPLIER_WORK_MEMBER_ROLES } from '../neture/middleware/supplier-context.resolver.js';
 import { resolveSemiFranchiseServiceAccess } from '../neture-pharmacy/services/semi-franchise-service-access.js';
+import { PHARMACY_STORE_MEMBER_ROLES } from '../neture-pharmacy/constants.js';
 import { getService } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
 
@@ -251,13 +252,26 @@ export class PolicyAcceptanceService {
     const published = await this.listPublishedTerms();
     if (published.length === 0) return [];
 
-    // Ledger eligibility can change at approval without an operator membership event: always re-evaluate it.
-    const dynamicSubjects = published.some(d => d.serviceKey === 'supplier' || !!getService(d.serviceKey)?.semiFranchiseAccessKey);
+    const q = this.db();
+    const hasSupplierPolicy = published.some(d => d.serviceKey === 'supplier');
+    const hasPharmacyPolicy = published.some(d => !!getService(d.serviceKey)?.semiFranchiseAccessKey);
+    // Probe current relations, not approval status. A newly added relation invalidates the hot path immediately.
+    // Unrelated accounts retain the empty-result cache without repeated membership/access resolver queries.
+    const relationRows = hasSupplierPolicy || hasPharmacyPolicy ? await q.query(
+      `SELECT /* policy_dynamic_relation */
+        EXISTS (SELECT 1 FROM organization_members om WHERE om.user_id = $1 AND om.left_at IS NULL
+          AND om.role = ANY($2::text[]))
+        OR ($3::boolean AND EXISTS (SELECT 1 FROM neture_suppliers s WHERE s.user_id = $1)) AS related`,
+      [userId, [...new Set([
+        ...(hasPharmacyPolicy ? PHARMACY_STORE_MEMBER_ROLES : []),
+        ...(hasSupplierPolicy ? SUPPLIER_WORK_MEMBER_ROLES : []),
+      ])], hasSupplierPolicy],
+    ) as { related: boolean }[] : [];
+    const dynamicSubjects = relationRows.some(row => row.related);
     const policyKey = published.map(d => `${d.id}:${d.version}:${d.slug ?? ''}`).sort().join('|');
     const cached = this.userOkCache.get(userId);
     if (!dynamicSubjects && cached?.policyKey === policyKey && Date.now() - cached.at < USER_OK_TTL_MS) return [];
 
-    const q = this.db();
     const memberships = (await q.query(
       `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
       [userId],
@@ -266,12 +280,12 @@ export class PolicyAcceptanceService {
       ...(published.some(isCommonAccountTermsDocument) ? [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }] : []),
       ...memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status)),
     ];
-    if (published.some(d => d.serviceKey === 'supplier') && !relevant.some(m => m.serviceKey === 'supplier')
+    if (dynamicSubjects && hasSupplierPolicy && !relevant.some(m => m.serviceKey === 'supplier')
       && await this.isSupplierPolicySubject(userId, q)) {
       relevant.push({ serviceKey: 'supplier', status: 'active' });
     }
     for (const { serviceKey } of published) {
-      if (!relevant.some(m => m.serviceKey === serviceKey) && await this.isLedgerServicePolicySubject(userId, serviceKey, q)) {
+      if (dynamicSubjects && !relevant.some(m => m.serviceKey === serviceKey) && await this.isLedgerServicePolicySubject(userId, serviceKey, q)) {
         relevant.push({ serviceKey, status: 'active' });
       }
     }
@@ -299,7 +313,7 @@ export class PolicyAcceptanceService {
    * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §8-2
    *
    *   raw pending      = `getPendingForUser` — 약관 데이터 기준 미승낙 (정책 상태 그대로)
-   *   enforced pending = raw pending을 요청 서비스 범위로 제한하고 Demo 예외를 반영한다. 공통 Neture 약관은 모든 범위에 포함한다.
+   *   enforced pending = raw pending을 요청 서비스 범위로 제한하고 Demo 예외를 반영한다. 표식된 새 공통 약관만 모든 범위에 포함한다.
    *
    * 활성 Demo 계정(`demo_accounts.user_id`)은 실제 개인·계약 주체가 아닌 공유 체험 계정이라 약관 동의
    * 강제 대상이 아니다. acceptance 를 만들거나 raw 상태를 바꾸지 않는다 — 여기서만 []로 본다.

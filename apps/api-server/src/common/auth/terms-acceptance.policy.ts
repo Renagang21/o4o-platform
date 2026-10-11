@@ -12,7 +12,7 @@
  *   - JWT claim 에 싣지 않는다. requireAuth 가 매 요청 판정한다 (게이트 우회 불가).
  *
  * ── 판정 규칙 ────────────────────────────────────────────────────────────────
- * Neture 공통 계정 terms는 물리 membership 없이 요구한다. 서비스 terms는 active/pending
+ * 표식된 새 Neture 공통 계정 terms의 published 이후 물리 membership 없이 요구한다. 서비스 terms는 active/pending
  * membership 또는 실제 사업 원장의 서비스 접근 자격에 요구한다. 게시 문서·기존 승낙 ID/version/hash를 그대로 보존한다.
  * 요청 차단은 공통 terms와 요청 서비스의 pending에만 적용한다. 가입·승인·role은 생성하지 않는다.
  * 전체관리자 업무 경로는 기존 별도 role guard와 게이트 예외를 유지한다.
@@ -117,6 +117,8 @@ export interface PendingPolicyAcceptance {
   policyDocumentId: string;
   version: number;
   title: string;
+  /** Set only from the currently published common-account document marker. */
+  accountPolicy?: boolean;
 }
 
 /**
@@ -151,6 +153,7 @@ export function computePendingPolicyAcceptances(
       policyDocumentId: doc.id,
       version: doc.version,
       title: doc.title,
+      ...(isCommonAccountTermsDocument(doc) ? { accountPolicy: true } : {}),
     });
   }
   return pending;
@@ -235,7 +238,7 @@ export function selectPendingPoliciesForRequest(
     ?? sessionServiceKey);
   // Store is a workspace, not a policy service. Expose enrolled store-capable services so its gate can accept them.
   if (service === 'store') {
-    return pending.filter(p => p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || getServiceWorkspaceCapability(p.serviceKey).storeWorkspaceEnabled);
+    return pending.filter(p => p.accountPolicy === true || getServiceWorkspaceCapability(p.serviceKey).storeWorkspaceEnabled);
   }
-  return pending.filter(p => !service || p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || p.serviceKey === service);
+  return pending.filter(p => !service || p.accountPolicy === true || p.serviceKey === service);
 }
