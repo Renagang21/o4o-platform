@@ -182,3 +182,7 @@ P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 p
 PR #475 P1 리뷰 대응: 건수가 맞지 않는 페이지에도 다른 운영 writer가 반환되면 count 재시도 전에 즉시 차단한다. queued → in_progress 이동 중 병렬 status 조회가 이를 놓치는 경우를 회귀 테스트로 고정했다. 불완전 페이지의 모든 반환 항목을 먼저 검사하며 정상 metadata/완전 목록만 허용한다.
 
 추가 P1 대응: count 불일치가 어느 status에서 발생하든 재시도는 다섯 status 전체를 다시 읽는다. 이전 병렬 요청도 allSettled로 완료·검사해 다른 분기의 알려진 writer나 metadata/권한 오류를 재시도로 숨기지 않는다. 반환되지 않은 queued 작업이 대기 중 in_progress로 이동하는 경우와 다른 분기의 writer 우선 차단을 회귀 테스트로 추가했다.
+
+CI 선행 수정: 최신 main 통합 중 CI `38132871563`의 기존 `CommunityServiceAdminPage.test.tsx:121` 테스트가 실패했다. label/select는 초기 렌더에 있지만 option은 비동기 community 조회 후 생기므로, option 생성 전에 c1로 change하면 선택되지 않을 수 있었다. 후보 검색 테스트에 첫 커뮤니티 option 대기 한 줄을 추가해 실제 데이터가 로드된 뒤 선택하게 한다. 테스트를 생략하거나 업무 화면 동작을 변경하지 않는다. 이후 funding PR #474의 최신 main도 기존 통합 규칙에 따라 반영한다.
+
+CI 선행 수정 검증: 해당 관리자 테스트 9 PASS. 로컬 공용 인증 패키지 산출물을 갱신한 뒤 CI와 동일한 web-neture Vitest 설정에서 전체 66파일·551테스트 PASS를 확인했다. tracked package.json/lockfile/업무 화면 변경은 없으며 옵션 대기 한 줄과 결과 기록만 추가했다.
