@@ -177,6 +177,9 @@ const BLOCKED_ORDER_TYPES = [
 
 ### 3.2 Reference Implementation
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 활성 주문 경로·capability 추가·parity/향후 구현·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH 기능을 유지/확장/복구하지 않는다. 공용 QR 계약·인쇄 QR 연결·Neture와 다른 서비스 기능·법정 보유 판단은 유지한다. 아래 PH 구조/구현 표기는 폐기 전 이력이다.
+
+
 | 매장 | OrderType | 상태 |
 |------|-----------|------|
 | Cosmetics | `COSMETICS` | Active (참조 구현) |

@@ -23,6 +23,9 @@
 
 ### 0-1. 확정 전제 7개 (WO 원문)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 활성 주문 경로·capability 추가·parity/향후 구현·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH 기능을 유지/확장/복구하지 않는다. 공용 QR 계약·인쇄 QR 연결·Neture와 다른 서비스 기능·법정 보유 판단은 유지한다. 아래 PH 구조/구현 표기는 폐기 전 이력이다.
+
+
 1. **QR 은 상품 설명서 전용이 아니다.** QR = Content 또는 정보 대상을 소비자 스마트폰으로 전달하는 **매장 Execution Channel**.
 2. **QR 전용 콘텐츠를 별도로 만들지 않는다.**
 3. 상품 SSOT = **ProductMaster**.
@@ -606,6 +609,9 @@ placement 축 추가는 QR 쪽 메타데이터일 뿐 개인 식별성을 높이
 
 ## §15. KPA / PharmacyHub parity 계획
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 활성 주문 경로·capability 추가·parity/향후 구현·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH 기능을 유지/확장/복구하지 않는다. 공용 QR 계약·인쇄 QR 연결·Neture와 다른 서비스 기능·법정 보유 판단은 유지한다. 아래 PH 구조/구현 표기는 폐기 전 이력이다.
+
+
 > 차이는 기본적으로 `MISSING_ADOPTION` 으로 본다. **새로운 business difference 로 만들지 않는다.**
 
 | 항목 | 현재 | 목표 |
@@ -708,6 +714,9 @@ QR 축의 백엔드는 이미 공통이다.
 ---
 
 ## §20. 이번 회차에 하지 않은 것
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 활성 주문 경로·capability 추가·parity/향후 구현·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH 기능을 유지/확장/복구하지 않는다. 공용 QR 계약·인쇄 QR 연결·Neture와 다른 서비스 기능·법정 보유 판단은 유지한다. 아래 PH 구조/구현 표기는 폐기 전 이력이다.
+
 
 ```text
 코드 구현 · migration · schema 적용 · production DB write

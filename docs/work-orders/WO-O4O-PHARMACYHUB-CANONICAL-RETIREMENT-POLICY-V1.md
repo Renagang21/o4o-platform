@@ -11,3 +11,5 @@ PH 서비스 baseline의 현행 1~6항이 이전 PH 서비스 모델을 대체�
 18개 기존 정본의 원문 보존·추가 링크·code fence 대조, docs 민감정보 검사·whitespace 검사가 통과했다. 이 문서 PR은 운영 URL map·Cloud Run·DB를 변경하지 않으며 운영 삭제 완료를 뜻하지 않는다. 최신 실행 결과는 기존 폐기 TODO 및 운영 workflow에서 추적한다.
 
 색인의 연결 정본을 추가 대조하여 사업 철학·Neture 약국 설계·shared module protocol·Store library/execution 설계·현행 refactoring 상태에도 PH 부분 폐기를 정렬했다. CLAUDE 진입점의 살아 있는 B2B 경로 목록에서는 은퇴 PH 축을 제외한다. Privacy/통합약관 게시 원문·과거 CHECK/IR/WO는 변경하지 않으며 이전 PH 데이터에 적용되는 법정 보유·동의 증빙 의무는 계속 유효하다. 문서 작업을 실제 게시 약관의 개정/재게시로 해석하지 않는다.
+
+PR #439 리뷰 대응: ACTIVE Store Rules의 PH live B2B 표기와 QR Active Design의 PH capability/parity 후속 구현 계약에도 부분 폐기 표기를 추가했다. 공용 QR 구현/분석 계약과 인쇄 QR 연결은 그대로 유지한다.
