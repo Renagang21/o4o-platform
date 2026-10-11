@@ -30,7 +30,7 @@
 - [x] 파라미터 검증·SQL 바인딩·와일드카드 literal 검색·페이지 경계·기존 권한 회귀 검증
 - [ ] desktop/mobile mock 브라우저·빌드·리뷰·CI·병합·API/Neture 배포 검증
 
-조사 결과: `/communities/:slug/memberships`는 상태별 전체 조회, `/communities/admin/communities/:id/members`는 active/suspended 전체 조회다. 실제 화면 소비처는 각각 MyCommunityOperatorPage와 CommunityServiceAdminPage 하나다. 이름 검색만 제공하며 마스킹 이메일 검색을 새로 허용하지 않는다. 정렬은 기존 우선순위를 유지하고 membership ID를 tie-breaker로 추가한다. API의 rows 필드를 보존해 기존 화면 응답 해석은 유지하되 조회는 기본 20건으로 제한한다. 회원 관리 상태 5종과 지정 목록 active/suspended 범위는 유지한다. [역할 정본](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5 및 [공유 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)를 검토했다.
+조사 결과: `/communities/:slug/memberships`는 상태별 전체 조회, `/communities/admin/communities/:id/members`는 active/suspended 전체 조회다. 실제 화면 소비처는 각각 MyCommunityOperatorPage와 CommunityServiceAdminPage 하나다. 이름 검색만 제공하며 마스킹 이메일 검색을 새로 허용하지 않는다. 정렬은 기존 우선순위를 유지하고 membership ID를 tie-breaker로 추가한다. API의 rows 필드를 보존해 기존 화면 응답 해석은 유지하되 페이지 파라미터가 있는 새 화면 요청은 기본 20건으로 제한한다. 구형/캐시 화면의 페이지 없는 호출은 기존 전체 결과를 유지한다. 회원 관리 상태 5종과 지정 목록 active/suspended 범위는 유지한다. [역할 정본](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5 및 [공유 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)를 검토했다.
 
 ## 검증 기록
 

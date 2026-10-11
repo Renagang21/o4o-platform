@@ -8,9 +8,9 @@ it.each([{ page: '0' }, { page: '-1' }, { page: '1.5' }, { page: '1000001' }, { 
   expect(() => parseCommunityMemberListQuery(query, statuses)).toThrow(CommunityMemberListQueryError);
 });
 it('defaults are bounded and names are trimmed', () => {
-  expect(parseCommunityMemberListQuery({}, statuses)).toEqual({ q: '', page: 1, pageSize: 20 });
+  expect(parseCommunityMemberListQuery({}, statuses)).toEqual({ q: '', page: 1, pageSize: 20, paginate: false });
   expect(parseCommunityMemberListQuery({ q: '  회원  ', pageSize: '100', status: 'active' }, statuses))
-    .toEqual({ q: '회원', page: 1, pageSize: 100, status: 'active' });
+    .toEqual({ q: '회원', page: 1, pageSize: 100, status: 'active', paginate: true });
   expect(() => parseCommunityMemberListQuery({ status: 'pending' }, ['active', 'suspended'])).toThrow('가입 상태');
 });
 
@@ -47,4 +47,22 @@ it('empty filtered results return the first page without unbounded fetching', as
   const result = await new CommunityLifecycleService(db as any).listMembershipsForReview({ communityId: 'c1', query });
   expect(result).toEqual({ memberships: [], pagination: { total: 0, totalPages: 1, page: 1, pageSize: 20 } });
   expect(db.query.mock.calls[1][1].slice(-2)).toEqual([20, 0]);
+});
+
+
+it.each(['review', 'designation'])('%s preserves full legacy results without page parameters', async kind => {
+  const id = '11111111-1111-4111-8111-111111111111';
+  const calls: string[] = [];
+  const db = { query: async (sql: string) => {
+    calls.push(sql);
+    if (sql.startsWith('SELECT id, name FROM communities')) return [{ id, name: '커뮤니티' }];
+    if (sql.includes('COUNT(*)')) return [{ total: 45 }];
+    return Array.from({ length: 45 }, (_, i) => ({ id: `m${i}`, membership_id: `m${i}`, user_id: `u${i}`, role: 'member', status: 'active', user_name: `회원 ${i}` }));
+  }, transaction: async () => undefined };
+  const query = parseCommunityMemberListQuery({ status: 'active' }, statuses);
+  const result = kind === 'review' ? await new CommunityLifecycleService(db as any).listMembershipsForReview({ communityId: id, query })
+    : await new CommunityOperatorDesignationService(db as any).listMembers(id, query);
+  expect('memberships' in result ? result.memberships : result.members).toHaveLength(45);
+  expect(result.pagination).toEqual({ total: 45, totalPages: 1, page: 1, pageSize: 45 });
+  expect(calls.at(-1)).not.toMatch(/LIMIT|OFFSET/);
 });

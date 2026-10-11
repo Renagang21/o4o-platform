@@ -351,13 +351,14 @@ export class CommunityLifecycleService {
         WHERE cm.community_id = $1${filter}`;
     const counts = await this.dataSource.query(`SELECT COUNT(*)::int AS total ${from}`, params);
     const pagination = communityMemberPagination(Number(counts[0]?.total ?? 0), query);
-    const pageParams = [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
+    const pageParams = query.paginate === false ? params : [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
+    const pageClause = query.paginate === false ? '' : `LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`;
     const rows: any[] = await this.dataSource.query(
       `SELECT cm.id, cm.user_id, cm.role, cm.status, cm.created_at,
               u.name AS user_name, u.email AS user_email, sm.status AS service_status
          ${from}
         ORDER BY cm.created_at ASC, cm.id ASC
-        LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`,
+        ${pageClause}`,
       pageParams,
     );
     return { pagination, memberships: rows.map((r) => ({

@@ -108,7 +108,8 @@ export class CommunityOperatorDesignationService {
       LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
       WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}`, params);
     const pagination = communityMemberPagination(Number(counts[0]?.total ?? 0), query);
-    const pageParams = [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
+    const pageParams = query.paginate === false ? params : [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
+    const pageClause = query.paginate === false ? '' : `LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`;
     const rows = await this.db.query(
       `SELECT cm.id AS membership_id, cm.user_id, cm.role, cm.status, u.name AS user_name, u.email AS user_email,
               sm.status AS service_status, u.status AS account_status, u."isActive" AS account_active,
@@ -120,7 +121,7 @@ export class CommunityOperatorDesignationService {
          LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
         WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}
         ORDER BY (cm.role IN ('admin', 'operator')) DESC, u.name ASC NULLS LAST, cm.id ASC
-        LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`,
+        ${pageClause}`,
       pageParams,
     );
     return {

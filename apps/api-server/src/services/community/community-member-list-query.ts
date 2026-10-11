@@ -4,6 +4,7 @@ export interface CommunityMemberListQuery {
   page: number;
   pageSize: number;
   status?: string;
+  paginate?: boolean;
 }
 export class CommunityMemberListQueryError extends Error {
   constructor(readonly code: string, message: string) { super(message); }
@@ -25,9 +26,9 @@ export function parseCommunityMemberListQuery(
     throw new CommunityMemberListQueryError('INVALID_STATUS', '알 수 없는 가입 상태입니다.');
   }
   return { q: typeof query.q === 'string' ? query.q.trim() : '', page: integer(query.page, 1, 1000000),
-    pageSize: integer(query.pageSize, 20, 100), status: status as string | undefined };
+    pageSize: integer(query.pageSize, 20, 100), paginate: query.page !== undefined || query.pageSize !== undefined, status: status as string | undefined };
 }
-export const DEFAULT_MEMBER_LIST_QUERY: CommunityMemberListQuery = { q: '', page: 1, pageSize: 20 };
+export const DEFAULT_MEMBER_LIST_QUERY: CommunityMemberListQuery = { q: '', page: 1, pageSize: 20, paginate: true };
 export function communityMemberListFilter(params: unknown[], query: CommunityMemberListQuery): string {
   let filter = '';
   if (query.status) { params.push(query.status); filter += ` AND cm.status = $${params.length}`; }
@@ -38,6 +39,7 @@ export function communityMemberListFilter(params: unknown[], query: CommunityMem
   return filter;
 }
 export function communityMemberPagination(total: number, query: CommunityMemberListQuery) {
+  if (query.paginate === false) return { total, totalPages: 1, page: 1, pageSize: Math.max(20, total) };
   const totalPages = Math.max(1, Math.ceil(total / query.pageSize));
   return { total, totalPages, page: Math.min(query.page, totalPages), pageSize: query.pageSize };
 }

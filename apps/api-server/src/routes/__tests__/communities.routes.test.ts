@@ -292,6 +292,6 @@ describe('회원 검색 및 페이지 HTTP 계약', () => {
     const list = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview').mockResolvedValue({ memberships: [], pagination });
     const response = await request(app()).get('/example/memberships').query({ status: 'active', q: ' 회원 ', page: 2 });
     expect(response.status).toBe(200); expect(response.body.data.pagination).toEqual(pagination);
-    expect(list).toHaveBeenCalledWith({ communityId: 'scoped-community', query: { q: '회원', status: 'active', page: 2, pageSize: 20 } });
+    expect(list).toHaveBeenCalledWith({ communityId: 'scoped-community', query: { q: '회원', status: 'active', page: 2, pageSize: 20, paginate: true } });
   });
 });
