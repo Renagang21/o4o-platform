@@ -94,16 +94,18 @@ export class SupplierUnifiedOrderService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 } };
   }
 
+  // A shared bind spans UUID offer ownership and varchar checkout ownership.
+  // Cast parameters, preserving the stored identifiers and column indexes.
   private netureScopeSql(): string {
     return `EXISTS (
       SELECT 1 FROM neture.neture_order_items oi
       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-      WHERE oi.order_id = o.id AND spo.supplier_id = $1
+      WHERE oi.order_id = o.id AND spo.supplier_id = $1::uuid
     ) AND ${netureOrderServiceSetSql('o', '$2')}`;
   }
 
   private checkoutScopeSql(): string {
-    return `co."supplierId" = $1
+    return `co."supplierId" = $1::varchar
       AND ${checkoutOrderServiceSetSql('co', '$2')}
       AND co."paymentStatus" = 'paid'
       AND NOT EXISTS (
@@ -119,13 +121,13 @@ export class SupplierUnifiedOrderService {
               COALESCE((o.metadata->>'testPayment')::boolean, false) AS test_payment,
               (SELECT COUNT(*)::int FROM neture.neture_order_items oi2
                  JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
-                 WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count,
+                 WHERE oi2.order_id = o.id AND spo2.supplier_id = $1::uuid) AS item_count,
               (SELECT COALESCE(jsonb_agg(jsonb_build_object(
                         'name', oi3.product_name, 'quantity', oi3.quantity,
                         'unitPrice', oi3.unit_price, 'lineTotal', oi3.total_price)), '[]'::jsonb)
                  FROM neture.neture_order_items oi3
                  JOIN supplier_product_offers spo3 ON spo3.id = oi3.product_id::uuid
-                 WHERE oi3.order_id = o.id AND spo3.supplier_id = $1) AS items_preview
+                 WHERE oi3.order_id = o.id AND spo3.supplier_id = $1::uuid) AS items_preview
        FROM neture_orders o`;
   }
 
