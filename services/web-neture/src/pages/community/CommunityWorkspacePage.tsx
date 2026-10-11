@@ -1,5 +1,6 @@
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
+import CommunityPublicReadManager from './CommunityPublicReadManager';
 import CommunitySelfWithdrawal from './CommunitySelfWithdrawal';
 import MyPostsPage from '../forum/MyPostsPage';
 import ForumRequestPage from '../forum/ForumRequestPage';
@@ -91,6 +92,7 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
     {!workspace && !error && <p className="my-4">불러오는 중입니다…</p>}
     {workspace && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
+      <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>
       <p className="my-4">{workspace.membershipStatus === 'pending' ? '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.' : '이 커뮤니티는 가입 승인 후 참여할 수 있습니다.'}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
       {workspace.canJoin && <button type="button" disabled={busy} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}
@@ -104,6 +106,7 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
         {workspace.kind === 'independent' && <Link to="/mypage/communities">회원 가입 심사</Link>}
       </section>}
       {workspace.canManage && <CommunityBoardReview communityKey={communityKey} />}
+      {workspace.canManage && workspace.kind === 'independent' && <CommunityPublicReadManager key={communityKey} communityKey={communityKey} />}
       {view === 'hub' && <ForumHubPage title={workspace.name} basePath={basePath} requestAction={<Link to={`${basePath}/request`}>게시판 개설 신청</Link>} description="회원들과 소식과 자료를 나누는 공간입니다." />}
       {view === 'posts' && <ForumPage title={workspace.name} boardSlug={new URLSearchParams(window.location.search).get('board') || undefined} basePath={basePath} />}
       {view === 'write' && <ForumWritePage communityLabel={workspace.name} categorySlug="" backPath={basePath} />}

@@ -67,6 +67,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import SupplierServiceEntry from './pages/SupplierServiceEntry';
 import SupplierLandingPage from './pages/SupplierLandingPage';
 import CommunityWorkspacePage from './pages/community/CommunityWorkspacePage';
+import CommunityPublicPostsPage from './pages/community/CommunityPublicPostsPage';
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
 
 // ============================================================================
@@ -715,6 +716,8 @@ function App() {
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
               <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />
+              <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
+              <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage />} />
               <Route path="/communities/:communityKey/forum/posts" element={<CommunityWorkspacePage view="posts" />} />
               <Route path="/communities/:communityKey/forum/write" element={<CommunityWorkspacePage view="write" />} />

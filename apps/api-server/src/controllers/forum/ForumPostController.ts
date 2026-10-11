@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { PostStatus } from '@o4o/forum-core/entities';
+import { PostStatus, PostType } from '@o4o/forum-core/entities';
 import { blocksToText, normalizeMetadata } from '@o4o/forum-core';
 // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
 //   forum-core 의 normalizeContent 는 브라우저 DOMParser 의존 → Node 에서 500.
@@ -38,6 +38,13 @@ export class ForumPostController extends ForumControllerBase {
       const tag = req.query.tag as string;
       const status = req.query.status as PostStatus;
       const sortBy = (req.query.sortBy as string) || 'latest';
+      const pinnedFilter = req.query.isPinned;
+      const typeFilter = req.query.type;
+      if ((pinnedFilter !== undefined && pinnedFilter !== 'true' && pinnedFilter !== 'false') ||
+          (typeFilter !== undefined && (typeof typeFilter !== 'string' || !Object.values(PostType).includes(typeFilter as PostType)))) {
+        res.status(400).json({ success: false, code: 'INVALID_POST_FILTER', error: 'Invalid post filter' });
+        return;
+      }
 
       // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1:
       //   My Posts 공통 query contract. 서비스별로 다른 query 이름을 만들지 않는다.
@@ -74,6 +81,8 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       // Forum filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      if (pinnedFilter !== undefined) queryBuilder.andWhere('post.isPinned = :pinnedFilter', { pinnedFilter: pinnedFilter === 'true' });
+      if (typeFilter !== undefined) queryBuilder.andWhere('post.type = :postTypeFilter', { postTypeFilter: typeFilter });
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
       if (forumId) {
         queryBuilder.andWhere('post.forumId = :forumId', { forumId });

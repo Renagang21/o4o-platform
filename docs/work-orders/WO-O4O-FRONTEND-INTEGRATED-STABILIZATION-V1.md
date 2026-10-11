@@ -16,7 +16,7 @@
 | T03 | 공급자·펀딩 UI | 제품 목록의 긴 작업 버튼 묶음·목록/상세/폼/상태의 모바일 가독성을 점검한다. content-only/B2B 경계와 기존 사업·승인 계약을 유지한다. |
 | T04 | 커뮤니티·강의·분회 UI | 현재 완성된 심사/탈퇴/회원 검색은 보존한다. 강의와 분회의 내부 목록·폼·표·조회 실패 상태를 점검한다. |
 | T05 | 서비스 이동 | 대표 홈·My Home·독립 서비스·내 매장의 기존 목적지/로그인 유지/재시도/직접 URL을 PC·mobile fixture와 공개 운영 화면으로 확인한다. 실계정은 T13이다. |
-| T06 | 약국 공지 | 회원 홈은 조회 20개 중 공지 3개를 표시한다. 실제 community mount의 공통 controller는 이미 고정 글 우선·작성일 내림차순으로 정렬한다. 오래된 고정 글을 신규 API로 다시 구현할 필요는 없다. 고정 글이 20개를 넘거나 비고정 announcement를 모두 노출하는 별도 정책은 미확정이다. |
+| T06 | 약국 공지 | 사용자 확정 기준은 고정 공지 최대 3개와 비고정 최근 공지 5개. 회원용 목록의 검증된 선택 필터로 각각 조회해 최근 글 20개 밖의 고정 공지도 유지하고 최근 공지가 고정 과다로 밀리지 않게 한다. |
 | T07 | 커뮤니티 공개 열람 | 목록 공개와 회원 콘텐츠 공개는 다르다. 공개 지정의 저장·읽기 정책을 먼저 확정한다. 기존 회원 자료를 자동 공개하지 않는다. |
 | T08 | 이력 보존 | 자기 탈퇴는 이미 배포됐다. 보존 기간·자동 삭제 결정은 별도이며 조사·검토안을 먼저 준비한다. 기간 확정 전 운영 이력을 삭제하지 않는다. |
 | T09 | 약관·개인정보 | 현행 본문·서비스 범위·인증 흐름 정합을 조사해 필요한 개정안과 발행 조건을 정리한다. 미확정 본문/버전을 운영에 발행하지 않는다. |
@@ -32,9 +32,9 @@
 - [x] T03 공급자·펀딩 대상 UI 조사·수정·PC/mobile 확인.
 - [x] T04 커뮤니티·강의·분회 현행/대상 UI 조사·수정·PC/mobile 확인.
 - [x] T05 My Home 직접 URL·대표 홈 연결·매장 통계 범위·조회 복구 fixture 회귀 검증. 실계정은 T13.
-- [x] T06 공지 실제 서버 계약 확인. 현행 고정 우선 유지·새 표시 정책은 별도 결정.
-- [ ] T07 공개 열람 기준·저장/읽기 계약 확정 및 적용.
-- [ ] T08 이력 보존 조사·검토안·확정 결과 적용.
+- [x] T06 사용자 확정 기준으로 고정 3개·최근 공지 5개 구현 및 pinned 과다·오래된 공지 회귀 PASS.
+- [x] T07 명시적 공개 저장·guest 목록/상세·운영 UI 구현 및 보안/API/UI 검증. 운영 반영은 T11.
+- [x] T08 보존 목적·기간·예외·삭제/비식별화·FK 검토 순서 준비. 사용자 결정에 따라 확정/삭제 적용은 후속이며 이번 삭제 0.
 - [x] T09 정책 정합 조사·기존 개정안/담당 작업·발행 조건 정리. 본문 게시 미실행.
 - [x] T10 폐기 WO 연계·최신 외부 blocker·담당 주체 확인. 실제 폐기는 관련 WO에서 계속 추적.
 - [ ] T11 tests/build/browser·문서 검사·push·CI/review·main·배포/smoke.
@@ -43,7 +43,7 @@
 
 ## 3. 안전 경계와 검증 구분
 
-공통 메뉴·Auth/Core·API·role·DB·migration·dependency·CI/배포 인프라 계약을 UI 표현 변경으로 확장하지 않는다. 현재 공통 소비처와 원장 경계를 정본문서로 확인한다. 넓은 표를 숨기거나 기능을 없애는 방식으로 모바일 표시를 해결하지 않는다. 합성 fixture PASS와 실제 운영 API/계정 검증은 구분한다. 사용자 테스트는 선행 코드 검증을 대체하지 않는다.
+UI 표현 변경으로 권한 계약을 확장하지 않는다. 별도 사용자 확정 정책에 따라 공개 읽기 API와 선택 필터를 추가하며 승인된 운영자의 명시적 공개 외에 회원 권한을 완화하지 않는다. DB schema/migration·dependency·CI/배포 인프라는 변경하지 않는다. 현재 공통 소비처와 원장 경계를 정본문서로 확인한다. 넓은 표를 숨기거나 기능을 없애는 방식으로 모바일 표시를 해결하지 않는다. 합성 fixture PASS와 실제 운영 API/계정 검증은 구분한다. 사용자 테스트는 선행 코드 검증을 대체하지 않는다.
 
 정본: [대표 홈](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md), [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md), [소비자 commerce 경계](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md), [B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md), [커뮤니티 후속](WO-O4O-COMMUNITY-REMAINING-TODO-V1.md), [PH 폐기 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md).
 
@@ -59,12 +59,12 @@
 
 공통 변경 조사: `packages/ui/src/layout/GlobalHeader.tsx`의 실제 서비스 소비처는 NetureGlobalHeader와 KpaGlobalHeader 두 곳이다. Neture 소비는 대표 사이트의 내부 화면·공급자·펀딩·커뮤니티이고 KPA 소비는 약국 서비스다. 둘 다 `@o4o/ui`의 dist export를 사용하므로 패키지 재빌드 후 소비 앱을 재빌드한다. 강의·분회·매장의 독자 헤더는 이 component를 사용하지 않는다. 공통 props·인증·권한·목적지 계약은 바꾸지 않는다.
 
-### 4.2 미확정 정책의 구체적인 후속 순서
+### 4.2 정책 조사·사용자 확정 결과
 
 | 항목 | 코드/정본 조사 | 후속 실행안·선행 조건 |
 | --- | --- | --- |
-| 공지 | `communities.routes.ts` → `createServiceForumRouter` → `ForumPostController.getPosts`: latest는 `isPinned DESC, createdAt DESC` 후 pagination. 회원 홈은 이 결과에서 pinned/announcement를 3개 선택 | 현행 고정 우선 기준은 유지. 비고정 공지 전용 조회나 고정 글 20개 초과 정책을 요구하면 별도 읽기 계약과 권한 회귀부터 준비 |
-| 공개 열람 | 커뮤니티 목록은 공개지만 회원 forum mount는 workspace.allowed를 검사. 전체 계정 인증 제거는 기존 회원 자료 공개로 이어질 수 있음 | 공개 지정 단위(게시판/글)·운영자 지정 권한·폐쇄 게시판 상속·목록/상세/첨부/검색/댓글 읽기 경계를 먼저 확정. 명시적 공개 대상만 guest 읽기 지원 후 비공개 접근/ID 추측/글쓰기 회귀. 기존 글을 일괄 공개하지 않음 |
+| 공지 | `communities.routes.ts` → `createServiceForumRouter` → `ForumPostController.getPosts`: latest는 `isPinned DESC, createdAt DESC` 후 pagination. 사용자 결정 후 선택 필터 isPinned/type을 추가 | pinned=true limit=3, pinned=false type=announcement limit=5로 분리. 기존 회원 스코프/폐쇄 게시판 guard 유지 및 최근 공지 회귀 PASS |
+| 공개 열람 | 커뮤니티 목록은 공개지만 회원 forum mount는 workspace.allowed를 검사. 전체 계정 인증 제거는 기존 회원 자료 공개로 이어질 수 있음 | 사용자 명시적 공개 기준 확정. 활성 독립 커뮤니티 운영자가 열린 게시판 전체/선택한 글 지정·철회. 별도 guest 목록/상세는 같은 SQL 조건·콘텐츠 응답 whitelist 사용. 비공개/직접 URL/권한/댓글·쓰기 차단 회귀 PASS. 기존 글 자동 공개 0 |
 | 이력 보존 | `community_membership_changes`는 role/status/action/actor/reason의 변경 증빙을 저장. 현행 privacy retention의 6개 대상 테이블에는 포함되지 않음 | 변경 이력과 개인정보 접속기록을 동일 기간으로 추정하지 않음. 목적·종결 기준 시각·보유기간·분쟁/법정 보존 예외·삭제/비식별화 방식 확정 → FK와 재가입/운영자 보호 대조 → 건수만 dry-run → 검증된 집행. 이번에는 삭제·job 추가 없음 |
 | 약관/개인정보 | [관련 개정안 PR #457](https://github.com/Renagang21/o4o-platform/pull/457)에 Neture 공통 계정 본문·서비스별 신청 조건·전역 동의 gate 차이·공고/시행 문제의 구체적 초안이 이미 있음 | 그 작업을 재사용하고 중복 초안을 발행하지 않음. 공개 v1 권리·위탁/국외처리 조항 대조, 실제 수신정보와 문서 version/hash 증빙, 공통/서비스 gate 분리 검증, 공고 기간·시행일 확정 후 새 draft 등록/게시. Git merge·웹 배포는 정책 DB 게시와 별개 |
 
@@ -82,9 +82,25 @@
 - 공통 packages build와 Neture·Pharmacy·Store·Lecture·Branch 앱 build PASS. 마지막 표현 변경 후 해당 앱을 다시 빌드한다.
 - 현재 번들의 PC 1440·mobile 390/320 브라우저 21개 및 추가 QR/약국 회원 홈/공급자 운영 허브 9개 PASS. 표 내부 스크롤, 오류 재시도, 긴 제목, 작업 버튼, 문서 overflow를 확인했다. My Home 1440/375/320의 9개 fixture E2E PASS.
 - 변경 TS/TSX ESLint error 0. SupplierProducts의 기존 useMemo dependency warning 1개는 이번 표현 수정과 무관하며 따로 고치지 않았다. 문서 민감정보 검사·diff whitespace PASS.
-- 최신 main의 공급자 SQL 수정 #454는 충돌 없이 기준으로 통합했다. 별도 API 구현은 이번 frontend 변경에 포함하지 않는다.
-- push·PR·required CI/review·main·배포는 아직 진행 전이며 완료 결과로 갱신한다.
+- 최신 main의 공급자 SQL 수정 #454는 충돌 없이 기준으로 통합했다. 사용자 확정 후 별도 공개 읽기 API와 공지 필터를 같은 통합 작업에 포함했다.
+- UI 및 소비처 CHECK를 push한 PR #458의 CI Gate/CodeQL/SonarCloud가 통과했고 소비처 표에 관한 P1 thread는 해결했다. 이후 #451의 main 병합으로 충돌이 확인되어 사용자 확정 공지·공개 열람을 함께 반영하고 최신 main 동기화·최종 CI/review를 다시 수행한다. main/운영 배포는 아직 진행 전이다.
 
 상태는 최종 사용자 테스트와 미확정 선행 조건이 남은 동안 ACTIVE를 유지한다.
 
 WORKTREE_DISPOSITION: `wo/frontend-integrated-stabilization` / `/workspace/o4o-wt/frontend-integrated-stabilization`, base `cba664e1e`, KEEP — 구현·통합·배포·최종 사용자 테스트가 남아 있다. 이전 작업공간은 삭제하지 않는다.
+
+## 5. 사용자 결정 반영 · 같은 WO의 후속 phase
+
+2026-10-11 사용자 답변: 공지는 고정 최대 3개와 최근 공지 목록을 분리한다(최근 5개로 시작). 공개 읽기는 운영자가 명시적으로 지정한 게시판/글만 허용한다. 보존·법률 정책은 조사·개정안 후 확정한다.
+
+UI PR #458에 이 WO의 공지·공개 정책 후속 phase를 함께 반영하고 같은 branch/worktree에서 최종 검증·통합한다. 새 독립 작업이나 과거 완료 worktree 재사용이 아니다.
+
+- [x] T06 고정 3개·비고정 최근 공지 5개 조회를 분리하고 pinned 과다/오래된 공지/실패·재시도 회귀.
+- [x] T07 저장 계약: 기존 게시판 metadata에 운영자의 명시적 공개 설정만 저장. 기본 private, 게시판 전체 공개 또는 선택한 게시글 공개; 폐쇄 게시판·미승인/폐기 커뮤니티·draft/삭제/조직 전용 글 제외.
+- [x] T07 공개 조회: 회원용 endpoint·승인 gate를 유지하고 별도 읽기 전용 endpoint 사용. 작성자 개인정보·원본 metadata·회원 댓글/활동/쓰기 API를 공개 조회에 포함하지 않음. UUID/slug 직접 URL에도 같은 조건 적용.
+- [x] T07 운영 UI: 해당 커뮤니티 운영자만 공개 범위 지정/철회. 기존 회원 게시판과 공개 열람 화면을 연결하고 공개 글이 없거나 회수됐을 때 안내/복구 상태 표시.
+- [ ] 보안·API·UI·모바일 회귀 → 통합 PR #458 최종 CI/review → main/필요한 통제 배포 → 공개 운영 smoke. 실계정 사용자 테스트는 모두 끝난 뒤 T13.
+
+### 5.1 확정 정책 구현 검증
+
+공개 읽기/기존 member mount·scope isolation API 56 tests, 공개 읽기/공지 필터 24 tests PASS. Neture 전체 500 tests와 Pharmacy 회원 홈 16 tests PASS. API·Neture·Pharmacy 최종 build PASS. 실제 번들 및 모의 API의 공개 목록/상세·철회 후 404·운영 설정/폐쇄 게시판 제한·약국 공지 PC 1440/mobile 390/320 9개 PASS. 고정 공지가 20개 이상이어도 최근 공지 5개를 별도 조회한다. 실제 운영 공개 지정이나 회원 DB 변경은 수행하지 않았다.
