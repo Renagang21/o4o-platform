@@ -51,3 +51,13 @@ test('a query error still rolls back and never returns partial paths', async () 
   } }));
   assert.equal(calls.at(-1), 'ROLLBACK');
 });
+
+
+test('sanitizing a known database error twice preserves only its allowlisted code', () => {
+  const first = safeInventoryError({ code: '42501', message: 'private row', detail: 'private secret' }, 'retirement-inventory');
+  const second = safeInventoryError(first, 'retirement-census');
+  assert.match(second.message, /code=42501/);
+  assert.equal(second.code, '42501');
+  assert.doesNotMatch(second.stack, /private/);
+  assert.equal(second.detail, undefined);
+});
