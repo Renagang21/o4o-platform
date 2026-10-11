@@ -149,8 +149,9 @@ PharmacyHub와 K-Cosmetics는 현재 폐기/퇴역 정책이 우선이므로 운
 - [x] 필요한 API/웹 회귀·빌드·desktop/mobile fixture browser 검증
 - [x] 사용자 직접 테스트와 미실행 정책 항목을 CHECK에 기록
 - [x] 구현·검증 변경 push (PR #487)
-- [ ] 최종 HEAD 필수 CI·review·정상 main 병합·post-merge CI 확인
-- [ ] 필요한 서비스 배포·서빙 확인 (PH 퇴역 WIF 인증 제한 해제 및 정상 Delivery gate 확인 필요)
+- [x] 최종 PR HEAD 필수 CI·review·정상 main 병합 (PR #487, main `0cb0080e1f`)
+- [x] post-merge CI 확인 (main `0cb0080e1f`, CI 38146913021 SUCCESS)
+- [ ] 필요한 서비스 배포·서빙 확인 — Delivery 38147499593의 WIF attribute condition 거절로 차단, API·웹 배포 SKIPPED. PH 단독 작업 창 종료·원래 WIF 조건 복원 후 현재 main 기준 정상 Delivery/Promote 재개가 필요하다.
 
 신규 schema·migration·운영 DB 테스트 write·새 금융/제재 정책·미정 workspace 신설 없이 현재 업무를 정비한다. 새 정책이 필요한 항목은 구체적인 조사 근거와 결정안을 남기고 독립적으로 진행 가능한 결함부터 수정한다.
 
