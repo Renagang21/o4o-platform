@@ -128,6 +128,14 @@ Actions artifact와 job log 다운로드는 클라우드 목적지 제한으로 
 
 이번 배포 결과를 확정하는 후속 문서 PR은 같은 미완료 WO의 연속 Phase다. 문서만 변경하므로 `DEPLOYMENT = NOT_APPLICABLE`이며 새 문서 commit과 위 runtime target을 구분한다.
 
+## 연속 Phase: 기록 조회·경영 추이 (2026-10-11)
+
+- 최신 main `c4db284f2d05d9591e0079d88885e517e222cb19`를 확인해 같은 미완료 WO branch에 반영했다. 다른 세션 checkout은 변경하지 않는다.
+- 알림 서버 page/limit/isRead 조회와 내 글 `author=me` 페이지, QR 반환 날짜만 사용하는 그래프, 계정별 선택 매장 보조 정보를 개선한다. 새로운 API·권한·DB·공유 패키지·dependency·CI 변경은 없다.
+- 집중 테스트 13개 PASS: 기존 본인/매장 scope·오류 재시도·계정 변경·알림 페이지/필터 및 늦은 응답·실패 envelope·내 글 임시 저장/빈 후속 페이지·그래프 날짜 정렬/0·잘못된 날짜/음수 거부·동일 계정 선택 유지/타 계정 및 제거된 매장 무효화.
+- 초기 집중 실행은 강화한 envelope 검증과 예전 fixture 불일치로 4개 실패했다. 성공 플래그·알림 pagination을 실제 서버 계약에 맞춰 fixture에 추가한 뒤 전체 집중 테스트가 통과했다. 검증 기준을 낮추지 않았다.
+- 전체 회귀·build·PC/모바일·PR·main·운영 배포는 실행 결과에 따라 아래에 확정한다. 실제 계정 문서는 작업·기준 checkout에 없으며 AUTHENTICATED PENDING을 유지한다.
+
 ## WORKTREE_DISPOSITION
 
 - worktree: `/workspace/o4o-wt/my-home-document-alignment`

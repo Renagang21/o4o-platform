@@ -13,6 +13,12 @@ const stores = [
     name: "화면 검증 매장",
     memberRole: "owner",
   },
+  {
+    serviceKey: "kpa-society",
+    organizationId: "fixture-store-second",
+    name: "두 번째 검증 매장",
+    memberRole: "owner",
+  },
 ];
 const community = {
   communityKey: "fixture-community",
@@ -123,51 +129,70 @@ async function prepare(page: Page) {
     } else if (path === "/communities") data = { communities: [community] };
     else if (path === "/communities/operating") data = { communities: [] };
     else if (path === "/notifications/unread-count") data = { count: 2 };
-    else if (path === "/notifications")
+    else if (path === "/notifications") {
+      const current = Number(url.searchParams.get("page"));
+      const limit = Number(url.searchParams.get("limit"));
+      const records = Array.from({ length: 11 }, (_, i) => ({
+        id: `fixture-notice-${i}`,
+        title: i === 0 ? "참여 상태 알림" : `검증 알림 ${i}`,
+        isRead: i % 2 === 1,
+        createdAt: "2026-10-01T00:00:00Z",
+      })).filter(
+        (item) =>
+          !url.searchParams.has("isRead") ||
+          item.isRead === (url.searchParams.get("isRead") === "true"),
+      );
       data = {
-        notifications: [
-          {
-            id: "fixture-notice",
-            title: "참여 상태 알림",
-            isRead: false,
-            createdAt: "2026-10-01T00:00:00Z",
-          },
-        ],
-        total: 1,
-        page: 1,
-        limit: 5,
-        totalPages: 1,
-        hasMore: false,
+        notifications: records.slice((current - 1) * limit, current * limit),
+        total: records.length,
+        page: current,
+        limit,
+        totalPages: Math.ceil(records.length / limit),
+        hasMore: current * limit < records.length,
       };
-    else if (path === "/communities/fixture-community/forum/posts")
+    } else if (path === "/communities/fixture-community/forum/posts")
       return route.fulfill({
         json: {
           success: true,
-          data: [
-            {
-              id: "fixture-post",
-              slug: "fixture-post",
-              title: "내가 작성한 글",
-              status: "publish",
-              createdAt: "2026-10-01T00:00:00Z",
-            },
-          ],
-          total: 1,
+          data: Array.from({ length: 11 }, (_, i) => ({
+            id: `fixture-post-${i}`,
+            slug: `fixture-post-${i}`,
+            title: i === 0 ? "내가 작성한 글" : `검증 작성 글 ${i}`,
+            status: i === 10 ? "draft" : "publish",
+            createdAt: "2026-10-01T00:00:00Z",
+          })).slice(
+            (Number(url.searchParams.get("page")) - 1) *
+              Number(url.searchParams.get("limit")),
+            Number(url.searchParams.get("page")) *
+              Number(url.searchParams.get("limit")),
+          ),
+          total: 11,
         },
       });
     else if (path === "/kpa/pharmacy/analytics/marketing") {
       if (
-        route.request().headers()["x-store-organization-id"] !== "fixture-store"
+        !stores.some(
+          (store) =>
+            store.organizationId ===
+            route.request().headers()["x-store-organization-id"],
+        )
       )
         throw new Error("Missing selected store scope");
       if (failStats)
         return route.fulfill({ status: 503, json: { success: false } });
       data = {
         totalScans: 100,
-        todayScans: 7,
+        todayScans:
+          route.request().headers()["x-store-organization-id"] ===
+          "fixture-store-second"
+            ? 9
+            : 7,
         weeklyScans: 30,
         activeQrCount: 4,
-        dailyScans: [{ date: "2026-10-01", count: 7 }],
+        dailyScans: [
+          { date: "2026-10-01", count: 0 },
+          { date: "2026-10-03", count: 7 },
+        ],
       };
     } else if (path.endsWith("/footer-legal")) data = {};
     return route.fulfill({ json: { success: true, data } });
@@ -336,4 +361,83 @@ test("statistics keep the selected store scope and recover from a failed read", 
     .getByRole("button", { name: "다시 불러오기", exact: true })
     .click();
   await expect(page.locator("dd").filter({ hasText: /^7$/ })).toBeVisible();
+});
+test("notification history pages and server filters remain usable on mobile", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.goto("/mypage");
+  const notices = page.locator("#my-home-notifications");
+  await expect(notices.getByText("검증 알림 4", { exact: true })).toBeVisible();
+  await expect(notices.getByText("검증 알림 5", { exact: true })).toHaveCount(
+    0,
+  );
+  await notices.getByRole("button", { name: "알림 전체보기" }).click();
+  await notices.getByRole("button", { name: "다음", exact: true }).click();
+  await expect(
+    notices.getByText("검증 알림 10", { exact: true }),
+  ).toBeVisible();
+  await notices.getByLabel("알림 상태").selectOption("unread");
+  await expect(
+    notices.getByText("참여 상태 알림", { exact: true }),
+  ).toBeVisible();
+  await expect(notices.getByText("검증 알림 1", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(
+    notices.getByRole("button", { name: "다음", exact: true }),
+  ).toBeDisabled();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true);
+});
+test("community history keeps own drafts and pages inside My Home", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.goto("/mypage/activity");
+  const community = page.getByRole("region", {
+    name: "화면 검증 커뮤니티 내 글",
+  });
+  await expect(
+    community.getByText("검증 작성 글 9", { exact: true }),
+  ).toBeVisible();
+  await community.getByRole("button", { name: "다음", exact: true }).click();
+  await expect(
+    community.getByText("검증 작성 글 10", { exact: true }),
+  ).toBeVisible();
+  await expect(community.getByText("임시 저장", { exact: true })).toBeVisible();
+  await expect(
+    community.getByRole("link", { name: "검증 작성 글 10" }),
+  ).toHaveAttribute(
+    "href",
+    "/communities/fixture-community/forum/post/fixture-post-10",
+  );
+});
+test("management preserves selected store between views and plots returned dates only", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.goto("/mypage");
+  await page.getByLabel("통계를 볼 매장").selectOption("fixture-store-second");
+  await expect(page.locator("dd").filter({ hasText: /^9$/ })).toBeVisible();
+  await page.getByRole("link", { name: "매장 방문 통계 더 보기 →" }).click();
+  await expect(page.getByLabel("통계를 볼 매장")).toHaveValue(
+    "fixture-store-second",
+  );
+  const trend = page.getByRole("region", { name: "일별 QR 방문 추이" });
+  await expect(trend.getByText("0건", { exact: true })).toBeVisible();
+  await expect(trend.getByText("7건", { exact: true })).toBeVisible();
+  await expect(trend.getByText("10-02", { exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByLabel("통계를 볼 매장")).toHaveValue(
+    "fixture-store-second",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth + 1,
+    ),
+  ).toBe(true);
 });
