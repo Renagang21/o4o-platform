@@ -206,3 +206,33 @@ describe('ordinary forum lifecycle metadata updates', () => {
     expect(query.mock.calls[0][1]).toEqual([boardId, 'community:fixture', JSON.stringify({ reviewedBy: actor.id }), status]);
   });
 });
+
+
+describe('withdrawal with stale retained selected posts', () => {
+  const other = '33333333-3333-4333-8333-333333333333';
+  const added = '44444444-4444-4444-8444-444444444444';
+  const current = signPublicReadDesignation('fixture', boardId, { ...designation, mode: 'selected', postIds: [postId, other] }, fixtureSecret);
+  it('withdraws one public ID even if the retained ID is now deleted/draft/archived; private read predicates still apply', async () => {
+    query.mockResolvedValueOnce([{ id: boardId, forumType: 'open', publicRead: current }]).mockResolvedValueOnce([]);
+    await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'selected', postIds: [other] }))
+      .resolves.toEqual({ mode: 'selected', postIds: [other] });
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[1][0]).toContain('UPDATE forum_category_requests');
+    const stored = JSON.parse(query.mock.calls[1][1][1]);
+    expect(stored.postIds).not.toContain(postId);
+    expect(hasAuthenticPublicReadDesignation('fixture', boardId, stored, fixtureSecret)).toBe(true);
+  });
+  it('rejects an invalid newly added ID even alongside retained valid proof IDs', async () => {
+    query.mockResolvedValueOnce([{ id: boardId, forumType: 'open', publicRead: current }]).mockResolvedValueOnce([]);
+    await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'selected', postIds: [other, added] }))
+      .rejects.toMatchObject({ code: 'INVALID_PUBLIC_POST_IDS' });
+    expect(query.mock.calls[1][1]).toEqual([[added], boardId]);
+    expect(query).toHaveBeenCalledTimes(2);
+  });
+  it('unsigned historical IDs cannot bypass validation as retained selections', async () => {
+    query.mockResolvedValueOnce([{ id: boardId, forumType: 'open', publicRead: { mode: 'selected', postIds: [other] } }]).mockResolvedValueOnce([]);
+    await expect(setCommunityPublicRead({ query }, 'fixture', actor, boardId, { mode: 'selected', postIds: [other] }))
+      .rejects.toMatchObject({ code: 'INVALID_PUBLIC_POST_IDS' });
+    expect(query.mock.calls[1][1]).toEqual([[other], boardId]);
+  });
+});

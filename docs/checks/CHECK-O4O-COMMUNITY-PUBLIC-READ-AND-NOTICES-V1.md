@@ -45,3 +45,5 @@ main/CI/review·운영 배포·공개 read-only smoke는 통합 WO에 최종 기
 최종 focused API 6 suites 109 tests PASS. 격리 PostgreSQL 15에서 실제 service/HMAC/원자 병합 helper를 실행해 unsigned legacy·복사/변조 서명·타 scope 거부, list/detail/date alias, 게시판별 chooser, 철회 후 stale proof 재주입 거부·기타 metadata 보존을 확인했다. 합성 임시 테이블 transaction rollback 후 해당 격리 DB만 종료했으며 운영 DB 쓰기는 없었다.
 
 후속 API build·변경 파일 ESLint PASS. 추가로 공통 controller의 raw-source 소비 계약을 포함하는 community catalog/access 31 tests PASS. 문서 민감정보 검사 3852 files 0건 및 diff whitespace 검사 PASS.
+
+후속 P1: 기존 선택 B가 삭제/archived/draft로 바뀌어도 공개된 A의 선택 해제가 거절되지 않도록, locked board의 현재 서명이 유효한 기존 selected ID와 새 추가 ID를 구분한다. 새 추가 ID는 기존과 같은 게시판/published/non-org 조건을 검증하며, 기존 선택은 자동 삭제하지 않는다. 현재 읽기 predicate는 유효하지 않은 기존 글을 계속 제외하고 A를 해제해 저장하면 UUID/slug 직접 열람도 철회된다. unsigned legacy ID는 기존 선택으로 신뢰하지 않는다. focused API 112 tests PASS; 격리 PostgreSQL에서 draft/archived/deleted 세 경우의 A 철회·B 비노출·유효하지 않은 신규 ID 거부 PASS.

@@ -110,18 +110,24 @@ export async function setCommunityPublicRead(exec: Exec, key: string, user: Comm
   if (!UUID.test(boardId)) throw new CommunityPublicReadError(400, 'INVALID_BOARD_ID', '유효한 게시판을 선택해 주세요.');
   const selection = parsePublicReadInput(input);
   const value = await workspace(exec, key, user, true);
-  const [board] = await exec.query(`SELECT id, forum_type AS "forumType" FROM forum_category_requests
+  const [board] = await exec.query(`SELECT id, forum_type AS "forumType", metadata->'${PUBLIC_READ_KEY}' AS "publicRead" FROM forum_category_requests
     WHERE id = $1::uuid AND service_code = ANY($2::text[]) AND status = 'completed'
       AND organization_id IS NULL FOR UPDATE`, [boardId, value.forumStorageCodes]);
   if (!board) throw new CommunityPublicReadError(404, 'BOARD_NOT_FOUND', '게시판을 찾을 수 없습니다.');
   if (board.forumType !== 'open' && selection.mode !== 'private') {
     throw new CommunityPublicReadError(400, 'CLOSED_BOARD_PRIVATE', '폐쇄 게시판은 비로그인 공개할 수 없습니다.');
   }
-  if (selection.postIds.length) {
+  // A stale retained selection must not prevent withdrawing another post.
+  // Only an authentic current designation can supply retained IDs; newly added IDs
+  // still require a published, non-organization post in this same board.
+  const previous = hasAuthenticPublicReadDesignation(value.communityKey, boardId, board.publicRead, process.env.JWT_SECRET)
+    && board.publicRead.mode === 'selected' ? new Set<string>(board.publicRead.postIds) : new Set<string>();
+  const addedIds = selection.postIds.filter(id => !previous.has(id));
+  if (addedIds.length) {
     const valid = await exec.query(`SELECT id FROM forum_post WHERE id = ANY($1::uuid[])
       AND forum_id = $2::uuid AND status = 'publish' AND organization_id IS NULL
-      AND is_organization_exclusive = false FOR SHARE`, [selection.postIds, boardId]);
-    if (valid.length !== selection.postIds.length) {
+      AND is_organization_exclusive = false FOR SHARE`, [addedIds, boardId]);
+    if (valid.length !== addedIds.length) {
       throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_POST_IDS', '게시판 안의 게시된 글만 공개할 수 있습니다.');
     }
   }

@@ -140,3 +140,5 @@ focused API 6 suites 109 tests PASS 및 격리 PostgreSQL 실제 소스 실행�
 ### 통합 대기 중 외부 작업 최신화
 
 main #459 PH 자원 제거 도구 및 #465 plan 결과 문서를 통합했다. 읽기 전용 plan은 성공했으나 실제 삭제는 누락 IAM 권한 3개 보완 전 대기다. 이 세션은 해당 apply/권한 변경을 실행하지 않는다. main #463 점검 SQL collation 수정과 #466 기존 승인된 매장 검증 복사본 정리 phase 종료 문서를 통합했다. 이는 활성 서비스 UI나 공개 정책을 바꾸지 않는 담당 작업의 결과이며, 사용자 실계정 테스트를 대체하지 않는다. 이 세션의 추가 검증은 자원 안전 테스트 18 PASS, 복사본 점검 테스트 4 PASS·격리 DB 의존 1 SKIP이다. 최신 main 통합마다 최종 HEAD의 required CI를 다시 확인한다.
+
+후속 P1: 기존 선택 B가 삭제/archived/draft로 바뀌어도 공개된 A의 선택 해제가 거절되지 않도록, locked board의 현재 서명이 유효한 기존 selected ID와 새 추가 ID를 구분한다. 새 추가 ID는 기존과 같은 게시판/published/non-org 조건을 검증하며, 기존 선택은 자동 삭제하지 않는다. 현재 읽기 predicate는 유효하지 않은 기존 글을 계속 제외하고 A를 해제해 저장하면 UUID/slug 직접 열람도 철회된다. unsigned legacy ID는 기존 선택으로 신뢰하지 않는다. focused API 112 tests PASS; 격리 PostgreSQL에서 draft/archived/deleted 세 경우의 A 철회·B 비노출·유효하지 않은 신규 ID 거부 PASS.
