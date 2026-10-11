@@ -29,6 +29,13 @@ it.each(['입금 확인 취소', '환불 완료 기록'])('%s preserves amount/r
   expect(save.mock.calls[0][1]).toEqual({ paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: '테스트 사유' });
 });
 
+it.each(['입금 확인 취소', '환불 완료 기록'])('%s with no reason clears the obsolete confirmation note', async action => {
+  render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: action }));
+  fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
+  await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+  expect(save.mock.calls[0][1]).toEqual({ paymentStatus: action === '입금 확인 취소' ? 'unpaid' : 'refunded', paymentNote: null });
+});
+
 it('a refunded record can be reconfirmed and cleared note/reference are explicit null', async () => {
   render(<FundingParticipantsSection {...props()} participants={[{ ...participant, paymentStatus: 'refunded' }]} />);
   fireEvent.click(screen.getByRole('button', { name: '수기 송금 확인' }));

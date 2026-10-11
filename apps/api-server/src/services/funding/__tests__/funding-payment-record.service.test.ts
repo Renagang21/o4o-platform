@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { ActionLog } from '@o4o/action-log-core';
+import { prepareValue } from 'pg/lib/utils.js';
 import { FundingPaymentRecordService, validatePaymentRecord } from '../funding-payment-record.service.js';
 
 const original = { id: 'participant', paymentStatus: 'paid', paidAmount: '12000.00', paymentReference: 'fixture-private-reference', paymentNote: 'fixture-private-note', paidAt: new Date('2026-10-01T00:00:00Z'), confirmedAt: new Date('2026-10-02T00:00:00Z') };
@@ -66,7 +67,6 @@ describe('offline payment record and audit transaction', () => {
   it('binds private text with node-postgres while masking TypeORM query parameters', async () => {
     await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paymentReference: original.paymentReference, paymentNote: original.paymentNote });
     const values = manager.query.mock.calls[1][1];
-    const { prepareValue } = require('pg/lib/utils');
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentReference);
     expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentNote);
     expect(JSON.stringify(values)).not.toContain(original.paymentReference);

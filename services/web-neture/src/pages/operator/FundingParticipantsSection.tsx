@@ -45,7 +45,7 @@ export default function FundingParticipantsSection(props: Props) {
       paymentStatus: 'paid', paymentMethod: 'manual_transfer', paymentProvider: 'internal',
       paidAmount: form.amount.trim() ? Number(form.amount) : null,
       paymentReference: form.reference.trim() || null, paymentNote: form.note.trim() || null,
-    } : { paymentStatus: form.action === 'refund' ? 'refunded' : 'unpaid', ...(form.note.trim() ? { paymentNote: form.note.trim() } : {}) };
+    } : { paymentStatus: form.action === 'refund' ? 'refunded' : 'unpaid', paymentNote: form.note.trim() || null };
     if (await props.onPaymentStatusChange(p, input)) setForm(null);
   };
   const paymentVisible = ['recruiting', 'development', 'outcome_confirming', 'fulfilled', 'closed'].includes(props.trialStatus);

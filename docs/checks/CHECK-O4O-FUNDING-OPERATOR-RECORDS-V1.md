@@ -11,7 +11,7 @@ funding admin/operator의 현재 동일 업무 권한을 유지한다. 서비스
 | 항목 | 검증 |
 |---|---|
 | API 회귀 | 최신 main 통합 후 funding·Neture dashboard·공급자/공개 origin 경계 11 suites, 221 tests PASS. 최종 query parameter 마스킹 보강 후 payment service 30 tests 추가 실행 PASS. 실제 TypeORM transaction orchestration과 mock query runner를 사용해 감사 실패 시 rollback/commit 미실행을 검증했다. 실 DB lock 경쟁 검증은 아님. |
-| 웹 회귀 | Neture 66 files, 546 tests PASS. 최종 이행 처리 중 필터·CSV 잠금 보강 후 운영 화면 3 files, 16 tests 추가 PASS(늦은 초기 KPI 응답과 빈 금액 null 정정 포함). 정정 실패 입력 유지, 환불 재확인, 최초 확인일 미전송, route 변경 후 이전 응답 무시, 입금/이행 필터·CSV 일치, 조회 error/retry 포함. |
+| 웹 회귀 | Neture 66 files, 546 tests PASS. 최종 이행 처리 중 필터·CSV 잠금 보강 후 운영 화면 3 files, 18 tests 추가 PASS(늦은 초기 KPI 응답과 빈 금액·취소/환불 사유 null 정정 포함). 정정 실패 입력 유지, 환불 재확인, 최초 확인일 미전송, route 변경 후 이전 응답 무시, 입금/이행 필터·CSV 일치, 조회 error/retry 포함. |
 | 빌드 | API TypeScript production build, Neture TypeScript + Vite production build PASS. Neture의 기존 large chunk 경고는 비차단. |
 | 데이터·감사 | 동일 participant+trial row lock, UPDATE와 action_logs insert 단일 transaction. 감사 금액·상태는 실제 RETURNING 값 사용. paymentReference/paymentNote 원문은 감사와 이번 구현의 application log에 기록하지 않음. node-postgres 실제 binding 값은 유지하며 TypeORM query parameter JSON 출력은 마스킹한다. |
 | CSV | 화면 조건을 그대로 적용. 최초/마지막 확인일 별도 컬럼. 문자열 quoting·formula 방어, UTF-8 파일명. |
@@ -35,3 +35,5 @@ funding admin/operator의 현재 동일 업무 권한을 유지한다. 서비스
 통합 기준: 초기 main `765c082d03`에서 시작했으며, 첫 push 전 최신 main `71c267ac877a93d2851b3f78afb8cdd60b852b79`으로 미게시 branch를 rebase했다. 작업 대상 파일과의 충돌은 없었다.
 
 PR 리뷰의 빈 금액 정정 누락(P2)을 반영했다. 금액을 지우면 paidAmount=null로 저장하고, 확인 취소/환불은 기존 금액 보존을 유지한다. 최신 UI 16 tests와 production build, desktop/mobile 10개 fixture 브라우저 모두 PASS.
+
+재리뷰 P2(빈 취소 사유가 과거 확인 메모를 보존함)를 수정했다. reset/refund의 빈 사유는 paymentNote=null이며 금액/참조/최초 확인일은 보존한다. 최종 UI 18 tests·빌드·fixture browser 10개 PASS. CI `38132094441`은 API Jest 세 묶음과 Sonar(`6159441`, duplication 0.0%)가 통과했지만 새 테스트의 require import 1건으로 lint가 실패했다. ES import로 수정한 뒤 payment service 30 tests 및 lint ratchet 실측 46 errors = 기존 baseline 46으로 PASS. baseline·검사 범위를 변경하지 않았다. 최종 HEAD의 CI/Sonar는 재실행 결과를 별도로 기록한다.

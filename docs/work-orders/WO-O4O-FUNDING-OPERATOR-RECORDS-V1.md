@@ -73,3 +73,5 @@
 입금 합계 KPI 조회에도 독립 최신 요청 채널을 적용해 초기 조회의 늦은 응답이 변경 후 합계를 덮어쓰지 않게 했으며 운영 화면 회귀 15 tests 및 웹 production build PASS.
 
 PR 리뷰 P2(금액 빈 입력을 생략해 이전 금액이 남음)를 수정해 명시적 null 정정을 제공했다. API의 null 금액 감사 회귀는 유지하며 UI 회귀 16 tests·빌드·브라우저 10개 재검증 PASS.
+
+재리뷰 P2의 빈 취소·환불 사유도 명시적 null로 수정했다(UI 18 tests·빌드·browser 10개 PASS). CI에서 지적된 테스트 require import 1건을 ES import로 바꿨으며 payment 30 tests와 lint ratchet(46 = 기존 baseline 46) PASS. 게이트 규칙·baseline은 수정하지 않았다.
