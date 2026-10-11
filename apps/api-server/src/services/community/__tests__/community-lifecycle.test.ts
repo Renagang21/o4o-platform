@@ -341,6 +341,7 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
     const svc = new CommunityLifecycleService({
       query: async (sql: string, params: unknown[]) => {
         calls.push({ sql, params });
+        if (sql.includes('COUNT(*)')) return [{ total: 1 }];
         return [
           {
             id: 'm1',
@@ -355,7 +356,8 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
         ];
       },
     } as any);
-    const rows = await svc.listMembershipsForReview({ communityId: 'c1', status: 'pending' });
+    const { memberships: rows, pagination } = await svc.listMembershipsForReview({ communityId: 'c1', status: 'pending' });
+    expect(pagination).toEqual({ page: 1, pageSize: 20, total: 1, totalPages: 1 });
     expect(calls[0].params).toEqual(['c1', COMMUNITY_SERVICE_KEY, 'pending']);
     expect(calls[0].sql).toMatch(/WHERE cm\.community_id = \$1 AND cm\.status = \$3/);
     expect(calls[0].sql).not.toMatch(/'pending'/);

@@ -27,11 +27,12 @@ const tx = {
   query: async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
+    if (s.startsWith('SELECT COUNT(*)::int AS total FROM community_memberships')) return [{ total: rows.filter(r => r.community_id === p[0] && ['active', 'suspended'].includes(r.status)).length }];
     if (s.startsWith('SELECT cm.id AS membership_id')) {
       if (demoLookupFails) throw new Error('db down');
-      expect(p).toEqual([C1, 'community', 'neture']);
+      expect(p).toEqual([C1, 'community', 'neture', 20, 0]);
       expect(s).toContain('da.is_active');
-      return rows.filter(r => r.community_id === p[0] && ['active', 'suspended'].includes(r.status)).map(r => ({
+      return rows.filter(r => r.community_id === p[0] && ['active', 'suspended'].includes(r.status)).slice(p.at(-1), p.at(-1) + p.at(-2)).map(r => ({
         membership_id: r.id, user_id: r.user_id, role: r.role, status: r.status,
         user_name: '테스트 회원', user_email: null, service_status: service[r.user_id] ?? null,
         account_status: 'active', account_active: true, email_verified: mainStatus[r.user_id] !== 'pending',
@@ -171,13 +172,13 @@ it('메인 이용이 정지된 회원은 운영자로 지정하지 않는다', a
 });
 
 describe('서버 지정 후보 자격 안내', () => {
-  it('회원 수가 늘어도 조회는 두 쿼리로 끝나고 행 잠금·쓰기 없이 자격을 판정한다', async () => {
+  it('회원 수가 늘어도 조회는 세 쿼리와 20개 행으로 제한되고 행 잠금·쓰기 없이 자격을 판정한다', async () => {
     rows = Array.from({ length: 1000 }, (_, i) => ({ id: `m${i}`, community_id: C1, user_id: `u${i}`, role: 'member', status: 'active' }));
     service = Object.fromEntries(rows.map(r => [r.user_id, 'active']));
     demoUsers = ['u1']; mainStatus['u2'] = 'suspended';
     const { members } = await svc().listMembers(C1);
-    expect(members).toHaveLength(1000);
-    expect(sql).toHaveLength(2);
+    expect(members).toHaveLength(20);
+    expect(sql).toHaveLength(3);
     expect(sql.every(s => s.startsWith('SELECT') && !s.includes('FOR UPDATE'))).toBe(true);
     expect(members[0].designationEligibility.eligible).toBe(true);
     expect(members[1].designationEligibility.code).toBe('DEMO_ACCOUNT_FORBIDDEN');

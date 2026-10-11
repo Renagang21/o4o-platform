@@ -1,3 +1,5 @@
+import { CommunityMemberListControls } from '../../components/community/CommunityMemberListControls';
+import type { CommunityMemberPagination } from '../../lib/api/communityMemberList';
 /**
  * MyCommunityOperatorPage — 내가 운영하는 커뮤니티의 가입 신청 심사
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
@@ -42,24 +44,28 @@ function JoinRequestsPanel({
   onChanged,
 }: Readonly<{ community: OperatedCommunity; onChanged: () => void }>) {
   const [history, setHistory] = useState<CommunityMembershipChange[] | null>(null);
+  const [q, setQ] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState<CommunityMemberPagination | null>(null);
   const [status, setStatus] = useState<JoinRequestStatus>('pending');
   const [rows, setRows] = useState<JoinRequestRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const processing = useRef(false);
-  const beginList = useLatestRequest(`${community.slug}:${status}`);
-  const beginHistory = useLatestRequest(`${community.slug}:${status}`);
+  const beginList = useLatestRequest(`${community.slug}:${status}:${q}:${page}:${pageSize}`);
+  const beginHistory = useLatestRequest(`${community.slug}:${status}:${q}:${page}:${pageSize}`);
   const beginAction = useLatestRequest(community.slug);
 
   const load = useCallback(() => {
     const current = beginList();
     setRows(null);
     setError(null);
-    listJoinRequests(community.slug, status)
-      .then(list => { if (current()) setRows(list); })
+    listJoinRequests(community.slug, status, { q, page, pageSize })
+      .then(result => { if (current()) { setRows(result.rows); setPagination(result.pagination); setPage(result.pagination.page); } })
       .catch(e => { if (current()) setError(communityOperatorErrorMessage(e, '가입 신청 목록을 불러오지 못했습니다.')); });
-  }, [community.slug, status, beginList]);
+  }, [community.slug, status, q, page, pageSize, beginList]);
 
   useEffect(() => { setHistory(null); setNotice(null); load(); }, [load]);
 
@@ -106,12 +112,11 @@ function JoinRequestsPanel({
 
   return (
     <section className="mt-4 text-sm">
-      <label className="block text-xs text-gray-600">회원 상태
-        <select aria-label="회원 상태" value={status} disabled={busyId !== null} onChange={e => setStatus(e.target.value as JoinRequestStatus)} className="ml-2 rounded border px-2 py-1">
-          <option value="pending">가입 대기</option><option value="active">활성</option>
-          <option value="suspended">정지</option><option value="rejected">반려</option><option value="withdrawn">탈퇴</option>
-        </select>
-      </label>
+      <CommunityMemberListControls q={q} status={status} pageSize={pageSize} pagination={pagination}
+        busy={busyId !== null} loading={rows === null}
+        statuses={[{ value: 'pending', label: '가입 대기' }, { value: 'active', label: '활성' }, { value: 'suspended', label: '정지' }, { value: 'rejected', label: '반려' }, { value: 'withdrawn', label: '탈퇴' }]}
+        onFilter={filter => { if (processing.current) return; setRows(null); setPagination(null); setQ(filter.q); setStatus(filter.status as JoinRequestStatus); setPageSize(filter.pageSize); setPage(1); if (filter.q === q && filter.status === status && filter.pageSize === pageSize && page === 1) load(); }}
+        onPage={next => { if (processing.current) return; setRows(null); setPage(next); }} />
       {history && <div className="mt-3 rounded border p-3">
         <div className="flex justify-between"><strong>회원 변경 이력 (최근 50건)</strong><button type="button" onClick={() => { beginHistory(); setHistory(null); }}>닫기</button></div>
         {history.length === 0 && <p>변경 이력이 없습니다.</p>}
@@ -180,7 +185,7 @@ function JoinRequestsPanel({
           </table>
         </div>
       )}
-      {rows?.length === 0 && <p className="mt-3 text-gray-500">해당 상태의 회원이 없습니다.</p>}
+      {rows?.length === 0 && <p className="mt-3 text-gray-500">검색 조건에 맞는 회원이 없습니다.</p>}
     </section>
   );
 }

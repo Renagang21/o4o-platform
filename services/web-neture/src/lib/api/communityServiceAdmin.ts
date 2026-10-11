@@ -1,3 +1,4 @@
+import { communityMemberPage, type CommunityMemberListOptions, type CommunityMemberPage } from './communityMemberList';
 /**
  * 커뮤니티 서비스 관리자(`community:admin`) API — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
  *
@@ -68,9 +69,9 @@ export async function listAdminCommunities(): Promise<CommunityAdminRow[]> {
   return res.data?.data?.communities ?? [];
 }
 
-export async function listCommunityMembers(communityId: string): Promise<CommunityMemberRow[]> {
-  const res = await api.get(`${BASE}/admin/communities/${encodeURIComponent(communityId)}/members`);
-  return res.data?.data?.members ?? [];
+export async function listCommunityMembers(communityId: string, options: CommunityMemberListOptions = {}): Promise<CommunityMemberPage<CommunityMemberRow>> {
+  const res = await api.get(`${BASE}/admin/communities/${encodeURIComponent(communityId)}/members`, { params: options });
+  return communityMemberPage<CommunityMemberRow>(res.data?.data?.members ?? [], res.data?.data?.pagination);
 }
 
 export async function setCommunityMemberRole(
