@@ -450,10 +450,10 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
     },
     {
       step: '04',
-      title: 'Event Offer · 유통참여형 펀딩 제안',
-      routeLabel: '/supplier/event-offers · /supplier/market-trial',
+      title: '이벤트 오퍼 · 펀딩 업무공간 진입',
+      routeLabel: '/supplier/event-offers · /market-trial/manage',
       description:
-        '이벤트 오퍼와 유통참여형 펀딩으로 매장의 적극적 참여를 이끌어 냅니다.',
+        '이벤트 오퍼는 공급자 서비스에서, 펀딩 개설 신청·보완·진행 운영은 funding.neture.co.kr의 개설자 업무공간에서 수행합니다.',
       items: [
         {
           label: 'Event Offer',
@@ -1027,14 +1027,16 @@ export const netureGuideFeatureMarketTrialProps: GuideFeatureManualPageProps = {
       id: 'supplier',
       step: '03',
       title: '공급자는 어떻게 활용하나?',
-      routeLabel: '/supplier/market-trial/new',
+      routeLabel: '/market-trial/manage/new',
       description:
         '공급자는 개발비 전체를 펀딩으로 받으려 하기보다, 제품이 실제 매장에 들어갈 수 있는 구조를 설계해야 합니다. 목표 금액보다 "몇 개 매장에 랜딩시킬 것인가"를 먼저 정합니다.',
       items: [
+        { label: '개설 신청', detail: 'funding.neture.co.kr에서 초안을 작성하고 개설을 신청합니다. 운영자 승인과 전용 포럼 준비가 완료되면 모집을 시작합니다.' },
+        { label: '개설자 운영', detail: '자기 펀딩의 공지·포럼 회원 승인·진행 단계를 관리합니다. 입금 확인은 펀딩 서비스 운영자가 별도로 담당합니다.' },
         { label: '제품 선정', detail: '개발 중·유통 준비 중이거나 매장 설명·초기 반응 검증이 필요한 제품을 고릅니다.' },
         { label: '목표 설정', detail: '목표 금액보다 목표 매장 수를 먼저 정합니다 (예: 50·100·200개 매장).' },
         { label: '참여 금액', detail: '매장 경영자가 부담 없이 참여할 수 있는 소액으로 설정합니다.' },
-        { label: '제품 정산 설계', detail: '개발 완료 후 제품으로 정산하며, 기준은 도매 공급가격 또는 그 이하로 설계합니다.' },
+        { label: '외부 이행 안내', detail: '실제 거래·발송·정산은 O4O 외부에서 처리합니다. O4O에는 참여와 오프라인 확인·처리 상태를 기록합니다.' },
         { label: '매장 실행자료', detail: '제품 설명자료·POP·QR 안내·블로그 소개 문구·고객 응대 FAQ를 준비합니다.' },
         { label: '피드백 수집', detail: '매장·고객 반응, 가격 적정성, 설명 난이도, 재주문 가능성을 모읍니다.' },
       ],

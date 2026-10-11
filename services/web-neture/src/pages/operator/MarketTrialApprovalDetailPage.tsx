@@ -8,6 +8,7 @@
  * 운영자 상세 — Trial 정보 확인 + 승인/반려 + 참여자 이행 상태 관리
  */
 
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -21,6 +22,7 @@ import {
   updateParticipantPaymentStatus,
   updateTrialStatus,
   getOperatorTrialKpi,
+  retryTrialForumSync,
 } from '../../api/trial';
 import type {
   OperatorTrial,
@@ -68,6 +70,10 @@ const NEXT_STATUS: Partial<Record<string, { status: TrialStatus; label: string }
 export default function MarketTrialApprovalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const beginLoad = useLatestRequest(`funding-review:${id}`);
+  const beginParticipants = useLatestRequest(`funding-review-participants:${id}`);
+  const beginRetry = useLatestRequest(`funding-forum-retry:${id}`);
+  const [loadedId, setLoadedId] = useState('');
   const [trial, setTrial] = useState<OperatorTrial | null>(null);
   const [participantData, setParticipantData] = useState<ParticipantListResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,6 +93,8 @@ export default function MarketTrialApprovalDetailPage() {
   const [trialKpi, setTrialKpi] = useState<MarketTrialDetailKpi | null>(null);
 
   const loadParticipants = useCallback(async (trialId: string, f: ParticipantFilter) => {
+    const current = beginParticipants();
+    if (!current()) return;
     const filters: {
       rewardType?: 'product' | 'cash';
       rewardStatus?: 'pending' | 'fulfilled';
@@ -96,24 +104,27 @@ export default function MarketTrialApprovalDetailPage() {
     else if (f === 'pending') filters.rewardStatus = 'pending';
     else if (f === 'fulfilled') filters.rewardStatus = 'fulfilled';
     const pData = await getOperatorTrialParticipants(trialId, filters).catch(() => null);
-    setParticipantData(pData);
-  }, []);
+    if (current()) setParticipantData(pData);
+  }, [beginParticipants]);
 
   const loadAll = useCallback(async () => {
     if (!id) return;
-    setLoading(true);
+    const current = beginLoad();
+    if (!current()) return;
+    setLoading(true); setError('');
     try {
       const trialData = await getOperatorTrialDetail(id);
-      setTrial(trialData);
+      if (!current()) return;
+      setTrial(trialData); setLoadedId(id);
       // KPI is best-effort — never blocks the page
-      getOperatorTrialKpi(id).then(setTrialKpi).catch(() => null);
+      getOperatorTrialKpi(id).then(value => { if (current()) setTrialKpi(value); }).catch(() => null);
       await loadParticipants(id, filter);
     } catch (err: any) {
-      setError(err.message || '유통참여형 펀딩을 불러오는데 실패했습니다.');
+      if (current()) setError(err.message || '유통참여형 펀딩을 불러오는데 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
-  }, [id, filter, loadParticipants]);
+  }, [id, filter, loadParticipants, beginLoad]);
 
   useEffect(() => {
     loadAll();
@@ -241,7 +252,7 @@ export default function MarketTrialApprovalDetailPage() {
     }
   };
 
-  if (loading) {
+  if (loading || !error && loadedId !== id) {
     return <div className="p-6 text-center text-gray-500">불러오는 중...</div>;
   }
 
@@ -253,7 +264,7 @@ export default function MarketTrialApprovalDetailPage() {
     );
   }
 
-  const isSubmitted = trial.status === 'submitted';
+  const isSubmitted = trial.status === 'submitted' && !trial.forumPending;
   const recruitRate =
     trial.maxParticipants && trial.maxParticipants > 0
       ? Math.round((trial.currentParticipants / trial.maxParticipants) * 100)
@@ -342,11 +353,24 @@ export default function MarketTrialApprovalDetailPage() {
         <InfoRow label="등록일" value={new Date(trial.createdAt).toLocaleString('ko-KR')} />
       </div>
 
+      {(trial.forumPending || !trial.forumReady && ['recruiting', 'development', 'outcome_confirming', 'fulfilled'].includes(trial.status)) && (
+        <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-4">
+          <p>승인된 펀딩의 전용 포럼을 개설합니다. 준비 완료 후 모집을 시작합니다.</p>
+          <button disabled={actionLoading} className="mt-2 min-h-11 rounded border px-4 disabled:opacity-50" onClick={async () => {
+            if (!id || actionLoading) return;
+            const current = beginRetry();
+            setActionLoading(true); setError('');
+            try { await retryTrialForumSync(id); if (current()) await loadAll(); }
+            catch (e: any) { if (current()) setError(e.response?.data?.message || '포럼 개설을 다시 시도해 주세요.'); }
+            finally { if (current()) setActionLoading(false); }
+          }}>포럼 개설 재처리</button>
+        </div>
+      )}
       {/* Forum Link */}
       {trial.forumLink && trial.forumLink.slug && (
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex items-center justify-between">
           <div>
-            <span className="text-sm text-gray-500">연결된 포럼 게시글</span>
+            <span className="text-sm text-gray-500">연결된 펀딩 포럼</span>
             <p className="text-sm text-gray-900 mt-0.5">{trial.forumLink.slug}</p>
           </div>
           <a
