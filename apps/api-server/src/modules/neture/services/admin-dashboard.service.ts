@@ -80,7 +80,6 @@ export class NetureAdminDashboardService {
       `);
 
       // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: event table dropped
-      const recentEvents: Array<{ id: string; eventType: string; sellerName: string; productName: string; serviceName: string; createdAt: Date }> = [];
 
       return {
         stats: {
@@ -115,12 +114,7 @@ export class NetureAdminDashboardService {
           date: r.createdAt,
           status: '대기중',
         })),
-        recentActivities: recentEvents.map((e) => ({
-          id: e.id,
-          type: e.eventType,
-          text: `${e.sellerName} - ${e.productName} (${e.serviceName})`,
-          time: e.createdAt,
-        })),
+        recentActivities: [] as Array<{ id: string; type: string; text: string; time: Date }>,
       };
     } catch (error) {
       logger.error('[NetureDashboardService] Error fetching admin dashboard summary:', error);

@@ -38,7 +38,7 @@ web-neture dashboard API와 Hub가 공급자 요약을 소비한다. 기존 impo
 ## 유지 계약
 
 - Supplier Domain 5축, Organization identity, PRIVATE `allowed_seller_ids` 범위 유지.
-- 기존 SQL·바인딩·집계 기간·로그 prefix·응답 필드·기본값·오류 전파 유지.
+- 기존 SQL·바인딩·집계 기간·로그 prefix·응답 필드·타입·기본값·오류 전파 유지.
 - 공급자는 supplierId, 매장은 organization/allowed seller 범위, 관리자는 global 조회 유지.
 - 정본의 B2B payment-first·consumer commerce 은퇴 계약 유지. 신규 주문·결제·배송 write 없음.
 - schema·migration·dependency·권한·route·API·Core/Frozen 본문 변경 없음.
@@ -72,3 +72,12 @@ Demo 체험은 공급자 read-only 검증에만 사용하며 실제 관리자·�
 - 관리자·매장 실제 인증 smoke 및 실DB 집계 fixture 검증 미실행. 운영 업무 write 없음.
 
 PR/CI/배포 결과는 최종 결과 artifact에서 구분하여 기록한다.
+
+## PR 품질 검사 보완
+
+첫 Sonar 분석에서 이동한 관리자 `recentEvents.map`이 항상 빈 배열에 적용되는 dead code라
+Reliability gate가 실패했다. 과거 event table 제거 뒤 남은 변환을 타입 명시한 빈 배열로
+교체하여 기존 recentActivities 배열 타입과 실제 빈 응답을 유지했다. 공급자 승인 수 파싱은
+동일 intrinsic인 Number.parseInt로 정렬했다. SQL·API 정책 변경은 없다. 최신 main
+e1cd3b187 통합과 함께 전체 focused 검증을 다시 진행한다. 최종 AST 비교는 이 두 개의
+동작 동일 정리를 정규화한 뒤 수행하고, 원본 문자 그대로 동일한 메서드와 구분한다.

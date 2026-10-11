@@ -71,7 +71,7 @@ export class NetureSupplierDashboardService {
             serviceId: svc.serviceId,
             serviceName: svc.serviceName,
             summary: {
-              approvedSellerCount: parseInt(svc.approvedCount, 10),
+              approvedSellerCount: Number.parseInt(svc.approvedCount, 10),
               pendingRequestCount: pendingCount,
               lastApprovedAt: svc.lastApprovedAt || null,
             },
