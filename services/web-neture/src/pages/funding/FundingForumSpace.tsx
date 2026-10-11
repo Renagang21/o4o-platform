@@ -30,7 +30,7 @@ export function FundingForumLayout() {
     });
     return () => { active = false; };
   }, [id, user?.id, isAuthenticated, version, scope]);
-  if (authLoading) return <p role="status" className="p-6">로그인 상태 확인 중…</p>;
+  if (authLoading) return <output className="p-6">로그인 상태 확인 중…</output>;
   if (!isAuthenticated) return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname)}`} replace />;
   const requestJoin = async () => {
     if (loadedScope !== scope || !access?.forum || busy) return;

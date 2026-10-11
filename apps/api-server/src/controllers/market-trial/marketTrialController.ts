@@ -58,6 +58,31 @@ const PRE_LAUNCH_STATUSES: TrialStatus[] = [
   TrialStatus.SUBMITTED,
 ];
 
+function fundingUpdatePayload(body: AuthRequest['body']) {
+  const {
+    title, oneLiner, videoUrl, description, outcomeSnapshot,
+    maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
+    targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
+  } = body;
+
+  return {
+    title,
+    oneLiner,
+    videoUrl,
+    description,
+    salesScenarioContent,
+    outcomeSnapshot,
+    maxParticipants: maxParticipants != null ? Number(maxParticipants) : undefined,
+    targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
+    trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
+    rewardRate: rewardRate != null ? Number(rewardRate) : undefined,
+    fundingStartAt: fundingStartAt ? new Date(fundingStartAt) : undefined,
+    fundingEndAt: fundingEndAt ? new Date(fundingEndAt) : undefined,
+    trialPeriodDays: trialPeriodDays ? Number(trialPeriodDays) : undefined,
+  };
+
+}
+
 export class MarketTrialController {
   private static dataSource: DataSource | null = null;
   private static trialRepo: Repository<MarketTrial>;
@@ -76,13 +101,13 @@ export class MarketTrialController {
     this.trialService = new MarketTrialService(ds);
   }
 
-  static requireActiveCreator: RequestHandler = (req, res, next) => {
+  static readonly requireActiveCreator: RequestHandler = (req, res, next) => {
     const ds = MarketTrialController.dataSource;
     if (!ds) { res.status(503).json({ success: false, message: 'Service unavailable' }); return; }
     void createRequireActiveSupplier(ds)(req, res, next).catch(next);
   };
 
-  static async creatorEligibility(req: AuthRequest, res: Response) {
+  static creatorEligibility(req: AuthRequest, res: Response) {
     res.json({ success: true, data: { supplierAccountId: (req as any).supplierId, supplierOrganizationId: (req as any).supplierOrganizationId } });
   }
 
@@ -218,27 +243,7 @@ export class MarketTrialController {
       const existing = await MarketTrialController.trialRepo.findOne({ where: { id } });
       if (!existing || !await isFundingCreator(MarketTrialController.dataSource!, existing, userId)) return res.status(403).json({ success: false, message: '자기 펀딩만 수정할 수 있습니다.' });
       if (!validFundingFields({ ...existing, ...req.body })) return res.status(400).json({ success: false, message: '모집 기간·수량·금액 입력을 확인해 주세요.' });
-      const {
-        title, oneLiner, videoUrl, description, outcomeSnapshot,
-        maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
-        targetAmount, trialUnitPrice, rewardRate, salesScenarioContent,
-      } = req.body;
-
-      const trial = await MarketTrialController.trialService.updateTrial(id, userId, {
-        title,
-        oneLiner,
-        videoUrl,
-        description,
-        salesScenarioContent,
-        outcomeSnapshot,
-        maxParticipants: maxParticipants != null ? Number(maxParticipants) : undefined,
-        targetAmount: targetAmount != null ? Number(targetAmount) : undefined,
-        trialUnitPrice: trialUnitPrice != null ? Number(trialUnitPrice) : undefined,
-        rewardRate: rewardRate != null ? Number(rewardRate) : undefined,
-        fundingStartAt: fundingStartAt ? new Date(fundingStartAt) : undefined,
-        fundingEndAt: fundingEndAt ? new Date(fundingEndAt) : undefined,
-        trialPeriodDays: trialPeriodDays ? Number(trialPeriodDays) : undefined,
-      });
+      const trial = await MarketTrialController.trialService.updateTrial(id, userId, fundingUpdatePayload(req.body));
 
       res.json({ success: true, data: toTrialDTO(trial) });
     } catch (error: any) {

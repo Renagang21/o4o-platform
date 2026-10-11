@@ -26,7 +26,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
-import { ForumWriteForm, type ForumWriteFormPayload } from '@o4o/shared-space-ui';
+import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
@@ -56,6 +56,12 @@ interface ForumWritePageProps {
   postSegment?: string;
   /** Funding creator/operator can publish notices in their own closed forum. */
   allowAnnouncement?: boolean;
+}
+
+function forumWriteHeading(isEditMode: boolean, communityLabel: string | undefined) {
+  if (isEditMode) return { title: '게시글 수정', description: '게시글 내용을 수정합니다.' };
+  if (communityLabel) return { title: `${communityLabel} 글 작성`, description: '회원들과 나눌 소식과 자료를 작성해 주세요.' };
+  return { title: '의견 남기기', description: 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.' };
 }
 
 export function ForumWritePage({
@@ -104,6 +110,8 @@ export function ForumWritePage({
     return () => { alive = false; };
   }, [isEditMode, categorySlug, forumSlugParam]);
 
+  const postTypeOptions: ForumWriteFormPostTypeOption[] | undefined = allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined;
+  const heading = forumWriteHeading(isEditMode, communityLabel);
   const forumTags = targetForum?.tags ?? [];
   const selectedClassification = forumTags.includes(classification) ? classification : '';
 
@@ -291,9 +299,9 @@ export function ForumWritePage({
 
       {/* Page Header */}
       <header style={styles.header}>
-        <h1 style={styles.title}>{isEditMode ? '게시글 수정' : communityLabel ? `${communityLabel} 글 작성` : '의견 남기기'}</h1>
+        <h1 style={styles.title}>{heading.title}</h1>
         <p style={styles.description}>
-          {isEditMode ? '게시글 내용을 수정합니다.' : communityLabel ? '회원들과 나눌 소식과 자료를 작성해 주세요.' : 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.'}
+          {heading.description}
         </p>
         {!isEditMode && targetForum && (
           <p style={styles.targetForum}>등록 포럼: <strong>{targetForum.name}</strong></p>
@@ -319,7 +327,7 @@ export function ForumWritePage({
       {/* Form: create/edit 공통 ForumWriteForm (WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1) */}
         <ForumWriteForm
           showPostType={allowAnnouncement}
-          postTypeOptions={allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined}
+          postTypeOptions={postTypeOptions}
           initialTitle={title}
           initialContentHtml={editorHtml}
           titleLabel="제목"

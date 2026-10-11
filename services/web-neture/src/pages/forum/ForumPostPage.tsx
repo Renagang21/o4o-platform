@@ -113,6 +113,10 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   };
 }
 
+function canEditForumContent(readOnly: boolean, isAdmin: boolean, userId: string | undefined, authorId: string | null | undefined) {
+  return !readOnly && (isAdmin || (!!userId && authorId === userId));
+}
+
 export function ForumPostPage({ basePath = '/forum', canModerate = false, readOnly = false, pinPost }: { basePath?: string; canModerate?: boolean; readOnly?: boolean; pinPost?: (id: string, pin: boolean) => Promise<void> } = {}) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -330,7 +334,9 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
   const postType = normalizePostType(post.type);
   const badge = getTypeBadge(postType);
   const authorName = getAuthorName(post);
-  const canManagePost = !readOnly && (isAdmin || (!!currentUserId && post.authorId === currentUserId));
+  const canManagePost = canEditForumContent(readOnly, isAdmin, currentUserId, post.authorId);
+  const canPinPost = Boolean((communityKey || pinPost) && canModerate && !readOnly);
+  const canShowActions = (canManagePost || canModerate) && !readOnly;
 
   return (
     <div style={isMobile ? styles.containerMobile : styles.container}>
@@ -362,7 +368,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
           </>
         }
         actionSlot={
-          (canManagePost || canModerate) && !readOnly ? (
+          canShowActions ? (
             isMobile ? (
               /* Mobile: ⋮ action menu */
               <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
@@ -375,7 +381,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
                 </button>
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
-                    {(communityKey || pinPost) && canModerate && !readOnly && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                    {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                     {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
@@ -392,7 +398,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
             ) : (
               /* Desktop: inline actions */
               <>
-                {(communityKey || pinPost) && canModerate && !readOnly && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                 {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
                 <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
               </>
@@ -490,7 +496,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false, readOn
             authorName: c.authorName,
             content: c.content,
             createdAt: `${formatForumDate(c.createdAt)}${c.isEdited ? ' (수정됨)' : ''}`,
-            isAuthor: !readOnly && ((!!currentUserId && c.authorId === currentUserId) || isAdmin),
+            isAuthor: canEditForumContent(readOnly, isAdmin, currentUserId, c.authorId),
             canDelete: canModerate && !readOnly,
           }))}
           onEditComment={handleUpdateComment}

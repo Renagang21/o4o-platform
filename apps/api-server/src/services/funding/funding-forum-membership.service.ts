@@ -7,7 +7,7 @@ import { getNetureMainMembershipStatus } from '../../modules/neture/services/net
 
 /** Funding membership writes share the project lock with review/progress/retries. */
 export class FundingForumMembershipService {
-  constructor(private ds: DataSource) {}
+  constructor(private readonly ds: DataSource) {}
 
   private async scope(m: EntityManager, trialId: string, forumId: string, actor: string, owner: boolean) {
     const trial = await m.getRepository(MarketTrial).findOne({ where: { id: trialId }, lock: { mode: 'pessimistic_write' } });
@@ -21,7 +21,7 @@ export class FundingForumMembershipService {
     return trial;
   }
 
-  async request(trialId: string, forumId: string, actor: string) {
+  request(trialId: string, forumId: string, actor: string) {
     return this.ds.transaction(async m => {
       await this.scope(m, trialId, forumId, actor, false);
       const [participant] = await m.query(`SELECT id FROM market_trial_participants WHERE "marketTrialId" = $1 AND "participantId" = $2`, [trialId, actor]);
@@ -37,7 +37,7 @@ export class FundingForumMembershipService {
 
   async review(trialId: string, forumId: string, requestId: string, actor: string, approve: boolean, comment?: string) {
     if (comment !== undefined && (typeof comment !== 'string' || comment.length > 1000)) throw new FundingError(400, 'INVALID_COMMENT', '검토 메모는 1,000자 이내로 입력해 주세요.');
-    return this.ds.transaction(async m => {
+    return await this.ds.transaction(async m => {
       await this.scope(m, trialId, forumId, actor, true);
       const [request] = await m.query(`SELECT id, user_id FROM forum_join_requests WHERE id = $1 AND forum_category_id = $2 AND status = 'pending' FOR UPDATE`, [requestId, forumId]);
       if (!request) throw new FundingError(409, 'REQUEST_CONFLICT', '이미 처리됐거나 해당 포럼의 신청이 아닙니다.');
@@ -52,7 +52,7 @@ export class FundingForumMembershipService {
     });
   }
 
-  async remove(trialId: string, forumId: string, target: string, actor: string) {
+  remove(trialId: string, forumId: string, target: string, actor: string) {
     return this.ds.transaction(async m => {
       const trial = await this.scope(m, trialId, forumId, actor, true);
       if (target === trial.supplierId) throw new FundingError(409, 'MEMBER_NOT_REMOVABLE', '개설자는 포럼에서 제거할 수 없습니다.');

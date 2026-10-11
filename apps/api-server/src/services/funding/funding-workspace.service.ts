@@ -8,7 +8,7 @@ export class FundingError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
 }
 export class FundingWorkspaceService {
-  constructor(private ds: DataSource) {}
+  constructor(private readonly ds: DataSource) {}
   private async locked(m: EntityManager, id: string) {
     const trial = await m.getRepository(MarketTrial).findOne({ where: { id }, lock: { mode: 'pessimistic_write' } });
     if (!trial) throw new FundingError(404, 'FUNDING_NOT_FOUND', '펀딩을 찾을 수 없습니다.');
@@ -19,7 +19,7 @@ export class FundingWorkspaceService {
   }
   async review(id: string, actor: string, approve: boolean, reason?: string) {
     if (!approve && (!reason?.trim() || reason.trim().length > 1000)) throw new FundingError(400, 'REVIEW_REASON_REQUIRED', '반려 사유를 1~1,000자로 입력해 주세요.');
-    return this.ds.transaction(async m => {
+    return await this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (trial.status !== TrialStatus.SUBMITTED || fundingReview(trial).forumPending) throw new FundingError(409, 'REVIEW_CONFLICT', '이미 처리됐거나 심사 대기 상태가 아닙니다.');
       if (approve && !await isFundingCreator(this.ds, trial, trial.supplierId)) throw new FundingError(409, 'CREATOR_NOT_ACTIVE', '개설자의 공급자 자격을 먼저 확인해 주세요.');
@@ -29,7 +29,7 @@ export class FundingWorkspaceService {
     });
   }
   /** Stable unique slug + trial row lock protect concurrent retries without new schema. */
-  async ensureForum(id: string, actor: string) {
+  ensureForum(id: string, actor: string) {
     return this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (!fundingWasApproved(trial) || trial.status === TrialStatus.CLOSED) throw new FundingError(409, 'FUNDING_NOT_APPROVED', '승인된 진행 중 펀딩만 포럼을 개설할 수 있습니다.');
@@ -54,7 +54,7 @@ export class FundingWorkspaceService {
       return { trial, forum, created: !existed };
     });
   }
-  async changeStatus(id: string, actor: string, next: TrialStatus, creator = false) {
+  changeStatus(id: string, actor: string, next: TrialStatus, creator = false) {
     return this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (creator && trial.supplierId !== actor) throw new FundingError(403, 'FUNDING_NOT_OWNER', '자기 펀딩만 관리할 수 있습니다.');
@@ -68,7 +68,7 @@ export class FundingWorkspaceService {
   }
 
   /** Participation records interest; it does not confirm payment or forum membership. */
-  async join(id: string, actor: string, rewardType: string) {
+  join(id: string, actor: string, rewardType: string) {
     return this.ds.transaction(async m => {
       if (await getNetureMainMembershipStatus(m, actor) !== 'active') throw new FundingError(403, 'MAIN_MEMBERSHIP_REQUIRED', '정상 계정과 이메일 확인이 필요합니다.');
       const trial = await this.locked(m, id);

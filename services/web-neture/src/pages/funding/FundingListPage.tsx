@@ -7,7 +7,7 @@
 
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { getMyTrials } from '../../api/trial';
 import type { Trial } from '../../api/trial';
@@ -105,7 +105,6 @@ export default function FundingListPage() {
             <div
               key={trial.id}
               style={s.card}
-              onClick={() => navigate(`/market-trial/manage/${trial.id}`)}
             >
               <div style={s.cardTop}>
                 <span
@@ -120,7 +119,7 @@ export default function FundingListPage() {
                   {new Date(trial.createdAt).toLocaleDateString('ko-KR')}
                 </span>
               </div>
-              <h2 style={s.cardTitle}>{trial.title}</h2>
+              <h2 style={s.cardTitle}><Link to={`/market-trial/manage/${trial.id}`} style={{ color: 'inherit' }}>{trial.title}</Link></h2>
               {/* WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 표시 */}
               {trial.product && (
                 <div style={s.productRef}>

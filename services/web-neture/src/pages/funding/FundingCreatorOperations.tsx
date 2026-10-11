@@ -39,7 +39,7 @@ export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Tr
     <h3 className="mt-5 font-medium">참여자 현황</h3>
     <p className="mt-1 text-sm text-gray-600">입금 확인은 펀딩 서비스 운영자가 담당합니다. 포럼 회원 승인은 별도로 관리합니다.</p>
     <ul className="mt-2 divide-y">{rows.map(row => <li key={row.id} className="flex flex-wrap justify-between gap-2 py-2"><span>{row.name || '회원'}</span><span>{PAYMENT_STATUS_LABELS[row.paymentStatus as PaymentStatus] || '상태 확인 필요'}</span></li>)}</ul>
-    {!error && loadedId !== trial.id && <p role="status">참여 현황 확인 중…</p>}
+    {!error && loadedId !== trial.id && <output>참여 현황 확인 중…</output>}
     {!error && loadedId === trial.id && !rows.length && <p className="mt-2 text-gray-500">참여자가 없습니다.</p>}
   </section>;
 }

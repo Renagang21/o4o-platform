@@ -85,7 +85,7 @@ function parseVideoEmbed(url: string): { type: 'youtube' | 'vimeo' | 'external';
       if (videoId) return { type: 'youtube', embedUrl: `https://www.youtube.com/embed/${videoId}` };
     }
     if (parsed.hostname.includes('vimeo.com')) {
-      const match = parsed.pathname.match(/\/(\d+)/);
+      const match = /\/(\d+)/.exec(parsed.pathname);
       if (match) return { type: 'vimeo', embedUrl: `https://player.vimeo.com/video/${match[1]}` };
     }
   } catch { /* invalid URL */ }
@@ -224,6 +224,7 @@ export default function FundingDetailPage() {
               <h2 style={s.sectionTitle}>대표 영상</h2>
               <div style={{ position: 'relative' as const, paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '8px' }}>
                 <iframe
+                  title={`${trial.title} 대표 영상`}
                   src={video.embedUrl}
                   style={{ position: 'absolute' as const, top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -360,7 +361,7 @@ export default function FundingDetailPage() {
                 <div style={s.settlementPreview}>
                   <strong>보상 예시</strong>: 단가 {unit.toLocaleString()}원 참여 시
                   → 총 {total.toLocaleString()}원 환원
-                  {qty > 0 && ` → 약 ${qty}개${rem > 0 ? ` + 잔액 ${rem.toLocaleString()}원` : ''}`}
+                  {qty > 0 && ` → 약 ${qty}개`}{rem > 0 && ` + 잔액 ${rem.toLocaleString()}원`}
                 </div>
               );
             })()}
@@ -453,7 +454,7 @@ export default function FundingDetailPage() {
   );
 }
 
-function StatCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function StatCard({ label, value, highlight }: Readonly<{ label: string; value: string; highlight?: boolean }>) {
   return (
     <div style={{
       ...sc.card,

@@ -47,3 +47,7 @@ push·required CI·Codex blocker 확인·main PR 병합·Delivery 판정 및 서
 ### 통합 중 보완
 
 공유 Guide route 계약 검사에서 공급자 업무공간의 옛 펀딩 주소 2곳이 확인되어 개설자 공간으로 수정했다. shared-space-ui 전체 Vitest 65개가 통과했다. 최신 main 공급자 identity/business 추출 소비처 83개도 통과했다. 추가 권한 검토에서 개설자 자격 회수 뒤 남아 있는 Forum owner 행을 이용한 회원 명단 조회를 현재 개설자 판정으로 차단하고 회귀 2개를 추가했다.
+
+### Sonar 보완
+
+초기 Reliability B의 접근성 지적을 받아 개설 폼 label/control 연결, 목록의 실제 상세 링크, 대표 영상 title을 보완했다. 저장·검증·DTO 변환을 분리하고 Promise 오류 계약을 유지했다. 보완 뒤 신규 API 60개와 웹 전체 503개가 통과했으며 최종 Sonar 재분석은 확인 중이다.

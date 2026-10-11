@@ -36,11 +36,78 @@ interface FundingCreatorFormProps {
   initialData?: Trial;
 }
 
+type FundingFormValues = {
+  title: string;
+  oneLiner: string;
+  videoUrl: string;
+  description: string;
+  outcomeDescription: string;
+  maxParticipants: string;
+  fundingStartAt: string;
+  fundingEndAt: string;
+  trialPeriodDays: string;
+  targetAmount: string;
+  trialUnitPrice: string;
+  rewardRate: string;
+  salesScenarioContent: string;
+  outcomeType: 'product' | 'cash';
+};
+
+function validateFundingForm({ title, oneLiner, videoUrl, fundingStartAt, fundingEndAt, trialPeriodDays }: FundingFormValues) {
+  const errors: Record<string, string> = {};
+  if (!title.trim()) errors.title = '제목을 입력해주세요.';
+  if (!oneLiner.trim() || oneLiner.trim().length < 10) errors.oneLiner = '한 줄 제안을 10자 이상 입력해주세요.';
+  if (videoUrl.trim()) {
+    try { new URL(videoUrl.trim()); } catch {
+      errors.videoUrl = '영상 URL 형식이 올바르지 않습니다.';
+    }
+  }
+  if (!fundingStartAt || !fundingEndAt || new Date(fundingEndAt) <= new Date(fundingStartAt)) errors.funding = '모집 종료일은 시작일 이후여야 합니다.';
+  if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해주세요.';
+
+  return errors;
+}
+
+function fieldBorder(error: string | undefined) {
+  return error ? 'border-red-400 bg-red-50' : 'border-gray-300';
+}
+function FieldError({ error }: Readonly<{ error?: string }>) {
+  return error && <p className="text-xs text-red-500 mt-1">{error}</p>;
+}
+
+function fundingPayload({ title, oneLiner, videoUrl, description, outcomeDescription, maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays, targetAmount, trialUnitPrice, rewardRate, salesScenarioContent, outcomeType }: FundingFormValues): CreateTrialPayload {
+  const scenarioHtml = salesScenarioContent?.trim();
+  return {
+    title: title.trim(),
+    oneLiner: oneLiner.trim(),
+    videoUrl: videoUrl.trim() || undefined,
+    description: description.trim() || undefined,
+    salesScenarioContent: scenarioHtml && !EMPTY_HTML_PATTERN.test(scenarioHtml) ? scenarioHtml : undefined,
+    outcomeSnapshot: outcomeDescription.trim()
+      ? { expectedType: outcomeType, description: outcomeDescription.trim() }
+      : undefined,
+    maxParticipants: maxParticipants ? Number(maxParticipants) : undefined,
+    fundingStartAt: new Date(fundingStartAt).toISOString(),
+    fundingEndAt: new Date(fundingEndAt).toISOString(),
+    trialPeriodDays: Number(trialPeriodDays),
+    // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
+    targetAmount: targetAmount ? Number(targetAmount) : undefined,
+    trialUnitPrice: trialUnitPrice ? Number(trialUnitPrice) : undefined,
+    rewardRate: Number(rewardRate) || 0,
+  };
+
+}
+
+function savedMessage(mode: 'create' | 'edit', submitted: boolean) {
+  if (mode === 'edit') return '유통참여형 펀딩이 수정되었습니다.';
+  return submitted ? '유통참여형 펀딩이 제출되었습니다.' : '유통참여형 펀딩이 저장되었습니다.';
+}
+
 export default function FundingCreatePage({
   mode = 'create',
   trialId,
   initialData,
-}: FundingCreatorFormProps = {}) {
+}: Readonly<FundingCreatorFormProps> = {}) {
   const navigate = useNavigate();
   const savedDraft = useRef<string | null>(null);
   const beginWrite = useLatestRequest(`funding-form:${trialId || 'new'}`);
@@ -79,6 +146,8 @@ export default function FundingCreatePage({
     return { total: Math.round(total), qty, rem: Math.round(rem) };
   })();
 
+  const values: FundingFormValues = { title, oneLiner, videoUrl, description, outcomeDescription, maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays, targetAmount, trialUnitPrice, rewardRate, salesScenarioContent, outcomeType };
+
   const handleSaveDraft = async () => {
     await handleCreate(false);
   };
@@ -87,19 +156,21 @@ export default function FundingCreatePage({
     await handleCreate(true);
   };
 
+  const saveFundingDraft = async (payload: CreateTrialPayload) => {
+    if (mode === 'edit' && trialId) {
+      await updateTrial(trialId, payload);
+      return trialId;
+    }
+    const created = savedDraft.current
+      ? await updateTrial(savedDraft.current, payload)
+      : await createTrial(payload);
+    savedDraft.current = created.id;
+    return created.id;
+  };
+
   const handleCreate = async (autoSubmit: boolean) => {
     if (loading) return;
-    // WO-MARKET-TRIAL-FORM-GUIDANCE-ENHANCEMENT-V1: 전체 필드 검증 + 인라인 에러
-    const errors: Record<string, string> = {};
-    if (!title.trim()) errors.title = '제목을 입력해주세요.';
-    if (!oneLiner.trim() || oneLiner.trim().length < 10) errors.oneLiner = '한 줄 제안을 10자 이상 입력해주세요.';
-    if (videoUrl.trim()) {
-      try { new URL(videoUrl.trim()); } catch {
-        errors.videoUrl = '영상 URL 형식이 올바르지 않습니다.';
-      }
-    }
-    if (!fundingStartAt || !fundingEndAt || new Date(fundingEndAt) <= new Date(fundingStartAt)) errors.funding = '모집 종료일은 시작일 이후여야 합니다.';
-    if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해주세요.';
+    const errors = validateFundingForm(values);
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -120,46 +191,13 @@ export default function FundingCreatePage({
     setFieldErrors({});
 
     try {
-      const scenarioHtml = salesScenarioContent?.trim();
-      const payload: CreateTrialPayload = {
-        title: title.trim(),
-        oneLiner: oneLiner.trim(),
-        videoUrl: videoUrl.trim() || undefined,
-        description: description.trim() || undefined,
-        salesScenarioContent: scenarioHtml && !EMPTY_HTML_PATTERN.test(scenarioHtml) ? scenarioHtml : undefined,
-        outcomeSnapshot: outcomeDescription.trim()
-          ? { expectedType: outcomeType, description: outcomeDescription.trim() }
-          : undefined,
-        maxParticipants: maxParticipants ? Number(maxParticipants) : undefined,
-        fundingStartAt: new Date(fundingStartAt).toISOString(),
-        fundingEndAt: new Date(fundingEndAt).toISOString(),
-        trialPeriodDays: Number(trialPeriodDays),
-        // WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1
-        targetAmount: targetAmount ? Number(targetAmount) : undefined,
-        trialUnitPrice: trialUnitPrice ? Number(trialUnitPrice) : undefined,
-        rewardRate: Number(rewardRate) || 0,
-      };
+      const payload = fundingPayload(values);
 
-      if (mode === 'edit' && trialId) {
-        await updateTrial(trialId, payload);
-        if (!current()) return;
-        navigate(`/market-trial/manage/${trialId}`, {
-          state: { message: '유통참여형 펀딩이 수정되었습니다.' },
-        });
-      } else {
-        const created = savedDraft.current
-          ? await updateTrial(savedDraft.current, payload)
-          : await createTrial(payload);
-        savedDraft.current = created.id;
-        if (!current()) return;
-        if (autoSubmit) {
-          await submitTrial(created.id);
-        }
-        if (!current()) return;
-        navigate(`/market-trial/manage/${created.id}`, {
-          state: { message: autoSubmit ? '유통참여형 펀딩이 제출되었습니다.' : '유통참여형 펀딩이 저장되었습니다.' },
-        });
-      }
+      const id = await saveFundingDraft(payload);
+      if (!current()) return;
+      if (autoSubmit && mode !== 'edit') await submitTrial(id);
+      if (!current()) return;
+      navigate(`/market-trial/manage/${id}`, { state: { message: savedMessage(mode, autoSubmit) } });
     } catch (err: any) {
       if (current()) setError(err.response?.data?.message || err.message || '유통참여형 펀딩 생성에 실패했습니다.');
     } finally {
@@ -203,52 +241,52 @@ export default function FundingCreatePage({
 
           {/* 제목 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="funding-title" className="block text-sm font-medium text-gray-700 mb-1">
               제목 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              id="funding-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="예: 신제품 A 약국 시험 도입"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.title ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.title)}`}
             />
-            {fieldErrors.title && <p className="text-xs text-red-500 mt-1">{fieldErrors.title}</p>}
+            <FieldError error={fieldErrors.title} />
           </div>
 
           {/* 한 줄 제안 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="funding-oneLiner" className="block text-sm font-medium text-gray-700 mb-1">
               한 줄 제안 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              id="funding-oneLiner"
               value={oneLiner}
               onChange={(e) => setOneLiner(e.target.value)}
               maxLength={120}
               placeholder="매장에서 바로 팔 수 있는 간 건강 제품 테스트"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.oneLiner ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.oneLiner)}`}
             />
             <div className="flex justify-between mt-1">
-              {fieldErrors.oneLiner ? <p className="text-xs text-red-500">{fieldErrors.oneLiner}</p> : <span />}
+              <FieldError error={fieldErrors.oneLiner} />
               <p className="text-xs text-gray-400">{oneLiner.length}/120</p>
             </div>
           </div>
 
           {/* 대표 영상 — WO-MARKET-TRIAL-VIDEO-FIELD-V1 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">대표 영상 (선택)</label>
+            <label htmlFor="funding-videoUrl" className="block text-sm font-medium text-gray-700 mb-1">대표 영상 (선택)</label>
             <input
               type="text"
+              id="funding-videoUrl"
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
               placeholder="영상 URL을 입력하세요 (YouTube, Vimeo 또는 기타 URL 가능)"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.videoUrl ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.videoUrl)}`}
             />
-            {fieldErrors.videoUrl
-              ? <p className="text-xs text-red-500 mt-1">{fieldErrors.videoUrl}</p>
-              : <p className="text-xs text-gray-400 mt-1">제품 사용이나 매장 판매 모습을 보여주면 참여율이 높아집니다</p>
-            }
+            <FieldError error={fieldErrors.videoUrl} /><p className="text-xs text-gray-400 mt-1">제품 사용이나 매장 판매 모습을 보여주면 참여율이 높아집니다</p>
           </div>
         </div>
 
@@ -260,8 +298,9 @@ export default function FundingCreatePage({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매장 관점의 필요성</label>
+            <label htmlFor="funding-description" className="block text-sm font-medium text-gray-700 mb-1">매장 관점의 필요성</label>
             <textarea
+              id="funding-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
@@ -292,9 +331,9 @@ export default function FundingCreatePage({
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium text-gray-700">
+              <p id="funding-scenario-label" className="block text-sm font-medium text-gray-700">
                 판매 시나리오 설명
-              </label>
+              </p>
               <button
                 type="button"
                 onClick={() => setSalesScenarioContent(SALES_SCENARIO_TEMPLATE)}
@@ -303,13 +342,13 @@ export default function FundingCreatePage({
                 예시 다시 넣기
               </button>
             </div>
-            <RichTextEditor
+            <div role="group" aria-labelledby="funding-scenario-label"><RichTextEditor
               value={salesScenarioContent}
               onChange={(c) => setSalesScenarioContent(c.html)}
               preset="compact"
               minHeight="280px"
               placeholder="판매 시나리오를 작성하세요..."
-            />
+            /></div>
           </div>
         </div>
 
@@ -322,7 +361,7 @@ export default function FundingCreatePage({
 
           {/* 결과 약속 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">결과 약속</label>
+            <label htmlFor="funding-outcomeDescription" className="block text-sm font-medium text-gray-700 mb-2">결과 약속</label>
             <div className="flex gap-4 mb-2">
               <label className="flex items-center gap-1.5 text-sm">
                 <input
@@ -331,7 +370,7 @@ export default function FundingCreatePage({
                   checked={outcomeType === 'product'}
                   onChange={() => setOutcomeType('product')}
                 />
-                제품 제공
+                {'제품 제공'}
               </label>
               <label className="flex items-center gap-1.5 text-sm">
                 <input
@@ -340,11 +379,12 @@ export default function FundingCreatePage({
                   checked={outcomeType === 'cash'}
                   onChange={() => setOutcomeType('cash')}
                 />
-                현금 보상
+                {'현금 보상'}
               </label>
             </div>
             <input
               type="text"
+              id="funding-outcomeDescription"
               value={outcomeDescription}
               onChange={(e) => setOutcomeDescription(e.target.value)}
               placeholder="예: 시험 참여 매장에 정식 제품 1박스 제공"
@@ -363,12 +403,13 @@ export default function FundingCreatePage({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="funding-targetAmount" className="block text-sm font-medium text-gray-700 mb-1">
                   목표 금액 (원)
                 </label>
                 <input
                   type="number"
-                  value={targetAmount}
+                  id="funding-targetAmount"
+              value={targetAmount}
                   onChange={(e) => setTargetAmount(e.target.value)}
                   min="0"
                   placeholder="예: 1000000"
@@ -377,12 +418,13 @@ export default function FundingCreatePage({
                 <p className="text-xs text-gray-400 mt-1">개발비 전체가 아니라 초기 매장 랜딩 규모 기준. 펀딩 운영자가 오프라인으로 안내하는 송금 목표입니다.</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="funding-trialUnitPrice" className="block text-sm font-medium text-gray-700 mb-1">
                   제품 단가 (원)
                 </label>
                 <input
                   type="number"
-                  value={trialUnitPrice}
+                  id="funding-trialUnitPrice"
+              value={trialUnitPrice}
                   onChange={(e) => setTrialUnitPrice(e.target.value)}
                   min="0"
                   placeholder="예: 2000"
@@ -393,13 +435,14 @@ export default function FundingCreatePage({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="funding-rewardRate" className="block text-sm font-medium text-gray-700 mb-1">
                 리워드 (%) — 참여자에게 돌아가는 추가 환원 비율
               </label>
               <div className="flex items-center gap-3">
                 <input
                   type="number"
-                  value={rewardRate}
+                  id="funding-rewardRate"
+              value={rewardRate}
                   onChange={(e) => setRewardRate(e.target.value)}
                   min="0"
                   max="100"
@@ -431,11 +474,12 @@ export default function FundingCreatePage({
 
           {/* 참여 인원 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="funding-maxParticipants" className="block text-sm font-medium text-gray-700 mb-1">
               최대 참여 매장 수 (비워두면 무제한)
             </label>
             <input
               type="number"
+              id="funding-maxParticipants"
               value={maxParticipants}
               onChange={(e) => setMaxParticipants(e.target.value)}
               min="1"
@@ -449,44 +493,47 @@ export default function FundingCreatePage({
           <div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="funding-fundingStartAt" className="block text-sm font-medium text-gray-700 mb-1">
                   모집 시작일 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={fundingStartAt}
+                  id="funding-fundingStartAt"
+              value={fundingStartAt}
                   onChange={(e) => setFundingStartAt(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.funding ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.funding)}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="funding-fundingEndAt" className="block text-sm font-medium text-gray-700 mb-1">
                   모집 종료일 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
-                  value={fundingEndAt}
+                  id="funding-fundingEndAt"
+              value={fundingEndAt}
                   onChange={(e) => setFundingEndAt(e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.funding ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.funding)}`}
                 />
               </div>
             </div>
-            {fieldErrors.funding && <p className="text-xs text-red-500 mt-1">{fieldErrors.funding}</p>}
+            <FieldError error={fieldErrors.funding} />
           </div>
 
           {/* 진행 기간 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="funding-trialPeriodDays" className="block text-sm font-medium text-gray-700 mb-1">
               진행 기간 (일) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
+              id="funding-trialPeriodDays"
               value={trialPeriodDays}
               onChange={(e) => setTrialPeriodDays(e.target.value)}
               min="1"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldErrors.trialPeriodDays ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.trialPeriodDays)}`}
             />
-            {fieldErrors.trialPeriodDays && <p className="text-xs text-red-500 mt-1">{fieldErrors.trialPeriodDays}</p>}
+            <FieldError error={fieldErrors.trialPeriodDays} />
           </div>
         </div>
 

@@ -124,7 +124,7 @@ export class MarketTrialOperatorController {
   }
 
   /** Recheck the current DB role after the existing service membership gate. */
-  static requireCurrentOperator: RequestHandler = (req, res, next) => {
+  static readonly requireCurrentOperator: RequestHandler = (req, res, next) => {
     const ds = MarketTrialOperatorController.dataSource;
     if (!ds || !(req as any).user?.id) { res.status(403).json({ success: false, message: '운영 권한이 없습니다.' }); return; }
     void hasFundingOperator(ds, (req as any).user.id).then(allowed => {
