@@ -35,7 +35,7 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 
 별도 worktree는 `LOCAL_COPY_INSTALLED_ROOT`로 의존성이 설치된 기준 checkout을 지정할 수 있다. 이는 pg·typeorm·TypeScript 의존성 선택용이며 검증할 프로젝트 source와 dist 선택용이 아니다. `LOCAL_COPY_PG_USER`는 로컬 DB 사용자 선택, `LOCAL_COPY_RESULT_FILE`은 결과 JSON 경로다. 비밀번호·운영 DB URL을 입력받지 않는다. 확인되지 않은 SQL proxy socket은 실제 연결 후 DDL 0건으로 차단되고, 설치 root의 stale dist를 의도적으로 오류 코드로 바꾼 격리 fixture에서도 현재 source의 6개 검증만 실행됨을 확인했다. 기존 설치 파일은 수정하지 않았다.
 
-## 운영 조건과 기존 미완료 작업
+## 초기 운영 조건과 당시 미완료 작업
 
 실제 `/auth/me`에서 현재 테스트 계정의 CMS 운영자 권한이 없음을 확인했다. 로컬 계정 안내에는 기존 운영자 인증 정보가 없다. 기존 공유 CMS 원본을 수정하거나 권한을 새로 발급하지 않았다. 운영 원본 변경 검증은 기존 운영자 인증 또는 별도로 검토된 정비 실행 경로가 필요하다.
 
@@ -56,7 +56,7 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 - [x] 기존 16개 테스트 조직의 차단 참조 처리 및 전체 정리
 - [ ] 실제 QR 스캔·태블릿 기기 출력 확인
 
-이번 완료 범위는 브라우저와 로컬 계약 검증이다. 운영 원본 변경·두 정상 매장·전체 조직 정리·물리 기기는 열린 TODO로 유지한다. DEPLOYMENT = NOT_APPLICABLE: 검증 도구·기록만 변경한다.
+최초 단계의 완료 범위는 브라우저와 로컬 계약 검증이었다. 후속 조직 정리 완료는 아래 운영 정리 기록과 TODO에 반영했다. 운영 원본 변경·두 정상 매장·물리 기기는 열린 TODO로 유지한다. DEPLOYMENT = NOT_APPLICABLE: 검증 도구·기록만 변경한다.
 
 
 ## 자동 리뷰 보완
