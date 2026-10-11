@@ -1,6 +1,6 @@
 # 펀딩 운영자 입금 확인·참여 처리 업무 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **근거**: 사용자 지시 — TODO 작성 → 문서·코드 조사 → TODO 수정 → 개발·검증·push·main 병합·배포. 실계정 직접 테스트는 후속 사용자 확인으로 유지한다.
 
@@ -61,8 +61,8 @@
 - [x] 숨긴 정산 UI 전이 제거; settlement 409와 기존 기록 보존 회귀 검증
 - [x] 금액·날짜 검증/transaction rollback/감사·scope/조회 실패/정정/CSV 회귀 테스트 및 API·웹 빌드
 - [x] desktop/mobile fixture 브라우저 10개 시나리오 PASS
-- [ ] push·CI·리뷰·정상 병합·api/neture 배포·공개 read-only 확인
-- [ ] 새 CHECK에 결과와 실계정 직접 테스트·DB 동시성 후속 확인 기록
+- [x] push·CI·리뷰·정상 병합·api/neture 배포·공개 read-only 확인
+- [x] 새 CHECK에 결과와 실계정 직접 테스트·DB 동시성 후속 확인 기록
 
 실행 검증·통합 증거와 실계정 후속 테스트는 [새 CHECK](../checks/CHECK-O4O-FUNDING-OPERATOR-RECORDS-V1.md)에 기록한다.
 
@@ -75,3 +75,12 @@
 PR 리뷰 P2(금액 빈 입력을 생략해 이전 금액이 남음)를 수정해 명시적 null 정정을 제공했다. API의 null 금액 감사 회귀는 유지하며 UI 회귀 16 tests·빌드·브라우저 10개 재검증 PASS.
 
 재리뷰 P2의 빈 취소·환불 사유도 명시적 null로 수정했다(UI 18 tests·빌드·browser 10개 PASS). CI에서 지적된 테스트 require import 1건을 ES import로 바꿨으며 payment 30 tests와 lint ratchet(46 = 기존 baseline 46) PASS. 게이트 규칙·baseline은 수정하지 않았다.
+
+
+## 완료 및 후속 검증
+
+[PR #474](https://github.com/Renagang21/o4o-platform/pull/474)를 정상 squash 병합했다. main 구현 SHA는 `5895ed177ecbfd8cc57da2fe4d516e0549dc781d`이다. 최종 PR CI·main post-merge CI·Sonar Quality Gate가 통과했고 최신 HEAD Codex 재리뷰에서 새 finding이 없었다. [Promote 38134096013](https://github.com/Renagang21/o4o-platform/actions/runs/38134096013)이 API → Neture 배포 및 serving SHA 판정을 완료했으며 `production=DEPLOYED · api,neture`이다.
+
+배포 화면의 실제 HTML/JS를 사용한 desktop/mobile fixture browser 10개 PASS, API readiness 200·비로그인 운영 API/CSV 401·funding 화면 200을 확인했다. 운영 API 쓰기는 전부 mock이며 실계정·실 DB 검증을 수행한 것으로 보지 않는다. 상세 증거와 사용자 직접 테스트 5개는 CHECK에 남겼다. 구현·배포 작업은 완료, 직접 테스트는 사용자 요청에 따라 후속 검증으로 유지한다.
+
+동일 WO의 완료 기록을 위해 기존 branch를 유지했고 게시 후 최신 main은 정상 merge로 통합했다. 완료 문서 2개만 추가 PR로 반영하며 이 문서 변경의 `DEPLOYMENT=NOT_APPLICABLE`이다.
