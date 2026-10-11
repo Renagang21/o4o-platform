@@ -1,440 +1,78 @@
 import { SupplierOfferReadService } from './supplier-offer-read.service.js';
 import { AdminOfferReadService } from './admin-offer-read.service.js';
 import { OperatorOfferReadService } from './operator-offer-read.service.js';
-import { Repository, In } from 'typeorm';
-import { AppDataSource } from '../../../database/connection.js';
-import {
-  NetureSupplier,
-  SupplierProductOffer,
-  OfferDistributionType,
-  OfferApprovalStatus,
-  SupplierStatus,
-} from '../entities/index.js';
-import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
-import logger from '../../../utils/logger.js';
-import { ProductCategory, ProductMaster } from '../entities/index.js';
-import { OfferServiceApprovalService } from './offer-service-approval.service.js';
+import { SupplierOfferRegistrationService } from './supplier-offer-registration.service.js';
+import { SupplierOfferWriteService } from './supplier-offer-write.service.js';
+import { SupplierOfferDistributionService } from './supplier-offer-distribution.service.js';
+import { OfferLifecycleService } from './offer-lifecycle.service.js';
+import { OfferDistributionType, OfferApprovalStatus } from '../entities/index.js';
 import type { NetureCatalogService } from './catalog.service.js';
-// WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1: 기존 master 비파괴 연결 계약
-import { resolveMasterWriteFields } from './master-link-policy.js';
-import { OfferErrorCode } from '../constants/offer-error-code.js';
-import { filterApprovalEligibleServiceKeys, isApprovalEligibleServiceKey } from '../constants/approval-service-keys.js';
-import { isSupplierOptinServiceKey } from '../constants/supplier-optin-services.js';
-// WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 등록 가능 상태 gate
-import {
-  SupplierRegulatedCategoryService,
-  resolveRegulatedCategoryFromProduct,
-} from './supplier-regulated-category.service.js';
-// WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1: 약국 대상 서비스 정책(DB) 참조
-import { ServiceAudienceService } from './service-audience.service.js';
-import { assertDrugOfferAllowed } from '../guards/drug-access.guard.js';
-// WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1: 기존 Master regulatory_type canonical 해석(순수 함수 · ③ 재사용)
-import { canonicalizeRegulatoryType } from '../promotion/adapters/supplier/supplier-regulatory-type.js';
+export type { CreateOfferFromExistingMasterInput } from './supplier-offer-registration.service.js';
 
-/**
- * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
- * isPublic + serviceKeys → distributionType 파생 (하위호환)
- */
-function deriveDistributionType(isPublic: boolean, serviceKeys: string[]): OfferDistributionType {
-  if (isPublic) return OfferDistributionType.PUBLIC;
-  if (serviceKeys.length > 0) return OfferDistributionType.SERVICE;
-  return OfferDistributionType.PRIVATE;
-}
-
-/**
- * WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1
- * POST /supplier/products/from-master 의 body 계약.
- *  - 허용: masterId + Offer 영역 필드만.
- *  - 금지: ProductMaster 기준정보/identity 필드 (기존 Master 가 SSOT — 공급자 입력으로 덮어쓰지 않는다).
- *  - supplierId 는 requireActiveSupplier 가 확정한 값만 쓴다 (body 주입 거부).
- */
-const FROM_MASTER_ALLOWED_KEYS = new Set([
-  'masterId',
-  'priceGeneral', 'priceGold', 'pricePlatinum', 'consumerReferencePrice',
-  'consumerShortDescription', 'consumerDetailDescription',
-  'stockQuantity', 'isFeatured', 'isPublic', 'distributionType', 'serviceKeys',
-]);
-const FROM_MASTER_FORBIDDEN_MASTER_KEYS = new Set([
-  'barcode', 'name', 'manufacturerName', 'regulatoryType', 'regulatoryName', 'mfdsPermitNumber',
-  'categoryId', 'brandName', 'brandId', 'specification', 'originCountry', 'tags', 'manualData',
-]);
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-export interface CreateOfferFromExistingMasterInput {
-  masterId: string;
-  priceGeneral?: number;
-  priceGold?: number | null;
-  pricePlatinum?: number | null;
-  consumerReferencePrice?: number | null;
-  consumerShortDescription?: string | null;
-  consumerDetailDescription?: string | null;
-  stockQuantity?: number | string | null;
-  isFeatured?: boolean;
-  isPublic?: boolean;
-  distributionType?: OfferDistributionType;
-  serviceKeys?: string[];
-}
-
-/**
- * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
- *
- * 규제 상품(의약품/건강기능식품/의약외품 등)은 약국 전용 서비스에만 연결될 수 있다.
- *
- * 약국 대상 서비스 판정은 DB 정책(service_audience_policies)을 SSOT 로 사용한다.
- *  - WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 에서 admin 설정 소스 도입.
- *  - WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1 에서 본 함수가 ServiceAudienceService 를 참조하도록 전환
- *    (기존 하드코딩 ['kpa-society'] 는 ServiceAudienceService 의 fallback 으로 이전됨).
- *  - 카테고리 정의 / 규제 판정 기준(isRegulated) 자체는 변경하지 않는다.
- */
-
-/**
- * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
- *
- * 규제 상품 permit 게이트 공통 헬퍼.
- * 기존 두 분기(승인 / 등록)의 동작을 그대로 유지하며 단일 진입점으로 흡수.
- *
- * - 'approval': 승인 시점 — DB 조회된 mfds_permit_number 부재 시 PERMIT_REQUIRED_FOR_APPROVAL
- * - 'registration': 등록 시점 — master MFDS 미검증 + 입력 허가번호 부재 시 PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED
- */
-function assertRegulatedPermit(args: {
-  isRegulated: boolean;
-  mfdsPermitNumber: string | null | undefined;
-  isMfdsVerified?: boolean;
-  mode: 'approval' | 'registration';
-}): OfferErrorCode | null {
-  if (!args.isRegulated) return null;
-  if (args.mode === 'approval') {
-    return args.mfdsPermitNumber ? null : OfferErrorCode.PERMIT_REQUIRED_FOR_APPROVAL;
-  }
-  // registration
-  if (!args.isMfdsVerified && !args.mfdsPermitNumber) {
-    return OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED;
-  }
-  return null;
-}
-
-/**
- * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
- *
- * 규제 상품의 service_keys가 약국 전용 서비스의 부분집합인지 검증.
- * 위반 시 OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE 반환.
- *
- * - 규제 상품 아님 → no-op
- * - service_keys 비어있음 → 본 WO에서는 강제하지 않음 (no-op)
- * - service_keys에 비-약국 서비스 1개라도 포함 → 거부
- */
-function assertPharmacyOnlyServiceKeys(
-  isPharmacyAudienceService: (serviceKey: string) => boolean,
-  isRegulated: boolean,
-  serviceKeys: string[] | null | undefined,
-): OfferErrorCode | null {
-  if (!isRegulated) return null;
-  if (!serviceKeys || serviceKeys.length === 0) return null;
-  const violating = serviceKeys.filter((k) => !isPharmacyAudienceService(k));
-  if (violating.length > 0) {
-    return OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE;
-  }
-  return null;
-}
-
-/**
- * NetureOfferService
- *
- * Offer CRUD, approval/rejection, supplier products, operator supply dashboard.
- * Extracted from NetureService (WO-O4O-NETURE-SERVICE-SPLIT-V1).
- */
+/** Compatibility facade for role-specific reads and offer write workflows. */
 export class NetureOfferService {
-  private _supplierOfferReadService?: SupplierOfferReadService;
   private get supplierOfferReadService(): SupplierOfferReadService {
     if (!this._supplierOfferReadService) this._supplierOfferReadService = new SupplierOfferReadService();
     return this._supplierOfferReadService;
   }
-
-  private _adminOfferReadService?: AdminOfferReadService;
   private get adminOfferReadService(): AdminOfferReadService {
     if (!this._adminOfferReadService) this._adminOfferReadService = new AdminOfferReadService();
     return this._adminOfferReadService;
   }
-
-  private _operatorOfferReadService?: OperatorOfferReadService;
   private get operatorOfferReadService(): OperatorOfferReadService {
     if (!this._operatorOfferReadService) this._operatorOfferReadService = new OperatorOfferReadService();
     return this._operatorOfferReadService;
   }
+  private _supplierOfferReadService?: SupplierOfferReadService;
+  private _adminOfferReadService?: AdminOfferReadService;
+  private _operatorOfferReadService?: OperatorOfferReadService;
 
-  // Lazy repositories
-  private _offerRepo?: Repository<SupplierProductOffer>;
-  private _supplierRepo?: Repository<NetureSupplier>;
-
-  private get offerRepo(): Repository<SupplierProductOffer> {
-    if (!this._offerRepo) {
-      this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
-    }
-    return this._offerRepo;
+  private _supplierOfferRegistrationService?: SupplierOfferRegistrationService;
+  private get supplierOfferRegistrationService(): SupplierOfferRegistrationService {
+    if (!this._supplierOfferRegistrationService) this._supplierOfferRegistrationService = new SupplierOfferRegistrationService();
+    return this._supplierOfferRegistrationService;
   }
 
-  private get supplierRepo(): Repository<NetureSupplier> {
-    if (!this._supplierRepo) {
-      this._supplierRepo = AppDataSource.getRepository(NetureSupplier);
-    }
-    return this._supplierRepo;
+  private _supplierOfferWriteService?: SupplierOfferWriteService;
+  private get supplierOfferWriteService(): SupplierOfferWriteService {
+    if (!this._supplierOfferWriteService) this._supplierOfferWriteService = new SupplierOfferWriteService();
+    return this._supplierOfferWriteService;
   }
 
+  private _supplierOfferDistributionService?: SupplierOfferDistributionService;
+  private get supplierOfferDistributionService(): SupplierOfferDistributionService {
+    if (!this._supplierOfferDistributionService) this._supplierOfferDistributionService = new SupplierOfferDistributionService();
+    return this._supplierOfferDistributionService;
+  }
+
+  private _offerLifecycleService?: OfferLifecycleService;
+  private get offerLifecycleService(): OfferLifecycleService {
+    if (!this._offerLifecycleService) this._offerLifecycleService = new OfferLifecycleService();
+    return this._offerLifecycleService;
+  }
+
+  // Preserve the constructor contract; supplier writes never call CatalogService.
   constructor(private readonly catalogService: NetureCatalogService) {}
+
   async getPendingProducts(): Promise<Array<{ id: string; supplierName: string; supplierId: string; distributionType: OfferDistributionType; createdAt: Date; approvalStatus: OfferApprovalStatus }>> {
     return this.adminOfferReadService.getPendingProducts();
   }
 
-  /**
-   * POST /admin/products/:id/approve — 상품 승인
-   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
-   *   Admin 승인 = 모든 service approvals → approved → 파생 sync
-   *   직접 offer.approvalStatus 변경 제거 → service approval SSOT
-   */
   async approveProduct(
     offerId: string,
     adminUserId: string,
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
-    try {
-      const offer = await this.offerRepo.findOne({ where: { id: offerId } });
-      if (!offer) {
-        return { success: false, error: 'PRODUCT_NOT_FOUND' };
-      }
-      // 멱등: 이미 승인된 offer → 기존 데이터 반환
-      if (offer.approvalStatus === OfferApprovalStatus.APPROVED) {
-        return {
-          success: true,
-          data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus, autoListedCount: 0 },
-        };
-      }
-
-      // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 permit 게이트
-      // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 공통 헬퍼(assertRegulatedPermit)로 흡수 — 동작 변경 없음
-      const masterForApproval: Array<{
-        mfds_permit_number: string | null;
-        category_id: string | null;
-        is_regulated: boolean | null;
-      }> = await AppDataSource.query(
-        `SELECT pm.mfds_permit_number, pm.category_id, pc.is_regulated
-         FROM product_masters pm
-         LEFT JOIN product_categories pc ON pc.id = pm.category_id
-         WHERE pm.id = $1`,
-        [offer.masterId],
-      );
-      if (masterForApproval.length > 0) {
-        const permitError = assertRegulatedPermit({
-          isRegulated: !!masterForApproval[0].is_regulated,
-          mfdsPermitNumber: masterForApproval[0].mfds_permit_number,
-          mode: 'approval',
-        });
-        if (permitError) {
-          return { success: false, error: permitError };
-        }
-      }
-
-      // WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1:
-      // Admin override = service approvals 보장 + 일괄 approved → 파생 sync
-      const approvalService = new OfferServiceApprovalService(AppDataSource);
-      const queryRunner = AppDataSource.createQueryRunner();
-      await queryRunner.startTransaction();
-      try {
-        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
-        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
-          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
-          [offerId],
-        );
-        if (existingApprovals.length === 0) {
-          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(keys)];
-          if (uniqueKeys.length === 0) {
-            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3):
-            //   공급처를 지정하지 않은 제품은 서비스 승인(OSA) 행이 없어 파생 sync 로는 APPROVED 가 될 수 없었다.
-            //   이 경우 운영자 승인 = **제품 등록 승인**을 직접 기록한다(pharmacy 기본 공급 대상).
-            //   세미프랜차이즈별 공급 승인은 supply_proposals 가 따로 맡는다. OSA 행이 있는 제품은 기존 파생 규칙 그대로.
-            await queryRunner.query(
-              `UPDATE supplier_product_offers
-                  SET approval_status = 'APPROVED', is_active = true, updated_at = NOW()
-                WHERE id = $1`,
-              [offerId],
-            );
-            await queryRunner.commitTransaction();
-            logger.info(`[NetureOfferService] Offer registration approved (no designated supply target): ${offerId} by ${adminUserId}`);
-            return {
-              success: true,
-              data: { id: offer.id, masterId: offer.masterId, isActive: true, approvalStatus: OfferApprovalStatus.APPROVED, autoListedCount: 0 },
-            };
-          }
-          if (uniqueKeys.length > 0) {
-            const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
-            await queryRunner.query(
-              `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-               VALUES ${values}
-               ON CONFLICT (offer_id, service_key) DO NOTHING`,
-              [offerId, ...uniqueKeys],
-            );
-          }
-        }
-
-        // 2. 모든 service approvals를 approved로 일괄 변경
-        await queryRunner.query(
-          `UPDATE offer_service_approvals
-           SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), updated_at = NOW()
-           WHERE offer_id = $1 AND approval_status != 'approved'`,
-          [offerId, adminUserId],
-        );
-
-        // 3. 파생 sync → offer 상태 + is_active + auto-expand
-        const syncResult = await approvalService.syncOfferFromServiceApprovals(offerId, adminUserId, queryRunner);
-
-        await queryRunner.commitTransaction();
-
-        logger.info(`[NetureOfferService] Offer approved via service approvals: ${offerId} by ${adminUserId} (sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}, autoListed: ${syncResult.autoListedCount})`);
-
-        return {
-          success: true,
-          data: {
-            id: offer.id,
-            masterId: offer.masterId,
-            isActive: true,
-            approvalStatus: syncResult.derivedStatus,
-            autoListedCount: syncResult.autoListedCount,
-          },
-        };
-      } catch (txError) {
-        await queryRunner.rollbackTransaction();
-        throw txError;
-      } finally {
-        await queryRunner.release();
-      }
-    } catch (error) {
-      logger.error('[NetureOfferService] Error approving offer:', error);
-      throw error;
-    }
+    return this.offerLifecycleService.approveProduct(offerId, adminUserId);
   }
 
-  /**
-   * POST /admin/products/:id/reject — 상품 반려
-   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
-   *   Admin 반려 = 모든 service approvals → rejected → 파생 sync (cascade 포함)
-   *   직접 offer.approvalStatus 변경 제거 → service approval SSOT
-   */
   async rejectProduct(
     offerId: string,
     adminUserId: string,
     reason?: string,
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
-    try {
-      const offer = await this.offerRepo.findOne({ where: { id: offerId } });
-      if (!offer) {
-        return { success: false, error: 'PRODUCT_NOT_FOUND' };
-      }
-      // 멱등: 이미 거절된 offer → 기존 데이터 반환
-      if (offer.approvalStatus === OfferApprovalStatus.REJECTED) {
-        return {
-          success: true,
-          data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus },
-        };
-      }
-
-      // WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1:
-      // Admin override reject = service approvals 보장 + 일괄 rejected → 파생 sync + cascade
-      const approvalService = new OfferServiceApprovalService(AppDataSource);
-      const queryRunner = AppDataSource.createQueryRunner();
-      await queryRunner.startTransaction();
-      try {
-        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
-        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
-          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
-          [offerId],
-        );
-        if (existingApprovals.length === 0) {
-          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(keys)];
-          if (uniqueKeys.length === 0) {
-            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3): approveProduct 의 공급처 미지정 분기와 짝.
-            //   OSA 행이 없으면 파생 sync 가 PENDING 을 돌려주므로 제품 등록 반려를 직접 기록하고,
-            //   파생 REJECTED 와 같은 cascade(product_approvals revoke · listings 비활성)를 적용한다.
-            //   (offer 에 반려 사유 컬럼은 없다 — 사유는 product_approvals · 로그에 남는다.)
-            await queryRunner.query(
-              `UPDATE supplier_product_offers
-                  SET approval_status = 'REJECTED', is_active = false, updated_at = NOW()
-                WHERE id = $1`,
-              [offerId],
-            );
-            await queryRunner.query(
-              `UPDATE product_approvals
-                  SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
-                      reason = $3, updated_at = NOW()
-                WHERE offer_id = $1 AND approval_status = 'approved'`,
-              [offerId, adminUserId, reason || 'Offer rejected by admin'],
-            );
-            await queryRunner.query(
-              `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
-              [offerId],
-            );
-            await queryRunner.commitTransaction();
-            logger.info(`[NetureOfferService] Offer registration rejected (no designated supply target): ${offerId} by ${adminUserId} (reason: ${reason || '-'})`);
-            return {
-              success: true,
-              data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: OfferApprovalStatus.REJECTED },
-            };
-          }
-          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
-          await queryRunner.query(
-            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-             VALUES ${values}
-             ON CONFLICT (offer_id, service_key) DO NOTHING`,
-            [offerId, ...uniqueKeys],
-          );
-        }
-
-        // 2. 모든 service approvals를 rejected로 일괄 변경
-        await queryRunner.query(
-          `UPDATE offer_service_approvals
-           SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(),
-               reason = $3, updated_at = NOW()
-           WHERE offer_id = $1 AND approval_status != 'rejected'`,
-          [offerId, adminUserId, reason || 'Offer rejected by admin'],
-        );
-
-        // 3. 파생 sync → offer 상태 + cascade (product_approvals revoke + listings 비활성화)
-        const syncResult = await approvalService.syncOfferFromServiceApprovals(offerId, adminUserId, queryRunner);
-
-        await queryRunner.commitTransaction();
-
-        logger.info(`[NetureOfferService] Offer rejected via service approvals: ${offerId} by ${adminUserId} (sync: ${syncResult.previousStatus}→${syncResult.derivedStatus})`);
-
-        return {
-          success: true,
-          data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: syncResult.derivedStatus },
-        };
-      } catch (txError) {
-        await queryRunner.rollbackTransaction();
-        throw txError;
-      } finally {
-        await queryRunner.release();
-      }
-    } catch (error) {
-      logger.error('[NetureOfferService] Error rejecting offer:', error);
-      throw error;
-    }
+    return this.offerLifecycleService.rejectProduct(offerId, adminUserId, reason);
   }
 
-  // ==================== Supplier: Submit for Approval (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ====================
-
-  /**
-   * POST /supplier/products/submit-approval
-   * 선택된 offer들에 대해 서비스별 pending 승인 레코드를 생성한다.
-   *
-   * WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
-   * 승인 요청 시 offer에 저장된 serviceKeys를 사용 (프론트에서 별도 선택 없음)
-   *
-   * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
-   * - submitted는 **실제로 pending 행이 최소 1개 이상 INSERT된 offer 수**만 집계
-   * - INSERT가 한 건도 발생하지 않은 offer(정책상 대상 key 없음, 이미 pending/approved 존재 등)는 skipped에 reason과 함께 기록
-   * - 소유권 없음, DB 예외는 errors에 error code로 기록
-   * - 승인 대상 serviceKey 정책은 `filterApprovalEligibleServiceKeys`(SSOT)를 통해서만 결정
-   */
   async submitForApproval(
     supplierId: string,
     offerIds: string[],
@@ -443,117 +81,15 @@ export class NetureOfferService {
     skipped: Array<{ id: string; reason: string }>;
     errors: Array<{ id: string; error: string }>;
   }> {
-    const approvalService = new OfferServiceApprovalService(AppDataSource);
-    const result = {
-      submitted: 0,
-      skipped: [] as Array<{ id: string; reason: string }>,
-      errors: [] as Array<{ id: string; error: string }>,
-    };
-
-    // 소유권 + 저장된 정책 + 제품 분류값(품목군 gate) 일괄 조회
-    const ownedRows: Array<{
-      id: string;
-      service_keys: string[];
-      regulatory_type: string | null;
-      is_regulated: boolean | null;
-      category_name: string | null;
-      category_slug: string | null;
-    }> = await AppDataSource.query(
-      `SELECT o.id, o.service_keys, m.regulatory_type, c.is_regulated, c.name AS category_name, c.slug AS category_slug
-       FROM supplier_product_offers o
-       JOIN product_masters m ON m.id = o.master_id
-       LEFT JOIN product_categories c ON c.id = m.category_id
-       WHERE o.id = ANY($1) AND o.supplier_id = $2 AND o.deleted_at IS NULL`,
-      [offerIds, supplierId],
-    );
-    const ownedMap = new Map(ownedRows.map((r) => [r.id, r]));
-
-    // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1:
-    // 승인요청 시점에 공급자 품목군이 approved 인지 확인 (생성/draft 는 허용, 승인요청만 gate).
-    const regulatedCategoryService = new SupplierRegulatedCategoryService(AppDataSource);
-    const categoryStatusMap = await regulatedCategoryService.getStatusMap(supplierId);
-
-    // WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
-    // 규제 상품은 약국 대상 서비스에만 연결 가능 — 방어적 재확인(생성 시 차단되나 수동 변경 대비).
-    const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-
-    // WO-O4O-NETURE-SUPPLIER-PROFILE-CATEGORY-SELECTION-ONLY-AND-PRODUCT-LIGHTWEIGHT-GATE-V1:
-    // 선진입 후보완 — 사업자등록증 PDF 미제출이어도 상품 승인요청은 허용한다(하드블록 제거).
-    // 미제출은 운영자 공급자 승인 화면의 '판매 전 필요' badge(D2)로 surface되며,
-    // 판매 가능/운영자 최종 승인 전까지 보완한다.
-
-    for (const offerId of offerIds) {
-      const ownedRow = ownedMap.get(offerId);
-      if (!ownedRow) {
-        result.errors.push({ id: offerId, error: 'NOT_OWNED' });
-        continue;
-      }
-
-      try {
-        // 품목군 등록 가능 상태 gate
-        const resolvedCategory = resolveRegulatedCategoryFromProduct({
-          regulatoryType: ownedRow.regulatory_type,
-          categoryName: ownedRow.category_name,
-          categorySlug: ownedRow.category_slug,
-        });
-        const gate = regulatedCategoryService.evaluateGate(resolvedCategory, categoryStatusMap);
-        if (!gate.allowed) {
-          result.skipped.push({ id: offerId, reason: gate.reasonCode || 'SUPPLIER_CATEGORY_NOT_APPROVED' });
-          continue;
-        }
-
-        // 정책 필터: 승인 대상 서비스 키만 추출 (SSOT)
-        const eligibleKeys = filterApprovalEligibleServiceKeys(ownedRow.service_keys || []);
-
-        if (eligibleKeys.length === 0) {
-          // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture only)
-          result.skipped.push({ id: offerId, reason: 'NO_ELIGIBLE_SERVICE_KEYS' });
-          continue;
-        }
-
-        // 규제 상품(의약품 등) → 약국 대상 서비스에만 연결 가능
-        if (ownedRow.is_regulated && eligibleKeys.some((k) => !isPharmacyAudience(k))) {
-          result.skipped.push({ id: offerId, reason: 'DRUG_SERVICE_NOT_PHARMACY_AUDIENCE' });
-          continue;
-        }
-
-        const { insertedServiceKeys, resubmittedServiceKeys } = await approvalService.createPendingApprovals(
-          offerId,
-          eligibleKeys,
-        );
-
-        if (insertedServiceKeys.length + resubmittedServiceKeys.length > 0) {
-          // WO-O4O-NETURE-PRODUCT-APPROVAL-RESUBMIT-AFTER-REJECT-FIX-V1:
-          // 반려(rejected) 행이 pending 으로 reset 된 경우, offer 파생 상태(REJECTED)도
-          // PENDING 으로 되돌려 운영자 승인 큐에 다시 노출되게 한다.
-          // sync 의 PENDING 분기는 offer.approval_status 만 갱신하며, listings 재활성화나
-          // 판매 가능 전환은 하지 않는다(판매 가능은 운영자 approved 이후에만).
-          // 이미 APPROVED 인 offer 는 derived 가 동일해 changed=false 로 early-return 된다.
-          if (resubmittedServiceKeys.length > 0) {
-            await approvalService.syncOfferFromServiceApprovals(offerId, supplierId, AppDataSource);
-          }
-          // 하나라도 신규 INSERT 또는 rejected→pending reset 이 발생했으면 submitted 로 집계
-          result.submitted++;
-        } else {
-          // 모든 eligible key 가 이미 pending/approved (WHERE 가드로 reset 제외)
-          result.skipped.push({ id: offerId, reason: 'ALREADY_REQUESTED_OR_DECIDED' });
-        }
-      } catch (error) {
-        logger.error(`[NetureOfferService] submitForApproval failed for ${offerId}:`, error);
-        result.errors.push({ id: offerId, error: 'INTERNAL_ERROR' });
-      }
-    }
-
-    logger.info(
-      `[NetureOfferService] submitForApproval: requested=${offerIds.length}, submitted=${result.submitted}, skipped=${result.skipped.length}, errors=${result.errors.length}`,
-    );
-    return result;
+    return this.offerLifecycleService.submitForApproval(supplierId, offerIds);
   }
+
   async getAllProducts(
     filters?: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus },
   ) {
     return this.adminOfferReadService.getAllProducts(filters);
   }
+
   async getAllProductsPaged(options?: {
     supplierId?: string;
     distributionType?: OfferDistributionType;
@@ -567,6 +103,7 @@ export class NetureOfferService {
   }): Promise<{ items: Array<Record<string, unknown>>; total: number }>{
     return this.adminOfferReadService.getAllProductsPaged(options);
   }
+
   async getProductsSummary(filters?: {
     supplierId?: string;
     distributionType?: OfferDistributionType;
@@ -574,369 +111,15 @@ export class NetureOfferService {
   }): Promise<{ total: number; pending: number; approved: number; rejected: number }>{
     return this.adminOfferReadService.getProductsSummary(filters);
   }
+
   async getSupplierProducts(supplierId: string) {
     return this.supplierOfferReadService.getSupplierProducts(supplierId);
   }
 
-  // ==================== (은퇴) createSupplierOffer / validateCreateInput / resolveProductMetadata ====================
-  //
-  // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 §2.3 (P3 은퇴)
-  //   공급자 Offer 경로에서 barcode/name 기반 resolveOrCreateMaster() 경유 · 신규 Master updateProductMaster() ·
-  //   공급자 입력 permit 판정 · 카테고리/브랜드 해석 · 브랜드 생성(resolveBrandId) 을 모두 제거했다.
-  //   공급자 Offer 는 ProductMaster 에 INSERT/UPDATE 하지 않는다. Master 생성은 Candidate → Promotion Core 만 담당한다.
-  //   남은 공급자 Offer 생성 경로 = createSupplierOfferFromExistingMaster() → persistOfferForResolvedMaster() 뿐.
-  //   CatalogService.resolveOrCreateMaster() 자체는 Admin/system 경로(catalog-import-resolver · admin.controller ·
-  //   product-master-create.controller · neture.service resolveOrCreateMaster 위임)가 계속 쓰므로 삭제하지 않는다.
-
-  /**
-   * WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1
-   *
-   * (supplier, master) 중복 등록을 업무 오류로 변환한다.
-   * soft-delete 된 Offer 도 unique 슬롯을 점유하므로 `withDeleted` 로 함께 조회하고,
-   * 사용자가 취할 조치가 다르므로 두 코드를 구분한다.
-   *   - 살아있는 Offer 존재 → OFFER_ALREADY_EXISTS (이미 등록된 공급 상품)
-   *   - 휴지통 Offer 존재   → OFFER_IN_RECYCLE_BIN (복원하거나 완전 삭제 후 등록)
-   * 중복이 없으면 null.
-   */
-  private async findDuplicateOffer(
-    supplierId: string,
-    masterId: string,
-  ): Promise<{ success: false; error: string; message: string } | null> {
-    const existing = await this.offerRepo.findOne({
-      where: { supplierId, masterId },
-      withDeleted: true,
-      select: { id: true, deletedAt: true },
-    });
-    if (!existing) return null;
-
-    return existing.deletedAt
-      ? {
-          success: false,
-          error: 'OFFER_IN_RECYCLE_BIN',
-          message:
-            '이 상품은 휴지통에 있습니다. 새로 등록하지 말고 휴지통에서 복원하거나 완전 삭제 후 등록해 주세요.',
-        }
-      : {
-          success: false,
-          error: 'OFFER_ALREADY_EXISTS',
-          message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
-        };
-  }
-
-  /**
-   * unique violation(23505) 중 **(supplier, master) 제약** 인 경우에만 업무 오류로 변환한다.
-   * 같은 테이블의 slug UNIQUE 등 다른 제약 위반을 중복 등록으로 오인하지 않는다.
-   */
-  private asOfferDuplicateViolation(
-    err: unknown,
-  ): { success: false; error: string; message: string } | null {
-    const e = err as { code?: string; constraint?: string; driverError?: { code?: string; constraint?: string } };
-    const code = e?.code ?? e?.driverError?.code;
-    const constraint = e?.constraint ?? e?.driverError?.constraint;
-    if (code !== '23505' || constraint !== 'uq_supplier_product_offers_master_supplier') {
-      return null;
-    }
-    return {
-      success: false,
-      error: 'OFFER_ALREADY_EXISTS',
-      message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
-    };
-  }
-
-  // ==================== Offer persistence primitive (Master identity 확정 이후) ====================
-
-  /**
-   * WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1
-   *
-   * Master identity 가 **이미 확정된** 뒤의 중립적 Offer persistence.
-   * 공급자 Offer 생성의 유일한 persistence 원형이다 — 호출자는 createSupplierOfferFromExistingMaster 뿐
-   * (레거시 createSupplierOffer 는 WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-AI-FIRST-CUTOVER-AND-LEGACY-MASTER-RESOLUTION-RETIREMENT-V1 로 은퇴).
-   *
-   * 맡는 것(순서·코드·로그 불변):
-   *   slug/serviceKeys 정제 → 규제 상품 약국 전용 검사 → DRUG gate → Offer 구성 →
-   *   (supplier, master) 중복 사전검사 → save + 23505 fallback → service approval 생성 → 응답.
-   *
-   * 맡지 않는 것: Master resolve/create · 입력 검증 · permit 판정 · ProductMaster write.
-   * ProductMaster / ProductIdentifier / ProductCandidate 에는 어떤 write 도 하지 않는다.
-   *
-   * 신규 Master 가 필요한 등록은 이 파일이 아니라 Candidate(POST /supplier/product-candidates) → Promotion Core 로 간다.
-   */
-  private async persistOfferForResolvedMaster(
-    supplierId: string,
-    input: {
-      masterId: string;
-      /** slug 생성용 — 기존 계약: master.barcode ?? master.id */
-      masterBarcode: string;
-      /** 카테고리 기반 규제 상품 여부(기존 is_regulated 축) */
-      isRegulated: boolean;
-      /** 알고 있으면 전달 — DRUG gate 가 master 를 재조회하지 않는다. 없으면 gate 가 masterId 로 조회(기존 동작) */
-      regulatoryType?: string | null;
-      stockQuantity: number;
-      isPublic?: boolean;
-      distributionType?: OfferDistributionType;
-      serviceKeys?: string[];
-      priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
-      consumerReferencePrice?: number | null;
-      consumerShortDescription?: string | null;
-      consumerDetailDescription?: string | null;
-      isFeatured?: boolean;
-    },
-  ) {
-    const { masterId, masterBarcode, isRegulated } = input;
-
-    // slug + offer entity
-    const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
-
-    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
-    //
-    // serviceKeys 는 등록 서비스 목록(allowlist)으로 검증되지 않으므로, 유통 축을 뒤집는
-    // 값은 여기서 입력 단계에 걸러낸다. 'neture' 는 PUBLIC 축이고 'glucoseview' 는 폐지된
-    // 서비스 키다 — 둘 중 하나라도 통과하면 deriveDistributionType 이 offer 를
-    // SERVICE 유통으로 잘못 판정한다.
-    const filteredServiceKeys = (input.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
-
-    // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
-    // 규제 상품은 약국 대상 서비스(service_audience_policies)에만 연결 가능
-    const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-    const pharmacyServiceError = assertPharmacyOnlyServiceKeys(isPharmacyAudience, isRegulated, filteredServiceKeys);
-    if (pharmacyServiceError) {
-      return {
-        success: false,
-        error: pharmacyServiceError,
-        message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
-      };
-    }
-    const resolvedIsPublic = input.isPublic ?? (input.distributionType === OfferDistributionType.PUBLIC);
-
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-    // 의약품 판정 SSOT = product_masters.regulatory_type='DRUG'.
-    // 위 is_regulated 축은 실측상 DRUG 를 전혀 커버하지 못하므로(카테고리 미연결 100%)
-    // DRUG 축 게이트를 별도로 적용한다. 빈 serviceKeys·PUBLIC 전환도 여기서 거부된다.
-    const drugCreateGate = await assertDrugOfferAllowed(AppDataSource, {
-      action: 'OFFER_CREATE',
-      masterId,
-      regulatoryType: input.regulatoryType,
-      serviceKeys: filteredServiceKeys,
-      isPublic: resolvedIsPublic,
-    });
-    if (!drugCreateGate.allowed) {
-      logger.warn(
-        `[NetureOfferService] DRUG OFFER_CREATE denied: supplier=${supplierId}, master=${masterId}, keys=[${filteredServiceKeys.join(',')}], isPublic=${resolvedIsPublic}, code=${drugCreateGate.code}`,
-      );
-      return { success: false, error: drugCreateGate.code!, message: drugCreateGate.message };
-    }
-
-    const offer = this.offerRepo.create({
-      supplierId,
-      masterId,
-      slug,
-      isPublic: resolvedIsPublic,
-      distributionType: deriveDistributionType(resolvedIsPublic, filteredServiceKeys),
-      isActive: false,
-      approvalStatus: OfferApprovalStatus.PENDING,
-      allowedSellerIds: [],
-      serviceKeys: filteredServiceKeys,
-      priceGeneral: input.priceGeneral ?? 0,
-      priceGold: input.priceGold ?? null,
-      pricePlatinum: input.pricePlatinum ?? null,
-      consumerReferencePrice: input.consumerReferencePrice ?? null,
-      stockQuantity: input.stockQuantity,
-      consumerShortDescription: input.consumerShortDescription ?? null,
-      consumerDetailDescription: input.consumerDetailDescription ?? null,
-      businessShortDescription: null,
-      businessDetailDescription: null,
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured: input.isFeatured ?? false,
-    });
-
-    // WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1:
-    //   Offer 는 (supplier_id, master_id) 당 1행이다
-    //   (DB 제약 uq_supplier_product_offers_master_supplier — 유지가 정답.
-    //    근거: CHECK-O4O-SUPPLIER-PRODUCT-OFFER-UNIQUE-CONSTRAINT-CONTRACT-AUDIT-V1).
-    //   기존에는 사전 검사 없이 save() 로 직행해 재등록 시 23505 가 그대로 터졌고,
-    //   컨트롤러의 포괄 catch 에 걸려 일반 500 으로 노출됐다(전역 duplicate key → 409
-    //   변환기는 이 경로에 도달하지 않는다).
-    //   soft-delete 행도 슬롯을 계속 점유하므로(휴지통 복원 정책) withDeleted 로 함께 조회해
-    //   "이미 등록됨" 과 "휴지통에 있음" 을 구분한다.
-    const duplicate = await this.findDuplicateOffer(supplierId, masterId);
-    if (duplicate) return duplicate;
-
-    let savedOffer: SupplierProductOffer;
-    try {
-      savedOffer = await this.offerRepo.save(offer);
-    } catch (err: unknown) {
-      // 사전 검사와 INSERT 사이의 경쟁 상태 대비 fallback.
-      // 반드시 해당 제약일 때만 변환한다 — 이 테이블에는 slug UNIQUE 도 있다.
-      const dup = this.asOfferDuplicateViolation(err);
-      if (dup) {
-        logger.warn(
-          `[NetureOfferService] Duplicate offer race for supplier ${supplierId} / master ${masterId}`,
-        );
-        return (await this.findDuplicateOffer(supplierId, masterId)) ?? dup;
-      }
-      throw err;
-    }
-    logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
-
-    // WO-NETURE-REMOVE-NETURE-FROM-SERVICE-SELECTION-AND-APPROVAL-V1:
-    // Neture는 기본 운영 공간이므로 service approval 대상 아님
-    // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
-    // 승인 대상 서비스 키 정책은 filterApprovalEligibleServiceKeys(SSOT) 통해서만 결정
-    const approvalService = new OfferServiceApprovalService(AppDataSource);
-    const approvalKeys = filterApprovalEligibleServiceKeys(input.serviceKeys);
-    if (approvalKeys.length > 0) {
-      await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
-    }
-
-    return {
-      success: true,
-      data: {
-        id: savedOffer.id,
-        masterId: savedOffer.masterId,
-        isActive: savedOffer.isActive,
-        isPublic: savedOffer.isPublic,
-        approvalStatus: savedOffer.approvalStatus,
-        distributionType: savedOffer.distributionType,
-        allowedSellerIds: savedOffer.allowedSellerIds,
-        priceGeneral: savedOffer.priceGeneral,
-        priceGold: savedOffer.priceGold,
-        pricePlatinum: savedOffer.pricePlatinum,
-        consumerReferencePrice: savedOffer.consumerReferencePrice,
-        createdAt: savedOffer.createdAt,
-      },
-    };
-  }
-
-  // ==================== createSupplierOfferFromExistingMaster (WO-O4O-SUPPLIER-EXISTING-MASTER-DIRECT-OFFER-LINK-V1) ====================
-
-  /**
-   * POST /supplier/products/from-master — 검증된 기존 ProductMaster 에 Offer 직접 연결
-   *
-   *   ProductMaster 선택 → masterId → 서버 재검증 → SupplierProductOffer
-   *
-   * - Master 를 재추론하지 않는다 (resolveOrCreateMaster 미경유 · barcode/name 재탐색 0).
-   * - ProductMaster / ProductIdentifier / ProductCandidate write 0. 생성되는 것은 Offer(+service approval)뿐.
-   * - 규제 정보는 기존 Master 가 SSOT — 공급자에게 regulatoryType/mfdsPermitNumber 를 다시 받지 않는다.
-   * - 레거시 POST /supplier/products(barcode/name → Master 재추론)는 은퇴했다. 공급자가 masterId 로 Offer 를 만드는 곳은 여기뿐.
-   * - DRUG gate(assertDrugOfferAllowed) · Offer 유일성 계약은 persistOfferForResolvedMaster 가 기존 그대로 적용한다.
-   *
-   * @param rawBody 요청 body 원문 — 허용 키 검사를 여기서 한다(라우트가 아니라 서비스 계약).
-   */
   async createSupplierOfferFromExistingMaster(supplierId: string, rawBody: Record<string, unknown>) {
-    try {
-      const body = (rawBody && typeof rawBody === 'object' && !Array.isArray(rawBody)) ? rawBody : {};
-
-      // 1. body 키 계약 — supplierId 주입 · Master 기준정보 · 허용 목록 밖 키 거부
-      if ('supplierId' in body) {
-        return { success: false as const, error: OfferErrorCode.SUPPLIER_ID_NOT_ALLOWED, message: 'supplierId 는 요청 본문으로 받지 않습니다.' };
-      }
-      const masterFields = Object.keys(body).filter((k) => FROM_MASTER_FORBIDDEN_MASTER_KEYS.has(k));
-      if (masterFields.length > 0) {
-        return {
-          success: false as const,
-          error: OfferErrorCode.MASTER_FIELD_NOT_ALLOWED,
-          message: `기존 제품 연결에서는 제품 기준정보를 받지 않습니다: ${masterFields.join(', ')}`,
-        };
-      }
-      const unknownFields = Object.keys(body).filter((k) => !FROM_MASTER_ALLOWED_KEYS.has(k));
-      if (unknownFields.length > 0) {
-        return { success: false as const, error: OfferErrorCode.UNSUPPORTED_FIELD, message: `허용되지 않는 필드: ${unknownFields.join(', ')}` };
-      }
-      const input = body as unknown as CreateOfferFromExistingMasterInput;
-
-      // 2. masterId 형식
-      if (typeof input.masterId !== 'string' || !UUID_RE.test(input.masterId.trim())) {
-        return { success: false as const, error: OfferErrorCode.INVALID_MASTER_ID, message: 'masterId 형식이 올바르지 않습니다.' };
-      }
-      const masterId = input.masterId.trim();
-
-      // 3. 공개 유통 설명 요건 · 공급자 상태 (기존 등록 경로와 동일 계약)
-      const isPublic = input.isPublic ?? (input.distributionType === OfferDistributionType.PUBLIC);
-      if (isPublic && !input.consumerShortDescription?.trim()) {
-        return { success: false as const, error: OfferErrorCode.PUBLIC_REQUIRES_DESCRIPTION };
-      }
-      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId }, select: ['id', 'status'] });
-      if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
-        return { success: false as const, error: OfferErrorCode.SUPPLIER_NOT_ACTIVE };
-      }
-
-      // 4. Master 서버 재조회 — 클라이언트(Product Library)가 ACTIVE 만 보여주더라도 write 는 다시 확인한다
-      const master = await AppDataSource.getRepository(ProductMaster).findOne({
-        where: { id: masterId },
-        select: ['id', 'status', 'regulatoryType', 'categoryId', 'isMfdsVerified', 'mfdsPermitNumber', 'barcode'],
-      });
-      if (!master) {
-        return { success: false as const, error: OfferErrorCode.MASTER_NOT_FOUND, message: '선택한 제품을 찾을 수 없습니다.' };
-      }
-      if (master.status !== 'ACTIVE') {
-        return {
-          success: false as const,
-          error: OfferErrorCode.MASTER_NOT_ACTIVE,
-          message: `이 제품은 현재 연결할 수 없는 상태입니다 (${master.status}).`,
-        };
-      }
-      const canonicalRegulatoryType = canonicalizeRegulatoryType(master.regulatoryType);
-      if (!canonicalRegulatoryType) {
-        return {
-          success: false as const,
-          error: OfferErrorCode.MASTER_REGULATORY_TYPE_UNSUPPORTED,
-          message: '이 제품의 규제 분류를 확인할 수 없어 연결할 수 없습니다. 운영자에게 문의해 주세요.',
-        };
-      }
-
-      // 5. 규제 상품 permit — Master 값만 사용 (공급자 입력 없음). 기존 is_regulated 축 = 카테고리 기준.
-      let isRegulated = false;
-      if (master.categoryId) {
-        const category = await AppDataSource.getRepository(ProductCategory).findOne({ where: { id: master.categoryId } });
-        isRegulated = category?.isRegulated ?? false;
-      }
-      const permitError = assertRegulatedPermit({
-        isRegulated,
-        mfdsPermitNumber: master.mfdsPermitNumber,
-        isMfdsVerified: master.isMfdsVerified,
-        mode: 'registration',
-      });
-      if (permitError) {
-        return {
-          success: false as const,
-          error: permitError,
-          message: '규제 상품은 MFDS 검증이 없고 허가번호도 없는 경우 연결할 수 없습니다. 제품 기준정보 보강은 운영자 경로로 진행됩니다.',
-        };
-      }
-
-      // 6. 공통 persistence (DRUG gate · 중복 · save · approval) — 공급자 Offer 의 유일한 persistence primitive
-      const rawStock = input.stockQuantity;
-      const parsedStock = rawStock != null && rawStock !== '' ? Number(rawStock) : 0;
-      return await this.persistOfferForResolvedMaster(supplierId, {
-        masterId: master.id,
-        masterBarcode: master.barcode || master.id,
-        isRegulated,
-        regulatoryType: canonicalRegulatoryType,
-        stockQuantity: Number.isFinite(parsedStock) ? parsedStock : 0,
-        isPublic: input.isPublic,
-        distributionType: input.distributionType,
-        serviceKeys: Array.isArray(input.serviceKeys) ? input.serviceKeys : [],
-        priceGeneral: input.priceGeneral,
-        priceGold: input.priceGold,
-        pricePlatinum: input.pricePlatinum,
-        consumerReferencePrice: input.consumerReferencePrice,
-        consumerShortDescription: input.consumerShortDescription,
-        consumerDetailDescription: input.consumerDetailDescription,
-        isFeatured: input.isFeatured,
-      });
-    } catch (error) {
-      logger.error('[NetureOfferService] Error creating supplier offer from existing master:', error);
-      throw error;
-    }
+    return this.supplierOfferRegistrationService.createSupplierOfferFromExistingMaster(supplierId, rawBody);
   }
 
-  /**
-   * PATCH /supplier/products/:id - Offer 상태 업데이트
-   *
-   * 허용: isActive, distributionType, allowedSellerIds, 가격 필드
-   */
   async updateSupplierOffer(
     offerId: string,
     supplierId: string,
@@ -963,442 +146,26 @@ export class NetureOfferService {
       isFeatured?: boolean;
     }
   ) {
-    try {
-      const offer = await this.offerRepo.findOne({
-        where: { id: offerId, supplierId },
-      });
-
-      if (!offer) {
-        return { success: false, error: 'PRODUCT_NOT_FOUND' };
-      }
-
-      // WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1:
-      //   PRIVATE + allowedSellerIds:[] 게이트를 "요청이 실제로 유통 축을 건드렸는가" 로 좁히기 위해
-      //   변경 전 상태를 캡처한다. 아래 §PRIVATE 게이트 참조.
-      const prevIsPublic = offer.isPublic;
-      const prevIsActive = offer.isActive;
-      const prevSellerIdCount = offer.allowedSellerIds?.length ?? 0;
-
-      if (updates.isActive !== undefined) {
-        offer.isActive = updates.isActive;
-      }
-
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      if (updates.isFeatured !== undefined) {
-        offer.isFeatured = updates.isFeatured;
-      }
-
-      // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
-      if (updates.isPublic !== undefined) {
-        offer.isPublic = updates.isPublic;
-      }
-
-      if (updates.distributionType !== undefined && updates.isPublic === undefined) {
-        // 레거시 호환: distributionType만 전달된 경우 isPublic 동기화
-        offer.isPublic = updates.distributionType === OfferDistributionType.PUBLIC;
-      }
-
-      // distributionType 파생 (isPublic + serviceKeys 기반)
-      offer.distributionType = deriveDistributionType(offer.isPublic, offer.serviceKeys || []);
-
-      // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-      // 본 경로는 기존에 의약품 게이트가 전혀 없었고, isPublic=true 전환 시 아래에서
-      // autoExpandPublicProduct 로 전 서비스 확산까지 유발했다 (선행 감사 P0).
-      // 저장 직전에 최종 상태(isPublic + serviceKeys)를 기준으로 판정한다.
-      const drugUpdateGate = await assertDrugOfferAllowed(AppDataSource, {
-        action: offer.isPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE',
-        masterId: offer.masterId,
-        serviceKeys: offer.serviceKeys || [],
-        isPublic: offer.isPublic,
-      });
-      if (!drugUpdateGate.allowed) {
-        logger.warn(
-          `[NetureOfferService] DRUG offer update denied: offer=${offerId}, supplier=${supplierId}, master=${offer.masterId}, isPublic=${offer.isPublic}, code=${drugUpdateGate.code}`,
-        );
-        return { success: false, error: drugUpdateGate.code!, message: drugUpdateGate.message };
-      }
-
-      if (updates.allowedSellerIds !== undefined) {
-        offer.allowedSellerIds = updates.allowedSellerIds;
-      }
-
-      if (updates.priceGeneral !== undefined) {
-        offer.priceGeneral = updates.priceGeneral;
-      }
-      if (updates.priceGold !== undefined) {
-        offer.priceGold = updates.priceGold;
-      }
-      if (updates.pricePlatinum !== undefined) {
-        offer.pricePlatinum = updates.pricePlatinum;
-      }
-      if (updates.consumerReferencePrice !== undefined) {
-        offer.consumerReferencePrice = updates.consumerReferencePrice;
-      }
-      if (updates.stockQuantity !== undefined) {
-        offer.stockQuantity = updates.stockQuantity;
-      }
-
-      if (updates.consumerShortDescription !== undefined) {
-        offer.consumerShortDescription = updates.consumerShortDescription;
-      }
-      if (updates.consumerDetailDescription !== undefined) {
-        offer.consumerDetailDescription = updates.consumerDetailDescription;
-      }
-
-      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level field updates (consolidated)
-      // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
-      //   offer 수정 시점의 master 는 **항상 기존 master** 다(이 요청이 만들지 않았다).
-      //   공급자 offer 수정은 공급 조건 수정이지 master 편집이 아니므로 기준정보를 쓰지 않는다.
-      //   ProductMaster 기준정보 수정은 운영자/관리자 경로(/api/v1/admin/o4o-product-db/*)가 담당한다.
-      const updateDecision = resolveMasterWriteFields(false, updates as Record<string, unknown>);
-      if (updateDecision.ignoredFields.length > 0) {
-        logger.info(
-          `[NetureOfferService] Offer ${offerId} update did not modify master ${offer.masterId} ` +
-            `(ignored supplier fields: ${updateDecision.ignoredFields.join(', ')})`,
-        );
-      }
-
-      // §PRIVATE 게이트 — WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1
-      //
-      // 이전 구현은 "PRIVATE + sellerIds 비어있음" 이면 **모든** 수정을 거부했다.
-      // 그런데 (당시의) createSupplierOffer 는 신규 등록을 항상 isPublic:false + serviceKeys:[] +
-      // allowedSellerIds:[] (= PRIVATE, UI 의 "내부 상품") 로 만들었다. 결과적으로 신규 등록 상품은
-      // 공급 방식을 설정하기 전까지 가격·설명·재고 등 어떤 정보도 저장할 수 없었다 (실사용 차단).
-      //
-      // 노출·거래 안전성은 이 게이트가 아니라 소비 경로가 이미 보장한다 —
-      // 매장 HUB(pharmacy-products.controller) · 매장 checkout(kpa) ·
-      // 파트너 조달(seller.service · neture-b2b-cart-checkout) 이 모두
-      // `distribution_type <> 'PRIVATE' OR $x = ANY(allowed_seller_ids)` 로 필터하므로
-      // allowedSellerIds 가 비어 있는 PRIVATE offer 는 어디에도 노출되지 않고 주문도 되지 않는다.
-      //
-      // 따라서 게이트는 **유통 축을 실제로 바꾸거나 상품을 활성화하는 요청**에만 적용한다.
-      // 순수 정보 수정(가격·설명·재고·대표 노출)은 통과시킨다.
-      const distributionChanged =
-        offer.isPublic !== prevIsPublic ||
-        (offer.allowedSellerIds?.length ?? 0) !== prevSellerIdCount;
-      const activating = offer.isActive === true && prevIsActive === false;
-
-      if ((distributionChanged || activating) &&
-          offer.distributionType === OfferDistributionType.PRIVATE &&
-          (!offer.allowedSellerIds || offer.allowedSellerIds.length === 0)) {
-        return { success: false, error: 'PRIVATE_REQUIRES_SELLER_IDS' };
-      }
-
-      const savedOffer = await this.offerRepo.save(offer);
-
-      // WO-O4O-PRODUCT-AUTO-LISTING-STABILIZATION-V1: PUBLIC 전환 시 기존 매장에 자동 Listing 확산
-      if (savedOffer.distributionType === OfferDistributionType.PUBLIC
-          && savedOffer.approvalStatus === OfferApprovalStatus.APPROVED
-          && savedOffer.isActive) {
-        autoExpandPublicProduct(AppDataSource, savedOffer.id, savedOffer.masterId)
-          .then((count) => logger.info(`[NetureOfferService] Auto-expanded ${count} listings for offer ${savedOffer.id} master ${savedOffer.masterId} (PUBLIC transition)`))
-          .catch((err) => logger.warn(`[NetureOfferService] Auto-expand failed for offer ${savedOffer.id} master ${savedOffer.masterId}:`, err));
-      }
-
-      logger.info(`[NetureOfferService] Updated offer ${offerId} by supplier ${supplierId}`);
-
-      return {
-        success: true,
-        data: {
-          id: savedOffer.id,
-          isActive: savedOffer.isActive,
-          isPublic: savedOffer.isPublic,
-          distributionType: savedOffer.distributionType,
-          allowedSellerIds: savedOffer.allowedSellerIds,
-          priceGeneral: savedOffer.priceGeneral,
-          priceGold: savedOffer.priceGold,
-          pricePlatinum: savedOffer.pricePlatinum,
-          consumerReferencePrice: savedOffer.consumerReferencePrice,
-          updatedAt: savedOffer.updatedAt,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureOfferService] Error updating supplier offer:', error);
-      throw error;
-    }
+    return this.supplierOfferWriteService.updateSupplierOffer(offerId, supplierId, updates);
   }
 
-  // ==================== 공급 방식 변경 (WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1) ====================
-
-  /**
-   * 공급 방식(전체 공개 여부 + 서비스 대상) 정식 변경.
-   *   - serviceKeys diff: 추가 → pending 생성/재심사, 제거 → 'cancelled' 전환 + 해당 listing 비활성.
-   *   - offer.service_keys / is_public / distribution_type 갱신 후 파생 상태 재동기화.
-   *   - PUBLIC 은 승인 무관(게이트 예외). 가격은 이번 경로에서 변경하지 않음(별도 편집).
-   *   - 트랜잭션으로 일괄 처리.
-   * @param userId 공급자 user id (sync 의 decidedBy actor — 운영자 액션 아님)
-   */
   async updateDistribution(
     offerId: string,
     supplierId: string,
     userId: string,
     input: { isPublic?: boolean; serviceKeys?: string[] },
   ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
-    const [offer] = await AppDataSource.query(
-      `SELECT id, supplier_id, is_public, service_keys, master_id FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL`,
-      [offerId],
-    );
-    if (!offer) return { success: false, error: 'OFFER_NOT_FOUND' };
-    if (offer.supplier_id !== supplierId) return { success: false, error: 'NOT_OWNED' };
-
-    const currentKeys: string[] = offer.service_keys || [];
-    // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1:
-    //   이 경로는 **승인 대상 키(SSOT) 2개만 책임진다**. 그 밖의 키
-    //   (pharmacy-hub / neture 등)는 다른 경로가 소유하므로 그대로 보존한다.
-    //
-    //   이전 구현은 nextKeys = filterApprovalEligibleServiceKeys(input.serviceKeys) 였다.
-    //   승인 대상이 아닌 키는 입력에 담겨 있든 없든 전부 탈락 → 공급자가 유통 화면을
-    //   한 번 저장하면 pharmacy-hub / neture 가 조용히 삭제되었다.
-    //
-    //   approval 생성·취소 diff 는 여전히 승인 대상 키에서만 계산하므로
-    //   기존 3개 서비스의 승인·listing 거동은 변하지 않는다.
-    const preservedKeys = currentKeys.filter((k) => !isApprovalEligibleServiceKey(k));
-    const currentEligible = filterApprovalEligibleServiceKeys(currentKeys);
-    const nextEligible = input.serviceKeys !== undefined
-      ? filterApprovalEligibleServiceKeys(input.serviceKeys)
-      : currentEligible;
-    const nextKeys = Array.from(new Set([...nextEligible, ...preservedKeys]));
-    const nextIsPublic = input.isPublic !== undefined ? !!input.isPublic : !!offer.is_public;
-
-    const added = nextEligible.filter((k) => !currentEligible.includes(k));
-    const removed = currentEligible.filter((k) => !nextEligible.includes(k));
-    const nextDist = deriveDistributionType(nextIsPublic, nextKeys);
-
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-    // 본 경로는 serviceKeys 와 is_public 을 모두 바꾸지만 의약품 게이트가 없었다.
-    // 최종 상태(nextKeys + nextIsPublic) 기준으로 판정한다.
-    const drugDistGate = await assertDrugOfferAllowed(AppDataSource, {
-      action: nextIsPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE',
-      masterId: offer.master_id,
-      serviceKeys: nextKeys,
-      isPublic: nextIsPublic,
-    });
-    if (!drugDistGate.allowed) {
-      logger.warn(
-        `[NetureOfferService] DRUG updateDistribution denied: offer=${offerId}, supplier=${supplierId}, master=${offer.master_id}, keys=[${nextKeys.join(',')}], isPublic=${nextIsPublic}, code=${drugDistGate.code}`,
-      );
-      return { success: false, error: drugDistGate.code! };
-    }
-
-    const approvalService = new OfferServiceApprovalService(AppDataSource);
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      // 1. offer 갱신 (service_keys / is_public / distribution_type)
-      await queryRunner.query(
-        `UPDATE supplier_product_offers
-         SET service_keys = $2::text[], is_public = $3, distribution_type = $4, updated_at = NOW()
-         WHERE id = $1`,
-        [offerId, nextKeys, nextIsPublic, nextDist],
-      );
-
-      // 2. 제거된 서비스 → cancelled + listing 비활성 (삭제 금지)
-      let removedResult = { cancelledServiceKeys: [] as string[], deactivatedListings: 0 };
-      if (removed.length) {
-        removedResult = await approvalService.cancelServiceApprovals(offerId, removed, queryRunner);
-      }
-
-      // 3. 추가된 서비스 → pending 생성/재심사 (cancelled/rejected → pending)
-      let addedResult = { insertedServiceKeys: [] as string[], resubmittedServiceKeys: [] as string[] };
-      if (added.length) {
-        addedResult = await approvalService.createPendingApprovals(offerId, added, queryRunner);
-      }
-
-      // 4. 파생 상태 재동기화 (cancelled 제외 규칙 반영)
-      const sync = await approvalService.syncOfferFromServiceApprovals(offerId, userId, queryRunner);
-
-      await queryRunner.commitTransaction();
-      logger.info(`[NetureOfferService] updateDistribution offer ${offerId}: +[${added.join(',')}] -[${removed.join(',')}] isPublic=${nextIsPublic} dist=${nextDist}`);
-      return {
-        success: true,
-        data: {
-          isPublic: nextIsPublic,
-          serviceKeys: nextKeys,
-          distributionType: nextDist,
-          added,
-          removed,
-          addedResult,
-          removedResult,
-          sync,
-        },
-      };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      logger.error(`[NetureOfferService] updateDistribution failed for ${offerId}:`, error);
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    return this.supplierOfferDistributionService.updateDistribution(offerId, supplierId, userId, input);
   }
 
-  // ==================== 단일 서비스 제공 토글 (WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1) ====================
-
-  /**
-   * 특정 서비스 1개에 대한 제공 시작/중지 — `service_keys` 에서 그 키만 멱등 추가/제거한다.
-   *
-   * updateDistribution 과의 관계:
-   *   updateDistribution 은 **승인 대상 2키(kpa-society/k-cosmetics)** 를 책임진다.
-   *   승인 큐·listing 캐스케이드가 그 3키에만 존재하기 때문이다.
-   *   이 메서드는 **승인 대상이 아닌 키**(pharmacy-hub 등)를 담당한다 — 승인 레코드를
-   *   만들지 않고 즉시 제공을 시작/중지한다. 유통 관리 기능을 복제하지 않으려고
-   *   소유권 검증·distribution_type 파생·서비스별 가격을 모두 기존 규칙으로 재사용한다.
-   *
-   * 불변식:
-   *   - 다른 서비스 키는 절대 건드리지 않는다 (대상 키 1개만 add/remove).
-   *   - offer_service_approvals / organization_product_listings / product_approvals 미변경.
-   *   - ProductMaster · 공통 가격(price_general) 미변경.
-   *   - Offer 삭제 없음.
-   *
-   * 규제 상품 게이트: 대상 서비스가 `service_audience_policies.is_pharmacy_target_service`
-   *   가 아니면 규제 상품 연결을 거부한다 (createSupplierOfferFromExistingMaster / submitForApproval 와 동일 술어).
-   */
   async setServiceDelivery(
     offerId: string,
     supplierId: string,
     serviceKey: string,
     input: { enabled: boolean; unitPrice?: number | null },
   ): Promise<{ success: boolean; error?: string; message?: string; data?: Record<string, unknown> }> {
-    if (isApprovalEligibleServiceKey(serviceKey)) {
-      // 승인 대상 키는 승인 큐를 거쳐야 한다 — 이 경로로 우회시키지 않는다.
-      return { success: false, error: 'SERVICE_KEY_REQUIRES_APPROVAL_FLOW' };
-    }
-
-    const [row]: Array<{
-      id: string;
-      supplier_id: string;
-      is_public: boolean;
-      service_keys: string[] | null;
-      is_regulated: boolean | null;
-      master_id: string;
-      regulatory_type: string | null;
-    }> = await AppDataSource.query(
-      `SELECT o.id, o.supplier_id, o.is_public, o.service_keys, pc.is_regulated,
-              o.master_id, pm.regulatory_type
-         FROM supplier_product_offers o
-         JOIN product_masters pm ON pm.id = o.master_id
-         LEFT JOIN product_categories pc ON pc.id = pm.category_id
-        WHERE o.id = $1 AND o.deleted_at IS NULL`,
-      [offerId],
-    );
-    if (!row) return { success: false, error: 'OFFER_NOT_FOUND' };
-    if (row.supplier_id !== supplierId) return { success: false, error: 'NOT_OWNED' };
-
-    const currentKeys: string[] = row.service_keys || [];
-    const alreadyOn = currentKeys.includes(serviceKey);
-
-    // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §16-5 결정):
-    //   공급자 opt-in 은 폐지 — 새 제공 시작을 받지 않는다(일반가 = 기본 공급, 별도 단가 = 공급 제안).
-    //   제공 중인 상품의 단가 변경 · 제공 중지는 기존 PH 주문 처리 동안 유지한다.
-    if (input.enabled && !alreadyOn && isSupplierOptinServiceKey(serviceKey)) {
-      return {
-        success: false,
-        error: 'SUPPLIER_OPTIN_RETIRED',
-        message:
-          '서비스 직접 제공은 종료되었습니다. 일반 공급은 제품 등록 승인(Neture 약국 기본 공급), 별도 단가는 공급 제안으로 신청해 주세요.',
-      };
-    }
-    //   service_keys 가 비면 Neture 약국 기본 공급으로 판정된다(supply-access). opt-in 키만 남은 상품에서
-    //   키를 지우면 운영자 승인 없이 공급 범위가 넓어지므로 막는다 — 공급을 멈추려면 상품을 비활성으로 바꾼다.
-    if (!input.enabled && alreadyOn && currentKeys.every((k) => k === serviceKey)) {
-      return {
-        success: false,
-        error: 'OPTIN_STOP_WOULD_EXPOSE_DEFAULT_SUPPLY',
-        message:
-          '이 상품은 다른 공급 경로가 없어 제공을 중지하면 Neture 약국 기본 공급으로 노출됩니다. 공급을 멈추려면 제품 목록에서 상품을 비활성으로 바꿔 주세요.',
-      };
-    }
-
-    if (input.enabled && !!row.is_regulated) {
-      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
-      if (!isPharmacyAudience(serviceKey)) {
-        return {
-          success: false,
-          error: OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE,
-          message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
-        };
-      }
-    }
-
-    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
-    // 위 is_regulated 축은 실측상 DRUG 를 전혀 커버하지 못한다(카테고리 미연결 100%).
-    // DRUG SSOT(regulatory_type) 기준으로 다시 판정한다. 제공 중지(enabled=false)는 막지 않는다.
-    if (input.enabled) {
-      const drugDeliveryGate = await assertDrugOfferAllowed(AppDataSource, {
-        action: 'OFFER_UPDATE',
-        masterId: row.master_id,
-        regulatoryType: row.regulatory_type,
-        serviceKeys: [serviceKey],
-        isPublic: false, // 본 경로는 is_public 을 바꾸지 않는다
-      });
-      if (!drugDeliveryGate.allowed) {
-        logger.warn(
-          `[NetureOfferService] DRUG setServiceDelivery denied: offer=${offerId}, master=${row.master_id}, service=${serviceKey}, code=${drugDeliveryGate.code}`,
-        );
-        return { success: false, error: drugDeliveryGate.code!, message: drugDeliveryGate.message };
-      }
-    }
-
-    const nextKeys = input.enabled
-      ? (alreadyOn ? currentKeys : [...currentKeys, serviceKey])
-      : currentKeys.filter((k) => k !== serviceKey);
-    // distribution_type 은 (is_public, service_keys) 파생값이다. updateSupplierOffer 가
-    // 모든 공급자 편집에서 같은 규칙으로 재계산하므로, 여기서도 함께 맞춰 중간 불일치를 없앤다.
-    const nextDist = deriveDistributionType(!!row.is_public, nextKeys);
-
-    const queryRunner = AppDataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      await queryRunner.query(
-        `UPDATE supplier_product_offers
-            SET service_keys = $2::text[], distribution_type = $3, updated_at = NOW()
-          WHERE id = $1`,
-        [offerId, nextKeys, nextDist],
-      );
-
-      // 서비스별 공급가 — 값이 오면 upsert. 제공 중지 시 가격 행은 지우지 않는다
-      // (재개 시 이전 단가 보존. 노출은 service_keys 로만 결정되므로 잔존 행은 무해하다).
-      let priceApplied: number | null = null;
-      if (input.unitPrice !== undefined && input.unitPrice !== null) {
-        const price = Math.max(0, Math.trunc(Number(input.unitPrice)));
-        if (!Number.isFinite(price)) return { success: false, error: 'INVALID_UNIT_PRICE' };
-        await queryRunner.query(
-          `INSERT INTO offer_service_prices (offer_id, service_key, unit_price, created_at, updated_at)
-           VALUES ($1, $2, $3, NOW(), NOW())
-           ON CONFLICT (offer_id, service_key)
-           DO UPDATE SET unit_price = EXCLUDED.unit_price, updated_at = NOW()`,
-          [offerId, serviceKey, price],
-        );
-        priceApplied = price;
-      }
-
-      await queryRunner.commitTransaction();
-      logger.info(
-        `[NetureOfferService] setServiceDelivery offer ${offerId} ${serviceKey}=${input.enabled} dist=${nextDist} price=${priceApplied ?? 'unchanged'}`,
-      );
-      return {
-        success: true,
-        data: {
-          offerId,
-          serviceKey,
-          enabled: input.enabled,
-          changed: alreadyOn !== input.enabled,
-          serviceKeys: nextKeys,
-          distributionType: nextDist,
-          unitPrice: priceApplied,
-        },
-      };
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      logger.error(`[NetureOfferService] setServiceDelivery failed for ${offerId}:`, error);
-      throw error;
-    } finally {
-      await queryRunner.release();
-    }
+    return this.supplierOfferDistributionService.setServiceDelivery(offerId, supplierId, serviceKey, input);
   }
-
-  // ==================== B2B Content (WO-NETURE-B2B-CONTENT-MANAGEMENT-V1) ====================
 
   async updateBusinessContent(
     offerId: string,
@@ -1408,39 +175,9 @@ export class NetureOfferService {
       businessDetailDescription?: string | null;
     },
   ) {
-    try {
-      const offer = await this.offerRepo.findOne({
-        where: { id: offerId, supplierId },
-      });
-
-      if (!offer) {
-        return { success: false, error: 'PRODUCT_NOT_FOUND' };
-      }
-
-      if (updates.businessShortDescription !== undefined) {
-        offer.businessShortDescription = updates.businessShortDescription;
-      }
-      if (updates.businessDetailDescription !== undefined) {
-        offer.businessDetailDescription = updates.businessDetailDescription;
-      }
-
-      const saved = await this.offerRepo.save(offer);
-      logger.info(`[NetureOfferService] Updated business content for offer ${offerId} by supplier ${supplierId}`);
-
-      return {
-        success: true,
-        data: {
-          id: saved.id,
-          businessShortDescription: saved.businessShortDescription,
-          businessDetailDescription: saved.businessDetailDescription,
-          updatedAt: saved.updatedAt,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureOfferService] Error updating business content:', error);
-      throw error;
-    }
+    return this.supplierOfferWriteService.updateBusinessContent(offerId, supplierId, updates);
   }
+
   async getSupplierProductsPaginated(
     supplierId: string,
     options: {
@@ -1460,6 +197,7 @@ export class NetureOfferService {
   ) {
     return this.supplierOfferReadService.getSupplierProductsPaginated(supplierId, options);
   }
+
   async getSupplierProductApprovalCounts(
     supplierId: string,
     options: {
@@ -1475,8 +213,6 @@ export class NetureOfferService {
     return this.supplierOfferReadService.getSupplierProductApprovalCounts(supplierId, options);
   }
 
-  // ==================== Batch Update (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
-
   async batchUpdateSupplierOffers(
     supplierId: string,
     updates: Array<{
@@ -1489,141 +225,28 @@ export class NetureOfferService {
       stockQuantity?: number;
     }>,
   ) {
-    const updated: string[] = [];
-    const failed: Array<{ id: string; error: string }> = [];
-
-    for (const item of updates) {
-      try {
-        const result = await this.updateSupplierOffer(item.offerId, supplierId, {
-          isActive: item.isActive,
-          isPublic: item.isPublic,
-          distributionType: item.distributionType,
-          priceGeneral: item.priceGeneral,
-          consumerReferencePrice: item.consumerReferencePrice,
-          stockQuantity: item.stockQuantity,
-        });
-        if (result.success) {
-          updated.push(item.offerId);
-        } else {
-          failed.push({ id: item.offerId, error: result.error || 'UNKNOWN' });
-        }
-      } catch (err) {
-        failed.push({ id: item.offerId, error: (err as Error).message });
-      }
-    }
-
-    return { updated, failed };
+    return this.supplierOfferWriteService.batchUpdateSupplierOffers(supplierId, updates);
   }
-
-  // ==================== Operator Batch Toggle Active ====================
 
   async batchToggleOfferActive(
     offerIds: string[],
     isActive: boolean,
   ): Promise<{ updated: string[]; failed: Array<{ id: string; error: string }> }> {
-    const updated: string[] = [];
-    const failed: Array<{ id: string; error: string }> = [];
-
-    for (const offerId of offerIds) {
-      try {
-        const offer = await this.offerRepo.findOne({ where: { id: offerId } });
-        if (!offer) {
-          failed.push({ id: offerId, error: 'PRODUCT_NOT_FOUND' });
-          continue;
-        }
-        offer.isActive = isActive;
-        await this.offerRepo.save(offer);
-        updated.push(offerId);
-      } catch (err) {
-        failed.push({ id: offerId, error: (err as Error).message });
-      }
-    }
-
-    return { updated, failed };
+    return this.offerLifecycleService.batchToggleOfferActive(offerIds, isActive);
   }
 
-  // ==================== Bulk Delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1) ====================
-
-  /**
-   * WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
-   * 공급자 삭제를 **soft delete** 로 정합화한다.
-   *
-   * 이전 계약(hard delete)의 문제:
-   *   - `supplier_product_offers` 를 참조하는 FK 5개가 전부 ON DELETE CASCADE 다
-   *     (organization_product_listings / service_products / offer_service_approvals /
-   *      product_approvals / offer_service_prices).
-   *     즉 공급자의 일괄 삭제 한 번이 **매장 진열과 운영자 승인 이력까지** 함께 지웠고 복구가 불가능했다.
-   *   - 운영자 정책은 이미 soft delete + 휴지통 + 복원이며(operator-product-cleanup.controller),
-   *     hard delete 는 "휴지통에 있고 활성 listing/service_products 가 없는 건"만 허용한다.
-   *   - 공급자 목록 조회(buildPaginatedWhereClause)는 이미 `spo.deleted_at IS NULL` 을 전제하고 있었다.
-   *     삭제 동작만 계약에서 벗어나 있었다.
-   *
-   * 새 계약: 운영자 hard-delete 와 **같은 가드**를 적용하고, 통과분은 soft delete 한다.
-   *   → 운영자 휴지통에 나타나고 복원 가능하며, `is_active=false` + `deleted_at` 로 노출도 끊긴다.
-   */
   async bulkDeleteOffers(
     supplierId: string,
     offerIds: string[],
     deletedBy?: string,
   ): Promise<{ deleted: number; failed: Array<{ id: string; error: string }> }> {
-    // findBy 는 @DeleteDateColumn 덕분에 이미 철회된 행을 제외한다 → 재삭제는 NOT_FOUND_OR_NOT_OWNED.
-    const offers = await this.offerRepo.find({
-      where: { id: In(offerIds), supplierId },
-    });
-
-    const foundIds = new Set(offers.map((o) => o.id));
-    const failed: Array<{ id: string; error: string }> = [];
-
-    for (const id of offerIds) {
-      if (!foundIds.has(id)) {
-        failed.push({ id, error: 'NOT_FOUND_OR_NOT_OWNED' });
-      }
-    }
-
-    let deleted = 0;
-    for (const offer of offers) {
-      try {
-        // 가드: 매장에 살아있는 진열/서비스 상품이 있으면 지우지 않는다.
-        // soft delete 라도 `opl.is_active` 만 보고 `spo.deleted_at` 은 안 보는 소비 경로가 있어
-        // 유령 상품이 남는다. 운영자 hard-delete 가드와 동일한 조건이다.
-        const [listings, serviceProducts] = await Promise.all([
-          AppDataSource.query(
-            `SELECT COUNT(*)::int AS cnt FROM organization_product_listings WHERE offer_id = $1 AND is_active = true`,
-            [offer.id],
-          ),
-          AppDataSource.query(
-            `SELECT COUNT(*)::int AS cnt FROM service_products WHERE offer_id = $1`,
-            [offer.id],
-          ),
-        ]);
-        if (listings[0]?.cnt > 0) {
-          failed.push({ id: offer.id, error: OfferErrorCode.HAS_ACTIVE_LISTINGS });
-          continue;
-        }
-        if (serviceProducts[0]?.cnt > 0) {
-          failed.push({ id: offer.id, error: OfferErrorCode.HAS_SERVICE_PRODUCTS });
-          continue;
-        }
-
-        // 운영자 휴지통이 읽는 컬럼(deleted_by / delete_reason)까지 함께 채운다.
-        await this.offerRepo.update(offer.id, {
-          isActive: false,
-          deletedBy: deletedBy ?? null,
-          deleteReason: 'SUPPLIER_DELETE',
-        });
-        await this.offerRepo.softDelete(offer.id);
-        deleted++;
-      } catch (err) {
-        failed.push({ id: offer.id, error: (err as Error).message });
-      }
-    }
-
-    logger.info(`[OfferService] bulkDeleteOffers(soft): supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
-    return { deleted, failed };
+    return this.supplierOfferWriteService.bulkDeleteOffers(supplierId, offerIds, deletedBy);
   }
+
   async getOperatorSupplyProducts(operatorUserId: string) {
     return this.operatorOfferReadService.getOperatorSupplyProducts(operatorUserId);
   }
+
   async getAllRegisteredOffers(options: {
     page?: number;
     limit?: number;
