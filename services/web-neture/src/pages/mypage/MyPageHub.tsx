@@ -12,6 +12,7 @@ import { api } from "../../lib/apiClient";
 import { useHomeEntry, buildHomeEntryModel } from "../../lib/home-entry";
 import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import HomeEntryPanel from "../../components/home/HomeEntryPanel";
+import { MyHomeParticipation } from "../../components/mypage/MyHomeParticipation";
 import { getNetureMyPageNavItems } from "./navItems";
 import {
   MyHomeActivity,
@@ -59,7 +60,7 @@ function MyHomeContent({ view }: { view: View }) {
     } catch {
       /* Optional return context. */
     }
-  }, [source, sourceKey, user?.id]);
+  }, [source, sourceKey, user]);
 
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
@@ -110,6 +111,25 @@ function MyHomeContent({ view }: { view: View }) {
             ))}
           </div>
           {entry.error && <ResourceNotice error reload={entry.reload} />}
+          <MyHomeParticipation accountId={user.id} data={entry.data} compact />
+          {entry.data && (
+            <>
+              <section aria-label="커뮤니티 활동 요약">
+                <h2 className="mb-3 text-lg font-semibold">커뮤니티 활동</h2>
+                <MyHomeActivity accountId={user.id} data={entry.data} compact />
+              </section>
+              <section aria-label="내 매장 경영 요약">
+                <h2 className="mb-3 text-lg font-semibold">
+                  내 매장 경영 현황
+                </h2>
+                <MyHomeManagement
+                  accountId={user.id}
+                  data={entry.data}
+                  compact
+                />
+              </section>
+            </>
+          )}
           <MyHomeNotifications accountId={user.id} />
           <div className="flex flex-wrap gap-4 text-sm">
             <Link to="/mypage/profile" className="text-blue-700 underline">
@@ -121,13 +141,16 @@ function MyHomeContent({ view }: { view: View }) {
           </div>
         </div>
       ) : view === "services" ? (
-        <HomeEntryPanel
-          user={user}
-          data={entry.data}
-          loading={entry.loading}
-          error={entry.error}
-          onReload={entry.reload}
-        />
+        <div className="space-y-6">
+          <HomeEntryPanel
+            user={user}
+            data={entry.data}
+            loading={entry.loading}
+            error={entry.error}
+            onReload={entry.reload}
+          />
+          <MyHomeParticipation accountId={user.id} data={entry.data} />
+        </div>
       ) : !entry.data ? (
         <ResourceNotice error={!!entry.error} reload={entry.reload} />
       ) : view === "activity" ? (
@@ -162,7 +185,8 @@ export default function MyPageHub({ view = "overview" }: { view?: View }) {
           <p className="mb-4">
             모든 서비스의 My Home은 대표 홈에서 함께 이용합니다.
           </p>
-          <MyHomeButton accountId={user?.id}
+          <MyHomeButton
+            accountId={user?.id}
             api={api}
             isAuthenticated
             className="text-blue-700 underline"

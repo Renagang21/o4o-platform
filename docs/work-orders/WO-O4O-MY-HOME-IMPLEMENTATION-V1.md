@@ -19,6 +19,8 @@
 | 화면 | 출처 | 제공 범위 |
 |---|---|---|
 | 참여 서비스 | 기존 `/auth/services`, `/neture/home/entry`, `/work-scope/operator-services`, `/communities` | 본인 이용 상태·업무 진입. 실제 상세 작업은 원래 서비스 |
+| 학습 참여 | `/lms/enrollments/me` | lecture 활성 회원의 본인 수강 상태·제공된 진도. 학습은 Study 원본 강의 |
+| 펀딩 참여 | `/api/market-trial/my-participations` | 인증 사용자의 본인 참여·펀딩 처리 상태. 금액 집계·처리 변경 없음 |
 | 알림 | `/notifications`, `/notifications/unread-count` | 본인 최근 5건·읽지 않은 수. 상세 및 읽음 처리는 해당 서비스 |
 | 커뮤니티 활동 | 접근 가능한 `/communities/:key/forum/posts?author=me` | 본인 글·전체 글 목록·기존 운영자 가입 심사. 댓글 상세는 원래 커뮤니티 |
 | 경영 현황 | `/kpa/pharmacy/analytics/marketing` + `X-Store-Organization-Id` | 선택한 승인 매장의 QR 방문: 오늘·최근 7일·누적·사용 중 QR·최근 14일 추이. 서버의 기존 매장 소유권 판정 유지 |
@@ -26,7 +28,20 @@
 
 이동 중 계정 변경 시 이전 인증 응답으로 이동하지 않는다. 조회 실패와 데이터 없음·실제 0을 구분하고 재시도를 제공한다. 계정 변경 시 이전 데이터는 즉시 숨기고 늦은 응답을 무시한다. 선택 매장 변경도 같은 방식으로 처리한다. 이동 버튼은 헤더·하단 메뉴 사이의 중복 요청을 차단하고 bfcache 복원 시 재시도할 수 있다.
 
-매출·POS·사업별 성과·학습 진도·펀딩 이력·댓글을 통합 집계하는 API는 새로 만들지 않았다. 원본 서비스에서 이어갈 수 있다. 존재하지 않는 최근 이용 이력이나 통계 수치는 표시하지 않는다. DB migration·원장 변경·신규 dependency·CI 설정 변경은 없다.
+매출·POS·사업별 성과·댓글을 통합 집계하는 API는 새로 만들지 않았다. 학습·펀딩은 아래 연속 Phase에서 기존 본인 조회 API를 소비하며 원장을 복제하지 않는다. 존재하지 않는 최근 이용 이력이나 통계 수치는 표시하지 않는다. DB migration·원장 변경·신규 dependency·CI 설정 변경은 없다.
+
+## 연속 Phase: 서비스 참여·활동 통합 (2026-10-11)
+
+사용자 `다음작업,작업을 작게 나누지 마` 지시에 따라, 같은 미완료 My Home WO의 전용 worktree·branch에서 화면·데이터·원본 업무 연결·검증·main 통합·배포를 한 범위로 진행한다. 최신 main `b565fb00965aa12c84df4f31ed3bff9395fac73e`의 Funding 독립 개설·포럼 변경과 기존 본인 참여 endpoint를 재확인했다. 다른 세션의 작업 폴더는 변경하지 않는다.
+
+- 모아보기에서 Study 최근 수강 3건과 진도, Funding 최근 참여 3건과 진행·펀딩 처리 상태를 표시한다. 참여 서비스에서는 Study 서버 페이지·Funding 클라이언트 페이지로 10건씩 확인한다. Funding 원본 API는 전체 본인 이력을 반환하므로 클라이언트 페이지가 서버 조회량을 줄이지는 않는다.
+- 모아보기에서 접근 가능한 최대 3개 커뮤니티의 최근 본인 글 2건씩과 선택한 승인 매장의 QR 방문 요약을 함께 확인한다. 커뮤니티 활동·경영 현황에서 기존 상세 조회를 유지한다. 전체 커뮤니티의 활동을 합산한 수치나 최근 이용 순위를 만들지 않는다.
+- Study는 `/lms/enrollments/me`를 사용한다. 서버의 lecture 고정 scope·현재 사용자·활성 membership guard를 유지하고, 클라이언트가 `userId`·`serviceKey`를 전달하지 않는다. 카탈로그 미확인·비활성 회원·서버 403을 성공한 빈 이력과 구분한다. 진도 미제공과 실제 0%도 구분한다.
+- Funding은 `/api/market-trial/my-participations`의 인증 사용자 기준 기록을 사용한다. 서비스 membership을 새 조회 조건으로 요구하지 않는다. 화면 상태에는 제목·식별자·진행 상태·펀딩 처리 상태만 남기며 참여자 개인정보·금액·오프라인 처리 원장은 집계하지 않는다. 잘못된 응답·조회 실패를 빈 이력으로 처리하지 않는다.
+- Study의 내 수강 목록과 개별 강의로 이동할 때 기존 one-use handoff를 사용한다. 고정 Study origin·`/handoff`·요청했던 `returnTo`를 확인하고, 중복 클릭·계정 변경·unmount·bfcache 이후 늦은 응답을 차단한다. Funding은 기존 Funding 호스트의 참여 목록·상세 링크를 사용한다. Funding에서 로그인 확인이 필요할 수 있다는 현재 동작을 안내하며 서비스 자격을 우회하지 않는다.
+- 기존 `/mypage` 화면 구조·공통 헤더·모바일 진입을 유지한다. API·권한·공유 패키지·schema·dependency·배포 설정 변경은 없다. 실제 테스트 계정 문서가 없는 운영 인증 smoke는 별도 미확인 범위다.
+
+이번 Phase의 실제 검증·통합·배포 결과는 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)의 연속 Phase 절에서 확인한다. 이전 PR #449의 결과를 이번 변경의 검증으로 대체하지 않는다.
 
 ## 검증과 남은 단계
 

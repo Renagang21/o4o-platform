@@ -1,6 +1,9 @@
 # 유통참여형 펀딩 개설자 업무공간 검증
 
-> 상태: IN_PROGRESS · 작성/갱신: 2026-10-11 · WO: [개설·심사·포럼·개설자 운영 정비](../work-orders/WO-O4O-FUNDING-CREATOR-WORKSPACE-V1.md)
+> **상태**: COMPLETED
+> **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11 · WO: [개설·심사·포럼·개설자 운영 정비](../work-orders/WO-O4O-FUNDING-CREATOR-WORKSPACE-V1.md)
+
+구현·자동 검증·통합·배포 회차를 종료했다. 실계정 수동 확인과 실제 PostgreSQL 경합 검증은 후속 확인 목록으로 남긴다.
 
 ## 변경과 경계
 
@@ -15,8 +18,8 @@ schema/migration·대량 backfill·주문·PG·배송·상품 전환 변경은 �
 ## 자동 검증
 
 - API 집중 회귀: 신규 개설·심사·포럼·회원·참여·공개/소유권 및 공유 포럼 테스트 213개 통과. 새 권한 해제·공급자 자격 재확인·심사 경합·실패 롤백·미공개 직접 주소·다른 게시판/펀딩·요청 역할 스푸핑을 확인했다.
-- Neture 전체 Vitest: 60파일, 503개 통과. 호스트 이전 주소·신규 포럼 API·개설자 동작·비동기 응답·기존 커뮤니티 고정/회원관리 소비처 포함.
-- API 및 Neture 빌드: 통과. 패키지 Market Trial 빌드 및 타입 검사 통과. 마지막 구현 변경 뒤 CI에서 동일 계약을 재검증한다.
+- Neture 전체 Vitest: 60파일, 최종 506개 통과. 호스트 이전 주소·신규 포럼 API·개설자 동작·비동기 응답·기존 커뮤니티 고정/회원관리 소비처 포함. 최종 PR CI의 Code Quality Check에서도 전체 테스트를 재검증했다.
+- API 및 Neture 빌드: 통과. 패키지 Market Trial 빌드 및 타입 검사 통과. 마지막 구현 변경 뒤 CI에서 동일 계약을 재검증했다.
 - Chromium production preview: 1440px/390px에서 초안 신청, 보완 사유, 신규/수정, 가입 신청, 회원관리, 글쓰기 공지 선택, 종료 읽기, 운영자 포럼 개설 재처리 18상황 통과. JS 오류/전체 화면 가로 넘침 0. 모든 API 응답·쓰기 요청은 fixture로 차단·처리했으며 실제 운영 DB를 수정하지 않았다.
 - 실제 PostgreSQL 동시 요청은 미검증이다. 단위 테스트로 트랜잭션 경계·행 잠금·상태 전제·롤백을 검증했으며 실계정·운영 원장 적용 결과와 구분한다.
 
@@ -38,7 +41,19 @@ schema/migration·대량 backfill·주문·PG·배송·상품 전환 변경은 �
 
 ## 통합·배포
 
-push·required CI·Codex blocker 확인·main PR 병합·Delivery 판정 및 서빙 SHA 확인 대기. 권한 관련 코드가 LEVEL 3으로 판정되면 현재 정책의 Promote 경로로 진행한다. 이 변경에는 운영 migration이 없다. 완료 후 이 절을 실제 PR/run/SHA로 갱신한다.
+[PR #451](https://github.com/Renagang21/o4o-platform/pull/451)을 2026-10-11 main에 squash 병합했다. 구현 SHA는 `b565fb00965aa12c84df4f31ed3bff9395fac73e`이며 작업 경로 diff 0으로 포함을 확인했다. 최종 branch HEAD `6724708d181fc91abf56b1968f9353273753b197`의 [필수 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38120372516)는 모두 통과했고 해당 HEAD의 Codex 리뷰도 완료됐다. 지적 3건은 수정·회귀 검증 후 해결했다.
+
+최종 branch HEAD의 [SonarCloud 검사](https://github.com/Renagang21/o4o-platform/runs/114415569081)는 2026-10-11 07:20:06 UTC에 통과했다. PR Quality Gate PASS, 신규 중복률 1.2%, Security Hotspots 0이며 비차단 새 이슈 11건이 남아 있다. 측정 coverage 0.0%는 테스트 보고서가 분석에 입력되지 않은 값이며 단위 테스트 실행 결과와 구분한다.
+
+[병합 후 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38120934155)도 통과했다. [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38121458982)의 LEVEL 3 판정 후 정상 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38121543851)를 `sha=b565fb00965aa12c84df4f31ed3bff9395fac73e`, `services=api,neture`로 실행했다. API·Neture의 배포, 새 revision 검사·트래픽 전환 후 검사 및 최종 서빙 SHA 보고가 모두 성공했다. 최종 Report는 계획된 서비스의 100% 서빙 SHA가 목표와 다르면 실패하도록 구현되어 있으며 해당 검사가 통과했다. 이 변경이 추가한 schema/migration은 없다. 공식 API workflow의 기존 migration 실행 단계도 성공했다.
+
+전체 `production` commit status는 선택하지 않은 admin 등 다른 서비스 때문에 `NOT_SELECTED`/pending으로 남는다. 이는 두 선택 서비스의 배포 실패를 의미하지 않으며 플랫폼 전체 배포 완료로 주장하지 않는다. 다른 서비스까지 승격하거나 상태를 강제로 바꾸지 않았다.
+
+운영 API 읽기 검증: `/health/ready` 200, `/api/market-trial/creator-eligibility` 401, `/api/market-trial?status=draft` 400, 존재하지 않는 테스트 UUID의 `/api/v1/funding/:id/forum/posts` 403으로 기대 결과를 확인했다. 일반 펀딩 API는 기존 `/api/market-trial` 경로를 유지하고 전용 포럼만 `/api/v1/funding`을 사용한다. 원시 운영 응답·개인정보는 기록하지 않는다.
+
+배포된 `https://funding.neture.co.kr`의 실제 HTML·JS를 Chromium으로 읽고 1440px/390px의 18상황을 재검증했다. 모두 통과했고 JS 오류·전체 화면 가로 넘침 0이다. 로그인·API 데이터와 쓰기 요청은 모두 fixture로 차단·처리했다. 이는 실제 사용자 인증·회원 상태 변경 검증을 대신하지 않는다. 실계정 및 실제 PostgreSQL 경합은 위 수동 확인 목록으로 남긴다.
+
+이 WO의 배포 기록만 마무리하는 전용 branch `wo/funding-creator-workspace-closure`를 같은 독립 clone에서 최신 main으로 시작했다. 후속 PR은 문서 2개만 변경하며 배포는 `NOT_APPLICABLE`이다. 작업장 disposition은 `KEEP`: 사용자 수동 확인과 재현에 필요한 clone·로그·fixture 스크린샷을 유지한다. 다른 작업장·공유 runtime을 정리하지 않는다.
 
 ## 문서 정합
 
@@ -50,7 +65,7 @@ push·required CI·Codex blocker 확인·main PR 병합·Delivery 판정 및 서
 
 ### Sonar 보완
 
-초기 Reliability B의 접근성 지적을 받아 개설 폼 label/control 연결, 목록의 실제 상세 링크, 대표 영상 title을 보완했다. 저장·검증·DTO 변환을 분리하고 Promise 오류 계약을 유지했다. 보완 뒤 신규 API 60개와 웹 전체 503개가 통과했으며 최종 Sonar 재분석은 확인 중이다.
+초기 Reliability B의 접근성 지적을 받아 개설 폼 label/control 연결, 목록의 실제 상세 링크, 대표 영상 title을 보완했다. 저장·검증·DTO 변환을 분리하고 Promise 오류 계약을 유지했다. 보완 당시 신규 API 60개와 웹 전체 503개가 통과했다. 이후 최종 branch HEAD의 Sonar 재분석도 통과했으며 분석 시점과 결과는 위 통합·배포 기록에 남겼다.
 
 Express가 끝 슬래시·대소문자 변형·HEAD를 GET 경로로 처리하는 점을 확인하여 펀딩 scope 경로를 정규화했다. 자격 회수 후 회원 명단, 구조 변경, 목록·공지 고정 경계를 변형 주소에서도 동일하게 판정하는 회귀 20개를 추가했다.
 
