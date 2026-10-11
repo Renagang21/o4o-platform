@@ -54,11 +54,10 @@
 ## 실행 원칙
 
 ```text
-조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR → CI · Codex → 완료 보고 · STOP
-→ (사용자 "main 통합 진행" 승인 시) PR merge → post-merge 확인 → worktree 종료 정리 → 트랙 종료
+조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR → CI · Codex → PR merge → post-merge 확인 → 필요한 배포 · 검증 → 완료 보고 · worktree 종료 정리 → 트랙 종료
 ```
 
-- **작업 완료와 main 통합은 별개다.** main 통합은 사용자의 명시 승인 후에만 PR merge 로 한다 — owner direct push · bypass 로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
+- **정상적인 push · main PR 병합 · 배포는 별도 사용자 승인 없이 진행한다.** 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge 로 반영한다 — owner direct push · bypass 로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
 - **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
@@ -94,7 +93,7 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 - **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
 - 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 push 된 PR 이 integration-ready**. `origin/main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다 — 완료 조건을 채우려고 먼저 merge 하지 않는다.
+- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 push 된 PR 이 integration-ready**. 이는 통합 준비 상태다. 기술 gate 충족 후 별도 승인 없이 PR merge와 필요한 배포 검증까지 진행한다. 사용자가 push까지만 등 종료 범위를 명시하면 그 지시를 따른다.
 
 ## 명령 실행 원칙
 
