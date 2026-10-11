@@ -119,7 +119,7 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 | 워크플로 | 대상 |
 |---|---|
 | `delivery.yml` | 자동 배포 진입점 — 판정 → 아래 workflow 를 `workflow_call` 로 호출 → serving SHA 확인 → commit status `production` |
-| `promote.yml` | LEVEL 3 · 첫 rollout 승인 1회 — `gh workflow run promote.yml -f sha=<40자 main HEAD>` |
+| `promote.yml` | LEVEL 3 · 첫 rollout 실행 1회 — `gh workflow run promote.yml -f sha=<40자 main HEAD>` |
 | `deploy-auto.yml` | **은퇴**(2026-10-02 P3 cutover) — 종전 태그 + dispatch 자동 경로. 실행되지 않음 |
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 |
@@ -131,7 +131,8 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
 - **자동 배포(LEVEL 2)**: target 은 CI 가 성공한 정확한 commit 으로 고정됩니다(Delivery 가 reusable workflow 에 직접 전달 · 태그 · dispatch 없음).
   API 가 함께 바뀌면 API 를 먼저 배포하고 성공을 확인한 뒤 프런트를 배포합니다. API 가 차단되면 프런트도 보류됩니다.
   main 에 더 새 commit 이 있으면 그 commit 의 cycle 이 누적 변경을 처리합니다.
-- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 사용자 승인 → `promote.yml` 1회 (commit status `production` 에 명령이 적힌다).
+- **통제 배포(LEVEL 3 · 배포 방식 변경 뒤 첫 배포)**: 기술 gate 확인 → `promote.yml` 1회 (일반 배포는 별도 사용자 승인 불필요, commit status `production` 에 명령이 적힌다).
+  migration 포함 promote는 운영 DB write/DDL을 수행하므로, 해당 migration 실행이 명시적으로 승인되지 않았다면 dispatch 전에 사용자 확인을 받습니다.
   `deploy/*` 태그 → 해당 workflow 수동 dispatch 는 break-glass 로만 남습니다.
   deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
 - DB 마이그레이션은 API 배포가 실행합니다
@@ -167,12 +168,11 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
   소유자 bypass 가능하나 정상 경로로 쓰지 않음). main 통합 절차는 [AGENTS.md §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). `deploy/*` tag 생성 · 변경은
   소유자만. `production` Environment 는 `main` · `deploy/*` 에서만. 수동 배포 게이트는 소유자만.
 
-1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다(소유자 승인 후 merge).
+1. `main` 이 저장소 정본입니다. 공동개발자는 별도 branch 에서 작업하고 PR 로 `main` 에 반영합니다(기술 gate 충족 후 별도 승인 없이 merge).
 2. `.github/workflows/**` 는 production 에 영향을 줄 수 있으므로 사용자 승인 없이 변경하지 않습니다.
    PR 의 workflow 변경도 merge 전에 사용자가 검토합니다.
-3. 사용자 승인 없이 하지 않는 것:
+3. 정상적인 push · main PR 병합 · 배포 실행은 별도 승인 없이 진행합니다. 새 위험 변경으로 사용자 확인이 필요한 것은:
    - production 배포 설정 변경 · `DEPLOY_FREEZE` 해제(`false` 로 변경) — 비상 시 `true` 설정은 누구나 즉시 해도 된다
-   - production 통제 배포 실행 (LEVEL 3 · 첫 rollout 의 `workflow_dispatch` 포함 — LEVEL 2 자동 배포는 승인 불필요)
    - production migration 실행 (`migrate_only` 포함) · `deploy/*` 태그 생성 · push
    - production DB write
 4. Repository · Environment · Actions secret 과 production credential 은 임의로 변경 · 열람 · 반출하지 않습니다.
