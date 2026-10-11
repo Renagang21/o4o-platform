@@ -375,3 +375,23 @@ describe('products — multiple approved stores and handled-product selection', 
     expect(dataSource.query.mock.calls.every(([sql]: [string]) => !/store_local_products|organization_product_listings/.test(sql))).toBe(true);
   });
 });
+
+
+describe('handled-products — shared authentication error contract', () => {
+  it.each([
+    ['get', '/store/handled-products', 'Store owner or operator role required'],
+    ['post', '/store/handled-products/remove', 'Store owner access required'],
+    ['get', '/store/handled-products/qr', 'Store owner access required'],
+    ['get', '/store/handled-products/qr/export', 'Store owner access required'],
+  ] as const)('%s %s preserves missing-user denial before product work', async (method, endpoint, error) => {
+    CURRENT_USER = '';
+    const { dataSource } = makeDataSource();
+    const app = express();
+    app.use(express.json());
+    app.use('/store', createStoreHandledProductsRoutes(dataSource));
+    const res = await request(app)[method](endpoint);
+    expect(res.status).toBe(403);
+    expect(res.body).toEqual({ success: false, error, code: 'FORBIDDEN' });
+    expect(dataSource.query).not.toHaveBeenCalled();
+  });
+});

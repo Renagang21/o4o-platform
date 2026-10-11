@@ -30,3 +30,5 @@
 ## 로컬 검증
 
 기존 상품·조직 회귀와 신규 HTTP 선택 경계: 4 suites / 58 tests PASS. 서비스 키·중립 경로 정적 계약: 1 suite / 10 tests PASS. 공통 패키지 빌드·API 번들 빌드 PASS. 변경 TypeScript focused ESLint·diff check·docs 민감정보 검사 PASS. 이 로컬 결과를 배포 후 운영 해결 확인으로 간주하지 않는다.
+
+최초 원격 SonarCloud는 새 코드 중복률 4.1%(기준 3%)로 FAIL했다. 취급 상품 제거·QR·export의 반복 인증·조직 판정을 내부 함수로 모았으며 미인증 사용자 메시지와 목록의 빈 응답을 유지했다. 기존 68 tests에 인증 응답 계약 4 tests를 더해 최종 5 suites / 72 tests PASS. API build·focused ESLint 다시 PASS. 로컬 문자열 무시 중복 검사에서 변경 상품 파일과 겹치는 clone은 0건이며 이 결과를 SonarCloud PASS로 대체하지 않는다. 최신 main의 문서·운영 진단 변경은 정상 merge로 반영했다.
