@@ -40,6 +40,9 @@ const writesTo = (src: string, table: string) =>
 
 const CONNECTED_SERVICE_FILES = [
   'modules/neture/services/supplier.service.ts',
+  'modules/neture/services/supplier-business.service.ts',
+  'modules/neture/services/supplier-lifecycle.service.ts',
+  'modules/neture/services/supplier-directory.service.ts',
   'modules/neture-pharmacy/services/pharmacy-membership.service.ts',
   'modules/neture-pharmacy/services/pharmacy-store-provisioner.ts',
   'modules/neture-pharmacy/services/semi-franchise.service.ts',
@@ -52,7 +55,7 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
   });
 
   it('공급자 신청 · 승인 · 재활성화는 현재 Neture 가입 상태를 전제조건으로 읽는다', () => {
-    const src = read('modules/neture/services/supplier.service.ts');
+    const src = read('modules/neture/services/supplier-lifecycle.service.ts');
     expect(src).toContain(`return { success: false, error: 'NETURE_MEMBERSHIP_REQUIRED' }`);
     expect(src.match(/APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
   });

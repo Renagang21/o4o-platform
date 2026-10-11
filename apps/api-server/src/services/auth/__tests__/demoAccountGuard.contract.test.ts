@@ -151,9 +151,10 @@ describe('Demo 계정 보호 계약', () => {
     // role · membership · ownership 해제/변경
     ['services/approval/MembershipApprovalService.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
     ['services/store-owner-termination.service.ts', /assertNotDemoStoreOwner\(this\.dataSource, input\.userId\)/, /INSERT INTO store_owner_termination_cases/],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(supplier\.userId/, /supplierRepo\.save\(supplier\)/, 'async approveSupplier('],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async deactivateSupplier('],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /isDemoSupplier\(locked\.user_id/, /return \{ supplier: locked \}/, 'private async lockSupplierForTransition('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /isDemoSupplier\(supplier\.userId/, /supplierRepo\.save\(supplier\)/, 'async approveSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async deactivateSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
     ['controllers/operator/MembershipConsoleController.ts', /rejectDemoAccountTarget\(|isDemoAccount\(/, /UPDATE service_memberships/],
   ];
 
