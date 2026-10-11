@@ -1,5 +1,7 @@
 # CHECK-O4O-MY-STORE-PRODUCT-HEADING-3SERVICES-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 배포 후 2서비스(KPA / K-Cosmetics) `my-products` / `local-products` heading · IA browser smoke.
 > **결과: PASS** — 6개 화면 모두 의도한 heading 렌더 확인 (redirect 0 / pageError 0).
 > 선행: `WO-O4O-MY-STORE-CANONICAL-MENU-LABEL-ALIGNMENT-3SERVICES-V1`(PASS, commit `d8c40e78c`) — 2026-06-11
@@ -34,7 +36,7 @@
 
 ## 3. 검증 방식
 
-- Playwright (chromium, headless) — gitignored SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 자격증명 직접 파싱(명령/로그 비노출).
+- Playwright (chromium, headless) — gitignored SSOT(`docs/local/TEST-ACCOUNT.txt`)에서 자격증명 직접 파싱(명령/로그 비노출).
 - 각 서비스 `/login` 로그인 → 대상 route hard-navigation → `h1/h2/h3` 텍스트 추출 + screenshot + console/pageerror/4xx-5xx 수집.
 - 계정: KPA = `[REDACTED_EMAIL_B]`(약국 경영자/약국 = store_owner), KCos = `[REDACTED_EMAIL_A]`(admin — store_owner 전용 계정 SSOT 부재).
 - 산출물(로컬, 비커밋): `c:\tmp\smoke-heading-result.json`, `c:\tmp\smoke-*.png`.

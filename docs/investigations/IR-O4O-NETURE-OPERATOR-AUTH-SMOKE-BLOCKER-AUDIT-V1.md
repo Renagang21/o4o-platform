@@ -1,5 +1,7 @@
 # IR-O4O-NETURE-OPERATOR-AUTH-SMOKE-BLOCKER-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **목적**: `WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1`(commit cd5d10017) 완료 후 남은
 > 인증 브라우저 smoke 블로커를 조사한다.
 > **성격**: read-only 조사 (코드/UI/API/DB/migration/운영데이터/테스트계정/commit 없음). 로그인 probe·read-only API/DB probe·Playwright 노출/점유 확인만 수행.
@@ -68,9 +70,9 @@ endpoint: GET /api/v1/neture/operator/dashboard
 - ❌ 계정 미존재 — 아님 (DB 존재, active)
 - ❌ 권한/membership 문제 — 아님 (별도 코드 존재, 받은 건 PW-mismatch 전용 `INVALID_CREDENTIALS`)
 - ❌ lockout — 아님 (`TOO_MANY_ATTEMPTS` 아님)
-- ✅ **문서값 `(TEST-ACCOUNTS.local.md 기재)` 가 sohae2100/renagang21 라이브 해시와 불일치.** 동일 인물(서철환)의 [REDACTED_EMAIL_C] 비밀번호도 sohae2100엔 불일치. 정답 PW는 미상(bcrypt 해시 평문 복원 불가).
+- ✅ **문서값 `(TEST-ACCOUNT.txt 기재)` 가 sohae2100/renagang21 라이브 해시와 불일치.** 동일 인물(서철환)의 [REDACTED_EMAIL_C] 비밀번호도 sohae2100엔 불일치. 정답 PW는 미상(bcrypt 해시 평문 복원 불가).
 
-> 평문 비밀번호는 본 문서에 기재하지 않는다. TEST-ACCOUNTS.local.md(gitignored)가 SSOT.
+> 평문 비밀번호는 본 문서에 기재하지 않는다. TEST-ACCOUNT.txt(gitignored)가 SSOT.
 
 ---
 
@@ -116,7 +118,7 @@ WO 보고는 블로커를 "test-account credential mismatch (known blocker)"로 
 
 ## 9. 후속 권장
 
-1. **TEST-ACCOUNTS.local.md 정정** (승인 후 별도 작업): sohae2100/renagang21 문서 PW가 라이브와 불일치 — 올바른 값으로 정정. ([REDACTED_EMAIL_C] 은 유효 확인됨.)
+1. **TEST-ACCOUNT.txt 정정** (승인 후 별도 작업): sohae2100/renagang21 문서 PW가 라이브와 불일치 — 올바른 값으로 정정. ([REDACTED_EMAIL_C] 은 유효 확인됨.)
 2. **즉시 smoke 필요 시**: 사용자가 sohae2100 올바른 PW 제공, 또는 sohae2100 PW reset 승인(DB write) → 이후 `CHECK-O4O-NETURE-OPERATOR-DASHBOARD-V2-LIVE-SMOKE-V1` 재실행.
 3. **Playwright 점유 해제**: 병렬 세션 브라우저 종료 후 재시도.
 4. (대안) 올바른 operator 토큰 확보 시, 브라우저 없이도 **API 인증 probe로 5-block 페이로드 검증** 가능.

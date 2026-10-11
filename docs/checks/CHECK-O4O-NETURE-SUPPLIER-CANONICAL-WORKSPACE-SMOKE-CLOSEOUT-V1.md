@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-CANONICAL-WORKSPACE-SMOKE-CLOSEOUT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-NETURE-SUPPLIER-CANONICAL-WORKSPACE-SMOKE-CLOSEOUT-V1`
 > **결과: PASS — 잔여 drift 2건 수정·배포·실브라우저 확인 완료**
 > 단, 공급자 **정식 폼 로그인은 불가**(L2 credential unknown) → 문서화된 L1 우회로 UI 검증 (§2)
@@ -31,7 +33,7 @@ $ git status --porcelain
 
 Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 (`packages/auth-react/src/useServiceAuth.ts:94` → `services/web-neture/src/contexts/AuthContext.tsx:62`).
-→ **L2 서비스 자격**으로 판정되는데, `docs/local/TEST-ACCOUNTS.local.md §2` 기준 전 계정이 `unknown` 이다.
+→ **L2 서비스 자격**으로 판정되는데, `docs/local/TEST-ACCOUNT.txt §2` 기준 전 계정이 `unknown` 이다.
 
 실측 (2026-08-10, read-only):
 
@@ -48,7 +50,7 @@ Neture 웹 로그인 폼은 `serviceKey: 'neture'` 를 보낸다
 
 ### 2-2. 사용한 채널 — 문서화된 L1 토큰 주입 우회
 
-`TEST-ACCOUNTS.local.md §4-2` 에 명시된 우회로를 사용했다.
+`TEST-ACCOUNT.txt §4-2` 에 명시된 우회로를 사용했다.
 
 ```text
 계정   [REDACTED_EMAIL_B]

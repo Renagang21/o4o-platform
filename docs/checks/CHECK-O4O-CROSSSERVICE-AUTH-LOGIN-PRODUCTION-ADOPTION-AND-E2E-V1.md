@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-CROSSSERVICE-AUTH-LOGIN-PRODUCTION-ADOPTION-AND-E2E-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작업일**: 2026-08-14
 - **기준**: `origin/main` `184eac978` (동기화 후)
 - **성격**: 조사 + production 브라우저 검증 (코드 변경 0)
@@ -180,7 +182,7 @@ WO-O4O-SERVICE-LEGAL-PHARMACY-HUB-SCOPE-EXTENSION-V1
 
 ### 7-1. 차단 사실
 
-`docs/local/TEST-ACCOUNTS.local.md`(SSOT) 실측:
+`docs/local/TEST-ACCOUNT.txt`(SSOT) 실측:
 
 | 자격 계층 | 상태 |
 |---|---|
@@ -269,7 +271,7 @@ PATCH /api/v1/admin/users/3f5582bc…/status {"status":"approved"}  → 200
 PATCH /api/v1/admin/users/972ede50…/status {"status":"approved"}  → 200
 ```
 
-자격은 `docs/local/TEST-ACCOUNTS.local.md §4-3` 의 `platform:super_admin` 계정 사용.
+자격은 `docs/local/TEST-ACCOUNT.txt §4-3` 의 `platform:super_admin` 계정 사용.
 **비밀번호는 어디에도 출력·기록하지 않았다.**
 
 ### 10-3. production 실로그인 E2E 결과 (desktop, 실제 브라우저)

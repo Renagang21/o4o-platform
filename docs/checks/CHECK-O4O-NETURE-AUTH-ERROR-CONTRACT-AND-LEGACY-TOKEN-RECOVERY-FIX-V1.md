@@ -1,5 +1,7 @@
 # CHECK — O4O Neture 인증 오류 계약 정리 · 과거 토큰 자동 이관 경합 제거
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1`
 - **선행 WO**: `WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1` ([CHECK](CHECK-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1.md)) — 이미 적용된 `6ea6f4494`(다른 탭 로그아웃 되돌림 경합) · `cc53d5099`(파트너 게이트 관리자 예외 제거) 는 그대로 유지
 - **작성일**: 2026-09-15
@@ -67,7 +69,7 @@
 
 ### 4-3. 운영 실브라우저 검증 (Playwright · `neture.co.kr` · 2026-09-15 배포 후)
 
-계정: `docs/local/TEST-ACCOUNTS.local.md` 의 공급자 승인 회원(53행) · 관리자(50행). 자격증명은 기록하지 않는다. 운영 계정의 가입·승인 상태는 변경하지 않았다.
+계정: `docs/local/TEST-ACCOUNT.txt` 의 공급자 승인 회원(53행) · 관리자(50행). 자격증명은 기록하지 않는다. 운영 계정의 가입·승인 상태는 변경하지 않았다.
 
 | WO §5 항목 | 방법 | 결과 |
 |---|---|---|

@@ -1,5 +1,7 @@
 # CHECK-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1`
 > 범위: admin-dashboard read-only skeleton (ProductCandidate / ProductMaster 조회)
 > 상태: 구현 + typecheck 완료 / 운영 배포·브라우저 smoke 대기
@@ -110,7 +112,7 @@ typecheck 통과. 신규 파일 8개 / 수정 파일 2개, 기존 라우트·메
 ## 7. 브라우저 smoke — PASS
 
 - 배포: `deploy-admin.yml` (push 자동 트리거, run `28701273192`) → 성공, 서비스 `o4o-admin-dashboard`.
-- 검증: Playwright, 계정 `[REDACTED_EMAIL_A]` (SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 미노출).
+- 검증: Playwright, 계정 `[REDACTED_EMAIL_A]` (SSOT `docs/local/TEST-ACCOUNT.txt`, env 주입 — 자격증명 미노출).
 - 로그인 랜딩 = `/home`. 보호 라우트는 hard-reload 시 auth 재수화 전 `/login` 리다이렉트되므로(앱 전역 동작) **사이드바 in-app 클릭**으로 검증.
 
 | 항목 | 기대 | 실측 |

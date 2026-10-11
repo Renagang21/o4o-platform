@@ -1,5 +1,7 @@
 # CHECK-O4O-PRODUCT-DESCRIPTION-AUTH-GATE-AND-RETURNURL-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 성격: **완료보고(구현·배포·프로덕션 smoke)** · 작성일 2026-07-12
 > 대응 WO: `WO-O4O-PRODUCT-DESCRIPTION-AUTH-GATE-AND-RETURNURL-V1`
 > 기준: `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT.md`(#8 서버 인증 / #9 로그인 열람) · `docs/adr/ADR-0002-o4o-product-description-authenticated-access.md`
@@ -75,7 +77,7 @@
 
 ## 9. 프로덕션 실브라우저 smoke (Playwright headless, 2026-07-12)
 
-대상: `https://neture.co.kr/p/<pilot key>`(HFF 파일럿 master `38a9d3e4…`, STORE canonical ko+en). 자격증명은 로컬 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에서 런타임 주입(env), 커밋·기록 안 함.
+대상: `https://neture.co.kr/p/<pilot key>`(HFF 파일럿 master `38a9d3e4…`, STORE canonical ko+en). 자격증명은 로컬 SSOT(`docs/local/TEST-ACCOUNT.txt`)에서 런타임 주입(env), 커밋·기록 안 함.
 
 | # | 시나리오 | 결과 |
 |---|---|---|

@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: [`WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1`](../work-orders/WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1.md)
 > 근거: [`IR-...-QR-TABLET-FLOW-AUDIT-V1`](../investigations/IR-O4O-NETURE-SUPPLIER-STORE-CONTENT-QR-TABLET-FLOW-AUDIT-V1.md) · [`DECISION-...-D1-D4-V1`](../investigations/DECISION-O4O-NETURE-SUPPLIER-STORE-CONTENT-D1-D4-V1.md)
 > 작성일: 2026-07-12 · 작업 위치: `C:\Users\sohae\coding\o4o-platform` (Laptop)
@@ -71,7 +73,7 @@ SPD 스키마/마이그레이션 (없음)
 - push `a58b95175` → GitHub Actions "Deploy Web Services (Cloud Run)" run `29180091023` **success** → `neture-web-01256-v8j` (2026-07-12T04:44Z) 롤포워드.
 
 ### 5.3 라이브 브라우저 스모크 (Playwright, 임시 userDataDir, 자격증명 env 주입)
-대상: `https://neture.co.kr`. 테스트 계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT.
+대상: `https://neture.co.kr`. 테스트 계정은 `docs/local/TEST-ACCOUNT.txt` SSOT.
 
 | 계정 | 상태 | heading | 분기 | 사이드바 진입점 | 정책문구 | SUPPLIER_STORE 미노출 | 콘솔오류 |
 |------|------|:------:|------|:------:|:------:|:------:|:------:|

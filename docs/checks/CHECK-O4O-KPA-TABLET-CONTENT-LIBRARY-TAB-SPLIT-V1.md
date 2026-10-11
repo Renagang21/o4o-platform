@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1 구현 결과.
 > 태블릿 관리 화면을 **[코너별 운영] / [태블릿 콘텐츠]** 두 탭으로 분리.
 
@@ -55,7 +57,7 @@
 | legacy 기능 보존 | ✅ (접이식 고급 설정으로 이동, 삭제 아님) |
 | 모바일/태블릿 폭 | 반응형 클래스 유지(`grid`, `min-h-[44px]` 터치 타깃) |
 
-> 배포 후 브라우저 스모크(약국 계정 `renagang21`, SSOT=`docs/local/TEST-ACCOUNTS.local.md`): 탭 전환 / 코너 교체(적용·해제) / 콘텐츠 목록·수정·보관 / 고급 설정 접이 동작을 실측 권장(성공·실패 toast + API success/error 확인).
+> 배포 후 브라우저 스모크(약국 계정 `renagang21`, SSOT=`docs/local/TEST-ACCOUNT.txt`): 탭 전환 / 코너 교체(적용·해제) / 콘텐츠 목록·수정·보관 / 고급 설정 접이 동작을 실측 권장(성공·실패 toast + API success/error 확인).
 
 ## 다음 단계 (병렬 가능)
 

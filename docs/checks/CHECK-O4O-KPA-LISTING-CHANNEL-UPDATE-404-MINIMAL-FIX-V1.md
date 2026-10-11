@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1`
 > 선행: [`CHECK-O4O-KPA-STORE-HUB-PRODUCT-FLOW-DEPLOY-AND-PRODUCTION-SMOKE-V1`](CHECK-O4O-KPA-STORE-HUB-PRODUCT-FLOW-DEPLOY-AND-PRODUCTION-SMOKE-V1.md) §6 F1
 > 실행일: 2026-07-27
@@ -214,7 +216,7 @@ BEFORE       : is_active = true       (전체 20행 스냅샷 기록)
 # 게이트
 cd services/web-kpa-society && npx tsc --noEmit -p tsconfig.json && npm run build
 
-# 프로덕션 실증 (자격증명은 env 주입, docs/local/TEST-ACCOUNTS.local.md 참조)
+# 프로덕션 실증 (자격증명은 env 주입, docs/local/TEST-ACCOUNT.txt 참조)
 KPA_EMAIL=... KPA_PASSWORD=... node <scratchpad>/kpa-smoke-pass3.mjs   # 진열 토글 write + 원복
 KPA_EMAIL=... KPA_PASSWORD=... node <scratchpad>/kpa-smoke-pass4.mjs   # 채널 엔드포인트 A/B
 

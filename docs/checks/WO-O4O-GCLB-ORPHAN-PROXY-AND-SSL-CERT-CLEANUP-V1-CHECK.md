@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-GCLB-ORPHAN-PROXY-AND-SSL-CERT-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작업일**: 2026-08-19
 - **대상 프로젝트**: `netureyoutube` (display name `neture-services`)
 - **범위**: orphan target HTTP proxy 2건 + 미참조 legacy SSL certificate 9건 **삭제 + production 검증**
@@ -164,7 +166,7 @@ WO §7 순서를 그대로 따랐다.
 | `o4o-core-api` | Ready True |
 | `GET /health` | **200** — `status: alive`, env production, version 0.5.0 |
 | `GET /health/database` | **200** — `status: healthy`, pingMs 4, activeConnections 10, longRunningQueries 0 |
-| 로그인 smoke | **200 · `success: true`** (`serviceKey=neture`, 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 조회 — 문서에 기록하지 않음) |
+| 로그인 smoke | **200 · `success: true`** (`serviceKey=neture`, 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 조회 — 문서에 기록하지 않음) |
 | `severity>=ERROR` 신규 (삭제 시각 이후) | **0건** |
 | LB `httpRequest.status>=500` 신규 | **0건** |
 | LB / TLS / image / startup 관련 신규 오류 | **0건** |

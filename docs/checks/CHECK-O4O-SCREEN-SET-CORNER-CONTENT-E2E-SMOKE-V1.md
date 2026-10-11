@@ -1,5 +1,7 @@
 # CHECK-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1`
 > 목표: 코너 콘텐츠 제작 → 미리보기 → 실제 태블릿 → QR 모바일까지 **배포 환경 실브라우저**로 전 구간 검증.
 > 신규 기능 추가 없음 / DB 구조·migration 변경 없음 / 발견한 실제 결함만 최소 수정.
@@ -10,7 +12,7 @@
 
 | 항목 | 값 |
 |------|------|
-| 계정 | 약국 경영자(store-owner) 테스트 계정 — 식별자·자격증명 모두 `docs/local/TEST-ACCOUNTS.local.md`(git-ignored) |
+| 계정 | 약국 경영자(store-owner) 테스트 계정 — 식별자·자격증명 모두 `docs/local/TEST-ACCOUNT.txt`(git-ignored) |
 | 매장 | 테스트 약국 매장 (`slug = 네뚜레-약국`, org `9c87f46b-57a1-4afe-80bd-60782c49ce96`) |
 | 코너 | 구강관리 코너 (`tabletId = c86863d8-c792-476c-b4b1-3aa1169a4395`) |
 | Screen Set | **E2E 스모크 코너** `dd81cf73-5cbf-4449-b1c1-fe2820336023` · 템플릿 `corner_information_basic_v1` · 블록 5 · `public_qr_slug = e2e-2` |
@@ -158,4 +160,4 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 - 매장 QR 활성/비활성 토글 UI 부재는 별도 판단 사항(본 WO 범위 밖). 현재 비활성 전이는 screen_set archive 경로로만 발생한다.
 - **문구 불일치(경미, 미수정)**: 보관 확인 대화상자는 "‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다" 라고 안내하지만 실제 필터 라벨은 **'보관'** 이다. 기능 결함은 아니고(§3-B 수정으로 목록은 실제로 채워진다) 문구만 어긋난다. 카피 정리는 별도 사항으로 남긴다.
 - **CI Pipeline `@o4o/auth-client` 해소 실패**(§5) — Code Quality Check job 이 소비 패키지를 빌드하지 않는 구조 문제. 별도 WO 필요.
-- `docs/local/TEST-ACCOUNTS.local.md` 의 약국 경영자 계정(19행) 비밀번호는 프로덕션과 불일치(`INVALID_CREDENTIALS`)한다. 매장 스코프 검증은 KPA 운영자 계정(`kpa:store_owner` 겸유, org `c9beb4a2`)으로 수행했다. 문서 갱신은 별도 사항.
+- `docs/local/TEST-ACCOUNT.txt` 의 약국 경영자 계정(19행) 비밀번호는 프로덕션과 불일치(`INVALID_CREDENTIALS`)한다. 매장 스코프 검증은 KPA 운영자 계정(`kpa:store_owner` 겸유, org `c9beb4a2`)으로 수행했다. 문서 갱신은 별도 사항.

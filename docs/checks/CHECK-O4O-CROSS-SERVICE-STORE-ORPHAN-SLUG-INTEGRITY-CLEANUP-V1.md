@@ -1,5 +1,7 @@
 # CHECK-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1`
 - **선행**: [`CHECK-O4O-KPA-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1`](CHECK-O4O-KPA-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1.md) (`d9771f7e2`)
 - **기준 commit**: `0a61957f7`
@@ -176,7 +178,7 @@ INSERT INTO platform_store_slugs (id, slug, store_id, service_key, is_active, cr
 | K-Cosmetics 로그인 → store-hub | `login(serviceKey=k-cosmetics)` 200 / `overview` 200 `data:null` / `capabilities` 403 `STORE_OWNER_REQUIRED` |
 | 다른 서비스 영향 | 없음 (kpa·pharmacy-hub 회귀 0) |
 
-> KCos smoke 결과는 `docs/local/TEST-ACCOUNTS.local.md` 에 **이번 작업 이전부터 기록된 baseline 과 동일**하다
+> KCos smoke 결과는 `docs/local/TEST-ACCOUNT.txt` 에 **이번 작업 이전부터 기록된 baseline 과 동일**하다
 > (해당 문서: "K-Cosmetics 매장 스코프 검증에 현재 사용 가능한 store_owner 계정은 없다").
 > 즉 이번 정리로 인한 회귀가 아니며, store_owner 해석은 slug 가 아니라 `organization_service_enrollments` 축을 쓰므로 slug 삭제의 영향을 받지 않는다.
 

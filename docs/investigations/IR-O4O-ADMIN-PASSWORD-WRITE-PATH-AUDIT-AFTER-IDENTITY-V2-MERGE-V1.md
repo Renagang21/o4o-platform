@@ -1,5 +1,7 @@
 # IR-O4O-ADMIN-PASSWORD-WRITE-PATH-AUDIT-AFTER-IDENTITY-V2-MERGE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **성격:** read-only 감사 IR. **코드 0 · migration 0 · DB write 0 · 배포 0 · 비밀번호 변경 0 · role 변경 0**
 > **작성일:** 2026-08-09
 > **기준 commit:** `12973622f` (통합 병합 `6c9ee8388` 반영 후 최신 main)
@@ -179,7 +181,7 @@ git 변경 = 본 IR 문서 1건
 ```
 
 조사 방법: 최신 main 정적 정독(Read/Grep). 프로덕션 API·DB 호출 없음.
-`docs/local/TEST-ACCOUNTS.local.md` 는 **존재만 확인**했고 내용을 열지 않았다.
+`docs/local/TEST-ACCOUNT.txt` 는 **존재만 확인**했고 내용을 열지 않았다.
 
 ---
 

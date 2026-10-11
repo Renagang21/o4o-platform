@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **결과: 구현 완료** — 프론트 한정(web-neture). 백엔드·DB·migration 무변경.
 > **작성일:** 2026-08-09
 > **근거 IR:** `IR-O4O-KPA-STORE-QR-TABLET-CONTENT-FLOW-AUDIT-V1` §9 (IA 시사점) · §10 (1차 메뉴 제안)
@@ -206,7 +208,7 @@ POST /api/v1/auth/login
 - curl 로 재현했다. 응답 코드가 `INVALID_CREDENTIALS`(비밀번호 불일치)라 **원인 오인 위험**이 크다 — 실제로는 자격증명 문제가 아니다.
 - 본 WO 는 프론트 IA 변경만 했고 인증 코드를 건드리지 않았다. **범위 밖이라 수정하지 않고 분리 보고**한다.
 - smoke 는 페이지 컨텍스트에서 `serviceKey` 없이 로그인해 쿠키·`o4o_accessToken` 을 확보하는 우회로 진행했다.
-- 참고: `docs/local/TEST-ACCOUNTS.local.md` 의 `[REDACTED_EMAIL_C]` 비밀번호도 프로덕션과 불일치(401) — 문서 drift.
+- 참고: `docs/local/TEST-ACCOUNT.txt` 의 `[REDACTED_EMAIL_C]` 비밀번호도 프로덕션과 불일치(401) — 문서 drift.
 
 > 이 두 건은 후속 §9 에 WO 후보로 올린다.
 
@@ -235,7 +237,7 @@ smoke-*.png · tmp-sidebar-*.png
 | 3 | 공급 오퍼 dead-end 해소 (선행 IR §19 버킷 C, P1) | P1 |
 | 4 | 게시 후 피드백 — 가져간 매장 **수** 집계 노출 여부 (IR §11-A 결정 필요) | P3 |
 | **5** | **`serviceKey` 포함 시 로그인 401 — 웹 로그인 차단 (§7.2)** | **P0 후보** |
-| 6 | `docs/local/TEST-ACCOUNTS.local.md` 프로덕션 비밀번호 drift 정리 (§7.2) | P3 |
+| 6 | `docs/local/TEST-ACCOUNT.txt` 프로덕션 비밀번호 drift 정리 (§7.2) | P3 |
 
 > 4번은 `store_asset_derivations` 로 조회 가능하나 **매장 식별 노출은 독립 사본 설계·매장 프라이버시와 충돌**한다. 집계 수준까지만 검토할 것.
 

@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-MYPAGE-HELP-SUPPORT-COMMONIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: My Page `Help / 문의 / 지원` 기능 census → 공통화 → 5서비스 adoption → production 검증
 * **선행 완료**
@@ -1033,6 +1035,6 @@ KPA `GET/PATCH /operator/contact-requests` 는 실제 운영자 화면 계약이
 
 ### M. 검증 계정 · 도메인
 
-* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md` (CLAUDE.md §15)
+* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNT.txt` (CLAUDE.md §15)
 * KCos 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 외부 쇼핑몰)
 * PH 는 `/mypage` 가 없고 `/account` · `/store-owner/account` 축이다 — §24 adoption 판정 시 "route 가 없다"를 곧바로 `NOT_IMPLEMENTED` 로 적기 전에 `/account` 축을 확인할 것

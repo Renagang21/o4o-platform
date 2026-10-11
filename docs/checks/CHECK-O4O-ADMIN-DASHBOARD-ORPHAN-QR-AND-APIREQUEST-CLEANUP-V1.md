@@ -1,5 +1,7 @@
 # CHECK-O4O-ADMIN-DASHBOARD-ORPHAN-QR-AND-APIREQUEST-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-ADMIN-DASHBOARD-ORPHAN-QR-AND-APIREQUEST-CLEANUP-V1`
 > 선행 IR: [IR-O4O-ADMIN-DASHBOARD-API-PATH-CONVENTION-INVENTORY-V1](../investigations/IR-O4O-ADMIN-DASHBOARD-API-PATH-CONVENTION-INVENTORY-V1.md) (CLOSED)
 
@@ -132,7 +134,7 @@ routes/lms-marketing.routes.tsx:39            주석
 ## 8. 실브라우저 smoke 결과
 
 **환경**: Playwright(chromium, headless) · `https://admin.neture.co.kr` · 배포 리비전 `01100-f5f`
-**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — `docs/local/TEST-ACCOUNTS.local.md` §4-3
+**계정**: `[REDACTED_EMAIL_D]` (`platform:super_admin`) — `docs/local/TEST-ACCOUNT.txt` §4-3
 **로그인**: `POST /api/v1/auth/login` → **200**, `/home` 착지, 콘솔 에러 0 (토큰 주입 우회 아님, 정식 폼 로그인)
 
 | 대상 | 최종 URL | 화면 | 콘솔 에러 | 비-2xx API | `/pharmacy/qr/*` |
@@ -153,7 +155,7 @@ routes/lms-marketing.routes.tsx:39            주석
 GET /api/v1/kpa/store/assets?page=1&limit=50   →  403
 ```
 
-- smoke 계정 `renariver21` 의 membership 은 **`platform` 단일**이다 (`docs/local/TEST-ACCOUNTS.local.md` §4-3).
+- smoke 계정 `renariver21` 의 membership 은 **`platform` 단일**이다 (`docs/local/TEST-ACCOUNT.txt` §4-3).
   KPA scope 자원에 403 이 나는 것은 **계정 권한 범위**에 따른 결과다.
 - 본 변경은 **어떤 route 도 참조하지 않던 프런트 파일 3개의 삭제뿐**이며, 공용 모듈·guard·API 계약을 건드리지 않았다.
 - 403 을 반환한 api-server 는 **재배포되지 않았다** (`o4o-core-api-03268-cq2`, 07:00 배포 — 본 변경 이전).

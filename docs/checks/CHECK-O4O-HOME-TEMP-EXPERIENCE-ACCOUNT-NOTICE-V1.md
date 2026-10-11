@@ -1,5 +1,7 @@
 # CHECK-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO:** WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1
 > **유형:** store-facing 3서비스 첫 화면 상단 임시 공용 체험 계정 안내 + 로그인 화면 "테스트"→"체험용" 정비 (frontend-only)
 > **작성일:** 2026-06-14
@@ -32,7 +34,7 @@
 | KPA | "약국 경영자" ([REDACTED_EMAIL_B] / **`[REDACTED — rotated]`**) | "🧪 체험용 약국 경영자 계정" + 비번 **`[REDACTED — rotated]`로 수정** |
 | KCos | (autofill 없음) | "🧪 체험용 매장 경영자 계정" ([REDACTED_EMAIL_B] / `[REDACTED — rotated]`) **신규 추가** |
 
-- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNTS.local.md) 기준 renagang21 현재 비번 = `[REDACTED — rotated]`(2026-06-06 reset). KPA가 박고 있던 `[REDACTED — rotated]`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
+- **KPA 스테일 비밀번호 수정:** SSOT(TEST-ACCOUNT.txt) 기준 renagang21 현재 비번 = `[REDACTED — rotated]`(2026-06-06 reset). KPA가 박고 있던 `[REDACTED — rotated]`는 스테일 → 기존 KPA 체험 로그인은 실패 상태였음. 동작하는 값으로 정렬(계정 자체 reset 아님, 코드 표기 수정).
 
 ## 5. 보안 판단 (사용자 결정 기록)
 - 이 계정은 여러 사람이 함께 쓰도록 **임시 제공하는 공용 체험 계정**이며 곧 제거 예정. 사용자 결정에 따라 **비밀번호 하드코딩 제거/별도 demo 계정 생성/rotation은 본 WO 범위 밖**.

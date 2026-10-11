@@ -1,5 +1,7 @@
 # IR-O4O-SUPPLIER-IDENTITY-BUSINESS-PROFILE-CANONICALIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **성격:** INVESTIGATION ONLY — 코드 구현 0 · DB write 0 · migration 0 · 배포 0 · 운영 데이터 수정 0
 > **기준 `origin/main`:** `ea0dbee6f` (`HEAD == origin/main` · reset/rebase 0 · 타 세션 dirty/untracked 불가침)
 > **조사일:** 2026-09-24
@@ -208,7 +210,7 @@ lifecycle: 공급자 선택(`not_requested`) → 증빙 제출(`submitted`) → 
 | `approved_by` | `cfd2a5e7` — **승인 운영자**이지 소유자 아님 |
 | 현존 users | **1건**(`cfd2a5e7` = 운영자) |
 
-세 supplier 를 **어느 사용자에게 연결해야 하는지 DB 안에 근거가 없다.** `docs/local/TEST-ACCOUNTS.local.md` 는 `[REDACTED_EMAIL_C]` 을 "(주)쓰라이프존 공급자" 로 적지만 **그 계정은 현재 users 에 없다**(1건뿐). 즉 복구하려면 계정 생성이 선행되고, 이는 추측이 아니라 **사용자 확인 사항**이다.
+세 supplier 를 **어느 사용자에게 연결해야 하는지 DB 안에 근거가 없다.** `docs/local/TEST-ACCOUNT.txt` 는 `[REDACTED_EMAIL_C]` 을 "(주)쓰라이프존 공급자" 로 적지만 **그 계정은 현재 users 에 없다**(1건뿐). 즉 복구하려면 계정 생성이 선행되고, 이는 추측이 아니라 **사용자 확인 사항**이다.
 
 > **REPAIR PLAN READY (실행 금지)** — 승인 시 다음 순서. ① 각 supplier 의 실제 소유자 이메일을 **사용자가 지정** ② 해당 Google 계정 로그인으로 users 행 생성 확인 ③ `organization_members`(role=owner) 생성 ④ (호환 기간 동안) `neture_suppliers.user_id` 설정 ⑤ ACTIVE 2건만 우선, PENDING 1건(`초윤`)은 승인 절차와 함께. **이 IR 은 UPDATE 를 실행하지 않았다.**
 >

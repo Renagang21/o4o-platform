@@ -1,5 +1,7 @@
 # O4O Platform Reset Execution Plan V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO-O4O-PLATFORM-RESET-DRYRUN-SCRIPT-V1**
 > 작성일: 2026-05-14
 > 상태: DRY-RUN COMPLETE — 실제 실행 전 사용자 승인 필수
@@ -15,7 +17,7 @@
 > - WO-O4O-KPA-TEMP-SEED-BOOTSTRAP-DEPRECATION-V1 (commit `86a08b420`) 에서 본 migration
 >   파일을 super-admin 만 유지하도록 trim 했으며, 다수의 보조 seed migration 을 삭제했다.
 > - STEP 5 / STEP 6 의 임시 계정 smoke test 항목은 폐기. super-admin 기반 smoke 만 유효.
-> - 신규 검증 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 로 관리.
+> - 신규 검증 자격증명은 `docs/local/TEST-ACCOUNT.txt` 로 관리.
 
 ---
 
@@ -208,12 +210,12 @@ gcloud logging read \
 
 ⚠️ **WO-O4O-TEMP-ACCOUNT-DOCS-AND-TEST-CLEANUP-V1 갱신**: 임시 계정 smoke 항목은 폐기.
 super-admin 1 계정만 reset 직후 자동 복구되며, 그 외 검증 계정은 운영자가
-`docs/local/TEST-ACCOUNTS.local.md` 의 정의를 따라 별도로 준비한다.
+`docs/local/TEST-ACCOUNT.txt` 의 정의를 따라 별도로 준비한다.
 
 | 계정 | 목적 |
 |------|------|
 | super-admin@o4o.com | /admin 접근 (자동 복구 — bootstrap migration) |
-| (그 외 검증 계정) | `docs/local/TEST-ACCOUNTS.local.md` SSOT 참조 — 운영자가 별도로 준비 |
+| (그 외 검증 계정) | `docs/local/TEST-ACCOUNT.txt` SSOT 참조 — 운영자가 별도로 준비 |
 
 smoke test 체크리스트:
 - [ ] 각 계정 로그인 성공
@@ -299,4 +301,4 @@ signage_schedules
 
 *문서 버전: V1*
 *관련 스크립트: `scripts/reset/O4O-RESET-DRYRUN-V1.sql`*
-*참조: `docs/local/TEST-ACCOUNTS.local.md`*
+*참조: `docs/local/TEST-ACCOUNT.txt`*

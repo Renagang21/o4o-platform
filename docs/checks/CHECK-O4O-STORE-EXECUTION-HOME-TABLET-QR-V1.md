@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 — 내 매장 「매장 실행」 홈 (Tablet + QR v1)
 > **일자**: 2026-09-10
 > **브랜치**: `work/store-execution-home-tablet-qr-v1`
@@ -120,7 +122,7 @@ DB enum 이 아니라 **화면 표시용 파생 값**이다. 새 컬럼 · 새 e
 ## 6. 프로덕션 브라우저 E2E (§19)
 
 로컬 dev 서버(빌드 산출물 동일 소스)를 **프로덕션 API(`api.neture.co.kr`)** 에 붙여
-실제 매장 데이터로 검증했다. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서
+실제 매장 데이터로 검증했다. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서
 런타임에 읽었고 **어떤 파일 · 문서 · 커밋에도 기록하지 않았다.**
 
 ### 6-1. KPA — 테스트 약국 (`/store/execution`)
@@ -296,7 +298,7 @@ read-only 로 보이는 것은 결함이 아니라 **정본 테이블이 갈린 
 - **발견 1건** — 설계 §5-3(POP/Signage placeholder 유지) 과 본 WO(placeholder 금지)의 충돌.
   WO 가 우선하며 §3-1 에 편차로 기록했다. 설계 문서 본문은 **수정하지 않았다** (CLAUDE.md §16-4:
   기준 문서의 내용·판정 변경은 별도 WO).
-- 참고 — `docs/local/TEST-ACCOUNTS.local.md` 의 `pharmacy-hub:store_owner` 행이 드리프트되어
+- 참고 — `docs/local/TEST-ACCOUNT.txt` 의 `pharmacy-hub:store_owner` 행이 드리프트되어
   401 이 난다(§6-2). 로컬 전용 · git 미추적 문서이며 범위 밖이라 **보고만 한다.**
 
 ---

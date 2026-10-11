@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1
 > **작성일**: 2026-09-15 · **상태**: CLOSED
 > **판정**: `STORE TABLET LOCATION/CONTENT RUNTIME MANAGEMENT: PASS` · `KPA REAL TABLET OPERABILITY: PASS`
@@ -71,7 +73,7 @@ jest 가 고정하는 계약: lookup 무효 404 `PAIRING_CODE_INVALID` · claim 
 - CI Pipeline 은 뒤이은 다른 세션 push(`e393c2f52`) 의 concurrency 로 취소됨(본 변경의 실패 아님). `c12f8c746` CI Pipeline · CodeQL 은 통과.
 
 ### 4-3. 실 태블릿 시나리오 (§23) — Playwright 태블릿 뷰포트 · 프로덕션
-스크립트: [`scripts/e2e/store-tablet-location-content-runtime.e2e.mjs`](../../scripts/e2e/store-tablet-location-content-runtime.e2e.mjs) (`KPA_EMAIL` / `KPA_PASS` / `OUT_DIR` 환경변수 · 자격증명 미포함). PC 컨텍스트 1440×900 + 태블릿 컨텍스트 1280×800(hasTouch · 별도 브라우저 프로필) · `https://kpa-society.co.kr` · 테스트 약국(`docs/local/TEST-ACCOUNTS.local.md` 약국 경영자).
+스크립트: [`scripts/e2e/store-tablet-location-content-runtime.e2e.mjs`](../../scripts/e2e/store-tablet-location-content-runtime.e2e.mjs) (`KPA_EMAIL` / `KPA_PASS` / `OUT_DIR` 환경변수 · 자격증명 미포함). PC 컨텍스트 1440×900 + 태블릿 컨텍스트 1280×800(hasTouch · 별도 브라우저 프로필) · `https://kpa-society.co.kr` · 테스트 약국(`docs/local/TEST-ACCOUNT.txt` 약국 경영자).
 
 | # | 단계 | 결과 |
 |---|---|---|

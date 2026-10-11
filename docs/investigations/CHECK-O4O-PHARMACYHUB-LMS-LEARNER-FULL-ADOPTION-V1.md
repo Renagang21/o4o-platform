@@ -1,5 +1,7 @@
 # CHECK-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1`
 - **작업일**: 2026-08-21
 - **범위**: PharmacyHub LMS **learner** capability 를 KPA-Society parity 로 채택
@@ -185,7 +187,7 @@ CI 의 `date-fns` 관련 실패(Admin Dashboard) 도 기존 선행 실패이며 
 ### 4-2. 프로덕션 브라우저 E2E (§24)
 
 프로덕션 `https://pharmacyhub.co.kr` · Playwright · **desktop 1440×900 + mobile 390×844 양쪽 수행**.
-계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 실행 시점에 읽었다(하드코딩·커밋 0).
+계정은 `docs/local/TEST-ACCOUNT.txt` 에서 실행 시점에 읽었다(하드코딩·커밋 0).
 
 | 화면 | desktop | mobile | 비고 |
 |---|:---:|:---:|---|

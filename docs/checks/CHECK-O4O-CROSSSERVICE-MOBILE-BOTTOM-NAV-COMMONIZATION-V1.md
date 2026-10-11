@@ -1,5 +1,7 @@
 # CHECK — Cross-Service Mobile Bottom Nav 공통화 V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: [`WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1`](../work-orders/WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1.md)
 - **작업일**: 2026-08-21
 - **상태**: COMPLETED
@@ -128,7 +130,7 @@
 
 - Neture 는 계정 역할에 따라 `/` 가 각각 `/supplier/dashboard`, `/admin` 으로 리다이렉트되어 홈 탭이 비활성으로 관측되는데, 이는 **기존 라우팅 동작**이며 active 로직 정상(게스트 `/` 에서 홈/커뮤니티 탭 active 확인).
 
-검증 계정: `docs/local/TEST-ACCOUNTS.local.md` (KPA `sohae2100@…`, KCos/Neture `renagang21@…`).
+검증 계정: `docs/local/TEST-ACCOUNT.txt` (KPA `sohae2100@…`, KCos/Neture `renagang21@…`).
 
 ---
 

@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **대상 에이전트**: Agent D
 - **작성일**: 2026-08-18
 - **성격**: 조사 + **실제 구현(수렴)** — 조사 전용 아님
@@ -181,7 +183,7 @@ CLAUDE.md 실행 원칙의 중지 조건을 그대로 따른다. 특히 본 WO �
        → 저장 → 새로고침 → 저장값 유지
 ```
 
-대상: KPA-Society / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md`).
+대상: KPA-Society / K-Cosmetics / PharmacyHub / Neture. **가능한 서비스는 실제 브라우저로 검증**한다 (계정 SSOT: `docs/local/TEST-ACCOUNT.txt`).
 
 ### 6-2. 확인 항목
 

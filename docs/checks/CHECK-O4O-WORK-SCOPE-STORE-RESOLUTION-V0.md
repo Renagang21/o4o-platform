@@ -1,5 +1,7 @@
 # CHECK-O4O-WORK-SCOPE-STORE-RESOLUTION-V0
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0
 - **일자**: 2026-09-08
 - **선행**: WO-O4O-COMMON-HOME-PHASE1-V1 (CLOSED) · WO-O4O-WORK-SCOPE-CONTRACT-V0 (CLOSED)
@@ -284,7 +286,7 @@ web-neture 에는 넣지 않았다(§22).
 
 - 배포: `Deploy API Server (Cloud Run)` success · `Deploy Web Services (Cloud Run)` success · CodeQL success (commit `fe5dced51`)
 - 대상: `https://api.neture.co.kr/api/v1/work-scope/store-resolution`
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 L1 자격 (`kpa:store_owner` 보유). 자격증명은 env 주입, 문서·로그에 기록하지 않는다.
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 L1 자격 (`kpa:store_owner` 보유). 자격증명은 env 주입, 문서·로그에 기록하지 않는다.
 - **전부 read-only GET. DB write 0.**
 
 | 요청 | 응답 | 기대 일치 |
