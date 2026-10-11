@@ -32,8 +32,18 @@ async function prepare(page: Page) {
   });
 
   let failStats = false;
+  let failFunding = false;
+  let denyStudy = false;
   await page.context().route("**/*", async (route) => {
     const url = new URL(route.request().url());
+    if (
+      url.origin === "https://study.neture.co.kr" &&
+      url.pathname === "/handoff"
+    )
+      return route.fulfill({
+        contentType: "text/html",
+        body: "<h1>Study 이동 검증 화면</h1>",
+      });
     if (url.hostname === "127.0.0.1" && !url.pathname.startsWith("/api/"))
       return route.continue();
     if (!url.pathname.startsWith("/api/")) return route.abort();
@@ -73,7 +83,44 @@ async function prepare(page: Page) {
         serviceStates: { supplier: { status: "none", source: "none" } },
       };
     else if (path === "/work-scope/operator-services") data = { services: [] };
-    else if (path === "/communities") data = { communities: [community] };
+    else if (path === "/lms/enrollments/me") {
+      if (denyStudy)
+        return route.fulfill({
+          status: 403,
+          json: { success: false, code: "MEMBERSHIP_NOT_ACTIVE" },
+        });
+      const limit = Number(url.searchParams.get("limit"));
+      const current = Number(url.searchParams.get("page"));
+      if (url.searchParams.has("serviceKey") || url.searchParams.has("userId"))
+        throw new Error("Unexpected caller-controlled LMS scope");
+      return route.fulfill({
+        json: {
+          success: true,
+          data: Array.from({ length: 11 }, (_, i) => ({
+            id: `enrollment-${i}`,
+            courseId: `course-${i}`,
+            course: { title: `검증 강의 ${i}` },
+            status: "in_progress",
+            progressPercentage: i === 0 ? 0 : undefined,
+          })).slice((current - 1) * limit, current * limit),
+          pagination: {
+            total: 11,
+            page: current,
+            limit,
+            totalPages: Math.ceil(11 / limit),
+          },
+        },
+      });
+    } else if (path === "/api/market-trial/my-participations") {
+      if (failFunding)
+        return route.fulfill({ status: 503, json: { success: false } });
+      data = Array.from({ length: 11 }, (_, i) => ({
+        id: `participation-${i}`,
+        trialId: `trial-${i}`,
+        trial: { title: `검증 펀딩 ${i}`, status: "recruiting" },
+        settlementStatus: "offline_review",
+      }));
+    } else if (path === "/communities") data = { communities: [community] };
     else if (path === "/communities/operating") data = { communities: [] };
     else if (path === "/notifications/unread-count") data = { count: 2 };
     else if (path === "/notifications")
@@ -131,6 +178,12 @@ async function prepare(page: Page) {
       failStats = value;
     },
     requests,
+    setFundingFailure: (value: boolean) => {
+      failFunding = value;
+    },
+    setStudyDenied: (value: boolean) => {
+      denyStudy = value;
+    },
   };
 }
 
@@ -175,6 +228,88 @@ test("personal views and direct entries stay visible without page overflow", asy
     });
   }
   expect(errors).toEqual([]);
+});
+test("overview displays actual service activities and bounded summaries", async ({
+  page,
+}) => {
+  await prepare(page);
+  await page.goto("/mypage");
+  await expect(page.getByText("학습 중 · 진도 0%")).toBeVisible();
+  await expect(page.getByText("검증 강의 2", { exact: true })).toBeVisible();
+  await expect(page.getByText("검증 강의 3", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("검증 펀딩 2", { exact: true })).toBeVisible();
+  await expect(page.getByText("검증 펀딩 3", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("내가 작성한 글", { exact: true })).toBeVisible();
+  await expect(page.locator("dd").filter({ hasText: /^7$/ })).toBeVisible();
+  await page
+    .getByRole("link", { name: "학습·펀딩 참여 이력 더 보기 →" })
+    .click();
+  await expect(page).toHaveURL(/\/mypage\/services$/);
+});
+test("service history pages and Study handoff continue at the original course", async ({
+  page,
+}) => {
+  const fixture = await prepare(page);
+  await page.goto("/mypage/services");
+  const study = page.getByRole("region", { name: "Study 학습 현황" });
+  const funding = page.getByRole("region", { name: "Funding 참여 현황" });
+  await expect(study.getByText("검증 강의 0", { exact: true })).toBeVisible();
+  await study.getByRole("button", { name: "다음", exact: true }).click();
+  await expect(study.getByText("검증 강의 10", { exact: true })).toBeVisible();
+  await expect(study.getByText("검증 강의 0", { exact: true })).toHaveCount(0);
+  await funding.getByRole("button", { name: "다음", exact: true }).click();
+  await expect(
+    funding.getByText("검증 펀딩 10", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    funding.getByRole("link", { name: "검증 펀딩 10 펀딩 보기" }),
+  ).toHaveAttribute(
+    "href",
+    "https://funding.neture.co.kr/market-trial/trial-10",
+  );
+  await page.route("**/api/v1/auth/handoff", async (route) => {
+    expect(route.request().postDataJSON()).toEqual({
+      targetServiceKey: "lecture",
+      returnPath: "/courses/course-10",
+    });
+    return route.fulfill({
+      json: {
+        success: true,
+        data: {
+          targetUrl:
+            "https://study.neture.co.kr/handoff?token=fixture&returnTo=%2Fcourses%2Fcourse-10",
+        },
+      },
+    });
+  });
+  await study.getByRole("button", { name: "검증 강의 10 강의 보기" }).click();
+  await expect(page).toHaveURL(
+    "https://study.neture.co.kr/handoff?token=fixture&returnTo=%2Fcourses%2Fcourse-10",
+  );
+  expect(
+    fixture.requests.filter((path) => path === "/lms/enrollments/me").length,
+  ).toBe(2);
+});
+test("a denied Study read and failed Funding read remain distinct from empty histories", async ({
+  page,
+}) => {
+  const fixture = await prepare(page);
+  fixture.setStudyDenied(true);
+  fixture.setFundingFailure(true);
+  await page.goto("/mypage/services");
+  await expect(page.getByText(/Study 이용 권한을 확인/)).toBeVisible();
+  const funding = page.getByRole("region", { name: "Funding 참여 현황" });
+  await expect(funding.getByRole("alert")).toBeVisible();
+  await expect(page.getByText("수강 이력이 없습니다.")).toHaveCount(0);
+  await expect(page.getByText("참여한 펀딩이 없습니다.")).toHaveCount(0);
+  fixture.setStudyDenied(false);
+  fixture.setFundingFailure(false);
+  await page.getByRole("button", { name: "다시 확인", exact: true }).click();
+  await funding
+    .getByRole("button", { name: "다시 불러오기", exact: true })
+    .click();
+  await expect(page.getByText("검증 강의 0", { exact: true })).toBeVisible();
+  await expect(page.getByText("검증 펀딩 0", { exact: true })).toBeVisible();
 });
 test("representative home summary opens the personal home", async ({
   page,
