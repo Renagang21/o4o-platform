@@ -87,6 +87,13 @@ test('unconfirmed deletion stops and rerunning resumes only remaining targets', 
   await retireResources(h.options);
   assert.deepEqual(h.removed, [targets[1], targets[2]]);
 });
+test('a resumed retirement needs permissions only for remaining resources', async () => {
+  const h = harness(); h.set([targets[2]]);
+  await retireResources({ ...h.options, permissions: async () => ['run.services.delete'] });
+  assert.deepEqual(h.removed, [targets[2]]);
+  await retireResources({ ...h.options, permissions: async () => [] });
+  assert.deepEqual(h.removed, [targets[2]]);
+});
 
 test('workflow rejects mixed resource operations, foreign actors and frozen writes before authentication', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/pharmacyhub-qr-cutover.yml', import.meta.url), 'utf8');

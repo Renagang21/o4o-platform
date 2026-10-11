@@ -73,10 +73,14 @@ export function inspectResources(cloud, http) {
 export async function retireResources({ mode, read, permissions, verify, remove, beforeWrite = () => {} }) {
   if (!['plan', 'apply'].includes(mode)) throw new ResourceDiagnosticError('Unknown PH resource mode.');
   const allowed = await permissions();
-  const missingPermissions = deletionPermissions.filter(permission => !allowed.includes(permission));
   let targets = await read();
+  const requiredPermissions = deletionPermissions.filter(permission =>
+    (targets.includes(backend) && ['compute.backendServices.delete', 'compute.globalOperations.get'].includes(permission))
+    || (targets.includes(neg) && ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get'].includes(permission))
+    || (targets.includes(service) && permission === 'run.services.delete'));
+  const missingPermissions = requiredPermissions.filter(permission => !allowed.includes(permission));
   await verify(); // Actual QR/tablet data and Neture targets, without recording QR scans.
-  const plan = { mode, applied: false, targets, missingPermissions, httpVerified: true };
+  const plan = { mode, applied: false, targets, requiredPermissions, missingPermissions, httpVerified: true };
   if (mode === 'plan') return plan;
   if (missingPermissions.length) throw new ResourceDiagnosticError(`PH resource deletion blocked; permissions=${missingPermissions.join(',')}.`);
   for (const target of [backend, neg, service]) {
