@@ -1,12 +1,15 @@
 # 내 매장 실제 계정 업무 흐름 검증
 
-> 상태: PARTIAL — 실제 API 작성·복사·수정·게시 검증 완료, 상품 선택 불일치·사본 완전 정리 대기
+> 상태: ACTIVE
+> 진행 결과: 실제 API 작성·복사·수정·게시 검증 완료, 상품 선택 불일치·사본 완전 정리 대기
 > 검증일: 2026-10-10~11 UTC
 > 선행: [선택 매장 리팩토링 WO](../work-orders/WO-O4O-STORE-SCOPE-REFACTOR-V1.md), PR #434
 
 ## 실행 범위와 결과
 
-운영 서비스의 canonical Store Owner Demo 계정으로 이메일·비밀번호 인증을 실제 실행했다. credential은 `packages/auth-utils/src/demoAccounts.ts`에서 읽었으며 공개 기록에 세션·계정·조직 식별자·응답 원문을 넣지 않는다. 브라우저 연결 도구가 없어 HTTP API 검증만 수행했다. 화면 조작이나 실제 기기 검증으로 간주하지 않는다.
+계정 선정 SSOT는 기준 checkout의 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md`다. 해당 안내의 연결 조사 결과와 운영 재연결 완료 기록은 이 작업의 승인된 테스트 계정을 canonical Store Owner Demo로 지정하고 공통 계정 코드 정본을 참조한다. 안내가 없는 상태에서 과거 seed/Demo 계정으로 대체한 것이 아니다. 검증은 사용자가 연결을 승인한 이 테스트 계정의 운영 API 흐름에 한정되며, 별도의 비공개 일반 사용자 계정 검증 완료를 뜻하지 않는다.
+
+이 계정으로 이메일·비밀번호 인증을 실제 실행했다. credential은 `packages/auth-utils/src/demoAccounts.ts`에서 읽었으며 공개 기록에 세션·계정·조직 식별자·응답 원문을 넣지 않는다. 브라우저 연결 도구가 없어 HTTP API 검증만 수행했다. 화면 조작이나 실제 기기 검증으로 간주하지 않는다.
 
 - 로그인: HTTP 200 / success=true.
 - 접근 가능한 조직: 17개. 실제 개설 매장이 17개라는 뜻이 아니다. 기존 재연결과 삭제 미실행 상태가 남아 있다.
