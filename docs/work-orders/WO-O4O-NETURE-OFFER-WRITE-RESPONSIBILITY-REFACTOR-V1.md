@@ -55,3 +55,27 @@ TODO 작성 후 최신 main의 코드/문서/호출처를 조사하고 아래 �
 6. production health와 사용자에게 이미 허용된 공개 공급자 Demo의 읽기만 점검한다. 실제 테스트 계정 검증과 운영 쓰기는 하지 않는다.
 
 운영 결과와 트랜잭션의 실제 DB 동작 확인 여부는 별도 검증 결과에서 구분한다. 이 WO의 기준점과 과거 결과를 최신 정책으로 다시 쓰지 않는다.
+
+## 중복 코드 보완
+
+초기 PR #485의 SonarCloud 결과가 병합 뒤 도착해 신규 중복률 4.1%로 기준 3%를 넘었다.
+승인·반려의 기존 승인 원장 조회/누락 행 생성만 `OfferLifecycleService.ensureServiceApprovals`로 공유한다.
+같은 QueryRunner를 전달하며 이미 승인 행이 있는 경우, 공급처 미지정인 경우, 누락 서비스별 행 생성 후의
+승인/반려와 cascade 분기는 그대로 유지한다. 순차 batch를 병렬화하거나 analyzer exclusion을 추가하지 않는다.
+
+이 보완 후에는 approveProduct/rejectProduct 본문 자체가 원본과 동일하다고 보고하지 않는다.
+기존 SQL와 바인딩의 다중집합, 공개 signature, 동적 transaction 순서/실패 검증과 다른 12개 moved method의
+AST 동일성을 구분해 확인한다. 초기 본문 동일 증적은 당시 검증 이력으로 보존한다.
+
+보완 검증: 새 행동 계약 58건을 원본 monolith에서도 통과시킨 뒤 분리본 관련 14 suites / 311 tests가
+통과했다. 기존 승인 행이 있지만 대상 키가 없는 경우의 파생 sync와 준비 SELECT/INSERT 실패 시
+판정 전 rollback/release를 추가 검증했다. DB 호출/바인딩 36개의 다중집합과 공개 signature 20개,
+다른 moved method 12개 및 순수 함수 3개 본문은 동일하다.
+
+후속 PR review에서 추출 시 동적 VALUES의 `$` 누락을 발견해 원래 `$2`, `$3` bind marker를 복원했다.
+생성된 INSERT SQL의 VALUES와 placeholder 집합 검증을 추가했다. 정적 query call 비교는 SQL을
+만드는 외부 변수의 동등성까지 증명하지 못하므로, 이 부분은 실제 생성 SQL assertion과 별도
+VALUES initializer AST 비교로 보완한다. 수정 전 보완본은 운영에 배포되지 않았다.
+
+사용자는 병행 PharmacyHub 정리 중 WIF 임시 차단 유지를 지정했다. main 통합과 배포를 구분하고,
+차단 해제 전 실제 배포 및 새 코드의 운영 검증을 완료했다고 보고하지 않는다.
