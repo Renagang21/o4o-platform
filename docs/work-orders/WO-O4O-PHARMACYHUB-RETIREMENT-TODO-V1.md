@@ -8,12 +8,12 @@
 
 - [x] PR #417 CI·리뷰 확인 후 main 병합.
 - [x] 전체 PH 호스트 리다이렉트 초안/실행 옵션 준비(`retire_host=true`). PH default backend·pathRules 참조를 제거하고 다른 host/matcher는 보존. 302·path/query 유지.
-- [ ] 새 코드 CI·리뷰·main 통합 후 `retire_host=true, mode=plan`의 변경 전후 map 확인.
-- [ ] URL map update·global operation 조회 권한 확인 후 전체 호스트 apply. 실제 QR/tablet·네 경로 규칙·root·기타 경로 302 검증. 실패 시 기존 map 복구.
+- [x] 새 코드 CI·리뷰·main 통합 후 `retire_host=true, mode=plan`의 변경 전후 map 확인.
+- [x] URL map update·global operation 조회 권한 확인 후 전체 호스트 apply. 실제 QR/tablet·네 경로 규칙·root·기타 경로 302 검증. 실행 `38119869917` SUCCESS.
 - [ ] 전체 URL map과 다른 backend/NEG에서 `pharmacy-hub-web` 참조가 없는지 확인. Cloud Run 삭제 권한과 대상 project/region 확인 후 전용 서비스 제거·부재 확인.
 - [ ] 현재 DB schema/FK 및 PH 전용 테이블·service_key 행 목록 확인. 공용 조직·사용자·Neture QR/매장 데이터를 PH 문자열만으로 삭제하지 않음. PH 전용 데이터는 transaction 단위 삭제 계획 후 실제 삭제·잔여 건수 확인.
 - [ ] 남은 PH 활성 등록·권한·호환 참조를 실제 공용 소비처 기준으로 제거. 과거 migration을 다시 실행하거나 migration 이력을 없애지 않음.
-- [ ] 각 운영 실행 결과·잔여 blocker 기록. 지금 운영 apply·Cloud Run·DB 삭제는 미실행.
+- [ ] 각 운영 실행 결과·잔여 blocker 기록. 전체 호스트 apply는 성공, Cloud Run·DB 삭제는 미완료.
 
 전체 제거 phase는 사용자 지정 worktree를 유지하고 최신 main의 `wo/pharmacyhub-full-retirement`에서 수행한다.
 
@@ -144,3 +144,17 @@ read-only census [38101012970](https://github.com/Renagang21/o4o-platform/action
 기존 검증은 최대 6회/10초 간격으로 약 50초 뒤 실패할 수 있었다. Compute operation DONE과 frontend 반영은 구분해야 하므로 동일 엄격 검증을 최대 5분까지 반복하도록 보강한다. 반영 지연은 아직 확정 원인이 아니며, 이 검증으로 확인한다. timeout 이후에는 기존 fingerprint·동시 변경 차단·검증된 rollback을 유지하고 workflow의 변경 전 25분 잔여 시간 gate도 유지한다. 지연 후 성공·기한 만료 rollback·이미 취소된 검증 회귀를 포함해 focused tests 52개 PASS다.
 
 동일 WO의 연속 phase로 사용자 지정 worktree를 재사용하며 branch는 `wo/pharmacyhub-retirement-propagation`, base는 최신 main `4f75e2563a`다. 운영 전환은 성공으로 보고하지 않으며 자원·데이터 제거는 여전히 미완료다.
+
+## 전체 호스트 전환 성공 및 자원 제거 phase — 2026-10-11
+
+PR #456은 최신 main 반영 후 필수 CI·최신 Codex 리뷰 통과로 main `ffa4403ddf`에 병합했다. main 후속 CI [38119674074](https://github.com/Renagang21/o4o-platform/actions/runs/38119674074)도 SUCCESS다. 새 plan `38119686512` SUCCESS 후 다른 API Delivery 진행을 확인해 초기 apply `38119756522`를 checkout 단계에서 취소했다. GCP 인증/운영 단계는 실행되지 않았다. 다른 Delivery 완료 후 단독 재실행한 [38119869917](https://github.com/Renagang21/o4o-platform/actions/runs/38119869917)은 SUCCESS(`applied=true`, `httpVerified=true`, `activeFamiliesVerified=2`, `ruleOnlyFamiliesVerified=6`). 실제 QR/tablet 2종과 나머지 규칙/전체 호스트·약관 경로를 확인했다. 앱 재배포는 NOT_APPLICABLE이며 실제 URL map 전환 완료다.
+
+다음 대상은 `backend-pharmacy-hub-web` → `neg-pharmacy-hub-web` → `pharmacy-hub-web` 세 자원이다. 동일 WO의 연속 phase로 지정 worktree의 최신 main 기반 `wo/pharmacyhub-resource-retirement`을 사용한다. `resource_retirement=true`의 standalone owner plan/apply 경로를 추가한다. complete URL map/backend/NEG 참조 조회, 두 옛 호스트의 12개 HTTP 규칙, 실제 QR/tablet read-only HEAD/API 검증, fixed-target 의존 순서 삭제, 매 삭제 전 재조회·시간 gate·삭제 후 부재 확인을 적용한다. 부분 삭제는 성공으로 보고하지 않고 다음 read-only plan에서 남은 고정 대상만 재개한다.
+
+plan은 현재 Actions principal의 backend/NEG/Cloud Run 삭제 및 operation 조회 권한도 read-only `testIamPermissions`로 확인한다. 누락 시 apply는 삭제 전 차단된다. 도메인·DNS·인증서와 운영 DB는 이 도구의 삭제 대상이 아니다. 기존 Demo/copy 정리와 혼합 실행을 인증 전에 거부한다. 자원/DB 삭제는 아직 실행하지 않았으며 기존 DB/FK·법정 보유·공용/Neture 데이터 보호 TODO는 계속 유효하다.
+
+PR #459 P1 리뷰 대응: PH workflow의 기존 concurrency만으로 다른 Delivery/API 배포를 직렬화할 수 없으므로, 매 삭제 직전 GitHub Actions의 Delivery/API/admin/web/다른 PH 실행·대기 상태를 완전 페이지 조회해 차단한다. 현재 자기 run과 CI는 제외하며 조회 권한·identity·metadata·pagination이 불완전하면 fail closed한다. 이 async gate를 await한 후에만 고정 대상 삭제를 실행한다. `actions: read`와 해당 step의 ephemeral GitHub token만 사용하며 다른 배포 workflow의 lock을 변경하지 않는다. 새 자원/삭제 자원의 재등장도 후속 삭제를 차단한다. 이 gate는 분산 원자 lock을 주장하지 않으며 AGENTS의 세션 간 단독 운영 확인도 계속 적용한다.
+
+추가 P1 대응: 최상위 `promote.yml`과 `referenced_workflows`의 production reusable workflow도 gate에 포함한다. caller 이름만으로 호출된 Delivery를 놓치지 않으며 호출 metadata가 불완전하면 차단한다. 품질 검사 지적에 따라 Ubuntu runner의 gcloud를 고정 절대 경로로 실행하고 의존 순서 삭제는 직렬 promise chain으로 유지한다. 자원 안전 테스트 18 PASS다.
+
+P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 preflight는 존 NEG 권한 대신 `compute.regionNetworkEndpointGroups.delete`를 검사한다. 기존 read-only list 권한과 삭제 권한은 구분하며, plan에서 실제 principal의 누락 권한을 확인하기 전 삭제하지 않는다.
