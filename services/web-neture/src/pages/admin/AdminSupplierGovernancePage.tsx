@@ -9,9 +9,10 @@
  * 승인/거절(PENDING)은 운영자 승인 콘솔(/operator/suppliers)이 canonical — 이 화면에서 다루지 않는다.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
-import { RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
+import { RowActionMenu, Dialog } from '@o4o/ui';
 import { adminSupplierApi, type GovernanceSupplier } from '../../lib/api';
 
 const statusLabels: Record<string, string> = {
@@ -38,18 +39,36 @@ type DialogState =
 export default function AdminSupplierGovernancePage() {
   const [suppliers, setSuppliers] = useState<GovernanceSupplier[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const beginList = useLatestRequest('supplier-governance-list');
+  const beginAction = useLatestRequest('supplier-governance-action');
+  const submitting = useRef(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'ACTIVE' | 'INACTIVE'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const openDialog = (next: NonNullable<DialogState>) => {
+    if (submitting.current) return;
+    setReason(''); setActionMessage(null); setDialog(next);
+  };
+  const closeDialog = () => { if (!submitting.current) setDialog(null); };
 
   const loadSuppliers = useCallback(async () => {
+    const current = beginList();
     setLoading(true);
-    const data = await adminSupplierApi.getGovernanceSuppliers();
-    setSuppliers(data || []);
-    setLoading(false);
-  }, []);
+    setLoadError('');
+    setSuppliers([]);
+    try {
+      const data = await adminSupplierApi.getGovernanceSuppliers();
+      if (current()) setSuppliers(data);
+    } catch (error) {
+      if (current()) setLoadError(error instanceof Error ? error.message : '공급자 상태 목록을 불러오지 못했습니다.');
+    } finally {
+      if (current()) setLoading(false);
+    }
+  }, [beginList]);
 
   useEffect(() => {
     loadSuppliers();
@@ -58,55 +77,64 @@ export default function AdminSupplierGovernancePage() {
   // §8/§10: 다이얼로그 오픈 시 대상 supplier 를 스냅샷한다. 취소=변경 0, 반복 확인=변경 1.
   const handleConfirm = useCallback(
     async (reason?: string) => {
-      if (!dialog) return;
+      if (!dialog || submitting.current || loading || loadError) return;
       const trimmed = (reason ?? '').trim();
-      if (!trimmed) return; // requireReason 로 이미 방지되지만 방어적 확인
+      if (!trimmed) return; // 버튼 비활성화와 별개로 핸들러에서도 사유를 확인한다.
       const { kind, supplier } = dialog;
+      submitting.current = true;
+      const current = beginAction();
       setActionLoading(true);
-      const result =
-        kind === 'deactivate'
-          ? await adminSupplierApi.deactivateSupplier(supplier.id, trimmed)
-          : await adminSupplierApi.reactivateSupplier(supplier.id, trimmed);
-      setActionLoading(false);
+      try {
+        const result =
+          kind === 'deactivate'
+            ? await adminSupplierApi.deactivateSupplier(supplier.id, trimmed)
+            : await adminSupplierApi.reactivateSupplier(supplier.id, trimmed);
+        if (!current()) return;
 
-      if (result.success) {
-        setDialog(null);
-        setActionMessage({
-          type: 'success',
-          text:
-            kind === 'deactivate'
-              ? `${supplier.name} 비활성화 완료 (INACTIVE)`
-              : `${supplier.name} 재활성화 완료 (ACTIVE)`,
-        });
-        await loadSuppliers();
-        return;
-      }
+        if (result.success) {
+          setDialog(null);
+          setActionMessage({
+            type: 'success',
+            text:
+              kind === 'deactivate'
+                ? `${supplier.name} 비활성화 완료 (INACTIVE)`
+                : `${supplier.name} 재활성화 완료 (ACTIVE)`,
+          });
+          await loadSuppliers();
+          return;
+        }
 
-      // §6: 진행 주문·미정산 차단 (409)
-      if (result.code === 'SUPPLIER_DEACTIVATION_BLOCKED' && result.blocked) {
-        setActionMessage({
-          type: 'error',
-          text: `비활성화할 수 없습니다 — 진행 주문 ${result.blocked.activeOrderCount}건 · 미정산 ${result.blocked.unsettledCount}건 · 정산 진행 ${result.blocked.settlementInProgressCount}건. 처리 완료 후 다시 시도해 주세요.`,
-        });
-        setDialog(null);
-        await loadSuppliers();
-        return;
+        // §6: 진행 주문·미정산 차단 (409)
+        if (result.code === 'SUPPLIER_DEACTIVATION_BLOCKED' && result.blocked) {
+          setActionMessage({
+            type: 'error',
+            text: `비활성화할 수 없습니다 — 진행 주문 ${result.blocked.activeOrderCount}건 · 미정산 ${result.blocked.unsettledCount}건 · 정산 진행 ${result.blocked.settlementInProgressCount}건. 처리 완료 후 다시 시도해 주세요.`,
+          });
+          setDialog(null);
+          await loadSuppliers();
+          return;
+        }
+        if (result.code === 'INVALID_STATUS') {
+          setActionMessage({ type: 'error', text: '이미 상태가 변경된 공급자입니다. 목록을 새로고침합니다.' });
+          setDialog(null);
+          await loadSuppliers();
+          return;
+        }
+        if (result.code === 'SUPPLIER_NOT_FOUND') {
+          setActionMessage({ type: 'error', text: '공급자를 찾을 수 없습니다.' });
+          setDialog(null);
+          await loadSuppliers();
+          return;
+        }
+        setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+      } catch {
+        if (current()) setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 입력한 사유를 확인하고 다시 시도해 주세요.' });
+      } finally {
+        submitting.current = false;
+        if (current()) setActionLoading(false);
       }
-      if (result.code === 'INVALID_STATUS') {
-        setActionMessage({ type: 'error', text: '이미 상태가 변경된 공급자입니다. 목록을 새로고침합니다.' });
-        setDialog(null);
-        await loadSuppliers();
-        return;
-      }
-      if (result.code === 'SUPPLIER_NOT_FOUND') {
-        setActionMessage({ type: 'error', text: '공급자를 찾을 수 없습니다.' });
-        setDialog(null);
-        await loadSuppliers();
-        return;
-      }
-      setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
     },
-    [dialog, loadSuppliers],
+    [dialog, loadSuppliers, beginAction, loading, loadError],
   );
 
   const statuses: Array<'all' | 'ACTIVE' | 'INACTIVE'> = ['all', 'ACTIVE', 'INACTIVE'];
@@ -181,11 +209,11 @@ export default function AdminSupplierGovernancePage() {
       render: (_v, s) => {
         const actions =
           s.status === 'ACTIVE'
-            ? [{ key: 'deactivate', label: '비활성화', variant: 'danger' as const, onClick: () => setDialog({ kind: 'deactivate', supplier: s }) }]
+            ? [{ key: 'deactivate', label: '비활성화', variant: 'danger' as const, onClick: () => openDialog({ kind: 'deactivate', supplier: s }) }]
             : s.status === 'INACTIVE'
-              ? [{ key: 'reactivate', label: '재활성화', onClick: () => setDialog({ kind: 'reactivate', supplier: s }) }]
+              ? [{ key: 'reactivate', label: '재활성화', onClick: () => openDialog({ kind: 'reactivate', supplier: s }) }]
               : [];
-        return <RowActionMenu actions={actions} disabled={actionLoading} />;
+        return <RowActionMenu actions={actions} disabled={actionLoading || loading || !!loadError} />;
       },
     },
   ];
@@ -251,7 +279,7 @@ export default function AdminSupplierGovernancePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {!loadError && !loading && <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
           <p className="text-sm text-slate-500">전체 (활성+비활성)</p>
           <p className="text-2xl font-bold text-slate-800">{suppliers.length}</p>
@@ -264,7 +292,7 @@ export default function AdminSupplierGovernancePage() {
           <p className="text-sm text-slate-500">비활성</p>
           <p className="text-2xl font-bold text-slate-400">{inactiveCount}</p>
         </div>
-      </div>
+      </div>}
 
       <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
         <div className="flex flex-col md:flex-row gap-4">
@@ -291,42 +319,34 @@ export default function AdminSupplierGovernancePage() {
         </div>
       </div>
 
-      <DataTable<GovernanceSupplier>
+      {loadError && <div role="alert" className="space-y-2 rounded border border-red-200 p-3 text-red-700">
+        <p>{loadError}</p><button type="button" disabled={actionLoading} className="rounded border px-3 py-2" onClick={() => void loadSuppliers()}>다시 조회</button>
+      </div>}
+      {!loadError && <DataTable<GovernanceSupplier>
         columns={columns}
         data={filtered}
         rowKey={(s) => s.id}
         loading={loading}
         emptyMessage={suppliers.length === 0 ? '활성/비활성 공급자가 없습니다' : '검색 결과가 없습니다'}
-      />
+      />}
 
-      {/* §10: window.confirm 미사용 — 표준 ConfirmActionDialog(사유 필수) 재사용 */}
-      <ConfirmActionDialog
-        open={dialog?.kind === 'deactivate'}
-        onClose={() => setDialog(null)}
-        onConfirm={handleConfirm}
-        title="공급자 비활성화"
-        message={deactivateMessage}
-        confirmText="비활성화"
-        cancelText="취소"
-        variant="danger"
-        requireReason
-        reasonPlaceholder="비활성화 사유를 입력하세요 (필수)"
-        loading={actionLoading}
-      />
-
-      <ConfirmActionDialog
-        open={dialog?.kind === 'reactivate'}
-        onClose={() => setDialog(null)}
-        onConfirm={handleConfirm}
-        title="공급자 재활성화"
-        message={reactivateMessage}
-        confirmText="재활성화"
-        cancelText="취소"
-        variant="warning"
-        requireReason
-        reasonPlaceholder="재활성화 사유를 입력하세요 (필수)"
-        loading={actionLoading}
-      />
+      {/* Keep the reason controlled here so failed requests do not erase it. */}
+      <Dialog open={dialog !== null} role="dialog" aria-modal="true" aria-label="공급자 상태 변경"
+        className="mx-4 w-full max-w-md max-h-[90vh] overflow-y-auto p-6"
+        onKeyDown={event => { if (event.key === 'Escape') closeDialog(); }}>
+        <h2 className="text-lg font-semibold">공급자 {dialog?.kind === 'deactivate' ? '비활성화' : '재활성화'}</h2>
+        <p className="mt-3 whitespace-pre-line text-sm text-slate-600">{dialog?.kind === 'deactivate' ? deactivateMessage : reactivateMessage}</p>
+        <label className="mt-3 block text-sm">변경 사유 (필수)
+          <textarea autoFocus value={reason} disabled={actionLoading} onChange={event => setReason(event.target.value)} rows={3}
+            className="mt-1 w-full rounded border p-2" />
+        </label>
+        {actionMessage?.type === 'error' && <p role="alert" className="mt-3 text-sm text-red-700">{actionMessage.text}</p>}
+        <div className="mt-4 flex justify-end gap-2">
+          <button type="button" disabled={actionLoading} className="rounded border px-4 py-2" onClick={closeDialog}>취소</button>
+          <button type="button" disabled={actionLoading || !reason.trim()} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+            onClick={() => void handleConfirm(reason)}>{actionLoading ? '처리 중...' : dialog?.kind === 'deactivate' ? '비활성화' : '재활성화'}</button>
+        </div>
+      </Dialog>
     </div>
   );
 }

@@ -12,7 +12,7 @@
  */
 
 import { useLatestRequest } from '../../hooks/useLatestRequest';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
 import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from '../../api/trial';
@@ -317,9 +317,13 @@ function ForumSyncFailuresPanel() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [resolvedFilter, setResolvedFilter] = useState<ResolvedFilter>('unresolved');
   const [trialIdInput, setTrialIdInput] = useState('');
-  const [page, setPage] = useState(1);
+  const [query, setQuery] = useState({ resolvedFilter: 'unresolved' as ResolvedFilter, trialId: '', page: 1, revision: 0 });
+  const { resolvedFilter, page } = query;
+  const beginList = useLatestRequest(JSON.stringify(query));
+  const beginResolve = useLatestRequest('funding-failure-resolution');
+  const submitting = useRef(false);
+  const [notice, setNotice] = useState('');
   const limit = 20;
 
   // resolve 모달 상태
@@ -331,49 +335,61 @@ function ForumSyncFailuresPanel() {
   // 에러 메시지 전체보기 모달
   const [errorDetailTarget, setErrorDetailTarget] = useState<ForumSyncFailure | null>(null);
 
-  useEffect(() => {
-    load();
-  }, [resolvedFilter, page]);
-
-  const load = async () => {
+  const load = useCallback(async () => {
+    const current = beginList();
     setLoading(true);
     setError('');
+    setItems([]);
     try {
       const resolved: 'true' | 'false' | undefined =
         resolvedFilter === 'resolved' ? 'true' : resolvedFilter === 'unresolved' ? 'false' : undefined;
       const result = await getForumSyncFailures({
         resolved,
-        trialId: trialIdInput.trim() || undefined,
+        trialId: query.trialId || undefined,
         page,
         limit,
       });
+      if (!current()) return;
+      const lastPage = Math.max(1, Math.ceil(result.meta.total / limit));
+      if (page > lastPage) {
+        beginList();
+        setQuery(previous => ({ ...previous, page: lastPage }));
+        return;
+      }
       setItems(result.data);
       setTotal(result.meta.total);
     } catch (err: any) {
-      setError(err.message || '데이터를 불러오는데 실패했습니다.');
+      if (current()) setError(err.message || '데이터를 불러오는데 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
-  };
+  }, [query, beginList]);
+
+  useEffect(() => { void load(); }, [load]);
 
   const handleSearch = () => {
-    setPage(1);
-    load();
+    if (submitting.current) return;
+    setQuery(previous => ({ ...previous, page: 1, trialId: trialIdInput.trim(), revision: previous.revision + 1 }));
   };
 
   const handleResolve = async () => {
-    if (!resolveTarget) return;
+    if (!resolveTarget || submitting.current) return;
+    submitting.current = true;
+    const current = beginResolve();
     setResolving(true);
     setResolveError('');
     try {
-      const updated = await resolveForumSyncFailure(resolveTarget.id, resolveNote || undefined);
-      setItems((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+      await resolveForumSyncFailure(resolveTarget.id, resolveNote.trim() || undefined);
+      if (!current()) return;
       setResolveTarget(null);
       setResolveNote('');
+      setNotice('해결 처리했습니다. 현재 조건의 목록을 다시 조회합니다.');
+      setQuery(previous => ({ ...previous, revision: previous.revision + 1 }));
     } catch (err: any) {
-      setResolveError(err.message || '처리에 실패했습니다.');
+      if (current()) setResolveError(err.message || '처리에 실패했습니다.');
     } finally {
-      setResolving(false);
+      submitting.current = false;
+      if (current()) setResolving(false);
     }
   };
 
@@ -388,7 +404,8 @@ function ForumSyncFailuresPanel() {
           {(['unresolved', 'all', 'resolved'] as ResolvedFilter[]).map((v) => (
             <button
               key={v}
-              onClick={() => { setResolvedFilter(v); setPage(1); }}
+              disabled={resolving}
+              onClick={() => setQuery(previous => ({ ...previous, resolvedFilter: v, page: 1 }))}
               className={`px-3 py-1.5 text-xs rounded-full border transition ${
                 resolvedFilter === v
                   ? 'bg-blue-600 text-white border-blue-600'
@@ -405,31 +422,36 @@ function ForumSyncFailuresPanel() {
           <input
             type="text"
             placeholder="Trial ID 검색"
+            aria-label="Trial ID 검색"
+            disabled={resolving}
             value={trialIdInput}
             onChange={(e) => setTrialIdInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400"
+            className="min-w-0 flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400"
           />
           <button
             onClick={handleSearch}
+            disabled={resolving}
             className="px-3 py-1.5 text-xs bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200"
           >
             검색
           </button>
         </div>
 
-        <span className="text-xs text-gray-400 ml-auto">총 {total}건</span>
+        {!loading && !error && <span className="text-xs text-gray-400 ml-auto">총 {total}건</span>}
       </div>
 
       {error && (
-        <div className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+        <div role="alert" className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {error}
+          <button type="button" onClick={() => void load()} disabled={resolving} className="ml-3 rounded border px-3 py-2">다시 조회</button>
         </div>
       )}
+      {notice && <p role="status" className="mb-3 text-sm text-green-700">{notice}</p>}
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
-      ) : items.length === 0 ? (
+      ) : error ? null : items.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           {resolvedFilter === 'unresolved' ? '미해결 실패 건이 없습니다.' : '실패 이력이 없습니다.'}
         </div>
@@ -456,6 +478,7 @@ function ForumSyncFailuresPanel() {
                   onNavigate={() => navigate(`/operator/market-trial/${item.trialId}`)}
                   onResolve={() => { setResolveTarget(item); setResolveNote(''); setResolveError(''); }}
                   onShowError={() => setErrorDetailTarget(item)}
+                  disabled={resolving}
                 />
               ))}
             </tbody>
@@ -464,11 +487,11 @@ function ForumSyncFailuresPanel() {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!loading && !error && totalPages > 1 && (
         <div className="flex justify-center gap-1 mt-4">
           <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
+            onClick={() => setQuery(previous => ({ ...previous, page: Math.max(1, previous.page - 1) }))}
+            disabled={page === 1 || resolving}
             className="px-3 py-1.5 text-xs border border-gray-300 rounded disabled:opacity-40 hover:bg-gray-50"
           >
             이전
@@ -477,8 +500,8 @@ function ForumSyncFailuresPanel() {
             {page} / {totalPages}
           </span>
           <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
+            onClick={() => setQuery(previous => ({ ...previous, page: Math.min(totalPages, previous.page + 1) }))}
+            disabled={page === totalPages || resolving}
             className="px-3 py-1.5 text-xs border border-gray-300 rounded disabled:opacity-40 hover:bg-gray-50"
           >
             다음
@@ -489,7 +512,7 @@ function ForumSyncFailuresPanel() {
       {/* Resolve 모달 */}
       {resolveTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <div role="dialog" aria-modal="true" aria-label="해결 처리" className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
             <h3 className="font-semibold text-gray-900 mb-1">해결 처리</h3>
             <p className="text-sm text-gray-500 mb-4 truncate">
               {resolveTarget.trialTitle}
@@ -498,15 +521,18 @@ function ForumSyncFailuresPanel() {
               value={resolveNote}
               onChange={(e) => setResolveNote(e.target.value)}
               placeholder="운영 메모 (선택)"
+              aria-label="운영 메모"
+              disabled={resolving}
               rows={3}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-400 mb-3"
             />
             {resolveError && (
-              <p className="text-xs text-red-600 mb-3">{resolveError}</p>
+              <p role="alert" className="text-xs text-red-600 mb-3">{resolveError}</p>
             )}
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setResolveTarget(null)}
+                disabled={resolving}
                 className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 취소
@@ -553,11 +579,13 @@ function ForumFailureRow({
   onNavigate,
   onResolve,
   onShowError,
+  disabled,
 }: {
   item: ForumSyncFailure;
   onNavigate: () => void;
   onResolve: () => void;
   onShowError: () => void;
+  disabled: boolean;
 }) {
   const isResolved = !!item.resolvedAt;
 
@@ -585,6 +613,7 @@ function ForumFailureRow({
       <td className="px-3 py-2.5 max-w-[180px]">
         <button
           onClick={onNavigate}
+          disabled={disabled}
           className="text-blue-600 hover:underline text-xs text-left truncate block w-full"
           title={item.trialTitle}
         >
@@ -625,6 +654,7 @@ function ForumFailureRow({
         {!isResolved && (
           <button
             onClick={onResolve}
+            disabled={disabled}
             className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 border border-blue-200 rounded hover:bg-blue-100"
           >
             해결 처리
