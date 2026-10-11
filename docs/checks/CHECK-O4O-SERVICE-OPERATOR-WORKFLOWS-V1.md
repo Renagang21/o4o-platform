@@ -103,3 +103,12 @@ fixture 검증은 가짜 계정/데이터와 API 응답으로 실제 앱 번들�
 - 병합 직전 main의 PH 퇴역 안전 보완 PR #490(`55f0061df3`) 이동을 확인해 정상 merge했다. PH 소스/WO는 재작성하지 않았다. 이 동기화와 증거 정리 이후 최종 HEAD의 필수 CI·review/main/배포 결과를 다시 확인한다.
 
 후속 기술 정비: 공유 담당 사업 화면의 비차단 복잡도 지적은 업무/역할 계약을 유지하면서 별도 정비한다. 새 정책과 실계정 검증은 상위 TODO/사용자 직접 테스트 목록에서 계속 추적한다.
+
+### 코드 통합 결과
+
+- PR [#487](https://github.com/Renagang21/o4o-platform/pull/487)은 정상 merge로 main `0cb0080e1f68e8dd0cafee35fc0d64a5e3a78c3a`에 반영했다. 최종 PR HEAD는 `b6f79a5fccfa220c5c0cdfc9796543cef80bef0c`이며 그 HEAD와 merge commit 사이 파일 차이는 없다. bypass/direct main push/force push는 사용하지 않았다.
+- 최종 [CI 38146285013](https://github.com/Renagang21/o4o-platform/actions/runs/38146285013) SUCCESS(CI Gate 포함), 같은 HEAD Codex review Completed·지적/미해결 스레드 0. Sonar check `114491448513` Quality Gate SUCCESS, duplication 0.0%, security hotspots 0, 비차단 복잡도 지적 1개.
+- main 후속 [CI 38146913021](https://github.com/Renagang21/o4o-platform/actions/runs/38146913021)는 SUCCESS다. API Jest 3개 분할, 영향 웹 production build, Code Quality Check, CI Gate를 모두 통과했다.
+- 배포는 `DEPLOYMENT=REQUIRED`다. 직전 main의 [Delivery 38146761739](https://github.com/Renagang21/o4o-platform/actions/runs/38146761739)는 WIF `unauthorized_client` / attribute condition 거절로 classify에서 실패했다. 이번 main의 [Delivery 38147499593](https://github.com/Renagang21/o4o-platform/actions/runs/38147499593)도 동일한 WIF 거절로 classify에서 FAILED다. API·Web·Admin·Report job은 모두 SKIPPED, production commit status도 생성되지 않았다. 배포 성공이나 현재 serving SHA 검증으로 해석하지 않는다. 정상 Promote 재실행으로 이 외부 인증 제한을 해결할 수 없으므로 중복 dispatch하지 않았다. PH 단독 작업 창 종료·원래 WIF 조건 복원 후 현재 main의 CI/freeze/동시 writer gate를 확인해 정상 Delivery/Promote로 재개한다.
+
+전체 상위 TODO는 **ACTIVE**를 유지한다. 이번 코드 정비가 신규 정책·실계정 테스트·후속 기술 정비·production 배포까지 완료됐다는 뜻이 아니다. 같은 WO 후속 증거 정리만 수행하는 문서 변경의 앱 배포는 `NOT_APPLICABLE`이며 구현 코드의 배포 미완료와 구분한다. 인증 제한을 임의 수정하지 않고 PH 단독 작업 창 종료 후 정상 Delivery/Promote의 freeze·CI·main ref·동시 writer gate로 재판정한다. 현재 clone/branch는 후속 검증을 위해 KEEP한다.
