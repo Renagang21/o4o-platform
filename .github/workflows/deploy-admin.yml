@@ -4,9 +4,10 @@ name: Deploy Admin Dashboard (Cloud Run)
 # Migrated from AWS Lightsail SSH to GCP Cloud Run (2025-12-29)
 
 concurrency:
-  # 서비스 단위 1개 rollout (WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 §18)
-  group: deploy-admin-production
+  # Direct 실행은 공통 production 잠금. Delivery/Promote 아래에서는 기존 서비스별 child group.
+  group: ${{ (startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/delivery.yml@') || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/promote.yml@')) && 'deploy-admin-production' || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/deploy-admin.yml@') && 'o4o-production-mutation' || format('unsupported-deploy-admin-{0}', github.run_id) }}
   cancel-in-progress: false
+  queue: max
 
 # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
 #
@@ -110,6 +111,14 @@ jobs:
       fallback: ${{ steps.scope.outputs.fallback }}
 
     steps:
+    - name: Validate production lock caller
+      shell: bash
+      run: |
+        case "$GITHUB_WORKFLOW_REF" in
+          Renagang21/o4o-platform/.github/workflows/deploy-admin.yml@* | Renagang21/o4o-platform/.github/workflows/delivery.yml@* | Renagang21/o4o-platform/.github/workflows/promote.yml@*) ;;
+          *) echo "::error::Unsupported caller for production lock ownership"; exit 1 ;;
+        esac
+
     - uses: actions/checkout@v6
       with:
         # multi-commit push batch(`event.before..sha`) 를 통째로 보기 위해 필요하다.

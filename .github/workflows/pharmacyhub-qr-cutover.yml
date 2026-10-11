@@ -83,8 +83,9 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pharmacyhub-global-url-map
+  group: o4o-production-mutation
   cancel-in-progress: false
+  queue: max
 
 jobs:
   cutover:

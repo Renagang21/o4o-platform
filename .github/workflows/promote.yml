@@ -33,8 +33,9 @@ on:
         default: 'false'
 
 concurrency:
-  group: promote-production
+  group: o4o-production-mutation
   cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: read

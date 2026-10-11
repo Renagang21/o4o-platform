@@ -186,3 +186,11 @@ PR #475 P1 리뷰 대응: 건수가 맞지 않는 페이지에도 다른 운영 
 CI 선행 수정: 최신 main 통합 중 CI `38132871563`의 기존 `CommunityServiceAdminPage.test.tsx:121` 테스트가 실패했다. label/select는 초기 렌더에 있지만 option은 비동기 community 조회 후 생기므로, option 생성 전에 c1로 change하면 선택되지 않을 수 있었다. 후보 검색 테스트에 첫 커뮤니티 option 대기 한 줄을 추가해 실제 데이터가 로드된 뒤 선택하게 한다. 테스트를 생략하거나 업무 화면 동작을 변경하지 않는다. 이후 funding PR #474의 최신 main도 기존 통합 규칙에 따라 반영한다.
 
 CI 선행 수정 검증: 해당 관리자 테스트 9 PASS. 로컬 공용 인증 패키지 산출물을 갱신한 뒤 CI와 동일한 web-neture Vitest 설정에서 전체 66파일·551테스트 PASS를 확인했다. tracked package.json/lockfile/업무 화면 변경은 없으며 옵션 대기 한 줄과 결과 기록만 추가했다.
+
+## 운영 직렬화 보강 — PR #475 추가 P1 대응
+
+status sweep 자체도 작업 상태 이동과 원자적이지 않다는 지적을 받아 현재 공식 production root workflow(Delivery/Promote/API/admin/web/PH)의 concurrency를 `o4o-production-mutation`으로 통일한다. 조회 gate는 보조 차단으로 유지하며 공통 잠금이 실제 다른 root 실행과의 상호 배제를 담당한다. 재사용 Delivery는 Promote 부모가 잠금을 보유할 때 run별 child group을 쓰고, 재사용 API/admin/web은 Delivery/Promote 부모 아래에서 기존 서비스별 child group을 유지한다. 부모와 자식이 같은 잠금을 재취득해 교착하거나 기존 단일 Delivery 내 서비스 배포 병렬성이 사라지지 않도록 한다.
+
+알려진 caller 경로는 현재 repository의 direct workflow/Delivery/Promote다. 지원되지 않는 reusable caller는 detect/classify의 checkout·GCP 인증 전 gate에서 실패시키므로 잠금 소유권을 추정한 하위 호출이 진행되지 않는다. freeze·owner·CI·ref·WIF 규칙은 유지하며 IAM 수정·새 workflow 경로는 필요 없다. 실제 YAML expression을 해석해 direct root 공통 잠금, Promote/Delivery 중첩 호출의 ancestor 잠금 비재취득, 알 수 없는 caller의 pre-auth 실패를 검증했다. 자원/직렬화 안전 테스트 26 PASS이며 이 파일을 일반 required CI에도 연결한다.
+
+GitHub concurrency는 `cancel-in-progress: false`, `queue: max`로 active 작업과 기존 pending 요청을 새 요청이 대체 취소하지 않게 한다. 공식 GitHub.com 지원 문서([queue 규칙](https://github.com/github/docs/blob/main/data/reusables/actions/actions-group-concurrency.md), [fpt/ghec 지원 범위](https://github.com/github/docs/blob/main/data/features/actions-nga.yml))에 따라 최대 100 pending 요청을 보존한다. 지원되지 않는 caller는 별도 run별 group에서 pre-auth 실패시켜 ancestor 잠금 대기 교착도 피한다. 운영 dispatch는 여전히 다른 실행·대기 작업이 없는 단독 창에서 진행한다. 이미 시작한 이전 버전 workflow에는 새 잠금이 소급 적용되지 않으므로 main 반영 후 기존 버전의 모든 알려진 운영 run이 종료됐는지 직접 상태 확인·drain한 뒤 PH apply를 재개한다. 현재 main의 공식 경로에 대한 직렬화이며 오래된 deployment tag의 과거 정의를 자동 변경한 것으로 주장하지 않는다. 업무 앱 재배포는 NOT_APPLICABLE, workflow 설정은 main 반영으로 새 실행에 적용된다. Cloud Run·PH DB 제거는 아직 미완료다.

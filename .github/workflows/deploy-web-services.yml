@@ -5,10 +5,10 @@ name: Deploy Web Services (Cloud Run)
 # 변경된 웹서버만 배포됨
 
 concurrency:
-  # 서비스 단위 1개 rollout — 서비스마다 독립 group. 진행 중 run 은 끝까지, 대기 run 은 더 새 것으로 대체.
-  #   (service=all 수동 실행은 개별 서비스 run 과 같은 group 이 아니다 — 동시에 쓰지 않는다)
-  group: deploy-web-${{ inputs.service || 'all' }}
+  # Direct 실행은 공통 production 잠금. Delivery/Promote 아래에서는 기존 서비스별 child group으로 내부 배포 병렬성을 유지.
+  group: ${{ (startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/delivery.yml@') || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/promote.yml@')) && format('deploy-web-{0}', inputs.service || 'all') || startsWith(github.workflow_ref, 'Renagang21/o4o-platform/.github/workflows/deploy-web-services.yml@') && 'o4o-production-mutation' || format('unsupported-deploy-web-services-{0}', github.run_id) }}
   cancel-in-progress: false
+  queue: max
 
 on:
   # WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1: push trigger 은퇴. 자동 배포는 `deploy-auto.yml`(main CI 성공 → 위험 판정 →
@@ -126,6 +126,14 @@ jobs:
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
       hospital-pharmacy: ${{ steps.changes.outputs.hospital-pharmacy }}
     steps:
+      - name: Validate production lock caller
+        shell: bash
+        run: |
+          case "$GITHUB_WORKFLOW_REF" in
+            Renagang21/o4o-platform/.github/workflows/deploy-web-services.yml@* | Renagang21/o4o-platform/.github/workflows/delivery.yml@* | Renagang21/o4o-platform/.github/workflows/promote.yml@*) ;;
+            *) echo "::error::Unsupported caller for production lock ownership"; exit 1 ;;
+          esac
+
       - name: Checkout code
         uses: actions/checkout@v6
         with:
