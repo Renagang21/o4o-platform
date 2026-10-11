@@ -20,10 +20,10 @@ class InventoryDiagnosticError extends Error {
 
 export function safeInventoryError(error, stage) {
   if (error instanceof InventoryDiagnosticError) return error;
-  const allowed = new Set(['XX000', 'XX001', 'SCHEMA_IDENTIFIER', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']);
-  // PostgreSQL SQLSTATE is exactly five uppercase characters, beginning with a digit
-  // (internal XX errors are explicitly listed). Never retain messages/details/stacks.
-  const code = typeof error?.code === 'string' && (/^[0-9][0-9A-Z]{4}$/.test(error.code) || allowed.has(error.code)) ? error.code : 'UNKNOWN';
+  const allowed = new Set(['SCHEMA_IDENTIFIER', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']);
+  // PostgreSQL SQLSTATE is exactly five uppercase letters/digits (including
+  // letter-led classes P0, HV, F0 and XX). Never retain messages/details/stacks.
+  const code = typeof error?.code === 'string' && (/^[0-9A-Z]{5}$/.test(error.code) || allowed.has(error.code)) ? error.code : 'UNKNOWN';
   return new InventoryDiagnosticError(code, stage);
 }
 
