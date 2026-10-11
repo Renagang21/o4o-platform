@@ -37,8 +37,9 @@
 - [x] T08 보존 목적·기간·예외·삭제/비식별화·FK 검토 순서 준비. 사용자 결정에 따라 확정/삭제 적용은 후속이며 이번 삭제 0.
 - [x] T09 정책 정합 조사·기존 개정안/담당 작업·발행 조건 정리. 본문 게시 미실행.
 - [x] T10 폐기 WO 연계·최신 외부 blocker·담당 주체 확인. 실제 폐기는 관련 WO에서 계속 추적.
-- [ ] T11 tests/build/browser·문서 검사·push·CI/review·main·배포/smoke.
-- [ ] T12 문서 정합·이전 공간 식별·보존 검토.
+- [x] T11 tests/build/browser·문서 검사·push·CI/review·main·배포/smoke. 최종 결과는 §9.
+- [x] T12 문서 정합·현재 작업공간 보존 판정 KEEP 및 사용자 테스트 인계.
+- [ ] T12 이전 클라우드 공간 식별·미푸시/로컬 파일·복원 가능성 확인. 식별 정보 미확정이며 삭제하지 않음.
 - [ ] T13 최종 사용자 테스트·발견 문제 반영·종료 판정.
 
 ## 3. 안전 경계와 검증 구분
@@ -99,7 +100,7 @@ UI PR #458에 이 WO의 공지·공개 정책 후속 phase를 함께 반영하�
 - [x] T07 저장 계약: 기존 게시판 metadata에 운영자의 명시적 공개 설정만 저장. 기본 private, 게시판 전체 공개 또는 선택한 게시글 공개; 폐쇄 게시판·미승인/폐기 커뮤니티·draft/삭제/조직 전용 글 제외.
 - [x] T07 공개 조회: 회원용 endpoint·승인 gate를 유지하고 별도 읽기 전용 endpoint 사용. 작성자 개인정보·원본 metadata·회원 댓글/활동/쓰기 API를 공개 조회에 포함하지 않음. UUID/slug 직접 URL에도 같은 조건 적용.
 - [x] T07 운영 UI: 해당 커뮤니티 운영자만 공개 범위 지정/철회. 기존 회원 게시판과 공개 열람 화면을 연결하고 공개 글이 없거나 회수됐을 때 안내/복구 상태 표시.
-- [ ] 보안·API·UI·모바일 회귀 → 통합 PR #458 최종 CI/review → main/필요한 통제 배포 → 공개 운영 smoke. 실계정 사용자 테스트는 모두 끝난 뒤 T13.
+- [x] 보안·API·UI·모바일 회귀 → PR #458·#467 CI/review → main/운영 배포 → 공개 운영 smoke. 실제 결과는 §9이며 실계정 사용자 테스트는 T13.
 
 ### 5.1 확정 정책 구현 검증
 
@@ -148,3 +149,55 @@ main #459 PH 자원 제거 도구 및 #465 plan 결과 문서를 통합했다. �
 PR #458은 HEAD `62f2eb25d2`의 required CI Pipeline 38126170214/CI Gate·CodeQL·Codex 통과, 미해결 리뷰 0으로 main `b19dc0a3d`에 병합됐다. 다만 별도 SonarCloud check의 실패 확인을 놓쳤으므로 전체 품질 검사 완료로 보지 않고 운영 배포 전에 후속 PR로 정정한다. 실패 annotation은 공개 서명 postIds의 암묵적 sort 비교와 약국 회원 홈 함수 complexity다. 지역 설정과 무관한 명시적 UUID 문자열 비교를 적용하여 기존 서명 정렬 계약을 보존하고, 비고정 최근 공지 predicate를 분리해 표시/조회 동작을 유지한다. 경고의 표 스크롤 키보드 focus는 접근성을 위해 유지한다. 기존 source 검증·이력은 삭제하지 않고 후속 실제 검사 결과를 기록한다.
 
 품질 정정 검증: API focused 112·약국 홈16 tests PASS, API/약국 production build·변경 파일 ESLint·문서 민감정보/whitespace PASS. 약국 새 번들 PC1440/mobile390/320 3 fixture PASS. 격리 PostgreSQL의 서명·공개 조건·철회·stale 선택 검증도 다시 PASS했다. 최종 Sonar check를 CI Gate와 별도로 확인한 뒤 후속 main 통합·배포한다.
+
+## 9. 최종 main 통합·운영 배포·사용자 테스트 인계
+
+위 §4~§8의 통합 대기·당시 테스트 수·Sonar 실패는 각 단계의 기록이다. 현재 완료 상태는 이 절을 기준으로 확인한다. 같은 ACTIVE WO의 완료 기록 phase로 기존 전용 branch/worktree를 유지하며 새 독립 작업으로 재사용하지 않는다.
+
+### 9.1 main 및 품질 검사
+
+- [PR #458](https://github.com/Renagang21/o4o-platform/pull/458): main `b19dc0a3ddaa32073407687b8dc84870a398fc76` 병합. 병합 후 [CI 38126817025](https://github.com/Renagang21/o4o-platform/actions/runs/38126817025) SUCCESS. 별도 Sonar 실패는 §8과 후속 PR에서 정정했다.
+- [PR #467](https://github.com/Renagang21/o4o-platform/pull/467): main `e1cd3b187861f22edd15c0ff2e05f4a43af1091f` 병합. 최종 HEAD의 CI Gate·CodeQL·별도 SonarCloud Code Analysis SUCCESS, Codex 주요 문제 없음·미해결 thread 0 확인 후 정상 PR 경로로 병합했다. 병합 후 [CI 38127790472](https://github.com/Renagang21/o4o-platform/actions/runs/38127790472) SUCCESS.
+- 이후 다른 담당자의 My Home [PR #469](https://github.com/Renagang21/o4o-platform/pull/469)를 main `1604014f98771a0b74861e6770382d1436510099` 기준으로 반영하고 새 알림·본인 글·방문 추이까지 회귀 검증했다. 병합 후 [CI 38128523232](https://github.com/Renagang21/o4o-platform/actions/runs/38128523232) SUCCESS. #470의 검증 도구·기록은 런타임 소스 변경 0으로 후속 기준에 반영한다.
+- 신규 schema/migration·dependency·배포 인프라 변경 0. 규칙 우회·main 직접 push·force push를 하지 않았다.
+
+### 9.2 실제 배포 결과
+
+[Delivery 38127405880](https://github.com/Renagang21/o4o-platform/actions/runs/38127405880)는 `b19dc0a3d`의 API·admin·Neture·Pharmacy·Store·Lecture·Branch 배포/점검을 완료했다. Sonar 정정 후 [Delivery 38128379067](https://github.com/Renagang21/o4o-platform/actions/runs/38128379067)는 `e1cd3b187`의 API와 Pharmacy 배포·트래픽 전환·serving Report를 완료했다. 최신 My Home [Delivery 38129107503](https://github.com/Renagang21/o4o-platform/actions/runs/38129107503)는 `1604014f9`의 Neture 배포·smoke·트래픽 전환·Report를 완료했다. 세 run 모두 SUCCESS이며 현재 정책의 자동 배포로 완료해 중복 Promote는 실행하지 않았다.
+
+| 대상 | 최종 검증 배포 SHA | 현재 코드와의 관계 |
+| --- | --- | --- |
+| API | `e1cd3b187` | 공개 지정 출처·철회 및 공지 조회 포함 |
+| Pharmacy (`kpa-society`) | `e1cd3b187` | 고정 최대3·비고정 최근5 및 품질 정정 포함 |
+| Neture / 공급자 / 펀딩 / 커뮤니티 | `1604014f9` | 통합 UI·공개 관리 및 최신 My Home 포함 |
+| admin / Store / Lecture / Branch | `b19dc0a3d` | 이후 대상별 runtime 변경 없음. 재배포 skip은 `BEHIND_NO_RUNTIME_CHANGE`이며 미배포 변경이 아님 |
+| Hospital 도구 | 기존 revision 유지 | 이번 runtime 변경 없음 |
+
+배포 완료와 법률 본문 DB 발행·PH 자원/데이터 삭제·실계정 검증은 별개다. 이 세션은 운영 설정 저장·회원 상태/권한 변경·이력 삭제를 실행하지 않았다.
+
+### 9.3 마지막 회귀 및 공개 운영 확인
+
+- API focused 6 suites 112 tests, community catalog/access 31, Pharmacy 16 PASS. API/Pharmacy build·변경 파일 ESLint PASS. 격리 PostgreSQL의 실제 소스 실행은 출처·철회·stale 선택·현재 JSON 보존을 확인하고 rollback/자기 cluster 종료까지 완료했다.
+- 최신 Neture 전체 63 files 533 tests·production build PASS. 빌드와 테스트 동시 실행에서 기존 회원 조회 테스트 한 건이 timeout했으나 해당 파일 9 tests 및 전체 순차 실행 533 tests가 통과했다. assertion·제품 코드·timeout을 바꿔 통과시키지 않았다.
+- 최신 My Home unit 13 tests, Chromium PC1440/mobile375/320 27 E2E PASS. 클라우드 Chromium 실행 경로를 명시해 재실행했으며 최초 브라우저 설치 경로 실패는 실제 테스트 실패와 구분했다. Pharmacy 새 번들 PC1440/mobile390/320 3 fixture PASS.
+- 마지막 배포 후 공개 운영 HTTP 28개 PASS: 8개 서비스 HTML/entry asset, readiness, 공개 API의 빈 목록/직접 private ID/오류 범위 및 운영자·회원 API의 인증 경계를 확인했다. private 상세 404, 관리 API 401, 회원 API 403이다. 공개 목록에 지정 글이 없다는 결과를 실제 공개 저장 검증으로 해석하지 않는다.
+- TLS 검증된 운영 번들/API를 사용한 비로그인 browser 9개 PASS(PC1440/mobile390/320). 공개 목록·비공개 직접 URL의 본문 보호·약국 guest 로그인 guard를 확인했다. 실제 운영자 계정·외부 OAuth·운영 설정 변경은 사용하지 않았다.
+- 문서 민감정보 및 diff whitespace 검사를 완료 기록에도 적용한다. 문서-only 후속 PR은 runtime 배포 `NOT_APPLICABLE`이다.
+
+### 9.4 마지막 사용자 테스트와 미실행 항목
+
+다음 실계정 테스트는 사용자가 마지막으로 수행한다. 비밀번호·토큰은 전달하지 않고 오류가 있으면 주소·수행 순서·기대/실제 결과만 기록한다.
+
+| 순서 | 사용자 테스트 | 기대 결과 |
+| --- | --- | --- |
+| 1 | 운영자 대표 홈에서 공급자·내 매장 | 기존 공급자 관리·내 매장 신청 심사 화면으로 연결 |
+| 2 | Google/Kakao 각각 로그인·서비스 이동 | 정상 로그인, 원래 화면 복귀, 연결 계정 및 세션 유지 |
+| 3 | My Home 참여·활동·알림·본인 글·선택 매장·방문 추이 | 본인 데이터 및 선택 매장 범위 일치. 다른 사용자/매장 정보 혼합 없음 |
+| 4 | 약국 로그인 후 루트와 서비스 이동 | 회원 초기화면 바로 표시, hero·고정 최대3·최근5·커뮤니티/자료/내 매장 이동 정상 |
+| 5 | 운영자 공개 지정/저장 → 비로그인 목록·상세 → 철회 | 명시적 공개만 표시, 회원 자료/댓글/쓰기 보호. 후보 밖 오래된 글도 개별 철회 가능하며 다른 기존 선택이 draft/archived/삭제여도 철회 저장 가능 |
+
+T08 보존 기간·예외/삭제 방식과 T09 약관·개인정보 최종 본문/시행일은 조사·개정안 후 사용자 확정이 남았다. 자동 삭제 job·실제 이력 삭제·새 정책 DB 발행은 미실행이다. T10 PH 전용 자원 제거는 별도 담당의 성공한 read-only plan 이후 누락 IAM 3개 보완 대기이며 이 세션은 apply/권한 변경을 중복 실행하지 않는다. 실제 매장·기기 검증의 별도 담당 기록도 사용자 실계정 T13을 대체하지 않는다.
+
+이전 클라우드 환경 ID·미푸시/로컬 파일·복원 가능성은 아직 확정하지 못했다. 해당 공간을 삭제하지 않으며 T13 및 보존 확인 후 정리한다. 현재 게시 버전의 관측은 spec/observed 37·current=true·running·connected·failure 없음으로 재확인했다. 기존 게시된 설정을 재저장/재게시하지 않았다.
+
+WORKTREE_DISPOSITION: `/workspace/o4o-wt/frontend-integrated-stabilization` / `wo/frontend-integrated-stabilization`, source main integration #458·#467 완료 / runtime deploy·공개 smoke PASS / verdict KEEP — T13·정책 확정·이전 공간 보존 확인이 남은 같은 ACTIVE WO. 완료 기록 PR의 main 포함·clean 확인은 마지막 Git 검증에서 수행한다. 다른 세션의 worktree/branch는 삭제하지 않는다.

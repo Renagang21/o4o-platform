@@ -11,6 +11,7 @@
  *   - 포럼 연계 실패: 포럼 자동 연계 실패 이력 조회 + resolve
  */
 
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOperatorTrials, getForumSyncFailures, resolveForumSyncFailure, getOperatorMarketTrialKpi } from '../../api/trial';
@@ -34,6 +35,9 @@ const FILTER_TABS: { label: string; value: string }[] = [
   { label: '전체', value: '' },
   { label: '심사 대기', value: 'submitted' },
   { label: '모집 중', value: 'recruiting' },
+  { label: '준비 중', value: 'development' },
+  { label: '결과 확정', value: 'outcome_confirming' },
+  { label: '이행 완료', value: 'fulfilled' },
   { label: '종료', value: 'closed' },
 ];
 
@@ -101,6 +105,7 @@ function TrialsPanel() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
   const [kpi, setKpi] = useState<MarketTrialKpiSnapshot | null>(null);
+  const beginTrials = useLatestRequest('funding-operator-list');
 
   useEffect(() => {
     loadKpi();
@@ -120,15 +125,16 @@ function TrialsPanel() {
   };
 
   const loadTrials = async () => {
+    const current = beginTrials();
     setLoading(true);
     setError('');
     try {
       const data = await getOperatorTrials(filter || undefined);
-      setTrials(data);
+      if (current()) setTrials(data);
     } catch (err: any) {
-      setError(err.message || '유통참여형 펀딩 목록을 불러오는데 실패했습니다.');
+      if (current()) setError(err.message || '유통참여형 펀딩 목록을 불러오는데 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
   };
 

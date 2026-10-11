@@ -20,6 +20,8 @@ export function quoteTable(table) {
   return parts.map(quoteIdentifier).join('.');
 }
 export const logicalEdges = [
+  ['checkout_orders','sellerId','organizations'],
+  ['checkout_orders','sellerOrganizationId','organizations'],
   ['signage_playlist_items','playlistId','signage_playlists'],
   ['signage_playlist_items','mediaId','signage_media'],
   ['store_playlist_items','playlist_id','store_playlists'],
@@ -93,12 +95,14 @@ async function inventory(client, keep, targets) {
     FROM users`)).rows[0];
   return { owner,keeper,roots,candidates,accounts };
 }
-const protectedTables=new Set(['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots']);
+const protectedTables=new Set(['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots','kpa_operator_audit_logs','checkout_order_logs']);
 function guardRow(table,row,state) {
   const targetIds=state.targetIds;
   if (protectedTables.has(table)) throw new CleanupStop('Protected entity referenced by deletion');
   if (table==='organizations' && !targetIds.has(row.id)) throw new CleanupStop('Retained organization dependency');
   for (const key of new Set(state.organizationColumns.get(table) || [])) {
+    // Legacy sellerId also permits a platform label; only UUID values are organization references.
+    if (table==='checkout_orders' && key==='sellerId' && !/^[a-f0-9-]{36}$/i.test(String(row[key]))) continue;
     if (row[key] != null && !targetIds.has(String(row[key]))) throw new CleanupStop('Shared retained-store row requires explicit disposition');
   }
 }
@@ -148,18 +152,43 @@ export async function verifyLogicalCoverage(client,state,columns,edges) {
   const ids=[...new Set([...state.rows.values()].flatMap(rows=>[...rows.values()].map(row=>row.id).filter(id=>typeof id==='string' && /^[a-f0-9-]{36}$/i.test(id))))];
   const references=[];
   for (const column of columns.filter(c=>(c.udt_name==='uuid' || (['text','varchar'].includes(c.udt_name) && /(_id|Id)$/.test(c.column_name))) && c.column_name!=='id' && (!directOrganizationColumn(c.table_name,c.column_name) || (c.table_name==='role_assignments' && c.column_name==='scope_id')))) {
-    if (!(column.table_name==='role_assignments' && column.column_name==='scope_id') && edges.some(e=>e.child===column.table_name && e.child_columns.includes(column.column_name))) continue;
+    const requiresValueCoverage=column.table_name==='checkout_orders' && ['sellerId','sellerOrganizationId'].includes(column.column_name);
+    if (!requiresValueCoverage && !(column.table_name==='role_assignments' && column.column_name==='scope_id') && edges.some(e=>e.child===column.table_name && e.child_columns.includes(column.column_name))) continue;
     const matches=(await client.query(`SELECT to_jsonb(t) AS row FROM ${quoteTable(column.table_name)} t WHERE t.${quoteIdentifier(column.column_name)}=ANY($1)`,[ids])).rows;
     const selected=state.rows.get(column.table_name);
     const remaining=matches.filter(({row})=>!selected?.has(rowKey(column.table_name,row,state.keys.get(column.table_name))));
-    if (!remaining.length) continue;
+    const blocked=[];
+    for (const {row} of remaining) {
+      if (retainedReferencePolicy(column.table_name,column.column_name,row,state)) {
+        const retained=state.retainedReferences || (state.retainedReferences=new Map());
+        const rows=retained.get(column.table_name) || new Map();
+        rows.set(rowKey(column.table_name,row,state.keys.get(column.table_name)),row);
+        retained.set(column.table_name,rows);
+      } else blocked.push({row});
+    }
+    if (!blocked.length) continue;
     // Report schema metadata and counts only; never serialize production rows or IDs.
-    const values=new Set(remaining.map(({row})=>row[column.column_name]));
+    const values=new Set(blocked.map(({row})=>row[column.column_name]));
     const referencedTables=[...state.rows].filter(([,rows])=>[...rows.values()].some(row=>values.has(row.id))).map(([table])=>table).sort((a,b)=>a.localeCompare(b,'en'));
     referencedTables.forEach(quoteTable);
-    references.push({table:column.table_name,column:column.column_name,count:remaining.length,referencedTables});
+    references.push({table:column.table_name,column:column.column_name,count:blocked.length,referencedTables});
   }
   if (references.length) throw new CleanupStop('Unmodelled UUID logical reference requires disposition: '+JSON.stringify({references}));
+}
+export function retainedReferencePolicy(table,column,row,state) {
+  const source=(name,id)=>[...(state.rows.get(name)?.values() || [])].find(r=>r.id===id);
+  // OrderLog is an audit/dispute history; orderId intentionally has no cascading FK.
+  if (table==='checkout_order_logs' && column==='orderId') return Boolean(source('checkout_orders',row.orderId));
+  // Audit targets are historical identifiers, not ownership/cascade links (KPA role matrix §7).
+  if (table==='kpa_operator_audit_logs' && column==='target_id') {
+    return row.target_type==='member' && Boolean(source('kpa_members',row.target_id));
+  }
+  // ensureStoreProduct copies master/offer identity; source_id records provenance only.
+  if (table==='organization_product_listings' && column==='source_id' && row.source_type==='event-offer' && row.organization_id===state.keeperId) {
+    const parent=source(table,row.source_id);
+    return Boolean(parent && row.master_id && row.offer_id && row.master_id===parent.master_id && row.offer_id===parent.offer_id);
+  }
+  return false;
 }
 async function readGraphMetadata(client) {
   const columns=(await client.query(metadataSql.columns)).rows;
@@ -205,9 +234,9 @@ async function verifyTablePolicies(client,affected) {
   const triggers=(await client.query(`SELECT count(*)::int AS count FROM pg_trigger g JOIN pg_class r ON r.oid=g.tgrelid JOIN pg_namespace n ON n.oid=r.relnamespace WHERE (CASE WHEN n.nspname='public' THEN r.relname ELSE n.nspname||'.'||r.relname END)=ANY($1::text[]) AND NOT g.tgisinternal AND g.tgenabled<>'D' AND (g.tgtype & 8)<>0`,[affected])).rows[0];
   if (triggers.count) throw new CleanupStop('Custom delete trigger requires explicit review');
 }
-async function buildGraph(client,roots) {
+async function buildGraph(client,roots,keeperId) {
   const {columns,keys,edges}=await readGraphMetadata(client);
-  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),organizationColumns:graphOrganizationColumns(columns,edges),targetIds:new Set(roots.map(x=>x.id))};
+  const state={keys:new Map(keys.map(x=>[x.table_name,x.columns])),rows:new Map(),retainedReferences:new Map(),keeperId,organizationColumns:graphOrganizationColumns(columns,edges),targetIds:new Set(roots.map(x=>x.id))};
   addRows(state,'organizations',roots);
   await seedLogicalRows(client,state,columns);
   await expandGraph(client,state,edges);
@@ -217,7 +246,8 @@ async function buildGraph(client,roots) {
   await verifyTablePolicies(client,affected);
   const order=deletionOrder(affected,edges.filter(e=>state.rows.has(e.parent)&&state.rows.has(e.child)));
   const tables=order.map(table=>({table,keys:state.keys.get(table),rows:[...state.rows.get(table).values()].sort((a,b)=>rowKey(table,a,state.keys.get(table)).localeCompare(rowKey(table,b,state.keys.get(table)),'en'))}));
-  return {tables,edges,columns,keys};
+  const retainedReferences=[...state.retainedReferences].map(([table,rows])=>({table,keys:state.keys.get(table),rows:[...rows.values()].sort((a,b)=>rowKey(table,a,state.keys.get(table)).localeCompare(rowKey(table,b,state.keys.get(table)),'en'))})).sort((a,b)=>a.table.localeCompare(b.table,'en'));
+  return {tables,retainedReferences,edges,columns,keys};
 }
 export async function removeTable(client,table) {
   for (let offset=0;offset<table.rows.length;offset+=100) {
@@ -232,6 +262,7 @@ async function executeDeletion(client,plan,digest,expected) {
   if (!ready.ready) throw new CleanupStop('Recovery table missing');
   const snapshot=(await client.query(`INSERT INTO canonical_demo_repair_snapshots (migration,snapshot) VALUES ($1,$2::jsonb) RETURNING id`,['store-cleanup-'+digest,JSON.stringify({before:plan})])).rows[0];
   for (const table of plan.graph.tables) await removeTable(client,table);
+  await verifyRetainedReferences(client,plan.graph.retainedReferences);
   const verified=(await client.query(`SELECT count(*)::int AS count FROM organizations WHERE id=ANY($1::uuid[])`,[plan.inventory.roots.map(r=>r.id)])).rows[0];
   if (verified.count!==0) throw new CleanupStop('Deletion verification failed');
   const keeper=(await client.query(`SELECT to_jsonb(o) AS row FROM organizations o WHERE id=$1`,[plan.inventory.keeper.id])).rows[0];
@@ -239,6 +270,12 @@ async function executeDeletion(client,plan,digest,expected) {
   const accounts=(await client.query('SELECT count(*)::int AS count FROM users')).rows[0];
   if (accounts.count!==plan.inventory.accounts.total) throw new CleanupStop('User identities changed');
   await client.query(`UPDATE canonical_demo_repair_snapshots SET snapshot=snapshot || $2::jsonb WHERE id=$1`,[snapshot.id,JSON.stringify({verified:true,deletedStores:plan.inventory.roots.length})]);
+}
+export async function verifyRetainedReferences(client,tables=[]) {
+  for (const table of tables) for (const before of table.rows) {
+    const rows=await selectRows(client,table.table,table.keys,table.keys.map(key=>before[key]));
+    if (rows.length!==1 || stableJson(rows[0])!==stableJson(before)) throw new CleanupStop('Retained historical reference changed');
+  }
 }
 export async function runStoreCleanup(client,{apply=false,keep='',targets=[],expectedDigest=''}={}) {
   validateTargets(keep,targets,apply);
@@ -250,12 +287,12 @@ export async function runStoreCleanup(client,{apply=false,keep='',targets=[],exp
     if (!targets.length) {
       await client.query('ROLLBACK');return {mode:'discovery',keepStore:keep,candidateStores:scope.candidates.length,targets:scope.candidates.map(r=>storeFingerprint(r.id)),accounts:scope.accounts};
     }
-    const graph=await buildGraph(client,scope.roots);
+    const graph=await buildGraph(client,scope.roots,scope.keeper.id);
     const plan={inventory:scope,graph,provenance:'user-approved-delete-other-test-stores-2026-10-10'};
     const digest=createHash('sha256').update(stableJson(plan)).digest('hex');
     if (apply) await executeDeletion(client,plan,digest,expectedDigest);
     await client.query(apply?'COMMIT':'ROLLBACK');
-    return {mode:apply?'apply':'plan',keepStore:keep,deleteStores:scope.roots.length,digest,tables:graph.tables.map(t=>({table:t.table,count:t.rows.length})),accounts:scope.accounts};
+    return {mode:apply?'apply':'plan',keepStore:keep,deleteStores:scope.roots.length,digest,tables:graph.tables.map(t=>({table:t.table,count:t.rows.length})),retainedReferences:graph.retainedReferences.map(t=>({table:t.table,count:t.rows.length})),accounts:scope.accounts};
   } catch (error) {
     try {await client.query('ROLLBACK');} catch { /* Original sanitized failure retained. */ }
     throw safeCleanupError(error,'store-cleanup');

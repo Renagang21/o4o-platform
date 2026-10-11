@@ -47,3 +47,9 @@ main/CI/review·운영 배포·공개 read-only smoke는 통합 WO에 최종 기
 후속 API build·변경 파일 ESLint PASS. 추가로 공통 controller의 raw-source 소비 계약을 포함하는 community catalog/access 31 tests PASS. 문서 민감정보 검사 3852 files 0건 및 diff whitespace 검사 PASS.
 
 후속 P1: 기존 선택 B가 삭제/archived/draft로 바뀌어도 공개된 A의 선택 해제가 거절되지 않도록, locked board의 현재 서명이 유효한 기존 selected ID와 새 추가 ID를 구분한다. 새 추가 ID는 기존과 같은 게시판/published/non-org 조건을 검증하며, 기존 선택은 자동 삭제하지 않는다. 현재 읽기 predicate는 유효하지 않은 기존 글을 계속 제외하고 A를 해제해 저장하면 UUID/slug 직접 열람도 철회된다. unsigned legacy ID는 기존 선택으로 신뢰하지 않는다. focused API 112 tests PASS; 격리 PostgreSQL에서 draft/archived/deleted 세 경우의 A 철회·B 비노출·유효하지 않은 신규 ID 거부 PASS.
+
+## 최종 통합·운영 확인 (2026-10-11)
+
+구현 PR #458과 Sonar 정정 PR #467은 main에 병합됐다. 최종 #467의 CI Gate·CodeQL·별도 SonarCloud·Codex 검사와 병합 후 CI가 통과했고, API/Pharmacy는 `e1cd3b187`, Neture는 후속 My Home 통합 `1604014f9` 배포가 완료됐다. 배포 run·대상별 SHA와 사용자 마지막 테스트는 [통합 WO §9](../work-orders/WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1.md#9-최종-main-통합운영-배포사용자-테스트-인계)에 기록한다.
+
+최종 API focused 112·community catalog/access 31·Pharmacy 16 및 최신 Neture 전체533 tests PASS. 마지막 공개 운영 HTTP28·비로그인 PC1440/mobile390/320 browser9 PASS. 공개 목록은 현재 지정 글 0으로 정상 응답했고 직접 private ID는404, 운영 관리 API는401, 회원 API는403이었다. 실제 운영자의 공개 지정/철회 저장·실계정 회원 홈·외부 OAuth는 T13 사용자 테스트이며 이번 공개 읽기 검증으로 완료 처리하지 않는다. 운영 DB 쓰기·legacy 자동 공개·이력 삭제·법률 본문 발행은 실행하지 않았다.

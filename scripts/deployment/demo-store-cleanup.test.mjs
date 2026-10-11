@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {validateTargets,quoteIdentifier,rowKey,deletionOrder,runStoreCleanup,quoteTable,batchDeleteStatement,directOrganizationColumn,logicalEdges,removeTable,verifyLogicalCoverage} from './demo-store-cleanup.mjs';
+import {validateTargets,quoteIdentifier,rowKey,deletionOrder,runStoreCleanup,quoteTable,batchDeleteStatement,directOrganizationColumn,logicalEdges,removeTable,verifyLogicalCoverage,retainedReferencePolicy,verifyRetainedReferences} from './demo-store-cleanup.mjs';
 const keep='1'.repeat(64),target='2'.repeat(64);
 test('apply requires exact nonempty targets; retained store cannot be a target',()=>{
   assert.throws(()=>validateTargets(keep,[],true));assert.throws(()=>validateTargets(keep,[keep],true));
@@ -60,4 +60,47 @@ test('selected rows and modelled FK references do not become false diagnostic bl
   const client={query:async()=>({rows:[{row}]})};
   await assert.doesNotReject(verifyLogicalCoverage(client,state,[column],[]));
   await assert.doesNotReject(verifyLogicalCoverage({query:async()=>{throw new Error('Known FK should not be queried');}},state,[column],[{child:'links',child_columns:['target_id']}]));
+});
+test('historical audit and keeper event-offer provenance are retained only with verified source identity',()=>{
+  const state={keeperId:'keeper',rows:new Map([['kpa_members',new Map([['m',{id:'member'}]])],['organization_product_listings',new Map([['l',{id:'source',master_id:'master',offer_id:'offer'}]])]])};
+  assert.equal(retainedReferencePolicy('kpa_operator_audit_logs','target_id',{target_type:'member',target_id:'member'},state),true);
+  assert.equal(retainedReferencePolicy('kpa_operator_audit_logs','target_id',{target_type:'content',target_id:'member'},state),false);
+  assert.equal(retainedReferencePolicy('kpa_operator_audit_logs','target_id',{target_type:'member',target_id:'unknown'},state),false);
+  const copy={organization_id:'keeper',source_type:'event-offer',source_id:'source',master_id:'master',offer_id:'offer'};
+  assert.equal(retainedReferencePolicy('organization_product_listings','source_id',copy,state),true);
+  for(const change of [{organization_id:'foreign'},{source_type:'unknown'},{source_id:'unknown'},{master_id:'wrong'},{offer_id:null}]) assert.equal(retainedReferencePolicy('organization_product_listings','source_id',{...copy,...change},state),false);
+});
+test('preserved references enter recovery before-images and still block unknown discriminators',async()=>{
+  const id='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const state={rows:new Map([['kpa_members',new Map([['m',{id}]])]]),keys:new Map([['kpa_operator_audit_logs',['id']]])};
+  const column={table_name:'kpa_operator_audit_logs',column_name:'target_id',udt_name:'uuid'};
+  const row={id:'audit',target_type:'member',target_id:id,metadata:{safe:true}};
+  await verifyLogicalCoverage({query:async()=>({rows:[{row}]})},state,[column],[]);
+  assert.deepEqual([...state.retainedReferences.get(column.table_name).values()],[row]);
+  await assert.rejects(verifyLogicalCoverage({query:async()=>({rows:[{row:{...row,target_type:'unknown'}}]})},state,[column],[]),/Unmodelled/);
+});
+test('changed or missing historical rows fail the post-delete preservation check',async()=>{
+  const before={id:'audit',metadata:{original:true}};
+  const tables=[{table:'kpa_operator_audit_logs',keys:['id'],rows:[before]}];
+  await verifyRetainedReferences({query:async()=>({rows:[{row:before}]})},tables);
+  await assert.rejects(verifyRetainedReferences({query:async()=>({rows:[]})},tables),/Retained historical/);
+  await assert.rejects(verifyRetainedReferences({query:async()=>({rows:[{row:{...before,metadata:{original:false}}}]})},tables),/Retained historical/);
+});
+test('checkout ownership edges do not suppress unmatched UUID reference diagnostics',async()=>{
+  const id='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const state={rows:new Map([['kpa_members',new Map([['m',{id}]])]]),keys:new Map()};
+  const column={table_name:'checkout_orders',column_name:'sellerId',udt_name:'varchar'};
+  await assert.rejects(verifyLogicalCoverage({query:async()=>({rows:[{row:{id:'order',sellerId:id}}]})},state,[column],[{child:'checkout_orders',child_columns:['sellerId']}]),/Unmodelled/);
+});
+test('order audit history requires an actual selected order and is included in preservation verification',async()=>{
+  const id='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const state={rows:new Map([['checkout_orders',new Map([['o',{id}]])]]),keys:new Map([['checkout_order_logs',['id']]])};
+  const column={table_name:'checkout_order_logs',column_name:'orderId',udt_name:'uuid'};
+  const row={id:'history',orderId:id,action:'created',metadata:{original:true}};
+  assert.equal(retainedReferencePolicy(column.table_name,column.column_name,row,state),true);
+  assert.equal(retainedReferencePolicy(column.table_name,column.column_name,{...row,orderId:'unknown'},state),false);
+  assert.equal(retainedReferencePolicy(column.table_name,'otherId',row,state),false);
+  await verifyLogicalCoverage({query:async()=>({rows:[{row}]})},state,[column],[]);
+  assert.deepEqual([...state.retainedReferences.get(column.table_name).values()],[row]);
+  await assert.rejects(verifyRetainedReferences({query:async()=>({rows:[{row:{...row,action:'cancelled'}}]})},[{table:column.table_name,keys:['id'],rows:[row]}]),/Retained historical/);
 });

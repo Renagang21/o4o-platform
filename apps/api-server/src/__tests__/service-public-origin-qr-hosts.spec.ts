@@ -46,6 +46,9 @@ describe('존재하지 않는 호스트 하드코딩 재유입 금지', () => {
     'routes/o4o-store/controllers/multilingual-product-content.controller.ts',
     'modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.service.ts',
     'modules/neture/services/neture-dashboard.service.ts',
+    'modules/neture/services/supplier-dashboard.service.ts',
+    'modules/neture/services/admin-dashboard.service.ts',
+    'modules/neture/services/seller-dashboard.service.ts',
     'modules/neture/neture.routes.ts',
   ];
   it.each(FILES)('%s', (rel) => {
