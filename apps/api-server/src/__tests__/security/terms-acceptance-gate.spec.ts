@@ -119,8 +119,8 @@ import {
 import policyAcceptanceRoutes from '../../modules/policy-acceptance/policy-acceptance.routes.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 
-function makeToken(serviceKey = 'neture'): string {
-  return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [], serviceKey, sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' }), 'utf8').toString('base64');
+function makeToken(serviceKey = 'neture', authMethod?: string, roles: string[] = []): string {
+  return Buffer.from(JSON.stringify({ userId: USER_ID, roles, memberships: [], serviceKey, authMethod, sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' }), 'utf8').toString('base64');
 }
 
 function makeApp() {
@@ -641,5 +641,51 @@ describe('실제 서비스 소유 mount의 약관 enforcement', () => {
   it.each(['/api/v1/neture/operator/suppliers-other', '/api/v1/neture/operator/market-trial-other'])('%s는 비슷한 이름만으로 하위 서비스가 되지 않는다', path => {
     const pending = ['neture', 'supplier', 'funding'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'Fixture' }));
     expect(selectPendingPoliciesForRequest(pending, 'supplier', path).map(p => p.serviceKey)).toEqual(['neture']);
+  });
+});
+
+
+describe('전체관리자 관리 세션의 재동의 예외', () => {
+  beforeEach(() => { publishedRows = [publishedDoc(DOC_NETURE, 'neture')]; });
+
+  it.each([
+    ['get', '/api/v1/settings/theme'],
+    ['put', '/api/v1/settings/theme'],
+    ['get', '/api/v1/apps/availability'],
+    ['get', '/api/v1/users'],
+    ['delete', '/api/v1/users/fixture'],
+    ['get', '/api/v1/neture/operator/suppliers/pending'],
+  ])('%s %s: 현재 DB 전체관리자 역할 + Google admin 세션은 재동의로 관리업무를 막지 않는다', async (method, path) => {
+    activeRoles = ['platform:super_admin'];
+    const res = await (request(makeApp()) as any)[method](path).set('Authorization', `Bearer ${makeToken('admin', 'google')}`);
+    expect(res.status).toBe(200);
+    expect(res.body.reached).toBe(true);
+    expect(acceptedIds).toEqual([]);
+    expect(await policyAcceptanceService.getPendingForUser(USER_ID)).toHaveLength(1);
+  });
+
+  it.each([{ roles: [] }, { roles: ['supplier:operator'] }])('admin scope와 오래된/위조 JWT 역할만으로는 예외가 없다: %p', async ({ roles }) => {
+    activeRoles = roles;
+    const res = await request(makeApp()).get('/api/v1/apps/availability')
+      .set('Authorization', `Bearer ${makeToken('admin', 'google', ['platform:super_admin'])}`);
+    expect(res.status).toBe(428);
+    expect(res.body.code).toBe('TERMS_ACCEPTANCE_REQUIRED');
+    expect(res.body.reached).toBeUndefined();
+  });
+
+  it('동일 전체관리자도 일반 서비스 세션에서 서비스 이용 시에는 공통 약관을 요구한다', async () => {
+    activeRoles = ['platform:super_admin'];
+    const res = await request(makeApp()).get('/api/v1/neture/profile')
+      .set('Authorization', `Bearer ${makeToken('neture', 'google')}`).set('Origin', 'https://admin.neture.co.kr');
+    expect(res.status).toBe(428);
+    expect(res.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual(['neture']);
+  });
+
+  it.each(['password', undefined])('Google 증거가 없는 전체관리자 세션은 예외 적용 전에 거부한다: %p', async method => {
+    activeRoles = ['platform:super_admin'];
+    const res = await request(makeApp()).get('/api/v1/settings/theme')
+      .set('Authorization', `Bearer ${makeToken('admin', method)}`);
+    expect(res.status).toBe(403);
+    expect(res.body.reached).toBeUndefined();
   });
 });

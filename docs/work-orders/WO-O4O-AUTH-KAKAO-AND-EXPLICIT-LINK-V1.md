@@ -290,3 +290,10 @@ push/PR 종료 범위와 운영 정책 미게시 경계는 유지한다.
 판정한다. 등록 경로 대조로 확인한 funding legacy API와 communities API도 연결했다.
 실제 요청의 차단·승낙 후 해소 및 prefix 경계 신규 회귀 7건이 통과했다. 운영자 역할 guard와
 전체관리자 예외는 유지한다. 최종 CI·리뷰는 이 후속 commit을 포함한 PR 최신 HEAD에서 확인한다.
+
+
+공통 계정 약관 도입으로 전체관리자의 settings/apps/users 등 관리 API가 차단될 수 있다는
+P1 리뷰도 보완했다. 최신 DB 전체관리자 역할과 서명된 admin 관리 세션을 함께 확인해 면제하며,
+Google 증거·계정/세션 상태·기존 role guard와 일반 서비스 세션의 약관 요구는 유지한다.
+신규 경계 회귀 11건, 보안 및 raw-source 재실행 67건과 API 타입/lint가 통과했다.
+동의 기록 생성·운영 DB 수정은 없으며 이번 종료 범위는 계속 push/PR다.

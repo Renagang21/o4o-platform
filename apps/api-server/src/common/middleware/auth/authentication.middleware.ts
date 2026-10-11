@@ -31,6 +31,7 @@ import {
 } from '../../auth/password-session.policy.js';
 import type { AccessTokenPayload } from '../../../types/auth.js';
 import { isBrowserSessionLive } from '../../../services/auth/browser-session.service.js';
+import { isPlatformAdmin } from '../../../utils/role.utils.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -97,7 +98,11 @@ function enforceAccountAccess(req: AuthRequest, res: Response, user: { id: strin
  *
  * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
  */
-async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string }): Promise<boolean> {
+async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string; roles?: string[] }): Promise<boolean> {
+  // Management context is the signed admin session plus current DB platform role, never Origin/body/JWT roles.
+  // The same account using a normal service session still follows that service's acceptance rules.
+  // Auth-method, account/session status, and downstream route role guards remain mandatory.
+  if (req.sessionServiceKey === 'admin' && isPlatformAdmin(user.roles ?? [])) return false;
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {

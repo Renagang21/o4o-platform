@@ -625,3 +625,21 @@ Neture 공통 본문과 서비스 신청 조건이 완성되기 전에 운영의
 않는 경계 회귀 2건도 통과했다. 약관 보안 suite 52 PASS, API 타입 및 변경 파일 lint PASS.
 추가 7건을 포함한 이번 고유 API 회귀는 209 PASS다. 기존 UI 301건과 로컬 브라우저 36건은
 이 서버 판정 수정으로 재실행하지 않았으며 해당 검증의 범위를 그대로 유지한다.
+
+
+### 전체관리자 관리 세션의 추가 리뷰 보완
+
+전체관리자 화면은 `/api/v1/admin/**`뿐 아니라 settings·apps/availability·users 및 서비스 관리
+API도 사용한다. 공통 Neture 약관을 membership 없이 요구한 변경으로 이 관리 업무가 차단될 수
+있음을 확인했다. `requireAuth`의 계정/세션 상태 및 Google 인증수단 검증 후, **서명된 admin
+세션 + 현재 DB platform:super_admin 역할**일 때만 약관 enforcement를 면제한다.
+클라이언트 Origin/body·오래된 JWT 역할은 근거로 사용하지 않는다. 관리 API의 기존 route role
+검사는 그대로 적용하며, 동일 계정의 일반 서비스 세션은 기존 공통/서비스 약관 규칙을 따른다.
+
+추가 11건은 관리 API 6개 요청, DB 역할 없는/서비스 운영자 2건, 일반 서비스 세션 1건,
+Google 증거 없는 관리자 세션 2건을 확인했다. 실제 DB·관리 데이터 변경 없이 공통 requireAuth
+단계의 HTTP fixture로 검증했다. 승낙 이력을 만들지 않고 raw pending도 보존한다.
+첫 실행의 raw-source 테스트 파일 확장자 오기와 음성 테스트의 예상 상태 오류(403 대신 실제
+약관 차단 428)를 정정한 재실행은 보안 63 + raw-source 4 = 67 PASS다. API 타입/lint도 PASS.
+이번 고유 API 회귀 합계는 220건, UI 301건, 로컬 PC/mobile 36건이다. 실제 OAuth·PG 통합과
+운영 검증의 별도 OPEN은 유지하며 최종 CI·리뷰는 이 후속 commit의 PR HEAD에서 확인한다.
