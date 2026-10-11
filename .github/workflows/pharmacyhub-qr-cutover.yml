@@ -79,6 +79,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   id-token: write
 
 concurrency:
@@ -244,6 +245,8 @@ jobs:
         run: node scripts/deployment/pharmacy-hub-qr-cutover.mjs
       - name: Plan or apply fixed PharmacyHub infrastructure retirement
         if: inputs.resource_retirement == true
+        env:
+          PRODUCTION_GATE_TOKEN: ${{ github.token }}
         run: node scripts/deployment/pharmacy-hub-resource-retirement.mjs
       - name: Save backup and verification evidence
         if: always() && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true

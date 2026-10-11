@@ -21,6 +21,47 @@ const permissionsByTarget = new Map([
   [neg, ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get']],
   [service, ['run.services.delete']],
 ]);
+const productionWorkflows = new Set(['delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);
+const activeStatuses = ['in_progress', 'queued', 'pending', 'waiting', 'requested'];
+
+function checkProductionRuns(result, runId, page) {
+  if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0
+    || result.workflow_runs.length !== Math.min(100, Math.max(0, result.total_count - (page - 1) * 100))) {
+    throw new ResourceDiagnosticError('Production run inventory is incomplete; no deletion submitted.');
+  }
+  for (const other of result.workflow_runs) {
+    if (String(other.id) === String(runId) || other.status === 'completed') continue;
+    if (typeof other.path !== 'string') throw new ResourceDiagnosticError('Production run path is unavailable; no deletion submitted.');
+    const name = other.path.split('@')[0].split('/').at(-1);
+    if (productionWorkflows.has(name)) throw new ResourceDiagnosticError(`Production write gate blocked: workflow=${name}; run=${Number(other.id)}.`);
+  }
+}
+
+export async function assertProductionIdle(runId, list) {
+  if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
+  // Include queued/manual-waiting deliveries; do not infer an idle runtime from running jobs alone.
+  await Promise.all(activeStatuses.map(async status => {
+    for (let page = 1; page <= 10; page++) {
+      const result = await list(status, page);
+      checkProductionRuns(result, runId, page);
+      if (page * 100 >= result.total_count) return;
+    }
+    throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
+  }));
+}
+
+async function checkProductionGate() {
+  const token = process.env.PRODUCTION_GATE_TOKEN;
+  if (!token) throw new ResourceDiagnosticError('Production run authorization is unavailable; no deletion submitted.');
+  await assertProductionIdle(process.env.GITHUB_RUN_ID, async (status, page) => {
+    const response = await fetch(`https://api.github.com/repos/Renagang21/o4o-platform/actions/runs?status=${status}&per_page=100&page=${page}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Cache-Control': 'no-cache' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) throw new ResourceDiagnosticError(`Production run check failed (HTTP ${response.status}); no deletion submitted.`);
+    return response.json();
+  });
+}
 
 function run(args, timeout = 15000) {
   const result = spawnSync('gcloud', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout });
@@ -97,7 +138,7 @@ export async function retireResources({ mode, read, permissions, verify, remove,
     assertExpectedResources(targets, expectedTargets);
     await verify();
     if (!targets.includes(target)) continue; // Resume safely after a partial deletion.
-    beforeWrite();
+    await beforeWrite();
     await remove(target);
     const after = await read();
     if (after.includes(target)) throw new ResourceDiagnosticError(`PH resource deletion not confirmed: ${target}.`);
@@ -116,7 +157,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       mode: process.env.CUTOVER_MODE ?? 'plan', permissions: readPermissions,
       read: async () => inspectResources(readCloud(), await collectHttpInventory()),
       verify: async () => { await verifyTargets(paths); await verifyPublicData(paths); },
-      beforeWrite: () => {
+      beforeWrite: async () => {
+        await checkProductionGate();
         const deadline = Number(process.env.CUTOVER_DEADLINE_MS);
         if (!Number.isFinite(deadline) || Date.now() + 15 * 60000 > deadline) {
           throw new ResourceDiagnosticError('Insufficient PH deletion time budget; no next delete submitted.');

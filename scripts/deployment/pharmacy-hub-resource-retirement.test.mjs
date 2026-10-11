@@ -4,7 +4,28 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inspectResources, retireResources, deletionPermissions } from './pharmacy-hub-resource-retirement.mjs';
+import { inspectResources, retireResources, deletionPermissions, assertProductionIdle } from './pharmacy-hub-resource-retirement.mjs';
+
+test('production gate allows its own run and read-only CI but blocks running and queued deployments', async () => {
+  const self = { id: 10, path: '.github/workflows/pharmacyhub-qr-cutover.yml', status: 'in_progress' };
+  const ci = { id: 11, path: '.github/workflows/ci-pipeline.yml', status: 'in_progress' };
+  await assertProductionIdle(10, async () => ({ total_count: 2, workflow_runs: [self, ci] }));
+  for (const workflow of ['delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']) {
+    for (const status of ['in_progress', 'queued', 'pending', 'waiting', 'requested']) {
+      await assert.rejects(assertProductionIdle(10, async queried => queried === status
+        ? { total_count: 1, workflow_runs: [{ id: 12, path: `.github/workflows/${workflow}`, status }] }
+        : { total_count: 0, workflow_runs: [] }), /write gate blocked/);
+    }
+  }
+});
+test('production gate checks later pages and fails closed on incomplete inventory or missing identity', async () => {
+  await assert.rejects(assertProductionIdle(10, async (_status, page) => ({ total_count: 101,
+    workflow_runs: page === 1 ? Array.from({ length: 100 }, (_, index) => ({ id: index + 100, path: '.github/workflows/ci-pipeline.yml', status: 'queued' }))
+      : [{ id: 12, path: '.github/workflows/delivery.yml', status: 'queued' }],
+  })), /write gate blocked/);
+  await assert.rejects(assertProductionIdle(10, async () => ({ total_count: 1, workflow_runs: [] })), /incomplete/);
+  await assert.rejects(assertProductionIdle(undefined, async () => assert.fail('must not query')), /identity/);
+});
 
 const targets = ['backend-pharmacy-hub-web', 'neg-pharmacy-hub-web', 'pharmacy-hub-web'];
 const negLink = 'https://www.googleapis.com/compute/v1/projects/netureyoutube/regions/asia-northeast3/networkEndpointGroups/neg-pharmacy-hub-web';
@@ -78,6 +99,11 @@ test('fresh reference failures and time budget failures prevent the next delete'
     return targets;
   } }), /new shared reference/);
   await assert.rejects(retireResources({ ...h.options, beforeWrite: () => { throw new Error('budget'); } }), /budget/);
+  assert.deepEqual(h.removed, []);
+});
+test('an asynchronous production gate rejection prevents deletion', async () => {
+  const h = harness();
+  await assert.rejects(retireResources({ ...h.options, beforeWrite: async () => { throw new Error('deployment active'); } }), /deployment active/);
   assert.deepEqual(h.removed, []);
 });
 test('unconfirmed deletion stops and rerunning resumes only remaining targets', async () => {
