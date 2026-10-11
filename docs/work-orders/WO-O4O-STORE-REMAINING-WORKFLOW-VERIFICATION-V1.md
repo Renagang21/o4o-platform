@@ -101,3 +101,7 @@ main 사후 CI 38129545596과 CodeQL 38129545592도 PASS다. main 포함을 확�
 QR 조회의 `store_execution_assets` JOIN은 활성 여부와 ID만 확인하고 매장 일치를 확인하지 않았다. 격리된 실제 PostgreSQL에서 다른 매장의 제목·본문·이미지 노출을 재현했으며 동일 매장 조건 추가 후 세 필드가 null이 되는 것을 확인했다. 이는 로컬 fixture 재현이며 운영 노출 사례를 확인했다는 뜻이 아니다. 같은 매장 활성 자료는 표시되고 비활성 자료는 제외된다. 관련 QR·태블릿 6개 suite/65개 PASS, 현재 resolver/Core 기반 원본·사본 독립성 SQL 6개 PASS다. 상세 배포 결과는 후속 WO에 기록한다.
 
 운영 원본 수정·두 정상 업무 매장·물리 QR/태블릿 TODO는 자동 검증 결과로 대체하지 않는다. 이번 runtime 수정의 DEPLOYMENT는 REQUIRED이며 앞 단계 검증 도구의 NOT_APPLICABLE 기록과 구분한다.
+
+## QR 수정 통합 후 배포 차단
+
+PR #483은 필수 CI와 Codex review finding 0을 확인하고 main `b4d428d606a6a9c29804b08c046a209b8880d843`에 통합했다. main 사후 CI 38141731196·CodeQL 38141731191도 성공했다. 그러나 자동 Delivery 38142342005가 GCP WIF 신원 조건에서 인증 거절됐으며 API build·migration·rollout은 모두 미실행이다. 따라서 위 QR 운영 배포 TODO는 열린 상태다. 이 작업에서 provider·OIDC·배포 workflow는 바꾸지 않았고 현재 provider metadata를 조회할 관리자 연결이 없어 정확한 불일치 조건은 미확정이다. 기존 운영 API의 read-only HEAD smoke 3개는 PASS이며 새 수정의 운영 반영 증거로 해석하지 않는다.

@@ -117,3 +117,6 @@ read-only plan 38128450487은 주문 판매자/조직 참조(각 컬럼 14행), 
 [QR 공개 자료 소유 경계 WO](../work-orders/WO-O4O-STORE-QR-PUBLIC-ASSET-OWNERSHIP-GUARD-V1.md)에서 공개 랜딩의 자료 JOIN에 빠진 `li.organization_id = qr.organization_id` 조건을 추가한다. 수정 전에는 잘못 연결된 타 매장 자료의 제목·본문·이미지가 반환됨을 격리 PostgreSQL에서 재현했고 수정 후 차단, 같은 매장 활성 자료 유지, 비활성 자료 제외를 확인했다. 운영 자료를 만들거나 변경해 재현하지 않았다.
 
 별도 CMS 운영자라는 계정 종류는 없다. 원본 수정 코드는 기존 플랫폼 관리자 또는 해당 서비스 관리자·운영자 권한을 사용한다. 이 환경에서 현재 기준 `TEST-ACCOUNT.txt`는 누락되어 새 운영 인증 검증은 실행하지 않았고 다른 Demo/seed 계정으로 대체하지 않았다. 정상 유지 매장 A 하나를 유지하며 운영 원본 수정·두 매장 업무·실제 기기 검증은 열린 TODO다. QR·태블릿 관련 테스트 65개와 현재 소스의 격리 원본·사본 SQL 검증 6개는 PASS다. 이 결과는 운영 원본 편집·물리 기기 PASS를 의미하지 않는다.
+
+
+QR 수정 PR #483은 main에 통합됐고 PR CI 38141045320·main CI 38141731196·main CodeQL 38141731191을 통과했다. Delivery 38142342005는 WIF authentication의 `unauthorized_client / rejected by the attribute condition`으로 실패해 API build·migration·배포 job이 모두 skip됐다. 운영 QR 경계 수정은 아직 미반영이며 배포 TODO를 완료 처리하지 않는다. 실패 후 기존 운영 readiness/QR namespace/없는 QR의 read-only HEAD 3개는 PASS지만 새 버전 서빙 확인은 미실행이다. 현재 GCP provider 조회용 관리자 연결이 없는 상태와 task worktree KEEP은 후속 WO에 기록한다.
