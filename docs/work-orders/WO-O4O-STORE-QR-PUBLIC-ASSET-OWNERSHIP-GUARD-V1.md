@@ -63,7 +63,7 @@ main 사후 CI 38141731196과 CodeQL 38141731191은 성공했다. 자동 Deliver
 
 이 작업은 WIF provider·OIDC 설정·배포 workflow를 변경하지 않았다. 같은 Delivery의 이전 run 38138235844는 2026-10-11 12:11 UTC에 WIF 인증이 성공했으며, 별도 read-only GCP WIF Auth Smoke 38141409234도 현재 같은 신원 조건 거절로 실패했다. 어떤 provider 조건이 달라졌는지는 현재 GCP 측 metadata를 읽지 못했으므로 확정하지 않는다. main에 해당 workflow 변경이 없다는 사실만으로 원인을 GitHub/GCP 중 하나로 단정하지 않는다.
 
-GitHub OIDC subject 설정은 기본 subject이고 executor의 outbound identity manifest에는 connection이 0개다. inherited Google credential 변수와 경로의 존재는 관리자 접근 증거가 아니다. 실제 credential 파일 값은 읽거나 출력하지 않았다. 이전 조사 단계에서는 현재 provider metadata를 조회할 관리자 연결이 없어 조건 불일치를 확정하지 못했다. 아래 최신 main의 승인된 격리 기록을 확인한 뒤에는 그 작업의 종료·원래 조건 복구를 기다린다., 다른 허용 workflow/새 키/완화된 조건으로 인증 경계를 우회하지 않는다. 설정 변경 없이 동일 인증 재실행도 하지 않았다.
+GitHub OIDC subject 설정은 기본 subject이고 executor의 outbound identity manifest에는 connection이 0개다. inherited Google credential 변수와 경로의 존재는 관리자 접근 증거가 아니다. 실제 credential 파일 값은 읽거나 출력하지 않았다. 이전 조사 단계에서는 현재 provider metadata를 조회할 관리자 연결이 없어 조건 불일치를 확정하지 못했다. 아래 최신 main의 승인된 격리 기록을 확인한 뒤에는 그 작업의 종료·원래 조건 복구를 기다린다. 다른 허용 workflow/새 키/완화된 조건으로 인증 경계를 우회하지 않는다. 설정 변경 없이 동일 인증 재실행도 하지 않았다.
 
 배포 실패 후 TLS 검증을 유지한 무인증 HEAD smoke 3개는 PASS다: `/health/ready` 200, slug 없는 QR namespace 404 + read-only HEAD marker, 존재하지 않는 임의 QR slug 404 + marker/no-store. HEAD body는 모두 0 bytes이며 QR scan 쓰기를 요청하지 않았다. 이 결과는 기존 운영 서비스의 준비 상태·HEAD 계약 확인이지 새 QR 수정이 운영에 반영됐다는 증거가 아니다.
 
