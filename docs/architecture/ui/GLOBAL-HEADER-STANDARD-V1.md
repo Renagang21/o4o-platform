@@ -7,7 +7,7 @@
 
 
 > **작성일**: 2026-04-17
-> **최종 갱신**: 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **최종 갱신**: 2026-10-11 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·구현 대기) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
 > **범위**: kpa-society, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
@@ -189,8 +189,8 @@ GlobalLayout
 
 | 항목 | 설명 |
 |------|------|
-| 역할 | 사용자 인증 상태 및 계정 관리 |
-| 포함 요소 | 비인증: 로그인/회원가입 버튼. 인증: 사용자 아바타, 드롭다운(이름, 이메일, 역할, 대시보드, 마이페이지, 로그아웃) |
+| 역할 | 사용자 인증 상태, My Home 개인 통합 공간 및 계정 관리 진입 |
+| 포함 요소 | 비인증: 로그인/회원가입 버튼. 인증: **My Home 직접 링크**와 사용자 아바타·드롭다운(이름, 이메일, 역할, 계정 설정, 권한별 업무 진입, 로그아웃). 매장 업무 권한이 있으면 **내 매장** 진입을 구분해 제공 |
 | 서비스별 차이 | 최소한 — 아바타 gradient 색상 정도만 허용 |
 | 구조 차이 | 비허용 — 드롭다운 항목, 순서, 위치 통일 |
 
@@ -351,8 +351,11 @@ serviceNavigation
 #### userMenu
 
 - 드롭다운 형태의 사용자 계정 메뉴
-- 대시보드, 마이페이지, 로그아웃 등
+- 계정 설정, 권한별 업무 진입, 로그아웃 등
 - 인증 시에만 표시
+- 개인 통합 공간의 이름은 **My Home**이다. 로그인 후 UserArea에 직접 링크를 두며 드롭다운 안에만 숨기지 않는다. 일반 회원에게도 제공하고, 매장 업무 권한이 있는 사용자는 **My Home · 내 매장**을 구분해 이용한다.
+- 데스크톱은 헤더 오른쪽 사용자 영역, 모바일은 공통 헤더의 직접 진입을 유지한다. 공통 하단 탐색이 있는 화면에서는 My Home을 고정 항목으로 제공한다. 서비스별로 새 하단 탐색을 무조건 생성하지 않는다.
+- 독립 서비스도 같은 이름과 공통 위치를 사용한다. 실제 목적지·세션 연결은 기존 route와 인증 계약으로 검증한다. 정책 정본은 [My Home](../../baseline/O4O-MY-HOME-CANONICAL-V1.md)이며 이 항목의 UI 구현·배포는 대기다.
 
 ### 6.4 메뉴 정의 위치 원칙
 
@@ -588,7 +591,7 @@ serviceNavigation
   제거 2026-08-21 · [CHECK-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1](../../checks/CHECK-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1.md))
 - `GlobalHeaderNavItem` 은 이제 `{ label, href }` 뿐이다. `children` 필드는 코드에 존재하지 않는다.
 - 즉 **Header submenu 는 본 표준의 구성 요소가 아니다.** PrimaryNav 는 1단 수평 메뉴를 유지하고,
-  하위 화면 진입은 허브 페이지·Footer·My Page nav 등 화면 내 UI 로 제공한다.
+  하위 화면 진입은 허브 페이지·Footer·My Home 내비게이션 등 화면 내 UI로 제공한다. My Home의 공통 직접 링크는 상단의 개인 공간 진입이며 submenu를 복원하는 근거가 아니다.
 - 상단 노출이 필요한 항목이 생기면 `children` 을 되살리지 말고 **parent 항목으로 승격**한다.
 
 ---
