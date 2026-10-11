@@ -1,6 +1,6 @@
 # O4O My Home 명칭 · 역할 · 진입 정본
 
-> **상태**: ACTIVE · 정책 확정 / main 통합·운영 배포 완료 / 인증 운영 검증 대기
+> **상태**: ACTIVE
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **근거 WO/IR**: [WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1](../work-orders/WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1.md) · 사용자 My Home 명칭 확정 및 관련 문서 정비 지시
 > **범위**: 개인 통합 공간의 사용자용 명칭, 정보구조, 공통 진입, 내 매장과의 관계. 구현·검증 근거는 아래 실행 문서로 구분한다.
