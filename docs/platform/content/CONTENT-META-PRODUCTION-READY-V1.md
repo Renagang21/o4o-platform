@@ -1,5 +1,8 @@
 # CONTENT-META-PRODUCTION-READY-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > O4O 콘텐츠 메타 구조 통합 완료 선언
 
 | 항목 | 값 |
@@ -51,6 +54,9 @@ O4O Platform의 콘텐츠는 서비스별로 독립된 테이블에 분산 저�
 ## 2. 수행 작업 요약
 
 ### Step 1 — ContentMeta 타입 계약
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH forum route/원장 adapter·Hub template 채택·활성 serviceKey 예시·프로비저닝 CLI 실행/유지 계약은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 새 소비처/구현/프로비저닝 대상이 아니며 PH 경로·등록/호환 참조를 제거한다. 공용 KPA/약사 커뮤니티·콘텐츠 모델·다른 서비스·인쇄 QR 연결은 보존하고 데이터 삭제는 전용 귀속/FK·타 서비스 소비처 확인 후 수행한다. 아래 PH 구조는 폐기 전 이력이다.
+
 
 > `WO-CONTENT-META-TYPE-CONTRACT-V1`
 

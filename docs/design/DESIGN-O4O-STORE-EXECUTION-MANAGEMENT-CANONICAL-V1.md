@@ -1,5 +1,11 @@
 # DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 - **WO**: WO-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-DESIGN-V1
 - **작성일**: 2026-09-09
 - **성격**: 설계 확정 — **구현 0 / migration 0 / 메뉴 변경 0 / entity 생성 0**
@@ -284,7 +290,13 @@ QR 91개 중 배치가 등록된 것은 **4개뿐**이고 backfill 은 하지 �
 
 ## 9. KPA / PharmacyHub parity (§12 — 전제 정정)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
+
 ### 9-1. 정정
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 WO §12 는 "KPA / PH 차이 = 없음"을 전제했으나 **메뉴 축에서는 이미 사실이 아니다**(IR §3-1).
 
@@ -298,6 +310,9 @@ WO §12 는 "KPA / PH 차이 = 없음"을 전제했으나 **메뉴 축에서는 
 
 ### 9-2. 계약
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 - 실행 관리 홈은 **공통 Core 1벌**로만 만든다. 서비스 조건문 0.
 - KPA/PH 는 endpoint · accent · 라벨만 주입한다 (QR 회차에서 검증된 패턴).
 - **둘 중 하나만 먼저 만들지 않는다.**
@@ -308,6 +323,9 @@ WO §12 는 "KPA / PH 차이 = 없음"을 전제했으나 **메뉴 축에서는 
 ## 10. 기존 메뉴 영향 (§13 판정 — 이번에 변경하지 않음)
 
 ### 10-1. 판정: 새 상위 메뉴가 맞다. 단 별도 회차에서.
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 근거:
 
@@ -361,6 +379,9 @@ WO §12 는 "KPA / PH 차이 = 없음"을 전제했으나 **메뉴 축에서는 
 
 ## 13. 최종 판정 (§17)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 ```text
 STORE EXECUTION MODEL              = CLOSED
 CORNER / LOCATION MODEL            = CLOSED  (신규 entity: 필요하나 3회차로 연기 · 근거 IR §1-1·§6)
@@ -373,6 +394,9 @@ IMPLEMENTATION                     = NOT_STARTED
 > (2026-10-04 정합) §11 1회차(실행 관리 홈 v1 — Tablet + QR)는 2026-09-10 구현 · 배포 완료 — [`CHECK-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1`](../checks/CHECK-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1.md). 위 `NOT_STARTED` 는 작성 시점 값이며 2회차 이후는 미착수.
 
 ### 13-1. 이 설계가 WO 원안과 다른 점 (명시)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 | WO 원안 | 이 설계 | 이유 |
 |---|---|---|
