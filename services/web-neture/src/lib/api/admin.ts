@@ -122,11 +122,11 @@ export const adminSupplierApi = {
   async getGovernanceSuppliers(): Promise<GovernanceSupplier[]> {
     try {
       const response = await api.get('/neture/admin/suppliers/governance');
-      return response.data.data || [];
+      if (!Array.isArray(response.data.data)) throw new Error('Invalid governance list');
+      return response.data.data;
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch governance suppliers:', error);
-      return [];
+      throw new Error('공급자 상태 목록을 불러오지 못했습니다. 다시 시도해 주세요.');
     }
   },
 

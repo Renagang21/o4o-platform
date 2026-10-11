@@ -28,12 +28,12 @@ export function validateHosts(map) {
   }
 }
 
-export function parseProbes(raw) {
+export function parseProbes(raw, { requireActiveFamilies = true } = {}) {
   const paths = raw.split(/\r?\n/).map(p => p.trim()).filter(Boolean);
-  if (paths.length < 2 || paths.length > printedQrPaths.length) throw new Error('Supply real QR and tablet paths, with optional multilingual and affiliate paths.');
+  if (paths.length < (requireActiveFamilies ? 2 : 0) || paths.length > printedQrPaths.length) throw new Error('Supply real QR and tablet paths, with optional multilingual and affiliate paths.');
   for (const prefix of printedQrPaths.map(p => p.slice(0, -1))) {
     const count = paths.filter(p => p.startsWith(prefix)).length;
-    if (count > 1 || (['/qr/', '/tablet/'].includes(prefix) && count !== 1)) throw new Error('QR and tablet are required; each family may appear at most once.');
+    if (count > 1 || (requireActiveFamilies && ['/qr/', '/tablet/'].includes(prefix) && count !== 1)) throw new Error('QR and tablet are required; each family may appear at most once.');
   }
   for (const p of paths) {
     if (!printedQrPaths.some(pattern => p.startsWith(pattern.slice(0, -1)))) throw new Error('Unknown QR route family.');
