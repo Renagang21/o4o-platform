@@ -22,6 +22,7 @@ import {
 export interface CreateTrialDto {
   supplierId: string;
   supplierName?: string;
+  initialHistory?: MarketTrial['statusHistory'];
   /**
    * Optional ProductMaster reference — WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1
    * 공급자 제품 목록에서 선택한 상품(ProductMaster id, = 목록 masterId)으로 펀딩 개설 시 soft 참조.
@@ -238,6 +239,7 @@ export class MarketTrialService {
       fundingEndAt: dto.fundingEndAt,
       trialPeriodDays: dto.trialPeriodDays,
       status: TrialStatus.DRAFT,
+      statusHistory: dto.initialHistory ?? [],
     });
 
     return this.trialRepo.save(trial);
@@ -247,18 +249,17 @@ export class MarketTrialService {
    * Submit trial for operator review (DRAFT → SUBMITTED)
    */
   async submitTrial(trialId: string, supplierId: string): Promise<MarketTrial> {
-    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
-    if (!trial) {
-      throw new Error('Market Trial not found');
-    }
-    if (trial.supplierId !== supplierId) {
-      throw new Error('Not authorized to submit this trial');
-    }
-    if (trial.status !== TrialStatus.DRAFT) {
-      throw new Error('Only DRAFT trials can be submitted');
-    }
-    trial.status = TrialStatus.SUBMITTED;
-    return this.trialRepo.save(trial);
+    return this.dataSource.transaction(async manager => {
+      const repo = manager.getRepository(MarketTrial);
+      const trial = await repo.findOne({ where: { id: trialId }, lock: { mode: 'pessimistic_write' } });
+      if (!trial) throw new Error('Market Trial not found');
+      if (trial.supplierId !== supplierId) throw new Error('Not authorized to submit this trial');
+      if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be submitted');
+      const event = { from: trial.status, to: TrialStatus.SUBMITTED, at: new Date().toISOString(), reason: 'funding_submitted', auto: false, actorUserId: supplierId };
+      trial.statusHistory = [...(trial.statusHistory ?? []), event];
+      trial.status = TrialStatus.SUBMITTED;
+      return repo.save(trial);
+    });
   }
 
   /**
@@ -266,26 +267,29 @@ export class MarketTrialService {
    * WO-MARKET-TRIAL-EDIT-FLOW-V1
    */
   async updateTrial(trialId: string, supplierId: string, dto: UpdateTrialDto): Promise<MarketTrial> {
-    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
-    if (!trial) throw new Error('Market Trial not found');
-    if (trial.supplierId !== supplierId) throw new Error('Not authorized to edit this trial');
-    if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be edited');
+    return this.dataSource.transaction(async manager => {
+      const repo = manager.getRepository(MarketTrial);
+      const trial = await repo.findOne({ where: { id: trialId }, lock: { mode: 'pessimistic_write' } });
+      if (!trial) throw new Error('Market Trial not found');
+      if (trial.supplierId !== supplierId) throw new Error('Not authorized to edit this trial');
+      if (trial.status !== TrialStatus.DRAFT) throw new Error('Only DRAFT trials can be edited');
 
-    if (dto.title !== undefined) trial.title = dto.title;
-    if (dto.oneLiner !== undefined) trial.oneLiner = dto.oneLiner || null;
-    if (dto.videoUrl !== undefined) trial.videoUrl = dto.videoUrl || null;
-    if (dto.description !== undefined) trial.description = dto.description || null;
-    if (dto.salesScenarioContent !== undefined) trial.salesScenarioContent = dto.salesScenarioContent || null;
-    if (dto.outcomeSnapshot !== undefined) trial.outcomeSnapshot = dto.outcomeSnapshot;
-    if (dto.maxParticipants !== undefined) trial.maxParticipants = dto.maxParticipants;
-    if (dto.trialUnitPrice !== undefined) trial.trialUnitPrice = dto.trialUnitPrice;
-    if (dto.targetAmount !== undefined) trial.targetAmount = dto.targetAmount;
-    if (dto.rewardRate !== undefined) trial.rewardRate = dto.rewardRate;
-    if (dto.fundingStartAt !== undefined) trial.fundingStartAt = dto.fundingStartAt;
-    if (dto.fundingEndAt !== undefined) trial.fundingEndAt = dto.fundingEndAt;
-    if (dto.trialPeriodDays !== undefined) trial.trialPeriodDays = dto.trialPeriodDays;
+      if (dto.title !== undefined) trial.title = dto.title;
+      if (dto.oneLiner !== undefined) trial.oneLiner = dto.oneLiner || null;
+      if (dto.videoUrl !== undefined) trial.videoUrl = dto.videoUrl || null;
+      if (dto.description !== undefined) trial.description = dto.description || null;
+      if (dto.salesScenarioContent !== undefined) trial.salesScenarioContent = dto.salesScenarioContent || null;
+      if (dto.outcomeSnapshot !== undefined) trial.outcomeSnapshot = dto.outcomeSnapshot;
+      if (dto.maxParticipants !== undefined) trial.maxParticipants = dto.maxParticipants;
+      if (dto.trialUnitPrice !== undefined) trial.trialUnitPrice = dto.trialUnitPrice;
+      if (dto.targetAmount !== undefined) trial.targetAmount = dto.targetAmount;
+      if (dto.rewardRate !== undefined) trial.rewardRate = dto.rewardRate;
+      if (dto.fundingStartAt !== undefined) trial.fundingStartAt = dto.fundingStartAt;
+      if (dto.fundingEndAt !== undefined) trial.fundingEndAt = dto.fundingEndAt;
+      if (dto.trialPeriodDays !== undefined) trial.trialPeriodDays = dto.trialPeriodDays;
 
-    return this.trialRepo.save(trial);
+      return repo.save(trial);
+    });
   }
 
   /**

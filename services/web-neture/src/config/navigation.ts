@@ -32,6 +32,7 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
   ];
   if (profile === 'funding') return [
     { label: '유통참여형 펀딩', href: '/market-trial' },
+    { label: '내 펀딩·개설 신청', href: '/market-trial/manage' },
     { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'supplier') return [

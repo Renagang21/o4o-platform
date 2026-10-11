@@ -56,3 +56,15 @@ it('공지 변경 중 다른 글로 이동하면 이전 응답을 새 글에 적
   await act(async () => release());
   expect(screen.queryByText('공지로 고정했습니다.')).toBeNull(); expect(screen.getByText('다음 안내')).toBeTruthy();
 });
+
+
+it('funding notices use the explicit project pin adapter and closed projects expose no mutations', async () => {
+  const pin = vi.fn().mockResolvedValue(undefined);
+  const basePath = '/market-trial/project/forum';
+  const view = render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate pinPost={pin} />} /></Routes></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '공지로 고정' }));
+  await act(async () => {}); expect(pin).toHaveBeenCalledWith('post-a', true); expect(mocks.pin).not.toHaveBeenCalled();
+  view.unmount();
+  render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate readOnly pinPost={pin} />} /></Routes></MemoryRouter>);
+  await screen.findByText('참여자 안내'); expect(screen.queryByRole('button', { name: '공지로 고정' })).toBeNull(); expect(screen.queryByPlaceholderText('댓글을 입력하세요...')).toBeNull();
+});

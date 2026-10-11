@@ -11,7 +11,7 @@
  */
 
 // Feature flag for API switching
-const usesRealApi = () => !!communityPathKey() || import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
+const usesRealApi = () => !!fundingPathKey() || !!communityPathKey() || import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
 
 import { api } from '../lib/apiClient';
 /**
@@ -24,7 +24,12 @@ import { api } from '../lib/apiClient';
 function communityPathKey(): string | undefined {
   return typeof window === 'undefined' ? undefined : /^\/communities\/([a-z0-9-]+)(?:\/|$)/.exec(window.location.pathname)?.[1];
 }
+function fundingPathKey(): string | undefined {
+  return typeof window === 'undefined' ? undefined : /^\/market-trial\/([a-f0-9-]+)\/forum(?:\/|$)/i.exec(window.location.pathname)?.[1];
+}
 function forumBase(): string {
+  const funding = fundingPathKey();
+  if (funding) return `/funding/${encodeURIComponent(funding)}/forum`;
   const key = communityPathKey();
   return key ? `/communities/${encodeURIComponent(key)}/forum` : '/neture/forum';
 }
@@ -565,6 +570,7 @@ export function extractTextContent(content: string | object[] | undefined): stri
 // ============================================================================
 
 export interface CreateForumPostPayload {
+  type?: 'discussion' | 'announcement';
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility
   categorySlug: string;
@@ -637,7 +643,7 @@ export async function createForumPost(
       content: payload.content,
       ...(payload.forumId ? { forumId: payload.forumId } : {}),
       categorySlug: payload.categorySlug,
-      type: 'discussion',
+      type: fundingPathKey() ? payload.type || 'discussion' : 'discussion',
       ...(payload.tags && payload.tags.length > 0 ? { tags: payload.tags } : {}),
       // WO-NETURE-EXTERNAL-CONTACT-V1
       showContactOnPost: payload.showContactOnPost || false,
@@ -685,7 +691,7 @@ export async function createForumComment(
  */
 export async function updateForumPost(
   postId: string,
-  payload: { title?: string; content?: any; categorySlug?: string }
+  payload: { title?: string; content?: any; categorySlug?: string; type?: string }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
     const response = await api.put(`${forumBase()}/posts/${postId}`, payload);

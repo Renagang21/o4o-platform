@@ -31,7 +31,7 @@ class Query {
   rows() {
     const sql = this.clauses.join(' ');
     return [publicRow, privateRow()].filter(row => {
-      if (sql.includes("NOT LIKE 'sf:%'") && /^(sf|community):/.test(row.serviceCode)) return false;
+      if (sql.includes("NOT LIKE 'sf:%'") && /^(sf|community|funding):/.test(row.serviceCode)) return false;
       if (this.parameters.ctxExcludedCommunityCodes?.includes(row.serviceCode)) return false;
       if (sql.includes('post.id = :postId') && row.id !== this.parameters.postId) return false;
       const codes = this.parameters.ctxForumCodes;
@@ -51,7 +51,7 @@ function repository(_entity: string) {
       const excluded = sql.includes('NOT (_public.service_code = ANY') ? arrays[0] : [];
       const codes = sql.includes('_svc.service_code = ANY') ? arrays[arrays.length - 1] : undefined;
       return [publicRow, privateRow()].filter(row =>
-        !(sql.includes("NOT LIKE 'sf:%'") && /^(sf|community):/.test(row.serviceCode)) && !excluded.includes(row.serviceCode) && (!codes || codes.includes(row.serviceCode)),
+        !(sql.includes("NOT LIKE 'sf:%'") && /^(sf|community|funding):/.test(row.serviceCode)) && !excluded.includes(row.serviceCode) && (!codes || codes.includes(row.serviceCode)),
       ).map(row => ({ tag: row.tag, count: 1 }));
     },
   };
@@ -61,7 +61,7 @@ function response() {
   res.status.mockReturnValue(res); return res;
 }
 
-describe.each(['sf:private', 'community:private', 'neture', 'kpa-society', 'pharmacy-hub', 'k-cosmetics'])('generic visibility isolation: %s', code => {
+describe.each(['sf:private', 'community:private', 'funding:private', 'neture', 'kpa-society', 'pharmacy-hub', 'k-cosmetics'])('generic visibility isolation: %s', code => {
   beforeEach(() => { privateCode = code; });
   it('public statistics omit private boards, posts, comments and authors', async () => {
     const res = response();

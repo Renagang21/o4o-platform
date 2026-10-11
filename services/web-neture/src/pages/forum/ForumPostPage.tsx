@@ -113,7 +113,7 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
   };
 }
 
-export function ForumPostPage({ basePath = '/forum', canModerate = false }: { basePath?: string; canModerate?: boolean } = {}) {
+export function ForumPostPage({ basePath = '/forum', canModerate = false, readOnly = false, pinPost }: { basePath?: string; canModerate?: boolean; readOnly?: boolean; pinPost?: (id: string, pin: boolean) => Promise<void> } = {}) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -164,12 +164,13 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   };
 
   const handlePin = async () => {
-    if (!post || !communityKey || !canModerate || pinProcessing.current || pinNeedsRefresh) return;
+    if (!post || (!communityKey && !pinPost) || !canModerate || readOnly || pinProcessing.current || pinNeedsRefresh) return;
     pinProcessing.current = true;
     const current = beginPin();
     setPinBusy(true); setPinNotice(null); setPinError(null);
     try {
-      await pinCommunityForumPost(communityKey, post.id, !post.isPinned);
+      if (pinPost) await pinPost(post.id, !post.isPinned);
+      else await pinCommunityForumPost(communityKey!, post.id, !post.isPinned);
       if (!current()) return;
       setPinNeedsRefresh(true);
       setPinNotice(post.isPinned ? '공지를 해제했습니다.' : '공지로 고정했습니다.');
@@ -270,7 +271,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   };
 
   const handleLike = async () => {
-    if (!post || isLiking) return;
+    if (readOnly || !post || isLiking) return;
     if (!isAuthenticated) {
       openLoginModal();
       return;
@@ -329,7 +330,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
   const postType = normalizePostType(post.type);
   const badge = getTypeBadge(postType);
   const authorName = getAuthorName(post);
-  const canManagePost = isAdmin || (!!currentUserId && post.authorId === currentUserId);
+  const canManagePost = !readOnly && (isAdmin || (!!currentUserId && post.authorId === currentUserId));
 
   return (
     <div style={isMobile ? styles.containerMobile : styles.container}>
@@ -361,7 +362,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
           </>
         }
         actionSlot={
-          canManagePost || canModerate ? (
+          (canManagePost || canModerate) && !readOnly ? (
             isMobile ? (
               /* Mobile: ⋮ action menu */
               <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
@@ -374,7 +375,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
                 </button>
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
-                    {communityKey && canModerate && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                    {(communityKey || pinPost) && canModerate && !readOnly && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                     {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
@@ -391,7 +392,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
             ) : (
               /* Desktop: inline actions */
               <>
-                {communityKey && canModerate && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                {(communityKey || pinPost) && canModerate && !readOnly && <button type="button" disabled={pinBusy || pinNeedsRefresh} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
                 {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
                 <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
               </>
@@ -448,7 +449,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
         <ForumLikeButton
           liked={isLiked}
           count={likeCount}
-          disabled={isLiking}
+          disabled={isLiking || readOnly}
           onClick={handleLike}
           compact={isMobile}
         />
@@ -461,7 +462,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
         </h3>
 
         {/* Comment Form */}
-        <ForumCommentForm
+        {!readOnly && <ForumCommentForm
           value={commentText}
           onChange={(v) => { setCommentText(v); setCommentError(null); }}
           onSubmit={handleSubmitComment}
@@ -480,7 +481,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
               <p>댓글을 작성하려면 <button onClick={() => openLoginModal()} style={styles.loginLink}>로그인</button>이 필요합니다.</p>
             </div>
           }
-        />
+        />}
 
         {/* Comments List — 인라인 수정/삭제는 공통 부품이 제공, mutation 은 서비스 adapter 소유 */}
         <ForumCommentList
@@ -489,8 +490,8 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
             authorName: c.authorName,
             content: c.content,
             createdAt: `${formatForumDate(c.createdAt)}${c.isEdited ? ' (수정됨)' : ''}`,
-            isAuthor: (!!currentUserId && c.authorId === currentUserId) || isAdmin,
-            canDelete: canModerate,
+            isAuthor: !readOnly && ((!!currentUserId && c.authorId === currentUserId) || isAdmin),
+            canDelete: canModerate && !readOnly,
           }))}
           onEditComment={handleUpdateComment}
           onDeleteComment={handleDeleteComment}
@@ -503,7 +504,7 @@ export function ForumPostPage({ basePath = '/forum', canModerate = false }: { ba
 
       {/* Footer */}
       <div style={styles.footer}>
-        <Link to="/forum" style={styles.backToList}>
+        <Link to={basePath} style={styles.backToList}>
           다른 글 둘러보기 →
         </Link>
       </div>

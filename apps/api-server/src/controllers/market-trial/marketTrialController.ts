@@ -30,6 +30,11 @@ import { MarketTrialService } from '@o4o/market-trial';
 import { marketTrialNotification } from '../../services/marketTrial.notification.js';
 import { computeKpiSnapshot } from './marketTrialOperatorController.js';
 import logger from '../../utils/logger.js';
+import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
+import type { RequestHandler } from 'express';
+import { fundingReview, fundingOwnerContext, fundingForumSlug, fundingForumCode, FUNDING_PUBLIC_STATUSES, isFundingPublic } from '../../services/funding/funding-review.js';
+import { isFundingCreator, resolveFundingAccess } from '../../services/funding/funding-access.js';
+import { FundingWorkspaceService, FundingError } from '../../services/funding/funding-workspace.service.js';
 
 /** Trial 참여 가능 상태 목록 */
 const JOINABLE_STATUSES: TrialStatus[] = [
@@ -71,6 +76,50 @@ export class MarketTrialController {
     this.trialService = new MarketTrialService(ds);
   }
 
+  static requireActiveCreator: RequestHandler = (req, res, next) => {
+    const ds = MarketTrialController.dataSource;
+    if (!ds) { res.status(503).json({ success: false, message: 'Service unavailable' }); return; }
+    void createRequireActiveSupplier(ds)(req, res, next).catch(next);
+  };
+
+  static async creatorEligibility(req: AuthRequest, res: Response) {
+    res.json({ success: true, data: { supplierAccountId: (req as any).supplierId, supplierOrganizationId: (req as any).supplierOrganizationId } });
+  }
+
+  static async getForumAccess(req: AuthRequest, res: Response) {
+    try {
+      const access = await resolveFundingAccess(MarketTrialController.dataSource!, req.params.id, (req as any).user?.id);
+      if (!access || (!access.creator && !access.operator && !access.participant)) return res.status(403).json({ success: false, message: '해당 펀딩 참여자만 포럼을 이용할 수 있습니다.' });
+      res.json({ success: true, data: { forum: access.forum, canRead: access.canRead, canWrite: access.canWrite, canManage: access.canManage, canModerate: access.canModerate, participant: access.participant, member: access.member } });
+    } catch (error) { logger.error('[Funding] forum access failed', error); res.status(500).json({ success: false, message: '포럼 이용 상태를 확인하지 못했습니다.' }); }
+  }
+
+  static async getCreatorParticipants(req: AuthRequest, res: Response) {
+    try {
+      const trial = await MarketTrialController.trialRepo.findOne({ where: { id: req.params.id } });
+      if (!trial || !await isFundingCreator(MarketTrialController.dataSource!, trial, req.user!.id)) return res.status(403).json({ success: false, message: '자기 펀딩만 조회할 수 있습니다.' });
+      const rows = await MarketTrialController.dataSource!.query(`SELECT p.id, COALESCE(u.name, '회원') AS name, p."paymentStatus" AS "paymentStatus"
+        FROM market_trial_participants p LEFT JOIN users u ON u.id = p."participantId" WHERE p."marketTrialId" = $1 ORDER BY p."createdAt", p.id`, [trial.id]);
+      res.json({ success: true, data: rows });
+    } catch (error) { logger.error('[Funding] creator participants failed', error); res.status(500).json({ success: false, message: '참여 현황 조회에 실패했습니다.' }); }
+  }
+
+  static async changeCreatorStatus(req: AuthRequest, res: Response) {
+    try {
+      const trial = await MarketTrialController.trialRepo.findOne({ where: { id: req.params.id } });
+      if (!trial || !await isFundingCreator(MarketTrialController.dataSource!, trial, req.user!.id)) return res.status(403).json({ success: false, message: '자기 펀딩만 관리할 수 있습니다.' });
+      const changed = await new FundingWorkspaceService(MarketTrialController.dataSource!).changeStatus(trial.id, req.user!.id, req.body.status, true);
+      if (changed.status === TrialStatus.DEVELOPMENT) void marketTrialNotification.onRecruitingResult(changed.id, true, req.user!.id);
+      else if (changed.status === TrialStatus.OUTCOME_CONFIRMING) void marketTrialNotification.onOutcomeConfirming(changed.id, req.user!.id);
+      else if (changed.status === TrialStatus.FULFILLED) void marketTrialNotification.onFulfilled(changed.id, req.user!.id);
+      res.json({ success: true, data: toTrialDTO(changed) });
+    } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      logger.error('[Funding] creator progress failed', error);
+      res.status(500).json({ success: false, message: '진행 상태를 변경하지 못했습니다.' });
+    }
+  }
+
   /**
    * POST /api/market-trial
    * 공급자 Trial 생성 (DRAFT)
@@ -92,7 +141,7 @@ export class MarketTrialController {
         productId,
       } = req.body;
 
-      if (!title || !fundingStartAt || !fundingEndAt || !trialPeriodDays) {
+      if (!validFundingFields(req.body)) {
         return res.status(400).json({
           success: false,
           message: 'Required: title, fundingStartAt, fundingEndAt, trialPeriodDays',
@@ -102,6 +151,8 @@ export class MarketTrialController {
       const trial = await MarketTrialController.trialService.createTrial({
         supplierId: userId,
         supplierName: userName,
+        initialHistory: [{ from: 'draft', to: 'draft', at: new Date().toISOString(), reason: 'funding_created', auto: false,
+          actorUserId: userId, supplierAccountId: (req as any).supplierId, supplierOrganizationId: (req as any).supplierOrganizationId ?? null } as any],
         // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 상품(ProductMaster) soft 참조
         productId: productId || undefined,
         title,
@@ -138,7 +189,10 @@ export class MarketTrialController {
         return res.status(401).json({ success: false, message: 'Authentication required' });
       }
 
+      const existing = await MarketTrialController.trialRepo.findOne({ where: { id: req.params.id } });
+      if (!existing || !await isFundingCreator(MarketTrialController.dataSource!, existing, userId)) return res.status(403).json({ success: false, message: '자기 펀딩만 신청할 수 있습니다.' });
       const trial = await MarketTrialController.trialService.submitTrial(req.params.id, userId);
+      void marketTrialNotification.onSubmitted(trial);
       res.json({ success: true, data: toTrialDTO(trial) });
     } catch (error: any) {
       console.error('Submit trial error:', error);
@@ -161,6 +215,9 @@ export class MarketTrialController {
       }
 
       const { id } = req.params;
+      const existing = await MarketTrialController.trialRepo.findOne({ where: { id } });
+      if (!existing || !await isFundingCreator(MarketTrialController.dataSource!, existing, userId)) return res.status(403).json({ success: false, message: '자기 펀딩만 수정할 수 있습니다.' });
+      if (!validFundingFields({ ...existing, ...req.body })) return res.status(400).json({ success: false, message: '모집 기간·수량·금액 입력을 확인해 주세요.' });
       const {
         title, oneLiner, videoUrl, description, outcomeSnapshot,
         maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
@@ -217,7 +274,7 @@ export class MarketTrialController {
 
       res.json({
         success: true,
-        data: trials.map((t) => toTrialDTO(t, undefined, productMap.get(t.productId ?? ''))),
+        data: trials.filter(t => !fundingOwnerContext(t)?.supplierAccountId || fundingOwnerContext(t)?.supplierAccountId === (req as any).supplierId).map((t) => ({ ...toTrialDTO(t, undefined, productMap.get(t.productId ?? '')), ...fundingReview(t) })),
       });
     } catch (error) {
       console.error('Get my trials error:', error);
@@ -284,6 +341,7 @@ export class MarketTrialController {
   static async getTrials(req: AuthRequest, res: Response) {
     try {
       const { status } = req.query;
+      if (status && (typeof status !== 'string' || !['open', 'recruiting', 'closed', ...FUNDING_PUBLIC_STATUSES].includes(status))) return res.status(400).json({ success: false, message: 'Invalid public status filter' });
 
       const qb = MarketTrialController.trialRepo.createQueryBuilder('trial');
 
@@ -302,7 +360,7 @@ export class MarketTrialController {
 
       qb.orderBy('trial.createdAt', 'DESC');
 
-      const trials = await qb.getMany();
+      const trials = (await qb.getMany()).filter(isFundingPublic);
 
       // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1:
       // Evaluate RECRUITING trials that may have expired (fundingEndAt passed)
@@ -352,7 +410,7 @@ export class MarketTrialController {
       const { id } = req.params;
       const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
 
-      if (!trial) {
+      if (!trial || !isFundingPublic(trial)) {
         return res.status(404).json({
           success: false,
           message: 'Trial not found',
@@ -436,7 +494,7 @@ export class MarketTrialController {
       if (!trial) {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
-      if (trial.supplierId !== userId) {
+      if (!await isFundingCreator(MarketTrialController.dataSource!, trial, userId)) {
         return res.status(403).json({ success: false, message: 'Not authorized' });
       }
 
@@ -465,10 +523,12 @@ export class MarketTrialController {
       // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
       const productMap = await buildProductRefMap(MarketTrialController.dataSource, [trial.productId]);
 
+      const [workspaceForum] = await MarketTrialController.dataSource!.query('SELECT id, slug FROM forum_category_requests WHERE slug = $1 AND service_code = $2 AND status = \'completed\' LIMIT 1', [fundingForumSlug(id), fundingForumCode(id)]);
       res.json({
         success: true,
         data: {
-          trial: toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? '')),
+          forum: workspaceForum ?? null,
+          trial: { ...toTrialDTO(trial, forumMapping?.forumId, productMap.get(trial.productId ?? '')), ...fundingReview(trial) },
           summary: {
             totalCount,
             productCount,
@@ -496,7 +556,6 @@ export class MarketTrialController {
       const { id } = req.params;
       const { rewardType } = req.body;
       const userId = (req as any).user?.id;
-      const userName = (req as any).user?.name || 'User';
 
       if (!userId) {
         return res.status(401).json({
@@ -512,72 +571,7 @@ export class MarketTrialController {
         });
       }
 
-      const trial = await MarketTrialController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({
-          success: false,
-          message: 'Trial not found',
-        });
-      }
-
-      if (!JOINABLE_STATUSES.includes(trial.status)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Trial is not accepting participants',
-        });
-      }
-
-      if (
-        trial.maxParticipants &&
-        trial.currentParticipants >= trial.maxParticipants
-      ) {
-        return res.status(400).json({
-          success: false,
-          message: 'Trial has reached maximum participants',
-        });
-      }
-
-      if (!trial.rewardOptions.includes(rewardType)) {
-        return res.status(400).json({
-          success: false,
-          message: `Reward type "${rewardType}" is not available for this trial`,
-        });
-      }
-
-      // Check duplicate participation
-      const existing = await MarketTrialController.participantRepo.findOne({
-        where: {
-          marketTrialId: id,
-          participantId: userId,
-        },
-      });
-
-      if (existing) {
-        return res.status(400).json({
-          success: false,
-          message: 'Already participated in this trial',
-        });
-      }
-
-      // Create participation
-      // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
-      // 'store_owner' = Neture 내부 participant type (Market Trial 참여자 구분).
-      // 기존 'seller' row 는 호환 유지 (operator UI label 매핑이 양쪽 모두 처리).
-      const participation = MarketTrialController.participantRepo.create({
-        marketTrialId: id,
-        participantId: userId,
-        participantType: 'store_owner', // WO-O4O-MARKET-TRIAL-PHASE1-V1: participant type — store_owner
-        contributionAmount: 0,
-        rewardType,
-        rewardStatus: 'pending',
-      });
-
-      const saved = await MarketTrialController.participantRepo.save(participation);
-
-      // Update participant count
-      await MarketTrialController.trialRepo.update(id, {
-        currentParticipants: () => '"currentParticipants" + 1',
-      });
+      const { trial, participant: saved } = await new FundingWorkspaceService(MarketTrialController.dataSource!).join(id, userId, rewardType);
 
       // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify participant of join.
       // Idempotent at the call site — duplicate-participation check above (line ~588) blocks repeats.
@@ -589,6 +583,7 @@ export class MarketTrialController {
         message: 'Successfully joined the trial',
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Join trial error:', error);
       res.status(500).json({
         success: false,
@@ -768,6 +763,7 @@ function toTrialDTO(
     outcomeSnapshot: trial.outcomeSnapshot,
     maxParticipants: maxParticipants || undefined,
     currentParticipants,
+    trialPeriodDays: trial.trialPeriodDays,
     startDate: trial.fundingStartAt ? new Date(trial.fundingStartAt).toISOString() : undefined,
     endDate: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
     deadline: trial.fundingEndAt ? new Date(trial.fundingEndAt).toISOString() : undefined,
@@ -918,4 +914,14 @@ function calcSettlementForParticipant(
     estimatedProductQty,
     estimatedRemainder,
   };
+}
+
+function validFundingFields(input: any): boolean {
+  if (!input.fundingStartAt || !input.fundingEndAt) return false;
+  if (['oneLiner', 'videoUrl'].some(key => input[key] != null && (typeof input[key] !== 'string' || input[key].length > (key === 'oneLiner' ? 120 : 500)))) return false;
+  const start = new Date(input.fundingStartAt).getTime(), end = new Date(input.fundingEndAt).getTime();
+  if (typeof input.title !== 'string' || !input.title.trim() || input.title.length > 255 || !Number.isFinite(start) || !Number.isFinite(end) || end <= start) return false;
+  if (!Number.isInteger(Number(input.trialPeriodDays)) || Number(input.trialPeriodDays) < 1 || Number(input.trialPeriodDays) > 3650) return false;
+  if (input.maxParticipants != null && (!Number.isInteger(Number(input.maxParticipants)) || Number(input.maxParticipants) < 1)) return false;
+  return ['targetAmount', 'trialUnitPrice', 'rewardRate'].every(key => input[key] == null || Number.isFinite(Number(input[key])) && Number(input[key]) >= 0);
 }

@@ -1,5 +1,5 @@
 /**
- * Supplier Trial Create Page
+ * Funding Creator Create Page
  *
  * WO-O4O-MARKET-TRIAL-PHASE1-V1
  * WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
@@ -9,13 +9,13 @@
  * 4개 섹션: 한 줄 제안 → 왜 이걸 해야 하는가 → 매장 활용 방법 → 참여 조건 및 혜택
  */
 
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { createTrial, submitTrial, updateTrial } from '../../api/trial';
 import type { CreateTrialPayload, Trial } from '../../api/trial';
-// WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1
-import SelectedSupplierProductBanner from '../../components/supplier/SelectedSupplierProductBanner';
+
 
 // WO-MARKET-TRIAL-SALES-SCENARIO-EDITOR-V1
 const SALES_SCENARIO_TEMPLATE = `<h3>1. 진열 위치 및 방법</h3>
@@ -30,19 +30,20 @@ const SALES_SCENARIO_TEMPLATE = `<h3>1. 진열 위치 및 방법</h3>
 const EMPTY_HTML_PATTERN = /^(<p>(<br\s*\/?>|\s|&nbsp;)*<\/p>\s*)*$/;
 
 /** WO-MARKET-TRIAL-EDIT-FLOW-V1 */
-interface SupplierTrialFormProps {
+interface FundingCreatorFormProps {
   mode?: 'create' | 'edit';
   trialId?: string;
   initialData?: Trial;
 }
 
-export default function SupplierTrialCreatePage({
+export default function FundingCreatePage({
   mode = 'create',
   trialId,
   initialData,
-}: SupplierTrialFormProps = {}) {
+}: FundingCreatorFormProps = {}) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // WO-O4O-...-SUPPLIER-PRODUCT-REFERENCE-V1: 선택 상품 masterId
+  const savedDraft = useRef<string | null>(null);
+  const beginWrite = useLatestRequest(`funding-form:${trialId || 'new'}`);
 
   const [title, setTitle] = useState(initialData?.title || '');
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
@@ -87,6 +88,7 @@ export default function SupplierTrialCreatePage({
   };
 
   const handleCreate = async (autoSubmit: boolean) => {
+    if (loading) return;
     // WO-MARKET-TRIAL-FORM-GUIDANCE-ENHANCEMENT-V1: 전체 필드 검증 + 인라인 에러
     const errors: Record<string, string> = {};
     if (!title.trim()) errors.title = '제목을 입력해주세요.';
@@ -96,7 +98,7 @@ export default function SupplierTrialCreatePage({
         errors.videoUrl = '영상 URL 형식이 올바르지 않습니다.';
       }
     }
-    if (!fundingStartAt || !fundingEndAt) errors.funding = '모집 기간을 설정해주세요.';
+    if (!fundingStartAt || !fundingEndAt || new Date(fundingEndAt) <= new Date(fundingStartAt)) errors.funding = '모집 종료일은 시작일 이후여야 합니다.';
     if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해주세요.';
 
     if (Object.keys(errors).length > 0) {
@@ -112,6 +114,7 @@ export default function SupplierTrialCreatePage({
       if (!confirmed) return;
     }
 
+    const current = beginWrite();
     setLoading(true);
     setError('');
     setFieldErrors({});
@@ -135,30 +138,32 @@ export default function SupplierTrialCreatePage({
         targetAmount: targetAmount ? Number(targetAmount) : undefined,
         trialUnitPrice: trialUnitPrice ? Number(trialUnitPrice) : undefined,
         rewardRate: Number(rewardRate) || 0,
-        // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1:
-        //   제품 목록에서 진입 시 선택 상품(ProductMaster id=masterId)을 soft 참조로 저장.
-        //   생성 모드에서만, query 에 있을 때만 (직접 메뉴 진입/수정 시 미전달).
-        productId: mode === 'edit' ? undefined : (searchParams.get('masterId') || undefined),
       };
 
       if (mode === 'edit' && trialId) {
         await updateTrial(trialId, payload);
-        navigate(`/supplier/market-trial/${trialId}`, {
+        if (!current()) return;
+        navigate(`/market-trial/manage/${trialId}`, {
           state: { message: '유통참여형 펀딩이 수정되었습니다.' },
         });
       } else {
-        const created = await createTrial(payload);
+        const created = savedDraft.current
+          ? await updateTrial(savedDraft.current, payload)
+          : await createTrial(payload);
+        savedDraft.current = created.id;
+        if (!current()) return;
         if (autoSubmit) {
           await submitTrial(created.id);
         }
-        navigate('/supplier/dashboard', {
+        if (!current()) return;
+        navigate(`/market-trial/manage/${created.id}`, {
           state: { message: autoSubmit ? '유통참여형 펀딩이 제출되었습니다.' : '유통참여형 펀딩이 저장되었습니다.' },
         });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '유통참여형 펀딩 생성에 실패했습니다.');
+      if (current()) setError(err.response?.data?.message || err.message || '유통참여형 펀딩 생성에 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
   };
 
@@ -169,17 +174,16 @@ export default function SupplierTrialCreatePage({
       </h1>
       <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하세요.</p>
 
-      {/* WO-O4O-NETURE-SUPPLIER-EVENT-FUNDING-WORKSPACE-PREFILL-V1: 선택 상품 context */}
-      <SelectedSupplierProductBanner kind="funding" />
+
 
       {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 설계 안내 */}
       <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-900 space-y-1.5">
         <p className="font-semibold">유통참여형 펀딩은 투자형 펀딩이 아닙니다.</p>
         <ul className="list-disc list-inside space-y-1 text-violet-800 text-[13px]">
           <li>개발비 전체를 모으는 것이 목적이 아니라 <b>제품 보상을 통한 초기 매장 랜딩</b>이 목적입니다. 목표 금액보다 <b>몇 개 매장에 들어갈지(목표 매장 수)</b>를 먼저 설계하세요.</li>
-          <li>참여금(송금)은 <b>Neture 운영자가 수령</b>하며, 송금 완료자 명단을 제품 개발자에게 공유합니다. 온라인 결제는 제공하지 않습니다.</li>
+          <li>참여금(송금)은 <b>펀딩 운영자가 수령</b>하며, 송금 완료자 명단을 제품 개발자에게 공유합니다. 온라인 결제는 제공하지 않습니다.</li>
           <li>제품 개발자는 <b>포럼 운영 주체</b>로서 참여자 검토·소통·미송금자 처리를 담당합니다.</li>
-          <li>제출한 제안은 <b>Neture 운영자 승인 후에만 공개·모집</b>됩니다 (투자형 오해·송금 흐름·보상 방식 선택·제품 보상 조건·포럼 운영 방식 확인). 반려 시 안내에 따라 보완 후 다시 제출할 수 있습니다.</li>
+          <li>제출한 제안은 <b>펀딩 운영자 승인 후에만 공개·모집</b>됩니다 (투자형 오해·송금 흐름·보상 방식 선택·제품 보상 조건·포럼 운영 방식 확인). 반려 시 안내에 따라 보완 후 다시 제출할 수 있습니다.</li>
         </ul>
       </div>
 
@@ -354,7 +358,7 @@ export default function SupplierTrialCreatePage({
             <div>
               <h3 className="text-sm font-semibold text-blue-800">펀딩 구조 설정</h3>
               <p className="text-xs text-blue-600 mt-1">매장이 제품 단가로 참여하면, 설정한 리워드 비율만큼 추가 혜택을 받을 수 있습니다.</p>
-              <p className="text-xs text-blue-600 mt-1">금액보다 <b>목표 매장 수</b>를 먼저 정하고, 제품 보상은 소비자가가 아니라 <b>도매 공급가격 또는 그 이하</b> 기준으로 설계하는 것이 바람직합니다. 참여금은 Neture 운영자가 오프라인으로 안내·수령합니다.</p>
+              <p className="text-xs text-blue-600 mt-1">금액보다 <b>목표 매장 수</b>를 먼저 정하고, 제품 보상은 소비자가가 아니라 <b>도매 공급가격 또는 그 이하</b> 기준으로 설계하는 것이 바람직합니다. 참여금은 펀딩 운영자가 오프라인으로 안내·수령합니다.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -370,7 +374,7 @@ export default function SupplierTrialCreatePage({
                   placeholder="예: 1000000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="text-xs text-gray-400 mt-1">개발비 전체가 아니라 초기 매장 랜딩 규모 기준. Neture 운영자가 오프라인으로 안내하는 송금 목표입니다.</p>
+                <p className="text-xs text-gray-400 mt-1">개발비 전체가 아니라 초기 매장 랜딩 규모 기준. 펀딩 운영자가 오프라인으로 안내하는 송금 목표입니다.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -384,7 +388,7 @@ export default function SupplierTrialCreatePage({
                   placeholder="예: 2000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="text-xs text-gray-400 mt-1">1인당 권장 참여금액(보상 기준 금액). 온라인 결제 금액이 아니라 Neture 운영자가 오프라인으로 안내하는 기준이며, 매장이 부담 없이 참여할 수준으로 설정하세요.</p>
+                <p className="text-xs text-gray-400 mt-1">1인당 권장 참여금액(보상 기준 금액). 온라인 결제 금액이 아니라 펀딩 운영자가 오프라인으로 안내하는 기준이며, 매장이 부담 없이 참여할 수준으로 설정하세요.</p>
               </div>
             </div>
 

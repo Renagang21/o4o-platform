@@ -85,7 +85,8 @@ export function MarketTrialHubPage() {
   return (
     <>
     <div style={s.container}>
-      <h1 className="mb-6 text-2xl font-semibold">유통참여형 펀딩</h1>
+      <h1 className="mb-3 text-2xl font-semibold">유통참여형 펀딩</h1>
+      <Link to="/market-trial/manage" className="mb-6 inline-flex min-h-11 items-center rounded border px-4 text-blue-700">내 펀딩·개설 신청</Link>
       {/* 3. 내가 참여한 유통참여형 펀딩 */}
       {isAuthenticated && myTrials.length > 0 && (
         <Section title="내가 참여한 유통참여형 펀딩" count={myTrials.length} accentColor="#7C3AED">

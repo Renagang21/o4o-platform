@@ -1,51 +1,57 @@
 /**
- * Supplier Trial Edit Page
+ * Funding Creator Edit Page
  *
  * WO-MARKET-TRIAL-EDIT-FLOW-V1
  * Wrapper that fetches existing DRAFT trial data and passes it to CreatePage in edit mode.
  */
 
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getTrial } from '../../api/trial';
+import { getSupplierTrialResults } from '../../api/trial';
 import type { Trial } from '../../api/trial';
-import SupplierTrialCreatePage from './SupplierTrialCreatePage';
+import FundingCreatePage from './FundingCreatePage';
 
-export default function SupplierTrialEditPage() {
+export default function FundingEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [trial, setTrial] = useState<Trial | null>(null);
+  const [loadedId, setLoadedId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // 조회 실패는 '새 펀딩'이 아니다 — 빈 폼으로 떨어뜨리지 않고 오류 표시 후 재시도.
   // 비초안(non-draft) 확정 상태는 재시도로 해결되지 않으므로 retry 미노출.
   const [canRetry, setCanRetry] = useState(false);
 
+  const beginLoad = useLatestRequest(`funding-detail:${id}`);
   const load = useCallback(() => {
+    const current = beginLoad();
     if (!id) return;
     setLoading(true);
     setError(null);
     setCanRetry(false);
-    getTrial(id)
+    getSupplierTrialResults(id).then(result => result.trial)
       .then((t) => {
+        if (!current()) return;
         if (t.status !== 'draft') {
           setError('초안 상태의 유통참여형 펀딩만 수정할 수 있습니다.');
           return;
         }
-        setTrial(t);
+        setTrial(t); setLoadedId(id);
       })
       .catch(() => {
+        if (!current()) return;
         setError('유통참여형 펀딩을 불러오지 못했습니다.');
         setCanRetry(true);
       })
-      .finally(() => setLoading(false));
-  }, [id]);
+      .finally(() => { if (current()) setLoading(false); });
+  }, [id, beginLoad]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  if (loading) {
+  if (loading || !error && loadedId !== id) {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <p className="text-gray-500">불러오는 중...</p>
@@ -77,5 +83,5 @@ export default function SupplierTrialEditPage() {
     );
   }
 
-  return <SupplierTrialCreatePage mode="edit" trialId={id} initialData={trial} />;
+  return <FundingCreatePage mode="edit" trialId={id} initialData={trial} />;
 }

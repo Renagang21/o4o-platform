@@ -775,7 +775,7 @@ export class ForumPostController extends ForumControllerBase {
       let serviceCondition = '';
       if (ctx?.excludeScopedCommunities) {
         params.push(CATALOG_FORUM_STORAGE_CODES);
-        serviceCondition = `AND EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = p.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND NOT (_public.service_code = ANY($${params.length}::text[])))`;
+        serviceCondition = `AND EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = p.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT LIKE 'funding:%' AND NOT (_public.service_code = ANY($${params.length}::text[])))`;
       }
       const ctxForumCodes = this.getContextForumCodes(ctx);
       if (ctxForumCodes) {

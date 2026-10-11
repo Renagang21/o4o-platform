@@ -14,8 +14,9 @@ import { authenticate, optionalAuth } from '../middleware/auth.middleware.js';
 const router: Router = Router();
 
 // Supplier trial management (WO-O4O-MARKET-TRIAL-PHASE1-V1)
-router.post('/', authenticate, MarketTrialController.createTrial);
-router.get('/my', authenticate, MarketTrialController.getMyTrials);
+router.get('/creator-eligibility', authenticate, MarketTrialController.requireActiveCreator, MarketTrialController.creatorEligibility);
+router.post('/', authenticate, MarketTrialController.requireActiveCreator, MarketTrialController.createTrial);
+router.get('/my', authenticate, MarketTrialController.requireActiveCreator, MarketTrialController.getMyTrials);
 
 // User participations (WO-MARKET-TRIAL-MY-PARTICIPATION-STATUS-V1)
 router.get('/my-participations', authenticate, MarketTrialController.getMyParticipations);
@@ -27,6 +28,9 @@ router.get('/:id', optionalAuth, MarketTrialController.getTrialById);
 router.patch('/:id', authenticate, MarketTrialController.updateTrial);
 
 // Authenticated routes
+router.get('/:id/forum-access', authenticate, MarketTrialController.getForumAccess);
+router.get('/:id/creator-participants', authenticate, MarketTrialController.getCreatorParticipants);
+router.patch('/:id/creator-status', authenticate, MarketTrialController.changeCreatorStatus);
 router.get('/:id/participation', authenticate, MarketTrialController.getParticipation);
 // WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1: supplier results (auth + owner check inside)
 router.get('/:id/results', authenticate, MarketTrialController.getSupplierTrialResults);

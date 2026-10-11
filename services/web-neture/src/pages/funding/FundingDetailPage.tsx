@@ -1,5 +1,5 @@
 /**
- * Supplier Trial Detail Page (Results & Feedback)
+ * Funding Creator Detail Page (Results & Feedback)
  *
  * WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1
  * - 집계 통계 (개인 참여자 정보 미노출)
@@ -7,8 +7,10 @@
  * - 상태별 다음 행동 안내
  */
 
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FundingCreatorOperations } from './FundingCreatorOperations';
 import { getSupplierTrialResults } from '../../api/trial';
 import type { TrialResults } from '../../api/trial';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -41,11 +43,11 @@ const STATUS_COLOR: Record<string, string> = {
 const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   draft: {
     title: '초안 상태입니다',
-    desc: '내용을 완성하고 "제출"하여 Neture 운영자의 검토를 요청하세요.',
+    desc: '내용을 완성하고 "제출"하여 펀딩 운영자의 검토를 요청하세요.',
   },
   submitted: {
-    title: 'Neture 운영자가 심사 중입니다',
-    desc: 'Neture 운영자 심사 후 승인되면 공개·모집이 시작됩니다. 승인 전에는 참여자에게 공개되지 않습니다. 보완이 필요하면 안내를 받을 수 있습니다.',
+    title: '펀딩 운영자가 심사 중입니다',
+    desc: '펀딩 운영자 심사 후 승인되면 공개·모집이 시작됩니다. 승인 전에는 참여자에게 공개되지 않습니다. 보완이 필요하면 안내를 받을 수 있습니다.',
   },
   recruiting: {
     title: '참여자 모집 중입니다',
@@ -90,24 +92,28 @@ function parseVideoEmbed(url: string): { type: 'youtube' | 'vimeo' | 'external';
   return { type: 'external', embedUrl: url };
 }
 
-export default function SupplierTrialDetailPage() {
+export default function FundingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [results, setResults] = useState<TrialResults | null>(null);
+  const [loadedId, setLoadedId] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // 404/403 은 재시도로 해결되지 않는 확정 상태 → retry 미노출.
   // 그 외 조회 오류만 재시도 가능(false 로 표시).
   const [canRetry, setCanRetry] = useState(false);
 
+  const beginLoad = useLatestRequest(`funding-detail:${id}`);
   const load = useCallback(() => {
+    const current = beginLoad();
     if (!id) return;
     setLoading(true);
     setError(null);
     setCanRetry(false);
     getSupplierTrialResults(id)
-      .then((r) => setResults(r))
+      .then((r) => { if (current()) { setResults(r); setLoadedId(id); } })
       .catch((err) => {
+        if (!current()) return;
         if (err?.response?.status === 403) {
           setError('접근 권한이 없습니다.');
         } else if (err?.response?.status === 404) {
@@ -117,14 +123,14 @@ export default function SupplierTrialDetailPage() {
           setCanRetry(true);
         }
       })
-      .finally(() => setLoading(false));
-  }, [id]);
+      .finally(() => { if (current()) setLoading(false); });
+  }, [id, beginLoad]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  if (loading) {
+  if (loading || !error && loadedId !== id) {
     return (
       <div style={s.container}>
         <p style={s.muted}>불러오는 중...</p>
@@ -135,7 +141,7 @@ export default function SupplierTrialDetailPage() {
   if (error || !results) {
     return (
       <div style={s.container}>
-        <button style={s.backLink} onClick={() => navigate('/supplier/market-trial')}>← 목록으로</button>
+        <button style={s.backLink} onClick={() => navigate('/market-trial/manage')}>← 목록으로</button>
         <p style={{ ...s.muted, color: '#EF4444', marginTop: '24px' }}>{error || '알 수 없는 오류'}</p>
         {canRetry && (
           <button style={{ ...s.primaryBtn, marginTop: '12px' }} onClick={load}>다시 시도</button>
@@ -156,7 +162,7 @@ export default function SupplierTrialDetailPage() {
   return (
     <div style={s.container}>
       {/* 상단 네비 */}
-      <button style={s.backLink} onClick={() => navigate('/supplier/market-trial')}>
+      <button style={s.backLink} onClick={() => navigate('/market-trial/manage')}>
         ← 내 유통참여형 펀딩 목록
       </button>
 
@@ -171,7 +177,7 @@ export default function SupplierTrialDetailPage() {
           {trial.status === 'draft' && (
             <button
               style={{ ...s.primaryBtn, padding: '6px 16px', fontSize: '13px' }}
-              onClick={() => navigate(`/supplier/market-trial/${id}/edit`)}
+              onClick={() => navigate(`/market-trial/manage/${id}/edit`)}
             >
               수정하기
             </button>
@@ -275,6 +281,8 @@ export default function SupplierTrialDetailPage() {
         </div>
       )}
 
+      <FundingCreatorOperations trial={trial} forum={results.forum} onChange={load} />
+
       {/* 운영 정보 — WO-MARKET-TRIAL-SUPPLIER-DETAIL-PREVIEW-ENHANCEMENT-V1 */}
       <div style={s.section}>
         <h2 style={s.sectionTitle}>운영 정보</h2>
@@ -358,7 +366,7 @@ export default function SupplierTrialDetailPage() {
             })()}
           {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 운영 모델 안내 */}
           <p style={{ fontSize: '12px', color: '#6B7280', lineHeight: 1.6, margin: '10px 0 0 0' }}>
-            참여금(송금)은 <strong>Neture 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·보상 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 보상 기준·보상 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
+            참여금(송금)은 <strong>펀딩 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·보상 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 보상 기준·보상 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
           </p>
         </div>
       )}
@@ -411,9 +419,9 @@ export default function SupplierTrialDetailPage() {
       {forumPostId && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>포럼 피드백</h2>
-          <p style={s.muted}>참여자들의 후기와 피드백이 포럼에 등록되어 있습니다.</p>
+          <p style={s.muted}>이전 공고 게시글입니다. 현재 펀딩 포럼은 운영 기능에서 이용하세요.</p>
           <a
-            href={`/forum/post/${forumPostId}`}
+            href={`https://community.neture.co.kr/communities/o4o-general/forum/post/${forumPostId}`}
             style={s.forumLink}
             target="_blank"
             rel="noopener noreferrer"
@@ -429,13 +437,13 @@ export default function SupplierTrialDetailPage() {
         <div style={{ ...s.section, display: 'flex', gap: '12px' }}>
           <button
             style={s.primaryBtn}
-            onClick={() => navigate(`/supplier/market-trial/${id}/edit`)}
+            onClick={() => navigate(`/market-trial/manage/${id}/edit`)}
           >
             이 유통참여형 펀딩 수정하기
           </button>
           <button
             style={{ ...s.primaryBtn, backgroundColor: '#6B7280' }}
-            onClick={() => navigate(`/supplier/market-trial/new`)}
+            onClick={() => navigate(`/market-trial/manage/new`)}
           >
             새 유통참여형 펀딩 등록
           </button>

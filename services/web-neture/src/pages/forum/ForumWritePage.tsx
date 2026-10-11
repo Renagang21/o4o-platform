@@ -54,6 +54,8 @@ interface ForumWritePageProps {
   backPath?: string;
   /** URL segment for post detail: 'post' (default) or 'article' (community) */
   postSegment?: string;
+  /** Funding creator/operator can publish notices in their own closed forum. */
+  allowAnnouncement?: boolean;
 }
 
 export function ForumWritePage({
@@ -61,6 +63,7 @@ export function ForumWritePage({
   categorySlug = 'neture-forum',
   backPath,
   postSegment = 'post',
+  allowAnnouncement = false,
 }: ForumWritePageProps = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -202,6 +205,7 @@ export function ForumWritePage({
       const base = (backPath || '/forum').replace(/\/$/, '');
       const response = await updateForumPost(editPostId, {
         title: payload.title,
+        ...(allowAnnouncement && (payload.type === 'discussion' || payload.type === 'announcement') ? { type: payload.type } : {}),
         content: blocks,
         categorySlug: categorySlug,
       });
@@ -234,6 +238,7 @@ export function ForumWritePage({
       }
       const response = await createForumPost({
         title: payload.title,
+        ...(allowAnnouncement && (payload.type === 'discussion' || payload.type === 'announcement') ? { type: payload.type } : {}),
         content: blocks,
         forumId,
         categorySlug: categorySlug,
@@ -313,6 +318,8 @@ export function ForumWritePage({
 
       {/* Form: create/edit 공통 ForumWriteForm (WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1) */}
         <ForumWriteForm
+          showPostType={allowAnnouncement}
+          postTypeOptions={allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined}
           initialTitle={title}
           initialContentHtml={editorHtml}
           titleLabel="제목"

@@ -7,6 +7,9 @@
 > **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (제품 정산 · 매장 랜딩 · 첫 주문 추적 · PG/checkout 절을 [`O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1`](../architecture/O4O-MARKET-TRIAL-CONTENT-ONLY-DOMAIN-BOUNDARY-V1.md)(2026-06-19) 로 대체 표기. 사람 중심 운영 · 운영자 오프라인 입금 확인은 유효 — 기록 정책은 [`O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1`](../architecture/O4O-MARKET-TRIAL-OFFLINE-SETTLEMENT-PAYMENT-POLICY-V1.md). 충돌 시 content-only 가 기준)
 > **관계**: [`IR-…-FUNCTIONAL-COMPLETENESS-AUDIT-V1`](../investigations/IR-O4O-NETURE-DISTRIBUTION-FUNDING-FUNCTIONAL-COMPLETENESS-AUDIT-V1.md)(기능 갭) · [`CHECK-…-OFFLINE-OPERATION-SAFETY-V1`](../investigations/CHECK-O4O-NETURE-DISTRIBUTION-FUNDING-OFFLINE-OPERATION-SAFETY-V1.md)(보안+오프라인 고지)
 
+
+> **2026-10-11 개설·업무공간 정합:** 개설 주체는 활성 공급자이며 개설 신청·보완·진행 운영은 `funding.neture.co.kr/market-trial/manage`에서 수행한다. 펀딩 서비스 admin/operator가 개설을 심사하고 승인 후 전용 폐쇄형 포럼을 연다. 개설자가 포럼 이용을 수동 승인·제거하며 입금 여부로 자동 가입시키지 않는 기존 §3 정책을 유지한다. 아래 “Neture 운영자” 업무의 서비스 역할은 `funding:admin`/`funding:operator`이며 입금 수령·오프라인 처리 정책은 변경하지 않는다. 과거 공통 포럼 공고 게시글 연결은 보존 자료이며 전용 게시판 ID와 구분한다. 구현·검증 기록은 [WO](../work-orders/WO-O4O-FUNDING-CREATOR-WORKSPACE-V1.md)를 따른다.
+
 ---
 
 ## 0. 한 줄 요약
