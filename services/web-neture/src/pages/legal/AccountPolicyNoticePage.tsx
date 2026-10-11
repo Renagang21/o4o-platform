@@ -16,7 +16,7 @@ export default function AccountPolicyNoticePage() {
   const [profile, setProfile] = useState<{ privacyOfficerName?: string; privacyOfficerEmail?: string; privacyOfficerPhone?: string } | null>(null);
   useEffect(() => { let alive = true; api.get('/public/services/neture/legal-profile').then((r: { data: { data: typeof profile } }) => { if (alive) setProfile(r.data.data); }).catch(() => {}); return () => { alive = false; }; }, []);
   const documents = [{ title: 'Neture 계정 이용약관 개정안', content: body(termsSource, '## 부칙 및 게시 전 대조') }, { title: 'Neture 계정 개인정보 처리방침 개정안', content: body(privacySource, '## 9. 게시 대조 기록') }, { title: '서비스별 이용약관·개인정보 안내 개정안', content: body(serviceSource, '## 내부 게시·적용 대조') }];
-  return <main className="mx-auto max-w-4xl px-4 py-10 text-slate-800">
+  return <article className="mx-auto max-w-4xl px-4 py-10 text-slate-800">
     <Link to="/notices" className="text-blue-700">공지사항</Link>
     <h1 className="mt-5 text-3xl font-semibold">계정 이용약관·개인정보 처리방침 개정 공고</h1>
     <p className="mt-4">공고일 {ACCOUNT_POLICY_NOTICE_DATE} · 시행 예정일 {ACCOUNT_POLICY_EFFECTIVE_DATE} (한국 시간)</p>
@@ -27,7 +27,7 @@ export default function AccountPolicyNoticePage() {
     <p className="mt-4"><Link to="/terms" className="text-blue-700">현재 이용약관</Link> · <Link to="/privacy" className="text-blue-700">현재 개인정보 처리방침</Link> · <Link to="/contact" className="text-blue-700">문의·의견 보내기</Link></p>
     {documents.map(document => <section key={document.title} className="mt-8"><h2 className="text-xl font-semibold">{document.title}</h2><div className="mt-4 break-words rounded-lg border bg-white p-5 leading-8"><NoticeBody content={document.content} /></div></section>)}
     <section className="mt-8 rounded-lg border p-5"><h2 className="font-semibold">개인정보 문의창구</h2>{profile?.privacyOfficerName && <p className="mt-3">개인정보 보호책임자: {profile.privacyOfficerName}</p>}{profile?.privacyOfficerEmail && <p>이메일: <a href={`mailto:${profile.privacyOfficerEmail}`}>{profile.privacyOfficerEmail}</a></p>}{profile?.privacyOfficerPhone && <p>전화: {profile.privacyOfficerPhone}</p>}<p className="mt-3"><Link to="/contact" className="text-blue-700">Neture 문의창구</Link>를 통해 권리 행사와 개정 의견을 접수할 수 있습니다.</p></section>
-  </main>;
+  </article>;
 }
 
 /** Render the limited headings, tables and paragraphs in the reviewed notice sources. */
