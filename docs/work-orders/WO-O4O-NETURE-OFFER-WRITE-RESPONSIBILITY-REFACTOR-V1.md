@@ -72,5 +72,10 @@ AST 동일성을 구분해 확인한다. 초기 본문 동일 증적은 당시 �
 판정 전 rollback/release를 추가 검증했다. DB 호출/바인딩 36개의 다중집합과 공개 signature 20개,
 다른 moved method 12개 및 순수 함수 3개 본문은 동일하다.
 
+후속 PR review에서 추출 시 동적 VALUES의 `$` 누락을 발견해 원래 `$2`, `$3` bind marker를 복원했다.
+생성된 INSERT SQL의 VALUES와 placeholder 집합 검증을 추가했다. 정적 query call 비교는 SQL을
+만드는 외부 변수의 동등성까지 증명하지 못하므로, 이 부분은 실제 생성 SQL assertion과 별도
+VALUES initializer AST 비교로 보완한다. 수정 전 보완본은 운영에 배포되지 않았다.
+
 사용자는 병행 PharmacyHub 정리 중 WIF 임시 차단 유지를 지정했다. main 통합과 배포를 구분하고,
 차단 해제 전 실제 배포 및 새 코드의 운영 검증을 완료했다고 보고하지 않는다.

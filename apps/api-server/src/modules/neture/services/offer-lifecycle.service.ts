@@ -238,7 +238,7 @@ export class OfferLifecycleService {
     const keys = serviceKeys?.length ? serviceKeys : [];
     const uniqueKeys = [...new Set(keys)];
     if (uniqueKeys.length === 0) return false;
-    const values = uniqueKeys.map((_, i) => `($1, ${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+    const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
     await queryRunner.query(
       `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
              VALUES ${values}

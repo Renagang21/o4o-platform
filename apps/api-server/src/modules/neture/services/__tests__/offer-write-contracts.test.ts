@@ -127,6 +127,8 @@ describe('operator decisions: idempotency, permit and atomic service approvals',
     await runDecision(method);
     const insert = tx.query.mock.calls.find(([sql]) => sql.includes('INSERT INTO offer_service_approvals'));
     expect(insert?.[1]).toEqual(['offer-fixture', 'kpa-society', 'k-cosmetics']);
+    expect(insert?.[0]).toContain("VALUES ($1, $2, 'pending', NOW(), NOW()), ($1, $3, 'pending', NOW(), NOW())");
+    expect([...new Set(insert?.[0].match(/\$\d+/g))]).toEqual(['$1', '$2', '$3']);
     expect(insert?.[0]).toContain('ON CONFLICT (offer_id, service_key) DO NOTHING');
     expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
     expect(events).toEqual(['startTransaction', 'select', 'write', 'write', 'sync', 'commitTransaction', 'release']);
