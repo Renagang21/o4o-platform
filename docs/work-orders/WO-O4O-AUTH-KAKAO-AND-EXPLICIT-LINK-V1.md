@@ -465,3 +465,18 @@ privacy가 먼저 게시된 경우에도 공통 terms/privacy의 표식과 versi
 API build PASS. main #484 충돌은 리소스별428·매장 사업 현황을 함께 유지했으며 기존 공급자 관리
 대표 진입이 약관 설정으로 바뀌지 않도록 화면 목록 우선순위를 보존했다. 관련 UI100 PASS/8 files,
 최신 Neture build와 PC/mobile 합성 gate18 PASS. 공고·시행은 여전히 실제 배포 검증 및30일 기간 이후다.
+
+
+### 가입 origin 전체의 공통 준비 판정 및 CI 소비처 보완
+
+약국이 legacy KPA 문서를 선택하는 동안에도 Neture 공통 terms/privacy를 별도로 대조한다.
+Neture privacy-first 상태에서 약국 origin의 이메일·Google·카카오 참조 있음/없음 가입 6건을 추가해
+최신 실제 PG 전체73 PASS/4 suites/0 SKIP, 가입 단위156 PASS/4 suites를 확인했다.
+Google 동의 화면의 정책 로딩·실패 시 다른 서비스 개인정보 링크를 노출하지 않으며, 소유권 조회 뒤
+정확한 링크를 제공한다(auth UI204 PASS/17 files). 기존 controller 테스트에는 실제 현재 privacy
+조회 fixture를 보완했고, stale 신청 테스트는 읽기 잠금과 write가 없음을 구분한다. 커뮤니티 탈퇴
+후 재조회는 정책 조회와 access 조회를 각각 검사한다. 새 약관 관리 route가 펀딩의 주 업무 진입을
+대체하지 않도록 home entry에서 보조 설정 경로를 구분했다(Neture 전체582 PASS/68 files).
+
+한국 날짜가 넘어가 아직 공개하지 않은 공고 예정일을2026-10-12로 정정했다. 시행 예정일
+2026-11-13은30일 이상을 유지한다. 실제 공개 시각 확인 전 공고 완료로 기록하지 않는다.

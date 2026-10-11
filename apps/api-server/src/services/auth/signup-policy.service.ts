@@ -2,7 +2,7 @@ import type { DataSource, EntityManager } from 'typeorm';
 import { resolveSessionServiceKey } from '../../utils/session-origin.js';
 import { policyAcceptanceService, PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 import { isCommonAccountTermsDocument, type PublishedTermsDocument } from '../../common/auth/terms-acceptance.policy.js';
-import { readCurrentPolicyDocument, recordPublishedPolicyEvidence } from '../../modules/policy-acceptance/policy-document-evidence.service.js';
+import { readCurrentPolicyDocument, recordPublishedPolicyEvidence, type CurrentPolicyDocument } from '../../modules/policy-acceptance/policy-document-evidence.service.js';
 
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 
@@ -63,6 +63,17 @@ export async function recordSignupPrivacy(userId: string, reference: SignupTerms
 /** A marked account rollout requires a matching privacy document, never legacy privacy. */
 export async function readSignupPrivacyPolicy(q: Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>, terms: PublishedTermsDocument | null) {
   const privacy = await readCurrentPolicyDocument(q, terms?.serviceKey ?? 'neture', 'privacy');
+  // Pharmacy still owns its legacy documents, but the account-wide rollout must be ready for every signup origin.
+  if (terms?.serviceKey === 'kpa-society') {
+    const accountTerms = await policyAcceptanceService.getPublishedTermsForService('neture', q);
+    const accountPrivacy = await readCurrentPolicyDocument(q, 'neture', 'privacy');
+    assertCommonSignupPolicyPair(accountTerms, accountPrivacy);
+  }
+  assertCommonSignupPolicyPair(terms, privacy);
+  return privacy;
+}
+
+function assertCommonSignupPolicyPair(terms: PublishedTermsDocument | null, privacy: CurrentPolicyDocument | null): void {
   const commonTerms = isCommonAccountTermsDocument(terms);
   const commonPrivacy = privacy?.service_key === 'neture' && privacy.slug === 'neture-account-privacy';
   if ((commonTerms || commonPrivacy) && (!commonTerms || !privacy || !commonPrivacy
@@ -70,5 +81,4 @@ export async function readSignupPrivacyPolicy(q: Pick<DataSource, 'query'> | Pic
     || !privacy.title?.trim() || !privacy.content?.trim())) {
     throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '공통 약관과 개인정보 처리방침을 함께 준비하고 있습니다.', 503);
   }
-  return privacy;
 }

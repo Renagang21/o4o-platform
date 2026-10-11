@@ -10,7 +10,7 @@ function body(source: string, internalHeading: string) {
   return source.split(internalHeading)[0].split('\n').filter(line => !/^>( |$)|^# /.test(line))
     .map(line => line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')).join('\n').trim();
 }
-export const ACCOUNT_POLICY_NOTICE_DATE = '2026-10-11';
+export const ACCOUNT_POLICY_NOTICE_DATE = '2026-10-12';
 export const ACCOUNT_POLICY_EFFECTIVE_DATE = '2026-11-13';
 export default function AccountPolicyNoticePage() {
   const [profile, setProfile] = useState<{ privacyOfficerName?: string; privacyOfficerEmail?: string; privacyOfficerPhone?: string } | null>(null);

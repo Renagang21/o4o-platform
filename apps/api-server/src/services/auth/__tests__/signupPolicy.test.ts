@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { AppDataSource } from '../../../database/connection.js';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { signupPolicyKeyFromOrigin, resolveSignupPolicyServiceKey, recordSignupTerms } from '../signup-policy.service.js';
@@ -49,14 +50,18 @@ describe('published common-account rollout', () => {
     const common = { id: 'common-doc', serviceKey: 'neture', documentType: 'terms', title: 'Common', contentHash: 'h', version: active ? 2 : 1, slug: active ? 'neture-account-terms' : null };
     const pharmacy = { ...common, id: 'pharmacy-doc', serviceKey: 'kpa-society', title: 'Pharmacy', version: 1, slug: null };
     const spy = jest.spyOn(policyAcceptanceService, 'getPublishedTermsForService').mockImplementation(async key => key === 'neture' ? common : pharmacy);
+    const privacyQuery = jest.spyOn(AppDataSource, 'query').mockImplementation(async (_sql: string, params?: any[]) => [{
+      id: 'privacy-doc', service_key: params?.[0], document_type: 'privacy', version: params?.[0] === 'neture' && active ? 2 : 1,
+      title: 'Privacy fixture', content: 'Privacy body', slug: params?.[0] === 'neture' && active ? 'neture-account-privacy' : null,
+    }]);
     const req: any = { get: () => 'https://pharmacy.neture.co.kr' };
     const res: any = { set: jest.fn().mockReturnThis(), status: jest.fn().mockReturnThis(), json: jest.fn().mockReturnThis() };
     try {
       await SignupTermsController.get(req, res);
       const doc = active ? common : pharmacy;
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ policyDocumentId: doc.id, version: doc.version, termsHref: active ? 'https://neture.co.kr/terms' : 'https://pharmacy.neture.co.kr/policy' }) }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ policyDocumentId: doc.id, version: doc.version, privacyHref: active ? 'https://neture.co.kr/privacy' : 'https://pharmacy.neture.co.kr/privacy', privacyPolicy: expect.objectContaining({ version: doc.version }), termsHref: active ? 'https://neture.co.kr/terms' : 'https://pharmacy.neture.co.kr/policy' }) }));
       expect(res.set).toHaveBeenCalledWith('Cache-Control', 'no-store');
-    } finally { spy.mockRestore(); }
+    } finally { privacyQuery.mockRestore(); spy.mockRestore(); }
   });
 
   it.each([
@@ -78,7 +83,9 @@ describe('published common-account rollout', () => {
     const manager = { query: jest.fn() };
     try {
       await expect(recordSignupTerms('fixture-user', 'kpa-society', policy, manager as any)).rejects.toMatchObject({ code: 'POLICY_VERSION_MISMATCH' });
-      expect(manager.query).not.toHaveBeenCalled();
+      expect(manager.query).toHaveBeenCalledTimes(2);
+      expect(manager.query.mock.calls.every(([sql]) => sql.includes('pg_advisory_xact_lock_shared'))).toBe(true);
+      expect(manager.query.mock.calls.map(([,params]) => params[0])).toEqual(['service-policy:neture', 'service-policy:kpa-society']);
     } finally { spy.mockRestore(); }
   });
 });

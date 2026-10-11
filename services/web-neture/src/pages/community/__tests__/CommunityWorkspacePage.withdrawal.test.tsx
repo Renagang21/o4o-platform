@@ -19,7 +19,7 @@ let workspace: CommunityWorkspace;
 beforeEach(() => {
   get.mockReset(); post.mockReset();
   workspace = { communityKey: 'fixture', name: '테스트 커뮤니티', kind: 'independent', communityStatus: 'active', membershipStatus: 'active', allowed: true, canManage: false, canJoin: false, reason: null };
-  get.mockImplementation(async () => ({ data: { data: workspace } }));
+  get.mockImplementation(async (path: string) => ({ data: { data: path.endsWith('/enrollment-policies') ? [] : workspace } }));
 });
 afterEach(cleanup);
 const show = () => render(<MemoryRouter initialEntries={['/communities/fixture/forum']}><Routes><Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage view="members" />} /></Routes></MemoryRouter>);
@@ -52,7 +52,7 @@ describe('본인 탈퇴 화면과 서버의 커뮤니티 상태 일치', () => {
     await screen.findByRole('button', { name: '가입 신청', exact: true });
     expect(screen.queryByText('회원 목록')).toBeNull();
     expect(screen.queryByRole('button', { name: '이 커뮤니티 탈퇴' })).toBeNull();
-    await waitFor(() => expect(get).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(get.mock.calls.filter(([path]) => path === '/communities/fixture/access')).toHaveLength(2));
     expect(post).toHaveBeenCalledExactlyOnceWith('/communities/fixture/leave', {});
   });
 });

@@ -10,3 +10,10 @@ it('preserves the pharmacy privacy owner before the common rollout', async () =>
 it.each([null, { ...terms, slug: 'legacy-terms', version: 1 }, { ...terms, version: 1 }])('blocks privacy-first rollout before exposing a mixed policy set: %j', async term => {
   await expect(readSignupPrivacyPolicy({ query: jest.fn().mockResolvedValue([privacy]) }, term)).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE');
 });
+
+it('checks account-wide privacy-first readiness even while pharmacy still owns its legacy pair', async () => {
+  const q = { query: jest.fn(async (_sql: string, params: string[]) => params[0] === 'kpa-society'
+    ? [{ ...privacy, service_key: 'kpa-society', version: 1, slug: 'legacy-privacy' }]
+    : params[0] === 'neture' ? [privacy] : []) };
+  await expect(readSignupPrivacyPolicy(q, { ...terms, serviceKey: 'kpa-society', slug: 'legacy-terms', version: 1 })).rejects.toHaveProperty('code', 'POLICY_UNAVAILABLE');
+});

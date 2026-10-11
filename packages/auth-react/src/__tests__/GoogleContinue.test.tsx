@@ -264,3 +264,21 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     expect(second.getConfig).not.toHaveBeenCalled();
   });
 });
+
+it('does not expose another service privacy link before policy ownership loads', async () => {
+  let resolve!: (doc: typeof TERMS) => void;
+  mount({ getSignupTerms: () => new Promise(r => { resolve = r; }), privacyHref: '/privacy', loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
+  await waitFor(() => expect(captured).not.toBeNull());
+  await act(async () => { captured!.onCredential('id-token'); });
+  await screen.findByTestId('google-continue-consent');
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+  await act(async () => { const doc = { ...TERMS, privacyHref: 'https://pharmacy.neture.co.kr/privacy' }; resolve(doc); });
+  expect((await screen.findByRole('link', { name: '개인정보 처리방침 내용 보기' })).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
+});
+it('does not expose a fallback privacy link after policy lookup fails', async () => {
+  mount({ getSignupTerms: async () => { throw new Error('unavailable'); }, privacyHref: '/privacy', loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
+  await waitFor(() => expect(captured).not.toBeNull());
+  await act(async () => { captured!.onCredential('id-token'); });
+  await screen.findByRole('alert');
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+});
