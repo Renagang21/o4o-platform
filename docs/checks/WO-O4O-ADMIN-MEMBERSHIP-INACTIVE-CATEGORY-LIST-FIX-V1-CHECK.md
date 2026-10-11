@@ -1,5 +1,7 @@
 # WO-O4O-ADMIN-MEMBERSHIP-INACTIVE-CATEGORY-LIST-FIX-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **작업일:** 2026-08-03
 **판정:** PASS
 **운영 데이터 write:** 0건
@@ -271,7 +273,7 @@ DB schema·migration / API prefix 정비 / 공용 Membership 구조 리팩터링
 ## 16. 미검증 항목
 
 1. **운영 환경에서의 비활성 분류 표시** — `yaksa_member_categories` 운영 row 가 0건이라 표시할 데이터 자체가 없다. WO 지시에 따라 분류를 새로 만들지 않았다. 코드 경로 + 테스트 15건으로 대체 검증.
-2. **platform 관리자 계정 200 응답** — `docs/local/TEST-ACCOUNTS.local.md` 의 계정 3개 모두 `platform:admin` / `platform:super_admin` 이 아니다(전부 403). 대조군 `/api/v1/admin/users` 도 동일하게 403 이므로 이번 변경 고유의 문제는 아니다. 실제 200 렌더링은 플랫폼 관리자 계정 확보 후 후속 "관리자 화면 실제 관리 동선 검증" 단계에서 확인해야 한다.
+2. **platform 관리자 계정 200 응답** — `docs/local/TEST-ACCOUNT.txt` 의 계정 3개 모두 `platform:admin` / `platform:super_admin` 이 아니다(전부 403). 대조군 `/api/v1/admin/users` 도 동일하게 403 이므로 이번 변경 고유의 문제는 아니다. 실제 200 렌더링은 플랫폼 관리자 계정 확보 후 후속 "관리자 화면 실제 관리 동선 검증" 단계에서 확인해야 한다.
 3. `handleToggleActive` dead handler — 관측만, 수정 대상 아님.
 4. 브라우저 실측 smoke — 위 2번 사유로 미실시.
 

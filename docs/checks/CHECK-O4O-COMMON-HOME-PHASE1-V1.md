@@ -1,5 +1,7 @@
 # CHECK-O4O-COMMON-HOME-PHASE1-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-COMMON-HOME-PHASE1-V1` — `neture.co.kr/` 를 O4O 전체 서비스 대표 진입점으로 전환 (Phase 1)
 > 작업일: 2026-09-08 · 대상: `services/web-neture`
 
@@ -182,7 +184,7 @@ web-neture 안에 두었다(공유 패키지 변경은 전 서비스 재빌드 +
 | 10 | `/supplier/products` (하위 route) | PASS — `접근 권한이 없습니다`. smoke 계정이 supplier 역할이 아니어서 나오는 **기존 역할 가드 동작**이며 `/` 로 튕기지 않음 |
 | 11 | `/handoff` | PASS — `/handoff` 유지(외부 복귀 처리 화면), `/` 로 덮어쓰지 않음 |
 
-smoke 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 Neture admin/operator 계정 (자격정보 본 문서 미기재).
+smoke 계정: `docs/local/TEST-ACCOUNT.txt` 의 Neture admin/operator 계정 (자격정보 본 문서 미기재).
 
 ---
 

@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-B2B-CANONICAL-END-TO-END-POSITIVE-SMOKE-V2
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > `o4o_payments` production 적용 후 Neture B2B canonical buyer flow 재검증(positive smoke).
 > **결과: PASS (prepare 까지 실데이터 성공 — V1 blocker 해소). Toss 결제 완료~bridge~supplier 노출은 interactive Toss sandbox 부재로 DEFERRED.**
 > 상위: `CHECK-O4O-NETURE-B2B-CANONICAL-END-TO-END-POSITIVE-SMOKE-V1` · `CHECK-O4O-PAYMENTCORE-O4O-PAYMENTS-MIGRATION-RELOCATE-V1` — 2026-06-12
@@ -43,7 +45,7 @@
 - legacy `/neture/seller/orders` → 410 retired(P2e). canonical buyer 경로만 사용.
 
 ## 6. 자격증명 주의 (SSOT 정합)
-- **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNTS.local.md 는 gitignore, 본 CHECK 에서 미수정.)
+- **로컬 SSOT 의 약국경영자 행이 stale** — 로컬 문서 갱신 권장(값은 본 CHECK 에 미기록). (TEST-ACCOUNT.txt 는 gitignore, 본 CHECK 에서 미수정.)
 
 ## 7. 생성 자원 / 정리 대상 (§17)
 | 자원 | id |
@@ -61,7 +63,7 @@
 ## 9. 남은 GAP · 후속
 - **Toss sandbox 결제 완료 1건**(Phase 4~6) → 브라우저로 `/store/payment?paymentGroupId=pg_690147fb...` 결제 후 confirm→paid→bridge→supplier unified view 노출 확인(SMOKE-V3 또는 수동).
 - `IR-O4O-API-SERVER-ORPHANED-SRC-MIGRATIONS-AUDIT-V1`(src/migrations 잔여 38개 — 동일 미적용 위험), `IR-O4O-NETURE-B2B-PRIVATE-OFFER-APPROVAL-GATE-AUDIT-V1`.
-- TEST-ACCOUNTS.local.md 약국경영자 비밀번호 행 갱신(로컬).
+- TEST-ACCOUNT.txt 약국경영자 비밀번호 행 갱신(로컬).
 
 ---
 

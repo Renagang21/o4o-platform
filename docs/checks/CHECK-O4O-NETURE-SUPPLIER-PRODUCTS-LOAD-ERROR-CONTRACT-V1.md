@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 WO: `WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1`
 대상: 공급자 상품 목록 조회 오류 계약
 작성일: 2026-07-26 (KST)
@@ -166,7 +168,7 @@ export const SUPPLIER_PRODUCTS_LOAD_FAILED = 'SUPPLIER_PRODUCTS_LOAD_FAILED';
 **텔레메트리**: page error **0** · mutation(POST/PUT/DELETE) 요청 **0**.
 console error 는 **주입한 500 자체**에 대한 브라우저 기본 로그뿐이며, 정상 시나리오(A·B·E)에서는 0.
 
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서 스크립트가 직접 읽고 명령행·로그에 남기지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서 스크립트가 직접 읽고 명령행·로그에 남기지 않았다.
 
 ## 8. 반응형 결과
 

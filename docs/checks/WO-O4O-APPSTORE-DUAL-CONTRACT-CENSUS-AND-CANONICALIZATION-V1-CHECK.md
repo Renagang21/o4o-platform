@@ -1,5 +1,7 @@
 # WO-O4O-APPSTORE-DUAL-CONTRACT-CENSUS-AND-CANONICALIZATION-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - 작성일: 2026-08-21
 - 대상: `/api/v1/appstore` (정적 카탈로그 + ModuleLoader in-memory) vs `/api/v1/admin/apps` (DB `app_registry`)
 - 판정: **A. ADMIN_APPS_CANONICAL**
@@ -201,7 +203,7 @@ retire 방식은 §12 지시대로 **404(라우트 미등록)** 를 택했다 �
 | `/health` | 200 |
 | `/health/database` | `status: healthy` (pingMs 4) |
 
-> `platform:super_admin` 자격증명이 `TEST-ACCOUNTS.local.md` 에 없어
+> `platform:super_admin` 자격증명이 `TEST-ACCOUNT.txt` 에 없어
 > `/admin/apps` 의 **허용(200) 경로는 production 에서 검증하지 못했다.** 401/403 차단만 확인했다.
 > §14 지시대로 production 에서 실제 install/uninstall write 는 수행하지 않았다.
 

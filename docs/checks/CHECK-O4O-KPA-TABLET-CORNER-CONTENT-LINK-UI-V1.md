@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1`
 > 선행: `WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1`(스키마+API) · `WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1`(탭 분리)
 > 성격: 프론트 — 코너별 운영 탭을 **연결(store_tablet_corner_contents) 모델**에 배선.
@@ -71,7 +73,7 @@
 | 사장 코드 제거 확인 | ✅ tsc TS6133 로 잔여 import 2건 검출 → 제거 후 0 |
 | DB/API 변경 | **없음**(기존 엔드포인트만 소비) |
 
-> **브라우저 스모크 = 미실시(DEFERRED)** — 매장 owner 인증 필요. 배포 후 약국 계정(SSOT=`docs/local/TEST-ACCOUNTS.local.md`)으로 실측 권장:
+> **브라우저 스모크 = 미실시(DEFERRED)** — 매장 owner 인증 필요. 배포 후 약국 계정(SSOT=`docs/local/TEST-ACCOUNT.txt`)으로 실측 권장:
 > 1. 코너에 여러 콘텐츠 연결 · 동일 콘텐츠 다중 코너 연결 · 중복 차단
 > 2. 빠른 교체(초안 확인 경로 포함) · 적용 해제
 > 3. 현재 콘텐츠 연결 해제 → 409 안내 · 비현재 해제 성공

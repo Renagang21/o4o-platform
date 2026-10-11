@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-LOAD-ERROR-CONTRACT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 WO: `WO-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-LOAD-ERROR-CONTRACT-V1`
 대상: `/supplier/partner-commissions` — 목록 조회 오류 계약
 작성일: 2026-07-25 (KST)
@@ -204,7 +206,7 @@ API(`api.neture.co.kr`)는 실제 프로덕션을 그대로 사용했다. 오리
 **텔레메트리**: page error 0 · 주입분 외 4xx/5xx 0 · mutation 요청 0.
 console error 2건은 **주입한 500 자체**에 대한 브라우저 기본 로그이며 결함이 아니다(정상 시나리오 A·D 에서는 0).
 
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서 스크립트가 직접 읽고, 명령행·로그에 남기지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서 스크립트가 직접 읽고, 명령행·로그에 남기지 않았다.
 
 ## 11. 반응형 (오류 카드)
 

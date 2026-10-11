@@ -1,5 +1,7 @@
 # CHECK — O4O Cross-Service Self-Profile Write Contract V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: [`WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1`](../work-orders/WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1.md)
 - **선행**: [`CHECK-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1`](CHECK-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1.md) (§11 MUST_FIX #6·#7·#8)
 - **작성일**: 2026-08-18
@@ -190,7 +192,7 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 | 5 | PharmacyHub store_owner (`pharmacy-hub`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
 | 6 | KPA-Society (`kpa-society`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
 
-- 계정은 전부 `docs/local/TEST-ACCOUNTS.local.md` 의 테스트 계정. 실사용자 계정 write 0.
+- 계정은 전부 `docs/local/TEST-ACCOUNT.txt` 의 테스트 계정. 실사용자 계정 write 0.
 - 수정 대상은 `nickname` 1개 필드뿐이며 6건 모두 원래 값으로 복원 후 재조회로 확인했다 (원복 실패 0).
 - role / status / membership / service_credentials / businessInfo / organizations write 0.
 
@@ -205,7 +207,7 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 | 5 | K-Cosmetics — `/mypage/profile` | **미수행** | SKIPPED |
 | 6 | Neture — `/mypage/profile` | **미수행** | SKIPPED |
 
-**5·6 SKIPPED 사유 (숨기지 않고 명시)** — 두 사이트는 브라우저에 저장된 자격증명이 없어 로그인 폼 자동 채움이 되지 않는다. 자격증명을 자동화 입력으로 넘기려면 `docs/local/TEST-ACCOUNTS.local.md` 의 비밀번호를 평문으로 노출해야 하는데, 이는 §15 자격증명 취급 원칙 위반이므로 수행하지 않았다 (자격증명을 로컬에서 브라우저로 전달하는 우회 경로도 환경 정책상 차단됨).
+**5·6 SKIPPED 사유 (숨기지 않고 명시)** — 두 사이트는 브라우저에 저장된 자격증명이 없어 로그인 폼 자동 채움이 되지 않는다. 자격증명을 자동화 입력으로 넘기려면 `docs/local/TEST-ACCOUNT.txt` 의 비밀번호를 평문으로 노출해야 하는데, 이는 §15 자격증명 취급 원칙 위반이므로 수행하지 않았다 (자격증명을 로컬에서 브라우저로 전달하는 우회 경로도 환경 정책상 차단됨).
 
 잔여 미확인 범위는 두 서비스의 화면 렌더링뿐이다.
 

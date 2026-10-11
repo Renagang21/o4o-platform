@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-ADMIN-USERS-SCOPE-BROWSER-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **검증 보고서 (Verification Report)**
 >
 > 코드 수정 없음 / 데이터 수정 없음
@@ -180,7 +182,7 @@ if (!scope.isPlatformAdmin) {
 | 우선순위 | 항목 |
 |---------|------|
 | 권장 | Neture web 브라우저 직접 접속 후 화면 렌더 결과(탭 카운트 UI 표기, 리스트 행 표시, 모바일 레이아웃) 사용자 관측 후 사진/메모 공유 |
-| 권장 | `TEST-ACCOUNTS.local.md` (CLAUDE.md §15 SSOT) 신설 — 본 검증에서 부재로 인증 절차가 사용자 수동 입력에 의존했음 |
+| 권장 | `TEST-ACCOUNT.txt` (CLAUDE.md §15 SSOT) 신설 — 본 검증에서 부재로 인증 절차가 사용자 수동 입력에 의존했음 |
 | 후속 IR | `IR-O4O-BOUNDARY-POLICY-PLATFORM-ADMIN-EXEMPTION-V1` — backend platform admin "무필터" 분기의 정책 정합 검토 |
 | 데이터 보강 시 재검증 | supplier/partner/seller 탭 동작 — Neture supplier/partner/seller role 보유자 발생 시점 |
 

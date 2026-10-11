@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
 > **일자**: 2026-09-15
 > **범위**: `neture.co.kr` 대표 홈(O4O 계정 · 로그인 · 회원가입 · 내 정보 · `O4O 로그아웃`) 과 공급자 · 파트너 **서비스**(각각 독립된 신청 · 승인 · 이용 상태) 의 분리. 서비스 이탈 ≠ 대표 로그아웃. 서버 권한은 서비스별 이용 상태로 판정.
@@ -102,7 +104,7 @@
 
 ## 4. 실 화면 검증 (운영, 배포 후)
 
-- 방법: Playwright(node 스크립트, 독립 context · bfcache 기본 비활성 스위치 제거) 로 `https://neture.co.kr` 운영 화면 실행. 계정은 `docs/local/TEST-ACCOUNTS.local.md` 의 공급자 승인(ACTIVE) 계정 · 관리자(neture:admin) 계정. **운영 회원 상태는 변경하지 않았고 신청 폼은 제출하지 않았다.**
+- 방법: Playwright(node 스크립트, 독립 context · bfcache 기본 비활성 스위치 제거) 로 `https://neture.co.kr` 운영 화면 실행. 계정은 `docs/local/TEST-ACCOUNT.txt` 의 공급자 승인(ACTIVE) 계정 · 관리자(neture:admin) 계정. **운영 회원 상태는 변경하지 않았고 신청 폼은 제출하지 않았다.**
 - 캡처: `01-prelogin-desktop/mobile` · `02-supplier-home-desktop` · `02-supplier-home-account-menu` · `02-supplier-home-mobile-menu` · `03-supplier-dashboard` · `04-partner-gate-none` · `05-partner-landing-apply` · `05-supplier-landing-active` · `06-after-logout-tab2` · `06-after-logout-tab1-crosstab` · `07-supplier-landing-header-logout` · `08-back-after-logout` · `09-operator-partners` · `10-admin-partner-dashboard` (세션 스크래치, 저장소 미포함).
 
 ### 4-1. 상태별 결과

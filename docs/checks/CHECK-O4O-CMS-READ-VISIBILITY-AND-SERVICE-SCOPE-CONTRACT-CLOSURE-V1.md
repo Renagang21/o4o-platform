@@ -1,5 +1,7 @@
 # CHECK-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **대상 WO**: WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
 **기준 commit**: `d9ecc678a` (origin/main)
 **작성일**: 2026-08-21
@@ -399,7 +401,7 @@ HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
 행: "인증된 비-platform-admin(일반 관리자·서비스 회원) + serviceKey 생략 → 400"
 ```
 
-프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNTS.local.md` 기준 **verified 계정은
+프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNT.txt` 기준 **verified 계정은
 `renariver21`(platform:super_admin) 하나뿐**이고 나머지 L2 는 전부 `unknown`,
 내 매장 검증 계정 2건은 `suspended` 다. 재활성화는 **프로덕션 write** 라 이 WO 가 금지한다.
 
@@ -470,7 +472,7 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 ### BLOCKED 해소 — §10-3 의 미실측 1건을 이번에 실측
 
 §10-3 은 “인증된 비-platform-admin + `serviceKey` 생략 → 400” 을 **계정 근거 부재로 BLOCKED** 처리했다.
-이번에 `docs/local/TEST-ACCOUNTS.local.md` §1 의 **verified L1 자격 2건**으로 실측했다 (read-only, write 0).
+이번에 `docs/local/TEST-ACCOUNT.txt` §1 의 **verified L1 자격 2건**으로 실측했다 (read-only, write 0).
 
 | 계정 성격 (역할 요약) | `/cms/contents` 생략 | `/cms/stats` 생략 | `?serviceKey=kpa-society` |
 |---|---|---|---|

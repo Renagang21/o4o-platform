@@ -1,12 +1,14 @@
 # CHECK — WO-O4O-STORE-HUB-ALL-SERVICES-PRODUCTION-ADOPTION-AND-E2E-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **상태**: `COMPLETE` (2026-08-14 갱신 — 후속 WO 로 blocker 해소 후 4/4 PASS)
 - **이전 상태**: `INCOMPLETE — BLOCKED` (B1·B2 미해소 시점 판정)
 - **후속 문서**: [CHECK-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1](CHECK-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1.md)
 - **작성일**: 2026-08-14
 - **대상 서비스**: KPA-Society · K-Cosmetics · Pharmacy-Hub (4개)
 - **검증 방식**: 프로덕션 실브라우저(Playwright chromium) 실로그인 · desktop(1440×900) + mobile(390×844, iPhone UA, isMobile/hasTouch)
-- **검증 계정**: `docs/local/TEST-ACCOUNTS.local.md` 매장 경영자 계정 (SSOT)
+- **검증 계정**: `docs/local/TEST-ACCOUNT.txt` 매장 경영자 계정 (SSOT)
 
 > **결론 먼저 (최종)**: 4개 서비스 모두 `로그인 → Store Hub 진입 → 상품 탐색 → 상세(또는 계약상 대체)
 > → 신청/가져오기 → 장바구니 → 주문 진입` 을 desktop·mobile 양쪽에서 통과한다.

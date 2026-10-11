@@ -1,11 +1,13 @@
 # CHECK — O4O Cross-Service Operator Forum Axis · Live Smoke V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 배포 후 Forum 축 3서비스 라이브 smoke. destructive action 은 **실행하지 않고** 버튼/확인 UI 표시만 확인.
 >
 > - 일자: 2026-06-16
 > - 대상: KPA-Society / K-Cosmetics operator 화면 (deployed)
 > - 검증 커밋: `b7c41195`(forum-categories) 포함된 배포 — Web Services deploy run `27622907554`(sha `a4e93fc1e`, success) 기준
-> - 도구: Playwright(chromium, headless), 운영자 통합 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 비기재)
+> - 도구: Playwright(chromium, headless), 운영자 통합 계정(SSOT `docs/local/TEST-ACCOUNT.txt`, env 주입 — 자격증명 비기재)
 >
 > ## 판정: **PASS** (3서비스)
 

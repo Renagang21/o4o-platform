@@ -1,5 +1,7 @@
 # CHECK-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **대상 IR**: IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1
 - **기준**: `origin/main` (조사 시작 HEAD `638ca7293`)
 - **일자**: 2026-08-12
@@ -152,4 +154,4 @@
 | KPA `/operator/members` → 더보기 → 비밀번호 변경 (`[REDACTED_EMAIL]`) | **PASS** — "대상 서비스 **KPA-Society** / 이 서비스의 로그인 비밀번호만 변경됩니다" 표시. 수정 전에는 후보 0 안내였다. |
 | 동상 (`[REDACTED_EMAIL_B]`) | **PASS** — 동일하게 KPA-Society 자동 확정 |
 | 실제 비밀번호 제출 | **수행하지 않음.** 후보 확정까지만 확인했고 `변경` 은 누르지 않았다(운영 데이터 write 회피). |
-| `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |
+| `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNT.txt` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |

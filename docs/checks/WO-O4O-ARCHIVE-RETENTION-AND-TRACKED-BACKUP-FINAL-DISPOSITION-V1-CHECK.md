@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 상태: CLOSED (CI 4/4 success · 2026-09-11)
 > 작성일: 2026-09-11
 > 기준 origin/main: `6ae74cbd6` → rebase `d0eaa24a4` (worktree `work/o4o-archive-disposition-v1`)
@@ -117,7 +119,7 @@
 | `tmp/**` (범위 밖 · 보고) | 0 | 6 파일 | §11 인계 |
 
 `docs/archive` 상세:
-- secret 패턴 2건 = IR 본문의 **요청 형태 예시** (`operator@example.com` · `ir-supplier-test@o4o.com` 계정의 placeholder 비밀번호). 실제 자격정보 여부: `docs/local/TEST-ACCOUNTS.local.md` 미일치 · 다른 추적 파일 0 · placeholder 어휘 포함 → **실 secret 아님**.
+- secret 패턴 2건 = IR 본문의 **요청 형태 예시** (`operator@example.com` · `ir-supplier-test@o4o.com` 계정의 placeholder 비밀번호). 실제 자격정보 여부: `docs/local/TEST-ACCOUNT.txt` 미일치 · 다른 추적 파일 0 · placeholder 어휘 포함 → **실 secret 아님**.
 - 개인정보 패턴 = 검증에 사용된 계정 이메일 6개(개발자·검증 tenant 계정) 와 휴대전화 형태 5개(테스트 fixture 값 · 1건은 CSV 바코드 숫자열 오탐). 제3자 실사용자 개인정보로 확인된 항목 0. 기록물 본문은 수정하지 않는다(`CLAUDE.md §16-1`) — 계정 마스킹이 필요하다고 판단되면 별도 문서 정비 WO.
 
 **ARCHIVE_SECRET_EXPOSURE = ZERO** (중지 조건 §14-4 비발동 · Git 이력 제거·rotation 불요).

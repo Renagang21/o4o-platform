@@ -1,5 +1,7 @@
 # CHECK — O4O Tablet Canonical Production Closure V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **WO**: `WO-O4O-TABLET-CANONICAL-PRODUCTION-CLOSURE-AND-COMMON-CORE-BOUNDARY-V1` §1~§4
 **작업일**: 2026-09-08
 **선행 commit**: `7971407f0` (WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1)
@@ -50,7 +52,7 @@ Cloud Run revision: `o4o-core-api` **`03545` → `03546-wjg`**, `kpa-society-web
 
 ## 4. Browser E2E (production)
 
-인증은 `TEST-ACCOUNTS.local.md §4-2` 의 L1 토큰 주입을 썼다(서비스 웹 로그인은 §2 자격이
+인증은 `TEST-ACCOUNT.txt §4-2` 의 L1 토큰 주입을 썼다(서비스 웹 로그인은 §2 자격이
 unknown 이라 불가). 문서 규정대로 **"로그인 자체" 는 이 회차의 검증 대상이 아니다.**
 
 | # | 시나리오 | 결과 | 실측 |

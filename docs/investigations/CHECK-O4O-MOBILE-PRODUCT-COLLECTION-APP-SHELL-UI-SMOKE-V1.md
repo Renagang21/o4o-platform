@@ -1,5 +1,7 @@
 # CHECK-O4O-MOBILE-PRODUCT-COLLECTION-APP-SHELL-UI-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > 모바일 상품 수집 앱 Shell 의 **UI 육안 smoke** 시도 및 코드 레벨 감사 보고.
 >
 > WO: `WO-O4O-MOBILE-PRODUCT-COLLECTION-APP-SHELL-UI-SMOKE-V1`
@@ -111,7 +113,7 @@ npx expo start          # QR → Expo Go(실기기) 또는 a(에뮬레이터)
 12. Metro 콘솔에 red box / warning 없는지
 ```
 
-> 계정: `docs/local/TEST-ACCOUNTS.local.md` (SSOT). 제출 시 disposable 데이터는 상세/목록에서 확인 후 운영자 검토 큐에 노이즈가 되지 않도록 `[SMOKE]` 표기 권장(아카이브 API 는 현재 UI 미노출).
+> 계정: `docs/local/TEST-ACCOUNT.txt` (SSOT). 제출 시 disposable 데이터는 상세/목록에서 확인 후 운영자 검토 큐에 노이즈가 되지 않도록 `[SMOKE]` 표기 권장(아카이브 API 는 현재 UI 미노출).
 
 ---
 

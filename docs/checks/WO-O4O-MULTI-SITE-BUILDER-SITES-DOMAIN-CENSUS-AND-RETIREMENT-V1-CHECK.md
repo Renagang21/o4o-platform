@@ -1,5 +1,7 @@
 # WO-O4O-MULTI-SITE-BUILDER-SITES-DOMAIN-CENSUS-AND-RETIREMENT-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작성일**: 2026-08-21
 - **대상**: `modules/sites/*`, `Site` entity, `database/entities.ts` 등록, Multi-Site Builder 잔여 계약
 - **최종 판정**: **`RETIRE_CONFIRMED`**
@@ -282,7 +284,7 @@ sites ≠ branch_sites
 검증 한계(숨기지 않고 기록):
 
 - `/service/templates` · `/service-admin/templates` 는 `platform:super_admin` 급 권한을 요구한다.
-  `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정(`[REDACTED_EMAIL_D]` · `super-admin@o4o.com`) 의
+  `docs/local/TEST-ACCOUNT.txt` 에 해당 계정(`[REDACTED_EMAIL_D]` · `super-admin@o4o.com`) 의
   비밀번호가 없어 **200 본문까지는 확인하지 못했다.** 미인증 401 → 로그인 후 403 전이로
   "라우터가 mount 돼 있고 가드까지 도달하며 `sites` 관련 500 이 아니다" 까지만 확증했다.
   이번 WO 의 위험(entity 등록 제거로 인한 부팅/스키마 오류)은 이 범위에서 배제된다.
