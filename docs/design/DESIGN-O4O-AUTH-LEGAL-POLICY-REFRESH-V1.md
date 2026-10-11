@@ -52,10 +52,10 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 
 | 조사 대상 | 현재 코드 | 정렬할 계약 |
 | --- | --- | --- |
-| signup-policy.service.ts | 이번 구현: 모든 허용 가입 origin은 Neture 약관 선택; 기존 별도 약국 선택 제거 | 계정 생성은 Neture 공통 약관; 서비스 약관은 서비스 신청에서 분리 |
+| signup-policy.service.ts | 이번 구현: 새 표식 공통 약관 published 후 모든 허용 origin은 Neture 선택; 그 전에는 약국 기존 선택 유지 | 계정 생성은 Neture 공통 약관; 서비스 약관은 서비스 신청에서 분리 |
 | service-legal-scope.ts | legal key는 neture/kpa-society/k-cosmetics/lecture. supplier/community/funding 등의 관리 권한 매핑은 미연결; 게시 정책 공개 read는 catalog key에 연결 | 서비스/사업별 정책 소유권·조회·관리 scope를 현재 catalog/승인 원장과 연결; 도메인별 무작정 key 증설 금지 |
 | terms-acceptance.policy.ts | 이번 구현: Neture 공통 + 요청 서비스의 pending만 차단. 서버 소유 API 경로 우선, 공유 API는 서명된 세션 범위 | Neture 공통 계정 약관과 해당 서비스의 정책 gate를 분리; 무관한 서비스 차단 금지 |
-| policy-acceptance.service.ts | 이번 구현: 공통 약관은 물리 membership 없이 요구·승낙; 서비스 약관 membership 또는 실제 공급자/세미프랜차이즈 resolver 자격 확인. ID/version/hash 보존 | Neture 공통 동의 요구를 물리 Neture membership 생성에 의존하지 않음; 기존 이력 유지 |
+| policy-acceptance.service.ts | 이번 구현: 새 표식 공통 약관 published 후 물리 membership 없이 요구·승낙; 서비스 약관 membership 또는 실제 공급자/세미프랜차이즈 resolver 자격 확인. ID/version/hash 보존 | Neture 공통 동의 요구를 물리 Neture membership 생성에 의존하지 않음; 기존 이력 유지 |
 | admin-service-legal.controller.ts | publish 즉시 공개; 이전 published는 draft로 보존. version과 시행일은 입력 가능 | 새 draft·증가 version·본문 동일성 검증; 기존 row 덮어쓰기/삭제 금지 |
 | 정책 공개·pending 조회 | 이번 구현: 미래 effectiveDate 문서의 즉시 publish를 409로 거부. 공고·예약 공개 기능은 아직 없음 | 공고와 시행을 구분. 미래 시행일만 넣고 즉시 publish하면 안 됨 |
 
