@@ -92,3 +92,5 @@ Canonical 문서 작업 경계 정정: ACTIVE/FROZEN 여부와 관계없이 기�
 운영 apply `38096187400`은 실제 QR/tablet 2종을 읽기 전용으로 발견하고 preflight를 통과했으나 옛 호스트의 302/path/query HTTP 검증에서 실패했다. 변경 도구는 기존 URL map을 복구·대조한 뒤 원래 검증 오류로 종료했다. Cloud Run/backend/데이터 삭제는 수행하지 않았다. 리다이렉트 검증의 실패 호스트·경로 종류·HTTP status·Location 일치 여부를 식별자 없는 진단으로 보강한다. 후속 census는 현재 PH matcher와 DNS 주소 일치 여부·고정 synthetic 경로 HTTPS 결과를 읽기 전용으로 확인해 복구 상태 및 DNS/라우팅 원인을 조사한다. 실제 IP/Location/DB 행 원문은 보고하지 않는다.
 
 PR #438 리뷰 대응: `checkout_orders.metadata.serviceKey/source` 등 JSON/JSONB scope를 명시적으로 집계하고 해당 테이블을 FK 조사 집합에 포함했다. scalar/array scope와 JSONB scope는 겹칠 수 있으므로 건수를 합산해 삭제 총량으로 해석하지 않는다. 조사 도구 안전 테스트 7개, 리다이렉트 안전 진단 회귀 포함 focused tests 통과.
+
+PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sourceService/sourceModule/serviceKeys/scopeKey도 안전한 식별자 quoting과 함께 집계한다. cms_contents.serviceKey의 PH 건수/FK 포함 회귀를 추가했다. SonarCloud 지적의 finally 내부 throw를 제거하고 원래 query 오류를 보존하는 rollback 처리로 정리했다. HTTPS/DNS 진단은 독립 요청을 bounded timeout으로 병렬 조회하고 진단 helper를 분리했다. 관련 focused tests 42개가 통과했다. 이 환경의 직접 DNS는 권한 요청 후에도 ECONNREFUSED이므로 실제 DNS/HTTPS 판정은 Actions census 결과를 따른다.

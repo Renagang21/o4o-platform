@@ -89,3 +89,27 @@ test('HTTP/DNS census uses synthetic paths and reports no addresses or Location 
   assert.equal(result.checks[0].status,301);
   assert.equal(result.checks[0].hostMatch,false);
 });
+
+
+test('quoted camelCase scopes are counted, safely quoted and included in FK review',async()=>{
+  const client={query:async(sql,args)=>{
+    if(sql.includes('information_schema.columns'))return {rows:[{table_name:'cms_contents',column_name:'serviceKey',data_type:'character varying',udt_name:'varchar'}]};
+    if(sql.includes('count(*)')){assert.match(sql,/"serviceKey"::text/);assert.deepEqual(args,[retiredKeys]);return {rows:[{count:'4'}]};}
+    if(sql.includes('pg_constraint')){assert.deepEqual(args,[['cms_contents']]);return {rows:[]};}
+    return {rows:[]};
+  }};
+  const result=await collectRetirementInventory(client);
+  assert.deepEqual(result.scopeCounts,[{table:'cms_contents',column:'serviceKey',count:'4'}]);
+});
+
+test('rollback failures remain sanitized and do not replace an earlier query failure',async()=>{
+  await assert.rejects(collectRetirementInventory({query:async(sql)=>{
+    if(sql==='ROLLBACK')throw Object.assign(new Error('private rollback'),{code:'ECONNRESET'});
+    if(sql.includes('information_schema'))throw Object.assign(new Error('private query'),{code:'42501'});
+    return {rows:[]};
+  }}),error=>error.message.includes('42501')&&!error.message.includes('private'));
+  await assert.rejects(collectRetirementInventory({query:async(sql)=>{
+    if(sql==='ROLLBACK')throw Object.assign(new Error('private rollback'),{code:'ECONNRESET'});
+    return {rows:[]};
+  }}),error=>error.message.includes('ECONNRESET')&&!error.message.includes('private'));
+});

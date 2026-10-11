@@ -6,11 +6,11 @@ import { resolve4 } from 'node:dns/promises';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
 
 const identifiers = value => {
-  if (!/^[a-z][a-z0-9_]*$/.test(value)) throw new Error('Unsupported schema identifier');
+  if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) throw new Error('Unsupported schema identifier');
   return `"${value}"`;
 };
 export const retiredKeys = ['pharmacy-hub', 'pharmacy_hub', 'pharmacy_hub_cart'];
-const scopes = new Set(['service_key', 'service_code', 'source_service', 'service', 'source', 'source_module', 'service_keys', 'scope', 'scope_key', 'role', 'name', 'code']);
+const scopes = new Set(['service_key', 'service_code', 'source_service', 'service', 'source', 'source_module', 'service_keys', 'scope', 'scope_key', 'role', 'name', 'code', 'serviceKey', 'serviceCode', 'sourceService', 'sourceModule', 'serviceKeys', 'scopeKey']);
 
 export function countQuery(table, column, array = false) {
   const field = identifiers(column);
@@ -30,6 +30,7 @@ export function jsonScopeQuery(table, column) {
 export async function collectRetirementInventory(client) {
   await client.query('BEGIN READ ONLY');
   let failure;
+  let result;
   try {
     await client.query("SET LOCAL statement_timeout = '10s'");
     const { rows: columns } = await client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_name
@@ -61,14 +62,14 @@ export async function collectRetirementInventory(client) {
       WHERE c.contype='f' AND sn.nspname='public' AND tn.nspname='public'
         AND (source.relname=ANY($1::text[]) OR target.relname=ANY($1::text[]))
       ORDER BY source.relname,target.relname,c.conname`, [targets]);
-    return { readOnly:true, dedicatedTables,scopeCounts,foreignKeys,
+    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys,
       deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
   } catch (error) {
-    failure=error;
-    throw safeInventoryError(error,'retirement-inventory');
-  } finally {
-    try { await client.query('ROLLBACK'); } catch(error) { if (!failure) throw safeInventoryError(error,'retirement-rollback'); }
+    failure=safeInventoryError(error,'retirement-inventory');
   }
+  try { await client.query('ROLLBACK'); } catch(error) { failure ??= safeInventoryError(error,'retirement-rollback'); }
+  if (failure) throw failure;
+  return result;
 }
 
 export function collectCloudInventory(run = execFileSync) {
@@ -107,27 +108,33 @@ export function collectCloudInventory(run = execFileSync) {
   return result;
 }
 
+async function collectDns(host,apiAddresses,resolve) {
+  try {
+    const addresses=await resolve(host);
+    return {host,addressCount:addresses.length,matchesApiAddress:apiAddresses.length?addresses.some(a=>apiAddresses.includes(a)):null};
+  } catch { return {host,error:'DNS_UNAVAILABLE'}; }
+}
+
+async function collectHttpProbe(host,path,request) {
+  try {
+    const response=await request(`https://${host}${path}`,{redirect:'manual',signal:AbortSignal.timeout(15000)});
+    await response.body?.cancel();
+    const location=response.headers.get('location');
+    const target=location?new URL(location,`https://${host}`):null;
+    const expected=new URL(path.startsWith('/terms')?path.replace('/terms','/policy'):path,'https://pharmacy.neture.co.kr');
+    return {host,family:path.split('?')[0],status:response.status,locationPresent:!!location,hostMatch:target?.host===expected.host,pathMatch:target?.pathname===expected.pathname,queryMatch:target?.search===expected.search,schemeMatch:target?.protocol===expected.protocol};
+  } catch { return {host,family:path.split('?')[0],error:'HTTPS_UNAVAILABLE'}; }
+}
+
 export async function collectHttpInventory(request=fetch,resolve=resolve4) {
   const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
   const paths=['/','/qr/__ph_retirement_rule_check__?ruleCheck=1','/tablet/__ph_retirement_rule_check__?ruleCheck=1','/multilingual-products/__ph_retirement_rule_check__?ruleCheck=1','/foreign-visitor/affiliate/__ph_retirement_rule_check__?ruleCheck=1','/terms?ruleCheck=1'];
-  const result={readOnly:true,dns:[],checks:[]};
-  let apiAddresses=[];
-  try { apiAddresses=await resolve('api.neture.co.kr'); } catch { /* diagnostic only */ }
-  for(const host of hosts) {
-    try { const addresses=await resolve(host);result.dns.push({host,addressCount:addresses.length,matchesApiAddress:apiAddresses.length?addresses.some(a=>apiAddresses.includes(a)):null}); }
-    catch { result.dns.push({host,error:'DNS_UNAVAILABLE'}); }
-    for(const path of paths) {
-      try {
-        const response=await request(`https://${host}${path}`,{redirect:'manual',signal:AbortSignal.timeout(15000)});
-        await response.body?.cancel();
-        const location=response.headers.get('location');
-        const target=location?new URL(location,`https://${host}`):null;
-        const expected=new URL(path.startsWith('/terms')?path.replace('/terms','/policy'):path,'https://pharmacy.neture.co.kr');
-        result.checks.push({host,family:path.split('?')[0],status:response.status,locationPresent:!!location,hostMatch:target?.host===expected.host,pathMatch:target?.pathname===expected.pathname,queryMatch:target?.search===expected.search,schemeMatch:target?.protocol===expected.protocol});
-      } catch { result.checks.push({host,family:path.split('?')[0],error:'HTTPS_UNAVAILABLE'}); }
-    }
-  }
-  return result;
+  const apiAddresses=await resolve('api.neture.co.kr').catch(()=>[]);
+  const [dns,checks]=await Promise.all([
+    Promise.all(hosts.map(host=>collectDns(host,apiAddresses,resolve))),
+    Promise.all(hosts.flatMap(host=>paths.map(path=>collectHttpProbe(host,path,request)))),
+  ]);
+  return {readOnly:true,dns,checks};
 }
 
 if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
