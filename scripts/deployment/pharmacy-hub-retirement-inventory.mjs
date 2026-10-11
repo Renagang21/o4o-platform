@@ -138,15 +138,31 @@ export async function collectHttpInventory(request=fetch,resolve=resolve4) {
   return {readOnly:true,dns,checks};
 }
 
+export async function collectCensus(database, cloud = collectCloudInventory, http = collectHttpInventory) {
+  let databaseResult;
+  let failed = false;
+  try { databaseResult = await database(); }
+  catch (error) {
+    failed = true;
+    databaseResult = { readOnly: true, complete: false, error: safeInventoryError(error, 'retirement-census').message };
+  }
+  // Database failure must not conceal independent Cloud permission and redirect evidence.
+  return { failed, database: databaseResult, cloud: cloud(), http: await http() };
+}
+
 if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
   let client;
   try {
-    if (!process.env.DB_USERNAME||!process.env.DB_NAME) throw new Error('Database bindings missing');
-    const require=createRequire(new URL('../../apps/api-server/package.json',import.meta.url));
-    const { Client }=require('pg');
-    client=new Client({host:'127.0.0.1',port:55432,user:process.env.DB_USERNAME,database:process.env.DB_NAME,password:readPassword(),connectionTimeoutMillis:15000,options:'-c default_transaction_read_only=on'});
-    await client.connect();
-    console.log(JSON.stringify({database:await collectRetirementInventory(client),cloud:collectCloudInventory(),http:await collectHttpInventory()}));
+    const result = await collectCensus(async () => {
+      if (!process.env.DB_USERNAME||!process.env.DB_NAME) throw new Error('Database bindings missing');
+      const require=createRequire(new URL('../../apps/api-server/package.json',import.meta.url));
+      const { Client }=require('pg');
+      client=new Client({host:'127.0.0.1',port:55432,user:process.env.DB_USERNAME,database:process.env.DB_NAME,password:readPassword(),connectionTimeoutMillis:15000,options:'-c default_transaction_read_only=on'});
+      await client.connect();
+      return collectRetirementInventory(client);
+    });
+    console.log(JSON.stringify(result));
+    if (result.failed) process.exitCode=1;
   } catch(error) {
     console.error(safeInventoryError(error,'retirement-census').message);
     process.exitCode=1;
