@@ -118,6 +118,7 @@ test('PostgreSQL cleanup integration', { skip: !databaseUrl }, async t => {
     });
     for (const [kind, ddl, insert, value] of [
       ['UUID','ref uuid','($1::uuid)',ids.snapshot], ['uppercase text','ref text','($1::text)',ids.snapshot.toUpperCase()],
+      ['embedded text','ref text','($1::text)','snapshot/' + ids.snapshot + '/detail'],
       ['nested JSON','ref jsonb','($1::jsonb)',JSON.stringify({ nested: { selected: ids.snapshot } })],
       ['UUID array','ref uuid[]','($1::uuid[])',[ids.edit]],
       ['fixed text array','ref character(36)[]','($1::character(36)[])',[ids.control.toUpperCase()]],

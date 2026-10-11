@@ -51,3 +51,5 @@ AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이�
 PR #452는 필수 CI·CodeQL과 미해결 리뷰 blocker 없음 확인 후 main `1ef602d63`에 통합했다. 운영 read-only plan 38117865729는 SQLSTATE `57014`(statement timeout)로 실패했다. apply는 실행하지 않았고 삭제는 0행이다. 전체 참조 조사를 생략하지 않고 statement 제한을 15초에서 60초로 조정한다. 실패한 table은 SHA256의 앞 16자리로 구분해 데이터 원문이나 schema 식별자를 추가로 노출하지 않는다. 5초 lock 제한·정확한 digest·3행 범위·복구 및 보존 확인은 유지한다. 같은 WO의 보완 Phase로 기존 작업 worktree에서 새 연속 branch를 사용한다.
 
 보완 검토에서 고정 길이 문자·JSON/JSONB 배열의 참조도 native 배열 조사 목록에 포함했다. 격리된 PostgreSQL에서 이 3가지 배열의 외부 참조가 plan/apply를 차단하는 실제 SQL 검증을 추가했다. 삭제 대상 확장이나 운영 schema 변경은 없다.
+
+UUID 단독값뿐 아니라 경로·본문에 포함된 UUID 문자열도 scalar text 조사에서 차단하도록 보완했다. 실제 PostgreSQL의 embedded text 참조 테스트를 추가해 정규 UUID·대소문자·JSON 및 배열 참조와 함께 검증했다. 최초 Code Quality Check의 기존 커뮤니티 관리자 UI 테스트 1개 실패는 같은 UI 코드의 main/이전 CI 통과와 구분해서 기록하며, 해당 UI 코드는 이 WO에서 수정하지 않는다.
