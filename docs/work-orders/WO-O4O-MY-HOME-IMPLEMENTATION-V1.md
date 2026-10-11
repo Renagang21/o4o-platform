@@ -58,6 +58,10 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 - QR 통계는 기존 승인 매장 헤더와 소유권 판정을 유지한다. 일별 날짜·0 이상 정수 검증 후 반환된 날짜만 정렬해 표시하고, 빈 일별 기록·실제 0·오류를 구분한다. 표 접근도 유지한다. 같은 탭의 선택 정보에는 계정·organizationId만 보관하고 현재 매장 목록과 다시 대조한다.
 - API·권한·DB·원장·dependency·공유 패키지·배포 설정 변경은 없다. 운영 실제 계정 smoke는 지정 계정 문서 미확보로 계속 미실행이다. 검증·통합·배포 근거는 CHECK에 기록한다.
 
+구현은 PR #469로 main `1604014f98771a0b74861e6770382d1436510099`에 병합했다. 최종 PR HEAD `7a738a4545838685ea29111936b385e331c6902f`의 required CI Gate, API 세 묶음·품질·웹/Admin build, CodeQL·SonarCloud가 통과했다. 정본 추가 설명을 분리하라는 자동 리뷰 지적은 구현 PR에서 제외해 해결했다. 이후 문서-only Phase에서 정본의 실제 구현 상태와 배포 결과를 정합한다. 승인 근거는 사용자의 관련 문서 일괄 수정 및 My Home 진행·배포 지시이며, 새 사업 정책·권한 계약을 추가하는 작업은 아니다. 같은 미완료 WO branch를 유지한다.
+
+**이 Phase의 DEPLOYMENT = AUTOMATIC → DEPLOYED**다. 구현 SHA의 main CI가 통과한 뒤 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38129107503)가 Neture만 배포했고 최종 실제 서빙 SHA Report와 production status가 `DEPLOYED`로 완료됐다. API·다른 서비스는 이번 배포 대상이 아니며 API 소스·migration 차이 0이다. 새 migration·수동 DB write/DDL·Promote 실행은 없었다. Neture 전체 533개, 타입 포함 build, 로컬 fixture 27개와 운영 HTML/JS의 새 기능 포함·공개 화면/API ready 200·개인 API 비로그인 401·운영 번들 fixture 27개가 통과했다. 운영 번들 검증은 TLS 검증을 유지한 curl로 받은 자원을 로컬 origin에서 렌더링하고 모든 사용자 데이터·handoff를 fixture로 응답한 방식이다. 실제 로그인 검증은 계속 미실행이다. 이번 후속 정합은 문서-only이므로 `DEPLOYMENT = NOT_APPLICABLE`이며 runtime SHA와 문서 commit을 구분한다.
+
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
 초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. PR #449와 required CI를 통과해 main에 통합했으며, `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`의 promote 배포와 최종 서빙 SHA·공개 운영 검증이 완료됐다. 세부 run·기존 테스트 재실행 근거는 CHECK에 기록했다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
