@@ -61,10 +61,55 @@ export function ResourceNotice({
   );
 }
 const BOX = "rounded-2xl border border-slate-200 bg-white p-5";
+const isCount = (value: unknown): value is number =>
+  typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+const isDate = (value: unknown): value is string =>
+  typeof value === "string" && Number.isFinite(Date.parse(value));
+function RecordPages({
+  page,
+  total,
+  limit,
+  label,
+  onChange,
+}: {
+  page: number;
+  total: number;
+  limit: number;
+  label: string;
+  onChange: (page: number) => void;
+}) {
+  const pages = Math.max(1, Math.ceil(total / limit));
+  return (
+    <nav
+      aria-label={`${label} 페이지`}
+      className="mt-4 flex flex-wrap items-center gap-3 text-sm"
+    >
+      <button
+        type="button"
+        disabled={page <= 1}
+        onClick={() => onChange(page - 1)}
+        className="rounded-lg border px-3 py-2 disabled:opacity-40"
+      >
+        이전
+      </button>
+      <span aria-live="polite">
+        {page} / {pages} 페이지 · {total}건
+      </span>
+      <button
+        type="button"
+        disabled={page >= pages}
+        onClick={() => onChange(page + 1)}
+        className="rounded-lg border px-3 py-2 disabled:opacity-40"
+      >
+        다음
+      </button>
+    </nav>
+  );
+}
 export function MyHomeUnread({ accountId }: { accountId: string }) {
   const result = useMyHomeResource(accountId, async () => {
     const res = await api.get("/notifications/unread-count");
-    if (typeof res.data?.data?.count !== "number")
+    if (res.data?.success !== true || !isCount(res.data?.data?.count))
       throw new Error("Invalid count");
     return res.data.data.count as number;
   });
@@ -73,7 +118,10 @@ export function MyHomeUnread({ accountId }: { accountId: string }) {
       {result.data === undefined ? (
         <ResourceNotice error={result.error} reload={result.reload} />
       ) : (
-        <Link to="/mypage" className="text-blue-700 underline">
+        <Link
+          to="/mypage"
+          className="text-blue-700 underline"
+        >
           읽지 않은 알림 {result.data}건
         </Link>
       )}
@@ -88,24 +136,70 @@ type Notice = {
   createdAt: string;
 };
 export function MyHomeNotifications({ accountId }: { accountId: string }) {
-  const result = useMyHomeResource(accountId, async () => {
-    const [list, count] = await Promise.all([
-      api.get("/notifications", { params: { page: 1, limit: 5 } }),
-      api.get("/notifications/unread-count"),
-    ]);
-    if (
-      !Array.isArray(list.data?.data?.notifications) ||
-      typeof count.data?.data?.count !== "number"
-    )
-      throw new Error("Invalid notifications");
-    return {
-      items: list.data.data.notifications as Notice[],
-      unread: count.data.data.count as number,
-    };
-  });
+  return <NotificationRecords key={accountId} accountId={accountId} />;
+}
+function NotificationRecords({ accountId }: { accountId: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const limit = expanded ? 10 : 5;
+  const result = useMyHomeResource(
+    `${accountId}:${page}:${limit}:${filter}`,
+    async () => {
+      const [list, count] = await Promise.all([
+        api.get("/notifications", {
+          params: {
+            page,
+            limit,
+            ...(filter === "all" ? {} : { isRead: filter === "read" }),
+          },
+        }),
+        api.get("/notifications/unread-count"),
+      ]);
+      const data = list.data?.data;
+      if (
+        list.data?.success !== true ||
+        count.data?.success !== true ||
+        !Array.isArray(data?.notifications) ||
+        !isCount(data.total) ||
+        data.page !== page ||
+        data.limit !== limit ||
+        data.notifications.length > limit ||
+        data.notifications.length > data.total ||
+        data.totalPages !== Math.ceil(data.total / limit) ||
+        !isCount(count.data?.data?.count) ||
+        !data.notifications.every(
+          (item: Notice) =>
+            item &&
+            typeof item.id === "string" &&
+            item.id.length > 0 &&
+            typeof item.title === "string" &&
+            typeof item.isRead === "boolean" &&
+            isDate(item.createdAt) &&
+            (item.message == null || typeof item.message === "string"),
+        )
+      )
+        throw new Error("Invalid notifications");
+      return {
+        items: data.notifications.map((item: Notice) => ({
+          id: item.id,
+          title: item.title,
+          message: item.message,
+          isRead: item.isRead,
+          createdAt: item.createdAt,
+        })) as Notice[],
+        total: data.total as number,
+        unread: count.data.data.count as number,
+      };
+    },
+  );
   return (
-    <section className={BOX} aria-labelledby="my-home-notifications">
-      <h2 id="my-home-notifications" className="text-lg font-semibold">
+    <section
+      id="my-home-notifications"
+      className={BOX}
+      aria-labelledby="my-home-notifications-heading"
+    >
+      <h2 id="my-home-notifications-heading" className="text-lg font-semibold">
         알림{" "}
         {result.data && (
           <span className="text-sm text-slate-500">
@@ -113,15 +207,41 @@ export function MyHomeNotifications({ accountId }: { accountId: string }) {
           </span>
         )}
       </h2>
+      {expanded && (
+        <label className="my-3 block text-sm">
+          알림 상태
+          <select
+            aria-label="알림 상태"
+            className="ml-2 rounded-lg border p-2"
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="all">전체 알림</option>
+            <option value="unread">읽지 않은 알림</option>
+            <option value="read">읽은 알림</option>
+          </select>
+        </label>
+      )}
       {!result.data ? (
         <ResourceNotice error={result.error} reload={result.reload} />
       ) : result.data.items.length === 0 ? (
-        <p className="text-sm text-slate-500">도착한 알림이 없습니다.</p>
+        <p className="text-sm text-slate-500">
+          {result.data.total > 0
+            ? "이 페이지에 알림이 없습니다."
+            : filter === "unread"
+              ? "읽지 않은 알림이 없습니다."
+              : filter === "read"
+                ? "읽은 알림이 없습니다."
+                : "도착한 알림이 없습니다."}
+        </p>
       ) : (
         <ul className="divide-y divide-slate-100">
           {result.data.items.map((item) => (
             <li key={item.id} className="py-3">
-              <p className="text-sm font-medium">
+              <p className="break-words text-sm font-medium">
                 {!item.isRead && (
                   <span aria-label="읽지 않음" className="mr-2 text-blue-600">
                     ●
@@ -130,7 +250,9 @@ export function MyHomeNotifications({ accountId }: { accountId: string }) {
                 {item.title}
               </p>
               {item.message && (
-                <p className="mt-1 text-sm text-slate-600">{item.message}</p>
+                <p className="mt-1 break-words text-sm text-slate-600">
+                  {item.message}
+                </p>
               )}
               <time
                 className="text-xs text-slate-500"
@@ -142,9 +264,29 @@ export function MyHomeNotifications({ accountId }: { accountId: string }) {
           ))}
         </ul>
       )}
+      {expanded && result.data && (
+        <RecordPages
+          label="알림"
+          page={page}
+          total={result.data.total}
+          limit={limit}
+          onChange={setPage}
+        />
+      )}
+      <button
+        type="button"
+        className="mt-3 text-sm text-blue-700 underline"
+        onClick={() => {
+          setExpanded(!expanded);
+          setFilter("all");
+          setPage(1);
+        }}
+      >
+        {expanded ? "최근 알림만 보기" : "알림 전체보기"}
+      </button>
       <p className="mt-3 text-xs text-slate-500">
-        최근 알림 5건입니다. 각 서비스의 알림에서 상세 내용과 읽음 상태를 관리할
-        수 있습니다.
+        {expanded ? "본인 알림을 10건씩 표시합니다." : "최근 알림 5건입니다."}{" "}
+        각 서비스의 알림에서 상세 내용과 읽음 상태를 관리할 수 있습니다.
       </p>
     </section>
   );
@@ -167,14 +309,31 @@ function CommunityPosts({
   name: string;
   compact?: boolean;
 }) {
+  const [page, setPage] = useState(1);
+  const limit = compact ? 2 : 10;
   const result = useMyHomeResource(
-    `${accountId}:${communityKey}:${compact}`,
+    `${accountId}:${communityKey}:${compact}:${page}`,
     async () => {
       const res = await api.get(
         `/communities/${encodeURIComponent(communityKey)}/forum/posts`,
-        { params: { author: "me", page: 1, limit: compact ? 2 : 5 } },
+        { params: { author: "me", page, limit } },
       );
-      if (!Array.isArray(res.data?.data) || typeof res.data?.total !== "number")
+      if (
+        res.data?.success !== true ||
+        !Array.isArray(res.data?.data) ||
+        !isCount(res.data?.total) ||
+        res.data.data.length > limit ||
+        !res.data.data.every(
+          (post: OwnPost) =>
+            post &&
+            typeof post.id === "string" &&
+            post.id.length > 0 &&
+            typeof post.title === "string" &&
+            typeof post.status === "string" &&
+            isDate(post.createdAt) &&
+            (post.slug == null || typeof post.slug === "string"),
+        )
+      )
         throw new Error("Invalid own posts");
       return {
         posts: res.data.data as OwnPost[],
@@ -184,7 +343,7 @@ function CommunityPosts({
   );
   const root = `/communities/${encodeURIComponent(communityKey)}/forum`;
   return (
-    <section className={BOX}>
+    <section className={BOX} aria-label={`${name} 내 글`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">{name}</h2>
         <Link
@@ -203,18 +362,32 @@ function CommunityPosts({
           </p>
           {result.data.posts.length === 0 ? (
             <p className="mt-3 text-sm text-slate-500">
-              아직 작성한 글이 없습니다.
+              {result.data.total > 0
+                ? "이 페이지에 작성 글이 없습니다."
+                : "아직 작성한 글이 없습니다."}
             </p>
           ) : (
             <ul className="mt-3 divide-y divide-slate-100">
               {result.data.posts.map((post) => (
                 <li key={post.id} className="py-3">
                   <Link
-                    className="text-sm text-blue-700 underline"
+                    className="break-words text-sm text-blue-700 underline"
                     to={`${root}/post/${encodeURIComponent(post.slug || post.id)}`}
                   >
                     {post.title}
                   </Link>
+                  <span className="ml-2 text-xs text-slate-500">
+                    {(
+                      {
+                        publish: "공개",
+                        published: "공개",
+                        draft: "임시 저장",
+                        pending: "승인 대기",
+                        rejected: "반려",
+                        archived: "보관",
+                      } as Record<string, string>
+                    )[post.status] ?? "상태 확인"}
+                  </span>
                   <time
                     dateTime={post.createdAt}
                     className="ml-3 text-xs text-slate-500"
@@ -224,6 +397,15 @@ function CommunityPosts({
                 </li>
               ))}
             </ul>
+          )}
+          {!compact && (
+            <RecordPages
+              label={`${name} 내 글`}
+              page={page}
+              total={result.data.total}
+              limit={limit}
+              onChange={setPage}
+            />
           )}
         </>
       )}
@@ -269,7 +451,7 @@ export function MyHomeActivity({
       ) : (
         (compact ? communities.slice(0, 3) : communities).map((c) => (
           <CommunityPosts
-            key={c.communityKey}
+            key={`${accountId}:${c.communityKey}:${compact}`}
             accountId={accountId}
             communityKey={c.communityKey}
             name={c.name}
@@ -295,6 +477,44 @@ type Analytics = {
   activeQrCount: number;
   dailyScans: { date: string; count: number }[];
 };
+function VisitTrend({ days }: { days: Analytics["dailyScans"] }) {
+  const max = Math.max(1, ...days.map((day) => day.count));
+  return (
+    <section className="mt-5" aria-label="일별 QR 방문 추이">
+      <h3 className="font-medium">일별 QR 방문 추이</h3>
+      <p className="mt-1 text-xs text-slate-500">
+        최근 14일 조회 결과입니다. 날짜는 집계 서버 기준이며, 응답에 없는 날짜는
+        표시하지 않습니다.
+      </p>
+      {days.length === 0 ? (
+        <p className="mt-3 text-sm text-slate-500">
+          이 기간에 제공된 일별 방문 기록이 없습니다.
+        </p>
+      ) : (
+        <ol className="mt-4 space-y-3">
+          {days.map((day) => (
+            <li
+              key={day.date}
+              className="grid grid-cols-[5rem_minmax(0,1fr)_3rem] items-center gap-2 text-xs"
+            >
+              <time dateTime={day.date}>{day.date.slice(5)}</time>
+              <div
+                aria-hidden="true"
+                className="h-4 overflow-hidden rounded bg-slate-100"
+              >
+                <div
+                  className="h-full rounded bg-blue-500"
+                  style={{ width: `${(day.count / max) * 100}%` }}
+                />
+              </div>
+              <span className="text-right">{day.count.toLocaleString()}건</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
 function StoreMetrics({
   accountId,
   store,
@@ -312,14 +532,34 @@ function StoreMetrics({
       });
       const data = res.data?.data as Analytics;
       if (
+        res.data?.success !== true ||
         !data ||
         !["totalScans", "todayScans", "weeklyScans", "activeQrCount"].every(
-          (key) => typeof data[key as keyof Analytics] === "number",
+          (key) => isCount(data[key as keyof Analytics]),
         ) ||
-        !Array.isArray(data.dailyScans)
+        !Array.isArray(data.dailyScans) ||
+        !data.dailyScans.every(
+          (day) =>
+            day &&
+            typeof day.date === "string" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(day.date) &&
+            isDate(day.date) &&
+            new Date(day.date).toISOString().slice(0, 10) === day.date &&
+            isCount(day.count),
+        ) ||
+        new Set(data.dailyScans.map((day) => day.date)).size !==
+          data.dailyScans.length
       )
         throw new Error("Invalid analytics");
-      return data;
+      return {
+        totalScans: data.totalScans,
+        todayScans: data.todayScans,
+        weeklyScans: data.weeklyScans,
+        activeQrCount: data.activeQrCount,
+        dailyScans: data.dailyScans
+          .map((day) => ({ date: day.date, count: day.count }))
+          .sort((a, b) => a.date.localeCompare(b.date)),
+      };
     },
   );
   return (
@@ -348,7 +588,8 @@ function StoreMetrics({
               </div>
             ))}
           </dl>
-          {!compact && (
+          {!compact && <VisitTrend days={result.data.dailyScans} />}
+          {!compact && result.data.dailyScans.length > 0 && (
             <details className="mt-5">
               <summary className="cursor-pointer text-sm">
                 최근 14일 일별 방문
@@ -393,9 +634,39 @@ export function MyHomeManagement({
   data: HomeEntryData;
   compact?: boolean;
 }) {
+  return (
+    <StoreManagement
+      key={accountId}
+      accountId={accountId}
+      data={data}
+      compact={compact}
+    />
+  );
+}
+function StoreManagement({
+  accountId,
+  data,
+  compact = false,
+}: {
+  accountId: string;
+  data: HomeEntryData;
+  compact?: boolean;
+}) {
   // Only an existing scoped analytics endpoint is consumed. No cross-store aggregation.
   const stores = data.stores.filter((s) => s.serviceKey === "kpa-society");
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState(() => {
+    try {
+      const previous = JSON.parse(
+        sessionStorage.getItem("o4o_my_home_store") ?? "null",
+      );
+      return previous?.accountId === accountId &&
+        typeof previous.organizationId === "string"
+        ? previous.organizationId
+        : "";
+    } catch {
+      return "";
+    }
+  });
   const store = stores.find((s) => s.organizationId === selected) ?? stores[0];
   if (!store)
     return (
@@ -421,7 +692,20 @@ export function MyHomeManagement({
           aria-label="통계를 볼 매장"
           className="mt-2 block w-full rounded-lg border border-slate-300 bg-white p-3"
           value={store.organizationId}
-          onChange={(e) => setSelected(e.target.value)}
+          onChange={(e) => {
+            const id = e.target.value;
+            if (!stores.some((candidate) => candidate.organizationId === id))
+              return;
+            setSelected(id);
+            try {
+              sessionStorage.setItem(
+                "o4o_my_home_store",
+                JSON.stringify({ accountId, organizationId: id }),
+              );
+            } catch {
+              /* Selection is optional and never grants access. */
+            }
+          }}
         >
           {stores.map((s) => (
             <option key={s.organizationId} value={s.organizationId}>

@@ -49,6 +49,15 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 
 ## 검증과 남은 단계
 
+### 연속 Phase: 기록 조회·경영 추이 (2026-10-11)
+
+사용자의 다음 작업 지시를 이어 같은 미완료 WO의 전용 worktree·branch를 유지한다. 시작 시 최신 main `c4db284f2d05d9591e0079d88885e517e222cb19`를 확인해 반영했다. 알림 전체 조회·상태 필터, 커뮤니티 내 글 페이지, 일별 QR 방문 그래프와 선택 매장 유지, 검증·main 병합·운영 배포를 한 범위로 수행한다.
+
+- 알림은 기존 인증 사용자 기준 `GET /notifications`의 page·limit·isRead와 `/notifications/unread-count`만 사용한다. 최근 5건/전체 10건, 상태 전환 시 첫 페이지, 계정 변경 시 필터·페이지 초기화와 늦은 응답 차단을 적용한다. 새 route·읽음 변경 호출은 추가하지 않는다.
+- 커뮤니티는 기존 접근 가능한 목록 안에서 `author=me`를 유지해 10건씩 조회한다. 커뮤니티마다 페이지가 독립적이며 모아보기의 최대 3개 × 최근 2건 요약은 유지한다. 공개·임시 저장·승인 대기·반려 등 기존 상태와 원본 글 이동을 제공한다.
+- QR 통계는 기존 승인 매장 헤더와 소유권 판정을 유지한다. 일별 날짜·0 이상 정수 검증 후 반환된 날짜만 정렬해 표시하고, 빈 일별 기록·실제 0·오류를 구분한다. 표 접근도 유지한다. 같은 탭의 선택 정보에는 계정·organizationId만 보관하고 현재 매장 목록과 다시 대조한다.
+- API·권한·DB·원장·dependency·공유 패키지·배포 설정 변경은 없다. 운영 실제 계정 smoke는 지정 계정 문서 미확보로 계속 미실행이다. 검증·통합·배포 근거는 CHECK에 기록한다.
+
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
 초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. PR #449와 required CI를 통과해 main에 통합했으며, `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`의 promote 배포와 최종 서빙 SHA·공개 운영 검증이 완료됐다. 세부 run·기존 테스트 재실행 근거는 CHECK에 기록했다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
