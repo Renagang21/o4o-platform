@@ -86,6 +86,9 @@ describe('supplier lifecycle contracts', () => {
     expect(organizationOpsService.ensureOrganization).toHaveBeenCalledWith(expect.objectContaining({ name: 'Fixture', isActive: false, type: 'supplier' }), manager.queryRunner);
     expect(organizationOpsService.setOwner).toHaveBeenCalledWith('fixture-org', 'fixture-user', manager.queryRunner);
     expect(organizationOpsService.enrollService).not.toHaveBeenCalled();
+    const audit = query.mock.calls.find(([sql]) => sql.includes('INSERT INTO action_logs'));
+    expect(audit).toBeDefined();
+    expect(JSON.parse(audit![1][2])).toEqual({ application: { type: 'supplier_application', id: supplier.id, resourceId: 'fixture-org' }, policies: [] });
   });
 
   it.each(['approveSupplier', 'rejectSupplier'] as const)('%s rejects a Demo organization even without a legacy user pointer', async (method) => {

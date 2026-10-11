@@ -1,4 +1,4 @@
-import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import { Repository, type EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
@@ -49,6 +49,7 @@ export class NetureSupplierLifecycleService {
           createdByUserId: userId, isActive: false }, manager.queryRunner);
         await organizationOpsService.setOwner(organization.id, userId, manager.queryRunner);
         await manager.query('UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL', [organization.id, saved.id]);
+        await recordEnrollmentApplication(manager, userId, 'supplier', { type: 'supplier_application', id: saved.id, resourceId: organization.id }, policies);
         return { success: true, data: { id: saved.id, name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt } };
       });
     } catch (error) {

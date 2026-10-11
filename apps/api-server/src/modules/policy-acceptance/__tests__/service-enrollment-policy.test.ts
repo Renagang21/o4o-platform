@@ -24,9 +24,11 @@ it.each([undefined, [], [{ policyDocumentId: id, version: 2, documentType: 'priv
 it('rejects a stale policy before storing an application association', async () => {
   const h = harness(); await expect(recordEnrollmentPolicies(h, 'user', 'supplier', [{ ...refs[0], version: 1 }, refs[1]])).rejects.toHaveProperty('code', 'POLICY_VERSION_MISMATCH'); expect(h.writes).toHaveLength(0);
 });
-it('does not fabricate agreement or audit history for legacy applications', async () => {
+it('records a legacy application attempt without fabricating policy agreement', async () => {
   const h = harness([]); expect(await recordEnrollmentPolicies(h, 'user', 'supplier', undefined)).toEqual([]);
-  await recordEnrollmentApplication(h, 'user', 'supplier', { type: 'application', id: 'id' }, []); expect(h.writes).toHaveLength(0);
+  await recordEnrollmentApplication(h, 'user', 'supplier', { type: 'application', id: 'id' }, []); expect(h.writes).toHaveLength(1);
+  expect((h.writes[0] as any).sql).toContain('INSERT INTO action_logs');
+  expect(JSON.parse((h.writes[0] as any).params[2])).toEqual({ application: { type: 'application', id: 'id' }, policies: [] });
 });
 it.each(['neture', 'store', 'admin', 'arbitrary'])('does not accept a workspace/common key as an independent application service: %s', async key => {
   const h = harness(); await expect(getEnrollmentPolicies(h, key)).rejects.toHaveProperty('code', 'UNKNOWN_SERVICE'); expect(h.query).not.toHaveBeenCalled();

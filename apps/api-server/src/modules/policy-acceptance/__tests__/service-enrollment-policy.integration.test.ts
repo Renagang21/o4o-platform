@@ -41,6 +41,18 @@ integration('application policy atomicity (owned loopback PostgreSQL)', () => {
     expect(await ds.query('SELECT service_key,version,content_hash,acceptance_kind FROM user_policy_acceptances')).toEqual(expect.arrayContaining([{ service_key: service, version: 2, content_hash: computePolicyContentHash('Exact application body'), acceptance_kind: 'agreement' }, { service_key: service, version: 2, content_hash: computePolicyContentHash('Exact privacy body'), acceptance_kind: 'acknowledgement' }]));
     expect((await ds.query('SELECT meta FROM action_logs'))[0].meta).toMatchObject({ application: { id, resourceId: 'fixture-resource' }, policies: expect.arrayContaining([expect.objectContaining({ policyDocumentId: docId, version: 2 })]) });
   });
+  it('preserves each legacy attempt with an empty policy list and no invented acceptance', async () => {
+    await ds.query("UPDATE service_policy_documents SET slug='legacy-integrated-'||document_type");
+    const id = randomUUID();
+    for (let attempt = 0; attempt < 2; attempt++) await ds.transaction(async m => {
+      const policies = await recordEnrollmentPolicies(m, userId, 'supplier', undefined);
+      await recordEnrollmentApplication(m, userId, 'supplier', { type: 'fixture_application', id }, policies);
+    });
+    const logs = await ds.query('SELECT meta FROM action_logs');
+    expect(logs).toHaveLength(2);
+    for (const row of logs) expect(row.meta).toEqual({ application: { type: 'fixture_application', id }, policies: [] });
+    expect(await ds.query('SELECT * FROM user_policy_acceptances')).toHaveLength(0);
+  });
   it('rolls policy evidence and application back together when the application write fails', async () => {
     await expect(ds.transaction(async m => {
       await recordEnrollmentPolicies(m, userId, 'supplier', [{ policyDocumentId: docId, version: 2, documentType: 'terms' }, { policyDocumentId: privacyId, version: 2, documentType: 'privacy' }]);

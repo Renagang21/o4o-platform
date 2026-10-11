@@ -39,7 +39,6 @@ export async function recordEnrollmentPolicies(m: Pick<EntityManager, 'query'>, 
 /** Append an application-specific audit association, without rewriting old agreements. */
 export async function recordEnrollmentApplication(m: Pick<EntityManager, 'query'>, userId: string, serviceKey: string,
   application: { type: string; id: string; resourceId?: string; conditions?: Record<string, unknown> }, policies: PolicyEvidence[]): Promise<void> {
-  if (policies.length === 0 && !application.conditions) return; // Never fabricate legacy policy evidence; explicit conditions can still have an audit.
   await m.query(`INSERT INTO action_logs (service_key, user_id, action_key, source, status, meta)
     VALUES ($1, $2, 'service:application_policy', 'manual', 'success', $3::jsonb)`,
   [serviceKey, userId, JSON.stringify({ application, policies })]);
