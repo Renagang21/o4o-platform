@@ -82,6 +82,7 @@ export class SupplierCopilotService {
     };
   }
 
+  // Checkout supplierId is varchar; offer supplier_id is UUID. Bind casts keep both scopes valid.
   async getProductPerformance(supplierId: string, limit = 10): Promise<ProductPerformanceItem[]> {
     const rows = await this.dataSource.query(
       `SELECT
@@ -92,11 +93,11 @@ export class SupplierCopilotService {
          0 AS "qrScans"
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
-       LEFT JOIN checkout_orders o ON o."supplierId" = $1
+       LEFT JOIN checkout_orders o ON o."supplierId" = $1::varchar
          AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
        LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
          ON (item->>'productId')::uuid = spo.id
-       WHERE spo.supplier_id = $1
+       WHERE spo.supplier_id = $1::uuid
        GROUP BY pm.id, pm.name
        ORDER BY revenue DESC
        LIMIT $2`,
@@ -145,8 +146,8 @@ export class SupplierCopilotService {
            FROM checkout_orders o,
                 jsonb_array_elements(o.items) AS item
            JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
-           WHERE spo.supplier_id = $1
-             AND o."supplierId" = $1
+           WHERE spo.supplier_id = $1::uuid
+             AND o."supplierId" = $1::varchar
              AND o."createdAt" >= CURRENT_DATE - INTERVAL '7 days'
              AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
            GROUP BY (item->>'productId')
@@ -156,8 +157,8 @@ export class SupplierCopilotService {
            FROM checkout_orders o,
                 jsonb_array_elements(o.items) AS item
            JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
-           WHERE spo.supplier_id = $1
-             AND o."supplierId" = $1
+           WHERE spo.supplier_id = $1::uuid
+             AND o."supplierId" = $1::varchar
              AND o."createdAt" >= CURRENT_DATE - INTERVAL '14 days'
              AND o."createdAt" < CURRENT_DATE - INTERVAL '7 days'
              AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
@@ -175,7 +176,7 @@ export class SupplierCopilotService {
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN current_period cp ON cp.product_id = spo.id::text
          LEFT JOIN prev_period pp ON pp.product_id = spo.id::text
-         WHERE spo.supplier_id = $1
+         WHERE spo.supplier_id = $1::uuid
            AND (COALESCE(cp.orders, 0) > 0 OR COALESCE(pp.orders, 0) > 0)
          ORDER BY "growthRate" DESC, "currentOrders" DESC
          LIMIT $2`,
