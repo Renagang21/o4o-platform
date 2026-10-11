@@ -1,4 +1,4 @@
-import { recordSignupTerms, signupPolicyServiceKey, type SignupTermsReference } from './signup-policy.service.js';
+import { recordSignupTerms, resolveSignupPolicyServiceKey, type SignupTermsReference } from './signup-policy.service.js';
 import type { DataSource } from 'typeorm';
 import { normalizeLoginEmail, isLoginEmailShapeValid, maskLoginEmail } from '@o4o/auth-utils';
 import { AppDataSource } from '../../database/connection.js';
@@ -63,7 +63,7 @@ export class KakaoAuthService {
         await manager.getRepository(LinkedAccount).save(manager.getRepository(LinkedAccount).create({
           userId:created.id,provider:'kakao',providerId:identity.providerId,linkedAt:now,lastUsedAt:now,
         }));
-        await recordSignupTerms(created.id, signupPolicyServiceKey(flow.service_key), input.consents.termsPolicy, manager);
+        await recordSignupTerms(created.id, await resolveSignupPolicyServiceKey(flow.service_key, manager), input.consents.termsPolicy, manager);
         return created;
       });
       return this.sessionOrVerification(user,serviceKey,true);

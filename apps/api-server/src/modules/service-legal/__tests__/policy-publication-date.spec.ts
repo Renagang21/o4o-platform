@@ -60,3 +60,16 @@ it('한국 시행일 자정에는 controller가 새 문서를 게시한다(UTC�
     expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'published' }));
   } finally { jest.useRealTimers(); }
 });
+
+
+describe('새 공통 계정 문서의 게시 준비', () => {
+  it.each([{ version: 1, effective: new Date() }, { version: 2, effective: null }])('%j: marker만 붙인 구 버전/미정 시행일은 기존 문서를 바꾸지 않는다', async ({ version, effective }) => {
+    const { app, execute, repo, doc } = harness(effective);
+    Object.assign(doc, { version, slug: 'neture-account-terms' });
+    const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+    expect(result.status).toBe(400);
+    expect(result.body.error.code).toBe('COMMON_ACCOUNT_POLICY_NOT_READY');
+    expect(execute).not.toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
+  });
+});

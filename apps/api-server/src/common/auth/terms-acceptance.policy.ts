@@ -100,6 +100,14 @@ export interface PublishedTermsDocument {
   version: number;
   title: string;
   contentHash: string;
+  slug?: string | null;
+}
+
+export const COMMON_ACCOUNT_TERMS_SLUG = 'neture-account-terms';
+/** Explicit new-document marker: never reclassify an existing service agreement as account terms. */
+export function isCommonAccountTermsDocument(doc: PublishedTermsDocument | null | undefined): boolean {
+  return !!doc && doc.serviceKey === ACCOUNT_POLICY_SERVICE_KEY && doc.documentType === REQUIRED_POLICY_DOCUMENT_TYPE
+    && doc.version >= 2 && doc.slug === COMMON_ACCOUNT_TERMS_SLUG;
 }
 
 /** 로그인 응답 · /auth/me 의 `pendingPolicyAcceptances` 항목 (WO §16 — 본문은 싣지 않는다). */
@@ -129,7 +137,8 @@ export function computePendingPolicyAcceptances(
   const seen = new Set<string>();
   const pending: PendingPolicyAcceptance[] = [];
   // Synthetic input only: never insert a Neture membership for an account agreement.
-  for (const m of [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }, ...memberships]) {
+  const common = published.some(isCommonAccountTermsDocument) ? [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }] : [];
+  for (const m of [...common, ...memberships]) {
     if (!REQUIRED_MEMBERSHIP_STATUSES.has(m.status)) continue;
     if (seen.has(m.serviceKey)) continue;
     seen.add(m.serviceKey);

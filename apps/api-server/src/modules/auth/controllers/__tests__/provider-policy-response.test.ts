@@ -13,6 +13,7 @@ jest.mock('../social-auth.helpers.js', () => ({ socialOrigin: (req: any) => ({ o
 jest.mock('../../../policy-acceptance/policy-acceptance.service.js', () => ({
   PolicyAcceptanceError: class extends Error {},
   policyAcceptanceService: {
+    getPublishedTermsForService: jest.fn(async () => null),
     getPendingForUser: jest.fn(async () => mockPending),
     getEnforcedPendingForUser: jest.fn(async (_user: string, serviceKey: string) => mockDemo ? [] : selectPendingPoliciesForRequest(mockPending, serviceKey)),
   },

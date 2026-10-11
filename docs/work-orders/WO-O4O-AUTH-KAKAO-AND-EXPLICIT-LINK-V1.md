@@ -358,3 +358,13 @@ semiFranchiseAccessKey와 기존 서비스 접근 resolver를 pending·승낙 �
 신규 9건 포함 6 suites 148 PASS다. 고유 서버 301건/UI 304건/로컬 합성 화면 48건이며
 membership/role 생성과 원장 변경은 없다. 기존 신청 snapshot/운영 검증 및 공고/게시 OPEN과
 동일 WO push/PR 범위는 유지한다. 최신 HEAD CI/review를 확인한다.
+
+
+공고 전 기존 Neture v1을 공통 계정 약관으로 바꾸지 않도록 rollout을 보완했다. 새 ID/version>=2/
+slug=neture-account-terms 문서가 실제 게시된 뒤에만 membership 없는 공통 요구와 약국 가입
+문서 전환을 적용한다. 표식 문서의 미확정 시행일·v1 게시를 거부하며 과거 동의를 옮기지 않는다.
+원장 자격의 빈 pending 캐시는 사용하지 않고 일반 캐시도 게시 문서 집합에 묶었다. 신규 18건
+포함 관련 6 suites 171 PASS, 고유 서버 회귀 319건/UI 304건이다. 로컬 PC/mobile 합성 검증
+48건의 경계는 유지한다. PG signup/social 18건과 sessionAuthMethod 21건은 총 39 SKIP다.
+30일 공고는 시작하지 않았고 실제 공고일·시행일은 미정이다.
+이번 동일 WO 작업은 push/PR 범위이며 최신 HEAD CI/review를 확인한다. main 통합·배포·DB 게시는 없다.

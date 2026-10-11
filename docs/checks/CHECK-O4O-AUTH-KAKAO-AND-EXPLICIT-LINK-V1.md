@@ -778,3 +778,30 @@ owner/admin/manager, left_at, 계정 활성·이메일 확인·Neture 정지 경
 이 gate 자격 보완으로 완료 처리하지 않는다. 최신 후속 HEAD의 CI/review까지 확인한다.
 
 약국 서비스 원장 보완 후 API 타입·changed lint·API build·docs 민감정보 guard도 PASS다.
+
+
+### 공고 전 공통 약관 적용 방지와 원장 승인 캐시 보완
+
+기존 v1·표식 없는 v2·v1 잘못된 표식은 membership 없는 공통 요구를 만들지 않는다. 새 ID의
+Neture terms/version>=2/slug=neture-account-terms가 published일 때만 전환한다. 기존 slug
+필드를 사용하며 migration/운영 DB 변경은 없다. 표식 문서의 version<2 또는 시행일 미정 게시는
+변경 전 400으로 거부한다. 한국 미래 시행일 409 방어도 유지한다. 자동 공고·예약 게시가 아니다.
+
+약국 공개 가입 문서의 ID/version/전문 링크를 전환 전후 대조했으며 이메일·Google·카카오의
+서버 선택도 같은 resolver를 사용한다. 전환 후 오래된 약국 가입 요청은 동의 쓰기 전 409다.
+원장 기반 약국/공급자 자격은 승인 직후 빈 pending 캐시로 건너뛰지 않는다. 일반 캐시는 게시
+문서 ID/version/slug 집합이 같을 때만 사용하며 published 문서 TTL 60초는 유지한다.
+
+신규 18건(rollout/캐시 7, 가입 9, 게시 2) 포함 관련 6 suites 171 PASS다. 초기 provider 응답
+테스트는 새 게시 문서 조회 mock이 없어 1건 실패했으며 해당 dependency fixture를 추가한 뒤
+기존 8건 모두 재실행 PASS다. API 고유 회귀는 301+18=319건, UI 304건이다. 기존 로컬
+PC/mobile 합성 검증 48건은 반복 합산하지 않는다. PG fixture에 slug를 추가했지만 실제 PG
+signup/social integration 18건은 DB 연결이 없어 SKIP이며, 이번 함께 실행한 sessionAuthMethod
+21건도 SKIP다(총 39 SKIP). 실제 OAuth/운영 검증으로 대체 보고하지 않는다.
+
+본문 완성·외부 인증 고지·서비스 신청 문서/snapshot·개인정보 version 증빙·8개 서비스 운영
+검증 TODO는 유지한다. 실제 공고일·시행일 미정, 30일 공고 미시작, 운영 정책 미게시다.
+최신 push HEAD의 CI·Codex review는 PR #457에서 확인하며 main 통합/배포는 이번 범위가 아니다.
+
+이메일·Google 기존 서비스 회귀 117 PASS도 재확인했다(고유 319건에 이미 포함, 중복 합산 없음).
+API build(실제 tsc)·타입 검사·changed lint·docs 민감정보 guard·diff check PASS다.

@@ -42,7 +42,7 @@ integration('signup agreement atomicity (dedicated loopback PostgreSQL)', () => 
       CREATE TABLE IF NOT EXISTS linked_accounts(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),"userId" uuid REFERENCES users(id) ON DELETE CASCADE,provider text,"providerId" text,UNIQUE(provider,"providerId"));
       CREATE TABLE IF NOT EXISTS user_password_credentials(user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE);
       CREATE TABLE IF NOT EXISTS demo_accounts(user_id uuid REFERENCES users(id),demo_type text,is_active boolean);
-      CREATE TABLE IF NOT EXISTS service_policy_documents(id uuid PRIMARY KEY,service_key text,document_type text,version integer,title text,content text,status text,published_at timestamptz DEFAULT now());
+      CREATE TABLE IF NOT EXISTS service_policy_documents(id uuid PRIMARY KEY,service_key text,document_type text,version integer,title text,content text,slug text,status text,published_at timestamptz DEFAULT now());
       CREATE TABLE IF NOT EXISTS user_policy_acceptances(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,service_key text NOT NULL,policy_document_id uuid NOT NULL REFERENCES service_policy_documents(id),document_type text NOT NULL,version integer NOT NULL,content_hash char(64) NOT NULL,acceptance_kind text NOT NULL,accepted_at timestamptz DEFAULT now(),UNIQUE(user_id,service_key,policy_document_id));
       CREATE TABLE IF NOT EXISTS service_memberships(user_id uuid REFERENCES users(id) ON DELETE CASCADE, service_key text,status text);
       CREATE TABLE IF NOT EXISTS role_assignments(user_id uuid REFERENCES users(id) ON DELETE CASCADE,role text);

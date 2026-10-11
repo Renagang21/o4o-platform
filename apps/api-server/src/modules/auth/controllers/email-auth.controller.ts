@@ -1,4 +1,4 @@
-import { signupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
@@ -55,7 +55,7 @@ export class EmailAuthController extends BaseController {
   static async signup(req: Request, res: Response): Promise<any> {
     const body = req.body as EmailSignupRequestDto;
     try {
-      const result = await emailAuthService.signup({ ...body, ...meta(req), policyServiceKey: signupPolicyKeyFromOrigin(req.get('origin')) });
+      const result = await emailAuthService.signup({ ...body, ...meta(req), policyServiceKey: await resolveSignupPolicyKeyFromOrigin(req.get('origin')) });
       return BaseController.created(res, {
         message: '확인 메일을 보냈습니다. 메일의 링크를 열면 가입이 완료됩니다.',
         maskedEmail: result.maskedEmail,

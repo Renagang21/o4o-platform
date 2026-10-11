@@ -3,6 +3,8 @@
 > 상태: DRAFT · 작성일: 2026-10-11 · 게시·시행 전 검토용
 > 적용: neture.co.kr 공통 계정. 서비스별 가입·사업 참여 약관은 별도다.
 > 문서 version은 게시 대상 DB의 기존 version을 확인한 후 확정한다. 제목의 V2는 개정안 식별자다.
+> 게시 메타데이터: 새 문서 ID · service_key=neture · document_type=terms · version>=2 · slug=neture-account-terms.
+> 실제 문서 ID·공고일·시행일은 미정이다. 이 파일 작성이나 push로 기존 v1을 공통 계정 약관으로 전환하지 않는다.
 
 ## 제1조 목적과 적용 범위
 

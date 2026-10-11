@@ -35,6 +35,7 @@ import {
   isSupportedPolicyDocumentType,
 } from './service-legal-scope.js';
 import logger from '../../utils/logger.js';
+import { COMMON_ACCOUNT_TERMS_SLUG } from '../../common/auth/terms-acceptance.policy.js';
 import {
   ServicePolicyLifecycleError,
   resolveServicePolicyLifecycle,
@@ -329,6 +330,10 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         const before = toAdminPolicyDocument(doc);
 
         if (action === 'publish') {
+          if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG
+            && (doc.version < 2 || !doc.effective_date)) {
+            return res.status(400).json({ success: false, error: { code: 'COMMON_ACCOUNT_POLICY_NOT_READY', message: '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.' } });
+          }
           // Validate before demoting any published row; notice must not activate future terms.
           assertPolicyEffectiveForPublication(doc.effective_date);
           // 같은 유형의 기존 published 문서 → draft

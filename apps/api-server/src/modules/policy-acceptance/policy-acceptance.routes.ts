@@ -18,7 +18,7 @@ import { Router, type IRouter, type Request, type Response } from 'express';
 import { requireAuth, type AuthRequest } from '../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
-import { ACCOUNT_POLICY_SERVICE_KEY, selectPendingPoliciesForRequest, REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
+import { ACCOUNT_POLICY_SERVICE_KEY, isCommonAccountTermsDocument, selectPendingPoliciesForRequest, REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
 import {
   PolicyAcceptanceError,
   STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
@@ -68,13 +68,15 @@ router.post(
 
     try {
       const isStoreAgreement = documentType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE;
+      const commonAccountAllowed = !isStoreAgreement && serviceKey === ACCOUNT_POLICY_SERVICE_KEY
+        && isCommonAccountTermsDocument(await policyAcceptanceService.getPublishedTermsForService(serviceKey));
       if (isStoreAgreement && serviceKey === 'kpa-society') {
         // WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1: 약국 매장계약은 요구 판정(getPendingStoreOwnerAgreementsForUser)과
         //   같은 Neture 원장 기준으로만 승낙을 허용한다. kpa-society membership · `kpa:store_owner` 는 보지 않는다.
         if (!(await policyAcceptanceService.isPharmacyLedgerStoreOwner(userId))) {
           return res.status(403).json({ success: false, error: '매장 경영자만 계약에 동의할 수 있습니다.', code: 'STORE_OWNER_REQUIRED' });
         }
-      } else if (isStoreAgreement || serviceKey !== ACCOUNT_POLICY_SERVICE_KEY) {
+      } else if (isStoreAgreement || !commonAccountAllowed) {
         // Account terms require authentication, not a physical Neture membership.
         // WO §20: 활성/허용된 service membership 보유자만 그 서비스 약관을 승낙할 수 있다.
         const rows = (await AppDataSource.query(

@@ -25,6 +25,7 @@ import { AppDataSource } from '../../database/connection.js';
 import {
   ACCEPTANCE_KIND_AGREEMENT,
   ACCOUNT_POLICY_SERVICE_KEY,
+  isCommonAccountTermsDocument,
   selectPendingPoliciesForRequest,
   REQUIRED_MEMBERSHIP_STATUSES,
   REQUIRED_POLICY_DOCUMENT_TYPE,
@@ -74,6 +75,7 @@ interface PublishedRow {
   version: number;
   title: string;
   content: string;
+  slug?: string | null;
 }
 
 function toPublished(row: PublishedRow): PublishedTermsDocument {
@@ -84,12 +86,13 @@ function toPublished(row: PublishedRow): PublishedTermsDocument {
     version: Number(row.version),
     title: row.title,
     contentHash: computePolicyContentHash(row.content),
+    slug: row.slug,
   };
 }
 
 /** 서비스별 최신 published terms 1건 (public API 와 같은 정렬: published_at DESC, version DESC). */
 const PUBLISHED_TERMS_SQL = `
-  SELECT DISTINCT ON (service_key) id, service_key, document_type, version, title, content
+  SELECT DISTINCT ON (service_key) id, service_key, document_type, version, title, content, slug
   FROM service_policy_documents
   WHERE document_type = $1 AND status = 'published'
   ORDER BY service_key, published_at DESC NULLS LAST, version DESC`;
@@ -97,7 +100,7 @@ const PUBLISHED_TERMS_SQL = `
 export class PolicyAcceptanceService {
   private publishedCache: { at: number; docs: PublishedTermsDocument[] } | null = null;
   private readonly publishedAgreementCache = new Map<string, { at: number; docs: PublishedTermsDocument[] }>();
-  private readonly userOkCache = new Map<string, number>();
+  private readonly userOkCache = new Map<string, { at: number; policyKey: string }>();
 
   constructor(private readonly db: () => Queryable = () => AppDataSource) {}
 
@@ -248,8 +251,11 @@ export class PolicyAcceptanceService {
     const published = await this.listPublishedTerms();
     if (published.length === 0) return [];
 
-    const okAt = this.userOkCache.get(userId);
-    if (okAt !== undefined && Date.now() - okAt < USER_OK_TTL_MS) return [];
+    // Ledger eligibility can change at approval without an operator membership event: always re-evaluate it.
+    const dynamicSubjects = published.some(d => d.serviceKey === 'supplier' || !!getService(d.serviceKey)?.semiFranchiseAccessKey);
+    const policyKey = published.map(d => `${d.id}:${d.version}:${d.slug ?? ''}`).sort().join('|');
+    const cached = this.userOkCache.get(userId);
+    if (!dynamicSubjects && cached?.policyKey === policyKey && Date.now() - cached.at < USER_OK_TTL_MS) return [];
 
     const q = this.db();
     const memberships = (await q.query(
@@ -257,7 +263,7 @@ export class PolicyAcceptanceService {
       [userId],
     )) as { serviceKey: string; status: string }[];
     const relevant = [
-      { serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' },
+      ...(published.some(isCommonAccountTermsDocument) ? [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }] : []),
       ...memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status)),
     ];
     if (published.some(d => d.serviceKey === 'supplier') && !relevant.some(m => m.serviceKey === 'supplier')
@@ -283,7 +289,7 @@ export class PolicyAcceptanceService {
     }
 
     const pending = computePendingPolicyAcceptances(relevant, published, acceptedIds);
-    if (pending.length === 0) this.userOkCache.set(userId, Date.now());
+    if (pending.length === 0 && !dynamicSubjects) this.userOkCache.set(userId, { at: Date.now(), policyKey });
     return pending;
   }
 
