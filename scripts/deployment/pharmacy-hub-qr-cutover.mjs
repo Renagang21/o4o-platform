@@ -122,6 +122,23 @@ export async function verifyRedirects(paths, request = fetch, signal, rulePaths 
   }));
 }
 
+export async function verifyPropagation(check, {
+  now = Date.now, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
+  timeoutMs = 300000, intervalMs = 10000,
+  signal = AbortSignal.timeout(timeoutMs),
+} = {}) {
+  const deadline = now() + timeoutMs;
+  let failure;
+  while (now() < deadline && !signal.aborted) {
+    try { await check(signal); return; }
+    catch (error) { failure = error; }
+    const remaining = deadline - now();
+    if (remaining <= 0 || signal.aborted) break;
+    await sleep(Math.min(intervalMs, remaining));
+  }
+  throw failure ?? new Error('Load balancer verification deadline expired.');
+}
+
 export async function settleOperation(name, readOperation, { now = Date.now, sleep = ms => new Promise(resolve => setTimeout(resolve, ms)), timeoutMs = 300000 } = {}) {
   const deadline = now() + timeoutMs;
   while (now() < deadline) {
@@ -249,14 +266,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       await settleOperation(operation.name, name => api(`https://compute.googleapis.com/compute/v1/projects/${project}/global/operations/${name}`));
     },
     verify: async (paths, rulePaths) => {
-      // Allow load balancer propagation; each probe attempt is bounded.
-      const signal = AbortSignal.timeout(120000);
-      for (let attempt = 0; attempt < 6; attempt++) {
-        try { await verifyRedirects(paths, fetch, signal, rulePaths); await verifyPublicData(paths, fetch, signal); return; } catch (error) {
-          if (attempt === 5 || signal.aborted) throw error;
-          await new Promise(resolve => setTimeout(resolve, 10000));
-        }
-      }
+      // Operation DONE precedes global data-plane propagation. Keep the same
+      // strict probes and rollback, but allow a bounded five-minute window.
+      await verifyPropagation(async signal => {
+        await verifyRedirects(paths, fetch, signal, rulePaths);
+        await verifyPublicData(paths, fetch, signal);
+      });
     },
   });
   console.log(JSON.stringify(result));
