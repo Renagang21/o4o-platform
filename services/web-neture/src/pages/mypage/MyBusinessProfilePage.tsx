@@ -1,5 +1,5 @@
 /**
- * MyBusinessProfilePage - 공급자 사업자 정보 (마이페이지 표준 구조)
+ * MyBusinessProfilePage - 공급자 사업자 정보 (My Home 표준 구조)
  *
  * WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1
  *
@@ -49,14 +49,14 @@ export default function MyBusinessProfilePage() {
         width="form"
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '마이페이지', href: '/mypage' },
+          { label: 'My Home', href: '/mypage' },
           { label: '사업자 정보' },
         ]}
         navItems={getNetureMyPageNavItems([])}
       >
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
-          description="마이페이지를 이용하려면 로그인해주세요."
+          description="My Home을 이용하려면 로그인해주세요."
           onAction={() => openLoginModal('/mypage/business-profile')}
         />
       </MyPageLayout>
@@ -73,7 +73,7 @@ export default function MyBusinessProfilePage() {
       width="form"
       breadcrumb={[
         { label: '홈', href: '/' },
-        { label: '마이페이지', href: '/mypage' },
+        { label: 'My Home', href: '/mypage' },
         { label: '사업자 정보' },
       ]}
       navItems={getNetureMyPageNavItems(user?.roles)}

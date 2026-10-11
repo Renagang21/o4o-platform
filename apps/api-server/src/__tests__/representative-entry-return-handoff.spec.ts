@@ -155,7 +155,7 @@ describe('B. generateHandoff', () => {
     expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'neture', 'neture', null]);
   });
 
-  it("target=neture 는 returnPath '/' 만 허용 — 다른 경로는 400 (범용 redirect 0)", async () => {
+  it("target=neture 는 대표 홈·My Home 이외의 returnPath 거부 — 다른 경로는 400 (범용 redirect 0)", async () => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     let res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: '/' }, 'https://study.neture.co.kr'), res);
@@ -167,6 +167,22 @@ describe('B. generateHandoff', () => {
     expect([res.statusCode, res.body.code]).toEqual([400, 'VALIDATION_ERROR']);
     res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: '//evil.test' }), res);
+    expect([res.statusCode, res.body.code]).toEqual([400, 'VALIDATION_ERROR']);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it.each(['/mypage', ...['store', 'study', 'community', 'funding', 'supplier', 'pharmacy', 'kpa', 'admin'].map(key => `/mypage?from=${key}`)])('My Home %s: 활성 계정의 세션만 전달 · membership 생성/검사 없음', async path => {
+    query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: path }), res);
+    expect(res.statusCode).toBe(200);
+    expect(new URL(res.body.data.targetUrl).searchParams.get('returnTo')).toBe(path);
+    expect(sqlCalls().some(sql => sql.includes('service_memberships'))).toBe(false);
+  });
+
+  it.each(['/mypage?from=evil', '/mypage?from=store&next=https://evil.test', '/mypage/profile', '/mypage/../admin', '/mypage?from=%73tore', '/mypage#admin'])('My Home 외부/비정형 목적지 %s 거부 · token INSERT 0', async path => {
+    const res = mockRes();
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: path }), res);
     expect([res.statusCode, res.body.code]).toEqual([400, 'VALIDATION_ERROR']);
     expect(query).not.toHaveBeenCalled();
   });

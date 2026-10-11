@@ -221,7 +221,7 @@ export default function MyCommunityOperatorPage() {
   const layout = (children: ReactNode, roles: readonly string[] = []) => (
     <MyPageLayout
       title="커뮤니티 회원 관리"
-      breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '커뮤니티 회원 관리' }]}
+      breadcrumb={[{ label: '홈', href: '/' }, { label: 'My Home', href: '/mypage' }, { label: '커뮤니티 회원 관리' }]}
       width="wide"
       navItems={getNetureMyPageNavItems(roles)}
     >

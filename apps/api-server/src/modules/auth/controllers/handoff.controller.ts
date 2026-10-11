@@ -249,10 +249,12 @@ export class HandoffController extends BaseController {
     //   대표 진입 복귀는 neture membership 을 요구하지 않는다(O4O 계정 인증 ≠ 서비스 회원권).
     //   "아무 서비스 active membership" 도 자격으로 쓰지 않는다 — 자격은 활성 O4O 계정 + 살아 있는 세션뿐.
     //   계정 상태는 requireAuth 가 DB 기준으로 이미 판정했다(blocked 403 · restricted 는 이 경로 비허용).
-    //   목적지는 대표 홈 '/' 고정 — 범용 redirect 를 만들지 않는다. membership·role 생성 0.
+    //   목적지는 대표 홈 '/' · My Home '/mypage' 와 열거된 복귀 맥락뿐이다. membership·role 생성 0.
     if (isRepresentativeEntryTarget(targetService.key)) {
-      if (safeReturnPath && safeReturnPath !== '/') {
-        return BaseController.error(res, 'returnPath must be / for representative entry', 400, 'VALIDATION_ERROR');
+      // Only representative home and the personal home, with a finite informational source.
+      const representativePath = safeReturnPath || '/';
+      if (!/^(?:\/|\/mypage(?:\?from=(?:store|study|community|funding|supplier|pharmacy|kpa|admin))?)$/.test(representativePath)) {
+        return BaseController.error(res, 'Invalid representative entry path', 400, 'VALIDATION_ERROR');
       }
       try {
         const source = await resolveVerifiedHandoffSource(req, user.id);
@@ -271,7 +273,7 @@ export class HandoffController extends BaseController {
         const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
         return BaseController.ok(res, {
           handoffToken,
-          targetUrl: `${targetOrigin}/handoff?token=${handoffToken}&returnTo=${encodeURIComponent('/')}`,
+          targetUrl: `${targetOrigin}/handoff?token=${handoffToken}&returnTo=${encodeURIComponent(representativePath)}`,
           targetService: { key: targetService.key, name: targetService.name, domain: targetService.domain },
         });
       } catch (err: any) {

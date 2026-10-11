@@ -726,6 +726,9 @@ function App() {
               <Route path="/community" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
+              <Route path="/mypage/services" element={<MyPageHub view="services" />} />
+              <Route path="/mypage/activity" element={<MyPageHub view="activity" />} />
+              <Route path="/mypage/management" element={<MyPageHub view="management" />} />
               <Route path="/mypage/profile" element={<MyProfilePage />} />
               <Route path="/mypage/settings" element={<MySettingsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-CANONICAL-PROFILE-ALIGNMENT-V1: 사업자 정보 */}

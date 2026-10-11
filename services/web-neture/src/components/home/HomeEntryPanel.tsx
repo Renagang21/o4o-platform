@@ -20,6 +20,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MyHomeUnread } from '../mypage/MyHomePanels';
 import { Loader2, ArrowUpRight, ExternalLink, RefreshCw } from 'lucide-react';
 import type { User } from '../../contexts/AuthContext';
 import {
@@ -38,6 +39,7 @@ interface HomeEntryPanelProps {
   onReload: () => void;
   /** 「O4O 서비스 소식」 섹션 — 내 서비스 아래 · 가입 · 이용 상태 위 */
   newsSlot?: React.ReactNode;
+  summary?: boolean;
 }
 
 const BTN =
@@ -95,7 +97,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot }: HomeEntryPanelProps) {
+export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot, summary }: HomeEntryPanelProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
   // 이동 세대(generation). 이동 시작마다 1 증가하고, 뒤로가기(bfcache) 복원 시에도 1 증가한다.
@@ -168,6 +170,19 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
   const hasWorkspaceEntry = model.groups.some((g) => g.items.length > 0);
   const nothingToShow =
     !hasWorkspaceEntry && !model.platformAdmin && model.myServices.length === 0 && model.statusItems.length === 0 && model.joinable.length === 0;
+
+  if (summary) {
+    const available = model.groups.flatMap(group => group.items);
+    return <section className="mt-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 text-left" aria-labelledby="home-my-home-title">
+      <div className="flex items-center justify-between gap-3"><h2 id="home-my-home-title" className="text-lg font-semibold">My Home</h2><Link to="/mypage" className="text-sm text-blue-700 underline">모아보기 →</Link></div>
+      <MyHomeUnread accountId={user.id} />
+      <p className="mt-2 text-sm text-slate-600">참여 서비스 {model.myServices.length}개 · 내 매장 {new Set(data.stores.map(store => store.organizationId)).size}개</p>
+      {model.statusItems.length > 0 && <p className="mt-2 text-sm text-amber-800">{model.statusItems.map(item => `${item.serviceName}: ${item.statusLabel}`).join(' · ')}</p>}
+      {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
+      {available.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{available.slice(0, 4).map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>}
+      <div className="mt-4 flex flex-wrap gap-4 text-sm"><Link to="/mypage/services" className="text-blue-700 underline">참여 서비스 이어가기</Link><Link to="/mypage/activity" className="text-blue-700 underline">커뮤니티 활동</Link><Link to="/mypage/management" className="text-blue-700 underline">경영 현황</Link></div>
+    </section>;
+  }
 
   return (
     <div className="mt-10 w-full max-w-2xl text-left">
