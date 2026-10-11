@@ -368,18 +368,18 @@ test("notification history pages and server filters remain usable on mobile", as
   await prepare(page);
   await page.goto("/mypage");
   const notices = page.locator("#my-home-notifications");
-  await expect(notices.getByText("검증 알림 4", { exact: true })).toBeVisible();
+  await expect(notices.getByText("검증 알림 4")).toBeVisible();
   await expect(notices.getByText("검증 알림 5", { exact: true })).toHaveCount(
     0,
   );
   await notices.getByRole("button", { name: "알림 전체보기" }).click();
   await notices.getByRole("button", { name: "다음", exact: true }).click();
   await expect(
-    notices.getByText("검증 알림 10", { exact: true }),
+    notices.getByText("검증 알림 10"),
   ).toBeVisible();
   await notices.getByLabel("알림 상태").selectOption("unread");
   await expect(
-    notices.getByText("참여 상태 알림", { exact: true }),
+    notices.getByText("참여 상태 알림"),
   ).toBeVisible();
   await expect(notices.getByText("검증 알림 1", { exact: true })).toHaveCount(
     0,

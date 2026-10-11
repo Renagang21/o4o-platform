@@ -134,7 +134,10 @@ Actions artifact와 job log 다운로드는 클라우드 목적지 제한으로 
 - 알림 서버 page/limit/isRead 조회와 내 글 `author=me` 페이지, QR 반환 날짜만 사용하는 그래프, 계정별 선택 매장 보조 정보를 개선한다. 새로운 API·권한·DB·공유 패키지·dependency·CI 변경은 없다.
 - 집중 테스트 13개 PASS: 기존 본인/매장 scope·오류 재시도·계정 변경·알림 페이지/필터 및 늦은 응답·실패 envelope·내 글 임시 저장/빈 후속 페이지·그래프 날짜 정렬/0·잘못된 날짜/음수 거부·동일 계정 선택 유지/타 계정 및 제거된 매장 무효화.
 - 초기 집중 실행은 강화한 envelope 검증과 예전 fixture 불일치로 4개 실패했다. 성공 플래그·알림 pagination을 실제 서버 계약에 맞춰 fixture에 추가한 뒤 전체 집중 테스트가 통과했다. 검증 기준을 낮추지 않았다.
-- 전체 회귀·build·PC/모바일·PR·main·운영 배포는 실행 결과에 따라 아래에 확정한다. 실제 계정 문서는 작업·기준 checkout에 없으며 AUTHENTICATED PENDING을 유지한다.
+- 최신 main `b19dc0a3d`의 공통 헤더와 커뮤니티 변경을 조사했다. 본인 글 `author=me`·인증·scope 계약과 기존 API 응답 구조 유지, migration·dependency 변경 0을 확인한 뒤 자기 branch에 병합했다. 바뀐 UI 패키지를 빌드하고 Neture 타입 포함 production build와 변경 파일 ESLint가 통과했다.
+- Chromium fixture **27개 PASS**(1440/375/320px 각 9개). 직접 화면 진입·모바일 메뉴·Study/Funding 기존 회귀 외에 알림 최근/전체/페이지/읽지 않음 필터, 본인 글 2페이지 임시 저장과 원본 이동, 선택 매장 화면 이동/새로고침 유지, 실제 0·누락 날짜 미생성·가로 넘침 0을 확인했다. 매장 화면 모바일 스크린샷도 확인했다. 데이터·handoff는 fixture이며 운영 계정·DB를 사용하지 않는다.
+- 첫 브라우저 실행은 설치된 Chromium의 경로 미지정으로 launch 실패했다. 경로를 지정한 첫 화면 실행은 23개 통과·알림의 읽지 않음 표시를 제목과 함께 찾는 locator 3개 실패·동시 빌드/테스트 중 조회 대기 1개 실패였다. 제목 locator를 수정하고 빌드 후 단독 실행해 27개 모두 통과했다. timeout·검증 조건·실제 동작을 완화하지 않았다.
+- 최초 전체 524개는 통과했다. 최신 main 반영 후 첫 전체 실행은 532개 통과·기존 CommunityServiceAdminPage 후보 목록 대기 1개 실패였다. 범위 밖 화면·테스트는 수정하지 않고 최종 단독 전체 재실행에서 **63파일·533개 PASS**를 확인했다. PR·main·운영 배포는 실제 실행 결과로 확정한다. 실제 계정 문서는 작업·기준 checkout에 없으며 AUTHENTICATED PENDING을 유지한다.
 
 ## WORKTREE_DISPOSITION
 
