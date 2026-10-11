@@ -136,3 +136,7 @@ PR #458의 이전 HEAD 전체 CI는 통과했으나 리뷰에서 발견한 목�
 focused API 6 suites 109 tests PASS 및 격리 PostgreSQL 실제 소스 실행에서 출처 검증·타 scope/closed/draft/org 거부·공지 날짜 alias·게시판별 chooser·철회/stale proof replay 거부·기타 metadata 보존 PASS. 운영 DB 설정 저장·이력 삭제·법률 게시·새 migration은 실행하지 않았다. 최종 push·CI·review·main/배포는 후속 실제 결과로 기록하며 사용자 검증은 T13에 유지한다.
 
 후속 API build·변경 파일 ESLint PASS. 추가로 공통 controller의 raw-source 소비 계약을 포함하는 community catalog/access 31 tests PASS. 문서 민감정보 검사 3852 files 0건 및 diff whitespace 검사 PASS.
+
+### 통합 대기 중 외부 작업 최신화
+
+main #459 PH 자원 제거 도구 및 #465 plan 결과 문서를 통합했다. 읽기 전용 plan은 성공했으나 실제 삭제는 누락 IAM 권한 3개 보완 전 대기다. 이 세션은 해당 apply/권한 변경을 실행하지 않는다. main #463 점검 SQL collation 수정과 #466 기존 승인된 매장 검증 복사본 정리 phase 종료 문서를 통합했다. 이는 활성 서비스 UI나 공개 정책을 바꾸지 않는 담당 작업의 결과이며, 사용자 실계정 테스트를 대체하지 않는다. 이 세션의 추가 검증은 자원 안전 테스트 18 PASS, 복사본 점검 테스트 4 PASS·격리 DB 의존 1 SKIP이다. 최신 main 통합마다 최종 HEAD의 required CI를 다시 확인한다.
