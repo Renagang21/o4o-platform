@@ -284,3 +284,9 @@ PR #457의 P1/P2 리뷰 지적을 반영했다. Google·Kakao 세션 응답에 �
 45건이 통과했다. 공통 처리방침 링크를 포함한 세 서비스 PC/mobile 가입 회귀 18건도 통과했다.
 최신 commit을 push한 뒤 CI·재리뷰·이전 스레드 해소를 확인한다. 동일 WO 연속 Phase이며
 push/PR 종료 범위와 운영 정책 미게시 경계는 유지한다.
+
+
+재리뷰에서 발견한 Neture 하위 공급자·펀딩 운영자 경로도 구체적인 service mount로 먼저
+판정한다. 등록 경로 대조로 확인한 funding legacy API와 communities API도 연결했다.
+실제 요청의 차단·승낙 후 해소 및 prefix 경계 신규 회귀 7건이 통과했다. 운영자 역할 guard와
+전체관리자 예외는 유지한다. 최종 CI·리뷰는 이 후속 commit을 포함한 PR 최신 HEAD에서 확인한다.

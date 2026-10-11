@@ -192,11 +192,17 @@ export function selectPendingPoliciesForRequest(
     ['/api/v1/cosmetics', 'k-cosmetics'],
     ['/api/v1/lms', 'lecture'],
     ['/api/v1/lecture', 'lecture'],
+    // More specific mounts must precede the generic Neture namespace.
+    ['/api/v1/neture/operator/market-trial', 'funding'],
+    ['/api/v1/neture/operator/suppliers', 'supplier'],
+    ['/api/v1/neture/admin/suppliers', 'supplier'],
     ['/api/v1/neture/supplier', 'supplier'],
     ['/api/v1/neture', 'neture'],
     ['/api/v1/supplier', 'supplier'],
+    ['/api/v1/communities', 'community'],
     ['/api/v1/community', 'community'],
     ['/api/v1/funding', 'funding'],
+    ['/api/market-trial', 'funding'],
   ];
   const service = owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
     ?? sessionServiceKey;

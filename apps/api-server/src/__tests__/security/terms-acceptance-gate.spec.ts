@@ -127,7 +127,7 @@ function makeApp() {
   const app = express();
   app.use(express.json());
   app.use('/api/v1/auth/policy-acceptances', policyAcceptanceRoutes);
-  app.all('/api/v1/*', requireAuth as any, (_req: any, res: any) => res.json({ success: true, reached: true }));
+  app.all('/api/*', requireAuth as any, (_req: any, res: any) => res.json({ success: true, reached: true }));
   return app;
 }
 
@@ -612,5 +612,34 @@ describe('공통 계정·서비스별 약관 범위', () => {
     expect(selectPendingPoliciesForRequest(items, undefined, '/api/v1/users/me')).toEqual(items);
     expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/neture/supplier/copilot/query').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
     expect(selectPendingPoliciesForRequest(items, 'supplier', '/api/v1/neture/supplier/spot-policies').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
+  });
+});
+
+
+describe('실제 서비스 소유 mount의 약관 enforcement', () => {
+  it.each([
+    ['/api/v1/neture/operator/market-trial/fixture', 'funding'],
+    ['/api/v1/neture/operator/suppliers/pending', 'supplier'],
+    ['/api/v1/neture/admin/suppliers/governance', 'supplier'],
+    ['/api/market-trial/fixture/join', 'funding'],
+    ['/api/v1/communities/fixture/members', 'community'],
+  ])('%s는 다른 세션 범위로 서비스 pending을 제거하지 않는다', async (path, serviceKey) => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, serviceKey)];
+    membershipRows = [{ serviceKey, status: 'active' }];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken('neture')}`;
+    expect((await request(app).get('/api/v1/neture/profile').set('Authorization', auth)).status).toBe(200);
+    const denied = await request(app).get(path).set('Authorization', auth);
+    expect(denied.status).toBe(428);
+    expect(denied.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual([serviceKey]);
+    acceptedIds.push(DOC_KPA);
+    policyAcceptanceService.invalidateAll();
+    expect((await request(app).get(path).set('Authorization', auth)).status).toBe(200);
+  });
+
+  it.each(['/api/v1/neture/operator/suppliers-other', '/api/v1/neture/operator/market-trial-other'])('%s는 비슷한 이름만으로 하위 서비스가 되지 않는다', path => {
+    const pending = ['neture', 'supplier', 'funding'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'Fixture' }));
+    expect(selectPendingPoliciesForRequest(pending, 'supplier', path).map(p => p.serviceKey)).toEqual(['neture']);
   });
 });
