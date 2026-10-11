@@ -85,6 +85,8 @@ test('plan reports exact missing permissions without deleting anything', async (
   const plan = await retireResources({ ...h.options, mode: 'plan', permissions: async () => ['run.services.delete'] });
   assert.deepEqual(plan.targets, targets);
   assert.ok(plan.missingPermissions.includes('compute.backendServices.delete'));
+  assert.ok(plan.missingPermissions.includes('compute.regionNetworkEndpointGroups.delete'));
+  assert.ok(!deletionPermissions.includes('compute.networkEndpointGroups.delete'));
   assert.deepEqual(h.removed, []);
 });
 test('missing permission or failed actual QR/tablet validation blocks all writes', async () => {

@@ -15,12 +15,12 @@ const backend = 'backend-pharmacy-hub-web';
 const neg = 'neg-pharmacy-hub-web';
 const service = 'pharmacy-hub-web';
 const negLink = `https://www.googleapis.com/compute/v1/projects/${project}/regions/${region}/networkEndpointGroups/${neg}`;
-export const deletionPermissions = ['compute.backendServices.delete', 'compute.networkEndpointGroups.delete',
+export const deletionPermissions = ['compute.backendServices.delete', 'compute.regionNetworkEndpointGroups.delete',
   'compute.globalOperations.get', 'compute.regionOperations.get', 'run.services.delete'];
 const knownPermissions = new Set([...deletionPermissions, 'run.services.list', 'iam.serviceAccounts.getAccessToken']);
 const permissionsByTarget = new Map([
   [backend, ['compute.backendServices.delete', 'compute.globalOperations.get']],
-  [neg, ['compute.networkEndpointGroups.delete', 'compute.regionOperations.get']],
+  [neg, ['compute.regionNetworkEndpointGroups.delete', 'compute.regionOperations.get']],
   [service, ['run.services.delete']],
 ]);
 const productionWorkflows = new Set(['promote.yml', 'delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);

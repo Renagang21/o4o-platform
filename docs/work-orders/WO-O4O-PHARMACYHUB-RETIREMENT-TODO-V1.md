@@ -156,3 +156,5 @@ plan은 현재 Actions principal의 backend/NEG/Cloud Run 삭제 및 operation �
 PR #459 P1 리뷰 대응: PH workflow의 기존 concurrency만으로 다른 Delivery/API 배포를 직렬화할 수 없으므로, 매 삭제 직전 GitHub Actions의 Delivery/API/admin/web/다른 PH 실행·대기 상태를 완전 페이지 조회해 차단한다. 현재 자기 run과 CI는 제외하며 조회 권한·identity·metadata·pagination이 불완전하면 fail closed한다. 이 async gate를 await한 후에만 고정 대상 삭제를 실행한다. `actions: read`와 해당 step의 ephemeral GitHub token만 사용하며 다른 배포 workflow의 lock을 변경하지 않는다. 새 자원/삭제 자원의 재등장도 후속 삭제를 차단한다. 이 gate는 분산 원자 lock을 주장하지 않으며 AGENTS의 세션 간 단독 운영 확인도 계속 적용한다.
 
 추가 P1 대응: 최상위 `promote.yml`과 `referenced_workflows`의 production reusable workflow도 gate에 포함한다. caller 이름만으로 호출된 Delivery를 놓치지 않으며 호출 metadata가 불완전하면 차단한다. 품질 검사 지적에 따라 Ubuntu runner의 gcloud를 고정 절대 경로로 실행하고 의존 순서 삭제는 직렬 promise chain으로 유지한다. 자원 안전 테스트 18 PASS다.
+
+P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 preflight는 존 NEG 권한 대신 `compute.regionNetworkEndpointGroups.delete`를 검사한다. 기존 read-only list 권한과 삭제 권한은 구분하며, plan에서 실제 principal의 누락 권한을 확인하기 전 삭제하지 않는다.
