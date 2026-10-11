@@ -52,7 +52,7 @@ test('cloud census calls read operations only and excludes Run credentials',()=>
     if(args[1]==='url-maps')return JSON.stringify([{name:'map',hostRules:[],pathMatchers:[],secret:'private credential'}]);
     return '[]';
   });
-  assert.equal(calls.length,5);
+  assert.equal(calls.length,6);
   assert.equal(calls.every(a=>a.includes('list')||a.includes('describe')),true);
   assert.equal(JSON.stringify(result).includes('private credential'),false);
   assert.deepEqual(result.resources.runService,{name:'pharmacy-hub-web',present:true});
@@ -60,7 +60,7 @@ test('cloud census calls read operations only and excludes Run credentials',()=>
 
 test('permission failures contain only safe permission names',()=>{
   const result=collectCloudInventory(()=>{throw {stderr:'PERMISSION_DENIED compute.backendServices.list private password',output:'private password'};});
-  assert.equal(result.blockers.length,5);
+  assert.equal(result.blockers.length,6);
   assert.equal(JSON.stringify(result).includes('private password'),false);
   assert.deepEqual(result.blockers[0].permissions,['compute.backendServices.list']);
 });
@@ -160,4 +160,22 @@ test('database failure still reports independent read-only cloud and HTTP eviden
   assert.equal(result.cloud.blockers.length, 1);
   assert.equal(result.http.checks[0].status, 301);
   assert.doesNotMatch(JSON.stringify(result), /private SQL|secret/);
+});
+
+
+test('successful gcloud exit with a permission warning cannot prove no resources', () => {
+  const result = collectCloudInventory(() => ({ status: 0, stdout: '[]', stderr: "WARNING: Some requests did not succeed. Required 'compute.urlMaps.list' permission private details" }));
+  assert.equal(result.blockers.length, 6);
+  assert.equal(Object.keys(result.resources).length, 0);
+  assert.deepEqual(result.blockers[0].permissions, ['compute.urlMaps.list']);
+  assert.doesNotMatch(JSON.stringify(result), /private details/);
+});
+
+test('scope query failure identifies only validated schema and SQLSTATE', async () => {
+  const client = { query: async sql => {
+    if (sql.includes('information_schema')) return { rows: [{ table_name: 'service_catalog', column_name: 'service_key', data_type: 'text', udt_name: 'text' }] };
+    if (sql.includes('count(*)')) throw Object.assign(new Error('private SQL row'), { code: '22P02' });
+    return { rows: [] };
+  } };
+  await assert.rejects(collectRetirementInventory(client), error => /retirement-scope:service_catalog.service_key; code=22P02/.test(error.message) && !error.stack.includes('private'));
 });

@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 vi.mock('../../../lib/api/communityServiceAdmin', () => ({
   listCreationRequests: vi.fn().mockResolvedValue([]),
   listAdminCommunities: vi.fn().mockResolvedValue([]),
-  listCommunityMembers: vi.fn().mockResolvedValue([]),
+  listCommunityMembers: vi.fn().mockResolvedValue({ rows: [], pagination: { page: 1, pageSize: 20, total: 0, totalPages: 1 } }),
   approveCreationRequest: vi.fn(),
   rejectCreationRequest: vi.fn(),
   setCommunityMemberRole: vi.fn(),
@@ -17,7 +17,7 @@ import CommunityServiceAdminPage from '../CommunityServiceAdminPage';
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(listAdminCommunities).mockResolvedValue([]);
-  vi.mocked(listCommunityMembers).mockResolvedValue([]);
+  vi.mocked(listCommunityMembers).mockResolvedValue({ rows: [], pagination: { page: 1, pageSize: 20, total: 0, totalPages: 1 } });
   vi.mocked(listCreationRequests).mockResolvedValue([]);
 });
 afterEach(() => { cleanup(); });
@@ -54,10 +54,10 @@ describe('관리 조회 탭 전환', () => {
     vi.mocked(listAdminCommunities).mockResolvedValue([
       { id: 'c1', slug: 'fixture', name: '테스트 커뮤니티', status: 'active', operatorCount: 2, memberCount: 3 },
     ]);
-    vi.mocked(listCommunityMembers).mockResolvedValue(['admin', 'operator', 'member'].map((role, index) => ({
+    vi.mocked(listCommunityMembers).mockResolvedValue({ rows: ['admin', 'operator', 'member'].map((role, index) => ({
       membershipId: `m${index}`, userId: `u${index}`, name: `회원 ${index}`, email: null,
       role: role as 'admin' | 'operator' | 'member', membershipStatus: 'active', serviceMembershipStatus: 'active',
-    })));
+    })), pagination: { page: 1, pageSize: 20, total: 3, totalPages: 1 } });
     render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
     fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
     expect((await screen.findByLabelText('회원 0 역할') as HTMLSelectElement).value).toBe('admin');
@@ -70,7 +70,7 @@ describe('관리 조회 탭 전환', () => {
     expect((selection as HTMLSelectElement).value).toBe('');
     fireEvent.change(selection, { target: { value: 'c1' } });
     await screen.findByLabelText('회원 0 역할');
-    expect(listCommunityMembers).toHaveBeenNthCalledWith(2, 'c1');
+    expect(listCommunityMembers).toHaveBeenNthCalledWith(2, 'c1', { q: '', status: undefined, page: 1, pageSize: 20 });
     expect(setCommunityMemberRole).not.toHaveBeenCalled();
   });
 });
