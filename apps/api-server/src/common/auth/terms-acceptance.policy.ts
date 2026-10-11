@@ -192,6 +192,7 @@ export function selectPendingPoliciesForRequest(
     ['/api/v1/cosmetics', 'k-cosmetics'],
     ['/api/v1/lms', 'lecture'],
     ['/api/v1/lecture', 'lecture'],
+    ['/api/v1/neture/supplier', 'supplier'],
     ['/api/v1/neture', 'neture'],
     ['/api/v1/supplier', 'supplier'],
     ['/api/v1/community', 'community'],

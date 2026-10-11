@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { styles } from './email/shared';
 
+// Account creation always uses the Neture common privacy notice; service notices belong to service enrollment.
+export const ACCOUNT_PRIVACY_HREF = 'https://neture.co.kr/privacy';
+
 export function SignupTermsAgreement({ load, checked, onChecked, onDocument, reloadKey = 0 }: {
   load: () => Promise<SignupTermsDocument>;
   checked: boolean;

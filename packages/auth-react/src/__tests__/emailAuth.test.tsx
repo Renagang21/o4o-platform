@@ -97,6 +97,9 @@ describe('EmailSignupForm', () => {
       <EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" links={{ login: '/login' }} />,
     );
     await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+    const privacyLink = screen.getByRole('link', { name: '개인정보 처리방침 내용 보기' });
+    expect(privacyLink.getAttribute('href')).toBe('https://neture.co.kr/privacy');
+    expect(privacyLink.getAttribute('target')).toBe('_blank');
     fill();
     expect(submit().disabled).toBe(true);
     const boxes = screen.getAllByRole('checkbox');

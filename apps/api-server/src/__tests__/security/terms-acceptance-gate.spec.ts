@@ -605,10 +605,12 @@ describe('공통 계정·서비스별 약관 범위', () => {
   });
 
   it('공유 API는 서명된 세션 범위를 사용하고 서비스 소유 API는 query나 다른 세션 범위로 우회하지 못한다', () => {
-    const items = ['neture', 'kpa-society', 'lecture'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'T' }));
+    const items = ['neture', 'kpa-society', 'lecture', 'supplier'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'T' }));
     expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/users/me?serviceKey=kpa-society').map(p => p.serviceKey)).toEqual(['neture']);
     expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/kpa/forum/posts?serviceKey=neture').map(p => p.serviceKey)).toEqual(['neture', 'kpa-society']);
     expect(selectPendingPoliciesForRequest(items, 'lecture', '/api/v1/kpa-not-a-service').map(p => p.serviceKey)).toEqual(['neture', 'lecture']);
     expect(selectPendingPoliciesForRequest(items, undefined, '/api/v1/users/me')).toEqual(items);
+    expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/neture/supplier/copilot/query').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
+    expect(selectPendingPoliciesForRequest(items, 'supplier', '/api/v1/neture/supplier/spot-policies').map(p => p.serviceKey)).toEqual(['neture', 'supplier']);
   });
 });

@@ -1,4 +1,4 @@
-import { SignupTermsAgreement } from './SignupTermsAgreement';
+import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
@@ -72,7 +72,6 @@ export function GoogleContinue<TUser = unknown>({
   onSuccess,
   onError,
   onStart,
-  privacyHref = '/privacy',
   hint,
   className,
 }: GoogleContinueProps<TUser>) {
@@ -209,7 +208,7 @@ export function GoogleContinue<TUser = unknown>({
           <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <label style={checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
-            <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+            <a href={ACCOUNT_PRIVACY_HREF} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
           </div>
           <label style={checkRow}>
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />

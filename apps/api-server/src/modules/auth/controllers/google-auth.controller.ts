@@ -114,7 +114,7 @@ export class GoogleAuthController extends BaseController {
       || (user.email as string | undefined)?.split('@')[0]
       || '사용자';
     try {
-      user.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(String(user.id));
+      user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id), resolveSessionServiceKey(req.get('origin')));
     } catch { user.pendingPolicyAcceptances = []; }
 
     const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);

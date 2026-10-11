@@ -586,3 +586,28 @@ Demo 예외는 enforcement에만 적용하고 raw 이력은 그대로 유지한�
 외부 인증 고지 근거, 실제 공고 경로와 30일 경과 후 시행·재동의 운영 검증은 OPEN이다.
 Neture 공통 본문과 서비스 신청 조건이 완성되기 전에 운영의 새 정책 적용 완료로 표시하지 않는다.
 이번 범위는 push/PR이며 main 통합·배포·정책 DB 게시는 실행하지 않았다.
+
+
+계정 생성의 처리방침 링크는 이메일·Google·카카오 UI에서 Neture 공통 주소와 새 탭을 단언했다.
+다른 서비스의 privacyHref를 전달해도 공통 계정 처리방침을 선택한다. 서비스 신청에서의 추가 수집
+고지·동의 기록을 이 링크 변경으로 구현 완료 처리하지 않는다.
+
+
+### PR #457 리뷰 보완과 추가 회귀
+
+- Google 로그인·가입 및 Kakao 로그인 완료·가입이 공유하는 세션 응답도
+  `getEnforcedPendingForUser(userId, sessionServiceKey)`를 사용한다. 세션 발급과 같은 origin 범위로
+  요구 약관과 Demo 예외를 적용한다. body의 serviceKey는 응답 범위를 바꾸지 않는다.
+- 실제 공급자 mount `/api/v1/neture/supplier`를 일반 Neture 경로보다 먼저 판정한다.
+  copilot 및 spot-policies의 공급자 pending이 제거되지 않음을 검증했다.
+- provider 응답 회귀 8건과 약관 보안 회귀 45건, 합계 53 PASS. 앞서 77건에 포함된 보안 회귀는
+  중복 합산하지 않는다. 이번 API 검증의 고유 테스트는 202 PASS(77 + 117 + provider 8)다.
+- 계정 가입 PC/mobile 회귀도 Neture·약국·분회에서 18 PASS: 정상 제출, 문서 조회 실패/재시도,
+  버전 변경 후 입력 보존/재동의, 공통 처리방침 새 탭, 제출 후 약관 페이지로 이동하지 않음.
+  별도의 정책 gate 회귀 18건과 합계 36건이며 모두 로컬 production bundle/합성 API 응답이다.
+- 최신 main의 market-trial 소스와 오래된 로컬 dist 간 차이로 API 타입 검사가 한 차례 실패했다.
+  해당 workspace 의존성을 재빌드한 후 타입 검사가 통과했다. 무관한 소스는 수정하지 않았다.
+- 변경 파일 lint 오류 0건. 기존 unused import 경고 2건은 남아 있다.
+
+최종 commit의 GitHub CI 및 리뷰 결과는 PR #457의 최신 HEAD에서 확인한다. 이전 HEAD의 CI PASS를
+후속 수정의 PASS로 대체하지 않는다. 실제 OAuth·운영 DB·배포·새 정책 공고/게시 검증은 별도다.

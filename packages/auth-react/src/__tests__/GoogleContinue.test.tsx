@@ -133,6 +133,9 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     await waitFor(() => expect(captured).not.toBeNull());
     await act(async () => { captured!.onCredential('id-token'); });
     await screen.findByTestId('google-continue-consent');
+    const privacyLink = screen.getByRole('link', { name: '개인정보 처리방침 내용 보기' });
+    expect(privacyLink.getAttribute('href')).toBe('https://neture.co.kr/privacy');
+    expect(privacyLink.getAttribute('target')).toBe('_blank');
 
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]); // 이용약관

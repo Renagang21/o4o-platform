@@ -1,4 +1,4 @@
-import { SignupTermsAgreement } from './SignupTermsAgreement';
+import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -87,7 +87,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
       <label style={styles.field}>개인 휴대전화<input style={styles.input} type="tel" autoComplete="tel" required maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></label>
       <p>휴대전화 본인 인증은 수행하지 않습니다. 이메일 소유 확인이 필요하면 확인 메일을 보냅니다.</p>
       <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
-      <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label><a style={styles.link} href={props.privacyHref ?? 'https://neture.co.kr/privacy'} target="_blank" rel="noreferrer">내용 보기</a></div>
+      <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label><a style={styles.link} href={ACCOUNT_PRIVACY_HREF} target="_blank" rel="noreferrer">내용 보기</a></div>
       <label><input type="checkbox" checked={marketing} onChange={e => setMarketing(e.target.checked)} />마케팅 정보 수신 동의 (선택)</label>
       <button type="submit" style={styles.primaryBtn} disabled={busy || !policy || !terms || !privacy}>동의하고 계정 만들기</button>
       <button type="button" style={styles.ghostBtn} disabled={busy} onClick={() => { setTicket(undefined); setMessage(''); }}>취소</button>
