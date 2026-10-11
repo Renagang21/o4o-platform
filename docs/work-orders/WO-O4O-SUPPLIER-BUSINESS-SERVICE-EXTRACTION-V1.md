@@ -28,6 +28,7 @@
 - [x] 기존 facade 메서드·오류 클래스 import 경로 유지
 - [x] 조직 helper 단일 구현 유지, 기존 lifecycle·guard·공개 디렉터리 동작 유지
 - [x] 새 구현 파일까지 기존 소스 계약 검사 확장
+- [x] SonarCloud 중복 지적 후 GET/PATCH 연락처·주문조건 응답을 전용 projection으로 공유
 - [x] 동작 회귀·타입·lint·민감정보 검사 결과 확인
 - [ ] push·PR 및 CI·Codex 확인
 - [ ] main 통합·Delivery는 이번 PR에 대한 승인 및 기술 gate 확인 후 진행
@@ -59,3 +60,13 @@ Organization의 사업자번호·주소·metadata와 Supplier의 서비스 프�
 - TypeScript AST로 이동한 7개 메서드 본문이 기준 commit과 동일함을 확인.
 - 실제 DB rollback·인증된 운영 Supplier 화면·운영 DB write 미실행.
 - 문서 정합: 이번 WO에 실행 범위를 기록. Supplier Frozen 정본의 정책/구조 변경 없음.
+
+## PR 분석 후 보정
+
+첫 CI Gate 및 CodeQL은 PASS, SonarCloud는 신규 코드 중복 7.1%로 실패했다.
+GET/PATCH에서 같은 연락처·주문조건 응답 필드를 전용 함수로 공유하여 중복을 제거했다.
+이는 API/권한/저장 의미 변경이 아니며 두 경로의 동일 필드 동작 검증을 추가했다.
+위 AST 비교는 최초 이동 단계의 증거이고, 최종 GET/PATCH 본문은 projection 위임 때문에 달라졌다.
+
+중복 보정 후 신규 동작 15건 + Supplier Domain/Identity 계약 68건 = 3 suites / 83 tests PASS.
+기존 다른 계약 66건을 포함한 서로 다른 총 검증은 149건이다.

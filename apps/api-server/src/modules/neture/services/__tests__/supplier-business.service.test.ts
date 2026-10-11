@@ -97,6 +97,23 @@ describe('supplier business profile behavior', () => {
     expect(result?.managerPhone).toBe('01000000000');
   });
 
+  it.each(['read', 'update'] as const)('%s keeps the contact and order condition response fields after sharing their projection', async (mode) => {
+    Object.assign(supplier, {
+      contactEmail: 'fixture-email', contactPhone: 'fixture-phone', contactWebsite: 'fixture-site', contactKakao: 'fixture-channel',
+      contactEmailVisibility: 'PRIVATE', contactPhoneVisibility: 'PUBLIC', contactWebsiteVisibility: 'PARTNERS', contactKakaoVisibility: 'PRIVATE',
+      orderConditionNote: 'fixture condition',
+    });
+    const result = mode === 'read'
+      ? await service.getSupplierProfile('fixture-supplier')
+      : await service.updateSupplierProfile('fixture-supplier', {});
+    expect(result).toMatchObject({
+      contactEmail: 'fixture-email', contactPhone: 'fixture-phone', contactWebsite: 'fixture-site', contactKakao: 'fixture-channel',
+      contactEmailVisibility: 'PRIVATE', contactPhoneVisibility: 'PUBLIC', contactWebsiteVisibility: 'PARTNERS', contactKakaoVisibility: 'PRIVATE',
+      minOrderAmount: 500, minOrderSurcharge: 20, orderConditionNote: 'fixture condition',
+    });
+    expect(Object.keys(result!)).not.toContain('contactAndOrderProfile');
+  });
+
   it('normalizes supplied order/shipping values and retains omitted fields', async () => {
     await service.updateSupplierProfile('fixture-supplier', { minOrderAmount: 0, orderConditionNote: '  fixture  ', baseShippingFee: 0, freeShippingThreshold: -1, averageDispatchDays: null, shippingIsland: '  island  ' });
     expect(save).toHaveBeenCalledWith(expect.objectContaining({ minOrderAmount: null, minOrderSurcharge: 20, orderConditionNote: 'fixture', baseShippingFee: 0, freeShippingThreshold: null, averageDispatchDays: null, shippingIsland: 'island' }));

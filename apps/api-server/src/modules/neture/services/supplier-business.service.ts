@@ -110,19 +110,8 @@ export class NetureSupplierBusinessService {
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         // deprecated — businessInfo prefill 은퇴 후 항상 false (응답 키만 호환 유지)
         _prefilled: false,
-        // Contact (existing — supplier remains SSOT for contact visibility)
-        contactEmail: supplier.contactEmail || null,
-        contactPhone: supplier.contactPhone || null,
-        contactWebsite: supplier.contactWebsite || null,
-        contactKakao: supplier.contactKakao || null,
-        contactEmailVisibility: supplier.contactEmailVisibility,
-        contactPhoneVisibility: supplier.contactPhoneVisibility,
-        contactWebsiteVisibility: supplier.contactWebsiteVisibility,
-        contactKakaoVisibility: supplier.contactKakaoVisibility,
-        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
-        minOrderAmount: supplier.minOrderAmount ?? null,
-        minOrderSurcharge: supplier.minOrderSurcharge ?? null,
-        orderConditionNote: supplier.orderConditionNote ?? null,
+        // Contact visibility and stored order conditions keep their existing response keys.
+        ...this.getContactAndOrderProfile(supplier),
         // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1: 배송 정책 (저장/조회 foundation)
         baseShippingFee: supplier.baseShippingFee ?? null,
         freeShippingThreshold: supplier.freeShippingThreshold ?? null,
@@ -341,24 +330,29 @@ export class NetureSupplierBusinessService {
         businessEntityType: savedBusinessProfile.businessEntityType ?? null,
         businessStartDate: savedBusinessProfile.businessStartDate ?? null,
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
-        // Contact
-        contactEmail: supplier.contactEmail || null,
-        contactPhone: supplier.contactPhone || null,
-        contactWebsite: supplier.contactWebsite || null,
-        contactKakao: supplier.contactKakao || null,
-        contactEmailVisibility: supplier.contactEmailVisibility,
-        contactPhoneVisibility: supplier.contactPhoneVisibility,
-        contactWebsiteVisibility: supplier.contactWebsiteVisibility,
-        contactKakaoVisibility: supplier.contactKakaoVisibility,
-        // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
-        minOrderAmount: supplier.minOrderAmount ?? null,
-        minOrderSurcharge: supplier.minOrderSurcharge ?? null,
-        orderConditionNote: supplier.orderConditionNote ?? null,
+        ...this.getContactAndOrderProfile(supplier),
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error updating supplier profile:', error);
       throw error;
     }
+  }
+
+  /** Response projection shared by profile GET and PATCH; no new response fields. */
+  private getContactAndOrderProfile(supplier: NetureSupplier) {
+    return {
+      contactEmail: supplier.contactEmail || null,
+      contactPhone: supplier.contactPhone || null,
+      contactWebsite: supplier.contactWebsite || null,
+      contactKakao: supplier.contactKakao || null,
+      contactEmailVisibility: supplier.contactEmailVisibility,
+      contactPhoneVisibility: supplier.contactPhoneVisibility,
+      contactWebsiteVisibility: supplier.contactWebsiteVisibility,
+      contactKakaoVisibility: supplier.contactKakaoVisibility,
+      minOrderAmount: supplier.minOrderAmount ?? null,
+      minOrderSurcharge: supplier.minOrderSurcharge ?? null,
+      orderConditionNote: supplier.orderConditionNote ?? null,
+    };
   }
 
   /**
