@@ -80,6 +80,29 @@
 - 실제 원본을 비공개로 연결한 뒤 일반 회원·매장 경영자의 handoff·개인 데이터·매장 권한을 검증해야 한다. 이번 조사에서는 로그인·비밀번호 추측·Demo/seed 대체·계정 변경을 하지 않았다.
 - 이번 변경은 문서-only이며 `DEPLOYMENT = NOT_APPLICABLE`이다. My Home의 운영 배포 및 `AUTHENTICATED PENDING` 판정은 유지한다.
 
+## 연속 Phase: 서비스 참여·활동 통합 (2026-10-11)
+
+같은 미완료 구현 WO의 전용 branch를 유지한다. 사용자 지시에 따라 최근 참여·활동 요약, 전체 이력의 페이지 조회, 원본 업무 연결, PC·모바일 검증과 배포를 함께 진행한다. API·권한·공유 패키지·dependency·schema·CI 설정을 변경하지 않는다. 아래 근거는 이전 구현 PR #449와 구분한다.
+
+| 소비 데이터 | 실제 서버 경계 · 표시 |
+|---|---|
+| Study `/lms/enrollments/me` | `requireLectureLearner` 활성 membership·현재 사용자·lecture 고정 scope. 수강 상태·제공된 진도, 서버 pagination. 사용자 식별·serviceKey query 미전송 |
+| Funding `/api/market-trial/my-participations` | `authenticate` + `participantId = req.user.id`. 전체 본인 목록을 받아 표시 필드만 보관·클라이언트 pagination. membership 우회나 자격 생성 없음 |
+| 커뮤니티 · 매장 | 기존 참여 판정·`author=me`·선택 organizationId 유지. 모아보기 글 요약은 최대 3개 커뮤니티 × 2건. QR 요약은 한 승인 매장 기준이며 매출 아님 |
+| 원본 업무 이동 | Study 고정 origin handoff의 요청 returnTo 확인. Funding 실제 독립 호스트 링크이며 해당 호스트 로그인 확인이 필요할 수 있음 |
+
+최신 main의 Funding 개설·포럼 변경을 조사해 본인 참여 API·상세/참여 목록 주소가 유효함을 확인하고 `b565fb00965aa12c84df4f31ed3bff9395fac73e`를 반영했다. 운영 migration·계정 변경·실제 개인정보 조회는 수행하지 않는다.
+
+로컬 검증:
+
+- 최신 main 반영 및 마지막 소스 수정 뒤 Neture 전체 Vitest: **61파일 · 517개 PASS**. 첫 전체 실행은 516개 통과·기존 CommunityServiceAdminPage의 후보 목록 대기 1개 실패였으며, 해당 9개 집중 재실행과 마지막 전체 실행에서 통과했다. 기존 화면·테스트·타임아웃을 수정하지 않았다.
+- 변경 파일 ESLint: **오류 0 · 경고 0**. docs 민감정보 검사와 `git diff --check` 통과.
+- 집중 회귀에는 기존 본인 조회만 사용, 비활성 Study 미조회·서버 403·재시도, 진도 미제공/실제 0, Funding malformed/실패와 빈 목록 구분, 서버/클라이언트 페이지, 계정 변경·늦은 응답·중복 이동·임의 origin 거부·bfcache 무효화가 포함된다.
+- 마지막 소스 수정 뒤 Neture production build(타입 검사 포함): **PASS**. 기존 Browserslist 데이터·큰 bundle 경고는 남아 있으며 dependency·빌드 설정을 변경하지 않았다.
+- 실제 Chromium fixture smoke **18개 PASS**(1440/375/320px 각 6개). 5개 개인 화면 직접 진입·메인 요약 진입·모바일 공통 메뉴·가로 넘침 0·JS 오류 0, 최근 이력 제한·전체 이력 페이지·Study 원본 강의 목적지·Funding 고정 호스트 주소·Study 403·Funding 503·재시도·선택 매장 scope를 확인했다. 운영 API를 가로채고 가상의 Study handoff만 응답해 실제 계정·DB를 사용하지 않았다.
+
+PR·운영 배포: 진행 중. 운영 인증 smoke는 지정 계정 문서 부재로 계속 미실행이다.
+
 ## WORKTREE_DISPOSITION
 
 - worktree: `/workspace/o4o-wt/my-home-document-alignment`
