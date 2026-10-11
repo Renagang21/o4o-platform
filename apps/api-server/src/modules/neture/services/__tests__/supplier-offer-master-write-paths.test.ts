@@ -18,6 +18,7 @@ jest.mock('../../../../database/connection.js', () => ({
 import fs from 'node:fs';
 import path from 'node:path';
 import { NetureOfferService } from '../offer.service.js';
+import { SupplierOfferWriteService } from '../supplier-offer-write.service.js';
 
 type AnyFn = jest.Mock;
 
@@ -49,7 +50,7 @@ describe('(은퇴) resolveProductMetadata — 공급자 Offer 경로의 Master �
   });
 
   it('offer.service 소스(주석 제외)에 resolveOrCreateMaster( · updateProductMaster( · resolveBrandId · ProductImportCommonService 참조 0', () => {
-    const raw = fs.readFileSync(path.join(__dirname, '..', 'offer.service.ts'), 'utf-8');
+    const raw = ['offer.service.ts','supplier-offer-registration.service.ts','supplier-offer-write.service.ts','supplier-offer-distribution.service.ts','offer-lifecycle.service.ts','offer-write-policy.ts'].map((file) => fs.readFileSync(path.join(__dirname, '..', file), 'utf-8')).join('\n');
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
     expect(src).not.toContain('resolveOrCreateMaster(');
     expect(src).not.toContain('updateProductMaster(');
@@ -65,7 +66,7 @@ describe('(은퇴) resolveProductMetadata — 공급자 Offer 경로의 Master �
 describe('updateSupplierOffer — master 기준정보 write 경로 제거', () => {
   it('소스에 offer 수정발 updateProductMaster 호출이 남아 있지 않다', () => {
     // 회귀 방지: 이 경로가 되살아나면 공급자 offer 수정이 공유 master 를 덮어쓴다.
-    const src = fs.readFileSync(path.join(__dirname, '..', 'offer.service.ts'), 'utf-8');
+    const src = fs.readFileSync(path.join(__dirname, '..', 'supplier-offer-write.service.ts'), 'utf-8');
     const updateFn = src.slice(src.indexOf('async updateSupplierOffer'));
     const body = updateFn.slice(0, updateFn.indexOf('\n  async ', 10));
     expect(body).not.toContain('updateProductMaster');
@@ -78,7 +79,7 @@ describe('권한 — offer 는 supplierId 로 스코프된다', () => {
     const findOne = jest.fn(async ({ where }: { where: { id: string; supplierId: string } }) =>
       where.supplierId === ownerSupplierId ? { id: where.id, supplierId: ownerSupplierId, masterId: 'master-1' } : null,
     );
-    const svc = new NetureOfferService({ updateProductMaster: jest.fn() } as never);
+    const svc = new SupplierOfferWriteService();
     (svc as never as { _offerRepo: unknown })._offerRepo = { findOne };
     return { svc, findOne };
   }
