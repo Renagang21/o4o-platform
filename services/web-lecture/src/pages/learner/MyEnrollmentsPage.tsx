@@ -14,9 +14,12 @@ export default function MyEnrollmentsPage() {
   const [items, setItems] = useState<LectureEnrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let alive = true;
+    setLoading(true);
+    setError(null);
     (async () => {
       try {
         const res = await learnerApi.getMyEnrollments<LectureEnrollment>({ limit: 100 });
@@ -25,12 +28,12 @@ export default function MyEnrollmentsPage() {
       finally { if (alive) setLoading(false); }
     })();
     return () => { alive = false; };
-  }, []);
+  }, [reloadKey]);
 
   return <main className="page page-wide">
     <div className="page-head"><h1>내 강의</h1><p className="muted">수강 신청한 강의와 진행 상황입니다.</p></div>
     {loading && <LmsLoading message="불러오는 중..." />}
-    {error && <div className="notice notice-error">{error}</div>}
+    {error && <div className="notice notice-error" role="alert">{error}<button type="button" className="btn mt-3" onClick={() => setReloadKey((key) => key + 1)}>다시 시도</button></div>}
     {!loading && !error && items.length === 0 && <LmsEmptyState title="수강 중인 강의가 없습니다" description="강의 목록에서 관심 있는 강의를 신청해 보세요." actionLabel="강의 둘러보기" onAction={() => navigate('/courses')} />}
     <ul className="list">
       {items.map((e) => <li key={e.id} className="list-item">

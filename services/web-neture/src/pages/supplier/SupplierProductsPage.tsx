@@ -1192,15 +1192,15 @@ export default function SupplierProductsPage() {
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-slate-900">내 제품 관리</h1>
           <p className="text-sm text-slate-500 mt-1">
             공급하는 제품을 관리하고, 가격 및 유통 정책을 설정합니다.
           </p>
           <div className="mt-2"><GuideBackLink to="/guide/features/product-registration" label="상품 등록 이용 안내" /></div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigate('/supplier/products/library')}
             className="flex items-center gap-1.5 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"

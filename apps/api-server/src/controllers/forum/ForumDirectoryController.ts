@@ -5,6 +5,7 @@ import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import { PostStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
+import { mergeForumMetadataPatch } from '../../services/community/community-public-read-metadata.js';
 import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 
 /**
@@ -327,17 +328,15 @@ export class ForumDirectoryController extends ForumControllerBase {
       }
 
       const ALLOWED_FIELDS = ['name', 'description', 'iconEmoji', 'iconUrl'] as const;
+      const patch: Partial<ForumCategoryRequest> = {};
       for (const field of ALLOWED_FIELDS) {
-        if (req.body[field] !== undefined) {
-          (forum as any)[field] = req.body[field];
-        }
+        if (req.body[field] !== undefined) patch[field] = req.body[field];
       }
-
-      if (req.body.name && req.body.name !== forum.name) {
-        forum.slug = this.generateSlug(req.body.name);
+      // Do not save a loaded entity: its metadata/status may predate an operator change.
+      if (Object.keys(patch).length) {
+        await this.forumRequestRepo.update({ id, requesterId: userId, serviceCode: forum.serviceCode }, patch);
       }
-
-      const saved = await this.forumRequestRepo.save(forum);
+      const saved = await this.forumRequestRepo.findOne({ where: { id } });
       res.json({ success: true, data: saved });
     } catch (error: any) {
       logger.error('Error updating my forum:', error);
@@ -382,8 +381,7 @@ export class ForumDirectoryController extends ForumControllerBase {
 
       const { reason } = req.body;
 
-      forum.metadata = {
-        ...meta,
+      const patch = {
         deleteRequestStatus: 'pending',
         deleteRequestedAt: new Date().toISOString(),
         deleteRequestedBy: userId,
@@ -393,7 +391,8 @@ export class ForumDirectoryController extends ForumControllerBase {
         deleteReviewComment: null,
       };
 
-      const saved = await this.forumRequestRepo.save(forum);
+      await mergeForumMetadataPatch(this.forumRequestRepo.manager, id, forum.serviceCode, patch);
+      const saved = await this.forumRequestRepo.findOne({ where: { id } });
       res.json({ success: true, data: saved });
     } catch (error: any) {
       logger.error('Error requesting forum deletion:', error);
