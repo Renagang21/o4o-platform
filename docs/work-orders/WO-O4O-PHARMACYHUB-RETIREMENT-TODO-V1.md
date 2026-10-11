@@ -139,7 +139,7 @@ read-only census [38101012970](https://github.com/Renagang21/o4o-platform/action
 
 사용자가 네 read 권한을 추가한 뒤 census [38117381901](https://github.com/Renagang21/o4o-platform/actions/runs/38117381901)은 SUCCESS이며 Cloud blockers는 0이다. HTTPS proxy `o4o-global-lb-target-proxy-2`는 실제 `o4o-global-lb`를 사용한다. PH backend 참조는 이 map 하나이며 `backend-pharmacy-hub-web` → `neg-pharmacy-hub-web` → `pharmacy-hub-web` 전용 연결을 확인했다. 다른 backend의 이 NEG 참조는 발견되지 않았다. 옛 두 호스트는 아직 HTTP 200·Location 없음이다.
 
-전체 호스트 plan [38117520110](https://github.com/Renagang21/o4o-platform/actions/runs/38117520110)은 SUCCESS(`applied=false`). 다른 운영 workflow 실행이 없음을 확인한 뒤 apply [38117605410](https://github.com/Renagang21/o4o-platform/actions/runs/38117605410)을 실행했으나 www QR의 HTTP 200·Location 없음으로 실패했다. Cloud Run/backend/NEG/DB 삭제는 실행하지 않았다. rollback 이후 census `38118536052`로 현재 map을 재확인한다.
+전체 호스트 plan [38117520110](https://github.com/Renagang21/o4o-platform/actions/runs/38117520110)은 SUCCESS(`applied=false`). 다른 운영 workflow 실행이 없음을 확인한 뒤 apply [38117605410](https://github.com/Renagang21/o4o-platform/actions/runs/38117605410)을 실행했으나 www QR의 HTTP 200·Location 없음으로 실패했다. Cloud Run/backend/NEG/DB 삭제는 실행하지 않았다. rollback 이후 census [38118536052](https://github.com/Renagang21/o4o-platform/actions/runs/38118536052)은 SUCCESS이며 PH matcher가 기존 backend로 복구됐고 Cloud blockers 0·Cloud Run 존재·옛 두 호스트 HTTP 200임을 재확인했다.
 
 기존 검증은 최대 6회/10초 간격으로 약 50초 뒤 실패할 수 있었다. Compute operation DONE과 frontend 반영은 구분해야 하므로 동일 엄격 검증을 최대 5분까지 반복하도록 보강한다. 반영 지연은 아직 확정 원인이 아니며, 이 검증으로 확인한다. timeout 이후에는 기존 fingerprint·동시 변경 차단·검증된 rollback을 유지하고 workflow의 변경 전 25분 잔여 시간 gate도 유지한다. 지연 후 성공·기한 만료 rollback·이미 취소된 검증 회귀를 포함해 focused tests 52개 PASS다.
 
