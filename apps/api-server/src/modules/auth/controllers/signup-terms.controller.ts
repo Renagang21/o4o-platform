@@ -12,7 +12,7 @@ export class SignupTermsController extends BaseController {
       if (!doc) return BaseController.error(res, '게시된 이용약관을 불러올 수 없습니다.', 503, 'POLICY_UNAVAILABLE');
       return BaseController.ok(res, {
         policyDocumentId: doc.id, version: doc.version, title: doc.title,
-        termsHref: serviceKey === 'kpa-society' ? 'https://pharmacy.neture.co.kr/policy' : 'https://neture.co.kr/terms',
+        termsHref: 'https://neture.co.kr/terms',
       });
     } catch (error) {
       if (error instanceof PolicyAcceptanceError) return BaseController.error(res, error.message, error.httpStatus, error.code);

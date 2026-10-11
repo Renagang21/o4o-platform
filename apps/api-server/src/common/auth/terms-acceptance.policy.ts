@@ -11,16 +11,11 @@
  *   - `users.tos_accepted_at` 은 legacy snapshot 이며 판정에 쓰지 않는다 (WO §6).
  *   - JWT claim 에 싣지 않는다. requireAuth 가 매 요청 판정한다 (게이트 우회 불가).
  *
- * ── 판정 규칙 (WO §15 · §22) ───────────────────────────────────────────────
- * required = 사용자의 service_memberships(status ∈ REQUIRED_MEMBERSHIP_STATUSES) 각각에 대해
- *            그 서비스의 **최신 published `terms`** 문서.
- * pending  = required 중 acceptance row 가 없는 것.
- *   - published terms 가 없는 서비스는 요구하지 않는다 → 약관 v1 게시 전에는 게이트가 아무도
- *     막지 않는다 (WO §25 "게시 전 임의 차단 금지").
- *   - membership 이 없는 계정(내부 플랫폼 관리자 등)은 pending 0 → 차단 없음 (WO §22).
- *   - 4 서비스 본문이 동일한 통합약관이므로 프론트는 pending 전부를 한 화면에서 승낙한다.
- *     따라서 서버 게이트는 경로→서비스 매핑 없이 **pending 이 하나라도 있으면** 차단한다
- *     (경로별 매핑은 lms/forum/store 같은 cross-service 경로에서 신뢰할 수 없다).
+ * ── 판정 규칙 ────────────────────────────────────────────────────────────────
+ * Neture 공통 계정 terms는 물리 membership 없이 요구한다. 서비스 terms는 active/pending
+ * membership에 대해서만 요구한다. 게시 문서·기존 승낙 ID/version/hash를 그대로 보존한다.
+ * 요청 차단은 공통 terms와 요청 서비스의 pending에만 적용한다. 가입·승인·role은 생성하지 않는다.
+ * 전체관리자 업무 경로는 기존 별도 role guard와 게이트 예외를 유지한다.
  *
  * ── default-deny + allowlist (WO §19) ────────────────────────────────────
  * pending 상태의 인증 요청은 아래 allowlist (METHOD, 정확한 경로) 만 통과한다.
@@ -36,6 +31,7 @@ export const TERMS_ACCEPTANCE_REQUIRED_STATUS = 428;
 
 /** 이번 WO 의 필수 acceptance 대상 (WO §14). */
 export const REQUIRED_POLICY_DOCUMENT_TYPE = 'terms';
+export const ACCOUNT_POLICY_SERVICE_KEY = 'neture';
 export const ACCEPTANCE_KIND_AGREEMENT = 'agreement';
 
 /**
@@ -131,7 +127,8 @@ export function computePendingPolicyAcceptances(
 
   const seen = new Set<string>();
   const pending: PendingPolicyAcceptance[] = [];
-  for (const m of memberships) {
+  // Synthetic input only: never insert a Neture membership for an account agreement.
+  for (const m of [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }, ...memberships]) {
     if (!REQUIRED_MEMBERSHIP_STATUSES.has(m.status)) continue;
     if (seen.has(m.serviceKey)) continue;
     seen.add(m.serviceKey);
@@ -177,4 +174,30 @@ export function checkSignupTermsDocument(
     if (v !== published.version) return { kind: 'mismatch', document: published };
   }
   return { kind: 'ok', document: published };
+}
+
+/**
+ * Service-owned API prefixes override session context; shared APIs use the signed session scope.
+ * Never choose the gate from client query/body/Origin. Unknown legacy scope stays conservative.
+ */
+export function selectPendingPoliciesForRequest(
+  pending: ReadonlyArray<PendingPolicyAcceptance>,
+  sessionServiceKey?: string | null,
+  rawUrl?: string,
+): PendingPolicyAcceptance[] {
+  const path = normalizeRequestPath(rawUrl);
+  const owners: ReadonlyArray<readonly [string, string]> = [
+    ['/api/v1/kpa-branch', 'kpa-branch'],
+    ['/api/v1/kpa', 'kpa-society'],
+    ['/api/v1/cosmetics', 'k-cosmetics'],
+    ['/api/v1/lms', 'lecture'],
+    ['/api/v1/lecture', 'lecture'],
+    ['/api/v1/neture', 'neture'],
+    ['/api/v1/supplier', 'supplier'],
+    ['/api/v1/community', 'community'],
+    ['/api/v1/funding', 'funding'],
+  ];
+  const service = owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
+    ?? sessionServiceKey;
+  return pending.filter(p => !service || p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || p.serviceKey === service);
 }

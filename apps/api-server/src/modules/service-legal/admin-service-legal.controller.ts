@@ -38,6 +38,7 @@ import logger from '../../utils/logger.js';
 import {
   ServicePolicyLifecycleError,
   resolveServicePolicyLifecycle,
+  assertPolicyEffectiveForPublication,
   type ServicePolicyLifecycleAction,
 } from './service-policy-lifecycle.js';
 
@@ -328,6 +329,8 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         const before = toAdminPolicyDocument(doc);
 
         if (action === 'publish') {
+          // Validate before demoting any published row; notice must not activate future terms.
+          assertPolicyEffectiveForPublication(doc.effective_date);
           // 같은 유형의 기존 published 문서 → draft
           await policyRepo
             .createQueryBuilder()
@@ -361,6 +364,9 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         });
         res.json({ success: true, data: after });
       } catch (error) {
+        if (error instanceof ServicePolicyLifecycleError) {
+          return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
+        }
         logger.error('[ServiceLegal Admin] publish policy error:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 게시 처리 실패' } });
       }

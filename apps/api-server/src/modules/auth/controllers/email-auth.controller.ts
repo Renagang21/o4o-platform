@@ -111,7 +111,7 @@ export class EmailAuthController extends BaseController {
         '사용자';
       try {
         // enforced pending — 서버 게이트와 같은 값(Demo 계정은 약관 화면 대상이 아니다).
-        user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id));
+        user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id), meta(req).sessionServiceKey);
       } catch {
         user.pendingPolicyAcceptances = [];
       }

@@ -108,6 +108,7 @@ import {
   checkSignupTermsDocument,
   computePendingPolicyAcceptances,
   isTermsPendingRequestAllowed,
+  selectPendingPoliciesForRequest,
 } from '../../common/auth/terms-acceptance.policy.js';
 import {
   PolicyAcceptanceError,
@@ -118,8 +119,8 @@ import {
 import policyAcceptanceRoutes from '../../modules/policy-acceptance/policy-acceptance.routes.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 
-function makeToken(): string {
-  return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [], serviceKey: 'neture', sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' }), 'utf8').toString('base64');
+function makeToken(serviceKey = 'neture'): string {
+  return Buffer.from(JSON.stringify({ userId: USER_ID, roles: [], memberships: [], serviceKey, sessionId: '33333333-3333-4333-8333-333333333333', tokenFamily: 'user-family' }), 'utf8').toString('base64');
 }
 
 function makeApp() {
@@ -173,17 +174,18 @@ describe('computePendingPolicyAcceptances (§15 · §22)', () => {
     const pending = computePendingPolicyAcceptances(
       [{ serviceKey: 'kpa-society', status: 'suspended' }, { serviceKey: 'neture', status: 'withdrawn' }],
       published,
-      new Set(),
+      new Set([DOC_NETURE]),
     );
     expect(pending).toEqual([]);
   });
 
   it('published terms 가 없는 서비스는 요구하지 않는다 (§25)', () => {
-    expect(computePendingPolicyAcceptances([{ serviceKey: 'k-cosmetics', status: 'active' }], published, new Set())).toEqual([]);
+    expect(computePendingPolicyAcceptances([{ serviceKey: 'k-cosmetics', status: 'active' }], published, new Set([DOC_NETURE]))).toEqual([]);
   });
 
-  it('membership 이 없는 계정(내부 관리자)은 pending 0 (§22)', () => {
-    expect(computePendingPolicyAcceptances([], published, new Set())).toEqual([]);
+  it('membership 없는 정상 계정도 공통 약관을 요구한다; 내부 관리 업무 경로는 별도 면제', () => {
+    expect(computePendingPolicyAcceptances([], published, new Set()).map(p => p.policyDocumentId)).toEqual([DOC_NETURE]);
+    expect(computePendingPolicyAcceptances([], published, new Set([DOC_NETURE]))).toEqual([]);
   });
 });
 
@@ -297,7 +299,7 @@ describe('requireAuth 약관 게이트', () => {
     publishedRows = [publishedDoc(DOC_KPA, 'kpa-society')];
     membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
     const app = makeApp();
-    const auth = `Bearer ${makeToken()}`;
+    const auth = `Bearer ${makeToken('kpa-society')}`;
 
     const denied = await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth);
     expect(denied.status).toBe(428);
@@ -335,12 +337,12 @@ describe('requireAuth 약관 게이트', () => {
   });
 
   it('membership 이 없는 서비스의 약관은 승낙할 수 없다 (§20)', async () => {
-    publishedRows = [publishedDoc(DOC_NETURE, 'neture')];
-    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
+    publishedRows = [publishedDoc(DOC_KPA, 'kpa-society')];
+    membershipRows = [];
     const res = await request(makeApp())
       .post('/api/v1/auth/policy-acceptances')
       .set('Authorization', `Bearer ${makeToken()}`)
-      .send({ serviceKey: 'neture', policyDocumentId: DOC_NETURE });
+      .send({ serviceKey: 'kpa-society', policyDocumentId: DOC_KPA });
     expect(res.status).toBe(403);
     expect(res.body.code).toBe('MEMBERSHIP_NOT_FOUND');
     expect(acceptedIds).toEqual([]);
@@ -498,11 +500,13 @@ describe('Demo 계정 약관 예외 (enforced pending)', () => {
     expect(pw.body.reached).toBe(true);
   });
 
-  it('GET /auth/policy-acceptances 는 raw 정책 상태를 그대로 보여 준다 (Demo 도 동의로 바꾸지 않는다)', async () => {
+  it('GET /auth/policy-acceptances 는 세션 범위의 raw 상태를 보여 준다 (Demo 예외로 동의 기록을 만들지 않는다)', async () => {
     demoUserIds = [USER_ID];
     const res = await request(makeApp()).get('/api/v1/auth/policy-acceptances').set('Authorization', `Bearer ${makeToken()}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.pending).toHaveLength(2);
+    expect(res.body.data.pending.map((p: any) => p.serviceKey)).toEqual(['neture']);
+    expect(await policyAcceptanceService.getPendingForUser(USER_ID)).toHaveLength(2);
+    expect(acceptedIds).toEqual([]);
   });
 
   it('일반 사용자 + 미동의 → enforced = raw · 428 유지', async () => {
@@ -563,5 +567,48 @@ describe('enforced pending 소비처 계약', () => {
     const src = read('modules/policy-acceptance/policy-acceptance.service.ts');
     expect(src).not.toMatch(/@example\.com/);
     expect(src).not.toMatch(/isDemoLoginEmail/);
+  });
+});
+
+
+describe('공통 계정·서비스별 약관 범위', () => {
+  it('membership 없는 계정은 Neture 공통 약관을 승낙할 수 있고 membership/role을 만들지 않는다', async () => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture')];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken()}`;
+    expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(428);
+    const accepted = await request(app).post('/api/v1/auth/policy-acceptances').set('Authorization', auth)
+      .send({ serviceKey: 'neture', policyDocumentId: DOC_NETURE, version: 1 });
+    expect(accepted.status).toBe(200);
+    expect(accepted.body.data.pending).toEqual([]);
+    expect(membershipRows).toEqual([]);
+    expect(queryLog.some(sql => /INSERT INTO (service_memberships|role_assignments)/.test(sql))).toBe(false);
+    expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(200);
+  });
+
+  it('약국 약관 미동의는 Neture 보호 API를 막지 않고 약국 보호 API만 막는다', async () => {
+    publishedRows = [publishedDoc(DOC_KPA, 'kpa-society'), publishedDoc(DOC_NETURE, 'neture')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    const auth = `Bearer ${makeToken()}`;
+    expect((await request(app).get('/api/v1/neture/profile').set('Authorization', auth)).status).toBe(200);
+    expect((await request(app).get('/api/v1/kpa/forum/posts').set('Authorization', auth)).status).toBe(428);
+  });
+
+  it('서비스 미가입자는 여전히 다른 서비스 약관을 승낙하지 못한다', async () => {
+    publishedRows = [publishedDoc(DOC_KPA, 'kpa-society')];
+    const response = await request(makeApp()).post('/api/v1/auth/policy-acceptances').set('Authorization', `Bearer ${makeToken()}`)
+      .send({ serviceKey: 'kpa-society', policyDocumentId: DOC_KPA, version: 1 });
+    expect(response.status).toBe(403);
+    expect(acceptedIds).toEqual([]);
+  });
+
+  it('공유 API는 서명된 세션 범위를 사용하고 서비스 소유 API는 query나 다른 세션 범위로 우회하지 못한다', () => {
+    const items = ['neture', 'kpa-society', 'lecture'].map(serviceKey => ({ serviceKey, documentType: 'terms', policyDocumentId: serviceKey, version: 1, title: 'T' }));
+    expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/users/me?serviceKey=kpa-society').map(p => p.serviceKey)).toEqual(['neture']);
+    expect(selectPendingPoliciesForRequest(items, 'neture', '/api/v1/kpa/forum/posts?serviceKey=neture').map(p => p.serviceKey)).toEqual(['neture', 'kpa-society']);
+    expect(selectPendingPoliciesForRequest(items, 'lecture', '/api/v1/kpa-not-a-service').map(p => p.serviceKey)).toEqual(['neture', 'lecture']);
+    expect(selectPendingPoliciesForRequest(items, undefined, '/api/v1/users/me')).toEqual(items);
   });
 });

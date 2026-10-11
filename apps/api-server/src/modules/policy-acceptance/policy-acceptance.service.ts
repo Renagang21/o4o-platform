@@ -24,6 +24,8 @@ import type { DataSource, EntityManager } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import {
   ACCEPTANCE_KIND_AGREEMENT,
+  ACCOUNT_POLICY_SERVICE_KEY,
+  selectPendingPoliciesForRequest,
   REQUIRED_MEMBERSHIP_STATUSES,
   REQUIRED_POLICY_DOCUMENT_TYPE,
   computePendingPolicyAcceptances,
@@ -236,12 +238,10 @@ export class PolicyAcceptanceService {
       `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
       [userId],
     )) as { serviceKey: string; status: string }[];
-    const relevant = memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status));
-    if (relevant.length === 0) {
-      this.userOkCache.set(userId, Date.now());
-      return [];
-    }
-
+    const relevant = [
+      { serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' },
+      ...memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status)),
+    ];
     const requiredIds = published
       .filter((d) => relevant.some((m) => m.serviceKey === d.serviceKey))
       .map((d) => d.id);
@@ -266,14 +266,14 @@ export class PolicyAcceptanceService {
    * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §8-2
    *
    *   raw pending      = `getPendingForUser` — 약관 데이터 기준 미승낙 (정책 상태 그대로)
-   *   enforced pending = raw pending 에서 Demo 예외만 뺀 것. 일반 사용자는 둘이 같다.
+   *   enforced pending = raw pending을 요청 서비스 범위로 제한하고 Demo 예외를 반영한다. 공통 Neture 약관은 모든 범위에 포함한다.
    *
    * 활성 Demo 계정(`demo_accounts.user_id`)은 실제 개인·계약 주체가 아닌 공유 체험 계정이라 약관 동의
    * 강제 대상이 아니다. acceptance 를 만들거나 raw 상태를 바꾸지 않는다 — 여기서만 []로 본다.
    * raw pending 이 없으면 Demo 조회도 하지 않는다. Demo 조회가 실패하면 예외를 열지 않고 raw 를 돌려준다.
    */
-  async getEnforcedPendingForUser(userId: string): Promise<PendingPolicyAcceptance[]> {
-    const pending = await this.getPendingForUser(userId);
+  async getEnforcedPendingForUser(userId: string, sessionServiceKey?: string | null, rawUrl?: string): Promise<PendingPolicyAcceptance[]> {
+    const pending = selectPendingPoliciesForRequest(await this.getPendingForUser(userId), sessionServiceKey, rawUrl);
     if (pending.length === 0) return pending;
     try {
       if (await demoAccountService.isDemoAccount(userId, this.db())) return [];

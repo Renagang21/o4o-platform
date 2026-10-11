@@ -547,3 +547,42 @@ fragment 보존은 기존 계약을 유지한다. shared auth/API·DB·권한·�
 커뮤니티 목록 fixture 누락으로 커뮤니티 PC 2건이 실패한 뒤 실행을 중단했다. 실제 API 구조의
 communities 배열을 추가한 독립 전체 재실행이 24/24 PASS다. 운영 장애로 해석하지 않는다.
 기존 기록의 운영 실패나 실제 OAuth OPEN은 이 로컬 성공으로 제거하지 않는다.
+
+
+## 2026-10-11 공통 계정·서비스별 약관 분리 — 로컬 검증
+
+### Shared Module Change Verification
+
+변경: API signup-policy/terms-acceptance/policy-acceptance, 공통 PolicyAcceptanceGate.
+전체관리자 관리 경로 예외·서비스 membership/role/매장 원장 guard는 유지한다. 요청 경로와 서명된
+세션 범위로 서비스 pending을 선택한다. common Neture acceptance 때문에 membership/role을 만들지 않는다.
+legacy 범위 미상은 전체 raw pending으로 보수적으로 처리한다. GET/POST 약관 응답은 세션 범위로 제한하며,
+Demo 예외는 enforcement에만 적용하고 raw 이력은 그대로 유지한다.
+
+| 소비처 | 변경 영향 | 검증 | 결과 |
+| --- | --- | --- | --- |
+| Neture 메인·공급자·커뮤니티·펀딩 | 같은 번들의 공통 gate; 무관 서비스 미동의 전역 차단 제거 | 전체 frontend 타입·Neture build; Neture PC/mobile production bundle | PASS(로컬; 각 운영 origin smoke는 이번 실행 대상 아님) |
+| 약국 | 가입 문서는 Neture; 공통/약국 본문 각각 확인 | API origin·가입 회귀; 약국 build 및 PC/mobile production bundle | PASS(로컬) |
+| 분회 | 공통 재동의 화면 신규 연결, 공통 workspace 의존성 한 건 | 분회 build/타입, 기존 4 files/35 tests; PC/mobile production bundle | PASS(로컬) |
+| 내 매장·강의 | 기존 공통 gate 소비; 서로 다른 문서 조회·표시 계약 적용 | 전체 frontend 타입 + 공통 UI 회귀 | PASS(로컬; 이번 별도 브라우저 smoke 미실행) |
+| 전체관리자 | 기존 관리 경로 exemption와 역할 guard 유지 | API admin 경로 회귀 | PASS(로컬) |
+| 은퇴 K-Cosmetics/PharmacyHub | 신규 가입·운영 화면 추가 없음 | 현행 소비처 검색 | 운영 smoke 제외 |
+| raw-source 계약 | auth-logout-retirement-contract의 약관 정책 경로 문자열 참조 | literal consumer 검색·raw-source 4 tests | PASS |
+
+### 실행 결과
+
+- API 약관·origin·미래 시행일 게시/lifecycle 및 raw-source: 5 suites, 77 PASS.
+- 공통 UI: 9 files, 70 PASS. 인증 UI: 17 files, 196 PASS.
+- 이메일·Google 서버 회귀: 2 suites, 117 PASS. 격리 PostgreSQL social suite 18건은
+  전용 테스트 포트가 없어 SKIP(운영 DB로 대체하지 않음).
+- API 타입 검사 및 전체 frontend 타입 검사 PASS. Neture·약국·분회 production build PASS.
+- 브라우저: 위 3개 빌드 × PC(1440)/mobile(390) × 동의 완료/문서 버전 변경/조회 실패 = 18 PASS.
+  합성 계정·API 응답을 사용했다. 실제 OAuth·운영 계정 생성·운영 DB 쓰기·공고·게시 증빙이 아니다.
+- 문서 변경일은 실제 공고일이 아니다. 미래 publish 거부 시 이전 published/draft 저장이 실행되지 않음 검증.
+
+### 미완료와 적용 경계
+
+서비스 신청별 정책 소유권/문서 참조/조건 snapshot, 개인정보 고지 및 version 증빙,
+외부 인증 고지 근거, 실제 공고 경로와 30일 경과 후 시행·재동의 운영 검증은 OPEN이다.
+Neture 공통 본문과 서비스 신청 조건이 완성되기 전에 운영의 새 정책 적용 완료로 표시하지 않는다.
+이번 범위는 push/PR이며 main 통합·배포·정책 DB 게시는 실행하지 않았다.

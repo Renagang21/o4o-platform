@@ -5,20 +5,20 @@
  *
  * mount: /api/v1/auth/policy-acceptances (register-routes.ts — Core auth.routes.ts 는 수정하지 않는다)
  *   GET  /   → { pending: PendingPolicyAcceptance[] }             (본인 · allowlist 경로)
- *              pending 은 **raw** 정책 상태다(Demo 예외 미반영). 서비스 접근을 실제로 강제하는 값은
+ *              pending 은 서명된 세션 범위의 **raw** 정책 상태다(Demo 예외 미반영). 서비스 접근을 실제로 강제하는 값은
  *              `policyAcceptanceService.getEnforcedPendingForUser` (requireAuth 게이트 · 로그인 응답 · /auth/me).
  *   POST /   → { serviceKey, policyDocumentId, version? }         (본인 · allowlist 경로)
  *              → { accepted: { serviceKey, policyDocumentId, version, created }, pending: [...] }
  *
- * 검증(서버 재확인): 현재 사용자 · 해당 serviceKey membership(active|pending) 보유 · 문서가 terms ·
+ * 검증(서버 재확인): 현재 사용자 · 서비스 약관은 해당 membership(active|pending), Neture 공통 약관은 계정 인증 · 문서 유형 ·
  * published · 그 서비스의 현재 적용 약관 · (버전 일치). 클라이언트가 임의 문서를 승낙시킬 수 없다.
  */
 
 import { Router, type IRouter, type Request, type Response } from 'express';
-import { requireAuth } from '../../common/middleware/auth.middleware.js';
+import { requireAuth, type AuthRequest } from '../../common/middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 import { AppDataSource } from '../../database/connection.js';
-import { REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
+import { ACCOUNT_POLICY_SERVICE_KEY, selectPendingPoliciesForRequest, REQUIRED_MEMBERSHIP_STATUSES, REQUIRED_POLICY_DOCUMENT_TYPE } from '../../common/auth/terms-acceptance.policy.js';
 import {
   PolicyAcceptanceError,
   STORE_OWNER_AGREEMENT_DOCUMENT_TYPE,
@@ -39,7 +39,7 @@ router.get(
     const requestedService = typeof req.query.serviceKey === 'string' ? req.query.serviceKey.trim() : '';
     const pending = requestedType === STORE_OWNER_AGREEMENT_DOCUMENT_TYPE
       ? await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, requestedService || undefined)
-      : await policyAcceptanceService.getPendingForUser(userId);
+      : selectPendingPoliciesForRequest(await policyAcceptanceService.getPendingForUser(userId), (req as AuthRequest).sessionServiceKey);
     return res.json({ success: true, data: { pending } });
   }),
 );
@@ -74,7 +74,8 @@ router.post(
         if (!(await policyAcceptanceService.isPharmacyLedgerStoreOwner(userId))) {
           return res.status(403).json({ success: false, error: '매장 경영자만 계약에 동의할 수 있습니다.', code: 'STORE_OWNER_REQUIRED' });
         }
-      } else {
+      } else if (isStoreAgreement || serviceKey !== ACCOUNT_POLICY_SERVICE_KEY) {
+        // Account terms require authentication, not a physical Neture membership.
         // WO §20: 활성/허용된 service membership 보유자만 그 서비스 약관을 승낙할 수 있다.
         const rows = (await AppDataSource.query(
           `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
@@ -111,7 +112,7 @@ router.post(
       const result = await policyAcceptanceService.recordAcceptance({ userId, serviceKey, policyDocumentId, version, documentType });
       const pending = isStoreAgreement
         ? await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(userId, serviceKey)
-        : await policyAcceptanceService.getPendingForUser(userId);
+        : selectPendingPoliciesForRequest(await policyAcceptanceService.getPendingForUser(userId), (req as AuthRequest).sessionServiceKey);
       logger.info('[PolicyAcceptance] agreement accepted', {
         userId,
         serviceKey,

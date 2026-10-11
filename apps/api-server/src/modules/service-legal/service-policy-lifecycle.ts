@@ -46,3 +46,15 @@ export function resolveServicePolicyLifecycle(
   }
   return 'draft';
 }
+
+/** Current publish is immediate activation, not a notice/scheduling operation. */
+export function assertPolicyEffectiveForPublication(effectiveDate: Date | string | null, now = new Date()): void {
+  if (effectiveDate === null) return; // Existing documents without an effective date retain their contract.
+  const date = new Date(effectiveDate);
+  if (!Number.isFinite(date.getTime())) {
+    throw new ServicePolicyLifecycleError('POLICY_EFFECTIVE_DATE_INVALID', '유효한 시행일이 필요합니다.', 400);
+  }
+  if (date.getTime() > now.getTime()) {
+    throw new ServicePolicyLifecycleError('POLICY_NOT_YET_EFFECTIVE', '공고 중인 문서는 시행일 이후 게시해 주세요.');
+  }
+}

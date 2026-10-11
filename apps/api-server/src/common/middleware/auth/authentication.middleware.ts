@@ -101,8 +101,8 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {
-    // enforced pending — Demo 계정 예외만 반영(정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2). 판정 로직은 불변.
-    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id);
+    // 공통 계정과 요청 서비스의 pending만 적용한다. 서명된 세션 범위와 서버 경로를 사용하며 Demo 예외를 유지한다.
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id, req.sessionServiceKey, req.originalUrl);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,
@@ -245,6 +245,7 @@ export const requireAuth = async (
     // Auth phase 4-A: fresh roles + explicit Google evidence for admin/platform accounts.
     if (await enforceSessionAuthMethodBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
+    req.sessionServiceKey = payload.serviceKey;
     if (await enforceTermsAcceptance(req, res, user)) return;
 
     // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload

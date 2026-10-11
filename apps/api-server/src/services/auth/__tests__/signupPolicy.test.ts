@@ -8,11 +8,11 @@ import { SocialSignupDto } from '../../../modules/auth/dto/social-auth.dto.js';
 
 const policy = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 };
 describe('signup policy boundary', () => {
-  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr'])('uses the account-center agreement for %s', host => {
+  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr'])('uses the account-center agreement for %s', host => {
     expect(signupPolicyKeyFromOrigin(`https://${host}`)).toBe('neture');
   });
-  it('uses Society published row and supports catalog www alias', () => {
-    expect(signupPolicyKeyFromOrigin('https://pharmacy.neture.co.kr')).toBe('kpa-society');
+  it('uses the same account agreement for Society and catalog www alias', () => {
+    expect(signupPolicyKeyFromOrigin('https://pharmacy.neture.co.kr')).toBe('neture');
     expect(signupPolicyKeyFromOrigin('https://www.neture.co.kr')).toBe('neture');
   });
   it.each([undefined, 'https://admin.neture.co.kr', 'https://unknown.invalid', 'https://neture.co.kr/path', 'https://neture.co.kr.evil.invalid', 'https://retail.neture.co.kr'])('rejects unknown/admin/retired origin %s', origin => {

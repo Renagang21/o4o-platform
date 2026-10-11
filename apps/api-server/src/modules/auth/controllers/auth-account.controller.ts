@@ -112,7 +112,7 @@ export class AuthAccountController extends BaseController {
       //   프론트는 이 목록이 비어 있지 않으면 닫을 수 없는 재동의 화면으로 전환한다. 판정 실패는 [] (hot path).
       //   enforced pending — 서버 게이트와 같은 값(Demo 계정 예외 · 정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2).
       try {
-        ud.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(req.user.id);
+        ud.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(req.user.id, req.sessionServiceKey);
       } catch { ud.pendingPolicyAcceptances = []; }
 
       // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).

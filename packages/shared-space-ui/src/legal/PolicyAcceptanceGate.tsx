@@ -7,15 +7,15 @@
  *   - dismiss 불가. 가능한 동작은 [약관 전문 보기] · [동의] · [로그아웃] 뿐이다.
  *   - 본문은 public policy API 로 연다(세션 응답에는 식별자만 온다). 불러온 문서의 id 가 pending 의
  *     policyDocumentId 와 다르면(게시 갱신 경합) 동의 버튼을 열지 않고 새로고침을 안내한다.
- *   - 4 서비스 본문이 동일한 통합약관이므로 pending 이 여러 서비스여도 전문은 한 번 보여주고
- *     한 번의 동의 행위로 전부 제출한다(`onAccept` 가 pending 을 순서대로 POST).
+ *   - 공통 계정·서비스별 문서는 각각 전문과 버전을 표시한다. 모든 문서의 ID/version이
+ *     pending과 일치한 경우에만 표시된 문서 전체에 대한 승낙 제출을 허용한다.
  *   - `allowPaths` 의 경로(예: 공개 /terms · /privacy)에서는 children 을 그대로 그린다 — 새 탭 전문 보기용.
  *   - 서버 게이트(428 TERMS_ACCEPTANCE_REQUIRED)가 최종 방어선이며 이 화면은 그 UX 표면이다.
  *
  * 실제 HTTP 호출은 service 측에서 주입한다(loadPolicy · onAccept · onLogout). 화면을 복사하지 않는다.
  */
 
-import { type CSSProperties, type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, type ReactNode, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import type { PolicyDocumentDto } from './PolicyDocumentViewer';
 
@@ -91,12 +91,12 @@ export function PolicyAcceptanceGate({
   const bypass = pending.length === 0 || allowPaths.includes(location.pathname);
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'empty' | 'error' | 'stale'>('idle');
-  const [doc, setDoc] = useState<(PolicyDocumentDto & { id?: string }) | null>(null);
+  const [docs, setDocs] = useState<Array<PolicyDocumentDto & { id?: string }>>([]);
   const [checked, setChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const docKey = first ? `${first.serviceKey}:${first.documentType}:${first.policyDocumentId}` : '';
+  const docKey = pending.map(p => `${p.serviceKey}:${p.documentType}:${p.policyDocumentId}:${p.version}`).join('|');
 
   useEffect(() => {
     if (bypass || !first) return;
@@ -104,14 +104,17 @@ export function PolicyAcceptanceGate({
     setStatus('loading');
     setChecked(false);
     setError(null);
-    loadPolicy(first.serviceKey, first.documentType)
-      .then((result) => {
+    setDocs([]);
+    Promise.all(pending.map(p => loadPolicy(p.serviceKey, p.documentType)))
+      .then((results) => {
         if (cancelled) return;
-        if (!result) { setDoc(null); setStatus('empty'); return; }
-        setDoc(result);
-        // 보여준 문서 = 승낙할 문서 인지 확정한다. id 를 내려주지 않는 구버전 API 면 version 으로만 대조한다.
-        const idMatches = result.id ? result.id === first.policyDocumentId : result.version === first.version;
-        setStatus(idMatches ? 'ok' : 'stale');
+        if (results.some(result => !result)) { setDocs([]); setStatus('empty'); return; }
+        const loaded = results as Array<PolicyDocumentDto & { id?: string }>;
+        setDocs(loaded);
+        const matches = loaded.every((result, i) => result.id === pending[i].policyDocumentId
+          && result.version === pending[i].version && result.serviceKey === pending[i].serviceKey
+          && result.documentType === pending[i].documentType);
+        setStatus(matches ? 'ok' : 'stale');
       })
       .catch(() => { if (!cancelled) setStatus('error'); });
     return () => { cancelled = true; };
@@ -119,11 +122,12 @@ export function PolicyAcceptanceGate({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bypass, docKey, loadPolicy]);
 
-  const services = useMemo(() => Array.from(new Set(pending.map((p) => p.serviceKey))), [pending]);
-
   if (bypass) return <>{children}</>;
 
-  const canSubmit = status === 'ok' && checked && !submitting;
+  const displayedMatches = docs.length === pending.length && docs.every((doc, i) =>
+    doc.id === pending[i].policyDocumentId && doc.version === pending[i].version
+      && doc.serviceKey === pending[i].serviceKey && doc.documentType === pending[i].documentType);
+  const canSubmit = status === 'ok' && displayedMatches && checked && !submitting;
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -137,8 +141,6 @@ export function PolicyAcceptanceGate({
     }
   };
 
-  const effective = fmtDate(doc?.effectiveDate);
-
   return (
     <div style={S.wrap} role="dialog" aria-modal="true" aria-labelledby="policy-acceptance-title">
       <div style={S.card}>
@@ -146,16 +148,8 @@ export function PolicyAcceptanceGate({
         <h1 id="policy-acceptance-title" style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</h1>
         <p style={S.lead}>
           {leadText ?? `서비스를 계속 이용하려면 아래 ${agreementLabel}을(를) 확인하고 동의해야 합니다. 동의하기 전까지는 계약 열람, 문의, O4O 메인 복귀, 로그아웃만 이용할 수 있습니다.`}
-          {services.length > 1 && (
-            <> 이 약관은 회원님이 가입한 {services.join(' · ')} 서비스에 공통으로 적용되며, 한 번의 동의로 함께 처리됩니다.</>
-          )}
+          {pending.length > 1 && <> 공통 계정 약관과 해당 서비스 약관을 각각 확인해 주세요.</>}
         </p>
-        {first && (
-          <p style={S.meta}>
-            버전 v{first.version}
-            {effective ? ` · 시행일 ${effective}` : ''}
-          </p>
-        )}
 
         {status === 'loading' && <div style={S.state}>약관을 불러오는 중입니다…</div>}
         {status === 'empty' && <div style={S.state}>게시된 약관을 찾을 수 없습니다. 잠시 후 새로고침해 주세요.</div>}
@@ -163,19 +157,30 @@ export function PolicyAcceptanceGate({
         {status === 'stale' && (
           <div style={S.state}>약관이 갱신되었습니다. 최신 약관으로 다시 동의하려면 화면을 새로고침해 주세요.</div>
         )}
-        {(status === 'ok' || status === 'stale') && doc && (
-          <div style={S.doc} data-testid="policy-acceptance-content">{doc.content}</div>
-        )}
+        {(status === 'ok' || status === 'stale') && docs.map((doc) => (
+          <section key={doc.id ?? `${doc.serviceKey}:${doc.documentType}`} aria-label={doc.title}>
+            <h2 style={S.meta}>{doc.title} · 버전 v{doc.version}
+              {fmtDate(doc.effectiveDate) ? ` · 시행일 ${fmtDate(doc.effectiveDate)}` : ''}
+            </h2>
+            <div style={S.doc} data-testid="policy-acceptance-content">{doc.content}</div>
+            {(termsPath || (doc.serviceKey === 'neture' && doc.documentType === 'terms')) && (
+              <a href={doc.serviceKey === 'neture' && doc.documentType === 'terms' ? 'https://neture.co.kr/terms' : termsPath}
+                target="_blank" rel="noopener noreferrer" style={S.link}>
+                {doc.title} 전문 새 탭에서 보기
+              </a>
+            )}
+          </section>
+        ))}
 
         <label style={S.checkRow}>
           <input
             type="checkbox"
             checked={checked}
-            disabled={status !== 'ok' || submitting}
+            disabled={status !== 'ok' || !displayedMatches || submitting}
             onChange={(e) => setChecked(e.target.checked)}
             style={{ marginTop: 3 }}
           />
-          <span>{checkboxText ?? `위 ${agreementLabel}을(를) 확인하였으며 이에 동의합니다. (필수)`}</span>
+          <span>{checkboxText ?? `표시된 모든 ${agreementLabel}을(를) 확인하였으며 이에 동의합니다. (필수)`}</span>
         </label>
 
         {error && <div style={S.error} role="alert">{error}</div>}
@@ -194,11 +199,7 @@ export function PolicyAcceptanceGate({
           </button>
           {/* Pending terms block handoff; public return does not accept terms or end the session. */}
           <a href="https://neture.co.kr/" style={S.secondary}>O4O 메인으로</a>
-          {termsPath && (
-            <a href={termsPath} target="_blank" rel="noopener noreferrer" style={S.link}>
-              약관 전문 새 탭에서 보기
-            </a>
-          )}
+
         </div>
       </div>
     </div>

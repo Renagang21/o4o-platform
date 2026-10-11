@@ -52,12 +52,12 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 
 | 조사 대상 | 현재 코드 | 정렬할 계약 |
 | --- | --- | --- |
-| signup-policy.service.ts | 대부분 Neture, kpa-society 계정 생성은 별도 약관 | 계정 생성은 Neture 공통 약관; 서비스 약관은 서비스 신청에서 분리 |
+| signup-policy.service.ts | 이번 구현: 모든 허용 가입 origin은 Neture 약관 선택; 기존 별도 약국 선택 제거 | 계정 생성은 Neture 공통 약관; 서비스 약관은 서비스 신청에서 분리 |
 | service-legal-scope.ts | legal key는 neture/kpa-society/k-cosmetics/lecture. supplier/community/funding 등의 개별 정책 저장·권한 매핑이 없음 | 서비스/사업별 정책 소유권·조회·관리 scope를 현재 catalog/승인 원장과 연결; 도메인별 무작정 key 증설 금지 |
-| terms-acceptance.policy.ts | membership의 published terms를 수집해 pending 하나라도 있으면 전역 차단 | Neture 공통 계정 약관과 해당 서비스의 정책 gate를 분리; 무관한 서비스 차단 금지 |
-| policy-acceptance.service.ts | 서비스 membership 기준·동의 문서 ID/version/hash 보존 | Neture 공통 동의 요구를 물리 Neture membership 생성에 의존하지 않음; 기존 이력 유지 |
+| terms-acceptance.policy.ts | 이번 구현: Neture 공통 + 요청 서비스의 pending만 차단. 서버 소유 API 경로 우선, 공유 API는 서명된 세션 범위 | Neture 공통 계정 약관과 해당 서비스의 정책 gate를 분리; 무관한 서비스 차단 금지 |
+| policy-acceptance.service.ts | 이번 구현: 공통 약관은 물리 membership 없이 요구·승낙; 서비스 약관 membership 검증 유지. ID/version/hash 보존 | Neture 공통 동의 요구를 물리 Neture membership 생성에 의존하지 않음; 기존 이력 유지 |
 | admin-service-legal.controller.ts | publish 즉시 공개; 이전 published는 draft로 보존. version과 시행일은 입력 가능 | 새 draft·증가 version·본문 동일성 검증; 기존 row 덮어쓰기/삭제 금지 |
-| 정책 공개·pending 조회 | status=published 기준; 미래 effectiveDate를 기다리는 별도 gate 없음 | 공고와 시행을 구분. 미래 시행일만 넣고 즉시 publish하면 안 됨 |
+| 정책 공개·pending 조회 | 이번 구현: 미래 effectiveDate 문서의 즉시 publish를 409로 거부. 공고·예약 공개 기능은 아직 없음 | 공고와 시행을 구분. 미래 시행일만 넣고 즉시 publish하면 안 됨 |
 
 이 차이는 새 본문만 게시해서 해결되지 않는다. 개인정보 고지·필수 수집 동의·선택 마케팅 동의와
 이용약관의 계약상 승낙도 별도 축으로 보존한다. 기존 checkbox 시점만 있는 개인정보 동의를
@@ -69,12 +69,14 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 - [x] 계정·서비스 약관 선택, 동의 gate, 정책 게시 API 대조.
 - [x] Neture 공통 본문 초안과 서비스별 작성 범위 제시.
 - [ ] 기존 v1의 공통 권리·의무·분쟁·위탁·국외 처리 조항을 개정 본문에 대조·완성.
-- [ ] 계정 생성 정책을 Neture로 통일하고 기존 약사회 가입 소비처 회귀.
+- [x] 계정 생성 정책을 Neture로 통일하고 기존 약사회 가입 소비처 회귀(서버 origin/공통 가입 UI 검증).
 - [ ] 각 신청 원장의 정책 소유권·문서 참조·조건 snapshot을 조사해 서비스별 조회/동의 저장 연결.
-- [ ] 공통 약관과 서비스별 gate 분리. 공통 정책 미동의와 서비스 미동의의 차단 범위 테스트.
+- [x] 공통 약관과 서비스별 gate 분리. 공통 정책 미동의와 서비스 미동의의 차단 범위 테스트(로컬).
+- [x] 동의 화면에서 서로 다른 모든 문서의 본문·ID/version을 확인하고 하나라도 누락/변경되면 제출 차단. 분회 소비처도 연결.
 - [ ] 새 문서 조회 실패·버전 변경·동시 게시 시 신청 rollback, 입력 보존·재동의 검증.
 - [ ] 개인정보 고지/수집 동의 기록의 version 증빙 공백을 조사하고 이력 계약 보완.
-- [ ] 공고·시행 및 재동의 시점 구현. published/effectiveDate 불일치로 조기 차단하지 않음.
+- [x] 미래 시행 문서의 즉시 게시 거부. 거부 시 기존 published/draft 수정 없음 검증.
+- [ ] 실제 공고 경로·본문 공개 준비, 30일 경과 후 시행일 게시 및 재동의 운영 검증. 자동 예약 게시로 구현 완료 표시하지 않음.
 - [ ] PC/mobile에서 공통 계정 가입, 미가입·대기·승인·반려·정지·탈퇴, 무관 서비스 영향 없음 검증.
 - [ ] 최신 CI·review 후 push/PR. main 통합·배포 및 정책 게시는 각각의 실제 완료 결과로 기록.
 
@@ -105,3 +107,15 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 필수 이름·개인 휴대전화, 공통 로그인, 서비스별 승인, 약국 전용과 면허증 파일 미수집,
 전체관리자 용어는 리팩터링 문서와 사용자 지시로 확정돼 다시 결정 요청하지 않는다.
 유료화는 현재 미정이므로 신규 결제 제한·가격·무료 종료일을 본문에 임의 추가하지 않는다.
+
+## 8. 2026-10-11 이번 구현 범위와 배포 경계
+
+[이번 검증 기록](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)의 정책 개편 절에
+소비처와 실행 결과를 기록한다. 정상 공통 계정의 Neture 약관 요구를 서비스 membership과 분리했으며,
+서비스별 반려·정지·미가입을 로그인 거부나 다른 서비스의 약관 미동의로 대체하지 않는다.
+불명인 이전 세션 범위는 보수적으로 처리한다. 전체관리자 업무 예외와 Demo registry 예외는 유지한다.
+
+이번 코드·본문 보완은 push/PR 검토 범위다. 기존 공개 v1·동의 이력·운영 DB를 변경하지 않았다.
+새 공통 정책 적용은 완성된 본문·서비스 신청 정책과 실제 공고/시행 계획에 맞춰 운영에 반영해야 한다.
+30일 공고를 이번 작성일에 시작한 것으로 간주하지 않으며, 미래 시행일 게시 거부는 공고를 수행하거나
+30일 경과를 증명하는 기능이 아니다. 외부 인증 고지·서비스별 신청 문서 연결·개인정보 version 증빙은 남아 있다.

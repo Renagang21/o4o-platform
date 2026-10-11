@@ -2351,6 +2351,9 @@ importers:
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
