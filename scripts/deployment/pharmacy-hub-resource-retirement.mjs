@@ -75,11 +75,15 @@ export function inspectResources(cloud, http) {
   return [ownedBackend.length ? backend : null, cloud.negs?.length ? neg : null, cloud.runPresent ? service : null].filter(Boolean);
 }
 
+function assertExpectedResources(targets, expected) {
+  if (targets.some(item => !expected.has(item))) throw new ResourceDiagnosticError('PH resources appeared after inventory; rerun standalone plan.');
+}
+
 export async function retireResources({ mode, read, permissions, verify, remove, beforeWrite = () => {} }) {
   if (!['plan', 'apply'].includes(mode)) throw new ResourceDiagnosticError('Unknown PH resource mode.');
   const allowed = await permissions();
   let targets = await read();
-  const initialTargets = new Set(targets);
+  const expectedTargets = new Set(targets);
   const requiredPermissions = deletionPermissions.filter(permission =>
     targets.some(target => permissionsByTarget.get(target)?.includes(permission)));
   const missingPermissions = requiredPermissions.filter(permission => !allowed.includes(permission));
@@ -90,12 +94,15 @@ export async function retireResources({ mode, read, permissions, verify, remove,
   for (const target of [backend, neg, service]) {
     // Fresh complete references + HTTP checks immediately before each irreversible delete.
     targets = await read();
-    if (targets.some(item => !initialTargets.has(item))) throw new ResourceDiagnosticError('PH resources appeared after inventory; rerun standalone plan.');
+    assertExpectedResources(targets, expectedTargets);
     await verify();
     if (!targets.includes(target)) continue; // Resume safely after a partial deletion.
     beforeWrite();
     await remove(target);
-    if ((await read()).includes(target)) throw new ResourceDiagnosticError(`PH resource deletion not confirmed: ${target}.`);
+    const after = await read();
+    if (after.includes(target)) throw new ResourceDiagnosticError(`PH resource deletion not confirmed: ${target}.`);
+    expectedTargets.delete(target);
+    assertExpectedResources(after, expectedTargets);
   }
   await verify();
   if ((await read()).length) throw new ResourceDiagnosticError('PH resource deletion is incomplete.');

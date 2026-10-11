@@ -99,6 +99,15 @@ test('resources appearing after the initial plan are preserved', async () => {
   await assert.rejects(retireResources({ ...h.options, read: async () => ++reads === 1 ? [targets[2]] : targets }), /appeared after inventory/);
   assert.deepEqual(h.removed, []);
 });
+test('a deleted resource reappearing prevents subsequent deletions', async () => {
+  const h = harness(); let reads = 0;
+  const read = h.options.read;
+  await assert.rejects(retireResources({ ...h.options, read: async () => {
+    if (++reads === 4) return targets; // Backend recreated before NEG deletion.
+    return read();
+  } }), /appeared after inventory/);
+  assert.deepEqual(h.removed, [targets[0]]);
+});
 
 test('workflow rejects mixed resource operations, foreign actors and frozen writes before authentication', () => {
   const workflow = readFileSync(new URL('../../.github/workflows/pharmacyhub-qr-cutover.yml', import.meta.url), 'utf8');
