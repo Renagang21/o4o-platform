@@ -147,7 +147,7 @@ describe('§3 Distribution — distribution_type 은 파생 표기다', () => {
   });
 
   it('PRIVATE 매장범위 축(allowed_seller_ids)은 살아 있다 — 은퇴시키지 않는다', () => {
-    const dash = read(`${API}/modules/neture/services/neture-dashboard.service.ts`);
+    const dash = read(`${API}/modules/neture/services/seller-dashboard.service.ts`);
     expect(dash).toContain('allowed_seller_ids');
   });
 });
