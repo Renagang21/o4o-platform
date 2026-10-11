@@ -11,10 +11,20 @@ export const queries = [
   `SELECT '/foreign-visitor/affiliate/' || q.short_code AS path FROM foreign_visitor_partner_qr_codes q WHERE q.service_key = 'pharmacy-hub' AND q.status = 'ACTIVE' AND q.deleted_at IS NULL AND (q.valid_from IS NULL OR q.valid_from <= now()) AND (q.valid_to IS NULL OR q.valid_to >= now()) ORDER BY q.id LIMIT 1`,
 ];
 
+class InventoryDiagnosticError extends Error {
+  constructor(code, stage) {
+    super(`Read-only QR inventory failed: stage=${stage}; code=${code}. No credentials or row contents logged.`);
+    this.code = code;
+  }
+}
+
 export function safeInventoryError(error, stage) {
-  const allowed = new Set(['28P01', '28000', '42501', '42P01', '42703', '42883', '57014', '53300', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']);
-  const code = allowed.has(error?.code) ? error.code : 'UNKNOWN';
-  return Object.assign(new Error(`Read-only QR inventory failed: stage=${stage}; code=${code}. No credentials or row contents logged.`), { code });
+  if (error instanceof InventoryDiagnosticError) return error;
+  const allowed = new Set(['SCHEMA_IDENTIFIER', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']);
+  // PostgreSQL SQLSTATE is exactly five uppercase letters/digits (including
+  // letter-led classes P0, HV, F0 and XX). Never retain messages/details/stacks.
+  const code = typeof error?.code === 'string' && (/^[0-9A-Z]{5}$/.test(error.code) || allowed.has(error.code)) ? error.code : 'UNKNOWN';
+  return new InventoryDiagnosticError(code, stage);
 }
 
 export function readPassword(run = execFileSync) {

@@ -103,3 +103,8 @@ PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sou
 ## 운영 census 진단 후속 — 2026-10-11
 
 PR #438은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main `498ccbd9ea`로 병합했다. read-only census `38099121451`은 DB 단계에서 실패했으나 이미 정제된 오류의 code를 CLI에서 다시 정제하며 UNKNOWN으로 잃는 결함을 확인했다. 알려진 오류 code만 유지하며 DB 실패 시에도 독립 Cloud/DNS/HTTPS 진단은 수집하고 실행 상태는 실패로 유지한다. 원문 SQL 오류·credential·행 데이터는 계속 출력하지 않는다. 같은 폐기 WO의 연속 phase로 사용자 지정 worktree와 최신 main 기준 `wo/pharmacyhub-retirement-census-diagnostics`를 사용한다. 운영 변경·Cloud Run·데이터 삭제는 미실행이다.
+
+
+read-only census `38099849484`: PH matcher는 기존 backend로 복구돼 있고 Cloud Run은 존재한다. root/www의 DNS는 API LB 주소와 일치하며 synthetic 6경로는 두 호스트 모두 HTTP 200·Location 없음이다. DB 오류는 여전히 UNKNOWN이며 gcloud list의 빈 결과도 권한 warning을 놓쳤을 수 있어 자원/데이터 부재 증거로 쓰지 않는다. 표준 SQLSTATE·검증된 schema context만 보존하고 exit 0인 gcloud 부분 실패 warning도 blocker로 처리하는 후속 진단 phase를 준비한다. 사용자 지정 worktree를 동일 WO의 `wo/pharmacyhub-retirement-census-context` phase로 유지한다. 리다이렉트 검증은 기존 6회/10초 retry가 이미 있어 반영 지연을 확정 원인으로 단정하지 않는다. 운영 삭제는 미실행이다.
+
+HTTPS frontend 연결 진단: 기존 production proxy `o4o-global-lb-target-proxy-2`의 현재 URL map 연결도 describe로 조회한다. DNS 일치만으로 변경 map이 실제 HTTPS frontend에 연결됐다고 추론하지 않는다. 부족한 get 권한은 다른 census와 동일한 안전한 blocker로 보고한다.

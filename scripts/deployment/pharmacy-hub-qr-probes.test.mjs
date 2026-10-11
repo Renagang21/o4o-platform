@@ -61,3 +61,14 @@ test('sanitizing a known database error twice preserves only its allowlisted cod
   assert.doesNotMatch(second.stack, /private/);
   assert.equal(second.detail, undefined);
 });
+
+
+test('standard SQLSTATE and schema context survive sanitization without original content', () => {
+  for (const code of ['22P02', '42804', '42704', '42P18', '0A000', 'P0001', 'HV000', 'F0000', 'XX002']) {
+    const first = safeInventoryError({ code, message: 'private row and credential' }, 'retirement-scope:service_catalog.service_key');
+    const second = safeInventoryError(first, 'retirement-census');
+    assert.equal(second.code, code);
+    assert.match(second.message, /stage=retirement-scope:service_catalog.service_key/);
+    assert.doesNotMatch(second.stack, /private/);
+  }
+});

@@ -1,12 +1,12 @@
 /** Read-only retirement census. Counts and schema only; no identities or credentials. */
 import { createRequire } from 'node:module';
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolve4 } from 'node:dns/promises';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
 
 const identifiers = value => {
-  if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) throw new Error('Unsupported schema identifier');
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw Object.assign(new Error('Unsupported schema identifier'), { code: 'SCHEMA_IDENTIFIER' });
   return `"${value}"`;
 };
 export const retiredKeys = ['pharmacy-hub', 'pharmacy_hub', 'pharmacy_hub_cart', 'pharmacy-hub-event-offer'];
@@ -31,6 +31,7 @@ export async function collectRetirementInventory(client) {
   await client.query('BEGIN READ ONLY');
   let failure;
   let result;
+  let stage = 'retirement-schema';
   try {
     await client.query("SET LOCAL statement_timeout = '10s'");
     const { rows: columns } = await client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_name
@@ -41,19 +42,26 @@ export async function collectRetirementInventory(client) {
     const dedicated = [...new Set(columns.filter(c => /^(ph_|pharmacy_hub_)/.test(c.table_name)).map(c => c.table_name))];
     const dedicatedTables = [];
     for (const table of dedicated) {
+      identifiers(table);
+      stage = `retirement-dedicated:${table}`;
       const { rows } = await client.query(`SELECT count(*)::text AS count FROM public.${identifiers(table)}`);
       dedicatedTables.push({ table, count: rows[0].count, columns: columns.filter(c => c.table_name === table).map(c => ({ name: c.column_name, type: c.data_type })) });
     }
     const scopeCounts = [];
     for (const c of columns.filter(c => (scopes.has(c.column_name) || /service/i.test(c.column_name)) && (['text','character varying','character','USER-DEFINED'].includes(c.data_type) || ['_text','_varchar'].includes(c.udt_name)))) {
+      identifiers(c.table_name); identifiers(c.column_name);
+      stage = `retirement-scope:${c.table_name}.${c.column_name}`;
       const { rows } = await client.query(countQuery(c.table_name,c.column_name,['_text','_varchar'].includes(c.udt_name)), [retiredKeys]);
       if (rows[0].count !== '0') scopeCounts.push({ table:c.table_name, column:c.column_name, count:rows[0].count });
     }
     for (const c of columns.filter(c => c.column_name==='metadata' && ['json','jsonb'].includes(c.data_type))) {
+      identifiers(c.table_name); identifiers(c.column_name);
+      stage = `retirement-json:${c.table_name}.${c.column_name}`;
       const { rows }=await client.query(jsonScopeQuery(c.table_name,c.column_name),[retiredKeys]);
       if(rows[0].count!=='0')scopeCounts.push({table:c.table_name,column:`${c.column_name}.{serviceKey,service_key,source,sourceService}`,count:rows[0].count});
     }
     const targets = [...new Set([...dedicated,...scopeCounts.map(c => c.table)])];
+    stage = 'retirement-foreign-keys';
     const { rows: foreignKeys } = await client.query(`SELECT source.relname AS source_table,target.relname AS target_table,
         pg_get_constraintdef(c.oid) AS definition
       FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
@@ -65,17 +73,18 @@ export async function collectRetirementInventory(client) {
     result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys,
       deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
   } catch (error) {
-    failure=safeInventoryError(error,'retirement-inventory');
+    failure=safeInventoryError(error,stage);
   }
   try { await client.query('ROLLBACK'); } catch(error) { failure ??= safeInventoryError(error,'retirement-rollback'); }
   if (failure) throw failure;
   return result;
 }
 
-export function collectCloudInventory(run = execFileSync) {
+export function collectCloudInventory(run = spawnSync) {
   const project='netureyoutube', region='asia-northeast3';
   const checks=[
     ['applicationMap',['compute','url-maps','describe','o4o-global-lb']],
+    ['httpsProxy',['compute','target-https-proxies','describe','o4o-global-lb-target-proxy-2']],
     ['urlMaps',['compute','url-maps','list']],
     ['backends',['compute','backend-services','list']],
     ['negs',['compute','network-endpoint-groups','list']],
@@ -84,9 +93,17 @@ export function collectCloudInventory(run = execFileSync) {
   const result={readOnly:true,project,region,resources:{},blockers:[]};
   for (const [key,args] of checks) {
     try {
-      const value=JSON.parse(run('gcloud',[...args,`--project=${project}`,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+      const output=run('gcloud',[...args,`--project=${project}`,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000});
+      // gcloud list can return exit 0 and [] while warning that required permissions
+      // prevented enumeration. Such partial results must never prove no references.
+      if (typeof output !== 'string' && (output.status !== 0 || /Some requests did not succeed|required.*permission|PERMISSION_DENIED|Forbidden/i.test(output.stderr ?? ''))) {
+        throw { stderr: output.stderr ?? '' };
+      }
+      const value=JSON.parse(typeof output === 'string' ? output : output.stdout);
       if(key==='applicationMap') {
         result.resources.applicationMap={name:value.name,phMatchers:(value.pathMatchers??[]).filter(m=>m.name==='path-matcher-pharmacy-hub')};
+      } else if (key==='httpsProxy') {
+        result.resources.httpsProxy={name:value.name,urlMap:value.urlMap};
       } else if (key==='urlMaps') {
         result.resources.urlMaps=value.map(map=>({name:map.name,region:map.region??'global',
           phReferences:JSON.stringify(map).includes('backend-pharmacy-hub-web'),
