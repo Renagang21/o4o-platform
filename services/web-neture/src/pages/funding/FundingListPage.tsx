@@ -1,12 +1,13 @@
 /**
- * Supplier Trial List Page
+ * Funding Creator List Page
  *
  * WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1
  * 공급자 본인의 Market Trial 목록 (상태별 현황)
  */
 
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { getMyTrials } from '../../api/trial';
 import type { Trial } from '../../api/trial';
@@ -33,21 +34,23 @@ const STATUS_COLOR: Record<string, string> = {
   closed: '#6B7280',
 };
 
-export default function SupplierTrialListPage() {
+export default function FundingListPage() {
   const navigate = useNavigate();
   const [trials, setTrials] = useState<Trial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // 조회 실패는 '펀딩 0건'이 아니다 — 오류 표시 후 재시도 가능.
+  const beginLoad = useLatestRequest('funding-list');
   const load = useCallback(() => {
+    const current = beginLoad();
     setLoading(true);
     setError(null);
     getMyTrials()
-      .then(setTrials)
-      .catch(() => setError('목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, []);
+      .then(data => { if (current()) setTrials(data); })
+      .catch(() => { if (current()) setError('목록을 불러오지 못했습니다.'); })
+      .finally(() => { if (current()) setLoading(false); });
+  }, [beginLoad]);
 
   useEffect(() => {
     load();
@@ -80,7 +83,7 @@ export default function SupplierTrialListPage() {
           <p style={s.subtitle}>등록한 체험단 목록을 확인하고 결과를 조회합니다.</p>
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/market-trial" label="유통참여형 펀딩 이용 안내" /></div>
         </div>
-        <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
+        <button style={s.createBtn} onClick={() => navigate('/market-trial/manage/new')}>
           + 새 펀딩 등록
         </button>
       </div>
@@ -92,7 +95,7 @@ export default function SupplierTrialListPage() {
           <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.6, maxWidth: 460, margin: '0 auto 16px', textAlign: 'center' }}>
             유통참여형 펀딩은 제품 개발 이후 매장 랜딩을 만들기 위한 참여형 유통 프로그램입니다. 목표 금액보다 <strong>목표 매장 수</strong>와 <strong>제품 보상 구조</strong>를 먼저 설계해 보세요.
           </p>
-          <button style={s.createBtn} onClick={() => navigate('/supplier/market-trial/new')}>
+          <button style={s.createBtn} onClick={() => navigate('/market-trial/manage/new')}>
             유통참여형 펀딩 등록하기
           </button>
         </div>
@@ -102,7 +105,6 @@ export default function SupplierTrialListPage() {
             <div
               key={trial.id}
               style={s.card}
-              onClick={() => navigate(`/supplier/market-trial/${trial.id}`)}
             >
               <div style={s.cardTop}>
                 <span
@@ -117,7 +119,7 @@ export default function SupplierTrialListPage() {
                   {new Date(trial.createdAt).toLocaleDateString('ko-KR')}
                 </span>
               </div>
-              <h2 style={s.cardTitle}>{trial.title}</h2>
+              <h2 style={s.cardTitle}><Link to={`/market-trial/manage/${trial.id}`} style={{ color: 'inherit' }}>{trial.title}</Link></h2>
               {/* WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 표시 */}
               {trial.product && (
                 <div style={s.productRef}>
@@ -143,7 +145,7 @@ export default function SupplierTrialListPage() {
               {trial.status === 'draft' && (
                 <button
                   style={s.editBtn}
-                  onClick={(e) => { e.stopPropagation(); navigate(`/supplier/market-trial/${trial.id}/edit`); }}
+                  onClick={(e) => { e.stopPropagation(); navigate(`/market-trial/manage/${trial.id}/edit`); }}
                 >
                   수정
                 </button>
