@@ -1,6 +1,6 @@
 # My Home 구현 검증
 
-> **상태**: DEPLOYED · LOCAL_VERIFIED / PUBLIC_PRODUCTION_VERIFIED / AUTHENTICATED_SMOKE_PENDING
+> **상태**: ACTIVE · 배포 완료 · LOCAL_VERIFIED / PUBLIC_PRODUCTION_VERIFIED / AUTHENTICATED_SMOKE_PENDING
 > **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB 직접 접속·실제 계정 로그인 없음. 운영 공개 HTTP·브라우저 검증과 정상 배포 workflow 수행.

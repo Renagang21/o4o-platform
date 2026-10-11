@@ -1,6 +1,6 @@
 # My Home 다중 화면 · 서비스 공통 진입 구현
 
-> **상태**: DEPLOYED · 구현·main 통합·공개 운영 검증 완료 / 인증 운영 검증 대기
+> **상태**: ACTIVE · 배포 완료 · 구현·main 통합·공개 운영 검증 완료 / 인증 운영 검증 대기
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
 > **DEPLOYMENT**: MANUAL/GATED → DEPLOYED · 실제 Delivery HELD_LEVEL_3 후 정상 promote 완료. 후속 배포 상태 문서 Phase는 NOT_APPLICABLE.
