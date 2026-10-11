@@ -82,7 +82,7 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 같은 미완료 WO의 전용 branch를 유지한다. 시작 HEAD는 `cee2a63caa11e8443fea689d8a5ba1a425664e29`다.
 
 - 모아보기의 알림을 상단으로 옮기고 기존 진입 모델로 이용 가능한 업무와 신청·이용 상태를 제공한다. 매장이 없는 회원에게는 overview 경영 카드·빈 경영 요약을 반복하지 않으며 기존 경영 현황 직접 경로와 빈 상태는 유지한다.
-- 선택 매장의 약국 협력사업은 기존 `GET /neture/pharmacy/semi-franchises`와 `X-Store-Organization-Id`로 조회한다. 운영 중인 사업 카탈로그 중 실제 membershipStatus가 있는 매장 기록만 모아보기 최대 3건/상세 10건으로 표시한다. 개인 서비스 가입과 매장 enrollment를 이 원장으로 대체하지 않는다.
+- 선택 매장의 약국 협력사업은 기존 `GET /neture/pharmacy/semi-franchises`와 `X-Store-Organization-Id`로 조회한다. 운영 중인 사업 카탈로그 중 실제 membershipStatus가 있는 매장 기록만 모아보기·경영 현황 최대 3건/참여 서비스 상세 10건으로 표시한다. 개인 서비스 가입과 매장 enrollment를 이 원장으로 대체하지 않는다.
 - 상세 경영 현황의 내 매장 업무를 기존 handoff로 연결한다. 복수 매장 선택값이 전달되지 않는 현재 계약을 화면에 설명하고 Store에서 다시 선택하도록 한다. 계정·조회 데이터·선택 매장 변경과 언마운트 후 늦은 이동 응답은 버린다.
 - API·권한·DB·dependency·공통 패키지·CI/배포 설정은 변경하지 않는다. 사업 신청·탈퇴·승인·판매/결제·데이터 정리 호출은 실행하지 않는다.
 - 제공 파일의 2개 계정은 현재 이메일 로그인에서 `401 INVALID_CREDENTIALS`로 거절됐다. 사용자가 이메일 전체 리팩터링 예정이므로 건너뛰라고 명시해 이번 실계정 smoke를 **SKIPPED_BY_USER**로 확정한다. 이전 Phase의 계정 문서 미확보 이력과 현재 상태를 구분한다.

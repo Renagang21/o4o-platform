@@ -497,6 +497,7 @@ test("business memberships follow the selected store without including unjoined 
   await expect(businesses.getByText("두 번째 매장 사업")).toBeVisible();
   await expect(businesses.getByText("참여 중인 검증 사업")).toHaveCount(0);
   await businesses.getByRole("link", { name: "협력사업 참여 현황 더 보기 →" }).click();
-  await expect(page.getByLabel("통계를 볼 매장")).toHaveValue("fixture-store-second");
+  await expect(page).toHaveURL(/\/mypage\/services$/);
+  await expect(page.getByLabel("참여 현황을 볼 매장")).toHaveValue("fixture-store-second");
   await expect(businesses.getByText("두 번째 매장 사업")).toBeVisible();
 });

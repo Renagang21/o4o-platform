@@ -517,7 +517,7 @@ function StoreBusinessRecords({ accountId, organizationId, compact }: { accountI
         <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></li>)}</ul>
         {compact ? <p className="mt-2 text-xs text-slate-500">참여 기록 {items.length}건 중 최대 3건을 표시합니다.</p> : <RecordPages page={page} total={items.length} limit={10} label="협력사업 참여" onChange={setPage} />}
       </>}
-    {compact && <Link to="/mypage/management" className="mt-3 inline-block text-sm text-blue-700 underline">협력사업 참여 현황 더 보기 →</Link>}
+    {compact && <Link to="/mypage/services" className="mt-3 inline-block text-sm text-blue-700 underline">협력사업 참여 현황 더 보기 →</Link>}
   </section>;
 }
 function VisitTrend({ days }: { days: Analytics["dailyScans"] }) {
@@ -689,16 +689,25 @@ export function MyHomeManagement({
     />
   );
 }
+export function MyHomeStoreParticipation({ accountId, data, renderStoreWorkspace }: {
+  accountId: string;
+  data: HomeEntryData;
+  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
+}) {
+  return <StoreManagement key={accountId} accountId={accountId} data={data} renderStoreWorkspace={renderStoreWorkspace} participationOnly />;
+}
 function StoreManagement({
   accountId,
   data,
   compact = false,
   renderStoreWorkspace,
+  participationOnly = false,
 }: {
   accountId: string;
   data: HomeEntryData;
   compact?: boolean;
   renderStoreWorkspace?: (store: EntryStore) => ReactNode;
+  participationOnly?: boolean;
 }) {
   // Only an existing scoped analytics endpoint is consumed. No cross-store aggregation.
   const stores = data.stores.filter((s) => s.serviceKey === "kpa-society");
@@ -716,6 +725,7 @@ function StoreManagement({
     }
   });
   const store = stores.find((s) => s.organizationId === selected) ?? stores[0];
+  if (!store && participationOnly) return <section className={BOX} aria-label="매장 협력사업 참여"><h2 className="text-lg font-semibold">매장 협력사업 참여</h2><p className="mt-2 text-sm text-slate-600">현재 사업 참여 현황을 조회할 수 있는 매장이 없습니다.</p></section>;
   if (!store)
     return (
       <section className={BOX}>
@@ -735,9 +745,9 @@ function StoreManagement({
   return (
     <div className="space-y-4">
       <label className="block text-sm font-medium">
-        통계를 볼 매장
+        {participationOnly ? "참여 현황을 볼 매장" : "통계를 볼 매장"}
         <select
-          aria-label="통계를 볼 매장"
+          aria-label={participationOnly ? "참여 현황을 볼 매장" : "통계를 볼 매장"}
           className="mt-2 block w-full rounded-lg border border-slate-300 bg-white p-3"
           value={store.organizationId}
           onChange={(e) => {
@@ -762,15 +772,15 @@ function StoreManagement({
           ))}
         </select>
       </label>
-      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} compact={compact} />
-      <StoreMetrics accountId={accountId} store={store} compact={compact} />
+      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} compact={!participationOnly} />
+      {!participationOnly && <StoreMetrics accountId={accountId} store={store} compact={compact} />}
       {!compact && renderStoreWorkspace?.(store)}
-      <Link
+      {!participationOnly && <Link
         className="inline-block text-sm text-blue-700 underline"
         to={compact ? "/mypage/management" : "/mypage/services"}
       >
         {compact ? "매장 방문 통계 더 보기 →" : "내 매장 업무 공간 보기"}
-      </Link>
+      </Link>}
     </div>
   );
 }

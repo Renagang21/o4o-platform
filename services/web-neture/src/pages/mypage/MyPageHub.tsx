@@ -9,7 +9,7 @@ import { MY_HOME_SOURCES, MyHomeButton } from "@o4o/auth-react";
 import { useAuth } from "../../contexts";
 import { useLoginModal } from "../../contexts/LoginModalContext";
 import { api } from "../../lib/apiClient";
-import { useHomeEntry, buildHomeEntryModel } from "../../lib/home-entry";
+import { useHomeEntry, buildHomeEntryModel, type EntryStore } from "../../lib/home-entry";
 import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import HomeEntryPanel from "../../components/home/HomeEntryPanel";
 import { MyHomeParticipation } from "../../components/mypage/MyHomeParticipation";
@@ -18,6 +18,7 @@ import {
   MyHomeActivity,
   MyHomeManagement,
   MyHomeNotifications,
+  MyHomeStoreParticipation,
   ResourceNotice,
 } from "../../components/mypage/MyHomePanels";
 
@@ -65,6 +66,16 @@ function MyHomeContent({ view }: { view: View }) {
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
   const hasStore = !!entry.data?.stores.length;
+  const renderStoreWorkspace = (store: EntryStore) => <HomeEntryPanel
+    key={`${user.id}:${store.organizationId}`}
+    user={user}
+    data={entry.data}
+    loading={entry.loading}
+    error={entry.error}
+    onReload={entry.reload}
+    workspaceOnly
+    storeOrganizationId={store.organizationId}
+  />;
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -159,22 +170,14 @@ function MyHomeContent({ view }: { view: View }) {
             onReload={entry.reload}
           />
           <MyHomeParticipation accountId={user.id} data={entry.data} />
+          {entry.data && <MyHomeStoreParticipation accountId={user.id} data={entry.data} renderStoreWorkspace={renderStoreWorkspace} />}
         </div>
       ) : !entry.data ? (
         <ResourceNotice error={!!entry.error} reload={entry.reload} />
       ) : view === "activity" ? (
         <MyHomeActivity accountId={user.id} data={entry.data} />
       ) : (
-        <MyHomeManagement accountId={user.id} data={entry.data} renderStoreWorkspace={store => <HomeEntryPanel
-          key={`${user.id}:${store.organizationId}`}
-          user={user}
-          data={entry.data}
-          loading={entry.loading}
-          error={entry.error}
-          onReload={entry.reload}
-          workspaceOnly
-          storeOrganizationId={store.organizationId}
-        />} />
+        <MyHomeManagement accountId={user.id} data={entry.data} renderStoreWorkspace={renderStoreWorkspace} />
       )}
     </>
   );

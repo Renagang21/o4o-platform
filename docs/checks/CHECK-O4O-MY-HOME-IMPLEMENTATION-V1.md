@@ -191,7 +191,7 @@ API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b18786
 | 항목 | 근거와 결과 |
 |---|---|
 | 모아보기 | 알림 → 이용 가능한 업무·가입 상태 → 참여·커뮤니티·권한 있는 매장 요약. 일반 회원은 overview 경영 요약을 표시하지 않고 기존 경영 경로의 빈 상태는 유지 |
-| 매장 협력사업 | 기존 `GET /neture/pharmacy/semi-franchises`의 운영 중인 사업 카탈로그 중 매장 membershipStatus가 있는 행만 projection. null=미가입 제외, 승인 대기/이용 중/정지/반려/탈퇴와 알 수 없는 상태 구분. 모아보기 최대 3건·상세 10건 |
+| 매장 협력사업 | 기존 `GET /neture/pharmacy/semi-franchises`의 운영 중인 사업 카탈로그 중 매장 membershipStatus가 있는 행만 projection. null=미가입 제외, 승인 대기/이용 중/정지/반려/탈퇴와 알 수 없는 상태 구분. 모아보기·경영 현황 최대 3건, 참여 서비스 상세 10건 |
 | 원장·권한 | `neture-pharmacy.routes.ts`의 기존 인증·메인 가입·`createRequireStoreOwner('kpa')`와 선택 매장 헤더 유지. API·role·DB 변경·사업 신청/탈퇴/승인 호출 0 |
 | 이동 | 기존 선택 매장 진입 모델·Store handoff 재사용. 조직 선택 전달이 없는 현재 계약을 설명하며 복수 매장은 Store에서 다시 선택. 계정/데이터/매장 변경·언마운트 후 늦은 응답 차단 |
 | 소비처 | `HomeEntryPanel`의 대표 메인 요약·참여 서비스 4개 업무 카드·플랫폼 관리 순서는 유지. 새 표시 방식은 My Home에만 적용. import·심볼·경로·raw-source 소비처를 대조 |
@@ -203,3 +203,9 @@ API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b18786
 브라우저 사용자·매장·사업·API·handoff는 전부 fixture다. 실제 계정의 데이터·권한 동작 PASS를 의미하지 않는다.
 초기 GitHub API 401·Git 인증 실패는 기존 클라우드 인증을 재확인한 뒤 소유자 API 조회와 fetch 성공으로 해소됐다. 자격증명을 추출하거나 변경하지 않았다.
 로컬 로그는 `/tmp/my-home-completion-final-vitest.log`, `/tmp/my-home-completion-playwright.log`, `/tmp/my-home-completion-final-build.log`와 `test-results/my-home`에 보존한다. 구현 PR·main·CI·Delivery·운영 공개 검증 결과는 통합 후 추가한다.
+
+### P1 리뷰 정합과 배포 환경 조건
+
+PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정본 §2와의 차이를 지적했다. 상세 10건과 원본 업무 이동을 참여 서비스에 배치하고 요약의 더 보기 링크도 `/mypage/services`로 수정했다. 경영 현황은 사업 요약 최대 3건과 QR 통계·추이를 유지한다. 선택 매장은 같은 계정의 승인 매장 목록과 대조해 화면 사이에서 유지한다. 참여 서비스에서 QR 통계를 호출하지 않는 회귀를 추가했고 수정 후 Neture 전체 **569개 PASS**다. `/tmp/my-home-completion-review-vitest.log`에 근거를 보존한다.
+
+직전 main `b4d428d606a6a9c29804b08c046a209b8880d843`의 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38142342005)는 Google Cloud 인증 단계에서 실패하고 실제 배포와 최종 Report는 SKIPPED였다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 최신 main의 PharmacyHub retirement TODO는 사용자가 승인·적용한 WIF 일시 차단을 기록한다. 이 환경 조건의 원래 인증 복구가 현재 배포 전제이며 CI/freeze/WIF를 우회하거나 해당 provider를 임의 수정하지 않는다. 사용자에게 복구 후 알려 달라고 요청하고 구현 검증·PR 작업을 계속한다.

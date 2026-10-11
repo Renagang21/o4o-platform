@@ -27,6 +27,7 @@ it("keeps the overview bounded and displays complete memberships in ten-row page
   await screen.findByText("사업 2");
   expect(screen.queryByText("사업 3")).toBeNull();
   expect(screen.queryByRole("button", { name: "다음" })).toBeNull();
+  expect(screen.getByRole("link", { name: "협력사업 참여 현황 더 보기 →" }).getAttribute("href")).toBe("/mypage/services");
   rerender(view());
   await screen.findByText("사업 9");
   fireEvent.click(screen.getByRole("button", { name: "다음" }));

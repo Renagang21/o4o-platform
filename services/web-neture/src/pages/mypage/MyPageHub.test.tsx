@@ -45,6 +45,7 @@ vi.mock("../../components/mypage/MyHomePanels", () => ({
   MyHomeActivity: () => <p>본인 커뮤니티 활동</p>,
   MyHomeManagement: () => <p>권한 있는 매장 통계</p>,
   MyHomeNotifications: () => <p>본인 알림</p>,
+  MyHomeStoreParticipation: () => <p>선택 매장 협력사업 참여 상세</p>,
   ResourceNotice: () => <p>재시도 안내</p>,
 }));
 import MyPageHub from "./MyPageHub";

@@ -55,6 +55,14 @@ main 반영·운영 배포·배포 후 검증을 구분하며, 외부 조건 때
 
 `neture-pharmacy.routes.ts`의 기존 GET은 `requireAuth`·메인 가입·`createRequireStoreOwner('kpa')`로 보호되며 요청마다 선택 organizationId를 재검증한다.
 협력사업은 `semi_franchise_memberships`의 매장 참여 상태다. `work-scope/store-services`의 enrollment나 개인 service membership으로 대체하지 않는다.
-모아보기는 참여 기록 최대 3건, 경영 현황은 10건씩 표시한다. 신청/탈퇴/승인 POST와 금액·성과 집계는 실행하지 않는다.
+모아보기·경영 현황은 참여 기록 최대 3건 요약, 참여 서비스는 10건씩 상세를 표시한다. 신청/탈퇴/승인 POST와 금액·성과 집계는 실행하지 않는다.
 현재 Store 이동은 `{targetWorkspace:'store', returnPath:'/'}`이며 조직 선택값을 전달하지 않는다.
 복수 매장인 경우 이동 후 Store의 기존 매장 선택을 다시 사용해야 함을 화면에 명시한다. 새 handoff·선택값 전달 계약은 만들지 않는다.
+
+### 리뷰 대조 보완
+
+PR #484의 P1은 정본 §2와 실제 상세 기록 위치의 차이를 지적했다. 상세 참여 목록·신청/정지/탈퇴 상태는 `/mypage/services`에 배치하고 요약의 더 보기 링크도 그 화면으로 수정했다.
+경영 현황에는 사업 요약과 QR 통계·추이를 유지한다. 선택 매장을 두 화면 사이에서 같은 계정의 저장값과 현재 승인 매장 목록으로 대조한다.
+참여 서비스의 사업 조회에서 QR 통계 API를 호출하지 않는 회귀를 추가했다. 기존 검증과 수정 후 재검증은 CHECK에서 구분한다.
+
+운영 배포는 현재 다른 PharmacyHub 정리 작업의 승인된 WIF 일시 차단에 의존한다. 원래 인증 조건 복구 전에 정상 Delivery를 성공했다고 표시하지 않는다.
