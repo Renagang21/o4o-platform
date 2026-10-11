@@ -1,5 +1,8 @@
 # O4O HUB Template Standard V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **상위 문서**: `CLAUDE.md` § 13 (O4O 공통 구조 원칙), § 13-A (APP 표준화)
 > **패키지**: `@o4o/shared-space-ui` (`packages/shared-space-ui/src/`)
 > **적용 범위**: KPA Society, K-Cosmetics, 향후 모든 O4O 서비스
@@ -314,6 +317,9 @@ return <LmsHubTemplate config={config} />;
 
 ### 7.1 현재 적용 현황
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH forum route/원장 adapter·Hub template 채택·활성 serviceKey 예시·프로비저닝 CLI 실행/유지 계약은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 새 소비처/구현/프로비저닝 대상이 아니며 PH 경로·등록/호환 참조를 제거한다. 공용 KPA/약사 커뮤니티·콘텐츠 모델·다른 서비스·인쇄 QR 연결은 보존하고 데이터 삭제는 전용 귀속/FK·타 서비스 소비처 확인 후 수행한다. 아래 PH 구조는 폐기 전 이력이다.
+
+
 | Template | KPA Society | K-Cosmetics |
 | ---------- | :-----------: | :-----------: |
 | **ContentHub** | `pharmacy/HubContentLibraryPage.tsx` | `library/ContentLibraryPage.tsx` |
@@ -395,6 +401,9 @@ return <{Domain}HubTemplate config={config} />;
 3. KPA 구조 변경 시 공통 구조 문서와 함께 검토한다
 
 ### 9.2 KPA 참조 파일 목록
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH forum route/원장 adapter·Hub template 채택·활성 serviceKey 예시·프로비저닝 CLI 실행/유지 계약은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 새 소비처/구현/프로비저닝 대상이 아니며 PH 경로·등록/호환 참조를 제거한다. 공용 KPA/약사 커뮤니티·콘텐츠 모델·다른 서비스·인쇄 QR 연결은 보존하고 데이터 삭제는 전용 귀속/FK·타 서비스 소비처 확인 후 수행한다. 아래 PH 구조는 폐기 전 이력이다.
+
 
 | 도메인 | KPA 파일 | 라우트 |
 |--------|---------|--------|

@@ -1,5 +1,8 @@
 # DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 - **WO**: WO-O4O-KCOS-STORE-ASSETS-AND-LIBRARY-CONTENT-CANONICAL-SCOPE-AUDIT-V1 (§14 조건부 산출물)
 - **작성일**: 2026-09-10
 - **성격**: 설계 확정 — 구현 0 / schema 0
@@ -11,6 +14,9 @@
 
 ## 0. 왜 DESIGN 을 쓰는가
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 WO §14 는 "canonical source 를 명확히 확정할 수 있을 때만" DESIGN 을 쓰라고 했다.
 확정할 수 있다. **KPA 와 PH 가 이미 같은 축 위에 있고, KCos 는 마운트만 어긋나 있다.**
 새 개념·새 테이블·사업 판단이 필요한 지점이 없다.
@@ -18,6 +24,9 @@ WO §14 는 "canonical source 를 명확히 확정할 수 있을 때만" DESIGN 
 ---
 
 ## 1. 매장 자료함 / 자산의 canonical 축 (3서비스 공통)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 ```text
 [1] 매장 직접 콘텐츠   kpa_store_contents (Store Production Material · source_type='direct')
@@ -46,6 +55,9 @@ rename 은 이번 설계의 결론에 영향을 주지 않으므로 다루지 �
 
 ## 2. 스냅샷과 asset control 은 "확장"이다
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 ```text
 o4o_asset_snapshots         HUB(운영자/커뮤니티) → 매장 복사 채널      frozen core
 kpa_store_asset_controls    KPA 가 그 위에 얹은 게시/채널/본사 강제 배포   KPA_SPECIFIC
@@ -66,6 +78,9 @@ kpa_store_asset_controls    KPA 가 그 위에 얹은 게시/채널/본사 강�
 ---
 
 ## 3. 조직 해석 계약 (서비스별 mount 규칙)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 서비스·가입/역할·공급/결제·공통화/parity·호환 보존 계약은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항을 따른다. PH 표기는 폐기 전 구조·구현 이력이며 새 기능/가입/발급/복구의 근거가 아니다. 다른 서비스와 공통 계약·Neture 약국 기능·인쇄 QR 연결·법정 보유 판단은 유지한다.
+
 
 ```text
 서비스 route  →  서비스 전용 controller(조직 결정만)  →  공용 service(검증·SQL)

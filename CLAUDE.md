@@ -161,7 +161,7 @@ import type { RelatedEntity } from './related.entity.js';
 ## 4. Order / Commerce Contract
 
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점.** 독립 `*_orders` · `*_payments` 테이블 신설 금지 (`scripts/check-forbidden-tables.mjs` 가 검사).
-- 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B / PharmacyHub → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
+- 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
 - 새 주문 구조 · 결제 · 환불을 만들기 전에 위 두 정본을 먼저 확인한다. 이는 현행 계약이며, 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차를 따른다.
 - 주문 생성 기술 계약(`createOrder()` 단일 지점 · 독립 테이블 금지 · PaymentCore)의 정본은 [`CHECKOUT-STABLE-DECLARATION-V2`](docs/baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 다. 구 `E-COMMERCE-ORDER-CONTRACT` 는 2026-10-07 SUPERSEDED(`OrderType` 열거는 현행 코드에 없음, 서비스 구분은 `metadata.serviceKey`) — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) 판정 해제 기록.
 
