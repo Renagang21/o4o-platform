@@ -67,3 +67,5 @@
 실행 검증·통합 증거와 실계정 후속 테스트는 [새 CHECK](../checks/CHECK-O4O-FUNDING-OPERATOR-RECORDS-V1.md)에 기록한다.
 
 첫 push 전 main `71c267ac87`으로 미게시 branch를 rebase하고 통합 API 221 tests, 웹 546 tests를 확인했다. TypeORM의 UPDATE raw result가 `[rows, rowCount]`임을 추가 확인해 SELECT CTE projection으로 입금·이행 응답을 정정했다. query parameter 로그의 원문 노출도 같은 서비스 안에서 node-postgres 지원 text binding과 JSON 마스킹으로 보완하고 30 tests로 확인했다.
+
+최종 자체 점검에서 이행 처리 중 필터 변경으로 이전 조건 재조회가 발생할 수 있음을 발견해 필터·CSV 잠금으로 보완했다. 운영 화면 14 tests 및 desktop/mobile 10개 fixture 시나리오를 재실행했고 모두 PASS(긴 회원명 포함).

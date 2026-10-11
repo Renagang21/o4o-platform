@@ -11,14 +11,14 @@ funding admin/operator의 현재 동일 업무 권한을 유지한다. 서비스
 | 항목 | 검증 |
 |---|---|
 | API 회귀 | 최신 main 통합 후 funding·Neture dashboard·공급자/공개 origin 경계 11 suites, 221 tests PASS. 최종 query parameter 마스킹 보강 후 payment service 30 tests 추가 실행 PASS. 실제 TypeORM transaction orchestration과 mock query runner를 사용해 감사 실패 시 rollback/commit 미실행을 검증했다. 실 DB lock 경쟁 검증은 아님. |
-| 웹 회귀 | Neture 66 files, 546 tests PASS. 정정 실패 입력 유지, 환불 재확인, 최초 확인일 미전송, route 변경 후 이전 응답 무시, 입금/이행 필터·CSV 일치, 조회 error/retry 포함. |
+| 웹 회귀 | Neture 66 files, 546 tests PASS. 최종 이행 처리 중 필터·CSV 잠금 보강 후 운영 화면 3 files, 14 tests 추가 PASS. 정정 실패 입력 유지, 환불 재확인, 최초 확인일 미전송, route 변경 후 이전 응답 무시, 입금/이행 필터·CSV 일치, 조회 error/retry 포함. |
 | 빌드 | API TypeScript production build, Neture TypeScript + Vite production build PASS. Neture의 기존 large chunk 경고는 비차단. |
 | 데이터·감사 | 동일 participant+trial row lock, UPDATE와 action_logs insert 단일 transaction. 감사 금액·상태는 실제 RETURNING 값 사용. paymentReference/paymentNote 원문은 감사와 이번 구현의 application log에 기록하지 않음. node-postgres 실제 binding 값은 유지하며 TypeORM query parameter JSON 출력은 마스킹한다. |
 | CSV | 화면 조건을 그대로 적용. 최초/마지막 확인일 별도 컬럼. 문자열 quoting·formula 방어, UTF-8 파일명. |
 
 ## 브라우저·통합·배포
 
-브라우저는 fixture 인증·API 응답/쓰기만 사용한다. 운영 API write나 실계정 인증을 검증한 것으로 보고하지 않는다. 로컬 production bundle에서 정정 실패·재시도 / 확인 취소·재확인 / 환불 기록·재확인 / 입금 필터·CSV·이행 / 준비 단계 필터의 5개 시나리오 × desktop 1440px·mobile 390px = 10 PASS. runtime error와 페이지 가로 넘침은 0. 화면도 desktop/mobile에서 확인했다. 운영 데이터 write는 0이다. PR/CI/배포 증거는 진행 후 이 절에 기록한다.
+브라우저는 fixture 인증·API 응답/쓰기만 사용한다. 운영 API write나 실계정 인증을 검증한 것으로 보고하지 않는다. 로컬 production bundle에서 정정 실패·재시도 / 확인 취소·재확인 / 환불 기록·재확인 / 입금 필터·CSV·이행 / 준비 단계 필터의 5개 시나리오 × desktop 1440px·mobile 390px = 10 PASS. runtime error와 페이지 가로 넘침은 0. 마지막 UI 보강 후 10개 모두 재실행 PASS. mobile의 공백 없는 긴 회원명 줄바꿈도 확인했다. 화면도 desktop/mobile에서 확인했다. 운영 데이터 write는 0이다. PR/CI/배포 증거는 진행 후 이 절에 기록한다.
 
 ## 사용자 직접 테스트로 남기는 항목
 

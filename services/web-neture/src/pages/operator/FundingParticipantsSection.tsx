@@ -34,7 +34,7 @@ const invalidAmount = (value: string) => value.trim() !== ''
 
 export default function FundingParticipantsSection(props: Props) {
   const [form, setForm] = useState<Form | null>(null);
-  const busy = props.updatingPaymentId !== null;
+  const busy = props.updatingPaymentId !== null || props.updatingId !== null;
   const open = (p: TrialParticipant, action: Form['action']) => setForm({
     id: p.id, action, amount: p.paidAmount == null ? '' : String(p.paidAmount),
     reference: p.paymentReference || '', note: action === 'confirm' ? p.paymentNote || '' : '',
@@ -54,7 +54,7 @@ export default function FundingParticipantsSection(props: Props) {
     <section className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 mb-4" aria-label="펀딩 참여자 관리">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
         <h2 className="text-sm font-semibold text-gray-700">펀딩 참여자 ({props.totalCount}명)</h2>
-        <button className={button} onClick={props.onExport} disabled={props.exportLoading || props.loading || !!props.error}>
+        <button className={button} onClick={props.onExport} disabled={busy || props.exportLoading || props.loading || !!props.error}>
           {props.exportLoading ? '내보내는 중...' : '현재 조건 CSV 내보내기'}
         </button>
       </div>
@@ -97,7 +97,7 @@ export default function FundingParticipantsSection(props: Props) {
                 const status = p.paymentStatus ?? 'unpaid';
                 const selected = form?.id === p.id ? form : null;
                 return <article key={p.id} className="border border-gray-200 rounded-lg p-3">
-                  <div className="flex flex-wrap items-center gap-2 mb-2"><strong className="text-sm">{p.name}</strong>
+                  <div className="flex flex-wrap items-center gap-2 mb-2"><strong className="text-sm min-w-0 break-all">{p.name}</strong>
                     <span className="text-xs text-gray-600">{PAYMENT_STATUS_LABELS[status]}</span>
                     <span className="text-sm">{p.paidAmount == null ? '금액 미기록' : `${p.paidAmount.toLocaleString()}원`}</span>
                   </div>

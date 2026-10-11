@@ -57,3 +57,11 @@ it('combines participation and payment conditions without confusing their pendin
   expect(fundingParticipantFilters('pending', 'paid')).toEqual({ rewardStatus: 'pending', paymentStatus: 'paid' });
   expect(fundingParticipantFilters('product', 'pending')).toEqual({ rewardType: 'product', paymentStatus: 'pending' });
 });
+
+it('locks filters and export during a reward mutation so its response cannot reload obsolete conditions', () => {
+  render(<FundingParticipantsSection {...props()} updatingId={participant.id} />);
+  expect((screen.getByRole('combobox', { name: '입금 상태' }) as HTMLSelectElement).disabled).toBe(true);
+  for (const name of ['제품 보상', '현재 조건 CSV 내보내기', '재확인·정정']) {
+    expect((screen.getByRole('button', { name, exact: true }) as HTMLButtonElement).disabled).toBe(true);
+  }
+});
