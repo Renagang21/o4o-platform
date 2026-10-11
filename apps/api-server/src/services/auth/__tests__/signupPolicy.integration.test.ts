@@ -56,26 +56,36 @@ integration('signup agreement atomicity (dedicated loopback PostgreSQL)', () => 
   afterEach(async () => {
     await db.query('DELETE FROM users WHERE email=$1', [email]);
     await db.query("DELETE FROM service_policy_documents WHERE id=$1 OR id IN (SELECT id FROM service_policy_documents WHERE title=$2 OR title='Privacy fixture notice')", [documentId, 'New fixture terms']);
-    await db.query('DELETE FROM auth_social_flows WHERE origin=$1', [origin]);
+    await db.query('DELETE FROM auth_social_flows WHERE origin IN ($1,$2)', [origin, 'https://pharmacy.neture.co.kr']);
     policyAcceptanceService.invalidateUser('fixture');
   });
-  async function signup(provider: string, reference: any = { policyDocumentId: documentId, version: 1 }, privacyPolicy?: any) {
+  async function signup(provider: string, reference: any = { policyDocumentId: documentId, version: 1 }, privacyPolicy?: any, scope = 'neture') {
     const consents = { terms: true, privacy: true, name: 'Fixture', phone: '01000000000', termsPolicy: reference, privacyPolicy };
     if (provider === 'google') {
       const service = new GoogleAuthService({ dataSource: source() as any, identity: { verifyGoogleIdToken: async () => ({ sub: randomUUID(), email, emailVerified: true }), findGoogleIdentityBySub: async () => null } as any, readContext: async () => ({ roles: [], memberships: [] }), issueSession: async () => ({ tokens: { accessToken: 'fixture', refreshToken: 'fixture' } }) as any });
-      return service.signup({ idToken: 'fixture', consents, policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'fixture' });
+      return service.signup({ idToken: 'fixture', consents, policyServiceKey: scope, ipAddress: '127.0.0.1', userAgent: 'fixture' });
     }
     if (provider === 'email') {
       const service = new EmailAuthService({ dataSource: source() as any, passwords: { hasPassword: async () => false, setPassword: async (id: string, _password: string, manager: any) => { await manager.query('INSERT INTO user_password_credentials(user_id) VALUES($1)', [id]); } } as any });
       jest.spyOn(service, 'sendVerificationMail').mockResolvedValue(true);
-      return service.signup({ email, name: consents.name, phone: consents.phone, password: 'Synthetic123!', consents, policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'fixture' });
+      return service.signup({ email, name: consents.name, phone: consents.phone, password: 'Synthetic123!', consents, policyServiceKey: scope, ipAddress: '127.0.0.1', userAgent: 'fixture' });
     }
-    const grant = await flows.create('kakao-signup', 'kakao', origin, 'neture', { providerId: randomUUID(), email, emailVerified: true });
+    const signupOrigin = scope === 'kpa-society' ? 'https://pharmacy.neture.co.kr' : origin;
+    const grant = await flows.create('kakao-signup', 'kakao', signupOrigin, scope, { providerId: randomUUID(), email, emailVerified: true });
     const service = new KakaoAuthService(source() as any, {} as any, flows);
-    try { return await service.signup(grant.token, grant.binding, origin, { email, name: consents.name, phone: consents.phone, consents }); }
+    try { return await service.signup(grant.token, grant.binding, signupOrigin, { email, name: consents.name, phone: consents.phone, consents }); }
     catch (error) { expect((await flows.read(grant.token)).used_at).toBeNull(); throw error; }
   }
 
+
+  it.each(['email', 'google', 'kakao'])('%s retains the pharmacy privacy evidence owner before the common policy rollout', async provider => {
+    const privacyId = randomUUID();
+    await db.query("UPDATE service_policy_documents SET service_key='kpa-society' WHERE id=$1", [documentId]);
+    await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,status) VALUES($1,'kpa-society','privacy',1,'Privacy fixture notice','Pharmacy privacy fixture body','published')", [privacyId]);
+    await signup(provider, { policyDocumentId: documentId, version: 1 }, { policyDocumentId: privacyId, version: 1 }, 'kpa-society');
+    const rows = await db.query('SELECT service_key,document_type,content_hash FROM user_policy_acceptances ORDER BY document_type');
+    expect(rows).toEqual([{ service_key: 'kpa-society', document_type: 'privacy', content_hash: computePolicyContentHash('Pharmacy privacy fixture body') }, { service_key: 'kpa-society', document_type: 'terms', content_hash: computePolicyContentHash('Fixture agreement') }]);
+  });
   it.each(['email', 'google', 'kakao'])('%s refuses legacy privacy during a partial common policy rollout and rolls everything back', async provider => {
     const privacyId = randomUUID();
     await db.query("UPDATE service_policy_documents SET version=2,slug='neture-account-terms' WHERE id=$1", [documentId]);

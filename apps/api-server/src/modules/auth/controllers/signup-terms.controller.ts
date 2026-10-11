@@ -14,6 +14,7 @@ export class SignupTermsController extends BaseController {
       const privacy = await readSignupPrivacyPolicy(AppDataSource, doc);
       return BaseController.ok(res, {
         policyDocumentId: doc.id, version: doc.version, title: doc.title,
+        privacyHref: serviceKey === 'neture' ? 'https://neture.co.kr/privacy' : 'https://pharmacy.neture.co.kr/privacy',
         termsHref: serviceKey === 'neture' ? 'https://neture.co.kr/terms' : 'https://pharmacy.neture.co.kr/policy',
         ...(privacy ? { privacyPolicy: { policyDocumentId: privacy.id, version: Number(privacy.version), title: privacy.title } } : {}),
       });

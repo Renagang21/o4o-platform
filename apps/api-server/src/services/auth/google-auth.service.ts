@@ -300,7 +300,7 @@ export class GoogleAuthService {
     const user = await this.dataSource.transaction(async (manager) => {
       const created = await this.createGoogleUser(manager, identity, input.consents);
       await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
-      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager);
+      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager, input.policyServiceKey ?? '');
       return created;
     });
 

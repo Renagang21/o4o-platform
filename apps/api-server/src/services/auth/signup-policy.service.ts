@@ -51,17 +51,17 @@ export async function recordSignupTerms(userId: string, serviceKey: string, refe
   await policyAcceptanceService.recordAcceptance({ userId, serviceKey, ...reference }, manager);
 }
 
-export async function recordSignupPrivacy(userId: string, reference: SignupTermsReference | undefined, manager: EntityManager): Promise<void> {
+export async function recordSignupPrivacy(userId: string, reference: SignupTermsReference | undefined, manager: EntityManager, serviceKey = 'neture'): Promise<void> {
   // Old clients remain compatible until the marked common policy rollout. Never manufacture a privacy version for them.
-  const terms = await policyAcceptanceService.getPublishedTermsForService('neture', manager);
+  const terms = await policyAcceptanceService.getPublishedTermsForService(serviceKey, manager);
   if (!reference && !isCommonAccountTermsDocument(terms)) return;
   await readSignupPrivacyPolicy(manager, terms);
-  await recordPublishedPolicyEvidence(manager, userId, 'neture', 'privacy', reference);
+  await recordPublishedPolicyEvidence(manager, userId, serviceKey, 'privacy', reference);
 }
 
 /** A marked account rollout requires a matching privacy document, never legacy privacy. */
 export async function readSignupPrivacyPolicy(q: Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>, terms: PublishedTermsDocument | null) {
-  const privacy = await readCurrentPolicyDocument(q, 'neture', 'privacy');
+  const privacy = await readCurrentPolicyDocument(q, terms?.serviceKey ?? 'neture', 'privacy');
   if (isCommonAccountTermsDocument(terms) && (!privacy || privacy.slug !== 'neture-account-privacy'
     || Number(privacy.version) !== Number(terms?.version) || Number(privacy.version) < 2
     || !privacy.title?.trim() || !privacy.content?.trim())) {

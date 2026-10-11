@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { styles } from './email/shared';
 
-// Account creation always uses the Neture common privacy notice; service notices belong to service enrollment.
+// Common rollout uses Neture; preserve the pharmacy disclosure until its terms actually switch.
 export const ACCOUNT_PRIVACY_HREF = 'https://neture.co.kr/privacy';
+export function signupPrivacyHref(document: SignupTermsDocument | null) {
+  return document?.privacyHref ?? (document?.termsHref === 'https://pharmacy.neture.co.kr/policy' ? 'https://pharmacy.neture.co.kr/privacy' : ACCOUNT_PRIVACY_HREF);
+}
 
 export function signupPolicyReferences(document: SignupTermsDocument) {
   return { termsPolicy: { policyDocumentId: document.policyDocumentId, version: document.version },
@@ -37,8 +40,10 @@ export function SignupTermsAgreement({ load, checked, onChecked, onDocument, rel
       if (!doc || !/^[0-9a-f-]{36}$/i.test(doc.policyDocumentId) || !Number.isInteger(doc.version) || doc.version < 1 || !doc.title || !doc.termsHref) throw new Error('Invalid published agreement');
       if (doc.privacyPolicy && (!/^[0-9a-f-]{36}$/i.test(doc.privacyPolicy.policyDocumentId) || !Number.isInteger(doc.privacyPolicy.version)
         || doc.privacyPolicy.version < 1 || typeof doc.privacyPolicy.title !== 'string' || !doc.privacyPolicy.title.trim())) throw new Error('Invalid privacy reference');
-      const href = new URL(doc.termsHref);
-      if (href.protocol !== 'https:' || href.username || href.password) throw new Error('Invalid policy link');
+      for (const link of [doc.termsHref, signupPrivacyHref(doc)]) {
+        const href = new URL(link);
+        if (href.protocol !== 'https:' || href.username || href.password) throw new Error('Invalid policy link');
+      }
       active = false; clearTimeout(timeout);
       setDocument(doc); setState('ready'); ref.current.onDocument(doc);
     }).catch(() => { if (active) { active = false; clearTimeout(timeout); setState('error'); } });

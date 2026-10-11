@@ -282,3 +282,13 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
   Docker·CI 배포 설정을 수정하거나 docs 전체를 production 이미지에 복사하지 않는다.
 - 커뮤니티 정책 오류는 기존 lifecycle 응답과 같은 top-level code·문자열 error로 반환해 문서 재조회와
   화면 표시가 정상 작동한다. 커뮤니티 개설 요청의 untrusted 참조도 저장 서비스에서 검증한다.
+
+
+### 공통 전환 전 약국 개인정보 소유권 보완
+
+추가 review를 반영해 공통 표식 전에는 약국 가입의 terms/privacy 문서·증빙·전문 링크 모두
+kpa-society 범위로 유지한다. 공통 표식이 실제 게시된 뒤 Neture의 같은 version 정책 세트로
+전환한다. 이메일·Google·카카오 세 경로에서 같은 선택된 범위를 사용한다.
+실제 PG의 약국 기존 정책 소유권 3건과 UI 링크·위험 URL 차단을 추가 검증했다.
+최종 로컬 고유 PG 검증은 60 PASS(기존 57 + 약국 소유권 3), 공통 auth UI는 202 PASS다.
+공통 정책 partial·구버전·DB 오류 rollback 및 one-use grant 재사용 방어 결과를 유지한다.

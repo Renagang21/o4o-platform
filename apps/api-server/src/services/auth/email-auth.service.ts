@@ -383,7 +383,7 @@ export class EmailAuthService {
       }
       await this.passwords.setPassword(created.id, input.password, manager);
       await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
-      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager);
+      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager, input.policyServiceKey ?? '');
       return created;
     });
 

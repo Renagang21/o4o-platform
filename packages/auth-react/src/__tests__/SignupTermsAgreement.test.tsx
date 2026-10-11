@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
+import { SignupTermsAgreement, signupPolicyReferences, signupPrivacyHref } from '../SignupTermsAgreement';
 
 const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
 afterEach(() => { cleanup(); vi.useRealTimers(); });
@@ -76,3 +76,6 @@ describe('published signup agreement', () => {
     expect(documentChanged).not.toHaveBeenCalledWith(TERMS);
   });
 });
+
+it('keeps the pharmacy privacy link until the server selects the common account policy', () => { expect(signupPrivacyHref({ ...TERMS, termsHref: 'https://pharmacy.neture.co.kr/policy' })).toBe('https://pharmacy.neture.co.kr/privacy'); expect(signupPrivacyHref({ ...TERMS, privacyHref: 'https://neture.co.kr/privacy' })).toBe('https://neture.co.kr/privacy'); });
+it('refuses an unsafe privacy link and prevents submission', async () => { render(<Form load={async () => ({ ...TERMS, privacyHref: 'javascript:alert(1)' })} />); await screen.findByRole('alert'); expect((screen.getByRole('checkbox') as HTMLInputElement).disabled).toBe(true); });

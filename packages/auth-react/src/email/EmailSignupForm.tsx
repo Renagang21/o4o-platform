@@ -1,4 +1,4 @@
-import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
+import { signupPrivacyHref, SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
  * <EmailSignupForm /> — 이메일 회원가입 + <EmailSentNotice /> 확인 메일 안내
@@ -159,7 +159,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <label style={styles.checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
-          <a href={ACCOUNT_PRIVACY_HREF} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+          <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
         </div>
         <label style={styles.checkRow}>
           <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
