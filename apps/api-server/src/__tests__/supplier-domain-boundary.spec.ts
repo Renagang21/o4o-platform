@@ -39,6 +39,8 @@ const IMPORT_COMMON = `${API}/modules/neture/services/product-import-common.serv
 const HANDOFF_SVC = `${API}/modules/neture/services/supplier-library-handoff.service.ts`;
 const CONTENT_SUBMIT = `${API}/routes/kpa/services/supplier-content.service.ts`;
 const RESOLVER = `${API}/modules/neture/middleware/supplier-context.resolver.ts`;
+const LIFECYCLE_SVC = 'apps/api-server/src/modules/neture/services/supplier-lifecycle.service.ts';
+const DIRECTORY_SVC = 'apps/api-server/src/modules/neture/services/supplier-directory.service.ts';
 const BUSINESS_SVC = `${API}/modules/neture/services/supplier-business.service.ts`;
 const SUPPLIER_SVC = `${API}/modules/neture/services/supplier.service.ts`;
 const BASELINE = 'docs/baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md';
@@ -101,6 +103,7 @@ describe('§2 Products — ProductMaster 는 플랫폼 SSOT', () => {
       `${API}/modules/neture/controllers/supplier-product-candidate.controller.ts`,
       `${API}/modules/neture/services/supplier-library-handoff.service.ts`,
       `${API}/modules/neture/services/supplier.service.ts`,
+      BUSINESS_SVC, LIFECYCLE_SVC, DIRECTORY_SVC,
     ]) {
       const body = stripComments(read(rel));
       for (const forbidden of ['openai', 'OpenAI', 'anthropic', 'Anthropic', 'gemini', 'generateContent']) {
@@ -320,7 +323,7 @@ const LEGACY_USER_ID_LOOKUP_ALLOWLIST: Record<string, string> = {
   // ONBOARDING_BRIDGE — 가입 승인 멱등성(같은 가입자의 row 재생성 방지) · 운영자 가입 신청 목록 표시.
   [`${API}/modules/neture/services/operator-registration.service.ts`]: 'ONBOARDING_BRIDGE',
   // ONBOARDING_BRIDGE — registerSupplier 중복 신청 방지(같은 가입자). 인가 판정 아님.
-  [`${API}/modules/neture/services/supplier.service.ts`]: 'ONBOARDING_BRIDGE',
+  [LIFECYCLE_SVC]: 'ONBOARDING_BRIDGE',
   // OPERATOR_FILTER — owner membership 이 하나도 없는 organization 에만 legacy 로 fallback.
   [`${API}/routes/market-trial-operator.routes.ts`]: 'OPERATOR_FILTER',
 };
@@ -382,7 +385,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
     expect(reg).not.toMatch(/INSERT INTO neture_suppliers/);
     expect(reg).not.toContain('setOwner(');
 
-    const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC));
+    const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
     expect(svc).toContain('await this.syncSupplierOrganization(supplier, { isActive: true });');
     // owner 는 공급자 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
     expect(svc).toContain('organizationOpsService.setOwner(orgId, supplier.userId)');
@@ -395,7 +398,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§9 Business Profile — Organization 이 SSOT', () => {
-  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('Supplier profile 이 users.businessInfo 를 read/write 하지 않는다', () => {
     expect(svc).not.toContain('businessInfo');

@@ -18,7 +18,7 @@ export class SupplierProfileFieldUnsupportedError extends Error {
 
 /**
  * Supplier Business profile and Organization data only.
- * Lifecycle authorization remains in NetureSupplierService and existing guards.
+ * Lifecycle authorization remains in NetureSupplierLifecycleService and existing guards.
  * Organization + supplier profile writes share the existing transaction.
  */
 export class NetureSupplierBusinessService {
@@ -503,4 +503,28 @@ export class NetureSupplierBusinessService {
     return missing;
   }
 
+
+
+  /** 판매 가능 전(상품 승인요청) 필수 — 사업자등록증 PDF. */
+  getMissingSaleFields(supplier: NetureSupplier): string[] {
+    const missing: string[] = [];
+    if (!supplier.businessRegistrationDocumentId) missing.push('businessRegistrationDocument');
+    return missing;
+  }
+
+
+  /** 정산 전 필수 — 정산 계좌/통장사본 + 세금계산서 이메일. */
+  getMissingSettlementFields(supplier: NetureSupplier): string[] {
+    const missing: string[] = [];
+    if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
+    if (!supplier.settlementAccountNumber?.trim()) missing.push('settlementAccountNumber');
+    if (!supplier.settlementAccountHolder?.trim()) missing.push('settlementAccountHolder');
+    if (!supplier.settlementBankbookDocumentId) missing.push('settlementBankbookDocument');
+    if (!supplier.taxInvoiceEmail?.trim()) {
+      missing.push('taxInvoiceEmail');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplier.taxInvoiceEmail)) {
+      missing.push('validTaxInvoiceEmail');
+    }
+    return missing;
+  }
 }
