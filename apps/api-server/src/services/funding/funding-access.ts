@@ -25,7 +25,7 @@ export async function isFundingCreator(ds: DataSource, trial: MarketTrial, userI
   const resolved = await resolveSupplierForUser(ds, userId, origin?.supplierOrganizationId ?? null);
   // Historical records belong to the recorded creator user, with no organization binding.
   // Verify eligibility without choosing or assigning an arbitrary supplier organization.
-  if (!origin && resolved.kind === 'context_required') return resolved.candidates.some(c => c.status === 'ACTIVE');
+  if (resolved.kind === 'context_required') return resolved.candidates.some(c => c.status === 'ACTIVE' && (!origin || c.supplierId === origin.supplierAccountId));
   return resolved.kind === 'resolved' && resolved.status === 'ACTIVE' &&
     (!origin?.supplierAccountId || resolved.supplierId === origin.supplierAccountId);
 }

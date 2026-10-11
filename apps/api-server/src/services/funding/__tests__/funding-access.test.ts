@@ -70,3 +70,15 @@ it('keeps ambiguous closed legacy funding unavailable even to a board member', a
   participant = member = true;
   expect(await resolveFundingAccess(ds, ID, 'actor')).toMatchObject({ canRead: false, canWrite: false });
 });
+
+it.each([['ACTIVE', true], ['SUSPENDED', false]])('matches the recorded supplier account when its organization is absent and status is %s', async (status, allowed) => {
+  trial.supplierId = 'actor'; trial.statusHistory = [{ ...origin, supplierOrganizationId: null }] as any;
+  supplier.mockResolvedValue({ kind: 'context_required', candidates: [{ supplierId: 'other', status: 'ACTIVE' }, { supplierId: 'supplier-a', status }] });
+  expect(await isFundingCreator(ds, trial, 'actor')).toBe(allowed);
+  expect(supplier).toHaveBeenCalledWith(ds, 'actor', null);
+});
+it('does not substitute another active supplier for a recorded legacy account', async () => {
+  trial.supplierId = 'actor'; trial.statusHistory = [{ ...origin, supplierOrganizationId: null }] as any;
+  supplier.mockResolvedValue({ kind: 'context_required', candidates: [{ supplierId: 'other', status: 'ACTIVE' }] });
+  expect(await isFundingCreator(ds, trial, 'actor')).toBe(false);
+});
