@@ -877,3 +877,14 @@ version 증빙/8개 서비스 운영 상태 검증/30일 공고·게시 OPEN과 
 Neture 타입 포함 build·changed lint·docs guard·diff check PASS다. own preview PID를 확인해
 종료하고 4391 port가 닫힌 것도 확인했다. 서버 회귀/PG SKIP 수와 실제 공고/게시 OPEN은 그대로다.
 최신 HEAD push 뒤 CI/review를 확인한다.
+
+### 게시 문서의 표시 필드 방어
+
+최신 리뷰에서 불완전한 draft가 게시되어 기존 공개 문서를 내릴 수 있는 경로를 확인했다.
+게시 시 title/content의 비어 있지 않은 문자열 계약을 먼저 검사한다. 누락/null/숫자/객체/
+빈 문자열/공백 12건, 일반 서비스 본문 1건은 400이고 강등 query builder·save·draft 변경은
+없다. 불완전한 문서 게시 해제와 원문 보존 정상 게시 2건도 확인했다. 신규 15건 포함
+게시/수명주기 2 suites 40 PASS다. 고유 인증·정책 서버 344 PASS와 추가 경계 41 PASS,
+UI 338 PASS·로컬 모의 화면 64 PASS·PG 39 SKIP을 구분한다. 실제 운영 DB 쓰기는 없다.
+API build·changed lint·docs guard·diff check PASS다. 최신 HEAD CI/review를 다시 확인한다.
+30일 공고·실제 시행일/정책 게시 및 후속 TODO는 그대로 OPEN이다.

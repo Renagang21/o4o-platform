@@ -399,3 +399,8 @@ PC/mobile 12건 포함 모의 화면 60건이며 실제 OAuth/운영 검증과 �
 PASS, 고유 유관 UI 338건이다. 새 bundle PC/mobile 16건 중 신규 누락 경계 4건을 더한 모의
 화면 합계는 64건이며 실제 OAuth/운영 검증으로 보지 않는다. own preview 종료·port closure를
 확인했고 최신 push HEAD의 CI/review로 이번 Phase를 마무리한다. 실제 공고/게시 OPEN은 유지한다.
+
+게시 API에도 제목/본문 검증을 추가했다. 불완전한 draft는 기존 published 강등 전에 400이며
+게시 해제와 유효 본문 원문 보존은 유지한다. 신규 15건 포함 게시/수명주기 40 PASS,
+고유 인증·정책 서버 344 + 추가 경계 41 PASS다. UI 338/모의 64 PASS 및 PG 39 SKIP 경계와
+실제 공고/게시 OPEN을 유지한다. 이번 동일 WO의 push/PR Phase에서 최신 CI/review를 확인한다.

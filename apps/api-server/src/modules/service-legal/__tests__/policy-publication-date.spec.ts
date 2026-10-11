@@ -64,6 +64,52 @@ it('한국 시행일 자정에는 controller가 새 문서를 게시한다(UTC�
 
 describe('새 공통 계정 문서의 게시 준비', () => {
   it.each([
+    ['content', undefined], ['content', null], ['content', 42], ['content', {}],
+    ['content', ''], ['content', ' \n\t '],
+    ['title', undefined], ['title', null], ['title', 42], ['title', {}],
+    ['title', ''], ['title', ' \n\t '],
+  ])('%s=%j: 읽을 수 없는 draft는 기존 공개 문서를 내리기 전에 거부한다', async (field, value) => {
+    const { app, execute, repo, doc } = harness(new Date(Date.now() - 1000));
+    Object.assign(doc, { slug: 'neture-account-terms', [field as string]: value });
+    const before = { ...doc };
+    const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+    expect(result.status).toBe(400);
+    expect(result.body.error.code).toBe('POLICY_DISPLAY_FIELDS_REQUIRED');
+    expect(execute).not.toHaveBeenCalled();
+    expect(repo.createQueryBuilder).not.toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
+    expect(doc).toEqual(before);
+  });
+
+  it('일반 서비스 정책에도 본문 검증을 적용한다', async () => {
+    const { app, execute, repo, doc } = harness(null);
+    Object.assign(doc, { content: ' ', version: 1 });
+    const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+    expect(result.status).toBe(400);
+    expect(result.body.error.code).toBe('POLICY_DISPLAY_FIELDS_REQUIRED');
+    expect(execute).not.toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
+  });
+
+  it('불완전한 문서의 게시 해제는 허용한다', async () => {
+    const { app, execute, repo, doc } = harness(null);
+    Object.assign(doc, { content: '', title: '', status: 'published' });
+    const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'unpublish' });
+    expect(result.status).toBe(200);
+    expect(execute).not.toHaveBeenCalled();
+    expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ status: 'draft' }));
+  });
+
+  it('공백이 포함된 실제 본문은 원문 그대로 게시한다', async () => {
+    const { app, execute, repo, doc } = harness(new Date(Date.now() - 1000));
+    Object.assign(doc, { title: ' Account terms ', content: ' \nComplete terms\n ', slug: 'neture-account-terms' });
+    const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+    expect(result.status).toBe(200);
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ title: ' Account terms ', content: ' \nComplete terms\n ', status: 'published' }));
+  });
+
+  it.each([
     ['published', null, 'neture-account-terms', 'PUBLISHED_POLICY_IMMUTABLE'],
     ['published', 'neture-account-terms', null, 'PUBLISHED_POLICY_IMMUTABLE'],
     ['published', 'legacy-neture', 'changed-legacy', 'PUBLISHED_POLICY_IMMUTABLE'],

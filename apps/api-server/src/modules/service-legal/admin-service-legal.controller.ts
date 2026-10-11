@@ -337,6 +337,9 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         const before = toAdminPolicyDocument(doc);
 
         if (action === 'publish') {
+          if ([doc.title, doc.content].some(value => typeof value !== 'string' || value.trim().length === 0)) {
+            return res.status(400).json({ success: false, error: { code: 'POLICY_DISPLAY_FIELDS_REQUIRED', message: '게시할 정책 문서의 제목과 본문을 입력해 주세요.' } });
+          }
           if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG
             && (doc.version < 2 || !doc.effective_date)) {
             return res.status(400).json({ success: false, error: { code: 'COMMON_ACCOUNT_POLICY_NOT_READY', message: '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.' } });
