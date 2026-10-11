@@ -55,6 +55,31 @@
 - `docs/local/TEST-ACCOUNTS.local.md`가 작업·기준 checkout 모두에 없어 로그인 후 공통 헤더/모바일 진입, 실제 handoff, 본인 서비스·작성 글·선택 매장 데이터의 운영 검증은 **미실행**이다. 공개 Demo·예전 seed·실제 운영 사용자 계정으로 대체하지 않았다.
 - 정책·화면·배포의 문서 정합은 동일 WO의 연속 배포 후 문서 Phase로 반영한다. 문서만 변경하므로 후속 문서 PR의 `DEPLOYMENT = NOT_APPLICABLE`; 위 런타임 SHA와 문서 정합 이후 main HEAD를 혼동하지 않는다.
 
+## 테스트 계정 원본 위치 조사 (2026-10-11)
+
+사용자가 계정 문서가 있다고 알려 주고 문서·docs에서 위치를 찾아 기록하도록 지시했다.
+기존 My Home WO의 미완료 인증 검증을 위한 연속 Phase로 같은 worktree·branch를 유지한다.
+이번 조사 기준 main은 `4f75e2563af5b105edabef430d835098f63a100c`다. 코드·계정·DB·배포 변경은 없다.
+
+### 문서에서 확인한 근거
+
+- [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)과 `AGENTS.md` §6은 계정 문서를 `docs/local/TEST-ACCOUNTS.local.md`로 지정한다.
+- [Codex 환경 조사](../investigations/CHECK-CODEX-ENV-SETUP-V1.md) §1은 원본 Windows 저장소 루트를 기록하고 테스트 계정 문서의 상대 경로도 명시한다. 이를 결합한 우선 확인 후보는 `%USERPROFILE%\coding\o4o-platform\docs\local\TEST-ACCOUNTS.local.md`다.
+- [운영 DB 잔여 조사](WO-O4O-FINAL-PRODUCTION-DB-RESIDUE-CLOSURE-V1-CHECK.md)의 이전 저장소 루트를 기준으로 `%USERPROFILE%\o4o-platform\docs\local\TEST-ACCOUNTS.local.md`도 확인 후보에 포함한다.
+- [계정 문서 정비 기록](CHECK-O4O-TEST-ACCOUNTS-IDENTITY-V2-SERVICE-CREDENTIAL-DOCUMENTATION-V1.md)은 2026-08-09 로컬 파일 갱신과 Git 추적 제외를 기록한다. [브라우저 검증 조사](../investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md)도 같은 로컬 문서의 수정 이력을 남긴다.
+
+위 경로는 문서 근거가 있는 **원본 PC 확인 후보**다. 연결되지 않은 PC의 현재 파일 존재·내용·로그인 가능 여부를 확인한 것은 아니다.
+개인 사용자 이름과 자격증명은 복사하지 않고 공개 기록에는 `%USERPROFILE%`만 사용했다.
+
+### 클라우드 검색 결과와 남은 일
+
+- `docs`·문서형 설정의 경로 참조를 조사했다. 문서에 있는 Git 제외 파일의 과거 사용 기록과 현재 클라우드의 실파일 존재를 구분했다.
+- 작업·기준 checkout 모두 `docs/local/TEST-ACCOUNTS.local.md` 없음. 접근 가능한 `/workspace`, `/tmp`, `/mnt`, `/media`, `/home`에서도 해당 이름이나 유사한 계정 문서 사본을 찾지 못했다. dependency·Git 내부·credential 디렉터리는 제외하고 파일 이름·경로 중심으로 조사했다. 접근 제한 디렉터리와 원본 PC는 미확인이다.
+- `git check-ignore -v`에서 `.gitignore`의 `docs/local/*.local.md` 규칙을 확인했다. 현재 Git refs의 `git ls-files`와 해당 경로의 `git log --all`에는 원본 파일이 없다. Git으로 자동 확보할 수 없다.
+- [SETUP의 위치 안내](../../SETUP.md#원본-pc의-위치-단서와-클라우드-확인-결과-2026-10-11)에 확인 후보·근거·비공개 재확보 절차를 추가했다.
+- 실제 원본을 비공개로 연결한 뒤 일반 회원·매장 경영자의 handoff·개인 데이터·매장 권한을 검증해야 한다. 이번 조사에서는 로그인·비밀번호 추측·Demo/seed 대체·계정 변경을 하지 않았다.
+- 이번 변경은 문서-only이며 `DEPLOYMENT = NOT_APPLICABLE`이다. My Home의 운영 배포 및 `AUTHENTICATED PENDING` 판정은 유지한다.
+
 ## WORKTREE_DISPOSITION
 
 - worktree: `/workspace/o4o-wt/my-home-document-alignment`
