@@ -49,3 +49,9 @@ Route 제거/rename·href 변경·메뉴 숨김·필터 변경·빈 그룹 제�
 공통 header 소비 화면 추가 fixture는 1440/390/320의 18개 PASS이며 mobile drawer 열기/닫기 버튼·문서 overflow·pageerror를 확인했다. 기존 대상 UI 30개, My Home 9개 E2E와 함께 검증했다. 모든 API 응답은 합성이며 운영 DB·OAuth·실계정 작업을 수행하지 않았다. 운영 bundle/배포 결과는 WO의 통합 결과에 기록하며 최종 사용자 테스트는 T13이다.
 
 WORKTREE_DISPOSITION: 같은 통합 WO의 `wo/frontend-integrated-stabilization`, KEEP — 통합·배포·후속 phase·사용자 테스트 대기.
+
+## 최종 배포 및 최신 회귀 (2026-10-11)
+
+위 소비처 표·테스트 수는 최초 구현 단계의 기록이다. 현재 PR #458·#467은 main에 병합됐고, 공통 UI의 영향을 받는 앱과 독립 Store/Lecture/Branch의 해당 UI 배포도 완료했다. 대상별 실제 배포 SHA 및 Delivery SUCCESS는 [통합 WO §9](../work-orders/WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1.md#9-최종-main-통합운영-배포사용자-테스트-인계)를 기준으로 확인한다. latest Neture 전체533 tests·production build, My Home unit13·PC1440/mobile375/320 E2E27 PASS. 추가 Pharmacy build·회원 홈16 및 PC1440/mobile390/320 fixture3도 PASS다.
+
+마지막 공개 운영 HTTP28·비로그인 browser9 PASS는 공개 진입/자산/인증 경계 확인이다. 운영자 헤더의 실제 업무 데이터나 real OAuth 검증을 대체하지 않는다. 운영자 공급자·내 매장 진입과 실제 서비스 세션 이동은 마지막 T13 사용자 테스트로 유지한다. WORKTREE_DISPOSITION은 KEEP이며 통합·배포 대기가 아닌 사용자 테스트·정책 결정·이전 공간 보존 확인 대기다.
