@@ -72,3 +72,29 @@ Frozen 문서 전체 대조: Supplier 정본도 ACTIVE (FROZEN)이므로 PH over
 Canonical 문서 작업 경계 정정: ACTIVE/FROZEN 여부와 관계없이 기준 문서의 PH 정책 판정 변경 전체를 별도 canonical 작업 #427로 분리했다. 본 PR에서 architecture·baseline·RBAC 정본은 모두 origin/main과 동일하게 복원했다. 앞선 정렬 기록은 branch에서 검토한 단계 이력이며 canonical 통합 완료를 뜻하지 않는다. 사용자 승인된 PH 완전 폐기 정책의 정본 적용과 index 정합은 후속 문서 PR에서 함께 처리한다. 본 PR의 변경은 전환 코드·읽기 전용 검증·실행 기록이며 운영 삭제는 아직 미실행이다.
 
 - 2026-10-11 리뷰 대응: workflow job-level skip을 제거하고 인증 이전 gate에서 입력 조합 및 Demo 소유자 권한을 명시적으로 검증한다. 비소유자 잘못된 조합도 실패하며 운영 자원에 접근하지 않는다. gate 5개 조합 검증 통과.
+
+
+## 2026-10-11 운영 제거 후속 phase
+
+동일 폐기 WO의 연속 phase로 사용자 지정 worktree를 유지하며 `wo/pharmacyhub-retirement-inventory`를 최신 main에서 생성했다. PR #422 병합(`9d1ee57f90`)·post-merge CI·Delivery `38094660443`의 API 배포는 성공했다. 운영 readiness HTTP 200 및 slug 없는 QR namespace HEAD의 읽기 전용 지원 헤더를 확인했다(404는 slug 없는 namespace의 정상 상태이며 실데이터 실패가 아니다).
+
+전체 호스트 read-only plan `38095477480`은 SUCCESS, `applied:false`다. DB/probe 조회 없이 URL map 초안 검증을 통과했다. artifact 다운로드는 네트워크 차단으로 실패했다. 다른 운영 배포 종료 확인 후 전체 호스트 apply `38096187400`을 시작했으며 결과는 아직 미확정이다. Cloud Run/backend/데이터 삭제 완료를 뜻하지 않는다.
+
+추가 운영 census는 `retirement_inventory=true, mode=plan` 전용이며 retire_host/Demo 동시 선택과 apply를 인증 전에 거부한다. production SQL은 READ ONLY transaction + timeout + ROLLBACK으로 테이블 schema/FK·PH namespace별 건수만 조회한다. 원문 행·사용자 식별자·credential은 출력하지 않는다. Cloud 자원은 list/describe만 수행하고 부족한 권한은 안전한 permission 이름으로 보고한다. 이 census는 삭제 계획 승인이나 PH 조직의 전용 귀속 판정이 아니다. 공용 조직·사용자·인쇄 QR/Neture 데이터 및 법정 보유 판단은 별도 보호한다.
+
+- [x] API 읽기 전용 QR 지원 배포·검증.
+- [x] 전체 호스트 URL map plan 검증.
+- [ ] 전체 호스트 apply 및 실제 QR/tablet/rule HTTP 검증.
+- [ ] resource/schema/scoped-row census push·CI·review·main 통합 후 운영 read-only 실행.
+- [ ] census 결과로 전용 자원/FK/데이터 삭제 계획 확정 및 실행.
+- [ ] PH 활성 참조 정리와 별도 정본 작업 #427.
+
+운영 apply `38096187400`은 실제 QR/tablet 2종을 읽기 전용으로 발견하고 preflight를 통과했으나 옛 호스트의 302/path/query HTTP 검증에서 실패했다. 변경 도구는 기존 URL map을 복구·대조한 뒤 원래 검증 오류로 종료했다. Cloud Run/backend/데이터 삭제는 수행하지 않았다. 리다이렉트 검증의 실패 호스트·경로 종류·HTTP status·Location 일치 여부를 식별자 없는 진단으로 보강한다. 후속 census는 현재 PH matcher와 DNS 주소 일치 여부·고정 synthetic 경로 HTTPS 결과를 읽기 전용으로 확인해 복구 상태 및 DNS/라우팅 원인을 조사한다. 실제 IP/Location/DB 행 원문은 보고하지 않는다.
+
+PR #438 리뷰 대응: `checkout_orders.metadata.serviceKey/source` 등 JSON/JSONB scope를 명시적으로 집계하고 해당 테이블을 FK 조사 집합에 포함했다. scalar/array scope와 JSONB scope는 겹칠 수 있으므로 건수를 합산해 삭제 총량으로 해석하지 않는다. 조사 도구 안전 테스트 7개, 리다이렉트 안전 진단 회귀 포함 focused tests 통과.
+
+PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sourceService/sourceModule/serviceKeys/scopeKey도 안전한 식별자 quoting과 함께 집계한다. cms_contents.serviceKey의 PH 건수/FK 포함 회귀를 추가했다. SonarCloud 지적의 finally 내부 throw를 제거하고 원래 query 오류를 보존하는 rollback 처리로 정리했다. HTTPS/DNS 진단은 독립 요청을 bounded timeout으로 병렬 조회하고 진단 helper를 분리했다. 관련 focused tests 42개가 통과했다. 이 환경의 직접 DNS는 권한 요청 후에도 ECONNREFUSED이므로 실제 DNS/HTTPS 판정은 Actions census 결과를 따른다.
+
+추가 census 범위/진단 리뷰: 등록된 pharmacy-hub-event-offer 키도 정확한 PH namespace 집계에 포함한다. 잘못된 Location은 별도 파싱 실패로 처리해 HTTP status와 Location 존재 여부를 보존하며 네트워크 장애로 오진하거나 원문 Location을 출력하지 않는다.
+
+서비스 범위 컬럼 전수 대조: 명시적 scope 목록 외에도 schema의 모든 호환 text/text-array service 명칭 컬럼을 후보 집계한다. handoff_tokens.source_service_key/target_service_key와 seller_recruitments.service_id의 PH 건수/FK 포함 회귀를 추가했다. UUID service_id가 PH 문자열과 일치하지 않는 경우의 실제 귀속은 FK 관계로 별도 조사하며 이 후보 census로 삭제를 승인하지 않는다.
