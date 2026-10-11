@@ -53,7 +53,17 @@ it('fails closed after account/role revocation and for unrelated users', async (
   await request(app).post(path(`/categories/${BOARD}/join-requests`)).expect(403);
 });
 
-it.each(['members', 'join-requests'])('does not reuse a retained forum owner row to read %s after creator qualification is lost', async section => {
+it.each(['members', 'join-requests', 'MEMBERS', 'JOIN-REQUESTS'].flatMap(section => ['get', 'head'].flatMap(method => ['', '/'].map(suffix => [section, method, suffix]))))('does not reuse a retained forum owner row to read %s using %s with suffix %s after creator qualification is lost', async (section, method, suffix) => {
   // Can read as a participant; the old board owner row is not creator authority.
-  await request(app).get(path(`/categories/${BOARD}/${section}`)).expect(403);
+  await (request(app) as any)[method](path(`/categories/${BOARD}/${section}${suffix}`)).expect(403);
+});
+
+it.each(['owner', 'delete-request', 'OWNER', 'DELETE-REQUEST'])('blocks structural %s mutation with a trailing slash', async section => {
+  resolver.mockResolvedValue({ trial: { status: 'recruiting' }, forum: { id: BOARD }, creator: true, canRead: true, canWrite: true });
+  await request(app).post(path(`/categories/${BOARD}/${section}/`)).expect(403);
+});
+it.each(['/posts/', '/POSTS/'])('normalizes the list and pin scope for %s', async listPath => {
+  const result = await request(app).get(path(listPath)).expect(200);
+  expect(result.body.forumId).toBe(BOARD);
+  await request(app).patch(path('/posts/post-fixture/pin/')).send({ pin: true }).expect(403);
 });

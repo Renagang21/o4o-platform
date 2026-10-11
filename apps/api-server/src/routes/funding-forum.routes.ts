@@ -17,22 +17,23 @@ export function createFundingForumRoutes(): Router {
       if (!UUID.test(id)) { res.status(400).json({ success: false, message: 'Invalid funding ID' }); return; }
       const access = await resolveFundingAccess(AppDataSource, id, (req as any).user?.id);
       if (!access?.forum || (!access.creator && !access.operator && !access.participant)) { res.status(403).json({ success: false, message: '해당 펀딩 참여자만 포럼을 이용할 수 있습니다.' }); return; }
-      const category = /^\/categories\/([^/]+)/.exec(req.path)?.[1];
+      const routePath = req.path.replace(/\/$/, '').toLowerCase() || '/';
+      const category = /^\/categories\/([^/]+)/.exec(routePath)?.[1];
       if (category && !['mine', 'popular'].includes(category) && category !== access.forum.id) { res.status(404).json({ success: false, message: '포럼을 찾을 수 없습니다.' }); return; }
-      const isMembershipAction = /^\/categories\/[^/]+\/(join-requests|membership-status)(?:\/|$)/.test(req.path);
-      const isMemberManagementRead = req.method === 'GET' && /^\/categories\/[^/]+\/(members|join-requests)$/.test(req.path);
+      const isMembershipAction = /^\/categories\/[^/]+\/(join-requests|membership-status)(?:\/|$)/.test(routePath);
+      const isMemberManagementRead = ['GET', 'HEAD'].includes(req.method) && /^\/categories\/[^/]+\/(members|join-requests)$/.test(routePath);
       if (isMemberManagementRead && !access.creator) { res.status(403).json({ success: false, message: '현재 개설자만 포럼 회원 명단을 조회할 수 있습니다.' }); return; }
       if (!access.canRead && !isMembershipAction) { res.status(403).json({ success: false, message: '포럼 이용 승인이 필요합니다.' }); return; }
       if (!['GET', 'HEAD'].includes(req.method) && !access.canWrite && !isMembershipAction) { res.status(403).json({ success: false, message: '종료된 펀딩은 읽기 전용입니다.' }); return; }
       // Membership operations never reopen a closed project.
       if (!['GET', 'HEAD'].includes(req.method) && access.trial.status === 'closed') { res.status(403).json({ success: false, message: '종료된 펀딩은 읽기 전용입니다.' }); return; }
-      if (req.method === 'GET' && req.path === '/posts') {
+      if (req.method === 'GET' && routePath === '/posts') {
         if (req.query.forumId && req.query.forumId !== access.forum.id) { res.status(404).json({ success: false, message: '포럼을 찾을 수 없습니다.' }); return; }
         req.query.forumId = access.forum.id;
       }
-      if (!['GET', 'HEAD'].includes(req.method) && /^\/categories\/.+\/(owner|delete-request)$/.test(req.path)) { res.status(403).json({ success: false, message: '펀딩 포럼 구조는 서비스 운영자가 관리합니다.' }); return; }
+      if (!['GET', 'HEAD'].includes(req.method) && /^\/categories\/.+\/(owner|delete-request)$/.test(routePath)) { res.status(403).json({ success: false, message: '펀딩 포럼 구조는 서비스 운영자가 관리합니다.' }); return; }
       if (!access.creator && !access.operator && !['GET', 'HEAD'].includes(req.method) &&
-        (req.body?.type === 'announcement' || req.body?.isPinned !== undefined || req.body?.isLocked !== undefined || req.path.endsWith('/pin'))) {
+        (req.body?.type === 'announcement' || req.body?.isPinned !== undefined || req.body?.isLocked !== undefined || routePath.endsWith('/pin'))) {
         res.status(403).json({ success: false, message: '공지·고정 관리는 개설자와 운영자만 가능합니다.' }); return;
       }
       req.forumContext = { forumStorageCodes: [fundingForumCode(id)], communityOperator: access.creator || access.operator, scope: 'community' };
