@@ -10,7 +10,7 @@
  * - Neture operator 1st approval (SUBMITTED → RECRUITING)
  * - Participant reward-status management (pending ↔ fulfilled)
  * - Trial status transitions (RECRUITING → DEVELOPMENT → ... → FULFILLED → CLOSED)
- * - Trial → Product conversion (link existing or create new ProductMaster)
+ * - Offline payment confirmation records with transactional audit
  * - Operator trial listing (all trials / service-scoped)
  */
 
@@ -21,9 +21,6 @@ import {
   MarketTrial,
   TrialStatus,
   MarketTrialForum,
-  PaymentStatus,
-  VALID_PAYMENT_STATUSES,
-  isPaymentStatus,
   calculateAchievementRate,
   calculateParticipationRate,
   calculatePaymentCompletionRate,
@@ -41,23 +38,8 @@ import type { RequestHandler } from 'express';
 import { hasFundingOperator } from '../../services/funding/funding-access.js';
 import { FundingWorkspaceService, FundingError } from '../../services/funding/funding-workspace.service.js';
 import { fundingReview, fundingForumSlug, fundingForumCode, FUNDING_PROGRESS_TRANSITIONS } from '../../services/funding/funding-review.js';
-import { ActionLogService } from '@o4o/action-log-core';
-
-/**
- * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
- * 운영자가 허용하는 participant settlementStatus 전이 규칙
- * pending → choice_pending: 수동 개방 (cascade 또는 개별 예외)
- * choice_completed → offline_review: 운영자 검토 시작
- * offline_review → offline_settled: 운영자 정산 완료
- * offline_settled: 변경 불가 (locked)
- */
-const ALLOWED_SETTLEMENT_TRANSITIONS: Record<string, string[]> = {
-  pending: ['choice_pending'],
-  choice_pending: [],
-  choice_completed: ['offline_review'],
-  offline_review: ['offline_settled'],
-  offline_settled: [],
-};
+import { participantFilters, participantCsvCell } from '../../services/funding/funding-participant-export.js';
+import { FundingPaymentRecordService } from '../../services/funding/funding-payment-record.service.js';
 
 // Valid participant reward status values
 const VALID_REWARD_STATUSES = ['pending', 'fulfilled'] as const;
@@ -386,7 +368,6 @@ export class MarketTrialOperatorController {
   static async listParticipants(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const { rewardType, rewardStatus } = req.query;
       const ds = MarketTrialOperatorController.dataSource;
       if (!ds) {
         return res.status(500).json({ success: false, message: 'DataSource not initialized' });
@@ -400,26 +381,12 @@ export class MarketTrialOperatorController {
       // Build filter conditions
       const conditions: string[] = [`p."marketTrialId" = $1`];
       const params: unknown[] = [id];
-      if (rewardType && typeof rewardType === 'string' && ['product', 'cash'].includes(rewardType)) {
-        params.push(rewardType);
-        conditions.push(`p."rewardType" = $${params.length}`);
-      }
-      if (rewardStatus && typeof rewardStatus === 'string' && VALID_REWARD_STATUSES.includes(rewardStatus as RewardStatus)) {
-        params.push(rewardStatus);
-        conditions.push(`p."rewardStatus" = $${params.length}`);
-      }
+      conditions.push(...participantFilters(req.query, params));
 
       // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: settlement filter support
       if (req.query.settlementStatus && typeof req.query.settlementStatus === 'string') {
         params.push(req.query.settlementStatus);
         conditions.push(`p."settlementStatus" = $${params.length}`);
-      }
-
-      // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: payment filter support
-      if (req.query.paymentStatus && typeof req.query.paymentStatus === 'string'
-        && isPaymentStatus(req.query.paymentStatus)) {
-        params.push(req.query.paymentStatus);
-        conditions.push(`COALESCE(p."paymentStatus", 'unpaid') = $${params.length}`);
       }
 
       const rows: Array<{
@@ -571,6 +538,7 @@ export class MarketTrialOperatorController {
         },
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Operator list participants error:', error);
       res.status(500).json({ success: false, message: 'Failed to list participants' });
     }
@@ -605,10 +573,10 @@ export class MarketTrialOperatorController {
 
       // Update participant rewardStatus
       const result = await ds.query(
-        `UPDATE market_trial_participants
-         SET "rewardStatus" = $1
+        `WITH updated AS (UPDATE market_trial_participants
+         SET "rewardStatus" = $1, "updatedAt" = now()
          WHERE id = $2 AND "marketTrialId" = $3
-         RETURNING id, "rewardType", "rewardStatus", "createdAt"`,
+         RETURNING id, "rewardType", "rewardStatus", "createdAt") SELECT * FROM updated`,
         [rewardStatus, participantId, id],
       );
 
@@ -631,284 +599,30 @@ export class MarketTrialOperatorController {
     }
   }
 
-  /**
-   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/settlement-status
-   * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1:
-   * 운영자 participant 정산 상태 변경
-   * Body: { settlementStatus, settlementNote? }
-   * 허용 전이: pending→choice_pending, choice_completed→offline_review, offline_review→offline_settled
-   */
-  static async updateParticipantSettlementStatus(req: AuthRequest, res: Response) {
-    try {
-      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
-      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 정산 상태 변경을 중단한다.
-      // (기존 settlementStatus 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
-      return res.status(409).json({
-        success: false,
-        error: 'Market Trial settlement is disabled by content-only boundary policy.',
-        message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
-        code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
-      });
-
-      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
-      const { id, participantId } = req.params;
-      const { settlementStatus: newStatus, settlementNote } = req.body;
-      const ds = MarketTrialOperatorController.dataSource;
-      if (!ds) {
-        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
-      }
-
-      if (!newStatus || typeof newStatus !== 'string') {
-        return res.status(400).json({ success: false, message: 'settlementStatus is required' });
-      }
-
-      // Verify trial exists
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-
-      // Fetch current participant status
-      const rows: Array<{ id: string; settlementStatus: string }> = await ds.query(
-        `SELECT id, COALESCE("settlementStatus", 'pending') AS "settlementStatus"
-         FROM market_trial_participants
-         WHERE id = $1 AND "marketTrialId" = $2`,
-        [participantId, id],
-      );
-      if (!rows || rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
-
-      const currentStatus = rows[0].settlementStatus;
-      const allowed = ALLOWED_SETTLEMENT_TRANSITIONS[currentStatus] ?? [];
-
-      if (!allowed.includes(newStatus)) {
-        const allowedStr = allowed.length > 0 ? allowed.join(', ') : '없음';
-        return res.status(400).json({
-          success: false,
-          message: `"${currentStatus}" 상태에서 "${newStatus}"로 전이할 수 없습니다. 허용: ${allowedStr}`,
-        });
-      }
-
-      // Build update query — include settlementNote if provided
-      let sql: string;
-      let sqlParams: unknown[];
-      if (settlementNote !== undefined) {
-        sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1, "settlementNote" = $2, "updatedAt" = now()
-               WHERE id = $3 AND "marketTrialId" = $4
-               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
-        sqlParams = [newStatus, settlementNote, participantId, id];
-      } else {
-        sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1, "updatedAt" = now()
-               WHERE id = $2 AND "marketTrialId" = $3
-               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
-        sqlParams = [newStatus, participantId, id];
-      }
-
-      const result = await ds.query(sql, sqlParams);
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found' });
-      }
-
-      const row = result[0];
-      res.json({
-        success: true,
-        data: {
-          id: row.id,
-          settlementStatus: row.settlementStatus,
-          settlementNote: row.settlementNote,
-          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
-        },
-        message: `정산 상태가 "${newStatus}"로 변경되었습니다.`,
-      });
-    } catch (error) {
-      console.error('Update participant settlement status error:', error);
-      res.status(500).json({ success: false, message: 'Failed to update settlement status' });
-    }
+  /** Compatibility endpoint: new settlement mutations stay disabled; existing data is preserved. */
+  static async updateParticipantSettlementStatus(_req: AuthRequest, res: Response) {
+    return res.status(409).json({
+      success: false,
+      message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
+      code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
+    });
   }
 
-  /**
-   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/payment-status
-   * WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1:
-   *   Operator updates a participant's payment lifecycle state. PG integration is
-   *   out of scope for this WO — the endpoint is the manual reconciliation entry
-   *   point and the future PG webhook target.
-   *
-   *   Body (all optional except paymentStatus):
-   *     paymentStatus     : 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded'
-   *     paymentMethod     : free-form (recommended: 'manual_transfer')
-   *     paymentProvider   : free-form (recommended: 'internal' for manual)
-   *     paymentReference  : PG tx id or transfer memo
-   *     paidAmount        : decimal
-   *     paidAt            : ISO datetime
-   *     confirmedAt       : ISO datetime (omit to auto-stamp on PAID)
-   *     paymentNote       : operator memo
-   *
-   *   Lifecycle policy:
-   *     - No transition matrix is enforced — operator may correct mistakes by
-   *       moving back to UNPAID, etc. WO §5: payment changes never auto-mutate
-   *       trial.status.
-   *     - When transitioning to PAID and confirmedAt is not supplied,
-   *       confirmedAt is auto-stamped to NOW() so the audit trail is preserved.
-   *
-   *   Future notification event point (NOT fired in this WO):
-   *     - PAID    → market_trial.payment_confirmed (supplier + participant)
-   *     - FAILED  → market_trial.payment_failed    (participant)
-   *     - REFUNDED → market_trial.refunded         (supplier + participant)
-   */
+  /** Offline confirmation records only; payment and audit commit together. */
   static async updateParticipantPaymentStatus(req: AuthRequest, res: Response) {
     try {
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1:
-      // content-only 운영 모델은 "운영자가 오프라인 입금을 확인·기록"하는 것을 전제한다
-      // (송금은 Neture 운영자 수령 → 입금 확인 완료자 명단 공유). 따라서 결제(payment) mutation 만
-      // 재활성화한다. 정산(settlement)·매장 진열·고객 전환은 content-only boundary 로 계속 차단(409 유지).
-      // 본 엔드포인트는 오프라인 입금 확인 기록일 뿐 온라인 결제(PG)가 아니다.
       const { id, participantId } = req.params;
-      const {
-        paymentStatus: newStatus,
-        paymentMethod,
-        paymentProvider,
-        paymentReference,
-        paidAmount,
-        paidAt,
-        confirmedAt,
-        paymentNote,
-      } = req.body ?? {};
       const ds = MarketTrialOperatorController.dataSource;
-      if (!ds) {
-        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
-      }
-
-      if (!isPaymentStatus(newStatus)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid paymentStatus. Allowed: ${VALID_PAYMENT_STATUSES.join(', ')}`,
-        });
-      }
-
+      if (!ds) return res.status(500).json({ success: false, message: 'DataSource not initialized' });
       const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 감사용 변경 전 값(전후 비교).
-      const before: Array<{
-        id: string;
-        paymentStatus: string;
-        paidAmount: string | null;
-        paymentReference: string | null;
-        paymentNote: string | null;
-      }> = await ds.query(
-        `SELECT id, COALESCE("paymentStatus", 'unpaid') AS "paymentStatus",
-                "paidAmount", "paymentReference", "paymentNote"
-         FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2`,
-        [participantId, id],
-      );
-      if (!before || before.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
-      const prev = before[0];
-
-      // Build the SET list dynamically so callers can omit fields they don't want
-      // to overwrite (e.g. update paymentStatus only without clearing paidAt).
-      const sets: string[] = [`"paymentStatus" = $1`];
-      const sqlParams: unknown[] = [newStatus];
-
-      const pushSet = (column: string, value: unknown, transform?: (v: any) => unknown) => {
-        if (value === undefined) return;
-        const idx = sqlParams.length + 1;
-        sets.push(`"${column}" = $${idx}`);
-        sqlParams.push(value === null ? null : transform ? transform(value) : value);
-      };
-
-      pushSet('paymentMethod', paymentMethod);
-      pushSet('paymentProvider', paymentProvider);
-      pushSet('paymentReference', paymentReference);
-      pushSet('paidAmount', paidAmount, (v) => Number(v));
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-PAIDAT-PRESERVE-V1:
-      // paidAt = 최초 입금 확인일. 기존 paidAt 이 있으면 보존(caller 가 값을 보내도 덮어쓰지 않음).
-      // PAID 최초 전환 시에만 설정(요청값 우선, 없으면 now). newStatus !== PAID 이면 paidAt 미변경(보존).
-      if (newStatus === PaymentStatus.PAID) {
-        const idx = sqlParams.length + 1;
-        sets.push(`"paidAt" = COALESCE("paidAt", $${idx})`);
-        sqlParams.push(paidAt !== undefined && paidAt !== null ? new Date(paidAt) : new Date());
-      }
-
-      pushSet('paymentNote', paymentNote);
-
-      // confirmedAt = 마지막 운영자 확인 시각. 입금 상태 변경/수정마다 now 로 갱신(요청값 있으면 우선).
-      {
-        const idx = sqlParams.length + 1;
-        sets.push(`"confirmedAt" = $${idx}`);
-        sqlParams.push(confirmedAt !== undefined && confirmedAt !== null ? new Date(confirmedAt) : new Date());
-      }
-
-      sets.push(`"updatedAt" = now()`);
-
-      const idIdx = sqlParams.length + 1;
-      const trialIdx = sqlParams.length + 2;
-      sqlParams.push(participantId, id);
-
-      const sql = `UPDATE market_trial_participants
-                   SET ${sets.join(', ')}
-                   WHERE id = $${idIdx} AND "marketTrialId" = $${trialIdx}
-                   RETURNING id, "paymentStatus", "paymentMethod", "paymentProvider",
-                             "paymentReference", "paidAmount", "paidAt", "confirmedAt",
-                             "paymentNote", "updatedAt"`;
-
-      const result = await ds.query(sql, sqlParams);
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found' });
-      }
-
-      const row = result[0];
-      logger.info(
-        `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${newStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
-      );
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 구조화 감사(전후 상태/금액, reference·note 변경 여부).
-      // 기존 action_logs 테이블 재사용(migration 없음). paymentReference/paymentNote 원문은 기록하지 않는다.
-      // afterStatus 는 검증된 newStatus 를, afterAmount 는 요청값(있으면)·없으면 기존 금액(보존)을 사용한다
-      // (UPDATE RETURNING row 직접 의존 회피).
-      const beforeAmount = prev.paidAmount != null ? Number(prev.paidAmount) : null;
-      const afterAmount = paidAmount !== undefined && paidAmount !== null ? Number(paidAmount) : beforeAmount;
-      new ActionLogService(ds)
-        .logSuccess('neture', (req as any).user?.id ?? null, 'neture.operator.market_trial_payment_change', {
-          meta: {
-            trialId: id,
-            participantId,
-            beforeStatus: prev.paymentStatus,
-            afterStatus: newStatus,
-            beforeAmount,
-            afterAmount,
-            referenceChanged: paymentReference !== undefined && (paymentReference ?? null) !== (prev.paymentReference ?? null),
-            noteChanged: paymentNote !== undefined && (paymentNote ?? null) !== (prev.paymentNote ?? null),
-          },
-        })
-        .catch((e) => logger.warn(`[MarketTrialPayment] audit log failed: ${e?.message ?? e}`));
-
-      res.json({
-        success: true,
-        data: {
-          id: row.id,
-          paymentStatus: row.paymentStatus,
-          paymentMethod: row.paymentMethod || null,
-          paymentProvider: row.paymentProvider || null,
-          paymentReference: row.paymentReference || null,
-          paidAmount: row.paidAmount != null ? Number(row.paidAmount) : null,
-          paidAt: row.paidAt ? new Date(row.paidAt).toISOString() : null,
-          confirmedAt: row.confirmedAt ? new Date(row.confirmedAt).toISOString() : null,
-          paymentNote: row.paymentNote || null,
-          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
-        },
-        message: `결제 상태가 "${newStatus}"로 변경되었습니다.`,
-      });
+      if (!trial) return res.status(404).json({ success: false, message: 'Trial not found' });
+      const record = await new FundingPaymentRecordService(ds).update(id, participantId, req.user!.id, req.body ?? {});
+      return res.json({ success: true, data: record, message: '오프라인 입금 기록을 저장했습니다.' });
     } catch (error) {
-      console.error('Update participant payment status error:', error);
-      res.status(500).json({ success: false, message: 'Failed to update payment status' });
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      // Database errors can include raw reference/note values; keep them out of application logs.
+      logger.error('[Funding] payment record transaction failed');
+      return res.status(500).json({ success: false, message: '입금 기록 저장에 실패했습니다. 다시 확인해 주세요.' });
     }
   }
 
@@ -983,6 +697,8 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
+      const params: unknown[] = [id];
+      const conditions = ['p."marketTrialId" = $1', ...participantFilters(req.query, params)];
       const rows: Array<{
         participantName: string;
         participantType: string;
@@ -991,6 +707,7 @@ export class MarketTrialOperatorController {
         contributionAmount: string | number | null;
         paymentStatus: string | null;
         paidAmount: string | number | null;
+        paidAt: Date | null;
         confirmedAt: Date | null;
         paymentReference: string | null;
         settlementChoice: string | null;
@@ -1005,6 +722,7 @@ export class MarketTrialOperatorController {
            p."contributionAmount",
            p."paymentStatus",
            p."paidAmount",
+           p."paidAt",
            p."confirmedAt",
            p."paymentReference",
            p."settlementChoice",
@@ -1012,9 +730,9 @@ export class MarketTrialOperatorController {
            p."createdAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
-         WHERE p."marketTrialId" = $1
+         WHERE ${conditions.join(' AND ')}
          ORDER BY p."createdAt" DESC`,
-        [id],
+        params,
       );
 
       // Human-readable label maps
@@ -1056,8 +774,8 @@ export class MarketTrialOperatorController {
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
-      const trialTitle = (trial.title || '').replace(/"/g, '""');
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const trialTitle = trial.title || '';
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
         recruiting: '모집 중', development: '준비 중',
@@ -1066,21 +784,12 @@ export class MarketTrialOperatorController {
       const trialStatusText = trialStatusLabel[trial.status] || trial.status;
 
       const csvRows = rows.map((r) => [
-        `"${(r.participantName || '').replace(/"/g, '""')}"`,
-        `"${participantTypeLabel(r.participantType)}"`,
-        `"${rewardTypeLabel(r.rewardType)}"`,
-        `"${rewardStatusLabel(r.rewardStatus)}"`,
-        `"${won(r.contributionAmount)}"`,
-        `"${paymentStatusLabel(r.paymentStatus)}"`,
-        `"${won(r.paidAmount)}"`,
-        `"${r.confirmedAt ? fmtDate(r.confirmedAt) : '-'}"`,
-        `"${(r.paymentReference || '-').replace(/"/g, '""')}"`,
-        `"${settlementChoiceLabel(r.settlementChoice)}"`,
-        `"${settlementStatusLabel(r.settlementStatus)}"`,
-        `"${fmtDate(r.createdAt)}"`,
-        `"${trialTitle}"`,
-        `"${trialStatusText}"`,
-      ].join(','));
+        r.participantName, participantTypeLabel(r.participantType), rewardTypeLabel(r.rewardType),
+        rewardStatusLabel(r.rewardStatus), won(r.contributionAmount), paymentStatusLabel(r.paymentStatus),
+        won(r.paidAmount), r.paidAt ? fmtDate(r.paidAt) : '-', r.confirmedAt ? fmtDate(r.confirmedAt) : '-',
+        r.paymentReference, settlementChoiceLabel(r.settlementChoice), settlementStatusLabel(r.settlementStatus),
+        fmtDate(r.createdAt), trialTitle, trialStatusText,
+      ].map(participantCsvCell).join(','));
 
       // BOM for Excel UTF-8 compatibility
       const bom = '\uFEFF';
@@ -1096,7 +805,8 @@ export class MarketTrialOperatorController {
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"; filename*=UTF-8''${utf8Filename}`);
       res.send(csv);
     } catch (error) {
-      console.error('Operator export participants CSV error:', error);
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      logger.error('[Funding] participant export failed');
       res.status(500).json({ success: false, message: 'Failed to export participants' });
     }
   }

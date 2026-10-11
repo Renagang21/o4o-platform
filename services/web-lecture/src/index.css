@@ -26,3 +26,15 @@
 .work-menu { position: relative; }
 .work-menu summary { cursor: pointer; }
 .work-menu > nav { position: absolute; right: 0; z-index: 20; min-width: 160px; padding: 12px; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px #0001; display: flex; flex-direction: column; gap: 12px; }
+
+/* Internal learning and course editing screens also support narrow viewports. */
+.list-title,.list-meta,.dl dd,.submission{min-width:0;overflow-wrap:anywhere}
+.option-row input[type=text],.field input,.field textarea,.field select{min-width:0;max-width:100%}
+.btn{min-height:44px}
+@media(max-width:720px){
+  .search{width:100%;min-width:0}
+  .search input{flex:1;min-width:0;width:0}
+  .grow{min-width:0;flex-basis:100%}
+  .option-row{flex-wrap:wrap}
+  .option-row input[type=text]{flex-basis:100%}
+}

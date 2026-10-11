@@ -101,12 +101,71 @@
 - 마지막 소스 수정 뒤 Neture production build(타입 검사 포함): **PASS**. 기존 Browserslist 데이터·큰 bundle 경고는 남아 있으며 dependency·빌드 설정을 변경하지 않았다.
 - 실제 Chromium fixture smoke **18개 PASS**(1440/375/320px 각 6개). 5개 개인 화면 직접 진입·메인 요약 진입·모바일 공통 메뉴·가로 넘침 0·JS 오류 0, 최근 이력 제한·전체 이력 페이지·Study 원본 강의 목적지·Funding 고정 호스트 주소·Study 403·Funding 503·재시도·선택 매장 scope를 확인했다. 운영 API를 가로채고 가상의 Study handoff만 응답해 실제 계정·DB를 사용하지 않았다.
 
-PR·운영 배포: 진행 중. 운영 인증 smoke는 지정 계정 문서 부재로 계속 미실행이다.
+### 통합 · 배포 결과
+
+| 근거 | 실제 결과 |
+|---|---|
+| [PR #461](https://github.com/Renagang21/o4o-platform/pull/461) | main 병합 완료. 구현 merge SHA `43fbe5bf7d2ad66b817317de2d3c90585694bfe5` |
+| [최종 PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38121863651) | HEAD `c9ae8e4959ebc739439ca0a415840dee6d54b08d`의 CI Gate·API 3개 묶음·품질·웹/Admin build PASS. CodeQL·SonarCloud PASS. 자동 Codex 리뷰 지적·미해결 스레드 0 |
+| [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38122416669) | 구현 merge SHA의 전체 CI PASS. 선행 main CI가 끝난 뒤 순차 실행 |
+| [구현 SHA Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38123217177) | `SUPERSEDED`. 실행 중 main에 Funding 배포 기록 문서 PR #462가 병합됨. 배포 job은 실행하지 않음 |
+| [배포 target CI](https://github.com/Renagang21/o4o-platform/actions/runs/38122683757) | 문서 변경만 있는 최신 main `65d55ca7ba12672f6f4e3e1f47e965a848c607c9`의 CI PASS. 구현 SHA와 `apps`·`packages`·`services`·`scripts`·`.github` 차이 0 확인 |
+| [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38123572960) | 정확한 target·소유자 계정·CI/freeze/서빙 범위 gate 확인 후 실행. API 선행 성공 → 관련 웹/Admin 성공 → 최종 서빙 SHA Report PASS. production commit status `DEPLOYED` |
+| 최종 서빙 확인 | api, admin, neture, kpa-society, lecture, store 6개가 위 target으로 완료. kpa-branch는 이번 배포 대상 아님 |
+
+최초 PR HEAD의 CI는 최신 main 반영으로 대체됐으며, 갱신 HEAD의 최종 CI를 근거로 병합했다. 최신 main 반영 때 Neture 전체 517개를 다시 실행해 통과했고, frontend·패키지 빌드 입력이 동일함을 확인했다. 직전 API 배포 `b565fb00965aa12c84df4f31ed3bff9395fac73e`부터 target까지 `apps/api-server/src/database` 전체와 `src/migrate.ts` 변경 0이다. 새 migration·수동 DB write/DDL을 실행하지 않았다. 기존 정상 API 배포 workflow의 Job·revision 검증을 따른다.
+
+Actions artifact와 job log 다운로드는 클라우드 목적지 제한으로 실패했다. 해당 파일을 직접 읽었다고 보고하지 않는다. GitHub job 결과·최종 Report·production commit status와 아래 운영 HTTPS·번들 검증을 근거로 사용한다. 정책·CI·freeze·TLS 검증을 우회하지 않았다.
+
+### 배포 후 검증 · 남은 범위
+
+- 실제 운영 `/mypage` HTML과 연결된 JS를 HTTPS로 받아 Study/Funding 제목과 본인 조회 endpoint 4개 표식이 존재함을 확인했다. `/`, `/mypage`, `/mypage/services`, `/mypage/activity`, `/mypage/management`, `/mypage/settings` 6개 모두 HTTP 200, API `/health/ready` 200.
+- 비로그인 Study 수강·Funding 참여·KPA 매장 통계 API는 모두 **401**이었다. 이는 인증 보호 확인이며 실제 계정의 소유권·활성 membership·개인 응답 검증을 대신하지 않는다.
+- **운영 번들 Chromium fixture 18개 PASS**: 1440/375/320px 각각 기존 6개 시나리오를 실행했다. HTTPS curl로 받은 실제 운영 HTML·JS·정적 자원을 브라우저에 응답하고, 모든 API 데이터·쓰기·Study 이동은 fixture로 가로챘다. 실제 계정·업무 데이터·DB를 사용하지 않았다. 로컬 origin에서 렌더링한 운영 코드의 본문·반응형·페이지·이동 계약·재시도 검증이며 실사용 인증 결과와 구분한다.
+- Chromium의 직접 운영 HTTPS 접속은 `ERR_CERT_AUTHORITY_INVALID`로 완료하지 못했다. `/tmp`에 기존 환경 CA를 가져온 별도 신뢰 저장소를 준비했지만 직접 접속 오류가 유지되어 해당 시도는 중단했다. 인증서 검증을 유지한 curl로 자원을 받아 위 브라우저 검증을 완료했으며 `ignoreHTTPSErrors`나 인증서 오류 무시 플래그를 사용하지 않았다. 로컬 빌드 fixture 18개와 운영 번들 fixture 18개는 별도 실행 결과다.
+- 운영 번들 검증 스크립트·스크린샷은 `/tmp/my-home-participation-deployed-fixture`, HTTP 결과는 `/tmp/my-home-participation-production-http.log`에 보관한다. 공개 문서에는 실제 사용자·사업자 정보·인증 값을 기록하지 않았다.
+- **AUTHENTICATED PENDING**: 지정된 로컬 계정 문서가 없어 실제 로그인·서비스 간 세션 전달·개인 데이터·매장 권한 smoke는 미실행이다. 파일 위치 조사·원본 PC 확인 후보는 위 계정 원본 위치 절과 SETUP에 유지한다. Demo/seed·운영 계정으로 대체하지 않는다.
+
+이번 배포 결과를 확정하는 후속 문서 PR은 같은 미완료 WO의 연속 Phase다. 문서만 변경하므로 `DEPLOYMENT = NOT_APPLICABLE`이며 새 문서 commit과 위 runtime target을 구분한다.
+
+## 연속 Phase: 기록 조회·경영 추이 (2026-10-11)
+
+- 최신 main `c4db284f2d05d9591e0079d88885e517e222cb19`를 확인해 같은 미완료 WO branch에 반영했다. 다른 세션 checkout은 변경하지 않는다.
+- 알림 서버 page/limit/isRead 조회와 내 글 `author=me` 페이지, QR 반환 날짜만 사용하는 그래프, 계정별 선택 매장 보조 정보를 개선한다. 새로운 API·권한·DB·공유 패키지·dependency·CI 변경은 없다.
+- 집중 테스트 13개 PASS: 기존 본인/매장 scope·오류 재시도·계정 변경·알림 페이지/필터 및 늦은 응답·실패 envelope·내 글 임시 저장/빈 후속 페이지·그래프 날짜 정렬/0·잘못된 날짜/음수 거부·동일 계정 선택 유지/타 계정 및 제거된 매장 무효화.
+- 초기 집중 실행은 강화한 envelope 검증과 예전 fixture 불일치로 4개 실패했다. 성공 플래그·알림 pagination을 실제 서버 계약에 맞춰 fixture에 추가한 뒤 전체 집중 테스트가 통과했다. 검증 기준을 낮추지 않았다.
+- 최신 main `b19dc0a3d`의 공통 헤더와 커뮤니티 변경을 조사했다. 본인 글 `author=me`·인증·scope 계약과 기존 API 응답 구조 유지, migration·dependency 변경 0을 확인한 뒤 자기 branch에 병합했다. 바뀐 UI 패키지를 빌드하고 Neture 타입 포함 production build와 변경 파일 ESLint가 통과했다.
+- Chromium fixture **27개 PASS**(1440/375/320px 각 9개). 직접 화면 진입·모바일 메뉴·Study/Funding 기존 회귀 외에 알림 최근/전체/페이지/읽지 않음 필터, 본인 글 2페이지 임시 저장과 원본 이동, 선택 매장 화면 이동/새로고침 유지, 실제 0·누락 날짜 미생성·가로 넘침 0을 확인했다. 매장 화면 모바일 스크린샷도 확인했다. 데이터·handoff는 fixture이며 운영 계정·DB를 사용하지 않는다.
+- 첫 브라우저 실행은 설치된 Chromium의 경로 미지정으로 launch 실패했다. 경로를 지정한 첫 화면 실행은 23개 통과·알림의 읽지 않음 표시를 제목과 함께 찾는 locator 3개 실패·동시 빌드/테스트 중 조회 대기 1개 실패였다. 제목 locator를 수정하고 빌드 후 단독 실행해 27개 모두 통과했다. timeout·검증 조건·실제 동작을 완화하지 않았다.
+- 최초 전체 524개는 통과했다. 최신 main 반영 후 첫 전체 실행은 532개 통과·기존 CommunityServiceAdminPage 후보 목록 대기 1개 실패였다. 범위 밖 화면·테스트는 수정하지 않고 최종 단독 전체 재실행에서 **63파일·533개 PASS**를 확인했다. PR·main·운영 배포는 실제 실행 결과로 확정한다. 실제 계정 문서는 작업·기준 checkout에 없으며 AUTHENTICATED PENDING을 유지한다.
+- PR #469 자동 리뷰에서 ACTIVE 정본 본문을 구현 Phase에 함께 변경한 점을 지적했다. 구현 PR에서 이번 정본 추가 문단을 제외하고 배포 결과 확정 문서 Phase로 옮긴다. 기존 사용자 관련 문서 수정·My Home 진행·배포 지시 범위의 구현 상태 정합이며 새로운 사업 정책·권한 변경은 아니다. WO/CHECK 실행 기록은 구현 PR에 유지한다.
+
+### 기록 조회·경영 추이 통합 근거
+
+| 항목 | 실제 결과 |
+|---|---|
+| [구현 PR #469](https://github.com/Renagang21/o4o-platform/pull/469) | main `1604014f98771a0b74861e6770382d1436510099` 병합 완료 |
+| [최종 PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38127914029) | HEAD `7a738a4545838685ea29111936b385e331c6902f`의 CI Gate·API 3개 묶음·품질·웹/Admin build PASS. CodeQL·SonarCloud PASS. 정본 분리 지적 처리·미해결 스레드 0 |
+| [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38128523232) | 위 구현 SHA의 전체 CI PASS |
+| [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38129107503) | Neture만 배포. 실제 서빙 SHA를 확인하는 최종 Report PASS. 위 구현 SHA의 production status `DEPLOYED · deploy: neture` |
+
+정본 설명 분리와 최신 main 반영으로 교체된 이전 PR HEAD의 CI는 자동 취소됐으며 PASS 근거로 사용하지 않는다. 마지막 main 반영은 커뮤니티 공개 지정의 정렬 표현·KPA 공지 predicate와 실행 기록 수정이었다. My Home/Neture·공통 UI·E2E 입력 차이 0을 확인했으며 해당 main의 전체 API 검사를 포함한 최종 PR/main CI가 통과했다.
+
+API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b187861f22edd15c0ff2e05f4a43af1091f`와 이번 target 사이 `apps/api-server`·database 전체·`src/migrate.ts` 차이는 0이다. 새 migration·수동 DB write/DDL·통제 Promote는 실행하지 않았다. CI/freeze/ref 경계를 우회하지 않고 정상 자동 Delivery를 따랐다.
+
+배포 후 검증:
+
+- 실제 운영 HTML의 `/assets/index-DBUjCG3k.js`를 TLS 검증을 유지해 받아 알림 전체보기·알림 상태·일별 QR 방문 추이·계정별 선택 보조 정보·Study/Funding 표식 6개를 확인했다. 페이지 6개(`/`, My Home 5개)와 API ready 200, 알림 목록/읽지 않은 수·Study·Funding·QR 개인 API 5개 비로그인 401을 확인했다. 이는 인증 보호 검증이며 실제 계정 소유권 검증을 대신하지 않는다.
+- **운영 번들 Chromium fixture 27개 PASS**(1440/375/320px 각 9개). HTTPS curl로 받은 실제 운영 HTML/JS/정적 자원만 렌더링하고 API·사용자 정보·쓰기·handoff는 기존 fixture로 응답했다. 직접 운영 HTTPS의 실제 로그인 세션 검증이 아니며, 선행 Phase에서 확인한 클라우드 Chromium 인증서 제약을 우회하지 않았다. 로컬 빌드 fixture 27개와 별도 실행 결과다.
+- 결과·스크린샷은 `/tmp/my-home-records-production-http.log`, `/tmp/my-home-records-deployed-fixture.log`, `/tmp/my-home-records-deployed-fixture/results`에 보존한다. 개인 데이터·실제 credential을 조회하거나 공개 기록에 복사하지 않았다.
+- AUTHENTICATED PENDING: 지정 계정 문서가 작업·기준 checkout에 없어 실제 로그인·본인 데이터·매장 권한 smoke는 미실행이다. 원본 위치 단서와 비공개 확보 절차를 SETUP에 유지하며 Demo/seed·운영 계정으로 대체하지 않는다.
+
+배포 결과 확정·정본 반영은 동일 미완료 WO의 별도 문서-only Phase다. 사용자 관련 문서 수정·My Home 진행·배포 지시 범위의 실행 상태를 정합하며 새로운 사업 정책·권한 계약 변경은 없다. `DEPLOYMENT = NOT_APPLICABLE`이고 새 문서 SHA와 위 Neture runtime SHA를 구분한다.
 
 ## WORKTREE_DISPOSITION
 
 - worktree: `/workspace/o4o-wt/my-home-document-alignment`
-- branch: `wo/my-home-document-alignment` · 구현 기준 main: `c9ba0ea2251866b4f1482dced9ee4f0434fe27a3`
-- main integration: #449 · CI: PR/main PASS · deployment: DEPLOYED · smoke: LOCAL/PUBLIC PASS, AUTHENTICATED PENDING
+- branch: `wo/my-home-document-alignment` · 초기 구현 기준 main: `c9ba0ea2251866b4f1482dced9ee4f0434fe27a3` · 참여 통합 시작: `b565fb00965aa12c84df4f31ed3bff9395fac73e` · 기록/추이 시작: `c4db284f2d05d9591e0079d88885e517e222cb19`
+- main integration: #449 · 참여 통합 #461 · 기록/추이 #469 · CI: 최종 PR/main PASS · deployment: Neture `1604014f98771a0b74861e6770382d1436510099` DEPLOYED · smoke: LOCAL 27/DEPLOYED-BUNDLE 27/HTTP PASS, AUTHENTICATED PENDING. 직접 운영 Chromium 세션은 선행 Phase의 CERT BLOCKED와 구분해 이번에는 실행하지 않았다.
 - 다른 세션의 기준 checkout은 변경하지 않았다. 문서 정합 통합 후 작업 범위 미커밋·untracked·branch-only commit 상태를 다시 확인한다.
 - verdict: **KEEP** — 테스트 계정 문서 확보 후 실제 로그인 운영 검증이 남아 있다. 로컬 브라우저 증거는 작업 폴더 밖에도 보관했다.

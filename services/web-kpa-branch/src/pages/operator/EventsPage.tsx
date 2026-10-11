@@ -443,7 +443,8 @@ export default function EventsPage({ slug }: { slug: string }) {
                   ) : rsvps.length === 0 ? (
                     <p className="text-sm text-gray-500">아직 응답한 회원이 없습니다.</p>
                   ) : (
-                    <table className="w-full text-sm">
+                    <div className="overflow-x-auto" role="region" aria-label="행사 응답 회원" tabIndex={0}>
+                    <table className="w-full min-w-[560px] text-sm">
                       <thead>
                         <tr className="text-left text-xs text-gray-500">
                           <th className="py-1">회원</th>
@@ -466,6 +467,7 @@ export default function EventsPage({ slug }: { slug: string }) {
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   )}
                 </div>
               )}

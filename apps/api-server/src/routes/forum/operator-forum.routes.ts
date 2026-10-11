@@ -40,6 +40,7 @@ import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
 import logger from '../../utils/logger.js';
 import { ActionLogService } from '@o4o/action-log-core';
+import { mergeForumMetadataPatch } from '../../services/community/community-public-read-metadata.js';
 import { purgeForumAndDependents } from '../../services/forum/forumHardDelete.js';
 
 /**
@@ -357,8 +358,7 @@ router.post('/delete-requests/:id/approve', async (req: Request, res: Response):
 
     const beforeStatus = forum.status;
     forum.status = 'archived';
-    forum.metadata = {
-      ...meta,
+    const metadataPatch = {
       deleteRequestStatus: 'approved',
       deleteReviewedAt: new Date().toISOString(),
       deleteReviewedBy: userId,
@@ -366,7 +366,8 @@ router.post('/delete-requests/:id/approve', async (req: Request, res: Response):
       archivedAt: new Date().toISOString(),
     };
 
-    const updated = await requestRepo().save(forum);
+    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'archived');
+    const updated = await requestRepo().findOne({ where: { id: forum.id } });
     await safeAudit(serviceCode, userId ?? null, 'forum.delete_request.approve', {
       forumId: forum.id,
       forumName: forum.name,
@@ -411,15 +412,15 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
       return;
     }
 
-    forum.metadata = {
-      ...meta,
+    const metadataPatch = {
       deleteRequestStatus: 'rejected',
       deleteReviewedAt: new Date().toISOString(),
       deleteReviewedBy: userId,
       deleteReviewComment: reviewComment?.trim() || null,
     };
 
-    const updated = await requestRepo().save(forum);
+    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch);
+    const updated = await requestRepo().findOne({ where: { id: forum.id } });
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error rejecting forum delete request:', error);
@@ -514,15 +515,14 @@ router.post('/delete-requests/batch-approve', async (req: Request, res: Response
           continue;
         }
         forum.status = 'archived';
-        forum.metadata = {
-          ...meta,
+        const metadataPatch = {
           deleteRequestStatus: 'approved',
           deleteReviewedAt: new Date().toISOString(),
           deleteReviewedBy: userId,
           deleteReviewComment: reviewComment?.trim() || null,
           archivedAt: new Date().toISOString(),
         };
-        await requestRepo().save(forum);
+        await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'archived');
         results.push({ id, status: 'success' });
       } catch (err: any) {
         results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
@@ -571,14 +571,13 @@ router.post('/delete-requests/batch-reject', async (req: Request, res: Response)
           results.push({ id, status: 'skipped', error: 'No pending delete request' });
           continue;
         }
-        forum.metadata = {
-          ...meta,
+        const metadataPatch = {
           deleteRequestStatus: 'rejected',
           deleteReviewedAt: new Date().toISOString(),
           deleteReviewedBy: userId,
           deleteReviewComment: reviewComment?.trim() || null,
         };
-        await requestRepo().save(forum);
+        await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch);
         results.push({ id, status: 'success' });
       } catch (err: any) {
         results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
@@ -669,7 +668,8 @@ router.patch('/categories/:id', async (req: Request, res: Response): Promise<voi
       forum.tags = sanitized;
     }
 
-    const updated = await requestRepo().save(forum);
+    await requestRepo().update({ id: forum.id, serviceCode: forum.serviceCode }, { name: forum.name, description: forum.description, tags: forum.tags });
+    const updated = await requestRepo().findOne({ where: { id: forum.id } });
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error updating forum:', error);
@@ -702,17 +702,15 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
       return;
     }
 
-    const meta = forum.metadata || {};
     forum.status = 'archived';
-    forum.metadata = {
-      ...meta,
+    const metadataPatch = {
       directDeactivatedAt: new Date().toISOString(),
       directDeactivatedBy: userId,
       directDeactivateReason: reason.trim(),
       archivedAt: new Date().toISOString(),
     };
 
-    await requestRepo().save(forum);
+    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'archived');
 
     // Fix B: cascade — archive all publish posts so they no longer appear in recent lists
     const updateResult = await postRepo().update(
@@ -759,15 +757,13 @@ router.post('/categories/:id/activate', async (req: Request, res: Response): Pro
       return;
     }
 
-    const meta = forum.metadata || {};
     forum.status = 'completed';
-    forum.metadata = {
-      ...meta,
+    const metadataPatch = {
       reactivatedAt: new Date().toISOString(),
       reactivatedBy: userId,
     };
 
-    await requestRepo().save(forum);
+    await mergeForumMetadataPatch(AppDataSource, forum.id, forum.serviceCode, metadataPatch, 'completed');
     logger.info(`Forum ${forum.id} reactivated by operator ${userId}`);
     res.json({ success: true, data: { id: forum.id, isActive: true } });
   } catch (error: any) {

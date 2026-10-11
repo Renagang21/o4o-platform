@@ -10,24 +10,33 @@ import { businessApi, businessError, businessPath, communityApiBase, pharmacyApi
 interface LoadedSection<T> { scope: string; data: T[]; error: string; loading: boolean }
 const pending = <T,>(scope: string): LoadedSection<T> => ({ scope, data: [], error: '', loading: true });
 const isNotice = (post: ForumPostResponse) => post.isPinned || post.type === 'announcement';
+const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type === 'announcement';
 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
   const { user } = useAuth();
   const scope = `${user?.id}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
+  const [noticesState, setNoticesState] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [materials, setMaterials] = useState<LoadedSection<BusinessContent>>(() => pending(scope));
   const [retryPosts, setRetryPosts] = useState(0);
   const [retryMaterials, setRetryMaterials] = useState(0);
   useEffect(() => {
     let alive = true;
     setPosts(pending(scope));
+    setNoticesState(pending(scope));
     if (!access?.allowed || !business.communityKey) return;
     void authClient.api.get(`${communityApiBase(business.communityKey)}/forum/posts`, { params: { page: 1, limit: 20, sortBy: 'latest' } })
       .then((response: { data: { data: ForumPostResponse[] } }) => { if (alive) setPosts({ scope, data: response.data.data, error: '', loading: false }); })
       .catch((error: unknown) => { if (alive) setPosts({ scope, data: [], error: businessError(error), loading: false }); });
+    void Promise.all([
+      authClient.api.get(`${communityApiBase(business.communityKey)}/forum/posts`, { params: { page: 1, limit: 3, sortBy: 'latest', isPinned: 'true' } }),
+      authClient.api.get(`${communityApiBase(business.communityKey)}/forum/posts`, { params: { page: 1, limit: 5, sortBy: 'latest', isPinned: 'false', type: 'announcement' } }),
+    ]).then(([pinned, recent]) => {
+      if (alive) setNoticesState({ scope, data: [...pinned.data.data, ...recent.data.data], error: '', loading: false });
+    }).catch(error => { if (alive) setNoticesState({ scope, data: [], error: businessError(error), loading: false }); });
     return () => { alive = false; };
-  }, [scope, retryPosts]);
+  }, [scope, access?.allowed, business.communityKey, retryPosts]);
   useEffect(() => {
     let alive = true;
     setMaterials(pending(scope));
@@ -36,13 +45,15 @@ export default function PharmacyMemberHomePage() {
       .then(data => { if (alive) setMaterials({ scope, data: data.items.filter(item => item.semiFranchiseKey === business.key), error: '', loading: false }); })
       .catch(error => { if (alive) setMaterials({ scope, data: [], error: businessError(error), loading: false }); });
     return () => { alive = false; };
-  }, [scope, retryMaterials]);
+  }, [scope, access?.allowed, access?.canManage, business.key, retryMaterials]);
   const currentPosts = posts.scope === scope ? posts : pending<ForumPostResponse>(scope);
+  const currentNotices = noticesState.scope === scope ? noticesState : pending<ForumPostResponse>(scope);
   const currentMaterials = materials.scope === scope ? materials : pending<BusinessContent>(scope);
   const forumPath = businessPath(business.key, 'forum');
   const materialsPath = businessPath(business.key, 'materials');
   const membershipPath = businessPath(business.key, 'participation');
-  const notices = currentPosts.data.filter(isNotice).slice(0, 3);
+  const pinnedNotices = currentNotices.data.filter(post => post.isPinned).slice(0, 3);
+  const recentNotices = currentNotices.data.filter(isRecentNotice).slice(0, 5);
   const conversations = currentPosts.data.filter(post => !isNotice(post)).slice(0, 5);
   return <div className="space-y-6">
     <section aria-labelledby="member-home-title" className="overflow-hidden rounded-2xl bg-slate-900 text-white">
@@ -65,11 +76,12 @@ export default function PharmacyMemberHomePage() {
       <Link className="font-medium text-blue-700" to={membershipPath}>참여 신청 · 상태 확인 →</Link>
     </section> : <>
       <section aria-labelledby="notices-title" className="rounded-xl border border-blue-100 bg-blue-50/60 p-5 sm:p-6">
-        <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="최근 공지" to={forumPath} linkLabel="게시판 보기" />
-        <p className="mb-3 text-xs text-slate-500">최근 게시글 중 상단 고정된 글과 공지를 먼저 확인하세요.</p>
+        <SectionHeading id="notices-title" icon={<Megaphone size={20} aria-hidden="true" />} title="공지" to={forumPath} linkLabel="게시판 보기" />
+        <p className="mb-3 text-xs text-slate-500">고정 공지 최대 3개와 최근 공지 5개를 확인하세요.</p>
         {!business.communityKey ? <p className="py-3 text-sm text-slate-500">게시판이 아직 개설되지 않았습니다.</p> :
-          <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={!notices.length} emptyText="최근 목록에 등록된 공지가 없습니다.">
-            <PostRows posts={notices} base={forumPath} notice />
+          <DataState state={currentNotices} retry={() => setRetryPosts(n => n + 1)} empty={!pinnedNotices.length && !recentNotices.length} emptyText="등록된 공지가 없습니다.">
+            {!!pinnedNotices.length && <div><h3 className="text-sm font-semibold text-blue-900">고정 공지</h3><PostRows posts={pinnedNotices} base={forumPath} notice /></div>}
+            {!!recentNotices.length && <div className={pinnedNotices.length ? 'mt-4 border-t border-blue-100 pt-4' : ''}><h3 className="text-sm font-semibold text-blue-900">최근 공지</h3><PostRows posts={recentNotices} base={forumPath} notice /></div>}
           </DataState>}
       </section>
       <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
