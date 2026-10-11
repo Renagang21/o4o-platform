@@ -31,10 +31,6 @@ function checkProductionRuns(result, runId, page, status) {
   if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0) {
     throw new ResourceDiagnosticError('Production run inventory is incomplete; no deletion submitted.');
   }
-  const expected = Math.min(100, Math.max(0, result.total_count - (page - 1) * 100));
-  if (result.workflow_runs.length !== expected) {
-    throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; expected=${expected}; returned=${result.workflow_runs.length}. Next deletion not submitted.`);
-  }
   for (const other of result.workflow_runs) {
     if (String(other.id) === String(runId) || other.status === 'completed') continue;
     if (typeof other.path !== 'string') throw new ResourceDiagnosticError('Production run path is unavailable; no deletion submitted.');
@@ -45,6 +41,10 @@ function checkProductionRuns(result, runId, page, status) {
     const paths = [other.path, ...references.map(item => item.path)];
     const name = paths.map(path => path.split('@')[0].split('/').at(-1)).find(path => productionWorkflows.has(path));
     if (name) throw new ResourceDiagnosticError(`Production write gate blocked: workflow=${name}; run=${Number(other.id)}.`);
+  }
+  const expected = Math.min(100, Math.max(0, result.total_count - (page - 1) * 100));
+  if (result.workflow_runs.length !== expected) {
+    throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; expected=${expected}; returned=${result.workflow_runs.length}. Next deletion not submitted.`);
   }
 }
 

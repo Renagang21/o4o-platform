@@ -198,3 +198,15 @@ test('pagination drift restarts at page one so a shifted writer is not missed', 
   }, async () => {}), /write gate blocked/);
   assert.equal(starts, 2);
 });
+
+test('a writer on a count-mismatched page blocks immediately before any retry or status transition', async () => {
+  let queuedCalls = 0;
+  await assert.rejects(assertProductionIdle(10, async status => {
+    if (status !== 'queued') return { total_count: 0, workflow_runs: [] };
+    queuedCalls++;
+    return queuedCalls === 1 ? { total_count: 0, workflow_runs: [
+      { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' },
+    ] } : { total_count: 0, workflow_runs: [] };
+  }, async () => assert.fail('a returned writer must not be retried')), /write gate blocked/);
+  assert.equal(queuedCalls, 1);
+});
