@@ -113,3 +113,15 @@ test('rollback failures remain sanitized and do not replace an earlier query fai
     return {rows:[]};
   }}),error=>error.message.includes('ECONNRESET')&&!error.message.includes('private'));
 });
+
+
+test('Event Offer is an exact retired namespace and malformed Location retains HTTP evidence',async()=>{
+  assert.equal(retiredKeys.includes('pharmacy-hub-event-offer'),true);
+  const {collectHttpInventory}=await import('./pharmacy-hub-retirement-inventory.mjs');
+  const result=await collectHttpInventory(async()=>new Response(null,{status:302,headers:{location:'https://[invalid-private'}}),async()=>[]);
+  assert.equal(result.checks[0].status,302);
+  assert.equal(result.checks[0].locationPresent,true);
+  assert.equal(result.checks[0].hostMatch,false);
+  assert.equal(result.checks[0].error,undefined);
+  assert.equal(JSON.stringify(result).includes('invalid-private'),false);
+});

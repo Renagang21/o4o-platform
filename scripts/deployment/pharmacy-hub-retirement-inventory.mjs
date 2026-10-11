@@ -9,7 +9,7 @@ const identifiers = value => {
   if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) throw new Error('Unsupported schema identifier');
   return `"${value}"`;
 };
-export const retiredKeys = ['pharmacy-hub', 'pharmacy_hub', 'pharmacy_hub_cart'];
+export const retiredKeys = ['pharmacy-hub', 'pharmacy_hub', 'pharmacy_hub_cart', 'pharmacy-hub-event-offer'];
 const scopes = new Set(['service_key', 'service_code', 'source_service', 'service', 'source', 'source_module', 'service_keys', 'scope', 'scope_key', 'role', 'name', 'code', 'serviceKey', 'serviceCode', 'sourceService', 'sourceModule', 'serviceKeys', 'scopeKey']);
 
 export function countQuery(table, column, array = false) {
@@ -120,7 +120,8 @@ async function collectHttpProbe(host,path,request) {
     const response=await request(`https://${host}${path}`,{redirect:'manual',signal:AbortSignal.timeout(15000)});
     await response.body?.cancel();
     const location=response.headers.get('location');
-    const target=location?new URL(location,`https://${host}`):null;
+    let target=null;
+    try { if(location)target=new URL(location,`https://${host}`); } catch { /* retain status without raw Location */ }
     const expected=new URL(path.startsWith('/terms')?path.replace('/terms','/policy'):path,'https://pharmacy.neture.co.kr');
     return {host,family:path.split('?')[0],status:response.status,locationPresent:!!location,hostMatch:target?.host===expected.host,pathMatch:target?.pathname===expected.pathname,queryMatch:target?.search===expected.search,schemeMatch:target?.protocol===expected.protocol};
   } catch { return {host,family:path.split('?')[0],error:'HTTPS_UNAVAILABLE'}; }

@@ -94,3 +94,5 @@ Canonical 문서 작업 경계 정정: ACTIVE/FROZEN 여부와 관계없이 기�
 PR #438 리뷰 대응: `checkout_orders.metadata.serviceKey/source` 등 JSON/JSONB scope를 명시적으로 집계하고 해당 테이블을 FK 조사 집합에 포함했다. scalar/array scope와 JSONB scope는 겹칠 수 있으므로 건수를 합산해 삭제 총량으로 해석하지 않는다. 조사 도구 안전 테스트 7개, 리다이렉트 안전 진단 회귀 포함 focused tests 통과.
 
 PR #438 추가 리뷰 대응: legacy quoted camelCase serviceKey/serviceCode/sourceService/sourceModule/serviceKeys/scopeKey도 안전한 식별자 quoting과 함께 집계한다. cms_contents.serviceKey의 PH 건수/FK 포함 회귀를 추가했다. SonarCloud 지적의 finally 내부 throw를 제거하고 원래 query 오류를 보존하는 rollback 처리로 정리했다. HTTPS/DNS 진단은 독립 요청을 bounded timeout으로 병렬 조회하고 진단 helper를 분리했다. 관련 focused tests 42개가 통과했다. 이 환경의 직접 DNS는 권한 요청 후에도 ECONNREFUSED이므로 실제 DNS/HTTPS 판정은 Actions census 결과를 따른다.
+
+추가 census 범위/진단 리뷰: 등록된 pharmacy-hub-event-offer 키도 정확한 PH namespace 집계에 포함한다. 잘못된 Location은 별도 파싱 실패로 처리해 HTTP status와 Location 존재 여부를 보존하며 네트워크 장애로 오진하거나 원문 Location을 출력하지 않는다.
