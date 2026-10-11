@@ -1,3 +1,4 @@
+import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * 내 매장(약국) 신청 · 승인 원장 (약국 1 = 원장 1 행 = 조직 1 = 내 매장 1)
  *
@@ -29,6 +30,7 @@ import { createPharmacyStoreOrganization, updatePharmacyStoreProfile } from './p
 import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
 
 export interface PharmacyApplicationInput {
+  policyReferences?: EnrollmentPolicyReference[];
   pharmacyName: string;
   businessNumber: string;
   pharmacistLicenseNumber: string;
@@ -147,9 +149,10 @@ export class PharmacyMembershipService {
         throw new NeturePharmacyError(409, 'BUSINESS_NUMBER_IN_USE', '이미 가입 진행 중인 사업자등록번호입니다.');
       }
 
+      const policies = await recordEnrollmentPolicies(m, userId, 'kpa-society', raw.policyReferences);
       const saveProfile = async (organizationId: string) => m.query(
         `UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('businessProfile', $2::jsonb) WHERE id = $1`,
-        [organizationId, JSON.stringify({ businessRegistrationDocumentId: input.businessRegistrationDocumentId,
+        [organizationId, JSON.stringify({ applicationPolicies: policies, businessRegistrationDocumentId: input.businessRegistrationDocumentId,
           businessName: input.pharmacyName, businessNumber: input.businessNumber, representativeName: input.representativeName,
           businessType: input.businessType, businessCategory: input.businessCategory, address: input.address })],
       );

@@ -24,7 +24,7 @@ const findOne = jest.fn();
 const save = jest.fn();
 const create = jest.fn();
 const query = jest.fn();
-const manager = { query };
+const manager = { getRepository: () => ({ findOne, save, create }), query, queryRunner: { query } };
 let supplier: any;
 let locked: any;
 let events: string[];
@@ -83,8 +83,8 @@ describe('supplier lifecycle contracts', () => {
   it('normalizes registration and provisions an inactive canonical owner organization', async () => {
     findOne.mockResolvedValue(null);
     expect(await service.registerSupplier('fixture-user', { name: ' Fixture ', slug: ' FIXTURE ' })).toMatchObject({ success: true, data: { name: 'Fixture', slug: 'fixture', status: 'PENDING' } });
-    expect(organizationOpsService.ensureOrganization).toHaveBeenCalledWith(expect.objectContaining({ name: 'Fixture', isActive: false, type: 'supplier' }));
-    expect(organizationOpsService.setOwner).toHaveBeenCalledWith('fixture-org', 'fixture-user');
+    expect(organizationOpsService.ensureOrganization).toHaveBeenCalledWith(expect.objectContaining({ name: 'Fixture', isActive: false, type: 'supplier' }), manager.queryRunner);
+    expect(organizationOpsService.setOwner).toHaveBeenCalledWith('fixture-org', 'fixture-user', manager.queryRunner);
     expect(organizationOpsService.enrollService).not.toHaveBeenCalled();
   });
 

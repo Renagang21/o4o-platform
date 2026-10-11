@@ -1,7 +1,9 @@
+import { isCourseInServiceScope } from '../utils/lms-service-scope.js';
+import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { BaseService } from '../../../common/base.service.js';
-import { Enrollment, EnrollmentStatus, Progress, ProgressStatus } from '@o4o/lms-core';
+import { Course, Enrollment, EnrollmentStatus, Progress, ProgressStatus } from '@o4o/lms-core';
 import { CourseService } from './CourseService.js';
 import { CompletionService } from './CompletionService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
@@ -18,6 +20,9 @@ export interface EnrollCourseRequest {
   courseId: string;
   userId: string;
   organizationId?: string;
+  policyReferences?: EnrollmentPolicyReference[];
+  /** Server-resolved request scope; never read from request body. */
+  serviceScope?: string;
   /** 결제 핸들러에서만 true — 유료 과정 직접 등록 차단용 (WO-LMS-PAID-COURSE-V1) */
   __fromPayment?: boolean;
 }
@@ -67,6 +72,11 @@ export class EnrollmentService extends BaseService<Enrollment> {
 
   // CRUD Operations
   async enrollCourse(data: EnrollCourseRequest): Promise<Enrollment> {
+    return AppDataSource.transaction(async manager => {
+      const course = await manager.getRepository(Course).findOne({ where: { id: data.courseId }, lock: { mode: 'pessimistic_write' } });
+      if (!course) throw new Error(`Course not found: ${data.courseId}`);
+      if (!isCourseInServiceScope(course.serviceKey, data.serviceScope)) throw Object.assign(new Error('Course not found'), { httpStatus: 404 });
+      const repository = manager.getRepository(Enrollment);
     // Check if already enrolled (exclude terminal states — allow re-enroll after cancel/reject/expire)
     // WO-O4O-ENROLLMENT-SYSTEM-V1: cancelled/rejected/expired → re-enrollment allowed
     //
@@ -77,7 +87,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
     // 정책 변경 시 반드시 IR → 합의 → WO 순서로 진행할 것.
     // 직접 코드 수정으로 이 정책을 우회하지 말 것.
     // ────────────────────────────────────────────────────────────────────────────────
-    const existing = await this.enrollmentRepository.findOne({
+    const existing = await repository.findOne({
       where: {
         userId: data.userId,
         courseId: data.courseId
@@ -91,7 +101,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
       if (existing.status === EnrollmentStatus.APPROVED) {
         existing.status = EnrollmentStatus.IN_PROGRESS;
         if (!existing.startedAt) existing.startedAt = new Date();
-        const started = await this.enrollmentRepository.save(existing);
+        const started = await repository.save(existing);
         logger.info(`[LMS] Enrollment APPROVED → IN_PROGRESS`, { enrollmentId: started.id, userId: data.userId, courseId: data.courseId });
         return started;
       }
@@ -106,11 +116,12 @@ export class EnrollmentService extends BaseService<Enrollment> {
       if (!terminalStatuses.includes(existing.status)) {
         throw new Error('User is already enrolled in this course');
       }
+      const policies = course.serviceKey === 'lecture' ? await recordEnrollmentPolicies(manager, data.userId, 'lecture', data.policyReferences) : [];
       // Reactivate terminal enrollment — reset progress
       // WO-O4O-LMS-INTEGRITY-PATCH-V1: completedLessonIds도 함께 초기화
       // WO-O4O-LMS-ENROLLMENT-REACTIVATION-APPROVAL-FIX-V1:
       // 재활성화 경로에도 신규 등록과 동일한 requiresApproval 정책 적용
-      const reactivateCourse = await this.courseService.getCourse(data.courseId);
+      const reactivateCourse = await Promise.resolve(course);
       const reactivateStatus = reactivateCourse?.requiresApproval
         ? EnrollmentStatus.PENDING
         : EnrollmentStatus.IN_PROGRESS;
@@ -121,8 +132,8 @@ export class EnrollmentService extends BaseService<Enrollment> {
       existing.enrolledAt = new Date();
       existing.startedAt = reactivateStatus === EnrollmentStatus.IN_PROGRESS ? new Date() : undefined as any;
       existing.completedAt = undefined as any;
-      existing.metadata = { ...(existing.metadata || {}), completedLessonIds: [] };
-      const reactivated = await this.enrollmentRepository.save(existing);
+      existing.metadata = { ...(existing.metadata || {}), completedLessonIds: [], applicationPolicies: policies };
+      const reactivated = await repository.save(existing);
       logger.info(`[LMS] Enrollment reactivated`, {
         enrollmentId: reactivated.id,
         userId: data.userId,
@@ -135,7 +146,6 @@ export class EnrollmentService extends BaseService<Enrollment> {
     }
 
     // Check if course is full
-    const course = await this.courseService.getCourse(data.courseId);
     if (!course) {
       throw new Error(`Course not found: ${data.courseId}`);
     }
@@ -155,15 +165,18 @@ export class EnrollmentService extends BaseService<Enrollment> {
     }
 
     // Get lesson count for this course
-    const lessonCount = await AppDataSource.getRepository('Lesson')
+    const lessonCount = await manager.getRepository('Lesson')
       .createQueryBuilder('lesson')
       .where('lesson.courseId = :courseId', { courseId: data.courseId })
       .andWhere('lesson.isPublished = :isPublished', { isPublished: true })
       .getCount();
 
+    const policies = course.serviceKey === 'lecture' ? await recordEnrollmentPolicies(manager, data.userId, 'lecture', data.policyReferences) : [];
     // Create enrollment
-    const enrollment = this.enrollmentRepository.create({
-      ...data,
+    const enrollment = repository.create({
+      courseId: data.courseId,
+      userId: data.userId,
+      metadata: { applicationPolicies: policies },
       organizationId: data.organizationId || course.organizationId,
       status: course.requiresApproval ? EnrollmentStatus.PENDING : EnrollmentStatus.IN_PROGRESS,
       progressPercentage: 0,
@@ -174,10 +187,11 @@ export class EnrollmentService extends BaseService<Enrollment> {
       startedAt: course.requiresApproval ? undefined : new Date()
     });
 
-    const saved = await this.enrollmentRepository.save(enrollment);
+    const saved = await repository.save(enrollment);
 
     // Increment course enrollment count
-    await this.courseService.incrementEnrollment(data.courseId);
+    course.incrementEnrollments();
+    await manager.getRepository(Course).save(course);
 
     logger.info(`[LMS] User enrolled in course`, {
       enrollmentId: saved.id,
@@ -186,6 +200,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
     });
 
     return saved;
+    });
   }
 
   async getEnrollment(id: string): Promise<Enrollment | null> {

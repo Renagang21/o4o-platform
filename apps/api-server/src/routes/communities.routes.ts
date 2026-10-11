@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../modules/policy-acceptance/policy-acceptance.service.js';
 import { parseCommunityMemberListQuery, CommunityMemberListQueryError } from '../services/community/community-member-list-query.js';
 import { hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
 import { CommunityMemberManagementService, type CommunityMemberAction } from '../services/community/community-member-management.service.js';
@@ -72,6 +73,7 @@ async function currentCommunityUser(req: AuthRequest): Promise<CommunityAccessUs
 
 /** lifecycle 오류를 응답으로 옮긴다 — 라우트마다 분기를 복제하지 않는다. */
 function sendLifecycleError(res: Response, error: unknown): boolean {
+  if (error instanceof PolicyAcceptanceError) { res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message }); return true; }
   if (error instanceof NetureMainMembershipRequiredError) {
     res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
     return true;
@@ -207,6 +209,7 @@ export function createCommunitiesRoutes(
           desiredSlug: String(body.slug ?? ''),
           name,
           description: typeof body.description === 'string' ? body.description : null,
+          policyReferences: body.policyReferences,
         });
         res.status(201).json({ success: true, data: created });
       } catch (error) {
@@ -310,9 +313,10 @@ export function createCommunitiesRoutes(
       const userId = requesterId(req as AuthRequest, res);
       if (!userId) return;
       try {
-        const membership = await lifecycle().requestJoin({ communityId: req.community!.id, userId });
+        const membership = await lifecycle().requestJoin({ communityId: req.community!.id, userId, policyReferences: req.body?.policyReferences });
         res.status(201).json({ success: true, data: membership });
       } catch (error) {
+        if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
         if (!sendLifecycleError(res, error)) throw error;
       }
     }),

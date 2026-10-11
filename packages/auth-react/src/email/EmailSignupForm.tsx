@@ -1,4 +1,4 @@
-import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement } from '../SignupTermsAgreement';
+import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
  * <EmailSignupForm /> — 이메일 회원가입 + <EmailSentNotice /> 확인 메일 안내
@@ -71,7 +71,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         name: name.trim(),
         phone: phoneDigits,
         password,
-        consents: { terms, privacy, marketing, termsPolicy: { policyDocumentId: policy!.policyDocumentId, version: policy!.version } },
+        consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) },
       });
       setPassword('');
       setConfirm('');

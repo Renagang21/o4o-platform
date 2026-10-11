@@ -96,6 +96,7 @@ export interface EnrollmentListResponse {
 /** POST /auth/google/signup 동의 항목 — terms/privacy 필수, marketing 선택. */
 export interface GoogleSignupConsents {
   termsPolicy: SignupTermsReference;
+  privacyPolicy?: SignupTermsReference;
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
@@ -146,8 +147,8 @@ export type SocialProvider = 'google' | 'kakao';
 export interface SocialProof { token: string; idToken?: string; code?: string }
 export interface SocialGrant { token: string; nonce?: string; authorizationUrl?: string; provider?: SocialProvider }
 export interface SignupTermsReference { policyDocumentId: string; version: number }
-export interface SignupTermsDocument extends SignupTermsReference { title: string; termsHref: string }
-export interface KakaoSignupRequest { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference } }
+export interface SignupTermsDocument extends SignupTermsReference { title: string; termsHref: string; privacyPolicy?: SignupTermsReference & { title: string } }
+export interface KakaoSignupRequest { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 export interface KakaoAuthResponse extends GoogleAuthResponse {
   nextStep?: 'signup' | 'verify-email'; signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
 }

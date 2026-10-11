@@ -29,11 +29,11 @@ describe('canonical 서비스의 게시 문서 공개 조회', () => {
     expect(findOne).not.toHaveBeenCalled();
   });
 
-  it('미게시 문서는 404이고 법정정보 scope는 확대하지 않는다', async () => {
+  it('미게시 문서는 404이고 공급자 법정정보는 독립 scope로 조회한다', async () => {
     const { app, findOne } = makeApp();
     findOne.mockResolvedValueOnce(null as any);
     expect((await request(app).get('/public/services/supplier/policies/terms')).status).toBe(404);
-    expect((await request(app).get('/public/services/supplier/legal-profile')).status).toBe(404);
-    expect(findOne).toHaveBeenCalledTimes(1);
+    expect((await request(app).get('/public/services/supplier/legal-profile')).status).toBe(200);
+    expect(findOne).toHaveBeenCalledTimes(2);
   });
 });

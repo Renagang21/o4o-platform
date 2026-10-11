@@ -14,7 +14,7 @@ import { PolicyAcceptanceGate } from '@o4o/shared-space-ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { loadPolicy } from '../../pages/legal/PolicyDocumentPage';
 
-const ALLOW_PATHS = ['/terms', '/privacy'];
+const ALLOW_PATHS = ['/terms', '/privacy', '/policies/account-update', '/notices', '/contact'];
 
 export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
   const { pendingPolicyAcceptances, acceptPendingPolicies, logout } = useAuth();

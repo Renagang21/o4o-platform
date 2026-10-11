@@ -16,6 +16,11 @@ export class EmailSignupConsentsDto {
   @Type(() => SignupTermsReferenceDto)
   termsPolicy!: SignupTermsReferenceDto;
 
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SignupTermsReferenceDto)
+  privacyPolicy?: SignupTermsReferenceDto;
+
   @IsBoolean()
   terms!: boolean;
 

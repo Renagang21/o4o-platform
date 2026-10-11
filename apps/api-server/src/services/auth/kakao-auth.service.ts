@@ -1,4 +1,4 @@
-import { recordSignupTerms, resolveSignupPolicyServiceKey, type SignupTermsReference } from './signup-policy.service.js';
+import { recordSignupTerms, recordSignupPrivacy, resolveSignupPolicyServiceKey, type SignupTermsReference } from './signup-policy.service.js';
 import type { DataSource } from 'typeorm';
 import { normalizeLoginEmail, isLoginEmailShapeValid, maskLoginEmail } from '@o4o/auth-utils';
 import { AppDataSource } from '../../database/connection.js';
@@ -16,7 +16,7 @@ import { kakaoIdentityService, type KakaoIdentityService, type VerifiedKakaoIden
 import { socialFlowService, type SocialFlowService } from './social-flow.service.js';
 import { SocialAuthError } from './social-auth-error.js';
 
-export interface KakaoSignupInput { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference } }
+export interface KakaoSignupInput { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 const uniqueViolation = (error: unknown): boolean => {
   const e = error as { code?: string; driverError?: { code?: string } };
   return (e?.code ?? e?.driverError?.code) === '23505';
@@ -64,6 +64,7 @@ export class KakaoAuthService {
           userId:created.id,provider:'kakao',providerId:identity.providerId,linkedAt:now,lastUsedAt:now,
         }));
         await recordSignupTerms(created.id, await resolveSignupPolicyServiceKey(flow.service_key, manager), input.consents.termsPolicy, manager);
+      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager);
         return created;
       });
       return this.sessionOrVerification(user,serviceKey,true);

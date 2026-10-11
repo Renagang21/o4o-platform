@@ -1,4 +1,4 @@
-import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement } from './SignupTermsAgreement';
+import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement, signupPolicyReferences } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
@@ -170,7 +170,7 @@ export function GoogleContinue<TUser = unknown>({
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits, termsPolicy: { policyDocumentId: policy.policyDocumentId, version: policy.version } });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits, ...signupPolicyReferences(policy!) });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
       callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });

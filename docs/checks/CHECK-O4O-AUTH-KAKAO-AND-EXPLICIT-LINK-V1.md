@@ -888,3 +888,26 @@ Neture 타입 포함 build·changed lint·docs guard·diff check PASS다. own pr
 UI 338 PASS·로컬 모의 화면 64 PASS·PG 39 SKIP을 구분한다. 실제 운영 DB 쓰기는 없다.
 API build·changed lint·docs guard·diff check PASS다. 최신 HEAD CI/review를 다시 확인한다.
 30일 공고·실제 시행일/정책 게시 및 후속 TODO는 그대로 OPEN이다.
+
+
+## 2026-10-11 잔여 작업 전체 Phase — 배포 준비 기록
+
+동일 WO·branch 연속 Phase. 사용자는 남은 작업 전체와 main 통합·배포를 승인했고, 운영회사·보유기간·
+위탁업체·국외 처리 계약은 기존 문서와 변경이 없다고 확인했다. 과거 push-only 종료 범위는 현재 범위가 아니다.
+
+구현: 공통 가입 개인정보 version 증빙; 서비스별 명시 표식·독립 정책 관리; 공급자/약국/커뮤니티/
+펀딩/강의 신청의 정책·조건 snapshot과 원자적 저장; 조회 실패·구버전·동시 게시 차단 및 입력 보존;
+공통·서비스별 개정 전문과 공개 공고 경로. DB schema/migration/dependency 변경은 추가하지 않았다.
+
+현재 로컬 검증: API focused 12 suites **299 PASS**, 실제 격리 PostgreSQL 4 suites **52 PASS·0 SKIP**.
+이 PG 결과는 앞 단계의 PG 미연결 SKIP와 별개이며 새 signup privacy/hash, social/session 및
+신청 정책의 rollback·동시 게시·개별 신청 증빙 연결을 실행했다. 운영 DB의 실제 상태별 신청 검증은 아니다.
+공통 auth UI 200 PASS, shared-space UI 93 PASS(이전 실행); 최종 영향 웹 빌드·PC/mobile smoke는 별도 기록한다.
+외부 Google·카카오 인증은 합성 처리이며 실제 본인 인증은 사용자 확인 범위다.
+
+공고 URL `/policies/account-update`, 공고 예정일 2026-10-11·시행 예정일 2026-11-13(KST).
+배포 전 기록이며 **공고·main 통합·운영 배포 완료 증거로 사용하지 않는다.** 운영 노출 시각과 serving SHA,
+최종 CI·review·smoke는 후속 결과에 기록한다. 현행 정책 v1을 유지하며 새 정책 적용은 30일 경과 후다.
+
+문서 정합: 공통 개정안의 운영회사·위탁·국외 처리 정보를 기존 정본과 대조했고 사용자 변경 없음 확인을 반영했다.
+서비스별 본문과 현재 TODO를 보완했으며, 과거 WO/CHECK의 미완료 기록은 당시 실행 결과로 보존했다.

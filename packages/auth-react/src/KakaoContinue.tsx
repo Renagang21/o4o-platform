@@ -1,4 +1,4 @@
-import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement } from './SignupTermsAgreement';
+import { ACCOUNT_PRIVACY_HREF, SignupTermsAgreement, signupPolicyReferences } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -80,7 +80,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     </>}
     {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
     {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
-    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing, termsPolicy: { policyDocumentId: policy.policyDocumentId, version: policy.version } } }).then(finish).catch(() => { if (mounted.current) { setBusy(false); setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
+    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) } }).then(finish).catch((error: any) => { if (mounted.current) { setBusy(false); if (['POLICY_VERSION_MISMATCH', 'POLICY_UNAVAILABLE'].includes(error?.response?.data?.code ?? error?.response?.data?.error?.code)) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(n => n + 1); setMessage('정책이 변경되었습니다. 입력 내용은 유지됩니다. 최신 내용을 확인해 주세요.'); } else setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
       <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>
       <label style={styles.field}>이메일<input style={styles.input} type="email" autoComplete="email" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label style={styles.field}>이름<input style={styles.input} autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>

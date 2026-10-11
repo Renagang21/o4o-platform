@@ -30,6 +30,11 @@ export class GoogleSignupConsentsDto {
   @Type(() => SignupTermsReferenceDto)
   termsPolicy!: SignupTermsReferenceDto;
 
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SignupTermsReferenceDto)
+  privacyPolicy?: SignupTermsReferenceDto;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)

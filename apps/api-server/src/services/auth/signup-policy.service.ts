@@ -2,6 +2,7 @@ import type { EntityManager } from 'typeorm';
 import { resolveSessionServiceKey } from '../../utils/session-origin.js';
 import { policyAcceptanceService, PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 import { isCommonAccountTermsDocument } from '../../common/auth/terms-acceptance.policy.js';
+import { recordPublishedPolicyEvidence } from '../../modules/policy-acceptance/policy-document-evidence.service.js';
 
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 
@@ -34,6 +35,8 @@ export async function resolveSignupPolicyKeyFromOrigin(origin: string | undefine
 }
 
 export async function recordSignupTerms(userId: string, serviceKey: string, reference: SignupTermsReference | undefined, manager: EntityManager): Promise<void> {
+  await manager.query('SELECT pg_advisory_xact_lock_shared(hashtext($1))', ['service-policy:neture']);
+  if (serviceKey !== 'neture') await manager.query('SELECT pg_advisory_xact_lock_shared(hashtext($1))', [`service-policy:${serviceKey}`]);
   if (!reference || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(reference.policyDocumentId) || !Number.isInteger(reference.version) || reference.version < 1) {
     throw new PolicyAcceptanceError('POLICY_ACCEPTANCE_REQUIRED', '현재 이용약관을 확인하고 동의해 주세요.', 400);
   }
@@ -46,4 +49,10 @@ export async function recordSignupTerms(userId: string, serviceKey: string, refe
   // Always query with the signup transaction. Failure rolls back the account,
   // credential/provider link and one-use grant along with the acceptance.
   await policyAcceptanceService.recordAcceptance({ userId, serviceKey, ...reference }, manager);
+}
+
+export async function recordSignupPrivacy(userId: string, reference: SignupTermsReference | undefined, manager: EntityManager): Promise<void> {
+  // Old clients remain compatible until the marked common policy rollout. Never manufacture a privacy version for them.
+  if (!reference && !isCommonAccountTermsDocument(await policyAcceptanceService.getPublishedTermsForService('neture', manager))) return;
+  await recordPublishedPolicyEvidence(manager, userId, 'neture', 'privacy', reference);
 }

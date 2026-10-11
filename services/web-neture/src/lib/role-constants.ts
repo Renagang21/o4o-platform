@@ -136,6 +136,9 @@ export const SUBDOMAIN_OPERATOR_SCREENS: ReadonlyArray<{
   key: SubdomainOperatorKey;
   level: SubdomainOperatorLevel;
 }> = Object.freeze([
+  { path: '/operator/legal/supplier', key: 'supplier', level: 'admin' },
+  { path: '/operator/legal/community', key: 'community', level: 'admin' },
+  { path: '/operator/legal/funding', key: 'funding', level: 'admin' },
   { path: '/admin/supplier-governance', key: 'supplier', level: 'admin' },
   // 승인·거절 canonical. governance 만 옮기면 supplier 운영자가 목록은 보고 승인은 못 한다.
   { path: '/operator/suppliers', key: 'supplier', level: 'operator' },

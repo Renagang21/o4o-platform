@@ -1,3 +1,4 @@
+import { recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, checkoutOrderServiceSetSql, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
 import { Repository, type EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
@@ -25,7 +26,7 @@ export class NetureSupplierLifecycleService {
 
   async registerSupplier(
     userId: string,
-    data: { name: string; slug: string; contactEmail?: string },
+    data: { name: string; slug: string; contactEmail?: string; policyReferences?: EnrollmentPolicyReference[] },
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     try {
       const name = data.name?.trim();
@@ -36,33 +37,20 @@ export class NetureSupplierLifecycleService {
       if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
         return { success: false, error: 'INVALID_SLUG' };
       }
-      // 신청 자격 = Neture 가입 승인(active). 공급자 신청 · 승인은 Neture 원장을 바꾸지 않는다(CHECK §10 E2 · E3).
-      if ((await getNetureMainMembershipStatus(AppDataSource, userId)) !== 'active') {
-        return { success: false, error: 'NETURE_MEMBERSHIP_REQUIRED' };
-      }
-      const existingByUser = await this.supplierRepo.findOne({ where: { userId }, select: ['id'] });
-      if (existingByUser) {
-        return { success: false, error: 'USER_ALREADY_HAS_SUPPLIER' };
-      }
-      const existingBySlug = await this.supplierRepo.findOne({ where: { slug }, select: ['id'] });
-      if (existingBySlug) {
-        return { success: false, error: 'SLUG_ALREADY_EXISTS' };
-      }
-      const supplier = this.supplierRepo.create({
-        slug, userId,
-        contactEmail: data.contactEmail || null,
-        status: SupplierStatus.PENDING,
+      return await AppDataSource.transaction(async manager => {
+        if ((await getNetureMainMembershipStatus(manager, userId)) !== 'active') return { success: false, error: 'NETURE_MEMBERSHIP_REQUIRED' };
+        const repo = manager.getRepository(NetureSupplier);
+        if (await repo.findOne({ where: { userId }, select: ['id'] })) return { success: false, error: 'USER_ALREADY_HAS_SUPPLIER' };
+        if (await repo.findOne({ where: { slug }, select: ['id'] })) return { success: false, error: 'SLUG_ALREADY_EXISTS' };
+        const policies = await recordEnrollmentPolicies(manager, userId, 'supplier', data.policyReferences);
+        const saved = await repo.save(repo.create({ slug, userId, contactEmail: data.contactEmail || null, status: SupplierStatus.PENDING }));
+        const organization = await organizationOpsService.ensureOrganization({ name, code: `neture-${slug}`, type: 'supplier',
+          metadata: { serviceKey: 'neture', netureSupplierSlug: slug, applicationPolicies: policies },
+          createdByUserId: userId, isActive: false }, manager.queryRunner);
+        await organizationOpsService.setOwner(organization.id, userId, manager.queryRunner);
+        await manager.query('UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL', [organization.id, saved.id]);
+        return { success: true, data: { id: saved.id, name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt } };
       });
-      const saved = await this.supplierRepo.save(supplier);
-      logger.info(`[NetureSupplierService] Supplier registered: ${saved.id} (PENDING) by user ${userId}`);
-
-      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: create org (isActive=false for PENDING)
-      await this.syncSupplierOrganization(saved, { isActive: false, name });
-
-      return {
-        success: true,
-        data: { id: saved.id, name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt },
-      };
     } catch (error) {
       logger.error('[NetureSupplierService] Error registering supplier:', error);
       throw error;

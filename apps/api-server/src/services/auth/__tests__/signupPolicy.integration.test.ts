@@ -55,12 +55,12 @@ integration('signup agreement atomicity (dedicated loopback PostgreSQL)', () => 
   });
   afterEach(async () => {
     await db.query('DELETE FROM users WHERE email=$1', [email]);
-    await db.query('DELETE FROM service_policy_documents WHERE id=$1 OR id IN (SELECT id FROM service_policy_documents WHERE title=$2)', [documentId, 'New fixture terms']);
+    await db.query("DELETE FROM service_policy_documents WHERE id=$1 OR id IN (SELECT id FROM service_policy_documents WHERE title=$2 OR title='Privacy fixture notice')", [documentId, 'New fixture terms']);
     await db.query('DELETE FROM auth_social_flows WHERE origin=$1', [origin]);
     policyAcceptanceService.invalidateUser('fixture');
   });
-  async function signup(provider: string, reference: any = { policyDocumentId: documentId, version: 1 }) {
-    const consents = { terms: true, privacy: true, name: 'Fixture', phone: '01000000000', termsPolicy: reference };
+  async function signup(provider: string, reference: any = { policyDocumentId: documentId, version: 1 }, privacyPolicy?: any) {
+    const consents = { terms: true, privacy: true, name: 'Fixture', phone: '01000000000', termsPolicy: reference, privacyPolicy };
     if (provider === 'google') {
       const service = new GoogleAuthService({ dataSource: source() as any, identity: { verifyGoogleIdToken: async () => ({ sub: randomUUID(), email, emailVerified: true }), findGoogleIdentityBySub: async () => null } as any, readContext: async () => ({ roles: [], memberships: [] }), issueSession: async () => ({ tokens: { accessToken: 'fixture', refreshToken: 'fixture' } }) as any });
       return service.signup({ idToken: 'fixture', consents, policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'fixture' });
@@ -75,6 +75,26 @@ integration('signup agreement atomicity (dedicated loopback PostgreSQL)', () => 
     try { return await service.signup(grant.token, grant.binding, origin, { email, name: consents.name, phone: consents.phone, consents }); }
     catch (error) { expect((await flows.read(grant.token)).used_at).toBeNull(); throw error; }
   }
+  it.each(['email', 'google', 'kakao'])('%s records a separate privacy acknowledgement with its exact version and hash', async provider => {
+    const privacyId = randomUUID();
+    await db.query("UPDATE service_policy_documents SET version=2,slug='neture-account-terms' WHERE id=$1", [documentId]);
+    await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,status) VALUES($1,'neture','privacy',3,'Privacy fixture notice','Account privacy fixture body','published')", [privacyId]);
+    await signup(provider, { policyDocumentId: documentId, version: 2 }, { policyDocumentId: privacyId, version: 3 });
+    const rows = await db.query("SELECT document_type,version,content_hash,acceptance_kind FROM user_policy_acceptances ORDER BY document_type");
+    expect(rows).toEqual([
+      { document_type: 'privacy', version: 3, content_hash: computePolicyContentHash('Account privacy fixture body'), acceptance_kind: 'acknowledgement' },
+      { document_type: 'terms', version: 2, content_hash: computePolicyContentHash('Fixture agreement'), acceptance_kind: 'agreement' },
+    ]);
+  });
+  it.each(['email', 'google', 'kakao'])('%s rolls back account, login method, terms and one-use grant when privacy changed', async provider => {
+    const privacyId = randomUUID();
+    await db.query("UPDATE service_policy_documents SET version=2,slug='neture-account-terms' WHERE id=$1", [documentId]);
+    await db.query("INSERT INTO service_policy_documents(id,service_key,document_type,version,title,content,status) VALUES($1,'neture','privacy',3,'Privacy fixture notice','Account privacy fixture body','published')", [privacyId]);
+    await expect(signup(provider, { policyDocumentId: documentId, version: 2 }, { policyDocumentId: privacyId, version: 2 })).rejects.toHaveProperty('code', 'POLICY_VERSION_MISMATCH');
+    for (const table of ['users', 'linked_accounts', 'user_password_credentials', 'user_policy_acceptances']) expect(await db.query(`SELECT * FROM ${table}`)).toHaveLength(0);
+    await signup(provider, { policyDocumentId: documentId, version: 2 }, { policyDocumentId: privacyId, version: 3 });
+    expect(await db.query('SELECT * FROM user_policy_acceptances')).toHaveLength(2);
+  });
   it.each(['email', 'google', 'kakao'])('%s stores the viewed document/version/hash without creating memberships or roles', async provider => {
     await signup(provider);
     const [user] = await db.query('SELECT id FROM users WHERE email=$1', [email]);

@@ -6,7 +6,7 @@ function harness(overrides: any = {}, failInsert = false) {
   const ds: any = { transaction: async (run: any) => {
     const working = structuredClone(state), added: any[] = [];
     const result = await run({
-      query: async () => [{ account_status: 'active', account_active: true, email_verified: true }],
+      query: async (sql: string) => /FROM service_policy_documents|pg_advisory_xact_lock/.test(sql) ? [] : [{ account_status: 'active', account_active: true, email_verified: true }],
       getRepository: (entity: any) => entity === MarketTrial ? {
         findOne: async (options: any) => { expect(options.lock).toEqual({ mode: 'pessimistic_write' }); return working; },
         save: async (trial: any) => { saved(trial); return trial; },

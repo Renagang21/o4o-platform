@@ -71,6 +71,7 @@ function makeHarness(
 
   const query = jest.fn(async (q: string, p: any[] = []) => {
     sql.push({ q, p });
+    if (/pg_advisory_xact_lock/.test(q)) return [];
     if (/FROM service_policy_documents/.test(q)) return [{ id: '11111111-1111-4111-8111-111111111111', service_key: 'neture', document_type: 'terms', version: 1, title: 'Fixture terms', content: 'Fixture agreement', status: 'published' }];
     if (/INSERT INTO user_policy_acceptances/.test(q)) return [{ id: 'acceptance-fixture' }];
     if (/UPDATE users SET tos_accepted_at/.test(q)) return [];

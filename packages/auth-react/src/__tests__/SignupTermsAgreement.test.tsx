@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { SignupTermsAgreement } from '../SignupTermsAgreement';
+import { SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
 
 const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
 afterEach(() => { cleanup(); vi.useRealTimers(); });
@@ -10,6 +10,21 @@ function Form({ load, reloadKey = 0, documentChanged = vi.fn() }: any) {
   return <SignupTermsAgreement load={load} reloadKey={reloadKey} checked={checked} onChecked={setChecked} onDocument={documentChanged} />;
 }
 describe('published signup agreement', () => {
+  it('preserves separate privacy version in the request without inventing one for old responses', async () => {
+    const privacyPolicy = { policyDocumentId: '22222222-2222-4222-8222-222222222222', version: 3, title: 'Privacy notice' };
+    render(<Form load={async () => ({ ...TERMS, privacyPolicy })} />);
+    await screen.findByText('개인정보 처리방침 버전 3을 함께 확인합니다.');
+    expect(signupPolicyReferences({ ...TERMS, privacyPolicy })).toEqual({
+      termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: 1 },
+      privacyPolicy: { policyDocumentId: privacyPolicy.policyDocumentId, version: 3 },
+    });
+    expect(signupPolicyReferences(TERMS)).not.toHaveProperty('privacyPolicy');
+  });
+  it.each([{ version: 0 }, { policyDocumentId: 'invalid' }, { title: '' }])('blocks an incomplete privacy reference %j', async invalid => {
+    render(<Form load={async () => ({ ...TERMS, privacyPolicy: { policyDocumentId: TERMS.policyDocumentId, version: 2, title: 'Privacy', ...invalid } })} />);
+    await screen.findByRole('alert');
+    expect((screen.getByRole('checkbox') as HTMLInputElement).disabled).toBe(true);
+  });
   it('blocks consent on lookup failure, then permits an explicit read-only retry', async () => {
     const load = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(TERMS);
     render(<Form load={load} />);

@@ -18,7 +18,7 @@ function harness(effective: Date | null) {
   const repo = { findOne: jest.fn(async () => doc), createQueryBuilder: jest.fn(() => builder), save: jest.fn(async (value: any) => value) };
   const app = express();
   app.use(express.json());
-  app.use('/api/v1/admin/services', createAdminServiceLegalController({ getRepository: () => repo } as any));
+  app.use('/api/v1/admin/services', createAdminServiceLegalController({ getRepository: () => repo, transaction: async (fn: any) => fn({ getRepository: () => repo, query: jest.fn(async () => []) }) } as any));
   return { app, repo, execute, doc };
 }
 
