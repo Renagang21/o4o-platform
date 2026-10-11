@@ -43,7 +43,7 @@ export default function FundingParticipantsSection(props: Props) {
     if (!form || busy || invalidAmount(form.amount)) return;
     const input: UpdateParticipantPaymentInput = form.action === 'confirm' ? {
       paymentStatus: 'paid', paymentMethod: 'manual_transfer', paymentProvider: 'internal',
-      ...(form.amount.trim() ? { paidAmount: Number(form.amount) } : {}),
+      paidAmount: form.amount.trim() ? Number(form.amount) : null,
       paymentReference: form.reference.trim() || null, paymentNote: form.note.trim() || null,
     } : { paymentStatus: form.action === 'refund' ? 'refunded' : 'unpaid', ...(form.note.trim() ? { paymentNote: form.note.trim() } : {}) };
     if (await props.onPaymentStatusChange(p, input)) setForm(null);

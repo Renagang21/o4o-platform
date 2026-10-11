@@ -38,6 +38,13 @@ it('a refunded record can be reconfirmed and cleared note/reference are explicit
   await waitFor(() => expect(save.mock.calls[0][1]).toMatchObject({ paymentStatus: 'paid', paymentReference: null, paymentNote: null }));
 });
 
+it('clearing a mistaken amount sends null rather than preserving the previous amount', async () => {
+  render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
+  fireEvent.change(screen.getByLabelText('입금 확인 금액 (원)'), { target: { value: '' } });
+  fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
+  await waitFor(() => expect(save.mock.calls[0][1].paidAmount).toBeNull());
+});
+
 it.each(['-1', '0.001', '10000000000'])('invalid amount %s cannot be saved', value => {
   render(<FundingParticipantsSection {...props()} />); fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
   fireEvent.change(screen.getByLabelText('입금 확인 금액 (원)'), { target: { value } });
