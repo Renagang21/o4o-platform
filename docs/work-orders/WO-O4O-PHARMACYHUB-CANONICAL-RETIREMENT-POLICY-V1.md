@@ -17,3 +17,5 @@ PR #439 리뷰 대응: ACTIVE Store Rules의 PH live B2B 표기와 QR Active Des
 ACTIVE 색인 전체 재대조: KPA Society Service Structure와 o4o-common-structure의 PH forum/원장 adapter 계약, content metadata/Hub template/운영 scripts inventory의 PH 적용·실행 표기도 폐기 정책으로 정렬했다. Privacy/보유정책/통합약관에는 PH의 과거 서비스 표기가 현재 운영을 뜻하지 않는 저장소 메타만 추가했으며, render-policy-plain 결과가 기존 HEAD와 byte-identical임을 3개 문서에서 확인했다. 법정 보유·동의/거래 증빙 계약과 게시 원문/과거 기록은 변경하지 않는다. Home discovery는 이미 PH 은퇴를 명시하며 KPA branch의 PH prefix 접근 거부는 보안 경계이므로 유지한다.
 
 최종 PH 약어 전수 대조: QR picker/source 확장(§6-2)·Store execution 후속 계획/최종 판정(§10/§13)·POP I6(§4-2)을 포함해 PH 약어로만 적힌 절에도 부분 폐기를 표시했다. 각 변경 정본은 모든 절/표/예시/불변식/후속 계획의 PH 전용 계약이 대체됨을 문서 단위로 명시한다. 개별 표기 누락이 PH의 복구/확장 의무를 되살리지 않으며 다른 서비스/Common/Core/Freeze는 보존한다. 법률 게시 원문에는 이 본문 표시를 넣지 않아 render 결과를 보존한다.
+
+연결 색인·Locked MyPage 대조: PH 계정 경로 보존/후속 UI 계약은 승인된 폐기로 대체했다. 서비스 색인의 제거된 웹 앱 연결·baseline 색인의 PH parity·canonical 색인의 종전 활성 4서비스와 법적 경로 안내·최종 갱신일을 정합했다. 매장 경영자 계약 초안은 PH 운영/게시 선행조건만 저장소 메타에서 정정했으며 게시 본문은 변경하지 않았다.
