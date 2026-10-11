@@ -60,7 +60,10 @@
 - [x] 운영자 목록의 준비/결과/이행 상태 필터와 최신 응답 보호
 - [x] 숨긴 정산 UI 전이 제거; settlement 409와 기존 기록 보존 회귀 검증
 - [x] 금액·날짜 검증/transaction rollback/감사·scope/조회 실패/정정/CSV 회귀 테스트 및 API·웹 빌드
-- [ ] desktop/mobile fixture 브라우저, push·CI·리뷰·정상 병합·api/neture 배포·공개 read-only 확인
+- [x] desktop/mobile fixture 브라우저 10개 시나리오 PASS
+- [ ] push·CI·리뷰·정상 병합·api/neture 배포·공개 read-only 확인
 - [ ] 새 CHECK에 결과와 실계정 직접 테스트·DB 동시성 후속 확인 기록
 
 실행 검증·통합 증거와 실계정 후속 테스트는 [새 CHECK](../checks/CHECK-O4O-FUNDING-OPERATOR-RECORDS-V1.md)에 기록한다.
+
+첫 push 전 main `71c267ac87`으로 미게시 branch를 rebase하고 통합 API 221 tests, 웹 546 tests를 확인했다. TypeORM의 UPDATE raw result가 `[rows, rowCount]`임을 추가 확인해 SELECT CTE projection으로 입금·이행 응답을 정정했다. query parameter 로그의 원문 노출도 같은 서비스 안에서 node-postgres 지원 text binding과 JSON 마스킹으로 보완하고 30 tests로 확인했다.

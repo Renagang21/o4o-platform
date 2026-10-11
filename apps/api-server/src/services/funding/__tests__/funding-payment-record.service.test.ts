@@ -62,6 +62,16 @@ describe('offline payment record and audit transaction', () => {
     await expect(new FundingPaymentRecordService(ds).update('other-project', 'participant', actor, { paymentStatus: 'paid' })).rejects.toMatchObject({ status: 404 });
     expect(manager.query).toHaveBeenCalledTimes(1); expect(audit.insert).not.toHaveBeenCalled(); expect(runner.rollbackTransaction).toHaveBeenCalled();
   });
+
+  it('binds private text with node-postgres while masking TypeORM query parameters', async () => {
+    await new FundingPaymentRecordService(ds).update('project', 'participant', actor, { paymentStatus: 'paid', paymentReference: original.paymentReference, paymentNote: original.paymentNote });
+    const values = manager.query.mock.calls[1][1];
+    const { prepareValue } = require('pg/lib/utils');
+    expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentReference);
+    expect(values.map((value: unknown) => prepareValue(value))).toContain(original.paymentNote);
+    expect(JSON.stringify(values)).not.toContain(original.paymentReference);
+    expect(JSON.stringify(values)).not.toContain(original.paymentNote);
+  });
 });
 
 describe('existing payment column validation', () => {

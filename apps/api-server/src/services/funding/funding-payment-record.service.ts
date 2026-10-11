@@ -6,6 +6,12 @@ import { FundingError } from './funding-workspace.service.js';
 const TEXT_LIMITS = { paymentMethod: 50, paymentProvider: 50, paymentReference: 255 } as const;
 const optionalFields = [...Object.keys(TEXT_LIMITS), 'paymentNote', 'paidAmount', 'paidAt', 'confirmedAt'];
 
+/** node-postgres binds the original text; TypeORM's JSON parameter logger sees a mask. */
+const privateText = (value: unknown) => value === null ? null : {
+  toPostgres: () => value,
+  toJSON: () => '[redacted]',
+};
+
 function validDate(value: unknown) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(value) || !Number.isFinite(Date.parse(value))) return false;
   const [year, month, day] = value.slice(0, 10).split('-').map(Number);
@@ -61,7 +67,7 @@ export class FundingPaymentRecordService {
       for (const field of optionalFields) {
         const value = input[field];
         if (field === 'paidAt' || field === 'confirmedAt' || value === undefined) continue;
-        values.push(value);
+        values.push(field === 'paymentReference' || field === 'paymentNote' ? privateText(value) : value);
         sets.push(`"${field}" = $${values.length}`);
       }
       // The first confirmation survives reconfirmation, cancellation and refunds.
