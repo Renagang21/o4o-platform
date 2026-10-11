@@ -39,6 +39,7 @@ const IMPORT_COMMON = `${API}/modules/neture/services/product-import-common.serv
 const HANDOFF_SVC = `${API}/modules/neture/services/supplier-library-handoff.service.ts`;
 const CONTENT_SUBMIT = `${API}/routes/kpa/services/supplier-content.service.ts`;
 const RESOLVER = `${API}/modules/neture/middleware/supplier-context.resolver.ts`;
+const BUSINESS_SVC = `${API}/modules/neture/services/supplier-business.service.ts`;
 const SUPPLIER_SVC = `${API}/modules/neture/services/supplier.service.ts`;
 const BASELINE = 'docs/baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md';
 
@@ -381,7 +382,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
     expect(reg).not.toMatch(/INSERT INTO neture_suppliers/);
     expect(reg).not.toContain('setOwner(');
 
-    const svc = stripComments(read(SUPPLIER_SVC));
+    const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC));
     expect(svc).toContain('await this.syncSupplierOrganization(supplier, { isActive: true });');
     // owner 는 공급자 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
     expect(svc).toContain('organizationOpsService.setOwner(orgId, supplier.userId)');
@@ -394,7 +395,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§9 Business Profile — Organization 이 SSOT', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC));
 
   it('Supplier profile 이 users.businessInfo 를 read/write 하지 않는다', () => {
     expect(svc).not.toContain('businessInfo');
