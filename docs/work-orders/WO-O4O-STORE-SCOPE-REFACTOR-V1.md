@@ -72,3 +72,11 @@ Frozen `asset-copy-core`의 callback에는 Request가 없다. Core 서명 변경
 - 운영 DB write·main 통합·배포: 미실행.
 
 WORKTREE_DISPOSITION: `wo/store-scope-refactor` / base `261cddc961f29f3d3ca71db9c23ffd2d226d154f` / KEEP(main 미통합).
+
+## 배포 완료와 실제 검증 후속
+
+PR #434는 `87831b3cf0e41522376a6d478c627295948d12a6`으로 main 통합됐다. 최신 PR CI Gate·SonarCloud·CodeQL과 post-merge CI·CodeQL PASS. Delivery `38095632561` SUCCESS, production `DEPLOYED · api,store`. API 준비 상태와 매장 홈·로그인 HTTP 200 및 앱 진입 HTML을 확인했다. 앞선 미실행·원격 대기 표기는 해당 push 시점의 기록이다.
+
+실제 계정 후속은 [CHECK-O4O-STORE-REAL-WORKFLOW-VERIFICATION-V1](../checks/CHECK-O4O-STORE-REAL-WORKFLOW-VERIFICATION-V1.md)에서 진행한다. 로그인·읽기 범위 검증 중 자체 상품 선택 불일치를 발견했다. 제품·자료 생성/수정/게시·원본 독립성은 아직 PASS가 아니다.
+
+실제 운영 사용자 API 후속에서 유지 매장의 상품 등록·수정과 직접 자료 작성·수정·삭제, CMS 복사·편집·게시·원본 불변을 확인했다. 상품의 다른 선택 조직 조회는 FAIL로 재현됐다. 검증 제품은 비활성화하고 직접 자료는 삭제했으며, CMS 검증 사본은 숨김 상태로 보관했다. 원본 변경 후 사본 유지·두 정상 매장·브라우저·기기·사본 종속 자료 완전 정리는 남아 있다.
