@@ -6,6 +6,17 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { inspectResources, retireResources, deletionPermissions, assertProductionIdle } from './pharmacy-hub-resource-retirement.mjs';
 
+test('manual blank or partial probes cannot impersonate an empty read-only inventory', () => {
+  for (const supplied of ['   ', '/qr/only']) {
+    const result = spawnSync(process.execPath, [new URL('./pharmacy-hub-resource-retirement.mjs', import.meta.url).pathname], {
+      encoding: 'utf8', env: { ...process.env, CUTOVER_MODE: 'plan', QR_PROBE_PATHS: supplied, PROBE_OUTPUT: '/does-not-exist' },
+    });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /PH resource retirement failed; check read-only inventory/);
+    assert.doesNotMatch(result.stderr, /PH resource command/);
+  }
+});
+
 test('production gate allows its own run and read-only CI but blocks running and queued deployments', async () => {
   const self = { id: 10, path: '.github/workflows/pharmacyhub-qr-cutover.yml', status: 'in_progress' };
   const ci = { id: 11, path: '.github/workflows/ci-pipeline.yml', status: 'in_progress' };
