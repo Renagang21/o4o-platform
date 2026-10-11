@@ -95,7 +95,7 @@ async function inventory(client, keep, targets) {
     FROM users`)).rows[0];
   return { owner,keeper,roots,candidates,accounts };
 }
-const protectedTables=new Set(['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots','kpa_operator_audit_logs']);
+const protectedTables=new Set(['users','demo_accounts','neture_suppliers','canonical_demo_repair_snapshots','kpa_operator_audit_logs','checkout_order_logs']);
 function guardRow(table,row,state) {
   const targetIds=state.targetIds;
   if (protectedTables.has(table)) throw new CleanupStop('Protected entity referenced by deletion');
@@ -177,6 +177,8 @@ export async function verifyLogicalCoverage(client,state,columns,edges) {
 }
 export function retainedReferencePolicy(table,column,row,state) {
   const source=(name,id)=>[...(state.rows.get(name)?.values() || [])].find(r=>r.id===id);
+  // OrderLog is an audit/dispute history; orderId intentionally has no cascading FK.
+  if (table==='checkout_order_logs' && column==='orderId') return Boolean(source('checkout_orders',row.orderId));
   // Audit targets are historical identifiers, not ownership/cascade links (KPA role matrix §7).
   if (table==='kpa_operator_audit_logs' && column==='target_id') {
     return row.target_type==='member' && Boolean(source('kpa_members',row.target_id));

@@ -92,3 +92,15 @@ test('checkout ownership edges do not suppress unmatched UUID reference diagnost
   const column={table_name:'checkout_orders',column_name:'sellerId',udt_name:'varchar'};
   await assert.rejects(verifyLogicalCoverage({query:async()=>({rows:[{row:{id:'order',sellerId:id}}]})},state,[column],[{child:'checkout_orders',child_columns:['sellerId']}]),/Unmodelled/);
 });
+test('order audit history requires an actual selected order and is included in preservation verification',async()=>{
+  const id='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const state={rows:new Map([['checkout_orders',new Map([['o',{id}]])]]),keys:new Map([['checkout_order_logs',['id']]])};
+  const column={table_name:'checkout_order_logs',column_name:'orderId',udt_name:'uuid'};
+  const row={id:'history',orderId:id,action:'created',metadata:{original:true}};
+  assert.equal(retainedReferencePolicy(column.table_name,column.column_name,row,state),true);
+  assert.equal(retainedReferencePolicy(column.table_name,column.column_name,{...row,orderId:'unknown'},state),false);
+  assert.equal(retainedReferencePolicy(column.table_name,'otherId',row,state),false);
+  await verifyLogicalCoverage({query:async()=>({rows:[{row}]})},state,[column],[]);
+  assert.deepEqual([...state.retainedReferences.get(column.table_name).values()],[row]);
+  await assert.rejects(verifyRetainedReferences({query:async()=>({rows:[{row:{...row,action:'cancelled'}}]})},[{table:column.table_name,keys:['id'],rows:[row]}]),/Retained historical/);
+});
