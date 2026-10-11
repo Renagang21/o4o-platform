@@ -78,7 +78,7 @@ export default function EventsPage({ slug }: { slug: string }) {
   return <BranchEventsPanel key={slug} slug={slug} />;
 }
 
-function BranchEventsPanel({ slug }: { slug: string }) {
+function BranchEventsPanel({ slug }: Readonly<{ slug: string }>) {
   const [status, setStatus] = useState<'' | EventStatus>('');
   const [items, setItems] = useState<BranchEventItem[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);

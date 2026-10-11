@@ -447,15 +447,17 @@ function ForumSyncFailuresPanel() {
           <button type="button" onClick={() => void load()} disabled={resolving} className="ml-3 rounded border px-3 py-2">다시 조회</button>
         </div>
       )}
-      {notice && <p role="status" className="mb-3 text-sm text-green-700">{notice}</p>}
+      {notice && <output className="block mb-3 text-sm text-green-700">{notice}</output>}
 
-      {loading ? (
+      {loading && (
         <div className="text-center py-12 text-gray-500">불러오는 중...</div>
-      ) : error ? null : items.length === 0 ? (
+      )}
+      {!loading && !error && items.length === 0 && (
         <div className="text-center py-12 text-gray-400">
           {resolvedFilter === 'unresolved' ? '미해결 실패 건이 없습니다.' : '실패 이력이 없습니다.'}
         </div>
-      ) : (
+      )}
+      {!loading && !error && items.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -512,7 +514,7 @@ function ForumSyncFailuresPanel() {
       {/* Resolve 모달 */}
       {resolveTarget && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div role="dialog" aria-modal="true" aria-label="해결 처리" className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+          <dialog open aria-modal="true" aria-label="해결 처리" className="relative m-0 bg-white rounded-xl shadow-xl w-full max-w-md p-6">
             <h3 className="font-semibold text-gray-900 mb-1">해결 처리</h3>
             <p className="text-sm text-gray-500 mb-4 truncate">
               {resolveTarget.trialTitle}
@@ -545,7 +547,7 @@ function ForumSyncFailuresPanel() {
                 {resolving ? '처리 중...' : '해결 완료'}
               </button>
             </div>
-          </div>
+          </dialog>
         </div>
       )}
 

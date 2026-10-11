@@ -249,6 +249,9 @@ export default function AdminSupplierGovernancePage() {
       ].join('\n')
     : '';
 
+  const targetAction = dialog?.kind === 'deactivate' ? '비활성화' : '재활성화';
+  const confirmLabel = actionLoading ? '처리 중...' : targetAction;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div>
@@ -334,9 +337,9 @@ export default function AdminSupplierGovernancePage() {
       <Dialog open={dialog !== null} role="dialog" aria-modal="true" aria-label="공급자 상태 변경"
         className="mx-4 w-full max-w-md max-h-[90vh] overflow-y-auto p-6"
         onKeyDown={event => { if (event.key === 'Escape') closeDialog(); }}>
-        <h2 className="text-lg font-semibold">공급자 {dialog?.kind === 'deactivate' ? '비활성화' : '재활성화'}</h2>
+        <h2 className="text-lg font-semibold">공급자 {targetAction}</h2>
         <p className="mt-3 whitespace-pre-line text-sm text-slate-600">{dialog?.kind === 'deactivate' ? deactivateMessage : reactivateMessage}</p>
-        <label className="mt-3 block text-sm">변경 사유 (필수)
+        <label className="mt-3 block text-sm"><span>변경 사유 (필수)</span>
           <textarea autoFocus value={reason} disabled={actionLoading} onChange={event => setReason(event.target.value)} rows={3}
             className="mt-1 w-full rounded border p-2" />
         </label>
@@ -344,7 +347,7 @@ export default function AdminSupplierGovernancePage() {
         <div className="mt-4 flex justify-end gap-2">
           <button type="button" disabled={actionLoading} className="rounded border px-4 py-2" onClick={closeDialog}>취소</button>
           <button type="button" disabled={actionLoading || !reason.trim()} className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
-            onClick={() => void handleConfirm(reason)}>{actionLoading ? '처리 중...' : dialog?.kind === 'deactivate' ? '비활성화' : '재활성화'}</button>
+            onClick={() => void handleConfirm(reason)}>{confirmLabel}</button>
         </div>
       </Dialog>
     </div>

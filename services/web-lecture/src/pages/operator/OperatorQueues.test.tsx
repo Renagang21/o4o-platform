@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, expect, it, describe, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-const mocks = vi.hoisted(() => ({ courses: vi.fn(), applications: vi.fn(), approve: vi.fn(), approveApplication: vi.fn(), success: vi.fn(), error: vi.fn() }));
+const mocks = vi.hoisted(() => ({ courses: vi.fn(), applications: vi.fn(), approve: vi.fn(), approveApplication: vi.fn(), rejectApplication: vi.fn(), success: vi.fn(), error: vi.fn() }));
 vi.mock('../../api/lecture', () => ({ operatorApi: mocks, errorMessage: (_err: unknown, fallback: string) => fallback }));
 vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: mocks.success, error: mocks.error }) }));
 import OperatorCoursesPage from './OperatorCoursesPage';
 import OperatorInstructorsPage from './OperatorInstructorsPage';
 const row = (name: string, status: string) => ({ id: name, title: name, user: { name }, userId: name, status, createdAt: '2026-10-11' });
 beforeEach(() => vi.resetAllMocks());
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe.each([
   { name: '강좌', Page: OperatorCoursesPage, fetch: mocks.courses, mutate: mocks.approve, pending: 'pending_review', filter: '게시 중', next: 'published', button: '승인(게시)' },
@@ -50,4 +50,16 @@ describe.each([
     expect(mocks.success).not.toHaveBeenCalled();
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+});
+
+it.each([null, ''])('instructor rejection keeps the optional-reason policy (prompt=%j)', async reason => {
+  mocks.applications.mockResolvedValue({ data: [row('반려 검증 강사', 'pending')] });
+  mocks.rejectApplication.mockResolvedValue({});
+  vi.spyOn(window, 'prompt').mockReturnValue(reason);
+  render(<MemoryRouter><OperatorInstructorsPage /></MemoryRouter>);
+  await screen.findByText('반려 검증 강사');
+  const button = screen.getAllByRole('button', { name: '반려' }).find(element => element.classList.contains('btn'))!;
+  fireEvent.click(button);
+  if (reason === null) expect(mocks.rejectApplication).not.toHaveBeenCalled();
+  else await waitFor(() => expect(mocks.rejectApplication).toHaveBeenCalledWith('반려 검증 강사', ''));
 });

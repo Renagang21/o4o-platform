@@ -19,7 +19,7 @@
 | T03 공급자 | `/operator/suppliers`, `/admin/supplier-governance` → supplier operator/admin controller → supplier 조직·입점·상태 이력 | supplier operator는 승인/반려, admin은 비활성화/재활성화. 진행 주문/미정산 409 유지. governance 조회 실패를 빈 목록으로 반환하는 것은 결함. 본인 상품·주문·정산은 공급자 업무다. |
 | T04 커뮤니티 | 서비스 개설/지정, 개별 workspace/게시판 심사/공개 관리 → communities/public-read API → community memberships/boards/posts/공개 지정 | 서비스 admin 지정·회수와 개별 admin/operator의 회원 심사·제재는 이미 분리. 게시판 심사 최신 요청/중복 방어는 기존 구현·회귀를 재사용. 새 신고·숨김·승계·삭제 자동화는 정책 미정. |
 | T05 강의 | 강사 신청/강좌 목록·검토/문의/수료증 → `/lms/operator` → lecture 강좌·강사 신청·수료증 원장 | lecture current role+가입, course.serviceKey. 강사 편집/학습 등록과 운영 심사는 분리. 강좌·강사 목록의 필터 응답 역전/조회 오류 후 옛 처리 버튼은 결함. 자동 발급·새 역할은 미정. |
-| T06 분회 | `/:slug/operator/*` → kpa-branch API → branch site/posts/domain, 연도별 신고/회비/교육, 행사/RSVP/임원 | 서비스 역할+분회 소속 이중 판정. 행사 화면의 slug/상태/명단 전환 시 응답 역전·이전 분회 편집 폼 잔존은 결함. 새 회비/교육 정책은 추가하지 않는다. |
+| T06 분회 | `/:slug/operator/*` → kpa-branch API → branch site/posts/domain, 연도별 신고/회비/교육, 행사/RSVP/임원 | 서비스 operator는 서비스 역할+분회 소속 이중 판정. 현재 kpa-branch:admin/platform:super_admin의 서비스 전체 분회 관리 예외는 유지한다. 행사 화면의 slug/상태/명단 전환 시 응답 역전·이전 분회 편집 폼 잔존은 결함. 새 회비/교육 정책은 추가하지 않는다. |
 | T07 Neture/약국 고유 운영 | service wrapper·operatorMenuGroups·hostProfile → Neture/KPA API → 상품 승인/모집 노출/홈·콘텐츠 등 현행 원장 | KPA의 이름이 PLATFORM_ROLES인 배열도 실제로 kpa:admin/operator를 포함한다. 이름만 보고 중앙 전용 guard로 오판하지 않는다. 호스트별 사업/매장 리다이렉트와 활성 route를 유지한다. 재배치/offer 조회는 기존 ACTIVE 트랙으로 연결하며 임의 메뉴 삭제하지 않는다. |
 
 역할 행렬: 중앙 관리자는 서비스 운영자 지정·회수/플랫폼 계정, 서비스 운영자는 각 서비스 원장의 업무, 사업/분회/개별 커뮤니티 담당자는 별도 관계 범위, 공급자·개설자·강사는 본인 사업 작성/진행을 담당한다. 공통 회원 상태·역할을 사업 원장 상태와 합치지 않는다. 약국 협력사업은 서비스 identity 신설 대상이 아니다. PharmacyHub/KCosmetics는 퇴역, Cafe24는 workspace 미정, 병원약국은 무로그인 로컬 업무 앱을 유지한다.
@@ -73,7 +73,7 @@ fixture 검증은 가짜 계정/데이터와 API 응답으로 실제 앱 번들�
 2. 약국 협력사업: 한 사업 담당/두 사업 담당/미담당 계정으로 사업·탭을 전환한다. 이전 사업 자료/회원과 처리 결과가 새 사업에 나타나지 않아야 한다. 게시·보관 결과는 해당 사업 활성 회원에게만 적용되고 매장 사본은 기존 계약대로 유지돼야 한다.
 3. 공급자: operator는 입점 승인/반려, admin은 상태 관리로 진입한다. 진행 주문/미정산 409는 우회할 수 없어야 한다. 조회·저장 실패 후 재시도하고 사유 보존/이중 처리 방지를 확인한다.
 4. 강의: 강사 신청 승인·반려와 강좌 심사/게시 중단/보관을 각각 검사한다. 다른 서비스 역할로 접근할 수 없어야 하고, 운영자 검토가 강사 편집이나 학습 등록을 대신하지 않아야 한다. 수료증/문의의 기존 업무도 별도 실제 데이터로 확인한다.
-5. 분회: A 행사 편집 중 B 주소로 이동하면 A 초안/편집 ID/명단이 남지 않아야 한다. A만 지정된 계정의 B API 접근은 서버에서 거절돼야 한다. 행사 저장 실패는 입력을 유지하고 중복 요청을 차단해야 한다. 연도별 신고·회비·교육 원장은 이번 변경 대상이 아니므로 후속 실제 검증으로 남긴다.
+5. 분회: A 행사 편집 중 B 주소로 이동하면 A 초안/편집 ID/명단이 남지 않아야 한다. 서비스 전체 관리 admin 예외가 없는 A 소속 operator 계정의 B API 접근은 서버에서 거절돼야 한다. 행사 저장 실패는 입력을 유지하고 중복 요청을 차단해야 한다. 연도별 신고·회비·교육 원장은 이번 변경 대상이 아니므로 후속 실제 검증으로 남긴다.
 6. 공통·커뮤니티: 중앙 지정/회수 후 기존 로그인에서도 현재 역할로 재판정되는지, 개별 operator의 회원 조회·승인·반려와 admin의 제재 경계, 사업 게시판과 일반 커뮤니티의 공개 범위를 직접 검사한다.
 
 미실행/후속: 실계정 로그인, 운영 DB 동시 변경, 실제 권한 회수/다른 담당 계정, 회원 화면의 운영 데이터 반영. 신규 신고·숨김/복구·소유자 승계·보존/삭제 및 금융/수료증 자동화 정책은 상위 TODO에 계속 남긴다. 기존 재배치/offer 조회 ACTIVE 트랙은 중복 구현하지 않는다.
@@ -83,3 +83,13 @@ fixture 검증은 가짜 계정/데이터와 API 응답으로 실제 앱 번들�
 상위 ACTIVE TODO와 이 CHECK를 함께 갱신하며 이전 COMPLETED 기록은 수정하지 않는다.
 
 배포 사전 제약 추가 확인: 최신 main의 [PH 퇴역 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)는 다른 운영 writer와 동시에 자원을 삭제하지 않도록 외부 WIF 인증 차단 창을 명시한다. 현재 인증 거절을 단순 고장으로 간주해 WIF 조건을 우회/해제하지 않는다. 코드 통합 뒤 이 창의 종료·배포 gate를 다시 확인한다.
+
+
+### 첫 push 원격 검증 및 최신 main 동기화
+
+- PR [#487](https://github.com/Renagang21/o4o-platform/pull/487), 첫 HEAD `584c07f4f16030b1b73f52b9a4755f2159ab2cbf`: [CI 38143266591](https://github.com/Renagang21/o4o-platform/actions/runs/38143266591) 모든 필수 검사 SUCCESS, Codex 최신 review Completed·지적/스레드 0.
+- SonarCloud check `114483077503`: Quality Gate passed, duplication 0.0%, security hotspots 0. Coverage 0.0%는 보고서 지표이며 실행한 회귀가 없다는 뜻이 아니다. 직접 Sonar API는 cloud proxy 403으로 접근 불가였으나 GitHub check에서 결과를 확인했다.
+- 첫 분석의 비차단 10개 지적 중 readonly props, output/dialog 요소, 중첩 조건·label 간격·목록 loader 가독성을 정비했다. 최종 HEAD의 CI/review/Sonar는 다시 확인해야 하며 첫 HEAD 결과를 최종 결과로 재사용하지 않는다.
+- 통합 전 main 이동을 확인해 `01621919195fa18616a8f0c0e4f04d5e282fba23`(공급자 offer write 책임 분리)을 정상 merge했다. 그 트랙의 소스/WO를 재작성하지 않는다. 영향받은 API와 수정 화면·공유 소비처를 재검증한다.
+
+동기화/품질 보완 뒤 로컬 API funding 92, 수정 화면 15, 강의 전체 14 tests PASS(강사 반려 사유 선택/취소를 별도 회귀로 보존). API·공유 패키지·Neture/KPA-Society/Lecture/KPA-Branch 빌드 PASS, native dialog/output 변경 뒤 실제 번들 fixture 14 시나리오도 PASS.

@@ -20,8 +20,8 @@ export default function OperatorInstructorsPage() {
   }
   async function reject(id: string) {
     const reason = window.prompt('반려 사유를 입력하세요.');
-    if (!reason?.trim()) return;
-    await run(id, () => operatorApi.rejectApplication(id, reason.trim()), '반려했습니다.', '반려에 실패했습니다.');
+    if (reason === null) return;
+    await run(id, () => operatorApi.rejectApplication(id, reason), '반려했습니다.', '반려에 실패했습니다.');
   }
 
   return <main className="page page-wide">

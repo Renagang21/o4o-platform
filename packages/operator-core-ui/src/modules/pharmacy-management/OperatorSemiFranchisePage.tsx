@@ -127,10 +127,20 @@ const RECRUITMENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject'; 
   ],
 };
 
-type BusinessPageProps = {
+type BusinessPageProps = Readonly<{
   businessKey?: string;
   forumHref?: (business: SemiFranchise) => string;
-};
+}>;
+
+function loadBusinessRows(key: string, tab: Tab, status: string) {
+  switch (tab) {
+    case 'memberships': return api.listSfMemberships(key, status);
+    case 'proposals': return api.listProposals(key, status);
+    case 'events': return api.listEvents(key, status);
+    case 'recruitments': return api.listRecruitments(key, status);
+    case 'contents': return api.listContents(key, status);
+  }
+}
 
 export default function OperatorSemiFranchisePage(props: BusinessPageProps = {}) {
   return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
@@ -189,16 +199,7 @@ function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
     setRows([]);
     setLoadError('');
     try {
-      const data =
-        tab === 'memberships'
-          ? await api.listSfMemberships(sfKey, status)
-          : tab === 'proposals'
-            ? await api.listProposals(sfKey, status)
-            : tab === 'events'
-              ? await api.listEvents(sfKey, status)
-              : tab === 'recruitments'
-                ? await api.listRecruitments(sfKey, status)
-                : await api.listContents(sfKey, status);
+      const data = await loadBusinessRows(sfKey, tab, status);
       if (!Array.isArray(data)) throw new Error('목록 응답을 확인할 수 없습니다. 다시 조회해 주세요.');
       if (current()) setRows(data);
     } catch (err) {
