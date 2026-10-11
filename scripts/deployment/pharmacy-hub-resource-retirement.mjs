@@ -48,29 +48,35 @@ function checkProductionRuns(result, runId, page, status) {
   }
 }
 
-async function readProductionPage(list, status, page, runId, pause, attempt = 0) {
-  const result = await list(status, page);
-  try {
+async function readProductionStatusOnce(runId, list, status) {
+  let total;
+  for (let page = 1; page <= 10; page++) {
+    const result = await list(status, page);
     checkProductionRuns(result, runId, page, status);
-    return result;
+    if (total !== undefined && result.total_count !== total) {
+      throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; previousTotal=${total}; currentTotal=${result.total_count}. Next deletion not submitted.`);
+    }
+    total = result.total_count;
+    if (page * 100 >= total) return;
+  }
+  throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
+}
+
+async function readProductionStatus(runId, list, status, pause, attempt = 0) {
+  try {
+    await readProductionStatusOnce(runId, list, status);
   } catch (error) {
-    // Re-read count/list disagreements only; never accept an incomplete page.
+    // Restart at page one: active runs may move between pages while counts change.
     if (!(error instanceof InventoryCountError) || attempt === 2) throw error;
     await pause(2000);
-    return readProductionPage(list, status, page, runId, pause, attempt + 1);
+    await readProductionStatus(runId, list, status, pause, attempt + 1);
   }
 }
 
 export async function assertProductionIdle(runId, list, pause = ms => new Promise(resolve => setTimeout(resolve, ms))) {
   if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
   // Include queued/manual-waiting deliveries; do not infer an idle runtime from running jobs alone.
-  await Promise.all(activeStatuses.map(async status => {
-    for (let page = 1; page <= 10; page++) {
-      const result = await readProductionPage(list, status, page, runId, pause);
-      if (page * 100 >= result.total_count) return;
-    }
-    throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
-  }));
+  await Promise.all(activeStatuses.map(status => readProductionStatus(runId, list, status, pause)));
 }
 
 async function checkProductionGate() {

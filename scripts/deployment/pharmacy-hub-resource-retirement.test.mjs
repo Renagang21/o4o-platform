@@ -182,3 +182,19 @@ test('count/list disagreement is retried read-only while writers and malformed m
   await assert.rejects(assertProductionIdle(10, async () => ({ total_count: '1', workflow_runs: [] }),
     async () => assert.fail('malformed metadata must not be retried')), /incomplete/);
 });
+
+test('pagination drift restarts at page one so a shifted writer is not missed', async () => {
+  let starts = 0;
+  const ci = () => Array.from({ length: 100 }, (_, index) => ({ id: index + 100, path: '.github/workflows/ci-pipeline.yml', status: 'queued' }));
+  await assert.rejects(assertProductionIdle(10, async (status, page) => {
+    if (status !== 'queued') return { total_count: 0, workflow_runs: [] };
+    if (page === 1) {
+      starts++;
+      const runs = ci();
+      if (starts > 1) runs[99] = { id: 12, path: '.github/workflows/delivery.yml', status: 'queued' };
+      return { total_count: starts === 1 ? 101 : 100, workflow_runs: runs };
+    }
+    return { total_count: 100, workflow_runs: [] };
+  }, async () => {}), /write gate blocked/);
+  assert.equal(starts, 2);
+});
