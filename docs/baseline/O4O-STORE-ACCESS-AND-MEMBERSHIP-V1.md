@@ -1,5 +1,8 @@
 # O4O-STORE-ACCESS-AND-MEMBERSHIP-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **Status**: Active · **확정일**: 2026-10-03 · **갱신**: 2026-10-05 (§3-A 약국 자가 가입 제외)

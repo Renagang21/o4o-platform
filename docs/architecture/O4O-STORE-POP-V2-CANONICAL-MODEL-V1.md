@@ -1,5 +1,11 @@
 # O4O Store POP V2 — Canonical Model V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 > **상태**: ACTIVE · **작성일**: 2026-09-10
 > **WO**: `WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1`
 > **선행 조사**: [`IR-O4O-STORE-POP-REAL-WORLD-USAGE-AND-PLACEMENT-AUDIT-V1`](../investigations/IR-O4O-STORE-POP-REAL-WORLD-USAGE-AND-PLACEMENT-AUDIT-V1.md)
@@ -24,6 +30,9 @@ V2 의 1급 개체는 **POP Document** 다. 출력물은 Document 의 부산물�
 
 ## 2. 기존 POP 3축 재조사 결과 (reference-only)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 조사 결과 기존 "POP" 은 **서로 다른 3개 축**이 같은 이름을 쓰고 있었다.
 
 | 축 | 실체 | 테이블 | 마운트 | V2 취급 |
@@ -33,6 +42,9 @@ V2 의 1급 개체는 **POP Document** 다. 출력물은 Document 의 부산물�
 | **C. 산출물 로그** | 생성된 PDF 파일 이력 | `store_execution_assets(usage_type='pop')` | 3서비스 공통 | **과거 output history 로 보존** |
 
 ### 2-1. 이미 존재하는 공통 Core
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 `packages/store-ui-core/src/components/pop/` 13파일
 (`StorePopComposerView` · `usePopComposer` · `PopLayoutTemplateSection` · `PopQrSelector` …)
@@ -115,6 +127,9 @@ V2 Editor 안에서 그대로 유효하다. 다만 종점이 `generate()` 가 �
 제약: `CHK_spd_sources_nonempty` · `CHK_spd_kind` · `CHK_spd_status` · `CHK_spd_layout`
 
 ### 4-2. 불변식
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 | # | 불변식 |
 |---|---|

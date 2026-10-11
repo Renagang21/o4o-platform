@@ -1,5 +1,8 @@
 # DESIGN-O4O-STORE-QR-CANONICAL-TARGET-PLACEMENT-AND-ANALYTICS-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **상태**: Active Design (설계 확정 · **구현 미착수**)
 > **WO**: `WO-O4O-STORE-QR-CANONICAL-TARGET-AND-PLACEMENT-DESIGN-V1`
 > **작성일**: 2026-09-09
@@ -10,6 +13,9 @@
 ---
 
 ## §0. 확정 기준 문장 (본 설계의 전제)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 ```text
 1. Tablet KPA/PH canonical axis는 이미 구현·배포·E2E까지 CLOSED다.
@@ -48,6 +54,9 @@
 ---
 
 ## §1. 현재 상태 요약 (census 결과)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 전문은 IR-V2. 설계에 직접 영향을 주는 사실만 옮긴다.
 
@@ -227,6 +236,9 @@ B2B / B2C 자동 fallback 은 금지한다.
 
 ### 5-2. 계약
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 1. QR 은 상품 콘텐츠를 **새로 고르지 않는다.** Tablet 과 동일한 resolve 함수를 호출한다.
 2. resolve 결과가 ③ empty 이면 QR 을 **생성하지 못하게 막는다** (PH 컨트롤러 헤더 원칙: "스캔했을 때 빈 화면이 되는 QR 0").
 3. `B2B` / `B2C` description_type 으로의 자동 fallback 은 QR 에서도 금지한다.
@@ -243,6 +255,9 @@ B2B / B2C 자동 fallback 은 금지한다.
 "프로모션"은 별도 target 이 아니라 `CONTENT` + 매장 콘텐츠다 — 그래서 `landing_type='promotion'` 은 DEAD 다.
 
 ### 6-2. Content picker 재사용
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 ```text
 canonical picker = services/web-kpa-society/src/components/store/StoreAssetSelectorModal.tsx
@@ -651,6 +666,9 @@ placement 축 추가는 QR 쪽 메타데이터일 뿐 개인 식별성을 높이
 
 ### 17-1. 4개 경계
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 | 경계 | 범위 | 현재 자산 | 조치 |
 |---|---|---|---|
 | **COMMON QR OPERATION** | 목록 · 생성 · 수정 · lifecycle · target selection · placement · analytics | `StoreQrConsoleView` 598L (**1세대**, 소비처 = KCos 1곳) | **세대 교체**. KPA `StoreQRPage` 2,070L 을 기준으로 새 공통 View 를 만들고 KPA·PH·KCos 3곳이 채택 |
@@ -735,6 +753,9 @@ ESL integration
 
 ### Phase 1 — QR Canonical Target + Common Operation + KPA/PH Parity
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 ```text
 1. type write/read 중단 · promotion 신규 생성 차단 · video → CONTENT+STORE_VIDEO
 2. contentSource 컬럼 승격 (additive, nullable) + 기존 88건 backfill 매핑 (§2-3)
@@ -764,6 +785,9 @@ schema 변경: additive 1개 컬럼 (contentSource) + backfill
 
 ### 21-1. 하나로 합칠 수 있는가
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
+
 **합치지 않는 것을 권장한다.** Phase 1 은 additive 컬럼 1개로 회귀 위험이 낮지만, Phase 2 는 신규 테이블 + backfill + UX 동선 신설이라 성격이 다르다. Phase 1 결과(공통 View 채택)를 매장이 실제로 쓰는 것을 확인한 뒤 placement 를 얹는 것이 안전하다.
 
 단, Phase 1 의 3·6번(landable 일반화 · PH parity)은 **Phase 1 안에서 반드시 끝내야 한다** — 여기서 미루면 Phase 2 의 placement UI 가 서비스별로 두 벌 생긴다.
@@ -771,6 +795,9 @@ schema 변경: additive 1개 컬럼 (contentSource) + backfill
 ---
 
 ## §22. 완료 조건
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 ```text
 QR TARGET MODEL       = CLOSED   (§2 · §3)

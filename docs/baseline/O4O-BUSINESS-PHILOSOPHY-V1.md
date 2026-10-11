@@ -1,5 +1,8 @@
 # O4O-BUSINESS-PHILOSOPHY-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > 이 문서는 O4O Platform 판단의 최상위 기준 문서이다.
 > 세부 구현 지시는 개별 WO 및 하위 기준 문서를 따른다.
 > **정정 (2026-09-17, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)**: 역할 경계 · 업무공간 · 콘텐츠 유입 경로는 [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) 이 동급 정본이며 충돌 시 그 문서가 우선한다 (동 문서 §8). 종전 §3 · §4 · §7 · 주의사항의 "3자 구조 / 공급자 직접 제작 주체 아님 / Neture 내 매장 금지" 서술은 그 문서 §1 · §2-1 · §3 기준으로 본문을 정렬했다.

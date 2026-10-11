@@ -1,5 +1,8 @@
 # O4O-STORE-CONTENT-AND-EXECUTION-MODEL-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **Status**: Active · **성격**: Canonical Architecture & Product Baseline
 > **작성일**: 2026-09-08 · **근거 WO**: `WO-O4O-STORE-CONTENT-TABLET-QR-CANONICAL-BASELINE-AND-LEGACY-CENSUS-V1`
 > **현재 코드 census(자매 문서)**: [`IR-O4O-STORE-CONTENT-TABLET-QR-CURRENT-STATE-AND-LEGACY-CENSUS-V1`](../investigations/IR-O4O-STORE-CONTENT-TABLET-QR-CURRENT-STATE-AND-LEGACY-CENSUS-V1.md)

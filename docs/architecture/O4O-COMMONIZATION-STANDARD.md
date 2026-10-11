@@ -1,5 +1,8 @@
 # O4O Commonization Standard
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **상위 문서**: `CLAUDE.md`
 > **관련**: `docs/o4o-common-structure.md`, `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md`, `docs/architecture/STORE-LAYER-ARCHITECTURE.md`, `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
 > **버전**: V3
@@ -460,6 +463,9 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 ---
 
 ## Changelog
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PH 소비처·adapter 유지·picker/source 확장·parity·후속 구현/최종 판정은 [완전 폐기 정책](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH를 새 소비처/구현/가입/역할 발급/복구/확장 대상으로 포함하지 않는다. PH를 포함했던 서비스 수·동시 정렬 지시도 PH에는 적용하지 않는다. 공용 Core·KPA/Neture와 다른 서비스·인쇄 QR 연결은 유지한다. 아래 PH 계약은 폐기 전 이력이다.
+
 
 | 날짜 | 버전 | 변경 |
 |------|------|------|
