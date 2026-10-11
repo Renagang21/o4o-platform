@@ -75,11 +75,16 @@ export async function listCommunityPublicReadSettings(exec: Exec, key: string, u
     FROM forum_category_requests WHERE service_code = ANY($1::text[]) AND organization_id IS NULL
       AND status = 'completed' ORDER BY name, id`, [value.forumStorageCodes]);
   // Bounded chooser per board; no content, author/profile or member data in this response.
-  const posts = await exec.query(`SELECT p.id, p.title, p.forum_id AS "forumId", p.created_at AS "createdAt"
-    FROM forum_post p JOIN forum_category_requests b ON b.id = p.forum_id
+  const posts = await exec.query(`SELECT p.id, p.title, b.id AS "forumId", p.created_at AS "createdAt"
+    FROM forum_category_requests b
+    JOIN LATERAL (
+      SELECT id, title, created_at FROM forum_post WHERE forum_id = b.id
+        AND status = 'publish' AND organization_id IS NULL AND is_organization_exclusive = false
+      ORDER BY created_at DESC, id LIMIT 100
+    ) p ON true
     WHERE b.service_code = ANY($1::text[]) AND b.status = 'completed' AND b.organization_id IS NULL
-      AND p.status = 'publish' AND p.organization_id IS NULL AND p.is_organization_exclusive = false
-    ORDER BY p.created_at DESC LIMIT 1000`, [value.forumStorageCodes]);
+      AND b.forum_type = 'open'
+    ORDER BY b.id, p.created_at DESC, p.id`, [value.forumStorageCodes]);
   return { boards, posts };
 }
 

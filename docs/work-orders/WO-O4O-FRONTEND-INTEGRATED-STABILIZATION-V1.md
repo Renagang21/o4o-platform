@@ -112,3 +112,5 @@ HEAD `71c1604ba`의 자동 리뷰 P1은 raw SQL 날짜 컬럼의 Entity 매핑 �
 리뷰 수정 후 공개/공지 필터·generic isolation·회원 mount·main #451 funding forum API 98 tests PASS. raw SQL 전체 list/detail/chooser SELECT/ORDER와 createdAt 응답 alias, 명시적 공개/선택/철회/비공개/다른 scope를 격리 PostgreSQL 15에서 실행해 PASS했다. Entity decorator의 실제 물리 컬럼을 대조하는 API 회귀도 통과했다.
 
 PH 연계 최신 관측: [QR Cutover 38119869917](https://github.com/Renagang21/o4o-platform/actions/runs/38119869917)은 SUCCESS이고 artifact after.json은 두 옛 호스트 matcher의 backend 연결 없이 pharmacy.neture.co.kr FOUND redirect 및 stripQuery=false를 확인했다. 이는 과거 rollback census 이후의 URL map 적용 증거다. 담당 자원 제거 PR #459는 별도 작업이며 전용 Cloud Run/backend/NEG·DB 귀속/FK/법정 보존 판단과 삭제 완료로 해석하지 않는다. 현재 클라우드는 spec/observed 37, current·running·failure 없음을 재확인했고 설정 재저장/게시 변경은 필요하지 않다.
+
+공개 설정 chooser의 커뮤니티 전체 LIMIT 1000이 다른 게시판의 글을 밀어낼 수 있다는 P2도 반영한다. 열린 게시판별 LATERAL 조회로 최근 100개를 각각 선택하며 폐쇄 게시판을 선택 목록에서 제외한다. 고정/최근 공지 정책과 별개로 공개 선택은 최대100개다. 기존 선택 ID는 화면 목록 밖에 있어도 유지하고 서버는 저장 시 게시 상태·같은 게시판·조직 경계를 다시 검증한다.

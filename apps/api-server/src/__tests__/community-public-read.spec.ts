@@ -134,4 +134,9 @@ it('operator post chooser uses the physical date column and keeps the response a
   const columns = new Set(getMetadataArgsStorage().columns.filter(c => c.target === ForumPost).map(c => c.options.name ?? c.propertyName));
   for (const match of sql.matchAll(/\bp\.(?:"([^"]+)"|(\w+))/g)) expect(columns.has(match[1] ?? match[2])).toBe(true);
   expect(sql).toContain('p.created_at AS "createdAt"');
+  expect(sql).toContain('JOIN LATERAL');
+  expect(sql).toContain('WHERE forum_id = b.id');
+  expect(sql).toContain('ORDER BY created_at DESC, id LIMIT 100');
+  expect(sql).toContain("b.forum_type = 'open'");
+  expect(sql).not.toContain('LIMIT 1000');
 });
