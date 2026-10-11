@@ -1,4 +1,4 @@
-import type { Repository } from 'typeorm';
+import type { Repository, QueryRunner } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { SupplierProductOffer, OfferApprovalStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
@@ -72,41 +72,25 @@ export class OfferLifecycleService {
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
-        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
-          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
-          [offerId],
-        );
-        if (existingApprovals.length === 0) {
-          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(keys)];
-          if (uniqueKeys.length === 0) {
-            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3):
-            //   공급처를 지정하지 않은 제품은 서비스 승인(OSA) 행이 없어 파생 sync 로는 APPROVED 가 될 수 없었다.
-            //   이 경우 운영자 승인 = **제품 등록 승인**을 직접 기록한다(pharmacy 기본 공급 대상).
-            //   세미프랜차이즈별 공급 승인은 supply_proposals 가 따로 맡는다. OSA 행이 있는 제품은 기존 파생 규칙 그대로.
-            await queryRunner.query(
-              `UPDATE supplier_product_offers
-                  SET approval_status = 'APPROVED', is_active = true, updated_at = NOW()
-                WHERE id = $1`,
-              [offerId],
-            );
-            await queryRunner.commitTransaction();
-            logger.info(`[NetureOfferService] Offer registration approved (no designated supply target): ${offerId} by ${adminUserId}`);
-            return {
-              success: true,
-              data: { id: offer.id, masterId: offer.masterId, isActive: true, approvalStatus: OfferApprovalStatus.APPROVED, autoListedCount: 0 },
-            };
-          }
-          if (uniqueKeys.length > 0) {
-            const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
-            await queryRunner.query(
-              `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-               VALUES ${values}
-               ON CONFLICT (offer_id, service_key) DO NOTHING`,
-              [offerId, ...uniqueKeys],
-            );
-          }
+        // 기존 승인 원장 조회/누락 행 생성은 단일 transaction helper로 공유한다.
+        const hasServiceApprovals = await this.ensureServiceApprovals(offerId, offer.serviceKeys, queryRunner);
+        if (!hasServiceApprovals) {
+          // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3):
+          //   공급처를 지정하지 않은 제품은 서비스 승인(OSA) 행이 없어 파생 sync 로는 APPROVED 가 될 수 없었다.
+          //   이 경우 운영자 승인 = **제품 등록 승인**을 직접 기록한다(pharmacy 기본 공급 대상).
+          //   세미프랜차이즈별 공급 승인은 supply_proposals 가 따로 맡는다. OSA 행이 있는 제품은 기존 파생 규칙 그대로.
+          await queryRunner.query(
+            `UPDATE supplier_product_offers
+                SET approval_status = 'APPROVED', is_active = true, updated_at = NOW()
+              WHERE id = $1`,
+            [offerId],
+          );
+          await queryRunner.commitTransaction();
+          logger.info(`[NetureOfferService] Offer registration approved (no designated supply target): ${offerId} by ${adminUserId}`);
+          return {
+            success: true,
+            data: { id: offer.id, masterId: offer.masterId, isActive: true, approvalStatus: OfferApprovalStatus.APPROVED, autoListedCount: 0 },
+          };
         }
 
         // 2. 모든 service approvals를 approved로 일괄 변경
@@ -176,50 +160,36 @@ export class OfferLifecycleService {
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
-        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
-          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
-          [offerId],
-        );
-        if (existingApprovals.length === 0) {
-          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(keys)];
-          if (uniqueKeys.length === 0) {
-            // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3): approveProduct 의 공급처 미지정 분기와 짝.
-            //   OSA 행이 없으면 파생 sync 가 PENDING 을 돌려주므로 제품 등록 반려를 직접 기록하고,
-            //   파생 REJECTED 와 같은 cascade(product_approvals revoke · listings 비활성)를 적용한다.
-            //   (offer 에 반려 사유 컬럼은 없다 — 사유는 product_approvals · 로그에 남는다.)
-            await queryRunner.query(
-              `UPDATE supplier_product_offers
-                  SET approval_status = 'REJECTED', is_active = false, updated_at = NOW()
-                WHERE id = $1`,
-              [offerId],
-            );
-            await queryRunner.query(
-              `UPDATE product_approvals
-                  SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
-                      reason = $3, updated_at = NOW()
-                WHERE offer_id = $1 AND approval_status = 'approved'`,
-              [offerId, adminUserId, reason || 'Offer rejected by admin'],
-            );
-            await queryRunner.query(
-              `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
-              [offerId],
-            );
-            await queryRunner.commitTransaction();
-            logger.info(`[NetureOfferService] Offer registration rejected (no designated supply target): ${offerId} by ${adminUserId} (reason: ${reason || '-'})`);
-            return {
-              success: true,
-              data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: OfferApprovalStatus.REJECTED },
-            };
-          }
-          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+        // 기존 승인 원장 조회/누락 행 생성은 단일 transaction helper로 공유한다.
+        const hasServiceApprovals = await this.ensureServiceApprovals(offerId, offer.serviceKeys, queryRunner);
+        if (!hasServiceApprovals) {
+          // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §3-3): approveProduct 의 공급처 미지정 분기와 짝.
+          //   OSA 행이 없으면 파생 sync 가 PENDING 을 돌려주므로 제품 등록 반려를 직접 기록하고,
+          //   파생 REJECTED 와 같은 cascade(product_approvals revoke · listings 비활성)를 적용한다.
+          //   (offer 에 반려 사유 컬럼은 없다 — 사유는 product_approvals · 로그에 남는다.)
           await queryRunner.query(
-            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-             VALUES ${values}
-             ON CONFLICT (offer_id, service_key) DO NOTHING`,
-            [offerId, ...uniqueKeys],
+            `UPDATE supplier_product_offers
+                SET approval_status = 'REJECTED', is_active = false, updated_at = NOW()
+              WHERE id = $1`,
+            [offerId],
           );
+          await queryRunner.query(
+            `UPDATE product_approvals
+                SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
+                    reason = $3, updated_at = NOW()
+              WHERE offer_id = $1 AND approval_status = 'approved'`,
+            [offerId, adminUserId, reason || 'Offer rejected by admin'],
+          );
+          await queryRunner.query(
+            `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
+            [offerId],
+          );
+          await queryRunner.commitTransaction();
+          logger.info(`[NetureOfferService] Offer registration rejected (no designated supply target): ${offerId} by ${adminUserId} (reason: ${reason || '-'})`);
+          return {
+            success: true,
+            data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: OfferApprovalStatus.REJECTED },
+          };
         }
 
         // 2. 모든 service approvals를 rejected로 일괄 변경
@@ -252,6 +222,30 @@ export class OfferLifecycleService {
       logger.error('[NetureOfferService] Error rejecting offer:', error);
       throw error;
     }
+  }
+
+  /** Existing operator override preparation; false means targetless registration. */
+  private async ensureServiceApprovals(
+    offerId: string,
+    serviceKeys: string[] | null | undefined,
+    queryRunner: QueryRunner,
+  ): Promise<boolean> {
+    const existingApprovals: Array<{ id: string }> = await queryRunner.query(
+      `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
+      [offerId],
+    );
+    if (existingApprovals.length > 0) return true;
+    const keys = serviceKeys?.length ? serviceKeys : [];
+    const uniqueKeys = [...new Set(keys)];
+    if (uniqueKeys.length === 0) return false;
+    const values = uniqueKeys.map((_, i) => `($1, ${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+    await queryRunner.query(
+      `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+             VALUES ${values}
+             ON CONFLICT (offer_id, service_key) DO NOTHING`,
+      [offerId, ...uniqueKeys],
+    );
+    return true;
   }
 
   // ==================== Supplier: Submit for Approval (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ====================
