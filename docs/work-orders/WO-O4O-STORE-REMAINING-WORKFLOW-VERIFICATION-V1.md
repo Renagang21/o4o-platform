@@ -62,3 +62,20 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 ## 자동 리뷰 보완
 
 PR #470의 두 P1 finding(원격 proxy socket을 로컬로 오인할 가능성, stale dist 재사용)을 반영했다. 단순 경로/소스 일치 비교 대신 실제 로컬 서버 identity를 DDL 전에 확인하고, 검증 코드 전체를 현재 source에서 컴파일한다. 보완한 실제 SQL 6개와 proxy 차단·stale artifact 비사용 검증이 통과했다.
+
+## 기존 조직 정리 read-only 재진단
+
+기존 16개 삭제 후보와 유지 매장 A를 명시한 read-only plan 38128450487은 main `e1cd3b187861f22edd15c0ff2e05f4a43af1091f`에서 실행했고 참조 검사로 중단됐다. apply를 요청하지 않았고 데이터 삭제는 0건이다.
+
+| 미모델링 참조 | 일치 행 수 | 참조 대상 |
+|---|---:|---|
+| `checkout_orders.sellerId` | 14 | organizations |
+| `checkout_orders.sellerOrganizationId` | 14 | organizations |
+| `kpa_operator_audit_logs.target_id` | 2 | kpa_members |
+| `organization_product_listings.source_id` | 1 | organization_product_listings |
+
+두 주문 컬럼의 수를 더해 주문 28건으로 해석하지 않는다. 코드의 주문 판매자/조직 구분, 감사 로그의 `target_type`, 상품 출처의 `source_type`은 서로 다른 의미를 가진다. UUID가 일치한다는 사실만으로 범용 cascade 삭제 규칙을 추가하지 않는다. 후속 정리는 후보 조직별 주문의 종속 관계와 보존 범위, 감사 대상의 기록 보존 방식, 다른 매장의 상품 출처 참조 여부를 먼저 확인하고 삭제·보존 규칙과 새 plan을 검증해야 한다. 운영자·관리자 계정은 계속 보존한다.
+
+## main 통합 기록
+
+PR #470은 최신 head의 CI 38128964948, SonarCloud 및 CodeQL 38128964933을 통과했고 두 P1 스레드의 보완·해결을 확인했다. main merge commit은 `c8903e1b8a013c8d6424af727bd75aa3ec8cf2ca`다. 동일 WO 결과 기록 Phase는 기존 전용 worktree/branch를 이어 사용한다. 검증 도구와 문서만 변경하므로 DEPLOYMENT = NOT_APPLICABLE이다.
