@@ -45,3 +45,7 @@ AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이�
 격리된 임시 로컬 PostgreSQL database에서 Node test runner **15 tests PASS, skip 0**. 실제 SQL로 read-only plan, 3행 삭제·before-image 저장·원본/계정/소유 보존, UUID·대소문자 text·nested JSON·UUID 배열 참조 차단, 편집 내용·원본 변경 시 digest 불일치, root delete 실패 시 종속 삭제/복구 insert rollback, 복구 insert 억제/복구 table 부재 시 삭제 차단을 확인했다. 테스트 database는 실행 후 삭제했다. 운영 DB에 이 결과를 적용한 것으로 간주하지 않는다.
 
 로컬 PostgreSQL의 JSON/배열-only 참조 table에서 미사용 bind parameter의 SQLSTATE 42P18을 실제 발견했다. 모든 probe의 parameter type을 명시하고 전체 테스트를 다시 통과했다. 라이브 테스트에서 확인한 결과와 mock 검증을 혼동하지 않는다.
+
+## 운영 plan 최초 실행과 제한 조정
+
+PR #452는 필수 CI·CodeQL과 미해결 리뷰 blocker 없음 확인 후 main `1ef602d63`에 통합했다. 운영 read-only plan 38117865729는 SQLSTATE `57014`(statement timeout)로 실패했다. apply는 실행하지 않았고 삭제는 0행이다. 전체 참조 조사를 생략하지 않고 statement 제한을 15초에서 60초로 조정한다. 실패한 table은 SHA256의 앞 16자리로 구분해 데이터 원문이나 schema 식별자를 추가로 노출하지 않는다. 5초 lock 제한·정확한 digest·3행 범위·복구 및 보존 확인은 유지한다. 같은 WO의 보완 Phase로 기존 작업 worktree에서 새 연속 branch를 사용한다.

@@ -72,7 +72,9 @@ export async function referenceAudit(client, columns, roots) {
       WHERE (${predicates.join(' OR ')}) AND cardinality($1::uuid[]) > 0 AND cardinality($2::text[]) > 0${own ? ' AND id <> $3::uuid' : ''}`;
     const args = [ids, ids.map(id => '%' + id + '%')];
     if (own) args.push(own.row.id);
-    const count = (await client.query(sql, args)).rows[0].count;
+    let count;
+    try { count = (await client.query(sql, args)).rows[0].count; }
+    catch (error) { throw safeInventoryError(error, 'verification-copy-reference-' + fingerprint(table).slice(0, 16)); }
     if (count) blockers.push({ table, count });
   }
   return blockers;
@@ -109,7 +111,7 @@ export async function runVerificationCopyCleanup(client, options) {
   const apply = options.apply === true;
   await client.query(apply ? 'BEGIN ISOLATION LEVEL SERIALIZABLE' : 'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   try {
-    await client.query("SET LOCAL statement_timeout='15s'");
+    await client.query("SET LOCAL statement_timeout='60s'");
     await client.query("SET LOCAL lock_timeout='5s'");
     if (apply) await client.query("SELECT pg_advisory_xact_lock(hashtext('canonical-demo-store-relink'))");
     const before = await inspect(client, options);
