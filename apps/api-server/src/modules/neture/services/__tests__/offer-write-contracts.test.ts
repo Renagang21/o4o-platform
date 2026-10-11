@@ -127,6 +127,8 @@ describe('operator decisions: idempotency, permit and atomic service approvals',
     await runDecision(method);
     const insert = tx.query.mock.calls.find(([sql]) => sql.includes('INSERT INTO offer_service_approvals'));
     expect(insert?.[1]).toEqual(['offer-fixture', 'kpa-society', 'k-cosmetics']);
+    expect(insert?.[0]).toContain("VALUES ($1, $2, 'pending', NOW(), NOW()), ($1, $3, 'pending', NOW(), NOW())");
+    expect([...new Set(insert?.[0].match(/\$\d+/g))]).toEqual(['$1', '$2', '$3']);
     expect(insert?.[0]).toContain('ON CONFLICT (offer_id, service_key) DO NOTHING');
     expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
     expect(events).toEqual(['startTransaction', 'select', 'write', 'write', 'sync', 'commitTransaction', 'release']);
@@ -138,6 +140,29 @@ describe('operator decisions: idempotency, permit and atomic service approvals',
     expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO'))).toBe(false);
     expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
     expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
+  });
+  it.each(['approveProduct', 'rejectProduct'] as const)('%s existing approvals with empty targets still use derived sync', async (method) => {
+    repo.findOne.mockResolvedValue(fixture({ serviceKeys: [] }));
+    tx.query.mockResolvedValue([{ id: 'approval-fixture' }]);
+    await runDecision(method);
+    expect(mockSync).toHaveBeenCalledWith('offer-fixture', 'actor-fixture', tx);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('UPDATE supplier_product_offers'))).toBe(false);
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('INSERT INTO'))).toBe(false);
+    expect(tx.commitTransaction).toHaveBeenCalledTimes(1);
+  });
+  it.each([
+    ['approveProduct', 'select'], ['approveProduct', 'insert'],
+    ['rejectProduct', 'select'], ['rejectProduct', 'insert'],
+  ] as const)('%s preparation %s failure rolls back before decision', async (method, stage) => {
+    const failure = new Error('Fixture preparation failure');
+    if (stage === 'insert') tx.query.mockResolvedValueOnce([]);
+    tx.query.mockRejectedValueOnce(failure);
+    await expect(runDecision(method)).rejects.toBe(failure);
+    expect(mockSync).not.toHaveBeenCalled();
+    expect(tx.query.mock.calls.some(([sql]) => sql.includes('UPDATE'))).toBe(false);
+    expect(tx.commitTransaction).not.toHaveBeenCalled();
+    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
+    expect(tx.release).toHaveBeenCalledTimes(1);
   });
   it('rejection preserves actor and explicit reason bindings', async () => {
     await service.rejectProduct('offer-fixture', 'actor-fixture', 'Fixture reason');
