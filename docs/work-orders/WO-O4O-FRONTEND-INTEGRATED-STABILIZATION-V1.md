@@ -118,3 +118,11 @@ PH 연계 최신 관측: [QR Cutover 38119869917](https://github.com/Renagang21/
 후속 P1 보완: 최근100개 목록 밖의 기존 선택은 삭제 없이 유지하되, 개별 글 보기·선택 해제 컨트롤을 추가해 해당 글만 철회할 수 있게 한다. 선택 해제 후 저장하면 해당 ID를 제외하고 다른 선택을 보존한다. 삭제/draft 전환 등으로 보기 불가한 기존 ID도 개별 해제할 수 있다. 해당 회귀를 추가하고 운영 DB 변경 없이 검증한다.
 
 공개 설정 UI 5 tests 및 최종 Neture build PASS. 목록 밖 선택의 보기/개별 해제/저장 payload를 실제 번들 PC1440·mobile390/320 3개 fixture에서도 확인했다. 원래 선택의 보존과 의도적인 개별 철회를 구분한다.
+
+## 6. 최신 통합 소스 검증 (2026-10-11)
+
+main #460 공급자 책임 분리·#455 점검 스크립트·#461 My Home 참여/활동 통합을 자기 branch에 merge 방식으로 반영했다. 다른 세션의 작업을 재구현하거나 작업공간을 변경하지 않는다. 최신 Neture 전체 526 tests·production build PASS, My Home 최신 PC1440/mobile375/320의 18 E2E PASS. 공개 UI 5 tests·목록 밖 선택 보기/개별 철회 PC1440/mobile390/320 3 fixture PASS. API 공개/공지·회원 mount·generic isolation·funding forum 98 tests PASS. API build PASS와 격리 PostgreSQL의 전체 list/detail/chooser SQL/물리 컬럼/JSON/공개 조건/게시판별 상한 검증 PASS를 확인했다.
+
+PR #458의 이전 HEAD 전체 CI는 통과했으나 리뷰에서 발견한 목록 밖 개별 철회를 보완했으므로 최종 HEAD의 required CI·자동 리뷰를 다시 수행한다. 이 절 시점의 push/main/배포는 완료로 표기하지 않으며 실제 결과를 후속 기록한다. 대표 홈 정본의 과거 화면 미적용 표기는 이미 main에서 #402 구현·배포 완료 상태로 정비되어 있어 중복 수정하지 않는다.
+
+실계정 사용자 테스트는 T13에서 운영자 공급자/내 매장 관리, Google/Kakao, My Home 실제 Study/Funding/커뮤니티/선택 매장 데이터와 서비스 이동, 약국 회원 홈, 공개 설정/철회를 확인한다. 이전 공간은 식별·보존 확인과 사용자 최종 테스트 전에 삭제하지 않는다. 현재 worktree는 같은 미완료 WO의 연속 phase이며 KEEP이다.
