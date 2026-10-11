@@ -1,4 +1,6 @@
 import express from 'express';
+import { getMetadataArgsStorage } from 'typeorm';
+import { ForumPost } from '../../../../packages/forum-core/src/backend/entities/ForumPost';
 import request from 'supertest';
 import { resolveCommunityWorkspace } from '../services/community/community-workspace.service.js';
 import { createCommunityPublicReadRoutes } from '../routes/community-public-read.routes.js';
@@ -32,6 +34,11 @@ describe('explicit public content read boundary', () => {
     expect(detail.status).toBe(200);
     expect(detail.body.data.post).toEqual({ id: postId, slug: 'public-fixture', title: '공개 글', content: [] });
     for (const [sql, params] of query.mock.calls) {
+      const columns = new Set(getMetadataArgsStorage().columns.filter(c => c.target === ForumPost).map(c => c.options.name ?? c.propertyName));
+      for (const match of sql.matchAll(/\bp\.(?:"([^"]+)"|(\w+))/g)) {
+        expect(columns.has(match[1] ?? match[2])).toBe(true);
+      }
+      expect(sql).toContain('p.created_at AS "createdAt"');
       expect(sql).toContain("b.forum_type = 'open'");
       expect(sql).toContain("b.status = 'completed'");
       expect(sql).toContain("p.status = 'publish'");
@@ -118,4 +125,13 @@ describe('operator designation preserves member boundaries', () => {
   it.each([{ mode: ['private'] }, { mode: 'unknown' }, { mode: 'selected', postIds: ['bad'] }, { mode: 'board', postIds: [postId] }])('rejects malformed selection %j', input => {
     expect(() => parsePublicReadInput(input)).toThrow();
   });
+});
+
+it('operator post chooser uses the physical date column and keeps the response alias', async () => {
+  query.mockResolvedValue([]);
+  await request(app).get('/communities/fixture/public-read-settings').set('x-fixture-operator', 'yes').expect(200);
+  const sql = query.mock.calls.find(([s]) => s.includes('FROM forum_post'))![0];
+  const columns = new Set(getMetadataArgsStorage().columns.filter(c => c.target === ForumPost).map(c => c.options.name ?? c.propertyName));
+  for (const match of sql.matchAll(/\bp\.(?:"([^"]+)"|(\w+))/g)) expect(columns.has(match[1] ?? match[2])).toBe(true);
+  expect(sql).toContain('p.created_at AS "createdAt"');
 });

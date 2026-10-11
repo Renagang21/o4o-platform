@@ -70,7 +70,7 @@ UI 표현 변경으로 권한 계약을 확장하지 않는다. 별도 사용자
 
 ### 4.3 다른 실행 주체와 연계
 
-- [펀딩 PR #451](https://github.com/Renagang21/o4o-platform/pull/451)은 개설·심사·전용 포럼·개설자 운영의 별도 작업이며 Hub와 SupplierProducts 파일도 변경한다. 이번 조회 실패/배치 수정은 기존 모집·참여 계약만 다루고, 통합 직전 해당 PR의 main 반영 여부와 중복 파일을 다시 확인한다.
+- [펀딩 PR #451](https://github.com/Renagang21/o4o-platform/pull/451)은 main `b565fb009`에 병합된 개설·심사·전용 포럼·개설자 운영의 별도 작업이며 Hub와 SupplierProducts 파일도 변경한다. 이번 조회 실패/배치 수정은 기존 모집·참여 계약만 다루고, main 통합에서 두 변경을 보존해 충돌을 해결했고 Neture 514 tests·관련 PC/mobile 15개 fixture를 재검증했다.
 - PharmacyHub의 네 Cloud read 권한은 해소됐다. census [38118536052](https://github.com/Renagang21/o4o-platform/actions/runs/38118536052)은 SUCCESS이나 전환 완료가 아니라 실패 후 복구 확인이다. 호스트는 기존 응답 상태이며 자원/DB 삭제는 미완료다. [PR #456](https://github.com/Renagang21/o4o-platform/pull/456)은 엄격 HTTP 검증의 대기 시간을 보완한다. 담당 실행을 중복 dispatch하지 않으며 호스트/path/query/실제 QR·tablet 검증 성공 → 전용 자원 참조 0 → 데이터 귀속/FK·법정 보존 판정 순서로 추적한다.
 - 이전 클라우드 작업공간의 식별 정보는 이 저장소의 worktree 이름만으로 확정할 수 없다. 기준 checkout과 과거 worktree를 유지하고 미푸시·복원 자료 확인 및 T13 결과 전 삭제하지 않는다.
 
@@ -103,4 +103,12 @@ UI PR #458에 이 WO의 공지·공개 정책 후속 phase를 함께 반영하�
 
 ### 5.1 확정 정책 구현 검증
 
-공개 읽기/기존 member mount·scope isolation API 56 tests, 공개 읽기/공지 필터 24 tests PASS. Neture 전체 500 tests와 Pharmacy 회원 홈 16 tests PASS. API·Neture·Pharmacy 최종 build PASS. 실제 번들 및 모의 API의 공개 목록/상세·철회 후 404·운영 설정/폐쇄 게시판 제한·약국 공지 PC 1440/mobile 390/320 9개 PASS. 고정 공지가 20개 이상이어도 최근 공지 5개를 별도 조회한다. 실제 운영 공개 지정이나 회원 DB 변경은 수행하지 않았다.
+공개 읽기/기존 member mount·scope isolation API 56 tests, 공개 읽기/공지 필터 24 tests PASS. main 동기화 후 Neture 전체 514 tests와 Pharmacy 회원 홈 16 tests PASS. API·Neture·Pharmacy 최종 build PASS. 실제 번들 및 모의 API의 공개 목록/상세·철회 후 404·운영 설정/폐쇄 게시판 제한·약국 공지 PC 1440/mobile 390/320 9개 PASS. 고정 공지가 20개 이상이어도 최근 공지 5개를 별도 조회한다. 실제 운영 공개 지정이나 회원 DB 변경은 수행하지 않았다.
+
+### 5.2 최종 리뷰 보완
+
+HEAD `71c1604ba`의 자동 리뷰 P1은 raw SQL 날짜 컬럼의 Entity 매핑 불일치다. `p.created_at AS "createdAt"` 선택과 물리 컬럼 정렬로 목록/상세/운영자 chooser를 수정하며 실제 Entity metadata와 SQL reference 대조 회귀를 추가했다. 공통 소비처 CHECK에 main #451의 funding forum mount도 추가했다. 격리 PostgreSQL 검증은 운영 DB와 다른 Unix socket 전용 임시 cluster에서 수행하며 transaction rollback 후 자기 cluster를 종료한다. 새 HEAD의 required CI와 자동 리뷰까지 완료한 뒤 main 병합한다.
+
+리뷰 수정 후 공개/공지 필터·generic isolation·회원 mount·main #451 funding forum API 98 tests PASS. raw SQL 전체 list/detail/chooser SELECT/ORDER와 createdAt 응답 alias, 명시적 공개/선택/철회/비공개/다른 scope를 격리 PostgreSQL 15에서 실행해 PASS했다. Entity decorator의 실제 물리 컬럼을 대조하는 API 회귀도 통과했다.
+
+PH 연계 최신 관측: [QR Cutover 38119869917](https://github.com/Renagang21/o4o-platform/actions/runs/38119869917)은 SUCCESS이고 artifact after.json은 두 옛 호스트 matcher의 backend 연결 없이 pharmacy.neture.co.kr FOUND redirect 및 stripQuery=false를 확인했다. 이는 과거 rollback census 이후의 URL map 적용 증거다. 담당 자원 제거 PR #459는 별도 작업이며 전용 Cloud Run/backend/NEG·DB 귀속/FK/법정 보존 판단과 삭제 완료로 해석하지 않는다. 현재 클라우드는 spec/observed 37, current·running·failure 없음을 재확인했고 설정 재저장/게시 변경은 필요하지 않다.

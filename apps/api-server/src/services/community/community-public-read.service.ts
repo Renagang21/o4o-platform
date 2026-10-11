@@ -44,7 +44,7 @@ const PUBLIC_POST = `b.service_code = ANY($1::text[])
     OR ((b.metadata->'${PUBLIC_READ_KEY}'->>'mode') = 'selected'
       AND jsonb_typeof(b.metadata->'${PUBLIC_READ_KEY}'->'postIds') = 'array'
       AND (b.metadata->'${PUBLIC_READ_KEY}'->'postIds') ? p.id::text))`;
-const PUBLIC_FIELDS = `p.id, p.slug, p.title, p.excerpt, p.type, p."isPinned", p."createdAt",
+const PUBLIC_FIELDS = `p.id, p.slug, p.title, p.excerpt, p.type, p."isPinned", p.created_at AS "createdAt",
   b.name AS "boardName"`;
 const publicFields = (p: Record<string, unknown>) => ({ id: p.id, slug: p.slug, title: p.title, excerpt: p.excerpt,
   type: p.type, isPinned: p.isPinned, createdAt: p.createdAt, boardName: p.boardName });
@@ -53,7 +53,7 @@ export async function listPublicCommunityPosts(exec: Exec, key: string, page: nu
   const value = await workspace(exec, key, null);
   const items = await exec.query(`SELECT ${PUBLIC_FIELDS}
     FROM forum_post p JOIN forum_category_requests b ON b.id = p.forum_id
-    WHERE ${PUBLIC_POST} ORDER BY p."isPinned" DESC, p."createdAt" DESC, p.id
+    WHERE ${PUBLIC_POST} ORDER BY p."isPinned" DESC, p.created_at DESC, p.id
     LIMIT 21 OFFSET $2`, [value.forumStorageCodes, (page - 1) * 20]);
   return { name: value.name, items: items.slice(0, 20).map(publicFields), hasNext: items.length > 20, page };
 }
@@ -75,11 +75,11 @@ export async function listCommunityPublicReadSettings(exec: Exec, key: string, u
     FROM forum_category_requests WHERE service_code = ANY($1::text[]) AND organization_id IS NULL
       AND status = 'completed' ORDER BY name, id`, [value.forumStorageCodes]);
   // Bounded chooser per board; no content, author/profile or member data in this response.
-  const posts = await exec.query(`SELECT p.id, p.title, p.forum_id AS "forumId", p."createdAt"
+  const posts = await exec.query(`SELECT p.id, p.title, p.forum_id AS "forumId", p.created_at AS "createdAt"
     FROM forum_post p JOIN forum_category_requests b ON b.id = p.forum_id
     WHERE b.service_code = ANY($1::text[]) AND b.status = 'completed' AND b.organization_id IS NULL
       AND p.status = 'publish' AND p.organization_id IS NULL AND p.is_organization_exclusive = false
-    ORDER BY p."createdAt" DESC LIMIT 1000`, [value.forumStorageCodes]);
+    ORDER BY p.created_at DESC LIMIT 1000`, [value.forumStorageCodes]);
   return { boards, posts };
 }
 
