@@ -824,3 +824,14 @@ organization_members의 현재 업무 관계 및 필요한 legacy supplier 관�
 고유 서버 323건/UI 304건, 로컬 PC/mobile 모의 48건이며 PG 39 SKIP 경계를 유지한다.
 API build·changed lint·docs 민감정보 guard·diff check PASS다. 실제 공고/시행·정책 게시·운영
 검증은 하지 않았으며 최신 HEAD CI/review를 확인한다.
+
+
+### 공통 문서 표식의 기존 row 재분류 차단
+
+published 문서의 slug도 본문/version/시행일과 함께 불변이다. 게시 해제/복원된 draft에도
+공통 표식을 추가하거나 제거할 수 없고 새 row 등록 시에만 지정한다. 과거 동의 ID를 그대로
+사용해 기존 서비스 문서를 공통 계약으로 재분류하는 경로를 차단한다. 실제 관리 PUT에서
+published 표식 추가·제거·일반 slug 변경, draft 표식 추가·제거의 5건은 409/저장 없음이며
+새 공통 draft의 표식 유지·본문 편집 1건은 정상이다. 신규 6건 포함 2 suites 25 PASS다.
+고유 서버 329건/UI 304건, 모의 PC/mobile 48건/PG 39 SKIP 및 실제 공고·게시 OPEN을
+유지한다. API build/lint/docs guard/diff check PASS, 최신 HEAD CI/review를 확인한다.

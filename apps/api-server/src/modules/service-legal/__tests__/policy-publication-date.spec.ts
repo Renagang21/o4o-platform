@@ -63,6 +63,32 @@ it('한국 시행일 자정에는 controller가 새 문서를 게시한다(UTC�
 
 
 describe('새 공통 계정 문서의 게시 준비', () => {
+  it.each([
+    ['published', null, 'neture-account-terms', 'PUBLISHED_POLICY_IMMUTABLE'],
+    ['published', 'neture-account-terms', null, 'PUBLISHED_POLICY_IMMUTABLE'],
+    ['published', 'legacy-neture', 'changed-legacy', 'PUBLISHED_POLICY_IMMUTABLE'],
+    ['draft', null, 'neture-account-terms', 'COMMON_ACCOUNT_POLICY_MARKER_IMMUTABLE'],
+    ['draft', 'neture-account-terms', null, 'COMMON_ACCOUNT_POLICY_MARKER_IMMUTABLE'],
+  ])('%s의 표식 %s→%s 변경은 저장 전에 거부한다', async (status, slug, nextSlug, code) => {
+    const { app, execute, repo, doc } = harness(new Date());
+    Object.assign(doc, { status, slug });
+    const before = { ...doc };
+    const result = await request(app).put('/api/v1/admin/services/neture/policies/draft-id').send({ slug: nextSlug });
+    expect(result.status).toBe(409);
+    expect(result.body.error.code).toBe(code);
+    expect(repo.save).not.toHaveBeenCalled();
+    expect(execute).not.toHaveBeenCalled();
+    expect(doc).toEqual(before);
+  });
+
+  it('새 공통 draft의 동일 표식 유지와 본문 수정은 허용한다', async () => {
+    const { app, repo, doc } = harness(new Date());
+    Object.assign(doc, { slug: 'neture-account-terms' });
+    const result = await request(app).put('/api/v1/admin/services/neture/policies/draft-id').send({ slug: 'neture-account-terms', content: 'Reviewed common body' });
+    expect(result.status).toBe(200);
+    expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ slug: 'neture-account-terms', content: 'Reviewed common body' }));
+  });
+
   it.each([{ version: 1, effective: new Date() }, { version: 2, effective: null }])('%j: marker만 붙인 구 버전/미정 시행일은 기존 문서를 바꾸지 않는다', async ({ version, effective }) => {
     const { app, execute, repo, doc } = harness(effective);
     Object.assign(doc, { version, slug: 'neture-account-terms' });

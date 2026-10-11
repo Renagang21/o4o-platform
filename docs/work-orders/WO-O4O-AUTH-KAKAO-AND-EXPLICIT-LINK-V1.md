@@ -376,3 +376,9 @@ slug=neture-account-terms 문서가 실제 게시된 뒤에만 membership 없는
 활용한다. 관계 생성/승인 직후 기존 resolver 판정은 유지한다. 신규 4건 포함 관련 128 PASS,
 고유 서버 323건/UI 304건이다. 모의 화면 48건·PG 39 SKIP·실제 공고/게시 OPEN·push/PR
 종료 경계는 유지하며 최신 HEAD CI/review까지 확인한다.
+
+
+게시 문서 slug 불변과 draft 공통 표식 추가/제거 금지를 보완했다. 새 row 등록 시에만 공통
+표식을 지정해 기존 동의 ID를 공통 계약으로 재분류하지 않는다. 실제 PUT 신규 6건 포함
+관련 25 PASS, 고유 서버 329건/UI 304건이다. 실제 공고/게시/운영 검증 OPEN과 push/PR
+종료 경계를 유지하며 최신 HEAD CI/review를 확인한다.
