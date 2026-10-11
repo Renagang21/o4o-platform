@@ -108,3 +108,29 @@ PR #438은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main `498ccbd9ea`로
 read-only census `38099849484`: PH matcher는 기존 backend로 복구돼 있고 Cloud Run은 존재한다. root/www의 DNS는 API LB 주소와 일치하며 synthetic 6경로는 두 호스트 모두 HTTP 200·Location 없음이다. DB 오류는 여전히 UNKNOWN이며 gcloud list의 빈 결과도 권한 warning을 놓쳤을 수 있어 자원/데이터 부재 증거로 쓰지 않는다. 표준 SQLSTATE·검증된 schema context만 보존하고 exit 0인 gcloud 부분 실패 warning도 blocker로 처리하는 후속 진단 phase를 준비한다. 사용자 지정 worktree를 동일 WO의 `wo/pharmacyhub-retirement-census-context` phase로 유지한다. 리다이렉트 검증은 기존 6회/10초 retry가 이미 있어 반영 지연을 확정 원인으로 단정하지 않는다. 운영 삭제는 미실행이다.
 
 HTTPS frontend 연결 진단: 기존 production proxy `o4o-global-lb-target-proxy-2`의 현재 URL map 연결도 describe로 조회한다. DNS 일치만으로 변경 map이 실제 HTTPS frontend에 연결됐다고 추론하지 않는다. 부족한 get 권한은 다른 census와 동일한 안전한 blocker로 보고한다.
+
+
+## 운영 census 결과 확정 — 2026-10-11
+
+PR #438·#441·#444는 필수 CI·최신 Codex 리뷰 통과 후 main에 병합했다. 정본 작업 PR #439도 병합했고 #427은 CLOSED, 병합 후 main CI는 PASS다. 이번 변경은 문서/Actions 운영 도구이며 앱 재배포는 NOT_APPLICABLE이다. 동일 WO의 결과 기록 phase는 사용자 지정 worktree의 `wo/pharmacyhub-retirement-census-report`(base `6ffe1316da`)를 사용한다.
+
+read-only census [38101012970](https://github.com/Renagang21/o4o-platform/actions/runs/38101012970)은 SUCCESS다. 운영 DB BEGIN READ ONLY + timeout + ROLLBACK으로 조사했고 원문 행/개인정보/credential을 출력하지 않았다. 선행 census의 UNKNOWN은 진단/식별자 처리 보강 후 재현되지 않았으므로 과거 실패의 정확한 SQL 원인은 확정하지 않는다. SUCCESS는 DB 조회 및 진단 수집 성공이며 전체 제거 준비 완료가 아니다.
+
+- PH 전용 테이블 접두사 `ph_`/`pharmacy_hub_`: 현재 발견 0. 테이블 이름만으로 PH 데이터가 없다고 판단하지 않는다.
+- 공용 테이블의 PH namespace 후보: 주문 6 · 결제 6, service 등록 1 · roles 5 · role assignments 3 · memberships 2, enrollment 8 · store slug 8 · 상품 listing 19 · Offer service_keys 19, 승인 18 · 서비스 가격 1, CMS 3 · forum category 1 · media 4 · POP 4 · derivation 2, audience policy 1 · legal profile 1 · policy documents 3 · acceptances 2, action logs 33 · event logs 5. scalar/array/JSON 및 role/service_key 집계가 겹치므로 합산하지 않는다.
+- schema FK 확인: 주문의 checkout_payments, 콘텐츠 slot, forum join/post, media links/self references, listing/channel, role_permissions, service enrollment, 정책 동의가 부모 행 삭제의 영향 범위다. CASCADE/SET NULL을 타 서비스 데이터 삭제 승인으로 해석하지 않는다.
+- 현재 URL map PH matcher는 기존 `backend-pharmacy-hub-web`을 사용하고 Cloud Run `pharmacy-hub-web`은 존재한다. 두 옛 호스트의 DNS 주소는 API LB와 같으며 synthetic 6경로는 양쪽 모두 HTTP 200·Location 없음이다. 리다이렉트 적용 완료가 아니다.
+- Cloud 조회 blocker: `compute.targetHttpsProxies.get`, `compute.urlMaps.list`, `compute.backendServices.list`, `compute.networkEndpointGroups.list`. gcloud exit 0의 권한 warning도 불완전 조회로 표시한다. 빈 목록을 참조 0으로 취급하지 않는다.
+
+### 갱신된 실행 순서
+
+1. 네 read 권한 추가 후 census 재실행 → 실제 HTTPS proxy/map 연결과 다른 map/backend/NEG의 PH 참조 확인.
+2. 승인된 전체 PH 호스트 plan/apply → 현재 QR/tablet와 네 규칙/약관/root의 302·path/query 검증. 실패 시 기존 map 복구.
+3. 참조 해제 확인 후 PH 전용 backend·NEG·Cloud Run 제거 및 부재 확인. 도메인·DNS·인증서는 인쇄 QR 연결 때문에 유지.
+4. 아래 세 데이터 그룹의 정확한 부모/자식 집합과 영향 건수를 READ ONLY로 확정한 뒤 transaction별 제거·잔여 검사. 신규 승인 대기가 아니라 이미 승인된 범위의 대상 판정 단계다.
+   - 폐기: PH 등록·역할·membership·enrollment·승인·서비스 가격·PH 전용 콘텐츠/설정/운영 데이터. 공용 사용자·조직·Offer 부모 자체는 자동 삭제하지 않는다.
+   - Neture/인쇄 QR 연결 보호: 기존 slug·QR 식별자 및 실제로 Neture가 사용하는 조직/콘텐츠는 삭제 전에 귀속·교차 참조 확인. 필요한 연결은 Neture 기준으로 정렬하고 PH 운영을 복구하지 않는다.
+   - 법정/증빙 판단: 발견된 주문·결제 6건의 실제 거래 여부와 법정 보유 의무, 약관/동의 증빙·접속 감사기록의 적용 기간을 확인. 서비스 종료를 법정 보유 면제로 취급하지 않는다. 단순 폐기 데이터는 승인대로 삭제한다.
+5. 공용 코드의 PH admission/role grant/opt-in/catalog/commerce 호환 잔재 제거와 보안 deny 목록·migration 이력 보존을 구분해 검증 → PR/CI/리뷰/병합/필요한 API 배포. Offer service_keys에서 PH를 뺀 결과 빈 배열이 되어 상품이 새로 노출되지 않도록 보호.
+
+실제 QR 전환·Cloud Run/backend/NEG·DB 삭제는 아직 미완료다. 워크트리는 운영 후속 작업과 blocker가 남아 KEEP이며 기존 `/workspace/o4o-platform`의 work branch는 변경하지 않았다.
