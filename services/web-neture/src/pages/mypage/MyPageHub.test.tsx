@@ -16,7 +16,7 @@ const { auth, openLoginModal, entry } = vi.hoisted(() => ({
   entry: {
     data: {
       services: [],
-      stores: [],
+      stores: [] as { serviceKey: string; organizationId: string; name: string; memberRole: string }[],
       branches: [],
       serviceStates: { supplier: { status: "none", source: "none" } },
     },
@@ -36,7 +36,7 @@ vi.mock("../../lib/home-entry", () => ({
   buildHomeEntryModel: () => ({ myServices: [] }),
 }));
 vi.mock("../../components/home/HomeEntryPanel", () => ({
-  default: () => <p>참여 서비스 목록</p>,
+  default: ({ workspaceOnly }: { workspaceOnly?: boolean }) => <p>{workspaceOnly ? "내 업무 바로가기" : "참여 서비스 목록"}</p>,
 }));
 vi.mock("../../components/mypage/MyHomeParticipation", () => ({
   MyHomeParticipation: () => <p>본인 학습과 펀딩 참여 현황</p>,
@@ -55,6 +55,7 @@ beforeEach(() => {
   auth.isAuthenticated = true;
   auth.isLoading = false;
   openLoginModal.mockClear();
+  entry.data.stores = [];
 });
 const app = (path = "/mypage") => (
   <MemoryRouter initialEntries={[path]}>
@@ -79,6 +80,24 @@ it("offers a personal home without requiring a store role or a service membershi
     expect(screen.getAllByRole("link", { name }).length).toBeGreaterThan(0);
   expect(screen.getByText("본인 알림")).toBeTruthy();
   expect(screen.getByText("본인 학습과 펀딩 참여 현황")).toBeTruthy();
+  expect(screen.queryByText("권한 있는 매장 통계")).toBeNull();
+  expect(screen.queryByRole("region", { name: "내 매장 경영 요약" })).toBeNull();
+  expect(screen.getByText("내 업무 바로가기")).toBeTruthy();
+});
+it("puts notifications and available work ahead of participation history", () => {
+  render(app());
+  const notices = screen.getByText("본인 알림");
+  const work = screen.getByText("내 업무 바로가기");
+  const participation = screen.getByText("본인 학습과 펀딩 참여 현황");
+  expect(notices.compareDocumentPosition(work) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(work.compareDocumentPosition(participation) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+it("shows store summary only after an approved store is returned", () => {
+  entry.data.stores = [{ serviceKey: "kpa-society", organizationId: "fixture-store", name: "검증 매장", memberRole: "owner" }];
+  render(app());
+  expect(screen.getByRole("region", { name: "내 매장 경영 요약" })).toBeTruthy();
+  expect(screen.getByText("권한 있는 매장 통계")).toBeTruthy();
+  expect(screen.getByText("1개 매장 · 방문 통계")).toBeTruthy();
 });
 it("keeps the previous service across personal subviews, but never carries it into another account", () => {
   const { rerender } = render(app("/mypage?from=store"));

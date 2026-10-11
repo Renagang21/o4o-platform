@@ -64,6 +64,7 @@ function MyHomeContent({ view }: { view: View }) {
 
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
+  const hasStore = !!entry.data?.stores.length;
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -78,6 +79,16 @@ function MyHomeContent({ view }: { view: View }) {
       </div>
       {view === "overview" ? (
         <div className="space-y-5">
+          <MyHomeNotifications accountId={user.id} />
+          <HomeEntryPanel
+            key={user.id}
+            user={user}
+            data={entry.data}
+            loading={entry.loading}
+            error={entry.error}
+            onReload={entry.reload}
+            workspaceOnly
+          />
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               {
@@ -85,7 +96,7 @@ function MyHomeContent({ view }: { view: View }) {
                 title: "참여 서비스",
                 value: model
                   ? `${model.myServices.length}개 서비스 · 이용 상태 확인`
-                  : "이용 상태 확인",
+                  : entry.error ? "이용 상태를 불러오지 못했습니다" : "이용 상태 확인 중…",
               },
               {
                 to: "/mypage/activity",
@@ -99,7 +110,7 @@ function MyHomeContent({ view }: { view: View }) {
                   ? `${new Set(entry.data.stores.map((store) => store.organizationId)).size}개 매장 · 방문 통계`
                   : "내 매장 방문 통계",
               },
-            ].map((card) => (
+            ].filter(card => card.to !== "/mypage/management" || hasStore).map((card) => (
               <Link
                 key={card.to}
                 to={card.to}
@@ -110,7 +121,6 @@ function MyHomeContent({ view }: { view: View }) {
               </Link>
             ))}
           </div>
-          {entry.error && <ResourceNotice error reload={entry.reload} />}
           <MyHomeParticipation accountId={user.id} data={entry.data} compact />
           {entry.data && (
             <>
@@ -118,7 +128,7 @@ function MyHomeContent({ view }: { view: View }) {
                 <h2 className="mb-3 text-lg font-semibold">커뮤니티 활동</h2>
                 <MyHomeActivity accountId={user.id} data={entry.data} compact />
               </section>
-              <section aria-label="내 매장 경영 요약">
+              {hasStore && <section aria-label="내 매장 경영 요약">
                 <h2 className="mb-3 text-lg font-semibold">
                   내 매장 경영 현황
                 </h2>
@@ -127,10 +137,9 @@ function MyHomeContent({ view }: { view: View }) {
                   data={entry.data}
                   compact
                 />
-              </section>
+              </section>}
             </>
           )}
-          <MyHomeNotifications accountId={user.id} />
           <div className="flex flex-wrap gap-4 text-sm">
             <Link to="/mypage/profile" className="text-blue-700 underline">
               프로필 수정
@@ -156,7 +165,16 @@ function MyHomeContent({ view }: { view: View }) {
       ) : view === "activity" ? (
         <MyHomeActivity accountId={user.id} data={entry.data} />
       ) : (
-        <MyHomeManagement accountId={user.id} data={entry.data} />
+        <MyHomeManagement accountId={user.id} data={entry.data} renderStoreWorkspace={store => <HomeEntryPanel
+          key={`${user.id}:${store.organizationId}`}
+          user={user}
+          data={entry.data}
+          loading={entry.loading}
+          error={entry.error}
+          onReload={entry.reload}
+          workspaceOnly
+          storeOrganizationId={store.organizationId}
+        />} />
       )}
     </>
   );

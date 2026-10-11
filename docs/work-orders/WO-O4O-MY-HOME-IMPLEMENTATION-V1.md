@@ -75,3 +75,16 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
 초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. PR #449와 required CI를 통과해 main에 통합했으며, `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`의 promote 배포와 최종 서빙 SHA·공개 운영 검증이 완료됐다. 세부 run·기존 테스트 재실행 근거는 CHECK에 기록했다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
+
+### 연속 Phase: My Home 본 작업 — 모아보기·선택 매장 사업 참여 (2026-10-11)
+
+사용자의 TODO 작성 → 코드·문서 검증 → TODO 보완 → 구현·배포 지시에 따라 [보완 TODO](TODO-O4O-MY-HOME-COMPLETION-V1.md)를 실행한다.
+같은 미완료 WO의 전용 branch를 유지한다. 시작 HEAD는 `cee2a63caa11e8443fea689d8a5ba1a425664e29`다.
+
+- 모아보기의 알림을 상단으로 옮기고 기존 진입 모델로 이용 가능한 업무와 신청·이용 상태를 제공한다. 매장이 없는 회원에게는 overview 경영 카드·빈 경영 요약을 반복하지 않으며 기존 경영 현황 직접 경로와 빈 상태는 유지한다.
+- 선택 매장의 약국 협력사업은 기존 `GET /neture/pharmacy/semi-franchises`와 `X-Store-Organization-Id`로 조회한다. 운영 중인 사업 카탈로그 중 실제 membershipStatus가 있는 매장 기록만 모아보기 최대 3건/상세 10건으로 표시한다. 개인 서비스 가입과 매장 enrollment를 이 원장으로 대체하지 않는다.
+- 상세 경영 현황의 내 매장 업무를 기존 handoff로 연결한다. 복수 매장 선택값이 전달되지 않는 현재 계약을 화면에 설명하고 Store에서 다시 선택하도록 한다. 계정·조회 데이터·선택 매장 변경과 언마운트 후 늦은 이동 응답은 버린다.
+- API·권한·DB·dependency·공통 패키지·CI/배포 설정은 변경하지 않는다. 사업 신청·탈퇴·승인·판매/결제·데이터 정리 호출은 실행하지 않는다.
+- 제공 파일의 2개 계정은 현재 이메일 로그인에서 `401 INVALID_CREDENTIALS`로 거절됐다. 사용자가 이메일 전체 리팩터링 예정이므로 건너뛰라고 명시해 이번 실계정 smoke를 **SKIPPED_BY_USER**로 확정한다. 이전 Phase의 계정 문서 미확보 이력과 현재 상태를 구분한다.
+
+Neture 전체 568개·공통 My Home 진입 10개·Study 헤더 2개와 PC/375/320px 로컬 Chromium fixture 39개를 통과했다. 세부 증거와 구현 PR·main·Delivery 결과는 CHECK와 TODO에 이어 기록한다. 정본 설명은 소스 PR과 분리된 문서 정합 Phase에서 반영한다.

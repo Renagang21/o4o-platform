@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/apiClient";
 import { listOperatedCommunities } from "../../lib/api/communityOperator";
@@ -477,6 +477,49 @@ type Analytics = {
   activeQrCount: number;
   dailyScans: { date: string; count: number }[];
 };
+const BUSINESS_STATUS: Record<string, string> = {
+  pending: "승인 대기", active: "이용 중", rejected: "반려", suspended: "이용 정지", terminated: "탈퇴",
+};
+type StoreBusiness = { key: string; name: string; status: string };
+export function MyHomeStoreBusinesses({ accountId, organizationId, compact = false }: {
+  accountId: string; organizationId: string; compact?: boolean;
+}) {
+  return <StoreBusinessRecords key={`${accountId}:${organizationId}:${compact}`} accountId={accountId} organizationId={organizationId} compact={compact} />;
+}
+function StoreBusinessRecords({ accountId, organizationId, compact }: { accountId: string; organizationId: string; compact: boolean }) {
+  const [page, setPage] = useState(1);
+  const result = useMyHomeResource<StoreBusiness[] | { denied: true }>(`${accountId}:${organizationId}`, async () => {
+    try {
+      const response = await api.get("/neture/pharmacy/semi-franchises", { headers: { "X-Store-Organization-Id": organizationId } });
+      const rows = response.data?.data;
+      if (response.data?.success !== true || !Array.isArray(rows) || !rows.every(row =>
+        row && typeof row.key === "string" && !!row.key.trim() && typeof row.name === "string" && !!row.name.trim() &&
+        (row.membershipStatus === null || typeof row.membershipStatus === "string" && !!row.membershipStatus.trim())) ||
+        new Set(rows.map(row => row.key)).size !== rows.length) throw new Error("Invalid business memberships");
+      // The API includes an available catalogue. Only explicit store memberships belong in My Home.
+      return rows.filter(row => row.membershipStatus !== null).map(row => ({
+        key: row.key, name: row.name,
+        status: Object.prototype.hasOwnProperty.call(BUSINESS_STATUS, row.membershipStatus) ? BUSINESS_STATUS[row.membershipStatus] : "상태 확인 필요",
+      }));
+    } catch (error) {
+      if ((error as { response?: { status?: number } })?.response?.status === 403) return { denied: true };
+      throw error;
+    }
+  });
+  const items = Array.isArray(result.data) ? result.data : undefined;
+  const visible = items?.slice(compact ? 0 : (page - 1) * 10, compact ? 3 : page * 10);
+  return <section className={BOX} aria-label="내 매장 협력사업 참여 현황">
+    <h2 className="text-lg font-semibold">약국 협력사업 참여 현황</h2>
+    <p className="mt-2 text-sm text-slate-600">운영 중인 약국 협력사업 중 선택한 매장의 가입 기록입니다. 신청·승인·사업 업무는 내 매장에서 이어갑니다.</p>
+    {!result.data ? <ResourceNotice error={result.error} reload={result.reload} /> : !items ?
+      <p className="mt-3 text-sm text-amber-800">선택한 매장의 사업 참여 정보를 조회할 수 없습니다. 내 매장에서 이용 권한을 확인해 주세요.</p> :
+      items.length === 0 ? <p className="mt-3 text-sm text-slate-500">운영 중인 약국 협력사업에 표시할 참여 기록이 없습니다.</p> : <>
+        <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="flex flex-wrap justify-between gap-2 py-3 text-sm"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></li>)}</ul>
+        {compact ? <p className="mt-2 text-xs text-slate-500">참여 기록 {items.length}건 중 최대 3건을 표시합니다.</p> : <RecordPages page={page} total={items.length} limit={10} label="협력사업 참여" onChange={setPage} />}
+      </>}
+    {compact && <Link to="/mypage/management" className="mt-3 inline-block text-sm text-blue-700 underline">협력사업 참여 현황 더 보기 →</Link>}
+  </section>;
+}
 function VisitTrend({ days }: { days: Analytics["dailyScans"] }) {
   const max = Math.max(1, ...days.map((day) => day.count));
   return (
@@ -629,10 +672,12 @@ export function MyHomeManagement({
   accountId,
   data,
   compact = false,
+  renderStoreWorkspace,
 }: {
   accountId: string;
   data: HomeEntryData;
   compact?: boolean;
+  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
 }) {
   return (
     <StoreManagement
@@ -640,6 +685,7 @@ export function MyHomeManagement({
       accountId={accountId}
       data={data}
       compact={compact}
+      renderStoreWorkspace={renderStoreWorkspace}
     />
   );
 }
@@ -647,10 +693,12 @@ function StoreManagement({
   accountId,
   data,
   compact = false,
+  renderStoreWorkspace,
 }: {
   accountId: string;
   data: HomeEntryData;
   compact?: boolean;
+  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
 }) {
   // Only an existing scoped analytics endpoint is consumed. No cross-store aggregation.
   const stores = data.stores.filter((s) => s.serviceKey === "kpa-society");
@@ -714,7 +762,9 @@ function StoreManagement({
           ))}
         </select>
       </label>
+      <MyHomeStoreBusinesses accountId={accountId} organizationId={store.organizationId} compact={compact} />
       <StoreMetrics accountId={accountId} store={store} compact={compact} />
+      {!compact && renderStoreWorkspace?.(store)}
       <Link
         className="inline-block text-sm text-blue-700 underline"
         to={compact ? "/mypage/management" : "/mypage/services"}

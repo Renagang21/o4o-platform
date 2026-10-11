@@ -17,7 +17,8 @@ const { get } = vi.hoisted(() => ({ get: vi.fn() }));
 vi.mock("../../lib/api/communityOperator", () => ({
   listOperatedCommunities: () => Promise.resolve([]),
 }));
-vi.mock("../../lib/apiClient", () => ({ api: { get } }));
+vi.mock("../../lib/apiClient", () => ({ api: { get: (path: string, ...args: unknown[]) => path === "/neture/pharmacy/semi-franchises"
+  ? Promise.resolve({ data: { success: true, data: [] } }) : get(path, ...args) } }));
 afterEach(cleanup);
 beforeEach(() => {
   get.mockReset();
