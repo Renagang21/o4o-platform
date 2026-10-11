@@ -82,7 +82,7 @@ export class ForumDirectoryController extends ForumControllerBase {
       if (forum && ctxForumCodes && !ctxForumCodes.includes(forum.serviceCode)) {
         forum = null;
       }
-      if (forum && this.getForumContext(req)?.excludeScopedCommunities && (/^(sf|community):/.test(forum.serviceCode) || CATALOG_FORUM_STORAGE_CODES.includes(forum.serviceCode))) forum = null;
+      if (forum && this.getForumContext(req)?.excludeScopedCommunities && (/^(sf|community|funding):/.test(forum.serviceCode) || CATALOG_FORUM_STORAGE_CODES.includes(forum.serviceCode))) forum = null;
 
       if (!forum) {
         res.status(404).json({
