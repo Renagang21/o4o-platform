@@ -142,3 +142,22 @@ test('service namespace discovery includes handoff source/target and seller serv
   const result=await collectRetirementInventory(client);
   assert.deepEqual(result.scopeCounts.map(c=>c.column),columns.map(c=>c.column_name));
 });
+
+
+test('database failure still reports independent read-only cloud and HTTP evidence and stays failed', async () => {
+  const { collectCensus } = await import('./pharmacy-hub-retirement-inventory.mjs');
+  const result = await collectCensus(
+    async () => collectRetirementInventory({ query: async sql => {
+      if (sql.includes('information_schema')) throw Object.assign(new Error('private SQL row and secret'), { code: '42501' });
+      return { rows: [] };
+    } }),
+    () => ({ readOnly: true, blockers: [{ permissions: ['compute.urlMaps.list'] }] }),
+    async () => ({ readOnly: true, checks: [{ status: 301 }] }),
+  );
+  assert.equal(result.failed, true);
+  assert.equal(result.database.complete, false);
+  assert.match(result.database.error, /code=42501/);
+  assert.equal(result.cloud.blockers.length, 1);
+  assert.equal(result.http.checks[0].status, 301);
+  assert.doesNotMatch(JSON.stringify(result), /private SQL|secret/);
+});
