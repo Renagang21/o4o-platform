@@ -32,7 +32,7 @@
 - [x] S01: 공급자 governance 조회 오류를 전달하고 실패/빈 목록을 구분한다. 처리 실패·재시도·중복 방어를 유지한 채 복구한다.
 - [x] L01: 강좌·강사 심사 목록에서 최신 필터만 반영하고 오류 중 옛 목록 작업을 막는다. 처리 중 필터 변경/중복 요청과 실패 재시도를 정비한다.
 - [x] B01: 분회 행사 페이지의 분회 변경은 작업 상태를 초기화하고 목록/참가 명단 최신 응답만 적용한다. 저장/상태 변경 중 중복 작업을 막는다.
-- [ ] 현재 정책으로 정상인 커뮤니티·호스트/메뉴 경계는 회귀 검증한다. 신규 정책/다른 ACTIVE 트랙/실계정 검증은 상위 TODO에 남긴다.
+- [x] 현재 정책으로 정상인 커뮤니티·호스트/메뉴 경계는 회귀 검증했다. 신규 정책/다른 ACTIVE 트랙/실계정 검증은 상위 TODO에 남긴다.
 
 ## Shared Module Change Verification
 
@@ -54,7 +54,7 @@
 | API funding 전체 + 포럼 실패 컨트롤러 | Jest 7 suites / 92 tests PASS. PostgreSQL 연결 없이 기존 transaction/role/소유권 회귀와 TypeORM의 실제 UUID 컬럼·IS NULL SQL 생성 확인. 운영 DB 동시 write는 미실행. |
 | Neture 전체 | Vitest 68 files / 566 tests PASS. 최종 수정 뒤 펀딩·공유 사업·공급자 집중 회귀 4 files / 19 tests도 PASS. 기존 커뮤니티/공통 회원/호스트 경계 포함. |
 | 약국 서비스 | Vitest 16 files / 132 tests PASS. |
-| 강의 서비스 | Vitest 4 files / 12 tests PASS. 강좌·강사 목록 동일 기술 기반의 필터 역전·실패 재시도·중복/언마운트를 각각 검증. |
+| 강의 서비스 | Vitest 4 files / 14 tests PASS(강사 반려 사유 선택·취소 회귀 포함). 강좌·강사 목록 동일 기술 기반의 필터 역전·실패 재시도·중복/언마운트를 각각 검증. |
 | 분회 서비스 | Vitest 5 files / 39 tests PASS. 분회 변경 편집 초기화·필터/명단 역전·조회 재시도·중복 저장 포함. |
 | 빌드 | API, Neture, KPA-Society, Lecture, KPA-Branch와 공유 소비 패키지 빌드 PASS. 강의 테스트의 Testing Library 타입 오류를 수정 후 강의/분회를 재빌드했다. 공유 사업 표의 모바일 최소 폭 변경 뒤 공유 패키지·Neture/KPA-Society 최종 빌드도 PASS. 패키지/lock/migration 변경 없음. |
 | 실제 번들 fixture browser | 1440px/390px × 펀딩·공급자·약국 담당 사업·Neture 구주소 이동·강좌·강사·분회 행사 = 14 시나리오 PASS. 페이지 오류/문서 가로 넘침 0. API 전체 intercept; 운영 DB write 0. 모바일 표 내부 가로 스크롤은 허용한다. |
@@ -93,3 +93,13 @@ fixture 검증은 가짜 계정/데이터와 API 응답으로 실제 앱 번들�
 - 통합 전 main 이동을 확인해 `01621919195fa18616a8f0c0e4f04d5e282fba23`(공급자 offer write 책임 분리)을 정상 merge했다. 그 트랙의 소스/WO를 재작성하지 않는다. 영향받은 API와 수정 화면·공유 소비처를 재검증한다.
 
 동기화/품질 보완 뒤 로컬 API funding 92, 수정 화면 15, 강의 전체 14 tests PASS(강사 반려 사유 선택/취소를 별도 회귀로 보존). API·공유 패키지·Neture/KPA-Society/Lecture/KPA-Branch 빌드 PASS, native dialog/output 변경 뒤 실제 번들 fixture 14 시나리오도 PASS.
+
+### 후속 main 반영 및 최종 검증 대상
+
+- My Home PR #484를 정상 merge한 HEAD `24d3e3df87e40ba19a4edcb2634323e8db003152`에서 Neture의 My Home·운영 화면 8 files / 67 tests PASS. 저장소 루트의 Neture Vitest 설정으로 실행했다. 잘못된 cwd/설정으로 실행한 초기 명령은 검증 증거에서 제외한다.
+- 같은 HEAD의 Codex review는 지적 없이 Completed. Sonar check `114487504390`는 Quality Gate SUCCESS, duplication 0.0%, security hotspots 0. 공유 사업 화면의 Cognitive Complexity 19/15 지적 1개는 비차단 후속 정비로 남긴다.
+- 이어서 공급자 offer PR #488의 main `8ea1d2aebb`를 정상 merge하고 HEAD `3032925dd12295b3d76d79e327e4e1a33d53063b`를 push했다. 새 offer write 계약 회귀는 1 suite / 58 tests PASS. 해당 트랙의 소스/WO는 재작성하지 않았다.
+- HEAD `3032925dd1`의 [CI 38145601441](https://github.com/Renagang21/o4o-platform/actions/runs/38145601441)는 SUCCESS(CI Gate 포함), Codex review는 지적 없이 Completed, Sonar check `114489431003`도 Quality Gate SUCCESS(duplication 0.0%, security hotspots 0, 비차단 복잡도 지적 1개)다. 이전 HEAD `24d3e3df87`의 CI는 자동 취소됐으므로 통과로 기록하지 않는다.
+- 병합 직전 main의 PH 퇴역 안전 보완 PR #490(`55f0061df3`) 이동을 확인해 정상 merge했다. PH 소스/WO는 재작성하지 않았다. 이 동기화와 증거 정리 이후 최종 HEAD의 필수 CI·review/main/배포 결과를 다시 확인한다.
+
+후속 기술 정비: 공유 담당 사업 화면의 비차단 복잡도 지적은 업무/역할 계약을 유지하면서 별도 정비한다. 새 정책과 실계정 검증은 상위 TODO/사용자 직접 테스트 목록에서 계속 추적한다.
