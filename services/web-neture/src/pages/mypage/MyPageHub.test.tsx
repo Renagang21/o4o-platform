@@ -38,6 +38,9 @@ vi.mock("../../lib/home-entry", () => ({
 vi.mock("../../components/home/HomeEntryPanel", () => ({
   default: () => <p>참여 서비스 목록</p>,
 }));
+vi.mock("../../components/mypage/MyHomeParticipation", () => ({
+  MyHomeParticipation: () => <p>본인 학습과 펀딩 참여 현황</p>,
+}));
 vi.mock("../../components/mypage/MyHomePanels", () => ({
   MyHomeActivity: () => <p>본인 커뮤니티 활동</p>,
   MyHomeManagement: () => <p>권한 있는 매장 통계</p>,
@@ -75,6 +78,7 @@ it("offers a personal home without requiring a store role or a service membershi
   ])
     expect(screen.getAllByRole("link", { name }).length).toBeGreaterThan(0);
   expect(screen.getByText("본인 알림")).toBeTruthy();
+  expect(screen.getByText("본인 학습과 펀딩 참여 현황")).toBeTruthy();
 });
 it("keeps the previous service across personal subviews, but never carries it into another account", () => {
   const { rerender } = render(app("/mypage?from=store"));

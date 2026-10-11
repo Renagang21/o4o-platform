@@ -160,23 +160,28 @@ function CommunityPosts({
   accountId,
   communityKey,
   name,
+  compact = false,
 }: {
   accountId: string;
   communityKey: string;
   name: string;
+  compact?: boolean;
 }) {
-  const result = useMyHomeResource(`${accountId}:${communityKey}`, async () => {
-    const res = await api.get(
-      `/communities/${encodeURIComponent(communityKey)}/forum/posts`,
-      { params: { author: "me", page: 1, limit: 5 } },
-    );
-    if (!Array.isArray(res.data?.data) || typeof res.data?.total !== "number")
-      throw new Error("Invalid own posts");
-    return {
-      posts: res.data.data as OwnPost[],
-      total: res.data.total as number,
-    };
-  });
+  const result = useMyHomeResource(
+    `${accountId}:${communityKey}:${compact}`,
+    async () => {
+      const res = await api.get(
+        `/communities/${encodeURIComponent(communityKey)}/forum/posts`,
+        { params: { author: "me", page: 1, limit: compact ? 2 : 5 } },
+      );
+      if (!Array.isArray(res.data?.data) || typeof res.data?.total !== "number")
+        throw new Error("Invalid own posts");
+      return {
+        posts: res.data.data as OwnPost[],
+        total: res.data.total as number,
+      };
+    },
+  );
   const root = `/communities/${encodeURIComponent(communityKey)}/forum`;
   return (
     <section className={BOX}>
@@ -241,17 +246,20 @@ function CommunityOperations({ accountId }: { accountId: string }) {
 export function MyHomeActivity({
   accountId,
   data,
+  compact = false,
 }: {
   accountId: string;
   data: HomeEntryData;
+  compact?: boolean;
 }) {
   const communities = (data.communities ?? []).filter((c) => c.canParticipate);
   return (
     <div className="space-y-4">
-      <CommunityOperations accountId={accountId} />
+      {!compact && <CommunityOperations accountId={accountId} />}
       <p className="text-sm text-slate-600">
         이용할 수 있는 커뮤니티의 작성 글을 모았습니다. 댓글과 게시판 관리는
         해당 커뮤니티에서 이어갈 수 있습니다.
+        {compact && " 최대 3개 커뮤니티의 최근 글 2건씩 표시합니다."}
       </p>
       {communities.length === 0 ? (
         <p className={BOX}>
@@ -259,14 +267,23 @@ export function MyHomeActivity({
           확인해 주세요.
         </p>
       ) : (
-        communities.map((c) => (
+        (compact ? communities.slice(0, 3) : communities).map((c) => (
           <CommunityPosts
             key={c.communityKey}
             accountId={accountId}
             communityKey={c.communityKey}
             name={c.name}
+            compact={compact}
           />
         ))
+      )}
+      {compact && (
+        <Link
+          to="/mypage/activity"
+          className="inline-block text-sm text-blue-700 underline"
+        >
+          커뮤니티 활동 더 보기 →
+        </Link>
       )}
     </div>
   );
@@ -281,9 +298,11 @@ type Analytics = {
 function StoreMetrics({
   accountId,
   store,
+  compact = false,
 }: {
   accountId: string;
   store: EntryStore;
+  compact?: boolean;
 }) {
   const result = useMyHomeResource(
     `${accountId}:${store.organizationId}`,
@@ -329,35 +348,37 @@ function StoreMetrics({
               </div>
             ))}
           </dl>
-          <details className="mt-5">
-            <summary className="cursor-pointer text-sm">
-              최근 14일 일별 방문
-            </summary>
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr>
-                    <th scope="col" className="text-left">
-                      날짜
-                    </th>
-                    <th scope="col" className="text-right">
-                      방문 수
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.data.dailyScans.map((day) => (
-                    <tr key={day.date}>
-                      <td className="py-1">{day.date}</td>
-                      <td className="text-right">
-                        {day.count.toLocaleString()}
-                      </td>
+          {!compact && (
+            <details className="mt-5">
+              <summary className="cursor-pointer text-sm">
+                최근 14일 일별 방문
+              </summary>
+              <div className="mt-3 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="text-left">
+                        날짜
+                      </th>
+                      <th scope="col" className="text-right">
+                        방문 수
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
+                  </thead>
+                  <tbody>
+                    {result.data.dailyScans.map((day) => (
+                      <tr key={day.date}>
+                        <td className="py-1">{day.date}</td>
+                        <td className="text-right">
+                          {day.count.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          )}
         </>
       )}
     </section>
@@ -366,9 +387,11 @@ function StoreMetrics({
 export function MyHomeManagement({
   accountId,
   data,
+  compact = false,
 }: {
   accountId: string;
   data: HomeEntryData;
+  compact?: boolean;
 }) {
   // Only an existing scoped analytics endpoint is consumed. No cross-store aggregation.
   const stores = data.stores.filter((s) => s.serviceKey === "kpa-society");
@@ -407,12 +430,12 @@ export function MyHomeManagement({
           ))}
         </select>
       </label>
-      <StoreMetrics accountId={accountId} store={store} />
+      <StoreMetrics accountId={accountId} store={store} compact={compact} />
       <Link
         className="inline-block text-sm text-blue-700 underline"
-        to="/mypage/services"
+        to={compact ? "/mypage/management" : "/mypage/services"}
       >
-        내 매장 업무 이어가기
+        {compact ? "매장 방문 통계 더 보기 →" : "내 매장 업무 공간 보기"}
       </Link>
     </div>
   );
