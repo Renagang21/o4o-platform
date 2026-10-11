@@ -31,7 +31,7 @@ const community = {
   ],
 };
 
-async function prepare(page: Page) {
+async function prepare(page: Page, withoutStore = false) {
   const requests: string[] = [];
   await page.context().addInitScript(() => {
     localStorage.setItem("o4o_accessToken", "fixture-not-a-real-credential");
@@ -84,7 +84,7 @@ async function prepare(page: Page) {
       };
     else if (path === "/neture/home/entry")
       data = {
-        stores,
+        stores: withoutStore ? [] : stores,
         branches: [],
         serviceStates: { supplier: { status: "none", source: "none" } },
       };
@@ -126,6 +126,12 @@ async function prepare(page: Page) {
         trial: { title: `검증 펀딩 ${i}`, status: "recruiting" },
         settlementStatus: "offline_review",
       }));
+    } else if (path === "/neture/pharmacy/semi-franchises") {
+      const selected = route.request().headers()["x-store-organization-id"];
+      if (!stores.some(store => store.organizationId === selected)) throw new Error("Missing business store scope");
+      data = [{ key: "fixture-active", name: selected === "fixture-store-second" ? "두 번째 매장 사업" : "참여 중인 검증 사업", membershipStatus: "active" },
+        { key: "fixture-pending", name: "신청 중인 검증 사업", membershipStatus: "pending" },
+        { key: "fixture-available", name: "미가입 검증 사업", membershipStatus: null }];
     } else if (path === "/communities") data = { communities: [community] };
     else if (path === "/communities/operating") data = { communities: [] };
     else if (path === "/notifications/unread-count") data = { count: 2 };
@@ -440,4 +446,58 @@ test("management preserves selected store between views and plots returned dates
       () => document.documentElement.scrollWidth <= innerWidth + 1,
     ),
   ).toBe(true);
+});
+
+test("overview prioritizes notifications and available workspace actions", async ({ page }) => {
+  await prepare(page);
+  await page.goto("/mypage");
+  const notices = page.locator("#my-home-notifications");
+  const work = page.getByRole("region", { name: "내 업무 바로가기" });
+  await expect(notices.getByText("참여 상태 알림")).toBeVisible();
+  await expect(work.getByRole("button", { name: /화면 검증 매장/ })).toBeVisible();
+  expect(await notices.evaluate((node) => !!(node.compareDocumentPosition(document.querySelector('[aria-label="내 업무 바로가기"]')!) & Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+});
+
+test("ordinary members see personal work without store summary or analytics requests", async ({ page }) => {
+  const fixture = await prepare(page, true);
+  await page.goto("/mypage");
+  await expect(page.getByRole("region", { name: "내 업무 바로가기" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "내 매장 경영 요약" })).toHaveCount(0);
+  await expect(page.getByText("0개 매장 · 방문 통계")).toHaveCount(0);
+  expect(fixture.requests.includes("/kpa/pharmacy/analytics/marketing")).toBe(false);
+  await page.goto("/mypage/management");
+  await expect(page.getByText(/현재 조회할 수 있는 매장 통계가 없습니다/)).toBeVisible();
+  expect(fixture.requests.includes("/kpa/pharmacy/analytics/marketing")).toBe(false);
+});
+
+test("selected store work opens the existing Store workspace handoff", async ({ page }) => {
+  await prepare(page);
+  await page.goto("/mypage/management");
+  await page.getByLabel("통계를 볼 매장").selectOption("fixture-store-second");
+  const work = page.getByRole("region", { name: "선택 매장 업무 바로가기" });
+  await expect(work.getByRole("button", { name: /화면 검증 매장/ })).toHaveCount(0);
+  await expect(work.getByRole("button", { name: /두 번째 검증 매장/ })).toBeVisible();
+  await page.route("https://store.neture.co.kr/handoff**", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: "<h1>내 매장 업무 검증 화면</h1>" }));
+  await page.route("**/api/v1/auth/handoff", route => {
+    expect(route.request().postDataJSON()).toEqual({ targetWorkspace: "store", returnPath: "/" });
+    return route.fulfill({ json: { success: true, data: { targetUrl: "https://store.neture.co.kr/handoff?token=fixture&returnTo=%2F" } } });
+  });
+  await work.getByRole("button", { name: /두 번째 검증 매장/ }).click();
+  await expect(page.getByRole("heading", { name: "내 매장 업무 검증 화면" })).toBeVisible();
+});
+
+test("business memberships follow the selected store without including unjoined catalogue entries", async ({ page }) => {
+  await prepare(page);
+  await page.goto("/mypage");
+  const businesses = page.getByRole("region", { name: "내 매장 협력사업 참여 현황" });
+  await expect(businesses.getByText("참여 중인 검증 사업")).toBeVisible();
+  await expect(businesses.getByText("승인 대기", { exact: true })).toBeVisible();
+  await expect(page.getByText("미가입 검증 사업")).toHaveCount(0);
+  await page.getByLabel("통계를 볼 매장").selectOption("fixture-store-second");
+  await expect(businesses.getByText("두 번째 매장 사업")).toBeVisible();
+  await expect(businesses.getByText("참여 중인 검증 사업")).toHaveCount(0);
+  await businesses.getByRole("link", { name: "협력사업 참여 현황 더 보기 →" }).click();
+  await expect(page).toHaveURL(/\/mypage\/services$/);
+  await expect(page.getByLabel("참여 현황을 볼 매장")).toHaveValue("fixture-store-second");
+  await expect(businesses.getByText("두 번째 매장 사업")).toBeVisible();
 });

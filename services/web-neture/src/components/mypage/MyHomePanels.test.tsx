@@ -11,13 +11,15 @@ import {
   MyHomeActivity,
   MyHomeManagement,
   MyHomeNotifications,
+  MyHomeStoreParticipation,
 } from "./MyHomePanels";
 import type { HomeEntryData } from "../../lib/home-entry";
 const { get } = vi.hoisted(() => ({ get: vi.fn() }));
 vi.mock("../../lib/api/communityOperator", () => ({
   listOperatedCommunities: () => Promise.resolve([]),
 }));
-vi.mock("../../lib/apiClient", () => ({ api: { get } }));
+vi.mock("../../lib/apiClient", () => ({ api: { get: (path: string, ...args: unknown[]) => path === "/neture/pharmacy/semi-franchises"
+  ? Promise.resolve({ data: { success: true, data: [] } }) : get(path, ...args) } }));
 vi.mock("../../contexts/AuthContext", () => ({ useAuth: () => ({ logout: vi.fn() }) }));
 afterEach(cleanup);
 beforeEach(() => {
@@ -54,6 +56,15 @@ const stores = {
 };
 const wrap = (node: React.ReactNode) => <MemoryRouter>{node}</MemoryRouter>;
 describe("My Home self-scoped data", () => {
+  it("offers store participation in Services without requesting management analytics", async () => {
+    render(wrap(<MyHomeStoreParticipation accountId="owner" data={stores} />));
+    await screen.findByText("운영 중인 약국 협력사업에 표시할 참여 기록이 없습니다.");
+    expect(screen.getByLabelText("참여 현황을 볼 매장")).toBeTruthy();
+    expect(screen.queryByText("QR 방문 현황")).toBeNull();
+    expect(get).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText("참여 현황을 볼 매장"), { target: { value: "second" } });
+    expect(JSON.parse(sessionStorage.getItem("o4o_my_home_store")!).organizationId).toBe("second");
+  });
   it("allows ordinary accounts without requesting store analytics", () => {
     render(wrap(<MyHomeManagement accountId="normal" data={empty} />));
     expect(
