@@ -21,11 +21,11 @@ apply는 정확한 before-image digest와 SERIALIZABLE transaction을 요구한�
 
 공개 출력은 plan/apply 상태·digest·table/count·차단 여부뿐이다. 계정·조직·사본 식별자, 표식 원문, credential, 데이터 원문은 출력하지 않는다. GitHub Actions에서는 동일한 요약을 notice annotation으로 남겨 실행 결과를 API로 읽을 수 있게 한다.
 
-## 운영 실행 연결 제안
+## 승인된 운영 실행 연결
 
-운영 CLI 연결은 기존 `pharmacyhub-qr-cutover.yml`의 WIF·Cloud SQL proxy·owner/main/freeze·standalone gate를 재사용한다. [검토용 workflow patch](proposals/WO-O4O-STORE-VERIFICATION-COPY-CLEANUP-V1.workflow.patch)는 실행 중 workflow에 적용하지 않은 제안이다. `copy_cleanup`과 4개 fingerprint/digest 입력, 독립 CLI step, 기존 작업과의 상호 배타 조건을 추가한다. 새 credential·서비스 계정·GitHub permission·배포 설정 변경은 제안하지 않는다.
+운영 CLI 연결은 기존 `pharmacyhub-qr-cutover.yml`의 WIF·Cloud SQL proxy·owner/main/freeze·standalone gate를 재사용한다. [검토용 workflow patch](proposals/WO-O4O-STORE-VERIFICATION-COPY-CLEANUP-V1.workflow.patch)는 적용 전 검토 기록이다. 사용자가 2026-10-11에 연결 변경과 운영 plan 확인 후 해당 3행 정리를 명시 승인했으며 실제 workflow에 적용했다. `copy_cleanup`과 4개 fingerprint/digest 입력, 독립 CLI step, 기존 작업과의 상호 배타 조건을 추가한다. 새 credential·서비스 계정·GitHub permission·배포 설정 변경은 제안하지 않는다.
 
-AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이번에 새로 확인할 범위다. 이 workflow 연결 변경을 승인받은 뒤만 적용한다. 이미 승인된 이번 검증 자료 정리 범위를 다른 테스트 매장·기존 전체 자료 삭제로 확대하지 않는다. CLI 준비와 실행 대상의 실제 운영 삭제를 구분한다.
+AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이번에 새로 확인할 범위다. 이번 workflow 연결 변경은 사용자 명시 승인 후 적용했다. 이미 승인된 이번 검증 자료 정리 범위를 다른 테스트 매장·기존 전체 자료 삭제로 확대하지 않는다. CLI 준비와 실행 대상의 실제 운영 삭제를 구분한다.
 
 ## TODO
 
@@ -35,7 +35,7 @@ AGENTS.md §5의 `Docker / CI / build·deployment infrastructure 변경`은 이�
 - [x] 격리된 로컬 PostgreSQL에서 실제 삭제·부분 실패 rollback·보존 검증
 - [x] 운영 workflow 연결의 적용 전 검토용 patch 작성
 - [ ] CLI·문서 commit/push·필수 CI·review·main 통합
-- [ ] 새 workflow 연결 변경 승인·적용·검증
+- [x] 새 workflow 연결 변경 승인·적용·로컬 검증
 - [ ] 운영 read-only plan의 대상·참조·digest 확인
 - [ ] 운영 단일 사본 정리 실행·3행 부재·원본 보존·API 404 확인
 - [ ] 실제 계정 CHECK의 완전 정리 TODO 완료 및 종료 정리
