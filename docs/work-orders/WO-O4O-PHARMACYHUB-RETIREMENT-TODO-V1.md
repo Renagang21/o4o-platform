@@ -158,3 +158,15 @@ PR #459 P1 리뷰 대응: PH workflow의 기존 concurrency만으로 다른 Deli
 추가 P1 대응: 최상위 `promote.yml`과 `referenced_workflows`의 production reusable workflow도 gate에 포함한다. caller 이름만으로 호출된 Delivery를 놓치지 않으며 호출 metadata가 불완전하면 차단한다. 품질 검사 지적에 따라 Ubuntu runner의 gcloud를 고정 절대 경로로 실행하고 의존 순서 삭제는 직렬 promise chain으로 유지한다. 자원 안전 테스트 18 PASS다.
 
 P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 preflight는 존 NEG 권한 대신 `compute.regionNetworkEndpointGroups.delete`를 검사한다. 기존 read-only list 권한과 삭제 권한은 구분하며, plan에서 실제 principal의 누락 권한을 확인하기 전 삭제하지 않는다.
+
+## 자원 제거 plan 실측 — 2026-10-11
+
+동일 WO 연속 phase로 지정 worktree에서 최신 main 기반 `wo/pharmacyhub-resource-plan-result`에 결과를 기록한다. PR [#459](https://github.com/Renagang21/o4o-platform/pull/459)는 required CI [38124261262](https://github.com/Renagang21/o4o-platform/actions/runs/38124261262), SonarCloud 및 최신 HEAD Codex 리뷰 통과·미해결 스레드 0으로 main `c15e96b5cd`에 병합됐다. 앱 배포는 NOT_APPLICABLE이다.
+
+읽기 전용 resource plan [38124839394](https://github.com/Renagang21/o4o-platform/actions/runs/38124839394)은 SUCCESS(`applied=false`, `httpVerified=true`). 고정 대상은 `backend-pharmacy-hub-web`, Seoul 리전 `neg-pharmacy-hub-web`, `pharmacy-hub-web` 세 개이며 URL map 분리·공용 참조·12개 HTTP 규칙과 실제 QR/tablet를 재검증했다. `compute.globalOperations.get`과 `run.services.delete`는 이미 유효하다. 실제 Actions principal에 없는 권한은 아래 세 개다.
+
+- `compute.backendServices.delete`
+- `compute.regionNetworkEndpointGroups.delete`
+- `compute.regionOperations.get`
+
+사용자 로컬의 IAM 관리 권한으로 기존 `pharmacyHubQrPlan` 역할에 이 세 권한을 추가해야 한다. Actions 계정에 스스로 IAM 정책을 수정할 권한을 부여하지 않는다. 권한 반영 후 새 read-only plan에서 missingPermissions가 비어 있음을 확인하고, 다른 운영 작업 종료·단독 진행·현재 gate를 확인한 뒤 resource apply → 세 자원 부재·QR 유지 검증을 진행한다. 이후 PH-only 데이터 소유/FK/법정 보유 조사 및 잔여 공용 코드 제거 TODO를 계속한다. 이번 실행은 Cloud Run/backend/NEG/DB를 삭제하지 않았으며 도메인·DNS·인증서는 유지한다. main 후속 CI [38124838980](https://github.com/Renagang21/o4o-platform/actions/runs/38124838980)은 이 기록 시점에 대기 중이며 PASS로 주장하지 않는다.
