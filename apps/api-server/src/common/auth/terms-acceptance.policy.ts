@@ -192,19 +192,24 @@ export function selectPendingPoliciesForRequest(
     ['/api/v1/cosmetics', 'k-cosmetics'],
     ['/api/v1/lms', 'lecture'],
     ['/api/v1/lecture', 'lecture'],
-    // More specific mounts must precede the generic Neture namespace.
+    // Specific service-owned management mounts precede Neture management routes.
+    // The general Neture namespace includes shared store APIs and must keep signed session scope.
     ['/api/v1/neture/operator/market-trial', 'funding'],
     ['/api/v1/neture/operator/suppliers', 'supplier'],
     ['/api/v1/neture/admin/suppliers', 'supplier'],
     ['/api/v1/neture/supplier', 'supplier'],
-    ['/api/v1/neture', 'neture'],
+    ['/api/v1/neture/seller-recruitment/recruitments', 'supplier'],
+    ['/api/v1/neture/operator', 'neture'],
+    ['/api/v1/neture/admin', 'neture'],
     ['/api/v1/supplier', 'supplier'],
     ['/api/v1/communities', 'community'],
     ['/api/v1/community', 'community'],
     ['/api/v1/funding', 'funding'],
     ['/api/market-trial', 'funding'],
   ];
-  const service = owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
-    ?? sessionServiceKey;
+  // Applications are mixed: store mine/cancel use session scope; supplier review/termination owns these actions.
+  const supplierApplicationAction = path && /^\/api\/v1\/neture\/seller-recruitment\/applications\/[^/]+\/(approve|reject|terminate)$/.test(path);
+  const service = supplierApplicationAction ? 'supplier' : (owners.find(([prefix]) => path === prefix || path?.startsWith(`${prefix}/`))?.[1]
+    ?? sessionServiceKey);
   return pending.filter(p => !service || p.serviceKey === ACCOUNT_POLICY_SERVICE_KEY || p.serviceKey === service);
 }

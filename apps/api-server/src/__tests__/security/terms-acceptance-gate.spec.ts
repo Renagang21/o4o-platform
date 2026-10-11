@@ -623,6 +623,11 @@ describe('실제 서비스 소유 mount의 약관 enforcement', () => {
     ['/api/v1/neture/admin/suppliers/governance', 'supplier'],
     ['/api/market-trial/fixture/join', 'funding'],
     ['/api/v1/communities/fixture/members', 'community'],
+    ['/api/v1/neture/seller-recruitment/recruitments/mine', 'supplier'],
+    ['/api/v1/neture/seller-recruitment/recruitments/fixture/close', 'supplier'],
+    ['/api/v1/neture/seller-recruitment/applications/fixture/approve', 'supplier'],
+    ['/api/v1/neture/seller-recruitment/applications/fixture/reject', 'supplier'],
+    ['/api/v1/neture/seller-recruitment/applications/fixture/terminate', 'supplier'],
   ])('%s는 다른 세션 범위로 서비스 pending을 제거하지 않는다', async (path, serviceKey) => {
     publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, serviceKey)];
     membershipRows = [{ serviceKey, status: 'active' }];
@@ -687,5 +692,25 @@ describe('전체관리자 관리 세션의 재동의 예외', () => {
       .set('Authorization', `Bearer ${makeToken('admin', method)}`);
     expect(res.status).toBe(403);
     expect(res.body.reached).toBeUndefined();
+  });
+});
+
+
+describe('혼합 소비 Neture API는 서명된 서비스 세션 범위를 유지한다', () => {
+  it.each([['neture', 200], ['kpa-society', 428]] as const)('%s 세션의 공용 API 판정', async (serviceKey, expectedStatus) => {
+    publishedRows = [publishedDoc(DOC_NETURE, 'neture'), publishedDoc(DOC_KPA, 'kpa-society')];
+    membershipRows = [{ serviceKey: 'kpa-society', status: 'active' }];
+    acceptedIds = [DOC_NETURE];
+    const app = makeApp();
+    for (const [method, path] of [
+      ['get', '/api/v1/neture/seller-recruitment/applications/mine'],
+      ['post', '/api/v1/neture/seller-recruitment/applications/fixture/cancel'],
+      ['get', '/api/v1/neture/suppliers'],
+    ]) {
+      const res = await (request(app) as any)[method](path).set('Authorization', `Bearer ${makeToken(serviceKey)}`);
+      expect(res.status).toBe(expectedStatus);
+      if (expectedStatus === 428) expect(res.body.pendingPolicyAcceptances.map((p: any) => p.serviceKey)).toEqual(['kpa-society']);
+      else expect(res.body.reached).toBe(true);
+    }
   });
 });

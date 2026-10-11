@@ -643,3 +643,18 @@ Google 증거 없는 관리자 세션 2건을 확인했다. 실제 DB·관리 �
 약관 차단 428)를 정정한 재실행은 보안 63 + raw-source 4 = 67 PASS다. API 타입/lint도 PASS.
 이번 고유 API 회귀 합계는 220건, UI 301건, 로컬 PC/mobile 36건이다. 실제 OAuth·PG 통합과
 운영 검증의 별도 OPEN은 유지하며 최종 CI·리뷰는 이 후속 commit의 PR HEAD에서 확인한다.
+
+
+### Neture namespace의 공용 경로 추가 리뷰 보완
+
+약국 소비처의 seller-recruitment 본인 신청 조회·취소와 공급자 목록 등은 Neture namespace에
+있지만 여러 서비스가 공유한다. namespace 전체를 Neture 소유로 덮지 않고 서명된 세션 범위를
+유지하도록 정정했다. 전용 Neture operator/admin, 공급자·펀딩 운영자 등은 구체적 소유 경로를
+계속 우선 판정한다. 모집의 supplier 전용 recruitments 및 applications 승인/반려/종료 동작도
+실제 controller의 requireActiveSupplier와 대조해 supplier로 판정한다. 매장 본인 신청 동작을
+supplier 전용으로 묶지 않는다.
+
+신규 7건은 supplier 전용 동작의 차단/승낙 후 해소 5건과, 공용 Neture API에서 Neture·약국
+두 세션의 다른 pending 판정 2건이다. 보안 70 + raw-source 4 = 74 PASS, API 타입/lint PASS.
+이번 고유 API 회귀는 227건, UI 301건, 로컬 PC/mobile 36건이다. HTTP fixture는 공통 middleware
+검증이며 실제 신청 DB의 rollback·조건 snapshot 검증은 별도 TODO다.
