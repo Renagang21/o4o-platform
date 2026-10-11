@@ -47,3 +47,16 @@ it('an old payment response cannot refresh or overwrite a newly selected trial',
   expect(mocks.participants.mock.calls.filter(([id]) => id === 'project-a')).toHaveLength(1);
   expect(screen.getByRole('heading', { name: '테스트 project-b' })).toBeTruthy();
 });
+
+it('an initial slow KPI response cannot overwrite the refreshed payment report', async () => {
+  let first!: (value: unknown) => void;
+  const kpi = (totalPaidAmount: number) => ({ participantCount: 1, paidParticipantCount: 1, unpaidParticipantCount: 0, refundCount: 0, totalPaidAmount });
+  mocks.kpi.mockImplementationOnce(() => new Promise(resolve => { first = resolve; })).mockResolvedValueOnce(kpi(24000));
+  renderPage(); await screen.findByText('참여 이행 관리');
+  fireEvent.click(screen.getByRole('button', { name: '재확인·정정' }));
+  fireEvent.change(screen.getByLabelText('입금 확인 금액 (원)'), { target: { value: '24000' } });
+  fireEvent.click(screen.getByRole('button', { name: '기록 저장' }));
+  await screen.findByText('24,000원');
+  await act(async () => first(kpi(12000)));
+  expect(screen.getByText('24,000원')).toBeTruthy();
+});

@@ -62,6 +62,7 @@ export default function MarketTrialApprovalDetailPage() {
   const beginPayment = useLatestRequest(`funding-payment:${id}`);
   const beginReward = useLatestRequest(`funding-reward:${id}`);
   const beginExport = useLatestRequest(`funding-export:${id}`);
+  const beginKpi = useLatestRequest(`funding-review-kpi:${id}`);
   const [loadedId, setLoadedId] = useState('');
   const [trial, setTrial] = useState<OperatorTrial | null>(null);
   const [participantData, setParticipantData] = useState<ParticipantListResponse | null>(null);
@@ -81,6 +82,13 @@ export default function MarketTrialApprovalDetailPage() {
   const [showStatusModal, setShowStatusModal] = useState(false);
   // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1
   const [trialKpi, setTrialKpi] = useState<MarketTrialDetailKpi | null>(null);
+
+  const refreshKpi = useCallback(async () => {
+    if (!id) return;
+    const current = beginKpi();
+    try { const value = await getOperatorTrialKpi(id); if (current()) setTrialKpi(value); }
+    catch { if (current()) setTrialKpi(null); }
+  }, [id, beginKpi]);
 
   const loadParticipants = useCallback(async () => {
     if (!id) return;
@@ -108,13 +116,13 @@ export default function MarketTrialApprovalDetailPage() {
       if (!current()) return;
       setTrial(trialData); setLoadedId(id);
       // KPI is best-effort — never blocks the page
-      getOperatorTrialKpi(id).then(value => { if (current()) setTrialKpi(value); }).catch(() => null);
+      void refreshKpi();
     } catch (err: any) {
       if (current()) setError(err.message || '유통참여형 펀딩을 불러오는데 실패했습니다.');
     } finally {
       if (current()) setLoading(false);
     }
-  }, [id, beginLoad]);
+  }, [id, beginLoad, refreshKpi]);
 
   useEffect(() => {
     loadAll();
@@ -179,7 +187,7 @@ export default function MarketTrialApprovalDetailPage() {
       if (!current()) return false;
       await loadParticipants();
       if (!current()) return false;
-      getOperatorTrialKpi(id).then(value => { if (current()) setTrialKpi(value); }).catch(() => null);
+      void refreshKpi();
       return true;
     } catch (err: any) {
       if (current()) setError(err.response?.data?.message || err.message || '입금 기록 저장에 실패했습니다.');
