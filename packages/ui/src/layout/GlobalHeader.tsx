@@ -175,10 +175,10 @@ export function GlobalHeader({
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
       <div className="max-w-[1280px] mx-auto px-4">
-        <div className="flex min-h-16 items-center justify-between py-2">
+        <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 py-2">
 
           {/* ── BrandSlot ── */}
-          <Link to={brand.href || '/'} className="flex items-center gap-2 no-underline shrink-0">
+          <Link to={brand.href || '/'} className="flex max-w-full items-center gap-2 no-underline shrink-0">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm"
               style={{
@@ -254,7 +254,7 @@ export function GlobalHeader({
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="ml-auto flex max-w-full flex-wrap items-center gap-2 md:gap-3">
           {/* ── HomeSlot (desktop + mobile, 로그인 무관) ── */}
           {homeSlot}
 

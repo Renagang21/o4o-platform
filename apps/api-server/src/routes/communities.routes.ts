@@ -40,6 +40,7 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
 
 import { NetureMainMembershipRequiredError } from '../modules/neture/services/neture-main-membership.js';
 import { createServiceForumRouter } from './forum/service-forum.routes.js';
+import { createCommunityPublicReadRoutes } from './community-public-read.routes.js';
 import { listCommunityWorkspaces, resolveCommunityWorkspace, createCommunityBoard } from '../services/community/community-workspace.service.js';
 import { Router, type RequestHandler, type Response } from 'express';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -105,6 +106,7 @@ export function createCommunitiesRoutes(
   authenticate: RequestHandler,
 ): Router {
   const router = Router({ mergeParams: true });
+  router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));
 
   // 개체 운영자 경계: slug -> 행 확인 -> active 가입 -> role='operator'
   const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];

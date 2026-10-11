@@ -633,6 +633,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   filterRow: {
     display: 'flex',
+    flexWrap: 'wrap',
     gap: '6px',
   },
   filterBtn: {
@@ -765,7 +766,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statsRow: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
     gap: '16px',
     marginBottom: '24px',
   },

@@ -24,10 +24,10 @@ const tree = (path: string) => <MemoryRouter initialEntries={[path]}><Routes>
 </Routes></MemoryRouter>;
 beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
-  mocks.get.mockImplementation(async (path: string) => {
+  mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
     if (path.endsWith('/access')) return { data: { data: access } };
-    if (path.endsWith('/forum/posts')) return { data: { data: [post('notice', true), post('conversation')] } };
+    if (path.endsWith('/forum/posts')) return { data: { data: config?.params?.isPinned === 'true' ? [post('notice', true)] : config?.params?.isPinned === 'false' ? [] : [post('notice', true), post('conversation')] } };
     if (path.endsWith('/store/contents')) return { data: { data: { items: [
       { id: 'guide', title: '게시된 실제 자료', summary: '사업 자료 요약', semiFranchiseKey: 'pharmacy' },
       { id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'other' },
@@ -38,6 +38,22 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('약국 회원 초기화면', () => {
+  it('고정 공지 3개와 최근 공지 5개를 일반 게시글 목록과 별도로 조회한다', async () => {
+    const original = mocks.get.getMockImplementation()!;
+    const pins = Array.from({ length: 3 }, (_, n) => ({ ...post(`pin-${n}`, true), title: `오래된 고정 ${n}`, createdAt: '2020-01-01' }));
+    const recent = Array.from({ length: 5 }, (_, n) => ({ ...post(`recent-${n}`), title: `최근 공지 ${n}`, type: 'announcement' }));
+    mocks.get.mockImplementation((path: string, config?: { params?: Record<string, unknown> }) => {
+      if (path.endsWith('/forum/posts') && config?.params?.isPinned) return Promise.resolve({ data: { data: config.params.isPinned === 'true' ? pins : recent } });
+      return original(path, config);
+    });
+    render(tree('/'));
+    expect(await screen.findByText('오래된 고정 0')).toBeTruthy();
+    expect(screen.getByText('최근 공지 4')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '고정 공지' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '최근 공지' })).toBeTruthy();
+    expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 3, sortBy: 'latest', isPinned: 'true' } });
+    expect(mocks.get).toHaveBeenCalledWith('/communities/business%3Apharmacy/forum/posts', { params: { page: 1, limit: 5, sortBy: 'latest', isPinned: 'false', type: 'announcement' } });
+  });
   it('루트에 Hero와 실제 공지·게시글·자료를 바로 표시하고 신청 화면을 거치지 않는다', async () => {
     render(tree('/'));
     expect(await screen.findByText('회원의 실제 이야기')).toBeTruthy();
@@ -102,10 +118,10 @@ describe('약국 회원 초기화면', () => {
     render(tree('/'));
     expect(await screen.findByText('게시된 실제 자료')).toBeTruthy();
     expect(await screen.findAllByRole('alert')).toHaveLength(2);
-    expect(screen.queryByText('최근 목록에 등록된 공지가 없습니다.')).toBeNull();
+    expect(screen.queryByText('등록된 공지가 없습니다.')).toBeNull();
     mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/forum/posts') ? Promise.resolve({ data: { data: [] } }) : original(path, config));
     fireEvent.click(screen.getAllByRole('button', { name: '다시 시도' })[0]);
-    expect(await screen.findByText('최근 목록에 등록된 공지가 없습니다.')).toBeTruthy();
+    expect(await screen.findByText('등록된 공지가 없습니다.')).toBeTruthy();
     expect(screen.getByText('최근 목록에 회원 게시글이 없습니다.')).toBeTruthy();
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
   });

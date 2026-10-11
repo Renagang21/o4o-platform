@@ -23,10 +23,11 @@ export default function CommunityHostHomePage() {
     {loading && <output aria-live="polite" className="mt-6">커뮤니티 목록을 확인하고 있습니다…</output>}
     {error && <div className="mt-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)} className="mt-3 text-blue-700">다시 시도</button></div>}
     <ul className="mt-6 divide-y border-y">
-      {rows.filter(c => c.kind === 'independent').map(c => <li key={c.communityKey}>
+      {rows.filter(c => c.kind === 'independent').map(c => <li key={c.communityKey} className="py-2">
         <Link to={`/communities/${encodeURIComponent(c.communityKey)}/forum`} className="flex justify-between gap-4 py-4">
           <span><strong className="block">{c.name}</strong><span className="text-sm text-slate-600">{c.allowed ? '참여 가능' : c.membershipStatus === 'pending' ? '승인 대기' : '이용 자격 확인'}</span></span><span aria-hidden>→</span>
         </Link>
+        <Link to={`/communities/${encodeURIComponent(c.communityKey)}/public`} className="mb-2 inline-block min-h-11 text-sm text-blue-700">공개 게시글 보기 →</Link>
       </li>)}
     </ul>
     {!loading && !error && !rows.some(c => c.kind === 'independent') && <p className="mt-4">등록된 커뮤니티가 없습니다.</p>}

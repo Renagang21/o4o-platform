@@ -83,11 +83,11 @@ export function ForeignVisitorPartnerQrCodesPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
-      <div className="flex items-start gap-3 mb-2">
+      <div className="flex flex-wrap items-start gap-3 mb-2">
         <div className="w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
           <QrCode className="w-6 h-6 text-teal-700" />
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
           <h1 className="text-2xl font-bold text-slate-900">제휴마케팅 QR 관리</h1>
           <p className="text-sm text-slate-500 mt-1">
             {partner ? <span className="font-medium text-slate-700">{partner.partnerName}</span> : '파트너'} 의 유입 식별 QR을 발급하고 관리합니다.
@@ -142,7 +142,8 @@ export function ForeignVisitorPartnerQrCodesPage() {
           </div>
         )}
         {listState === 'ready' && qrCodes.length > 0 && (
-          <table className="w-full text-sm">
+          <div className="max-w-full overflow-x-auto" role="region" aria-label="제휴 QR 목록" tabIndex={0}>
+              <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="text-left text-xs text-slate-500 border-b border-slate-100 bg-slate-50/60">
                 <th className="px-4 py-2.5 font-medium">QR 이름</th>
@@ -193,6 +194,7 @@ export function ForeignVisitorPartnerQrCodesPage() {
               ))}
             </tbody>
           </table>
+              </div>
         )}
       </div>
 
