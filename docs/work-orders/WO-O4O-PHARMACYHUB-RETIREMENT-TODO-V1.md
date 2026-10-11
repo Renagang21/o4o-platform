@@ -170,3 +170,11 @@ P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 p
 - `compute.regionOperations.get`
 
 사용자 로컬의 IAM 관리 권한으로 기존 `pharmacyHubQrPlan` 역할에 이 세 권한을 추가해야 한다. Actions 계정에 스스로 IAM 정책을 수정할 권한을 부여하지 않는다. 권한 반영 후 새 read-only plan에서 missingPermissions가 비어 있음을 확인하고, 다른 운영 작업 종료·단독 진행·현재 gate를 확인한 뒤 resource apply → 세 자원 부재·QR 유지 검증을 진행한다. 이후 PH-only 데이터 소유/FK/법정 보유 조사 및 잔여 공용 코드 제거 TODO를 계속한다. 이번 실행은 Cloud Run/backend/NEG/DB를 삭제하지 않았으며 도메인·DNS·인증서는 유지한다. main 후속 CI [38124838980](https://github.com/Renagang21/o4o-platform/actions/runs/38124838980)은 이 기록 시점에 대기 중이며 PASS로 주장하지 않는다.
+
+## 권한 해소·부분 자원 제거 및 재개 준비 — 2026-10-11
+
+사용자가 삭제 권한 세 개를 기존 역할에 추가했다. 새 resource plan [38130540549](https://github.com/Renagang21/o4o-platform/actions/runs/38130540549)은 SUCCESS(`missingPermissions=[]`, `httpVerified=true`)이며 세 고정 대상이 남아 있었다. 앞선 main 후속 CI `38124838980`, `38125089787`도 SUCCESS를 확인했다.
+
+다른 main CI `38130407287` 및 후속 API Delivery `38130997115` SUCCESS 후 다섯 active status 전체에서 운영 writer 부재를 확인하고 apply [38131427277](https://github.com/Renagang21/o4o-platform/actions/runs/38131427277)을 실행했다. 실행은 후속 삭제 직전 production run inventory의 완전성 검사에서 실패했다. 전체 제거 성공으로 보고하지 않는다. 새 read-only plan [38131645110](https://github.com/Renagang21/o4o-platform/actions/runs/38131645110)은 SUCCESS이며 남은 대상은 `pharmacy-hub-web` 하나, 누락 권한 0, QR 검증 PASS다. 백엔드와 NEG는 부재하며 Cloud Run/DB는 아직 제거하지 않았다.
+
+불완전 조회를 수용하지 않고 count/list 불일치 페이지만 2초 간격 최대 3회 read-only 재조회하도록 보강한다. 최종 불일치는 status/page/expected/returned 숫자만 진단하며 차단한다. 알려진 다른 운영 writer·구조/metadata 오류·권한/HTTP 오류는 그대로 즉시 차단한다. 불일치의 일시성은 아직 확정 원인으로 주장하지 않는다. 자원 안전 테스트 19 PASS이며 기존 권한/QR/참조/시간/삭제 후 부재/새 자원 재등장 차단 조건을 유지한다. 동일 WO의 연속 phase로 지정 worktree의 최신 main 기반 `wo/pharmacyhub-resource-gate-retry`에서 작업한다. CI·리뷰·병합 후 남은 Cloud Run만 재개한다. 앱 배포 NOT_APPLICABLE; DB/DNS/인증서 변경 없음.

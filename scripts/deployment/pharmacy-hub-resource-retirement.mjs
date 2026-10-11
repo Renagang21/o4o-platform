@@ -6,6 +6,7 @@ import { collectCloudInventory, collectHttpInventory } from './pharmacy-hub-reti
 import { parseProbes, verifyTargets, verifyPublicData } from './pharmacy-hub-qr-cutover.mjs';
 
 class ResourceDiagnosticError extends Error {}
+class InventoryCountError extends ResourceDiagnosticError {}
 
 const project = 'netureyoutube';
 // ubuntu-latest's preinstalled Cloud SDK; never resolve an executable from checkout-writable PATH entries.
@@ -26,10 +27,13 @@ const permissionsByTarget = new Map([
 const productionWorkflows = new Set(['promote.yml', 'delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);
 const activeStatuses = ['in_progress', 'queued', 'pending', 'waiting', 'requested'];
 
-function checkProductionRuns(result, runId, page) {
-  if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0
-    || result.workflow_runs.length !== Math.min(100, Math.max(0, result.total_count - (page - 1) * 100))) {
+function checkProductionRuns(result, runId, page, status) {
+  if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0) {
     throw new ResourceDiagnosticError('Production run inventory is incomplete; no deletion submitted.');
+  }
+  const expected = Math.min(100, Math.max(0, result.total_count - (page - 1) * 100));
+  if (result.workflow_runs.length !== expected) {
+    throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; expected=${expected}; returned=${result.workflow_runs.length}. Next deletion not submitted.`);
   }
   for (const other of result.workflow_runs) {
     if (String(other.id) === String(runId) || other.status === 'completed') continue;
@@ -44,13 +48,25 @@ function checkProductionRuns(result, runId, page) {
   }
 }
 
-export async function assertProductionIdle(runId, list) {
+async function readProductionPage(list, status, page, runId, pause, attempt = 0) {
+  const result = await list(status, page);
+  try {
+    checkProductionRuns(result, runId, page, status);
+    return result;
+  } catch (error) {
+    // Re-read count/list disagreements only; never accept an incomplete page.
+    if (!(error instanceof InventoryCountError) || attempt === 2) throw error;
+    await pause(2000);
+    return readProductionPage(list, status, page, runId, pause, attempt + 1);
+  }
+}
+
+export async function assertProductionIdle(runId, list, pause = ms => new Promise(resolve => setTimeout(resolve, ms))) {
   if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
   // Include queued/manual-waiting deliveries; do not infer an idle runtime from running jobs alone.
   await Promise.all(activeStatuses.map(async status => {
     for (let page = 1; page <= 10; page++) {
-      const result = await list(status, page);
-      checkProductionRuns(result, runId, page);
+      const result = await readProductionPage(list, status, page, runId, pause);
       if (page * 100 >= result.total_count) return;
     }
     throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
