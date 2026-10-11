@@ -183,3 +183,29 @@ API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b18786
 - main integration: #449 · 참여 통합 #461 · 기록/추이 #469 · CI: 최종 PR/main PASS · deployment: Neture `1604014f98771a0b74861e6770382d1436510099` DEPLOYED · smoke: LOCAL 27/DEPLOYED-BUNDLE 27/HTTP PASS, AUTHENTICATED PENDING. 직접 운영 Chromium 세션은 선행 Phase의 CERT BLOCKED와 구분해 이번에는 실행하지 않았다.
 - 다른 세션의 기준 checkout은 변경하지 않았다. 문서 정합 통합 후 작업 범위 미커밋·untracked·branch-only commit 상태를 다시 확인한다.
 - verdict: **KEEP** — 테스트 계정 문서 확보 후 실제 로그인 운영 검증이 남아 있다. 로컬 브라우저 증거는 작업 폴더 밖에도 보관했다.
+
+## 연속 Phase: 본 작업 — 모아보기·선택 매장 사업 참여 (2026-10-11)
+
+[보완 TODO](../work-orders/TODO-O4O-MY-HOME-COMPLETION-V1.md)를 먼저 작성하고 현재 정본·코드·서비스 원장·계정 조건으로 보완한 뒤 구현했다.
+
+| 항목 | 근거와 결과 |
+|---|---|
+| 모아보기 | 알림 → 이용 가능한 업무·가입 상태 → 참여·커뮤니티·권한 있는 매장 요약. 일반 회원은 overview 경영 요약을 표시하지 않고 기존 경영 경로의 빈 상태는 유지 |
+| 매장 협력사업 | 기존 `GET /neture/pharmacy/semi-franchises`의 운영 중인 사업 카탈로그 중 매장 membershipStatus가 있는 행만 projection. null=미가입 제외, 승인 대기/이용 중/정지/반려/탈퇴와 알 수 없는 상태 구분. 모아보기·경영 현황 최대 3건, 참여 서비스 상세 10건 |
+| 원장·권한 | `neture-pharmacy.routes.ts`의 기존 인증·메인 가입·`createRequireStoreOwner('kpa')`와 선택 매장 헤더 유지. API·role·DB 변경·사업 신청/탈퇴/승인 호출 0 |
+| 이동 | 기존 선택 매장 진입 모델·Store handoff 재사용. 조직 선택 전달이 없는 현재 계약을 설명하며 복수 매장은 Store에서 다시 선택. 계정/데이터/매장 변경·언마운트 후 늦은 응답 차단 |
+| 소비처 | `HomeEntryPanel`의 대표 메인 요약·참여 서비스 4개 업무 카드·플랫폼 관리 순서는 유지. 새 표시 방식은 My Home에만 적용. import·심볼·경로·raw-source 소비처를 대조 |
+| 단위/회귀 | Neture 67개 파일·568개 PASS. 최종 사업 안내 문구 정밀화 후 사업 테스트 10개 재검증 PASS. 공통 My Home 진입 10개·Study 헤더 2개 PASS. 변경 TS/TSX eslint·diff whitespace PASS |
+| 브라우저 | production build의 로컬 origin에서 PC 1440px·375/320px, 13시나리오 × 3=39 PASS. 일반 회원·직접 경로·복수 매장·상태/빈/오류·사업 scope·원본 업무 fixture 이동·알림/글/학습/펀딩/QR 회귀·가로 넘침 확인 |
+| 초기 검증 정정 | 기존 서비스 신청 상태의 테스트 기대 문구와 fixture HTML UTF-8 설정, beforeEach가 mock을 cleanup으로 반환하던 테스트 준비 오류를 수정했다. 실패 회차를 PASS로 보고하지 않고 수정 후 결과만 완료 근거로 사용 |
+| 실제 인증 | 사용자 제공 로컬 파일 존재·두 이메일 계정 인증 거절 확인. 이후 이메일 리팩터링 예정·건너뛰라는 사용자 지시로 **SKIPPED_BY_USER**. 이메일 변경·비밀번호 추측/재설정·Demo 대체·Google 운영자 세션 획득은 실행하지 않음 |
+
+브라우저 사용자·매장·사업·API·handoff는 전부 fixture다. 실제 계정의 데이터·권한 동작 PASS를 의미하지 않는다.
+초기 GitHub API 401·Git 인증 실패는 기존 클라우드 인증을 재확인한 뒤 소유자 API 조회와 fetch 성공으로 해소됐다. 자격증명을 추출하거나 변경하지 않았다.
+로컬 로그는 `/tmp/my-home-completion-final-vitest.log`, `/tmp/my-home-completion-playwright.log`, `/tmp/my-home-completion-final-build.log`와 `test-results/my-home`에 보존한다. 구현 PR·main·CI·Delivery·운영 공개 검증 결과는 통합 후 추가한다.
+
+### P1 리뷰 정합과 배포 환경 조건
+
+PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정본 §2와의 차이를 지적했다. 상세 10건과 원본 업무 이동을 참여 서비스에 배치하고 요약의 더 보기 링크도 `/mypage/services`로 수정했다. 경영 현황은 사업 요약 최대 3건과 QR 통계·추이를 유지한다. 선택 매장은 같은 계정의 승인 매장 목록과 대조해 화면 사이에서 유지한다. 참여 서비스에서 QR 통계를 호출하지 않는 회귀를 추가했고 수정 후 Neture 전체 **569개 PASS**다. `/tmp/my-home-completion-review-vitest.log`에 근거를 보존한다.
+
+직전 main `b4d428d606a6a9c29804b08c046a209b8880d843`의 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38142342005)는 Google Cloud 인증 단계에서 실패하고 실제 배포와 최종 Report는 SKIPPED였다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 최신 main의 PharmacyHub retirement TODO는 사용자가 승인·적용한 WIF 일시 차단을 기록한다. 이 환경 조건의 원래 인증 복구가 현재 배포 전제이며 CI/freeze/WIF를 우회하거나 해당 provider를 임의 수정하지 않는다. 사용자에게 복구 후 알려 달라고 요청하고 구현 검증·PR 작업을 계속한다.
