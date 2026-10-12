@@ -16,7 +16,7 @@ import { apiV1Base } from '../../lib/serviceContext';
  * `/start-pharmacy`(StoreGate 밖 — 매장이 아직 없는 사용자)와 내 매장 메뉴(`/store/pharmacy/membership`) 두 곳에서 연다.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../../config/workspace';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
@@ -44,7 +44,8 @@ export default function PharmacyMembershipPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const agreement = useServiceEnrollmentPolicies('kpa-society', async () => { const response = await fetch(`${apiV1Base()}/public/services/kpa-society/enrollment-policies`); if (!response.ok) throw new Error('Policy unavailable'); return (await response.json()).data; }, user?.id ?? 'signed-out');
   const { reload, stores, organizationId } = useUnifiedStore();
-  const approvedStaff = (stores ?? []).some(store => store.organizationId === organizationId && store.memberRole === 'staff');
+  const { pathname } = useLocation();
+  const approvedStaff = pathname.includes('/store/pharmacy/membership') && (stores ?? []).some(store => store.organizationId === organizationId && store.memberRole === 'staff');
   const [membership, setMembership] = useState<PharmacyMembership | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);

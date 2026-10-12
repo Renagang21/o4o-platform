@@ -21,7 +21,7 @@ import { requireNetureMainMembership } from '../../middleware/neture-main-member
 import { requireRole } from '../../middleware/auth.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
-import { createRequireStoreWorkspaceAccess } from '../../utils/store-workspace-access.js';
+import { createPharmacyStoreAccess } from './pharmacy-store-access.js';
 import { createRequireActiveSupplier } from '../neture/middleware/neture-identity.middleware.js';
 import { checkoutService } from '../../services/checkout.service.js';
 import { EventOfferService } from '../../routes/kpa/services/event-offer.service.js';
@@ -114,7 +114,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   });
 
   const mainAccess = requireNetureMainMembership(dataSource);
-  const store = [requireAuth, mainAccess, createRequireStoreWorkspaceAccess(dataSource, 'kpa')] as RequestHandler[];
+  const store = [requireAuth, createPharmacyStoreAccess(dataSource)] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];

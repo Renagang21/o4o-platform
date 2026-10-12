@@ -62,7 +62,7 @@ const OUTSIDER = 'outsider-1';
 type Row = Record<string, any>;
 
 /** organization_members · users 를 메모리로 둔 가짜 DataSource. SQL 모양으로 분기한다. */
-function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
+function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {}) {
   const members: Row[] = seed.members ?? [];
   const users: Row[] = seed.users ?? [];
   const sql: string[] = [];
@@ -71,6 +71,9 @@ function makeDs(seed: { members?: Row[]; users?: Row[] } = {}) {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
 
+    if (s.startsWith('SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm')) {
+      return members.filter(m => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null && m.role === p[2]).map(() => ({ is_pharmacy: seed.pharmacy !== false }));
+    }
     if (s.startsWith('SELECT om.organization_id FROM organization_members om')) {
       const granted = await hasAnyRoleMock(p[0], ['kpa:store_member']);
       return granted ? members.filter(m => m.user_id === p[0] && m.left_at == null && m.role === STORE_STAFF_ROLE).map(m => ({ organization_id: m.organization_id })) : [];
@@ -511,4 +514,22 @@ it('다른 매장에서는 경영자여도 선택한 직원 매장의 자격은 
   asOwnerOf(ORG_A);
   const { ds } = makeDs({ members: [{ organization_id: ORG_B, user_id: OWNER, role: STORE_STAFF_ROLE, left_at: null }] });
   expect(await resolveStoreAccessLevel(ds, OWNER, 'kpa', ORG_B)).toMatchObject({ level: 'member', organizationId: ORG_B });
+});
+
+
+it('현역 외부 Cafe24 초대의 기존 수락·인가 경로를 승인 대기에 가두지 않는다', async () => {
+  linkedMock.mockImplementation(async (_ds, _org, key) => key === 'cafe24-b2b');
+  const { ds, members } = makeDs({ pharmacy: false, members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+  const result = await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A });
+  expect(result).toMatchObject({ role: STORE_STAFF_ROLE, services: ['cafe24-b2b'] });
+  expect(members[0].role).toBe(STORE_STAFF_ROLE);
+  expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'cafe24-b2b:store_member' }));
+});
+
+it('은퇴 서비스만 연결된 초대는 새 권한을 발급하지 않는다', async () => {
+  linkedMock.mockImplementation(async (_ds, _org, key) => key === 'pharmacy-hub');
+  const { ds, members } = makeDs({ pharmacy: false, members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_INVITED_ROLE, left_at: null }] });
+  await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
+  expect(members[0].role).toBe(STORE_INVITED_ROLE);
+  expect(assignRoleMock).not.toHaveBeenCalled();
 });

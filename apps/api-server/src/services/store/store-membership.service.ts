@@ -328,18 +328,30 @@ export async function acceptStoreInvitation(
   dataSource: DataSource,
   input: { userId: string; organizationId: string },
 ): Promise<{ organizationId: string; role: string; services: StoreOwnerServiceKey[] }> {
+  const [invitation]: Array<{ is_pharmacy: boolean }> = await dataSource.query(
+    `SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm WHERE pm.organization_id = om.organization_id) AS is_pharmacy
+       FROM organization_members om
+      WHERE om.organization_id = $1 AND om.user_id = $2 AND om.left_at IS NULL AND om.role = $3`,
+    [input.organizationId, input.userId, STORE_INVITED_ROLE],
+  );
+  if (!invitation) fail('INVITATION_NOT_FOUND', 404);
+  // The current pharmacy policy does not replace the active external Cafe24 invitation flow.
+  const legacyCafe = !invitation.is_pharmacy && (await linkedServiceKeys(dataSource, input.organizationId)).includes('cafe24-b2b');
+  if (!invitation.is_pharmacy && !legacyCafe) fail('STORE_NOT_RESOLVED', 403);
+  const nextRole = legacyCafe ? STORE_STAFF_ROLE : STORE_ACCEPTED_ROLE;
   const result = await dataSource.query(
     `UPDATE organization_members
         SET role = $3, updated_at = now()
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $4
       RETURNING organization_id`,
-    [input.organizationId, input.userId, STORE_ACCEPTED_ROLE, STORE_INVITED_ROLE],
+    [input.organizationId, input.userId, nextRole, STORE_INVITED_ROLE],
   );
   // UPDATE ... RETURNING 은 [rows, count] 형태로 온다.
   const rows = (Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result) as unknown[];
   if (!rows || rows.length === 0) fail('INVITATION_NOT_FOUND', 404);
 
-  return { organizationId: input.organizationId, role: STORE_ACCEPTED_ROLE, services: [] };
+  if (legacyCafe) await roleAssignmentService.assignRole({ userId: input.userId, role: STORE_MEMBER_ROLE_BY_SERVICE['cafe24-b2b'], assignedBy: input.userId });
+  return { organizationId: input.organizationId, role: nextRole, services: legacyCafe ? ['cafe24-b2b'] : [] };
 }
 
 /** Final approval belongs to the store owner, never to the invitee. */
@@ -357,7 +369,9 @@ export async function approveStoreMember(
     [organizationId, input.targetUserId, STORE_ACCEPTED_ROLE],
   );
   if (!pending) fail('INVITATION_NOT_FOUND', 404);
-  await roleAssignmentService.assignRole({ userId: input.targetUserId, role: STORE_MEMBER_ROLE_BY_SERVICE.kpa, assignedBy: input.ownerUserId });
+  const linked = await linkedServiceKeys(dataSource, organizationId);
+  const services: StoreOwnerServiceKey[] = ['kpa', ...linked.filter(key => key === 'cafe24-b2b')];
+  for (const key of services) await roleAssignmentService.assignRole({ userId: input.targetUserId, role: STORE_MEMBER_ROLE_BY_SERVICE[key], assignedBy: input.ownerUserId });
   const result = await dataSource.query(
     `UPDATE organization_members SET role = $3, updated_at = now()
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $4
