@@ -1,0 +1,77 @@
+# 커뮤니티 회원 변경 이력 보존 조사·개정안
+
+> **상태**: DRAFT
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **근거**: 통합 안정화 T08의 조사·개정안 후 확정 지시
+> **범위**: 현재 코드/FK 조사와 사용자 검토안. 기간 확정·정본 개정·삭제 job·운영 데이터 삭제·정책 DB 발행은 포함하지 않는다.
+
+연결: [통합 WO](../work-orders/WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1.md), [커뮤니티 후속](../work-orders/WO-O4O-COMMUNITY-REMAINING-TODO-V1.md), [역할 정본](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [현행 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md).
+
+## 1. 코드로 확인한 현재 상태
+
+main `20ed384b1` 기준으로 다음을 확인했다. 운영 DB 내용·실계정 정보를 조회한 결과는 아니다.
+
+| 항목 | 현재 구현 | 영향 |
+| --- | --- | --- |
+| 저장 | `community_membership_changes`: community/membership/actor, action, 변경 전후 role/status, reason(최대1000자), created_at | 권한 변경·승인·반려·정지·복구·탈퇴의 증빙. 자유 입력 사유와 연결 식별자는 개인정보 검토 대상 |
+| 변경 원자성 | 가입 변경과 `recordCommunityMembershipChange`를 같은 transaction으로 처리 | 삭제 설계가 현재 변경 이력 기록·rollback을 방해하면 안 됨 |
+| 개별 자기 탈퇴 | active 가입만 withdrawn/member로 변경. 마지막 유효 admin 보호 및 기존 이력 유지 | 가입 탈퇴가 계정 삭제·게시글 삭제·이력 삭제를 의미하지 않음 |
+| 조회 | 같은 커뮤니티 admin scope의 회원 이력 endpoint, 최근50개. actor name을 현재 users에서 join | 조회 상한50은 보유기간/삭제 규칙이 아님. guest나 일반 회원에게 공개하지 않음 |
+| 자동 삭제 | 현행 PrivacyRetentionService의6개 대상에 이 테이블 없음 | 기존365일 로그 집행을 이 테이블에도 적용한다고 설명하면 안 됨 |
+| 권한의 원장 | 현재 가입 role/status 및 자격은 현행 테이블/판정으로 재확인 | 과거 이력 row를 삭제하더라도 현재 권한 원장을 지우거나 권한을 복원하지 않아야 함 |
+
+근거: [migration](../../apps/api-server/src/database/migrations/1791632505104-AddCommunityMemberAdministration.ts), [가입 원장](../../apps/api-server/src/database/migrations/1790400000000-CreateCommunityDomain.ts), [회원 변경](../../apps/api-server/src/services/community/community-member-management.service.ts), [이력 기록](../../apps/api-server/src/services/community/community-membership-mutations.ts), [조회 router](../../apps/api-server/src/routes/communities.routes.ts), [retention service](../../apps/api-server/src/services/privacy-retention.service.ts).
+
+## 2. 실제 FK와 삭제 영향
+
+| 삭제되는 부모 | 현재 FK | 이력 영향 |
+| --- | --- | --- |
+| communities | history.community_id → ON DELETE CASCADE | 해당 커뮤니티 이력도 삭제 |
+| community_memberships | history.membership_id → ON DELETE CASCADE | 해당 가입 이력도 삭제 |
+| 변경 대상 users | memberships.user_id → ON DELETE CASCADE → history.membership_id | 대상 계정의 가입과 이력이 연쇄 삭제 |
+| 변경 수행자 users | history.actor_user_id → ON DELETE SET NULL | 수행자 연결만 제거. actor가 동일 row의 대상 회원이면 위 cascade도 별도로 적용됨 |
+
+`actor_user_id`가 NULL이 되는 것만으로 익명화가 완료되는 것은 아니다. membership 연결과 자유 입력 reason이 남을 수 있다. 커뮤니티 비활성화·개별 탈퇴와 부모 row 물리 삭제는 구분한다. 분쟁 보유 예외가 필요한 경우 부모 삭제로 예외 이력까지 cascade되는 문제를 먼저 해결해야 한다. 현재 FK가 법률 보유 예외를 자동 보장한다고 판단하지 않는다.
+
+## 3. 기간 비교와 권고안 — 미확정
+
+운영 변경 증빙이라는 목적을 기준으로 검토한다. 개인정보처리시스템 접속기록·전자상거래 증빙의 법정 기간을 이 테이블에 자동 복사하지 않는다. 이력 전체가 어떤 법정 기록에 해당하는지는 별도 검토가 필요하다.
+
+| 선택안 | 기준 | 장점 | 한계 |
+| --- | --- | --- | --- |
+| 6개월 | 각 이력 created_at 이후6개월 | 연결 식별자·자유 사유 장기 보유를 줄임 | 반년 이후 운영자 지정/제재 분쟁의 조사 자료가 줄어듦 |
+| **1년 권고** | 각 이력 created_at 이후365일 | 연간 운영 변경 확인과 보유 최소화의 균형 | 법정/분쟁 예외가 필요한 기록을 식별·보호할 별도 절차 필요 |
+| 2년 | 각 이력 created_at 이후730일 | 장기 분쟁 대응 자료 확보 | 기간 확대의 구체적 필요·수집 고지 근거가 추가로 필요 |
+
+권고안은 **생성 후365일**이다. 회원의 탈퇴/복구/재가입이 이전 모든 이력의 시계를 다시 시작하지 않도록 각 row의 created_at을 사용한다. 회원 활동 중에도 오래된 이력은 기간 경과 대상이다. 현재 가입 원장·계정 정보·게시글·거래 증빙은 별도 정책 대상이며 이 규칙으로 삭제하지 않는다. 시각이 누락/비정상인 row는 미확정으로 분류하고 자동 삭제하지 않는다. 달력상의1년과365일 차이는 최종 고지와 집행에서 같은 기준으로 표기한다.
+
+분쟁·법정 보유 예외는 관련 row만 대상으로 목적·근거·승인자·보유 종료일/다음 검토일을 기록하고 접근을 제한하는 방식을 제안한다. 무조건 무기한 보존하거나 모든 커뮤니티 이력에 동일 예외를 적용하지 않는다. 예외 저장·cascade 보호 방식은 아직 구현되지 않았으므로 그 방식이 확정/검증되기 전 자동 삭제는 활성화하지 않는다. 새 schema가 필요한지까지 다음 구현 범위에서 따로 판단한다.
+
+기간 만료의 기본 파기는 해당 **이력 row만 삭제**하는 안을 권고한다. reason 일부 마스킹과 actor NULL만으로 비식별화를 완료했다고 판단하지 않는다. 통계 목적의 비식별 집계를 별도로 남기려면 재식별 위험·필드·목적을 추가 확정해야 한다.
+
+## 4. 개인정보 처리방침 개정 문구 제안 — 게시 전
+
+아래 문구는 365일 권고안이 확정될 때의 후보이며 현행 처리방침을 대체하지 않는다.
+
+> 커뮤니티 운영의 적정성 확인과 회원 문의 처리를 위해 가입 승인·반려, 역할 변경, 이용 제한·복구 및 탈퇴의 변경 이력을 처리합니다. 처리 항목은 커뮤니티·가입 식별정보, 변경 수행자 식별정보, 변경 전후 상태와 역할, 처리 사유 및 기록 시각입니다. 변경 이력은 각 기록 생성 후365일 보관한 뒤 파기합니다. 관계 법령에 따라 보존하거나 실제 분쟁 처리를 위해 별도 보관이 필요한 기록은 해당 목적과 기간을 정해 접근을 제한하고, 그 기간이 끝나면 파기합니다.
+
+이 후보와 계정 자체 삭제·커뮤니티 폐쇄 시 처리, 예외의 실제 근거·기간 및 현행 v1 조항의 일치 여부를 함께 확정한다. 운영 안내에는 개별 탈퇴 후 게시글/기존 이력이 남는 현재 범위를 정확하게 표시한다. 자동 삭제를 지원하기 전 그 기능이 이미 운영 중이라고 공고하지 않는다.
+
+## 5. 확정 후 구현·검증 순서
+
+1. 기간/기산점, 예외의 근거·보유 종료, 부모 삭제와 증빙 보존의 충돌 처리 및 파기 방식 확정.
+2. 보유기간 정본과 처리방침 개정안 정렬. 새 정책 version·본문·공고/시행일은 기존 인증/법률 담당 작업과 맞춤.
+3. 현재 schema에서 가능한 범위와 예외/인덱스 등에 필요한 추가 변경을 명시해 별도 구현 범위 확정. 미승인 schema/migration은 추가하지 않음.
+4. 합성 데이터로 기간 경계·active/withdrawn·재가입·정지/복구·예외·비정상 시각·마지막 admin·cascade를 검증. 현재 role/status와 회원 원장 불변 확인.
+5. 운영 read-only dry-run으로 후보/예외/미확정 **건수만** 검증. actor/name/reason/원문·식별자는 보고하지 않음. 이번 조사에서는 운영 dry-run도 실행하지 않음.
+6. 공고/시행 및 필요한 고지 후, 승인된 대상/배치/복구·실패 중단 기준으로 집행. 예외가 검증되지 않으면 fail closed. 작업 로그는 기준일·건수·성공/실패만 기록.
+
+## 6. 인접 법률·폐기 작업의 현재 상태
+
+- 인증·공통/서비스별 정책 개편 [PR #457](https://github.com/Renagang21/o4o-platform/pull/457)은 최초 조사 중 OPEN이었으나2026-10-12 09:42(KST)에 main `210529860` 병합을 확인했다. 공통 계정 이용약관·개인정보·서비스별 본문 초안을 재사용하며 이 문서에서 전문을 복제하거나 대신 발행하지 않는다. 계획된 공고2026-10-12(KST)·시행2026-11-13(KST)은 PR의 예정일이며 실제 운영 공개/시행 완료 증거가 아니다. 공고 검증 전 예정일을 확정된 시작일로 해석하지 않는다. 이 문서의 미확정 커뮤니티 이력365일 제안도 해당 공고에 자동 포함하지 않는다.
+- #457의 과거 WIF 인증 차단은 PH 담당의 원래 조건 복구와 read-only smoke38187804879 SUCCESS로 해소됐다. 해당 PR 병합 후 CI·배포·실제 공고 확인은 담당 작업의 후속이며 이 세션은 다른 branch를 수정/중복 게시하지 않는다.
+- PH 자원 apply38187016286 및 독립 재검증38187187895 SUCCESS로 Cloud Run/backend/NEG 제거 phase 완료, 12개 리다이렉트 규칙 확인. activeFamiliesVerified=0이므로 실제 QR/tablet 데이터·기기 검증으로 보고하지 않는다. PH-only DB·주문/결제/역할/정책/상품 scope 및 공용 코드 잔여는 별도 담당 WO의 미완료 범위다. 종전 PH 동의/거래의 법정 증빙을 이 커뮤니티 이력 권고 기간으로 삭제하지 않는다.
+
+## 7. 이번 실행 결과
+
+코드·migration·정본 대조, 기존 담당 PR/Actions 상태 조회와 검토안 작성만 수행했다. 새 코드/schema/migration/dependency 변경, 운영 DB write/삭제, 새 정책 DB 발행, PH apply/권한 변경, 이전 클라우드 삭제는 모두0이다. 문서 검사·push/main 결과는 연결 통합 WO의 연속 phase에 기록한다. 사용자 실계정/OAuth 확인과 정책 확정은 마지막 단계에 유지한다.

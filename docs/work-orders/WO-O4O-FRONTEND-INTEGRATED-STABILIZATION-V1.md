@@ -201,3 +201,25 @@ T08 보존 기간·예외/삭제 방식과 T09 약관·개인정보 최종 본�
 이전 클라우드 환경 ID·미푸시/로컬 파일·복원 가능성은 아직 확정하지 못했다. 해당 공간을 삭제하지 않으며 T13 및 보존 확인 후 정리한다. 현재 게시 버전의 관측은 spec/observed 37·current=true·running·connected·failure 없음으로 재확인했다. 기존 게시된 설정을 재저장/재게시하지 않았다.
 
 WORKTREE_DISPOSITION: `/workspace/o4o-wt/frontend-integrated-stabilization` / `wo/frontend-integrated-stabilization`, source main integration #458·#467 완료 / runtime deploy·공개 smoke PASS / verdict KEEP — T13·정책 확정·이전 공간 보존 확인이 남은 같은 ACTIVE WO. 완료 기록 PR의 main 포함·clean 확인은 마지막 Git 검증에서 수행한다. 다른 세션의 worktree/branch는 삭제하지 않는다.
+
+## 10. 남은 항목 연속 phase — 2026-10-12
+
+사용자의 진행 지시에 따라 외부 후속 TODO 초안을 먼저 작성하고 main `20ed384b1`의 코드·정본·담당 실행을 조사해 보완했다. 같은 ACTIVE WO의 연속 phase로 전용 branch/worktree를 유지한다. §9의 배포 결과는 당시 결과이며 이후 공급자/펀딩/운영 UI의 다른 담당 변경을 재구현하거나 그 브라우저 테스트를 이번 세션 결과로 복제하지 않는다.
+
+| 항목 | 최신 조사 결과 | 현재 실행/남은 단계 |
+| --- | --- | --- |
+| T08 변경 이력 | 기존 retention 대상6개에 community_membership_changes 없음. 부모 community/membership/대상 user 삭제 시 cascade, actor 삭제 시 SET NULL | [조사·개정안](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md) 준비. 생성 후365일 권고와6개월/2년 비교, 예외·FK 보호·처리방침 문구 포함. 사용자 확정 전 job/삭제 미실행 |
+| T09 약관·개인정보 | 조사 중 담당 PR #457이 main `210529860`에 병합됨. 공통/서비스별 본문·동의 증빙·공고 구현 포함. PH 인증 제한 복구 완료로 종전 WIF blocker 해소 | 해당 담당 초안 재사용. 병합 후 CI·배포·실제 공고/정책 게시 증거는 담당 기록으로 확인. 예정일을 실제 공고일로 표시하지 않으며 이번 이력365일 제안은 자동 포함하지 않음 |
+| T10 PH 폐기 | apply38187016286·재검증38187187895 SUCCESS: 전용 Cloud Run/backend/NEG 부재·12개 리다이렉트 PASS. WIF read-only smoke38187804879 SUCCESS | 종전 누락 IAM/Cloud 자원/원래 인증 복구 대기는 해소. PH-only DB 및 공용 코드 잔여만 담당 WO에서 계속 추적. 실제 기기/데이터 검증은 이번 active inventory0과 구분 |
+| T12 이전 공간 | 현재 클라우드만 식별 가능. 이전 환경 ID/미푸시/로컬 파일 보존 증거 미확정 | 이름/ID 확인 요청. 이전 공간·다른 세션 worktree 삭제0. 현재 공간 KEEP |
+| T13 사용자 테스트 | 이 세션에서 실계정/OAuth 검증을 수행하지 않음 | 사용자 결과 수집 → 발견 문제 수정/회귀/배포 → 종료 판정. 마지막 순서 유지 |
+
+- [x] 후속 TODO 초안 → 최신 코드/문서/담당 결과 조사 → 위 표로 보완.
+- [x] T08 구체적인 기간·기산점·예외·FK/계정 삭제 영향·개정 문구 검토안 준비.
+- [x] T09·T10 최신 담당 결과를 읽기 전용으로 확인, 이전 blocker와 실제 잔여 범위 구분.
+- [x] 이번 검토안·TODO 문서 민감정보 검사·상대 링크·diff whitespace PASS.
+- 최종 commit/push·CI/review·main 통합 결과는 이 연속 phase의 PR에서 확인한다. 이번 변경은 문서-only DEPLOYMENT=NOT_APPLICABLE이며 담당 인증 PR의 실제 배포는 별개다.
+- [ ] 기간/예외·본문 최종 확정과 필요한 후속 구현/발행. 현재 검토안은 DRAFT이며 정본 정책을 대체하지 않음.
+- [ ] 이전 공간 식별·보존 확인 및 마지막 사용자 테스트. 현재 작업공간 KEEP.
+
+문서 정합: 종전 T10의 IAM3개 미해소 표기는 과거 조사 결과다. 최신 실제 자원 제거·인증 복구 완료와 DB/공용 코드 미완료를 이 절에 반영했다. 현행 보유기간 정본·게시된 법률 본문은 변경하지 않았다. 현재 클라우드 관측은 spec/observed41·current=true·running·connected·failure 없음이며 설정 재게시 없이 진행한다.
