@@ -105,11 +105,15 @@ export class MembershipConsoleController {
   }
 
   /** The same catalogue ownership check applies to role assignment and removal. */
-  private requireMemberRoleAdmin(req: Request, res: Response, serviceKey: string): boolean {
+  private requireMemberRoleScope(req: Request, res: Response, serviceKey: string): boolean {
     const scope: ServiceScope = (req as any).serviceScope;
-    const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
-    if (scope.isPlatformAdmin || !adminKeys || adminKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
-    res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
+    const selected = req.body?.serviceKey ?? req.query?.serviceKey;
+    if (typeof selected === 'string' && resolveCanonicalServiceKey(selected) !== resolveCanonicalServiceKey(serviceKey)) {
+      res.status(400).json({ success: false, code: 'SERVICE_KEY_MISMATCH', error: '선택한 서비스와 역할의 서비스가 일치하지 않습니다.' });
+      return false;
+    }
+    if (scope.isPlatformAdmin || scope.serviceKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
+    res.status(403).json({ success: false, code: 'SERVICE_SCOPE_REQUIRED', error: '역할이 속한 서비스의 운영 권한이 필요합니다.' });
     return false;
   }
 
@@ -1342,13 +1346,13 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
         // Assignability check
         if (!roleEntity.isAssignable) {
           res.status(403).json({ success: false, error: 'This role is not assignable' });
           return;
         }
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -1476,8 +1480,8 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;

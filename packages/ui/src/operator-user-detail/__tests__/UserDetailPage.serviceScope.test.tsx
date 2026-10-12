@@ -49,3 +49,19 @@ it.each([['active', '정지'], ['suspended', '복구']])('service admin can mana
   await waitFor(() => expect(screen.getByRole('button', { name: action })).toBeTruthy());
   expect(screen.getByRole('button', { name: '삭제' })).toBeTruthy();
 });
+
+
+it.each([['active', '정지'], ['suspended', '복구']])('operator daily authority performs %s without exposing deletion or operator assignment', async (status, action) => {
+  const get = vi.fn(async (path: string) => path.startsWith('/operator/roles') ? { data: [
+    { name: 'neture:member', displayName: '일반 회원', isAssignable: true, isAdminRole: false },
+    { name: 'neture:operator', displayName: '서비스 운영자', isAssignable: true, isAdminRole: false },
+  ] } : { user: { id: 'u', name: '회원', email: 'fixture@example.invalid', status: 'active', isActive: true, createdAt: '2026-01-01' }, roles: [], memberships: [{ id: 'membership', serviceKey: 'neture', status, role: 'member', createdAt: '2026-01-01' }] });
+  const api = { get, put: vi.fn(), patch: vi.fn(), post: vi.fn(), delete: vi.fn() };
+  render(<UserDetailPage userId="u" apiAdapter={api} isAdmin={false} canManageMembers navigate={vi.fn()} config={{ theme: 'blue', serviceKey: 'neture' }} />);
+  await waitFor(() => expect(screen.getByRole('button', { name: action })).toBeTruthy());
+  expect(screen.queryByRole('button', { name: '삭제' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '역할 추가' }));
+  await waitFor(() => expect(get).toHaveBeenCalledWith('/operator/roles?service=neture'));
+  expect(screen.queryByRole('option', { name: '서비스 운영자' })).toBeNull();
+  expect(screen.getByRole('option', { name: '일반 회원' })).toBeTruthy();
+});

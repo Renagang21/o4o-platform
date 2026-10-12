@@ -402,7 +402,7 @@ describe('기존 계약 유지', () => {
 
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: 'Cannot remove roles outside your service scope' }),
+      expect.objectContaining({ code: 'SERVICE_SCOPE_REQUIRED' }),
     );
   });
 
@@ -521,8 +521,20 @@ it.each(['assignMemberRole', 'removeMemberRole'] as const)('%s validates a bare 
   request.memberAdminServiceKeys = ['neture'];
   const response = makeRes();
   await controller[action](request, response);
-  expect(response.status).toHaveBeenCalledWith(403);
-  expect(response.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_MEMBER_ADMIN_REQUIRED' }));
+  expect(response.status).toHaveBeenCalledWith(400);
+  expect(response.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_KEY_MISMATCH' }));
   expect(mockRemoveRole).not.toHaveBeenCalled();
   expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
+});
+
+
+it('ordinary role assignment checks the target membership in its own service even for a multi-service operator', async () => {
+  primeRole('neture:member');
+  const request = makeReq(TARGET_ID, 'neture:member', { isPlatformAdmin: false, serviceKeys: ['neture', 'lecture'], rolePrefixes: ['neture', 'lecture'] });
+  request.body = { role: 'neture:member', serviceKey: 'neture' };
+  mockQuery.mockResolvedValue([]);
+  const response = makeRes();
+  await controller.assignMemberRole(request, response);
+  expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FROM service_memberships'), [TARGET_ID, ['neture']]);
+  expect(response.status).toHaveBeenCalledWith(404);
 });

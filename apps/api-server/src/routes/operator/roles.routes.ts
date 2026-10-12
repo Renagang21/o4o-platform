@@ -28,6 +28,10 @@ router.use(requireRole([
   'admin', 'operator', 'manager',
   'platform:super_admin',
   'neture:admin', 'neture:operator',
+  'lecture:admin', 'lecture:operator',
+  'community:admin', 'community:operator',
+  'supplier:admin', 'supplier:operator',
+  'funding:admin', 'funding:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa:admin', 'kpa:operator',
   // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
