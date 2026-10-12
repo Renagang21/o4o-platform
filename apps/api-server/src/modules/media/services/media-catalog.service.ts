@@ -142,6 +142,7 @@ export class MediaCatalogService {
       lock: { mode: 'pessimistic_write' },
     });
     if (!asset) throw new MediaCatalogError('ASSET_NOT_FOUND', 404);
+    if (isRetiredServiceValue(asset.serviceKey)) throw new MediaCatalogError('SERVICE_RETIRED', 410);
     return asset;
   }
   async createExternal(input: Record<string, unknown>, userId: string) {
@@ -219,6 +220,7 @@ export class MediaCatalogService {
     mediaUuid(id);
     const asset = await this.ds.getRepository(MediaAsset).findOneBy({ id });
     if (!asset) throw new MediaCatalogError('ASSET_NOT_FOUND', 404);
+    if (isRetiredServiceValue(asset.serviceKey)) throw new MediaCatalogError('SERVICE_RETIRED', 410);
     const links = await this.ds.query(
       `SELECT id, media_asset_id AS "mediaAssetId", entity_type AS "entityType", entity_id AS "entityId", purpose, created_at AS "createdAt" FROM media_entity_links WHERE media_asset_id=$1 ORDER BY created_at,id`,
       [id],

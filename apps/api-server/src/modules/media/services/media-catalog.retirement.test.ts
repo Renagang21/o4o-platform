@@ -9,3 +9,11 @@ describe('retired service media links', () => {
     expect(transaction).not.toHaveBeenCalled();
   });
 });
+
+it('rejects loaded PH assets before opaque-ID catalog mutations', async () => {
+  const findOne = jest.fn().mockResolvedValue({ serviceKey: 'pharmacy-hub' });
+  const manager = { getRepository: () => ({ findOne }) };
+  const service = new MediaCatalogService({} as any);
+  await expect(service.locked(manager as any, '11111111-2222-4333-8444-555555555555'))
+    .rejects.toMatchObject({ code: 'SERVICE_RETIRED', status: 410 });
+});

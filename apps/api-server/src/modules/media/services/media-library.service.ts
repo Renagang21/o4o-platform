@@ -238,6 +238,7 @@ export class MediaLibraryService {
 
     const qb = this.repo.createQueryBuilder('m')
       .where('m.is_library_public = true')
+      .andWhere("(m.service_key IS NULL OR BTRIM(m.service_key) NOT IN (:...retiredKeys))", { retiredKeys: ['pharmacy-hub', 'pharmacy-hub-event-offer'] })
       .orderBy('m.created_at', 'DESC').addOrderBy('m.id', 'DESC');
 
     // Type(asset_type) — 파일 종류 필터
@@ -290,7 +291,8 @@ export class MediaLibraryService {
    * 단건 조회.
    */
   async getById(id: string): Promise<MediaAsset | null> {
-    return this.repo.findOne({ where: { id } });
+    const asset = await this.repo.findOne({ where: { id } });
+    return asset && !isRetiredServiceValue(asset.serviceKey) ? asset : null;
   }
 
   /**
@@ -303,6 +305,7 @@ export class MediaLibraryService {
   async getUsage(assetId: string): Promise<{ resourceUrl: string; usages: MediaAssetUsage[] }> {
     const asset = await this.repo.findOne({ where: { id: assetId } });
     if (!asset) throw new Error('Asset not found');
+    if (isRetiredServiceValue(asset.serviceKey)) throw new RetiredServiceError();
     const url = asset.url;
     if (!url) return { resourceUrl: '', usages: [] };
 
@@ -340,6 +343,7 @@ export class MediaLibraryService {
   async moveToFolder(assetId: string, folder: string): Promise<MediaAsset> {
     const asset = await this.repo.findOne({ where: { id: assetId } });
     if (!asset) throw new Error('Asset not found');
+    if (isRetiredServiceValue(asset.serviceKey)) throw new RetiredServiceError();
     asset.folder = folder;
     return this.repo.save(asset);
   }
@@ -367,6 +371,7 @@ export class MediaLibraryService {
   ): Promise<MediaAsset> {
     const asset = await this.repo.findOne({ where: { id: assetId } });
     if (!asset) throw new Error('Asset not found');
+    if (isRetiredServiceValue(asset.serviceKey)) throw new RetiredServiceError();
 
     // 화이트리스트 필드만 반영(파일 속성은 절대 미변경)
     if (patch.title !== undefined) asset.title = patch.title;
@@ -433,6 +438,7 @@ export class MediaLibraryService {
     const repo=manager.getRepository(MediaAsset);
     const asset = await repo.findOne({ where: { id: assetId }, lock: { mode: 'pessimistic_write' } });
     if (!asset) throw new Error('Asset not found');
+    if (isRetiredServiceValue(asset.serviceKey)) throw new RetiredServiceError();
 
     const links=await manager.query('SELECT 1 FROM media_entity_links WHERE media_asset_id=$1 LIMIT 1',[assetId]);
     const descendants=await manager.query('SELECT 1 FROM media_assets WHERE parent_asset_id=$1 OR root_asset_id=$1 LIMIT 1',[assetId]);

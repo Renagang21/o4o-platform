@@ -65,6 +65,12 @@ const INVALID_USER_ID_RESPONSE = {
  */
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
 
+function currentApprovalMemberships(rows: Array<{ id: string; service_key?: string; role?: string }>) {
+  const current = rows.filter(m => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+  if (rows.length > 0 && current.length === 0) throw new RetiredServiceError();
+  return current;
+}
+
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
 
@@ -606,8 +612,7 @@ export class MembershipConsoleController {
             );
 
         if (pendingMemberships.length > 0) {
-          pendingMemberships = pendingMemberships.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
-          if (pendingMemberships.length === 0) throw new RetiredServiceError();
+          pendingMemberships = currentApprovalMemberships(pendingMemberships);
           for (const m of pendingMemberships) {
             await approvalService.approveMembership({
               membershipId: m.id,
@@ -811,8 +816,7 @@ export class MembershipConsoleController {
                 );
 
             if (pendingMemberships.length > 0) {
-              pendingMemberships = pendingMemberships.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
-              if (pendingMemberships.length === 0) throw new RetiredServiceError();
+              pendingMemberships = currentApprovalMemberships(pendingMemberships);
               for (const m of pendingMemberships) {
                 await approvalService.approveMembership({
                   membershipId: m.id,
