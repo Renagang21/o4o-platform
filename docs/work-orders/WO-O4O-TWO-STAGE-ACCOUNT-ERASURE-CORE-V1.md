@@ -181,8 +181,10 @@ main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 m
 
 ### 10.4 검증 후속의 실제 최종 범위
 
-[CHECK의 PR #507 후속](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md#검증-후속--pr-507)을 적용한다. 유효 target grant의 최종 잠금/재확인, 타인의 더 긴 이메일/metadata actor 오판 방지, 동일 연락처의 새 UUID 가입 허용을 추가했다. 이전 임시 email hash fence 결과는 최신 계약이 아니다. 연락처 hash를 보존/차단하지 않고 retired UUID만7일 복원 차단하며 이전 calendar anchor를 그대로 유지한다. 임의 metadata alias/provider namespace는 typed handler 전수 분류가 필요하다. DB25+storage4+정적 인증17+Demo9=55 tests·API build·lint PASS; 새 DDL0. #505 main/post-CI PASS, API/Admin dry-run만 실행했고 실제 운영 DDL/배포는 미승인으로 보류했다.
+[CHECK의 PR #507 후속](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md#검증-후속--pr-507)을 적용한다. 현재 및 예정 super admin target grant를 보호하고, caller는 현재 유효 grant만 인가한다. 타인의 긴 이메일/metadata actor를 대상 신원으로 추정하지 않으며 동일 연락처의 새 UUID 가입과 원래 calendar anchor를 유지한다. typed providerId/provider_id는 AuthProvider 전체 namespace를 구분하고, 일반 memo/저장소 provider에는 namespace를 확장하지 않는다. 후보는 SQL 경계 검사 후64행 cursor로 처리한다. 전체 alias/domain/file handler 완료를 의미하지 않는다.
+
+최종 집중 DB37+storage4+정적 인증17+Demo9=67 tests·API build·focused lint PASS. #505/#507 정상 main 통합·각 post-merge CI PASS. #507 main은 `b1570cc9bf9dcd1440c2ec37bf46afb06ce6fa5f`다. API/Admin 선택 dry-run만 실행했으며 실제 운영 DDL/배포·계정/GCS 제거·job/법률 게시0이다. 운영 활성화 전 잔여는 §10.2와 CHECK를 따른다.
 
 ### 10.5 legacy 완료 operation의 연락처 marker retirement
 
-CHECK의 업그레이드 P2 후속을 따른다.24단계 migration은 이미 완료된 operation까지 legacy identity hash를 파기하고 UUID-only writer 함수를 적용한다. 최종 schema 지문41e3be0a…·6617 lines, fresh/23→24/no-op·집중58 tests·migration contract21 checks PASS.23단계 원본은 불변이며 실제 운영23/24 적용·일반 계정/GCS 제거·job/법률 게시0이다. 새24단계 코드·격리 검증은 승인된 Core WO의 재검토 수정 범위이며 실제 DB 실행은 별도 승인 대상이다.
+24단계 migration은 완료 operation까지 legacy identity hash를 파기하고 UUID-only writer 함수를 적용한다. table lock 안에서 UUID-only CHECK를 추가해 구버전 serving API의 hash 재삽입도 거절한다. capability/ready는 이 제약의 validated 상태를 필수로 확인한다. 최종 schema 지문 `0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50`,6618 lines이며 fresh baseline→24/기존23→24/no-op·migration contract21 checks PASS.23단계 원본/지문은 불변이다. 새24단계 코드·격리 검증은 승인된 Core WO 재검토 수정 범위이며 실제 운영23/24 적용은 별도 승인 대상이다. 파기한 연락처 hash를 복원하지 않고 forward repair를 요구한다.

@@ -132,3 +132,13 @@ legacy 인증의 `users.provider/provider_id`도 동일 typed namespace 계약�
 준비 상태 재검토 P2: capability/실행 ready는24단계 UUID-only CHECK의 존재·validated 상태를 필수로 확인한다.23단계 상태/NOT VALID 제약에서는 disabled·요청503이며 계정 활성/operation0을 유지한다. 제약 검증 후에만 준비 조건을 충족한다. 집중 DB34+storage4+정적 인증17+Demo9=64 tests·API build·focused lint PASS.24단계 지문0d25da3d/6618 및 운영 실행0은 그대로다.
 
 legacy provider 범위 P2: 인증 타입 `AuthProvider` 전체(email/google/kakao/naver/service)를 `Record<AuthProvider,true>`로 빠짐없이 반영한다. 저장소 provider는 여전히 인증 namespace로 취급하지 않으며 providerId/provider_id 필드에만 scope를 적용한다. 다른 provider의 email/naver/service linked row와 legacy user ID 보존 회귀를 추가했다. retired 인증 경로를 활성화하거나 권한을 넓히지 않았다. 집중 DB37+storage4+정적 인증17+Demo9=67 tests·API build·focused lint PASS; 추가 DDL0·최종 지문0d25da3d/6618·운영 실행0.
+
+
+## 검증 후속의 정상 main 통합 — 2026-10-12
+
+- [PR #507](https://github.com/Renagang21/o4o-platform/pull/507)의 최종 head `54f57e86bb3478c305ad2543cc8fd379bde4efe5`: [CI38240981404](https://github.com/Renagang21/o4o-platform/actions/runs/38240981404) SUCCESS(API3 shards·Admin build·quality), CodeQL PASS. 최신 main #510의 인증 완료 문서만 정상 merge로 반영했고 실제 본인 OAuth/일반 계정 검증 완료로 확대하지 않았다.
+- 최종 ready review 후 Codex 👍(2026-10-12T11:15:09Z), 새 지적0·모든 스레드 해결·active ruleset/최신 main 확인 후 일반 PR merge. main `b1570cc9bf9dcd1440c2ec37bf46afb06ce6fa5f`; [post-merge CI38242122228](https://github.com/Renagang21/o4o-platform/actions/runs/38242122228) SUCCESS.
+- production은 `HELD_LEVEL_3 · api(L3),admin(needs-api)`다. 이번 Core/API/migration의 새 운영 승인 경계이며 #457/#497 인증 잔여를 다시 미해소로 표시한 것이 아니다.
+- [선택 Promote dry-run38243289400](https://github.com/Renagang21/o4o-platform/actions/runs/38243289400): main SHA b1570cc9 고정·services=api,admin·dry_run=true, workflow/Classify SUCCESS. API/Admin/Web/Report 전부 skipped; tag/traffic/migration/운영 data write0. 상세 artifact는 redirect 접근 제약으로 확보하지 못했으며 상세 serving snapshot/승격 decision JSON을 확인 완료로 표시하지 않는다. 실행 시 최신 main·CI·freeze·serving 및 전체 pending migration을 다시 확인하는 정상 gate를 유지한다.
+- 운영 실행 승인안: 삭제 기능 비활성 상태에서23/24 migration 및 API/Admin verified rollout.23단계5테이블/기존 writer trigger·24단계 연락처 hash retirement/UUID-only 함수·table lock/검증 제약이 대상이다. 일반 계정·GCS 파기/apply flags/job/새 법률 게시·재동의·분회 전용 배포는 포함하지 않는다. source/local 검증은 운영 schema 적용·전수 inventory 완료 증거가 아니다.
+- 동일 WO의 통합 증거 phase로 branch/worktree를 유지한다(새 독립 WO 재사용 아님). WORKTREE_DISPOSITION=KEEP; 활성화 전 전수 분류/법률 시행/마지막 사용자 테스트 잔여를 유지한다.
