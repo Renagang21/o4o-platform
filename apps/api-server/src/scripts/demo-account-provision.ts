@@ -36,7 +36,7 @@
  */
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { normalizeLoginEmail } from '@o4o/auth-utils';
+import { normalizeLoginEmail, PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 // 싱글턴을 그대로 쓴다 — 해시 정책(bcrypt cost 12 · 72바이트 상한)을 이 스크립트가 다시 쓰지 않는다.
 // 기본 연결이 AppDataSource 라서, entity 를 싣지 않는 이 스크립트의 DataSource 를 manager 로 넘긴다.
 import { passwordCredentialService } from '../services/auth/password-credential.service.js';
@@ -47,7 +47,7 @@ const APPLY = process.argv.includes('--apply');
 const DEMOS = [
   {
     demoType: 'STORE_OWNER' as const,
-    email: 'teststoreowner@example.com',
+    email: PUBLIC_DEMO_ACCOUNTS[0].email,
     name: '매장 경영자 Demo',
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
@@ -57,7 +57,7 @@ const DEMOS = [
   },
   {
     demoType: 'SUPPLIER' as const,
-    email: 'testsupplier@example.com',
+    email: PUBLIC_DEMO_ACCOUNTS[1].email,
     name: '공급자 Demo',
     /** 기존 조직을 쓰지 않는다 — 셋 다 실제 주문·실제 신청과 얽혀 있다(§주석 상단). 새로 만든다. */
     organizationId: null,
@@ -175,7 +175,8 @@ async function run(): Promise<void> {
       const has = await passwordCredentialService.hasPassword(userId, ds);
       pwAction = has ? 'exists(keep)' : 'CREATE';
       if (!has && APPLY) {
-        await passwordCredentialService.setPassword(userId, 'testmail1!', ds);
+        const credential = PUBLIC_DEMO_ACCOUNTS.find(account => account.type === demo.demoType)!;
+        await passwordCredentialService.setPassword(userId, credential.password, ds);
         writes += 1;
       }
     }

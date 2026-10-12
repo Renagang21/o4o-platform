@@ -13,6 +13,7 @@ import { DEMO_ACCOUNTS, readDemoMetadata, demoAwareErrorMessage, DEMO_ACCOUNT_FO
 describe('readDemoMetadata', () => {
   it('서버 demo 필드만 본다', () => {
     expect(readDemoMetadata({ demo: { isDemo: true, demoType: 'SUPPLIER' } })).toEqual({ isDemo: true, demoType: 'SUPPLIER' });
+    expect(readDemoMetadata({ demo: { isDemo: true, demoType: 'STORE_STAFF' } })).toEqual({ isDemo: true, demoType: 'STORE_STAFF' });
     expect(readDemoMetadata({ demo: { isDemo: false, demoType: null } })).toEqual({ isDemo: false, demoType: null });
     // Demo 계정 이메일이어도 서버 필드가 없으면 Demo 아님
     expect(readDemoMetadata({ email: DEMO_ACCOUNTS[0].email })).toEqual({ isDemo: false, demoType: null });
@@ -31,6 +32,12 @@ describe('demoAwareErrorMessage', () => {
 });
 
 describe('Demo credential 단일 정의', () => {
+  it('직원은 같은 매장 업무공간으로 이동하며 별도 credential을 사용한다', () => {
+    const staff = DEMO_ACCOUNTS.find(account => account.type === 'STORE_STAFF');
+    expect(staff?.landing).toEqual({ kind: 'storeWorkspace' });
+    expect(staff?.email).not.toBe(DEMO_ACCOUNTS[0].email);
+    expect(staff?.password).not.toBe(DEMO_ACCOUNTS[0].password);
+  });
   it('web-neture src 에서 Demo 이메일 · 비밀번호는 lib/demoAccounts.ts 에만 있다', () => {
     const src = join(__dirname, '..', '..');
     const files: string[] = [];

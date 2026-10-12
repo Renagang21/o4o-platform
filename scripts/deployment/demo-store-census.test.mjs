@@ -42,6 +42,15 @@ test('missing, duplicated or ambiguous canonical Demo registry fails before othe
   }
 });
 
+test('one approved staff Demo extends the registry without widening ownership or accepting duplicates',async()=>{
+  const base=[{demo_type:'STORE_OWNER',count:1},{demo_type:'SUPPLIER',count:1}];
+  const {client}=fakeClient({demos:[...base,{demo_type:'STORE_STAFF',count:1}]});
+  assert.equal((await collectDemoStoreCensus(client)).readOnly,true);
+  for(const demos of [[...base,{demo_type:'STORE_OWNER',count:1}],[...base,{demo_type:'STORE_STAFF',count:2}],[...base,{demo_type:'OPERATOR',count:1}]]){
+    await assert.rejects(collectDemoStoreCensus(fakeClient({demos}).client),/Canonical|stage=demo-census/);
+  }
+});
+
 test('invalid catalog identifier is rejected without executing its contents', async () => {
   const { client, calls } = fakeClient({ columns: [{table_name:'store_assets";DELETE',column_name:'user_id'}] });
   await assert.rejects(collectDemoStoreCensus(client), /code=UNKNOWN/);

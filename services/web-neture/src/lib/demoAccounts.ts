@@ -13,7 +13,7 @@ import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
  *   - 화면 접근은 정상 service role, 데이터 범위는 ownership — Demo 전용 우회 경로 없음.
  */
 
-export type DemoAccountType = 'STORE_OWNER' | 'SUPPLIER';
+export type DemoAccountType = typeof PUBLIC_DEMO_ACCOUNTS[number]['type'];
 
 /** 서버 `/auth/me` · email 로그인 응답의 `user.demo` (일반 사용자는 isDemo:false). */
 export interface DemoMetadata {
@@ -52,6 +52,13 @@ export const DEMO_ACCOUNTS: readonly DemoAccountEntry[] = [
     password: PUBLIC_DEMO_ACCOUNTS[1].password,
     landing: { kind: 'internal', to: '/supplier/dashboard' },
   },
+  {
+    type: 'STORE_STAFF',
+    label: '매장 직원 Demo 체험',
+    email: PUBLIC_DEMO_ACCOUNTS[2].email,
+    password: PUBLIC_DEMO_ACCOUNTS[2].password,
+    landing: { kind: 'storeWorkspace' },
+  },
 ];
 
 export const DEMO_NOTICE = 'Demo 계정으로 체험 중입니다. 일부 변경 기능은 제한됩니다.';
@@ -70,7 +77,7 @@ export const DEMO_ACCOUNT_FORBIDDEN_NOTICE = 'Demo 계정에서는 이 기능을
 /** API user → `user.demo`. 필드가 없거나 형식이 다르면 Demo 아님(배지 미표시). */
 export function readDemoMetadata(apiUser: unknown): DemoMetadata {
   const raw = (apiUser as { demo?: { isDemo?: unknown; demoType?: unknown } } | null)?.demo;
-  const demoType = raw?.demoType === 'STORE_OWNER' || raw?.demoType === 'SUPPLIER' ? raw.demoType : null;
+  const demoType = raw?.demoType === 'STORE_OWNER' || raw?.demoType === 'SUPPLIER' || raw?.demoType === 'STORE_STAFF' ? raw.demoType : null;
   return raw?.isDemo === true && demoType ? { isDemo: true, demoType } : { isDemo: false, demoType: null };
 }
 

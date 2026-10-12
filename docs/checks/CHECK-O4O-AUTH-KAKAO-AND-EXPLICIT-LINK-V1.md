@@ -1309,3 +1309,17 @@ TLS 검증과 기존 프록시를 유지했다. fixture·인가 우회·계정 �
 2026-11-13 이후 실제30일 공고를 확인하고 게시·재동의를 검증한다. 앱 코드 변경 없이
 기존 WO/CHECK에만 결과를 반영했고 DEPLOYMENT=NOT_APPLICABLE이다.
 같은 미완료 WO의 후속을 위해 WORKTREE_DISPOSITION=KEEP로 남긴다.
+
+### 제공 테스트3계정 전체 전환 — 로컬 검증,2026-10-12
+
+최신 사용자 지시는 제공 경영자·공급자·직원3개를 모두 테스트 계정으로 확정하고 버튼과 데이터 연결까지 전환하는 것이다. 앞선 운영자 분류는 이3개에 적용하지 않는다. 실제 별도 Google 운영자/OAuth 검증은 사용자가 담당한다. 비공개 원본은 `docs/local/TEST-ACCOUNT.txt`에 유지하고 Git에서 제외한다.
+
+- 공통 config3개·Neture staff 착지·server registry type·provision/census/cleanup 소비처를 수정했다. 기본 경영자/공급자 provision과 기존 business user UUID는 유지하고, 별도 직원 reconcile로 기존 Demo 약국 staff 관계와 `kpa:store_member`만 연결한다.
+- read-only plan/digest, SERIALIZABLE apply, 감사 before/after image, 충돌·특권·provider·pending operator 초대 중단, 원자 세션 family 폐기와 멱등을 구현했다. 공개 artifact에는 사용자 ID/개인정보/비밀번호/hash를 출력하지 않는다.
+- API 및5웹(Neture·Store·Lecture·KPA Society·KPA Branch) build, CLI typecheck 통과. `@o4o/ui`의 stale dist로 처음 Neture build가 실패했고 최신 shared package rebuild 후 통과했다. 관련 없는 source 수정은 없다.
+- Vitest UI17, 실제 격리 PostgreSQL DB9, census/cleanup24, migration contract21, 기존 배포/PH 경계114 모두 통과했다. DB9 중7은 정확한 격리 DB opt-in이며 기본 CI에서는 skip,2 gate만 실행된다.
+- 정식 migration runner로 합성 빈 DB에 bootstrap+25단계를 적용해 pre/post fingerprint를 확인했다.25단계는 `9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641`,6618줄이다. down/up24/25 hash roundtrip과 staff row가 있을 때 down 거절도 통과했다. 운영 DB에는 실행하지 않았다.
+- 실제 새 build 산출물을 사용한 로컬 브라우저48/48조건(8 origin×PC/mobile×3계정)에서 각 버튼·정확한 credential POST·실패 후 재시도·overflow/JS error를 확인했다. API는 합성 응답이므로 실제 운영 로그인 성공 증거는 아니다.
+- origin/app 정본: neture/supplier/community/funding→Neture, pharmacy→KPA Society, store→Store, study→Lecture, kpa→KPA Branch. 최초 fixture54조건의12실패는 잘못된 community 응답과 가상 branch host/base경로였다. 정확한 정본으로 community6·pharmacy6·kpa6 재확인 후 유효48조건 모두 통과했다. 최초 실패와 수정 결과는 비공개 helper artifacts에 함께 보존했다.
+
+현재 운영 계정 전환·migration·신규 배포·신규3계정 운영48검증은 실행0이다. 앞서 기존 Demo32운영 통과는 과거 checkpoint이며 이번3계정 전환의 운영 성공을 의미하지 않는다. 직원 migration25 앞의23/24는 [별도 개인정보 WO §10](../work-orders/WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md)의 운영 승인 범위 밖이다. main 통합 이후 실제 read-only plan의 schema history로 적용 필요성을 먼저 판정한다.

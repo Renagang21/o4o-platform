@@ -75,7 +75,8 @@ export async function collectDemoStoreCensus(client) {
     await client.query("SET LOCAL statement_timeout='15s'");
     const demos = (await client.query(queries.demos)).rows;
     const types = new Set(demos.map(row => row.demo_type));
-    if (demos.length !== 2 || !types.has('STORE_OWNER') || !types.has('SUPPLIER') ||
+    if (demos.length < 2 || demos.length > 3 || types.size !== demos.length || !types.has('STORE_OWNER') || !types.has('SUPPLIER') ||
+        demos.some(row => !['STORE_OWNER','SUPPLIER','STORE_STAFF'].includes(row.demo_type)) ||
         demos.some(row => row.count !== 1)) throw new Error('Canonical Demo registry is ambiguous');
     const organizations = (await client.query(queries.organizations)).rows;
     const memberships = (await client.query(queries.memberships)).rows;

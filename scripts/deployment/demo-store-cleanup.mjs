@@ -79,7 +79,9 @@ const metadataSql = {
 };
 async function inventory(client, keep, targets) {
   const demos = (await client.query(`SELECT demo_type,user_id FROM demo_accounts WHERE is_active`)).rows;
-  if (demos.length !== 2 || new Set(demos.map(d => d.demo_type)).size !== 2 || !demos.some(d => d.demo_type==='STORE_OWNER') || !demos.some(d => d.demo_type==='SUPPLIER')) throw new CleanupStop('Canonical registry ambiguous');
+  if (demos.length < 2 || demos.length > 3 || new Set(demos.map(d => d.demo_type)).size !== demos.length ||
+    demos.some(d => !['STORE_OWNER','SUPPLIER','STORE_STAFF'].includes(d.demo_type)) ||
+    !demos.some(d => d.demo_type==='STORE_OWNER') || !demos.some(d => d.demo_type==='SUPPLIER')) throw new CleanupStop('Canonical registry ambiguous');
   const owner=demos.find(d => d.demo_type==='STORE_OWNER').user_id;
   const stores=(await client.query(`SELECT to_jsonb(o) AS row FROM organizations o WHERE type IN ('pharmacy','store') AND "createdAt" <= $1::timestamptz ORDER BY id`,[STORE_INVENTORY_CUTOFF])).rows.map(x=>x.row);
   const keeper=stores.find(o=>storeFingerprint(o.id)===keep);
