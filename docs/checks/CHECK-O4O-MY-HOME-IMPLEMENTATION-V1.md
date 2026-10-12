@@ -2,9 +2,10 @@
 
 > **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
 
-> **상태**: ACTIVE
-> **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-11
+> **상태**: COMPLETED
+> **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
+> **현재 본 작업 결과**: PR #484 main·사후 CI PASS, WIF 복구·Neture runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2` 배포·최종 서빙 Report PASS. 운영 번들 fixture 39개·공개 HTTP/보호 API PASS. 실제 인증 smoke는 SKIPPED_BY_USER. 최종 정본·TODO 결과는 문서 PR #489로 통합하며 아래 이전 Phase의 배포·계정 상태와 구분한다.
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB 직접 접속·실제 계정 로그인 없음. 운영 공개 HTTP·브라우저 검증과 정상 배포 workflow 수행.
 
 ## 연속 문서 Phase: 테스트 계정 파일 확보·이름 통일 (2026-10-11)
@@ -209,3 +210,65 @@ API는 이 배포의 대상이 아니다. 선행 API serving target `e1cd3b18786
 PR #484 P1은 사업 상세 참여 기록이 경영 현황에만 있다는 정본 §2와의 차이를 지적했다. 상세 10건과 원본 업무 이동을 참여 서비스에 배치하고 요약의 더 보기 링크도 `/mypage/services`로 수정했다. 경영 현황은 사업 요약 최대 3건과 QR 통계·추이를 유지한다. 선택 매장은 같은 계정의 승인 매장 목록과 대조해 화면 사이에서 유지한다. 참여 서비스에서 QR 통계를 호출하지 않는 회귀를 추가했고 수정 후 Neture 전체 **569개 PASS**다. `/tmp/my-home-completion-review-vitest.log`에 근거를 보존한다.
 
 직전 main `b4d428d606a6a9c29804b08c046a209b8880d843`의 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38142342005)는 Google Cloud 인증 단계에서 실패하고 실제 배포와 최종 Report는 SKIPPED였다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 최신 main의 PharmacyHub retirement TODO는 사용자가 승인·적용한 WIF 일시 차단을 기록한다. 이 환경 조건의 원래 인증 복구가 현재 배포 전제이며 CI/freeze/WIF를 우회하거나 해당 provider를 임의 수정하지 않는다. 사용자에게 복구 후 알려 달라고 요청하고 구현 검증·PR 작업을 계속한다.
+
+### 본 작업 최종 소스 검증·main 통합
+
+- P1 수정 후 Neture **67파일·569개 PASS**, 타입 포함 production build PASS, PC/375/320px Chromium fixture **39개 PASS**. 로그는 `/tmp/my-home-completion-review-vitest.log`, `/tmp/my-home-completion-review-build.log`, `/tmp/my-home-completion-review-playwright.log`다. 현재 소스의 모바일 참여 서비스·PC 경영 현황 화면과 가로 넘침을 확인했다.
+- [PR #484](https://github.com/Renagang21/o4o-platform/pull/484)의 최종 HEAD `131ee3cb30384feecd554b3d665a5738736dbf4d` [CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)는 required CI Gate·API 세 묶음·품질·웹/Admin build PASS, CodeQL·Guard PASS. 리뷰 P1 반영·미해결 스레드 0. 이전 PR HEAD CI는 최종 gate 근거로 쓰지 않았다.
+- 2026-10-11 13:40 UTC main `ec7a21d59db197ae573420645c858e772424b006`에 정상 squash merge했다. 통합 전 실제 ruleset의 PR·CI Gate·human approval 0을 확인했고 admin bypass·main 직접 push·force push를 사용하지 않았다. 진행 중인 직전 Delivery가 종료된 후 통합했다. 공급자 API main 변경은 정상 merge로 반영했으며 My Home 소스·사용 조회 API 입력 차이 0. main 포함 source 경로 diff 0.
+
+### 사용자 요청에 따른 최신 WIF 재확인
+
+사용자가 인증 상태를 다시 확인하라고 요청해 현재 main의 기존 `gcp-wif-auth-smoke.yml`을 `kakao_metadata=false`로 새로 실행했다. [run 38144147528](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528), job `114483877967`은 Authenticate to Google Cloud(WIF)에서 실패했다. check annotation은 `unauthorized_client`·`The given credential is rejected by the attribute condition`이다. 13:41 UTC의 새 검증이며 과거 실패만 재인용한 결과가 아니다. credential/token/secret version·운영 데이터에 접근하거나 출력하지 않았고 배포·revision·DB·provider 변경 0이다.
+
+현재 GitHub API·fetch·push는 정상이다. 이 클라우드에 별도 GCP outbound identity는 없어 사용자 IAM 조건을 직접 변경할 권한을 추정하지 않는다. PharmacyHub 정리 작업의 원래 WIF 조건 복구 여부를 사용자에게 다시 확인 요청했다. 이 상태에서 신규 운영 배포·서빙 Report·운영 번들 검증은 완료로 기록하지 않는다.
+
+### 본 작업 사후 CI·Delivery·현재 PH 격리 창
+
+| 항목 | 현재 실제 결과 |
+|---|---|
+| [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38144099865) | 구현 SHA `ec7a21d59db197ae573420645c858e772424b006`의 전체 CI·required Gate PASS, CodeQL PASS |
+| [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38144718455) | job `114485556659`의 GCP 인증에서 동일 `unauthorized_client`·attribute condition 거절. API/Web/Admin/Report SKIPPED, 신규 runtime 배포·서빙·운영 번들 검증 미실행 |
+| [PH 정리 workflow](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943) | 같은 SHA의 WIF auth PASS·고정 인프라 정리 단계 FAIL. 현재 인증이 PH 작업에는 허용되고 정상 Delivery에는 거절됨을 확인. 다른 작업의 삭제·복구 결과를 추정하거나 해당 작업을 수정/취소하지 않음 |
+| [문서 PR #489](https://github.com/Renagang21/o4o-platform/pull/489) | 정본·색인·현재 인증 제외·실제 구현/배포 상태 6문서 정합. 첫 HEAD `fe2d1c0fc2a107108dbb903c73cac7b004da6873`의 [Docs Fast·required CI Gate](https://github.com/Renagang21/o4o-platform/actions/runs/38144416967) PASS·미해결 스레드 0. 후속 실제 결과 추가 후 최종 HEAD CI로 대체 확인 |
+
+PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 draft로 유지한다. 이 보류는 새 승인 요구가 아니라 다른 작업의 격리 창과 실제 GCP 조건 거절에 따른 배포 전제다. 원래 조건 복구·PH 창 종료가 확인되면 최신 main·CI·freeze·동시 운영 작업·serving 차이/risk를 다시 확인하고 정상 Delivery를 이어간다. 인증 제한·freeze·CI·ref를 우회하거나 provider를 임의 변경하지 않았다. TLS 검증을 유지하는 운영 번들 수집/fixture 설정은 `/tmp/my-home-deployed-assets.py`와 `/tmp/my-home-completion-deployed-fixture`에 준비했으며 실행하지 않았다.
+
+## WORKTREE_DISPOSITION — 2026-10-11 보류 당시 판정
+
+문서 PR #489의 P2는 WO 상단의 과거 초기 구현 promote 완료 요약이 현재 상태로 읽힐 수 있음을 지적했다. WO 헤더에 현재 PR #484의 자동 배포 미완료와 문서 draft 상태를 명시하고 과거 기록은 이전 Phase로 한정했다. CHECK 헤더도 현재 결과를 표시한다. 초기 promote 기록·SHA·당시 결과는 보존하며 신규 배포 PASS로 재사용하지 않는다.
+
+- worktree: `/workspace/o4o-wt/my-home-document-alignment` · branch: `wo/my-home-document-alignment`
+- main integration: 구현 #484 완료, 정본 문서 #489 draft · CI: 최종 구현 PR/main PASS, 문서 최종 HEAD 재확인
+- deployment: AUTOMATIC, WIF 조건 거절로 미완료 · smoke: LOCAL 39 PASS, DEPLOYED-BUNDLE/실서빙 미실행, AUTHENTICATED SKIPPED_BY_USER
+- source main 포함: diff 0 · 타 checkout 수정/branch 전환 없음 · 계정 파일은 로컬 ignored `docs/local/TEST-ACCOUNT.txt`에 보존
+- verdict: **KEEP** — PH 고정 SHA 창 종료·원래 인증 복구 이후 문서 main 통합·배포·운영 확인이 남아 있다. 제공 계정 파일과 로컬 검증 증거를 삭제하지 않는다.
+
+## 최종 완료 — WIF 복구·실제 배포·배포 후 확인 (2026-10-12 KST)
+
+사용자의 재확인 요청에 따라 과거 실패와 최신 실제 상태를 구분해 조회했다. PH TODO의 원래 인증 조건 복구 완료 절은 PH-only/root/called SHA 제한이 제거되고 기존 기본 조건을 유지했음을 기록한다. 오늘 오전 9시 23분(KST)에 시작한 읽기 전용 smoke와 이후 실제 Delivery가 성공했다. 원래 조건 복구와 성공한 누적 배포는 해당 작업의 결과이며 이번 확인에서 provider·freeze·workflow·DB를 수정하지 않았다.
+
+| 근거 | 최종 실제 결과 |
+|---|---|
+| [WIF smoke 38187804879](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879) | main `7ebd3548cbdcc593414455dfde83667b3e3c13c9`의 인증·읽기 전용 identity/project/serving metadata 조회 PASS |
+| [runtime main CI 38188139756](https://github.com/Renagang21/o4o-platform/actions/runs/38188139756) | target `20ed384b1591c23bad53b14d99b7531e23dac1f2`의 CI Gate PASS·CodeQL PASS |
+| [Delivery 38188251558](https://github.com/Renagang21/o4o-platform/actions/runs/38188251558) | 위 target의 Neture CI gate·deploy·summary PASS, 최종 실제 서빙 Report job `114616922225` PASS. commit status production=DEPLOYED |
+| 정상 배포의 누적 변경 | Report는 API/Admin/Neture/KPA/Study/Store/분회 배포 완료를 기록한다. 본 작업의 My Home 입력은 구현 SHA와 diff 0이며 Neture 배포에 포함. 다른 기능의 실제 사용자 검증까지 수행했다는 의미는 아님 |
+| 운영 번들 표식 | 실제 `/assets/index-CoUJxlWE.js`와 import 자원 총 109개를 TLS 검증을 유지해 다운로드. 내 업무 바로가기·약국 협력사업 참여 현황·기존 사업 조회 경로·복수 매장 재선택 안내·참여 없음 안내 5개 모두 포함 |
+| 운영 HTTP | 대표 메인과 My Home 5경로 HTTP 200, API readiness 200. auth/me·알림·읽지 않은 수·Study·QR·협력사업 6개 보호 API 비로그인 401. 실제 계정 데이터·소유권 검증을 대신하지 않음 |
+| 운영 번들 fixture | **39개 PASS**, 1440/375/320px × 13개. 다운로드한 실제 HTML/JS/CSS만 렌더링하고 사용자·API·쓰기·handoff는 기존 fixture 응답. 모바일 모아보기·PC 경영 현황 화면과 가로 넘침 확인 |
+| 실제 인증 | 사용자 이메일 리팩터링 예정·검증 제외 지시에 따라 SKIPPED_BY_USER. 계정 추측·비밀번호 재설정·Demo 대체·운영자 Google 세션 획득 미실행 |
+
+직접 운영 Chromium의 이전 인증서 제약을 우회하지 않았다. HTTPS curl로 실제 자원을 받아 로컬 HTTP에서 기존 fixture를 실행한 결과이며 운영 로그인 세션 성공과 구분한다. 로그·스크린샷은 `/tmp/my-home-completion-deployed-assets.log`, `/tmp/my-home-completion-deployed-public-http.json`, `/tmp/my-home-completion-deployed-playwright.log`, `/tmp/my-home-completion-deployed-fixture/results`에 보존한다. 실제 자격증명·개인 데이터·production 응답 본문은 공개 문서에 복사하지 않았다.
+
+위 배포·39개 fixture 결과의 대상은 runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2`다. 검증 후 main에 추가된 인증·약관 PR #457은 그대로 보존해 문서 branch에 통합했으나 해당 변경의 운영 배포·실계정 검증까지 이번 결과로 주장하지 않는다. 이 문서 PR의 main SHA와 검증한 runtime SHA를 구분한다.
+
+최신 main을 기존 미완료 WO branch에 정상 merge했고 자기 변경은 결과 문서 6개뿐이다. 정본·색인의 최종 제공 데이터/배포 상태·이메일 검증 사용자 제외와 TODO를 [문서 PR #489](https://github.com/Renagang21/o4o-platform/pull/489)로 통합한다. WIF 고정 SHA 창이 끝났으므로 이전 draft 보류 사유는 해소됐다. 문서-only DEPLOYMENT=NOT_APPLICABLE이며 이미 성공한 runtime을 중복 배포하지 않는다. 최종 PR/main CI·merged 상태는 해당 PR의 실제 결과로 확인한다. 초기 소스 CI와 후속 문서 CI를 구분한다.
+
+## WORKTREE_DISPOSITION — 최종 판정
+
+- worktree: `/workspace/o4o-wt/my-home-document-alignment` · branch: `wo/my-home-document-alignment`
+- source main integration: #484 완료, 최종 정본 결과 통합: #489 · runtime: `20ed384b1591c23bad53b14d99b7531e23dac1f2` DEPLOYED
+- CI: 구현 최종 PR/main PASS, 문서 최종 PR/main 결과는 #489에서 확인 · smoke: LOCAL 39/DEPLOYED-BUNDLE 39/HTTP PASS, AUTHENTICATED SKIPPED_BY_USER
+- source main 포함: diff 0 · 자기 변경: 정본·색인·WO·CHECK·TODO·헤더 문서 6개. 최종 commit/push 이후 자기 작업 범위 미커밋·untracked 0을 확인한다.
+- verdict: **KEEP** — 제공된 ignored 로컬 `docs/local/TEST-ACCOUNT.txt`와 browser 검증 증거를 보존한다. 이전 배포·인증 복구 대기는 해소됐다. 보존 파일을 잃게 되는 worktree 강제 삭제는 실행하지 않는다.
