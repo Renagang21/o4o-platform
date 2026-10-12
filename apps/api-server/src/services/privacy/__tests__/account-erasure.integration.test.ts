@@ -321,6 +321,29 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const result=await service().request(target.id);
     expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
   });
+  it('storage provider fields cannot hide a copied authentication identifier',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-provider-copy';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    for(const provider of ['gcs','kakao']) {
+      await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider',$1::text,'providerId','other-identity','memo',$2::text) WHERE id=$3`,[provider,providerId,peer.id]);
+      const result=await service().request(target.id);
+      expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+    }
+  });
+  it('provider candidate scanning reaches copies beyond a bounded cursor batch',async()=>{
+    const target=await user(),providerId='1';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'kakao',$2)`,[target.id,providerId]);
+    for(let n=0;n<70;n++) {
+      const peer=await user();
+      await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','google','providerId',$1::text) WHERE id=$2`,[providerId,peer.id]);
+    }
+    const peer=await user();
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','kakao','providerId',$1::text) WHERE id=$2`,[providerId,peer.id]);
+    const result=await service().request(target.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+    await db.query('UPDATE users SET "businessInfo"=NULL WHERE id=$1',[peer.id]);
+    expect((await service().resume(result.operationId)).erased).toBe(true);
+  });
   it('punctuation extending another opaque provider ID is not treated as this subject',async()=>{
     const peer=await user(),providerId='synthetic-provider-identity';
     for(const suffix of ['-extra','.extra']) {

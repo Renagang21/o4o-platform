@@ -236,25 +236,40 @@ export class AccountErasureService {
       '$.** ? (@.type() == "string")')`;
     // Provider IDs belong to a namespace. Unattributed copies still need domain review,
     // but an explicit different provider is another identity, even when the ID is equal.
-    const providerCopies=(value:unknown, namespace?:string):boolean => {
-      if(typeof value==='string')return identities.providers.some(p=>
-        (!namespace || namespace===p.provider) && new RegExp(
-          `(^|[^a-zA-Z0-9_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^a-zA-Z0-9_.-])`,'i').test(value));
-      if(Array.isArray(value))return value.some(v=>providerCopies(v,namespace));
+    const providerPatterns=identities.providers.map(p=>({provider:p.provider,
+      pattern:new RegExp(`(^|[^a-zA-Z0-9_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^a-zA-Z0-9_.-])`,'i')}));
+    const providerCopies=(value:unknown):boolean => {
+      if(typeof value==='string')return providerPatterns.some(p=>p.pattern.test(value));
+      if(Array.isArray(value))return value.some(v=>providerCopies(v));
       if(value && typeof value==='object') {
         const object=value as Record<string,unknown>;
-        const scoped=typeof object.provider==='string' ? object.provider : namespace;
-        return Object.entries(object).some(([key,v])=>key!=='provider' && providerCopies(v,scoped));
+        // Only the typed providerId field belongs to this namespace. A storage/provider
+        // column never scopes memo, contacts, sibling fields or nested identity objects.
+        const namespace=['google','kakao'].includes(String(object.provider)) ? object.provider : undefined;
+        return Object.entries(object).some(([key,v])=> {
+          if(key==='provider')return false;
+          if(key==='providerId' && namespace && typeof v==='string')return providerPatterns.some(p=>p.provider===namespace && p.pattern.test(v));
+          return providerCopies(v);
+        });
       }
       return false;
     };
     const providerReview=async(table:string, exclusion:string):Promise<boolean> => {
       if(!identities.providers.length)return false;
-      // Candidate filtering stays inside PostgreSQL; never emit identifier/row payloads in logs.
-      const rows=await m.query(`SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+      // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
+      // Node memory even when many genuine candidates require namespace/domain inspection.
+      await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
+        SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
         jsonb_path_query_array(to_jsonb(r),'$.** ? (@.type() == "string")')::text
-        ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))]);
-      return rows.some((r:{payload:unknown})=>providerCopies(r.payload));
+        ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
+          `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
+      try {
+        for (;;) {
+          const rows: {payload:unknown}[]=await m.query('FETCH FORWARD 64 FROM erasure_provider_scan');
+          if(rows.some(r=>providerCopies(r.payload)))return true;
+          if(rows.length<64)return false;
+        }
+      } finally { await m.query('CLOSE erasure_provider_scan'); }
     };
     const codes: string[] = [];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1

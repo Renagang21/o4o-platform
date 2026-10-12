@@ -78,9 +78,9 @@ UUID 없는 고유 이메일/출처 식별자의 문자열·JSON 재복사도7�
 
 승인 대상 후보는 **코드의 기본 비활성 상태로 API/Admin만 verified 배포**다. main 병합·post-merge CI·최신 main SHA 고정 후 `promote.yml`의 `services=api,admin`을 사용하며 분회/다른 web 전용 배포는 포함하지 않는다. 먼저 `dry_run=true`로 실제 serving gap·freeze·계정 권한·pending migration 전부를 확인한다. repository variable 조회는 현재 주입 GitHub integration 권한의403으로 직접 확인되지 않았으며 workflow 판정을 대신 승인했다고 표시하지 않는다.
 
-실제 promote는 migration Job의 production DDL을 수반하므로 AGENTS §4-1(f)/§5에 따라 **별도 사용자 실행 승인 전에는 dispatch하지 않는다**. 대상은 신규5개 테이블·writer function·현재 canonical 테이블 INSERT/UPDATE triggers다. migration 자체의 계정/파일 데이터 제거는0이지만 기존 writer에 shared transaction barrier와 UUID/신원 해시 검사를 도입한다. 대량/장기 transaction·role/membership lock·원문 길이에 따른 비용/false-positive를 운영 규모에서 검토해야 한다. 이미 다른 migration이 쌓였으면 그 전체 pending diff를 새 범위로 보고하고 SHA를 다시 고정한다.
+실제 promote는 migration Job의 production DDL을 수반하므로 AGENTS §4-1(f)/§5에 따라 **별도 사용자 실행 승인 전에는 dispatch하지 않는다**. 대상은23단계 신규5개 테이블·writer function·현재 canonical 테이블 INSERT/UPDATE triggers와24단계 legacy identity-kind hash 파기·UUID-only writer function 교체다. 일반 계정/파일 제거는 포함하지 않으며 기존 writer에 shared transaction barrier와 UUID 복원 검사를 도입한다. 대량/장기 transaction·role/membership lock·원문 길이에 따른 비용/false-positive를 운영 규모에서 검토해야 한다. 이미 다른 migration이 쌓였으면 그 전체 pending diff를 새 범위로 보고하고 SHA를 다시 고정한다.
 
-승인 후 검증 순서는 migration pre/post fingerprint → API0% revision Ready/전환/health → Admin0% tag smoke/전환 → serving SHA·capability disabled 확인이다. migration 이후 API rollout 실패 시 기존 revision traffic rollback은 schema를 되돌리지 않는다. 신규 원장에 데이터가 있으면 down을 거절하며 forward repair를 검토한다. 계정/GCS 제거·환경 apply flag·inventory confirmed·job activation·법률 게시/재동의는 이 배포 승인안에도 포함하지 않는다.
+승인 후 검증 순서는 migration pre/post fingerprint → API0% revision Ready/전환/health → Admin0% tag smoke/전환 → serving SHA·capability disabled 확인이다. migration 이후 API rollout 실패 시 기존 revision traffic rollback은 schema를 되돌리지 않는다. 23단계는 신규 원장에 데이터가 있으면 down을 거절하며24단계는 파기한 개인정보 hash 복원 없이 forward repair를 요구한다. 계정/GCS 제거·환경 apply flag·inventory confirmed·job activation·법률 게시/재동의는 이 배포 승인안에도 포함하지 않는다.
 
 삭제 기능 **활성화 승인안은 아직 준비 완료가 아니다**: 전수 domain/file inventory·producer/orphan·GCS soft-delete/복제/backup·법정1/2년 해당성·lock 성능·미분류 담당/24h 처리 절차를 먼저 마쳐야 한다. 기본1년 정책을 재질문하지 않고 아직 미확정인 근거와 실제 집행만 따로 다룬다.
 
@@ -119,3 +119,6 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 운영 승인안은23단계5개 테이블/trigger/function과24단계legacy 연락처 hash retirement/function 교체를 함께 검토한다. 후속이 새 migration0이던 이전 검증 기록은 이24단계 추가 전 기록이다. 운영의 일반 user/account·GCS 삭제나 feature apply flag/job/legal 게시 승인은 여전히 포함하지 않는다. 현재 운영에서23/24 실행0; 추가 변경은 격리 합성 DB에서만 적용했다.
 
 제공자 namespace 재검토 P2 처리: LinkedAccount 식별자는 `(provider, providerId)`로 snapshot을 유지한다. 별도 연결 email은 일반 고유 email 검사에 남긴다. provider ID 후보의 구조화 JSON은 제공자 context를 함께 검사하여 Google/Kakao의 동일 ID를 다른 사람으로 구분한다. 같은 제공자의 copy 또는 제공자가 불명확한 copy는 여전히 domain review로 미완료 처리한다. 다른 제공자의 실제 linked row·중첩 copy 보존과 같은 제공자의 중첩 copy 검출을 합성 DB에서 검증했다. 집중 DB30+storage4+정적 인증17+Demo9=60 tests PASS. 새 DDL/API/UI/운영 실행은 없다.
+
+추가 재검토 P1/P2: namespace는 알려진 Google/Kakao 구조의 `providerId` 값에만 적용한다. storage provider 및 memo/형제/중첩 값 전체로 context를 확장하지 않는다. SQL 경계 필터 뒤 transaction cursor를64행씩 읽고 발견 즉시 닫으며, 전체 후보 payload를 Node에 한꺼번에 전송하지 않는다. storage provider/다른 인증 provider의 memo copy와 짧은 ID의64행 초과 후속 copy 검출·제거 후 재시도 완료를 합성 회귀로 확인한다.
+최종 집중 DB32+storage4+정적 인증17+Demo9=62 tests·API build·focused lint PASS. 새 DDL은24단계 이후 추가하지 않았으며 운영 실행0이다.
