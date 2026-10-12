@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+`d4c0225b8b` P1 리뷰에 따라 활성 RBAC 조회(getActiveRoles/getRoleNames/hasRole/hasAnyRole)도 공통 퇴역 role 판정을 사용한다. 기존 K-Cosmetics admin/operator assignment가 공용 운영 API capability로 남지 않으며, 현역 Neture/KPA 역할과 유효기간 검사는 유지한다. 사용자 목록의 과거 K-Cosmetics 역할 표시는 `(퇴역)`으로 정합했다. DB role row 삭제/비활성화나 전체 token family 파기는 수행하지 않는다. focused 19 tests 및 관련 81 suites 1798 tests PASS, 환경 의존 95 tests는 skipped였다.
+
 퇴역 역할 신규 부여의 내부 SQL 우회도 차단했다. MembershipApprovalService의 승인·복구·activateRoleAssignment는 PH 및 K-Cosmetics namespace를 거절한다. 기존 K-Cosmetics 권한의 반려·정지·회수 매핑은 유지한다. 사용자 승인 대상 필터도 같은 퇴역 role 판정을 사용한다. 퇴역 서비스의 과거 긍정 fixture는 현역 서비스 격리 fixture와 퇴역 승인 거절·회수 회귀로 정합했다. 5 focused suites 133 tests PASS. 이는 기존 K-Cosmetics active 세션의 일괄 회수나 운영 데이터 삭제를 수행한 결과가 아니다.
 
 `3db87c3238`의 기존 계약 종료 정리 리뷰 대응: PH는 신규 createCase를 410으로 거절하되, 저장된 종료 건의 config는 데이터 purge 전까지 내부 정리용으로 유지한다. legacy 종료 건의 media 파기는 PH scope만 허용하는 내부 deleteRetiredAsset을 사용하며 기존 링크/파생/Screen Set/storage 보호 검사를 유지한다. 공용 미디어 API의 PH 접근 금지는 그대로다. DB 통합 fixture는 새 PH 종료 건을 생성하지 않고 역사적 행을 seed하도록 정합했다(실제 운영 DB 테스트 미실행).
@@ -293,7 +295,7 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 배포 전 후속 미디어 리뷰 대응: PH 자산을 공용 목록 SQL에서 제외하고 UUID 조회·사용처·폴더·metadata·삭제 및 catalog의 locked mutation/relations 조회에서 퇴역 scope를 확인한다. 기존 PH 공개 자산의 타 서비스 재사용을 코드 배포와 purge 사이에도 차단한다. 승인 PH 필터는 공통 helper로 추출해 중복을 줄였다. focused 3 suites 29 tests PASS. 이 기록은 배포 성공 또는 실제 데이터 삭제를 의미하지 않는다.
 
-추가 요청의 퇴역 서비스 역할 정합: PH는 앞선 변경에서 신규 지정 목록·부여 경계를 제거했다. K-Cosmetics의 `cosmetics:*` 운영자 allowlist, admin 역할 서비스 목록, 공용 역할 관리 selector를 제거한다. DB 역할 catalog와 신규 assignRole/회원 역할 지정은 `cosmetics`·`k-cosmetics` 및 두 접두 역할도 거절한다. 과거 타입·registry 메타데이터는 퇴역(deprecated) 표시로 남기고 신규 서비스별 역할 조회에서 제외한다. 기존 cosmetics 권한 회수·전체 API 종료·데이터 삭제는 이번 역할 지정 정합 범위에 포함하지 않는다. 서버 focused 25 tests 및 화면 catalog 정합 10 tests PASS.
+추가 요청의 퇴역 서비스 역할 정합: PH는 앞선 변경에서 신규 지정 목록·부여 경계를 제거했다. K-Cosmetics의 `cosmetics:*` 운영자 allowlist, admin 역할 서비스 목록, 공용 역할 관리 selector를 제거한다. DB 역할 catalog와 신규 assignRole/회원 역할 지정은 `cosmetics`·`k-cosmetics` 및 두 접두 역할도 거절한다. 과거 타입·registry 메타데이터는 퇴역(deprecated) 표시로 남기고 신규 서비스별 역할 조회에서 제외한다. 기존 cosmetics role row의 운영 DB 일괄 비활성화·전체 API 종료·데이터 삭제는 수행하지 않는다. 활성 권한 조회 제외는 후속 P1 대응을 따른다. 서버 focused 25 tests 및 화면 catalog 정합 10 tests PASS.
 
 `5b351cab40` 후속 리뷰 4건 대응: Local Agent pairing/CORS 허용 목록에서 PH root/www origin을 제거하고, admin QR 안내의 PH 링크를 제거했다. 사용자 단위 및 일괄 승인에서는 PH membership을 루프 전에 제외한다. 재활성화도 퇴역 membership/role을 먼저 제외하여 정상 서비스의 승인·복구를 보존하고 PH-only 요청은 410으로 거절한다. mixed membership의 양쪽 순서·PH-only 승인 및 복구 회귀를 포함한 2 suites 29 tests PASS, Local Agent origin 확인 PASS, API 타입 검사 PASS. 기존 설치된 Local Agent에는 별도 업데이트 반영이 필요하며 도메인 종료 전에 확인한다. 운영 변경은 수행하지 않았다.
 
