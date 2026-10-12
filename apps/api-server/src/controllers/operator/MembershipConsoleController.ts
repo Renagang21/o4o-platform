@@ -6,7 +6,7 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
-import { isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
+import { isRetiredRoleValue, isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
@@ -978,7 +978,7 @@ export class MembershipConsoleController {
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
-      if (isRetiredServiceValue(req.body?.membershipServiceKey) || isRetiredServiceValue(req.body?.membershipRole)) {
+      if (isRetiredServiceValue(req.body?.membershipServiceKey) || isRetiredRoleValue(req.body?.membershipRole)) {
         res.status(410).json({ success:false, code:'SERVICE_RETIRED' });
         return;
       }
@@ -1332,7 +1332,7 @@ export class MembershipConsoleController {
         return;
       }
 
-      if (isRetiredServiceValue(role)) {
+      if (isRetiredRoleValue(role)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
         return;
       }
@@ -1364,7 +1364,7 @@ export class MembershipConsoleController {
         return;
       }
 
-      if (isRetiredServiceValue(roleEntity.serviceKey) || isRetiredServiceValue(roleEntity.name)) {
+      if (isRetiredRoleValue(roleEntity.serviceKey) || isRetiredRoleValue(roleEntity.name)) {
         res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
         return;
       }

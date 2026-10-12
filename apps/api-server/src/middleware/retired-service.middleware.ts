@@ -10,6 +10,15 @@ export function isRetiredServiceValue(value: unknown): boolean {
   return retiredKeys.has(key) || key.startsWith('pharmacy-hub:');
 }
 
+/** Role provisioning/catalog boundary; legacy cosmetics service APIs are outside this scope. */
+export function isRetiredRoleValue(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(isRetiredRoleValue);
+  if (isRetiredServiceValue(value)) return true;
+  if (typeof value !== 'string') return false;
+  const key = value.trim();
+  return key === 'cosmetics' || key === 'k-cosmetics' || key.startsWith('cosmetics:') || key.startsWith('k-cosmetics:');
+}
+
 export class RetiredServiceError extends Error {
   readonly code = 'SERVICE_RETIRED';
   readonly httpStatus = 410;

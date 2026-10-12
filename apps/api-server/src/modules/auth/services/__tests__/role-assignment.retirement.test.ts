@@ -23,3 +23,9 @@ it('Ph role cannot be recreated by direct service callers before purge',async()=
  expect(mockRepository.findOne).not.toHaveBeenCalled();
  expect(mockRepository.save).not.toHaveBeenCalled();
 });
+
+it.each(['cosmetics:admin', ' cosmetics:store_owner ', 'k-cosmetics:operator'])('retired cosmetics role %s cannot be newly assigned', async role => {
+ await expect(service.assignRole({userId:'user',role})).rejects.toMatchObject({code:'SERVICE_RETIRED',httpStatus:410});
+ expect(mockRepository.findOne).not.toHaveBeenCalled();
+ expect(mockRepository.save).not.toHaveBeenCalled();
+});

@@ -94,3 +94,7 @@ describe('/operators — 비밀번호 표면 0 (§17)', () => {
     expect(code).toMatch(/userId:\s*selectedCandidate!\.userId/);
   });
 });
+
+it('퇴역 서비스 PH·K-Cosmetics 역할은 신규 지정 목록에 없다', () => {
+ expect(ASSIGNABLE_ROLE_VALUES.some(role => /^(pharmacy-hub|cosmetics|k-cosmetics):/.test(role))).toBe(false);
+});

@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+추가 요청의 퇴역 서비스 역할 정합: PH는 앞선 변경에서 신규 지정 목록·부여 경계를 제거했다. K-Cosmetics의 `cosmetics:*` 운영자 allowlist, admin 역할 서비스 목록, 공용 역할 관리 selector를 제거한다. DB 역할 catalog와 신규 assignRole/회원 역할 지정은 `cosmetics`·`k-cosmetics` 및 두 접두 역할도 거절한다. 과거 타입·registry 메타데이터는 퇴역(deprecated) 표시로 남기고 신규 서비스별 역할 조회에서 제외한다. 기존 cosmetics 권한 회수·전체 API 종료·데이터 삭제는 이번 역할 지정 정합 범위에 포함하지 않는다. 서버 focused 25 tests 및 화면 catalog 정합 10 tests PASS.
+
 `5b351cab40` 후속 리뷰 4건 대응: Local Agent pairing/CORS 허용 목록에서 PH root/www origin을 제거하고, admin QR 안내의 PH 링크를 제거했다. 사용자 단위 및 일괄 승인에서는 PH membership을 루프 전에 제외한다. 재활성화도 퇴역 membership/role을 먼저 제외하여 정상 서비스의 승인·복구를 보존하고 PH-only 요청은 410으로 거절한다. mixed membership의 양쪽 순서·PH-only 승인 및 복구 회귀를 포함한 2 suites 29 tests PASS, Local Agent origin 확인 PASS, API 타입 검사 PASS. 기존 설치된 Local Agent에는 별도 업데이트 반영이 필요하며 도메인 종료 전에 확인한다. 운영 변경은 수행하지 않았다.
 
 후속 리뷰에서 발견된 서비스형 media link의 PH namespace 재생성을 saveLink 서비스 계층에서 DB transaction 전에 410/SERVICE_RETIRED로 거절한다. 신규·수정 링크가 같은 경계를 사용한다. 퇴역 키·공백·prefixed role 4개 회귀 테스트 PASS. GitHub 실행·대기 Actions는 조회 시 0건이었으며, 다른 Cloud/로컬 운영 작업 종료 확인은 별도로 필요하다.

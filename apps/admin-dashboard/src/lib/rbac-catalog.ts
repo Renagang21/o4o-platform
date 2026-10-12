@@ -12,7 +12,6 @@ export const SERVICE_KEYS = [
   'platform',
   'kpa',
   'neture',
-  'cosmetics',
   'lecture',
   // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
   //   약사회 분회 서비스. role prefix = canonical service_key = 'kpa-branch' (security-core self-map).
@@ -39,7 +38,6 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   platform: { key: 'platform', label: 'Platform', badgeClass: 'text-red-700 bg-red-50' },
   kpa: { key: 'kpa', label: 'KPA', badgeClass: 'text-blue-700 bg-blue-50' },
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
-  cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
   'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
@@ -142,7 +140,7 @@ export function isOperatorRole(raw: string): boolean {
  *
  * WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
  *   - Platform 은 super_admin role 의 namespace 로만 의미가 있어 운영자 필터 옵션에서 제외.
- *   - canonical 운영 서비스: KPA / Neture / K-Cosmetics
+ *   - canonical 운영 서비스: KPA / Neture / O4O 강의
  *
  */
 const EXCLUDED_FROM_FACET: ReadonlySet<ServiceKey> = new Set(['platform']);

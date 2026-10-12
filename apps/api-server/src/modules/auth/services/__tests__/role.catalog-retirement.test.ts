@@ -22,3 +22,12 @@ it('PH role creation cannot recreate catalog data',async()=>{
  expect(mockRepo.findOne).not.toHaveBeenCalled();
  expect(mockRepo.save).not.toHaveBeenCalled();
 });
+
+it('hides cosmetics canonical and legacy catalog entries while keeping Neture', async()=>{
+ mockRepo.find.mockResolvedValue([{name:'cosmetics:admin',serviceKey:'k-cosmetics'},{name:'admin',serviceKey:'cosmetics'},{name:'neture:operator',serviceKey:'neture'}]);
+ expect(await service.getAllRoles()).toEqual([{name:'neture:operator',serviceKey:'neture'}]);
+});
+it.each(['cosmetics','k-cosmetics'])('retired service %s has no assignable roles',async key=>{
+ expect(await service.getAssignableRoles(key)).toEqual([]);
+ expect(mockRepo.find).not.toHaveBeenCalled();
+});

@@ -388,7 +388,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics administrator',
     service: 'cosmetics',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
   'cosmetics:operator': {
     role: 'cosmetics:operator',
@@ -396,7 +396,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics operator',
     service: 'cosmetics',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
   'cosmetics:pharmacist': {
     role: 'cosmetics:pharmacist',
@@ -404,7 +404,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics 약사',
     service: 'cosmetics',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
   'cosmetics:user': {
     role: 'cosmetics:user',
@@ -412,7 +412,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics 사용자',
     service: 'cosmetics',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
   'cosmetics:supplier': {
     role: 'cosmetics:supplier',
@@ -420,7 +420,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics supplier',
     service: 'cosmetics',
     category: 'commerce',
-    deprecated: false
+    deprecated: true
   },
   'cosmetics:store_owner': {
     role: 'cosmetics:store_owner',
@@ -428,7 +428,7 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'K-Cosmetics store owner',
     service: 'cosmetics',
     category: 'commerce',
-    deprecated: false
+    deprecated: true
   },
 
 
@@ -483,6 +483,6 @@ export function getRoleMetadata(role: string): RoleMetadata | undefined {
  */
 export function getRolesByService(serviceKey: ServiceKey): PrefixedRole[] {
   return Object.values(ROLE_REGISTRY)
-    .filter(meta => meta.service === serviceKey)
+    .filter(meta => meta.service === serviceKey && !meta.deprecated)
     .map(meta => meta.role);
 }

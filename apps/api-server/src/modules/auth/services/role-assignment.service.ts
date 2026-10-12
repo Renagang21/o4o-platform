@@ -19,7 +19,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
-import { isRetiredServiceValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
+import { isRetiredRoleValue, isRetiredServiceValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { invalidateRoles } from '../utils/role-cache.js';
 
 export interface AssignRoleInput {
@@ -129,7 +129,7 @@ export class RoleAssignmentService {
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil } = input;
-    if (isRetiredServiceValue(role)) throw new RetiredServiceError();
+    if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists

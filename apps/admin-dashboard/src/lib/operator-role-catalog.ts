@@ -34,10 +34,6 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
     { value: 'lecture:admin', label: 'Admin', description: 'O4O 강의 서비스 관리자 (운영 권한 포함)' },
     { value: 'lecture:operator', label: 'Operator', description: 'O4O 강의 서비스 운영자' },
   ],
-  cosmetics: [
-    { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
-    { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
-  ],
   'kpa-branch': [
     {
       value: 'kpa-branch:admin',
