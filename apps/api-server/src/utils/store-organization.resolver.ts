@@ -95,7 +95,7 @@ export const STORE_SERVICE_ORG_LINKAGE: Readonly<
  * "요청 서비스에 귀속 기록이 존재하는가" 만 본다. 다른 서비스 귀속은 배제 사유가 아니다.
  */
 export async function isOrganizationLinkedToService(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
   serviceKey: StoreOwnerServiceKey,
 ): Promise<boolean> {

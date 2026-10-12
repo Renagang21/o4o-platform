@@ -23,22 +23,18 @@ import {
 } from 'lucide-react';
 import {
   IdlePlaylistEditor, TabletKioskPage,
-  type IdlePlaylistItem, type LibraryAsset, type TabletKioskApi,
+  type IdlePlaylistItem, type TabletKioskApi,
 } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-PREVIEW-V1: 공개 뷰어 재사용 미리보기 — 공개 데이터 조회 + 매장 slug
 import { fetchTabletProducts, fetchTabletSettings, fetchTabletScreen } from '../../api/tablet';
 import { getStoreSlug } from '../../api/pharmacyInfo';
-import { extractSnapshotMediaList, type SnapshotForMedia } from '@o4o/store-asset-policy-core';
-import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
-import { assetSnapshotApi, handledProductContentApi, type LinkedContentItem } from '../../api/assetSnapshot';
+import { loadIdleLibraryAssets, loadTabletWorkspace } from './hooks/storeWorkspaceLoaders';
+import { handledProductContentApi, type LinkedContentItem } from '../../api/assetSnapshot';
 import {
   fetchTablets,
   createTablet,
   deleteTablet,
-  fetchTabletDisplays,
-  fetchProductPool,
   saveTabletDisplays,
-  fetchTabletIdlePlaylist,
   saveTabletIdlePlaylist,
   fetchTabletDisplaySettings,
   saveTabletDisplaySettings,
@@ -558,16 +554,16 @@ export default function StoreTabletDisplaysPage() {
   }, []);
 
   // Load pool + displays + idle playlist when tablet changes
+  const tabletLoadRevision = useRef(0);
   const loadTabletData = useCallback(async () => {
+    const revision = ++tabletLoadRevision.current;
     if (!selectedTabletId) return;
     setLoadingPool(true);
+    setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]);
     setError(null);
     try {
-      const [poolData, displayData, idleData] = await Promise.all([
-        fetchProductPool(selectedTabletId),
-        fetchTabletDisplays(selectedTabletId),
-        fetchTabletIdlePlaylist(selectedTabletId).catch(() => [] as IdlePlaylistItem[]),
-      ]);
+      const { pool: poolData, displays: displayData, idle: idleData } = await loadTabletWorkspace(selectedTabletId);
+      if (revision !== tabletLoadRevision.current) return;
       setPool(poolData);
       setIdleItems(idleData);
       setIdleInitial(idleData);
@@ -595,15 +591,17 @@ export default function StoreTabletDisplaysPage() {
       setHasChanges(false);
       setSelectedPoolIds(new Set());
     } catch (err: any) {
-      setError(err.message || '태블릿 데이터를 불러오는데 실패했습니다.');
+      if (revision === tabletLoadRevision.current) setError(err.message || '태블릿 데이터를 불러오는데 실패했습니다.');
     } finally {
-      setLoadingPool(false);
+      if (revision === tabletLoadRevision.current) setLoadingPool(false);
     }
   }, [selectedTabletId]);
 
+  const cancelTabletLoad = useCallback(() => { tabletLoadRevision.current++; }, []);
   useEffect(() => {
-    loadTabletData();
-  }, [loadTabletData]);
+    void loadTabletData();
+    return cancelTabletLoad;
+  }, [loadTabletData, cancelTabletLoad]);
 
   // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1:
   //   진열 제품별 연결 콘텐츠 후보를 by-product 로 조회(캐시). supplier↔listing / local↔local 매핑.
@@ -758,58 +756,7 @@ export default function StoreTabletDisplaysPage() {
   //   1) store_library_items (직접 업로드)
   //   2) o4o_asset_snapshots (Community → Store snapshot copy)
   // runtime 은 url 만 사용 — assetId lookup 없음. 동일 url 은 dedupe 처리.
-  const fetchIdleLibraryAssets = useCallback(async (): Promise<LibraryAsset[]> => {
-    // (1) store_execution_assets
-    const directAssetsP = getStoreExecutionAssets({ limit: 100 }).then((res) => {
-      if (!res.success) return [] as LibraryAsset[];
-      const items = res.data?.items ?? [];
-      const out: LibraryAsset[] = [];
-      for (const item of items) {
-        const mime = item.mimeType ?? '';
-        const isVideo = mime.startsWith('video/');
-        const isImage = mime.startsWith('image/');
-        if (!isVideo && !isImage) continue;
-        const url = item.fileUrl ?? item.url ?? '';
-        if (!url) continue;
-        const asset: LibraryAsset = {
-          id: item.id,
-          title: item.title,
-          type: isVideo ? 'video' : 'image',
-          url,
-        };
-        if (item.fileUrl) asset.thumbnail = item.fileUrl;
-        out.push(asset);
-      }
-      return out;
-    });
-
-    // (2) o4o_asset_snapshots → 미디어 추출
-    const snapshotAssetsP = assetSnapshotApi
-      .list({ limit: 100 })
-      .then((res) => {
-        const items = res?.data?.items ?? [];
-        const snapshots: SnapshotForMedia[] = items.map((s) => ({
-          id: s.id,
-          assetType: s.assetType,
-          title: s.title,
-          contentJson: s.contentJson,
-        }));
-        return extractSnapshotMediaList(snapshots) as LibraryAsset[];
-      })
-      .catch(() => [] as LibraryAsset[]);
-
-    const [direct, fromSnapshots] = await Promise.all([directAssetsP, snapshotAssetsP]);
-
-    // dedupe by url (직접 업로드 우선)
-    const seen = new Set<string>();
-    const merged: LibraryAsset[] = [];
-    for (const a of [...direct, ...fromSnapshots]) {
-      if (seen.has(a.url)) continue;
-      seen.add(a.url);
-      merged.push(a);
-    }
-    return merged;
-  }, []);
+  const fetchIdleLibraryAssets = loadIdleLibraryAssets;
 
   // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
   const handleSaveIdle = async () => {
@@ -1054,6 +1001,7 @@ export default function StoreTabletDisplaysPage() {
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700">{error}</p>
+          <button type="button" disabled={loadingPool} onClick={() => void loadTabletData()}>다시 시도</button>
         </div>
       )}
 
@@ -1449,7 +1397,7 @@ export default function StoreTabletDisplaysPage() {
           )}
 
           {/* Idle Playlist Editor (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1) */}
-          {!loadingPool && (
+          {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1500,7 +1448,7 @@ export default function StoreTabletDisplaysPage() {
           )}
 
           {/* 전시 설정 (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통 */}
-          {!loadingPool && (
+          {!loadingPool && pool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-slate-700">태블릿 화면 설정</h3>
