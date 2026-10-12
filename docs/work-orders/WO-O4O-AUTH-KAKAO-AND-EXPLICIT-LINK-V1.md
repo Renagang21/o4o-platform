@@ -601,5 +601,22 @@ DEPLOYMENT=NOT_APPLICABLE이다. 자체 local static 서버와 PostgreSQL fixtur
 `004a42c0`의 My Home overview·업무 카드·알림 요약 runtime 변경은 해당 serving/32조건에 포함되지 않는다.
 이 문서-only 기록 PR #501도 #498의 배포나 운영 smoke를 대신하지 않는다.
 
-- [ ] 별도 #498 My Home Delivery·실제 serving·운영 smoke 확인 — 소유 트랙
-  [TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1](../work-orders/TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1.md)에서 OPEN으로 유지.
+- [x] 별도 #498 My Home Delivery·실제 serving·소유 검증 범위 완료 기록 확인(#500, 아래 추가 결과) — 소유 트랙
+  [TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1](../work-orders/TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1.md)에서 당시 OPEN으로 유지했고 이후 완료 기록을 아래에 확인했다.
+
+
+#### 최신 My Home 소유 트랙 완료 확인 및 추가 인증 검증
+
+위 review 보완 당시 OPEN이었던 별도 #498 항목은 이후 문서 PR #500/main `03aa2824aa`에서
+소유 TODO가 COMPLETED로 갱신됐다. 구현 SHA `004a42c012ad8b67a446db373d4de33889c6f4e8`의
+Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
+이후 Neture PC/mobile × 매장 경영자/공급자 Demo4조건을 추가 실행해 새 My Home 모아보기
+표시·계정 설정 링크 클릭/직접 접근과 기존 로그인·업무 권한·관리 제한·UI 로그아웃·토큰 폐기를
+모두 확인했다. 기본32조건(인증 배포 SHA)과 이 최신 Neture4조건을 구분하며 합산된 별도 고유
+조건으로 늘려 보고하지 않는다. 일반 상태 계정·본인 외부 OAuth 검증으로도 대체하지 않는다.
+
+- [x] 별도 #498 Delivery·serving·소유 트랙의 명시 검증 범위 완료 기록 확인(#500).
+- [x] Neture 최신 My Home의 Demo 인증·계정 설정 진입 PC/mobile4조건 추가 검증.
+
+현재 열린 인증 TODO는30일 이후 정책 적용·본인 외부 OAuth/명시적 연결·일반 상태 계정 SSOT의
+세 조건이다. My Home AI 등 소유 트랙의 제외 범위를 이 인증 작업으로 새로 구현하거나 닫지 않는다.
