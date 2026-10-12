@@ -22,9 +22,9 @@ jest.mock('../../../database/connection.js', () => ({ AppDataSource: {
   get manager() { return db?.manager ?? {query:(...args:any[])=>(db.query as any)(...args)}; },
 } }));
 jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({ roleAssignmentService: {
-  getRoleNames: async (id: string) => (await db.query('SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true',[id])).map((r: {role:string})=>r.role),
-  hasAnyRole: async (id: string,roles:string[]) => (await db.query('SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND role=ANY($2)',[id,roles])).length>0,
-  getActiveRoles: async (id: string) => db.query('SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true',[id]),
+  getRoleNames: async (id: string) => (await db.query('SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())',[id])).map((r: {role:string})=>r.role),
+  hasAnyRole: async (id: string,roles:string[]) => (await db.query('SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp()) AND role=ANY($2)',[id,roles])).length>0,
+  getActiveRoles: async (id: string) => db.query('SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())',[id]),
 } }));
 jest.mock('../../../modules/policy-acceptance/policy-acceptance.service.js', () => ({ policyAcceptanceService: { getEnforcedPendingForUser: async () => [] } }));
 jest.mock('../../../utils/logger.js', () => ({ __esModule: true, default: { info: jest.fn(),warn: jest.fn(),error: jest.fn(),debug: jest.fn() } }));
@@ -148,6 +148,19 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     await db.query("UPDATE role_assignments SET is_active=false WHERE user_id=$1",[fixtureAdminId]);
     await expect(service().resume(r.operationId)).rejects.toMatchObject({code:'FORBIDDEN'});
     expect((await service().get(r.operationId)).state).toBe('review_required');
+  });
+  it('expired or not-yet-valid platform grants cannot request or retry removal',async()=>{
+    const target=await user(),peer=await user();
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'subject\',$1::text) WHERE id=$2',[target.id,peer.id]);
+    const r=await service().request(target.id);expect(r.state).toBe('review_required');
+    for(const future of [false,true]) {
+      await db.query(`UPDATE role_assignments SET valid_from=statement_timestamp()+$2::interval,
+        valid_until=CASE WHEN $3 THEN NULL ELSE statement_timestamp()-interval '1 second' END WHERE user_id=$1`,
+        [fixtureAdminId,future?'1 hour':'-1 hour',future]);
+      await expect(service().request(target.id)).rejects.toMatchObject({code:'FORBIDDEN'});
+      await expect(service().resume(r.operationId)).rejects.toMatchObject({code:'FORBIDDEN'});
+      expect((await service().get(r.operationId)).state).toBe('review_required');
+    }
   });
   it('an already-started non-FK writer commits before the erasure snapshot, never after false completion',async()=>{
     const target=await user(),peer=await user();const q=db.createQueryRunner();await q.startTransaction();

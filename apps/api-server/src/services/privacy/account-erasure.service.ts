@@ -85,7 +85,8 @@ export class AccountErasureService {
     if (!UUID.test(actorId ?? '')) throw new AccountErasureError('AUTH_REQUIRED',401);
     // Avoid holding the global barrier behind another worker's storage transaction on a duplicate request.
     const [actor]=await this.db.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-      WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true`,[actorId]);
+      WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
+        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp())`,[actorId]);
     if(!actor)throw new AccountErasureError('FORBIDDEN',403);
     const [known]=await this.db.query('SELECT id FROM account_erasure_operations WHERE subject_hash=$1',[hash(userId)]);
     if(known)return this.resume(known.id,actorId);
@@ -93,7 +94,8 @@ export class AccountErasureService {
       await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
       await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hash(userId)]);
       const [actor] = await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-        WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true FOR SHARE OF u,ra`,[actorId]);
+        WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
+        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
       if (!actor) throw new AccountErasureError('FORBIDDEN',403);
       const [existing] = await m.query('SELECT * FROM account_erasure_operations WHERE subject_hash=$1 FOR UPDATE', [hash(userId)]);
       if (existing) return existing.id as string;
@@ -141,7 +143,8 @@ export class AccountErasureService {
         await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
         await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hint.subject_hash]);
         const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-          WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true FOR SHARE OF u,ra`,[actorId]);
+          WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
+        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
         if(!actor)throw new AccountErasureError('FORBIDDEN',403);
         const [o]: Operation[] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE NOWAIT', [operationId]);
         if (o.state === 'completed') return false;
@@ -375,7 +378,8 @@ export class AccountErasureService {
 
   private async assertActor(m:EntityManager,actorId:string):Promise<void> {
     const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-      WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true FOR SHARE OF u,ra`,[actorId]);
+      WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
+        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
     if(!actor)throw new AccountErasureError('FORBIDDEN',403);
   }
 

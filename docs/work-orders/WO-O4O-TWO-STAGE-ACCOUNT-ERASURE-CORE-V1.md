@@ -161,7 +161,7 @@ GCS adapter는 소유 bucket의 avatar에 대해 객체 metadata `o4o_owner_user
 
 ### 10.3 검증 및 통합 추적
 
-격리 PostgreSQL 실제 schema/합성 계정 테스트21개: 두 실제 HTTP 경로·실제 JWT/현재 DB role·보호 대상·scoped stop·중복/비FK 동시 writer·개인/타인 자료·최소 증빙·기존 access/refresh/handoff와 stale 발급·file failure/retry·ownership/inventory·restore fence·달력 µs/hold 검증 PASS. 실제 Google/Kakao OAuth나 실계정 테스트는 아니다.
+격리 PostgreSQL 실제 schema/합성 계정 테스트22개: 두 실제 HTTP 경로·실제 JWT/현재 DB role·보호 대상·scoped stop·중복/비FK 동시 writer·개인/타인 자료·최소 증빙·기존 access/refresh/handoff와 stale 발급·file failure/retry·ownership/inventory·restore fence·달력 µs/hold 검증 PASS. 실제 Google/Kakao OAuth나 실계정 테스트는 아니다.
 
 승인/정지 회귀7 suites157개, 인증 회귀6 suites182개, Admin UI6개, 설계 planner11개 PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 실제 Chromium에서 합성 API를 사용한 제거 control을1440/375/320 폭으로 확인(3 checks); 일반 사용자 전체 앱/OAuth 검증을 대체하지 않는다. storage SDK mock과 PR CI/검토·main/Delivery 최종 결과는 [공통 영향 CHECK](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md)에 기록한다.
 
@@ -169,10 +169,12 @@ GCS adapter는 소유 bucket의 avatar에 대해 객체 metadata `o4o_owner_user
 
 법률 새 본문·게시/재동의·2년 해당성 판정과 마지막 사용자 테스트는 §8/TODO의 후속이다. 분회 전용 개발/배포와 이전 환경 삭제는 수행하지 않는다.
 
-재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB21개+storage mock4개=25 tests PASS.
+재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB22개+storage mock4개=26 tests PASS.
 
 UUID 없는 고유 이메일/출처 식별자의 문자열·JSON 재복사도7일 writer fence로 차단하는 합성 회귀 PASS. restore key에는 원문 대신 해시·문자 길이만 저장하며 완료 시 transient UUID를 제거한다. 이 추가 fence의 운영 성능/충돌 영향도 활성화 전 평가 대상이다.
 
-Codex `f8fc042`의 P1/P2 처리: 공통 이름·닉네임·IP·전화·avatar/business 값은 타인의 정당한 데이터와 구분되지 않으므로 단독 자동 차단/해시 fence에서 제외했다. 고유 UUID/이메일/provider·소유 row 출처 식별자로 연관 복제를 검출하고 source UUID가 있는 이름 복제는 계속 미완료다. 분류 근거 없는 타인 이름을 지우지 않는다. 실제 완료 Admin이 audit actor를 기록하고 최초 요청 event는 원래 요청자를 유지한다. 동명이인/공통 접속·연락처 보존과 두 Admin의 요청/완료 구분을 포함한21+4 tests PASS.
+Codex `f8fc042`의 P1/P2 처리: 공통 이름·닉네임·IP·전화·avatar/business 값은 타인의 정당한 데이터와 구분되지 않으므로 단독 자동 차단/해시 fence에서 제외했다. 고유 UUID/이메일/provider·소유 row 출처 식별자로 연관 복제를 검출하고 source UUID가 있는 이름 복제는 계속 미완료다. 분류 근거 없는 타인 이름을 지우지 않는다. 실제 완료 Admin이 audit actor를 기록하고 최초 요청 event는 원래 요청자를 유지한다. 동명이인/공통 접속·연락처 보존과 두 Admin의 요청/완료 구분을 포함한22+4 tests PASS.
 
 PR CI shard2 실패를 로컬 전체 shard로 재현했다(155 suites2635 tests PASS, 실패1개). 원인은 email verification token consumer를 인증 발급 경로 하나로 고정한 기존 source guard였다. 계정 제거의 소유 토큰 파기 경로를 명시적으로 추가하고 토큰 INSERT/UPDATE 부재를 검증한다. 수정된 정적 인증/Demo guard26 tests PASS; 전체 PR CI 재실행 결과를 통합 gate로 사용한다.
+
+main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 merge로 통합했다. 해당 소유 트랙 기능을 이 작업에서 재구현하지 않았다. 역할 is_active뿐 아니라 valid_from/valid_until을 각 제거 단계의 현재 시점으로 재확인한다. 만료/미시작 역할은 요청·retry403이며 기존 operation을 변경하지 않는다. 최신 main 통합 후 격리 DB22+storage4+정적 인증17=43 tests, API build·lint PASS.
