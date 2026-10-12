@@ -179,3 +179,26 @@ test('scope query failure identifies only validated schema and SQLSTATE', async 
   } };
   await assert.rejects(collectRetirementInventory(client), error => /retirement-scope:service_catalog.service_key; code=22P02/.test(error.message) && !error.stack.includes('private'));
 });
+
+
+test('array scopes retain nested predicates; cross-schema dependencies and mixed offers remain visible', async()=>{
+ const client={query:async(sql,args)=>{
+  if(sql.includes('information_schema.columns'))return {rows:[{table_name:'supplier_product_offers',column_name:'service_keys',data_type:'ARRAY',udt_name:'_text'}]};
+  if(sql.includes('array_agg'))return {rows:[{source_schema:'neture',source_table:'offer_consumers',target_schema:'public',target_table:'supplier_product_offers',constraint_name:'offer_fk',source_columns:['offer_id'],target_columns:['id']}]};
+  if(sql.includes('pg_constraint'))return {rows:[]};
+  if(sql.includes('JOIN (SELECT')){
+   assert.match(sql,/FROM "neture"\."offer_consumers" s/);
+   assert.match(sql,/unnest\("service_keys"\) v WHERE v::text = ANY/);
+   assert.match(sql,/pharmacy-hub:'\)\)\) p ON s\."offer_id" = p\."id"/);
+   assert.deepEqual(args,[retiredKeys]);return {rows:[{count:'3'}]};
+  }
+  if(sql.includes('FILTER'))return {rows:[{total:'19',mixed:'2',ph_only:'17'}]};
+  if(sql.includes('count(*)'))return {rows:[{count:'19'}]};
+  return {rows:[]};
+ }};
+ const result=await collectRetirementInventory(client);
+ assert.equal(result.dependencyCounts[0].source_schema,'neture');
+ assert.equal(result.dependencyCounts[0].count,'3');
+ assert.deepEqual(result.offerScopes,{total:'19',mixed:'2',ph_only:'17'});
+ assert.equal(result.deletionApprovedByInventory,false);
+});
