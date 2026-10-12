@@ -89,8 +89,8 @@ function MyHomeContent({ view }: { view: View }) {
         )}
       </div>
       {view === "overview" ? (
-        <div className="space-y-5">
-          <MyHomeNotifications accountId={user.id} />
+        <div id="my-home-overview" className="space-y-5">
+          <MyHomeNotifications accountId={user.id} previewLimit={3} />
           <HomeEntryPanel
             key={user.id}
             user={user}
@@ -99,66 +99,32 @@ function MyHomeContent({ view }: { view: View }) {
             error={entry.error}
             onReload={entry.reload}
             workspaceOnly
+            compactWorkspace
           />
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                to: "/mypage/services",
-                title: "참여 서비스",
-                value: model
-                  ? `${model.myServices.length}개 서비스 · 이용 상태 확인`
-                  : entry.error ? "이용 상태를 불러오지 못했습니다" : "이용 상태 확인 중…",
-              },
-              {
-                to: "/mypage/activity",
-                title: "커뮤니티 활동",
-                value: "내가 작성한 글 모아보기",
-              },
-              {
-                to: "/mypage/management",
-                title: "경영 현황",
-                value: entry.data
-                  ? `${new Set(entry.data.stores.map((store) => store.organizationId)).size}개 매장 · 방문 통계`
-                  : "내 매장 방문 통계",
-              },
-            ].filter(card => card.to !== "/mypage/management" || hasStore).map((card) => (
-              <Link
-                key={card.to}
-                to={card.to}
-                className="rounded-2xl border border-slate-200 bg-white p-5 no-underline hover:border-blue-400"
-              >
-                <h2 className="font-semibold text-slate-900">{card.title}</h2>
-                <p className="mt-2 text-sm text-slate-600">{card.value}</p>
-              </Link>
-            ))}
-          </div>
-          <MyHomeParticipation accountId={user.id} data={entry.data} compact />
-          {entry.data && (
-            <>
-              <section aria-label="커뮤니티 활동 요약">
-                <h2 className="mb-3 text-lg font-semibold">커뮤니티 활동</h2>
-                <MyHomeActivity accountId={user.id} data={entry.data} compact />
-              </section>
-              {hasStore && <section aria-label="내 매장 경영 요약">
-                <h2 className="mb-3 text-lg font-semibold">
-                  내 매장 경영 현황
-                </h2>
-                <MyHomeManagement
-                  accountId={user.id}
-                  data={entry.data}
-                  compact
-                />
-              </section>}
-            </>
-          )}
-          <div className="flex flex-wrap gap-4 text-sm">
-            <Link to="/mypage/profile" className="text-blue-700 underline">
-              프로필 수정
-            </Link>
-            <Link to="/mypage/settings" className="text-blue-700 underline">
-              계정 설정
-            </Link>
-          </div>
+          <nav aria-label="내 현황 자세히 보기" className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="font-semibold text-slate-900">내 현황 자세히 보기</h2>
+            <p className="mt-1 text-sm text-slate-600">참여 기록과 통계는 필요한 화면에서 확인하세요.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  to: "/mypage/services",
+                  title: "참여 서비스",
+                  value: model ? `${model.myServices.length}개 서비스 · 이용 상태 확인`
+                    : entry.error ? "이용 상태를 불러오지 못했습니다" : "이용 상태 확인 중…",
+                },
+                { to: "/mypage/activity", title: "커뮤니티 활동", value: "내가 작성한 글 모아보기" },
+                ...(hasStore ? [{
+                  to: "/mypage/management",
+                  title: "경영 현황",
+                  value: `${new Set(entry.data!.stores.map(store => store.organizationId)).size}개 매장 · 사업 요약과 방문 통계`,
+                }] : []),
+                { to: "/mypage/settings", title: "계정 설정", value: "프로필·로그인 설정" },
+              ].map(item => <Link key={item.to} to={item.to} className="rounded-lg border border-slate-100 p-3 no-underline hover:border-blue-400">
+                <span className="font-medium text-blue-700">{item.title} →</span>
+                <span className="mt-1 block text-xs text-slate-500">{item.value}</span>
+              </Link>)}
+            </div>
+          </nav>
         </div>
       ) : view === "services" ? (
         <div className="space-y-6">

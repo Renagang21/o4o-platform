@@ -126,6 +126,22 @@ it('소속 매장·개인 공급자 자격이 없는 운영자도 각 카드에�
 
 describe('My Home available workspace entries', () => {
   const workspace = (d: HomeEntryData, selected?: string) => render(<MemoryRouter><HomeEntryPanel user={user()} data={d} loading={false} error={null} onReload={() => {}} workspaceOnly storeOrganizationId={selected} /></MemoryRouter>);
+  it('compact overview keeps one entry per available role and routes additional work to Services', () => {
+    render(<MemoryRouter><HomeEntryPanel user={user()} data={data({
+      stores: [
+        { serviceKey: 'kpa-society', organizationId: 'o1', name: '첫 번째 매장', memberRole: 'owner' },
+        { serviceKey: 'kpa-society', organizationId: 'o2', name: '두 번째 매장', memberRole: 'owner' },
+      ],
+      serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } },
+      operatorServices: [{ serviceKey: 'kpa-society', serviceName: 'kpa-society', scope: 'operator', workspaceMode: 'standard', workspaceAvailable: true }],
+    })} loading={false} error={null} onReload={() => {}} workspaceOnly compactWorkspace /></MemoryRouter>);
+    expect(screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent)).toEqual(['커뮤니티', '매장', '공급자', '서비스 운영']);
+    expect(screen.getByRole('button', { name: /첫 번째 매장/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /두 번째 매장/ })).toBeNull();
+    expect(screen.getByRole('link', { name: '공급자 업무' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /약사 커뮤니티/ })).toBeNull();
+    expect(screen.getByRole('link', { name: '참여 서비스와 이용 상태 보기 →' }).getAttribute('href')).toBe('/mypage/services');
+  });
   it('shows available community and supplier work, but no empty store/operator cards', () => {
     workspace(data({ stores: [], serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } } }));
     expect(screen.getByRole('heading', { name: '내 업무 바로가기' })).toBeTruthy();
