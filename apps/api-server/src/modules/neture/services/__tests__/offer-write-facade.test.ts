@@ -11,7 +11,6 @@ const routes = [
   ['batchUpdateSupplierOffers', 'supplierOfferWriteService', ['supplier-fixture', [{ offerId: 'offer-fixture' }]]],
   ['bulkDeleteOffers', 'supplierOfferWriteService', ['supplier-fixture', ['offer-fixture'], 'actor-fixture']],
   ['updateDistribution', 'supplierOfferDistributionService', ['offer-fixture', 'supplier-fixture', 'actor-fixture', { serviceKeys: [] }]],
-  ['setServiceDelivery', 'supplierOfferDistributionService', ['offer-fixture', 'supplier-fixture', 'fixture-service', { enabled: false }]],
   ['approveProduct', 'offerLifecycleService', ['offer-fixture', 'actor-fixture']],
   ['rejectProduct', 'offerLifecycleService', ['offer-fixture', 'actor-fixture', 'Fixture reason']],
   ['submitForApproval', 'offerLifecycleService', ['supplier-fixture', ['offer-fixture']]],

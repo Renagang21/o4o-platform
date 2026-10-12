@@ -59,7 +59,7 @@ import logger from './logger.js';
 export const STORE_MEMBER_ROLES: readonly string[] = ['owner', 'admin', 'manager'];
 
 /** 서비스별 store_owner role prefix (role_assignments 접두사 기준) */
-export type StoreOwnerServiceKey = 'kpa' | 'cosmetics' | 'pharmacy-hub' | 'cafe24-b2b';
+export type StoreOwnerServiceKey = 'kpa' | 'cosmetics' | 'cafe24-b2b';
 
 /**
  * 서비스 → organization 연결 근거.
@@ -75,7 +75,6 @@ export const STORE_SERVICE_ORG_LINKAGE: Readonly<
 > = Object.freeze({
   kpa: { enrollmentCodes: ['kpa-society', 'kpa'], slugKeys: ['kpa'] },
   cosmetics: { enrollmentCodes: ['k-cosmetics', 'cosmetics'], slugKeys: ['k-cosmetics', 'cosmetics'] },
-  'pharmacy-hub': { enrollmentCodes: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
   // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1:
   //   프로비저닝이 enrollment 와 slug 를 모두 같은 키로 기록하므로 후보도 1개씩이다.
   'cafe24-b2b': { enrollmentCodes: ['cafe24-b2b'], slugKeys: ['cafe24-b2b'] },
@@ -101,6 +100,7 @@ export async function isOrganizationLinkedToService(
   serviceKey: StoreOwnerServiceKey,
 ): Promise<boolean> {
   const linkage = STORE_SERVICE_ORG_LINKAGE[serviceKey];
+  if (!linkage) return false;
   const rows = await dataSource.query(
     `SELECT 1
        WHERE EXISTS (
@@ -170,6 +170,7 @@ export async function findStoreOrganizationCandidates(
   }
 
   const linkage = STORE_SERVICE_ORG_LINKAGE[serviceKey];
+  if (!linkage) return [];
   const rows = await dataSource.query(
     `SELECT DISTINCT ON (om.organization_id)
             om.organization_id AS organization_id,

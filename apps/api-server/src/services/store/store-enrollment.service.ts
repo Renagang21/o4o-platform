@@ -63,7 +63,6 @@ export const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Partial<Record<StoreOwnerServ
   Object.freeze({
     kpa: 'kpa:store_owner',
     cosmetics: 'cosmetics:store_owner',
-    'pharmacy-hub': 'pharmacy-hub:store_owner',
   });
 
 /** 조직 type — 기존 프로비저닝과 같은 값(매장). */

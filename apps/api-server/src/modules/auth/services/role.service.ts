@@ -5,6 +5,7 @@
  * roles 테이블 CRUD + 검증.
  * RBAC SSOT(role_assignments)와 분리된 메타데이터 관리.
  */
+import { isRetiredRoleValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { Role } from '../entities/Role.js';
@@ -46,6 +47,7 @@ export class RoleService {
    * Check if role name exists and is active
    */
   async isValidRole(name: string): Promise<boolean> {
+    if (isRetiredRoleValue(name)) return false;
     const count = await this.repository.count({ where: { name, isActive: true } });
     return count > 0;
   }
@@ -54,36 +56,39 @@ export class RoleService {
    * Get all roles for a specific service
    */
   async getRolesByService(serviceKey: string): Promise<Role[]> {
-    return this.repository.find({
+    if (isRetiredRoleValue(serviceKey)) return [];
+    return (await this.repository.find({
       where: { serviceKey, isActive: true },
       order: { name: 'ASC' },
-    });
+    })).filter(r => !isRetiredRoleValue(r.serviceKey) && !isRetiredRoleValue(r.name));
   }
 
   /**
    * Get assignable roles for a service (operator console용)
    */
   async getAssignableRoles(serviceKey: string): Promise<Role[]> {
-    return this.repository.find({
+    if (isRetiredRoleValue(serviceKey)) return [];
+    return (await this.repository.find({
       where: { serviceKey, isActive: true, isAssignable: true },
       order: { name: 'ASC' },
-    });
+    })).filter(r => !isRetiredRoleValue(r.serviceKey) && !isRetiredRoleValue(r.name));
   }
 
   /**
    * Get all active roles
    */
   async getAllRoles(): Promise<Role[]> {
-    return this.repository.find({
+    return (await this.repository.find({
       where: { isActive: true },
       order: { serviceKey: 'ASC', name: 'ASC' },
-    });
+    })).filter(r => !isRetiredRoleValue(r.serviceKey) && !isRetiredRoleValue(r.name));
   }
 
   /**
    * Create a new role (admin only)
    */
   async createRole(data: CreateRoleInput): Promise<Role> {
+    if (isRetiredRoleValue(data.serviceKey) || isRetiredRoleValue(data.name)) throw new RetiredServiceError();
     const existing = await this.repository.findOne({ where: { name: data.name } });
     if (existing) {
       throw new Error(`Role '${data.name}' already exists`);
@@ -114,6 +119,7 @@ export class RoleService {
     if (!role) {
       throw new Error('Role not found');
     }
+    if (isRetiredRoleValue(role.serviceKey) || isRetiredRoleValue(role.name)) throw new RetiredServiceError();
 
     if (data.displayName !== undefined) role.displayName = data.displayName;
     if (data.description !== undefined) role.description = data.description;
@@ -134,6 +140,7 @@ export class RoleService {
     if (!role) {
       throw new Error('Role not found');
     }
+    if (isRetiredRoleValue(role.serviceKey) || isRetiredRoleValue(role.name)) throw new RetiredServiceError();
     if (role.isSystem) {
       throw new Error('Cannot delete system role');
     }

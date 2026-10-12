@@ -31,7 +31,7 @@ export type StorePolicyServiceKey =
   | 'cosmetics'
   | 'kpa'
   | 'neture'
-  | 'pharmacy-hub'
+
   // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 §D2: StoreSlugServiceKey 와 동일 집합 유지.
   | 'cafe24-b2b';
 

@@ -1,3 +1,4 @@
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import { randomUUID } from 'node:crypto';
 import { Request, Response } from 'express';
 import { Repository, type EntityManager } from 'typeorm';
@@ -52,6 +53,10 @@ export class AuthTokenSessionService {
       const error = new Error('Invalid or expired refresh token') as Error & { code: string };
       error.code = 'REFRESH_TOKEN_INVALID';
       throw error;
+    }
+
+    if (isRetiredServiceValue(payload.serviceKey)) {
+      this.throwServiceSessionRevoked(payload.userId, payload.serviceKey!);
     }
 
     // Check token expiration explicitly for clearer error

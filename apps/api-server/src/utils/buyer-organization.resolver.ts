@@ -51,7 +51,6 @@ const CART_SERVICE_TO_STORE_ORG_KEY: Readonly<Record<string, StoreOwnerServiceKe
   kpa: 'kpa',
   'k-cosmetics': 'cosmetics',
   cosmetics: 'cosmetics',
-  'pharmacy-hub': 'pharmacy-hub',
 });
 
 export type BuyerOrganizationResolution =
@@ -65,6 +64,7 @@ async function loadCandidates(
   userId: string,
   serviceKey: string,
 ): Promise<StoreOrganizationCandidate[]> {
+  if (serviceKey === 'pharmacy-hub') return [];
   const mapped = CART_SERVICE_TO_STORE_ORG_KEY[serviceKey];
   return mapped
     ? findStoreOrganizationCandidates(dataSource, userId, mapped)

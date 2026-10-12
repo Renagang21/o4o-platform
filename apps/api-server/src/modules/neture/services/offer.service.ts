@@ -158,15 +158,6 @@ export class NetureOfferService {
     return this.supplierOfferDistributionService.updateDistribution(offerId, supplierId, userId, input);
   }
 
-  async setServiceDelivery(
-    offerId: string,
-    supplierId: string,
-    serviceKey: string,
-    input: { enabled: boolean; unitPrice?: number | null },
-  ): Promise<{ success: boolean; error?: string; message?: string; data?: Record<string, unknown> }> {
-    return this.supplierOfferDistributionService.setServiceDelivery(offerId, supplierId, serviceKey, input);
-  }
-
   async updateBusinessContent(
     offerId: string,
     supplierId: string,

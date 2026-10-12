@@ -50,7 +50,6 @@ const MEMBERSHIP_ROW = [{ '?column?': 1 }];
 const CANONICAL: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   cosmetics: 'k-cosmetics',
-  'pharmacy-hub': 'pharmacy-hub',
 };
 
 describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과한다', () => {
@@ -98,13 +97,13 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
   it('multi-service 계정이라도 현재 route 의 serviceKey 조직만 후보로 조회한다', async () => {
     const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-ph', role: 'owner' }]]);
-    const guard = createRequireStoreOwner(dataSource, 'pharmacy-hub');
+    const guard = createRequireStoreOwner(dataSource, 'cosmetics');
     const req: any = {
       user: {
         id: 'u1',
         memberships: [
           { serviceKey: 'kpa-society', status: 'active' },
-          { serviceKey: 'pharmacy-hub', status: 'active' },
+          { serviceKey: 'k-cosmetics', status: 'active' },
           { serviceKey: 'k-cosmetics', status: 'active' },
         ],
       },
@@ -113,10 +112,10 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
     await guard(req, makeRes(), jest.fn());
 
     expect(req.organizationId).toBe('org-ph');
-    // 조직 후보 조회 SQL 에 pharmacy-hub linkage 만 들어간다 (타 서비스 조직 fallback 금지)
+    // 조직 후보 조회 SQL 에 cosmetics linkage 만 들어간다 (타 서비스 조직 fallback 금지)
     const orgCall = dataSource.query.mock.calls[2];
     expect(orgCall[0]).toContain('organization_service_enrollments');
-    expect(JSON.stringify(orgCall[1])).toContain('pharmacy-hub');
+    expect(JSON.stringify(orgCall[1])).toContain('cosmetics');
     expect(JSON.stringify(orgCall[1])).not.toContain('kpa');
   });
 

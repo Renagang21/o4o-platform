@@ -10,13 +10,13 @@ function fakeDs(handler: (sql:string, params:any[])=>any[]) {
 }
 
 describe('StoreOwnerTerminationService', () => {
-  it('does not remove service membership when terminating store-owner contract', async () => {
+  it.each(['kpa-society', 'pharmacy-hub'])('does not remove service membership when terminating an existing %s contract', async (serviceKey) => {
     const queries:string[] = [];
     const now = new Date('2026-09-18T00:00:00Z');
     const ds=fakeDs((sql)=>{
       queries.push(sql);
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'11111111-1111-1111-1111-111111111111', service_key:'kpa-society',
+        id:'11111111-1111-1111-1111-111111111111', service_key:serviceKey,
         organization_id:'22222222-2222-2222-2222-222222222222', user_id:'33333333-3333-3333-3333-333333333333',
         status:'termination_scheduled', requested_at:now, requested_by:null, return_requested:false,
         return_completed_at:null, termination_effective_at:now, purge_due_at:null, purge_completed_at:null,
@@ -73,7 +73,7 @@ describe('StoreOwnerTerminationService', () => {
     const ds=fakeDs((sql)=>{
       queries.push(sql);
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'pharmacy-hub', organization_id:'2', user_id:'3', status:'terminated',
+        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'terminated',
         requested_at:due, requested_by:null, return_requested:false, return_completed_at:null,
         termination_effective_at:due, purge_due_at:due, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:due, updated_at:due,
@@ -97,7 +97,7 @@ describe('StoreOwnerTerminationService', () => {
     const now=new Date('2026-09-18T00:00:00Z');
     const ds=fakeDs((sql)=>{
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'pharmacy-hub', organization_id:'2', user_id:'3', status:'return_pending',
+        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'return_pending',
         requested_at:now, requested_by:null, return_requested:true, return_completed_at:null,
         termination_effective_at:now, purge_due_at:null, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:now, updated_at:now,
@@ -112,4 +112,10 @@ describe('StoreOwnerTerminationService', () => {
     expect(pkg.data.auditLogs).toBeUndefined();
     expect(pkg.manifestHash).toMatch(/^[a-f0-9]{64}$/);
   });
+});
+
+it('blocks new PH termination cases before database access', async () => {
+ const ds = fakeDs(() => []);
+ await expect(new StoreOwnerTerminationService(ds).createCase({ serviceKey: 'pharmacy-hub', organizationId: 'org', userId: 'user' })).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+ expect(ds.query).not.toHaveBeenCalled();
 });

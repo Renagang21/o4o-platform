@@ -1,3 +1,4 @@
+import { isRetiredServiceValue, RetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { AccountActivity } from '../../entities/AccountActivity.js';
@@ -47,6 +48,7 @@ export class AuthGuestService {
     request: GuestTokenIssueRequest,
   ): Promise<GuestTokenIssueResponse> {
     const { serviceId, storeId, deviceId, entryType, metadata } = request;
+    if (isRetiredServiceValue(serviceId)) throw new RetiredServiceError();
 
     try {
       // Generate unique guest session ID
@@ -118,12 +120,12 @@ export class AuthGuestService {
           ipAddress: metadata?.ipAddress || 'unknown',
           userAgent: metadata?.userAgent || 'unknown',
           details: {
+            ...metadata,
             guestSessionId: guestData.guestSessionId,
             serviceId: guestData.serviceId,
             storeId: guestData.storeId,
             deviceId: guestData.deviceId,
             entryType: guestData.entryType,
-            ...metadata,
           },
         }),
       );

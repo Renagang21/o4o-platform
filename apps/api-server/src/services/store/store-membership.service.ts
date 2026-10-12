@@ -85,7 +85,6 @@ export const STORE_MEMBERSHIP_MANAGED_ROLES: readonly string[] = [STORE_INVITED_
 export const STORE_MEMBER_ROLE_BY_SERVICE: Readonly<Record<StoreOwnerServiceKey, string>> = Object.freeze({
   kpa: 'kpa:store_member',
   cosmetics: 'cosmetics:store_member',
-  'pharmacy-hub': 'pharmacy-hub:store_member',
   'cafe24-b2b': 'cafe24-b2b:store_member',
 });
 

@@ -53,7 +53,7 @@ describe('§2-C bridge — Event Offer 가 공급자에게 전달된다', () => 
   });
 
   it('기존 3 source 는 그대로다 (무회귀)', () => {
-    expect(bridge).toContain('pharmacy_hub_cart:');
+    expect(bridge).not.toContain('pharmacy_hub_cart:');
     expect(bridge).toContain('store_b2b_cart:');
     expect(bridge).toMatch(/\[NETURE_B2B_ORDER_SOURCE\]:/);
   });

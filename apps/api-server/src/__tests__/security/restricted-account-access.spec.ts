@@ -163,7 +163,7 @@ describe('중앙 가드 — requireAuth 통합 (§5-B / §11.7)', () => {
   it('② restricted 계정은 allowlist GET 을 통과한다', async () => {
     setUser(UserStatus.PENDING);
     const res = await request(app)
-      .get('/api/v1/pharmacy-hub/join/status')
+      .get('/api/v1/auth/me')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
   });
@@ -211,7 +211,7 @@ describe('중앙 가드 — requireAuth 통합 (§5-B / §11.7)', () => {
   it('⑥ method 불일치는 차단된다 (GET 허용 경로에 POST)', async () => {
     setUser(UserStatus.PENDING);
     const res = await request(app)
-      .post('/api/v1/pharmacy-hub/join/status')
+      .post('/api/v1/auth/me')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(403);
     expect(res.body.code).toBe(RESTRICTED_CODE);

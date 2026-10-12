@@ -72,11 +72,11 @@ describe('축 A — KCos 태블릿 라우트의 서비스 스코프 조직 해�
     expect(poolOrgParams[0]).toBe(ORG_COS);
   });
 
-  it('C. pharmacy-hub mount 는 PH 조직을 고른다', async () => {
+  it('retired PH mount cannot resolve a shared organization or product pool', async () => {
     const { dataSource, poolOrgParams } = makeDataSource();
     const res = await request(makeApp(dataSource, 'pharmacy-hub')).get('/store/product-pool');
-    expect(res.status).toBe(200);
-    expect(poolOrgParams[0]).toBe(ORG_PH);
+    expect(res.status).toBe(403);
+    expect(poolOrgParams).toHaveLength(0);
   });
 
   it('D. 해당 서비스 store_owner role 이 없으면 403 (게이트 완화 없음)', async () => {
