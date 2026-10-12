@@ -376,7 +376,7 @@ export default function AdminAccountsSettings() {
         </div>
         <div className="shrink-0 flex items-center gap-2">
           {/* WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-              이 화면은 **플랫폼 관리자 계정** 전용이다. 서비스 운영자(KPA·Neture·Pharmacy-Hub 등) 등록은
+              이 화면은 **플랫폼 관리자 계정** 전용이다. 서비스 운영자 계정 등록은
               `/operators` 가 canonical 이므로 생성 기능을 여기에 복제하지 않고 진입점만 둔다
               (중복 구현 시 등록 계약이 두 곳으로 갈라진다). */}
           <button type="button" onClick={() => navigate('/operators')}
@@ -392,7 +392,7 @@ export default function AdminAccountsSettings() {
 
       {/* 두 화면의 역할 경계를 화면에서 분명히 한다 — 어디서 무엇을 만드는지 헷갈리지 않게. */}
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        서비스 운영자(KPA · Neture · K-Cosmetics · Pharmacy-Hub) 계정 등록은 이 화면이 아니라
+        서비스 운영자 계정 등록·역할 지정은 이 화면이 아니라
         <b>서비스 운영자 관리</b> 화면에서 처리합니다. 로그인 수단은 Google 계정 하나입니다.
       </div>
 

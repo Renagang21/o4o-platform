@@ -120,7 +120,7 @@ const service = new MembershipApprovalService();
 function seed(userStatus: string) {
   db = {
     memberships: [
-      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' },
+      { id: 'm-ph', user_id: 'u1', service_key: 'lecture', role: 'pharmacy', status: 'suspended' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'suspended' },
     ],
     roles: [{ id: 'ra-1', user_id: 'u1', role: 'member', is_active: false }],
@@ -137,7 +137,7 @@ const reactivateAsOperator = () =>
     userId: 'u1',
     reactivatedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['pharmacy-hub'],
+    serviceKeys: ['lecture'],
   });
 
 const reactivateAsPlatformAdmin = () =>
@@ -223,13 +223,30 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 it.each(['operator', 'other-service-admin'])('does not restore a withdrawn membership with %s authority', async role => {
   seed('active');
   db.memberships[0].status = 'withdrawn';
-  await expect(service.reactivateMembership({ userId: 'u1', reactivatedBy: 'op-1', isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'], adminServiceKeys: role === 'operator' ? [] : ['kpa-society'] }))
+  await expect(service.reactivateMembership({ userId: 'u1', reactivatedBy: 'op-1', isPlatformAdmin: false, serviceKeys: ['lecture'], adminServiceKeys: role === 'operator' ? [] : ['kpa-society'] }))
     .rejects.toMatchObject({ code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED' });
   expect(db.memberships[0].status).toBe('withdrawn');
   expect(queries.some(q => /^UPDATE/i.test(q.sql))).toBe(false);
 });
 it('same-service admin can restore a withdrawn membership', async () => {
   seed('active'); db.memberships[0].status = 'withdrawn';
-  await service.reactivateMembership({ userId: 'u1', reactivatedBy: 'admin-1', isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'], adminServiceKeys: ['pharmacy-hub'] });
+  await service.reactivateMembership({ userId: 'u1', reactivatedBy: 'admin-1', isPlatformAdmin: false, serviceKeys: ['lecture'], adminServiceKeys: ['lecture'] });
   expect(db.memberships[0].status).toBe('active');
+});
+ describe('PH retirement mixed membership recovery', () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('recovers current services while leaving %s suspended', async (retiredKey) => {
+    seed('active');
+    db.memberships.push({ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' });
+    const result = await reactivateAsPlatformAdmin();
+    expect(result?.reactivatedMemberships).toBe(2);
+    expect(db.memberships.find(m => m.id === 'retired')?.status).toBe('suspended');
+    expect(db.memberships.filter(m => m.id !== 'retired').every(m => m.status === 'active')).toBe(true);
+  });
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('returns 410 without updates when only %s remains', async (retiredKey) => {
+    seed('active');
+    db.memberships = [{ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' }];
+    await expect(reactivateAsPlatformAdmin()).rejects.toMatchObject({ httpStatus: 410 });
+    expect(queries.some(q => /^UPDATE /i.test(q.sql))).toBe(false);
+  });
+
 });

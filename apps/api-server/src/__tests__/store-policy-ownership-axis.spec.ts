@@ -93,7 +93,7 @@ describe('store-policy ownership — canonical axis', () => {
   });
 
   it('F. kpa / pharmacy-hub slug 도 같은 축으로 판정된다', async () => {
-    for (const serviceKey of ['kpa', 'pharmacy-hub']) {
+    for (const serviceKey of ['kpa', 'cosmetics']) {
       const { dataSource } = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });
       await expect(isStoreOwner(dataSource, ORG_ID, serviceKey, 'user-1')).resolves.toBe(true);
 

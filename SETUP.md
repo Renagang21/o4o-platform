@@ -231,7 +231,8 @@ API 상태 확인: `curl http://localhost:3002/health`
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 로그인은 Google 로그인뿐입니다(GIS popup → ID token → API 가 `aud` 검증). 로컬 로그인 smoke 에는
+- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNT.txt`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
+- Google 로그인 smoke는 GIS popup → ID token → API의 `aud` 검증 흐름을 확인합니다. 로컬 Google 로그인 smoke에는
   Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
   `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
 

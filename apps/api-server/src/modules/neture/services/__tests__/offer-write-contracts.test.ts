@@ -325,30 +325,8 @@ describe('distribution writes preserve scope, diff and transaction order', () =>
     expect(tx.commitTransaction).not.toHaveBeenCalled();
     expect(events.slice(-2)).toEqual(['rollbackTransaction', 'release']);
   });
-  it('single-service price edit retains other keys and common price and never touches approvals', async () => {
-    query.mockResolvedValue([rawFixture({ service_keys: ['fixture-other', 'pharmacy-hub'] })]);
-    expect(await service.setServiceDelivery('offer-fixture', 'supplier-fixture', 'pharmacy-hub', { enabled: true, unitPrice: 123.9 })).toMatchObject({
-      success: true, data: { changed: false, unitPrice: 123, serviceKeys: ['fixture-other', 'pharmacy-hub'] },
-    });
-    expect(tx.query.mock.calls[1][1]).toEqual(['offer-fixture', 'pharmacy-hub', 123]);
-    expect(tx.query.mock.calls[1][0]).toContain('ON CONFLICT (offer_id, service_key)');
-    const sql = tx.query.mock.calls.map(([s]) => s).join('\n');
-    expect(sql).not.toMatch(/offer_service_approvals|organization_product_listings|product_approvals|price_general|product_masters/);
-    expect(events).toEqual(['connect', 'startTransaction', 'write', 'write', 'commitTransaction', 'release']);
-  });
-  it('single-service price DB failure rolls back and propagates', async () => {
-    query.mockResolvedValue([rawFixture({ service_keys: ['fixture-other', 'pharmacy-hub'] })]);
-    const failure = new Error('fixture price failure');
-    tx.query.mockResolvedValueOnce([]).mockRejectedValueOnce(failure);
-    await expect(service.setServiceDelivery('offer-fixture', 'supplier-fixture', 'pharmacy-hub', { enabled: true, unitPrice: 100 })).rejects.toBe(failure);
-    expect(tx.commitTransaction).not.toHaveBeenCalled();
-    expect(tx.rollbackTransaction).toHaveBeenCalledTimes(1);
-    expect(tx.release).toHaveBeenCalledTimes(1);
-  });
-  it('approval service keys cannot bypass the approval flow', async () => {
-    expect(await service.setServiceDelivery('offer-fixture', 'supplier-fixture', 'kpa-society', { enabled: true })).toEqual({
-      success: false, error: 'SERVICE_KEY_REQUIRES_APPROVAL_FLOW',
-    });
+  it('removed direct service delivery cannot issue price or scope writes', () => {
+    expect('setServiceDelivery' in service).toBe(false);
     expect(query).not.toHaveBeenCalled();
     expect(tx.startTransaction).not.toHaveBeenCalled();
   });

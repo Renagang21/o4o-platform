@@ -136,8 +136,7 @@ const COMPLETE_BUSINESS_INFO = {
 /** 5개 서비스 canonical service_key → 기대 role prefix (security-core SSOT 와 같아야 한다) */
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
-  { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
+  { serviceKey: 'lecture', prefix: 'lecture' },
   { serviceKey: 'neture', prefix: 'neture' },
 ];
 
@@ -261,7 +260,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
   describe('의도적으로 접두어가 없는 전역 역할은 그대로 부여한다', () => {
     it.each([
       ['kpa-society', 'user'],
-      ['k-cosmetics', 'customer'],
+      ['neture', 'user'],
     ])('%s / %s', async (serviceKey, role) => {
       seed(serviceKey, role, 'pending');
       await approve();
@@ -283,7 +282,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
   });
 
   describe('service membership cannot restore centrally assigned operational roles', () => {
-    it.each(['kpa:admin', 'cosmetics:operator', 'platform:super_admin'])('%s', async (role) => {
+    it.each(['kpa:admin', 'neture:operator', 'platform:super_admin'])('%s', async (role) => {
       seed('kpa-society', role, 'suspended', role);
       await reactivate();
       expect(grantedRoles()).toEqual([]);
@@ -310,4 +309,19 @@ it.each(['pending', 'suspended'])('a legacy foreign-service membership role cann
   if (status === 'pending') await approve(); else await reactivate();
   expect(db.memberships[0].status).toBe('active');
   expect(grantedRoles()).toEqual([]);
+});
+
+it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('cannot grant ordinary roles by approving retired %s memberships', async key => {
+ seed(key, 'pharmacy', 'pending');
+ await expect(approve()).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+ expect(db.memberships[0].status).toBe('pending');
+ expect(grantedRoles()).toEqual([]);
+});
+
+it.each(['cosmetics:member', 'pharmacy-hub:member'])('internal SQL grant never creates or restores retired role %s', async role => {
+  for (const mode of ['grant', 'restore-only']) {
+    const query = jest.fn();
+    await expect((service as any).activateRoleAssignment({ query }, 'user', role, 'admin', mode)).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+    expect(query).not.toHaveBeenCalled();
+  }
 });

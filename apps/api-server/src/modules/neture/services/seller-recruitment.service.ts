@@ -53,12 +53,9 @@ import { isPublicRecruitment } from '../../neture-pharmacy/services/recruitment-
  *   Legacy Partner 영역(`/partner/recruitment-applications`)은 은퇴했다 — fallback 도 매장 경로.
  */
 const STORE_RECRUITMENT_APPLICATIONS_ROUTE = '/store/commerce/recruitment-applications';
-const PHARMACY_HUB_RECRUITMENT_APPLICATIONS_ROUTE = '/store-owner/recruitment-applications';
 
 export function resolveRecruitmentApplicationTargetUrl(serviceKey?: string): string {
   switch (serviceKey) {
-    case 'pharmacy-hub':
-      return PHARMACY_HUB_RECRUITMENT_APPLICATIONS_ROUTE;
     case 'kpa-society':
     case 'k-cosmetics':
     case 'cosmetics': // service-catalog canonical 은 'k-cosmetics' 이나 일부 경로가 'cosmetics' 사용

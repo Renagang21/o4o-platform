@@ -32,7 +32,10 @@
 - [x] 공통 개인정보/서비스별 공개 초안의 누락 조문·시행 조건 대조. 기존 공고에 이번 정책이 이미 포함됐다고 표시하지 않음.
 - [x] 위 WO §1의 구체 Core/API/DDL 코드 준비·격리 합성 검증 사용자 승인. 기본 개인정보 최소화·1년 정책 재확정은 요청하지 않음.
 - [x] 두 API 통합·pending/token/fence·명시적 파일 retry·독립 최소 증빙·Admin 완료 상태 및 합성 검증 구현. 운영 활성화 전 전수 domain/file classification·producer/orphan·GCS/lock 검증 잔여는 WO §10.2 참조.
-- [ ] 코드/정책 시행 후속과 정상 PR/main 통합·필요 배포.
+- [x] Core 구현 PR #505 정상 main 통합(최종 PR CI·Codex 통과). 실제 범위/한계는 WO §10을 따른다.
+- [x] 보호 grant·전체 인증 namespace·legacy hash retirement/준비 상태 후속 PR #507 정상 main 통합 및 post-merge CI PASS. 집중67 tests와 새24단계 정상 runner 검증 완료.
+- [ ] 별도 운영 DDL 실행 승인 후 API/Admin 배포(기능 비활성); 활성화와 실제 파기 승인은 별도 범위.
+- [ ] 전수 domain/file inventory·producer/orphan·법정1/2년 근거·공개 본문/시행·승인된 실제 집행.
 - [ ] 마지막 사용자 테스트 결과 → 발견 문제 수정/회귀/통합/배포 → 종료 판정.
 
 ## 4. 마지막 사용자 테스트

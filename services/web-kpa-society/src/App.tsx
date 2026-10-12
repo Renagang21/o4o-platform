@@ -234,7 +234,6 @@ const PharmacyInfoPage = lazy(() => import('./pages/pharmacy/PharmacyInfoPage').
 
 // WO-O4O-STORE-PRODUCTS-SERVICE-ROUTING-V1: 매장 경영자용 매장 상품 관리 (공통 패키지)
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
-// PharmacyHubLayout는 정적 유지 (Layout)
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import {

@@ -6,6 +6,7 @@
  * WO-O4O-USER-DOMAIN-CLEANUP-V1: enrollment 제거 → service_memberships 기반
  */
 
+import { isRetiredServiceValue, RetiredServiceError } from '../middleware/retired-service.middleware.js';
 import { Repository, DataSource } from 'typeorm';
 import { PlatformService } from '../entities/PlatformService.js';
 import type { PlatformServiceStatus } from '../entities/PlatformService.js';
@@ -32,10 +33,11 @@ export class PlatformServiceCatalogService {
 
     qb.orderBy('s.featuredOrder', 'ASC').addOrderBy('s.name', 'ASC');
 
-    return qb.getMany();
+    return (await qb.getMany()).filter(s => !isRetiredServiceValue(s.code));
   }
 
   async getServiceByCode(code: string): Promise<PlatformService | null> {
+    if (isRetiredServiceValue(code)) return null;
     return this.serviceRepo.findOne({ where: { code } });
   }
 
@@ -43,6 +45,7 @@ export class PlatformServiceCatalogService {
     code: string,
     data: Partial<Pick<PlatformService, 'name' | 'shortDescription' | 'entryUrl' | 'serviceType' | 'approvalRequired' | 'visibilityPolicy' | 'isFeatured' | 'featuredOrder' | 'status' | 'iconEmoji'>>,
   ): Promise<PlatformService | null> {
+    if (isRetiredServiceValue(code)) throw new RetiredServiceError();
     const service = await this.serviceRepo.findOne({ where: { code } });
     if (!service) return null;
 
@@ -59,10 +62,10 @@ export class PlatformServiceCatalogService {
    * 매핑: active → 'approved', pending → 'applied', suspended → 'rejected'
    */
   async listVisibleServicesForUser(userId?: string): Promise<Array<PlatformService & { enrollmentStatus?: string }>> {
-    const services = await this.serviceRepo.find({
+    const services = (await this.serviceRepo.find({
       where: { status: 'active' as PlatformServiceStatus },
       order: { featuredOrder: 'ASC', name: 'ASC' },
-    });
+    })).filter(s => !isRetiredServiceValue(s.code));
 
     if (!userId) {
       return services.map((s) => ({ ...s, enrollmentStatus: undefined }));

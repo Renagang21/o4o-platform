@@ -19,6 +19,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { isRetiredRoleValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { invalidateRoles } from '../utils/role-cache.js';
 
 export interface AssignRoleInput {
@@ -45,7 +46,7 @@ export class RoleAssignmentService {
     });
 
     // Filter by validity period
-    return assignments.filter((a) => a.isValidNow());
+    return assignments.filter((a) => !isRetiredRoleValue(a.role) && a.isValidNow());
   }
 
   /**
@@ -60,6 +61,7 @@ export class RoleAssignmentService {
    * Check if user has a specific role
    */
   async hasRole(userId: string, role: string): Promise<boolean> {
+    if (isRetiredRoleValue(role)) return false;
     const assignment = await this.repository.findOne({
       where: { userId, role, isActive: true },
     });
@@ -79,7 +81,7 @@ export class RoleAssignmentService {
       where: { userId, role: In(roles), isActive: true },
     });
 
-    return assignments.some((a) => a.isValidNow());
+    return assignments.some((a) => !isRetiredRoleValue(a.role) && a.isValidNow());
   }
 
   /**
@@ -127,6 +129,7 @@ export class RoleAssignmentService {
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil } = input;
+    if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists

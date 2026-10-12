@@ -14,8 +14,8 @@ describe('PharmacyHub retirement', () => {
     expect(read('apps/api-server/src/bootstrap/register-routes.ts')).not.toContain('createPharmacyHubRoutes');
     expect(existsSync(resolve(root, 'apps/api-server/src/database/migrations/20270216000000-SeedPharmacyHubServiceAndRoles.ts'))).toBe(true);
   });
-  it('closes workspace and supplier entry points without deleting historical identity', () => {
-    expect(getService('pharmacy-hub')).toMatchObject({ joinEnabled: false, workspace: { storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false } });
+  it('removes service identity and closes supplier entry points', () => {
+    expect(getService('pharmacy-hub')).toBeUndefined();
     expect(listSupplierContentHandoffTargets().map(service => service.key)).not.toContain('pharmacy-hub');
     expect(read('services/web-store/src/App.tsx')).not.toContain('PhPaymentSuccessPage');
     expect(read('services/web-neture/src/App.tsx')).not.toContain('SupplierServiceDeliveryPage');

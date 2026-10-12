@@ -12,6 +12,7 @@
 import { Application } from 'express';
 import { DataSource } from 'typeorm';
 import logger from '../utils/logger.js';
+import { rejectRetiredService } from '../middleware/retired-service.middleware.js';
 
 // ============================================================================
 // CORE ROUTE IMPORTS (registered before server listen)
@@ -123,6 +124,7 @@ import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.
 // PHASE 1: Core routes — registered BEFORE server listen
 // ============================================================================
 export async function registerCoreRoutes(app: Application): Promise<void> {
+  app.use('/api', rejectRetiredService);
   // Register core API routes
   // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §20: 약관 pending 조회·승낙 제출.
   //   authRoutes(Core) 보다 먼저 — 더 구체적인 prefix. allowlist(terms-acceptance.policy) 경로와 일치해야 한다.

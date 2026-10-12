@@ -22,12 +22,8 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   'kpa:operator',
   'neture:admin',
   'neture:operator',
-  'pharmacy-hub:admin',
-  'pharmacy-hub:operator',
   'lecture:admin',
   'lecture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 분회 서비스 전체 관리자. 개별 분회 운영자와 분리된 상위 권한이다.
   //   분회 개설 승인 주체 — operator 급으로 열면 A 분회 운영자가 B 분회 개설을 승인할 수 있다.
   'kpa-branch:admin',

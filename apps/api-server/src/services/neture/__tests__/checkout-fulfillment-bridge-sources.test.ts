@@ -101,33 +101,15 @@ describe('CheckoutFulfillmentBridgeService — bridge source registry', () => {
     expect(saved.order.serviceKey).toBe('neture');
   });
 
-  it('② Pharmacy-Hub 주문은 같은 bridge 를 타고 service_key 를 승계한다', async () => {
-    const { dataSource, saved } = makeDataSource({
-      source: 'pharmacy_hub_cart',
-      serviceKey: 'pharmacy-hub',
-    });
+  it('retired PharmacyHub orders cannot create shared fulfillment records', async () => {
+    const { dataSource, saved } = makeDataSource({ source: 'pharmacy_hub_cart', serviceKey: 'pharmacy-hub' });
     const result = await new CheckoutFulfillmentBridgeService(dataSource)
       .bridgeCheckoutOrderToNetureFulfillment({ checkoutOrderId: 'co-1' });
-
-    expect(result.bridged).toBe(true);
-    expect(saved.order.serviceKey).toBe('pharmacy-hub');
-    expect(saved.order.metadata.sourceService).toBe('pharmacy-hub');
-    expect(saved.order.metadata.checkoutOrderId).toBe('co-1');
-    // 취소·환불 추적축이 보존된다
-    expect(saved.order.metadata.paymentGroupId).toBe('pg-1');
+    expect(result.bridged).toBe(false);
+    expect(saved.order).toBeUndefined();
+    expect(dataSource.transaction).not.toHaveBeenCalled();
   });
 
-  it('②-b Pharmacy-Hub 라인의 product_id 는 공급자 조인 축(SPO id)을 그대로 옮긴다', async () => {
-    const { dataSource, saved } = makeDataSource({
-      source: 'pharmacy_hub_cart',
-      serviceKey: 'pharmacy-hub',
-    });
-    await new CheckoutFulfillmentBridgeService(dataSource)
-      .bridgeCheckoutOrderToNetureFulfillment({ checkoutOrderId: 'co-1' });
-
-    // 이 값이 SPO id 가 아니면 공급자 주문 목록 조인이 성립하지 않는다
-    expect(saved.items?.[0].productId).toBe('offer-1');
-  });
 
   it('②-c Neture 약국 주문은 구매 약국 · 테스트 결제 표식을 승계한다', async () => {
     const { dataSource, saved } = makeDataSource({
@@ -168,8 +150,8 @@ describe('CheckoutFulfillmentBridgeService — bridge source registry', () => {
 
   it('④ 미결제 주문은 bridge 되지 않는다 (payment-first)', async () => {
     const { dataSource } = makeDataSource({
-      source: 'pharmacy_hub_cart',
-      serviceKey: 'pharmacy-hub',
+      source: 'neture_b2b_checkout',
+      serviceKey: 'neture',
       paid: false,
     });
     const result = await new CheckoutFulfillmentBridgeService(dataSource)

@@ -6,6 +6,7 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
+import { isRetiredRoleValue, isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
@@ -63,6 +64,12 @@ const INVALID_USER_ID_RESPONSE = {
  *   users 공통 계정은 건드리지 않는다. (계정 전체 정지·삭제는 DELETE /:userId 및 admin API 담당)
  */
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
+
+function currentApprovalMemberships(rows: Array<{ id: string; service_key?: string; role?: string }>) {
+  const current = rows.filter(m => !isRetiredRoleValue(m.service_key) && !isRetiredRoleValue(m.role));
+  if (rows.length > 0 && current.length === 0) throw new RetiredServiceError();
+  return current;
+}
 
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
@@ -332,6 +339,7 @@ export class MembershipConsoleController {
         pagination: { page: pageNum, limit: limitNum, total, totalPages },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMembers error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -453,6 +461,7 @@ export class MembershipConsoleController {
         })),
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMemberDetail error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -489,6 +498,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
@@ -543,6 +553,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[MembershipConsole] rejectMembership error', {
         membershipId: req.params.membershipId,
@@ -594,17 +605,18 @@ export class MembershipConsoleController {
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
         // (membership + user + role_assignments in single transaction)
-        const pendingMemberships = writeScope.isPlatformAdmin
+        let pendingMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
               [userId]
             )
           : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
               [userId, writeScope.serviceKeys]
             );
 
         if (pendingMemberships.length > 0) {
+          pendingMemberships = currentApprovalMemberships(pendingMemberships);
           for (const m of pendingMemberships) {
             await approvalService.approveMembership({
               membershipId: m.id,
@@ -730,10 +742,12 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
         res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
         return;
       }
+
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -801,17 +815,18 @@ export class MembershipConsoleController {
           }
 
           if (targetStatus === 'approved') {
-            const pendingMemberships = writeScope.isPlatformAdmin
+            let pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
                   [userId]
                 )
               : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
                   [userId, writeScope.serviceKeys]
                 );
 
             if (pendingMemberships.length > 0) {
+              pendingMemberships = currentApprovalMemberships(pendingMemberships);
               for (const m of pendingMemberships) {
                 await approvalService.approveMembership({
                   membershipId: m.id,
@@ -892,6 +907,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, data: { results } });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] batchUpdateStatus error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -960,10 +976,12 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
         res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
         return;
       }
+
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -981,6 +999,10 @@ export class MembershipConsoleController {
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
+      if (isRetiredServiceValue(req.body?.membershipServiceKey) || isRetiredRoleValue(req.body?.membershipRole)) {
+        res.status(410).json({ success:false, code:'SERVICE_RETIRED' });
+        return;
+      }
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
@@ -1140,6 +1162,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User updated' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] updateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1200,6 +1223,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getDeleteRisk error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1297,6 +1321,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] deleteMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1328,6 +1353,11 @@ export class MembershipConsoleController {
         return;
       }
 
+      if (isRetiredRoleValue(role)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
+        return;
+      }
+
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
       if (await rejectDemoAccountTarget(res, userId)) return;
 
@@ -1352,6 +1382,11 @@ export class MembershipConsoleController {
       }
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
+        return;
+      }
+
+      if (isRetiredRoleValue(roleEntity.serviceKey) || isRetiredRoleValue(roleEntity.name)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
         return;
       }
 
@@ -1409,6 +1444,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} assigned`, assignment });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] assignMemberRole error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1598,6 +1634,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} removed` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] removeMemberRole error', {
         userId: req.params.userId,
         role: req.params.role,
@@ -1667,6 +1704,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getStats error', {
         error: error instanceof Error ? error.message : String(error),
       });

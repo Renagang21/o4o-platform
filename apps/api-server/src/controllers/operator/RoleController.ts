@@ -5,6 +5,7 @@
  * roles 테이블 조회/관리 엔드포인트.
  * 목록/조회: operator 이상, 생성/수정/삭제: admin only.
  */
+import { sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { Request, Response } from 'express';
 import { roleService } from '../../modules/auth/services/role.service.js';
 import {
@@ -71,6 +72,7 @@ export class RoleController {
 
       res.json({ success: true, data: roles.map(r => r.toJSON()) });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[RoleController] getRoles error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -94,6 +96,7 @@ export class RoleController {
 
       res.json({ success: true, data: role.toJSON() });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[RoleController] getRoleByName error', {
         name: req.params.name,
         error: error instanceof Error ? error.message : String(error),
@@ -134,6 +137,7 @@ export class RoleController {
 
       res.status(201).json({ success: true, data: role.toJSON() });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[RoleController] createRole error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -167,6 +171,7 @@ export class RoleController {
 
       res.json({ success: true, data: role.toJSON() });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[RoleController] updateRole error', {
         id: req.params.id,
         error: error instanceof Error ? error.message : String(error),
@@ -193,6 +198,7 @@ export class RoleController {
 
       res.json({ success: true, message: 'Role deactivated' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[RoleController] deleteRole error', {
         id: req.params.id,
         error: error instanceof Error ? error.message : String(error),

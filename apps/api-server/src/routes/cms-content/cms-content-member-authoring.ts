@@ -76,28 +76,11 @@ export interface CmsMemberAuthoringCapability {
   readonly selfTransitions: Readonly<Record<string, readonly string[]>>;
 }
 
-const CMS_CONTENTS_MEMBER_LEDGER: CmsMemberAuthoringCapability = {
-  types: ['knowledge'],
-  subTypes: ['content', 'resource'],
-  defaultSubType: 'content',
-  authorRole: 'community',
-  visibilityScope: 'service',
-  initialStatus: 'draft',
-  editableStatuses: ['draft', 'pending'],
-  selfTransitions: {
-    draft: ['pending', 'archived'],
-    pending: ['draft'],
-    published: ['archived'],
-    archived: [],
-  },
-};
-
 /**
  * 회원 콘텐츠 원장이 공통 `cms_contents` 인 서비스.
  * key 는 canonical serviceKey (`resolveCanonicalServiceKey` 결과)로 정규화해 조회한다.
  */
 const CMS_MEMBER_AUTHORING_LEDGERS: Readonly<Record<string, CmsMemberAuthoringCapability>> = {
-  'pharmacy-hub': CMS_CONTENTS_MEMBER_LEDGER,
 };
 
 /** 요청 subType 을 capability 화이트리스트로 정규화한다. 미지정·미허용은 기본 축으로 떨어진다. */

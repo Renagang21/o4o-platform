@@ -18,6 +18,10 @@ describe('browser logout / account security generation', () => {
     const claims = tokenUtils.verifyAccessToken(tokens.accessToken)!;
     return service.logout(USER_ID, claims.serviceKey!, claims.sessionId!);
   };
+  it.each(['pharmacy-hub', 'pharmacy-hub-event-offer'])('never rotates a signed retired %s session', async key => {
+    await expect(service.refreshTokens(issue(key).refreshToken)).rejects.toMatchObject({ code: 'SERVICE_SESSION_REVOKED' });
+    expect(query).not.toHaveBeenCalled();
+  });
   beforeAll(() => { process.env.JWT_SECRET ||= "test-browser-session-secret"; process.env.JWT_REFRESH_SECRET ||= "test-browser-refresh-secret"; });
   beforeEach(() => {
     user = { id: USER_ID, email: 'fixture@example.test', isActive: true, status: 'active', refreshTokenFamily: 'initial-family' };

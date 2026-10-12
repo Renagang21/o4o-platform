@@ -30,17 +30,9 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
     { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
     { value: 'neture:operator', label: 'Operator', description: 'Neture 운영자' },
   ],
-  'pharmacy-hub': [
-    { value: 'pharmacy-hub:admin', label: 'Admin', description: 'Pharmacy-Hub 관리자 (운영 권한 포함)' },
-    { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
-  ],
   lecture: [
     { value: 'lecture:admin', label: 'Admin', description: 'O4O 강의 서비스 관리자 (운영 권한 포함)' },
     { value: 'lecture:operator', label: 'Operator', description: 'O4O 강의 서비스 운영자' },
-  ],
-  cosmetics: [
-    { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
-    { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
   'kpa-branch': [
     {

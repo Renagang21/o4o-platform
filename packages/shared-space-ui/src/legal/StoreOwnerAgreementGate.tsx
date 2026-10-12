@@ -15,7 +15,7 @@ export interface StoreOwnerAgreementApi {
 }
 
 export interface StoreOwnerAgreementGateProps {
-  serviceKey: 'kpa-society' | 'k-cosmetics' | 'pharmacy-hub';
+  serviceKey: 'kpa-society' | 'k-cosmetics';
   serviceName: string;
   api: StoreOwnerAgreementApi;
   onLogout: () => void | Promise<void>;

@@ -8,7 +8,7 @@ jest.mock('../../../modules/auth/services/role.service.js', () => ({ roleService
 jest.mock('../../../services/auth/demo-account.service.js', () => ({ rejectDemoAccountTarget: jest.fn(async () => false) }));
 import { MembershipConsoleController } from '../MembershipConsoleController.js';
 const ID = '11111111-2222-4333-8444-555555555555';
-function makeReq(body: any = {}, keys = ['neture', 'pharmacy-hub'], platform = false): any {
+function makeReq(body: any = {}, keys = ['neture', 'lecture'], platform = false): any {
   return { body, query: {}, params: { userId: ID }, user: { id: 'actor' }, serviceScope: { serviceKeys: keys, rolePrefixes: keys, isPlatformAdmin: platform } };
 }
 function res(): any { const r: any = {}; r.status = jest.fn(() => r); r.json = jest.fn(() => r); return r; }
@@ -43,7 +43,7 @@ beforeEach(() => {
   primeMemberReads();
 });
 describe.each([
-  { primary: 'neture', secondary: 'pharmacy-hub' },
+  { primary: 'neture', secondary: 'lecture' },
   { primary: 'community', secondary: 'kpa-society' },
 ])('$primary service membership boundaries', ({ primary, secondary }) => {
   function req(body: any = {}, keys = [primary, secondary], platform = false) {
@@ -98,7 +98,7 @@ describe('canonical member read scopes', () => {
     expect(mockQuery).not.toHaveBeenCalled();
   });
   it('detail scopes memberships and role query to the selected canonical service', async () => {
-    await readMembers('getMemberDetail', ['neture', 'pharmacy-hub'], { serviceKey: 'neture' });
+    await readMembers('getMemberDetail', ['neture', 'lecture'], { serviceKey: 'neture' });
     expectReadScope(ID, 'neture', 'neture');
   });
   it('platform list selecting one service scopes both membership and role batches', async () => {
@@ -117,7 +117,7 @@ describe('canonical member read scopes', () => {
 });
 
 describe('membership read isolation on latest main', () => {
-  it.each([['neture', 'neture'], ['pharmacy-hub', 'pharmacy-hub'], ['kpa-society', 'kpa'], ['k-cosmetics', 'cosmetics'], ['community', 'community'], ['lecture', 'lecture'], ['supplier', 'supplier'], ['funding', 'funding']])('limits %s detail data to its role prefix %s', async (serviceKey, prefix) => {
+  it.each([['neture', 'neture'], ['kpa-society', 'kpa'], ['k-cosmetics', 'cosmetics'], ['community', 'community'], ['lecture', 'lecture'], ['supplier', 'supplier'], ['funding', 'funding']])('limits %s detail data to its role prefix %s', async (serviceKey, prefix) => {
     await readMembers('getMemberDetail', [serviceKey, 'other-service'], { serviceKey });
     expectReadScope(ID, serviceKey, prefix);
   });
@@ -127,7 +127,7 @@ describe('membership read isolation on latest main', () => {
     expectReadScope(ID, null, null);
   });
   it.each([
-    { name: 'target has no selected-service membership', keys: ['neture', 'pharmacy-hub'], serviceKey: 'neture' },
+    { name: 'target has no selected-service membership', keys: ['neture', 'lecture'], serviceKey: 'neture' },
     { name: 'selected service is not owned', keys: ['neture'], serviceKey: 'lecture' },
   ])('returns no personal data when $name', async ({ keys, serviceKey }) => {
     mockQuery.mockResolvedValue([]);
@@ -136,4 +136,11 @@ describe('membership read isolation on latest main', () => {
     expect(mockQuery).toHaveBeenCalledTimes(1);
     expect(out.json).toHaveBeenCalledWith({ success: false, error: 'User not found' });
   });
+});
+
+it('membershipServiceKey cannot change a pending retired membership through an admin profile update',async()=>{
+ const response = res();
+ await new MembershipConsoleController().updateMember(makeReq({membershipRole:'member',membershipServiceKey:' pharmacy-hub '},[],true),response);
+ expect(response.status).toHaveBeenCalledWith(410);
+ expect(mockQuery).not.toHaveBeenCalled();
 });

@@ -56,3 +56,7 @@ memberManagementPolicy는 정지·복구·membershipRole·역할 부여를 서�
 GitHub API 접근이 복구되어 PR #508 및 CI 38220836388 결과를 조회했다. API Jest 3개 shard와 영향 웹/Admin production build는 PASS, Code Quality Check의 frontend type-check에서 Admin이 공유 ui 테스트 소스까지 검사하며 새 fixture의 필수 labels 누락(TS2741)을 발견했다. 테스트 실행 및 패키지 build만으로 이 검사 범위를 검증하지 못했다. fixture에 labels를 명시해 수정하고 공유 ui 21개 테스트와 Admin type-check를 다시 실행한다. workflow/권한 정책은 변경하지 않는다. 새 HEAD의 원격 CI 결과는 따로 확인한다.
 
 PR #508의 P1 추가 처리: 사용중지 복구와 탈퇴 복구를 구분했다. 회원관리의 단건 status·일괄 status·reactivate 요청 모두 실제 서비스 admin 목록을 복구 서비스에 전달하고, transaction의 잠긴 가입 상태가 withdrawn이면 해당 서비스 admin 권한 없이는 write 전에 거절한다. 타 서비스 admin도 우회할 수 없다. Neture 일괄 복구 후보도 operator에게 suspended만 제공한다. Core 복구 경로의 기존 외부 호출 계약은 선택적 파라미터로 유지하며 새로운 계정 제거 기능을 활성화하지 않는다. 격리 API 회귀 77개 PASS.
+
+### 최신 main 통합 — 2026-10-12
+
+main `c1bab86c0`의 PH/KCos 퇴역 역할 차단·계정 제거 후속 및 인증 안내 변경을 정상 merge로 반영했다. 회원/역할 컨트롤러와 복구 서비스의 충돌은 퇴역 대상 필터와 탈퇴 복구 admin 제한을 함께 유지해 해결했다. 퇴역 대상의 기존 차단 테스트를 유지하며 이 작업의 탈퇴 복구 fixture는 현행 lecture 서비스로 옮겼다. API 집중 회귀 4 suites / 112 tests와 API TypeScript build PASS. 충돌 해결 후 새 HEAD의 CI와 main 병합·서빙 결과를 따로 확인한다.

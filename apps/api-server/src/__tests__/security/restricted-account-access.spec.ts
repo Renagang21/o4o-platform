@@ -163,9 +163,24 @@ describe('중앙 가드 — requireAuth 통합 (§5-B / §11.7)', () => {
   it('② restricted 계정은 allowlist GET 을 통과한다', async () => {
     setUser(UserStatus.PENDING);
     const res = await request(app)
-      .get('/api/v1/pharmacy-hub/join/status')
+      .get('/api/v1/auth/me')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
+  });
+
+  it('공급자 계정 안내는 본인 me만 조회할 수 있고 home entry와 handoff는 제한된다', async () => {
+    setUser(UserStatus.PENDING);
+    const me = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
+    expect(me.status).toBe(200);
+    expect(me.body.reached).toBe(true);
+    for (const res of [
+      await request(app).get('/api/v1/neture/home/entry').set('Authorization', `Bearer ${token}`),
+      await request(app).post('/api/v1/auth/handoff').set('Authorization', `Bearer ${token}`).send({ targetServiceKey: 'neture', returnPath: '/' }),
+    ]) {
+      expect(res.status).toBe(403);
+      expect(res.body.code).toBe(RESTRICTED_CODE);
+      expect(res.body.reached).toBeUndefined();
+    }
   });
 
   it('③ restricted 계정은 allowlist POST 를 통과한다', async () => {
@@ -196,7 +211,7 @@ describe('중앙 가드 — requireAuth 통합 (§5-B / §11.7)', () => {
   it('⑥ method 불일치는 차단된다 (GET 허용 경로에 POST)', async () => {
     setUser(UserStatus.PENDING);
     const res = await request(app)
-      .post('/api/v1/pharmacy-hub/join/status')
+      .post('/api/v1/auth/me')
       .set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(403);
     expect(res.body.code).toBe(RESTRICTED_CODE);
