@@ -1,3 +1,4 @@
+import { useStoreResource } from './hooks/useStoreResource';
 /**
  * Store Tablet Displays Management Page
  *
@@ -100,6 +101,11 @@ function contentOptionLabel(it: LinkedContentItem): string {
 
 // ==================== Component ====================
 
+async function loadActiveTablets(): Promise<TabletType[]> {
+  const tablets = await fetchTablets();
+  return tablets.filter(tablet => tablet.is_active);
+}
+
 export default function StoreTabletDisplaysPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,9 +143,8 @@ export default function StoreTabletDisplaysPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Tablet state
-  const [tablets, setTablets] = useState<TabletType[]>([]);
+  const { data: tablets, setData: setTablets, loading: loadingTablets, error: tabletListError, reload: loadTablets } = useStoreResource(loadActiveTablets, []);
   const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
-  const [loadingTablets, setLoadingTablets] = useState(true);
 
   // Pool & display state
   const [pool, setPool] = useState<ProductPool | null>(null);
@@ -534,24 +539,6 @@ export default function StoreTabletDisplaysPage() {
     if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}시간 전 접속`;
     return `${new Date(iso).toLocaleDateString('ko-KR')} 접속`;
   };
-
-  // Load tablets
-  useEffect(() => {
-    (async () => {
-      setLoadingTablets(true);
-      try {
-        const data = await fetchTablets();
-        const active = data.filter((t) => t.is_active);
-        setTablets(active);
-        // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 기본 화면 = 코너 현황판(카드).
-        //   자동 선택하지 않는다 — 근무자가 모든 코너를 한눈에 보고 카드를 눌러 들어간다.
-      } catch (err: any) {
-        setError(err.message || '태블릿 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setLoadingTablets(false);
-      }
-    })();
-  }, []);
 
   // Load pool + displays + idle playlist when tablet changes
   const tabletLoadRevision = useRef(0);
@@ -997,11 +984,11 @@ export default function StoreTabletDisplaysPage() {
 
       {/* No tablets (코너별 운영 탭 전용) */}
       {/* Error */}
-      {error && (
+      {(error || tabletListError) && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-700">{error}</p>
-          <button type="button" disabled={loadingPool} onClick={() => void loadTabletData()}>다시 시도</button>
+          <p className="text-sm text-red-700">{tabletListError || error}</p>
+          <button type="button" disabled={loadingPool || loadingTablets} onClick={() => void (tabletListError ? loadTablets() : loadTabletData())}>다시 시도</button>
         </div>
       )}
 

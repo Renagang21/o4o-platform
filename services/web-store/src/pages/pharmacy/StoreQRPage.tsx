@@ -178,7 +178,7 @@ export function StoreQRPage() {
 
   // Load product options when landingType is 'product'
   useEffect(() => {
-    if (formLandingType !== 'product' || !creating) return;
+    if (formLandingType !== 'product' || !creating) { setProductError(null); setLoadingProducts(false); return; }
     let cancelled = false;
     setLoadingProducts(true); setProductError(null);
     Promise.all([
@@ -701,7 +701,7 @@ export function StoreQRPage() {
 
       {/* Batch Print Toolbar */}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
-      {productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
+      {creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
       {items.length > 0 && (
         <div style={styles.printToolbar}>
           <label style={styles.selectAllLabel}>
