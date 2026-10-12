@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {jobArguments} from './pharmacy-hub-administrative-purge-job.mjs';
+import {jobArguments,restrictedWifCondition,assertRestrictedWif} from './pharmacy-hub-administrative-purge-job.mjs';
 import {createRequire} from 'node:module';
 import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -9,6 +9,13 @@ import {spawnSync} from 'node:child_process';
 
 const input={image:`asia-northeast3-docker.pkg.dev/netureyoutube/o4o-api/api-server@sha256:${'a'.repeat(64)}`,
   source:'export class PharmacyHubAdministrativePurge {}',mode:'plan',runId:'12345',attempt:'1',username:'fixture_user',database:'fixture_db'};
+test('apply requires exact temporary WIF policy, excluding other workflows, stale SHA and OR bypass',()=>{
+  const sha='a'.repeat(40),condition=restrictedWifCondition(sha);
+  assert.doesNotThrow(()=>assertRestrictedWif(condition,sha));
+  for(const bad of [condition+' || true',condition.replace('workflow_dispatch','workflow_run'),
+    condition.replaceAll(sha,'b'.repeat(40)),condition.replaceAll('pharmacyhub-qr-cutover','deploy-api')])
+    assert.throws(()=>assertRestrictedWif(bad,sha),/RESTRICTION_REQUIRED/);
+});
 test('a Cloud Run job uses immutable serving image, singleton/no-retry execution and fixed runtime identity',()=>{
   const {name,args}=jobArguments(input);
   assert.equal(name,'ph-admin-12345-1');

@@ -11,7 +11,7 @@ function fixture(problem) {
     calls.push(sql);
     if(sql.includes('FROM pg_constraint')) return problem==='reference' ? [{schema:'neture',table:'refs',target:'platform_services',source_columns:['service_code'],target_columns:['code']}] : [];
     if(sql.includes('FROM pg_trigger')) return [{count:problem==='trigger'?'1':'0'}];
-    if(sql.includes('NOT COALESCE')) return [{count:problem==='mixed'||problem==='reference'&&sql.includes('"neture"."refs"')?'1':'0'}];
+    if(sql.includes('NOT COALESCE')) return [{count:problem==='mixed'||problem==='mixedReverse'&&sql.includes('FROM public.roles')||problem==='reference'&&sql.includes('"neture"."refs"')?'1':'0'}];
     const table=sql.match(/FROM public\."([a-z0-9_]+)"/)?.[1];
     if(sql.startsWith('WITH removed')) { deleted.add(table);return [{count:String(counts[table])}]; }
     if(sql.startsWith('SELECT count')&&table) return [{count:String(deleted.has(table)||problem==='count'?0:counts[table])}];
@@ -23,7 +23,7 @@ test('a transaction is mandatory before any query',async()=>{
   await assert.rejects(new PharmacyHubAdministrativePurge().up(q),/TRANSACTION_REQUIRED/);
   assert.equal(q.calls.length,0);
 });
-for(const problem of ['count','mixed','trigger','reference'])test(`${problem} blocks all deletes`,async()=>{
+for(const problem of ['count','mixed','mixedReverse','trigger','reference'])test(`${problem} blocks all deletes`,async()=>{
   const q=fixture(problem);
   await assert.rejects(new PharmacyHubAdministrativePurge().up(q),/PH_PURGE_/);
   assert.ok(q.calls.every(sql=>!sql.includes('DELETE FROM')));

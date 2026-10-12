@@ -57,6 +57,10 @@ export class PharmacyHubAdministrativePurge {
                 throw new Error(`PH_PURGE_MIXED_OWNERSHIP:${table}`);
             }
         }
+        if (await count(`SELECT count(*)::text AS count FROM public.roles
+            WHERE ${ph('service_key')} AND NOT COALESCE(${ph('name')},FALSE)`)) {
+            throw new Error('PH_PURGE_MIXED_OWNERSHIP:roles');
+        }
         for (const r of roots) {
             if (await count(`SELECT count(*)::text AS count FROM public.${id(r.table)} WHERE ${ph(id(r.column))}`) !== r.count) {
                 throw new Error(`PH_PURGE_CENSUS_CHANGED:${r.table}`);

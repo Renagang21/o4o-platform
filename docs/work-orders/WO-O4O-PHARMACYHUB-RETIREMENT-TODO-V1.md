@@ -330,3 +330,5 @@ FK catalog의 name[]를 pg client가 문자열로 읽는 문제를 text[] 집계
 - [ ] PH administrative data plan/apply 및 운영 잔여 검증.
 - [ ] 주문·결제·공급·콘텐츠·미디어의 비-FK/파일 참조 조사와 후속 삭제.
 - [ ] 인증서 목록 권한 보완 후 PH 인증서/map entry/DNS authorization/URL map 종료.
+
+PR #522 리뷰 보완: PH `roles.service_key`와 `roles.name`의 귀속 불일치를 양방향으로 차단한다. apply 전에는 관리자 측 원래 WIF 조건 백업과 해당 main SHA/PH workflow/owner에만 한정된 임시 조건이 필요하다. 코드가 provider의 실제 조건을 정확히 대조하며 다른 workflow/SHA·OR 우회를 허용하지 않는다. 기존 토큰을 가진 실행도 없는 단독 운영 구간을 확인하고, 동일 PH workflow의 concurrency와 함께 다른 운영 writer의 신규 인증을 작업 종료까지 차단한다. `iam.workloadIdentityPoolProviders.get` 읽기 권한이 필요하다. 작업·잔여 검증 뒤 원래 조건을 복구한다. 이 세션에서 기존 PC Local Agent를 변경하지 않는다.

@@ -6,6 +6,14 @@ import { assertProductionIdle } from './pharmacy-hub-resource-retirement.mjs';
 
 const project='netureyoutube', region='asia-northeast3';
 const base=[`--project=${project}`,`--region=${region}`,'--quiet'];
+export function restrictedWifCondition(sha) {
+  if(!/^[a-f0-9]{40}$/.test(sha))throw new Error('PH_JOB_SHA');
+  const ref='Renagang21/o4o-platform/.github/workflows/pharmacyhub-qr-cutover.yml@refs/heads/main';
+  return `assertion.repository_id == '964347291' && assertion.repository_owner_id == '173977471' && assertion.repository == 'Renagang21/o4o-platform' && assertion.environment == 'production' && assertion.event_name == 'workflow_dispatch' && assertion.actor_id == '173977471' && assertion.ref == 'refs/heads/main' && assertion.workflow_ref == '${ref}' && assertion.workflow_sha == '${sha}' && assertion.job_workflow_ref == '${ref}' && assertion.job_workflow_sha == '${sha}'`;
+}
+export function assertRestrictedWif(condition,sha) {
+  if(String(condition).trim().replace(/\s+/g,' ')!==restrictedWifCondition(sha))throw new Error('PH_JOB_WIF_RESTRICTION_REQUIRED');
+}
 async function github(path) {
   if(!process.env.PRODUCTION_GATE_TOKEN)throw new Error('PH_JOB_GITHUB_AUTH');
   const response=await fetch(`https://api.github.com/repos/Renagang21/o4o-platform/${path}`,{
@@ -20,6 +28,11 @@ async function gate() {
   if(e.GITHUB_REF!=='refs/heads/main'||e.WORKFLOW_ACTOR!==e.REPOSITORY_OWNER||
     !['plan','apply'].includes(e.CUTOVER_MODE)||!/^\d+$/.test(e.GITHUB_RUN_ID??''))throw new Error('PH_JOB_OWNER_MAIN_MODE');
   if(e.CUTOVER_MODE==='apply'&&e.DEPLOY_FREEZE!=='false')throw new Error('PH_JOB_FROZEN');
+  if(e.CUTOVER_MODE==='apply') {
+    const condition=run(['iam','workload-identity-pools','providers','describe','o4o-platform',
+      '--project=netureyoutube','--location=global','--workload-identity-pool=github-actions','--format=value(attributeCondition)']);
+    assertRestrictedWif(condition,e.GITHUB_SHA);
+  }
   const main=await github('git/ref/heads/main');
   if(main.object?.sha!==e.GITHUB_SHA)throw new Error('PH_JOB_MAIN_MOVED');
   const checks=await github(`commits/${e.GITHUB_SHA}/check-runs?check_name=CI%20Gate&per_page=100`);
@@ -81,6 +94,8 @@ export async function runJob() {
   // Recheck immediately before the job can connect/write. A failure retains the job for inspection.
   await gate();
   run(['run','jobs','execute',name,...base,'--wait'],360000);
+  // Keep the exclusive authentication window through completion and cleanup.
+  await gate();
   console.log(JSON.stringify({mode:process.env.CUTOVER_MODE,job:name,executionSucceeded:true,applied:process.env.CUTOVER_MODE==='apply'}));
   run(['run','jobs','delete',name,...base]);
 }
