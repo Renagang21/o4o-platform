@@ -1,3 +1,4 @@
+import { loadChannelWorkspace } from './hooks/storeWorkspaceLoaders';
 /**
  * StoreChannelsPage — 채널 중심 진열 실행 콘솔
  *
@@ -57,9 +58,7 @@ import {
   Save,
 } from 'lucide-react';
 import {
-  fetchChannelOverviewWithCode,
   // WO-O4O-STORE-SLUG-EDITABLE-V1
-  fetchStoreSlugStatus,
   updateStoreSlug,
   type ChannelOverview,
   type ChannelType,
@@ -530,6 +529,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const [channels, setChannels] = useState<ChannelOverview[]>([]);
   const [assets, setAssets] = useState<StoreAssetItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
@@ -590,30 +590,18 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   }, []);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
-    const results = await Promise.allSettled([
-      fetchChannelOverviewWithCode().catch(() => ({ channels: [] as ChannelOverview[], organizationCode: null })),
-      storeAssetControlApi.list({ limit: 200 }).then(r => r.data.items).catch(() => [] as StoreAssetItem[]),
-      // WO-O4O-STORE-SLUG-EDITABLE-V1: slug status (graceful degradation)
-      fetchStoreSlugStatus().catch(() => ({ slug: null, isActive: false, canChange: false })),
-    ]);
-    const chResult = results[0].status === 'fulfilled'
-      ? results[0].value as { channels: ChannelOverview[]; organizationCode: string | null }
-      : { channels: [], organizationCode: null };
-    setChannels(chResult.channels);
-    setOrgCode(chResult.organizationCode);
-    setAssets(results[1].status === 'fulfilled' ? results[1].value as StoreAssetItem[] : []);
-    if (results[2].status === 'fulfilled') {
-      setCanChangeSlug(results[2].value.canChange);
-    }
-    setLastFetched(new Date());
-    setLoading(false);
-
-    // WO-STORE-CHANNEL-BETA-READINESS-V1: error feedback
-    if (chResult.channels.length === 0 && results[0].status === 'rejected') {
+    setLoading(true); setLoadError(null);
+    try {
+      const { overview, assets: loadedAssets, slug } = await loadChannelWorkspace(showSettings);
+      setChannels(overview.channels); setOrgCode(overview.organizationCode);
+      if (loadedAssets) setAssets(loadedAssets);
+      if (slug) setCanChangeSlug(slug.canChange);
+      setLastFetched(new Date());
+    } catch {
+      setLoadError('채널 정보를 불러오지 못했습니다. 다시 시도해 주세요.');
       showToast('error', '채널 정보를 불러오지 못했습니다.');
-    }
-  }, [showToast]);
+    } finally { setLoading(false); }
+  }, [showToast, showSettings]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -840,6 +828,14 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
         <Loader2 className="w-5 h-5 animate-spin mr-2" /> 채널 정보를 불러오는 중...
       </div>
     );
+  }
+
+  if (loadError) {
+    return <div role="alert" className="max-w-7xl mx-auto px-6 py-8 text-red-700">
+      <h1 className="text-2xl font-bold mb-4">{pageTitle}</h1>
+      <p>{loadError}</p>
+      <button type="button" onClick={() => void fetchData()}>다시 시도</button>
+    </div>;
   }
 
   if (!loading && channels.length === 0) {

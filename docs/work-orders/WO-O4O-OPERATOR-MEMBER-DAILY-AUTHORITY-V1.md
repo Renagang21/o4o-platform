@@ -1,7 +1,11 @@
 # 서비스 operator의 일상 회원관리 권한 정비
 
-> 상태: ACTIVE · 2026-10-12 사용자 작업 지시
-> 기준: main `c9b630feb` · 작업 branch `wo/operator-member-daily-authority`
+> **상태**: COMPLETED
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **근거 WO/IR**: [서비스별 운영자 로드맵](WO-O4O-SERVICE-SPECIFIC-OPERATOR-ROADMAP-V1.md) · 사용자 공통 회원관리 권한 정비 지시
+> **기준**: main `c9b630feb` · **작업 branch**: `wo/operator-member-daily-authority`
+
+공통 회원관리 일상 권한 정비·main 통합·운영 배포를 완료했다.
 
 ## 확정 범위
 
@@ -16,7 +20,7 @@
 - [x] Neture/KPA 목록·일괄 처리·편집·상세 및 Lecture/Community/Supplier/Funding 공통 wrapper 정비.
 - [x] 삭제 슬롯·일괄 탈퇴와 일상 사용중지·복구 분리. 미변경 소비처는 기존 동작 유지.
 - [x] API/공유 UI/웹 회귀·타입/빌드·PC/모바일 fixture 검증.
-- [ ] PR·필수 CI·리뷰·main 통합·필요한 배포 검증. 운영 DB write·실제 계정 삭제 테스트 없음.
+- [x] PR·필수 CI·리뷰·main 통합·필요한 배포 검증. 운영 DB write·실제 계정 삭제 테스트 없음.
 
 ## Shared Module Change Verification
 
@@ -60,3 +64,14 @@ PR #508의 P1 추가 처리: 사용중지 복구와 탈퇴 복구를 구분했�
 ### 최신 main 통합 — 2026-10-12
 
 main `c1bab86c0`의 PH/KCos 퇴역 역할 차단·계정 제거 후속 및 인증 안내 변경을 정상 merge로 반영했다. 회원/역할 컨트롤러와 복구 서비스의 충돌은 퇴역 대상 필터와 탈퇴 복구 admin 제한을 함께 유지해 해결했다. 퇴역 대상의 기존 차단 테스트를 유지하며 이 작업의 탈퇴 복구 fixture는 현행 lecture 서비스로 옮겼다. API 집중 회귀 4 suites / 112 tests와 API TypeScript build PASS. 충돌 해결 후 새 HEAD의 CI와 main 병합·서빙 결과를 따로 확인한다.
+
+
+## 최종 통합·운영 배포 증거
+
+- [PR #508](https://github.com/Renagang21/o4o-platform/pull/508)의 동기화 HEAD `f2cb7e3b5`는 [CI 38247930445](https://github.com/Renagang21/o4o-platform/actions/runs/38247930445)의 필수 CI Gate·품질·API 3개 shard·영향 빌드를 통과했다. 기존 Codex P1 탈퇴 복구 권한을 수정하고 스레드 해결을 확인했다. 우회/force push 없이 정상 merge했다.
+- main 병합 commit: `614248fda7aa932b07fe17a9e2dac16da7835fe4`. [main CI 38249070875](https://github.com/Renagang21/o4o-platform/actions/runs/38249070875)와 CodeQL 38249070879 SUCCESS.
+- [Delivery 38250084644](https://github.com/Renagang21/o4o-platform/actions/runs/38250084644)는 LEVEL_3 승인 배포로 보류했다. 사용자 main 병합·배포 지시에 따라 [Promote dry-run 38250419559](https://github.com/Renagang21/o4o-platform/actions/runs/38250419559) SUCCESS 후 동일 SHA의 [실제 Promote 38250715342](https://github.com/Renagang21/o4o-platform/actions/runs/38250715342)를 실행했다.
+- 실제 Promote의 API·Admin·Neture·KPA-Society·Lecture·Store·KPA-Branch 배포와 최종 serving SHA Report 모두 SUCCESS. 해당 runtime SHA의 production status는 `DEPLOYED · deploy: api,admin,neture,kpa-society,lecture,store,kpa-branch`다. freeze/CI/현재 main SHA/serving 검증 경계를 우회하지 않았다.
+- TLS 검증을 유지한 공개 화면 9개·API health 1개 HTTP 200, 6개 서비스 회원관리 API 비로그인 401: 총16개 PASS. 실제 계정 로그인·운영 회원 상태 변경·계정/파일 삭제 테스트는 수행하지 않았다.
+- 이 완료는 첫 작업 묶음인 공통 회원관리 일상 권한 정비의 결과다. 전체 관리자의 지정 전후 가입 과정 보완·서비스별 업무 동선·My Home 통합 실계정 검증은 별도 후속이다. 계정 제거 Core 활성화·퇴역 서비스 복구를 포함하지 않는다.
+- 본 결과 기록은 문서-only이며 DEPLOYMENT=NOT_APPLICABLE. 문서 commit과 실제 runtime SHA를 구분한다.

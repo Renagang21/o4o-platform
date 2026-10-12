@@ -378,7 +378,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
 
   it('공급자 알림 수신자는 owner membership 집합이다 (legacy 단일 user_id 아님)', () => {
     for (const f of [
-      `${API}/modules/neture/services/neture-settlement.service.ts`,
+      `${API}/modules/neture/services/settlement-command.service.ts`,
       `${API}/modules/neture/services/offer-service-approval.service.ts`,
     ]) {
       expect(stripComments(read(f))).toContain('listSupplierOwnerUserIds(');

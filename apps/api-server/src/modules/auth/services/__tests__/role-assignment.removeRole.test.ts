@@ -167,3 +167,13 @@ describe('해제 후 재부여 — 왕복이 성립한다', () => {
     expect(db).toHaveLength(1);
   });
 });
+
+it('transactional removal uses only the supplied repository and preserves the canonical deactivation', async () => {
+  const service = new RoleAssignmentService();
+  const assignment = { deactivate: jest.fn() };
+  const repository = { findOne: jest.fn().mockResolvedValue(assignment), save: jest.fn().mockResolvedValue(assignment) };
+  const manager = { getRepository: jest.fn().mockReturnValue(repository) };
+  await expect(service.removeRole(USER, ROLE, manager as any)).resolves.toBe(true);
+  expect(assignment.deactivate).toHaveBeenCalledTimes(1);
+  expect(repository.save).toHaveBeenCalledWith(assignment);
+});

@@ -32,6 +32,7 @@
 - 모든 업무 요청은 현재 DB 관계·Role을 재확인한다. 해제는 `left_at`을 설정해 다음 요청부터 차단한다.
   작성 자료와 매장 업무 데이터는 매장에 유지하며, 다른 매장의 직원 접근은 유지한다.
 - 명시한 선택 매장이 허용 후보에 없으면 직원 업무·구성원 변경 요청을 거절한다. 다른 매장으로 대신 쓰지 않는다.
+- 직원 상태 변경은 사용자 단위 DB 트랜잭션 잠금으로 직렬화한다. 최종 승인·해제의 관계와 Role 변경은 같은 트랜잭션이며 실패 시 롤백한다.
 - 기존 `staff` 관계를 대량 변환하거나 운영 데이터에 새 권한을 backfill하지 않는다.
 
 `store.neture.co.kr`(공통 Store Workspace)에 **누가 들어올 수 있는가**를 정한다.
@@ -61,7 +62,7 @@
 |---|---|---|
 | **Store Owner** | 사업자 대표 · 소유 접근 | **기존 판정 그대로** — `role_assignments` 의 `{prefix}:store_owner` + 해당 서비스 active membership + 조직 해석 (`isStoreOwner()`) |
 | **Store Member** | 사업자가 허가한 사용자(직원 · 담당자) | **Role** `role_assignments` 의 `{prefix}:store_member` **∧ Relationship** `organization_members` 활성 `'staff'` 행 **∧** 조직↔서비스 linkage |
-| (없음) | 그 외 전부 | 초대 대기(`'invited'`) 포함 — **수락 전에는 아무 접근도 없다** |
+| (없음) | 그 외 전부 | 초대·승인 대기(`'invited'`·`'accepted'`) 포함 — **최종 승인 전에는 아무 접근도 없다** |
 
 V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들지 않는다 — 기존
 `organization_members` 에 이미 있는 값이고, 그 의미는 각 서비스 프로비저닝이 정한다.
@@ -74,7 +75,8 @@ V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들
 ```text
 1. 세션 사용자        userId 는 세션에서만. body/query 의 userId 는 받지 않는다
 2. 조직 확정          Owner = isStoreOwner() 가 해석한 조직
-                     Member = 자기 활성 행의 조직 (요청이 고르지 않는다)
+                     Member = 자기 활성 관계·Role로 검증된 후보 중 명시 선택 매장
+                     허용 후보 밖 선택은 거절, 단일 후보만 선택 없이 해석
 3. Role              role 이 없으면 거부 (Identity V3 §7-1)
 4. Relationship      활성 'staff' 행이 없으면 거부
 5. 업종 경계          조직 ↔ serviceKey linkage (STORE_SERVICE_ORG_LINKAGE)

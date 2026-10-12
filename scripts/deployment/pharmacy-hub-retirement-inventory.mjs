@@ -84,8 +84,8 @@ export async function collectRetirementInventory(client) {
     }
     const incoming = await client.query(`SELECT sn.nspname AS source_schema,source.relname AS source_table,
         tn.nspname AS target_schema,target.relname AS target_table,c.conname AS constraint_name,
-        array_agg(sa.attname ORDER BY k.ordinality) AS source_columns,
-        array_agg(ta.attname ORDER BY k.ordinality) AS target_columns
+        array_agg(sa.attname::text ORDER BY k.ordinality) AS source_columns,
+        array_agg(ta.attname::text ORDER BY k.ordinality) AS target_columns
       FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
         JOIN pg_namespace sn ON sn.oid=source.relnamespace
         JOIN pg_class target ON target.oid=c.confrelid JOIN pg_namespace tn ON tn.oid=target.relnamespace

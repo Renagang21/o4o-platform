@@ -221,8 +221,9 @@ export class RoleAssignmentService {
    *   비활성 행은 몇 개든 공존할 수 있으므로, 활성 행을 내리는 이 경로는 구조적으로 충돌하지 않는다.
    *   행을 지우지 않고 이력을 남긴다.
    */
-  async removeRole(userId: string, role: string): Promise<boolean> {
-    const assignment = await this.repository.findOne({
+  async removeRole(userId: string, role: string, manager?: EntityManager): Promise<boolean> {
+    const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
+    const assignment = await repository.findOne({
       where: { userId, role, isActive: true },
     });
 
@@ -234,7 +235,7 @@ export class RoleAssignmentService {
     }
 
     assignment.deactivate();
-    await this.repository.save(assignment);
+    await repository.save(assignment);
     invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
 
     logger.info(
