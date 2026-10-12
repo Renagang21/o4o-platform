@@ -7,6 +7,8 @@ import { User } from '../../../entities/User.js';
 import { AccountErasureService, calendarExpiry, type PersonalStorage } from '../account-erasure.service.js';
 import { AccountErasureError } from '../account-erasure.service.js';
 import { CALENDAR_EXPIRY_SQL } from '../calendar-retention.js';
+import { CreateAccountErasureOperations1791777540800 } from '../../../database/migrations/1791777540800-CreateAccountErasureOperations.js';
+import { RetireLegacyErasureIdentityHashes1791795139475 } from '../../../database/migrations/1791795139475-RetireLegacyErasureIdentityHashes.js';
 
 let db: DataSource;
 const repository = {
@@ -53,7 +55,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
   const user = async (extra: Record<string,unknown>={}) => {
     const id=randomUUID();
     const [r]=await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified",avatar)
-      VALUES($1,$2,$3,'active',true,true,$4) RETURNING *`,[id,`${id}@fixture.invalid`,extra.name??`Privacy fixture ${id}`,extra.avatar??null]);
+      VALUES($1,$2,$3,'active',true,true,$4) RETURNING *`,[id,extra.email??`${id}@fixture.invalid`,extra.name??`Privacy fixture ${id}`,extra.avatar??null]);
     if(extra.netureStopped!==false) await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'neture','member','suspended')",[id]);
     return Object.assign(new User(),r);
   };
@@ -132,6 +134,10 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const demo=await user();await db.query("INSERT INTO demo_accounts(user_id,demo_type) VALUES($1,'STORE_OWNER')",[demo.id]);
     await expect(service().request(demo.id)).rejects.toMatchObject({code:'DEMO_ACCOUNT_FORBIDDEN'});
     expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
+    const former=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_until) VALUES($1,'platform:super_admin',true,statement_timestamp()-interval '1 day')",[former.id]);
+    expect((await service().request(former.id)).erased).toBe(true);
+    const future=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '1 day')",[future.id]);
+    await expect(service().request(future.id)).rejects.toMatchObject({code:'SUPER_ADMIN_PROTECTED'});
   });
   it('concurrent duplicate requests share one completed operation',async()=>{
     const u=await user();const results=await Promise.all([service().request(u.id),service().request(u.id)]);
@@ -265,13 +271,167 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     await expect(service().request('invalid')).rejects.toMatchObject({statusCode:400});
     expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(1);
   });
-  it('UUID-free embedded identity copies cannot be restored after confirmed completion',async()=>{
-    const u=await user({name:'합성개인명'}),other=await user();
-    const r=await service().request(u.id);expect(r.erased).toBe(true);
-    await expect(db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',[`Former contact: ${u.email}`,other.id])).rejects.toMatchObject({code:'P0001'});
-    await db.query('UPDATE users SET nickname=$1 WHERE id=$2',[`독립된 합성개인명 기록`,other.id]);
-    const rows=await db.query("SELECT reference_id,key_kind,identity_length FROM account_erasure_reference_keys WHERE operation_id=$1",[r.operationId]);
-    expect(rows.every((k:any)=>k.reference_id===null)).toBe(true);expect(rows.some((k:any)=>k.key_kind==='identity')).toBe(true);
+  it('email boundaries preserve an unrelated longer address and identify real embedded copies',async()=>{
+    const target=await user({email:'a@fixture.invalid'}),peer=await user({email:'ba@fixture.invalid'});
+    expect((await service().request(target.id)).erased).toBe(true);
+    await db.query('UPDATE users SET nickname=$1 WHERE id=$2',['Unrelated updated profile',peer.id]);
+    const copy=await user({email:'x@fixture.invalid'});
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',[`Former contact: ${copy.email}.`,peer.id]);
+    const r=await service().request(copy.id);expect(r.erased).toBe(false);expect(r.reviewCodes).toContain('REVIEW:public.users');
+  });
+  it('fresh re-registration can reuse contact without restoring old UUIDs or resetting minimum-history expiry',async()=>{
+    const target=await user({email:'synthetic-rejoin@fixture.invalid'}),h=await community(target.id,fixtureAdminId);
+    const r=await service().request(target.id);expect(r.erased).toBe(true);
+    const [before]=await db.query('SELECT occurred_at,expires_at,subject_key FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event]);
+    const fresh=await user({email:target.email});expect(fresh.id).not.toBe(target.id);
+    await db.query("INSERT INTO community_memberships(community_id,user_id,role,status) VALUES($1,$2,'member','suspended')",[h.c,fresh.id]);
+    const [after]=await db.query('SELECT occurred_at,expires_at,subject_key FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event]);expect(after).toEqual(before);
+    await expect(db.query('INSERT INTO users(id,email) VALUES($1,$2)',[target.id,`${target.id}-restored@fixture.invalid`])).rejects.toMatchObject({code:'P0001'});
+    expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[r.operationId])).toHaveLength(0);
+  });
+  it('another actor referenced in owned metadata is not misidentified as the erasure subject',async()=>{
+    const target=await user();
+    await db.query(`INSERT INTO notifications("userId",type,title,metadata)
+      VALUES($1,'fixture','Synthetic private notification',jsonb_build_object('assignedByUserId',$2::text))`,[target.id,fixtureAdminId]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[fixtureAdminId]))[0].isActive).toBe(true);
+    expect(await db.query('SELECT id FROM notifications WHERE "userId"=$1',[target.id])).toHaveLength(0);
+  });
+  it('typed linked provider IDs and nullable aliases must not survive in another row',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-provider-identity';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId",email)
+      VALUES($1,'google',$2,$3)`,[target.id,providerId,'synthetic-alias@fixture.invalid']);
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'providerReference\',$1::text) WHERE id=$2',[providerId,peer.id]);
+    const first=await service().request(target.id);expect(first.erased).toBe(false);expect(first.reviewCodes).toContain('REVIEW:public.users');
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',['synthetic-alias@fixture.invalid',peer.id]);
+    const second=await service().resume(first.operationId);expect(second.erased).toBe(false);expect(second.reviewCodes).toContain('REVIEW:public.users');
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[target.id])).toHaveLength(1);
+  });
+  it('equal provider IDs in a different namespace belong to another account',async()=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$3),($2,'kakao',$3)`,[target.id,peer.id,providerId]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('identity',jsonb_build_object('provider','kakao','providerId',$1::text)) WHERE id=$2`,[providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[peer.id])).toHaveLength(1);
+  });
+  it.each(['email','naver','service'])('legacy %s identities with equal IDs remain another subject',async(provider)=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$3),($2,$4,$3)`,[target.id,peer.id,providerId,provider]);
+    await db.query(`UPDATE users SET provider=$1,provider_id=$2 WHERE id=$3`,[provider,providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[peer.id])).toHaveLength(1);
+    expect((await db.query('SELECT provider_id FROM users WHERE id=$1',[peer.id]))[0].provider_id).toBe(providerId);
+  });
+  it('a copied provider identity in the same namespace still requires review',async()=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('identity',jsonb_build_object('provider','google','providerId',$1::text)) WHERE id=$2`,[providerId,peer.id]);
+    const result=await service().request(target.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+  });
+  it('legacy snake_case IDs preserve another provider and detect a legacy subject copy',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-legacy-id';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    await db.query(`UPDATE users SET provider='kakao',provider_id=$1 WHERE id=$2`,[providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect((await db.query('SELECT provider_id FROM users WHERE id=$1',[peer.id]))[0].provider_id).toBe(providerId);
+    const legacy=await user();
+    await db.query(`UPDATE users SET provider='google',provider_id=$1 WHERE id=$2`,['synthetic-legacy-copy',legacy.id]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','google','provider_id',$1::text) WHERE id=$2`,['synthetic-legacy-copy',peer.id]);
+    const result=await service().request(legacy.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+  });
+  it('storage provider fields cannot hide a copied authentication identifier',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-provider-copy';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    for(const provider of ['gcs','kakao']) {
+      await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider',$1::text,'providerId','other-identity','memo',$2::text) WHERE id=$3`,[provider,providerId,peer.id]);
+      const result=await service().request(target.id);
+      expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+    }
+  });
+  it('provider candidate scanning reaches copies beyond a bounded cursor batch',async()=>{
+    const target=await user(),providerId='1';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'kakao',$2)`,[target.id,providerId]);
+    for(let n=0;n<70;n++) {
+      const peer=await user();
+      await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','google','providerId',$1::text) WHERE id=$2`,[providerId,peer.id]);
+    }
+    const peer=await user();
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','kakao','providerId',$1::text) WHERE id=$2`,[providerId,peer.id]);
+    const result=await service().request(target.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+    await db.query('UPDATE users SET "businessInfo"=NULL WHERE id=$1',[peer.id]);
+    expect((await service().resume(result.operationId)).erased).toBe(true);
+  });
+  it('punctuation extending another opaque provider ID is not treated as this subject',async()=>{
+    const peer=await user(),providerId='synthetic-provider-identity';
+    for(const suffix of ['-extra','.extra']) {
+      const target=await user();
+      await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+      await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'providerReference\',$1::text) WHERE id=$2',[providerId+suffix,peer.id]);
+      expect((await service().request(target.id)).erased).toBe(true);
+      expect((await db.query('SELECT "businessInfo" FROM users WHERE id=$1',[peer.id]))[0].businessInfo.providerReference).toBe(providerId+suffix);
+    }
+  });
+  it('migration 23 or an unvalidated upgrade never advertises erasure readiness',async()=>{
+    const target=await user();
+    const core=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'isolated-synthetic-system',personalBuckets:[]});
+    await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT account_erasure_uuid_keys_only');
+    try {
+      expect(await core.capabilities()).toEqual({enabled:false});
+      await expect(core.request(target.id,fixtureAdminId)).rejects.toMatchObject({code:'ACCOUNT_ERASURE_MIGRATION_REQUIRED'});
+      expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target.id]))[0].isActive).toBe(true);
+      expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
+      await db.query("ALTER TABLE account_erasure_reference_keys ADD CONSTRAINT account_erasure_uuid_keys_only CHECK (key_kind='uuid') NOT VALID");
+      expect(await core.capabilities()).toEqual({enabled:false});
+      await db.query('ALTER TABLE account_erasure_reference_keys VALIDATE CONSTRAINT account_erasure_uuid_keys_only');
+      expect(await core.capabilities()).toEqual({enabled:true});
+    } finally {
+      await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT IF EXISTS account_erasure_uuid_keys_only');
+      await db.query("ALTER TABLE account_erasure_reference_keys ADD CONSTRAINT account_erasure_uuid_keys_only CHECK (key_kind='uuid')");
+    }
+  });
+  it('upgrade retires already-completed legacy contact hashes without touching UUID markers or evidence',async()=>{
+    const target=await user({email:'legacy-contact@fixture.invalid'}),h=await community(target.id,fixtureAdminId);
+    const r=await service().request(target.id);expect(r.erased).toBe(true);
+    const evidence=await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event]);
+    const refs=await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId]);
+    await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT IF EXISTS account_erasure_uuid_keys_only');
+    await db.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
+      VALUES($1,encode(digest($2::text,'sha256'),'hex'),'identity',char_length($2::text))`,[r.operationId,target.email]);
+    const legacySql:string[]=[];
+    await new CreateAccountErasureOperations1791777540800().up({query:async(sql:string)=>{legacySql.push(sql);return [];}} as any);
+    const oldFunction=legacySql.find(sql=>sql.startsWith('CREATE FUNCTION account_erasure_write_fence'))!;
+    const q=db.createQueryRunner();let upgraded=false;
+    try {
+      await q.query(oldFunction.replace('CREATE FUNCTION','CREATE OR REPLACE FUNCTION'));
+      await expect(user({email:target.email})).rejects.toMatchObject({code:'P0001'});
+      await q.startTransaction();
+      await new RetireLegacyErasureIdentityHashes1791795139475().up(q);
+      await q.commitTransaction();upgraded=true;
+    } finally {
+      if(q.isTransactionActive)await q.rollbackTransaction();
+      if(!upgraded) {
+        await q.startTransaction();await new RetireLegacyErasureIdentityHashes1791795139475().up(q);await q.commitTransaction();
+      }
+      await q.release();
+    }
+    await expect(db.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
+      VALUES($1,encode(digest($2::text,'sha256'),'hex'),'identity',char_length($2::text))`,[r.operationId,target.email])).rejects.toMatchObject({code:'23514'});
+    expect((await user({email:target.email})).id).not.toBe(target.id);
+    expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId])).toEqual(refs);
+    expect(await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event])).toEqual(evidence);
+    expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE key_kind='identity'")).toHaveLength(0);
+  });
+  it('scheduled unexpired protection blocks both metadata lookup and deletion before time can advance',async()=>{
+    const target=await user({avatar:'https://storage.googleapis.com/fixture-private/protected-avatar.png'});
+    await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '2 seconds')",[target.id]);
+    const storage={generation:jest.fn(async()=> '7'),deleteGeneration:jest.fn()};
+    await expect(service(storage).request(target.id)).rejects.toMatchObject({code:'SUPER_ADMIN_PROTECTED'});
+    expect(storage.generation).not.toHaveBeenCalled();expect(storage.deleteGeneration).not.toHaveBeenCalled();
+    expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target.id]))[0].isActive).toBe(true);
+    expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
   });
   it('calendar boundaries preserve leap-day KST anniversary and original two-year anchor',()=>{
     expect(calendarExpiry(new Date('2024-02-28T15:00:00Z'),1).toISOString()).toBe('2025-02-28T15:00:00.000Z');
