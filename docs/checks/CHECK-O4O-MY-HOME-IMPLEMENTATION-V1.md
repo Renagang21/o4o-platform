@@ -2,10 +2,10 @@
 
 > **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
-> **현재 최소 모아보기 Phase**: 구현·검증 중. My Home AI는 별도 개발. 기존 PR #484/#489의 배포 완료 결과와 이번 Phase를 구분하며 main·운영 반영까지 확인한다.
+> **현재 최소 모아보기 결과**: PR #498 main/runtime `004a42c012ad8b67a446db373d4de33889c6f4e8`의 main CI·CodeQL·Neture 자동 배포·최종 서빙 Report PASS, 운영 번들 39개·공개 HTTP/보호 API 13개 PASS. AI 별도 개발·실제 인증 SKIPPED_BY_USER. 결과 문서 PR #500은 NOT_APPLICABLE이며 아래 이전 Phase와 구분한다.
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB 직접 접속·실제 계정 로그인 없음. 운영 공개 HTTP·브라우저 검증과 정상 배포 workflow 수행.
 
 ## 연속 문서 Phase: 테스트 계정 파일 확보·이름 통일 (2026-10-11)
@@ -288,3 +288,21 @@ PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 d
 - [PR #498](https://github.com/Renagang21/o4o-platform/pull/498)의 최종 HEAD `e84a154b1451f5fb9efa96a97af1d068ec60234c`: [CI 38195449376](https://github.com/Renagang21/o4o-platform/actions/runs/38195449376)·required CI Gate·API 3묶음·품질·웹/Admin build·CodeQL·SonarCloud PASS. 자동 Codex 리뷰 완료·inline 지적/미해결 thread 0건. current main ruleset의 required check와 human approval 0을 확인해 정상 squash 병합했다.
 - 기존 타 세션의 Promote 38195979353이 종료·서빙 Report PASS인 것을 확인한 뒤 main 통합했다. 최신 main 대비 이번 10개 경로 차이는 Neture LEVEL 2, API/DB/권한 변경 0이다. 기존 분회 배포를 임의 중단하거나 해당 배포 설정을 변경하지 않았다.
 - 구현 main `004a42c012ad8b67a446db373d4de33889c6f4e8`의 [CI 38196315889](https://github.com/Renagang21/o4o-platform/actions/runs/38196315889)는 진행 중이다. 같은 WO의 별도 문서 정합 Phase에서 정본 §2/§6의 최소 화면·상세 기능·AI 별도 개발 경계와 색인을 맞춘다. 이번 최소 화면의 배포·실제 서빙·운영 번들 확인은 완료 전이며 문서 PR은 draft로 유지한다.
+
+### 최소 모아보기 배포·운영 확인 완료
+
+| 검증 | 실제 결과 |
+|---|---|
+| source PR | #498, exact HEAD e84a154b1451f5fb9efa96a97af1d068ec60234c, CI 38195449376·required CI Gate·자동 리뷰 완료·미해결 thread 0 |
+| main/runtime | 004a42c012ad8b67a446db373d4de33889c6f4e8, CI 38196315889·CodeQL PASS |
+| Delivery | [38196926152](https://github.com/Renagang21/o4o-platform/actions/runs/38196926152) PASS. Neture deploy·verified revision/traffic·최종 서빙 Report PASS. production = DEPLOYED. API·Admin·다른 웹 서비스·migration 미배포 |
+| 실제 운영 자원 | TLS 검증 curl, 109 assets, `/assets/index-BbsWojlR.js`, 최소 구성/상세 기능 marker 8/8 |
+| 운영 HTTP | 대표 홈+개인 5화면·API ready 200, 개인 API 6개 비로그인 401. 총 13 checks PASS. 응답 본문은 저장하지 않음 |
+| 운영 번들 browser | 실제 받은 자원 + fixture 사용자/API/handoff, 1440/375/320px 39 tests PASS. 개인 5화면·짧은 overview·최근 3/전체 10·필터·원본 업무·사업/매장·오류 상태 회귀 |
+| 문서 검증 | 코드/정본/색인/TODO 대조. 로컬 docs consumer 18 suites/365 tests PASS, 첫 문서 CI 38196415160 PASS. 최종 결과 변경 후 required CI를 확인해 #500 정상 통합 |
+| 제외 | 실계정 이메일 SKIPPED_BY_USER. AI 입력/모델/API/요청/Task/결과 없음. 권한·API·DB·dependency·공통 패키지·배포 설정 변경 없음 |
+
+- `/notifications` 서버 route와 service의 pagination 코드를 읽어 limit=3을 그대로 조회·응답하고 req.user.id가 조회 주체임을 확인했다. fixture만으로 신규 API 지원을 추정하지 않았다.
+- 운영 screenshot도 1440px 1,349px·375px 1,743px·320px 1,763px이며 375px 실제 운영 번들 화면을 직접 확인했다. 가로 overflow·pageerror 0이고 첫 화면의 상세 API 미호출과 상세 진입 후 조회가 확인됐다.
+- 작업공간의 테스트 계정 원문·스크린샷·검증 로그는 Git 제외 상태로 보존한다. credential·운영 사용자 데이터는 공개 기록에 복사하지 않는다. 작업공간 KEEP이며 다른 worktree·branch·staging은 변경하지 않는다.
+- 문서 정합: 현재 모아보기 3건/대표 업무/상세 진입과 상세 기록·QR 범위, AI 별도 개발을 정본/색인/WO/CHECK/TODO에 맞췄다. 이전 최근 5건·overview 상세 요약·WIF 차단은 이전 Phase 이력으로 보존한다.

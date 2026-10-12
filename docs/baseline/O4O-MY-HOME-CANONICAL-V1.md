@@ -85,11 +85,11 @@ PR #449를 main에 병합하고 `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`를 �
 
 위 PR의 로컬 Neture 569개·타입 포함 build·PC/375/320px fixture 39개와 최종 PR/main CI가 통과했다. 2026-10-11의 WIF 조건 거절은 이후 PH 정리의 임시 인증 제한 복구로 해소됐다. 2026-10-12 [읽기 전용 인증 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879)은 PASS이며, [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38188251558)가 runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2`의 Neture 배포·최종 실제 서빙 Report를 완료했다. 해당 SHA의 production status는 DEPLOYED이고 본 작업의 My Home 입력은 구현 SHA와 동일하다. 실제 운영 HTML/JS의 신규 기능 표식, 공개 화면·API readiness 200과 개인 API 비로그인 401을 확인했다. TLS 검증을 유지해 받은 운영 번들의 PC/375/320px fixture 39개도 통과했다. 사용자·API·handoff는 fixture이며 직접 운영 로그인 세션 검증을 의미하지 않는다. 제공된 `docs/local/TEST-ACCOUNT.txt`는 확인했으나 사용자가 이메일 리팩터링 예정·검증 제외를 명시했으므로 실제 인증 smoke는 **SKIPPED_BY_USER**다. 초기 WIF 차단·계정 문서 부재와 이번 최종 완료 상태는 WO/CHECK에서 구분하며 결과 정합 문서는 PR #489로 통합한다.
 
-### 최소 모아보기 Phase 통합 — 2026-10-12 KST
+### 최소 모아보기 Phase 완료 — 2026-10-12 KST
 
-[구현 PR #498](https://github.com/Renagang21/o4o-platform/pull/498)은 최종 HEAD `e84a154b1451f5fb9efa96a97af1d068ec60234c`의 required CI·품질/API 3묶음·웹/Admin build·CodeQL·SonarCloud와 자동 리뷰를 통과하고 main `004a42c012ad8b67a446db373d4de33889c6f4e8`에 정상 병합했다. [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38196315889)는 진행 중이며 이번 최소 화면의 운영 반영은 아직 확인 전이다. 위 현재 화면 범위는 main 구현이며 이전 runtime 배포 결과로 이번 배포를 대체하지 않는다.
+[구현 PR #498](https://github.com/Renagang21/o4o-platform/pull/498)은 최종 HEAD `e84a154b1451f5fb9efa96a97af1d068ec60234c`의 required CI·품질/API 3묶음·웹/Admin build·CodeQL·SonarCloud와 자동 리뷰를 통과해 main `004a42c012ad8b67a446db373d4de33889c6f4e8`에 정상 병합했다. 같은 SHA의 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38196315889)·CodeQL PASS 후 [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38196926152)가 Neture만 배포했다. Neture deploy와 최종 실제 서빙 Report PASS, production status는 `DEPLOYED`다. API·다른 서비스·migration은 이번 배포 대상이 아니다. runtime SHA는 `004a42c012ad8b67a446db373d4de33889c6f4e8`다.
 
-Neture unit 600 tests/70 files·타입 포함 build·변경 ESLint/docs guard·PC/375/320px 로컬 fixture 39개 PASS. fixture는 실제 로그인 검증이 아니며 이메일 로그인은 사용자 제외에 따른 SKIPPED_BY_USER다. 같은 WO의 정본 정합 Phase를 draft로 유지하고 새 Delivery·실제 서빙·운영 번들을 확인한 뒤 결과를 확정한다. 문서-only DEPLOYMENT는 NOT_APPLICABLE이며 runtime 배포 의무는 구현 Phase에서 유지한다.
+Neture unit 600 tests/70 files·타입 포함 build·변경 ESLint/docs guard·PC/375/320px 로컬 fixture 39개 PASS. TLS 검증을 유지해 받은 운영 자원 109개와 `/assets/index-BbsWojlR.js`에서 최소 화면 및 상세 기능 표식 8개를 확인했고, 실제 운영 번들의 fixture 39개와 공개 화면/API readiness 200·개인 API 비로그인 401 검사 13개 PASS다. 데이터·handoff는 fixture이며 직접 실계정 운영 검증이 아니다. 이메일 로그인은 사용자 제외에 따른 SKIPPED_BY_USER다. 같은 WO의 [결과 문서 PR #500](https://github.com/Renagang21/o4o-platform/pull/500)으로 정본·색인·TODO를 정합하며 문서-only DEPLOYMENT는 NOT_APPLICABLE, 문서 commit과 runtime SHA를 구분한다.
 
 1. 일반 회원·매장 경영자의 PC·모바일에서 `My Home` 표기와 직접 진입이 일치하는가?
 2. 대표 홈·독립 서비스·내 매장에서 개인 공간으로 이동하고 원래 업무로 돌아갈 수 있는가?
