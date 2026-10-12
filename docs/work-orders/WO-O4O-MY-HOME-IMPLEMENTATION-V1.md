@@ -117,3 +117,5 @@ TLS 검증을 유지해 받은 운영 HTML/JS의 신규 표식 5개, 공개 화�
 - 대표 홈의 기존 요약·O4O AI·모든 서비스의 My Home 헤더/모바일 진입은 유지한다. Neture 내부 패널의 compact 옵션만 변경하며 공통 패키지/API/route/권한/DB/dependency/CI/배포 설정 변경은 없다.
 - My Home AI의 입력·모델/API·Task 상태·결과 UI는 구현하지 않는다. 향후 모아보기 상단에서 연결하는 위치와 별도 개발 경계만 후속 정본 정합에 기록한다. 실계정 이메일 검증은 기존 사용자 지시대로 SKIPPED_BY_USER다.
 - 최신 main `0db33efda8fb380ac08243fc5286707db414316c`의 인증/약관 동의 기능을 보존한다. `HomeEntryPanel`의 대표 홈 summary·참여 서비스 full·선택 매장 workspace 소비처를 확인한다. 소스 PR과 별도 결과 문서 Phase를 같은 TODO에서 연속 수행한다.
+
+최소 모아보기 구현은 PR #498의 required CI·자동 리뷰 gate를 통과해 main `004a42c012ad8b67a446db373d4de33889c6f4e8`에 병합했다. 이전 타 작업 Promote 종료를 확인해 통합을 직렬화했다. 같은 WO의 결과 문서 Phase에서 정본·색인을 맞추며 새 main CI와 Neture Delivery·실제 서빙·운영 번들 확인까지 완료한다. 문서 PR은 결과 확정 전 draft로 유지하며 문서-only DEPLOYMENT는 NOT_APPLICABLE이다.

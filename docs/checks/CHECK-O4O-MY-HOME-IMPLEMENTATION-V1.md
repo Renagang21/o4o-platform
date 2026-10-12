@@ -284,3 +284,7 @@ PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 d
 - auth-client 재빌드 후 Neture 타입 포함 production build PASS. 변경 TS/TSX ESLint·docs 민감정보 검사(3,868 files)·`git diff --check` PASS.
 - 로컬 Chromium 1440/375/320px **39 fixture PASS**. 첫 화면에서 학습·펀딩·커뮤니티 글·사업·QR API 미호출, 상세 진입 후 조회, 알림 3/전체 10/필터, 원본 handoff, 복수 매장 선택 유지·오류 재조회·일반 회원 동선을 확인했다. 개인 데이터와 handoff는 fixture이며 실제 로그인 검증이 아니다.
 - 모아보기 screenshot의 전체 높이는 1440px에서 1,349px, 375px에서 1,743px, 320px에서 1,763px다. 375px 화면을 직접 확인했고 카드·헤더·하단 메뉴와 가로 overflow 없음도 확인했다. 사진과 로컬 검증 로그는 Git 제외 작업공간에 보존한다.
+
+- [PR #498](https://github.com/Renagang21/o4o-platform/pull/498)의 최종 HEAD `e84a154b1451f5fb9efa96a97af1d068ec60234c`: [CI 38195449376](https://github.com/Renagang21/o4o-platform/actions/runs/38195449376)·required CI Gate·API 3묶음·품질·웹/Admin build·CodeQL·SonarCloud PASS. 자동 Codex 리뷰 완료·inline 지적/미해결 thread 0건. current main ruleset의 required check와 human approval 0을 확인해 정상 squash 병합했다.
+- 기존 타 세션의 Promote 38195979353이 종료·서빙 Report PASS인 것을 확인한 뒤 main 통합했다. 최신 main 대비 이번 10개 경로 차이는 Neture LEVEL 2, API/DB/권한 변경 0이다. 기존 분회 배포를 임의 중단하거나 해당 배포 설정을 변경하지 않았다.
+- 구현 main `004a42c012ad8b67a446db373d4de33889c6f4e8`의 [CI 38196315889](https://github.com/Renagang21/o4o-platform/actions/runs/38196315889)는 진행 중이다. 같은 WO의 별도 문서 정합 Phase에서 정본 §2/§6의 최소 화면·상세 기능·AI 별도 개발 경계와 색인을 맞춘다. 이번 최소 화면의 배포·실제 서빙·운영 번들 확인은 완료 전이며 문서 PR은 draft로 유지한다.
