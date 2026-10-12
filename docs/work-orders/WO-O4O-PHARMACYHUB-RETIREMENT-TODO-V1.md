@@ -274,3 +274,7 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 ### PR #502 리뷰 보강
 
 최초 commit `1763adb714`의 원격 CI [38196980183](https://github.com/Renagang21/o4o-platform/actions/runs/38196980183)은 CI Gate 포함 SUCCESS였다. Codex 리뷰의 P1 두 건/P2 한 건은 별도로 반영한다. 범용 역할 부여는 요청의 prefixed role과 해석된 DB role의 service/name 모두에서 PH를 거절한다(플랫폼 관리자도 예외 없음). multer memory parse 후 업로드 경계에서 다시 검사하고 서비스 upload 자체도 GCS/DB write 전에 거절한다. scope·role 비교는 trim 및 배열을 처리한다. 3개 focused suites 55 tests PASS, API 타입 검사 PASS. multipart/공백 scope/role 배열/DB의 bare-role→PH 매핑 회귀를 추가했다. main 통합·배포·DB/DNS/인증서 변경은 여전히 다른 운영 작업 종료 대기다.
+
+### PR #502 인증 권한·회원 selector 후속 리뷰
+
+`064809e5b6`의 CI [38197765196](https://github.com/Renagang21/o4o-platform/actions/runs/38197765196)은 SUCCESS였다. 추가 P1/P2 대응으로 승인된 PH namespace만 공통 RBAC SSOT에서 제외한다: getActiveRoles/getRoleNames/hasRole/hasAnyRole은 PH를 권한으로 인정하지 않고 assignRole도 PH 재생성을 거절한다. 다른 서비스의 role·유효기간·회수 계약은 유지한다. membershipServiceKey/member role selector도 전역 및 프로필 write 앞에서 거절한다. opaque membership 승인·복구의 폐기 예외는 전용 RetiredServiceError(410/SERVICE_RETIRED)로 응답한다. 7 focused suites의 최종 fixture 정합 후 106 tests PASS, API 타입 검사 PASS. DB 활성 플래그를 바꾸지 않고 인증 capability를 닫으며 실제 DB purge는 계속 대기한다.

@@ -29,7 +29,7 @@ it.each(['/api/v1/store/membership?serviceKey=kpa', '/api/v1/store/membership', 
 });
 
 it.each([
- { serviceKey: ' pharmacy-hub ' }, { role: 'pharmacy-hub:operator' },
+ { membershipServiceKey: ' pharmacy-hub ' }, { serviceKey: ' pharmacy-hub ' }, { role: 'pharmacy-hub:operator' },
  { role: ' pharmacy-hub:admin ' }, { roles: ['neture:member','pharmacy-hub:member'] },
  { serviceKeys: ['neture','pharmacy-hub'] }, { targetServiceKey:'pharmacy-hub' },
 ])('rejects normalized scopes and role variants %j', async body => {

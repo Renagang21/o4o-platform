@@ -1,3 +1,4 @@
+import { RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 /**
  * WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1
  *
@@ -295,4 +296,13 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
       );
     });
   });
+});
+
+it('ID-only approval reports retirement as 410 instead of a server failure',async()=>{
+ mockApprovalService.approveMembership.mockRejectedValueOnce(new RetiredServiceError());
+ const request:any={body:{},params:{membershipId:'membership'},user:{id:'actor'},serviceScope:{isPlatformAdmin:true,serviceKeys:[]}};
+ const response=makeRes();
+ await new MembershipConsoleController().approveMembership(request,response);
+ expect(response.status).toHaveBeenCalledWith(410);
+ expect(response.json).toHaveBeenCalledWith(expect.objectContaining({code:'SERVICE_RETIRED'}));
 });

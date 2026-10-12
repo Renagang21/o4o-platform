@@ -378,7 +378,7 @@ it('operator rejection cannot restrict an active member or touch other services'
  it('retired PH membership cannot be approved even through an ID-only request', async () => {
    db.memberships[0].service_key = 'pharmacy-hub';
    db.memberships[0].role = 'pharmacy-hub:store_owner';
-   await expect(approve('m-ph', ['pharmacy-hub'])).rejects.toThrow('SERVICE_RETIRED');
+   await expect(approve('m-ph', ['pharmacy-hub'])).rejects.toMatchObject({code:'SERVICE_RETIRED',httpStatus:410});
    expect(committed).toBe(false);
    expect(rolledBack).toBe(true);
    expect(db.memberships[0].status).toBe('pending');

@@ -6,7 +6,7 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
-import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
+import { isRetiredServiceValue, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
@@ -329,6 +329,7 @@ export class MembershipConsoleController {
         pagination: { page: pageNum, limit: limitNum, total, totalPages },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMembers error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -450,6 +451,7 @@ export class MembershipConsoleController {
         })),
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMemberDetail error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -486,6 +488,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
@@ -540,6 +543,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[MembershipConsole] rejectMembership error', {
         membershipId: req.params.membershipId,
@@ -726,6 +730,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -883,6 +888,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, data: { results } });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] batchUpdateStatus error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -950,6 +956,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -967,6 +974,10 @@ export class MembershipConsoleController {
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
+      if (isRetiredServiceValue(req.body?.membershipServiceKey) || isRetiredServiceValue(req.body?.membershipRole)) {
+        res.status(410).json({ success:false, code:'SERVICE_RETIRED' });
+        return;
+      }
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
@@ -1126,6 +1137,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User updated' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] updateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1186,6 +1198,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getDeleteRisk error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1283,6 +1296,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] deleteMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1405,6 +1419,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} assigned`, assignment });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] assignMemberRole error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1594,6 +1609,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} removed` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] removeMemberRole error', {
         userId: req.params.userId,
         role: req.params.role,
@@ -1663,6 +1679,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getStats error', {
         error: error instanceof Error ? error.message : String(error),
       });
