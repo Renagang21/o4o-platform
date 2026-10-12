@@ -260,22 +260,25 @@ test("personal views and direct entries stay visible without page overflow", asy
   }
   expect(errors).toEqual([]);
 });
-test("overview displays actual service activities and bounded summaries", async ({
-  page,
-}) => {
-  await prepare(page);
+test("overview stays minimal and loads participation records only on detail entry", async ({ page }) => {
+  const fixture = await prepare(page);
   await page.goto("/mypage");
-  await expect(page.getByText("학습 중 · 진도 0%")).toBeVisible();
-  await expect(page.getByText("검증 강의 2", { exact: true })).toBeVisible();
-  await expect(page.getByText("검증 강의 3", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("검증 펀딩 2", { exact: true })).toBeVisible();
-  await expect(page.getByText("검증 펀딩 3", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("내가 작성한 글", { exact: true })).toBeVisible();
-  await expect(page.locator("dd").filter({ hasText: /^7$/ })).toBeVisible();
-  await page
-    .getByRole("link", { name: "학습·펀딩 참여 이력 더 보기 →" })
-    .click();
+  await expect(page.getByRole("navigation", { name: "내 현황 자세히 보기" })).toBeVisible();
+  await expect(page.getByText("참여 상태 알림")).toBeVisible();
+  await expect(page.getByText("검증 강의 0", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("검증 펀딩 0", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "내 매장 협력사업 참여 현황" })).toHaveCount(0);
+  await expect(page.getByText("QR 방문 현황", { exact: true })).toHaveCount(0);
+  for (const path of ["/lms/enrollments/me", "/api/market-trial/my-participations", "/communities/fixture-community/forum/posts", "/neture/pharmacy/semi-franchises", "/kpa/pharmacy/analytics/marketing"])
+    expect(fixture.requests.includes(path)).toBe(false);
+  const work = page.getByRole("region", { name: "내 업무 바로가기" });
+  await expect(work.getByRole("button", { name: /화면 검증 매장/ })).toBeVisible();
+  await expect(work.getByRole("button", { name: /두 번째 검증 매장/ })).toHaveCount(0);
+  await page.getByRole("navigation", { name: "내 현황 자세히 보기" }).getByRole("link", { name: /참여 서비스/ }).click();
   await expect(page).toHaveURL(/\/mypage\/services$/);
+  await expect(page.getByText("학습 중 · 진도 0%")).toBeVisible();
+  await expect(page.getByText("검증 펀딩 0", { exact: true })).toBeVisible();
+  await expect(page.getByText("참여 중인 검증 사업", { exact: true })).toBeVisible();
 });
 test("service history pages and Study handoff continue at the original course", async ({
   page,
@@ -374,8 +377,8 @@ test("notification history pages and server filters remain usable on mobile", as
   await prepare(page);
   await page.goto("/mypage");
   const notices = page.locator("#my-home-notifications");
-  await expect(notices.getByText("검증 알림 4")).toBeVisible();
-  await expect(notices.getByText("검증 알림 5", { exact: true })).toHaveCount(
+  await expect(notices.getByText("검증 알림 2")).toBeVisible();
+  await expect(notices.getByText("검증 알림 3", { exact: true })).toHaveCount(
     0,
   );
   await notices.getByRole("button", { name: "알림 전체보기" }).click();
@@ -426,10 +429,12 @@ test("management preserves selected store between views and plots returned dates
   page,
 }) => {
   await prepare(page);
-  await page.goto("/mypage");
+  await page.goto("/mypage/management");
   await page.getByLabel("통계를 볼 매장").selectOption("fixture-store-second");
   await expect(page.locator("dd").filter({ hasText: /^9$/ })).toBeVisible();
-  await page.getByRole("link", { name: "매장 방문 통계 더 보기 →" }).click();
+  await page.getByRole("link", { name: "참여 서비스", exact: true }).first().click();
+  await expect(page.getByLabel("참여 현황을 볼 매장")).toHaveValue("fixture-store-second");
+  await page.getByRole("link", { name: "경영 현황", exact: true }).first().click();
   await expect(page.getByLabel("통계를 볼 매장")).toHaveValue(
     "fixture-store-second",
   );
@@ -488,7 +493,7 @@ test("selected store work opens the existing Store workspace handoff", async ({ 
 
 test("business memberships follow the selected store without including unjoined catalogue entries", async ({ page }) => {
   await prepare(page);
-  await page.goto("/mypage");
+  await page.goto("/mypage/management");
   const businesses = page.getByRole("region", { name: "내 매장 협력사업 참여 현황" });
   await expect(businesses.getByText("참여 중인 검증 사업")).toBeVisible();
   await expect(businesses.getByText("승인 대기", { exact: true })).toBeVisible();

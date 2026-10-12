@@ -2,10 +2,10 @@
 
 > **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
 
-> **상태**: COMPLETED
+> **상태**: ACTIVE
 > **검증일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **WO**: [WO-O4O-MY-HOME-IMPLEMENTATION-V1](../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
-> **현재 본 작업 결과**: PR #484 main·사후 CI PASS, WIF 복구·Neture runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2` 배포·최종 서빙 Report PASS. 운영 번들 fixture 39개·공개 HTTP/보호 API PASS. 실제 인증 smoke는 SKIPPED_BY_USER. 최종 정본·TODO 결과는 문서 PR #489로 통합하며 아래 이전 Phase의 배포·계정 상태와 구분한다.
+> **현재 최소 모아보기 Phase**: 구현·검증 중. My Home AI는 별도 개발. 기존 PR #484/#489의 배포 완료 결과와 이번 Phase를 구분하며 main·운영 반영까지 확인한다.
 > **검증 환경**: 전용 Linux worktree, Node 22.18.0, pnpm 10.25.0, Chromium. 기존 frozen lockfile·공유 패키지 빌드 사용. 운영 DB 직접 접속·실제 계정 로그인 없음. 운영 공개 HTTP·브라우저 검증과 정상 배포 workflow 수행.
 
 ## 연속 문서 Phase: 테스트 계정 파일 확보·이름 통일 (2026-10-11)
@@ -272,3 +272,15 @@ PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 d
 - CI: 구현 최종 PR/main PASS, 문서 최종 PR/main 결과는 #489에서 확인 · smoke: LOCAL 39/DEPLOYED-BUNDLE 39/HTTP PASS, AUTHENTICATED SKIPPED_BY_USER
 - source main 포함: diff 0 · 자기 변경: 정본·색인·WO·CHECK·TODO·헤더 문서 6개. 최종 commit/push 이후 자기 작업 범위 미커밋·untracked 0을 확인한다.
 - verdict: **KEEP** — 제공된 ignored 로컬 `docs/local/TEST-ACCOUNT.txt`와 browser 검증 증거를 보존한다. 이전 배포·인증 복구 대기는 해소됐다. 보존 파일을 잃게 되는 worktree 강제 삭제는 실행하지 않는다.
+
+## 최소 모아보기 연속 Phase — 2026-10-12 KST
+
+- 먼저 TODO 초안을 작성하고 코드·정본을 대조해 최근 알림 3건·역할별 대표 업무·상세 진입으로 범위를 보완했다. 같은 WO의 연속 Phase로 기존 branch/worktree를 유지한다.
+- 최초 focused 검증은 34 PASS/1 FAIL이었다. 새 fixture가 `total=12`의 빈 페이지에 전체 기록 없음 문구를 기대한 오류를 수정했다. 이 과정에서 알림 하단의 5건 고정 안내도 실제 previewLimit에 맞게 수정했다.
+- Neture 전체 unit: **70 files / 600 tests PASS**. 대표 홈/full/선택 매장 소비처, 역할별 대표 업무, 상세 기록의 지연 조회, 사용자·선택 매장·늦은 응답 및 약관 동의 회귀를 포함한다.
+- 최초 타입 포함 build는 main의 신규 SignupTermsDocument와 이전 auth-client dist 불일치로 실패했다. 소스 계약 변경 없이 기존 `@o4o/auth-client` 패키지 재빌드 후 재검증한다. 결과를 아래 이어 기록한다.
+- AI API·실제 로그인·운영 DB 직접 접근·상태 변경 호출은 실행하지 않았다. 이메일 로그인은 SKIPPED_BY_USER다.
+
+- auth-client 재빌드 후 Neture 타입 포함 production build PASS. 변경 TS/TSX ESLint·docs 민감정보 검사(3,868 files)·`git diff --check` PASS.
+- 로컬 Chromium 1440/375/320px **39 fixture PASS**. 첫 화면에서 학습·펀딩·커뮤니티 글·사업·QR API 미호출, 상세 진입 후 조회, 알림 3/전체 10/필터, 원본 handoff, 복수 매장 선택 유지·오류 재조회·일반 회원 동선을 확인했다. 개인 데이터와 handoff는 fixture이며 실제 로그인 검증이 아니다.
+- 모아보기 screenshot의 전체 높이는 1440px에서 1,349px, 375px에서 1,743px, 320px에서 1,763px다. 375px 화면을 직접 확인했고 카드·헤더·하단 메뉴와 가로 overflow 없음도 확인했다. 사진과 로컬 검증 로그는 Git 제외 작업공간에 보존한다.

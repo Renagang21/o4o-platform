@@ -198,6 +198,18 @@ describe("My Home self-scoped data", () => {
     expect(screen.queryByText("첫 계정 알림")).toBeNull();
     await waitFor(() => expect(screen.getByRole("status")).toBeTruthy());
   });
+  it("requests three overview notices and ten records when expanded", async () => {
+    get.mockImplementation((path, options) => Promise.resolve({ data: { success: true, data: path.endsWith("unread-count")
+      ? { count: 12 }
+      : { notifications: [], total: 12, page: options.params.page, limit: options.params.limit, totalPages: Math.ceil(12 / options.params.limit) } } }));
+    render(wrap(<MyHomeNotifications accountId="normal" previewLimit={3} />));
+    await screen.findByText("이 페이지에 알림이 없습니다.");
+    expect(screen.getByText(/최근 알림 3건입니다/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "알림 전체보기" }));
+    await screen.findByText("1 / 2 페이지 · 12건");
+    expect(get.mock.calls.filter(([path]) => path === "/notifications").map(([, options]) => options.params))
+      .toEqual([{ page: 1, limit: 3 }, { page: 1, limit: 10 }]);
+  });
   it("pages and filters notifications on the server without caller identity", async () => {
     get.mockImplementation((path, options) =>
       Promise.resolve({
