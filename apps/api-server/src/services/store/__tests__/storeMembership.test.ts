@@ -70,6 +70,7 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
   const query = jest.fn(async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
+    if (s.startsWith('SELECT pg_advisory_xact_lock')) return [];
 
     if (s.startsWith('SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm')) {
       return members.filter(m => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null && m.role === p[2]).map(() => ({ is_pharmacy: seed.pharmacy !== false }));
@@ -152,7 +153,13 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
     throw new Error(`unexpected SQL: ${s}`);
   });
 
-  return { ds: { query } as any, members, sql };
+  return { ds: { query,
+    transaction: async (work: (manager: any) => Promise<unknown>) => {
+      const before = members.map(member => ({ ...member }));
+      try { return await work({ query }); }
+      catch (error) { members.splice(0, members.length, ...before); throw error; }
+    },
+  } as any, members, sql };
 }
 
 const asOwnerOf = (organizationId: string) =>
@@ -430,7 +437,7 @@ describe('M7 Role ∧ Relationship', () => {
     expect(members[0].role).toBe(STORE_ACCEPTED_ROLE);
     await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceKey: 'kpa', preferredOrganizationId: ORG_A });
     expect(members[0].role).toBe(STORE_STAFF_ROLE);
-    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member', assignedBy: OWNER }));
+    expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ userId: STAFF, role: 'kpa:store_member', assignedBy: OWNER }), expect.objectContaining({ query: expect.any(Function) }));
   });
 
   it('직원은 자기 최종 승인을 할 수 없다', async () => {
@@ -485,7 +492,7 @@ describe('M7 Role ∧ Relationship', () => {
     // 이 매장 하나뿐 → 회수한다.
     const only = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
     await removeStoreMember(only.ds, { ownerUserId: OWNER, targetUserId: STAFF });
-    expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
+    expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member', expect.objectContaining({ query: expect.any(Function) }));
 
     // 다른 매장에 아직 남아 있으면 → 회수하지 않는다(그쪽 접근까지 끊지 않는다).
     removeRoleMock.mockClear();
@@ -506,7 +513,7 @@ it('현재 약국 직원 해제는 enrollment가 없어도 최종 승인 role을
   const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
   await removeStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceKey: 'kpa' });
   expect(members[0].left_at).not.toBeNull();
-  expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member');
+  expect(removeRoleMock).toHaveBeenCalledWith(STAFF, 'kpa:store_member', expect.objectContaining({ query: expect.any(Function) }));
   expect(ds.query).toHaveBeenCalledWith(expect.stringContaining('FROM neture_pharmacy_memberships pm'), expect.arrayContaining(['kpa']));
 });
 
@@ -524,7 +531,7 @@ it('현역 외부 Cafe24 초대의 기존 수락·인가 경로를 승인 대기
   const result = await acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A });
   expect(result).toMatchObject({ role: STORE_STAFF_ROLE, services: ['cafe24-b2b'] });
   expect(members[0].role).toBe(STORE_STAFF_ROLE);
-  expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'cafe24-b2b:store_member' }));
+  expect(assignRoleMock).toHaveBeenCalledWith(expect.objectContaining({ role: 'cafe24-b2b:store_member' }), expect.objectContaining({ query: expect.any(Function) }));
 });
 
 it('은퇴 서비스만 연결된 초대는 새 권한을 발급하지 않는다', async () => {
@@ -533,4 +540,23 @@ it('은퇴 서비스만 연결된 초대는 새 권한을 발급하지 않는다
   await expectCode(acceptStoreInvitation(ds, { userId: STAFF, organizationId: ORG_A }), 'STORE_NOT_RESOLVED');
   expect(members[0].role).toBe(STORE_INVITED_ROLE);
   expect(assignRoleMock).not.toHaveBeenCalled();
+});
+
+it('해제 Role 정리 실패는 관계 변경도 롤백하며 다시 해제할 수 있다', async () => {
+  asOwnerOf(ORG_A);
+  const { ds, members } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_STAFF_ROLE, left_at: null }] });
+  removeRoleMock.mockRejectedValueOnce(new Error('role cleanup unavailable'));
+  await expect(removeStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceKey: 'kpa' })).rejects.toThrow('role cleanup unavailable');
+  expect(members[0].left_at).toBeNull();
+  await removeStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF, serviceKey: 'kpa' });
+  expect(removeRoleMock.mock.calls.filter(call => call[1] === 'kpa:store_member')).toHaveLength(2);
+});
+
+it('실패한 승인 트랜잭션 뒤 다음 승인에서 다시 사용자 잠금을 얻는다', async () => {
+  asOwnerOf(ORG_A);
+  const { ds, sql } = makeDs({ members: [{ organization_id: ORG_A, user_id: STAFF, role: STORE_ACCEPTED_ROLE, left_at: null }] });
+  assignRoleMock.mockRejectedValueOnce(new Error('grant unavailable'));
+  await expect(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF })).rejects.toThrow('grant unavailable');
+  await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF });
+  expect(sql.filter(q => q.includes('pg_advisory_xact_lock')).length).toBe(2);
 });

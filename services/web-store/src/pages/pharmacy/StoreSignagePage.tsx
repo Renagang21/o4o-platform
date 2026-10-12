@@ -20,6 +20,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   GuideBackLink,
@@ -163,6 +164,12 @@ type ActiveTab = 'assets' | 'playlist' | 'schedules';
 
 /* ─── Main Component ─────────────────────────── */
 
+async function loadSignageAssets(): Promise<StoreAssetItem[]> {
+  const response = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
+  if (!response.success) throw new Error('SIGNAGE_LOAD_FAILED');
+  return response.data.items || [];
+}
+
 export function StoreSignagePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -209,9 +216,10 @@ export function StoreSignagePage() {
   const [schSaving, setSchSaving] = useState(false);
 
   // ── Legacy asset state ──
-  const [items, setItems] = useState<StoreAssetItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items, setData: setItems, loading, error: listError, reload: reloadItems } = useStoreResource(loadSignageAssets, []);
+
   const [error, setError] = useState<string | null>(null);
+  const fetchItems = useCallback(async () => { setError(null); await reloadItems(); }, [reloadItems]);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -258,22 +266,6 @@ export function StoreSignagePage() {
   const [editSourceUrl, setEditSourceUrl] = useState('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
-
-  const fetchItems = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
-      const loadedItems = res.data.items || [];
-      setItems(loadedItems);
-    } catch {
-      // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
-      // error state 는 이미 있는데 catch 가 채우지 않아 실패가 "동영상이 없습니다" 로 위장됐다.
-      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const loadPlaylists = useCallback(async () => {
     setPlaylistLoading(true);
@@ -338,12 +330,11 @@ export function StoreSignagePage() {
 
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
-    fetchItems();
     loadPlaylists();
     loadSchedules();
     loadSignagePlaylists();
     loadSignageMedia();
-  }, [fetchItems, loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
+  }, [loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
 
   useEffect(() => {
     if (activeTab === 'schedules' && schedules.length === 0) {
@@ -1598,7 +1589,7 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── [A] Signage KPI ─────────────────────── */}
-      {!loading && !error && (
+      {!loading && !error && !listError && (
         <div className="grid grid-cols-5 gap-4 mb-6">
           <KpiCard label="게시 중" count={kpi.published} color="green" />
           <KpiCard label="초안" count={kpi.draft} color="slate" />
@@ -1611,7 +1602,7 @@ export function StoreSignagePage() {
       )}
 
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
-      {!loading && !error && unifiedVideos.length > 0 && (
+      {!loading && !error && !listError && unifiedVideos.length > 0 && (
         <div className="relative mb-3">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -1623,7 +1614,7 @@ export function StoreSignagePage() {
           />
         </div>
       )}
-      {!loading && !error && unifiedVideos.length > 0 && (
+      {!loading && !error && !listError && unifiedVideos.length > 0 && (
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -1678,10 +1669,10 @@ export function StoreSignagePage() {
           <Loader2 className="w-5 h-5 animate-spin mr-2" />
           사이니지 목록을 불러오는 중...
         </div>
-      ) : error ? (
+      ) : (error || listError) ? (
         <div className="flex flex-col items-center justify-center py-20 text-red-500">
           <AlertCircle className="w-6 h-6 mb-2" />
-          <p className="text-sm">{error}</p>
+          <p className="text-sm">{listError || error}</p>
           <button onClick={fetchItems} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
         </div>
       ) : filteredUnified.length === 0 ? (
