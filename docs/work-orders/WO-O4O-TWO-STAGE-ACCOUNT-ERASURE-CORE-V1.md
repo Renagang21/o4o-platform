@@ -161,10 +161,12 @@ GCS adapter는 소유 bucket의 avatar에 대해 객체 metadata `o4o_owner_user
 
 ### 10.3 검증 및 통합 추적
 
-격리 PostgreSQL 실제 schema/합성 계정 테스트18개: 두 실제 HTTP 경로·실제 JWT/현재 DB role·보호 대상·scoped stop·중복/비FK 동시 writer·개인/타인 자료·최소 증빙·기존 access/refresh/handoff와 stale 발급·file failure/retry·ownership/inventory·restore fence·달력 µs/hold 검증 PASS. 실제 Google/Kakao OAuth나 실계정 테스트는 아니다.
+격리 PostgreSQL 실제 schema/합성 계정 테스트19개: 두 실제 HTTP 경로·실제 JWT/현재 DB role·보호 대상·scoped stop·중복/비FK 동시 writer·개인/타인 자료·최소 증빙·기존 access/refresh/handoff와 stale 발급·file failure/retry·ownership/inventory·restore fence·달력 µs/hold 검증 PASS. 실제 Google/Kakao OAuth나 실계정 테스트는 아니다.
 
 승인/정지 회귀7 suites157개, 인증 회귀6 suites182개, Admin UI6개, 설계 planner11개 PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 실제 Chromium에서 합성 API를 사용한 제거 control을1440/375/320 폭으로 확인(3 checks); 일반 사용자 전체 앱/OAuth 검증을 대체하지 않는다. storage SDK mock과 PR CI/검토·main/Delivery 최종 결과는 [공통 영향 CHECK](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md)에 기록한다.
 
 새 empty disposable DB에서 정식 migrate runner의 baseline→23단계 전체 적용·pre/post schema assertion PASS: 최종 `f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c`, 6613 lines. 격리 empty fixture down은 기존22단계 fingerprint로 복귀하며 up은 새 fingerprint를 재현했다. 운영 DB migration/기존 실제 row 조회·삭제0. 데이터가 존재하는 새 원장의 down은 거절하며 운영 복구는 별도 forward repair review다.
 
 법률 새 본문·게시/재동의·2년 해당성 판정과 마지막 사용자 테스트는 §8/TODO의 후속이다. 분회 전용 개발/배포와 이전 환경 삭제는 수행하지 않는다.
+
+재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB19개+storage mock4개=23 tests PASS.

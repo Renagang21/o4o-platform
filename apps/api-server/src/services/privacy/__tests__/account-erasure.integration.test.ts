@@ -46,7 +46,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const core=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:years,systemBasis:'isolated-synthetic-system',personalBuckets:['fixture-private'],storage});
     return {
       request:(id:string,actorId=fixtureAdminId)=>core.request(id,actorId),
-      resume:(id:string)=>core.resume(id),get:(id:string)=>core.get(id),
+      resume:(id:string,actorId=fixtureAdminId)=>core.resume(id,actorId),get:(id:string)=>core.get(id),
       retentionReport:(now?:Date,apply=false)=>core.retentionReport(now,apply),
     };
   };
@@ -140,6 +140,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(results.some(r=>r.erased)).toBe(true);
     expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(1);
     expect((await service().request(u.id)).erased).toBe(true);
+  });
+  it('retry rechecks current platform authority without changing the operation on revocation',async()=>{
+    const u=await user(),other=await user();
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'subject\',$1::text) WHERE id=$2',[u.id,other.id]);
+    const r=await service().request(u.id);expect(r.state).toBe('review_required');
+    await db.query("UPDATE role_assignments SET is_active=false WHERE user_id=$1",[fixtureAdminId]);
+    await expect(service().resume(r.operationId)).rejects.toMatchObject({code:'FORBIDDEN'});
+    expect((await service().get(r.operationId)).state).toBe('review_required');
   });
   it('an already-started non-FK writer commits before the erasure snapshot, never after false completion',async()=>{
     const target=await user(),peer=await user();const q=db.createQueryRunner();await q.startTransaction();

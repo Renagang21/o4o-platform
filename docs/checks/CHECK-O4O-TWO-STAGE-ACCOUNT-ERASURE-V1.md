@@ -44,7 +44,7 @@
 
 ## 검증 증거와 한계
 
-격리 PostgreSQL18, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c`,6613 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
+격리 PostgreSQL19, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c`,6613 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
 
 실계정/운영 DB/실제 GCS 데이터 테스트0. 새 기능은 기본 비활성이고 운영 migration·전수 개인 파일 inventory·법정1/2년 근거·writer 규모·외부 upload/orphan/버전/백업 검증 없이는 활성화하지 않는다. 기존 문서 제안의 전수 handler/자동 backoff/producer 계약이 모두 완료됐다고 판정하지 않는다.
 
@@ -61,7 +61,7 @@
 
 ## 격리 검증 재현 계약
 
-integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬18개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
+integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬19개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
 
 ```bash
 pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/privacy/__tests__/account-erasure.storage.test.ts
@@ -69,3 +69,5 @@ O4O_ERASURE_TEST_PORT=55469 pnpm --filter @o4o/api-server exec jest --runInBand 
 pnpm --filter @o4o/admin-dashboard exec vitest run src/pages/platform/account-governance/AccountErasureControls.test.tsx
 node scripts/db/check-migration-contract.mjs
 ```
+
+재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB19개+storage mock4개=23 tests PASS.

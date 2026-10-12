@@ -44,7 +44,7 @@ export async function respondErasure(req: Request, res: Response, action: 'reque
     const service = erasureService();
     const actorId=(req as Request & {user?:{id?:string}}).user?.id;
     const result = action === 'request' ? await service.request(req.params.id,actorId ?? '')
-      : action === 'get' ? await service.get(req.params.operationId) : await service.resume(req.params.operationId);
+      : action === 'get' ? await service.get(req.params.operationId) : await service.resume(req.params.operationId,actorId ?? '');
     res.status(result.erased || action === 'get' ? 200 : 202).json({ success: true, data: result });
   } catch (e) {
     const known = e instanceof AccountErasureError;

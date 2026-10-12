@@ -88,7 +88,7 @@ export class AccountErasureService {
       WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true`,[actorId]);
     if(!actor)throw new AccountErasureError('FORBIDDEN',403);
     const [known]=await this.db.query('SELECT id FROM account_erasure_operations WHERE subject_hash=$1',[hash(userId)]);
-    if(known)return this.resume(known.id);
+    if(known)return this.resume(known.id,actorId);
     const operationId = await this.db.transaction(async m => {
       await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
       await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hash(userId)]);
@@ -118,7 +118,7 @@ export class AccountErasureService {
       await this.audit(m,o.id,hash(userId),actorId,'requested');
       return o.id as string;
     });
-    return this.resume(operationId);
+    return this.resume(operationId,actorId);
   }
 
   async get(operationId: string): Promise<ErasureResult> {
@@ -129,9 +129,10 @@ export class AccountErasureService {
     return this.result(o);
   }
 
-  async resume(operationId: string): Promise<ErasureResult> {
+  async resume(operationId: string, actorId: string): Promise<ErasureResult> {
     if (!UUID.test(operationId)) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
     await this.ready();
+    if (!UUID.test(actorId ?? '')) throw new AccountErasureError('AUTH_REQUIRED',401);
     try {
       // Claim, source manifest and DB cleanup are serialised by subject + operation locks.
       const prepared = await this.db.transaction(async m => {
@@ -139,6 +140,9 @@ export class AccountErasureService {
         if (!hint) throw new AccountErasureError('ERASURE_OPERATION_NOT_FOUND', 404);
         await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
         await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hint.subject_hash]);
+        const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
+          WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true FOR SHARE OF u,ra`,[actorId]);
+        if(!actor)throw new AccountErasureError('FORBIDDEN',403);
         const [o]: Operation[] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE NOWAIT', [operationId]);
         if (o.state === 'completed') return false;
         await m.query("UPDATE account_erasure_operations SET state='processing',error_code=NULL,updated_at=now() WHERE id=$1", [operationId]);
@@ -158,14 +162,14 @@ export class AccountErasureService {
         return true;
       });
       if (prepared) {
-        await this.removeFiles(operationId);
+        await this.removeFiles(operationId,actorId);
         // First pass commits the generation manifest; second performs that exact deletion.
-        await this.removeFiles(operationId);
-        await this.finish(operationId);
+        await this.removeFiles(operationId,actorId);
+        await this.finish(operationId,actorId);
       }
     } catch (e) {
       if((e as {code?:string}).code==='55P03')return this.get(operationId);
-      if (e instanceof AccountErasureError && ['ERASURE_OPERATION_NOT_FOUND','INVALID_OPERATION_ID'].includes(e.code)) throw e;
+      if (e instanceof AccountErasureError && ['ERASURE_OPERATION_NOT_FOUND','INVALID_OPERATION_ID','FORBIDDEN','AUTH_REQUIRED'].includes(e.code)) throw e;
       const code = e instanceof AccountErasureError ? e.code : 'ERASURE_STEP_FAILED';
       // Never log a SQL error's detail, source profile or GCS path.
       const review = code.includes('REVIEW_REQUIRED');
@@ -355,8 +359,15 @@ export class AccountErasureService {
     if (!operationId) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
   }
 
-  private async removeFiles(operationId: string): Promise<void> {
+  private async assertActor(m:EntityManager,actorId:string):Promise<void> {
+    const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
+      WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true FOR SHARE OF u,ra`,[actorId]);
+    if(!actor)throw new AccountErasureError('FORBIDDEN',403);
+  }
+
+  private async removeFiles(operationId: string,actorId: string): Promise<void> {
     await this.db.transaction(async m => {
+      await this.assertActor(m,actorId);
       const [o] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE', [operationId]);
       if (o.state === 'completed') return;
       const tasks = await m.query("SELECT * FROM account_erasure_file_tasks WHERE operation_id=$1 AND state IN ('pending','retry_required') FOR UPDATE", [operationId]);
@@ -376,11 +387,12 @@ export class AccountErasureService {
     });
   }
 
-  private async finish(operationId: string): Promise<void> {
+  private async finish(operationId: string,actorId: string): Promise<void> {
     await this.db.transaction(async m => {
       const [hint] = await m.query('SELECT subject_hash FROM account_erasure_operations WHERE id=$1', [operationId]);
       await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
       await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hint.subject_hash]);
+      await this.assertActor(m,actorId);
       const [o]: Operation[] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE', [operationId]);
       if (o.state === 'completed') return;
       await m.query("UPDATE account_erasure_operations SET state='processing' WHERE id=$1", [operationId]);
