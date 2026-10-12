@@ -50,7 +50,7 @@ export interface UnifiedStoreContextValue {
   organizationName: string | null;
   services: StoreServiceMembership[];
   /**
-   * §8-4 서비스 문맥(2차 축). 이 매장의 활성 enrollment 중 canonical 우선순위(KPA → KCos → PH)로 고른 공통 문맥.
+   * §8-4 서비스 문맥(2차 축). 이 매장의 활성 enrollment 중 canonical 우선순위(KPA)로 고른 공통 문맥.
    * 내 매장(/store) · 매장 HUB(/hub) 의 백엔드 호출은 이 문맥으로 나간다. null = 이용 가능한 서비스 업무공간 없음.
    */
   commonServiceKey: UnifiedServiceKey | null;
