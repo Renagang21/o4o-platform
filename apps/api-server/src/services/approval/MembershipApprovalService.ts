@@ -227,7 +227,6 @@ export class StoreOwnerBusinessInfoRequiredError extends Error {
 
 const STORE_OWNER_BUSINESS_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
   'k-cosmetics': 'cosmetics:store_owner',
-  'pharmacy-hub': 'pharmacy-hub:store_owner',
 };
 const STORE_OWNER_REQUIRED_BUSINESS_FIELDS = [
   'businessName',
@@ -423,6 +422,7 @@ export class MembershipApprovalService {
       }
 
       const membership = selectResult[0] as ApproveResult;
+      if (membership.service_key === 'pharmacy-hub') throw new Error('SERVICE_RETIRED');
       const userId = membership.user_id;
 
       logger.info('[APPROVAL][STEP0] membership locked', {
@@ -954,6 +954,7 @@ export class MembershipApprovalService {
         return null;
       }
 
+      if (selectResult.some((m: any) => m.service_key === 'pharmacy-hub')) throw new Error('SERVICE_RETIRED');
       const membershipIds = selectResult.map((m: any) => m.id);
       const roles = selectResult.map((m: any) => m.role).filter(Boolean);
 

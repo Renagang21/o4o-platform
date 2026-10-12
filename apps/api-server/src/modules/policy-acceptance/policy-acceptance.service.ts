@@ -50,7 +50,6 @@ const MANDATORY_AGREEMENT_TYPES: ReadonlySet<string> = new Set([REQUIRED_POLICY_
 const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
   'kpa-society': 'kpa:store_owner',
   'k-cosmetics': 'cosmetics:store_owner',
-  'pharmacy-hub': 'pharmacy-hub:store_owner',
 };
 
 /** 승낙 당시 본문 동일성 검증용 안정 hash (WO §5). 게시 도구 sha256 과 같은 입력(원문 그대로). */

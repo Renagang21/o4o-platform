@@ -190,14 +190,14 @@ const COMPLETE_BUSINESS_INFO = {
   businessPhone: '02-000-0000',
 };
 
-const ALL_KEYS = ['pharmacy-hub', 'kpa-society', 'neture', 'k-cosmetics'];
+const ALL_KEYS = ['k-cosmetics', 'kpa-society', 'neture'];
 
 beforeEach(() => {
   committed = false;
   rolledBack = false;
   db = {
     memberships: [
-      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy-hub:store_owner', status: 'pending' },
+      { id: 'm-ph', user_id: 'u1', service_key: 'k-cosmetics', role: 'cosmetics:store_owner', status: 'pending' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'active' },
     ],
     roles: [
@@ -205,7 +205,7 @@ beforeEach(() => {
       { id: 'ra-neture', user_id: 'u1', role: 'neture:supplier', is_active: true },
     ],
     kpaMembers: [{ user_id: 'u1', status: 'active' }],
-    // pharmacy-hub store_owner 승인 게이트(§4 사업자정보 5항목)를 통과하는 완비 픽스처
+    // k-cosmetics store_owner 승인 게이트(§4 사업자정보 5항목)를 통과하는 완비 픽스처
     users: [{ id: 'u1', status: 'pending', businessInfo: COMPLETE_BUSINESS_INFO }],
     cosmeticsMembers: [],
   };
@@ -225,8 +225,8 @@ describe('rejectMembership — 반환값 정합성 (D2)', () => {
     expect(result).not.toBeNull();
     expect(result!.id).toBe('m-ph');
     expect(result!.user_id).toBe('u1');
-    expect(result!.service_key).toBe('pharmacy-hub');
-    expect(result!.role).toBe('pharmacy-hub:store_owner');
+    expect(result!.service_key).toBe('k-cosmetics');
+    expect(result!.role).toBe('cosmetics:store_owner');
     expect(result!.status).toBe('rejected');
     expect(result!.rejection_reason).toBe('서류 미비');
     expect(committed).toBe(true);
@@ -257,17 +257,17 @@ describe('rejectMembership — 반환값 정합성 (D2)', () => {
 
 describe('rejectMembership — role 격리 (D3)', () => {
   it('대상 서비스 role 만 비활성화하고 다른 서비스 role 은 불변', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
 
     await reject('m-ph');
 
-    expect(db.roles.find((r) => r.role === 'pharmacy-hub:store_owner')!.is_active).toBe(false);
+    expect(db.roles.find((r) => r.role === 'cosmetics:store_owner')!.is_active).toBe(false);
     expect(db.roles.find((r) => r.role === 'neture:supplier')!.is_active).toBe(true);
     expect(db.roles.find((r) => r.role === 'member')!.is_active).toBe(true);
   });
 
   it('role row 를 삭제하지 않는다', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
     const before = db.roles.length;
     await reject('m-ph');
     expect(db.roles.length).toBe(before);
@@ -313,7 +313,7 @@ describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEME
 
     expect(rolledBack).toBe(true);
     expect(committed).toBe(false);
-    expect(db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner' && r.is_active)).toHaveLength(0);
+    expect(db.roles.filter((r) => r.role === 'cosmetics:store_owner' && r.is_active)).toHaveLength(0);
   });
 
   it('누락 항목을 missingFields 로 보고한다', async () => {
@@ -335,13 +335,13 @@ describe('매장 경영자 승인 게이트 — 사업자정보 5항목 (AGREEME
 
 describe('재승인 정합성 (§4.3)', () => {
   it('rejected → approved 시 기존 role row 를 재활성화하고 중복 active row 를 만들지 않는다', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
 
     await reject('m-ph');
     const approved = await approve('m-ph');
 
     expect(approved!.status).toBe('active');
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
+    const phRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
     expect(phRoles).toHaveLength(1);
     expect(phRoles[0].is_active).toBe(true);
     expect(phRoles[0].id).toBe('ra-ph');
@@ -349,19 +349,19 @@ describe('재승인 정합성 (§4.3)', () => {
 
   it('기존 role row 가 없으면 생성한다', async () => {
     await approve('m-ph');
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
+    const phRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
     expect(phRoles).toHaveLength(1);
     expect(phRoles[0].is_active).toBe(true);
   });
 
   it('반려 → 승인 → 반려 를 반복해도 unique constraint 를 위반하지 않는다', async () => {
-    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'pharmacy-hub:store_owner', is_active: true });
+    db.roles.push({ id: 'ra-ph', user_id: 'u1', role: 'cosmetics:store_owner', is_active: true });
 
     await reject('m-ph');
     await approve('m-ph');
     await reject('m-ph');
 
-    const phRoles = db.roles.filter((r) => r.role === 'pharmacy-hub:store_owner');
+    const phRoles = db.roles.filter((r) => r.role === 'cosmetics:store_owner');
     expect(phRoles).toHaveLength(1);
     expect(phRoles[0].is_active).toBe(false);
   });
@@ -374,3 +374,13 @@ it('operator rejection cannot restrict an active member or touch other services'
   expect(db.users[0].status).toBe('pending');
   expect(rolledBack).toBe(true);
 });
+
+ it('retired PH membership cannot be approved even through an ID-only request', async () => {
+   db.memberships[0].service_key = 'pharmacy-hub';
+   db.memberships[0].role = 'pharmacy-hub:store_owner';
+   await expect(approve('m-ph', ['pharmacy-hub'])).rejects.toThrow('SERVICE_RETIRED');
+   expect(committed).toBe(false);
+   expect(rolledBack).toBe(true);
+   expect(db.memberships[0].status).toBe('pending');
+   expect(db.roles.some(r => String(r.role).startsWith('pharmacy-hub:'))).toBe(false);
+ });

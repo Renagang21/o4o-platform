@@ -52,7 +52,7 @@ beforeEach(() => {
 });
 
 describe('authenticated entry does not grant service access', () => {
-  it.each(['kpa-society', 'pharmacy-hub', 'lecture'])('nonmember can move to %s introduction without membership writes', async (target) => {
+  it.each(['kpa-society', 'lecture'])('nonmember can move to %s introduction without membership writes', async (target) => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockHandoffRes();
     await HandoffController.generateHandoff(req({ targetServiceKey: target }, 'https://neture.co.kr'), res);

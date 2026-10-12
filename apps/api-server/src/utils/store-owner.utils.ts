@@ -66,7 +66,6 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
   //   `kpa` 매장 판정 자체는 아래 isStoreOwner 에서 내 매장(약국) 신청 원장으로 한다 — 이 목록은 role 기반 소비처용.
   kpa: ['kpa:store_owner', 'neture:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
-  'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
 
 /**
@@ -131,7 +130,7 @@ export async function isStoreOwner(
   preferredOrganizationId?: string | null,
 ): Promise<StoreOwnerCheckResult> {
   const allowedRoles: readonly string[] = serviceKey
-    ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
+    ? (STORE_OWNER_ROLES_BY_SERVICE[serviceKey] ?? [])
     : ALL_STORE_OWNER_ROLES;
 
   // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7

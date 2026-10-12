@@ -119,7 +119,6 @@ describe('Store ↔ Service (1 Store : N Services)', () => {
     expect(r.services.map((s) => [s.serviceKey, s.enrollmentStatus, s.workspaceAvailable])).toEqual([
       ['k-cosmetics', 'inactive', false],
       ['kpa-society', 'active', true],
-      ['pharmacy-hub', 'active', false],
     ]);
     expect(r.services.every((s) => s.organizationId === STORE_A)).toBe(true);
     // 1) organization_members 소유 후보 → 2) 그 조직으로 스코프된 enrollment 질의
@@ -216,11 +215,8 @@ describe('Service ↔ Store (1 Service : N Stores)', () => {
       { organization_id: STORE_A, service_code: 'pharmacy-hub', status: 'active' },
       { organization_id: 'org-c', service_code: 'pharmacy-hub', status: 'inactive' },
     ]]);
-    const list = await listEnrolledStoreOrganizationIds(dataSource, 'pharmacy-hub', { includeInactive: true });
-    expect(list).toEqual([
-      { organizationId: STORE_A, enrollmentStatus: 'active' },
-      { organizationId: 'org-c', enrollmentStatus: 'inactive' },
-    ]);
+    expect(await listEnrolledStoreOrganizationIds(dataSource, 'pharmacy-hub', { includeInactive: true })).toEqual([]);
+
   });
 
   it('서비스 identity 가 아닌 키는 질의 없이 빈 목록', async () => {
@@ -242,13 +238,12 @@ describe('Operator ↔ Service (1 Operator : N Services)', () => {
 
     expect(list.map((s) => [s.serviceKey, s.scope, s.workspaceAvailable])).toEqual([
       ['kpa-society', 'operator', true],
-      ['pharmacy-hub', 'admin', false],
     ]);
     expect(norm(calls[0].sql)).toContain('role_assignments');
     expect(calls[0].params).toEqual([USER_X]);
     // membership 질의는 canonical key 로 (별칭 'kpa' 아님)
     expect(calls[1].params).toEqual([USER_X, 'kpa-society']);
-    expect(calls[2].params).toEqual([USER_X, 'pharmacy-hub']);
+    expect(calls).toHaveLength(2);
   });
 
   it('role 만 있고 membership 이 active 가 아니면 운영 서비스가 아니다 (membership guard 와 동일 정책)', async () => {

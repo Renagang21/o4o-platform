@@ -83,7 +83,6 @@ const SERVICE_OPTIONS = [
   { value: 'neture', label: 'Neture' },
   { value: 'kpa-society', label: 'KPA' },
   { value: 'k-cosmetics', label: 'K-Cosmetics' },
-  { value: 'pharmacy-hub', label: 'Pharmacy-Hub' },
   { value: 'lecture', label: 'O4O 강의' },
   { value: 'lms', label: 'LMS (Legacy)' },
 ];

@@ -137,7 +137,6 @@ const COMPLETE_BUSINESS_INFO = {
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
   { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
   { serviceKey: 'neture', prefix: 'neture' },
 ];
 

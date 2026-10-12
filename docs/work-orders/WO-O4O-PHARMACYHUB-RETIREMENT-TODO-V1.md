@@ -1,11 +1,11 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-12): PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
+> 현재(2026-10-12): 최종 제거 범위에 PH 도메인/DNS/인증서 종료 포함. 다른 작업 종료 전 운영 변경 대기. PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
-사용자는 PH 재사용·전용 데이터 보존이 불필요하며 PH 전용 데이터 삭제도 승인했다. 다른 서비스의 공용 행·기능은 삭제 대상이 아니다. 기존 QR 연결용 도메인·DNS·인증서는 유지한다. 기존의 데이터 삭제 승인 대기 문구는 이 명시적 승인으로 해소됐다. 삭제 대상 귀속·FK·타 서비스 영향 확인은 계속 필요하다.
+사용자는 PH 재사용·전용 데이터 보존이 불필요하며 PH 전용 데이터 삭제도 승인했다. 다른 서비스의 공용 행·기능은 삭제 대상이 아니다. 기존 QR 연결 보존은 2026-10-12 사용자 후속 승인으로 철회됐다. PH 도메인·DNS·인증서 연결도 종료한다. 기존의 데이터 삭제 승인 대기 문구는 이 명시적 승인으로 해소됐다. 삭제 대상 귀속·FK·타 서비스 영향 확인은 계속 필요하다.
 
 - [x] PR #417 CI·리뷰 확인 후 main 병합.
 - [x] 전체 PH 호스트 리다이렉트 초안/실행 옵션 준비(`retire_host=true`). PH default backend·pathRules 참조를 제거하고 다른 host/matcher는 보존. 302·path/query 유지.
@@ -243,3 +243,30 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 실제 read-only 인증 smoke [38187804879](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879)은 main 7ebd3548cb에서 SUCCESS다. WIF auth (read-only) job이 실행·성공했고 WIF_AUTH_PASS를 확인했다. GCP 인증, project 및 기존 core API serving metadata 조회만 수행했으며 배포·삭제·DB write·secret version 조회는 없었다. 제거 결과 기록 PR #492는 main 7ebd3548cb에 병합됐고 main 후속 CI 38187554411도 SUCCESS다.
 
 전용 Cloud 자원 제거/12개 규칙 검증/일시 인증 제한 복구 phase는 완료다. PH-only DB·공용 코드 잔여 제거는 여전히 미완료이며 전체 WO는 ACTIVE·worktree KEEP다. 동일 WO 연속 결과 기록 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-auth-restoration-result를 사용한다. 이번 변경은 문서-only, 업무 앱 배포 NOT_APPLICABLE이다.
+
+## 최종 제거 연속 phase — 2026-10-12
+
+사용자는 PH 데이터가 사용자 사용 이력 없는 개발 데이터뿐이며 PH·유사 개발 계획이 없고, 공통화 대상은 이미 서비스별 서브도메인으로 분리됐음을 확인했다. PH 전용 데이터 보존과 런타임 호환 유지, 인쇄 QR 연결 보존 예외를 철회하고 PH 전용 도메인/DNS/인증서 종료까지 승인했다. 공유 Neture/KPA 기능·사용자·조직·제품 master 전체 삭제 승인은 아니다.
+
+최신 main `0db33efda8fb380ac08243fc5286707db414316c`와 지정 worktree의 동일 WO 연속 branch `wo/pharmacyhub-final-code-data-retirement`에서 진행한다. 기존 기준 checkout의 branch·파일은 변경하지 않는다.
+
+- [x] 최신 main과 실제 소비처 조사. 전용 앱/API/배포 job은 이미 없음.
+- [x] 서비스·역할·공급 opt-in·fulfillment PH 등록 제거, 공용 membership/약관/조직 처리의 PH 매핑 제거, 사용 참조 없는 KPA `PharmacyHubLayout` 삭제.
+- [x] 삭제된 PH scope가 서비스 중립 API로 fallback하지 않도록 요청 경계에서 410 차단. 현재 Neture/KPA·hospital-pharmacy 요청은 유지.
+- [x] 읽기 전용 운영 census [38195246677](https://github.com/Renagang21/o4o-platform/actions/runs/38195246677) SUCCESS. DB write 0. PH 전용 테이블 0; 공용 테이블의 PH scope는 아래와 같이 남음.
+- [ ] 변경 코드 CI·리뷰·main 반영 및 API/Admin/관련 공용 패키지 소비 앱 배포.
+- [ ] 실제 schema/FK/공유 소비처를 기준으로 PH row와 전용 종속 row 삭제 계획 고정·단독 운영 창에서 transaction 삭제·잔여 검증.
+- [ ] PH-only 공급 scope 19건 제거 시 빈 service_keys가 기본 공급으로 노출되지 않도록 상품 귀속·비활성화/삭제 순서 검증.
+- [ ] PH 도메인 DNS 관리 주체·인증서 공유 소비처 조사 후 DNS/PH redirect/전용 인증서 종료. 공유 LB·IP는 유지.
+- [ ] 종료 후 PH-only workflow/도구 및 WIF workflow 허용 항목 정리. 현재 workflow는 Demo/Store 정리도 수행하므로 전체 파일을 바로 삭제하지 않음.
+- [ ] 과거 migration 변경은 schema 재구축 및 적용 history 정합 조사 후 판정. 이번 phase에서 기존 migration·DB history 삭제/재실행 없음.
+
+운영 census: checkout_orders PH metadata 6건, o4o_payments PH sourceService/metadata 각 6건(겹치므로 합산 금지), supplier_product_offers PH service_keys 19건, offer_service_approvals 18건, offer_service_prices 1건, service_memberships service_key 2건/role 1건(겹침), role_assignments role 3건, roles 5건, platform_services 1건, service_policy_documents 3건, user_policy_acceptances 2건, service_legal_profiles 1건, service_audience_policies 1건, cms_contents 3건, forum_category_requests 1건, media_assets 4건, action_logs 33건, o4o_event_logs 5건. FK는 checkout_payments·content slots·forum posts·media links·role permissions·policy acceptances 등의 종속 관계를 포함한다. 숫자는 scope별 건수이며 삭제 총량이 아니다.
+
+현재 도메인 두 개는 DNS가 기존 LB를 가리키며 12개 synthetic redirect 검사가 302/path/query 일치다. 이는 제거 전 현재 상태이지 최종 보존 정책이 아니다. Cloud census의 run describe는 UNAVAILABLE이며, 다른 성공한 자원 plan에서 확인된 부재를 이번 census 오류만으로 다시 확정하지 않는다.
+
+사용자는 다른 작업이 끝날 때까지 운영 변경 대기를 지시했다. main 통합·DB·DNS·인증서 변경·배포는 해당 종료 확인 후 단독 진행한다. 이 환경에는 직접 GCP 관리 identity가 없다. GitHub production workflow의 읽기 전용 census는 실행 가능하지만 새 DB 삭제/DNS/인증서 삭제는 아직 실행하지 않았다.
+
+검증: focused Jest 12 suites / 220 tests PASS. Admin 타입 검사 PASS. API 타입 검사의 market-trial initialHistory 오류는 main 소스가 아닌 오래된 market-trial dist 때문에 발생했고 패키지 재빌드 후 API 타입 검사 PASS. PH 전용 서비스/도메인 삭제를 위한 직접 GCP 관리자 identity는 없으며 새 운영 write/정리 도구·실행은 미완료다. DB 삭제 전 과거 포럼 partition의 비공개 데이터 격리와 공용 파기 보호 목록은 유지한다. 이 보호용 PH 참조는 서비스 재사용 등록이 아니며 데이터 삭제 후 제거한다.
+
+추가 검증: Node 22.18.0에서 관련 API 회귀 175 suites를 조사해 172 suites PASS, 폐기 전 PH를 현행 서비스로 전제한 승인/복구 3 suites는 현행 서비스 fixture로 정렬 후 모두 PASS. 기존 11 skipped suites는 실행 PASS로 세지 않는다. 신규 retired-request 경계 13 tests PASS. API/Admin/KPA 타입 검사 PASS. Node 24 런타임과 기존 better-sqlite3(Node 22) ABI 차이는 저장소 밖에 설치한 기준 Node 22.18.0으로 해소했고 native DB-backed validity 회귀도 실행됐다. 기존 SQL/기능 assertion을 끄지 않고 폐기된 producer 테스트를 제거·거절 회귀로 대체했다.

@@ -10,7 +10,6 @@ import {
   type ExposureOfferRow,
 } from '../offer-exposure-strategy.js';
 import { APPROVAL_ELIGIBLE_SERVICE_KEYS } from '../../../modules/neture/constants/approval-service-keys.js';
-import { SUPPLIER_OPTIN_SERVICE_KEYS } from '../../../modules/neture/constants/supplier-optin-services.js';
 
 const row = (over: Partial<ExposureOfferRow> = {}): ExposureOfferRow => ({
   id: 'offer-1',
@@ -41,23 +40,16 @@ const ctx = (over: Partial<{ buyerId: string; serviceKey: string; organizationId
 });
 
 describe('공급 축 상호 배타 (§5)', () => {
-  it('승인 축과 opt-in 축은 교집합이 없다', () => {
-    const optin = new Set<string>(SUPPLIER_OPTIN_SERVICE_KEYS);
-    expect(APPROVAL_ELIGIBLE_SERVICE_KEYS.filter((k) => optin.has(k))).toEqual([]);
-  });
-
   it('한 serviceKey 는 정확히 하나의 strategy 로만 해석된다', () => {
     for (const key of APPROVAL_ELIGIBLE_SERVICE_KEYS) {
       expect(resolveOfferExposureStrategy(key)?.key).toBe('approval');
-    }
-    for (const key of SUPPLIER_OPTIN_SERVICE_KEYS) {
-      expect(resolveOfferExposureStrategy(key)?.key).toBe('optin');
     }
     expect(resolveOfferExposureStrategy('neture')?.key).toBe('neture');
   });
 
   it('등록되지 않은 serviceKey 는 B2B 확정 대상이 아니다', () => {
     expect(resolveOfferExposureStrategy('unknown-service')).toBeNull();
+    expect(resolveOfferExposureStrategy('pharmacy-hub')).toBeNull();
   });
 });
 
@@ -102,37 +94,6 @@ describe('approval strategy (§30)', () => {
       'DISTRIBUTION_DENIED',
     );
     expect(s.gate(row({ distribution_type: 'SERVICE' }), ctx())).toBeNull();
-  });
-});
-
-describe('optin strategy (§30)', () => {
-  const s = OFFER_EXPOSURE_STRATEGIES.optin;
-
-  it('공급자 opt-in(service_keys) 을 SQL 에서 강제한다', () => {
-    expect(s.offerWhereSql).toContain('$2 = ANY(spo.service_keys)');
-    expect(s.offerWhereSql).not.toContain('offer_service_approvals');
-  });
-
-  it('운영자 승인(approval_status)을 요구하지 않는다', () => {
-    expect(s.gate(row({ approval_status: 'PENDING' }), ctx({ serviceKey: 'pharmacy-hub' }))).toBeNull();
-  });
-
-  it('조직 컨텍스트를 요구하지 않는다', () => {
-    expect(
-      s.gate(row({ distribution_type: 'SERVICE' }), ctx({ serviceKey: 'pharmacy-hub', organizationId: null })),
-    ).toBeNull();
-  });
-
-  it('PRIVATE 유통은 축이 없으므로 거부한다', () => {
-    expect(s.gate(row({ distribution_type: 'PRIVATE' }), ctx({ serviceKey: 'pharmacy-hub' }))?.code).toBe(
-      'DISTRIBUTION_DENIED',
-    );
-  });
-
-  it('마스터가 비활성이면 거부한다', () => {
-    expect(s.gate(row({ master_status: 'ARCHIVED' }), ctx({ serviceKey: 'pharmacy-hub' }))?.code).toBe(
-      'MASTER_INACTIVE',
-    );
   });
 });
 

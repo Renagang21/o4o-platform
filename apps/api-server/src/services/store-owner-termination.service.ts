@@ -9,7 +9,7 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from './auth/demo-account.service.js';
 
-export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society', 'k-cosmetics', 'pharmacy-hub'] as const;
+export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society', 'k-cosmetics'] as const;
 export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number];
 
 type CaseStatus =
@@ -32,7 +32,6 @@ interface ServiceConfig {
 const SERVICE_CONFIG: Record<StoreOwnerContractServiceKey, ServiceConfig> = {
   'kpa-society': { role: 'kpa:store_owner', contentKeys: ['kpa', 'kpa-society'], slugKeys: ['kpa'] },
   'k-cosmetics': { role: 'cosmetics:store_owner', contentKeys: ['k-cosmetics', 'cosmetics'], slugKeys: ['cosmetics'] },
-  'pharmacy-hub': { role: 'pharmacy-hub:store_owner', contentKeys: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
 };
 
 /** 공유 Store 데이터 보호 시 현재 store-capable enrollment 로 취급할 축. */

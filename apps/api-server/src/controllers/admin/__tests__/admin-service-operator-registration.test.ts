@@ -122,8 +122,8 @@ function mockRes() {
 const body = (overrides: Record<string, unknown> = {}) => ({
   body: {
     email: 'ph-op@example.com',
-    roles: ['pharmacy-hub:operator'],
-    serviceKey: 'pharmacy-hub',
+    roles: ['lecture:operator'],
+    serviceKey: 'lecture',
     ...overrides,
   },
 });
@@ -138,8 +138,8 @@ describe('resolveOperatorTargetServiceKey — 대상 서비스는 하나다', ()
   it('role prefix 를 canonical service_key 로 변환한다 (SSOT 위임)', () => {
     expect(resolveOperatorTargetServiceKey(['kpa:operator']).serviceKey).toBe('kpa-society');
     expect(resolveOperatorTargetServiceKey(['cosmetics:admin']).serviceKey).toBe('k-cosmetics');
-    // pharmacy-hub 는 role prefix 와 canonical key 가 같다 — 로컬 매핑을 만들 이유가 없다.
-    expect(resolveOperatorTargetServiceKey(['pharmacy-hub:operator']).serviceKey).toBe('pharmacy-hub');
+    // lecture 는 role prefix 와 canonical key 가 같다 — 로컬 매핑을 만들 이유가 없다.
+    expect(resolveOperatorTargetServiceKey(['lecture:operator']).serviceKey).toBe('lecture');
   });
 
   it('platform · 무접두 legacy role 은 서비스 축 대상이 아니다', () => {
@@ -155,7 +155,7 @@ describe('resolveOperatorTargetServiceKey — 대상 서비스는 하나다', ()
   });
 
   it('명시 serviceKey 가 role 파생 키와 다르면 거절한다 (SERVICE_KEY_MISMATCH)', () => {
-    const r = resolveOperatorTargetServiceKey(['kpa:operator'], 'pharmacy-hub');
+    const r = resolveOperatorTargetServiceKey(['kpa:operator'], 'lecture');
     expect(r.error?.code).toBe('SERVICE_KEY_MISMATCH');
   });
 
@@ -223,10 +223,10 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
 
     expect(rec.users).toHaveLength(0);
     expect(rec.roles).toEqual([
-      expect.objectContaining({ userId: 'user-1', role: 'pharmacy-hub:operator', inTransaction: true }),
+      expect.objectContaining({ userId: 'user-1', role: 'lecture:operator', inTransaction: true }),
     ]);
     expect(rec.memberships).toHaveLength(1);
-    expect(rec.memberships[0]).toMatchObject({ serviceKey: 'pharmacy-hub', status: 'active', role: 'operator' });
+    expect(rec.memberships[0]).toMatchObject({ serviceKey: 'lecture', status: 'active', role: 'operator' });
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
@@ -247,7 +247,7 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
   it('기존 membership 은 상태를 승격하지 않고 그대로 보고한다', async () => {
     const rec = installDataSource({
       existingUser: EXISTING_USER,
-      existingMembership: { userId: 'user-1', serviceKey: 'pharmacy-hub', status: 'suspended' },
+      existingMembership: { userId: 'user-1', serviceKey: 'lecture', status: 'suspended' },
     });
     const res = mockRes();
 
@@ -256,7 +256,7 @@ describe('createUser — 기존 사용자에게 서비스 운영자 역할 추�
     expect(rec.memberships).toHaveLength(0); // 생성 0 — 기존 행을 건드리지 않는다
     expect(res.json.mock.calls[0][0]).toMatchObject({
       membershipPolicy: 'KEEP_EXISTING_STATUS',
-      membershipStatuses: { 'pharmacy-hub': 'suspended' },
+      membershipStatuses: { 'lecture': 'suspended' },
     });
   });
 });

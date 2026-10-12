@@ -17,40 +17,18 @@
  *   approval  : kpa-society / k-cosmetics
  *               `offer_service_approvals` 에 해당 serviceKey 승인(APPROVED) 행이 있어야 한다.
  *               `service_keys` opt-in 만으로 우회할 수 없다.
- *   optin     : pharmacy-hub
- *               공급자가 직접 켠 축 — `serviceKey = ANY(spo.service_keys)`. 운영자 승인 게이트 없음.
  *   neture    : neture
  *               Neture 원본 공급 정책 — approval_status / distribution_type / allowed_seller_ids.
  *               서비스 노출 junction 을 쓰지 않는다(공급자 자신의 홈 서비스).
  *
- * 두 SSOT(`APPROVAL_ELIGIBLE_SERVICE_KEYS` · `SUPPLIER_OPTIN_SERVICE_KEYS`)의 상호 배타
- * 계약은 이 파일 로드 시점에 fail-fast 로 강제한다 — 한 키가 두 축에 동시에 들어가면
- * 승인 게이트가 조용히 우회된다.
+ * PH 직접 opt-in은 완전 폐기로 제거됐다. 등록되지 않은 서비스는 주문 확정 불가.
  */
 
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import {
-  APPROVAL_ELIGIBLE_SERVICE_KEYS,
   isApprovalEligibleServiceKey,
 } from '../../modules/neture/constants/approval-service-keys.js';
-import {
-  SUPPLIER_OPTIN_SERVICE_KEYS,
-  isSupplierOptinServiceKey,
-} from '../../modules/neture/constants/supplier-optin-services.js';
-
-/** 두 공급 축이 겹치면 승인 게이트가 조용히 무력화된다 — 부팅 시점에 막는다. */
-(function assertMutuallyExclusiveSupplyAxes(): void {
-  const optin = new Set<string>(SUPPLIER_OPTIN_SERVICE_KEYS);
-  const overlap = APPROVAL_ELIGIBLE_SERVICE_KEYS.filter((k) => optin.has(k));
-  if (overlap.length > 0) {
-    throw new Error(
-      `[OfferExposureStrategy] 승인 축과 opt-in 축에 동시에 속한 serviceKey 가 있습니다: ${overlap.join(', ')}. ` +
-        '두 목록은 상호 배타여야 한다(승인 게이트 우회 방지).',
-    );
-  }
-})();
-
-export type OfferExposureStrategyKey = 'approval' | 'optin' | 'neture';
+export type OfferExposureStrategyKey = 'approval' | 'neture';
 
 /** 공급 노출 판정에 쓰이는 offer 행 (Core 의 공통 SELECT 결과) */
 export interface ExposureOfferRow {
@@ -146,28 +124,6 @@ const approvalStrategy: OfferExposureStrategy = {
 };
 
 /**
- * 공급자 직접 opt-in 축 (Pharmacy-Hub).
- *
- * 조회(`PharmacyHubStoreProductController` EXPOSURE_GATE_SQL)와 **같은 기준**으로 재검증한다 —
- * 조회에 보이면 담을 수 있고, 담을 수 있으면 주문 시점에 같은 기준으로 다시 본다.
- * `approval_status` 는 보지 않는다(승인 대상 2키 파생값이라 PENDING 이 정상).
- */
-const optinStrategy: OfferExposureStrategy = {
-  key: 'optin',
-  offerWhereSql: `
-          AND $2 = ANY(spo.service_keys)`,
-  gate(offer) {
-    if (offer.distribution_type === 'PRIVATE') {
-      return { code: 'DISTRIBUTION_DENIED', reason: `구매할 수 없는 상품입니다: ${offer.product_name}` };
-    }
-    if (offer.master_status !== 'ACTIVE') {
-      return { code: 'MASTER_INACTIVE', reason: `이용할 수 없는 상품입니다: ${offer.product_name}` };
-    }
-    return null;
-  },
-};
-
-/**
  * Neture 원본 공급 정책.
  *
  * 서비스 노출 junction 을 쓰지 않는다 — 공급자가 자기 홈 서비스에서 파는 축이다.
@@ -198,7 +154,6 @@ const netureStrategy: OfferExposureStrategy = {
 export const OFFER_EXPOSURE_STRATEGIES: Readonly<Record<OfferExposureStrategyKey, OfferExposureStrategy>> =
   Object.freeze({
     approval: approvalStrategy,
-    optin: optinStrategy,
     neture: netureStrategy,
   });
 
@@ -210,7 +165,6 @@ export const OFFER_EXPOSURE_STRATEGIES: Readonly<Record<OfferExposureStrategyKey
  */
 export function resolveOfferExposureStrategy(serviceKey: string): OfferExposureStrategy | null {
   if (isApprovalEligibleServiceKey(serviceKey)) return approvalStrategy;
-  if (isSupplierOptinServiceKey(serviceKey)) return optinStrategy;
   if (serviceKey === SERVICE_KEYS.NETURE) return netureStrategy;
   return null;
 }

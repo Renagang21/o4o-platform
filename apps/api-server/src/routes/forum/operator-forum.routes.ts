@@ -74,7 +74,6 @@ const SERVICE_CODE_TO_RBAC_KEY: Record<string, ServiceKey> = {
   neture: 'neture',
   'k-cosmetics': 'cosmetics',
   'kpa-society': 'kpa',
-  'pharmacy-hub': 'pharmacy-hub',
 };
 
 const VALID_SERVICE_CODES = Object.keys(SERVICE_CODE_TO_RBAC_KEY);

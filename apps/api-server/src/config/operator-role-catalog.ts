@@ -22,8 +22,6 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   'kpa:operator',
   'neture:admin',
   'neture:operator',
-  'pharmacy-hub:admin',
-  'pharmacy-hub:operator',
   'lecture:admin',
   'lecture:operator',
   'cosmetics:admin',

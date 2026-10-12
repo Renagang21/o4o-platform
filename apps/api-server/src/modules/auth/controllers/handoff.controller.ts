@@ -353,6 +353,10 @@ export class HandoffController extends BaseController {
         );
       }
 
+      if (payload.targetServiceKey === 'pharmacy-hub') {
+        return BaseController.error(res, 'Service has been retired', 410, 'SERVICE_RETIRED');
+      }
+
       // 2. Load user from DB
       const userRepo = AppDataSource.getRepository(User);
       const user = await userRepo.findOne({ where: { id: payload.userId } });

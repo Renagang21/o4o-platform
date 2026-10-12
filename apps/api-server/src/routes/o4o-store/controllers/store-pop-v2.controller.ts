@@ -49,7 +49,6 @@ type AuthMiddleware = RequestHandler;
 const POP_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   cosmetics: 'k-cosmetics',
-  'pharmacy-hub': 'pharmacy-hub',
   'cafe24-b2b': 'cafe24-b2b',
 };
 

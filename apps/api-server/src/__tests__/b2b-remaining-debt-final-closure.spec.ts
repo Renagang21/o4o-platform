@@ -150,11 +150,8 @@ describe('③ 공급 노출 게이트', () => {
     expect(s.offerWhereSql).toMatch(/osa\.approval_status\s*=\s*'approved'/);
   });
 
-  it('opt-in 축은 공급자 service_keys 로만 노출한다', () => {
-    const s = resolveOfferExposureStrategy('pharmacy-hub')!;
-    expect(s.key).toBe('optin');
-    expect(s.offerWhereSql).toContain('$2 = ANY(spo.service_keys)');
-    expect(s.offerWhereSql).not.toContain('offer_service_approvals');
+  it('retired PH opt-in cannot expose or confirm offers', () => {
+    expect(resolveOfferExposureStrategy('pharmacy-hub')).toBeNull();
   });
 
   it('neture 축은 미승인 offer 를 행 단위로 차단한다', () => {

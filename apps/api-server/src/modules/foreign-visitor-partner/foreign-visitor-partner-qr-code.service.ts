@@ -19,6 +19,7 @@ import { getServicePublicOrigin } from '../../config/service-catalog.js';
  * 파일별 호스트 표는 존재하지 않는 `cosmetics.neture.co.kr` 을 찍었다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
  */
 export function buildAffiliateLandingUrl(serviceKey: string, shortCode: string): string {
+  if (serviceKey === 'pharmacy-hub') throw new Error('SERVICE_RETIRED');
   const origin = getServicePublicOrigin(serviceKey) || 'https://pharmacy.neture.co.kr';
   return `${origin}/foreign-visitor/affiliate/${shortCode}`;
 }

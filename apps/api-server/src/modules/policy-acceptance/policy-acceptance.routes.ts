@@ -99,7 +99,6 @@ router.post(
         if (isStoreAgreement) {
           const roleByService: Record<string, string> = {
             'k-cosmetics': 'cosmetics:store_owner',
-            'pharmacy-hub': 'pharmacy-hub:store_owner',
           };
           const requiredRole = roleByService[serviceKey];
           if (!requiredRole) {

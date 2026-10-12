@@ -120,7 +120,7 @@ const service = new MembershipApprovalService();
 function seed(userStatus: string) {
   db = {
     memberships: [
-      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' },
+      { id: 'm-ph', user_id: 'u1', service_key: 'lecture', role: 'pharmacy', status: 'suspended' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'suspended' },
     ],
     roles: [{ id: 'ra-1', user_id: 'u1', role: 'member', is_active: false }],
@@ -137,7 +137,7 @@ const reactivateAsOperator = () =>
     userId: 'u1',
     reactivatedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['pharmacy-hub'],
+    serviceKeys: ['lecture'],
   });
 
 const reactivateAsPlatformAdmin = () =>

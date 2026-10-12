@@ -135,7 +135,6 @@ const service = new MembershipApprovalService();
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
   { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
   { serviceKey: 'neture', prefix: 'neture' },
 ];
 
@@ -306,8 +305,8 @@ describe('§11 admin tier — 복구가 권한을 만들어내지 않는다', ()
     seedAllFive();
     db.roles = []; // 정지 이전에 역할 row 가 하나도 없던 계정
 
-    await suspend(['pharmacy-hub']);
-    await reactivate(['pharmacy-hub']);
+    await suspend(['neture']);
+    await reactivate(['neture']);
 
     expect(db.roles).toHaveLength(0);
     expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
@@ -317,12 +316,12 @@ describe('§11 admin tier — 복구가 권한을 만들어내지 않는다', ()
 
 it('service suspension preserves centrally assigned operator roles while blocking membership', async () => {
   seedAllFive();
-  db.memberships.find(m => m.service_key === 'pharmacy-hub')!.role = 'pharmacy-hub:operator';
-  db.roles.push({ id: 'central-operator', user_id: db.users[0].id, role: 'pharmacy-hub:operator', is_active: true });
-  await suspend(['pharmacy-hub']);
-  expect(statusOf('pharmacy-hub')).toBe('suspended');
-  expect(activeRoles()).toContain('pharmacy-hub:operator');
-  expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'pharmacy-hub:operator')).toBe(false);
+  db.memberships.find(m => m.service_key === 'neture')!.role = 'neture:operator';
+  db.roles.push({ id: 'central-operator', user_id: db.users[0].id, role: 'neture:operator', is_active: true });
+  await suspend(['neture']);
+  expect(statusOf('neture')).toBe('suspended');
+  expect(activeRoles()).toContain('neture:operator');
+  expect(queries.some(q => q.sql.startsWith('UPDATE role_assignments') && q.params[1] === 'neture:operator')).toBe(false);
 });
 
 it('a corrupt membership type cannot suspend a role belonging to another service', async () => {

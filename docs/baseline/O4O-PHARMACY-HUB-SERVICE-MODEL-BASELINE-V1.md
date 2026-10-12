@@ -10,8 +10,9 @@
 2. **식별자와 권한**: `pharmacy-hub` 서비스 등록, PH namespace의 membership/role/권한·호환 adapter를 제거 대상으로 삼는다. 옛 식별자를 공통 resolver·등록 목록에 남긴 사실은 현행 운영 근거가 아니다. Neture 및 다른 서비스의 가입·역할·권한은 유지한다.
 3. **공급과 결제**: PH 직접 opt-in·`pharmacy_hub_cart` producer·PH 주문/결제 표면은 폐기한다. 공용 offer/checkout/payment/fulfillment/콘텐츠 테이블 전체를 지우지 않는다. `service_keys`에서 PH만 제거해 빈 배열의 기본 공급 의미로 상품이 새로 노출되지 않도록 현행 소비처와 노출 계약을 확인한다. Neture B2B·Store B2B·Neture 약국·구독 및 공통 PaymentCore/Freeze 계약은 그대로다.
 4. **데이터**: PH 전용 데이터는 재사용을 위해 보관하지 않고 삭제한다. 실제 schema/FK·전용 귀속·타 서비스 소비처를 확인한 뒤 계획을 고정하고 transaction 단위로 삭제·잔여 검증한다. 공용 조직/사용자/상품/약사 자격/Neture 데이터는 PH 표기만으로 삭제하지 않는다. 법정 보유 대상은 별도 확인하며 서비스 폐기를 보유기간 면제로 해석하지 않는다. 과거 migration과 migration history는 보존하고 다시 실행하지 않는다.
-5. **인쇄 QR 연결**: `pharmacyhub.co.kr`·`www.pharmacyhub.co.kr`의 도메인·DNS·인증서는 Neture 약국 리다이렉트에 필요한 연결 자원으로 유지한다. `/qr/*`, `/tablet/*`, `/multilingual-products/*`, `/foreign-visitor/affiliate/*`와 기타 호스트 경로는 Neture 약국으로 302 전환해 path/query를 보존한다. `/terms`·`/terms/`는 `/policy`로 전환한다. 실제 QR/tablet은 동작을 검증하고 없는 나머지 경로는 규칙을 검증한다. 인쇄 QR/Neture가 사용하는 공용 식별자와 연결은 삭제하지 않는다. 필요한 귀속 이전은 명시적인 이전·검증 후 수행한다.
-6. **완료 경계**: 정책 확정·코드 push·main 병합·API 배포는 운영 삭제 완료와 다르다. 전체 호스트 전환·검증 후 PH backend 참조를 제거하고 전용 Cloud Run을 삭제한다. 현행 실행 상태와 blocker는 [폐기 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 기록한다. 이 문서 작업은 운영 전환·데이터 삭제를 실행하지 않는다.
+5. **도메인 종료**: 2026-10-12 사용자가 PH 데이터는 사용 이력이 없는 개발 데이터이며 재사용·유사 개발 계획이 없음을 확인하고, 기존 인쇄 QR 리다이렉트 보존 정책을 철회했다. `pharmacyhub.co.kr`·`www.pharmacyhub.co.kr` 리다이렉트, 전용 DNS·인증서·도메인 연결도 종료 대상이다. 공유 LB/IP·다른 도메인의 인증서·Neture/KPA QR 기능은 제거하지 않는다. 실제 DNS 관리 주체와 인증서 소비처를 조사하고 PH 연결만 분리한다.
+6. **완료 경계**: 정책 확정·코드 push·main 병합·API 배포는 운영 삭제 완료와 다르다. PH 전용 Cloud Run/backend/NEG는 앞선 phase에서 제거됐으며, 현재 최종 phase는 잔여 코드/PH 전용 개발 데이터/도메인 연결 종료다. 공용 소비처와 FK를 확인하고 운영 단독 창에서 삭제·잔여 검증 후 전체 완료로 기록한다. PH workflow는 Demo/Store 유지관리도 포함하므로 그 기능을 보존·분리한 뒤 PH 전용 도구만 제거한다. 현행 실행 상태는 [폐기 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 기록한다.
+
 
 ## 대체 범위와 우선순위
 

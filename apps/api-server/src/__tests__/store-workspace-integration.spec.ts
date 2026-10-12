@@ -66,7 +66,7 @@ describe('My Services 합성 시나리오 매장 A (WO §21)', () => {
 
     expect(byKey['kpa-society']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: true, organizationId: ORG_A });
     expect(byKey['k-cosmetics']).toMatchObject({ enrollmentStatus: 'active', workspaceAvailable: false, organizationId: ORG_A });
-    expect(byKey['pharmacy-hub']).toMatchObject({ enrollmentStatus: 'inactive', workspaceAvailable: false, organizationId: ORG_A });
+    expect(byKey['pharmacy-hub']).toBeUndefined();
 
     const shown = services.filter((s) => s.enrollmentStatus === 'active' && s.workspaceAvailable).map((s) => s.serviceKey);
     expect(shown).toEqual(['kpa-society']);
