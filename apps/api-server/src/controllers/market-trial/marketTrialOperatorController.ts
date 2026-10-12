@@ -16,7 +16,7 @@
 
 import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, IsNull } from 'typeorm';
 import {
   MarketTrial,
   TrialStatus,
@@ -40,6 +40,7 @@ import { FundingWorkspaceService, FundingError } from '../../services/funding/fu
 import { fundingReview, fundingForumSlug, fundingForumCode, FUNDING_PROGRESS_TRANSITIONS } from '../../services/funding/funding-review.js';
 import { participantFilters, participantCsvCell } from '../../services/funding/funding-participant-export.js';
 import { FundingPaymentRecordService } from '../../services/funding/funding-payment-record.service.js';
+import { forumFailureFilters, isForumFailureId } from '../../services/funding/funding-forum-failure-filters.js';
 
 // Valid participant reward status values
 const VALID_REWARD_STATUSES = ['pending', 'fulfilled'] as const;
@@ -853,15 +854,14 @@ export class MarketTrialOperatorController {
    */
   static async listForumSyncFailures(req: AuthRequest, res: Response) {
     try {
-      const { trialId, resolved, limit: limitStr, page: pageStr } = req.query;
-
-      const limit = Math.min(100, Math.max(1, Number(limitStr) || 50));
-      const page = Math.max(1, Number(pageStr) || 1);
-      const offset = (page - 1) * limit;
+      const filters = forumFailureFilters(req.query);
+      if (!filters) return res.status(400).json({ success: false, message: '조회 조건을 확인해 주세요.' });
+      const { trialId, resolved, limit, page, offset } = filters;
 
       const qb = MarketTrialOperatorController.forumSyncFailureRepo
         .createQueryBuilder('f')
         .orderBy('f.occurredAt', 'DESC')
+        .addOrderBy('f.id', 'DESC')
         .take(limit)
         .skip(offset);
 
@@ -895,7 +895,10 @@ export class MarketTrialOperatorController {
   static async resolveForumSyncFailure(req: AuthRequest, res: Response) {
     try {
       const { failureId } = req.params;
-      const { note } = req.body as { note?: string };
+      const { note } = req.body ?? {};
+      if (!isForumFailureId(failureId) || (note != null && typeof note !== 'string')) {
+        return res.status(400).json({ success: false, message: '해결 처리 입력을 확인해 주세요.' });
+      }
 
       const record = await MarketTrialOperatorController.forumSyncFailureRepo.findOne({
         where: { id: failureId },
@@ -909,9 +912,15 @@ export class MarketTrialOperatorController {
         return res.status(400).json({ success: false, message: 'Already resolved' });
       }
 
-      record.resolvedAt = new Date();
-      record.resolutionNote = note ?? null;
-      await MarketTrialOperatorController.forumSyncFailureRepo.save(record);
+      const resolution = { resolvedAt: new Date(), resolutionNote: note ?? null };
+      // Only the first resolver can write its memo, including concurrent retry/automatic recovery.
+      const result = await MarketTrialOperatorController.forumSyncFailureRepo.update(
+        { id: failureId, resolvedAt: IsNull() }, resolution,
+      );
+      if (result.affected !== 1) {
+        return res.status(400).json({ success: false, message: 'Already resolved' });
+      }
+      Object.assign(record, resolution);
 
       res.json({ success: true, data: toForumSyncFailureDTO(record) });
     } catch (error) {

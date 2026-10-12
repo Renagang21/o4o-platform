@@ -9,7 +9,7 @@
  *   가입 신청 목록은 내 매장(약국) 신청 원장의 사업자번호 · 면허번호 · 내 매장 신청 상태를 함께 보여준다.
  *   승인 시 서버가 신청자의 Neture 가입 승인(active)을 직접 확인한다(아니면 409).
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   neturePharmacyOperatorApi as api,
@@ -127,10 +127,26 @@ const RECRUITMENT_ACTIONS: Record<string, Array<{ action: 'approve' | 'reject'; 
   ],
 };
 
-export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
+type BusinessPageProps = Readonly<{
   businessKey?: string;
   forumHref?: (business: SemiFranchise) => string;
-} = {}) {
+}>;
+
+function loadBusinessRows(key: string, tab: Tab, status: string) {
+  switch (tab) {
+    case 'memberships': return api.listSfMemberships(key, status);
+    case 'proposals': return api.listProposals(key, status);
+    case 'events': return api.listEvents(key, status);
+    case 'recruitments': return api.listRecruitments(key, status);
+    case 'contents': return api.listContents(key, status);
+  }
+}
+
+export default function OperatorSemiFranchisePage(props: BusinessPageProps = {}) {
+  return <AssignedBusinessPanel key={props.businessKey ?? 'all'} {...props} />;
+}
+
+function AssignedBusinessPanel({ businessKey, forumHref }: BusinessPageProps) {
   const [searchParams] = useSearchParams();
   const queryTab = searchParams.get('tab');
   const initialTab: Tab = isTab(queryTab) ? queryTab : 'memberships';
@@ -142,52 +158,63 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<Msg>(null);
+  const [loadError, setLoadError] = useState('');
+  const [assignmentError, setAssignmentError] = useState('');
+  const [assignmentRevision, setAssignmentRevision] = useState(0);
+  const initialKey = useRef(searchParams.get('key'));
+  const lifecycle = useRef({ mounted: false, scope: '', sequence: 0 });
+  const submitting = useRef(false);
+  const scope = `${sfKey}:${tab}:${status}`;
+
+  useLayoutEffect(() => {
+    const state = lifecycle.current;
+    state.mounted = true;
+    state.scope = scope;
+    return () => { state.mounted = false; state.sequence++; };
+  }, [scope]);
 
   useEffect(() => {
+    let active = true;
+    setAssignmentError('');
     api
       .listAssignedSemiFranchises()
       .then((assigned) => {
+        if (!active) return;
         const list = businessKey ? assigned.filter(f => f.key === businessKey) : assigned;
         setFranchises(list ?? []);
-        const wanted = searchParams.get('key');
+        const wanted = initialKey.current;
         if (list?.length) setSfKey(list.find((f) => f.key === wanted)?.key ?? list[0].key);
       })
       .catch((err: Error) => {
-        setFranchises([]);
-        setMessage({ type: 'error', text: err.message });
+        if (active) setAssignmentError(err.message || '담당 사업을 불러오지 못했습니다.');
       });
-    // 최초 진입 시 1회만 — 쿼리는 초기 선택에만 쓴다.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => { active = false; };
+  }, [businessKey, assignmentRevision]);
 
   const load = useCallback(async () => {
     if (!sfKey) return;
+    const sequence = ++lifecycle.current.sequence;
+    const current = () => lifecycle.current.mounted && lifecycle.current.scope === scope && lifecycle.current.sequence === sequence;
     setLoading(true);
+    setRows([]);
+    setLoadError('');
     try {
-      const data =
-        tab === 'memberships'
-          ? await api.listSfMemberships(sfKey, status)
-          : tab === 'proposals'
-            ? await api.listProposals(sfKey, status)
-            : tab === 'events'
-              ? await api.listEvents(sfKey, status)
-              : tab === 'recruitments'
-                ? await api.listRecruitments(sfKey, status)
-                : await api.listContents(sfKey, status);
-      setRows(Array.isArray(data) ? data : []);
+      const data = await loadBusinessRows(sfKey, tab, status);
+      if (!Array.isArray(data)) throw new Error('목록 응답을 확인할 수 없습니다. 다시 조회해 주세요.');
+      if (current()) setRows(data);
     } catch (err) {
-      setRows([]);
-      setMessage({ type: 'error', text: (err as Error).message });
+      if (current()) setLoadError((err as Error).message || '목록을 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
-  }, [sfKey, tab, status]);
+  }, [sfKey, tab, status, scope]);
 
   useEffect(() => {
     load();
   }, [load]);
 
   const run = async (id: string, label: string, needsReason: boolean, call: (reason?: string) => Promise<unknown>) => {
+    if (submitting.current || loading || loadError) return;
     let reason: string | undefined;
     if (needsReason) {
       const r = askReason(label);
@@ -196,20 +223,28 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
     } else if (!window.confirm(`${label} 처리할까요?`)) {
       return;
     }
+    submitting.current = true;
+    const current = () => lifecycle.current.mounted && lifecycle.current.scope === scope;
     setBusyId(id);
     setMessage(null);
     try {
       await call(reason);
+      if (!current()) return;
       setMessage({ type: 'success', text: `${label} 처리했습니다.` });
       await load();
     } catch (err) {
-      setMessage({ type: 'error', text: (err as Error).message });
+      if (current()) setMessage({ type: 'error', text: (err as Error).message });
     } finally {
-      setBusyId(null);
+      submitting.current = false;
+      if (current()) setBusyId(null);
     }
   };
 
   const positive = (a: string) => a === 'approve' || a === 'reactivate';
+
+  if (assignmentError) return <div role="alert" className="space-y-3 p-6 text-sm text-red-700">
+    <p>{assignmentError}</p><button type="button" className="rounded border px-3 py-2" onClick={() => setAssignmentRevision(value => value + 1)}>담당 사업 다시 조회</button>
+  </div>;
 
   if (franchises === null) {
     return <div className="p-6 text-sm text-gray-500">불러오는 중...</div>;
@@ -234,7 +269,9 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         <select
           className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           value={sfKey}
-          onChange={(e) => setSfKey(e.target.value)}
+          aria-label="담당 사업"
+          disabled={busyId !== null}
+          onChange={(e) => { setRows([]); setLoading(true); setMessage(null); setSfKey(e.target.value); }}
         >
           {franchises.map((f) => (
             <option key={f.key} value={f.key}>
@@ -253,10 +290,14 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
           <button
             key={t.key}
             type="button"
+            disabled={busyId !== null}
             onClick={() => {
+              if (t.key === tab) return;
               setTab(t.key);
               setStatus(DEFAULT_STATUS[t.key]);
               setRows([]);
+              setLoading(true);
+              setMessage(null);
             }}
             className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
               tab === t.key ? 'border-primary-600 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -283,12 +324,20 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         </div>
       )}
 
-      <StatusFilter value={status} options={FILTERS[tab]} onChange={setStatus} />
+      <fieldset disabled={busyId !== null}>
+        <StatusFilter value={status} options={FILTERS[tab]} onChange={value => {
+          if (value === status) return;
+          setRows([]); setLoading(true); setMessage(null); setStatus(value);
+        }} />
+      </fieldset>
       <Message message={message} />
+      {loadError && <div role="alert" className="space-y-2 text-sm text-red-700">
+        <p>{loadError}</p><button type="button" className="rounded border px-3 py-2" onClick={() => void load()}>목록 다시 조회</button>
+      </div>}
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      {!loadError && <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
         {tab === 'memberships' && (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>약국</th>
@@ -329,7 +378,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
                             key={a.action}
                             label={a.label}
                             action={a.action}
-                            disabled={busyId === m.id}
+                            disabled={busyId !== null || loading}
                             onClick={() =>
                               run(m.id, a.label, !positive(a.action), (reason) => api.decideSfMembership(sfKey, m.id, a.action, reason))
                             }
@@ -345,7 +394,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         )}
 
         {tab === 'proposals' && (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>제품</th>
@@ -387,7 +436,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
                             key={a.action}
                             label={a.label}
                             action={a.action}
-                            disabled={busyId === p.id}
+                            disabled={busyId !== null || loading}
                             onClick={() =>
                               run(p.id, a.label, !positive(a.action), (reason) => api.decideProposal(sfKey, p.id, a.action, reason))
                             }
@@ -403,7 +452,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         )}
 
         {tab === 'events' && (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>제품</th>
@@ -451,7 +500,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
                             key={a.action}
                             label={a.label}
                             action={a.action}
-                            disabled={busyId === ev.id}
+                            disabled={busyId !== null || loading}
                             onClick={() =>
                               run(ev.id, a.label, !positive(a.action), (reason) => api.decideEvent(sfKey, ev.id, a.action, reason))
                             }
@@ -467,7 +516,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         )}
 
         {tab === 'recruitments' && (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>제품</th>
@@ -508,7 +557,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
                             key={a.action}
                             label={a.label}
                             action={a.action}
-                            disabled={busyId === r.id}
+                            disabled={busyId !== null || loading}
                             onClick={() =>
                               run(r.id, a.label, a.action === 'reject', (note) => api.decideRecruitment(sfKey, r.id, a.action, note))
                             }
@@ -524,7 +573,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
         )}
 
         {tab === 'contents' && (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full min-w-[640px] divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className={TH}>제목</th>
@@ -568,7 +617,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
                             key={a.action}
                             label={a.label}
                             action={a.action}
-                            disabled={busyId === c.id}
+                            disabled={busyId !== null || loading}
                             onClick={() => run(c.id, a.label, false, () => api.setContentStatus(sfKey, c.id, a.action))}
                           />
                         ))}
@@ -580,7 +629,7 @@ export default function OperatorSemiFranchisePage({ businessKey, forumHref }: {
             </tbody>
           </table>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

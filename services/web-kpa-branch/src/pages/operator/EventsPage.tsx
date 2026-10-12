@@ -8,7 +8,7 @@
  * 게시·취소는 별도 버튼이지만 같은 PATCH 를 쓴다 (상태도 행사의 한 속성이다).
  * `rsvpOpen` 은 서버 판정값을 그대로 쓴다 — 화면이 마감을 다시 계산하지 않는다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   listOperatorEvents,
   createEvent,
@@ -75,6 +75,10 @@ const EMPTY: Draft = {
 };
 
 export default function EventsPage({ slug }: { slug: string }) {
+  return <BranchEventsPanel key={slug} slug={slug} />;
+}
+
+function BranchEventsPanel({ slug }: Readonly<{ slug: string }>) {
   const [status, setStatus] = useState<'' | EventStatus>('');
   const [items, setItems] = useState<BranchEventItem[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);
@@ -90,14 +94,22 @@ export default function EventsPage({ slug }: { slug: string }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const requests = useRef({ mounted: false, list: 0, roster: 0, submitting: false });
+  useLayoutEffect(() => {
+    requests.current.mounted = true;
+    return () => { requests.current.mounted = false; requests.current.list++; requests.current.roster++; };
+  }, []);
 
   const reload = useCallback(async () => {
+    const request = ++requests.current.list;
+    const current = () => requests.current.mounted && requests.current.list === request;
     setListError(null);
+    setItems(null);
     try {
-      setItems(await listOperatorEvents(slug, status || null));
+      const result = await listOperatorEvents(slug, status || null);
+      if (current()) setItems(result);
     } catch (e) {
-      setItems(null);
-      setListError(describe(e));
+      if (current()) setListError(describe(e));
     }
   }, [slug, status]);
 
@@ -106,6 +118,7 @@ export default function EventsPage({ slug }: { slug: string }) {
   }, [reload]);
 
   function openCreate() {
+    if (requests.current.submitting) return;
     setEditId(null);
     setDraft(EMPTY);
     setFormOpen(true);
@@ -114,6 +127,7 @@ export default function EventsPage({ slug }: { slug: string }) {
   }
 
   function openEdit(e: BranchEventItem) {
+    if (requests.current.submitting) return;
     setEditId(e.id);
     setDraft({
       title: e.title,
@@ -132,6 +146,8 @@ export default function EventsPage({ slug }: { slug: string }) {
   }
 
   async function save() {
+    if (requests.current.submitting) return;
+    requests.current.submitting = true;
     setBusy(true);
     setActionError(null);
     setMessage(null);
@@ -150,47 +166,56 @@ export default function EventsPage({ slug }: { slug: string }) {
       };
       if (editId) {
         await updateEvent(slug, editId, input);
+        if (!requests.current.mounted) return;
         setMessage('행사를 저장했습니다.');
       } else {
         await createEvent(slug, input);
+        if (!requests.current.mounted) return;
         setMessage('행사를 만들었습니다. 아직 작성중 상태이며 게시해야 회원에게 보입니다.');
       }
       setFormOpen(false);
       setEditId(null);
       await reload();
     } catch (e) {
-      setActionError(describe(e));
+      if (requests.current.mounted) setActionError(describe(e));
     } finally {
-      setBusy(false);
+      requests.current.submitting = false;
+      if (requests.current.mounted) setBusy(false);
     }
   }
 
   async function setEventStatus(e: BranchEventItem, next: EventStatus) {
+    if (requests.current.submitting) return;
+    requests.current.submitting = true;
     setBusy(true);
     setActionError(null);
     setMessage(null);
     try {
       await updateEvent(slug, e.id, { status: next });
+      if (!requests.current.mounted) return;
       setMessage(`«${e.title}» ${EVENT_STATUS_LABEL[next]} 처리했습니다.`);
       await reload();
       if (rsvpFor === e.id) await openRsvps(e.id);
     } catch (err) {
-      setActionError(describe(err));
+      if (requests.current.mounted) setActionError(describe(err));
     } finally {
-      setBusy(false);
+      requests.current.submitting = false;
+      if (requests.current.mounted) setBusy(false);
     }
   }
 
   const openRsvps = useCallback(
     async (eventId: string) => {
+      const request = ++requests.current.roster;
+      const current = () => requests.current.mounted && requests.current.roster === request;
       setRsvpFor(eventId);
       setRsvps(null);
       setRsvpError(null);
       try {
         const res = await listEventRsvps(slug, eventId);
-        setRsvps(res.items);
+        if (current()) setRsvps(res.items);
       } catch (e) {
-        setRsvpError(describe(e));
+        if (current()) setRsvpError(describe(e));
       }
     },
     [slug],
@@ -208,7 +233,14 @@ export default function EventsPage({ slug }: { slug: string }) {
         <div className="flex items-center gap-2">
           <select
             value={status}
-            onChange={(e) => setStatus(e.target.value as '' | EventStatus)}
+            aria-label="행사 상태"
+            disabled={busy}
+            onChange={(e) => {
+              if (e.target.value === status) return;
+              requests.current.list++; requests.current.roster++;
+              setItems(null); setRsvpFor(null); setRsvps(null);
+              setStatus(e.target.value as '' | EventStatus);
+            }}
             className="rounded border border-gray-300 px-2 py-1 text-sm"
           >
             {STATUS_FILTERS.map((f) => (
@@ -220,6 +252,7 @@ export default function EventsPage({ slug }: { slug: string }) {
           <button
             type="button"
             onClick={openCreate}
+            disabled={busy}
             className="rounded bg-primary-600 px-3 py-1.5 text-sm font-medium text-white"
           >
             행사 만들기
@@ -240,7 +273,7 @@ export default function EventsPage({ slug }: { slug: string }) {
           <div className="border-b border-gray-200 bg-gray-50 px-4 py-2">
             <h2 className="text-sm font-semibold text-gray-800">{editId ? '행사 수정' : '새 행사'}</h2>
           </div>
-          <div className="space-y-3 p-4">
+          <fieldset disabled={busy} className="space-y-3 p-4">
             <label className="block">
               <span className="text-xs text-gray-500">행사명 *</span>
               <input
@@ -357,12 +390,14 @@ export default function EventsPage({ slug }: { slug: string }) {
                 취소
               </button>
             </div>
-          </div>
+          </fieldset>
         </section>
       )}
 
       {/* ── 목록 ────────────────────────────────────────────────────── */}
-      {listError && <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{listError}</p>}
+      {listError && <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <p>{listError}</p><button type="button" disabled={busy} className="mt-2 rounded border px-3 py-2" onClick={() => void reload()}>목록 다시 조회</button>
+      </div>}
 
       {items === null && !listError ? (
         <p className="text-sm text-gray-500">불러오는 중입니다…</p>
@@ -399,7 +434,7 @@ export default function EventsPage({ slug }: { slug: string }) {
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <button type="button" onClick={() => openEdit(e)} className="text-primary-700 hover:underline">
+                  <button type="button" disabled={busy} onClick={() => openEdit(e)} className="text-primary-700 hover:underline">
                     수정
                   </button>
                   {e.status === 'draft' && (
@@ -426,6 +461,7 @@ export default function EventsPage({ slug }: { slug: string }) {
                     <button
                       type="button"
                       onClick={() => void openRsvps(e.id)}
+                      disabled={busy}
                       className="text-primary-700 hover:underline"
                     >
                       참가명단

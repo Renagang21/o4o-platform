@@ -43,6 +43,24 @@ test('API diagnostics retain known permissions but discard raw messages and meta
 });
 
 const paths = ['/qr/active', '/tablet/store?tabletId=test&language=ko', '/multilingual-products/product?locale=ko', '/foreign-visitor/affiliate/active'];
+test('retirement accepts no remaining active data while ordinary cutover stays strict', () => {
+  assert.deepEqual(parseProbes('', { requireActiveFamilies: false }), []);
+  assert.throws(() => parseProbes(''), /Supply real QR/);
+});
+
+test('retirement validates whichever active route families remain', () => {
+  for (const path of paths) {
+    assert.deepEqual(parseProbes(path, { requireActiveFamilies: false }), [path]);
+    assert.throws(() => parseProbes(path));
+  }
+});
+
+test('optional active families still reject unsafe paths, duplicate families and excessive probes', () => {
+  for (const raw of ['/qr/a\n/qr/b', '/qr/../secret', '/tablet/x#fragment', '/unknown/x',
+    '/qr/a\n/tablet/b\n/multilingual-products/c\n/foreign-visitor/affiliate/d\n/qr/e']) {
+    assert.throws(() => parseProbes(raw, { requireActiveFamilies: false }));
+  }
+});
 const original = () => ({
   name: 'o4o-global-lb', fingerprint: 'v1',
   hostRules: [{ hosts: ['pharmacyhub.co.kr', 'www.pharmacyhub.co.kr'], pathMatcher: 'path-matcher-pharmacy-hub' }],
