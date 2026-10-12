@@ -2,6 +2,7 @@
 
 > **상태**: COMPLETED
 > **작성일**: 2026-10-11
+> **최종 갱신**: 2026-10-12
 > **유형**: 기존 상품 쓰기 책임 리팩터링
 > **범위**: Neture Offer 등록 · 수정 · 승인/반려 · 유통 · 일괄 처리
 > **상위 정본**: [Supplier Domain Boundary](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) · [Role Workspace §9](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md#9-리팩터링-실행-규칙-모든-단계-공통)
