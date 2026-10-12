@@ -42,6 +42,8 @@ interface HomeEntryPanelProps {
   summary?: boolean;
   /** My Home shows only workspaces the current account can actually enter. */
   workspaceOnly?: boolean;
+  /** My Home overview: one entry per populated role, with details in services. */
+  compactWorkspace?: boolean;
   /** A selected store's original workspace, using the existing server-owned entries. */
   storeOrganizationId?: string;
 }
@@ -101,7 +103,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot, summary, workspaceOnly, storeOrganizationId }: HomeEntryPanelProps) {
+export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot, summary, workspaceOnly, compactWorkspace, storeOrganizationId }: HomeEntryPanelProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
   // 이동 세대(generation). 이동 시작마다 1 증가하고, 뒤로가기(bfcache) 복원 시에도 1 증가한다.
@@ -201,12 +203,16 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
       {groups.length > 0 ? <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {groups.map(group => <div key={group.id}>
           <h3 className="text-sm font-medium text-slate-600">{group.title}</h3>
-          <div className="mt-2 flex flex-wrap gap-2">{group.items.map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>
+          <div className="mt-2 flex flex-wrap gap-2">{(compactWorkspace ? group.items.slice(0, 1) : group.items).map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>
         </div>)}
       </div> : <p className="mt-3 text-sm text-slate-500">현재 바로 이동할 수 있는 업무가 없습니다. 참여 서비스에서 이용 상태를 확인해 주세요.</p>}
-      {!storeOrganizationId && model.statusItems.length > 0 && <ul className="mt-4 space-y-2 text-sm" aria-label="가입·이용 상태">
+      {!storeOrganizationId && !compactWorkspace && model.statusItems.length > 0 && <ul className="mt-4 space-y-2 text-sm" aria-label="가입·이용 상태">
         {model.statusItems.map(item => <li key={item.id} className="flex flex-wrap gap-2"><span>{item.serviceName}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.statusLabel}</span></li>)}
       </ul>}
+      {compactWorkspace && (groups.reduce((total, group) => total + group.items.length, 0) > groups.length || model.statusItems.length > 0) && <p className="mt-3 text-xs text-slate-500">
+        {groups.reduce((count, group) => count + group.items.length, 0) > groups.length && "추가 업무는 참여 서비스에서 확인할 수 있습니다. "}
+        {model.statusItems.length > 0 && `가입·이용 상태 ${model.statusItems.length}건을 참여 서비스에서 확인하세요.`}
+      </p>}
       <Link to="/mypage/services" className="mt-4 inline-block text-sm text-blue-700 underline">참여 서비스와 이용 상태 보기 →</Link>
     </section>;
   }
