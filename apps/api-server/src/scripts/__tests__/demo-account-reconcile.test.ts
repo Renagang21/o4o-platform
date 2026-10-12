@@ -2,6 +2,9 @@ import { Client } from 'pg';
 import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 import { runDemoAccountReconcile, assertFoundationDemoProvisionIdentity } from '../demo-account-reconcile.service';
 import { passwordCredentialService } from '../../services/auth/password-credential.service';
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { findApprovedStoreMemberCandidates } from '../../utils/store-member-access';
 
 describe('Demo transition transaction gates',()=>{
@@ -163,6 +166,33 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     await expect(runDemoAccountReconcile(client)).rejects.toThrow('UNEXPECTED_DEMO_SUPPLIER_POINTER');
     expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
   });
+  it('explicitly refuses an inactive staff registry during plan without duplicate inserts or reactivation',async()=>{
+    const id=(await query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified") VALUES($1,'Inactive staff fixture','active',true,true) RETURNING id`,[staff.email]))[0].id;
+    await query("INSERT INTO demo_accounts(user_id,demo_type,is_active) VALUES($1,'STORE_STAFF',false)",[id]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('INACTIVE_DEMO_REGISTRY_REQUIRES_REVIEW');
+    expect((await query('SELECT is_active FROM demo_accounts WHERE user_id=$1',[id]))[0].is_active).toBe(false);
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
+  it('census includes staff membership, role and creator rows in Store Demo scope exactly once',async()=>{
+    const plan=await runDemoAccountReconcile(client);
+    await runDemoAccountReconcile(client,{apply:true,expectedDigest:plan.digest});
+    // Load the real native ESM producer without changing the repository's CommonJS Jest transform policy.
+    const scopedCountQuery=(table:string,columns:string[])=>{
+      const moduleUrl=pathToFileURL(resolve(__dirname,'../../../../../scripts/deployment/demo-store-census.mjs')).href;
+      const source=`import(${JSON.stringify(moduleUrl)}).then(m=>process.stdout.write(m.scopedCountQuery(${JSON.stringify(table)},${JSON.stringify(columns)})))`;
+      return execFileSync(process.execPath,['--input-type=module','-e',source],{encoding:'utf8'});
+    };
+    const counts=await query(scopedCountQuery('service_memberships',['user_id']));
+    expect(counts[0]).toMatchObject({count:12,store_demo_count:8,supplier_demo_count:4,unlinked_to_demo_count:0});
+    const roles=await query(scopedCountQuery('role_assignments',['user_id']));
+    expect(roles[0]).toMatchObject({count:3,store_demo_count:2,supplier_demo_count:1,unlinked_to_demo_count:0});
+    const employee=(await query('SELECT id FROM users WHERE email=$1',[staff.email]))[0].id;
+    await query('CREATE TEMP TABLE fixture_demo_creator (created_by uuid)');
+    try{
+      await query('INSERT INTO fixture_demo_creator(created_by) VALUES($1),($2)',[owner,employee]);
+      expect((await query(scopedCountQuery('fixture_demo_creator',['created_by'])))[0]).toMatchObject({count:2,store_demo_count:2,supplier_demo_count:0,unlinked_to_demo_count:0});
+    }finally{await query('DROP TABLE fixture_demo_creator');}
+  },30000);
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

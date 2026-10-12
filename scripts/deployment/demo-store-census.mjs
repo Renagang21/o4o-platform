@@ -9,7 +9,7 @@ export const queries = {
   organizations: `SELECT type, count(*)::int AS count FROM organizations GROUP BY type ORDER BY type`,
   memberships: `SELECT m.role, (d.user_id IS NOT NULL) AS demo_owned, count(*)::int AS count
     FROM organization_members m LEFT JOIN demo_accounts d ON d.user_id=m.user_id
-      AND d.is_active AND d.demo_type='STORE_OWNER'
+      AND d.is_active AND d.demo_type IN ('STORE_OWNER','STORE_STAFF')
     WHERE m.left_at IS NULL GROUP BY m.role, (d.user_id IS NOT NULL) ORDER BY m.role, demo_owned`,
   columns: `SELECT table_name, column_name FROM information_schema.columns
     WHERE table_schema='public'
@@ -50,12 +50,12 @@ export function scopedCountQuery(table, columns) {
     }
     return conditions.length ? `COALESCE((${conditions.join(' OR ')}), false)` : 'false';
   }
-  const store = predicate('STORE_OWNER');
+  const store = `(${predicate('STORE_OWNER')} OR ${predicate('STORE_STAFF')})`;
   const supplier = predicate('SUPPLIER');
   return `WITH demo_orgs AS (
     SELECT DISTINCT m.organization_id,d.demo_type FROM organization_members m
       JOIN demo_accounts d ON d.user_id=m.user_id AND d.is_active
-    WHERE m.left_at IS NULL AND m.role IN ('owner','admin','manager')
+    WHERE m.left_at IS NULL AND (m.role IN ('owner','admin','manager') OR (d.demo_type='STORE_STAFF' AND m.role='staff'))
   ), demo_suppliers AS (
     SELECT s.id FROM neture_suppliers s WHERE
       s.user_id IN (SELECT user_id FROM demo_accounts WHERE is_active AND demo_type='SUPPLIER')

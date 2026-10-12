@@ -49,6 +49,8 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
     FROM users WHERE id = ANY($1::uuid[]) OR lower(email) = ANY($2::text[])
     ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [ids, PUBLIC_DEMO_ACCOUNTS.map(account => account.email)]);
   const scopeIds = users.map(row => row.id);
+  const inactiveRegistry=await client.query('SELECT user_id,demo_type FROM demo_accounts WHERE user_id=ANY($1::uuid[]) AND NOT is_active ORDER BY user_id',[scopeIds]);
+  if (inactiveRegistry.length) fail('INACTIVE_DEMO_REGISTRY_REQUIRES_REVIEW');
   const roles = await client.query(`SELECT id,user_id,role,is_active,valid_from,valid_until
     FROM role_assignments WHERE user_id = ANY($1::uuid[]) ORDER BY user_id,role,id
     ${lock ? 'FOR UPDATE' : ''}`, [scopeIds]);
