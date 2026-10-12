@@ -12,7 +12,8 @@
  * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useStoreResource } from './hooks/useStoreResource';
 import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
@@ -120,11 +121,16 @@ const QR_EXPORT_GUIDE: { situation: string; recommend: string; reason: string }[
 // @o4o/store-ui-core 의 StoreQrOperationBoard 안으로 옮겼다
 // (WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1 의 해법을 Core 로 승격).
 
+async function loadQrCodes(): Promise<StoreQrCode[]> {
+  const response = await getStoreQrCodes({ limit: 100, includeInactive: true });
+  if (!response.success || !response.data) throw new Error('QR_LOAD_FAILED');
+  return response.data.items;
+}
+
 export function StoreQRPage() {
   const location = useLocation();
 
-  const [items, setItems] = useState<StoreQrCode[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: items, setData: setItems, loading, error: listError, reload: fetchItems } = useStoreResource(loadQrCodes, []);
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 + QR 설정 모달
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: 'screen_set'(태블릿 코너) 추가.
   const [listFilter, setListFilter] = useState<QrListFilter>('all');
@@ -167,32 +173,20 @@ export function StoreQRPage() {
   // Product dropdown state
   const [productOptions, setProductOptions] = useState<{ id: string; name: string }[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
-
-  const fetchItems = useCallback(async () => {
-    try {
-      const res = await getStoreQrCodes({ limit: 100, includeInactive: true });
-      if (res.success && res.data) {
-        setItems(res.data.items);
-      }
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  const [productError, setProductError] = useState<string | null>(null);
+  const [productRetry, setProductRetry] = useState(0);
 
   // Load product options when landingType is 'product'
   useEffect(() => {
-    if (formLandingType !== 'product' || !creating) return;
-    setLoadingProducts(true);
+    if (formLandingType !== 'product' || !creating) { setProductError(null); setLoadingProducts(false); return; }
+    let cancelled = false;
+    setLoadingProducts(true); setProductError(null);
     Promise.all([
-      getListings().catch(() => ({ success: false as const, data: [] as any[] })),
-      fetchLocalProducts({ limit: 100 }).catch(() => ({ items: [] as any[], total: 0, page: 1, limit: 100 })),
+      getListings(),
+      fetchLocalProducts({ limit: 100 }),
     ]).then(([listingsRes, localRes]) => {
+      if (cancelled) return;
+      if (!listingsRes.success) throw new Error('PRODUCT_LOAD_FAILED');
       const combined: { id: string; name: string }[] = [];
       if (listingsRes.success && Array.isArray(listingsRes.data)) {
         for (const l of listingsRes.data) {
@@ -204,9 +198,10 @@ export function StoreQRPage() {
         if (p.is_active) combined.push({ id: p.id, name: p.name });
       }
       setProductOptions(combined);
-      setLoadingProducts(false);
-    });
-  }, [formLandingType, creating]);
+    }).catch(() => { if (!cancelled) { setProductOptions([]); setProductError('상품 목록을 불러오지 못했습니다.'); } })
+      .finally(() => { if (!cancelled) setLoadingProducts(false); });
+    return () => { cancelled = true; };
+  }, [formLandingType, creating, productRetry]);
 
   // Router state 기반 자동 선택 — canonical production.source.items[] 단일 시그니처:
   //  - 내 자료함 → 제작 시작 → QR (다건 가능, 첫 library 항목 사용)
@@ -705,6 +700,8 @@ export function StoreQRPage() {
       </div>
 
       {/* Batch Print Toolbar */}
+      {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
+      {creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
       {items.length > 0 && (
         <div style={styles.printToolbar}>
           <label style={styles.selectAllLabel}>
@@ -1022,7 +1019,7 @@ export function StoreQRPage() {
           (외부 toolbar) 는 그대로 보존 — DataTable rowSelection 은 Set ↔ Array 변환만.
           analytics 토글은 행 아래 펼침이 직접 지원 안 되므로 표 하단에 별도 패널로 표시. */}
       <div style={styles.body}>
-        {!loading && items.length === 0 && !creating ? (
+        {!loading && !listError && items.length === 0 && !creating ? (
           <div style={styles.emptyState}>
             {/* WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
                 QR 사용 입구를 3개로 분리 — 운영자 제공 가져오기 / 내 자료 제작 / 외부 URL(준비 중). */}

@@ -50,7 +50,8 @@ import { findActiveStoreMemberCandidates, resolveApprovedStoreMemberOrganization
  *   경영자 최종 승인이 role 을 발급하고, 해제가 회수한다. 관계 행 하나가 생겼다고 권한이 생기지 않는다
  *   — 초기 구현이 그렇게 돼 있었고(PR #277 리뷰 P1) 정본과 어긋나 바로잡았다.
  */
-import type { DataSource } from 'typeorm';
+import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
+import type { DataSource, EntityManager } from 'typeorm';
 import { isStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 import {
   STORE_SERVICE_ORG_LINKAGE,
@@ -92,7 +93,7 @@ const ALL_STORE_MEMBER_ROLES: readonly string[] = Object.values(STORE_MEMBER_ROL
 
 /** 이 조직이 매장으로 등록된 서비스들. 수락 시 발급할 role 과 해제 시 회수할 role 을 정한다. */
 async function linkedServiceKeys(
-  dataSource: DataSource,
+  dataSource: Pick<DataSource, 'query'>,
   organizationId: string,
 ): Promise<StoreOwnerServiceKey[]> {
   const keys = Object.keys(STORE_SERVICE_ORG_LINKAGE) as StoreOwnerServiceKey[];
@@ -282,26 +283,38 @@ export async function inviteStoreMember(
   if (!user) fail('USER_NOT_FOUND', 404);
   if (user.id === input.ownerUserId) fail('SELF_INVITE_FORBIDDEN', 400);
 
-  const [existing]: Array<{ role: string; left_at: Date | null }> = await dataSource.query(
-    `SELECT role, left_at FROM organization_members WHERE organization_id = $1 AND user_id = $2 LIMIT 1`,
-    [organizationId, user.id],
-  );
+  return withStoreMemberLock(dataSource, user.id, async manager => {
+    const [existing]: Array<{ role: string; left_at: Date | null }> = await manager.query(
+      `SELECT role, left_at FROM organization_members WHERE organization_id = $1 AND user_id = $2 LIMIT 1`,
+      [organizationId, user.id],
+    );
 
-  if (existing && existing.left_at === null) {
-    // 이미 활성 행이 있다 — 경영자 · 관리자 역할을 이 경로로 덮어쓰지 않는다.
-    if (existing.role !== STORE_INVITED_ROLE) fail('ALREADY_MEMBER', 409);
-    return { organizationId, userId: user.id, role: STORE_INVITED_ROLE }; // 재초대는 멱등
-  }
+    if (existing && existing.left_at === null) {
+      // 이미 활성 행이 있다 — 경영자 · 관리자 역할을 이 경로로 덮어쓰지 않는다.
+      if (existing.role !== STORE_INVITED_ROLE) fail('ALREADY_MEMBER', 409);
+      return { organizationId, userId: user.id, role: STORE_INVITED_ROLE }; // 재초대는 멱등
+    }
 
-  // `UNIQUE (organization_id, user_id)` 라 과거에 나간 사람은 같은 행을 되살린다.
-  await dataSource.query(
-    `INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-     VALUES ($1, $2, $3, false, now(), now(), now())
-     ON CONFLICT (organization_id, user_id) DO UPDATE
-       SET role = EXCLUDED.role, left_at = NULL, joined_at = now(), updated_at = now()`,
-    [organizationId, user.id, STORE_INVITED_ROLE],
-  );
-  return { organizationId, userId: user.id, role: STORE_INVITED_ROLE };
+    // `UNIQUE (organization_id, user_id)` 라 과거에 나간 사람은 같은 행을 되살린다.
+    await manager.query(
+      `INSERT INTO organization_members (organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+       VALUES ($1, $2, $3, false, now(), now(), now())
+       ON CONFLICT (organization_id, user_id) DO UPDATE
+         SET role = EXCLUDED.role, left_at = NULL, joined_at = now(), updated_at = now()`,
+      [organizationId, user.id, STORE_INVITED_ROLE],
+    );
+    return { organizationId, userId: user.id, role: STORE_INVITED_ROLE };
+  });
+}
+
+/** Serialize store transitions for one user and commit relationship and canonical Role writes together. */
+async function withStoreMemberLock<T>(dataSource: DataSource, userId: string, work: (manager: EntityManager) => Promise<T>): Promise<T> {
+  try {
+    return await dataSource.transaction(async manager => {
+      await manager.query("SELECT pg_advisory_xact_lock(hashtextextended('store-member:' || $1, 0))", [userId]);
+      return work(manager);
+    });
+  } finally { invalidateRoles(userId); }
 }
 
 /** 내가 받은 초대 목록 — 수락 화면용. */
@@ -326,8 +339,12 @@ export async function listMyInvitations(
  * 세션 사용자와 대상 행의 user_id 가 같을 때만 바뀐다. 초대가 없으면 아무 것도 만들지 않는다
  * (수락이 membership 을 새로 만드는 경로가 되면 초대 없이 들어올 수 있다).
  */
-export async function acceptStoreInvitation(
-  dataSource: DataSource,
+export async function acceptStoreInvitation(dataSource: DataSource, input: Parameters<typeof acceptStoreInvitationUnlocked>[1]): ReturnType<typeof acceptStoreInvitationUnlocked> {
+  return withStoreMemberLock(dataSource, input.userId, manager => acceptStoreInvitationUnlocked(manager, input));
+}
+
+async function acceptStoreInvitationUnlocked(
+  dataSource: EntityManager,
   input: { userId: string; organizationId: string },
 ): Promise<{ organizationId: string; role: string; services: StoreOwnerServiceKey[] }> {
   const [invitation]: Array<{ is_pharmacy: boolean }> = await dataSource.query(
@@ -341,6 +358,7 @@ export async function acceptStoreInvitation(
   const legacyCafe = !invitation.is_pharmacy && (await linkedServiceKeys(dataSource, input.organizationId)).includes('cafe24-b2b');
   if (!invitation.is_pharmacy && !legacyCafe) fail('STORE_NOT_RESOLVED', 403);
   const nextRole = legacyCafe ? STORE_STAFF_ROLE : STORE_ACCEPTED_ROLE;
+  if (legacyCafe) await roleAssignmentService.assignRole({ userId: input.userId, role: STORE_MEMBER_ROLE_BY_SERVICE['cafe24-b2b'], assignedBy: input.userId }, dataSource);
   const result = await dataSource.query(
     `UPDATE organization_members
         SET role = $3, updated_at = now()
@@ -352,29 +370,34 @@ export async function acceptStoreInvitation(
   const rows = (Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result) as unknown[];
   if (!rows || rows.length === 0) fail('INVITATION_NOT_FOUND', 404);
 
-  if (legacyCafe) await roleAssignmentService.assignRole({ userId: input.userId, role: STORE_MEMBER_ROLE_BY_SERVICE['cafe24-b2b'], assignedBy: input.userId });
   return { organizationId: input.organizationId, role: nextRole, services: legacyCafe ? ['cafe24-b2b'] : [] };
 }
 
 /** Final approval belongs to the store owner, never to the invitee. */
-export async function approveStoreMember(
-  dataSource: DataSource,
-  input: { ownerUserId: string; targetUserId: string; serviceKey?: StoreOwnerServiceKey; preferredOrganizationId?: string | null },
-): Promise<{ organizationId: string; userId: string; role: string }> {
+export async function approveStoreMember(dataSource: DataSource, input: Parameters<typeof approveStoreMemberUnlocked>[1]): ReturnType<typeof approveStoreMemberUnlocked> {
   if (input.serviceKey && input.serviceKey !== 'kpa') fail('STORE_NOT_RESOLVED', 403);
   const organizationId = await requireOwnedOrganization(dataSource, input.ownerUserId, 'kpa', input.preferredOrganizationId);
+  return withStoreMemberLock(dataSource, input.targetUserId, manager => approveStoreMemberUnlocked(manager, input, organizationId));
+}
+
+async function approveStoreMemberUnlocked(
+  manager: EntityManager,
+  input: { ownerUserId: string; targetUserId: string; serviceKey?: StoreOwnerServiceKey; preferredOrganizationId?: string | null },
+  organizationId: string,
+): Promise<{ organizationId: string; userId: string; role: string }> {
+  if (input.serviceKey && input.serviceKey !== 'kpa') fail('STORE_NOT_RESOLVED', 403);
   // Granting a global member role alone never grants a store: the active staff relationship is also required.
   // Keep the relation accepted until role issuance succeeds so failed approval is retryable.
-  const [pending] = await dataSource.query(
+  const [pending] = await manager.query(
     `SELECT 1 FROM organization_members
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $3`,
     [organizationId, input.targetUserId, STORE_ACCEPTED_ROLE],
   );
   if (!pending) fail('INVITATION_NOT_FOUND', 404);
-  const linked = await linkedServiceKeys(dataSource, organizationId);
+  const linked = await linkedServiceKeys(manager, organizationId);
   const services: StoreOwnerServiceKey[] = ['kpa', ...linked.filter(key => key === 'cafe24-b2b')];
-  for (const key of services) await roleAssignmentService.assignRole({ userId: input.targetUserId, role: STORE_MEMBER_ROLE_BY_SERVICE[key], assignedBy: input.ownerUserId });
-  const result = await dataSource.query(
+  for (const key of services) await roleAssignmentService.assignRole({ userId: input.targetUserId, role: STORE_MEMBER_ROLE_BY_SERVICE[key], assignedBy: input.ownerUserId }, manager);
+  const result = await manager.query(
     `UPDATE organization_members SET role = $3, updated_at = now()
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $4
       RETURNING organization_id`,
@@ -386,7 +409,11 @@ export async function approveStoreMember(
 }
 
 /** Invitees can decline invitations or cancel an acceptance while waiting for approval. */
-export async function declineStoreInvitation(dataSource: DataSource, input: { userId: string; organizationId: string }): Promise<void> {
+export async function declineStoreInvitation(dataSource: DataSource, input: Parameters<typeof declineStoreInvitationUnlocked>[1]): ReturnType<typeof declineStoreInvitationUnlocked> {
+  return withStoreMemberLock(dataSource, input.userId, manager => declineStoreInvitationUnlocked(manager, input));
+}
+
+async function declineStoreInvitationUnlocked(dataSource: EntityManager, input: { userId: string; organizationId: string }): Promise<void> {
   await dataSource.query(
     `UPDATE organization_members SET left_at = now(), updated_at = now()
       WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = ANY($3::text[])`,
@@ -398,24 +425,24 @@ export async function declineStoreInvitation(dataSource: DataSource, input: { us
  * 구성원 해제 — Owner 전용. 행을 지우지 않고 `left_at` 을 세운다(이력 보존).
  * 이 경로는 **이 모듈이 만든 역할만** 건드린다 — owner · admin · manager 는 거절한다.
  */
-export async function removeStoreMember(
-  dataSource: DataSource,
+export async function removeStoreMember(dataSource: DataSource, input: Parameters<typeof removeStoreMemberUnlocked>[1]): ReturnType<typeof removeStoreMemberUnlocked> {
+  const organizationId = await requireOwnedOrganization(dataSource, input.ownerUserId, input.serviceKey, input.preferredOrganizationId);
+  return withStoreMemberLock(dataSource, input.targetUserId, manager => removeStoreMemberUnlocked(manager, input, organizationId));
+}
+
+async function removeStoreMemberUnlocked(
+  dataSource: EntityManager,
   input: {
     ownerUserId: string;
     targetUserId: string;
     serviceKey?: StoreOwnerServiceKey;
     preferredOrganizationId?: string | null;
   },
+  organizationId: string,
 ): Promise<{ organizationId: string; userId: string; services: StoreOwnerServiceKey[] }> {
-  const organizationId = await requireOwnedOrganization(
-    dataSource,
-    input.ownerUserId,
-    input.serviceKey,
-    input.preferredOrganizationId,
-  );
   const [row]: Array<{ role: string }> = await dataSource.query(
     `SELECT role FROM organization_members
-      WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL LIMIT 1`,
+      WHERE organization_id = $1 AND user_id = $2 LIMIT 1`,
     [organizationId, input.targetUserId],
   );
   if (!row) fail('INVITATION_NOT_FOUND', 404);
@@ -460,7 +487,7 @@ export async function removeStoreMember(
       ],
     );
     if (!remaining || remaining.length === 0) {
-      await roleAssignmentService.removeRole(input.targetUserId, STORE_MEMBER_ROLE_BY_SERVICE[key]);
+      await roleAssignmentService.removeRole(input.targetUserId, STORE_MEMBER_ROLE_BY_SERVICE[key], dataSource);
     }
   }
   return { organizationId, userId: input.targetUserId, services };
