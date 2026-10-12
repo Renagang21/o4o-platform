@@ -13,7 +13,7 @@
  * - Controller MUST NOT contain DB logic — only this service
  * - approve = membership active + ordinary role granted (atomic; no shared account activation)
  */
-import { RetiredServiceError } from '../../middleware/retired-service.middleware.js';
+import { isRetiredServiceValue, RetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
@@ -932,7 +932,7 @@ export class MembershipApprovalService {
         userId, reactivatedBy, isPlatformAdmin,
       });
 
-      const selectResult = isPlatformAdmin
+      let selectResult = isPlatformAdmin
         ? await queryRunner.query(
             `SELECT id, user_id, service_key, role, status
              FROM service_memberships
@@ -955,7 +955,8 @@ export class MembershipApprovalService {
         return null;
       }
 
-      if (selectResult.some((m: any) => m.service_key === 'pharmacy-hub')) throw new RetiredServiceError();
+      selectResult = selectResult.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+      if (selectResult.length === 0) throw new RetiredServiceError();
       const membershipIds = selectResult.map((m: any) => m.id);
       const roles = selectResult.map((m: any) => m.role).filter(Boolean);
 

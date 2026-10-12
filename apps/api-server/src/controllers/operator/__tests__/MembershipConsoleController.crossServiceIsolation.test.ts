@@ -83,7 +83,7 @@ function primeQuery(membershipIds: string[], inScope = true) {
   mockQuery.mockImplementation((sql: string) => {
     const s = String(sql).replace(/\s+/g, ' ').trim();
     if (/^SELECT 1 FROM service_memberships/i.test(s)) return Promise.resolve(inScope ? [{ ok: 1 }] : []);
-    if (/^SELECT id FROM service_memberships/i.test(s)) {
+    if (/^SELECT id(?:, service_key, role)? FROM service_memberships/i.test(s)) {
       return Promise.resolve(membershipIds.map((id) => ({ id })));
     }
     return Promise.resolve([]);
@@ -125,7 +125,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       const selects = mockQuery.mock.calls
         .map(([sql, params]) => ({ sql: String(sql).replace(/\s+/g, ' '), params }))
-        .filter((c) => /SELECT id FROM service_memberships/i.test(c.sql));
+        .filter((c) => /SELECT id(?:, service_key, role)? FROM service_memberships/i.test(c.sql));
 
       expect(selects).toHaveLength(1);
       expect(selects[0].sql).toContain('service_key = ANY($2)');
@@ -305,4 +305,25 @@ it('ID-only approval reports retirement as 410 instead of a server failure',asyn
  await new MembershipConsoleController().approveMembership(request,response);
  expect(response.status).toHaveBeenCalledWith(410);
  expect(response.json).toHaveBeenCalledWith(expect.objectContaining({code:'SERVICE_RETIRED'}));
+});
+
+ describe('retired memberships in user approval', () => {
+  it.each([false, true])('filters PH before approving current services (PH first=%s)', async (phFirst) => {
+    jest.clearAllMocks();
+    const rows = [{ id: 'live', service_key: 'neture', role: 'pharmacy' }, { id: 'retired', service_key: 'pharmacy-hub', role: 'pharmacy' }];
+    if (phFirst) rows.reverse();
+    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? rows : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
+    mockApprovalService.approveMembership.mockResolvedValue({ id: 'live' });
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved'), makeRes());
+    expect(mockApprovalService.approveMembership).toHaveBeenCalledTimes(1);
+    expect(mockApprovalService.approveMembership).toHaveBeenCalledWith(expect.objectContaining({ membershipId: 'live' }));
+  });
+  it('refuses PH-only approval before any approval transaction', async () => {
+    jest.clearAllMocks();
+    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? [{ id: 'retired', service_key: 'pharmacy-hub' }] : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
+    const res = makeRes();
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved'), res);
+    expect(res.status).toHaveBeenCalledWith(410);
+    expect(mockApprovalService.approveMembership).not.toHaveBeenCalled();
+  });
 });

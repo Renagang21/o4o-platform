@@ -6,7 +6,7 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
-import { isRetiredServiceValue, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
+import { isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
@@ -595,17 +595,19 @@ export class MembershipConsoleController {
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
         // (membership + user + role_assignments in single transaction)
-        const pendingMemberships = writeScope.isPlatformAdmin
+        let pendingMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
               [userId]
             )
           : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
               [userId, writeScope.serviceKeys]
             );
 
         if (pendingMemberships.length > 0) {
+          pendingMemberships = pendingMemberships.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+          if (pendingMemberships.length === 0) throw new RetiredServiceError();
           for (const m of pendingMemberships) {
             await approvalService.approveMembership({
               membershipId: m.id,
@@ -798,17 +800,19 @@ export class MembershipConsoleController {
           }
 
           if (targetStatus === 'approved') {
-            const pendingMemberships = writeScope.isPlatformAdmin
+            let pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
                   [userId]
                 )
               : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
                   [userId, writeScope.serviceKeys]
                 );
 
             if (pendingMemberships.length > 0) {
+              pendingMemberships = pendingMemberships.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+              if (pendingMemberships.length === 0) throw new RetiredServiceError();
               for (const m of pendingMemberships) {
                 await approvalService.approveMembership({
                   membershipId: m.id,
