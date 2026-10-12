@@ -33,3 +33,24 @@ test('invalid map identity cannot become a gcloud argument',()=>{
  const result=collectDomainInventory((_cmd,args)=>({status:0,stderr:'',stdout:JSON.stringify(args[1]==='maps'?[{name:'--project=other'}]:[])}));
  assert.equal(result.complete,false);assert.equal(result.blockers[0].check,'certificateMapIdentity');
 });
+
+
+test('regional PH resources and direct consumers match full identity, not just a duplicate name',()=>{
+ const regional='projects/p/locations/asia-northeast3/certificates/ph-cert';
+ const global='projects/p/locations/global/certificates/ph-cert';
+ const calls=[];
+ const result=collectDomainInventory((_cmd,args)=>{
+  calls.push(args);
+  let rows=[];
+  if(args[1]==='certificates')rows=[{name:regional,managed:{domains:['pharmacyhub.co.kr']}}];
+  if(args[1]==='dns-authorizations')rows=[{name:'projects/p/locations/asia-northeast3/dnsAuthorizations/ph-auth',domain:'pharmacyhub.co.kr'}];
+  if(args[1]==='target-https-proxies')rows=[{name:'regional-consumer',certificateManagerCertificates:['//certificatemanager.googleapis.com/'+regional]},
+   {name:'different-cert-consumer',certificateManagerCertificates:[global]}];
+  return {status:0,stdout:JSON.stringify(rows),stderr:''};
+ });
+ assert.equal(result.complete,true);
+ assert.equal(result.managedCertificates[0].resource,regional);
+ assert.deepEqual(result.managedCertificates[0].directProxies.map(p=>p.name),['regional-consumer']);
+ assert.match(result.dnsAuthorizations[0].resource,/asia-northeast3/);
+ assert.equal(calls.filter(a=>['certificates','dns-authorizations'].includes(a[1])).every(a=>a.includes('--location=-')),true);
+});

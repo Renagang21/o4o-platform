@@ -313,3 +313,5 @@ PR #502 main 반영 뒤 main `c1bab86c01ea8eeb5d23c4605fca08008cd09bbf`의 CI를
 [최신 read-only census 38247798519](https://github.com/Renagang21/o4o-platform/actions/runs/38247798519)은 SUCCESS, DB write 0. 로그 접근을 다시 확인해 PH namespace 건수와 FK 정의를 읽었다. 전용 테이블 0, 주문/결제 6건·공급 scope 19건 및 기존 회원/역할/정책/미디어 등 scope는 여전히 남아 있다. 각 scope 건수는 중복될 수 있어 삭제 총량으로 합산하지 않는다.
 
 삭제 전 조사 도구는 live incoming FK의 다른 schema 및 실제 종속 행 건수, 대상 table column type, PH-only/mixed 공급 scope를 읽기 전용으로 추가 집계한다. 인증서 조사는 PH SAN을 포함한 legacy/Certificate Manager 인증서, 모든 HTTPS proxy/map entry의 공유 참조, PH DNS authorization을 조회한다. 오류·부분 목록은 complete=false로 기록하며 비공개 row/PEM/credential을 출력하지 않는다. 이 조사 확장은 DB/인증서/URL map 삭제 기능을 추가하지 않는다. 실제 삭제 runner는 위 종속 귀속과 공유 참조를 확인한 뒤 고정한다.
+
+인증서 조사 리뷰 대응: Certificate Manager certificate/DNS authorization은 `--location=-`로 모든 위치를 조회한다. HTTPS proxy의 certificateManagerCertificates 직접 연결도 집계하며 전체 project/location/resource identity로 비교하여 같은 이름의 지역별 자원을 혼동하지 않는다. map entry와 legacy 인증서 참조도 전체 identity를 보존한다. focused 19 tests PASS. 실제 운영 조사·삭제 결과는 아직 아니다.
