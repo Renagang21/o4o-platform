@@ -3,7 +3,7 @@ import { VALID_STATUSES, type SettlementFilters } from './settlement-query-types
 
 /** Existing settlement responsibility; public callers use NetureSettlementService. */
 export class SupplierSettlementReadService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   // ─────────────────────────────────────────────
   // Supplier endpoints

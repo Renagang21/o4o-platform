@@ -11,7 +11,7 @@ const calculateSupplierAmount = (total: number, fee: number) => total - fee;
 
 /** Existing settlement responsibility; public callers use NetureSettlementService. */
 export class SettlementCommandService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   // ─────────────────────────────────────────────
   // Admin endpoints

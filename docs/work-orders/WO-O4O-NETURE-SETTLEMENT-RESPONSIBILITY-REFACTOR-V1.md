@@ -61,3 +61,14 @@ API dependency/build·typecheck·scoped lint(오류/경고0), 실제 compiled ES
 통과했다. 실제 AppDataSource는 초기화되지 않았으며 import 시 시작된 기존 로컬 notification
 heartbeat만 검증 종료 시 중지했다. 문서 민감정보 검사와 diff 검사도 통과했다.
 실제 PostgreSQL 트랜잭션 fixture·운영 정산 쓰기·실제 지급은 실행하지 않았다.
+
+## 품질 리뷰 처리
+
+Sonar의 새 경고10건을 GitHub check annotation으로 확인했다. 새 역할 서비스3개의
+DataSource 필드를 readonly로 선언하고 façade3개의 lazy 초기화 대입을 return과 분리했다.
+공개 constructor/signature와 이동한11메서드 본문·SQL·금액 정책은 바꾸지 않는다.
+
+나머지4건은 계산 시 공급자별/주문별 쓰기와 지급 알림 수신자 루프의 await다.
+기존 순서·부분 쓰기/실패 전파·첫 알림 실패 시 이후 수신자 처리 중단을 보존해야 하므로
+병렬화하지 않는다. 실제로 해당 순차/실패/완료 시점을 행동 계약에서 검증한다.
+이는 경고를 숨기는 설정 변경이나 원자성 보장으로 해석하지 않는다.

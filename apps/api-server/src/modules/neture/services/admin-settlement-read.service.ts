@@ -3,7 +3,7 @@ import { VALID_STATUSES, type SettlementFilters } from './settlement-query-types
 
 /** Existing settlement responsibility; public callers use NetureSettlementService. */
 export class AdminSettlementReadService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) {}
 
   /**
    * 운영자 정산 목록 (페이지네이션 + 상태 필터 + 공급자명)

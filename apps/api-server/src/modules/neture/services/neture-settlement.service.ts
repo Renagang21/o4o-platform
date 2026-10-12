@@ -11,19 +11,22 @@ export class NetureSettlementService {
   private _supplierRead?: SupplierSettlementReadService;
 
   private get supplierRead(): SupplierSettlementReadService {
-    return this._supplierRead ??= new SupplierSettlementReadService(this.dataSource);
+    this._supplierRead ??= new SupplierSettlementReadService(this.dataSource);
+    return this._supplierRead;
   }
 
   private _adminRead?: AdminSettlementReadService;
 
   private get adminRead(): AdminSettlementReadService {
-    return this._adminRead ??= new AdminSettlementReadService(this.dataSource);
+    this._adminRead ??= new AdminSettlementReadService(this.dataSource);
+    return this._adminRead;
   }
 
   private _command?: SettlementCommandService;
 
   private get command(): SettlementCommandService {
-    return this._command ??= new SettlementCommandService(this.dataSource);
+    this._command ??= new SettlementCommandService(this.dataSource);
+    return this._command;
   }
 
   async getSupplierSettlements(supplierId: string, filters: SettlementFilters) {
