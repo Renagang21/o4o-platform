@@ -261,6 +261,8 @@ PH TODO의 고정 main SHA/허용 workflow 창을 보존하도록 문서 PR을 d
 
 직접 운영 Chromium의 이전 인증서 제약을 우회하지 않았다. HTTPS curl로 실제 자원을 받아 로컬 HTTP에서 기존 fixture를 실행한 결과이며 운영 로그인 세션 성공과 구분한다. 로그·스크린샷은 `/tmp/my-home-completion-deployed-assets.log`, `/tmp/my-home-completion-deployed-public-http.json`, `/tmp/my-home-completion-deployed-playwright.log`, `/tmp/my-home-completion-deployed-fixture/results`에 보존한다. 실제 자격증명·개인 데이터·production 응답 본문은 공개 문서에 복사하지 않았다.
 
+위 배포·39개 fixture 결과의 대상은 runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2`다. 검증 후 main에 추가된 인증·약관 PR #457은 그대로 보존해 문서 branch에 통합했으나 해당 변경의 운영 배포·실계정 검증까지 이번 결과로 주장하지 않는다. 이 문서 PR의 main SHA와 검증한 runtime SHA를 구분한다.
+
 최신 main을 기존 미완료 WO branch에 정상 merge했고 자기 변경은 결과 문서 6개뿐이다. 정본·색인의 최종 제공 데이터/배포 상태·이메일 검증 사용자 제외와 TODO를 [문서 PR #489](https://github.com/Renagang21/o4o-platform/pull/489)로 통합한다. WIF 고정 SHA 창이 끝났으므로 이전 draft 보류 사유는 해소됐다. 문서-only DEPLOYMENT=NOT_APPLICABLE이며 이미 성공한 runtime을 중복 배포하지 않는다. 최종 PR/main CI·merged 상태는 해당 PR의 실제 결과로 확인한다. 초기 소스 CI와 후속 문서 CI를 구분한다.
 
 ## WORKTREE_DISPOSITION — 최종 판정
