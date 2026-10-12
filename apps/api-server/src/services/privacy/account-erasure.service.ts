@@ -101,12 +101,7 @@ export class AccountErasureService {
       if (existing) return existing.id as string;
       const [user] = await m.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
       if (!user) throw new AccountErasureError('USER_NOT_FOUND', 404);
-      const [protectedUser] = await m.query(`SELECT
-        EXISTS(SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true
-          AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())) AS admin,
-        EXISTS(SELECT 1 FROM demo_accounts WHERE user_id=$1 AND is_active) AS demo`, [userId]);
-      if (protectedUser.admin) throw new AccountErasureError('SUPER_ADMIN_PROTECTED', 403);
-      if (protectedUser.demo) throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN', 403);
+      await this.assertTarget(m,userId);
       const active = await m.query("SELECT service_key FROM service_memberships WHERE user_id=$1 AND status='active' FOR UPDATE", [userId]);
       // Stage one is a scoped Operator action. Never silently suspend other services as Admin deletion.
       // Inactive/pending/rejected membership or historical events do not block erasure.
@@ -153,8 +148,9 @@ export class AccountErasureService {
         await m.query("SELECT set_config('o4o.erasure_operation',$1,true)", [operationId]);
         const [user] = await m.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [o.subject_id]);
         if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
+        // Retire legacy contact hashes: a fresh account may reuse contact details.
+        await m.query("DELETE FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[operationId]);
         await this.captureReferenceKeys(m,operationId,o.subject_id!);
-        await this.captureIdentityKeys(m,operationId,user);
         const reviews = await this.reviewManifest(m, user);
         if (reviews.length) {
           await m.query("UPDATE account_erasure_operations SET state='review_required',review_codes=$2,updated_at=now() WHERE id=$1", [operationId, JSON.stringify(reviews)]);
@@ -177,7 +173,7 @@ export class AccountErasureService {
       if (e instanceof AccountErasureError && ['ERASURE_OPERATION_NOT_FOUND','INVALID_OPERATION_ID','FORBIDDEN','AUTH_REQUIRED'].includes(e.code)) throw e;
       const code = e instanceof AccountErasureError ? e.code : 'ERASURE_STEP_FAILED';
       // Never log a SQL error's detail, source profile or GCS path.
-      const review = code.includes('REVIEW_REQUIRED');
+      const review = code.includes('REVIEW_REQUIRED') || ['SUPER_ADMIN_PROTECTED','DEMO_ACCOUNT_FORBIDDEN'].includes(code);
       await this.db.query(`UPDATE account_erasure_operations SET state=$3,error_code=$2,review_codes=$4,updated_at=now()
         WHERE id=$1 AND state<>'completed'`, [operationId, code,review ? 'review_required' : 'retry_required',JSON.stringify(review ? [code] : [])]);
     }
@@ -206,57 +202,33 @@ export class AccountErasureService {
       VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, [operationId,id,hash(id)]);
   }
 
-  private async captureIdentityKeys(m:EntityManager,operationId:string,user:Record<string,unknown>):Promise<void> {
-    for(const token of await this.identityTokens(m,user)) {
-      const [length]=await m.query('SELECT char_length(lower($1::text)) AS n',[token]);
-      if(length.n>8192)throw new AccountErasureError('IDENTITY_MANIFEST_REVIEW_REQUIRED',409);
-      // Hash + character length fence embedded email/name copies without keeping the profile.
-      await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
-        VALUES($1,encode(public.digest(lower($2::text),'sha256'),'hex'),'identity',char_length(lower($2::text)))
-        ON CONFLICT DO NOTHING`,[operationId,token]);
-    }
-  }
-
   private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<string[]> {
-    const tokens = new Set<string>();
-    const visit = (v: unknown): void => {
-      if (typeof v === 'string' && v.length >= 1) tokens.add(v);
-      else if (Array.isArray(v)) v.forEach(visit);
-      else if (v && typeof v === 'object') Object.values(v).forEach(visit);
-    };
-    const visitProfile = (v:unknown):void => {
-      if(Array.isArray(v))v.forEach(visitProfile);
-      else if(v && typeof v==='object')for(const [key,value] of Object.entries(v)) {
-        if(!/role/i.test(key) && /email|^sub$|provider.?id|account.?id|user.?id/i.test(key))visit(value);
-        else if(value && typeof value==='object')visitProfile(value);
-      }
-    };
-    // Non-unique names, nicknames, phone/IP/avatar/shared business values do not identify a copy's subject.
-    // Related copies are detected by subject/email/owned-row/provider identifiers; preserve unrelated people's legitimate values.
-    for (const key of ['id','email']) visit(user[key]);
-    for (const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
-      JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`, [user.id])) visit(r.reference_id);
-    for (const t of await this.tables(m)) {
-      const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const where = owners?.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
-      const fields = t.columns.filter(c => /email|provider.?id|account.?id|metadata|profile/i.test(c));
-      if (!where || !fields.length) continue;
-      for (const row of await m.query(`SELECT ${fields.map(quote).join(',')} FROM public.${quote(t.table_name)} WHERE ${where}`, [user.id])) visitProfile(row);
+    // These identify THIS subject. Actor/alias/provider values in arbitrary metadata
+    // are not globally unique subject keys; their typed domain handlers require review.
+    const tokens=new Set<string>([String(user.id),String(user.email)]);
+    for(const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
+      JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`,[user.id])) {
+      if(r.reference_id)tokens.add(String(r.reference_id));
     }
     return [...tokens];
   }
 
   private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: string[]): Promise<string[]> {
     const tokens = frozenTokens ?? await this.identityTokens(m,user);
-    const patterns = tokens.filter(v=>v.length>=2).map(v => `%${v.replace(/[\\%_]/g, '\\$&')}%`);
+    const localPart = "[:alnum:]_.!#$%&'*+/=?^`{|}~-";
+    const patterns = tokens.filter(v=>v.length>=2).map(v => {
+      const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      // A unique email is not a substring identity: preserve another person's longer address.
+      return v.includes('@') ? `(^|[^${localPart}])${escaped}(?![[:alnum:]-]|\\.[[:alnum:]-])` : escaped;
+    });
     const shortTokens=tokens.filter(v=>v.length<2);
-    // Search values, not JSON column/key names. Short Korean names must not be missed.
+    // Search attributed identifier values, not JSON column/key names or another actor’s profile.
     const leaf=(alias:string)=>`jsonb_path_query_array(to_jsonb(${alias})
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
     const codes: string[] = [];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
-      AND (${leaf('r')}::text ILIKE ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
+      AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
     if(otherUsers.n)codes.push('REVIEW:public.users');
     const [soleAdmin] = await m.query(`SELECT count(*)::int AS n FROM community_memberships target
       WHERE target.user_id=$1 AND target.role='admin' AND target.status='active'
@@ -275,7 +247,7 @@ export class AccountErasureService {
       if (t.table_name === 'community_membership_changes') {
         const [other] = await m.query(`SELECT count(*)::int AS n FROM community_membership_changes h
           JOIN community_memberships cm ON cm.id=h.membership_id WHERE cm.user_id<>$1
-          AND h.actor_user_id IS DISTINCT FROM $1 AND (${leaf('h')}::text ILIKE ANY($2::text[])
+          AND h.actor_user_id IS DISTINCT FROM $1 AND (${leaf('h')}::text ~* ANY($2::text[])
           OR ${leaf('h')} ?| $3::text[])`, [user.id,patterns,shortTokens]);
         if (other.n) codes.push('REVIEW:public.community_membership_changes');
         if (!this.options.systemYears || !this.options.systemBasis?.trim()) {
@@ -286,7 +258,7 @@ export class AccountErasureService {
         continue;
       }
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
-        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ILIKE ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
+        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
       if (r.n) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
@@ -377,6 +349,15 @@ export class AccountErasureService {
     if (!operationId) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
   }
 
+  private async assertTarget(m:EntityManager,userId:string):Promise<void> {
+    const grants=await m.query(`SELECT id,
+      (valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())) AS valid_now
+      FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true FOR SHARE`,[userId]);
+    if(grants.some((g:{valid_now:boolean})=>g.valid_now))throw new AccountErasureError('SUPER_ADMIN_PROTECTED',403);
+    const demo=await m.query('SELECT user_id FROM demo_accounts WHERE user_id=$1 AND is_active FOR SHARE',[userId]);
+    if(demo.length)throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN',403);
+  }
+
   private async assertActor(m:EntityManager,actorId:string):Promise<void> {
     const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
       WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
@@ -389,6 +370,7 @@ export class AccountErasureService {
       await this.assertActor(m,actorId);
       const [o] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE', [operationId]);
       if (o.state === 'completed') return;
+      await this.assertTarget(m,o.subject_id);
       const tasks = await m.query("SELECT * FROM account_erasure_file_tasks WHERE operation_id=$1 AND state IN ('pending','retry_required') FOR UPDATE", [operationId]);
       for (const t of tasks) {
         if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED', 503);
@@ -418,6 +400,7 @@ export class AccountErasureService {
       await m.query("SELECT set_config('o4o.erasure_operation',$1,true)", [operationId]);
       const [user] = await m.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [o.subject_id]);
       if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
+      await this.assertTarget(m,o.subject_id!);
       const frozenTokens = await this.identityTokens(m,user);
       const codes = await this.reviewManifest(m,user,frozenTokens);
       const [f] = await m.query("SELECT count(*)::int AS n FROM account_erasure_file_tasks WHERE operation_id=$1 AND state NOT IN ('deleted','already_absent')", [operationId]);
@@ -427,6 +410,8 @@ export class AccountErasureService {
       if ((await this.reviewManifest(m,user,frozenTokens)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
       await m.query('DELETE FROM users WHERE id=$1', [o.subject_id]);
       await this.audit(m,operationId,o.subject_hash,actorId,'completed');
+      // Only retired UUIDs fence a restore. Re-registration with a fresh UUID/contact is not a restore.
+      await m.query("DELETE FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[operationId]);
       await m.query('UPDATE account_erasure_reference_keys SET reference_id=NULL WHERE operation_id=$1', [operationId]);
       await m.query(`UPDATE account_erasure_operations SET state='completed',subject_id=NULL,review_codes='[]',
         error_code=NULL,completed_at=now(),expires_at=now()+interval '7 days',updated_at=now() WHERE id=$1`, [operationId]);

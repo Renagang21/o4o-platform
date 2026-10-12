@@ -122,9 +122,9 @@ describe('Demo 계정 보호 계약', () => {
       expect(method).not.toMatch(/softDeleteUser|userRepo\.remove/);
     }
     const core=read('services/privacy/account-erasure.service.ts');
-    expect(core).toContain('FROM demo_accounts WHERE user_id=$1 AND is_active');
-    expect(core).toContain("if (protectedUser.demo) throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN', 403)");
-    expect(core.indexOf('if (protectedUser.demo)')).toBeLessThan(core.indexOf('INSERT INTO account_erasure_operations'));
+    expect(core).toContain('FROM demo_accounts WHERE user_id=$1 AND is_active FOR SHARE');
+    expect(core).toContain("if(demo.length)throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN',403)");
+    expect(core.indexOf('await this.assertTarget(m,userId)')).toBeLessThan(core.indexOf('INSERT INTO account_erasure_operations'));
     // Actual JWT/router/DB no-write behavior is covered by the isolated integration fixture.
   });
 
