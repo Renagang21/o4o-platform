@@ -27,3 +27,16 @@ it.each(['/api/v1/store/membership?serviceKey=kpa', '/api/v1/store/membership', 
   expect((await request(app).get(url)).status).toBe(200);
   expect(downstream).toHaveBeenCalledTimes(1);
 });
+
+it.each([
+ { serviceKey: ' pharmacy-hub ' }, { role: 'pharmacy-hub:operator' },
+ { role: ' pharmacy-hub:admin ' }, { roles: ['neture:member','pharmacy-hub:member'] },
+ { serviceKeys: ['neture','pharmacy-hub'] }, { targetServiceKey:'pharmacy-hub' },
+])('rejects normalized scopes and role variants %j', async body => {
+ expect((await request(app).post('/api/v1/operator/members/id/roles').send(body)).status).toBe(410);
+ expect(downstream).not.toHaveBeenCalled();
+});
+it('rejects normalized query scope', async () => {
+ expect((await request(app).get('/api/v1/store/membership').query({serviceKey:' pharmacy-hub '})).status).toBe(410);
+ expect(downstream).not.toHaveBeenCalled();
+});

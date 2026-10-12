@@ -6,6 +6,7 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
@@ -1313,6 +1314,11 @@ export class MembershipConsoleController {
         return;
       }
 
+      if (isRetiredServiceValue(role)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
+        return;
+      }
+
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
       if (await rejectDemoAccountTarget(res, userId)) return;
 
@@ -1337,6 +1343,11 @@ export class MembershipConsoleController {
       }
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
+        return;
+      }
+
+      if (isRetiredServiceValue(roleEntity.serviceKey) || isRetiredServiceValue(roleEntity.name)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
         return;
       }
 

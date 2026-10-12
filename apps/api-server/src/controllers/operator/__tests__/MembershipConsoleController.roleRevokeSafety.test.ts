@@ -515,8 +515,8 @@ describe('tier 제한 — 카탈로그 플래그 + 이름 규칙 이중 판정',
 });
 
 it.each(['assignMemberRole', 'removeMemberRole'] as const)('%s validates a bare role against its catalogue service, not a forged body serviceKey', async action => {
-  mockGetRoleByName.mockResolvedValue({ name: 'member', serviceKey: 'pharmacy-hub', roleKey: 'member', isAdminRole: false, isAssignable: true });
-  const request = makeReq(TARGET_ID, 'member', { isPlatformAdmin: false, serviceKeys: ['neture', 'pharmacy-hub'], rolePrefixes: ['neture', 'pharmacy-hub'] });
+  mockGetRoleByName.mockResolvedValue({ name: 'member', serviceKey: 'lecture', roleKey: 'member', isAdminRole: false, isAssignable: true });
+  const request = makeReq(TARGET_ID, 'member', { isPlatformAdmin: false, serviceKeys: ['neture', 'lecture'], rolePrefixes: ['neture', 'lecture'] });
   request.body = { role: 'member', serviceKey: 'neture' };
   request.memberAdminServiceKeys = ['neture'];
   const response = makeRes();
@@ -525,4 +525,23 @@ it.each(['assignMemberRole', 'removeMemberRole'] as const)('%s validates a bare 
   expect(response.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_MEMBER_ADMIN_REQUIRED' }));
   expect(mockRemoveRole).not.toHaveBeenCalled();
   expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
+});
+
+it('even platform administrators cannot reassign a retired PH prefixed role', async () => {
+ const response = makeRes();
+ const req = makeReq(TARGET_ID, 'pharmacy-hub:operator', PLATFORM_SCOPE);
+ req.body = {role:'pharmacy-hub:operator'};
+ await controller.assignMemberRole(req, response);
+ expect(response.status).toHaveBeenCalledWith(410);
+ expect(mockGetRoleByName).not.toHaveBeenCalled();
+ expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
+});
+it('bare role resolving to a PH database catalog entry cannot be assigned', async () => {
+ mockGetRoleByName.mockResolvedValue({name:'member',serviceKey:'pharmacy-hub',isAssignable:true});
+ const response = makeRes();
+ const req = makeReq(TARGET_ID, 'member', PLATFORM_SCOPE);
+ req.body = {role:'member'};
+ await controller.assignMemberRole(req, response);
+ expect(response.status).toHaveBeenCalledWith(410);
+ expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
 });

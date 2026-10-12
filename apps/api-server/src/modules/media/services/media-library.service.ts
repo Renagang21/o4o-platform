@@ -1,3 +1,4 @@
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 /**
  * MediaLibraryService — WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1
  *
@@ -92,6 +93,7 @@ export class MediaLibraryService {
     folder = 'general',
     opts?: { imageMode?: 'thumbnail-1000' | 'preserve-original' },
   ): Promise<MediaAsset> {
+    if (isRetiredServiceValue(serviceKey)) throw new Error('SERVICE_RETIRED');
     const isImage = IMAGE_MIMES.includes(file.mimetype);
     let buffer = file.buffer;
     let mimeType = file.mimetype;

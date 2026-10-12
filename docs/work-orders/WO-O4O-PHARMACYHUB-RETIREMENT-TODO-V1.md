@@ -270,3 +270,7 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 검증: focused Jest 12 suites / 220 tests PASS. Admin 타입 검사 PASS. API 타입 검사의 market-trial initialHistory 오류는 main 소스가 아닌 오래된 market-trial dist 때문에 발생했고 패키지 재빌드 후 API 타입 검사 PASS. PH 전용 서비스/도메인 삭제를 위한 직접 GCP 관리자 identity는 없으며 새 운영 write/정리 도구·실행은 미완료다. DB 삭제 전 과거 포럼 partition의 비공개 데이터 격리와 공용 파기 보호 목록은 유지한다. 이 보호용 PH 참조는 서비스 재사용 등록이 아니며 데이터 삭제 후 제거한다.
 
 추가 검증: Node 22.18.0에서 관련 API 회귀 175 suites를 조사해 172 suites PASS, 폐기 전 PH를 현행 서비스로 전제한 승인/복구 3 suites는 현행 서비스 fixture로 정렬 후 모두 PASS. 기존 11 skipped suites는 실행 PASS로 세지 않는다. 신규 retired-request 경계 13 tests PASS. API/Admin/KPA 타입 검사 PASS. Node 24 런타임과 기존 better-sqlite3(Node 22) ABI 차이는 저장소 밖에 설치한 기준 Node 22.18.0으로 해소했고 native DB-backed validity 회귀도 실행됐다. 기존 SQL/기능 assertion을 끄지 않고 폐기된 producer 테스트를 제거·거절 회귀로 대체했다.
+
+### PR #502 리뷰 보강
+
+최초 commit `1763adb714`의 원격 CI [38196980183](https://github.com/Renagang21/o4o-platform/actions/runs/38196980183)은 CI Gate 포함 SUCCESS였다. Codex 리뷰의 P1 두 건/P2 한 건은 별도로 반영한다. 범용 역할 부여는 요청의 prefixed role과 해석된 DB role의 service/name 모두에서 PH를 거절한다(플랫폼 관리자도 예외 없음). multer memory parse 후 업로드 경계에서 다시 검사하고 서비스 upload 자체도 GCS/DB write 전에 거절한다. scope·role 비교는 trim 및 배열을 처리한다. 3개 focused suites 55 tests PASS, API 타입 검사 PASS. multipart/공백 scope/role 배열/DB의 bare-role→PH 매핑 회귀를 추가했다. main 통합·배포·DB/DNS/인증서 변경은 여전히 다른 운영 작업 종료 대기다.

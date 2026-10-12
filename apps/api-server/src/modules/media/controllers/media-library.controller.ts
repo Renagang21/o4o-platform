@@ -9,6 +9,7 @@ import type { Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { isPlatformAdmin } from '../../../utils/role.utils.js';
+import { rejectRetiredService } from '../../../middleware/retired-service.middleware.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { MediaLibraryService } from '../services/media-library.service.js';
 import logger from '../../../utils/logger.js';
@@ -22,7 +23,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
    * POST /media-library/upload
    * 공용 미디어 라이브러리 업로드 (동의 필수)
    */
-  router.post('/media-library/upload', authenticate, uploadSingleMiddleware('file'), async (req: any, res: Response) => {
+  router.post('/media-library/upload', authenticate, uploadSingleMiddleware('file'), rejectRetiredService, async (req: any, res: Response) => {
     try {
       const file = req.file as Express.Multer.File;
       if (!file) {
