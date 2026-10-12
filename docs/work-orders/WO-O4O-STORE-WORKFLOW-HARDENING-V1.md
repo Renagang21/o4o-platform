@@ -1,6 +1,6 @@
 # WO-O4O-STORE-WORKFLOW-HARDENING-V1
 
-> 상태: ACTIVE · 작성일: 2026-10-12 KST
+> **상태**: COMPLETED · **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12 (KST)
 > 근거: 사용자 승인 — 조회 오류·직원 권한 정합성·대형 화면 기능 분리·문서 정리를 하나의 작업으로 구현·검증·push·main 통합·배포
 > 정본: [매장 접근](../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md), [약국 commerce](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
 
@@ -12,7 +12,7 @@
 - [x] QR·사이니지 목록과 채널·태블릿 조회 기능을 화면 밖으로 분리
 - [x] 현행 약국 직원 접근과 선택 매장 설명·퇴역 서비스 주석 정합
 - [x] 실패·재시도·동시 요청 회귀 검사 및 API 타입·웹 빌드·품질 검사
-- [ ] commit·push·PR·CI·리뷰 후 main 통합·운영 배포 확인
+- [x] commit·push·PR·CI·리뷰 후 main 통합·운영 배포 확인
 
 직원은 최종 승인 후 업무 전체를 이용하며 구성원 관리는 경영자만 이용한다. 데이터·Role schema와 Frozen Core를 변경하지 않는다. 기존 canonical Role writer를 사용한다. 승인·Role 발급은 기존 manager 지원을 재사용하고 해제도 관계·Role 변경을 한 트랜잭션으로 반영하여 부분 실패를 롤백하고 재시도한다. Role writer의 기존 호출 계약·인가 SSOT를 유지하는 선택적 manager 지원만 보완한다(Freeze의 버그 수정 범위). 운영 계정 생성·권한 backfill·운영 업무 데이터 변경은 이 코드 작업에 포함하지 않는다.
 
@@ -38,3 +38,9 @@
 태블릿 상세 조회 실패 후 위치 목록으로 돌아오면 이전 상세 오류·pool·진열·대기 목록을 초기화한다. PC·모바일 합성 검증에 상세 실패→목록 복귀를 추가해 36개 PASS다.
 
 CI 38255436395는 변경하지 않은 auth-react 카카오 가입 테스트에서 `resolve is not a function`으로 실패했다(앞선 두 PR CI의 같은 인증 테스트는 PASS). 비동기 terms 요청의 준비 전 테스트 resolve 호출이며 인증 코드는 임의 수정하지 않는다. 현재 보완 커밋의 required CI가 최종 gate다.
+
+## 완료 판정
+
+구현·검증·PR #514 main 통합·API 및 내 매장 웹 운영 배포를 완료했다.
+배포 SHA·CI·합성 브라우저 결과와 실제 계정·기기 검증 경계는
+[CHECK-O4O-STORE-WORKFLOW-HARDENING-V1](../checks/CHECK-O4O-STORE-WORKFLOW-HARDENING-V1.md)에 기록한다.
