@@ -97,6 +97,9 @@ describe('EmailSignupForm', () => {
       <EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" links={{ login: '/login' }} />,
     );
     await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+    const privacyLink = screen.getByRole('link', { name: '개인정보 처리방침 내용 보기' });
+    expect(privacyLink.getAttribute('href')).toBe('https://neture.co.kr/privacy');
+    expect(privacyLink.getAttribute('target')).toBe('_blank');
     fill();
     expect(submit().disabled).toBe(true);
     const boxes = screen.getAllByRole('checkbox');
@@ -261,4 +264,26 @@ describe('useServiceAuth.loginWithEmail', () => {
     await act(async () => { r = await result.current.loginWithEmail('a@b.co', 'x'); });
     expect(r.success).toBe(false);
   });
+});
+
+it('email signup hides privacy links until the server supplies the policy owner', async () => {
+  let resolve!: (doc: typeof TERMS) => void;
+  render(<EmailSignupForm api={{ getSignupTerms: () => new Promise(r => { resolve = r; }), signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} privacyHref="/privacy" />);
+  await waitFor(() => expect(resolve).toBeTypeOf('function'));
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+  await act(async () => { const doc = { ...TERMS, privacyHref: 'https://pharmacy.neture.co.kr/privacy' }; resolve(doc); });
+  expect((await screen.findByRole('link', { name: '개인정보 처리방침 내용 보기' })).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
+});
+
+it('email requires fresh privacy acknowledgement after a policy version mismatch', async () => {
+  const load=vi.fn().mockResolvedValueOnce(TERMS).mockResolvedValue({...TERMS,version:2,privacyPolicy:{policyDocumentId:'22222222-2222-4222-8222-222222222222',version:2,title:'Updated privacy'}});
+  const signup=vi.fn(async()=>{throw {response:{data:{code:'POLICY_VERSION_MISMATCH',error:'Changed'}}};});
+  render(<EmailSignupForm api={{getSignupTerms:load,signupWithEmail:signup,resendVerificationEmail:vi.fn()}} />);
+  await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
+  fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'),{target:{value:'synthetic@fixture.invalid'}});fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('휴대전화'),{target:{value:'01012345678'}});
+  for(const id of ['email-signup-password','email-signup-confirm'])fireEvent.change(screen.getByTestId(id),{target:{value:'Synthetic123!'}});
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);fireEvent.click(screen.getByRole('button',{name:'가입하고 확인 메일 받기'}));
+  await screen.findByRole('link',{name:'내용 보기 · 버전 2'});
+  expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(false);
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);expect((screen.getByRole('button',{name:'가입하고 확인 메일 받기'}) as HTMLButtonElement).disabled).toBe(true);expect(signup).toHaveBeenCalledTimes(1);
 });

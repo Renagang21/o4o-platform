@@ -31,6 +31,7 @@ import {
 } from '../../auth/password-session.policy.js';
 import type { AccessTokenPayload } from '../../../types/auth.js';
 import { isBrowserSessionLive } from '../../../services/auth/browser-session.service.js';
+import { isPlatformAdmin } from '../../../utils/role.utils.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -97,12 +98,16 @@ function enforceAccountAccess(req: AuthRequest, res: Response, user: { id: strin
  *
  * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
  */
-async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string }): Promise<boolean> {
+async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string; roles?: string[] }): Promise<boolean> {
+  // Management context is the signed admin session plus current DB platform role, never Origin/body/JWT roles.
+  // The same account using a normal service session still follows that service's acceptance rules.
+  // Auth-method, account/session status, and downstream route role guards remain mandatory.
+  if (req.sessionServiceKey === 'admin' && isPlatformAdmin(user.roles ?? [])) return false;
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {
-    // enforced pending — Demo 계정 예외만 반영(정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2). 판정 로직은 불변.
-    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id);
+    // 공통 계정과 요청 서비스의 pending만 적용한다. 서명된 세션 범위와 서버 경로를 사용하며 Demo 예외를 유지한다.
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id, req.sessionServiceKey, req.originalUrl, req.method);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,
@@ -245,6 +250,7 @@ export const requireAuth = async (
     // Auth phase 4-A: fresh roles + explicit Google evidence for admin/platform accounts.
     if (await enforceSessionAuthMethodBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
+    req.sessionServiceKey = payload.serviceKey;
     if (await enforceTermsAcceptance(req, res, user)) return;
 
     // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload

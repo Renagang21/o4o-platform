@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
@@ -46,13 +47,16 @@ export class EnrollmentController extends BaseController {
       // 타 서비스 courseId 로는 수강 신청 자체가 불가능해야 한다.
       if (!(await guardCourseScope(req, res, courseId))) return;
 
-      const data = { courseId, userId };
+      const resolved = resolveScopeOrRespond(req, res); if (!resolved.ok) return;
+      const data = { courseId, userId, serviceScope: resolved.scope, policyReferences: req.body?.policyReferences };
       const service = EnrollmentService.getInstance();
 
       const enrollment = await service.enrollCourse(data);
 
       return BaseController.created(res, { enrollment });
     } catch (error: any) {
+      if (error.httpStatus === 404) return BaseController.error(res, 'Course not found', 404);
+      if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
       logger.error('[EnrollmentController.enrollCourse] Error', { error: error.message });
 
       if (error.message && error.message.includes('already enrolled')) {

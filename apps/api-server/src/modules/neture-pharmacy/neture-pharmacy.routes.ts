@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
@@ -64,7 +65,7 @@ function handle(fn: Handler): RequestHandler {
       const data = await fn(req as Req, res);
       if (!res.headersSent) res.json({ success: true, data });
     } catch (err) {
-      if (err instanceof NeturePharmacyError) {
+      if (err instanceof NeturePharmacyError || err instanceof PolicyAcceptanceError) {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
         return;
       }

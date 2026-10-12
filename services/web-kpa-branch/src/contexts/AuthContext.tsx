@@ -20,7 +20,7 @@ import {
   type UserLike,
 } from '@o4o/auth-utils';
 import { getAccessToken, type GoogleAuthConfig } from '@o4o/auth-client';
-import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents } from '@o4o/auth-react';
+import { useServiceAuth, type AuthLoginResult, type GoogleSignupConsents, type PendingPolicyAcceptance, type PolicyAcceptanceResult } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { SERVICE_KEY } from '../config/service';
 
@@ -42,6 +42,8 @@ interface AuthContextValue {
   signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<BranchUser>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<BranchUser>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
+  pendingPolicyAcceptances: PendingPolicyAcceptance[];
+  acceptPendingPolicies: () => Promise<PolicyAcceptanceResult>;
   logout: () => void;
 }
 
@@ -86,6 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signupWithGoogle: core.signupWithGoogle,
         loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
+        pendingPolicyAcceptances: core.pendingPolicyAcceptances,
+        acceptPendingPolicies: core.acceptPendingPolicies,
         logout: () => {
           void core.logout();
         },

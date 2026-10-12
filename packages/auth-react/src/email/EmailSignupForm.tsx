@@ -1,4 +1,4 @@
-import { SignupTermsAgreement } from '../SignupTermsAgreement';
+import { signupPrivacyHref, SignupTermsAgreement, signupPolicyReferences } from '../SignupTermsAgreement';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
  * <EmailSignupForm /> — 이메일 회원가입 + <EmailSentNotice /> 확인 메일 안내
@@ -25,7 +25,7 @@ export interface EmailSignupFormProps {
 
 const PHONE_SHAPE = /^01\d{8,9}$/;
 
-export function EmailSignupForm({ api, links, privacyHref, className }: EmailSignupFormProps) {
+export function EmailSignupForm({ api, links, className }: EmailSignupFormProps) {
   const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
   const [policyReload, setPolicyReload] = useState(0);
   const [email, setEmail] = useState('');
@@ -71,14 +71,14 @@ export function EmailSignupForm({ api, links, privacyHref, className }: EmailSig
         name: name.trim(),
         phone: phoneDigits,
         password,
-        consents: { terms, privacy, marketing, termsPolicy: { policyDocumentId: policy!.policyDocumentId, version: policy!.version } },
+        consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) },
       });
       setPassword('');
       setConfirm('');
       setSentTo({ email: email.trim(), masked: res.maskedEmail ?? undefined, mailSent: res.mailSent });
     } catch (e) {
       const failure = readEmailAuthError(e, '회원가입을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-      if (failure.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
+      if (failure.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
       setError(failure.message);
     } finally {
       setSubmitting(false);
@@ -156,10 +156,10 @@ export function EmailSignupForm({ api, links, privacyHref, className }: EmailSig
 
       <fieldset style={{ border: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <legend style={{ ...styles.label, marginBottom: 4 }}>약관 동의</legend>
-        <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+        <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <label style={styles.checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
-          <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+          {policy && <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>}
         </div>
         <label style={styles.checkRow}>
           <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />

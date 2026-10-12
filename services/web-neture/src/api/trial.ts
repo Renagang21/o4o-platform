@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * Trial API Client
  *
@@ -290,9 +291,10 @@ export async function getTrial(trialId: string): Promise<Trial> {
 
 export async function joinTrial(
   trialId: string,
-  rewardType: 'cash' | 'product'
+  rewardType: 'cash' | 'product',
+  policyReferences?: EnrollmentPolicyReference[]
 ): Promise<Participation> {
-  const { data } = await api.post(`${API_BASE_URL}/api/market-trial/${trialId}/join`, { rewardType });
+  const { data } = await api.post(`${API_BASE_URL}/api/market-trial/${trialId}/join`, { rewardType, policyReferences });
   return data.data || data;
 }
 

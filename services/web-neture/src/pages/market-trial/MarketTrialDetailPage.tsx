@@ -1,3 +1,5 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
+import { api } from '../../lib/apiClient';
 /**
  * MarketTrialDetailPage — Neture 유통참여형 펀딩(Market Trial) 상세
  *
@@ -42,7 +44,8 @@ const REWARD_LABELS: Record<string, string> = {
 export function MarketTrialDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const agreement = useServiceEnrollmentPolicies('funding', async () => (await api.get('/public/services/funding/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${id}`);
 
   const [trial, setTrial] = useState<Trial | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +94,8 @@ export function MarketTrialDetailPage() {
     setJoinLoading(true);
     setJoinError(null);
     try {
-      const res = await joinTrial(id, selectedReward);
+      if (!agreement.ready) { setJoinError('서비스 약관을 먼저 확인해 주세요.'); return; }
+      const res = await joinTrial(id, selectedReward, agreement.references);
       if (res?.id) {
         setParticipation({
           id: res.id,
@@ -113,6 +117,7 @@ export function MarketTrialDetailPage() {
       const e = err as { response?: { data?: { message?: string }; status?: number } };
       const msg = e?.response?.data?.message || '';
       const status = e?.response?.status;
+      if (status === 409 && ['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes((e.response?.data as any)?.code)) agreement.reload();
       if (status === 401) {
         navigate(`/login?returnUrl=/market-trial/${id}`);
         return;
@@ -433,10 +438,11 @@ export function MarketTrialDetailPage() {
               <p style={s.joinError}>{joinError}</p>
             )}
 
+            {isAuthenticated && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
             <button
               type="button"
               onClick={handleJoin}
-              disabled={!selectedReward || joinLoading}
+              disabled={!selectedReward || joinLoading || (isAuthenticated && !agreement.ready)}
               style={{
                 width: '100%',
                 padding: '12px 20px',

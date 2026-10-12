@@ -14,7 +14,6 @@ import {
 } from '@o4o/operator-core-ui/modules/service-legal';
 import { api } from '../../lib/apiClient';
 
-const SERVICE_KEY = 'neture';
 
 /** axios 오류 → 사용자 메시지(권한 우회 없이 상태별 표시). */
 function toError(err: any): Error {
@@ -86,6 +85,6 @@ const legalApi: ServiceLegalApi = {
   },
 };
 
-export default function ServiceLegalSettingsPage() {
-  return <SharedServiceLegalSettingsPage serviceKey={SERVICE_KEY} api={legalApi} />;
+export default function ServiceLegalSettingsPage({ serviceKey = 'neture' }: { serviceKey?: 'neture' | 'supplier' | 'community' | 'funding' }) {
+  return <SharedServiceLegalSettingsPage serviceKey={serviceKey} api={legalApi} />;
 }

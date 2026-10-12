@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 /**
  * Neture 공개 정책 문서 페이지 (이용약관 / 개인정보처리방침)
  *
@@ -32,9 +33,9 @@ export async function loadPolicy(serviceKey: string, documentType: string): Prom
 }
 
 export function TermsPage() {
-  return <PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="terms" heading="이용약관" loadPolicy={loadPolicy} />;
+  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="terms" heading="이용약관" loadPolicy={loadPolicy} /></>;
 }
 
 export function PrivacyPage() {
-  return <PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="privacy" heading="개인정보처리방침" loadPolicy={loadPolicy} />;
+  return <><p className="mx-auto max-w-4xl px-4 pt-6"><Link to="/policies/account-update" className="text-blue-700">계정 이용약관·개인정보 처리방침 개정 공고 보기</Link></p><PolicyDocumentViewer serviceKey={SERVICE_KEY} documentType="privacy" heading="개인정보처리방침" loadPolicy={loadPolicy} /></>;
 }

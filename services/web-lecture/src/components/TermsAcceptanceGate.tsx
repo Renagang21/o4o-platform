@@ -14,5 +14,6 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
     allowPaths={['/terms', '/privacy']}
     serviceName={BRAND.name}
     termsPath="/terms"
+    termsServiceKey="lecture"
   >{children}</PolicyAcceptanceGate>;
 }

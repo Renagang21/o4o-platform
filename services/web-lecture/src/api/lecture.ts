@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * O4O 강의 (lecture) — LMS API 계층
  *
@@ -188,8 +189,8 @@ export const learnerApi = {
   getLesson: (lessonId: string) =>
     lmsHttp.get<LmsApiResponse<{ lesson: LectureLesson }>>(`/lms/lessons/${lessonId}`),
   /** 강사 신청 (학습자 = active membership). */
-  applyInstructor: () =>
-    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply'),
+  applyInstructor: (policyReferences?: EnrollmentPolicyReference[]) =>
+    lmsHttp.post<LmsApiResponse<{ application: InstructorApplication }>>('/lms/instructor/apply', { policyReferences }),
   /** 공개 수료증 검증 (비로그인 허용). */
   verifyCertificate: (verificationCode: string) =>
     lmsHttp.get<LmsApiResponse<any>>(`/lms/certificates/verify/${encodeURIComponent(verificationCode)}`),

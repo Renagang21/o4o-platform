@@ -1,3 +1,4 @@
+import { recordEnrollmentPolicies, recordEnrollmentApplication, type EnrollmentPolicyReference } from '../../policy-acceptance/service-enrollment-policy.service.js';
 import { businessCommunityKeyTaken } from '../../../services/community/community-key-namespace.js';
 /**
  * 세미프랜차이즈 = 데이터 행 (DESIGN §1 R3 · R4 · §3-2)
@@ -67,21 +68,26 @@ export class SemiFranchiseService {
     return rows.map(row => ({ ...row, communityKey: row.communityKey || `business:${row.key}` }));
   }
 
-  async apply(organizationId: string, userId: string, key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string } = {}) {
-    const sf = await this.requireActive(key);
-    if (sf.registration_conditions && application.acceptedConditions !== true)
-      throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주세요.');
-    if (sf.registration_conditions && application.conditions !== sf.registration_conditions)
-      throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
+  async apply(organizationId: string, userId: string, key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string; policyReferences?: EnrollmentPolicyReference[] } = {}) {
     if (application.note !== undefined && (typeof application.note !== 'string' || application.note.length > 2000))
       throw new NeturePharmacyError(400, 'INVALID_APPLICATION', '추가 신청 내용은 2000자 이내로 입력해 주세요.');
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, userId);
-      const saveApplication = () => m.query(
+      const [sf]: SemiFranchiseRow[] = await m.query(`SELECT sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, owner.metadata->>'registrationConditions' AS registration_conditions FROM semi_franchises sf JOIN organizations owner ON owner.id = sf.organization_id WHERE sf.key = $1 FOR SHARE OF sf, owner`, [key]);
+      if (!sf || sf.status !== 'active') throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
+      if (sf.registration_conditions && application.acceptedConditions !== true)
+        throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주세요.');
+      if ((application.conditions ?? '') !== (sf.registration_conditions ?? ''))
+        throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
+      const policies = key === 'pharmacy' ? await recordEnrollmentPolicies(m, userId, 'kpa-society', application.policyReferences) : [];
+      const saveApplication = async (membershipId: string) => {
+        if (key === 'pharmacy') await recordEnrollmentApplication(m, userId, 'kpa-society', { type: 'pharmacy_business_application', id: membershipId, resourceId: sf.id, conditions: { conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null } }, policies);
+        return m.query(
         `UPDATE organizations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{semiFranchiseApplications}',
           COALESCE(metadata->'semiFranchiseApplications', '{}'::jsonb) || jsonb_build_object($2::text, $3::jsonb)) WHERE id = $1`,
-        [organizationId, key, JSON.stringify({ conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null, appliedBy: userId })],
+        [organizationId, key, JSON.stringify({ conditions: sf.registration_conditions || null, accepted: application.acceptedConditions === true, note: application.note?.trim() || null, appliedBy: userId, appliedAt: new Date().toISOString(), applicationPolicies: policies })],
       );
+      };
       const [existing] = await m.query(
         `SELECT id, status FROM semi_franchise_memberships
           WHERE semi_franchise_id = $1 AND organization_id = $2 FOR UPDATE`,
@@ -98,7 +104,7 @@ export class SemiFranchiseService {
             WHERE id = $1 RETURNING id, status`,
           [existing.id, userId],
         ));
-        await saveApplication();
+        await saveApplication(row.id);
         return row;
       }
       const [row] = await m.query(
@@ -106,7 +112,7 @@ export class SemiFranchiseService {
          VALUES ($1, $2, 'pending', $3) RETURNING id, status`,
         [sf.id, organizationId, userId],
       );
-      await saveApplication();
+      await saveApplication(row.id);
       return row;
     });
   }

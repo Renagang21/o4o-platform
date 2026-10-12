@@ -2,6 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { styles } from './email/shared';
 
+// Common rollout uses Neture; preserve the pharmacy disclosure until its terms actually switch.
+export const ACCOUNT_PRIVACY_HREF = 'https://neture.co.kr/privacy';
+export function signupPrivacyHref(document: SignupTermsDocument | null) {
+  return document?.privacyHref ?? (document?.termsHref === 'https://pharmacy.neture.co.kr/policy' ? 'https://pharmacy.neture.co.kr/privacy' : ACCOUNT_PRIVACY_HREF);
+}
+
+export function signupPolicyReferences(document: SignupTermsDocument) {
+  return { termsPolicy: { policyDocumentId: document.policyDocumentId, version: document.version },
+    ...(document.privacyPolicy ? { privacyPolicy: { policyDocumentId: document.privacyPolicy.policyDocumentId, version: document.privacyPolicy.version } } : {}) };
+}
+
 export function SignupTermsAgreement({ load, checked, onChecked, onDocument, reloadKey = 0 }: {
   load: () => Promise<SignupTermsDocument>;
   checked: boolean;
@@ -27,8 +38,12 @@ export function SignupTermsAgreement({ load, checked, onChecked, onDocument, rel
     }).then(doc => {
       if (!active) return;
       if (!doc || !/^[0-9a-f-]{36}$/i.test(doc.policyDocumentId) || !Number.isInteger(doc.version) || doc.version < 1 || !doc.title || !doc.termsHref) throw new Error('Invalid published agreement');
-      const href = new URL(doc.termsHref);
-      if (href.protocol !== 'https:' || href.username || href.password) throw new Error('Invalid policy link');
+      if (doc.privacyPolicy && (!/^[0-9a-f-]{36}$/i.test(doc.privacyPolicy.policyDocumentId) || !Number.isInteger(doc.privacyPolicy.version)
+        || doc.privacyPolicy.version < 1 || typeof doc.privacyPolicy.title !== 'string' || !doc.privacyPolicy.title.trim())) throw new Error('Invalid privacy reference');
+      for (const link of [doc.termsHref, signupPrivacyHref(doc)]) {
+        const href = new URL(link);
+        if (href.protocol !== 'https:' || href.username || href.password) throw new Error('Invalid policy link');
+      }
       active = false; clearTimeout(timeout);
       setDocument(doc); setState('ready'); ref.current.onDocument(doc);
     }).catch(() => { if (active) { active = false; clearTimeout(timeout); setState('error'); } });
@@ -41,5 +56,6 @@ export function SignupTermsAgreement({ load, checked, onChecked, onDocument, rel
       <label style={styles.checkRow}><input type="checkbox" disabled={state !== 'ready'} checked={checked} onChange={e => onChecked(e.target.checked)} /><span>이용약관 동의 (필수)</span></label>
       {document && <a href={document.termsHref} target="_blank" rel="noopener noreferrer" style={styles.link}>내용 보기 · 버전 {document.version}</a>}
     </div>
+    {document?.privacyPolicy && <p style={styles.muted}>개인정보 처리방침 버전 {document.privacyPolicy.version}을 함께 확인합니다.</p>}
   </div>;
 }

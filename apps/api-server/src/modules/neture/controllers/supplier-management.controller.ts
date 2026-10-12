@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * SupplierManagementController — WO-O4O-ROUTES-REFACTOR-V1
  * Extracted from neture.routes.ts
@@ -34,8 +35,8 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       if (!userId) {
         return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
       }
-      const { name, slug, contactEmail } = req.body || {};
-      const result = await netureService.registerSupplier(userId, { name, slug, contactEmail });
+      const { name, slug, contactEmail, policyReferences } = req.body || {};
+      const result = await netureService.registerSupplier(userId, { name, slug, contactEmail, policyReferences });
       if (!result.success) {
         const statusMap: Record<string, number> = {
           NETURE_MEMBERSHIP_REQUIRED: 403,
@@ -48,6 +49,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       }
       res.status(201).json({ success: true, data: result.data });
     } catch (error) {
+      if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
       logger.error('[Neture API] Error registering supplier:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to register supplier' } });
     }

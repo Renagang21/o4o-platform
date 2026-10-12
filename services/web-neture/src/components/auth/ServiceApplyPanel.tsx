@@ -1,3 +1,4 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
 /**
  * ServiceApplyPanel — 로그인 회원의 공급자 서비스 신청 · 상태 패널 (랜딩 페이지용)
  *
@@ -43,6 +44,7 @@ export function ServiceApplyPanel({ service, enterWorkspace = false }: { service
   const { user, isAuthenticated } = useAuth();
   const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
+  const agreement = useServiceEnrollmentPolicies('supplier', async () => (await api.get('/public/services/supplier/enrollment-policies')).data.data, user?.id ?? 'signed-out');
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -133,13 +135,15 @@ export function ServiceApplyPanel({ service, enterWorkspace = false }: { service
   const isReapply = status !== 'none';
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!agreement.ready || submitting) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email });
+      await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email, policyReferences: agreement.references });
       reload();
     } catch (err: unknown) {
       const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code;
+      if (code === 'POLICY_VERSION_MISMATCH' || code === 'ENROLLMENT_POLICY_REQUIRED') { agreement.reload(); setSubmitError('서비스 약관이 변경되었습니다. 입력 내용은 유지됩니다. 최신 약관을 확인해 주세요.'); return; }
       setSubmitError((code && ERROR_MESSAGES[code]) || '신청에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setSubmitting(false);
@@ -170,8 +174,9 @@ export function ServiceApplyPanel({ service, enterWorkspace = false }: { service
             <input className={input} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder={user?.email} />
           </label>
         </div>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
       {submitError && <p className="text-sm text-red-600 mt-3">{submitError}</p>}
-      <button type="submit" disabled={submitting} className="mt-4 inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50">
+      <button type="submit" disabled={submitting || !agreement.ready} className="mt-4 inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50">
         {submitting ? '신청 중...' : isReapply ? '다시 신청하기' : `${info.name} 신청`}
       </button>
     </form>
