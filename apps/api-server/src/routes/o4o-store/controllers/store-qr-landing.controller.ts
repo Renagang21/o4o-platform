@@ -29,10 +29,11 @@ import { DataSource } from 'typeorm';
 import { createHash } from 'crypto';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1:
 //   QR CRUD·집계 계약을 services/store/store-qr.service.ts 로 추출했다. 이 controller 는
-//   인증·조직 결정(공통 createRequireStoreOwner — 무변경)과 응답 매핑·파일 스트리밍만 담당한다.
+//   인증·조직 결정(공통 createRequireStoreWorkspaceAccess — 무변경)과 응답 매핑·파일 스트리밍만 담당한다.
 //   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다.
 import {
   resolvePublicQrLanding,
@@ -154,7 +155,7 @@ export function createStoreQrLandingController(
 ): Router {
   const router = Router();
   const qrRepo = dataSource.getRepository(StoreQrCode);
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // Advertise HEAD semantics on the existing namespace, including its slug-less
   // 404. Clients can check deployment support without resolving a QR or writing a scan.

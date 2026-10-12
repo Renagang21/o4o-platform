@@ -1,3 +1,4 @@
+import { respondErasure } from '../../services/privacy/account-erasure.http.js';
 /**
  * @core O4O_PLATFORM_CORE — Approval
  * Core Controller: User list, status change (approve/reject), password reset, delete
@@ -19,8 +20,6 @@ import { isPlatformAdmin } from '../../utils/role.utils.js';
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
 import {
   demoAccountService,
-  DEMO_ACCOUNT_FORBIDDEN_CODE,
-  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
   respondDemoAccountForbidden,
 } from '../../services/auth/demo-account.service.js';
 import {
@@ -578,76 +577,9 @@ export class AdminUserController {
     }
   };
 
-  // Delete user
+  // CORE_CHANGE_REQUIRED — WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1 approved 2026-10-12.
   deleteUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params;
-      const userRepo = AppDataSource.getRepository(User);
-
-      const user = await userRepo.findOne({ where: { id } });
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          error: 'User not found'
-        });
-        return;
-      }
-
-      // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1:
-      // platform:super_admin 계정은 이 API로 삭제/비활성화 불가
-      const isSuperAdmin = await roleAssignmentService.hasAnyRole(id, ['platform:super_admin']);
-      if (isSuperAdmin) {
-        res.status(403).json({
-          success: false,
-          error: 'Cannot delete or deactivate a platform super admin account',
-          code: 'SUPER_ADMIN_PROTECTED',
-        });
-        return;
-      }
-
-      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
-      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
-      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
-      if (await demoAccountService.isDemoAccount(id)) {
-        res.status(403).json({
-          success: false,
-          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
-          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
-        });
-        return;
-      }
-
-      // Try hard delete first; if FK constraint prevents it, soft-delete instead
-      try {
-        await userRepo.remove(user);
-        res.json({
-          success: true,
-          message: 'User deleted successfully'
-        });
-      } catch (deleteError: any) {
-        // FK constraint violation — fall back to soft delete
-        if (deleteError?.code === '23503' || deleteError?.message?.includes('violates foreign key')) {
-          await userRepo.update(id, { isActive: false });
-          // Also remove role assignments so the user can no longer log in
-          await AppDataSource.query(
-            `DELETE FROM role_assignments WHERE user_id = $1`,
-            [id]
-          );
-          res.json({
-            success: true,
-            message: 'User deactivated (has related records that prevent full deletion)'
-          });
-        } else {
-          throw deleteError;
-        }
-      }
-    } catch (error) {
-      logger.error('Error deleting user:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to delete user'
-      });
-    }
+    await respondErasure(req, res);
   };
 
   // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1

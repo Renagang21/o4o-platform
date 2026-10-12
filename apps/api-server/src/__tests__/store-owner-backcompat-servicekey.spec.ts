@@ -160,8 +160,8 @@ function read(rel: string): string {
 describe('§9 census — 전환한 호출부는 back-compat 로 돌아가지 않는다', () => {
   it('store-product-request.controller 는 kpa 로 가드한다', () => {
     const src = read('routes/o4o-store/controllers/store-product-request.controller.ts');
-    expect(src).toContain("createRequireStoreOwner(dataSource, 'kpa')");
-    expect(src).not.toMatch(/createRequireStoreOwner\(\s*dataSource\s*\)/);
+    expect(src).toContain("createRequireStoreWorkspaceAccess(dataSource, 'kpa')");
+    expect(src).not.toMatch(/(?:createRequireStoreOwner|createRequireStoreWorkspaceAccess)\(\s*dataSource\s*\)/);
   });
 
   it('store-handled-products.routes 의 조직 결정 4곳이 모두 kpa 로 고정된다', () => {
@@ -221,7 +221,7 @@ describe('§9 census — SERVICE_NEUTRAL_BACKCOMPAT 잔여 집합이 늘지 않�
       // 주석 줄은 제외하고 실제 호출만 본다 (설계 근거 주석에 함수명이 자주 등장한다).
       for (const line of src.split('\n')) {
         if (/^\s*(\*|\/\/)/.test(line)) continue;
-        if (/createRequireStoreOwner\(\s*dataSource\s*\)/.test(line)) found.add(rel);
+        if (/(?:createRequireStoreOwner|createRequireStoreWorkspaceAccess)\(\s*dataSource\s*\)/.test(line)) found.add(rel);
         const m = line.match(/resolveStoreAccess\(([^)]*)\)/);
         if (m && m[1].trim() && m[1].split(',').length < 4) found.add(rel);
       }

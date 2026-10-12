@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
 /**
  * 실제 태블릿 기기(store_tablet_devices) · 연결(pairing) · 현장 runtime 관리 라우트
  *
@@ -371,6 +372,7 @@ export function registerStoreTabletDeviceRoutes(
         [userId, device.organizationId],
       );
       let allowed = !!member?.[0];
+      if (!allowed) allowed = (await resolveApprovedStoreMemberOrganization(dataSource, userId, deps.storeOwnerServiceKey, device.organizationId)) === device.organizationId;
       if (!allowed) {
         try {
           const owner = await isStoreOwner(dataSource, userId, deps.storeOwnerServiceKey);

@@ -41,7 +41,8 @@ import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-
 import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
 import { StoreProductProfile } from '../../modules/store-core/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../utils/store-workspace-access.js';
 // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 기기·연결 코드·현장 runtime + 복제.
 import { registerStoreTabletDeviceRoutes } from './store-tablet-device.routes.js';
 import { duplicateScreenSetRows } from './store-tablet-screen-set-ops.js';
@@ -257,7 +258,7 @@ export interface StoreTabletRoutesOptions {
    * store_owner 판정·조직 해석에 쓰이는 serviceKey
    * (WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 축 B).
    *
-   * 미지정 = 기존 back-compat 경로: `createRequireStoreOwner(dataSource)` 가 모든 서비스의
+   * 미지정 = 기존 back-compat 경로: `createRequireStoreWorkspaceAccess(dataSource)` 가 모든 서비스의
    * store_owner role 을 허용하고 조직도 서비스 중립으로 고른다 → 다중 서비스 사용자에게
    * **타 서비스 조직**이 선택될 수 있다(같은 My Store 문맥의 local-products 와 조직 불일치).
    *
@@ -272,7 +273,7 @@ export function createStoreTabletRoutes(
   options: StoreTabletRoutesOptions = {},
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, options.storeOwnerServiceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, options.storeOwnerServiceKey);
 
   // 서비스별 주입값 — 미지정 시 기존 상수(kpa)와 동일하다.
   const qrServiceKey = options.qrServiceKey ?? TABLET_QR_SERVICE_KEY;

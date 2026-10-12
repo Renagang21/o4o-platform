@@ -1,3 +1,4 @@
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
 /**
  * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 §18
  *

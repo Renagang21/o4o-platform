@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from './store-member-access.js';
 /**
  * Store Owner Utilities
  *
@@ -369,6 +370,6 @@ export async function resolveStoreAccess(
   // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
   // preferredOrganizationId(선택 매장 헤더)는 허용 후보 안에서만 고르는 힌트다(§21-14).
   const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey, preferredOrganizationId);
-  if (isOwner) return organizationId;
-  return null;
+  if (isOwner && organizationId && (!preferredOrganizationId || preferredOrganizationId === organizationId)) return organizationId;
+  return resolveApprovedStoreMemberOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
 }

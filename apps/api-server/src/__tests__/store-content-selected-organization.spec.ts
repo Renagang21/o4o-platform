@@ -1,3 +1,4 @@
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
 import express from 'express';
 import request from 'supertest';
 import { isStoreOwner } from '../utils/store-owner.utils.js';
@@ -71,6 +72,12 @@ describe('content organization selection', () => {
     owner.mockResolvedValueOnce(access(null, 'none', false));
     expect(await resolveKpaContentOrganization(ds, 'synthetic-user')).toBe('association');
     expect(repo.findOne).toHaveBeenCalledTimes(1);
+  });
+  it('legacy association affiliation cannot restore a pharmacy store after staff access is removed', async () => {
+    const { ds, repo, query } = database(); owner.mockResolvedValue(access(null, 'none', false));
+    repo.findOne.mockResolvedValue({ organization_id: B });
+    query.mockImplementation(async (sql: string) => sql.includes('FROM neture_pharmacy_memberships') ? [{ present: 1 }] : []);
+    expect(await resolveKpaContentOrganization(ds, 'synthetic-user')).toBeNull();
   });
   it('concurrent asset requests keep independent request-local selections through the frozen factory', async () => {
     const { ds } = database(); const app = appFor(ds);

@@ -19,6 +19,8 @@ export interface UseNetureServiceStatesResult {
   states: NetureServiceStates | null;
   loading: boolean;
   error: string | null;
+  /** 중앙 가드의 제한 계정 응답을 허용된 /auth/me로 재확인한 경우만 true. */
+  restrictedAccount: boolean;
   reload: () => void;
 }
 
@@ -26,6 +28,7 @@ export function useNetureServiceStates(enabled: boolean): UseNetureServiceStates
   const [states, setStates] = useState<NetureServiceStates | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [restrictedAccount, setRestrictedAccount] = useState(false);
   const [tick, setTick] = useState(0);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);
@@ -34,12 +37,14 @@ export function useNetureServiceStates(enabled: boolean): UseNetureServiceStates
     if (!enabled) {
       setStates(null);
       setError(null);
+      setRestrictedAccount(false);
       setLoading(false);
       return;
     }
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setRestrictedAccount(false);
     (async () => {
       try {
         const res = await api.get('/neture/home/entry');
@@ -47,9 +52,24 @@ export function useNetureServiceStates(enabled: boolean): UseNetureServiceStates
         if (!raw) throw new Error('bad response');
         if (cancelled) return;
         setStates(normalizeServiceStates(raw));
-      } catch {
+      } catch (err: unknown) {
         if (cancelled) return;
         setStates(null);
+        const response = (err as { response?: { status?: number; data?: { code?: string } } })?.response;
+        if (response?.status === 403 && response.data?.code === 'ACCOUNT_ACCESS_RESTRICTED') {
+          try {
+            // 제한 계정에게 home/entry를 열지 않는다. 기존 allowlist의 본인 상태만 확인한다.
+            const me = (await api.get('/auth/me')).data?.data?.user;
+            if (cancelled) return;
+            if (me?.status === 'pending' && me?.accountAccess === 'restricted') {
+              setRestrictedAccount(true);
+              setError('Neture 계정 확인이 필요합니다. 계정의 이메일 확인이나 이용 제한 상태를 확인해 주세요.');
+              return;
+            }
+          } catch {
+            if (cancelled) return;
+          }
+        }
         setError('서비스 이용 상태를 불러오지 못했습니다.');
       } finally {
         if (!cancelled) setLoading(false);
@@ -60,5 +80,5 @@ export function useNetureServiceStates(enabled: boolean): UseNetureServiceStates
     };
   }, [enabled, tick]);
 
-  return { states, loading, error, reload };
+  return { states, loading, error, restrictedAccount, reload };
 }

@@ -64,7 +64,7 @@ export async function generateTokensWithContext(
   const capturedFamily = user.refreshTokenFamily ?? null;
   const result = await AppDataSource.query(
     `UPDATE users SET "refreshTokenFamily" = COALESCE("refreshTokenFamily", $1)
-     WHERE id = $2 AND "refreshTokenFamily" IS NOT DISTINCT FROM $3
+     WHERE id = $2 AND "isActive" = true AND "refreshTokenFamily" IS NOT DISTINCT FROM $3
      RETURNING "refreshTokenFamily"`,
     [randomUUID(), user.id, capturedFamily],
   );

@@ -16,7 +16,7 @@ import { apiV1Base } from '../../lib/serviceContext';
  * `/start-pharmacy`(StoreGate 밖 — 매장이 아직 없는 사용자)와 내 매장 메뉴(`/store/pharmacy/membership`) 두 곳에서 연다.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../../config/workspace';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
@@ -43,7 +43,9 @@ const STATUS_HELP: Record<string, string> = {
 export default function PharmacyMembershipPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const agreement = useServiceEnrollmentPolicies('kpa-society', async () => { const response = await fetch(`${apiV1Base()}/public/services/kpa-society/enrollment-policies`); if (!response.ok) throw new Error('Policy unavailable'); return (await response.json()).data; }, user?.id ?? 'signed-out');
-  const { reload } = useUnifiedStore();
+  const { reload, stores, organizationId } = useUnifiedStore();
+  const { pathname } = useLocation();
+  const approvedStaff = pathname.includes('/store/pharmacy/membership') && (stores ?? []).some(store => store.organizationId === organizationId && store.memberRole === 'staff');
   const [membership, setMembership] = useState<PharmacyMembership | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -54,6 +56,7 @@ export default function PharmacyMembershipPage() {
   const [netureRequired, setNetureRequired] = useState(false);
 
   const load = useCallback(async () => {
+    if (approvedStaff) { setLoading(false); return; }
     setLoading(true);
     setLoadError(null);
     try {
@@ -65,7 +68,7 @@ export default function PharmacyMembershipPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [approvedStaff]);
 
   useEffect(() => {
     if (isAuthenticated) void load();
@@ -124,6 +127,8 @@ export default function PharmacyMembershipPage() {
       setBusy(false);
     }
   };
+
+  if (approvedStaff) return <main className="page"><h1>내 매장 이용 자격</h1><p>경영자가 최종 승인한 직원으로 연결되어 있습니다. 별도의 약국 매장 신청 없이 내 매장 업무를 이용할 수 있습니다.</p><p>경영자의 약국 개설 신청과 본인 자격 관리는 경영자가 담당합니다.</p></main>;
 
   return (
     <main className="center-card" data-testid="pharmacy-membership">
