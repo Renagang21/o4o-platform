@@ -248,8 +248,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   // Contact-hash retirement also removes the legacy contact branch from the writer function.
   {
     appliedThrough: 'RetireLegacyErasureIdentityHashes1791795139475',
-    fingerprint: '41e3be0aed15b49266cca75c543d8e6d008c6b0fcf4d3b85f28b2f6a56f7c75f',
-    fingerprintLineCount: 6617,
+    fingerprint: '0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50',
+    fingerprintLineCount: 6618,
   },
 ] as const;
 

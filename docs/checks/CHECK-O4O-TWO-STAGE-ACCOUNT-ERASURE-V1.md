@@ -124,3 +124,7 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 최종 집중 DB32+storage4+정적 인증17+Demo9=62 tests·API build·focused lint PASS. 새 DDL은24단계 이후 추가하지 않았으며 운영 실행0이다.
 
 legacy 인증의 `users.provider/provider_id`도 동일 typed namespace 계약에 포함한다. 대상의 legacy source를 snapshot하고 다른 제공자의 snake_case ID는 보존하며, 같은 제공자 legacy copy는 미완료다. provider 없는 legacy source는 임의 namespace를 만들지 않고 review 후보로 유지한다. 집중 DB33+storage4+정적 인증17+Demo9=63 tests·API build·focused lint PASS. 새 DDL/API/운영 실행0.
+
+배포 구버전 재삽입 P1 보완:24단계는 reference-key table의 ACCESS EXCLUSIVE lock 안에서 기존 identity-kind hash를 파기하고 `key_kind='uuid'` CHECK를 추가한다. migration 뒤 구버전의 연락처 hash 재삽입은23514로 실패·rollback되며 새 revision 이전에 retired 개인정보를 재생성하지 않는다. UUID marker/audit/evidence와 원래 기산점은 그대로다. 운영 제안에는 이 짧은 table lock/제약 추가도 포함하며 실제 실행은 하지 않았다.
+
+집중63 tests·API build·focused lint·migration contract21 checks PASS. 최종24단계 지문은 `0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50`,6618 lines로 갱신했다. 정식 runner fresh baseline→24, 기존23(지문 c45f9b5)→24,24 재실행 no-op 모두 PASS. 이전41e3be0/6617 기록은 CHECK 추가 전 검증 이력이며 현재 승인안은 이 최종 제약을 포함한다.23단계 소스/지문은 바꾸지 않았다.

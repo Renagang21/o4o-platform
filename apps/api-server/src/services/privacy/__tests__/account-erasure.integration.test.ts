@@ -371,17 +371,28 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const r=await service().request(target.id);expect(r.erased).toBe(true);
     const evidence=await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event]);
     const refs=await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId]);
+    await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT IF EXISTS account_erasure_uuid_keys_only');
     await db.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
       VALUES($1,encode(digest($2::text,'sha256'),'hex'),'identity',char_length($2::text))`,[r.operationId,target.email]);
     const legacySql:string[]=[];
     await new CreateAccountErasureOperations1791777540800().up({query:async(sql:string)=>{legacySql.push(sql);return [];}} as any);
     const oldFunction=legacySql.find(sql=>sql.startsWith('CREATE FUNCTION account_erasure_write_fence'))!;
-    const q=db.createQueryRunner();
+    const q=db.createQueryRunner();let upgraded=false;
     try {
       await q.query(oldFunction.replace('CREATE FUNCTION','CREATE OR REPLACE FUNCTION'));
       await expect(user({email:target.email})).rejects.toMatchObject({code:'P0001'});
+      await q.startTransaction();
       await new RetireLegacyErasureIdentityHashes1791795139475().up(q);
-    } finally {await new RetireLegacyErasureIdentityHashes1791795139475().up(q);await q.release();}
+      await q.commitTransaction();upgraded=true;
+    } finally {
+      if(q.isTransactionActive)await q.rollbackTransaction();
+      if(!upgraded) {
+        await q.startTransaction();await new RetireLegacyErasureIdentityHashes1791795139475().up(q);await q.commitTransaction();
+      }
+      await q.release();
+    }
+    await expect(db.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
+      VALUES($1,encode(digest($2::text,'sha256'),'hex'),'identity',char_length($2::text))`,[r.operationId,target.email])).rejects.toMatchObject({code:'23514'});
     expect((await user({email:target.email})).id).not.toBe(target.id);
     expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId])).toEqual(refs);
     expect(await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event])).toEqual(evidence);

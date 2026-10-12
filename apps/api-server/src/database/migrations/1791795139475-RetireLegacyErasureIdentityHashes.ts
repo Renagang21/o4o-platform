@@ -6,7 +6,11 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 export class RetireLegacyErasureIdentityHashes1791795139475 implements MigrationInterface {
   name = 'RetireLegacyErasureIdentityHashes1791795139475';
   async up(q:QueryRunner):Promise<void> {
+    // Serialize cleanup with old serving writers. Their subsequent identity inserts fail
+    // rather than recreating retired personal data before the new revision is serving.
+    await q.query('LOCK TABLE account_erasure_reference_keys IN ACCESS EXCLUSIVE MODE');
     await q.query("DELETE FROM account_erasure_reference_keys WHERE key_kind='identity'");
+    await q.query("ALTER TABLE account_erasure_reference_keys ADD CONSTRAINT account_erasure_uuid_keys_only CHECK (key_kind='uuid')");
     // A restored subject/owned-record UUID is fenced; contact reuse is not a restore.
     await q.query(`CREATE OR REPLACE FUNCTION account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$
       DECLARE op_id text; hit uuid;
