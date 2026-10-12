@@ -142,6 +142,27 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     expect((await query('SELECT email FROM users WHERE id=$1',[supplier]))[0].email).toBe('testsupplier@example.com');
     expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
   });
+  it('does not publish an owner credential when the owner also owns a supplier organization',async()=>{
+    const other=(await query("INSERT INTO organizations(name,code,type) VALUES('Cross Supplier','fixture-cross-supplier','supplier') RETURNING id"))[0].id;
+    await query("INSERT INTO organization_members(organization_id,user_id,role,is_primary) VALUES($1,$2,'owner',false)",[other,owner]);
+    await query("INSERT INTO neture_suppliers(organization_id,slug,status) VALUES($1,'fixture-cross-supplier','ACTIVE')",[other]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('UNEXPECTED_DEMO_RUNTIME_RELATION');
+    expect((await query('SELECT email FROM users WHERE id=$1',[owner]))[0].email).toBe('teststoreowner@example.com');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
+  it('rejects a supplier with an unrelated store relationship without granting or changing its scope',async()=>{
+    await query("INSERT INTO organization_members(organization_id,user_id,role,is_primary) VALUES($1,$2,'manager',false)",[store,supplier]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('UNEXPECTED_DEMO_RUNTIME_RELATION');
+    expect((await query('SELECT email FROM users WHERE id=$1',[supplier]))[0].email).toBe('testsupplier@example.com');
+  });
+  it.each(['STORE_OWNER','STORE_STAFF'])('rejects a legacy supplier pointer at the %s identity without exposing identifiers',async(type)=>{
+    let id=owner;
+    if(type==='STORE_STAFF')id=(await query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified") VALUES($1,'Staff fixture','active',true,true) RETURNING id`,[staff.email]))[0].id;
+    const other=(await query("INSERT INTO organizations(name,code,type) VALUES('Legacy Supplier','fixture-cross-legacy','supplier') RETURNING id"))[0].id;
+    await query("INSERT INTO neture_suppliers(user_id,organization_id,slug,status) VALUES($1,$2,'fixture-cross-legacy','ACTIVE')",[id,other]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('UNEXPECTED_DEMO_SUPPLIER_POINTER');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

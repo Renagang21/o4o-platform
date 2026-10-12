@@ -4,7 +4,7 @@ import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 import { passwordCredentialService } from '../services/auth/password-credential.service.js';
 import type { EntityManager, DataSource } from 'typeorm';
 import { findStoreOrganizationCandidates } from '../utils/store-organization.resolver.js';
-import { listSupplierCandidates } from '../modules/neture/middleware/supplier-context.resolver.js';
+import { listSupplierCandidates, hasLegacySupplierIdentityPointer } from '../modules/neture/middleware/supplier-context.resolver.js';
 
 type Row = Record<string, unknown>;
 export interface DemoQueryClient { query(sql: string, params?: unknown[]): Promise<Row[]>; }
@@ -98,6 +98,11 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
     const user = base ? users.find(row => row.id === base.user_id) : existing[0];
     if (base && !user) fail('REGISTRY_USER_MISSING');
     if (user) {
+      const intendedOrganization=account.type==='SUPPLIER'?supplierRuntimeCandidates[0].organizationId:organizationId;
+      const intendedMemberRole=account.type==='STORE_STAFF'?'staff':'owner';
+      if (relationships.some(row=>row.user_id===user.id && row.left_at===null &&
+        (row.organization_id!==intendedOrganization || row.role!==intendedMemberRole))) fail('UNEXPECTED_DEMO_RUNTIME_RELATION');
+      if (account.type!=='SUPPLIER' && await hasLegacySupplierIdentityPointer(runtimeDb,String(user.id))) fail('UNEXPECTED_DEMO_SUPPLIER_POINTER');
       if (!['active','approved'].includes(String(user.status)) || user.isActive !== true || user.isEmailVerified !== true) fail('ACCOUNT_NOT_READY');
       const activeRoles = roles.filter(row => row.user_id === user.id && row.is_active === true);
       if (activeRoles.some(row => row.role !== allowedRoles[account.type] && row.role !== 'user')) fail('PROTECTED_OR_FOREIGN_ROLE');

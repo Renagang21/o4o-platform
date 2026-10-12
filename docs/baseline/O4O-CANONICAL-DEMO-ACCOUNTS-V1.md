@@ -318,3 +318,5 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 운영 실행 분류는 [API scripts inventory](operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)가 정본이다. 현재 기존 Demo 전환은 ACTIVE reconcile만 사용한다. foundation은 PAUSED로 유지하며 이 지시로 새 foundation 생성까지 자동 실행하지 않는다.
 
 **단일 업무공간 검증:** 전환 시 기존 런타임 해석기로 승인 약국 후보(owner/admin/manager 포함)와 canonical 공급자 후보를 확인한다. 경영자는 의도한 약국의 owner 후보1개, 공급자는 ACTIVE 후보1개여야 한다. 다른 조직의 관계를 삭제·임의 선택하거나 Demo 역할을 넓혀 복수 컨텍스트를 숨기지 않는다.
+
+**반대 도메인 관계 보호:** 각 유형은 의도한 조직과 역할의 활성 관계만 허용한다. 매장 경영자·직원의 canonical 공급자 관계 또는 legacy supplier pointer, 공급자의 반대 매장 관계가 있으면 공유 credential 적용 전 중단한다. legacy pointer 검사는 기존 supplier resolver 안의 read-only protection probe이며 컨텍스트 선택/권한 부여/로그 식별자 출력은 하지 않는다.
