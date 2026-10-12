@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+`0557e26a05` 후속 세션 리뷰: signed PH access token은 requireAuth에서 DB 조회 전에 401/SERVICE_SESSION_REVOKED, optionalAuth에서는 익명 처리한다. PH refresh token도 동일한 기존 세션 종료 코드로 거절하며 재발급·다른 서비스의 token family 변경은 하지 않는다. 인증 경계 2 tests 및 기존 refresh 계약 포함 25 tests PASS. 사용자는 현재 서비스에서 다시 로그인해야 한다.
+
 이전 commit `f9f9cbcd72` 리뷰의 공개 slug 우회도 반영했다. resolvePublicStore는 slug record를 해석한 직후 PH scope를 410으로 거절하여 공용 매장/태블릿 조회 및 interest 생성이 store 데이터에 접근하기 전에 중단된다. PH namespace·공백·event-offer 회귀 3 tests PASS. 최신 main `63653694b3`을 작업 branch에 일반 merge로 통합했다.
 
 배포 전 후속 미디어 리뷰 대응: PH 자산을 공용 목록 SQL에서 제외하고 UUID 조회·사용처·폴더·metadata·삭제 및 catalog의 locked mutation/relations 조회에서 퇴역 scope를 확인한다. 기존 PH 공개 자산의 타 서비스 재사용을 코드 배포와 purge 사이에도 차단한다. 승인 PH 필터는 공통 helper로 추출해 중복을 줄였다. focused 3 suites 29 tests PASS. 이 기록은 배포 성공 또는 실제 데이터 삭제를 의미하지 않는다.

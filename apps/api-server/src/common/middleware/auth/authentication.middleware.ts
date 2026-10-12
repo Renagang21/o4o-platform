@@ -4,6 +4,7 @@
  * Extracted from auth.middleware.ts (WO-O4O-AUTH-MIDDLEWARE-SPLIT-V1)
  * Contains: requireAuth, optionalAuth, requirePlatformUser, compat aliases
  */
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 import { Response, NextFunction } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -204,6 +205,10 @@ export const requireAuth = async (
       });
     }
 
+    if (isRetiredServiceValue(payload.serviceKey)) {
+      return res.status(401).json({ success: false, code: 'SERVICE_SESSION_REVOKED', error: '세션이 종료되었습니다. 현재 서비스에서 다시 로그인해 주세요.' });
+    }
+
     // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1:
     //   requireAuth 는 사람 사용자(tokenType:'user') 경계다. service / guest 등 다른 tokenType 은
     //   userId 가 실제 users.id 와 일치하더라도 통과시키지 않는다 (Human Auth ≠ Service Auth).
@@ -306,6 +311,8 @@ export const optionalAuth = async (
     if (!payload) {
       return next(); // Invalid token, continue without authentication
     }
+
+    if (isRetiredServiceValue(payload.serviceKey)) return next();
 
     // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: requireAuth 와 동일 — 사용자 토큰이 아니면 비로그인 취급
     if (payload.tokenType && payload.tokenType !== 'user') {
