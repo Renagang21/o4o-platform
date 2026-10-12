@@ -242,8 +242,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   // No production migration execution is authorised by registration.
   {
     appliedThrough: 'CreateAccountErasureOperations1791777540800',
-    fingerprint: 'f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c',
-    fingerprintLineCount: 6613,
+    fingerprint: 'c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f',
+    fingerprintLineCount: 6617,
   },
 ] as const;
 

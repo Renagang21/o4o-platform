@@ -28,7 +28,12 @@ export class CreateAccountErasureOperations1791777540800 implements MigrationInt
     )`);
     await q.query(`CREATE TABLE account_erasure_reference_keys (
       operation_id uuid NOT NULL REFERENCES account_erasure_operations(id) ON DELETE CASCADE,
-      reference_id uuid, key_hash varchar(64) NOT NULL, PRIMARY KEY(operation_id,key_hash)
+      reference_id uuid, key_hash varchar(64) NOT NULL,
+      key_kind varchar(16) NOT NULL DEFAULT 'uuid' CHECK(key_kind IN ('uuid','identity')),
+      identity_length integer,
+      CHECK ((key_kind='uuid' AND identity_length IS NULL) OR
+        (key_kind='identity' AND reference_id IS NULL AND identity_length BETWEEN 1 AND 8192)),
+      PRIMARY KEY(operation_id,key_hash)
     )`);
     await q.query(`CREATE TABLE account_erasure_community_evidence (
       source_event_id uuid PRIMARY KEY, community_id uuid NOT NULL,
@@ -67,11 +72,18 @@ export class CreateAccountErasureOperations1791777540800 implements MigrationInt
         PERFORM pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0));
         op_id := current_setting('o4o.erasure_operation', true);
         SELECT o.id INTO hit FROM public.account_erasure_operations o
-        WHERE EXISTS (SELECT 1 FROM regexp_matches(lower(to_jsonb(NEW)::text),
+        WHERE (EXISTS (SELECT 1 FROM regexp_matches(lower(to_jsonb(NEW)::text),
           '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', 'g') AS r
           WHERE encode(public.digest(r[1], 'sha256'), 'hex') = o.subject_hash OR EXISTS (
             SELECT 1 FROM public.account_erasure_reference_keys k WHERE k.operation_id=o.id
             AND k.key_hash=encode(public.digest(r[1], 'sha256'), 'hex')))
+          OR EXISTS (SELECT 1 FROM public.account_erasure_reference_keys k
+            CROSS JOIN LATERAL jsonb_path_query(to_jsonb(NEW), '$.** ? (@.type() == "string")') v
+            WHERE k.operation_id=o.id AND k.key_kind='identity'
+              AND ((k.identity_length=1 AND k.key_hash=encode(public.digest(lower(v #>> '{}'),'sha256'),'hex'))
+                OR (k.identity_length>1 AND EXISTS (
+                  SELECT 1 FROM generate_series(1,char_length(v #>> '{}')-k.identity_length+1) position
+                  WHERE k.key_hash=encode(public.digest(substring(lower(v #>> '{}') FROM position FOR k.identity_length),'sha256'),'hex'))))))
         AND NOT (o.id::text = COALESCE(op_id,'') AND o.state = 'processing')
         AND (o.expires_at IS NULL OR o.expires_at > now()) LIMIT 1;
         IF hit IS NOT NULL THEN RAISE EXCEPTION USING ERRCODE='P0001', MESSAGE='ACCOUNT_ERASURE_PENDING'; END IF;

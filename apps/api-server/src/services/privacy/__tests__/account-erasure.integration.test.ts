@@ -240,6 +240,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     await expect(service().request('invalid')).rejects.toMatchObject({statusCode:400});
     expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(1);
   });
+  it('UUID-free embedded identity copies cannot be restored after confirmed completion',async()=>{
+    const u=await user({name:'합성개인명'}),other=await user();
+    const r=await service().request(u.id);expect(r.erased).toBe(true);
+    await expect(db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',[`Former contact: ${u.email}`,other.id])).rejects.toMatchObject({code:'P0001'});
+    await expect(db.query('UPDATE users SET nickname=$1 WHERE id=$2',[`회수된 합성개인명 기록`,other.id])).rejects.toMatchObject({code:'P0001'});
+    const rows=await db.query("SELECT reference_id,key_kind,identity_length FROM account_erasure_reference_keys WHERE operation_id=$1",[r.operationId]);
+    expect(rows.every((k:any)=>k.reference_id===null)).toBe(true);expect(rows.some((k:any)=>k.key_kind==='identity')).toBe(true);
+  });
   it('calendar boundaries preserve leap-day KST anniversary and original two-year anchor',()=>{
     expect(calendarExpiry(new Date('2024-02-28T15:00:00Z'),1).toISOString()).toBe('2025-02-28T15:00:00.000Z');
     expect(calendarExpiry(new Date('2023-03-01T00:00:00Z'),2).toISOString()).toBe('2025-03-01T00:00:00.000Z');

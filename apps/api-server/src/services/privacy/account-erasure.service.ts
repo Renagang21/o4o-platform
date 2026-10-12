@@ -150,6 +150,7 @@ export class AccountErasureService {
         const [user] = await m.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [o.subject_id]);
         if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
         await this.captureReferenceKeys(m,operationId,o.subject_id!);
+        await this.captureIdentityKeys(m,operationId,user);
         const reviews = await this.reviewManifest(m, user);
         if (reviews.length) {
           await m.query("UPDATE account_erasure_operations SET state='review_required',review_codes=$2,updated_at=now() WHERE id=$1", [operationId, JSON.stringify(reviews)]);
@@ -199,6 +200,17 @@ export class AccountErasureService {
     }
     for (const id of ids) await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,reference_id,key_hash)
       VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, [operationId,id,hash(id)]);
+  }
+
+  private async captureIdentityKeys(m:EntityManager,operationId:string,user:Record<string,unknown>):Promise<void> {
+    for(const token of await this.identityTokens(m,user)) {
+      const [length]=await m.query('SELECT char_length(lower($1::text)) AS n',[token]);
+      if(length.n>8192)throw new AccountErasureError('IDENTITY_MANIFEST_REVIEW_REQUIRED',409);
+      // Hash + character length fence embedded email/name copies without keeping the profile.
+      await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
+        VALUES($1,encode(public.digest(lower($2::text),'sha256'),'hex'),'identity',char_length(lower($2::text)))
+        ON CONFLICT DO NOTHING`,[operationId,token]);
+    }
   }
 
   private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<string[]> {

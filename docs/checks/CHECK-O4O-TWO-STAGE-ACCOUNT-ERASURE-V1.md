@@ -44,7 +44,7 @@
 
 ## 검증 증거와 한계
 
-격리 PostgreSQL19, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c`,6613 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
+격리 PostgreSQL20, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f`,6617 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
 
 실계정/운영 DB/실제 GCS 데이터 테스트0. 새 기능은 기본 비활성이고 운영 migration·전수 개인 파일 inventory·법정1/2년 근거·writer 규모·외부 upload/orphan/버전/백업 검증 없이는 활성화하지 않는다. 기존 문서 제안의 전수 handler/자동 backoff/producer 계약이 모두 완료됐다고 판정하지 않는다.
 
@@ -61,7 +61,7 @@
 
 ## 격리 검증 재현 계약
 
-integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬19개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
+integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬20개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
 
 ```bash
 pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/privacy/__tests__/account-erasure.storage.test.ts
@@ -70,4 +70,16 @@ pnpm --filter @o4o/admin-dashboard exec vitest run src/pages/platform/account-go
 node scripts/db/check-migration-contract.mjs
 ```
 
-재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB19개+storage mock4개=23 tests PASS.
+재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB20개+storage mock4개=24 tests PASS.
+
+UUID 없는 이메일/이름의 문자열·JSON 재복사도7일 writer fence로 차단하는 합성 회귀 PASS. restore key에는 원문 대신 해시·문자 길이만 저장하며 완료 시 transient UUID를 제거한다. 이 추가 fence의 운영 성능/충돌 영향도 활성화 전 평가 대상이다.
+
+## 운영 DDL 포함 배포 승인안 — 실행 전
+
+승인 대상 후보는 **코드의 기본 비활성 상태로 API/Admin만 verified 배포**다. main 병합·post-merge CI·최신 main SHA 고정 후 `promote.yml`의 `services=api,admin`을 사용하며 분회/다른 web 전용 배포는 포함하지 않는다. 먼저 `dry_run=true`로 실제 serving gap·freeze·계정 권한·pending migration 전부를 확인한다. repository variable 조회는 현재 주입 GitHub integration 권한의403으로 직접 확인되지 않았으며 workflow 판정을 대신 승인했다고 표시하지 않는다.
+
+실제 promote는 migration Job의 production DDL을 수반하므로 AGENTS §4-1(f)/§5에 따라 **별도 사용자 실행 승인 전에는 dispatch하지 않는다**. 대상은 신규5개 테이블·writer function·현재 canonical 테이블 INSERT/UPDATE triggers다. migration 자체의 계정/파일 데이터 제거는0이지만 기존 writer에 shared transaction barrier와 UUID/신원 해시 검사를 도입한다. 대량/장기 transaction·role/membership lock·원문 길이에 따른 비용/false-positive를 운영 규모에서 검토해야 한다. 이미 다른 migration이 쌓였으면 그 전체 pending diff를 새 범위로 보고하고 SHA를 다시 고정한다.
+
+승인 후 검증 순서는 migration pre/post fingerprint → API0% revision Ready/전환/health → Admin0% tag smoke/전환 → serving SHA·capability disabled 확인이다. migration 이후 API rollout 실패 시 기존 revision traffic rollback은 schema를 되돌리지 않는다. 신규 원장에 데이터가 있으면 down을 거절하며 forward repair를 검토한다. 계정/GCS 제거·환경 apply flag·inventory confirmed·job activation·법률 게시/재동의는 이 배포 승인안에도 포함하지 않는다.
+
+삭제 기능 **활성화 승인안은 아직 준비 완료가 아니다**: 전수 domain/file inventory·producer/orphan·GCS soft-delete/복제/backup·법정1/2년 해당성·lock 성능·미분류 담당/24h 처리 절차를 먼저 마쳐야 한다. 기본1년 정책을 재질문하지 않고 아직 미확정인 근거와 실제 집행만 따로 다룬다.
