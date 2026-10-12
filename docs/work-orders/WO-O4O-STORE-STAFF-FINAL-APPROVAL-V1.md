@@ -1,6 +1,6 @@
 # WO-O4O-STORE-STAFF-FINAL-APPROVAL-V1
 
-> **상태**: ACTIVE · **작성일**: 2026-10-12 KST
+> **상태**: COMPLETED · **작성일**: 2026-10-12 KST
 > **근거**: 사용자 확정 — 경영자 초대 → 직원 수락 → 경영자 최종 승인, My Home 관리, 직원 업무 전체 이용
 > **정본**: [매장 접근](../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) · [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md)
 
@@ -19,8 +19,8 @@
 - [x] 승인 직원의 매장 목록·서비스 조회·업무 권한 연결, 명시 선택 매장 격리
 - [x] 서비스 조회 오류·재시도 처리
 - [x] 회귀 테스트·타입·lint·PC/모바일 fixture 검증
-- [ ] 검증 결과 정합·commit·push·PR·required CI
-- [ ] 기술 gate 충족 후 정상 PR merge·Delivery 확인
+- [x] 검증 결과 정합·commit·push·PR·required CI
+- [x] 기술 gate 충족 후 정상 PR merge·Delivery 확인
 
 ## 실행 경계
 
@@ -46,7 +46,7 @@
 - 운영 DB write·migration·계정 추가·권한 backfill은 실행하지 않았다.
 - Frozen Core·dependency·lockfile·CI·배포 설정 변경 없음.
 
-main 통합·Delivery는 PR의 필수 CI·리뷰·현재 main 위치를 확인한 뒤 진행하고 결과를 확정한다.
+main 통합과 운영 배포를 완료했으며 아래 실행 기록으로 확정한다.
 
 ## 자동 리뷰 보완
 
@@ -55,3 +55,15 @@ main 통합·Delivery는 PR의 필수 CI·리뷰·현재 main 위치를 확인�
 - 직원의 개인 약국 개설 신청은 내 매장 메뉴의 직원 안내와 구분한다. 현재 선택한 매장에서 직원이라는 이유로 개인 신청 URL을 막지 않는다.
 
 - 후속 리뷰의 Café24 매장 선택 누락도 보완했다. 현역 Café24의 유효 Role·staff 관계·서비스 연결을 확인해 매장 목록과 서비스 조회에 함께 포함하며, 약국 업무 권한으로 확대하지 않는다.
+
+## main 통합·배포 기록
+
+- 구현 [PR #503](https://github.com/Renagang21/o4o-platform/pull/503) 정상 merge, main `64b8df16f1544bd3a505ba00af643d697bcb38c4`.
+- [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38212078522)·CodeQL PASS.
+- [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38212841828)는 auth-context 변경을 LEVEL 3으로 판정해 보류했다.
+- 운영 serving API부터 대상까지 migration 파일 차이 0을 확인하고 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38213034663)를 실행했다.
+- Promote SUCCESS, `production=DEPLOYED · deploy: api,neture,store`. 세 서비스의 대상은 위 main SHA다.
+- 배포 후 공개 API 준비 상태 `200 ready`, 인증 없는 초대·매장 권한 조회 `401` 확인.
+- 실제 배포 Neture HTML·assets를 TLS 검증 curl로 받아 Chromium에서 실행: 1280px·375px·320px 합성 업무 API fixture 21 assertions PASS. 브라우저의 프록시 CA 오류를 인증서 검증 해제로 우회하지 않았다.
+- 실제 직원 계정 로그인·운영 데이터 변경 검증은 미실행이다. 이는 합성 UI·로컬 회귀 검사와 별개다.
+- 이 결과 정합은 문서-only closure이며 `DEPLOYMENT=NOT_APPLICABLE`; 운영 기능 배포 SHA와 후속 문서 SHA를 구분한다.
