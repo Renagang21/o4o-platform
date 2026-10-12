@@ -78,7 +78,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       setSentTo({ email: email.trim(), masked: res.maskedEmail ?? undefined, mailSent: res.mailSent });
     } catch (e) {
       const failure = readEmailAuthError(e, '회원가입을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-      if (failure.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
+      if (failure.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
       setError(failure.message);
     } finally {
       setSubmitting(false);
@@ -156,7 +156,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
 
       <fieldset style={{ border: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <legend style={{ ...styles.label, marginBottom: 4 }}>약관 동의</legend>
-        <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+        <SignupTermsAgreement load={() => api.getSignupTerms!()} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <label style={styles.checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
           {policy && <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>}

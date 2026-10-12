@@ -55,7 +55,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     if (result.success && result.user) { ref.current.onSuccess(result.user); return; }
     if (result.nextStep === 'signup' && result.signupTicket) { setTicket(result.signupTicket); setEmail(result.email ?? ''); return; }
     if (result.nextStep === 'verify-email') { setTicket(undefined); setMessage(result.mailSent ? '확인 메일을 보냈습니다. 이메일을 확인한 뒤 카카오로 다시 로그인해 주세요.' : '확인 메일을 보내지 못했습니다. 잠시 후 카카오로 다시 로그인해 주세요.'); return; }
-    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
+    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
     setMessage(result.error ?? '인증을 다시 시작해 주세요.'); ref.current.onError?.(result);
   }, []);
   useLayoutEffect(() => {
@@ -86,7 +86,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
       <label style={styles.field}>이름<input style={styles.input} autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>
       <label style={styles.field}>개인 휴대전화<input style={styles.input} type="tel" autoComplete="tel" required maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></label>
       <p>휴대전화 본인 인증은 수행하지 않습니다. 이메일 소유 확인이 필요하면 확인 메일을 보냅니다.</p>
-      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
       <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label>{policy && <a style={styles.link} href={signupPrivacyHref(policy)} target="_blank" rel="noreferrer">내용 보기</a>}</div>
       <label><input type="checkbox" checked={marketing} onChange={e => setMarketing(e.target.checked)} />마케팅 정보 수신 동의 (선택)</label>
       <button type="submit" style={styles.primaryBtn} disabled={busy || !policy || !terms || !privacy}>동의하고 계정 만들기</button>

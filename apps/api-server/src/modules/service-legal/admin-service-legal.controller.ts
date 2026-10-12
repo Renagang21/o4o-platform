@@ -1,3 +1,4 @@
+import { readCurrentPolicyDocument } from '../policy-acceptance/policy-document-evidence.service.js';
 import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * Admin Service Legal Controller
@@ -355,6 +356,19 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
             if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < 2 || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '새 서비스 신청 정책은 새 버전과 확정된 시행일이 필요합니다.', 400);
             // Validate before demoting any published row; notice must not activate future terms.
             assertPolicyEffectiveForPublication(doc.effective_date);
+            if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG) {
+              const privacy = await readCurrentPolicyDocument(manager, 'neture', 'privacy', true);
+              if (!privacy || privacy.slug !== 'neture-account-privacy' || Number(privacy.version) !== doc.version || !privacy.title?.trim() || !privacy.content?.trim()) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '같은 버전의 공통 개인정보 처리방침을 먼저 준비해 주세요.', 409);
+              }
+            }
+            if (doc.service_key === 'neture' && doc.document_type === 'privacy') {
+              const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
+              if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2
+                && (doc.slug !== 'neture-account-privacy' || doc.version !== Number(terms.version))) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 같은 버전의 개인정보 처리방침을 유지해 주세요.', 409);
+              }
+            }
             // 같은 유형의 기존 published 문서 → draft
             await txRepo
               .createQueryBuilder()
@@ -373,6 +387,12 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
             doc.published_by = userId;
             doc.updated_by = userId;
           } else {
+            if (doc.service_key === 'neture' && doc.document_type === 'privacy' && doc.slug === 'neture-account-privacy' && doc.status === 'published') {
+              const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
+              if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 정책 전환 순서를 먼저 확인해 주세요.', 409);
+              }
+            }
             doc.status = 'draft';
             doc.updated_by = userId;
           }

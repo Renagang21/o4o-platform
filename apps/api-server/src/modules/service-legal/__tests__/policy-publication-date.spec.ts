@@ -9,7 +9,8 @@ jest.mock('../service-legal-scope.js', () => ({
 }));
 jest.mock('@o4o/action-log-core', () => ({ ActionLogService: class { async logSuccess() {} } }));
 
-function harness(effective: Date | null) {
+const matchingPrivacy = { id: 'privacy-id', service_key: 'neture', document_type: 'privacy', version: 2, slug: 'neture-account-privacy', title: 'Privacy', content: 'Privacy body' };
+function harness(effective: Date | null, pairRows: Record<string, unknown>[] = [matchingPrivacy]) {
   const doc = { id: 'draft-id', service_key: 'neture', document_type: 'terms', status: 'draft', effective_date: effective, version: 2, title: 'T', content: 'Body' };
   const execute = jest.fn(async () => ({}));
   const builder: any = {};
@@ -18,7 +19,7 @@ function harness(effective: Date | null) {
   const repo = { findOne: jest.fn(async () => doc), createQueryBuilder: jest.fn(() => builder), save: jest.fn(async (value: any) => value) };
   const app = express();
   app.use(express.json());
-  app.use('/api/v1/admin/services', createAdminServiceLegalController({ getRepository: () => repo, transaction: async (fn: any) => fn({ getRepository: () => repo, query: jest.fn(async () => []) }) } as any));
+  app.use('/api/v1/admin/services', createAdminServiceLegalController({ getRepository: () => repo, transaction: async (fn: any) => fn({ getRepository: () => repo, query: jest.fn(async (sql: string) => sql.includes("FROM service_policy_documents") ? pairRows : []) }) } as any));
   return { app, repo, execute, doc };
 }
 
@@ -144,4 +145,40 @@ describe('새 공통 계정 문서의 게시 준비', () => {
     expect(execute).not.toHaveBeenCalled();
     expect(repo.save).not.toHaveBeenCalled();
   });
+});
+
+it.each([[], [{ ...matchingPrivacy, version: 1 }], [{ ...matchingPrivacy, version: 3 }], [{ ...matchingPrivacy, slug: 'legacy-privacy' }], [{ ...matchingPrivacy, content: '' }]].map(rows => ({ rows })))('does not activate a global common requirement without its matching published privacy: %j', async ({ rows }) => {
+  const { app, repo, execute, doc } = harness(new Date(Date.now() - 1000), rows);
+  Object.assign(doc, { slug: 'neture-account-terms' });
+  const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+  expect(result.status).toBe(409); expect(result.body.error.code).toBe('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED');
+  expect(execute).not.toHaveBeenCalled(); expect(repo.save).not.toHaveBeenCalled(); expect(doc.status).toBe('draft');
+});
+it('does not remove common privacy while a global terms requirement is active', async () => {
+  const terms = { ...matchingPrivacy, document_type: 'terms', slug: 'neture-account-terms' };
+  const { app, repo, execute, doc } = harness(new Date(), [terms]);
+  Object.assign(doc, { document_type: 'privacy', slug: 'neture-account-privacy', status: 'published' });
+  const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'unpublish' });
+  expect(result.status).toBe(409); expect(result.body.error.code).toBe('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED');
+  expect(execute).not.toHaveBeenCalled(); expect(repo.save).not.toHaveBeenCalled(); expect(doc.status).toBe('published');
+});
+
+it.each([{ slug: 'legacy-privacy', version: 1 }, { slug: 'neture-account-privacy', version: 3 }])('does not replace active common privacy with an incompatible document: %j', async (next) => {
+  const terms = { ...matchingPrivacy, document_type: 'terms', slug: 'neture-account-terms' };
+  const { app, repo, execute, doc } = harness(new Date(Date.now() - 1000), [terms]);
+  Object.assign(doc, { document_type: 'privacy', ...next });
+  const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+  expect(result.status).toBe(409); expect(result.body.error.code).toBe('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED');
+  expect(execute).not.toHaveBeenCalled(); expect(repo.save).not.toHaveBeenCalled(); expect(doc.status).toBe('draft');
+});
+
+it('permits publication of matching common privacy and does not block an unrelated privacy draft unpublish', async () => {
+  const terms = { ...matchingPrivacy, document_type: 'terms', slug: 'neture-account-terms' };
+  const { app, repo, execute, doc } = harness(new Date(Date.now() - 1000), [terms]);
+  Object.assign(doc, { document_type: 'privacy', slug: 'neture-account-privacy' });
+  const result = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'publish' });
+  expect(result.status).toBe(200); expect(execute).toHaveBeenCalledTimes(1); expect(repo.save).toHaveBeenCalledTimes(1);
+  doc.status = 'draft';
+  const unpublish = await request(app).patch('/api/v1/admin/services/neture/policies/draft-id/publish').send({ action: 'unpublish' });
+  expect(unpublish.status).toBe(200);
 });

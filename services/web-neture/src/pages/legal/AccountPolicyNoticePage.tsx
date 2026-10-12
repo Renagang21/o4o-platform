@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import termsSource from '../../content/legal/neture-account-terms-v2.md?raw';
-import privacySource from '../../content/legal/neture-account-privacy-v2.md?raw';
-import serviceSource from '../../content/legal/service-policies-v2.md?raw';
+import termsSource from '../../content/legal/neture-account-terms-v2.txt?raw';
+import privacySource from '../../content/legal/neture-account-privacy-v2.txt?raw';
+import serviceSource from '../../content/legal/service-policies-v2.txt?raw';
 import { api } from '../../lib/apiClient';
 
 /** A public notice is separate from the effective policy rows and signup reference. */

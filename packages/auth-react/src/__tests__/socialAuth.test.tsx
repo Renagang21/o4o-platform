@@ -46,3 +46,17 @@ it('Kakao signup hides privacy links until the server supplies the policy owner'
   await act(async()=>{const doc={...TERMS,privacyHref:'https://pharmacy.neture.co.kr/privacy'};resolve(doc);});
   expect((await screen.findByRole('link',{name:'내용 보기'})).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
 });
+
+it('Kakao requires fresh privacy acknowledgement after a policy version mismatch', async () => {
+  callback={token:'state',kind:'kakao-login'};
+  const load=vi.fn().mockResolvedValueOnce(TERMS).mockResolvedValue({...TERMS,version:2,privacyPolicy:{policyDocumentId:'22222222-2222-4222-8222-222222222222',version:2,title:'Updated privacy'}});
+  const signup=vi.fn(async()=>({success:false,code:'POLICY_VERSION_MISMATCH',error:'Changed'}));
+  render(<KakaoContinue client={{getSignupTerms:load,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={vi.fn()} />);
+  await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
+  fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01012345678'}});
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
+  await screen.findByRole('link',{name:'내용 보기 · 버전 2'});
+  expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(false);
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);expect((screen.getByRole('button',{name:'동의하고 계정 만들기'}) as HTMLButtonElement).disabled).toBe(true);expect(signup).toHaveBeenCalledTimes(1);
+});
