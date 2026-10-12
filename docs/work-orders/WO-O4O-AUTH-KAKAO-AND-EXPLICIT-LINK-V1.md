@@ -731,8 +731,8 @@ Demo가 아니며 운영자 검증 사용자 담당 경계는 유지한다.
 | T03 | 직원 Demo의 registry 유형·보호·배지와 매장 직원 착지를 추가; 전체관리자 로그인·권한은 생성하지 않음 | 구현·격리25단계 스키마 검증 완료 |
 | T04 | 기존 활성 경영자/공급자 Demo의 user ID를 유지해 주소·비밀번호를 전환; 대상 Gmail 충돌·특권·provider 연결은 먼저 조사하고 임의 병합하지 않음 | CLI 구현·격리 DB 검증 완료; 운영 plan 대기 |
 | T05 | 직원 Demo를 같은 체험 약국의 활성 staff 관계와 기존 `kpa:store_member` 인가로 연결; 소유자·관리자·공급자 role은 주지 않음 | CLI 구현·실제 직원 해석기 격리 검증 완료; 운영 대기 |
-| T06 | CLI 기본 read-only plan·정확한 before-image digest·트랜잭션·rollback/멱등·세션 폐기 검증; DB 변경은 지시된 Demo 범위에 한정 | 격리 DB15조건·CLI 타입검사 완료 |
-| T07 | 로컬 집중 회귀·격리 DB·PC/mobile3버튼 검증 → 최신 review·CI → 정상 main 통합·운영 plan/apply·배포 | 로컬 완료:5웹/API build, UI17·DB15·운영경계114·화면48 통과. review/CI/main·운영 대기 |
+| T06 | CLI 기본 read-only plan·정확한 before-image digest·트랜잭션·rollback/멱등·세션 폐기 검증; DB 변경은 지시된 Demo 범위에 한정 | 격리 DB18조건·CLI 타입검사 완료 |
+| T07 | 로컬 집중 회귀·격리 DB·PC/mobile3버튼 검증 → 최신 review·CI → 정상 main 통합·운영 plan/apply·배포 | 로컬 완료:5웹/API build, UI17·DB18·운영경계114·화면48 통과. review/CI/main·운영 대기 |
 | T08 | 운영8 origin × PC/mobile ×3계정48조건으로 버튼·실제 registry·연결 매장/상품·권한·로그아웃을 검증 | 대기 |
 
 기존 ID를 유지하는 전환은 연결된 매장·공급자·상품·샘플의 user FK를 옮기지 않는다.

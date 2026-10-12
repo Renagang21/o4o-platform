@@ -316,3 +316,5 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 **전환 시 서비스 연결 검증:** 세 Demo 유형 모두 `DEMO_REQUIRED_MEMBERSHIPS`의 필수 가입 상태를 확인한다. 이 map은 foundation provision과 reconcile의 공통 정본이다. 기존 Demo의 누락 연결은 같은 user ID에 생성하며, 기존 pending/suspended/withdrawn 연결을 active로 바꾸지 않는다. 필요한 membership·role 의도는 검토 digest에 포함한다. 로그인 성공만으로 Lecture 등 기능 이용 가능을 판정하지 않는다.
 
 운영 실행 분류는 [API scripts inventory](operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)가 정본이다. 현재 기존 Demo 전환은 ACTIVE reconcile만 사용한다. foundation은 PAUSED로 유지하며 이 지시로 새 foundation 생성까지 자동 실행하지 않는다.
+
+**단일 업무공간 검증:** 전환 시 기존 런타임 해석기로 승인 약국 후보(owner/admin/manager 포함)와 canonical 공급자 후보를 확인한다. 경영자는 의도한 약국의 owner 후보1개, 공급자는 ACTIVE 후보1개여야 한다. 다른 조직의 관계를 삭제·임의 선택하거나 Demo 역할을 넓혀 복수 컨텍스트를 숨기지 않는다.

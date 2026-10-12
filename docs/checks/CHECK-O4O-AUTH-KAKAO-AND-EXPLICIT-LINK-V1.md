@@ -1343,3 +1343,5 @@ PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은
 최종 리뷰의 운영 후보 분류 누락 P1을 수용했다. scripts inventory에 새 reconcile entry를 ACTIVE로 등록하고 service module은 dependency임을 명시했다. 기존 foundation 생성기는 PAUSED로 기록해 이번 운영 전환에서 실행하지 않는다. Canonical Demo의 명령 설명도 같은 분류로 정합했다. 같은 사용자 지시·현재 인증 WO·기본 plan/digest/보호/transaction 및 기존 WIF DB identity를 등록 근거로 남겼다. ACTIVE/PAUSED 모두 DB_USERNAME/DB_NAME 공백을 접속 전에 거절하도록 inline 필수 검사를 보완했다. 이 등록은 별도23/24 migration이나 일반 사용자/운영자 수정의 승인이 아니다.
 
 도구 분류 보완 후 DB identity/provision 계약44,3 CLI typecheck, username 미설정/공백의 접속 전 거절2조건, docs 민감정보 guard3878파일 모두 PASS. API scripts inventory 분류를 완화하지 않고 실행 후보와 이번 실제 운영 경로를 명시했다.
+
+운영 관계 전수와 단일 공급자 컨텍스트 지적 P1/P2를 수용했다. 새 CLI는 기존 `findStoreOrganizationCandidates(kpa)`와 `listSupplierCandidates`를 직접 재사용한다. store owner의 다른 active 약국 admin/manager 관계도 포함해 후보1개·의도한 owner를 요구하며 canonical supplier 후보도 ACTIVE1개만 허용한다. 후보 결과는 private before-image/digest에 포함하고 공유 credential 변경 전 실패한다. 다른 약국 admin·manager2조건과 복수 supplier1조건을 실제 DB에서 재현해 사용자 주소·감사 write0을 확인했다. 집중 회귀111/111(격리 DB18+공급자41+Google 은퇴17+Demo/provision35),3 CLI typecheck PASS. 운영 write·신규 배포·신규3계정 운영 검증은 아직0이다.

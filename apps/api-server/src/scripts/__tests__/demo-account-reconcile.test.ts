@@ -124,6 +124,24 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     expect((await query("SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='lecture'",[id]))[0].status).toBe('suspended');
     expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
   });
+  it.each(['admin','manager'])('rejects another approved pharmacy %s relation before exposing the shared identity',async(memberRole)=>{
+    const foreignUser=(await query("INSERT INTO users(email,name,status,\"isActive\",\"isEmailVerified\") VALUES('foreign-owner@fixture.invalid','Foreign fixture','active',true,true) RETURNING id"))[0].id;
+    const foreign=(await query("INSERT INTO organizations(name,code,type) VALUES('Other Pharmacy','fixture-other-pharmacy','pharmacy') RETURNING id"))[0].id;
+    await query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number)
+      VALUES($1,$2,'active','Other Pharmacy','FOREIGN-BUSINESS','FOREIGN-LICENSE')`,[foreign,foreignUser]);
+    await query('INSERT INTO organization_members(organization_id,user_id,role,is_primary) VALUES($1,$2,$3,false)',[foreign,owner,memberRole]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('AMBIGUOUS_RUNTIME_DEMO_STORE');
+    expect((await query('SELECT email FROM users WHERE id=$1',[owner]))[0].email).toBe('teststoreowner@example.com');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
+  it('rejects multiple canonical supplier contexts without selecting or moving data',async()=>{
+    const other=(await query("INSERT INTO organizations(name,code,type) VALUES('Other Supplier','fixture-other-supplier','supplier') RETURNING id"))[0].id;
+    await query("INSERT INTO organization_members(organization_id,user_id,role,is_primary) VALUES($1,$2,'owner',false)",[other,supplier]);
+    await query("INSERT INTO neture_suppliers(organization_id,slug,status) VALUES($1,'fixture-other-supplier','ACTIVE')",[other]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('AMBIGUOUS_DEMO_SUPPLIER');
+    expect((await query('SELECT email FROM users WHERE id=$1',[supplier]))[0].email).toBe('testsupplier@example.com');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

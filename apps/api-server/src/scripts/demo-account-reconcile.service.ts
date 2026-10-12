@@ -2,7 +2,9 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 import { passwordCredentialService } from '../services/auth/password-credential.service.js';
-import type { EntityManager } from 'typeorm';
+import type { EntityManager, DataSource } from 'typeorm';
+import { findStoreOrganizationCandidates } from '../utils/store-organization.resolver.js';
+import { listSupplierCandidates } from '../modules/neture/middleware/supplier-context.resolver.js';
 
 type Row = Record<string, unknown>;
 export interface DemoQueryClient { query(sql: string, params?: unknown[]): Promise<Row[]>; }
@@ -60,6 +62,7 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
   const relationships = await client.query(`SELECT id,user_id,organization_id,role,left_at,is_primary
     FROM organization_members WHERE user_id = ANY($1::uuid[]) ORDER BY user_id,organization_id,id
     ${lock ? 'FOR UPDATE' : ''}`, [scopeIds]);
+  const runtimeDb={query:client.query.bind(client)} as DataSource;
   const ownerId = source.get('STORE_OWNER')!.user_id;
   const ownerOrganizations = await client.query(`SELECT DISTINCT om.organization_id
     FROM organization_members om JOIN neture_pharmacy_memberships pm
@@ -69,6 +72,8 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
   if (ownerOrganizations.length !== 1) fail('AMBIGUOUS_APPROVED_DEMO_STORE');
   const organizationId = ownerOrganizations[0].organization_id;
   if (!uuid(organizationId)) fail('INVALID_DEMO_STORE');
+  const ownerRuntimeCandidates=await findStoreOrganizationCandidates(runtimeDb,String(ownerId),'kpa');
+  if (ownerRuntimeCandidates.length!==1 || ownerRuntimeCandidates[0].organizationId!==organizationId || ownerRuntimeCandidates[0].memberRole!=='owner') fail('AMBIGUOUS_RUNTIME_DEMO_STORE');
   const storeState = await client.query(`SELECT id,organization_id,status,applicant_user_id FROM neture_pharmacy_memberships
     WHERE organization_id=$1 AND status='active' ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [organizationId]);
   const supplierLinks = await client.query(`SELECT id,user_id,organization_id,status FROM neture_suppliers
@@ -76,7 +81,9 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
       (SELECT om.organization_id FROM organization_members om JOIN organizations o ON o.id=om.organization_id
         WHERE om.user_id=$1 AND om.left_at IS NULL AND om.role='owner' AND o.type='supplier')
     ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [source.get('SUPPLIER')!.user_id]);
-  if (!supplierLinks.length || supplierLinks.some(row => row.status !== 'ACTIVE')) fail('SUPPLIER_DATA_NOT_READY');
+  const supplierRuntimeCandidates=await listSupplierCandidates(runtimeDb,String(source.get('SUPPLIER')!.user_id));
+  if (supplierRuntimeCandidates.length!==1 || supplierLinks.length!==1) fail('AMBIGUOUS_DEMO_SUPPLIER');
+  if (supplierLinks[0].id!==supplierRuntimeCandidates[0].supplierId || supplierRuntimeCandidates[0].status!=='ACTIVE') fail('SUPPLIER_DATA_NOT_READY');
   const flags = await client.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
     WHERE conrelid='demo_accounts'::regclass AND conname='chk_demo_accounts_type'`);
   const history = await client.query(`SELECT name FROM typeorm_migrations WHERE name=ANY($1::text[]) ORDER BY name`,
@@ -112,7 +119,7 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
     if (user && account.type === 'STORE_STAFF' && !roleReady && roles.some(row => row.user_id === user.id && row.role === allowedRoles.STORE_STAFF && row.is_active === true)) fail('STAFF_ROLE_NOT_EFFECTIVE');
     plans.push({account,user,base,passwordMatches,memberReady,roleReady,membershipReady});
   }
-  const before = {registry,users,roles,providers,passwords,memberships,relationships,storeState,supplierLinks,schema:flags,history};
+  const before = {registry,users,roles,providers,passwords,memberships,relationships,storeState,supplierLinks,ownerRuntimeCandidates,supplierRuntimeCandidates,schema:flags,history};
   const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password),requiredMemberships:DEMO_REQUIRED_MEMBERSHIPS[account.type],requiredRole:allowedRoles[account.type]}));
   const changed = plans.filter(plan => !plan.user || plan.user.email !== plan.account.email || !plan.passwordMatches ||
     !plan.base || !plan.membershipReady || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady)));
