@@ -1104,3 +1104,32 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 
 현재 열린 인증 TODO는30일 이후 정책 적용·본인 외부 OAuth/명시적 연결·일반 상태 계정 SSOT의
 세 조건이다. My Home AI 등 소유 트랙의 제외 범위를 이 인증 작업으로 새로 구현하거나 닫지 않는다.
+
+### 일반 계정 상태 검증 재개와 계정 안내 수정 — 2026-10-12
+
+기준 main `63653694b3`에서 실제 공급자 화면 소비처와 상태 source를 다시 확인했다.
+`ServiceApplyPanel`의 공통 계정 미완료·정지 안내가 이전 수동 가입 승인 정책을 표시하고,
+대표 홈 링크가 `supplier.neture.co.kr/`의 같은 신청 화면으로 돌아가는 문제를 수정했다.
+공통 계정 상태 확인 문구와 `neture.co.kr` 공개 대표 홈 주소를 사용한다. 비정상 공통 계정에
+새 handoff를 발급하거나 계정·서비스 역할을 바꾸지 않는다.
+
+- 실제 라우트는 `SupplierLandingPage`/`SupplierServiceEntry`가 패널을 사용한다.
+  `ServiceUsageGate`는 현재 production 라우트에 소비처가 없다. 처음 이 컴포넌트를 대상으로
+  작성한 변경·테스트는 제거했고 실제 노출 화면만 수정했다.
+- 최종 서버131/131 PASS: 로그인과 서비스 가입 분리, 메인 정상 계정·이메일 확인,
+  공급자 source/기존 신청 거절, DB 현재 정지 판정, 서비스 탈퇴와 공통 계정 분리.
+- 최종 화면50/50 PASS: 신청 패널11, 서비스 미가입 진입18, 홈 서비스 상태11,
+  역할별 업무 시나리오10. 추가한 공통 계정4조건은 수정 전 실패했고 수정 후 통과했다.
+- Neture `tsc && vite build` PASS. 기존 번들 크기·Browserslist 경고는 오류가 아니다.
+- 실제 로컬 production bundle × PC/mobile 합성20/20 PASS: 공급자6상태와 공통 계정
+  비정상4상태를 각각 두 화면 폭에서 확인했다. canonical 대표 홈 href, 잘못된 승인 문구
+  부재, 신청 금지/약관 미확인 차단, 계정 token 유지, 불필요한 POST 없음, JS 오류·모바일
+  overflow 없음. 현재 source에서 나오지 않는 supplier `withdrawn`은 방어적 합성 조건뿐이다.
+  미사용 gate를 대상으로 했던 최초 브라우저 시도는 timeout 후 중단했으며 PASS 수에 포함하지 않는다.
+- `SETUP.md`의 Google 전용 로그인 설명을 현행 세 인증 수단과 Google 개발용 예시로 정정했다.
+- `docs/local/TEST-ACCOUNT.txt`는 현재 checkout과 기준 workspace 모두 누락됐다.
+  실제 일반 상태 계정의 운영 로그인·업무·상태 변경 검증은 미실행이다. Demo32조건과 위
+  합성20조건으로 대신하지 않는다. 비공개 계정 출처를 요청했고 값은 로그·문서에 넣지 않는다.
+
+동일 WO의 보존된 branch에서 실행했다. 새 정책은 게시하지 않았으며 시행 예정일
+2026-11-13과 실제30일 공고 조건을 유지한다. main 통합·웹 배포·운영 검증은 별도로 기록한다.

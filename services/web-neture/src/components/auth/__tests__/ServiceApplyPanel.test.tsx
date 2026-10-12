@@ -14,7 +14,7 @@ const authState = { user: { id: 'u1', email: 'u1@example.test', name: '회원', 
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user }) }));
 
 const statesResult = {
-  states: null as null | { supplier: { status: string; source: string } },
+  states: null as null | { supplier: { status: string; source: string }; netureMain?: { status: string; source: string } },
   loading: false,
   error: null as string | null,
   reload: vi.fn(),
@@ -98,6 +98,16 @@ describe('ServiceApplyPanel', () => {
     mount();
     expect(screen.getByTestId('service-apply-supplier-none')).toBeTruthy();
     expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  it.each(['pending', 'rejected', 'suspended', 'withdrawn'])('공통 계정 %s → 계정 상태 확인이며 서비스 수동 승인 대기로 안내하지 않는다', (status) => {
+    statesResult.states = { ...st('none'), netureMain: { status, source: 'account_verification' } };
+    mount();
+    expect(screen.getByTestId('service-apply-supplier-neture-required')).toBeTruthy();
+    expect(screen.getByRole('link', { name: '대표 홈에서 계정 상태 확인' }).getAttribute('href')).toBe('https://neture.co.kr/');
+    expect(screen.queryByText(/가입 승인|승인 대기/)).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(api.post).not.toHaveBeenCalled();
   });
 
   it('공급자 진입에서 승인된 서비스는 기존 guard가 있는 업무 주소로 이동한다', async () => {

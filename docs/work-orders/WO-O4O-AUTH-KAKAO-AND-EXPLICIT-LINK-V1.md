@@ -620,3 +620,38 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 
 현재 열린 인증 TODO는30일 이후 정책 적용·본인 외부 OAuth/명시적 연결·일반 상태 계정 SSOT의
 세 조건이다. My Home AI 등 소유 트랙의 제외 범위를 이 인증 작업으로 새로 구현하거나 닫지 않는다.
+
+### 일반 계정 상태 검증 재개 — 2026-10-12
+
+사용자의 남은 작업 진행 지시에 따라 동일 WO의 보존된 전용 branch를 최신 main
+`63653694b3`으로 fast-forward했다. 초기 TODO의 모든 서비스에 동일한 상태를 적용한다는
+전제를 아래 코드 근거로 보완했다.
+
+| ID | 초기 TODO | 코드·문서 확인으로 보완한 실행 항목 | 현재 판정 |
+|---|---|---|---|
+| V01 | 일반 미가입·대기·반려·정지·탈퇴 검증 | `users`의 공통 계정 상태, 서비스 membership, 약국·공급자 별도 원장을 구분한다. 로그인 성공과 보호 업무 API 허용도 구분한다 | 조사 완료 |
+| V02 | 공급자 상태별 안내 확인 | 실제 소비처는 `SupplierLandingPage`/`SupplierServiceEntry` → `ServiceApplyPanel`이다. 미사용 `ServiceUsageGate`의 문구만 바꿔 운영 개선으로 판정하지 않는다 | 실제 소비처 확인 완료 |
+| V03 | 공통 계정 승인 대기 안내 | `neture-main-membership.ts`의 정상 계정·이메일 확인 기준에 맞춰 수동 승인 문구를 제거한다. 서브도메인의 `/`로 돌아가 같은 패널을 반복하지 않고 `neture.co.kr` 공개 대표 홈으로 안내한다 | 로컬 구현·검증 완료; 통합·배포 대기 |
+| V04 | 실제 상태별 로그인·역할·업무 검증 | 8개 유지 origin × PC/mobile에서 계정 출처와 실제 원장 상태를 먼저 확인한 후 로그인, 메뉴·직접 주소, 보호 API, 상태 안내, 다른 서비스 영향, 로그아웃을 검증한다 | 로컬 계정 SSOT 연결 대기 |
+| V05 | 정책 적용·재동의 | 실제 공개 공고와 30일 경과를 다시 확인하고 2026-11-13 이후 새 정책을 게시·검증한다 | 시행일 대기 |
+| V06 | Google·카카오 실제 인증·명시적 연결 | 본인 실제 OAuth는 사용자가 담당한다. 자동 이메일 병합 없음·연결 후 권한 합집합 없음의 실제 결과를 전달받아 기록한다 | 사용자 확인 대기 |
+
+공급자 이용 상태의 실제 출처는 `neture-service-state.service.ts`와
+`supplier-context.resolver.ts`가 해석하는 `neture_suppliers`다. 현재 source의
+`PENDING/ACTIVE/REJECTED/INACTIVE`와 row 부재를 검사하며, supplier `withdrawn`은
+현재 source에서 생성되지 않는 방어적 UI 분기다. 이 분기의 합성 테스트를 실제 탈퇴 계정
+증거로 삼거나 DB에 임의 상태를 넣지 않는다. Store의 약국 신청 종료와 서비스 membership
+탈퇴도 같은 상태명이라고 합치지 않는다.
+
+`docs/local/TEST-ACCOUNT.txt`는 현재 checkout과 기준 workspace 모두에 없다.
+[SETUP.md](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)의 비공개 파일/환경 Secret
+확보 절차를 따르며, 기존 Demo·과거 seed 계정으로 대체하지 않는다. 계정 원본 확보 후에도
+필요한 상태가 없는 조건은 미실행으로 기록한다. 상태 변경 검증은 대상·복구 방법·공유 runtime
+사용 여부를 확인하고 승인된 범위에서만 실행한다.
+
+- [x] 상태 원장과 실제 화면 소비처 조사 → TODO 보완.
+- [x] V03 서버 회귀131건·화면 회귀50건·Neture build·PC/mobile 합성20조건 확인.
+- [ ] V03 push·review·main·Neture 배포·운영 검증.
+- [ ] 일반 계정 SSOT 연결 후 V04 운영 상태별 검증.
+- [ ] V05 시행일·공고 기간 확인 후 정책 적용과 재동의 운영 검증.
+- [ ] V06 사용자 본인 실제 OAuth/명시적 연결 결과 기록.
