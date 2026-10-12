@@ -35,8 +35,10 @@
 | 공개 정보 | `notices`, `resources`, `officers`, `events`; 게시된 사이트 및 공개 범위의 공지/자료/임원/행사 |
 | 회원 영역 | `meetings`, `mypage`, `mypage/annual-report`, `mypage/fees`, `mypage/education`, `mypage/events`; 회의 자료·신상신고·본인 회비/교육·행사 응답 |
 | 분회 운영자 | `operator/site`, `posts`, `domains`, `annual-reports`, `fees`, `education`, `members`, `events`, `officers`; 사이트/게시/도메인·신상신고 검수/승인/동기화·회비·연수교육·회원 콘솔·행사·임원 명부 |
-| 서비스 관리자 | `/service-admin`; 서비스 가입 심사·분회 개설 심사·분회 운영자 지정/해제·연도별 신상신고 양식 등. 실제 허용 범위는 router guard 확인 |
+| 서비스 관리자 | `/service-admin`; 서비스 가입 심사·분회 개설 심사·분회 운영자 지정/해제. 연도별 신상신고 양식 관리 UI는 없음 |
 | 내 업무 공간 이동 | 기존 O4O 메인/My Home 이동 버튼. 프런트 role 판정으로 공개/회원/운영 메뉴를 나누고 모바일 메뉴는 접이식 구성 |
+
+연도별 신상신고 양식의 조회/개설/수정은 router의 `/admin/annual-report-templates` API로 존재하지만 `/service-admin`의 관리 UI와 이를 사용하는 프런트 소비처는 없다. 기존 양식을 조회해 회원이 작성/제출하는 화면과 양식 자체를 개설/편집하는 관리화면을 구분한다. 신규 개발자의 API/UI 인수 항목이며 이번에 화면을 추가하지 않는다.
 
 현재 첫 화면은 사이트/공지/자료 중 하나라도 실패하면 오류 상태가 된다. 행사 조회 실패는 빈 행사 배열로 처리되어 실제 행사0건과 구분되지 않는다. 이는 [BranchHomePage.tsx](../../services/web-kpa-branch/src/pages/BranchHomePage.tsx)에서 관측한 동작이며 이번 인계에서 고치지 않는다. 신규 개발자는 오류·빈 상태·권한 안내·직접 URL·PC/모바일을 기획과 함께 재평가한다.
 
@@ -57,6 +59,8 @@
 | 행사·응답 | `branch_events`, `branch_event_rsvps` |
 | 공통 신원·가입·권한·자격 | `users`, `service_memberships`, `role_assignments`, `kpa_pharmacist_profiles` |
 
+분회 전용 신상신고·회비/교육 원장·소속 이력의 보존/파기 기간은 이번 조사로 확정되지 않았다. 공통 [개인정보 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)의 대상 서비스 표와 기간표에는 이 분회 원장들의 구체 기간이 없다. 개인정보 최소화의 사용자 원칙과 공통 계정 처리 원칙을 참고하되, 분회 처리 항목·목적·법정 의무·기간/기산점·계정 제거 시 기록 분리를 별도 확정하고 정본에 반영해야 한다. 커뮤니티 이력1년이나 generic 로그365일을 이 원장들의 삭제 기준으로 복사하지 않는다.
+
 재정비 전에 개인정보/FK/연도별 제출 스냅샷·회비/교육 원장·소속 이력의 영향도를 다시 조사해야 한다. 같은 이름의 오래된 KPA 조직/회원 테이블이나 migration 파일을 삭제 근거로 삼지 않는다. 운영 DB 변경·DDL·기존 데이터 제거는 [AGENTS.md §5](../../AGENTS.md)의 별도 승인 경계를 따른다.
 
 ## 5. main·배포·검증을 구분한 현황
@@ -64,7 +68,7 @@
 | 근거 | 확인한 결과 | 의미·한계 |
 | --- | --- | --- |
 | [Promote38190265457](https://github.com/Renagang21/o4o-platform/actions/runs/38190265457), [38192368264](https://github.com/Renagang21/o4o-platform/actions/runs/38192368264) | 전체 FAILURE, 분회 이미지 빌드 실패 | 공통 인증/정책 개편의 전체 배포 완료로 표시하면 안 됨. 다른 서비스의 배포 성공과 분회 실패를 구분 |
-| [PR #497](https://github.com/Renagang21/o4o-platform/pull/497) | 2026-10-12 11:17(KST) main `899e871cc` 병합. 분회 약관 UI Docker 의존성 보완 | 별도 담당이 인계 지시 전 진행한 빌드 수정. 소스 병합이 운영 이미지/serving SHA 일치를 증명하지 않음 |
+| [PR #497](https://github.com/Renagang21/o4o-platform/pull/497) | 2026-10-12 11:17(KST) main `899e871cc` 병합. 분회 약관 UI Docker 의존성 보완 | 별도 담당의 기존 빌드 수정 기록. 소스 병합이 운영 이미지/serving SHA 일치를 증명하지 않음 |
 | 공개 주소 읽기 | 이 조사에서 `https://kpa.neture.co.kr/` HTTP200, SPA 문서 제목 확인 | 엔트리 응답만 확인. JavaScript 실행·현재 이미지 SHA·가입/권한/신고/회비 정상 동작 증거 아님 |
 | 과거 분회 CHECK | [운영 배포 smoke](../checks/CHECK-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1.md), [IA/내비게이션](../checks/CHECK-O4O-KPA-BRANCH-IA-AND-NAVIGATION-FINALIZATION-V1.md), [회원 업무 콘솔](../checks/CHECK-O4O-KPA-BRANCH-MEMBER-OPERATIONS-CONSOLE-V1.md) | 당시 결과. 과거 green을 최신 인증/정책 이미지의 검증으로 재사용하지 않음 |
 
@@ -76,7 +80,7 @@
 2. 공통 Google/Kakao/이메일 인증과 명시적 연결·동의/정책 흐름을 분회 serviceKey·공용/자체 도메인에서 검증한다. `kpa:*` 세션을 분회 권한으로 오인하지 않는다.
 3. 신상신고 파일 첨부는 [FieldRenderer.tsx](../../services/web-kpa-branch/src/pages/annual-report/FieldRenderer.tsx)의 `file` 분기에서 준비 중 안내만 제공한다. 수집 항목·저장/삭제/열람 범위를 확정한 뒤 별도 구현을 판단한다.
 4. 홈페이지/행사 조회 실패와 실제 빈 결과, 미게시 분회와 존재하지 않는 분회, 회원/운영자403의 안내를 구분해 점검한다.
-5. 공개 게시/임원 명부와 회원 회의자료·개인 신고/회비/교육·개인정보 노출 경계를 검증한다. 현재 데이터의 보유기간·계정 제거 정책은 [개인정보 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)을 기준으로 한다.
+5. 공개 게시/임원 명부와 회원 회의자료·개인 신고/회비/교육·개인정보 노출 경계를 검증한다. 공통 계정의 개인정보 최소화 원칙과 분회 고유 원장의 미확정 보존 계약은 §4처럼 구분하고, 분회 원장의 기간을 별도 확정한다.
 6. 전면 정비의 기능/권한/API/schema/기존 자료 이전 범위를 새 WO로 확정한다. 기존 과거 WO를 포괄적인 새 개발·데이터 삭제 승인으로 사용하지 않는다.
 7. 신규 개발자의 정비 작업을 시작하면 [SETUP.md](../../SETUP.md)의 설치/검증 절차와 현재 package/CI 정의로 환경을 준비한다. 프런트 검증 설정은 [vitest.config.mjs](../../services/web-kpa-branch/vitest.config.mjs), 서버 검증은 기존 scope/service/route 테스트다. 이 인계는 새 빌드·회원 실계정·데이터 변경 테스트를 수행하지 않았다.
 
