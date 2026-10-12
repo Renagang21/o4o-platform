@@ -57,7 +57,7 @@ LOCAL_COPY_PG_SOCKET=/path/to/local/postgresql/socket \
 - [ ] 정상 승인 업무 매장 두 곳 간 전환·작성·게시 확인
 - [x] 기존 16개 테스트 조직의 차단 참조 처리 및 전체 정리
 - [x] QR 공개 자료 조회의 매장 소유 경계 누락 수정 및 로컬 재현
-- [ ] QR 경계 수정 main 통합·운영 배포·사후 확인
+- [x] QR 경계 수정 main 통합·운영 배포·사후 확인
 - [ ] 실제 QR 스캔·태블릿 기기 출력 확인
 
 최초 단계의 완료 범위는 브라우저와 로컬 계약 검증이었다. 후속 조직 정리 완료는 아래 운영 정리 기록과 TODO에 반영했다. 운영 원본 변경·두 정상 매장·물리 기기는 열린 TODO로 유지한다. DEPLOYMENT = NOT_APPLICABLE: 검증 도구·기록만 변경한다.
@@ -101,3 +101,13 @@ main 사후 CI 38129545596과 CodeQL 38129545592도 PASS다. main 포함을 확�
 QR 조회의 `store_execution_assets` JOIN은 활성 여부와 ID만 확인하고 매장 일치를 확인하지 않았다. 격리된 실제 PostgreSQL에서 다른 매장의 제목·본문·이미지 노출을 재현했으며 동일 매장 조건 추가 후 세 필드가 null이 되는 것을 확인했다. 이는 로컬 fixture 재현이며 운영 노출 사례를 확인했다는 뜻이 아니다. 같은 매장 활성 자료는 표시되고 비활성 자료는 제외된다. 관련 QR·태블릿 6개 suite/65개 PASS, 현재 resolver/Core 기반 원본·사본 독립성 SQL 6개 PASS다. 상세 배포 결과는 후속 WO에 기록한다.
 
 운영 원본 수정·두 정상 업무 매장·물리 QR/태블릿 TODO는 자동 검증 결과로 대체하지 않는다. 이번 runtime 수정의 DEPLOYMENT는 REQUIRED이며 앞 단계 검증 도구의 NOT_APPLICABLE 기록과 구분한다.
+
+## QR 수정 통합 후 배포 차단
+
+PR #483은 필수 CI와 Codex review finding 0을 확인하고 main `b4d428d606a6a9c29804b08c046a209b8880d843`에 통합했다. main 사후 CI 38141731196·CodeQL 38141731191도 성공했다. 그러나 자동 Delivery 38142342005가 GCP WIF 신원 조건에서 인증 거절됐으며 API build·migration·rollout은 모두 미실행이다. 따라서 위 QR 운영 배포 TODO는 열린 상태다. 이 작업에서 provider·OIDC·배포 workflow는 바꾸지 않았고 현재 provider metadata를 조회할 관리자 연결이 없어 정확한 불일치 조건은 미확정이다. 기존 운영 API의 read-only HEAD smoke 3개는 PASS이며 새 수정의 운영 반영 증거로 해석하지 않는다.
+
+후속 main PR #475의 [PH 퇴역 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 사용자 승인으로 WIF 기존 조건 뒤의 `&& false`를 적용한 격리 창이 기록돼 있다. QR 배포는 해당 PH 작업의 종료·원래 조건 복구 후 재개하며 이 제한을 우회하거나 임의 해제하지 않는다. 상세 근거와 결과 기록 main 통합 보류·worktree KEEP은 QR 소유 경계 WO에 기록한다.
+
+## QR 소유 경계 배포 완료 — 2026-10-12
+
+WIF 제한 복구 후 Delivery 38188251558에서 API 배포 및 실제 서빙 확인이 성공했다(target `20ed384b1591c23bad53b14d99b7531e23dac1f2`, production DEPLOYED). 배포된 QR 소스는 회귀 65개·격리 QR SQL 4개를 통과한 수정 소스와 동일하다. 배포 후 readiness 및 QR read-only HEAD 3개도 PASS다. 앞의 인증 차단·배포 미완료·고정 SHA 대기는 이전 단계 이력이며 QR 수정은 현재 배포 완료다. 상세 결과는 QR 소유 경계 WO에 기록한다. 기존 관리자 인증 원본 편집·두 정상 업무 매장·실제 QR/태블릿 기기 검증은 별도 열린 TODO이며 완료 처리하지 않는다.
