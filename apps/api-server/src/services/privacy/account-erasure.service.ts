@@ -223,17 +223,19 @@ export class AccountErasureService {
     const visitProfile = (v:unknown):void => {
       if(Array.isArray(v))v.forEach(visitProfile);
       else if(v && typeof v==='object')for(const [key,value] of Object.entries(v)) {
-        if(!/role/i.test(key) && /email|phone|name|address|picture|avatar|^sub$|provider.?id|account.?id/i.test(key))visit(value);
+        if(!/role/i.test(key) && /email|^sub$|provider.?id|account.?id|user.?id/i.test(key))visit(value);
         else if(value && typeof value==='object')visitProfile(value);
       }
     };
-    for (const key of ['id','email','phone','name','nickname','avatar','firstName','lastName','lastLoginIp','businessInfo','kakao_open_chat_url','kakao_channel_url']) visit(user[key]);
+    // Non-unique names, nicknames, phone/IP/avatar/shared business values do not identify a copy's subject.
+    // Related copies are detected by subject/email/owned-row/provider identifiers; preserve unrelated people's legitimate values.
+    for (const key of ['id','email']) visit(user[key]);
     for (const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
       JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`, [user.id])) visit(r.reference_id);
     for (const t of await this.tables(m)) {
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       const where = owners?.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
-      const fields = t.columns.filter(c => /email|phone|name|address|avatar|picture|metadata|profile/i.test(c));
+      const fields = t.columns.filter(c => /email|provider.?id|account.?id|metadata|profile/i.test(c));
       if (!where || !fields.length) continue;
       for (const row of await m.query(`SELECT ${fields.map(quote).join(',')} FROM public.${quote(t.table_name)} WHERE ${where}`, [user.id])) visitProfile(row);
     }
@@ -419,7 +421,7 @@ export class AccountErasureService {
       await this.removePrivateRows(m,o.subject_id!);
       if ((await this.reviewManifest(m,user,frozenTokens)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
       await m.query('DELETE FROM users WHERE id=$1', [o.subject_id]);
-      await this.audit(m,operationId,o.subject_hash,o.requested_by_key,'completed');
+      await this.audit(m,operationId,o.subject_hash,actorId,'completed');
       await m.query('UPDATE account_erasure_reference_keys SET reference_id=NULL WHERE operation_id=$1', [operationId]);
       await m.query(`UPDATE account_erasure_operations SET state='completed',subject_id=NULL,review_codes='[]',
         error_code=NULL,completed_at=now(),expires_at=now()+interval '7 days',updated_at=now() WHERE id=$1`, [operationId]);

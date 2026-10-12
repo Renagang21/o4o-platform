@@ -208,18 +208,30 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(await handoffTokenService.exchangeToken(handoff)).toBeNull();
     await expect(generateTokensWithContext(u,'neture.co.kr','neture','google',context)).rejects.toMatchObject({code:'SESSION_CHANGED_RETRY_LOGIN'});
   });
-  it('short Korean identifiers copied into another account are not falsely considered erased',async()=>{
+  it('a copied Korean profile attributed to the subject remains an unresolved personal reference',async()=>{
     const target=await user({name:'홍길동'}),peer=await user();
-    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contactName\',$1::text) WHERE id=$2',[target.name,peer.id]);
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contactName\',$1::text,\'sourceUserId\',$3::text) WHERE id=$2',[target.name,peer.id,target.id]);
     const r=await service().request(target.id);expect(r.erased).toBe(false);expect(r.reviewCodes).toContain('REVIEW:public.users');
     expect((await db.query('SELECT "businessInfo" FROM users WHERE id=$1',[peer.id]))[0].businessInfo.contactName).toBe('홍길동');
+  });
+  it('unrelated people sharing name, nickname, IP and contact values are preserved without blocking erasure',async()=>{
+    const target=await user({name:'합성동명이인'}),peer=await user({name:'합성동명이인'});
+    await db.query('UPDATE users SET nickname=$1,"lastLoginIp"=$2,phone=$3,"businessInfo"=jsonb_build_object(\'address\',$4::text) WHERE id=ANY($5::uuid[])',
+      ['공통 별칭','127.0.0.1','fixture-contact','Synthetic shared address',[target.id,peer.id]]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect((await db.query('SELECT name,nickname,phone,"isActive" FROM users WHERE id=$1',[peer.id]))[0]).toEqual({name:'합성동명이인',nickname:'공통 별칭',phone:'fixture-contact',isActive:true});
+    // The deleted person's name is not a general ban on an unrelated person's profile updates.
+    await db.query('UPDATE users SET nickname=$1 WHERE id=$2',['합성동명이인',peer.id]);
   });
   it('durable generation + external failure retries without a false completed result',async()=>{
     const u=await user({avatar:'https://storage.googleapis.com/fixture-private/personal-avatar.png'});
     let fail=true;const storage={generation:jest.fn(async()=> '7'),deleteGeneration:jest.fn(async()=>{if(fail)throw new Error('Synthetic storage failure');})};
     const first=await service(storage).request(u.id);expect(first.erased).toBe(false);expect(first.state).toBe('retry_required');
     expect((await db.query('SELECT generation FROM account_erasure_file_tasks'))[0].generation).toBe('7');
-    fail=false;const last=await service(storage).resume(first.operationId);expect(last.erased).toBe(true);
+    const completingAdmin=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[completingAdmin.id]);
+    fail=false;const last=await service(storage).resume(first.operationId,completingAdmin.id);expect(last.erased).toBe(true);
+    const audit=await db.query('SELECT action,actor_key FROM account_erasure_audit_events WHERE operation_id=$1 ORDER BY action',[first.operationId]);
+    expect(audit).toEqual([{action:'completed',actor_key:completingAdmin.id},{action:'requested',actor_key:fixtureAdminId}]);
     expect(storage.generation).toHaveBeenCalledTimes(1);expect(storage.deleteGeneration).toHaveBeenLastCalledWith('fixture-private','personal-avatar.png','7');
     const [f]=await db.query('SELECT bucket,object_path,generation,state FROM account_erasure_file_tasks');
     expect(f).toEqual({bucket:null,object_path:null,generation:null,state:'deleted'});
@@ -244,7 +256,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const u=await user({name:'합성개인명'}),other=await user();
     const r=await service().request(u.id);expect(r.erased).toBe(true);
     await expect(db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',[`Former contact: ${u.email}`,other.id])).rejects.toMatchObject({code:'P0001'});
-    await expect(db.query('UPDATE users SET nickname=$1 WHERE id=$2',[`회수된 합성개인명 기록`,other.id])).rejects.toMatchObject({code:'P0001'});
+    await db.query('UPDATE users SET nickname=$1 WHERE id=$2',[`독립된 합성개인명 기록`,other.id]);
     const rows=await db.query("SELECT reference_id,key_kind,identity_length FROM account_erasure_reference_keys WHERE operation_id=$1",[r.operationId]);
     expect(rows.every((k:any)=>k.reference_id===null)).toBe(true);expect(rows.some((k:any)=>k.key_kind==='identity')).toBe(true);
   });

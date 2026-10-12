@@ -44,7 +44,7 @@
 
 ## 검증 증거와 한계
 
-격리 PostgreSQL20, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f`,6617 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
+격리 PostgreSQL21, 승인157, 인증182, Admin UI6, 설계11 tests PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 새 DB의 정식 baseline→23 migration runner 최종 schema assertion PASS (`c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f`,6617 lines). 상세 검증 대상/운영 미확인 항목은 WO §10.2~§10.3을 따른다. storage SDK mock4 tests도 PASS. 실제 GCS가 아닌 mock 검증이다. PR CI는 아래 통합 기록에 추가한다.
 
 실계정/운영 DB/실제 GCS 데이터 테스트0. 새 기능은 기본 비활성이고 운영 migration·전수 개인 파일 inventory·법정1/2년 근거·writer 규모·외부 upload/orphan/버전/백업 검증 없이는 활성화하지 않는다. 기존 문서 제안의 전수 handler/자동 backoff/producer 계약이 모두 완료됐다고 판정하지 않는다.
 
@@ -61,7 +61,7 @@
 
 ## 격리 검증 재현 계약
 
-integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬20개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
+integration suite는 명시적 `O4O_ERASURE_TEST_PORT=55469`에서만 실행한다. loopback의 전용 disposable PostgreSQL cluster와 `o4o_erasure_fixture` DB를 준비하고 정식 baseline/migrate runner로 schema를 적용한 뒤 실행한다. suite의 TRUNCATE는 해당 fixture 전용이며 운영/staging DB에 연결하지 않는다. 일반 CI에서는 DB fixture 없이 skip되므로 위 실제 로컬21개 실행 증거와 구분한다. storage/unit 검증은 DB 없이 실행된다.
 
 ```bash
 pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/privacy/__tests__/account-erasure.storage.test.ts
@@ -70,9 +70,9 @@ pnpm --filter @o4o/admin-dashboard exec vitest run src/pages/platform/account-go
 node scripts/db/check-migration-contract.mjs
 ```
 
-재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB20개+storage mock4개=24 tests PASS.
+재시도 권한 회수 회귀 PASS: 준비·파일 단계·최종 DB commit에서 현재 platform super admin을 재확인한다. 회수된 권한의 retry는403이며 operation을 재분류/수정하지 않는다. 최종 격리 DB21개+storage mock4개=25 tests PASS.
 
-UUID 없는 이메일/이름의 문자열·JSON 재복사도7일 writer fence로 차단하는 합성 회귀 PASS. restore key에는 원문 대신 해시·문자 길이만 저장하며 완료 시 transient UUID를 제거한다. 이 추가 fence의 운영 성능/충돌 영향도 활성화 전 평가 대상이다.
+UUID 없는 고유 이메일/출처 식별자의 문자열·JSON 재복사도7일 writer fence로 차단하는 합성 회귀 PASS. restore key에는 원문 대신 해시·문자 길이만 저장하며 완료 시 transient UUID를 제거한다. 이 추가 fence의 운영 성능/충돌 영향도 활성화 전 평가 대상이다.
 
 ## 운영 DDL 포함 배포 승인안 — 실행 전
 
@@ -83,3 +83,9 @@ UUID 없는 이메일/이름의 문자열·JSON 재복사도7일 writer fence로
 승인 후 검증 순서는 migration pre/post fingerprint → API0% revision Ready/전환/health → Admin0% tag smoke/전환 → serving SHA·capability disabled 확인이다. migration 이후 API rollout 실패 시 기존 revision traffic rollback은 schema를 되돌리지 않는다. 신규 원장에 데이터가 있으면 down을 거절하며 forward repair를 검토한다. 계정/GCS 제거·환경 apply flag·inventory confirmed·job activation·법률 게시/재동의는 이 배포 승인안에도 포함하지 않는다.
 
 삭제 기능 **활성화 승인안은 아직 준비 완료가 아니다**: 전수 domain/file inventory·producer/orphan·GCS soft-delete/복제/backup·법정1/2년 해당성·lock 성능·미분류 담당/24h 처리 절차를 먼저 마쳐야 한다. 기본1년 정책을 재질문하지 않고 아직 미확정인 근거와 실제 집행만 따로 다룬다.
+
+Codex `f8fc042`의 P1/P2 처리: 공통 이름·닉네임·IP·전화·avatar/business 값은 타인의 정당한 데이터와 구분되지 않으므로 단독 자동 차단/해시 fence에서 제외했다. 고유 UUID/이메일/provider·소유 row 출처 식별자로 연관 복제를 검출하고 source UUID가 있는 이름 복제는 계속 미완료다. 분류 근거 없는 타인 이름을 지우지 않는다. 실제 완료 Admin이 audit actor를 기록하고 최초 요청 event는 원래 요청자를 유지한다. 동명이인/공통 접속·연락처 보존과 두 Admin의 요청/완료 구분을 포함한21+4 tests PASS.
+
+PR CI shard2 실패를 로컬 전체 shard로 재현했다(155 suites2635 tests PASS, 실패1개). 원인은 email verification token consumer를 인증 발급 경로 하나로 고정한 기존 source guard였다. 계정 제거의 소유 토큰 파기 경로를 명시적으로 추가하고 토큰 INSERT/UPDATE 부재를 검증한다. 수정된 정적 인증/Demo guard26 tests PASS; 전체 PR CI 재실행 결과를 통합 gate로 사용한다.
+
+로컬 synthetic rollback 측정: 1000 users insert는 operation0/1/10개에서28/137/753ms였다. 각 operation의 identity key는1개인 작은 fixture이며, 운영 데이터/전체 profile key 수/장기 transaction·경합 성능을 검증한 수치가 아니다. 운영 활성화 전 성능 평가를 대체하지 않는다.
