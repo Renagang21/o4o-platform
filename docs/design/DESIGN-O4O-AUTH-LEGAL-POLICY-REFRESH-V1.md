@@ -259,7 +259,7 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
 ### 남은 실행 조건
 
 - [x] 최신 HEAD 전체 Codex review·CI 확인 → PR #457 main 통합(2026-10-12).
-- [ ] canonical Delivery/Promote로 API 및 영향 웹 배포, 실제 serving SHA 확인.
+- [x] canonical Delivery/Promote로 API 및 영향 웹 배포, 실제 serving SHA 확인(아래 최종 결과).
 - [x] 공개 공고 전문·날짜·링크의 운영 PC/mobile 검증 및 공개 시각 기록(2026-10-12 KST).
 - [x] 유지 서비스 8개 PC/mobile Demo 로그인·업무 권한·로그아웃 회귀 운영 검증(32조건, 아래 기록).
 - [ ] 30일 공고 후 시행일에 새 문서를 게시하고 새 가입·기존 회원 재동의 운영 검증.
@@ -397,3 +397,46 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 기준 workspace에 없어 Demo를 미가입·대기·반려·정지·탈퇴 일반 계정의 증명으로 대체하지 않는다.
 GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 현재 프록시403으로
 조회가 차단돼 실제 serving SHA 확인은 OPEN이다. 환경 초안에 도메인을 추가했으며 저장·게시 후 재확인한다.
+
+
+### 2026-10-12 분회 수정 통합·배포 최종 결과
+
+- [PR #497](https://github.com/Renagang21/o4o-platform/pull/497)의 최신 HEAD `cdc9138614`는
+  Codex 주요 지적 없음·미해결 스레드0, PR CI38194647281 SUCCESS다. 정상 PR merge로
+  main `899e871cce`에 통합했고 main CI38195234125도 SUCCESS다.
+- 원래 Docker manifest 파일 집합은 실제 설치에서 shared-space-ui 누락 오류로 실패했다.
+  수정된 독립 파일 집합의 설치·5개 의존성/Vite build가 통과했다. 추가로
+  [Promote38195979353](https://github.com/Renagang21/o4o-platform/actions/runs/38195979353)의
+  실제 Docker 이미지 build/push·Cloud Run 배포·최종 Report가 모두 SUCCESS다.
+- 분회 최종 serving SHA는 `899e871ccee0114f6cf7ac73999011a1d364b994`다. Report는 GCP serving을
+  다시 읽고 계획된 서비스의 SHA가 target과 일치할 때만 DEPLOYED로 판정한다.
+  해당 SHA의 최종 production status도 SUCCESS/DEPLOYED다.
+- API·전체관리자·Neture·KPA Society·강의·매장의 실제 serving 검증은 앞선 run38190265457의
+  최종 production status에서 통과한6개를 확인했다(target `0e1aa41eafab8cd3bc1b2c099f20d903ac785a18`).
+  최신 Promote에서는 추가 runtime 변경이 없는6개를 재배포하지 않고 분회만 배포했다.
+  앞선 전체 FAILED는 분회 실패 때문이며 이번 성공으로 그 배포 잔여가 해소됐다.
+- 분회 배포 후 PC/mobile × Demo2역할4조건도 검증했다. 초회3/4 뒤 PC의 초기 카카오 버튼
+  로딩 시간 초과1조건을 별도 재실행해 실제 설정 조회200·enabled·버튼 표시와 로그인/권한/로그아웃
+  PASS를 확인했다. 앞선8개 origin32조건과 구분해 기록하며 새 분회 결과를 포함한 최종 범위는32/32다.
+- 공개 공고 PC/mobile 및 계약14건의 결과는 이전 기록대로 유지한다. 공고 전문을 다시 쓰거나
+  시행일 전 운영 정책을 게시하지 않았다. 확인한 날짜는 한국2026-10-12, 시행 예정일은2026-11-13이다.
+- 상세 Actions 로그의 추가 허용 도메인은 초안 저장 상태이며 현재 실행 리비전42에는 아직 없다.
+  실제 serving 증명은 허용된 GitHub 최종 status 및 Report 성공으로 확인해 그 OPEN을 해소했다.
+  초안 저장을 환경 게시/적용 완료라고 기록하지 않는다.
+
+현재 TODO는 ①30일 공고와 시행일 충족 후 새 정책 게시·기존 회원 재동의 운영 검증,
+②사용자 본인의 Google·카카오 실제 인증·명시적 계정 연결 확인,
+③로컬 테스트 계정 SSOT 확보 후 일반 미가입·대기·반려·정지·탈퇴 상태별 운영 검증이다.
+코드/배포·공고 공개·Demo 검증은 완료했고 이 세 조건을 완료로 대체하지 않는다.
+현재 새 main의 개인정보 최소화·달력 보유기간 정본도 시행 전 최종 문서 대조에 포함한다.
+
+같은 인증 WO의 연속 결과 기록으로 전용 branch를 유지한다. 배포 결과 기록만의 변경은
+DEPLOYMENT=NOT_APPLICABLE이다. 자체 local static 서버와 PostgreSQL fixture는 종료했고
+일반 상태 계정 SSOT/정책 시행 후속이 있어 WORKTREE_DISPOSITION=KEEP다.
+
+
+#### 현재 열린 TODO
+
+- [ ] 2026-11-13 시행 예정일과 실제30일 공고 충족 확인 → 새 정책 게시·기존 회원 재동의 운영 검증.
+- [ ] 사용자 본인의 Google·카카오 실제 인증과 명시적 계정 연결 결과 확인.
+- [ ] 로컬 테스트 계정 SSOT 확보 → 일반 미가입·대기·반려·정지·탈퇴 상태별 운영 검증.
