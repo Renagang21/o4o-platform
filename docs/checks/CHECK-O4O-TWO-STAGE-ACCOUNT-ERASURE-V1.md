@@ -117,3 +117,5 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 집중 DB28+storage4+정적 인증17+Demo9=58 tests·API build·lint·migration contract21 checks PASS. 정식 runner로 fresh baseline→24, 기존23→24,24단계 재실행 no-op 모두 PASS. 최종 지문 `41e3be0aed15b49266cca75c543d8e6d008c6b0fcf4d3b85f28b2f6a56f7c75f`,6617 lines. 파기한 연락처 hash를 backup/복원하지 않으며 down은 forward repair를 요구한다.
 
 운영 승인안은23단계5개 테이블/trigger/function과24단계legacy 연락처 hash retirement/function 교체를 함께 검토한다. 후속이 새 migration0이던 이전 검증 기록은 이24단계 추가 전 기록이다. 운영의 일반 user/account·GCS 삭제나 feature apply flag/job/legal 게시 승인은 여전히 포함하지 않는다. 현재 운영에서23/24 실행0; 추가 변경은 격리 합성 DB에서만 적용했다.
+
+제공자 namespace 재검토 P2 처리: LinkedAccount 식별자는 `(provider, providerId)`로 snapshot을 유지한다. 별도 연결 email은 일반 고유 email 검사에 남긴다. provider ID 후보의 구조화 JSON은 제공자 context를 함께 검사하여 Google/Kakao의 동일 ID를 다른 사람으로 구분한다. 같은 제공자의 copy 또는 제공자가 불명확한 copy는 여전히 domain review로 미완료 처리한다. 다른 제공자의 실제 linked row·중첩 copy 보존과 같은 제공자의 중첩 copy 검출을 합성 DB에서 검증했다. 집중 DB30+storage4+정적 인증17+Demo9=60 tests PASS. 새 DDL/API/UI/운영 실행은 없다.

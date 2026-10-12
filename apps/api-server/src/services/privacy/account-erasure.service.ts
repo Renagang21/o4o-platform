@@ -202,7 +202,7 @@ export class AccountErasureService {
       VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, [operationId,id,hash(id)]);
   }
 
-  private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<string[]> {
+  private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<{ tokens: string[]; providers: { provider: string; id: string }[] }> {
     // These identify THIS subject. Actor/alias/provider values in arbitrary metadata
     // are not globally unique subject keys; their typed domain handlers require review.
     const tokens=new Set<string>([String(user.id),String(user.email)]);
@@ -211,14 +211,17 @@ export class AccountErasureService {
       if(r.reference_id)tokens.add(String(r.reference_id));
     }
     // Whitelisted typed subject identifiers; never guess identity from arbitrary metadata actors.
-    for(const linked of await m.query('SELECT "providerId",email FROM linked_accounts WHERE "userId"=$1',[user.id])) {
-      for(const value of [linked.providerId,linked.email])if(typeof value==='string' && value.length)tokens.add(value);
+    const providers: { provider: string; id: string }[] = [];
+    for(const linked of await m.query('SELECT provider,"providerId",email FROM linked_accounts WHERE "userId"=$1',[user.id])) {
+      if(typeof linked.email==='string' && linked.email.length)tokens.add(linked.email);
+      if(typeof linked.providerId==='string' && linked.providerId.length)providers.push({provider:linked.provider,id:linked.providerId});
     }
-    return [...tokens];
+    return {tokens:[...tokens],providers};
   }
 
-  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: string[]): Promise<string[]> {
-    const tokens = frozenTokens ?? await this.identityTokens(m,user);
+  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>): Promise<string[]> {
+    const identities = frozenTokens ?? await this.identityTokens(m,user);
+    const tokens = identities.tokens;
     const localPart = "[:alnum:]_.!#$%&'*+/=?^`{|}~-";
     const patterns = tokens.filter(v=>v.length>=2).map(v => {
       const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -231,10 +234,32 @@ export class AccountErasureService {
     const leaf=(alias:string)=>`jsonb_path_query_array(to_jsonb(${alias})
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
+    // Provider IDs belong to a namespace. Unattributed copies still need domain review,
+    // but an explicit different provider is another identity, even when the ID is equal.
+    const providerCopies=(value:unknown, namespace?:string):boolean => {
+      if(typeof value==='string')return identities.providers.some(p=>
+        (!namespace || namespace===p.provider) && new RegExp(
+          `(^|[^a-zA-Z0-9_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^a-zA-Z0-9_.-])`,'i').test(value));
+      if(Array.isArray(value))return value.some(v=>providerCopies(v,namespace));
+      if(value && typeof value==='object') {
+        const object=value as Record<string,unknown>;
+        const scoped=typeof object.provider==='string' ? object.provider : namespace;
+        return Object.entries(object).some(([key,v])=>key!=='provider' && providerCopies(v,scoped));
+      }
+      return false;
+    };
+    const providerReview=async(table:string, exclusion:string):Promise<boolean> => {
+      if(!identities.providers.length)return false;
+      // Candidate filtering stays inside PostgreSQL; never emit identifier/row payloads in logs.
+      const rows=await m.query(`SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(to_jsonb(r),'$.** ? (@.type() == "string")')::text
+        ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))]);
+      return rows.some((r:{payload:unknown})=>providerCopies(r.payload));
+    };
     const codes: string[] = [];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
       AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
-    if(otherUsers.n)codes.push('REVIEW:public.users');
+    if(otherUsers.n || await providerReview('public.users','AND r.id::text<>$1'))codes.push('REVIEW:public.users');
     const [soleAdmin] = await m.query(`SELECT count(*)::int AS n FROM community_memberships target
       WHERE target.user_id=$1 AND target.role='admin' AND target.status='active'
       AND NOT EXISTS(SELECT 1 FROM community_memberships other JOIN users u ON u.id=other.user_id
@@ -254,7 +279,7 @@ export class AccountErasureService {
           JOIN community_memberships cm ON cm.id=h.membership_id WHERE cm.user_id<>$1
           AND h.actor_user_id IS DISTINCT FROM $1 AND (${leaf('h')}::text ~* ANY($2::text[])
           OR ${leaf('h')} ?| $3::text[])`, [user.id,patterns,shortTokens]);
-        if (other.n) codes.push('REVIEW:public.community_membership_changes');
+        if (other.n || await providerReview(table, 'AND r.actor_user_id::text IS DISTINCT FROM $1 AND NOT EXISTS(SELECT 1 FROM community_memberships cm WHERE cm.id=r.membership_id AND cm.user_id::text=$1)')) codes.push('REVIEW:public.community_membership_changes');
         if (!this.options.systemYears || !this.options.systemBasis?.trim()) {
           const [h] = await m.query(`SELECT count(*)::int AS n FROM community_membership_changes h
             JOIN community_memberships cm ON cm.id=h.membership_id WHERE cm.user_id=$1 OR h.actor_user_id=$1`, [user.id]);
@@ -265,7 +290,7 @@ export class AccountErasureService {
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
         WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace

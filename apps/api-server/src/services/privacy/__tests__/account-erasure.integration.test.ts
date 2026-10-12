@@ -307,6 +307,20 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const second=await service().resume(first.operationId);expect(second.erased).toBe(false);expect(second.reviewCodes).toContain('REVIEW:public.users');
     expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[target.id])).toHaveLength(1);
   });
+  it('equal provider IDs in a different namespace belong to another account',async()=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$3),($2,'kakao',$3)`,[target.id,peer.id,providerId]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('identity',jsonb_build_object('provider','kakao','providerId',$1::text)) WHERE id=$2`,[providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[peer.id])).toHaveLength(1);
+  });
+  it('a copied provider identity in the same namespace still requires review',async()=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('identity',jsonb_build_object('provider','google','providerId',$1::text)) WHERE id=$2`,[providerId,peer.id]);
+    const result=await service().request(target.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+  });
   it('punctuation extending another opaque provider ID is not treated as this subject',async()=>{
     const peer=await user(),providerId='synthetic-provider-identity';
     for(const suffix of ['-extra','.extra']) {
