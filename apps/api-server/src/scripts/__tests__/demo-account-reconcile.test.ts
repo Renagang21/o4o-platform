@@ -94,6 +94,17 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     expect(await query('SELECT id,email FROM users ORDER BY id')).toEqual(before);
     expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
   });
+  it('supplier inventory uses canonical owned organizations, ignoring an unrelated legacy pointer',async()=>{
+    const foreign=(await query("INSERT INTO organizations(name,code,type) VALUES('Unrelated Supplier','fixture-foreign-supplier','supplier') RETURNING id"))[0].id;
+    // Legacy pointer is unique: clear it on the canonical organization before modeling pointer drift.
+    await query('UPDATE neture_suppliers SET user_id=NULL WHERE user_id=$1',[supplier]);
+    await query("INSERT INTO neture_suppliers(user_id,organization_id,slug,status) VALUES($1,$2,'fixture-legacy-pointer','PENDING')",[supplier,foreign]);
+    const before=await query('SELECT id,email FROM users ORDER BY id');
+    const plan=await runDemoAccountReconcile(client);
+    expect(plan.changes).toBe(3);
+    expect(await query('SELECT id,email FROM users ORDER BY id')).toEqual(before);
+    expect((await query("SELECT status FROM neture_suppliers WHERE slug='fixture-legacy-pointer'"))[0].status).toBe('PENDING');
+  });
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

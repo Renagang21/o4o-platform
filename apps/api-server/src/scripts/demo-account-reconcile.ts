@@ -16,6 +16,9 @@ async function main() {
     const summary=await runDemoAccountReconcile({query:async(sql,params)=>(await client.query(sql,params)).rows},
       {apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST});
     console.log(JSON.stringify(summary));
+    // Same sanitized result in native Actions annotations, independently reviewable through the GitHub API.
+    const notice=JSON.stringify(summary).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
+    console.log(`::notice title=Canonical Demo reconciliation::${notice}`);
     if(process.env.DEMO_ACCOUNTS_OUTPUT) writeFileSync(process.env.DEMO_ACCOUNTS_OUTPUT,JSON.stringify(summary,null,2),{mode:0o600});
   } finally {await client.end();}
 }

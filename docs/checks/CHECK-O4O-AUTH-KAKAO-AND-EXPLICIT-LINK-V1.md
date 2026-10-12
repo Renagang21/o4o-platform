@@ -1327,3 +1327,9 @@ TLS 검증과 기존 프록시를 유지했다. fixture·인가 우회·계정 �
 PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은 활성 registry와 새 credential 주소가 다르면 어떤 쓰기보다 먼저 reconcile을 요구한다. 기존 provision의 credential·registry·관계 write도 같은 SERIALIZABLE QueryRunner transaction으로 묶어 중간 실패 시 공개 credential만 남지 않도록 했다. reconcile은 경영자·공급자의 미래/만료 role을 중단하고, 직원의 활성 기간 오류도 임의 연장/중복 부여하지 않는다. legacy registry 보호와 경영자 미래/공급자 만료 role의 실제 격리 DB 회귀3조건을 추가했다.
 
 리뷰 수정 후 DB12/12(격리 integration10+기본 gate2), CLI3개 typecheck 및 API build를 재확인했다. 정식 foundation `--apply`도 격리 legacy registry에서 전환 필요 오류로 쓰기 전에 중단하여 target Gmail orphan0·기존 사용자2 보존을 확인했다. 최신 main의 Store bundle PC/mobile6조건도 재확인 통과했다.
+
+최신 PR CI38266255821은 API shard2가 실패했다. 원격 로그 다운로드는 sandbox escalation 재시도도 proxy403이었으며, 로컬에서 동일 shard2를 실행해 `supplier-domain-boundary.spec.ts` §8-b의 신규 CLI legacy `user_id` lookup을 재현했다. contract/allowlist를 완화하지 않고 CLI inventory를 canonical supplier 조직의 활성 owner 관계로 한정했다. 무관한 조직의 PENDING supplier에 같은 legacy pointer가 있어도 canonical Demo inventory에 섞지 않고 해당 행을 변경하지 않는 실제 DB 회귀를 추가했다.
+
+운영 CLI의 기존 sanitized summary를 native Actions notice에도 남겨 mode/schema history/검토 digest/변경 건수를 GitHub API에서 직접 확인할 수 있게 했다. raw snapshot·ID·credential 원문·비밀번호 hash는 공개하지 않는다. 새 DB fixture 최초 시도는 기존 unique legacy-pointer 제약에 걸렸으므로 canonical 행의 nullable legacy pointer를 비운 뒤 무관한 행의 pointer drift를 모델링하도록 수정했다. 운영 schema 제약을 바꾸지 않았다.
+
+공급자 정본 수정 후 집중 회귀54/54(격리 DB13+공급자 경계41) 및3 CLI typecheck PASS. 기존 보호/provision source contract35도 PASS. 한국시간2026-10-13에 후속 수정 push·최신 CI/review를 진행한다. 운영 변경은 여전히0이다.

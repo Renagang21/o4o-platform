@@ -71,8 +71,9 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
   const storeState = await client.query(`SELECT id,organization_id,status,applicant_user_id FROM neture_pharmacy_memberships
     WHERE organization_id=$1 AND status='active' ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [organizationId]);
   const supplierLinks = await client.query(`SELECT id,user_id,organization_id,status FROM neture_suppliers
-    WHERE user_id = $1 OR organization_id IN
-      (SELECT organization_id FROM organization_members WHERE user_id=$1 AND left_at IS NULL AND role='owner')
+    WHERE organization_id IN
+      (SELECT om.organization_id FROM organization_members om JOIN organizations o ON o.id=om.organization_id
+        WHERE om.user_id=$1 AND om.left_at IS NULL AND om.role='owner' AND o.type='supplier')
     ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [source.get('SUPPLIER')!.user_id]);
   if (!supplierLinks.length || supplierLinks.some(row => row.status !== 'ACTIVE')) fail('SUPPLIER_DATA_NOT_READY');
   const flags = await client.query(`SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
