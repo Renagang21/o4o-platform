@@ -366,6 +366,24 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
       expect((await db.query('SELECT "businessInfo" FROM users WHERE id=$1',[peer.id]))[0].businessInfo.providerReference).toBe(providerId+suffix);
     }
   });
+  it('migration 23 or an unvalidated upgrade never advertises erasure readiness',async()=>{
+    const target=await user();
+    const core=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'isolated-synthetic-system',personalBuckets:[]});
+    await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT account_erasure_uuid_keys_only');
+    try {
+      expect(await core.capabilities()).toEqual({enabled:false});
+      await expect(core.request(target.id,fixtureAdminId)).rejects.toMatchObject({code:'ACCOUNT_ERASURE_MIGRATION_REQUIRED'});
+      expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target.id]))[0].isActive).toBe(true);
+      expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
+      await db.query("ALTER TABLE account_erasure_reference_keys ADD CONSTRAINT account_erasure_uuid_keys_only CHECK (key_kind='uuid') NOT VALID");
+      expect(await core.capabilities()).toEqual({enabled:false});
+      await db.query('ALTER TABLE account_erasure_reference_keys VALIDATE CONSTRAINT account_erasure_uuid_keys_only');
+      expect(await core.capabilities()).toEqual({enabled:true});
+    } finally {
+      await db.query('ALTER TABLE account_erasure_reference_keys DROP CONSTRAINT IF EXISTS account_erasure_uuid_keys_only');
+      await db.query("ALTER TABLE account_erasure_reference_keys ADD CONSTRAINT account_erasure_uuid_keys_only CHECK (key_kind='uuid')");
+    }
+  });
   it('upgrade retires already-completed legacy contact hashes without touching UUID markers or evidence',async()=>{
     const target=await user({email:'legacy-contact@fixture.invalid'}),h=await community(target.id,fixtureAdminId);
     const r=await service().request(target.id);expect(r.erased).toBe(true);

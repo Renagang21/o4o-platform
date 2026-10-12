@@ -128,3 +128,5 @@ legacy 인증의 `users.provider/provider_id`도 동일 typed namespace 계약�
 배포 구버전 재삽입 P1 보완:24단계는 reference-key table의 ACCESS EXCLUSIVE lock 안에서 기존 identity-kind hash를 파기하고 `key_kind='uuid'` CHECK를 추가한다. migration 뒤 구버전의 연락처 hash 재삽입은23514로 실패·rollback되며 새 revision 이전에 retired 개인정보를 재생성하지 않는다. UUID marker/audit/evidence와 원래 기산점은 그대로다. 운영 제안에는 이 짧은 table lock/제약 추가도 포함하며 실제 실행은 하지 않았다.
 
 집중63 tests·API build·focused lint·migration contract21 checks PASS. 최종24단계 지문은 `0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50`,6618 lines로 갱신했다. 정식 runner fresh baseline→24, 기존23(지문 c45f9b5)→24,24 재실행 no-op 모두 PASS. 이전41e3be0/6617 기록은 CHECK 추가 전 검증 이력이며 현재 승인안은 이 최종 제약을 포함한다.23단계 소스/지문은 바꾸지 않았다.
+
+준비 상태 재검토 P2: capability/실행 ready는24단계 UUID-only CHECK의 존재·validated 상태를 필수로 확인한다.23단계 상태/NOT VALID 제약에서는 disabled·요청503이며 계정 활성/operation0을 유지한다. 제약 검증 후에만 준비 조건을 충족한다. 집중 DB34+storage4+정적 인증17+Demo9=64 tests·API build·focused lint PASS.24단계 지문0d25da3d/6618 및 운영 실행0은 그대로다.

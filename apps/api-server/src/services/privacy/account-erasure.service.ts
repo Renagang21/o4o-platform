@@ -75,7 +75,9 @@ export class AccountErasureService {
       AND to_regclass('public.account_erasure_reference_keys') IS NOT NULL
       AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
       AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
-      AND to_regproc('public.account_erasure_write_fence') IS NOT NULL AS ready`);
+      AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
+      AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
+        AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
     return {enabled:r?.ready===true};
   }
 
