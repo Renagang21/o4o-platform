@@ -218,3 +218,18 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
     });
   });
 });
+
+
+it.each(['operator', 'other-service-admin'])('does not restore a withdrawn membership with %s authority', async role => {
+  seed('active');
+  db.memberships[0].status = 'withdrawn';
+  await expect(service.reactivateMembership({ userId: 'u1', reactivatedBy: 'op-1', isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'], adminServiceKeys: role === 'operator' ? [] : ['kpa-society'] }))
+    .rejects.toMatchObject({ code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED' });
+  expect(db.memberships[0].status).toBe('withdrawn');
+  expect(queries.some(q => /^UPDATE/i.test(q.sql))).toBe(false);
+});
+it('same-service admin can restore a withdrawn membership', async () => {
+  seed('active'); db.memberships[0].status = 'withdrawn';
+  await service.reactivateMembership({ userId: 'u1', reactivatedBy: 'admin-1', isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'], adminServiceKeys: ['pharmacy-hub'] });
+  expect(db.memberships[0].status).toBe('active');
+});

@@ -389,7 +389,7 @@ export default function UsersManagementPage() {
           variant: 'primary',
           icon: <UserCheck size={14} />,
           getTargetIds: (users) =>
-            users.filter((u) => ['suspended', 'withdrawn'].includes(u.status)).map((u) => u.id),
+            users.filter((u) => u.status === 'suspended' || (canDeleteMembership && u.status === 'withdrawn')).map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
               ids.map((id) => api.post(`/operator/members/${id}/reactivate`, { serviceKey: 'neture' })),

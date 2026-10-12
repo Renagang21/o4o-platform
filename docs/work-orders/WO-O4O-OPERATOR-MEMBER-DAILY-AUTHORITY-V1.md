@@ -50,3 +50,9 @@ memberManagementPolicy는 정지·복구·membershipRole·역할 부여를 서�
 - 변경 파일 ESLint, docs 민감정보 검사, git diff --check PASS.
 - GitHub HTTPS Git fetch는 정상. GitHub API rulesets 요청은 현재 proxy에서 Forbidden이므로 PR 생성·원격 필수 CI/review·main 통합·배포 상태 확인은 차단. API 접근 실패를 Git 읽기/쓰기 인증 실패로 간주하지 않는다. 필요한 연결이 확보되면 PR gate부터 이어간다.
 - 새 완전 제거 Core 기능의 운영 활성화와 실제 계정/파일 삭제는 이 작업 범위 밖이다.
+
+### PR #508 CI 후속 수정
+
+GitHub API 접근이 복구되어 PR #508 및 CI 38220836388 결과를 조회했다. API Jest 3개 shard와 영향 웹/Admin production build는 PASS, Code Quality Check의 frontend type-check에서 Admin이 공유 ui 테스트 소스까지 검사하며 새 fixture의 필수 labels 누락(TS2741)을 발견했다. 테스트 실행 및 패키지 build만으로 이 검사 범위를 검증하지 못했다. fixture에 labels를 명시해 수정하고 공유 ui 21개 테스트와 Admin type-check를 다시 실행한다. workflow/권한 정책은 변경하지 않는다. 새 HEAD의 원격 CI 결과는 따로 확인한다.
+
+PR #508의 P1 추가 처리: 사용중지 복구와 탈퇴 복구를 구분했다. 회원관리의 단건 status·일괄 status·reactivate 요청 모두 실제 서비스 admin 목록을 복구 서비스에 전달하고, transaction의 잠긴 가입 상태가 withdrawn이면 해당 서비스 admin 권한 없이는 write 전에 거절한다. 타 서비스 admin도 우회할 수 없다. Neture 일괄 복구 후보도 operator에게 suspended만 제공한다. Core 복구 경로의 기존 외부 호출 계약은 선택적 파라미터로 유지하며 새로운 계정 제거 기능을 활성화하지 않는다. 격리 API 회귀 77개 PASS.

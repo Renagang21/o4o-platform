@@ -622,6 +622,7 @@ export class MembershipConsoleController {
             reactivatedBy: updatedBy,
             isPlatformAdmin: writeScope.isPlatformAdmin,
             serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
           })
         ) {
           // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -729,6 +730,10 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -824,6 +829,7 @@ export class MembershipConsoleController {
                 reactivatedBy: updatedBy,
                 isPlatformAdmin: writeScope.isPlatformAdmin,
                 serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
               })
             ) {
               // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -929,6 +935,7 @@ export class MembershipConsoleController {
         reactivatedBy,
         isPlatformAdmin: writeScope.isPlatformAdmin,
         serviceKeys: writeScope.serviceKeys,
+        adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
       });
 
       if (!result) {
@@ -953,6 +960,10 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),

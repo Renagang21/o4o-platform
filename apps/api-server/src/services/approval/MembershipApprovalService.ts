@@ -141,6 +141,8 @@ export interface ReactivateParams {
   reactivatedBy: string | null;
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+  /** When supplied, withdrawal recovery requires admin authority in that service. */
+  adminServiceKeys?: string[];
   /**
    * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1: 호출자 transaction 참여용. 주입 시 이 서비스는 자체 transaction 을 열지 않는다.
    * 미주입 시 기존 동작(자체 queryRunner transaction) 을 그대로 유지한다.
@@ -967,6 +969,15 @@ export class MembershipApprovalService {
           userId, isPlatformAdmin, serviceKeys,
         });
         return null;
+      }
+
+      if (!isPlatformAdmin && params.adminServiceKeys !== undefined && selectResult.some(
+        (membership: { status: string; service_key: string }) => membership.status === 'withdrawn'
+          && !params.adminServiceKeys!.includes(membership.service_key),
+      )) {
+        throw Object.assign(new Error('탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.'), {
+          code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED',
+        });
       }
 
       const membershipIds = selectResult.map((m: any) => m.id);
