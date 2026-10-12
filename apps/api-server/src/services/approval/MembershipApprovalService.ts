@@ -14,7 +14,7 @@ import { getNetureMainMembershipStatus } from '../../modules/neture/services/net
  * - Controller MUST NOT contain DB logic — only this service
  * - approve = membership active + ordinary role granted (atomic; no shared account activation)
  */
-import { isRetiredServiceValue, RetiredServiceError } from '../../middleware/retired-service.middleware.js';
+import { isRetiredRoleValue, RetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
@@ -165,9 +165,10 @@ const BARE_ROLE_NORMALIZATION_TARGETS = ['member', 'store_owner'];
  * service_memberships.role → role_assignments.role 매핑 (승인 시 실제로 부여되는 역할).
  *
  * WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+ *   퇴역 K-Cosmetics의 기존 권한 회수를 위해 역사적 매핑을 유지한다. 신규 승인/복구는 거절한다.
  *   K-Cosmetics 판매자 = 매장 경영자. canonical role 은 cosmetics:store_owner.
  *   write-path 정규화(auth-register) 이전에 생성된 legacy 'seller' 변종 멤버십도
- *   승인 시점에 정규화하여 cosmetics:store_owner 가 부여되도록 한다
+ *   퇴역 이전 승인 시 cosmetics:store_owner 로 정규화하여 부여했다
  *   (2026-09 BackfillStoreOwnerRoles / CleanupKCosmeticsSellerRole 통합 마이그레이션 정렬).
  *
  * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1:
@@ -310,6 +311,7 @@ export class MembershipApprovalService {
      */
     mode: 'grant' | 'restore-only' = 'grant'
   ): Promise<'already_active' | 'reactivated' | 'created' | 'skipped_no_row'> {
+    if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     const active = normalizeReturningRows(
       await queryRunner.query(
         `UPDATE role_assignments SET updated_at = NOW()
@@ -424,7 +426,7 @@ export class MembershipApprovalService {
       }
 
       const membership = selectResult[0] as ApproveResult;
-      if (membership.service_key === 'pharmacy-hub') throw new RetiredServiceError();
+      if (isRetiredRoleValue(membership.service_key)) throw new RetiredServiceError();
       const userId = membership.user_id;
 
       logger.info('[APPROVAL][STEP0] membership locked', {
@@ -970,7 +972,7 @@ export class MembershipApprovalService {
         return null;
       }
 
-      selectResult = selectResult.filter((m: any) => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+      selectResult = selectResult.filter((m: any) => !isRetiredRoleValue(m.service_key) && !isRetiredRoleValue(m.role));
       if (selectResult.length === 0) throw new RetiredServiceError();
       const membershipIds = selectResult.map((m: any) => m.id);
       const roles = selectResult.map((m: any) => m.role).filter(Boolean);

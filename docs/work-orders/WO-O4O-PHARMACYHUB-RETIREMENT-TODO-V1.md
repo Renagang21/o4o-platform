@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+퇴역 역할 신규 부여의 내부 SQL 우회도 차단했다. MembershipApprovalService의 승인·복구·activateRoleAssignment는 PH 및 K-Cosmetics namespace를 거절한다. 기존 K-Cosmetics 권한의 반려·정지·회수 매핑은 유지한다. 사용자 승인 대상 필터도 같은 퇴역 role 판정을 사용한다. 퇴역 서비스의 과거 긍정 fixture는 현역 서비스 격리 fixture와 퇴역 승인 거절·회수 회귀로 정합했다. 5 focused suites 133 tests PASS. 이는 기존 K-Cosmetics active 세션의 일괄 회수나 운영 데이터 삭제를 수행한 결과가 아니다.
+
 `3db87c3238`의 기존 계약 종료 정리 리뷰 대응: PH는 신규 createCase를 410으로 거절하되, 저장된 종료 건의 config는 데이터 purge 전까지 내부 정리용으로 유지한다. legacy 종료 건의 media 파기는 PH scope만 허용하는 내부 deleteRetiredAsset을 사용하며 기존 링크/파생/Screen Set/storage 보호 검사를 유지한다. 공용 미디어 API의 PH 접근 금지는 그대로다. DB 통합 fixture는 새 PH 종료 건을 생성하지 않고 역사적 행을 seed하도록 정합했다(실제 운영 DB 테스트 미실행).
 
 운영 단독 진행 재개 후 `b9b383f9ef` 최종 리뷰 2건을 반영했다. 공개 제휴 QR resolver는 ACTIVE 행도 PH scope이면 null로 반환하여 공개 라우트의 404 경계에서 매장 조회·scan write를 중단한다. 최신 main `22955b68f6`의 매장 승인 변경은 PH-only invitation을 관계 UPDATE 전에 STORE_NOT_RESOLVED로 거절하고 invited 상태를 보존한다(해당 회귀 재실행). 2 focused suites 37 tests PASS. 최신 main은 일반 merge로 반영했다. 병합·배포 성공은 실제 workflow 결과 확인 후 기록한다.

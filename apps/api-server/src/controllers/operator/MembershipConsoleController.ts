@@ -66,7 +66,7 @@ const INVALID_USER_ID_RESPONSE = {
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
 
 function currentApprovalMemberships(rows: Array<{ id: string; service_key?: string; role?: string }>) {
-  const current = rows.filter(m => !isRetiredServiceValue(m.service_key) && !isRetiredServiceValue(m.role));
+  const current = rows.filter(m => !isRetiredRoleValue(m.service_key) && !isRetiredRoleValue(m.role));
   if (rows.length > 0 && current.length === 0) throw new RetiredServiceError();
   return current;
 }

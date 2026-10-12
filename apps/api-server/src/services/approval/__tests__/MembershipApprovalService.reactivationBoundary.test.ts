@@ -220,17 +220,17 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 });
 
  describe('PH retirement mixed membership recovery', () => {
-  it('recovers current services while leaving PH suspended', async () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('recovers current services while leaving %s suspended', async (retiredKey) => {
     seed('active');
-    db.memberships.push({ id: 'retired', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' });
+    db.memberships.push({ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' });
     const result = await reactivateAsPlatformAdmin();
     expect(result?.reactivatedMemberships).toBe(2);
     expect(db.memberships.find(m => m.id === 'retired')?.status).toBe('suspended');
     expect(db.memberships.filter(m => m.id !== 'retired').every(m => m.status === 'active')).toBe(true);
   });
-  it('returns 410 without updates when only PH remains', async () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('returns 410 without updates when only %s remains', async (retiredKey) => {
     seed('active');
-    db.memberships = [{ id: 'retired', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' }];
+    db.memberships = [{ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' }];
     await expect(reactivateAsPlatformAdmin()).rejects.toMatchObject({ httpStatus: 410 });
     expect(queries.some(q => /^UPDATE /i.test(q.sql))).toBe(false);
   });

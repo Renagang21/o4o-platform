@@ -134,7 +134,7 @@ const service = new MembershipApprovalService();
 
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
-  { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
+  { serviceKey: 'lecture', prefix: 'lecture' },
   { serviceKey: 'neture', prefix: 'neture' },
 ];
 
@@ -270,17 +270,14 @@ describe('§12 active → suspended → active 왕복', () => {
     expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
   });
 
-  it('membership.role 과 별개로 붙어 있는 store_owner 도 대칭 처리된다 (기존 kpa 전용 분기 제거)', async () => {
-    // membership.role='member' 인데 capability role 로 store_owner 를 별도 보유한 계정
+  it('퇴역 K-Cosmetics 기존 권한은 회수하지만 재활성화하지 않는다', async () => {
     seedAllFive({ extraRoles: ['cosmetics:store_owner', 'pharmacy-hub:store_owner'] });
-
+    db.memberships.push({ id: 'm-retired', user_id: 'u1', service_key: 'k-cosmetics', role: 'member', status: 'active' });
     await suspend(['k-cosmetics']);
     expect(activeRoles()).not.toContain('cosmetics:store_owner');
-    // 정지하지 않은 서비스의 store_owner 는 그대로다
     expect(activeRoles()).toContain('pharmacy-hub:store_owner');
-
-    await reactivate(['k-cosmetics']);
-    expect(activeRoles()).toContain('cosmetics:store_owner');
+    await expect(reactivate(['k-cosmetics'])).rejects.toMatchObject({ code: 'SERVICE_RETIRED', httpStatus: 410 });
+    expect(activeRoles()).not.toContain('cosmetics:store_owner');
   });
 });
 

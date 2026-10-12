@@ -308,21 +308,21 @@ it('ID-only approval reports retirement as 410 instead of a server failure',asyn
 });
 
  describe('retired memberships in user approval', () => {
-  it.each([false, true])('filters PH before approving current services (PH first=%s)', async (phFirst) => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'].flatMap(key => [[key, false], [key, true]]))('filters %s before approving current services (retired first=%s)', async (retiredKey, retiredFirst) => {
     jest.clearAllMocks();
-    const rows = [{ id: 'live', service_key: 'neture', role: 'pharmacy' }, { id: 'retired', service_key: 'pharmacy-hub', role: 'pharmacy' }];
-    if (phFirst) rows.reverse();
+    const rows = [{ id: 'live', service_key: 'neture', role: 'pharmacy' }, { id: 'retired', service_key: retiredKey, role: 'pharmacy' }];
+    if (retiredFirst) rows.reverse();
     mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? rows : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
     mockApprovalService.approveMembership.mockResolvedValue({ id: 'live' });
-    await new MembershipConsoleController().updateMemberStatus(makeReq('approved'), makeRes());
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved', { body: { status: 'approved', serviceKey: 'neture' }, serviceScope: { isPlatformAdmin: true, serviceKeys: [] } }), makeRes());
     expect(mockApprovalService.approveMembership).toHaveBeenCalledTimes(1);
     expect(mockApprovalService.approveMembership).toHaveBeenCalledWith(expect.objectContaining({ membershipId: 'live' }));
   });
-  it('refuses PH-only approval before any approval transaction', async () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('refuses %s-only approval before any approval transaction', async retiredKey => {
     jest.clearAllMocks();
-    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? [{ id: 'retired', service_key: 'pharmacy-hub' }] : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
+    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? [{ id: 'retired', service_key: retiredKey }] : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
     const res = makeRes();
-    await new MembershipConsoleController().updateMemberStatus(makeReq('approved'), res);
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved', { body: { status: 'approved', serviceKey: 'neture' }, serviceScope: { isPlatformAdmin: true, serviceKeys: [] } }), res);
     expect(res.status).toHaveBeenCalledWith(410);
     expect(mockApprovalService.approveMembership).not.toHaveBeenCalled();
   });
