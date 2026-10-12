@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
-import { runDemoAccountReconcile } from '../demo-account-reconcile.service';
+import { runDemoAccountReconcile, assertFoundationDemoProvisionIdentity } from '../demo-account-reconcile.service';
 import { passwordCredentialService } from '../../services/auth/password-credential.service';
 import { findApprovedStoreMemberCandidates } from '../../utils/store-member-access';
 
@@ -75,6 +75,25 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     expect((await runDemoAccountReconcile(client,{apply:true,expectedDigest:repeat.digest})).writes).toBe(0);
   },30000);
 
+  it('foundation provisioning refuses legacy registry identities before any write',async()=>{
+    const before=await query('SELECT id,email FROM users ORDER BY id');
+    await expect(assertFoundationDemoProvisionIdentity(client)).rejects.toThrow('DEMO_IDENTITY_TRANSITION_REQUIRES_RECONCILE');
+    expect(await query('SELECT id,email FROM users ORDER BY id')).toEqual(before);
+    const plan=await runDemoAccountReconcile(client);
+    await runDemoAccountReconcile(client,{apply:true,expectedDigest:plan.digest});
+    await expect(assertFoundationDemoProvisionIdentity(client)).resolves.toBeUndefined();
+  },30000);
+  it.each([
+    ['STORE_OWNER','valid_from',"now()+interval '1 day'"],
+    ['SUPPLIER','valid_until',"now()-interval '1 day'"],
+  ])('refuses a non-effective %s business role without credential or data writes',async(type,column,value)=>{
+    const id=type==='STORE_OWNER'?owner:supplier;
+    await query(`UPDATE role_assignments SET ${column}=${value} WHERE user_id=$1`,[id]);
+    const before=await query('SELECT id,email FROM users ORDER BY id');
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('BASE_DEMO_ROLE_NOT_EFFECTIVE');
+    expect(await query('SELECT id,email FROM users ORDER BY id')).toEqual(before);
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

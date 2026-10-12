@@ -1323,3 +1323,7 @@ TLS 검증과 기존 프록시를 유지했다. fixture·인가 우회·계정 �
 - origin/app 정본: neture/supplier/community/funding→Neture, pharmacy→KPA Society, store→Store, study→Lecture, kpa→KPA Branch. 최초 fixture54조건의12실패는 잘못된 community 응답과 가상 branch host/base경로였다. 정확한 정본으로 community6·pharmacy6·kpa6 재확인 후 유효48조건 모두 통과했다. 최초 실패와 수정 결과는 비공개 helper artifacts에 함께 보존했다.
 
 현재 운영 계정 전환·migration·신규 배포·신규3계정 운영48검증은 실행0이다. 앞서 기존 Demo32운영 통과는 과거 checkpoint이며 이번3계정 전환의 운영 성공을 의미하지 않는다. 직원 migration25 앞의23/24는 [별도 개인정보 WO §10](../work-orders/WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md)의 운영 승인 범위 밖이다. main 통합 이후 실제 read-only plan의 schema history로 적용 필요성을 먼저 판정한다.
+
+PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은 활성 registry와 새 credential 주소가 다르면 어떤 쓰기보다 먼저 reconcile을 요구한다. 기존 provision의 credential·registry·관계 write도 같은 SERIALIZABLE QueryRunner transaction으로 묶어 중간 실패 시 공개 credential만 남지 않도록 했다. reconcile은 경영자·공급자의 미래/만료 role을 중단하고, 직원의 활성 기간 오류도 임의 연장/중복 부여하지 않는다. legacy registry 보호와 경영자 미래/공급자 만료 role의 실제 격리 DB 회귀3조건을 추가했다.
+
+리뷰 수정 후 DB12/12(격리 integration10+기본 gate2), CLI3개 typecheck 및 API build를 재확인했다. 정식 foundation `--apply`도 격리 legacy registry에서 전환 필요 오류로 쓰기 전에 중단하여 target Gmail orphan0·기존 사용자2 보존을 확인했다. 최신 main의 Store bundle PC/mobile6조건도 재확인 통과했다.

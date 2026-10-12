@@ -13,6 +13,17 @@ const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(va
 const fail = (code: string): never => { throw new Error(code); };
 const uuid = (value: unknown) => typeof value === 'string' && /^[0-9a-f-]{36}$/i.test(value);
 
+/** Foundation provisioning must not replace the registry UUID during an email transition. */
+export async function assertFoundationDemoProvisionIdentity(client: DemoQueryClient): Promise<void> {
+  const rows = await client.query(`SELECT d.demo_type,u.email FROM demo_accounts d
+    LEFT JOIN users u ON u.id=d.user_id WHERE d.is_active AND d.demo_type IN ('STORE_OWNER','SUPPLIER')
+    ORDER BY d.demo_type`);
+  for (const row of rows) {
+    const target = PUBLIC_DEMO_ACCOUNTS.find(account => account.type === row.demo_type);
+    if (!target || row.email !== target.email) fail('DEMO_IDENTITY_TRANSITION_REQUIRES_RECONCILE');
+  }
+}
+
 async function inventory(client: DemoQueryClient, lock: boolean) {
   // pg's adapter returns row arrays, matching the existing credential service's raw-query contract.
   const passwordManager={query:client.query.bind(client)} as Pick<EntityManager,'query'>;
@@ -92,6 +103,8 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
     const memberReady = !!user && relationships.some(row => row.user_id === user.id && row.organization_id === organizationId && row.role === 'staff' && row.left_at === null);
     const roleReady = !!user && roles.some(row => row.user_id === user.id && row.role === allowedRoles[account.type] && row.is_active === true &&
       new Date(String(row.valid_from)).getTime() <= Date.now() && (row.valid_until === null || new Date(String(row.valid_until)).getTime() >= Date.now()));
+    if (user && account.type !== 'STORE_STAFF' && !roleReady) fail('BASE_DEMO_ROLE_NOT_EFFECTIVE');
+    if (user && account.type === 'STORE_STAFF' && !roleReady && roles.some(row => row.user_id === user.id && row.role === allowedRoles.STORE_STAFF && row.is_active === true)) fail('STAFF_ROLE_NOT_EFFECTIVE');
     plans.push({account,user,base,passwordMatches,memberReady,roleReady});
   }
   const before = {registry,users,roles,providers,passwords,memberships,relationships,operatorInvitations,storeState,supplierLinks,schema:flags,history};
