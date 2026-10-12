@@ -10,7 +10,7 @@ import {
 } from './auth/demo-account.service.js';
 
 export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society', 'k-cosmetics'] as const;
-export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number];
+export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number] | 'pharmacy-hub';
 
 type CaseStatus =
   | 'requested'
@@ -30,6 +30,8 @@ interface ServiceConfig {
 }
 
 const SERVICE_CONFIG: Record<StoreOwnerContractServiceKey, ServiceConfig> = {
+  // Legacy persisted cases only; createCase rejects this retired namespace.
+  'pharmacy-hub': { role: 'pharmacy-hub:store_owner', contentKeys: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
   'kpa-society': { role: 'kpa:store_owner', contentKeys: ['kpa', 'kpa-society'], slugKeys: ['kpa'] },
   'k-cosmetics': { role: 'cosmetics:store_owner', contentKeys: ['k-cosmetics', 'cosmetics'], slugKeys: ['cosmetics'] },
 };
@@ -96,7 +98,7 @@ async function assertNotDemoStoreOwner(db: Pick<DataSource, 'query'>, userId: st
 }
 
 function configFor(serviceKey: string): ServiceConfig {
-  if (!STORE_OWNER_CONTRACT_SERVICES.includes(serviceKey as StoreOwnerContractServiceKey)) {
+  if (!Object.prototype.hasOwnProperty.call(SERVICE_CONFIG, serviceKey)) {
     throw new StoreOwnerTerminationError('STORE_OWNER_TERMINATION_SERVICE_NOT_ALLOWED', '매장 경영자 계약 종료 대상 서비스가 아닙니다.');
   }
   return SERVICE_CONFIG[serviceKey as StoreOwnerContractServiceKey];
@@ -143,6 +145,7 @@ export class StoreOwnerTerminationService {
     returnRequested?: boolean;
     terminationEffectiveAt?: string | null;
   }): Promise<StoreOwnerTerminationCase> {
+    if (input.serviceKey === 'pharmacy-hub') throw new StoreOwnerTerminationError('SERVICE_RETIRED', 'Service has been retired', 410);
     const cfg = configFor(input.serviceKey);
     const effective = input.terminationEffectiveAt ? new Date(input.terminationEffectiveAt) : new Date();
     if (Number.isNaN(effective.getTime())) {
@@ -588,7 +591,8 @@ export class StoreOwnerTerminationService {
     for (const row of rows) {
       if (await this.hasExternalReference(row.url, c.organizationId)) continue;
       try {
-        await mediaService.deleteAsset(row.id);
+        if (c.serviceKey === 'pharmacy-hub') await mediaService.deleteRetiredAsset(row.id);
+        else await mediaService.deleteAsset(row.id);
       } catch (error: any) {
         if (error?.code === 'MEDIA_STORAGE_DELETE_FAILED' || error?.message === 'MEDIA_STORAGE_DELETE_FAILED') {
           throw new StoreOwnerTerminationError('PURGE_INCOMPLETE', 'GCS 객체 삭제 실패로 파기를 완료하지 못했습니다.', 500);

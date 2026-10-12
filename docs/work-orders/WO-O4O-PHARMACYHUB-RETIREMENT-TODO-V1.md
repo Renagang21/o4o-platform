@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+`3db87c3238`의 기존 계약 종료 정리 리뷰 대응: PH는 신규 createCase를 410으로 거절하되, 저장된 종료 건의 config는 데이터 purge 전까지 내부 정리용으로 유지한다. legacy 종료 건의 media 파기는 PH scope만 허용하는 내부 deleteRetiredAsset을 사용하며 기존 링크/파생/Screen Set/storage 보호 검사를 유지한다. 공용 미디어 API의 PH 접근 금지는 그대로다. DB 통합 fixture는 새 PH 종료 건을 생성하지 않고 역사적 행을 seed하도록 정합했다(실제 운영 DB 테스트 미실행).
+
 운영 단독 진행 재개 후 `b9b383f9ef` 최종 리뷰 2건을 반영했다. 공개 제휴 QR resolver는 ACTIVE 행도 PH scope이면 null로 반환하여 공개 라우트의 404 경계에서 매장 조회·scan write를 중단한다. 최신 main `22955b68f6`의 매장 승인 변경은 PH-only invitation을 관계 UPDATE 전에 STORE_NOT_RESOLVED로 거절하고 invited 상태를 보존한다(해당 회귀 재실행). 2 focused suites 37 tests PASS. 최신 main은 일반 merge로 반영했다. 병합·배포 성공은 실제 workflow 결과 확인 후 기록한다.
 
 `0557e26a05` 후속 세션 리뷰: signed PH access token은 requireAuth에서 DB 조회 전에 401/SERVICE_SESSION_REVOKED, optionalAuth에서는 익명 처리한다. PH refresh token도 동일한 기존 세션 종료 코드로 거절하며 재발급·다른 서비스의 token family 변경은 하지 않는다. 인증 경계 2 tests 및 기존 refresh 계약 포함 25 tests PASS. 사용자는 현재 서비스에서 다시 로그인해야 한다.

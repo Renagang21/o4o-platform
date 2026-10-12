@@ -434,11 +434,17 @@ export class MediaLibraryService {
    * 과거에는 warn 후 DB 삭제를 계속해 "삭제 완료"로 보고되면서 GCS object 가 고아로 남았다.
    * object 가 이미 없는 404 는 삭제된 것으로 본다.
    */
-  async deleteAssetIn(manager: EntityManager, assetId: string): Promise<void> {
+  /** Internal legacy retirement cleanup; public routes never expose this entry point. */
+  async deleteRetiredAsset(assetId: string): Promise<void> {
+    return this.dataSource.transaction(manager => this.deleteAssetIn(manager, assetId, true));
+  }
+
+  async deleteAssetIn(manager: EntityManager, assetId: string, retirementCleanup = false): Promise<void> {
     const repo=manager.getRepository(MediaAsset);
     const asset = await repo.findOne({ where: { id: assetId }, lock: { mode: 'pessimistic_write' } });
     if (!asset) throw new Error('Asset not found');
-    if (isRetiredServiceValue(asset.serviceKey)) throw new RetiredServiceError();
+    if (retirementCleanup && !isRetiredServiceValue(asset.serviceKey)) throw new Error('RETIREMENT_SCOPE_MISMATCH');
+    if (isRetiredServiceValue(asset.serviceKey) && !retirementCleanup) throw new RetiredServiceError();
 
     const links=await manager.query('SELECT 1 FROM media_entity_links WHERE media_asset_id=$1 LIMIT 1',[assetId]);
     const descendants=await manager.query('SELECT 1 FROM media_assets WHERE parent_asset_id=$1 OR root_asset_id=$1 LIMIT 1',[assetId]);
