@@ -122,3 +122,5 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 
 추가 재검토 P1/P2: namespace는 알려진 Google/Kakao 구조의 `providerId` 값에만 적용한다. storage provider 및 memo/형제/중첩 값 전체로 context를 확장하지 않는다. SQL 경계 필터 뒤 transaction cursor를64행씩 읽고 발견 즉시 닫으며, 전체 후보 payload를 Node에 한꺼번에 전송하지 않는다. storage provider/다른 인증 provider의 memo copy와 짧은 ID의64행 초과 후속 copy 검출·제거 후 재시도 완료를 합성 회귀로 확인한다.
 최종 집중 DB32+storage4+정적 인증17+Demo9=62 tests·API build·focused lint PASS. 새 DDL은24단계 이후 추가하지 않았으며 운영 실행0이다.
+
+legacy 인증의 `users.provider/provider_id`도 동일 typed namespace 계약에 포함한다. 대상의 legacy source를 snapshot하고 다른 제공자의 snake_case ID는 보존하며, 같은 제공자 legacy copy는 미완료다. provider 없는 legacy source는 임의 namespace를 만들지 않고 review 후보로 유지한다. 집중 DB33+storage4+정적 인증17+Demo9=63 tests·API build·focused lint PASS. 새 DDL/API/운영 실행0.

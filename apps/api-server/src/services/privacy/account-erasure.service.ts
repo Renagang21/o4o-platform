@@ -212,6 +212,10 @@ export class AccountErasureService {
     }
     // Whitelisted typed subject identifiers; never guess identity from arbitrary metadata actors.
     const providers: { provider: string; id: string }[] = [];
+    if(typeof user.provider_id==='string' && user.provider_id.length) {
+      if(typeof user.provider==='string' && user.provider.length)providers.push({provider:user.provider,id:user.provider_id});
+      else tokens.add(user.provider_id); // Unattributed legacy source requires domain review.
+    }
     for(const linked of await m.query('SELECT provider,"providerId",email FROM linked_accounts WHERE "userId"=$1',[user.id])) {
       if(typeof linked.email==='string' && linked.email.length)tokens.add(linked.email);
       if(typeof linked.providerId==='string' && linked.providerId.length)providers.push({provider:linked.provider,id:linked.providerId});
@@ -248,7 +252,7 @@ export class AccountErasureService {
         const namespace=['google','kakao'].includes(String(object.provider)) ? object.provider : undefined;
         return Object.entries(object).some(([key,v])=> {
           if(key==='provider')return false;
-          if(key==='providerId' && namespace && typeof v==='string')return providerPatterns.some(p=>p.provider===namespace && p.pattern.test(v));
+          if(['providerId','provider_id'].includes(key) && namespace && typeof v==='string')return providerPatterns.some(p=>p.provider===namespace && p.pattern.test(v));
           return providerCopies(v);
         });
       }

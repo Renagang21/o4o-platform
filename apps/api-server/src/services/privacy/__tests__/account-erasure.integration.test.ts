@@ -321,6 +321,18 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const result=await service().request(target.id);
     expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
   });
+  it('legacy snake_case IDs preserve another provider and detect a legacy subject copy',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-legacy-id';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+    await db.query(`UPDATE users SET provider='kakao',provider_id=$1 WHERE id=$2`,[providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect((await db.query('SELECT provider_id FROM users WHERE id=$1',[peer.id]))[0].provider_id).toBe(providerId);
+    const legacy=await user();
+    await db.query(`UPDATE users SET provider='google',provider_id=$1 WHERE id=$2`,['synthetic-legacy-copy',legacy.id]);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_build_object('provider','google','provider_id',$1::text) WHERE id=$2`,['synthetic-legacy-copy',peer.id]);
+    const result=await service().request(legacy.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('REVIEW:public.users');
+  });
   it('storage provider fields cannot hide a copied authentication identifier',async()=>{
     const target=await user(),peer=await user(),providerId='synthetic-provider-copy';
     await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
