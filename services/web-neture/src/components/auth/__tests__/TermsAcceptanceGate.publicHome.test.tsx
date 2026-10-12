@@ -15,3 +15,5 @@ function mount(path: string) { render(<MemoryRouter initialEntries={[path]}><Ter
 it('대표 호스트의 공개 홈은 미동의 세션으로도 돌아갈 수 있다', () => { mount('/'); expect(screen.getByText('공개 홈')).toBeTruthy(); });
 it('대표 호스트의 업무 화면은 계속 동의를 요구한다', () => { mount('/mypage'); expect(screen.getByText('동의 필요')).toBeTruthy(); expect(screen.queryByText('공개 홈')).toBeNull(); });
 it('형제 서브도메인의 루트에는 공개 홈 예외를 확대하지 않는다', () => { state.profile = 'community'; mount('/'); expect(screen.getByText('동의 필요')).toBeTruthy(); });
+
+it.each(['/policies/account-update', '/notices', '/contact'])('공고와 의견 제출 경로 %s는 재동의 전에도 열 수 있다', path => { mount(path); expect(screen.getByText('공개 홈')).toBeTruthy(); });

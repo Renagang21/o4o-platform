@@ -1,4 +1,4 @@
-import { recordSignupTerms, type SignupTermsReference } from './signup-policy.service.js';
+import { recordSignupTerms, recordSignupPrivacy, type SignupTermsReference } from './signup-policy.service.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
@@ -139,6 +139,7 @@ export class GoogleAuthError extends Error {
 
 export interface GoogleSignupConsents {
   termsPolicy?: SignupTermsReference;
+  privacyPolicy?: SignupTermsReference;
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
@@ -299,6 +300,7 @@ export class GoogleAuthService {
     const user = await this.dataSource.transaction(async (manager) => {
       const created = await this.createGoogleUser(manager, identity, input.consents);
       await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
+      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager, input.policyServiceKey ?? '');
       return created;
     });
 

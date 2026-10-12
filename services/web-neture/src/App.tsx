@@ -1,3 +1,4 @@
+import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
 import ServiceMembersPage from './pages/operator/ServiceMembersPage';
 /**
@@ -747,6 +748,7 @@ function App() {
                   public API + 공통 PolicyDocumentViewer 로 정렬한다. */}
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/policies/account-update" element={<AccountPolicyNoticePage />} />
 
               {/* WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10~§14:
                   초대 토큰 + Google 인증만으로 운영 권한을 수락한다(비밀번호 없음). */}
@@ -1120,6 +1122,7 @@ function App() {
               <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
               {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
               <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
+              <Route path="/operator/legal/supplier" element={<SubdomainOperatorRoute serviceKey="supplier" level="admin"><ServiceLegalSettingsPage serviceKey="supplier" /></SubdomainOperatorRoute>} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
             </Route>
             <Route element={
@@ -1143,6 +1146,7 @@ function App() {
               <Route path="/admin/market-trial" element={<Navigate to="/operator/market-trial" replace />} />
               <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
+              <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1160,6 +1164,7 @@ function App() {
                 <SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />
               </SubdomainOperatorRoute>
             }>
+              <Route path="/operator/legal/community" element={<SubdomainOperatorRoute serviceKey="community" level="admin"><ServiceLegalSettingsPage serviceKey="community" /></SubdomainOperatorRoute>} />
               <Route path="/admin/communities" element={<CommunityServiceAdminPage />} />
             </Route>
 

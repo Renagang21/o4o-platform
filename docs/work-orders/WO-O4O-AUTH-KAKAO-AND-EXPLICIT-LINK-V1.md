@@ -228,3 +228,283 @@ API 및 웹 6개 SUCCESS. 정확한 검증 경계·실패와 재실행은 CHECK�
 검토할 조문과 질문은 [정책 변경 검토안](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md),
 실제 브라우저 실행 목록과 검증 범위는 [CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)
 의 2026-10-10 남은 인증 절을 참조한다. AUTH-R5의 CI/review 완료 여부는 PR 최신 head 결과로 확인한다.
+
+## 2026-10-11 Neture 공통/서비스별 정책 분리 — 조사·초안
+
+사용자는 이전 통합 서비스 설명 대신 neture.co.kr 공통 계정 정책을 사용하고, 각 서비스 가입에는
+해당 서비스 내용을 넣도록 지시했다. 새 버전은 리팩터링 문서를 따르며 미흡한 부분을 논의한다.
+기존 동일 WO의 정책 후속 단계이므로 전용 branch/workspace를 유지하고 최신 main을 반영했다.
+[개정 설계](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md)의 TODO로 계정 정책과
+서비스 신청 조건, 계정 약관 gate·서비스별 gate, 공고·시행·재동의 시점을 분리했다.
+공통 이용약관·개인정보 초안은 DRAFT이며 게시 본문·version·DB·런타임은 변경하지 않았다.
+
+구현 조사에서 약사회 계정 생성의 별도 정책 선택, 전역 서비스 pending 차단, 일부 신청 서비스의
+legal scope 부재, publish 즉시 활성화와 미래 시행일 미처리를 확인했다. 새 본문만 게시해 해결했다고
+판정하지 않는다. 공고 기간과 외부 인증 고지 근거는 구체적인 논의 항목이다.
+본인 계정의 실제 Google·카카오 인증은 사용자가 진행한다. 성공 증빙을 임의 작성하지 않는다.
+
+PR #423 로그인 순환 수정은 main 통합·운영 반영 완료다. 후속 운영 실제 로그인 진입 8/8,
+Demo 32/32 PASS는 이전 대화의 결과이며 이번 문서 조사에서 새로 실행한 검증은 아니다.
+상위의 과거 날짜별 OPEN은 당시 기록으로 보존하고, 위 완료 항목을 신규 잔여 구현으로 보지 않는다.
+
+### 2026-10-11 공고 기간 확정
+
+사용자가 이번 정책 개정의 **30일 공고 후 시행**을 선택했다. 개정 설계와 공통 이용약관 초안에
+반영했다. 실제 공고일·시행일은 본문 검토와 게시 준비 후 확정하며, 초안 작성·push는 공고가 아니다.
+공고 기간에는 새 약관을 조기 적용하지 않는다. 정책 DB 게시·런타임 변경은 아직 실행하지 않았다.
+외부 인증 고지 근거 검토와 개정 설계의 미완료 구현 TODO는 계속 남아 있다.
+
+
+### 2026-10-11 정책 개편 구현 후속
+
+동일 WO/전용 branch를 유지하는 후속 구현이다. 계정 생성 origin의 Neture 공통 약관 선택,
+물리 Neture membership 없는 계정의 요구·승낙, 요청 서비스별 차단 범위를 정렬했다. 서명된
+세션 범위와 서버 소유 API 경로를 사용하며 body/query/Origin으로 요청 게이트를 우회하지 않는다.
+기존 서비스 승낙 자격·Demo 예외·전체관리자 관리 경로·ID/version/hash 이력은 유지한다.
+
+공통 UI는 서로 다른 문서를 모두 표시하고 문서 ID/version·서비스/유형이 일치한 경우에만 제출한다.
+분회 앱은 이 화면이 없어 기존 workspace 공통 UI 의존성 한 건과 lockfile importer를 연결했다.
+외부 패키지·버전 변경은 없다. 미래 시행일 draft는 publish 409로 거부하고 기존 게시 문서를 보존한다.
+이 방어는 자동 예약 게시나 30일 공고 이력 관리의 완료가 아니다.
+
+공통 이용약관은 기존 v1의 권리·의무·책임·분쟁 조항을, 개인정보 초안은 권리 행사·파기·안전성
+조항을 보완했다. 본문과 공고는 DRAFT다. 실제 사용자 Google·카카오 인증은 사용자가 진행한다.
+구현·검증 범위와 잔여 작업은 개정 설계 및 CHECK의 이번 날짜 절을 따른다. 이번 종료 범위는 push/PR이며,
+운영 정책 게시·DB write·main 통합·배포는 실행하지 않는다.
+
+
+최종 소비처 점검 후 이메일·Google·카카오 계정 생성 UI의 처리방침 링크도 Neture 공통
+`https://neture.co.kr/privacy`로 정렬했다. 이전 서비스별 privacyHref prop은 호출 호환성만 유지하며
+계정 생성에서는 서비스별 문서를 적용하지 않는다. 링크는 새 탭이며 가입 입력을 초기화하지 않는다.
+서비스별 추가 수집 안내는 서비스 신청 단계의 후속 TODO다.
+
+
+PR #457의 P1/P2 리뷰 지적을 반영했다. Google·Kakao 세션 응답에 같은 scoped enforcement를 적용하고,
+실제 공급자 API prefix를 일반 Neture보다 먼저 선택한다. provider 응답 8건 및 기존 보안 회귀
+45건이 통과했다. 공통 처리방침 링크를 포함한 세 서비스 PC/mobile 가입 회귀 18건도 통과했다.
+최신 commit을 push한 뒤 CI·재리뷰·이전 스레드 해소를 확인한다. 동일 WO 연속 Phase이며
+push/PR 종료 범위와 운영 정책 미게시 경계는 유지한다.
+
+
+재리뷰에서 발견한 Neture 하위 공급자·펀딩 운영자 경로도 구체적인 service mount로 먼저
+판정한다. 등록 경로 대조로 확인한 funding legacy API와 communities API도 연결했다.
+실제 요청의 차단·승낙 후 해소 및 prefix 경계 신규 회귀 7건이 통과했다. 운영자 역할 guard와
+전체관리자 예외는 유지한다. 최종 CI·리뷰는 이 후속 commit을 포함한 PR 최신 HEAD에서 확인한다.
+
+
+공통 계정 약관 도입으로 전체관리자의 settings/apps/users 등 관리 API가 차단될 수 있다는
+P1 리뷰도 보완했다. 최신 DB 전체관리자 역할과 서명된 admin 관리 세션을 함께 확인해 면제하며,
+Google 증거·계정/세션 상태·기존 role guard와 일반 서비스 세션의 약관 요구는 유지한다.
+신규 경계 회귀 11건, 보안 및 raw-source 재실행 67건과 API 타입/lint가 통과했다.
+동의 기록 생성·운영 DB 수정은 없으며 이번 종료 범위는 계속 push/PR다.
+
+
+공용 Neture 하위 API의 재리뷰도 반영했다. 매장 본인 신청·취소/공용 조회는 signed session을
+유지하고, 전용 관리 및 supplier 모집 심사 동작만 실제 controller 권한 경계로 소유 범위를
+지정한다. 신규 회귀 7건을 포함한 보안/기존 계약 74건 및 API 타입/lint가 통과했다.
+실제 서비스 신청 원장·조건 snapshot과 30일 공고/시행은 이번 구현 PASS로 완료 처리하지 않는다.
+
+
+후행 slash는 기존 normalizeRequestPath가 처리하므로 리뷰의 해당 재현 가정을 정정했다.
+Express 실제 route의 slash 및 uppercase supplier 동작을 검증하고 owner의 대소문자를 맞췄다.
+date 입력 시행일은 한국 달력 날짜(Asia/Seoul)로 비교하며 한국 자정 및 오전 게시 경계를 보완했다.
+신규 11건 포함 관련 4 suites/94 PASS이며 숫자 날짜 key 보완 뒤 게시/lifecycle 17건을 재확인했다.
+이 변경은 실제 공고나 30일 공고 증빙을 대신하지 않는다. 최종 CI·재리뷰는 후속 HEAD에서 확인한다.
+
+
+공급자 이미지 변경 API의 리뷰 지적은 서버 HTTP 메서드와 경로를 함께 사용해 보완했다.
+공용 GET은 signed scope, 공급자 mutation은 supplier로 판정한다. 관련 controller guard를
+대조해 private library와 supplier hub trigger도 포함했고, Neture 관리자 hub trigger는 분리했다.
+신규 10건 포함 보안/raw-source/provider 95건 및 API 타입/lint가 통과했다. 고유 서버 회귀는
+248건, UI 301건이며 실제 OAuth·운영 DB·30일 공고/시행은 완료 처리하지 않는다.
+동일 WO 연속 Phase이며 push/PR 종료 경계와 최신 HEAD의 CI·리뷰 확인 조건을 유지한다.
+
+
+KPA supplier mount도 일반 KPA보다 먼저 판정한다. 기존 active-supplier helper 검색뿐 아니라
+실제 supplier identity 조회 소비처·등록 route를 대조했다. 제안/자료/signage/screen-set의 신규
+6건 포함 관련 101건이 통과했다. 고유 서버 회귀 254건, UI 301건이며 실제 운영 검증과
+공고/정책 게시를 완료 처리하지 않는다. 최신 HEAD push/CI/review로 이번 Phase를 종료한다.
+
+
+재리뷰의 Store 서비스 약관 표시 deadlock과 실제 공급자 자격 공백을 보완했다. Store는 현재
+catalog의 Store-capable 서비스만, 공급자는 기존 canonical resolver의 업무 자격을 사용한다.
+무관 서비스 차단·membership/role 생성 없이 pending과 승낙 자격을 일치시켰다. 신규 7건 포함
+관련 4 suites 126 PASS, resolver context 인자를 명시한 뒤 보안/resolver 114건을 재확인했다.
+추가 resolver 18건을 포함한 고유 서버 회귀는 279건, UI 301건이다. 실제 원장/조건 snapshot,
+운영 검증 및 30일 공고·시행 OPEN과 이번 push/PR 종료 범위는 유지한다.
+
+
+게시 정책 본문 read 경로는 catalog의 canonical 서비스에 연결하고 관리 write·법정정보 scope는
+유지했다. 조회 신규 7건과 기존 legal scope 6건이 통과했으며 고유 서버 회귀는 292건이다.
+정책 관리 권한 연결·실제 신규 본문 게시/공고는 후속 TODO이며 이번 read 보완으로 완료 처리하지 않는다.
+
+
+Store 문서별 전문 링크 리뷰도 보완했다. Neture 공통 문서 링크만 공통 주소를 사용하며 서비스
+전문 경로가 미정이면 링크를 생략하고 실제 문서 본문은 표시한다. Store 소비처 1건 및 새 production
+bundle PC/mobile 6건이 통과했다. UI 회귀 302건/서버 292건/로컬 합성 화면 42건이며 운영 검증과
+구분한다. 동일 WO 연속 Phase로 최신 HEAD CI/review까지 확인하며 push/PR 경계를 유지한다.
+
+
+전문 링크 소유 판정을 공통 gate로 올려 Store 외 Neture 소비처의 같은 문제도 해소했다.
+termsServiceKey는 실제 약관 페이지 조회 key이며 Neture/KPA/lecture 소비처를 대조해 연결했다.
+공통 UI 72건/Store 1건, 해당 4개 앱 타입 포함 build와 lint, 새 3개 bundle PC/mobile 18건이
+통과했다. 신규 복수 서비스 경계 포함 고유 로컬 화면 48건/UI 304건/서버 292건이며 실제 운영
+검증 OPEN과 동일 WO push/PR 종료 경계는 유지한다. 최신 HEAD CI/review를 확인한다.
+
+
+KPA 약국 사업자는 서비스 membership 없이 실제 승인 원장으로 접근하므로 카탈로그의
+semiFranchiseAccessKey와 기존 서비스 접근 resolver를 pending·승낙 자격에 재사용했다.
+약국 승인만으로 서비스 가입으로 간주하지 않고 동일 조직의 기본/사업 가입 active가 필요하다.
+신규 9건 포함 6 suites 148 PASS다. 고유 서버 301건/UI 304건/로컬 합성 화면 48건이며
+membership/role 생성과 원장 변경은 없다. 기존 신청 snapshot/운영 검증 및 공고/게시 OPEN과
+동일 WO push/PR 범위는 유지한다. 최신 HEAD CI/review를 확인한다.
+
+
+공고 전 기존 Neture v1을 공통 계정 약관으로 바꾸지 않도록 rollout을 보완했다. 새 ID/version>=2/
+slug=neture-account-terms 문서가 실제 게시된 뒤에만 membership 없는 공통 요구와 약국 가입
+문서 전환을 적용한다. 표식 문서의 미확정 시행일·v1 게시를 거부하며 과거 동의를 옮기지 않는다.
+원장 자격의 빈 pending 캐시는 사용하지 않고 일반 캐시도 게시 문서 집합에 묶었다. 신규 18건
+포함 관련 6 suites 171 PASS, 고유 서버 회귀 319건/UI 304건이다. 로컬 PC/mobile 합성 검증
+48건의 경계는 유지한다. PG signup/social 18건과 sessionAuthMethod 21건은 총 39 SKIP다.
+30일 공고는 시작하지 않았고 실제 공고일·시행일은 미정이다.
+이번 동일 WO 작업은 push/PR 범위이며 최신 HEAD CI/review를 확인한다. main 통합·배포·DB 게시는 없다.
+
+
+최신 리뷰에서 기존 Neture 서비스 pending의 전역 선택과 전 사용자 cache 비활성화를 추가
+보완했다. 새 공통 문서만 accountPolicy로 전역 선택하며 기존 Neture 문서는 요청 범위에 둔다.
+현재 조직/legacy 공급자 관계를 EXISTS로 확인하고 관계 없는 사용자는 기존 빈 결과 cache를
+활용한다. 관계 생성/승인 직후 기존 resolver 판정은 유지한다. 신규 4건 포함 관련 128 PASS,
+고유 서버 323건/UI 304건이다. 모의 화면 48건·PG 39 SKIP·실제 공고/게시 OPEN·push/PR
+종료 경계는 유지하며 최신 HEAD CI/review까지 확인한다.
+
+
+게시 문서 slug 불변과 draft 공통 표식 추가/제거 금지를 보완했다. 새 row 등록 시에만 공통
+표식을 지정해 기존 동의 ID를 공통 계약으로 재분류하지 않는다. 실제 PUT 신규 6건 포함
+관련 25 PASS, 고유 서버 329건/UI 304건이다. 실제 공고/게시/운영 검증 OPEN과 push/PR
+종료 경계를 유지하며 최신 HEAD CI/review를 확인한다.
+
+
+My Home의 cross-service API 428은 해당 패널의 inline policy gate에 전달하고 승낙 후 조회를
+재개한다. Neture 전체 pending에 무관 서비스 문서를 넣지 않으며 원장/역할·서비스 가입을
+만들지 않는다. My Home 23/공통 UI 73 PASS, 고유 UI 328건이다. 새 production bundle의
+PC/mobile 12건 포함 모의 화면 60건이며 실제 OAuth/운영 검증과 구분한다.
+직전 CI의 supplier 경계 실패는 로컬 재현 후 canonical resolver로 후보 조회를 이동했다.
+관련 API 187 PASS, 인증·정책 고유 329 + 추가 supplier 경계 41을 분리 기록한다. SonarCloud
+지적의 복잡도/정렬도 보완했다. 최신 push HEAD CI/review를 확인하며 실제 공고/게시 OPEN과
+이번 push/PR 범위를 유지한다.
+
+
+제목/본문의 runtime 문자열·비어 있지 않음도 공통 gate에서 확인한다. ID/version이 일치해도
+본문이 누락되거나 표시 불가능하면 제출하지 않는다. 신규 10건 포함 공통 UI 83/My Home 23
+PASS, 고유 유관 UI 338건이다. 새 bundle PC/mobile 16건 중 신규 누락 경계 4건을 더한 모의
+화면 합계는 64건이며 실제 OAuth/운영 검증으로 보지 않는다. own preview 종료·port closure를
+확인했고 최신 push HEAD의 CI/review로 이번 Phase를 마무리한다. 실제 공고/게시 OPEN은 유지한다.
+
+게시 API에도 제목/본문 검증을 추가했다. 불완전한 draft는 기존 published 강등 전에 400이며
+게시 해제와 유효 본문 원문 보존은 유지한다. 신규 15건 포함 게시/수명주기 40 PASS,
+고유 인증·정책 서버 344 + 추가 경계 41 PASS다. UI 338/모의 64 PASS 및 PG 39 SKIP 경계와
+실제 공고/게시 OPEN을 유지한다. 이번 동일 WO의 push/PR Phase에서 최신 CI/review를 확인한다.
+
+
+## 2026-10-11 잔여 작업 전체 Phase — 배포 준비 기록
+
+동일 WO·branch 연속 Phase. 사용자는 남은 작업 전체와 main 통합·배포를 승인했고, 운영회사·보유기간·
+위탁업체·국외 처리 계약은 기존 문서와 변경이 없다고 확인했다. 과거 push-only 종료 범위는 현재 범위가 아니다.
+
+구현: 공통 가입 개인정보 version 증빙; 서비스별 명시 표식·독립 정책 관리; 공급자/약국/커뮤니티/
+펀딩/강의 신청의 정책·조건 snapshot과 원자적 저장; 조회 실패·구버전·동시 게시 차단 및 입력 보존;
+공통·서비스별 개정 전문과 공개 공고 경로. DB schema/migration/dependency 변경은 추가하지 않았다.
+
+현재 로컬 검증: API focused 12 suites **299 PASS**, 실제 격리 PostgreSQL 4 suites **52 PASS·0 SKIP**.
+이 PG 결과는 앞 단계의 PG 미연결 SKIP와 별개이며 새 signup privacy/hash, social/session 및
+신청 정책의 rollback·동시 게시·개별 신청 증빙 연결을 실행했다. 운영 DB의 실제 상태별 신청 검증은 아니다.
+공통 auth UI 200 PASS, shared-space UI 93 PASS(이전 실행); 최종 영향 웹 빌드·PC/mobile smoke는 별도 기록한다.
+외부 Google·카카오 인증은 합성 처리이며 실제 본인 인증은 사용자 확인 범위다.
+
+공고 URL `/policies/account-update`, 공고 예정일 2026-10-11·시행 예정일 2026-11-13(KST).
+배포 전 기록이며 **공고·main 통합·운영 배포 완료 증거로 사용하지 않는다.** 운영 노출 시각과 serving SHA,
+최종 CI·review·smoke는 후속 결과에 기록한다. 현행 정책 v1을 유지하며 새 정책 적용은 30일 경과 후다.
+
+문서 정합: 공통 개정안의 운영회사·위탁·국외 처리 정보를 기존 정본과 대조했고 사용자 변경 없음 확인을 반영했다.
+서비스별 본문과 현재 TODO를 보완했으며, 과거 WO/CHECK의 미완료 기록은 당시 실행 결과로 보존했다.
+
+
+### 최신 전체 review 지적 처리
+
+공고 전문의 production Docker 누락을 서비스 내부 공개 자산으로 해결했다(배포 설정 변경 없음).
+terms/privacy 부분 게시·version 불일치 때 가입·신청을 503으로 차단하고, 약국 기본/사업/강의 재신청의
+append-only 감사 연결을 보완했다. 커뮤니티 stale 정책 응답 형식을 UI와 정렬했다. 공고 자산 세 개와
+검토 문서 공개 본문의 정합 검증을 추가했다. API build에서 발견한 커뮤니티 개설 참조 타입도 수정했다.
+최종 재실행 결과와 최신 review·CI는 PR에서 검증하며 이전 숫자를 새 HEAD의 통과로 추정하지 않는다.
+
+
+### 공통 전환 전 약국 개인정보 소유권 보완
+
+추가 review를 반영해 공통 표식 전에는 약국 가입의 terms/privacy 문서·증빙·전문 링크 모두
+kpa-society 범위로 유지한다. 공통 표식이 실제 게시된 뒤 Neture의 같은 version 정책 세트로
+전환한다. 이메일·Google·카카오 세 경로에서 같은 선택된 범위를 사용한다.
+실제 PG의 약국 기존 정책 소유권 3건과 UI 링크·위험 URL 차단을 추가 검증했다.
+최종 로컬 고유 PG 검증은 60 PASS(기존 57 + 약국 소유권 3), 공통 auth UI는 202 PASS다.
+공통 정책 partial·구버전·DB 오류 rollback 및 one-use grant 재사용 방어 결과를 유지한다.
+
+
+### 정책 전환 전 신청 이력 보존 (추가 review)
+
+서비스 정책이 아직 게시되지 않은 신청도 `policies: []`로 신청별 감사 로그를 남긴다.
+약국·강의 재신청과 공급자 최초 신청을 포함해 기록 누락을 없앴으며, 기존 사용자 동의 증빙을
+새로 만들거나 과거 신청을 소급 채우지 않는다. 동일 신청 ID의 두 번 접수를 실제 PostgreSQL에서
+검증해 감사 로그 2건·동의 증빙 0건을 확인했다. 관련 단위 55 PASS, 실제 PG 전체 61 PASS, API build PASS.
+
+
+### 공통 정책 양방향 준비 판정 및 최신 main 통합 검증
+
+privacy가 먼저 게시된 경우에도 공통 terms/privacy의 표식과 version이 함께 일치해야 한다.
+선택적 privacy 참조를 생략한 legacy 클라이언트도 이 준비 판정을 우회할 수 없다. 이메일·Google·카카오
+각 경로에서 privacy-first의 참조 있음/없음 6건이 account/credential/provider/동의 및 one-use grant를
+부분 저장하지 않는 것을 실제 PostgreSQL로 검증했다. 최신 PG 전체 67 PASS/4 suites, 가입 단위127 PASS,
+API build PASS. main #484 충돌은 리소스별428·매장 사업 현황을 함께 유지했으며 기존 공급자 관리
+대표 진입이 약관 설정으로 바뀌지 않도록 화면 목록 우선순위를 보존했다. 관련 UI100 PASS/8 files,
+최신 Neture build와 PC/mobile 합성 gate18 PASS. 공고·시행은 여전히 실제 배포 검증 및30일 기간 이후다.
+
+
+### 가입 origin 전체의 공통 준비 판정 및 CI 소비처 보완
+
+약국이 legacy KPA 문서를 선택하는 동안에도 Neture 공통 terms/privacy를 별도로 대조한다.
+Neture privacy-first 상태에서 약국 origin의 이메일·Google·카카오 참조 있음/없음 가입 6건을 추가해
+최신 실제 PG 전체73 PASS/4 suites/0 SKIP, 가입 단위156 PASS/4 suites를 확인했다.
+Google 동의 화면의 정책 로딩·실패 시 다른 서비스 개인정보 링크를 노출하지 않으며, 소유권 조회 뒤
+정확한 링크를 제공한다(auth UI204 PASS/17 files). 기존 controller 테스트에는 실제 현재 privacy
+조회 fixture를 보완했고, stale 신청 테스트는 읽기 잠금과 write가 없음을 구분한다. 커뮤니티 탈퇴
+후 재조회는 정책 조회와 access 조회를 각각 검사한다. 새 약관 관리 route가 펀딩의 주 업무 진입을
+대체하지 않도록 home entry에서 보조 설정 경로를 구분했다(Neture 전체582 PASS/68 files).
+
+한국 날짜가 넘어가 아직 공개하지 않은 공고 예정일을2026-10-12로 정정했다. 시행 예정일
+2026-11-13은30일 이상을 유지한다. 실제 공개 시각 확인 전 공고 완료로 기록하지 않는다.
+
+
+### 개인정보 링크 소비처 전체 보완 및 운영 배포 사전 진단
+
+Google와 같은 미조회 정책 링크 문제를 이메일·카카오 가입에도 적용했다. 서버가 소유권을 반환하기
+전에는 전문 링크를 노출하지 않으며 소유권 확인 후 해당 문서 링크를 제공한다. 공통 auth UI 전체
+206 PASS/17 files, 최신 main 포함 Neture 전체597 PASS/70 files를 확인했다. API 및 Neture
+최신 main 빌드도 통과했다. 공개 공고 전문의 날짜는 실제 공고 전2026-10-12(KST)로 맞췄다.
+
+읽기 전용 Delivery 진단 run38185745396은2026-10-11T23:50:24Z에 GCP WIF
+`unauthorized_client / The given credential is rejected by the attribute condition`으로 실패했다.
+PH 폐기의 workflow/SHA 단독 제한 기록과 일치하며 API/Web/Admin/Report는 SKIPPED였다.
+배포0·운영 정책 게시0이고 serving SHA를 확인하지 못했다. 다른 트랙의 WIF 조건을 수정하거나
+배포 경계를 우회하지 않는다. PH 작업 종료·기존 조건 복원 후 canonical 배포와 운영 smoke를 재개한다.
+
+
+### 정책 갱신 재동의와 공통 정책 적용 순서 (최종 review 보완)
+
+이메일·Google·카카오 가입에서 정책 변경/재조회가 발생하면 약관과 개인정보 체크를 모두 해제한다.
+새 개인정보 ID/version을 과거 체크로 제출하지 않으며 재확인 전 제출을 차단한다. 추가 회귀3건을
+포함한 auth UI209 PASS/17 files를 확인했다. 공통 약관의 글로벌 요구 활성화 전에 같은 버전의
+게시된 공통 개인정보 본문이 있어야 하고, 적용 중 개인정보의 삭제·불일치 버전/legacy 교체도
+거부한다. draft 게시 해제와 같은 버전 복구는 허용한다. 게시·소유권49 PASS/2 suites, API build PASS.
+
+공개 전문 자산은 서비스 내부의 `.txt` 원문을 raw import하므로 Markdown 제외 패턴에 의존하지
+않는다. 정본 공개 부분 대조3 PASS, Neture build PASS, 새 번들 PC/mobile 공고4 PASS
+(anonymous/pending 합성 API)다. Docker 이미지 실행이나 운영 게시를 검증한 결과는 아니다.
+main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인증 거절 상태는 해소되지 않았다.

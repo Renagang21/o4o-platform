@@ -1,3 +1,4 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
 import { getAccessToken } from '@o4o/auth-client';
 import { apiV1Base } from '../../lib/serviceContext';
 /**
@@ -40,7 +41,8 @@ const STATUS_HELP: Record<string, string> = {
 };
 
 export default function PharmacyMembershipPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const agreement = useServiceEnrollmentPolicies('kpa-society', async () => { const response = await fetch(`${apiV1Base()}/public/services/kpa-society/enrollment-policies`); if (!response.ok) throw new Error('Policy unavailable'); return (await response.json()).data; }, user?.id ?? 'signed-out');
   const { reload } = useUnifiedStore();
   const [membership, setMembership] = useState<PharmacyMembership | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +84,7 @@ export default function PharmacyMembershipPage() {
 
   const canApply = !membership || membership.status === 'rejected' || membership.status === 'terminated';
   const set = (k: keyof PharmacyMembershipInput) => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const ready = form.pharmacyName.trim() && form.businessNumber.trim() && form.pharmacistLicenseNumber.trim() && form.address?.trim() && form.representativeName?.trim() && form.businessType?.trim() && form.businessCategory?.trim() && form.phone?.trim() && (documentFile || form.businessRegistrationDocumentId);
+  const ready = agreement.ready && form.pharmacyName.trim() && form.businessNumber.trim() && form.pharmacistLicenseNumber.trim() && form.address?.trim() && form.representativeName?.trim() && form.businessType?.trim() && form.businessCategory?.trim() && form.phone?.trim() && (documentFile || form.businessRegistrationDocumentId);
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -102,6 +104,7 @@ export default function PharmacyMembershipPage() {
         setDocumentFile(null);
       }
       const saved = await neturePharmacyApi.applyMembership({
+        policyReferences: agreement.references,
         businessRegistrationDocumentId: documentId,
         representativeName: form.representativeName?.trim(),
         businessType: form.businessType?.trim(),
@@ -114,6 +117,7 @@ export default function PharmacyMembershipPage() {
       });
       setMembership(saved);
     } catch (e) {
+      if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(pharmacyErrorCode(e) ?? '')) agreement.reload();
       setError(pharmacyErrorMessage(e));
       setNetureRequired(pharmacyErrorCode(e) === 'NETURE_MEMBERSHIP_REQUIRED');
     } finally {
@@ -174,6 +178,7 @@ export default function PharmacyMembershipPage() {
                 <input id="pharmacy-address" type="text" value={form.address ?? ''} onChange={set('address')} disabled={busy} />
                 <label htmlFor="pharmacy-phone">약국 전화번호 *</label>
                 <input id="pharmacy-phone" type="text" value={form.phone ?? ''} onChange={set('phone')} disabled={busy} />
+                <ServiceEnrollmentPolicyAgreement agreement={agreement} />
                 <button type="submit" disabled={busy || !ready}>
                   {busy ? '처리 중...' : membership ? '다시 신청' : '가입 신청'}
                 </button>

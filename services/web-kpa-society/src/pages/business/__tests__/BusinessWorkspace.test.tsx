@@ -22,6 +22,7 @@ const mount = (path: string) => render(<MemoryRouter initialEntries={[path]}><Ro
 beforeEach(() => {
   mocks.user = { id: 'owner' }; mocks.get.mockReset(); mocks.post.mockReset();
   mocks.get.mockImplementation(async (path: string) => {
+    if (path.endsWith('/enrollment-policies')) return response([]);
     if (path.endsWith('/businesses/pharmacy')) return response(business);
     if (path.endsWith('/access')) return response(access);
     if (path.endsWith('/semi-franchises')) return response([{ key: 'pharmacy', membershipStatus: null }]);
@@ -76,7 +77,7 @@ describe('사업 서비스의 참가자 공간', () => {
     const check = await screen.findByRole('checkbox'); fireEvent.click(check);
     fireEvent.click(screen.getByRole('button', { name: '참여 신청' }));
     await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/pharmacy/apply', {
-      acceptedConditions: true, conditions: '참여 조건', note: '',
+      acceptedConditions: true, conditions: '참여 조건', note: '', policyReferences: [],
     }));
   });
   it('담당 운영자에게 약국 소유자 전용 가입 조회를 요구하지 않는다', async () => {

@@ -26,6 +26,7 @@ export function TermsAcceptanceGate({ children }: { children: ReactNode }) {
       allowPaths={ALLOW_PATHS}
       serviceName="O4O 약국"
       termsPath="/policy"
+      termsServiceKey="kpa-society"
     >
       {children}
     </PolicyAcceptanceGate>

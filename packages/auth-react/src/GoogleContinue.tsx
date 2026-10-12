@@ -1,4 +1,4 @@
-import { SignupTermsAgreement } from './SignupTermsAgreement';
+import { signupPrivacyHref, SignupTermsAgreement, signupPolicyReferences } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 /**
@@ -72,7 +72,6 @@ export function GoogleContinue<TUser = unknown>({
   onSuccess,
   onError,
   onStart,
-  privacyHref = '/privacy',
   hint,
   className,
 }: GoogleContinueProps<TUser>) {
@@ -171,13 +170,13 @@ export function GoogleContinue<TUser = unknown>({
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits, termsPolicy: { policyDocumentId: policy.policyDocumentId, version: policy.version } });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, name: name.trim(), phone: phoneDigits, ...signupPolicyReferences(policy!) });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
       callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });
       return;
     }
-    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
+    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
     fail(result);
     // ID token 은 짧게 유효 — 동의 화면으로 되돌려 재시도를 허용한다(EMAIL_IN_USE 등은 메시지로 안내).
     setStage({ kind: 'consent', idToken });
@@ -206,10 +205,10 @@ export function GoogleContinue<TUser = unknown>({
           <label style={styles.field}>이름 (필수)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
           <label style={styles.field}>개인 휴대전화 (필수)<input style={styles.input} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
           <p style={muted}>연락처를 등록합니다. 휴대전화 본인 인증을 수행하는 것은 아닙니다.</p>
-          <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
+          <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <label style={checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
-            <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>
+            {policy && <a href={signupPrivacyHref(policy)} target="_blank" rel="noopener noreferrer" style={styles.link}>개인정보 처리방침 내용 보기</a>}
           </div>
           <label style={checkRow}>
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
