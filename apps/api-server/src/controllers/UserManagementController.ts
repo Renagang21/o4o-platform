@@ -1,3 +1,4 @@
+import { respondErasure } from '../services/privacy/account-erasure.http.js';
 import { Request, Response } from 'express';
 import { UserRepository, UserFilters, PaginationOptions } from '../repositories/UserRepository.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
@@ -12,8 +13,6 @@ import { isPlatformAdmin } from '../utils/role.utils.js';
 // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1
 import {
   demoAccountService,
-  DEMO_ACCOUNT_FORBIDDEN_CODE,
-  DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
   respondDemoAccountForbidden,
 } from '../services/auth/demo-account.service.js';
 import { OperatorRoleContractError } from '../config/operator-role-catalog.js';
@@ -277,46 +276,9 @@ export class UserManagementController {
     }
   };
 
-  // Delete user (soft delete)
+  // CORE_CHANGE_REQUIRED — same approved complete-erasure contract as /admin/users/:id.
   deleteUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { id } = req.params;
-
-      const user = await this.userRepository.findOne({ where: { id } });
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          error: 'User not found'
-        });
-        return;
-      }
-
-      // WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1:
-      //   Demo 계정은 개발 표본 데이터의 정본 소유자다 — 삭제하면 그 데이터가 다시 주인을 잃는다.
-      //   판정은 `demo_accounts.user_id` 한 곳만 본다(이메일 문자열 비교 금지).
-      if (await demoAccountService.isDemoAccount(id)) {
-        res.status(403).json({
-          success: false,
-          error: DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
-          code: DEMO_ACCOUNT_FORBIDDEN_CODE,
-        });
-        return;
-      }
-
-      await this.userRepository.softDeleteUser(id);
-
-      res.json({
-        success: true,
-        message: 'User deleted successfully'
-      });
-    } catch (error) {
-      logger.error('Error deleting user:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to delete user',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
-    }
+    await respondErasure(req, res);
   };
 
   // Approve user

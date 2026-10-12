@@ -1,5 +1,5 @@
 import { unifiedApi } from './unified-client'
-import { User, UserFilters, UserBulkAction, UserFormData, UserActivityLog } from '@/types/user'
+import { User, UserFilters, UserBulkAction, UserFormData, UserActivityLog, UserErasureResult } from '@/types/user'
 import { ApiResponse, PaginatedResponse } from '@/types'
 
 export class UserApi {
@@ -79,7 +79,7 @@ export class UserApi {
     return response.data
   }
 
-  static async deleteUser(userId: string): Promise<ApiResponse<void>> {
+  static async deleteUser(userId: string): Promise<ApiResponse<UserErasureResult>> {
     const response = await unifiedApi.raw.delete(`/v1/users/${userId}`)
     return response.data
   }

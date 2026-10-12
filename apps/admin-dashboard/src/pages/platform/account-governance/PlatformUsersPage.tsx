@@ -4,15 +4,17 @@
  * WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1
  * 선행: IR-O4O-PLATFORM-GLOBAL-USERS-UI-SCOPE-AUDIT-V1 (권장안 B — read-only + PII 투영)
  *
- * O4O 전체 사용자 현황 read-only 조회. backend `/api/v1/admin/platform-users`(안전 투영) 사용.
- * 이용중지·삭제·개인정보 파기·권한 변경은 각 전용 관리 화면(operator/service admin) 소관 — 본 화면 미제공.
- * action 버튼/상세 개인정보 조회 없음.
+ * 조회 projection은 유지. 승인된 WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1의
+ * 플랫폼 관리자 완전 제거 요청/실제 완료 상태를 역할 해제와 분리한다.
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@o4o/auth-context';
+import AccountErasureControls from './AccountErasureControls';
 import { Search, Info } from 'lucide-react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { platformAdminApi, type PlatformUser } from '@/api/platform-governance';
+import { api } from '@/api/base';
 
 function fmtDate(iso: string | null | undefined): string {
   if (!iso) return '-';
@@ -98,6 +100,15 @@ const columns: ListColumnDef<PlatformUser>[] = [
 ];
 
 export default function PlatformUsersPage() {
+  const { user: currentUser } = useAuth();
+  const isPlatformAdmin=currentUser?.roles?.includes('platform:super_admin') ?? false;
+  const [erasureReady,setErasureReady]=useState(false);
+  useEffect(()=>{
+    let live=true;setErasureReady(false);
+    if(isPlatformAdmin) void api.get('/admin/users/erasure-capabilities')
+      .then(r=>{if(live)setErasureReady(r.data?.data?.enabled===true);}).catch(()=>{});
+    return ()=>{live=false;};
+  },[currentUser?.id,isPlatformAdmin]);
   const [users, setUsers] = useState<PlatformUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -133,8 +144,8 @@ export default function PlatformUsersPage() {
     <div>
       <h1 className="text-xl font-bold text-slate-900 mb-1">전체 사용자 조회</h1>
       <p className="text-sm text-slate-500 mb-3">
-        O4O 전체 사용자 현황을 조회하는 <strong>read-only</strong> 화면입니다.
-        이용중지·개인정보 파기·권한 변경은 각 서비스의 전용 관리 화면에서 처리합니다.
+        O4O 전체 사용자 현황과 계정 완전 제거 처리 상태를 확인합니다.
+        서비스 사용중지는 해당 Operator가 처리하고, 전체 계정 완전 제거는 Admin이 요청합니다. 권한 해제와는 별도 절차입니다.
       </p>
 
       <div className="flex items-start gap-2 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 mb-5 text-xs text-slate-500">
@@ -178,7 +189,12 @@ export default function PlatformUsersPage() {
       ) : (
         <>
           <DataTable<PlatformUser>
-            columns={columns}
+            columns={isPlatformAdmin && erasureReady && currentUser ? [...columns, {
+              key: 'erasure', header: '계정 완전 제거',
+              render: (_value: unknown, u: PlatformUser) => u.roles.includes('platform:super_admin')
+                ? <span className="text-xs text-slate-500">보호된 관리자 계정</span>
+                : <AccountErasureControls accountId={String(currentUser.id)} userId={u.id} onCompleted={load} />,
+            }] : columns}
             data={users}
             rowKey={(u) => u.id}
             emptyMessage="조건에 맞는 사용자가 없습니다."
