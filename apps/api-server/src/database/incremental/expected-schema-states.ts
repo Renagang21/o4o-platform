@@ -238,6 +238,13 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '30be348978adb3aa0b5b0c378517b232ee36038c6bdbbdac70780d3c8f86f4bb',
     fingerprintLineCount: 6218,
   },
+  // Isolated PostgreSQL 15: exact down/up replay of the approved code/local erasure schema.
+  // No production migration execution is authorised by registration.
+  {
+    appliedThrough: 'CreateAccountErasureOperations1791777540800',
+    fingerprint: 'c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f',
+    fingerprintLineCount: 6617,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
