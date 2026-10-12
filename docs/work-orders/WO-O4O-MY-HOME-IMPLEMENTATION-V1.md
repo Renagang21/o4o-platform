@@ -1,9 +1,9 @@
 # My Home 다중 화면 · 서비스 공통 진입 구현
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
-> **DEPLOYMENT (현재 최소 모아보기 Phase)**: AUTOMATIC · 구현·회귀 검증 중. My Home AI는 별도 개발이며 이번 화면 정비에 포함하지 않는다. 이전 PR #484/#489의 완료·runtime 기록은 아래 이력으로 유지한다.
+> **DEPLOYMENT (현재 최소 모아보기 Phase)**: AUTOMATIC → DEPLOYED · PR #498 main/runtime `004a42c012ad8b67a446db373d4de33889c6f4e8`의 Neture deploy·최종 서빙 Report PASS. 운영 번들 39개·공개 HTTP/보호 API 13개 PASS. AI 별도 개발·실제 인증 SKIPPED_BY_USER. 결과 문서 PR #500은 NOT_APPLICABLE이며 이전 Phase 기록을 보존한다.
 > **이전 초기 구현 Phase의 배포 기록**: MANUAL/GATED → DEPLOYED · 당시 Delivery HELD_LEVEL_3 후 정상 promote 완료. 해당 결과 확정 문서 Phase는 NOT_APPLICABLE. 현재 본 작업의 배포 완료를 의미하지 않는다.
 
 ## 연속 문서 Phase: 사용자 제공 테스트 계정 파일 (2026-10-11)
@@ -117,3 +117,13 @@ TLS 검증을 유지해 받은 운영 HTML/JS의 신규 표식 5개, 공개 화�
 - 대표 홈의 기존 요약·O4O AI·모든 서비스의 My Home 헤더/모바일 진입은 유지한다. Neture 내부 패널의 compact 옵션만 변경하며 공통 패키지/API/route/권한/DB/dependency/CI/배포 설정 변경은 없다.
 - My Home AI의 입력·모델/API·Task 상태·결과 UI는 구현하지 않는다. 향후 모아보기 상단에서 연결하는 위치와 별도 개발 경계만 후속 정본 정합에 기록한다. 실계정 이메일 검증은 기존 사용자 지시대로 SKIPPED_BY_USER다.
 - 최신 main `0db33efda8fb380ac08243fc5286707db414316c`의 인증/약관 동의 기능을 보존한다. `HomeEntryPanel`의 대표 홈 summary·참여 서비스 full·선택 매장 workspace 소비처를 확인한다. 소스 PR과 별도 결과 문서 Phase를 같은 TODO에서 연속 수행한다.
+
+최소 모아보기 구현은 PR #498의 required CI·자동 리뷰 gate를 통과해 main `004a42c012ad8b67a446db373d4de33889c6f4e8`에 병합했다. 이전 타 작업 Promote 종료를 확인해 통합을 직렬화했다. 같은 WO의 결과 문서 Phase에서 정본·색인을 맞추며 새 main CI와 Neture Delivery·실제 서빙·운영 번들 확인까지 완료한다. 문서 PR은 결과 확정 전 draft로 유지하며 문서-only DEPLOYMENT는 NOT_APPLICABLE이다.
+
+### 최소 모아보기 최종 완료 — 2026-10-12 KST
+
+구현 main/runtime `004a42c012ad8b67a446db373d4de33889c6f4e8`의 main CI·CodeQL 및 자동 Delivery 38196926152가 성공했다. Neture의 새 revision 점검·트래픽 전환·최종 실제 서빙 Report를 완료했고 production status가 DEPLOYED다. 이번 배포는 Neture만 대상이며 API·migration·다른 서비스는 배포하지 않았다. 추가 Promote나 배포 재실행 없이 정상 자동 경로의 실제 결과를 확인했다.
+
+TLS 검증을 유지해 받은 운영 HTML/JS 자원 109개·새 구성 표식 8개, 공개 6화면/API ready 200·개인 API 6개 비로그인 401을 확인했다. 실제 운영 번들의 1440/375/320px fixture 39개도 PASS다. 알림 3/전체 10·상세 API 미호출과 상세 진입 후 조회·선택 매장·오류 재조회·원본 handoff·일반 회원 동선을 확인했다. 사용자/API/handoff는 fixture이며 직접 실계정 운영 검증이 아니다. 이메일 로그인은 SKIPPED_BY_USER, My Home AI는 별도 개발이다.
+
+TODO의 구현·검증·main·배포·운영 확인을 완료하고 같은 WO의 결과 문서 PR #500으로 정본·색인·CHECK·TODO를 정합한다. 문서-only DEPLOYMENT는 NOT_APPLICABLE이며 runtime SHA와 문서 commit을 구분한다. 로컬 문서 consumer 18 suites/365 tests와 첫 문서 CI는 PASS이며 최종 문서 HEAD의 required CI와 리뷰 gate를 재확인해 정상 통합한다. 테스트 계정 파일·브라우저 증거 보존 때문에 작업공간은 KEEP이다.
