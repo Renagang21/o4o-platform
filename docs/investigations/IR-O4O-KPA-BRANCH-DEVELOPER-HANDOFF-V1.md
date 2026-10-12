@@ -1,6 +1,6 @@
 # 분회 서비스 현황·신규 개발자 인수 기록
 
-> **상태**: COMPLETED · 현황 조사와 인계 문서 작성
+> **상태**: ACTIVE · 현황 문서 작성 완료, 신규 개발자 후속 WO 인수 전 참고 기록
 > **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
 > **근거 WO/IR**: WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1 · 분회 작업 중단·신규 개발자 인계
 > **조사 기준**: main `899e871ccee0114f6cf7ac73999011a1d364b994`의 코드·문서와 아래 GitHub Actions 관측. 운영 데이터 조사 결과가 아니다.
@@ -78,7 +78,7 @@
 4. 홈페이지/행사 조회 실패와 실제 빈 결과, 미게시 분회와 존재하지 않는 분회, 회원/운영자403의 안내를 구분해 점검한다.
 5. 공개 게시/임원 명부와 회원 회의자료·개인 신고/회비/교육·개인정보 노출 경계를 검증한다. 현재 데이터의 보유기간·계정 제거 정책은 [개인정보 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)을 기준으로 한다.
 6. 전면 정비의 기능/권한/API/schema/기존 자료 이전 범위를 새 WO로 확정한다. 기존 과거 WO를 포괄적인 새 개발·데이터 삭제 승인으로 사용하지 않는다.
-7. 개발 재개 승인이 있으면 [SETUP.md](../../SETUP.md)의 설치/검증 절차와 현재 package/CI 정의로 환경을 준비한다. 프런트 검증 설정은 [vitest.config.mjs](../../services/web-kpa-branch/vitest.config.mjs), 서버 검증은 기존 scope/service/route 테스트다. 이 인계는 새 빌드·회원 실계정·데이터 변경 테스트를 수행하지 않았다.
+7. 신규 개발자의 정비 작업을 시작하면 [SETUP.md](../../SETUP.md)의 설치/검증 절차와 현재 package/CI 정의로 환경을 준비한다. 프런트 검증 설정은 [vitest.config.mjs](../../services/web-kpa-branch/vitest.config.mjs), 서버 검증은 기존 scope/service/route 테스트다. 이 인계는 새 빌드·회원 실계정·데이터 변경 테스트를 수행하지 않았다.
 
 ## 7. 새 개발환경에서 비분회 작업 재개
 
