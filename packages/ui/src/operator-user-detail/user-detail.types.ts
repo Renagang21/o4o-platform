@@ -136,6 +136,8 @@ export interface UserDetailPageProps {
   config: UserDetailConfig;
   /** 현재 사용자가 admin인지 여부 (서비스별 판단 로직이 다름) */
   isAdmin: boolean;
+  /** Daily member actions; deletion stays gated by isAdmin. */
+  canManageMembers?: boolean;
   /** 서비스별 커스텀 동작 */
   actions?: UserDetailActions;
   /** react-router useNavigate (호환성을 위해 외부 주입) */

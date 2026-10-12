@@ -78,6 +78,7 @@ export default function UserDetailPage() {
       apiAdapter={apiAdapter}
       config={netureConfig}
       isAdmin={isCurrentUserAdmin}
+      canManageMembers={isCurrentUserAdmin || (currentUser?.roles?.includes('neture:operator') ?? false)}
       actions={netureActions}
       navigate={navigate}
       userId={id}

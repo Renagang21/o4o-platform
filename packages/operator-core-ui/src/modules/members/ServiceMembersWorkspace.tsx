@@ -15,6 +15,7 @@ export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, user
   navigate: (path: string) => void;
 }>) {
   const isAdmin = roles.includes(`${serviceKey}:admin`) || roles.includes('platform:super_admin');
+  const canManageLifecycle = isAdmin || roles.includes(`${serviceKey}:operator`);
   const client = useMemo<MembersConsoleClient>(() => ({
     list: params => {
       const query = new URLSearchParams({ serviceKey, page: String(params.page), limit: String(params.limit) });
@@ -25,9 +26,9 @@ export function ServiceMembersWorkspace({ serviceKey, basePath, api, roles, user
     stats: () => api.get(`/operator/members/stats?serviceKey=${encodeURIComponent(serviceKey)}`),
     updateStatus: async (id, status) => { await api.patch(`/operator/members/${id}/status`, { status, serviceKey }); },
   }), [api, serviceKey]);
-  if (userId) return <UserDetailPage userId={userId} apiAdapter={api} isAdmin={isAdmin} navigate={navigate}
+  if (userId) return <UserDetailPage userId={userId} apiAdapter={api} isAdmin={isAdmin} canManageMembers={canManageLifecycle} navigate={navigate}
     config={{ serviceKey, listPath: basePath, theme: 'blue', labels: { businessInfoTitle: '사업자 정보', businessNameLabel: '사업자명' } }} />;
-  return <OperatorMembersConsolePage serviceKey={serviceKey} client={client} canManageLifecycle={isAdmin}
+  return <OperatorMembersConsolePage serviceKey={serviceKey} client={client} canManageLifecycle={canManageLifecycle} canDeleteMembership={isAdmin}
     title="서비스 회원 관리" description="이 서비스의 가입 신청과 회원 이용 상태를 관리합니다." roleTabs={[]}
     fullDetailHref={user => `${basePath}/${user.id}`}
     statusTabs={[{ key: 'active', label: '활성', status: 'active' }, { key: 'suspended', label: '정지', status: 'suspended' }, { key: 'withdrawn', label: '탈퇴', status: 'withdrawn' }]}

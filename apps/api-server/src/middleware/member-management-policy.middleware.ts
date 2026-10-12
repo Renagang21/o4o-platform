@@ -41,13 +41,17 @@ export function memberManagementPolicy(req: Request, res: Response, next: NextFu
   const selected = roleMutation && roleService ? roleService : req.body?.membershipServiceKey ?? req.body?.serviceKey ?? req.query.serviceKey;
   const keys = typeof selected === 'string' ? [selected] : scope.serviceKeys;
   const admin = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => adminKeys.includes(key)));
-  (req as any).memberManagementApprovalOnly = !admin;
+  const ownsSelection = scope.isPlatformAdmin || (keys.length > 0 && keys.every(key => scope.serviceKeys.includes(key)));
+  if (!ownsSelection) {
+    res.status(403).json({ success: false, code: 'SERVICE_SCOPE_REQUIRED', error: '담당 서비스의 회원만 관리할 수 있습니다.' });
+    return;
+  }
+  (req as any).memberManagementApprovalOnly = false;
   const status = req.body?.status;
-  const adminAction = req.method === 'DELETE'
-    || (req.method === 'POST' && req.path.endsWith('/reactivate'))
-    || (req.path.endsWith('/status') || req.path === '/batch-status') && !['approved', 'active', 'rejected'].includes(status)
-    || req.method === 'PUT' && req.body?.membershipRole !== undefined
-    || req.method === 'POST' && req.path.endsWith('/roles');
+  // Ordinary role removal is daily work; membership deletion remains sensitive.
+  const adminAction = req.method === 'DELETE' && !roleMutation
+    || (req.path.endsWith('/status') || req.path === '/batch-status')
+      && !['approved', 'active', 'rejected', 'suspended'].includes(status);
   if (adminAction && !admin) {
     res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '해당 서비스 관리자 권한이 필요합니다.' });
     return;

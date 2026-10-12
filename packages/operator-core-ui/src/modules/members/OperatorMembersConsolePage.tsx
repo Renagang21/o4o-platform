@@ -154,6 +154,7 @@ export function OperatorMembersConsolePage({
   // WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
   consoleMode = 'members',
   canManageLifecycle = false,
+  canDeleteMembership = canManageLifecycle,
   rejectReason,
   fullDetailHref,
 }: OperatorMembersConsolePageProps) {
@@ -162,7 +163,7 @@ export function OperatorMembersConsolePage({
 
   /** 각 affordance 는 승인 전용 모드 + client/slot 존재 여부로 함께 결정한다. */
   const canEdit = !isApprovalOnly && !!renderEditModal;
-  const canDelete = canManageLifecycle && !isApprovalOnly && !!renderDeleteFlow;
+  const canDelete = canDeleteMembership && !isApprovalOnly && !!renderDeleteFlow;
   const canBulk = !isApprovalOnly && !!client.batchUpdateStatus;
   const showStats = !isApprovalOnly && !!client.stats;
   const getPrimaryRole = useMemo(
@@ -1019,7 +1020,7 @@ export function OperatorMembersConsolePage({
         })}
 
       {/* Delete Flow — service-provided slot */}
-      {canManageLifecycle && deleteTarget &&
+      {canDelete && deleteTarget &&
         renderDeleteFlow &&
         renderDeleteFlow({
           user: deleteTarget,

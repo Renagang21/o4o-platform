@@ -101,8 +101,8 @@ function themeClasses(theme: 'primary' | 'blue') {
 
 interface AssignableRole { value: string; label: string; isAdminRole: boolean; }
 
-function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose, onSuccess }: {
-  userId: string; existingRoles: string[]; isAdmin: boolean;
+function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, theme, onClose, onSuccess }: {
+  userId: string; existingRoles: string[]; isAdmin: boolean; serviceKey?: string;
   apiAdapter: UserDetailApiAdapter; theme: 'primary' | 'blue';
   onClose: () => void; onSuccess: () => void;
 }) {
@@ -114,7 +114,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
   const [rolesLoading, setRolesLoading] = useState(true);
 
   useEffect(() => {
-    apiAdapter.get('/operator/roles')
+    apiAdapter.get(`/operator/roles${serviceKey ? `?service=${encodeURIComponent(serviceKey)}` : ''}`)
       .then((res: any) => {
         const data = res.success !== undefined ? res : res.data || res;
         if (data.success !== false) {
@@ -130,7 +130,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
       })
       .catch(() => {})
       .finally(() => setRolesLoading(false));
-  }, [apiAdapter]);
+  }, [apiAdapter, serviceKey]);
 
   const filteredRoles = isAdmin
     ? assignableRoles
@@ -143,7 +143,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
     setLoading(true);
     setError('');
     try {
-      await apiAdapter.post(`/operator/members/${userId}/roles`, { role: selectedRole });
+      await apiAdapter.post(`/operator/members/${userId}/roles`, { role: selectedRole, ...(serviceKey ? { serviceKey } : {}) });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -200,6 +200,7 @@ export default function UserDetailPage({
   apiAdapter,
   config,
   isAdmin,
+  canManageMembers = isAdmin,
   actions,
   navigate,
   userId: id,
@@ -344,7 +345,7 @@ export default function UserDetailPage({
     if (!confirm(`역할 "${role}"을(를) 제거하시겠습니까?`)) return;
     setActionLoading(`role-${role}`);
     try {
-      await apiAdapter.delete(`/operator/members/${id}/roles/${encodeURIComponent(role)}`);
+      await apiAdapter.delete(`/operator/members/${id}/roles/${encodeURIComponent(role)}${config.serviceKey ? `?serviceKey=${encodeURIComponent(config.serviceKey)}` : ''}`);
       fetchDetail();
     } catch (err: any) {
       alert(err.message || '오류가 발생했습니다.');
@@ -473,7 +474,7 @@ export default function UserDetailPage({
                 </button>
               </>
             )}
-            {isAdmin && (lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
+            {canManageMembers && (lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
               <button
                 onClick={() => handleStatusChange('suspended')}
                 disabled={actionLoading === 'status'}
@@ -482,7 +483,7 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {isAdmin && lifecycleStatus === 'suspended' && (
+            {canManageMembers && lifecycleStatus === 'suspended' && (
               <button
                 onClick={handleReactivate}
                 disabled={actionLoading === 'reactivate'}
@@ -578,7 +579,7 @@ export default function UserDetailPage({
           <Shield className="w-4 h-4 text-slate-500" />
           <h2 className="text-base font-semibold text-slate-800">역할 (Role Assignments)</h2>
           <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
-          {isAdmin && (<button
+          {canManageMembers && (<button
             onClick={() => setShowRoleModal(true)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs ${tc.btnBg} text-white rounded-lg`}
           >
@@ -614,7 +615,7 @@ export default function UserDetailPage({
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                     <td className="px-5 py-2.5">
                       <div className="flex items-center justify-end">
-                        {r.isActive && isAdmin && (!config.serviceKey || !/(^|:)(admin|operator)$/.test(r.role)) && (
+                        {r.isActive && canManageMembers && (!config.serviceKey || !/(^|:)(admin|operator)$/.test(r.role)) && (
                           actionLoading === `role-${r.role}` ? (
                             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                           ) : (
@@ -709,6 +710,7 @@ export default function UserDetailPage({
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
           isAdmin={isAdmin && !config.serviceKey}
+          serviceKey={config.serviceKey}
           apiAdapter={apiAdapter}
           theme={config.theme}
           onClose={() => setShowRoleModal(false)}
