@@ -6,12 +6,14 @@ import { fetchChannelOverviewWithCode, fetchStoreSlugStatus } from '../../../api
 import { fetchProductPool, fetchTabletDisplays, fetchTabletIdlePlaylist } from '../../../api/tabletDisplays';
 
 /** Required sources fail together, so an unavailable source never becomes an editable empty list. */
-export async function loadChannelWorkspace() {
+export async function loadChannelWorkspace(includeSettings = true) {
   const [overview, assets, slug] = await Promise.all([
-    fetchChannelOverviewWithCode(), storeAssetControlApi.list({ limit: 200 }), fetchStoreSlugStatus(),
+    fetchChannelOverviewWithCode(),
+    includeSettings ? storeAssetControlApi.list({ limit: 200 }) : Promise.resolve(null),
+    includeSettings ? fetchStoreSlugStatus() : Promise.resolve(null),
   ]);
-  if (!assets.success) throw new Error('채널 자료를 불러오지 못했습니다.');
-  return { overview, assets: assets.data.items, slug };
+  if (assets && !assets.success) throw new Error('채널 자료를 불러오지 못했습니다.');
+  return { overview, assets: assets?.data.items ?? null, slug };
 }
 
 export async function loadTabletWorkspace(tabletId: string) {

@@ -29,3 +29,11 @@ it('both media library sources must load before presenting an empty library', as
   await expect(loadIdleLibraryAssets()).rejects.toThrow('자료함');
   await expect(loadIdleLibraryAssets()).resolves.toEqual([]);
 });
+
+it('product management does not depend on unused settings or asset sources', async () => {
+  mocks.assets.mockRejectedValue(new Error('settings-only assets offline'));
+  mocks.slug.mockRejectedValue(new Error('slug offline'));
+  await expect(loadChannelWorkspace(false)).resolves.toMatchObject({ overview: { channels: [] }, assets: null, slug: null });
+  expect(mocks.assets).not.toHaveBeenCalled();
+  expect(mocks.slug).not.toHaveBeenCalled();
+});

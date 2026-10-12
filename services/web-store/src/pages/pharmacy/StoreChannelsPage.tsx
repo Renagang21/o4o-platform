@@ -592,14 +592,16 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const fetchData = useCallback(async () => {
     setLoading(true); setLoadError(null);
     try {
-      const { overview, assets: loadedAssets, slug } = await loadChannelWorkspace();
+      const { overview, assets: loadedAssets, slug } = await loadChannelWorkspace(showSettings);
       setChannels(overview.channels); setOrgCode(overview.organizationCode);
-      setAssets(loadedAssets); setCanChangeSlug(slug.canChange); setLastFetched(new Date());
+      if (loadedAssets) setAssets(loadedAssets);
+      if (slug) setCanChangeSlug(slug.canChange);
+      setLastFetched(new Date());
     } catch {
       setLoadError('채널 정보를 불러오지 못했습니다. 다시 시도해 주세요.');
       showToast('error', '채널 정보를 불러오지 못했습니다.');
     } finally { setLoading(false); }
-  }, [showToast]);
+  }, [showToast, showSettings]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
