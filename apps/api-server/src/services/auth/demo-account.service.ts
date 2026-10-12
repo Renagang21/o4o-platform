@@ -24,10 +24,11 @@
  *   일반 사용자 동작은 불변이다. 이 모듈은 `demo_accounts` 에 행이 있는 사용자에게만 반응한다.
  */
 import type { EntityManager } from 'typeorm';
+import type { PublicDemoAccountType } from '@o4o/auth-utils';
 
 type Queryable = Pick<EntityManager, 'query'>;
 
-export type DemoAccountType = 'STORE_OWNER' | 'SUPPLIER';
+export type DemoAccountType = PublicDemoAccountType;
 
 /** 응답 `user.demo` — 일반 사용자는 `{ isDemo:false, demoType:null }`. */
 export interface DemoAccountMetadata {

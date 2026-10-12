@@ -632,9 +632,9 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 | V01 | 일반 미가입·대기·반려·정지·탈퇴 검증 | `users`의 공통 계정 상태, 서비스 membership, 약국·공급자 별도 원장을 구분한다. 로그인 성공과 보호 업무 API 허용도 구분한다 | 조사 완료 |
 | V02 | 공급자 상태별 안내 확인 | 실제 소비처는 `SupplierLandingPage`/`SupplierServiceEntry` → `ServiceApplyPanel`이다. 미사용 `ServiceUsageGate`의 문구만 바꿔 운영 개선으로 판정하지 않는다 | 실제 소비처 확인 완료 |
 | V03 | 공통 계정 승인 대기 안내 | 수동 승인 문구를 제거한다. 정상 인증의 메인 이용 상태 안내는 기존 handoff로 복귀하며, 중앙 가드의 제한 계정은 허용된 `/auth/me`로만 재확인해 계정 안내·읽기 재시도를 제공한다. 제한 계정에 handoff/서비스 신청을 제공하지 않는다 | #504 main 통합·Neture 웹 배포 완료; 로컬 합성30조건·운영 Demo4조건 통과. 실제 일반 상태 계정은 V04 대기 |
-| V04 | 실제 상태별 로그인·역할·업무 검증 | 8개 유지 origin × PC/mobile에서 계정 출처와 실제 원장 상태를 먼저 확인한 후 로그인, 메뉴·직접 주소, 보호 API, 상태 안내, 다른 서비스 영향, 로그아웃을 검증한다 | 로컬 계정 SSOT 연결 대기 |
+| V04 | 실제 상태별 로그인·역할·업무 검증 | 8개 유지 origin × PC/mobile에서 계정 출처와 실제 원장 상태를 먼저 확인한 후 로그인, 메뉴·직접 주소, 보호 API, 상태 안내, 다른 서비스 영향, 로그아웃을 검증한다 | 기준 파일 확보. 사용자 확인상 제공3개는 최신 지시에 따른 Demo 전환 대상. 일반 상태별 계정은 별도 확보 필요 |
 | V05 | 정책 적용·재동의 | 실제 공개 공고와 30일 경과를 다시 확인하고 2026-11-13 이후 새 정책을 게시·검증한다 | 시행일 대기 |
-| V06 | Google·카카오 실제 인증·명시적 연결 | 본인 실제 OAuth는 사용자가 담당한다. 자동 이메일 병합 없음·연결 후 권한 합집합 없음의 실제 결과를 전달받아 기록한다 | 사용자 확인 대기 |
+| V06 | Google·카카오 실제 인증·명시적 연결·운영자 검증 | 본인 실제 OAuth와 별도 Google 운영자 계정 검증은 사용자가 담당한다. 자동 이메일 병합 없음·연결 후 권한 합집합 없음의 실제 결과를 전달받아 기록한다 | 사용자 확인 대기 |
 
 공급자 이용 상태의 실제 출처는 `neture-service-state.service.ts`와
 `supplier-context.resolver.ts`가 해석하는 `neture_suppliers`다. 현재 source의
@@ -643,9 +643,12 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 증거로 삼거나 DB에 임의 상태를 넣지 않는다. Store의 약국 신청 종료와 서비스 membership
 탈퇴도 같은 상태명이라고 합치지 않는다.
 
-`docs/local/TEST-ACCOUNT.txt`는 현재 checkout과 기준 workspace 모두에 없다.
-[SETUP.md](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)의 비공개 파일/환경 Secret
-확보 절차를 따르며, 기존 Demo·과거 seed 계정으로 대체하지 않는다. 계정 원본 확보 후에도
+V03 조사 당시 `docs/local/TEST-ACCOUNT.txt`는 checkout과 기준 workspace 모두에 없었다.
+2026-10-12 사용자가 다시 제공한 원문을 현재 기준 파일에 저장하고 Git 추적 제외·내용 일치를
+확인했다. 이후 사용자는 제공 Gmail 계정이 운영자이며 운영자 테스트를 직접 담당한다고 확인했다.
+자동 검증에는 공개 Demo 버튼 정본만 사용하고 이 운영자 계정을 다시 대입하지 않는다.
+일반 상태별 계정은 [SETUP.md](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)의
+비공개 파일/환경 Secret 확보 절차를 따르며 Demo·과거 seed 계정으로 대체하지 않는다. 원본 확보 후에도
 필요한 상태가 없는 조건은 미실행으로 기록한다. 상태 변경 검증은 대상·복구 방법·공유 runtime
 사용 여부를 확인하고 승인된 범위에서만 실행한다.
 
@@ -655,9 +658,9 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 - [x] review 보완 화면53건·Neture build·PC/mobile 고유 합성24조건 확인(제한 거절2조건의 selector 보완 재실행 포함).
 - [x] 실제 제한 계정의 home/entry 403 → 본인 me 재확인 분기 검증; 화면61건·중앙 가드25건·로컬 PC/mobile 고유30조건 확인. allowlist·서버 인가 변경 없음.
 - [x] V03 push·review·main·Neture 웹 배포·운영 Demo 검증(실제 일반 상태 계정은 V04로 분리).
-- [ ] 일반 계정 SSOT 연결 후 V04 운영 상태별 검증.
+- [ ] 일반 상태별 계정 확보 후 V04 운영 검증(제공3개는 아래 최신 Demo 전환 대상으로 변경; 실제 운영자는 사용자 담당).
 - [ ] V05 시행일·공고 기간 확인 후 정책 적용과 재동의 운영 검증.
-- [ ] V06 사용자 본인 실제 OAuth/명시적 연결 결과 기록.
+- [ ] V06 사용자 본인 실제 OAuth/명시적 연결·운영자 검증 결과 기록.
 
 #### V03 통합·배포 결과 — 2026-10-12
 
@@ -685,3 +688,61 @@ Neture UI 로그아웃·access/refresh401과 다른 Store 세션200을 확인했
 이번 후속 기록은 문서만 변경하므로 DEPLOYMENT=NOT_APPLICABLE이다. 자체 local 서버는 종료했고
 운영 smoke의 테스트 소유 세션을 정리했다. V04~V06 후속을 위해 동일 WO branch/checkout을 유지한다
 (WORKTREE_DISPOSITION=KEEP). 일반 계정 파일은 현재 클라우드에 여전히 없으며 새 정책도 아직 게시하지 않았다.
+
+#### 계정 파일 확보·운영자 사용자 담당·Demo 전체 재검증 — 2026-10-12 후속
+
+위 V03 결과 기록 이후 사용자가 계정 원문을 다시 제공해 기준 파일을 확보했다. 파일은
+현재 checkout의 `docs/local/TEST-ACCOUNT.txt`에 저장했고 내용 일치·Git 추적 제외를 확인했다.
+제공 Gmail 계정은 모두 운영자이며 운영자 테스트는 사용자가 담당한다는 추가 지시를 받았다.
+따라서 기준 파일 미확보와 일반 상태별 검증 계정 미확보를 구분한다. 운영자 계정의
+비밀번호·주소 변경, 계정 생성·역할 부여·자격 복구는 실행하지 않는다.
+
+자동 검증은 공개 Demo 버튼의 매장 경영자·공급자다. Neture/Supplier/Community/Funding/
+약국 협력사업/Store/강의/KPA Society의 운영8 origin × PC/mobile ×2계정32조건을
+새 browser context로 다시 실행해 **32/32 PASS**를 확인했다. 로그인200·본인 me200,
+역할별 업무 API·관리자403, Demo 계정 설정 관리 제한, 실제 UI logout200과 이전
+access/refresh401을 확인했다. Neture 매장 경영자의 Store handoff 및 Neture 로그아웃 후
+다른 Store 세션 유지도 PC/mobile에서 확인했다. 실제 외부 OAuth와 운영자 검증은 제외했다.
+
+- [x] 기준 파일 재저장·원문 일치·Git 추적 제외 및 최신 운영자 검증 소유 확인.
+- [x] 공개 Demo를 운영자 입력과 구분해 운영8 origin의 PC/mobile32조건 재검증.
+- [x] 비로그인 화면 PC/mobile16조건의 이메일 폼·입력·강의 대표 진입 확인(로그인 성공과 구분).
+- [ ] 일반 미가입·대기·반려·정지·탈퇴 상태별 비운영자 계정 확보 후 V04 검증.
+- [ ] 사용자 본인 OAuth·명시적 연결 및 운영자 검증 결과 기록.
+- [ ] 2026-11-13 이후 실제30일 공고 확인·정책 게시·기존 회원 재동의 검증.
+
+이번32조건은 과거32조건과 같은 회귀 모집단이며 실행 횟수를 합산하지 않는다. 정상 Demo
+검증으로 V04의 실제 일반 상태 계정 조건을 닫지 않는다. 코드 결함이 확인된 범위는 없으며
+이번 변경은 기존 WO/CHECK 갱신뿐이다. DEPLOYMENT=NOT_APPLICABLE, 같은 미완료 WO의
+후속을 위해 WORKTREE_DISPOSITION=KEEP다. 최신 main의 타 트랙 API/admin/DB 변경을
+이번 테스트나 문서 통합으로 배포 완료했다고 판정하지 않는다.
+
+### 제공 테스트 계정3개로 전체 전환 — 2026-10-12 최신 사용자 지시
+
+사용자는 앞선 운영자 분류를 정정하고, 새로 제공한3개를 실제 테스트 계정으로 사용하며
+전체 사용자 로그인 화면의 버튼과 데이터가 연결된 계정 등 모든 관련 부분을 수정하도록
+지시했다. 이 최신 지시가 위 운영자 분류를 대체한다. 운영자/전체관리자의 Google 계정은
+Demo가 아니며 운영자 검증 사용자 담당 경계는 유지한다.
+
+| ID | 조사로 보완한 실행 TODO | 현재 상태 |
+|---|---|---|
+| T01 | 공통 credential·Neture 착지·Demo metadata·registry 제약·seed/repair·운영 census/cleanup의 소비처를 전수 확인 | 조사 완료 |
+| T02 | 사용자 제공 경영자·공급자·직원 credential을 공통 정본으로 하고8개 사용자 origin에3버튼·기존 일반 로그인을 연결 | 코드·로컬 화면 검증 완료; 운영 전환 대기 |
+| T03 | 직원 Demo의 registry 유형·보호·배지와 매장 직원 착지를 추가; 전체관리자 로그인·권한은 생성하지 않음 | 구현·격리25단계 스키마 검증 완료 |
+| T04 | 기존 활성 경영자/공급자 Demo의 user ID를 유지해 주소·비밀번호를 전환; 대상 Gmail 충돌·특권·provider 연결은 먼저 조사하고 임의 병합하지 않음 | CLI 구현·격리 DB 검증 완료; 운영 plan 대기 |
+| T05 | 직원 Demo를 같은 체험 약국의 활성 staff 관계와 기존 `kpa:store_member` 인가로 연결; 소유자·관리자·공급자 role은 주지 않음 | CLI 구현·실제 직원 해석기 격리 검증 완료; 운영 대기 |
+| T06 | CLI 기본 read-only plan·정확한 before-image digest·트랜잭션·rollback/멱등·세션 폐기 검증; DB 변경은 지시된 Demo 범위에 한정 | 격리 DB24조건·CLI 타입검사 완료 |
+| T07 | 로컬 집중 회귀·격리 DB·PC/mobile3버튼 검증 → 최신 review·CI → 정상 main 통합·운영 plan/apply·배포 | 로컬 완료:5웹/API build, UI17·DB24·운영경계114·화면48 통과. review/CI/main·운영 대기 |
+| T08 | 운영8 origin × PC/mobile ×3계정48조건으로 버튼·실제 registry·연결 매장/상품·권한·로그아웃을 검증 | 대기 |
+
+기존 ID를 유지하는 전환은 연결된 매장·공급자·상품·샘플의 user FK를 옮기지 않는다.
+직원은 동일한 승인 체험 약국에 연결하며 조직이 불명확하면 임의 조직을 고르지 않는다.
+대상 Gmail에 별도 identity가 있으면 일반 계정 자동 병합·권한 합집합을 실행하지 않는다.
+schema migration은 신규 incremental로 등록하고 기존 적용 이력은 수정하지 않는다.
+같이 pending인 타 WO의 미승인 운영 migration을 이번 Demo 지시의 승인 범위로 확대하지 않는다.
+이 후속은 같은 미완료 인증 WO/branch를 유지하는 구현 단계이며 앞선 문서-only 커밋은
+아직 main에 통합하지 않았다. 이전 Demo32조건은 전환 전 검증으로 보존하며 새48조건의 증거가 아니다.
+
+운영 순서: main 통합 후 standalone `demo_accounts=true,mode=plan`으로 실제 원장과 migration history를 읽는다. 직원 registry migration25는 연속 manifest의23/24 뒤에 있다. 다른 WO의 §10은23/24 운영 migration을 아직 승인하지 않았으므로 미적용이면 이번 Demo 지시를 근거로 함께 실행하지 않는다. 실제 read-only 결과와 구체 적용 영향을 확보하고 승인/협의한다. schema 적용 후 다시 plan하여 정확한 새 digest로 계정 전환하고, 그 이후5웹 app/eight origin을 배포·검증한다. 코드 main 통합을 데이터 전환/운영 검증 완료로 기록하지 않는다.
+
+운영 도구 분류: inventory에서 reconcile ACTIVE·구현 service module dependency·기존 foundation PAUSED로 등록했다. 현재 운영은 ACTIVE standalone plan/apply만 사용한다. 신규 foundation 생성·일반 계정/운영자 변경·별도 미승인 migration으로 범위를 넓히지 않는다.

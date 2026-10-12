@@ -251,6 +251,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50',
     fingerprintLineCount: 6618,
   },
+  // Isolated PostgreSQL 15 baseline + incremental 1..25; Demo type classification only.
+  {
+    appliedThrough: 'AllowStoreStaffDemoAccounts1791810417566',
+    fingerprint: '9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641',
+    fingerprintLineCount: 6618,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

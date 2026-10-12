@@ -9,7 +9,7 @@ export const queries = {
   organizations: `SELECT type, count(*)::int AS count FROM organizations GROUP BY type ORDER BY type`,
   memberships: `SELECT m.role, (d.user_id IS NOT NULL) AS demo_owned, count(*)::int AS count
     FROM organization_members m LEFT JOIN demo_accounts d ON d.user_id=m.user_id
-      AND d.is_active AND d.demo_type='STORE_OWNER'
+      AND d.is_active AND d.demo_type IN ('STORE_OWNER','STORE_STAFF')
     WHERE m.left_at IS NULL GROUP BY m.role, (d.user_id IS NOT NULL) ORDER BY m.role, demo_owned`,
   columns: `SELECT table_name, column_name FROM information_schema.columns
     WHERE table_schema='public'
@@ -50,12 +50,12 @@ export function scopedCountQuery(table, columns) {
     }
     return conditions.length ? `COALESCE((${conditions.join(' OR ')}), false)` : 'false';
   }
-  const store = predicate('STORE_OWNER');
+  const store = `(${predicate('STORE_OWNER')} OR ${predicate('STORE_STAFF')})`;
   const supplier = predicate('SUPPLIER');
   return `WITH demo_orgs AS (
     SELECT DISTINCT m.organization_id,d.demo_type FROM organization_members m
       JOIN demo_accounts d ON d.user_id=m.user_id AND d.is_active
-    WHERE m.left_at IS NULL AND m.role IN ('owner','admin','manager')
+    WHERE m.left_at IS NULL AND (m.role IN ('owner','admin','manager') OR (d.demo_type='STORE_STAFF' AND m.role='staff'))
   ), demo_suppliers AS (
     SELECT s.id FROM neture_suppliers s WHERE
       s.user_id IN (SELECT user_id FROM demo_accounts WHERE is_active AND demo_type='SUPPLIER')
@@ -75,7 +75,8 @@ export async function collectDemoStoreCensus(client) {
     await client.query("SET LOCAL statement_timeout='15s'");
     const demos = (await client.query(queries.demos)).rows;
     const types = new Set(demos.map(row => row.demo_type));
-    if (demos.length !== 2 || !types.has('STORE_OWNER') || !types.has('SUPPLIER') ||
+    if (demos.length < 2 || demos.length > 3 || types.size !== demos.length || !types.has('STORE_OWNER') || !types.has('SUPPLIER') ||
+        demos.some(row => !['STORE_OWNER','SUPPLIER','STORE_STAFF'].includes(row.demo_type)) ||
         demos.some(row => row.count !== 1)) throw new Error('Canonical Demo registry is ambiguous');
     const organizations = (await client.query(queries.organizations)).rows;
     const memberships = (await client.query(queries.memberships)).rows;

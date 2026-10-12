@@ -37,6 +37,14 @@ export async function hasSupplierRuntimeRelation(dataSource: Pick<DataSource, 'q
   return rows.some(row => row.related);
 }
 
+/** Read-only maintenance protection probe; never selects or grants a supplier context. */
+export async function hasLegacySupplierIdentityPointer(dataSource: Pick<DataSource, 'query'>, userId: string): Promise<boolean> {
+  const rows: { related: boolean }[] = await dataSource.query(
+    'SELECT EXISTS (SELECT 1 FROM neture_suppliers s WHERE s.user_id = $1) AS related', [userId],
+  );
+  return rows.some(row => row.related);
+}
+
 export interface SupplierCandidate {
   supplierId: string;
   organizationId: string;

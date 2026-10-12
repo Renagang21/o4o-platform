@@ -1240,3 +1240,114 @@ main #503 `64b8df16f1`을 자신의 branch에 merge한 뒤 source 기준 서버7
 새 정책 게시도 미실행이다. 이번 완료 기록은 문서-only/DEPLOYMENT=NOT_APPLICABLE이며
 자체 local 서버 종료·테스트 소유 세션 정리 후 동일 WO 후속을 위해
 WORKTREE_DISPOSITION=KEEP로 남긴다.
+
+#### 기준 계정 파일 확보와 운영자 검증 소유 확인 — 2026-10-12 후속
+
+사용자가 계정 원문을 다시 제공해 `docs/local/TEST-ACCOUNT.txt`를 덮어썼다.
+제공 내용 일치·파일 존재·Git 추적 제외를 확인했고 기존 입력을 추측한 주소나 비밀번호로
+고치지 않았다. 과거 파일 미확보 기록은 그 조사 시점의 결과다. 현재는 파일 확보 완료이며,
+실제 로그인 가능 여부와 계정의 검증 용도는 별도 판정한다.
+
+처음 일반 테스트 계정으로 해석해 제공3계정의 `POST /auth/email/login`을 확인했으나
+모두401 `INVALID_CREDENTIALS`였다. Neture PC 직접 입력1조건에서도 같은 응답과 실패 안내를
+확인했다. 이 응답은 계정 없음·비밀번호 수단 없음·비밀번호 불일치를 합친 계약이므로
+계정 미등록·서비스 권한 문제·인증 코드 결함 중 하나로 확정하지 않는다.
+로그인 실패 제한은15분 실패5회이며 반복 대입을 확대하지 않았다.
+
+이후 사용자는 **제공 Gmail 계정은 모두 운영자이며 운영자 테스트는 사용자가 담당**한다고
+확인했다. 이 최신 지시를 로컬 기준 파일의 설명과 WO에 반영하고 초기 운영자 probe helper는
+재실행 시 인증 요청 없이 종료하도록 했다. 사용자 확인 이후 운영자 비밀번호 로그인,
+운영자 역할 조회·변경, 실제 Google 인증은 실행하지 않았다. 이 분류는 사용자 확인이며
+운영 DB의 역할·credential 상태를 조회해 입증한 결과는 아니다.
+
+자동 검증의 대상은 현행 `packages/auth-utils/src/demoAccounts.ts`와 로그인 화면의 공개 Demo
+버튼이다. 공급한 Gmail 원문을 공개 Demo 주소로 바꾸지 않았고 운영자 정보·비밀번호를
+tracked 문서에 복사하지 않았다. Neture PC에서 두 Demo 버튼의 로그인·업무 진입·권한·
+UI logout·세션 폐기를 비교 확인해2/2 통과했다. 아래 전체 재실행에 포함되는 같은 조건이므로
+서로 더해 새 고유 조건 수로 보고하지 않는다.
+
+유지8 origin의 비로그인 화면 PC/mobile16조건도 확인했다. 이메일 폼 표시·입력과 가로 overflow
+부재, 강의의 Neture `service-entry/lecture` 진입을 확인해16/16 통과했다. 이는 로그인 완료
+검증이 아니다. 이 단계의 카카오 버튼 즉시 표시 관찰값은 설정 로딩 대기·노출 검증을 거치지
+않았으므로 성공/실패 판정에 쓰지 않으며 실제 Demo 회귀의 대기 후 검증과 구분한다.
+
+#### 운영자 제외 후 공개 Demo 운영8 origin 재검증
+
+사용자 확인 이후 운영자 계정은 자동 검증에서 제외하고 실제 화면의 두 Demo 버튼을 눌러
+새 Chromium browser context로 전 조건을 실행했다. PC1440×900/mobile390×844 viewport이며
+TLS 검증과 기존 프록시를 유지했다. fixture·인가 우회·계정 생성·역할/membership 변경은 없다.
+
+| 운영 origin | PC 매장 경영자 | PC 공급자 | mobile 매장 경영자 | mobile 공급자 |
+|---|---|---|---|---|
+| neture.co.kr | PASS | PASS | PASS | PASS |
+| supplier.neture.co.kr | PASS | PASS | PASS | PASS |
+| community.neture.co.kr | PASS | PASS | PASS | PASS |
+| funding.neture.co.kr | PASS | PASS | PASS | PASS |
+| pharmacy.neture.co.kr | PASS | PASS | PASS | PASS |
+| store.neture.co.kr | PASS | PASS | PASS | PASS |
+| study.neture.co.kr | PASS | PASS | PASS | PASS |
+| kpa.neture.co.kr | PASS | PASS | PASS | PASS |
+
+- 최종 **32/32 PASS**, 해당 Demo 실행의 실패·재실행0. 초기 운영자 입력 probe와
+  구분하며 비교용 Neture PC2조건·기존32조건을 더해 새로운 고유 조건 수로 늘리지 않는다.
+- 모든 조건의 실제 로그인200·본인 me200, UI origin 유지와 `status/accountAccess` 계약 확인.
+  Demo 설정의 소셜/비밀번호 `canManage=false`, 관리자403 `ROLE_REQUIRED` 확인.
+- 매장 경영자는 Store context200·공급자 상품403 `NO_SUPPLIER`, 공급자는 상품200·
+  Store context403 `STORE_OWNER_REQUIRED`. 공급자의403을 약국장 업무 실패로 판정하지 않는다.
+- 실제 UI logout200, 이전 access401·refresh401. 각 조건에서 생성한 테스트 소유 세션만
+  정리했다. Neture 매장 경영자의 실제 Store 이동·handoff200/exchange200와 Neture
+  로그아웃 후 다른 origin인 Store의 me200을 PC/mobile에서 확인했다.
+- 카카오 config200/enabled와 로딩 완료 후 실제 버튼 표시를 확인했다. 강의는 자체 소셜
+  폼 대신 Neture `service-entry/lecture`로 연결된다. 실제 Google·카카오 인증이나 연결
+  완료를 뜻하지 않는다. 운영자 검증과 일반 상태별 실제 계정 검증도 대신하지 않는다.
+- 소스 조사/기록 기준 checkout은 main `6210fb7ed3`이며 이 SHA 전체의 runtime 배포
+  확인을 뜻하지 않는다. 이번 검증은 해당 실행 시점의 실제 운영 URL·UI·API 응답에 한정한다.
+  새로운 GCP serving label 조회·배포·migration은 실행하지 않았다.
+
+현재 기준 계정 파일은 확보했다. 일반 미가입·대기·반려·정지·탈퇴의 비운영자 계정은
+별도 필요하며, 운영자 및 본인 OAuth/명시적 연결은 사용자가 담당한다. 새 정책은
+2026-11-13 이후 실제30일 공고를 확인하고 게시·재동의를 검증한다. 앱 코드 변경 없이
+기존 WO/CHECK에만 결과를 반영했고 DEPLOYMENT=NOT_APPLICABLE이다.
+같은 미완료 WO의 후속을 위해 WORKTREE_DISPOSITION=KEEP로 남긴다.
+
+### 제공 테스트3계정 전체 전환 — 로컬 검증,2026-10-12
+
+최신 사용자 지시는 제공 경영자·공급자·직원3개를 모두 테스트 계정으로 확정하고 버튼과 데이터 연결까지 전환하는 것이다. 앞선 운영자 분류는 이3개에 적용하지 않는다. 실제 별도 Google 운영자/OAuth 검증은 사용자가 담당한다. 비공개 원본은 `docs/local/TEST-ACCOUNT.txt`에 유지하고 Git에서 제외한다.
+
+- 공통 config3개·Neture staff 착지·server registry type·provision/census/cleanup 소비처를 수정했다. 기본 경영자/공급자 provision과 기존 business user UUID는 유지하고, 별도 직원 reconcile로 기존 Demo 약국 staff 관계와 `kpa:store_member`만 연결한다.
+- read-only plan/digest, SERIALIZABLE apply, 감사 before/after image, 충돌·특권·provider·pending operator 초대 중단, 원자 세션 family 폐기와 멱등을 구현했다. 공개 artifact에는 사용자 ID/개인정보/비밀번호/hash를 출력하지 않는다.
+- API 및5웹(Neture·Store·Lecture·KPA Society·KPA Branch) build, CLI typecheck 통과. `@o4o/ui`의 stale dist로 처음 Neture build가 실패했고 최신 shared package rebuild 후 통과했다. 관련 없는 source 수정은 없다.
+- Vitest UI17, 실제 격리 PostgreSQL DB9, census/cleanup24, migration contract21, 기존 배포/PH 경계114 모두 통과했다. DB9 중7은 정확한 격리 DB opt-in이며 기본 CI에서는 skip,2 gate만 실행된다.
+- 정식 migration runner로 합성 빈 DB에 bootstrap+25단계를 적용해 pre/post fingerprint를 확인했다.25단계는 `9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641`,6618줄이다. down/up24/25 hash roundtrip과 staff row가 있을 때 down 거절도 통과했다. 운영 DB에는 실행하지 않았다.
+- 실제 새 build 산출물을 사용한 로컬 브라우저48/48조건(8 origin×PC/mobile×3계정)에서 각 버튼·정확한 credential POST·실패 후 재시도·overflow/JS error를 확인했다. API는 합성 응답이므로 실제 운영 로그인 성공 증거는 아니다.
+- origin/app 정본: neture/supplier/community/funding→Neture, pharmacy→KPA Society, store→Store, study→Lecture, kpa→KPA Branch. 최초 fixture54조건의12실패는 잘못된 community 응답과 가상 branch host/base경로였다. 정확한 정본으로 community6·pharmacy6·kpa6 재확인 후 유효48조건 모두 통과했다. 최초 실패와 수정 결과는 비공개 helper artifacts에 함께 보존했다.
+
+현재 운영 계정 전환·migration·신규 배포·신규3계정 운영48검증은 실행0이다. 앞서 기존 Demo32운영 통과는 과거 checkpoint이며 이번3계정 전환의 운영 성공을 의미하지 않는다. 직원 migration25 앞의23/24는 [별도 개인정보 WO §10](../work-orders/WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md)의 운영 승인 범위 밖이다. main 통합 이후 실제 read-only plan의 schema history로 적용 필요성을 먼저 판정한다.
+
+PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은 활성 registry와 새 credential 주소가 다르면 어떤 쓰기보다 먼저 reconcile을 요구한다. 기존 provision의 credential·registry·관계 write도 같은 SERIALIZABLE QueryRunner transaction으로 묶어 중간 실패 시 공개 credential만 남지 않도록 했다. reconcile은 경영자·공급자의 미래/만료 role을 중단하고, 직원의 활성 기간 오류도 임의 연장/중복 부여하지 않는다. legacy registry 보호와 경영자 미래/공급자 만료 role의 실제 격리 DB 회귀3조건을 추가했다.
+
+리뷰 수정 후 DB12/12(격리 integration10+기본 gate2), CLI3개 typecheck 및 API build를 재확인했다. 정식 foundation `--apply`도 격리 legacy registry에서 전환 필요 오류로 쓰기 전에 중단하여 target Gmail orphan0·기존 사용자2 보존을 확인했다. 최신 main의 Store bundle PC/mobile6조건도 재확인 통과했다.
+
+최신 PR CI38266255821은 API shard2가 실패했다. 원격 로그 다운로드는 sandbox escalation 재시도도 proxy403이었으며, 로컬에서 동일 shard2를 실행해 `supplier-domain-boundary.spec.ts` §8-b의 신규 CLI legacy `user_id` lookup을 재현했다. contract/allowlist를 완화하지 않고 CLI inventory를 canonical supplier 조직의 활성 owner 관계로 한정했다. 무관한 조직의 PENDING supplier에 같은 legacy pointer가 있어도 canonical Demo inventory에 섞지 않고 해당 행을 변경하지 않는 실제 DB 회귀를 추가했다.
+
+운영 CLI의 기존 sanitized summary를 native Actions notice에도 남겨 mode/schema history/검토 digest/변경 건수를 GitHub API에서 직접 확인할 수 있게 했다. raw snapshot·ID·credential 원문·비밀번호 hash는 공개하지 않는다. 새 DB fixture 최초 시도는 기존 unique legacy-pointer 제약에 걸렸으므로 canonical 행의 nullable legacy pointer를 비운 뒤 무관한 행의 pointer drift를 모델링하도록 수정했다. 운영 schema 제약을 바꾸지 않았다.
+
+공급자 정본 수정 후 집중 회귀54/54(격리 DB13+공급자 경계41) 및3 CLI typecheck PASS. 기존 보호/provision source contract35도 PASS. 한국시간2026-10-13에 후속 수정 push·최신 CI/review를 진행한다. 운영 변경은 여전히0이다.
+
+로컬 전체 shard2 진단은165 suites 중160 PASS·3 skipped·2 FAIL,2769조건 중2739 PASS·28 skipped·2 FAIL이었다. 두 실패는 신규 CLI의 공급자 legacy 조회와 은퇴 `operator_invitations` 참조였다. 후자는 현행 runtime 금지 계약에 따라 제거했다. 새 예외/기능 복구/테이블 삭제는 하지 않는다. 현행 역할·provider identity 보호와 Demo 지정 후 권한/인증수단 변경 guard는 유지한다. 최초 구현 기록의 pending 초대 보호는 최종 구현에 포함하지 않는다.
+
+최종 집중 회귀70/70(격리 DB12·공급자 경계41·Google 은퇴 경계17), CLI3개 타입 검사 및 DB binding 누락 시 native sanitized error annotation 검증 PASS. 최종 구현의 실제 DB 조건은12개다. 전체 CI를 다시 확인하며 실패 gate를 우회하지 않는다.
+
+최신 main 동기화 후 리뷰의 필수 서비스 연결 지적도 수용했다. 경영자/공급자/직원 모두 foundation과 동일한 required membership map을 사용한다. 없어진 연결만 생성하고 비활성/제한된 연결은 자동 복구하지 않는다. plan의 membership readiness와 mutation intent digest를 추가했다. 기존 owner Lecture 누락을 복구한 뒤 user ID·ownership 보존/멱등을 확인했고 owner·supplier suspended Lecture를 유지하는2조건도 통과했다. 집중 회귀108/108(격리 DB15+공급자41+Google 은퇴17+기존 Demo/provision35),3 CLI typecheck PASS. 동기화된 PH inventory 회귀15도 PASS. 운영 반영은 아직0이다.
+
+최종 리뷰의 운영 후보 분류 누락 P1을 수용했다. scripts inventory에 새 reconcile entry를 ACTIVE로 등록하고 service module은 dependency임을 명시했다. 기존 foundation 생성기는 PAUSED로 기록해 이번 운영 전환에서 실행하지 않는다. Canonical Demo의 명령 설명도 같은 분류로 정합했다. 같은 사용자 지시·현재 인증 WO·기본 plan/digest/보호/transaction 및 기존 WIF DB identity를 등록 근거로 남겼다. ACTIVE/PAUSED 모두 DB_USERNAME/DB_NAME 공백을 접속 전에 거절하도록 inline 필수 검사를 보완했다. 이 등록은 별도23/24 migration이나 일반 사용자/운영자 수정의 승인이 아니다.
+
+도구 분류 보완 후 DB identity/provision 계약44,3 CLI typecheck, username 미설정/공백의 접속 전 거절2조건, docs 민감정보 guard3878파일 모두 PASS. API scripts inventory 분류를 완화하지 않고 실행 후보와 이번 실제 운영 경로를 명시했다.
+
+운영 관계 전수와 단일 공급자 컨텍스트 지적 P1/P2를 수용했다. 새 CLI는 기존 `findStoreOrganizationCandidates(kpa)`와 `listSupplierCandidates`를 직접 재사용한다. store owner의 다른 active 약국 admin/manager 관계도 포함해 후보1개·의도한 owner를 요구하며 canonical supplier 후보도 ACTIVE1개만 허용한다. 후보 결과는 private before-image/digest에 포함하고 공유 credential 변경 전 실패한다. 다른 약국 admin·manager2조건과 복수 supplier1조건을 실제 DB에서 재현해 사용자 주소·감사 write0을 확인했다. 집중 회귀111/111(격리 DB18+공급자41+Google 은퇴17+Demo/provision35),3 CLI typecheck PASS. 운영 write·신규 배포·신규3계정 운영 검증은 아직0이다.
+
+main #522의 PH scoped purge workflow 추가 때문에 #521 mergeability가 dirty가 되어 CI trigger가 생성되지 않았다. 자기 branch의 승인된 main merge에서 공용 workflow4조건을 병합했다. 새 Demo는 PH purge와 동시 선택을 startup gate에서 거절하고 각 proxy/public-path/default cutover/backup의 독립 실행 제외 조건을 모두 보존했다. 실제 bash gate의 standalone Demo plan/apply 허용·PH/다른 Demo 동시 선택·다른 actor/ref/frozen write 거절, 기존 PH purge/job 안전 회귀14/14 PASS. PH 운영 run38319576225는 다른 작업이며 변경/취소하지 않았다. 이번 인증 운영 write0을 유지하고 실제 종료/정상 WIF를 확인한 후 진행한다.
+
+반대 도메인 관계 노출 지적 P1을 수용했다. 모든 identity의 active 조직 관계가 의도한 pharmacy owner/staff 또는 supplier owner만 가리키는지 확인한다. 매장 계정의 legacy supplier pointer도 기존 resolver에 둔 read-only probe로 확인하고 공유 credential 적용 전 거절한다. 기존 resolveSupplierForUser의 fallback logger로 private ID를 출력하지 않으며 probe는 supplier를 선택하거나 접근 권한을 주지 않는다. owner의 다른 supplier 소유, supplier의 store manager 관계, owner/staff legacy pointer4조건에서 변경 전 거절을 확인했다. 집중115/115(격리 DB22+공급자41+Google 은퇴17+Demo/provision35),3 CLI typecheck PASS. runtime supplier resolver의 기존 선택·fallback·권한 동작은 변경하지 않았다.
+
+inactive staff registry·직원 census 지적 P2 두 건을 수용했다. scoped user의 inactive registry가 있으면 plan에서 INACTIVE_DEMO_REGISTRY_REQUIRES_REVIEW로 중단하고 상태를 보존한다. 직원 user ID와 staff 조직 관계를 store_demo_count/membership 집계에 포함한다. 실 DB에서 inactive staff 중단·감사 write0, membership12행(store8/supplier4/unlinked0), role3행(store2/supplier1/unlinked0), owner/staff creator2행(store2/unlinked0)을 검증했다. 최초 test의 native ESM 직접 import는 CommonJS Jest parse 오류여서, transform/guard를 변경하지 않고 Node ESM child로 실제 SQL producer를 읽어 PG에서 실행했다. 최종 집중117/117(격리 DB24+공급자41+Google 은퇴17+Demo/provision35),Node census/cleanup24·CLI3 typecheck PASS.

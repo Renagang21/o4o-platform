@@ -35,8 +35,9 @@
  *   npx tsx --env-file=.env src/scripts/demo-account-provision.ts --apply    # 수치 확인 후
  */
 import 'reflect-metadata';
+import { assertFoundationDemoProvisionIdentity, DEMO_REQUIRED_MEMBERSHIPS } from './demo-account-reconcile.service.js';
 import { DataSource } from 'typeorm';
-import { normalizeLoginEmail } from '@o4o/auth-utils';
+import { normalizeLoginEmail, PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 // 싱글턴을 그대로 쓴다 — 해시 정책(bcrypt cost 12 · 72바이트 상한)을 이 스크립트가 다시 쓰지 않는다.
 // 기본 연결이 AppDataSource 라서, entity 를 싣지 않는 이 스크립트의 DataSource 를 manager 로 넘긴다.
 import { passwordCredentialService } from '../services/auth/password-credential.service.js';
@@ -47,22 +48,22 @@ const APPLY = process.argv.includes('--apply');
 const DEMOS = [
   {
     demoType: 'STORE_OWNER' as const,
-    email: 'teststoreowner@example.com',
+    email: PUBLIC_DEMO_ACCOUNTS[0].email,
     name: '매장 경영자 Demo',
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
-    serviceKeys: ['kpa-society', 'neture', 'lecture', 'community'],
+    serviceKeys: DEMO_REQUIRED_MEMBERSHIPS.STORE_OWNER,
     /** Approved Store pharmacy marker; unrelated to KPA personal membership. */
     roles: ['neture:store_owner'],
   },
   {
     demoType: 'SUPPLIER' as const,
-    email: 'testsupplier@example.com',
+    email: PUBLIC_DEMO_ACCOUNTS[1].email,
     name: '공급자 Demo',
     /** 기존 조직을 쓰지 않는다 — 셋 다 실제 주문·실제 신청과 얽혀 있다(§주석 상단). 새로 만든다. */
     organizationId: null,
     newOrganization: { name: 'O4O 공급자 Demo', code: 'O4O-SUPPLIER-DEMO', type: 'supplier' },
-    serviceKeys: ['supplier', 'neture', 'lecture', 'community'],
+    serviceKeys: DEMO_REQUIRED_MEMBERSHIPS.SUPPLIER,
     /** web-neture SupplierRoute 의 SUPPLIER_ROLES 정본(NETURE_ROLES.SUPPLIER). 데이터 범위는 위 ownership 이 정한다. */
     roles: ['neture:supplier'],
   },
@@ -82,7 +83,7 @@ const ALLOWED_DEMO_ROLES: ReadonlySet<string> = new Set(['neture:store_owner', '
 
 function createDataSource(): DataSource {
   const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
-  if (!DB_HOST || !DB_USERNAME || !DB_PASSWORD || !DB_NAME) {
+  if (!DB_HOST || !DB_USERNAME?.trim() || !DB_PASSWORD || !DB_NAME?.trim()) {
     const presence = (v?: string) => (v ? 'SET' : 'MISSING');
     throw new Error(
       `Missing required database environment variables.\n` +
@@ -107,10 +108,11 @@ function createDataSource(): DataSource {
 }
 
 const ds = createDataSource();
+const runner = ds.createQueryRunner();
 
 type Row = Record<string, unknown>;
 const one = async (sql: string, params: unknown[] = []): Promise<Row | undefined> =>
-  (await ds.query(sql, params))[0];
+  (await runner.query(sql, params))[0];
 
 async function assertPreconditions(): Promise<void> {
   const demo = await one(
@@ -119,6 +121,7 @@ async function assertPreconditions(): Promise<void> {
   if ((demo?.c as number) !== 1) {
     throw new Error('demo_accounts 테이블이 없다 — migration 1790940000000 선행 필요');
   }
+  await assertFoundationDemoProvisionIdentity(runner);
   // 금지 대상이 실수로 들어오지 않았는지 — 상수 자체를 검사한다.
   for (const d of DEMOS) {
     if (d.organizationId && FORBIDDEN_ORG_PREFIXES.some((p) => d.organizationId!.startsWith(p))) {
@@ -132,13 +135,16 @@ async function assertPreconditions(): Promise<void> {
 
 /** 접두 8자로 받은 조직 id 를 전체 uuid 로 확정한다(사람이 읽은 census 값을 그대로 쓰기 위해). */
 async function resolveOrganization(prefix: string): Promise<{ id: string; name: string }> {
-  const rows = await ds.query(`SELECT id, name FROM organizations WHERE id::text LIKE $1`, [`${prefix}%`]);
+  const rows = await runner.query(`SELECT id, name FROM organizations WHERE id::text LIKE $1`, [`${prefix}%`]);
   if (rows.length !== 1) throw new Error(`조직 접두 ${prefix} 가 ${rows.length} 건에 일치한다 — 중단`);
   return rows[0];
 }
 
 async function run(): Promise<void> {
   await ds.initialize();
+  await runner.connect();
+  await runner.startTransaction('SERIALIZABLE');
+  if (!APPLY) await runner.query('SET TRANSACTION READ ONLY');
   console.log(`mode: ${APPLY ? 'APPLY (write)' : 'DRY-RUN (measure only)'}`);
   await assertPreconditions();
 
@@ -172,10 +178,11 @@ async function run(): Promise<void> {
     const willHaveUser = Boolean(userId) || (!existing && !APPLY);
     let pwAction = willHaveUser ? 'CREATE(plan)' : 'skip';
     if (userId) {
-      const has = await passwordCredentialService.hasPassword(userId, ds);
+      const has = await passwordCredentialService.hasPassword(userId, runner.manager);
       pwAction = has ? 'exists(keep)' : 'CREATE';
       if (!has && APPLY) {
-        await passwordCredentialService.setPassword(userId, 'testmail1!', ds);
+        const credential = PUBLIC_DEMO_ACCOUNTS.find(account => account.type === demo.demoType)!;
+        await passwordCredentialService.setPassword(userId, credential.password, runner.manager);
         writes += 1;
       }
     }
@@ -186,7 +193,7 @@ async function run(): Promise<void> {
       const reg = await one(`SELECT id FROM demo_accounts WHERE user_id = $1`, [userId]);
       regAction = reg ? 'exists' : 'CREATE';
       if (!reg && APPLY) {
-        await ds.query(`INSERT INTO demo_accounts (user_id, demo_type) VALUES ($1, $2)`, [userId, demo.demoType]);
+        await runner.query(`INSERT INTO demo_accounts (user_id, demo_type) VALUES ($1, $2)`, [userId, demo.demoType]);
         writes += 1;
       }
     }
@@ -227,7 +234,7 @@ async function run(): Promise<void> {
       );
       ownerAction = member ? 'exists' : 'CREATE';
       if (!member && APPLY) {
-        await ds.query(
+        await runner.query(
           `INSERT INTO organization_members (organization_id, user_id, role, is_primary) VALUES ($1, $2, 'owner', true)`,
           [orgId, userId],
         );
@@ -242,7 +249,7 @@ async function run(): Promise<void> {
       const sup = await one(`SELECT id FROM neture_suppliers WHERE organization_id = $1`, [orgId]);
       supplierAction = sup ? 'exists' : 'CREATE';
       if (!sup && APPLY) {
-        await ds.query(
+        await runner.query(
           `INSERT INTO neture_suppliers (slug, status, organization_id, representative_name)
            VALUES ($1, 'ACTIVE', $2, $3)`,
           ['o4o-supplier-demo', orgId, demo.name],
@@ -255,7 +262,7 @@ async function run(): Promise<void> {
     if (demo.demoType === 'STORE_OWNER' && userId && orgId) {
       const pharmacy = await one(`SELECT id FROM neture_pharmacy_memberships WHERE organization_id = $1`, [orgId]);
       if (!pharmacy && APPLY) {
-        await ds.query(
+        await runner.query(
           `INSERT INTO neture_pharmacy_memberships (organization_id, applicant_user_id, status,
              pharmacy_name, business_number, pharmacist_license_number, reason)
            VALUES ($1, $2, 'active', $3, '0000000000', 'DEMO-ONLY', 'Synthetic public experience account')`,
@@ -276,7 +283,7 @@ async function run(): Promise<void> {
       const m = await one(`SELECT id FROM service_memberships WHERE user_id = $1 AND service_key = $2`, [userId, key]);
       memberships.push(`${key}:${m ? 'exists' : 'CREATE'}`);
       if (!m && APPLY) {
-        await ds.query(
+        await runner.query(
           `INSERT INTO service_memberships (user_id, service_key, status) VALUES ($1, $2, 'active')`,
           [userId, key],
         );
@@ -298,7 +305,7 @@ async function run(): Promise<void> {
       );
       roleActions.push(`${role}:${r ? 'exists' : 'CREATE'}`);
       if (!r && APPLY) {
-        await ds.query(
+        await runner.query(
           `INSERT INTO role_assignments (user_id, role, is_active, valid_from, assigned_at, created_at, updated_at)
            VALUES ($1, $2, true, NOW(), NOW(), NOW(), NOW())`,
           [userId, role],
@@ -318,11 +325,16 @@ async function run(): Promise<void> {
   console.log('');
   console.log(`TOTAL writes=${APPLY ? writes : 0} (dry-run 은 항상 0)`);
   if (!APPLY) console.log('no rows written — re-run with --apply after reviewing the plan above');
+  if (APPLY) await runner.commitTransaction();
+  else await runner.rollbackTransaction();
+  await runner.release();
   await ds.destroy();
 }
 
 run().catch(async (e) => {
   console.error(`demo-account-provision FAILED: ${e instanceof Error ? e.message : String(e)}`);
+  if (runner.isTransactionActive) await runner.rollbackTransaction();
+  if (!runner.isReleased) await runner.release();
   if (ds.isInitialized) await ds.destroy();
   process.exit(1);
 });

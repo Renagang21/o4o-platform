@@ -1,6 +1,8 @@
 # O4O-CANONICAL-DEMO-ACCOUNTS-V1
 
-> **2026-10-07 갱신**: 모든 사용자 서비스 로그인 화면에 두 테스트 로그인 버튼을 제공한다. credential의 공통 코드 정본은 `packages/auth-utils/src/demoAccounts.ts`다. 매장 Demo는 합성 약국 승인 원장과 `neture:store_owner` 표식으로 접근하며 KPA 회원 승인으로 접근을 얻지 않는다. 인가 우회·관리자 권한은 없다.
+> **2026-10-12 최신 확정**: 사용자가 제공한 매장 경영자·공급자·직원 세 계정을 전체 사용자 로그인 버튼과 연결 데이터의 정본으로 전환한다. 직원은 같은 체험 약국의 직원 권한만 가지며 전체관리자·운영자 계정은 포함하지 않는다. 값의 단일 정본은 공통 코드이며 구현·운영 반영은 인증 WO의 T01~T08에서 별도로 기록한다.
+
+> **2026-10-07 갱신**: 모든 사용자 서비스 로그인 화면에 테스트 로그인 버튼을 제공한다. credential의 공통 코드 정본은 `packages/auth-utils/src/demoAccounts.ts`다. 매장 Demo는 합성 약국 승인 원장과 `neture:store_owner` 표식으로 접근하며 KPA 회원 승인으로 접근을 얻지 않는다. 인가 우회·관리자 권한은 없다.
 
 > 발행: 2026-10-01 · 상태: **ACTIVE (정책 정본)**
 > 집행 WO: [`WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1`](../work-orders/WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1.md)
@@ -10,8 +12,9 @@
 
 ## 0. 한 줄 요약
 
-O4O 의 Demo 계정은 **테스트 로그인 계정이 아니다.** 공개 체험 진입점이자 **개발 샘플 데이터의 정본
-소유자**다. 앞으로 개발 중 필요한 테스트 데이터는 임의 계정을 새로 만들지 않고 **이 두 계정에 붙인다.**
+O4O의 Demo 계정은 공개 체험 진입점과 개발 샘플 데이터 계정이다. 경영자·공급자·직원 세 계정을
+공통 정본으로 사용한다. 샘플 매장·공급자 데이터는 경영자·공급자의 소유권에 연결하고 직원은
+같은 체험 매장의 승인된 직원 관계로 접근한다.
 
 ---
 
@@ -28,8 +31,13 @@ O4O 의 Demo 계정은 **테스트 로그인 계정이 아니다.** 공개 체�
 
 | 구분 | 로그인 아이디 | 비밀번호 | 용도 | 데이터 축 |
 |---|---|---|---|---|
-| **Store Owner Demo** | `teststoreowner@example.com` | `testmail1!` | 매장 경영자 체험 | 매장 · 약국 · POP · 사이니지 · 매장 콘텐츠 · 주문 작업대 · 상품 진열 |
-| **Supplier Demo** | `testsupplier@example.com` | `testmail1!` | 공급자 체험 | 공급자 · 상품 · B2B 콘텐츠 · 상품 승인 · 서비스 배포 |
+| **Store Owner Demo** | 공통 정본 `STORE_OWNER`의 email | 공통 정본 password | 매장 경영자 체험 | 매장 · 약국 · POP · 사이니지 · 매장 콘텐츠 · 주문 작업대 · 상품 진열 |
+| **Supplier Demo** | 공통 정본 `SUPPLIER`의 email | 공통 정본 password | 공급자 체험 | 공급자 · 상품 · B2B 콘텐츠 · 상품 승인 · 서비스 배포 |
+| **Store Staff Demo** | 공통 정본 `STORE_STAFF`의 email | 공통 정본 password | 매장 직원 체험 | 같은 Demo 약국의 직원 업무 · 소유/직원 관리 제외 |
+
+**2026-10-12 사용자 확정:** 제공한 세 테스트 계정으로 전체 버튼·registry·데이터 연결을 전환한다.
+주소·비밀번호의 코드 정본은 `packages/auth-utils/src/demoAccounts.ts` 하나이며 직원 credential은
+경영자·공급자와 다르다. 전체관리자·운영자의 Google 계정은 이 Demo 계정에 포함하지 않는다.
 
 ---
 
@@ -42,14 +50,14 @@ O4O 의 Demo 계정은 **테스트 로그인 계정이 아니다.** 공개 체�
 
 ## 4. 이 비밀번호의 의미 — **공개 정보**
 
-`testmail1!` 은 secret 이 아니다. 사용자가 직접 입력해도 되고 Demo 버튼이 대신 넣어도 된다.
+공통 정본의 세 Demo credential은 사용자가 공개를 허용한 체험용 정보다. 직접 입력하거나 버튼으로 로그인할 수 있다.
 다만 **여러 곳에 하드코딩하지 않고 한 곳(config/helper)에서 관리**한다.
 
 공개해도 되는 근거는 **데이터 격리**다. Demo 사용자는 일반 사용자와 같은 identity 구조로 로그인하고,
 보는 매장 · 공급자 등 데이터는 그 Demo 사용자의 ownership 에 귀속되어 다른 사용자 데이터와 연결되지
 않는다(§18-1 "데이터 범위는 role 이 아니라 ownership 이 정한다"). 따라서 문서의 비밀번호 금지 규칙에서
 이 공개 credential 은 예외다 — [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
-예외는 이 정본의 Demo 2계정에 한정한다.
+예외는 이 정본이 정한 Demo 3계정에 한정한다.
 
 ## 5. 일반 사용자와 다른 점
 
@@ -166,7 +174,7 @@ V1 은 완전한 sandbox 를 만들지 않는다 — **명확히 위험한 것�
 처음 방문하셨나요?
 테스트 계정으로 O4O 서비스를 둘러볼 수 있습니다.
 
-[ 공급자 화면 둘러보기 ]  [ 매장 경영자 화면 둘러보기 ]
+[ 공급자 화면 둘러보기 ]  [ 매장 경영자 화면 둘러보기 ]  [ 매장 직원 화면 둘러보기 ]
 
 이메일 / 비밀번호 / [로그인]      또는      [ Google 계정으로 계속 ]
 ```
@@ -205,8 +213,9 @@ REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 ## 15. 개발 데이터 생성 원칙
 
 ```text
-매장 데이터가 필요하면   → teststoreowner@example.com
-공급자 데이터가 필요하면 → testsupplier@example.com
+매장 데이터가 필요하면   → STORE_OWNER Demo의 기존 사용자 ID
+공급자 데이터가 필요하면 → SUPPLIER Demo의 기존 사용자 ID
+직원 체험이 필요하면     → STORE_STAFF Demo와 같은 체험 약국의 직원 관계
 ```
 
 에이전트가 `test1@` · `supplier123@` · `storetest@` 같은 사용자를 계속 만들지 않는다.
@@ -237,12 +246,13 @@ platform:* 없음 · admin-dashboard 접근 금지
 ### 18-1. service-scoped role allowlist (2026-10-02 확정)
 
 Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결" 이 그것이고, 그게 없으면
-체험 화면에 들어가지 못한다. 다만 **허용 범위는 이 둘로 고정**한다.
+체험 화면에 들어가지 못한다. 다만 **허용 범위는 아래 세 값으로 고정**한다.
 
 | | role | 쓰는 곳 |
 |---|---|---|
 | Store Owner Demo | `neture:store_owner` | `isStoreOwner('kpa')` — store-contents · store-playlists 진입 |
 | Supplier Demo | `neture:supplier` | web-neture `SupplierRoute` 의 `SUPPLIER_ROLES` |
+| Store Staff Demo | `kpa:store_member` | 승인 체험 약국의 활성 `staff` 관계와 함께 직원 접근 |
 
 ```text
 금지  platform:*  ·  admin  ·  operator  ·  *:admin  ·  *:operator  ·  그 밖의 모든 role
@@ -252,14 +262,19 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 운영 권한으로 번지지 않게 **허용값을 좁게 적는다** — Demo 는 공개 credential 을 쓰므로, 역할이
 하나 넓어지면 그만큼이 공개된다.
 
-데이터 범위는 role 이 아니라 **ownership** 이 정한다. route guard 를 "Demo 니까" 로 우회하지 않는다.
+데이터 범위는 **Demo 조직 소유권과 승인된 직원 관계**가 정한다. 직원은 같은 Demo 약국만 사용하며 소유·직원 관리 권한을 받지 않는다. route guard 를 "Demo 니까" 로 우회하지 않는다.
 
 구현 · 계약:
 
 ```text
-CLI      apps/api-server/src/scripts/demo-account-provision.ts
+PAUSED   apps/api-server/src/scripts/demo-account-provision.ts
+         foundation 신규 생성은 운영 실행 대상 아님; 별도 대상 검토 후 재개
          ALLOWED_DEMO_ROLES = { neture:store_owner, neture:supplier }
          목록 밖 role 은 DB 를 건드리기 전(assertPreconditions)에 거절한다
+ACTIVE   apps/api-server/src/scripts/demo-account-reconcile.ts
+         기존 경영자/공급자 UUID 유지·고정 credential 정정·직원 registry/관계 + kpa:store_member
+         기본 read-only plan·정확한 before-image digest·일괄 transaction·변경 세션 폐기
+         foundation provision도 registry 주소 불일치 시 쓰기 전 중단; 계정/credential/registry/관계는 같은 transaction
 계약     src/scripts/__tests__/demo-account-provision.contract.test.ts ⑦
          allowlist 값 · 실제 부여 role · 금지 prefix · 선행 거절 · INSERT guard 순서를 고정
 ```
@@ -297,3 +312,13 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 ---
 
 *Created: 2026-10-01*
+
+**전환 시 서비스 연결 검증:** 세 Demo 유형 모두 `DEMO_REQUIRED_MEMBERSHIPS`의 필수 가입 상태를 확인한다. 이 map은 foundation provision과 reconcile의 공통 정본이다. 기존 Demo의 누락 연결은 같은 user ID에 생성하며, 기존 pending/suspended/withdrawn 연결을 active로 바꾸지 않는다. 필요한 membership·role 의도는 검토 digest에 포함한다. 로그인 성공만으로 Lecture 등 기능 이용 가능을 판정하지 않는다.
+
+운영 실행 분류는 [API scripts inventory](operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)가 정본이다. 현재 기존 Demo 전환은 ACTIVE reconcile만 사용한다. foundation은 PAUSED로 유지하며 이 지시로 새 foundation 생성까지 자동 실행하지 않는다.
+
+**단일 업무공간 검증:** 전환 시 기존 런타임 해석기로 승인 약국 후보(owner/admin/manager 포함)와 canonical 공급자 후보를 확인한다. 경영자는 의도한 약국의 owner 후보1개, 공급자는 ACTIVE 후보1개여야 한다. 다른 조직의 관계를 삭제·임의 선택하거나 Demo 역할을 넓혀 복수 컨텍스트를 숨기지 않는다.
+
+**반대 도메인 관계 보호:** 각 유형은 의도한 조직과 역할의 활성 관계만 허용한다. 매장 경영자·직원의 canonical 공급자 관계 또는 legacy supplier pointer, 공급자의 반대 매장 관계가 있으면 공유 credential 적용 전 중단한다. legacy pointer 검사는 기존 supplier resolver 안의 read-only protection probe이며 컨텍스트 선택/권한 부여/로그 식별자 출력은 하지 않는다.
+
+**registry·census:** target user에 비활성 Demo registry가 있으면 plan에서 명확히 중단하고 자동 재활성화/중복 insert하지 않는다. staff가 생성한 user-scoped membership/role/creator 행과 활성 staff 조직 관계는 매장 Demo census에 포함하며 owner/staff가 같은 조직을 가리켜도 행을 중복 집계하지 않는다.

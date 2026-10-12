@@ -47,7 +47,7 @@ interface LoginModalProps {
   returnUrl?: string;
 }
 
-/** All user service hosts expose both public experience accounts. */
+/** All user service hosts expose the three canonical public experience accounts. */
 const VISIBLE_DEMO_ACCOUNTS = DEMO_ACCOUNTS;
 
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
@@ -154,7 +154,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       return;
     }
 
-    // 매장 경영자: 홈 매장 버튼과 같은 handoff 로 Store Workspace 에 바로 들어간다.
+    // 매장 경영자·직원: 홈 매장 버튼과 같은 handoff로 각자의 자격에 맞는 Store Workspace로 이동한다.
     //   로그인은 이미 성공했다 — 이동만 실패한 경우를 로그인 실패와 구분해 안내한다.
     try {
       window.location.assign(await resolveSingleStoreWorkspaceUrl(result.user));
