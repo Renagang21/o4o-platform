@@ -1,9 +1,11 @@
 # KPA-BRANCH-ROLE-MATRIX-V1 — 약사 분회 서비스 역할 · 접근 행렬
 
 > **상태**: ACTIVE · **작성일**: 2026-10-06 · `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`
+> **최종 갱신**: 2026-10-12 · 사용자 결정에 따른 개발 인계 표기 추가. 현행 권한 계약 변경 없음.
 > **범위**: serviceKey `kpa-branch`(약사 분회 서비스)의 role · 분회 소속 · 접근 판정. KPA Society(`kpa:*`) 역할은 [`KPA-ROLE-MATRIX-V1`](KPA-ROLE-MATRIX-V1.md) 이 다룬다.
 > **성격**: 현행 코드를 정본화한 문서다. 권한 · role · route 를 새로 정하지 않는다 — 코드와 다르면 코드를 기준으로 이 문서를 정정한다.
 > **판정 SSOT(코드)**: `apps/api-server/src/middleware/kpa-branch-scope.middleware.ts` · `apps/api-server/src/routes/kpa-branch/kpa-branch.routes.ts`
+> **개발 인계 (2026-10-12 사용자 결정)**: 현재 통합 작업에서 분회 추가 개발·배포를 중단하고 신규 개발자가 전면 정비한다. 현행 서비스·권한 계약은 유지하며 서비스 폐기를 뜻하지 않는다. [현황·인수 기록](../investigations/IR-O4O-KPA-BRANCH-DEVELOPER-HANDOFF-V1.md)에서 코드·데이터·배포 미완료와 재개 조건을 확인한다.
 
 ---
 
