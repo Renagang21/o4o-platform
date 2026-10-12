@@ -122,3 +122,7 @@ read-only plan 38128450487은 주문 판매자/조직 참조(각 컬럼 14행), 
 QR 수정 PR #483은 main에 통합됐고 PR CI 38141045320·main CI 38141731196·main CodeQL 38141731191을 통과했다. Delivery 38142342005는 WIF authentication의 `unauthorized_client / rejected by the attribute condition`으로 실패해 API build·migration·배포 job이 모두 skip됐다. 운영 QR 경계 수정은 아직 미반영이며 배포 TODO를 완료 처리하지 않는다. 실패 후 기존 운영 readiness/QR namespace/없는 QR의 read-only HEAD 3개는 PASS지만 새 버전 서빙 확인은 미실행이다. 현재 GCP provider 조회용 관리자 연결이 없는 상태와 task worktree KEEP은 후속 WO에 기록한다.
 
 후속 main PR #475의 [PH 퇴역 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)에 사용자 승인으로 WIF 기존 조건 뒤의 `&& false`를 적용한 격리 창이 기록돼 있다. QR 배포는 해당 PH 작업의 종료·원래 조건 복구 후 재개하며 이 제한을 우회하거나 임의 해제하지 않는다. 상세 근거와 결과 기록 main 통합 보류·worktree KEEP은 QR 소유 경계 WO에 기록한다.
+
+## QR 소유 경계 배포 완료 — 2026-10-12
+
+WIF 제한 복구 후 Delivery 38188251558에서 API 배포 및 실제 서빙 확인이 성공했다(target `20ed384b1591c23bad53b14d99b7531e23dac1f2`, production DEPLOYED). 배포된 QR 소스는 회귀 65개·격리 QR SQL 4개를 통과한 수정 소스와 동일하다. 배포 후 readiness 및 QR read-only HEAD 3개도 PASS다. 앞의 인증 차단·배포 미완료·고정 SHA 대기는 이전 단계 이력이며 QR 수정은 현재 배포 완료다. 상세 결과는 QR 소유 경계 WO에 기록한다. 기존 관리자 인증 원본 편집·두 정상 업무 매장·실제 QR/태블릿 기기 검증은 별도 열린 TODO이며 완료 처리하지 않는다.

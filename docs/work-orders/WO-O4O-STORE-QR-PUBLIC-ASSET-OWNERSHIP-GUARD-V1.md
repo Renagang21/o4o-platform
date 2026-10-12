@@ -1,7 +1,7 @@
 # QR 공개 자료의 매장 소유 경계 수정
 
-> 상태: ACTIVE
-> 작성일: 2026-10-11 · 최종 갱신: 2026-10-11
+> 상태: COMPLETED
+> 작성일: 2026-10-11 · 최종 갱신: 2026-10-12
 > 근거: [잔여 업무 TODO](WO-O4O-STORE-REMAINING-WORKFLOW-VERIFICATION-V1.md)
 > 범위: 공개 QR 자료 조회 경계 수정·회귀 검증·main 통합·운영 API 배포
 
@@ -22,8 +22,9 @@ JOIN에 `li.organization_id = qr.organization_id`를 추가한다. QR과 동일 
 - [x] 별도 CMS 계정 전제 수정 및 미실행 운영·기기 TODO 명시
 - [x] 필수 PR CI·미해결 리뷰 확인·main 통합
 - [x] main 사후 CI·CodeQL 확인
-- [ ] Delivery WIF 인증 차단 해소 후 정상 배포·서빙 확인
-- [ ] 배포 후 공개 read-only smoke·결과 문서 정합·자기 worktree 정리
+- [x] Delivery WIF 인증 차단 해소 후 정상 배포·서빙 확인
+- [x] 배포 후 공개 read-only smoke·결과 문서 정합
+- [x] 자기 worktree 종료 판정 (아래 표준 정리 조건 적용)
 
 실제 SQL 4개는 수정 전 조회의 타 매장 제목·본문·이미지 노출 재현, 수정 후 해당 필드 모두 차단, 같은 매장 활성 자료 표시, 비활성 자료 제외다. 현재 서비스 소스의 첫 SELECT를 그대로 추출해 임의 이름의 자기 로컬 DB에서 실행했으며 SQL을 별도로 복제한 fixture 조회로 검증하지 않았다. DDL 전에 control system identifier·backend/postmaster·socket/port를 검증했고 종료 시 자기 DB를 삭제했다. 운영 DB 쓰기는 없고 fixture 식별자는 비공개 실행 기록에만 보관한다.
 
@@ -57,7 +58,7 @@ PR [#483](https://github.com/Renagang21/o4o-platform/pull/483)의 head `8d07bb94
 
 본 WO의 연속 결과 기록 Phase는 동일 worktree/branch를 사용한다. 통합 후 main 사후 CI 38141731196 및 실제 Delivery·서빙 결과를 확인하고 아래 기록을 갱신한다. code merge를 운영 배포 완료로 해석하지 않는다.
 
-## 배포 실행과 확인된 차단
+## 배포 실행과 당시 차단 이력
 
 main 사후 CI 38141731196과 CodeQL 38141731191은 성공했다. 자동 Delivery [38142342005](https://github.com/Renagang21/o4o-platform/actions/runs/38142342005)는 같은 main commit에서 실행됐으나 Classify의 `Authenticate to Google Cloud` 단계에서 `unauthorized_client / rejected by the attribute condition`으로 실패했다. API build·migration·revision 배포·traffic 전환·Report는 모두 skip이다. production commit status는 만들어지지 않았으며 **운영 배포는 미완료**다.
 
@@ -69,8 +70,18 @@ GitHub OIDC subject 설정은 기본 subject이고 executor의 outbound identity
 
 환경의 기존 install 설정은 유지하고, 사용한 workspace 내 pnpm cache/data 설정 및 이 차단·계정 기준을 start_skill draft에 저장했다. draft 저장은 환경 게시나 GCP provider 변경이 아니다. 이 WO는 배포 TODO 때문에 ACTIVE이며 자체 worktree/branch 판정은 KEEP이다. parent의 운영 원본 편집·두 업무 매장·물리 기기 TODO도 미완료다.
 
-### 최신 main에서 확인한 승인된 WIF 격리 창
+### 당시 main에서 확인한 승인된 WIF 격리 창
 
 후속 fetch에서 PR #475의 main `a3462a0256877b641e433e7e9630173540dd8137`을 확인했다. [PH 퇴역 TODO](WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)의 “WIF 일시 차단 적용 확인”은 사용자가 provider 기존 조건 뒤의 `&& false` 추가를 승인했고 로컬 IAM 관리자가 update/describe로 적용을 확인했다고 기록한다. 이후 검증된 main SHA의 PH workflow만 일시 허용해 남은 자원 정리를 끝내고 원래 조건을 복구하는 순서다. 이는 다른 작업의 승인된 공유 운영 격리이며 이번 작업이 임의 해제하거나 별도 credential/허용 workflow로 회피할 대상이 아니다.
 
 이 기록과 현재 두 인증 실패가 일치한다. 이 세션이 GCP provider를 직접 describe한 것은 아니며 관리자 연결 요구로 PH 작업의 복구 절차를 대체하지 않는다. PH 세션에서 격리 종료·원래 조건 복구를 확인한 뒤 최신 main의 CI/freeze/Delivery risk 및 동시 운영 작업 상태를 재확인해 QR 배포를 재개한다. 고정 main SHA를 사용하는 PH 실행 창에서 임의 main 통합으로 대상 SHA를 바꾸지 않도록, 이번 추가 결과 문서는 branch에 push해 보존하고 그 창의 종료 전 main 통합은 보류한다. 배포 TODO는 ACTIVE·worktree는 KEEP이다.
+
+## 운영 배포·사후 검증 완료 — 2026-10-12
+
+PH 퇴역 WO의 원래 WIF 조건 복구 기록과 실제 인증 smoke 38187804879 SUCCESS를 확인했다. 이 작업은 WIF/provider/OIDC 설정을 변경하지 않았다. [Delivery 38188251558](https://github.com/Renagang21/o4o-platform/actions/runs/38188251558)는 main `20ed384b1591c23bad53b14d99b7531e23dac1f2`에서 API build-and-deploy 및 Report가 성공했고 production status는 DEPLOYED다. 이 target은 QR 수정 commit을 포함하며 해당 QR 서비스 소스는 격리 SQL/회귀 테스트를 통과한 `8d07bb9462c15ae3435dbfbd46f90e3dac252d51`의 소스와 byte-identical임을 확인했다. main CI 38188139756도 SUCCESS다.
+
+배포 후 TLS 검증을 유지한 read-only HEAD smoke 3개는 PASS다: readiness 200, slug-less QR namespace 404 + read-only marker, 임의 미등록 QR 404 + marker/no-store. 모든 body는 0 bytes이고 운영 QR scan을 요청하지 않았다. 실제 타 매장 자료를 연결하거나 운영 fixture를 만들지 않았다. 로컬 SQL 4개·focused 65개 결과와 배포된 정확한 소스·서빙 확인을 결합한 검증이며 물리 QR 스캔/태블릿 출력 확인은 아니다.
+
+앞 절의 WIF 차단·main 통합 보류·KEEP은 당시 단계 기록이며 현재 미완료 상태가 아니다. 결과 기록 PR #486은 같은 WO의 연속 Phase로 최신 main을 통합해 갱신한다. 결과 문서는 runtime 무영향으로 추가 서비스 배포 NOT_APPLICABLE이다. 필수 PR CI·리뷰·main 반영·문서 main 사후 CI 확인 후 아래 정리 조건을 적용한다.
+
+WORKTREE_DISPOSITION: 자기 commit의 main 포함·post-merge CI PASS·uncommitted/untracked 0·진행 중 operation 없음·보존할 private artifact는 checkout 밖에 있음·다른 세션 사용 없음·symlink 비재귀 해제 및 재스캔 0을 확인하면 SAFE_TO_REMOVE다. 이 세션의 `/workspace/o4o-wt/store-remaining-workflow-closure` 및 `wo/store-remaining-workflow-closure`만 삭제한다. parent WO의 운영 계정 원본 편집·두 정상 매장·물리 기기 TODO는 별도이며 이번 QR 수정 WO의 완료 판정을 대신하지 않는다.
