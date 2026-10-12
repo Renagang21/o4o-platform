@@ -68,7 +68,8 @@ export class PharmacyHubAdministrativePurge {
                 throw new Error('PH_PURGE_FK_SHAPE');
             const root = byTable.get(fk.target);
             const source = fk.schema === 'public' ? byTable.get(fk.table) : undefined;
-            const bridge = fk.schema === 'public' && fk.table === 'role_permissions' && fk.target === 'roles';
+            const bridge = fk.schema === 'public' && fk.table === 'role_permissions' && fk.target === 'roles'
+                && fk.source_columns.length === 1 && fk.source_columns[0] === 'role_id' && fk.target_columns[0] === 'id';
             const owned = bridge ? 'TRUE' : source ? ph(`s.${id(source.column)}`) : 'FALSE';
             const join = fk.source_columns.map((c, i) => `s.${id(c)}=p.${id(fk.target_columns[i])}`).join(' AND ');
             if (await count(`SELECT count(*)::text AS count FROM ${id(fk.schema)}.${id(fk.table)} s
