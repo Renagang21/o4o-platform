@@ -26,11 +26,15 @@
 - 채널·태블릿의 필수 source loader와 태블릿 미디어 자료함 병합을 화면 밖으로 분리했다. source 실패 시 빈 배열을 만들어 편집하지 않고 오류·재시도를 제공한다. 태블릿 변경 시 이전 pool·진열·대기 자료를 비우고 이전 응답을 무시한다.
 - API/Role 4 suites / 55 tests PASS. 웹 8 files / 50 tests PASS. 트랜잭션 rollback 검사는 unit fixture이며 실제 운영 DB 동시 변경 검증이 아니다.
 - API tsc noEmit·웹 타입 포함 production build PASS. 저장소 ESLint ratchet PASS(기존 46 errors baseline 유지), 변경 파일 ESLint 0 errors(기존 unused-disable warning 1개). 문서 민감정보 검사 PASS.
-- Chromium 합성 API fixture: QR·사이니지·태블릿·현역 서비스 경로의 채널 화면, 1280px·375px에서 조회 실패 안내→재시도→정상 빈 목록 및 화면 오류 없음 30 assertions PASS. 실제 계정·운영 데이터·물리 기기 검증과 구분한다.
+- Chromium 합성 API fixture: QR·사이니지·태블릿·현역 서비스 경로의 채널 화면, 1280px·375px에서 조회 실패 안내→재시도→정상 빈 목록 및 화면 오류 없음 36 assertions PASS. 실제 계정·운영 데이터·물리 기기 검증과 구분한다.
 - 후속 화면 폼·출력 구성요소의 추가 분리는 유지보수 후보이며 이번에는 확인된 조회·상태 경계를 분리했다. 기존 route·Core UI·출력·결제 계약은 유지한다.
 
 ## PR 리뷰 보완
 
-[PR #514](https://github.com/Renagang21/o4o-platform/pull/514)의 최초 CI·CodeQL·정책 검사 PASS. P2 두 건을 보완했다: 태블릿 목록 실패는 목록 resource loader를 다시 실행하며, QR 상품 편집 종료·유형 변경 시 관련 오류를 지우고 재시도 버튼을 감춘다. PC·모바일 30개 합성 화면 확인에 두 재현을 포함해 PASS다. 최신 main의 다른 작업 문서도 충돌 없이 통합했다.
+[PR #514](https://github.com/Renagang21/o4o-platform/pull/514)의 최초 CI·CodeQL·정책 검사 PASS. P2 두 건을 보완했다: 태블릿 목록 실패는 목록 resource loader를 다시 실행하며, QR 상품 편집 종료·유형 변경 시 관련 오류를 지우고 재시도 버튼을 감춘다. PC·모바일 36개 합성 화면 확인에 두 재현을 포함해 PASS다. 최신 main의 다른 작업 문서도 충돌 없이 통합했다.
 
 후속 P2 보완: 상품 관리에서는 사용하지 않는 slug·자료 설정 조회를 요청하지 않는다. 상품 관리가 설정 source의 장애에 막히지 않는 검사를 추가했으며 웹 50개·타입 포함 빌드 PASS다.
+
+태블릿 상세 조회 실패 후 위치 목록으로 돌아오면 이전 상세 오류·pool·진열·대기 목록을 초기화한다. PC·모바일 합성 검증에 상세 실패→목록 복귀를 추가해 36개 PASS다.
+
+CI 38255436395는 변경하지 않은 auth-react 카카오 가입 테스트에서 `resolve is not a function`으로 실패했다(앞선 두 PR CI의 같은 인증 테스트는 PASS). 비동기 terms 요청의 준비 전 테스트 resolve 호출이며 인증 코드는 임의 수정하지 않는다. 현재 보완 커밋의 required CI가 최종 gate다.

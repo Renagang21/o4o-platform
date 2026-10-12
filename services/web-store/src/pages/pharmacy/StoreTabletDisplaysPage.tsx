@@ -544,7 +544,10 @@ export default function StoreTabletDisplaysPage() {
   const tabletLoadRevision = useRef(0);
   const loadTabletData = useCallback(async () => {
     const revision = ++tabletLoadRevision.current;
-    if (!selectedTabletId) return;
+    if (!selectedTabletId) {
+      setError(null); setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
+      return;
+    }
     setLoadingPool(true);
     setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]);
     setError(null);
@@ -985,7 +988,7 @@ export default function StoreTabletDisplaysPage() {
       {/* No tablets (코너별 운영 탭 전용) */}
       {/* Error */}
       {(error || tabletListError) && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+        <div role="alert" className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700">{tabletListError || error}</p>
           <button type="button" disabled={loadingPool || loadingTablets} onClick={() => void (tabletListError ? loadTablets() : loadTabletData())}>다시 시도</button>
