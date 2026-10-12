@@ -1,3 +1,4 @@
+jest.mock('../utils/store-member-access.js', () => ({ findApprovedStoreMemberCandidates: jest.fn(async () => []) }));
 /**
  * WO-O4O-SERVICE-TENANT-FOUNDATION-V1
  *

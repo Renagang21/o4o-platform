@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from '../../../utils/store-member-access.js';
 /**
  * KPA Asset Snapshot Controller
  *
@@ -42,7 +43,7 @@ export function createAssetSnapshotController(
     // content/resource 5종 assetType 전체에 적용되므로, store_owner는 모든 자료 가져가기에 자동 허용된다.
     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 내 매장(약국) 신청 승인 약국(neture:store_owner)도 내 매장 자료함으로
     //   가져온다. 조직은 선택 매장을 반영하는 KPA 어댑터와 내 매장 신청 원장이 확정한다.
-    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner'],
+    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:pharmacist', 'kpa:store_owner', 'neture:store_owner', 'kpa:store_member'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),
     noOrgErrorCode: 'NO_ORGANIZATION',
@@ -85,7 +86,12 @@ export function createAssetSnapshotController(
     const preferred = readPreferredStoreOrganizationId(req);
     const scoped = createAssetCopyController(dataSource, requireAuth, {
       ...config,
-      resolveOrgId: (ds, userId) => resolveKpaContentOrganization(ds, userId, preferred),
+      resolveOrgId: (ds, userId) => {
+        const roles = req.user?.roles ?? [];
+        const delegatedOnly = roles.includes('kpa:store_member') && !roles.some(role => config.allowedRoles.includes(role) && role !== 'kpa:store_member');
+        return delegatedOnly ? resolveApprovedStoreMemberOrganization(ds, userId, 'kpa', preferred)
+          : resolveKpaContentOrganization(ds, userId, preferred);
+      },
     });
     scoped(req, res, next);
   });

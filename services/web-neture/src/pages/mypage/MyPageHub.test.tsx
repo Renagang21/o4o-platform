@@ -38,6 +38,7 @@ vi.mock("../../lib/home-entry", () => ({
 vi.mock("../../components/home/HomeEntryPanel", () => ({
   default: ({ workspaceOnly }: { workspaceOnly?: boolean }) => <p>{workspaceOnly ? "내 업무 바로가기" : "참여 서비스 목록"}</p>,
 }));
+vi.mock("../../components/mypage/MyHomeStoreMembers", () => ({ MyHomeStoreMembers: () => <p>본인 매장 초대 관리</p> }));
 vi.mock("../../components/mypage/MyHomeParticipation", () => ({
   MyHomeParticipation: () => <p>본인 학습과 펀딩 참여 현황</p>,
 }));

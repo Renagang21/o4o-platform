@@ -28,7 +28,7 @@ import { PRODUCT_CLASSIFICATION_CODES, classificationLabel, type ProductClassifi
 import { inferIdentifierTypeFromBarcode, normalizeIdentifier, sanitizeIdentifierValue } from '../../../modules/neture/utils/product-identifier.util.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import logger from '../../../utils/logger.js';
 
 // 출처 라벨 — external_api(공공 seed) / operator import 등과 매장 요청을 구분하는 고정 태그.
@@ -189,7 +189,7 @@ export function createStoreProductRequestController(dataSource: DataSource): Rou
   // WO-O4O-STORE-OWNER-BACKCOMPAT-SERVICEKEY-MIGRATION-V1 §3
   // `/api/v1/store/product-requests` 소비처는 services/web-kpa-society 뿐이다
   // (admin-dashboard 는 `/api/v1/operator/store-product-requests` 를 쓴다).
-  const requireStoreOwner = createRequireStoreOwner(dataSource, 'kpa');
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, 'kpa');
   const candidateRepo = dataSource.getRepository(ProductCandidate);
   const candidateService = new ProductCandidateService(dataSource);
 

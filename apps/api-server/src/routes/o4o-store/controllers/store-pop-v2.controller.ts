@@ -18,7 +18,8 @@
 import { Router, type Request, type Response, type RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { getService } from '../../../config/service-catalog.js';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../platform/entities/store-execution-asset.entity.js';
@@ -99,7 +100,7 @@ export function createStorePopV2Controller(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
   const guards = [requireAuth, requireStoreOwner];
 
   const orgOf = (req: Request): string => (req as any).organizationId;

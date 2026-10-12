@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from '../utils/store-member-access.js';
 /**
  * Signage Role Middleware
  *
@@ -160,6 +161,7 @@ async function resolveLedgerPharmacyStoreEntry(
   const userId = user?.id || user?.userId;
   if (!userId || !AppDataSource.isInitialized) return { status: 'deny' };
   try {
+    if (await resolveApprovedStoreMemberOrganization(AppDataSource, userId, 'kpa', organizationId)) return { status: 'ok' };
     const result = await isStoreOwner(AppDataSource, userId, 'kpa', organizationId);
     if (result.organizationId !== organizationId) return { status: 'deny' };
     if (result.pendingAgreement) return { status: 'agreement', pendingAgreement: result.pendingAgreement };
@@ -167,6 +169,26 @@ async function resolveLedgerPharmacyStoreEntry(
   } catch {
     return { status: 'deny' };
   }
+}
+
+/** Current pharmacy store access never trusts a stale JWT organization claim. */
+async function handlePharmacyWorkspace(req: Request, res: Response, next: NextFunction, denyCode: string, readOnly = false): Promise<boolean> {
+  const serviceKey = getSignageServiceKey(req);
+  if (serviceKey !== 'kpa-society' || hasSignageAdminPermission(req.user) || hasSignageOperatorPermission(req.user, serviceKey)) return false;
+  const organizationId = (req.headers['x-organization-id'] as string) || (req.query.organizationId as string) || req.body?.organizationId;
+  if (!organizationId && !(await hasSignageServiceMembership(req.user, serviceKey))) { denySignageMembership(res, serviceKey); return true; }
+  if (!organizationId) {
+    const status = readOnly || denyCode === 'SIGNAGE_STORE_REQUIRED' ? 400 : 403;
+    res.status(status).json({ success: false, code: status === 400 ? 'ORGANIZATION_ID_REQUIRED' : denyCode, error: '선택한 매장이 필요합니다.' });
+    return true;
+  }
+  const entry = await resolveLedgerPharmacyStoreEntry(req.user, serviceKey, organizationId);
+  if (entry.status === 'deny' && !(await hasSignageServiceMembership(req.user, serviceKey))) { denySignageMembership(res, serviceKey); return true; }
+  if (entry.status === 'deny') { res.status(403).json({ success: false, code: denyCode, error: '선택한 매장에 접근할 수 없습니다.' }); return true; }
+  if (denyUnlessLedgerEntry(res, serviceKey, entry)) return true;
+  req.signageContext = { role: 'store', serviceKey, organizationId, permissions: [`signage:store:${organizationId}${readOnly ? ':read' : ''}`] };
+  next();
+  return true;
 }
 
 /** membership 미보유 시 원장 약국 진입 판정 결과에 맞춘 차단 응답. 통과면 null. */
@@ -427,6 +449,8 @@ export const requireSignageStore = async (
     });
   }
 
+  if (await handlePharmacyWorkspace(req, res, next, 'SIGNAGE_STORE_REQUIRED')) return;
+
   const serviceKey = getSignageServiceKey(req);
 
   // Organization ID can come from header, query, or body
@@ -526,6 +550,8 @@ export const allowSignageStoreRead = async (
     });
   }
 
+  if (await handlePharmacyWorkspace(req, res, next, 'SIGNAGE_ACCESS_DENIED', true)) return;
+
   const serviceKey = getSignageServiceKey(req);
 
   if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
@@ -602,6 +628,8 @@ export const requireSignageOperatorOrStore = async (
       message: 'Authentication required',
     });
   }
+
+  if (await handlePharmacyWorkspace(req, res, next, 'SIGNAGE_ACCESS_DENIED')) return;
 
   const serviceKey = getSignageServiceKey(req);
 

@@ -14,7 +14,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2: 활성 QR = 실제 공개 랜딩 가능 QR(판정식 SSOT).
 import { SCREEN_SET_QR_JOIN, QR_LANDABLE_CONDITION } from '../../platform/store-screen-set-qr.service.js';
 
@@ -28,7 +29,7 @@ export function createStoreAnalyticsController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // ─── GET /pharmacy/analytics/marketing ───────────────────────
   router.get(

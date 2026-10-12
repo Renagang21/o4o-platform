@@ -1,3 +1,4 @@
+import { MyHomeStoreMembers } from '../../components/mypage/MyHomeStoreMembers';
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -91,6 +92,7 @@ function MyHomeContent({ view }: { view: View }) {
       {view === "overview" ? (
         <div id="my-home-overview" className="space-y-5">
           <MyHomeNotifications accountId={user.id} previewLimit={3} />
+          <MyHomeStoreMembers key={user.id} accountId={user.id} onChanged={entry.reload} />
           <HomeEntryPanel
             key={user.id}
             user={user}

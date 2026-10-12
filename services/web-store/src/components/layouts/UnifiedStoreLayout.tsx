@@ -67,12 +67,14 @@ export function StoreAgreementGate({ serviceKey, children }: { serviceKey: Unifi
 /** 사이드바 + 본문(Outlet) — 내 매장 / 서비스 업무가 공유하는 골격 */
 export function StoreWorkDashboard({ config, withCapabilities = false }: { config: StoreDashboardConfig; withCapabilities?: boolean }) {
   const { user, logout } = useAuth();
-  const { organizationName } = useUnifiedStore();
+  const { organizationName, stores, organizationId } = useUnifiedStore();
+  const isStaff = stores.some(store => store.organizationId === organizationId && store.memberRole === 'staff');
+  const visibleConfig = isStaff ? { ...config, menuSections: config.menuSections?.map(section => ({ ...section, items: section.items.filter(item => item.key !== 'members') })) } : config;
   const navigate = useNavigate();
   const caps = useStoreCapabilities(withCapabilities ? fetchStoreCapabilities : undefined);
   return (
     <StoreDashboardLayout
-      config={resolveStoreMenu(config, caps)}
+      config={resolveStoreMenu(visibleConfig, caps)}
       hideTopBar
       userName={user ? getUserDisplayName(user) : ''}
       orgName={organizationName ?? undefined}
@@ -183,12 +185,13 @@ export function ServiceRoleOnly({ serviceKey, roles, children }: { serviceKey: U
  */
 export function StoreOwnerOnly({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const { effectiveServiceKey } = useUnifiedStore();
-  if (!effectiveServiceKey || isServiceStoreOwner(user?.roles, effectiveServiceKey)) return <>{children}</>;
+  const { effectiveServiceKey, stores, organizationId } = useUnifiedStore();
+  const isStaff = stores.some(store => store.organizationId === organizationId && store.memberRole === 'staff');
+  if (!isStaff && (!effectiveServiceKey || isServiceStoreOwner(user?.roles, effectiveServiceKey))) return <>{children}</>;
   return (
     <main className="center-card"><section className="card" data-testid="store-owner-only">
       <h1>매장 경영자만 이용할 수 있습니다</h1>
-      <p>이 화면은 {SERVICE_LABEL[effectiveServiceKey]} 매장 경영자 권한이 필요합니다.</p>
+      <p>이 화면은 매장 경영자 권한이 필요합니다.</p>
       <Link className="button-link" to={WORKSPACE_PATHS.myServices}>이용 사업 확인</Link>
     </section></main>
   );

@@ -118,9 +118,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         clearSelectedOrganizationId();
         setSelectedId(null);
         setError('선택한 매장에 대한 접근 권한이 확인되지 않습니다. 매장을 다시 선택해 주세요.');
-        setTick((t) => t + 1);
+        setListState('error');
       })
-      .catch(() => { if (!cancelled) setError('매장의 서비스 목록을 불러오지 못했습니다.'); });
+      .catch(() => { if (!cancelled) { setListState('error'); setError('매장의 서비스 목록을 불러오지 못했습니다.'); } });
     return () => { cancelled = true; };
   }, [effectiveId]);
 
