@@ -1,4 +1,4 @@
-import { SignupTermsAgreement } from './SignupTermsAgreement';
+import { signupPrivacyHref, SignupTermsAgreement, signupPolicyReferences } from './SignupTermsAgreement';
 import { styles } from './email/shared';
 import type { SignupTermsDocument } from '@o4o/auth-client';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -55,7 +55,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     if (result.success && result.user) { ref.current.onSuccess(result.user); return; }
     if (result.nextStep === 'signup' && result.signupTicket) { setTicket(result.signupTicket); setEmail(result.email ?? ''); return; }
     if (result.nextStep === 'verify-email') { setTicket(undefined); setMessage(result.mailSent ? '확인 메일을 보냈습니다. 이메일을 확인한 뒤 카카오로 다시 로그인해 주세요.' : '확인 메일을 보내지 못했습니다. 잠시 후 카카오로 다시 로그인해 주세요.'); return; }
-    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPolicyReload(value => value + 1); }
+    if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
     setMessage(result.error ?? '인증을 다시 시작해 주세요.'); ref.current.onError?.(result);
   }, []);
   useLayoutEffect(() => {
@@ -80,14 +80,14 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     </>}
     {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
     {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
-    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing, termsPolicy: { policyDocumentId: policy.policyDocumentId, version: policy.version } } }).then(finish).catch(() => { if (mounted.current) { setBusy(false); setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
+    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, phone, consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) } }).then(finish).catch((error: any) => { if (mounted.current) { setBusy(false); if (['POLICY_VERSION_MISMATCH', 'POLICY_UNAVAILABLE'].includes(error?.response?.data?.code ?? error?.response?.data?.error?.code)) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(n => n + 1); setMessage('정책이 변경되었습니다. 입력 내용은 유지됩니다. 최신 내용을 확인해 주세요.'); } else setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
       <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>
       <label style={styles.field}>이메일<input style={styles.input} type="email" autoComplete="email" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label style={styles.field}>이름<input style={styles.input} autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>
       <label style={styles.field}>개인 휴대전화<input style={styles.input} type="tel" autoComplete="tel" required maxLength={20} value={phone} onChange={e => setPhone(e.target.value)} /></label>
       <p>휴대전화 본인 인증은 수행하지 않습니다. 이메일 소유 확인이 필요하면 확인 메일을 보냅니다.</p>
-      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={setPolicy} reloadKey={policyReload} />
-      <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label><a style={styles.link} href={props.privacyHref ?? 'https://neture.co.kr/privacy'} target="_blank" rel="noreferrer">내용 보기</a></div>
+      <SignupTermsAgreement load={() => ref.current.client.getSignupTerms()} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
+      <div style={styles.checkRow}><label style={styles.checkRow}><input type="checkbox" required checked={privacy} onChange={e => setPrivacy(e.target.checked)} />개인정보 처리방침 동의 (필수)</label>{policy && <a style={styles.link} href={signupPrivacyHref(policy)} target="_blank" rel="noreferrer">내용 보기</a>}</div>
       <label><input type="checkbox" checked={marketing} onChange={e => setMarketing(e.target.checked)} />마케팅 정보 수신 동의 (선택)</label>
       <button type="submit" style={styles.primaryBtn} disabled={busy || !policy || !terms || !privacy}>동의하고 계정 만들기</button>
       <button type="button" style={styles.ghostBtn} disabled={busy} onClick={() => { setTicket(undefined); setMessage(''); }}>취소</button>

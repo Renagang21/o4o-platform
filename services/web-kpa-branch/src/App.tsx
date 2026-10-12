@@ -1,3 +1,4 @@
+import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 /**
  * App — KPA Branch (분회 홈페이지 SaaS)
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -184,7 +185,7 @@ export default function App() {
       <AuthProvider>
         <TenantProvider>
           <StandaloneReturnNavigation />
-          <AppRoutes />
+          <TermsAcceptanceGate><AppRoutes /></TermsAcceptanceGate>
         </TenantProvider>
       </AuthProvider>
     </BrowserRouter>

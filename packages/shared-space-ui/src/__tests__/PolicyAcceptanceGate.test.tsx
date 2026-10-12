@@ -49,6 +49,7 @@ function renderGate(opts: {
         allowPaths={['/policy', '/privacy']}
         serviceName="KPA Society"
         termsPath="/policy"
+        termsServiceKey="kpa-society"
       >
         <div data-testid="app-shell">서비스 화면</div>
       </PolicyAcceptanceGate>
@@ -77,6 +78,7 @@ describe('PolicyAcceptanceGate', () => {
     expect(onLogout).not.toHaveBeenCalled();
     expect(screen.queryByTestId('app-shell')).toBeNull();
     await waitFor(() => expect(screen.getByTestId('policy-acceptance-content').textContent).toContain('제1조 목적'));
+    expect(screen.getByRole('link', { name: 'O4O 통합 서비스 이용약관 전문 새 탭에서 보기' }).getAttribute('href')).toBe('/policy');
     expect(screen.getByRole('dialog').getAttribute('aria-modal')).toBe('true');
     expect(screen.queryByRole('button', { name: /닫기/ })).toBeNull();
     expect(screen.getByRole('button', { name: '로그아웃' })).toBeTruthy();
@@ -133,4 +135,96 @@ describe('PolicyAcceptanceGate', () => {
     expect(loadPolicy).toHaveBeenCalledTimes(1);
   });
 
+});
+
+
+describe('서로 다른 공통·서비스 약관', () => {
+  const account = { ...PENDING[0], serviceKey: 'neture', policyDocumentId: 'account-doc', title: 'Neture 계정 약관' };
+  function renderBoth(second: typeof DOC | null) {
+    const onAccept = vi.fn(async () => ({ success: true }));
+    render(<MemoryRouter><PolicyAcceptanceGate pending={[account, ...PENDING]}
+      loadPolicy={async key => key === 'neture' ? { ...DOC, id: account.policyDocumentId, serviceKey: 'neture', content: '공통 계정 본문' } : second}
+      onAccept={onAccept} onLogout={() => {}}><span>서비스</span></PolicyAcceptanceGate></MemoryRouter>);
+    return onAccept;
+  }
+  it('두 본문을 모두 표시한 다음에만 전체 승낙을 제출한다', async () => {
+    const accept = renderBoth({ ...DOC, content: '약국 서비스 본문' });
+    await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(2));
+    expect(screen.getByText('공통 계정 본문')).toBeTruthy();
+    expect(screen.getByText('약국 서비스 본문')).toBeTruthy();
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+    await waitFor(() => expect(accept).toHaveBeenCalledTimes(1));
+  });
+  it.each([null, { ...DOC, id: 'unreviewed' }, { ...DOC, version: 2 }])('두 번째 문서 누락·교체·버전 변경 시 일괄 승낙을 막는다', async doc => {
+    const accept = renderBoth(doc);
+    await waitFor(() => expect((screen.getByRole('checkbox') as HTMLInputElement).disabled).toBe(true));
+    await waitFor(() => expect(screen.getByText(doc ? /약관이 갱신되었습니다/ : /게시된 약관을 찾을 수 없습니다/)).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+    expect(accept).not.toHaveBeenCalled();
+  });
+});
+
+
+it('일부 승낙 후 pending 목록이 줄어도 이전 본문 인덱스로 접근하지 않는다', async () => {
+  const second = { ...PENDING[0], policyDocumentId: 'neture-doc', serviceKey: 'neture', title: '계정 약관' };
+  const load = async (key: string) => key === 'neture' ? { ...DOC, ...second, id: second.policyDocumentId } : DOC;
+  const props = { loadPolicy: load, onAccept: async () => ({ success: true }), onLogout: () => {} };
+  const view = render(<MemoryRouter><PolicyAcceptanceGate {...props} pending={[...PENDING, second]}><span>서비스</span></PolicyAcceptanceGate></MemoryRouter>);
+  await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(2));
+  view.rerender(<MemoryRouter><PolicyAcceptanceGate {...props} pending={[second]}><span>서비스</span></PolicyAcceptanceGate></MemoryRouter>);
+  await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(1));
+  expect(screen.getByRole('dialog').textContent).toContain('계정 약관');
+});
+
+
+describe('문서 소유 서비스와 전문 링크의 일치', () => {
+  it.each([{ keys: ['neture', 'supplier', 'community', 'funding'] }, { keys: ['supplier'] }])('%j: Neture 전문 링크를 다른 서비스 본문에 재사용하지 않는다', async ({ keys }) => {
+    const pending = keys.map(serviceKey => ({ ...PENDING[0], serviceKey, policyDocumentId: `${serviceKey}-doc`, title: `${serviceKey} terms` }));
+    render(<MemoryRouter><PolicyAcceptanceGate pending={pending}
+      loadPolicy={async serviceKey => ({ ...DOC, serviceKey, id: `${serviceKey}-doc`, title: `${serviceKey} terms`, content: `${serviceKey} body` })}
+      termsPath="/terms" termsServiceKey="neture" onAccept={async () => ({ success: true })} onLogout={() => {}}><span>app</span></PolicyAcceptanceGate></MemoryRouter>);
+    await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(keys.length));
+    const links = screen.queryAllByRole('link', { name: /전문 새 탭에서 보기/ });
+    expect(links).toHaveLength(keys.includes('neture') ? 1 : 0);
+    if (links.length) expect(links[0].getAttribute('href')).toBe('https://neture.co.kr/terms');
+    for (const key of keys) expect(screen.getByText(`${key} body`)).toBeTruthy();
+  });
+});
+
+it('복수 패널의 inline gate는 서로 다른 제목을 가진 비모달 region이며 무관한 화면은 유지한다', async () => {
+  const props = { loadPolicy: async () => DOC, onAccept: async () => ({ success: true }), onLogout: () => {} };
+  render(<MemoryRouter><p>계속 이용 가능한 패널</p>{[1, 2].map(key =>
+    <PolicyAcceptanceGate key={key} inline {...props} pending={PENDING}>{null}</PolicyAcceptanceGate>
+  )}</MemoryRouter>);
+  await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(2));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(screen.getByText('계속 이용 가능한 패널')).toBeTruthy();
+  const regions = screen.getAllByRole('region', { name: 'O4O 통합 서비스 이용약관에 동의해 주세요' });
+  const ids = regions.map(region => region.getAttribute('aria-labelledby'));
+  expect(new Set(ids).size).toBe(2);
+  for (const region of regions) expect(region.getAttribute('aria-modal')).toBeNull();
+  expect(screen.getAllByRole('heading', { level: 2, name: 'O4O 통합 서비스 이용약관에 동의해 주세요' })).toHaveLength(2);
+});
+
+it.each([
+  { content: undefined }, { content: null }, { content: 123 }, { content: { body: 'not text' } },
+  { content: '' }, { content: '   ' }, { title: undefined }, { title: '' }, { title: 123 },
+])('%j: 식별 필드가 일치해도 표시할 제목/본문이 없는 응답은 승낙을 열지 않는다', async fields => {
+  const { onAccept } = renderGate({ doc: { ...DOC, ...fields } as any });
+  await screen.findByText(/약관을 불러오지 못했습니다/);
+  expect(screen.queryByTestId('policy-acceptance-content')).toBeNull();
+  expect((screen.getByRole('checkbox') as HTMLInputElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+  expect(onAccept).not.toHaveBeenCalled();
+});
+it('복수 문서 중 뒤 문서의 본문이 누락돼도 전체 승낙을 차단한다', async () => {
+  const second = { ...PENDING[0], serviceKey: 'neture', policyDocumentId: 'neture-doc' };
+  const onAccept = vi.fn(async () => ({ success: true }));
+  render(<MemoryRouter><PolicyAcceptanceGate pending={[...PENDING, second]}
+    loadPolicy={async key => key === 'neture' ? { ...DOC, ...second, id: second.policyDocumentId, content: undefined } as any : DOC}
+    onAccept={onAccept} onLogout={() => {}}>{null}</PolicyAcceptanceGate></MemoryRouter>);
+  await screen.findByText(/약관을 불러오지 못했습니다/);
+  fireEvent.click(screen.getByRole('button', { name: '동의하고 계속하기' }));
+  expect(onAccept).not.toHaveBeenCalled();
 });

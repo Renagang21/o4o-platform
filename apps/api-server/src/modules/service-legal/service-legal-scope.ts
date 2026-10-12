@@ -23,6 +23,9 @@ import type { ServiceScopeGuardConfig } from '@o4o/security-core';
 //   (pharmacy-hub-scope.middleware.ts 주석 참조). 여기서도 그 정의를 그대로 재사용한다 —
 //   legal 용 config 를 새로 만들면 권한 표가 둘로 갈라진다.
 import { LECTURE_SCOPE_CONFIG } from '../../middleware/lecture-scope.middleware.js';
+import { SUPPLIER_SCOPE_CONFIG } from '../../middleware/supplier-service-scope.middleware.js';
+import { COMMUNITY_SCOPE_CONFIG } from '../../middleware/community-service-scope.middleware.js';
+import { FUNDING_SCOPE_CONFIG } from '../../middleware/funding-service-scope.middleware.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 
 /** 본 기능이 관리하는 canonical serviceKey (service-catalog 기준). */
@@ -34,6 +37,9 @@ export const SUPPORTED_LEGAL_SERVICE_KEYS = [
   //   pharmacy-hub 는 공개 푸터를 가진 정식 서비스인데 이 집합에 없어
   //   GET /public/services/pharmacy-hub/footer-legal 이 UNKNOWN_SERVICE 404 였다.
   'lecture',
+  'supplier',
+  'community',
+  'funding',
 ] as const;
 
 export type LegalServiceKey = (typeof SUPPORTED_LEGAL_SERVICE_KEYS)[number];
@@ -73,6 +79,9 @@ const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = 
   'kpa-society': KPA_SCOPE_CONFIG,
   'k-cosmetics': COSMETICS_SCOPE_CONFIG,
   lecture: LECTURE_SCOPE_CONFIG,
+  supplier: SUPPLIER_SCOPE_CONFIG,
+  community: COMMUNITY_SCOPE_CONFIG,
+  funding: FUNDING_SCOPE_CONFIG,
 };
 
 const GUARD_BY_SERVICE_KEY: Record<

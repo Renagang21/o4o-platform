@@ -133,6 +133,9 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     await waitFor(() => expect(captured).not.toBeNull());
     await act(async () => { captured!.onCredential('id-token'); });
     await screen.findByTestId('google-continue-consent');
+    const privacyLink = screen.getByRole('link', { name: '개인정보 처리방침 내용 보기' });
+    expect(privacyLink.getAttribute('href')).toBe('https://neture.co.kr/privacy');
+    expect(privacyLink.getAttribute('target')).toBe('_blank');
 
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]); // 이용약관
@@ -260,4 +263,40 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     expect(first.loginWithGoogle).not.toHaveBeenCalled();
     expect(second.getConfig).not.toHaveBeenCalled();
   });
+});
+
+it('does not expose another service privacy link before policy ownership loads', async () => {
+  let resolve!: (doc: typeof TERMS) => void;
+  mount({ getSignupTerms: () => new Promise(r => { resolve = r; }), privacyHref: '/privacy', loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
+  await waitFor(() => expect(captured).not.toBeNull());
+  await act(async () => { captured!.onCredential('id-token'); });
+  await screen.findByTestId('google-continue-consent');
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+  await act(async () => { const doc = { ...TERMS, privacyHref: 'https://pharmacy.neture.co.kr/privacy' }; resolve(doc); });
+  expect((await screen.findByRole('link', { name: '개인정보 처리방침 내용 보기' })).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');
+});
+it('does not expose a fallback privacy link after policy lookup fails', async () => {
+  mount({ getSignupTerms: async () => { throw new Error('unavailable'); }, privacyHref: '/privacy', loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
+  await waitFor(() => expect(captured).not.toBeNull());
+  await act(async () => { captured!.onCredential('id-token'); });
+  await screen.findByRole('alert');
+  expect(screen.queryByRole('link', { name: '개인정보 처리방침 내용 보기' })).toBeNull();
+});
+
+it('requires fresh privacy acknowledgement after a signup policy version mismatch', async () => {
+  const changed = { ...TERMS, version: 2, privacyPolicy: { policyDocumentId: '22222222-2222-4222-8222-222222222222', version: 2, title: 'Updated privacy' } };
+  const load = vi.fn().mockResolvedValueOnce(TERMS).mockResolvedValue(changed);
+  const signup = vi.fn(async () => ({ success: false, code: 'POLICY_VERSION_MISMATCH', error: 'Changed' }));
+  mount({ getSignupTerms: load, signupWithGoogle: signup, loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
+  await waitFor(() => expect(captured).not.toBeNull()); await act(async () => { captured!.onCredential('id-token'); });
+  await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+  fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: 'Fixture' } });
+  fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
+  const boxes = screen.getAllByRole('checkbox'); fireEvent.click(boxes[0]); fireEvent.click(boxes[1]);
+  fireEvent.click(screen.getByRole('button', { name: '동의하고 계정 만들기' }));
+  await screen.findByRole('link', { name: '내용 보기 · 버전 2' });
+  expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(false);
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);
+  expect((screen.getByRole('button', { name: '동의하고 계정 만들기' }) as HTMLButtonElement).disabled).toBe(true);
+  expect(signup).toHaveBeenCalledTimes(1);
 });

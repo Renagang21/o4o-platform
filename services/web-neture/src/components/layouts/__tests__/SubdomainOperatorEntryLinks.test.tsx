@@ -197,7 +197,7 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
   it('supplier:admin → 두 항목 모두 보인다', () => {
     signIn(['supplier:admin']);
     render(<SubdomainOperatorLayoutWrapper serviceKey="supplier" area="admin" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/admin/supplier-governance']);
+    expect(menuPaths()).toEqual(['/operator/service-members/supplier', '/operator/suppliers', '/admin/supplier-governance', '/operator/legal/supplier']);
   });
 
   it('funding:operator → 펀딩 항목', () => {
@@ -217,7 +217,7 @@ describe('③ 서브도메인 전용 셸 메뉴', () => {
   it('community:admin → 커뮤니티 서비스 관리 항목', () => {
     signIn(['community:admin'], active('community'));
     render(<SubdomainOperatorLayoutWrapper serviceKey="community" area="admin" />);
-    expect(menuPaths()).toEqual(['/operator/service-members/community', '/admin/communities', '/operator/communities']);
+    expect(menuPaths()).toEqual(['/operator/service-members/community', '/admin/communities', '/operator/legal/community', '/operator/communities']);
   });
 
   it('community:admin 이어도 community membership 이 active 가 아니면 항목이 없다', () => {

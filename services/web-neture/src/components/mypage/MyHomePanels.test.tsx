@@ -20,6 +20,7 @@ vi.mock("../../lib/api/communityOperator", () => ({
 }));
 vi.mock("../../lib/apiClient", () => ({ api: { get: (path: string, ...args: unknown[]) => path === "/neture/pharmacy/semi-franchises"
   ? Promise.resolve({ data: { success: true, data: [] } }) : get(path, ...args) } }));
+vi.mock("../../contexts/AuthContext", () => ({ useAuth: () => ({ logout: vi.fn() }) }));
 afterEach(cleanup);
 beforeEach(() => {
   get.mockReset();

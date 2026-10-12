@@ -1,8 +1,48 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/apiClient";
 import { listOperatedCommunities } from "../../lib/api/communityOperator";
 import type { HomeEntryData, EntryStore } from "../../lib/home-entry";
+import { PolicyAcceptanceGate, type PendingPolicyAcceptanceLike } from "@o4o/shared-space-ui";
+import { loadPolicy } from "../../pages/legal/PolicyDocumentPage";
+import { useAuth } from "../../contexts/AuthContext";
+
+type ResourceError = boolean | PendingPolicyAcceptanceLike[];
+function policyError(error: unknown): ResourceError {
+  const response = (error as { response?: { status?: number; data?: { code?: string; pendingPolicyAcceptances?: unknown } } })?.response;
+  const pending = response?.data?.pendingPolicyAcceptances;
+  if (response?.status !== 428 || response.data?.code !== "TERMS_ACCEPTANCE_REQUIRED" || !Array.isArray(pending) || pending.length === 0) return true;
+  return pending.every(p => p && typeof p.serviceKey === "string" && /^[a-z0-9-]+$/.test(p.serviceKey)
+    && p.documentType === "terms" && typeof p.policyDocumentId === "string"
+    && /^[0-9a-f-]{36}$/i.test(p.policyDocumentId) && Number.isInteger(p.version) && p.version > 0 && typeof p.title === "string") ? pending : true;
+}
+
+/** A cross-service 428 belongs to this resource, not the account-wide Neture gate. */
+function ResourcePolicyNotice({ pending, reload }: { pending: PendingPolicyAcceptanceLike[]; reload: () => void }) {
+  const { logout } = useAuth();
+  const alive = useRef(true);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+  const accept = async () => {
+    try {
+      for (const p of pending) {
+        if (!alive.current) return { success: false };
+        const res = await api.post("/auth/policy-acceptances", { serviceKey: p.serviceKey, policyDocumentId: p.policyDocumentId, version: p.version });
+        if (res.data?.success !== true) throw new Error("Policy acceptance failed");
+      }
+      if (alive.current) reload();
+      return { success: true };
+    } catch {
+      if (alive.current) reload();
+      return { success: false, error: "약관 상태를 다시 확인해 주세요." };
+    }
+  };
+  return <div>
+    <PolicyAcceptanceGate inline pending={pending} loadPolicy={loadPolicy} onAccept={accept} onLogout={logout}
+      serviceName="이용하려는 서비스" leadText="이 항목을 조회하려면 해당 서비스의 약관을 확인해 주세요. 다른 항목은 계속 이용할 수 있습니다.">
+      {null}
+    </PolicyAcceptanceGate>
+  </div>;
+}
 
 /** A request belongs to one account/resource. Late replies cannot replace newer data. */
 export function useMyHomeResource<T>(
@@ -12,7 +52,7 @@ export function useMyHomeResource<T>(
   const [result, setResult] = useState<{
     key: string;
     data?: T;
-    error?: boolean;
+    error?: ResourceError;
   }>({ key: "" });
   const [tick, setTick] = useState(0);
   useEffect(() => {
@@ -22,8 +62,8 @@ export function useMyHomeResource<T>(
       .then((data) => {
         if (alive) setResult({ key: resourceKey, data });
       })
-      .catch(() => {
-        if (alive) setResult({ key: resourceKey, error: true });
+      .catch((error) => {
+        if (alive) setResult({ key: resourceKey, error: policyError(error) });
       });
     return () => {
       alive = false;
@@ -41,9 +81,10 @@ export function ResourceNotice({
   error,
   reload,
 }: {
-  error?: boolean;
+  error?: ResourceError;
   reload: () => void;
 }) {
+  if (Array.isArray(error)) return <ResourcePolicyNotice pending={error} reload={reload} />;
   return error ? (
     <div
       role="alert"
@@ -414,7 +455,7 @@ function CommunityPosts({
 }
 function CommunityOperations({ accountId }: { accountId: string }) {
   const result = useMyHomeResource(accountId, listOperatedCommunities);
-  if (result.error) return <ResourceNotice error reload={result.reload} />;
+  if (result.error) return <ResourceNotice error={result.error} reload={result.reload} />;
   if (!result.data?.length) return null;
   return (
     <Link

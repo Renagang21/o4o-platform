@@ -1,3 +1,4 @@
+import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../modules/policy-acceptance/service-enrollment-policy.service.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { MarketTrial, MarketTrialParticipant, TrialStatus } from '@o4o/market-trial';
 import { fundingForumCode, fundingForumSlug, fundingHistory, fundingReview, fundingWasApproved, FUNDING_PROGRESS_TRANSITIONS, type FundingEvent } from './funding-review.js';
@@ -67,7 +68,7 @@ export class FundingWorkspaceService {
   }
 
   /** Participation records interest; it does not confirm payment or forum membership. */
-  join(id: string, actor: string, rewardType: string) {
+  join(id: string, actor: string, rewardType: string, policyReferences?: EnrollmentPolicyReference[]) {
     return this.ds.transaction(async m => {
       if (await getNetureMainMembershipStatus(m, actor) !== 'active') throw new FundingError(403, 'MAIN_MEMBERSHIP_REQUIRED', '정상 계정과 이메일 확인이 필요합니다.');
       const trial = await this.locked(m, id);
@@ -77,7 +78,9 @@ export class FundingWorkspaceService {
       if (!['cash', 'product'].includes(rewardType) || !trial.rewardOptions.includes(rewardType)) throw new FundingError(400, 'INVALID_REWARD', '허용된 참여 조건을 선택해 주세요.');
       const participants = m.getRepository(MarketTrialParticipant);
       if (await participants.findOne({ where: { marketTrialId: id, participantId: actor } })) throw new FundingError(409, 'ALREADY_PARTICIPANT', '이미 참여한 펀딩입니다.');
+      const policies = await recordEnrollmentPolicies(m, actor, 'funding', policyReferences);
       const participant = await participants.save(participants.create({ marketTrialId: id, participantId: actor, participantType: 'store_owner', contributionAmount: 0, rewardType, rewardStatus: 'pending' }));
+      await recordEnrollmentApplication(m, actor, 'funding', { type: 'funding_participation', id: participant.id, resourceId: id, conditions: { rewardType, rewardOptions: trial.rewardOptions, fundingStartAt: trial.fundingStartAt, fundingEndAt: trial.fundingEndAt } }, policies);
       trial.currentParticipants += 1;
       await m.getRepository(MarketTrial).save(trial);
       return { participant, trial };

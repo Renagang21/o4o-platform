@@ -1,3 +1,4 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
 import CommunityPublicReadManager from './CommunityPublicReadManager';
@@ -31,6 +32,7 @@ export interface CommunityWorkspace {
 export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' | 'posts' | 'write' | 'post' | 'mine' | 'request' | 'owned' | 'members' }) {
   const { communityKey = '' } = useParams();
   const { user, isAuthenticated } = useAuth();
+  const agreement = useServiceEnrollmentPolicies('community', async () => (await api.get('/public/services/community/enrollment-policies')).data.data, `${user?.id ?? 'signed-out'}:${communityKey}`);
   const navigate = useNavigate();
   const location = useLocation();
   const [moveRetry, setMoveRetry] = useState(0);
@@ -72,9 +74,10 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
   </section>;
 
   const join = async () => {
+    if (!agreement.ready || busy) return;
     setBusy(true); setError('');
-    try { await api.post(`/communities/${encodeURIComponent(communityKey)}/join`, {}); setVersion(v => v + 1); }
-    catch (e: any) { setError(e.response?.data?.error || '가입 신청에 실패했습니다. 내 프로필의 닉네임과 이용 상태를 확인해 주세요.'); }
+    try { await api.post(`/communities/${encodeURIComponent(communityKey)}/join`, { policyReferences: agreement.references }); setVersion(v => v + 1); }
+    catch (e: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(e.response?.data?.code)) agreement.reload(); setError(e.response?.data?.error || '가입 신청에 실패했습니다. 내 프로필의 닉네임과 이용 상태를 확인해 주세요.'); }
     finally { setBusy(false); }
   };
   const createBoard = async () => {
@@ -95,7 +98,8 @@ export default function CommunityWorkspacePage({ view = 'hub' }: { view?: 'hub' 
       <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>
       <p className="my-4">{workspace.membershipStatus === 'pending' ? '가입 신청을 접수했습니다. 운영자의 승인을 기다려 주세요.' : '이 커뮤니티는 가입 승인 후 참여할 수 있습니다.'}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
-      {workspace.canJoin && <button type="button" disabled={busy} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}
+      {workspace.canJoin && <ServiceEnrollmentPolicyAgreement agreement={agreement} />}
+      {workspace.canJoin && <button type="button" disabled={busy || !agreement.ready} onClick={join} className="rounded bg-blue-700 px-4 py-2 text-white">가입 신청</button>}
       {workspace.reason === 'NETURE_MEMBERSHIP_REQUIRED' && <Link to="/mypage">내 계정 확인</Link>}
     </section>}
     {workspace?.allowed && <>
