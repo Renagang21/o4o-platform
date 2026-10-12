@@ -18,6 +18,7 @@ const ROLE_LABEL: Record<string, string> = {
   manager: '매니저',
   staff: '구성원',
   invited: '수락 대기',
+  accepted: '승인 대기',
 };
 
 const errorMessage = (e: unknown): string =>
@@ -36,7 +37,7 @@ export default function StoreMembersPage() {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const data = await storeMembershipApi.listMembers(effectiveServiceKey ?? undefined);
+      const data = await storeMembershipApi.listMembers(effectiveServiceKey ?? 'kpa');
       setMembers(data.members);
     } catch (e) {
       setMembers([]);
@@ -55,8 +56,8 @@ export default function StoreMembersPage() {
     setError(null);
     setNotice(null);
     try {
-      await storeMembershipApi.invite(email.trim(), effectiveServiceKey ?? undefined);
-      setNotice('초대했습니다. 상대가 수락하면 구성원이 됩니다.');
+      await storeMembershipApi.invite(email.trim(), effectiveServiceKey ?? 'kpa');
+      setNotice('초대했습니다. 상대가 수락한 뒤 최종 승인해 주세요.');
       setEmail('');
       await load();
     } catch (e) {
@@ -66,13 +67,24 @@ export default function StoreMembersPage() {
     }
   };
 
+  const approve = async (member: StoreMember) => {
+    if (busy) return;
+    setBusy(true); setError(null); setNotice(null);
+    try {
+      await storeMembershipApi.approve(member.userId, effectiveServiceKey ?? 'kpa');
+      setNotice('승인했습니다. 직원이 내 매장 업무 기능을 이용할 수 있습니다.');
+      await load();
+    } catch (e) { setError(errorMessage(e)); }
+    finally { setBusy(false); }
+  };
+
   const remove = async (member: StoreMember) => {
     if (busy) return;
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      await storeMembershipApi.remove(member.userId, effectiveServiceKey ?? undefined);
+      await storeMembershipApi.remove(member.userId, effectiveServiceKey ?? 'kpa');
       setNotice(`${member.email} 님의 접근을 해제했습니다.`);
       await load();
     } catch (e) {
@@ -87,7 +99,7 @@ export default function StoreMembersPage() {
       <h1>매장 구성원</h1>
       <p>
         매장 업무를 함께할 사용자를 초대합니다. <strong>이미 가입한 사용자</strong>만 초대할 수 있고,
-        상대가 수락해야 접근이 생깁니다.
+        상대가 수락한 뒤 경영자가 최종 승인해야 접근이 생깁니다.
       </p>
 
       <form onSubmit={invite} className="card">
@@ -122,7 +134,8 @@ export default function StoreMembersPage() {
                 {m.status === 'invited' && ' · 수락 대기'}
               </span>
               {/* 경영자 · 관리자 · 매니저 행은 서버가 거절한다 — 버튼도 내보내지 않는다. */}
-              {(m.role === 'staff' || m.role === 'invited') && (
+              {m.role === 'accepted' && <button type="button" onClick={() => void approve(m)} disabled={busy}>최종 승인</button>}
+              {(m.role === 'staff' || m.role === 'invited' || m.role === 'accepted') && (
                 <button type="button" onClick={() => void remove(m)} disabled={busy}>
                   해제
                 </button>

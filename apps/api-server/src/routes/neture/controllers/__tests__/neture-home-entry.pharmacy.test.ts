@@ -1,3 +1,4 @@
+jest.mock('../../../../utils/store-member-access.js', () => ({ findApprovedStoreMemberCandidates: jest.fn(async () => []), findActiveStoreMemberCandidates: jest.fn(async () => []) }));
 import { createNetureHomeEntryController } from '../neture-home-entry.controller.js';
 import { getServiceMembershipStatusFromDb } from '../../../../utils/service-membership.js';
 import { findStoreOrganizationCandidates } from '../../../../utils/store-organization.resolver.js';

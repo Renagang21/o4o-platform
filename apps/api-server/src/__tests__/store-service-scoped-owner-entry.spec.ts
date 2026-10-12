@@ -27,12 +27,13 @@ describe('web-store — 서비스 지정 매장 화면', () => {
     expect(norm(app)).toContain('<Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}> {storeChildRoutes()}');
   });
 
-  it('owner-only 화면 4개는 StoreOwnerOnly 로 감싼다', () => {
+  it('매장 업무 화면은 승인 직원에게도 제공하고 구성원 관리는 Owner 전용이다', () => {
     for (const p of ['my-products', 'handled-products', 'commerce/local-products', 'products/multilingual/:targetKind/:targetId']) {
-      expect(norm(app)).toMatch(new RegExp(`<Route path="${p.replace(/[/:]/g, (c) => `\\${c}`)}" element=\\{<StoreOwnerOnly>`));
+      const route = norm(app).split(`<Route path="${p}"`)[1]?.split('/>')[0];
+      expect(route).toBeDefined();
+      expect(route).not.toContain('<StoreOwnerOnly>');
     }
-    expect(svc).toContain('`${short}:store_owner`');
-    expect(svc).toContain("'platform:super_admin'");
+    expect(norm(app)).toContain('<Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />');
   });
 
   it('서비스 고정은 이 매장의 활성 서비스일 때만 · 세션 유지 · 매장 변경 시 해제', () => {

@@ -1,3 +1,4 @@
+import { findApprovedStoreMemberCandidates } from '../../../utils/store-member-access.js';
 /**
  * Neture 대표 홈 진입 정보 API
  *
@@ -92,7 +93,9 @@ export function createNetureHomeEntryController(
           if (!ra) continue;
         }
 
-        const candidates = await findStoreOrganizationCandidates(dataSource, userId, svc.rolePrefix);
+        const owned = await findStoreOrganizationCandidates(dataSource, userId, svc.rolePrefix);
+        const members = await findApprovedStoreMemberCandidates(dataSource, userId, svc.rolePrefix);
+        const candidates = [...owned, ...members.filter(m => !owned.some(o => o.organizationId === m.organizationId))];
         if (candidates.length === 0) continue;
 
         const orgRows: Array<{ id: string; name: string | null }> = await dataSource.query(

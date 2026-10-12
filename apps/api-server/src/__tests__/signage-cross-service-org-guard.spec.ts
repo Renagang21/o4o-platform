@@ -1,3 +1,10 @@
+jest.mock('../utils/service-membership.js', () => ({ hasActiveServiceMembership: jest.fn(async () => true) }));
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
+jest.mock('../utils/store-owner.utils.js', () => ({ isStoreOwner: jest.fn(async (ds, userId, _service, org) => {
+  const owned = await ds.query('SELECT 1 FROM organization_members', [userId, org]);
+  const linked = owned.length ? await ds.query('SELECT 1 FROM neture_pharmacy_memberships', [org]) : [];
+  return { isOwner: !!owned.length && !!linked.length, organizationId: owned.length && linked.length ? org : null, pendingAgreement: null };
+}) }));
 /**
  * WO-O4O-SIGNAGE-CROSS-SERVICE-ORGANIZATION-SCOPE-GUARD-V1
  *
@@ -16,7 +23,7 @@ import {
 } from '../utils/store-organization.resolver.js';
 
 jest.mock('../database/connection.js', () => ({
-  AppDataSource: { query: jest.fn() },
+  AppDataSource: { isInitialized: true, query: jest.fn() },
 }));
 
 import { AppDataSource } from '../database/connection.js';

@@ -5,7 +5,7 @@
  * WO-O4O-LIBRARY-SELECTOR-PAGINATION-V1
  * WO-STORE-LIBRARY-ASSET-EXTENSION-V1
  * WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 — CRUD 로직을 services/store/store-library.service.ts 로 추출.
- *   이 라우터는 **조직 결정(createRequireStoreOwner) + 응답 envelope** 만 담당한다.
+ *   이 라우터는 **조직 결정(createRequireStoreWorkspaceAccess) + 응답 envelope** 만 담당한다.
  *   Pharmacy-Hub 는 같은 서비스 함수를 자기 조직 해석기와 함께 호출한다 (로직 복제 0).
  *   요청/응답 계약은 추출 전과 동일하다.
  *
@@ -31,7 +31,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import {
   listLibraryAssets,
   createLibraryAsset,
@@ -67,7 +68,7 @@ export function createStoreLibraryController(
 ): Router {
   const router = Router();
 
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // ─── GET /pharmacy/library — 자료 목록 (페이지네이션) ──────────
   router.get(

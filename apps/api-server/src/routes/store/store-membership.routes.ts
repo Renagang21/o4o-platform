@@ -35,6 +35,8 @@ import {
 import {
   StoreMemberError,
   acceptStoreInvitation,
+  approveStoreMember,
+  declineStoreInvitation,
   inviteStoreMember,
   listMyInvitations,
   listStoreMembers,
@@ -46,6 +48,7 @@ import {
 const SERVICE_KEYS: readonly StoreOwnerServiceKey[] = ['kpa', 'cosmetics', 'pharmacy-hub', 'cafe24-b2b'];
 function readServiceKey(req: Request): StoreOwnerServiceKey | undefined {
   const raw = typeof req.query.serviceKey === 'string' ? req.query.serviceKey : undefined;
+  if (raw === 'kpa-society') return 'kpa';
   return raw && (SERVICE_KEYS as readonly string[]).includes(raw) ? (raw as StoreOwnerServiceKey) : undefined;
 }
 
@@ -149,6 +152,21 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
       }
     }),
   );
+
+  router.post('/members/:userId/approve', requireAuth, asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const data = await approveStoreMember(dataSource, {
+        ownerUserId: sessionUserId(req), targetUserId: req.params.userId,
+        serviceKey: readServiceKey(req), preferredOrganizationId: readPreferredStoreOrganizationId(req),
+      });
+      res.json({ success: true, data });
+    } catch (e) { sendError(res, e); }
+  }));
+
+  router.post('/invitations/:organizationId/decline', requireAuth, asyncHandler(async (req: Request, res: Response) => {
+    await declineStoreInvitation(dataSource, { userId: sessionUserId(req), organizationId: req.params.organizationId });
+    res.json({ success: true });
+  }));
 
   router.delete(
     '/members/:userId',

@@ -33,7 +33,7 @@ import type { DataSource } from 'typeorm';
 import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ImageStorageService } from '../../../modules/neture/services/image-storage.service.js';
 import { deriveProductClassification, classificationToFilter } from '../../../modules/neture/utils/product-type.util.js';
@@ -78,7 +78,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   const router = Router();
   const listingRepo = dataSource.getRepository(OrganizationProductListing);
   const imageStorageService = new ImageStorageService();
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource);
   const netureService = new NetureService();
 
   // ─── GET /search — 제품 검색 (ProductMaster 기반) ────────────────────
