@@ -82,6 +82,7 @@ import { CreateSocialAuthFlows1791592932097 } from '../migrations/1791592932097-
 
 import { AddCommunityMemberAdministration1791632505104 } from '../migrations/1791632505104-AddCommunityMemberAdministration.js';
 import { CreateAccountErasureOperations1791777540800 } from '../migrations/1791777540800-CreateAccountErasureOperations.js';
+import { RetireLegacyErasureIdentityHashes1791795139475 } from '../migrations/1791795139475-RetireLegacyErasureIdentityHashes.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -107,6 +108,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateSocialAuthFlows1791592932097,
   AddCommunityMemberAdministration1791632505104,
   CreateAccountErasureOperations1791777540800,
+  RetireLegacyErasureIdentityHashes1791795139475,
 ];
 
 export function incrementalMigrationNames(): string[] {

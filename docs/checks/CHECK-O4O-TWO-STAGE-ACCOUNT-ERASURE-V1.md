@@ -111,3 +111,9 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 추가 P1 처리: primary email/UUID만으로 typed identity의 잔여를 놓치지 않도록 대상 소유 `LinkedAccount.providerId`·nullable `email`을 whitelist로 수집한다. arbitrary metadata의 타인 actor 값은 계속 제외한다. UUID가 아닌 provider 문자열은 식별자 경계를 검사하며 다른 긴 값의 부분문자열로 취급하지 않는다. non-owned JSON의 provider ID와 별도 연결 이메일 copy를 각각 검사하고 미완료·typed source 보존을 확인했다. 최종 집중 DB26+storage4+정적 인증17+Demo9=56 tests·API build·lint PASS. 전체 alias/provider/domain 전수 handler가 모두 완료된 것은 아니며 활성화 전 inventory/classification 경계는 그대로다.
 
 재검토 P2 보완: opaque provider ID의 `-`·`.`는 연속 문자로 취급한다. `-extra`·`.extra`로 이어지는 타인의 값은 변경하지 않고 대상 제거가 완료되는 실제 DB 회귀를 추가했다. 정확한 provider ID·별도 email copy는 기존 미완료 검증을 유지한다. 최종 집중 DB27+storage4+정적 인증17+Demo9=57 tests·API build·lint PASS. schema/manifest 변화0.
+
+업그레이드 재검토 P2 처리: 신규24단계 `RetireLegacyErasureIdentityHashes1791795139475`는 completed를 포함한 **모든 legacy identity-kind hash만** 파기하고 writer 함수를 UUID/uuid-kind references만 검사하도록 바꾼다. 이전23단계 소스/지문은 수정하지 않았다. UUID marker·operation/audit·community evidence·원래 기산점은 변경하지 않는다. 이미 완료된 이전 operation의 재가입 차단을 실제23단계 함수/legacy hash로 재현한 뒤24단계에서 해소·원래 UUID/증빙 보존을 검증했다.
+
+집중 DB28+storage4+정적 인증17+Demo9=58 tests·API build·lint·migration contract21 checks PASS. 정식 runner로 fresh baseline→24, 기존23→24,24단계 재실행 no-op 모두 PASS. 최종 지문 `41e3be0aed15b49266cca75c543d8e6d008c6b0fcf4d3b85f28b2f6a56f7c75f`,6617 lines. 파기한 연락처 hash를 backup/복원하지 않으며 down은 forward repair를 요구한다.
+
+운영 승인안은23단계5개 테이블/trigger/function과24단계legacy 연락처 hash retirement/function 교체를 함께 검토한다. 후속이 새 migration0이던 이전 검증 기록은 이24단계 추가 전 기록이다. 운영의 일반 user/account·GCS 삭제나 feature apply flag/job/legal 게시 승인은 여전히 포함하지 않는다. 현재 운영에서23/24 실행0; 추가 변경은 격리 합성 DB에서만 적용했다.

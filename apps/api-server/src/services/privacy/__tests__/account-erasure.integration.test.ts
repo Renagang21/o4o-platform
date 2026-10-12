@@ -7,6 +7,8 @@ import { User } from '../../../entities/User.js';
 import { AccountErasureService, calendarExpiry, type PersonalStorage } from '../account-erasure.service.js';
 import { AccountErasureError } from '../account-erasure.service.js';
 import { CALENDAR_EXPIRY_SQL } from '../calendar-retention.js';
+import { CreateAccountErasureOperations1791777540800 } from '../../../database/migrations/1791777540800-CreateAccountErasureOperations.js';
+import { RetireLegacyErasureIdentityHashes1791795139475 } from '../../../database/migrations/1791795139475-RetireLegacyErasureIdentityHashes.js';
 
 let db: DataSource;
 const repository = {
@@ -314,6 +316,27 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
       expect((await service().request(target.id)).erased).toBe(true);
       expect((await db.query('SELECT "businessInfo" FROM users WHERE id=$1',[peer.id]))[0].businessInfo.providerReference).toBe(providerId+suffix);
     }
+  });
+  it('upgrade retires already-completed legacy contact hashes without touching UUID markers or evidence',async()=>{
+    const target=await user({email:'legacy-contact@fixture.invalid'}),h=await community(target.id,fixtureAdminId);
+    const r=await service().request(target.id);expect(r.erased).toBe(true);
+    const evidence=await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event]);
+    const refs=await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId]);
+    await db.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
+      VALUES($1,encode(digest($2::text,'sha256'),'hex'),'identity',char_length($2::text))`,[r.operationId,target.email]);
+    const legacySql:string[]=[];
+    await new CreateAccountErasureOperations1791777540800().up({query:async(sql:string)=>{legacySql.push(sql);return [];}} as any);
+    const oldFunction=legacySql.find(sql=>sql.startsWith('CREATE FUNCTION account_erasure_write_fence'))!;
+    const q=db.createQueryRunner();
+    try {
+      await q.query(oldFunction.replace('CREATE FUNCTION','CREATE OR REPLACE FUNCTION'));
+      await expect(user({email:target.email})).rejects.toMatchObject({code:'P0001'});
+      await new RetireLegacyErasureIdentityHashes1791795139475().up(q);
+    } finally {await new RetireLegacyErasureIdentityHashes1791795139475().up(q);await q.release();}
+    expect((await user({email:target.email})).id).not.toBe(target.id);
+    expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='uuid' ORDER BY key_hash",[r.operationId])).toEqual(refs);
+    expect(await db.query('SELECT * FROM account_erasure_community_evidence WHERE source_event_id=$1',[h.event])).toEqual(evidence);
+    expect(await db.query("SELECT key_hash FROM account_erasure_reference_keys WHERE key_kind='identity'")).toHaveLength(0);
   });
   it('scheduled unexpired protection blocks both metadata lookup and deletion before time can advance',async()=>{
     const target=await user({avatar:'https://storage.googleapis.com/fixture-private/protected-avatar.png'});
