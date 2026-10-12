@@ -1,6 +1,7 @@
 # PharmacyHub retirement TODO
 
-> 상태: ACTIVE · 2026-10-10 · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
+> 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
+> 현재(2026-10-12): PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·인증 시험과 PH-only DB/잔여 공용 코드 정리는 미완료.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -10,10 +11,12 @@
 - [x] 전체 PH 호스트 리다이렉트 초안/실행 옵션 준비(`retire_host=true`). PH default backend·pathRules 참조를 제거하고 다른 host/matcher는 보존. 302·path/query 유지.
 - [x] 새 코드 CI·리뷰·main 통합 후 `retire_host=true, mode=plan`의 변경 전후 map 확인.
 - [x] URL map update·global operation 조회 권한 확인 후 전체 호스트 apply. 실제 QR/tablet·네 경로 규칙·root·기타 경로 302 검증. 실행 `38119869917` SUCCESS.
-- [ ] 전체 URL map과 다른 backend/NEG에서 `pharmacy-hub-web` 참조가 없는지 확인. Cloud Run 삭제 권한과 대상 project/region 확인 후 전용 서비스 제거·부재 확인.
+- [x] 전체 URL map과 다른 backend/NEG의 PH 참조 해제·권한/project/region 확인 후 전용 backend·NEG·Cloud Run 제거·부재 확인. apply `38187016286` 및 독립 plan `38187187895` SUCCESS.
 - [ ] 현재 DB schema/FK 및 PH 전용 테이블·service_key 행 목록 확인. 공용 조직·사용자·Neture QR/매장 데이터를 PH 문자열만으로 삭제하지 않음. PH 전용 데이터는 transaction 단위 삭제 계획 후 실제 삭제·잔여 건수 확인.
 - [ ] 남은 PH 활성 등록·권한·호환 참조를 실제 공용 소비처 기준으로 제거. 과거 migration을 다시 실행하거나 migration 이력을 없애지 않음.
-- [ ] 각 운영 실행 결과·잔여 blocker 기록. 전체 호스트 apply는 성공, Cloud Run·DB 삭제는 미완료.
+- [x] 이번 자원 제거 실행 결과·잔여 작업 기록. 전체 호스트 전환과 전용 자원 제거는 완료.
+- [ ] 일시 WIF 제한을 원래 조건으로 복구하고 read-only 인증 smoke 확인.
+- [ ] PH-only DB/잔여 공용 코드 정리 및 최종 결과 기록.
 
 전체 제거 phase는 사용자 지정 worktree를 유지하고 최신 main의 `wo/pharmacyhub-full-retirement`에서 수행한다.
 
@@ -218,3 +221,17 @@ PR #475는 main a3462a0256에 병합됐고 main 후속 CI 38142397450 SUCCESS를
 읽기 전용 resource plan [38144701943](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943)은 인증/DB 조회에 성공했지만 삭제 검증 단계에서 실패했다. private probe 수집의 요약은 네 종류 모두 false, foundFamilies=0이다. 실데이터가 없는 상황에서도 기존 parseProbes가 QR/tablet 두 종류를 필수 요구해 중단했다. 추가 read-only census [38144858219](https://github.com/Renagang21/o4o-platform/actions/runs/38144858219)은 SUCCESS이며 실제 삭제는 제출하지 않았다.
 
 동일 WO 연속 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-resource-empty-probes에서 보강한다. 자원 폐기 entrypoint만 active-family 필수를 해제한다. 일반 QR cutover는 기존 strict 기본값을 유지한다. 남아 있는 공개 경로는 동일 검증하고, 없을 때는 독립적인 12개 전체 호스트/경로/query/스킴 리다이렉트 검사와 자원 참조/권한/시간/동시 writer 차단을 모두 유지한다. 결과의 activeFamiliesVerified가 0이면 실제 데이터 검증 성공으로 보고하지 않는다. 빈 경로/단일 잔여 family/잘못된 URL·중복 경로 차단 회귀를 포함해 focused tests 53 PASS. CI·리뷰·병합 후 새 main SHA로 WIF를 제한해 plan → 잔여 Cloud Run 제거 → 재검증 → 원래 인증 조건 복구 순으로 진행한다. Cloud Run 및 PH-only DB 정리는 아직 미완료다.
+
+## 전용 Cloud 자원 제거 완료 — 2026-10-12
+
+PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 병합됐다. 이후 main de23f34310까지 PH workflow/삭제 스크립트 변경이 없음을 확인했고 해당 main CI 38147807102도 SUCCESS다. 사용자가 WIF root/called workflow SHA 제한을 de23f34310으로 갱신한 뒤 단독 운영 창에서 진행했다.
+
+- 읽기 전용 plan [38186892659](https://github.com/Renagang21/o4o-platform/actions/runs/38186892659): SUCCESS. 남은 대상 pharmacy-hub-web 하나, 누락 권한 0, httpVerified=true, activeFamiliesVerified=0.
+- 적용 [38187016286](https://github.com/Renagang21/o4o-platform/actions/runs/38187016286): SUCCESS. applied=true, targets=[], httpVerified=true, databaseWrites=false, activeFamiliesVerified=0. 기존에 제거된 backend/NEG에 이어 Seoul의 전용 Cloud Run도 부재를 확인했다.
+- 독립 읽기 전용 재검증 [38187187895](https://github.com/Renagang21/o4o-platform/actions/runs/38187187895): SUCCESS. targets=[], requiredPermissions=[], missingPermissions=[], httpVerified=true, activeFamiliesVerified=0. 전체 12개 host/route/path/query/scheme 리다이렉트 검사를 유지했다.
+
+활성 네 종류 경로는 이번 inventory에서 0건이므로 실데이터 QR/tablet 동작이나 실제 브라우저/인쇄 QR 스캔 성공을 주장하지 않는다. 도메인·DNS·인증서는 유지하며 운영 DB write는 없었다. PH-only 주문/결제/역할/정책/상품 scope 데이터 및 공용 코드 잔재 정리는 계속 미완료다.
+
+인증 복구는 이미 승인됐으나 클라우드 환경에는 IAM 관리용 연결이 없어 사용자 로컬 관리자로 수행해야 한다. 원래 조건 백업이 다른 PC에 있을 때도 현재 조건에서 이번에 추가한 정확한 PH/ref/root SHA/called SHA 제한 suffix만 제거하면 기존 기본 조건을 보존할 수 있다. 다른 변경이 감지되면 복구 명령은 중단한다. 실제 복구 describe와 read-only WIF smoke 결과 확인 전에는 인증 복구 완료로 기록하지 않는다.
+
+동일 WO 연속 결과 기록 phase로 지정 worktree와 최신 main 기반 wo/pharmacyhub-resource-removal-result를 사용한다. 업무 앱 배포 NOT_APPLICABLE. WO 전체는 데이터/공용 코드/인증 복구 검증이 남아 ACTIVE·worktree KEEP다.
