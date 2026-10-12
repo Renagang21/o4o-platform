@@ -1333,3 +1333,7 @@ PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은
 운영 CLI의 기존 sanitized summary를 native Actions notice에도 남겨 mode/schema history/검토 digest/변경 건수를 GitHub API에서 직접 확인할 수 있게 했다. raw snapshot·ID·credential 원문·비밀번호 hash는 공개하지 않는다. 새 DB fixture 최초 시도는 기존 unique legacy-pointer 제약에 걸렸으므로 canonical 행의 nullable legacy pointer를 비운 뒤 무관한 행의 pointer drift를 모델링하도록 수정했다. 운영 schema 제약을 바꾸지 않았다.
 
 공급자 정본 수정 후 집중 회귀54/54(격리 DB13+공급자 경계41) 및3 CLI typecheck PASS. 기존 보호/provision source contract35도 PASS. 한국시간2026-10-13에 후속 수정 push·최신 CI/review를 진행한다. 운영 변경은 여전히0이다.
+
+로컬 전체 shard2 진단은165 suites 중160 PASS·3 skipped·2 FAIL,2769조건 중2739 PASS·28 skipped·2 FAIL이었다. 두 실패는 신규 CLI의 공급자 legacy 조회와 은퇴 `operator_invitations` 참조였다. 후자는 현행 runtime 금지 계약에 따라 제거했다. 새 예외/기능 복구/테이블 삭제는 하지 않는다. 현행 역할·provider identity 보호와 Demo 지정 후 권한/인증수단 변경 guard는 유지한다. 최초 구현 기록의 pending 초대 보호는 최종 구현에 포함하지 않는다.
+
+최종 집중 회귀70/70(격리 DB12·공급자 경계41·Google 은퇴 경계17), CLI3개 타입 검사 및 DB binding 누락 시 native sanitized error annotation 검증 PASS. 최종 구현의 실제 DB 조건은12개다. 전체 CI를 다시 확인하며 실패 gate를 우회하지 않는다.

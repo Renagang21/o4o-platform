@@ -55,10 +55,6 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
   const relationships = await client.query(`SELECT id,user_id,organization_id,role,left_at,is_primary
     FROM organization_members WHERE user_id = ANY($1::uuid[]) ORDER BY user_id,organization_id,id
     ${lock ? 'FOR UPDATE' : ''}`, [scopeIds]);
-  const operatorInvitations = await client.query(`SELECT id,invited_email,role,service_key,status,expires_at
-    FROM operator_invitations WHERE lower(invited_email)=ANY($1::text[]) AND status='pending' AND expires_at>now()
-    ORDER BY id ${lock ? 'FOR UPDATE' : ''}`, [PUBLIC_DEMO_ACCOUNTS.map(account=>account.email)]);
-  if (operatorInvitations.length) fail('PROTECTED_OPERATOR_INVITATION');
   const ownerId = source.get('STORE_OWNER')!.user_id;
   const ownerOrganizations = await client.query(`SELECT DISTINCT om.organization_id
     FROM organization_members om JOIN neture_pharmacy_memberships pm
@@ -108,7 +104,7 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
     if (user && account.type === 'STORE_STAFF' && !roleReady && roles.some(row => row.user_id === user.id && row.role === allowedRoles.STORE_STAFF && row.is_active === true)) fail('STAFF_ROLE_NOT_EFFECTIVE');
     plans.push({account,user,base,passwordMatches,memberReady,roleReady});
   }
-  const before = {registry,users,roles,providers,passwords,memberships,relationships,operatorInvitations,storeState,supplierLinks,schema:flags,history};
+  const before = {registry,users,roles,providers,passwords,memberships,relationships,storeState,supplierLinks,schema:flags,history};
   const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password)}));
   const changed = plans.filter(plan => !plan.user || plan.user.email !== plan.account.email || !plan.passwordMatches ||
     !plan.base || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady ||

@@ -24,6 +24,8 @@ async function main() {
 }
 main().catch(error=>{
   const code=typeof error?.message==='string' && /^[A-Z_]+$/.test(error.message)?error.message:'RECONCILE_FAILED';
-  console.error(JSON.stringify({code,diagnostic:safeInventoryError(error,'demo-account-reconcile').code}));
+  const failure={code,diagnostic:safeInventoryError(error,'demo-account-reconcile').code};
+  console.error(JSON.stringify(failure));
+  console.error(`::error title=Canonical Demo reconciliation::${JSON.stringify(failure)}`);
   process.exitCode=1;
 });

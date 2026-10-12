@@ -126,12 +126,6 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     await query('INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,\'google\',\'fixture-subject\')',[id]);
     await expect(runDemoAccountReconcile(client)).rejects.toThrow('PROVIDER_IDENTITY_REQUIRES_REVIEW');
   });
-  it('a pending operator invitation reserves the target even without a user or role row',async()=>{
-    await query(`INSERT INTO operator_invitations(invited_email,service_key,role,token_hash,status,expires_at,invited_by_user_id)
-      VALUES($1,'neture','neture:operator','fixture-invitation-hash','pending',now()+interval '1 day',$2)`,[staff.email,owner]);
-    await expect(runDemoAccountReconcile(client)).rejects.toThrow('PROTECTED_OPERATOR_INVITATION');
-    expect(Number((await query('SELECT count(*) AS n FROM users'))[0].n)).toBe(2);
-  });
   it('post-write failure rolls back emails, credentials, registry and staff relationships together',async()=>{
     const planned=await runDemoAccountReconcile(client);
     const broken={query:async(sql:string,params?:unknown[])=>{if(sql.startsWith('UPDATE canonical_demo_repair_snapshots'))throw Error('FORCED_FAILURE');return query(sql,params);}};
