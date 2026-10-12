@@ -112,11 +112,15 @@ export class MembershipConsoleController {
   }
 
   /** The same catalogue ownership check applies to role assignment and removal. */
-  private requireMemberRoleAdmin(req: Request, res: Response, serviceKey: string): boolean {
+  private requireMemberRoleScope(req: Request, res: Response, serviceKey: string): boolean {
     const scope: ServiceScope = (req as any).serviceScope;
-    const adminKeys: string[] | undefined = (req as any).memberAdminServiceKeys;
-    if (scope.isPlatformAdmin || !adminKeys || adminKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
-    res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '역할이 속한 서비스의 관리자 권한이 필요합니다.' });
+    const selected = req.body?.serviceKey ?? req.query?.serviceKey;
+    if (typeof selected === 'string' && resolveCanonicalServiceKey(selected) !== resolveCanonicalServiceKey(serviceKey)) {
+      res.status(400).json({ success: false, code: 'SERVICE_KEY_MISMATCH', error: '선택한 서비스와 역할의 서비스가 일치하지 않습니다.' });
+      return false;
+    }
+    if (scope.isPlatformAdmin || scope.serviceKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
+    res.status(403).json({ success: false, code: 'SERVICE_SCOPE_REQUIRED', error: '역할이 속한 서비스의 운영 권한이 필요합니다.' });
     return false;
   }
 
@@ -630,6 +634,7 @@ export class MembershipConsoleController {
             reactivatedBy: updatedBy,
             isPlatformAdmin: writeScope.isPlatformAdmin,
             serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
           })
         ) {
           // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -738,6 +743,11 @@ export class MembershipConsoleController {
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
       if (sendRetiredServiceError(res, error)) return;
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
+
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -834,6 +844,7 @@ export class MembershipConsoleController {
                 reactivatedBy: updatedBy,
                 isPlatformAdmin: writeScope.isPlatformAdmin,
                 serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
               })
             ) {
               // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -940,6 +951,7 @@ export class MembershipConsoleController {
         reactivatedBy,
         isPlatformAdmin: writeScope.isPlatformAdmin,
         serviceKeys: writeScope.serviceKeys,
+        adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
       });
 
       if (!result) {
@@ -965,6 +977,11 @@ export class MembershipConsoleController {
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
       if (sendRetiredServiceError(res, error)) return;
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
+
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1375,13 +1392,13 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
         // Assignability check
         if (!roleEntity.isAssignable) {
           res.status(403).json({ success: false, error: 'This role is not assignable' });
           return;
         }
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -1510,8 +1527,8 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        if (!this.requireMemberRoleAdmin(req, res, roleEntity.serviceKey)) return;
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
