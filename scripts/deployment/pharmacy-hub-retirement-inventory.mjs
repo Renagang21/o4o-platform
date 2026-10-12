@@ -233,7 +233,7 @@ if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
       return collectRetirementInventory(client);
     });
     result.domains = collectDomainInventory();
-    console.log(JSON.stringify(result));
+    console.log(JSON.stringify(result, null, 2));
     if (result.failed) process.exitCode=1;
   } catch(error) {
     console.error(safeInventoryError(error,'retirement-census').message);
