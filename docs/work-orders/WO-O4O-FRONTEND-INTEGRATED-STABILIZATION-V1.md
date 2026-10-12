@@ -208,7 +208,7 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/frontend-integrated-stabilization` / `w
 
 | 항목 | 최신 조사 결과 | 현재 실행/남은 단계 |
 | --- | --- | --- |
-| T08 변경 이력 | 기존 retention 대상6개에 community_membership_changes 없음. 부모 community/membership/대상 user 삭제 시 cascade, actor 삭제 시 SET NULL | [조사·개정안](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md) 준비. 생성 후365일 권고와6개월/2년 비교, 예외·FK 보호·처리방침 문구 포함. 사용자 확정 전 job/삭제 미실행 |
+| T08 변경 이력 | 기존 retention 대상6개에 community_membership_changes 없음. 운영자 처리 기록은 정본 §6의 최소1년·해당 시2년 기준 적용. 부모 삭제 시 cascade, actor 삭제 시 SET NULL | [조사·개정안](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md) 준비. 생성 후365일 이상 유지·2년 요건/본인 탈퇴/자동 생성 행 분류, 예외·FK 보호·처리방침 문구 포함. 최초6개월안 철회. 집행 확정 전 job/삭제 미실행 |
 | T09 약관·개인정보 | 조사 중 담당 PR #457이 main `210529860`에 병합됨. 공통/서비스별 본문·동의 증빙·공고 구현 포함. PH 인증 제한 복구 완료로 종전 WIF blocker 해소 | 해당 담당 초안 재사용. 병합 후 CI·배포·실제 공고/정책 게시 증거는 담당 기록으로 확인. 예정일을 실제 공고일로 표시하지 않으며 이번 이력365일 제안은 자동 포함하지 않음 |
 | T10 PH 폐기 | apply38187016286·재검증38187187895 SUCCESS: 전용 Cloud Run/backend/NEG 부재·12개 리다이렉트 PASS. WIF read-only smoke38187804879 SUCCESS | 종전 누락 IAM/Cloud 자원/원래 인증 복구 대기는 해소. PH-only DB 및 공용 코드 잔여만 담당 WO에서 계속 추적. 실제 기기/데이터 검증은 이번 active inventory0과 구분 |
 | T12 이전 공간 | 현재 클라우드만 식별 가능. 이전 환경 ID/미푸시/로컬 파일 보존 증거 미확정 | 이름/ID 확인 요청. 이전 공간·다른 세션 worktree 삭제0. 현재 공간 KEEP |
