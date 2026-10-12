@@ -311,3 +311,5 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 ---
 
 *Created: 2026-10-01*
+
+**전환 시 서비스 연결 검증:** 세 Demo 유형 모두 `DEMO_REQUIRED_MEMBERSHIPS`의 필수 가입 상태를 확인한다. 이 map은 foundation provision과 reconcile의 공통 정본이다. 기존 Demo의 누락 연결은 같은 user ID에 생성하며, 기존 pending/suspended/withdrawn 연결을 active로 바꾸지 않는다. 필요한 membership·role 의도는 검토 digest에 포함한다. 로그인 성공만으로 Lecture 등 기능 이용 가능을 판정하지 않는다.

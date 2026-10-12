@@ -105,6 +105,25 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     expect(await query('SELECT id,email FROM users ORDER BY id')).toEqual(before);
     expect((await query("SELECT status FROM neture_suppliers WHERE slug='fixture-legacy-pointer'"))[0].status).toBe('PENDING');
   });
+  it('repairs a partial legacy owner Lecture membership without moving identity or business links',async()=>{
+    const first=await runDemoAccountReconcile(client);
+    await runDemoAccountReconcile(client,{apply:true,expectedDigest:first.digest});
+    await query("DELETE FROM service_memberships WHERE user_id=$1 AND service_key='lecture'",[owner]);
+    const partial=await runDemoAccountReconcile(client);
+    expect(partial.changes).toBe(1);
+    expect(partial.accounts.find(item=>item.type==='STORE_OWNER')!.membershipsReady).toBe(false);
+    await runDemoAccountReconcile(client,{apply:true,expectedDigest:partial.digest});
+    expect((await query("SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='lecture'",[owner]))[0].status).toBe('active');
+    expect((await runDemoAccountReconcile(client)).changes).toBe(0);
+    expect((await query("SELECT user_id FROM organization_members WHERE organization_id=$1 AND role='owner'",[store]))[0].user_id).toBe(owner);
+  },30000);
+  it.each(['STORE_OWNER','SUPPLIER'])('does not reactivate a restricted %s Lecture membership',async(type)=>{
+    const id=type==='STORE_OWNER'?owner:supplier;
+    await query("INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'lecture','suspended')",[id]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('REQUIRED_DEMO_MEMBERSHIP_NOT_ACTIVE');
+    expect((await query("SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='lecture'",[id]))[0].status).toBe('suspended');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
   it('a stale security generation refuses apply and leaves identities untouched',async()=>{
     const planned=await runDemoAccountReconcile(client);
     await query('UPDATE users SET "refreshTokenFamily"=gen_random_uuid() WHERE id=$1',[owner]);

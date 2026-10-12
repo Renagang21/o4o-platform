@@ -1337,3 +1337,5 @@ PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은
 로컬 전체 shard2 진단은165 suites 중160 PASS·3 skipped·2 FAIL,2769조건 중2739 PASS·28 skipped·2 FAIL이었다. 두 실패는 신규 CLI의 공급자 legacy 조회와 은퇴 `operator_invitations` 참조였다. 후자는 현행 runtime 금지 계약에 따라 제거했다. 새 예외/기능 복구/테이블 삭제는 하지 않는다. 현행 역할·provider identity 보호와 Demo 지정 후 권한/인증수단 변경 guard는 유지한다. 최초 구현 기록의 pending 초대 보호는 최종 구현에 포함하지 않는다.
 
 최종 집중 회귀70/70(격리 DB12·공급자 경계41·Google 은퇴 경계17), CLI3개 타입 검사 및 DB binding 누락 시 native sanitized error annotation 검증 PASS. 최종 구현의 실제 DB 조건은12개다. 전체 CI를 다시 확인하며 실패 gate를 우회하지 않는다.
+
+최신 main 동기화 후 리뷰의 필수 서비스 연결 지적도 수용했다. 경영자/공급자/직원 모두 foundation과 동일한 required membership map을 사용한다. 없어진 연결만 생성하고 비활성/제한된 연결은 자동 복구하지 않는다. plan의 membership readiness와 mutation intent digest를 추가했다. 기존 owner Lecture 누락을 복구한 뒤 user ID·ownership 보존/멱등을 확인했고 owner·supplier suspended Lecture를 유지하는2조건도 통과했다. 집중 회귀108/108(격리 DB15+공급자41+Google 은퇴17+기존 Demo/provision35),3 CLI typecheck PASS. 동기화된 PH inventory 회귀15도 PASS. 운영 반영은 아직0이다.

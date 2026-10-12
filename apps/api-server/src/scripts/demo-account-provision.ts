@@ -35,7 +35,7 @@
  *   npx tsx --env-file=.env src/scripts/demo-account-provision.ts --apply    # 수치 확인 후
  */
 import 'reflect-metadata';
-import { assertFoundationDemoProvisionIdentity } from './demo-account-reconcile.service.js';
+import { assertFoundationDemoProvisionIdentity, DEMO_REQUIRED_MEMBERSHIPS } from './demo-account-reconcile.service.js';
 import { DataSource } from 'typeorm';
 import { normalizeLoginEmail, PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 // 싱글턴을 그대로 쓴다 — 해시 정책(bcrypt cost 12 · 72바이트 상한)을 이 스크립트가 다시 쓰지 않는다.
@@ -52,7 +52,7 @@ const DEMOS = [
     name: '매장 경영자 Demo',
     /** 기존 "테스트 약국" 재사용 — 샘플 콘텐츠 15 · 플레이리스트 5 가 이미 붙어 있다. */
     organizationId: '9c87f46b',
-    serviceKeys: ['kpa-society', 'neture', 'lecture', 'community'],
+    serviceKeys: DEMO_REQUIRED_MEMBERSHIPS.STORE_OWNER,
     /** Approved Store pharmacy marker; unrelated to KPA personal membership. */
     roles: ['neture:store_owner'],
   },
@@ -63,7 +63,7 @@ const DEMOS = [
     /** 기존 조직을 쓰지 않는다 — 셋 다 실제 주문·실제 신청과 얽혀 있다(§주석 상단). 새로 만든다. */
     organizationId: null,
     newOrganization: { name: 'O4O 공급자 Demo', code: 'O4O-SUPPLIER-DEMO', type: 'supplier' },
-    serviceKeys: ['supplier', 'neture', 'lecture', 'community'],
+    serviceKeys: DEMO_REQUIRED_MEMBERSHIPS.SUPPLIER,
     /** web-neture SupplierRoute 의 SUPPLIER_ROLES 정본(NETURE_ROLES.SUPPLIER). 데이터 범위는 위 ownership 이 정한다. */
     roles: ['neture:supplier'],
   },

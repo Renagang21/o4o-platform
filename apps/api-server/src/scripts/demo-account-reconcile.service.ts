@@ -8,6 +8,11 @@ type Row = Record<string, unknown>;
 export interface DemoQueryClient { query(sql: string, params?: unknown[]): Promise<Row[]>; }
 type Options = { apply?: boolean; expectedDigest?: string };
 const types = PUBLIC_DEMO_ACCOUNTS.map(account => account.type);
+export const DEMO_REQUIRED_MEMBERSHIPS = {
+  STORE_OWNER: ['kpa-society','neture','lecture','community'],
+  SUPPLIER: ['supplier','neture','lecture','community'],
+  STORE_STAFF: ['kpa-society','neture','lecture','community'],
+} as const;
 const allowedRoles = { STORE_OWNER: 'neture:store_owner', SUPPLIER: 'neture:supplier', STORE_STAFF: 'kpa:store_member' } as const;
 const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fail = (code: string): never => { throw new Error(code); };
@@ -96,19 +101,21 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
         if (memberships.some(row => row.user_id === user.id && row.status !== 'active')) fail('STAFF_MEMBERSHIP_NOT_READY');
       } else if (!activeRoles.some(row => row.role === allowedRoles[account.type])) fail('BASE_DEMO_ROLE_MISSING');
     }
+    const required=DEMO_REQUIRED_MEMBERSHIPS[account.type];
+    if (user && memberships.some(row=>row.user_id===user.id && required.some(key=>key===row.service_key) && row.status!=='active')) fail('REQUIRED_DEMO_MEMBERSHIP_NOT_ACTIVE');
+    const membershipReady=!!user && required.every(key=>memberships.some(row=>row.user_id===user.id && row.service_key===key && row.status==='active'));
     const passwordMatches = user ? await passwordCredentialService.verifyPassword(String(user.id),account.password,passwordManager) : false;
     const memberReady = !!user && relationships.some(row => row.user_id === user.id && row.organization_id === organizationId && row.role === 'staff' && row.left_at === null);
     const roleReady = !!user && roles.some(row => row.user_id === user.id && row.role === allowedRoles[account.type] && row.is_active === true &&
       new Date(String(row.valid_from)).getTime() <= Date.now() && (row.valid_until === null || new Date(String(row.valid_until)).getTime() >= Date.now()));
     if (user && account.type !== 'STORE_STAFF' && !roleReady) fail('BASE_DEMO_ROLE_NOT_EFFECTIVE');
     if (user && account.type === 'STORE_STAFF' && !roleReady && roles.some(row => row.user_id === user.id && row.role === allowedRoles.STORE_STAFF && row.is_active === true)) fail('STAFF_ROLE_NOT_EFFECTIVE');
-    plans.push({account,user,base,passwordMatches,memberReady,roleReady});
+    plans.push({account,user,base,passwordMatches,memberReady,roleReady,membershipReady});
   }
   const before = {registry,users,roles,providers,passwords,memberships,relationships,storeState,supplierLinks,schema:flags,history};
-  const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password)}));
+  const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password),requiredMemberships:DEMO_REQUIRED_MEMBERSHIPS[account.type],requiredRole:allowedRoles[account.type]}));
   const changed = plans.filter(plan => !plan.user || plan.user.email !== plan.account.email || !plan.passwordMatches ||
-    !plan.base || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady ||
-      ['neture','kpa-society','lecture','community'].some(key => !memberships.some(row => row.user_id===plan.user?.id && row.service_key===key && row.status==='active')))));
+    !plan.base || !plan.membershipReady || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady)));
   return {before,plans,changed,organizationId,schemaReady,digest:digest({before,intent})};
 }
 
@@ -129,7 +136,7 @@ export async function runDemoAccountReconcile(client: DemoQueryClient, options: 
         legacyHashRetirement:plan.before.history.some(row=>row.name==='RetireLegacyErasureIdentityHashes1791795139475'),
         staffDemo:plan.before.history.some(row=>row.name==='AllowStoreStaffDemoAccounts1791810417566')},
       accounts:plan.plans.map(item=>({type:item.account.type,identity:item.user?'preserve':'create',registry:!!item.base,
-        emailMatches:item.user?.email===item.account.email,passwordMatches:item.passwordMatches,
+        emailMatches:item.user?.email===item.account.email,passwordMatches:item.passwordMatches,membershipsReady:item.membershipReady,
         staffRelation:item.account.type==='STORE_STAFF'?item.memberReady:undefined,
         staffRole:item.account.type==='STORE_STAFF'?item.roleReady:undefined})),
       changes:plan.changed.length,existingBusinessIdentitiesPreserved:true};
@@ -169,10 +176,10 @@ export async function runDemoAccountReconcile(client: DemoQueryClient, options: 
           await client.query(`INSERT INTO role_assignments (user_id,role,is_active,valid_from,assigned_at,created_at,updated_at)
             VALUES ($1,'kpa:store_member',true,now(),now(),now(),now())`,[id]);writes++;
         }
-        for (const key of ['neture','kpa-society','lecture','community']) {
-          if (!plan.before.memberships.some(row=>row.user_id===id && row.service_key===key)) {
-            await client.query("INSERT INTO service_memberships (user_id,service_key,status) VALUES ($1,$2,'active')",[id,key]);writes++;
-          }
+      }
+      for (const key of DEMO_REQUIRED_MEMBERSHIPS[item.account.type]) {
+        if (!plan.before.memberships.some(row=>row.user_id===id && row.service_key===key)) {
+          await client.query("INSERT INTO service_memberships (user_id,service_key,status) VALUES ($1,$2,'active')",[id,key]);writes++;
         }
       }
     }
