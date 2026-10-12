@@ -1,7 +1,11 @@
 # 서비스 operator의 일상 회원관리 권한 정비
 
-> 상태: COMPLETED · 공통 회원관리 일상 권한 정비·main 통합·운영 배포 완료
-> 기준: main `c9b630feb` · 작업 branch `wo/operator-member-daily-authority`
+> **상태**: COMPLETED
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **근거 WO/IR**: [서비스별 운영자 로드맵](WO-O4O-SERVICE-SPECIFIC-OPERATOR-ROADMAP-V1.md) · 사용자 공통 회원관리 권한 정비 지시
+> **기준**: main `c9b630feb` · **작업 branch**: `wo/operator-member-daily-authority`
+
+공통 회원관리 일상 권한 정비·main 통합·운영 배포를 완료했다.
 
 ## 확정 범위
 
