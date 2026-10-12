@@ -1,6 +1,6 @@
 # WO-O4O-STORE-WORKFLOW-HARDENING-V1
 
-> **상태**: COMPLETED · **작성일**: 2026-10-12 KST
+> **상태**: COMPLETED · **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12 (KST)
 > 근거: 사용자 승인 — 조회 오류·직원 권한 정합성·대형 화면 기능 분리·문서 정리를 하나의 작업으로 구현·검증·push·main 통합·배포
 > 정본: [매장 접근](../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md), [약국 commerce](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md)
 
@@ -39,17 +39,8 @@
 
 CI 38255436395는 변경하지 않은 auth-react 카카오 가입 테스트에서 `resolve is not a function`으로 실패했다(앞선 두 PR CI의 같은 인증 테스트는 PASS). 비동기 terms 요청의 준비 전 테스트 resolve 호출이며 인증 코드는 임의 수정하지 않는다. 현재 보완 커밋의 required CI가 최종 gate다.
 
-## main 통합·배포 확인
+## 완료 판정
 
-- 구현 PR #514 최신 head `47b0e9a7b3260feefec7c5b450e3b162dadd1be1`: [필수 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38256829272)·CodeQL·정책 검사 PASS, 리뷰 네 건 해결.
-- main 정상 병합 `483f633379ca2d6771f6475b92562cc59700ed08` (2026-10-12 KST).
-- 공통 인증 UI의 동일 CI 설정 로컬 재확인: 17 files / 209 tests PASS. 앞선 timing 실패를 이 결과로 삭제하거나 해당 failed run을 PASS로 바꾸지 않는다.
-- [main 사후 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38257999374)·CodeQL PASS. 최신 main c64e54c06의 [CI](https://github.com/Renagang21/o4o-platform/actions/runs/38259679233)·CodeQL도 PASS.
-
-- [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38259145416)는 Auth Role writer 변경을 LEVEL 3으로 판정해 보류했다. 이전 운영 API `614248fda`부터 최신 대상까지 migration 차이 0을 확인했다.
-- 다른 PR #516 통합으로 main이 이동하여 이전 SHA로 시작한 본인 Promote 38259891208은 취소했다. 내 매장 구현 파일은 최신 main에서 차이 0이다. 다른 세션의 실행은 수정·취소하지 않았다.
-- [정식 Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38261132551) SUCCESS, `production=DEPLOYED · deploy: api,store`.
-- 실제 운영 배포 SHA: `c64e54c0601b664d432cce8bf202ef51e2d0a795`. 구현 병합 SHA `483f63337`와 후속 문서 커밋은 이 서빙 SHA와 구분한다.
-- 배포 후 API readiness·내 매장 웹·My Home HTTP 200. 실제 계정 로그인·운영 업무 데이터 변경·물리 기기 검증은 미실행이다.
-- 이 결과 정합은 문서-only이며 `DEPLOYMENT=NOT_APPLICABLE`이다.
-- 배포된 Store HTML·JS·CSS를 TLS 검증 curl로 받아 Chromium에서 실행한 PC·모바일 합성 화면 검증 36개 PASS. 실제 계정 세션·업무 데이터 검증은 아니다.
+구현·검증·PR #514 main 통합·API 및 내 매장 웹 운영 배포를 완료했다.
+배포 SHA·CI·합성 브라우저 결과와 실제 계정·기기 검증 경계는
+[CHECK-O4O-STORE-WORKFLOW-HARDENING-V1](../checks/CHECK-O4O-STORE-WORKFLOW-HARDENING-V1.md)에 기록한다.
