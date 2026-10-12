@@ -105,3 +105,5 @@ Codex P1 보완: 모든 활성 플래그 super admin grant를 읽을 때 잠그�
 격리 DB25+storage4+정적 인증17+Demo9=55 tests, API build·focused lint PASS. schema/manifest 변화0; #505의23단계 지문은 그대로다. 초기행위/완료권한·새가입/다른사용자 이메일/metadata actor·calendar anchor와 보호 시간 경계의 합성 검증이며 실제 OAuth/운영 삭제는 아니다.
 
 #505 main의 `production=HELD_LEVEL_3 · api(L3),admin(needs-api)` 확인. [선택적 Promote dry-run](https://github.com/Renagang21/o4o-platform/actions/runs/38215548971) SUCCESS: services=api,admin, dry_run=true; classify만 성공, API/Admin/Web/Report 모두 skipped. 배포·migration·운영 데이터 변경0. #507 이후 최종 main SHA로 CI/serving gap을 다시 확인한다.
+
+후속 재검토 P1의 최종 처리: role lock으로 시간 진행을 막을 수 없으므로 대상의 활성 플래그가 있고 아직 만료되지 않은 **예정 super admin grant도 보호**한다. 만료된 과거 grant는 막지 않는다. Caller 권한은 여전히 valid_from/valid_until 현재 유효기간 둘 다 필요하며 확대하지 않았다. 보호 대상은 metadata lookup/삭제 시작 전403·generation/delete0·계정 활성/operation0이다. 이미 시작한 grant writer는 global barrier/UUID fence로 직렬화/거절한다. 각 파일/최종 단계의 잠금·재확인도 유지한다. 임시 미래 grant 허용/metadata 대기 테스트는 이 최종 보호 계약으로 대체했다. 집중55 tests·API build·lint PASS; 새 DDL0.

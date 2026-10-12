@@ -135,7 +135,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const former=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_until) VALUES($1,'platform:super_admin',true,statement_timestamp()-interval '1 day')",[former.id]);
     expect((await service().request(former.id)).erased).toBe(true);
     const future=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '1 day')",[future.id]);
-    expect((await service().request(future.id)).erased).toBe(true);
+    await expect(service().request(future.id)).rejects.toMatchObject({code:'SUPER_ADMIN_PROTECTED'});
   });
   it('concurrent duplicate requests share one completed operation',async()=>{
     const u=await user();const results=await Promise.all([service().request(u.id),service().request(u.id)]);
@@ -295,13 +295,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[fixtureAdminId]))[0].isActive).toBe(true);
     expect(await db.query('SELECT id FROM notifications WHERE "userId"=$1',[target.id])).toHaveLength(0);
   });
-  it('a scheduled protected grant becoming effective during metadata lookup prevents destructive completion',async()=>{
+  it('scheduled unexpired protection blocks both metadata lookup and deletion before time can advance',async()=>{
     const target=await user({avatar:'https://storage.googleapis.com/fixture-private/protected-avatar.png'});
     await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '2 seconds')",[target.id]);
-    const storage={generation:jest.fn(async()=>{await new Promise(resolve=>setTimeout(resolve,2300));return '7';}),deleteGeneration:jest.fn()};
-    const r=await service(storage).request(target.id);expect(r.erased).toBe(false);expect(r.reviewCodes).toContain('SUPER_ADMIN_PROTECTED');
-    expect(storage.deleteGeneration).not.toHaveBeenCalled();expect(await db.query('SELECT id FROM users WHERE id=$1',[target.id])).toHaveLength(1);
-    expect(await db.query("SELECT id FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true",[target.id])).toHaveLength(1);
+    const storage={generation:jest.fn(async()=> '7'),deleteGeneration:jest.fn()};
+    await expect(service(storage).request(target.id)).rejects.toMatchObject({code:'SUPER_ADMIN_PROTECTED'});
+    expect(storage.generation).not.toHaveBeenCalled();expect(storage.deleteGeneration).not.toHaveBeenCalled();
+    expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target.id]))[0].isActive).toBe(true);
+    expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
   });
   it('calendar boundaries preserve leap-day KST anniversary and original two-year anchor',()=>{
     expect(calendarExpiry(new Date('2024-02-28T15:00:00Z'),1).toISOString()).toBe('2025-02-28T15:00:00.000Z');

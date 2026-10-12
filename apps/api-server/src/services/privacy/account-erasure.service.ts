@@ -351,9 +351,10 @@ export class AccountErasureService {
 
   private async assertTarget(m:EntityManager,userId:string):Promise<void> {
     const grants=await m.query(`SELECT id,
-      (valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())) AS valid_now
+      (valid_until IS NULL OR valid_until>=statement_timestamp()) AS protected_grant
       FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true FOR SHARE`,[userId]);
-    if(grants.some((g:{valid_now:boolean})=>g.valid_now))throw new AccountErasureError('SUPER_ADMIN_PROTECTED',403);
+    // Scheduled unexpired grants stay protected: time alone must not activate one during irreversible work.
+    if(grants.some((g:{protected_grant:boolean})=>g.protected_grant))throw new AccountErasureError('SUPER_ADMIN_PROTECTED',403);
     const demo=await m.query('SELECT user_id FROM demo_accounts WHERE user_id=$1 AND is_active FOR SHARE',[userId]);
     if(demo.length)throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN',403);
   }
