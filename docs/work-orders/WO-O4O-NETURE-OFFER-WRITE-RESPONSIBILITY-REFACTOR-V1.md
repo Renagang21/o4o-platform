@@ -1,6 +1,6 @@
 # WO-O4O-NETURE-OFFER-WRITE-RESPONSIBILITY-REFACTOR-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-11
 > **유형**: 기존 상품 쓰기 책임 리팩터링
 > **범위**: Neture Offer 등록 · 수정 · 승인/반려 · 유통 · 일괄 처리
@@ -79,3 +79,23 @@ VALUES initializer AST 비교로 보완한다. 수정 전 보완본은 운영에
 
 사용자는 병행 PharmacyHub 정리 중 WIF 임시 차단 유지를 지정했다. main 통합과 배포를 구분하고,
 차단 해제 전 실제 배포 및 새 코드의 운영 검증을 완료했다고 보고하지 않는다.
+
+## 완료 기록 — 2026-10-12
+
+- 구현 [PR #485](https://github.com/Renagang21/o4o-platform/pull/485)와 품질/SQL 보완
+  [PR #488](https://github.com/Renagang21/o4o-platform/pull/488)을 main에 통합했다.
+  최신 보완 HEAD `31d889765`의 CI/CodeQL/Codex와 Sonar(신규 중복률 0.0%)가 통과했고
+  병합 main `8ea1d2aeb`의 CI/CodeQL도 통과했다.
+- 해당 source HEAD는 누적 API 배포 target `0e1aa41eafab8cd3bc1b2c099f20d903ac785a18`의 조상이다.
+  [Promote38190265457의 API job](https://github.com/Renagang21/o4o-platform/actions/runs/38190265457/job/114621698356)이
+  실제 이미지 배포·새 revision readiness·traffic switch·전환 후 검증을 모두 통과했다.
+  최종 production status의 `deploy: api,… / failed: kpa-branch`와 Report의 서비스별 SHA 판정으로
+  API의 DEPLOYED를 확인했다. 전체 run FAIL은 분회 실패이며 전체 run을 SUCCESS로 보고하지 않는다.
+- 2026-10-12에 대조한 main `cbdc1619f`의 이번 runtime 6경로는 해당 API 배포 target과 동일하다.
+  이 기록은 공급자 리팩터링의 배포 포함 증명이며 이후 최신 main 전체의 배포 완료 판정이 아니다.
+- 현재 공개 공급자 Demo PC1440/mobile390에서 로그인200, 홈·제품·운영 허브·사업자 정보4화면,
+  상품 조회4종과 관련 요약/디렉터리 읽기가 통과했다. 화면 오류·가로 넘침·page error·업무 쓰기0,
+  TLS 검증 유지, API health/readiness200을 확인했다.
+- 실제 계정/OAuth와 운영 상품 등록·수정·승인·반려는 실행하지 않았다. 해당 쓰기 계약은 원본/분리본
+  행동 검증과 SQL/AST 비교로 확인했다. 다른 트랙의 새 account-erasure DDL을 실행하거나
+  최신 main을 중복 배포하지 않았다. 이 완료 기록 자체의 배포는 NOT_APPLICABLE이다.
