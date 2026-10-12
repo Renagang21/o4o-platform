@@ -34,7 +34,7 @@
 ## 로컬 검증 — 2026-10-12 KST
 
 - Neture: 71 files / 605 tests PASS. Store: 6 files / 43 tests PASS.
-- Store·Signage·대표 홈 API 71개 파일 명시 선택: 70 PASS / 1 SKIPPED, 1,129 tests PASS / 1 SKIPPED.
+- Store·Signage·대표 홈 API 71개 파일 명시 선택: 70 PASS / 1 SKIPPED, 1,130 tests PASS / 1 SKIPPED.
   SKIPPED는 격리 PG URL이 필요한 기존 매장 종료 통합 검사이며 운영 DB로 대체하지 않았다.
   사이니지의 다른 매장 경영자 Role·이전 조직 claim, 자료의 association fallback 해제 우회,
   약국 enrollment 없는 상태의 Role 회수와 선택 매장의 정확한 member 자격도 검증했다.
@@ -53,3 +53,5 @@ main 통합·Delivery는 PR의 필수 CI·리뷰·현재 main 위치를 확인�
 - 승인 직원에게 개인 Neture 가입을 추가 요구하던 매장 업무 gate를 분리했다. 경영자의 기존 가입 gate와 개인·공급자·운영자 경로는 유지한다.
 - 약국 외 현역 Café24 B2B의 수락·Role 발급을 기존 흐름으로 유지했다. 약국과 함께 연결된 현역 Café24 권한은 최종 승인 후 발급하며 은퇴한 PH·K-Cosmetics Role은 발급하지 않는다.
 - 직원의 개인 약국 개설 신청은 내 매장 메뉴의 직원 안내와 구분한다. 현재 선택한 매장에서 직원이라는 이유로 개인 신청 URL을 막지 않는다.
+
+- 후속 리뷰의 Café24 매장 선택 누락도 보완했다. 현역 Café24의 유효 Role·staff 관계·서비스 연결을 확인해 매장 목록과 서비스 조회에 함께 포함하며, 약국 업무 권한으로 확대하지 않는다.

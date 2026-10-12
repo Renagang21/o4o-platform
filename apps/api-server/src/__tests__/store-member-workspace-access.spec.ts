@@ -36,6 +36,7 @@ describe('approved staff scope', () => {
   it('staff store listed by the selector also resolves its services, then loses both after revocation', async () => {
     let active = true;
     const query = jest.fn(async (sql: string) => {
+      if (sql.includes("ra.role = 'cafe24-b2b:store_member'")) return [];
       if (sql.includes('JOIN neture_pharmacy_memberships')) return active ? [staffRow] : [];
       if (sql.includes("status <> 'active'")) return [];
       if (sql.includes('FROM organizations')) return [{ id: 'store-a', name: '합성 매장' }];
@@ -49,4 +50,20 @@ describe('approved staff scope', () => {
     expect(await resolveAccessibleStores(ds, 'staff')).toEqual([]);
     expect(await resolveStoreServices(ds, { userId: 'staff', organizationId: 'store-a' })).toMatchObject({ status: 'none', organizationId: null });
   });
+});
+
+
+it('active Cafe24 staff remain in the selector and service resolution without gaining pharmacy access', async () => {
+  const query = jest.fn(async (sql: string) => {
+    if (sql.includes("ra.role = 'cafe24-b2b:store_member'")) return [{ organization_id: 'cafe-store' }];
+    if (sql.includes('JOIN neture_pharmacy_memberships')) return [];
+    if (sql.includes("status <> 'active'")) return [];
+    if (sql.includes('FROM organizations')) return [{ id: 'cafe-store', name: '합성 외부 매장' }];
+    if (sql.includes('FROM organization_service_enrollments')) return [{ organization_id: 'cafe-store', service_code: 'cafe24-b2b', status: 'active' }];
+    throw new Error(sql);
+  });
+  const ds = { query } as any;
+  expect(await resolveAccessibleStores(ds, 'staff')).toEqual([{ organizationId: 'cafe-store', organizationName: '합성 외부 매장', memberRole: 'staff' }]);
+  expect(await resolveStoreServices(ds, { userId: 'staff', organizationId: 'cafe-store' })).toMatchObject({ status: 'resolved', organizationId: 'cafe-store' });
+  expect(await resolveApprovedStoreMemberOrganization(ds, 'staff', 'kpa', 'cafe-store')).toBeNull();
 });

@@ -1,4 +1,4 @@
-import { resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
+import { findActiveStoreMemberCandidates, resolveApprovedStoreMemberOrganization } from '../../utils/store-member-access.js';
 /**
  * Store Membership — 사업자가 허가한 사용자(Store Member)의 **단일 정본**
  *
@@ -174,7 +174,10 @@ export async function resolveStoreAccessLevel(
   }
 
   if (!serviceKey || serviceKey === 'kpa') {
-    const organizationId = await resolveApprovedStoreMemberOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
+    const members = !serviceKey ? await findActiveStoreMemberCandidates(dataSource, userId) : null;
+    const organizationId = members
+      ? (preferredOrganizationId ? members.find(m => m.organizationId === preferredOrganizationId)?.organizationId ?? null : members.length === 1 ? members[0].organizationId : null)
+      : await resolveApprovedStoreMemberOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
     return organizationId ? { level: 'member', organizationId, memberRole: STORE_STAFF_ROLE }
       : { level: 'none', organizationId: null, memberRole: null };
   }

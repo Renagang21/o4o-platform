@@ -1,4 +1,4 @@
-import { findApprovedStoreMemberCandidates } from './store-member-access.js';
+import { findActiveStoreMemberCandidates } from './store-member-access.js';
 /**
  * Service Tenant Foundation — Service Identity · Store↔Service · Operator↔Service 해석기 (read-only)
  *
@@ -215,7 +215,7 @@ export async function resolveStoreServices(
   }
 
   const owners = await findAnyServiceStoreOrganizationCandidates(dataSource, userId);
-  const members = await findApprovedStoreMemberCandidates(dataSource, userId);
+  const members = await findActiveStoreMemberCandidates(dataSource, userId);
   const candidates = [...owners, ...members.filter(m => !owners.some(o => o.organizationId === m.organizationId))];
   const picked = pickOrganization(candidates, input.organizationId);
   if ('deny' in picked) return picked.deny;
@@ -269,7 +269,7 @@ export async function resolveAccessibleStores(
   //   쓰는 집합(owner/admin/manager)이라 member 가 빠진다 — **그 배열을 넓히지 않고** 별도 후보를
   //   더한다(넓히면 owner 조직 해석까지 같이 넓어진다).
   //   인가는 role 이 한다: `{prefix}:store_member` 보유자의 활성 'staff' 관계만 후보가 된다.
-  const memberCandidates = await findApprovedStoreMemberCandidates(dataSource, userId);
+  const memberCandidates = await findActiveStoreMemberCandidates(dataSource, userId);
   const merged = [...candidates];
   for (const m of memberCandidates) {
     if (!merged.some((c) => c.organizationId === m.organizationId)) merged.push(m);

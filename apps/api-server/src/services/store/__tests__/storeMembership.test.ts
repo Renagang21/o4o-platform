@@ -75,6 +75,7 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
       return members.filter(m => m.organization_id === p[0] && m.user_id === p[1] && m.left_at == null && m.role === p[2]).map(() => ({ is_pharmacy: seed.pharmacy !== false }));
     }
     if (s.startsWith('SELECT om.organization_id FROM organization_members om')) {
+      if (s.includes("ra.role = 'cafe24-b2b:store_member'")) return [];
       const granted = await hasAnyRoleMock(p[0], ['kpa:store_member']);
       return granted ? members.filter(m => m.user_id === p[0] && m.left_at == null && m.role === STORE_STAFF_ROLE).map(m => ({ organization_id: m.organization_id })) : [];
     }
