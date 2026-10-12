@@ -176,14 +176,14 @@ type Notice = {
   isRead: boolean;
   createdAt: string;
 };
-export function MyHomeNotifications({ accountId }: { accountId: string }) {
-  return <NotificationRecords key={accountId} accountId={accountId} />;
+export function MyHomeNotifications({ accountId, previewLimit = 5 }: { accountId: string; previewLimit?: 3 | 5 }) {
+  return <NotificationRecords key={`${accountId}:${previewLimit}`} accountId={accountId} previewLimit={previewLimit} />;
 }
-function NotificationRecords({ accountId }: { accountId: string }) {
+function NotificationRecords({ accountId, previewLimit }: { accountId: string; previewLimit: 3 | 5 }) {
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const limit = expanded ? 10 : 5;
+  const limit = expanded ? 10 : previewLimit;
   const result = useMyHomeResource(
     `${accountId}:${page}:${limit}:${filter}`,
     async () => {
@@ -326,7 +326,7 @@ function NotificationRecords({ accountId }: { accountId: string }) {
         {expanded ? "최근 알림만 보기" : "알림 전체보기"}
       </button>
       <p className="mt-3 text-xs text-slate-500">
-        {expanded ? "본인 알림을 10건씩 표시합니다." : "최근 알림 5건입니다."}{" "}
+        {expanded ? "본인 알림을 10건씩 표시합니다." : `최근 알림 ${previewLimit}건입니다.`}{" "}
         각 서비스의 알림에서 상세 내용과 읽음 상태를 관리할 수 있습니다.
       </p>
     </section>
