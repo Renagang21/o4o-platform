@@ -267,10 +267,11 @@ Demo 는 **role 을 가진다.** §5 의 "role · membership · ownership 연결
 구현 · 계약:
 
 ```text
-CLI      apps/api-server/src/scripts/demo-account-provision.ts
+PAUSED   apps/api-server/src/scripts/demo-account-provision.ts
+         foundation 신규 생성은 운영 실행 대상 아님; 별도 대상 검토 후 재개
          ALLOWED_DEMO_ROLES = { neture:store_owner, neture:supplier }
          목록 밖 role 은 DB 를 건드리기 전(assertPreconditions)에 거절한다
-전환     apps/api-server/src/scripts/demo-account-reconcile.ts
+ACTIVE   apps/api-server/src/scripts/demo-account-reconcile.ts
          기존 경영자/공급자 UUID 유지·고정 credential 정정·직원 registry/관계 + kpa:store_member
          기본 read-only plan·정확한 before-image digest·일괄 transaction·변경 세션 폐기
          foundation provision도 registry 주소 불일치 시 쓰기 전 중단; 계정/credential/registry/관계는 같은 transaction
@@ -313,3 +314,5 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 *Created: 2026-10-01*
 
 **전환 시 서비스 연결 검증:** 세 Demo 유형 모두 `DEMO_REQUIRED_MEMBERSHIPS`의 필수 가입 상태를 확인한다. 이 map은 foundation provision과 reconcile의 공통 정본이다. 기존 Demo의 누락 연결은 같은 user ID에 생성하며, 기존 pending/suspended/withdrawn 연결을 active로 바꾸지 않는다. 필요한 membership·role 의도는 검토 digest에 포함한다. 로그인 성공만으로 Lecture 등 기능 이용 가능을 판정하지 않는다.
+
+운영 실행 분류는 [API scripts inventory](operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)가 정본이다. 현재 기존 Demo 전환은 ACTIVE reconcile만 사용한다. foundation은 PAUSED로 유지하며 이 지시로 새 foundation 생성까지 자동 실행하지 않는다.

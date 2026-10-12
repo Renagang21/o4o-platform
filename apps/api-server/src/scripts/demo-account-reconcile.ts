@@ -7,7 +7,7 @@ import { readPassword, safeInventoryError } from '../../../../scripts/deployment
 async function main() {
   const mode=process.env.DEMO_ACCOUNTS_MODE ?? 'plan';
   if (!['plan','apply'].includes(mode)) throw new Error('INVALID_OPERATION_MODE');
-  if (!process.env.DB_USERNAME || !process.env.DB_NAME) throw new Error('DATABASE_BINDINGS_MISSING');
+  if (!process.env.DB_USERNAME?.trim() || !process.env.DB_NAME?.trim()) throw new Error('DATABASE_BINDINGS_MISSING');
   const client = new Client({host:'127.0.0.1',port:55432,user:process.env.DB_USERNAME,
     database:process.env.DB_NAME,password:readPassword(),connectionTimeoutMillis:15000,
     ...(mode==='plan'?{options:'-c default_transaction_read_only=on'}:{})});

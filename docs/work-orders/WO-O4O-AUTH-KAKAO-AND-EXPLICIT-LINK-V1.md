@@ -744,3 +744,5 @@ schema migration은 신규 incremental로 등록하고 기존 적용 이력은 �
 아직 main에 통합하지 않았다. 이전 Demo32조건은 전환 전 검증으로 보존하며 새48조건의 증거가 아니다.
 
 운영 순서: main 통합 후 standalone `demo_accounts=true,mode=plan`으로 실제 원장과 migration history를 읽는다. 직원 registry migration25는 연속 manifest의23/24 뒤에 있다. 다른 WO의 §10은23/24 운영 migration을 아직 승인하지 않았으므로 미적용이면 이번 Demo 지시를 근거로 함께 실행하지 않는다. 실제 read-only 결과와 구체 적용 영향을 확보하고 승인/협의한다. schema 적용 후 다시 plan하여 정확한 새 digest로 계정 전환하고, 그 이후5웹 app/eight origin을 배포·검증한다. 코드 main 통합을 데이터 전환/운영 검증 완료로 기록하지 않는다.
+
+운영 도구 분류: inventory에서 reconcile ACTIVE·구현 service module dependency·기존 foundation PAUSED로 등록했다. 현재 운영은 ACTIVE standalone plan/apply만 사용한다. 신규 foundation 생성·일반 계정/운영자 변경·별도 미승인 migration으로 범위를 넓히지 않는다.

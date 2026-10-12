@@ -3,7 +3,7 @@
 > **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
 
 
-> **상태**: ACTIVE · **일자**: 2026-09-30
+> **상태**: ACTIVE · **일자**: 2026-10-13
 > **WO**: WO-O4O-REPOSITORY-DB-IDENTITY-AND-LEGACY-OPERATIONAL-SCRIPTS-CLEANUP-V1
 > **범위**: `apps/api-server/src/scripts/**` — 운영 DB 에 직접 접속하는 CLI · 일회성 데이터 생산 스크립트
 
@@ -29,6 +29,7 @@
 | `check-tables.ts` | 범용 점검 CLI | `DB_USERNAME` 필수 (이 WO 에서 fallback 제거) |
 | `package.json` 에 등록된 CLI (`drug:candidate-import` · `hff:*` · `medical-device:*` · `guard:product-description` · `drug-master:promotion:*` · `migration:roles*` · `migration:member-dedup*` 등) | 실행 명령 존재 | `o4o_api` 로그인 없음 (계약 테스트 ③) |
 | `seed-lecture-service-and-roles.ts` · `community-catalog-promotion.ts` · `encryption-key-rotation.ts` · `cafe24-product-census.ts` · `pharmacy-hub-store-subject-provisioning.ts` · `audit-roles.ts` · `productmaster-landing-bulk-apply.ts` | 2026-08~09 WO 의 현행 CLI | `DB_USERNAME` env |
+| `demo-account-reconcile.ts` (`demo-account-reconcile.service.ts`는 import되는 구현 모듈이며 독립 실행 도구가 아님) | [인증 WO T01~T08](../../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md),2026-10-12 사용자 제공3계정·버튼·연결 데이터 전환 지시. main/owner workflow의 standalone `demo_accounts=true` 경로. 기본 read-only plan, 정확한 digest, ACTIVE registry UUID 보존·역할/provider 보호·제한 membership 유지·감사/rollback/멱등 검토 완료. 현행 Test Demo 범위만 실행 후보이며 migration은 별도 gate | `DB_USERNAME`·`DB_NAME` 필수, 기존 Cloud SQL/WIF/Secret Manager binding. 로그인 identity 기본값 없음 |
 
 `package.json` 등록 CLI 중 현재도 쓰이는지는 개별 판정하지 않았다(실행 전 해당 WO 에서 확인).
 
@@ -36,10 +37,11 @@
 
 | 파일 | 트랙 · 재개 근거 |
 |---|---|
+| `demo-account-provision.ts` | 기존 foundation 생성용 구현을 유지한다. 이번 운영 전환은 ACTIVE reconcile로만 수행하며 이 도구는 운영 실행하지 않는다. 신규 foundation 생성은 대상·보호·DB identity를 해당 WO에서 재검토 후 재개한다. 공통 credential/필수 membership map 및 registry 충돌 중단·transaction 회귀는 유지 |
 | `hff-en-c01-*.mjs` (DB 접속 6: apply · fix-speckle · glossary · regression · survey · verify) · `hff-en-census-fetch.mjs` | HFF EN C01 — "잔여 16,805 문서는 Cycle 3 으로 인계" (`2b0b634fd`, 2026-08-08) |
 | `hff-ja-b04-*.mjs` (DB 접속 4: apply · measure · regression · verify) | HFF JA — 롱테일 저작 사이클, 신규 저작은 다음 WO 로 분리 (`7e46e1aa6`) |
 
-위 11개는 `requireDbUsername()` 으로 전환했다. 같은 prefix 의 DB 비접속 모듈(lib · translate · render 등)과 `hff-ja-b01-build/translate` 는 이들이 import 하므로 함께 유지한다.
+위 HFF11개는 `requireDbUsername()` 으로 전환했다. Demo foundation은 `DB_USERNAME` inline 필수 검사를 유지한다. 같은 prefix 의 DB 비접속 모듈(lib · translate · render 등)과 `hff-ja-b01-build/translate` 는 이들이 import 하므로 함께 유지한다.
 
 ### COMPLETED_ONE_OFF / LEGACY — 실행 금지 · 물리 삭제는 후속
 

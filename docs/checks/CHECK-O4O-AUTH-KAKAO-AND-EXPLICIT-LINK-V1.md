@@ -1339,3 +1339,7 @@ PR #521의 첫 리뷰 P2 두 건은 수용했다. legacy foundation provision은
 최종 집중 회귀70/70(격리 DB12·공급자 경계41·Google 은퇴 경계17), CLI3개 타입 검사 및 DB binding 누락 시 native sanitized error annotation 검증 PASS. 최종 구현의 실제 DB 조건은12개다. 전체 CI를 다시 확인하며 실패 gate를 우회하지 않는다.
 
 최신 main 동기화 후 리뷰의 필수 서비스 연결 지적도 수용했다. 경영자/공급자/직원 모두 foundation과 동일한 required membership map을 사용한다. 없어진 연결만 생성하고 비활성/제한된 연결은 자동 복구하지 않는다. plan의 membership readiness와 mutation intent digest를 추가했다. 기존 owner Lecture 누락을 복구한 뒤 user ID·ownership 보존/멱등을 확인했고 owner·supplier suspended Lecture를 유지하는2조건도 통과했다. 집중 회귀108/108(격리 DB15+공급자41+Google 은퇴17+기존 Demo/provision35),3 CLI typecheck PASS. 동기화된 PH inventory 회귀15도 PASS. 운영 반영은 아직0이다.
+
+최종 리뷰의 운영 후보 분류 누락 P1을 수용했다. scripts inventory에 새 reconcile entry를 ACTIVE로 등록하고 service module은 dependency임을 명시했다. 기존 foundation 생성기는 PAUSED로 기록해 이번 운영 전환에서 실행하지 않는다. Canonical Demo의 명령 설명도 같은 분류로 정합했다. 같은 사용자 지시·현재 인증 WO·기본 plan/digest/보호/transaction 및 기존 WIF DB identity를 등록 근거로 남겼다. ACTIVE/PAUSED 모두 DB_USERNAME/DB_NAME 공백을 접속 전에 거절하도록 inline 필수 검사를 보완했다. 이 등록은 별도23/24 migration이나 일반 사용자/운영자 수정의 승인이 아니다.
+
+도구 분류 보완 후 DB identity/provision 계약44,3 CLI typecheck, username 미설정/공백의 접속 전 거절2조건, docs 민감정보 guard3878파일 모두 PASS. API scripts inventory 분류를 완화하지 않고 실행 후보와 이번 실제 운영 경로를 명시했다.

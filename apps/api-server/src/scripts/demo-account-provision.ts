@@ -83,7 +83,7 @@ const ALLOWED_DEMO_ROLES: ReadonlySet<string> = new Set(['neture:store_owner', '
 
 function createDataSource(): DataSource {
   const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME } = process.env;
-  if (!DB_HOST || !DB_USERNAME || !DB_PASSWORD || !DB_NAME) {
+  if (!DB_HOST || !DB_USERNAME?.trim() || !DB_PASSWORD || !DB_NAME?.trim()) {
     const presence = (v?: string) => (v ? 'SET' : 'MISSING');
     throw new Error(
       `Missing required database environment variables.\n` +
