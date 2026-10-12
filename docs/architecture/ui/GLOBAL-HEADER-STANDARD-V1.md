@@ -7,7 +7,7 @@
 
 
 > **작성일**: 2026-04-17
-> **최종 갱신**: 2026-10-11 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·운영 배포, 실제 인증 검증 사용자 제외) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **최종 갱신**: 2026-10-12 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·운영 배포, 실제 인증 검증 사용자 제외) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
 > **범위**: kpa-society, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
