@@ -1155,3 +1155,31 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 패널 내부의 alert로 범위를 한정하고 해당2조건만 재실행해2/2 PASS를 확인했다.
 실제 발급 POST의 대상/returnPath·제한 시 이동 없음·버튼 재활성·source token 보존을
 검사했다. 성공 조건은 합성 handoff 주소까지의 이동 확인이며 실제 서버 교환/OAuth를 증명하지 않는다.
+
+#### 제한 계정의 실제 읽기 계약 review 보완
+
+최신 `5a7b534a9d` 재리뷰의 P2 지적은 `users.status=pending` 제한 계정의
+`GET /neture/home/entry`가 중앙 allowlist에 없어, 위처럼 주입한 `netureMain:pending`
+안내에 실제로 도달하지 못한다는 내용이다. 해당4조건은 메인 이용 상태 안내 분기의 합성
+회귀이며 실제 제한 로그인 계정의 HTTP 계약 증거가 아니다.
+
+서버 allowlist는 넓히지 않았다. 실제 `useNetureServiceStates`가 정확히
+`403 ACCOUNT_ACCESS_RESTRICTED`를 받으면 기존 허용 경로인 `GET /auth/me`로
+본인의 `status=pending && accountAccess=restricted`를 재확인한다. 확인된 경우에도
+serviceStates는 null로 유지하며 전용 계정 안내·읽기 재시도·명시적인 공개 메인 링크만
+표시한다. 제한 계정에 handoff나 공급자 신청을 제공하지 않는다. 본인 조회 실패·상태 불일치·
+다른403/500은 일반 조회 오류로 유지하며 미가입/정상 계정으로 추정하지 않는다.
+
+- 실제 hook과 신청 패널을 함께 사용한 HTTP 응답 통합 회귀8/8 PASS:
+  제한403/본인 확인, 확인되지 않은 상태3조건, 본인 조회 실패, 다른 오류2조건,
+  서버가 정상 상태로 바뀐 뒤 읽기 재시도로 안내가 전환되는 조건. 최종 관련 화면61/61 PASS.
+- 실제 `requireAuth`를 통과하는 중앙 가드 회귀25/25 PASS. 제한 계정의 me는200,
+  home/entry와 POST handoff는403이며 handler에 도달하지 않는다. API runtime 수정 없음.
+- 최신 로컬 production bundle × PC/mobile 합성30/30 PASS. 기존24조건에 실제 제한
+  읽기 응답·본인 조회 실패·정상 전환 재조회6조건을 더했다. 서버 allowlist 계약은 위 중앙
+  가드 테스트로 검증하며 브라우저 HTTP fixture는 운영 계정 검증으로 확대하지 않는다.
+- Neture tsc/Vite build PASS. 공통 hook/button과 Frozen/권한/DB 구조 변경 없음.
+
+동시에 main에 들어온 Store 직원 최종 승인 트랙 #503은 소유 트랙의 변경이다. 자기 PR에
+소유 코드를 복제하지 않으며 통합 시 최신 main을 merge하고 필요한 회귀를 확인한다.
+해당 트랙의 운영 rollout 진행 중에는 인증 배포를 겹쳐 실행하지 않는다.

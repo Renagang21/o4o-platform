@@ -24,7 +24,7 @@ import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '
 
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { O4OHomeButton } from '@o4o/auth-react';
+import { O4OHomeButton, O4O_HOME_URL } from '@o4o/auth-react';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
@@ -43,7 +43,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export function ServiceApplyPanel({ service, enterWorkspace = false }: { service: ServiceKey; enterWorkspace?: boolean }) {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
+  const { states, loading, error, restrictedAccount, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
   const agreement = useServiceEnrollmentPolicies('supplier', async () => (await api.get('/public/services/supplier/enrollment-policies')).data.data, user?.id ?? 'signed-out');
 
@@ -57,8 +57,18 @@ export function ServiceApplyPanel({ service, enterWorkspace = false }: { service
 
   const box = 'bg-white/95 text-gray-900 rounded-xl p-6 text-left max-w-lg mx-auto shadow-lg';
 
-  if (loading || (!states && !error)) {
+  if (loading || (!states && !error && !restrictedAccount)) {
     return <div className={box}><p className="text-sm text-gray-500">서비스 이용 상태를 확인하는 중...</p></div>;
+  }
+
+  if (restrictedAccount) {
+    return (
+      <div className={box} data-testid={`service-apply-${service}-account-restricted`}>
+        <p className="text-sm text-gray-700 mb-4">Neture 계정 확인이 필요합니다. 계정의 이메일 확인이나 이용 제한 상태를 확인해 주세요. 공급자 신청과 업무는 계정 확인 후 이용할 수 있습니다.</p>
+        <button type="button" onClick={reload} className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-semibold">계정 상태 다시 확인</button>
+        <a href={O4O_HOME_URL} className="block mt-4 text-sm text-gray-600 underline">Neture 공개 메인으로</a>
+      </div>
+    );
   }
 
   if (error || !states) {
