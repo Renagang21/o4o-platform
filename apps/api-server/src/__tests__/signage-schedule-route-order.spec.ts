@@ -1,3 +1,9 @@
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
+jest.mock('../utils/service-membership.js', () => ({ hasActiveServiceMembership: jest.fn(async () => true) }));
+jest.mock('../utils/store-owner.utils.js', () => ({ isStoreOwner: jest.fn(async (ds, userId, _service, org) => {
+  const rows = await ds.query('SELECT 1 FROM neture_pharmacy_memberships', [userId, org]);
+  return { isOwner: !!rows.length, organizationId: rows.length ? org : null, pendingAgreement: null };
+}) }));
 /**
  * WO-O4O-SIGNAGE-SCHEDULES-CALENDAR-ROUTE-SHADOWING-FIX-V1
  *
@@ -18,7 +24,7 @@ import express from 'express';
 import request from 'supertest';
 
 jest.mock('../database/connection.js', () => ({
-  AppDataSource: { query: jest.fn() },
+  AppDataSource: { isInitialized: true, query: jest.fn() },
 }));
 
 const entered: string[] = [];

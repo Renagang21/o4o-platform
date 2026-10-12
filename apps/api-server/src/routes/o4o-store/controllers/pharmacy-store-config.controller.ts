@@ -16,7 +16,8 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -34,7 +35,7 @@ export function createPharmacyStoreConfigController(
 
   // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
   // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey 전파.
-  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // GET /config — 매장 설정 조회
   router.get('/config', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {

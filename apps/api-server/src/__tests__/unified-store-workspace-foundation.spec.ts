@@ -28,6 +28,7 @@ function makeDataSource(responses: Row[][]) {
     isInitialized: true,
     query: jest.fn(async (sql: string, params: unknown[] = []) => {
       calls.push({ sql, params });
+      if (sql.includes("ra.role = 'cafe24-b2b:store_member'")) return [];
       return queue.shift() ?? [];
     }),
   };
@@ -50,7 +51,7 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
   //   Store Member(사업자가 허가한 사용자)도 자기 매장을 봐야 하므로 후보 질의가 하나 늘었다.
   //   owner 후보 집합(owner/admin/manager)은 **그대로** 두고 member 후보('staff')를 따로 구한다 —
   //   그 배열을 넓히면 owner 조직 해석까지 같이 넓어진다.
-  it('후보는 owner · member 두 질의, 약국 원장 확인 1 질의, 이름은 organizations 에서 붙인다 — 4 질의', async () => {
+  it('후보는 owner · 약국 member · Café24 member, 약국 원장과 표시명을 조회한다 — 5 질의', async () => {
     const { dataSource, calls } = makeDataSource([
       [memberRow(STORE_B), memberRow(STORE_A, 'manager')],
       [], // member 후보 없음
@@ -58,7 +59,7 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
       [{ id: STORE_A, name: '가나약국' }, { id: STORE_B, name: '다라약국' }],
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
-    expect(calls).toHaveLength(4);
+    expect(calls).toHaveLength(5);
     expect(norm(calls[0].sql)).toContain('organization_members');
     expect(norm(calls[0].sql)).not.toContain('organization_service_enrollments');
     expect(calls[0].params[0]).toBe(USER_X);
@@ -66,9 +67,10 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
     expect(calls[0].params[1]).toEqual(['owner', 'admin', 'manager']);
     expect(norm(calls[1].sql)).toContain('organization_members');
     expect(norm(calls[1].sql)).toContain("role = 'staff'");
-    expect(norm(calls[2].sql)).toContain('neture_pharmacy_memberships');
-    expect(norm(calls[3].sql)).toContain('FROM organizations');
-    expect(calls[3].params).toEqual([[STORE_B, STORE_A]]);
+    expect(norm(calls[2].sql)).toContain("ra.role = 'cafe24-b2b:store_member'");
+    expect(norm(calls[3].sql)).toContain('neture_pharmacy_memberships');
+    expect(norm(calls[4].sql)).toContain('FROM organizations');
+    expect(calls[4].params).toEqual([[STORE_B, STORE_A]]);
     // 자동 선택 없음 — 2개 모두 돌려주고 이름 오름차순
     expect(stores).toEqual([
       { organizationId: STORE_A, organizationName: '가나약국', memberRole: 'manager' },
@@ -91,7 +93,7 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
     const { dataSource, calls } = makeDataSource([[], []]);
     expect(await resolveAccessibleStores(dataSource, USER_X)).toEqual([]);
     // owner · member 후보를 각각 한 번씩만 보고, 비면 organizations 는 건드리지 않는다.
-    expect(calls).toHaveLength(2);
+    expect(calls).toHaveLength(3);
   });
 
   it('Member 매장도 목록에 들어간다 — owner 와 합치고 중복은 제거한다', async () => {
@@ -117,13 +119,13 @@ describe('resolveAccessibleStores — Store Selector 입력 (WO §3-③)', () =>
     ]);
     const stores = await resolveAccessibleStores(dataSource, USER_X);
     expect(stores.map((s) => s.organizationId)).toEqual([STORE_A]);
-    expect(calls[3].params).toEqual([[STORE_A]]);
+    expect(calls[4].params).toEqual([[STORE_A]]);
   });
 
   it('후보가 모두 비활성 약국이면 organizations 를 조회하지 않고 [] (가입 안내 분기)', async () => {
     const { dataSource, calls } = makeDataSource([[memberRow(STORE_A)], [], [{ organization_id: STORE_A }]]);
     expect(await resolveAccessibleStores(dataSource, USER_X)).toEqual([]);
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
   });
 
   it('userId 가 비어 있으면 질의 없이 []', async () => {

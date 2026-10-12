@@ -169,13 +169,13 @@ function storeChildRoutes() {
         <Route path="execution" element={<StoreExecutionPage />} />
         <Route path="execution/product-info" element={<Navigate to={`${S}/handled-products`} replace />} />
         {/* 매장 제품 */}
-        <Route path="my-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
-        <Route path="handled-products" element={<StoreOwnerOnly><StoreHandledProductsPage /></StoreOwnerOnly>} />
-        <Route path="product-settings" element={<StoreOwnerOnly><StoreProductsManagerPage
+        <Route path="my-products" element={<StoreHandledProductsPage />} />
+        <Route path="handled-products" element={<StoreHandledProductsPage />} />
+        <Route path="product-settings" element={<StoreProductsManagerPage
           {...STORE_PRODUCT_SETTINGS_LABELS}
-        /></StoreOwnerOnly>} />
-        <Route path="commerce/local-products" element={<StoreOwnerOnly><StoreLocalProductsPage /></StoreOwnerOnly>} />
-        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreOwnerOnly><StoreProductMultilingualContentPage /></StoreOwnerOnly>} />
+        />} />
+        <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
+        <Route path="products/multilingual/:targetKind/:targetId" element={<StoreProductMultilingualContentPage />} />
         {/* 매장 경영지원 */}
         <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
         <Route path="marketing/qr" element={<StoreQRPage />} />

@@ -1,3 +1,5 @@
+const delegated = jest.fn();
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: (...args: unknown[]) => delegated(...args) }));
 /**
  * WO-NETURE-PHARMACY-PREDEPLOY-ACCESS-ALIGNMENT-V1 — 내 매장(약국) 신청 약국의 내 매장 signage
  *
@@ -66,6 +68,7 @@ const ledgerOwner = (organizationId = ORG) =>
   isStoreOwner.mockResolvedValue({ isOwner: true, organizationId, memberRole: 'owner', pendingAgreement: null });
 
 beforeEach(() => {
+  delegated.mockReset(); delegated.mockResolvedValue(null);
   query.mockReset();
   query.mockResolvedValue([{ one: 1 }]); // organization_members 소유 row
   hasActiveServiceMembership.mockReset();
@@ -85,9 +88,8 @@ describe('S1 원장 약국 + 자기 매장 org → store 계열 통과', () => {
     expect(r.next).toHaveBeenCalled();
     expect(r.req.signageContext).toMatchObject({ role: 'store', serviceKey: 'kpa-society', organizationId: ORG });
     expect(isStoreOwner).toHaveBeenCalledWith(expect.anything(), 'u-pharmacy', 'kpa', ORG);
-    // 소유 · 서비스 귀속 검사는 그대로 거친다
-    expect(query).toHaveBeenCalled();
-    expect(isOrganizationLinkedToService).toHaveBeenCalledWith(expect.anything(), ORG, 'kpa');
+    // 현재 약국 원장과 소유 관계를 검증하는 canonical guard가 선택 org를 확정한다.
+    expect(delegated).toHaveBeenCalledWith(expect.anything(), 'u-pharmacy', 'kpa', ORG);
   });
 
   it('allowSignageStoreRead (TV 재생 active-content) — 명시한 자기 매장 org 의 store 읽기 context', async () => {
@@ -100,6 +102,8 @@ describe('S1 원장 약국 + 자기 매장 org → store 계열 통과', () => {
   it('원장 경로에서도 소유 row 가 없으면 기존 SIGNAGE_STORE_REQUIRED', async () => {
     ledgerOwner();
     query.mockResolvedValue([]);
+    isStoreOwner.mockResolvedValue({ isOwner: false, organizationId: null, pendingAgreement: null });
+    hasActiveServiceMembership.mockResolvedValue(true);
     const r = await run(requireSignageStore, makeReq('kpa-society', ORG));
     expect([r.status, r.code]).toEqual([403, 'SIGNAGE_STORE_REQUIRED']);
   });
@@ -165,10 +169,29 @@ describe('S4 열지 않는 경로', () => {
 });
 
 describe('S5 kpa-society 회원은 기존 경로', () => {
-  it('membership active → 원장 판정 0', async () => {
+  it('개인 서비스 가입이 있어도 선택 매장의 원장을 재검증한다', async () => {
     hasActiveServiceMembership.mockResolvedValue(true);
+    ledgerOwner();
     const r = await run(requireSignageStore, makeReq('kpa-society', ORG, { id: 'u-kpa', roles: ['kpa:store_owner'] }));
     expect(r.next).toHaveBeenCalled();
+    expect(isStoreOwner).toHaveBeenCalledWith(expect.anything(), 'u-kpa', 'kpa', ORG);
+  });
+});
+
+
+describe('승인 직원과 해제된 직원의 현재 매장 권한', () => {
+  it.each([requireSignageStore, requireSignageOperatorOrStore, allowSignageStoreRead])('승인 직원은 개인 약사 서비스 가입 없이 매장 업무를 이용한다', async mw => {
+    delegated.mockResolvedValue(ORG);
+    const r = await run(mw, makeReq('kpa-society', ORG, { id: 'staff', roles: ['kpa:store_member'] }));
+    expect(r.next).toHaveBeenCalled();
+    expect(r.req.signageContext.organizationId).toBe(ORG);
     expect(isStoreOwner).not.toHaveBeenCalled();
+  });
+  it.each([requireSignageStore, requireSignageOperatorOrStore, allowSignageStoreRead])('다른 매장의 경영자 role과 이전 조직 claim도 해제를 우회하지 못한다', async mw => {
+    hasActiveServiceMembership.mockResolvedValue(true);
+    isStoreOwner.mockResolvedValue({ isOwner: false, organizationId: null, pendingAgreement: null });
+    const r = await run(mw, makeReq('kpa-society', ORG, { id: 'staff', roles: ['neture:store_owner', 'kpa:store_member'], organizationId: ORG, organizations: [ORG] }));
+    expect(r.status).toBe(403);
+    expect(r.next).not.toHaveBeenCalled();
   });
 });

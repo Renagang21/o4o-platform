@@ -12,7 +12,8 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { generateQrSvg } from '../../../services/qr-print.service.js';
 import { getServicePublicOrigin } from '../../../config/service-catalog.js';
 
@@ -178,7 +179,7 @@ export function createMultilingualProductContentController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // ─── PUBLIC: GET /public/multilingual-product-contents/:publicKey?locale=en ───
   // WO-O4O-MULTILINGUAL-PRODUCT-QR-LANDING-V1
