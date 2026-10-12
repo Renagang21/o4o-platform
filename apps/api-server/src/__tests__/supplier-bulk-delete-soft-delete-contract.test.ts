@@ -28,7 +28,7 @@ jest.mock('../database/connection.js', () => ({
   AppDataSource: { query: (...args: unknown[]) => queryMock(...args) },
 }));
 
-import { NetureOfferService } from '../modules/neture/services/offer.service.js';
+import { SupplierOfferWriteService } from '../modules/neture/services/supplier-offer-write.service.js';
 
 /** listing/serviceProduct 카운트를 흉내낸다. */
 function mockCounts({ listings = 0, serviceProducts = 0 }) {
@@ -40,7 +40,7 @@ function mockCounts({ listings = 0, serviceProducts = 0 }) {
 }
 
 function withOffers(rows: Array<{ id: string; supplierId: string }>) {
-  const svc = Object.create(NetureOfferService.prototype) as any;
+  const svc = Object.create(SupplierOfferWriteService.prototype) as any;
   const updated: Array<{ id: string; patch: Record<string, unknown> }> = [];
   const softDeleted: string[] = [];
   const removed: string[] = [];

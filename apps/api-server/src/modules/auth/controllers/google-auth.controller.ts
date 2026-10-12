@@ -1,4 +1,4 @@
-import { signupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
@@ -9,7 +9,6 @@ import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance
  * displayName · pendingPolicyAcceptances). 검증·조회·세션 발급은 전부 `googleAuthService` 가 담당한다.
  */
 import { Request, Response } from 'express';
-import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
@@ -76,7 +75,7 @@ export class GoogleAuthController extends BaseController {
     const { idToken, consents, includeLegacyTokens } = req.body as GoogleSignupRequestDto;
     try {
       const session = await googleAuthService.signup({
-        policyServiceKey: signupPolicyKeyFromOrigin(req.get('origin')),
+        policyServiceKey: await resolveSignupPolicyKeyFromOrigin(req.get('origin')),
         idToken,
         consents,
         ipAddress: getTrustedClientIp(req),
@@ -114,7 +113,7 @@ export class GoogleAuthController extends BaseController {
       || (user.email as string | undefined)?.split('@')[0]
       || '사용자';
     try {
-      user.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(String(user.id));
+      user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id), resolveSessionServiceKey(req.get('origin')));
     } catch { user.pendingPolicyAcceptances = []; }
 
     const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);

@@ -1,3 +1,5 @@
+import { api } from './apiClient';
+import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * O4O 강의 (lecture) — `@o4o/lms-ui` 공통 View adapter
  *
@@ -54,6 +56,11 @@ function toLesson(l: LectureLesson) {
     videoUrl: l.videoUrl ?? null,
     content: l.content ?? null,
   };
+}
+
+export async function enrollWithPolicy(courseId: string, policyReferences: EnrollmentPolicyReference[]) {
+  const response = await api.post(`/lms/courses/${encodeURIComponent(courseId)}/enroll`, { policyReferences });
+  return toEnrollment(response.data?.data?.enrollment ?? response.data?.data);
 }
 
 export const lecturePort: LmsLearnerPort = {

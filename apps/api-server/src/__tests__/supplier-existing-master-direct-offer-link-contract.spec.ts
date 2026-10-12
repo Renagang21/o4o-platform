@@ -26,7 +26,15 @@ const CONTROLLER = 'apps/api-server/src/modules/neture/controllers/supplier-prod
 const ERROR_CODES = 'apps/api-server/src/modules/neture/constants/offer-error-code.ts';
 const NETURE_SERVICE = 'apps/api-server/src/modules/neture/neture.service.ts';
 
-const offerSrc = stripComments(read(OFFER_SERVICE));
+// Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
+const offerSrc = [
+  OFFER_SERVICE,
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-write.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-distribution.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'offer-lifecycle.service.ts'),
+  OFFER_SERVICE.replace('offer.service.ts', 'offer-write-policy.ts'),
+].map((rel) => stripComments(read(rel))).join('\n');
 const controllerSrc = stripComments(read(CONTROLLER));
 
 /** 메서드 본문 추출 — 다음 top-level 메서드 선언(2-space indent `async`/`private`) 직전까지 */
@@ -38,8 +46,9 @@ function methodBody(src: string, signature: RegExp): string {
   return next < 0 ? rest : rest.slice(0, next);
 }
 
-const fromMasterBody = methodBody(offerSrc, /\n {2}async createSupplierOfferFromExistingMaster\(/);
-const primitiveBody = methodBody(offerSrc, /\n {2}private async persistOfferForResolvedMaster\(/);
+const registrationSrc = stripComments(read(OFFER_SERVICE.replace('offer.service.ts', 'supplier-offer-registration.service.ts')));
+const fromMasterBody = methodBody(registrationSrc, /\n {2}async createSupplierOfferFromExistingMaster\(/);
+const primitiveBody = methodBody(registrationSrc, /\n {2}private async persistOfferForResolvedMaster\(/);
 
 describe('① /from-master 서비스 경로 — Master 생성·수정·Identifier·Candidate 참조 0', () => {
   it.each([

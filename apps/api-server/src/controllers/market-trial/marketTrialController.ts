@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../../modules/policy-acceptance/policy-acceptance.service.js';
 /**
  * Market Trial Controller
  *
@@ -576,7 +577,7 @@ export class MarketTrialController {
         });
       }
 
-      const { trial, participant: saved } = await new FundingWorkspaceService(MarketTrialController.dataSource!).join(id, userId, rewardType);
+      const { trial, participant: saved } = await new FundingWorkspaceService(MarketTrialController.dataSource!).join(id, userId, rewardType, req.body.policyReferences);
 
       // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify participant of join.
       // Idempotent at the call site — duplicate-participation check above (line ~588) blocks repeats.
@@ -588,6 +589,7 @@ export class MarketTrialController {
         message: 'Successfully joined the trial',
       });
     } catch (error) {
+      if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, message: error.message });
       if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Join trial error:', error);
       res.status(500).json({

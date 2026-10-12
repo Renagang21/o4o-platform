@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * NetureService — Thin Facade
  *
@@ -91,7 +92,7 @@ export class NetureService {
 
   async registerSupplier(
     userId: string,
-    data: { name: string; slug: string; contactEmail?: string },
+    data: { name: string; slug: string; contactEmail?: string; policyReferences?: EnrollmentPolicyReference[] },
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     return this.supplierService.registerSupplier(userId, data);
   }

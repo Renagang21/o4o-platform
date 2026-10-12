@@ -117,6 +117,7 @@ describe('중앙 개별 역할 지정', () => {
       return ok({ members: [{ membershipId: 'm1', userId: 'u1', role: 'member', name: `${q || '회원'}-${page}`, membershipStatus: 'active', designationEligibility: { eligible: true } }], pagination: { page, pageSize, total: 21, totalPages: 2 } });
     });
     render(<MemoryRouter><CommunityServiceAdminPage /></MemoryRouter>);
+    await screen.findByRole('option', { name: /^첫 커뮤니티/ });
     fireEvent.change(await screen.findByLabelText('커뮤니티 선택'), { target: { value: 'c1' } });
     await screen.findByText('회원-1');
     fireEvent.click(screen.getByRole('button', { name: '다음 페이지' })); await screen.findByText('회원-2');

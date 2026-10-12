@@ -1,3 +1,5 @@
+import { readCurrentPolicyDocument } from '../policy-acceptance/policy-document-evidence.service.js';
+import { isEnrollmentPolicySlug } from '../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * Admin Service Legal Controller
  *
@@ -35,9 +37,11 @@ import {
   isSupportedPolicyDocumentType,
 } from './service-legal-scope.js';
 import logger from '../../utils/logger.js';
+import { COMMON_ACCOUNT_TERMS_SLUG } from '../../common/auth/terms-acceptance.policy.js';
 import {
   ServicePolicyLifecycleError,
   resolveServicePolicyLifecycle,
+  assertPolicyEffectiveForPublication,
   type ServicePolicyLifecycleAction,
 } from './service-policy-lifecycle.js';
 
@@ -246,47 +250,57 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
       const serviceKey = req.params.serviceKey;
       const userId = (req as any).user?.id ?? null;
       try {
-        const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
-        if (!doc) {
-          return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
-        }
-        if (doc.status === 'archived') {
-          return res.status(409).json({ success: false, error: { code: 'POLICY_ARCHIVED', message: '보관된 문서는 복원 후 수정할 수 있습니다.' } });
-        }
-        const before = toAdminPolicyDocument(doc);
-        const { title, slug, content, version, effectiveDate, changeReason } = req.body;
-        // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §5: published 문서 무결성.
-        //   승낙 이력이 "어느 문서·본문에 동의했는가" 를 가리키므로 게시 중인 row 의 본문·버전·시행일은
-        //   덮어쓰지 않는다. 변경은 새 draft → 새 version → publish (구 published 는 draft 로 내려가 보존).
-        if (doc.status === 'published') {
-          const toTime = (v: unknown) => (v ? new Date(v as string | Date).getTime() : null);
-          const immutableTouched =
-            (typeof content === 'string' && content !== doc.content)
-            || (Number.isInteger(version) && version > 0 && version !== doc.version)
-            || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date));
-          if (immutableTouched) {
-            return res.status(409).json({
-              success: false,
-              error: { code: 'PUBLISHED_POLICY_IMMUTABLE', message: '게시 중인 문서의 본문·버전·시행일은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.' },
-            });
+        const { saved, before, after } = await dataSource.transaction(async manager => {
+          await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`service-policy:${serviceKey}`]);
+          const txRepo = manager.getRepository(ServicePolicyDocument);
+          const doc = await txRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+          if (!doc) {
+            throw new ServicePolicyLifecycleError('NOT_FOUND', '문서를 찾을 수 없습니다.', 404);
           }
-        }
-        if (title !== undefined) {
-          const cleanTitle = normalizeStr(title);
-          if (!cleanTitle) {
-            return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title 은 비울 수 없습니다.' } });
+          if (doc.status === 'archived') {
+            throw new ServicePolicyLifecycleError('POLICY_ARCHIVED', '보관된 문서는 복원 후 수정할 수 있습니다.', 409);
           }
-          doc.title = cleanTitle;
-        }
-        if (slug !== undefined) doc.slug = normalizeStr(slug);
-        if (typeof content === 'string') doc.content = content;
-        if (Number.isInteger(version) && version > 0) doc.version = version;
-        if (effectiveDate !== undefined) doc.effective_date = effectiveDate ? new Date(effectiveDate) : null;
-        if (changeReason !== undefined) doc.change_reason = normalizeStr(changeReason);
-        doc.updated_by = userId;
+          const before = toAdminPolicyDocument(doc);
+          const { title, slug, content, version, effectiveDate, changeReason } = req.body;
+          const slugChanged = slug !== undefined && normalizeStr(slug) !== normalizeStr(doc.slug);
+          // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §5: published 문서 무결성.
+          //   승낙 이력이 "어느 문서·본문에 동의했는가" 를 가리키므로 게시 중인 row 의 본문·버전·시행일·표식은
+          //   덮어쓰지 않는다. 변경은 새 draft → 새 version → publish (구 published 는 draft 로 내려가 보존).
+          if (doc.status === 'published') {
+            const toTime = (v: unknown) => (v ? new Date(v as string | Date).getTime() : null);
+            const immutableTouched =
+              (typeof content === 'string' && content !== doc.content)
+              || (Number.isInteger(version) && version > 0 && version !== doc.version)
+              || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date))
+              || slugChanged;
+            if (immutableTouched) {
+              throw new ServicePolicyLifecycleError('PUBLISHED_POLICY_IMMUTABLE', '게시 중인 문서의 본문·버전·시행일·표식은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.', 409);
+            }
+          }
+          // The account marker belongs to a newly created row, including after unpublish/restore.
+          if (slugChanged && (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) || isEnrollmentPolicySlug(doc.service_key, doc.document_type, normalizeStr(slug)))) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_MARKER_IMMUTABLE', '서비스 신청 정책 표식은 새 문서 등록 시에만 지정할 수 있습니다.');
+          if (slugChanged && doc.service_key === 'neture' && ['terms', 'privacy'].includes(doc.document_type)
+            && (doc.slug === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy') || normalizeStr(slug) === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy'))) {
+            throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_MARKER_IMMUTABLE', '공통 계정 약관 표식은 새 문서 등록 시에만 지정할 수 있습니다.', 409);
+          }
+          if (title !== undefined) {
+            const cleanTitle = normalizeStr(title);
+            if (!cleanTitle) {
+              throw new ServicePolicyLifecycleError('VALIDATION_ERROR', 'title 은 비울 수 없습니다.', 400);
+            }
+            doc.title = cleanTitle;
+          }
+          if (slug !== undefined) doc.slug = normalizeStr(slug);
+          if (typeof content === 'string') doc.content = content;
+          if (Number.isInteger(version) && version > 0) doc.version = version;
+          if (effectiveDate !== undefined) doc.effective_date = effectiveDate ? new Date(effectiveDate) : null;
+          if (changeReason !== undefined) doc.change_reason = normalizeStr(changeReason);
+          doc.updated_by = userId;
 
-        const saved = await policyRepo.save(doc);
-        const after = toAdminPolicyDocument(saved);
+          const saved = await txRepo.save(doc);
+          const after = toAdminPolicyDocument(saved);
+          return { saved, before, after };
+        });
         await audit(serviceKey, userId, 'service_legal:policy_update', {
           entityType: 'service_policy_document',
           entityId: saved.id,
@@ -296,6 +310,7 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         });
         res.json({ success: true, data: after });
       } catch (error) {
+        if (error instanceof ServicePolicyLifecycleError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
         logger.error('[ServiceLegal Admin] update policy error:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 수정 실패' } });
       }
@@ -318,40 +333,74 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: "action 은 publish 또는 unpublish 여야 합니다." } });
       }
       try {
-        const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
-        if (!doc) {
-          return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
-        }
-        if (doc.status === 'archived') {
-          return res.status(409).json({ success: false, error: { code: 'POLICY_ARCHIVED', message: '보관된 문서는 복원 후 게시할 수 있습니다.' } });
-        }
-        const before = toAdminPolicyDocument(doc);
+        const { saved, before, after } = await dataSource.transaction(async manager => {
+          await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`service-policy:${serviceKey}`]);
+          const txRepo = manager.getRepository(ServicePolicyDocument);
+          const doc = await txRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+          if (!doc) {
+            throw new ServicePolicyLifecycleError('NOT_FOUND', '문서를 찾을 수 없습니다.', 404);
+          }
+          if (doc.status === 'archived') {
+            throw new ServicePolicyLifecycleError('POLICY_ARCHIVED', '보관된 문서는 복원 후 게시할 수 있습니다.', 409);
+          }
+          const before = toAdminPolicyDocument(doc);
 
-        if (action === 'publish') {
-          // 같은 유형의 기존 published 문서 → draft
-          await policyRepo
-            .createQueryBuilder()
-            .update(ServicePolicyDocument)
-            .set({ status: 'draft', updated_at: () => 'now()' })
-            .where('service_key = :serviceKey AND document_type = :dt AND status = :s AND id != :id', {
-              serviceKey,
-              dt: doc.document_type,
-              s: 'published',
-              id: doc.id,
-            })
-            .execute();
+          if (action === 'publish') {
+            if ([doc.title, doc.content].some(value => typeof value !== 'string' || value.trim().length === 0)) {
+              throw new ServicePolicyLifecycleError('POLICY_DISPLAY_FIELDS_REQUIRED', '게시할 정책 문서의 제목과 본문을 입력해 주세요.', 400);
+            }
+            if (doc.service_key === 'neture' && ['terms', 'privacy'].includes(doc.document_type) && doc.slug === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy')
+              && (doc.version < 2 || !doc.effective_date)) {
+              throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_NOT_READY', '새 공통 계정 약관은 새 버전과 확정된 시행일이 필요합니다.', 400);
+            }
+            if (isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug) && (doc.version < 2 || !doc.effective_date)) throw new ServicePolicyLifecycleError('ENROLLMENT_POLICY_NOT_READY', '새 서비스 신청 정책은 새 버전과 확정된 시행일이 필요합니다.', 400);
+            // Validate before demoting any published row; notice must not activate future terms.
+            assertPolicyEffectiveForPublication(doc.effective_date);
+            if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG) {
+              const privacy = await readCurrentPolicyDocument(manager, 'neture', 'privacy', true);
+              if (!privacy || privacy.slug !== 'neture-account-privacy' || Number(privacy.version) !== doc.version || !privacy.title?.trim() || !privacy.content?.trim()) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '같은 버전의 공통 개인정보 처리방침을 먼저 준비해 주세요.', 409);
+              }
+            }
+            if (doc.service_key === 'neture' && doc.document_type === 'privacy') {
+              const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
+              if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2
+                && (doc.slug !== 'neture-account-privacy' || doc.version !== Number(terms.version))) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 같은 버전의 개인정보 처리방침을 유지해 주세요.', 409);
+              }
+            }
+            // 같은 유형의 기존 published 문서 → draft
+            await txRepo
+              .createQueryBuilder()
+              .update(ServicePolicyDocument)
+              .set({ status: 'draft', updated_at: () => 'now()' })
+              .where('service_key = :serviceKey AND document_type = :dt AND status = :s AND id != :id', {
+                serviceKey,
+                dt: doc.document_type,
+                s: 'published',
+                id: doc.id,
+              })
+              .execute();
 
-          doc.status = 'published';
-          doc.published_at = new Date();
-          doc.published_by = userId;
-          doc.updated_by = userId;
-        } else {
-          doc.status = 'draft';
-          doc.updated_by = userId;
-        }
+            doc.status = 'published';
+            doc.published_at = new Date();
+            doc.published_by = userId;
+            doc.updated_by = userId;
+          } else {
+            if (doc.service_key === 'neture' && doc.document_type === 'privacy' && doc.slug === 'neture-account-privacy' && doc.status === 'published') {
+              const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
+              if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2) {
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 정책 전환 순서를 먼저 확인해 주세요.', 409);
+              }
+            }
+            doc.status = 'draft';
+            doc.updated_by = userId;
+          }
 
-        const saved = await policyRepo.save(doc);
-        const after = toAdminPolicyDocument(saved);
+          const saved = await txRepo.save(doc);
+          const after = toAdminPolicyDocument(saved);
+          return { saved, before, after };
+        });
         await audit(serviceKey, userId, `service_legal:policy_${action}`, {
           entityType: 'service_policy_document',
           entityId: saved.id,
@@ -361,6 +410,9 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         });
         res.json({ success: true, data: after });
       } catch (error) {
+        if (error instanceof ServicePolicyLifecycleError) {
+          return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
+        }
         logger.error('[ServiceLegal Admin] publish policy error:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 게시 처리 실패' } });
       }
@@ -384,16 +436,21 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
       }
 
       try {
-        const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
-        if (!doc) {
-          return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
-        }
+        const { saved, before, after } = await dataSource.transaction(async manager => {
+          await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`service-policy:${serviceKey}`]);
+          const txRepo = manager.getRepository(ServicePolicyDocument);
+          const doc = await txRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+          if (!doc) {
+            throw new ServicePolicyLifecycleError('NOT_FOUND', '문서를 찾을 수 없습니다.', 404);
+          }
 
-        const before = toAdminPolicyDocument(doc);
-        doc.status = resolveServicePolicyLifecycle(doc.status, action);
-        doc.updated_by = userId;
-        const saved = await policyRepo.save(doc);
-        const after = toAdminPolicyDocument(saved);
+          const before = toAdminPolicyDocument(doc);
+          doc.status = resolveServicePolicyLifecycle(doc.status, action);
+          doc.updated_by = userId;
+          const saved = await txRepo.save(doc);
+          const after = toAdminPolicyDocument(saved);
+          return { saved, before, after };
+        });
         await audit(serviceKey, userId, `service_legal:policy_${action}`, {
           entityType: 'service_policy_document',
           entityId: saved.id,

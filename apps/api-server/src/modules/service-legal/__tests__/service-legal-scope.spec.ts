@@ -43,12 +43,15 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('lecture')).toBe(true);
   });
 
-  it('집합은 정확히 5개 canonical key 다 (의도치 않은 확장 감지)', () => {
+  it('현재 관리 대상 7개 canonical key만 포함한다', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',
       'lecture',
       'neture',
-    ]);
+      'community',
+      'funding',
+      'supplier',
+    ].sort());
   });
 });

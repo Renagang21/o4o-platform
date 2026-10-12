@@ -1,6 +1,7 @@
 # PharmacyHub retirement TODO
 
-> 상태: ACTIVE · 2026-10-10 · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
+> 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
+> 현재(2026-10-12): PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -10,10 +11,12 @@
 - [x] 전체 PH 호스트 리다이렉트 초안/실행 옵션 준비(`retire_host=true`). PH default backend·pathRules 참조를 제거하고 다른 host/matcher는 보존. 302·path/query 유지.
 - [x] 새 코드 CI·리뷰·main 통합 후 `retire_host=true, mode=plan`의 변경 전후 map 확인.
 - [x] URL map update·global operation 조회 권한 확인 후 전체 호스트 apply. 실제 QR/tablet·네 경로 규칙·root·기타 경로 302 검증. 실행 `38119869917` SUCCESS.
-- [ ] 전체 URL map과 다른 backend/NEG에서 `pharmacy-hub-web` 참조가 없는지 확인. Cloud Run 삭제 권한과 대상 project/region 확인 후 전용 서비스 제거·부재 확인.
+- [x] 전체 URL map과 다른 backend/NEG의 PH 참조 해제·권한/project/region 확인 후 전용 backend·NEG·Cloud Run 제거·부재 확인. apply `38187016286` 및 독립 plan `38187187895` SUCCESS.
 - [ ] 현재 DB schema/FK 및 PH 전용 테이블·service_key 행 목록 확인. 공용 조직·사용자·Neture QR/매장 데이터를 PH 문자열만으로 삭제하지 않음. PH 전용 데이터는 transaction 단위 삭제 계획 후 실제 삭제·잔여 건수 확인.
 - [ ] 남은 PH 활성 등록·권한·호환 참조를 실제 공용 소비처 기준으로 제거. 과거 migration을 다시 실행하거나 migration 이력을 없애지 않음.
-- [ ] 각 운영 실행 결과·잔여 blocker 기록. 전체 호스트 apply는 성공, Cloud Run·DB 삭제는 미완료.
+- [x] 이번 자원 제거 실행 결과·잔여 작업 기록. 전체 호스트 전환과 전용 자원 제거는 완료.
+- [x] 일시 WIF 제한을 원래 조건으로 복구하고 read-only 인증 smoke 확인. 실행 38187804879 SUCCESS, WIF_AUTH_PASS 확인.
+- [ ] PH-only DB/잔여 공용 코드 정리 및 최종 결과 기록.
 
 전체 제거 phase는 사용자 지정 worktree를 유지하고 최신 main의 `wo/pharmacyhub-full-retirement`에서 수행한다.
 
@@ -170,3 +173,73 @@ P2 리뷰 대응: 대상 NEG는 Seoul 리전 SERVERLESS 자원이므로 삭제 p
 - `compute.regionOperations.get`
 
 사용자 로컬의 IAM 관리 권한으로 기존 `pharmacyHubQrPlan` 역할에 이 세 권한을 추가해야 한다. Actions 계정에 스스로 IAM 정책을 수정할 권한을 부여하지 않는다. 권한 반영 후 새 read-only plan에서 missingPermissions가 비어 있음을 확인하고, 다른 운영 작업 종료·단독 진행·현재 gate를 확인한 뒤 resource apply → 세 자원 부재·QR 유지 검증을 진행한다. 이후 PH-only 데이터 소유/FK/법정 보유 조사 및 잔여 공용 코드 제거 TODO를 계속한다. 이번 실행은 Cloud Run/backend/NEG/DB를 삭제하지 않았으며 도메인·DNS·인증서는 유지한다. main 후속 CI [38124838980](https://github.com/Renagang21/o4o-platform/actions/runs/38124838980)은 이 기록 시점에 대기 중이며 PASS로 주장하지 않는다.
+
+## 권한 해소·부분 자원 제거 및 재개 준비 — 2026-10-11
+
+사용자가 삭제 권한 세 개를 기존 역할에 추가했다. 새 resource plan [38130540549](https://github.com/Renagang21/o4o-platform/actions/runs/38130540549)은 SUCCESS(`missingPermissions=[]`, `httpVerified=true`)이며 세 고정 대상이 남아 있었다. 앞선 main 후속 CI `38124838980`, `38125089787`도 SUCCESS를 확인했다.
+
+다른 main CI `38130407287` 및 후속 API Delivery `38130997115` SUCCESS 후 다섯 active status 전체에서 운영 writer 부재를 확인하고 apply [38131427277](https://github.com/Renagang21/o4o-platform/actions/runs/38131427277)을 실행했다. 실행은 후속 삭제 직전 production run inventory의 완전성 검사에서 실패했다. 전체 제거 성공으로 보고하지 않는다. 새 read-only plan [38131645110](https://github.com/Renagang21/o4o-platform/actions/runs/38131645110)은 SUCCESS이며 남은 대상은 `pharmacy-hub-web` 하나, 누락 권한 0, QR 검증 PASS다. 백엔드와 NEG는 부재하며 Cloud Run/DB는 아직 제거하지 않았다.
+
+불완전 조회를 수용하지 않고 count/list 불일치나 페이지 간 총건수 변화 시 다섯 status 전체 목록을 각 1페이지부터 2초 간격 최대 3회 read-only 재조회하도록 보강한다. 최종 불일치는 status/page/expected/returned 숫자만 진단하며 차단한다. 알려진 다른 운영 writer·구조/metadata 오류·권한/HTTP 오류는 그대로 즉시 차단한다. 불일치의 일시성은 아직 확정 원인으로 주장하지 않는다. 자원 안전 테스트 23 PASS이며 기존 권한/QR/참조/시간/삭제 후 부재/새 자원 재등장 차단 조건을 유지한다. 동일 WO의 연속 phase로 지정 worktree의 최신 main 기반 `wo/pharmacyhub-resource-gate-retry`에서 작업한다. CI·리뷰·병합 후 남은 Cloud Run만 재개한다. 앱 배포 NOT_APPLICABLE; DB/DNS/인증서 변경 없음.
+
+PR #475 P1 리뷰 대응: 건수가 맞지 않는 페이지에도 다른 운영 writer가 반환되면 count 재시도 전에 즉시 차단한다. queued → in_progress 이동 중 병렬 status 조회가 이를 놓치는 경우를 회귀 테스트로 고정했다. 불완전 페이지의 모든 반환 항목을 먼저 검사하며 정상 metadata/완전 목록만 허용한다.
+
+추가 P1 대응: count 불일치가 어느 status에서 발생하든 재시도는 다섯 status 전체를 다시 읽는다. 이전 병렬 요청도 allSettled로 완료·검사해 다른 분기의 알려진 writer나 metadata/권한 오류를 재시도로 숨기지 않는다. 반환되지 않은 queued 작업이 대기 중 in_progress로 이동하는 경우와 다른 분기의 writer 우선 차단을 회귀 테스트로 추가했다.
+
+CI 선행 수정: 최신 main 통합 중 CI `38132871563`의 기존 `CommunityServiceAdminPage.test.tsx:121` 테스트가 실패했다. label/select는 초기 렌더에 있지만 option은 비동기 community 조회 후 생기므로, option 생성 전에 c1로 change하면 선택되지 않을 수 있었다. 후보 검색 테스트에 첫 커뮤니티 option 대기 한 줄을 추가해 실제 데이터가 로드된 뒤 선택하게 한다. 테스트를 생략하거나 업무 화면 동작을 변경하지 않는다. 이후 funding PR #474의 최신 main도 기존 통합 규칙에 따라 반영한다.
+
+CI 선행 수정 검증: 해당 관리자 테스트 9 PASS. 로컬 공용 인증 패키지 산출물을 갱신한 뒤 CI와 동일한 web-neture Vitest 설정에서 전체 66파일·551테스트 PASS를 확인했다. tracked package.json/lockfile/업무 화면 변경은 없으며 옵션 대기 한 줄과 결과 기록만 추가했다.
+
+## 운영 직렬화 보강 — PR #475 추가 P1 대응
+
+status sweep 자체도 작업 상태 이동과 원자적이지 않다는 지적을 받아 현재 공식 production root workflow(Delivery/Promote/API/admin/web/PH)의 concurrency를 `o4o-production-mutation`으로 통일한다. 조회 gate는 보조 차단으로 유지하며 공통 잠금이 실제 다른 root 실행과의 상호 배제를 담당한다. 재사용 Delivery는 Promote 부모가 잠금을 보유할 때 run별 child group을 쓰고, 재사용 API/admin/web은 Delivery/Promote 부모 아래에서 기존 서비스별 child group을 유지한다. 부모와 자식이 같은 잠금을 재취득해 교착하거나 기존 단일 Delivery 내 서비스 배포 병렬성이 사라지지 않도록 한다.
+
+알려진 caller 경로는 현재 repository의 direct workflow/Delivery/Promote다. 지원되지 않는 reusable caller는 detect/classify의 checkout·GCP 인증 전 gate에서 실패시키므로 잠금 소유권을 추정한 하위 호출이 진행되지 않는다. freeze·owner·CI·ref·WIF 규칙은 유지하며 IAM 수정·새 workflow 경로는 필요 없다. 실제 YAML expression을 해석해 direct root 공통 잠금, Promote/Delivery 중첩 호출의 ancestor 잠금 비재취득, 알 수 없는 caller의 pre-auth 실패를 검증했다. 자원/직렬화 안전 테스트 26 PASS이며 이 파일을 일반 required CI에도 연결한다.
+
+GitHub concurrency는 `cancel-in-progress: false`, `queue: max`로 active 작업과 기존 pending 요청을 새 요청이 대체 취소하지 않게 한다. 공식 GitHub.com 지원 문서([queue 규칙](https://github.com/github/docs/blob/main/data/reusables/actions/actions-group-concurrency.md), [fpt/ghec 지원 범위](https://github.com/github/docs/blob/main/data/features/actions-nga.yml))에 따라 최대 100 pending 요청을 보존한다. 지원되지 않는 caller는 별도 run별 group에서 pre-auth 실패시켜 ancestor 잠금 대기 교착도 피한다. 운영 dispatch는 여전히 다른 실행·대기 작업이 없는 단독 창에서 진행한다. 이미 시작한 이전 버전 workflow에는 새 잠금이 소급 적용되지 않으므로 main 반영 후 기존 버전의 모든 알려진 운영 run이 종료됐는지 직접 상태 확인·drain한 뒤 PH apply를 재개한다. 현재 main의 공식 경로에 대한 직렬화이며 오래된 deployment tag의 과거 정의를 자동 변경한 것으로 주장하지 않는다. 업무 앱 재배포는 NOT_APPLICABLE, workflow 설정은 main 반영으로 새 실행에 적용된다. Cloud Run·PH DB 제거는 아직 미완료다.
+
+### 추가 검증 및 외부 인증 경계 blocker
+
+읽기 전용 plan [38134188272](https://github.com/Renagang21/o4o-platform/actions/runs/38134188272)은 SUCCESS이며 남은 자원은 `pharmacy-hub-web` 하나, `missingPermissions=[]`, `httpVerified=true`다. 다른 Demo 작업 `38134169210`도 종료했다. 아직 새 apply는 제출하지 않았다.
+
+CI `38136277948`은 기존 배포 gate 테스트 두 곳이 과거 concurrency 문자열을 요구해서 실패했다. 서비스별 child group 유지와 direct root 공통 잠금, Promote 부모 아래 Delivery의 잠금 비재취득, `queue: max`를 검사하도록 갱신했다. 해당 gate 및 자원 안전 테스트 합계 110 PASS다.
+
+추가 P1: 이전 `deploy/*` 태그 또는 이전 workflow 실행의 재실행은 과거 YAML을 쓰므로 main의 잠금만으로 완전히 차단되지 않는다. 이미 생성된 run drain과 사용자 단독 작업 합의만으로 기술적 차단이 완료됐다고 주장하지 않는다. PH 삭제 창에서는 WIF provider의 기존 조건을 보존한 채 main ref와 잠금이 포함된 특정 main workflow SHA만 인증하도록 외부 IAM 경계를 일시 제한해야 한다. `assertion.ref == 'refs/heads/main'`만 추가하면 과거 main 실행의 rerun이 통과하므로 충분하지 않다. root `workflow_sha`와 called `job_workflow_sha` 모두 동일한 검증된 main SHA로 제한하고, 기존 자격증명을 받은 run도 종료·만료됐는지 확인한다. 실제 provider 변경은 IAM 관리 권한이 있는 사용자가 수행하며, 복구할 원래 조건은 로컬에 보관한다. 이후 새 plan 인증 성공과 다른 production 실행 차단을 확인하기 전에는 apply하지 않는다. 현재 이 외부 인증 경계는 적용 전이며 P1을 해결했다고 기록하지 않는다.
+
+### WIF 일시 차단 적용 확인 — 2026-10-11
+
+사용자가 새 인증 정책 변경을 승인하고 로컬 IAM 관리자로 기존 provider 조건을 저장소 밖에 백업했다. provider update 성공 및 describe 결과 기존 조건 전체 뒤에 `&& false`가 붙었음을 확인했다. 과거 태그/이전 main 재실행을 포함한 신규 WIF 인증은 현재 차단된다. 기존 run에 이미 발급된 자격증명은 별도 종료 확인 대상이며 차단과 동시에 폐기된 것으로 주장하지 않는다. 최신 main 반영·필수 CI·리뷰 완료 후 PR #475를 병합하고, 새 main SHA의 PharmacyHub workflow만 인증하도록 로컬 IAM 관리자가 제한 조건을 적용한다. read-only plan 성공 이후 남은 Cloud Run 제거·QR 재검증을 진행하고 원래 조건으로 복구한다. 아직 새 main SHA 제한·Cloud Run 삭제·DB 삭제는 실행하지 않았다.
+
+### 최종 범위 정리 — PR #475 P2 대응
+
+공통 `queue: max`가 오래된 자동 Delivery를 누적시켜 최신 배포를 지연시키는 P2 지적을 수용했다. 전체 서비스의 concurrency/caller 변경과 이에 종속된 테스트 변경을 철회하고 기존 main의 배포 coalescing/child group 동작을 보존한다. 앞선 공통 잠금 설계와 26/110 테스트 기록은 당시 검증 이력이며 최종 구현이 아니다. 최종 구현은 불완전 Actions inventory의 제한된 전체-sweep 재조회, writer/metadata 오류 우선 차단, 해당 자원 테스트의 required CI 연결과 비동기 옵션 대기 수정이다. 실제 PH 삭제 창은 승인·적용된 외부 WIF 인증 차단 및 병합 후 단일 main SHA/PH workflow 제한으로 격리한다. status 조회만으로 원자적 잠금을 구현했다고 주장하지 않는다. 새 P1/P2는 이 외부 제한과 범위 축소로 대응하며, 제한 적용·새 plan 성공 전 apply는 금지한다.
+
+## 잔여 활성 경로 0건 대응 — 2026-10-11
+
+PR #475는 main a3462a0256에 병합됐고 main 후속 CI 38142397450 SUCCESS를 확인했다. 이후 main ec7a21d59d로 이동해 사용자가 WIF의 root/called workflow SHA 제한을 동일 SHA로 갱신했다. 해당 main CI 38144099865도 SUCCESS다. PH workflow 및 삭제 스크립트는 그 사이 변경되지 않았다.
+
+읽기 전용 resource plan [38144701943](https://github.com/Renagang21/o4o-platform/actions/runs/38144701943)은 인증/DB 조회에 성공했지만 삭제 검증 단계에서 실패했다. private probe 수집의 요약은 네 종류 모두 false, foundFamilies=0이다. 실데이터가 없는 상황에서도 기존 parseProbes가 QR/tablet 두 종류를 필수 요구해 중단했다. 추가 read-only census [38144858219](https://github.com/Renagang21/o4o-platform/actions/runs/38144858219)은 SUCCESS이며 실제 삭제는 제출하지 않았다.
+
+동일 WO 연속 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-resource-empty-probes에서 보강한다. 자원 폐기 entrypoint만 active-family 필수를 해제한다. 일반 QR cutover는 기존 strict 기본값을 유지한다. 남아 있는 공개 경로는 동일 검증하고, 없을 때는 독립적인 12개 전체 호스트/경로/query/스킴 리다이렉트 검사와 자원 참조/권한/시간/동시 writer 차단을 모두 유지한다. 결과의 activeFamiliesVerified가 0이면 실제 데이터 검증 성공으로 보고하지 않는다. 빈 경로/단일 잔여 family/잘못된 URL·중복 경로 차단 회귀를 포함해 focused tests 53 PASS. CI·리뷰·병합 후 새 main SHA로 WIF를 제한해 plan → 잔여 Cloud Run 제거 → 재검증 → 원래 인증 조건 복구 순으로 진행한다. Cloud Run 및 PH-only DB 정리는 아직 미완료다.
+
+## 전용 Cloud 자원 제거 완료 — 2026-10-12
+
+PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 병합됐다. 이후 main de23f34310까지 PH workflow/삭제 스크립트 변경이 없음을 확인했고 해당 main CI 38147807102도 SUCCESS다. 사용자가 WIF root/called workflow SHA 제한을 de23f34310으로 갱신한 뒤 단독 운영 창에서 진행했다.
+
+- 읽기 전용 plan [38186892659](https://github.com/Renagang21/o4o-platform/actions/runs/38186892659): SUCCESS. 남은 대상 pharmacy-hub-web 하나, 누락 권한 0, httpVerified=true, activeFamiliesVerified=0.
+- 적용 [38187016286](https://github.com/Renagang21/o4o-platform/actions/runs/38187016286): SUCCESS. applied=true, targets=[], httpVerified=true, databaseWrites=false, activeFamiliesVerified=0. 기존에 제거된 backend/NEG에 이어 Seoul의 전용 Cloud Run도 부재를 확인했다.
+- 독립 읽기 전용 재검증 [38187187895](https://github.com/Renagang21/o4o-platform/actions/runs/38187187895): SUCCESS. targets=[], requiredPermissions=[], missingPermissions=[], httpVerified=true, activeFamiliesVerified=0. 전체 12개 host/route/path/query/scheme 리다이렉트 검사를 유지했다.
+
+활성 네 종류 경로는 이번 inventory에서 0건이므로 실데이터 QR/tablet 동작이나 실제 브라우저/인쇄 QR 스캔 성공을 주장하지 않는다. 도메인·DNS·인증서는 유지하며 운영 DB write는 없었다. PH-only 주문/결제/역할/정책/상품 scope 데이터 및 공용 코드 잔재 정리는 계속 미완료다.
+
+인증 복구는 이미 승인됐으나 클라우드 환경에는 IAM 관리용 연결이 없어 사용자 로컬 관리자로 수행해야 한다. 원래 조건 백업이 다른 PC에 있을 때도 현재 조건에서 이번에 추가한 정확한 PH/ref/root SHA/called SHA 제한 suffix만 제거하면 기존 기본 조건을 보존할 수 있다. 다른 변경이 감지되면 복구 명령은 중단한다. 실제 복구 describe와 read-only WIF smoke 결과 확인 전에는 인증 복구 완료로 기록하지 않는다.
+
+동일 WO 연속 결과 기록 phase로 지정 worktree와 최신 main 기반 wo/pharmacyhub-resource-removal-result를 사용한다. 업무 앱 배포 NOT_APPLICABLE. WO 전체는 데이터/공용 코드/인증 복구 검증이 남아 ACTIVE·worktree KEEP다.
+
+## 원래 WIF 인증 조건 복구 완료 — 2026-10-12
+
+사용자 로컬 IAM 관리자가 현재 provider 조건에서 이번에 추가한 PH workflow/ref/root SHA/called SHA 제한 suffix만 제거했다. describe 결과 기존 repository/owner/environment/main·deploy-tag/event/허용 workflow 조건을 보존한 원래 기본 predicate를 확인했다. 바깥 괄호는 논리적 조건을 변경하지 않는다. SHA 고정 및 PH-only 인증 제한은 더 이상 유지하지 않는다.
+
+실제 read-only 인증 smoke [38187804879](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879)은 main 7ebd3548cb에서 SUCCESS다. WIF auth (read-only) job이 실행·성공했고 WIF_AUTH_PASS를 확인했다. GCP 인증, project 및 기존 core API serving metadata 조회만 수행했으며 배포·삭제·DB write·secret version 조회는 없었다. 제거 결과 기록 PR #492는 main 7ebd3548cb에 병합됐고 main 후속 CI 38187554411도 SUCCESS다.
+
+전용 Cloud 자원 제거/12개 규칙 검증/일시 인증 제한 복구 phase는 완료다. PH-only DB·공용 코드 잔여 제거는 여전히 미완료이며 전체 WO는 ACTIVE·worktree KEEP다. 동일 WO 연속 결과 기록 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-auth-restoration-result를 사용한다. 이번 변경은 문서-only, 업무 앱 배포 NOT_APPLICABLE이다.

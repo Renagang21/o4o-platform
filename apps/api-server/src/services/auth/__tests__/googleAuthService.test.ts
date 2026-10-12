@@ -91,6 +91,7 @@ function makeDataSource(store: Store) {
         },
         // 가입 시 대소문자만 다른 기존 주소 확인(`lower(email) = $1`) — 그 외 raw SQL 은 쓰지 않는다.
         query: jest.fn(async (sql: string, params: unknown[]) => {
+          if (/pg_advisory_xact_lock/.test(sql)) return [];
           if (/FROM service_policy_documents/.test(sql)) return [{ id: '11111111-1111-4111-8111-111111111111', service_key: 'neture', document_type: 'terms', version: 1, title: 'Fixture terms', content: 'Fixture agreement', status: 'published' }];
           if (/INSERT INTO user_policy_acceptances/.test(sql)) return [{ id: 'acceptance-fixture' }];
           if (/UPDATE users SET tos_accepted_at/.test(sql)) return [];

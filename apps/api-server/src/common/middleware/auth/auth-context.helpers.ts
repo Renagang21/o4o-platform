@@ -18,6 +18,8 @@ import type { AccessTokenPayload } from '../../../types/auth.js';
  */
 export interface AuthRequest extends Request {
   user?: User;
+  /** Verified access-token scope; not supplied by headers or request body. */
+  sessionServiceKey?: string;
   roleAssignment?: RoleAssignment;
 }
 

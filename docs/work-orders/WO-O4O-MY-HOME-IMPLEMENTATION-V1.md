@@ -1,9 +1,10 @@
 # My Home 다중 화면 · 서비스 공통 진입 구현
 
-> **상태**: ACTIVE
-> **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
+> **상태**: COMPLETED
+> **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **승인 범위**: 사용자 My Home 기획 진행 및 배포 지시. 이전 문서 정비의 연속 Phase로 같은 전용 branch를 유지한다.
-> **DEPLOYMENT**: MANUAL/GATED → DEPLOYED · 실제 Delivery HELD_LEVEL_3 후 정상 promote 완료. 후속 배포 상태 문서 Phase는 NOT_APPLICABLE.
+> **DEPLOYMENT (현재 본 작업 PR #484)**: AUTOMATIC → DEPLOYED · runtime SHA `20ed384b1591c23bad53b14d99b7531e23dac1f2`의 Neture 배포·최종 서빙 Report PASS. WIF 복구·운영 번들 39개·공개 HTTP/보호 API 검증 완료. 실제 인증은 SKIPPED_BY_USER. 결과 정합 문서 PR #489의 DEPLOYMENT는 NOT_APPLICABLE이다.
+> **이전 초기 구현 Phase의 배포 기록**: MANUAL/GATED → DEPLOYED · 당시 Delivery HELD_LEVEL_3 후 정상 promote 완료. 해당 결과 확정 문서 Phase는 NOT_APPLICABLE. 현재 본 작업의 배포 완료를 의미하지 않는다.
 
 ## 연속 문서 Phase: 사용자 제공 테스트 계정 파일 (2026-10-11)
 
@@ -75,3 +76,34 @@ Neture 전체 517개, production build, 로컬 Chromium fixture 18개가 통과�
 [CHECK](../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md)에 공유 소비처·테스트·브라우저 증거를 기록한다. 인증·권한 기술 gate, PR required CI, Codex blocker, main 통합을 확인한 뒤 정확한 main SHA에 대해 현재 Delivery 정책을 따른다. migration 없는 정상 promote는 사용자 배포 지시 범위 안에서 실행한다.
 
 초기 네트워크 차단 후 재시도에서 GitHub PR #449 생성·CI/ruleset 조회·운영 홈페이지와 API ready 조회가 성공했다. PR #449와 required CI를 통과해 main에 통합했으며, `bd5c28d83366f0ba84cddc35d616dd2fb9edc653`의 promote 배포와 최종 서빙 SHA·공개 운영 검증이 완료됐다. 세부 run·기존 테스트 재실행 근거는 CHECK에 기록했다. 인증된 운영 화면 smoke에 필요한 테스트 계정 문서는 작업·기준 checkout 모두에 없으며 사용자에게 경로를 요청했다. 기존 Demo/seed 계정으로 대체하지 않는다.
+
+### 연속 Phase: My Home 본 작업 — 모아보기·선택 매장 사업 참여 (2026-10-11)
+
+사용자의 TODO 작성 → 코드·문서 검증 → TODO 보완 → 구현·배포 지시에 따라 [보완 TODO](TODO-O4O-MY-HOME-COMPLETION-V1.md)를 실행한다.
+같은 미완료 WO의 전용 branch를 유지한다. 시작 HEAD는 `cee2a63caa11e8443fea689d8a5ba1a425664e29`다.
+
+- 모아보기의 알림을 상단으로 옮기고 기존 진입 모델로 이용 가능한 업무와 신청·이용 상태를 제공한다. 매장이 없는 회원에게는 overview 경영 카드·빈 경영 요약을 반복하지 않으며 기존 경영 현황 직접 경로와 빈 상태는 유지한다.
+- 선택 매장의 약국 협력사업은 기존 `GET /neture/pharmacy/semi-franchises`와 `X-Store-Organization-Id`로 조회한다. 운영 중인 사업 카탈로그 중 실제 membershipStatus가 있는 매장 기록만 모아보기·경영 현황 최대 3건/참여 서비스 상세 10건으로 표시한다. 개인 서비스 가입과 매장 enrollment를 이 원장으로 대체하지 않는다.
+- 상세 경영 현황의 내 매장 업무를 기존 handoff로 연결한다. 복수 매장 선택값이 전달되지 않는 현재 계약을 화면에 설명하고 Store에서 다시 선택하도록 한다. 계정·조회 데이터·선택 매장 변경과 언마운트 후 늦은 이동 응답은 버린다.
+- API·권한·DB·dependency·공통 패키지·CI/배포 설정은 변경하지 않는다. 사업 신청·탈퇴·승인·판매/결제·데이터 정리 호출은 실행하지 않는다.
+- 제공 파일의 2개 계정은 현재 이메일 로그인에서 `401 INVALID_CREDENTIALS`로 거절됐다. 사용자가 이메일 전체 리팩터링 예정이므로 건너뛰라고 명시해 이번 실계정 smoke를 **SKIPPED_BY_USER**로 확정한다. 이전 Phase의 계정 문서 미확보 이력과 현재 상태를 구분한다.
+
+Neture 전체 568개·공통 My Home 진입 10개·Study 헤더 2개와 PC/375/320px 로컬 Chromium fixture 39개를 통과했다. 세부 증거와 구현 PR·main·Delivery 결과는 CHECK와 TODO에 이어 기록한다. 정본 설명은 소스 PR과 분리된 문서 정합 Phase에서 반영한다.
+
+### 본 작업 통합·정본 정합의 연속 Phase
+
+리뷰 P1을 반영해 사업 상세·더 보기 링크를 참여 서비스로 연결하고 서비스 조회의 QR 통계 미호출 회귀를 추가했다. 수정 후 Neture 569개·타입 포함 build·PC/375/320px fixture 39개 PASS. 최종 [PR #484 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38143474451)의 required CI Gate·API 세 묶음·품질·웹/Admin build와 CodeQL·Guard를 확인한 뒤 main `ec7a21d59db197ae573420645c858e772424b006`에 정상 병합했다. 리뷰 P1 해결·미해결 스레드 0·source main 포함 차이 0이다.
+
+동일 미완료 WO의 별도 문서 정합 Phase로 정본 §6의 실제 데이터·화면 배치·일반 회원·원본 이동과 색인의 현재 상태를 갱신한다. 기존 사용자 관련 문서 수정·My Home 구현·배포 지시 범위이며 새로운 사업 정책·원장·권한 결정이 아니다. 기존 branch/worktree를 유지한다. 문서-only 변경의 DEPLOYMENT는 NOT_APPLICABLE이며 소스 PR #484의 운영 배포 의무는 유지한다.
+
+사용자 재확인 요청으로 현재 main에서 실행한 [WIF 점검](https://github.com/Renagang21/o4o-platform/actions/runs/38144147528)도 13:41 UTC provider attribute condition에 의해 거절됐다. 원래 인증 조건 복구를 사용자에게 요청했다. 신규 소스의 DEPLOYMENT는 AUTOMATIC, 현재 운영 반영은 미완료다. 실제 이메일 검증은 사용자 지시에 따른 SKIPPED_BY_USER로 기록하며 인증 PASS나 배포 blocker로 취급하지 않는다. main CI·Delivery·서빙·운영 번들 확인의 실제 결과는 CHECK와 TODO에 이어 기록한다.
+
+구현 SHA의 [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38144099865)·CodeQL PASS를 확인했다. [자동 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38144718455)는 GCP 인증 조건 거절로 실패했으며 실제 배포·서빙 Report는 SKIPPED다. 같은 SHA의 PH 정리 workflow는 인증을 통과했으나 고정 인프라 정리 단계에서 실패했다. 현재 PH에 제한된 인증 창의 종료·원래 조건 복구는 미확인이다. 문서 [PR #489](https://github.com/Renagang21/o4o-platform/pull/489)는 고정 SHA 보존을 위해 draft로 유지하며 첫 문서 required CI·Docs Fast PASS, 최신 결과 추가 후 재확인한다. My Home 전체 작업은 배포·운영 확인까지 미완료로 유지한다.
+
+### 최종 완료·배포 후 확인 — 2026-10-12 (KST)
+
+사용자 로컬 IAM 관리자의 원래 WIF 조건 복구가 PH TODO에 기록됐고 실제 [인증 smoke](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879)는 PASS다. 이후 정상 [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38188251558)는 main/runtime `20ed384b1591c23bad53b14d99b7531e23dac1f2`의 Neture 배포와 최종 서빙 Report를 완료했고 production status가 DEPLOYED다. 본 작업의 소스·E2E 입력은 구현 SHA와 차이 0이며 자동 Delivery의 누적 변경에 포함됐다. 이미 성공한 배포를 추가 dispatch하지 않고 실제 결과·운영 번들을 확인했다.
+
+TLS 검증을 유지해 받은 운영 HTML/JS의 신규 표식 5개, 공개 화면·API readiness 200과 개인 API 6개 비로그인 401을 확인했다. 실제 운영 번들의 PC/375/320px Chromium fixture 39개 PASS다. API·사용자·handoff는 fixture이며 실제 운영 로그인 세션 검증이 아니다. 이메일 인증 smoke는 사용자 지시에 따라 SKIPPED_BY_USER로 유지한다. 변경·검증·runtime 증거는 CHECK의 최종 절에 기록했다.
+
+보완 TODO의 구현·main·운영 배포·배포 후 확인을 완료하고 같은 WO의 결과 정합 문서 PR #489로 정본·색인을 통합한다. 문서-only DEPLOYMENT는 NOT_APPLICABLE이며 문서 SHA와 실제 runtime SHA를 구분한다. 새 사업 정책·API·권한·DB·dependency·배포 설정을 변경하지 않는다. 초기 WIF 차단·PH 고정 SHA 창의 draft 보류는 이전 Phase의 기록이다.

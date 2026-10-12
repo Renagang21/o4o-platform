@@ -123,3 +123,33 @@ it('소속 매장·개인 공급자 자격이 없는 운영자도 각 카드에�
   expect(within(cards()[2]).queryByText('이용 중인 항목이 없습니다.')).toBeNull();
   expect(within(cards()[2]).queryByRole('link', { name: '공급자 업무' })).toBeNull();
 });
+
+describe('My Home available workspace entries', () => {
+  const workspace = (d: HomeEntryData, selected?: string) => render(<MemoryRouter><HomeEntryPanel user={user()} data={d} loading={false} error={null} onReload={() => {}} workspaceOnly storeOrganizationId={selected} /></MemoryRouter>);
+  it('shows available community and supplier work, but no empty store/operator cards', () => {
+    workspace(data({ stores: [], serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } } }));
+    expect(screen.getByRole('heading', { name: '내 업무 바로가기' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '공급자 업무' }).getAttribute('href')).toBe('/supplier/dashboard');
+    expect(screen.queryByRole('heading', { name: '매장', exact: true })).toBeNull();
+    expect(screen.queryByRole('heading', { name: '서비스 운영', exact: true })).toBeNull();
+  });
+  it('retains pending membership information without creating an entry', () => {
+    workspace(data({ stores: [], communities: [], services: [svc('lecture', 'Study', 'pending')] as HomeEntryData['services'] }));
+    expect(screen.getByText('가입 신청 중')).toBeTruthy();
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByText(/현재 바로 이동할 수 있는 업무가 없습니다/)).toBeTruthy();
+  });
+  it('offers only the selected store, excluding other stores and inactive/retired services', () => {
+    workspace(data({
+      stores: [
+        { serviceKey: 'kpa-society', organizationId: 'o1', name: '선택 매장', memberRole: 'owner' },
+        { serviceKey: 'kpa-society', organizationId: 'o2', name: '다른 매장', memberRole: 'owner' },
+        { serviceKey: 'pharmacy-hub', organizationId: 'o1', name: '은퇴한 서비스 매장', memberRole: 'owner' },
+      ],
+    }), 'o1');
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: /선택 매장/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /다른 매장|은퇴한/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'O4O 공통 커뮤니티' })).toBeNull();
+  });
+});

@@ -6,6 +6,7 @@ import { collectCloudInventory, collectHttpInventory } from './pharmacy-hub-reti
 import { parseProbes, verifyTargets, verifyPublicData } from './pharmacy-hub-qr-cutover.mjs';
 
 class ResourceDiagnosticError extends Error {}
+class InventoryCountError extends ResourceDiagnosticError {}
 
 const project = 'netureyoutube';
 // ubuntu-latest's preinstalled Cloud SDK; never resolve an executable from checkout-writable PATH entries.
@@ -26,9 +27,8 @@ const permissionsByTarget = new Map([
 const productionWorkflows = new Set(['promote.yml', 'delivery.yml', 'deploy-api.yml', 'deploy-admin.yml', 'deploy-web-services.yml', 'pharmacyhub-qr-cutover.yml']);
 const activeStatuses = ['in_progress', 'queued', 'pending', 'waiting', 'requested'];
 
-function checkProductionRuns(result, runId, page) {
-  if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0
-    || result.workflow_runs.length !== Math.min(100, Math.max(0, result.total_count - (page - 1) * 100))) {
+function checkProductionRuns(result, runId, page, status) {
+  if (!Array.isArray(result.workflow_runs) || !Number.isInteger(result.total_count) || result.total_count < 0) {
     throw new ResourceDiagnosticError('Production run inventory is incomplete; no deletion submitted.');
   }
   for (const other of result.workflow_runs) {
@@ -42,19 +42,49 @@ function checkProductionRuns(result, runId, page) {
     const name = paths.map(path => path.split('@')[0].split('/').at(-1)).find(path => productionWorkflows.has(path));
     if (name) throw new ResourceDiagnosticError(`Production write gate blocked: workflow=${name}; run=${Number(other.id)}.`);
   }
+  const expected = Math.min(100, Math.max(0, result.total_count - (page - 1) * 100));
+  if (result.workflow_runs.length !== expected) {
+    throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; expected=${expected}; returned=${result.workflow_runs.length}. Next deletion not submitted.`);
+  }
 }
 
-export async function assertProductionIdle(runId, list) {
-  if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
-  // Include queued/manual-waiting deliveries; do not infer an idle runtime from running jobs alone.
-  await Promise.all(activeStatuses.map(async status => {
-    for (let page = 1; page <= 10; page++) {
-      const result = await list(status, page);
-      checkProductionRuns(result, runId, page);
-      if (page * 100 >= result.total_count) return;
+async function readProductionStatusOnce(runId, list, status) {
+  let total;
+  for (let page = 1; page <= 10; page++) {
+    const result = await list(status, page);
+    checkProductionRuns(result, runId, page, status);
+    if (total !== undefined && result.total_count !== total) {
+      throw new InventoryCountError(`Production run inventory is incomplete: status=${status}; page=${page}; previousTotal=${total}; currentTotal=${result.total_count}. Next deletion not submitted.`);
     }
-    throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
-  }));
+    total = result.total_count;
+    if (page * 100 >= total) return;
+  }
+  throw new ResourceDiagnosticError('Production run inventory exceeds its bound; no deletion submitted.');
+}
+
+async function readProductionSweep(runId, list) {
+  const results = await Promise.allSettled(activeStatuses.map(status => readProductionStatusOnce(runId, list, status)));
+  const failures = results.filter(result => result.status === 'rejected').map(result => result.reason);
+  // A count disagreement must never hide another branch's known writer or invalid metadata.
+  const fatal = failures.find(error => !(error instanceof InventoryCountError));
+  if (fatal) throw fatal;
+  if (failures.length) throw failures[0];
+}
+
+async function readProductionSweepWithRetry(runId, list, pause, attempt = 0) {
+  try {
+    await readProductionSweep(runId, list);
+  } catch (error) {
+    // Restart every status and page: queued runs may become in_progress during the pause.
+    if (!(error instanceof InventoryCountError) || attempt === 2) throw error;
+    await pause(2000);
+    await readProductionSweepWithRetry(runId, list, pause, attempt + 1);
+  }
+}
+
+export async function assertProductionIdle(runId, list, pause = ms => new Promise(resolve => setTimeout(resolve, ms))) {
+  if (!/^\d+$/.test(String(runId))) throw new ResourceDiagnosticError('Production run identity is unavailable; no deletion submitted.');
+  await readProductionSweepWithRetry(runId, list, pause);
 }
 
 async function checkProductionGate() {
@@ -162,7 +192,10 @@ export async function retireResources({ mode, read, permissions, verify, remove,
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    const paths = parseProbes(process.env.QR_PROBE_PATHS || await readFile(process.env.PROBE_OUTPUT, 'utf8'));
+    // Retirement may have no active PH data. Keep all route validation and the
+    // independent twelve host redirect checks; verify any paths that still exist.
+    const supplied = process.env.QR_PROBE_PATHS;
+    const paths = parseProbes(supplied || await readFile(process.env.PROBE_OUTPUT, 'utf8'), { requireActiveFamilies: Boolean(supplied) });
     const result = await retireResources({
       mode: process.env.CUTOVER_MODE ?? 'plan', permissions: readPermissions,
       read: async () => inspectResources(readCloud(), await collectHttpInventory()),
@@ -185,7 +218,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         run([...args, `--project=${project}`, '--quiet'], 90000);
       },
     });
-    console.log(JSON.stringify(result));
+    console.log(JSON.stringify({ ...result, activeFamiliesVerified: paths.length }));
   } catch (error) {
     // Helpers only emit fixed diagnostics and allowlisted permission/resource names.
     console.error(error instanceof ResourceDiagnosticError ? error.message : 'PH resource retirement failed; check read-only inventory and public QR/tablet readiness.');

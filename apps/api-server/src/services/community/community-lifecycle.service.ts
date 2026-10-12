@@ -1,3 +1,4 @@
+import { recordEnrollmentApplication, recordEnrollmentPolicies, type EnrollmentPolicyReference } from '../../modules/policy-acceptance/service-enrollment-policy.service.js';
 import { communityMemberListFilter, communityMemberPagination, DEFAULT_MEMBER_LIST_QUERY, type CommunityMemberListQuery } from './community-member-list-query.js';
 import { recordCommunityMembershipChange } from './community-membership-mutations.js';
 import { hasCommunityServiceOperator, hasCommunityServiceAdmin } from './community-service-operator-access.js';
@@ -131,6 +132,7 @@ export class CommunityLifecycleService {
     desiredSlug: string;
     name: string;
     description?: string | null;
+    policyReferences?: EnrollmentPolicyReference[];
   }): Promise<CommunityCreationRequest> {
     const slug = normalizeSlug(input.desiredSlug);
     return this.dataSource.transaction(async (m) => {
@@ -139,7 +141,8 @@ export class CommunityLifecycleService {
         throw new CommunityLifecycleError('SLUG_TAKEN', `이미 사용 중인 주소입니다: ${slug}`, 409);
       }
       const repo = m.getRepository(CommunityCreationRequest);
-      return repo.save(
+      const policies = await recordEnrollmentPolicies(m, input.requesterUserId, 'community', input.policyReferences);
+      const saved = await repo.save(
         repo.create({
           requesterUserId: input.requesterUserId,
           desiredSlug: slug,
@@ -148,6 +151,8 @@ export class CommunityLifecycleService {
           status: 'pending',
         }),
       );
+      await recordEnrollmentApplication(m, input.requesterUserId, 'community', { type: 'community_creation', id: saved.id }, policies);
+      return saved;
     });
   }
 
@@ -222,7 +227,7 @@ export class CommunityLifecycleService {
   }
 
   /** 가입 신청 — 승인형 하나. 자동 승인하지 않는다. */
-  async requestJoin(input: { communityId: string; userId: string }): Promise<CommunityMembership> {
+  async requestJoin(input: { communityId: string; userId: string; policyReferences?: EnrollmentPolicyReference[] }): Promise<CommunityMembership> {
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, input.userId);
       const [profile] = await m.query(`SELECT nickname FROM users WHERE id = $1`, [input.userId]);
@@ -234,12 +239,15 @@ export class CommunityLifecycleService {
       if (existing && ['active', 'pending', 'suspended'].includes(existing.status)) {
         throw new CommunityLifecycleError('ALREADY_MEMBER', '이미 가입했거나 승인 대기 중입니다.', 409);
       }
+      const policies = await recordEnrollmentPolicies(m, input.userId, 'community', input.policyReferences);
       if (existing) {
         existing.status = 'pending';
         existing.role = 'member';
-        return repo.save(existing);
+        const saved = await repo.save(existing);
+        await recordEnrollmentApplication(m, input.userId, 'community', { type: 'community_membership', id: saved.id, resourceId: input.communityId }, policies);
+        return saved;
       }
-      return repo.save(
+      const saved = await repo.save(
         repo.create({
           communityId: input.communityId,
           userId: input.userId,
@@ -247,6 +255,8 @@ export class CommunityLifecycleService {
           status: 'pending',
         }),
       );
+      await recordEnrollmentApplication(m, input.userId, 'community', { type: 'community_membership', id: saved.id, resourceId: input.communityId }, policies);
+      return saved;
     });
   }
 
