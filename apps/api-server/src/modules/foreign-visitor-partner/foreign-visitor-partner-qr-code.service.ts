@@ -6,6 +6,7 @@
  * shortCode/landingUrl 은 서버 생성(public URL 에 partnerId 미노출). V1 템플릿=AFFILIATE_MARKETING.
  */
 import { randomBytes } from 'crypto';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import type { DataSource, Repository } from 'typeorm';
 import {
   ForeignVisitorPartnerQrCode,
@@ -89,7 +90,7 @@ export class ForeignVisitorPartnerQrCodeService {
     now: Date = new Date(),
   ): Promise<ForeignVisitorPartnerQrCode | null> {
     const qr = await this.repo.findOne({ where: { shortCode } });
-    if (!qr || qr.status !== 'ACTIVE') return null;
+    if (!qr || qr.status !== 'ACTIVE' || isRetiredServiceValue(qr.serviceKey)) return null;
     if (qr.validFrom && qr.validFrom.getTime() > now.getTime()) return null;
     if (qr.validTo && qr.validTo.getTime() < now.getTime()) return null;
     return qr;
