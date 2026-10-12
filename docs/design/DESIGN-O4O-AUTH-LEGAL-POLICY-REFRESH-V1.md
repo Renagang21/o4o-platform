@@ -259,7 +259,7 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
 ### 남은 실행 조건
 
 - [x] 최신 HEAD 전체 Codex review·CI 확인 → PR #457 main 통합(2026-10-12).
-- [x] canonical Delivery/Promote로 API 및 영향 웹 배포, 실제 serving SHA 확인(아래 최종 결과).
+- [x] PR #457·#497 인증 구현의 API·웹 배포 SHA 확인(아래 최종 결과). 이후 #498 My Home의 배포·smoke는 별도 OPEN이며 이 완료 범위에 포함하지 않는다.
 - [x] 공개 공고 전문·날짜·링크의 운영 PC/mobile 검증 및 공개 시각 기록(2026-10-12 KST).
 - [x] 유지 서비스 8개 PC/mobile Demo 로그인·업무 권한·로그아웃 회귀 운영 검증(32조건, 아래 기록).
 - [ ] 30일 공고 후 시행일에 새 문서를 게시하고 새 가입·기존 회원 재동의 운영 검증.
@@ -427,7 +427,7 @@ GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 �
 현재 TODO는 ①30일 공고와 시행일 충족 후 새 정책 게시·기존 회원 재동의 운영 검증,
 ②사용자 본인의 Google·카카오 실제 인증·명시적 계정 연결 확인,
 ③로컬 테스트 계정 SSOT 확보 후 일반 미가입·대기·반려·정지·탈퇴 상태별 운영 검증이다.
-코드/배포·공고 공개·Demo 검증은 완료했고 이 세 조건을 완료로 대체하지 않는다.
+PR #457·#497의 인증 구현/배포·공고 공개·해당 serving SHA의 Demo 검증을 완료했으며 이 세 조건을 완료로 대체하지 않는다.
 현재 새 main의 개인정보 최소화·달력 보유기간 정본도 시행 전 최종 문서 대조에 포함한다.
 
 같은 인증 WO의 연속 결과 기록으로 전용 branch를 유지한다. 배포 결과 기록만의 변경은
@@ -440,3 +440,15 @@ DEPLOYMENT=NOT_APPLICABLE이다. 자체 local static 서버와 PostgreSQL fixtur
 - [ ] 2026-11-13 시행 예정일과 실제30일 공고 충족 확인 → 새 정책 게시·기존 회원 재동의 운영 검증.
 - [ ] 사용자 본인의 Google·카카오 실제 인증과 명시적 계정 연결 결과 확인.
 - [ ] 로컬 테스트 계정 SSOT 확보 → 일반 미가입·대기·반려·정지·탈퇴 상태별 운영 검증.
+
+
+#### 배포·검증 완료 범위 한정 — PR #501 review 보완
+
+위 완료 판정은 인증 PR #457·#497의 배포 증거(API/admin/Neture/KPA Society/강의/매장 `0e1aa41eaf`,
+분회 `899e871cce`)와 그 serving에서 실행한32조건에 한정한다. 저장소 최신 HEAD 전체를 배포·검증
+완료로 판정하지 않는다. 이후 main에 들어온 [PR #498](https://github.com/Renagang21/o4o-platform/pull/498)
+`004a42c0`의 My Home overview·업무 카드·알림 요약 runtime 변경은 해당 serving/32조건에 포함되지 않는다.
+이 문서-only 기록 PR #501도 #498의 배포나 운영 smoke를 대신하지 않는다.
+
+- [ ] 별도 #498 My Home Delivery·실제 serving·운영 smoke 확인 — 소유 트랙
+  [TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1](../work-orders/TODO-O4O-MY-HOME-MINIMAL-OVERVIEW-V1.md)에서 OPEN으로 유지.
