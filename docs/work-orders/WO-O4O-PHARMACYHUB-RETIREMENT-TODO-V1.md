@@ -281,6 +281,8 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+이전 commit `f9f9cbcd72` 리뷰의 공개 slug 우회도 반영했다. resolvePublicStore는 slug record를 해석한 직후 PH scope를 410으로 거절하여 공용 매장/태블릿 조회 및 interest 생성이 store 데이터에 접근하기 전에 중단된다. PH namespace·공백·event-offer 회귀 3 tests PASS. 최신 main `63653694b3`을 작업 branch에 일반 merge로 통합했다.
+
 배포 전 후속 미디어 리뷰 대응: PH 자산을 공용 목록 SQL에서 제외하고 UUID 조회·사용처·폴더·metadata·삭제 및 catalog의 locked mutation/relations 조회에서 퇴역 scope를 확인한다. 기존 PH 공개 자산의 타 서비스 재사용을 코드 배포와 purge 사이에도 차단한다. 승인 PH 필터는 공통 helper로 추출해 중복을 줄였다. focused 3 suites 29 tests PASS. 이 기록은 배포 성공 또는 실제 데이터 삭제를 의미하지 않는다.
 
 추가 요청의 퇴역 서비스 역할 정합: PH는 앞선 변경에서 신규 지정 목록·부여 경계를 제거했다. K-Cosmetics의 `cosmetics:*` 운영자 allowlist, admin 역할 서비스 목록, 공용 역할 관리 selector를 제거한다. DB 역할 catalog와 신규 assignRole/회원 역할 지정은 `cosmetics`·`k-cosmetics` 및 두 접두 역할도 거절한다. 과거 타입·registry 메타데이터는 퇴역(deprecated) 표시로 남기고 신규 서비스별 역할 조회에서 제외한다. 기존 cosmetics 권한 회수·전체 API 종료·데이터 삭제는 이번 역할 지정 정합 범위에 포함하지 않는다. 서버 focused 25 tests 및 화면 catalog 정합 10 tests PASS.
