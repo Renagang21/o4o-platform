@@ -1,9 +1,9 @@
 # O4O 두 단계 계정 완전 제거 Core 변경 WO
 
-> **상태**: DRAFT
+> **상태**: ACTIVE
 > **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
 > **근거 WO/IR**: [통합 WO §10~§11](WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1.md) · [후속 TODO](TODO-O4O-INTEGRATED-PRIVACY-FOLLOWUP-V1.md) · [보존 조사](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md)
-> **범위**: 조사·구체 처리 계약·승인 대상 제안. 아래 API/DDL/worker는 구현·운영 집행된 기능이 아니다.
+> **범위**: 기존 통합 WO 후속 Core/API 코드·격리 합성 검증. §2~§9는 승인 전 조사/제안 기록이며, 승인 후 실제 구현과 한계는 §10을 따른다. 운영 집행 완료가 아니다.
 > **조사 기준**: 시작 시 fetch한 main `63653694b3bc35b4d127541fafb76f021df1bf68`; 로컬 격리 PostgreSQL의 schema metadata와 rollback 합성 fixture. 운영 DB/실계정/GCS 조회·삭제 0.
 
 ## 1. 확정 정책과 Core 승인 경계
@@ -134,3 +134,37 @@ DB cleanup 중 실패는 rollback하여 pending fence와 durable retry 상태를
 - 다음 단계는 §1의 **구체 Core/API/DDL 코드 준비·격리 로컬 검증 승인**이다. 승인 후 handler 전수 분류·implementation·관련 E2E·PR/main 통합을 수행한다. 운영 migration/삭제/job 게시와 법률 본문 시행은 각각의 범위/조건을 따로 확인한다.
 
 문서 정합: 과거 FK 실패 성공/soft-delete/GCS 미연동 문제를 완전 제거 완료로 표시하지 않는다. 당시 분회 실패/HELD·인증 대기는 최신 담당 완료 기록으로 해소됐으며 새 분회 개발·정책 집행 완료로 확대하지 않는다.
+
+## 10. 승인 후 구현 phase — 2026-10-12
+
+사용자는 §1의 Core/API/migration 코드 준비와 격리 합성 검증을 승인했다. 같은 코드 승인을 다시 요청하지 않는다. **운영 migration·실계정/개인 GCS 삭제·retention job 활성화·법률 게시 승인은 포함하지 않는다.** §2~§9의 미구현/다음 승인 문구는 조사 phase 당시 기록이며 다음 결과를 함께 읽는다.
+
+### 10.1 실제 처리와 완료 계약
+
+두 기존 DELETE를 `AccountErasureService`로 통합했다. 인증·현재 DB platform super admin·기존 Admin Google 경계를 유지하며 Demo/super admin을 보호한다. 사용 중인 서비스는 Operator가 먼저 중지해야 한다. 검증된 이메일의 묵시적 Neture 접근도 scoped stop으로만 suspended 원장을 만들며 다른 서비스나 전체 계정은 중지하지 않는다. 가입/수행자 이력 자체를 계정 유지 guard로 쓰지 않는다.
+
+operation의 pending 진입과 계정 비활성화/token family 회전은 원자 처리한다. 상태/재시도/capability API와 Admin UI는 `completed && erased=true`만 완료로 표시하며 접수/검토/재시도는202·미완료다. 고정24시간 검토 기한을 재시도 때 연장하지 않는다. 자동 retry/backoff/lease worker는 아직 등록하지 않았으며 권한 있는 Admin의 명시적 retry를 사용한다.
+
+새 migration은 operation·개인 파일 task·일시 reference keys·독립 커뮤니티 최소 증빙·제거 최소 audit 5개 테이블과 writer fence를 추가한다. 커뮤니티 최소 증빙은 원래 created_at의 KST 달력1/2년(µs 보존, 윤일3월1일 규칙), 사건/목적별 보존 근거만 사용하며 재가입/복구로 초기화하지 않는다. 프로필·reason·이메일·전화번호를 복제하지 않고 live user/membership/community FK를 두지 않는다. 본인 탈퇴/migration은 자동으로 법정 취급 증빙에 승격하지 않는다. 시스템1/2년 판정과 근거 입력은 활성화 전 필수이며 테스트용1/2년이 운영 법률 판단을 대신하지 않는다.
+
+보존 maintenance는 명시 호출·기본 dry-run이다. 검토 기한이 지난 hold를 자동 연장하지 않으며 종료 후 원래 만료일을 따른다. 기존6개 retention target/job과 `community_membership_changes` 자동 파기 범위는 바꾸지 않았다. 완료 operation/restore fence는7일 만료이며 실제 파기는 승인된 maintenance가 필요하다. 최소 audit은 요청자/시스템 완료 기록이고 모든 retry 수행자를 기록하는 새 활동 원장은 아니다.
+
+### 10.2 구현 범위와 운영 활성화 전 필수 잔여
+
+검토된 개인 소유 row(인증·세션·개인 자격/profile·알림·북마크·일부 assistant·membership/role)만 명시 순서로 제거한다. canonical schema의 문자열/JSON/다른 Users/소유 row UUID를 재조회하고 미분류 business·타인 글·약관 증빙·분회 원장·공유 파일·개인 첨부는 `review_required`로 남긴다. 이 상태는 계정/일반 개인정보 제거 **미완료**다. 415개 후보 전체 handler 분류, 사업 책임 이전, branch 최소 기록 목적/기간, 검색/캐시/백업/외부 저장 전수 inventory는 아직 완료하지 않았다. 그 잔여를 일반 계정의 무기한 보관 정책으로 승인하지 않는다.
+
+DB writer는 전역 shared transaction advisory barrier를 거치며 manifest/final rescan은 exclusive barrier를 사용한다. 먼저 시작한 비FK writer를 기다린 뒤 snapshot을 만들고 완료된 UUID/reference의 복원을7일 차단한다. 전역 barrier와 전체 값 census의 운영 규모 latency/lock 영향은 미측정이다. DB deadlock/오류는 rollback 후 미완료·retry로 처리하며 모든 외부 upload producer의 선행 GCS upload/orphan task 계약까지 구현된 것은 아니다. 운영 활성화 전 producer와 파일 inventory 경계를 닫아야 한다.
+
+GCS adapter는 소유 bucket의 avatar에 대해 객체 metadata `o4o_owner_user_id`와 `o4o_asset_purpose=personal`을 확인하고 durable generation을 먼저 commit한 뒤 조건부 삭제한다. 업로더/URL만으로 소유를 추정하지 않는다. metadata가 없는 legacy 객체·공유 참조·기타 개인 첨부는 검토 대상이다. 실제 GCS/IAM/soft-delete/버전/복제/캐시는 미검증이며 synthetic adapter/SDK mock 검증을 운영 완전 제거 증명으로 사용하지 않는다.
+
+기본은 **비활성화**다. 활성화에는 `ACCOUNT_ERASURE_MODE=apply`, `ACCOUNT_ERASURE_FILE_INVENTORY_REVIEW=confirmed`, `ACCOUNT_ERASURE_SYSTEM_YEARS`, `ACCOUNT_ERASURE_SYSTEM_POLICY_BASIS`와 migration 존재가 모두 필요하다. 이번 작업은 이 운영 값을 설정하지 않았다. inventory confirmed를 미완료 파일 전수 조사 대신 입력하지 않는다.
+
+### 10.3 검증 및 통합 추적
+
+격리 PostgreSQL 실제 schema/합성 계정 테스트18개: 두 실제 HTTP 경로·실제 JWT/현재 DB role·보호 대상·scoped stop·중복/비FK 동시 writer·개인/타인 자료·최소 증빙·기존 access/refresh/handoff와 stale 발급·file failure/retry·ownership/inventory·restore fence·달력 µs/hold 검증 PASS. 실제 Google/Kakao OAuth나 실계정 테스트는 아니다.
+
+승인/정지 회귀7 suites157개, 인증 회귀6 suites182개, Admin UI6개, 설계 planner11개 PASS. API build·Admin typecheck/build·migration contract21 checks PASS. 실제 Chromium에서 합성 API를 사용한 제거 control을1440/375/320 폭으로 확인(3 checks); 일반 사용자 전체 앱/OAuth 검증을 대체하지 않는다. storage SDK mock과 PR CI/검토·main/Delivery 최종 결과는 [공통 영향 CHECK](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md)에 기록한다.
+
+새 empty disposable DB에서 정식 migrate runner의 baseline→23단계 전체 적용·pre/post schema assertion PASS: 최종 `f1ff5cc8f6f6aec9eeb1bc793021ff02b32a0fa613cac5ae12b255f42867612c`, 6613 lines. 격리 empty fixture down은 기존22단계 fingerprint로 복귀하며 up은 새 fingerprint를 재현했다. 운영 DB migration/기존 실제 row 조회·삭제0. 데이터가 존재하는 새 원장의 down은 거절하며 운영 복구는 별도 forward repair review다.
+
+법률 새 본문·게시/재동의·2년 해당성 판정과 마지막 사용자 테스트는 §8/TODO의 후속이다. 분회 전용 개발/배포와 이전 환경 삭제는 수행하지 않는다.

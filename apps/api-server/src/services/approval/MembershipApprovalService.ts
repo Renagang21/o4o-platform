@@ -1,3 +1,4 @@
+import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 /**
  * MembershipApprovalService — Core-level approval logic
  *
@@ -751,6 +752,7 @@ export class MembershipApprovalService {
     }
   }
 
+  // CORE_CHANGE_REQUIRED — approved two-stage erasure WO: scoped stop must cover derived Neture access.
   private async suspendMembershipCore(
     queryRunner: MembershipTxExecutor,
     params: SuspendParams
@@ -766,6 +768,9 @@ export class MembershipApprovalService {
         userId, suspendedBy, isPlatformAdmin,
       });
 
+      // Same user -> membership lock order as account erasure; no global account mutation.
+      await queryRunner.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
+      await queryRunner.query('SELECT id FROM users WHERE id=$1 FOR UPDATE',[userId]);
       const selectResult = isPlatformAdmin
         ? await queryRunner.query(
             `SELECT id, user_id, service_key, role, status
@@ -781,6 +786,16 @@ export class MembershipApprovalService {
              FOR UPDATE`,
             [userId, serviceKeys]
           );
+
+      if (serviceKeys?.includes('neture') && !selectResult?.some((m:any)=>m.service_key==='neture') &&
+          await getNetureMainMembershipStatus(queryRunner,userId)==='active') {
+        // Verified-email main access may have no active row, or a legacy pending row.
+        // Materialise only the explicitly scoped stop; never grant a role or stop other services.
+        const rows=await queryRunner.query(`INSERT INTO service_memberships(user_id,service_key,role,status)
+          VALUES($1,'neture','member','active') ON CONFLICT(user_id,service_key)
+          DO UPDATE SET status='active',updated_at=now() RETURNING id,user_id,service_key,role,status`,[userId]);
+        selectResult.push(...rows);
+      }
 
       if (!selectResult || selectResult.length === 0) {
         logger.warn('[SUSPEND][STEP0] no active memberships found', {

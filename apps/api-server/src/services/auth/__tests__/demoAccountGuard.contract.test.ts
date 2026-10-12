@@ -114,21 +114,18 @@ describe('Demo 계정 보호 계약', () => {
   });
 
   // ── D4 ────────────────────────────────────────────────────────────────────
-  it('D4 계정 삭제 2경로가 registry 판정을 호출하고 403 을 돌려준다', () => {
-    const paths = ['controllers/admin/AdminUserController.ts', 'controllers/UserManagementController.ts'];
-    const missing: string[] = [];
-    for (const rel of paths) {
-      const src = read(rel);
-      if (!/demoAccountService\.isDemoAccount\(/.test(src)) missing.push(`${rel}: 판정 호출 없음`);
-      if (!/DEMO_ACCOUNT_FORBIDDEN_CODE/.test(src)) missing.push(`${rel}: 사유 코드 없음`);
-      // 삭제 **전에** 막는다 — 호출 순서가 뒤바뀌면 행이 지워진 뒤 403 을 낸다.
-      const guardAt = src.indexOf('isDemoAccount(');
-      const deleteAt = Math.min(
-        ...[src.indexOf('userRepo.remove('), src.indexOf('softDeleteUser(')].filter((i) => i >= 0),
-      );
-      if (!(guardAt >= 0 && deleteAt >= 0 && guardAt < deleteAt)) missing.push(`${rel}: 판정이 삭제보다 뒤에 있다`);
+  it('D4 both deletion routes delegate to the registry-protected orchestrator before writes', () => {
+    for (const rel of ['controllers/admin/AdminUserController.ts', 'controllers/UserManagementController.ts']) {
+      const src=read(rel);
+      const method=src.slice(src.indexOf('deleteUser ='),src.indexOf('};',src.indexOf('deleteUser =')));
+      expect(method).toContain('await respondErasure(req, res)');
+      expect(method).not.toMatch(/softDeleteUser|userRepo\.remove/);
     }
-    expect(missing).toEqual([]);
+    const core=read('services/privacy/account-erasure.service.ts');
+    expect(core).toContain('FROM demo_accounts WHERE user_id=$1 AND is_active');
+    expect(core).toContain("if (protectedUser.demo) throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN', 403)");
+    expect(core.indexOf('if (protectedUser.demo)')).toBeLessThan(core.indexOf('INSERT INTO account_erasure_operations'));
+    // Actual JWT/router/DB no-write behavior is covered by the isolated integration fixture.
   });
 
   // ── D5 ────────────────────────────────────────────────────────────────────

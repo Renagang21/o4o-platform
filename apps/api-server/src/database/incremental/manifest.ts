@@ -81,6 +81,7 @@ import { AllowKakaoHandoffAuthMethod1791527589096 } from '../migrations/17915275
 import { CreateSocialAuthFlows1791592932097 } from '../migrations/1791592932097-CreateSocialAuthFlows.js';
 
 import { AddCommunityMemberAdministration1791632505104 } from '../migrations/1791632505104-AddCommunityMemberAdministration.js';
+import { CreateAccountErasureOperations1791777540800 } from '../migrations/1791777540800-CreateAccountErasureOperations.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -105,6 +106,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AllowKakaoHandoffAuthMethod1791527589096,
   CreateSocialAuthFlows1791592932097,
   AddCommunityMemberAdministration1791632505104,
+  CreateAccountErasureOperations1791777540800,
 ];
 
 export function incrementalMigrationNames(): string[] {
