@@ -53,13 +53,16 @@
 | 데이터 영역 | 주요 테이블 |
 | --- | --- |
 | 분회 식별·사이트·게시·도메인 | `kpa_organizations`, `branch_sites`, `branch_posts`, `branch_domains` |
+| 개설 신청·심사 | `branch_creation_requests` (raw SQL 원장, [branch-lifecycle.service.ts](../../apps/api-server/src/services/kpa-branch/branch-lifecycle.service.ts)) |
 | 소속·임원 | `branch_memberships`, `branch_officers` |
 | 신상신고 | `annual_report_templates`, `annual_reports` |
 | 회비·연수교육 | `branch_fee_policies`, `branch_fee_ledgers`, `branch_education_credit_ledgers` |
 | 행사·응답 | `branch_events`, `branch_event_rsvps` |
-| 공통 신원·가입·권한·자격 | `users`, `service_memberships`, `role_assignments`, `kpa_pharmacist_profiles` |
+| 공통 신원·가입·권한·자격 | `users`, `service_memberships`, `role_assignments`, `kpa_pharmacist_profiles`; `kpa_members`는 기존 호환 read fallback도 존재 |
 
-분회 전용 신상신고·회비/교육 원장·소속 이력의 보존/파기 기간은 이번 조사로 확정되지 않았다. 공통 [개인정보 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)의 대상 서비스 표와 기간표에는 이 분회 원장들의 구체 기간이 없다. 개인정보 최소화의 사용자 원칙과 공통 계정 처리 원칙을 참고하되, 분회 처리 항목·목적·법정 의무·기간/기산점·계정 제거 시 기록 분리를 별도 확정하고 정본에 반영해야 한다. 커뮤니티 이력1년이나 generic 로그365일을 이 원장들의 삭제 기준으로 복사하지 않는다.
+개설 신청 원장은 [CreateBranchCreationRequests](../../apps/api-server/src/database/migrations/1790400000001-CreateBranchCreationRequests.ts)에 정의되어 있고, 서비스 관리자 심사와 신청자 본인 조회가 [branch-lifecycle.service.ts](../../apps/api-server/src/services/kpa-branch/branch-lifecycle.service.ts)를 통해 처리된다. 신청자/검토자, 연락처·주소·처리 사유·생성된 분회 연결을 보관한다. 신청자 users FK는 ON DELETE CASCADE, 검토자 및 조직 FK는 SET NULL이며 승인 상태와 생성 분회 연결의 CHECK도 있다. 계정/조직 제거 시 개인정보·심사 기록·제약 조건 영향을 인수 범위에 포함한다. 위 표는 주요 직접 테이블이며 인증/정책 증빙·범용 감사 등 공통 서비스의 간접 참조까지 전부 열거한 목록은 아니다. 실제 삭제 대상을 이 표만으로 확정하지 않는다.
+
+분회 전용 개설 신청·심사·신상신고·회비/교육 원장·소속 이력의 보존/파기 기간은 이번 조사로 확정되지 않았다. 공통 [개인정보 보유기간 정본](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)의 대상 서비스 표와 기간표에는 이 분회 원장들의 구체 기간이 없다. 개인정보 최소화의 사용자 원칙과 공통 계정 처리 원칙을 참고하되, 분회 처리 항목·목적·법정 의무·기간/기산점·계정 제거 시 기록 분리를 별도 확정하고 정본에 반영해야 한다. 커뮤니티 이력1년이나 generic 로그365일을 이 원장들의 삭제 기준으로 복사하지 않는다.
 
 재정비 전에 개인정보/FK/연도별 제출 스냅샷·회비/교육 원장·소속 이력의 영향도를 다시 조사해야 한다. 같은 이름의 오래된 KPA 조직/회원 테이블이나 migration 파일을 삭제 근거로 삼지 않는다. 운영 DB 변경·DDL·기존 데이터 제거는 [AGENTS.md §5](../../AGENTS.md)의 별도 승인 경계를 따른다.
 
