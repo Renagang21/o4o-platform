@@ -13,7 +13,8 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { optionalStoreAuth } from '../../../auth/auth-context.middleware.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import { OrganizationChannel } from '../../../modules/store-core/entities/organization-channel.entity.js';
@@ -61,7 +62,7 @@ export function createStoreHubController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
   // WO-O4O-STORE-HUB-OPTIONAL-AUTH-MIGRATION-V1: serviceKey 전파 →
   //   read-only GET endpoint 도 cross-service routing 차단 (req.organizationId 미설정).
   const optionalAuth = optionalStoreAuth(dataSource, serviceKey);

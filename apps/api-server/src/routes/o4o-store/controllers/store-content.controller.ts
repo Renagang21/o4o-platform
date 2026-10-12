@@ -119,7 +119,7 @@ export function createStoreContentController(
     noOrgMessage = '매장 조직 정보를 찾을 수 없습니다.',
   ): Promise<string | null> {
     const access = await resolveKpaContentAccess(dataSource, userId, readPreferredStoreOrganizationId(req));
-    if (!access.isOwner) {
+    if (!access.hasAccess) {
       res.status(403).json({ success: false, error: { code: 'STORE_OWNER_REQUIRED', message: ownerMessage } });
       return null;
     }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { storeMembershipApi, type StoreInvitation } from '../api/storeMembership';
-import { WORKSPACE_PATHS } from '../config/workspace';
+
 import { useUnifiedStore } from '../contexts/StoreContext';
 
 /**
@@ -20,7 +20,7 @@ const errorMessage = (e: unknown): string =>
     : '요청을 처리하지 못했습니다.';
 
 export default function StoreInvitationsPage() {
-  const navigate = useNavigate();
+
   const { reload } = useUnifiedStore();
   const [invitations, setInvitations] = useState<StoreInvitation[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -49,7 +49,8 @@ export default function StoreInvitationsPage() {
       // 수락으로 매장이 **방금** 생겼다 — context 의 매장 목록은 로그인 사용자가 바뀔 때만 다시
       // 읽으므로, 여기서 reload 하지 않으면 홈에 가도 빈 목록이 남아 수동 새로고침이 필요하다.
       reload();
-      navigate(WORKSPACE_PATHS.home, { replace: true });
+      await load();
+      setBusy(false);
     } catch (e) {
       setError(errorMessage(e));
       setBusy(false);
@@ -69,9 +70,9 @@ export default function StoreInvitationsPage() {
           {invitations.map((inv) => (
             <li key={inv.organizationId}>
               <span className="option-name">{inv.organizationName || '이름 없는 매장'}</span>
-              <button type="button" onClick={() => void accept(inv)} disabled={busy}>
+              {inv.status === 'accepted' ? <span>경영자 최종 승인 대기</span> : <button type="button" onClick={() => void accept(inv)} disabled={busy}>
                 {busy ? '처리 중...' : '수락'}
-              </button>
+              </button>}
             </li>
           ))}
         </ul>

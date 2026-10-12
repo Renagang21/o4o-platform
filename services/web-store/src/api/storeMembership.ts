@@ -22,13 +22,14 @@ export interface StoreMember {
   email: string;
   name: string | null;
   role: string;
-  status: 'invited' | 'active';
+  status: 'invited' | 'accepted' | 'active';
   joinedAt: string;
 }
 
 export interface StoreInvitation {
   organizationId: string;
   organizationName: string;
+  status: 'invited' | 'accepted';
 }
 
 type Envelope<T> = { success: boolean; data: T };
@@ -58,6 +59,11 @@ export const storeMembershipApi = {
       { email },
     );
     return res.data;
+  },
+
+  async approve(userId: string, serviceKey?: string): Promise<void> {
+    const q = serviceKey ? `?serviceKey=${encodeURIComponent(serviceKey)}` : '';
+    await coreApiClient.post(`/store/members/${encodeURIComponent(userId)}/approve${q}`, {});
   },
 
   async remove(userId: string, serviceKey?: string): Promise<void> {
