@@ -220,6 +220,7 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/frontend-integrated-stabilization` / `w
 - [x] 이번 검토안·TODO 문서 민감정보 검사·상대 링크·diff whitespace PASS.
 - 최종 commit/push·CI/review·main 통합 결과는 이 연속 phase의 PR에서 확인한다. 이번 변경은 문서-only DEPLOYMENT=NOT_APPLICABLE이며 담당 인증 PR의 실제 배포는 별개다.
 - [ ] 기간/예외·본문 최종 확정과 필요한 후속 구현/발행. 현재 검토안은 DRAFT이며 정본 정책을 대체하지 않음.
+- [ ] **즉시 선행 보호**: 현행 admin 계정 hard-delete의 membership/history cascade가 일반 최소 보존도 깨뜨릴 수 있음. [검토안 §2.1](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md#21-현재-활성-계정-삭제의-선행-보호--미구현)의 전체관리자 삭제 차단 API 변경 범위 확정 → 구현/격리 동시성 검증/main/배포. 자동 삭제 job과 무관한 현재 위험이며 아직 보호 코드 미구현. 실제 계정 삭제 테스트 금지.
 - [ ] 이전 공간 식별·보존 확인 및 마지막 사용자 테스트. 현재 작업공간 KEEP.
 
 문서 정합: 종전 T10의 IAM3개 미해소 표기는 과거 조사 결과다. 최신 실제 자원 제거·인증 복구 완료와 DB/공용 코드 미완료를 이 절에 반영했다. 현행 보유기간 정본·게시된 법률 본문은 변경하지 않았다. 현재 클라우드 관측은 spec/observed41·current=true·running·connected·failure 없음이며 설정 재게시 없이 진행한다.
