@@ -254,7 +254,7 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 - [x] 서비스·역할·공급 opt-in·fulfillment PH 등록 제거, 공용 membership/약관/조직 처리의 PH 매핑 제거, 사용 참조 없는 KPA `PharmacyHubLayout` 삭제.
 - [x] 삭제된 PH scope가 서비스 중립 API로 fallback하지 않도록 요청 경계에서 410 차단. 현재 Neture/KPA·hospital-pharmacy 요청은 유지.
 - [x] 읽기 전용 운영 census [38195246677](https://github.com/Renagang21/o4o-platform/actions/runs/38195246677) SUCCESS. DB write 0. PH 전용 테이블 0; 공용 테이블의 PH scope는 아래와 같이 남음.
-- [ ] 변경 코드 CI·리뷰·main 반영 및 API/Admin/관련 공용 패키지 소비 앱 배포.
+- [x] 변경 코드 CI·리뷰·main 반영 및 API/Admin/관련 공용 패키지 소비 앱 배포. 결과는 아래 2026-10-12 운영 후속 기록 참조.
 - [ ] 실제 schema/FK/공유 소비처를 기준으로 PH row와 전용 종속 row 삭제 계획 고정·단독 운영 창에서 transaction 삭제·잔여 검증.
 - [ ] PH-only 공급 scope 19건 제거 시 빈 service_keys가 기본 공급으로 노출되지 않도록 상품 귀속·비활성화/삭제 순서 검증.
 - [ ] PH 도메인 DNS 관리 주체·인증서 공유 소비처 조사 후 DNS/PH redirect/전용 인증서 종료. 공유 LB·IP는 유지.
@@ -302,3 +302,14 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 후속 리뷰에서 발견된 서비스형 media link의 PH namespace 재생성을 saveLink 서비스 계층에서 DB transaction 전에 410/SERVICE_RETIRED로 거절한다. 신규·수정 링크가 같은 경계를 사용한다. 퇴역 키·공백·prefixed role 4개 회귀 테스트 PASS. GitHub 실행·대기 Actions는 조회 시 0건이었으며, 다른 Cloud/로컬 운영 작업 종료 확인은 별도로 필요하다.
 
 코드 catalog와 별도로 활성 DB 행을 조회하는 공개 PlatformServiceCatalogService 및 RoleService 목록도 PH를 제외한다. PH role의 opaque ID update/delete 및 직접 create는 410으로 거절한다. 내부 DB 조회는 필요한 제거 조사용으로 남기지만 공개 목록·권한·mutation에는 쓰지 않는다. guest serviceId는 전역 selector 및 직접 발급 서비스에서 거절하며, guest 감사 원장의 canonical service/session 필드는 클라이언트 metadata로 덮어쓸 수 없도록 보존한다. DB 활성 행이 있어도 목록/권한에서 제외되는 회귀, opaque role ID mutation, guest 발급/audit 부재를 포함한 4 focused suites 34 tests PASS, API 타입 검사 PASS. 이는 원격 DB/DNS 변경이나 완전 제거 완료가 아니다.
+
+
+## 운영 후속 — 2026-10-12
+
+PR #502 main 반영 뒤 main `c1bab86c01ea8eeb5d23c4605fca08008cd09bbf`의 CI를 확인했다. 사용자가 누적 계정 삭제 migration 2개를 포함한 배포를 승인했다. [Promote 38245766124](https://github.com/Renagang21/o4o-platform/actions/runs/38245766124)은 SUCCESS, production 상태는 DEPLOYED다. API migration·새 revision readiness·트래픽 전환 후 검증과 admin/neture/kpa-society/lecture/store/kpa-branch 배포가 성공했다. 운영 API의 PH 경로는 410/SERVICE_RETIRED다. 계정 삭제 apply 기능 활성화·실제 계정/GCS 파일 삭제는 실행하지 않았다.
+
+사용자는 가비아의 `pharmacyhub.co.kr` DNS 레코드 4개(A root/www 및 두 ACME CNAME)를 삭제했고 관리자 화면의 레코드 0개를 제시했다. 이는 가비아 설정 완료 증거이며 외부 DNS 캐시 만료 검증·GCP 인증서/맵/URL map 제거 완료 증거는 아니다. PC Local Agent의 업데이트는 담당 에이전트 범위로 확정했으며 이 세션에서 실행하지 않는다.
+
+[최신 read-only census 38247798519](https://github.com/Renagang21/o4o-platform/actions/runs/38247798519)은 SUCCESS, DB write 0. 로그 접근을 다시 확인해 PH namespace 건수와 FK 정의를 읽었다. 전용 테이블 0, 주문/결제 6건·공급 scope 19건 및 기존 회원/역할/정책/미디어 등 scope는 여전히 남아 있다. 각 scope 건수는 중복될 수 있어 삭제 총량으로 합산하지 않는다.
+
+삭제 전 조사 도구는 live incoming FK의 다른 schema 및 실제 종속 행 건수, 대상 table column type, PH-only/mixed 공급 scope를 읽기 전용으로 추가 집계한다. 인증서 조사는 PH SAN을 포함한 legacy/Certificate Manager 인증서, 모든 HTTPS proxy/map entry의 공유 참조, PH DNS authorization을 조회한다. 오류·부분 목록은 complete=false로 기록하며 비공개 row/PEM/credential을 출력하지 않는다. 이 조사 확장은 DB/인증서/URL map 삭제 기능을 추가하지 않는다. 실제 삭제 runner는 위 종속 귀속과 공유 참조를 확인한 뒤 고정한다.

@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolve4 } from 'node:dns/promises';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
+import { collectDomainInventory } from './pharmacy-hub-domain-inventory.mjs';
 
 const identifiers = value => {
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw Object.assign(new Error('Unsupported schema identifier'), { code: 'SCHEMA_IDENTIFIER' });
@@ -70,7 +71,60 @@ export async function collectRetirementInventory(client) {
       WHERE c.contype='f' AND sn.nspname='public' AND tn.nspname='public'
         AND (source.relname=ANY($1::text[]) OR target.relname=ANY($1::text[]))
       ORDER BY source.relname,target.relname,c.conname`, [targets]);
-    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys,
+    const predicates = new Map();
+    for (const c of scopeCounts) {
+      const schemaColumn = columns.find(column => column.table_name === c.table &&
+        column.column_name === c.column.split('.{')[0]);
+      if (!schemaColumn) throw Object.assign(new Error('Scope column unavailable'), { code: 'SCHEMA_IDENTIFIER' });
+      const query = c.column.includes('.{') ? jsonScopeQuery(c.table, schemaColumn.column_name)
+        : countQuery(c.table, schemaColumn.column_name, ['_text','_varchar'].includes(schemaColumn.udt_name));
+      const list = predicates.get(c.table) ?? [];
+      list.push(`(${query.slice(query.indexOf(' WHERE ') + 7)})`);
+      predicates.set(c.table, list);
+    }
+    const incoming = await client.query(`SELECT sn.nspname AS source_schema,source.relname AS source_table,
+        tn.nspname AS target_schema,target.relname AS target_table,c.conname AS constraint_name,
+        array_agg(sa.attname ORDER BY k.ordinality) AS source_columns,
+        array_agg(ta.attname ORDER BY k.ordinality) AS target_columns
+      FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
+        JOIN pg_namespace sn ON sn.oid=source.relnamespace
+        JOIN pg_class target ON target.oid=c.confrelid JOIN pg_namespace tn ON tn.oid=target.relnamespace
+        CROSS JOIN LATERAL unnest(c.conkey,c.confkey) WITH ORDINALITY k(source_key,target_key,ordinality)
+        JOIN pg_attribute sa ON sa.attrelid=c.conrelid AND sa.attnum=k.source_key
+        JOIN pg_attribute ta ON ta.attrelid=c.confrelid AND ta.attnum=k.target_key
+      WHERE c.contype='f' AND tn.nspname='public' AND target.relname=ANY($1::text[])
+      GROUP BY sn.nspname,source.relname,tn.nspname,target.relname,c.conname
+      ORDER BY sn.nspname,source.relname,c.conname`, [targets]);
+    const dependencyCounts = [];
+    for (const fk of incoming.rows) {
+      const filter = predicates.get(fk.target_table)?.join(' OR ');
+      if (!filter && !dedicated.includes(fk.target_table)) continue;
+      if (!Array.isArray(fk.source_columns) || !Array.isArray(fk.target_columns) ||
+          !fk.source_columns.length || fk.source_columns.length !== fk.target_columns.length) {
+        throw Object.assign(new Error('Unsupported FK shape'), { code: 'SCHEMA_IDENTIFIER' });
+      }
+      const join = fk.source_columns.map((col,i) => `s.${identifiers(col)} = p.${identifiers(fk.target_columns[i])}`).join(' AND ');
+      stage = `retirement-dependency:${fk.source_schema}.${fk.source_table}`;
+      const { rows } = await client.query(`SELECT count(*)::text AS count
+        FROM ${identifiers(fk.source_schema)}.${identifiers(fk.source_table)} s
+        JOIN (SELECT * FROM public.${identifiers(fk.target_table)} WHERE ${filter ?? 'TRUE'}) p ON ${join}`,
+      filter ? [retiredKeys] : []);
+      dependencyCounts.push({ ...fk, count: rows[0].count });
+    }
+    let offerScopes;
+    if (predicates.has('supplier_product_offers') && columns.some(c => c.table_name === 'supplier_product_offers' && c.column_name === 'service_keys')) {
+      stage = 'retirement-offer-sharing';
+      const { rows } = await client.query(`SELECT count(*)::text AS total,
+        count(*) FILTER (WHERE EXISTS (SELECT 1 FROM unnest(service_keys) v
+          WHERE NOT (v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')))::text AS mixed,
+        count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM unnest(service_keys) v
+          WHERE NOT (v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')))::text AS ph_only
+        FROM public.supplier_product_offers WHERE ${predicates.get('supplier_product_offers').join(' OR ')}`, [retiredKeys]);
+      offerScopes = rows[0];
+    }
+    const inspectedTables = new Set([...targets, ...incoming.rows.filter(fk => fk.source_schema === 'public').map(fk => fk.source_table)]);
+    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,
+      targetColumns: columns.filter(c => inspectedTables.has(c.table_name)),
       deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
   } catch (error) {
     failure=safeInventoryError(error,stage);
@@ -178,6 +232,7 @@ if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
       await client.connect();
       return collectRetirementInventory(client);
     });
+    result.domains = collectDomainInventory();
     console.log(JSON.stringify(result));
     if (result.failed) process.exitCode=1;
   } catch(error) {
