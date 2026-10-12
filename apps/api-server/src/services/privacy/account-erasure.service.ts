@@ -210,6 +210,10 @@ export class AccountErasureService {
       JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`,[user.id])) {
       if(r.reference_id)tokens.add(String(r.reference_id));
     }
+    // Whitelisted typed subject identifiers; never guess identity from arbitrary metadata actors.
+    for(const linked of await m.query('SELECT "providerId",email FROM linked_accounts WHERE "userId"=$1',[user.id])) {
+      for(const value of [linked.providerId,linked.email])if(typeof value==='string' && value.length)tokens.add(value);
+    }
     return [...tokens];
   }
 
@@ -219,7 +223,8 @@ export class AccountErasureService {
     const patterns = tokens.filter(v=>v.length>=2).map(v => {
       const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
       // A unique email is not a substring identity: preserve another person's longer address.
-      return v.includes('@') ? `(^|[^${localPart}])${escaped}(?![[:alnum:]-]|\\.[[:alnum:]-])` : escaped;
+      return v.includes('@') ? `(^|[^${localPart}])${escaped}(?![[:alnum:]-]|\\.[[:alnum:]-])`
+        : UUID.test(v) ? escaped : `(^|[^[:alnum:]_])${escaped}($|[^[:alnum:]_])`;
     });
     const shortTokens=tokens.filter(v=>v.length<2);
     // Search attributed identifier values, not JSON column/key names or another actor’s profile.

@@ -295,6 +295,16 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[fixtureAdminId]))[0].isActive).toBe(true);
     expect(await db.query('SELECT id FROM notifications WHERE "userId"=$1',[target.id])).toHaveLength(0);
   });
+  it('typed linked provider IDs and nullable aliases must not survive in another row',async()=>{
+    const target=await user(),peer=await user(),providerId='synthetic-provider-identity';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId",email)
+      VALUES($1,'google',$2,$3)`,[target.id,providerId,'synthetic-alias@fixture.invalid']);
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'providerReference\',$1::text) WHERE id=$2',[providerId,peer.id]);
+    const first=await service().request(target.id);expect(first.erased).toBe(false);expect(first.reviewCodes).toContain('REVIEW:public.users');
+    await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'contact\',$1::text) WHERE id=$2',['synthetic-alias@fixture.invalid',peer.id]);
+    const second=await service().resume(first.operationId);expect(second.erased).toBe(false);expect(second.reviewCodes).toContain('REVIEW:public.users');
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[target.id])).toHaveLength(1);
+  });
   it('scheduled unexpired protection blocks both metadata lookup and deletion before time can advance',async()=>{
     const target=await user({avatar:'https://storage.googleapis.com/fixture-private/protected-avatar.png'});
     await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '2 seconds')",[target.id]);
