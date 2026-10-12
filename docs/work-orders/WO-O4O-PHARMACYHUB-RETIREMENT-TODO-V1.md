@@ -332,3 +332,5 @@ FK catalog의 name[]를 pg client가 문자열로 읽는 문제를 text[] 집계
 - [ ] 인증서 목록 권한 보완 후 PH 인증서/map entry/DNS authorization/URL map 종료.
 
 PR #522 리뷰 보완: PH `roles.service_key`와 `roles.name`의 귀속 불일치를 양방향으로 차단한다. apply 전에는 관리자 측 원래 WIF 조건 백업과 해당 main SHA/PH workflow/owner에만 한정된 임시 조건이 필요하다. 코드가 provider의 실제 조건을 정확히 대조하며 다른 workflow/SHA·OR 우회를 허용하지 않는다. 기존 토큰을 가진 실행도 없는 단독 운영 구간을 확인하고, 동일 PH workflow의 concurrency와 함께 다른 운영 writer의 신규 인증을 작업 종료까지 차단한다. `iam.workloadIdentityPoolProviders.get` 읽기 권한이 필요하다. 작업·잔여 검증 뒤 원래 조건을 복구한다. 이 세션에서 기존 PC Local Agent를 변경하지 않는다.
+
+PR #522는 SonarCloud 정렬/복잡도 지적 수정, 관련 56 tests와 PostgreSQL 실검증, 필수 CI·리뷰 해결 후 main `e46f3467892e01f142af8bf58025ac33cd8e6eb7`에 병합했다. post-merge CI 38318999460도 SUCCESS다. 최초 Cloud Run plan 38320131242는 인증 전 safety test에서 중단됐다. 기존 resource-gate 테스트가 실제 workflow의 새 `PH_ADMIN_PURGE=true`를 상속하는 fixture 격리 문제다. DB 접속·job 생성·삭제는 실행하지 않았다. 테스트 환경을 명시적으로 격리하고 PH 입력과 resource retirement의 혼합 거절을 검사한다. 최신 census 38319576225도 인증서 권한 부족 complete=false이며 실제 자원 부재를 증명하지 않는다.
