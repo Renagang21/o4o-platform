@@ -24,7 +24,6 @@ JOIN에 `li.organization_id = qr.organization_id`를 추가한다. QR과 동일 
 - [x] main 사후 CI·CodeQL 확인
 - [x] Delivery WIF 인증 차단 해소 후 정상 배포·서빙 확인
 - [x] 배포 후 공개 read-only smoke·결과 문서 정합
-- [x] 자기 worktree 종료 판정 (아래 표준 정리 조건 적용)
 
 실제 SQL 4개는 수정 전 조회의 타 매장 제목·본문·이미지 노출 재현, 수정 후 해당 필드 모두 차단, 같은 매장 활성 자료 표시, 비활성 자료 제외다. 현재 서비스 소스의 첫 SELECT를 그대로 추출해 임의 이름의 자기 로컬 DB에서 실행했으며 SQL을 별도로 복제한 fixture 조회로 검증하지 않았다. DDL 전에 control system identifier·backend/postmaster·socket/port를 검증했고 종료 시 자기 DB를 삭제했다. 운영 DB 쓰기는 없고 fixture 식별자는 비공개 실행 기록에만 보관한다.
 
@@ -82,6 +81,10 @@ PH 퇴역 WO의 원래 WIF 조건 복구 기록과 실제 인증 smoke 381878048
 
 배포 후 TLS 검증을 유지한 read-only HEAD smoke 3개는 PASS다: readiness 200, slug-less QR namespace 404 + read-only marker, 임의 미등록 QR 404 + marker/no-store. 모든 body는 0 bytes이고 운영 QR scan을 요청하지 않았다. 실제 타 매장 자료를 연결하거나 운영 fixture를 만들지 않았다. 로컬 SQL 4개·focused 65개 결과와 배포된 정확한 소스·서빙 확인을 결합한 검증이며 물리 QR 스캔/태블릿 출력 확인은 아니다.
 
-앞 절의 WIF 차단·main 통합 보류·KEEP은 당시 단계 기록이며 현재 미완료 상태가 아니다. 결과 기록 PR #486은 같은 WO의 연속 Phase로 최신 main을 통합해 갱신한다. 결과 문서는 runtime 무영향으로 추가 서비스 배포 NOT_APPLICABLE이다. 필수 PR CI·리뷰·main 반영·문서 main 사후 CI 확인 후 아래 정리 조건을 적용한다.
+앞 절의 WIF 차단·main 통합 보류·KEEP은 당시 단계 기록이며 현재 미완료 상태가 아니다. 결과 기록 PR #486은 같은 WO의 연속 Phase로 최신 main을 통합해 갱신했고 main `803d8dcf01f7ebc51b954080a8e1ade89b33443a`에 병합됐다. required PR CI 38191437683과 문서 main 사후 CI 38191640186은 실제 SUCCESS다. 결과 문서는 runtime 무영향으로 추가 서비스 배포 NOT_APPLICABLE이다.
 
-WORKTREE_DISPOSITION: 자기 commit의 main 포함·post-merge CI PASS·uncommitted/untracked 0·진행 중 operation 없음·보존할 private artifact는 checkout 밖에 있음·다른 세션 사용 없음·symlink 비재귀 해제 및 재스캔 0을 확인하면 SAFE_TO_REMOVE다. 이 세션의 `/workspace/o4o-wt/store-remaining-workflow-closure` 및 `wo/store-remaining-workflow-closure`만 삭제한다. parent WO의 운영 계정 원본 편집·두 정상 매장·물리 기기 TODO는 별도이며 이번 QR 수정 WO의 완료 판정을 대신하지 않는다.
+## 완료 상태 리뷰 보완
+
+PR #486의 P2는 완료 상태를 필수 통합·사후 확인보다 앞서 표시한 점을 지적했다. 이전 커밋에서 이를 먼저 완료 표시한 것은 잘못이었다. 현재는 위 PR의 main 반영과 사후 CI 성공을 실제로 확인했으며, 조건부 미래 절차를 완료 사실처럼 기록한 문장을 제거했다. QR 개발·운영 배포·사후 검증·결과 문서 main 반영은 완료됐고 부모의 별도 운영·기기 TODO는 계속 열린 상태다.
+
+worktree 삭제를 실행 전에 완료했다고 기록하지 않는다. AGENTS.md의 표준 Git 종료 절차(자기 commit main 포함·최종 결과 PR 사후 CI·clean/operation 검사·symlink 비재귀 해제·삭제 후 기준 checkout 손상 검사)는 별도로 실행하고 실제 종료 결과는 checkout 밖 private ledger와 완료 보고에 남긴다. 본 문서의 COMPLETED는 위에 실행 결과가 있는 QR 개발·배포·검증 작업의 완료이며, 조건부 WORKTREE_DISPOSITION을 삭제 완료 증거로 사용하지 않는다. 이 사실 보완 문서 변경 자체는 새 runtime 개발·배포 작업이 아니다.
