@@ -1,6 +1,6 @@
 # My Home 최소 모아보기 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-12 (KST)
 > **근거**: AI 중심 My Home의 최소 화면 범위에 대한 사용자 진행 지시. My Home AI는 별도 개발.
 > **연속 WO**: [My Home 구현](WO-O4O-MY-HOME-IMPLEMENTATION-V1.md)
@@ -29,8 +29,8 @@
 - [x] 최근 알림 3건·대표 업무·간단한 상세 진입 구현
 - [x] 모아보기의 상세 API 미호출·상세 화면 기능 회귀 검증
 - [x] 타입 포함 build·PC/375/320px fixture·역할/계정 전환 검증
-- [ ] 정본·WO·CHECK·TODO의 현재 범위·결과 정합
-- [ ] required CI·정상 PR main 통합·Delivery·실제 서빙/운영 번들 확인
+- [x] 정본·WO·CHECK·TODO의 현재 범위·결과 정합
+- [x] required CI·정상 PR main 통합·Delivery·실제 서빙/운영 번들 확인
 
 ## 완료 기준
 
@@ -39,3 +39,11 @@
 ## 구현 검증 결과 (통합 전)
 
 Neture 600 tests/70 files·auth-client 재빌드 후 타입 포함 build·변경 ESLint·docs guard·diff 검사 PASS. PC/375/320px 브라우저 fixture 39 PASS. 로그인은 사용자 제외, AI는 별도 개발. 상세 화면의 데이터는 fixture이며 운영 실계정 검증을 대신하지 않는다. main 통합·배포 및 정본 정합은 완료 근거 확인 뒤 체크한다.
+
+## 최종 완료 — 2026-10-12 KST
+
+- 구현 PR #498 exact HEAD CI·리뷰 gate PASS → main `004a42c012ad8b67a446db373d4de33889c6f4e8` 정상 병합 → main CI/CodeQL PASS.
+- [자동 Delivery 38196926152](https://github.com/Renagang21/o4o-platform/actions/runs/38196926152): Neture만 배포·최종 서빙 Report PASS, production DEPLOYED. runtime은 구현 main SHA와 동일하다.
+- 운영 HTML/JS 109개·표식 8개·공개 HTTP/API 보호 13 checks·실제 운영 번들의 PC/375/320px fixture 39 tests PASS. 직접 실계정 로그인은 사용자 제외이며 fixture와 구분한다.
+- 정본·색인·WO/CHECK의 최소 화면/상세 기능/AI 별도 개발/실제 결과를 문서 PR #500으로 정합한다. 문서-only DEPLOYMENT는 NOT_APPLICABLE, runtime과 문서 SHA를 구분한다.
+- My Home AI·매출/POS·새 경영지표·이메일 리팩터링은 이번 구현에 포함하지 않는다. 테스트 계정과 검증 증거 보존을 위해 기존 연속 WO 작업공간 KEEP.
