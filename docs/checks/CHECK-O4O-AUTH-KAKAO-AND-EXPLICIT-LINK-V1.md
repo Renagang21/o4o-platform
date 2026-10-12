@@ -1133,3 +1133,25 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 
 동일 WO의 보존된 branch에서 실행했다. 새 정책은 게시하지 않았으며 시행 예정일
 2026-11-13과 실제30일 공고 조건을 유지한다. main 통합·웹 배포·운영 검증은 별도로 기록한다.
+
+#### PR #504의 대표 홈 세션 복귀 review 보완
+
+초기 `926858beb0` review의 P2 지적은 direct URL이 origin별 localStorage 세션을
+대표 홈에 전달하지 않는다는 내용이다. 위 초기 공개 홈 직접 링크 구현은 최종안이 아니다.
+현재 사용 중인 `O4OHomeButton`을 계정 상태 안내에 연결해 로그인 중에는
+`POST /auth/handoff { targetServiceKey: neture, returnPath: / }`의 검증된 주소로 이동한다.
+인증 복구 중에는 버튼을 비활성화하고, 서버의 `403 ACCOUNT_NOT_ACTIVE`는 기존 공통
+오류·재시도를 표시한다. 제한 계정을 승격하거나 거절 시 로그아웃하지 않는다.
+공통 버튼·handoff 서버·shared contract는 수정하지 않았다.
+
+보완 후 화면53/53 PASS(신청 패널14 + 기존3파일39), Neture tsc/Vite build PASS.
+패널 회귀는 발급 성공·제한 거절 후 재시도·인증 복구 중 발급0을 실제 공통 버튼으로
+확인하며 source token 유지와 불필요한 신청/logout 호출 부재를 검사한다.
+초기 단순 href 검증은 로그인 유지의 증거가 아니며, 최종 브라우저 결과도 별도로 기록한다.
+
+보완된 로컬 production bundle PC/mobile 고유24조건은 최종24/24 PASS다.
+앞의20조건에 handoff 성공·계정 제한 거절4조건을 추가했다. 최초22/24에서 제한 거절2조건은
+공통 버튼이 header와 패널에 동시에 오류를 표시해 selector가 중복 매칭된 harness 실패였다.
+패널 내부의 alert로 범위를 한정하고 해당2조건만 재실행해2/2 PASS를 확인했다.
+실제 발급 POST의 대상/returnPath·제한 시 이동 없음·버튼 재활성·source token 보존을
+검사했다. 성공 조건은 합성 handoff 주소까지의 이동 확인이며 실제 서버 교환/OAuth를 증명하지 않는다.

@@ -24,7 +24,7 @@ import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '
 
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { O4O_HOME_URL } from '@o4o/auth-react';
+import { O4OHomeButton } from '@o4o/auth-react';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
@@ -42,7 +42,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export function ServiceApplyPanel({ service, enterWorkspace = false }: { service: ServiceKey; enterWorkspace?: boolean }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
   const agreement = useServiceEnrollmentPolicies('supplier', async () => (await api.get('/public/services/supplier/enrollment-policies')).data.data, user?.id ?? 'signed-out');
@@ -125,9 +125,13 @@ export function ServiceApplyPanel({ service, enterWorkspace = false }: { service
             ? `Neture 계정 확인이 필요합니다. 대표 홈에서 계정 상태를 확인한 뒤 ${info.name}를 신청해 주세요.`
             : `${info.name}를 신청하려면 정상적으로 이용할 수 있는 Neture 계정이 필요합니다.`}
         </p>
-        <a href={O4O_HOME_URL} className="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800">
-          대표 홈에서 계정 상태 확인 <ArrowRight className="ml-2 w-4 h-4" />
-        </a>
+        <O4OHomeButton
+          api={api}
+          isAuthenticated={isAuthenticated}
+          authLoading={isLoading}
+          label="대표 홈에서 계정 상태 확인"
+          className="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800"
+        />
       </div>
     );
   }

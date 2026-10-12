@@ -631,7 +631,7 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 |---|---|---|---|
 | V01 | 일반 미가입·대기·반려·정지·탈퇴 검증 | `users`의 공통 계정 상태, 서비스 membership, 약국·공급자 별도 원장을 구분한다. 로그인 성공과 보호 업무 API 허용도 구분한다 | 조사 완료 |
 | V02 | 공급자 상태별 안내 확인 | 실제 소비처는 `SupplierLandingPage`/`SupplierServiceEntry` → `ServiceApplyPanel`이다. 미사용 `ServiceUsageGate`의 문구만 바꿔 운영 개선으로 판정하지 않는다 | 실제 소비처 확인 완료 |
-| V03 | 공통 계정 승인 대기 안내 | `neture-main-membership.ts`의 정상 계정·이메일 확인 기준에 맞춰 수동 승인 문구를 제거한다. 서브도메인의 `/`로 돌아가 같은 패널을 반복하지 않고 `neture.co.kr` 공개 대표 홈으로 안내한다 | 로컬 구현·검증 완료; 통합·배포 대기 |
+| V03 | 공통 계정 승인 대기 안내 | `neture-main-membership.ts`의 정상 계정·이메일 확인 기준에 맞춰 수동 승인 문구를 제거한다. 같은 서브도메인 `/` 반복 대신 기존 `O4OHomeButton`의 로그인 유지 handoff로 대표 홈에 복귀하고, 계정 제한으로 거절되면 이동 없이 오류·재시도를 제공한다 | review 보완 로컬 검증; 통합·배포 대기 |
 | V04 | 실제 상태별 로그인·역할·업무 검증 | 8개 유지 origin × PC/mobile에서 계정 출처와 실제 원장 상태를 먼저 확인한 후 로그인, 메뉴·직접 주소, 보호 API, 상태 안내, 다른 서비스 영향, 로그아웃을 검증한다 | 로컬 계정 SSOT 연결 대기 |
 | V05 | 정책 적용·재동의 | 실제 공개 공고와 30일 경과를 다시 확인하고 2026-11-13 이후 새 정책을 게시·검증한다 | 시행일 대기 |
 | V06 | Google·카카오 실제 인증·명시적 연결 | 본인 실제 OAuth는 사용자가 담당한다. 자동 이메일 병합 없음·연결 후 권한 합집합 없음의 실제 결과를 전달받아 기록한다 | 사용자 확인 대기 |
@@ -650,7 +650,9 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 사용 여부를 확인하고 승인된 범위에서만 실행한다.
 
 - [x] 상태 원장과 실제 화면 소비처 조사 → TODO 보완.
-- [x] V03 서버 회귀131건·화면 회귀50건·Neture build·PC/mobile 합성20조건 확인.
+- [x] V03 서버 회귀131건·초기 화면 회귀50건·Neture build·초기 PC/mobile 합성20조건 확인.
+- [x] 대표 홈 직접 링크의 세션 미승계 review 지적을 기존 handoff 버튼으로 보완; 공통 계정4조건·성공/제한/복구 중3조건 회귀 확인.
+- [x] review 보완 화면53건·Neture build·PC/mobile 고유 합성24조건 확인(제한 거절2조건의 selector 보완 재실행 포함).
 - [ ] V03 push·review·main·Neture 배포·운영 검증.
 - [ ] 일반 계정 SSOT 연결 후 V04 운영 상태별 검증.
 - [ ] V05 시행일·공고 기간 확인 후 정책 적용과 재동의 운영 검증.
