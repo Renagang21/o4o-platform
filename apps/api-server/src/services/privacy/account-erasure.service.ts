@@ -224,7 +224,7 @@ export class AccountErasureService {
       const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
       // A unique email is not a substring identity: preserve another person's longer address.
       return v.includes('@') ? `(^|[^${localPart}])${escaped}(?![[:alnum:]-]|\\.[[:alnum:]-])`
-        : UUID.test(v) ? escaped : `(^|[^[:alnum:]_])${escaped}($|[^[:alnum:]_])`;
+        : UUID.test(v) ? escaped : `(^|[^[:alnum:]_.-])${escaped}($|[^[:alnum:]_.-])`;
     });
     const shortTokens=tokens.filter(v=>v.length<2);
     // Search attributed identifier values, not JSON column/key names or another actor’s profile.

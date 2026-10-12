@@ -305,6 +305,16 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const second=await service().resume(first.operationId);expect(second.erased).toBe(false);expect(second.reviewCodes).toContain('REVIEW:public.users');
     expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[target.id])).toHaveLength(1);
   });
+  it('punctuation extending another opaque provider ID is not treated as this subject',async()=>{
+    const peer=await user(),providerId='synthetic-provider-identity';
+    for(const suffix of ['-extra','.extra']) {
+      const target=await user();
+      await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);
+      await db.query('UPDATE users SET "businessInfo"=jsonb_build_object(\'providerReference\',$1::text) WHERE id=$2',[providerId+suffix,peer.id]);
+      expect((await service().request(target.id)).erased).toBe(true);
+      expect((await db.query('SELECT "businessInfo" FROM users WHERE id=$1',[peer.id]))[0].businessInfo.providerReference).toBe(providerId+suffix);
+    }
+  });
   it('scheduled unexpired protection blocks both metadata lookup and deletion before time can advance',async()=>{
     const target=await user({avatar:'https://storage.googleapis.com/fixture-private/protected-avatar.png'});
     await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '2 seconds')",[target.id]);
