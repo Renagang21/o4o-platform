@@ -281,4 +281,6 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 
 ### PR #502 DB 카탈로그·guest 발급 후속 리뷰
 
+후속 리뷰에서 발견된 서비스형 media link의 PH namespace 재생성을 saveLink 서비스 계층에서 DB transaction 전에 410/SERVICE_RETIRED로 거절한다. 신규·수정 링크가 같은 경계를 사용한다. 퇴역 키·공백·prefixed role 4개 회귀 테스트 PASS. GitHub 실행·대기 Actions는 조회 시 0건이었으며, 다른 Cloud/로컬 운영 작업 종료 확인은 별도로 필요하다.
+
 코드 catalog와 별도로 활성 DB 행을 조회하는 공개 PlatformServiceCatalogService 및 RoleService 목록도 PH를 제외한다. PH role의 opaque ID update/delete 및 직접 create는 410으로 거절한다. 내부 DB 조회는 필요한 제거 조사용으로 남기지만 공개 목록·권한·mutation에는 쓰지 않는다. guest serviceId는 전역 selector 및 직접 발급 서비스에서 거절하며, guest 감사 원장의 canonical service/session 필드는 클라이언트 metadata로 덮어쓸 수 없도록 보존한다. DB 활성 행이 있어도 목록/권한에서 제외되는 회귀, opaque role ID mutation, guest 발급/audit 부재를 포함한 4 focused suites 34 tests PASS, API 타입 검사 PASS. 이는 원격 DB/DNS 변경이나 완전 제거 완료가 아니다.

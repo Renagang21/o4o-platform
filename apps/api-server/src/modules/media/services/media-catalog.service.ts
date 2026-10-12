@@ -1,5 +1,6 @@
 ﻿import type { DataSource, EntityManager } from 'typeorm';
 import { MediaAsset } from '../entities/MediaAsset.entity.js';
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 
 export class MediaCatalogError extends Error {
   constructor(
@@ -240,6 +241,8 @@ export class MediaCatalogService {
       throw new MediaCatalogError('INVALID_ENTITY_TYPE');
     // Service slugs and future production job IDs are opaque identifiers, never SQL/table names.
     const entityId = mediaText(input.entityId, 200);
+    if (entityType === 'service' && isRetiredServiceValue(entityId))
+      throw new MediaCatalogError('SERVICE_RETIRED', 410);
     const purpose = mediaText(input.purpose, 100);
     return this.ds.transaction(async (manager) => {
       await this.locked(manager, id);
