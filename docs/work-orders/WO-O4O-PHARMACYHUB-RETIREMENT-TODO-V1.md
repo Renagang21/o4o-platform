@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-12): PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·인증 시험과 PH-only DB/잔여 공용 코드 정리는 미완료.
+> 현재(2026-10-12): PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -15,7 +15,7 @@
 - [ ] 현재 DB schema/FK 및 PH 전용 테이블·service_key 행 목록 확인. 공용 조직·사용자·Neture QR/매장 데이터를 PH 문자열만으로 삭제하지 않음. PH 전용 데이터는 transaction 단위 삭제 계획 후 실제 삭제·잔여 건수 확인.
 - [ ] 남은 PH 활성 등록·권한·호환 참조를 실제 공용 소비처 기준으로 제거. 과거 migration을 다시 실행하거나 migration 이력을 없애지 않음.
 - [x] 이번 자원 제거 실행 결과·잔여 작업 기록. 전체 호스트 전환과 전용 자원 제거는 완료.
-- [ ] 일시 WIF 제한을 원래 조건으로 복구하고 read-only 인증 smoke 확인.
+- [x] 일시 WIF 제한을 원래 조건으로 복구하고 read-only 인증 smoke 확인. 실행 38187804879 SUCCESS, WIF_AUTH_PASS 확인.
 - [ ] PH-only DB/잔여 공용 코드 정리 및 최종 결과 기록.
 
 전체 제거 phase는 사용자 지정 worktree를 유지하고 최신 main의 `wo/pharmacyhub-full-retirement`에서 수행한다.
@@ -235,3 +235,11 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 인증 복구는 이미 승인됐으나 클라우드 환경에는 IAM 관리용 연결이 없어 사용자 로컬 관리자로 수행해야 한다. 원래 조건 백업이 다른 PC에 있을 때도 현재 조건에서 이번에 추가한 정확한 PH/ref/root SHA/called SHA 제한 suffix만 제거하면 기존 기본 조건을 보존할 수 있다. 다른 변경이 감지되면 복구 명령은 중단한다. 실제 복구 describe와 read-only WIF smoke 결과 확인 전에는 인증 복구 완료로 기록하지 않는다.
 
 동일 WO 연속 결과 기록 phase로 지정 worktree와 최신 main 기반 wo/pharmacyhub-resource-removal-result를 사용한다. 업무 앱 배포 NOT_APPLICABLE. WO 전체는 데이터/공용 코드/인증 복구 검증이 남아 ACTIVE·worktree KEEP다.
+
+## 원래 WIF 인증 조건 복구 완료 — 2026-10-12
+
+사용자 로컬 IAM 관리자가 현재 provider 조건에서 이번에 추가한 PH workflow/ref/root SHA/called SHA 제한 suffix만 제거했다. describe 결과 기존 repository/owner/environment/main·deploy-tag/event/허용 workflow 조건을 보존한 원래 기본 predicate를 확인했다. 바깥 괄호는 논리적 조건을 변경하지 않는다. SHA 고정 및 PH-only 인증 제한은 더 이상 유지하지 않는다.
+
+실제 read-only 인증 smoke [38187804879](https://github.com/Renagang21/o4o-platform/actions/runs/38187804879)은 main 7ebd3548cb에서 SUCCESS다. WIF auth (read-only) job이 실행·성공했고 WIF_AUTH_PASS를 확인했다. GCP 인증, project 및 기존 core API serving metadata 조회만 수행했으며 배포·삭제·DB write·secret version 조회는 없었다. 제거 결과 기록 PR #492는 main 7ebd3548cb에 병합됐고 main 후속 CI 38187554411도 SUCCESS다.
+
+전용 Cloud 자원 제거/12개 규칙 검증/일시 인증 제한 복구 phase는 완료다. PH-only DB·공용 코드 잔여 제거는 여전히 미완료이며 전체 WO는 ACTIVE·worktree KEEP다. 동일 WO 연속 결과 기록 phase로 지정 worktree의 최신 main 기반 wo/pharmacyhub-auth-restoration-result를 사용한다. 이번 변경은 문서-only, 업무 앱 배포 NOT_APPLICABLE이다.
