@@ -508,3 +508,43 @@ PH 폐기의 workflow/SHA 단독 제한 기록과 일치하며 API/Web/Admin/Rep
 않는다. 정본 공개 부분 대조3 PASS, Neture build PASS, 새 번들 PC/mobile 공고4 PASS
 (anonymous/pending 합성 API)다. Docker 이미지 실행이나 운영 게시를 검증한 결과는 아니다.
 main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인증 거절 상태는 해소되지 않았다.
+
+
+### 2026-10-12 운영 반영·공고·Demo 검증 및 분회 이미지 보완
+
+- PR #457은 최종 HEAD `199de048ba`의 CI·Codex blocker 없음·미해결 스레드 0을 확인하고
+  main `210529860d`로 통합했다. PR CI run38188346785와 main CI run38189055903은 SUCCESS다.
+- PH 종료 후 WIF 복원을 사용자가 확인했다. 읽기 전용 인증 run38187804879와
+  Delivery 진단38188246897이 SUCCESS다. 이전 WIF 거절 기록은 당시 결과이며 현재 blocker가 아니다.
+- Promote38189866093은 main 이동으로 SUPERSEDED되어 실제 배포하지 않았다. 최신 문서 변경을
+  포함한 Promote38190265457(target `0e1aa41eaf`)에서는 API·Neture·KPA Society·강의·매장·전체관리자
+  이미지 배포 job이 SUCCESS였다. 분회는 Docker 이미지 빌드가 실패했고 전체 Report도 FAILED다.
+  후속 Promote38192368264에서도 분회 빌드가 실패했다. 전체 배포 완료로 기록하지 않는다.
+- 분회 package.json에 추가한 `@o4o/shared-space-ui`가 기존 Docker COPY 목록에는 빠져 있었다.
+  기존 UI·content-editor의 manifest/source도 함께 복사하고 기존 build 명령을 추가하는 최소 보완이다.
+  dependency·lockfile·운영 DB·WIF·workflow·트래픽 정책을 추가 변경하지 않는다.
+- 실제 Docker COPY와 같은 독립 파일 집합(기존 node_modules/dist 없음)에서 workspace 의존성
+  8개 closure, pnpm10.25 설치, types/auth-utils/auth-client/ui/content-editor 및 Vite build를 통과했다.
+  기존 작업 폴더의 분회 type-check 포함 build도 PASS다. 로컬 Docker 이미지는 기본 설정 경로의
+  읽기 전용 제한으로 미실행이며, 독립 빌드를 Docker 이미지 검증으로 바꾸어 부르지 않는다.
+- 운영 공개 공고 `https://neture.co.kr/policies/account-update`는 PC1440/mobile390 HTTP200,
+  전문14625자·표1개·제목46개·내부 DRAFT 미노출·모바일 overflow 없음·현행 약관 왕복 링크 PASS다.
+  두 화면의 렌더 article SHA-256은 `9905a241b9f7b2f7317219b2f0f24896307731eee6bf112d26c6a58ce05b5d74`다.
+  최초 보존된 전체 PC/mobile 확인 시각은2026-10-12T01:17:39.163Z(한국10:17:39)부터다.
+  실제 공고일2026-10-12·시행 예정일2026-11-13은30일 이상을 확보한다.
+- 유지 서비스8개(Neture·공급자·커뮤니티·펀딩·약국·매장·강의·분회)의 PC/mobile ×
+  매장 경영자/공급자 실제 Demo 버튼32조건을 검증했다. 초회30/32 PASS 뒤 공급자 화면2조건은
+  정확한 전역 메뉴 선택과 공급자 정보 안내의 ‘나중에 하기’ 처리로 재검증 PASS다.
+  로그인/내 정보200, 전체관리자403, 역할별 업무200/403, Demo 비밀번호·연결 관리 제한,
+  UI 로그아웃200 후 access/refresh401을 확인했다. Neture 매장 Demo의 매장 handoff와
+  원래 Neture 세션 로그아웃 후 매장 세션 유지200도 PC/mobile에서 확인했다.
+- 운영 정책 계약14건은 PASS다. 가입8 origin의 현행 terms/privacy v1·정확한 privacy 소유권·no-store,
+  서비스5곳의 미적용 새 정책 배열[], Neture 공통 계정의 독립 서비스 신청 제외404를 확인했다.
+  이번 실행에서 운영 정책을 게시하거나 과거 동의 증빙을 채우지 않았다.
+
+현재 남은 조건: 분회 수정안의 최신 review/CI → main 통합 → canonical 배포 및 실제 serving SHA,
+2026-11-13 시행일의 새 정책 게시·기존 회원 재동의, 사용자 본인의 실제 Google·카카오 인증,
+로컬 `docs/local/TEST-ACCOUNT.txt` 확보 후 일반 계정 상태별 운영 검증이다. 해당 SSOT는 이 checkout과
+기준 workspace에 없어 Demo를 미가입·대기·반려·정지·탈퇴 일반 계정의 증명으로 대체하지 않는다.
+GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 현재 프록시403으로
+조회가 차단돼 실제 serving SHA 확인은 OPEN이다. 환경 초안에 도메인을 추가했으며 저장·게시 후 재확인한다.
