@@ -1240,3 +1240,72 @@ main #503 `64b8df16f1`을 자신의 branch에 merge한 뒤 source 기준 서버7
 새 정책 게시도 미실행이다. 이번 완료 기록은 문서-only/DEPLOYMENT=NOT_APPLICABLE이며
 자체 local 서버 종료·테스트 소유 세션 정리 후 동일 WO 후속을 위해
 WORKTREE_DISPOSITION=KEEP로 남긴다.
+
+#### 기준 계정 파일 확보와 운영자 검증 소유 확인 — 2026-10-12 후속
+
+사용자가 계정 원문을 다시 제공해 `docs/local/TEST-ACCOUNT.txt`를 덮어썼다.
+제공 내용 일치·파일 존재·Git 추적 제외를 확인했고 기존 입력을 추측한 주소나 비밀번호로
+고치지 않았다. 과거 파일 미확보 기록은 그 조사 시점의 결과다. 현재는 파일 확보 완료이며,
+실제 로그인 가능 여부와 계정의 검증 용도는 별도 판정한다.
+
+처음 일반 테스트 계정으로 해석해 제공3계정의 `POST /auth/email/login`을 확인했으나
+모두401 `INVALID_CREDENTIALS`였다. Neture PC 직접 입력1조건에서도 같은 응답과 실패 안내를
+확인했다. 이 응답은 계정 없음·비밀번호 수단 없음·비밀번호 불일치를 합친 계약이므로
+계정 미등록·서비스 권한 문제·인증 코드 결함 중 하나로 확정하지 않는다.
+로그인 실패 제한은15분 실패5회이며 반복 대입을 확대하지 않았다.
+
+이후 사용자는 **제공 Gmail 계정은 모두 운영자이며 운영자 테스트는 사용자가 담당**한다고
+확인했다. 이 최신 지시를 로컬 기준 파일의 설명과 WO에 반영하고 초기 운영자 probe helper는
+재실행 시 인증 요청 없이 종료하도록 했다. 사용자 확인 이후 운영자 비밀번호 로그인,
+운영자 역할 조회·변경, 실제 Google 인증은 실행하지 않았다. 이 분류는 사용자 확인이며
+운영 DB의 역할·credential 상태를 조회해 입증한 결과는 아니다.
+
+자동 검증의 대상은 현행 `packages/auth-utils/src/demoAccounts.ts`와 로그인 화면의 공개 Demo
+버튼이다. 공급한 Gmail 원문을 공개 Demo 주소로 바꾸지 않았고 운영자 정보·비밀번호를
+tracked 문서에 복사하지 않았다. Neture PC에서 두 Demo 버튼의 로그인·업무 진입·권한·
+UI logout·세션 폐기를 비교 확인해2/2 통과했다. 아래 전체 재실행에 포함되는 같은 조건이므로
+서로 더해 새 고유 조건 수로 보고하지 않는다.
+
+유지8 origin의 비로그인 화면 PC/mobile16조건도 확인했다. 이메일 폼 표시·입력과 가로 overflow
+부재, 강의의 Neture `service-entry/lecture` 진입을 확인해16/16 통과했다. 이는 로그인 완료
+검증이 아니다. 이 단계의 카카오 버튼 즉시 표시 관찰값은 설정 로딩 대기·노출 검증을 거치지
+않았으므로 성공/실패 판정에 쓰지 않으며 실제 Demo 회귀의 대기 후 검증과 구분한다.
+
+#### 운영자 제외 후 공개 Demo 운영8 origin 재검증
+
+사용자 확인 이후 운영자 계정은 자동 검증에서 제외하고 실제 화면의 두 Demo 버튼을 눌러
+새 Chromium browser context로 전 조건을 실행했다. PC1440×900/mobile390×844 viewport이며
+TLS 검증과 기존 프록시를 유지했다. fixture·인가 우회·계정 생성·역할/membership 변경은 없다.
+
+| 운영 origin | PC 매장 경영자 | PC 공급자 | mobile 매장 경영자 | mobile 공급자 |
+|---|---|---|---|---|
+| neture.co.kr | PASS | PASS | PASS | PASS |
+| supplier.neture.co.kr | PASS | PASS | PASS | PASS |
+| community.neture.co.kr | PASS | PASS | PASS | PASS |
+| funding.neture.co.kr | PASS | PASS | PASS | PASS |
+| pharmacy.neture.co.kr | PASS | PASS | PASS | PASS |
+| store.neture.co.kr | PASS | PASS | PASS | PASS |
+| study.neture.co.kr | PASS | PASS | PASS | PASS |
+| kpa.neture.co.kr | PASS | PASS | PASS | PASS |
+
+- 최종 **32/32 PASS**, 해당 Demo 실행의 실패·재실행0. 초기 운영자 입력 probe와
+  구분하며 비교용 Neture PC2조건·기존32조건을 더해 새로운 고유 조건 수로 늘리지 않는다.
+- 모든 조건의 실제 로그인200·본인 me200, UI origin 유지와 `status/accountAccess` 계약 확인.
+  Demo 설정의 소셜/비밀번호 `canManage=false`, 관리자403 `ROLE_REQUIRED` 확인.
+- 매장 경영자는 Store context200·공급자 상품403 `NO_SUPPLIER`, 공급자는 상품200·
+  Store context403 `STORE_OWNER_REQUIRED`. 공급자의403을 약국장 업무 실패로 판정하지 않는다.
+- 실제 UI logout200, 이전 access401·refresh401. 각 조건에서 생성한 테스트 소유 세션만
+  정리했다. Neture 매장 경영자의 실제 Store 이동·handoff200/exchange200와 Neture
+  로그아웃 후 다른 origin인 Store의 me200을 PC/mobile에서 확인했다.
+- 카카오 config200/enabled와 로딩 완료 후 실제 버튼 표시를 확인했다. 강의는 자체 소셜
+  폼 대신 Neture `service-entry/lecture`로 연결된다. 실제 Google·카카오 인증이나 연결
+  완료를 뜻하지 않는다. 운영자 검증과 일반 상태별 실제 계정 검증도 대신하지 않는다.
+- 소스 조사/기록 기준 checkout은 main `6210fb7ed3`이며 이 SHA 전체의 runtime 배포
+  확인을 뜻하지 않는다. 이번 검증은 해당 실행 시점의 실제 운영 URL·UI·API 응답에 한정한다.
+  새로운 GCP serving label 조회·배포·migration은 실행하지 않았다.
+
+현재 기준 계정 파일은 확보했다. 일반 미가입·대기·반려·정지·탈퇴의 비운영자 계정은
+별도 필요하며, 운영자 및 본인 OAuth/명시적 연결은 사용자가 담당한다. 새 정책은
+2026-11-13 이후 실제30일 공고를 확인하고 게시·재동의를 검증한다. 앱 코드 변경 없이
+기존 WO/CHECK에만 결과를 반영했고 DEPLOYMENT=NOT_APPLICABLE이다.
+같은 미완료 WO의 후속을 위해 WORKTREE_DISPOSITION=KEEP로 남긴다.
