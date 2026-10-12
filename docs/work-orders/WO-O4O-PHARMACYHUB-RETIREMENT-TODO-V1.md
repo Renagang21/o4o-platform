@@ -317,3 +317,18 @@ PR #502 main 반영 뒤 main `c1bab86c01ea8eeb5d23c4605fca08008cd09bbf`의 CI를
 인증서 조사 리뷰 대응: Certificate Manager certificate/DNS authorization은 `--location=-`로 모든 위치를 조회한다. HTTPS proxy의 certificateManagerCertificates 직접 연결도 집계하며 전체 project/location/resource identity로 비교하여 같은 이름의 지역별 자원을 혼동하지 않는다. map entry와 legacy 인증서 참조도 전체 identity를 보존한다. focused 19 tests PASS. 실제 운영 조사·삭제 결과는 아직 아니다.
 
 FK catalog의 name[]를 pg client가 문자열로 읽는 문제를 text[] 집계로 수정했다(PR #513). 분리된 PostgreSQL 16에서 cross-schema incoming FK·PH/Neture 혼합 공급·타 서비스 미디어 참조가 검출되고 census 후 원본 데이터가 유지되는 실제 SQL 검증이 PASS다. 수정한 운영 census 38255309265는 SUCCESS지만 다운로드한 로그에 결과 JSON이 없으므로 삭제 입력/잔여 건수 검증 완료로 해석하지 않는다. 출력은 대형 한 줄 JSON 대신 여러 줄 JSON으로 바꿔 결과 수집을 확인한다. 앞선 38251425660의 인증서 조사는 목록 권한 부족으로 complete=false였다. PH 데이터/인증서/URL map 삭제는 여전히 0건이다. 다른 세션의 main 병합·운영 단독 작업 확인과 읽기 권한 보완이 진행 대기 조건이다.
+
+## 운영 후속 — 2026-10-13
+
+사용자가 다른 작업 종료를 확인했다. PR #518은 최신 main 반영·필수 CI·Codex blocker 부재 확인 후 병합했다(`e6d97c23410ae550101476a18bdc42e315b30435`). 출력 수정 후 [read-only census 38314086152](https://github.com/Renagang21/o4o-platform/actions/runs/38314086152)의 결과 JSON을 수집했다. 공급 scope 19건은 PH-only, mixed 0건이다. 연결 승인 18건·가격 1건·정책 동의 2건·미디어 링크 1건을 확인했다. DNS A 조회는 두 PH 호스트 모두 불가했다. 인증서 조사는 목록 권한 부족으로 여전히 complete=false이며 빈 목록을 자원 부재로 해석하지 않는다.
+
+첫 데이터 제거 범위는 PH 서비스 등록·회원·역할·정책·로그 10개 테이블의 고정 namespace 행 56건 및 해당 역할의 permission bridge다. users/organizations/permission 정의·주문·결제·공급·콘텐츠·미디어·파일은 이 단계에서 삭제하지 않는다. 실제 운영 census와 테이블별 건수가 달라지거나, 혼합 귀속·타 서비스 FK·검토되지 않은 DELETE trigger가 있으면 삭제 전에 중단한다. transaction·table lock·삭제 건수·잔여 검증으로 실패 시 전체 rollback한다. 스키마 변경은 없으며 과거 migration/manifest/fingerprint는 변경하지 않는다.
+
+별도 유지보수 실행은 기존 production workflow의 standalone owner/main/CI/freeze/idle gate를 사용한다. runner는 SQL에 연결하지 않고, 현재 API serving image digest의 일회성 Cloud Run job에 검토된 코드와 기존 socket/Secret Manager binding을 지정한다. plan은 READ ONLY transaction, apply는 SERIALIZABLE transaction·task/retry 1/0이다. 성공한 job은 제거하고, 실패/확인 불가 실행은 보존하여 read-only census 재확인 전 재실행하지 않는다. 분리된 PostgreSQL 16에서 PH 행 제거·Neture/사용자/조직/스키마 보존, cross-schema FK·혼합 귀속·건수 drift·삭제 trigger의 rollback을 확인했다. 이 기록은 production 삭제 완료가 아니다. PC Local Agent 업데이트는 담당 에이전트 범위다.
+
+- [x] PR #518 병합 및 읽을 수 있는 실제 census 결과 확보.
+- [ ] PH administrative data plan/apply 및 운영 잔여 검증.
+- [ ] 주문·결제·공급·콘텐츠·미디어의 비-FK/파일 참조 조사와 후속 삭제.
+- [ ] 인증서 목록 권한 보완 후 PH 인증서/map entry/DNS authorization/URL map 종료.
+
+PR #522 리뷰 보완: PH `roles.service_key`와 `roles.name`의 귀속 불일치를 양방향으로 차단한다. apply 전에는 관리자 측 원래 WIF 조건 백업과 해당 main SHA/PH workflow/owner에만 한정된 임시 조건이 필요하다. 코드가 provider의 실제 조건을 정확히 대조하며 다른 workflow/SHA·OR 우회를 허용하지 않는다. 기존 토큰을 가진 실행도 없는 단독 운영 구간을 확인하고, 동일 PH workflow의 concurrency와 함께 다른 운영 writer의 신규 인증을 작업 종료까지 차단한다. `iam.workloadIdentityPoolProviders.get` 읽기 권한이 필요하다. 작업·잔여 검증 뒤 원래 조건을 복구한다. 이 세션에서 기존 PC Local Agent를 변경하지 않는다.
