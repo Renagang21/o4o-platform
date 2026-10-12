@@ -314,6 +314,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect((await service().request(target.id)).erased).toBe(true);
     expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[peer.id])).toHaveLength(1);
   });
+  it.each(['email','naver','service'])('legacy %s identities with equal IDs remain another subject',async(provider)=>{
+    const target=await user(),peer=await user(),providerId='123';
+    await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$3),($2,$4,$3)`,[target.id,peer.id,providerId,provider]);
+    await db.query(`UPDATE users SET provider=$1,provider_id=$2 WHERE id=$3`,[provider,providerId,peer.id]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect(await db.query('SELECT id FROM linked_accounts WHERE "userId"=$1',[peer.id])).toHaveLength(1);
+    expect((await db.query('SELECT provider_id FROM users WHERE id=$1',[peer.id]))[0].provider_id).toBe(providerId);
+  });
   it('a copied provider identity in the same namespace still requires review',async()=>{
     const target=await user(),peer=await user(),providerId='123';
     await db.query(`INSERT INTO linked_accounts("userId",provider,"providerId") VALUES($1,'google',$2)`,[target.id,providerId]);

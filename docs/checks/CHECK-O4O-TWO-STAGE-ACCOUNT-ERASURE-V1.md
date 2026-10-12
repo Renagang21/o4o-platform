@@ -130,3 +130,5 @@ legacy 인증의 `users.provider/provider_id`도 동일 typed namespace 계약�
 집중63 tests·API build·focused lint·migration contract21 checks PASS. 최종24단계 지문은 `0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50`,6618 lines로 갱신했다. 정식 runner fresh baseline→24, 기존23(지문 c45f9b5)→24,24 재실행 no-op 모두 PASS. 이전41e3be0/6617 기록은 CHECK 추가 전 검증 이력이며 현재 승인안은 이 최종 제약을 포함한다.23단계 소스/지문은 바꾸지 않았다.
 
 준비 상태 재검토 P2: capability/실행 ready는24단계 UUID-only CHECK의 존재·validated 상태를 필수로 확인한다.23단계 상태/NOT VALID 제약에서는 disabled·요청503이며 계정 활성/operation0을 유지한다. 제약 검증 후에만 준비 조건을 충족한다. 집중 DB34+storage4+정적 인증17+Demo9=64 tests·API build·focused lint PASS.24단계 지문0d25da3d/6618 및 운영 실행0은 그대로다.
+
+legacy provider 범위 P2: 인증 타입 `AuthProvider` 전체(email/google/kakao/naver/service)를 `Record<AuthProvider,true>`로 빠짐없이 반영한다. 저장소 provider는 여전히 인증 namespace로 취급하지 않으며 providerId/provider_id 필드에만 scope를 적용한다. 다른 provider의 email/naver/service linked row와 legacy user ID 보존 회귀를 추가했다. retired 인증 경로를 활성화하거나 권한을 넓히지 않았다. 집중 DB37+storage4+정적 인증17+Demo9=67 tests·API build·focused lint PASS; 추가 DDL0·최종 지문0d25da3d/6618·운영 실행0.

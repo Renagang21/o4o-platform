@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
+import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
 
@@ -25,6 +26,8 @@ export interface ErasureOptions {
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
 const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
+// Exhaustive legacy identity namespaces; recognizing stored data does not enable auth routes.
+const AUTH_IDENTITY_NAMESPACES: Readonly<Record<AuthProvider,true>> = {email:true,google:true,kakao:true,naver:true,service:true};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** These are exclusively owned individual rows; business/shared/statutory rows are NOT in this list. */
@@ -251,7 +254,7 @@ export class AccountErasureService {
         const object=value as Record<string,unknown>;
         // Only the typed providerId field belongs to this namespace. A storage/provider
         // column never scopes memo, contacts, sibling fields or nested identity objects.
-        const namespace=['google','kakao'].includes(String(object.provider)) ? object.provider : undefined;
+        const namespace=typeof object.provider==='string' && Object.prototype.hasOwnProperty.call(AUTH_IDENTITY_NAMESPACES,object.provider) ? object.provider : undefined;
         return Object.entries(object).some(([key,v])=> {
           if(key==='provider')return false;
           if(['providerId','provider_id'].includes(key) && namespace && typeof v==='string')return providerPatterns.some(p=>p.provider===namespace && p.pattern.test(v));
