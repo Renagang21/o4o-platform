@@ -1,7 +1,7 @@
 # 서비스별 운영자 업무 정비 전체 TODO
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-11
+> **작성일**: 2026-10-11 · **최종 갱신**: 2026-10-12
 > **근거**: 사용자 지시 — 회원관리는 공통 기반으로 두고 각 서비스의 실제 업무에 맞는 운영자 기능을 개발한다. 앞선 공통 회원·커뮤니티·펀딩 정비 완료를 전체 서비스 운영 기능 완료로 보지 않는다.
 
 ## 1. 초기 조사 TODO
@@ -151,8 +151,12 @@ PharmacyHub와 K-Cosmetics는 현재 폐기/퇴역 정책이 우선이므로 운
 - [x] 구현·검증 변경 push (PR #487)
 - [x] 최종 PR HEAD 필수 CI·review·정상 main 병합 (PR #487, main `0cb0080e1f`)
 - [x] post-merge CI 확인 (main `0cb0080e1f`, CI 38146913021 SUCCESS)
-- [ ] 필요한 서비스 배포·서빙 확인 — Delivery 38147499593의 WIF attribute condition 거절로 차단, API·웹 배포 SKIPPED. PH 단독 작업 창 종료·원래 WIF 조건 복원 후 현재 main 기준 정상 Delivery/Promote 재개가 필요하다.
+- [x] 필요한 서비스 배포·서빙 확인 — 2026-10-12 WIF 인증 smoke 38187804879 SUCCESS, Delivery 38188251558 SUCCESS 및 배포본 `20ed384b15`의 production 상태 `DEPLOYED` 확인. 이번 운영자 변경을 포함한 API·Neture·KPA-Society·Lecture·KPA-Branch 배포가 완료됐다. 앞선 Delivery 38147499593의 인증 거절은 복구 전 이력이며 실계정 업무 검증은 여전히 미실행이다.
 
 신규 schema·migration·운영 DB 테스트 write·새 금융/제재 정책·미정 workspace 신설 없이 현재 업무를 정비한다. 새 정책이 필요한 항목은 구체적인 조사 근거와 결정안을 남기고 독립적으로 진행 가능한 결함부터 수정한다.
 
 수정 TODO와 서비스별 정적 조사/공유 소비처는 [실행 CHECK](../checks/CHECK-O4O-SERVICE-OPERATOR-WORKFLOWS-V1.md)에 기록했다. F01/F02 → P01 → S01 → 기존 커뮤니티 회귀 → L01 → B01 → 호스트/메뉴 회귀 순으로 진행한다. §4의 전체 업무 검증은 이 결함 수정이나 정적 조사만으로 전부 완료 체크하지 않는다. 신규 정책 미정과 실계정 검증은 계속 추적한다.
+
+### WIF 복구·배포 결과 정합 — 2026-10-12
+
+사용자의 최신 결과 반영 지시에 따라 같은 ACTIVE WO의 연속 기록 phase로 기존 독립 clone/branch를 유지했다. WIF 임시 제한 해제와 이번 구현의 배포 완료를 [실행 CHECK의 최신 결과](../checks/CHECK-O4O-SERVICE-OPERATOR-WORKFLOWS-V1.md#wif-복구-및-배포-완료--2026-10-12)에 연결한다. 배포 증거는 `20ed384b15` 기준이며 이후 main 변경의 배포 완료까지 의미하지 않는다. 기존 인증 실패·CI 이력은 보존하고 실계정 테스트·미정 정책·후속 기술 정비가 남아 전체 WO는 ACTIVE다. 이 결과 정리 자체는 문서-only이며 앱 배포는 NOT_APPLICABLE이다.
