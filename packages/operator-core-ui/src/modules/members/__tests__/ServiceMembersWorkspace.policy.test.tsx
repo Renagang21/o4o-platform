@@ -11,7 +11,7 @@ function fixture(serviceKey: string, status: string) {
   return { get, post: vi.fn(), put: vi.fn(), patch: vi.fn(async () => ({})), delete: vi.fn() };
 }
 describe('service member workspace role policy', () => {
-  it.each(['lecture', 'supplier', 'funding', 'community'])('%s operator can approve with the selected service and cannot suspend', async serviceKey => {
+  it.each(['lecture', 'supplier', 'funding', 'community'])('%s operator can approve with the selected service and cannot delete membership', async serviceKey => {
     const api = fixture(serviceKey, 'pending');
     render(<MemoryRouter><ServiceMembersWorkspace serviceKey={serviceKey} basePath="/members" api={api} roles={[`${serviceKey}:operator`]} navigate={vi.fn()} /></MemoryRouter>);
     await waitFor(() => expect(screen.getByText('테스트회원')).toBeTruthy());
@@ -22,14 +22,15 @@ describe('service member workspace role policy', () => {
     fireEvent.click(screen.getByRole('button', { name: '승인' }));
     await waitFor(() => expect(api.patch).toHaveBeenCalledWith('/operator/members/fixture-user/status', { status: 'approved', serviceKey }));
   });
-  it.each([false, true])('active member lifecycle control follows same-service admin authority (%s)', async isAdmin => {
+  it.each([false, true])('active member daily actions are available without deletion authority (%s)', async isAdmin => {
     const api = fixture('lecture', 'active');
     render(<MemoryRouter><ServiceMembersWorkspace serviceKey="lecture" basePath="/members" api={api} roles={[isAdmin ? 'lecture:admin' : 'lecture:operator', 'funding:admin']} navigate={vi.fn()} /></MemoryRouter>);
     await waitFor(() => expect(screen.getByText('테스트회원')).toBeTruthy());
     fireEvent.click(screen.getByText('테스트회원'));
     await waitFor(() => expect(screen.getByText('전체 상세 페이지 →')).toBeTruthy());
-    expect(!!screen.queryByRole('button', { name: '비활성화' })).toBe(isAdmin);
-    if (isAdmin) {
+    expect(!!screen.queryByRole('button', { name: '비활성화' })).toBe(true);
+    if (!isAdmin) expect(screen.queryByRole('button', { name: '삭제' })).toBeNull();
+    {
       fireEvent.click(screen.getByRole('button', { name: '비활성화' }));
       await waitFor(() => expect(api.patch).toHaveBeenCalledWith('/operator/members/fixture-user/status', { status: 'suspended', serviceKey: 'lecture' }));
     }

@@ -47,6 +47,7 @@ export default function UserDetailPage() {
       apiAdapter={apiAdapter}
       config={kpaConfig}
       isAdmin={isCurrentUserAdmin}
+      canManageMembers={isCurrentUserAdmin || (currentUser?.roles?.includes('kpa:operator') ?? false)}
       navigate={navigate}
       userId={id}
     />

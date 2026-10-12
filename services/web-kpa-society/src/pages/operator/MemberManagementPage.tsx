@@ -33,6 +33,7 @@ import {
 import {
   OperatorMembersConsolePage,
   type MembersConsoleClient,
+  type MembersBulkActionConfig,
   type MembersConsoleListParams,
   type UserData,
 } from '@o4o/operator-core-ui/modules/members';
@@ -206,7 +207,8 @@ async function fanOutStatusBatch(
 
 export default function MemberManagementPage() {
   const { user } = useAuth();
-  const canManageLifecycle = user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
+  const canDeleteMembership = user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
+  const canManageLifecycle = user?.roles?.some(role => role === 'kpa:admin' || role === 'kpa:operator' || role === 'platform:super_admin') ?? false;
   // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1:
   //   가입 신청서(KpaApplication) outer tab·deeplink(?tab=applications)·stats 제거 — dead flow.
   //   회원 승인 canonical 화면만 유지. (?tab=applications 딥링크는 아래 wrapper 가 무시하고 회원 목록 렌더.)
@@ -319,7 +321,8 @@ export default function MemberManagementPage() {
           Action Queue 상태 딥링크(?members_tab=status-suspended 등)를 읽어 해당 탭 자동 선택.
           공용 콘솔의 syncUrl opt-in(URL key=members_tab, 기본 false) 활성화만 — 공용 컴포넌트 무수정. */}
       <OperatorMembersConsolePage
-      canManageLifecycle={canManageLifecycle}
+          canManageLifecycle={canManageLifecycle}
+          canDeleteMembership={canDeleteMembership}
           serviceKey="kpa-society"
           client={client}
           syncUrl
@@ -393,7 +396,7 @@ export default function MemberManagementPage() {
               },
             },
           ]}
-          extraBulkActions={canManageLifecycle ? [
+          extraBulkActions={canManageLifecycle ? ([
             {
               key: 'kpa-bulk-suspend',
               label: (n) => `정지 (${n})`,
@@ -451,7 +454,7 @@ export default function MemberManagementPage() {
                 variant: 'danger',
               },
             },
-          ] : []}
+          ] satisfies MembersBulkActionConfig[]).filter(action => canDeleteMembership || action.key !== 'kpa-bulk-withdraw') : []}
         />
     </div>
   );

@@ -23,6 +23,7 @@ export type {
 export type {
   OperatorMembersConsolePageProps,
   MembersConsoleClient,
+  MembersBulkActionConfig,
   MembersConsoleListParams,
   MembersConsoleListResponse,
   MembersConsoleStatsResponse,

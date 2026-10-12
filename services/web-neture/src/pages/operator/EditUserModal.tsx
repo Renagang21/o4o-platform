@@ -57,7 +57,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: {
   onSuccess: () => void;
 }) {
   const { user } = useAuth();
-  const canChangeMembershipType = user?.roles?.some(role => role === 'neture:admin' || role === 'platform:super_admin') ?? false;
+  const canChangeMembershipType = user?.roles?.some(role => role === 'neture:admin' || role === 'neture:operator' || role === 'platform:super_admin') ?? false;
   return (
     <CommonEditUserModal
       userId={userId}

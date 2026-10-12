@@ -493,3 +493,12 @@ WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
 변경 이력은 actor·시각·사유·before/after를 상태·역할 변경과 같은 트랜잭션에 남기며 이력 저장 실패는 변경도 rollback한다.
 정지 회원은 재가입 신청으로 우회할 수 없고 탈퇴 회원은 다시 pending/member로 신청해야 한다.
 운영 DB 전환과 배포는 [개별 설계](../../design/DESIGN-O4O-INDIVIDUAL-COMMUNITY-MEMBER-ADMIN-V1.md) §9를 따른다.
+
+
+## 2026-10-12 사용자 정정 — 일상 업무와 민감 업무
+
+서비스 operator는 담당 서비스 회원의 조회·승인·반려·사용중지·복구·일반 회원 역할 변경을 담당한다. service admin은 같은 일상 업무와 민감한 관리 업무를 담당한다. 전체 관리자는 admin.neture.co.kr에서 서비스 admin/operator를 지정·회수하며 추가 요청은 오프라인으로 받는다. 회원 역할 변경이 서비스 admin/operator 권한 부여·회수를 포함하지 않는다.
+
+사용중지/복구와 삭제 UI/API 권한을 분리한다. 기존 서비스 탈퇴/삭제는 이번 일상권한 확대에 포함하지 않는다. 전체 계정 제거는 별도 #505 Core 작업의 결과·기본 비활성·운영 집행 전제를 따른다. 지정 전후 서비스 가입은 보완 조사 대상이며 자동 가입을 금지하거나 본인 가입을 강제하는 정책을 추가하지 않는다.
+
+현재 구현 및 검증 단계는 [일상 회원관리 WO](../../work-orders/WO-O4O-OPERATOR-MEMBER-DAILY-AUTHORITY-V1.md)를 따른다. 이 절은 과거 admin 전용 정지/복구 서술을 대체하며 실제 배포 완료를 의미하지 않는다.
