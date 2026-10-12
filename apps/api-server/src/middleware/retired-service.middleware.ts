@@ -1,7 +1,7 @@
 import type { RequestHandler, Response } from 'express';
 
 const retiredKeys = new Set(['pharmacy-hub', 'pharmacy-hub-event-offer']);
-const scopeFields = ['serviceKey', 'service_key', 'serviceCode', 'service_code', 'sourceService',
+const scopeFields = ['serviceId', 'serviceKey', 'service_key', 'serviceCode', 'service_code', 'sourceService',
   'membershipServiceKey', 'membershipRole', 'targetServiceKey', 'sourceServiceKey', 'serviceKeys', 'service_keys', 'role', 'roles'] as const;
 export function isRetiredServiceValue(value: unknown): boolean {
   if (Array.isArray(value)) return value.some(isRetiredServiceValue);

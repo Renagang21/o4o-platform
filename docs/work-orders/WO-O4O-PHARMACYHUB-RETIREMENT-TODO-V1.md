@@ -278,3 +278,7 @@ PR #490은 필수 CI·최신 Codex 리뷰·Sonar 통과 후 main 55f0061df3에 �
 ### PR #502 인증 권한·회원 selector 후속 리뷰
 
 `064809e5b6`의 CI [38197765196](https://github.com/Renagang21/o4o-platform/actions/runs/38197765196)은 SUCCESS였다. 추가 P1/P2 대응으로 승인된 PH namespace만 공통 RBAC SSOT에서 제외한다: getActiveRoles/getRoleNames/hasRole/hasAnyRole은 PH를 권한으로 인정하지 않고 assignRole도 PH 재생성을 거절한다. 다른 서비스의 role·유효기간·회수 계약은 유지한다. membershipServiceKey/member role selector도 전역 및 프로필 write 앞에서 거절한다. opaque membership 승인·복구의 폐기 예외는 전용 RetiredServiceError(410/SERVICE_RETIRED)로 응답한다. 7 focused suites의 최종 fixture 정합 후 106 tests PASS, API 타입 검사 PASS. DB 활성 플래그를 바꾸지 않고 인증 capability를 닫으며 실제 DB purge는 계속 대기한다.
+
+### PR #502 DB 카탈로그·guest 발급 후속 리뷰
+
+코드 catalog와 별도로 활성 DB 행을 조회하는 공개 PlatformServiceCatalogService 및 RoleService 목록도 PH를 제외한다. PH role의 opaque ID update/delete 및 직접 create는 410으로 거절한다. 내부 DB 조회는 필요한 제거 조사용으로 남기지만 공개 목록·권한·mutation에는 쓰지 않는다. guest serviceId는 전역 selector 및 직접 발급 서비스에서 거절하며, guest 감사 원장의 canonical service/session 필드는 클라이언트 metadata로 덮어쓸 수 없도록 보존한다. DB 활성 행이 있어도 목록/권한에서 제외되는 회귀, opaque role ID mutation, guest 발급/audit 부재를 포함한 4 focused suites 34 tests PASS, API 타입 검사 PASS. 이는 원격 DB/DNS 변경이나 완전 제거 완료가 아니다.
