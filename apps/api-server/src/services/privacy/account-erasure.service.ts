@@ -102,7 +102,8 @@ export class AccountErasureService {
       const [user] = await m.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
       if (!user) throw new AccountErasureError('USER_NOT_FOUND', 404);
       const [protectedUser] = await m.query(`SELECT
-        EXISTS(SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true) AS admin,
+        EXISTS(SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true
+          AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())) AS admin,
         EXISTS(SELECT 1 FROM demo_accounts WHERE user_id=$1 AND is_active) AS demo`, [userId]);
       if (protectedUser.admin) throw new AccountErasureError('SUPER_ADMIN_PROTECTED', 403);
       if (protectedUser.demo) throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN', 403);

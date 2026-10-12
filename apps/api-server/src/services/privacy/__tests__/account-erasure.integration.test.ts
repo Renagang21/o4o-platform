@@ -132,6 +132,10 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const demo=await user();await db.query("INSERT INTO demo_accounts(user_id,demo_type) VALUES($1,'STORE_OWNER')",[demo.id]);
     await expect(service().request(demo.id)).rejects.toMatchObject({code:'DEMO_ACCOUNT_FORBIDDEN'});
     expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
+    const former=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_until) VALUES($1,'platform:super_admin',true,statement_timestamp()-interval '1 day')",[former.id]);
+    expect((await service().request(former.id)).erased).toBe(true);
+    const future=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'platform:super_admin',true,statement_timestamp()+interval '1 day')",[future.id]);
+    expect((await service().request(future.id)).erased).toBe(true);
   });
   it('concurrent duplicate requests share one completed operation',async()=>{
     const u=await user();const results=await Promise.all([service().request(u.id),service().request(u.id)]);

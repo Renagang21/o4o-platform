@@ -53,7 +53,7 @@
 - Base: 시작 시 최신 origin/main `63653694b3bc35b4d127541fafb76f021df1bf68`.
 - Branch: `wo/integrated-account-erasure-contract` (기존 통합 WO의 후속 phase).
 - Ruleset 조회: main은 PR·CI Gate 필수, human approval0. bypass를 사용하지 않는다.
-- PR/main/post-merge: 진행 중. required CI와 Codex blocker/미해결 스레드를 확인한 뒤 정상 병합한다.
+- [PR #505](https://github.com/Renagang21/o4o-platform/pull/505): 최종7562f9f의 CI Gate·전체 API3 shards·CodeQL·Admin build PASS, 동일 SHA Codex 완료/추가 지적0·스레드2개 해결. 정상 merge main `c9b630feb8727aacf0d05a30b5f2ca6e922fc629`; post-merge CI 확인 중. 병합 직전 base 조회 후 동시에 반영된 #506은 #503 배포 기록만 바꾼 문서-only이며 code/schema 차이0 확인.
 - Deployment: MANUAL/GATED 예상. migration 포함 promote는 AGENTS §4-1(f)/§5의 별도 운영 DDL 실행 승인 전 dispatch하지 않는다.
 - Worktree: KEEP — 운영 검증·법률 시행·마지막 사용자 테스트 잔여.
 
@@ -91,3 +91,5 @@ PR CI shard2 실패를 로컬 전체 shard로 재현했다(155 suites2635 tests 
 로컬 synthetic rollback 측정: 1000 users insert는 operation0/1/10개에서28/137/753ms였다. 각 operation의 identity key는1개인 작은 fixture이며, 운영 데이터/전체 profile key 수/장기 transaction·경합 성능을 검증한 수치가 아니다. 운영 활성화 전 성능 평가를 대체하지 않는다.
 
 main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 merge로 통합했다. 해당 소유 트랙 기능을 이 작업에서 재구현하지 않았다. 역할 is_active뿐 아니라 valid_from/valid_until을 각 제거 단계의 현재 시점으로 재확인한다. 만료/미시작 역할은 요청·retry403이며 기존 operation을 변경하지 않는다. 최신 main 통합 후 격리 DB22+storage4+정적 인증17=43 tests, API build·lint PASS.
+
+같은 WO의 검증 후속 phase를 위해 기존 branch/worktree를 유지했다(새 독립 WO 재사용 아님). 대상 super admin 보호도 현재 유효기간을 확인하도록 후속 보완한다. 만료/미시작 grant 이력만 있는 계정은 그 이유로 삭제를 막지 않으며, 현재 유효 super admin/Demo 보호는 유지한다. 같은 실제 DB fixture에서 두 만료 경계와 원래 보호를 검증했으며43 tests·API build·lint PASS. 이 보완은 추가 DDL/API/UI/운영 실행을 포함하지 않는다.
