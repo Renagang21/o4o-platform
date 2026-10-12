@@ -1188,3 +1188,55 @@ main #503 `64b8df16f1`을 자신의 branch에 merge한 뒤 source 기준 서버7
 156/156, 화면7파일77/77, Neture tsc/Vite build를 다시 확인했다. 화면77조건은
 인증 관련61조건과 해당 main에서 바뀐 My Home·매장 구성원16조건이며 이전 실행과
 합산하지 않는다. main의 Staff 승인 구현은 이 인증 PR의 구현으로 보고하지 않는다.
+
+#### PR #504 최종 통합·Neture 웹 배포·운영 회귀 — 2026-10-12
+
+- main #505 반영 후 서버156/156과 Neture tsc/Vite build를 재확인했다. #505는
+  API/admin 변경이고 위77조건을 검증한 Neture 구현은 같으며 반복 실행을 더하지 않는다.
+- 최종 PR head `c0e7688337ee791852f3af32280deeb00775afa4`의 Codex review는 새 지적 없이
+  완료됐다(완료시각 2026-10-12T07:11:25Z). 이전 두 P2 스레드는 해결됐으며 required CI
+  [38215572959](https://github.com/Renagang21/o4o-platform/actions/runs/38215572959)는 SUCCESS다.
+  active main ruleset을 다시 확인하고 일반 PR merge로
+  [#504](https://github.com/Renagang21/o4o-platform/pull/504)를 통합했다.
+  main SHA는 `cbdc1619f0c012e3ded925ca02b899795947f86c`이며 post-merge CI
+  [38217993155](https://github.com/Renagang21/o4o-platform/actions/runs/38217993155)도 SUCCESS다.
+- 일반 Delivery38218878433는 LEVEL3 보류, read-only Promote dry-run38219899889는
+  `HELD_API_NOT_DEPLOYED`였다. 판정 이유는 별도 API commit `c9b630feb`에 작업 식별 키가
+  없어 관련성을 판단할 수 없다는 것이다. #505 WO에서 제외한 운영 migration을 실행하거나
+  commit 이력·classifier·production status를 고쳐 자동 승격 판정을 만들지 않았다.
+- 이미 승인된 Neture 웹 배포는 기존 owner 전용 `deploy-web-services.yml`의
+  `service=neture, rollout_mode=verified, ref=main` 경로로 실행했다.
+  [38220652882](https://github.com/Renagang21/o4o-platform/actions/runs/38220652882)의
+  고정 대상 SHA는 위 `cbdc1619f0`이다. CI Gate·freeze·소유자·production ref 검사를
+  유지했고 build/push, Cloud Run 배포, 신규 revision smoke와 traffic 전환, verify 단계가
+  모두 SUCCESS였다. 다른 서비스는 skipped이며 이 실행의 API 배포·migration은0이다.
+  workflow·IAM·freeze·환경 설정 변경이나 admin bypass는 없다.
+- 운영 Neture HTML200·asset200, 실제 asset의 신규 계정 안내·제한 계정 본인 읽기 분기·
+  공개 메인 label·`ACCOUNT_ACCESS_RESTRICTED` 포함을 확인했다. bundle SHA256은
+  `5866714efd98eb9b33bdd8b4fe6e5c32634ea922e48b5848a3497aa51c009457`이다.
+  이는 코드 서빙 증거이며 실제 제한 일반 계정 로그인 증거로 대신하지 않는다.
+- 실제 로그인 화면의 Demo 버튼으로 PC/mobile × 매장 경영자/공급자4조건을 실행했다.
+  최초3/4 PASS에서 PC 매장 경영자는 login200 이후 업무 화면 이동 대기 timeout이었다.
+  해당1조건만 변경 없는 앱·동일25초 timeout으로 재실행해1/1 PASS, 최종 고유4/4 PASS다.
+  최초 실패와 재실행을 보존했고 첫 timeout의 원인은 확정하지 않는다.
+- PC 매장 경영자 재실행에서 실제 handoff200·exchange200·Store 업무 진입을 확인했다.
+  네 조건에서 Neture My Home 모아보기·계정 설정 링크/직접 접근, 본인 me200,
+  관리자403 `ROLE_REQUIRED`, Demo 소셜/비밀번호 관리 불가, 역할별 업무 API를 확인했다.
+  매장 경영자는 Store context200이고 공급자는 `STORE_OWNER_REQUIRED`403이 기대 결과다.
+  공급자 products200, 매장 경영자의 공급자 products403 `NO_SUPPLIER`도 기대 결과다.
+- Neture UI logout200, source access401·refresh401, 다른 origin인 Store의 세션200을
+  확인했다. smoke에서 만든 source/Store 세션만 정리했다. 카카오 설정200·버튼 노출 확인은
+  본인 카카오 실제 인증·계정 연결 완료를 뜻하지 않는다.
+- 배포 후 GCP serving label을 별도로 재조회한 dry-run38221323572는 SUCCESS였으나
+  해당 artifact 다운로드는 프록시403으로 실패했다. 추가 권한 실행은 사용자 중단으로
+  미실행됐고 동일 자료 접근을 우회하지 않았다. 따라서 exact serving label 재확인 완료로
+  기록하지 않는다. 위 배포 대상·성공 및 실제 bundle·운영 동작으로 확인한 범위만 완료다.
+  통합 production 상태의 별도 API/admin 보류를 전체 배포 완료로 바꾸지 않는다.
+
+최종 열린 TODO는 일반 계정 SSOT 확보 후 실제 상태별 운영 검증, 사용자가 담당하는
+본인 Google·카카오 인증·명시적 연결 결과, 2026-11-13 이후 실제30일 공고 확인과 새 정책
+게시·기존 회원 재동의다. 로컬 합성30조건·운영 Demo4조건을 앞선 전체 서비스32조건에
+더해 새로운 고유 조건 수로 보고하지 않는다. 일반 계정 파일은 현재 클라우드에 없고
+새 정책 게시도 미실행이다. 이번 완료 기록은 문서-only/DEPLOYMENT=NOT_APPLICABLE이며
+자체 local 서버 종료·테스트 소유 세션 정리 후 동일 WO 후속을 위해
+WORKTREE_DISPOSITION=KEEP로 남긴다.

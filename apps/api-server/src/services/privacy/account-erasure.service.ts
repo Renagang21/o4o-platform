@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
+import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
 
@@ -25,6 +26,8 @@ export interface ErasureOptions {
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
 const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
+// Exhaustive legacy identity namespaces; recognizing stored data does not enable auth routes.
+const AUTH_IDENTITY_NAMESPACES: Readonly<Record<AuthProvider,true>> = {email:true,google:true,kakao:true,naver:true,service:true};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** These are exclusively owned individual rows; business/shared/statutory rows are NOT in this list. */
@@ -75,7 +78,9 @@ export class AccountErasureService {
       AND to_regclass('public.account_erasure_reference_keys') IS NOT NULL
       AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
       AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
-      AND to_regproc('public.account_erasure_write_fence') IS NOT NULL AS ready`);
+      AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
+      AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
+        AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
     return {enabled:r?.ready===true};
   }
 
@@ -101,11 +106,7 @@ export class AccountErasureService {
       if (existing) return existing.id as string;
       const [user] = await m.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
       if (!user) throw new AccountErasureError('USER_NOT_FOUND', 404);
-      const [protectedUser] = await m.query(`SELECT
-        EXISTS(SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true) AS admin,
-        EXISTS(SELECT 1 FROM demo_accounts WHERE user_id=$1 AND is_active) AS demo`, [userId]);
-      if (protectedUser.admin) throw new AccountErasureError('SUPER_ADMIN_PROTECTED', 403);
-      if (protectedUser.demo) throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN', 403);
+      await this.assertTarget(m,userId);
       const active = await m.query("SELECT service_key FROM service_memberships WHERE user_id=$1 AND status='active' FOR UPDATE", [userId]);
       // Stage one is a scoped Operator action. Never silently suspend other services as Admin deletion.
       // Inactive/pending/rejected membership or historical events do not block erasure.
@@ -152,8 +153,9 @@ export class AccountErasureService {
         await m.query("SELECT set_config('o4o.erasure_operation',$1,true)", [operationId]);
         const [user] = await m.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [o.subject_id]);
         if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
+        // Retire legacy contact hashes: a fresh account may reuse contact details.
+        await m.query("DELETE FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[operationId]);
         await this.captureReferenceKeys(m,operationId,o.subject_id!);
-        await this.captureIdentityKeys(m,operationId,user);
         const reviews = await this.reviewManifest(m, user);
         if (reviews.length) {
           await m.query("UPDATE account_erasure_operations SET state='review_required',review_codes=$2,updated_at=now() WHERE id=$1", [operationId, JSON.stringify(reviews)]);
@@ -176,7 +178,7 @@ export class AccountErasureService {
       if (e instanceof AccountErasureError && ['ERASURE_OPERATION_NOT_FOUND','INVALID_OPERATION_ID','FORBIDDEN','AUTH_REQUIRED'].includes(e.code)) throw e;
       const code = e instanceof AccountErasureError ? e.code : 'ERASURE_STEP_FAILED';
       // Never log a SQL error's detail, source profile or GCS path.
-      const review = code.includes('REVIEW_REQUIRED');
+      const review = code.includes('REVIEW_REQUIRED') || ['SUPER_ADMIN_PROTECTED','DEMO_ACCOUNT_FORBIDDEN'].includes(code);
       await this.db.query(`UPDATE account_erasure_operations SET state=$3,error_code=$2,review_codes=$4,updated_at=now()
         WHERE id=$1 AND state<>'completed'`, [operationId, code,review ? 'review_required' : 'retry_required',JSON.stringify(review ? [code] : [])]);
     }
@@ -205,58 +207,83 @@ export class AccountErasureService {
       VALUES($1,$2,$3) ON CONFLICT DO NOTHING`, [operationId,id,hash(id)]);
   }
 
-  private async captureIdentityKeys(m:EntityManager,operationId:string,user:Record<string,unknown>):Promise<void> {
-    for(const token of await this.identityTokens(m,user)) {
-      const [length]=await m.query('SELECT char_length(lower($1::text)) AS n',[token]);
-      if(length.n>8192)throw new AccountErasureError('IDENTITY_MANIFEST_REVIEW_REQUIRED',409);
-      // Hash + character length fence embedded email/name copies without keeping the profile.
-      await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,key_hash,key_kind,identity_length)
-        VALUES($1,encode(public.digest(lower($2::text),'sha256'),'hex'),'identity',char_length(lower($2::text)))
-        ON CONFLICT DO NOTHING`,[operationId,token]);
+  private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<{ tokens: string[]; providers: { provider: string; id: string }[] }> {
+    // These identify THIS subject. Actor/alias/provider values in arbitrary metadata
+    // are not globally unique subject keys; their typed domain handlers require review.
+    const tokens=new Set<string>([String(user.id),String(user.email)]);
+    for(const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
+      JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`,[user.id])) {
+      if(r.reference_id)tokens.add(String(r.reference_id));
     }
+    // Whitelisted typed subject identifiers; never guess identity from arbitrary metadata actors.
+    const providers: { provider: string; id: string }[] = [];
+    if(typeof user.provider_id==='string' && user.provider_id.length) {
+      if(typeof user.provider==='string' && user.provider.length)providers.push({provider:user.provider,id:user.provider_id});
+      else tokens.add(user.provider_id); // Unattributed legacy source requires domain review.
+    }
+    for(const linked of await m.query('SELECT provider,"providerId",email FROM linked_accounts WHERE "userId"=$1',[user.id])) {
+      if(typeof linked.email==='string' && linked.email.length)tokens.add(linked.email);
+      if(typeof linked.providerId==='string' && linked.providerId.length)providers.push({provider:linked.provider,id:linked.providerId});
+    }
+    return {tokens:[...tokens],providers};
   }
 
-  private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<string[]> {
-    const tokens = new Set<string>();
-    const visit = (v: unknown): void => {
-      if (typeof v === 'string' && v.length >= 1) tokens.add(v);
-      else if (Array.isArray(v)) v.forEach(visit);
-      else if (v && typeof v === 'object') Object.values(v).forEach(visit);
-    };
-    const visitProfile = (v:unknown):void => {
-      if(Array.isArray(v))v.forEach(visitProfile);
-      else if(v && typeof v==='object')for(const [key,value] of Object.entries(v)) {
-        if(!/role/i.test(key) && /email|^sub$|provider.?id|account.?id|user.?id/i.test(key))visit(value);
-        else if(value && typeof value==='object')visitProfile(value);
-      }
-    };
-    // Non-unique names, nicknames, phone/IP/avatar/shared business values do not identify a copy's subject.
-    // Related copies are detected by subject/email/owned-row/provider identifiers; preserve unrelated people's legitimate values.
-    for (const key of ['id','email']) visit(user[key]);
-    for (const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
-      JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`, [user.id])) visit(r.reference_id);
-    for (const t of await this.tables(m)) {
-      const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const where = owners?.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
-      const fields = t.columns.filter(c => /email|provider.?id|account.?id|metadata|profile/i.test(c));
-      if (!where || !fields.length) continue;
-      for (const row of await m.query(`SELECT ${fields.map(quote).join(',')} FROM public.${quote(t.table_name)} WHERE ${where}`, [user.id])) visitProfile(row);
-    }
-    return [...tokens];
-  }
-
-  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: string[]): Promise<string[]> {
-    const tokens = frozenTokens ?? await this.identityTokens(m,user);
-    const patterns = tokens.filter(v=>v.length>=2).map(v => `%${v.replace(/[\\%_]/g, '\\$&')}%`);
+  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>): Promise<string[]> {
+    const identities = frozenTokens ?? await this.identityTokens(m,user);
+    const tokens = identities.tokens;
+    const localPart = "[:alnum:]_.!#$%&'*+/=?^`{|}~-";
+    const patterns = tokens.filter(v=>v.length>=2).map(v => {
+      const escaped=v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      // A unique email is not a substring identity: preserve another person's longer address.
+      return v.includes('@') ? `(^|[^${localPart}])${escaped}(?![[:alnum:]-]|\\.[[:alnum:]-])`
+        : UUID.test(v) ? escaped : `(^|[^[:alnum:]_.-])${escaped}($|[^[:alnum:]_.-])`;
+    });
     const shortTokens=tokens.filter(v=>v.length<2);
-    // Search values, not JSON column/key names. Short Korean names must not be missed.
+    // Search attributed identifier values, not JSON column/key names or another actor’s profile.
     const leaf=(alias:string)=>`jsonb_path_query_array(to_jsonb(${alias})
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
+    // Provider IDs belong to a namespace. Unattributed copies still need domain review,
+    // but an explicit different provider is another identity, even when the ID is equal.
+    const providerPatterns=identities.providers.map(p=>({provider:p.provider,
+      pattern:new RegExp(`(^|[^a-zA-Z0-9_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^a-zA-Z0-9_.-])`,'i')}));
+    const providerCopies=(value:unknown):boolean => {
+      if(typeof value==='string')return providerPatterns.some(p=>p.pattern.test(value));
+      if(Array.isArray(value))return value.some(v=>providerCopies(v));
+      if(value && typeof value==='object') {
+        const object=value as Record<string,unknown>;
+        // Only the typed providerId field belongs to this namespace. A storage/provider
+        // column never scopes memo, contacts, sibling fields or nested identity objects.
+        const namespace=typeof object.provider==='string' && Object.prototype.hasOwnProperty.call(AUTH_IDENTITY_NAMESPACES,object.provider) ? object.provider : undefined;
+        return Object.entries(object).some(([key,v])=> {
+          if(key==='provider')return false;
+          if(['providerId','provider_id'].includes(key) && namespace && typeof v==='string')return providerPatterns.some(p=>p.provider===namespace && p.pattern.test(v));
+          return providerCopies(v);
+        });
+      }
+      return false;
+    };
+    const providerReview=async(table:string, exclusion:string):Promise<boolean> => {
+      if(!identities.providers.length)return false;
+      // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
+      // Node memory even when many genuine candidates require namespace/domain inspection.
+      await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
+        SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(to_jsonb(r),'$.** ? (@.type() == "string")')::text
+        ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
+          `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
+      try {
+        for (;;) {
+          const rows: {payload:unknown}[]=await m.query('FETCH FORWARD 64 FROM erasure_provider_scan');
+          if(rows.some(r=>providerCopies(r.payload)))return true;
+          if(rows.length<64)return false;
+        }
+      } finally { await m.query('CLOSE erasure_provider_scan'); }
+    };
     const codes: string[] = [];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
-      AND (${leaf('r')}::text ILIKE ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
-    if(otherUsers.n)codes.push('REVIEW:public.users');
+      AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
+    if(otherUsers.n || await providerReview('public.users','AND r.id::text<>$1'))codes.push('REVIEW:public.users');
     const [soleAdmin] = await m.query(`SELECT count(*)::int AS n FROM community_memberships target
       WHERE target.user_id=$1 AND target.role='admin' AND target.status='active'
       AND NOT EXISTS(SELECT 1 FROM community_memberships other JOIN users u ON u.id=other.user_id
@@ -274,9 +301,9 @@ export class AccountErasureService {
       if (t.table_name === 'community_membership_changes') {
         const [other] = await m.query(`SELECT count(*)::int AS n FROM community_membership_changes h
           JOIN community_memberships cm ON cm.id=h.membership_id WHERE cm.user_id<>$1
-          AND h.actor_user_id IS DISTINCT FROM $1 AND (${leaf('h')}::text ILIKE ANY($2::text[])
+          AND h.actor_user_id IS DISTINCT FROM $1 AND (${leaf('h')}::text ~* ANY($2::text[])
           OR ${leaf('h')} ?| $3::text[])`, [user.id,patterns,shortTokens]);
-        if (other.n) codes.push('REVIEW:public.community_membership_changes');
+        if (other.n || await providerReview(table, 'AND r.actor_user_id::text IS DISTINCT FROM $1 AND NOT EXISTS(SELECT 1 FROM community_memberships cm WHERE cm.id=r.membership_id AND cm.user_id::text=$1)')) codes.push('REVIEW:public.community_membership_changes');
         if (!this.options.systemYears || !this.options.systemBasis?.trim()) {
           const [h] = await m.query(`SELECT count(*)::int AS n FROM community_membership_changes h
             JOIN community_memberships cm ON cm.id=h.membership_id WHERE cm.user_id=$1 OR h.actor_user_id=$1`, [user.id]);
@@ -285,9 +312,9 @@ export class AccountErasureService {
         continue;
       }
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
-        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ILIKE ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
+        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
@@ -376,6 +403,16 @@ export class AccountErasureService {
     if (!operationId) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
   }
 
+  private async assertTarget(m:EntityManager,userId:string):Promise<void> {
+    const grants=await m.query(`SELECT id,
+      (valid_until IS NULL OR valid_until>=statement_timestamp()) AS protected_grant
+      FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true FOR SHARE`,[userId]);
+    // Scheduled unexpired grants stay protected: time alone must not activate one during irreversible work.
+    if(grants.some((g:{protected_grant:boolean})=>g.protected_grant))throw new AccountErasureError('SUPER_ADMIN_PROTECTED',403);
+    const demo=await m.query('SELECT user_id FROM demo_accounts WHERE user_id=$1 AND is_active FOR SHARE',[userId]);
+    if(demo.length)throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN',403);
+  }
+
   private async assertActor(m:EntityManager,actorId:string):Promise<void> {
     const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
       WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
@@ -388,6 +425,7 @@ export class AccountErasureService {
       await this.assertActor(m,actorId);
       const [o] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE', [operationId]);
       if (o.state === 'completed') return;
+      await this.assertTarget(m,o.subject_id);
       const tasks = await m.query("SELECT * FROM account_erasure_file_tasks WHERE operation_id=$1 AND state IN ('pending','retry_required') FOR UPDATE", [operationId]);
       for (const t of tasks) {
         if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED', 503);
@@ -417,6 +455,7 @@ export class AccountErasureService {
       await m.query("SELECT set_config('o4o.erasure_operation',$1,true)", [operationId]);
       const [user] = await m.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [o.subject_id]);
       if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
+      await this.assertTarget(m,o.subject_id!);
       const frozenTokens = await this.identityTokens(m,user);
       const codes = await this.reviewManifest(m,user,frozenTokens);
       const [f] = await m.query("SELECT count(*)::int AS n FROM account_erasure_file_tasks WHERE operation_id=$1 AND state NOT IN ('deleted','already_absent')", [operationId]);
@@ -426,6 +465,8 @@ export class AccountErasureService {
       if ((await this.reviewManifest(m,user,frozenTokens)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
       await m.query('DELETE FROM users WHERE id=$1', [o.subject_id]);
       await this.audit(m,operationId,o.subject_hash,actorId,'completed');
+      // Only retired UUIDs fence a restore. Re-registration with a fresh UUID/contact is not a restore.
+      await m.query("DELETE FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[operationId]);
       await m.query('UPDATE account_erasure_reference_keys SET reference_id=NULL WHERE operation_id=$1', [operationId]);
       await m.query(`UPDATE account_erasure_operations SET state='completed',subject_id=NULL,review_codes='[]',
         error_code=NULL,completed_at=now(),expires_at=now()+interval '7 days',updated_at=now() WHERE id=$1`, [operationId]);

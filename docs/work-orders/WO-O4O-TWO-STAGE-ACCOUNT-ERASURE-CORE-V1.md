@@ -178,3 +178,11 @@ Codex `f8fc042`의 P1/P2 처리: 공통 이름·닉네임·IP·전화·avatar/bu
 PR CI shard2 실패를 로컬 전체 shard로 재현했다(155 suites2635 tests PASS, 실패1개). 원인은 email verification token consumer를 인증 발급 경로 하나로 고정한 기존 source guard였다. 계정 제거의 소유 토큰 파기 경로를 명시적으로 추가하고 토큰 INSERT/UPDATE 부재를 검증한다. 수정된 정적 인증/Demo guard26 tests PASS; 전체 PR CI 재실행 결과를 통합 gate로 사용한다.
 
 main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 merge로 통합했다. 해당 소유 트랙 기능을 이 작업에서 재구현하지 않았다. 역할 is_active뿐 아니라 valid_from/valid_until을 각 제거 단계의 현재 시점으로 재확인한다. 만료/미시작 역할은 요청·retry403이며 기존 operation을 변경하지 않는다. 최신 main 통합 후 격리 DB22+storage4+정적 인증17=43 tests, API build·lint PASS.
+
+### 10.4 검증 후속의 실제 최종 범위
+
+[CHECK의 PR #507 후속](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md#검증-후속--pr-507)을 적용한다. 유효 target grant의 최종 잠금/재확인, 타인의 더 긴 이메일/metadata actor 오판 방지, 동일 연락처의 새 UUID 가입 허용을 추가했다. 이전 임시 email hash fence 결과는 최신 계약이 아니다. 연락처 hash를 보존/차단하지 않고 retired UUID만7일 복원 차단하며 이전 calendar anchor를 그대로 유지한다. 임의 metadata alias/provider namespace는 typed handler 전수 분류가 필요하다. DB25+storage4+정적 인증17+Demo9=55 tests·API build·lint PASS; 새 DDL0. #505 main/post-CI PASS, API/Admin dry-run만 실행했고 실제 운영 DDL/배포는 미승인으로 보류했다.
+
+### 10.5 legacy 완료 operation의 연락처 marker retirement
+
+CHECK의 업그레이드 P2 후속을 따른다.24단계 migration은 이미 완료된 operation까지 legacy identity hash를 파기하고 UUID-only writer 함수를 적용한다. 최종 schema 지문41e3be0a…·6617 lines, fresh/23→24/no-op·집중58 tests·migration contract21 checks PASS.23단계 원본은 불변이며 실제 운영23/24 적용·일반 계정/GCS 제거·job/법률 게시0이다. 새24단계 코드·격리 검증은 승인된 Core WO의 재검토 수정 범위이며 실제 DB 실행은 별도 승인 대상이다.

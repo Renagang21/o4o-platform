@@ -245,6 +245,12 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f',
     fingerprintLineCount: 6617,
   },
+  // Contact-hash retirement also removes the legacy contact branch from the writer function.
+  {
+    appliedThrough: 'RetireLegacyErasureIdentityHashes1791795139475',
+    fingerprint: '0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50',
+    fingerprintLineCount: 6618,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
