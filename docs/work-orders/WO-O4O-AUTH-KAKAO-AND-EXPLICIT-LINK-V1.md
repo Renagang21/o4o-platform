@@ -631,7 +631,7 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 |---|---|---|---|
 | V01 | 일반 미가입·대기·반려·정지·탈퇴 검증 | `users`의 공통 계정 상태, 서비스 membership, 약국·공급자 별도 원장을 구분한다. 로그인 성공과 보호 업무 API 허용도 구분한다 | 조사 완료 |
 | V02 | 공급자 상태별 안내 확인 | 실제 소비처는 `SupplierLandingPage`/`SupplierServiceEntry` → `ServiceApplyPanel`이다. 미사용 `ServiceUsageGate`의 문구만 바꿔 운영 개선으로 판정하지 않는다 | 실제 소비처 확인 완료 |
-| V03 | 공통 계정 승인 대기 안내 | 수동 승인 문구를 제거한다. 정상 인증의 메인 이용 상태 안내는 기존 handoff로 복귀하며, 중앙 가드의 제한 계정은 허용된 `/auth/me`로만 재확인해 계정 안내·읽기 재시도를 제공한다. 제한 계정에 handoff/서비스 신청을 제공하지 않는다 | 두 review 지적 보완 로컬 검증; 통합·배포 대기 |
+| V03 | 공통 계정 승인 대기 안내 | 수동 승인 문구를 제거한다. 정상 인증의 메인 이용 상태 안내는 기존 handoff로 복귀하며, 중앙 가드의 제한 계정은 허용된 `/auth/me`로만 재확인해 계정 안내·읽기 재시도를 제공한다. 제한 계정에 handoff/서비스 신청을 제공하지 않는다 | #504 main 통합·Neture 웹 배포 완료; 로컬 합성30조건·운영 Demo4조건 통과. 실제 일반 상태 계정은 V04 대기 |
 | V04 | 실제 상태별 로그인·역할·업무 검증 | 8개 유지 origin × PC/mobile에서 계정 출처와 실제 원장 상태를 먼저 확인한 후 로그인, 메뉴·직접 주소, 보호 API, 상태 안내, 다른 서비스 영향, 로그아웃을 검증한다 | 로컬 계정 SSOT 연결 대기 |
 | V05 | 정책 적용·재동의 | 실제 공개 공고와 30일 경과를 다시 확인하고 2026-11-13 이후 새 정책을 게시·검증한다 | 시행일 대기 |
 | V06 | Google·카카오 실제 인증·명시적 연결 | 본인 실제 OAuth는 사용자가 담당한다. 자동 이메일 병합 없음·연결 후 권한 합집합 없음의 실제 결과를 전달받아 기록한다 | 사용자 확인 대기 |
@@ -654,7 +654,34 @@ Delivery38196926152와 최종 production status는 Neture DEPLOYED/SUCCESS다.
 - [x] 대표 홈 직접 링크의 세션 미승계 review 지적을 기존 handoff 버튼으로 보완; 공통 계정4조건·성공/제한/복구 중3조건 회귀 확인.
 - [x] review 보완 화면53건·Neture build·PC/mobile 고유 합성24조건 확인(제한 거절2조건의 selector 보완 재실행 포함).
 - [x] 실제 제한 계정의 home/entry 403 → 본인 me 재확인 분기 검증; 화면61건·중앙 가드25건·로컬 PC/mobile 고유30조건 확인. allowlist·서버 인가 변경 없음.
-- [ ] V03 push·review·main·Neture 배포·운영 검증.
+- [x] V03 push·review·main·Neture 웹 배포·운영 Demo 검증(실제 일반 상태 계정은 V04로 분리).
 - [ ] 일반 계정 SSOT 연결 후 V04 운영 상태별 검증.
 - [ ] V05 시행일·공고 기간 확인 후 정책 적용과 재동의 운영 검증.
 - [ ] V06 사용자 본인 실제 OAuth/명시적 연결 결과 기록.
+
+#### V03 통합·배포 결과 — 2026-10-12
+
+[PR #504](https://github.com/Renagang21/o4o-platform/pull/504)의 최종 head `c0e7688337`
+review는 새 지적 없이 완료됐고 앞선 두 P2 스레드는 해결됐다. required CI38215572959
+통과 후 일반 PR merge로 main `cbdc1619f0`에 통합했다. main CI38217993155도 통과했다.
+동시 main 변경 반영 후 서버156조건·화면77조건과 Neture build를 확인했으며 반복 실행을 합산하지 않는다.
+
+일반 Delivery38218878433와 Promote dry-run38219899889는 별도 API 변경의 식별 키 누락으로
+Neture 자동 승격을 보류했다. 해당 API #505의 운영 migration은 승인 범위 밖이므로 실행하지 않았다.
+기존 owner 전용 서비스별 `verified` 웹 배포38220652882에서 대상 SHA `cbdc1619f0`의
+CI·freeze·production ref 검사를 유지한 채 Neture만 빌드·신규 revision smoke·traffic 전환·검증을
+완료했다. workflow·IAM·설정 변경이나 API 배포·migration 없이 실행했다.
+
+운영 Neture HTML/asset200 및 신규 계정 안내 코드 포함을 확인했다. PC/mobile × 매장 경영자/공급자
+Demo4조건은 최초3/4 통과했고 PC 매장 경영자의 이동 대기 timeout만 같은 코드·같은 timeout으로
+재실행해1/1 통과했다. 실제 handoff/교환200, 약국 업무 context200, 권한별 API 제한,
+Neture UI 로그아웃·access/refresh401과 다른 Store 세션200을 확인했다. 최초 timeout 원인은 확정하지 않는다.
+이4조건과 로컬 합성30조건은 실제 일반 상태 계정이나 외부 OAuth의 증거가 아니다.
+
+배포 후 별도 GCP serving label 재조회 artifact는 프록시403으로 확보하지 못했고 추가 권한 실행도
+사용자 중단으로 미실행됐다. 배포 workflow의 대상/성공과 실제 bundle·기능 확인 범위만 완료로 판정한다.
+전체 main/API/admin 배포 완료로 확대하지 않는다. 세부 증거는 기존 CHECK에 추가했다.
+
+이번 후속 기록은 문서만 변경하므로 DEPLOYMENT=NOT_APPLICABLE이다. 자체 local 서버는 종료했고
+운영 smoke의 테스트 소유 세션을 정리했다. V04~V06 후속을 위해 동일 WO branch/checkout을 유지한다
+(WORKTREE_DISPOSITION=KEEP). 일반 계정 파일은 현재 클라우드에 여전히 없으며 새 정책도 아직 게시하지 않았다.
