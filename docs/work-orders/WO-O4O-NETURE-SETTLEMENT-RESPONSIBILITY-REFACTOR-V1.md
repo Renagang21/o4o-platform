@@ -1,6 +1,6 @@
 # WO-O4O-NETURE-SETTLEMENT-RESPONSIBILITY-REFACTOR-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-12
 > **최종 갱신**: 2026-10-12
 > **유형**: 기존 정산 서비스 책임 리팩터링
@@ -72,3 +72,38 @@ DataSource 필드를 readonly로 선언하고 façade3개의 lazy 초기화 대�
 기존 순서·부분 쓰기/실패 전파·첫 알림 실패 시 이후 수신자 처리 중단을 보존해야 하므로
 병렬화하지 않는다. 실제로 해당 순차/실패/완료 시점을 행동 계약에서 검증한다.
 이는 경고를 숨기는 설정 변경이나 원자성 보장으로 해석하지 않는다.
+
+## 전달 완료 — 2026-10-12 (Asia/Seoul)
+
+- [PR #516](https://github.com/Renagang21/o4o-platform/pull/516), 최종 source
+  `bf293491956591522af7555bc9f6c9a20cbaf4b8`를 normal merge해 main
+  `c64e54c0601b664d432cce8bf202ef51e2d0a795`에 반영했다. 최신 main의 점포 공통 권한 변경까지
+  점검하고 정산/권한 회귀9 suites / 288 tests, API typecheck/build를 통과했다.
+- PR CI `38258462946`, CodeQL `38258462970`, Codex 지적/미해결 리뷰0 및
+  Sonar gate PASS를 확인했다. readonly/lazy 초기화6건은 해소됐고, 보존해야 하는 순차
+  await4건만 남았다(check `114845559472`). 원본11메서드 본문/18query·바인딩/금액과
+  공개10메서드 signature·constructor는 동일하며 façade는487→71행이다.
+- main CI `38259679233`/CodeQL `38259679256` PASS, native Delivery `38260853504`의
+  LEVEL_3(API·Store) 판정 후 [Promote `38261132551`](https://github.com/Renagang21/o4o-platform/actions/runs/38261132551)가
+  같은 main SHA를 배포했다. API job `114852513738`의 빌드·readiness·트래픽 전환·전환 후
+  검증이 성공했으며, 최종 production status는 **DEPLOYED · deploy: api,store**다.
+  native Report는 실제 serving SHA와 단일 revision100%를 다시 조회해 target 일치를 확인한다.
+- 같은 SHA를 다른 세션도 먼저 dispatch한 경합에서 자기 중복 pending run `38261203786`만
+  취소했다. 다른 세션의 실행을 변경하지 않고 동일 target의 실제 전달 증거로 확인했다.
+- 배포 전·후 공개 공급자 Demo PC(1440×1000)/mobile(390×844) 로그인, 홈/상품/주문/정산
+  화면4개 및 목록/paid 필터/KPI가 모두 HTTP200·정상 응답이었다. JS 오류/조회 실패/가로
+  넘침/정산 업무 쓰기0, API health=alive·ready=ready. 토큰·응답 본문·식별자·개인정보를
+  smoke 결과에 저장하지 않았다.
+
+### 검증 한계와 문서 정합
+
+Demo 정산0건으로 실제 상세 조회는 NOT_RUN이다. 실제 계정/Google 로그인 유예를 유지하며
+운영 계산·승인·취소·지급·은행 송금 및 실제 PostgreSQL 쓰기 fixture는 검증하지 않았다.
+공통 native API 배포의 기존 **Run database migrations** step은 실행·성공했다.
+이번 source 및 누적614→c64에는 migration 파일 변경이 없지만, job 실행을 생략했거나
+운영 DB 전체 write0이었다고 주장하지 않는다. 직접 job 상세 로그/적용 건수는 환경의
+artifact host 제한으로 조회하지 못했으며, 해당 host만 추가한 설정 초안은 게시 대기다.
+
+최신 AGENTS/SETUP/정본Index/Supplier FROZEN/Role Workspace§9/Commerce/B2B/문서 lifecycle을
+기준으로 TODO와 WO를 정합화했다. 새 금전·권한·schema 정책이나 engine·route·인프라 변경은 없다.
+이 완료 기록은 문서만 변경하며 이미 배포된 정산 runtime의 재배포를 요구하지 않는다.
