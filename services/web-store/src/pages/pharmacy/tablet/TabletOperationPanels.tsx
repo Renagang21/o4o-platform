@@ -110,40 +110,39 @@ export function TabletCommonIdlePicker({
     <dialog
       ref={dialogRef}
       aria-label="서비스 공통 대기 영상 선택"
-      className="m-auto p-0 border-0 bg-white rounded-2xl max-w-2xl max-h-[80vh] overflow-y-auto backdrop:bg-slate-900/50"
-      style={{ zIndex: 100000, width: "calc(100% - 2rem)" }}
+      className="m-0 p-4 border-0 bg-transparent w-screen h-[100dvh] max-w-none max-h-none open:flex open:items-center open:justify-center backdrop:bg-slate-900/50"
+      style={{ zIndex: 100000 }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
       }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-      onKeyDown={(event) => {
-        if (
-          event.key === "Escape" &&
-          typeof dialogRef.current?.showModal !== "function"
-        )
-          onClose();
-      }}
     >
-      <div className="px-4 py-3 border-b flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-700">
-          서비스 공통 대기 영상 선택
-        </h3>
-        <button
-          onClick={() => onClose()}
-          aria-label="공통 대기 영상 선택 닫기"
-          className="min-h-11 min-w-11 text-slate-400 hover:text-slate-600 text-lg"
-        >
-          ×
-        </button>
-      </div>
-      <div className="p-4 overflow-y-auto">
-        {body}
-        <p className="text-[11px] text-slate-400 mt-3">
-          영상 등록·수정·삭제·기간 변경은 서비스 운영자만 할 수 있습니다.
-        </p>
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="공통 영상 선택 배경 닫기"
+        onClick={onClose}
+        className="absolute inset-0 border-0 bg-transparent"
+      />
+      <div className="relative bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <div className="px-4 py-3 border-b flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-700">
+            서비스 공통 대기 영상 선택
+          </h3>
+          <button
+            onClick={() => onClose()}
+            aria-label="공통 대기 영상 선택 닫기"
+            className="min-h-11 min-w-11 text-slate-400 hover:text-slate-600 text-lg"
+          >
+            ×
+          </button>
+        </div>
+        <div className="p-4 overflow-y-auto">
+          {body}
+          <p className="text-[11px] text-slate-400 mt-3">
+            영상 등록·수정·삭제·기간 변경은 서비스 운영자만 할 수 있습니다.
+          </p>
+        </div>
       </div>
     </dialog>
   );

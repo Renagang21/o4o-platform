@@ -123,15 +123,14 @@ export function StoreSignageScheduleForm({
       </div>
 
       {/* Row 3: Days of week */}
-      <div>
-        <p id={`${fieldId}-days`} className="text-xs text-slate-500 mb-1 block">
-          요일 선택 *
-        </p>
-        <div
-          role="group"
-          aria-labelledby={`${fieldId}-days`}
-          className="flex flex-wrap gap-1.5"
+      <fieldset>
+        <legend
+          id={`${fieldId}-days`}
+          className="text-xs text-slate-500 mb-1 block"
         >
+          요일 선택 *
+        </legend>
+        <div className="flex flex-wrap gap-1.5">
           {DAY_LABELS.map((label, idx) => (
             <button
               key={label}
@@ -148,7 +147,7 @@ export function StoreSignageScheduleForm({
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Row 4: Start / End time */}
       <div className="grid gap-3 sm:grid-cols-2">

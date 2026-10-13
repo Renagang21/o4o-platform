@@ -383,7 +383,7 @@ export function StoreQrCreateForms({
                     checked={ctaEnabled}
                     onChange={(e) => setCtaEnabled(e.target.checked)}
                     style={{ marginTop: "3px" }}
-                  />
+                  />{" "}
                   콘텐츠 하단에 상담 요청 버튼 표시
                 </label>
                 <p
