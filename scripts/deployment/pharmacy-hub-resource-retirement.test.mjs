@@ -166,12 +166,12 @@ test('workflow rejects mixed resource operations, foreign actors and frozen writ
     const env = { PATH: process.env.PATH, GITHUB_ENV: join(directory, 'env'), RUNNER_TEMP: directory,
       GITHUB_REF: 'refs/heads/main', CUTOVER_MODE: 'plan', DEPLOY_FREEZE: 'false',
       WORKFLOW_ACTOR: 'owner', REPOSITORY_OWNER: 'owner', RESOURCE_RETIREMENT: 'true',
-      PH_ADMIN_PURGE: 'false', PH_DEVELOPMENT_PURGE: 'false', QR_PROBE_PATHS: '',
+      PH_ADMIN_PURGE: 'false', PH_DEVELOPMENT_PURGE: 'false', PH_MEDIA_PURGE: 'false', QR_PROBE_PATHS: '',
       RETIREMENT_INVENTORY: 'false', RETIRE_PH_HOST: 'false', DEMO_CENSUS_FLAG: 'false',
       DEMO_RELINK_FLAG: 'false', DEMO_CLEANUP_FLAG: 'false', COPY_CLEANUP_FLAG: 'false' };
     const execute = overrides => spawnSync('bash', ['-c', gate], { env: { ...env, ...overrides }, encoding: 'utf8' }).status;
     assert.equal(execute({}), 0);
-    for (const flag of ['PH_ADMIN_PURGE', 'PH_DEVELOPMENT_PURGE', 'RETIREMENT_INVENTORY', 'RETIRE_PH_HOST', 'DEMO_CENSUS_FLAG', 'DEMO_RELINK_FLAG', 'DEMO_CLEANUP_FLAG', 'COPY_CLEANUP_FLAG']) {
+    for (const flag of ['PH_ADMIN_PURGE', 'PH_DEVELOPMENT_PURGE', 'PH_MEDIA_PURGE', 'RETIREMENT_INVENTORY', 'RETIRE_PH_HOST', 'DEMO_CENSUS_FLAG', 'DEMO_RELINK_FLAG', 'DEMO_CLEANUP_FLAG', 'COPY_CLEANUP_FLAG']) {
       assert.equal(execute({ [flag]: 'true' }), 1, flag);
     }
     assert.equal(execute({ WORKFLOW_ACTOR: 'another-actor' }), 1);

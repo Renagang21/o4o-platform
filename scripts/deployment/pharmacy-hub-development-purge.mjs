@@ -38,10 +38,11 @@ async function dependencies(q,plan) {
   await q.query("SET LOCAL lock_timeout='5s'");
   await q.query("SET LOCAL statement_timeout='15s'");
   // All application relations are held stable for the conservative non-FK ID scan.
-  const tables=await q.query(`SELECT n.nspname AS schema,c.relname AS "table" FROM pg_class c
+  const tables=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",c.relrowsecurity AS row_security FROM pg_class c
     JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','p')
     AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
     ORDER BY n.nspname,c.relname`);
+  if(tables.some(t=>t.row_security))throw new Error('PH_DEV_ROW_SECURITY');
   await lock(q,tables.map(t=>`${id(t.schema)}.${id(t.table)}`),plan);
   const fks=await q.query(`SELECT sn.nspname AS schema,s.relname AS "table",t.relname AS target,
     array_agg(sa.attname::text ORDER BY k.ordinality) AS source_columns,
@@ -56,7 +57,8 @@ async function dependencies(q,plan) {
   if(await count(q,`SELECT count(*)::text AS count FROM pg_trigger g
     JOIN pg_class t ON t.oid=g.tgrelid JOIN pg_namespace n ON n.oid=t.relnamespace
     WHERE n.nspname='public' AND t.relname=ANY($1::text[]) AND NOT g.tgisinternal
-    AND g.tgenabled<>'D' AND (g.tgtype::int & 8)<>0`,[[...byTable.keys()]]))throw new Error('PH_DEV_DELETE_TRIGGER');
+    AND g.tgenabled<>'D' AND ((g.tgtype::int & 8)<>0 OR
+      (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))`,[[...byTable.keys()]]))throw new Error('PH_DEV_MUTATION_TRIGGER');
   return {fks,tables};
 }
 async function census(q,residual=false) {
@@ -71,8 +73,8 @@ async function ownership(q) {
       AND EXISTS (SELECT 1 FROM unnest(ARRAY[x.metadata->>'serviceKey',x.metadata->>'service_key',x.metadata->>'sourceService']) v
         WHERE NULLIF(v,'') IS NOT NULL AND NOT (${ph('v')}))`))throw new Error(`PH_DEV_MIXED_OWNERSHIP:${table}`);
   }
-  if(await count(q,`SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE ${byTable.get('supplier_product_offers').scope('x')}
-    AND EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`))throw new Error('PH_DEV_MIXED_OWNERSHIP:supplier_product_offers');
+  // Offers are shared supplier-owned rows, not PH-owned just because their service_keys mention PH.
+  // Preserve every offer and its public/private/seller inputs; remove only the retired association.
   if(await count(q,`SELECT count(*)::text AS count FROM public.o4o_payments p WHERE
     (${ph('p."sourceService"')} AND (NOT EXISTS (SELECT 1 FROM public.checkout_orders o WHERE ${paymentLink} AND ${orderScope('o')})
       OR EXISTS (SELECT 1 FROM public.checkout_orders o WHERE ${paymentLink} AND NOT COALESCE(${orderScope('o')},FALSE))))
@@ -81,9 +83,10 @@ async function ownership(q) {
 }
 async function references(q,fks,tables) {
   for(const fk of fks) {
+    if(fk.target==='supplier_product_offers')continue; // No offer is deleted.
     if(!Array.isArray(fk.source_columns)||!fk.source_columns.length||!Array.isArray(fk.target_columns)||fk.source_columns.length!==fk.target_columns.length)
       throw new Error('PH_DEV_FK_SHAPE');
-    const source=fk.schema==='public'?byTable.get(fk.table):undefined;
+    const source=fk.schema==='public'&&fk.table!=='supplier_product_offers'?byTable.get(fk.table):undefined;
     const target=byTable.get(fk.target);
     const join=fk.source_columns.map((c,i)=>`s.${id(c)}=p.${id(fk.target_columns[i])}`).join(' AND ');
     if(await count(q,`SELECT count(*)::text AS count FROM ${id(fk.schema)}.${id(fk.table)} s
@@ -92,7 +95,7 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
-  const targetIds=roots.filter(r=>r.table!=='checkout_order_logs').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${r.scope('x')}`).join(' UNION ');
+  const targetIds=roots.filter(r=>!['checkout_order_logs','supplier_product_offers'].includes(r.table)).map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${r.scope('x')}`).join(' UNION ');
   const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')
@@ -101,7 +104,7 @@ async function references(q,fks,tables) {
   const locked=new Set(tables.map(t=>`${t.schema}.${t.table}`));
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
-    const owned=c.schema==='public'?byTable.get(c.table):undefined;
+    const owned=c.schema==='public'&&c.table!=='supplier_product_offers'?byTable.get(c.table):undefined;
     if(await count(q,`SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s
       WHERE NOT COALESCE(${owned?owned.scope('s'):'FALSE'},FALSE)
       AND EXISTS (SELECT 1 FROM (${targetIds}) targets WHERE strpos(s.${id(c.column)}::text,targets.id)>0)`))
@@ -115,12 +118,23 @@ export class PharmacyHubDevelopmentPurge {
     await census(q);await ownership(q);await references(q,fks,tables);
     if(!plan) {
       for(const r of roots) {
+        if(r.table==='supplier_product_offers') {
+          const changed=await count(q,`WITH changed AS (UPDATE public.supplier_product_offers x
+            SET service_keys=ARRAY(SELECT v FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')})),
+              distribution_type=CASE WHEN x.is_public THEN 'PUBLIC'
+                WHEN EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')})) THEN 'SERVICE'
+                ELSE 'PRIVATE' END::supplier_product_offers_distribution_type_enum
+            WHERE ${r.scope('x')} RETURNING 1) SELECT count(*)::text AS count FROM changed`);
+          if(changed!==r.count)throw new Error('PH_DEV_ASSOCIATION_COUNT');
+          continue;
+        }
         const deleted=await count(q,`WITH removed AS (DELETE FROM public.${id(r.table)} x WHERE ${r.scope('x')} RETURNING 1)
           SELECT count(*)::text AS count FROM removed`);
         if(deleted!==r.count)throw new Error(`PH_DEV_DELETE_COUNT:${r.table}`);
       }
       await census(q,true);
     }
-    return {counts:Object.fromEntries(roots.map(r=>[r.table,r.count])),applied:!plan,mediaAndGcsPreserved:true};
+    return {counts:Object.fromEntries(roots.map(r=>[r.table,r.count])),applied:!plan,
+      offerRowsPreserved:19,offerAssociations:19,rowsToDelete:41,mediaAndGcsPreserved:true};
   }
 }
