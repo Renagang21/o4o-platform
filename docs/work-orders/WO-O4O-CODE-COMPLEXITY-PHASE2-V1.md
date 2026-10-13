@@ -718,3 +718,22 @@ root `pnpm test`는 API의 test script를 실행하고 required CI는 API 전체
 현재 cloud의 외부 서비스 직접 HTTP는 proxy 403이다. 공식 workflow의 revision smoke/health/serving SHA 결과를 확인하며
 직접 외부 HTTP 검증을 수행했다고 표시하지 않는다. repository variable 조회도 integration 403이므로
 freeze 상태는 workflow의 실제 판정으로 확인한다.
+
+### 15.1 CI bridge 출력 판정 수정 — 사용자 제공 실패 로그
+
+사용자가 제공한 CI 로그는 child Vitest 4 files / 48 tests PASS, child exit 0을 보여 주지만
+bridge의 stdout PASS summary 정규식이 실패했다. 실제 모달 회귀 실패와 구분한다.
+콘솔 출력 형식에 의존하지 않고 Vitest JSON reporter의 현재 실행 결과를 검증한다.
+
+TODO 및 검증 기준:
+- [x] 실패 로그에서 실패 지점과 실제 child 결과 대조.
+- [x] 실행마다 고유한 임시 report directory 사용, finally에서 정리.
+- [x] exit 0, report.success, nonzero total, passed = total, failed = 0 유지.
+- [x] CI/GitHub Actions/color 환경에서 실제 bridge 실행 및 ESLint 검증.
+- [ ] 최신 main 정상 통합, push, required CI/review 확인.
+- [ ] 정상 PR merge, post-merge CI, 공식 Delivery/Promote 및 serving/smoke 확인.
+
+package/dependency/lockfile/CI workflow 수정 없이 test runner bridge만 수정한다.
+분회 전용 배포 제외, 새 migration/DDL/운영 데이터 삭제 제외를 유지한다.
+
+로컬 검증: CI=true / GITHUB_ACTIONS=true / FORCE_COLOR=1에서 API Jest bridge 1 PASS, child Vitest 4 files / 48 tests PASS. ESLint 0, diff check PASS. 환경 복원 직후 첫 실행은 기존 5초 lifecycle timeout에 걸렸고, 로딩 완료 후 동일 명령에서 모든 assertions가 통과했다. timeout/assertion 완화 없이 유지했다.
