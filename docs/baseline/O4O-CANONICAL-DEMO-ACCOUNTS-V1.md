@@ -235,13 +235,13 @@ REUSE_AND_RELINK · DELETE_AFTER_RELINK · KEEP · UNKNOWN
 Demo 계정에 Google·카카오 로그인 Identity를 **연결하지 않는다.**
 인증 수단은 password credential 하나뿐이다.
 
-## 18. 전체관리자 정책 · role 허용 범위
+## 18. 전체 관리자 정책 · role 허용 범위
 
 ```text
 platform:* 없음 · admin-dashboard 접근 금지
 ```
 
-`admin.neture.co.kr`의 관리 주체는 **전체관리자**라고 부른다. 전체관리자의 Google 전용 인증 정책을 그대로 따른다.
+`admin.neture.co.kr`의 관리 주체는 **전체 관리자**라고 부른다. 전체 관리자의 Google 전용 인증 정책을 그대로 따른다.
 
 ### 18-1. service-scoped role allowlist (2026-10-02 확정)
 

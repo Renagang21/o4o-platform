@@ -26,7 +26,7 @@ Neture 홈 모델은 반환된 약국을 KPA 개인 가입 상태로 다시 걸�
 - Chromium **로컬 API fixture**: 메인 `/` 헤더 로그인 모달에서 매장 Demo 버튼 클릭. desktop 1440×900·mobile 390×844 각각 승인 후보 1개/KPA 가입 없음 → Store workspace handoff·fixture 목적지 이동 PASS. 승인 후보 없음 → 이동 오류 표시·handoff 0건 PASS. 4개 조합 모두 page error 0건.
 - fixture 첫 실행은 HTTPS만 허용하는 기존 URL 검증에 HTTP fixture 목적지를 제공하여 실패했다. 목적지를 HTTPS 형식으로 수정하고 브라우저 route fixture에서 응답한 뒤 위 4개 조합을 재실행했다. 실제 네트워크의 TLS 검증을 비활성화하지 않았다.
 
-- 루트 전체 `pnpm run type-check` PASS. 최초에는 최신 main에서 추가된 workspace export/dependency가 이전 node_modules에 반영되지 않아 전체관리자·Lecture·Store 3단계가 실패했다. 동결 lockfile 설치로 로컬 의존성을 갱신하고 전체를 재실행해 PASS했다. 소스·dependency 선언·lockfile은 변경하지 않았다.
+- 루트 전체 `pnpm run type-check` PASS. 최초에는 최신 main에서 추가된 workspace export/dependency가 이전 node_modules에 반영되지 않아 전체 관리자·Lecture·Store 3단계가 실패했다. 동결 lockfile 설치로 로컬 의존성을 갱신하고 전체를 재실행해 PASS했다. 소스·dependency 선언·lockfile은 변경하지 않았다.
 - `node scripts/lint-ratchet.mjs` PASS: 오류 46건으로 baseline 46 유지, warning 1001건. lint 오류 0으로 보고하지 않는다.
 - Neture production build PASS. 기존 bundle 크기·Browserslist 경고 잔존.
 - 문서 민감정보 검사 2 files / 패턴 0건, `git diff --check` PASS.
