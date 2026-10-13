@@ -182,3 +182,22 @@ DESIGN-O4O-STORE-LIBRARY-AND-ASSET-CANONICAL-SOURCE-V1.md.
 7. AI 선택·실행·비용 계약은 O4O 공통 담당과 맞춘다. 메뉴마다 별도 비서·제공 업체 연결 구현을 만들지 않는다.
 
 검증 결과는 [CHECK](../../checks/CHECK-O4O-STORE-WORKSPACE-WEB-PLAN-V1.md)에 기록한다.
+
+
+## 12. 실제 화면 적용 branch — 2026-10-13
+
+[WO-O4O-STORE-WORKSPACE-FLOW-V1](../../work-orders/WO-O4O-STORE-WORKSPACE-FLOW-V1.md)에서 기획을 바탕으로 실제 web-store 화면에 적용했다.
+main merge·배포는 사용자 종료 범위에 포함되지 않는다. 아래는 개발 브랜치 상태이며 운영 적용 증거가 아니다.
+
+| 계획 TODO | 개발 브랜치 결과 |
+|---|---|
+| 전체 소비처 확인 | StoreWorkDashboard의 공통·서비스 지정·사업별 업무, 제공 자료 레이아웃을 같은 탐색으로 조립. 공유 패키지는 변경하지 않음 |
+| 업무 메뉴 재배치 | 4개 상단 메뉴와 업무 하위 메뉴·설정 보조 진입, 기존 메뉴 항목 보존 |
+| 제작·활용 이동 | 기존 URL에 workspace query로 업무 진입을 연결하고 전달 자료·서비스 문맥 보존 |
+| 편집·미리보기 분리 | QR 일반·동영상 폼과 스타일, 사이니지 미디어 편집, 태블릿 고객 화면 미리보기 추출 |
+| 자료 기반 QR 활용 | 저장된 direct 콘텐츠 → 기존 QR 생성 → 배치·출력 진입. 지원하지 않는 snapshot 원장을 direct QR 대상으로 임의 승격하지 않음 |
+| 직원 권한·기존 경로 | 기존 서버·가드 유지. 직원 구성원 메뉴 제외 및 경영자 전용 직접 진입 회귀 확인 |
+| AI 연결 | 기존 외부 LLM 제작 도움 유지. 새 공통 AI 연결은 별도 담당과의 후속 작업 |
+
+대형 화면의 나머지 세부 폼·실계정/실기기 검증·공통 AI 연결은 완료로 표시하지 않는다.
+검증 근거: [CHECK](../../checks/CHECK-O4O-STORE-WORKSPACE-FLOW-V1.md).

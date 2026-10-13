@@ -16,6 +16,9 @@ import { useStoreResource } from './hooks/useStoreResource';
  *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
  */
 
+import { StoreTabletPreview } from './StoreTabletPreview';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
+import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -23,7 +26,7 @@ import {
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv, Link2, Unplug, MoveRight,
 } from 'lucide-react';
 import {
-  IdlePlaylistEditor, TabletKioskPage,
+  IdlePlaylistEditor,
   type IdlePlaylistItem, type TabletKioskApi,
 } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-PREVIEW-V1: 공개 뷰어 재사용 미리보기 — 공개 데이터 조회 + 매장 slug
@@ -123,14 +126,19 @@ export default function StoreTabletDisplaysPage() {
     editScreenSetId?: string;
   } | null;
   const [activeTab, setActiveTab] = useState<'corners' | 'contents'>(
-    navState?.tab === 'contents' || navState?.editScreenSetId ? 'contents' : 'corners',
+    navState?.tab === 'contents' || navState?.editScreenSetId || new URLSearchParams(location.search).get('workspace') === 'studio' ? 'contents' : 'corners',
   );
+  useEffect(() => {
+    const mode = new URLSearchParams(location.search).get('workspace');
+    if (mode === 'studio') setActiveTab('contents');
+    if (mode === 'use') setActiveTab('corners');
+  }, [location.search]);
   const [highlightScreenSetId] = useState<string | null>(navState?.highlightScreenSetId ?? null);
   const [autoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
   // 소비 후 history state 제거(새로고침·뒤로가기 시 재트리거 방지).
   useEffect(() => {
     if (navState?.tab || navState?.highlightScreenSetId || navState?.editScreenSetId) {
-      navigate(location.pathname, { replace: true, state: null });
+      navigate(`${withWorkspaceMode(`${location.pathname}${location.search}`, 'studio')}${location.hash}`, { replace: true, state: null });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -819,8 +827,9 @@ export default function StoreTabletDisplaysPage() {
 
   return (
     <div className="space-y-6">
+      <StoreWorkflowNavigation subject="태블릿" />
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
               뒤로가기가 '매장 자체 상품' 관리 화면으로 가던 잔재 정정 → 매장 홈으로 복귀. */}
@@ -863,7 +872,7 @@ export default function StoreTabletDisplaysPage() {
         ] as const).map((t) => (
           <button
             key={t.key}
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => navigate(withWorkspaceMode(`${location.pathname}${location.search}`, t.key === 'contents' ? 'studio' : 'use'), { state: location.state })}
             className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
               activeTab === t.key
                 ? 'border-teal-600 text-teal-700'
@@ -1797,77 +1806,18 @@ export default function StoreTabletDisplaysPage() {
       {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1)
           WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §3: 미리보기 1종으로 통합 —
           태블릿/휴대전화 보기 전환 + 보조(새 창에서 열기 · 주소 복사). 코너 카드/상세 모두 이 모달을 연다. */}
-      {previewOpen && previewSlug && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.85)' }}>
-          {/* 상단 바: 보기 전환 + 보조 메뉴 + 닫기 */}
-          <div
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100001 }}
-            className="flex items-center justify-between gap-3 bg-slate-900/95 text-white px-4 py-2"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <p className="text-sm font-semibold whitespace-nowrap">고객 화면 미리보기</p>
-              {/* 태블릿 / 휴대전화 보기 */}
-              <div className="flex rounded-lg overflow-hidden border border-white/20">
-                {([
-                  { key: 'tablet', label: '태블릿' },
-                  { key: 'mobile', label: '휴대전화' },
-                ] as const).map((v) => (
-                  <button
-                    key={v.key}
-                    onClick={() => setPreviewView(v.key)}
-                    className={`px-3 py-1 text-xs font-semibold ${previewView === v.key ? 'bg-white text-slate-900' : 'bg-transparent text-slate-200 hover:bg-white/10'}`}
-                  >
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* 보조 메뉴 */}
-              {previewTabletIdRef.current && storeSlug && (
-                <>
-                  <button
-                    onClick={() => window.open(publicTabletUrl(previewTabletIdRef.current as string), '_blank', 'noopener,noreferrer')}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
-                  >
-                    새 창에서 열기
-                  </button>
-                  <button
-                    onClick={() => handleCopyTabletUrl(previewTabletIdRef.current as string)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
-                  >
-                    주소 복사
-                  </button>
-                </>
-              )}
-              <button
-                onClick={handleClosePreview}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap"
-              >
-                <X className="w-4 h-4" /> 닫기
-              </button>
-            </div>
-          </div>
-          {/* kiosk-core 재사용 (Router 중첩 금지 → slug prop 직접 주입). 휴대전화 보기 = 390px 프레임. */}
-          <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'auto' }} className="flex justify-center">
-            <div
-              style={
-                previewView === 'mobile'
-                  ? { position: 'relative', width: 390, maxWidth: '100%', height: '100%', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)', background: '#fff', overflow: 'hidden' }
-                  : { position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }
-              }
-            >
-              <TabletKioskPage
-                api={previewApi}
-                slug={previewSlug}
-                displaySettings={previewSettings}
-                showQrBadge={previewSettings?.showQr !== false}
-                embedded
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {previewOpen && previewSlug && <StoreTabletPreview
+        previewSlug={previewSlug}
+        previewView={previewView}
+        previewSettings={previewSettings}
+        previewApi={previewApi}
+        tabletId={previewTabletIdRef.current}
+        storeSlug={storeSlug}
+        publicUrl={previewTabletIdRef.current ? publicTabletUrl(previewTabletIdRef.current) : ''}
+        onCopy={() => { if (previewTabletIdRef.current) handleCopyTabletUrl(previewTabletIdRef.current); }}
+        onClose={handleClosePreview}
+        onViewChange={setPreviewView}
+      />}
 
       {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 '화면 바꾸기' 모달 */}
       {swapCorner && (

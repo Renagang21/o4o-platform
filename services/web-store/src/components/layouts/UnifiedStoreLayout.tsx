@@ -24,6 +24,7 @@ import { authClient, useAuth } from '../../contexts/AuthContext';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { fetchStoreCapabilities } from '../../api/storeHub';
 import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
+import { StoreWorkspaceShell } from './StoreWorkspaceShell';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import {
   SERVICE_LABEL,
@@ -65,16 +66,18 @@ export function StoreAgreementGate({ serviceKey, children }: { serviceKey: Unifi
 }
 
 /** 사이드바 + 본문(Outlet) — 내 매장 / 서비스 업무가 공유하는 골격 */
-export function StoreWorkDashboard({ config, withCapabilities = false }: { config: StoreDashboardConfig; withCapabilities?: boolean }) {
+export function StoreWorkDashboard({ config, withCapabilities = false, workspace = false, serviceWorkConfig, children }: { config: StoreDashboardConfig; withCapabilities?: boolean; workspace?: boolean; serviceWorkConfig?: StoreDashboardConfig; children?: ReactNode }) {
   const { user, logout } = useAuth();
   const { organizationName, stores, organizationId } = useUnifiedStore();
   const isStaff = stores.some(store => store.organizationId === organizationId && store.memberRole === 'staff');
   const visibleConfig = isStaff ? { ...config, menuSections: config.menuSections?.map(section => ({ ...section, items: section.items.filter(item => item.key !== 'members') })) } : config;
   const navigate = useNavigate();
   const caps = useStoreCapabilities(withCapabilities ? fetchStoreCapabilities : undefined);
+  const resolvedConfig = resolveStoreMenu(visibleConfig, caps);
+  if (workspace) return <StoreWorkspaceShell config={resolvedConfig} organizationName={organizationName ?? undefined} serviceWorkConfig={serviceWorkConfig}>{children}</StoreWorkspaceShell>;
   return (
     <StoreDashboardLayout
-      config={resolveStoreMenu(visibleConfig, caps)}
+      config={resolvedConfig}
       hideTopBar
       userName={user ? getUserDisplayName(user) : ''}
       orgName={organizationName ?? undefined}
@@ -87,14 +90,14 @@ export function StoreWorkDashboard({ config, withCapabilities = false }: { confi
 export default function UnifiedStoreLayout() {
   // 서비스 고정(§21-13)이 있으면 그 서비스, 없으면 공통 우선순위 문맥으로 이용계약 게이트를 통과한다.
   const { effectiveServiceKey, scopedServiceKey } = useUnifiedStore();
-  const { pathname, search, hash } = useLocation();
+  const { pathname, search, hash, state } = useLocation();
   if (useRetiredOnlyStore()) return <RetiredServiceNotice />;
   // 서비스 지정 화면으로 고정된 상태에서 `/store/...` 링크를 따라오면 서비스가 보이는 URL 로 옮긴다(§21-14).
   const scopedPath = toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`);
-  if (scopedPath) return <Navigate to={scopedPath} replace />;
+  if (scopedPath) return <Navigate to={scopedPath} state={state} replace />;
   return (
     <StoreAgreementGate serviceKey={effectiveServiceKey}>
-      <StoreWorkDashboard config={storeMenuFor(effectiveServiceKey, UNIFIED_STORE_CONFIG)} withCapabilities />
+      <StoreWorkDashboard config={storeMenuFor(effectiveServiceKey, UNIFIED_STORE_CONFIG)} withCapabilities workspace />
     </StoreAgreementGate>
   );
 }
@@ -145,7 +148,7 @@ export function ServiceStoreLayout() {
   };
   const body = (
     <StoreAgreementGate serviceKey={serviceKey}>
-      <StoreWorkDashboard config={config} withCapabilities />
+      <StoreWorkDashboard config={config} withCapabilities workspace />
     </StoreAgreementGate>
   );
   return mount.ownerOnly ? <ServiceRoleOnly serviceKey={serviceKey}>{body}</ServiceRoleOnly> : body;
@@ -178,11 +181,7 @@ export function ServiceRoleOnly({ serviceKey, roles, children }: { serviceKey: U
   );
 }
 
-/**
- * 매장 경영자 전용 화면 — 각 서비스 앱의 owner-only 가드와 같은 규칙(현재 서비스 문맥 기준).
- *   KPA 는 `/store/my-products` · `/handled-products` · `/commerce/local-products` · `/products/multilingual/*`
- *   를 `PharmacyOwnerOnlyGuard` 로 막는다 — 옮긴 화면에서도 같은 권한 동작을 보존한다.
- */
+/** 구성원 관리 등 경영자 전용 화면. 일반 직원 업무 라우트는 이 가드로 감싸지 않는다. */
 export function StoreOwnerOnly({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { effectiveServiceKey, stores, organizationId } = useUnifiedStore();
