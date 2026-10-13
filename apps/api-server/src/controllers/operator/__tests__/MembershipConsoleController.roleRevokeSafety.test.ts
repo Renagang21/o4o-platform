@@ -66,12 +66,13 @@ jest.mock('../../../utils/logger.js', () => ({
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() },
 }));
 
+const mockAssignRole = jest.fn();
 const mockRemoveRole = jest.fn();
 const mockGetUsersWithRole = jest.fn();
 jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
   roleAssignmentService: {
     removeRole: (...args: any[]) => mockRemoveRole(...args),
-    assignRole: jest.fn(),
+    assignRole: (...args: any[]) => mockAssignRole(...args),
     getRoleNames: jest.fn(),
     getUsersWithRole: (...args: any[]) => mockGetUsersWithRole(...args),
   },
@@ -555,5 +556,123 @@ it('bare role resolving to a PH database catalog entry cannot be assigned', asyn
  await controller.assignMemberRole(req, response);
  expect(response.status).toHaveBeenCalledWith(410);
  expect(mockQuery.mock.calls.some(([sql]) => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
+
+});
+
+
+describe.each(['assign', 'remove'] as const)('%s catalogue resolution preserves endpoint boundaries', operation => {
+  function roleEntry(name: string, serviceKey = 'neture', isAssignable = true) {
+    return { name, serviceKey, roleKey: 'member', isAdminRole: false, isAssignable };
+  }
+  async function invoke(role: string, scope = NETURE_OPERATOR_SCOPE) {
+    const req: any = makeReq(TARGET_ID, role, scope);
+    req.body = { role };
+    const res = makeRes();
+    await (operation === 'assign' ? controller.assignMemberRole : controller.removeMemberRole)(req, res);
+    return res;
+  }
+  beforeEach(() => {
+    mockGetRoleByName.mockReset();
+    mockAssignRole.mockReset().mockResolvedValue({ id: 'fixture-assignment' });
+  });
+
+  it('exact catalogue hit does not add prefix queries and writes the original requested role', async () => {
+    mockGetRoleByName.mockResolvedValue(roleEntry('neture:member'));
+    const res = await invoke('neture:member');
+    expect(mockGetRoleByName.mock.calls).toEqual([['neture:member']]);
+    if (operation === 'assign') {
+      expect(mockAssignRole).toHaveBeenCalledWith({ userId: TARGET_ID, role: 'neture:member', assignedBy: REQUESTER_ID });
+    } else {
+      expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'neture:member');
+    }
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it('missing bare role tries prefixes in order and stops at the first hit', async () => {
+    mockGetRoleByName.mockImplementation(async name => name === 'neture:member' ? roleEntry(name) : null);
+    const res = await invoke('member', { ...NETURE_OPERATOR_SCOPE, rolePrefixes: ['missing', 'neture', 'unused'] });
+    expect(mockGetRoleByName.mock.calls).toEqual([['member'], ['missing:member'], ['neture:member']]);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    if (operation === 'assign') expect(mockAssignRole).toHaveBeenCalledWith(expect.objectContaining({ role: 'member' }));
+    else expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'member');
+  });
+
+  it('bare collision with another service re-searches inside the caller prefixes', async () => {
+    mockGetRoleByName.mockImplementation(async name => name === 'member'
+      ? roleEntry('member', 'lecture') : roleEntry('neture:member'));
+    const res = await invoke('member');
+    expect(mockGetRoleByName.mock.calls).toEqual([['member'], ['neture:member']]);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it('collision without an in-scope hit remains forbidden and makes no assignment/revocation', async () => {
+    mockGetRoleByName.mockImplementation(async name => name === 'member' ? roleEntry(name, 'lecture') : null);
+    const res = await invoke('member');
+    expect(mockGetRoleByName.mock.calls).toEqual([['member'], ['neture:member']]);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockAssignRole).not.toHaveBeenCalled();
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('missing explicit prefix returns Invalid role without fallback', async () => {
+    mockGetRoleByName.mockResolvedValue(null);
+    const res = await invoke('neture:missing');
+    expect(mockGetRoleByName.mock.calls).toEqual([['neture:missing']]);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ success: false, error: 'Invalid role' });
+    expect(mockAssignRole).not.toHaveBeenCalled();
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('catalogue failure stays an endpoint error and never reaches a role write', async () => {
+    mockGetRoleByName.mockRejectedValue(new Error('fixture catalogue failure'));
+    const res = await invoke('neture:member');
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ success: false, error: 'fixture catalogue failure' });
+    expect(mockAssignRole).not.toHaveBeenCalled();
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('assignment checks assignability while revocation can remove that same role', async () => {
+    mockGetRoleByName.mockResolvedValue(roleEntry('neture:member', 'neture', false));
+    const res = await invoke('neture:member');
+    if (operation === 'assign') {
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({ success: false, error: 'This role is not assignable' });
+      expect(mockAssignRole).not.toHaveBeenCalled();
+    } else {
+      expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'neture:member');
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    }
+  });
+
+  it('missing bare role exhausts the caller prefixes without writing', async () => {
+    mockGetRoleByName.mockResolvedValue(null);
+    const res = await invoke('missing');
+    expect(mockGetRoleByName.mock.calls).toEqual([['missing'], ['neture:missing']]);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(mockAssignRole).not.toHaveBeenCalled();
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('platform catalogue hit bypasses collision re-search and preserves the bare request', async () => {
+    mockGetRoleByName.mockResolvedValue(roleEntry('member', 'lecture'));
+    const res = await invoke('member', PLATFORM_SCOPE);
+    expect(mockGetRoleByName.mock.calls).toEqual([['member']]);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+  });
+
+  it('resolved prefix exception remains specific to revocation when catalogue and canonical keys differ', async () => {
+    mockGetRoleByName.mockImplementation(async name => name === 'kpa:member' ? roleEntry(name, 'kpa') : null);
+    const res = await invoke('member', { isPlatformAdmin: false, serviceKeys: ['kpa-society'], rolePrefixes: ['kpa'] });
+    expect(mockGetRoleByName.mock.calls).toEqual([['member'], ['kpa:member']]);
+    if (operation === 'assign') {
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(mockAssignRole).not.toHaveBeenCalled();
+    } else {
+      expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'member');
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    }
+  });
 
 });
