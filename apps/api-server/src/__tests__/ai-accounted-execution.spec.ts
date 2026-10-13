@@ -79,3 +79,44 @@ it('uses the admission price version even if configured prices change during a p
   expect(h.save).toHaveBeenCalledWith(expect.objectContaining({costEstimated:0.0000065}));
   expect(h.quota.settle).toHaveBeenCalledWith(expect.anything(),expect.anything(),expect.any(Function),expect.objectContaining({detail:expect.objectContaining({price:expect.objectContaining({version:'legacy-provider-estimate-v1'})})}));
 });
+
+it('resolves primary then fallback configuration once before quota admission and uses their resolved values', async () => {
+  const h = harness();
+  const order: string[] = [];
+  const config = jest.fn(async () => { order.push('primary-config'); return primary.config; });
+  const fallbackConfig = jest.fn(async () => { order.push('fallback-config'); return fallback.config; });
+  h.quota.reserve.mockImplementationOnce(async () => { order.push('reserve'); return { id: 'reservation', warnings: [] }; });
+  mockExecute.mockImplementationOnce(async request => { order.push('execute'); expect(request.config).toEqual(primary.config); return response; });
+  await h.service.invoke({ ...primary, config }, account, { ...fallback, config: fallbackConfig });
+  expect(order).toEqual(['primary-config', 'fallback-config', 'reserve', 'execute']);
+  expect(config).toHaveBeenCalledTimes(1);
+  expect(fallbackConfig).toHaveBeenCalledTimes(1);
+});
+it('retains fallback capacity but does not call an unconfigured fallback after primary failure', async () => {
+  const h = harness();
+  const failure = new Error('primary-failure');
+  mockExecute.mockRejectedValueOnce(failure);
+  await expect(h.service.invoke(primary, account, { ...fallback, config: { ...fallback.config, apiKey: '' } })).rejects.toBe(failure);
+  expect(h.quota.reserve).toHaveBeenCalledWith(account.scope, account.userId, expect.objectContaining({ tokens: 60 }), expect.anything(), undefined);
+  expect(mockExecute).toHaveBeenCalledTimes(1);
+  expect(h.quota.settle).not.toHaveBeenCalled();
+});
+it('returns an already generated response when its model has no catalog rate, preserving the reservation without fallback', async () => {
+  const h = harness();
+  process.env.AI_PRICING_CATALOG = JSON.stringify({ version: 'exact-v1', rates: [
+    { provider: 'gemini', model: 'primary', currency: 'USD', inputPerMillion: 1, outputPerMillion: 2 },
+    { provider: 'openai', model: 'fallback', currency: 'USD', inputPerMillion: 1, outputPerMillion: 2 },
+  ] });
+  const generated = { ...response, model: 'unpriced-response-model' };
+  mockExecute.mockResolvedValueOnce(generated);
+  await expect(h.service.invoke(primary, account, fallback)).resolves.toBe(generated);
+  expect(mockExecute).toHaveBeenCalledTimes(1);
+  expect(h.quota.settle).not.toHaveBeenCalled();
+});
+it('combines unknown primary usage with failed fallback retries without retaining a second request count', async () => {
+  const h = harness();
+  mockExecute.mockRejectedValueOnce(new Error('primary timeout')).mockResolvedValueOnce({ ...response, model: 'fallback', attempts: 2 });
+  await h.service.invoke(primary, account, { ...fallback, retry: { ...fallback.retry, maxAttempts: 2 } });
+  expect(h.quota.settle).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ requests: 1, tokens: 7 }), expect.any(Function), expect.objectContaining({ uncertain: expect.objectContaining({ requests: 0, tokens: 60 }) }));
+  expect(mockExecute).toHaveBeenCalledTimes(2);
+});

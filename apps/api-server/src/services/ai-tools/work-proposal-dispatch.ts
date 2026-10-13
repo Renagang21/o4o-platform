@@ -12,6 +12,7 @@ import {
   describeObservationElement,
   fingerprintObservation,
   type WorkProposal,
+  type WorkAction,
   type WorkObservation,
   type WorkStepRecord,
 } from './work-agent-contract.js';
@@ -20,20 +21,78 @@ import type { WorkAgentRunResult } from './work-agent-runtime.js';
 import type { WorkDispatchContext } from './work-execution-types.js';
 import type { issueDomCommand } from './browser-dom-executor.js';
 const READ_SUMMARY_MAX = 600;
+type ReadContext = Pick<
+  WorkDispatchContext,
+  | 'state'
+  | 'surface'
+  | 'lastRead'
+  | 'stepMeta'
+  | 'currentActor'
+  | 'observe'
+  | 'observeFailed'
+  | 'dom'
+  | 'takeoverWith'
+>;
+type UnitContext = Pick<
+  WorkDispatchContext,
+  | 'state'
+  | 'unitCapable'
+  | 'overTime'
+  | 'budgetLeft'
+  | 'takeover'
+  | 'runUnit'
+  | 'observe'
+  | 'observeFailed'
+  | 'execActOnce'
+  | 'takeoverWith'
+  | 'lastActRecord'
+  | 'applyDomObservation'
+  | 'unitObserveError'
+  | 'reobserve'
+>;
+type SingleContext = Pick<
+  WorkDispatchContext,
+  | 'state'
+  | 'overTime'
+  | 'budgetLeft'
+  | 'takeover'
+  | 'execActOnce'
+  | 'takeoverWith'
+  | 'lastActRecord'
+  | 'lastRejectReason'
+  | 'stepMeta'
+  | 'currentActor'
+  | 'reobserve'
+  | 'observeFailed'
+>;
+const NOT_HANDLED = Symbol('not-handled');
+type PhaseResult = WorkAgentRunResult | null | typeof NOT_HANDLED;
+
 /** Execute a validated proposal. null asks the existing planner loop to continue. */
 export async function dispatchWorkProposal(
   ctx: WorkDispatchContext,
   proposal: WorkProposal,
 ): Promise<WorkAgentRunResult | null> {
-  // Act (§14·§16). snapshot 은 직전 관찰과 짝이다. 비-행동(inspect·find·read_*)은 배치 대상이 아니라 표면별로 여기서 처리하고,
-  // 행동(act-only)은 단발 또는 Fast Loop 배치로 execActOnce 에 위임한다.
+  // Use the same context reference: history, lastRead and observation remain owned by the session.
   const snapshotId =
-    (
-      ctx.state.observation as WorkObservation & {
-        snapshotId?: string;
-      }
-    )?.snapshotId ?? '';
-  const a = proposal.action;
+    (ctx.state.observation as WorkObservation & { snapshotId?: string })
+      ?.snapshotId ?? '';
+  const read = await dispatchRead(ctx, proposal.action, snapshotId);
+  if (read !== NOT_HANDLED) return read;
+  const steps =
+    proposal.batch && proposal.batch.length > 1
+      ? proposal.batch
+      : [proposal.action];
+  const unit = await dispatchUnit(ctx, steps, snapshotId);
+  if (unit !== NOT_HANDLED) return unit;
+  return dispatchSingle(ctx, steps, snapshotId);
+}
+
+async function dispatchRead(
+  ctx: ReadContext,
+  a: WorkAction,
+  snapshotId: string,
+): Promise<PhaseResult> {
   // ── inspect — 두 표면 공통: 재관찰. ──
   if (a.kind === 'inspect') {
     const rec: WorkStepRecord = {
@@ -219,11 +278,14 @@ export async function dispatchWorkProposal(
       (rows.length > 8 ? `\n… (전체 ${rows.length}행)` : '');
     return null;
   }
-  // ── 행동(act) — 단발 또는 Fast Loop 배치(§7). 배치는 act-only 최대 WORK_BATCH_MAX 개를 연속 실행하되, 각 행동 전에 예산·안전을
-  //    재확인하고 화면 변화(이동·변경·오류·대상 상실·숨은 목록)면 즉시 중단하고 한 번만 재관찰한다 — 한 동작마다 AI 를 부르지 않는 축이다.
-  //    execActOnce 가 UIA/visual/DOM 명령·오류 해석·인계 판단을 모두 담고, 여기서는 배치 진행/중단/재관찰만 조율한다.
-  const steps =
-    proposal.batch && proposal.batch.length > 1 ? proposal.batch : [a];
+  return NOT_HANDLED;
+}
+
+async function dispatchUnit(
+  ctx: UnitContext,
+  steps: WorkAction[],
+  snapshotId: string,
+): Promise<PhaseResult> {
   // Phase E — DOM 행동 묶음을 작업 단위 하나로: 노드가 행동들을 잇고, 화면이 바뀌거나 실패하면 거기서 멈춘 뒤 관찰까지 해서
   // 돌려준다(행동 n + 재관찰 2 왕복 → 1). 같은 snapshot 의 ref 만 쓴다 — 화면이 바뀐 뒤의 ref 는 노드가 쓰지 않는다(reobserve).
   // 각 행동의 기록 · 오류 해석 · 인계는 단발과 같은 execActOnce 를 지난다. 노드가 형상을 거절하면(denied) 아래 단발 경로로 같은 일을 한다.
@@ -317,6 +379,14 @@ export async function dispatchWorkProposal(
     }
     // denied — 노드가 아무것도 실행하지 않았다. 아래 단발 경로로.
   }
+  return NOT_HANDLED;
+}
+
+async function dispatchSingle(
+  ctx: SingleContext,
+  steps: WorkAction[],
+  snapshotId: string,
+): Promise<WorkAgentRunResult | null> {
   let pendingObserve: {
     navigated: boolean;
   } | null = null;

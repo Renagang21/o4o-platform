@@ -1,3 +1,4 @@
+import { buildHomeChatToolPresentation } from './ai-proxy/home-chat-tool-presentation.js';
 import { fetchUrlText, fetchUrlContent, deriveTitleFromBlocks, detectUsageConditions, UsageWarning } from "./ai-proxy/url-content.js";
 /**
  * AI Proxy Routes
@@ -55,7 +56,7 @@ import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import { runAssistantWorkTask } from '../services/assistant/personal-assistant.js';
 import type { ExecutionIntent, ExecutionReport } from '../services/ai-tools/work-agent-contract.js';
-import { selectToolInvocationForRequest, executeAiTool, renderToolContext, computerRequestGap, domRequestGap, isDomToolName, isSupplierToolName, pharmacyWebRequestGap, supplierRequestGap, needsLocalDeviceResolution } from '../services/ai-tools/ai-tool-router.js';
+import { selectToolInvocationForRequest, executeAiTool, renderToolContext, computerRequestGap, domRequestGap, pharmacyWebRequestGap, supplierRequestGap, needsLocalDeviceResolution } from '../services/ai-tools/ai-tool-router.js';
 import { AI_TOOL_NAMES, assertToolAllowed, validateToolArguments, findToolDefinition, type VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import { resolveAiTarget, normalizeAiError, aiErrorUserMessage } from '../utils/ai-provider-runtime.js';
 /** Home AI 타임아웃 — reasoning 계열은 provider 기본 10s 로는 끊긴다. */
@@ -1342,51 +1343,9 @@ async function performHomeChat(
       executedTool = selected.tool;
       toolOutcome = toolResult.ok ? 'allowed' : toolResult.reason;
       toolContextBlock = renderToolContext(toolResult);
-      // 프롬프트의 기본 금지 문장("어떤 작업도 실행하지 않습니다")은 창 축이 실행됐을 때
-      // 사실이 아니다. 실제로 수행한 동작을 프롬프트에 반영하지 않으면 모델이 그 동작을
-      // 부인한다 — 2026-09-10 프로덕션 실측.
-      if (toolContextBlock) {
-        if (selected.tool === AI_TOOL_NAMES.ACTIVATE_WINDOW) facts.windowsAppAction = 'activate';
-        else if (selected.tool === AI_TOOL_NAMES.FIND_APPLICATION) facts.windowsAppAction = 'inspect';
-        // BROWSER-CONTROL-V0: 사이트 축도 같은 이유로 실제 수행 동작을 프롬프트에 반영한다.
-        else if (selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE) facts.browserAction = 'open';
-        else if (selected.tool === AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS) facts.browserAction = 'inspect';
-        // COMPUTER-USE-V0 §38: 화면 조작 축도 실제 수행 동작을 프롬프트에 반영한다.
-        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_INSPECT) facts.computerAction = 'inspect';
-        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_CLICK) facts.computerAction = 'click';
-        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT) facts.computerAction = 'type_text';
-        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_KEY) facts.computerAction = 'key';
-        // BROWSER-DOM-CONTROL-V0 §32·§34: DOM 축은 읽기/상호작용 두 갈래로만 프롬프트에 반영하고,
-        // 페이지에서 읽은 텍스트는 renderer 가 [webpage] 블록(source=webpage)으로 표시한다.
-        // SUPPLIER-SITE-ADAPTER-V0 §26·§34: 공급처 축은 읽었다/막혔다 두 갈래로만 프롬프트에 반영한다.
-        else if (isSupplierToolName(selected.tool)) {
-          facts.supplierLookup = toolResult.data?.available === true ? 'read' : 'blocked';
-        }
-        // PHARMACY-WEB-CORE V0 §31·§44: 약국 웹 축은 읽었다/막혔다 두 갈래로만 프롬프트에 반영한다.
-        else if (selected.tool === AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT) {
-          facts.pharmacyWebAction = toolResult.data?.available === true ? 'read' : 'blocked';
-        }
-        else if (isDomToolName(selected.tool)) {
-          facts.browserDomAction = toolResult.data?.available === true
-            ? (selected.tool === AI_TOOL_NAMES.DOM_SET_INPUT ||
-               selected.tool === AI_TOOL_NAMES.DOM_SELECT_OPTION ||
-               selected.tool === AI_TOOL_NAMES.DOM_CLICK
-                ? 'interact'
-                : 'read')
-            : 'blocked';
-        }
-      }
-      if (
-        selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE &&
-        toolResult.ok &&
-        toolResult.data?.available === true &&
-        toolResult.data?.opened === true
-      ) {
-        browserSiteOpened = {
-          siteId: String(toolResult.data.siteId ?? ''),
-          displayName: String(toolResult.data.displayName ?? ''),
-        };
-      }
+      const presentation = buildHomeChatToolPresentation(selected.tool, toolResult, !!toolContextBlock);
+      Object.assign(facts, presentation.facts);
+      browserSiteOpened = presentation.browserSiteOpened;
     }
 
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:

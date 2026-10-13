@@ -6,12 +6,17 @@ import {
   AIUsageStatus,
   type AIProvider,
 } from '../../entities/AIUsageLog.js';
-import { AiQuotaService, type AiQuotaUsage } from './ai-quota.service.js';
+import {
+  AiQuotaService,
+  type AiQuotaUsage,
+  type AiQuotaReservation,
+} from './ai-quota.service.js';
 import {
   loadAiPriceCatalog,
   resolveAiPrice,
   estimateAiCost,
   type AiPriceSnapshot,
+  type AiPriceCatalog,
 } from './ai-pricing.js';
 import type { AiPolicyScope } from './ai-policy-scope.js';
 
@@ -20,6 +25,72 @@ export interface AiAccountingContext {
   serviceKey?: string;
   userId?: string;
 }
+type ResolvedConfig = Exclude<ExecuteRequest['config'], () => unknown>;
+type PreparedAttempt = Readonly<{
+  request: ExecuteRequest;
+  config: ResolvedConfig;
+  provider: string;
+  price: AiPriceSnapshot;
+  inputTokens: number;
+  maxTokens: number;
+  budget: AiQuotaUsage;
+}>;
+type PreparedInvocation = Readonly<{
+  catalog: AiPriceCatalog;
+  primary: PreparedAttempt;
+  fallback?: PreparedAttempt;
+}>;
+type ProviderOutcome = Readonly<{
+  result: ExecuteResult;
+  provider: string;
+  uncertain?: AiQuotaUsage;
+}>;
+
+function attemptBudget(
+  attempt: Pick<PreparedAttempt, 'price' | 'inputTokens' | 'maxTokens'>,
+  count: number,
+): AiQuotaUsage {
+  return {
+    requests: 0,
+    tokens: (attempt.inputTokens + attempt.maxTokens) * count,
+    cost: estimateAiCost(
+      attempt.price,
+      attempt.inputTokens * count,
+      attempt.maxTokens * count,
+    ),
+  };
+}
+function sumBudgets(
+  primary: AiQuotaUsage,
+  fallback?: AiQuotaUsage,
+): AiQuotaUsage {
+  return {
+    requests: 0,
+    tokens: primary.tokens + (fallback?.tokens ?? 0),
+    cost: Math.round((primary.cost + (fallback?.cost ?? 0)) * 1e8) / 1e8,
+  };
+}
+function prepareAttempt(
+  request: ExecuteRequest,
+  config: ResolvedConfig,
+  price: AiPriceSnapshot,
+  maxAttempts: number,
+  maxTokens: number,
+): PreparedAttempt {
+  const inputTokens =
+    Buffer.byteLength(request.systemPrompt, 'utf8') +
+    Buffer.byteLength(request.userPrompt, 'utf8');
+  const attempt = {
+    request,
+    config,
+    provider: request.provider ?? 'gemini',
+    price,
+    inputTokens,
+    maxTokens,
+  };
+  return { ...attempt, budget: attemptBudget(attempt, maxAttempts) };
+}
+
 export class AiAccountedExecution {
   constructor(
     private dataSource: DataSource,
@@ -31,6 +102,34 @@ export class AiAccountedExecution {
     account: AiAccountingContext,
     fallback?: ExecuteRequest,
   ): Promise<ExecuteResult> {
+    const plan = await this.prepare(request, fallback);
+    const reservation = await this.quota.reserve(
+      account.scope,
+      account.userId,
+      {
+        ...sumBudgets(plan.primary.budget, plan.fallback?.budget),
+        requests: 1,
+      },
+      plan.fallback
+        ? [plan.primary.price, plan.fallback.price]
+        : [plan.primary.price],
+      account.serviceKey,
+    );
+    if (reservation.warnings.length)
+      console.warn('[AiPolicy] quota nearing limit', {
+        scope: account.scope,
+        count: reservation.warnings.length,
+      });
+    const outcome = await this.callProviders(plan, account, reservation);
+    await this.settleResult(plan, outcome, account, reservation);
+    return outcome.result;
+  }
+
+  private async prepare(
+    request: ExecuteRequest,
+    fallback?: ExecuteRequest,
+  ): Promise<PreparedInvocation> {
+    // Preserve resolver order and validate both paths before admission or any paid call.
     const config =
       typeof request.config === 'function'
         ? await request.config()
@@ -40,7 +139,6 @@ export class AiAccountedExecution {
         ? await fallback.config()
         : fallback.config
       : undefined;
-    const provider = request.provider ?? 'gemini';
     if (!config.apiKey) throw new Error('AI_NOT_CONFIGURED');
     const maxAttempts = request.retry?.maxAttempts ?? 2;
     const maxTokens = config.maxTokens ?? 2048;
@@ -56,7 +154,11 @@ export class AiAccountedExecution {
     )
       throw new Error('AI_POLICY_INVALID');
     const catalog = loadAiPriceCatalog();
-    const price = resolveAiPrice(catalog, provider, config.model);
+    const price = resolveAiPrice(
+      catalog,
+      request.provider ?? 'gemini',
+      config.model,
+    );
     const fallbackPrice =
       fallback && fallbackConfig
         ? resolveAiPrice(
@@ -65,74 +167,52 @@ export class AiAccountedExecution {
             fallbackConfig.model,
           )
         : undefined;
-    const inputTokens =
-      Buffer.byteLength(request.systemPrompt, 'utf8') +
-      Buffer.byteLength(request.userPrompt, 'utf8');
-    const budgetFor = (
-      rate: AiPriceSnapshot,
-      attempts: number,
-      outputTokens: number,
-      input = inputTokens,
-    ): AiQuotaUsage => ({
-      requests: 0,
-      tokens: (input + outputTokens) * attempts,
-      cost: estimateAiCost(rate, input * attempts, outputTokens * attempts),
-    });
-    const primaryBudget = budgetFor(price, maxAttempts, maxTokens);
-    const fallbackInput = fallback
-      ? Buffer.byteLength(fallback.systemPrompt, 'utf8') +
-        Buffer.byteLength(fallback.userPrompt, 'utf8')
-      : 0;
-    const fallbackBudget = fallbackPrice
-      ? budgetFor(
-          fallbackPrice,
-          fallbackAttempts,
-          fallbackMaxTokens,
-          fallbackInput,
-        )
-      : { requests: 0, tokens: 0, cost: 0 };
-    const reservation = await this.quota.reserve(
-      account.scope,
-      account.userId,
-      {
-        requests: 1,
-        tokens: primaryBudget.tokens + fallbackBudget.tokens,
-        cost:
-          Math.round((primaryBudget.cost + fallbackBudget.cost) * 1e8) / 1e8,
-      },
-      fallbackPrice ? [price, fallbackPrice] : [price],
-      account.serviceKey,
+    const primary = prepareAttempt(
+      request,
+      config,
+      price,
+      maxAttempts,
+      maxTokens,
     );
-    if (reservation.warnings.length)
-      console.warn('[AiPolicy] quota nearing limit', {
-        scope: account.scope,
-        count: reservation.warnings.length,
-      });
+    const alternate =
+      fallback && fallbackConfig && fallbackPrice
+        ? prepareAttempt(
+            fallback,
+            fallbackConfig,
+            fallbackPrice,
+            fallbackAttempts,
+            fallbackMaxTokens,
+          )
+        : undefined;
+    return { catalog, primary, fallback: alternate };
+  }
+
+  private async callProviders(
+    plan: PreparedInvocation,
+    account: AiAccountingContext,
+    reservation: AiQuotaReservation,
+  ): Promise<ProviderOutcome> {
     const start = Date.now();
+    const { primary, fallback } = plan;
     let result: ExecuteResult | undefined;
-    let actualProvider = provider;
+    let provider = primary.provider;
     let uncertain: AiQuotaUsage | undefined;
     try {
-      result = await execute({ ...request, config });
+      result = await execute({ ...primary.request, config: primary.config });
       if ((result.attempts ?? 1) > 1)
-        uncertain = budgetFor(price, (result.attempts ?? 1) - 1, maxTokens);
+        uncertain = attemptBudget(primary, (result.attempts ?? 1) - 1);
     } catch (primaryError) {
-      if (fallback && fallbackConfig?.apiKey && fallbackPrice) {
+      if (fallback?.config.apiKey) {
         try {
-          result = await execute({ ...fallback, config: fallbackConfig });
-          actualProvider = fallback.provider ?? 'gemini';
-          const retryBudget = budgetFor(
-            fallbackPrice,
-            (result.attempts ?? 1) - 1,
-            fallbackMaxTokens,
-            fallbackInput,
+          result = await execute({
+            ...fallback.request,
+            config: fallback.config,
+          });
+          provider = fallback.provider;
+          uncertain = sumBudgets(
+            primary.budget,
+            attemptBudget(fallback, (result.attempts ?? 1) - 1),
           );
-          uncertain = {
-            requests: 0,
-            tokens: primaryBudget.tokens + retryBudget.tokens,
-            cost:
-              Math.round((primaryBudget.cost + retryBudget.cost) * 1e8) / 1e8,
-          };
         } catch {
           console.warn('[AiPolicy] fallback unavailable', {
             scope: account.scope,
@@ -141,13 +221,13 @@ export class AiAccountedExecution {
         }
       }
       if (!result) {
-        // Responses lost to timeout/parsing may still be billable; preserve the reservation for verified reconciliation.
+        // Responses lost to timeout/parsing may still be billable; retain the reservation for reconciliation.
         try {
           await this.record(
             this.dataSource.manager,
             account,
-            provider,
-            config.model,
+            primary.provider,
+            primary.config.model,
             undefined,
             Date.now() - start,
           );
@@ -164,19 +244,25 @@ export class AiAccountedExecution {
         throw primaryError;
       }
     }
+    return { result, provider, uncertain };
+  }
+
+  private async settleResult(
+    plan: PreparedInvocation,
+    outcome: ProviderOutcome,
+    account: AiAccountingContext,
+    reservation: AiQuotaReservation,
+  ): Promise<void> {
+    const { result, provider } = outcome;
+    let { uncertain } = outcome;
     try {
-      const actualPrice = resolveAiPrice(catalog, actualProvider, result.model);
+      const actualPrice = resolveAiPrice(plan.catalog, provider, result.model);
       const promptTokens = result.promptTokens ?? 0,
         completionTokens = result.completionTokens ?? 0;
       const cost = estimateAiCost(actualPrice, promptTokens, completionTokens);
       if (promptTokens === 0 && completionTokens === 0 && result.content) {
         // An omitted usage report is unknown usage, not proof that a nonempty generation was free.
-        uncertain = {
-          requests: 0,
-          tokens: primaryBudget.tokens + fallbackBudget.tokens,
-          cost:
-            Math.round((primaryBudget.cost + fallbackBudget.cost) * 1e8) / 1e8,
-        };
+        uncertain = sumBudgets(plan.primary.budget, plan.fallback?.budget);
       }
       await this.quota.settle(
         reservation,
@@ -185,10 +271,10 @@ export class AiAccountedExecution {
           this.record(
             manager,
             account,
-            actualProvider,
-            result!.model,
+            provider,
+            result.model,
             result,
-            result!.durationMs,
+            result.durationMs,
             cost,
           ),
         {
@@ -196,7 +282,7 @@ export class AiAccountedExecution {
           outcome: 'success',
           uncertain,
           detail: {
-            provider: actualProvider,
+            provider,
             model: result.model,
             price: actualPrice,
             attempts: result.attempts ?? 1,
@@ -204,13 +290,12 @@ export class AiAccountedExecution {
         },
       );
     } catch {
-      // A generated result must never trigger a second paid provider call due to a receipt/DB error.
+      // Receipt/DB errors after generation must never trigger another paid provider call.
       console.warn('[AiPolicy] usage reconciliation required', {
         scope: account.scope,
         reservationId: reservation.id,
       });
     }
-    return result;
   }
 
   private async record(
