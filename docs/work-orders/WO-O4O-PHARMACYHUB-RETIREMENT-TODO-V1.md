@@ -346,3 +346,5 @@ PR #522는 SonarCloud 정렬/복잡도 지적 수정, 관련 56 tests와 Postgre
 후속 삭제 준비: 기존 FK census에 포함되지 않는 주문 로그·결제 주문 귀속, 미디어 연결 대상의 PH 콘텐츠 귀속, 다른 서비스 자산의 동일 URL/GCS 경로 사용, Screen Set JSON의 URL 사용과 PH GCS 경로 건수를 추가 read-only 집계한다. 행 ID·URL·파일 경로·인증 정보는 출력하지 않는다. 필요한 컬럼이 없으면 명시적 schema blocker로 남기며 0건으로 해석하지 않는다. 이는 참조 조사를 보완하는 도구이며 전체 비-FK 참조 부재나 삭제 승인/완료를 뜻하지 않는다. 실제 운영 집계 결과를 확인한 뒤 후속 삭제 범위를 확정한다.
 
 PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐츠에서 출발하는 역방향 링크와 Neture/NULL 등 공유 자산의 연결도 집계한다. PH 콘텐츠 삭제 후 dangling entity_id 링크를 남기지 않도록 양방향 근거를 확보하며 공유 자산 자체는 삭제 대상으로 승격하지 않는다.
+
+PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`이며 아직 실제 인증서 삭제 완료는 아니다.

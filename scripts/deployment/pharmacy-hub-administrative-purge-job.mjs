@@ -23,7 +23,7 @@ async function github(path) {
   if(!response.ok)throw new Error('PH_JOB_GITHUB_GATE');
   return response.json();
 }
-async function gate() {
+export async function gate() {
   const e=process.env;
   if(e.GITHUB_REF!=='refs/heads/main'||e.WORKFLOW_ACTOR!==e.REPOSITORY_OWNER||
     !['plan','apply'].includes(e.CUTOVER_MODE)||!/^\d+$/.test(e.GITHUB_RUN_ID??''))throw new Error('PH_JOB_OWNER_MAIN_MODE');
