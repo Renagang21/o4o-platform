@@ -746,3 +746,13 @@ schema migration은 신규 incremental로 등록하고 기존 적용 이력은 �
 운영 순서: main 통합 후 standalone `demo_accounts=true,mode=plan`으로 실제 원장과 migration history를 읽는다. 직원 registry migration25는 연속 manifest의23/24 뒤에 있다. 다른 WO의 §10은23/24 운영 migration을 아직 승인하지 않았으므로 미적용이면 이번 Demo 지시를 근거로 함께 실행하지 않는다. 실제 read-only 결과와 구체 적용 영향을 확보하고 승인/협의한다. schema 적용 후 다시 plan하여 정확한 새 digest로 계정 전환하고, 그 이후5웹 app/eight origin을 배포·검증한다. 코드 main 통합을 데이터 전환/운영 검증 완료로 기록하지 않는다.
 
 운영 도구 분류: inventory에서 reconcile ACTIVE·구현 service module dependency·기존 foundation PAUSED로 등록했다. 현재 운영은 ACTIVE standalone plan/apply만 사용한다. 신규 foundation 생성·일반 계정/운영자 변경·별도 미승인 migration으로 범위를 넓히지 않는다.
+
+### 기존 경영자 레거시 역할 정합 — 2026-10-13
+
+PR #521은 head `cafd632499777334b2f99ec2996453ff5fa1c03a`의 CI Gate·최신 Codex 검토·미해결 스레드0을 확인해 정상 merge했다. main `f25b467a74e2b5733c2bf917e989936d5ecf2eb7`의 CI Pipeline·CodeQL도 성공했다. 운영 read-only plan run `38323977160`은 `PROTECTED_OR_FOREIGN_ROLE`로 중단했고 계정/credential/관계 쓰기와 신규 배포는 실행하지 않았다.
+
+기존 공개 Demo의 일반 로그인·self-read에서 경영자 역할은 `kpa:store_owner`와 `neture:store_owner`, 공급자는 `neture:supplier`로 확인했다. 경영자의 레거시 역할은 현행 정본 allowlist 밖이다. 기존 등록 경영자 Demo UUID에 한해서만 이 정확한 역할의 비활성화를 before-image와 계획 digest에 포함한다. 정상 `neture:store_owner`·승인된 단일 Demo 약국의 소유자 관계를 요구하며 전체관리자/운영자·다른 foreign role·provider 보호는 유지한다. 공급자/직원 또는 registry 밖 대상 identity에는 레거시 역할을 허용하지 않는다. 실행은 다른 credential·membership 변경과 같은 transaction 및 before/after 복구 snapshot 안에서 하고 세션을 폐기한다. 역할 row를 삭제하거나 legacy 역할을 새로 부여하지 않는다.
+
+T07의 코드 main 통합은 완료했으나 T04/T05의 운영 전환과 T08의 새3계정 운영48조건은 미완료다. 다음 순서는 이 운영 발견을 수정·격리 검증·PR review/CI/main 통합한 뒤 read-only plan을 다시 실행하고, 실제 schema history에 따라 승인 범위 내 migration·재계획·정확 digest apply·웹 배포·운영 검증이다. 같은 미완료 인증 WO/branch를 유지한다.
+
+검증: 격리 PostgreSQL 실제28조건 통과. 등록 경영자 레거시 역할의 read-only 계획·before/after 감사·현재 역할/매장 보존·멱등, 공급자/직원에서 동일 역할 거부, 운영자 권한 혼재 거부, 실패 시 레거시 역할까지 rollback을 확인했다. CLI 타입검사·문서 민감정보 검사(3878파일0건)·diff check 통과. 신규 운영 쓰기/배포/48조건은 아직 실행하지 않았다.

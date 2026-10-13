@@ -29,7 +29,7 @@
 | `check-tables.ts` | 범용 점검 CLI | `DB_USERNAME` 필수 (이 WO 에서 fallback 제거) |
 | `package.json` 에 등록된 CLI (`drug:candidate-import` · `hff:*` · `medical-device:*` · `guard:product-description` · `drug-master:promotion:*` · `migration:roles*` · `migration:member-dedup*` 등) | 실행 명령 존재 | `o4o_api` 로그인 없음 (계약 테스트 ③) |
 | `seed-lecture-service-and-roles.ts` · `community-catalog-promotion.ts` · `encryption-key-rotation.ts` · `cafe24-product-census.ts` · `pharmacy-hub-store-subject-provisioning.ts` · `audit-roles.ts` · `productmaster-landing-bulk-apply.ts` | 2026-08~09 WO 의 현행 CLI | `DB_USERNAME` env |
-| `demo-account-reconcile.ts` (`demo-account-reconcile.service.ts`는 import되는 구현 모듈이며 독립 실행 도구가 아님) | [인증 WO T01~T08](../../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md),2026-10-12 사용자 제공3계정·버튼·연결 데이터 전환 지시. main/owner workflow의 standalone `demo_accounts=true` 경로. 기본 read-only plan, 정확한 digest, ACTIVE registry UUID 보존·역할/provider 보호·제한 membership 유지·감사/rollback/멱등 검토 완료. 현행 Test Demo 범위만 실행 후보이며 migration은 별도 gate | `DB_USERNAME`·`DB_NAME` 필수, 기존 Cloud SQL/WIF/Secret Manager binding. 로그인 identity 기본값 없음 |
+| `demo-account-reconcile.ts` (`demo-account-reconcile.service.ts`는 import되는 구현 모듈이며 독립 실행 도구가 아님) | [인증 WO T01~T08](../../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md),2026-10-12 사용자 제공3계정·버튼·연결 데이터 전환 지시. main/owner workflow의 standalone `demo_accounts=true` 경로. 기본 read-only plan, 정확한 digest, ACTIVE registry UUID 보존·등록된 경영자 레거시 `kpa:store_owner`만 감사 transaction에서 비활성화·다른 역할/provider 보호·제한 membership 유지·감사/rollback/멱등 검토 완료. 현행 Test Demo 범위만 실행 후보이며 migration은 별도 gate | `DB_USERNAME`·`DB_NAME` 필수, 기존 Cloud SQL/WIF/Secret Manager binding. 로그인 identity 기본값 없음 |
 
 `package.json` 등록 CLI 중 현재도 쓰이는지는 개별 판정하지 않았다(실행 전 해당 WO 에서 확인).
 

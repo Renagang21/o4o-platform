@@ -1351,3 +1351,13 @@ main #522의 PH scoped purge workflow 추가 때문에 #521 mergeability가 dirt
 반대 도메인 관계 노출 지적 P1을 수용했다. 모든 identity의 active 조직 관계가 의도한 pharmacy owner/staff 또는 supplier owner만 가리키는지 확인한다. 매장 계정의 legacy supplier pointer도 기존 resolver에 둔 read-only probe로 확인하고 공유 credential 적용 전 거절한다. 기존 resolveSupplierForUser의 fallback logger로 private ID를 출력하지 않으며 probe는 supplier를 선택하거나 접근 권한을 주지 않는다. owner의 다른 supplier 소유, supplier의 store manager 관계, owner/staff legacy pointer4조건에서 변경 전 거절을 확인했다. 집중115/115(격리 DB22+공급자41+Google 은퇴17+Demo/provision35),3 CLI typecheck PASS. runtime supplier resolver의 기존 선택·fallback·권한 동작은 변경하지 않았다.
 
 inactive staff registry·직원 census 지적 P2 두 건을 수용했다. scoped user의 inactive registry가 있으면 plan에서 INACTIVE_DEMO_REGISTRY_REQUIRES_REVIEW로 중단하고 상태를 보존한다. 직원 user ID와 staff 조직 관계를 store_demo_count/membership 집계에 포함한다. 실 DB에서 inactive staff 중단·감사 write0, membership12행(store8/supplier4/unlinked0), role3행(store2/supplier1/unlinked0), owner/staff creator2행(store2/unlinked0)을 검증했다. 최초 test의 native ESM 직접 import는 CommonJS Jest parse 오류여서, transform/guard를 변경하지 않고 Node ESM child로 실제 SQL producer를 읽어 PG에서 실행했다. 최종 집중117/117(격리 DB24+공급자41+Google 은퇴17+Demo/provision35),Node census/cleanup24·CLI3 typecheck PASS.
+
+### 기존 경영자 레거시 역할 정합 — 2026-10-13
+
+PR #521은 head `cafd632499777334b2f99ec2996453ff5fa1c03a`의 CI Gate·최신 Codex 검토·미해결 스레드0을 확인해 정상 merge했다. main `f25b467a74e2b5733c2bf917e989936d5ecf2eb7`의 CI Pipeline·CodeQL도 성공했다. 운영 read-only plan run `38323977160`은 `PROTECTED_OR_FOREIGN_ROLE`로 중단했고 계정/credential/관계 쓰기와 신규 배포는 실행하지 않았다.
+
+기존 공개 Demo의 일반 로그인·self-read에서 경영자 역할은 `kpa:store_owner`와 `neture:store_owner`, 공급자는 `neture:supplier`로 확인했다. 경영자의 레거시 역할은 현행 정본 allowlist 밖이다. 기존 등록 경영자 Demo UUID에 한해서만 이 정확한 역할의 비활성화를 before-image와 계획 digest에 포함한다. 정상 `neture:store_owner`·승인된 단일 Demo 약국의 소유자 관계를 요구하며 전체관리자/운영자·다른 foreign role·provider 보호는 유지한다. 공급자/직원 또는 registry 밖 대상 identity에는 레거시 역할을 허용하지 않는다. 실행은 다른 credential·membership 변경과 같은 transaction 및 before/after 복구 snapshot 안에서 하고 세션을 폐기한다. 역할 row를 삭제하거나 legacy 역할을 새로 부여하지 않는다.
+
+T07의 코드 main 통합은 완료했으나 T04/T05의 운영 전환과 T08의 새3계정 운영48조건은 미완료다. 다음 순서는 이 운영 발견을 수정·격리 검증·PR review/CI/main 통합한 뒤 read-only plan을 다시 실행하고, 실제 schema history에 따라 승인 범위 내 migration·재계획·정확 digest apply·웹 배포·운영 검증이다. 같은 미완료 인증 WO/branch를 유지한다.
+
+검증: 격리 PostgreSQL 실제28조건 통과. 등록 경영자 레거시 역할의 read-only 계획·before/after 감사·현재 역할/매장 보존·멱등, 공급자/직원에서 동일 역할 거부, 운영자 권한 혼재 거부, 실패 시 레거시 역할까지 rollback을 확인했다. CLI 타입검사·문서 민감정보 검사(3878파일0건)·diff check 통과. 신규 운영 쓰기/배포/48조건은 아직 실행하지 않았다.

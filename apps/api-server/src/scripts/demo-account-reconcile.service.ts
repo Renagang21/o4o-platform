@@ -107,7 +107,12 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
       if (account.type!=='SUPPLIER' && await hasLegacySupplierIdentityPointer(runtimeDb,String(user.id))) fail('UNEXPECTED_DEMO_SUPPLIER_POINTER');
       if (!['active','approved'].includes(String(user.status)) || user.isActive !== true || user.isEmailVerified !== true) fail('ACCOUNT_NOT_READY');
       const activeRoles = roles.filter(row => row.user_id === user.id && row.is_active === true);
-      if (activeRoles.some(row => row.role !== allowedRoles[account.type] && row.role !== 'user')) fail('PROTECTED_OR_FOREIGN_ROLE');
+      // Only the registered owner may retire this observed legacy marker. Never permit it
+      // on a target-only identity, supplier or staff, or accept other foreign roles.
+      const legacyOwnerRoles = base && account.type === 'STORE_OWNER'
+        ? activeRoles.filter(row => row.role === 'kpa:store_owner') : [];
+      if (activeRoles.some(row => row.role !== allowedRoles[account.type] && row.role !== 'user' &&
+        !legacyOwnerRoles.includes(row))) fail('PROTECTED_OR_FOREIGN_ROLE');
       if (providers.some(row => row.user_id === user.id)) fail('PROVIDER_IDENTITY_REQUIRES_REVIEW');
       if (account.type === 'STORE_STAFF') {
         if (relationships.some(row => row.user_id === user.id &&
@@ -124,12 +129,14 @@ async function inventory(client: DemoQueryClient, lock: boolean) {
       new Date(String(row.valid_from)).getTime() <= Date.now() && (row.valid_until === null || new Date(String(row.valid_until)).getTime() >= Date.now()));
     if (user && account.type !== 'STORE_STAFF' && !roleReady) fail('BASE_DEMO_ROLE_NOT_EFFECTIVE');
     if (user && account.type === 'STORE_STAFF' && !roleReady && roles.some(row => row.user_id === user.id && row.role === allowedRoles.STORE_STAFF && row.is_active === true)) fail('STAFF_ROLE_NOT_EFFECTIVE');
-    plans.push({account,user,base,passwordMatches,memberReady,roleReady,membershipReady});
+    const retireRoleIds = base && account.type === 'STORE_OWNER' && user
+      ? roles.filter(row=>row.user_id===user.id && row.is_active===true && row.role==='kpa:store_owner').map(row=>row.id) : [];
+    plans.push({account,user,base,passwordMatches,memberReady,roleReady,membershipReady,retireRoleIds});
   }
   const before = {registry,users,roles,providers,passwords,memberships,relationships,storeState,supplierLinks,ownerRuntimeCandidates,supplierRuntimeCandidates,schema:flags,history};
-  const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password),requiredMemberships:DEMO_REQUIRED_MEMBERSHIPS[account.type],requiredRole:allowedRoles[account.type]}));
+  const intent = PUBLIC_DEMO_ACCOUNTS.map(account=>({type:account.type,email:account.email,passwordFingerprint:digest(account.password),requiredMemberships:DEMO_REQUIRED_MEMBERSHIPS[account.type],requiredRole:allowedRoles[account.type],retireRegisteredOwnerRole:account.type==='STORE_OWNER'?'kpa:store_owner':null}));
   const changed = plans.filter(plan => !plan.user || plan.user.email !== plan.account.email || !plan.passwordMatches ||
-    !plan.base || !plan.membershipReady || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady)));
+    !plan.base || !plan.membershipReady || plan.retireRoleIds.length>0 || (plan.account.type==='STORE_STAFF' && (!plan.memberReady || !plan.roleReady)));
   return {before,plans,changed,organizationId,schemaReady,digest:digest({before,intent})};
 }
 
@@ -151,6 +158,7 @@ export async function runDemoAccountReconcile(client: DemoQueryClient, options: 
         staffDemo:plan.before.history.some(row=>row.name==='AllowStoreStaffDemoAccounts1791810417566')},
       accounts:plan.plans.map(item=>({type:item.account.type,identity:item.user?'preserve':'create',registry:!!item.base,
         emailMatches:item.user?.email===item.account.email,passwordMatches:item.passwordMatches,membershipsReady:item.membershipReady,
+        legacyOwnerRolesToRetire:item.retireRoleIds.length,
         staffRelation:item.account.type==='STORE_STAFF'?item.memberReady:undefined,
         staffRole:item.account.type==='STORE_STAFF'?item.roleReady:undefined})),
       changes:plan.changed.length,existingBusinessIdentitiesPreserved:true};
@@ -179,6 +187,10 @@ export async function runDemoAccountReconcile(client: DemoQueryClient, options: 
       }
       // Credential/identity changes revoke all old access, refresh and handoff sessions atomically.
       await client.query('UPDATE users SET "refreshTokenFamily"=$2 WHERE id=$1',[id,randomUUID()]);writes++;
+      if (item.retireRoleIds.length) {
+        await client.query(`UPDATE role_assignments SET is_active=false,updated_at=now()
+          WHERE id=ANY($1::uuid[]) AND user_id=$2 AND role='kpa:store_owner' AND is_active`,[item.retireRoleIds,id]);writes++;
+      }
       if (item.account.type==='STORE_STAFF') {
         if (!item.base) {
           await client.query("INSERT INTO demo_accounts (user_id,demo_type,is_active) VALUES ($1,'STORE_STAFF',true)",[id]);writes++;
