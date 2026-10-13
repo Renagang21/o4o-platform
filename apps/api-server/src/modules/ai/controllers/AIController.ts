@@ -35,14 +35,14 @@ export class AIController extends BaseController {
           if (!Array.isArray(payload.questions) || !Array.isArray(payload.userAnswers)) {
             return BaseController.error(res, 'quiz payload requires questions[] and userAnswers[]', 400);
           }
-          result = await service.analyzeQuiz(payload);
+          result = await service.analyzeQuiz(payload, userId);
           break;
 
         case 'assignment':
           if (typeof payload.submissionContent !== 'string' || payload.submissionContent.trim().length === 0) {
             return BaseController.error(res, 'assignment payload requires non-empty submissionContent', 400);
           }
-          result = await service.feedbackAssignment(payload);
+          result = await service.feedbackAssignment(payload, userId);
           break;
 
         default:

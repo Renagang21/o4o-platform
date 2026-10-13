@@ -197,7 +197,7 @@ describe('Work Agent — 안전 거절 → 인계', () => {
     expect(Object.keys(entry![1]).sort()).toEqual(['action', 'appId', 'automationMethod', 'deviceId', 'durationMs', 'elementCount', 'elementRole', 'errorCode', 'riskLevel', 'status', 'tool']);
     expect(entry![1].errorCode).toBe('WINDOWS_AUTOMATION_USER_ACTIVE');
     expect(JSON.stringify(entry![1])).not.toMatch(/홍길동|user_active|x=|y=/);
-    const runtime = readFileSync(join(__dirname, '..', 'services', 'ai-tools', 'work-agent-runtime.ts'), 'utf8');
+    const runtime = ['work-agent-runtime.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts'].map(file => readFileSync(join(__dirname, '..', 'services', 'ai-tools', file), 'utf8')).join('\n');
     // VISUAL-CU-V1: 시각 fallback 은 이제 Work Agent 에 배선된다 — 조작은 COMPUTER_CLICK/TYPE_TEXT/KEY 로만 나간다.
     expect(runtime).toContain('LOCAL_AGENT_ACTIONS.COMPUTER_CLICK');
     expect(runtime).toContain('LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT');

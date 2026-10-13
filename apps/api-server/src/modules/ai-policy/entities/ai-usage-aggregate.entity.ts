@@ -31,7 +31,7 @@ export class AiUsageAggregate {
   @Column({ name: 'period_key', type: 'varchar', length: 10 })
   periodKey!: string;
 
-  @Column({ name: 'current_value', type: 'numeric', precision: 15, scale: 4, default: 0 })
+  @Column({ name: 'current_value', type: 'numeric', precision: 20, scale: 8, default: 0 })
   currentValue!: number;
 
   @Column({ name: 'last_updated_at', type: 'timestamptz', default: () => 'NOW()' })
