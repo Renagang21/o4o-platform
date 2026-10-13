@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-12): 최종 제거 범위에 PH 도메인/DNS/인증서 종료 포함. 다른 작업 종료 전 운영 변경 대기. PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
+> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH 주문·결제·공급·콘텐츠·미디어/GCS 및 URL map 연결 종료는 미완료. PC Local Agent는 담당 에이전트 범위다.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -354,3 +354,13 @@ PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐�
 PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`, `certificatemanager.operations.get`이다. plan은 실제 IAM 누락 권한을 보고하고 apply는 누락 시 첫 삭제 전에 차단한다. 아직 실제 인증서 삭제 완료는 아니다.
 
 SonarCloud 보완: 문자열 정렬의 localeCompare 비교 함수를 명시하고 SDK read/delete dependency를 Promise 반환 함수로 선언했다. 단일 DB connection의 조회와 인증서 의존 순서 삭제는 순차 Promise chain으로 유지한다. 병렬 삭제나 query 실행으로 gate/rollback 경계를 우회하지 않는다. 관련 26 tests와 PostgreSQL 16 실제 16개 집계를 다시 검증했다.
+
+### 2026-10-13 PH 인증서 종료 실행
+
+PR #527은 main `e4c48811b6b414aa8939d639373d9331d2c4c470`에 병합됐으며 post-merge CI 38347390566은 SUCCESS다. Delivery 38348144329는 NO_DEPLOY로 종료해 애플리케이션 배포는 수행하지 않았다. 읽기 전용 census [38347391583](https://github.com/Renagang21/o4o-platform/actions/runs/38347391583)은 SUCCESS, 참조 조사 complete=true였다. PH 주문 로그 6건, PH/타 서비스 주문 공유 결제 0건, PH 콘텐츠 밖의 미디어 링크 1건, GCS 경로를 가진 PH 자산 4건을 확인했다. PH 결제가 없는 주문 1건과 복수 PH 결제 주문 1건이 있어 주문/결제를 1:1로 가정하지 않는다. 이 데이터는 삭제하지 않았다.
+
+첫 인증서 plan 38348151860은 당시 실행 중인 Delivery 때문에 idle gate에서 중단됐으며 삭제는 없었다. Delivery 종료 뒤 plan 38348278165는 SUCCESS였으나 인증서 삭제 권한 4개 누락을 보고했다. 관리자가 해당 권한을 추가한 뒤 [38349009973](https://github.com/Renagang21/o4o-platform/actions/runs/38349009973)은 SUCCESS, missingPermissions=[] 및 PH 전용 대상 5개를 확인했다.
+
+관리자는 원래 WIF 조건을 로컬 `pharmacyhub-cert-retirement-e4c48811b6b414aa8939d639373d9331d2c4c470.json`에 백업하고 해당 main SHA/PH workflow/owner로 임시 제한한 검증 결과 WIF_RESTRICTION_ACTIVE를 전달했다. apply [38349256767](https://github.com/Renagang21/o4o-platform/actions/runs/38349256767)은 SUCCESS, applied=true, targets=[], sharedResourcesPreserved=true, missingPermissions=[]로 종료했다. `cm-entry-pharmacyhub-root`·`cm-entry-pharmacyhub-www`, `cm-cert-pharmacyhub`, `dns-auth-pharmacyhub-root`·`dns-auth-pharmacyhub-www`를 제거하고 재조회로 부재 및 공유 설정 보존을 확인했다. 공유 인증서 map/proxy/LB 및 URL map은 변경하지 않았다.
+
+관리자는 같은 로컬 백업을 사용해 원래 WIF 조건을 복구하고 재조회 검증 결과 `WIF_RESTORED`를 전달했다. 인증서 종료용 임시 SHA/workflow 제한은 해제됐다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이며 도메인 등록/자동 갱신 종료는 별도 확인이 필요하다. PC Local Agent는 담당 에이전트 범위다.
