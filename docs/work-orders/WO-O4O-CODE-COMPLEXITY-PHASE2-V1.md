@@ -331,7 +331,7 @@ Core/API·상태 정책·권한·운영 DB·분회 전용 개발·main 병합·�
 - PR 생성·main 병합·배포 없음. CI/리뷰 integration-ready 판정은 하지 않았다.
 
 
-## 11. 공유 상태·모달 비동기 수명 — TODO 초안
+## 11. 공유 상태·모달 비동기 수명 — TODO·검증 결과
 
 동일 WO/branch의 연속 묶음. 최신 main `aa59a0962f`, 직전 push `0c8d68e2a6`.
 사용자 승인 범위는 기존 상태 전이/실행 순서를 유지하는 정비 및 push까지다.
@@ -452,3 +452,87 @@ content-editor/API type/build·공개 타입 동일성·Store 경계와 lint를 
 이 종료 기록과 함께 push한다. 동작 변경 없음. 최종 diff-check를 통과한 상태로 종료한다.
 main 기준은 `aa59a0962f` 유지. 이번 묶음 D01~D06 완료, D-N01~D-N04는 미완료다.
 PR 생성·main 병합·배포·운영 DB 변경 및 CI/리뷰 integration-ready 판정 없음.
+
+
+## 12. 오래된 생성 응답 UI 반영 차단 — TODO 초안
+
+같은 WO/branch의 연속 묶음. 기준 main `aa59a0962f`, 직전 push `f674af98a4`.
+대상은 AiContentModal의 text/URL 생성 결과·오류·loading 반영이다.
+
+- [x] E01: 현재 두 생성 handler의 await/성공/오류/finally·open/source 전환 계약 확인.
+- [x] E02: request identity와 invalidation 시점 및 제외 범위를 검증.
+- [x] E03: 실제 모달에서 재열기 후 오래된 응답을 거부하는 회귀 검증을 먼저 작성·재현.
+- [x] E04: 내부 요청 수명 guard 및 text/URL 결과·오류·finally 차단 구현.
+- [x] E05: 닫기/외부 close/재열기/연속 요청/source 전환/JSON 대기/unmount/현재 오류·저장 callback 검증.
+- [x] E06: content-editor type/build·공개 타입·Store 경계·lint 검증 및 결과 기록.
+- [ ] E07: 전용 branch에 commit·push, 원격 확인. main 병합·배포 없음.
+
+
+### 12.1 TODO 검증 결과 (구현 전)
+
+실제 모달 regression을 먼저 작성했고 기존 구현에서 재열기 후 저장 버튼이 생겨 실패함을 확인했다.
+이 RED 실행은 expected failure이며 PASS로 집계하지 않는다.
+
+| 경계 | 확정 처리 |
+|---|---|
+| 모달 open edge / unmount | committed lifetime 변경 때 기존 generation identity 무효화. 생성 result/error/loading/copied 초기화 |
+| handleClose / source tab 변경 | 즉시 기존 generation identity 무효화. source 전환은 이전 loading도 해제해 새 입력에서 생성 가능 |
+| 새 유효한 text 또는 URL 요청 | 같은 결과 슬롯을 공유하므로 이전 생성 요청을 supersede. 입력 검증 실패만으로 요청을 새로 만들지는 않음 |
+| text/URL 응답 성공·오류·finally | 현재 open lifetime의 최신 요청일 때만 결과/오류/loading 반영 |
+| URL 90초 타이머 | 기존 AbortController·90초 메시지 유지. 오래된 요청도 타이머 cleanup은 실행 |
+| 저장/커뮤니티 목록/외부 callback | 이번 generation guard 대상 아님. 저장 API/body/권한/성공 callback 계약은 유지 |
+
+React render 중 ref를 변경하지 않고 layout effect로 committed open 수명을 설정한다.
+close/source handler는 UI 의도 시점에 즉시 invalidate한다. 서버 생성 작업의 취소나 비용 절감을
+이 변경으로 보장한다고 주장하지 않는다. 생성 input/template/provider/API는 바꾸지 않는다.
+위 후보는 §10의 소비처/Store 은퇴·Shared Module Protocol 및 현재 async handler와 대조했다.
+분회 전용 개발/배포·Core·DB·새 공통 서비스 모듈 범위로 확대하지 않는다.
+
+
+### 12.2 구현·검증 결과
+
+§11.3에서 재현한 **생성 요청→닫기→재열기→이전 결과 반영** 문제는 이 묶음에서 수정했다.
+모달 내부 `useAiGenerationRequest`의 committed lifetime/request ID가 최신 요청의 결과 슬롯을 소유한다.
+렌더 중 ref를 바꾸지 않고 close/source-change handler에서 즉시 invalidate한다.
+text/URL 성공·오류·finally의 state write는 current request에만 허용한다.
+같은 source tab을 다시 선택하는 것만으로는 pending request를 취소하지 않는다.
+
+외부 open=false 및 unmount도 기존 identity를 무효화한다. 새 open 수명은 generation
+result/error/loading/copied를 초기화한다. URL AbortController/90초 메시지/타이머 cleanup은 유지하며,
+저장 handler·API 요청 body/headers·server write·성공 callback에는 generation guard를 붙이지 않았다.
+
+검증:
+- 수정 전 새 stale-response regression: 1 expected failure / 필터 제외 2 skip. 문제 재현이며 PASS 아님.
+- 수정 후 실제 modal 14 tests + identity hook 5 tests: Vitest 2 files / 19 tests PASS.
+  close/reopen, 외부 close, 구 요청 성공/실패/finally 대 신 요청 pending,
+  JSON 대기 중 close, 실제 source 변경/같은 tab 재선택, text↔URL,
+  현재 text 실패/URL 성공/90초 timeout, 확인된 저장 성공 callback 유지 검증.
+  Hook은 latest-only·inactive open·rerender·unmount·다른 instance·StrictMode replay 검증.
+- 기존 panel/format 및 Store 내부 AI 은퇴/외부 LLM/editor boundary: Jest 6 suite / 164 tests PASS.
+- 고유 테스트 파일 8개 / 183 tests PASS. 반복 실행은 합산하지 않는다.
+- content-editor typecheck/build PASS. public index.d.ts byte 동일 PASS.
+- 변경 소스/테스트 4파일 ESLint errors/warnings 0. 저장소 ratchet PASS:
+  errors 46 / baseline 46, warnings 1,006 (기존 오류 해결 판정 아님).
+- runtime/API 서버 코드는 변경하지 않아 전체 API/runtime suite를 다시 실행하지 않았다.
+  운영 계정/OAuth/실제 생성 provider·저장 API·브라우저 운영 smoke·배포는 실행하지 않음.
+  실제 React/jsdom에 synthetic fetch만 사용했다.
+
+재현/검증 명령은 root에서:
+`pnpm exec vitest run packages/content-editor/tests/AiContentModal.lifecycle.test.tsx packages/content-editor/tests/useAiGenerationRequest.test.tsx --environment jsdom --maxWorkers=1`.
+새 dependency/lockfile/CI 설정·공개 props/export 계약·권한 변경 없음.
+
+검증 중 main `90e49c3e60` (#536 PH 담당 변경)이 추가됐다. 14개 경로는 deployment scripts/workflow와
+PH 기록이며 이번 수정 경로·content-editor dependencies와 겹치지 않는다. 구현을 먼저 commit한 뒤
+작업 branch에 정상 merge하고 관련 UI/Store 계약 및 lint를 최종 재확인한다.
+그 소스 통합은 PH 삭제 job/apply·운영 DB·GCS 작업 실행을 의미하지 않는다.
+
+### 12.3 잔여 항목
+
+- [ ] E-N01: 늦은 커뮤니티 목록·저장 응답이 새 panel의 상태를 덮는 조건 조사/guard 준비.
+  server 성공 callback은 검증된 성공 때 유지하고 stale UI만 분리하는 계약부터 확인.
+- [ ] E-N02: 같은 payload 중복 저장/저장 실패·background 완료 표시 정책은 별도 검증.
+- [ ] E-N03: 같은 open 수명 안의 initialText/template/sourceMetadata/header 변경에 대한
+  별도 content-context identity 필요 여부를 조사. 이번 guard를 모든 비동기 작업의 전체 해소로 표시하지 않음.
+- [ ] E-N04: runtime observe/replay/dispatch의 공유 상태는 §11.3 D-N04 후속 유지.
+
+이번 수정의 종료는 push까지다. main 병합·배포·새 서비스 공통화는 진행하지 않는다.

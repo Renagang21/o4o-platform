@@ -28,12 +28,13 @@
  * - initialMode: POP / 제목 추천 / 블로그 글 / QR 안내문 (Extension 진입). 없으면 flexible 자유 입력.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import { sanitizeHtml } from '../sanitize';
 import { blocksToHtml, type UrlBlock } from './ai-content-format';
 import { buildCommunitySavePayload, buildStoreSavePayload, buildProductionMaterialSavePayload } from './ai-content-save-payload';
 import { useCommunitySavePanelState, useStoreSavePanelState, useProductionMaterialSavePanelState } from './use-ai-content-save-panels';
+import { useAiGenerationRequest } from './use-ai-generation-request';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -274,6 +275,15 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [error, setError] = useState('');
   const [resultTab, setResultTab] = useState<ResultTab>('preview');
   const [copied, setCopied] = useState(false);
+  const generationRequest = useAiGenerationRequest(open);
+  // External open changes must start with no result/error/spinner from another lifetime.
+  useLayoutEffect(() => {
+    setLoading(false);
+    setResult(null);
+    setError('');
+    setCopied(false);
+  }, [open]);
+
   // WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
   const [channelSaving, setChannelSaving] = useState(false);
   const [channelSaveStatus, setChannelSaveStatus] = useState<{ ok: boolean; label?: string; error?: string } | null>(null);
@@ -319,6 +329,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setError('변환할 텍스트를 입력해 주세요.');
       return;
     }
+    const isCurrentRequest = generationRequest.begin();
     setLoading(true);
     setError('');
     setResult(null);
@@ -353,6 +364,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       });
 
       const data = await response.json();
+      if (!isCurrentRequest()) return;
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'AI 생성에 실패했습니다.');
@@ -361,9 +373,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setResult({ html: data.html, title: data.title || '', summary: data.summary || '', usageWarning: data.usageWarning });
       setResultTab('preview');
     } catch (err: any) {
+      if (!isCurrentRequest()) return;
       setError(err.message || 'AI 서비스 오류가 발생했습니다.');
     } finally {
-      setLoading(false);
+      if (isCurrentRequest()) setLoading(false);
     }
   };
 
@@ -379,6 +392,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       return;
     }
 
+    const isCurrentRequest = generationRequest.begin();
     setLoading(true);
     setError('');
     setResult(null);
@@ -408,6 +422,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       });
 
       const data = await response.json();
+      if (!isCurrentRequest()) return;
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'URL 콘텐츠 생성에 실패했습니다.');
@@ -442,6 +457,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       });
       setResultTab('preview');
     } catch (err: any) {
+      if (!isCurrentRequest()) return;
       if (err?.name === 'AbortError') {
         setError('URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.');
       } else {
@@ -449,7 +465,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       }
     } finally {
       clearTimeout(abortTimer);
-      setLoading(false);
+      if (isCurrentRequest()) setLoading(false);
     }
   };
 
@@ -655,6 +671,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   };
 
   const handleClose = () => {
+    generationRequest.invalidate();
     setInput('');
     setResult(null);
     setError('');
@@ -676,6 +693,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   };
 
   const handleSourceTabChange = (tab: SourceTab) => {
+    if (tab !== sourceTab) {
+      generationRequest.invalidate();
+      setLoading(false);
+    }
     setSourceTab(tab);
     setResult(null);
     setError('');
