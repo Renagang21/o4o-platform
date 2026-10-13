@@ -208,3 +208,80 @@ Node22.18.0/pnpm10.25.0을 명시한 실행으로 정정했다. 실패를 테스
 
 4차 종료: 구현 `b45b0379020c8bc295bd656960289cc05ab71a78`의 `wo/supplier-code-phase4` push와 원격 SHA 일치를 확인했다.
 기존/이번 clone은 미통합 branch와 shared object 참조 때문에 KEEP. main 통합·배포는 수행하지 않았다.
+
+## 5차 — 이미지·콘텐츠·모바일 묶음 (2026-10-13 KST)
+
+근거: [WO-O4O-SUPPLIER-MEDIA-CONTENT-MOBILE-CODE-CLEANUP-V1](../work-orders/WO-O4O-SUPPLIER-MEDIA-CONTENT-MOBILE-CODE-CLEANUP-V1.md).
+기준: fresh main `75a28d931` + 승인 dependency `dd07ab8ec`, 전용 clone/branch.
+18개 endpoint(이미지5/가져오기2/library8/STORE 설명서3)의 처리 경계와 모바일 두 문제를 함께 정비했다.
+
+| 검사 | 결과 |
+|---|---|
+| 원래 HTTP/이미지 소유 검사 | 2 suites / 47 tests PASS |
+| fetch 보안·복사 검사, 수정 전 | 10 PASS / 3 FAIL — userinfo 사전 검사 부재와 localhost/타 origin 자동 redirect 재현 |
+| 수정 후 HTTP/소유/fetch 집중 검사 | 3 suites / 61 tests PASS |
+| API 관련 최종 회귀 | 31 suites / 777 tests PASS |
+| Neture 전체 회귀 | 89 files / 788 tests PASS |
+| KPA 전체 회귀 | 17 files / 135 tests PASS |
+| 원본 AST/route 비교 | 46 checks PASS / 18 routes — 경로·순서·gate, 이동 handler·소유 판정, STORE validation/SQL/writer/응답, OCR 실제 대상, 변경 없는 import controller |
+| API 타입·TypeScript 빌드·운영 번들 | PASS |
+| content-editor typecheck/build | PASS |
+| Neture/KPA tsc + Vite 운영 빌드 | PASS |
+| admin/store-web/forum-core/lecture-web 타입 검사 | PASS |
+| 변경 15개 TS/TSX 범위 ESLint | PASS — 오류/경고 0 |
+| 원래 Chromium 3개 실제 화면 × PC/mobile | 6개 동작 묶음 PASS — 기존 overflow는 관측·기록 |
+| 수정 후 같은 Chromium 동작 | 6개 동작 묶음 PASS — payload와 PC bounds 동일, page error 0 |
+| 열린 이미지 메뉴 resize | Neture/KPA × 320/600/390px = 6 checks PASS — editor/viewport 내 위치 유지, error 0 |
+| 실계정/운영 저장/외부 이미지 요청 | NOT_RUN — I/O fixture 사용, 사용자 유예 |
+| main merge/배포 | NOT_RUN — commit/push 종료 범위 |
+
+수정 전 실제 CSS가 적용된 390px viewport에서 Drawer x=-90/width480,
+import 이미지 메뉴 right≈523과 문서 scrollWidth523을 확인했다.
+수정 후 Drawer x=0/width390, import scrollWidth390, 메뉴 width290으로 제한됐다.
+KPA resource 모달의 메뉴도 width292/높이52로 wrapping되어 editor 안에 들어온다.
+PC1440의 Drawer480과 두 메뉴의 위치/폭/높이는 전후 동일하다.
+SVG/본문 fixture로 실제 TipTap·Neture Products/Import·KPA ResourceWriteModal을 렌더하고
+폭/정렬/삭제·HTML 탭 메뉴 숨김, dirty 확인·offer 저장, copy preserve 모드, KPA draft 저장을 확인했다.
+스크린샷을 직접 점검했고 저장 payload/call 기록은 전후 동일하다.
+
+### Consumer Impact Matrix
+
+RTE 식별자/import/re-export/주석/테스트 검색 결과 80개 source 파일을 별도 목록에 보존했다.
+이는 80개 live screen이라는 판정이 아니다. 기존 public props/export와 HTML/JSON/저장 의미는 그대로다.
+상세 import/문자열/원본 파일 소비처를 조사하고 관련 editor source 계약도 함께 실행했다.
+
+| 소비처 | 사용/영향 | route/role/capability | 검증 | 결과 |
+|---|---|---|---|---|
+| Neture supplier Products/Import | Drawer·RTE 배치 변경 | 무변경 | PC/mobile 실제 화면 + resize + 전체 회귀 + 빌드 | PASS |
+| Neture operator/콘텐츠 | 공통 RTE 배치 변경 | 무변경 | Neture type/build·회귀, 공통 contract | PASS; 실계정 NOT_RUN |
+| KPA resources/약국/콘텐츠 | 공통 RTE 배치 변경 | 무변경 | ResourceWriteModal PC/mobile+resize, 전체 회귀·build | PASS |
+| web-store 약국/콘텐츠 | 공통 RTE 배치 변경 | 무변경 | store-web type-check + 두 소비처 real RTE smoke | PASS; 개별 실계정 NOT_RUN |
+| admin CMS/store | 공통 RTE 배치 변경 | 무변경 | admin type-check + 공통 RTE/계약 검사 | PASS; 개별 실계정 NOT_RUN |
+| forum-core admin-ui | RTE 사용 | 무변경 | forum-core typecheck + shared props 보존 | PASS |
+| operator-core-ui/shared-space-ui/store-ui-core/tablet-screen-set-editor | RTE 또는 주입/re-export 소비 | 무변경 | 상기 서비스 타입 검사·소스 census | PASS |
+| web-lecture 강사 편집 | RTE 사용 | 무변경 | lecture-web 타입 검사 | PASS; 실계정 NOT_RUN |
+| tablet-kiosk-core/types | RTE 이름은 주석/산출 HTML 설명에 등장 | 무변경 | import/사용 여부 소스 대조 | 직접 편집기 소비 아님 |
+| K-Cosmetics/PharmacyHub | 퇴역 서비스 복구 대상 아님 | 무변경 | 현행 서비스/소비처 census, 퇴역 계약 유지 | NOT_APPLICABLE |
+
+### 안전 경계·검사 도구 진단
+
+네트워크/DNS/MediaLibraryService·GCS·actor/auth/DB는 fixture다. 실제 외부 URL이나 운영 storage 쓰기는 없다.
+실제 legacy gate/이미지 소유 service와 HTTP router를 사용하되 저장/query는 stub으로 검증했다.
+fetch는 initial URL과 매 redirect target을 다시 검증한다. 동일 origin 이동/bytes/MIME·크기·부분 복사 결과를 확인했다.
+중간 response를 정리하고 8초 timeout signal을 공유하며 5회 redirect 이후 기존 fetch_error로 종료한다.
+private/다른 origin target은 두 번째 fetch 전에 거부한다. 주소 credential은 요청 전에 거부하며, 복사/업로드 실패 로그에는 입력 URL을 넣지 않는다. 별도 회귀로 이를 확인했다.
+
+초기 fixture에는 재사용 Response body, query URL의 잘못된 CSS 주소, control 이름/초기 유형 선택 누락이 있었다.
+fixture를 정정하고 재실행했으며 그 실패를 앱 회귀 PASS로 세지 않았다.
+원본 Drawer용으로 새 bundle에서 사라진 원래 480px utility만 fixture에 복원했다.
+CSS preflight와 fixed 위치를 검사한 뒤 최종 전후 크기를 기록했다.
+KPA 지정 검사 경로가 비어 있던 실행은 실패/0 tests로 구분하고 실제 전체 suite를 실행했다.
+store package 이름 무매칭 및 admin appearance dependency 부재를 확인해 정확한 package name과 dependency graph build로 해소했다.
+서로 연결된 shared clone의 alternate 깊이 실패는 자기 clone의 참조 목록만 평탄화/정렬하여 해결했다. 외부 clone은 변경하지 않았다.
+
+빌드의 기존 Browserslist/큰 chunk·duplicate skipLibCheck, Jest force-exit 안내는 설정 변경 없이 남아 있다.
+원본/AST/로그: `/workspace/artifacts/supplier-code-phase5-*`.
+브라우저 JSON·스크린샷·resize/call 비교: `/workspace/artifacts/supplier-phase5-browser/`.
+자기 5192 서버 종료와 listen 0을 확인했다. 이전/이번 clone·미통합 branch는 KEEP이다.
+main 최종 조회 `75a28d931`. 실계정과 main 통합/배포는 별도 실행 범위다.
+문서 정합: 해당 없음 — 정본 정책 변경이나 추가 문서 drift 없음.
