@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, AdminProtectedRoute, SessionManager } from '@o4o/auth-context';
+import { AuthProvider, AdminProtectedRoute } from '@o4o/auth-context';
 import { adminAuthClient as ssoClient } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
@@ -99,15 +99,6 @@ function App() {
     }
   };
 
-  // 세션 만료 경고 처리
-  const handleSessionExpiring = (remainingSeconds: number) => {
-    const minutes = Math.floor(remainingSeconds / 60);
-    toast(`${minutes}분 후 세션이 만료됩니다.`, {
-      icon: '⏰',
-      duration: 5000,
-    });
-  };
-
 
   return (
     <ErrorBoundary>
@@ -118,13 +109,8 @@ function App() {
             ssoClient={ssoClient}
             autoRefresh={true}
             onAuthError={handleAuthError}
-            onSessionExpiring={handleSessionExpiring}
           >
           <AuthStoreSync />
-          <SessionManager
-            warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
-            onSessionExpiring={handleSessionExpiring}
-          >
             <Routes>
             {/* 공개 라우트 — 로그인, 미리보기, 에디터, 스토어프론트, 디버그 */}
             {PublicRoutes()}
@@ -174,7 +160,6 @@ function App() {
               </AdminProtectedRoute>
             } />
         </Routes>
-      </SessionManager>
     </AuthProvider>
         </ToastProvider>
     </ThemeProvider>

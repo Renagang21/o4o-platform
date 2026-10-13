@@ -283,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1 의 "토큰 없으면 /auth/me 생략" 규칙과
-   * 로그인/로그아웃/전체 로그아웃은 Core(useServiceAuth)가 동일하게 수행한다.
+   * 로그인/현재 브라우저 로그아웃은 Core(useServiceAuth)가 수행한다.
    * checkAuth 는 기존 이름을 유지하되 Core.refresh 로 위임한다(외부 계약 불변).
    */
   const checkAuth = core.refresh;

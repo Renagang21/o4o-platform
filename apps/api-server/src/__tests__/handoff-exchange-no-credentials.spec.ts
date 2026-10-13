@@ -40,8 +40,7 @@ const codeOnly = (src: string) =>
 
 describe('handoff exchange 서버 — 인증 쿠키를 내리지 않는다', () => {
   it('handoff.controller.ts 는 setAuthCookies · res.cookie 를 호출하지 않는다', () => {
-    const file = path.join(REPO, 'apps/api-server/src/modules/auth/controllers/handoff.controller.ts');
-    const src = codeOnly(fs.readFileSync(file, 'utf-8'));
+    const src = ['handoff.controller', 'handoff-issuance.controller', 'handoff-exchange.controller', 'handoff-catalog.controller', 'handoff-source.helpers'].map(name => codeOnly(fs.readFileSync(path.join(REPO, `apps/api-server/src/modules/auth/controllers/${name}.ts`), 'utf-8'))).join('\n');
     expect(src).not.toMatch(/setAuthCookies\s*\(/);
     expect(src).not.toMatch(/res\.cookie\s*\(/);
   });
@@ -57,8 +56,8 @@ describe('HandoffPage — exchange 는 credentials 없이 호출한다', () => {
       expect(src).toMatch(/import\s*\{[^}]*HandoffEntryPage[^}]*\}\s*from\s*['"]@o4o\/auth-react['"]/);
       expect(src).toMatch(/<HandoffEntryPage\b/);
     } else {
-      expect(src).toMatch(/exchangeHandoffToken\s*\(/);
-      expect(src).toContain("from '@o4o/auth-client'");
+      expect(src).toMatch(/useHandoffExchange\s*\(/);
+      expect(src).toContain("from '@o4o/auth-react'");
     }
     expect(src).not.toMatch(/credentials\s*:\s*['"]include['"]/);
   });
@@ -71,8 +70,11 @@ describe('shared handoff delegation preserves the cookie boundary', () => {
     const receiver = read('packages/auth-react/src/HandoffEntryPage.tsx');
     const transport = read('packages/auth-client/src/exchangeHandoffToken.ts');
     expect(read('packages/auth-react/src/index.ts')).toContain("export { HandoffEntryPage } from './HandoffEntryPage'");
-    expect(receiver).toMatch(/exchangeHandoffToken\s*\(/);
-    expect(receiver).toContain("from '@o4o/auth-client'");
+    expect(receiver).toMatch(/useHandoffExchange\s*\(/);
+    const hook = read('packages/auth-react/src/useHandoffExchange.ts');
+    expect(hook).toMatch(/exchangeHandoffToken\s*\(/);
+    expect(hook).toContain("from '@o4o/auth-client'");
+    expect(hook).not.toMatch(/credentials\s*:\s*['"]include['"]/);
     expect(read('packages/auth-client/src/index.ts')).toContain("export { exchangeHandoffToken } from './exchangeHandoffToken.js'");
     expect(transport).toContain('/auth/handoff/exchange');
     expect(transport).toMatch(/return\s+fetch\s*\(/);

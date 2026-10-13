@@ -1,3 +1,4 @@
+import { SessionResponse } from './session-response.js';
 import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
@@ -17,8 +18,6 @@ import { resolveLoginMembershipGateKey } from '../../../common/auth/service-logi
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
-import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
-import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 import {
   emailAuthService,
   EmailAuthError,
@@ -36,7 +35,6 @@ import type {
 } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
-import { isCrossOriginRequest } from './auth-helpers.js';
 import { resolveExposableAccountStatus } from '../../../common/auth/account-access.policy.js';
 
 type Op = 'signup' | 'login' | 'resend' | 'verify' | 'forgot' | 'reset' | 'set' | 'findId';
@@ -101,35 +99,8 @@ export class EmailAuthController extends BaseController {
         ...meta(req),
         loginMembershipGateKey: resolveLoginMembershipGateKey(req.get('origin')),
       });
-      authenticationService.setAuthCookies(req, res, session.tokens);
-
-      const user = session.user;
-      user.displayName =
-        (user.name as string | null | undefined) ||
-        `${(user.lastName as string) || ''}${(user.firstName as string) || ''}`.trim() ||
-        (user.email as string | undefined)?.split('@')[0] ||
-        '사용자';
-      try {
-        // enforced pending — 서버 게이트와 같은 값(Demo 계정은 약관 화면 대상이 아니다).
-        user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id), meta(req).sessionServiceKey);
-      } catch {
-        user.pendingPolicyAcceptances = [];
-      }
-      // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).
-      user.demo = await demoAccountService.getDemoMetadata(String(user.id));
-
-      const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);
-      return BaseController.ok(res, {
-        message: 'Login successful',
-        user,
-        isNewUser: false,
-        ...(includeTokensInBody && {
-          tokens: {
-            accessToken: session.tokens.accessToken,
-            refreshToken: session.tokens.refreshToken,
-            expiresIn: session.tokens.expiresIn,
-          },
-        }),
+      return await SessionResponse.send(req, res, session, {
+        includeLegacyTokens, message: 'Login successful', includeDemoMetadata: true,
       });
     } catch (error) {
       return EmailAuthController.handleError(res, error, 'login');

@@ -1,3 +1,4 @@
+import { claimLoginNavigation, cancelLoginNavigation } from '../lib/loginNavigation';
 /**
  * LoginModal - 로그인 오버레이 모달
  * 현재 페이지 위에 오버레이로 표시되어 메뉴 등이 보임
@@ -35,11 +36,6 @@ const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freez
   funding: '유통참여형 펀딩',
   community: '커뮤니티',
 });
-
-// WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
-//   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
-//   순환이 된다 — 로컬 상수 패턴을 따른다.
-const LOGIN_EXPLICIT_NAV_KEY = 'neture_login_explicit_nav';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -104,7 +100,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
       //   PostLoginRedirect 가 같은 auth 변화에 반응해 역할 대시보드로 덮어쓰지 않도록 표시한다.
       //   production 실측: 미인증 /operator → 로그인 → /admin 착지(원래 경로 복귀 실패).
-      sessionStorage.setItem(LOGIN_EXPLICIT_NAV_KEY, '1');
+      claimLoginNavigation();
       navigate(returnUrl);
     }
     onClose();
@@ -130,10 +126,10 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     };
 
     // PostLoginRedirect 가 같은 auth 변화에 반응해 역할 대시보드로 덮어쓰지 않도록 표시한다(handleLoginSuccess 와 같은 계약).
-    sessionStorage.setItem(LOGIN_EXPLICIT_NAV_KEY, '1');
+    claimLoginNavigation();
     const result = await loginWithEmail(demo.email, demo.password);
     if (!result.success || !result.user) {
-      sessionStorage.removeItem(LOGIN_EXPLICIT_NAV_KEY);
+      cancelLoginNavigation();
       release(demoLoginErrorMessage(result));
       return;
     }

@@ -112,8 +112,10 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/resend-verification|verifyEmailGet/)).toEqual([]);
       expect(offenders(/email_verification_tokens/)).toEqual([
         path.join('services','auth','email-auth.service.ts'),
+        path.join('services','auth','email-auth.shared.ts'),
         path.join('services','privacy','account-erasure.service.ts'),
       ]);
+      expect(codeOnly(read(path.join(SRC,'services','auth','email-auth.shared.ts')))).not.toMatch(/(?:dataSource|manager)\.query\(/);
       const erasure=codeOnly(read(path.join(SRC,'services','privacy','account-erasure.service.ts')));
       expect(erasure).not.toMatch(/(?:INSERT\s+INTO|UPDATE)\s+email_verification_tokens/i);
       expect(erasure).toContain("email_verification_tokens: ['user_id']");

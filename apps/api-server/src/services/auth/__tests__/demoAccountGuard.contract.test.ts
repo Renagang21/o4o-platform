@@ -195,7 +195,9 @@ describe('Demo 계정 보호 계약', () => {
     expect(DEMO_ACCOUNT_FORBIDDEN_CODE).toBe('DEMO_ACCOUNT_FORBIDDEN');
     expect(DEMO_ACCOUNT_FORBIDDEN_MESSAGE).toContain('테스트 계정');
     // 비밀번호·이메일 경로도 같은 상수를 쓴다(문구 복제 0).
-    expect(read('services/auth/email-auth.service.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
+    expect(read('services/auth/email-auth.service.ts')).toContain('EmailAuthRecovery');
+    expect(read('services/auth/email-auth.recovery.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
+    expect(read('services/auth/email-auth.shared.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
     expect(read('services/auth/google-auth.service.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_MESSAGE');
   });
 });

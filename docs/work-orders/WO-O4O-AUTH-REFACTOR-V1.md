@@ -51,7 +51,7 @@
 - [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
 - [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
 - [x] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합 (`2002214684`, 통합 후 CI #37892227465 PASS)
-- [ ] 별도 문서 정합 작업: Identity V3의 과거 kpa-society/k-cosmetics 로그인 membership 필수 문구를 현행 공통 로그인 정책과 정렬 (CHECK의 OPEN 드리프트; Frozen 본문 임의 수정 없음)
+- [x] Identity V3의 2026-10-07 대체 정책 고지와 현행 공통 로그인 정본 확인. catalog의 로그인 membership gate는 비활성이고 관련 회귀로 확인했다. 과거 Frozen 본문은 보존한다(2026-10-13 후속 CHECK).
 
 ### 4. 카카오 로그인·명시적 연결
 
@@ -70,20 +70,34 @@
 - [x] 운영 callback의 `Invalid request / invalid characters` 차단 수정: PR #401 main `73cd907d20` 통합, API-only Promote #38035112556 SUCCESS. 합성 opaque code/state는 401 flow 검증까지 전달, 다른 SQL 필드는 400 거절 유지. 실제 소유자 가입 완료와 구분.
 - [x] 홈 카카오 config 조회 복구 UI: PR #403 main `82742b84e8` 통합·Promote #38039708401 웹 6개 배포 SUCCESS. 유지 8 origin PC/mobile 화면 16·config 장애/재시도 12·공개 API 12·Demo 32건 PASS. 사용자 브라우저 최초 조회 실패 원인은 미확정이며 실제 소유자 가입 완료와 구분.
 - [x] P1 가입 acceptance 누락 수정: 카카오·이메일·Google의 published 문서 ID/version 전달·재검증 및 signup transaction의 `user_policy_acceptances` 원자적 저장 구현. rollback/pending 판정·공통 입력/동의 UI 회귀 검증, PR #407 통합·API/웹 배포 완료. 실제 소유자 약관 화면 이동 원인·OAuth 완료는 아래 별도 OPEN 항목으로 유지.
-- [ ] 공급자·펀딩의 미로그인 `/login` ↔ `/` 순환 수정 및 PC/mobile 가입/Demo 회귀. 실제 소유자 추가 정보 적용 후 약관 gate 재확인은 별도 실행.
-- [ ] 후속 개인정보 처리방침 표시·내용 정합: 읽기 어려운 화면과 리팩터링 전 내용을 조사해 사용자 검토 후 갱신.
+- [x] 공급자·펀딩의 미로그인 `/login` ↔ `/` 순환 수정 및 PC/mobile 가입/Demo 회귀(#423 통합·운영 반영). 실제 소유자 추가 정보 적용 후 약관 gate 재확인은 별도 사용자 검증으로 유지.
+- [x] 개인정보 처리방침 표시·내용 조사, 개정 본문·전문 링크·공고 UI 구현 및 배포(#457/#497). 기존 회사·위탁·국외 처리 정보 유지와 30일 공고는 사용자 확인 완료. 새 정책 게시·재동의는 시행일 이후 별도 TODO다.
 
 연결과 기존 두 O4O 계정 병합은 별개다. 다른 `users.id`에 연결된 소셜 계정을 자동 이동하지 않는다. 기존 두 계정의 병합은 양쪽 소유 증명, 유지할 계정 선택, 역할·서비스 가입·사업자 소유권 충돌 처리안을 먼저 사용자와 검토한다. 서비스/관리 권한의 단순 합집합은 금지한다.
 
 ### 5. 테스트 데이터 연결·정리
 
-- [ ] 실제 대상 DB와 접속 경로 확인; 격리 로컬 DB와 기존 데이터 DB를 혼동하지 않음
-- [ ] 계정·가입·역할·소유권·콘텐츠·상품·주문·FK 목록 조사 및 disposition 작성
-- [ ] 기존 provisioning의 고정 보호 ID/과거 실사용 가정 재검토; 기본 dry-run인 명시적 대상 계획으로 교체
-- [ ] 재사용 데이터 연결 → 기능 검증 → 미사용 데이터 삭제 → 마지막에 불필요 계정 삭제
-- [ ] 삭제 전 복구 자료, 정확한 대상 목록, transaction·멱등성과 참조 무결성 검증
-- [ ] 모든 사용자 서비스에서 두 Demo의 일반 로그인·원래 목적지 복귀·기능 체험 desktop/mobile smoke
-- [ ] 테스트 계정 소셜 연결·비밀번호 변경·관리 권한 차단 회귀 검증
+- [x] 운영 WIF workflow의 실제 대상 DB·접속 경로 확인; 격리 로컬 DB와 구분(#521/#524).
+- [x] 제공 Demo 3개 대상의 계정·가입·역할·소유권·FK 조사와 명시적 disposition 검토. 기존 두 계정 ID·연결 데이터를 유지하고 직원은 같은 매장에 연결했다.
+- [x] Demo 전환의 기본 read-only plan, exact digest apply, transaction·audit·재실행 no-op 및 참조 무결성 검증(#524, 적용38327629454·no-op38327913102).
+- [x] 연결 후 모든 사용자8 origin × PC/mobile × Demo3의 실제 로그인·역할별 업무·logout48/48, 대표 홈 버튼6/6 및 owner-only API 경계 확인(#525 기록).
+- [x] Demo 소셜 연결·비밀번호 관리·관리 권한 차단 회귀 검증. 전체관리자 PC/mobile의 Google 전용·Demo 없음도 확인.
+- [ ] Demo 전환 범위 밖의 미사용 콘텐츠·상품·주문·계정 전수 disposition 확정. 앞선 Demo3/FK 조사를 전체 데이터 census로 확대하지 않는다.
+- [ ] 위 전수 계획에서 삭제 대상이 확정되면 복구 자료·정확한 대상·transaction·멱등성·FK 검증 후 데이터 → 계정 순서로 정리. Demo 적용21 writes는 삭제 완료 증거가 아니다.
+
+### 2026-10-13 현재 잔여 TODO와 실행 경계
+
+현재 실행 계획과 코드 대조 근거는 [인증 잔여 검증 CHECK](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)를 따른다.
+위 checkbox는 현재 작업 상태이며 아래 날짜별 실행 기록은 당시 결과로 보존한다.
+
+- [ ] V04: Demo·관리 계정과 별개인 일반 상태별 계정 및 실제 원장을 확보하고8 origin PC/mobile 검증.
+- [ ] V06: 사용자 담당 실제 Google·카카오 가입/로그인·명시적 연결·취소/충돌 및 운영자 검증 결과 기록.
+- [ ] V05: 2026-11-13 KST 이후 실제30일 공고를 확인한 뒤 새 정책 게시·기존 회원 재동의 검증.
+- [ ] 위 단계5의 전체 미사용 데이터 disposition·정리. Demo3 전환 완료와 구분.
+- [ ] 과거 Google-only 운영 E2E의 현행 정책 정렬. 사용자 로그인/전체관리자 경계·유지 origin을 구분하고 실제 자격정보 없는 검증부터 구성한다. workflow 수정 전 별도 범위 확인(상세 CHECK).
+
+이번 단계는 같은 미완료 인증 WO의 연속 작업으로 보존된 `wo/auth-kakao-explicit-link` checkout을 사용한다.
+사용자 최신 지시는 **branch push까지만**이다. 이번 문서 변경의 main 통합·배포·운영 DB 변경·새 정책 게시는 실행하지 않는다.
 
 ## 승인 범위와 실행 경계
 
