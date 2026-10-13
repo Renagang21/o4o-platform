@@ -370,3 +370,5 @@ PR #527은 main `e4c48811b6b414aa8939d639373d9331d2c4c470`에 병합됐으며 po
 PR #533은 필수 CI와 Codex 리뷰 통과 뒤 병합됐으나 SonarCloud의 API URL 입력 검사가 실패한 것을 병합 전에 처리하지 못했다. 실제 URL map plan/apply는 수행하지 않고 후속 수정으로 호출 목적지를 고정 action/URL/method 목록으로 제한하고 operation path를 검증·URI 인코딩하며 request UUID query를 구조화한다. 임의 URL·path traversal·query injection 회귀를 추가했다. 이 수정의 CI/Sonar 재검증 및 운영 적용은 후속 실행 결과로 기록한다. 도메인 등록/자동연장은 유지하되 o4o의 PH DNS/인증서/URL map·전용 코드/데이터는 제거한다는 사용자 후속 지시를 반영했다.
 
 후속 Sonar 검증에서도 동적 URL fetch 지적이 남아 있어 PR #534 병합/운영 적용을 중단했다. HTTP read/validate는 고정 literal URL만 사용하고, update URL은 고정 origin/path에 코드 내부에서 생성한 UUID query만 추가한다. 원격 operation name은 operation- 접두 및 단일 operand 형태를 검증한 뒤 고정 project/global의 Cloud SDK describe 인자로만 사용한다. 원격 응답/호출자가 목적지 URL·SDK flag·request UUID를 지정할 수 없음을 실제 client 경계 회귀로 검증한다. 검사 억제/quality gate 변경은 하지 않는다.
+
+HTTP URL 지적은 해소됐으며 SDK operation operand 입력 검사가 남아 적용을 계속 보류한다. 문자열 타입과 허용 문자 정제 결과의 원문 일치를 확인하고 operation- 접두의 단일 operand만 고정 SDK 명령에 전달한다. 메타문자·공백·제어문자·비문자열 및 다른 project flag 입력을 실제 client 경계 테스트에서 거절한다.

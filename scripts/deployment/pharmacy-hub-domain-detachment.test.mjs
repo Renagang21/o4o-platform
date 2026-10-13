@@ -18,7 +18,8 @@ test('remote names cannot select URLs or SDK flags; update UUID is generated loc
   assert.equal(calls[2].url.searchParams.get('requestId'),saved);assert.equal(result.requestId,saved);
   assert.equal(JSON.parse(calls[2].options.body).fingerprint,'before');
   assert.deepEqual(domainOperationArguments('operation-123'),['compute','operations','describe','operation-123','--global','--project=netureyoutube','--format=json']);
-  for(const name of ['../urlMaps/another-map','https://example.invalid','operation-123?x=bad','operation/other','--project=another',''])
+  for(const name of ['../urlMaps/another-map','https://example.invalid','operation-123?x=bad','operation/other','--project=another','',
+    'operation-123;whoami','operation-123 --project=another','operation-123'+String.fromCharCode(10),null,{}])
     assert.throws(()=>domainOperationArguments(name));
 });
 function live() {

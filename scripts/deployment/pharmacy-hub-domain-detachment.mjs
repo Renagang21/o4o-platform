@@ -11,8 +11,10 @@ import {safeComputeError,settleOperation} from './pharmacy-hub-qr-cutover.mjs';
 const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
 const matcher='path-matcher-pharmacy-hub';
 export function domainOperationArguments(name) {
-  if(!/^operation-[a-zA-Z0-9-]+$/.test(name??''))throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
-  return ['compute','operations','describe',name,'--global','--project=netureyoutube','--format=json'];
+  if(typeof name!=='string')throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
+  const operand=name.replace(/[^a-zA-Z0-9-]/g,'');
+  if(operand!==name||!/^operation-[a-zA-Z0-9-]+$/.test(operand))throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
+  return ['compute','operations','describe',operand,'--global','--project=netureyoutube','--format=json'];
 }
 async function responseJson(response,method) {
   if(!response.ok)throw safeComputeError(method,response.status,await response.json().catch(()=>null));
