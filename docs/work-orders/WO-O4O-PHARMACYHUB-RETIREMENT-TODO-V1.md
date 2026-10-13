@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH 주문·결제·공급·콘텐츠·미디어/GCS 및 URL map 연결 종료는 미완료. PC Local Agent는 담당 에이전트 범위다.
+> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH URL map 호스트/matcher 제거·공유 설정 보존 검증 완료. 이번 URL map 종료용 임시 WIF 제한의 복구는 대기 중이다. PH 주문·결제·공급·콘텐츠·미디어/GCS 제거는 미완료. PC Local Agent는 담당 에이전트 범위다.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -376,3 +376,7 @@ HTTP URL 지적은 해소됐으며 SDK operation operand 입력 검사가 남아
 ### 2026-10-13 URL map 종료 plan 검증 완료
 
 PR #534의 최종 commit 73687cf93d779bf8ba6e3fefe389ec74af945a3d는 필수 CI·SonarCloud·최신 Codex 리뷰를 모두 통과하고 main f66ed5f5f8e6198e0043053b24cae6230ffa96cf에 병합됐다. post-merge CI 38355910041 및 CodeQL은 SUCCESS, Delivery 38356668088은 NO_DEPLOY로 종료했다. standalone domain_detachment plan [38356815800](https://github.com/Renagang21/o4o-platform/actions/runs/38356815800)은 SUCCESS이며 실제 map 귀속/퇴역 상태 및 Compute validation을 확인했다. 대상은 pharmacyhub.co.kr, www.pharmacyhub.co.kr, path-matcher-pharmacy-hub이며 제거할 PH validation test는 0건이었다. applied=false로 실제 URL map 변경은 없었다. 이 main SHA에 대한 관리자 임시 WIF 제한 적용 전에는 apply하지 않는다. 인증서 삭제 때의 제한은 이미 복구됐으며, 이번 새 제한은 아직 적용하지 않았다. PH 잔여 데이터/GCS 삭제도 미실행이다. 가비아 등록/자동연장은 사용자 지시에 따라 유지한다.
+
+### 2026-10-13 URL map 연결 종료 apply 완료
+
+관리자는 f66ed5f5f8e6198e0043053b24cae6230ffa96cf와 PH workflow/owner로 한정한 임시 WIF 조건을 별도 로컬 pharmacyhub-domain-detachment-f66ed5f5f8e6198e0043053b24cae6230ffa96cf.json에 백업 후 적용하고 WIF_RESTRICTION_ACTIVE 검증 결과를 전달했다. main·필수 CI·다른 운영 Actions 부재를 재확인한 뒤 apply [38358591293](https://github.com/Renagang21/o4o-platform/actions/runs/38358591293)은 SUCCESS, applied=true, targets=[], removedTests=0, sharedResourcesPreserved=true로 종료했다. Compute update의 terminal success 이후 map을 재조회해 PH root/www host rule 및 전용 matcher 부재와 전체 공유 설정 보존을 검증했다. 공유 LB/IP/proxy/다른 host 및 DB/GCS는 변경하지 않았다. 원래 WIF 조건 복구는 관리자 실행·재조회 검증 대기이며 아직 완료로 기록하지 않는다. PH 전용 데이터/GCS 정리는 계속 미완료다. 가비아 도메인 등록/자동연장은 사용자 지시에 따라 유지한다.
