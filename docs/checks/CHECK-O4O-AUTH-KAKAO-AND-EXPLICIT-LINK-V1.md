@@ -1361,3 +1361,53 @@ PR #521은 head `cafd632499777334b2f99ec2996453ff5fa1c03a`의 CI Gate·최신 Co
 T07의 코드 main 통합은 완료했으나 T04/T05의 운영 전환과 T08의 새3계정 운영48조건은 미완료다. 다음 순서는 이 운영 발견을 수정·격리 검증·PR review/CI/main 통합한 뒤 read-only plan을 다시 실행하고, 실제 schema history에 따라 승인 범위 내 migration·재계획·정확 digest apply·웹 배포·운영 검증이다. 같은 미완료 인증 WO/branch를 유지한다.
 
 검증: 격리 PostgreSQL 실제28조건 통과. 등록 경영자 레거시 역할의 read-only 계획·before/after 감사·현재 역할/매장 보존·멱등, 공급자/직원에서 동일 역할 거부, 운영자 권한 혼재 거부, 실패 시 레거시 역할까지 rollback을 확인했다. CLI 타입검사·문서 민감정보 검사(3878파일0건)·diff check 통과. 신규 운영 쓰기/배포/48조건은 아직 실행하지 않았다.
+
+### 운영 계정 전환·배포 완료, browser 검증 진행 — 2026-10-13
+
+- PR #524 정상 merge main `88d45b8208bdf9a24e63fb1fe70d0ad69233c0fd`; exact head `37fb6d79a1d213acf33f3332346cda066b93e819`의 최신 Codex 완료·미해결0·CI Gate 통과, 같은 main의 CI Pipeline `38325955393` 성공.
+- 읽기 전용 운영 plan `38325970867` 성공. 기존23/24 history는 적용돼 있었고25만 미적용이었다. 다른 WO의 미승인 pending migration을 이번 범위로 실행하지 않았다.
+- API-only Promote `38326847455` 성공: migration25·새 revision 준비/트래픽 전환·serving SHA 검증. schema 적용 후 새 plan `38327434280` 성공.
+- 정확한 새 plan digest의 scoped apply `38327629454` 성공:3계정 전환·21 writes, before/after 감사 snapshot·transaction 검증, 기존 경영자/공급자 UUID와 store/supplier 연결 보존. 등록 경영자의 기존 `kpa:store_owner`1행만 비활성화했다.
+- 변경 후 read-only plan `38327913102` 성공:3 registry·email/password·필수 membership 일치, 직원 role/같은 매장 관계 준비, legacy role retirement0·추가 변경0. 새 plan digest가 apply afterDigest와 일치했다. 재적용 쓰기는 실행하지 않았다.
+- 실제 API 새3계정 로그인·self-read200 및 registry/역할/필수 소속 통과. 경영자와 직원의 store context200·같은 매장, 공급자의 store403, 공급자 products200·경영자/직원 products403,3계정 admin403 확인. 테스트 생성 세션만 logout했다.
+- 기존 공개 경영자/공급자 주소와 직원의 다른2계정 비밀번호3조건 모두401. 일반 사용자·실제 Google/Kakao·운영자 인증은 실행하지 않았다.
+- Web/Admin Promote `38327819896` 성공: neture·kpa-society·lecture·store·kpa-branch·admin의 verified rollout 및 serving SHA 검증. 사용자8 origin은5웹 app에서 서빙한다. API는 앞선 run의 같은 target SHA를 유지했고 중복 배포하지 않았다.
+- 최초 Neture 직원 PC 버튼에서 실제 로그인200·Store handoff generate/exchange200·계정 설정 이동·권한 경계·UI logout200·이전 access/refresh401·다른 Store 세션200 유지 확인. 이후 전체8 origin×PC/mobile×3계정48조건은 별도 실행 중이며 아직 전체 PASS로 판정하지 않는다.
+
+문서 정합: 제공3계정 TODO를 실제 main/운영 상태로 갱신했다. 이전@example Demo32조건과 로컬 합성48조건은 새 운영48조건의 증거로 합산하지 않는다. 같은 미완료 인증 WO/branch 유지; 검증 closure가 남아 WORKTREE_DISPOSITION=KEEP.
+
+### 제공3계정 운영 browser48조건 완료 — 2026-10-13
+
+8개 사용자 origin의 PC(1440×900)·mobile(390×844)에서 경영자·공급자·직원 버튼을 실제 클릭했다. 조건은48개 고유 조합이며 모두 PASS다. TLS를 검증한 실제 upstream 응답으로 확인했으며 로컬 합성 응답이나 외부 OAuth 로그인 성공을 대체하지 않는다.
+
+| 운영 origin | PC 경영자/공급자/직원 | mobile 경영자/공급자/직원 |
+|---|---|---|
+| neture.co.kr |3/3 PASS|3/3 PASS|
+| supplier.neture.co.kr |3/3 PASS|3/3 PASS|
+| community.neture.co.kr |3/3 PASS|3/3 PASS|
+| funding.neture.co.kr |3/3 PASS|3/3 PASS|
+| pharmacy.neture.co.kr |3/3 PASS|3/3 PASS|
+| store.neture.co.kr |3/3 PASS|3/3 PASS|
+| study.neture.co.kr |3/3 PASS|3/3 PASS|
+| kpa.neture.co.kr |3/3 PASS|3/3 PASS|
+
+모든 조건에서 버튼이 공통 정본의 정확한 email/password를 전송하고 실제 로그인·self-read200, registry type·필수 활성 membership, Demo social/password 관리 차단, 전체관리자 API403, 역할별 매장/공급자 API 경계와 UI logout200·기존 access/refresh401을 확인했다. Neture 경영자/직원의 PC/mobile4조건은 Store handoff generate/exchange200, Store 착지, 메인 계정 설정 진입, 메인 로그아웃 뒤 다른 Store 세션200 유지를 확인했다. 강의 화면은 실제 Neture account-center 진입 링크를 확인했으며 본인 Google/Kakao 인증은 수행하지 않았다.
+
+별도 실제 API3계정 재검증은 Store membership 자격을 경영자=`owner`, 공급자=`none`, 직원=`member`로 확인했다. 구성원 목록의 소유자 전용 API는 경영자200·공급자/직원403, 직원의 정확한 `STORE_OWNER_REQUIRED` 차단을 확인했다. 경영자와 직원의 매장은 같았다. 사업자 소유권 변경·초대·해제 쓰기 검증은 실행하지 않았다.
+
+전체관리자 익명 로그인 화면은 PC/mobile2조건에서 Google 진입 표시·Demo 버튼0·비밀번호 입력0 확인했다. 관리자 본인 Google 인증 성공과 구분한다. 최초 직원PC preflight·기존@example32·로컬 합성48·API 검사 횟수를 운영48조건에 더하지 않는다.
+
+### 메인 홈 직접 진입·제공 계정 전환 Phase closure — 2026-10-13
+
+추가 메인 홈 검사 첫 시도는 실제 `O4OHomePage`에 공통 `<header>`가 있다고 잘못 가정한 테스트 locator 때문에2조건 timeout했다. 원본 실패 기록을 보존했고 제품 코드 변경 없이 실제 홈의 정확한 ‘로그인’ 버튼으로 locator를 고쳤다. `/login` 자동 진입과 별도로 `https://neture.co.kr/`의 로그인 버튼 → 모달 →3 Demo 버튼을 PC/mobile6조건에서 모두 통과했다. 실제 login/registry/권한·Store handoff·계정 설정·UI logout/access/refresh 폐기 및 다른 Store 세션 유지도 확인했다. 기존48조건과 같은 검사 횟수로 합산하지 않는다.
+
+T01~T08 제공 테스트 계정 전환 Phase는 완료다. 코드 PR #521/#524는 main에 통합됐고 실제 API·사용자5웹 app/eight origin·관리자 웹 serving target은 `88d45b8208bdf9a24e63fb1fe70d0ad69233c0fd`다. 이번 검증 기록 변경은 문서-only이며 `DEPLOYMENT=NOT_APPLICABLE`; 기록 merge를 새 runtime 배포로 해석하지 않는다. 일반 상태 계정 V04, 사용자 담당 실제 Google/Kakao·운영자 V06,30일 공고 후 정책 시행은 별도 기존 TODO로 유지한다. 제공3 Demo 검증으로 이 조건들을 닫지 않는다.
+
+문서 정합: 제공 계정3개 공통 정본·ACTIVE reconciliation 도구 분류·현행 역할 상한과 TODO/운영 실행/검증 결과가 일치한다. 공개 코드 밖 문서에는 credential/실사용자·조직 식별자를 복사하지 않았다.
+
+WORKTREE_DISPOSITION
+worktree: /workspace/o4o-platform / branch: wo/auth-kakao-explicit-link
+base: 867b91cdd320c5f025e62afd6c4b146ad4430663 / main integration: #521,#524
+CI: exact PR heads + runtime target main PASS / deployment: API,5 user apps,admin verified target88d45b8208
+smoke: actual user48/48 + root entry6/6 + admin anonymous2/2; API role boundaries/retired credentials PASS
+verdict: KEEP — 같은 미완료 인증 WO의 사용자 OAuth/일반 상태/공고 시행 후속을 유지한다. 이번 제공 계정 전환 Phase의 코드·DB·배포·운영 smoke는 완료했다.
