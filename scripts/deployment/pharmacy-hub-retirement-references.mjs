@@ -17,6 +17,11 @@ const checks=[
     `SELECT count(*)::text AS count FROM media_entity_links l JOIN media_assets a ON l.media_asset_id=a.id
       WHERE ${ph('a.service_key')} AND NOT EXISTS (SELECT 1 FROM cms_contents c
         WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
+  ['phContentMediaLinks',['media_entity_links.entity_type','media_entity_links.entity_id','cms_contents.id','cms_contents.serviceKey'],
+    `SELECT count(*)::text AS count FROM media_entity_links l JOIN cms_contents c ON l.entity_type='content' AND l.entity_id=c.id::text WHERE ${ph('c."serviceKey"')}`],
+  ['phContentSharedAssets',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
+    `SELECT count(*)::text AS count FROM media_entity_links l JOIN cms_contents c ON l.entity_type='content' AND l.entity_id=c.id::text
+      JOIN media_assets a ON a.id=l.media_asset_id WHERE ${ph('c."serviceKey"')} AND NOT COALESCE(${ph('a.service_key')},FALSE)`],
   ['sharedMediaStorage',['media_assets.id','media_assets.service_key','media_assets.gcs_path','media_assets.url'],
     `SELECT count(*)::text AS count FROM media_assets s WHERE NOT COALESCE(${ph('s.service_key')},FALSE)
       AND EXISTS (SELECT 1 FROM media_assets a WHERE ${ph('a.service_key')} AND
