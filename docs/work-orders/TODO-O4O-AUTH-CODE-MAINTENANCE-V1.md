@@ -138,3 +138,19 @@ GitHub [재실행38407087021](https://github.com/Renagang21/o4o-platform/actions
 원문을 읽었다고 주장하지 않는다. 실행 step의 PASS와64조건의 로컬 수집/재현은 구분한다.
 통합 대기 중 main이 이동하여 자기 branch에 충돌 없이 반영했다. 이 동기화와 기록 갱신 이후의
 최종 HEAD는 위 PR의 새 CI/review 기술 게이트를 다시 충족해야 한다.
+
+### 운영 검증 review 보완 — 2026-10-14 (KST)
+
+최종 동기화 HEAD `e753210e9f`의 GitHub 공개 E2E job은
+[38470995960](https://github.com/Renagang21/o4o-platform/actions/runs/38470995960)에서 success다.
+TLS를 검증한 운영 upstream으로 동일 assertion을 실행한 전체 로컬 재검증은64/64 PASS·skip0·retry0이다.
+자동 리뷰는 익명401와 checkout 정적 P2만으로 **배포된** 관리자 route 부재를 구분할 수 없음을 지적했다.
+이 한계를 인정하고 테스트를 보강했다. 공개 Demo 공급자의 canonical credential로 새 일반 세션을 만든 뒤
+본인 me200·살아 있는 관리자 조회403/`ROLE_REQUIRED`·은퇴 password 경로와 동일 router의 없는 경로404를
+함께 확인한다. 이전 route가 다시 등록되면403 또는 입력 오류가 발생하여404 assertion이 실패한다.
+존재하지 않는 합성 대상 UUID와 빈 body를 사용하므로 이전 handler도 password write에 도달하지 않는다.
+검증이 만든 세션만 finally에서 logout200으로 종료한다. 실제 사용자/운영자 자격정보·위조 토큰은 사용하지 않는다.
+이 보완 후 대상26조건은 PC/mobile에서26/26 PASS다. 기존64/64 결과와 재실행26개를 합산하지 않는다.
+현재 수동 workflow의 credential-free 명칭과 달리 이 한 조건은 **의도적으로 공개된 Demo 세션**을 사용하며,
+민감한 계정 fixture나 관리자 credential을 소비하지 않는다. 새 인프라/권한 정책은 추가하지 않는다.
+후속 HEAD의 CI/review·E2E·main 통합 결과는 PR #546의 실제 check와 merge 상태로 확인한다.
