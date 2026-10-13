@@ -1,5 +1,5 @@
 
-import { useState, useEffect, FC } from 'react';
+import type { FC } from 'react';
 import { Menu, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, buildAccountDisplayInfo } from '@o4o/auth-context';
@@ -21,7 +21,7 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
-  const { user, logout, getSessionStatus } = useAuth();
+  const { user, logout, isAuthenticated, isLoading, sessionConflict } = useAuth();
   // WO-O4O-IDENTITY-ACCOUNT-DISPLAY-AND-DOCUMENT-ALIGNMENT-V1:
   //   표시 전용 값이다 — 인가는 AdminProtectedRoute/백엔드 guard 가 roles[] 로 한다.
   const accountDisplay = buildAccountDisplayInfo(user);
@@ -46,53 +46,18 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
     }
   })();
   const navigate = useNavigate();
-  const [sessionStatus, setSessionStatus] = useState(getSessionStatus());
-
-  // 세션 상태 업데이트
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionStatus(getSessionStatus());
-    }, 60000); // 1분마다 업데이트
-
-    return () => clearInterval(interval);
-  }, [getSessionStatus]);
+  const sessionLabel = sessionConflict ? '다시 로그인 필요' : isLoading ? '확인 중' : isAuthenticated ? '로그인됨' : '로그아웃됨';
+  const sessionTone = sessionConflict ? 'text-red-600' : 'text-o4o-text-secondary';
 
   const handleLogout = async () => {
     try {
       await logout();
       toast.success('로그아웃되었습니다.');
-    } catch (error: any) {
+    } catch {
     // Error logging - use proper error handler
       toast.error('로그아웃 처리 중 오류가 발생했습니다.');
     }
   };
-
-  const getSessionStatusColor = () => {
-    if (!sessionStatus) return 'text-o4o-text-secondary';
-    
-    const remainingMinutes = Math.floor(sessionStatus.remainingTime / 60000);
-    if (remainingMinutes > 10) {
-      return 'text-green-600';
-    } else if (remainingMinutes > 5) {
-      return 'text-yellow-600';
-    } else {
-      return 'text-red-600';
-    }
-  };
-
-  const getSessionStatusText = () => {
-    if (!sessionStatus) return 'Unknown';
-    
-    const remainingMinutes = Math.floor(sessionStatus.remainingTime / 60000);
-    if (remainingMinutes > 10) {
-      return 'Active';
-    } else if (remainingMinutes > 5) {
-      return 'Expiring Soon';
-    } else {
-      return 'Expired';
-    }
-  };
-
 
   return (
     <header className="bg-white border-b border-gray-300">
@@ -130,9 +95,9 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
             className="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-200 text-o4o-text-secondary hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary disabled:opacity-60"
           />
           {/* Session Status Indicator */}
-          <div className={`flex items-center gap-1 text-xs ${getSessionStatusColor()}`}>
+          <div className={`flex items-center gap-1 text-xs ${sessionTone}`}>
             <Clock className="w-3 h-3" />
-            <span>세션: {getSessionStatusText()}</span>
+            <span>세션: {sessionLabel}</span>
           </div>
 
           {/* 검토 대기 업무 (WO-O4O-ADMIN-PENDING-WORK-COUNTER-AND-HEADER-ENTRY-V1) */}
@@ -199,8 +164,8 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
                 <div className="text-xs text-o4o-text-secondary space-y-1">
                   <div className="flex justify-between">
                     <span>세션 상태:</span>
-                    <span className={getSessionStatusColor()}>
-                      {getSessionStatusText()}
+                    <span className={sessionTone}>
+                      {sessionLabel}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -251,7 +216,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               <DropdownMenuSeparator />
               <div className="px-2 py-2">
                 <div className="text-xs text-o4o-text-tertiary text-center">
-                  🔒 보안 세션 | 8시간 후 자동 만료
+                  🔒 Google 인증으로 확인된 전체관리자 세션
                 </div>
               </div>
             </DropdownMenuContent>

@@ -565,12 +565,16 @@ describe('enforced pending 소비처 계약', () => {
 
   it.each([
     'common/middleware/auth/authentication.middleware.ts',
-    'modules/auth/controllers/email-auth.controller.ts',
+    'modules/auth/controllers/session-response.ts',
     'modules/auth/controllers/auth-account.controller.ts',
   ])('%s 는 getEnforcedPendingForUser 를 쓰고 raw getPendingForUser 를 직접 부르지 않는다', (rel) => {
     const src = read(rel);
     expect(src).toContain('getEnforcedPendingForUser(');
     expect(src).not.toMatch(/\.getPendingForUser\(/);
+  });
+
+  it.each(['email-auth.controller.ts', 'google-auth.controller.ts', 'social-auth.controller.ts'])('%s delegates session responses to the enforced common builder', name => {
+    expect(read(`modules/auth/controllers/${name}`)).toContain('SessionResponse.send(');
   });
 
   it('Demo 예외 판정에 email 문자열 비교가 없다', () => {

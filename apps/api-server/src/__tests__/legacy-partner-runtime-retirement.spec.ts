@@ -110,7 +110,7 @@ describe('WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT — Legacy Partner runtime = 
   it('password 회원가입 controller 는 부재하고, 살아 있는 가입 경로는 partner 를 모른다', () => {
     expect(existsSync(resolve(REPO, 'apps/api-server/src/modules/auth/controllers/auth-register.controller.ts'))).toBe(false);
 
-    const join = code('apps/api-server/src/modules/auth/controllers/handoff.controller.ts');
+    const join = code('apps/api-server/src/modules/auth/controllers/handoff-catalog.controller.ts');
     expect(join).toContain('joinService');
     expect(join).not.toMatch(/neture:partner|'partner'|cosmetics:partner/);
   });

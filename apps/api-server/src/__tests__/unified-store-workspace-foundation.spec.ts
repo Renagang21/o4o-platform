@@ -181,7 +181,7 @@ describe('Store Workspace 는 서비스가 아니다 (IR §13)', () => {
     expect(authRoutes).toMatch(/router\.post\(\s*'\/handoff',\s*requireAuth,/);
     expect(authRoutes).toMatch(/router\.post\(\s*'\/handoff\/exchange',\s*asyncHandler/);
     expect(authRoutes).not.toContain('/handoff/store');
-    const handoff = read('modules/auth/controllers/handoff.controller.ts');
+    const handoff = ['handoff.controller', 'handoff-issuance.controller', 'handoff-exchange.controller', 'handoff-source.helpers'].map(name => read(`modules/auth/controllers/${name}.ts`)).join('\n');
     // 'store' 리터럴은 STORE_WORKSPACE_KEY 상수 뒤에 숨긴다 — controller 코드(주석 제외)에 'store' 문자열이 없다
     const code = handoff.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     expect(code).not.toContain("'store'");

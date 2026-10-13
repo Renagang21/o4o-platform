@@ -2,7 +2,7 @@ import { recordSignupTerms, recordSignupPrivacy, type SignupTermsReference } fro
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
- * GoogleAuthService — Google-only Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
+ * GoogleAuthService — Google Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
  *
  * 흐름: Google ID token → `googleIdentityService.verifyGoogleIdToken`(단일 검증 경로)
  *       → Google `sub` → linked_accounts(provider='google', providerId=sub) → users.id → canonical 세션.
@@ -14,7 +14,7 @@ import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone
  *   - Google 전용 JWT 없음 — `generateTokensWithContext` 재사용, JWT sub = users.id.
  *   - signup 은 role_assignments · service_memberships · service_credentials 를 **만들지 않는다**.
  *   - linked_accounts 에 email/displayName/profileImage/providerData 스냅샷을 쓰지 않는다(picture 미저장).
- *   - users.name = NULL. (password 컬럼은 Phase B-1 에서 선언째 사라졌다 — 쓰지 않는다.)
+ *   - 신규 가입은 공통 이름·개인 모바일 정보를 저장한다. password credential은 별도 원장이다.
  *     email 은 `users.email NOT NULL UNIQUE` 가 남아 있어
  *     Google email claim 을 과도기 프로필 값으로만 저장한다. claim 이 없으면 placeholder 없이 실패.
  *
@@ -70,7 +70,6 @@ import {
   type SemiFranchiseAccessResolver,
 } from '../../common/auth/service-login-eligibility.policy.js';
 import type { SemiFranchiseAccessDetails } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
-import * as tokenUtils from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
 export type GoogleAuthErrorCode =

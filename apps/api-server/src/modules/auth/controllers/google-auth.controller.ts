@@ -1,3 +1,4 @@
+import { SessionResponse } from './session-response.js';
 import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
 import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
@@ -13,8 +14,6 @@ import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
-import { authenticationService } from '../../../services/authentication.service.js';
-import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { googleAuthService, GoogleAuthError, type GoogleAuthSession } from '../../../services/auth/google-auth.service.js';
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
@@ -24,7 +23,6 @@ import type {
 } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
-import { isCrossOriginRequest } from './auth-helpers.js';
 import { resolveExposableAccountStatus } from '../../../common/auth/account-access.policy.js';
 
 /** 프런트 GIS 초기화용 공개 Client ID env(선택). 없으면 allowlist 첫 항목을 쓴다. secret 아님. */
@@ -103,34 +101,7 @@ export class GoogleAuthController extends BaseController {
     message: string,
     status: 200 | 201 = 200,
   ): Promise<any> {
-    authenticationService.setAuthCookies(req, res, session.tokens);
-
-    const user = session.user;
-    // name 은 NULL 허용 — /auth/login 과 같은 우선순위로 null-safe 하게 만든다.
-    user.displayName =
-      (user.name as string | null | undefined)
-      || `${(user.lastName as string) || ''}${(user.firstName as string) || ''}`.trim()
-      || (user.email as string | undefined)?.split('@')[0]
-      || '사용자';
-    try {
-      user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id), resolveSessionServiceKey(req.get('origin')));
-    } catch { user.pendingPolicyAcceptances = []; }
-
-    const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);
-    const body = {
-      message,
-      user,
-      isNewUser: session.isNewUser,
-      ...(session.serviceMembership && { serviceMembership: session.serviceMembership }),
-      ...(includeTokensInBody && {
-        tokens: {
-          accessToken: session.tokens.accessToken,
-          refreshToken: session.tokens.refreshToken,
-          expiresIn: session.tokens.expiresIn,
-        },
-      }),
-    };
-    return status === 201 ? BaseController.created(res, body) : BaseController.ok(res, body);
+    return SessionResponse.send(req, res, session, { includeLegacyTokens, message, status });
   }
 
   private static handleError(res: Response, error: unknown, op: 'login' | 'signup' | 'link'): any {
