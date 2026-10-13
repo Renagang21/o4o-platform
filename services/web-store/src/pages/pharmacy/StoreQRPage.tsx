@@ -12,13 +12,15 @@
  * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
+import { captureStoreOrganizationHeaders } from '../../lib/storeOrganizationHeader';
+import { StoreQrPrintToolbar, StoreQrOutputGuide } from './qr/StoreQrOutput';
 import { StoreQrCreateForms } from './qr/StoreQrCreateForms';
 import { styles } from './qr/qrStyles';
 import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { useState, useEffect } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
-import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
+import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
 //   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
@@ -95,15 +97,6 @@ function autoLandingType(assetType: string): string {
 }
 
 // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내(상황 → 추천 파일 → 이유)
-const QR_EXPORT_GUIDE: { situation: string; recommend: string; reason: string }[] = [
-  { situation: '전문 출력소·디자인 업체에 전달', recommend: 'SVG (벡터)', reason: '크기를 키우거나 줄여도 선명하게 출력됩니다' },
-  { situation: '대형 POP·포스터·진열대 출력', recommend: 'SVG 우선 · PNG 고해상도', reason: '큰 사이즈 출력에 유리합니다' },
-  { situation: 'PPT·문서·POP 편집에 삽입', recommend: 'PNG 고해상도', reason: '일반 문서 편집 도구에서 사용하기 쉽습니다' },
-  { situation: '약국에서 A4로 바로 출력', recommend: 'A4 1장 PDF', reason: '별도 편집 없이 바로 출력하기 좋습니다' },
-  { situation: '작은 안내카드 여러 장', recommend: 'A4 4분할 PDF', reason: '잘라서 여러 곳에 부착하기 좋습니다' },
-  { situation: '임시 확인·간단 공유', recommend: 'PNG (이미지)', reason: '가장 간단하지만 확대 출력에는 적합하지 않습니다' },
-];
-
 // 출력 메뉴(QR_EXPORT_PRESETS 5종 · DataTable overflow 클리핑을 피하는 portal)는
 // @o4o/store-ui-core 의 StoreQrOperationBoard 안으로 옮겼다
 // (WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1 의 해법을 Core 로 승격).
@@ -567,7 +560,7 @@ export function StoreQRPage() {
         // 기본 QR 시트 — 기존 일괄 출력
         const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          headers: captureStoreOrganizationHeaders({ 'Content-Type': 'application/json', ...authHeaders }),
           body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
         });
         if (!resp.ok) throw new Error('Print failed');
@@ -590,7 +583,7 @@ export function StoreQRPage() {
       for (const qr of productQrs) {
         const resp = await fetch(
           `${apiBase}/pharmacy/qr/${qr.id}/flyer?template=${templateNum}`,
-          { headers: authHeaders },
+          { headers: captureStoreOrganizationHeaders(authHeaders) },
         );
         if (!resp.ok) throw new Error('Flyer generation failed');
         const blob = await resp.blob();
@@ -701,30 +694,7 @@ export function StoreQRPage() {
       {/* Batch Print Toolbar */}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
       {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
-      {items.length > 0 && (
-        <div style={styles.printToolbar}>
-          <label style={styles.selectAllLabel}>
-            <input
-              type="checkbox"
-              checked={selectedIds.size === printableItems.length && printableItems.length > 0}
-              onChange={handleSelectAll}
-              style={styles.checkbox}
-            />
-            {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1: 분모 = 출력 가능한 QR(보관 제외). */}
-            전체 선택 ({selectedIds.size}/{printableItems.length})
-          </label>
-          {selectedIds.size > 0 && (
-            <button
-              onClick={handleOpenPrintModal}
-              disabled={printing}
-              style={{ ...styles.printBtn, opacity: printing ? 0.7 : 1 }}
-            >
-              <Printer size={14} />
-              {printing ? 'PDF 생성 중...' : `선택 QR 출력 (${selectedIds.size})`}
-            </button>
-          )}
-        </div>
-      )}
+      {items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
 
       {workspaceMode === 'studio' && <StoreQrCreateForms
         creating={creating}
@@ -1066,33 +1036,7 @@ export function StoreQRPage() {
 
       {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내 모달
           상황별 추천 파일/이유를 카드형으로 안내(모바일에서도 표 깨짐 없음). */}
-      {showExportGuide && (
-        <div style={styles.guideOverlay} onClick={() => setShowExportGuide(false)}>
-          <div style={styles.guideModal} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.guideHeader}>
-              <h2 style={styles.guideTitle}>QR 출력 파일은 이렇게 선택하세요</h2>
-              <button onClick={() => setShowExportGuide(false)} style={styles.iconBtn} aria-label="닫기">
-                <X size={20} />
-              </button>
-            </div>
-            <div style={styles.guideBody}>
-              {QR_EXPORT_GUIDE.map((g) => (
-                <div key={g.situation} style={styles.guideCard}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={styles.guideSituation}>{g.situation}</p>
-                    <p style={styles.guideReason}>{g.reason}</p>
-                  </div>
-                  <span style={styles.guideRecommend}>{g.recommend}</span>
-                </div>
-              ))}
-            </div>
-            <div style={styles.guideFooterNote}>
-              크기 조절이나 전문 출력소 전달이 필요하면 <strong>SVG (벡터)</strong>를 선택하세요.<br />
-              약국에서 바로 종이에 출력할 때는 <strong>A4 PDF</strong>가 가장 간단합니다.
-            </div>
-          </div>
-        </div>
-      )}
+      <StoreQrOutputGuide open={showExportGuide} onClose={() => setShowExportGuide(false)} />
     </div>
   );
 }
