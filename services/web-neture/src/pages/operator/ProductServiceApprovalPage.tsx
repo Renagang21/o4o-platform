@@ -25,6 +25,9 @@ import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConst
 import { useAuth } from '../../contexts/AuthContext';
 import { buildServiceApprovalListParams, getSelectedPendingServiceApprovalIds } from './productServiceApprovalModel';
 import { getServiceApprovalDecisionOutcome, type ServiceApprovalDecision, type ServiceApprovalDecisionOutcome } from './serviceApprovalDecisionResult';
+import { ProductServiceApprovalDrawer } from './ProductServiceApprovalDrawer';
+import { ProductServiceApprovalDecisionModal } from './ProductServiceApprovalDecisionModal';
+import { STATUS_BADGE, getRegulatoryBadge, getCompletenessBadge, hasPermitRisk, formatPrice, getQualityFlags, getRecommendation } from './productServiceApprovalPresentation';
 import { useLatestRequest } from '../../hooks/useLatestRequest';
 
 // ==================== Constants ====================
@@ -40,66 +43,6 @@ const SERVICE_OPTIONS = [
   { key: '', label: '전체 서비스' },
   { key: 'k-cosmetics', label: 'K-Cosmetics' },
   { key: 'kpa-society', label: 'KPA Society' },
-];
-
-const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: '승인대기', bg: 'bg-amber-50', text: 'text-amber-700' },
-  approved: { label: '승인됨', bg: 'bg-green-50', text: 'text-green-700' },
-  rejected: { label: '거절됨', bg: 'bg-red-50', text: 'text-red-700' },
-};
-
-// ==================== Helpers ====================
-
-function getRegulatoryBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
-  const rt = item.regulatoryType;
-  if (!rt || rt === 'GENERAL') return { label: '일반', bg: 'bg-slate-50', text: 'text-slate-500' };
-  if (!item.mfdsPermitNumber) return { label: '⚠ 허가없음', bg: 'bg-red-50', text: 'text-red-700' };
-  if (item.isMfdsVerified) return { label: '검증됨', bg: 'bg-green-50', text: 'text-green-700' };
-  return { label: '미검증', bg: 'bg-amber-50', text: 'text-amber-700' };
-}
-
-function getCompletenessBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
-  if (item.offerApprovalStatus === 'approved') return { label: 'APPROVED', bg: 'bg-green-50', text: 'text-green-700' };
-  const score = item.completenessScore || 0;
-  if (score >= 60) return { label: 'READY', bg: 'bg-blue-50', text: 'text-blue-700' };
-  if (score > 0) return { label: 'INCOMPLETE', bg: 'bg-amber-50', text: 'text-amber-700' };
-  return { label: 'DRAFT', bg: 'bg-slate-50', text: 'text-slate-500' };
-}
-
-function hasPermitRisk(item: ServiceApprovalItem): boolean {
-  const rt = item.regulatoryType;
-  return !!rt && rt !== 'GENERAL' && !item.mfdsPermitNumber;
-}
-
-function formatPrice(price: number | null): string {
-  if (price == null) return '-';
-  return `₩${price.toLocaleString('ko-KR')}`;
-}
-
-// WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: 품질 판단 헬퍼
-
-function getQualityFlags(item: ServiceApprovalItem): string[] {
-  const flags: string[] = [];
-  if (!item.imageUrl) flags.push('이미지 없음');
-  if (!item.priceGeneral || item.priceGeneral <= 0) flags.push('가격 미설정');
-  if (!item.hasShortDescription) flags.push('간단 설명 없음');
-  if (!item.hasDetailDescription) flags.push('상세 설명 없음');
-  if (!item.distributionType) flags.push('유통 타입 미설정');
-  return flags;
-}
-
-function getRecommendation(score: number): { label: string; bg: string; text: string; icon: string } {
-  if (score >= 80) return { label: '승인 추천', bg: 'bg-green-50', text: 'text-green-700', icon: '✓' };
-  if (score >= 60) return { label: '검토 필요', bg: 'bg-amber-50', text: 'text-amber-700', icon: '!' };
-  return { label: '보완 필요', bg: 'bg-red-50', text: 'text-red-700', icon: '✕' };
-}
-
-const REJECT_TEMPLATES = [
-  '상품 이미지가 없습니다. 이미지를 추가한 후 다시 요청해 주세요.',
-  '상품 설명이 부족합니다. 간단 소개와 상세 설명을 작성해 주세요.',
-  '가격 정보가 누락되었습니다. 공급가를 설정해 주세요.',
-  '상품 정보가 불완전합니다. 완성도를 높인 후 재요청 바랍니다.',
-  '규제 정보 확인이 필요합니다. MFDS 허가번호를 입력해 주세요.',
 ];
 
 // ==================== Component ====================
@@ -395,7 +338,7 @@ export default function ProductServiceApprovalPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">서비스별 상품 승인</h1>
         <p className="text-sm text-slate-500 mt-1">
-          공급자가 선���한 서비스별 상품 승인을 관리합니다.
+          공급자가 선택한 서비스별 상품 승인을 관리합니다.
         </p>
       </div>
 
@@ -752,7 +695,7 @@ export default function ProductServiceApprovalPage() {
                 key={item.id}
                 className={`p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${borderClass}`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex flex-wrap items-start gap-3 xl:flex-nowrap">
                   {/* Checkbox */}
                   <input
                     type="checkbox"
@@ -777,14 +720,14 @@ export default function ProductServiceApprovalPage() {
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0" onClick={() => setDrawerItem(item)}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-slate-900 truncate">{item.productName || '(이름 없음)'}</span>
+                  <div className="flex-1 min-w-0 basis-[calc(100%-6rem)] xl:basis-auto" onClick={() => setDrawerItem(item)}>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                      <span className="font-medium text-slate-900 truncate max-w-full">{item.productName || '(이름 없음)'}</span>
                       {item.brandName && (
                         <span className="text-xs text-slate-400 shrink-0">({item.brandName})</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                       <span className="font-mono">{item.barcode || '-'}</span>
                       <span>·</span>
                       <span>{item.supplierName || '-'}</span>
@@ -794,7 +737,7 @@ export default function ProductServiceApprovalPage() {
                   </div>
 
                   {/* Badges + Recommendation */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0 w-full xl:w-auto">
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${recommendation.bg} ${recommendation.text}`}>
                       {recommendation.icon} {recommendation.label}
                     </span>
@@ -964,96 +907,17 @@ export default function ProductServiceApprovalPage() {
         </div>
       )}
 
-      {/* Reject Modal */}
       {rejectTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {rejectTarget === 'batch' ? `일괄 거절 (${selectedPendingIds.length}건)` : '승인 거절'}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              {rejectTarget === 'batch'
-                ? '선택한 승인대기 상품을 일괄 거절합니다.'
-                : '이 상품의 서비스 승인을 거절합니다.'}
-            </p>
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {REJECT_TEMPLATES.map((tpl, i) => (
-                <button
-                  key={i}
-                  onClick={() => setRejectReason(tpl)}
-                  disabled={decisionBusy}
-                  className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded text-xs hover:bg-slate-200 text-left"
-                >
-                  {tpl.length > 30 ? tpl.slice(0, 30) + '…' : tpl}
-                </button>
-              ))}
-            </div>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              disabled={decisionBusy}
-              placeholder="거절 사유를 입력하세요 (선택)"
-              className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {decisionError && <p role="alert" className="mt-3 text-sm text-red-700">{decisionError}</p>}
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => { if (!decisionWriting.current) setRejectTarget(null); }}
-                disabled={decisionBusy}
-                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
-              >
-                취소
-              </button>
-              <button
-                onClick={() => void handleDecisionConfirm('reject')}
-                disabled={decisionBusy || !canManage}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
-              >
-                거절 확인
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductServiceApprovalDecisionModal decision="reject" batch={rejectTarget === 'batch'} count={selectedPendingIds.length}
+          value={rejectReason} error={decisionError} busy={decisionBusy} canManage={canManage}
+          onChange={setRejectReason} onCancel={() => { if (!decisionWriting.current) setRejectTarget(null); }}
+          onConfirm={() => void handleDecisionConfirm('reject')} />
       )}
-
-      {/* Approve Modal (WO-NETURE-APPROVAL-ACTION-UX-V1) */}
       {approveTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {approveTarget === 'batch' ? `일괄 승인 (${selectedPendingIds.length}건)` : '상품 승인'}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              {approveTarget === 'batch'
-                ? '선택한 승인대기 상품을 일괄 승인합니다.'
-                : '이 상품의 서비스 승인을 처리합니다.'}
-            </p>
-            <textarea
-              value={approveMemo}
-              onChange={(e) => setApproveMemo(e.target.value)}
-              disabled={decisionBusy}
-              placeholder="승인 메모를 입력하세요 (선택)"
-              className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            {decisionError && <p role="alert" className="mt-3 text-sm text-red-700">{decisionError}</p>}
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => { if (!decisionWriting.current) setApproveTarget(null); }}
-                disabled={decisionBusy}
-                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
-              >
-                취소
-              </button>
-              <button
-                onClick={() => void handleDecisionConfirm('approve')}
-                disabled={decisionBusy || !canManage}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                승인 확인
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductServiceApprovalDecisionModal decision="approve" batch={approveTarget === 'batch'} count={selectedPendingIds.length}
+          value={approveMemo} error={decisionError} busy={decisionBusy} canManage={canManage}
+          onChange={setApproveMemo} onCancel={() => { if (!decisionWriting.current) setApproveTarget(null); }}
+          onConfirm={() => void handleDecisionConfirm('approve')} />
       )}
 
       {/* Delete Confirm Modal (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1) */}
@@ -1083,175 +947,10 @@ export default function ProductServiceApprovalPage() {
         </div>
       )}
 
-      {/* Detail Drawer */}
       {drawerItem && (
-        <>
-          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setDrawerItem(null)} />
-          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
-            <div className="p-6">
-              {/* Drawer header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-slate-900">상품 상세</h2>
-                <button
-                  onClick={() => setDrawerItem(null)}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Image */}
-              <div className="w-full h-48 rounded-lg overflow-hidden bg-slate-100 mb-6 flex items-center justify-center">
-                {drawerItem.imageUrl ? (
-                  <img src={drawerItem.imageUrl} alt="" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-slate-300 text-sm">이미지 없음</div>
-                )}
-              </div>
-
-              {/* Info grid */}
-              <div className="space-y-4 mb-6">
-                <div>
-                  <div className="text-xs text-slate-400 mb-1">상품명</div>
-                  <div className="font-medium text-slate-900">{drawerItem.productName || '-'}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">바코드</div>
-                    <div className="font-mono text-sm text-slate-700">{drawerItem.barcode || '-'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">브랜드</div>
-                    <div className="text-sm text-slate-700">{drawerItem.brandName || '-'}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">공급사</div>
-                    <div className="text-sm text-slate-700">{drawerItem.supplierName || '-'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">공급가</div>
-                    <div className="text-sm font-medium text-slate-700">{formatPrice(drawerItem.priceGeneral)}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">서비스</div>
-                    <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
-                      {getServiceDisplay(drawerItem.serviceKeys) || drawerItem.serviceKey}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">유통</div>
-                    <div className="flex flex-wrap gap-1">
-                      {getSupplyPolicyBadges(drawerItem).map((b) => (
-                        <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
-                          {b.label}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status badges */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {(() => {
-                  const badge = STATUS_BADGE[drawerItem.approvalStatus] || { label: drawerItem.approvalStatus, bg: 'bg-slate-50', text: 'text-slate-600' };
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${badge.bg} ${badge.text}`}>
-                      상태: {badge.label}
-                    </span>
-                  );
-                })()}
-                {(() => {
-                  const rb = getRegulatoryBadge(drawerItem);
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${rb.bg} ${rb.text}`}>
-                      규제: {rb.label}
-                    </span>
-                  );
-                })()}
-                {(() => {
-                  const cb = getCompletenessBadge(drawerItem);
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${cb.bg} ${cb.text}`}>
-                      완성도: {cb.label} ({drawerItem.completenessScore}/100)
-                    </span>
-                  );
-                })()}
-              </div>
-
-              {/* Completeness detail */}
-              <div className="bg-slate-50 rounded-lg p-4 mb-6">
-                <div className="text-xs font-medium text-slate-500 mb-3">완성도 상세 (각 20점)</div>
-                <div className="space-y-2">
-                  {[
-                    { label: '공급가 설정', ok: drawerItem.priceGeneral != null && drawerItem.priceGeneral > 0 },
-                    { label: '상품 이미지', ok: !!drawerItem.imageUrl },
-                    { label: '간단 소개', ok: drawerItem.hasShortDescription },
-                    { label: '상세 설명', ok: drawerItem.hasDetailDescription },
-                    { label: '유통 타입', ok: !!drawerItem.distributionType },
-                  ].map((c) => (
-                    <div key={c.label} className="flex items-center gap-2 text-sm">
-                      <span className={c.ok ? 'text-green-600' : 'text-slate-300'}>{c.ok ? '✓' : '✗'}</span>
-                      <span className={c.ok ? 'text-slate-700' : 'text-slate-400'}>{c.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Decision reason */}
-              {drawerItem.reason && (
-                <div className={`border rounded-lg p-4 mb-6 ${
-                  drawerItem.approvalStatus === 'rejected'
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-green-50 border-green-200'
-                }`}>
-                  <div className={`text-xs font-medium mb-1 ${
-                    drawerItem.approvalStatus === 'rejected' ? 'text-red-600' : 'text-green-600'
-                  }`}>
-                    {drawerItem.approvalStatus === 'rejected' ? '거절 사유' : '승인 메모'}
-                  </div>
-                  <div className={`text-sm ${
-                    drawerItem.approvalStatus === 'rejected' ? 'text-red-800' : 'text-green-800'
-                  }`}>{drawerItem.reason}</div>
-                </div>
-              )}
-
-              {/* Date info */}
-              <div className="text-xs text-slate-400 mb-6">
-                등록일: {new Date(drawerItem.createdAt).toLocaleString('ko-KR')}
-                {drawerItem.decidedAt && (
-                  <span className="ml-3">처리일: {new Date(drawerItem.decidedAt).toLocaleString('ko-KR')}</span>
-                )}
-              </div>
-
-              {/* Drawer actions */}
-              {drawerItem.approvalStatus === 'pending' && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleApprove(drawerItem.id)}
-                    disabled={!canManage || decisionBusy}
-                    className="flex-1 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    승인
-                  </button>
-                  <button
-                    onClick={() => openDecision('reject', drawerItem.id)}
-                    disabled={!canManage || decisionBusy}
-                    className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    거절
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </>
+        <ProductServiceApprovalDrawer item={drawerItem} canManage={canManage} decisionBusy={decisionBusy}
+          onClose={() => setDrawerItem(null)} onApprove={handleApprove}
+          onReject={(id) => openDecision('reject', id)} />
       )}
     </div>
   );
