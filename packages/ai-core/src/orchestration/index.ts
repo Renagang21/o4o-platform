@@ -60,3 +60,6 @@ export { mapActions } from './action-mapper.js';
 // Providers
 export { GeminiProvider } from './providers/gemini.provider.js';
 export { OpenAIProvider, isReasoningGenerationModel } from './providers/openai.provider.js';
+
+// Business Extension workflow (additive; existing provider execution remains unchanged).
+export { runAiExtension, AiExtensionError } from './run-extension.js';

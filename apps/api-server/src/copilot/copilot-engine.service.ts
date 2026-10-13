@@ -8,12 +8,18 @@
  *
  * Strategy:
  *   1. Always run enhanced rule-based analysis (fast, deterministic)
- *   2. If AI API key configured, also call runAIInsight() from @o4o/ai-core
- *   3. AI call has 3s timeout — falls back to rule-based on failure
+ *   2. If AI API key configured, run a service-specific business Extension through @o4o/ai-core
+ *   3. AI call uses the existing 800ms provider timeout — falls back to rule-based on failure
  *   4. Returns AiSummaryItem[] (max 3) for aiSummary block
  */
 
 import type { AIServiceId, AIInsight } from '@o4o/ai-core';
+import { randomUUID } from 'node:crypto';
+import { createOperatorInsightExtension } from '../services/ai-extensions/operator-insight.extension.js';
+import { resolveServiceAiProfile } from '../services/ai-extensions/service-query.extension.js';
+import { resolveAiTarget } from '../utils/ai-provider-runtime.js';
+import { AppDataSource } from '../database/connection.js';
+import logger from '../utils/logger.js';
 import { generateRuleBasedInsights } from './insight-rules.js';
 import type { AiSummaryItem } from '../types/operator-dashboard.types.js';
 
@@ -57,19 +63,6 @@ function transformInsightToSummary(insight: AIInsight): AiSummaryItem[] {
   return items.slice(0, 3);
 }
 
-/**
- * Create a timeout promise that rejects after the specified duration.
- */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('AI_TIMEOUT')), ms);
-    promise.then(
-      (value) => { clearTimeout(timer); resolve(value); },
-      (error) => { clearTimeout(timer); reject(error); },
-    );
-  });
-}
-
 export class CopilotEngineService {
   /**
    * Generate AI-powered insights for an operator dashboard.
@@ -80,32 +73,41 @@ export class CopilotEngineService {
    * @returns AiSummaryItem[] (max 3 items)
    */
   async generateInsights(
-    service: AIServiceId,
+    service: string,
     metrics: Record<string, unknown>,
     user: { id: string; role: string },
   ): Promise<{ insights: AiSummaryItem[]; source: 'ai' | 'rule-based' }> {
     // 1. Always generate rule-based insights (fast fallback)
-    const ruleBasedInsights = generateRuleBasedInsights(service, metrics);
+    const profile = resolveServiceAiProfile(service);
+    if (!profile || !user.id) throw new Error('SERVICE_OR_ACTOR_UNSUPPORTED');
+    const legacyService: AIServiceId | undefined = profile.serviceId === 'kpa-society' ? 'kpa' : profile.serviceId === 'neture' ? 'neture' : undefined;
+    const ruleBasedInsights = legacyService ? generateRuleBasedInsights(legacyService, metrics) : [];
 
     // 2. Try AI-enhanced insights if API key is available
     if (hasAiApiKey()) {
       try {
-        const { runAIInsight } = await import('@o4o/ai-core');
-
-        const aiResult = await withTimeout(
-          runAIInsight({
-            service,
-            insightType: 'operator-dashboard',
-            contextData: metrics,
-            user,
-          }),
-          AI_TIMEOUT_MS,
-        );
-
-        if (aiResult.success && aiResult.insight) {
-          const aiInsights = transformInsightToSummary(aiResult.insight);
-          return { insights: aiInsights, source: 'ai' };
-        }
+        const { execute, runAiExtension } = await import('@o4o/ai-core');
+        const target = await resolveAiTarget(AppDataSource);
+        const extension = createOperatorInsightExtension(profile);
+        const run = await runAiExtension({
+          extension, input: { metrics },
+          context: { requestId: randomUUID(), serviceId: profile.serviceId, featureId: 'operator-insight', actorId: user.id, audience: 'staff' },
+          materials: [], funding: { payer: 'platform' },
+        }, {
+          invoke: async prompt => {
+            const result = await execute({ ...prompt, provider: target.provider,
+              config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
+              timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
+              meta: { service: profile.serviceId, callerName: extension.id },
+            });
+            return { ...result, provider: result.provider ?? target.provider };
+          },
+        }, {
+          // The existing admin guard authorizes caller-submitted aggregates, not domain record access.
+          authorize: async context => context.actorId === user.id,
+          record: async event => { logger.info('[AI_EXTENSION]', event); },
+        });
+        return { insights: transformInsightToSummary(run.output), source: 'ai' };
       } catch (error) {
         // AI unavailable or timed out — fall through to rule-based
         const msg = error instanceof Error ? error.message : String(error);

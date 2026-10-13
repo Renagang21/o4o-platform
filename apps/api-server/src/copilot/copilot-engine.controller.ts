@@ -16,7 +16,9 @@ import type { Request, Response } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 import { CopilotEngineService } from './copilot-engine.service.js';
 
-const VALID_SERVICES = ['neture', 'cosmetics', 'kpa'] as const;
+import { resolveServiceAiProfile, listServiceAiProfiles } from '../services/ai-extensions/service-query.extension.js';
+
+const VALID_SERVICES = listServiceAiProfiles().map(profile => profile.serviceId);
 
 export function createCopilotEngineController(): Router {
   const router = Router();
@@ -34,7 +36,7 @@ export function createCopilotEngineController(): Router {
       const { service, metrics } = req.body || {};
 
       // Validate service
-      if (!service || !VALID_SERVICES.includes(service)) {
+      if (!service || !resolveServiceAiProfile(service)) {
         res.status(400).json({
           success: false,
           error: `Invalid service. Must be one of: ${VALID_SERVICES.join(', ')}`,

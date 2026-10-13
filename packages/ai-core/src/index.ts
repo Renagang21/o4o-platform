@@ -6,7 +6,7 @@
  * AI Core - Main Entry Point
  *
  * AI의 정책, 계약, 로그 기준을 정의하는 Core App입니다.
- * 이 앱은 AI 기능을 제공하지 않습니다.
+ * 공통 실행을 제공하며 업무 규칙과 권한·저장은 호스트/Extension에 위임합니다.
  *
  * @package @o4o/ai-core
  * @workorder WO-AI-CORE-APP-SCAFFOLD-V0

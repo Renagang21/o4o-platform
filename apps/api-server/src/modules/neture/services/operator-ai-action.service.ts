@@ -47,7 +47,7 @@ export class OperatorAiActionService {
   /**
    * Rule → LLM → Fallback 3-tier 추천 생성
    */
-  async generateActions(ctx: OperatorContext): Promise<AiActionItem[]> {
+  async generateActions(ctx: OperatorContext, actorId: string): Promise<AiActionItem[]> {
     // 1. Rule 기반 (항상 실행, 빠름)
     const ruleActions = this.generateRuleActions(ctx);
 
@@ -58,7 +58,7 @@ export class OperatorAiActionService {
 
     // 3. LLM 보완 호출
     try {
-      const llmActions = await this.llmService.generate(ctx);
+      const llmActions = await this.llmService.generate(ctx, actorId);
 
       if (llmActions.length > 0) {
         // 병합: Rule 기존 type과 중복되지 않는 LLM 항목만 추가
