@@ -1,6 +1,6 @@
 # WO-O4O-CODE-COMPLEXITY-PHASE2-V1
 
-상태: 회원 콘솔 첫 묶음 구현·검증 완료 — push 준비 (2026-10-13)
+상태: 회원 콘솔 첫 묶음 구현·검증·push 완료 (2026-10-13)
 
 ## 1. 지시와 종료 범위
 
@@ -21,7 +21,7 @@
 - [x] T05: 검증된 내부 중복 정리·책임 추출. 동작·권한·SQL 의미·API 계약 유지.
 - [x] T06: 기존 회귀 테스트와 필요한 행동 검증, API type-check/build 실행.
 - [x] T07: 전후 지표·검증 결과·보류 이유와 전체 공통화 후보 기록.
-- [ ] T08: 변경 범위 점검 → commit → 전용 branch push → 원격 commit 확인.
+- [x] T08: 변경 범위 점검 → commit → 전용 branch push → 원격 commit 확인.
 
 ## 3. 제외·검증 경계
 
@@ -124,3 +124,16 @@ guard·route·승인 Core·공통 패키지·DDL·dependency·CI는 변경하지
 개별 서비스 정비는 위 후보를 수집하는 단계다. 서비스 간 공통화로 전환할 때에는
 소유 주체·필드 계약·권한·상태·실패 결과가 같은지 전체 소비처를 확인한다.
 공통화 때문에 서비스 분기/boolean 옵션/예외가 늘면 유지 또는 별도 책임 분리를 선택한다.
+
+
+## 8. push 종료 기록
+
+- 전용 branch: `wo/code-complexity-phase2`.
+- 구현 commit: `f109cbef43bad45a93fb5fd1a74dad22c8a9190e`.
+- `git push -u origin wo/code-complexity-phase2` 성공.
+- `git ls-remote --heads origin wo/code-complexity-phase2`로 구현 commit 원격 일치 확인.
+- push 직전 최신 main은 시작 기준과 같은 `f66ed5f5f8`이며 자동 merge/rebase 없음.
+- 종료 기록은 별도 문서 commit으로 같은 branch에 push한다.
+- 사용자 종료 범위에 따라 PR 생성·main 병합·배포 없음. required CI/리뷰 통과 또는
+  integration-ready로 표시하지 않는다. §6은 로컬 실행 검증 결과다.
+- T01~T08은 이번 묶음 완료, §7 N01~N07은 다음 정비의 미완료 항목이다.
