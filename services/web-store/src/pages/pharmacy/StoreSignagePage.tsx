@@ -1,3 +1,7 @@
+import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, type SignageEditTarget, type SignageMediaDraft } from './signage/signageMediaDraft';
+import { buildSignageVideoList, filterSignageVideos, summarizePlaylistDuration, type UnifiedVideoItem, type SignageStatusFilter as StatusFilter, type SignageSortKey as SortKey } from './signage/signageVideoList';
+import { useSignagePlaylists } from './hooks/useSignagePlaylists';
+import { useSignageSchedules } from './hooks/useSignageSchedules';
 /**
  * StoreSignagePage — 사이니지 운영 엔진
  *
@@ -19,7 +23,11 @@
  * 4. 공개 렌더링: /public/signage?playlist=:id
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { StoreSignageScheduleForm } from './StoreSignageScheduleForm';
+import { StoreSignageMediaEditor } from './StoreSignageMediaEditor';
+import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -29,7 +37,6 @@ import {
   formatSignageDate as formatDate,
   formatSignageShortDate as formatShortDate,
   daysUntil,
-  isForcedActive,
   isForcedExpiringSoon,
   isForcedExpired,
   toHHMM,
@@ -59,37 +66,15 @@ import {
   Pencil,
   Search,
 } from 'lucide-react';
-import { DataTable, type Column, BaseDetailDrawer } from '@o4o/ui';
-import {
-  fetchSchedules,
-  createSchedule,
-  updateSchedule,
-  deleteSchedule,
-  fetchSignagePlaylists,
-  type SignageScheduleItem,
-  type SignagePlaylistOption,
-  type CreateSchedulePayload,
-} from '../../api/signageSchedule';
+import { DataTable, type Column } from '@o4o/ui';
+import type { SignageScheduleItem } from '../../api/signageSchedule';
 import {
   assetSnapshotApi,
   storeAssetControlApi,
   type StoreAssetItem,
   type AssetPublishStatus,
-  type ChannelMap,
 } from '../../api/assetSnapshot';
-import {
-  fetchStorePlaylists,
-  updateStorePlaylist,
-  deleteStorePlaylist,
-  fetchPlaylistItems,
-  addPlaylistItem,
-  addPlaylistItemFromLibrary,
-  addPlaylistItemFromSignage,
-  deletePlaylistItem,
-  reorderPlaylistItems,
-  type StorePlaylist,
-  type StorePlaylistItem,
-} from '../../api/storePlaylist';
+import type { StorePlaylist } from '../../api/storePlaylist';
 import {
   fetchSignageMedia,
   createSignageMedia,
@@ -98,7 +83,6 @@ import {
   type SignageMediaItem,
 } from '../../api/signageMedia';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
-import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 
 /* ─── Constants ──────────────────────────────── */
@@ -111,8 +95,6 @@ const STATUS_CONFIG: Record<AssetPublishStatus, { label: string; bg: string; tex
   hidden: { label: '숨김', bg: 'bg-orange-50', text: 'text-orange-700' },
 };
 
-type StatusFilter = 'all' | 'published' | 'draft' | 'hidden' | 'forced';
-type SortKey = 'newest' | 'forced-first' | 'published-first';
 
 /* ─── Helpers ────────────────────────────────── */
 
@@ -134,35 +116,7 @@ function deriveYtThumbnail(cj: Record<string, unknown> | undefined): string | un
   return undefined;
 }
 
-/* ─── Schedule Visibility Helpers ───────────── */
-
-/* ─── KPI Computation ────────────────────────── */
-
-/* ─── Unified Video Item (snapshot + direct media) ── */
-
-type VideoSource = 'snapshot' | 'direct';
-
-interface UnifiedVideoItem {
-  id: string;
-  title: string;
-  source: VideoSource;
-  sourceUrl?: string;
-  sourceType?: string;
-  publishStatus?: AssetPublishStatus;
-  channelMap?: ChannelMap;
-  isForced?: boolean;
-  isLocked?: boolean;
-  forcedStartAt?: string | null;
-  forcedEndAt?: string | null;
-  createdAt: string;
-  _snapshot?: StoreAssetItem;
-  _media?: SignageMediaItem;
-}
-
 type ActiveTab = 'assets' | 'playlist' | 'schedules';
-
-
-/* ─── Main Component ─────────────────────────── */
 
 async function loadSignageAssets(): Promise<StoreAssetItem[]> {
   const response = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
@@ -177,6 +131,7 @@ export function StoreSignagePage() {
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
   const { organizationId } = useStoreOrganizationId();
+  const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
 
   // URL-based tab derivation (IA restructure)
   const activeTab = useMemo((): ActiveTab => {
@@ -191,29 +146,46 @@ export function StoreSignagePage() {
       assets: '/store/marketing/signage/videos',
       schedules: '/store/marketing/signage/schedules',
     };
-    navigate(map[tab], { replace: true });
+    const base = storeWorkspaceBase(location.pathname);
+    const target = map[tab].replace('/store', base);
+    navigate(withWorkspaceMode(target, tab === 'schedules' ? 'use' : 'studio'), { replace: true });
   };
 
-  // ── Schedule state ──
-  const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
-  const [scheduleLoading, setScheduleLoading] = useState(false);
-  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1: 스케줄 조회 실패 표시용
-  const [scheduleError, setScheduleError] = useState<string | null>(null);
-  const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistOption[]>([]);
-  const [showScheduleForm, setShowScheduleForm] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<SignageScheduleItem | null>(null);
-
-  // Schedule form state
-  const [schName, setSchName] = useState('');
-  const [schPlaylistId, setSchPlaylistId] = useState('');
-  const [schDays, setSchDays] = useState<number[]>([1, 2, 3, 4, 5]); // Mon-Fri default
-  const [schStartTime, setSchStartTime] = useState('09:00');
-  const [schEndTime, setSchEndTime] = useState('18:00');
-  const [schValidFrom, setSchValidFrom] = useState('');
-  const [schValidUntil, setSchValidUntil] = useState('');
-  const [schPriority, setSchPriority] = useState(0);
-  const [schIsActive, setSchIsActive] = useState(true);
-  const [schSaving, setSchSaving] = useState(false);
+  const {
+    loadSchedules,
+    loadSignagePlaylists,
+    schedules,
+    scheduleLoading,
+    scheduleError,
+    signagePlaylists,
+    showScheduleForm,
+    editingSchedule,
+    schName,
+    schPlaylistId,
+    schDays,
+    schStartTime,
+    schEndTime,
+    schValidFrom,
+    schValidUntil,
+    schPriority,
+    schIsActive,
+    schSaving,
+    schSaveError,
+    setShowScheduleForm,
+    setSchName,
+    setSchPlaylistId,
+    setSchPriority,
+    setSchStartTime,
+    setSchEndTime,
+    setSchValidFrom,
+    setSchValidUntil,
+    setSchIsActive,
+    resetScheduleForm,
+    openEditSchedule,
+    handleSaveSchedule,
+    handleDeleteSchedule,
+    toggleSchDay,
+  } = useSignageSchedules(organizationId);
 
   // ── Legacy asset state ──
   const { data: items, setData: setItems, loading, error: listError, reload: reloadItems } = useStoreResource(loadSignageAssets, []);
@@ -227,22 +199,36 @@ export function StoreSignagePage() {
   const [page, setPage] = useState(1);
   const [assetKeyword, setAssetKeyword] = useState('');
 
-  // ── Playlist state ──
-  const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
-  const [playlistLoading, setPlaylistLoading] = useState(true);
-  const [playlistError, setPlaylistError] = useState<string | null>(null);
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
-  const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
-  const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
-  const [playlistKeyword, setPlaylistKeyword] = useState('');
-  const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>([]);
-
-  // ── Add video modal state ──
-  const [showAddVideoModal, setShowAddVideoModal] = useState(false);
-  const [addModalSearch, setAddModalSearch] = useState('');
-  const [addModalSelected, setAddModalSelected] = useState<Set<string>>(new Set());
-  const [addModalSaving, setAddModalSaving] = useState(false);
-  const [showLibrarySelector, setShowLibrarySelector] = useState(false);
+  const {
+    playlistActionError,
+    loadPlaylists,
+    playlists,
+    playlistLoading,
+    playlistError,
+    selectedPlaylistId,
+    setSelectedPlaylistId,
+    playlistItems,
+    playlistItemsLoading,
+    playlistKeyword,
+    setPlaylistKeyword,
+    selectedPlaylistKeys,
+    setSelectedPlaylistKeys,
+    showAddVideoModal,
+    setShowAddVideoModal,
+    addModalSearch,
+    setAddModalSearch,
+    addModalSelected,
+    setAddModalSelected,
+    addModalSaving,
+    showLibrarySelector,
+    setShowLibrarySelector,
+    handleTogglePublish,
+    handleDeletePlaylist,
+    handleAddFromLibrary,
+    handleDeleteItem,
+    handleBulkAdd,
+    handleMoveItem,
+  } = useSignagePlaylists(organizationId);
 
   // ── Direct video registration (signage_media) ──
   const [signageMediaItems, setSignageMediaItems] = useState<SignageMediaItem[]>([]);
@@ -256,178 +242,45 @@ export function StoreSignagePage() {
   const [regVideoError, setRegVideoError] = useState('');
   const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
-  // ── Media / snapshot edit drawer ──
-  const [editingMedia, setEditingMedia] = useState<SignageMediaItem | null>(null);
-  const [editingSnapshot, setEditingSnapshot] = useState<StoreAssetItem | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editTags, setEditTags] = useState('');
-  const [editThumbnailUrl, setEditThumbnailUrl] = useState('');
-  const [editSourceUrl, setEditSourceUrl] = useState('');
+  // Target and draft belong to one editor, with one change action.
+  const [editingTarget, setEditingTarget] = useState<SignageEditTarget | null>(null);
+  const [editDraft, setEditDraft] = useState<SignageMediaDraft>(emptySignageMediaDraft);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
-
-  const loadPlaylists = useCallback(async () => {
-    setPlaylistLoading(true);
-    setPlaylistError(null);
-    try {
-      const data = await fetchStorePlaylists();
-      setPlaylists(data);
-    } catch {
-      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setPlaylistLoading(false);
-    }
-  }, []);
-
-  const loadPlaylistItems = useCallback(async (playlistId: string) => {
-    setPlaylistItemsLoading(true);
-    try {
-      const data = await fetchPlaylistItems(playlistId);
-      setPlaylistItems(data);
-    } catch {
-      setPlaylistItems([]);
-      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setPlaylistItemsLoading(false);
-    }
-  }, []);
-
-  // ── Schedule loaders ──
-  const loadSchedules = useCallback(async () => {
-    if (!organizationId) return;
-    setScheduleLoading(true);
-    setScheduleError(null);
-    try {
-      const res = await fetchSchedules(organizationId);
-      setSchedules(Array.isArray(res.items) ? res.items : Array.isArray(res) ? res as unknown as SignageScheduleItem[] : []);
-    } catch {
-      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setScheduleLoading(false);
-    }
-  }, [organizationId]);
-
-  const loadSignagePlaylists = useCallback(async () => {
-    if (!organizationId) return;
-    try {
-      const data = await fetchSignagePlaylists(organizationId);
-      setSignagePlaylists(data);
-    } catch {
-      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    }
-  }, [organizationId]);
+  const editBusy = useRef(false);
+  const editTargetRef = useRef(editingTarget); editTargetRef.current = editingTarget;
+  const editDraftRef = useRef(editDraft); editDraftRef.current = editDraft;
+  const registrationBusy = useRef(false);
+  const registrationDraft = JSON.stringify([regVideoTitle, regVideoUrl, regVideoDescription, regVideoTags, regVideoStatus]);
+  const registrationDraftRef = useRef(registrationDraft); registrationDraftRef.current = registrationDraft;
 
   const loadSignageMedia = useCallback(async () => {
     if (!organizationId) return;
     try {
       const data = await fetchSignageMedia(organizationId);
-      setSignageMediaItems(data);
+      if (organizationRef.current === organizationId) setSignageMediaItems(data);
     } catch {
-      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      if (organizationRef.current === organizationId) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   }, [organizationId]);
 
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
-    loadPlaylists();
-    loadSchedules();
-    loadSignagePlaylists();
     loadSignageMedia();
-  }, [loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
-
-  useEffect(() => {
-    if (activeTab === 'schedules' && schedules.length === 0) {
-      loadSchedules();
-      loadSignagePlaylists();
-    }
-  }, [activeTab, loadSchedules, loadSignagePlaylists, schedules.length]);
-
-  useEffect(() => {
-    if (selectedPlaylistId) loadPlaylistItems(selectedPlaylistId);
-  }, [selectedPlaylistId, loadPlaylistItems]);
-
-  // ── Playlist handlers ──
-  const handleTogglePublish = async (pl: StorePlaylist) => {
-    const next = pl.publishStatus === 'draft' ? 'published' : 'draft';
-    try {
-      await updateStorePlaylist(pl.id, { publishStatus: next });
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
-
-  const handleDeletePlaylist = async (pl: StorePlaylist) => {
-    if (!confirm(`"${pl.name}" 플레이리스트를 삭제하시겠습니까?`)) return;
-    try {
-      await deleteStorePlaylist(pl.id);
-      if (selectedPlaylistId === pl.id) {
-        setSelectedPlaylistId(null);
-        setPlaylistItems([]);
-      }
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
-
-  const handleAddFromLibrary = async (item: LibrarySelectorResult) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await addPlaylistItemFromLibrary(selectedPlaylistId, item.id);
-      setShowLibrarySelector(false);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
-  const handleDeleteItem = async (itemId: string) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await deletePlaylistItem(selectedPlaylistId, itemId);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
-  const handleBulkAdd = async () => {
-    if (!selectedPlaylistId || addModalSelected.size === 0) return;
-    setAddModalSaving(true);
-    for (const key of addModalSelected) {
-      try {
-        if (key.startsWith('media_')) {
-          await addPlaylistItemFromSignage(selectedPlaylistId, key.slice(6), organizationId);
-        } else {
-          await addPlaylistItem(selectedPlaylistId, key);
-        }
-      } catch { /* skip individual failures, user can retry */ }
-    }
-    setShowAddVideoModal(false);
-    setAddModalSelected(new Set());
-    setAddModalSearch('');
-    setAddModalSaving(false);
-    loadPlaylistItems(selectedPlaylistId);
-  };
-
-  const handleMoveItem = async (index: number, direction: -1 | 1) => {
-    if (!selectedPlaylistId) return;
-    const newItems = [...playlistItems];
-    const swapIdx = index + direction;
-    if (swapIdx < 0 || swapIdx >= newItems.length) return;
-    [newItems[index], newItems[swapIdx]] = [newItems[swapIdx], newItems[index]];
-    setPlaylistItems(newItems);
-    try {
-      await reorderPlaylistItems(selectedPlaylistId, newItems.map(i => i.id));
-    } catch {
-      loadPlaylistItems(selectedPlaylistId);
-    }
-  };
+  }, [loadSignageMedia]);
 
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
     setRegVideoError('');
-    if (!regVideoTitle.trim() || !regVideoUrl.trim()) return;
+    if (registrationBusy.current || !regVideoTitle.trim() || !regVideoUrl.trim()) return;
     const sourceType = detectVideoSource(regVideoUrl.trim());
     if (!sourceType) {
       setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.');
       return;
     }
     const tags = regVideoTags.split(',').map(t => t.trim()).filter(Boolean);
+    const submitted = registrationDraft, store = organizationId;
+    registrationBusy.current = true;
     setRegVideoSaving(true);
     try {
       await createSignageMedia(organizationId, {
@@ -439,6 +292,9 @@ export function StoreSignagePage() {
         tags: tags.length > 0 ? tags : undefined,
         status: regVideoStatus,
       });
+      if (organizationRef.current !== store) return;
+      void loadSignageMedia();
+      if (registrationDraftRef.current !== submitted) return;
       setRegVideoTitle('');
       setRegVideoUrl('');
       setRegVideoDescription('');
@@ -446,10 +302,10 @@ export function StoreSignagePage() {
       setRegVideoStatus('active');
       setRegVideoError('');
       setShowVideoRegForm(false);
-      loadSignageMedia();
     } catch (err: unknown) {
-      setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+      if (organizationRef.current === store) setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
     } finally {
+      registrationBusy.current = false;
       setRegVideoSaving(false);
     }
   };
@@ -459,162 +315,77 @@ export function StoreSignagePage() {
     try {
       await deleteSignageMedia(organizationId, mediaId);
       loadSignageMedia();
-    } catch { /* user can retry */ }
+    } catch { setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
   };
 
-  // ── Media / snapshot edit drawer handlers ──
-  const handleOpenEdit = (v: UnifiedVideoItem) => {
-    setEditError('');
-    if (v.source === 'direct' && v._media) {
-      const media = v._media;
-      setEditingMedia(media);
-      setEditingSnapshot(null);
-      setEditName(media.name);
-      setEditDescription(media.description ?? '');
-      setEditTags((media.tags ?? []).join(', '));
-      setEditThumbnailUrl(media.thumbnailUrl ?? '');
-      setEditSourceUrl(media.sourceUrl ?? '');
-    } else if (v.source === 'snapshot' && v._snapshot) {
-      const snap = v._snapshot;
-      setEditingSnapshot(snap);
-      setEditingMedia(null);
-      setEditName(snap.title);
-      const cj = snap.contentJson ?? {};
-      setEditDescription((cj.description as string) ?? '');
-      setEditTags(((cj.tags as string[]) ?? []).join(', '));
-      setEditThumbnailUrl((cj.thumbnailUrl as string) ?? '');
-      setEditSourceUrl((cj.sourceUrl as string) ?? '');
-    }
+  const handleOpenEdit = (video: UnifiedVideoItem) => {
+    const target: SignageEditTarget | null = video.source === 'direct' && video._media
+      ? { kind: 'direct', media: video._media }
+      : video._snapshot ? { kind: 'snapshot', snapshot: video._snapshot } : null;
+    if (!target) return;
+    const draft = readSignageMediaDraft(target);
+    editTargetRef.current = target; editDraftRef.current = draft;
+    setEditingTarget(target); setEditDraft(draft); setEditError('');
   };
-
+  const handleEditChange = (field: keyof SignageMediaDraft, value: string) => {
+    setEditDraft(previous => {
+      const next = { ...previous, [field]: value }; editDraftRef.current = next; return next;
+    });
+  };
   const handleCloseEditDrawer = () => {
-    setEditingMedia(null);
-    setEditingSnapshot(null);
-    setEditError('');
+    editTargetRef.current = null;
+    setEditingTarget(null); setEditError('');
   };
-
   const handleSaveEdit = async () => {
-    if (!editName.trim()) return;
-    setEditSaving(true);
-    setEditError('');
+    const target = editingTarget, draft = editDraft, store = organizationId;
+    if (!target || !draft.name.trim() || editBusy.current) return;
+    editBusy.current = true; setEditSaving(true); setEditError('');
     try {
-      const tags = editTags.split(',').map(t => t.trim()).filter(Boolean);
-      const trimmedSourceUrl = editSourceUrl.trim();
-      if (editingMedia) {
-        const updated = await updateSignageMedia(organizationId, editingMedia.id, {
-          name: editName.trim(),
-          description: editDescription.trim() || undefined,
-          tags: tags.length > 0 ? tags : [],
-          thumbnailUrl: editThumbnailUrl.trim() || undefined,
-          sourceUrl: trimmedSourceUrl || undefined,
-        });
-        setSignageMediaItems(prev => prev.map(m => m.id === updated.id ? updated : m));
-      } else if (editingSnapshot) {
-        const res = await assetSnapshotApi.patch(editingSnapshot.id, {
-          title: editName.trim(),
-          description: editDescription.trim() || undefined,
-          tags: tags.length > 0 ? tags : [],
-          thumbnailUrl: editThumbnailUrl.trim() || undefined,
-          sourceUrl: trimmedSourceUrl || undefined,
-        });
-        const updated = res.data;
-        setItems(prev => prev.map(it => it.id === editingSnapshot.id
-          ? { ...it, title: updated.title, contentJson: updated.contentJson }
-          : it,
-        ));
+      const metadata = signageMediaMetadata(draft);
+      if (target.kind === 'direct') {
+        const updated = await updateSignageMedia(store, target.media.id, { name: draft.name.trim(), ...metadata });
+        if (organizationRef.current !== store) return;
+        setSignageMediaItems(previous => previous.map(media => media.id === updated.id ? updated : media));
+      } else {
+        const response = await assetSnapshotApi.patch(target.snapshot.id, { title: draft.name.trim(), ...metadata });
+        if (organizationRef.current !== store) return;
+        setItems(previous => previous.map(item => item.id === target.snapshot.id
+          ? { ...item, title: response.data.title, contentJson: response.data.contentJson } : item));
       }
-      handleCloseEditDrawer();
-    } catch (err: unknown) {
-      setEditError(err instanceof Error ? err.message : '저장에 실패했습니다.');
-    } finally {
-      setEditSaving(false);
-    }
+      if (editTargetRef.current === target && editDraftRef.current === draft) handleCloseEditDrawer();
+    } catch (error) {
+      if (organizationRef.current === store && editTargetRef.current === target) setEditError(error instanceof Error ? error.message : '저장에 실패했습니다.');
+    } finally { editBusy.current = false; setEditSaving(false); }
   };
-
   const handleDeleteFromDrawer = async () => {
-    if (editingMedia) {
-      if (!confirm(`"${editingMedia.name}" 동영상을 삭제하시겠습니까?`)) return;
-      try {
-        await deleteSignageMedia(organizationId, editingMedia.id);
-        handleCloseEditDrawer();
-        loadSignageMedia();
-      } catch { /* user can retry */ }
-    } else if (editingSnapshot) {
-      if (!confirm(`"${editingSnapshot.title}" 동영상(HUB 복사본)을 삭제하시겠습니까?`)) return;
-      try {
-        await assetSnapshotApi.remove(editingSnapshot.id);
-        handleCloseEditDrawer();
-        fetchItems();
-      } catch { /* user can retry */ }
-    }
+    const target = editingTarget, store = organizationId;
+    if (!target || editBusy.current) return;
+    const name = target.kind === 'direct' ? target.media.name : target.snapshot.title;
+    if (!confirm(`"${name}" 동영상을 삭제하시겠습니까?`)) return;
+    editBusy.current = true; setEditSaving(true); setEditError('');
+    try {
+      if (target.kind === 'direct') await deleteSignageMedia(store, target.media.id);
+      else await assetSnapshotApi.remove(target.snapshot.id);
+      if (organizationRef.current !== store) return;
+      if (editTargetRef.current === target) handleCloseEditDrawer();
+      if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
+    } catch {
+      if (organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주세요.');
+    } finally { editBusy.current = false; setEditSaving(false); }
   };
+  useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
 
   // ── Unified video list (snapshots + direct media) ──
-  const unifiedVideos = useMemo((): UnifiedVideoItem[] => {
-    const snaps: UnifiedVideoItem[] = items.map(s => ({
-      id: s.id,
-      title: s.title,
-      source: 'snapshot' as const,
-      publishStatus: s.publishStatus,
-      channelMap: s.channelMap,
-      isForced: s.isForced,
-      isLocked: s.isLocked,
-      forcedStartAt: s.forcedStartAt,
-      forcedEndAt: s.forcedEndAt,
-      createdAt: s.createdAt,
-      _snapshot: s,
-    }));
-    const media: UnifiedVideoItem[] = signageMediaItems.map(m => ({
-      id: `media_${m.id}`,
-      title: m.name,
-      source: 'direct' as const,
-      sourceUrl: m.sourceUrl,
-      sourceType: m.sourceType,
-      createdAt: m.createdAt,
-      _media: m,
-    }));
-    return [...snaps, ...media];
-  }, [items, signageMediaItems]);
+  const unifiedVideos = useMemo(() => buildSignageVideoList(items, signageMediaItems), [items, signageMediaItems]);
 
   // KPI (snapshot 기준 유지)
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
   // Filter + Sort + Keyword (unified: snapshots + direct media)
-  const filteredUnified = useMemo(() => {
-    let filtered = unifiedVideos.filter(v => {
-      // Status filter: only apply to snapshots; direct always passes on 'all'
-      if (statusFilter !== 'all' && v.source === 'snapshot') {
-        if (statusFilter === 'published' && v.publishStatus !== 'published') return false;
-        if (statusFilter === 'draft' && v.publishStatus !== 'draft') return false;
-        if (statusFilter === 'hidden' && v.publishStatus !== 'hidden') return false;
-        if (statusFilter === 'forced' && !v._snapshot) return false;
-        if (statusFilter === 'forced' && v._snapshot && !isForcedActive(v._snapshot)) return false;
-      }
-      if (statusFilter !== 'all' && v.source === 'direct') return false;
-      return true;
-    });
-    if (assetKeyword.trim()) {
-      const kw = assetKeyword.toLowerCase();
-      filtered = filtered.filter(v => v.title.toLowerCase().includes(kw));
-    }
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortKey === 'forced-first' && a._snapshot && b._snapshot) {
-        const aF = isForcedActive(a._snapshot) ? 1 : 0;
-        const bF = isForcedActive(b._snapshot) ? 1 : 0;
-        if (bF !== aF) return bF - aF;
-      }
-      if (sortKey === 'published-first') {
-        const order: Record<string, number> = { published: 0, draft: 1, hidden: 2 };
-        const aO = a.publishStatus ? (order[a.publishStatus] ?? 9) : 9;
-        const bO = b.publishStatus ? (order[b.publishStatus] ?? 9) : 9;
-        if (aO !== bO) return aO - bO;
-      }
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    return filtered;
-  }, [unifiedVideos, statusFilter, sortKey, assetKeyword]);
+  const filteredUnified = useMemo(() => filterSignageVideos(unifiedVideos, {
+    status: statusFilter, sort: sortKey, keyword: assetKeyword,
+  }), [unifiedVideos, statusFilter, sortKey, assetKeyword]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredUnified.length / PAGE_LIMIT));
@@ -626,16 +397,7 @@ export function StoreSignagePage() {
   useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
 
   // Total duration + missing-duration count for selected playlist items
-  const totalDurationInfo = useMemo(() => {
-    let totalSec = 0;
-    let missingCount = 0;
-    for (const item of playlistItems) {
-      const dur = item.contentJson?.duration as number | undefined;
-      if (dur && dur > 0) totalSec += Math.round(dur);
-      else missingCount++;
-    }
-    return { totalSec, missingCount };
-  }, [playlistItems]);
+  const totalDurationInfo = useMemo(() => summarizePlaylistDuration(playlistItems), [playlistItems]);
 
   // Filtered unified video list for add modal
   const addModalVideos = useMemo(() => {
@@ -662,90 +424,9 @@ export function StoreSignagePage() {
       setItems(prev => prev.map(it =>
         it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
       ));
-    } catch { /* user can retry */ } finally {
+    } catch { setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.'); } finally {
       setUpdatingId(null);
     }
-  };
-
-  // ── Schedule handlers ──
-  const resetScheduleForm = () => {
-    setSchName('');
-    setSchPlaylistId('');
-    setSchDays([1, 2, 3, 4, 5]);
-    setSchStartTime('09:00');
-    setSchEndTime('18:00');
-    setSchValidFrom('');
-    setSchValidUntil('');
-    setSchPriority(0);
-    setSchIsActive(true);
-    setEditingSchedule(null);
-    setShowScheduleForm(false);
-  };
-
-  const openEditSchedule = (sch: SignageScheduleItem) => {
-    setEditingSchedule(sch);
-    setSchName(sch.name);
-    setSchPlaylistId(sch.storePlaylistId || sch.playlistId || '');
-    setSchDays([...sch.daysOfWeek]);
-    setSchStartTime(sch.startTime.slice(0, 5)); // HH:MM:SS → HH:MM
-    setSchEndTime(sch.endTime.slice(0, 5));
-    setSchValidFrom(sch.validFrom ?? '');
-    setSchValidUntil(sch.validUntil ?? '');
-    setSchPriority(sch.priority);
-    setSchIsActive(sch.isActive);
-    setShowScheduleForm(true);
-  };
-
-  const handleSaveSchedule = async () => {
-    if (!schName.trim() || !schPlaylistId || schDays.length === 0 || !organizationId) return;
-    setSchSaving(true);
-    try {
-      if (editingSchedule) {
-        await updateSchedule(organizationId, editingSchedule.id, {
-          name: schName.trim(),
-          storePlaylistId: schPlaylistId,
-          daysOfWeek: schDays,
-          startTime: schStartTime,
-          endTime: schEndTime,
-          validFrom: schValidFrom || null,
-          validUntil: schValidUntil || null,
-          priority: schPriority,
-          isActive: schIsActive,
-        });
-      } else {
-        const payload: CreateSchedulePayload = {
-          name: schName.trim(),
-          storePlaylistId: schPlaylistId,
-          daysOfWeek: schDays,
-          startTime: schStartTime,
-          endTime: schEndTime,
-          priority: schPriority,
-          isActive: schIsActive,
-        };
-        if (schValidFrom) payload.validFrom = schValidFrom;
-        if (schValidUntil) payload.validUntil = schValidUntil;
-        await createSchedule(organizationId, payload);
-      }
-      resetScheduleForm();
-      loadSchedules();
-    } catch {
-      /* user can retry */
-    } finally {
-      setSchSaving(false);
-    }
-  };
-
-  const handleDeleteSchedule = async (sch: SignageScheduleItem) => {
-    if (!confirm(`"${sch.name}" 스케줄을 삭제하시겠습니까?`)) return;
-    if (!organizationId) return;
-    try {
-      await deleteSchedule(organizationId, sch.id);
-      loadSchedules();
-    } catch { /* user can retry */ }
-  };
-
-  const toggleSchDay = (day: number) => {
-    setSchDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort());
   };
 
   const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
@@ -763,8 +444,10 @@ export function StoreSignagePage() {
   // WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리
   return (
     <div className="w-full">
+      <StoreWorkflowNavigation subject="사이니지" studioPath="/marketing/signage/playlist" usePath="/marketing/signage/schedules" />
+      {playlistActionError && !showAddVideoModal && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{playlistActionError}</div>}
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
@@ -788,7 +471,7 @@ export function StoreSignagePage() {
       </div>
 
       {/* ─── Tab Bar ─────────────────────────────── */}
-      <div className="flex gap-1 mb-1 border-b border-slate-200">
+      <div className="flex flex-wrap gap-1 mb-1 border-b border-slate-200">
         <button
           onClick={() => navigateTab('assets')}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -1201,148 +884,32 @@ export function StoreSignagePage() {
           </div>
 
           {/* ── Create / Edit Form ── */}
-          {showScheduleForm && (
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
-              <div className="text-sm font-medium text-slate-700">
-                {editingSchedule ? '스케줄 수정' : '새 스케줄'}
-              </div>
-
-              {/* Row 1: Name */}
-              <input
-                type="text"
-                value={schName}
-                onChange={e => setSchName(e.target.value)}
-                placeholder="스케줄명 *"
-                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                autoFocus
-              />
-
-              {/* Row 2: Playlist + Priority */}
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  {playlists.filter(p => p.publishStatus === 'published').length === 0 && (
-                    <p className="text-xs text-amber-600 mb-1">
-                      게시된 플레이리스트가 없습니다. &lsquo;내 플레이리스트&rsquo; 탭에서 플레이리스트를 게시해주세요.
-                    </p>
-                  )}
-                  <select
-                    value={schPlaylistId}
-                    onChange={e => setSchPlaylistId(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">플레이리스트 선택 *</option>
-                    {playlists.filter(p => p.publishStatus === 'published').map(pl => (
-                      <option key={pl.id} value={pl.id}>{pl.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <label className="text-xs text-slate-500 whitespace-nowrap">우선순위</label>
-                  <input
-                    type="number"
-                    value={schPriority}
-                    onChange={e => setSchPriority(Number(e.target.value))}
-                    min={0}
-                    className="w-16 px-2 py-1.5 text-sm border border-slate-300 rounded-md text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Row 3: Days of week */}
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">요일 선택 *</label>
-                <div className="flex gap-1.5">
-                  {DAY_LABELS.map((label, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => toggleSchDay(idx)}
-                      className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
-                        schDays.includes(idx)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Row 4: Start / End time */}
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="text-xs text-slate-500 mb-1 block">시작 시간</label>
-                  <input
-                    type="time"
-                    value={schStartTime}
-                    onChange={e => setSchStartTime(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-xs text-slate-500 mb-1 block">종료 시간</label>
-                  <input
-                    type="time"
-                    value={schEndTime}
-                    onChange={e => setSchEndTime(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Row 5: Valid from / until */}
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="text-xs text-slate-500 mb-1 block">유효 시작일</label>
-                  <input
-                    type="date"
-                    value={schValidFrom}
-                    onChange={e => setSchValidFrom(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-xs text-slate-500 mb-1 block">유효 종료일</label>
-                  <input
-                    type="date"
-                    value={schValidUntil}
-                    onChange={e => setSchValidUntil(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Row 6: Active toggle + actions */}
-              <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={schIsActive}
-                    onChange={e => setSchIsActive(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-slate-700">활성화</span>
-                </label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSaveSchedule}
-                    disabled={schSaving || !schName.trim() || !schPlaylistId || schDays.length === 0}
-                    className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {schSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    {editingSchedule ? '수정' : '저장'}
-                  </button>
-                  <button
-                    onClick={resetScheduleForm}
-                    className="px-4 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-                  >
-                    취소
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {showScheduleForm && <StoreSignageScheduleForm
+            editing={!!editingSchedule}
+            playlists={playlists}
+            schName={schName}
+            schPlaylistId={schPlaylistId}
+            schPriority={schPriority}
+            schDays={schDays}
+            schStartTime={schStartTime}
+            schEndTime={schEndTime}
+            schValidFrom={schValidFrom}
+            schValidUntil={schValidUntil}
+            schIsActive={schIsActive}
+            schSaving={schSaving}
+            saveError={schSaveError}
+            setSchName={setSchName}
+            setSchPlaylistId={setSchPlaylistId}
+            setSchPriority={setSchPriority}
+            setSchStartTime={setSchStartTime}
+            setSchEndTime={setSchEndTime}
+            setSchValidFrom={setSchValidFrom}
+            setSchValidUntil={setSchValidUntil}
+            setSchIsActive={setSchIsActive}
+            toggleSchDay={toggleSchDay}
+            handleSaveSchedule={handleSaveSchedule}
+            resetScheduleForm={resetScheduleForm}
+          />}
 
           {/* ── Schedule List ── */}
           {scheduleLoading ? (
@@ -1615,8 +1182,8 @@ export function StoreSignagePage() {
         </div>
       )}
       {!loading && !error && !listError && unifiedVideos.length > 0 && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-1 min-w-0">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
             {([
               { key: 'all', label: '전체' },
@@ -1907,6 +1474,7 @@ export function StoreSignagePage() {
                 </span>
               )}
             </div>
+            {playlistActionError && <div role="alert" className="px-4 py-3 text-sm text-red-700">{playlistActionError}</div>}
             {/* Search */}
             <div className="px-4 py-2.5 border-b border-slate-100">
               <div className="relative">
@@ -2026,134 +1594,12 @@ export function StoreSignagePage() {
       />
 
       {/* ─── Media / Snapshot Edit Drawer ─────────── */}
-      <BaseDetailDrawer
-        open={!!editingMedia || !!editingSnapshot}
-        onClose={handleCloseEditDrawer}
-        title="동영상 편집"
-        width={480}
-        footer={
-          <div className="flex items-center justify-between w-full">
-            <button
-              onClick={handleDeleteFromDrawer}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              삭제
-            </button>
-            <div className="flex gap-2">
-              <button
-                onClick={handleCloseEditDrawer}
-                className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                disabled={editSaving || !editName.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {editSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                {editSaving ? '저장 중...' : '저장'}
-              </button>
-            </div>
-          </div>
-        }
-      >
-        {(editingMedia || editingSnapshot) && (() => {
-          const sourceType = editingMedia
-            ? editingMedia.sourceType
-            : (editingSnapshot!.contentJson?.sourceType as string | undefined) ?? '';
-          const createdAt = editingMedia ? editingMedia.createdAt : editingSnapshot!.createdAt;
-          return (
-            <div className="space-y-5">
-              {editError && (
-                <p className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded">{editError}</p>
-              )}
-
-              {/* 소스 URL (수정 가능) */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">동영상 URL</label>
-                <input
-                  type="url"
-                  value={editSourceUrl}
-                  onChange={e => setEditSourceUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                />
-                <p className="mt-1 text-[11px] text-slate-400">
-                  URL을 변경하면 이 항목이 재생하는 동영상이 변경됩니다. 기존 플레이리스트에는 변경된 URL이 적용됩니다.
-                </p>
-              </div>
-
-              {/* 읽기 전용 메타 */}
-              <div className="flex gap-4 text-[11px]">
-                <div>
-                  <span className="font-medium text-slate-400">유형 · </span>
-                  <span className="text-slate-500 capitalize">{sourceType}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-slate-400">등록일 · </span>
-                  <span className="text-slate-500">{new Date(createdAt).toLocaleDateString('ko-KR')}</span>
-                </div>
-                {editingSnapshot && (
-                  <div>
-                    <span className="font-medium text-slate-400">출처 · </span>
-                    <span className="text-slate-500">HUB 복사본</span>
-                  </div>
-                )}
-              </div>
-
-              {/* 수정 가능 필드 */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">제목 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="동영상 제목"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">설명</label>
-                <textarea
-                  value={editDescription}
-                  onChange={e => setEditDescription(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                  placeholder="동영상 설명 또는 용도 메모"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">태그 <span className="text-slate-400 font-normal">(쉼표로 구분)</span></label>
-                <input
-                  type="text"
-                  value={editTags}
-                  onChange={e => setEditTags(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="예: 약국, 건강, 홍보"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">썸네일 URL</label>
-                <input
-                  type="url"
-                  value={editThumbnailUrl}
-                  onChange={e => setEditThumbnailUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="https://..."
-                />
-                {editThumbnailUrl && (
-                  <img src={editThumbnailUrl} alt="썸네일 미리보기" className="mt-2 rounded-md w-full max-h-32 object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                )}
-              </div>
-            </div>
-          );
-        })()}
-      </BaseDetailDrawer>
+      <StoreSignageMediaEditor
+        target={editingTarget} draft={editDraft} onChange={handleEditChange}
+        editSaving={editSaving} editError={editError}
+        handleCloseEditDrawer={handleCloseEditDrawer}
+        handleDeleteFromDrawer={handleDeleteFromDrawer} handleSaveEdit={handleSaveEdit}
+      />
     </div>
   );
 }
@@ -2190,6 +1636,4 @@ function KpiCard({ label, count, color, warning }: {
     </div>
   );
 }
-
-
 

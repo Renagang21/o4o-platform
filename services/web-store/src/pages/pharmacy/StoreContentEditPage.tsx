@@ -19,6 +19,7 @@
  * - 저장 성공 toast
  */
 
+import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -262,6 +263,7 @@ export default function StoreContentEditPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
+      <StoreContentNextSteps />
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
