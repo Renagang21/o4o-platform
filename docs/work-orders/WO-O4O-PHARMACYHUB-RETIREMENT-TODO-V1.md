@@ -380,3 +380,10 @@ PR #534의 최종 commit 73687cf93d779bf8ba6e3fefe389ec74af945a3d는 필수 CI·
 ### 2026-10-13 URL map 연결 종료 apply 완료
 
 관리자는 f66ed5f5f8e6198e0043053b24cae6230ffa96cf와 PH workflow/owner로 한정한 임시 WIF 조건을 별도 로컬 pharmacyhub-domain-detachment-f66ed5f5f8e6198e0043053b24cae6230ffa96cf.json에 백업 후 적용하고 WIF_RESTRICTION_ACTIVE 검증 결과를 전달했다. main·필수 CI·다른 운영 Actions 부재를 재확인한 뒤 apply [38358591293](https://github.com/Renagang21/o4o-platform/actions/runs/38358591293)은 SUCCESS, applied=true, targets=[], removedTests=0, sharedResourcesPreserved=true로 종료했다. Compute update의 terminal success 이후 map을 재조회해 PH root/www host rule 및 전용 matcher 부재와 전체 공유 설정 보존을 검증했다. 공유 LB/IP/proxy/다른 host 및 DB/GCS는 변경하지 않았다. 관리자는 같은 로컬 백업을 사용해 원래 WIF 조건으로 복구하고 재조회 검증 결과 WIF_RESTORED를 전달했다. URL map 종료용 임시 인증 제한은 해제됐다. PH 전용 데이터/GCS 정리는 계속 미완료다. 가비아 도메인 등록/자동연장은 사용자 지시에 따라 유지한다.
+
+
+### PH 개발 데이터 후속 정리 준비 (2026-10-13)
+
+최신 main 기반 read-only census [38373127586](https://github.com/Renagang21/o4o-platform/actions/runs/38373127586)은 SUCCESS, failed=false, references.complete=true다. 잔여 root 58건 및 주문 로그 6건은 이전 집계와 같았다. 우선 주문/결제/공급/콘텐츠/게시판 요청 54건과 주문 로그 6건을 독립 Cloud Run transaction으로 제거하는 고정 범위 도구를 준비한다. 미디어 4건·연결 1건·GCS 파일은 이 단계에서 보존한다. 모든 application 테이블의 쓰기를 짧게 잠그고, 혼합 서비스 귀속·공유 결제·cross-schema FK·삭제 trigger·텍스트/JSON/배열/UUID의 타 행 참조를 검사한다. 건수 변경/미확인 참조가 있으면 삭제 전 중단한다. 관련 테이블별 삭제 건수 및 잔여를 확인한 뒤에만 COMMIT한다. 과거 source 태그만으로 KPA 행을 지우지 않는다.
+
+분리된 PostgreSQL 16 fixture에서 실제 plan/apply, 혼합 귀속, 공유 결제 그룹, cross-schema FK, JSON 참조, DELETE trigger 차단 및 전체 rollback·공유 identity/media 보존을 검증했다. 운영 삭제는 아직 미실행이다. 동일 WO의 연속 Phase이므로 현재 전용 worktree/branch를 유지한다. `ph_development_purge`는 standalone owner/main 모드이며 apply에는 정확한 reviewed main SHA의 임시 WIF 제한이 필요하다. 미디어 연결이 PH service 링크인지와 미귀속 연결인지도 read-only census에서 분리 집계한다.

@@ -47,7 +47,8 @@ function run(args,timeout=60000) {
   }
   return r.stdout.trim();
 }
-export function jobArguments({image,source,mode,runId,attempt,username,database}) {
+export function jobArguments({image,source,mode,runId,attempt,username,database,purge='administrative'}) {
+  if(!['administrative','development'].includes(purge))throw new Error('PH_JOB_SCOPE');
   if(!/^asia-northeast3-docker\.pkg\.dev\/netureyoutube\/o4o-api\/api-server@sha256:[a-f0-9]{64}$/.test(image))throw new Error('PH_JOB_IMAGE_NOT_PINNED');
   if(!['plan','apply'].includes(mode)||!/^\d+$/.test(runId)||!/^\d+$/.test(attempt))throw new Error('PH_JOB_IDENTITY');
   // These are secret bindings, not interpolated shell code; reject Cloud SDK delimiter injection.
@@ -59,26 +60,26 @@ const client=new Client({host:process.env.DB_HOST,port:5432,user:process.env.DB_
 try {
   await client.connect();
   await client.query(${JSON.stringify(mode==='plan'?'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY':'BEGIN ISOLATION LEVEL SERIALIZABLE')});
-  const result=await new PharmacyHubAdministrativePurge().up({isTransactionActive:true,query:async(sql,args)=>(await client.query(sql,args)).rows},${mode==='plan'});
+  const result=await new ${purge==='development'?'PharmacyHubDevelopmentPurge':'PharmacyHubAdministrativePurge'}().up({isTransactionActive:true,query:async(sql,args)=>(await client.query(sql,args)).rows},${mode==='plan'});
   await client.query(${JSON.stringify(mode==='plan'?'ROLLBACK':'COMMIT')});
   console.log(JSON.stringify(result??{applied:true,administrativeScopeOnly:true}));
 } catch(error) {
   try{await client.query('ROLLBACK')}catch{}
-  const message=typeof error.message==='string'&&/^PH_PURGE_[A-Z_]+(?::[a-zA-Z0-9_.]+)?$/.test(error.message)?error.message:'PH_PURGE_FAILED';
+  const message=typeof error.message==='string'&&/^PH_(?:PURGE|DEV)_[A-Z_]+(?::[a-zA-Z0-9_.]+)?$/.test(error.message)?error.message:'PH_PURGE_FAILED';
   console.error(message);process.exitCode=1;
 } finally {try{await client.end()}catch{process.exitCode=1}}
 `;
   const payload=Buffer.from(source+entry).toString('base64');
   const boot=`await import('data:text/javascript;base64,${payload}')`;
-  const name=`ph-admin-${runId}-${attempt}`;
+  const name=`${purge==='development'?'ph-dev':'ph-admin'}-${runId}-${attempt}`;
   return {name,args:['run','jobs','create',name,...base,`--image=${image}`,
-    '--service-account=o4o-runtime@netureyoutube.iam.gserviceaccount.com','--tasks=1','--parallelism=1','--max-retries=0','--task-timeout=300',
+    '--service-account=o4o-runtime@netureyoutube.iam.gserviceaccount.com','--tasks=1','--parallelism=1','--max-retries=0',`--task-timeout=${purge==='development'?600:300}`,
     '--set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db',
     '--set-secrets=DB_PASSWORD=o4o-db-password:latest',
     `--set-env-vars=^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${username}::DB_NAME=${database}`,
     '--command=node',`--args=^|^--input-type=module|-e|${boot}`]};
 }
-export async function runJob() {
+export async function runJob({development=false}={}) {
   await gate();
   const service=JSON.parse(run(['run','services','describe','o4o-core-api',...base,'--format=json(status.traffic)']));
   const traffic=service.status?.traffic?.filter(t=>t.percent>0);
@@ -86,14 +87,14 @@ export async function runJob() {
   const revision=traffic[0].revisionName;
   if(!/^o4o-core-api-[a-z0-9-]+$/.test(revision))throw new Error('PH_JOB_REVISION');
   const image=run(['run','revisions','describe',revision,...base,'--format=value(status.imageDigest)']);
-  const source=await readFile(new URL('./pharmacy-hub-administrative-purge.mjs',import.meta.url),'utf8');
+  const source=await readFile(new URL(development?'./pharmacy-hub-development-purge.mjs':'./pharmacy-hub-administrative-purge.mjs',import.meta.url),'utf8');
   const {name,args}=jobArguments({image,source,mode:process.env.CUTOVER_MODE,runId:process.env.GITHUB_RUN_ID,
-    attempt:process.env.GITHUB_RUN_ATTEMPT,username:process.env.DB_USERNAME,database:process.env.DB_NAME});
+    attempt:process.env.GITHUB_RUN_ATTEMPT,username:process.env.DB_USERNAME,database:process.env.DB_NAME,purge:development?'development':'administrative'});
   await gate();
   run(args);
   // Recheck immediately before the job can connect/write. A failure retains the job for inspection.
   await gate();
-  run(['run','jobs','execute',name,...base,'--wait'],360000);
+  run(['run','jobs','execute',name,...base,'--wait'],development?660000:360000);
   // Keep the exclusive authentication window through completion and cleanup.
   await gate();
   console.log(JSON.stringify({mode:process.env.CUTOVER_MODE,job:name,executionSucceeded:true,applied:process.env.CUTOVER_MODE==='apply'}));

@@ -43,6 +43,13 @@ const checks=[
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
       WHERE ${ph('a.service_key')} AND NOT EXISTS (SELECT 1 FROM public.cms_contents c
         WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
+  ['mediaPhServiceLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND l.entity_type='service' AND ${ph('l.entity_id')}`],
+  ['mediaUnownedEntityLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND NOT COALESCE((l.entity_type='service' AND ${ph('l.entity_id')}),FALSE)
+      AND NOT EXISTS (SELECT 1 FROM public.cms_contents c WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
   ['phContentMediaLinks',['media_entity_links.entity_type','media_entity_links.entity_id','cms_contents.id','cms_contents.serviceKey'],
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.cms_contents c ON l.entity_type='content' AND l.entity_id=c.id::text WHERE ${ph('c."serviceKey"')}`],
   ['phContentSharedAssets',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
