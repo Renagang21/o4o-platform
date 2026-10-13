@@ -67,16 +67,11 @@ import {
   type ExecutionReport,
 } from './work-agent-contract.js';
 import {
-  RECOVERY_ERROR,
-  RECOVERY_LIMITS,
-  classifyFailure,
-  decideRecovery,
-  isEscalatable,
-  noteNotRecovered,
   noteRecovered,
   sanitizeRecoveryHint,
   type ClassifyInput,
 } from './automation-recovery-contract.js';
+import { decideWorkAgentRecoveryAttempt } from './work-agent-recovery-attempt.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
 import {
@@ -1164,30 +1159,24 @@ export async function runWorkAgent(
   //   normalSpent=true 는 "이미 정상 재시도(loop 의 반복 상한 · invalidProposals 예산)를 소진했다" 는 뜻 —
   //   국면을 strong 부터 판단하게 한다(§16). throw 경로는 false 로 정상 tier 진행(정상 재시도 → strong).
   const recover = (input2: ClassifyInput, opts: { normalSpent?: boolean } = {}): 'retry' | 'giveup' => {
-    const cls = classifyFailure(input2);
-    if (opts.normalSpent) {
-      state.recovery.activeClass = cls;
-      state.recovery.lastClass = cls;
-      state.recovery.normalRetries = RECOVERY_LIMITS.normalRetryMax;
-    }
-    const decision = decideRecovery(state.recovery, cls);
-    if (decision.useStrongModel && strongPlanner) {
+    const decision = decideWorkAgentRecoveryAttempt(state.recovery, input2, !!strongPlanner, opts.normalSpent ?? false);
+    if (decision.action === 'escalate') {
+      // The decision emits escalation only when a strong planner is available.
       activePlanner = strongPlanner;
       if (plannerMode !== 'discovery') logger.info('work-agent planner mode', { mode: 'discovery', why: 'escalation', aiPlanCount: state.aiPlanCount });
       plannerMode = 'discovery'; // 막힘 → Discovery 역할로 되돌린다(B). 기록 actor 도 ai_strong.
-      recoveryStatus = RECOVERY_ERROR.ESCALATED;
+      recoveryStatus = decision.status;
       state.invalidProposals = 0;
       sameObservationRun = 0;
       repeatedActionRun = 0;
       retryCount += 1;
       return 'retry';
     }
-    if (!decision.askUser && !opts.normalSpent && strongPlanner) { retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
-    noteNotRecovered(state.recovery);
-    recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
+    if (decision.action === 'retry') { retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
+    recoveryStatus = decision.status;
     // 복구 소진의 끝: escalatable 하고 사용자에게 넘기는 국면이면 QUESTION(답하면 같은 run 재개), 아니면 TAKEOVER(§조건 5).
     // non-escalatable(RISK_BLOCKED·USER_INTERFERENCE·UNSUPPORTED_UI·AMBIGUOUS_STATE) · provider 불가는 항상 TAKEOVER.
-    recoveryGiveupKind = decision.askUser && isEscalatable(cls) ? 'question' : 'takeover';
+    recoveryGiveupKind = decision.giveupKind;
     return 'giveup';
   };
   /** 복구 국면 뒤 성공(완료) — 무엇으로 복구됐는지 기록한다(§27). 힌트가 실려 있으면 그 덕으로 본다. */

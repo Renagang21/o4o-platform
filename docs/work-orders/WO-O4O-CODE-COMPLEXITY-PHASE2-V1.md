@@ -222,7 +222,7 @@ N01의 이번 회원 조회/역할 후보는 검증·정비 완료했다. §7 N0
 CI/리뷰 integration-ready 판정은 하지 않으며 위 결과는 로컬 검증이다.
 
 
-## 10. N02 AI runtime·콘텐츠 모달 — TODO 초안
+## 10. N02 AI runtime·콘텐츠 모달 — TODO·검증 결과
 
 같은 WO/branch의 연속 묶음이다. 시작 main `af24236df8`을 확인했다.
 기존 기준 이후 main 변경은 PH 작업 문서 1개이며 이번 소스와 겹치지 않아
@@ -329,3 +329,116 @@ Core/API·상태 정책·권한·운영 DB·분회 전용 개발·main 병합·�
 - 이 종료 기록도 같은 branch의 후속 문서 commit으로 push한다.
 - C01~C06은 이번 내부 추출 묶음 완료. C-N01~C-N04의 큰 상태/부작용 분리는 미완료.
 - PR 생성·main 병합·배포 없음. CI/리뷰 integration-ready 판정은 하지 않았다.
+
+
+## 11. 공유 상태·모달 비동기 수명 — TODO 초안
+
+동일 WO/branch의 연속 묶음. 최신 main `aa59a0962f`, 직전 push `0c8d68e2a6`.
+사용자 승인 범위는 기존 상태 전이/실행 순서를 유지하는 정비 및 push까지다.
+
+- [x] D01: runtime 상태의 변경 주체·모달 상태/효과/async 응답/닫기 초기화 조사.
+- [x] D02: 동일 수명에 묶이는 상태와 별도 전이/실패 계약을 대조해 TODO 검증.
+- [x] D03: 검증된 recovery 판정 책임 및 개별 저장 panel 상태 책임 추출.
+- [x] D04: 실제 React hook 상태 전이·runtime recovery 행동 회귀·빌드/lint 검증.
+- [x] D05: 상태 소유 목록·비동기 경쟁 상태·후속 수정안 기록.
+- [ ] D06: commit·push 후 원격 commit 확인. PR 생성/main 병합/배포 없음.
+
+
+### 11.1 상태 소유 조사·TODO 검증 (구현 전)
+
+| 상태 그룹 | 현재 변경 주체 | 판정 |
+|---|---|---|
+| runtime recovery(activeClass/tier/예산/result) | recover→기존 classifyFailure/decideRecovery/noteNotRecovered, 성공 시 markRecovered | recover의 recovery 원장 판정만 별도 internal 함수. planner/로그/반복 카운터 변경은 runtime에 유지 |
+| plannerMode/activePlanner | 시작/경험 routing의 setPlannerMode 및 recover escalation | 여러 전이 주체가 있어 함께 분리하지 않음 |
+| retryCount/관찰 반복/단위 예산 | recover 외 observe/runUnit/replay/dispatch에서도 변경 | 큰 RuntimeContext로 묶지 않음. recovery 내부 예산과 실행 계측을 구분 |
+| terminalKind/recoveryGiveupKind/종료 코드 | question/takeover/observeFailed/복구 판정 | 상태 전이/원장 저장 순서를 그대로 유지 |
+| 모달 생성/URL/초기값 | 3 useEffect·생성 handler·source tab·handleClose | 비동기 결과·재열기 계약 준비 전 그대로 둠 |
+| 커뮤니티 저장 panel | open/save/list fetch 및 handleClose | 전용 상태 hook으로 소유 분리. forums 목록/loading은 기존 close에서도 reset하지 않음 |
+| 내 매장/제작 자료 panel | 각 open/save 및 handleClose | 서로 다른 전용 상태 hook. title·상태·saving·노출 초기화 순서 유지 |
+
+검증한 구현: D-R01 internal recovery 결정 함수(RecoveryState만 수정; 네트워크·planner·로그 접근 없음),
+D-M01 커뮤니티/내 매장/제작 자료 각각의 상태 hook(공통 generic save hook 아님).
+기존 automation-recovery-contract 및 public index·props/상태 정책·API 계약은 변경하지 않는다.
+정본은 §10의 Assistant V2/Store 콘텐츠 경계/Shared Module Protocol과 현재 코드를 대조했다.
+consumer 범위는 §10.3과 같고 분회 전용 개발로 확대하지 않는다.
+
+확인한 잔여: close 후 늦은 생성/목록/저장 응답이 setter를 다시 호출할 수 있다.
+AbortController/run generation/stale response guard가 없고 finally도 그대로 실행된다.
+이번 extraction에 취소·결과 무시·callback 정책 변경을 숨겨 넣지 않는다.
+후속에는 재열기 중 stale 응답·저장은 실제 완료됐으나 화면은 닫힌 경우·서버 write 이후 abort·
+외부 성공 callback의 처리 계약을 따로 준비한다. 프론트 abort는 서버 write rollback을 보장하지 않는다.
+
+검증 계획: 기존 recovery/strong routing/안전/단위 dispatch suite를 실행하고,
+실제 React renderHook으로 panel 격리·초기값·close reset 범위·인스턴스 수명을 검증한다.
+기존 recovery 판정과 새 함수의 상태/결정 결과를 합성 시퀀스로 대조한다.
+content-editor/API type/build·공개 타입 동일성·Store 경계와 lint를 확인한다.
+
+
+### 11.2 구현·검증 결과
+
+- recovery는 내부 `decideWorkAgentRecoveryAttempt`가 실패 분류/예산/끝맺음 결정을 담당한다.
+  기존 RecoveryState만 수정한다. planner 교체·로그·invalid proposal/관찰 반복/실행 계측 카운터는
+  runtime에 남기고 원래 순서로 적용한다. 기존 recovery policy 파일은 수정하지 않았다.
+- 저장 panel은 각각의 hook과 communityPanel/storePanel/materialPanel 소유 객체로 나눴다.
+  modal에서 15개 panel useState 호출과 개별 setter 변수를 제거하고 각 panel의 open/reset 액션을 호출한다.
+  네트워크·오류 메시지·성공 callback·finally 처리는 기존 handler에 유지했다.
+- 커뮤니티의 forum 목록/loading을 close가 초기화하지 않던 계약 및 open이 pending saving을
+  취소하지 않던 계약을 유지했다. open prop 변경에 자동 reset effect를 새로 추가하지 않았다.
+- 범용 shared hook/RuntimeContext·public export·API/권한·dependency/CI·운영 DB 변경 없음.
+
+| 비교 지표 (직전 push → 이번 변경) | 전 | 후 |
+|---|---:|---:|
+| runtime recover 길이 / 분기 요소 | 27 / 10 | 21 / 4 |
+| runtime 본체 길이 / 분기 요소 | 1,469 / 216 | 1,463 / 216 |
+| AiContentModal 컴포넌트 길이 / 분기 요소 | 1,527 / 124 | 1,495 / 124 |
+| 추출 recovery 결정 함수 길이 / 분기 요소 | — | 25 / 9 |
+| runtime/모달 및 이번·기존 추출 파일 전체 길이 / 분기 요소 | 4,155 / 1,059 | 4,267 / 1,062 |
+
+§6의 AST 비교 지표다. helper 포함 전체 분기 요소는 discriminated decision/옵션 처리로 3개 늘었고
+타입·상태 반환·open/reset 경계로 전체 줄 수는 112줄 늘었다. 큰 실행/렌더 분기(216/124)를 줄였다고
+보고하지 않는다. 효과는 상태 소유와 recovery 판정의 변경·검증 지점을 격리한 것이다.
+
+검증:
+- 변경 전 recovery/routing 관련 3 suite / 31 tests PASS.
+- 기존 recovery/안전·새 상태 hook/결정·변환·Store 경계 포함 9 Jest suite / 134 tests PASS.
+- 소유 객체로 정리한 최종 panel/변환/Store 경계 4 suite / 91 tests 재실행 PASS (앞 수치의 부분집합).
+- 실제 React renderHook 8건: 초기값·패널 간/인스턴스 간 격리·open/reset 범위·rerender·unmount 수명.
+- 실제 AiContentModal Vitest/jsdom 2건: 닫기/재열기 후 새 생성·저장 panel 초기값,
+  동시에 열린 store/material 제목 격리. synthetic fetch만 사용했다.
+- 최종 고유 테스트 파일 기준 Jest 9개 134건 + Vitest 1개 2건. 반복 실행은 합산하지 않는다.
+- recovery 결정·RecoveryState·plannerMode/선택·기존 status·반복/실행 카운터·로그를
+  이전 구현과 576개 합성 조합으로 비교하여 동일 PASS.
+- content-editor typecheck/build, API type-check/build PASS.
+- content-editor 공개 index.d.ts byte 동일 PASS.
+- 변경 7개 소스/테스트 ESLint errors/warnings 0. 전체 ratchet PASS: errors 46 / baseline 46,
+  warnings 1,006. 기존 lint 오류 해결 판정 아님.
+- `git diff --check` PASS. 운영 DB/실계정/OAuth·사용자 PC·배포 검증은 실행하지 않았다.
+
+실행 명령: API suite는 SETUP의 Jest 경로 지정 방식. 실제 모달 테스트는 root에서
+`pnpm exec vitest run packages/content-editor/tests/AiContentModal.lifecycle.test.tsx --environment jsdom --maxWorkers=1`.
+테스트 환경/manifest/lockfile 변경 없이 이미 설치된 도구를 사용했다.
+
+### 11.3 실제 재현한 늦은 응답과 다음 TODO
+
+실제 AiContentModal을 jsdom에 mount하고 fetch 응답만 지연한 별도 조사에서:
+1. Fixture 입력으로 생성 요청 → 응답 대기.
+2. 닫기 → 다시 열기. 새 요청은 보내지 않음.
+3. 이전 요청 응답을 반환하면 새 화면에 저장 버튼이 생기고 이전 결과 제목이 표시됨.
+
+1개 임시 characterization은 이 **미해결 동작을 재현**한 것이며 수정 PASS가 아니다.
+기존 불량 동작을 영구 기대 계약으로 고정하지 않도록 그 임시 파일은 검증 후 제거했다.
+서버/실계정 없이 synthetic fetch로 재현했고 운영 응답을 읽지 않았다.
+
+- [ ] D-N01: modal open/close/source 전환에 대한 request generation과 작업별 request ID를 준비.
+  generation/request가 다른 생성·URL·목록 응답은 현재 화면 state/finally를 갱신하지 않게 하는 계약을 검증.
+- [ ] D-N02: 저장 요청의 서버 성공은 UI close/abort와 별개라는 계약 확인.
+  늦은 응답은 새 panel 상태를 덮지 않되 기존 성공 callback은 확인된 서버 성공일 때 유지하는 안을 검증.
+  프론트 abort가 서버 write를 취소했다고 가정하지 않는다.
+- [ ] D-N03: 동시에 반복되는 같은 종류의 요청·같은 payload 저장 및 오류/no-op의 처리 조건을 준비.
+  기존 saving flag의 close reset만으로 중복 요청 제어가 된다고 판단하지 않는다.
+- [ ] D-N04: runtime observe/replay/dispatch와 planner routing의 상태 쓰기 주체/전이표를 계속 조사.
+  이번 판정 추출을 전체 공유 mutable 상태 분리 완료로 표시하지 않는다.
+
+다음 첫 구현 후보는 D-N01의 오래된 **생성 응답 UI 반영 차단**이다.
+모달 내부의 요청 식별·결과 반영만 다루고 생성/저장 API·권한·Core/운영 DB는 바꾸지 않는 범위로
+구체 TODO와 실패/재열기/연속 요청 검증을 먼저 준비한다.
