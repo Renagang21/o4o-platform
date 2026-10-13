@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-12): 최종 제거 범위에 PH 도메인/DNS/인증서 종료 포함. 다른 작업 종료 전 운영 변경 대기. PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
+> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH 주문·결제·공급·콘텐츠·미디어/GCS 및 URL map 연결 종료는 미완료. PC Local Agent는 담당 에이전트 범위다.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
