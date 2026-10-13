@@ -1,0 +1,30 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import Page from './OperatorSupplierApprovalPage';
+const api = vi.hoisted(() => ({ getSuppliersPaged: vi.fn(), rejectSupplier: vi.fn(), downloadDocument: vi.fn() }));
+vi.mock('../../lib/api', () => ({ operatorSupplierApi: api, PROFILE_FIELD_LABELS: {} }));
+const supplier = { id: 'supplier', name: '합성 공급자', status: 'PENDING', createdAt: '2026-01-01', businessRegistrationDocumentId: 'document', profileComplete: true };
+beforeEach(() => { vi.resetAllMocks(); api.getSuppliersPaged.mockResolvedValue({ items: [supplier], pagination: { page: 1, limit: 20, total: 1, totalPages: 1 } }); });
+afterEach(cleanup);
+it('keeps a rejected request reason after failure so the operator can retry', async () => {
+  api.rejectSupplier.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.click(await screen.findByText('합성 공급자'));
+  fireEvent.click(screen.getByRole('button', { name: '승인 거절' }));
+  const dialog = screen.getByRole('dialog', { name: '공급자 거절' });
+  fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: '보존할 사유' } });
+  fireEvent.click(within(dialog).getByRole('button', { name: '거절' }));
+  await within(dialog).findByRole('alert');
+  expect((within(dialog).getByRole('textbox') as HTMLTextAreaElement).value).toBe('보존할 사유');
+  fireEvent.click(within(dialog).getByRole('button', { name: '거절' }));
+  await screen.findByText('합성 공급자 거절 처리 완료');
+  expect(api.rejectSupplier).toHaveBeenLastCalledWith('supplier', '보존할 사유');
+});
+it('shows document download failure in the supplier detail', async () => {
+  api.downloadDocument.mockResolvedValue(null);
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.click(await screen.findByText('합성 공급자'));
+  fireEvent.click(screen.getByRole('button', { name: '사업자등록증' }));
+  expect((await screen.findByRole('alert')).textContent).toContain('서류를 내려받지 못했습니다.');
+});
