@@ -14,8 +14,7 @@ import { User } from '../../modules/auth/entities/User.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
-// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
-import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
+import { buildMemberProfileUpdate } from './membership-profile-update.js';
 import { MembershipApprovalService, StoreOwnerBusinessInfoRequiredError } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
@@ -130,6 +129,53 @@ export class MembershipConsoleController {
       [userId, serviceKeys]
     );
     return result.length > 0;
+  }
+
+  /** The single and batch approval endpoints read the same pending candidates. */
+  private async findApprovableMemberships(
+    userId: string,
+    scope: Pick<ServiceScope, 'isPlatformAdmin' | 'serviceKeys'>,
+  ): Promise<Array<{ id: string; service_key?: string; role?: string }>> {
+    return scope.isPlatformAdmin
+      ? AppDataSource.query(
+          `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+          [userId],
+        )
+      : AppDataSource.query(
+          `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+          [userId, scope.serviceKeys],
+        );
+  }
+
+  /** Reject scoped memberships sequentially; each endpoint owns its HTTP/batch result. */
+  private async rejectUserMemberships(
+    userId: string,
+    scope: Pick<ServiceScope, 'isPlatformAdmin' | 'serviceKeys'>,
+    reason: string | null,
+    adminServiceKeys: string[] | undefined,
+  ): Promise<number> {
+    const memberships: Array<{ id: string }> = scope.isPlatformAdmin
+      ? await AppDataSource.query(
+          `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
+          [userId],
+        )
+      : await AppDataSource.query(
+          `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
+          [userId, scope.serviceKeys],
+        );
+
+    let rejectedCount = 0;
+    for (const membership of memberships) {
+      const rejected = await approvalService.rejectMembership({
+        membershipId: membership.id,
+        reason,
+        adminServiceKeys,
+        isPlatformAdmin: scope.isPlatformAdmin,
+        serviceKeys: scope.serviceKeys,
+      });
+      if (rejected) rejectedCount += 1;
+    }
+    return rejectedCount;
   }
 
   /**
@@ -605,15 +651,7 @@ export class MembershipConsoleController {
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
         // (membership + user + role_assignments in single transaction)
-        let pendingMemberships = writeScope.isPlatformAdmin
-          ? await AppDataSource.query(
-              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
-              [userId]
-            )
-          : await AppDataSource.query(
-              `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-              [userId, writeScope.serviceKeys]
-            );
+        let pendingMemberships = await this.findApprovableMemberships(userId, writeScope);
 
         if (pendingMemberships.length > 0) {
           pendingMemberships = currentApprovalMemberships(pendingMemberships);
@@ -672,27 +710,9 @@ export class MembershipConsoleController {
         //   suspendMembership 이 이미 users 를 건드리지 않는 계약이므로 그 형태로 통일한다.
         //
         //   service_memberships.status(SSOT) 갱신은 그대로 유지 — 목록 필터가 이 값을 본다.
-        const rejectableMemberships = writeScope.isPlatformAdmin
-          ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
-              [userId]
-            )
-          : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-              [userId, writeScope.serviceKeys]
-            );
-
-        let rejectedCount = 0;
-        for (const m of rejectableMemberships) {
-          const rejected = await approvalService.rejectMembership({
-            membershipId: m.id,
-            reason: req.body.reason || null,
-            adminServiceKeys: (req as any).memberAdminServiceKeys,
-            isPlatformAdmin: writeScope.isPlatformAdmin,
-            serviceKeys: writeScope.serviceKeys,
-          });
-          if (rejected) rejectedCount += 1;
-        }
+        const rejectedCount = await this.rejectUserMemberships(
+          userId, writeScope, req.body.reason || null, (req as any).memberAdminServiceKeys,
+        );
 
         // suspend 분기와 동일한 계약 — 스코프 안에 대상이 없으면 404.
         if (rejectedCount === 0) {
@@ -815,15 +835,7 @@ export class MembershipConsoleController {
           }
 
           if (targetStatus === 'approved') {
-            let pendingMemberships = writeScope.isPlatformAdmin
-              ? await AppDataSource.query(
-                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
-                  [userId]
-                )
-              : await AppDataSource.query(
-                  `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-                  [userId, writeScope.serviceKeys]
-                );
+            let pendingMemberships = await this.findApprovableMemberships(userId, writeScope);
 
             if (pendingMemberships.length > 0) {
               pendingMemberships = currentApprovalMemberships(pendingMemberships);
@@ -864,29 +876,9 @@ export class MembershipConsoleController {
               continue;
             }
           } else if (targetStatus === 'rejected') {
-            const pendingMemberships = writeScope.isPlatformAdmin
-              ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
-                  [userId]
-                )
-              : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-                  [userId, writeScope.serviceKeys]
-                );
-
-            // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-            //   단건 경로와 동일 — membership 만 반려하고 users 전역 상태는 건드리지 않는다.
-            let rejectedCount = 0;
-            for (const m of pendingMemberships) {
-              const rejected = await approvalService.rejectMembership({
-                membershipId: m.id,
-                reason: req.body.reason || null,
-                adminServiceKeys: (req as any).memberAdminServiceKeys,
-                isPlatformAdmin: writeScope.isPlatformAdmin,
-                serviceKeys: writeScope.serviceKeys,
-              });
-              if (rejected) rejectedCount += 1;
-            }
+            const rejectedCount = await this.rejectUserMemberships(
+              userId, writeScope, req.body.reason || null, (req as any).memberAdminServiceKeys,
+            );
 
             if (rejectedCount === 0) {
               results.push({ id: userId, status: 'skipped', error: 'No memberships found to reject' });
@@ -995,7 +987,7 @@ export class MembershipConsoleController {
 
   /**
    * PUT /api/v1/operator/members/:userId
-   * 사용자 정보 수정 (프로필 + 비밀번호 + 사업자 정보)
+   * 사용자 정보 수정 (프로필 + 회원 유형 + 사업자 정보)
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -1009,16 +1001,7 @@ export class MembershipConsoleController {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
         return;
       }
-      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail/managerPhone canonical 수용.
-      // taxEmail/representativeName 은 legacy alias — controller 에서 canonical key 로만 저장.
-      const {
-        lastName, firstName, nickname, phone,
-        businessName, businessNumber, businessType,
-        businessCategory, zipCode, address1, address2,
-        ceoName, contactName, taxInvoiceEmail, pharmacyPhone, managerPhone,
-        taxEmail, representativeName, // legacy aliases
-        membershipRole, // service_memberships.role 변경
-      } = req.body;
+      const { membershipRole } = req.body;
 
       if (!scope.isPlatformAdmin) {
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
@@ -1083,81 +1066,9 @@ export class MembershipConsoleController {
       //   회원 로그인은 Google sub → users.id 하나로만 이뤄진다.
       //   운영자가 대신 바꿔줄 비밀번호가 존재하지 않으므로 이 경로는 무의미하다.
 
-      // 2. Profile fields update
-      const sets: string[] = [];
-      const params: any[] = [];
-      let idx = 1;
-
-      if (lastName !== undefined) { sets.push(`"lastName" = $${idx++}`); params.push(lastName); }
-      if (firstName !== undefined) { sets.push(`"firstName" = $${idx++}`); params.push(firstName); }
-      if (nickname !== undefined) { sets.push(`nickname = $${idx++}`); params.push(nickname); }
-      if (phone !== undefined) { sets.push(`phone = $${idx++}`); params.push(phone.replace(/\D/g, '')); }
-
-      // name 동기화 (lastName+firstName → name)
-      if (lastName !== undefined || firstName !== undefined) {
-        sets.push(`name = $${idx++}`);
-        params.push(`${lastName || ''}${firstName || ''}`.trim());
-      }
-
-      // 3. businessInfo JSONB 머지
-      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
-      //   ceoName / taxInvoiceEmail / managerPhone canonical write.
-      //   taxEmail → email overwrite 제거 (대표 이메일과 세금계산서 이메일 의미 분리).
-      //   legacy alias (taxEmail / representativeName) 는 client 보내도 canonical key 로 저장.
-      const bizFields: Record<string, any> = {};
-      if (businessName !== undefined) bizFields.businessName = businessName;
-      if (businessNumber !== undefined) bizFields.businessNumber = businessNumber;
-      if (businessType !== undefined) bizFields.businessType = businessType;
-      if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
-      const effectiveCeoName = ceoName ?? representativeName;
-      if (effectiveCeoName !== undefined) bizFields.ceoName = effectiveCeoName;
-      if (contactName !== undefined) bizFields.contactName = contactName;
-      const effectiveTaxInvoiceEmail = taxInvoiceEmail ?? taxEmail;
-      if (effectiveTaxInvoiceEmail !== undefined) bizFields.taxInvoiceEmail = effectiveTaxInvoiceEmail;
-      if (pharmacyPhone !== undefined) bizFields.pharmacyPhone = pharmacyPhone;
-      if (managerPhone !== undefined) bizFields.managerPhone = managerPhone;
-      // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
-      if (zipCode !== undefined) bizFields.zipCode = zipCode;
-      if (address1 !== undefined) bizFields.address = address1;
-      if (address2 !== undefined) bizFields.address2 = address2;
-      // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 동기화
-      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
-      //   기존 구현은 storeAddress 를 **통째로 새로 만들어** 넣었다. 그래서
-      //   상세주소만 수정해도 `baseAddress` 가 '' 로 덮이고 `zipCode` 키가 사라졌다
-      //   (실측: 프로덕션 storeAddress 보유 11명 중 zipCode 보유 6 / detailAddress 보유 9).
-      //   교정: 요청이 보낸 하위 키만 담아 중첩 부분 병합에 맡긴다 — 형제 키는 보존된다.
-      //   빈 문자열은 최상위 키(address/address2)와 동일하게 "그 값으로 수정" 으로 다룬다
-      //   (그래야 상세주소 지우기가 계속 동작한다).
-      const storeAddressFields: Record<string, any> = {};
-      if (zipCode !== undefined) storeAddressFields.zipCode = zipCode;
-      if (address1 !== undefined) storeAddressFields.baseAddress = address1;
-      if (address2 !== undefined) storeAddressFields.detailAddress = address2;
-
-      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
-      //   read → 병합 → 전체 재저장 제거. 부분 갱신 표현식을 같은 UPDATE 문에 합쳐
-      //   scalar 컬럼과 businessInfo 가 단일 statement 로 원자적으로 반영되게 한다.
-      const bizFragment = buildBusinessInfoUpdate(
-        {
-          root: bizFields,
-          ...(Object.keys(storeAddressFields).length > 0
-            ? { nested: { storeAddress: storeAddressFields } }
-            : {}),
-        },
-        idx,
-      );
-      if (bizFragment) {
-        sets.push(`"businessInfo" = ${bizFragment.expression}`);
-        params.push(...bizFragment.params);
-        idx = bizFragment.nextIndex;
-      }
-
-      if (sets.length > 0) {
-        sets.push(`"updatedAt" = NOW()`);
-        params.push(userId);
-        await AppDataSource.query(
-          `UPDATE users SET ${sets.join(', ')} WHERE id = $${idx}`,
-          params
-        );
+      const profileUpdate = buildMemberProfileUpdate(req.body, userId);
+      if (profileUpdate) {
+        await AppDataSource.query(profileUpdate.sql, profileUpdate.params);
       }
 
       res.json({ success: true, message: 'User updated' });
