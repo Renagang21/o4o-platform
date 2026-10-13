@@ -205,3 +205,6 @@ Node22.18.0/pnpm10.25.0을 명시한 실행으로 정정했다. 실패를 테스
 새 서비스/컨테이너/운영 인증 세션을 시작하지 않았다. supertest fixture 요청은 테스트 수명 안에서 종료됐다.
 후속: 이미지/가져오기·콘텐츠 처리 경계, 앞선 mobile Drawer/공통 에디터 사용성 한계, 사용자 실계정 검증.
 문서 정합: 사업자 필드의 조직 metadata 저장 소유권 코드 주석을 정본에 맞췄다. 정본 정책 변경 없음.
+
+4차 종료: 구현 `b45b0379020c8bc295bd656960289cc05ab71a78`의 `wo/supplier-code-phase4` push와 원격 SHA 일치를 확인했다.
+기존/이번 clone은 미통합 branch와 shared object 참조 때문에 KEEP. main 통합·배포는 수행하지 않았다.

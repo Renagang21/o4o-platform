@@ -1,6 +1,6 @@
 # 공급자 backend HTTP 책임 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거**: 사용자 — 다음 작업, 너무 작게 나누지 말 것. 공급자 코드 정비 4차를 commit → push까지 진행.
 
@@ -23,7 +23,7 @@
 - [x] 정의되지 않은 객체 상속 키의 제품 유형 접수 결함 재현·수정
 - [x] 기존 소스 assertion을 유지하며 facade가 연결한 실제 handler/모듈까지 검사
 - [x] 회귀·HTTP 요청·AST·타입·TypeScript 빌드·운영 번들·lint 검증
-- [ ] 명시적 파일 commit → 전용 branch push → 원격 일치 확인
+- [x] 명시적 파일 commit → 전용 branch push → 원격 일치 확인
 
 ## 구현 범위
 
@@ -59,3 +59,6 @@ Supplier Management의 사업자등록증 필드 저장 위치 주석만 현행 
 후속은 이 나머지 처리 경계와 앞선 mobile Drawer/공통 에디터 한계를 최신 main에서 재조사해 묶음으로 정비하는 것이다.
 
 문서 정합: backend 사업자 필드 저장 위치 코드 주석을 현행 정본에 맞췄다. 정본 정책 변경 없음.
+
+종료: 구현 `b45b0379020c8bc295bd656960289cc05ab71a78`를 전용 branch에 push하고 원격 SHA 일치를 확인했다.
+미통합 작업이므로 이전 branch·참조된 clone과 이번 작업 폴더는 KEEP이다.
