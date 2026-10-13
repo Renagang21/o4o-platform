@@ -11,31 +11,29 @@
  * 수정 모드: ProductForm mode="edit" 사용 (editMode: 'b2c' | 'b2b')
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Pencil, Loader2 } from 'lucide-react';
-import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
-import { SUPPLIER_SPOT_POLICIES_FORBIDDEN } from '../../lib/api/supplier';
-import { type ProductFormData } from '../../components/product';
-import { ContentRenderer, type MediaInsert } from '@o4o/content-editor';
-// WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
+import { X, Pencil } from 'lucide-react';
+import type { SupplierProduct } from '../../lib/api';
 import { Section, InfoRow } from '@o4o/operator-ux-core';
-import { toast } from '@o4o/error-handling';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
-// WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §A: Drawer 분해
 import SupplierImageSection from './product-detail/SupplierImageSection';
 import MasterReadOnlySection from './product-detail/MasterReadOnlySection';
 import OfferDistributionSection from './product-detail/OfferDistributionSection';
 import OfferEditSection from './product-detail/OfferEditSection';
-import {
-  DISTRIBUTION_TYPE_BADGE,
-  REGULATORY_TYPE_LABELS,
-  REGULATORY_TYPE_BADGE,
-  VISIBILITY_STATUS,
-  getVisibilityStatus,
-} from '../../lib/productConstants';
+import { useSupplierProductEditor } from './product-detail/useSupplierProductEditor';
+import { useSupplierProductImages } from './product-detail/useSupplierProductImages';
+import { useSupplierSpotPolicies } from './product-detail/useSupplierSpotPolicies';
+import { useSupplierDistribution } from './product-detail/useSupplierDistribution';
+import { useSupplierServicePrices } from './product-detail/useSupplierServicePrices';
+import SupplierSpotPolicySection from './product-detail/SupplierSpotPolicySection';
+import SupplierDescriptionSections from './product-detail/SupplierDescriptionSections';
+import SupplierDistributionModal from './product-detail/SupplierDistributionModal';
+import SupplierServicePricesModal from './product-detail/SupplierServicePricesModal';
+import { formatPrice, formatDate, toFormData } from './product-detail/productDetailHelpers';
+import { DISTRIBUTION_TYPE_BADGE, REGULATORY_TYPE_LABELS, REGULATORY_TYPE_BADGE, VISIBILITY_STATUS, getVisibilityStatus } from '../../lib/productConstants';
 
 interface ProductDetailDrawerProps {
   product: SupplierProduct | null;
@@ -71,474 +69,79 @@ const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
   DRAFT: { label: '초안', cls: 'bg-slate-100 text-slate-600' },
 };
 
-/**
- * WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATION-AND-DESCRIPTION-WRITE-SMOKE-BATCH-V1:
- * offer 저장 실패 시 백엔드 error code 를 그대로 노출하던 것을 공급자가 읽고 조치할 수 있는
- * 한국어 안내로 바꾼다. 매핑에 없는 코드는 코드 원문을 유지한다(진단 가능성 보존).
- */
-const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
-  PRIVATE_REQUIRES_SELLER_IDS:
-    '판매자가 지정되지 않은 내부 상품은 활성화하거나 유통 범위를 바꿀 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주세요. (가격·설명 등 정보 수정은 그대로 저장됩니다)',
-  SERVICE_REQUIRES_KEYS: '서비스 공급으로 설정하려면 대상 서비스를 1개 이상 선택해야 합니다.',
-  PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 전환하려면 상품 설명을 먼저 입력해야 합니다.',
-  PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.',
-};
-
-/**
- * WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
- * 이미지 API 실패 코드 → 공급자 안내. 매핑에 없는 코드는 원문 유지.
- */
-const IMAGE_ERROR_MESSAGE: Record<string, string> = {
-  MASTER_NOT_OWNED: '이 상품에 대한 권한이 없습니다.',
-  NETWORK_ERROR: '통신 오류로 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.',
-  MISSING_MASTER_ID: '상품 정보가 없어 처리할 수 없습니다. 화면을 새로고침해 주세요.',
-  MISSING_IMAGE_URL: '이미지 주소가 올바르지 않습니다.',
-};
-
-function imageErrorMessage(code: string | null | undefined): string {
-  if (!code) return '알 수 없는 오류';
-  return IMAGE_ERROR_MESSAGE[code] ?? code;
-}
-
-function offerSaveErrorMessage(code: string | null | undefined): string {
-  if (!code) return '알 수 없는 오류';
-  return OFFER_SAVE_ERROR_MESSAGE[code] ?? code;
-}
-
-function formatPrice(v: number | null | undefined): string {
-  if (v == null) return '-';
-  return `${Number(v).toLocaleString()}원`;
-}
-
-
-function formatDate(dateString: string | null | undefined): string {
-  if (!dateString) return '-';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-}
-
-function toFormData(p: SupplierProduct): Partial<ProductFormData> {
-  return {
-    marketingName: p.name || p.masterName || '',
-    priceGeneral: p.priceGeneral ?? null,
-    priceGold: p.priceGold ?? null,
-    consumerReferencePrice: p.consumerReferencePrice ?? null,
-    stockQuantity: p.stockQuantity ?? 0,
-    isActive: p.isActive,
-    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
-    isPublic: (p as any).isPublic ?? (p.distributionType === 'PUBLIC'),
-    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-    isFeatured: p.isFeatured ?? false,
-    serviceKeys: p.serviceKeys || [],
-    distributionType: p.distributionType || 'PRIVATE',
-  };
-}
-
-// ─── Component ───
-
-
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: 공통 input 스타일
 const INPUT_CLASS =
   'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50';
 
 export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions }: ProductDetailDrawerProps) {
-  // WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1: dual edit mode
-  const [editMode, setEditMode] = useState<'b2c' | 'b2b' | null>(null);
-  const isEditing = editMode !== null;
-  const [showSecondaryEdit, setShowSecondaryEdit] = useState(false);
-  const b2bEditRef = useRef<HTMLDivElement>(null);
-  const [saving, setSaving] = useState(false);
-  const [showDirtyConfirm, setShowDirtyConfirm] = useState(false);
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-ENTRY-V1: 공급 방식 정책 안내 토글
+  const editor = useSupplierProductEditor(product, open, onClose, onSaved);
+  const {
+    editMode,
+    isEditing,
+    showSecondaryEdit,
+    setShowSecondaryEdit,
+    b2bEditRef,
+    saving,
+    showDirtyConfirm,
+    setShowDirtyConfirm,
+    editCategory,
+    editBrand,
+    editSpec,
+    editOrigin,
+    editBizShort,
+    setEditBizShort,
+    editBizDetail,
+    setEditBizDetail,
+    editConsumerShort,
+    setEditConsumerShort,
+    editConsumerDetail,
+    setEditConsumerDetail,
+    categories,
+    brands,
+    handleFormChange,
+    startEdit,
+    cancelEdit,
+    handleClose,
+    handleSave
+  } = editor;
+  const imageManagement = useSupplierProductImages(product, open, onSaved);
+  const {
+    images,
+    loadingImages,
+    uploading,
+    uploadType,
+    setUploadType,
+    fileInputRef,
+    mediaPickerTarget,
+    setMediaPickerTarget,
+    showImagePicker,
+    setShowImagePicker,
+    handleImageUpload,
+    editorImageUpload,
+    handleImageDelete,
+    handleMediaPickerSelect
+  } = imageManagement;
+  const spot = useSupplierSpotPolicies(product, open);
+  const distribution = useSupplierDistribution(product, onSaved);
+  const {
+    setDistMgmtOpen,
+    setDistForm,
+    setDistConfirmRemove
+  } = distribution;
+  const servicePrices = useSupplierServicePrices(product, open, onSaved);
+  const {
+    svcPrices,
+    setSvcPriceOpen,
+    setSvcPriceForm
+  } = servicePrices;
   const [showSupplyGuide, setShowSupplyGuide] = useState(false);
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 모달
-  const [distMgmtOpen, setDistMgmtOpen] = useState(false);
-  const [distSaving, setDistSaving] = useState(false);
-  const [distForm, setDistForm] = useState<{ isPublic: boolean; serviceKeys: string[] }>({ isPublic: false, serviceKeys: [] });
-  const [distConfirmRemove, setDistConfirmRemove] = useState<string[] | null>(null);
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-TO-EVENT-OFFER-ENTRY-V1
   const navigate = useNavigate();
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가
-  const [svcPrices, setSvcPrices] = useState<{ priceGeneral: number; prices: Array<{ serviceKey: string; unitPrice: number }> } | null>(null);
-  const [svcPriceOpen, setSvcPriceOpen] = useState(false);
-  const [svcPriceSaving, setSvcPriceSaving] = useState(false);
-  const [svcPriceForm, setSvcPriceForm] = useState<Record<string, string>>({});
-
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
   const tpl = useContentTemplates();
   const canCreatePublicTemplate = user?.roles?.some(
     (r: string) => r.includes('admin') || r.includes('operator') || r.includes('super_admin'),
   ) ?? false;
-
-  // Image state
-  const [images, setImages] = useState<ProductImage[]>([]);
-  const [loadingImages, setLoadingImages] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadType, setUploadType] = useState<'thumbnail' | 'detail' | 'content'>('detail');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Track ProductForm data via ref to avoid re-render loops
-  const formRef = useRef<ProductFormData | null>(null);
-  const isDirtyRef = useRef(false);
-
-  // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master field editing state
-  const [editCategory, setEditCategory] = useState<string | null>(null);
-  const [editBrand, setEditBrand] = useState<string | null>(null);
-  const [editSpec, setEditSpec] = useState('');
-  const [editOrigin, setEditOrigin] = useState('');
-  const [editBizShort, setEditBizShort] = useState('');
-  const [editBizDetail, setEditBizDetail] = useState('');
-  // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C description editing state
-  const [editConsumerShort, setEditConsumerShort] = useState('');
-  const [editConsumerDetail, setEditConsumerDetail] = useState('');
-  const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
-  const [brands, setBrands] = useState<BrandItem[]>([]);
-
-  // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
-  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
-  const [showImagePicker, setShowImagePicker] = useState(false);
-
-  // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 state
-  // WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1:
-  //   null = 아직 못 불러옴. 정상 "정책 없음"([]) 과 타입 수준에서 구분한다.
-  const [spotPolicies, setSpotPolicies] = useState<SpotPricePolicy[] | null>(null);
-  const [spotLoading, setSpotLoading] = useState(false);
-  const [spotError, setSpotError] = useState<null | 'load' | 'forbidden'>(null);
-  const [spotFormOpen, setSpotFormOpen] = useState(false);
-  const [spotForm, setSpotForm] = useState({ policyName: '', spotPrice: '', startAt: '', endAt: '' });
-  const [spotSaving, setSpotSaving] = useState(false);
-
-  // Load images when drawer opens
-  useEffect(() => {
-    if (product?.masterId && open) {
-      setLoadingImages(true);
-      productApi.getProductImages(product.masterId).then((data) => {
-        setImages(data);
-        setLoadingImages(false);
-      });
-    }
-    if (!open) {
-      setImages([]);
-    }
-  }, [product?.masterId, open]);
-
-
-  // Reset state when product changes
-  useEffect(() => {
-    if (product) {
-      setEditMode(null);
-      setShowSecondaryEdit(false);
-      setShowDirtyConfirm(false);
-      formRef.current = null;
-      isDirtyRef.current = false;
-    }
-  }, [product]);
-
-  const handleFormChange = useCallback((data: ProductFormData, dirty: boolean) => {
-    formRef.current = data;
-    isDirtyRef.current = dirty;
-  }, []);
-
-  // WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1: startEdit initializes fields and sets mode
-  const startEdit = useCallback((mode: 'b2c' | 'b2b') => {
-    if (!product) return;
-    setEditCategory(product.categoryId || null);
-    setEditBrand(product.brandId || null);
-    setEditSpec(product.specification || '');
-    setEditOrigin(product.originCountry || '');
-    setEditBizShort(product.businessShortDescription || '');
-    setEditBizDetail(product.businessDetailDescription || '');
-    setEditConsumerShort(product.consumerShortDescription || '');
-    setEditConsumerDetail(product.consumerDetailDescription || '');
-    productApi.getCategories().then(setCategories);
-    productApi.getBrands().then(setBrands);
-    setShowSecondaryEdit(false);
-    setEditMode(mode);
-    if (mode === 'b2b') {
-      setTimeout(() => b2bEditRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
-    }
-  }, [product]);
-
-  const cancelEdit = useCallback(() => {
-    setEditMode(null);
-    setShowSecondaryEdit(false);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    if (isEditing && isDirtyRef.current) {
-      setShowDirtyConfirm(true);
-      return;
-    }
-    setEditMode(null);
-    onClose();
-  }, [isEditing, onClose]);
-
-  // ESC key handler
-  useEffect(() => {
-    if (!open) return;
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isEditing) {
-          if (isDirtyRef.current) {
-            setShowDirtyConfirm(true);
-          } else {
-            cancelEdit();
-          }
-        } else {
-          onClose();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [open, isEditing, cancelEdit, onClose]);
-
-  const handleSave = async () => {
-    if (!product) return;
-
-    // IR-NETURE-PRODUCT-DETAIL-DRAWER-B2B-SAVE-NO-RESPONSE-V1:
-    // B2B 전용 편집 모드에서는 ProductForm이 미렌더링되어 formRef가 null.
-    // B2B 설명만 별도 저장한다.
-    if (!formRef.current && editMode === 'b2b') {
-      setSaving(true);
-      try {
-        const bizShort = editBizShort.trim() || null;
-        const bizDetail = editBizDetail.trim() || null;
-        const bizResult = await supplierApi.updateBusinessContent(product.id, {
-          businessShortDescription: bizShort,
-          businessDetailDescription: bizDetail,
-        });
-        if (!bizResult.success) {
-          toast.error(`저장 실패: ${offerSaveErrorMessage(bizResult.error)}`);
-        } else {
-          setEditMode(null);
-          setShowSecondaryEdit(false);
-          onSaved?.();
-        }
-      } catch (error) {
-        console.error('[ProductDetailDrawer] B2B save error:', error);
-        toast.error('저장 중 오류가 발생했습니다');
-      } finally {
-        setSaving(false);
-      }
-      return;
-    }
-
-    if (!formRef.current) {
-      console.warn('[ProductDetailDrawer] formRef.current is null — form not ready');
-      return;
-    }
-    const form = formRef.current;
-    setSaving(true);
-
-    try {
-      // 1. 기본 필드 + isPublic + Master 필드 업데이트
-      // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
-      //   상품명·카테고리·브랜드·사양·원산지는 ProductMaster 기준정보다.
-      //   공급자 offer 수정은 공급 조건 수정이지 master 편집이 아니므로 전송하지 않는다
-      //   (서버도 무시한다 — offer.service resolveMasterWriteFields).
-      const payload = {
-        priceGeneral: form.priceGeneral ?? undefined,
-        priceGold: form.priceGold,
-        consumerReferencePrice: form.consumerReferencePrice,
-        stockQuantity: form.stockQuantity,
-        isActive: form.isActive,
-        // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 직접 전달
-        isPublic: form.isPublic,
-        // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-        isFeatured: form.isFeatured,
-        // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C 설명 저장 복구
-        consumerShortDescription: editConsumerShort.trim() || null,
-        consumerDetailDescription: editConsumerDetail.trim() || null,
-        // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
-        // serviceKeys 는 상품 정보 저장에서 제외 — 공급 방식 변경은 [공급 방식 변경] 모달(distribution API)로만 처리.
-      };
-            const result = await supplierApi.updateProduct(product.id, payload);
-
-      if (!result.success) {
-        toast.error(`저장 실패: ${offerSaveErrorMessage(result.error)}`);
-        setSaving(false);
-        return;
-      }
-
-      // 2. B2B 설명 업데이트 (전용 엔드포인트)
-      const bizShort = editBizShort.trim() || null;
-      const bizDetail = editBizDetail.trim() || null;
-      if (editBizShort !== (product.businessShortDescription || '') || editBizDetail !== (product.businessDetailDescription || '')) {
-        const bizResult = await supplierApi.updateBusinessContent(product.id, {
-          businessShortDescription: bizShort,
-          businessDetailDescription: bizDetail,
-        });
-        if (!bizResult.success) {
-          // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
-          //   console.warn 만 남기면 공급자는 B2B 설명이 저장된 줄 안다.
-          toast.error(`B2B 설명 저장 실패: ${offerSaveErrorMessage(bizResult.error)}`);
-        }
-      }
-
-      // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
-      // serviceKeys 변경 시 auto submitForApproval 우회 제거 — 공급 방식 변경/승인요청은 distribution API 단일 경로.
-
-      setEditMode(null);
-      setShowSecondaryEdit(false);
-      onSaved?.();
-    } catch (error) {
-      console.error('[ProductDetailDrawer] save error:', error);
-      toast.error('저장 중 오류가 발생했습니다');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 로드
-  // WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1:
-  //   조회 실패는 throw 된다. "정책 없음" 으로 표시하지 않고 지속 오류 상태로 분리한다.
-  //   초기 조회 / 생성 후 / 상태 변경 후 3개 지점이 이 함수를 공유한다.
-  //   keepExisting=true 면 mutation 후 재조회 실패 시 기존 목록을 비우지 않는다.
-  const spotReqRef = useRef(0);
-  const loadSpotPolicies = useCallback(async (offerId: string, keepExisting = false) => {
-    const reqId = ++spotReqRef.current;
-    setSpotLoading(true);
-    setSpotError(null);
-    try {
-      const rows = await supplierApi.listSpotPolicies(offerId);
-      if (reqId !== spotReqRef.current) return; // stale 응답이 새 offer 를 덮어쓰지 않게 한다
-      setSpotPolicies(rows);
-    } catch (e: any) {
-      if (reqId !== spotReqRef.current) return;
-      if (!keepExisting) setSpotPolicies(null);
-      setSpotError(e?.message === SUPPLIER_SPOT_POLICIES_FORBIDDEN ? 'forbidden' : 'load');
-    } finally {
-      if (reqId === spotReqRef.current) setSpotLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!product?.id || !open) return;
-    // offer 전환·재오픈 시 이전 데이터·오류를 먼저 초기화한다.
-    spotReqRef.current++;
-    setSpotPolicies(null);
-    setSpotError(null);
-    setSpotFormOpen(false);
-    loadSpotPolicies(product.id);
-  }, [product?.id, open, loadSpotPolicies]);
-
-  // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 로드
-  useEffect(() => {
-    if (!product?.id || !open) { setSvcPrices(null); return; }
-    let cancelled = false;
-    supplierApi.getServicePrices(product.id).then((r) => {
-      if (!cancelled && r.success && r.data) setSvcPrices(r.data);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [product?.id, open]);
-
-  // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 분리
-  const validateSpotForm = (): string | null => {
-    if (!spotForm.policyName.trim()) return '정책명을 입력하세요';
-    if (!spotForm.spotPrice) return '스팟 가격을 입력하세요';
-    if (!spotForm.startAt) return '시작일을 입력하세요';
-    if (!spotForm.endAt) return '종료일을 입력하세요';
-    return null;
-  };
-
-  const handleSpotCreate = async () => {
-    if (!product?.id) return;
-    const validationError = validateSpotForm();
-    if (validationError) {
-      toast.error(validationError);
-      return;
-    }
-    setSpotSaving(true);
-    const result = await supplierApi.createSpotPolicy({
-      offerId: product.id,
-      policyName: spotForm.policyName,
-      spotPrice: Number(spotForm.spotPrice),
-      startAt: spotForm.startAt,
-      endAt: spotForm.endAt,
-    });
-    if (result.success) {
-      setSpotFormOpen(false);
-      setSpotForm({ policyName: '', spotPrice: '', startAt: '', endAt: '' });
-      // 생성은 성공했다. 후속 재조회가 실패해도 mutation 을 실패로 뒤집지 않고
-      // 기존 목록을 유지한 채 정책 영역만 오류 상태로 전환한다.
-      await loadSpotPolicies(product.id, true);
-    } else {
-      toast.error(result.error || '스팟 정책 생성 실패');
-    }
-    setSpotSaving(false);
-  };
-
-  const handleSpotStatusChange = async (policyId: string, status: 'ACTIVE' | 'CANCELLED') => {
-    if (!product?.id) return;
-    const result = await supplierApi.changeSpotPolicyStatus(policyId, status);
-    if (result.success) {
-      await loadSpotPolicies(product.id, true);
-    } else {
-      toast.error(result.error || '상태 변경 실패');
-    }
-  };
-
-  // Image handlers
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !product?.masterId) return;
-    setUploading(true);
-    const res = await productApi.uploadProductImage(product.masterId, file, uploadType);
-    if (res.success) {
-      const updated = await productApi.getProductImages(product.masterId);
-      setImages(updated);
-      onSaved?.();
-    } else {
-      // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1: 이미지 실패 무음 금지
-      toast.error(`이미지 업로드 실패: ${imageErrorMessage(res.error)}`);
-    }
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  // Editor inline image upload — RichTextEditor onImageUpload callback
-  const editorImageUpload = useCallback(async (file: File): Promise<string> => {
-    if (!product?.masterId) throw new Error('No product');
-    const res = await productApi.uploadProductImage(product.masterId, file, 'content');
-    if (res.success && res.data) {
-      // Refresh images list so existingImages stays in sync
-      const updated = await productApi.getProductImages(product.masterId);
-      setImages(updated);
-      return res.data.imageUrl;
-    }
-    throw new Error(res.error || 'Upload failed');
-  }, [product?.masterId]);
-
-  const handleImageDelete = async (imageId: string) => {
-    if (!product?.masterId) return;
-    const ok = await productApi.deleteProductImage(imageId, product.masterId);
-    if (ok) {
-      setImages((prev) => prev.filter((i) => i.id !== imageId));
-      onSaved?.();
-    } else {
-      toast.error('이미지를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    }
-  };
-
-  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 이미지 선택 핸들러
-  const handleMediaPickerSelect = async (asset: { url: string }) => {
-    if (!product?.masterId) return;
-    setShowImagePicker(false);
-    setUploading(true);
-    const res = await productApi.registerImageFromUrl(product.masterId, asset.url, uploadType);
-    if (res.success) {
-      const updated = await productApi.getProductImages(product.masterId);
-      setImages(updated);
-      onSaved?.();
-    } else {
-      toast.error(`이미지 등록 실패: ${imageErrorMessage(res.error)}`);
-    }
-    setUploading(false);
-  };
-
 
   if (!open || !product) return null;
 
@@ -586,155 +189,10 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       )}
 
       {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1: 공급 방식 변경 모달 */}
-      {distMgmtOpen && product && (() => {
-        const SERVICES = [
-          { key: 'kpa-society', label: 'KPA Society' },
-          { key: 'k-cosmetics', label: 'K-Cosmetics' },
-        ];
-        const currentKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
-        const removed = currentKeys.filter((k) => !distForm.serviceKeys.includes(k));
-        const toggleSvc = (k: string) =>
-          setDistForm((f) => ({ ...f, serviceKeys: f.serviceKeys.includes(k) ? f.serviceKeys.filter((x) => x !== k) : [...f.serviceKeys, k] }));
-        const doSave = async () => {
-          setDistSaving(true);
-          try {
-            const r = await supplierApi.updateDistribution(product.id, { isPublic: distForm.isPublic, serviceKeys: distForm.serviceKeys });
-            if (!r.success) { toast.error(`공급 방식 변경 실패: ${r.error || '오류'}`); setDistSaving(false); return; }
-            toast.success('공급 방식이 변경되었습니다');
-            setDistMgmtOpen(false);
-            setDistConfirmRemove(null);
-            onSaved?.();
-          } catch {
-            toast.error('공급 방식 변경 중 오류가 발생했습니다');
-          } finally {
-            setDistSaving(false);
-          }
-        };
-        return (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={(e) => { if (e.target === e.currentTarget && !distSaving) setDistMgmtOpen(false); }}>
-            <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md max-h-[85vh] overflow-y-auto">
-              <h3 className="text-base font-bold text-slate-900 mb-3">공급 방식 변경</h3>
-              {!distConfirmRemove ? (
-                <>
-                  <label className="flex items-start gap-2 mb-2 cursor-pointer">
-                    <input type="checkbox" checked={distForm.isPublic} onChange={(e) => setDistForm((f) => ({ ...f, isPublic: e.target.checked }))} className="mt-0.5" />
-                    <span>
-                      <span className="text-sm font-medium text-slate-800">B2B 전체 공급</span>
-                      <span className="block text-xs text-slate-500">운영자 승인 없이 각 서비스 HUB에 노출될 수 있습니다.</span>
-                    </span>
-                  </label>
-                  {distForm.isPublic && (
-                    <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5 mb-3">
-                      B2B 전체 공급으로 설정하면 서비스 운영자 승인 없이 각 서비스 HUB에 노출될 수 있습니다.
-                    </p>
-                  )}
-                  <p className="text-xs font-semibold text-slate-600 mb-1 mt-3">서비스 공급 대상</p>
-                  <p className="text-[11px] text-slate-500 mb-2">선택한 서비스 운영자의 승인 후 해당 서비스 HUB에 노출됩니다.</p>
-                  <div className="space-y-1.5 mb-3">
-                    {SERVICES.map((s) => (
-                      <label key={s.key} className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={distForm.serviceKeys.includes(s.key)} onChange={() => toggleSvc(s.key)} />
-                        <span className="text-sm text-slate-700">{s.label}</span>
-                        {currentKeys.includes(s.key) && !distForm.serviceKeys.includes(s.key) && (
-                          <span className="text-[10px] text-red-600">철회 예정</span>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-                  {!distForm.isPublic && distForm.serviceKeys.length === 0 && (
-                    <p className="text-[11px] text-slate-500 mb-3">아무것도 선택하지 않으면 내부 상품(미노출)으로 저장됩니다.</p>
-                  )}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                    <button onClick={() => setDistMgmtOpen(false)} disabled={distSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">취소</button>
-                    <button
-                      onClick={() => { if (removed.length) setDistConfirmRemove(removed); else doSave(); }}
-                      disabled={distSaving}
-                      className="px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
-                    >{distSaving ? '저장 중...' : '저장'}</button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-slate-700 mb-2">다음 서비스 공급을 철회합니다:</p>
-                  <ul className="text-sm font-medium text-slate-900 mb-3 list-disc list-inside">
-                    {distConfirmRemove.map((k) => <li key={k}>{SERVICES.find((s) => s.key === k)?.label || k}</li>)}
-                  </ul>
-                  <p className="text-[11px] text-slate-500 mb-4">해당 서비스 HUB 노출이 중단되고, 기존 승인 이력은 '철회됨'으로 보존됩니다. 다시 공급하려면 재신청(승인 대기)이 필요합니다.</p>
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => setDistConfirmRemove(null)} disabled={distSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">뒤로</button>
-                    <button onClick={doSave} disabled={distSaving} className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50">{distSaving ? '처리 중...' : '철회하고 저장'}</button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })()}
+      <SupplierDistributionModal product={product} controller={distribution} />
 
       {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 설정 모달 */}
-      {svcPriceOpen && product && (() => {
-        const SERVICE_LABELS: Record<string, string> = { 'kpa-society': 'KPA Society', 'k-cosmetics': 'K-Cosmetics' };
-        const supplyKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
-        const priceGeneral = Number(svcPrices?.priceGeneral ?? product.priceGeneral ?? 0);
-        const doSave = async () => {
-          setSvcPriceSaving(true);
-          try {
-            const prices: Array<{ serviceKey: string; unitPrice: number }> = [];
-            for (const sk of supplyKeys) {
-              const raw = (svcPriceForm[sk] ?? '').trim();
-              if (!raw) continue; // 빈 값 = 기본가 적용(서비스가 미설정)
-              const n = Number(raw);
-              if (!Number.isInteger(n) || n <= 0) {
-                toast.error(`${SERVICE_LABELS[sk] || sk}: 0보다 큰 정수를 입력하세요`);
-                setSvcPriceSaving(false);
-                return;
-              }
-              prices.push({ serviceKey: sk, unitPrice: n });
-            }
-            const r = await supplierApi.setServicePrices(product.id, prices);
-            if (!r.success) { toast.error(`서비스별 공급가 저장 실패: ${r.error || '오류'}`); setSvcPriceSaving(false); return; }
-            const g = await supplierApi.getServicePrices(product.id);
-            if (g.success && g.data) setSvcPrices(g.data);
-            toast.success('서비스별 공급가가 저장되었습니다');
-            setSvcPriceOpen(false);
-            onSaved?.();
-          } catch {
-            toast.error('서비스별 공급가 저장 중 오류가 발생했습니다');
-          } finally {
-            setSvcPriceSaving(false);
-          }
-        };
-        return (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={(e) => { if (e.target === e.currentTarget && !svcPriceSaving) setSvcPriceOpen(false); }}>
-            <div className="bg-white rounded-xl shadow-xl p-5 w-full max-w-md max-h-[85vh] overflow-y-auto">
-              <h3 className="text-base font-bold text-slate-900 mb-1">서비스별 공급가</h3>
-              <p className="text-[11px] text-slate-500 mb-3">
-                서비스별 공급가를 입력하면 해당 서비스 주문에 우선 적용됩니다. 비우면 기본 공급가(₩{priceGeneral.toLocaleString()})가 적용됩니다.
-              </p>
-              <div className="space-y-2 mb-3">
-                {supplyKeys.map((sk) => (
-                  <div key={sk} className="flex items-center gap-2">
-                    <span className="text-sm text-slate-700 w-28 shrink-0">{SERVICE_LABELS[sk] || sk}</span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={svcPriceForm[sk] ?? ''}
-                      onChange={(e) => setSvcPriceForm((f) => ({ ...f, [sk]: e.target.value }))}
-                      placeholder={`기본 ${priceGeneral.toLocaleString()}`}
-                      className="flex-1 px-2 py-1.5 border border-slate-200 rounded text-sm"
-                    />
-                    <span className="text-xs text-slate-400">원</span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onClick={() => setSvcPriceOpen(false)} disabled={svcPriceSaving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg disabled:opacity-50">취소</button>
-                <button onClick={doSave} disabled={svcPriceSaving} className="px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50">{svcPriceSaving ? '저장 중...' : '저장'}</button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      <SupplierServicePricesModal product={product} controller={servicePrices} />
 
       {/* Backdrop */}
       <div
@@ -978,87 +436,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             />
           )}
 
-          {/* ── 소비자 공개 설명 (B2C) ── */}
-          {!isEditing && (
-            <Section title="소비자 공개 설명 (B2C)">
-              {!product.consumerShortDescription && !product.consumerDetailDescription && (
-                <p className="text-xs text-amber-600 mb-2">소비자 공개용 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.</p>
-              )}
-              {product.consumerShortDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <ContentRenderer html={product.consumerShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-              {product.consumerDetailDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" variant="product-detail" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* ── 판매자 지원 설명 (B2B) ── */}
-          {!isEditing && (
-            <Section title="판매자 지원 설명 (B2B)">
-              {!product.businessShortDescription && !product.businessDetailDescription && (
-                <p className="text-xs text-amber-600 mb-2">판매자 지원 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.</p>
-              )}
-              {product.businessShortDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <ContentRenderer html={product.businessShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-              {product.businessDetailDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" variant="product-detail" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* ── 매장용 상품 설명서 ──
-              WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
-                상품 → 매장용 설명서 작성 이동선이 없어 사이드바 경유로만 닿았다.
-                이동만 보완한다 — 권한·정책·API 변경 0 (대상 화면은 이미 전 상품을 나열한다). */}
-          {!isEditing && (
-            <Section title="매장용 상품 설명서">
-              <p className="text-[11px] text-slate-500 mb-2">
-                위 B2C·B2B 설명과는 다른 축입니다. 매장 경영자가 고객 응대·QR·태블릿에 활용하는
-                매장용(STORE) 설명서는 운영자 검수를 거쳐 매장에 노출됩니다.
-              </p>
-              <button
-                type="button"
-                onClick={() => navigate(`/supplier/store-descriptions?masterId=${encodeURIComponent(product.masterId || '')}`)}
-                className="w-full py-2 text-sm font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg border border-sky-200"
-              >
-                이 상품의 매장용 설명서 작성
-              </button>
-            </Section>
-          )}
+          {!isEditing && <SupplierDescriptionSections product={product} />}
 
           {/* WO-O4O-SUPPLIER-POST-REGISTRATION-PRODUCT-MANAGEMENT-OFFER-FIRST-REALIGNMENT-V1 §E-1 (2026-09-23):
               공급자 표면의 AI 태그 생성·추천·수동 태그 관리 UI 는 제거됐다.
@@ -1076,96 +454,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
-          {/* ── 스팟 가격 정책 (WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1) ── */}
-          {!isEditing && (
-            <Section title="스팟 가격 정책">
-              {spotLoading ? (
-                <div className="flex items-center gap-2 text-xs text-slate-400"><Loader2 className="w-3 h-3 animate-spin" /> 로딩 중...</div>
-              ) : spotError ? (
-                /* 지속 오류 — "정책 없음" 문구는 노출하지 않는다. 토스트로 대체하지 않는다. */
-                <div className="text-center py-3">
-                  <p className="text-xs text-slate-600 mb-2">
-                    {spotError === 'forbidden'
-                      ? '이 상품의 스팟 정책을 볼 권한이 없습니다.'
-                      : '스팟 정책을 불러오지 못했습니다.'}
-                  </p>
-                  {spotError === 'load' && product?.id && (
-                    <button
-                      onClick={() => loadSpotPolicies(product.id)}
-                      className="text-xs text-slate-600 underline hover:text-slate-800 font-medium"
-                    >
-                      다시 시도
-                    </button>
-                  )}
-                </div>
-              ) : (spotPolicies?.length ?? 0) === 0 && !spotFormOpen ? (
-                <div className="text-center py-3">
-                  <p className="text-xs text-slate-400 mb-2">등록된 스팟 정책이 없습니다</p>
-                  <button onClick={() => setSpotFormOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">+ 스팟 정책 추가</button>
-                </div>
-              ) : (
-                <>
-                  {(spotPolicies ?? []).map((p) => {
-                    const now = new Date();
-                    const isExpired = p.status === 'ACTIVE' && new Date(p.endAt) < now;
-                    const statusLabel = isExpired ? '만료' : p.status === 'DRAFT' ? '초안' : p.status === 'ACTIVE' ? '활성' : '취소';
-                    const statusCls = isExpired ? 'bg-slate-100 text-slate-500' : p.status === 'DRAFT' ? 'bg-amber-50 text-amber-700' : p.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-500';
-                    return (
-                      <div key={p.id} className="border border-slate-100 rounded-lg p-3 mb-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-slate-700">{p.policyName}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${statusCls}`}>{statusLabel}</span>
-                        </div>
-                        <div className="text-sm font-semibold text-purple-700 mb-1">\u20a9{Number(p.spotPrice).toLocaleString()}</div>
-                        <div className="text-[11px] text-slate-400">{new Date(p.startAt).toLocaleDateString()} ~ {new Date(p.endAt).toLocaleDateString()}</div>
-                        {p.status === 'DRAFT' && (
-                          <div className="flex gap-2 mt-2">
-                            <button onClick={() => handleSpotStatusChange(p.id, 'ACTIVE')} className="text-[11px] text-emerald-600 hover:text-emerald-700 font-medium">활성화</button>
-                            <button onClick={() => handleSpotStatusChange(p.id, 'CANCELLED')} className="text-[11px] text-red-500 hover:text-red-600 font-medium">취소</button>
-                          </div>
-                        )}
-                        {p.status === 'ACTIVE' && !isExpired && (
-                          <div className="mt-2">
-                            <button onClick={() => handleSpotStatusChange(p.id, 'CANCELLED')} className="text-[11px] text-red-500 hover:text-red-600 font-medium">정책 취소</button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {!spotFormOpen && (
-                    <button onClick={() => setSpotFormOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium mt-1">+ 스팟 정책 추가</button>
-                  )}
-                </>
-              )}
-              {spotFormOpen && (
-                <div className="border border-blue-200 bg-blue-50/30 rounded-lg p-3 mt-2">
-                  <h5 className="text-xs font-semibold text-slate-600 mb-2">새 스팟 정책</h5>
-                  <div className="space-y-2">
-                    <input type="text" placeholder="정책명 (예: 4월 프로모션)" value={spotForm.policyName} onChange={(e) => setSpotForm((f) => ({ ...f, policyName: e.target.value }))} className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm" />
-                    <input type="number" placeholder="스팟 가격 (원)" value={spotForm.spotPrice} onChange={(e) => setSpotForm((f) => ({ ...f, spotPrice: e.target.value }))} className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm" />
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[10px] text-slate-400">시작일</label>
-                        <input type="date" value={spotForm.startAt} onChange={(e) => setSpotForm((f) => ({ ...f, startAt: e.target.value }))} className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm" />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-slate-400">종료일</label>
-                        <input type="date" value={spotForm.endAt} onChange={(e) => setSpotForm((f) => ({ ...f, endAt: e.target.value }))} className="w-full px-2 py-1.5 border border-slate-200 rounded text-sm" />
-                      </div>
-                    </div>
-                    <div className="flex gap-2 pt-1">
-                      {/* WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 은 handleSpotCreate 내부 */}
-                      <button onClick={handleSpotCreate} disabled={spotSaving} className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50">
-                        {spotSaving ? '저장 중...' : '생성'}
-                      </button>
-                      <button onClick={() => { setSpotFormOpen(false); setSpotForm({ policyName: '', spotPrice: '', startAt: '', endAt: '' }); }} className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded hover:bg-slate-200">취소</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <p className="text-[10px] text-slate-400 mt-2">스팟 가격은 기간 한정 특별 공급가입니다. 상시 가격(공급가/서비스가)과 별도로 관리됩니다.</p>
-            </Section>
-          )}
+          {!isEditing && <SupplierSpotPolicySection product={product} controller={spot} />}
 
           {/* ── 재고·기타 ── */}
           {!isEditing && (
