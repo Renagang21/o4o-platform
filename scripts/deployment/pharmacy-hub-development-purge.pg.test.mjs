@@ -63,6 +63,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
 
         ["CREATE SCHEMA external;CREATE TABLE external.refs(order_id uuid REFERENCES checkout_orders(id));INSERT INTO external.refs VALUES('"+uuid(1)+"')",/SHARED_FK/],
         ["INSERT INTO shared_notes VALUES('"+uuid(999)+"','{\"order\":\""+uuid(1)+"\"}')",/SHARED_VALUE/],
+        ["INSERT INTO shared_notes VALUES('"+uuid(999)+"','{\"orderLog\":\""+uuid(101)+"\"}')",/SHARED_VALUE/],
         ["INSERT INTO o4o_payments VALUES('"+uuid(998)+"','"+uuid(1)+"','neture','{}')",/SHARED_PAYMENT/],
         ["UPDATE checkout_orders SET metadata=metadata||'{\"paymentGroupId\":\"group\"}' WHERE id IN ('"+uuid(1)+"','"+uuid(7)+"');UPDATE o4o_payments SET \"orderId\"='group' WHERE id='"+uuid(201)+"'",/SHARED_PAYMENT/],
         ["CREATE FUNCTION deny_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN OLD; END $$;CREATE TRIGGER extra BEFORE DELETE ON cms_contents FOR EACH ROW EXECUTE FUNCTION deny_delete()",/MUTATION_TRIGGER/],
@@ -95,11 +96,24 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('INSERT INTO shared_notes VALUES($1,$2)',[uuid(999),{image:'https://storage.googleapis.com/o4o-media-library/media/fixture-0.png'}]);
       await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_VALUE/);await client.query('ROLLBACK');
       await client.query('DELETE FROM shared_notes');
+      await client.query('INSERT INTO shared_notes VALUES($1,$2)',[uuid(999),{catalogLink:uuid(820)}]);
+      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_VALUE/);await client.query('ROLLBACK');
+      await client.query('DELETE FROM shared_notes');
       await client.query('INSERT INTO media_entity_links VALUES($1,$2,$3,$4)',[uuid(821),uuid(800),'product',uuid(300)]);
-      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_FK/);await client.query('ROLLBACK');
+      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/LINK_CENSUS_CHANGED/);await client.query('ROLLBACK');
       await client.query('DELETE FROM media_entity_links WHERE id=$1',[uuid(821)]);
+      await client.query("UPDATE media_entity_links SET entity_type='video-production-job'");
+      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/LINK_CENSUS_CHANGED/);await client.query('ROLLBACK');
+      await client.query('CREATE TABLE product_masters(id uuid PRIMARY KEY,name text)');
+      await client.query('INSERT INTO product_masters VALUES($1,$2)',[uuid(300),'shared product']);
+      await client.query("UPDATE media_entity_links SET entity_type='product',entity_id=$1",[uuid(300)]);
+      await client.query('CREATE SCHEMA external; CREATE TABLE external.asset_consumers(asset_id uuid REFERENCES media_assets(id))');
+      await client.query('INSERT INTO external.asset_consumers VALUES($1)',[uuid(800)]);
+      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_FK/);await client.query('ROLLBACK');
+      await client.query('DROP SCHEMA external CASCADE');
       await begin();await new PharmacyHubMediaPurge({storage}).up(q);await client.query('COMMIT');
       assert.equal(removed.length,4);assert.equal((await client.query('SELECT count(*)::text AS count FROM media_assets')).rows[0].count,'1');
       assert.equal((await client.query('SELECT count(*)::text AS count FROM media_entity_links')).rows[0].count,'0');
+      assert.equal((await client.query('SELECT name FROM product_masters')).rows[0].name,'shared product');
     } finally {await client.query('ROLLBACK');await client.end();}
   });

@@ -103,7 +103,7 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
-  const targetIds=roots.filter(r=>!['checkout_order_logs','supplier_product_offers'].includes(r.table)).map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
+  const targetIds=roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
   const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')

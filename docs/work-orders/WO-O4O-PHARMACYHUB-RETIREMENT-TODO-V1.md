@@ -393,3 +393,14 @@ PH media/GCS 후속 standalone 도구도 준비했다. 자산 4건과 PH service
 재리뷰 P1 대응: sole-PH 제안의 service_keys만 비우면 active/APPROVED 행이 Neture 약국 기본 공급으로 새로 노출될 수 있음을 확인했다. 최종 도구는 is_public=false·allowed_seller_ids 비어 있음·다른 service_keys 없음인 전용 제안을 FK/비-FK 검사 후 삭제한다. 공유 제안은 PH 연결만 제거하고 기존 공개/지정 매장/다른 서비스 입력을 보존한다. 공유 active/APPROVED 제안에서 키를 비워 기본 공급을 넓히게 되는 상태는 plan/apply 전에 PH_DEV_SHARED_BASELINE_WIDENING으로 차단한다. 따라서 공급 제안 삭제/보존의 실제 건수는 강화된 read-only census와 운영 plan으로 확정하며, 앞선 전체 보존 19건/삭제 41건은 중간 준비안이다. 운영 쓰기는 아직 수행하지 않았다.
 
 최종 공급 제안 판정 수정: Neture 일반 B2B의 SERVICE 전략도 service_keys와 무관하게 공급 제안을 소비하므로 SPO hard DELETE는 제외했다. supplier_product_offers 19행은 모두 보존한다. 전용 판정(is_public=false·지정 매장 없음·다른 service_keys 없음)에 해당하는 제안은 PH 연결 제거와 is_active=false를 같은 UPDATE로 적용하여 PH 공급의 Neture 노출도 명시적으로 종료한다. 공유 제안의 활성 상태·공개/지정 매장/타 서비스 입력은 보존하며, active/APPROVED 공유 제안이 새로운 default 공급이 되는 경우는 여전히 차단한다. 최종 DB 삭제 범위는 41행, 공급 제안의 PH 연결 제거는 19행이다. 앞선 전용 제안 hard DELETE 준비안은 운영에 적용하지 않았다. 전용 제안은 퇴역 상태로 남는 공유 supplier record이며 PH 서비스 연결은 남기지 않는다. 테스트는 분리된 loopback ph_dev_purge_fixture DB로 제한한다.
+
+
+### 운영 재조회 및 미디어 연결의 소비처 구분 (2026-10-13)
+
+PR #536은 CI/CodeQL/SonarCloud 및 최신 Codex review 무지적 후 main 90e49c3e601d62beb1363842dc71f6fb7064b0b1에 병합했다. post-merge CI 38379500628과 CodeQL 38379500608은 SUCCESS다. 강화된 census 38379578239도 SUCCESS, references.complete=true였다. 공급 제안 19건은 전용 조건에 해당하고 sharedOfferBaselineWidening=0이다. PH 자산 4건의 연결은 1건이지만 PH service 링크는 0, 종전 PH content/service 정의 밖 링크는 1이었다. 이를 부재/전용 service 링크로 오해하지 않는다.
+
+media_entity_links의 실제 소비처를 다시 조사했다. product/brand/content/service 연결은 MediaCatalog 관계 표시·MediaLibrary 분류 필터이고 해당 target 행 자체를 갱신하는 FK/렌더러 계약이 아니다. 일반 MediaLibrary는 퇴역 PH 자산을 제외한다. 반면 video-production-job 연결은 AutomationJob의 INPUT/INTERMEDIATE/legacy OUTPUT을 직접 소비하므로 제거하지 않는다. 후속 도구는 PH 자산에 소속된 catalog 연결만 정리하며 VIDEO Job/알 수 없는 연결·실제 다른 테이블의 UUID/URL/GCS 경로·FK 참조는 계속 차단한다. product/CMS/service/brand target 데이터와 타 서비스 자산은 변경하지 않는다. 고정 1건의 catalog 관계 및 실제 타입별 건수는 추가 read-only 집계와 운영 plan으로 확인한다. 종전 PH service 링크 1건 가정은 폐기하며 운영 media/GCS 삭제는 아직 미실행이다.
+
+DB development plan 38381041967은 job 생성 후 run.jobs.execute 권한 거부로 실패했다. DB worker는 실행하지 않았으며 운영 삭제는 0건이다. 일회성 ph-dev-38381041967-1은 실패 조사용으로 남아 있다. GitHub 실행 계정의 기존 IAM job 실행 범위는 로컬 관리자의 read-only 정책 조회로 확인 중이다. Delivery 38380573911은 SUCCESS지만 production=HELD_LEVEL_3로 누적 application 변경이 보류돼 있다. 이번 inline maintenance source 실행은 API promote를 필요로 하지 않으며 무관한 누적 배포를 실행하지 않았다.
+
+후속 안전 검증에서는 catalog product 관계 제거 후 실제 product_masters 행이 유지되고, VIDEO Job 관계·외부 FK·URL 소비·catalog link UUID 참조·order log UUID 참조가 삭제를 막는 PostgreSQL fixture를 실행했다. PH 자산의 catalog 관계만 소속 자산과 함께 정리하며 실행 Job 관계는 계속 보호한다. 고정 타입별 카탈로그 집계가 추가됐다. 운영 media/GCS 쓰기는 미실행이다.
