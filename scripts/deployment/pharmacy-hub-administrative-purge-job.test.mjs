@@ -46,7 +46,7 @@ test('the actual workflow rejects mixed flags, wrong owner/ref, invalid mode and
   const dir=mkdtempSync(join(tmpdir(),'ph-admin-gate-'));
   const env={PATH:process.env.PATH,GITHUB_ENV:join(dir,'env'),RUNNER_TEMP:dir,
     GITHUB_REF:'refs/heads/main',WORKFLOW_ACTOR:'owner',REPOSITORY_OWNER:'owner',
-    PH_ADMIN_PURGE:'true',CUTOVER_MODE:'plan',DEPLOY_FREEZE:'false',QR_PROBE_PATHS:'',
+    PH_ADMIN_PURGE:'true',CERTIFICATE_RETIREMENT:'false',DOMAIN_DETACHMENT:'false',CUTOVER_MODE:'plan',DEPLOY_FREEZE:'false',QR_PROBE_PATHS:'',
     RETIREMENT_INVENTORY:'false',RESOURCE_RETIREMENT:'false',RETIRE_PH_HOST:'false',
     DEMO_CENSUS_FLAG:'false',DEMO_RELINK_FLAG:'false',DEMO_CLEANUP_FLAG:'false',COPY_CLEANUP_FLAG:'false'};
   try {
@@ -55,8 +55,17 @@ test('the actual workflow rejects mixed flags, wrong owner/ref, invalid mode and
       {CUTOVER_MODE:'apply',DEPLOY_FREEZE:'true'},{RETIREMENT_INVENTORY:'true'},
       {RESOURCE_RETIREMENT:'true'},{RETIRE_PH_HOST:'true'},{DEMO_CENSUS_FLAG:'true'},
       {DEMO_RELINK_FLAG:'true'},{DEMO_CLEANUP_FLAG:'true'},{COPY_CLEANUP_FLAG:'true'},
+      {CERTIFICATE_RETIREMENT:'true'},{DOMAIN_DETACHMENT:'true'},
       {QR_PROBE_PATHS:'/qr/fixture'}])assert.notEqual(spawnSync('bash',['-c',gate],{env:{...env,...update}}).status,0);
+    const domainEnv={...env,PH_ADMIN_PURGE:'false',DOMAIN_DETACHMENT:'true'};
+    assert.equal(spawnSync('bash',['-c',gate],{env:domainEnv}).status,0);
+    for(const update of [{PH_ADMIN_PURGE:'true'},{CERTIFICATE_RETIREMENT:'true'},
+      {WORKFLOW_ACTOR:'other'},{CUTOVER_MODE:'apply',DEPLOY_FREEZE:'true'},
+      {RESOURCE_RETIREMENT:'true'},{RETIREMENT_INVENTORY:'true'},{DEMO_CENSUS_FLAG:'true'},
+      {DEMO_ACCOUNTS_FLAG:'true'},{QR_PROBE_PATHS:'/qr/fixture'}])
+      assert.notEqual(spawnSync('bash',['-c',gate],{env:{...domainEnv,...update}}).status,0);
     const proxy=workflow.jobs.cutover.steps.find(s=>s.name?.startsWith('Start authenticated'));
     assert.ok(proxy.if.startsWith('inputs.ph_admin_purge != true'));
+    assert.ok(proxy.if.includes('inputs.domain_detachment != true'));
   } finally {rmSync(dir,{recursive:true,force:true});}
 });
