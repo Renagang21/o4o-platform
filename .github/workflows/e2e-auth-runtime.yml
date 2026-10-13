@@ -1,15 +1,7 @@
 name: E2E — Auth Runtime Regression
 
-# 배포 서비스(Neture / KPA-Society) auth runtime 검증 (K-Cosmetics 는 서비스 종료로 제외 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1) — **Google-only 기준**
-# (WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 로그인 시나리오·secret 소비 0)
-# 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
-#   - workflow_dispatch: 유일한 실행 경로 (배포 후 수동 검증)
-#
-# WO-O4O-GOOGLE-IDENTITY-OPERATOR-EXPLICIT-LINK-V1 (2026-09-19, 사용자 승인):
-#   push 자동 트리거를 임시 제거했다. legacy password E2E 계정이 WO-2C reset 으로 사라진 뒤
-#   stale E2E_*_ADMIN_* secret 으로 3서비스 반복 로그인 → 운영자 계정 loginAttempts 누적 → 30분 잠금이
-#   auth 패키지 push 마다 재발했기 때문이다(09-17~18, 10회). secret 은 삭제하지 않는다.
-#   Google-only 인증 기준 E2E 재정의는 WO-2F 에서 수행하며, 그때까지 수동 실행만 허용한다.
+# Credential-free checks for maintained user origins and Google-only 전체관리자.
+# Manual dispatch only. No operator/admin password credentials or fake authenticated sessions.
 
 on:
   workflow_dispatch:
@@ -28,7 +20,7 @@ env:
 
 jobs:
   e2e-auth-runtime:
-    name: Auth Runtime E2E (3 Services)
+    name: Auth Runtime E2E (PC/mobile)
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -50,37 +42,24 @@ jobs:
           cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Chromium
-        run: npx playwright install chromium --with-deps
+        run: pnpm exec playwright install chromium --with-deps
 
-      # WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 (2026-09-23) — Google-only 재정의
-      #
-      # `E2E_*_ADMIN_EMAIL/PASSWORD` **secret 소비를 전부 제거**했다. 로그인 수단이 Google 하나가 되어
-      # CI 에 넣을 password 가 존재하지 않으며(계정에 password 자체가 없다), Google 계정 자동 로그인은
-      # 새 테스트 계정 금지 + Google 의 자동화 차단으로 CI 에서 재현 불가다.
-      # 토큰 주입은 "로그인한 척" 일 뿐이라 쓰지 않는다.
-      #
-      # 그래서 이 workflow 는 **자격증명 없이 증명 가능한 계약**만 본다:
-      #   로그인 surface(Google 진입 존재 · password 입력 0) · 은퇴 endpoint 404 ·
-      #   Google 경로 생존과 토큰 검증(가짜 토큰 401) · 미인증 동작.
-      # 세션 이후 런타임(refresh · logout · token-cleared)은 통제된 배포 창의 사용자 브라우저 smoke 다.
-      #
-      # 남아 있던 repository secret 6개는 사용자 승인으로 2026-10-02 삭제됐다
-      # (WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1). 아래 검사는 소비 재도입을 막는다.
+      # Guard against reintroducing legacy operator/admin password fixtures.
       - name: Verify no password credential is consumed
         run: |
           if grep -RInE 'E2E_[A-Z]+_ADMIN_(EMAIL|PASSWORD)' e2e/auth-runtime; then
-            echo "::error::E2E 스위트가 password 자격증명을 다시 소비한다 (Google-only 계약 위반)"
+            echo "::error::E2E 스위트가 관리자 비밀번호 자격증명을 다시 소비한다"
             exit 1
           fi
-          echo "✅ password 자격증명 소비 0 — Google-only 계약 유지""
+          echo "✅ 관리자 비밀번호 자격증명 소비 0"
 
-      - name: Run Auth Runtime E2E (Google-only)
+      - name: Run Auth Runtime E2E (credential-free)
         env:
           CI: 'true'
-        run: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
+        run: pnpm exec playwright test --config=e2e/auth-runtime/playwright.config.ts
 
       - name: Upload Playwright report (on failure)
         if: failure()

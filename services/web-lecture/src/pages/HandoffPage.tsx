@@ -1,6 +1,4 @@
-import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { clearStoredTokens, exchangeHandoffToken, storeTokens } from '@o4o/auth-client';
+import { useHandoffExchange } from '@o4o/auth-react';
 import { API_BASE_URL } from '../lib/apiClient';
 import { INQUIRY_URL, isPublicLecturePath } from '../config/service';
 
@@ -16,29 +14,10 @@ const ERROR_MESSAGES: Record<string, string> = {
 const MEMBERSHIP_CODES = new Set(['HANDOFF_TARGET_NO_MEMBERSHIP', 'HANDOFF_TARGET_WITHDRAWN', 'HANDOFF_TARGET_NOT_ACTIVE']);
 
 export default function HandoffPage() {
-  const [error, setError] = useState('');
-  const [code, setCode] = useState('');
-  const [returnTo] = useState(() => resolveHandoffReturnTo(new URLSearchParams(window.location.search).get('returnTo'), window.location.origin));
-  useLayoutEffect(() => { clearStoredTokens(); }, []);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    if (!token) { setError('이동 정보가 없습니다.'); return; }
-    void (async () => {
-      try {
-        const response = await exchangeHandoffToken(API_BASE_URL, token);
-        const data = await response.json().catch(() => null);
-        const tokens = data?.data?.tokens;
-        if (response.ok && data?.success && tokens?.accessToken) {
-          storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
-          window.location.replace(buildHandoffDestination(returnTo, window.location.origin));
-          return;
-        }
-        setCode(typeof data?.code === 'string' ? data.code : '');
-        setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');
-      } catch { setError('네트워크 오류가 발생했습니다.'); }
-    })();
-  }, [returnTo]);
+  const result = useHandoffExchange({ apiBaseUrl: API_BASE_URL, missingTokenMessage: '이동 정보가 없습니다.', networkErrorMessage: '네트워크 오류가 발생했습니다.' });
+  const { returnTo } = result;
+  const code = result.status === 'error' ? result.code : '';
+  const error = result.status === 'error' ? ERROR_MESSAGES[code] || result.message : '';
   if (!error) return <main className="center-card"><section className="card"><h1>O4O 강의</h1><p>서비스 이동 중...</p></section></main>;
   if (MEMBERSHIP_CODES.has(code)) {
     const backToPublic = isPublicLecturePath(returnTo);

@@ -362,19 +362,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     setError(null);
   };
 
-  const getSessionStatus = (): SessionStatus | null => {
-    if (!user) return null;
-    
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
-    const remainingTime = expiresAt.getTime() - now.getTime();
-    
-    return {
-      isValid: remainingTime > 0,
-      expiresAt,
-      remainingTime
-    };
-  };
+  // Cookie expiry is not exposed by the server. Never fabricate an expiry from the current time.
+  const getSessionStatus = (): SessionStatus | null => null;
 
   // Check both user.role and user.roles array for admin/operator access
   // Support both string roles and object roles with name field

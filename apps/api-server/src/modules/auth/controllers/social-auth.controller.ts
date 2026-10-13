@@ -11,7 +11,7 @@ import { socialLinkService } from '../../../services/auth/social-link.service.js
 import { socialFlowService,socialDigest } from '../../../services/auth/social-flow.service.js';
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { invalidSocialFlow,SocialAuthError } from '../../../services/auth/social-auth-error.js';
-import { GoogleAuthController } from './google-auth.controller.js';
+import { SessionResponse } from './session-response.js';
 import { socialOrigin,socialOwner,safeSocialReturnTo,setSocialBinding,clearSocialBinding,socialBinding } from './social-auth.helpers.js';
 import type { SocialProvider } from '../../../services/auth/social-flow.service.js';
 
@@ -65,14 +65,14 @@ export class SocialAuthController extends BaseController {
         if('grant' in result && result.nextStep==='signup'){setSocialBinding(res,result.grant);return BaseController.ok(res,{nextStep:result.nextStep,signupTicket:result.grant.token,email:result.email});}
         return BaseController.ok(res,result);
       }
-      return GoogleAuthController.respondWithSession(req,res,result,req.body.includeLegacyTokens,'Login successful');
+      return SessionResponse.send(req,res,result,{includeLegacyTokens:req.body.includeLegacyTokens,message:'Login successful'});
     });
   }
   static async signup(req:Request,res:Response) {
     return SocialAuthController.respond(res,async()=>{
       const {origin}=socialOrigin(req);const result=await kakaoAuthService.signup(req.body.token,socialBinding(req,req.body.token),origin,req.body);
       clearSocialBinding(res,req.body.token);
-      return 'nextStep'in result?BaseController.ok(res,result):GoogleAuthController.respondWithSession(req,res,result,req.body.includeLegacyTokens,'Signup successful',201);
+      return 'nextStep'in result?BaseController.ok(res,result):SessionResponse.send(req,res,result,{includeLegacyTokens:req.body.includeLegacyTokens,message:'Signup successful',status:201});
     });
   }
   static async accounts(req:AuthRequest,res:Response) {

@@ -13,7 +13,8 @@ describe('Lecture Service Foundation', () => {
   const cors = read('bootstrap/setup-middlewares.ts');
   // reference seed 는 migration 이 아니라 CLI (data-only 는 incremental 계약 C22 fingerprint 중복 · MIGRATION-STANDARD 규칙 8)
   const seed = read('scripts/seed-lecture-service-and-roles.ts');
-  const join = read('modules/auth/controllers/handoff.controller.ts');
+  const join = read('modules/auth/controllers/handoff-catalog.controller.ts');
+  expect(read('modules/auth/controllers/handoff.controller.ts')).toContain('static joinService = HandoffCatalogController.joinService');
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8:
   //   origin -> 서비스 판정이 `utils/session-origin` 으로 옮겨졌다(로그인·로그아웃·handoff 가
   //   같은 답을 써야 서비스 단위 세션 폐기가 어긋나지 않는다). 계약은 그대로다 — 정확 호스트명 일치.
