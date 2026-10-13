@@ -1,7 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareDomainDetachment,detachDomain} from './pharmacy-hub-domain-detachment.mjs';
+import {prepareDomainDetachment,detachDomain,domainComputeRequest} from './pharmacy-hub-domain-detachment.mjs';
 import {prepareHostRetirement} from './pharmacy-hub-qr-redirect.mjs';
+test('Compute destinations and methods are fixed; untrusted operation paths and request query injection are rejected',()=>{
+  assert.equal(domainComputeRequest('read').method,'GET');
+  assert.equal(domainComputeRequest('validate').method,'POST');
+  const r=domainComputeRequest('replace',{requestId:'12345678-1234-4123-8123-123456789abc'});
+  assert.equal(r.method,'PUT');assert.equal(new URL(r.url).hostname,'compute.googleapis.com');
+  assert.match(domainComputeRequest('operation',{operationName:'operation-123'}).url,/global\/operations\/operation-123$/);
+  for(const name of ['../urlMaps/another-map','https://example.invalid','op?requestId=bad','op/other',''])
+    assert.throws(()=>domainComputeRequest('operation',{operationName:name}));
+  assert.throws(()=>domainComputeRequest('replace',{requestId:'x&resource=another'}));
+  assert.throws(()=>domainComputeRequest('https://example.invalid'));
+});
 function live() {
   return {...prepareHostRetirement({name:'o4o-global-lb',defaultService:'shared-backend',
     hostRules:[{hosts:['pharmacyhub.co.kr','www.pharmacyhub.co.kr'],pathMatcher:'path-matcher-pharmacy-hub'},
