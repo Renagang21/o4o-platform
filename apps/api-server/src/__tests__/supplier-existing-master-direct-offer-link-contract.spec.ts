@@ -14,11 +14,11 @@
  *   web-neture cutover · 레거시 라우트 제거 · Offer 경로 Master write 0 의 최종 상태는
  *   supplier-product-registration-cutover-contract.spec.ts 가 증명한다.
  */
-import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 const stripComments = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
 
 const OFFER_SERVICE = 'apps/api-server/src/modules/neture/services/offer.service.ts';

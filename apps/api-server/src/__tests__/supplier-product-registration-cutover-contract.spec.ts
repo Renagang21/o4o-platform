@@ -13,10 +13,11 @@
  *      → normalizer → plan.master.metadata / effects.images → Core create INSERT + linkPromotionImages(커밋 후 · create 만)
  */
 import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 const stripComments = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
 
 const NETURE = 'apps/api-server/src/modules/neture';

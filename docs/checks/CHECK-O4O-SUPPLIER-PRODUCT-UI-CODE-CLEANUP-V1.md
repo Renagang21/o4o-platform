@@ -156,3 +156,52 @@ PC 1440×1000, mobile 390×844에서 각각 9개 동작 묶음을 확인했다.
 
 3차 종료: 구현 `c5718402d1e986e57559fb8f0e3ad348de4e3ef9`의 `wo/supplier-code-phase3` push와 원격 일치를 확인했다.
 자기 검증 서버 종료(5191 listen 0), 기존 checkout/branch 보존을 확인했다. main merge·배포는 수행하지 않았다.
+
+## 4차 — backend HTTP 책임 정비 (2026-10-13 KST)
+
+근거: [WO-O4O-SUPPLIER-BACKEND-HTTP-CODE-CLEANUP-V1](../work-orders/WO-O4O-SUPPLIER-BACKEND-HTTP-CODE-CLEANUP-V1.md).
+기준: fresh main `e36bcf931` + 앞선 승인 push `70546698a`, 전용 clone/`wo/supplier-code-phase4`.
+먼저 TODO 작성 후 현재 supplier route/mount/인가/서비스/웹 소비처·검사를 재조사했다.
+사업자 관리 13개 + 상품 12개 route를 업무별 handler와 bulk Candidate 업무 서비스로 분리했다.
+외부 route/factory, middleware 순서, 다른 주문/배송/재고/정산/Programs 계약은 유지했다.
+
+| 검사 | 결과 |
+|---|---|
+| 기존 경계/컨트롤러 기준 검사, 수정 전 | 11 suites / 268 tests PASS |
+| 신규 HTTP 계약, 원래 코드 | 1 suite / 48 tests PASS |
+| 객체 상속 키 타입 접수 결함, 원래 코드 | 3 tests FAIL — 각각 기대 400 / 실제 201. 결함 재현이며 skip 48건은 실행 성공으로 세지 않음 |
+| 최종 공급자·주문·정산 관련 회귀 | 25 suites / 619 tests PASS |
+| 신규 HTTP 계약 포함 건수 | 51 tests PASS — 기존 48 + 결함 회귀 3 |
+| 실제 소스 AST 전후 비교 | 57 checks PASS — 25개 path/order/guard, 24개 handler, bulk 상수/helper/검증·행 처리. 의도한 own-key 검사 1곳은 명시적 수정으로 대조 |
+| API 전체 타입 검사 | PASS (`tsc --noEmit`) |
+| API TypeScript 빌드 | PASS (`tsc -p tsconfig.build.json`) |
+| API 운영 번들 | PASS (`tsup`, main/migrate 산출물) |
+| 변경 18개 TypeScript 파일 ESLint | PASS — 오류/경고 0 |
+| main 최종 fetch | `e36bcf931` 유지 |
+| 실계정·운영 DB/API 쓰기·운영 OAuth | NOT_RUN — 사용자 유예, fixture I/O만 사용 |
+| PR/main merge·배포 | NOT_RUN — commit/push 종료 범위 |
+
+실제 Express HTTP 요청을 보내고 실제 supplier identity middleware를 사용했다.
+인증·조직 resolver·main membership·업무 서비스·upload/storage는 fixture로 대체했다.
+따라서 운영 토큰, 실제 조직 DB 인가, 실제 PDF 저장 성공을 뜻하지 않는다.
+linked/active 상태 분리, explicit 조직 403/409, service 미호출, 승인 전 profile/onboarding 보완,
+등록 201/403/409/428, profile 404/지원 불가 400, onboarding 오류, 문서 stream/header/404/다운로드 실패,
+품목군 선택/해제 잠금, Offer whitelist·권한/상태 매핑·100개 제한·부분 삭제 결과,
+bulk 파일 차단·행별 실패·중복 생성·분류 alias·출처·예외 시 이후 행 중단을 확인했다.
+새 상속 키 거부 3건을 제외한 handler 본문과 bulk 흐름은 AST로 원본을 대조했다.
+
+기존 소스 검사는 test-only helper로 이동한 handler의 실제 연결을 따라간다.
+기존 single-line route/숫자 상태 ternary의 포맷팅만 정규화하고 금지 assertion은 유지했다.
+순서가 중요한 static/dynamic route와 middleware를 합치거나 mount 위치를 옮기지 않았다.
+ProductMaster/Offer 직접 bulk 생성, 새 transaction/정산 정책, 새로운 Programs engine은 없다.
+
+초기 build:deps는 미빌드 content-editor에서, 초기 번들/타입은 일부 API dependency 산출물 부재에서 실패했다.
+기존 frozen 설치 후 shared/API dependency graph를 순서대로 빌드해 최종 검사에서 모두 해소했다.
+한 회귀 실행은 기본 Node24/fallback pnpm 활성화 누락으로 테스트 시작 전에 실패했고,
+Node22.18.0/pnpm10.25.0을 명시한 실행으로 정정했다. 실패를 테스트 PASS로 세지 않았다.
+별도 package/lockfile/CI 변경 없이 해결했다. tsup의 기존 duplicate skipLibCheck와 Jest force-exit 안내는 남아 있다.
+
+로그/원본 비교: `/workspace/artifacts/supplier-code-phase4-*`, `/workspace/artifacts/supplier-phase4-compare-source.mjs`.
+새 서비스/컨테이너/운영 인증 세션을 시작하지 않았다. supertest fixture 요청은 테스트 수명 안에서 종료됐다.
+후속: 이미지/가져오기·콘텐츠 처리 경계, 앞선 mobile Drawer/공통 에디터 사용성 한계, 사용자 실계정 검증.
+문서 정합: 사업자 필드의 조직 metadata 저장 소유권 코드 주석을 정본에 맞췄다. 정본 정책 변경 없음.

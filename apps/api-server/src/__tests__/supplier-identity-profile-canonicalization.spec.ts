@@ -10,11 +10,11 @@
  *   §C     신규 등록이 canonical owner membership 을 만든다
  *   §10·§11 Regulated Category 불변 · Operator/Admin 경계 불변
  */
-import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 
 const RESOLVER = 'apps/api-server/src/modules/neture/middleware/supplier-context.resolver.ts';
 const MIDDLEWARE = 'apps/api-server/src/modules/neture/middleware/neture-identity.middleware.ts';
