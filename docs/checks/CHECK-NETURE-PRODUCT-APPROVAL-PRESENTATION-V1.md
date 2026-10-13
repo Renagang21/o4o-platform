@@ -50,3 +50,5 @@ API·권한·심사 guard·실패 보존 정책을 바꾸지 않는다. 최신 m
 Chromium desktop/mobile 16개 승인·거절 실패/전체 실패/부분 성공/재시도·키보드 Enter 상세 진입 시나리오 PASS.
 환경 게시로 이전 /tmp fixture가 초기화되어 합성 fixture를 새로 작성했으며 실제 운영 회원 데이터나 계정은 사용하지 않았다.
 이전 전체 관리자 용어 정비는 독립 검토 branch `wo/admin-terminology-finalization`에서 준비했으며 이번 PR에서 함께 통합한다.
+
+통합 CI에서 약관 안내 asset과 검토 문서의 byte 일치 검사로 전체 관리자 띄어쓰기 2곳의 미동기화를 발견했다. Neture account notice asset에 같은 띄어쓰기만 반영했고, 다른 문장·정책/버전/DB·동의 조건은 변경하지 않았다. 기존 asset을 동일 단어 치환한 결과가 검토 draft와 정확히 일치하는지 assert한 뒤 회귀 검증한다.
