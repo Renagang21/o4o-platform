@@ -1,3 +1,6 @@
+const mockQuotaReserve = jest.fn(async (..._args: unknown[]) => ({ id: 'quota-reservation', warnings: [] }));
+const mockQuotaSettle = jest.fn(async (..._args: unknown[]) => {});
+jest.mock('../modules/ai-policy/ai-quota.service.js', () => ({ AiQuotaService: jest.fn().mockImplementation(() => ({ reserve: (...args: unknown[]) => mockQuotaReserve(...args), settle: (...args: unknown[]) => mockQuotaSettle(...args) })) }));
 const mockExecute = jest.fn();
 jest.mock('@o4o/ai-core', () => ({ ...jest.requireActual('@o4o/ai-core'), execute: (...args: unknown[]) => mockExecute(...args) }));
 import { LmsAIService } from '../modules/ai/services/LmsAIService.js';

@@ -1,3 +1,5 @@
+import { AppDataSource } from '../../../database/connection.js';
+import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
 /**
  * Operator AI LLM Service
  *
@@ -36,7 +38,7 @@ export class OperatorAiLlmService {
 
     try {
       // Dynamic import to avoid startup failure if ai-core not built
-      const { execute, runAiExtension } = await import('@o4o/ai-core');
+      const { runAiExtension } = await import('@o4o/ai-core');
 
       const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
       if (!apiKey) {
@@ -52,11 +54,11 @@ export class OperatorAiLlmService {
         materials: [], funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await execute({ ...prompt, provider, responseMode: 'json',
+          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider, responseMode: 'json',
             config: { apiKey, model, maxTokens: 500, temperature: 0.2 },
             timeoutMs: 3000, retry: { maxAttempts: 1, delayMs: 0 },
             meta: { service: 'neture', callerName: 'OperatorAiLlm' },
-          });
+          }, { scope: 'OPERATOR_ACTIONS', serviceKey: 'neture', userId: actorId });
           return { ...result, provider: result.provider ?? provider };
         },
       }, {

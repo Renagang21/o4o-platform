@@ -1,3 +1,4 @@
+import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 /**
  * AI Query Service
  * Phase 1 - 서비스 맥락 기반 AI 질의 처리
@@ -15,7 +16,7 @@ import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
-import { execute, runAiExtension } from '@o4o/ai-core';
+import { runAiExtension } from '@o4o/ai-core';
 import { createServiceQueryExtension, resolveServiceAiProfile, SERVICE_AI_TASKS } from './ai-extensions/service-query.extension.js';
 import type { ServiceAiTask } from './ai-extensions/service-query.extension.js';
 import { aiCardExposureService } from './ai-card-exposure.service.js';
@@ -79,7 +80,7 @@ export interface AiQueryResponse {
   attachedInfo?: Record<string, any>;
   remainingQueries?: number;
   error?: string;
-  errorCode?: 'LIMIT_EXCEEDED' | 'AI_DISABLED' | 'AI_ERROR' | 'NO_API_KEY' | 'SERVICE_UNSUPPORTED' | 'TASK_UNSUPPORTED';
+  errorCode?: 'LIMIT_EXCEEDED' | 'AI_DISABLED' | 'AI_ERROR' | 'NO_API_KEY' | 'SERVICE_UNSUPPORTED' | 'TASK_UNSUPPORTED' | 'QUOTA_EXCEEDED' | 'AI_QUOTA_UNAVAILABLE';
   // Phase 2: 맥락 정보 UI 데이터
   contextPanel?: ContextInfoPanel;
   // Phase 3: AI 카드 (최대 3개, 설명 가능성 포함)
@@ -496,12 +497,12 @@ class AiQueryService {
         funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await execute({
+          const result = await executeAccountedAi(AppDataSource, {
             ...prompt,
             responseMode: 'text',
             config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
             meta: { service: profile.serviceId, callerName: extension.id },
-          });
+          }, { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
           return { ...result, provider: result.provider ?? 'unknown' };
         },
       }, {
@@ -581,7 +582,8 @@ class AiQueryService {
       return {
         success: false,
         error: error.message || 'AI 응답 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        errorCode: 'AI_ERROR'
+        errorCode: error.message === 'QUOTA_EXCEEDED' ? 'QUOTA_EXCEEDED'
+          : error.message === 'AI_QUOTA_UNAVAILABLE' ? 'AI_QUOTA_UNAVAILABLE' : 'AI_ERROR'
       };
     }
   }

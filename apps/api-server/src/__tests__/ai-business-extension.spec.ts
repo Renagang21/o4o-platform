@@ -72,3 +72,14 @@ describe('provider-neutral business Extension workflow', () => {
     expect(h.invoke).not.toHaveBeenCalled();
   });
 });
+
+it('retains sanitized accounting outage codes through the common Extension boundary', async () => {
+  const context = { requestId: 'request', serviceId: 'neture', featureId: 'draft', actorId: 'actor', audience: 'staff' as const };
+  const prepare = jest.fn(() => ({ systemPrompt: 's', userPrompt: 'u' }));
+  const parse = jest.fn();
+  const record = jest.fn(async () => {});
+  await expect(runAiExtension({ extension: { id: 'test', operation: 'draft', prepare, parse }, input: {}, context, materials: [], funding: { payer: 'platform' } },
+    { invoke: async () => { throw new Error('AI_QUOTA_UNAVAILABLE'); } }, { authorize: async () => true, record })).rejects.toThrow('AI_QUOTA_UNAVAILABLE');
+  expect(parse).not.toHaveBeenCalled();
+  expect(record).toHaveBeenCalledWith(expect.objectContaining({ stage: 'failed', errorCode: 'AI_QUOTA_UNAVAILABLE' }));
+});

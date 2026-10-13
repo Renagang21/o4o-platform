@@ -157,3 +157,10 @@ provider/model/key/timeout은 호스트 runtime의 기존 resolver/execute가 �
 운영자 요약 10개 PASS. 합계 208개 테스트(11 suite) PASS. Core build·API build/type-check PASS. 변경 파일 ESLint 오류 0(기존 ai-query route unused catch warning 4건), docs 민감정보 검사 3881개 파일 PASS, git diff --check PASS. 외부 provider는 mock, 실제 유료 호출/운영 인증/서비스 UI 변경은 미실행.
 
 종료 범위는 작업 branch push이며 main 통합/PR 병합/배포는 실행하지 않는다. WORKTREE_DISPOSITION: `wo/ai-core-extension-foundation` / base `b3f792578a` / main integration 없음 / CI 원격 미실행 / deployment 미실행 / KEEP(검토·후속 작업용).
+
+
+## 10. 비용·quota/Runtime 후속 정비 (2026-10-13)
+
+[후속 WO](../work-orders/WO-O4O-AI-QUOTA-RUNTIME-MAINTENANCE-V1.md)는 위 P2의 가격 snapshot·원자 예약·정산·관측을 기존 정책 실행과 전체 catalogue 공통 질의/운영 요약·LMS/Neture 추천에 연결한다. 기존 aggregate/billing 정본을 유지하고 예약 상태만 별도 원장으로 둔다. 플랫폼 부담 유지, 모델별 가격 version, UTC 기간 귀속, 검증된 actor quota, DB 장애 거부, 성공 뒤 기록 실패의 중복 유료 호출 방지를 구현했다. 새 원문/Memory/결제/인증 기반을 만들지 않는다.
+
+`ExecuteResult.attempts`는 additive metadata다. Core의 업무 계약·권한 callback과 서비스별 Extension prompt는 그대로다. 직접 transport/멀티모달/public research의 전체 비용 이관, store/user/external-account billing, 운영 migration/가격 설정 적용은 후속 WO의 한계·적용 전제를 따른다. 앞 절의 과거 검증과 초기 한계는 당시 단계 기록이며 이 절과 후속 WO가 현재 구현 범위를 설명한다.

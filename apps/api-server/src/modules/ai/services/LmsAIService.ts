@@ -1,3 +1,5 @@
+import { AppDataSource } from '../../../database/connection.js';
+import { executeAccountedAi } from '../../ai-policy/ai-accounted-execution.js';
 import { randomUUID } from 'node:crypto';
 import { lmsAssistanceExtension } from './lms-assistance.extension.js';
 import type { LmsAssistanceInput } from './lms-assistance.extension.js';
@@ -98,7 +100,7 @@ export class LmsAIService {
     }
 
     try {
-      const { execute, runAiExtension } = await import('@o4o/ai-core');
+      const { runAiExtension } = await import('@o4o/ai-core');
       const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY!;
       const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
       const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
@@ -109,11 +111,11 @@ export class LmsAIService {
         materials: [], funding: { payer: 'platform' },
       }, {
         invoke: async prompt => {
-          const result = await execute({ ...prompt, provider, responseMode: 'json',
+          const result = await executeAccountedAi(AppDataSource, { ...prompt, provider, responseMode: 'json',
             config: { apiKey, model, maxTokens: 700, temperature: 0.4 },
             timeoutMs: TIMEOUT_MS, retry: { maxAttempts: 1, delayMs: 0 },
             meta: { service: 'lms', callerName: `LmsAI.${kind}` },
-          });
+          }, { scope: 'LMS_ASSISTANCE', serviceKey: 'lecture', userId: actorId });
           return { ...result, provider: result.provider ?? provider };
         },
       }, {

@@ -91,7 +91,8 @@ export class AiQueryController {
       const response = await aiQueryService.query(request);
 
       if (!response.success) {
-        const statusCode = response.errorCode === 'LIMIT_EXCEEDED' ? 429
+        const statusCode = ['LIMIT_EXCEEDED', 'QUOTA_EXCEEDED'].includes(response.errorCode ?? '') ? 429
+          : response.errorCode === 'AI_QUOTA_UNAVAILABLE' ? 503
           : ['SERVICE_UNSUPPORTED', 'TASK_UNSUPPORTED'].includes(response.errorCode ?? '') ? 400 : 500;
         return res.status(statusCode).json(response);
       }

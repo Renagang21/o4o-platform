@@ -1,3 +1,4 @@
+import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 /**
  * Copilot Engine Service
  *
@@ -86,7 +87,7 @@ export class CopilotEngineService {
     // 2. Try AI-enhanced insights if API key is available
     if (hasAiApiKey()) {
       try {
-        const { execute, runAiExtension } = await import('@o4o/ai-core');
+        const { runAiExtension } = await import('@o4o/ai-core');
         const target = await resolveAiTarget(AppDataSource);
         const extension = createOperatorInsightExtension(profile);
         const run = await runAiExtension({
@@ -95,11 +96,11 @@ export class CopilotEngineService {
           materials: [], funding: { payer: 'platform' },
         }, {
           invoke: async prompt => {
-            const result = await execute({ ...prompt, provider: target.provider,
+            const result = await executeAccountedAi(AppDataSource, { ...prompt, provider: target.provider,
               config: { apiKey: target.apiKey, model: target.model, maxTokens: 2048, temperature: 0.3 },
               timeoutMs: AI_TIMEOUT_MS, retry: { maxAttempts: 1 },
               meta: { service: profile.serviceId, callerName: extension.id },
-            });
+            }, { scope: 'OPERATOR_INSIGHT', serviceKey: profile.serviceId, userId: user.id });
             return { ...result, provider: result.provider ?? target.provider };
           },
         }, {

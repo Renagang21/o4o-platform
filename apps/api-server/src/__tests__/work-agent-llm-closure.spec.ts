@@ -350,7 +350,7 @@ describe('Runtime · Multimodal · Privacy (§13·§18~§24·§34)', () => {
     expect(Object.keys(usage).sort()).toEqual(['actionCount', 'aiPlanCount', 'completionState', 'durationMs', 'failureClass', 'improvementCandidate', 'inputMode', 'recoveryAttempt', 'recoveryMethod', 'recoveryStatus', 'recoveryTier', 'siteId', 'takeoverReason', 'takeoverStep', 'timestamp', 'userCorrectionCount']);
     expect(usage.inputMode).toBe('text+image');
     // 고정 약 스키마 · 이미지 저장 경로 부재(소스 잠금).
-    const src = ['work-agent-runtime.ts', 'work-agent-contract.ts', 'work-planner.ts', 'work-run-finalization.ts']
+    const src = ['work-agent-runtime.ts', 'work-agent-contract.ts', 'work-planner.ts', 'work-run-finalization.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts']
       .map((file) => read(`services/ai-tools/${file}`)).join('\n');
     for (const bad of ['PillVisualFeatures', 'drugName', 'frontMark', 'backMark', 'writeFileSync', 'INSERT INTO', 'getRepository']) expect(src).not.toContain(bad);
     expect(src).toContain('현재 화면이 요구하는 입력에 필요한 부분만');

@@ -1,3 +1,6 @@
+const mockQuotaReserve = jest.fn(async (..._args: unknown[]) => ({ id: 'quota-reservation', warnings: [] }));
+const mockQuotaSettle = jest.fn(async (..._args: unknown[]) => {});
+jest.mock('../modules/ai-policy/ai-quota.service.js', () => ({ AiQuotaService: jest.fn().mockImplementation(() => ({ reserve: (...args: unknown[]) => mockQuotaReserve(...args), settle: (...args: unknown[]) => mockQuotaSettle(...args) })) }));
 const mockExecute = jest.fn();
 const mockSave = jest.fn(async (value: unknown) => value);
 jest.mock('@o4o/ai-core', () => ({ ...jest.requireActual('@o4o/ai-core'), execute: (...args: unknown[]) => mockExecute(...args) }));
@@ -29,6 +32,7 @@ it.each(profiles.map(p => p.serviceId))('HTTP request for %s runs its real Exten
   expect(response.status).toBe(200); expect(response.body).toMatchObject({ success: true, answer: '답변', remainingQueries: 9 });
   expect(mockExecute).toHaveBeenCalledWith(expect.objectContaining({ meta: { service: serviceId, callerName: `${serviceId}.summary` }, config: expect.objectContaining({ model: 'configured-model' }) }));
   expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({ userId: 'authenticated-actor', success: true }));
+  expect(mockQuotaReserve).toHaveBeenCalledWith('SERVICE_QUERY', 'authenticated-actor', expect.objectContaining({ requests: 1 }), expect.any(Array), serviceId);
 });
 it('keeps old requests without service/task on the representative service', async () => {
   expect((await request(app).post('/query').set('X-Test-Auth', 'yes').send({ question: '기존 질문' })).status).toBe(200);
@@ -51,4 +55,12 @@ it('missing AI connection does not pretend to produce a successful answer', asyn
   (aiQueryService as any).getApiKey.mockResolvedValue('');
   const response = await request(app).post('/query').set('X-Test-Auth', 'yes').send({ question: '질문', serviceId: 'lecture' });
   expect(response.status).toBe(500); expect(response.body.errorCode).toBe('NO_API_KEY'); expect(mockExecute).not.toHaveBeenCalled();
+});
+
+it.each([['QUOTA_EXCEEDED',429],['AI_QUOTA_UNAVAILABLE',503]])('returns %s without a provider call or successful query log', async (code, status) => {
+  mockQuotaReserve.mockRejectedValueOnce(new Error(code as string));
+  const response = await request(app).post('/query').set('X-Test-Auth', 'yes').send({ question: '질문', serviceId: 'community' });
+  expect(response.status).toBe(status); expect(response.body.errorCode).toBe(code);
+  expect(mockExecute).not.toHaveBeenCalled();
+  expect(mockSave).not.toHaveBeenCalledWith(expect.objectContaining({ success: true }));
 });
