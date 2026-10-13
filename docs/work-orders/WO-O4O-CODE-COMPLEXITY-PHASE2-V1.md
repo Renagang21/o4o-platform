@@ -231,8 +231,8 @@ origin/main을 정상 merge했다. 이전 미병합 정비 commit도 유지한�
 - [x] C01: AI 종료/결과 구성과 모달 변환/저장/상태 책임 조사.
 - [x] C02: 정본·소비처·은퇴 경계·테스트와 대조해 구현/보류 목록 검증.
 - [x] C03: 검증된 내부 함수 추출 구현. 기존 public export/API·상태·부작용 순서 유지.
-- [ ] C04: 관련 기존 suite와 변환/종료 보고 행동 검증, 패키지/API 빌드·lint.
-- [ ] C05: 전후 지표·실행 결과·큰 함수 잔여 기록.
+- [x] C04: 관련 기존 suite와 변환/종료 보고 행동 검증, 패키지/API 빌드·lint.
+- [x] C05: 전후 지표·실행 결과·큰 함수 잔여 기록.
 - [ ] C06: commit·push 후 원격 일치 확인. main 병합·배포 없음.
 
 
@@ -278,3 +278,44 @@ Store AI 진입·서비스 정책·분회 전용 코드는 변경하거나 복�
 겹치지 않는다. 이번 구현을 먼저 commit하고 main 변경을 작업 branch에 정상 merge한 뒤,
 API type/build·대표 runtime/변환·인증 및 기존 회원 콘솔 회귀를 재확인한다.
 새 인증 기능/권한/운영 배포를 이 WO의 구현 실적으로 간주하지 않는다.
+
+
+### 10.3 최신 main 통합 후 검증과 잔여 구조
+
+`aa59a0962f`를 전용 branch에 정상 merge했다. 충돌/미커밋 혼입 없음.
+통합 후 대표 runtime/DOM 변환/modality/인증 session·handoff/Demo 및 기존 회원 콘솔
+11 suite / 203 tests PASS. API type-check/build 재실행 PASS.
+최종 lint ratchet PASS: errors 46 / baseline 46, warnings 1,006.
+관련 AI/Store 계약 23 suite 390건 + 새 변환/저장 body 15건은 통합 전 검증이며,
+통합 후 203건과 겹치는 테스트를 단순 합산하지 않는다.
+
+| 지표 (N02 시작 소스 → 이번 변경) | 전 | 후 |
+|---|---:|---:|
+| runtime 종료 finish 길이 / 분기 요소 | 60 / 43 | 39 / 25 |
+| runWorkAgent 길이 / 분기 요소 | 1,490 / 216 | 1,469 / 216 |
+| AiContentModal 컴포넌트 길이 / 분기 요소 | 1,552 / 124 | 1,527 / 124 |
+| 커뮤니티 저장 handler 길이 / 분기 요소 | 32 / 9 | 25 / 6 |
+| 내 매장 저장 handler 길이 / 분기 요소 | 29 / 10 | 25 / 8 |
+| 제작 자료 저장 handler 길이 / 분기 요소 | 44 / 15 | 30 / 9 |
+| runtime+모달+추출 파일 전체 길이 / 분기 요소 | 4,105 / 1,064 | 4,155 / 1,059 |
+
+§6과 같은 AST 비교 지표다. 추출 모듈의 분기를 빼고 개선을 주장하지 않는다.
+모달 변환/저장 body의 전체 분기 수는 그대로이며 runtime의 반복 taskKey 계산을 줄여
+전체 분기 합은 5개 줄었다. 설명·타입·명시적 입력 경계로 전체 줄 수는 50줄 늘었다.
+핵심 효과는 결과 보고/형식 변환/요청 body를 부작용에서 격리하여 직접 검증 가능하게 만든 것이다.
+큰 함수의 본체 복잡성(216/124)은 아직 그대로이므로 N02 전체 구조 정비 완료로 표시하지 않는다.
+
+정적 content-editor import census: Neture/KPA-Society/Lecture/Store/Admin 및
+shared-space-ui/operator-core-ui/store-ui-core/forum-core/tablet 관련 패키지/utils를 확인했다.
+이 census는 기능 활성 판정이 아니다. 공개 타입 byte 동일·Store/외부 LLM 경계 source suite와
+실제 변환 행동으로 이번 내부 추출을 확인했다. frontend 앱 전체 빌드나 로그인/browser smoke를
+실행했다고 주장하지 않는다. React state·JSX·네트워크/오류/콜백 처리는 기존 handler에 유지했다.
+
+잔여 TODO:
+- [ ] C-N01: runtime의 observe/replay/recover/dispatch가 공유하는 mutable 상태와 변경 주체·순서 조사.
+- [ ] C-N02: finish의 원장 저장/경험/도움 기록 best-effort 실패와 실행 상태 전이를 대조한 분리안 준비.
+- [ ] C-N03: 모달의 생성/삽입/저장 panel 수명·닫기/재열기·비동기 응답 상태를 조사한 개별 hook/component 분리안 준비.
+- [ ] C-N04: 각 후속 TODO를 해당 상태 계약과 행동 검증으로 확인한 뒤 구현 범위를 결정.
+
+범용 RuntimeContext/공통 저장 훅/서비스 간 새 공통화는 하지 않았다.
+Core/API·상태 정책·권한·운영 DB·분회 전용 개발·main 병합·배포는 이번 변경 범위가 아니다.
