@@ -95,13 +95,18 @@ export function StoreQrOutputGuide({
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div style={styles.guideOverlay} onClick={() => onClose()}>
+    <div style={styles.guideOverlay}>
+      <button
+        type="button"
+        aria-label="QR 출력 안내 바깥 영역 닫기"
+        onClick={onClose}
+        style={{ position: "absolute", inset: 0, border: 0, background: "transparent" }}
+      />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="QR 출력 파일 안내"
-        style={styles.guideModal}
-        onClick={(e) => e.stopPropagation()}
+        style={{ ...styles.guideModal, position: "relative" }}
       >
         <div style={styles.guideHeader}>
           <h2 style={styles.guideTitle}>QR 출력 파일은 이렇게 선택하세요</h2>

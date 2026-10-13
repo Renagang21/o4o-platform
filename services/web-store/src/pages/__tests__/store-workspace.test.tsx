@@ -1,6 +1,7 @@
+import { authClient } from "../../lib/apiClient";
 import UnifiedStoreLayout from "../../components/layouts/UnifiedStoreLayout";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import {
   UNIFIED_STORE_CONFIG,
@@ -17,6 +18,10 @@ import {
   StoreWorkflowNavigation,
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
+
+vi.mock("../../contexts/AuthContext", () => ({
+  useAuth: () => ({ user: { id: "fixture-owner" }, isAuthenticated: true, isLoading: false }),
+}));
 
 vi.mock("../../contexts/StoreContext", () => ({
   useUnifiedStore: () => ({
@@ -205,4 +210,17 @@ it("공통 URL에서 서비스 지정 URL로 전환할 때 제작 자료 전달�
   expect(location.search).toBe("?workspace=studio");
   expect(location.hash).toBe("#selected");
   expect(location.state).toEqual(state);
+});
+
+ it("My Home은 직접 도메인 링크 대신 기존 인증 handoff를 사용하고 실패를 표시한다", async () => {
+  const post = vi.spyOn(authClient.api, "post").mockRejectedValueOnce(new Error("fixture handoff failure"));
+  try {
+    render(<MemoryRouter initialEntries={["/store"]}><StoreWorkspaceShell config={config}><h1>내 매장</h1></StoreWorkspaceShell></MemoryRouter>);
+    fireEvent.click(screen.getByTestId("my-home-button"));
+    await waitFor(() => expect(post).toHaveBeenCalledWith("/auth/handoff", { targetServiceKey: "neture", returnPath: "/mypage" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("My Home으로 이동하지 못했습니다");
+    expect(screen.queryByRole("link", { name: /My Home/ })).toBeNull();
+  } finally {
+    post.mockRestore();
+  }
 });

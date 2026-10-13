@@ -71,7 +71,7 @@ const state = {
   resultNotice: "",
 };
 const main = document.querySelector("#workspace");
-const escape = (value) =>
+const escapeHtml = (value) =>
   String(value).replace(
     /[&<>"']/g,
     (char) =>
@@ -127,14 +127,14 @@ function libraryView() {
   const list = state.materials.filter((item) =>
     `${item.title} ${item.source}`.includes(state.query),
   );
-  return `<div class="search"><label class="field" style="width:100%;margin:0">자료 검색<input id="material-search" type="search" value="${escape(state.query)}" placeholder="제목 또는 출처"></label></div><div id="material-list" class="grid">${materialCards(list)}</div><p class="support-note">내 자료함에는 콘텐츠와 파일·참고 자료를 함께 탐색할 진입을 둡니다. 원본 탐색과 매장 소유 사본은 구분합니다.</p>`;
+  return `<div class="search"><label class="field" style="width:100%;margin:0">자료 검색<input id="material-search" type="search" value="${escapeHtml(state.query)}" placeholder="제목 또는 출처"></label></div><div id="material-list" class="grid">${materialCards(list)}</div><p class="support-note">내 자료함에는 콘텐츠와 파일·참고 자료를 함께 탐색할 진입을 둡니다. 원본 탐색과 매장 소유 사본은 구분합니다.</p>`;
 }
 function materialCards(list) {
   return list.length
     ? list
         .map(
           (item) =>
-            `<article class="card ${state.selected === item.id ? "selected" : ""}"><span class="tag">${escape(item.source)}</span><h2>${escape(item.title)}</h2><p class="muted">${escape(item.body)}</p><div class="actions">${button("이 자료로 제작", "make", true, `data-id="${escape(item.id)}"`)}</div></article>`,
+            `<article class="card ${state.selected === item.id ? "selected" : ""}"><span class="tag">${escapeHtml(item.source)}</span><h2>${escapeHtml(item.title)}</h2><p class="muted">${escapeHtml(item.body)}</p><div class="actions">${button("이 자료로 제작", "make", true, `data-id="${escapeHtml(item.id)}"`)}</div></article>`,
         )
         .join("")
     : `<div class="empty">검색에 맞는 자료가 없습니다. 다른 검색어를 입력해 주세요.</div>`;
@@ -150,7 +150,7 @@ function makerView() {
   const selectedSource = state.materials.find(
     (item) => item.id === draft.sourceId,
   );
-  return `<div class="step-strip"><span>자료 선택</span><span class="current">제작·미리보기</span><span>저장</span><span>매장에서 활용</span></div><div class="two-col"><section class="card"><h2>활용할 형태로 만들기</h2><p class="caption">선택 자료: ${escape(selectedSource?.title ?? "선택 없음")} · ${escape(selectedSource?.source ?? "")}</p><form id="maker-form"><label class="field">제목<input id="draft-title" required maxlength="120" value="${escape(draft.title)}"></label><label class="field">활용 형태<select id="draft-format">${formats.map((format) => `<option ${draft.format === format ? "selected" : ""}>${format}</option>`).join("")}</select></label><label class="field">자료 언어<select id="draft-language"><option ${draft.language === "한국어" ? "selected" : ""}>한국어</option><option ${draft.language === "English" ? "selected" : ""}>English</option></select></label><label class="field">안내 내용<textarea id="draft-body" required maxlength="4000">${escape(draft.body)}</textarea></label><p class="caption">언어 선택은 자료의 언어 표시입니다. 자동 번역하지 않습니다. AI 작성·번역은 공통 AI 연결 후 제공할 기능입니다.</p><div class="actions"><button type="submit" class="primary">초안 저장</button>${button("저장한 자료 활용하기", "saved-use", false, state.savedId ? "" : "disabled")}</div><p id="save-state" class="caption">${state.savedId ? "예시 초안을 저장했습니다. 실제 매장 자료는 변경되지 않습니다." : "저장한 다음 활용 공간으로 이동할 수 있습니다."}</p></form></section><section class="card"><h2>미리보기</h2><p class="caption">본문과 형태를 확인하는 화면 배치 예시입니다. 실제 매체 렌더러·QR 코드·인쇄 파일은 아닙니다.</p><div class="preview"><div class="preview-sheet"><div id="preview-meta" class="preview-meta">${escape(draft.format)} · ${escape(draft.language)}</div><h3 id="preview-title">${escape(draft.title)}</h3><p id="preview-body">${escape(draft.body)}</p></div></div><p class="support-note">폼과 미리보기는 PC에서 나란히, 모바일 웹에서는 위아래로 배치합니다. 제작 저장은 현장 적용과 별도입니다.</p></section></div>`;
+  return `<div class="step-strip"><span>자료 선택</span><span class="current">제작·미리보기</span><span>저장</span><span>매장에서 활용</span></div><div class="two-col"><section class="card"><h2>활용할 형태로 만들기</h2><p class="caption">선택 자료: ${escapeHtml(selectedSource?.title ?? "선택 없음")} · ${escapeHtml(selectedSource?.source ?? "")}</p><form id="maker-form"><label class="field">제목<input id="draft-title" required maxlength="120" value="${escapeHtml(draft.title)}"></label><label class="field">활용 형태<select id="draft-format">${formats.map((format) => `<option ${draft.format === format ? "selected" : ""}>${format}</option>`).join("")}</select></label><label class="field">자료 언어<select id="draft-language"><option ${draft.language === "한국어" ? "selected" : ""}>한국어</option><option ${draft.language === "English" ? "selected" : ""}>English</option></select></label><label class="field">안내 내용<textarea id="draft-body" required maxlength="4000">${escapeHtml(draft.body)}</textarea></label><p class="caption">언어 선택은 자료의 언어 표시입니다. 자동 번역하지 않습니다. AI 작성·번역은 공통 AI 연결 후 제공할 기능입니다.</p><div class="actions"><button type="submit" class="primary">초안 저장</button>${button("저장한 자료 활용하기", "saved-use", false, state.savedId ? "" : "disabled")}</div><p id="save-state" class="caption">${state.savedId ? "예시 초안을 저장했습니다. 실제 매장 자료는 변경되지 않습니다." : "저장한 다음 활용 공간으로 이동할 수 있습니다."}</p></form></section><section class="card"><h2>미리보기</h2><p class="caption">본문과 형태를 확인하는 화면 배치 예시입니다. 실제 매체 렌더러·QR 코드·인쇄 파일은 아닙니다.</p><div class="preview"><div class="preview-sheet"><div id="preview-meta" class="preview-meta">${escapeHtml(draft.format)} · ${escapeHtml(draft.language)}</div><h3 id="preview-title">${escapeHtml(draft.title)}</h3><p id="preview-body">${escapeHtml(draft.body)}</p></div></div><p class="support-note">폼과 미리보기는 PC에서 나란히, 모바일 웹에서는 위아래로 배치합니다. 제작 저장은 현장 적용과 별도입니다.</p></section></div>`;
 }
 function studioView() {
   return (
@@ -176,12 +176,12 @@ function studioView() {
 function useView() {
   let body;
   if (state.useTab === "placements")
-    body = `<section class="card"><h2>현재 활용 배치 · 예시</h2>${state.placements.length ? state.placements.map((item) => `<div class="task-row"><div><span class="tag">${escape(item.format)}</span><h3>${escape(item.title)}</h3><p>${escape(item.target)}</p><p class="caption">예시 배치입니다. 실제 기기 재생·게시 상태는 확인하지 않았습니다.</p></div>${button("작업실에서 수정", "edit", false, `data-id="${escape(item.resultId)}"`)}</div>`).join("") : '<div class="empty">이 초안에서 적용한 자료가 없습니다. 준비된 자료를 골라 배치를 확인해 보세요.</div>'}</section>`;
+    body = `<section class="card"><h2>현재 활용 배치 · 예시</h2>${state.placements.length ? state.placements.map((item) => `<div class="task-row"><div><span class="tag">${escapeHtml(item.format)}</span><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.target)}</p><p class="caption">예시 배치입니다. 실제 기기 재생·게시 상태는 확인하지 않았습니다.</p></div>${button("작업실에서 수정", "edit", false, `data-id="${escapeHtml(item.resultId)}"`)}</div>`).join("") : '<div class="empty">이 초안에서 적용한 자료가 없습니다. 준비된 자료를 골라 배치를 확인해 보세요.</div>'}</section>`;
   else if (state.useTab === "consultation")
     body = `<section class="card"><span class="tag amber">향후 기획</span><h2>한국어·다국어 상담</h2><p>직원 보조 상담과 소비자 직접 상담을 구분하고, 각 대상에게 허용된 매장 자료만 사용합니다.</p><div class="actions"><button type="button" disabled>직원 상담 도우미 · 준비 중</button><button type="button" disabled>소비자 상담 · 준비 중</button></div><p class="caption">현재 기능인 상담 요청의 진입도 활용 공간에 배치할 예정입니다. 이 초안에는 실제 상담·요청 기능이 연결되지 않았습니다.</p></section>`;
   else {
     const item = result();
-    body = `<div class="two-col"><section class="card"><h2>준비된 자료 선택</h2><p class="muted">복잡한 제작 설정을 거치지 않고 사용할 결과물을 선택합니다.</p><div class="task-list">${state.results.map((entry) => `<div class="task-row"><div><span class="tag">${escape(entry.format)} · ${escape(entry.language)}</span><h3>${escape(entry.title)}</h3></div><button type="button" data-action="select-result" data-id="${escape(entry.id)}" aria-pressed="${entry.id === state.selectedResult}">${entry.id === state.selectedResult ? "선택됨" : "선택"}</button></div>`).join("")}</div></section><section class="card"><h2>어디에서 사용할까요?</h2>${item ? `<p class="context-box"><strong>${escape(item.title)}</strong><br>${escape(item.format)} · ${escape(item.language)}</p><label class="field">사용 위치<select id="target"><option value="">위치를 선택하세요</option>${targets[item.format].map((target) => `<option ${state.target === target ? "selected" : ""}>${target}</option>`).join("")}</select></label><p class="caption">실제 구현에서는 해당 매장의 접근 가능한 위치·기기를 조회하고, 게시·기기 적용·출력을 매체별로 처리합니다.</p><div class="actions">${button("예시 적용 확인", "apply", true)}${button("작업실에서 수정", "edit", false, `data-id="${escape(item.id)}"`)}</div>` : '<div class="empty">제작 결과물이 없습니다. 작업실에서 먼저 저장해 주세요.</div>'}</section></div><p class="support-note">QR 배치·출력, 사이니지 스케줄·재생, 태블릿 화면 적용을 이 공간에 묶습니다. 기능별 상세 설정은 선택한 대상에서 열고, 편집은 작업실로 연결합니다.</p>`;
+    body = `<div class="two-col"><section class="card"><h2>준비된 자료 선택</h2><p class="muted">복잡한 제작 설정을 거치지 않고 사용할 결과물을 선택합니다.</p><div class="task-list">${state.results.map((entry) => `<div class="task-row"><div><span class="tag">${escapeHtml(entry.format)} · ${escapeHtml(entry.language)}</span><h3>${escapeHtml(entry.title)}</h3></div><button type="button" data-action="select-result" data-id="${escapeHtml(entry.id)}" aria-pressed="${entry.id === state.selectedResult}">${entry.id === state.selectedResult ? "선택됨" : "선택"}</button></div>`).join("")}</div></section><section class="card"><h2>어디에서 사용할까요?</h2>${item ? `<p class="context-box"><strong>${escapeHtml(item.title)}</strong><br>${escapeHtml(item.format)} · ${escapeHtml(item.language)}</p><label class="field">사용 위치<select id="target"><option value="">위치를 선택하세요</option>${targets[item.format].map((target) => `<option ${state.target === target ? "selected" : ""}>${target}</option>`).join("")}</select></label><p class="caption">실제 구현에서는 해당 매장의 접근 가능한 위치·기기를 조회하고, 게시·기기 적용·출력을 매체별로 처리합니다.</p><div class="actions">${button("예시 적용 확인", "apply", true)}${button("작업실에서 수정", "edit", false, `data-id="${escapeHtml(item.id)}"`)}</div>` : '<div class="empty">제작 결과물이 없습니다. 작업실에서 먼저 저장해 주세요.</div>'}</section></div><p class="support-note">QR 배치·출력, 사이니지 스케줄·재생, 태블릿 화면 적용을 이 공간에 묶습니다. 기능별 상세 설정은 선택한 대상에서 열고, 편집은 작업실로 연결합니다.</p>`;
   }
   return (
     title(
@@ -197,7 +197,7 @@ function useView() {
       "useTab",
     ) +
     (state.resultNotice
-      ? `<p class="result-banner" role="status">${escape(state.resultNotice)}</p>`
+      ? `<p class="result-banner" role="status">${escapeHtml(state.resultNotice)}</p>`
       : "") +
     body
   );

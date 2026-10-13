@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { LayoutTemplate, ArrowRight } from "lucide-react";
 import { GuideBlock } from "@o4o/shared-space-ui";
 import { colors } from "../../../styles/theme";
@@ -84,6 +85,7 @@ export function StoreQrCreateForms({
   handleCreateVideo,
   handleCreate,
 }: StoreQrCreateFormsProps) {
+  const fieldId = useId();
   return (
     <>
       {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 QR 생성 폼 (library 자료 흐름과 분리) */}
@@ -130,8 +132,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 제목</label>
+            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>QR 제목</label>
             <input
+              id={`${fieldId}-title`}
               type="text"
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
@@ -142,8 +145,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>짧은 안내문 (선택)</label>
             <input
+              id={`${fieldId}-description`}
               type="text"
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
@@ -154,10 +158,11 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
+            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>QR 주소 (URL 경로)</label>
             <div style={styles.slugPreview}>
               <span style={styles.slugBase}>{qrBaseUrl}</span>
               <input
+                id={`${fieldId}-slug`}
                 type="text"
                 value={formSlug}
                 onChange={(e) =>
@@ -271,8 +276,9 @@ export function StoreQrCreateForms({
 
           {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: QR 제목 */}
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 제목</label>
+            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>QR 제목</label>
             <input
+              id={`${fieldId}-title`}
               type="text"
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
@@ -284,8 +290,9 @@ export function StoreQrCreateForms({
 
           {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: 짧은 안내문 */}
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>짧은 안내문 (선택)</label>
             <input
+              id={`${fieldId}-description`}
               type="text"
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
@@ -307,10 +314,11 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
+            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>QR 주소 (URL 경로)</label>
             <div style={styles.slugPreview}>
               <span style={styles.slugBase}>{qrBaseUrl}</span>
               <input
+                id={`${fieldId}-slug`}
                 type="text"
                 value={formSlug}
                 onChange={(e) =>

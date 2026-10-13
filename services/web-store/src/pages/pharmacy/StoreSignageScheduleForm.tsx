@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { Loader2 } from "lucide-react";
 import { SIGNAGE_DAY_LABELS as DAY_LABELS } from "@o4o/store-ui-core";
 import type { StorePlaylist } from "../../api/storePlaylist";
@@ -55,6 +56,7 @@ export function StoreSignageScheduleForm({
   handleSaveSchedule,
   resetScheduleForm,
 }: StoreSignageScheduleFormProps) {
+  const fieldId = useId();
   return (
     <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
       <div className="text-sm font-medium text-slate-700">
@@ -142,8 +144,9 @@ export function StoreSignageScheduleForm({
       {/* Row 4: Start / End time */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0">
-          <label className="text-xs text-slate-500 mb-1 block">시작 시간</label>
+          <label htmlFor={`${fieldId}-start`} className="text-xs text-slate-500 mb-1 block">시작 시간</label>
           <input
+            id={`${fieldId}-start`}
             type="time"
             aria-label="시작 시간"
             value={schStartTime}
@@ -152,8 +155,9 @@ export function StoreSignageScheduleForm({
           />
         </div>
         <div className="min-w-0">
-          <label className="text-xs text-slate-500 mb-1 block">종료 시간</label>
+          <label htmlFor={`${fieldId}-end`} className="text-xs text-slate-500 mb-1 block">종료 시간</label>
           <input
+            id={`${fieldId}-end`}
             type="time"
             aria-label="종료 시간"
             value={schEndTime}
@@ -166,10 +170,11 @@ export function StoreSignageScheduleForm({
       {/* Row 5: Valid from / until */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0">
-          <label className="text-xs text-slate-500 mb-1 block">
+          <label htmlFor={`${fieldId}-from`} className="text-xs text-slate-500 mb-1 block">
             유효 시작일
           </label>
           <input
+            id={`${fieldId}-from`}
             type="date"
             aria-label="유효 시작일"
             value={schValidFrom}
@@ -178,10 +183,11 @@ export function StoreSignageScheduleForm({
           />
         </div>
         <div className="min-w-0">
-          <label className="text-xs text-slate-500 mb-1 block">
+          <label htmlFor={`${fieldId}-until`} className="text-xs text-slate-500 mb-1 block">
             유효 종료일
           </label>
           <input
+            id={`${fieldId}-until`}
             type="date"
             aria-label="유효 종료일"
             value={schValidUntil}

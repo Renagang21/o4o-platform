@@ -7,7 +7,9 @@ import {
   workspaceItems,
   workspaceSupportItems,
 } from "../../config/storeWorkspace";
-import { PLATFORM_ORIGIN } from "../../config/workspace";
+import { MyHomeButton } from "@o4o/auth-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { authClient } from "../../lib/apiClient";
 
 export interface StoreWorkspaceOutlet {
   config: StoreDashboardConfig;
@@ -26,6 +28,7 @@ export function StoreWorkspaceShell({
   children?: ReactNode;
 }) {
   const location = useLocation();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const active = currentWorkspaceArea(
     location.pathname,
     location.search,
@@ -57,12 +60,16 @@ export function StoreWorkspaceShell({
                   {item.label}
                 </Link>
               ))}
-              <a
+              <MyHomeButton
+                api={authClient.api}
+                accountId={user?.id}
+                isAuthenticated={isAuthenticated}
+                authLoading={authLoading}
                 className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-                href={`${PLATFORM_ORIGIN}/mypage`}
-              >
-                My Home · 직원 초대·승인
-              </a>
+              />
+              <span className="px-3 text-xs text-slate-500">
+                직원 초대·승인은 My Home에서
+              </span>
               <Link
                 className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
                 to="/services"

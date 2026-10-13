@@ -38,7 +38,7 @@ button:hover {
 }
 button:disabled {
   cursor: default;
-  color: #64756c;
+  color: #425349;
   background: #f0f2ef;
 }
 button:focus-visible,
@@ -493,7 +493,7 @@ main h3 {
   .header-links button {
     font-size: 12px;
     padding: 4px 8px;
-    min-height: 36px;
+    min-height: 44px;
   }
   .primary-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -543,9 +543,6 @@ main h3 {
   }
   .dialog-header {
     gap: 8px;
-  }
-  .header-links button {
-    min-height: 44px;
   }
   dialog {
     max-height: calc(100dvh - 32px);

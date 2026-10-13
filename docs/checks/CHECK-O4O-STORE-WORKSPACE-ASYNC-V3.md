@@ -51,3 +51,13 @@ main merge·배포와 PR CI는 미실행이다. DEPLOYMENT = REQUIRED: 추후 ma
 작업 공간·브랜치는 KEEP으로 보존한다.
 
 문서 정합: WO TODO·종료 결과와 [웹 기획](../platform/store/DESIGN-O4O-STORE-WORKSPACE-WEB-V1.md) §16을 반영했다.
+
+## main 통합 검증 추가 (2026-10-13)
+
+사용자가 기존 push-only 범위를 main merge와 배포까지 확장했다. 전체 기획·메뉴·패널·상태·복잡성·비동기 정비를 [PR #547](https://github.com/Renagang21/o4o-platform/pull/547) 하나로 제출했다. 최신 main `e388b1534`는 정상 merge로 반영했다. 위 push-only 종료 결과는 당시의 기록이다.
+
+- 통합 빌드: 14개 테스트 파일 130개 통과, TypeScript 포함 store-web production build 통과, 수정 TS 파일 ESLint 통과.
+- main 반영 직후 합성 브라우저 검증: 1280·375·320px × 경영자·직원, 600 + 144 + 252 = 996개 통과. 아래 리뷰 수정 전 빌드의 결과이며 수정 후에는 영향 범위를 재검증한다.
+- Codex P1: My Home 직접 링크를 기존 `@o4o/auth-react` MyHomeButton으로 교체했다. 기존 authClient와 계정·세션 상태를 전달하며 공통 인증 코드는 수정하지 않았다. handoff 발급 및 실패 표시 회귀 테스트를 추가했다.
+- SonarCloud 초기 결과: 신규 중복률 10.9%와 신뢰성 D로 quality gate 실패. 실제 main ruleset의 필수 체크는 CI Gate이다. QR·스케줄 입력 label 연결, QR 안내 배경 닫기 버튼, 초안 CSS 중복 선택자·대비와 escapeHtml 명칭을 수정했다. 나머지 서비스 간 중복·복잡성 등의 정적 분석 항목은 O4O 전체 정비의 후보이며 새 공통 모듈이나 분석 제외 설정을 만들지 않는다.
+- PR 최신 HEAD CI·리뷰 결과, main merge와 실제 Delivery는 이 시점에 진행 중이다. 운영 제공 SHA 확인 전에는 배포 완료로 판정하지 않는다.
