@@ -100,7 +100,8 @@ clean 상태·auth 경로 충돌 없음·branch-only commit0을 확인한 뒤 �
 - [x] Neture `/`의 로그인 모달에서 Demo3 × PC/mobile6/6 PASS.
 - [x] 공개 E2E 최초 실패를 코드·HTTP·전체64조건으로 재현해 test contract를 정정.
 - [x] 수정한 은퇴/거절 E2E26/26 및 정적 은퇴/Google DTO2 suites58/58 PASS.
-- [ ] 수정 HEAD의 GitHub 공개 E2E64조건·CI/review 확인 후 검증 보완 PR 통합. 결과는 해당 PR/check 링크에서 확인.
+- [x] 보완 commit `fae89f0752`의 GitHub 공개 E2E 실행·CI Gate·Codex review PASS, 미해결 thread0 확인.
+- 최신 main 동기화 이후 HEAD의 통합 게이트·merge 결과는 [검증 보완 PR #546](https://github.com/Renagang21/o4o-platform/pull/546)에서 확인한다.
 
 [Promote run 38403004672](https://github.com/Renagang21/o4o-platform/actions/runs/38403004672)의
 API·전체관리자·Neture·약국 협력사업·강의·Store·분회 실제 배포 job과 최종 serving Report가 PASS다.
@@ -131,3 +132,9 @@ Google signup은 DTO 형식의 합성 termsPolicy와 허용 계정 센터 Origin
 [잔여 계획](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)의 별도 모집단을 완료로 확대하지 않는다.
 WORKTREE_DISPOSITION: KEEP — 같은 미완료 WO의 후속 검증·2차 조사에 사용하는 cloud checkout이며 제거하지 않는다.
 후속 변경은 E2E·검증 기록뿐으로 DEPLOYMENT=NOT_APPLICABLE이다. 런타임 배포는 위 target에 대한 증거로 판정한다.
+
+GitHub [재실행38407087021](https://github.com/Renagang21/o4o-platform/actions/runs/38407087021)의
+공개 E2E job은 success다. 해당 job 로그 다운로드도 환경의 다른 저장소 제한으로 중단되어
+원문을 읽었다고 주장하지 않는다. 실행 step의 PASS와64조건의 로컬 수집/재현은 구분한다.
+통합 대기 중 main이 이동하여 자기 branch에 충돌 없이 반영했다. 이 동기화와 기록 갱신 이후의
+최종 HEAD는 위 PR의 새 CI/review 기술 게이트를 다시 충족해야 한다.
