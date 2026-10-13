@@ -1,7 +1,7 @@
 # O4O 통합 개인정보 후속 TODO
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-13
 > **근거 WO/IR**: WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1 §9~§11 · 사용자 새 환경 재개 지시
 > **범위**: 기존 통합 WO의 연속 phase. 완료된 UI/인증/My Home을 재구현하지 않는다.
 
@@ -34,8 +34,8 @@
 - [x] 두 API 통합·pending/token/fence·명시적 파일 retry·독립 최소 증빙·Admin 완료 상태 및 합성 검증 구현. 운영 활성화 전 전수 domain/file classification·producer/orphan·GCS/lock 검증 잔여는 WO §10.2 참조.
 - [x] Core 구현 PR #505 정상 main 통합(최종 PR CI·Codex 통과). 실제 범위/한계는 WO §10을 따른다.
 - [x] 보호 grant·전체 인증 namespace·legacy hash retirement/준비 상태 후속 PR #507 정상 main 통합 및 post-merge CI PASS. 집중67 tests와 새24단계 정상 runner 검증 완료.
-- [ ] 별도 운영 DDL 실행 승인 후 API/Admin 배포(기능 비활성); 활성화와 실제 파기 승인은 별도 범위.
-- [ ] 전수 domain/file inventory·producer/orphan·법정1/2년 근거·공개 본문/시행·승인된 실제 집행.
+- [x] 2026-10-13 운영 실행 승인 확인 및 기존23/24·API/Admin 반영 재확인. 현재25단계 history ready와 runtime target88d45b8208 확인; 중복 적용/재배포0. 설정/코드 기준 삭제 기능 OFF, 실제 관리자 capability 응답은 마지막 본인 Google 검증에서 확인한다.
+- [ ] 전수 domain/file inventory·producer/orphan·GCS/backup·lock 검증·법정1/2년 근거·공개 본문/시행·승인된 실제 집행. 운영 준비 완료는 활성화 승인이 아니다.
 - [ ] 마지막 사용자 테스트 결과 → 발견 문제 수정/회귀/통합/배포 → 종료 판정.
 
 ## 4. 마지막 사용자 테스트
@@ -45,3 +45,5 @@
 문서 정합: 과거 배포 HELD/분회 빌드 실패를 현재 미해소 상태로 반복하지 않는다. 당시 기록을 다시 쓰지 않고 최신 완료·후속 범위를 이 연속 TODO에 기록한다.
 
 환경: frozen-lockfile 설치 완료. GitHub API allowlist 적용 후 PR/ruleset 조회 성공; 이전 Forbidden은 현재 blocker가 아니다. 운영 활성화·법률 시행·일반 사용자 테스트는 아직 완료하지 않았다.
+
+최신 운영 준비 근거는 [CHECK의2026-10-13 재확인](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md#운영-준비-재확인--2026-10-13)을 따른다. 이전12일 HELD 기록을 현재 미해소로 반복하지 않는다. 새3 Demo 소유 트랙 검증도 일반 상태 계정/본인 OAuth/운영자 최종 테스트를 대신하지 않는다.
