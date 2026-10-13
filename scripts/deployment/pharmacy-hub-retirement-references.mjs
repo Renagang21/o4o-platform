@@ -10,6 +10,17 @@ const paymentLink=`(o.id::text=p."orderId"::text OR
   CASE WHEN jsonb_typeof(p.metadata::jsonb->'checkoutOrderIds')='array'
     THEN (p.metadata::jsonb->'checkoutOrderIds') ? o.id::text ELSE FALSE END)`;
 const checks=[
+  ['exclusivePhOffers',['supplier_product_offers.service_keys','supplier_product_offers.is_public','supplier_product_offers.allowed_seller_ids'],
+    `SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE
+      EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE ${ph('v')}) AND x.is_public=FALSE
+      AND COALESCE(cardinality(x.allowed_seller_ids),0)=0
+      AND NOT EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`],
+  ['sharedOfferBaselineWidening',['supplier_product_offers.service_keys','supplier_product_offers.is_public','supplier_product_offers.allowed_seller_ids','supplier_product_offers.is_active','supplier_product_offers.approval_status'],
+    `SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE
+      EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE ${ph('v')})
+      AND (x.is_public OR COALESCE(cardinality(x.allowed_seller_ids),0)>0)
+      AND x.is_active AND x.approval_status::text='APPROVED'
+      AND NOT EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`],
   ['orderLogs',['checkout_order_logs.orderId','checkout_orders.id','checkout_orders.metadata'],
     `SELECT count(*)::text AS count FROM public.checkout_order_logs l JOIN public.checkout_orders o ON l."orderId"=o.id WHERE ${orderScope}`],
   ['paymentsWithoutPhOrder',paymentColumns,
@@ -43,6 +54,13 @@ const checks=[
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
       WHERE ${ph('a.service_key')} AND NOT EXISTS (SELECT 1 FROM public.cms_contents c
         WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
+  ['mediaPhServiceLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND l.entity_type='service' AND ${ph('l.entity_id')}`],
+  ['mediaUnownedEntityLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND NOT COALESCE((l.entity_type='service' AND ${ph('l.entity_id')}),FALSE)
+      AND NOT EXISTS (SELECT 1 FROM public.cms_contents c WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
   ['phContentMediaLinks',['media_entity_links.entity_type','media_entity_links.entity_id','cms_contents.id','cms_contents.serviceKey'],
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.cms_contents c ON l.entity_type='content' AND l.entity_id=c.id::text WHERE ${ph('c."serviceKey"')}`],
   ['phContentSharedAssets',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
