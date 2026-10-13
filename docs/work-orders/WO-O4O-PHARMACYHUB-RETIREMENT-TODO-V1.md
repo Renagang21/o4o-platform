@@ -363,4 +363,4 @@ PR #527은 main `e4c48811b6b414aa8939d639373d9331d2c4c470`에 병합됐으며 po
 
 관리자는 원래 WIF 조건을 로컬 `pharmacyhub-cert-retirement-e4c48811b6b414aa8939d639373d9331d2c4c470.json`에 백업하고 해당 main SHA/PH workflow/owner로 임시 제한한 검증 결과 WIF_RESTRICTION_ACTIVE를 전달했다. apply [38349256767](https://github.com/Renagang21/o4o-platform/actions/runs/38349256767)은 SUCCESS, applied=true, targets=[], sharedResourcesPreserved=true, missingPermissions=[]로 종료했다. `cm-entry-pharmacyhub-root`·`cm-entry-pharmacyhub-www`, `cm-cert-pharmacyhub`, `dns-auth-pharmacyhub-root`·`dns-auth-pharmacyhub-www`를 제거하고 재조회로 부재 및 공유 설정 보존을 확인했다. 공유 인증서 map/proxy/LB 및 URL map은 변경하지 않았다.
 
-원래 WIF 조건 복구는 관리자 실행·검증 대기이며 아직 완료로 기록하지 않는다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이며 도메인 등록/자동 갱신 종료는 별도 확인이 필요하다. PC Local Agent는 담당 에이전트 범위다.
+관리자는 같은 로컬 백업을 사용해 원래 WIF 조건을 복구하고 재조회 검증 결과 `WIF_RESTORED`를 전달했다. 인증서 종료용 임시 SHA/workflow 제한은 해제됐다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이며 도메인 등록/자동 갱신 종료는 별도 확인이 필요하다. PC Local Agent는 담당 에이전트 범위다.
