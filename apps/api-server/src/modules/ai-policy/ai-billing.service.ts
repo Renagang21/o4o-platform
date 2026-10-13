@@ -6,6 +6,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { SERVICE_FOR_SCOPE, DYNAMIC_SERVICE_SCOPES, type AiPolicyScope } from './ai-policy-scope.js';
 
 // ── Types ──
 
@@ -158,6 +159,7 @@ export class AiBillingService {
 
       const scopeMap = new Map<string, { requests: number; tokens: number; cost: number }>();
       for (const r of scopeRows) {
+        if (DYNAMIC_SERVICE_SCOPES.includes(r.scope) || SERVICE_FOR_SCOPE[r.scope as AiPolicyScope] !== summary.serviceKey) continue;
         if (!scopeMap.has(r.scope)) {
           scopeMap.set(r.scope, { requests: 0, tokens: 0, cost: 0 });
         }
@@ -168,13 +170,22 @@ export class AiBillingService {
         else if (r.limitType === 'cost') entry.cost = val;
       }
 
+      // Shared feature scopes span catalogue services; their receipts carry the actual service binding.
+      const dynamicRows = await this.dataSource.query(`SELECT scope,
+          SUM(COALESCE(actual_requests,0)) AS requests, SUM(COALESCE(actual_tokens,0)) AS tokens,
+          SUM(COALESCE(actual_cost,0)) AS cost
+        FROM ai_usage_reservations WHERE service_key = $1 AND monthly_key = $2
+          AND status IN ('settled','pending') AND scope = ANY($3::varchar[]) GROUP BY scope`,
+      [summary.serviceKey, summary.period, DYNAMIC_SERVICE_SCOPES]);
+      for (const row of dynamicRows) scopeMap.set(row.scope, { requests: Number(row.requests), tokens: Number(row.tokens), cost: Number(row.cost) });
+
       scopeBreakdown = Array.from(scopeMap.entries()).map(([scope, data]) => ({
         scope,
         requests: data.requests,
         tokens: data.tokens,
         cost: data.cost,
       }));
-    } catch { /* aggregate table may not exist */ }
+    } catch { throw new Error('AI_BILLING_BREAKDOWN_UNAVAILABLE'); }
 
     return { summary, scopeBreakdown };
   }

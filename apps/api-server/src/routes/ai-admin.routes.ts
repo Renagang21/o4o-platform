@@ -1,3 +1,4 @@
+import { AiQuotaService } from '../modules/ai-policy/ai-quota.service.js';
 /**
  * AI Admin Routes
  * WO-AI-ADMIN-CONTROL-PLANE-V1 + WO-O4O-AI-OBSERVABILITY-MINIMUM-V1
@@ -369,23 +370,8 @@ router.get('/quotas', authenticate, requireAdmin, async (_req, res: Response) =>
 
 router.get('/quotas/status', authenticate, requireAdmin, async (_req, res: Response) => {
   try {
-    const now = new Date();
-    const dailyKey = now.toISOString().slice(0, 10);
-    const monthlyKey = now.toISOString().slice(0, 7);
-    const data = await AppDataSource.query(`
-      SELECT q.id, q.layer, q.layer_key AS "layerKey", q.limit_type AS "limitType",
-             q.period, q.limit_value AS "limitValue", q.warning_threshold AS "warningThreshold",
-             q.is_enabled AS "isEnabled", COALESCE(a.current_value, 0) AS "currentValue"
-      FROM ai_usage_quota q
-      LEFT JOIN ai_usage_aggregate a ON a.layer = q.layer AND a.layer_key = q.layer_key
-        AND a.limit_type = q.limit_type AND a.period_key = CASE WHEN q.period = 'daily' THEN $1 ELSE $2 END
-      WHERE q.is_enabled = true ORDER BY q.layer, q.layer_key`, [dailyKey, monthlyKey]);
-    return res.json({ success: true, data: data.map((r: any) => {
-      const limitValue = Number(r.limitValue); const currentValue = Number(r.currentValue);
-      const usagePercent = limitValue > 0 ? Math.round((currentValue / limitValue) * 1000) / 10 : 0;
-      const status = currentValue >= limitValue ? 'exceeded' : usagePercent >= Number(r.warningThreshold) ? 'warning' : 'ok';
-      return { ...r, limitValue, currentValue, usagePercent, status };
-    }) });
+    const data = await new AiQuotaService(AppDataSource).getStatus();
+    return res.json({ success: true, data });
   } catch { return res.status(500).json({ success: false, error: 'Quota status failed' }); }
 });
 

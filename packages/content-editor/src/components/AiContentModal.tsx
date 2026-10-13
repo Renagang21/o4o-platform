@@ -1,3 +1,5 @@
+import { CommunitySavePanel, StoreSavePanel, ProductionMaterialSavePanel } from './AiContentSavePanels';
+import { blocksToHtml, UrlBlock } from "./ai-content-conversion.js";
 /**
  * AiContentModal — AI 콘텐츠 변환 모달
  *
@@ -28,7 +30,9 @@
  * - initialMode: POP / 제목 추천 / 블로그 글 / QR 안내문 (Extension 진입). 없으면 flexible 자유 입력.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
+import { aiContentGenerationReducer, INITIAL_GENERATION_STATE } from './ai-content-generation-state';
+import { useAiContentSaving } from './useAiContentSaving';
 import type { Editor } from '@tiptap/react';
 import { sanitizeHtml } from '../sanitize';
 
@@ -36,30 +40,7 @@ const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
   'https://api.neture.co.kr';
 
-// WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
-interface UsageWarning {
-  detected: boolean;
-  categories: string[];
-  snippets: string[];
-}
-
-interface AiContentResult {
-  html: string;
-  title: string;
-  summary: string;
-  /**
-   * WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
-   *   o4o/youtube 블록의 URL 목록.
-   *   setContent 경로는 TipTap parseHTML 매칭 한계로 youtube embed 를 drop 하므로,
-   *   handleInsert 에서 별도로 editor.commands.setYoutubeVideo({src}) 로 삽입한다.
-   *   미리보기(blocksToHtml)에는 youtube wrapper 가 그대로 포함되므로 시각적 일관성 유지.
-   */
-  youtubeUrls?: string[];
-  /** WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: 원문 이용조건 감지 결과 */
-  usageWarning?: UsageWarning;
-}
-
-interface AiContentModalProps {
+export interface AiContentModalProps {
   open: boolean;
   onClose: () => void;
   editor: Editor | null;
@@ -115,7 +96,7 @@ interface AiContentModalProps {
   showProductionMaterialSave?: boolean;
   /**
    * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1: 매장 제작 자료 저장 성공 시 콜백.
-   * - 호출 시점: handleProductionMaterialSave 가 201 응답 받은 직후
+   * - 호출 시점: productionMaterial.save 가 201 응답 받은 직후
    * - 호출 측은 보통 list refresh 에 사용. 모달은 자동으로 닫지 않음
    *   (사용자가 결과를 추가 검토하거나 "에디터에 삽입" 등 다른 액션을 이어갈 수 있도록).
    * - 미제공 시 noop.
@@ -181,7 +162,7 @@ interface AiContentModalProps {
   };
 }
 
-type AiMode = 'pop' | 'title_suggest' | 'blog' | 'store_qr';
+export type AiMode = 'pop' | 'title_suggest' | 'blog' | 'store_qr';
 type ToneOption = 'friendly' | 'professional' | 'concise';
 type LengthOption = 'short' | 'medium' | 'long';
 type ResultTab = 'preview' | 'html';
@@ -190,14 +171,6 @@ type UrlTone = 'normal' | 'professional' | 'store';
 // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
 //   URL 모드도 결과 형식 프리셋 제거. length 만 보조 가이드로 유지.
 type UrlLength = 'short' | 'medium' | 'long';
-
-interface UrlBlock {
-  id?: string;
-  type: string;
-  content?: string;
-  attributes?: Record<string, any>;
-  innerBlocks?: UrlBlock[];
-}
 
 // WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
 //   백엔드 ai-prompts 카탈로그가 7개 outputType 을 이미 지원하지만
@@ -239,92 +212,6 @@ const URL_LENGTH_LABELS: Record<UrlLength, string> = {
   long: '길게(A4 1장↑)',
 };
 
-/**
- * HTML → Forum Block[] 변환 (프론트엔드 전용, DOMParser 사용)
- * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
- *   forum post API는 Block[] JSON을 기대하지만 백엔드 normalizeContent가
- *   Node.js에서 DOMParser를 호출하므로 실패함 → 프론트에서 미리 변환해서 전달
- */
-function htmlToForumBlocks(html: string): object[] {
-  if (!html || !html.trim()) return [];
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const blocks: object[] = [];
-  doc.body.childNodes.forEach((node, index) => {
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-    const el = node as Element;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
-      blocks.push({ id: `b${index}`, type: 'heading', content: el.textContent || '', attributes: { level: parseInt(tag[1]) } });
-    } else if (tag === 'p') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    } else if (tag === 'ul' || tag === 'ol') {
-      const items = Array.from(el.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
-      if (items.length) blocks.push({ id: `b${index}`, type: 'list', content: { items }, attributes: { ordered: tag === 'ol' } });
-    } else if (tag === 'blockquote') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'quote', content: text });
-    } else if (tag === 'div' && el.getAttribute('data-youtube-video')) {
-      const iframe = el.querySelector('iframe');
-      const src = iframe?.getAttribute('src') || '';
-      if (src) blocks.push({ id: `b${index}`, type: 'paragraph', content: `[YouTube: ${src}]` });
-    } else {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    }
-  });
-  return blocks;
-}
-
-/** Block[] → HTML 변환 (RichTextEditor TipTap 기반) */
-function blocksToHtml(blocks: UrlBlock[]): string {
-  return blocks
-    .map((block) => {
-      switch (block.type) {
-        case 'o4o/heading': {
-          const level = block.attributes?.level || 2;
-          return `<h${level}>${block.content || ''}</h${level}>`;
-        }
-        case 'o4o/paragraph':
-          return `<p>${block.content || ''}</p>`;
-        case 'o4o/list': {
-          const ordered = block.attributes?.ordered;
-          const tag = ordered ? 'ol' : 'ul';
-          return `<${tag}>${block.content || ''}</${tag}>`;
-        }
-        case 'o4o/youtube': {
-          const url = block.attributes?.url || block.attributes?.src || '';
-          if (!url) return '';
-          const embedUrl = url.includes('watch?v=')
-            ? url.replace('watch?v=', 'embed/')
-            : url;
-          // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-RENDER-V1:
-          //   TipTap @tiptap/extension-youtube 의 parseHTML 규칙은
-          //     { tag: 'div[data-youtube-video] iframe' }
-          //   raw <iframe> 단독은 setContent 시 drop 되므로 wrapper 필수.
-          return `<div data-youtube-video><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
-        }
-        case 'o4o/image': {
-          const src = block.attributes?.url || block.attributes?.src || '';
-          const alt = block.attributes?.alt || '';
-          return src ? `<img src="${src}" alt="${alt}" style="max-width:100%;" />` : '';
-        }
-        case 'o4o/columns':
-        case 'o4o/group': {
-          if (block.innerBlocks && block.innerBlocks.length > 0) {
-            return `<div>${blocksToHtml(block.innerBlocks)}</div>`;
-          }
-          return block.content ? `<div>${block.content}</div>` : '';
-        }
-        default:
-          return block.content ? `<p>${block.content}</p>` : '';
-      }
-    })
-    .filter(Boolean)
-    .join('\n');
-}
-
 export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata, templateId, templateSystemPrompt, templateForcedOptions }: AiContentModalProps) {
   // 기존 text 모드 상태
   const [input, setInput] = useState('');
@@ -360,35 +247,14 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   }, [open, templateForcedOptions]);
   const [tone, setTone] = useState<ToneOption>(templateForcedOptions?.tone ?? 'professional');
   const [length, setLength] = useState<LengthOption>(templateForcedOptions?.length ?? 'medium');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AiContentResult | null>(null);
-  const [error, setError] = useState('');
-  const [resultTab, setResultTab] = useState<ResultTab>('preview');
-  const [copied, setCopied] = useState(false);
-  // WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
-  const [channelSaving, setChannelSaving] = useState(false);
-  const [channelSaveStatus, setChannelSaveStatus] = useState<{ ok: boolean; label?: string; error?: string } | null>(null);
-
-  // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
-  const [showCommunitySavePanel, setShowCommunitySavePanel] = useState(false);
-  const [communityTitle, setCommunityTitle] = useState('');
-  const [communityForumId, setCommunityForumId] = useState('');
-  const [communityForums, setCommunityForums] = useState<{ id: string; name: string }[]>([]);
-  const [communityForumsLoading, setCommunityForumsLoading] = useState(false);
-  const [communitySaving, setCommunitySaving] = useState(false);
-  const [communitySaveStatus, setCommunitySaveStatus] = useState<{ ok: boolean; error?: string; postId?: string } | null>(null);
-
-  // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
-  const [showStoreSavePanel, setShowStoreSavePanel] = useState(false);
-  const [storeTitle, setStoreTitle] = useState('');
-  const [storeSaving, setStoreSaving] = useState(false);
-  const [storeSaveStatus, setStoreSaveStatus] = useState<{ ok: boolean; error?: string; contentId?: string } | null>(null);
-
-  // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
-  const [showProductionMaterialSavePanel, setShowProductionMaterialSavePanel] = useState(false);
-  const [productionMaterialTitle, setProductionMaterialTitle] = useState('');
-  const [productionMaterialSaving, setProductionMaterialSaving] = useState(false);
-  const [productionMaterialSaveStatus, setProductionMaterialSaveStatus] = useState<{ ok: boolean; error?: string; assetId?: string } | null>(null);
+  const [generation, generationDispatch] = useReducer(aiContentGenerationReducer, INITIAL_GENERATION_STATE);
+  const { loading, result, error, resultTab, copied, showUsageSnippets } = generation;
+  const saves = useAiContentSaving({
+    apiBaseUrl: API_BASE_URL, result, mode,
+    outputType: MODE_CONFIG.find(c => c.key === mode)?.outputType ?? mode,
+    aiRequestHeaders, onChannelSave, onProductionMaterialSaved, sourceMetadata, templateId,
+  });
+  const { channel, community, store, productionMaterial } = saves;
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
@@ -406,7 +272,6 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [customPrompt, setCustomPrompt] = useState('');
   const CUSTOM_PROMPT_MAX = 500;
   // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
-  const [showUsageSnippets, setShowUsageSnippets] = useState(false);
 
   if (!open) return null;
 
@@ -422,13 +287,10 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleGenerate = async () => {
     if (!input.trim()) {
-      setError('변환할 텍스트를 입력해 주세요.');
+      generationDispatch({ type: 'error', error: '변환할 텍스트를 입력해 주세요.' });
       return;
     }
-    setLoading(true);
-    setError('');
-    setResult(null);
-    setCopied(false);
+    generationDispatch({ type: 'started' });
 
     try {
       // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
@@ -464,31 +326,27 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         throw new Error(data.error || 'AI 생성에 실패했습니다.');
       }
 
-      setResult({ html: data.html, title: data.title || '', summary: data.summary || '', usageWarning: data.usageWarning });
-      setResultTab('preview');
+      generationDispatch({ type: 'result', result: { html: data.html, title: data.title || '', summary: data.summary || '', usageWarning: data.usageWarning } });
     } catch (err: any) {
-      setError(err.message || 'AI 서비스 오류가 발생했습니다.');
+      generationDispatch({ type: 'error', error: err.message || 'AI 서비스 오류가 발생했습니다.' });
     } finally {
-      setLoading(false);
+      generationDispatch({ type: 'finished' });
     }
   };
 
   const handleGenerateFromUrl = async () => {
     if (!urlInput.trim()) {
-      setError('URL을 입력해 주세요.');
+      generationDispatch({ type: 'error', error: 'URL을 입력해 주세요.' });
       return;
     }
     try {
       new URL(urlInput.trim());
     } catch {
-      setError('올바른 URL 형식이 아닙니다. (예: https://example.com)');
+      generationDispatch({ type: 'error', error: '올바른 URL 형식이 아닙니다. (예: https://example.com)' });
       return;
     }
 
-    setLoading(true);
-    setError('');
-    setResult(null);
-    setCopied(false);
+    generationDispatch({ type: 'started' });
 
     // 90s client-side guard — backend can hang on transcript/AI; without this
     // the finally block never fires and the spinner never clears.
@@ -539,23 +397,22 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1:
       //   백엔드가 추출한 제목(YouTube oEmbed / HTML <title>·og·twitter / blocks fallback)을 사용.
       //   미추출 시 빈 문자열 — 호출 측(ContentWritePage / ResourceWritePage)이 자체 fallback 적용.
-      setResult({
+      generationDispatch({ type: 'result', result: {
         html,
         title: typeof data.title === 'string' ? data.title : '',
         summary: `${data.blocks.length}개 블록 → HTML 변환 완료`,
         youtubeUrls,
         usageWarning: data.usageWarning,
-      });
-      setResultTab('preview');
+      } });
     } catch (err: any) {
       if (err?.name === 'AbortError') {
-        setError('URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.');
+        generationDispatch({ type: 'error', error: 'URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.' });
       } else {
-        setError(err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.');
+        generationDispatch({ type: 'error', error: err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.' });
       }
     } finally {
       clearTimeout(abortTimer);
-      setLoading(false);
+      generationDispatch({ type: 'finished' });
     }
   };
 
@@ -563,8 +420,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     if (!result) return;
     try {
       await navigator.clipboard.writeText(result.html);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      generationDispatch({ type: 'copied', copied: true });
+      setTimeout(() => generationDispatch({ type: 'copied', copied: false }), 2000);
     } catch {
       // fallback: select + execCommand
       const el = document.createElement('textarea');
@@ -573,8 +430,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      generationDispatch({ type: 'copied', copied: true });
+      setTimeout(() => generationDispatch({ type: 'copied', copied: false }), 2000);
     }
   };
 
@@ -614,209 +471,12 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     handleClose();
   };
 
-  const handleChannelSave = async () => {
-    if (!result || !onChannelSave) return;
-    setChannelSaving(true);
-    setChannelSaveStatus(null);
-    try {
-      const res = await onChannelSave({
-        outputType: currentConfig.outputType,
-        html: result.html,
-        title: result.title,
-        summary: result.summary,
-        mode,
-      });
-      setChannelSaveStatus({ ok: res.success, label: res.fieldLabel, error: res.error });
-    } catch (err: any) {
-      setChannelSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
-    } finally {
-      setChannelSaving(false);
-    }
-  };
-
-  // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
-  const handleOpenCommunitySavePanel = async () => {
-    if (!result) return;
-    setCommunityTitle(result.title || '');
-    setCommunityForumId('');
-    setCommunitySaveStatus(null);
-    setShowCommunitySavePanel(true);
-    if (communityForums.length === 0) {
-      setCommunityForumsLoading(true);
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/v1/forum/categories`, {
-          headers: { ...aiRequestHeaders },
-          credentials: 'include',
-        });
-        const data = await res.json();
-        if (data.success && Array.isArray(data.data)) {
-          setCommunityForums(data.data.map((f: any) => ({ id: f.id, name: f.name })));
-        }
-      } catch {
-        // 포럼 목록 로딩 실패 — 사용자는 포럼 없이 저장 가능
-      } finally {
-        setCommunityForumsLoading(false);
-      }
-    }
-  };
-
-  const handleCommunitySave = async () => {
-    if (!result) return;
-    setCommunitySaving(true);
-    setCommunitySaveStatus(null);
-    try {
-      // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
-      //   백엔드 normalizeContent가 Node.js에서 DOMParser를 사용해 실패하므로
-      //   프론트에서 HTML → Block[] 변환 후 전달 (백엔드는 Array인 경우 그대로 저장)
-      const contentBlocks = htmlToForumBlocks(result.html);
-      const body: Record<string, any> = {
-        title: communityTitle.trim() || 'AI 생성 콘텐츠',
-        content: contentBlocks.length > 0 ? contentBlocks : result.html,
-        type: 'discussion',
-      };
-      if (communityForumId) body.forumId = communityForumId;
-      const res = await fetch(`${API_BASE_URL}/api/v1/forum/posts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || '커뮤니티 저장에 실패했습니다.');
-      }
-      setCommunitySaveStatus({ ok: true, postId: data.data?.id });
-    } catch (err: any) {
-      setCommunitySaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
-    } finally {
-      setCommunitySaving(false);
-    }
-  };
-
-  // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
-  const handleOpenStoreSavePanel = () => {
-    if (!result) return;
-    setStoreTitle(result.title || '');
-    setStoreSaveStatus(null);
-    setShowStoreSavePanel(true);
-  };
-
-  const handleStoreSave = async () => {
-    if (!result) return;
-    setStoreSaving(true);
-    setStoreSaveStatus(null);
-    try {
-      const contentBlocks = htmlToForumBlocks(result.html);
-      const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store-contents`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify({
-          title: storeTitle.trim() || 'AI 생성 콘텐츠',
-          contentJson: contentBlocks.length > 0 ? contentBlocks : { html: result.html },
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        const msg = res.status === 403
-          ? '매장 소속이 없습니다. 매장 경영자만 내 매장에 저장할 수 있습니다.'
-          : (data.error?.message || data.error || '내 매장 저장에 실패했습니다.');
-        throw new Error(msg);
-      }
-      setStoreSaveStatus({ ok: true, contentId: data.data?.id });
-    } catch (err: any) {
-      setStoreSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
-    } finally {
-      setStoreSaving(false);
-    }
-  };
-
-  // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
-  //   매장 제작 자료(store_execution_assets)로 AI 결과 저장.
-  //   - assetType=content / sourceType=generated 고정.
-  //   - category 는 outputType 그대로 (free-form) — 통합 리스트에서 유형 분류 키.
-  //   - usageType 은 enum 매핑 가능한 경우만 지정 (pop, qr). 그 외 null.
-  //     · pop outputType → 'pop'
-  //     · store_qr outputType → 'qr'
-  //     · blog / product_detail / summary / title_suggest / store_sns → null (category 만 사용)
-  //   - showStoreSave / showCommunitySave 와 독립.
-  const handleOpenProductionMaterialSavePanel = () => {
-    if (!result) return;
-    setProductionMaterialTitle(result.title || '');
-    setProductionMaterialSaveStatus(null);
-    setShowProductionMaterialSavePanel(true);
-  };
-
-  const handleProductionMaterialSave = async () => {
-    if (!result) return;
-    setProductionMaterialSaving(true);
-    setProductionMaterialSaveStatus(null);
-    try {
-      const outputType = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
-      const usageType =
-        outputType === 'pop' ? 'pop'
-        : outputType === 'store_qr' ? 'qr'
-        : null;
-      const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store/assets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify({
-          title: productionMaterialTitle.trim() || 'AI 생성 매장 제작 자료',
-          description: result.summary || null,
-          assetType: 'content',
-          htmlContent: result.html,
-          category: outputType,
-          usageType,
-          sourceType: 'generated',
-          // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: source 추적 메타 (선택적)
-          ...(sourceMetadata ? { sourceMetadata } : {}),
-          // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template id 추적 (선택적)
-          ...(templateId ? { templateId } : {}),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        const msg = res.status === 403
-          ? '매장 소속이 없습니다. 매장 경영자만 매장 제작 자료를 저장할 수 있습니다.'
-          : (data.error?.message || data.error || '매장 제작 자료 저장에 실패했습니다.');
-        throw new Error(msg);
-      }
-      const assetId: string | undefined = data.data?.id;
-      setProductionMaterialSaveStatus({ ok: true, assetId });
-      onProductionMaterialSaved?.(assetId);
-    } catch (err: any) {
-      setProductionMaterialSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
-    } finally {
-      setProductionMaterialSaving(false);
-    }
-  };
-
   const handleClose = () => {
     setInput('');
-    setResult(null);
-    setError('');
-    setLoading(false);
-    setCopied(false);
-    setChannelSaveStatus(null);
-    setChannelSaving(false);
+    generationDispatch({ type: 'closed' });
+    saves.reset();
     setUrlInput('');
-    setShowCommunitySavePanel(false);
-    setCommunityTitle('');
-    setCommunityForumId('');
-    setCommunitySaveStatus(null);
-    setCommunitySaving(false);
-    setShowStoreSavePanel(false);
-    setStoreTitle('');
-    setStoreSaveStatus(null);
-    setStoreSaving(false);
-    // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
-    setShowProductionMaterialSavePanel(false);
-    setProductionMaterialTitle('');
-    setProductionMaterialSaveStatus(null);
-    setProductionMaterialSaving(false);
     setCustomPrompt('');
-    setShowUsageSnippets(false);
     setSourceTab(initialSourceTab ?? 'text');
     // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-AI-FLOW-V1
     setMode(initialMode ?? 'pop');
@@ -825,8 +485,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleSourceTabChange = (tab: SourceTab) => {
     setSourceTab(tab);
-    setResult(null);
-    setError('');
+    generationDispatch({ type: 'source_changed' });
   };
 
   return (
@@ -1292,7 +951,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                     </div>
                     <button
                       type="button"
-                      onClick={() => setShowUsageSnippets((v) => !v)}
+                      onClick={() => generationDispatch({ type: 'usage_snippets' })}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', color: '#b45309', whiteSpace: 'nowrap', padding: 0 }}
                     >
                       {showUsageSnippets ? '접기' : '감지된 표현 보기'}
@@ -1331,7 +990,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                   <button
                     key={tab}
                     type="button"
-                    onClick={() => setResultTab(tab)}
+                    onClick={() => generationDispatch({ type: 'result_tab', tab })}
                     style={{
                       padding: '8px 16px',
                       fontSize: '13px',
@@ -1399,314 +1058,45 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           )}
 
           {/* WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: 커뮤니티 저장 패널 */}
-          {showCommunitySave && result && showCommunitySavePanel && (
-            <div
-              style={{
-                border: '1px solid #bae6fd',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#f0f9ff',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0369a1' }}>커뮤니티 게시글로 저장</div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={communityTitle}
-                  onChange={(e) => setCommunityTitle(e.target.value)}
-                  placeholder="게시글 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 게시판 선택 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>게시판 선택</label>
-                <select
-                  value={communityForumId}
-                  onChange={(e) => setCommunityForumId(e.target.value)}
-                  disabled={communityForumsLoading}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    background: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="">
-                    {communityForumsLoading ? '게시판 목록 로딩 중...' : '게시판 선택 (선택사항)'}
-                  </option>
-                  {communityForums.map((f) => (
-                    <option key={f.id} value={f.id}>{f.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 저장 결과 */}
-              {communitySaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: communitySaveStatus.ok ? '#15803d' : '#dc2626',
-                    background: communitySaveStatus.ok ? '#f0fdf4' : '#fef2f2',
-                  }}
-                >
-                  {communitySaveStatus.ok
-                    ? `게시글이 저장되었습니다 ✓`
-                    : `저장 실패: ${communitySaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCommunitySave}
-                  disabled={communitySaving || Boolean(communitySaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: communitySaveStatus?.ok ? '#d1fae5' : communitySaving ? '#bfdbfe' : '#0284c7',
-                    color: communitySaveStatus?.ok ? '#15803d' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: communitySaving || communitySaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {communitySaving ? '저장 중...' : communitySaveStatus?.ok ? '저장됨 ✓' : '게시글 저장'}
-                </button>
-              </div>
-            </div>
+          {showCommunitySave && result && community.open && (
+            <CommunitySavePanel
+              communityTitle={community.title}
+              setCommunityTitle={community.setTitle}
+              communityForumId={community.forumId}
+              setCommunityForumId={community.setForumId}
+              communityForums={community.forums}
+              communityForumsLoading={community.forumsLoading}
+              communitySaving={community.saving}
+              communitySaveStatus={community.status}
+              handleCommunitySave={community.save}
+              onCancel={community.hide}
+            />
           )}
 
           {/* WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: 내 매장 저장 패널 */}
-          {showStoreSave && result && showStoreSavePanel && (
-            <div
-              style={{
-                border: '1px solid #bbf7d0',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#f0fdf4',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#15803d' }}>내 매장 콘텐츠로 저장</div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={storeTitle}
-                  onChange={(e) => setStoreTitle(e.target.value)}
-                  placeholder="저장할 콘텐츠 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 저장 결과 */}
-              {storeSaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: storeSaveStatus.ok ? '#15803d' : '#dc2626',
-                    background: storeSaveStatus.ok ? '#dcfce7' : '#fef2f2',
-                  }}
-                >
-                  {storeSaveStatus.ok
-                    ? `내 매장 콘텐츠에 저장되었습니다 ✓`
-                    : `저장 실패: ${storeSaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowStoreSavePanel(false); setStoreSaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleStoreSave}
-                  disabled={storeSaving || Boolean(storeSaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: storeSaveStatus?.ok ? '#dcfce7' : storeSaving ? '#bbf7d0' : '#16a34a',
-                    color: storeSaveStatus?.ok ? '#15803d' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: storeSaving || storeSaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {storeSaving ? '저장 중...' : storeSaveStatus?.ok ? '저장됨 ✓' : '매장에 저장'}
-                </button>
-              </div>
-            </div>
+          {showStoreSave && result && store.open && (
+            <StoreSavePanel
+              storeTitle={store.title}
+              setStoreTitle={store.setTitle}
+              storeSaving={store.saving}
+              storeSaveStatus={store.status}
+              handleStoreSave={store.save}
+              onCancel={store.hide}
+            />
           )}
 
           {/* WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: 매장 제작 자료 저장 패널 */}
-          {showProductionMaterialSave && result && showProductionMaterialSavePanel && (
-            <div
-              style={{
-                border: '1px solid #c7d2fe',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#eef2ff',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4338ca' }}>
-                매장 제작 자료로 저장
-              </div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={productionMaterialTitle}
-                  onChange={(e) => setProductionMaterialTitle(e.target.value)}
-                  placeholder="저장할 매장 제작 자료 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 분류 안내 (read-only) */}
-              <div style={{ fontSize: '11px', color: '#6366f1' }}>
-                분류:&nbsp;
-                <strong>{MODE_CONFIG.find((c) => c.key === mode)?.label ?? mode}</strong>
-                {' '}({MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode}
-                {(() => {
-                  const ot = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
-                  const ut = ot === 'pop' ? 'pop' : ot === 'store_qr' ? 'qr' : null;
-                  return ut ? ` · usageType=${ut}` : '';
-                })()})
-              </div>
-
-              {/* 저장 결과 */}
-              {productionMaterialSaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: productionMaterialSaveStatus.ok ? '#4338ca' : '#dc2626',
-                    background: productionMaterialSaveStatus.ok ? '#e0e7ff' : '#fef2f2',
-                  }}
-                >
-                  {productionMaterialSaveStatus.ok
-                    ? `매장 제작 자료에 저장되었습니다 ✓`
-                    : `저장 실패: ${productionMaterialSaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleProductionMaterialSave}
-                  disabled={productionMaterialSaving || Boolean(productionMaterialSaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: productionMaterialSaveStatus?.ok ? '#e0e7ff' : productionMaterialSaving ? '#c7d2fe' : '#4f46e5',
-                    color: productionMaterialSaveStatus?.ok ? '#4338ca' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: productionMaterialSaving || productionMaterialSaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {productionMaterialSaving ? '저장 중...' : productionMaterialSaveStatus?.ok ? '저장됨 ✓' : '제작 자료로 저장'}
-                </button>
-              </div>
-            </div>
+          {showProductionMaterialSave && result && productionMaterial.open && (
+            <ProductionMaterialSavePanel
+              productionMaterialTitle={productionMaterial.title}
+              setProductionMaterialTitle={productionMaterial.setTitle}
+              productionMaterialSaving={productionMaterial.saving}
+              productionMaterialSaveStatus={productionMaterial.status}
+              handleProductionMaterialSave={productionMaterial.save}
+              mode={mode}
+              onCancel={productionMaterial.hide}
+              modeConfig={MODE_CONFIG.find((c) => c.key === mode)}
+            />
           )}
 
           {/* Disclaimer */}
@@ -1718,20 +1108,20 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         {/* Footer */}
         <div style={{ flexShrink: 0 }}>
           {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: 채널 저장 상태 메시지 */}
-          {channelSaveStatus && (
+          {channel.status && (
             <div
               style={{
                 padding: '6px 20px',
                 fontSize: '12px',
-                color: channelSaveStatus.ok ? '#16a34a' : '#dc2626',
-                background: channelSaveStatus.ok ? '#f0fdf4' : '#fef2f2',
+                color: channel.status.ok ? '#16a34a' : '#dc2626',
+                background: channel.status.ok ? '#f0fdf4' : '#fef2f2',
                 borderTop: '1px solid #e5e7eb',
                 textAlign: 'right',
               }}
             >
-              {channelSaveStatus.ok
-                ? `저장 완료${channelSaveStatus.label ? ` — ${channelSaveStatus.label}` : ''} ✓`
-                : `저장 실패: ${channelSaveStatus.error}`}
+              {channel.status.ok
+                ? `저장 완료${channel.status.label ? ` — ${channel.status.label}` : ''} ✓`
+                : `저장 실패: ${channel.status.error}`}
             </div>
           )}
           <div
@@ -1781,77 +1171,77 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             {showCommunitySave && result && (
               <button
                 type="button"
-                onClick={showCommunitySavePanel ? () => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); } : handleOpenCommunitySavePanel}
+                onClick={community.open ? community.hide : community.show}
                 style={{
                   padding: '8px 16px',
-                  border: `1px solid ${showCommunitySavePanel ? '#0369a1' : '#0284c7'}`,
+                  border: `1px solid ${community.open ? '#0369a1' : '#0284c7'}`,
                   borderRadius: '6px',
-                  background: showCommunitySavePanel ? '#e0f2fe' : '#f0f9ff',
+                  background: community.open ? '#e0f2fe' : '#f0f9ff',
                   fontSize: '14px',
                   cursor: 'pointer',
                   color: '#0369a1',
                   fontWeight: 600,
                 }}
               >
-                {communitySaveStatus?.ok ? '저장됨 ✓' : showCommunitySavePanel ? '커뮤니티 저장 ▲' : '커뮤니티 저장'}
+                {community.status?.ok ? '저장됨 ✓' : community.open ? '커뮤니티 저장 ▲' : '커뮤니티 저장'}
               </button>
             )}
             {/* WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: 내 매장 저장 버튼 */}
             {showStoreSave && result && (
               <button
                 type="button"
-                onClick={showStoreSavePanel ? () => { setShowStoreSavePanel(false); setStoreSaveStatus(null); } : handleOpenStoreSavePanel}
+                onClick={store.open ? store.hide : store.show}
                 style={{
                   padding: '8px 16px',
-                  border: `1px solid ${showStoreSavePanel ? '#15803d' : '#16a34a'}`,
+                  border: `1px solid ${store.open ? '#15803d' : '#16a34a'}`,
                   borderRadius: '6px',
-                  background: showStoreSavePanel ? '#dcfce7' : '#f0fdf4',
+                  background: store.open ? '#dcfce7' : '#f0fdf4',
                   fontSize: '14px',
                   cursor: 'pointer',
                   color: '#15803d',
                   fontWeight: 600,
                 }}
               >
-                {storeSaveStatus?.ok ? '저장됨 ✓' : showStoreSavePanel ? '내 매장 저장 ▲' : '내 매장 저장'}
+                {store.status?.ok ? '저장됨 ✓' : store.open ? '내 매장 저장 ▲' : '내 매장 저장'}
               </button>
             )}
             {/* WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: 매장 제작 자료 저장 버튼 */}
             {showProductionMaterialSave && result && (
               <button
                 type="button"
-                onClick={showProductionMaterialSavePanel ? () => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); } : handleOpenProductionMaterialSavePanel}
+                onClick={productionMaterial.open ? productionMaterial.hide : productionMaterial.show}
                 style={{
                   padding: '8px 16px',
-                  border: `1px solid ${showProductionMaterialSavePanel ? '#4338ca' : '#4f46e5'}`,
+                  border: `1px solid ${productionMaterial.open ? '#4338ca' : '#4f46e5'}`,
                   borderRadius: '6px',
-                  background: showProductionMaterialSavePanel ? '#e0e7ff' : '#eef2ff',
+                  background: productionMaterial.open ? '#e0e7ff' : '#eef2ff',
                   fontSize: '14px',
                   cursor: 'pointer',
                   color: '#4338ca',
                   fontWeight: 600,
                 }}
               >
-                {productionMaterialSaveStatus?.ok ? '저장됨 ✓' : showProductionMaterialSavePanel ? '제작 자료로 저장 ▲' : '제작 자료로 저장'}
+                {productionMaterial.status?.ok ? '저장됨 ✓' : productionMaterial.open ? '제작 자료로 저장 ▲' : '제작 자료로 저장'}
               </button>
             )}
             {/* WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1: onChannelSave가 있을 때만 표시 */}
             {onChannelSave && result && (
               <button
                 type="button"
-                onClick={handleChannelSave}
-                disabled={channelSaving}
+                onClick={channel.save}
+                disabled={channel.saving}
                 style={{
                   padding: '8px 16px',
                   border: '1px solid #059669',
                   borderRadius: '6px',
-                  background: channelSaving ? '#d1fae5' : channelSaveStatus?.ok ? '#d1fae5' : '#ecfdf5',
+                  background: channel.saving ? '#d1fae5' : channel.status?.ok ? '#d1fae5' : '#ecfdf5',
                   fontSize: '14px',
-                  cursor: channelSaving ? 'not-allowed' : 'pointer',
+                  cursor: channel.saving ? 'not-allowed' : 'pointer',
                   color: '#059669',
                   fontWeight: 600,
                 }}
               >
-                {channelSaving ? '저장 중...' : channelSaveStatus?.ok ? '저장됨 ✓' : '채널에 저장'}
+                {channel.saving ? '저장 중...' : channel.status?.ok ? '저장됨 ✓' : '채널에 저장'}
               </button>
             )}
             <button

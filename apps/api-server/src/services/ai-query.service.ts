@@ -1,9 +1,10 @@
+import { executeAccountedAi } from '../modules/ai-policy/ai-accounted-execution.js';
 /**
  * AI Query Service
  * Phase 1 - 서비스 맥락 기반 AI 질의 처리
  *
  * 핵심 원칙:
- * - Gemini Flash 단일 모델
+ * - 서비스별 업무 Extension + 기존 정책/model 설정 재사용
  * - 무료/유료 차이: 일 사용 상한선만
  * - 토큰 단위 X, 질문 횟수 기준
  * - AI 응답에 항상 서비스 맥락/정보/제품/카테고리 포함
@@ -15,7 +16,9 @@ import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
-import { execute } from '@o4o/ai-core';
+import { runAiExtension } from '@o4o/ai-core';
+import { createServiceQueryExtension, resolveServiceAiProfile, SERVICE_AI_TASKS } from './ai-extensions/service-query.extension.js';
+import type { ServiceAiTask } from './ai-extensions/service-query.extension.js';
 import { aiCardExposureService } from './ai-card-exposure.service.js';
 import { aiOperationsService } from './ai-operations.service.js';
 import type { AiCard, CardExposureContext, AiCardData } from '@o4o/ai-core';
@@ -35,6 +38,7 @@ export interface AiQueryRequest {
   isPaidUser?: boolean;
   // Phase 2: B2C 컨텍스트 정보
   serviceId?: string;
+  task?: ServiceAiTask;
   storeId?: string;
   productId?: string;
   categoryId?: string;
@@ -76,7 +80,7 @@ export interface AiQueryResponse {
   attachedInfo?: Record<string, any>;
   remainingQueries?: number;
   error?: string;
-  errorCode?: 'LIMIT_EXCEEDED' | 'AI_DISABLED' | 'AI_ERROR' | 'NO_API_KEY';
+  errorCode?: 'LIMIT_EXCEEDED' | 'AI_DISABLED' | 'AI_ERROR' | 'NO_API_KEY' | 'SERVICE_UNSUPPORTED' | 'TASK_UNSUPPORTED' | 'QUOTA_EXCEEDED' | 'AI_QUOTA_UNAVAILABLE';
   // Phase 2: 맥락 정보 UI 데이터
   contextPanel?: ContextInfoPanel;
   // Phase 3: AI 카드 (최대 3개, 설명 가능성 포함)
@@ -429,6 +433,11 @@ class AiQueryService {
 
     const startTime = Date.now();
     const today = this.getTodayDate();
+    const profile = resolveServiceAiProfile(request.serviceId ?? 'neture');
+    if (!profile) return { success: false, error: '지원하지 않는 서비스입니다.', errorCode: 'SERVICE_UNSUPPORTED' };
+    const task = request.task ?? 'question';
+    if (!SERVICE_AI_TASKS.includes(task)) return { success: false, error: '지원하지 않는 AI 작업입니다.', errorCode: 'TASK_UNSUPPORTED' };
+    const extension = createServiceQueryExtension(profile, task);
 
     // 0. Operations: Record request and check circuit breaker
     aiOperationsService.recordRequest({
@@ -476,15 +485,32 @@ class AiQueryService {
 
     try {
       // 4. Call AI (WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1)
-      const aiResult = await execute({
-        systemPrompt,
-        userPrompt: `[사용자 질문]\n${request.question}`,
-        responseMode: 'text',
-        config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
-        meta: { service: 'ai-query', callerName: 'AiQueryService' },
+      const run = await runAiExtension({
+        extension,
+        input: { profile, task, systemPrompt, question: request.question },
+        context: {
+          requestId: uuidv4(), serviceId: profile.serviceId, featureId: task,
+          actorId: request.userId, audience: 'staff',
+        },
+        // Client-provided IDs/context never authorize a domain read. This path uses submitted text only.
+        materials: [],
+        funding: { payer: 'platform' },
+      }, {
+        invoke: async prompt => {
+          const result = await executeAccountedAi(AppDataSource, {
+            ...prompt,
+            responseMode: 'text',
+            config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
+            meta: { service: profile.serviceId, callerName: extension.id },
+          }, { scope: 'SERVICE_QUERY', serviceKey: profile.serviceId, userId: request.userId });
+          return { ...result, provider: result.provider ?? 'unknown' };
+        },
+      }, {
+        authorize: async context => !!request.userId && context.actorId === request.userId && context.serviceId === profile.serviceId,
+        record: async event => { logger.info('[AI_EXTENSION]', event); },
       });
 
-      const answer = aiResult.content;
+      const answer = run.output;
       const durationMs = Date.now() - startTime;
 
       // Operations: Record success
@@ -556,7 +582,8 @@ class AiQueryService {
       return {
         success: false,
         error: error.message || 'AI 응답 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        errorCode: 'AI_ERROR'
+        errorCode: error.message === 'QUOTA_EXCEEDED' ? 'QUOTA_EXCEEDED'
+          : error.message === 'AI_QUOTA_UNAVAILABLE' ? 'AI_QUOTA_UNAVAILABLE' : 'AI_ERROR'
       };
     }
   }

@@ -1,0 +1,37 @@
+import type { MigrationInterface, QueryRunner } from 'typeorm';
+
+/** Review-only schema change. Apply only through the authorized incremental migration job. */
+export class CreateAiUsageReservations1791870434349
+  implements MigrationInterface
+{
+  name = 'CreateAiUsageReservations1791870434349';
+  async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE TABLE ai_usage_reservations (
+      id uuid PRIMARY KEY, scope varchar(50) NOT NULL, service_key varchar(100) NOT NULL,
+      user_id varchar(100), daily_key varchar(10) NOT NULL, monthly_key varchar(7) NOT NULL,
+      status varchar(10) NOT NULL DEFAULT 'reserved' CHECK (status IN ('reserved','pending','settled','released')),
+      reserved_requests bigint NOT NULL CHECK (reserved_requests >= 0),
+      reserved_tokens bigint NOT NULL CHECK (reserved_tokens >= 0),
+      reserved_cost numeric(20,8) NOT NULL CHECK (reserved_cost >= 0),
+      pricing jsonb NOT NULL, receipt jsonb, outcome varchar(10) CHECK (outcome IN ('success','error')),
+      actual_requests bigint, actual_tokens bigint, actual_cost numeric(20,8), provider_request_id uuid,
+      reconciliation_id varchar(100) UNIQUE, reconciliation_usage jsonb,
+      created_at timestamptz NOT NULL DEFAULT NOW(), settled_at timestamptz
+    )`);
+    await queryRunner.query(
+      `CREATE INDEX idx_ai_usage_reservations_pending ON ai_usage_reservations (daily_key, monthly_key) WHERE status IN ('reserved','pending')`,
+    );
+    // Sub-cent model prices must accumulate instead of rounding each call to zero.
+    await queryRunner.query(
+      'ALTER TABLE ai_usage_aggregate ALTER COLUMN current_value TYPE numeric(20,8)',
+    );
+    await queryRunner.query(
+      'ALTER TABLE ai_usage_logs ALTER COLUMN "costEstimated" TYPE numeric(20,8)',
+    );
+  }
+  async down(): Promise<void> {
+    throw new Error(
+      'AI usage receipts and reservations must be preserved; use an approved forward repair',
+    );
+  }
+}
