@@ -137,3 +137,76 @@ guard·route·승인 Core·공통 패키지·DDL·dependency·CI는 변경하지
 - 사용자 종료 범위에 따라 PR 생성·main 병합·배포 없음. required CI/리뷰 통과 또는
   integration-ready로 표시하지 않는다. §6은 로컬 실행 검증 결과다.
 - T01~T08은 이번 묶음 완료, §7 N01~N07은 다음 정비의 미완료 항목이다.
+
+
+## 9. N01 회원 조회·역할 처리 — 후속 TODO 검증·구현 결과
+
+같은 WO의 다음 묶음으로 `wo/code-complexity-phase2` branch를 유지한다.
+기준: 작업 시작 시 최신 origin/main `f66ed5f5f8`, 이전 push `27017ffff2`.
+기존 첫 묶음은 아직 main에 병합되지 않았으므로 그 검증된 변경 위에서 연속 정비한다.
+사용자 종료 지시는 계속 push까지이며 PR 생성·병합·배포는 하지 않는다.
+
+- [x] B01: 조회·상세·역할 부여/해제 중복과 차이를 분류.
+- [x] B02: RBAC/Freeze·소비처·기존 테스트 대조 후 구현/보류 목록 확정.
+- [x] B03: 동일한 내부 처리만 추출. guard/응답/SQL/권한·호출 순서 유지.
+- [x] B04: 기존 회귀와 역할 검색 순서·목록/상세 응답 행동 검증.
+- [x] B05: API type-check/build와 lint·scope 검사, 결과 기록.
+- [ ] B06: commit·push 후 원격 commit과 clean 상태 확인.
+
+
+### 9.1 TODO 검증 결과 (구현 전)
+
+현재 목록/상세는 역할 조회 SQL·활성 필터·상태 표시·응답 구조가 다르고,
+역할 부여/해제는 assignability·self revoke·마지막 admin·권한 tier·캐시 처리에 차이가 있다.
+RBAC 정본/카탈로그, Core/USER-OPERATOR Freeze 및 현재 route·기존 회귀 테스트를 대조했다.
+그 차이를 옵션으로 흡수하는 범용 읽기/권한 실행기는 만들지 않는다.
+
+| 후보 | 검증 결과 | 이번 판정 |
+|---|---|---|
+| B-D01 역할 카탈로그 검색 | assign/remove의 원문 검색→다른 서비스 bare 충돌→prefix 재검색→미발견 fallback 알고리즘이 동일 | 컨트롤러 private resolver로 추출. 원문과 해석된 역할의 권한 판정은 기존 endpoint에 유지 |
+| B-D02 멤버십 응답 매핑 | 목록/상세의 8개 snake_case→camelCase 필드가 동일. 상세만 updatedAt 추가 | 같은 파일 내부 매퍼 추출. 상세에서만 updatedAt를 명시적으로 추가 |
+| B-H01 역할 조회 SQL | 목록은 active 역할 이름 집계, 상세는 inactive 포함 유효기간/할당자/스코프 이력 | 통합 보류. 같은 의미의 중복이 아님 |
+| B-H02 회원 상태 | 목록은 membership 상태 우선·필터 반영, 상세 user.status는 계정 상태 | 통합 보류. 응답의 두 상태 축을 임의로 같게 만들지 않음 |
+| B-H03 역할 권한 | 부여는 isAssignable 검사, 해제는 자기 해제/마지막 관리자/잠금/캐시 보호와 bare resolved prefix 예외 포함 | 통합 보류. Core·권한 계약 변경 없음 |
+
+소비처는 §5의 Extension API 소비 경로와 동일하다. 조회 route·scope·쿼리·부여/해제
+서비스 호출은 그대로 두고 B-D01/B-D02만 수정한다. 새 공통 패키지/API는 만들지 않는다.
+검증은 기존 suite를 먼저 실행하고, 실제 endpoint 호출로 검색 순서·충돌·미발견·권한 차이·
+목록/상세 필드와 상태 차이를 확인한다. private 함수 이름만 확인하는 테스트는 만들지 않는다.
+
+
+### 9.2 구현·검증 결과
+
+- B-D01: 동일 역할 검색을 `resolveMemberRole` private 메서드로 추출.
+  DB 역할 카탈로그 자체는 변경하지 않았으며, 해석된 이름으로 원문 요청을 바꾸지 않는다.
+- B-D02: 동일 8필드만 module-local `toMembershipSummary`로 추출.
+  상세의 updatedAt는 상세 응답에서 추가한다. 목록/상세의 SQL·정렬·역할 활성 범위·상태 축은 유지한다.
+- B-H01~B-H03은 구분 유지. 부여의 assignability와 해제의 prefix 예외,
+  자기 역할/최후 관리자/잠금/캐시 계약을 공통 executor로 합치지 않는다.
+
+| 비교 지표 (직전 push → 이번 변경) | 전 | 후 |
+|---|---:|---:|
+| 컨트롤러 전체 줄 수 / 분기 요소 | 1,625 / 303 | 1,627 / 293 |
+| assignMemberRole 줄 수 / 분기 요소 | 118 / 33 | 102 / 23 |
+| removeMemberRole 줄 수 / 분기 요소 | 186 / 39 | 172 / 29 |
+| getMembers 줄 수 | 210 | 201 |
+| getMemberDetail 줄 수 | 118 | 111 |
+| 추출 resolver 줄 수 / 분기 요소 | — | 20 / 10 |
+| 추출 응답 매퍼 줄 수 / 분기 요소 | — | 12 / 0 |
+
+§6과 같은 AST 비교 지표다. helper를 포함한 전체 분기 감소는 10개이며,
+필드 타입·설명 때문에 전체 줄 수는 2줄 늘었다. 줄 수 감소만을 정비 목표로 삼지 않는다.
+
+검증:
+- 변경 전 기존 관련 6 suite / 129 tests PASS.
+- 검색 순서·bare 충돌/미발견·명시 prefix·플랫폼 예외·원문 write·DB 실패·assignability와
+  resolved prefix 정책 차이 및 목록/상세 projection/no-op 행동 검증 23건 추가.
+- 최종 기존 관련/소비 guard 포함 10 suite / 237 tests PASS.
+  첫 묶음의 214건에 이번 행동 검증 23건을 더한 결과다.
+- API type-check/build PASS. 이번 소스·테스트 3파일 ESLint errors/warnings 0.
+- 전체 lint ratchet PASS: errors 46 / baseline 46, warnings 1,009. 기존 오류 해결 판정 아님.
+- `git diff --check` PASS. 운영 DB·실계정·GCS·브라우저·OAuth 테스트는 실행하지 않았다.
+
+N01의 이번 회원 조회/역할 후보는 검증·정비 완료했다. §7 N01의 인증·서비스 이동·콘텐츠 저장
+후보까지 조사 완료한 것은 아니다. 다음 묶음은 N02 AI runtime/콘텐츠 모달의 책임·함수 추출 조사이며,
+서비스 간 공통화·Core 구조 변경·계약 변경은 계속 별도 후보로 유지한다.

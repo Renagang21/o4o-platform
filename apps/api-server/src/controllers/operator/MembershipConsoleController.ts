@@ -11,6 +11,7 @@ import { In } from 'typeorm';
 import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
+import type { Role } from '../../modules/auth/entities/Role.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
@@ -68,6 +69,31 @@ function currentApprovalMemberships(rows: Array<{ id: string; service_key?: stri
   const current = rows.filter(m => !isRetiredRoleValue(m.service_key) && !isRetiredRoleValue(m.role));
   if (rows.length > 0 && current.length === 0) throw new RetiredServiceError();
   return current;
+}
+
+type MembershipReadRow = {
+  id: string;
+  service_key: string;
+  status: string;
+  role: string | null;
+  approved_by: string | null;
+  approved_at: Date | null;
+  rejection_reason: string | null;
+  created_at: Date;
+};
+
+/** Only the fields shared by list and detail; detail adds updatedAt separately. */
+function toMembershipSummary(row: MembershipReadRow) {
+  return {
+    id: row.id,
+    serviceKey: row.service_key,
+    status: row.status,
+    role: row.role,
+    approvedBy: row.approved_by,
+    approvedAt: row.approved_at,
+    rejectionReason: row.rejection_reason,
+    createdAt: row.created_at,
+  };
 }
 
 export class MembershipConsoleController {
@@ -129,6 +155,28 @@ export class MembershipConsoleController {
       [userId, serviceKeys]
     );
     return result.length > 0;
+  }
+
+  /** Resolve the catalogue entry only. Assignment/revocation authorization stays at the caller. */
+  private async resolveMemberRole(role: string, scope: ServiceScope): Promise<Role | null> {
+    let roleEntity = await roleService.getRoleByName(role);
+    // Cross-service collision: unprefixed name이 다른 서비스 role과 매칭된 경우 caller prefix로 재검색
+    if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
+      if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
+        for (const prefix of scope.rolePrefixes) {
+          const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
+          if (prefixed) { roleEntity = prefixed; break; }
+        }
+      }
+    }
+    // Fallback: 못 찾은 경우 prefix 붙여서 재시도
+    if (!roleEntity && !role.includes(':')) {
+      for (const prefix of scope.rolePrefixes) {
+        roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
+        if (roleEntity) break;
+      }
+    }
+    return roleEntity;
   }
 
   /** The single and batch approval endpoints read the same pending candidates. */
@@ -321,16 +369,7 @@ export class MembershipConsoleController {
       const membershipMap: Record<string, any[]> = {};
       for (const row of membershipRows) {
         if (!membershipMap[row.user_id]) membershipMap[row.user_id] = [];
-        membershipMap[row.user_id].push({
-          id: row.id,
-          serviceKey: row.service_key,
-          status: row.status,
-          role: row.role,
-          approvedBy: row.approved_by,
-          approvedAt: row.approved_at,
-          rejectionReason: row.rejection_reason,
-          createdAt: row.created_at,
-        });
+        membershipMap[row.user_id].push(toMembershipSummary(row));
       }
 
       // Compose response
@@ -494,15 +533,8 @@ export class MembershipConsoleController {
           scopeId: r.scope_id,
           createdAt: r.created_at,
         })),
-        memberships: membershipRows.map((m: any) => ({
-          id: m.id,
-          serviceKey: m.service_key,
-          status: m.status,
-          role: m.role,
-          approvedBy: m.approved_by,
-          approvedAt: m.approved_at,
-          rejectionReason: m.rejection_reason,
-          createdAt: m.created_at,
+        memberships: membershipRows.map((m: MembershipReadRow & { updated_at: Date }) => ({
+          ...toMembershipSummary(m),
           updatedAt: m.updated_at,
         })),
       });
@@ -1274,23 +1306,7 @@ export class MembershipConsoleController {
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
-      let roleEntity = await roleService.getRoleByName(role);
-      // Cross-service collision: unprefixed name이 다른 서비스 role과 매칭된 경우 caller prefix로 재검색
-      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
-        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
-          for (const prefix of scope.rolePrefixes) {
-            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
-            if (prefixed) { roleEntity = prefixed; break; }
-          }
-        }
-      }
-      // Fallback: 못 찾은 경우 prefix 붙여서 재시도
-      if (!roleEntity && !role.includes(':')) {
-        for (const prefix of scope.rolePrefixes) {
-          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
-          if (roleEntity) break;
-        }
-      }
+      const roleEntity = await this.resolveMemberRole(role, scope);
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
@@ -1416,21 +1432,7 @@ export class MembershipConsoleController {
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
-      let roleEntity = await roleService.getRoleByName(role);
-      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
-        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
-          for (const prefix of scope.rolePrefixes) {
-            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
-            if (prefixed) { roleEntity = prefixed; break; }
-          }
-        }
-      }
-      if (!roleEntity && !role.includes(':')) {
-        for (const prefix of scope.rolePrefixes) {
-          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
-          if (roleEntity) break;
-        }
-      }
+      const roleEntity = await this.resolveMemberRole(role, scope);
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
