@@ -6,7 +6,7 @@
  * - 옮긴 화면에서도 KPA 앱의 owner-only 권한 동작(`PharmacyOwnerOnlyGuard`)을 보존한다.
  * - `/work/:serviceKey` 업무에서 돌아올 때는 고정 서비스 문맥으로 복원한다.
  * - KPA 앱의 handoff 는 공통 매장 화면을 KPA 서비스 지정 경로로 보낸다(플래그는 기본 꺼짐 그대로).
- * web-store 는 CI 테스트 러너가 없어 텍스트 계약으로 고정한다. DB · 네트워크 0.
+ * 서비스 경계는 정적 계약으로 고정한다. 실제 라우팅·전달 자료 보존은 web-store Vitest에서 검증한다. DB · 네트워크 0.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -71,7 +71,9 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
     // K-Cosmetics 는 서비스 종료 — /work/k-cosmetics/* 전체가 종료 안내 하나다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/*`} element={KcosRetired} />');
     expect(layout).toContain('toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`)');
-    expect(layout).toContain('<Navigate to={scopedPath} replace />');
+    // QR 제작 자료 등 location.state도 서비스 지정 경로로 보존한다.
+    expect(layout).toContain('const { pathname, search, hash, state } = useLocation();');
+    expect(layout).toContain('<Navigate to={scopedPath} state={state} replace />');
   });
 
   it('다른 서비스 업무로 옮기면 서비스 고정을 푼다', () => {
