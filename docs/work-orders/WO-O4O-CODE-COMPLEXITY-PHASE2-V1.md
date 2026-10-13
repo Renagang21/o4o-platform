@@ -551,3 +551,61 @@ PH 기록이며 이번 수정 경로·content-editor dependencies와 겹치지 �
 - E01~E07 완료. §11.3의 생성 응답 재열기 문제는 해결했고, §12.3 저장/목록/context/runtime 잔여는 미완료.
 - PR 생성·우리 변경의 main 병합·배포·PH job/apply·운영 DB/GCS 작업은 실행하지 않았다.
   CI/리뷰 integration-ready 판정은 하지 않으며 이번 결과는 로컬 실행 검증이다.
+
+## 13. 모달 비동기 수명 전체 정비 — 단일 작업 묶음
+
+사용자 지시: 너무 작게 나누지 않고 문제 하나를 조사·수정·회귀 검증·push까지 완료한다.
+동일 WO/전용 branch를 유지한다. 시작 기준 최신 origin/main `90e49c3e60`.
+
+- [x] F01 조사·TODO 검증: 생성 외에 채널/커뮤니티/매장/제작자료 저장과 게시판 목록의 모든 await와 소비처 확인.
+- [x] F02 외부 context/open 변화, 새 생성, source 전환, panel 재열기의 stale UI 보호 구현.
+- [x] F03 목적지별 pending 저장 중복 방지·실패 후 재시도·독립 저장·확인된 성공 callback 보존 구현.
+- [x] F04 실제 React 모달에서 목록/저장/생성/context/close/unmount 경계의 실패 재현 및 회귀 검증.
+- [x] F05 타입/빌드/공개 타입/Store 은퇴 경계/lint 검증, 결과 기록·commit·push.
+
+구현 전 계약 검증:
+- 기존 생성 guard는 open/source만 다룬다. 목록과 네 저장 handler에는 수명 guard가 없다.
+- 닫기에서 saving=false가 되므로 아직 진행 중인 쓰기를 다시 보낼 수 있다. 서버 쓰기를 취소했다고 표시하지 않는다.
+- 화면 수명/목적지별 panel 수명과 진행 중 저장 잠금을 분리한다. 닫기/재열기에도 같은 instance의 pending 잠금은 유지하고 UI는 해당 수명만 갱신한다.
+- 저장 성공은 서버 확인 이후의 기존 callback을 유지한다. stale UI를 차단해도 완료 callback은 버리지 않는다.
+- 실패 후 잠금을 해제해 재시도한다. 다른 저장 목적지는 독립적으로 동작한다. 서버 idempotency·remount 간 중복 보장은 API 변경 없이 주장하지 않는다.
+- 게시판 cache는 인증/context를 넘겨 재사용하지 않는다. 새로운 목록 요청의 loading을 이전 finally가 해제하지 않는다.
+- context는 initialText/mode/source, template의 실제 값, sourceMetadata와 정렬된 header 값으로 판단한다. inline object/callback identity만 달라지는 rerender는 요청을 무효화하지 않는다.
+- 공개 props/export, endpoint/body/권한/DDL 및 service 공통화 변경 없음. Store 내부 AI 은퇴 유지, 분회 전용 개발 제외.
+- Shared Module Protocol의 전체 소비처를 확인했다. Toolbar와 CommunityContentWriteShell이 직접 경로이며 나머지는 editor/package 소비처다. static import는 활성 기능의 증거로 쓰지 않는다.
+
+
+### 13.1 구현 및 검증
+
+- 생성/목록/저장/복사의 화면 반영 수명은 open/context 및 결과·panel 전환으로 만료된다.
+  generation은 기존 최신 요청 guard를 확장했고, 저장/목록/복사는 private 모달 bookkeeping으로 처리한다.
+- 네 목적지의 saving boolean을 제거하고 issued-write pending 소유자 하나로 모았다.
+  화면 reset은 pending 잠금을 지우지 않는다. ref로 동기 획득해 rerender 전 연속 호출도 차단한다.
+  다른 목적지는 독립적으로 저장한다. finish는 current UI 여부와 무관하게 잠금을 해제하되 unmount 뒤 setState하지 않는다.
+- 저장 성공 callback은 원래 작업의 서버 성공 확인 때 한 번 실행한다. close/context 변경/unmount는 이를 버리지 않는다.
+  현재 성공 화면의 반복 click은 차단하며 실패 후에는 재시도한다. panel 재열기/새 생성 뒤 완료된 자료를
+  새로 저장하는 기존 흐름은 유지한다. pending 중에는 다른 payload라도 같은 목적지의 새 쓰기를 기다린다.
+  remount/다른 탭/서버에서의 idempotency, 네트워크 실패 뒤 서버 처리 여부는 이 프론트 변경으로 보장하지 않는다.
+- 인증/entry의 값 변화는 결과와 게시판 cache를 비운다. 값이 같은 header/template object 재생성은 무효화하지 않는다.
+  source tab 재선택은 현재 결과/요청을 유지한다. URL 90초 timeout 및 현재 요청 오류 처리는 유지했다.
+- await 전후의 clipboard와 2초 confirmation timer도 같은 결과 수명으로 보호하고 cleanup했다.
+
+검증 결과:
+- 수정 전 실제 모달 테스트 7건: 6 expected failure / 1 PASS. pending 재저장·stale UI·context 문제 재현.
+- 최종 Vitest: 실제 모달 38 + 두 수명 hook 10 = 4 files / 48 tests PASS.
+  세 저장 목적지/채널의 close-reopen, stale 성공/오류/JSON/finally, 실패 재시도, 독립 쓰기,
+  callback after unmount, 최신 목록/실패/재시도/cache, entry/template/auth 변경, 복사/timer, StrictMode 포함.
+- 최종 Jest: panel/format 및 네 Store 경계 계약 6 suites / 164 tests PASS.
+  private panel 테스트는 네트워크 pending 소유 제거에 맞춰 수정하고 draft/status/instance 격리 검증은 유지했다.
+- 합계 고유 테스트 10 files / 212 tests PASS. 반복 실행은 합산하지 않는다.
+- content-editor typecheck/build PASS, public index.d.ts byte 동일 PASS.
+- 변경 source/test 7파일 ESLint errors/warnings 0. lint ratchet PASS: errors 46 / baseline 46, warnings 1,006.
+- 새 dependency/lockfile/CI/API/DDL/권한/서비스 공통화 변경 없음. 전체 API/runtime suite는 변경 대상이 아니므로 실행하지 않았다.
+- 합성 fetch/실제 React-jsdom 검증이다. 실제 계정/OAuth/provider/저장 API/운영 DB/GCS/배포는 실행하지 않았다.
+
+§12.3 E-N01~E-N03의 모달 목록·저장·entry context 잔여를 이번 전체 묶음으로 처리했다.
+E-N04 runtime observe/replay/dispatch 공유 상태는 별도 도메인 후속이다.
+검증 기록과 구현을 동일 WO의 한 commit으로 묶어 `wo/code-complexity-phase2`에 push한다.
+최종 원격 SHA 일치와 작업 범위 clean 여부는 push 이후 최종 보고에서 확인한다.
+PR/main 병합·배포·CI/리뷰 integration-ready 판정은 이 push-only 작업의 범위가 아니다.
+worktree disposition: KEEP — 같은 WO 연속 branch이며 작업 변경은 아직 main 미반영.

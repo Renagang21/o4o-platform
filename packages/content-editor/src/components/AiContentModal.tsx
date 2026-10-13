@@ -28,13 +28,14 @@
  * - initialMode: POP / 제목 추천 / 블로그 글 / QR 안내문 (Extension 진입). 없으면 flexible 자유 입력.
  */
 
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import { sanitizeHtml } from '../sanitize';
 import { blocksToHtml, type UrlBlock } from './ai-content-format';
 import { buildCommunitySavePayload, buildStoreSavePayload, buildProductionMaterialSavePayload } from './ai-content-save-payload';
 import { useCommunitySavePanelState, useStoreSavePanelState, useProductionMaterialSavePanelState } from './use-ai-content-save-panels';
 import { useAiGenerationRequest } from './use-ai-generation-request';
+import { useAiModalSaveRequests } from './use-ai-modal-save-requests';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -267,7 +268,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setTone(templateForcedOptions?.tone ?? 'professional');
       setLength(templateForcedOptions?.length ?? 'medium');
     }
-  }, [open, templateForcedOptions]);
+  }, [open, templateForcedOptions?.tone, templateForcedOptions?.length]);
   const [tone, setTone] = useState<ToneOption>(templateForcedOptions?.tone ?? 'professional');
   const [length, setLength] = useState<LengthOption>(templateForcedOptions?.length ?? 'medium');
   const [loading, setLoading] = useState(false);
@@ -275,17 +276,17 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [error, setError] = useState('');
   const [resultTab, setResultTab] = useState<ResultTab>('preview');
   const [copied, setCopied] = useState(false);
-  const generationRequest = useAiGenerationRequest(open);
-  // External open changes must start with no result/error/spinner from another lifetime.
-  useLayoutEffect(() => {
-    setLoading(false);
-    setResult(null);
-    setError('');
-    setCopied(false);
-  }, [open]);
-
+  // Compare actual entry/auth values, not caller-created object or callback identities.
+  const contentContext = JSON.stringify([
+    initialText, initialMode, initialSourceTab, templateId, templateSystemPrompt,
+    templateForcedOptions?.tone, templateForcedOptions?.length,
+    sourceMetadata?.sourceContentId, sourceMetadata?.sourceTitle, sourceMetadata?.sourceOrigin,
+    Object.entries(aiRequestHeaders ?? {}).sort(([a], [b]) => a.localeCompare(b)),
+  ]);
+  const generationRequest = useAiGenerationRequest(open, contentContext);
+  const saveRequests = useAiModalSaveRequests(open, contentContext);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   // WO-O4O-AI-CONTENT-AUTO-CHANNEL-SAVE-V1
-  const [channelSaving, setChannelSaving] = useState(false);
   const [channelSaveStatus, setChannelSaveStatus] = useState<{ ok: boolean; label?: string; error?: string } | null>(null);
 
   const communityPanel = useCommunitySavePanelState();
@@ -294,6 +295,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const materialPanel = useProductionMaterialSavePanelState();
 
+  const resetSaveViews = () => {
+    communityPanel.reset();
+    communityPanel.setForumsLoading(false);
+    storePanel.reset();
+    materialPanel.reset();
+    setChannelSaveStatus(null);
+  };
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
   const [sourceTab, setSourceTab] = useState<SourceTab>(initialSourceTab ?? 'text');
@@ -312,6 +320,24 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   // WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1
   const [showUsageSnippets, setShowUsageSnippets] = useState(false);
 
+  // A new committed entry/auth context cannot retain presentation from another one.
+  useLayoutEffect(() => {
+    setLoading(false);
+    setResult(null);
+    setError('');
+    setCopied(false);
+    resetSaveViews();
+    communityPanel.setForums([]);
+    setUrlInput('');
+    setCustomPrompt('');
+    setShowUsageSnippets(false);
+    setSourceTab(initialSourceTab ?? 'text');
+    clearTimeout(copyTimer.current);
+    return () => clearTimeout(copyTimer.current);
+    // Context contains initialSourceTab; owner objects change but their setters are stable.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, contentContext]);
+
   if (!open) return null;
 
   const currentConfig = MODE_CONFIG.find((m) => m.key === mode)!;
@@ -329,6 +355,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       setError('변환할 텍스트를 입력해 주세요.');
       return;
     }
+    saveRequests.invalidate();
+    clearTimeout(copyTimer.current);
+    resetSaveViews();
     const isCurrentRequest = generationRequest.begin();
     setLoading(true);
     setError('');
@@ -392,6 +421,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       return;
     }
 
+    saveRequests.invalidate();
+    clearTimeout(copyTimer.current);
+    resetSaveViews();
     const isCurrentRequest = generationRequest.begin();
     setLoading(true);
     setError('');
@@ -471,11 +503,18 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleCopy = async () => {
     if (!result) return;
+    const isCurrent = saveRequests.beginView('copy');
+    clearTimeout(copyTimer.current);
+    const showCopied = () => {
+      if (!isCurrent()) return;
+      setCopied(true);
+      copyTimer.current = setTimeout(() => { if (isCurrent()) setCopied(false); }, 2000);
+    };
     try {
       await navigator.clipboard.writeText(result.html);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showCopied();
     } catch {
+      if (!isCurrent()) return;
       // fallback: select + execCommand
       const el = document.createElement('textarea');
       el.value = result.html;
@@ -483,8 +522,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showCopied();
     }
   };
 
@@ -525,8 +563,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   };
 
   const handleChannelSave = async () => {
-    if (!result || !onChannelSave) return;
-    setChannelSaving(true);
+    if (!result || !onChannelSave || channelSaveStatus?.ok) return;
+    const request = saveRequests.beginSave('channel');
+    if (!request) return;
     setChannelSaveStatus(null);
     try {
       const res = await onChannelSave({
@@ -536,17 +575,19 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         summary: result.summary,
         mode,
       });
-      setChannelSaveStatus({ ok: res.success, label: res.fieldLabel, error: res.error });
+      if (request.isCurrent()) setChannelSaveStatus({ ok: res.success, label: res.fieldLabel, error: res.error });
     } catch (err: any) {
-      setChannelSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+      if (request.isCurrent()) setChannelSaveStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
     } finally {
-      setChannelSaving(false);
+      request.finish();
     }
   };
 
   // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
   const handleOpenCommunitySavePanel = async () => {
     if (!result) return;
+    saveRequests.invalidate('community');
+    const isCurrent = saveRequests.beginView('forums');
     communityPanel.open(result.title || '');
     if (communityPanel.forums.length === 0) {
       communityPanel.setForumsLoading(true);
@@ -556,20 +597,30 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           credentials: 'include',
         });
         const data = await res.json();
-        if (data.success && Array.isArray(data.data)) {
+        if (isCurrent() && res.ok && data.success && Array.isArray(data.data)) {
           communityPanel.setForums(data.data.map((f: any) => ({ id: f.id, name: f.name })));
         }
       } catch {
         // 포럼 목록 로딩 실패 — 사용자는 포럼 없이 저장 가능
       } finally {
-        communityPanel.setForumsLoading(false);
+        if (isCurrent()) communityPanel.setForumsLoading(false);
       }
     }
   };
 
+  const hideCommunitySavePanel = () => {
+    saveRequests.invalidate('community');
+    saveRequests.invalidate('forums');
+    communityPanel.setVisible(false);
+    communityPanel.setStatus(null);
+    communityPanel.setForumsLoading(false);
+  };
+
   const handleCommunitySave = async () => {
     if (!result) return;
-    communityPanel.setSaving(true);
+    if (communityPanel.status?.ok) return;
+    const request = saveRequests.beginSave('community');
+    if (!request) return;
     communityPanel.setStatus(null);
     try {
       // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
@@ -585,23 +636,26 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       if (!res.ok || !data.success) {
         throw new Error(data.error || '커뮤니티 저장에 실패했습니다.');
       }
-      communityPanel.setStatus({ ok: true, postId: data.data?.id });
+      if (request.isCurrent()) communityPanel.setStatus({ ok: true, postId: data.data?.id });
     } catch (err: any) {
-      communityPanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+      if (request.isCurrent()) communityPanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
     } finally {
-      communityPanel.setSaving(false);
+      request.finish();
     }
   };
 
   // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
   const handleOpenStoreSavePanel = () => {
     if (!result) return;
+    saveRequests.invalidate('store');
     storePanel.open(result.title || '');
   };
 
   const handleStoreSave = async () => {
     if (!result) return;
-    storePanel.setSaving(true);
+    if (storePanel.status?.ok) return;
+    const request = saveRequests.beginSave('store');
+    if (!request) return;
     storePanel.setStatus(null);
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store-contents`, {
@@ -617,11 +671,11 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
           : (data.error?.message || data.error || '내 매장 저장에 실패했습니다.');
         throw new Error(msg);
       }
-      storePanel.setStatus({ ok: true, contentId: data.data?.id });
+      if (request.isCurrent()) storePanel.setStatus({ ok: true, contentId: data.data?.id });
     } catch (err: any) {
-      storePanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+      if (request.isCurrent()) storePanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
     } finally {
-      storePanel.setSaving(false);
+      request.finish();
     }
   };
 
@@ -636,12 +690,15 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   //   - showStoreSave / showCommunitySave 와 독립.
   const handleOpenProductionMaterialSavePanel = () => {
     if (!result) return;
+    saveRequests.invalidate('material');
     materialPanel.open(result.title || '');
   };
 
   const handleProductionMaterialSave = async () => {
     if (!result) return;
-    materialPanel.setSaving(true);
+    if (materialPanel.status?.ok) return;
+    const request = saveRequests.beginSave('material');
+    if (!request) return;
     materialPanel.setStatus(null);
     try {
       const outputType = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
@@ -661,29 +718,26 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
         throw new Error(msg);
       }
       const assetId: string | undefined = data.data?.id;
-      materialPanel.setStatus({ ok: true, assetId });
+      if (request.isCurrent()) materialPanel.setStatus({ ok: true, assetId });
       onProductionMaterialSaved?.(assetId);
     } catch (err: any) {
-      materialPanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
+      if (request.isCurrent()) materialPanel.setStatus({ ok: false, error: err?.message || '저장 중 오류가 발생했습니다.' });
     } finally {
-      materialPanel.setSaving(false);
+      request.finish();
     }
   };
 
   const handleClose = () => {
     generationRequest.invalidate();
+    saveRequests.invalidate();
+    clearTimeout(copyTimer.current);
+    resetSaveViews();
     setInput('');
     setResult(null);
     setError('');
     setLoading(false);
     setCopied(false);
-    setChannelSaveStatus(null);
-    setChannelSaving(false);
     setUrlInput('');
-    communityPanel.reset();
-    storePanel.reset();
-    // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
-    materialPanel.reset();
     setCustomPrompt('');
     setShowUsageSnippets(false);
     setSourceTab(initialSourceTab ?? 'text');
@@ -693,10 +747,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   };
 
   const handleSourceTabChange = (tab: SourceTab) => {
-    if (tab !== sourceTab) {
-      generationRequest.invalidate();
-      setLoading(false);
-    }
+    if (tab === sourceTab) return;
+    generationRequest.invalidate();
+    saveRequests.invalidate();
+    clearTimeout(copyTimer.current);
+    setCopied(false);
+    resetSaveViews();
+    setLoading(false);
     setSourceTab(tab);
     setResult(null);
     setError('');
@@ -1354,7 +1411,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() => { communityPanel.setVisible(false); communityPanel.setStatus(null); }}
+                  onClick={hideCommunitySavePanel}
                   style={{
                     padding: '7px 14px',
                     border: '1px solid #d1d5db',
@@ -1370,19 +1427,19 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 <button
                   type="button"
                   onClick={handleCommunitySave}
-                  disabled={communityPanel.saving || Boolean(communityPanel.status?.ok)}
+                  disabled={saveRequests.pending.community || Boolean(communityPanel.status?.ok)}
                   style={{
                     padding: '7px 14px',
                     border: 'none',
                     borderRadius: '6px',
-                    background: communityPanel.status?.ok ? '#d1fae5' : communityPanel.saving ? '#bfdbfe' : '#0284c7',
+                    background: communityPanel.status?.ok ? '#d1fae5' : saveRequests.pending.community ? '#bfdbfe' : '#0284c7',
                     color: communityPanel.status?.ok ? '#15803d' : 'white',
                     fontSize: '13px',
                     fontWeight: 600,
-                    cursor: communityPanel.saving || communityPanel.status?.ok ? 'not-allowed' : 'pointer',
+                    cursor: saveRequests.pending.community || communityPanel.status?.ok ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {communityPanel.saving ? '저장 중...' : communityPanel.status?.ok ? '저장됨 ✓' : '게시글 저장'}
+                  {saveRequests.pending.community ? '저장 중...' : communityPanel.status?.ok ? '저장됨 ✓' : '게시글 저장'}
                 </button>
               </div>
             </div>
@@ -1444,7 +1501,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() => { storePanel.setVisible(false); storePanel.setStatus(null); }}
+                  onClick={() => { saveRequests.invalidate('store'); storePanel.setVisible(false); storePanel.setStatus(null); }}
                   style={{
                     padding: '7px 14px',
                     border: '1px solid #d1d5db',
@@ -1460,19 +1517,19 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 <button
                   type="button"
                   onClick={handleStoreSave}
-                  disabled={storePanel.saving || Boolean(storePanel.status?.ok)}
+                  disabled={saveRequests.pending.store || Boolean(storePanel.status?.ok)}
                   style={{
                     padding: '7px 14px',
                     border: 'none',
                     borderRadius: '6px',
-                    background: storePanel.status?.ok ? '#dcfce7' : storePanel.saving ? '#bbf7d0' : '#16a34a',
+                    background: storePanel.status?.ok ? '#dcfce7' : saveRequests.pending.store ? '#bbf7d0' : '#16a34a',
                     color: storePanel.status?.ok ? '#15803d' : 'white',
                     fontSize: '13px',
                     fontWeight: 600,
-                    cursor: storePanel.saving || storePanel.status?.ok ? 'not-allowed' : 'pointer',
+                    cursor: saveRequests.pending.store || storePanel.status?.ok ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {storePanel.saving ? '저장 중...' : storePanel.status?.ok ? '저장됨 ✓' : '매장에 저장'}
+                  {saveRequests.pending.store ? '저장 중...' : storePanel.status?.ok ? '저장됨 ✓' : '매장에 저장'}
                 </button>
               </div>
             </div>
@@ -1548,7 +1605,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() => { materialPanel.setVisible(false); materialPanel.setStatus(null); }}
+                  onClick={() => { saveRequests.invalidate('material'); materialPanel.setVisible(false); materialPanel.setStatus(null); }}
                   style={{
                     padding: '7px 14px',
                     border: '1px solid #d1d5db',
@@ -1564,19 +1621,19 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 <button
                   type="button"
                   onClick={handleProductionMaterialSave}
-                  disabled={materialPanel.saving || Boolean(materialPanel.status?.ok)}
+                  disabled={saveRequests.pending.material || Boolean(materialPanel.status?.ok)}
                   style={{
                     padding: '7px 14px',
                     border: 'none',
                     borderRadius: '6px',
-                    background: materialPanel.status?.ok ? '#e0e7ff' : materialPanel.saving ? '#c7d2fe' : '#4f46e5',
+                    background: materialPanel.status?.ok ? '#e0e7ff' : saveRequests.pending.material ? '#c7d2fe' : '#4f46e5',
                     color: materialPanel.status?.ok ? '#4338ca' : 'white',
                     fontSize: '13px',
                     fontWeight: 600,
-                    cursor: materialPanel.saving || materialPanel.status?.ok ? 'not-allowed' : 'pointer',
+                    cursor: saveRequests.pending.material || materialPanel.status?.ok ? 'not-allowed' : 'pointer',
                   }}
                 >
-                  {materialPanel.saving ? '저장 중...' : materialPanel.status?.ok ? '저장됨 ✓' : '제작 자료로 저장'}
+                  {saveRequests.pending.material ? '저장 중...' : materialPanel.status?.ok ? '저장됨 ✓' : '제작 자료로 저장'}
                 </button>
               </div>
             </div>
@@ -1654,7 +1711,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             {showCommunitySave && result && (
               <button
                 type="button"
-                onClick={communityPanel.visible ? () => { communityPanel.setVisible(false); communityPanel.setStatus(null); } : handleOpenCommunitySavePanel}
+                onClick={communityPanel.visible ? hideCommunitySavePanel : handleOpenCommunitySavePanel}
                 style={{
                   padding: '8px 16px',
                   border: `1px solid ${communityPanel.visible ? '#0369a1' : '#0284c7'}`,
@@ -1673,7 +1730,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             {showStoreSave && result && (
               <button
                 type="button"
-                onClick={storePanel.visible ? () => { storePanel.setVisible(false); storePanel.setStatus(null); } : handleOpenStoreSavePanel}
+                onClick={storePanel.visible ? () => { saveRequests.invalidate('store'); storePanel.setVisible(false); storePanel.setStatus(null); } : handleOpenStoreSavePanel}
                 style={{
                   padding: '8px 16px',
                   border: `1px solid ${storePanel.visible ? '#15803d' : '#16a34a'}`,
@@ -1692,7 +1749,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             {showProductionMaterialSave && result && (
               <button
                 type="button"
-                onClick={materialPanel.visible ? () => { materialPanel.setVisible(false); materialPanel.setStatus(null); } : handleOpenProductionMaterialSavePanel}
+                onClick={materialPanel.visible ? () => { saveRequests.invalidate('material'); materialPanel.setVisible(false); materialPanel.setStatus(null); } : handleOpenProductionMaterialSavePanel}
                 style={{
                   padding: '8px 16px',
                   border: `1px solid ${materialPanel.visible ? '#4338ca' : '#4f46e5'}`,
@@ -1712,19 +1769,19 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               <button
                 type="button"
                 onClick={handleChannelSave}
-                disabled={channelSaving}
+                disabled={saveRequests.pending.channel || Boolean(channelSaveStatus?.ok)}
                 style={{
                   padding: '8px 16px',
                   border: '1px solid #059669',
                   borderRadius: '6px',
-                  background: channelSaving ? '#d1fae5' : channelSaveStatus?.ok ? '#d1fae5' : '#ecfdf5',
+                  background: saveRequests.pending.channel ? '#d1fae5' : channelSaveStatus?.ok ? '#d1fae5' : '#ecfdf5',
                   fontSize: '14px',
-                  cursor: channelSaving ? 'not-allowed' : 'pointer',
+                  cursor: saveRequests.pending.channel || channelSaveStatus?.ok ? 'not-allowed' : 'pointer',
                   color: '#059669',
                   fontWeight: 600,
                 }}
               >
-                {channelSaving ? '저장 중...' : channelSaveStatus?.ok ? '저장됨 ✓' : '채널에 저장'}
+                {saveRequests.pending.channel ? '저장 중...' : channelSaveStatus?.ok ? '저장됨 ✓' : '채널에 저장'}
               </button>
             )}
             <button

@@ -30,14 +30,14 @@ describe('AiContentModal independent save panel lifetimes', () => {
     };
   }
 
-  it('initially hides all panels with no request/status or shared draft', () => {
+  it('initially hides all panels with no status or shared draft', () => {
     const { result } = renderHook(usePanels);
     expect(result.current.community).toMatchObject({
       visible: false, title: '', forumId: '',
-      forums: [], forumsLoading: false, saving: false, status: null,
+      forums: [], forumsLoading: false, status: null,
     });
-    expect(result.current.store).toMatchObject({ visible: false, title: '', saving: false, status: null });
-    expect(result.current.material).toMatchObject({ visible: false, title: '', saving: false, status: null });
+    expect(result.current.store).toMatchObject({ visible: false, title: '', status: null });
+    expect(result.current.material).toMatchObject({ visible: false, title: '', status: null });
   });
 
   it('store draft and success leave community/material state unchanged', () => {
@@ -45,21 +45,17 @@ describe('AiContentModal independent save panel lifetimes', () => {
     act(() => {
       result.current.store.setVisible(true);
       result.current.store.setTitle('Store draft');
-      result.current.store.setSaving(true);
     });
-    expect(result.current.store.saving).toBe(true);
     act(() => {
       result.current.store.setStatus({ ok: true, contentId: 'fixture-content' });
-      result.current.store.setSaving(false);
     });
     expect(result.current.store.status).toEqual({ ok: true, contentId: 'fixture-content' });
     expect(result.current.community.title).toBe('');
     expect(result.current.community.status).toBeNull();
-    expect(result.current.material.saving).toBe(false);
     expect(result.current.material.status).toBeNull();
   });
 
-  it('community close resets draft/request status and preserves existing forum list/loading', () => {
+  it('community close resets draft/status and preserves existing forum list/loading', () => {
     const { result } = renderHook(usePanels);
     const forums = [{ id: 'fixture-forum', name: 'Fixture forum' }];
     act(() => {
@@ -68,14 +64,13 @@ describe('AiContentModal independent save panel lifetimes', () => {
       result.current.community.setForumId('fixture-forum');
       result.current.community.setForums(forums);
       result.current.community.setForumsLoading(true);
-      result.current.community.setSaving(true);
       result.current.community.setStatus({ ok: false, error: 'fixture failure' });
       result.current.store.setTitle('Store draft');
     });
     act(() => result.current.community.reset());
     expect(result.current.community).toMatchObject({
       visible: false, title: '', forumId: '',
-      saving: false, status: null, forums: forums, forumsLoading: true,
+      status: null, forums: forums, forumsLoading: true,
     });
     expect(result.current.store.title).toBe('Store draft');
   });
@@ -85,18 +80,16 @@ describe('AiContentModal independent save panel lifetimes', () => {
     act(() => {
       result.current.store.setVisible(true);
       result.current.store.setTitle('Store draft');
-      result.current.store.setSaving(true);
       result.current.store.setStatus({ ok: false, error: 'fixture failure' });
       result.current.material.setVisible(true);
       result.current.material.setTitle('Material draft');
-      result.current.material.setSaving(true);
       result.current.material.setStatus({ ok: true, assetId: 'fixture-asset' });
     });
     act(() => result.current.store.reset());
-    expect(result.current.store).toMatchObject({ visible: false, title: '', saving: false, status: null });
+    expect(result.current.store).toMatchObject({ visible: false, title: '', status: null });
     expect(result.current.material.title).toBe('Material draft');
     act(() => result.current.material.reset());
-    expect(result.current.material).toMatchObject({ visible: false, title: '', saving: false, status: null });
+    expect(result.current.material).toMatchObject({ visible: false, title: '', status: null });
   });
 
   it('rerender retains the draft and React setter identity', () => {
@@ -118,36 +111,33 @@ describe('AiContentModal independent save panel lifetimes', () => {
     expect(third.result.current.store.title).toBe('');
   });
 
-  it('opening community initializes its draft but retains cached forums and in-flight flags', () => {
+  it('opening community initializes its draft but retains cached forums', () => {
     const { result } = renderHook(usePanels);
     const forums = [{ id: 'fixture-forum', name: 'Fixture forum' }];
     act(() => {
       result.current.community.setForums(forums);
       result.current.community.setForumId('old-forum');
-      result.current.community.setSaving(true);
       result.current.community.setStatus({ ok: true, postId: 'old-post' });
     });
     act(() => result.current.community.open('New draft'));
     expect(result.current.community).toMatchObject({
       visible: true, title: 'New draft', forumId: '',
-      status: null, forums: forums, saving: true,
+      status: null, forums: forums,
     });
   });
 
-  it('opening store/material sets titles and clears status without cancelling pending saves', () => {
+  it('opening store/material sets titles and clears status without owning network requests', () => {
     const { result } = renderHook(usePanels);
     act(() => {
-      result.current.store.setSaving(true);
       result.current.store.setStatus({ ok: false, error: 'old error' });
-      result.current.material.setSaving(true);
       result.current.material.setStatus({ ok: true, assetId: 'old-asset' });
     });
     act(() => {
       result.current.store.open('Store draft');
       result.current.material.open('Material draft');
     });
-    expect(result.current.store).toMatchObject({ visible: true, title: 'Store draft', status: null, saving: true });
-    expect(result.current.material).toMatchObject({ visible: true, title: 'Material draft', status: null, saving: true });
+    expect(result.current.store).toMatchObject({ visible: true, title: 'Store draft', status: null, });
+    expect(result.current.material).toMatchObject({ visible: true, title: 'Material draft', status: null, });
   });
 
 });

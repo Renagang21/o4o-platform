@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 
 /** AiContentModal's one generation-result slot, scoped to a committed open lifetime. */
-export function useAiGenerationRequest(open: boolean) {
+export function useAiGenerationRequest(open: boolean, context = '') {
   const lifetime = useRef({ active: false, requestId: 0 });
 
   useLayoutEffect(() => {
@@ -12,7 +12,7 @@ export function useAiGenerationRequest(open: boolean) {
       current.active = false;
       current.requestId += 1;
     };
-  }, [open]);
+  }, [open, context]);
 
   const invalidate = () => { lifetime.current.requestId += 1; };
   const begin = () => {
