@@ -1,6 +1,7 @@
 # O4O 계정 제거 domain/file inventory — 재개 조사
 
-> 상태: INVESTIGATION / 운영 활성화 미승인
+> 상태: DRAFT
+> 실행 경계: 운영 활성화 미승인
 > 작성: 2026-10-13
 > 근거: [Core WO §10.2·§10.7](../work-orders/WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md), [통합 후속 TODO](../work-orders/TODO-O4O-INTEGRATED-PRIVACY-FOLLOWUP-V1.md)
 
