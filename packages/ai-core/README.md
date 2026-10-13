@@ -146,3 +146,8 @@ read/draft만 허용하며, consumer 요청에 staff 자료는 거부한다. hos
 미연결·한도·provider 오류는 안전한 코드로 반환한다. 자료 audience 표시는 권한 증명이 아니다.
 첫 연결은 기존 콘텐츠 번역 + CONTENT_TRANSLATION 정책이다. 로그 observer는 구조화 logger이며 durable 실행 원장/원자 quota/외부 계정 연결은 후속이다.
 기존 execute/stream/runAIInsight 계약과 호출부는 보존한다.
+
+
+서비스 확대: 카탈로그별 question/summary/draft·운영 요약, LMS 피드백, Neture 추천, 공용 리서치를 기존 실행에 연결했다.
+기본 principal은 인증 actor다. 명시적 public principal은 actor 없이 consumer read/no-materials만 허용하며 호스트의 기존 공개 접근 판정이 반드시 필요하다.
+public으로 직원 자료·draft·도메인 실행을 열 수 없다. [구조안 §9](../../docs/architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)에서 연결 범위와 호환 유지 경로를 확인한다.

@@ -8,7 +8,9 @@ export interface AiExecutionContext {
   requestId: string;
   serviceId: string;
   featureId: string;
-  actorId: string;
+  /** Defaults to authenticated. Public read-only tools must be explicitly authorized by the host. */
+  principal?: 'authenticated' | 'public';
+  actorId?: string;
   organizationId?: string;
   storeId?: string;
   taskId?: string;

@@ -39,7 +39,11 @@ export async function runAiExtension<Input, Output>(request: {
     catch { throw new AiExtensionError('HISTORY_UNAVAILABLE'); }
   };
   try {
-    if (!context.requestId || !context.serviceId || !context.featureId || !context.actorId ||
+    const publicRead = context.principal === 'public';
+    if (!context.requestId || !context.serviceId || !context.featureId ||
+        (!publicRead && !context.actorId) ||
+        (context.principal !== undefined && !['authenticated', 'public'].includes(context.principal)) ||
+        (publicRead && (!!context.actorId || context.audience !== 'consumer' || extension.operation !== 'read' || materials.length > 0)) ||
         !['staff', 'consumer'].includes(context.audience) ||
         !['read', 'draft'].includes(extension.operation) ||
         !['platform', 'store', 'user', 'external-account'].includes(funding.payer) ||

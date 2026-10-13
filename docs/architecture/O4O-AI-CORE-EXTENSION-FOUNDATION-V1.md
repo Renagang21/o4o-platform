@@ -108,3 +108,52 @@ import·symbol·endpoint·파일 경로·raw-source assertion census를 수행�
 첫 adapter는 platform 부담·기존 정책만 동작한다. store/user/external-account는 공통 계약과 mock runtime 검증 수준이며 실제 계정/청구 구현이 아니다.
 provider-completed 이력은 파싱 실패에도 usage를 남기지만 host observer는 구조화 logger다. durable 실행 원장은 P2이며 기존 usage/aggregate의 fire-and-forget과 quota 경쟁은 남는다.
 저장 직전 재검증/원문 비교와 최종 DB write 사이의 원자 CAS는 후속 persistence 작업이다. 정책별 가격·한도 변경·credential 전환을 운영에 적용하지 않았다.
+
+
+## 9. 전체 서비스 공통 기반 연결 (2026-10-13 계속 작업)
+
+서비스 identity는 기존 `config/service-catalog.ts`에서 가져온다. 별도 서비스 목록이나 인증 체계를 만들지 않는다.
+`services/ai-extensions/service-query.extension.ts`는 현재 카탈로그의 퇴역 외 8개 서비스마다 question/summary/draft Extension을 구성한다.
+질의/요약/초안은 실제 `/api/ai/query` 경로에서 실행되며 서비스별 사업 규칙을 prompt에 전달한다.
+관리자 운영 요약도 같은 카탈로그와 `operator-insight.extension`으로 각 서비스를 지원한다.
+
+| 서비스/화면 | 연결 | 경계 |
+|---|---|---|
+| neture | 질의·요약·초안 + 운영 요약 + 기존 운영자 추천 Extension | 사업자/거래 권한은 기존 도메인 API. AI는 추천만 반환 |
+| kpa-society | 질의·요약·초안·운영 요약 | 조직 업무/의료 표현 제약. 매장 콘텐츠 번역 별도 ownership guard 유지 |
+| kpa-branch | 질의·요약·초안·운영 요약 | 분회 자료 권한을 서비스 선택으로 부여하지 않음 |
+| lecture | 질의·요약·초안·운영 요약 + 기존 LMS 피드백 Extension | 제출된 답안만 분석, 성적·수강 자격 변경 없음 |
+| community | 질의·요약·초안·운영 요약 | 비공개 글·대화를 서버에서 조회하지 않음 |
+| supplier | 질의·요약·초안·운영 요약 | 제품/인증을 추측하지 않음. 기존 사업자 ownership 유지 |
+| funding | 질의·요약·초안·운영 요약 | content-only, 주문/결제/정산 확정 없음 |
+| cafe24-b2b | O4O 인증 사용자가 제출한 자료의 질의·요약·초안·운영 요약 | Cafe24 사용자 신원을 O4O 계정으로 바꾸거나 외부 자료 조회를 열지 않음 |
+| 내 매장 | 앞 Phase 콘텐츠 번역·선택 조직·권한 재검증 | 메뉴/실행 업무 재배치 없음. 독립 서비스 identity 추가 없음 |
+| 계정센터 | 공유 O4O 질의 계약을 사용할 수 있음 | 계정센터를 새 서비스 키로 등록하지 않음. 현재 화면 신규 AI UI는 추가하지 않음 |
+| 병원약국 | 기존 웹 리서치 호출을 web.research Extension + Core에 연결 | 기존 무로그인/리미터/로컬 파일 정책 유지, 서버 원내 DB·staff 자료·실행 없음 |
+
+### HTTP 계약
+
+- GET `/api/ai/extensions`: 기존 authenticate 필요. 서비스/작업/제약 metadata만 반환, provider/key 없음.
+- POST `/api/ai/query`: 기존 question/contextType/contextData에 선택 `serviceId`, `task=question|summary|draft` 추가.
+- 두 필드가 없으면 기존 대표 서비스 질의로 처리. `kpa` 별칭은 기존 canonical resolver 사용.
+- 미지원/퇴역 서비스·delete 같은 작업은 400, 무인증 401, 기존 일 사용량 초과 429. 응답 answer/remainingQueries/contextPanel/cards 유지.
+- serviceId/storeId/contextData는 신원·권한 증명이 아니다. 이 공통 경로는 domain record를 읽지 않고 사용자가 제출한 자료만 처리한다.
+- private 자료를 실제로 가져오는 업무는 기존 도메인 guard를 통과한 서버 조립부가 별도 Extension 입력을 만들어야 한다.
+
+### Core/Extension/외부 연결 정비 범위
+
+LMS의 prompt·입력 구성·출력 정규화는 `lms-assistance.extension`으로, Neture 추천의 prompt·유효 유형·confidence·action mapping은 `operator-actions.extension`으로 분리했다.
+provider/model/key/timeout은 호스트 runtime의 기존 resolver/execute가 맡는다. 추천 캐시는 actor+지표별 hash로 격리한다.
+공용 웹 리서치는 명시적 public principal로 read만 허용하며 실제 actor를 만들지 않는다. Core는 public+staff/자료 참조/draft/위조 actor 조합을 거부한다.
+
+기존 ai-proxy의 구조화 편집·multimodal transport, Assistant/Task/노드 실행, Forum의 rule-based adapter, 상품 AI와 legacy runAIInsight 계약은 호환성을 유지한다.
+그 경로를 새 private-data 권한 없이 공통 질의로 우회하지 않았다. **모든 기존 specialty route의 이관 완료나 각 화면 신규 AI UI 배포를 주장하지 않는다.**
+텍스트 질의/서비스 운영 요약 기반을 전체 카탈로그에 제공하고 기존 업무 사례를 Core+Extension으로 연결한 코드 단계다.
+모델별 정책/가격·원자 quota·durable 이력·외부 계정은 §6 P2/P5로 남는다.
+
+### 서비스 확대 검증
+
+서비스별 Core task·LMS/추천 검증 56개, 실제 질의 HTTP 경로 15개, 기존 AI/번역/리서치/병원약국/모델 선택 회귀 127개 PASS.
+운영자 요약 10개 PASS. 합계 208개 테스트(11 suite) PASS. Core build·API build/type-check PASS. 변경 파일 ESLint 오류 0(기존 ai-query route unused catch warning 4건), docs 민감정보 검사 3881개 파일 PASS, git diff --check PASS. 외부 provider는 mock, 실제 유료 호출/운영 인증/서비스 UI 변경은 미실행.
+
+종료 범위는 작업 branch push이며 main 통합/PR 병합/배포는 실행하지 않는다. WORKTREE_DISPOSITION: `wo/ai-core-extension-foundation` / base `b3f792578a` / main integration 없음 / CI 원격 미실행 / deployment 미실행 / KEEP(검토·후속 작업용).

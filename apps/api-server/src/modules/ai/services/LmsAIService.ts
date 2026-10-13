@@ -1,3 +1,6 @@
+import { randomUUID } from 'node:crypto';
+import { lmsAssistanceExtension } from './lms-assistance.extension.js';
+import type { LmsAssistanceInput } from './lms-assistance.extension.js';
 import logger from '../../../utils/logger.js';
 import { GEMINI_CANONICAL_MODEL } from '../../../types/ai-proxy.types.js';
 
@@ -60,41 +63,6 @@ function hasApiKey(): boolean {
   return !!(process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
 }
 
-function clip(s: string, max: number): string {
-  return s.length <= max ? s : s.slice(0, max - 1) + '…';
-}
-
-// ─── System prompts ──────────────────────────────────────────────────────────
-
-const QUIZ_PROMPT = `You are an LMS tutor. Analyze a learner's quiz attempt.
-
-Return a single JSON object with this exact shape (no prose around it):
-{
-  "summary": "1-2 sentences in Korean summarizing performance.",
-  "insights": ["Korean string", ...],         // 2-4 items: what was missed, common pattern of errors
-  "recommendations": ["Korean string", ...]   // 2-4 items: concrete next-step study suggestions
-}
-
-Constraints:
-- Korean only.
-- Be encouraging but specific. Reference question topics, not question IDs.
-- If everything was correct, focus recommendations on next steps / extending mastery.
-- Do not invent facts that aren't in the input.`;
-
-const ASSIGNMENT_PROMPT = `You are an LMS instructor giving formative feedback.
-
-Return a single JSON object:
-{
-  "summary": "Korean 1-2 sentence high-level take on the submission.",
-  "insights": ["Korean", ...],            // 2-4 strengths / accurate parts
-  "recommendations": ["Korean", ...]      // 2-4 specific improvement points
-}
-
-Constraints:
-- Korean only.
-- Be honest but constructive. Match feedback to the instructions if provided.
-- Do not grade with a number/score. Do not invent missing context.`;
-
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 export class LmsAIService {
@@ -105,14 +73,12 @@ export class LmsAIService {
     return LmsAIService.instance;
   }
 
-  async analyzeQuiz(payload: QuizAnalysisPayload): Promise<AIAnalyzeResult> {
-    const userPrompt = this.buildQuizPrompt(payload);
-    return this.run('quiz', QUIZ_PROMPT, userPrompt, () => this.quizFallback(payload));
+  async analyzeQuiz(payload: QuizAnalysisPayload, actorId: string): Promise<AIAnalyzeResult> {
+    return this.run({ kind: 'quiz', payload }, actorId, () => this.quizFallback(payload));
   }
 
-  async feedbackAssignment(payload: AssignmentFeedbackPayload): Promise<AIAnalyzeResult> {
-    const userPrompt = this.buildAssignmentPrompt(payload);
-    return this.run('assignment', ASSIGNMENT_PROMPT, userPrompt, () =>
+  async feedbackAssignment(payload: AssignmentFeedbackPayload, actorId: string): Promise<AIAnalyzeResult> {
+    return this.run({ kind: 'assignment', payload }, actorId, () =>
       this.assignmentFallback(payload),
     );
   }
@@ -120,42 +86,45 @@ export class LmsAIService {
   // ─── Provider call ─────────────────────────────────────────────────────────
 
   private async run(
-    kind: LmsAiKind,
-    systemPrompt: string,
-    userPrompt: string,
+    input: LmsAssistanceInput,
+    actorId: string,
     fallback: () => AIAnalyzeResult,
   ): Promise<AIAnalyzeResult> {
+    const { kind } = input;
+    if (!actorId) throw new Error('AUTH_REQUIRED');
     if (!hasApiKey()) {
       logger.info(`[LmsAI] No API key configured — returning rule-based fallback for ${kind}`);
       return fallback();
     }
 
     try {
-      const { execute } = await import('@o4o/ai-core');
+      const { execute, runAiExtension } = await import('@o4o/ai-core');
       const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY!;
       const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
       const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
 
-      const result = await execute({
-        systemPrompt,
-        userPrompt,
-        provider,
-        responseMode: 'json',
-        config: {
-          apiKey,
-          model,
-          maxTokens: 700,
-          temperature: 0.4,
+      const run = await runAiExtension({
+        extension: lmsAssistanceExtension, input,
+        context: { requestId: randomUUID(), serviceId: 'lecture', featureId: `lms.${kind}`, actorId, audience: 'staff' },
+        materials: [], funding: { payer: 'platform' },
+      }, {
+        invoke: async prompt => {
+          const result = await execute({ ...prompt, provider, responseMode: 'json',
+            config: { apiKey, model, maxTokens: 700, temperature: 0.4 },
+            timeoutMs: TIMEOUT_MS, retry: { maxAttempts: 1, delayMs: 0 },
+            meta: { service: 'lms', callerName: `LmsAI.${kind}` },
+          });
+          return { ...result, provider: result.provider ?? provider };
         },
-        timeoutMs: TIMEOUT_MS,
-        retry: { maxAttempts: 1, delayMs: 0 },
-        meta: { service: 'lms', callerName: `LmsAI.${kind}` },
+      }, {
+        // Authenticated request's own submitted text only; no course/learner DB lookup or grade mutation.
+        authorize: async context => !!actorId && context.actorId === actorId,
+        record: async event => { logger.info('[AI_EXTENSION]', event); },
       });
-
-      const parsed = JSON.parse(result.content);
-      const normalized = this.normalize(parsed);
+      const result = run.invocation;
+      const normalized = run.output;
       logger.info(
-        `[LmsAI] ${kind} via ${provider}/${model} (${result.durationMs}ms, ${
+        `[LmsAI] ${kind} via ${provider}/${model} (${
           (result.promptTokens || 0) + (result.completionTokens || 0)
         } tokens)`,
       );
@@ -165,45 +134,6 @@ export class LmsAIService {
       logger.warn(`[LmsAI] ${kind} LLM call failed (${msg}) — using fallback`);
       return fallback();
     }
-  }
-
-  private normalize(raw: any): AIAnalyzeResult {
-    const summary = typeof raw?.summary === 'string' ? raw.summary : '';
-    const insights = Array.isArray(raw?.insights)
-      ? raw.insights.filter((s: any) => typeof s === 'string').slice(0, 5)
-      : [];
-    const recommendations = Array.isArray(raw?.recommendations)
-      ? raw.recommendations.filter((s: any) => typeof s === 'string').slice(0, 5)
-      : [];
-    return { summary, insights, recommendations };
-  }
-
-  // ─── User prompt builders ──────────────────────────────────────────────────
-
-  private buildQuizPrompt(p: QuizAnalysisPayload): string {
-    const lines = ['# Quiz attempt', ''];
-    if (typeof p.score === 'number') lines.push(`Score: ${Math.round(p.score)}`);
-    if (typeof p.passingScore === 'number') lines.push(`Passing: ${p.passingScore}`);
-    lines.push('');
-    lines.push('## Questions and answers');
-    p.questions.forEach((q, i) => {
-      const ua = p.userAnswers.find((a) => a.questionId === q.id);
-      const userAns = ua ? JSON.stringify(ua.answer) : '(unanswered)';
-      const correctAns = q.correctAnswer !== undefined ? JSON.stringify(q.correctAnswer) : '(hidden)';
-      const correct = ua?.isCorrect === true ? 'O' : ua?.isCorrect === false ? 'X' : '?';
-      lines.push(
-        `Q${i + 1} [${correct}] ${clip(q.question, 200)}\n  user: ${userAns}\n  correct: ${correctAns}`,
-      );
-    });
-    return lines.join('\n');
-  }
-
-  private buildAssignmentPrompt(p: AssignmentFeedbackPayload): string {
-    const lines = ['# Assignment submission', ''];
-    if (p.instructions) lines.push(`Instructions: ${clip(p.instructions, 2000)}`);
-    lines.push('');
-    lines.push(`Submission:\n${clip(p.submissionContent, 6000)}`);
-    return lines.join('\n');
   }
 
   // ─── Rule-based fallbacks (when no API key or call fails) ──────────────────
