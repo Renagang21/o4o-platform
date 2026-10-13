@@ -13,7 +13,7 @@
  * - 거절 시 사유 입력 모달
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   operatorServiceApprovalApi,
   type ServiceApprovalItem,
@@ -25,6 +25,7 @@ import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConst
 import { useAuth } from '../../contexts/AuthContext';
 import { buildServiceApprovalListParams, getSelectedPendingServiceApprovalIds } from './productServiceApprovalModel';
 import { getServiceApprovalDecisionOutcome, type ServiceApprovalDecision, type ServiceApprovalDecisionOutcome } from './serviceApprovalDecisionResult';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 
 // ==================== Constants ====================
 
@@ -115,7 +116,8 @@ export default function ProductServiceApprovalPage() {
   const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [permissionError, setPermissionError] = useState<string | null>(null);
-  const [analytics, setAnalytics] = useState<ApprovalAnalytics | null>(null);
+  const [analyticsResult, setAnalyticsResult] = useState<{ scope: string; data: ApprovalAnalytics | null } | null>(null);
+  const analytics = analyticsResult?.data ?? null;
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [analyticsPeriod, setAnalyticsPeriod] = useState<'all' | '7d' | '30d'>('all');
 
@@ -168,9 +170,21 @@ export default function ProductServiceApprovalPage() {
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
 
+  // 목록과 분석의 요청 채널을 분리해 각 응답 순서를 관리한다.
+  const listScope = JSON.stringify([user?.id ?? null, statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
+  const analyticsScope = JSON.stringify([user?.id ?? null, analyticsPeriod]);
+  const beginListRequest = useLatestRequest(listScope);
+  const beginAnalyticsRequest = useLatestRequest(analyticsScope);
+  const activeList = useRef<{ scope: string; page: number; fetch: ((page?: number) => Promise<void>) | null }>({ scope: listScope, page: 1, fetch: null });
+
   // ==================== Data Fetching ====================
 
   const fetchData = useCallback(async (page = 1) => {
+    // 이전 조건을 캡처한 callback은 새 조건의 유효 요청도 무효화하지 않는다.
+    if (activeList.current.scope !== listScope) return;
+    const isCurrent = beginListRequest();
+    if (!isCurrent()) return;
+    activeList.current.page = page;
     setLoading(true);
     setPermissionError(null);
     try {
@@ -181,42 +195,76 @@ export default function ProductServiceApprovalPage() {
         }, page)),
         operatorServiceApprovalApi.stats(),
       ]);
+      if (!isCurrent()) return;
+      activeList.current.page = listResult.pagination.page;
       setItems(listResult.data);
       setPagination(listResult.pagination);
       setStats(statsResult);
       setSelectedIds(new Set());
     } catch (err: any) {
-      setPermissionError(err?.message || '데이터를 불러올 수 없습니다');
+      if (isCurrent()) setPermissionError(err?.message || '데이터를 불러올 수 없습니다');
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
+  }, [listScope, beginListRequest, statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
+
+  useLayoutEffect(() => {
+    const current = activeList.current;
+    if (current.scope !== listScope) {
+      current.scope = listScope;
+      current.page = 1;
+    }
+    current.fetch = fetchData;
+  }, [listScope, fetchData]);
+
+  const refreshData = useCallback((page?: number) => {
+    const current = activeList.current;
+    return current.fetch?.(page ?? current.page);
+  }, []);
 
   useEffect(() => {
     fetchData(1);
   }, [fetchData]);
 
-  // Fetch analytics (re-fetch on period change)
+  // 분석은 목록과 독립적인 최신 기간의 결과만 반영한다.
   useEffect(() => {
-    operatorServiceApprovalApi
-      .analytics(analyticsPeriod)
-      .then((data) => {
-        if (data) {
-          setAnalytics(data);
-          setShowAnalytics(true);
-        }
+    const isCurrent = beginAnalyticsRequest();
+    operatorServiceApprovalApi.analytics(analyticsPeriod)
+      .then(data => {
+        if (!isCurrent()) return;
+        setAnalyticsResult({ scope: analyticsScope, data });
+        setShowAnalytics(!!data);
       })
       .catch(() => {
-        // 분석 패널은 보조 정보 — 조회 실패 시 패널만 숨긴다(목록 화면 상태에는 영향 없음).
+        if (!isCurrent()) return;
+        setAnalyticsResult({ scope: analyticsScope, data: null });
         setShowAnalytics(false);
       });
-  }, [analyticsPeriod]);
+  }, [analyticsPeriod, analyticsScope, beginAnalyticsRequest]);
+
+  const cancelSearchTimer = useCallback(() => {
+    if (searchTimer.current !== null) {
+      clearTimeout(searchTimer.current);
+      searchTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => cancelSearchTimer, [cancelSearchTimer]);
+
+  const applySearch = (value: string) => {
+    cancelSearchTimer();
+    setSearchInput(value);
+    setSearchQuery(value);
+  };
 
   // Search debounce
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => setSearchQuery(value), 300);
+    cancelSearchTimer();
+    searchTimer.current = setTimeout(() => {
+      searchTimer.current = null;
+      setSearchQuery(value);
+    }, 300);
   };
 
   // ==================== Selection ====================
@@ -301,7 +349,7 @@ export default function ProductServiceApprovalPage() {
       } else if (drawerItem?.id === target) {
         setDrawerItem(null);
       }
-      await fetchData(pagination.page);
+      await refreshData();
     } catch {
       if (decisionMounted.current) {
         setDecisionError(getServiceApprovalDecisionOutcome(decision, { success: false }, isBatch).message);
@@ -313,6 +361,7 @@ export default function ProductServiceApprovalPage() {
         setActionLoading(null);
       }
     }
+
   };
 
   const handleBatchApprove = () => {
@@ -334,7 +383,7 @@ export default function ProductServiceApprovalPage() {
     setDeleteTarget(null);
     if (result.success) {
       if (drawerItem?.offerId === deleteTarget) setDrawerItem(null);
-      await fetchData(pagination.page);
+      await refreshData();
     }
   };
 
@@ -403,6 +452,10 @@ export default function ProductServiceApprovalPage() {
           </div>
           {showAnalytics && (
             <>
+              {analyticsResult?.scope !== analyticsScope ? (
+                <p role="status" className="py-4 text-sm text-slate-500">선택한 기간의 분석을 불러오는 중...</p>
+              ) : (
+                <>
               {/* Actionable Alerts (WO-NETURE-APPROVAL-ACTIONABLE-INSIGHTS-V1) */}
               {analytics.alerts && (analytics.alerts.lowQualitySuppliers.length > 0 || analytics.alerts.stalePendingCount > 0) && (
                 <div className="flex flex-wrap gap-3 mb-4">
@@ -423,7 +476,7 @@ export default function ProductServiceApprovalPage() {
                       {analytics.alerts.lowQualitySuppliers.map((lq, i) => (
                         <button
                           key={lq.supplierId}
-                          onClick={() => { setSearchInput(lq.supplierName); setSearchQuery(lq.supplierName); }}
+                          onClick={() => applySearch(lq.supplierName)}
                           className="text-red-700 underline hover:text-red-900"
                         >
                           {i > 0 && ', '}{lq.supplierName} ({lq.approvalRate}%)
@@ -493,6 +546,8 @@ export default function ProductServiceApprovalPage() {
                     ))}
                   </div>
                 </div>
+              )}
+                </>
               )}
             </>
           )}
@@ -812,7 +867,7 @@ export default function ProductServiceApprovalPage() {
                         setActionLoading(item.id);
                         const res = await productCleanupApi.softDelete(item.offerId);
                         setActionLoading(null);
-                        if (res.success) fetchData();
+                        if (res.success) refreshData(1);
                       }}
                       disabled={!canManage || actionLoading === item.id}
                       className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
