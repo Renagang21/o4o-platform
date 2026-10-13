@@ -47,6 +47,7 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   pending: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
   rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
   suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
+  withdrawn: { label: '탈퇴', color: 'text-slate-500', bg: 'bg-slate-100' },
   inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
 };
 
@@ -279,7 +280,7 @@ export default function UserDetailPage({
   // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: 서비스 멤버십 + 역할 복구
   const handleReactivate = async () => {
     if (!id || !user) return;
-    if (!confirm('이 사용자의 멤버십과 역할을 복구하시겠습니까?')) return;
+    if (!confirm('해당 서비스의 가입 상태와 일반 회원 역할을 복구하시겠습니까?\n운영 권한 지정·회수는 별도 업무입니다.')) return;
     setActionLoading('reactivate');
     try {
       await apiAdapter.post(`/operator/members/${id}/reactivate`, config.serviceKey ? { serviceKey: config.serviceKey } : undefined);
@@ -293,16 +294,16 @@ export default function UserDetailPage({
 
   const handleDelete = async () => {
     if (!user || !id) return;
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    if (!config.serviceKey) {
+      alert('대상 서비스를 알 수 없어 탈퇴 처리를 중단했습니다.');
+      return;
+    }
+    if (!confirm(`${getUserName(user)} (${user.email}) 회원을 해당 서비스에서 탈퇴 처리하시겠습니까?\n공통 계정과 다른 서비스 가입은 유지됩니다.`)) return;
     setActionLoading('delete');
     try {
       // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
       //   status/reactivate 와 같은 규칙 — 대상 서비스를 명시한다.
       //   범위 없는 요청은 서버가 거부하므로(전 서비스 종료 방지) 여기서 먼저 막는다.
-      if (!config.serviceKey) {
-        alert('대상 서비스를 알 수 없어 삭제를 중단했습니다.');
-        return;
-      }
       await apiAdapter.delete(
         `/operator/members/${id}?serviceKey=${encodeURIComponent(config.serviceKey)}`,
       );
@@ -329,6 +330,7 @@ export default function UserDetailPage({
 
   const handleMembershipReject = async (membershipId: string) => {
     const reason = prompt('거부 사유를 입력하세요 (선택사항):');
+    if (reason === null) return;
     setActionLoading(membershipId);
     try {
       await apiAdapter.patch(`/operator/members/${membershipId}/reject`, { reason });
@@ -438,9 +440,15 @@ export default function UserDetailPage({
                 </tr>
               )}
               <tr className="border-b border-slate-50">
-                <td className="py-2.5 pr-4 text-slate-500">상태</td>
+                <td className="py-2.5 pr-4 text-slate-500">공통 계정 상태</td>
                 <td className="py-2.5"><StatusBadge status={user.status} /></td>
               </tr>
+              {config.serviceKey && (
+                <tr className="border-b border-slate-50">
+                  <td className="py-2.5 pr-4 text-slate-500">서비스 가입 상태</td>
+                  <td className="py-2.5"><StatusBadge status={lifecycleStatus} /></td>
+                </tr>
+              )}
               <tr className="border-b border-slate-50">
                 <td className="py-2.5 pr-4 text-slate-500">가입일</td>
                 <td className="py-2.5 text-slate-800">{new Date(user.createdAt).toLocaleString('ko-KR')}</td>
@@ -483,13 +491,13 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {canManageMembers && lifecycleStatus === 'suspended' && (
+            {((canManageMembers && lifecycleStatus === 'suspended') || (isAdmin && lifecycleStatus === 'withdrawn')) && (
               <button
                 onClick={handleReactivate}
                 disabled={actionLoading === 'reactivate'}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                <CheckCircle className="w-4 h-4" />복구
+                <CheckCircle className="w-4 h-4" />{lifecycleStatus === 'withdrawn' ? '탈퇴 회원 복구' : '복구'}
               </button>
             )}
             {lifecycleStatus === 'rejected' && (
@@ -512,7 +520,7 @@ export default function UserDetailPage({
               disabled={actionLoading === 'delete'}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 ml-auto"
             >
-              <Trash2 className="w-4 h-4" />삭제
+              <Trash2 className="w-4 h-4" />{config.serviceKey ? '서비스 탈퇴' : '삭제'}
             </button>)}
           </div>
         </div>

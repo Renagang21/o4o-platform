@@ -1,0 +1,32 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import Page from './OperatorCertificatesPage';
+const api = vi.hoisted(() => ({ issueCertificate: vi.fn(), renewCertificate: vi.fn(), revokeCertificate: vi.fn() }));
+vi.mock('../../api/lecture', () => ({ operatorApi: api, errorMessage: () => '처리 실패' }));
+vi.mock('../../components/Toast', () => ({ useToast: () => ({ success: vi.fn(), error: vi.fn() }) }));
+beforeEach(() => vi.resetAllMocks());
+afterEach(cleanup);
+it('connects the issued certificate to renewal and public verification', async () => {
+  api.issueCertificate.mockResolvedValue({ data: { certificate: { id: 'cert', certificateNumber: 'SAMPLE', verificationCode: 'verify-code' } } });
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText('학습자 userId'), { target: { value: 'student' } });
+  fireEvent.change(screen.getByLabelText('강의 courseId'), { target: { value: 'course' } });
+  fireEvent.click(screen.getByRole('button', { name: '발급' }));
+  await screen.findByRole('status');
+  expect((screen.getByLabelText('수료증 id') as HTMLInputElement).value).toBe('cert');
+  expect((screen.getByLabelText('verificationCode') as HTMLInputElement).value).toBe('verify-code');
+  fireEvent.change(screen.getByLabelText('갱신 기간(개월)'), { target: { value: '0' } });
+  expect((screen.getByRole('button', { name: '갱신' }) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.change(screen.getByLabelText('갱신 기간(개월)'), { target: { value: '6' } });
+  fireEvent.click(screen.getByRole('button', { name: '갱신' }));
+  await waitFor(() => expect(api.renewCertificate).toHaveBeenCalledWith('cert', 6));
+});
+it('retains the target and shows persistent errors after a failed renewal', async () => {
+  api.renewCertificate.mockRejectedValue(new Error('fixture'));
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText('수료증 id'), { target: { value: 'cert' } });
+  fireEvent.click(screen.getByRole('button', { name: '갱신' }));
+  await screen.findByRole('alert');
+  expect((screen.getByLabelText('수료증 id') as HTMLInputElement).value).toBe('cert');
+});
