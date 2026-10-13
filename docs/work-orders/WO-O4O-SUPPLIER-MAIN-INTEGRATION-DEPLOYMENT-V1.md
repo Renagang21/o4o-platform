@@ -1,6 +1,6 @@
 # 공급자 누적 변경 main 통합·배포 V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13
 > **상위 요청**: 사용자 추가 지시 “머지, 배포”
 > **검증 기록**: [CHECK-O4O-SUPPLIER-MAIN-INTEGRATION-DEPLOYMENT-V1](../checks/CHECK-O4O-SUPPLIER-MAIN-INTEGRATION-DEPLOYMENT-V1.md)
@@ -21,7 +21,7 @@
 - [x] 공유 실행 확인 및 concurrency 준수. 정상 Promote 38403004672 완료, API 먼저 배포하고 6 frontend verified rollout.
 - [x] 7서비스 serving SHA=target 및 production DEPLOYED 확인. 운영 HTTP 전/후 각 17 PASS.
 - [x] 완료된 이력에 대한 잘못된 추가를 원상복구하고 별도 실행 기록 작성.
-- [ ] 신규 실행 기록의 lifecycle·민감정보·정확한 변경 범위·링크 검증.
+- [x] 신규 실행 기록의 lifecycle·민감정보·정확한 변경 범위·링크 검증 PASS. 원래 CHECK는 baf38ff7b와 byte 동일, 원래 WO는 최신 main과 byte 동일.
 
 ## 실제 결과와 잔여 범위
 

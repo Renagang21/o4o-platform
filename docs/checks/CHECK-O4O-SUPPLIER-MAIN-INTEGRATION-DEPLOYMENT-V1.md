@@ -1,6 +1,6 @@
 # 공급자 누적 변경 main 통합·배포 검증 V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13
 > **실행 WO**: [WO-O4O-SUPPLIER-MAIN-INTEGRATION-DEPLOYMENT-V1](../work-orders/WO-O4O-SUPPLIER-MAIN-INTEGRATION-DEPLOYMENT-V1.md)
 > **범위**: 사용자 추가 요청에 따른 누적 공급자 변경의 main 통합·배포 실행. 완료된 코드 정비 기록과 별도 실행 경계를 유지한다.
