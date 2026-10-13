@@ -23,6 +23,7 @@ import {
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { useAuth } from '../../contexts/AuthContext';
+import { getServiceApprovalDecisionOutcome, type ServiceApprovalDecision, type ServiceApprovalDecisionOutcome } from './serviceApprovalDecisionResult';
 
 // ==================== Constants ====================
 
@@ -141,6 +142,15 @@ export default function ProductServiceApprovalPage() {
   // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [decisionError, setDecisionError] = useState<string | null>(null);
+  const [decisionNotice, setDecisionNotice] = useState<ServiceApprovalDecisionOutcome | null>(null);
+  const decisionWriting = useRef(false);
+  const decisionMounted = useRef(true);
+  const decisionBusy = batchLoading || actionLoading !== null;
+  useEffect(() => {
+    decisionMounted.current = true;
+    return () => { decisionMounted.current = false; };
+  }, []);
 
   // Reject modal
   const [rejectTarget, setRejectTarget] = useState<string | null>(null); // single ID or 'batch'
@@ -247,59 +257,86 @@ export default function ProductServiceApprovalPage() {
 
   // ==================== Actions ====================
 
-  const handleApprove = (id: string) => {
-    setApproveTarget(id);
-    setApproveMemo('');
+  const openDecision = (decision: ServiceApprovalDecision, target: string) => {
+    if (decisionWriting.current) return;
+    setDecisionError(null);
+    setDecisionNotice(null);
+    if (decision === 'approve') {
+      setRejectTarget(null);
+      setApproveTarget(target);
+      setApproveMemo('');
+    } else {
+      setApproveTarget(null);
+      setRejectTarget(target);
+      setRejectReason('');
+    }
   };
 
-  const handleApproveConfirm = async () => {
-    if (!approveTarget) return;
+  const handleApprove = (id: string) => openDecision('approve', id);
 
-    if (approveTarget === 'batch') {
-      setBatchLoading(true);
-      await operatorServiceApprovalApi.batchApprove(selectedPendingIds, approveMemo || undefined);
-      setBatchLoading(false);
-    } else {
-      setActionLoading(approveTarget);
-      await operatorServiceApprovalApi.approve(approveTarget, approveMemo || undefined);
-      setActionLoading(null);
-      if (drawerItem?.id === approveTarget) setDrawerItem(null);
+  const handleDecisionConfirm = async (decision: ServiceApprovalDecision) => {
+    const target = decision === 'approve' ? approveTarget : rejectTarget;
+    if (!target || !canManage || decisionWriting.current) return;
+    const isBatch = target === 'batch';
+    const ids = [...selectedPendingIds];
+    if (isBatch && ids.length === 0) return;
+    const reason = (decision === 'approve' ? approveMemo : rejectReason) || undefined;
+    decisionWriting.current = true;
+    setDecisionError(null);
+    setDecisionNotice(null);
+    if (isBatch) setBatchLoading(true);
+    else setActionLoading(target);
+    try {
+      const result = isBatch
+        ? await (decision === 'approve'
+          ? operatorServiceApprovalApi.batchApprove(ids, reason)
+          : operatorServiceApprovalApi.batchReject(ids, reason))
+        : await (decision === 'approve'
+          ? operatorServiceApprovalApi.approve(target, reason)
+          : operatorServiceApprovalApi.reject(target, reason));
+      if (!decisionMounted.current) return;
+      const outcome = getServiceApprovalDecisionOutcome(decision, result, isBatch);
+      if (outcome.kind === 'failure') {
+        setDecisionError(outcome.message);
+        return;
+      }
+      setDecisionNotice(outcome);
+      if (decision === 'approve') {
+        setApproveTarget(null);
+        setApproveMemo('');
+      } else {
+        setRejectTarget(null);
+        setRejectReason('');
+      }
+      if (isBatch) {
+        // 실패한 ID는 API에 없으므로 갱신된 목록에서 다시 선택한다. 성공 건 재전송 방지.
+        setSelectedIds(new Set());
+        setDrawerItem(null);
+      } else if (drawerItem?.id === target) {
+        setDrawerItem(null);
+      }
+      await fetchData(pagination.page);
+    } catch {
+      if (decisionMounted.current) {
+        setDecisionError(getServiceApprovalDecisionOutcome(decision, { success: false }, isBatch).message);
+      }
+    } finally {
+      decisionWriting.current = false;
+      if (decisionMounted.current) {
+        setBatchLoading(false);
+        setActionLoading(null);
+      }
     }
-
-    setApproveTarget(null);
-    setApproveMemo('');
-    await fetchData(pagination.page);
-  };
-
-  const handleRejectConfirm = async () => {
-    if (!rejectTarget) return;
-
-    if (rejectTarget === 'batch') {
-      setBatchLoading(true);
-      await operatorServiceApprovalApi.batchReject(selectedPendingIds, rejectReason || undefined);
-      setBatchLoading(false);
-    } else {
-      setActionLoading(rejectTarget);
-      await operatorServiceApprovalApi.reject(rejectTarget, rejectReason || undefined);
-      setActionLoading(null);
-      if (drawerItem?.id === rejectTarget) setDrawerItem(null);
-    }
-
-    setRejectTarget(null);
-    setRejectReason('');
-    await fetchData(pagination.page);
   };
 
   const handleBatchApprove = () => {
     if (selectedPendingIds.length === 0) return;
-    setApproveTarget('batch');
-    setApproveMemo('');
+    openDecision('approve', 'batch');
   };
 
   const handleBatchReject = () => {
     if (selectedPendingIds.length === 0) return;
-    setRejectTarget('batch');
-    setRejectReason('');
+    openDecision('reject', 'batch');
   };
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
@@ -326,6 +363,12 @@ export default function ProductServiceApprovalPage() {
           공급자가 선���한 서비스별 상품 승인을 관리합니다.
         </p>
       </div>
+
+      {decisionNotice && (
+        <div role="status" className={`mb-4 rounded-lg border p-3 text-sm ${decisionNotice.kind === 'partial' ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-green-200 bg-green-50 text-green-800'}`}>
+          {decisionNotice.message}
+        </div>
+      )}
 
       {/* KPI Bar */}
       <div className="grid grid-cols-5 gap-3 mb-6">
@@ -595,14 +638,14 @@ export default function ProductServiceApprovalPage() {
             <>
               <button
                 onClick={handleBatchApprove}
-                disabled={!canManage || batchLoading}
+                disabled={!canManage || decisionBusy}
                 className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 승인 ({selectedPendingIds.length})
               </button>
               <button
                 onClick={handleBatchReject}
-                disabled={!canManage || batchLoading}
+                disabled={!canManage || decisionBusy}
                 className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 거절 ({selectedPendingIds.length})
@@ -753,15 +796,15 @@ export default function ProductServiceApprovalPage() {
                       )}
                       <button
                         onClick={() => handleApprove(item.id)}
-                        disabled={!canManage || actionLoading === item.id}
+                        disabled={!canManage || decisionBusy}
                         title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         승인
                       </button>
                       <button
-                        onClick={() => { setRejectTarget(item.id); setRejectReason(''); }}
-                        disabled={!canManage || actionLoading === item.id}
+                        onClick={() => openDecision('reject', item.id)}
+                        disabled={!canManage || decisionBusy}
                         title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -897,6 +940,7 @@ export default function ProductServiceApprovalPage() {
                 <button
                   key={i}
                   onClick={() => setRejectReason(tpl)}
+                  disabled={decisionBusy}
                   className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded text-xs hover:bg-slate-200 text-left"
                 >
                   {tpl.length > 30 ? tpl.slice(0, 30) + '…' : tpl}
@@ -906,19 +950,22 @@ export default function ProductServiceApprovalPage() {
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
+              disabled={decisionBusy}
               placeholder="거절 사유를 입력하세요 (선택)"
               className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {decisionError && <p role="alert" className="mt-3 text-sm text-red-700">{decisionError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setRejectTarget(null)}
+                onClick={() => { if (!decisionWriting.current) setRejectTarget(null); }}
+                disabled={decisionBusy}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
               >
                 취소
               </button>
               <button
-                onClick={handleRejectConfirm}
-                disabled={batchLoading || (rejectTarget !== 'batch' && actionLoading === rejectTarget)}
+                onClick={() => void handleDecisionConfirm('reject')}
+                disabled={decisionBusy || !canManage}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 거절 확인
@@ -943,19 +990,22 @@ export default function ProductServiceApprovalPage() {
             <textarea
               value={approveMemo}
               onChange={(e) => setApproveMemo(e.target.value)}
+              disabled={decisionBusy}
               placeholder="승인 메모를 입력하세요 (선택)"
               className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
+            {decisionError && <p role="alert" className="mt-3 text-sm text-red-700">{decisionError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setApproveTarget(null)}
+                onClick={() => { if (!decisionWriting.current) setApproveTarget(null); }}
+                disabled={decisionBusy}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
               >
                 취소
               </button>
               <button
-                onClick={handleApproveConfirm}
-                disabled={batchLoading || (approveTarget !== 'batch' && actionLoading === approveTarget)}
+                onClick={() => void handleDecisionConfirm('approve')}
+                disabled={decisionBusy || !canManage}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 승인 확인
@@ -1144,14 +1194,14 @@ export default function ProductServiceApprovalPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleApprove(drawerItem.id)}
-                    disabled={!canManage || actionLoading === drawerItem.id}
+                    disabled={!canManage || decisionBusy}
                     className="flex-1 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     승인
                   </button>
                   <button
-                    onClick={() => { setRejectTarget(drawerItem.id); setRejectReason(''); }}
-                    disabled={!canManage || actionLoading === drawerItem.id}
+                    onClick={() => openDecision('reject', drawerItem.id)}
+                    disabled={!canManage || decisionBusy}
                     className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     거절
