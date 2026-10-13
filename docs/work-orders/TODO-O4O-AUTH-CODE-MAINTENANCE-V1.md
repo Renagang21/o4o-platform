@@ -86,3 +86,100 @@ provider ID 식별·자동 이메일 병합 금지, 브라우저 logout·비밀�
 
 WORKTREE_DISPOSITION: `/workspace/o4o-platform` · `wo/auth-kakao-explicit-link`는 KEEP이다. 승인 범위가 push까지이므로 main 통합·배포 전 branch와 검증 기록을 보존한다. 이 TODO의 완료는 인증 전체 잔여 운영 작업이나 향후 배포의 완료를 뜻하지 않는다.
 DEPLOYMENT=REQUIRED_AFTER_MERGE이며 이번 실행은 push-only다. 실제 운영 반영·OAuth·일반 상태 계정·시행일 정책 적용을 완료로 표시하지 않는다.
+
+## main 통합·운영 배포 후속 — 2026-10-13 (KST)
+
+위 push-only 기록은 당시 종료 범위다. 이후 사용자가 PR #531 main 통합·배포를 승인했다.
+같은 미완료 인증 WO의 운영 검증 Phase로 기존 격리 checkout/branch를 유지했고,
+clean 상태·auth 경로 충돌 없음·branch-only commit0을 확인한 뒤 최신 main으로 fast-forward했다.
+2차 복잡성 정비 구현이나 타 트랙 변경은 이번 수정에 포함하지 않는다.
+
+- [x] PR #531 merge `aa59a0962f`와 배포 대상 `3809c42db3`의 포함 관계 확인.
+- [x] 대상 main의 CI Gate PASS 및 API·웹7개의 실제 배포/serving revision 확인.
+- [x] 사용자8 origin × PC/mobile × 공개 Demo3의 실제 로그인·접근·로그아웃48/48 PASS.
+- [x] Neture `/`의 로그인 모달에서 Demo3 × PC/mobile6/6 PASS.
+- [x] 공개 E2E 최초 실패를 코드·HTTP·전체64조건으로 재현해 test contract를 정정.
+- [x] 수정한 은퇴/거절 E2E26/26 및 정적 은퇴/Google DTO2 suites58/58 PASS.
+- [x] 보완 commit `fae89f0752`의 GitHub 공개 E2E 실행·CI Gate·Codex review PASS, 미해결 thread0 확인.
+- 최신 main 동기화 이후 HEAD의 통합 게이트·merge 결과는 [검증 보완 PR #546](https://github.com/Renagang21/o4o-platform/pull/546)에서 확인한다.
+
+[Promote run 38403004672](https://github.com/Renagang21/o4o-platform/actions/runs/38403004672)의
+API·전체관리자·Neture·약국 협력사업·강의·Store·분회 실제 배포 job과 최종 serving Report가 PASS다.
+최종 Report는7개 모두 target `3809c42db3`의 revision-label을 확인했고 API ready는200이다.
+이 실행의 source에 인증 정비가 포함된다. 이번 세션의 선행 Store/분회 전용 실행은
+API dependency gate에 보류되어 실제 배포0이었다. 보류 실행의 workflow success를 배포 성공으로 세지 않는다.
+
+운영 Demo 검증은 canonical 공개 버튼을 직접 클릭했고 mock 인증 응답을 사용하지 않았다.
+상속 proxy와 검증된 TLS의 실제 upstream 응답을 전달했다. 사용자8 origin은 Neture·공급자·커뮤니티·
+펀딩·약국 협력사업·Store·강의·분회다. 매장 경영자/직원 Store context200, 공급자 products200,
+다른 역할의 해당 API403을 확인했다. 로그아웃200 뒤 기존 access/refresh401,
+Neture에서 Store로 이동한 별도 세션이 원래 origin 로그아웃 후 유지되는 것도 확인했다.
+검증이 만든 세션만 종료했고 실제 Google/카카오·전체관리자 인증은 사용자 담당 범위다.
+
+[최초 GitHub 공개 E2E](https://github.com/Renagang21/o4o-platform/actions/runs/38404670005)는 실패했다.
+이 클라우드의 해당 로그 저장소 접근은 제한되어 있었으므로 로그를 읽었다고 보고하지 않는다.
+동일64개 assertion을 실제 운영에 실행한 로컬 재현은60 PASS·4 FAIL·skip0이다.
+관리자 password 경로404 기대와 Google signup의 필수 policy reference 누락이 각각 PC/mobile에서 실패했다.
+관리자 router는 `authenticate`가 선행되어 존재하지 않는 동일 router 경로도401이다.
+수정은 양쪽401/`AUTH_REQUIRED`·password 힌트 부재를 함께 확인하고 route 부재는 기존 정적 P2로 검증한다.
+Google signup은 DTO 형식의 합성 termsPolicy와 허용 계정 센터 Origin을 제공해
+실제 invalid ID token401/`GOOGLE_ID_TOKEN_INVALID` assertion을 유지했다. 토큰 검증 전에 origin을 검사하고,
+토큰 거절 뒤 계정 transaction·동의 기록에 도달하지 않는다. 최초 보완에서 Origin을 빠뜨려403이 난 것도
+기록하며, 두 필수 조건을 보완한 재실행26/26 PASS와 구분한다. 운영 인증·권한·DB·CI 설정을 바꾸지 않았다.
+
+문서 정합: 과거 push-only 기록은 보존하고 이후 통합·운영 검증 결과를 이 절에 추가했다.
+공개 E2E의 인증 선행 router 주석을 정정했으며 일반 상태 계정·사용자 OAuth·시행일 정책 적용 등
+[잔여 계획](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)의 별도 모집단을 완료로 확대하지 않는다.
+WORKTREE_DISPOSITION: KEEP — 같은 미완료 WO의 후속 검증·2차 조사에 사용하는 cloud checkout이며 제거하지 않는다.
+후속 변경은 E2E·검증 기록뿐으로 DEPLOYMENT=NOT_APPLICABLE이다. 런타임 배포는 위 target에 대한 증거로 판정한다.
+
+GitHub [재실행38407087021](https://github.com/Renagang21/o4o-platform/actions/runs/38407087021)의
+공개 E2E job은 success다. 해당 job 로그 다운로드도 환경의 다른 저장소 제한으로 중단되어
+원문을 읽었다고 주장하지 않는다. 실행 step의 PASS와64조건의 로컬 수집/재현은 구분한다.
+통합 대기 중 main이 이동하여 자기 branch에 충돌 없이 반영했다. 이 동기화와 기록 갱신 이후의
+최종 HEAD는 위 PR의 새 CI/review 기술 게이트를 다시 충족해야 한다.
+
+### 운영 검증 review 보완 — 2026-10-14 (KST)
+
+최종 동기화 HEAD `e753210e9f`의 GitHub 공개 E2E job은
+[38470995960](https://github.com/Renagang21/o4o-platform/actions/runs/38470995960)에서 success다.
+TLS를 검증한 운영 upstream으로 동일 assertion을 실행한 전체 로컬 재검증은64/64 PASS·skip0·retry0이다.
+자동 리뷰는 익명401와 checkout 정적 P2만으로 **배포된** 관리자 route 부재를 구분할 수 없음을 지적했다.
+이 한계를 인정하고 테스트를 보강했다. 공개 Demo 공급자의 canonical credential로 새 일반 세션을 만든 뒤
+본인 me200·살아 있는 관리자 조회403/`ROLE_REQUIRED`·은퇴 password 경로와 동일 router의 없는 경로404를
+함께 확인한다. 이전 route가 다시 등록되면403 또는 입력 오류가 발생하여404 assertion이 실패한다.
+존재하지 않는 합성 대상 UUID와 빈 body를 사용하므로 이전 handler도 password write에 도달하지 않는다.
+검증이 만든 세션만 finally에서 logout200으로 종료한다. 실제 사용자/운영자 자격정보·위조 토큰은 사용하지 않는다.
+이 보완 후 대상26조건은 PC/mobile에서26/26 PASS다. 기존64/64 결과와 재실행26개를 합산하지 않는다.
+현재 수동 workflow의 credential-free 명칭과 달리 이 한 조건은 **의도적으로 공개된 Demo 세션**을 사용하며,
+민감한 계정 fixture나 관리자 credential을 소비하지 않는다. 새 인프라/권한 정책은 추가하지 않는다.
+후속 HEAD의 CI/review·E2E·main 통합 결과는 PR #546의 실제 check와 merge 상태로 확인한다.
+
+### 최종 실행 경계 보완 — 기본 검사와 운영 session smoke 분리
+
+`a93fc1d263`의 전체 로컬64/64·GitHub [38471830955](https://github.com/Renagang21/o4o-platform/actions/runs/38471830955)
+PASS 이후 리뷰에서 ref별 workflow가 동시에 운영 Demo 세션을 변경할 수 있다는 P1이 나왔다.
+실제 로그인은 세션 발급·마지막 로그인 시각·브라우저 폐기 원장 write를 수반한다. 앞 절의
+"비밀번호/계정 write 없음"은 비밀번호·프로필·권한을 바꾸지 않았다는 범위이며, **DB write 전체0이라는 뜻은 아니다**.
+이 경계를 명시하고 CI 인프라를 확대하는 대신 실제 세션 검사를 별도로 분리했다.
+
+- 기본 `playwright.config.ts`는 기존 `*.spec.ts`64조건만 수집한다. 유효한 credential을 보내지 않는다.
+  관리자401 항목은 익명 인증 gate의 거절만 확인하며 route 부재 증거로 주장하지 않는다.
+- `admin-route-retirement.live-smoke.ts`의 실제 me200/관리자403/은퇴404 구분은
+  `playwright.live-smoke.config.ts`로 **사용자가 승인한 운영 smoke 창**에서만 실행한다.
+  `CI`가 설정되거나 승인 flag가 없으면 runner 시작 단계에서 거절한다. workers1·retry0이다.
+- 실행자는 같은 runtime의 배포/운영 DB 작업 및 다른 실제 session smoke가 없음을 먼저 확인하고
+  다른 ref/세션의 live 실행과 직렬화한다. flag를 setup script·workflow에서 자동 설정하지 않는다.
+- 이번 세션은 진행 중인 Promote/deploy/Auth Runtime workflow0과 기존 local live 검사 종료를 확인한 뒤
+  별도 검사를 순서대로 실행했다. PC/mobile2/2 PASS이며 그 검사에서 만든 세션만 종료했다.
+- 기본64조건과 별도 live2조건의 수집 분리를 확인했다. `CI=true`에서 승인 flag가 있어도
+  live config가 시작을 거절하는 것을 실제 확인했다. `.github` workflow·의존성·운영 인증 정책 변경은 없다.
+
+승인된 별도 명령(검사 전 공유 runtime 직렬화 확인 필요):
+
+```bash
+E2E_APPROVED_AUTH_LIVE_SMOKE=1 pnpm exec playwright test --config=e2e/auth-runtime/playwright.live-smoke.config.ts
+```
+
+문서 정합: 이전 회차의 세션 write 표현을 이 절에서 명확히 정정했다. 기본 workflow PASS와
+승인된 실제 세션 smoke PASS를 분리하며, 최종 통합은 PR #546의 최신 HEAD 기술 게이트를 따른다.
