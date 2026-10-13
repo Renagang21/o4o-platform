@@ -6,7 +6,7 @@
  * Data access layer for Neture entities
  */
 
-import { DataSource, Repository, FindManyOptions, ILike } from 'typeorm';
+import { EntityManager, DataSource, Repository, FindManyOptions, ILike } from 'typeorm';
 import {
   NetureProduct,
   NetureProductStatus,
@@ -27,7 +27,7 @@ export class NetureRepository {
   private orderItemRepo: Repository<NetureOrderItem>;
   private supplierOfferRepo: Repository<SupplierProductOffer>;
 
-  constructor(private dataSource: DataSource) {
+  constructor(private dataSource: DataSource | EntityManager) {
     this.productRepo = dataSource.getRepository(NetureProduct);
     this.logRepo = dataSource.getRepository(NetureProductLog);
     this.orderRepo = dataSource.getRepository(NetureOrder);

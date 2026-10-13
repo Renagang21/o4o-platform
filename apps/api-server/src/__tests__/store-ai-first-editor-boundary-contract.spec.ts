@@ -57,6 +57,7 @@ const NON_STORE_REPRESENTATIVES = [
   'packages/shared-space-ui/src/community/CommunityContentWriteShell.tsx', // COMMUNITY
   'packages/shared-space-ui/src/ForumWriteForm.tsx', // COMMUNITY
   'services/web-neture/src/pages/supplier/SupplierProductCreatePage.tsx', // SUPPLIER
+  'services/web-neture/src/pages/supplier/product-create/SupplierCandidateMediaFields.tsx', // extracted Supplier editor
   'packages/operator-core-ui/src/modules/hub-content-write/OperatorHubContentWritePage.tsx', // OPERATOR
   'services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx', // LECTURE (Phase 2 §14: KPA 강사 화면 은퇴)
 ];

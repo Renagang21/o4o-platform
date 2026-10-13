@@ -404,3 +404,12 @@ media_entity_links의 실제 소비처를 다시 조사했다. product/brand/con
 DB development plan 38381041967은 job 생성 후 run.jobs.execute 권한 거부로 실패했다. DB worker는 실행하지 않았으며 운영 삭제는 0건이다. 일회성 ph-dev-38381041967-1은 실패 조사용으로 남아 있다. GitHub 실행 계정의 기존 IAM job 실행 범위는 로컬 관리자의 read-only 정책 조회로 확인 중이다. Delivery 38380573911은 SUCCESS지만 production=HELD_LEVEL_3로 누적 application 변경이 보류돼 있다. 이번 inline maintenance source 실행은 API promote를 필요로 하지 않으며 무관한 누적 배포를 실행하지 않았다.
 
 후속 안전 검증에서는 catalog product 관계 제거 후 실제 product_masters 행이 유지되고, VIDEO Job 관계·외부 FK·URL 소비·catalog link UUID 참조·order log UUID 참조가 삭제를 막는 PostgreSQL fixture를 실행했다. PH 자산의 catalog 관계만 소속 자산과 함께 정리하며 실행 Job 관계는 계속 보호한다. 고정 타입별 카탈로그 집계가 추가됐다. 운영 media/GCS 쓰기는 미실행이다.
+
+PR #537은 필수 CI·SonarCloud·Codex 무지적 후 main 76941a5dae61470ebf53ae738de545d6abd2e673에 병합했다. 운영 census 38385010227은 SUCCESS, reference.complete=true, 실제 연결은 video-production-job 1건·catalog 0건으로 확인됐다. 현행 media worker는 이를 보호하며 실제 GCS/미디어 삭제는 실행하지 않는다. 연결 대상 job의 존재/상태·INPUT/INTERMEDIATE/OUTPUT·다른 서비스 자산·임시 output 유무를 추가 aggregate-only read-only 쿼리로 구분한다. 제목·지침·job/사용자 ID·파일 경로는 출력하지 않는다. orphan/개발 이력인지 실제 공용 job 입력인지 확인하기 전에는 이 연결을 제거하지 않는다. run.jobs.execute 권한 부족은 별도 로컬 IAM 조회 결과를 기다리고 있다.
+
+
+### 고아 VIDEO OUTPUT의 귀속 확인 (2026-10-13)
+
+PR #539는 최신 main 통합 후 CI·SonarCloud PASS 및 Codex blocker 없음으로 main 4604f947e50d38eb558081cc50d9a6059f88aee5에 병합했다. read-only census [38398176276](https://github.com/Renagang21/o4o-platform/actions/runs/38398176276)은 SUCCESS, failed=false, references.complete=true다. PH media 연결 1건은 존재하지 않는 VIDEO Job의 OUTPUT이며, 실제 job 상태별 건수·임시 output은 모두 0이다. 같은 고아 job 식별자의 비-PH 자산 연결 1건은 별도로 남아 있다. 공용 GCS/화면 참조는 0이다.
+
+후속 media scope는 소속 자산이 PH인 catalog 관계 또는 대상 job 부재를 transaction lock 안에서 재확인한 고아 OUTPUT만 허용한다. 고아 INPUT/INTERMEDIATE, 존재하는 job의 OUTPUT, 비-PH 자산과 연결은 계속 보호한다. 링크 1건·자산 4건·개별 GCS 객체 4건의 고정 census 및 cross-schema FK/자산·링크 UUID/URL/경로 검사와 generation 조건은 유지한다. 격리 PostgreSQL fixture에서 존재하는 job 및 고아 INPUT 차단, 고아 OUTPUT plan/apply·rollback, 같은 식별자를 가진 타 서비스 자산/연결 보존을 검증했다. 운영 삭제는 아직 0건이며 run.jobs.execute 권한과 로컬 IAM 조회 결과가 blocker다. WIF는 원래 조건으로 복구된 상태다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
