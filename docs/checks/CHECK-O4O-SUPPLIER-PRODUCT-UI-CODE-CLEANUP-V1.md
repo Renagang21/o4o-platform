@@ -103,5 +103,7 @@ mobile viewport 390px에서 이미지 선택 도구막대가 가로로 넘치는
 이번 책임 분리를 모바일 사용성 개선 완료로 판정하지 않는다. 공통 에디터/1차 Drawer 폭 보완과 실계정 검증은 후속 대상이다.
 
 로그/AST 결과는 `/workspace/artifacts/supplier-code-phase2-*`, browser JSON/스크린샷은
-`/workspace/artifacts/supplier-phase2-browser/`에 보존했다. 검증 서버 종료와 push 일치는 최종 인계에서 확인한다.
+`/workspace/artifacts/supplier-phase2-browser/`에 보존했다. 자기 검증 서버 종료를 확인했다.
+구현 `15498766a0cb946d52c8492d2cc1ea3e0b10a68d`의 branch push와 원격 일치를 확인했다.
+이번 범위는 main 통합/배포/실계정 검증을 포함하지 않는다.
 문서 정합: 정본 정책 변경 없음. 동일 트랙 CHECK에 추가하여 별도 회차 CHECK를 만들지 않았다.

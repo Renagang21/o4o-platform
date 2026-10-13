@@ -1,6 +1,6 @@
 # 공급자 상품 등록·import 코드 정비 — 2차
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거**: 사용자 — 다음 작업 진행. 1차 다음의 등록/import 정비, commit → push 종료 범위 유지.
 
@@ -22,7 +22,7 @@ dependency merge했다. 이전 checkout/branch는 그대로 보존했다.
 - [x] import 분석/편집 workflow·이미지 복사/초안 전달·표시 모듈 분리
 - [x] 기존 소스 경계 검사를 분리된 모듈까지 확장하고 assertion 유지
 - [x] 회귀·타입·빌드·lint·AST 비교·PC/mobile browser 검사
-- [ ] 명시적 파일 commit → branch push → 원격 일치 확인
+- [x] 명시적 파일 commit → branch push → 원격 일치 확인
 
 ## 확정 구현
 
@@ -54,3 +54,10 @@ API·권한·schema·CI·package/lockfile·운영 데이터 변경은 없다. �
 공통 에디터의 변경은 모든 소비처 점검을 거친 별도 범위이며 이번에 임의 수정하지 않았다.
 
 문서 정합: 이번 WO와 동일 트랙 CHECK의 2차 검증 절만 추가. 정본·1차 기록 의미 변경 없음.
+
+## Git 인계
+
+구현 `15498766a0cb946d52c8492d2cc1ea3e0b10a68d`를 `wo/supplier-code-phase2`에 push했고
+`ls-remote` 일치를 확인했다. 이후 완료 기록 commit의 최종 원격 SHA는 결과 보고에서 확인한다.
+앞선 공급자 변경도 dependency merge로 이 branch에 포함된다. main PR/merge·배포는 수행하지 않았다.
+자기 검증 서버는 종료했다. checkout/branch는 KEEP — main 미통합, 후속 인계에 필요하다.
