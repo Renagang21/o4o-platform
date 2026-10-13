@@ -265,6 +265,24 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const r=await service(storage).request(u.id);expect(r.erased).toBe(false);expect(r.state).toBe('review_required');
     expect(storage.deleteGeneration).not.toHaveBeenCalled();
   });
+  it.each([
+    'gcs://fixture-private/kyc/synthetic.pdf',
+    'https://attachments.fixture.invalid/synthetic.pdf',
+    'gs://fixture-private/kyc/synthetic.pdf',
+  ])('unreviewed KYC fileUrl %s preserves the manifest without false completion',async fileUrl=>{
+    const u=await user();
+    const documentId=randomUUID();
+    await db.query(`INSERT INTO kyc_documents(id,user_id,"documentType","fileUrl","fileName")
+      VALUES($1,$2,'business_registration',$3,'synthetic.pdf')`,[documentId,u.id,fileUrl]);
+    const storage={generation:jest.fn(),deleteGeneration:jest.fn()};
+    const result=await service(storage).request(u.id);
+    expect(result).toMatchObject({erased:false,state:'review_required',reviewCodes:['PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED']});
+    expect(await db.query('SELECT "fileUrl" FROM kyc_documents WHERE id=$1',[documentId])).toEqual([{fileUrl}]);
+    expect(await db.query('SELECT id FROM users WHERE id=$1',[u.id])).toHaveLength(1);
+    expect(await db.query("SELECT id FROM account_erasure_audit_events WHERE operation_id=$1 AND action='completed'",[result.operationId])).toHaveLength(0);
+    expect(storage.generation).not.toHaveBeenCalled();
+    expect(storage.deleteGeneration).not.toHaveBeenCalled();
+  });
   it('completed generation fences prevent restoring a deleted identity; malformed IDs cannot affect data',async()=>{
     const u=await user();await service().request(u.id);
     await expect(db.query('INSERT INTO users(id,email) VALUES($1,$2)',[u.id,`${u.id}@fixture.invalid`])).rejects.toMatchObject({code:'P0001'});

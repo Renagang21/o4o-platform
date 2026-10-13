@@ -1,6 +1,24 @@
 # WO-O4O-CODE-COMPLEXITY-PHASE2-V1
 
-상태: 회원 콘솔 첫 묶음 구현·검증·push 완료 (2026-10-13)
+상태: 선택 정비 구현·PR #541 정상 main 통합·비분회 6개 배포 완료 (2026-10-13)
+
+## 0. 현재 완료와 다음 정비 판단
+
+회원 콘솔·AI 실행 evidence·콘텐츠 모달 async lifetime의 선택 정비는 PR #541로 main
+`5742dce8d9`에 반영됐다. PR/main CI PASS, 선택 api/admin/neture/kpa-society/lecture/store
+Promote38406578739 및 최종 serving Report PASS, 직접 HTTP6개200. 분회 배포는 제외했다.
+집계 production은 분회 NOT_SELECTED 때문에 pending이며 선택6개 배포 결과와 구분한다.
+
+아래 §1~§14의 push-only/미완료 checkbox는 당시 실행 순서의 기록이다.
+N02·AI 상태 및 §12.3 모달 잔여는 §13~§14에서 처리했으며 현재 잔여로 중복 집계하지 않는다.
+추가 후보는 인증/서비스 이동·키오스크·의존성 조사, 가입 승인/회원 수정 처리 계약, 전체 공통화다.
+이 후보를 이번 완료 범위나 즉시 구현 약속으로 승격하지 않는다.
+
+사용자의 반복 정비 방침에 따라 지금 효과가 있는 내부 정비만 선별한 뒤 원래 통합 후속으로 복귀한다.
+계정 제거의 같은 transaction 인가 중복은 기존 private 함수로 정리하며, 미분류 파일의 실제 누락은
+[Core WO §10.7](WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md)와
+[domain/file inventory](../investigations/IR-O4O-ACCOUNT-ERASURE-DOMAIN-FILE-INVENTORY-V1.md)에서 이어서 추적한다.
+서비스 간 공통화는 전체 정비 단계에서 소비처/업무 차이를 확인한 뒤 판단한다.
 
 ## 1. 지시와 종료 범위
 
