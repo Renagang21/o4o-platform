@@ -40,7 +40,7 @@ main `20ed384b1` 기준으로 다음을 확인했다. 운영 DB 내용·실계�
 | 경로 | 조사한 실제 동작 | 구현 시 정렬할 차이 |
 | --- | --- | --- |
 | 서비스 사용중지 | [MembershipApprovalService.suspendMembershipCore](../../apps/api-server/src/services/approval/MembershipApprovalService.ts)는 서비스 운영 범위의 active 가입을 정지하고 해당 권한을 중지. 플랫폼 권한은 별도 범위 | 해당 서비스 사용중지가 공통 계정 또는 다른 서비스의 제거 권한으로 확대되지 않도록 유지 |
-| 전체관리자 삭제 | [AdminUserController.deleteUser](../../apps/api-server/src/controllers/admin/AdminUserController.ts), `DELETE /api/v1/admin/users/:id`. 현재 `platform:super_admin`만 호출. Super Admin/Demo 보호 후 hard-delete | FK 오류23503이면 isActive=false·역할 제거 후 success=true를 반환하는 fallback은 완전 제거가 아님. 일반 개인정보가 남으며 제거 성공으로 판정하면 안 됨 |
+| 전체 관리자 삭제 | [AdminUserController.deleteUser](../../apps/api-server/src/controllers/admin/AdminUserController.ts), `DELETE /api/v1/admin/users/:id`. 현재 `platform:super_admin`만 호출. Super Admin/Demo 보호 후 hard-delete | FK 오류23503이면 isActive=false·역할 제거 후 success=true를 반환하는 fallback은 완전 제거가 아님. 일반 개인정보가 남으며 제거 성공으로 판정하면 안 됨 |
 | 다른 관리자 삭제 경로 | [UserManagementController.deleteUser](../../apps/api-server/src/controllers/UserManagementController.ts), `DELETE /api/v1/users/:id`; [UserRepository.softDeleteUser](../../apps/api-server/src/repositories/UserRepository.ts)를 호출. [Admin UserApi.deleteUser](../../apps/admin-dashboard/src/api/userApi.ts)도 이 경로를 참조 | soft-delete 시도와 완전 제거 계약은 다름. 두 API의 mount·인증·실제 UI 소비처를 함께 확정해야 함 |
 | 개인 첨부파일 | 보유기간 정본 §9의 계정 제거→GCS 연동 미구현 | 계정 row 삭제만으로 개인 파일까지 제거했다고 보고할 수 없음 |
 
