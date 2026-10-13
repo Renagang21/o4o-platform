@@ -190,7 +190,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         pendingInquiries: unreadMessages,
         activeProducts,
         pendingRegs,
-      });
+      }, (_req as AuthenticatedRequest).user?.id ?? '');
 
       const aiItems: ActionQueueItem[] = aiRaw.map((a) => ({
         id: a.id,

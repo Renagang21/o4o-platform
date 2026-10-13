@@ -20,7 +20,11 @@
  * - API 키는 env/Secret(ai_settings)에서만 주입(`resolveAiApiKey`) · 코드·로그에 기록하지 않는다.
  */
 
-import { execute } from '@o4o/ai-core';
+import { execute, runAiExtension } from '@o4o/ai-core';
+import type { ExecuteResult } from '@o4o/ai-core';
+import { randomUUID } from 'node:crypto';
+import { webResearchExtension } from '../ai-extensions/web-research.extension.js';
+import logger from '../../utils/logger.js';
 import type { AIGroundingMetadata } from '@o4o/ai-core';
 import { AppDataSource } from '../../database/connection.js';
 import { resolveEditingModel } from '../../utils/ai-editing-model-resolver.js';
@@ -35,9 +39,6 @@ import { resolveAiApiKey } from '../../utils/ai-key.util.js';
 export const WEB_RESEARCH_TIMEOUT_MS = 24_000;
 /** 시도 횟수 — 시간 예산 안에서 1회. 재시도를 넣으면 최악 시간이 LB 상한을 넘는다. */
 export const WEB_RESEARCH_MAX_ATTEMPTS = 1;
-
-const DEFAULT_SYSTEM_PROMPT =
-  '너는 근거를 검색해 답하는 범용 리서치 어시스턴트다. 최신 웹 검색 결과에 근거해 간결하고 정확하게 답하라.';
 
 export interface WebResearchRequest {
   /** 리서치 질의(범용) */
@@ -75,16 +76,26 @@ export async function runWebResearch(request: WebResearchRequest): Promise<WebRe
   const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
 
   // 3. 범용 grounding 호출 — model 은 admin 해석값, provider 는 gemini 고정
-  const result = await execute({
-    systemPrompt: request.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
-    userPrompt: request.query,
-    provider: 'gemini',
-    grounding: true,
-    config: { apiKey, model },
-    timeoutMs: request.timeoutMs ?? WEB_RESEARCH_TIMEOUT_MS,
-    retry: { maxAttempts: WEB_RESEARCH_MAX_ATTEMPTS },
-    meta: { service: 'web-research', callerName: 'runWebResearch' },
+  let result: ExecuteResult | undefined;
+  await runAiExtension({
+    extension: webResearchExtension, input: request,
+    context: { requestId: randomUUID(), serviceId: 'web-research', featureId: 'web.research', principal: 'public', audience: 'consumer' },
+    materials: [], funding: { payer: 'platform' },
+  }, {
+    invoke: async prompt => {
+      result = await execute({ ...prompt, provider: 'gemini', grounding: true,
+        config: { apiKey, model }, timeoutMs: request.timeoutMs ?? WEB_RESEARCH_TIMEOUT_MS,
+        retry: { maxAttempts: WEB_RESEARCH_MAX_ATTEMPTS },
+        meta: { service: 'web-research', callerName: 'runWebResearch' },
+      });
+      return { ...result, provider: result.provider ?? 'gemini' };
+    },
+  }, {
+    // Existing public research surface only; the Core disallows staff materials or mutations for public principals.
+    authorize: async context => context.principal === 'public' && context.serviceId === 'web-research' && context.featureId === webResearchExtension.id,
+    record: async event => { logger.info('[AI_EXTENSION]', event); },
   });
+  if (!result) throw new Error('RESEARCH_FAILED');
 
   return {
     content: result.content,
