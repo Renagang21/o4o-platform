@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import LegacyEducationRequestsPanel from '../LegacyEducationRequestsPanel';
 
 const { get, patch } = vi.hoisted(() => ({ get: vi.fn(), patch: vi.fn() }));
@@ -18,6 +18,28 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('Study handles pre-existing education inquiries', () => {
+  it('reports list failure without a false empty result and retries', async () => {
+    get.mockRejectedValueOnce(new Error('unavailable'));
+    render(<LegacyEducationRequestsPanel />);
+    await screen.findByRole('alert');
+    expect(screen.queryByText('기존 문의가 없습니다.')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '다시 불러오기' }));
+    await screen.findByRole('button', { name: '기존 강의 문의 · 문의자' });
+  });
+  it('does not let an old detail request replace the latest selected inquiry', async () => {
+    let first!: (value: unknown) => void;
+    get.mockImplementation(async (path: string) => {
+      if (path === base) return { data: { data: { items: [inquiry, { ...inquiry, id: 'second', subject: '최신 문의' }], pagination: { totalPages: 1 } } } };
+      if (path.endsWith('/existing-id')) return new Promise(resolve => { first = resolve; });
+      return { data: { data: { ...inquiry, id: 'second', subject: '최신 문의', email: 'synthetic@example.invalid', message: '최신 본문' } } };
+    });
+    render(<LegacyEducationRequestsPanel />);
+    fireEvent.click(await screen.findByRole('button', { name: '기존 강의 문의 · 문의자' }));
+    fireEvent.click(screen.getByRole('button', { name: '최신 문의 · 문의자' }));
+    await screen.findByText('최신 본문');
+    await act(async () => first({ data: { data: { ...inquiry, message: '이전 본문' } } }));
+    expect(screen.queryByText('이전 본문')).toBeNull();
+  });
   it('opens the existing record and saves its status through the Study operator API', async () => {
     render(<LegacyEducationRequestsPanel />);
     fireEvent.click(await screen.findByRole('button', { name: '기존 강의 문의 · 문의자' }));
