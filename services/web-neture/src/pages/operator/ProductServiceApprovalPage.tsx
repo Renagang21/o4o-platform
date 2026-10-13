@@ -720,21 +720,21 @@ export default function ProductServiceApprovalPage() {
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0 basis-[calc(100%-6rem)] xl:basis-auto" onClick={() => setDrawerItem(item)}>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                  <button type="button" aria-label={`상품 상세 열기: ${item.productName || '(이름 없음)'}`} className="text-left flex-1 min-w-0 basis-[calc(100%-6rem)] xl:basis-auto" onClick={() => setDrawerItem(item)}>
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
                       <span className="font-medium text-slate-900 truncate max-w-full">{item.productName || '(이름 없음)'}</span>
                       {item.brandName && (
                         <span className="text-xs text-slate-400 shrink-0">({item.brandName})</span>
                       )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                    </span>
+                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                       <span className="font-mono">{item.barcode || '-'}</span>
                       <span>·</span>
                       <span>{item.supplierName || '-'}</span>
                       <span>·</span>
                       <span>{formatPrice(item.priceGeneral)}</span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
 
                   {/* Badges + Recommendation */}
                   <div className="flex flex-wrap items-center gap-2 shrink-0 w-full xl:w-auto">

@@ -15,15 +15,19 @@ interface Props {
 }
 
 /** 입력/표시만 담당한다. 요청과 입력 보존·중복 전송 방어는 부모가 소유한다. */
-export function ProductServiceApprovalDecisionModal({ decision, batch, count, value, error, busy, canManage, onChange, onCancel, onConfirm }: Props) {
+export function ProductServiceApprovalDecisionModal({ decision, batch, count, value, error, busy, canManage, onChange, onCancel, onConfirm }: Readonly<Props>) {
   const reject = decision === 'reject';
-  const title = batch ? `일괄 ${reject ? '거절' : '승인'} (${count}건)` : reject ? '승인 거절' : '상품 승인';
+  const action = reject ? '거절' : '승인';
+  const singleTitle = reject ? '승인 거절' : '상품 승인';
+  const title = batch ? `일괄 ${action} (${count}건)` : singleTitle;
+  const singleDescription = reject ? '이 상품의 서비스 승인을 거절합니다.' : '이 상품의 서비스 승인을 처리합니다.';
+  const description = batch ? `선택한 승인대기 상품을 일괄 ${action}합니다.` : singleDescription;
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <div role="dialog" aria-modal="true" aria-label={title} className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <dialog open aria-modal="true" aria-label={title} className="relative m-0 border-0 bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
         <p className="text-sm text-slate-500 mb-4">
-          {batch ? `선택한 승인대기 상품을 일괄 ${reject ? '거절' : '승인'}합니다.` : reject ? '이 상품의 서비스 승인을 거절합니다.' : '이 상품의 서비스 승인을 처리합니다.'}
+          {description}
         </p>
         {reject && <div className="flex flex-wrap gap-1.5 mb-3">
           {REJECT_TEMPLATES.map((tpl) => <button key={tpl} onClick={() => onChange(tpl)} disabled={busy}
@@ -42,7 +46,7 @@ export function ProductServiceApprovalDecisionModal({ decision, batch, count, va
             {reject ? '거절 확인' : '승인 확인'}
           </button>
         </div>
-      </div>
+      </dialog>
     </div>
   );
 }

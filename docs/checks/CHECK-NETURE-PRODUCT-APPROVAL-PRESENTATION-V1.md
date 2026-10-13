@@ -39,3 +39,14 @@ Neture 내부 Drawer는 상세 표시·부모 행동 전달, 결정 모달은 �
 전체 TODO 두 문서에서 이미 배포된 작업과 이번 push 단위 완료를 구분했다. 과거 개별 WO/CHECK의 당시 미병합 기록은 보존했다.
 종료는 commit/push다. 이번 작업의 PR 생성·main merge·배포는 하지 않는다. 실계정 검증은 사용자 담당이다.
 WORKTREE_DISPOSITION: KEEP — 이 branch는 아직 미병합, 기존 작업공간 보존.
+
+## 사용자 요청 후 main 통합 준비
+
+초기 push 기록 이후 사용자 요청으로 merge/배포까지 확장했다. 최신 main `5742dce8d` 반영, 표시 정비 소스 충돌 0.
+앞선 통합 main `3809c42db` 기준 Neture 90 files/794 tests 및 build PASS.
+PR #544 SonarCloud의 새 UI keyboard/read-only/dialog/nested conditional 지적을 처리했다.
+상세 진입·배경 닫기는 native button, 상세/결정 표시는 native dialog(open), props는 Readonly, 모달 제목/설명 조건은 명시적으로 분리한다.
+API·권한·심사 guard·실패 보존 정책을 바꾸지 않는다. 최신 main에서 page 회귀 4 files/40 tests, build 및 변경 파일 lint PASS.
+Chromium desktop/mobile 16개 승인·거절 실패/전체 실패/부분 성공/재시도·키보드 Enter 상세 진입 시나리오 PASS.
+환경 게시로 이전 /tmp fixture가 초기화되어 합성 fixture를 새로 작성했으며 실제 운영 회원 데이터나 계정은 사용하지 않았다.
+이전 전체 관리자 용어 정비는 독립 검토 branch `wo/admin-terminology-finalization`에서 준비했으며 이번 PR에서 함께 통합한다.
