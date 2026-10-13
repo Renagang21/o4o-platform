@@ -1,10 +1,10 @@
 # O4O 두 단계 계정 완전 제거 Core 변경 WO
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-13
 > **근거 WO/IR**: [통합 WO §10~§11](WO-O4O-FRONTEND-INTEGRATED-STABILIZATION-V1.md) · [후속 TODO](TODO-O4O-INTEGRATED-PRIVACY-FOLLOWUP-V1.md) · [보존 조사](../investigations/IR-O4O-COMMUNITY-MEMBERSHIP-HISTORY-RETENTION-PROPOSAL-V1.md)
-> **범위**: 기존 통합 WO 후속 Core/API 코드·격리 합성 검증. §2~§9는 승인 전 조사/제안 기록이며, 승인 후 실제 구현과 한계는 §10을 따른다. 운영 집행 완료가 아니다.
-> **조사 기준**: 시작 시 fetch한 main `63653694b3bc35b4d127541fafb76f021df1bf68`; 로컬 격리 PostgreSQL의 schema metadata와 rollback 합성 fixture. 운영 DB/실계정/GCS 조회·삭제 0.
+> **범위**: 기존 통합 WO 후속 Core/API 코드·격리 합성 검증. §2~§9는 승인 전 조사/제안 기록이며, 승인 후 실제 구현과 한계는 §10을 따른다. 코드/운영 준비 상태와 실제 계정·파일 파기는 구분한다.
+> **초기 조사 기준(2026-10-12)**: 시작 시 fetch한 main `63653694b3bc35b4d127541fafb76f021df1bf68`; 로컬 격리 PostgreSQL의 schema metadata와 rollback 합성 fixture. 운영 DB/실계정/GCS 조회·삭제 0.
 
 ## 1. 확정 정책과 Core 승인 경계
 
@@ -188,3 +188,10 @@ main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 m
 ### 10.5 legacy 완료 operation의 연락처 marker retirement
 
 24단계 migration은 완료 operation까지 legacy identity hash를 파기하고 UUID-only writer 함수를 적용한다. table lock 안에서 UUID-only CHECK를 추가해 구버전 serving API의 hash 재삽입도 거절한다. capability/ready는 이 제약의 validated 상태를 필수로 확인한다. 최종 schema 지문 `0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50`,6618 lines이며 fresh baseline→24/기존23→24/no-op·migration contract21 checks PASS.23단계 원본/지문은 불변이다. 새24단계 코드·격리 검증은 승인된 Core WO 재검토 수정 범위이며 실제 운영23/24 적용은 별도 승인 대상이다. 파기한 연락처 hash를 복원하지 않고 forward repair를 요구한다.
+
+
+### 10.6 운영 준비 상태 재확인 — 2026-10-13
+
+사용자가23/24 migration 및 기능 OFF API/Admin 실행안을 승인했다. 현재 운영은 소유 트랙의 API/Admin verified target `88d45b8208`까지 이미 반영됐고23/24/25 history가 준비 상태다. 이번 standalone read-only plan38336196583도 세 history=true·schemaReady=true를 확인했다. 중복 DDL/재배포를 실행하지 않았다. 배포 설정은 erasure flags를 주입하지 않아 코드 기본 OFF이며, 실제 super-admin capability 응답은 마지막 본인 Google 검증으로 구분한다.
+
+상세 run/증거와 한계는 CHECK의2026-10-13 절을 따른다.12일 dry-run/HELD/운영 실행0 문구는 당시 기록이다. 운영 준비 확인으로 §10.2의 전수 분류·법정 적용 근거·GCS/backup/producer·lock 검증을 완료하거나 계정/파일 파기·job/법률 게시를 승인했다고 해석하지 않는다. 마지막 일반 계정/본인 OAuth/운영자 테스트도 아직 미완료다. 같은 통합 WO를 ACTIVE로 유지한다.

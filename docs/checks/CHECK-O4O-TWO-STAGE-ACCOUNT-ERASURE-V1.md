@@ -1,9 +1,9 @@
 # O4O 두 단계 계정 제거 공통 영향 검증
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-12
+> **작성일**: 2026-10-12 · **최종 갱신**: 2026-10-13
 > **근거 WO/IR**: [Core WO](../work-orders/WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md) §10
-> **범위**: 코드/격리 합성 검증·PR/main 추적. 운영 DB/GCS 집행·일반 실계정 OAuth 완료 기록이 아니다.
+> **범위**: 코드/격리 합성 검증·PR/main·운영 준비 상태 추적. 실제 계정/GCS 제거와 일반 실계정 OAuth는 미실행이다.
 
 ## Shared Module Change Verification
 
@@ -74,7 +74,9 @@ node scripts/db/check-migration-contract.mjs
 
 UUID 없는 고유 이메일/출처 식별자의 문자열·JSON 재복사도7일 writer fence로 차단하는 합성 회귀 PASS. restore key에는 원문 대신 해시·문자 길이만 저장하며 완료 시 transient UUID를 제거한다. 이 추가 fence의 운영 성능/충돌 영향도 활성화 전 평가 대상이다.
 
-## 운영 DDL 포함 배포 승인안 — 실행 전
+## 운영 DDL 포함 배포 승인안 — 2026-10-12 준비 기록
+
+이 절은 준비 당시 기록이다. 2026-10-13 사용자의 실행 승인과 이미 적용된 운영 상태 재확인은 문서 말미의 최신 절을 따른다. 같은23/24 실행 승인을 다시 요청하지 않는다.
 
 승인 대상 후보는 **코드의 기본 비활성 상태로 API/Admin만 verified 배포**다. main 병합·post-merge CI·최신 main SHA 고정 후 `promote.yml`의 `services=api,admin`을 사용하며 분회/다른 web 전용 배포는 포함하지 않는다. 먼저 `dry_run=true`로 실제 serving gap·freeze·계정 권한·pending migration 전부를 확인한다. repository variable 조회는 현재 주입 GitHub integration 권한의403으로 직접 확인되지 않았으며 workflow 판정을 대신 승인했다고 표시하지 않는다.
 
@@ -142,3 +144,15 @@ legacy provider 범위 P2: 인증 타입 `AuthProvider` 전체(email/google/kaka
 - [선택 Promote dry-run38243289400](https://github.com/Renagang21/o4o-platform/actions/runs/38243289400): main SHA b1570cc9 고정·services=api,admin·dry_run=true, workflow/Classify SUCCESS. API/Admin/Web/Report 전부 skipped; tag/traffic/migration/운영 data write0. 상세 artifact는 redirect 접근 제약으로 확보하지 못했으며 상세 serving snapshot/승격 decision JSON을 확인 완료로 표시하지 않는다. 실행 시 최신 main·CI·freeze·serving 및 전체 pending migration을 다시 확인하는 정상 gate를 유지한다.
 - 운영 실행 승인안: 삭제 기능 비활성 상태에서23/24 migration 및 API/Admin verified rollout.23단계5테이블/기존 writer trigger·24단계 연락처 hash retirement/UUID-only 함수·table lock/검증 제약이 대상이다. 일반 계정·GCS 파기/apply flags/job/새 법률 게시·재동의·분회 전용 배포는 포함하지 않는다. source/local 검증은 운영 schema 적용·전수 inventory 완료 증거가 아니다.
 - 동일 WO의 통합 증거 phase로 branch/worktree를 유지한다(새 독립 WO 재사용 아님). WORKTREE_DISPOSITION=KEEP; 활성화 전 전수 분류/법률 시행/마지막 사용자 테스트 잔여를 유지한다.
+
+
+## 운영 준비 재확인 — 2026-10-13
+
+사용자가 migration23/24 및 삭제 기능 OFF API/Admin 실행안을 승인했다. 최신 main을 다시 조사하니 소유 트랙에서 이미 운영 반영이 완료돼 있었다. 중복 DDL/배포를 실행하지 않고 실제 이력과 성공한 배포 기록을 확인했다.
+
+- 인증 소유 WO/CHECK의 [read-only plan38325970867](https://github.com/Renagang21/o4o-platform/actions/runs/38325970867)은 native annotation에 `privacyPreparation=true`, `legacyHashRetirement=true`, `staffDemo=false`를 보고했다. 당시23/24는 이미 적용됐고25만 미적용이었다.
+- [API Promote38326847455](https://github.com/Renagang21/o4o-platform/actions/runs/38326847455)는 migration25 및 verified API rollout 성공; [Web/Admin Promote38327819896](https://github.com/Renagang21/o4o-platform/actions/runs/38327819896)는 Admin rollout 성공이다. 두 기록의 runtime target은 `88d45b8208bdf9a24e63fb1fe70d0ad69233c0fd`다. 이 작업이 다른 담당의 웹/분회 배포를 수행한 것으로 기록하지 않는다.
+- 이번 재확인의 [standalone read-only plan38336196583](https://github.com/Renagang21/o4o-platform/actions/runs/38336196583)은 main `1b158cf4c1673b066de8ed8dd05038562c0f6469`에서 SUCCESS. native annotation의 `mode=plan`, `schemaReady=true`, 세 history 항목 모두true 및 business identity 보존을 확인했다. 계정/관계/파일 쓰기0; PH purge/QR/DNS 조작0이다.
+- 성공한 API 배포 workflow는 `--set-env-vars`의 지정 목록을 적용하며 `ACCOUNT_ERASURE_*`를 주입하지 않는다. 네 optional carry 항목에도 포함하지 않는다. 따라서 승인된 배포 설정/코드 기준 삭제 기능은 기본 OFF다. 실제 super-admin capability 응답은 본인 Google 인증을 수행할 마지막 사용자 검증 항목으로 남긴다. 관리자 인증을 대체하거나 Demo 권한을 높이지 않았다.
+- 코드/기록 변경 이후 최신 Delivery는 `NO_DEPLOY`다. 이 phase의 새 migration·API/Admin 재배포·일반 계정/GCS 제거·retention job 활성화·법률 게시0이다. 현재25단계 상태를24단계 로컬 checkpoint 지문0d25da3d와 혼동하지 않는다. 운영 schema의 최신 전체 fingerprint를 이번 plan이 직접 출력했다고 주장하지 않는다.
+- 전수 domain/file/producer/orphan 분류, 실제 GCS/backup·lock 검증, 법정1/2년 적용 근거 및 공개 본문/시행, 마지막 일반 계정/본인 OAuth·운영자 검증은 미완료다. API/Admin 운영 준비 완료를 삭제 기능 활성화나 통합 WO 전체 완료로 확대하지 않는다. WORKTREE_DISPOSITION=KEEP.
