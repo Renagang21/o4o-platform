@@ -62,24 +62,19 @@ for (const svc of ALL_SERVICES) {
     });
 
     test('redirect 무한 루프 없음', async ({ page }) => {
-      const redirectCount = { value: 0 };
-      let lastUrl = '';
-
+      const visits = new Map<string, number>();
       page.on('framenavigated', (frame) => {
         if (frame !== page.mainFrame()) return;
-        const u = frame.url();
-        if (u === lastUrl) {
-          redirectCount.value++;
-        }
-        lastUrl = u;
+        const url = frame.url();
+        visits.set(url, (visits.get(url) ?? 0) + 1);
       });
 
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(5000);
 
       expect(
-        redirectCount.value,
-        `[${svc.name}] 동일 URL 반복 리다이렉트 ${redirectCount.value}회 — 루프 의심`,
+        Math.max(0, ...visits.values()),
+        `[${svc.name}] URL 반복 방문 ${Math.max(0, ...visits.values())}회 — 루프 의심`,
       ).toBeLessThan(3);
     });
 

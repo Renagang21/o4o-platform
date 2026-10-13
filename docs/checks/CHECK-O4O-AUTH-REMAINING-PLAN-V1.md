@@ -72,7 +72,7 @@ Demo3의 연결·멱등성·FK 검증은 완료됐지만 모든 미사용 콘텐
 ## 새로 확인한 과거 E2E 드리프트
 
 `e2e/auth-runtime`과 `.github/workflows/e2e-auth-runtime.yml`은 과거 Google-only 정책을 사용한다.
-사용자 화면 password 입력 부재와 현재 복구된 이메일 endpoint의404를 요구하고, KPA 대상도 과거 도메인이다.
+사용자 화면 password 입력 부재를 요구하고 KPA 대상도 과거 도메인이다. 은퇴 `/auth/login` 등의404 검증은 현행 `/auth/email/login`과 별개이며 은퇴 경로 차단은 유지한다.
 workflow에는 frozen 설치 실패 후 non-frozen 재설치와 credential guard의 닫히지 않은 quote도 남아 있다.
 이 스위트를 현재 운영 PASS 기준으로 실행하지 않았다. 일반 사용자 password 지원과 전체관리자 Google 전용을 분리해야 한다.
 
