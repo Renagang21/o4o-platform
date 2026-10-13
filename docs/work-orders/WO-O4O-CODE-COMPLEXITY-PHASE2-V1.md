@@ -695,3 +695,26 @@ worktree disposition: KEEP — 동일 WO 연속 branch, 우리 변경은 아직 
 - 최종 main 대비 diff-check PASS. 기록 문장의 source 변경 없음 오기를 contract 변경 없음으로 바로잡았다.
 - 이 확인 기록과 구현·main 통합 이력을 같은 branch에 push한다. 원격 SHA 일치/clean 여부는 최종 보고에서 확인한다.
   push-only 종료, PR/main 병합/배포/운영 계정 또는 운영 자원 변경 없음.
+
+## 15. 정상 main 통합·배포 — 사용자 추가 지시
+
+사용자가 누적 정비의 main merge·배포를 지시했다. 이전 push-only 종료 기록은 당시 기록으로 보존한다.
+최신 main `75a28d9313`의 두 release 기록 문서를 정상 merge하고 PR #541을 생성했다.
+
+Codex 리뷰의 P2: content-editor의 48개 Vitest lifecycle 테스트가 기본 test/required CI에 연결되지 않았다.
+기존 API Jest discovery에 `content-editor-modal-lifecycle-runner.spec.ts`를 추가해 실제 Vitest suite를
+Node 자식 process에서 실행한다. Vite import.meta.env를 Jest CJS로 억지 변환하지 않고 실제 React/ESM 테스트를 유지한다.
+root `pnpm test`는 API의 test script를 실행하고 required CI는 API 전체 test 목록을 3 shards로 실행하므로
+이 bridge가 두 기본 실행 경로에서 발견된다. child exit status와 nonzero PASS summary를 검사하고 실제 counts/실패 상세를 출력한다.
+
+검증: 기본 API Jest로 bridge 1건 PASS, child Vitest 4 files / 48 tests PASS.
+새 Jest 파일 ESLint 오류·경고 0. package/dependency/lockfile/CI workflow/config 변경 없음.
+기존 API runner로 실행을 연결하는 test-only 수정이며 runtime/API/권한 계약 변경 없음.
+새 head의 required CI와 리뷰 지적 해결을 확인한 뒤 정상 merge·main CI·Delivery/Promote를 진행한다.
+
+배포 판정 준비: API의 MembershipConsoleController/profile-update가 RBAC 경로로 LEVEL_3에 해당한다.
+선택 서비스는 api/admin/neture/kpa-society/lecture/store. 분회 전용 배포 제외를 유지한다.
+새 migration/DDL/운영 데이터 삭제는 포함하지 않는다. serving 기준 최종 판정과 rollout은 공식 workflow의 기술 gate를 따른다.
+현재 cloud의 외부 서비스 직접 HTTP는 proxy 403이다. 공식 workflow의 revision smoke/health/serving SHA 결과를 확인하며
+직접 외부 HTTP 검증을 수행했다고 표시하지 않는다. repository variable 조회도 integration 403이므로
+freeze 상태는 workflow의 실제 판정으로 확인한다.
