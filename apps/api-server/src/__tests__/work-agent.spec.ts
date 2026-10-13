@@ -262,6 +262,8 @@ describe('Action (§14·§16)', () => {
     expect(db.commands.filter((c) => String(c.action).startsWith('local.computer.'))).toHaveLength(0);
     expect(result.takeover?.reason).toBe('goal_sufficiently_advanced');
     expect(result.progress).toBe('completed');
+    expect(result.report).toMatchObject({ claim: 'execution_complete', runOpened: true });
+
 
     // 확장이 COMMIT 으로 막으면 commit_required 인계
     const commit = await run('약학정보원에서 결제해줘', scripted([{ action: { kind: 'click', elementRef: 'e_4' } }]), {
@@ -316,6 +318,15 @@ describe('Takeover (§19·§20·§21)', () => {
       expect(result.progress).toBe('needs_user');
       expect(result.goal.status).toBe(QUESTION_REASONS.has(reason) ? 'waiting_for_user' : 'taken_over');
       expect(result.resumable).toBe(QUESTION_REASONS.has(reason));
+      expect(result.report).toMatchObject({
+        claim: QUESTION_REASONS.has(reason) ? 'needs_user' : 'handed_over',
+        runOpened: true, resultObserved: false, replayVerified: false,
+        memory: { targetId: SITE, targetKind: 'browser_site' },
+      });
+      if (QUESTION_REASONS.has(reason)) expect(result.report?.memory?.resumeFrame).not.toBeNull();
+      else expect(result.report?.memory?.resumeFrame).toBeNull();
+      expect(JSON.stringify(result.report?.memory)).not.toContain('약학정보원에서 아모디핀정 찾아줘');
+
       expect(result.message).toContain('Chrome');
     }
     // 등재 밖 이동 차단 → unsupported_control

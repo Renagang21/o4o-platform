@@ -220,3 +220,61 @@ N01의 이번 회원 조회/역할 후보는 검증·정비 완료했다. §7 N0
 본 종료 기록도 같은 branch의 문서 후속 commit으로 push한다.
 최신 main 기준은 여전히 `f66ed5f5f8`. PR 생성·main 병합·배포·운영 DB 변경은 하지 않았다.
 CI/리뷰 integration-ready 판정은 하지 않으며 위 결과는 로컬 검증이다.
+
+
+## 10. N02 AI runtime·콘텐츠 모달 — TODO 초안
+
+같은 WO/branch의 연속 묶음이다. 시작 main `af24236df8`을 확인했다.
+기존 기준 이후 main 변경은 PH 작업 문서 1개이며 이번 소스와 겹치지 않아
+origin/main을 정상 merge했다. 이전 미병합 정비 commit도 유지한다.
+
+- [x] C01: AI 종료/결과 구성과 모달 변환/저장/상태 책임 조사.
+- [x] C02: 정본·소비처·은퇴 경계·테스트와 대조해 구현/보류 목록 검증.
+- [x] C03: 검증된 내부 함수 추출 구현. 기존 public export/API·상태·부작용 순서 유지.
+- [ ] C04: 관련 기존 suite와 변환/종료 보고 행동 검증, 패키지/API 빌드·lint.
+- [ ] C05: 전후 지표·실행 결과·큰 함수 잔여 기록.
+- [ ] C06: commit·push 후 원격 일치 확인. main 병합·배포 없음.
+
+
+### 10.1 TODO 검증 결과 (구현 전)
+
+| 후보 | 판정 |
+|---|---|
+| C-R01 runtime 종료 보고 | finish closure의 claim/관찰 근거/replay/최소 기억 구조를 순수 snapshot mapper로 추출. 원장 저장·경험/도움 기록·로그 순서를 그대로 유지 |
+| C-R02 종료 상태 판정 | completed/question/takeover/needs_user 우선순위를 module-local 함수로 분리. 기존 상태 enum·재개 계약은 변경하지 않음 |
+| C-M02 저장 본문 구성 | 세 저장 경로의 요청 body를 각각의 stateless builder로 추출. API 경로·fetch·오류·콜백·상태 setter는 각 handler에 유지. title/fallback/metadata/usageType 계약을 행동 검증 |
+| C-M01 콘텐츠 형식 변환 | htmlToForumBlocks / blocksToHtml 및 UrlBlock 타입을 content-editor 내부 모듈로 추출. index public exports 변경 없음 |
+| C-H01 runtime 전체 분해 | replay/observe/복구/단위 dispatch는 공유 mutable state가 많음. 큰 Context 객체나 함수 주입 프레임워크를 급히 만들지 않고 후속 상태 전이 조사에 남김 |
+| C-H02 모달 저장 통합 | 커뮤니티/내 매장/제작 자료의 body·권한·오류·콜백 계약이 다름. 범용 save 훅으로 합치지 않음 |
+
+변환 함수는 기존 모달의 단일 내부 소비 경로를 유지한다. 서비스 간 공통화가 아니라 이미
+공통 패키지 안의 책임 분리다. Shared Module Change Protocol에 따라 Toolbar와
+CommunityContentWriteShell 및 content-editor import 소비 앱/패키지를 확인했다.
+Store 내부 AI 은퇴/외부 LLM 계약과 Community/Lecture 기존 보조 AI를 구분했다.
+Store AI 진입·서비스 정책·분회 전용 코드는 변경하거나 복구하지 않는다.
+
+검증: 기존 AI runtime/기억/재개/복구/단위 dispatch 관련 suite와 Store 내부 AI 은퇴·
+외부 LLM·editor boundary source 계약을 실행한다. DOM 변환은 실제 jsdom DOMParser로
+행동 검증한다. content-editor와 API typecheck/build를 실행하며 state/네트워크/UI
+동작을 바꾸지 않는 추출이므로 실제 OAuth/사용자 PC 작업·운영 저장을 테스트하지 않는다.
+
+
+### 10.2 첫 검증 결과와 main 추가 통합
+
+- 관련 AI/기억/재개/복구/Windows 안전/단위 dispatch 및 Store 은퇴/외부 LLM/편집기 경계:
+  23 suite / 390 tests PASS.
+- 실제 jsdom 변환·각 저장 경로의 fallback/category/metadata 검증: 1 suite / 15 tests PASS.
+- 완료/question/takeover 보고 claim·runOpened·관찰·재개 frame·원문 비포함 assertions를 추가해
+  work-agent suite를 재실행 PASS. 두 행동 suite 합계 29건이며 기존 14건을 중복 집계하지 않는다.
+- 최초 baseline 명령의 Jest 옵션을 plural로 지정해 선택이 적용되지 않았다. 그 전체 실행은 중단(exit 130)했고
+  PASS로 집계하지 않는다. 설치 버전의 singular --testPathPattern을 확인하여 23개 선택 목록을 검증 후 실행했다.
+- 종료 상태의 실제 WorkProgress 5종 × run 유무 × terminalKind 3종 × takeover 유무,
+  총 60조합을 이전 main의 inline 판정과 비교하여 동일함을 확인했다.
+- content-editor typecheck/build 및 API type-check/build PASS.
+- content-editor 공개 index.d.ts는 baseline 소스 동일성 확인 후 기존 빌드와 byte 동일 확인 PASS.
+- 변경 파일 ESLint 신규 오류 없음, 전체 ratchet PASS (46 errors / baseline 46, 1,009 warnings).
+
+검증 중 main이 `aa59a0962f` (#531 인증 담당 정비)로 이동했다. 변경 56개 경로는 이번 수정 경로와
+겹치지 않는다. 이번 구현을 먼저 commit하고 main 변경을 작업 branch에 정상 merge한 뒤,
+API type/build·대표 runtime/변환·인증 및 기존 회원 콘솔 회귀를 재확인한다.
+새 인증 기능/권한/운영 배포를 이 WO의 구현 실적으로 간주하지 않는다.

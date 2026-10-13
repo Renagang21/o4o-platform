@@ -31,6 +31,8 @@
 import { useEffect, useState } from 'react';
 import type { Editor } from '@tiptap/react';
 import { sanitizeHtml } from '../sanitize';
+import { blocksToHtml, type UrlBlock } from './ai-content-format';
+import { buildCommunitySavePayload, buildStoreSavePayload, buildProductionMaterialSavePayload } from './ai-content-save-payload';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -191,14 +193,6 @@ type UrlTone = 'normal' | 'professional' | 'store';
 //   URL 모드도 결과 형식 프리셋 제거. length 만 보조 가이드로 유지.
 type UrlLength = 'short' | 'medium' | 'long';
 
-interface UrlBlock {
-  id?: string;
-  type: string;
-  content?: string;
-  attributes?: Record<string, any>;
-  innerBlocks?: UrlBlock[];
-}
-
 // WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
 //   백엔드 ai-prompts 카탈로그가 7개 outputType 을 이미 지원하지만
 //   모달에는 4개만 노출되어 있던 격차를 해소.
@@ -238,92 +232,6 @@ const URL_LENGTH_LABELS: Record<UrlLength, string> = {
   medium: '보통',
   long: '길게(A4 1장↑)',
 };
-
-/**
- * HTML → Forum Block[] 변환 (프론트엔드 전용, DOMParser 사용)
- * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
- *   forum post API는 Block[] JSON을 기대하지만 백엔드 normalizeContent가
- *   Node.js에서 DOMParser를 호출하므로 실패함 → 프론트에서 미리 변환해서 전달
- */
-function htmlToForumBlocks(html: string): object[] {
-  if (!html || !html.trim()) return [];
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const blocks: object[] = [];
-  doc.body.childNodes.forEach((node, index) => {
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-    const el = node as Element;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
-      blocks.push({ id: `b${index}`, type: 'heading', content: el.textContent || '', attributes: { level: parseInt(tag[1]) } });
-    } else if (tag === 'p') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    } else if (tag === 'ul' || tag === 'ol') {
-      const items = Array.from(el.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
-      if (items.length) blocks.push({ id: `b${index}`, type: 'list', content: { items }, attributes: { ordered: tag === 'ol' } });
-    } else if (tag === 'blockquote') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'quote', content: text });
-    } else if (tag === 'div' && el.getAttribute('data-youtube-video')) {
-      const iframe = el.querySelector('iframe');
-      const src = iframe?.getAttribute('src') || '';
-      if (src) blocks.push({ id: `b${index}`, type: 'paragraph', content: `[YouTube: ${src}]` });
-    } else {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    }
-  });
-  return blocks;
-}
-
-/** Block[] → HTML 변환 (RichTextEditor TipTap 기반) */
-function blocksToHtml(blocks: UrlBlock[]): string {
-  return blocks
-    .map((block) => {
-      switch (block.type) {
-        case 'o4o/heading': {
-          const level = block.attributes?.level || 2;
-          return `<h${level}>${block.content || ''}</h${level}>`;
-        }
-        case 'o4o/paragraph':
-          return `<p>${block.content || ''}</p>`;
-        case 'o4o/list': {
-          const ordered = block.attributes?.ordered;
-          const tag = ordered ? 'ol' : 'ul';
-          return `<${tag}>${block.content || ''}</${tag}>`;
-        }
-        case 'o4o/youtube': {
-          const url = block.attributes?.url || block.attributes?.src || '';
-          if (!url) return '';
-          const embedUrl = url.includes('watch?v=')
-            ? url.replace('watch?v=', 'embed/')
-            : url;
-          // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-RENDER-V1:
-          //   TipTap @tiptap/extension-youtube 의 parseHTML 규칙은
-          //     { tag: 'div[data-youtube-video] iframe' }
-          //   raw <iframe> 단독은 setContent 시 drop 되므로 wrapper 필수.
-          return `<div data-youtube-video><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
-        }
-        case 'o4o/image': {
-          const src = block.attributes?.url || block.attributes?.src || '';
-          const alt = block.attributes?.alt || '';
-          return src ? `<img src="${src}" alt="${alt}" style="max-width:100%;" />` : '';
-        }
-        case 'o4o/columns':
-        case 'o4o/group': {
-          if (block.innerBlocks && block.innerBlocks.length > 0) {
-            return `<div>${blocksToHtml(block.innerBlocks)}</div>`;
-          }
-          return block.content ? `<div>${block.content}</div>` : '';
-        }
-        default:
-          return block.content ? `<p>${block.content}</p>` : '';
-      }
-    })
-    .filter(Boolean)
-    .join('\n');
-}
 
 export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata, templateId, templateSystemPrompt, templateForcedOptions }: AiContentModalProps) {
   // 기존 text 모드 상태
@@ -668,18 +576,11 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
       // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
       //   백엔드 normalizeContent가 Node.js에서 DOMParser를 사용해 실패하므로
       //   프론트에서 HTML → Block[] 변환 후 전달 (백엔드는 Array인 경우 그대로 저장)
-      const contentBlocks = htmlToForumBlocks(result.html);
-      const body: Record<string, any> = {
-        title: communityTitle.trim() || 'AI 생성 콘텐츠',
-        content: contentBlocks.length > 0 ? contentBlocks : result.html,
-        type: 'discussion',
-      };
-      if (communityForumId) body.forumId = communityForumId;
       const res = await fetch(`${API_BASE_URL}/api/v1/forum/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
-        body: JSON.stringify(body),
+        body: JSON.stringify(buildCommunitySavePayload(result.html, communityTitle, communityForumId)),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -706,15 +607,11 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setStoreSaving(true);
     setStoreSaveStatus(null);
     try {
-      const contentBlocks = htmlToForumBlocks(result.html);
       const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store-contents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
-        body: JSON.stringify({
-          title: storeTitle.trim() || 'AI 생성 콘텐츠',
-          contentJson: contentBlocks.length > 0 ? contentBlocks : { html: result.html },
-        }),
+        body: JSON.stringify(buildStoreSavePayload(result.html, storeTitle)),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -753,27 +650,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     setProductionMaterialSaveStatus(null);
     try {
       const outputType = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
-      const usageType =
-        outputType === 'pop' ? 'pop'
-        : outputType === 'store_qr' ? 'qr'
-        : null;
       const res = await fetch(`${API_BASE_URL}/api/v1/kpa/store/assets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
         credentials: 'include',
-        body: JSON.stringify({
-          title: productionMaterialTitle.trim() || 'AI 생성 매장 제작 자료',
-          description: result.summary || null,
-          assetType: 'content',
-          htmlContent: result.html,
-          category: outputType,
-          usageType,
-          sourceType: 'generated',
-          // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: source 추적 메타 (선택적)
-          ...(sourceMetadata ? { sourceMetadata } : {}),
-          // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template id 추적 (선택적)
-          ...(templateId ? { templateId } : {}),
-        }),
+        body: JSON.stringify(buildProductionMaterialSavePayload(
+          result, productionMaterialTitle, outputType, sourceMetadata, templateId,
+        )),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {

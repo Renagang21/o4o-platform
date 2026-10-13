@@ -653,6 +653,60 @@ export function resolveWorkSite(request: string, targetHint?: string): string | 
   return t && t.targetType === 'browser_site' ? t.targetId : null;
 }
 
+/** Pure terminal classification; persistence and run mutation stay in finish(). */
+function resolveTerminalGoalStatus(
+  progress: WorkProgress,
+  runCreated: boolean,
+  terminalKind: 'question' | 'takeover' | null,
+  hasTakeover: boolean,
+): WorkGoalStatus {
+  return progress === 'completed' ? 'completed'
+    : runCreated && terminalKind === 'question' ? 'waiting_for_user'
+    : runCreated && terminalKind === 'takeover' ? 'taken_over'
+    : runCreated && hasTakeover ? 'taken_over'
+    : progress === 'needs_user' ? 'waiting_for_user'
+    : 'stopped';
+}
+
+/** Report projection only: no persistence, logging or execution-state mutation. */
+function buildExecutionReport({
+  kind, runCreated, history, replay, plannerMode, taskKey, targetId, targetKind,
+  lastAssistanceEvent, resumeFrame,
+}: {
+  kind: WorkGoalStatus;
+  runCreated: boolean;
+  history: readonly WorkStepRecord[];
+  replay: WorkflowRunSummary['replay'];
+  plannerMode: PlannerMode;
+  taskKey: string | null;
+  targetId: string;
+  targetKind: WorkTargetRef['targetType'];
+  lastAssistanceEvent: WorkAssistanceEvent | null;
+  resumeFrame: RunResumeFrame | null;
+}): ExecutionReport {
+  return {
+    claim: kind === 'completed' ? 'execution_complete'
+      : kind === 'waiting_for_user' ? 'needs_user'
+      : kind === 'taken_over' ? 'handed_over'
+      : runCreated ? 'stopped' : 'not_started',
+    runOpened: runCreated,
+    resultObserved: history.some((h) => h.status === 'success'
+      && (h.navigated === true || h.action.kind === 'read_text' || h.action.kind === 'read_table')),
+    replayVerified: replay === 'completed',
+    plannerMode,
+    taskTypeProposal: taskKey,
+    // Cloud Continuity — 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다.
+    memory: runCreated ? {
+      targetId,
+      targetKind,
+      taskKey,
+      verifiedPatterns: deriveVerifiedPatterns(taskKey, lastAssistanceEvent),
+      failedAlternative: failedAlternativeOf(taskKey, lastAssistanceEvent),
+      resumeFrame,
+    } : undefined,
+  };
+}
+
 export async function runWorkAgent(
   dataSource: DataSource,
   ctx: VerifiedToolContext,
@@ -1034,13 +1088,7 @@ export async function runWorkAgent(
   const finish = async (): Promise<WorkAgentRunResult> => {
     // goal.status ← 진행/종료 종류. QUESTION=waiting_for_user, TAKEOVER=taken_over, 완료=completed, 그 밖 중지=stopped.
     // run 이 열리기 전(대상 준비 실패 등)에는 종전대로 progress 기준으로만 매핑한다 — QUESTION/TAKEOVER 구분은 logical run 이 있어야 의미가 있다.
-    const kind: WorkGoalStatus =
-      state.progress === 'completed' ? 'completed'
-      : runCreated && terminalKind === 'question' ? 'waiting_for_user'
-      : runCreated && terminalKind === 'takeover' ? 'taken_over'
-      : runCreated && state.takeover ? 'taken_over'
-      : state.progress === 'needs_user' ? 'waiting_for_user'
-      : 'stopped';
+    const kind = resolveTerminalGoalStatus(state.progress, runCreated, terminalKind, !!state.takeover);
     goal.status = kind;
     // QUESTION 만 같은 logical run 으로 이어갈 수 있다 — run 이 실제로 열렸을 때만(runId 존재).
     const resumable = kind === 'waiting_for_user' && !!goal.runId;
@@ -1068,27 +1116,12 @@ export async function runWorkAgent(
       target: targetOutcome,
       workflow: { ...workflow },
       taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-      report: {
-        claim: kind === 'completed' ? 'execution_complete'
-          : kind === 'waiting_for_user' ? 'needs_user'
-          : kind === 'taken_over' ? 'handed_over'
-          : runCreated ? 'stopped' : 'not_started',
-        runOpened: runCreated,
-        resultObserved: state.history.some((h) => h.status === 'success'
-          && (h.navigated === true || h.action.kind === 'read_text' || h.action.kind === 'read_table')),
-        replayVerified: workflow.replay === 'completed',
-        plannerMode,
-        taskTypeProposal: declaredTask ?? resumeFrame?.taskKey ?? null,
-        // Cloud Continuity — 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다.
-        memory: runCreated ? {
-          targetId: siteId,
-          targetKind: targetRef.targetType,
-          taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-          verifiedPatterns: deriveVerifiedPatterns(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
-          failedAlternative: failedAlternativeOf(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
-          resumeFrame: kind === 'waiting_for_user' && goal.runId ? currentRunFrame() : null,
-        } : undefined,
-      },
+      report: buildExecutionReport({
+        kind, runCreated, history: state.history, replay: workflow.replay, plannerMode,
+        taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
+        targetId: siteId, targetKind: targetRef.targetType, lastAssistanceEvent,
+        resumeFrame: runCreated && kind === 'waiting_for_user' && goal.runId ? currentRunFrame() : null,
+      }),
     };
   };
   /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
