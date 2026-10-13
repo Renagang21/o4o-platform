@@ -6,7 +6,7 @@
 
 ## 범위·근거
 
-최신 main `aa59a0962f`에서 `wo/ai-work-agent-session-maintenance` 전용 worktree를 만들고 앞 push `dae538aacd`를 연결했다. 앞 unmerged AI 정비를 포함한다. 현재 Runtime의 구조 정비이며 V1 기능 확장/성능·polling/vision/provider 최적화가 아니다. 새 Core·서비스 간 공통화·public route/API/권한/DB/프로토콜·운영 인증·결제·실 PC write·배포 없음. 종료는 push까지.
+최신 main `aa59a0962f`에서 `wo/ai-work-agent-session-maintenance` 전용 worktree를 만들고 앞 push `dae538aacd`를 연결했다. 앞 unmerged AI 정비를 포함한다. 종료 전 main `90e49c3e60`의 PH 은퇴/deployment 변경 14개 경로를 확인했다. AI 모집단/이번 소유 경로 겹침 0개이며, 정비 커밋 후 clean 상태에서 작업 branch에 conflict 없이 연결했다. 실행 코드·의존성 변경이 없어 기존 검증 결과의 적용 범위를 바꾸지 않는다. 현재 Runtime의 구조 정비이며 V1 기능 확장/성능·polling/vision/provider 최적화가 아니다. 새 Core·서비스 간 공통화·public route/API/권한/DB/프로토콜·운영 인증·결제·실 PC write·배포 없음. 종료는 push까지.
 AGENTS, canonical index, [공통 소비처](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md), [자동화 §25](../baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md), [Assistant V2 §18](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md), [업무공간 §9](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [Memory 배치](../baseline/O4O-ASSISTANT-MEMORY-PLACEMENT-POLICY-V1.md), [설치](../../SETUP.md)를 확인했다. 기존 Assistant A→I, Task 완료 계약, Node/Memory 소유권을 대체하지 않는다.
 
 ## 재조사·상태 소유권
