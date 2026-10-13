@@ -51,4 +51,3 @@ export function getRecommendation(score: number): { label: string; bg: string; t
   if (score >= 60) return { label: '검토 필요', bg: 'bg-amber-50', text: 'text-amber-700', icon: '!' };
   return { label: '보완 필요', bg: 'bg-red-50', text: 'text-red-700', icon: '✕' };
 }
-
