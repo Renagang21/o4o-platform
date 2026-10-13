@@ -1106,7 +1106,7 @@ export const supplierApi = {
 
   async updateInventory(
     offerId: string,
-    updates: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean }
+    updates: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean; expected_version?: string }
   ): Promise<{ success: boolean; error?: string; data?: InventoryItem }> {
     try {
       const response = await api.patch(`/neture/supplier/inventory/${offerId}`, updates);

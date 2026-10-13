@@ -11,14 +11,11 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { createRequireActiveSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { ShipmentService } from '../services/shipment.service.js';
-import { NetureOrderStatus } from '../../../routes/neture/entities/neture-order.entity.js';
-import { NetureService as LegacyNetureService } from '../../../routes/neture/services/neture.service.js';
 import logger from '../../../utils/logger.js';
 
 export function createShipmentController(dataSource: DataSource): Router {
   const router = Router();
   const shipmentService = new ShipmentService(dataSource);
-  const legacyNetureService = new LegacyNetureService(dataSource);
   const requireActiveSupplier = createRequireActiveSupplier(dataSource);
 
   // PATCH /supplier/shipments/:id
@@ -45,11 +42,6 @@ export function createShipmentController(dataSource: DataSource): Router {
             message: `Cannot transition from '${result.currentStatus}' to '${result.targetStatus}'`,
           });
         }
-      }
-
-      // Auto-transition order status to 'delivered' if shipment delivered
-      if ('isDelivered' in result && result.isDelivered) {
-        await legacyNetureService.updateOrderStatus(result.orderId!, { status: NetureOrderStatus.DELIVERED });
       }
 
       res.json({ success: true, data: result.data });
