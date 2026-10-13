@@ -1,3 +1,4 @@
+import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, type SignageEditTarget, type SignageMediaDraft } from './signage/signageMediaDraft';
 import { buildSignageVideoList, filterSignageVideos, summarizePlaylistDuration, type UnifiedVideoItem, type SignageStatusFilter as StatusFilter, type SignageSortKey as SortKey } from './signage/signageVideoList';
 import { useSignagePlaylists } from './hooks/useSignagePlaylists';
 import { useSignageSchedules } from './hooks/useSignageSchedules';
@@ -26,7 +27,7 @@ import { StoreSignageScheduleForm } from './StoreSignageScheduleForm';
 import { StoreSignageMediaEditor } from './StoreSignageMediaEditor';
 import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -130,6 +131,7 @@ export function StoreSignagePage() {
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
   const { organizationId } = useStoreOrganizationId();
+  const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
 
   // URL-based tab derivation (IA restructure)
   const activeTab = useMemo((): ActiveTab => {
@@ -240,24 +242,25 @@ export function StoreSignagePage() {
   const [regVideoError, setRegVideoError] = useState('');
   const [selectedVideoKeys, setSelectedVideoKeys] = useState<string[]>([]);
 
-  // ── Media / snapshot edit drawer ──
-  const [editingMedia, setEditingMedia] = useState<SignageMediaItem | null>(null);
-  const [editingSnapshot, setEditingSnapshot] = useState<StoreAssetItem | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editTags, setEditTags] = useState('');
-  const [editThumbnailUrl, setEditThumbnailUrl] = useState('');
-  const [editSourceUrl, setEditSourceUrl] = useState('');
+  // Target and draft belong to one editor, with one change action.
+  const [editingTarget, setEditingTarget] = useState<SignageEditTarget | null>(null);
+  const [editDraft, setEditDraft] = useState<SignageMediaDraft>(emptySignageMediaDraft);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
+  const editBusy = useRef(false);
+  const editTargetRef = useRef(editingTarget); editTargetRef.current = editingTarget;
+  const editDraftRef = useRef(editDraft); editDraftRef.current = editDraft;
+  const registrationBusy = useRef(false);
+  const registrationDraft = JSON.stringify([regVideoTitle, regVideoUrl, regVideoDescription, regVideoTags, regVideoStatus]);
+  const registrationDraftRef = useRef(registrationDraft); registrationDraftRef.current = registrationDraft;
 
   const loadSignageMedia = useCallback(async () => {
     if (!organizationId) return;
     try {
       const data = await fetchSignageMedia(organizationId);
-      setSignageMediaItems(data);
+      if (organizationRef.current === organizationId) setSignageMediaItems(data);
     } catch {
-      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      if (organizationRef.current === organizationId) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   }, [organizationId]);
 
@@ -269,13 +272,15 @@ export function StoreSignagePage() {
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
     setRegVideoError('');
-    if (!regVideoTitle.trim() || !regVideoUrl.trim()) return;
+    if (registrationBusy.current || !regVideoTitle.trim() || !regVideoUrl.trim()) return;
     const sourceType = detectVideoSource(regVideoUrl.trim());
     if (!sourceType) {
       setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.');
       return;
     }
     const tags = regVideoTags.split(',').map(t => t.trim()).filter(Boolean);
+    const submitted = registrationDraft, store = organizationId;
+    registrationBusy.current = true;
     setRegVideoSaving(true);
     try {
       await createSignageMedia(organizationId, {
@@ -287,6 +292,9 @@ export function StoreSignagePage() {
         tags: tags.length > 0 ? tags : undefined,
         status: regVideoStatus,
       });
+      if (organizationRef.current !== store) return;
+      void loadSignageMedia();
+      if (registrationDraftRef.current !== submitted) return;
       setRegVideoTitle('');
       setRegVideoUrl('');
       setRegVideoDescription('');
@@ -294,10 +302,10 @@ export function StoreSignagePage() {
       setRegVideoStatus('active');
       setRegVideoError('');
       setShowVideoRegForm(false);
-      loadSignageMedia();
     } catch (err: unknown) {
-      setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
+      if (organizationRef.current === store) setRegVideoError(err instanceof Error ? err.message : '동영상 등록에 실패했습니다.');
     } finally {
+      registrationBusy.current = false;
       setRegVideoSaving(false);
     }
   };
@@ -310,92 +318,62 @@ export function StoreSignagePage() {
     } catch { setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
   };
 
-  // ── Media / snapshot edit drawer handlers ──
-  const handleOpenEdit = (v: UnifiedVideoItem) => {
-    setEditError('');
-    if (v.source === 'direct' && v._media) {
-      const media = v._media;
-      setEditingMedia(media);
-      setEditingSnapshot(null);
-      setEditName(media.name);
-      setEditDescription(media.description ?? '');
-      setEditTags((media.tags ?? []).join(', '));
-      setEditThumbnailUrl(media.thumbnailUrl ?? '');
-      setEditSourceUrl(media.sourceUrl ?? '');
-    } else if (v.source === 'snapshot' && v._snapshot) {
-      const snap = v._snapshot;
-      setEditingSnapshot(snap);
-      setEditingMedia(null);
-      setEditName(snap.title);
-      const cj = snap.contentJson ?? {};
-      setEditDescription((cj.description as string) ?? '');
-      setEditTags(((cj.tags as string[]) ?? []).join(', '));
-      setEditThumbnailUrl((cj.thumbnailUrl as string) ?? '');
-      setEditSourceUrl((cj.sourceUrl as string) ?? '');
-    }
+  const handleOpenEdit = (video: UnifiedVideoItem) => {
+    const target: SignageEditTarget | null = video.source === 'direct' && video._media
+      ? { kind: 'direct', media: video._media }
+      : video._snapshot ? { kind: 'snapshot', snapshot: video._snapshot } : null;
+    if (!target) return;
+    const draft = readSignageMediaDraft(target);
+    editTargetRef.current = target; editDraftRef.current = draft;
+    setEditingTarget(target); setEditDraft(draft); setEditError('');
   };
-
+  const handleEditChange = (field: keyof SignageMediaDraft, value: string) => {
+    setEditDraft(previous => {
+      const next = { ...previous, [field]: value }; editDraftRef.current = next; return next;
+    });
+  };
   const handleCloseEditDrawer = () => {
-    setEditingMedia(null);
-    setEditingSnapshot(null);
-    setEditError('');
+    editTargetRef.current = null;
+    setEditingTarget(null); setEditError('');
   };
-
   const handleSaveEdit = async () => {
-    if (!editName.trim()) return;
-    setEditSaving(true);
-    setEditError('');
+    const target = editingTarget, draft = editDraft, store = organizationId;
+    if (!target || !draft.name.trim() || editBusy.current) return;
+    editBusy.current = true; setEditSaving(true); setEditError('');
     try {
-      const tags = editTags.split(',').map(t => t.trim()).filter(Boolean);
-      const trimmedSourceUrl = editSourceUrl.trim();
-      if (editingMedia) {
-        const updated = await updateSignageMedia(organizationId, editingMedia.id, {
-          name: editName.trim(),
-          description: editDescription.trim() || undefined,
-          tags: tags.length > 0 ? tags : [],
-          thumbnailUrl: editThumbnailUrl.trim() || undefined,
-          sourceUrl: trimmedSourceUrl || undefined,
-        });
-        setSignageMediaItems(prev => prev.map(m => m.id === updated.id ? updated : m));
-      } else if (editingSnapshot) {
-        const res = await assetSnapshotApi.patch(editingSnapshot.id, {
-          title: editName.trim(),
-          description: editDescription.trim() || undefined,
-          tags: tags.length > 0 ? tags : [],
-          thumbnailUrl: editThumbnailUrl.trim() || undefined,
-          sourceUrl: trimmedSourceUrl || undefined,
-        });
-        const updated = res.data;
-        setItems(prev => prev.map(it => it.id === editingSnapshot.id
-          ? { ...it, title: updated.title, contentJson: updated.contentJson }
-          : it,
-        ));
+      const metadata = signageMediaMetadata(draft);
+      if (target.kind === 'direct') {
+        const updated = await updateSignageMedia(store, target.media.id, { name: draft.name.trim(), ...metadata });
+        if (organizationRef.current !== store) return;
+        setSignageMediaItems(previous => previous.map(media => media.id === updated.id ? updated : media));
+      } else {
+        const response = await assetSnapshotApi.patch(target.snapshot.id, { title: draft.name.trim(), ...metadata });
+        if (organizationRef.current !== store) return;
+        setItems(previous => previous.map(item => item.id === target.snapshot.id
+          ? { ...item, title: response.data.title, contentJson: response.data.contentJson } : item));
       }
-      handleCloseEditDrawer();
-    } catch (err: unknown) {
-      setEditError(err instanceof Error ? err.message : '저장에 실패했습니다.');
-    } finally {
-      setEditSaving(false);
-    }
+      if (editTargetRef.current === target && editDraftRef.current === draft) handleCloseEditDrawer();
+    } catch (error) {
+      if (organizationRef.current === store && editTargetRef.current === target) setEditError(error instanceof Error ? error.message : '저장에 실패했습니다.');
+    } finally { editBusy.current = false; setEditSaving(false); }
   };
-
   const handleDeleteFromDrawer = async () => {
-    if (editingMedia) {
-      if (!confirm(`"${editingMedia.name}" 동영상을 삭제하시겠습니까?`)) return;
-      try {
-        await deleteSignageMedia(organizationId, editingMedia.id);
-        handleCloseEditDrawer();
-        loadSignageMedia();
-      } catch { setEditError('삭제하지 못했습니다. 다시 시도해 주세요.'); }
-    } else if (editingSnapshot) {
-      if (!confirm(`"${editingSnapshot.title}" 동영상(HUB 복사본)을 삭제하시겠습니까?`)) return;
-      try {
-        await assetSnapshotApi.remove(editingSnapshot.id);
-        handleCloseEditDrawer();
-        fetchItems();
-      } catch { setEditError('삭제하지 못했습니다. 다시 시도해 주세요.'); }
-    }
+    const target = editingTarget, store = organizationId;
+    if (!target || editBusy.current) return;
+    const name = target.kind === 'direct' ? target.media.name : target.snapshot.title;
+    if (!confirm(`"${name}" 동영상을 삭제하시겠습니까?`)) return;
+    editBusy.current = true; setEditSaving(true); setEditError('');
+    try {
+      if (target.kind === 'direct') await deleteSignageMedia(store, target.media.id);
+      else await assetSnapshotApi.remove(target.snapshot.id);
+      if (organizationRef.current !== store) return;
+      if (editTargetRef.current === target) handleCloseEditDrawer();
+      if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
+    } catch {
+      if (organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주세요.');
+    } finally { editBusy.current = false; setEditSaving(false); }
   };
+  useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
 
   // ── Unified video list (snapshots + direct media) ──
   const unifiedVideos = useMemo(() => buildSignageVideoList(items, signageMediaItems), [items, signageMediaItems]);
@@ -1204,8 +1182,8 @@ export function StoreSignagePage() {
         </div>
       )}
       {!loading && !error && !listError && unifiedVideos.length > 0 && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-1 min-w-0">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
             {([
               { key: 'all', label: '전체' },
@@ -1617,23 +1595,10 @@ export function StoreSignagePage() {
 
       {/* ─── Media / Snapshot Edit Drawer ─────────── */}
       <StoreSignageMediaEditor
-        editingMedia={editingMedia}
-        editingSnapshot={editingSnapshot}
-        editName={editName}
-        editDescription={editDescription}
-        editTags={editTags}
-        editThumbnailUrl={editThumbnailUrl}
-        editSourceUrl={editSourceUrl}
-        editSaving={editSaving}
-        editError={editError}
-        setEditName={setEditName}
-        setEditDescription={setEditDescription}
-        setEditTags={setEditTags}
-        setEditThumbnailUrl={setEditThumbnailUrl}
-        setEditSourceUrl={setEditSourceUrl}
+        target={editingTarget} draft={editDraft} onChange={handleEditChange}
+        editSaving={editSaving} editError={editError}
         handleCloseEditDrawer={handleCloseEditDrawer}
-        handleDeleteFromDrawer={handleDeleteFromDrawer}
-        handleSaveEdit={handleSaveEdit}
+        handleDeleteFromDrawer={handleDeleteFromDrawer} handleSaveEdit={handleSaveEdit}
       />
     </div>
   );

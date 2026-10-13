@@ -1,3 +1,4 @@
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { resolveTabletDisplayEntries, toTabletDisplayPayload, tabletDisplayPayloadsEqual, appendSelectedTabletProducts, moveTabletDisplayEntry, type TabletDisplayEntry as DisplayEntry, type TabletDisplayPayload } from './tablet/tabletDisplayDraft';
 import { useTabletScreenApplication } from './hooks/useTabletScreenApplication';
 import { useStoreResource } from './hooks/useStoreResource';
@@ -101,6 +102,8 @@ async function loadActiveTablets(): Promise<TabletType[]> {
 }
 
 export default function StoreTabletDisplaysPage() {
+  const { organizationId } = useStoreOrganizationId();
+  const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -150,6 +153,7 @@ export default function StoreTabletDisplaysPage() {
     reload: loadTablets,
   } = useStoreResource(loadActiveTablets, []);
   const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
+  const tabletLoadRevision = useRef(0);
 
   // Pool & display state
   const [pool, setPool] = useState<ProductPool | null>(null);
@@ -210,28 +214,44 @@ export default function StoreTabletDisplaysPage() {
     idleSlideSeconds: 10,
   });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsLoadError, setSettingsLoadError] = useState<string | null>(null);
+  const [settingsRetry, setSettingsRetry] = useState(0);
+  const settingsSaveBusy = useRef(false);
+  const settingsRequestRevision = useRef(0);
+  const idleSaveBusy = useRef(false);
+  const ocWriteBusy = useRef(false);
 
-  // Load display settings (once)
+  const invalidateSettingsRequest = useCallback(() => { settingsRequestRevision.current++; }, []);
+  // A failed load is unconfirmed settings, not permission to overwrite defaults.
   useEffect(() => {
     let cancelled = false;
+    invalidateSettingsRequest();
+    setSettingsLoading(true); setSettingsLoadError(null);
     fetchTabletDisplaySettings()
-      .then((s) => { if (!cancelled) setSettings(s); })
-      .catch(() => { /* 기본값 유지 */ });
-    return () => { cancelled = true; };
-  }, []);
+      .then(value => { if (!cancelled) setSettings(value); })
+      .catch(() => { if (!cancelled) setSettingsLoadError('화면 설정을 불러오지 못했습니다. 다시 시도해 주세요.'); })
+      .finally(() => { if (!cancelled) setSettingsLoading(false); });
+    return () => { cancelled = true; invalidateSettingsRequest(); };
+  }, [organizationId, settingsRetry, invalidateSettingsRequest]);
 
   const handleSaveSettings = useCallback(async () => {
+    if (settingsSaveBusy.current || settingsLoading || settingsLoadError) return;
+    const submitted = settings, store = organizationId, revision = settingsRequestRevision.current;
+    settingsSaveBusy.current = true;
     setSavingSettings(true);
     try {
-      const saved = await saveTabletDisplaySettings(settings);
-      setSettings(saved);
+      const saved = await saveTabletDisplaySettings(submitted);
+      if (organizationRef.current !== store || revision !== settingsRequestRevision.current) return;
+      setSettings(current => current === submitted ? saved : current);
       setToast({ type: 'success', message: '전시 설정이 저장되었습니다.' });
     } catch {
-      setToast({ type: 'error', message: '전시 설정 저장에 실패했습니다.' });
+      if (organizationRef.current === store && revision === settingsRequestRevision.current) setToast({ type: 'error', message: '전시 설정 저장에 실패했습니다.' });
     } finally {
+      settingsSaveBusy.current = false;
       setSavingSettings(false);
     }
-  }, [settings]);
+  }, [settings, organizationId, settingsLoading, settingsLoadError]);
 
   // ── 고객 화면 미리보기 (WO-O4O-KPA-TABLET-PREVIEW-V1) ──
   //   kiosk-core 공개 뷰어를 재사용. 저장된 공개 데이터(products/settings) 기준.
@@ -304,33 +324,42 @@ export default function StoreTabletDisplaysPage() {
   }, []);
 
   const handleOcSelect = useCallback(async (forcedContentId: string) => {
-    if (!selectedTabletId || ocBusy) return;
+    if (!selectedTabletId || ocWriteBusy.current) return;
+    const revision = tabletLoadRevision.current;
+    ocWriteBusy.current = true;
     setOcBusy(true);
     try {
       await selectOperatorCommonIdle(selectedTabletId, forcedContentId);
-      setOcSelection(await fetchOperatorCommonIdleSelection(selectedTabletId));
+      const selection = await fetchOperatorCommonIdleSelection(selectedTabletId);
+      if (revision !== tabletLoadRevision.current) return;
+      setOcSelection(selection);
       setOcModalOpen(false);
       setToast({ type: 'success', message: '서비스 공통 대기 영상이 선택되었습니다.' });
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '선택에 실패했습니다.' });
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: e?.message || '선택에 실패했습니다.' });
     } finally {
+      ocWriteBusy.current = false;
       setOcBusy(false);
     }
-  }, [selectedTabletId, ocBusy]);
+  }, [selectedTabletId]);
 
   const handleOcClear = useCallback(async () => {
-    if (!selectedTabletId || ocBusy) return;
+    if (!selectedTabletId || ocWriteBusy.current) return;
+    const revision = tabletLoadRevision.current;
+    ocWriteBusy.current = true;
     setOcBusy(true);
     try {
       await clearOperatorCommonIdle(selectedTabletId);
+      if (revision !== tabletLoadRevision.current) return;
       setOcSelection(null);
       setToast({ type: 'success', message: '선택이 해제되었습니다.' });
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
     } finally {
+      ocWriteBusy.current = false;
       setOcBusy(false);
     }
-  }, [selectedTabletId, ocBusy]);
+  }, [selectedTabletId]);
 
   const ocStatusLabel: Record<string, string> = {
     active: '방영 중', upcoming: '방영 예정', expired: '기간 만료', unavailable: '사용 불가',
@@ -492,10 +521,9 @@ export default function StoreTabletDisplaysPage() {
   };
 
   // Load pool + displays + idle playlist when tablet changes
-  const tabletLoadRevision = useRef(0);
   const loadTabletData = useCallback(async () => {
     const revision = ++tabletLoadRevision.current;
-    if (!selectedTabletId) {
+    if (!selectedTabletId || !organizationId) {
       setError(null); setPool(null); setDisplays([]); setSavedDisplayPayload([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
       return;
     }
@@ -518,7 +546,7 @@ export default function StoreTabletDisplaysPage() {
     } finally {
       if (revision === tabletLoadRevision.current) setLoadingPool(false);
     }
-  }, [selectedTabletId]);
+  }, [selectedTabletId, organizationId]);
 
   const cancelTabletLoad = useCallback(() => { tabletLoadRevision.current++; }, []);
   useEffect(() => {
@@ -659,16 +687,20 @@ export default function StoreTabletDisplaysPage() {
 
   // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
   const handleSaveIdle = async () => {
-    if (!selectedTabletId) return;
+    if (!selectedTabletId || idleSaveBusy.current) return;
+    const submitted = idleItems, revision = tabletLoadRevision.current;
+    idleSaveBusy.current = true;
     setSavingIdle(true);
     try {
-      const saved = await saveTabletIdlePlaylist(selectedTabletId, idleItems);
-      setIdleItems(saved);
+      const saved = await saveTabletIdlePlaylist(selectedTabletId, submitted);
+      if (revision !== tabletLoadRevision.current) return;
+      setIdleItems(current => current === submitted ? saved : current);
       setIdleInitial(saved);
       setToast({ type: 'success', message: 'Idle 재생 목록이 저장되었습니다.' });
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || 'Idle 저장에 실패했습니다.' });
+    } catch (err: unknown) {
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: err instanceof Error ? err.message : 'Idle 저장에 실패했습니다.' });
     } finally {
+      idleSaveBusy.current = false;
       setSavingIdle(false);
     }
   };
@@ -1340,7 +1372,6 @@ export default function StoreTabletDisplaysPage() {
                 <IdlePlaylistEditor
                   items={idleItems}
                   onChange={setIdleItems}
-                  disabled={savingIdle}
                   fetchLibraryAssets={fetchIdleLibraryAssets}
                 />
               </div>
@@ -1354,7 +1385,7 @@ export default function StoreTabletDisplaysPage() {
                 <h3 className="text-sm font-bold text-slate-700">태블릿 화면 설정</h3>
                 <button
                   onClick={handleSaveSettings}
-                  disabled={savingSettings}
+                  disabled={savingSettings || settingsLoading || !!settingsLoadError}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {savingSettings ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -1426,6 +1457,7 @@ export default function StoreTabletDisplaysPage() {
             </div>
           )}
 
+          {settingsLoadError && <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{settingsLoadError}<button type="button" className="ml-3 underline" onClick={() => setSettingsRetry(value => value + 1)}>다시 시도</button></div>}
           {/* Editor */}
           {!loadingPool && pool && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

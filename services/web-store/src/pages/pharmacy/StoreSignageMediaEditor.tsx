@@ -1,47 +1,45 @@
 import { BaseDetailDrawer } from "@o4o/ui";
 import { Trash2, Loader2 } from "lucide-react";
-import type { SignageMediaItem } from "../../api/signageMedia";
-import type { StoreAssetItem } from "../../api/assetSnapshot";
+import type {
+  SignageEditTarget,
+  SignageMediaDraft,
+} from "./signage/signageMediaDraft";
 
 interface StoreSignageMediaEditorProps {
-  editingMedia: SignageMediaItem | null;
-  editingSnapshot: StoreAssetItem | null;
-  editName: string;
-  editDescription: string;
-  editTags: string;
-  editThumbnailUrl: string;
-  editSourceUrl: string;
+  target: SignageEditTarget | null;
+  draft: SignageMediaDraft;
+  onChange: (field: keyof SignageMediaDraft, value: string) => void;
   editSaving: boolean;
   editError: string;
-  setEditName: (value: string) => void;
-  setEditDescription: (value: string) => void;
-  setEditTags: (value: string) => void;
-  setEditThumbnailUrl: (value: string) => void;
-  setEditSourceUrl: (value: string) => void;
   handleCloseEditDrawer: () => void;
   handleDeleteFromDrawer: () => void;
   handleSaveEdit: () => void;
 }
-
 export function StoreSignageMediaEditor({
-  editingMedia,
-  editingSnapshot,
-  editName,
-  editDescription,
-  editTags,
-  editThumbnailUrl,
-  editSourceUrl,
+  target,
+  draft,
+  onChange,
   editSaving,
   editError,
-  setEditName,
-  setEditDescription,
-  setEditTags,
-  setEditThumbnailUrl,
-  setEditSourceUrl,
   handleCloseEditDrawer,
   handleDeleteFromDrawer,
   handleSaveEdit,
 }: StoreSignageMediaEditorProps) {
+  const editingMedia = target?.kind === "direct" ? target.media : null;
+  const editingSnapshot = target?.kind === "snapshot" ? target.snapshot : null;
+  const {
+    name: editName,
+    description: editDescription,
+    tags: editTags,
+    thumbnailUrl: editThumbnailUrl,
+    sourceUrl: editSourceUrl,
+  } = draft;
+  const setEditName = (value: string) => onChange("name", value);
+  const setEditDescription = (value: string) => onChange("description", value);
+  const setEditTags = (value: string) => onChange("tags", value);
+  const setEditThumbnailUrl = (value: string) =>
+    onChange("thumbnailUrl", value);
+  const setEditSourceUrl = (value: string) => onChange("sourceUrl", value);
   return (
     <BaseDetailDrawer
       open={!!editingMedia || !!editingSnapshot}
@@ -52,6 +50,7 @@ export function StoreSignageMediaEditor({
         <div className="flex items-center justify-between w-full">
           <button
             onClick={handleDeleteFromDrawer}
+            disabled={editSaving}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -89,7 +88,10 @@ export function StoreSignageMediaEditor({
           return (
             <div className="space-y-5">
               {editError && (
-                <p className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded">
+                <p
+                  role="alert"
+                  className="text-xs text-red-600 px-2 py-1.5 bg-red-50 border border-red-200 rounded"
+                >
                   {editError}
                 </p>
               )}

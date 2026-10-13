@@ -1,3 +1,4 @@
+import { printQrSelection } from './qr/printQrSelection';
 import { buildLibraryQrPayload } from './qr/libraryQrPayload';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { useQrOperations } from './hooks/useQrOperations';
@@ -21,7 +22,7 @@ import { StoreQrCreateForms } from './qr/StoreQrCreateForms';
 import { styles } from './qr/qrStyles';
 import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
 import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
@@ -143,6 +144,7 @@ export function StoreQRPage() {
   // Print / download state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [printing, setPrinting] = useState(false);
+  const printBusy = useRef(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
   // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내 모달
   const [showExportGuide, setShowExportGuide] = useState(false);
@@ -437,50 +439,25 @@ export function StoreQRPage() {
   };
 
   const handleConfirmPrint = async (template: PrintTemplate) => {
+    if (printBusy.current) return;
+    const token = getAccessToken();
+    const headers = captureStoreOrganizationHeaders(token ? { Authorization: `Bearer ${token}` } : {});
+    const qrIds = Array.from(selectedIds);
+    const productQrIds = items.filter(item => selectedIds.has(item.id) && item.landingType === 'product' && item.landingTargetId).map(item => item.id);
+    printBusy.current = true;
     setShowPrintModal(false);
     setPrinting(true);
     try {
-      const token = getAccessToken();
-      const authHeaders: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
-
-      if (template === 'sheet') {
-        // 기본 QR 시트 — 기존 일괄 출력
-        const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
-          method: 'POST',
-          headers: captureStoreOrganizationHeaders({ 'Content-Type': 'application/json', ...authHeaders }),
-          body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
-        });
-        if (!resp.ok) throw new Error('Print failed');
-        const blob = await resp.blob();
+      const count = await printQrSelection({ apiBase, template, headers, qrIds, productQrIds }, blob => {
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 60000);
-        return;
-      }
-
-      // Flyer 템플릿 — product 타입 QR만 처리
-      const templateNum = template === 'flyer1' ? 1 : template === 'flyer4' ? 4 : 8;
-      const productQrs = items.filter(
-        (i) => selectedIds.has(i.id) && i.landingType === 'product' && i.landingTargetId,
-      );
-      if (productQrs.length === 0) {
-        toast.error('이 템플릿은 상품 QR에만 사용할 수 있습니다.');
-        return;
-      }
-      for (const qr of productQrs) {
-        const resp = await fetch(
-          `${apiBase}/pharmacy/qr/${qr.id}/flyer?template=${templateNum}`,
-          { headers: captureStoreOrganizationHeaders(authHeaders) },
-        );
-        if (!resp.ok) throw new Error('Flyer generation failed');
-        const blob = await resp.blob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-      }
+      });
+      if (!count) toast.error('이 템플릿은 상품 QR에만 사용할 수 있습니다.');
     } catch {
       toast.error('PDF 생성 중 오류가 발생했습니다.');
     } finally {
+      printBusy.current = false;
       setPrinting(false);
     }
   };
