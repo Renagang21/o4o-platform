@@ -103,3 +103,33 @@ it("태블릿 미리보기는 선택 slug와 보기 전환을 유지하고 Escap
   fireEvent.keyDown(document, { key: "Escape" });
   expect(onClose).toHaveBeenCalledOnce();
 });
+
+it("QR CTA and landing controls are reachable by their visible labels", () => {
+  const value = props();
+  const { rerender } = render(<StoreQrCreateForms {...value} ctaEnabled />);
+  expect(
+    (
+      screen.getByLabelText(
+        "콘텐츠 하단에 상담 요청 버튼 표시",
+      ) as HTMLInputElement
+    ).type,
+  ).toBe("checkbox");
+  expect(screen.getByLabelText("상담 요청 버튼 문구")).toBeTruthy();
+  rerender(
+    <StoreQrCreateForms
+      {...value}
+      selectedLibrary={{ ...value.selectedLibrary!, source: "direct-content" }}
+      formLandingType="product"
+    />,
+  );
+  expect(screen.getByLabelText("연결 유형").tagName).toBe("SELECT");
+  expect(screen.getByLabelText("연결 상품 (선택)").tagName).toBe("SELECT");
+  rerender(
+    <StoreQrCreateForms
+      {...value}
+      selectedLibrary={{ ...value.selectedLibrary!, source: "direct-content" }}
+      formLandingType="link"
+    />,
+  );
+  expect(screen.getByLabelText("연결 URL").tagName).toBe("INPUT");
+});

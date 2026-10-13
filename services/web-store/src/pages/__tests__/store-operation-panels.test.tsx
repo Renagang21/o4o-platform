@@ -7,7 +7,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 import { ChannelPublicUrlCard } from "../pharmacy/channels/ChannelPublicUrlCard";
 import { StoreSignageScheduleForm } from "../pharmacy/StoreSignageScheduleForm";
 import {
@@ -128,6 +128,8 @@ it("스케줄은 게시된 플레이리스트만 선택하고 요일 없는 저�
     <StoreSignageScheduleForm {...value} playlists={playlists} />,
   );
   expect(screen.getByRole("option", { name: "게시 목록" })).toBeTruthy();
+  expect(screen.getByLabelText("우선순위")).toBeTruthy();
+  expect(screen.getByRole("group", { name: "요일 선택 *" })).toBeTruthy();
   expect(screen.queryByRole("option", { name: "초안 목록" })).toBeNull();
   expect(
     (screen.getByRole("button", { name: "저장" }) as HTMLButtonElement)
@@ -176,6 +178,14 @@ it("공통 영상은 만료된 후보를 숨기고 조회 실패를 빈 상태�
     />,
   );
   expect(screen.queryByText("만료 자료")).toBeNull();
+  const dialog = screen.getByRole("dialog", {
+    name: "서비스 공통 대기 영상 선택",
+  });
+  expect(dialog.tagName).toBe("DIALOG");
+  fireEvent.click(
+    screen.getByText("현재 사용 가능한 서비스 공통 영상이 없습니다."),
+  );
+  expect(callbacks.onClose).not.toHaveBeenCalled();
   expect(
     screen.getByText("현재 사용 가능한 서비스 공통 영상이 없습니다."),
   ).toBeTruthy();
@@ -194,7 +204,10 @@ it("공통 영상은 만료된 후보를 숨기고 조회 실패를 빈 상태�
   ).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "다시 시도" }));
   expect(callbacks.onRetry).toHaveBeenCalledOnce();
-  fireEvent.keyDown(document, { key: "Escape" });
+  fireEvent(
+    screen.getByRole("dialog", { name: "서비스 공통 대기 영상 선택" }),
+    new Event("cancel", { bubbles: false, cancelable: true }),
+  );
   expect(callbacks.onClose).toHaveBeenCalledOnce();
 });
 it("되돌리기 동작 전에 알림을 해제해 같은 액션을 남겨두지 않는다", () => {
@@ -254,4 +267,40 @@ it("출력 안내는 열린 동안에만 Escape로 닫힌다", () => {
   rerender(<StoreQrOutputGuide open={false} onClose={close} />);
   fireEvent.keyDown(document, { key: "Escape" });
   expect(close).toHaveBeenCalledOnce();
+});
+
+it("닫힌 태블릿 영상 대화상자는 열었던 버튼으로 포커스를 복원한다", () => {
+  function Harness() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <button type="button" onClick={() => setOpen(true)}>
+          영상 선택 열기
+        </button>
+        {open && (
+          <TabletCommonIdlePicker
+            ocLoading={false}
+            ocLoadError={false}
+            ocCandidates={[]}
+            ocStatusLabel={{}}
+            ocBusy={false}
+            onRetry={vi.fn()}
+            onSelect={vi.fn()}
+            onClose={() => setOpen(false)}
+          />
+        )}
+      </>
+    );
+  }
+  render(<Harness />);
+  const trigger = screen.getByRole("button", { name: "영상 선택 열기" });
+  trigger.focus();
+  fireEvent.click(trigger);
+  const close = screen.getByRole("button", {
+    name: "공통 대기 영상 선택 닫기",
+  });
+  close.focus();
+  fireEvent.click(close);
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement).toBe(trigger);
 });
