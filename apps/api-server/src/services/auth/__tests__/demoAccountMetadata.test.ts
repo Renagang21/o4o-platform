@@ -53,8 +53,10 @@ describe('Demo 응답 metadata', () => {
     expect(src('modules/auth/controllers/auth-account.controller.ts')).toMatch(
       /ud\.demo = await demoAccountService\.getDemoMetadata\(req\.user\.id\)/,
     );
-    expect(src('modules/auth/controllers/email-auth.controller.ts')).toMatch(
-      /user\.demo = await demoAccountService\.getDemoMetadata\(String\(user\.id\)\)/,
+    expect(src('modules/auth/controllers/email-auth.controller.ts')).toContain('SessionResponse.send(');
+    expect(src('modules/auth/controllers/email-auth.controller.ts')).toContain('includeDemoMetadata: true');
+    expect(src('modules/auth/controllers/session-response.ts')).toMatch(
+      /user\.demo\s*=\s*await\s+demoAccountService\.getDemoMetadata\(\s*String\(user\.id\)/,
     );
   });
 });

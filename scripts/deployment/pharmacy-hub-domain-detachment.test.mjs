@@ -1,7 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepareDomainDetachment,detachDomain} from './pharmacy-hub-domain-detachment.mjs';
+import {prepareDomainDetachment,detachDomain,domainMapClient,domainOperationArguments} from './pharmacy-hub-domain-detachment.mjs';
 import {prepareHostRetirement} from './pharmacy-hub-qr-redirect.mjs';
+test('remote names cannot select URLs or SDK flags; update UUID is generated locally and bound to saved evidence',async()=>{
+  const calls=[];
+  const client=domainMapClient({token:'',fetcher:async(url,options)=>{
+    calls.push({url:new URL(url),options});return {ok:true,json:async()=>({name:'operation-123'})};
+  }});
+  await client.read();await client.validate({name:'https://example.invalid'});
+  let saved;
+  const result=await client.submit({name:'https://example.invalid'},'before',async id=>{saved=id;});
+  for(const c of calls)assert.equal(c.url.origin,'https://compute.googleapis.com');
+  assert.deepEqual(calls.map(c=>c.options.method),['GET','POST','PUT']);
+  assert.equal(calls[0].url.pathname,'/compute/v1/projects/netureyoutube/global/urlMaps/o4o-global-lb');
+  assert.equal(calls[1].url.pathname,calls[0].url.pathname+'/validate');
+  assert.equal(calls[2].url.pathname,calls[0].url.pathname);
+  assert.equal(calls[2].url.searchParams.get('requestId'),saved);assert.equal(result.requestId,saved);
+  assert.equal(JSON.parse(calls[2].options.body).fingerprint,'before');
+  assert.deepEqual(domainOperationArguments('operation-123'),['compute','operations','describe','operation-123','--global','--project=netureyoutube','--format=json']);
+  for(const name of ['../urlMaps/another-map','https://example.invalid','operation-123?x=bad','operation/other','--project=another','',
+    'operation-123;whoami','operation-123 --project=another','operation-123'+String.fromCharCode(10),null,{}])
+    assert.throws(()=>domainOperationArguments(name));
+});
 function live() {
   return {...prepareHostRetirement({name:'o4o-global-lb',defaultService:'shared-backend',
     hostRules:[{hosts:['pharmacyhub.co.kr','www.pharmacyhub.co.kr'],pathMatcher:'path-matcher-pharmacy-hub'},

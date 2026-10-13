@@ -93,7 +93,7 @@ test.describe('Google 경로 생존 + 검증 동작 (R2)', () => {
 
   test('POST /auth/google/signup 도 같은 검증을 거친다 (동의만으로 계정이 생기지 않는다)', async ({ request }) => {
     const res = await request.post(`${V1}/auth/google/signup`, {
-      data: { idToken: 'not-a-real-google-id-token', consents: { terms: true, privacy: true } },
+      data: { idToken: 'not-a-real-google-id-token', consents: { terms: true, privacy: true, name: 'Fixture', phone: '01000000000' } },
       failOnStatusCode: false,
     });
     expect(res.status()).toBe(401);

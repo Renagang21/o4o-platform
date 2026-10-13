@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH 주문·결제·공급·콘텐츠·미디어/GCS 및 URL map 연결 종료는 미완료. PC Local Agent는 담당 에이전트 범위다.
+> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH URL map 호스트/matcher 제거·공유 설정 보존 검증 완료. 이번 URL map 종료용 임시 WIF 제한도 관리자가 원래 조건으로 복구하고 WIF_RESTORED로 재조회 검증을 확인했다. PH 주문·결제·공급·콘텐츠·미디어/GCS 제거는 미완료. PC Local Agent는 담당 에이전트 범위다.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -363,6 +363,53 @@ PR #527은 main `e4c48811b6b414aa8939d639373d9331d2c4c470`에 병합됐으며 po
 
 관리자는 원래 WIF 조건을 로컬 `pharmacyhub-cert-retirement-e4c48811b6b414aa8939d639373d9331d2c4c470.json`에 백업하고 해당 main SHA/PH workflow/owner로 임시 제한한 검증 결과 WIF_RESTRICTION_ACTIVE를 전달했다. apply [38349256767](https://github.com/Renagang21/o4o-platform/actions/runs/38349256767)은 SUCCESS, applied=true, targets=[], sharedResourcesPreserved=true, missingPermissions=[]로 종료했다. `cm-entry-pharmacyhub-root`·`cm-entry-pharmacyhub-www`, `cm-cert-pharmacyhub`, `dns-auth-pharmacyhub-root`·`dns-auth-pharmacyhub-www`를 제거하고 재조회로 부재 및 공유 설정 보존을 확인했다. 공유 인증서 map/proxy/LB 및 URL map은 변경하지 않았다.
 
-관리자는 같은 로컬 백업을 사용해 원래 WIF 조건을 복구하고 재조회 검증 결과 `WIF_RESTORED`를 전달했다. 인증서 종료용 임시 SHA/workflow 제한은 해제됐다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이며 도메인 등록/자동 갱신 종료는 별도 확인이 필요하다. PC Local Agent는 담당 에이전트 범위다.
+관리자는 같은 로컬 백업을 사용해 원래 WIF 조건을 복구하고 재조회 검증 결과 `WIF_RESTORED`를 전달했다. 인증서 종료용 임시 SHA/workflow 제한은 해제됐다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이다. 사용자는 2026-10-13 다른 용도의 활용을 위해 도메인 등록/자동연장은 유지하며 o4o와의 PH 연결만 제거하도록 범위를 확정했다. PC Local Agent는 담당 에이전트 범위다.
 
 후속 URL map 연결 종료 준비: domain_detachment standalone 모드를 추가한다. 고정 application map o4o-global-lb의 PH root/www host rule과 path-matcher-pharmacy-hub만 제거하며, 해당 호스트의 map validation test도 함께 정리한다. 기존 호스트 전체 리다이렉트의 정확한 상태와 PH matcher의 전용 귀속을 확인하고, 타 서비스가 같은 matcher를 공유하거나 부분/예상 밖 상태이면 차단한다. Compute validation과 fingerprint 비교, apply 직전 owner/main/CI/freeze/idle 및 정확한 WIF 제한 gate를 적용한다. 전체 최종 draft 일치와 PH 대상 부재로 공유 설정 보존을 검증하며, 응답 유실·operation 미확인 시 자동 재실행/rollback하지 않고 request/operation 증거를 보존한다. DB/GCS/DNS/인증서/공유 LB 자원은 이 모드에서 변경하지 않는다. focused 35 tests PASS이며 실제 URL map 변경은 아직 수행하지 않았다. 동일 WO 연속 단계로 전용 worktree/branch를 유지한다.
+
+PR #533은 필수 CI와 Codex 리뷰 통과 뒤 병합됐으나 SonarCloud의 API URL 입력 검사가 실패한 것을 병합 전에 처리하지 못했다. 실제 URL map plan/apply는 수행하지 않고 후속 수정으로 호출 목적지를 고정 action/URL/method 목록으로 제한하고 operation path를 검증·URI 인코딩하며 request UUID query를 구조화한다. 임의 URL·path traversal·query injection 회귀를 추가했다. 이 수정의 CI/Sonar 재검증 및 운영 적용은 후속 실행 결과로 기록한다. 도메인 등록/자동연장은 유지하되 o4o의 PH DNS/인증서/URL map·전용 코드/데이터는 제거한다는 사용자 후속 지시를 반영했다.
+
+후속 Sonar 검증에서도 동적 URL fetch 지적이 남아 있어 PR #534 병합/운영 적용을 중단했다. HTTP read/validate는 고정 literal URL만 사용하고, update URL은 고정 origin/path에 코드 내부에서 생성한 UUID query만 추가한다. 원격 operation name은 operation- 접두 및 단일 operand 형태를 검증한 뒤 고정 project/global의 Cloud SDK describe 인자로만 사용한다. 원격 응답/호출자가 목적지 URL·SDK flag·request UUID를 지정할 수 없음을 실제 client 경계 회귀로 검증한다. 검사 억제/quality gate 변경은 하지 않는다.
+
+HTTP URL 지적은 해소됐으며 SDK operation operand 입력 검사가 남아 적용을 계속 보류한다. 문자열 타입과 허용 문자 정제 결과의 원문 일치를 확인하고 operation- 접두의 단일 operand만 고정 SDK 명령에 전달한다. 메타문자·공백·제어문자·비문자열 및 다른 project flag 입력을 실제 client 경계 테스트에서 거절한다.
+
+### 2026-10-13 URL map 종료 plan 검증 완료
+
+PR #534의 최종 commit 73687cf93d779bf8ba6e3fefe389ec74af945a3d는 필수 CI·SonarCloud·최신 Codex 리뷰를 모두 통과하고 main f66ed5f5f8e6198e0043053b24cae6230ffa96cf에 병합됐다. post-merge CI 38355910041 및 CodeQL은 SUCCESS, Delivery 38356668088은 NO_DEPLOY로 종료했다. standalone domain_detachment plan [38356815800](https://github.com/Renagang21/o4o-platform/actions/runs/38356815800)은 SUCCESS이며 실제 map 귀속/퇴역 상태 및 Compute validation을 확인했다. 대상은 pharmacyhub.co.kr, www.pharmacyhub.co.kr, path-matcher-pharmacy-hub이며 제거할 PH validation test는 0건이었다. applied=false로 실제 URL map 변경은 없었다. 이 main SHA에 대한 관리자 임시 WIF 제한 적용 전에는 apply하지 않는다. 인증서 삭제 때의 제한은 이미 복구됐으며, 이번 새 제한은 아직 적용하지 않았다. PH 잔여 데이터/GCS 삭제도 미실행이다. 가비아 등록/자동연장은 사용자 지시에 따라 유지한다.
+
+### 2026-10-13 URL map 연결 종료 apply 완료
+
+관리자는 f66ed5f5f8e6198e0043053b24cae6230ffa96cf와 PH workflow/owner로 한정한 임시 WIF 조건을 별도 로컬 pharmacyhub-domain-detachment-f66ed5f5f8e6198e0043053b24cae6230ffa96cf.json에 백업 후 적용하고 WIF_RESTRICTION_ACTIVE 검증 결과를 전달했다. main·필수 CI·다른 운영 Actions 부재를 재확인한 뒤 apply [38358591293](https://github.com/Renagang21/o4o-platform/actions/runs/38358591293)은 SUCCESS, applied=true, targets=[], removedTests=0, sharedResourcesPreserved=true로 종료했다. Compute update의 terminal success 이후 map을 재조회해 PH root/www host rule 및 전용 matcher 부재와 전체 공유 설정 보존을 검증했다. 공유 LB/IP/proxy/다른 host 및 DB/GCS는 변경하지 않았다. 관리자는 같은 로컬 백업을 사용해 원래 WIF 조건으로 복구하고 재조회 검증 결과 WIF_RESTORED를 전달했다. URL map 종료용 임시 인증 제한은 해제됐다. PH 전용 데이터/GCS 정리는 계속 미완료다. 가비아 도메인 등록/자동연장은 사용자 지시에 따라 유지한다.
+
+
+### PH 개발 데이터 후속 정리 준비 (2026-10-13)
+
+최신 main 기반 read-only census [38373127586](https://github.com/Renagang21/o4o-platform/actions/runs/38373127586)은 SUCCESS, failed=false, references.complete=true다. 잔여 root 58건 및 주문 로그 6건은 이전 집계와 같았다. 첫 준비안은 주문/결제/공급/콘텐츠/게시판 요청 54건과 주문 로그 6건 삭제였다. PR #536 P1 리뷰에서 supplier_product_offers의 서비스 키만으로 전용 귀속을 단정할 수 없음을 확인해, 최종 범위를 DB 41건 삭제와 공유 공급 제안 19건의 PH 연결 제거로 수정했다. 공급 제안은 전부 보존하며 is_public·allowed_seller_ids·다른 service_keys 입력을 유지하고 distribution_type만 남은 입력으로 파생한다. 미디어 4건·연결 1건·GCS 파일은 이 단계에서 보존한다. 모든 application 테이블의 쓰기를 짧게 잠그고, 혼합 서비스 귀속·공유 결제·cross-schema FK·삭제 trigger·텍스트/JSON/배열/UUID의 타 행 참조를 검사한다. 건수 변경/미확인 참조가 있으면 삭제 전 중단한다. 관련 테이블별 삭제 건수 및 잔여를 확인한 뒤에만 COMMIT한다. 과거 source 태그만으로 KPA 행을 지우지 않는다.
+
+분리된 PostgreSQL 16 fixture에서 실제 plan/apply, 혼합 귀속, 공유 결제 그룹, cross-schema FK, JSON 참조, DELETE trigger 차단 및 전체 rollback·공유 identity/media 보존을 검증했다. 운영 삭제는 아직 미실행이다. 동일 WO의 연속 Phase이므로 현재 전용 worktree/branch를 유지한다. `ph_development_purge`는 standalone owner/main 모드이며 apply에는 정확한 reviewed main SHA의 임시 WIF 제한이 필요하다. 미디어 연결이 PH service 링크인지와 미귀속 연결인지도 read-only census에서 분리 집계한다.
+
+PH media/GCS 후속 standalone 도구도 준비했다. 자산 4건과 PH service 링크 1건의 귀속·고정 건수 및 모든 application 테이블의 FK/자산 ID/URL/GCS 경로 참조를 검증한다. 공용 media/bucket 자체는 삭제하지 않는다. 고정 o4o-media-library의 media namespace 개별 객체 4개만 SDK의 실제 bucket/name/generation을 확인하고 ifGenerationMatch로 삭제하며 자동 재시도는 끈다. 모든 객체의 404 부재를 재확인한 뒤 PH 링크/자산만 지운다. GCS 삭제는 PG rollback으로 복구되지 않으며 실패 시 DB 행을 보존하고 실제 객체 상태를 다시 조회해야 한다. 운영 삭제는 아직 미실행이다. PostgreSQL fixture에서 직접 URL 소비/공유 product 링크 차단, 공용 자산 보존 및 정상 media transaction을 실제 SQL로 검증했다.
+
+재리뷰 P1 대응: sole-PH 제안의 service_keys만 비우면 active/APPROVED 행이 Neture 약국 기본 공급으로 새로 노출될 수 있음을 확인했다. 최종 도구는 is_public=false·allowed_seller_ids 비어 있음·다른 service_keys 없음인 전용 제안을 FK/비-FK 검사 후 삭제한다. 공유 제안은 PH 연결만 제거하고 기존 공개/지정 매장/다른 서비스 입력을 보존한다. 공유 active/APPROVED 제안에서 키를 비워 기본 공급을 넓히게 되는 상태는 plan/apply 전에 PH_DEV_SHARED_BASELINE_WIDENING으로 차단한다. 따라서 공급 제안 삭제/보존의 실제 건수는 강화된 read-only census와 운영 plan으로 확정하며, 앞선 전체 보존 19건/삭제 41건은 중간 준비안이다. 운영 쓰기는 아직 수행하지 않았다.
+
+최종 공급 제안 판정 수정: Neture 일반 B2B의 SERVICE 전략도 service_keys와 무관하게 공급 제안을 소비하므로 SPO hard DELETE는 제외했다. supplier_product_offers 19행은 모두 보존한다. 전용 판정(is_public=false·지정 매장 없음·다른 service_keys 없음)에 해당하는 제안은 PH 연결 제거와 is_active=false를 같은 UPDATE로 적용하여 PH 공급의 Neture 노출도 명시적으로 종료한다. 공유 제안의 활성 상태·공개/지정 매장/타 서비스 입력은 보존하며, active/APPROVED 공유 제안이 새로운 default 공급이 되는 경우는 여전히 차단한다. 최종 DB 삭제 범위는 41행, 공급 제안의 PH 연결 제거는 19행이다. 앞선 전용 제안 hard DELETE 준비안은 운영에 적용하지 않았다. 전용 제안은 퇴역 상태로 남는 공유 supplier record이며 PH 서비스 연결은 남기지 않는다. 테스트는 분리된 loopback ph_dev_purge_fixture DB로 제한한다.
+
+
+### 운영 재조회 및 미디어 연결의 소비처 구분 (2026-10-13)
+
+PR #536은 CI/CodeQL/SonarCloud 및 최신 Codex review 무지적 후 main 90e49c3e601d62beb1363842dc71f6fb7064b0b1에 병합했다. post-merge CI 38379500628과 CodeQL 38379500608은 SUCCESS다. 강화된 census 38379578239도 SUCCESS, references.complete=true였다. 공급 제안 19건은 전용 조건에 해당하고 sharedOfferBaselineWidening=0이다. PH 자산 4건의 연결은 1건이지만 PH service 링크는 0, 종전 PH content/service 정의 밖 링크는 1이었다. 이를 부재/전용 service 링크로 오해하지 않는다.
+
+media_entity_links의 실제 소비처를 다시 조사했다. product/brand/content/service 연결은 MediaCatalog 관계 표시·MediaLibrary 분류 필터이고 해당 target 행 자체를 갱신하는 FK/렌더러 계약이 아니다. 일반 MediaLibrary는 퇴역 PH 자산을 제외한다. 반면 video-production-job 연결은 AutomationJob의 INPUT/INTERMEDIATE/legacy OUTPUT을 직접 소비하므로 제거하지 않는다. 후속 도구는 PH 자산에 소속된 catalog 연결만 정리하며 VIDEO Job/알 수 없는 연결·실제 다른 테이블의 UUID/URL/GCS 경로·FK 참조는 계속 차단한다. product/CMS/service/brand target 데이터와 타 서비스 자산은 변경하지 않는다. 고정 1건의 catalog 관계 및 실제 타입별 건수는 추가 read-only 집계와 운영 plan으로 확인한다. 종전 PH service 링크 1건 가정은 폐기하며 운영 media/GCS 삭제는 아직 미실행이다.
+
+DB development plan 38381041967은 job 생성 후 run.jobs.execute 권한 거부로 실패했다. DB worker는 실행하지 않았으며 운영 삭제는 0건이다. 일회성 ph-dev-38381041967-1은 실패 조사용으로 남아 있다. GitHub 실행 계정의 기존 IAM job 실행 범위는 로컬 관리자의 read-only 정책 조회로 확인 중이다. Delivery 38380573911은 SUCCESS지만 production=HELD_LEVEL_3로 누적 application 변경이 보류돼 있다. 이번 inline maintenance source 실행은 API promote를 필요로 하지 않으며 무관한 누적 배포를 실행하지 않았다.
+
+후속 안전 검증에서는 catalog product 관계 제거 후 실제 product_masters 행이 유지되고, VIDEO Job 관계·외부 FK·URL 소비·catalog link UUID 참조·order log UUID 참조가 삭제를 막는 PostgreSQL fixture를 실행했다. PH 자산의 catalog 관계만 소속 자산과 함께 정리하며 실행 Job 관계는 계속 보호한다. 고정 타입별 카탈로그 집계가 추가됐다. 운영 media/GCS 쓰기는 미실행이다.
+
+PR #537은 필수 CI·SonarCloud·Codex 무지적 후 main 76941a5dae61470ebf53ae738de545d6abd2e673에 병합했다. 운영 census 38385010227은 SUCCESS, reference.complete=true, 실제 연결은 video-production-job 1건·catalog 0건으로 확인됐다. 현행 media worker는 이를 보호하며 실제 GCS/미디어 삭제는 실행하지 않는다. 연결 대상 job의 존재/상태·INPUT/INTERMEDIATE/OUTPUT·다른 서비스 자산·임시 output 유무를 추가 aggregate-only read-only 쿼리로 구분한다. 제목·지침·job/사용자 ID·파일 경로는 출력하지 않는다. orphan/개발 이력인지 실제 공용 job 입력인지 확인하기 전에는 이 연결을 제거하지 않는다. run.jobs.execute 권한 부족은 별도 로컬 IAM 조회 결과를 기다리고 있다.
+
+
+### 고아 VIDEO OUTPUT의 귀속 확인 (2026-10-13)
+
+PR #539는 최신 main 통합 후 CI·SonarCloud PASS 및 Codex blocker 없음으로 main 4604f947e50d38eb558081cc50d9a6059f88aee5에 병합했다. read-only census [38398176276](https://github.com/Renagang21/o4o-platform/actions/runs/38398176276)은 SUCCESS, failed=false, references.complete=true다. PH media 연결 1건은 존재하지 않는 VIDEO Job의 OUTPUT이며, 실제 job 상태별 건수·임시 output은 모두 0이다. 같은 고아 job 식별자의 비-PH 자산 연결 1건은 별도로 남아 있다. 공용 GCS/화면 참조는 0이다.
+
+후속 media scope는 소속 자산이 PH인 catalog 관계 또는 대상 job 부재를 transaction lock 안에서 재확인한 고아 OUTPUT만 허용한다. 고아 INPUT/INTERMEDIATE, 존재하는 job의 OUTPUT, 비-PH 자산과 연결은 계속 보호한다. 링크 1건·자산 4건·개별 GCS 객체 4건의 고정 census 및 cross-schema FK/자산·링크 UUID/URL/경로 검사와 generation 조건은 유지한다. 격리 PostgreSQL fixture에서 존재하는 job 및 고아 INPUT 차단, 고아 OUTPUT plan/apply·rollback, 같은 식별자를 가진 타 서비스 자산/연결 보존을 검증했다. 운영 삭제는 아직 0건이며 run.jobs.execute 권한과 로컬 IAM 조회 결과가 blocker다. WIF는 원래 조건으로 복구된 상태다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.

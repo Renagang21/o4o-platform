@@ -1,5 +1,5 @@
 /**
- * <LoginMethods /> — 서비스 로그인 화면 공통 조립: 이메일 로그인 → "또는" → Google 로 계속하기
+ * <LoginMethods /> — 서비스 로그인 화면 공통 조립: 이메일·Google·카카오와 공개 Demo 진입
  * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1
  *
  * 이메일 계정은 플랫폼 계정이라 어느 서비스 호스트에서든 같은 수단으로 로그인한다(세션 서비스는 서버가 Origin 으로 정한다).

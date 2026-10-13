@@ -269,7 +269,8 @@ export default function OperatorSupplierApprovalPage() {
   };
 
   const handleRejectConfirm = async () => {
-    if (!rejectModal) return;
+    if (!rejectModal || actionLoading || batch.loading) return;
+    setActionMessage(null);
     const { ids, bulk, name } = rejectModal;
     if (bulk) {
       await batch.executeBatch(
@@ -288,6 +289,7 @@ export default function OperatorSupplierApprovalPage() {
         refetch();
       } else {
         setActionMessage({ type: 'error', text: '거절 처리에 실패했습니다. 다시 시도해 주세요.' });
+        return;
       }
     }
     setRejectModal(null);
@@ -299,7 +301,10 @@ export default function OperatorSupplierApprovalPage() {
     documentType: 'business_registration' | 'bank_statement' | 'mail_order_report',
   ) => {
     const blob = await operatorSupplierApi.downloadDocument(supplierId, documentType);
-    if (!blob) return;
+    if (!blob) {
+      setActionMessage({ type: 'error', text: '서류를 내려받지 못했습니다. 다시 시도해 주세요.' });
+      return;
+    }
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank', 'noopener,noreferrer');
     setTimeout(() => URL.revokeObjectURL(url), 30_000);
@@ -389,7 +394,7 @@ export default function OperatorSupplierApprovalPage() {
       ? [
           {
             label: '승인 거절',
-            onClick: () => { setRejectModal({ ids: [drawer.id], bulk: false, name: drawer.name }); setRejectReason(''); },
+            onClick: () => { setActionMessage(null); setRejectModal({ ids: [drawer.id], bulk: false, name: drawer.name }); setRejectReason(''); },
             variant: 'danger' as const,
             disabled: actionLoading === drawer.id,
           },
@@ -507,7 +512,7 @@ export default function OperatorSupplierApprovalPage() {
             rowKey="id"
             loading={loading}
             emptyMessage={query.search || statusFilter ? '조건에 맞는 공급자가 없습니다.' : '등록된 공급자가 없습니다.'}
-            onRowClick={(s) => setDrawer(s)}
+            onRowClick={(s) => { setActionMessage(null); setDrawer(s); }}
             manualSort
             sortBy={query.sortBy}
             sortOrder={query.sortOrder}
@@ -537,6 +542,7 @@ export default function OperatorSupplierApprovalPage() {
         width={560}
         actions={drawerActions}
       >
+        {actionMessage?.type === 'error' && <p role="alert" className="mb-3 text-red-700">{actionMessage.text}</p>}
         {drawer && (
           <SupplierDetailBody
             supplier={drawer}
@@ -566,8 +572,8 @@ export default function OperatorSupplierApprovalPage() {
 
       {/* 거절 사유 모달 (단일 + 일괄 공용) */}
       {rejectModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1010]">
+          <div role="dialog" aria-label="공급자 거절" className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl mx-4">
             <h3 className="text-lg font-bold text-slate-800 mb-2">
               {rejectModal.bulk ? `공급자 일괄 거절 (${rejectModal.ids.length}건)` : '공급자 거절'}
             </h3>
@@ -581,8 +587,10 @@ export default function OperatorSupplierApprovalPage() {
               className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
               rows={3}
             />
+            {actionMessage?.type === 'error' && <p role="alert" className="mb-3 text-red-700">{actionMessage.text}</p>}
             <div className="flex gap-2 justify-end">
               <button
+                disabled={batch.loading || !!actionLoading}
                 onClick={() => { setRejectModal(null); setRejectReason(''); }}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200"
               >

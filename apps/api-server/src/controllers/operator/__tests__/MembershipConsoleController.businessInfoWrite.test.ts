@@ -186,4 +186,59 @@ describe('updateMember — businessInfo 부분 갱신', () => {
     const payloads = bizPayloads(userUpdates()[0]);
     expect(payloads[0]).toEqual({ ceoName: '대표', taxInvoiceEmail: 'tax@example.com' });
   });
+
+  it('canonical 값이 alias보다 우선하며 빈 문자열도 명시적 값으로 저장한다', async () => {
+    await controller.updateMember(makeReq({
+      ceoName: '', representativeName: 'LEGACY-NAME',
+      taxInvoiceEmail: 'canonical@example.invalid', taxEmail: 'legacy@example.invalid',
+    }), makeRes());
+    expect(bizPayloads(userUpdates()[0])).toEqual([
+      { ceoName: '', taxInvoiceEmail: 'canonical@example.invalid' },
+    ]);
+  });
+
+  it('canonical null은 기존 nullish alias 규칙을 유지한다', async () => {
+    await controller.updateMember(makeReq({
+      ceoName: null, representativeName: 'ALIAS-NAME',
+      taxInvoiceEmail: null, taxEmail: 'alias@example.invalid',
+    }), makeRes());
+    expect(bizPayloads(userUpdates()[0])).toEqual([
+      { ceoName: 'ALIAS-NAME', taxInvoiceEmail: 'alias@example.invalid' },
+    ]);
+  });
+
+  it.each([{}, { unknownField: 'ignored', email: 'ignored@example.invalid' }])(
+    '수정할 허용 필드가 없으면 users UPDATE 없이 성공한다: %j', async body => {
+      const res = makeRes();
+      await controller.updateMember(makeReq(body), res);
+      expect(userUpdates()).toEqual([]);
+      expect(res.json).toHaveBeenCalledWith({ success: true, message: 'User updated' });
+    },
+  );
+
+  it('이름·전화·사업정보를 함께 보내도 바인딩 번호와 값이 대응한다', async () => {
+    await controller.updateMember(makeReq({
+      lastName: 'TEST-', firstName: 'USER', nickname: 'FIXTURE', phone: '010-0000-0000',
+      address2: '',
+    }), makeRes());
+    const [update] = userUpdates();
+    expect(update.params.slice(0, 5)).toEqual(['TEST-', 'USER', 'FIXTURE', '01000000000', 'TEST-USER']);
+    expect(update.params.slice(5)).toEqual([
+      JSON.stringify({ address2: '' }), JSON.stringify({ detailAddress: '' }), TARGET,
+    ]);
+    expect(update.sql).toMatch(/WHERE id = \$8$/);
+  });
+
+  it('프로필 DB 실패를 성공 응답으로 바꾸지 않는다', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (/^UPDATE users SET/.test(sql)) throw new Error('fixture write failure');
+      return [{ ok: 1 }];
+    });
+    const res = makeRes();
+    await controller.updateMember(makeReq({ nickname: 'FIXTURE' }), res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ success: false, error: 'Failed to update member' });
+    expect(userUpdates()).toHaveLength(1);
+  });
+
 });

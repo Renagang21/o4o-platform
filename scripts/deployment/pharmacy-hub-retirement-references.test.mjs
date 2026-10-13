@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {collectRetirementReferences} from './pharmacy-hub-retirement-references.mjs';
 test('missing schemas remain explicit blockers, never zero evidence',async()=>{
   const result=await collectRetirementReferences({query:()=>{throw new Error('unexpected SQL');}},[]);
-  assert.equal(result.complete,false);assert.equal(result.blockers.length,16);
+  assert.equal(result.complete,false);assert.equal(result.blockers.length,37);
   assert.deepEqual(result.counts,{});assert.equal(result.deletionApproved,false);
 });
 test('order logs use PH order ownership and parameter bindings without outputting rows',async()=>{

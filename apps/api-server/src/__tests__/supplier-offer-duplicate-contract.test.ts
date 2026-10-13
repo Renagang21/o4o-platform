@@ -1,3 +1,4 @@
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 /**
  * WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1 — regression guard
  *
@@ -120,7 +121,7 @@ describe('source contract', () => {
   const serviceSrc = () =>
     readFileSync(join(__dirname, '..', 'modules', 'neture', 'services', 'supplier-offer-registration.service.ts'), 'utf8');
   const controllerSrc = () =>
-    readFileSync(join(__dirname, '..', 'modules', 'neture', 'controllers', 'supplier-product.controller.ts'), 'utf8');
+    readSupplierControllerSource(join(__dirname, '../../../..'), 'apps/api-server/src/modules/neture/controllers/supplier-product.controller.ts');
 
   it('등록 경로가 save() 전에 중복 검사를 수행한다', () => {
     const src = serviceSrc();

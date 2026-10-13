@@ -8,7 +8,7 @@
  *   저장은 초안(draft)으로만 한다. 게시 · 보관은 목록(콘텐츠 탭)에서 처리한다.
  *   보관된 콘텐츠는 수정할 수 없다(API 가 404 로 거부).
  */
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import { neturePharmacyOperatorApi as api, type SemiFranchiseContent } from './api';
@@ -37,14 +37,31 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reload, setReload] = useState(0);
+  const [loadedScope, setLoadedScope] = useState('');
+  const scope = `${businessKey ?? ''}:${key}:${id ?? 'new'}`;
+  const lifecycle = useRef({ mounted: false, scope, saving: false });
+  useLayoutEffect(() => {
+    const state = { mounted: true, scope, saving: false };
+    lifecycle.current = state;
+    return () => { state.mounted = false; };
+  }, [scope]);
 
   useEffect(() => {
-    if (!id || (businessKey && businessKey !== key)) return;
+    let active = true;
+    setForm(EMPTY); setCurrent(null); setMessage(null); setLoadError(false); setSaving(false);
+    if (!id || (businessKey && businessKey !== key)) {
+      setLoading(false); setLoadedScope(scope);
+      return () => { active = false; };
+    }
     setLoading(true);
     api
       .getContent(key, id)
       .then((c) => {
+        if (!active) return;
         setCurrent(c);
+        setLoadedScope(scope);
         setForm({
           title: c.title ?? '',
           summary: c.summary ?? '',
@@ -53,15 +70,18 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
           tags: (c.tags ?? []).join(', '),
         });
       })
-      .catch((err: Error) => setMessage({ type: 'error', text: err.message }))
-      .finally(() => setLoading(false));
-  }, [key, id]);
+      .catch((err: Error) => { if (active) { setLoadError(true); setMessage({ type: 'error', text: err.message }); } })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [key, id, businessKey, scope, reload]);
 
   const archived = current?.status === 'archived';
   const set = (field: keyof FormState, value: string) => setForm((f) => ({ ...f, [field]: value }));
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    const state = lifecycle.current;
+    if (state.saving || loading || loadError || loadedScope !== scope || archived || (businessKey && businessKey !== key)) return;
     const title = form.title.trim();
     if (!title) {
       setMessage({ type: 'error', text: '제목을 입력해 주세요.' });
@@ -77,24 +97,26 @@ export default function SemiFranchiseContentFormPage({ businessKey }: { business
         .map((t) => t.trim())
         .filter(Boolean),
     };
-    setSaving(true);
+    state.saving = true; setSaving(true);
     setMessage(null);
     try {
       if (id) await api.updateContent(key, id, input);
       else await api.createContent(key, input);
-      navigate(listPath);
+      if (state.mounted && lifecycle.current === state) navigate(listPath);
     } catch (err) {
-      setMessage({ type: 'error', text: (err as Error).message });
+      if (state.mounted && lifecycle.current === state) setMessage({ type: 'error', text: (err as Error).message });
     } finally {
-      setSaving(false);
+      state.saving = false;
+      if (state.mounted && lifecycle.current === state) setSaving(false);
     }
   };
 
-  if (loading) {
+  if (businessKey && businessKey !== key) return <p>이 사업의 콘텐츠가 아닙니다.</p>;
+  if (loadError) return <div role="alert" className="p-6"><Message message={message} /><button onClick={() => setReload(value => value + 1)} className="mt-3 rounded border px-4 py-2">다시 불러오기</button></div>;
+  if (loading || loadedScope !== scope) {
     return <div className="p-6 text-sm text-gray-500">불러오는 중...</div>;
   }
 
-  if (businessKey && businessKey !== key) return <p>이 사업의 콘텐츠가 아닙니다.</p>;
   return (
     <div className="max-w-4xl space-y-4 p-6">
       <PageHeader

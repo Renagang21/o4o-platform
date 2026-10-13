@@ -1,4 +1,3 @@
-import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils';
 /**
  * Workspace handoff 수신 — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-④
  *
@@ -8,8 +7,7 @@ import { resolveHandoffReturnTo, buildHandoffDestination } from '@o4o/auth-utils
  * 서버는 이 origin(store.neture.co.kr)에서만 workspace 토큰을 교환하며, 판정 축은 서비스 membership 이 아니라
  * "접근 가능한 매장(organization)" 이다. 가짜 serviceKey 로 우회하지 않는다.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { clearStoredTokens, exchangeHandoffToken, storeTokens } from '@o4o/auth-client';
+import { useHandoffExchange } from '@o4o/auth-react';
 import { API_BASE_URL } from '../lib/apiClient';
 import { BRAND, PLATFORM_ORIGIN } from '../config/workspace';
 
@@ -22,31 +20,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_USER: '계정을 확인할 수 없습니다.',
 };
 export default function HandoffPage() {
-  const [error, setError] = useState('');
-  const exchangeStarted = useRef(false);
-  useLayoutEffect(() => { clearStoredTokens(); }, []);
-  useEffect(() => {
-    // StrictMode replays effects; the server consumes each handoff token once.
-    if (exchangeStarted.current) return;
-    exchangeStarted.current = true;
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    const returnTo = resolveHandoffReturnTo(params.get('returnTo'), window.location.origin);
-    if (!token) { setError('이동 정보가 없습니다.'); return; }
-    void (async () => {
-      try {
-        const response = await exchangeHandoffToken(API_BASE_URL, token);
-        const data = await response.json().catch(() => null);
-        const tokens = data?.data?.tokens;
-        if (response.ok && data?.success && tokens?.accessToken) {
-          storeTokens({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
-          window.location.replace(buildHandoffDestination(returnTo, window.location.origin));
-          return;
-        }
-        setError(ERROR_MESSAGES[data?.code] || data?.error || '매장 업무공간 이동에 실패했습니다.');
-      } catch { setError('네트워크 오류가 발생했습니다.'); }
-    })();
-  }, []);
+  const result = useHandoffExchange({ apiBaseUrl: API_BASE_URL, missingTokenMessage: '이동 정보가 없습니다.', networkErrorMessage: '네트워크 오류가 발생했습니다.' });
+  const error = result.status === 'error' ? ERROR_MESSAGES[result.code] || result.message : '';
   if (!error) return <main className="center-card"><section className="card"><h1>{BRAND.name}</h1><p>매장 업무공간으로 이동 중...</p></section></main>;
   return <main className="center-card"><section className="card"><h1>이동 실패</h1><p>{error}</p><a className="button-link" href={PLATFORM_ORIGIN}>O4O 메인으로</a></section></main>;
 }

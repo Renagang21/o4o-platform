@@ -175,3 +175,12 @@ it('token-cleared event invalidates a pending status response', async () => {
   expect(seen?.user).toBeNull();
   expect(seen?.isLoading).toBe(false);
 });
+
+// Cookie TTL is not exposed. A verified account must not manufacture a fresh hour on each render.
+it('does not fabricate a cookie-session expiry', async () => {
+  const client = makeClient();
+  client.api.get.mockResolvedValue(statusOf(A));
+  renderWith(client);
+  await waitFor(() => expect(seen?.user?.id).toBe(A.id));
+  expect(seen?.getSessionStatus()).toBeNull();
+});
