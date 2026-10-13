@@ -52,7 +52,7 @@ export function createInventoryController(dataSource: DataSource): Router {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { offerId } = req.params;
-      const { stock_quantity, low_stock_threshold, track_inventory } = req.body;
+      const { stock_quantity, low_stock_threshold, track_inventory, expected_version } = req.body;
 
       // Validate inputs
       if (stock_quantity !== undefined && (!Number.isInteger(stock_quantity) || stock_quantity < 0)) {
@@ -62,12 +62,19 @@ export function createInventoryController(dataSource: DataSource): Router {
         return res.status(400).json({ success: false, error: 'INVALID_THRESHOLD', message: 'low_stock_threshold must be a non-negative integer' });
       }
 
-      const result = await service.updateInventory(offerId, supplierId, { stock_quantity, low_stock_threshold, track_inventory });
+      if (expected_version !== undefined && (typeof expected_version !== 'string' || !/^[a-f0-9]{32}$/.test(expected_version))) {
+        return res.status(400).json({ success: false, error: 'INVALID_INVENTORY_VERSION', message: 'Invalid inventory version' });
+      }
+
+      const result = await service.updateInventory(offerId, supplierId, { stock_quantity, low_stock_threshold, track_inventory, expected_version });
       if (result === null) {
         return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Product not found' });
       }
       if (result === 'NO_UPDATES') {
         return res.status(400).json({ success: false, error: 'NO_UPDATES', message: 'No fields to update' });
+      }
+      if (result === 'INVENTORY_CONFLICT') {
+        return res.status(409).json({ success: false, error: 'INVENTORY_CONFLICT', message: '재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.' });
       }
       res.json({ success: true, data: result });
     } catch (error) {

@@ -112,6 +112,22 @@ integration('supplier order and product reads (isolated PostgreSQL)', () => {
     expect(result.data.every((order) => order.canFulfill === false && order.fulfillmentUrl === null)).toBe(true);
   });
 
+  it.each(['other-supplier', 'other-service', 'missing-items'])(
+    'retains a paid checkout when its bridge pointer is not visible: %s', async (kind) => {
+      await checkout(101);
+      await neture(1, kind === 'other-service' ? 'excluded-service' : 'neture', { checkoutOrderId: id(101) });
+      if (kind === 'other-supplier') {
+        await q.query('UPDATE supplier_product_offers SET supplier_id=$1 WHERE id=$2', [otherSupplierId, offerId]);
+      }
+      if (kind === 'missing-items') await q.query('DELETE FROM neture.neture_order_items WHERE order_id=$1', [id(1)]);
+      const all = await service.listUnifiedOrders(supplierId, { page: 1, limit: 20 });
+      expect(all.meta.total).toBe(1);
+      expect(all.data[0]).toMatchObject({ id: id(101), source: 'checkout_order', canFulfill: false, fulfillmentUrl: null });
+      const checkoutOnly = await service.listUnifiedOrders(supplierId, { page: 1, limit: 20, source: 'checkout' });
+      expect(checkoutOnly.meta.total).toBe(1);
+    },
+  );
+
   it('pages ties across sources without duplicates or omitted rows', async () => {
     await neture(1); await neture(2); await checkout(101); await checkout(102);
     const first = await service.listUnifiedOrders(supplierId, { page: 1, limit: 3 });
