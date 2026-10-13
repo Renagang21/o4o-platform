@@ -1,3 +1,4 @@
+import { loadAiPriceCatalog, resolveAiPrice, estimateAiCost } from '../modules/ai-policy/ai-pricing.js';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import type { User } from './User.js';
 
@@ -39,7 +40,7 @@ export class AIUsageLog {
   @Column({ type: 'varchar', length: 50, nullable: true })
   scope?: string;
 
-  @Column({ type: 'numeric', precision: 15, scale: 6, nullable: true })
+  @Column({ type: 'numeric', precision: 20, scale: 8, nullable: true })
   costEstimated?: number;
 
   @ManyToOne('User')
@@ -85,29 +86,9 @@ export class AIUsageLog {
   @CreateDateColumn()
   createdAt!: Date;
 
-  /**
-   * Estimate cost based on provider and token usage
-   * Rough estimates (as of 2025):
-   * - OpenAI GPT-4: $0.03/1K prompt, $0.06/1K completion
-   * - Gemini Pro: $0.0005/1K prompt, $0.0015/1K completion
-   * - Claude Opus: $0.015/1K prompt, $0.075/1K completion
-   */
+  /** Same versioned model price resolver used by policy accounting; estimate only. */
   estimateCost(): number {
-    if (!this.promptTokens || !this.completionTokens) return 0;
-
-    const costs = {
-      [AIProvider.OPENAI]: { prompt: 0.03, completion: 0.06 },
-      [AIProvider.GEMINI]: { prompt: 0.0005, completion: 0.0015 },
-      [AIProvider.CLAUDE]: { prompt: 0.015, completion: 0.075 },
-    };
-
-    const cost = costs[this.provider];
-    if (!cost) return 0;
-
-    const promptCost = (this.promptTokens / 1000) * cost.prompt;
-    const completionCost = (this.completionTokens / 1000) * cost.completion;
-
-    return promptCost + completionCost;
+    return estimateAiCost(resolveAiPrice(loadAiPriceCatalog(), this.provider, this.model), this.promptTokens ?? 0, this.completionTokens ?? 0);
   }
 
   /**

@@ -1,17 +1,10 @@
-/**
- * AiQuotaService — WO-O4O-AI-COST-LIMIT-QUOTA-V1
- *
- * AI 사용량 quota 검사 + 집계 카운터 관리.
- *
- * checkQuota(): 실행 전 제한 초과 여부 판정
- * incrementAggregates(): 실행 후 카운터 원자적 증가 (UPSERT)
- */
-
-import type { DataSource } from 'typeorm';
+import { reservedQuotaUsageSql } from './quota-reservation-sql.js';
+/** Atomic admission and settlement on the existing aggregate ledger, with separate durable reservations. */
+import { randomUUID } from 'crypto';
+import type { DataSource, EntityManager } from 'typeorm';
 import type { AiPolicyScope } from './ai-policy-scope.js';
 import { SERVICE_FOR_SCOPE } from './ai-policy-scope.js';
-
-// ── Types ──
+import type { AiPriceSnapshot } from './ai-pricing.js';
 
 export interface QuotaWarning {
   layer: string;
@@ -20,7 +13,6 @@ export interface QuotaWarning {
   period: string;
   usagePercent: number;
 }
-
 export interface QuotaExceeded {
   layer: string;
   layerKey: string;
@@ -29,127 +21,316 @@ export interface QuotaExceeded {
   currentValue: number;
   limitValue: number;
 }
-
 export interface QuotaCheckResult {
   allowed: boolean;
   warnings: QuotaWarning[];
   exceeded: QuotaExceeded[];
 }
-
-// ── Service ──
+export interface AiQuotaUsage {
+  requests: number;
+  tokens: number;
+  cost: number;
+}
+export interface AiQuotaReservation {
+  id: string;
+  warnings: QuotaWarning[];
+}
+type Query = Pick<EntityManager, 'query'>;
+const LOCK = 'SELECT pg_advisory_xact_lock(1791870, 1)';
+function validUsage(usage: AiQuotaUsage): void {
+  if (
+    !Number.isSafeInteger(usage.requests) ||
+    usage.requests < 0 ||
+    !Number.isSafeInteger(usage.tokens) ||
+    usage.tokens < 0 ||
+    !Number.isFinite(usage.cost) ||
+    usage.cost < 0 ||
+    usage.cost > 999_999_999_999
+  )
+    throw new Error('AI_USAGE_INVALID');
+}
+function periods(now: Date) {
+  return [now.toISOString().slice(0, 10), now.toISOString().slice(0, 7)];
+}
+function safeFailure(operation: string): Error {
+  // Database/provider errors may contain credentials or request values. Only the operation is observable.
+  console.warn('[AiQuota] persistence unavailable', { operation });
+  return new Error('AI_QUOTA_UNAVAILABLE');
+}
 
 export class AiQuotaService {
   constructor(private dataSource: DataSource) {}
 
-  /**
-   * Scope에 적용되는 모든 quota를 검사.
-   * 검사 순서: global → service → scope → user.
-   * 테이블 미존재 시 { allowed: true } 반환.
-   */
-  async checkQuota(scope: AiPolicyScope, userId?: string): Promise<QuotaCheckResult> {
-    try {
-      const service = SERVICE_FOR_SCOPE[scope];
-      const now = new Date();
-      const dailyKey = now.toISOString().slice(0, 10);
-      const monthlyKey = now.toISOString().slice(0, 7);
-
-      // 1. 적용 가능 quota 로드
-      const layerConditions = [
-        `(layer = 'global' AND layer_key = '*')`,
-        `(layer = 'service' AND layer_key = $1)`,
-        `(layer = 'scope' AND layer_key = $2)`,
-      ];
-      const params: string[] = [service, scope];
-
-      if (userId) {
-        layerConditions.push(`(layer = 'user' AND layer_key = $${params.length + 1})`);
-        params.push(userId);
-      }
-
-      const quotas = await this.dataSource.query(
-        `SELECT layer, layer_key AS "layerKey", limit_type AS "limitType", period,
-                limit_value AS "limitValue", warning_threshold AS "warningThreshold"
-         FROM ai_usage_quota
-         WHERE is_enabled = true AND (${layerConditions.join(' OR ')})`,
-        params,
-      );
-
-      if (!quotas || quotas.length === 0) {
-        return { allowed: true, warnings: [], exceeded: [] };
-      }
-
-      // 2. 해당 quota들의 aggregate 현재값 로드
-      const aggKeys: string[] = [];
-      const aggParams: (string | undefined)[] = [];
-      let paramIdx = 1;
-
-      for (const q of quotas) {
-        const periodKey = q.period === 'daily' ? dailyKey : monthlyKey;
-        aggKeys.push(`($${paramIdx}, $${paramIdx + 1}, $${paramIdx + 2}, $${paramIdx + 3})`);
-        aggParams.push(q.layer, q.layerKey, q.limitType, periodKey);
-        paramIdx += 4;
-      }
-
-      const aggregates = await this.dataSource.query(
-        `SELECT layer, layer_key AS "layerKey", limit_type AS "limitType",
-                period_key AS "periodKey", current_value AS "currentValue"
-         FROM ai_usage_aggregate
-         WHERE (layer, layer_key, limit_type, period_key) IN (${aggKeys.join(', ')})`,
-        aggParams,
-      );
-
-      // 3. aggregate를 맵으로 변환
-      const aggMap = new Map<string, number>();
-      for (const a of aggregates) {
-        aggMap.set(`${a.layer}|${a.layerKey}|${a.limitType}|${a.periodKey}`, Number(a.currentValue));
-      }
-
-      // 4. 판정
-      const warnings: QuotaWarning[] = [];
-      const exceeded: QuotaExceeded[] = [];
-
-      for (const q of quotas) {
-        const periodKey = q.period === 'daily' ? dailyKey : monthlyKey;
-        const key = `${q.layer}|${q.layerKey}|${q.limitType}|${periodKey}`;
-        const currentValue = aggMap.get(key) ?? 0;
-        const limitValue = Number(q.limitValue);
-        const usagePercent = limitValue > 0 ? (currentValue / limitValue) * 100 : 0;
-
-        if (currentValue >= limitValue) {
-          exceeded.push({
-            layer: q.layer,
-            layerKey: q.layerKey,
-            limitType: q.limitType,
-            period: q.period,
-            currentValue,
-            limitValue,
-          });
-        } else if (usagePercent >= Number(q.warningThreshold)) {
-          warnings.push({
-            layer: q.layer,
-            layerKey: q.layerKey,
-            limitType: q.limitType,
-            period: q.period,
-            usagePercent: Math.round(usagePercent * 10) / 10,
-          });
-        }
-      }
-
+  /** Admin visibility: completed billing usage and held admission capacity stay separate. */
+  async getStatus(): Promise<Record<string, unknown>[]> {
+    const [daily, monthly] = periods(new Date());
+    const rows = await this.dataSource.query(
+      `SELECT q.id, q.layer, q.layer_key AS "layerKey", q.limit_type AS "limitType",
+      q.period, q.limit_value AS "limitValue", q.warning_threshold AS "warningThreshold", q.is_enabled AS "isEnabled",
+      COALESCE(a.current_value,0) AS "currentValue", ${reservedQuotaUsageSql(1, 2)} AS "reservedValue"
+      FROM ai_usage_quota q LEFT JOIN ai_usage_aggregate a ON a.layer = q.layer AND a.layer_key = q.layer_key
+        AND a.limit_type = q.limit_type AND a.period_key = CASE q.period WHEN 'daily' THEN $1 ELSE $2 END
+      WHERE q.is_enabled = true ORDER BY q.layer, q.layer_key`,
+      [daily, monthly],
+    );
+    return rows.map((row: any) => {
+      const limitValue = Number(row.limitValue),
+        currentValue = Number(row.currentValue),
+        reservedValue = Number(row.reservedValue);
+      const projectedValue = currentValue + reservedValue;
+      const usagePercent =
+        limitValue > 0
+          ? Math.round((projectedValue / limitValue) * 1000) / 10
+          : 0;
       return {
-        allowed: exceeded.length === 0,
-        warnings,
-        exceeded,
+        ...row,
+        limitValue,
+        currentValue,
+        reservedValue,
+        projectedValue,
+        usagePercent,
+        status:
+          projectedValue >= limitValue
+            ? 'exceeded'
+            : usagePercent >= Number(row.warningThreshold)
+              ? 'warning'
+              : 'ok',
       };
+    });
+  }
+
+  async checkQuota(
+    scope: AiPolicyScope,
+    userId?: string,
+  ): Promise<QuotaCheckResult> {
+    try {
+      return await this.evaluate(
+        this.dataSource,
+        scope,
+        userId,
+        { requests: 0, tokens: 0, cost: 0 },
+        new Date(),
+      );
     } catch {
-      // 테이블 미존재 등 → 제한 없이 허용
-      return { allowed: true, warnings: [], exceeded: [] };
+      throw safeFailure('check');
     }
   }
 
-  /**
-   * 모든 적용 레이어의 집계 카운터를 원자적으로 증가.
-   * Fire-and-forget으로 호출 (caller에서 .catch(() => {})).
-   */
+  async reserve(
+    scope: AiPolicyScope,
+    userId: string | undefined,
+    budget: AiQuotaUsage,
+    prices: AiPriceSnapshot[],
+    serviceKey = SERVICE_FOR_SCOPE[scope],
+  ): Promise<AiQuotaReservation> {
+    validUsage(budget);
+    const now = new Date();
+    const [dailyKey, monthlyKey] = periods(now);
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        await manager.query(LOCK);
+        const result = await this.evaluate(
+          manager,
+          scope,
+          userId,
+          budget,
+          now,
+          serviceKey,
+        );
+        if (!result.allowed) throw new Error('QUOTA_EXCEEDED');
+        const id = randomUUID();
+        await manager.query(
+          `INSERT INTO ai_usage_reservations
+          (id, scope, service_key, user_id, daily_key, monthly_key, reserved_requests, reserved_tokens, reserved_cost, pricing)
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb)`,
+          [
+            id,
+            scope,
+            serviceKey,
+            userId ?? null,
+            dailyKey,
+            monthlyKey,
+            budget.requests,
+            budget.tokens,
+            budget.cost,
+            JSON.stringify(prices),
+          ],
+        );
+        return { id, warnings: result.warnings };
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'QUOTA_EXCEEDED')
+        throw error;
+      throw safeFailure('reserve');
+    }
+  }
+
+  /** Log + aggregate + reservation transition commit together. Repeat settlement is idempotent. */
+  async settle(
+    reservation: AiQuotaReservation,
+    usage: AiQuotaUsage,
+    record: (manager: EntityManager) => Promise<void>,
+    receipt: {
+      providerRequestId?: string;
+      outcome: 'success' | 'error';
+      uncertain?: AiQuotaUsage;
+      detail?: {
+        provider: string;
+        model: string;
+        price: AiPriceSnapshot;
+        attempts: number;
+      };
+    },
+  ): Promise<void> {
+    validUsage(usage);
+    if (receipt.uncertain) validUsage(receipt.uncertain);
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        await manager.query(LOCK);
+        const [row] = await manager.query(
+          'SELECT * FROM ai_usage_reservations WHERE id = $1 FOR UPDATE',
+          [reservation.id],
+        );
+        if (!row) throw new Error('RESERVATION_NOT_FOUND');
+        if (row.status !== 'reserved') {
+          if (
+            ['settled', 'pending'].includes(row.status) &&
+            row.outcome === receipt.outcome &&
+            row.provider_request_id === (receipt.providerRequestId ?? null) &&
+            Number(row.actual_requests) === usage.requests &&
+            Number(row.actual_tokens) === usage.tokens &&
+            Number(row.actual_cost) === usage.cost
+          )
+            return;
+          throw new Error('RESERVATION_CONFLICT');
+        }
+        await record(manager);
+        await this.increment(
+          manager,
+          row.scope,
+          row.user_id ?? undefined,
+          usage,
+          [row.daily_key, row.monthly_key],
+          row.service_key,
+        );
+        const uncertain = receipt.uncertain ?? {
+          requests: 0,
+          tokens: 0,
+          cost: 0,
+        };
+        const status =
+          uncertain.requests || uncertain.tokens || uncertain.cost
+            ? 'pending'
+            : 'settled';
+        await manager.query(
+          `UPDATE ai_usage_reservations SET status = $7, outcome = $2,
+          actual_requests = $3, actual_tokens = $4, actual_cost = $5, provider_request_id = $6, settled_at = NOW(), reserved_requests = $8, reserved_tokens = $9, reserved_cost = $10, receipt = $11::jsonb WHERE id = $1`,
+          [
+            reservation.id,
+            receipt.outcome,
+            usage.requests,
+            usage.tokens,
+            usage.cost,
+            receipt.providerRequestId ?? null,
+            status,
+            uncertain.requests,
+            uncertain.tokens,
+            uncertain.cost,
+            receipt.detail ? JSON.stringify(receipt.detail) : null,
+          ],
+        );
+      });
+    } catch {
+      throw safeFailure('settle');
+    }
+  }
+
+  /** Host-only reconciliation after verified provider usage/no-charge evidence; never exposed as a user tool. */
+  async reconcile(
+    reservation: AiQuotaReservation,
+    verified: { evidenceId: string; usage: AiQuotaUsage },
+    record: (manager: EntityManager) => Promise<void>,
+  ): Promise<void> {
+    validUsage(verified.usage);
+    if (!/^[a-zA-Z0-9._:-]{1,100}$/.test(verified.evidenceId))
+      throw new Error('AI_RECONCILIATION_INVALID');
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        await manager.query(LOCK);
+        const [row] = await manager.query(
+          'SELECT * FROM ai_usage_reservations WHERE id = $1 FOR UPDATE',
+          [reservation.id],
+        );
+        if (!row) throw new Error('RESERVATION_NOT_FOUND');
+        if (row.reconciliation_id === verified.evidenceId) {
+          if (
+            !row.reconciliation_usage ||
+            ['requests', 'tokens', 'cost'].some(
+              (key) =>
+                Number(row.reconciliation_usage[key]) !==
+                verified.usage[key as keyof AiQuotaUsage],
+            )
+          )
+            throw new Error('RESERVATION_CONFLICT');
+          return;
+        }
+        if (verified.usage.requests > Number(row.reserved_requests))
+          throw new Error('RESERVATION_CONFLICT');
+        if (!['reserved', 'pending'].includes(row.status))
+          throw new Error('RESERVATION_CONFLICT');
+        await record(manager);
+        await this.increment(
+          manager,
+          row.scope,
+          row.user_id ?? undefined,
+          verified.usage,
+          [row.daily_key, row.monthly_key],
+          row.service_key,
+        );
+        await manager.query(
+          `UPDATE ai_usage_reservations SET status = 'settled',
+          actual_requests = COALESCE(actual_requests,0) + $2, actual_tokens = COALESCE(actual_tokens,0) + $3,
+          actual_cost = COALESCE(actual_cost,0) + $4, reserved_requests = 0, reserved_tokens = 0, reserved_cost = 0,
+          reconciliation_id = $5, reconciliation_usage = $6::jsonb, settled_at = NOW() WHERE id = $1`,
+          [
+            reservation.id,
+            verified.usage.requests,
+            verified.usage.tokens,
+            verified.usage.cost,
+            verified.evidenceId,
+            JSON.stringify(verified.usage),
+          ],
+        );
+      });
+    } catch {
+      throw safeFailure('reconcile');
+    }
+  }
+
+  /** Only for work proven not dispatched. Uncertain/crashed requests remain reserved for reconciliation. */
+  async release(reservation: AiQuotaReservation): Promise<void> {
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        await manager.query(LOCK);
+        const rows = await manager.query(
+          "WITH released AS (UPDATE ai_usage_reservations SET status = 'released', settled_at = NOW() WHERE id = $1 AND status = 'reserved' RETURNING id) SELECT id FROM released",
+          [reservation.id],
+        );
+        if (!rows.length) {
+          const [row] = await manager.query(
+            'SELECT status FROM ai_usage_reservations WHERE id = $1',
+            [reservation.id],
+          );
+          if (row?.status !== 'released')
+            throw new Error('RESERVATION_CONFLICT');
+        }
+      });
+    } catch {
+      throw safeFailure('release');
+    }
+  }
+
+  /** Compatibility for callers outside admission; errors are surfaced rather than silently discarded. */
   async incrementAggregates(
     scope: AiPolicyScope,
     userId: string | undefined,
@@ -157,60 +338,122 @@ export class AiQuotaService {
     totalTokens: number,
     costEstimated: number,
   ): Promise<void> {
+    const usage = { requests, tokens: totalTokens, cost: costEstimated };
+    validUsage(usage);
     try {
-      const service = SERVICE_FOR_SCOPE[scope];
-      const now = new Date();
-      const dailyKey = now.toISOString().slice(0, 10);
-      const monthlyKey = now.toISOString().slice(0, 7);
+      await this.dataSource.transaction(async (manager) => {
+        await manager.query(LOCK);
+        await this.increment(
+          manager,
+          scope,
+          userId,
+          usage,
+          periods(new Date()),
+        );
+      });
+    } catch {
+      throw safeFailure('increment');
+    }
+  }
 
-      // 레이어별 키
-      const layers: Array<[string, string]> = [
-        ['global', '*'],
-        ['service', service],
-        ['scope', scope],
-      ];
-      if (userId) {
-        layers.push(['user', userId]);
-      }
+  private async evaluate(
+    query: Query,
+    scope: AiPolicyScope,
+    userId: string | undefined,
+    budget: AiQuotaUsage,
+    now: Date,
+    serviceKey = SERVICE_FOR_SCOPE[scope],
+  ): Promise<QuotaCheckResult> {
+    const service = serviceKey;
+    if (!service) throw new Error('AI_SCOPE_INVALID');
+    const [dailyKey, monthlyKey] = periods(now);
+    const quotas = await query.query(
+      `SELECT q.layer, q.layer_key AS "layerKey", q.limit_type AS "limitType", q.period,
+      q.limit_value AS "limitValue", q.warning_threshold AS "warningThreshold",
+      COALESCE(a.current_value, 0) + ${reservedQuotaUsageSql(4, 5)} AS "currentValue"
+      FROM ai_usage_quota q LEFT JOIN ai_usage_aggregate a
+        ON a.layer = q.layer AND a.layer_key = q.layer_key AND a.limit_type = q.limit_type
+        AND a.period_key = CASE q.period WHEN 'daily' THEN $4 ELSE $5 END
+      WHERE q.is_enabled = true AND ((q.layer = 'global' AND q.layer_key = '*')
+        OR (q.layer = 'service' AND q.layer_key = $1) OR (q.layer = 'scope' AND q.layer_key = $2)
+        OR (q.layer = 'user' AND q.layer_key = $3))`,
+      [service, scope, userId ?? null, dailyKey, monthlyKey],
+    );
+    const warnings: QuotaWarning[] = [],
+      exceeded: QuotaExceeded[] = [];
+    for (const q of quotas) {
+      if (
+        !['requests', 'tokens', 'cost'].includes(q.limitType) ||
+        !['daily', 'monthly'].includes(q.period)
+      )
+        throw new Error('AI_QUOTA_INVALID');
+      const currentValue = Number(q.currentValue),
+        limitValue = Number(q.limitValue);
+      if (
+        !Number.isFinite(currentValue) ||
+        !Number.isFinite(limitValue) ||
+        currentValue < 0 ||
+        limitValue < 0
+      )
+        throw new Error('AI_QUOTA_INVALID');
+      const projected =
+        currentValue + budget[q.limitType as keyof AiQuotaUsage];
+      const usagePercent =
+        limitValue > 0 ? (projected / limitValue) * 100 : 100;
+      if (
+        projected > limitValue ||
+        (projected === limitValue && budget.requests === 0)
+      )
+        exceeded.push({
+          layer: q.layer,
+          layerKey: q.layerKey,
+          limitType: q.limitType,
+          period: q.period,
+          currentValue,
+          limitValue,
+        });
+      else if (usagePercent >= Number(q.warningThreshold))
+        warnings.push({
+          layer: q.layer,
+          layerKey: q.layerKey,
+          limitType: q.limitType,
+          period: q.period,
+          usagePercent: Math.round(usagePercent * 10) / 10,
+        });
+    }
+    return { allowed: !exceeded.length, warnings, exceeded };
+  }
 
-      // 타입별 값
-      const types: Array<[string, number]> = [
-        ['requests', requests],
-        ['tokens', totalTokens],
-        ['cost', costEstimated],
-      ];
-
-      // 기간
-      const periods: Array<string> = [dailyKey, monthlyKey];
-
-      // multi-row UPSERT
-      const values: string[] = [];
-      const params: (string | number)[] = [];
-      let idx = 1;
-
-      for (const [layer, layerKey] of layers) {
-        for (const [limitType, value] of types) {
-          if (value === 0) continue;
-          for (const periodKey of periods) {
-            values.push(`($${idx}, $${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4})`);
-            params.push(layer, layerKey, limitType, periodKey, value);
-            idx += 5;
-          }
+  private async increment(
+    query: Query,
+    scope: AiPolicyScope,
+    userId: string | undefined,
+    usage: AiQuotaUsage,
+    keys: string[],
+    serviceKey = SERVICE_FOR_SCOPE[scope],
+  ): Promise<void> {
+    const layers: Array<[string, string]> = [
+      ['global', '*'],
+      ['service', serviceKey],
+      ['scope', scope],
+    ];
+    if (userId) layers.push(['user', userId]);
+    const values: string[] = [],
+      params: (string | number)[] = [];
+    for (const [layer, key] of layers)
+      for (const [kind, value] of Object.entries(usage))
+        for (const period of keys) {
+          if (!value) continue;
+          const i = params.length + 1;
+          values.push(`($${i},$${i + 1},$${i + 2},$${i + 3},$${i + 4})`);
+          params.push(layer, key, kind, period, value);
         }
-      }
-
-      if (values.length === 0) return;
-
-      await this.dataSource.query(
-        `INSERT INTO ai_usage_aggregate (layer, layer_key, limit_type, period_key, current_value, last_updated_at)
-         VALUES ${values.join(', ')}
-         ON CONFLICT (layer, layer_key, limit_type, period_key)
-         DO UPDATE SET current_value = ai_usage_aggregate.current_value + EXCLUDED.current_value,
-                       last_updated_at = NOW()`,
+    if (values.length)
+      await query.query(
+        `INSERT INTO ai_usage_aggregate (layer, layer_key, limit_type, period_key, current_value)
+      VALUES ${values.join(',')} ON CONFLICT (layer, layer_key, limit_type, period_key)
+      DO UPDATE SET current_value = ai_usage_aggregate.current_value + EXCLUDED.current_value, last_updated_at = NOW()`,
         params,
       );
-    } catch (err) {
-      console.warn('[AiQuota] incrementAggregates failed:', err);
-    }
   }
 }

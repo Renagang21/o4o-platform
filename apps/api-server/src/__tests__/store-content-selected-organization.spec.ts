@@ -1,3 +1,4 @@
+const mockTranslation = jest.fn();
 jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
 import express from 'express';
 import request from 'supertest';
@@ -13,7 +14,7 @@ import { createDirectContent, updateDirectContent } from '../services/store/stor
 jest.mock('../utils/store-owner.utils.js', () => ({ isStoreOwner: jest.fn() }));
 jest.mock('@o4o/asset-copy-core', () => jest.requireActual('../../../../packages/asset-copy-core/src/index.ts'), { virtual: true });
 jest.mock('../modules/asset-snapshot/resolvers/kpa-asset.resolver.js', () => ({ KpaAssetResolver: class {} }));
-jest.mock('../modules/store-ai/services/content-ai-translation.service.js', () => ({ ContentTranslationService: class {} }));
+jest.mock('../modules/store-ai/services/content-ai-translation.service.js', () => ({ ContentTranslationService: class { translate = mockTranslation; } }));
 jest.mock('../services/store/store-content.service.js', () => ({
   createDirectContent: jest.fn(async (_ds, organizationId) => ({ ok: true, data: { organizationId } })),
   updateDirectContent: jest.fn(async (_ds, organizationId) => ({ ok: true, data: { organizationId } })),
@@ -157,5 +158,44 @@ describe('content organization selection', () => {
     expect(responses[2].body.data.items).toEqual([]);
     expect(query).not.toHaveBeenCalled(); expect(repo.findOne).not.toHaveBeenCalled();
     expect(createDirectContent).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('AI translation uses existing store authorization and draft persistence', () => {
+  function translationDatabase() {
+    const { ds, repo } = database();
+    const row = { id: A, organization_id: B, source_type: 'direct', title: 'original', content_json: { html: '<p>original</p>' } };
+    repo.findOne.mockImplementation(async ({ where }: any) => where.id === A && where.organization_id === B ? { ...row, content_json: { ...row.content_json } } : null);
+    mockTranslation.mockImplementation(async (_title, _html, _locale, access) => {
+      expect(access).toMatchObject({ actorId: 'synthetic-user', organizationId: B, contentId: A });
+      expect(await access.authorize()).toBe(true);
+      return { result: { title: 'translated', html: '<p>translated</p>' }, model: 'selected-model', execution: { requestId: 'run-a', providerRequestId: 'call-a' } };
+    });
+    return { ds, repo, row };
+  }
+  it('keeps ownership scoped and saves only a draft with execution correlation', async () => {
+    const { ds, repo } = translationDatabase();
+    const result = await request(appFor(ds)).post(`/contents/direct/${A}/translate`).set('X-Store-Organization-Id', B).send({ locale: 'en' });
+    expect(result.status).toBe(200);
+    expect(result.body.data.translation).toMatchObject({ title: 'translated', status: 'draft', execution: { requestId: 'run-a', providerRequestId: 'call-a' } });
+    expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ organization_id: B, updated_by: 'synthetic-user' }));
+  });
+  it("never invokes AI for a different store's material", async () => {
+    const { ds, repo } = translationDatabase();
+    const result = await request(appFor(ds)).post(`/contents/direct/${A}/translate`).set('X-Store-Organization-Id', A).send({ locale: 'en' });
+    expect(result.status).toBe(404); expect(mockTranslation).not.toHaveBeenCalled(); expect(repo.save).not.toHaveBeenCalled();
+  });
+  it('does not save after store access is revoked during the model call', async () => {
+    const { ds, repo } = translationDatabase();
+    mockTranslation.mockImplementation(async () => { owner.mockResolvedValue(access(null, 'none', false)); return { result: { title: 'T', html: '<p>T</p>' }, model: 'm' }; });
+    const result = await request(appFor(ds)).post(`/contents/direct/${A}/translate`).set('X-Store-Organization-Id', B).send({ locale: 'en' });
+    expect(result.status).toBe(403); expect(repo.save).not.toHaveBeenCalled();
+  });
+  it('does not save a draft for source content changed during the call', async () => {
+    const { ds, repo, row } = translationDatabase();
+    mockTranslation.mockImplementation(async () => { row.title = 'edited'; return { result: { title: 'T', html: '<p>T</p>' }, model: 'm' }; });
+    const result = await request(appFor(ds)).post(`/contents/direct/${A}/translate`).set('X-Store-Organization-Id', B).send({ locale: 'en' });
+    expect(result.status).toBe(409); expect(result.body.error.code).toBe('CONTENT_CHANGED'); expect(repo.save).not.toHaveBeenCalled();
   });
 });

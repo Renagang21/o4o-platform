@@ -1,3 +1,4 @@
+import { normalizeAiShortLongResponse } from './common.js';
 /**
  * AI Prompt — store_qr (QR 안내문)
  *
@@ -50,27 +51,5 @@ export function parseStoreQrResponse(
   parsed: Record<string, any>,
   rawText: string
 ): Omit<NormalizedAiContentResponse, 'type'> {
-  const title = typeof parsed.title === 'string' ? parsed.title : '';
-  const shortText = typeof parsed.shortText === 'string' ? parsed.shortText : '';
-  const longText = typeof parsed.longText === 'string' ? parsed.longText : '';
-
-  const html =
-    parsed.html ||
-    [
-      title ? `<p><strong>${title}</strong></p>` : '',
-      shortText ? `<p>${shortText}</p>` : '',
-      longText ? `<p>${longText}</p>` : '',
-    ]
-      .filter(Boolean)
-      .join('') ||
-    `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-
-  return {
-    html,
-    title,
-    summary: typeof parsed.summary === 'string' ? parsed.summary : '',
-    bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [],
-    shortText,
-    longText,
-  };
+  return normalizeAiShortLongResponse(parsed, rawText);
 }
