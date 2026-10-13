@@ -1,6 +1,6 @@
 # 전체 관리자의 서비스 운영자 지정 후속 안내 보완
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13
 > **근거 WO/IR**: 사용자 지시 — 오프라인 지정 흐름 조사 후 확인한 안내 부족 수정 · [서비스별 운영자 로드맵](WO-O4O-SERVICE-SPECIFIC-OPERATOR-ROADMAP-V1.md)
 
@@ -23,7 +23,10 @@ Google 미연결 사용자는 본인이 계정 설정의 명시적 연결 절차
 - [x] 기존 관련 테스트 2파일 11개·Admin 타입 검사·공통 패키지 및 Admin 빌드 통과.
 - [x] 합성 계정/응답으로 Chromium 1440px·390px 각각 7상태의 지정 요청·후속 안내·닫기 동작 확인(14개 통과).
 - [x] diff 공백 검사·문서 민감정보 검사 통과.
-- [ ] PR 통합·배포·후속 확인.
+- [x] [PR #529](https://github.com/Renagang21/o4o-platform/pull/529) main 통합: `79ef86063b59cdb7c4b460b4d3f4b223d1be0950`.
+- [x] [PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38341846427) · [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38342104774) · [main CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/38342104687) 성공.
+- [x] [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38342326134) 성공 · `DEPLOYED · deploy: admin` · API/다른 서비스 배포 없음.
+- [x] 관리자 홈 HTTP 200 및 운영자 지연 로딩 자산에서 검색·상태·후속 처리·닫기 안내 문구 제공 확인.
 
 실제 계정 작업·운영 DB 변경은 수행하지 않는다. 개별 분회·커뮤니티 내부 운영자 지정은 별도 업무 경계를 유지한다.
 문서 정합: 과거 로드맵의 중앙 운영자 용어와 admin 전용 정지 설명은 이번 변경의 정책 근거로 사용하지 않는다. 기존 별도 문서 정비 작업의 변경은 포함하지 않는다.
