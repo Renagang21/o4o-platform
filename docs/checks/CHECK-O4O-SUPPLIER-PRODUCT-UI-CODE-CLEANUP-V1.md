@@ -288,3 +288,13 @@ main 최종 조회 `75a28d931`. 실계정과 main 통합/배포는 별도 실행
 
 5차 종료: 구현 `a130dc53a8734bd121a184ea573a031a5006bab1`의 전용 branch push와 원격 SHA 일치를 확인했다.
 검증 5192 서버 종료·listen 0·기존 clone/branch 보존을 확인했다. 종료 범위는 commit/push다.
+
+
+## 누적 변경 main 통합·배포 준비 — 2026-10-13
+
+- 사용자 종료 범위 변경: 앞선 push-only 기록은 당시 범위이며, 이번 요청은 누적 공급자 변경의 PR 병합과 배포까지다.
+- 최신 main `4604f947e50d38eb558081cc50d9a6059f88aee5`의 4개 별도 PH 정리 파일을 자기 branch에 충돌 없이 merge했다. 추가 조회 테스트 5 PASS. 공급자 소스는 기존 검증 완료 상태를 유지한다.
+- 앞선 검증: API 31 suites/777 tests, Neture 89 files/788 tests, KPA 17 files/135 tests PASS; API·editor·Neture·KPA 빌드 및 공유 소비자 typecheck PASS. PC/mobile fixture smoke는 실제 운영 계정 검증과 구분한다.
+- 실제 main ruleset 조회: PR 필수, required check `CI Gate`, 필수 human approval 0. 정상 PR 경로로 통합한다.
+- main 대비 누적 diff에 schema/migration, dependency/lockfile, workflow 변경은 없다. PR 기준 API 위험은 정산 코드의 payment 규칙으로 LEVEL_3이며, 에디터 소비자 frontend는 LEVEL_2다. 실제 배포 범위는 Delivery의 서비스별 serving SHA→target SHA 판정으로 확정한다.
+- PR CI·리뷰 및 post-merge CI·Delivery·서빙 SHA·read-only 운영 smoke는 이후 실행 결과로 별도 기록한다. 운영 계정·데이터 쓰기 검증은 사용자 후속 검증으로 유지한다.
