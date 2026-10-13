@@ -7,7 +7,7 @@
  *   3. O4O 범위 외 금지 키(lot/유효기간/일련번호/재고)는 bulk 경로 BULK_FORBIDDEN_KEYS 와 값이 같다
  *   4. neture.routes.ts 에 /supplier 마운트 존재
  */
-import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 import {
   O4O_OUT_OF_SCOPE_KEYS,
@@ -15,7 +15,7 @@ import {
 } from '../modules/neture/services/supplier-single-candidate.mapper.js';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 
 const CONTROLLER = 'apps/api-server/src/modules/neture/controllers/supplier-product-candidate.controller.ts';
 const MAPPER = 'apps/api-server/src/modules/neture/services/supplier-single-candidate.mapper.ts';

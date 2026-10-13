@@ -18,7 +18,7 @@
  * WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 이 정리했다 —
  * 물리 명칭 계약은 아래 Seller Recruitment 절 + legacy-partner-physical-cleanup.spec.ts 가 고정한다.
  */
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { resolve } from 'path';
 
 const REPO = resolve(__dirname, '../../../..');
@@ -153,7 +153,12 @@ describe('Seller Recruitment (판매자 모집) — Partner 가 아니므로 보
       'services/web-kpa-society/src/pages/pharmacy/StoreRecruitmentApplicationsPage.tsx',
       'services/web-neture/src/lib/api/supplier.ts',
     ]) {
-      const c = code(p);
+      const c = p === 'services/web-neture/src/lib/api/supplier.ts'
+        ? [p, ...readdirSync(resolve(REPO, 'services/web-neture/src/lib/api/supplier'))
+          .filter((name) => name.endsWith('.ts')).sort()
+          .map((name) => `services/web-neture/src/lib/api/supplier/${name}`)]
+          .map(code).join('\n')
+        : code(p);
       expect(c).toContain('/neture/seller-recruitment/');
       expect(c).not.toContain('/neture/partner/');
     }

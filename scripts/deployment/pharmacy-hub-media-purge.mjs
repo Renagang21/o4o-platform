@@ -6,9 +6,13 @@ const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-even
 const ph=field=>`${field}::text=ANY($1::text[])`;
 const assetScope=a=>ph(`${a}.service_key`);
 // These links annotate library resources; business renderers persist their own asset/URL refs.
-// VIDEO Job links are execution inputs/outputs and must never enter this catalog-only scope.
+// Existing VIDEO jobs and orphan INPUT/INTERMEDIATE links stay protected.
+// A PH-owned legacy OUTPUT may be removed only while its job is confirmed absent.
 const linkScope=l=>`EXISTS (SELECT 1 FROM public.media_assets a WHERE a.id=${l}.media_asset_id AND ${assetScope('a')})
-  AND ${l}.entity_type IN ('product','brand','content','service')`;
+  AND (${l}.entity_type IN ('product','brand','content','service') OR
+    (${l}.entity_type='video-production-job' AND ${l}.purpose='OUTPUT'
+      AND NULLIF(${l}.entity_id,'') IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM public.automation_jobs j WHERE j.id::text=${l}.entity_id)))`;
 function id(value) {
   if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_MEDIA_IDENTIFIER');
   return `"${value}"`;
