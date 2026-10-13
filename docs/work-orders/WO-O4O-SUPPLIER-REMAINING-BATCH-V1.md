@@ -1,6 +1,6 @@
 # 공급자 잔여 개발 보완 일괄
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거**: 사용자 — 남은 부분도 일괄 진행, push까지만
 
@@ -17,7 +17,7 @@
 - [x] 현재 supplier에게 보이는 bridge만 호환 조회에서 중복 제거
 - [x] PostgreSQL·HTTP·웹 회귀 및 PC/mobile fixture browser 검증
 - [x] 타입·빌드·lint·차이 검사
-- [ ] 명시적 파일 commit → branch push 및 원격 일치 확인
+- [x] 명시적 파일 commit → branch push 및 원격 일치 확인
 
 main PR/merge·배포·운영 DB 쓰기는 범위 밖이다. 사용자 유예 실계정 검증은 그대로 유지한다.
 최종 fetch에서 main이 `9400a625e`로 이동했다. 추가 경로는 PharmacyHub 퇴역 스크립트/워크플로/기록이며 이번 변경 경로와 겹치지 않는다.
@@ -55,3 +55,10 @@ push 종료 범위이므로 자동 main 통합을 하지 않았으며, 나중의
 실계정·실데이터·실운영 부하는 NOT_RUN이다. 호환 조회 제거 판단과 금융 분배/schema 변경은 후속 근거/승인 대상이다.
 
 문서 정합: 정본 정책·이전 WO/CHECK는 유지하고 이번 실행 기록/검증 절차만 추가했다.
+
+## Git 인계
+
+구현 commit `48d4cc56cf15a9bc6484dd32aac4b5b3d2ed49af`를 `wo/supplier-remaining-batch`에 push했고 `ls-remote`로 일치를 확인했다.
+이 branch에 앞선 쓰기 안정화도 포함된다. 종료 기록 commit의 원격 SHA는 최종 보고에서 확인한다.
+승인된 개발·검증·commit/push 범위 완료이며 main 통합·배포 완료를 뜻하지 않는다.
+독립 checkout/branch는 KEEP — main 미통합, 후속 인계에 필요하다.
