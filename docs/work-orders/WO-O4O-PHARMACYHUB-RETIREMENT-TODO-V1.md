@@ -327,10 +327,30 @@ FK catalog의 name[]를 pg client가 문자열로 읽는 문제를 text[] 집계
 별도 유지보수 실행은 기존 production workflow의 standalone owner/main/CI/freeze/idle gate를 사용한다. runner는 SQL에 연결하지 않고, 현재 API serving image digest의 일회성 Cloud Run job에 검토된 코드와 기존 socket/Secret Manager binding을 지정한다. plan은 READ ONLY transaction, apply는 SERIALIZABLE transaction·task/retry 1/0이다. 성공한 job은 제거하고, 실패/확인 불가 실행은 보존하여 read-only census 재확인 전 재실행하지 않는다. 분리된 PostgreSQL 16에서 PH 행 제거·Neture/사용자/조직/스키마 보존, cross-schema FK·혼합 귀속·건수 drift·삭제 trigger의 rollback을 확인했다. 이 기록은 production 삭제 완료가 아니다. PC Local Agent 업데이트는 담당 에이전트 범위다.
 
 - [x] PR #518 병합 및 읽을 수 있는 실제 census 결과 확보.
-- [ ] PH administrative data plan/apply 및 운영 잔여 검증.
+- [x] PH administrative data plan/apply 및 운영 잔여 검증.
 - [ ] 주문·결제·공급·콘텐츠·미디어의 비-FK/파일 참조 조사와 후속 삭제.
 - [ ] 인증서 목록 권한 보완 후 PH 인증서/map entry/DNS authorization/URL map 종료.
 
 PR #522 리뷰 보완: PH `roles.service_key`와 `roles.name`의 귀속 불일치를 양방향으로 차단한다. apply 전에는 관리자 측 원래 WIF 조건 백업과 해당 main SHA/PH workflow/owner에만 한정된 임시 조건이 필요하다. 코드가 provider의 실제 조건을 정확히 대조하며 다른 workflow/SHA·OR 우회를 허용하지 않는다. 기존 토큰을 가진 실행도 없는 단독 운영 구간을 확인하고, 동일 PH workflow의 concurrency와 함께 다른 운영 writer의 신규 인증을 작업 종료까지 차단한다. `iam.workloadIdentityPoolProviders.get` 읽기 권한이 필요하다. 작업·잔여 검증 뒤 원래 조건을 복구한다. 이 세션에서 기존 PC Local Agent를 변경하지 않는다.
 
 PR #522는 SonarCloud 정렬/복잡도 지적 수정, 관련 56 tests와 PostgreSQL 실검증, 필수 CI·리뷰 해결 후 main `e46f3467892e01f142af8bf58025ac33cd8e6eb7`에 병합했다. post-merge CI 38318999460도 SUCCESS다. 최초 Cloud Run plan 38320131242는 인증 전 safety test에서 중단됐다. 기존 resource-gate 테스트가 실제 workflow의 새 `PH_ADMIN_PURGE=true`를 상속하는 fixture 격리 문제다. DB 접속·job 생성·삭제는 실행하지 않았다. 테스트 환경을 명시적으로 격리하고 PH 입력과 resource retirement의 혼합 거절을 검사한다. 최신 census 38319576225도 인증서 권한 부족 complete=false이며 실제 자원 부재를 증명하지 않는다.
+
+### 2026-10-13 관리 데이터 삭제 및 인증 복구
+
+동일 WO의 연속 단계로 전용 worktree/branch를 유지했다. PR #523의 fixture 격리 수정 후 read-only Cloud Run plan [38322339531](https://github.com/Renagang21/o4o-platform/actions/runs/38322339531)은 SUCCESS였으며 쓰기는 없었다. 관리자가 읽기 권한을 추가한 뒤 census [38324906191](https://github.com/Renagang21/o4o-platform/actions/runs/38324906191)은 인증서 조사 complete=true, blockers 0을 확인했다. PH 전용 `cm-cert-pharmacyhub`, 공유 `o4o-main-cert-map` 안의 PH root/www entry 2개, PH DNS authorization 2개가 남아 있다. 공유 map/proxy/LB는 삭제 대상이 아니다.
+
+필수 CI가 통과한 main `e999db2b9e9460bc5ce9791d64dde35f8f09d081`에서 관리자가 원래 WIF 조건을 로컬 백업하고 정확한 SHA/PH workflow로 임시 제한했다. 실행·대기 중인 다른 Actions가 없음을 확인한 뒤 apply [38334494970](https://github.com/Renagang21/o4o-platform/actions/runs/38334494970)이 SUCCESS, `executionSucceeded=true`, `applied=true`로 종료했다. PH 서비스 등록·회원·역할·정책·로그 10개 테이블의 승인된 행 56건을 삭제했다. 성공한 일회성 Cloud Run job도 제거됐다. 후속 read-only census [38334641874](https://github.com/Renagang21/o4o-platform/actions/runs/38334641874)은 SUCCESS, failed=false, 해당 관리 scope의 잔여 nonzero 항목 0을 확인했다. 관리자는 이후 백업된 원래 조건 복구 및 재조회 검증 결과 `WIF_RESTORED`를 전달했다.
+
+잔여 데이터는 주문 6건·결제 6건, PH-only 공급 제안 19건과 승인 18건·가격 1건, 콘텐츠 3건·게시판 요청 1건·미디어 4건이다. 결제 sourceService/metadata 집계는 같은 행이므로 더하지 않는다. 이 후속 범위와 인증서·URL map은 아직 삭제하지 않았다. 사용자/조직/공유 상품·공급자 master와 migration 이력, PC Local Agent는 이번 실행의 삭제 대상이 아니다.
+
+후속 삭제 준비: 기존 FK census에 포함되지 않는 주문 로그·결제 주문 귀속, 미디어 연결 대상의 PH 콘텐츠 귀속, 다른 서비스 자산의 동일 URL/GCS 경로 사용, Screen Set JSON의 URL 사용과 PH GCS 경로 건수를 추가 read-only 집계한다. 행 ID·URL·파일 경로·인증 정보는 출력하지 않는다. 필요한 컬럼이 없으면 명시적 schema blocker로 남기며 0건으로 해석하지 않는다. 이는 참조 조사를 보완하는 도구이며 전체 비-FK 참조 부재나 삭제 승인/완료를 뜻하지 않는다. 실제 운영 집계 결과를 확인한 뒤 후속 삭제 범위를 확정한다.
+
+PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐츠에서 출발하는 역방향 링크와 Neture/NULL 등 공유 자산의 연결도 집계한다. PH 콘텐츠 삭제 후 dangling entity_id 링크를 남기지 않도록 양방향 근거를 확보하며 공유 자산 자체는 삭제 대상으로 승격하지 않는다.
+
+추가 P2 대응: PH 주문의 전체 결제 연결·정상 PH 결제 연결·고아 PH 결제를 명시적으로 집계하고, PH 결제가 없거나 복수인 주문 건수도 분리한다. 주문 6건/결제 6건이라는 총수만으로 1:1 연결을 추정하지 않는다. 모든 후속 참조 SQL은 조사 대상인 public schema를 명시한다.
+
+그룹 결제 P2 대응: B2B 계약과 실제 `b2b-payment-controller.factory.ts`의 연결 방식에 따라 주문 UUID, 주문 metadata의 paymentGroupId, 결제 metadata의 paymentGroupId/checkoutOrderIds를 함께 해석한다. EXISTS로 한 결제를 여러 주문 수만큼 중복 집계하지 않는다. PH·타 서비스 주문을 함께 포함하는 결제도 별도로 보고하며 삭제 대상으로 자동 승격하지 않는다. 격리된 PostgreSQL 16에서 READ ONLY transaction으로 16개 집계의 정확한 결과를 검증했다(직접 연결·다중 주문 1회 결제·metadata-only 그룹·checkoutOrderIds-only 공유 그룹·고아/누락/중복 결제·역방향 공유 미디어·Screen Set·동일 저장 경로). fixture 컨테이너와 임시 테스트 비밀번호 파일을 제거했다. 이 결과는 production 데이터 삭제가 아니다.
+
+PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`, `certificatemanager.operations.get`이다. plan은 실제 IAM 누락 권한을 보고하고 apply는 누락 시 첫 삭제 전에 차단한다. 아직 실제 인증서 삭제 완료는 아니다.
+
+SonarCloud 보완: 문자열 정렬의 localeCompare 비교 함수를 명시하고 SDK read/delete dependency를 Promise 반환 함수로 선언했다. 단일 DB connection의 조회와 인증서 의존 순서 삭제는 순차 Promise chain으로 유지한다. 병렬 삭제나 query 실행으로 gate/rollback 경계를 우회하지 않는다. 관련 26 tests와 PostgreSQL 16 실제 16개 집계를 다시 검증했다.

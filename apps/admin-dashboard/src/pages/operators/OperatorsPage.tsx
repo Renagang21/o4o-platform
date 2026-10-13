@@ -119,6 +119,7 @@ export default function OperatorsPage() {
   const [selectedCandidate, setSelectedCandidate] = useState<OperatorCandidate | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [assignmentNotice, setAssignmentNotice] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -353,13 +354,20 @@ export default function OperatorsPage() {
         });
         const membershipPolicy = res?.data?.data?.membershipPolicy;
         const statuses: Record<string, string> = res?.data?.data?.membershipStatuses ?? {};
-        if (membershipPolicy === 'KEEP_EXISTING_STATUS') {
-          // 기존 가입 상태를 승격하지 않는다는 사실을 숨기지 않는다 (§6).
-          const status = statuses[canonicalServiceKey] ?? '기존 상태';
-          toast.success(`권한을 부여했습니다. ${serviceLabel} 가입 상태는 "${status}" 그대로 유지됩니다.`);
-        } else {
-          toast.success(`${serviceLabel} 운영 권한을 부여했습니다.`);
-        }
+        const status = membershipPolicy === 'CREATED' ? 'active' : statuses[canonicalServiceKey];
+        const nextStep = status === 'active'
+          ? '서비스 가입은 활성 상태입니다. 대상자에게 재로그인한 뒤 해당 서비스 운영 화면에 접근되는지 확인하도록 안내하세요.'
+          : status === 'pending'
+            ? '서비스 가입은 승인 대기 상태로 유지됩니다. 해당 서비스 회원관리에서 가입 승인 후 운영 화면 접근을 확인하세요.'
+            : status === 'suspended'
+              ? '서비스 가입은 정지 상태로 유지됩니다. 정지 사유를 확인하고 해당 서비스 회원관리에서 복구 여부를 처리해야 운영할 수 있습니다.'
+              : status === 'rejected'
+                ? '서비스 가입은 반려 상태로 유지됩니다. 반려 사유를 확인하고 해당 서비스의 재신청·승인 절차를 처리해야 운영할 수 있습니다.'
+                : status === 'withdrawn'
+                  ? '서비스 가입은 탈퇴 상태로 유지됩니다. 전체 관리자 또는 해당 서비스 관리자(admin)가 회원 복구 여부를 처리해야 운영할 수 있습니다.'
+                  : '서비스 가입 상태를 확인하지 못했습니다. 해당 서비스 회원관리에서 가입 상태를 확인한 뒤 대상자의 운영 화면 접근을 확인하세요.';
+        setAssignmentNotice(`${serviceLabel} 운영 권한을 부여했습니다. ${nextStep}`);
+        toast.success('운영 권한을 부여했습니다. 화면의 가입 상태·후속 처리 안내를 확인하세요.');
         closeModal();
         fetchUsers();
       }
@@ -540,6 +548,15 @@ export default function OperatorsPage() {
           { id: 'refresh', label: 'Refresh', onClick: fetchUsers, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
+
+      {assignmentNotice && (
+        <div role="status" className="mb-4 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <p className="min-w-0 flex-1">{assignmentNotice}</p>
+          <button type="button" aria-label="지정 결과 안내 닫기" onClick={() => setAssignmentNotice(null)} className="shrink-0 rounded p-1 hover:bg-blue-100">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Stats — WO-O4O-ADMIN-OPERATORS-REDUNDANT-ACTIVE-KPI-REMOVE-V1: Active KPI 제거 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -836,7 +853,9 @@ export default function OperatorsPage() {
                     </p>
                   )}
                   <p className="mt-1 text-xs text-slate-500">
-                    검색 결과에 없다면 아직 가입하지 않은 사람입니다 — 대상자가 <b>Google 로 O4O 에 가입</b>한 뒤 지정하세요.
+                    검색 결과가 없으면 이름·이메일과 검색어를 먼저 확인하세요. 공통 계정이 없다면 본인이 가입하고,
+                    기존 계정에 Google이 연결되지 않았다면 본인이 계정 설정에서 연결한 뒤 지정하세요.
+                    해당 서비스의 사전 가입은 지정의 필수 조건이 아닙니다.
                   </p>
                 </div>
               )}

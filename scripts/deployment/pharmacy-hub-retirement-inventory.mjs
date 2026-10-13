@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { resolve4 } from 'node:dns/promises';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
 import { collectDomainInventory } from './pharmacy-hub-domain-inventory.mjs';
+import { collectRetirementReferences } from './pharmacy-hub-retirement-references.mjs';
 
 const identifiers = value => {
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw Object.assign(new Error('Unsupported schema identifier'), { code: 'SCHEMA_IDENTIFIER' });
@@ -123,7 +124,9 @@ export async function collectRetirementInventory(client) {
       offerScopes = rows[0];
     }
     const inspectedTables = new Set([...targets, ...incoming.rows.filter(fk => fk.source_schema === 'public').map(fk => fk.source_table)]);
-    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,
+    stage='retirement-non-fk-references';
+    const references=await collectRetirementReferences(client,columns);
+    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,references,
       targetColumns: columns.filter(c => inspectedTables.has(c.table_name)),
       deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
   } catch (error) {
