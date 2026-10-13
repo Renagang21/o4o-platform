@@ -233,7 +233,7 @@ origin/main을 정상 merge했다. 이전 미병합 정비 commit도 유지한�
 - [x] C03: 검증된 내부 함수 추출 구현. 기존 public export/API·상태·부작용 순서 유지.
 - [x] C04: 관련 기존 suite와 변환/종료 보고 행동 검증, 패키지/API 빌드·lint.
 - [x] C05: 전후 지표·실행 결과·큰 함수 잔여 기록.
-- [ ] C06: commit·push 후 원격 일치 확인. main 병합·배포 없음.
+- [x] C06: commit·push 후 원격 일치 확인. main 병합·배포 없음.
 
 
 ### 10.1 TODO 검증 결과 (구현 전)
@@ -319,3 +319,13 @@ shared-space-ui/operator-core-ui/store-ui-core/forum-core/tablet 관련 패키�
 
 범용 RuntimeContext/공통 저장 훅/서비스 간 새 공통화는 하지 않았다.
 Core/API·상태 정책·권한·운영 DB·분회 전용 개발·main 병합·배포는 이번 변경 범위가 아니다.
+
+
+### 10.4 push 종료
+
+- 구현 commit `d1d6f18b82`, 최신 main `aa59a0962f` 통합 commit `6026d346e5`.
+- 검증 기록 commit `09932849501e43270b40a3d8a00d8ac75f503e98`까지
+  `wo/code-complexity-phase2` push 성공, git ls-remote 원격 SHA 일치 및 clean 확인.
+- 이 종료 기록도 같은 branch의 후속 문서 commit으로 push한다.
+- C01~C06은 이번 내부 추출 묶음 완료. C-N01~C-N04의 큰 상태/부작용 분리는 미완료.
+- PR 생성·main 병합·배포 없음. CI/리뷰 integration-ready 판정은 하지 않았다.
