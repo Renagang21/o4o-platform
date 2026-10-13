@@ -18,7 +18,7 @@ export function ProductServiceApprovalDrawer({ item, canManage, decisionBusy, on
   return (
     <>
       <button type="button" aria-label="상품 상세 배경 닫기" className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
-      <dialog open aria-modal="true" aria-label="상품 상세" className="m-0 p-0 border-0 left-auto fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
+      <dialog open aria-modal="true" aria-label="상품 상세" className="m-0 p-0 border-0 left-auto fixed right-0 top-0 bottom-0 h-full w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
         <div className="p-6">
           {/* Drawer header */}
           <div className="flex items-center justify-between mb-6">

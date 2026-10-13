@@ -52,3 +52,5 @@ Chromium desktop/mobile 16개 승인·거절 실패/전체 실패/부분 성공/
 이전 전체 관리자 용어 정비는 독립 검토 branch `wo/admin-terminology-finalization`에서 준비했으며 이번 PR에서 함께 통합한다.
 
 통합 CI에서 약관 안내 asset과 검토 문서의 byte 일치 검사로 전체 관리자 띄어쓰기 2곳의 미동기화를 발견했다. Neture account notice asset에 같은 띄어쓰기만 반영했고, 다른 문장·정책/버전/DB·동의 조건은 변경하지 않았다. 기존 asset을 동일 단어 치환한 결과가 검토 draft와 정확히 일치하는지 assert한 뒤 회귀 검증한다.
+
+native dialog의 UA 기본 height:fit-content가 기존 full-height Drawer와 다름을 Chromium에서 확인했다(400px 내용/1000px viewport). Drawer에 h-full을 명시하여 기존 화면 높이와 overflow 스크롤 계약을 유지한다.
