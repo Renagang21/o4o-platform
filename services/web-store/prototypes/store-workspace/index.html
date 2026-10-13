@@ -1,35 +1,67 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>내 매장 — 웹 배치 초안</title>
-  <link rel="stylesheet" href="./workspace.css">
-  <script src="./workspace.js" defer></script>
-</head>
-<body>
-  <a class="skip" href="#workspace">본문으로 이동</a>
-  <div class="draft-banner">웹 화면 기획 초안 · 모든 자료와 동작은 예시입니다. 실제 저장·게시·주문·AI 호출은 하지 않습니다.</div>
-  <header class="header">
-    <div class="brand"><span class="brand-mark">O4O</span><div><strong>내 매장</strong><small>예시 매장 · 승인 직원</small></div></div>
-    <div class="header-links"><button type="button" data-info="설정·사업 가입·매장 선택은 보조 진입으로 제공합니다. 실제 연결은 기획 이후 진행합니다.">매장 설정</button><button type="button" data-info="My Home에서 경영자가 초대·최종 승인·접근 해제를 관리하고, 직원은 초대를 수락합니다.">My Home</button></div>
-  </header>
-  <nav class="primary-nav" aria-label="내 매장 주요 업무">
-    <button type="button" data-view="home" aria-current="page">내 매장 홈</button>
-    <button type="button" data-view="commerce">상품·거래</button>
-    <button type="button" data-view="studio">콘텐츠 작업실</button>
-    <button type="button" data-view="use">매장에서 활용</button>
-  </nav>
-  <main id="workspace" tabindex="-1"></main>
-  <footer>PC·모바일 웹 반응형 검토용 · 새로고침하면 예시 작업이 초기화됩니다.</footer>
-  <div id="notice" role="status" aria-live="polite"></div>
-  <dialog id="assistant" aria-labelledby="assistant-title">
-    <div class="dialog-header"><h2 id="assistant-title">AI 비서</h2><button type="button" id="close-assistant" aria-label="AI 비서 닫기">닫기</button></div>
-    <p class="muted">동일한 O4O 비서가 현재 메뉴와 선택 자료의 문맥을 이어받는 자리입니다.</p>
-    <p id="assistant-context" class="context-box"></p>
-    <p id="assistant-suggestion"></p>
-    <p class="caption">기획 시연입니다. 실제 AI 응답·비용 발생은 없습니다. 제공 서비스와 비용 정책은 O4O 공통 AI 기반과 연결합니다.</p>
-  </dialog>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>내 매장 — 웹 배치 초안</title>
+    <link rel="stylesheet" href="./workspace.css" />
+    <script src="./workspace.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#workspace">본문으로 이동</a>
+    <div class="draft-banner">
+      웹 화면 기획 초안 · 모든 자료와 동작은 예시입니다. 실제 저장·게시·주문·AI
+      호출은 하지 않습니다.
+    </div>
+    <header class="header">
+      <div class="brand">
+        <span class="brand-mark">O4O</span>
+        <div><strong>내 매장</strong><small>예시 매장 · 승인 직원</small></div>
+      </div>
+      <div class="header-links">
+        <button
+          type="button"
+          data-info="설정·사업 가입·매장 선택은 보조 진입으로 제공합니다. 실제 연결은 기획 이후 진행합니다."
+        >
+          매장 설정</button
+        ><button
+          type="button"
+          data-info="My Home에서 경영자가 초대·최종 승인·접근 해제를 관리하고, 직원은 초대를 수락합니다."
+        >
+          My Home
+        </button>
+      </div>
+    </header>
+    <nav class="primary-nav" aria-label="내 매장 주요 업무">
+      <button type="button" data-view="home" aria-current="page">
+        내 매장 홈
+      </button>
+      <button type="button" data-view="commerce">상품·거래</button>
+      <button type="button" data-view="studio">콘텐츠 작업실</button>
+      <button type="button" data-view="use">매장에서 활용</button>
+    </nav>
+    <main id="workspace" tabindex="-1"></main>
+    <footer>
+      PC·모바일 웹 반응형 검토용 · 새로고침하면 예시 작업이 초기화됩니다.
+    </footer>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <dialog id="assistant" aria-labelledby="assistant-title">
+      <div class="dialog-header">
+        <h2 id="assistant-title">AI 비서</h2>
+        <button type="button" id="close-assistant" aria-label="AI 비서 닫기">
+          닫기
+        </button>
+      </div>
+      <p class="muted">
+        동일한 O4O 비서가 현재 메뉴와 선택 자료의 문맥을 이어받는 자리입니다.
+      </p>
+      <p id="assistant-context" class="context-box"></p>
+      <p id="assistant-suggestion"></p>
+      <p class="caption">
+        기획 시연입니다. 실제 AI 응답·비용 발생은 없습니다. 제공 서비스와 비용
+        정책은 O4O 공통 AI 기반과 연결합니다.
+      </p>
+    </dialog>
+  </body>
 </html>
