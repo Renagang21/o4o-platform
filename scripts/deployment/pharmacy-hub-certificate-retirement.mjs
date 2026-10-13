@@ -11,14 +11,15 @@ export const certificatePermissions=['certificatemanager.certmapentries.delete',
   'certificatemanager.dnsauthorizations.delete','certificatemanager.operations.get'];
 const resource=v=>String(v).replace(/^.*?projects\//,'projects/').replace('projects/117791934476/','projects/netureyoutube/');
 const path=(kind,name)=>`projects/netureyoutube/locations/global/${kind}/${name}`;
+const alphabet=(a,b)=>String(a).localeCompare(String(b),'en');
 function inspectCertificate(snapshot) {
   const own=snapshot.certificates.filter(c=>resource(c.name)===path('certificates',cert));
   if(own.length>1)throw new Error('PH_CERT_IDENTITY');
   if(own.length) {
     const c=own[0];
-    if(!isDeepStrictEqual([...(c.managed?.domains??[])].sort(),[...hosts].sort())||c.selfManaged)
+    if(!isDeepStrictEqual([...(c.managed?.domains??[])].sort(alphabet),[...hosts].sort(alphabet))||c.selfManaged)
       throw new Error('PH_CERT_SHARED_DOMAINS');
-    if(!isDeepStrictEqual((c.managed?.dnsAuthorizations??[]).map(resource).sort(),auth.map(a=>path('dnsAuthorizations',a)).sort()))
+    if(!isDeepStrictEqual((c.managed?.dnsAuthorizations??[]).map(resource).sort(alphabet),auth.map(a=>path('dnsAuthorizations',a)).sort(alphabet)))
       throw new Error('PH_CERT_AUTHORIZATION_DRIFT');
   }
   for(const c of snapshot.certificates) {
@@ -68,7 +69,7 @@ function command(args) {
     throw new Error('PH_CERT_COMMAND_UNCONFIRMED');
   return r.stdout;
 }
-function inventory() {
+async function inventory() {
   const certificates=JSON.parse(command(['certificate-manager','certificates','list','--location=-','--format=json']));
   const maps=JSON.parse(command(['certificate-manager','maps','list','--format=json']));
   const entries=maps.flatMap(m=>JSON.parse(command(['certificate-manager','maps','entries','list',`--map=${m.name.split('/').at(-1)}`,'--format=json'])));
@@ -81,22 +82,27 @@ const shared=s=>({maps:s.maps,entries:s.entries.filter(e=>!entries.some(n=>resou
   certificates:s.certificates.filter(c=>resource(c.name)!==path('certificates',cert)),
   authorizations:s.authorizations.filter(a=>!auth.some(n=>resource(a.name)===path('dnsAuthorizations',n))),proxies:s.proxies});
 const preserved=s=>Object.fromEntries(Object.entries(shared(s)).map(([key,items])=>[key,stable(items)]));
-export async function retireCertificates({mode,read=inventory,beforeWrite=gate,remove=target=>{
-  const group=target.kind==='entry'?['maps','entries']:target.kind==='certificate'?['certificates']:['dns-authorizations'];
+async function removeCertificateTarget(target) {
+  const groups={entry:['maps','entries'],certificate:['certificates'],authorization:['dns-authorizations']};
+  const group=groups[target.kind];
+  if(!group)throw new Error('PH_CERT_TARGET_KIND');
   command(['certificate-manager',...group,'delete',target.name,...(target.kind==='entry'?[`--map=${map}`]:['--location=global'])]);
-}}) {
+}
+async function removeVerifiedTarget(target,baseline,read,beforeWrite,remove) {
+  await beforeWrite();
+  const current=await read();
+  if(!isDeepStrictEqual(preserved(current),preserved(baseline)))throw new Error('PH_CERT_SHARED_RESOURCE_DRIFT');
+  const pending=certificatePlan(current);
+  if(!pending.some(t=>isDeepStrictEqual(t,target)))throw new Error('PH_CERT_TARGET_DRIFT');
+  await remove(target);
+}
+export async function retireCertificates({mode,read=inventory,beforeWrite=gate,remove=removeCertificateTarget}) {
   if(!['plan','apply'].includes(mode))throw new Error('PH_CERT_MODE');
   const baseline=await read();
   let targets=certificatePlan(baseline);
   if(mode==='plan')return {mode,targets,applied:false};
-  for(const target of targets) {
-    await beforeWrite();
-    const current=await read();
-    if(!isDeepStrictEqual(preserved(current),preserved(baseline)))throw new Error('PH_CERT_SHARED_RESOURCE_DRIFT');
-    const pending=certificatePlan(current);
-    if(!pending.some(t=>isDeepStrictEqual(t,target)))throw new Error('PH_CERT_TARGET_DRIFT');
-    await remove(target);
-  }
+  // Deletions have dependencies and fresh gates; never issue them concurrently.
+  await targets.reduce((previous,target)=>previous.then(()=>removeVerifiedTarget(target,baseline,read,beforeWrite,remove)),Promise.resolve());
   const after=await read();targets=certificatePlan(after);
   if(targets.length||!isDeepStrictEqual(preserved(after),preserved(baseline)))throw new Error('PH_CERT_FINAL_VERIFICATION');
   return {mode,targets:[],applied:true,sharedResourcesPreserved:true};

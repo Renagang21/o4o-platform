@@ -61,12 +61,14 @@ const checks=[
 export async function collectRetirementReferences(client,columns) {
   const available=new Set(columns.map(c=>`${c.table_name}.${c.column_name}`));
   const counts={},blockers=[];
-  for(const [name,required,sql]of checks) {
-    if(required.some(column=>!available.has(column))) {blockers.push({check:name,code:'REFERENCE_SCHEMA_UNAVAILABLE'});continue;}
+  const collect=async([name,required,sql])=>{
+    if(required.some(column=>!available.has(column))) {blockers.push({check:name,code:'REFERENCE_SCHEMA_UNAVAILABLE'});return;}
     const result=await client.query(sql,[keys]);
     const value=result.rows?.[0]?.count;
     if(typeof value!=='string'||!/^\d+$/.test(value))throw Object.assign(new Error('Invalid reference count'),{code:'REFERENCE_COUNT'});
     counts[name]=value;
-  }
+  };
+  // One read-only connection; do not leave queued queries running after rollback on failure.
+  await checks.reduce((previous,check)=>previous.then(()=>collect(check)),Promise.resolve());
   return {readOnly:true,complete:blockers.length===0,counts,blockers,deletionApproved:false};
 }
