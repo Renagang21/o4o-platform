@@ -12,15 +12,19 @@
  * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
+import { StoreQrCreateForms } from './qr/StoreQrCreateForms';
+import { styles } from './qr/qrStyles';
+import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { useState, useEffect } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
-import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
+import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
 //   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
 //   표 자체는 여전히 @o4o/ui DataTable 이다 — Core 안에서 그대로 쓴다.
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { colors } from '../../styles/theme';
@@ -70,13 +74,6 @@ import {
 } from '@o4o/store-ui-core';
 import { getActiveServicePrefix, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 
-const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'product', label: '제품' },
-  { value: 'page', label: '콘텐츠' },
-  { value: 'link', label: '외부 링크' },
-];
-
-
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: QR 목록 필터 키.
 type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 
@@ -91,16 +88,6 @@ function toSlug(text: string): string {
     .replace(/^-|-$/g, '')
     .slice(0, 60) || `qr-${Date.now()}`;
 }
-
-const ASSET_TYPE_LABELS: Record<string, string> = {
-  file: '파일',
-  content: '콘텐츠',
-  'external-link': '외부 링크',
-  // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안): 블로그 대상 배지
-  blog: '블로그',
-  // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1: 다국어 제품 콘텐츠 배지
-  mlc: '다국어 제품',
-};
 
 function autoLandingType(assetType: string): string {
   if (assetType === 'external-link') return 'link';
@@ -129,6 +116,9 @@ async function loadQrCodes(): Promise<StoreQrCode[]> {
 
 export function StoreQRPage() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
+  const [createdTitle, setCreatedTitle] = useState<string | null>(null);
 
   const { data: items, setData: setItems, loading, error: listError, reload: fetchItems } = useStoreResource(loadQrCodes, []);
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 + QR 설정 모달
@@ -137,6 +127,11 @@ export function StoreQRPage() {
   const [settingsQr, setSettingsQr] = useState<StoreQrCode | null>(null);
   const [showSelector, setShowSelector] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const openSelector = () => {
+    navigate(withWorkspaceMode(`${location.pathname}${location.search}`, 'studio'), { state: location.state });
+    setShowSelector(true);
+  };
 
   // Create form state
   const [creating, setCreating] = useState(false);
@@ -279,6 +274,7 @@ export function StoreQRPage() {
         slug: formSlug.trim(),
       });
       if (res.success && res.data) {
+        setCreatedTitle(res.data.title);
         setItems((prev) => [res.data, ...prev]);
         setCreating(false);
         setVideoTarget(null);
@@ -354,6 +350,7 @@ export function StoreQRPage() {
       });
 
       if (res.success && res.data) {
+        setCreatedTitle(res.data.title);
         setItems((prev) => [res.data, ...prev]);
         setCreating(false);
         setSelectedLibrary(null);
@@ -636,6 +633,8 @@ export function StoreQRPage() {
 
   return (
     <div style={styles.container}>
+      <StoreWorkflowNavigation subject="QR" />
+      {createdTitle && <div role="status" className="mb-4 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm">{createdTitle} QR을 저장했습니다. <Link className="font-semibold underline" to={withWorkspaceMode(`${location.pathname}${location.search}`, 'use')}>배치·출력으로 이어가기</Link></div>}
       {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: QR canonical 안내 */}
       <div style={{ marginBottom: '16px' }}>
         <GuideBlock
@@ -650,9 +649,9 @@ export function StoreQRPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-                breadcrumb 상위·현재 항목을 실제 사이드바(약국 경영지원 > QR-code)와 일치시킨다. */}
+                breadcrumb 상위·현재 항목을 실제 사이드바(콘텐츠·활용 > QR-code)와 일치시킨다. */}
             <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
-              약국 경영지원
+              콘텐츠·활용
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>QR-code</span>
@@ -681,7 +680,7 @@ export function StoreQRPage() {
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button
             type="button"
-            onClick={() => setShowSelector(true)}
+            onClick={openSelector}
             style={styles.addBtn}
           >
             <QrCode size={14} />
@@ -694,14 +693,14 @@ export function StoreQRPage() {
           </Link>
           <Link to="/store/library/qr" style={styles.hubImportBtn}>
             <Download size={14} />
-            매장 HUB에서 가져오기
+            자료 가져오기
           </Link>
         </div>
       </div>
 
       {/* Batch Print Toolbar */}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
-      {creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
+      {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
       {items.length > 0 && (
         <div style={styles.printToolbar}>
           <label style={styles.selectAllLabel}>
@@ -727,299 +726,44 @@ export function StoreQRPage() {
         </div>
       )}
 
-      {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 QR 생성 폼 (library 자료 흐름과 분리) */}
-      {creating && videoTarget && (
-        <div style={styles.createForm}>
-          <div style={{ marginBottom: '16px' }}>
-            <h3 style={styles.formTitle}>동영상 QR 만들기</h3>
-            <p style={{ fontSize: '12px', color: colors.neutral400, margin: '6px 0 0' }}>
-              QR 스캔 시 동영상 전용 화면이 열립니다 (일반 메뉴 없이 동영상만 표시).
-            </p>
-          </div>
-
-          {/* 연결 대상 동영상 (읽기 전용) */}
-          <div style={styles.selectedLibraryCard}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <span style={styles.assetTypeBadge}>동영상</span>
-              </div>
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>
-                {videoTarget.title}
-              </p>
-            </div>
-          </div>
-
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 제목</label>
-            <input
-              type="text"
-              value={formTitle}
-              onChange={(e) => setFormTitle(e.target.value)}
-              style={styles.input}
-              placeholder="QR 스캔 후 표시될 제목"
-              maxLength={60}
-            />
-          </div>
-
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
-            <input
-              type="text"
-              value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
-              style={styles.input}
-              placeholder="QR 스캔 후 표시될 짧은 설명 (선택)"
-              maxLength={150}
-            />
-          </div>
-
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
-            <div style={styles.slugPreview}>
-              <span style={styles.slugBase}>{qrBaseUrl}</span>
-              <input
-                type="text"
-                value={formSlug}
-                onChange={(e) => setFormSlug(e.target.value.replace(/[^a-z0-9-]/g, ''))}
-                style={styles.slugInput}
-                placeholder="my-video-qr"
-              />
-            </div>
-          </div>
-
-          {formError && <p style={styles.formError}>{formError}</p>}
-
-          <div style={styles.formActions}>
-            <button
-              onClick={() => { setCreating(false); setVideoTarget(null); }}
-              style={styles.cancelBtn}
-            >
-              취소
-            </button>
-            <button
-              onClick={handleCreateVideo}
-              disabled={saving}
-              style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
-            >
-              {saving ? '저장 중...' : 'QR 만들기'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Create Form */}
-      {creating && selectedLibrary && (
-        <div style={styles.createForm}>
-          <div style={{ marginBottom: '16px' }}>
-            <h3 style={styles.formTitle}>새 QR 만들기</h3>
-            {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: template badge */}
-            {selectedTemplate && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-                <span style={styles.templateBadge}>
-                  <LayoutTemplate size={11} />
-                  {selectedTemplate.name}
-                  {selectedTemplate.style ? ` · ${selectedTemplate.style}` : ''}
-                </span>
-                <span style={{ fontSize: '12px', color: colors.neutral400 }}>
-                  {selectedTemplate.description}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* 선택된 자료 정보 */}
-          <div style={styles.selectedLibraryCard}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <span style={styles.assetTypeBadge}>
-                  {ASSET_TYPE_LABELS[selectedLibrary.assetType] || selectedLibrary.assetType}
-                </span>
-                {selectedLibrary.category && (
-                  <span style={styles.categoryBadge}>{selectedLibrary.category}</span>
-                )}
-              </div>
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>
-                {selectedLibrary.title}
-              </p>
-            </div>
-            <button
-              onClick={() => { setCreating(false); setSelectedLibrary(null); setShowSelector(true); }}
-              style={styles.changeLibraryBtn}
-            >
-              자료 변경
-              <ArrowRight size={14} />
-            </button>
-          </div>
-
-          {/* WO-O4O-KPA-QR-AI-STEP-REMOVE-V1: QR 문구 AI 생성(초안 생성) 진입점 제거.
-              QR 제목/안내문은 직접 입력하거나, 선택한 콘텐츠 본문을 기반으로 생성한다.
-              (편집기 Toolbar의 AI 정리·AiContentModal 컴포넌트·/api/ai/content 는 유지.) */}
-
-          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: QR 제목 */}
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 제목</label>
-            <input
-              type="text"
-              value={formTitle}
-              onChange={(e) => setFormTitle(e.target.value)}
-              style={styles.input}
-              placeholder="QR 스캔 후 표시될 제목"
-              maxLength={60}
-            />
-          </div>
-
-          {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: 짧은 안내문 */}
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>짧은 안내문 (선택)</label>
-            <input
-              type="text"
-              value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
-              style={styles.input}
-              placeholder="QR 스캔 후 표시될 짧은 설명 (50자 이내 권장)"
-              maxLength={150}
-            />
-            {formDescription && (
-              <p style={{ fontSize: '11px', color: colors.neutral400, margin: '4px 0 0' }}>
-                {formDescription.length}/150자
-              </p>
-            )}
-          </div>
-
-          <div style={styles.formRow}>
-            <label style={styles.formLabel}>QR 주소 (URL 경로)</label>
-            <div style={styles.slugPreview}>
-              <span style={styles.slugBase}>{qrBaseUrl}</span>
-              <input
-                type="text"
-                value={formSlug}
-                onChange={(e) => setFormSlug(e.target.value.replace(/[^a-z0-9-]/g, ''))}
-                style={styles.slugInput}
-                placeholder="my-qr-code"
-              />
-            </div>
-          </div>
-
-          {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
-              운영자 콘텐츠(참조형)는 연결 유형/대상이 'page'+content.id 로 고정 — 잠금 안내로 대체. */}
-          {selectedLibrary.source === 'content-hub' ? (
-            <div style={{ marginBottom: '12px' }}>
-              <GuideBlock
-                variant="info"
-                title="운영자 콘텐츠 연결 QR"
-                description="QR을 스캔하면 선택한 콘텐츠가 표시됩니다. 선택 시 매장 사본이 생성되어 QR은 매장 사본을 가리킵니다(원본 수정은 자동 반영되지 않으며, 매장에서 사본을 직접 편집할 수 있습니다)."
-                compact
-              />
-              {/* WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠 하단 상담 요청 버튼 옵션 (page 타입 전용) */}
-              <div style={{ marginTop: '12px', padding: '12px', border: `1px solid ${colors.neutral200}`, borderRadius: '8px' }}>
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={ctaEnabled}
-                    onChange={(e) => setCtaEnabled(e.target.checked)}
-                    style={{ marginTop: '3px' }}
-                  />
-                  <span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800 }}>콘텐츠 하단에 상담 요청 버튼 표시</span>
-                    <span style={{ display: 'block', fontSize: '12px', color: colors.neutral500, marginTop: '2px', lineHeight: 1.5 }}>
-                      QR을 본 고객이 콘텐츠 하단에서 바로 상담을 요청할 수 있습니다. 요청은 매장 알림으로 전달됩니다.
-                    </span>
-                  </span>
-                </label>
-                {ctaEnabled && (
-                  <input
-                    type="text"
-                    value={ctaLabel}
-                    onChange={(e) => setCtaLabel(e.target.value)}
-                    style={{ ...styles.input, marginTop: '10px' }}
-                    placeholder="버튼 문구 (기본: 상담 요청하기)"
-                    maxLength={100}
-                  />
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div style={styles.formRow}>
-                <label style={styles.formLabel}>연결 유형</label>
-                <select
-                  value={formLandingType}
-                  onChange={(e) => setFormLandingType(e.target.value)}
-                  style={styles.select}
-                >
-                  {LANDING_TYPE_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* WO-O4O-STORE-WORKSPACE-QR-PREFILL-V2: link 타입 추가 경고 */}
-              {formLandingType === 'link' && (
-                <div style={{ marginBottom: '12px' }}>
-                  <GuideBlock
-                    variant="warning"
-                    title="URL 연결형 QR"
-                    description="URL 연결형 QR입니다. QR 자체에 콘텐츠가 저장되지 않으며, 입력한 URL로 바로 이동합니다. 대상 URL이 사라지면 QR도 작동하지 않습니다."
-                    compact
-                  />
-                </div>
-              )}
-
-              <div style={styles.formRow}>
-                <label style={styles.formLabel}>
-                  {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '연결 URL' : '연결 대상 (선택)'}
-                </label>
-                {formLandingType === 'product' ? (
-                  <select
-                    value={formLandingTargetId}
-                    onChange={(e) => setFormLandingTargetId(e.target.value)}
-                    style={styles.select}
-                    disabled={loadingProducts}
-                  >
-                    <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
-                    {productOptions.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={formLandingTargetId}
-                    onChange={(e) => setFormLandingTargetId(e.target.value)}
-                    style={styles.input}
-                    placeholder={formLandingType === 'link' ? 'https://example.com' : '비워두면 자료 페이지로 이동합니다'}
-                  />
-                )}
-              </div>
-            </>
-          )}
-
-          {formError && <p style={styles.formError}>{formError}</p>}
-
-          <div style={styles.formActions}>
-            <button
-              onClick={() => { setCreating(false); setSelectedLibrary(null); setCtaEnabled(false); setCtaLabel(''); }}
-              style={styles.cancelBtn}
-            >
-              취소
-            </button>
-            <button
-              onClick={handleCreate}
-              disabled={saving}
-              style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
-            >
-              {saving ? '저장 중...' : 'QR 만들기'}
-            </button>
-          </div>
-        </div>
-      )}
+      {workspaceMode === 'studio' && <StoreQrCreateForms
+        creating={creating}
+        videoTarget={videoTarget}
+        selectedLibrary={selectedLibrary}
+        formTitle={formTitle}
+        formDescription={formDescription}
+        formSlug={formSlug}
+        formLandingType={formLandingType}
+        formLandingTargetId={formLandingTargetId}
+        selectedTemplate={selectedTemplate}
+        ctaEnabled={ctaEnabled}
+        ctaLabel={ctaLabel}
+        formError={formError}
+        saving={saving}
+        qrBaseUrl={qrBaseUrl}
+        loadingProducts={loadingProducts}
+        productOptions={productOptions}
+        setFormTitle={setFormTitle}
+        setFormDescription={setFormDescription}
+        setFormSlug={setFormSlug}
+        setFormLandingType={setFormLandingType}
+        setFormLandingTargetId={setFormLandingTargetId}
+        setCtaEnabled={setCtaEnabled}
+        setCtaLabel={setCtaLabel}
+        setCreating={setCreating}
+        setVideoTarget={setVideoTarget}
+        setSelectedLibrary={setSelectedLibrary}
+        setShowSelector={(value) => { if (value) openSelector(); else setShowSelector(false); }}
+        handleCreateVideo={handleCreateVideo}
+        handleCreate={handleCreate}
+      />}
 
       {/* QR Code List — WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1:
           카드형 → @o4o/ui DataTable. 자체 selectedIds (Set<string>) + handleBulkPrint
           (외부 toolbar) 는 그대로 보존 — DataTable rowSelection 은 Set ↔ Array 변환만.
           analytics 토글은 행 아래 펼침이 직접 지원 안 되므로 표 하단에 별도 패널로 표시. */}
       <div style={styles.body}>
-        {!loading && !listError && items.length === 0 && !creating ? (
+        {!loading && !listError && items.length === 0 && (!creating || workspaceMode === 'use') ? (
           <div style={styles.emptyState}>
             {/* WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1:
                 QR 사용 입구를 3개로 분리 — 운영자 제공 가져오기 / 내 자료 제작 / 외부 URL(준비 중). */}
@@ -1041,7 +785,7 @@ export function StoreQRPage() {
                   대상 범위가 콘텐츠·자료·내 매장 제작자료 전체임을 문구로 명시. */}
               <button
                 type="button"
-                onClick={() => setShowSelector(true)}
+                onClick={openSelector}
                 style={styles.emptyStateBtn}
               >
                 <FolderOpen size={14} />
@@ -1206,7 +950,7 @@ export function StoreQRPage() {
                       태블릿 콘텐츠 목록(보관 해제 지점)으로 보낸다 — dead action 을 만들지 않는다. */}
                   {item.landingType === 'screen_set' && item.landingTargetId && (
                     <Link
-                      to="/store/commerce/tablet-displays"
+                      to="/store/commerce/tablet-displays?workspace=studio"
                       state={
                         isArchivedCornerQr(item)
                           ? { tab: 'contents', highlightScreenSetId: item.landingTargetId }
@@ -1419,624 +1163,3 @@ function QrSettingsModal({ qr, onClose, onSaved }: { qr: StoreQrCode; onClose: (
 }
 
 // ── 스타일 ──
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: '24px',
-    maxWidth: '900px',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    // 모바일 폭에서 액션 버튼이 가로 overflow 를 만들지 않도록 줄바꿈 허용
-    flexWrap: 'wrap',
-    gap: '12px',
-    marginBottom: '24px',
-  },
-  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 탭
-  filterTabs: { display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' },
-  filterTab: {
-    display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
-    background: '#fff', border: `1px solid ${colors.neutral200}`, borderRadius: '999px',
-    fontSize: '13px', color: colors.neutral600, cursor: 'pointer',
-  },
-  filterTabActive: {
-    display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px',
-    background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '999px',
-    fontSize: '13px', fontWeight: 600, color: '#fff', cursor: 'pointer',
-  },
-  filterTabCount: { fontSize: '11px', opacity: 0.8 },
-  title: {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-  addBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 16px',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
-  body: {
-    minHeight: '300px',
-  },
-  emptyState: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '60px 20px',
-    border: `1px dashed ${colors.neutral200}`,
-    borderRadius: '12px',
-    backgroundColor: colors.neutral50,
-  },
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  card: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '16px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '10px',
-    backgroundColor: '#fff',
-  },
-  cardIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '48px',
-    height: '48px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '8px',
-    flexShrink: 0,
-  },
-  cardInfo: {
-    flex: 1,
-    minWidth: 0,
-  },
-  cardTitle: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginTop: '6px',
-  },
-  cardBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    backgroundColor: colors.neutral100,
-    fontSize: '11px',
-    color: colors.neutral500,
-  },
-  cardSlug: {
-    fontSize: '12px',
-    color: colors.neutral400,
-    fontFamily: 'monospace',
-  },
-  cardActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    flexShrink: 0,
-  },
-  iconBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '32px',
-    height: '32px',
-    border: 'none',
-    backgroundColor: 'transparent',
-    color: colors.neutral400,
-    cursor: 'pointer',
-    borderRadius: '6px',
-    textDecoration: 'none',
-  },
-  downloadBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '6px 10px',
-    border: `1px solid ${colors.primary}`,
-    backgroundColor: '#fff',
-    color: colors.primary,
-    cursor: 'pointer',
-    borderRadius: '6px',
-    fontSize: '12px',
-    fontWeight: 600,
-    whiteSpace: 'nowrap',
-  },
-  emptyStateBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: `1px solid ${colors.primary}`,
-    backgroundColor: '#fff',
-    color: colors.primary,
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: 500,
-    textDecoration: 'none',
-    cursor: 'pointer',
-  },
-  // WO-O4O-KPA-STORE-QR-WORKFLOW-UX-ALIGNMENT-V1: 빈 상태 3-CTA 행
-  emptyCtaRow: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: '8px',
-    marginTop: '20px',
-  },
-  emptyCtaPrimary: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: 'none',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: 600,
-    textDecoration: 'none',
-    cursor: 'pointer',
-  },
-  emptyCtaDisabled: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: `1px dashed ${colors.neutral200}`,
-    backgroundColor: colors.neutral50,
-    color: colors.neutral400,
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: 500,
-    cursor: 'not-allowed',
-  },
-  // 헤더 상시 노출 — 운영자 제공 QR 가져오기 동선
-  hubImportBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: `1px solid ${colors.primary}`,
-    backgroundColor: '#fff',
-    color: colors.primary,
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: 500,
-    textDecoration: 'none',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  },
-  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 진입 버튼
-  aiDescBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '8px 14px',
-    border: 'none',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: 500,
-    textDecoration: 'none',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  },
-
-  // Selected library card
-  selectedLibraryCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 16px',
-    marginBottom: '20px',
-    backgroundColor: colors.neutral50,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '10px',
-  },
-  assetTypeBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    backgroundColor: '#f0fdf4',
-    color: '#16a34a',
-    fontSize: '11px',
-    fontWeight: 500,
-  },
-  categoryBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    backgroundColor: colors.neutral100,
-    fontSize: '11px',
-    color: colors.neutral500,
-  },
-  changeLibraryBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '6px 12px',
-    backgroundColor: '#fff',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '6px',
-    fontSize: '12px',
-    color: colors.neutral600,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-  },
-
-  // Create form
-  createForm: {
-    padding: '20px',
-    marginBottom: '24px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-  },
-  formTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: '0 0 4px',
-  },
-  formSubtitle: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    margin: '0 0 20px',
-  },
-  formRow: {
-    marginBottom: '16px',
-  },
-  formLabel: {
-    display: 'block',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: colors.neutral600,
-    marginBottom: '6px',
-  },
-  slugPreview: {
-    display: 'flex',
-    alignItems: 'center',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    overflow: 'hidden',
-  },
-  slugBase: {
-    padding: '8px 10px',
-    backgroundColor: colors.neutral50,
-    fontSize: '13px',
-    color: colors.neutral400,
-    whiteSpace: 'nowrap',
-    borderRight: `1px solid ${colors.neutral200}`,
-  },
-  slugInput: {
-    flex: 1,
-    padding: '8px 10px',
-    border: 'none',
-    outline: 'none',
-    fontSize: '13px',
-    fontFamily: 'monospace',
-    color: colors.neutral800,
-  },
-  select: {
-    width: '100%',
-    padding: '8px 10px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    fontSize: '13px',
-    color: colors.neutral800,
-    backgroundColor: '#fff',
-    outline: 'none',
-  },
-  input: {
-    width: '100%',
-    padding: '8px 10px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    fontSize: '13px',
-    color: colors.neutral800,
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-  formError: {
-    fontSize: '13px',
-    color: '#dc2626',
-    margin: '0 0 12px',
-  },
-  formActions: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '8px',
-    marginTop: '20px',
-  },
-  cancelBtn: {
-    padding: '8px 16px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-    fontSize: '13px',
-    color: colors.neutral600,
-    cursor: 'pointer',
-  },
-  saveBtn: {
-    padding: '8px 16px',
-    border: 'none',
-    borderRadius: '8px',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    fontSize: '13px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-
-  // Scan analytics
-  scanBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    borderRadius: '10px',
-    backgroundColor: '#dbeafe',
-    fontSize: '11px',
-    color: '#2563eb',
-    fontWeight: 500,
-  },
-  analyticsPanel: {
-    padding: '16px',
-    marginTop: '-1px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '0 0 10px 10px',
-    backgroundColor: colors.neutral50,
-  },
-  analyticsLoading: {
-    fontSize: '13px',
-    color: colors.neutral400,
-    textAlign: 'center',
-    margin: 0,
-    padding: '8px 0',
-  },
-  analyticsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '12px',
-  },
-  statBox: {
-    textAlign: 'center',
-    padding: '8px',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    border: `1px solid ${colors.neutral100}`,
-  },
-  statValue: {
-    fontSize: '20px',
-    fontWeight: 700,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  statLabel: {
-    fontSize: '11px',
-    color: colors.neutral500,
-    margin: '2px 0 0',
-  },
-  deviceRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '4px',
-    fontSize: '12px',
-    color: colors.neutral600,
-    padding: '2px 0',
-  },
-
-  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1
-  templateBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '3px 8px',
-    background: '#eef2ff',
-    color: '#4f46e5',
-    borderRadius: '5px',
-    fontSize: '11px',
-    fontWeight: 600,
-  },
-  cardDescription: {
-    fontSize: '12px',
-    color: colors.neutral500,
-    margin: '3px 0 0',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    maxWidth: '400px',
-  },
-
-  // Print / download
-  printToolbar: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 16px',
-    marginBottom: '12px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '8px',
-    border: `1px solid ${colors.neutral200}`,
-  },
-  selectAllLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: colors.neutral600,
-    cursor: 'pointer',
-  },
-  checkbox: {
-    width: '16px',
-    height: '16px',
-    cursor: 'pointer',
-    accentColor: colors.primary,
-    flexShrink: 0,
-  },
-  printBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 14px',
-    backgroundColor: colors.primary,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  },
-  // WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1: portal 메뉴 박스 (위치는 인라인 fixed 로 지정)
-  downloadMenuPortal: {
-    backgroundColor: '#fff',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    overflow: 'hidden',
-    minWidth: '190px',
-  },
-  downloadMenuItem: {
-    display: 'block',
-    width: '100%',
-    padding: '8px 14px',
-    border: 'none',
-    backgroundColor: 'transparent',
-    fontSize: '13px',
-    color: colors.neutral700,
-    cursor: 'pointer',
-    textAlign: 'left',
-  },
-
-  // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 파일 선택 안내 버튼 + 모달
-  exportGuideBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '4px 10px',
-    border: `1px solid ${colors.neutral200}`,
-    backgroundColor: '#fff',
-    color: colors.neutral600,
-    borderRadius: '6px',
-    fontSize: '12px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  guideOverlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: '16px',
-  },
-  guideModal: {
-    width: '560px',
-    maxWidth: '95vw',
-    maxHeight: '85vh',
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-  },
-  guideHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '20px 24px 12px',
-  },
-  guideTitle: {
-    fontSize: '17px',
-    fontWeight: 700,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  guideBody: {
-    flex: 1,
-    overflow: 'auto',
-    padding: '4px 24px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  guideCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 14px',
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '10px',
-    backgroundColor: colors.neutral50,
-  },
-  guideSituation: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  guideReason: {
-    fontSize: '12px',
-    color: colors.neutral500,
-    margin: '3px 0 0',
-    lineHeight: 1.5,
-  },
-  guideRecommend: {
-    flexShrink: 0,
-    maxWidth: '40%',
-    padding: '4px 10px',
-    backgroundColor: '#eef2ff',
-    color: '#4338ca',
-    borderRadius: '12px',
-    fontSize: '12px',
-    fontWeight: 600,
-    textAlign: 'center',
-    lineHeight: 1.4,
-  },
-  guideFooterNote: {
-    margin: '12px 24px 20px',
-    padding: '12px 14px',
-    backgroundColor: '#fffbeb',
-    border: '1px solid #fde68a',
-    borderRadius: '10px',
-    fontSize: '13px',
-    color: colors.neutral700,
-    lineHeight: 1.7,
-  },
-};
