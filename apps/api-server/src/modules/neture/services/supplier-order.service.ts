@@ -2,9 +2,14 @@
  * SupplierOrderService — WO-O4O-ROUTES-REFACTOR-V1
  * Extracted from neture.routes.ts (WO-O4O-SUPPLIER-ORDER-PROCESSING-V1, WO-O4O-SHIPMENT-ENGINE-V1)
  */
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
+import { NetureService } from '../../../routes/neture/services/neture.service.js';
+import { NetureOrderStatus } from '../../../routes/neture/entities/neture-order.entity.js';
 // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS, netureOrderServiceSetSql } from '../constants/fulfillment-service-scope.js';
+import {
+  SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS,
+  netureOrderServiceSetSql,
+} from '../constants/fulfillment-service-scope.js';
 
 /** Allowed supplier status transitions */
 const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -23,11 +28,13 @@ function extractRegion(shipping: any): string | null {
       return first || null;
     }
     return null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export class SupplierOrderService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource | EntityManager) {}
 
   async getOrderKpi(supplierId: string) {
     const result = await this.dataSource.query(
@@ -154,7 +161,9 @@ export class SupplierOrderService {
     });
   }
 
-  getStatusTransitions() { return SUPPLIER_STATUS_TRANSITIONS; }
+  getStatusTransitions() {
+    return SUPPLIER_STATUS_TRANSITIONS;
+  }
 
   /**
    * WO-O4O-SUPPLIER-FULFILLMENT-PAYMENT-READINESS-GUARD-V1
@@ -188,9 +197,7 @@ export class SupplierOrderService {
 
     const md = row.metadata && typeof row.metadata === 'object' ? row.metadata : {};
     const isCheckoutOrigin =
-      md.source === 'checkout_order' ||
-      md.sourceOrderType === 'checkout_order' ||
-      !!md.checkoutOrderId;
+      md.source === 'checkout_order' || md.sourceOrderType === 'checkout_order' || !!md.checkoutOrderId;
 
     // legacy neture_orders — V1 guard 비대상 (기존 B2B 운영 보호)
     if (!isCheckoutOrigin) return { isCheckoutOrigin: false, fulfillmentReady: true };
@@ -201,22 +208,60 @@ export class SupplierOrderService {
     return { isCheckoutOrigin: true, fulfillmentReady: paymentReady || statusReady };
   }
 
-  async createShipment(orderId: string, supplierId: string, data: { carrier_code: string; carrier_name: string; tracking_number: string }) {
-    // Check if shipment already exists
-    const existing = await this.dataSource.query(
-      `SELECT id FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
-      [orderId, supplierId],
-    );
-    if (existing.length > 0) return { error: 'SHIPMENT_EXISTS' };
+  async updateStatus(orderId: string, supplierId: string, status: NetureOrderStatus) {
+    return this.dataSource.transaction(async (manager) => {
+      const scoped = new SupplierOrderService(manager);
+      const [order] = await manager.query('SELECT status FROM neture_orders WHERE id = $1 FOR UPDATE', [orderId]);
+      if (!order || !(await scoped.validateOwnership(orderId, supplierId))) return { error: 'ORDER_NOT_FOUND' };
+      if (!(SUPPLIER_STATUS_TRANSITIONS[order.status] || []).includes(status)) {
+        return { error: 'INVALID_TRANSITION', currentStatus: order.status, targetStatus: status };
+      }
+      if (['preparing', 'shipped', 'delivered'].includes(status)) {
+        const readiness = await scoped.getFulfillmentReadiness(orderId);
+        if (readiness.isCheckoutOrigin && !readiness.fulfillmentReady)
+          return { error: 'FULFILLMENT_NOT_PAYMENT_READY' };
+      }
+      const updated = await new NetureService(manager).updateOrderStatus(orderId, { status }, manager);
+      if (!updated) throw new Error('Order update failed');
+      return { success: true, data: updated };
+    });
+  }
 
-    const [shipment] = await this.dataSource.query(
-      `INSERT INTO neture_shipments (order_id, supplier_id, carrier_code, carrier_name, tracking_number, status, shipped_at)
+  async createShipment(
+    orderId: string,
+    supplierId: string,
+    data: { carrier_code: string; carrier_name: string; tracking_number: string },
+  ) {
+    return this.dataSource.transaction(async (manager) => {
+      const scoped = new SupplierOrderService(manager);
+      const [order] = await manager.query('SELECT status FROM neture_orders WHERE id = $1 FOR UPDATE', [orderId]);
+      if (!order || !(await scoped.validateOwnership(orderId, supplierId))) return { error: 'ORDER_NOT_FOUND' };
+      // Check if shipment already exists
+      const existing = await manager.query(
+        `SELECT id FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
+        [orderId, supplierId],
+      );
+      if (existing.length > 0) return { error: 'SHIPMENT_EXISTS' };
+
+      if (order.status !== 'preparing') return { error: 'INVALID_STATE', currentStatus: order.status };
+      const readiness = await scoped.getFulfillmentReadiness(orderId);
+      if (readiness.isCheckoutOrigin && !readiness.fulfillmentReady) return { error: 'FULFILLMENT_NOT_PAYMENT_READY' };
+
+      const [shipment] = await manager.query(
+        `INSERT INTO neture_shipments (order_id, supplier_id, carrier_code, carrier_name, tracking_number, status, shipped_at)
        VALUES ($1, $2, $3, $4, $5, 'shipped', NOW())
        RETURNING *`,
-      [orderId, supplierId, data.carrier_code, data.carrier_name, data.tracking_number],
-    );
+        [orderId, supplierId, data.carrier_code, data.carrier_name, data.tracking_number],
+      );
 
-    return { success: true, data: shipment };
+      const updated = await new NetureService(manager).updateOrderStatus(
+        orderId,
+        { status: NetureOrderStatus.SHIPPED },
+        manager,
+      );
+      if (!updated) throw new Error('Order update failed');
+      return { success: true, data: shipment };
+    });
   }
 
   async getShipment(orderId: string, supplierId: string) {
