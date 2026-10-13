@@ -66,16 +66,16 @@ export function ChannelPublicUrlCard({
       setDraft("");
     } catch (err: any) {
       const code = err?.code as string | undefined;
+      const messages: Record<string, string> = {
+        SLUG_RESERVED: "사용할 수 없는 주소입니다.",
+        SLUG_DUPLICATE: "이미 사용 중인 주소입니다.",
+        SLUG_INVALID:
+          "잘못된 주소 형식입니다. (3~120자, 소문자·숫자·한글·하이픈만 허용)",
+        SLUG_ALREADY_CHANGED:
+          "이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.",
+      };
       const msg =
-        code === "SLUG_RESERVED"
-          ? "사용할 수 없는 주소입니다."
-          : code === "SLUG_DUPLICATE"
-            ? "이미 사용 중인 주소입니다."
-            : code === "SLUG_INVALID"
-              ? "잘못된 주소 형식입니다. (3~120자, 소문자·숫자·한글·하이픈만 허용)"
-              : code === "SLUG_ALREADY_CHANGED"
-                ? "이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요."
-                : err?.message || "주소 변경에 실패했습니다.";
+        messages[code ?? ""] ?? (err?.message || "주소 변경에 실패했습니다.");
       showToast("error", msg);
     } finally {
       setSaving(false);

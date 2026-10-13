@@ -75,30 +75,27 @@ export function workspaceItems(
 ): StoreMenuSectionItem[] {
   const items = (config.menuSections ?? []).flatMap((section) => section.items);
   if (area === "home") return [];
-  const keys =
-    area === "commerce"
-      ? commerceKeys
-      : area === "studio"
-        ? studioKeys
-        : useKeys;
+  const keys = { commerce: commerceKeys, studio: studioKeys, use: useKeys }[
+    area
+  ];
   const selected = items.filter(
     (item) => keys.has(item.key) || (area === "use" && dualKeys.has(item.key)),
   );
-  const result = selected.map((item) => ({
-    ...item,
-    label:
-      area === "use"
-        ? ({
-            qr: "QR 배치·출력",
-            "tablet-displays": "태블릿 적용",
-            "signage-playlist": "사이니지 적용",
-            pop: "POP 출력",
-          }[item.key] ?? item.label)
-        : item.label,
-    subPath: dualKeys.has(item.key)
-      ? withWorkspaceMode(item.subPath, area === "use" ? "use" : "studio")
-      : item.subPath,
-  }));
+  const useLabels: Record<string, string> = {
+    qr: "QR 배치·출력",
+    "tablet-displays": "태블릿 적용",
+    "signage-playlist": "사이니지 적용",
+    pop: "POP 출력",
+  };
+  const mode = area === "use" ? "use" : "studio";
+  const result = selected.map((item) => {
+    const label =
+      area === "use" ? (useLabels[item.key] ?? item.label) : item.label;
+    const subPath = dualKeys.has(item.key)
+      ? withWorkspaceMode(item.subPath, mode)
+      : item.subPath;
+    return { ...item, label, subPath };
+  });
   if (
     area === "studio" &&
     items.some((item) => item.key === "library-contents")
@@ -137,11 +134,10 @@ export function currentWorkspaceArea(
   search: string,
   basePath: string,
 ): StoreWorkspaceArea | null {
-  const relative = pathname.startsWith(`${basePath}/`)
-    ? pathname.slice(basePath.length)
-    : pathname === basePath
-      ? ""
-      : null;
+  let relative: string | null = null;
+  if (pathname === basePath) relative = "";
+  else if (pathname.startsWith(`${basePath}/`))
+    relative = pathname.slice(basePath.length);
   if (relative === null) {
     const workBase = basePath.startsWith("/work/")
       ? basePath.replace(/\/store$/, "")
