@@ -27,3 +27,5 @@ PR #547의 최종 분석(중복률 10.2%, 신뢰성 D)을 근거로 코드·문�
 코드·TODO·로컬 검증과 최초 PR 분석을 완료했다. [PR #548](https://github.com/Renagang21/o4o-platform/pull/548)의 `e72578c85`에서 필수 CI·CodeQL·SonarCloud Quality Gate가 통과했고 신규 코드 중복률은 1.6%였다. 이 수치는 이번 수정분의 분석이며 PR #547 전체 모집단과 직접 같은 분모로 비교하지 않는다. 이후 남은 접근성 지적 3건(fieldset, input 뒤 명시적 공백, dialog의 mouse/key handler)을 같은 작업에서 추가 정비했다. 문서 상태 오기(IN_PROGRESS)는 정본의 6종 상태에 맞췄다.
 
 후속 commit의 외부 CI·Sonar 분석 및 main 통합·배포 결과는 최종 실행에서 확인한다. 현재 문서의 완료는 개발·로컬 검증 범위이며 배포 완료를 뜻하지 않는다. 서비스 간 복제·기존 원 분석의 전체 복잡성/스타일 모집단은 O4O 전체 정비 TODO로 유지한다.
+
+추가 보완과 최종 로컬 재검증도 완료: 테스트 132개, build·lint, 기존 업무 606 + native/비동기 336개 합성 브라우저 통과. 페이지 간격 CSS에 영향을 받던 modal의 inset·margin을 고정했다. 최종 외부 분석은 같은 PR 최신 HEAD에서 확인한다.

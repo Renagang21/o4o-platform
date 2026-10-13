@@ -34,3 +34,5 @@
 ## 최초 분석 후 같은 작업의 보완
 
 남은 3개 접근성 지적은 fieldset/legend, input 뒤 명시적 JSX 공백, dialog의 배경 실제 button으로 정비했다. native showModal·cancel·배경 차단·focus 복원 계약은 유지한다. 예전 IN_PROGRESS 헤더는 문서 lifecycle enum에 맞춰 바로잡았다. 최종 변경 후 테스트 132개, build·수정 파일 lint를 재통과했고 PC/모바일 브라우저도 재실행한다. 최종 SHA의 CI·SonarCloud 재분석과 main/배포는 이 기록 작성 시 대기 중이며 완료를 선행 주장하지 않는다. GitHub PR 및 commit status가 해당 실행 결과의 근거다.
+
+최종 로컬 재검증: 스케줄 native fieldset·dialog 배경 button 보완 뒤 테스트 132개·build·수정 파일 lint를 통과했다. 브라우저 기존 업무는 QR 원본 prefill 완료를 명시적으로 기다려 606개, native dialog·비동기 편집은 336개를 통과했다. 배경 click 검사에서 페이지 space-y의 24px margin 영향을 실제 좌표로 확인해 dialog의 inset·margin을 명시했고 재통과했다. 실패 실행은 PASS에 포함하지 않았다. 최종 외부 분석 결과는 PR #548의 최신 commit check를 확인한다.

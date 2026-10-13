@@ -111,7 +111,7 @@ export function TabletCommonIdlePicker({
       ref={dialogRef}
       aria-label="서비스 공통 대기 영상 선택"
       className="m-0 p-4 border-0 bg-transparent w-screen h-[100dvh] max-w-none max-h-none open:flex open:items-center open:justify-center backdrop:bg-slate-900/50"
-      style={{ zIndex: 100000 }}
+      style={{ zIndex: 100000, inset: 0, margin: 0 }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
