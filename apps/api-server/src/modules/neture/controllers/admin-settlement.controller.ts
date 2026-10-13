@@ -17,6 +17,7 @@
  *   — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
  */
 import { Router } from 'express';
+import { SettlementOrderConflictError } from '../services/settlement-order-conflict.error.js';
 import type { Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
@@ -60,6 +61,9 @@ export function createAdminSettlementController(dataSource: DataSource): Router 
       const result = await settlementService.calculateSettlements(period_start, period_end);
       res.json(result);
     } catch (error: any) {
+      if (error instanceof SettlementOrderConflictError) {
+        return res.status(409).json({ success: false, error: error.code, message: error.message });
+      }
       if (error?.code === '23505') {
         return res.status(409).json({ success: false, error: 'DUPLICATE_SETTLEMENT', message: 'A settlement already exists for one or more suppliers in this period.' });
       }

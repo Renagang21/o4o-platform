@@ -110,6 +110,12 @@ export class SupplierUnifiedOrderService {
       AND co."paymentStatus" = 'paid'
       AND NOT EXISTS (
         SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
+          AND ${netureOrderServiceSetSql('no2', '$2')}
+          AND EXISTS (
+            SELECT 1 FROM neture.neture_order_items bridged_item
+            JOIN supplier_product_offers bridged_offer ON bridged_offer.id = bridged_item.product_id::uuid
+            WHERE bridged_item.order_id = no2.id AND bridged_offer.supplier_id = $1::uuid
+          )
       )`;
   }
 

@@ -10,7 +10,7 @@
  * - 재고 상태 표시 (충분/부족/품절/미관리)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Package,
@@ -43,8 +43,17 @@ export default function SupplierInventoryPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStock, setEditStock] = useState(0);
   const [editThreshold, setEditThreshold] = useState(10);
+  const [editVersion, setEditVersion] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showMessage = (text: string, type: 'success' | 'error', persistent = false) => {
+    if (messageTimer.current !== null) clearTimeout(messageTimer.current);
+    setMessage({ text, type });
+    messageTimer.current = persistent ? null : setTimeout(() => setMessage(null), 3000);
+  };
+  useEffect(() => () => { if (messageTimer.current !== null) clearTimeout(messageTimer.current); }, []);
 
   // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
   //   getInventory() 는 실패 시 throw 한다. 조회 실패를 빈 목록(정상 0건)으로 표시하지 않는다.
@@ -67,30 +76,34 @@ export default function SupplierInventoryPage() {
   }, [fetchInventory]);
 
   const handleToggleTracking = async (item: InventoryItem) => {
+    if (saving) return;
     setSaving(true);
-    const result = await supplierApi.updateInventory(item.offer_id, {
-      track_inventory: !item.track_inventory,
-    });
-    if (result.success) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.offer_id === item.offer_id
-            ? { ...i, track_inventory: !item.track_inventory }
-            : i
-        )
-      );
-      setMessage({ text: `${item.name} 재고 추적 ${!item.track_inventory ? '활성화' : '비활성화'}`, type: 'success' });
-    } else {
-      setMessage({ text: result.error || '업데이트 실패', type: 'error' });
+    try {
+      const result = await supplierApi.updateInventory(item.offer_id, {
+        track_inventory: !item.track_inventory,
+        expected_version: item.inventory_version,
+      });
+      if (result.success && result.data) {
+        setItems((prev) => prev.map((i) => i.offer_id === item.offer_id ? { ...i, ...result.data } : i));
+        showMessage(`${item.name} 재고 추적 ${result.data.track_inventory ? '활성화' : '비활성화'}`, 'success');
+      } else if (result.error === 'INVENTORY_CONFLICT') {
+        await fetchInventory();
+        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.', 'error', true);
+      } else {
+        showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주세요.', 'error');
+      }
+    } catch {
+      showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주세요.', 'error');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setTimeout(() => setMessage(null), 3000);
   };
 
   const startEdit = (item: InventoryItem) => {
     setEditingId(item.offer_id);
     setEditStock(item.stock_quantity);
     setEditThreshold(item.low_stock_threshold);
+    setEditVersion(item.inventory_version);
   };
 
   const cancelEdit = () => {
@@ -98,32 +111,30 @@ export default function SupplierInventoryPage() {
   };
 
   const saveEdit = async (offerId: string) => {
+    if (saving) return;
     setSaving(true);
-    const result = await supplierApi.updateInventory(offerId, {
-      stock_quantity: editStock,
-      low_stock_threshold: editThreshold,
-    });
-    if (result.success && result.data) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.offer_id === offerId
-            ? {
-                ...i,
-                stock_quantity: result.data!.stock_quantity,
-                reserved_quantity: result.data!.reserved_quantity,
-                low_stock_threshold: result.data!.low_stock_threshold,
-                available_stock: result.data!.available_stock,
-              }
-            : i
-        )
-      );
-      setEditingId(null);
-      setMessage({ text: '재고 업데이트 완료', type: 'success' });
-    } else {
-      setMessage({ text: result.error || '업데이트 실패', type: 'error' });
+    try {
+      const result = await supplierApi.updateInventory(offerId, {
+        stock_quantity: editStock,
+        low_stock_threshold: editThreshold,
+        expected_version: editVersion,
+      });
+      if (result.success && result.data) {
+        setItems((prev) => prev.map((i) => i.offer_id === offerId ? { ...i, ...result.data } : i));
+        setEditingId(null);
+        showMessage('재고 업데이트 완료', 'success');
+      } else if (result.error === 'INVENTORY_CONFLICT') {
+        setEditingId(null);
+        await fetchInventory();
+        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.', 'error', true);
+      } else {
+        showMessage('재고를 저장하지 못했습니다. 다시 시도해 주세요.', 'error');
+      }
+    } catch {
+      showMessage('재고를 저장하지 못했습니다. 다시 시도해 주세요.', 'error');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setTimeout(() => setMessage(null), 3000);
   };
 
   const stats = {
@@ -147,6 +158,7 @@ export default function SupplierInventoryPage() {
       {/* Message */}
       {message && (
         <div
+          role={message.type === 'error' ? 'alert' : 'status'}
           style={{
             ...styles.messageBanner,
             backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
@@ -250,8 +262,9 @@ export default function SupplierInventoryPage() {
                       {isEditing ? (
                         <div style={styles.editForm}>
                           <div style={styles.editField}>
-                            <label style={styles.editLabel}>재고 수량</label>
+                            <label htmlFor={`stock-${item.offer_id}`} style={styles.editLabel}>재고 수량</label>
                             <input
+                              id={`stock-${item.offer_id}`}
                               type="number"
                               min={0}
                               value={editStock}
@@ -260,8 +273,9 @@ export default function SupplierInventoryPage() {
                             />
                           </div>
                           <div style={styles.editField}>
-                            <label style={styles.editLabel}>부족 기준</label>
+                            <label htmlFor={`threshold-${item.offer_id}`} style={styles.editLabel}>부족 기준</label>
                             <input
+                              id={`threshold-${item.offer_id}`}
                               type="number"
                               min={0}
                               value={editThreshold}
@@ -304,6 +318,7 @@ export default function SupplierInventoryPage() {
                           </div>
                           <button
                             onClick={() => startEdit(item)}
+                              disabled={saving}
                             style={styles.editBtn}
                           >
                             <Edit3 size={14} /> 수정
@@ -322,8 +337,11 @@ export default function SupplierInventoryPage() {
                 <div style={styles.trackToggle}>
                   <span style={styles.trackLabel}>재고 추적</span>
                   <button
+                    role="switch"
+                    aria-label={`${item.name} 재고 추적`}
+                    aria-checked={item.track_inventory}
                     onClick={() => handleToggleTracking(item)}
-                    disabled={saving}
+                    disabled={saving || editingId !== null}
                     style={styles.toggleButton}
                   >
                     {item.track_inventory ? (
@@ -369,7 +387,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '16px',
   },
 
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', marginBottom: '24px' },
   statCard: {
     backgroundColor: '#fff',
     borderRadius: '12px',

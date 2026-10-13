@@ -428,7 +428,15 @@ export const adminSettlementApi = {
         period_end: periodEnd,
       });
       return response.data;
-    } catch { return { success: false, error: 'NETWORK_ERROR' }; }
+    } catch (error: unknown) {
+      const response = (error as { response?: { status?: number; data?: { error?: string; message?: string } } })?.response;
+      const conflict = response?.data;
+      if (response?.status === 409 && conflict?.error &&
+          ['DUPLICATE_SETTLEMENT', 'SETTLEMENT_ORDER_SUPPLIER_CONFLICT'].includes(conflict.error)) {
+        return { success: false, error: conflict.error, message: typeof conflict.message === 'string' ? conflict.message : undefined };
+      }
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
   },
 
   async approve(id: string, notes?: string): Promise<boolean> {

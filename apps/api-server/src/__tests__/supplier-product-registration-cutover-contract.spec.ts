@@ -34,6 +34,14 @@ const TYPES = `${NETURE}/promotion/product-promotion.types.ts`;
 
 const WEB = 'services/web-neture/src';
 
+// Include every extracted responsibility so relocation cannot weaken the existing boundary assertions.
+function authoringSource(page: string, directory: string): string {
+  const modules = fs.readdirSync(path.join(REPO_ROOT, WEB, 'pages/supplier', directory))
+    .filter((name) => /\.(ts|tsx)$/.test(name)).sort()
+    .map((name) => `${WEB}/pages/supplier/${directory}/${name}`);
+  return [page, ...modules].map((rel) => stripComments(read(rel))).join('\n');
+}
+
 // Inspect the facade and every extracted write responsibility; contract assertions are unchanged.
 const offerSrc = [
   OFFER_SERVICE,
@@ -69,7 +77,12 @@ describe('A. web-neture — 레거시 createSupplierOffer 소비 0 · 3 경로 c
   });
 
   it('supplierApi 에 createOfferFromMaster(from-master) · submitProductCandidate(product-candidates) 가 있다', () => {
-    const api = stripComments(read(`${WEB}/lib/api/supplier.ts`));
+    const api = [
+      `${WEB}/lib/api/supplier.ts`,
+      ...fs.readdirSync(path.join(REPO_ROOT, WEB, 'lib/api/supplier'))
+        .filter((name) => name.endsWith('.ts')).sort()
+        .map((name) => `${WEB}/lib/api/supplier/${name}`),
+    ].map((rel) => stripComments(read(rel))).join('\n');
     expect(api).toMatch(/async createOfferFromMaster\([\s\S]*?api\.post\('\/neture\/supplier\/products\/from-master'/);
     expect(api).toMatch(/async submitProductCandidate\([\s\S]*?api\.post\('\/neture\/supplier\/product-candidates'/);
   });
@@ -98,7 +111,7 @@ describe('A. web-neture — 레거시 createSupplierOffer 소비 0 · 3 경로 c
   });
 
   it('신규 단일 등록 화면: submitProductCandidate 만 호출 · Offer/ProductImage 직접 생성 0 · 금지 키(distributionType/serviceKeys/stock) 미전송', () => {
-    const page = stripComments(read(`${WEB}/pages/supplier/SupplierProductCreatePage.tsx`));
+    const page = authoringSource(`${WEB}/pages/supplier/SupplierProductCreatePage.tsx`, 'product-create');
     expect(page).toContain('supplierApi.submitProductCandidate({');
     expect(page).not.toContain('supplierApi.createProduct(');
     expect(page).not.toContain('productApi.uploadProductImage(');
@@ -119,7 +132,7 @@ describe('A. web-neture — 레거시 createSupplierOffer 소비 0 · 3 경로 c
 
   it('대량 → bulk-candidates 유지 · Import Assistant → /supplier/products/new (Candidate 화면)', () => {
     expect(webHits('/products/bulk-candidates').length).toBeGreaterThan(0);
-    const imp = stripComments(read(`${WEB}/pages/supplier/SupplierProductImportPage.tsx`));
+    const imp = authoringSource(`${WEB}/pages/supplier/SupplierProductImportPage.tsx`, 'product-import');
     expect(imp).toContain('/supplier/products/new');
     expect(imp).not.toContain('createProduct(');
   });
