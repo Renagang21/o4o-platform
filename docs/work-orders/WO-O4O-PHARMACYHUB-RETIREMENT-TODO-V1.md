@@ -1,7 +1,7 @@
 # PharmacyHub retirement TODO
 
 > 상태: ACTIVE · 사용자 범위: TODO 작성 → 조사로 보정 → 구현·검증·push
-> 현재(2026-10-12): 최종 제거 범위에 PH 도메인/DNS/인증서 종료 포함. 다른 작업 종료 전 운영 변경 대기. PH 전용 backend·NEG·Cloud Run 제거 및 12개 리다이렉트 규칙 검증 완료. WIF 원래 조건 복구·실제 인증 시험도 완료. PH-only DB/잔여 공용 코드 정리는 미완료.
+> 현재(2026-10-13): PH 전용 backend·NEG·Cloud Run, 관리 데이터 56건 및 Certificate Manager 자원 5개 제거·검증 완료. Gabia DNS 삭제는 사용자 확인 완료. 최신 인증서 종료 실행의 WIF 원래 조건 복구·재조회 검증은 관리자가 WIF_RESTORED로 확인했다(과거 인증 smoke와 구분). PH URL map 호스트/matcher 제거·공유 설정 보존 검증 완료. 이번 URL map 종료용 임시 WIF 제한도 관리자가 원래 조건으로 복구하고 WIF_RESTORED로 재조회 검증을 확인했다. PH 주문·결제·공급·콘텐츠·미디어/GCS 제거는 미완료. PC Local Agent는 담당 에이전트 범위다.
 
 ## 완전 제거 범위 확정 — 2026-10-10
 
@@ -354,3 +354,29 @@ PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐�
 PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`, `certificatemanager.operations.get`이다. plan은 실제 IAM 누락 권한을 보고하고 apply는 누락 시 첫 삭제 전에 차단한다. 아직 실제 인증서 삭제 완료는 아니다.
 
 SonarCloud 보완: 문자열 정렬의 localeCompare 비교 함수를 명시하고 SDK read/delete dependency를 Promise 반환 함수로 선언했다. 단일 DB connection의 조회와 인증서 의존 순서 삭제는 순차 Promise chain으로 유지한다. 병렬 삭제나 query 실행으로 gate/rollback 경계를 우회하지 않는다. 관련 26 tests와 PostgreSQL 16 실제 16개 집계를 다시 검증했다.
+
+### 2026-10-13 PH 인증서 종료 실행
+
+PR #527은 main `e4c48811b6b414aa8939d639373d9331d2c4c470`에 병합됐으며 post-merge CI 38347390566은 SUCCESS다. Delivery 38348144329는 NO_DEPLOY로 종료해 애플리케이션 배포는 수행하지 않았다. 읽기 전용 census [38347391583](https://github.com/Renagang21/o4o-platform/actions/runs/38347391583)은 SUCCESS, 참조 조사 complete=true였다. PH 주문 로그 6건, PH/타 서비스 주문 공유 결제 0건, PH 콘텐츠 밖의 미디어 링크 1건, GCS 경로를 가진 PH 자산 4건을 확인했다. PH 결제가 없는 주문 1건과 복수 PH 결제 주문 1건이 있어 주문/결제를 1:1로 가정하지 않는다. 이 데이터는 삭제하지 않았다.
+
+첫 인증서 plan 38348151860은 당시 실행 중인 Delivery 때문에 idle gate에서 중단됐으며 삭제는 없었다. Delivery 종료 뒤 plan 38348278165는 SUCCESS였으나 인증서 삭제 권한 4개 누락을 보고했다. 관리자가 해당 권한을 추가한 뒤 [38349009973](https://github.com/Renagang21/o4o-platform/actions/runs/38349009973)은 SUCCESS, missingPermissions=[] 및 PH 전용 대상 5개를 확인했다.
+
+관리자는 원래 WIF 조건을 로컬 `pharmacyhub-cert-retirement-e4c48811b6b414aa8939d639373d9331d2c4c470.json`에 백업하고 해당 main SHA/PH workflow/owner로 임시 제한한 검증 결과 WIF_RESTRICTION_ACTIVE를 전달했다. apply [38349256767](https://github.com/Renagang21/o4o-platform/actions/runs/38349256767)은 SUCCESS, applied=true, targets=[], sharedResourcesPreserved=true, missingPermissions=[]로 종료했다. `cm-entry-pharmacyhub-root`·`cm-entry-pharmacyhub-www`, `cm-cert-pharmacyhub`, `dns-auth-pharmacyhub-root`·`dns-auth-pharmacyhub-www`를 제거하고 재조회로 부재 및 공유 설정 보존을 확인했다. 공유 인증서 map/proxy/LB 및 URL map은 변경하지 않았다.
+
+관리자는 같은 로컬 백업을 사용해 원래 WIF 조건을 복구하고 재조회 검증 결과 `WIF_RESTORED`를 전달했다. 인증서 종료용 임시 SHA/workflow 제한은 해제됐다. 남은 범위는 PH 전용 주문/결제/공급/콘텐츠/미디어·GCS 파일, PH URL map host/matcher 종료다. Gabia DNS 삭제는 앞선 사용자 확인 사항이다. 사용자는 2026-10-13 다른 용도의 활용을 위해 도메인 등록/자동연장은 유지하며 o4o와의 PH 연결만 제거하도록 범위를 확정했다. PC Local Agent는 담당 에이전트 범위다.
+
+후속 URL map 연결 종료 준비: domain_detachment standalone 모드를 추가한다. 고정 application map o4o-global-lb의 PH root/www host rule과 path-matcher-pharmacy-hub만 제거하며, 해당 호스트의 map validation test도 함께 정리한다. 기존 호스트 전체 리다이렉트의 정확한 상태와 PH matcher의 전용 귀속을 확인하고, 타 서비스가 같은 matcher를 공유하거나 부분/예상 밖 상태이면 차단한다. Compute validation과 fingerprint 비교, apply 직전 owner/main/CI/freeze/idle 및 정확한 WIF 제한 gate를 적용한다. 전체 최종 draft 일치와 PH 대상 부재로 공유 설정 보존을 검증하며, 응답 유실·operation 미확인 시 자동 재실행/rollback하지 않고 request/operation 증거를 보존한다. DB/GCS/DNS/인증서/공유 LB 자원은 이 모드에서 변경하지 않는다. focused 35 tests PASS이며 실제 URL map 변경은 아직 수행하지 않았다. 동일 WO 연속 단계로 전용 worktree/branch를 유지한다.
+
+PR #533은 필수 CI와 Codex 리뷰 통과 뒤 병합됐으나 SonarCloud의 API URL 입력 검사가 실패한 것을 병합 전에 처리하지 못했다. 실제 URL map plan/apply는 수행하지 않고 후속 수정으로 호출 목적지를 고정 action/URL/method 목록으로 제한하고 operation path를 검증·URI 인코딩하며 request UUID query를 구조화한다. 임의 URL·path traversal·query injection 회귀를 추가했다. 이 수정의 CI/Sonar 재검증 및 운영 적용은 후속 실행 결과로 기록한다. 도메인 등록/자동연장은 유지하되 o4o의 PH DNS/인증서/URL map·전용 코드/데이터는 제거한다는 사용자 후속 지시를 반영했다.
+
+후속 Sonar 검증에서도 동적 URL fetch 지적이 남아 있어 PR #534 병합/운영 적용을 중단했다. HTTP read/validate는 고정 literal URL만 사용하고, update URL은 고정 origin/path에 코드 내부에서 생성한 UUID query만 추가한다. 원격 operation name은 operation- 접두 및 단일 operand 형태를 검증한 뒤 고정 project/global의 Cloud SDK describe 인자로만 사용한다. 원격 응답/호출자가 목적지 URL·SDK flag·request UUID를 지정할 수 없음을 실제 client 경계 회귀로 검증한다. 검사 억제/quality gate 변경은 하지 않는다.
+
+HTTP URL 지적은 해소됐으며 SDK operation operand 입력 검사가 남아 적용을 계속 보류한다. 문자열 타입과 허용 문자 정제 결과의 원문 일치를 확인하고 operation- 접두의 단일 operand만 고정 SDK 명령에 전달한다. 메타문자·공백·제어문자·비문자열 및 다른 project flag 입력을 실제 client 경계 테스트에서 거절한다.
+
+### 2026-10-13 URL map 종료 plan 검증 완료
+
+PR #534의 최종 commit 73687cf93d779bf8ba6e3fefe389ec74af945a3d는 필수 CI·SonarCloud·최신 Codex 리뷰를 모두 통과하고 main f66ed5f5f8e6198e0043053b24cae6230ffa96cf에 병합됐다. post-merge CI 38355910041 및 CodeQL은 SUCCESS, Delivery 38356668088은 NO_DEPLOY로 종료했다. standalone domain_detachment plan [38356815800](https://github.com/Renagang21/o4o-platform/actions/runs/38356815800)은 SUCCESS이며 실제 map 귀속/퇴역 상태 및 Compute validation을 확인했다. 대상은 pharmacyhub.co.kr, www.pharmacyhub.co.kr, path-matcher-pharmacy-hub이며 제거할 PH validation test는 0건이었다. applied=false로 실제 URL map 변경은 없었다. 이 main SHA에 대한 관리자 임시 WIF 제한 적용 전에는 apply하지 않는다. 인증서 삭제 때의 제한은 이미 복구됐으며, 이번 새 제한은 아직 적용하지 않았다. PH 잔여 데이터/GCS 삭제도 미실행이다. 가비아 등록/자동연장은 사용자 지시에 따라 유지한다.
+
+### 2026-10-13 URL map 연결 종료 apply 완료
+
+관리자는 f66ed5f5f8e6198e0043053b24cae6230ffa96cf와 PH workflow/owner로 한정한 임시 WIF 조건을 별도 로컬 pharmacyhub-domain-detachment-f66ed5f5f8e6198e0043053b24cae6230ffa96cf.json에 백업 후 적용하고 WIF_RESTRICTION_ACTIVE 검증 결과를 전달했다. main·필수 CI·다른 운영 Actions 부재를 재확인한 뒤 apply [38358591293](https://github.com/Renagang21/o4o-platform/actions/runs/38358591293)은 SUCCESS, applied=true, targets=[], removedTests=0, sharedResourcesPreserved=true로 종료했다. Compute update의 terminal success 이후 map을 재조회해 PH root/www host rule 및 전용 matcher 부재와 전체 공유 설정 보존을 검증했다. 공유 LB/IP/proxy/다른 host 및 DB/GCS는 변경하지 않았다. 관리자는 같은 로컬 백업을 사용해 원래 WIF 조건으로 복구하고 재조회 검증 결과 WIF_RESTORED를 전달했다. URL map 종료용 임시 인증 제한은 해제됐다. PH 전용 데이터/GCS 정리는 계속 미완료다. 가비아 도메인 등록/자동연장은 사용자 지시에 따라 유지한다.
