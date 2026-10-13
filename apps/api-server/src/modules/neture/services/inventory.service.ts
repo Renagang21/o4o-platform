@@ -44,44 +44,49 @@ export class InventoryService {
     );
   }
 
-  async updateInventory(offerId: string, supplierId: string, data: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean }) {
-    // Verify ownership
-    const ownerCheck = await this.dataSource.query(
-      `SELECT id FROM supplier_product_offers WHERE id = $1 AND supplier_id = $2`,
-      [offerId, supplierId],
-    );
-    if (ownerCheck.length === 0) return null;
+  async updateInventory(
+    offerId: string,
+    supplierId: string,
+    data: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean },
+  ) {
+    return this.dataSource.transaction(async (manager) => {
+      // Verify ownership
+      const ownerCheck = await manager.query(
+        `SELECT id FROM supplier_product_offers WHERE id = $1 AND supplier_id = $2 FOR UPDATE`,
+        [offerId, supplierId],
+      );
+      if (ownerCheck.length === 0) return null;
 
-    // Build update fields
-    const setClauses: string[] = [];
-    const params: any[] = [offerId, supplierId];
-    let paramIdx = 3;
+      // Build update fields
+      const setClauses: string[] = [];
+      const params: any[] = [offerId, supplierId];
+      let paramIdx = 3;
 
-    if (data.stock_quantity !== undefined) {
-      setClauses.push(`stock_quantity = $${paramIdx++}`);
-      params.push(data.stock_quantity);
-    }
-    if (data.low_stock_threshold !== undefined) {
-      setClauses.push(`low_stock_threshold = $${paramIdx++}`);
-      params.push(data.low_stock_threshold);
-    }
-    if (data.track_inventory !== undefined) {
-      setClauses.push(`track_inventory = $${paramIdx++}`);
-      params.push(!!data.track_inventory);
-    }
+      if (data.stock_quantity !== undefined) {
+        setClauses.push(`stock_quantity = $${paramIdx++}`);
+        params.push(data.stock_quantity);
+      }
+      if (data.low_stock_threshold !== undefined) {
+        setClauses.push(`low_stock_threshold = $${paramIdx++}`);
+        params.push(data.low_stock_threshold);
+      }
+      if (data.track_inventory !== undefined) {
+        setClauses.push(`track_inventory = $${paramIdx++}`);
+        params.push(!!data.track_inventory);
+      }
 
-    if (setClauses.length === 0) return 'NO_UPDATES';
+      if (setClauses.length === 0) return 'NO_UPDATES';
 
-    setClauses.push('updated_at = NOW()');
+      setClauses.push('updated_at = NOW()');
 
-    await this.dataSource.query(
-      `UPDATE supplier_product_offers SET ${setClauses.join(', ')} WHERE id = $1 AND supplier_id = $2`,
-      params,
-    );
+      await manager.query(
+        `UPDATE supplier_product_offers SET ${setClauses.join(', ')} WHERE id = $1 AND supplier_id = $2`,
+        params,
+      );
 
-    // Return updated inventory
-    const updated = await this.dataSource.query(
-      `SELECT spo.id AS offer_id, spo.master_id,
+      // Return updated inventory
+      const updated = await manager.query(
+        `SELECT spo.id AS offer_id, spo.master_id,
               pm.name, pm.brand_name,
               spo.stock_quantity, spo.reserved_quantity,
               spo.low_stock_threshold, spo.track_inventory,
@@ -89,9 +94,10 @@ export class InventoryService {
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        WHERE spo.id = $1 AND spo.supplier_id = $2`,
-      [offerId, supplierId],
-    );
+        [offerId, supplierId],
+      );
 
-    return updated[0];
+      return updated[0];
+    });
   }
 }
