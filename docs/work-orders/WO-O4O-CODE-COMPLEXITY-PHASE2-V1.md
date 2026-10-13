@@ -151,7 +151,7 @@ guard·route·승인 Core·공통 패키지·DDL·dependency·CI는 변경하지
 - [x] B03: 동일한 내부 처리만 추출. guard/응답/SQL/권한·호출 순서 유지.
 - [x] B04: 기존 회귀와 역할 검색 순서·목록/상세 응답 행동 검증.
 - [x] B05: API type-check/build와 lint·scope 검사, 결과 기록.
-- [ ] B06: commit·push 후 원격 commit과 clean 상태 확인.
+- [x] B06: commit·push 후 원격 commit과 clean 상태 확인.
 
 
 ### 9.1 TODO 검증 결과 (구현 전)
@@ -210,3 +210,13 @@ RBAC 정본/카탈로그, Core/USER-OPERATOR Freeze 및 현재 route·기존 회
 N01의 이번 회원 조회/역할 후보는 검증·정비 완료했다. §7 N01의 인증·서비스 이동·콘텐츠 저장
 후보까지 조사 완료한 것은 아니다. 다음 묶음은 N02 AI runtime/콘텐츠 모달의 책임·함수 추출 조사이며,
 서비스 간 공통화·Core 구조 변경·계약 변경은 계속 별도 후보로 유지한다.
+
+
+### 9.3 push 종료 기록
+
+구현 commit `bcd890c4b04b55868e687441c0a68c65333bf947`을
+`wo/code-complexity-phase2`에 push했고 `git ls-remote`로 동일 SHA를 확인했다.
+작업 파일은 clean이며 B01~B06은 이번 회원 조회/역할 묶음 완료다.
+본 종료 기록도 같은 branch의 문서 후속 commit으로 push한다.
+최신 main 기준은 여전히 `f66ed5f5f8`. PR 생성·main 병합·배포·운영 DB 변경은 하지 않았다.
+CI/리뷰 integration-ready 판정은 하지 않으며 위 결과는 로컬 검증이다.
