@@ -11,6 +11,7 @@
  * - 삭제 (store owner 전용)
  */
 
+import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -239,6 +240,7 @@ export default function StoreDirectContentPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
+      {!editing && <StoreContentNextSteps contentId={id} title={content.title} />}
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${

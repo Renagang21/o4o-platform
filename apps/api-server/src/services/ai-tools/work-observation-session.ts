@@ -1,30 +1,34 @@
+import {
+  createWorkAgentExecutionState,
+  type WorkAgentExecutionState,
+} from "./work-agent-execution-state.js";
 /** Per-run observation session. It uses the already verified node and existing executors; it grants no permission. */
-import type { DataSource } from 'typeorm';
-import type { VerifiedToolContext } from './ai-tool-contract.js';
-import type { DeviceRow } from '../local-agent/local-agent-service.js';
+import type { DataSource } from "typeorm";
+import type { VerifiedToolContext } from "./ai-tool-contract.js";
+import type { DeviceRow } from "../local-agent/local-agent-service.js";
 import {
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
-} from '../local-agent/local-agent-protocol.js';
+} from "../local-agent/local-agent-protocol.js";
 import {
   DOM_UNIT_MAX_COMMANDS,
   DOM_UNIT_MAX_DURATION_MS,
   type DomUnitStep,
   type SafeDomElement,
-} from '../local-agent/browser-dom-contract.js';
+} from "../local-agent/browser-dom-contract.js";
 import type {
   SafeUiaElement,
   SafeUiaWindow,
-} from '../local-agent/windows-uia-contract.js';
+} from "../local-agent/windows-uia-contract.js";
 import {
   issueDomCommand,
   issueDomUnitCommand,
-} from './browser-dom-executor.js';
-import { issueUiaCommand } from './windows-uia-executor.js';
+} from "./browser-dom-executor.js";
+import { issueUiaCommand } from "./windows-uia-executor.js";
 import {
   issueComputerCapture,
   issueComputerAction,
-} from './windows-computer-executor.js';
+} from "./windows-computer-executor.js";
 import {
   WORK_AGENT_ERROR,
   WORK_LOOP_LIMITS,
@@ -34,13 +38,13 @@ import {
   type WorkObservation,
   type WorkElement,
   type WorkSurface,
-} from './work-agent-contract.js';
+} from "./work-agent-contract.js";
 import type {
   UnitReport,
   UnitStop,
   UnitObservation,
   UnitRun,
-} from './work-execution-types.js';
+} from "./work-execution-types.js";
 
 /** Numeric counters only; images and observation data never enter measurements or persistence inputs. */
 export interface WorkRunMeasurements {
@@ -70,6 +74,7 @@ interface ObservationOptions {
   siteId: string;
   surface: WorkSurface;
   state: WorkAgentState;
+  executionState?: WorkAgentExecutionState;
   measurements: WorkRunMeasurements;
 }
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -85,9 +90,10 @@ export function createWorkObservationSession({
   surface,
   state,
   measurements,
+  executionState,
 }: ObservationOptions) {
   // These values are private to this invocation, never a singleton or a copied persistence snapshot.
-  let sameObservationRun = 0;
+  const execution = executionState ?? createWorkAgentExecutionState(state);
   let visualFallback = false;
   let unitDisabled = false;
   const settle = async (): Promise<void> => {
@@ -157,16 +163,16 @@ export function createWorkObservationSession({
       tool,
       siteId,
     );
-    if (cap.status !== 'success' || !cap.image)
+    if (cap.status !== "success" || !cap.image)
       return {
         ok: false,
         errorCode:
           cap.errorCode ?? LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION,
       };
     visualImage = {
-      mimeType: 'image/jpeg',
+      mimeType: "image/jpeg",
       base64: cap.image.base64,
-      provenance: 'screen_capture',
+      provenance: "screen_capture",
     };
     return { ok: true };
   };
@@ -175,11 +181,15 @@ export function createWorkObservationSession({
     ok: boolean;
     errorCode?: string;
   }> => {
-    if (surface !== 'uia' || visualFallback) return { ok: false };
+    if (surface !== "uia" || visualFallback) return { ok: false };
     const cap = await captureForVisual();
     if (!cap.ok) return { ok: false, errorCode: cap.errorCode };
     visualFallback = true;
-    if (state.observation) state.observation.visualFallback = true; // 이미지는 담지 않는다 — 표식만.
+    if (state.observation)
+      execution.acceptObservation(
+        { ...state.observation, visualFallback: true },
+        "preserve",
+      ); // 이미지는 담지 않는다 — 표식만.
     return { ok: true };
   };
 
@@ -188,7 +198,7 @@ export function createWorkObservationSession({
     if (budgetLeft() < 1)
       return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
     const r = await uia(LOCAL_AGENT_ACTIONS.UIA_INSPECT);
-    if (r.status !== 'success') return { ok: false, errorCode: r.errorCode };
+    if (r.status !== "success") return { ok: false, errorCode: r.errorCode };
     const rawEls = (
       Array.isArray(r.safe.elements) ? r.safe.elements : []
     ) as SafeUiaElement[];
@@ -210,18 +220,18 @@ export function createWorkObservationSession({
       windowRef: e.windowRef,
     }));
     const fg = windows.find((w) => w.foreground) ?? windows[0];
-    const path = `window:${fg?.title ?? ''}`;
+    const path = `window:${fg?.title ?? ""}`;
     const obs: WorkObservation & { snapshotId: string } = {
       siteId,
       path,
       ready: true,
       elements,
       elementCount:
-        typeof r.safe.elementCount === 'number'
+        typeof r.safe.elementCount === "number"
           ? r.safe.elementCount
           : elements.length,
-      source: 'app_window',
-      surface: 'uia',
+      source: "app_window",
+      surface: "uia",
       windows: windows.map((w) => ({
         windowRef: w.windowRef,
         title: w.title,
@@ -229,20 +239,17 @@ export function createWorkObservationSession({
         userAction: w.userAction,
       })),
       fingerprint: fingerprintObservation(path, elements),
-      snapshotId: String(r.safe.snapshotId ?? ''),
+      snapshotId: String(r.safe.snapshotId ?? ""),
     };
     // 시각 모드면 현재 화면을 다시 캡처(Planner 는 이 이미지를 본다). 캡처 실패해도 UIA 관찰은 유지한다.
     if (visualFallback) {
       obs.visualFallback = true;
       await captureForVisual();
       // UIA 지문은 시각 모드에서 화면 변화를 반영하지 못한다(요소 미노출) — 같은-관찰 카운터를 진전 신호로 쓰지 않는다.
-      state.observation = obs;
-      sameObservationRun = 0;
+      execution.acceptObservation(obs, "reset");
       return { ok: true };
     }
-    const same = state.observation?.fingerprint === obs.fingerprint;
-    sameObservationRun = same ? sameObservationRun + 1 : 0;
-    state.observation = obs;
+    execution.acceptObservation(obs);
     return { ok: true };
   };
 
@@ -253,7 +260,7 @@ export function createWorkObservationSession({
   //   지금 화면을 관찰해 돌려준다. 다음 판단은 늘 여기서 한다. 단위는 Task 목적이나 절차를 정하지 않는다.
 
   const unitCapable = (): boolean =>
-    surface === 'dom' &&
+    surface === "dom" &&
     !unitDisabled &&
     executionNode?.capabilities?.taskUnit === true;
   /**
@@ -290,35 +297,35 @@ export function createWorkObservationSession({
         observe: opts.observe,
         maxCommands,
         maxDurationMs,
-        ...(typeof docId === 'string' ? { docId } : {}),
+        ...(typeof docId === "string" ? { docId } : {}),
         ...(steps.length === 0 && opts.afterNavigation
           ? { afterNavigation: true }
           : {}),
       },
     );
-    if (r.status === 'denied') {
+    if (r.status === "denied") {
       unitDisabled = true;
-      return { kind: 'denied' };
+      return { kind: "denied" };
     }
-    if (r.status !== 'success') {
+    if (r.status !== "success") {
       unitDisabled = true;
-      return { kind: 'lost', errorCode: r.errorCode };
+      return { kind: "lost", errorCode: r.errorCode };
     }
-    if (typeof r.safe.probeCount === 'number')
+    if (typeof r.safe.probeCount === "number")
       measurements.retryCount += r.safe.probeCount;
     const obs =
-      r.safe.observation && typeof r.safe.observation === 'object'
+      r.safe.observation && typeof r.safe.observation === "object"
         ? (r.safe.observation as UnitObservation)
         : null;
     return {
-      kind: 'ran',
+      kind: "ran",
       reports: (Array.isArray(r.safe.reports)
         ? r.safe.reports
         : []) as UnitReport[],
       stop: (r.safe.stop ?? null) as UnitStop,
       observation: obs,
       observeErrorCode:
-        typeof r.safe.observeErrorCode === 'string'
+        typeof r.safe.observeErrorCode === "string"
           ? r.safe.observeErrorCode
           : null,
     };
@@ -328,33 +335,29 @@ export function createWorkObservationSession({
     const elements = (
       Array.isArray(o.elements) ? o.elements : []
     ) as SafeDomElement[];
-    const path = typeof o.path === 'string' ? o.path : '';
+    const path = typeof o.path === "string" ? o.path : "";
     const obs: WorkObservation & { snapshotId: string } = {
       siteId,
       path,
       ready: true,
       elements,
       elementCount:
-        typeof o.elementCount === 'number' ? o.elementCount : elements.length,
-      source: 'webpage',
+        typeof o.elementCount === "number" ? o.elementCount : elements.length,
+      source: "webpage",
       fingerprint: fingerprintObservation(path, elements),
-      snapshotId: String(o.snapshotId ?? ''),
-      ...(typeof o.docId === 'string' ? { docId: o.docId } : {}),
+      snapshotId: String(o.snapshotId ?? ""),
+      ...(typeof o.docId === "string" ? { docId: o.docId } : {}),
     };
     state.stepCount += 2;
-    if (countSame) {
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-    }
-    state.observation = obs;
+    execution.acceptObservation(obs, countSame ? "count" : "preserve");
   };
   /** 노드가 관찰하지 못한 이유 → 단발 observe() 와 같은 오류 축. */
   const unitObserveError = (code: string | null): string => {
-    if (code === 'DOM_UNIT_BUDGET') return WORK_AGENT_ERROR.LOOP_LIMIT;
+    if (code === "DOM_UNIT_BUDGET") return WORK_AGENT_ERROR.LOOP_LIMIT;
     if (
       code === null ||
-      code === 'DOM_UNIT_TIME' ||
-      code === 'DOM_UNIT_NOT_READY'
+      code === "DOM_UNIT_TIME" ||
+      code === "DOM_UNIT_NOT_READY"
     )
       return WORK_AGENT_ERROR.SITE_NOT_READY;
     return code;
@@ -377,7 +380,7 @@ export function createWorkObservationSession({
   const observe = async (
     opts: { afterNavigation?: boolean } = {},
   ): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (surface === 'uia') return observeUia();
+    if (surface === "uia") return observeUia();
     // Phase E — 관찰 전용 단위: get_context · 대기 · inspect 를 노드가 한 번에(왕복 1). 같은 재시도 · 옛 문서 규칙.
     if (unitCapable()) {
       if (budgetLeft() < 2)
@@ -386,7 +389,7 @@ export function createWorkObservationSession({
         observe: true,
         afterNavigation: opts.afterNavigation,
       });
-      if (u.kind === 'ran') {
+      if (u.kind === "ran") {
         if (u.observation) {
           applyDomObservation(u.observation);
           return { ok: true };
@@ -411,14 +414,14 @@ export function createWorkObservationSession({
         state.stepCount -= 1;
         measurements.retryCount += 1;
       };
-      if (c.status !== 'success') {
+      if (c.status !== "success") {
         if (c.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) {
           unspend();
           continue;
         }
         return { ok: false, errorCode: c.errorCode };
       }
-      if (typeof c.safe.siteId === 'string' && c.safe.siteId !== siteId)
+      if (typeof c.safe.siteId === "string" && c.safe.siteId !== siteId)
         return {
           ok: false,
           errorCode: LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED,
@@ -438,7 +441,7 @@ export function createWorkObservationSession({
         continue;
       }
       const i = await dom(LOCAL_AGENT_ACTIONS.DOM_INSPECT);
-      if (i.status !== 'success') {
+      if (i.status !== "success") {
         if (i.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) {
           unspend();
           continue;
@@ -448,24 +451,22 @@ export function createWorkObservationSession({
       const elements = (
         Array.isArray(i.safe.elements) ? i.safe.elements : []
       ) as SafeDomElement[];
-      const path = typeof c.safe.path === 'string' ? c.safe.path : '';
+      const path = typeof c.safe.path === "string" ? c.safe.path : "";
       const obs: WorkObservation & { snapshotId: string } = {
         siteId,
         path,
         ready: true,
         elements,
         elementCount:
-          typeof i.safe.elementCount === 'number'
+          typeof i.safe.elementCount === "number"
             ? i.safe.elementCount
             : elements.length,
-        source: 'webpage',
+        source: "webpage",
         fingerprint: fingerprintObservation(path, elements),
-        snapshotId: String(i.safe.snapshotId ?? ''),
-        ...(typeof c.safe.docId === 'string' ? { docId: c.safe.docId } : {}),
+        snapshotId: String(i.safe.snapshotId ?? ""),
+        ...(typeof c.safe.docId === "string" ? { docId: c.safe.docId } : {}),
       };
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-      state.observation = obs;
+      execution.acceptObservation(obs);
       return { ok: true };
     }
     return { ok: false, errorCode: WORK_AGENT_ERROR.SITE_NOT_READY };
@@ -487,12 +488,12 @@ export function createWorkObservationSession({
     isVisualFallback: () => visualFallback,
     // A method keeps image bytes out of serializable session properties; only Planner consumes them.
     plannerImage: () => visualImage,
-    sameObservationRun: () => sameObservationRun,
+    sameObservationRun: () => execution.sameObservationRun,
     resetSameObservationRun: () => {
-      sameObservationRun = 0;
+      execution.restoreObservationRun(0);
     },
     restoreSameObservationRun: (value: number) => {
-      sameObservationRun = value;
+      execution.restoreObservationRun(value);
     },
   };
 }

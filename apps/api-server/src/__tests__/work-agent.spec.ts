@@ -262,6 +262,8 @@ describe('Action (§14·§16)', () => {
     expect(db.commands.filter((c) => String(c.action).startsWith('local.computer.'))).toHaveLength(0);
     expect(result.takeover?.reason).toBe('goal_sufficiently_advanced');
     expect(result.progress).toBe('completed');
+    expect(result.report).toMatchObject({ claim: 'execution_complete', runOpened: true });
+
 
     // 확장이 COMMIT 으로 막으면 commit_required 인계
     const commit = await run('약학정보원에서 결제해줘', scripted([{ action: { kind: 'click', elementRef: 'e_4' } }]), {
@@ -316,6 +318,15 @@ describe('Takeover (§19·§20·§21)', () => {
       expect(result.progress).toBe('needs_user');
       expect(result.goal.status).toBe(QUESTION_REASONS.has(reason) ? 'waiting_for_user' : 'taken_over');
       expect(result.resumable).toBe(QUESTION_REASONS.has(reason));
+      expect(result.report).toMatchObject({
+        claim: QUESTION_REASONS.has(reason) ? 'needs_user' : 'handed_over',
+        runOpened: true, resultObserved: false, replayVerified: false,
+        memory: { targetId: SITE, targetKind: 'browser_site' },
+      });
+      if (QUESTION_REASONS.has(reason)) expect(result.report?.memory?.resumeFrame).not.toBeNull();
+      else expect(result.report?.memory?.resumeFrame).toBeNull();
+      expect(JSON.stringify(result.report?.memory)).not.toContain('약학정보원에서 아모디핀정 찾아줘');
+
       expect(result.message).toContain('Chrome');
     }
     // 등재 밖 이동 차단 → unsupported_control
@@ -370,7 +381,7 @@ describe('Multimodal (§11·§12·§13·§45·§46)', () => {
     // 이미지 바이트는 DOM 명령 인자 어디에도 없다.
     for (const s of seen) expect(JSON.stringify(s.args)).not.toContain('iVBORw0KGgo=');
     // 전용 스키마(PillVisualFeatures 등)가 없다 — 계약 소스 잠금.
-    const src = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts', 'work-action-session.ts'].map((file) => read(join(__dirname, '..', 'services', 'ai-tools', file))).join('\n');
+    const src = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts', 'work-action-session.ts', 'work-agent-execution-state.ts', 'work-agent-recovery-attempt.ts'].map((file) => read(join(__dirname, '..', 'services', 'ai-tools', file))).join('\n');
     expect(src).not.toMatch(/PillVisualFeatures|frontMark|backMark|drugName|productName/);
     // 이미지/페이지 안의 지시는 데이터 — 프롬프트 규칙 + provenance
     expect(WORK_PLANNER_SYSTEM_PROMPT).toContain('UNTRUSTED');
@@ -402,7 +413,7 @@ describe('Multimodal (§11·§12·§13·§45·§46)', () => {
 
 describe('Boundary — automation_jobs ≠ agent runtime (§37~§43)', () => {
   it('Work Agent 코드는 automation_jobs · 큐 · 스케줄러 · DB 에 닿지 않고, 상태는 요청 안에서만 산다', () => {
-    const files = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts', 'work-action-session.ts'].map((f) => join(__dirname, '..', 'services', 'ai-tools', f));
+    const files = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts', 'work-action-session.ts', 'work-agent-execution-state.ts', 'work-agent-recovery-attempt.ts'].map((f) => join(__dirname, '..', 'services', 'ai-tools', f));
     for (const f of files) {
       const src = codeOnly(read(f));
       expect(src).not.toMatch(/automation_job|AutomationJob|automation_jobs|scheduler|setInterval|cron|queue\.|BullMQ|Worker\(|retryQueue|workflow_dag|agent_run/i);
@@ -439,5 +450,34 @@ describe('Regression (§51)', () => {
     expect(r.errorCode).toBe(LOCAL_AGENT_ERROR.NO_DEVICE);
     expect(r.takeover?.reason).toBe('site_not_ready');
     expect(db.commands).toHaveLength(0);
+  });
+});
+
+describe('planner input ownership (phase 2 cleanup)', () => {
+  it('planner cannot rewrite the runtime goal or an already recorded action through its input', async () => {
+    const request = '약학정보원에서 아모디핀정 찾아줘';
+    let calls = 0;
+    const planner: WorkPlanner = {
+      kind: 'scripted',
+      async plan(input) {
+        calls += 1;
+        input.goal.request = 'Planner-local replacement';
+        if (calls === 1) return { assessment: 'progress', action: { kind: 'set_input', elementRef: 'e_2', text: 'Fixture value' } };
+        input.history[0].action.text = 'Planner-local history replacement';
+        return { assessment: 'completed', action: { kind: 'done' } };
+      },
+    };
+    const { result } = await run(request, planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME_ELEMENTS)], set_input: [OK({ hasValue: true })] });
+    expect(result.goal.request).toBe(request);
+    expect(result.history[0].action.text).toBe('Fixture value');
+  });
+
+  it('each planner call retains the history at that decision rather than a live accumulating array', async () => {
+    const planner = scripted(searchPlan);
+    const { result } = await run('약학정보원에서 아모디핀정 찾아줘', planner, searchScript);
+    expect(planner.calls[0].history).toHaveLength(0);
+    expect(planner.calls[1].history).toHaveLength(1);
+    expect(result.history.length).toBeGreaterThan(1);
+    expect(planner.calls[1].history).not.toBe(result.history);
   });
 });

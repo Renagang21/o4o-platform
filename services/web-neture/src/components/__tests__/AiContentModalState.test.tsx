@@ -509,7 +509,13 @@ it('keeps a pending store request disabled after hiding and reopening its panel,
   await act(async () => {
     complete(reply({ success: true, data: { id: 'content-one' } }));
   });
-  expect(screen.getByText('내 매장 콘텐츠에 저장되었습니다 ✓')).toBeTruthy();
+  // Current main invalidates the hidden panel receipt while retaining the issued write.
+  expect(screen.queryByText('내 매장 콘텐츠에 저장되었습니다 ✓')).toBeNull();
+  expect((screen.getByRole('button', { name: '매장에 저장' }) as HTMLButtonElement).disabled).toBe(false);
+  fetchMock.mockResolvedValueOnce(reply({ success: true, data: { id: 'content-two' } }));
+  fireEvent.click(screen.getByRole('button', { name: '매장에 저장' }));
+  await screen.findByText('내 매장 콘텐츠에 저장되었습니다 ✓');
+  expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith('/api/v1/kpa/store-contents'))).toHaveLength(2);
 });
 it('preserves production 403 and completion-callback failure handling without repeating the successful server write', async () => {
   const callback = vi.fn(() => {

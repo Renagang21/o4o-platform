@@ -1,3 +1,4 @@
+import { createWorkAgentExecutionState } from './work-agent-execution-state.js';
 import { createWorkActionSession, type WorkActionSession } from './work-action-session.js';
 import { createWorkTaskSession, type WorkTaskSession } from './work-task-session.js';
 import { createWorkPlanningSession, type WorkPlanningSession } from './work-planning-session.js';
@@ -168,6 +169,7 @@ export async function runWorkAgent(
   const displayName = targetRef.displayName;
   let targetOutcome: WorkTargetOutcome | null = null;
   const state: WorkAgentState = createWorkAgentState(goal, siteId);
+  const executionState = createWorkAgentExecutionState(state);
   const image = imageCheck.image;
   const inputMode: 'text' | 'text+image' = image ? 'text+image' : 'text';
   let lastRead: string | null = null;
@@ -382,13 +384,15 @@ export async function runWorkAgent(
   await taskSession.initialize();
 
   // Bind the observation session only after node ownership, target preparation and run claim have passed.
-  const observationSession = createWorkObservationSession({ dataSource, ctx, deviceId: deviceId as string, executionNode: executionNode as DeviceRow, tool, siteId, surface, state, measurements });
+  const observationSession = createWorkObservationSession({
+    executionState, dataSource, ctx, deviceId: deviceId as string, executionNode: executionNode as DeviceRow, tool, siteId, surface, state, measurements });
   observationBinding.current = observationSession;
   const { budgetLeft, overTime, dom, unitCapable, runUnit, applyDomObservation, unitObserveError, reobserve, observe } = observationSession;
   const actionBinding: { current?: WorkActionSession } = {};
   const enterVisualFallback = () => actionBinding.current!.enterVisualFallback();
 
   const planningSession = createWorkPlanningSession({
+    executionState,
     state, planner, strongPlanner: options.strongPlanner, taskSession, observationSession, measurements, workflow, surface, stepMeta,
     request: { image, siteDisplayName: displayName, recoveryHint, intent: input.intent },
     readFeedback: () => ({ lastRead, lastSafetyReason: actionBinding.current?.safetyReason() ?? '' }), isReplaying: () => replaying,
@@ -406,7 +410,8 @@ export async function runWorkAgent(
    * `pre` — Phase E 단위 경로: 노드가 이미 실행한 행동의 결과. 명령을 다시 보내지 않고 같은 기록 · 같은 오류 해석 · 같은 지시를 만든다
    * (단발 경로와 history · trajectory · Experience 가 같은 모양이 되게). 예산은 단발과 같이 행동 1.
    */
-  const actionSession = createWorkActionSession({ state, surface, observationSession, stepMeta, trajectory, currentActor, setRejectReason: planningSession.setRejectReason });
+  const actionSession = createWorkActionSession({
+    executionState, state, surface, observationSession, stepMeta, trajectory, currentActor, setRejectReason: planningSession.setRejectReason });
   actionBinding.current = actionSession;
   const execActOnce = actionSession.execute;
 

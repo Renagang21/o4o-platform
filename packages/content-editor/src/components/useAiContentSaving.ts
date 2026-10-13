@@ -1,54 +1,60 @@
-import type { AiContentSession } from './useAiContentSession';
+import type { AiContentSession } from "./useAiContentSession";
 /** Internal saving controllers for this modal. Each business request remains explicit and independently owned. */
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { htmlToForumBlocks } from './ai-content-conversion';
-import type { AiContentModalProps, AiMode } from './AiContentModal';
-import type { AiContentResult } from './ai-content-generation-state';
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import {
+  buildCommunitySavePayload,
+  buildStoreSavePayload,
+  buildProductionMaterialSavePayload,
+} from "./ai-content-save-payload";
+import {
+  useCommunitySavePanelState,
+  useStoreSavePanelState,
+  useProductionMaterialSavePanelState,
+} from "./use-ai-content-save-panels";
+import {
+  useAiModalSaveRequests,
+  type SaveTarget,
+} from "./use-ai-modal-save-requests";
+import type { AiContentModalProps, AiMode } from "./AiContentModal";
+import type { AiContentResult } from "./ai-content-generation-state";
 
-type SaveJob<T> =
-  | { saving: true; status: null }
-  | { saving: false; status: T | null };
-const PENDING_SAVE = { saving: true, status: null } as const;
-function idleJob<T>(): SaveJob<T> {
-  return { saving: false, status: null };
-}
-function clearReceipt<T>(job: SaveJob<T>): SaveJob<T> {
-  return job.saving ? job : idleJob();
-}
-/** Per-destination write ownership: resets suppress old receipts, never abort or retry a submitted write. */
-function useSaveJob<T>(session: AiContentSession) {
-  const [job, setJob] = useState<SaveJob<T>>(idleJob);
-  const pending = useRef<object | null>(null);
+type SaveJob<T> = { saving: boolean; status: T | null };
+/** Reuse main's issued-write owner; hiding/resetting receipts never releases or retries a pending write. */
+function useSaveJob<T>(
+  session: AiContentSession,
+  target: SaveTarget,
+  receipt: {
+    status: T | null;
+    setStatus: React.Dispatch<React.SetStateAction<T | null>>;
+  },
+) {
+  const ownership = useAiModalSaveRequests(true, "", session);
+  const { setStatus } = receipt;
   const begin = () => {
-    if (pending.current || !session.current(session.capture())) return null;
-    const ticket = { epoch: session.capture() };
-    pending.current = ticket;
-    setJob(PENDING_SAVE);
+    const ticket = ownership.beginSave(target);
+    if (ticket) setStatus(null);
     return ticket;
   };
-  const update = (ticket: { epoch: number }, next: SaveJob<T>) => {
-    if (pending.current === ticket && session.current(ticket.epoch))
-      setJob(next);
+  type Ticket = NonNullable<ReturnType<typeof begin>>;
+  const update = (ticket: Ticket, next: SaveJob<T>) => {
+    if (ticket.isCurrent()) setStatus(next.status);
   };
-  const finish = (ticket: { epoch: number }) => {
-    if (pending.current !== ticket) return;
-    pending.current = null;
-    if (session.mounted())
-      setJob((previous) =>
-        session.current(ticket.epoch) ? previous : idleJob(),
-      );
+  const finish = (ticket: Ticket) => {
+    ticket.finish();
+    if (session.mounted() && !ticket.isCurrent()) setStatus(null);
   };
-  const reset = useCallback(
-    () => setJob(pending.current ? PENDING_SAVE : idleJob()),
-    [],
-  );
+  const invalidate = ownership.invalidate;
+  const reset = useCallback(() => {
+    invalidate(target);
+    setStatus(null);
+  }, [invalidate, target, setStatus]);
   return {
-    job,
+    job: { saving: ownership.pending[target], status: receipt.status },
     begin,
     update,
     finish,
     reset,
-    clearReceipt: () => setJob(clearReceipt),
+    clearReceipt: reset,
   };
 }
 type ChannelStatus = { ok: boolean; label?: string; error?: string };
@@ -57,11 +63,11 @@ type StoreStatus = { ok: boolean; error?: string; contentId?: string };
 type ProductionStatus = { ok: boolean; error?: string; assetId?: string };
 type SavingOptions = Pick<
   AiContentModalProps,
-  | 'aiRequestHeaders'
-  | 'onChannelSave'
-  | 'onProductionMaterialSaved'
-  | 'sourceMetadata'
-  | 'templateId'
+  | "aiRequestHeaders"
+  | "onChannelSave"
+  | "onProductionMaterialSaved"
+  | "sourceMetadata"
+  | "templateId"
 > & {
   apiBaseUrl: string;
   result: AiContentResult | null;
@@ -71,7 +77,7 @@ type SavingOptions = Pick<
 };
 type RequestOptions = Pick<
   SavingOptions,
-  'apiBaseUrl' | 'aiRequestHeaders' | 'result' | 'session'
+  "apiBaseUrl" | "aiRequestHeaders" | "result" | "session"
 >;
 
 function useChannelSaving({
@@ -82,12 +88,16 @@ function useChannelSaving({
   session,
 }: Pick<
   SavingOptions,
-  'result' | 'onChannelSave' | 'outputType' | 'mode' | 'session'
+  "result" | "onChannelSave" | "outputType" | "mode" | "session"
 >) {
-  const channelWrite = useSaveJob<ChannelStatus>(session);
+  const [status, setStatus] = useState<ChannelStatus | null>(null);
+  const channelWrite = useSaveJob<ChannelStatus>(session, "channel", {
+    status,
+    setStatus,
+  });
   const channelJob = channelWrite.job;
   const handleChannelSave = async () => {
-    if (!result || !onChannelSave) return;
+    if (!result || !onChannelSave || channelJob.status?.ok) return;
     const ticket = channelWrite.begin();
     if (!ticket) return;
     try {
@@ -107,7 +117,7 @@ function useChannelSaving({
         saving: false,
         status: {
           ok: false,
-          error: err?.message || '저장 중 오류가 발생했습니다.',
+          error: err?.message || "저장 중 오류가 발생했습니다.",
         },
       });
     } finally {
@@ -129,25 +139,23 @@ function useCommunitySaving({
   aiRequestHeaders,
   session,
 }: RequestOptions) {
-  const [communityForm, setCommunityForm] = useState({
-    open: false,
-    title: '',
-    forumId: '',
-  });
+  const panel = useCommunitySavePanelState();
   const {
-    open: showCommunitySavePanel,
+    visible: showCommunitySavePanel,
     title: communityTitle,
     forumId: communityForumId,
-  } = communityForm;
-  const setCommunityTitle = (title: string) =>
-    setCommunityForm((previous) => ({ ...previous, title }));
-  const communityWrite = useSaveJob<CommunityStatus>(session);
+    forums: communityForums,
+    setTitle: setCommunityTitle,
+    setForumId: setCommunityForumId,
+    setForums: setCommunityForums,
+    setForumsLoading: setCommunityForumsLoading,
+  } = panel;
+  const communityWrite = useSaveJob<CommunityStatus>(
+    session,
+    "community",
+    panel,
+  );
   const communityJob = communityWrite.job;
-  const [catalog, setCatalog] = useState<{
-    items: { id: string; name: string }[];
-    loading: boolean;
-  }>({ items: [], loading: false });
-  const { items: communityForums } = catalog;
   const catalogRequest = useRef(0);
   const headersKey = JSON.stringify(
     Object.entries(aiRequestHeaders ?? {}).sort(([a], [b]) =>
@@ -159,18 +167,13 @@ function useCommunitySaving({
     if (catalogOwner.current !== headersKey) {
       catalogOwner.current = headersKey;
       catalogRequest.current += 1;
-      setCatalog({ items: [], loading: false });
+      setCommunityForums([]);
+      setCommunityForumsLoading(false);
     }
-  }, [headersKey]);
-  const setCommunityForumId = (forumId: string) =>
-    setCommunityForm((previous) => ({ ...previous, forumId }));
-  const setCommunityForumsLoading = (loading: boolean) =>
-    setCatalog((previous) => ({ ...previous, loading }));
-  const setCommunityForums = (items: { id: string; name: string }[]) =>
-    setCatalog((previous) => ({ ...previous, items }));
+  }, [headersKey, setCommunityForums, setCommunityForumsLoading]);
   const handleOpenCommunitySavePanel = async () => {
     if (!result) return;
-    setCommunityForm({ open: true, title: result.title || '', forumId: '' });
+    panel.open(result.title || "");
     communityWrite.clearReceipt();
     if (communityForums.length === 0) {
       setCommunityForumsLoading(true);
@@ -179,7 +182,7 @@ function useCommunitySaving({
       try {
         const res = await fetch(`${apiBaseUrl}/api/v1/forum/categories`, {
           headers: { ...aiRequestHeaders },
-          credentials: 'include',
+          credentials: "include",
         });
         const data = await res.json();
         if (
@@ -209,22 +212,20 @@ function useCommunitySaving({
       // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
       //   백엔드 normalizeContent가 Node.js에서 DOMParser를 사용해 실패하므로
       //   프론트에서 HTML → Block[] 변환 후 전달 (백엔드는 Array인 경우 그대로 저장)
-      const contentBlocks = htmlToForumBlocks(result.html);
-      const body: Record<string, any> = {
-        title: communityTitle.trim() || 'AI 생성 콘텐츠',
-        content: contentBlocks.length > 0 ? contentBlocks : result.html,
-        type: 'discussion',
-      };
-      if (communityForumId) body.forumId = communityForumId;
+      const body = buildCommunitySavePayload(
+        result.html,
+        communityTitle,
+        communityForumId,
+      );
       const res = await fetch(`${apiBaseUrl}/api/v1/forum/posts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...aiRequestHeaders },
+        credentials: "include",
         body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || '커뮤니티 저장에 실패했습니다.');
+        throw new Error(data.error || "커뮤니티 저장에 실패했습니다.");
       }
       communityWrite.update(ticket, {
         saving: false,
@@ -235,7 +236,7 @@ function useCommunitySaving({
         saving: false,
         status: {
           ok: false,
-          error: err?.message || '저장 중 오류가 발생했습니다.',
+          error: err?.message || "저장 중 오류가 발생했습니다.",
         },
       });
     } finally {
@@ -243,26 +244,29 @@ function useCommunitySaving({
     }
   };
 
-  const resetWrite = communityWrite.reset;
+  const resetWrite = communityWrite.reset,
+    resetPanel = panel.reset;
   const reset = useCallback(() => {
     catalogRequest.current += 1;
     setCommunityForumsLoading(false);
-    setCommunityForm({ open: false, title: '', forumId: '' });
+    resetPanel();
     resetWrite();
-  }, [resetWrite]);
+  }, [resetWrite, resetPanel, setCommunityForumsLoading]);
   return {
     open: showCommunitySavePanel,
     title: communityTitle,
     forumId: communityForumId,
     forums: communityForums,
-    forumsLoading: catalog.loading,
+    forumsLoading: panel.forumsLoading,
     ...communityJob,
     setTitle: setCommunityTitle,
     setForumId: setCommunityForumId,
     save: handleCommunitySave,
     show: handleOpenCommunitySavePanel,
     hide: () => {
-      setCommunityForm((previous) => ({ ...previous, open: false }));
+      panel.setVisible(false);
+      catalogRequest.current += 1;
+      setCommunityForumsLoading(false);
       communityWrite.clearReceipt();
     },
     reset,
@@ -275,16 +279,18 @@ function useStoreSaving({
   aiRequestHeaders,
   session,
 }: RequestOptions) {
-  const [storeForm, setStoreForm] = useState({ open: false, title: '' });
-  const { open: showStoreSavePanel, title: storeTitle } = storeForm;
-  const setStoreTitle = (title: string) =>
-    setStoreForm((previous) => ({ ...previous, title }));
-  const storeWrite = useSaveJob<StoreStatus>(session);
+  const panel = useStoreSavePanelState();
+  const {
+    visible: showStoreSavePanel,
+    title: storeTitle,
+    setTitle: setStoreTitle,
+  } = panel;
+  const storeWrite = useSaveJob<StoreStatus>(session, "store", panel);
   const storeJob = storeWrite.job;
   // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
   const handleOpenStoreSavePanel = () => {
     if (!result) return;
-    setStoreForm({ open: true, title: result.title || '' });
+    panel.open(result.title || "");
     storeWrite.clearReceipt();
   };
 
@@ -293,25 +299,20 @@ function useStoreSaving({
     const ticket = storeWrite.begin();
     if (!ticket) return;
     try {
-      const contentBlocks = htmlToForumBlocks(result.html);
       const res = await fetch(`${apiBaseUrl}/api/v1/kpa/store-contents`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify({
-          title: storeTitle.trim() || 'AI 생성 콘텐츠',
-          contentJson:
-            contentBlocks.length > 0 ? contentBlocks : { html: result.html },
-        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...aiRequestHeaders },
+        credentials: "include",
+        body: JSON.stringify(buildStoreSavePayload(result.html, storeTitle)),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
         const msg =
           res.status === 403
-            ? '매장 소속이 없습니다. 매장 경영자만 내 매장에 저장할 수 있습니다.'
+            ? "매장 소속이 없습니다. 매장 경영자만 내 매장에 저장할 수 있습니다."
             : data.error?.message ||
               data.error ||
-              '내 매장 저장에 실패했습니다.';
+              "내 매장 저장에 실패했습니다.";
         throw new Error(msg);
       }
       storeWrite.update(ticket, {
@@ -323,7 +324,7 @@ function useStoreSaving({
         saving: false,
         status: {
           ok: false,
-          error: err?.message || '저장 중 오류가 발생했습니다.',
+          error: err?.message || "저장 중 오류가 발생했습니다.",
         },
       });
     } finally {
@@ -331,11 +332,12 @@ function useStoreSaving({
     }
   };
 
-  const resetWrite = storeWrite.reset;
+  const resetWrite = storeWrite.reset,
+    resetPanel = panel.reset;
   const reset = useCallback(() => {
-    setStoreForm({ open: false, title: '' });
+    resetPanel();
     resetWrite();
-  }, [resetWrite]);
+  }, [resetWrite, resetPanel]);
   return {
     open: showStoreSavePanel,
     title: storeTitle,
@@ -344,7 +346,7 @@ function useStoreSaving({
     save: handleStoreSave,
     show: handleOpenStoreSavePanel,
     hide: () => {
-      setStoreForm((previous) => ({ ...previous, open: false }));
+      panel.setVisible(false);
       storeWrite.clearReceipt();
     },
     reset,
@@ -363,19 +365,19 @@ function useProductionMaterialSaving({
 }: RequestOptions &
   Pick<
     SavingOptions,
-    'outputType' | 'onProductionMaterialSaved' | 'sourceMetadata' | 'templateId'
+    "outputType" | "onProductionMaterialSaved" | "sourceMetadata" | "templateId"
   >) {
-  const [productionMaterialForm, setProductionMaterialForm] = useState({
-    open: false,
-    title: '',
-  });
+  const panel = useProductionMaterialSavePanelState();
   const {
-    open: showProductionMaterialSavePanel,
+    visible: showProductionMaterialSavePanel,
     title: productionMaterialTitle,
-  } = productionMaterialForm;
-  const setProductionMaterialTitle = (title: string) =>
-    setProductionMaterialForm((previous) => ({ ...previous, title }));
-  const productionMaterialWrite = useSaveJob<ProductionStatus>(session);
+    setTitle: setProductionMaterialTitle,
+  } = panel;
+  const productionMaterialWrite = useSaveJob<ProductionStatus>(
+    session,
+    "material",
+    panel,
+  );
   const productionMaterialJob = productionMaterialWrite.job;
   // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
   //   매장 제작 자료(store_execution_assets)로 AI 결과 저장.
@@ -388,7 +390,7 @@ function useProductionMaterialSaving({
   //   - showStoreSave / showCommunitySave 와 독립.
   const handleOpenProductionMaterialSavePanel = () => {
     if (!result) return;
-    setProductionMaterialForm({ open: true, title: result.title || '' });
+    panel.open(result.title || "");
     productionMaterialWrite.clearReceipt();
   };
 
@@ -397,34 +399,28 @@ function useProductionMaterialSaving({
     const ticket = productionMaterialWrite.begin();
     if (!ticket) return;
     try {
-      const usageType =
-        outputType === 'pop' ? 'pop' : outputType === 'store_qr' ? 'qr' : null;
       const res = await fetch(`${apiBaseUrl}/api/v1/kpa/store/assets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify({
-          title: productionMaterialTitle.trim() || 'AI 생성 매장 제작 자료',
-          description: result.summary || null,
-          assetType: 'content',
-          htmlContent: result.html,
-          category: outputType,
-          usageType,
-          sourceType: 'generated',
-          // WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-AI-BRIDGE-V1: source 추적 메타 (선택적)
-          ...(sourceMetadata ? { sourceMetadata } : {}),
-          // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1: template id 추적 (선택적)
-          ...(templateId ? { templateId } : {}),
-        }),
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...aiRequestHeaders },
+        credentials: "include",
+        body: JSON.stringify(
+          buildProductionMaterialSavePayload(
+            result,
+            productionMaterialTitle,
+            outputType,
+            sourceMetadata,
+            templateId,
+          ),
+        ),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
         const msg =
           res.status === 403
-            ? '매장 소속이 없습니다. 매장 경영자만 매장 제작 자료를 저장할 수 있습니다.'
+            ? "매장 소속이 없습니다. 매장 경영자만 매장 제작 자료를 저장할 수 있습니다."
             : data.error?.message ||
               data.error ||
-              '매장 제작 자료 저장에 실패했습니다.';
+              "매장 제작 자료 저장에 실패했습니다.";
         throw new Error(msg);
       }
       const assetId: string | undefined = data.data?.id;
@@ -438,7 +434,7 @@ function useProductionMaterialSaving({
         saving: false,
         status: {
           ok: false,
-          error: err?.message || '저장 중 오류가 발생했습니다.',
+          error: err?.message || "저장 중 오류가 발생했습니다.",
         },
       });
     } finally {
@@ -446,11 +442,12 @@ function useProductionMaterialSaving({
     }
   };
 
-  const resetWrite = productionMaterialWrite.reset;
+  const resetWrite = productionMaterialWrite.reset,
+    resetPanel = panel.reset;
   const reset = useCallback(() => {
-    setProductionMaterialForm({ open: false, title: '' });
+    resetPanel();
     resetWrite();
-  }, [resetWrite]);
+  }, [resetWrite, resetPanel]);
   return {
     open: showProductionMaterialSavePanel,
     title: productionMaterialTitle,
@@ -459,7 +456,7 @@ function useProductionMaterialSaving({
     save: handleProductionMaterialSave,
     show: handleOpenProductionMaterialSavePanel,
     hide: () => {
-      setProductionMaterialForm((previous) => ({ ...previous, open: false }));
+      panel.setVisible(false);
       productionMaterialWrite.clearReceipt();
     },
     reset,

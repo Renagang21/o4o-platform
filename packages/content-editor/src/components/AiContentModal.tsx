@@ -251,7 +251,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const { loading, result, error, resultTab, copied, showUsageSnippets } = generation;
   // Entry context is private memory only, never a permission decision or a persisted/logged value.
   const requestHeadersKey = JSON.stringify(Object.entries(aiRequestHeaders ?? {}).sort(([a], [b]) => a.localeCompare(b)));
-  const entryContext = JSON.stringify([initialText, initialMode, initialSourceTab, templateId, templateSystemPrompt, sourceMetadata?.sourceContentId, sourceMetadata?.sourceOrigin, requestHeadersKey]);
+  const entryContext = JSON.stringify([initialText, initialMode, initialSourceTab, templateId, templateSystemPrompt, templateForcedOptions?.tone, templateForcedOptions?.length, sourceMetadata?.sourceContentId, sourceMetadata?.sourceTitle, sourceMetadata?.sourceOrigin, requestHeadersKey]);
   const previousEntry = useRef(entryContext);
   const session = useAiContentSession(open, entryContext);
   const saves = useAiContentSaving({
@@ -272,6 +272,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
   const [sourceTab, setSourceTab] = useState<SourceTab>(initialSourceTab ?? 'text');
+  useEffect(() => {
+    if (open) setSourceTab(initialSourceTab ?? 'text');
+  }, [open, initialSourceTab]);
   const [urlInput, setUrlInput] = useState('');
   const [urlTone, setUrlTone] = useState<UrlTone>('normal');
   // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
@@ -356,6 +359,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   };
 
   const handleSourceTabChange = (tab: SourceTab) => {
+    if (tab === sourceTab) return;
     setSourceTab(tab);
     session.invalidate();
     requests.cancel('source_changed');
@@ -954,14 +958,14 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
               <button
                 type="button"
                 onClick={channel.save}
-                disabled={channel.saving}
+                disabled={channel.saving || Boolean(channel.status?.ok)}
                 style={{
                   padding: '8px 16px',
                   border: '1px solid #059669',
                   borderRadius: '6px',
                   background: channel.saving ? '#d1fae5' : channel.status?.ok ? '#d1fae5' : '#ecfdf5',
                   fontSize: '14px',
-                  cursor: channel.saving ? 'not-allowed' : 'pointer',
+                  cursor: channel.saving || channel.status?.ok ? 'not-allowed' : 'pointer',
                   color: '#059669',
                   fontWeight: 600,
                 }}

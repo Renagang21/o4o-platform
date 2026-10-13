@@ -50,6 +50,7 @@ const named = <M extends Record<string, unknown>, K extends keyof M>(load: () =>
   lazy(() => load().then((m) => ({ default: m[key] as ComponentType<Record<string, unknown>> })));
 
 // ── 내 매장(공통) — KPA canonical ─────────────────────────────────────────────
+const StoreWorkspacePage = named(() => import('./pages/pharmacy/StoreWorkspacePage'), 'StoreWorkspacePage');
 const StoreHomePage = named(() => import('./pages/pharmacy/StoreHomePage'), 'StoreHomePage');
 const PharmacyInfoPage = named(() => import('./pages/pharmacy/PharmacyInfoPage'), 'PharmacyInfoPage');
 const StoreExecutionPage = lazy(() => import('./pages/pharmacy/StoreExecutionPage'));
@@ -159,6 +160,9 @@ function ServiceGuideRedirect() {
 function storeChildRoutes() {
   return <>
         <Route index element={<StoreHomePage />} />
+        <Route path="workspace/commerce" element={<StoreWorkspacePage area="commerce" />} />
+        <Route path="workspace/studio" element={<StoreWorkspacePage area="studio" />} />
+        <Route path="workspace/use" element={<StoreWorkspacePage area="use" />} />
         <Route path="info" element={<PharmacyInfoPage />} />
         <Route path="settings" element={<Navigate to={`${S}/info`} replace />} />
         {/* 서비스 앱의 옛 매장 경로(북마크 · handoff returnPath) — 404 대신 같은 화면으로(§21-14) */}

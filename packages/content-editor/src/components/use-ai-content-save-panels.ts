@@ -1,0 +1,116 @@
+/** Draft/status owners only; issued-write lifetime lives in useAiModalSaveRequests. */
+import { useCallback, useState } from "react";
+
+export function useCommunitySavePanelState() {
+  // WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1
+  const [showCommunitySavePanel, setShowCommunitySavePanel] = useState(false);
+  const [communityTitle, setCommunityTitle] = useState("");
+  const [communityForumId, setCommunityForumId] = useState("");
+  const [communityForums, setCommunityForums] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [communityForumsLoading, setCommunityForumsLoading] = useState(false);
+  const [communitySaveStatus, setCommunitySaveStatus] = useState<{
+    ok: boolean;
+    error?: string;
+    postId?: string;
+  } | null>(null);
+
+  const openCommunitySavePanel = useCallback((title: string) => {
+    setCommunityTitle(title);
+    setCommunityForumId("");
+    setCommunitySaveStatus(null);
+    setShowCommunitySavePanel(true);
+  }, []);
+
+  // Preserve forum list/loading: existing close never cleared those states.
+  const resetCommunitySavePanel = useCallback(() => {
+    setShowCommunitySavePanel(false);
+    setCommunityTitle("");
+    setCommunityForumId("");
+    setCommunitySaveStatus(null);
+  }, []);
+
+  return {
+    visible: showCommunitySavePanel,
+    setVisible: setShowCommunitySavePanel,
+    title: communityTitle,
+    setTitle: setCommunityTitle,
+    forumId: communityForumId,
+    setForumId: setCommunityForumId,
+    forums: communityForums,
+    setForums: setCommunityForums,
+    forumsLoading: communityForumsLoading,
+    setForumsLoading: setCommunityForumsLoading,
+    status: communitySaveStatus,
+    setStatus: setCommunitySaveStatus,
+    open: openCommunitySavePanel,
+    reset: resetCommunitySavePanel,
+  };
+}
+
+export function useStoreSavePanelState() {
+  // WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1
+  const [showStoreSavePanel, setShowStoreSavePanel] = useState(false);
+  const [storeTitle, setStoreTitle] = useState("");
+  const [storeSaveStatus, setStoreSaveStatus] = useState<{
+    ok: boolean;
+    error?: string;
+    contentId?: string;
+  } | null>(null);
+
+  const openStoreSavePanel = useCallback((title: string) => {
+    setStoreTitle(title);
+    setStoreSaveStatus(null);
+    setShowStoreSavePanel(true);
+  }, []);
+
+  const resetStoreSavePanel = useCallback(() => {
+    setShowStoreSavePanel(false);
+    setStoreTitle("");
+    setStoreSaveStatus(null);
+  }, []);
+
+  return {
+    visible: showStoreSavePanel,
+    setVisible: setShowStoreSavePanel,
+    title: storeTitle,
+    setTitle: setStoreTitle,
+    status: storeSaveStatus,
+    setStatus: setStoreSaveStatus,
+    open: openStoreSavePanel,
+    reset: resetStoreSavePanel,
+  };
+}
+
+export function useProductionMaterialSavePanelState() {
+  // WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1
+  const [showProductionMaterialSavePanel, setShowProductionMaterialSavePanel] =
+    useState(false);
+  const [productionMaterialTitle, setProductionMaterialTitle] = useState("");
+  const [productionMaterialSaveStatus, setProductionMaterialSaveStatus] =
+    useState<{ ok: boolean; error?: string; assetId?: string } | null>(null);
+
+  const openProductionMaterialSavePanel = useCallback((title: string) => {
+    setProductionMaterialTitle(title);
+    setProductionMaterialSaveStatus(null);
+    setShowProductionMaterialSavePanel(true);
+  }, []);
+
+  const resetProductionMaterialSavePanel = useCallback(() => {
+    setShowProductionMaterialSavePanel(false);
+    setProductionMaterialTitle("");
+    setProductionMaterialSaveStatus(null);
+  }, []);
+
+  return {
+    visible: showProductionMaterialSavePanel,
+    setVisible: setShowProductionMaterialSavePanel,
+    title: productionMaterialTitle,
+    setTitle: setProductionMaterialTitle,
+    status: productionMaterialSaveStatus,
+    setStatus: setProductionMaterialSaveStatus,
+    open: openProductionMaterialSavePanel,
+    reset: resetProductionMaterialSavePanel,
+  };
+}
