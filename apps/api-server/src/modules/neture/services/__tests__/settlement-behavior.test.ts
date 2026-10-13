@@ -137,6 +137,13 @@ describe('settlement reads: ownership, filters, response and DB failures', () =>
 });
 
 describe('settlement calculation: existing eligible scope, money and sequential queries', () => {
+  it('rejects cross-supplier junction overlap before creating any settlement', async () => {
+    query.mockResolvedValueOnce(['fixture-a', 'fixture-b'].map(id => ({ supplier_id: id, total_sales: 10, order_count: 1, order_ids: ['fixture-shared-order'] })));
+    await expect(service.calculateSettlements(start, end)).rejects.toMatchObject({ code: 'SETTLEMENT_ORDER_SUPPLIER_CONFLICT', conflictingOrderCount: 1 });
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(transaction).toHaveBeenCalledTimes(1);
+    expect(notify).not.toHaveBeenCalled();
+  });
   it('empty eligible aggregate returns zero with no mutations or notification', async () => {
     query.mockResolvedValue([]);
     expect(await service.calculateSettlements(start, end)).toEqual({

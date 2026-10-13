@@ -52,10 +52,11 @@ fixture('supplier writes: PostgreSQL rollback, races and retries', () => {
     await ds.dropDatabase();
     await ds.query('CREATE SCHEMA IF NOT EXISTS neture');
     await ds.synchronize();
-    await ds.query(`CREATE TABLE product_masters(id uuid PRIMARY KEY, name text, brand_name text);
+    await ds.query(`CREATE TABLE product_masters(id uuid PRIMARY KEY, name text, brand_name text, barcode text, specification text);
+      CREATE TABLE product_images(master_id uuid REFERENCES product_masters, image_url text, is_primary boolean);
       CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY, supplier_id uuid NOT NULL, master_id uuid REFERENCES product_masters,
         stock_quantity int DEFAULT 10, reserved_quantity int DEFAULT 2, low_stock_threshold int DEFAULT 1,
-        track_inventory boolean DEFAULT true, updated_at timestamptz DEFAULT NOW());
+        track_inventory boolean DEFAULT true, updated_at timestamptz DEFAULT NOW(), price_general int DEFAULT 10, is_active boolean DEFAULT true);
       CREATE TABLE neture_shipments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), order_id uuid REFERENCES neture_orders,
         supplier_id uuid NOT NULL, carrier_code text NOT NULL, carrier_name text NOT NULL, tracking_number text NOT NULL,
         status text NOT NULL, shipped_at timestamptz, delivered_at timestamptz, updated_at timestamptz DEFAULT NOW());
@@ -83,7 +84,7 @@ fixture('supplier writes: PostgreSQL rollback, races and retries', () => {
     offerId = randomUUID();
     orderId = randomUUID();
     const masterId = randomUUID();
-    await ds.query('INSERT INTO product_masters VALUES ($1, $2, $3)', [masterId, 'Fixture item', 'Fixture brand']);
+    await ds.query('INSERT INTO product_masters(id,name,brand_name) VALUES ($1, $2, $3)', [masterId, 'Fixture item', 'Fixture brand']);
     await ds.query('INSERT INTO supplier_product_offers(id,supplier_id,master_id) VALUES ($1,$2,$3)', [
       offerId,
       supplierId,
@@ -331,7 +332,7 @@ fixture('supplier writes: PostgreSQL rollback, races and retries', () => {
         unitPrice: 10,
         totalPrice: 10,
       });
-    await expect(calculate()).rejects.toThrow('duplicate key');
+    await expect(calculate()).rejects.toMatchObject({ code: 'SETTLEMENT_ORDER_SUPPLIER_CONFLICT', conflictingOrderCount: 1 });
     expect(await ds.query('SELECT * FROM neture_settlements')).toHaveLength(0);
     expect(await ds.query('SELECT * FROM neture_settlement_orders')).toHaveLength(0);
     await ds.getRepository(NetureOrderItem).delete(item.id);
@@ -363,5 +364,37 @@ fixture('supplier writes: PostgreSQL rollback, races and retries', () => {
       await runner.release();
       if (calculation) await calculation;
     }
+  });
+
+  it('inventory snapshots agree across reads and PATCH, and stale settings are refused', async () => {
+    const service = new InventoryService(ds);
+    const list = await service.getSupplierInventory(supplierId);
+    const detail = await service.getInventoryDetail(offerId, supplierId);
+    expect(list[0].inventory_version).toMatch(/^[a-f0-9]{32}$/);
+    expect(detail[0].inventory_version).toBe(list[0].inventory_version);
+    const updated = await service.updateInventory(offerId, supplierId, { stock_quantity: 15, expected_version: list[0].inventory_version });
+    expect(updated).toMatchObject({ stock_quantity: 15 });
+    if (!updated || typeof updated === 'string') throw new Error('fixture update missing');
+    expect(updated.inventory_version).not.toBe(list[0].inventory_version);
+    expect(await service.updateInventory(offerId, supplierId, { track_inventory: false, expected_version: list[0].inventory_version })).toBe('INVENTORY_CONFLICT');
+    expect((await service.getInventoryDetail(offerId, supplierId))[0]).toMatchObject({ stock_quantity: 15, track_inventory: true, inventory_version: updated.inventory_version });
+    expect(await service.updateInventory(offerId, randomUUID(), { stock_quantity: 1, expected_version: list[0].inventory_version })).toBeNull();
+  });
+  it('simultaneous PATCH using the same snapshot permits only one winner', async () => {
+    const service = new InventoryService(ds);
+    const [{ inventory_version }] = await service.getInventoryDetail(offerId, supplierId);
+    const results = await Promise.all([15, 20].map(stock_quantity => service.updateInventory(offerId, supplierId, { stock_quantity, expected_version: inventory_version })));
+    expect(results.filter(result => result === 'INVENTORY_CONFLICT')).toHaveLength(1);
+    expect(results.filter(result => result && typeof result === 'object')).toHaveLength(1);
+    expect([15, 20]).toContain((await state()).stock.stock_quantity);
+  });
+  it('shipment inventory effects invalidate an open editor snapshot without being overwritten', async () => {
+    const service = new InventoryService(ds);
+    const [{ inventory_version }] = await service.getInventoryDetail(offerId, supplierId);
+    const created = await orders.createShipment(orderId, supplierId, carrier);
+    if (!created.data) throw new Error('fixture shipment missing');
+    await shipments.updateShipment(created.data.id, supplierId, { status: 'delivered' });
+    expect(await service.updateInventory(offerId, supplierId, { stock_quantity: 10, expected_version: inventory_version })).toBe('INVENTORY_CONFLICT');
+    expect((await state()).stock).toEqual({ stock_quantity: 8, reserved_quantity: 0 });
   });
 });

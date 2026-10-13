@@ -178,6 +178,7 @@ export interface SupplierOrderKpi {
 // ==================== Inventory Types ====================
 
 export interface InventoryItem {
+  inventory_version?: string;
   offer_id: string;
   master_id: string;
   name: string;

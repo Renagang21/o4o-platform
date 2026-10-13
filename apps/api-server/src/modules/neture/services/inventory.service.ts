@@ -4,6 +4,10 @@
  */
 import type { DataSource } from 'typeorm';
 
+// Opaque inventory snapshot, including non-UI writes such as fulfillment. No schema/version column required.
+const INVENTORY_VERSION_SQL = `md5(jsonb_build_array(spo.stock_quantity, spo.reserved_quantity,
+  spo.low_stock_threshold, spo.track_inventory, EXTRACT(EPOCH FROM spo.updated_at))::text)`;
+
 export class InventoryService {
   constructor(private dataSource: DataSource) {}
 
@@ -16,6 +20,7 @@ export class InventoryService {
               spo.is_active,
               spo.stock_quantity, spo.reserved_quantity,
               spo.low_stock_threshold, spo.track_inventory,
+              ${INVENTORY_VERSION_SQL} AS inventory_version,
               (spo.stock_quantity - spo.reserved_quantity) AS available_stock
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
@@ -35,6 +40,7 @@ export class InventoryService {
               spo.is_active,
               spo.stock_quantity, spo.reserved_quantity,
               spo.low_stock_threshold, spo.track_inventory,
+              ${INVENTORY_VERSION_SQL} AS inventory_version,
               (spo.stock_quantity - spo.reserved_quantity) AS available_stock
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
@@ -47,12 +53,13 @@ export class InventoryService {
   async updateInventory(
     offerId: string,
     supplierId: string,
-    data: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean },
+    data: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean; expected_version?: string },
   ) {
     return this.dataSource.transaction(async (manager) => {
       // Verify ownership
       const ownerCheck = await manager.query(
-        `SELECT id FROM supplier_product_offers WHERE id = $1 AND supplier_id = $2 FOR UPDATE`,
+        `SELECT spo.id, ${INVENTORY_VERSION_SQL} AS inventory_version
+         FROM supplier_product_offers spo WHERE spo.id = $1 AND spo.supplier_id = $2 FOR UPDATE`,
         [offerId, supplierId],
       );
       if (ownerCheck.length === 0) return null;
@@ -76,6 +83,10 @@ export class InventoryService {
       }
 
       if (setClauses.length === 0) return 'NO_UPDATES';
+      // Old clients without a version retain their existing contract. The current UI sends its edit-start snapshot.
+      if (data.expected_version !== undefined && ownerCheck[0].inventory_version !== data.expected_version) {
+        return 'INVENTORY_CONFLICT';
+      }
 
       setClauses.push('updated_at = NOW()');
 
@@ -90,6 +101,7 @@ export class InventoryService {
               pm.name, pm.brand_name,
               spo.stock_quantity, spo.reserved_quantity,
               spo.low_stock_threshold, spo.track_inventory,
+              ${INVENTORY_VERSION_SQL} AS inventory_version,
               (spo.stock_quantity - spo.reserved_quantity) AS available_stock
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id

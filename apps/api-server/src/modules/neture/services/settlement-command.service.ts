@@ -1,5 +1,6 @@
 import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
+import { SettlementOrderConflictError } from './settlement-order-conflict.error.js';
 import logger from '../../../utils/logger.js';
 import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
 import { notificationService } from '../../../services/NotificationService.js';
@@ -82,6 +83,18 @@ export class SettlementCommandService {
           message: 'No unsettled, payment-ready delivered orders found in the given period.',
         };
       }
+
+      // Detect the existing junction uniqueness violation before any financial rows are inserted.
+      const ownerByOrder = new Map<string, string>();
+      const conflictingOrders = new Set<string>();
+      for (const aggregate of supplierAggregates) {
+        for (const orderId of aggregate.order_ids as string[]) {
+          const previousSupplier = ownerByOrder.get(orderId);
+          if (previousSupplier !== undefined && previousSupplier !== aggregate.supplier_id) conflictingOrders.add(orderId);
+          ownerByOrder.set(orderId, aggregate.supplier_id);
+        }
+      }
+      if (conflictingOrders.size > 0) throw new SettlementOrderConflictError(conflictingOrders.size);
 
       const created: any[] = [];
       const feeRate = getPlatformFeeRate();
