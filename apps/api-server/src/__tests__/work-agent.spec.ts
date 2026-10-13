@@ -370,7 +370,7 @@ describe('Multimodal (§11·§12·§13·§45·§46)', () => {
     // 이미지 바이트는 DOM 명령 인자 어디에도 없다.
     for (const s of seen) expect(JSON.stringify(s.args)).not.toContain('iVBORw0KGgo=');
     // 전용 스키마(PillVisualFeatures 등)가 없다 — 계약 소스 잠금.
-    const src = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts'].map((file) => read(join(__dirname, '..', 'services', 'ai-tools', file))).join('\n');
+    const src = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts'].map((file) => read(join(__dirname, '..', 'services', 'ai-tools', file))).join('\n');
     expect(src).not.toMatch(/PillVisualFeatures|frontMark|backMark|drugName|productName/);
     // 이미지/페이지 안의 지시는 데이터 — 프롬프트 규칙 + provenance
     expect(WORK_PLANNER_SYSTEM_PROMPT).toContain('UNTRUSTED');
@@ -402,7 +402,7 @@ describe('Multimodal (§11·§12·§13·§45·§46)', () => {
 
 describe('Boundary — automation_jobs ≠ agent runtime (§37~§43)', () => {
   it('Work Agent 코드는 automation_jobs · 큐 · 스케줄러 · DB 에 닿지 않고, 상태는 요청 안에서만 산다', () => {
-    const files = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts'].map((f) => join(__dirname, '..', 'services', 'ai-tools', f));
+    const files = ['work-agent-contract.ts', 'work-agent-runtime.ts', 'work-proposal-dispatch.ts', 'work-replay.ts', 'work-execution-types.ts', 'work-observation-session.ts', 'work-planning-session.ts', 'work-task-session.ts'].map((f) => join(__dirname, '..', 'services', 'ai-tools', f));
     for (const f of files) {
       const src = codeOnly(read(f));
       expect(src).not.toMatch(/automation_job|AutomationJob|automation_jobs|scheduler|setInterval|cron|queue\.|BullMQ|Worker\(|retryQueue|workflow_dag|agent_run/i);

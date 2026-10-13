@@ -5,6 +5,7 @@ import type {
   WorkGoalStatus,
   WorkAgentState,
   WorkStepRecord,
+  ExecutionReport,
 } from './work-agent-contract.js';
 import type { WorkTargetRef } from './work-target-resolver.js';
 import type { WorkflowRunSummary } from './work-agent-runtime.js';
@@ -392,4 +393,43 @@ export async function recordExperience(
       code: (e as { code?: string })?.code ?? null,
     });
   }
+}
+
+/** Honest execution evidence only. Assistant owns the separate Task completion contract. */
+export function buildWorkExecutionReport(
+  state: WorkAgentState,
+  input: {
+    kind: WorkGoalStatus;
+    runCreated: boolean;
+    workflow: WorkflowRunSummary;
+    plannerMode: ExecutionReport['plannerMode'];
+    taskKey: string | null;
+    memory?: ExecutionReport['memory'];
+  },
+): ExecutionReport {
+  const { kind, runCreated, workflow, plannerMode, taskKey, memory } = input;
+  return {
+    claim:
+      kind === 'completed'
+        ? 'execution_complete'
+        : kind === 'waiting_for_user'
+          ? 'needs_user'
+          : kind === 'taken_over'
+            ? 'handed_over'
+            : runCreated
+              ? 'stopped'
+              : 'not_started',
+    runOpened: runCreated,
+    resultObserved: state.history.some(
+      (h) =>
+        h.status === 'success' &&
+        (h.navigated === true ||
+          h.action.kind === 'read_text' ||
+          h.action.kind === 'read_table'),
+    ),
+    replayVerified: workflow.replay === 'completed',
+    plannerMode,
+    taskTypeProposal: taskKey,
+    memory,
+  };
 }

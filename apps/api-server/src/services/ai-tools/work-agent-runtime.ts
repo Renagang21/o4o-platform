@@ -1,9 +1,11 @@
+import { createWorkTaskSession, type WorkTaskSession } from './work-task-session.js';
+import { createWorkPlanningSession, type WorkPlanningSession } from './work-planning-session.js';
 import { createWorkObservationSession, createWorkRunMeasurements, type WorkObservationSession } from './work-observation-session.js';
 import { dispatchWorkProposal } from './work-proposal-dispatch.js';
 import { createWorkReplay } from './work-replay.js';
 import type { WorkDispatchContext, ActDirective } from './work-execution-types.js';
-import { persistTerminalRun, persistWorkflow, recordExperience } from './work-run-finalization.js';
-import { WorkPlanner, PlannerInput, METHOD_DISCOVERY_MAX } from "./work-planner.js";
+import { persistTerminalRun, persistWorkflow, recordExperience, buildWorkExecutionReport } from './work-run-finalization.js';
+import { WorkPlanner } from "./work-planner.js";
 export { METHOD_DISCOVERY_MAX, PlannerInput, WorkPlanner, WORK_PLANNER_SYSTEM_PROMPT, describeExecutionIntent, buildPlannerUserPrompt, PlannerTargetResolver, createPlannerTargetResolverForProvider, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, OPENAI_CHAT_COMPLETIONS_URL, buildOpenAiVisionBody, openAiMessageText, createLlmPlanner, createStrongLlmPlanner } from "./work-planner.js";
 /**
  * Goal-Driven Multimodal Work Agent — 세션 조율 · runtime loop · 렌더
@@ -13,7 +15,7 @@ export { METHOD_DISCOVERY_MAX, PlannerInput, WorkPlanner, WORK_PLANNER_SYSTEM_PR
  *   User Goal → Observe → Plan → (Interpret needed input) → Act → Observe Result → Progress → Continue / Takeover / Stop
  *
  *   - 관찰 · 행동은 기존 DOM/UIA/computer executor를 쓴다. 관찰 세션은 내부 책임 분리이며 새 action/실행 수단이 아니다.
- *   - Planner(AI) 는 다음 행동 **하나**를 제안할 뿐이다. Runtime 이 `validateWorkProposal` 로 검증하고 실행한다(§9·§10).
+ *   - Planner(AI) 는 다음 행동 **하나**를 제안할 뿐이다. 계획 세션이 `validateWorkProposal`로 검증하고 Runtime이 실행한다(§9·§10).
  *   - 행동 성공 ≠ 목적 달성 — 행동 뒤에는 반드시 다시 관찰한다(§17).
  *   - 실행 상태/이미지는 요청 세션 안에서만 산다. 기존 coordination/최종 기록 서비스에 위임하며 automation_jobs/큐/스케줄러를 추가하지 않는다.
  *   - 이미지는 Planner 가 "현재 화면이 요구하는 입력" 을 정한 뒤 그 값을 뽑는 데만 쓴다(§11·§12). 전용 스키마가 없다.
@@ -30,16 +32,14 @@ import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
 
-import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, isSubmitWindowNamedInGoal, sameWorkAction, validateWorkImageInput, validateWorkProposal, type ProposalRejectReason, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkObservation, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkAction, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
-import { RECOVERY_ERROR, RECOVERY_LIMITS, classifyFailure, decideRecovery, isEscalatable, noteNotRecovered, noteRecovered, sanitizeRecoveryHint, type ClassifyInput } from './automation-recovery-contract.js';
+import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, isSubmitWindowNamedInGoal, validateWorkImageInput, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkAction, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
+import { sanitizeRecoveryHint } from './automation-recovery-contract.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
 import { WORK_RUN_STATUS, checkResumable, createWorkRun, isValidRunId, transitionWorkRun, type ResumeRejectReason, type WorkRunCoordinationRow } from './work-run-coordination-service.js';
-import { issueWorkRunUpsert, issueWorkflowCandidateMatch, issueWorkRunContextSave, issueWorkRunContextRecall, issueWorkRunAssistanceRecord, issueExperienceRecall } from './work-run-executor.js';
-// Experience Model V1 Phase 2 — User Assistance · Correction(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1).
-import { deriveVerifiedPatterns, failedAlternativeOf, isPlainValueAnswer, mergeRecalledPatterns, pickRecalledContext, pickSafeExperienceRecall, stripLabels, strategyContains, verifyAlternative, type ProposalAsk, type ProposalUserInput, type RecalledPattern, type RunResumeFrame, type Strategy, type WorkAssistanceEvent } from './work-assistance.js';
-import { experienceLocatorOf, experienceOutcomeOf, isRuntimeLayerCode, type ExperienceActor, type ExperienceStepMeta } from './work-experience.js';
-import { buildTrajectoryEntry, normalizeWorkflowText, replayPreflight, assessReplayValue, validateReplaySteps, type ReplayStep, type TrajectoryEntry, type WorkflowLocator } from './workflow-candidate.js';
+import { issueWorkRunUpsert, issueWorkflowCandidateMatch } from './work-run-executor.js';
+import { experienceLocatorOf, isRuntimeLayerCode, type ExperienceStepMeta } from './work-experience.js';
+import { buildTrajectoryEntry, normalizeWorkflowText, replayPreflight, assessReplayValue, type TrajectoryEntry } from './workflow-candidate.js';
 
 /**
  * QUESTION 성격의 인계 사유(§조건 5) — 사용자의 판단/답만 있으면 같은 logical run 으로 이어갈 수 있는 국면.
@@ -48,41 +48,7 @@ import { buildTrajectoryEntry, normalizeWorkflowText, replayPreflight, assessRep
  */
 const QUESTION_TAKEOVER_REASONS = new Set<TakeoverReason>(['user_judgment_required']);
 
-// ── STRONG-FIRST-DISCOVERY-ROUTING-V1 A — 질문 이유 분리 ──
-//   정보 부족 · 사용자 결정은 바로 묻는다/넘긴다. 방법 부족은 사용자에게 넘기기 전에 Discovery 가 현재 화면을 다시 보고 직접 찾는다.
-//   credential · commit 은 이 분류 전에 별도 인계(never-escalate)로 끝나므로 여기 오지 않는다.
-export type QuestionBasis = 'information_missing' | 'method_missing' | 'user_decision';
-const METHOD_ASK_KINDS: ReadonlySet<string> = new Set(['menu_location', 'procedure_order', 'manual_request']);
-const INFORMATION_ASK_KINDS: ReadonlySet<string> = new Set(['value_confirmation', 'target_confirmation']);
-
-/**
- * 질문의 이유. 근거는 Planner 가 선언한 ask.kind 와 neededInput 뿐이다.
- * 이유를 알 수 없는 질문(ask 없음 · neededInput 없음)은 사용자 결정으로 본다 — AI 가 억지로 풀지 않는 쪽이 안전하다.
- */
-export function classifyQuestionBasis(ask: ProposalAsk | null | undefined, neededInput?: string | null): QuestionBasis {
-  if (ask && METHOD_ASK_KINDS.has(ask.kind)) return 'method_missing';
-  if (ask && INFORMATION_ASK_KINDS.has(ask.kind)) return 'information_missing';
-  if (!ask && neededInput) return 'information_missing';
-  return 'user_decision';
-}
-
-// ── STRONG-FIRST-DISCOVERY-ROUTING-V1 B — Planner 역할(mode) routing ──
-//   모델 교체가 아니다. 같은 모델이어도 Discovery 역할(strongPlanner 경로)과 Experienced execution 역할(normal planner 경로)을
-//   국면으로 고른다. 새 업무 · 경험 없음 · 기존 방법 불일치 · Method Correction 직후는 Discovery. 검증된 방법이 있을 때만 Experienced.
-export type PlannerMode = 'discovery' | 'experienced';
-export function choosePlannerMode(s: {
-  /** 이 Task × Target 의 verified Preferred 패턴이 있다. */
-  hasVerifiedPreferred: boolean;
-  /** 저장된 Workflow 재생이 어긋남 없이 끝났다. */
-  replayCompleted: boolean;
-  /** 이번 run 에 사용자 교정(Method Correction 포함)이 들어왔다. */
-  correctionSeen: boolean;
-  /** 기존 방법이 맞지 않았다(재생 이탈 · 방법 탐색 · 복구 escalation). */
-  methodMismatch: boolean;
-}): PlannerMode {
-  if (s.correctionSeen || s.methodMismatch) return 'discovery';
-  return s.hasVerifiedPreferred || s.replayCompleted ? 'experienced' : 'discovery';
-}
+export { classifyQuestionBasis, choosePlannerMode, type QuestionBasis, type PlannerMode } from './work-planning-session.js';
 
 /** 재개 거부 사유 → 사용자 안내 한 줄. runId·원문·상태 enum 은 노출하지 않는다(§20). */
 function resumeRejectMessage(reason: ResumeRejectReason): string {
@@ -214,25 +180,14 @@ export async function runWorkAgent(
    */
   let ledgerOwner: string | null = null;
   let neededInput: string | null = null;
-  let repeatedActionRun = 0;
-  let lastRejectReason: ProposalRejectReason | undefined;
   // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
   const safetyRejects: Record<string, number> = {};
   let lastSafetyReason = '';
-  // 실패→복구 계층(WO-O4O-AUTOMATION-FAILURE-ESCALATION). strongPlanner 없으면 escalation 없이 기존대로 동작한다.
-  const strongPlanner = options.strongPlanner;
-  // B — 경험 없는 시작은 Discovery 역할이다(아래 loop 진입 때 경험 근거로 다시 정한다). strongPlanner 가 없으면 같은 planner 가 맡는다.
-  let plannerMode: PlannerMode = 'discovery';
-  let activePlanner: WorkPlanner = strongPlanner ?? planner;
-  /** A — 이번 run 의 방법 탐색 재시도 횟수와, 다음 계획에 실을 탐색 맥락(한 번 쓰고 비운다). */
-  let methodDiscoveryAttempts = 0;
-  let methodDiscovery: PlannerInput['methodDiscovery'] = undefined;
   const recoveryHint = sanitizeRecoveryHint(input.recoveryHint) ?? undefined;
-  let recoveryStatus: string | null = null;
+  const sessions: { task?: WorkTaskSession; planning?: WorkPlanningSession } = {};
   // PHASE 1 — QUESTION↔TAKEOVER 분리 · 재개 원장(§조건 5). QUESTION 은 waiting_for_user(같은 runId 재개 가능),
-  // TAKEOVER 는 taken_over(자동 재개 대상 아님). recoveryGiveupKind 는 복구 소진의 끝이 질문인지 인계인지 정한다.
+  // TAKEOVER 는 taken_over(자동 재개 대상 아님). 계획 세션이 복구 소진의 끝을 질문/인계로 구분한다.
   let terminalKind: 'question' | 'takeover' | null = null;
-  let recoveryGiveupKind: 'question' | 'takeover' = 'takeover';
   let runCreated = false;
   let coordinationVersion: number | null = null;
   // PHASE 2 — Workflow Candidate. trajectory 는 요청 메모리 전용(성공 DOM 행동의 semantic 형상 + 템플릿용 값).
@@ -247,7 +202,7 @@ export async function runWorkAgent(
   const measurements = createWorkRunMeasurements();
   let replaying = false;
   // Phase E — 작업 단위 dispatch(V2 §11-2). measurements.roundTrips 는 서버↔노드 명령 왕복 수(단발 · 단위 모두 1), measurements.unitDispatches 는 그중 단위 수.
-  // unitDisabled 는 이번 run 안에서 단위 경로를 끈다(형상 거절 · 전송 실패 뒤 — 같은 단위를 다시 보내지 않는다).
+  // 관찰 세션은 형상 거절/전송 실패 뒤 이번 run의 단위 경로를 끄며 같은 단위를 다시 보내지 않는다.
   /** 종료(인계) 직전 실패의 오류 코드 — 근거가 있는 곳에서만 정한다. */
   let terminalErrorCode: string | null = null;
   /** 인계를 Planner 가 제안했는가(Outcome 근거 = agent_inferred). */
@@ -258,144 +213,9 @@ export async function runWorkAgent(
   let replayDiverge: { cause: 'budget' | 'find_failed' | 'locator_not_found' | 'validation_rejected' | 'step_failed' | 'expect_mismatch'; code: string | null; stepSeq: number | null } | null = null;
   /** execActOnce 가 이번 호출에서 남긴 단계 기록(실행 전 인계면 null). */
   let lastActRecord: WorkStepRecord | null = null;
-  // ── Phase 2 User Assistance · Correction(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1) — 요청 메모리 전용. ──
-  //   구조(업무 키 · 단계 키 · 무엇을 물었나 · 방법)만 둔다. 재개 답변 원문은 Planner 프롬프트 · slot 채우기에만 쓰고 저장하지 않는다.
-  /** 재개 시 Local 이 돌려준 원래 업무 구조. */
-  let resumeFrame: PlannerInput['resumeFrame'] = null;
-  /** 재개 답변이 막힌 재생 자리를 채워 결정적으로 이어간 경우의 재생 단계. */
-  let resumeReplay: { candidateId: string; steps: ReplayStep[] } | null = null;
-  /** 이 대상에서 확인된 업무 키 · 선언된 업무의 검증 패턴. */
-  let knownTaskKeys: string[] = [];
-  let patterns: RecalledPattern[] = [];
-  let patternsRecalledFor: string | null = null;
-  /** Planner 가 선언한 최신 구조. */
-  let declaredTask: string | null = null;
-  let declaredStage: string | null = null;
-  let declaredStrategy: Strategy | null = null;
-  let declaredAsk: ProposalAsk | null = null;
-  /** Planner 가 분류한 사용자 입력(재개 답변 · 요청 안 방법 지시) — 첫 분류를 쓴다. */
-  let userInput: ProposalUserInput | null = null;
-  /** 재생 전 의미 검증이 멈춘 자리 — 재개 답이 값이면 그 자리만 채워 결정적으로 잇는다. */
-  let questionReplay: { candidateId: string; stepIndex: number } | null = null;
-  /** Cloud Continuity — 이번 segment 의 구조화 도움 · 교정 이벤트(노드에 보낸 것과 같은 값). 검증 방법 파생의 근거. */
-  let lastAssistanceEvent: WorkAssistanceEvent | null = null;
-  // Experience 의 actor 는 실제로 계획한 planner 경로다 — Discovery(strongPlanner) 는 ai_strong, Experienced 는 ai_normal.
-  const currentActor = (): ExperienceActor =>
-    replaying ? 'deterministic' : strongPlanner && activePlanner === strongPlanner ? 'ai_strong' : 'ai_normal';
-  /** B — 경험 근거로 planner 역할을 다시 정한다. 시작 시와 바뀔 때만 enum 로그를 남긴다. */
-  const refreshPlannerMode = (why: 'start' | 'patterns' | 'correction' | 'method_discovery' | 'escalation'): void => {
-    const next = choosePlannerMode({
-      hasVerifiedPreferred: patterns.some((p) => p.polarity === 'preferred'),
-      replayCompleted: workflow.replay === 'completed',
-      correctionSeen: userInput?.kind === 'correction',
-      methodMismatch: workflow.replay === 'diverged' || methodDiscoveryAttempts > 0 || state.recovery.escalatedToStrong,
-    });
-    const nextPlanner = next === 'discovery' && strongPlanner ? strongPlanner : planner;
-    if (why !== 'start' && next === plannerMode && nextPlanner === activePlanner) return; // 시작 역할은 늘 남긴다(실 PC 확인용).
-    plannerMode = next;
-    activePlanner = nextPlanner;
-    logger.info('work-agent planner mode', { mode: next, why, aiPlanCount: state.aiPlanCount });
-  };
   /** 실패 종료가 실행 환경(runtime) 층인가 — Candidate 실패 통계에서 뺀다(D7 · §11). */
   const endedByRuntime = (): boolean =>
     isRuntimeLayerCode(terminalErrorCode) || state.takeover?.reason === 'site_not_ready';
-
-  /**
-   * Phase 2 — QUESTION 으로 멈출 때 원래 업무의 **구조**를 Local 에 남긴다(재개 때 짧은 답이 새 목표가 되지 않게).
-   * 방법은 label 없이(검증 전 화면 이름 미저장 · D5). 재생 전 의미 검증이 멈춘 자리면 그 위치(candidate · 단계 번호)만.
-   */
-  /** 지금 멈춘 자리의 원래 업무 구조 — 노드 저장과 Cloud 재개 구조(M5)가 같은 값을 쓴다. 방법은 label 없이. */
-  const currentRunFrame = (): RunResumeFrame => ({
-    taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-    stageKey: declaredStage ?? resumeFrame?.stageKey ?? null,
-    ask: declaredAsk ?? (questionReplay ? { kind: 'value_confirmation', slots: [] } : null),
-    strategy: stripLabels(declaredStrategy),
-  });
-  const saveRunContext = async (): Promise<void> => {
-    if (!deviceId || !goal.runId) return;
-    try {
-      await issueWorkRunContextSave(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
-        runId: goal.runId, targetId: siteId,
-        ...currentRunFrame(),
-        replay: questionReplay,
-      });
-    } catch (e) {
-      logger.warn('work-agent run context save failed', { code: (e as { code?: string })?.code ?? null });
-    }
-  };
-
-  /** 이번 segment 에서 실제로 성공한 클릭 · 선택 단계의 semantic locator — 대안 방법 검증의 근거(D5). */
-  const successfulLocators = (): WorkflowLocator[] =>
-    state.history
-      .filter((r) => r.status === 'success' && (r.action.kind === 'click' || r.action.kind === 'select_option'))
-      .map((r) => stepMeta.get(r)?.locator ?? null)
-      .filter((l): l is WorkflowLocator => !!l);
-
-  /**
-   * Phase 2 — 사용자 도움 · 교정을 구조로 Local 에 남긴다(write only · best-effort). 답변 원문 · slot 값 · 화면 글은 없다.
-   *   재개 segment 는 항상 하나 남긴다(분류가 없으면 값/확인으로 보수 분류). 새 run 은 요청 안 방법 지시를 분류했을 때만.
-   *   교정의 대안은 실제 성공한 단계와 맞을 때만 verified — Local 은 verified + reusable 일 때만 Preferred/Avoid 를 만든다.
-   */
-  const recordAssistance = async (kind: WorkGoalStatus): Promise<void> => {
-    if (!deviceId || !goal.runId || !runCreated) return;
-    let ui = userInput;
-    if (!ui && resumedRun) {
-      const plain = isPlainValueAnswer(goal.request);
-      ui = {
-        kind: 'assistance', askKind: resumeFrame?.ask?.kind ?? 'value_confirmation', providedKind: plain ? 'value' : 'confirmation',
-        correctionType: null, stage: null, reason: null, wrong: null, alternative: null, reusability: plain ? 'per_run_value' : 'not_reusable',
-      };
-    }
-    if (!ui) return;
-    try {
-      const end = kind as Exclude<WorkGoalStatus, 'active'>;
-      const outcome = experienceOutcomeOf({ endState: end, reason: state.takeover?.reason ?? null, plannerProposed: plannerTakeover });
-      const outcomeStatus = outcome?.status ?? null;
-      const progressedSteps = Math.min(1000, state.history.filter((r) => r.status === 'success' && r.action.kind !== 'inspect').length);
-      const resolution: WorkAssistanceEvent['resolution'] = kind === 'completed' ? 'resolved' : progressedSteps > 0 ? 'partially' : 'not_resolved';
-      const locs = successfulLocators();
-      const isCorrection = ui.kind === 'correction' && !!ui.correctionType;
-      // 방법(대안 · 경로)은 검증된 label 만 남긴다. 값 확인은 slot 키만.
-      const checked = ui.providedKind === 'value' ? null : verifyAlternative(ui.alternative, outcomeStatus, locs);
-      const validationResult: WorkAssistanceEvent['validation']['result'] = checked
-        ? checked.result
-        : outcomeStatus === 'SUCCESS' || outcomeStatus === 'PARTIAL_SUCCESS' ? 'verified' : outcomeStatus ? 'failed' : 'not_verified';
-      const structured: WorkAssistanceEvent['structured'] = ui.providedKind === 'value'
-        ? { slots: resumeFrame?.ask?.slots ?? declaredAsk?.slots ?? [] }
-        : !isCorrection && checked?.strategy ? { strategy: checked.strategy } : null;
-      const event: WorkAssistanceEvent = {
-        kind: isCorrection ? 'correction' : 'assistance',
-        stageKey: ui.stage ?? resumeFrame?.stageKey ?? declaredStage ?? null,
-        askKind: ui.askKind,
-        providedKind: ui.providedKind,
-        structured,
-        resolution,
-        progressedSteps,
-        reusability: ui.reusability,
-        correction: isCorrection
-          ? {
-            type: ui.correctionType,
-            reason: ui.reason,
-            // 틀린 방법은 op 순서만 — Planner 가 적지 않았으면 질문 때 하던 방법(원래 업무 구조).
-            wrong: stripLabels(ui.wrong ?? resumeFrame?.strategy ?? null),
-            alternative: checked?.strategy ?? null,
-          }
-          : null,
-        validation: { result: validationResult, evidence: outcome?.evidence ?? null },
-      };
-      if (isCorrection) state.userCorrectionCount = (state.userCorrectionCount ?? 0) + 1;
-      lastAssistanceEvent = event;
-      const r = await issueWorkRunAssistanceRecord(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
-        runId: goal.runId, targetId: siteId, taskKey: declaredTask ?? resumeFrame?.taskKey ?? null, event,
-      });
-      logger.info('work-agent assistance', {
-        kind: event.kind, askKind: event.askKind, providedKind: event.providedKind, correctionType: event.correction?.type ?? null,
-        validation: validationResult, reusability: event.reusability, status: r.status, patternCount: r.safe?.patternCount ?? null,
-      });
-    } catch (e) {
-      logger.warn('work-agent assistance record failed', { code: (e as { code?: string })?.code ?? null });
-    }
-  };
 
   const finish = async (): Promise<WorkAgentRunResult> => {
     // goal.status ← 진행/종료 종류. QUESTION=waiting_for_user, TAKEOVER=taken_over, 완료=completed, 그 밖 중지=stopped.
@@ -414,10 +234,10 @@ export async function runWorkAgent(
     if (runCreated && goal.runId) await persistWorkflow({ dataSource, ctx, goal, deviceId, ledgerOwner, targetRef, siteId, workflow, trajectory, resumedRun, hasRecoveryHint: !!recoveryHint, replayedCandidateId, replayDiverge, endedByRuntime: endedByRuntime() }, kind);
     if (surfaceReady) await recordExperience({ dataSource, ctx, goal, deviceId, ledgerOwner, state, resumeRow, runCreated, targetRef, siteId, surface, stepMeta, terminalErrorCode, inputMissing, visualFallback: observationBinding.current?.isVisualFallback() ?? false, replayDiverge, resumedRun, plannerTakeover, aiCalls: measurements.aiCalls, aiMs: measurements.aiMs, settleMs: measurements.settleMs, retryCount: measurements.retryCount }, kind);
     // Phase 2 — 질문으로 멈추면 원래 업무 구조를 남기고, 도움 · 교정은 구조로 남긴다(Experience 기록 뒤 — 같은 run 행).
-    if (runCreated && goal.runId && kind === 'waiting_for_user') await saveRunContext();
-    if (runCreated && goal.runId) await recordAssistance(kind);
+    if (runCreated && goal.runId && kind === 'waiting_for_user') await sessions.task?.saveRunContext();
+    if (runCreated && goal.runId) await sessions.task?.recordAssistance(kind, plannerTakeover);
     // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
-    logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
+    logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), sessions.planning?.recoveryStatus() ?? null));
     // Phase E — 왕복 수만(내용 없음). 단위 경로 이전/이후 비교의 운영 근거.
     if (surface === 'dom' && measurements.roundTrips > 0) {
       logger.info('work-agent dispatch', { roundTrips: measurements.roundTrips, unitDispatches: measurements.unitDispatches, stepCount: state.stepCount, taskUnit: executionNode?.capabilities?.taskUnit === true });
@@ -433,28 +253,12 @@ export async function runWorkAgent(
       message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome, resumable),
       target: targetOutcome,
       workflow: { ...workflow },
-      taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-      report: {
-        claim: kind === 'completed' ? 'execution_complete'
-          : kind === 'waiting_for_user' ? 'needs_user'
-          : kind === 'taken_over' ? 'handed_over'
-          : runCreated ? 'stopped' : 'not_started',
-        runOpened: runCreated,
-        resultObserved: state.history.some((h) => h.status === 'success'
-          && (h.navigated === true || h.action.kind === 'read_text' || h.action.kind === 'read_table')),
-        replayVerified: workflow.replay === 'completed',
-        plannerMode,
-        taskTypeProposal: declaredTask ?? resumeFrame?.taskKey ?? null,
-        // Cloud Continuity — 기억 후보(구조만). 저장 여부 · 위치는 Assistant 가 레지스트리로 정한다.
-        memory: runCreated ? {
-          targetId: siteId,
-          targetKind: targetRef.targetType,
-          taskKey: declaredTask ?? resumeFrame?.taskKey ?? null,
-          verifiedPatterns: deriveVerifiedPatterns(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
-          failedAlternative: failedAlternativeOf(declaredTask ?? resumeFrame?.taskKey ?? null, lastAssistanceEvent),
-          resumeFrame: kind === 'waiting_for_user' && goal.runId ? currentRunFrame() : null,
-        } : undefined,
-      },
+      taskKey: sessions.task?.taskKey() ?? null,
+      report: buildWorkExecutionReport(state, {
+        kind, runCreated, workflow, plannerMode: sessions.planning?.mode() ?? 'discovery',
+        taskKey: sessions.task?.taskKey() ?? null,
+        memory: runCreated ? sessions.task?.memoryReport(kind, targetRef.targetType) : undefined,
+      }),
     };
   };
   /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
@@ -477,7 +281,7 @@ export async function runWorkAgent(
   };
   /** 복구 소진 뒤 끝맺음 — escalatable 하고 사용자 답으로 이어질 국면이면 QUESTION, 아니면 TAKEOVER(§조건 5). */
   const stuckEnd = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> =>
-    recoveryGiveupKind === 'question' ? question(reason) : takeover(reason, progress);
+    sessions.planning?.giveupKind() === 'question' ? question(reason) : takeover(reason, progress);
   /** 행동 뒤 재관찰 실패의 인계 사유 — 예산 소진은 loop_limit, 그 밖(탭 없음 · 등재 밖 이동 등)은 site_not_ready. */
   const observeFailed = (o: { errorCode?: string }): Promise<WorkAgentRunResult> => {
     terminalErrorCode = o.errorCode ?? null;
@@ -487,48 +291,6 @@ export async function runWorkAgent(
   const takeoverWith = (code: string | undefined, reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> => {
     terminalErrorCode = code ?? null;
     return takeover(reason, progress);
-  };
-
-  // ── 실패→복구 계층 (WO-O4O-AUTOMATION-FAILURE-ESCALATION §4·§11·§16·§22·§27·§67) ──
-  //   실패를 무작정 반복하지 않는다. 분류(classify) → 판단(decideRecovery): 더 강한 추론(strong)으로 올릴지,
-  //   그냥 다시 시도할지, 사용자에게 넘길지. credential/commit/unsupported 는 이 경로를 타지 않는다 —
-  //   위의 즉시 takeover 가 먼저 잡는다(§8 never-escalate). strongPlanner 가 없으면 escalation 없이 기존 동작 그대로다.
-  //
-  //   normalSpent=true 는 "이미 정상 재시도(loop 의 반복 상한 · invalidProposals 예산)를 소진했다" 는 뜻 —
-  //   국면을 strong 부터 판단하게 한다(§16). throw 경로는 false 로 정상 tier 진행(정상 재시도 → strong).
-  const recover = (input2: ClassifyInput, opts: { normalSpent?: boolean } = {}): 'retry' | 'giveup' => {
-    const cls = classifyFailure(input2);
-    if (opts.normalSpent) {
-      state.recovery.activeClass = cls;
-      state.recovery.lastClass = cls;
-      state.recovery.normalRetries = RECOVERY_LIMITS.normalRetryMax;
-    }
-    const decision = decideRecovery(state.recovery, cls);
-    if (decision.useStrongModel && strongPlanner) {
-      activePlanner = strongPlanner;
-      if (plannerMode !== 'discovery') logger.info('work-agent planner mode', { mode: 'discovery', why: 'escalation', aiPlanCount: state.aiPlanCount });
-      plannerMode = 'discovery'; // 막힘 → Discovery 역할로 되돌린다(B). 기록 actor 도 ai_strong.
-      recoveryStatus = RECOVERY_ERROR.ESCALATED;
-      state.invalidProposals = 0;
-      observationBinding.current?.resetSameObservationRun();
-      repeatedActionRun = 0;
-      measurements.retryCount += 1;
-      return 'retry';
-    }
-    if (!decision.askUser && !opts.normalSpent && strongPlanner) { measurements.retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
-    noteNotRecovered(state.recovery);
-    recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
-    // 복구 소진의 끝: escalatable 하고 사용자에게 넘기는 국면이면 QUESTION(답하면 같은 run 재개), 아니면 TAKEOVER(§조건 5).
-    // non-escalatable(RISK_BLOCKED·USER_INTERFERENCE·UNSUPPORTED_UI·AMBIGUOUS_STATE) · provider 불가는 항상 TAKEOVER.
-    recoveryGiveupKind = decision.askUser && isEscalatable(cls) ? 'question' : 'takeover';
-    return 'giveup';
-  };
-  /** 복구 국면 뒤 성공(완료) — 무엇으로 복구됐는지 기록한다(§27). 힌트가 실려 있으면 그 덕으로 본다. */
-  const markRecovered = () => {
-    if (state.recovery.escalatedToStrong || state.recovery.activeClass || recoveryHint) {
-      noteRecovered(state.recovery, { userHintPresent: !!recoveryHint });
-      recoveryStatus = null; // 복구 성공 — 진행(ESCALATED) 신호 해제.
-    }
   };
 
   // WINDOWS-UI-AUTOMATION-V0 — 표면 선택. windows_app 은 UIA(같은 Planner 어휘 · 같은 검증 · 다른 실행층).
@@ -618,81 +380,10 @@ export async function runWorkAgent(
     runId: goal.runId, status: 'active', targetId: siteId, goalSummary: resumedRun ? undefined : goal.request.slice(0, 200),
   });
 
-  // ── Phase 2 최소 recall(D1 질의형) — 구조만 읽는다. 구 agent(미지원 action)면 조용히 Phase 1 동작으로 남는다. ──
-  const ledgerCtx = { userId: ctx.userId, deviceId, ownerKey: ledgerOwner };
-  // Phase D — 노드 원장의 재개 구조는 그 노드가 이 run 의 **마지막 질문**을 받은 노드일 때만 최신이다.
-  //   A 에서 질문 → B 에서 이어 더 진행 · 다시 질문 → A 로 돌아오면, A 의 원장에는 첫 질문 시점의 구조가 남아 있다.
-  //   마지막으로 질문한 노드(resumeRow.deviceId)가 지금 노드가 아니면 노드 구조 · 재생 단계를 쓰지 않고 Cloud 구조를 쓴다.
-  const lastAskedOnThisNode = !resumeRow?.deviceId || resumeRow.deviceId === deviceId;
-  if (resumedRun && !lastAskedOnThisNode) logger.info('work-agent resume frame', { source: 'skip_stale_node' });
-  if (resumedRun && lastAskedOnThisNode) {
-    try {
-      // 답이 "값 하나" 면 막혔던 재생 자리만 채워 달라고 한다(Local 은 그 값을 저장하지 않는다).
-      const answer = normalizeWorkflowText(goal.request);
-      const slotValue = isPlainValueAnswer(answer) && answer.length <= 200 && !/[<>{}]/.test(answer) ? answer : null;
-      const r = await issueWorkRunContextRecall(dataSource, ledgerCtx, { runId: goal.runId, targetId: siteId, slotValue });
-      const c = r.status === 'success' ? pickRecalledContext(r.safe) : null;
-      if (c?.found) {
-        resumeFrame = { taskKey: c.taskKey, stageKey: c.stageKey, ask: c.ask, strategy: c.strategy };
-        const steps = c.candidateId ? validateReplaySteps(c.steps) : null;
-        if (c.candidateId && steps && surface === 'dom') resumeReplay = { candidateId: c.candidateId, steps };
-      }
-    } catch (e) {
-      logger.warn('work-agent context recall failed', { code: (e as { code?: string })?.code ?? null });
-    }
-  }
-  if (resumedRun) {
-    // Cloud Continuity — 이 노드 원장의 구조를 쓰지 않았으면(다른 노드에서 질문했던 run · 오래된 노드 구조) Assistant Memory 의
-    // 재개 구조를 쓴다. 재생 단계(Workflow Candidate)는 노드 원장에만 있다 — 그때는 결정적 재생 없이 현재 화면으로 이어간다.
-    const cloudFrame = input.intent?.memory?.resumeFrame ?? null;
-    if (!resumeFrame && cloudFrame) {
-      resumeFrame = { taskKey: cloudFrame.taskKey, stageKey: cloudFrame.stageKey, ask: cloudFrame.ask, strategy: cloudFrame.strategy };
-      logger.info('work-agent resume frame', { source: 'assistant_memory' });
-    }
-  }
-  /** 업무 키 목록(taskKey 없음) 또는 그 업무의 검증 패턴. 실패해도 계속한다. */
-  /** Cloud Continuity — Assistant Memory 가 넘긴 같은 소유 주체의 검증 방법 중 이 업무 키의 것. */
-  const cloudPatternsFor = (taskKey: string): RecalledPattern[] =>
-    (input.intent?.memory?.patterns ?? [])
-      .filter((p) => p.taskKey === taskKey)
-      .map((p) => ({ stageKey: p.stageKey, polarity: p.polarity, strategy: p.strategy, verifiedCount: p.verifiedCount }));
-  const recallExperience = async (taskKey: string | null): Promise<void> => {
-    let nodePatterns: RecalledPattern[] = [];
-    // Phase D — 소유 주체 원장 노드면 ledgerCtx.ownerKey 로 이 소유 주체의 기억만 돌아온다.
-    try {
-      const r = await issueExperienceRecall(dataSource, ledgerCtx, { targetId: siteId, taskKey });
-      if (r.status === 'success') {
-        const safe = pickSafeExperienceRecall(r.safe);
-        if (taskKey === null) knownTaskKeys = safe.taskKeys ?? [];
-        else nodePatterns = safe.patterns ?? [];
-      }
-    } catch (e) {
-      logger.warn('work-agent experience recall failed', { code: (e as { code?: string })?.code ?? null });
-    }
-    // 소유 주체 Cloud 기억 + 노드 원장(그 노드). Cloud 가 앞선다(Phase D) — 노드가 비어도, 노드에 오래된 기억이 있어도
-    // 모든 노드의 검증으로 갱신되는 Cloud 쪽을 따른다. 현재 화면으로 다시 검증하며 쓴다(P3).
-    if (taskKey !== null) {
-      const cloud = cloudPatternsFor(taskKey);
-      patterns = mergeRecalledPatterns(nodePatterns, cloud);
-      patternsRecalledFor = taskKey;
-      if (cloud.length) logger.info('work-agent patterns', { node: nodePatterns.length, cloud: cloud.length, merged: patterns.length });
-    }
-  };
-  await recallExperience(null);
-  // Phase B — 같은 Task 를 이어가면 Assistant 가 이전 run 의 업무 키를 준다. 경험 조회 키를 맞출 뿐 절차를 정하지 않는다.
-  const hintKey = input.intent?.taskTypeHint ?? null;
-  // Phase C — Assistant Memory(Cloud)가 아는 같은 소유 주체 · 같은 대상의 업무 유형. 이 노드의 Local 원장이 비어 있어도(새 PC)
-  // 같은 업무를 같은 키로 이어간다. 노드가 아는 키가 앞, Cloud 기억은 뒤에 붙인다(중복 제거). 절차를 정하지 않는다.
-  for (const k of input.intent?.knownTaskTypes ?? []) if (!knownTaskKeys.includes(k)) knownTaskKeys = [...knownTaskKeys, k];
-  if (hintKey && !knownTaskKeys.includes(hintKey)) knownTaskKeys = [hintKey, ...knownTaskKeys];
-  if (resumeFrame?.taskKey) await recallExperience(resumeFrame.taskKey);
-  /** 방법 label 에 들어가면 안 되는 이번 run 의 값 — 재개 답 + 지금까지 입력한 글. */
-  const forbiddenValues = (): string[] => {
-    const out: string[] = resumedRun ? [goal.request] : [];
-    for (const r of state.history) if (r.action.kind === 'set_input' && typeof r.action.text === 'string') out.push(r.action.text);
-    return out.slice(-20);
-  };
-
+  // Bind Task recall only after owner/node verification and successful run claim.
+  const taskSession = createWorkTaskSession({ dataSource, ledgerCtx: { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, state, siteId, surface, stepMeta, resumedRun, resumeRow, intent: input.intent });
+  sessions.task = taskSession;
+  await taskSession.initialize();
 
   // Bind the observation session only after node ownership, target preparation and run claim have passed.
   const observationSession = createWorkObservationSession({ dataSource, ctx, deviceId: deviceId as string, executionNode: executionNode as DeviceRow, tool, siteId, surface, state, measurements });
@@ -706,6 +397,16 @@ export async function runWorkAgent(
     if (outcome.ok) visualFailureRun = 0;
     return outcome;
   };
+
+  const planningSession = createWorkPlanningSession({
+    state, planner, strongPlanner: options.strongPlanner, taskSession, observationSession, measurements, workflow, surface, stepMeta,
+    request: { image, siteDisplayName: displayName, recoveryHint, intent: input.intent },
+    readFeedback: () => ({ lastRead, lastSafetyReason }), isReplaying: () => replaying,
+    onNeededInput: (value) => { neededInput = value; }, onPlannerTakeover: () => { plannerTakeover = true; },
+    finish, takeover, stuckEnd, observeFailed, enterVisualFallback,
+  });
+  sessions.planning = planningSession;
+  const { currentActor, refreshPlannerMode, recover, planNextProposal, acceptProposal } = planningSession;
 
   // ── 행동 실행(단발·Fast Loop 배치 공용) — act-only 종류 하나를 실행하고 다음 지시만 돌려준다. 재관찰은 호출자가 한다. ──
   //   uia 표면: set_input·click·key → local.uia.*, visual_* → local.computer.*(시각 모드 전용).  dom 표면: set_input·select_option·click → local.dom.*.
@@ -779,12 +480,12 @@ export async function runWorkAgent(
           // §4 — 숨은 목록 항목(구조적 확인 불가)은 즉시 인계하지 않는다. 아직 시각 모드가 아니면 화면을 캡처해 AI 가 실제 화면을 보고 잇게 한다.
           if (outcome.errorCode === LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL && !observationSession.isVisualFallback()) {
             const v = await enterVisualFallback();
-            if (v.ok) { lastRejectReason = undefined; return { do: 'continue' }; }
+            if (v.ok) { planningSession.setRejectReason(undefined); return { do: 'continue' }; }
           }
           safetyRejects[outcome.errorCode as string] = (safetyRejects[outcome.errorCode as string] ?? 0) + 1;
           lastSafetyReason = typeof outcome.safe.safety === 'object' && outcome.safe.safety ? String((outcome.safe.safety as Record<string, unknown>).reason ?? '') : '';
           if (safety.immediate || safetyRejects[outcome.errorCode as string] >= 2) return { do: 'takeover', reason: safety.reason, progress: 'needs_user' };
-          lastRejectReason = 'SAFETY_REJECT';
+          planningSession.setRejectReason('SAFETY_REJECT');
           return { do: 'observe', navigated: false };
         }
         return { do: 'observe', navigated: false };
@@ -869,7 +570,7 @@ export async function runWorkAgent(
       // Phase 2 — 막힌 자리(Candidate · 단계 번호)만 남긴다. 재개 답이 값이면 그 자리만 채워 결정적으로 잇는다.
       const req = normalizeWorkflowText(goal.request);
       const idx = match.steps.findIndex((s) => s.value !== undefined && (s.actionKind === 'set_input' || req.includes(s.value)) && assessReplayValue(s.value) === 'ambiguous');
-      if (idx >= 0 && idx <= 63) questionReplay = { candidateId: match.candidateId, stepIndex: idx };
+      if (idx >= 0 && idx <= 63) taskSession.rememberReplayQuestion({ candidateId: match.candidateId, stepIndex: idx });
       neededInput = '무엇을 찾거나 입력할지 구체적인 이름이나 번호로 알려 주세요.';
       inputMissing = true;
       return question('user_judgment_required');
@@ -879,7 +580,8 @@ export async function runWorkAgent(
       const r = await runReplay(match.steps);
       if (r) return r;
     }
-  } else if (surface === 'dom' && resumedRun && resumeReplay) {
+  } else if (surface === 'dom' && resumedRun && taskSession.resumeReplay()) {
+    const resumeReplay = taskSession.resumeReplay()!;
     // Phase 2 — 재개 답(값)으로 막혔던 자리만 채운 재생. 같은 검증 · 실행 경로. Candidate 통계에는 넣지 않는다
     // (replayedCandidateId 미설정 — Phase 1 재개 run 의 Candidate 계약 유지). 완료 판단은 이어서 loop 의 Planner 가 한다.
     logger.info('work-agent resume replay', { steps: resumeReplay.steps.length });
@@ -890,213 +592,6 @@ export async function runWorkAgent(
   // ── loop ──────────────────────────────────────────────────────────────────
   // B — 새 업무 · 경험 없음 · 재생 불일치 · 교정 직후는 Discovery 역할로 시작한다. 검증 경험이 있으면 Experienced.
 
-  /** One planning attempt, validation and recovery. null retries the existing loop. */
-  const planNextProposal = async (): Promise<{
-    proposal?: WorkProposal;
-    result?: WorkAgentRunResult;
-  } | null> => {
-    // Plan (§8)
-    let raw: unknown;
-    state.aiPlanCount += 1;
-    const planT0 = Date.now();
-    measurements.aiCalls += 1;
-    try {
-      raw = await activePlanner.plan({
-        goal,
-        siteDisplayName: displayName,
-        observation: state.observation as WorkObservation,
-        history: state.history,
-        lastRead,
-        image: observationSession.isVisualFallback() && observationSession.plannerImage() ? observationSession.plannerImage() : image,
-        lastRejectReason,
-        lastSafetyReason: lastSafetyReason || undefined,
-        recoveryHint,
-        stepsLeft: budgetLeft(),
-        ...(resumedRun ? { userAnswer: goal.request, resumeFrame } : {}),
-        ...(knownTaskKeys.length ? { knownTaskKeys } : {}),
-        ...(patterns.length ? { patterns } : {}),
-        ...(methodDiscovery ? { methodDiscovery } : {}),
-        ...(input.intent ? { intent: input.intent } : {}),
-      });
-      methodDiscovery = undefined;
-      measurements.aiMs += Date.now() - planT0;
-    } catch {
-      measurements.aiMs += Date.now() - planT0;
-      // planner 호출 실패(PLANNING_FAILURE) — 정상 재시도 → strong → 사용자(§16). strong 없으면 기존대로 즉시 인계.
-      if (recover({ plannerFault: true }) === 'giveup')
-        return { result: await takeover('planner_unavailable', 'failed') };
-      return null;
-    }
-    const checked = validateWorkProposal(raw, state.observation, {
-      forbiddenValues: forbiddenValues(),
-    });
-    if (!checked.ok || !checked.proposal) {
-      state.invalidProposals += 1;
-      lastRejectReason = checked.reason;
-      const rejected: WorkStepRecord = {
-        step: state.stepCount,
-        action: { kind: 'inspect' },
-        status: 'rejected',
-        rejectReason: checked.reason,
-      };
-      state.history.push(rejected);
-      stepMeta.set(rejected, {
-        actor: currentActor(),
-        locator: null,
-        durationMs: null,
-      });
-      if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
-        // 정상 planner 가 계속 무효 제안 — 정상 재시도 소진으로 보고 strong 부터 판단(§16). strong 없으면 기존대로 인계.
-        if (recover({ plannerFault: true }, { normalSpent: true }) === 'giveup')
-          return { result: await takeover('planner_unavailable', 'failed') };
-      }
-      return null;
-    }
-    return { proposal: checked.proposal };
-  };
-  /** Accept task/experience declarations and control decisions before any action dispatch. */
-  const acceptProposal = async (
-    proposal: WorkProposal,
-  ): Promise<WorkAgentRunResult | 'continue' | null> => {
-    // ── Phase 2 — 선언된 구조를 받아 둔다(요청 메모리). 사용자 입력 분류는 첫 것을 쓴다. ──
-    if (proposal.task) declaredTask = proposal.task;
-    if (proposal.stage) declaredStage = proposal.stage;
-    if (proposal.strategy) declaredStrategy = proposal.strategy;
-    if (proposal.ask) declaredAsk = proposal.ask;
-    if (proposal.userInput && !userInput) {
-      userInput = proposal.userInput;
-      if (userInput.kind === 'correction') refreshPlannerMode('correction');
-    }
-    // 처음 선언된 업무면 그 Task × Target 의 검증 패턴을 한 번 읽고, 있으면 이 제안은 실행하지 않고 패턴을 보여 주며 다시 계획한다.
-    if (declaredTask && patternsRecalledFor !== declaredTask) {
-      await recallExperience(declaredTask);
-      patternsRecalledFor = declaredTask;
-      refreshPlannerMode('patterns');
-      if (patterns.length) {
-        lastRejectReason = undefined;
-        return 'continue';
-      }
-    }
-    // 검증된 Avoid 와 같은 방법(같은 단계)은 실행하지 않는다 — 사용자가 교정하고 실제로 대안이 성공한 방법을 되풀이하지 않는다.
-    if (
-      proposal.strategy &&
-      proposal.action.kind !== 'done' &&
-      proposal.action.kind !== 'takeover'
-    ) {
-      const stage = proposal.stage ?? declaredStage;
-      const hit = patterns.some(
-        (p) =>
-          p.polarity === 'avoid' &&
-          (!stage || p.stageKey === stage) &&
-          strategyContains(proposal.strategy as Strategy, p.strategy),
-      );
-      if (hit) {
-        state.invalidProposals += 1;
-        lastRejectReason = 'AVOID_PATTERN';
-        const rejected: WorkStepRecord = {
-          step: state.stepCount,
-          action: { kind: 'inspect' },
-          status: 'rejected',
-          rejectReason: 'AVOID_PATTERN',
-        };
-        state.history.push(rejected);
-        stepMeta.set(rejected, {
-          actor: currentActor(),
-          locator: null,
-          durationMs: null,
-        });
-        logger.info('work-agent avoid pattern', {
-          stage: stage ?? null,
-          aiPlanCount: state.aiPlanCount,
-        });
-        if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
-          if (recover({ plannerFault: true }, { normalSpent: true }) === 'giveup')
-            return takeover('planner_unavailable', 'failed');
-        }
-        return 'continue';
-      }
-    }
-    lastRejectReason = undefined;
-    // A — 사용자에게 묻기 전에 질문 이유를 나눈다. 방법 부족(menu_location · procedure_order · manual_request)이면
-    // 바로 넘기지 않고 Discovery 역할로 현재 화면을 다시 관찰해 스스로 찾게 한다(상한 METHOD_DISCOVERY_MAX).
-    // 정보 부족(값 · 대상) · 사용자 결정 · 인증 · 고위험은 이 경로를 타지 않는다.
-    const asksUser =
-      (proposal.action.kind === 'takeover' &&
-        proposal.action.reason === 'user_judgment_required') ||
-      (proposal.assessment === 'needs_user' &&
-        proposal.action.kind !== 'takeover' &&
-        proposal.action.kind !== 'done');
-    if (
-      asksUser &&
-      classifyQuestionBasis(proposal.ask, proposal.neededInput) ===
-        'method_missing' &&
-      methodDiscoveryAttempts < METHOD_DISCOVERY_MAX &&
-      budgetLeft() > 1
-    ) {
-      methodDiscoveryAttempts += 1;
-      refreshPlannerMode('method_discovery');
-      declaredAsk = null;
-      const keepRun = observationSession.sameObservationRun(); // 다시 보기는 무진전으로 세지 않는다.
-      const o = await observe();
-      observationSession.restoreSameObservationRun(keepRun);
-      if (!o.ok) return observeFailed(o);
-      methodDiscovery = {
-        attempt: methodDiscoveryAttempts,
-        askKind: proposal.ask?.kind ?? 'unknown',
-      };
-      logger.info('work-agent method discovery', {
-        attempt: methodDiscoveryAttempts,
-        askKind: methodDiscovery.askKind,
-        aiPlanCount: state.aiPlanCount,
-      });
-      return 'continue';
-    }
-    if (proposal.neededInput) neededInput = proposal.neededInput;
-    state.plannedAction = proposal.action;
-    // Loop control actions — takeover 를 먼저 본다. Planner 가 assessment=completed 와 takeover 를 함께 내면
-    // 인계 사유(goal_sufficiently_advanced 등)를 기록으로 남기는 쪽이 맞다(실 smoke 에서 관측).
-    if (proposal.action.kind === 'takeover') {
-      const reason = proposal.action.reason as TakeoverReason;
-      // §4 — unsupported_control 은 바로 인계하지 않는다. uia 표면에서 아직 시각 모드가 아니면 화면을 캡처해
-      // AI 가 실제 화면을 보고 이어서 판단하게 한다. 캡처가 되면 다시 계획(continue), 안 되면 원래대로 인계.
-      if (
-        reason === 'unsupported_control' &&
-        surface === 'uia' &&
-        !observationSession.isVisualFallback()
-      ) {
-        const v = await enterVisualFallback();
-        if (v.ok) {
-          lastRejectReason = undefined;
-          return 'continue';
-        }
-      }
-      if (reason === 'goal_sufficiently_advanced') markRecovered();
-      plannerTakeover = true;
-      return takeover(
-        reason,
-        reason === 'goal_sufficiently_advanced' ? 'completed' : 'needs_user',
-      );
-    }
-    if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
-      state.progress = 'completed';
-      markRecovered();
-      return finish();
-    }
-    if (proposal.assessment === 'needs_user') {
-      plannerTakeover = true;
-      return takeover('user_judgment_required', 'needs_user');
-    }
-    // 반복 행동 감지(§36) — 같은 행동을 무작정 반복하지 않는다. 복구 판단: strong 이 있으면 다른 계획을 세우게 하고, 없으면 인계.
-    if (sameWorkAction(state.lastResult?.action, proposal.action)) {
-      repeatedActionRun += 1;
-      if (repeatedActionRun >= WORK_LOOP_LIMITS.maxRepeatedAction) {
-        if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup')
-          return stuckEnd('no_progress', 'no_progress');
-        return 'continue';
-      }
-    } else repeatedActionRun = 0;
-    return null;
-  };
   const dispatchContext: WorkDispatchContext = {
     state,
     surface,
@@ -1125,10 +620,10 @@ export async function runWorkAgent(
       lastRead = value;
     },
     get lastRejectReason() {
-      return lastRejectReason;
+      return planningSession.rejectReason();
     },
     set lastRejectReason(value) {
-      lastRejectReason = value;
+      planningSession.setRejectReason(value);
     },
   };
   refreshPlannerMode('start');
