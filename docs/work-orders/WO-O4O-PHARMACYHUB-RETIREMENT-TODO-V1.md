@@ -349,4 +349,6 @@ PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐�
 
 추가 P2 대응: PH 주문의 전체 결제 연결·정상 PH 결제 연결·고아 PH 결제를 명시적으로 집계하고, PH 결제가 없거나 복수인 주문 건수도 분리한다. 주문 6건/결제 6건이라는 총수만으로 1:1 연결을 추정하지 않는다. 모든 후속 참조 SQL은 조사 대상인 public schema를 명시한다.
 
+그룹 결제 P2 대응: B2B 계약과 실제 `b2b-payment-controller.factory.ts`의 연결 방식에 따라 주문 UUID, 주문 metadata의 paymentGroupId, 결제 metadata의 paymentGroupId/checkoutOrderIds를 함께 해석한다. EXISTS로 한 결제를 여러 주문 수만큼 중복 집계하지 않는다. PH·타 서비스 주문을 함께 포함하는 결제도 별도로 보고하며 삭제 대상으로 자동 승격하지 않는다. 격리된 PostgreSQL 16에서 READ ONLY transaction으로 16개 집계의 정확한 결과를 검증했다(직접 연결·다중 주문 1회 결제·metadata-only 그룹·checkoutOrderIds-only 공유 그룹·고아/누락/중복 결제·역방향 공유 미디어·Screen Set·동일 저장 경로). fixture 컨테이너와 임시 테스트 비밀번호 파일을 제거했다. 이 결과는 production 데이터 삭제가 아니다.
+
 PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`, `certificatemanager.operations.get`이다. plan은 실제 IAM 누락 권한을 보고하고 apply는 누락 시 첫 삭제 전에 차단한다. 아직 실제 인증서 삭제 완료는 아니다.
