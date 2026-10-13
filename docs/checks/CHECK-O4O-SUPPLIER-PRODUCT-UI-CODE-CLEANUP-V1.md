@@ -153,3 +153,6 @@ PC 1440×1000, mobile 390×844에서 각각 9개 동작 묶음을 확인했다.
 브라우저 전후 JSON/스크린샷: `/workspace/artifacts/supplier-phase3-browser/`.
 후속은 backend router/controller 최신 census와 실계정 검증이다. 앞선 Drawer/공통 에디터 사용성 한계는 유지된다.
 문서 정합: 잘못된 businessInfo 저장 소유권 코드 주석을 정본에 맞췄다. 정본 정책 변경 없음.
+
+3차 종료: 구현 `c5718402d1e986e57559fb8f0e3ad348de4e3ef9`의 `wo/supplier-code-phase3` push와 원격 일치를 확인했다.
+자기 검증 서버 종료(5191 listen 0), 기존 checkout/branch 보존을 확인했다. main merge·배포는 수행하지 않았다.
