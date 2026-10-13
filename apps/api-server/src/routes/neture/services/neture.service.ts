@@ -6,7 +6,7 @@
  * Business logic layer for Neture operations
  */
 
-import { DataSource } from 'typeorm';
+import { EntityManager, DataSource } from 'typeorm';
 import { NetureRepository } from '../repositories/neture.repository.js';
 import {
   NetureProduct,
@@ -46,7 +46,7 @@ import logger from '../../../utils/logger.js';
 export class NetureService {
   private repository: NetureRepository;
 
-  constructor(private dataSource: DataSource) {
+  constructor(private dataSource: DataSource | EntityManager) {
     this.repository = new NetureRepository(dataSource);
   }
 
@@ -614,10 +614,22 @@ export class NetureService {
 
   async updateOrderStatus(
     id: string,
-    data: UpdateOrderStatusRequestDto
+    data: UpdateOrderStatusRequestDto,
+    manager?: EntityManager,
   ): Promise<OrderDto | null> {
-    const order = await this.repository.findOrderById(id);
+    if (!manager) {
+      return this.dataSource.transaction((transactionManager) => this.updateOrderStatus(id, data, transactionManager));
+    }
+    if (!manager.queryRunner?.isTransactionActive) {
+      throw new Error('Order status writes require an active transaction');
+    }
+    // All inventory effects and the order transition share this locked transaction.
+    const locked = await manager.query('SELECT id FROM neture_orders WHERE id = $1 FOR UPDATE', [id]);
+    if (locked.length === 0) return null;
+    const repository = new NetureRepository(manager);
+    const order = await repository.findOrderById(id);
     if (!order) return null;
+    if (order.status === data.status) return this.toOrderDto(order);
 
     const updateData: Partial<NetureOrder> = {
       status: data.status,
@@ -631,14 +643,14 @@ export class NetureService {
       if (order.items) {
         for (const item of order.items) {
           // 예약 수량 해제 (trackInventory 여부와 무관하게 안전하게 감소)
-          await this.dataSource.query(
+          await manager.query(
             `UPDATE supplier_product_offers
              SET reserved_quantity = GREATEST(reserved_quantity - $1, 0), updated_at = NOW()
              WHERE id = $2`,
             [item.quantity, item.productId],
           );
           // Legacy 재고 복원 (기존 neture_products 호환)
-          await this.repository.restoreStock(item.productId, item.quantity);
+          await repository.restoreStock(item.productId, item.quantity);
         }
       }
     }
@@ -647,7 +659,7 @@ export class NetureService {
     if (data.status === NetureOrderStatus.DELIVERED) {
       if (order.items) {
         for (const item of order.items) {
-          await this.dataSource.query(
+          await manager.query(
             `UPDATE supplier_product_offers
              SET stock_quantity = GREATEST(stock_quantity - $1, 0),
                  reserved_quantity = GREATEST(reserved_quantity - $1, 0),
@@ -661,8 +673,8 @@ export class NetureService {
       // (은퇴) Partner Commission auto-trigger — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
     }
 
-    const updated = await this.repository.updateOrder(id, updateData);
-    if (!updated) return null;
+    const updated = await repository.updateOrder(id, updateData);
+    if (!updated) throw new Error('Order update failed');
 
     return this.toOrderDto(updated);
   }

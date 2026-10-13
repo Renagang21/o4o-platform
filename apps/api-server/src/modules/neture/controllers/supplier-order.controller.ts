@@ -177,7 +177,15 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
         }
       }
 
-      const updated = await legacyNetureService.updateOrderStatus(orderId, { status });
+      const result = await service.updateStatus(orderId, supplierId, status);
+      if ('error' in result) {
+        const httpStatus = result.error === 'ORDER_NOT_FOUND' ? 404 : 403;
+        return res.status(httpStatus).json({ success: false, error: result.error,
+          message: result.error === 'INVALID_TRANSITION'
+            ? `Cannot transition from '${result.currentStatus}' to '${status}'`
+            : result.error === 'ORDER_NOT_FOUND' ? 'Order not found' : '결제 또는 수금 확인 전 주문은 배송 처리를 시작할 수 없습니다.' });
+      }
+      const updated = result.data;
       if (!updated) {
         return res.status(500).json({ success: false, error: 'UPDATE_FAILED', message: 'Failed to update order status' });
       }
@@ -229,11 +237,13 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
 
       const result = await service.createShipment(orderId, supplierId, { carrier_code, carrier_name, tracking_number });
       if ('error' in result) {
-        return res.status(409).json({ success: false, error: result.error, message: 'Shipment already registered for this order' });
+        const httpStatus = result.error === 'SHIPMENT_EXISTS' ? 409 : result.error === 'ORDER_NOT_FOUND' ? 404 : 403;
+        const message = result.error === 'SHIPMENT_EXISTS' ? 'Shipment already registered for this order'
+          : result.error === 'ORDER_NOT_FOUND' ? 'Order not found'
+          : result.error === 'INVALID_STATE' ? `Order must be in 'preparing' state (current: ${result.currentStatus})`
+          : '결제 또는 수금 확인 전 주문은 배송 처리를 시작할 수 없습니다.';
+        return res.status(httpStatus).json({ success: false, error: result.error, message });
       }
-
-      // Auto-transition order status to 'shipped'
-      await legacyNetureService.updateOrderStatus(orderId, { status: NetureOrderStatus.SHIPPED });
 
       res.json({ success: true, data: result.data });
     } catch (error) {

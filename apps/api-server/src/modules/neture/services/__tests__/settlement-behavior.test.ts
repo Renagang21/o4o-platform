@@ -19,6 +19,7 @@ const end = '2026-01-31';
 const row = { id: settlementId, supplier_id: supplierId, status: 'calculated' };
 let query: jest.Mock;
 let transaction: jest.Mock;
+let lockQuery: jest.Mock;
 let createQueryRunner: jest.Mock;
 let source: DataSource;
 let service: NetureSettlementService;
@@ -28,7 +29,9 @@ beforeEach(() => {
   owners.mockReset().mockResolvedValue(['fixture-owner-a', 'fixture-owner-b']);
   notify.mockReset().mockResolvedValue({});
   query = jest.fn();
-  transaction = jest.fn();
+  lockQuery = jest.fn().mockResolvedValue([]);
+  transaction = jest.fn(async (callback) => callback({ query: (sql: string, params?: unknown[]) =>
+    sql.includes('pg_advisory_xact_lock') ? lockQuery(sql, params) : query(sql, params) }));
   createQueryRunner = jest.fn();
   source = { query, transaction, createQueryRunner } as unknown as DataSource;
   service = new NetureSettlementService(source);
@@ -167,7 +170,8 @@ describe('settlement calculation: existing eligible scope, money and sequential 
       expect(query.mock.calls[1][0]).toContain("VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'calculated')");
       expect(query.mock.calls[2][1]).toEqual([[orderId], supplierId]);
       expect(query.mock.calls[3][1]).toEqual([settlementId, orderId, String(sales)]);
-      expect(transaction).not.toHaveBeenCalled();
+      expect(transaction).toHaveBeenCalledTimes(1);
+      expect(lockQuery).toHaveBeenCalledWith('SELECT pg_advisory_xact_lock(7410, 1)', undefined);
       expect(createQueryRunner).not.toHaveBeenCalled();
     },
   );
@@ -199,7 +203,8 @@ describe('settlement calculation: existing eligible scope, money and sequential 
     query.mockRejectedValueOnce(error);
     await expect(service.calculateSettlements(start, end)).rejects.toBe(error);
     expect(query).toHaveBeenCalledTimes(stage + 1);
-    expect(transaction).not.toHaveBeenCalled();
+    expect(transaction).toHaveBeenCalledTimes(1);
+      expect(lockQuery).toHaveBeenCalledWith('SELECT pg_advisory_xact_lock(7410, 1)', undefined);
     expect(createQueryRunner).not.toHaveBeenCalled();
     expect(notify).not.toHaveBeenCalled();
   });
@@ -248,12 +253,13 @@ describe('settlement commands: transition gates, generated bind markers and fail
     expect(notify).not.toHaveBeenCalled();
   });
 
-  it('cancellation junction deletion failure propagates after the existing UPDATE', async () => {
+  it('cancellation junction deletion failure propagates through the transaction', async () => {
     const error = new Error('Fixture junction deletion failure');
     query.mockResolvedValueOnce([row]).mockRejectedValueOnce(error);
     await expect(service.cancelSettlement(settlementId)).rejects.toBe(error);
     expect(query).toHaveBeenCalledTimes(2);
-    expect(transaction).not.toHaveBeenCalled();
+    expect(transaction).toHaveBeenCalledTimes(1);
+      expect(lockQuery).toHaveBeenCalledWith('SELECT pg_advisory_xact_lock(7410, 1)', undefined);
   });
 });
 
