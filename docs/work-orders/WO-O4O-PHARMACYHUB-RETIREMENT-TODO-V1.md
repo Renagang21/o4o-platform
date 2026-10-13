@@ -347,4 +347,6 @@ PR #522는 SonarCloud 정렬/복잡도 지적 수정, 관련 56 tests와 Postgre
 
 PR #527 P2 리뷰 대응: PH 자산에서 출발하는 링크 외에 PH 콘텐츠에서 출발하는 역방향 링크와 Neture/NULL 등 공유 자산의 연결도 집계한다. PH 콘텐츠 삭제 후 dangling entity_id 링크를 남기지 않도록 양방향 근거를 확보하며 공유 자산 자체는 삭제 대상으로 승격하지 않는다.
 
+추가 P2 대응: PH 주문의 전체 결제 연결·정상 PH 결제 연결·고아 PH 결제를 명시적으로 집계하고, PH 결제가 없거나 복수인 주문 건수도 분리한다. 주문 6건/결제 6건이라는 총수만으로 1:1 연결을 추정하지 않는다. 모든 후속 참조 SQL은 조사 대상인 public schema를 명시한다.
+
 PH 인증서 종료 도구는 실제 조사에서 확인한 Certificate Manager entry 2개 → 전용 인증서 1개 → DNS authorization 2개만 순차 제거하도록 준비한다. 모든 인증서/map entry/proxy를 재조회해 shared SAN·다른 entry·직접 proxy·공유 DNS authorization이면 차단한다. 삭제마다 기존 owner/main/필수 CI/freeze/idle 및 정확한 WIF 임시 제한 gate를 재확인한다. 공유 map·proxy·LB·외부 DNS·URL map은 이 도구에서 변경하지 않는다. 삭제 후 고정 대상 부재와 공유 자원 설정 보존을 재검증한다. 필요한 추가 권한은 `certificatemanager.certmapentries.delete`, `certificatemanager.certs.delete`, `certificatemanager.dnsauthorizations.delete`, `certificatemanager.operations.get`이다. plan은 실제 IAM 누락 권한을 보고하고 apply는 누락 시 첫 삭제 전에 차단한다. 아직 실제 인증서 삭제 완료는 아니다.
