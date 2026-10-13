@@ -1,10 +1,11 @@
 import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
+import { SettlementOrderConflictError } from './settlement-order-conflict.error.js';
 import logger from '../../../utils/logger.js';
 import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
 import { notificationService } from '../../../services/NotificationService.js';
 
-const PLATFORM_FEE_RATE = 0.10;
+const PLATFORM_FEE_RATE = 0.1;
 const getPlatformFeeRate = () => PLATFORM_FEE_RATE;
 const calculatePlatformFee = (total: number) => Math.round(total * PLATFORM_FEE_RATE);
 const calculateSupplierAmount = (total: number, fee: number) => total - fee;
@@ -36,16 +37,13 @@ export class SettlementCommandService {
    * → 결제 확인 없이 delivered 만 된 주문(legacy 우회·테스트)은 정산에서 제외된다. (pre-launch: 0건이 정상)
    */
   async calculateSettlements(periodStart: string, periodEnd: string) {
-    // Find delivered AND payment/collection-ready orders not in any settlement, grouped by supplier
-    const supplierAggregates = await this.dataSource.query(
-      `SELECT
-         spo.supplier_id,
-         ARRAY_AGG(DISTINCT o.id) AS order_ids,
-         COUNT(DISTINCT o.id)::int AS order_count,
-         SUM(oi.total_price)::int AS total_sales
-       FROM neture_orders o
-       JOIN neture.neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+    return this.dataSource.transaction(async (manager) => {
+      // Calculation and cancellation serialize even for overlapping date ranges.
+      await manager.query('SELECT pg_advisory_xact_lock(7410, 1)');
+      // Find delivered AND payment/collection-ready orders not in any settlement, grouped by supplier
+      const supplierAggregates = await manager.query(
+        `WITH eligible_orders AS MATERIALIZED (
+         SELECT o.* FROM neture_orders o
        WHERE o.status = 'delivered'
          AND (
            o.paid_at IS NOT NULL
@@ -63,101 +61,124 @@ export class SettlementCommandService {
          --   공용 fulfillment 원장에는 여러 서비스 주문이 담긴다. Neture 정산은
          --   Neture 주문만 집계해야 한다(미표기 = neture). 다른 서비스 정산은 각자 축에서 처리한다.
          AND ${netureOrderServiceScopeSql('o', '$3')}
+         ORDER BY o.id FOR UPDATE OF o
+       )
+       SELECT
+         spo.supplier_id,
+         ARRAY_AGG(DISTINCT o.id) AS order_ids,
+         COUNT(DISTINCT o.id)::int AS order_count,
+         SUM(oi.total_price)::int AS total_sales
+       FROM eligible_orders o
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        GROUP BY spo.supplier_id
        HAVING SUM(oi.total_price) > 0`,
-      [periodStart, periodEnd, NETURE_FULFILLMENT_SERVICE_KEY],
-    );
+        [periodStart, periodEnd, NETURE_FULFILLMENT_SERVICE_KEY],
+      );
 
-    if (supplierAggregates.length === 0) {
-      return {
-        success: true,
-        data: { created: 0, settlements: [] },
-        message: 'No unsettled, payment-ready delivered orders found in the given period.',
-      };
-    }
+      if (supplierAggregates.length === 0) {
+        return {
+          success: true,
+          data: { created: 0, settlements: [] },
+          message: 'No unsettled, payment-ready delivered orders found in the given period.',
+        };
+      }
 
-    const created: any[] = [];
-    const feeRate = getPlatformFeeRate();
+      // Detect the existing junction uniqueness violation before any financial rows are inserted.
+      const ownerByOrder = new Map<string, string>();
+      const conflictingOrders = new Set<string>();
+      for (const aggregate of supplierAggregates) {
+        for (const orderId of aggregate.order_ids as string[]) {
+          const previousSupplier = ownerByOrder.get(orderId);
+          if (previousSupplier !== undefined && previousSupplier !== aggregate.supplier_id) conflictingOrders.add(orderId);
+          ownerByOrder.set(orderId, aggregate.supplier_id);
+        }
+      }
+      if (conflictingOrders.size > 0) throw new SettlementOrderConflictError(conflictingOrders.size);
 
-    for (const agg of supplierAggregates) {
-      const totalSales = Number(agg.total_sales);
-      const platformFee = calculatePlatformFee(totalSales);
-      const supplierAmount = calculateSupplierAmount(totalSales, platformFee);
-      const orderIds: string[] = agg.order_ids;
+      const created: any[] = [];
+      const feeRate = getPlatformFeeRate();
 
-      const [settlement] = await this.dataSource.query(
-        `INSERT INTO neture_settlements
+      for (const agg of supplierAggregates) {
+        const totalSales = Number(agg.total_sales);
+        const platformFee = calculatePlatformFee(totalSales);
+        const supplierAmount = calculateSupplierAmount(totalSales, platformFee);
+        const orderIds: string[] = agg.order_ids;
+
+        const [settlement] = await manager.query(
+          `INSERT INTO neture_settlements
            (supplier_id, period_start, period_end, total_sales, platform_fee,
             supplier_amount, platform_fee_rate, order_count, status)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'calculated')
          RETURNING *`,
-        [agg.supplier_id, periodStart, periodEnd, totalSales,
-         platformFee, supplierAmount, feeRate, agg.order_count],
-      );
+          [agg.supplier_id, periodStart, periodEnd, totalSales, platformFee, supplierAmount, feeRate, agg.order_count],
+        );
 
-      // Per-order supplier sales for the junction table
-      const orderSales = await this.dataSource.query(
-        `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
+        // Per-order supplier sales for the junction table
+        const orderSales = await manager.query(
+          `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
          FROM neture_orders o
          JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE o.id = ANY($1::uuid[]) AND spo.supplier_id = $2
          GROUP BY o.id`,
-        [orderIds, agg.supplier_id],
-      );
-
-      for (const os of orderSales) {
-        await this.dataSource.query(
-          `INSERT INTO neture_settlement_orders (settlement_id, order_id, supplier_sales_amount)
-           VALUES ($1, $2, $3)`,
-          [settlement.id, os.order_id, os.supplier_sales_amount],
+          [orderIds, agg.supplier_id],
         );
+
+        for (const os of orderSales) {
+          await manager.query(
+            `INSERT INTO neture_settlement_orders (settlement_id, order_id, supplier_sales_amount)
+           VALUES ($1, $2, $3)`,
+            [settlement.id, os.order_id, os.supplier_sales_amount],
+          );
+        }
+
+        created.push(settlement);
       }
 
-      created.push(settlement);
-    }
+      logger.info(`[Neture Settlement] Created ${created.length} settlements for period ${periodStart} ~ ${periodEnd}`);
 
-    logger.info(`[Neture Settlement] Created ${created.length} settlements for period ${periodStart} ~ ${periodEnd}`);
-
-    return {
-      success: true,
-      data: { created: created.length, settlements: created },
-    };
+      return {
+        success: true,
+        data: { created: created.length, settlements: created },
+      };
+    });
   }
 
   /**
    * 정산 취소 (calculated/approved → cancelled)
    */
   async cancelSettlement(settlementId: string, notes?: string) {
-    const setClauses = ['status = $1', 'updated_at = NOW()'];
-    const params: any[] = ['cancelled'];
-    let paramIdx = 2;
+    return this.dataSource.transaction(async (manager) => {
+      // Calculation and cancellation serialize even for overlapping date ranges.
+      await manager.query('SELECT pg_advisory_xact_lock(7410, 1)');
+      const setClauses = ['status = $1', 'updated_at = NOW()'];
+      const params: any[] = ['cancelled'];
+      let paramIdx = 2;
 
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
+      if (notes !== undefined) {
+        setClauses.push(`notes = $${paramIdx}`);
+        params.push(notes);
+        paramIdx++;
+      }
 
-    params.push(settlementId);
-    const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+      params.push(settlementId);
+      const result = await manager.query(
+        `WITH changed AS (UPDATE neture_settlements SET ${setClauses.join(', ')}
        WHERE id = $${paramIdx} AND status IN ('calculated', 'approved')
-       RETURNING *`,
-      params,
-    );
+       RETURNING *) SELECT * FROM changed`,
+        params,
+      );
 
-    if (!result || result.length === 0) {
-      return null;
-    }
+      if (!result || result.length === 0) {
+        return null;
+      }
 
-    // Delete junction rows to allow re-settlement
-    await this.dataSource.query(
-      `DELETE FROM neture_settlement_orders WHERE settlement_id = $1`,
-      [settlementId],
-    );
+      // Delete junction rows to allow re-settlement
+      await manager.query(`DELETE FROM neture_settlement_orders WHERE settlement_id = $1`, [settlementId]);
 
-    return { success: true, data: result[0] };
+      return { success: true, data: result[0] };
+    });
   }
 
   /**
@@ -176,9 +197,9 @@ export class SettlementCommandService {
 
     params.push(settlementId);
     const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+      `WITH changed AS (UPDATE neture_settlements SET ${setClauses.join(', ')}
        WHERE id = $${paramIdx} AND status = 'calculated'
-       RETURNING *`,
+       RETURNING *) SELECT * FROM changed`,
       params,
     );
 
@@ -206,9 +227,9 @@ export class SettlementCommandService {
 
     params.push(settlementId);
     const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+      `WITH changed AS (UPDATE neture_settlements SET ${setClauses.join(', ')}
        WHERE id = $${paramIdx} AND status = 'approved'
-       RETURNING *`,
+       RETURNING *) SELECT * FROM changed`,
       params,
     );
 
