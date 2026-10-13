@@ -10,23 +10,31 @@ import {safeComputeError,settleOperation} from './pharmacy-hub-qr-cutover.mjs';
 
 const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
 const matcher='path-matcher-pharmacy-hub';
-const endpoint='https://compute.googleapis.com/compute/v1/projects/netureyoutube/global/urlMaps/o4o-global-lb';
-export function domainComputeRequest(action,{operationName,requestId}={}) {
-  const urls={read:endpoint,validate:`${endpoint}/validate`,replace:endpoint,
-    operation:'https://compute.googleapis.com/compute/v1/projects/netureyoutube/global/operations/'};
-  const methods={read:'GET',validate:'POST',replace:'PUT',operation:'GET'};
-  if(!Object.hasOwn(urls,action))throw new Error('PH_DOMAIN_API_ACTION');
-  const url=new URL(urls[action]);
-  if(action==='operation') {
-    if(!/^[a-zA-Z0-9-]+$/.test(operationName??''))throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
-    url.pathname+=encodeURIComponent(operationName);
-  }
-  if(action==='replace') {
-    if(!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(requestId??''))
-      throw new Error('PH_DOMAIN_REQUEST_ID');
-    url.searchParams.set('requestId',requestId);
-  }
-  return {url:url.toString(),method:methods[action]};
+export function domainOperationArguments(name) {
+  if(!/^operation-[a-zA-Z0-9-]+$/.test(name??''))throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
+  return ['compute','operations','describe',name,'--global','--project=netureyoutube','--format=json'];
+}
+async function responseJson(response,method) {
+  if(!response.ok)throw safeComputeError(method,response.status,await response.json().catch(()=>null));
+  return response.json();
+}
+export function domainMapClient({token,fetcher=fetch}) {
+  const headers={Authorization:`Bearer ${token}`,'Content-Type':'application/json'};
+  return {
+    read:async()=>responseJson(await fetcher('https://compute.googleapis.com/compute/v1/projects/netureyoutube/global/urlMaps/o4o-global-lb',
+      {method:'GET',headers,signal:AbortSignal.timeout(60000)}),'GET'),
+    validate:async draft=>responseJson(await fetcher('https://compute.googleapis.com/compute/v1/projects/netureyoutube/global/urlMaps/o4o-global-lb/validate',
+      {method:'POST',headers,body:JSON.stringify({resource:draft}),signal:AbortSignal.timeout(60000)}),'POST'),
+    submit:async(draft,fingerprint,saveRequest)=>{
+      // No remote name or caller-selected URL enters this destination/query.
+      const requestId=randomUUID();
+      const url=new URL('https://compute.googleapis.com/compute/v1/projects/netureyoutube/global/urlMaps/o4o-global-lb');
+      url.searchParams.set('requestId',requestId);
+      await saveRequest(requestId);
+      const response=await fetcher(url,{method:'PUT',headers,body:JSON.stringify({...draft,fingerprint}),signal:AbortSignal.timeout(60000)});
+      return {requestId,operation:await responseJson(response,'PUT')};
+    },
+  };
 }
 const clean=map=>{
   const copy=structuredClone(map);
@@ -78,32 +86,28 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   await gate();
   const sdk=spawnSync('/usr/bin/gcloud',['auth','print-access-token'],{encoding:'utf8',timeout:15000});
   if(sdk.status!==0||!sdk.stdout.trim())throw new Error('PH_DOMAIN_AUTH');
-  const token=sdk.stdout.trim();
-  const api=async(action,body,parameters)=>{
-    const {url,method}=domainComputeRequest(action,parameters);
-    const response=await fetch(url,{method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
-      body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(60000)});
-    if(!response.ok)throw safeComputeError(method,response.status,await response.json().catch(()=>null));
-    return response.json();
-  };
+  const client=domainMapClient({token:sdk.stdout.trim()});
   const output=process.env.CUTOVER_OUTPUT;
   if(!output)throw new Error('PH_DOMAIN_EVIDENCE_PATH');
   await mkdir(output,{recursive:true,mode:0o700});
   const save=(name,value)=>writeFile(`${output}/${name}`,JSON.stringify(value,null,2)+'\n',{mode:0o600});
-  const result=await detachDomain({mode:process.env.CUTOVER_MODE,read:()=>api('read'),save,beforeWrite:gate,
+  const result=await detachDomain({mode:process.env.CUTOVER_MODE,read:client.read,save,beforeWrite:gate,
     validate:async draft=>{
-      const result=await api('validate',{resource:draft});
+      const result=await client.validate(draft);
       if(!result.result?.loadSucceeded||!result.result?.testPassed)throw new Error('PH_DOMAIN_VALIDATION');
     },
     replace:async(draft,fingerprint)=>{
-      const requestId=randomUUID();
-      await save('request.json',{requestId,map:'o4o-global-lb'});
-      let operation;
-      try {operation=await api('replace',{...draft,fingerprint},{requestId});}
+      let submitted;
+      try {submitted=await client.submit(draft,fingerprint,requestId=>save('request.json',{requestId,map:'o4o-global-lb'}));}
       catch {throw new Error('PH_DOMAIN_WRITE_UNCONFIRMED; inspect saved request and live map before retry');}
-      if(!/^[a-zA-Z0-9-]+$/.test(operation.name??''))throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
+      const {requestId,operation}=submitted;
+      domainOperationArguments(operation.name);
       await save('operation.json',{requestId,operation:operation.name});
-      await settleOperation(operation.name,name=>api('operation',undefined,{operationName:name}));
+      await settleOperation(operation.name,async name=>{
+        const result=spawnSync('/usr/bin/gcloud',domainOperationArguments(name),{encoding:'utf8',timeout:15000});
+        if(result.status!==0)throw new Error('PH_DOMAIN_OPERATION_UNCONFIRMED');
+        return JSON.parse(result.stdout);
+      });
     },
   });
   console.log(JSON.stringify(result));
