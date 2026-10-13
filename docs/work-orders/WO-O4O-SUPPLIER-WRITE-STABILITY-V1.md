@@ -1,6 +1,6 @@
 # 공급자 주문·배송·재고·정산 쓰기 안정화
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거**: 사용자 승인 — 관련 쓰기를 한 묶음으로 보완하고 commit → push까지만 진행
 
@@ -15,7 +15,7 @@
 - [x] 점검 결과로 TODO 수정
 - [x] 원자성·동시성·재시도 보완
 - [x] 로컬 PostgreSQL·회귀·타입·빌드·lint 검사 종료
-- [ ] 명시적 파일 commit·작업 branch push 및 원격 일치 확인
+- [x] 명시적 파일 commit·작업 branch push 및 원격 일치 확인
 
 ## Fresh census와 수정한 범위
 
@@ -42,7 +42,8 @@
 ## 검증·인계
 
 검증 상세와 한계는 [CHECK](../checks/CHECK-O4O-SUPPLIER-WRITE-STABILITY-V1.md)를 따른다.
-브랜치: `wo/supplier-write-stability`. 원격 push의 실제 SHA와 상태는 최종 보고에서 확인한다.
+브랜치: `wo/supplier-write-stability`. 구현 commit `7a4a363fde284d6016c9e0d1d57e22430c1be78a`를 push했고 `ls-remote`로 원격 일치를 확인했다.
+승인된 개발·검증·commit/push 인계 범위가 완료됐다. 종료 기록 commit의 최종 원격 SHA는 최종 보고에서 확인한다.
 main 통합·배포는 이번 승인 범위에 포함되지 않는다.
 
 ## 남은 조건과 문서 정합

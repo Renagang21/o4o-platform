@@ -50,6 +50,7 @@ fulfillment service scope 및 통합 주문 조회를 함께 검증한다.
 | 변경 파일 ESLint | 오류 0, 기존 legacy NetureService의 unused logger 경고 1 |
 | docs 민감정보·`git diff --check` | PASS |
 | 실계정·운영 DB 쓰기·main PR/merge·배포 | NOT_RUN — 사용자 범위 밖 |
+| 구현 branch push | PASS — `7a4a363fde284d6016c9e0d1d57e22430c1be78a`, 원격 SHA 일치 |
 
 초기 fixture에서 취소 재시도의 실제 TypeORM 결과 shape 오류를 재현했고, CTE SELECT 처리 후 지급/취소/배송 반환 계약과 rollback 검사를 통과했다.
 최종 코드 점검에서는 트랜잭션 외부의 후속 주문 UPDATE가 controller에서 제거됐고 기존 금융·결제·권한 guard assertion이 유지됨을 확인했다.
