@@ -1,3 +1,5 @@
+import { CommunitySavePanel, StoreSavePanel, ProductionMaterialSavePanel } from './AiContentSavePanels';
+import { htmlToForumBlocks, blocksToHtml, UrlBlock } from "./ai-content-conversion.js";
 /**
  * AiContentModal — AI 콘텐츠 변환 모달
  *
@@ -191,14 +193,6 @@ type UrlTone = 'normal' | 'professional' | 'store';
 //   URL 모드도 결과 형식 프리셋 제거. length 만 보조 가이드로 유지.
 type UrlLength = 'short' | 'medium' | 'long';
 
-interface UrlBlock {
-  id?: string;
-  type: string;
-  content?: string;
-  attributes?: Record<string, any>;
-  innerBlocks?: UrlBlock[];
-}
-
 // WO-O4O-AI-MODAL-OUTPUT-TYPE-EXPOSE-V1:
 //   백엔드 ai-prompts 카탈로그가 7개 outputType 을 이미 지원하지만
 //   모달에는 4개만 노출되어 있던 격차를 해소.
@@ -238,92 +232,6 @@ const URL_LENGTH_LABELS: Record<UrlLength, string> = {
   medium: '보통',
   long: '길게(A4 1장↑)',
 };
-
-/**
- * HTML → Forum Block[] 변환 (프론트엔드 전용, DOMParser 사용)
- * WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1:
- *   forum post API는 Block[] JSON을 기대하지만 백엔드 normalizeContent가
- *   Node.js에서 DOMParser를 호출하므로 실패함 → 프론트에서 미리 변환해서 전달
- */
-function htmlToForumBlocks(html: string): object[] {
-  if (!html || !html.trim()) return [];
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const blocks: object[] = [];
-  doc.body.childNodes.forEach((node, index) => {
-    if (node.nodeType !== Node.ELEMENT_NODE) return;
-    const el = node as Element;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
-      blocks.push({ id: `b${index}`, type: 'heading', content: el.textContent || '', attributes: { level: parseInt(tag[1]) } });
-    } else if (tag === 'p') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    } else if (tag === 'ul' || tag === 'ol') {
-      const items = Array.from(el.querySelectorAll('li')).map((li) => li.textContent?.trim() || '').filter(Boolean);
-      if (items.length) blocks.push({ id: `b${index}`, type: 'list', content: { items }, attributes: { ordered: tag === 'ol' } });
-    } else if (tag === 'blockquote') {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'quote', content: text });
-    } else if (tag === 'div' && el.getAttribute('data-youtube-video')) {
-      const iframe = el.querySelector('iframe');
-      const src = iframe?.getAttribute('src') || '';
-      if (src) blocks.push({ id: `b${index}`, type: 'paragraph', content: `[YouTube: ${src}]` });
-    } else {
-      const text = el.textContent?.trim();
-      if (text) blocks.push({ id: `b${index}`, type: 'paragraph', content: el.innerHTML });
-    }
-  });
-  return blocks;
-}
-
-/** Block[] → HTML 변환 (RichTextEditor TipTap 기반) */
-function blocksToHtml(blocks: UrlBlock[]): string {
-  return blocks
-    .map((block) => {
-      switch (block.type) {
-        case 'o4o/heading': {
-          const level = block.attributes?.level || 2;
-          return `<h${level}>${block.content || ''}</h${level}>`;
-        }
-        case 'o4o/paragraph':
-          return `<p>${block.content || ''}</p>`;
-        case 'o4o/list': {
-          const ordered = block.attributes?.ordered;
-          const tag = ordered ? 'ol' : 'ul';
-          return `<${tag}>${block.content || ''}</${tag}>`;
-        }
-        case 'o4o/youtube': {
-          const url = block.attributes?.url || block.attributes?.src || '';
-          if (!url) return '';
-          const embedUrl = url.includes('watch?v=')
-            ? url.replace('watch?v=', 'embed/')
-            : url;
-          // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-RENDER-V1:
-          //   TipTap @tiptap/extension-youtube 의 parseHTML 규칙은
-          //     { tag: 'div[data-youtube-video] iframe' }
-          //   raw <iframe> 단독은 setContent 시 drop 되므로 wrapper 필수.
-          return `<div data-youtube-video><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
-        }
-        case 'o4o/image': {
-          const src = block.attributes?.url || block.attributes?.src || '';
-          const alt = block.attributes?.alt || '';
-          return src ? `<img src="${src}" alt="${alt}" style="max-width:100%;" />` : '';
-        }
-        case 'o4o/columns':
-        case 'o4o/group': {
-          if (block.innerBlocks && block.innerBlocks.length > 0) {
-            return `<div>${blocksToHtml(block.innerBlocks)}</div>`;
-          }
-          return block.content ? `<div>${block.content}</div>` : '';
-        }
-        default:
-          return block.content ? `<p>${block.content}</p>` : '';
-      }
-    })
-    .filter(Boolean)
-    .join('\n');
-}
 
 export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeaders, onChannelSave, showCommunitySave, showStoreSave, showProductionMaterialSave, onProductionMaterialSaved, initialMode, initialText, headerLabel, urlPlaceholder, initialSourceTab, sourceMetadata, templateId, templateSystemPrompt, templateForcedOptions }: AiContentModalProps) {
   // 기존 text 모드 상태
@@ -1400,313 +1308,44 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
           {/* WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: 커뮤니티 저장 패널 */}
           {showCommunitySave && result && showCommunitySavePanel && (
-            <div
-              style={{
-                border: '1px solid #bae6fd',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#f0f9ff',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0369a1' }}>커뮤니티 게시글로 저장</div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={communityTitle}
-                  onChange={(e) => setCommunityTitle(e.target.value)}
-                  placeholder="게시글 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 게시판 선택 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>게시판 선택</label>
-                <select
-                  value={communityForumId}
-                  onChange={(e) => setCommunityForumId(e.target.value)}
-                  disabled={communityForumsLoading}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    background: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="">
-                    {communityForumsLoading ? '게시판 목록 로딩 중...' : '게시판 선택 (선택사항)'}
-                  </option>
-                  {communityForums.map((f) => (
-                    <option key={f.id} value={f.id}>{f.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 저장 결과 */}
-              {communitySaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: communitySaveStatus.ok ? '#15803d' : '#dc2626',
-                    background: communitySaveStatus.ok ? '#f0fdf4' : '#fef2f2',
-                  }}
-                >
-                  {communitySaveStatus.ok
-                    ? `게시글이 저장되었습니다 ✓`
-                    : `저장 실패: ${communitySaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCommunitySave}
-                  disabled={communitySaving || Boolean(communitySaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: communitySaveStatus?.ok ? '#d1fae5' : communitySaving ? '#bfdbfe' : '#0284c7',
-                    color: communitySaveStatus?.ok ? '#15803d' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: communitySaving || communitySaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {communitySaving ? '저장 중...' : communitySaveStatus?.ok ? '저장됨 ✓' : '게시글 저장'}
-                </button>
-              </div>
-            </div>
+            <CommunitySavePanel
+              communityTitle={communityTitle}
+              setCommunityTitle={setCommunityTitle}
+              communityForumId={communityForumId}
+              setCommunityForumId={setCommunityForumId}
+              communityForums={communityForums}
+              communityForumsLoading={communityForumsLoading}
+              communitySaving={communitySaving}
+              communitySaveStatus={communitySaveStatus}
+              handleCommunitySave={handleCommunitySave}
+              onCancel={() => { setShowCommunitySavePanel(false); setCommunitySaveStatus(null); }}
+            />
           )}
 
           {/* WO-O4O-AI-STORE-CONTENT-DIRECT-SAVE-V1: 내 매장 저장 패널 */}
           {showStoreSave && result && showStoreSavePanel && (
-            <div
-              style={{
-                border: '1px solid #bbf7d0',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#f0fdf4',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#15803d' }}>내 매장 콘텐츠로 저장</div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={storeTitle}
-                  onChange={(e) => setStoreTitle(e.target.value)}
-                  placeholder="저장할 콘텐츠 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 저장 결과 */}
-              {storeSaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: storeSaveStatus.ok ? '#15803d' : '#dc2626',
-                    background: storeSaveStatus.ok ? '#dcfce7' : '#fef2f2',
-                  }}
-                >
-                  {storeSaveStatus.ok
-                    ? `내 매장 콘텐츠에 저장되었습니다 ✓`
-                    : `저장 실패: ${storeSaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowStoreSavePanel(false); setStoreSaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleStoreSave}
-                  disabled={storeSaving || Boolean(storeSaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: storeSaveStatus?.ok ? '#dcfce7' : storeSaving ? '#bbf7d0' : '#16a34a',
-                    color: storeSaveStatus?.ok ? '#15803d' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: storeSaving || storeSaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {storeSaving ? '저장 중...' : storeSaveStatus?.ok ? '저장됨 ✓' : '매장에 저장'}
-                </button>
-              </div>
-            </div>
+            <StoreSavePanel
+              storeTitle={storeTitle}
+              setStoreTitle={setStoreTitle}
+              storeSaving={storeSaving}
+              storeSaveStatus={storeSaveStatus}
+              handleStoreSave={handleStoreSave}
+              onCancel={() => { setShowStoreSavePanel(false); setStoreSaveStatus(null); }}
+            />
           )}
 
           {/* WO-O4O-AI-MODAL-PRODUCTION-MATERIAL-SAVE-V1: 매장 제작 자료 저장 패널 */}
           {showProductionMaterialSave && result && showProductionMaterialSavePanel && (
-            <div
-              style={{
-                border: '1px solid #c7d2fe',
-                borderRadius: '8px',
-                padding: '14px',
-                background: '#eef2ff',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#4338ca' }}>
-                매장 제작 자료로 저장
-              </div>
-
-              {/* 제목 입력 */}
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px' }}>제목</label>
-                <input
-                  type="text"
-                  value={productionMaterialTitle}
-                  onChange={(e) => setProductionMaterialTitle(e.target.value)}
-                  placeholder="저장할 매장 제작 자료 제목을 입력하세요"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontFamily: 'inherit',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              {/* 분류 안내 (read-only) */}
-              <div style={{ fontSize: '11px', color: '#6366f1' }}>
-                분류:&nbsp;
-                <strong>{MODE_CONFIG.find((c) => c.key === mode)?.label ?? mode}</strong>
-                {' '}({MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode}
-                {(() => {
-                  const ot = MODE_CONFIG.find((c) => c.key === mode)?.outputType ?? mode;
-                  const ut = ot === 'pop' ? 'pop' : ot === 'store_qr' ? 'qr' : null;
-                  return ut ? ` · usageType=${ut}` : '';
-                })()})
-              </div>
-
-              {/* 저장 결과 */}
-              {productionMaterialSaveStatus && (
-                <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: productionMaterialSaveStatus.ok ? '#4338ca' : '#dc2626',
-                    background: productionMaterialSaveStatus.ok ? '#e0e7ff' : '#fef2f2',
-                  }}
-                >
-                  {productionMaterialSaveStatus.ok
-                    ? `매장 제작 자료에 저장되었습니다 ✓`
-                    : `저장 실패: ${productionMaterialSaveStatus.error}`}
-                </div>
-              )}
-
-              {/* 버튼 */}
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); }}
-                  style={{
-                    padding: '7px 14px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    background: 'white',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    color: '#374151',
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={handleProductionMaterialSave}
-                  disabled={productionMaterialSaving || Boolean(productionMaterialSaveStatus?.ok)}
-                  style={{
-                    padding: '7px 14px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: productionMaterialSaveStatus?.ok ? '#e0e7ff' : productionMaterialSaving ? '#c7d2fe' : '#4f46e5',
-                    color: productionMaterialSaveStatus?.ok ? '#4338ca' : 'white',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: productionMaterialSaving || productionMaterialSaveStatus?.ok ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {productionMaterialSaving ? '저장 중...' : productionMaterialSaveStatus?.ok ? '저장됨 ✓' : '제작 자료로 저장'}
-                </button>
-              </div>
-            </div>
+            <ProductionMaterialSavePanel
+              productionMaterialTitle={productionMaterialTitle}
+              setProductionMaterialTitle={setProductionMaterialTitle}
+              productionMaterialSaving={productionMaterialSaving}
+              productionMaterialSaveStatus={productionMaterialSaveStatus}
+              handleProductionMaterialSave={handleProductionMaterialSave}
+              mode={mode}
+              onCancel={() => { setShowProductionMaterialSavePanel(false); setProductionMaterialSaveStatus(null); }}
+              modeConfig={MODE_CONFIG.find((c) => c.key === mode)}
+            />
           )}
 
           {/* Disclaimer */}

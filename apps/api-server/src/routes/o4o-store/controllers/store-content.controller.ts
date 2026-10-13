@@ -751,25 +751,44 @@ export function createStoreContentController(
           return;
         }
 
-        const out = await translationService.translate(content.title, html, locale);
+        const out = await translationService.translate(content.title, html, locale, {
+          actorId: userId,
+          organizationId: content.organization_id,
+          contentId: id,
+          authorize: async () => {
+            const access = await resolveKpaContentAccess(dataSource, userId, content.organization_id);
+            if (!access.hasAccess || access.organizationId !== content.organization_id) return false;
+            return !!await repo.findOne({ where: { id, organization_id: content.organization_id, source_type: 'direct' } });
+          },
+        });
         if (!out) {
           res.status(502).json({ success: false, error: { code: 'TRANSLATION_FAILED', message: 'AI 번역에 실패했습니다. (AI 설정/키 확인)' } });
           return;
         }
 
-        const translations = (cj.translations && typeof cj.translations === 'object')
-          ? (cj.translations as Record<string, unknown>) : {};
+        // A long-running model call must not let revoked ownership save a result.
+        const stillOwned = await requireTranslationContent(req, res, userId, id, '매장 콘텐츠 수정 권한이 필요합니다.');
+        if (!stillOwned) return;
+        const currentJson = (stillOwned.content.content_json ?? {}) as Record<string, unknown>;
+        const currentHtml = typeof currentJson.html === 'string' ? currentJson.html : '';
+        if (stillOwned.content.title !== content.title || currentHtml !== html) {
+          res.status(409).json({ success: false, error: { code: 'CONTENT_CHANGED', message: '원문이 변경되었습니다. 다시 번역해 주세요.' } });
+          return;
+        }
+        const translations = (currentJson.translations && typeof currentJson.translations === 'object')
+          ? (currentJson.translations as Record<string, unknown>) : {};
         const entry = {
           title: out.result.title,
           html: out.result.html,
           status: 'draft',
           model: out.model,
+          execution: out.execution,
           updatedAt: new Date().toISOString(),
         };
         translations[locale] = entry;
-        content.content_json = { ...cj, translations };
-        content.updated_by = userId;
-        await repo.save(content);
+        stillOwned.content.content_json = { ...currentJson, translations };
+        stillOwned.content.updated_by = userId;
+        await stillOwned.repo.save(stillOwned.content);
 
         res.json({ success: true, data: { id, locale, translation: entry } });
       } catch (error: any) {

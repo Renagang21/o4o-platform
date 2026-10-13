@@ -85,6 +85,8 @@ import { CreateAccountErasureOperations1791777540800 } from '../migrations/17917
 import { RetireLegacyErasureIdentityHashes1791795139475 } from '../migrations/1791795139475-RetireLegacyErasureIdentityHashes.js';
 import { AllowStoreStaffDemoAccounts1791810417566 } from '../migrations/1791810417566-AllowStoreStaffDemoAccounts.js';
 
+import { CreateAiUsageReservations1791870434349 } from '../migrations/1791870434349-CreateAiUsageReservations.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -111,6 +113,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateAccountErasureOperations1791777540800,
   RetireLegacyErasureIdentityHashes1791795139475,
   AllowStoreStaffDemoAccounts1791810417566,
+  CreateAiUsageReservations1791870434349,
 ];
 
 export function incrementalMigrationNames(): string[] {
