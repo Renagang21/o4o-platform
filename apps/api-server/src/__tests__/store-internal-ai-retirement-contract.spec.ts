@@ -214,7 +214,7 @@ describe('WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1 — (E) non-Store · content-ed
     expect(exists('packages/content-editor/src/components/AiContentModal.tsx')).toBe(true);
     expect(exists('packages/content-editor/src/components/StoreUseModal.tsx')).toBe(true);
     expect(read('packages/content-editor/src/components/AiContentModal.tsx')).toMatch(/export function AiContentModal|export (const|default) AiContentModal/);
-    expect(read('packages/content-editor/src/components/AiContentModal.tsx')).toContain('/api/ai/content');
+    expect(['AiContentModal.tsx', 'useAiContentGeneration.ts'].map(file => read(`packages/content-editor/src/components/${file}`)).join('\n')).toContain('/api/ai/content');
     expect(read('packages/content-editor/src/components/RichTextEditor.tsx')).toContain('aiRequestHeaders');
     expect(read('packages/content-editor/src/components/RichTextEditor.tsx')).toContain('showInternalAi');
   });

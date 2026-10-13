@@ -480,7 +480,6 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
     currentActor,
     refreshPlannerMode,
     recover,
-    markRecovered,
     mode: (): PlannerMode => plannerMode,
     recoveryStatus: (): string | null => recoveryStatus,
     giveupKind: () => recoveryGiveupKind,

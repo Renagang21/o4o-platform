@@ -47,6 +47,80 @@ import {
   type WorkflowLocator,
 } from './workflow-candidate.js';
 
+/** Pure structural event projection. No goal text, node access, timing or permission decisions. */
+function buildAssistanceEvent(
+  ui: ProposalUserInput,
+  input: {
+    kind: WorkGoalStatus;
+    outcome: ReturnType<typeof experienceOutcomeOf>;
+    progressedSteps: number;
+    locs: WorkflowLocator[];
+    resumeFrame: PlannerInput['resumeFrame'];
+    declaredAsk: ProposalAsk | null;
+    declaredStage: string | null;
+  },
+): WorkAssistanceEvent {
+  const {
+    kind,
+    outcome,
+    progressedSteps,
+    locs,
+    resumeFrame,
+    declaredAsk,
+    declaredStage,
+  } = input;
+  const outcomeStatus = outcome?.status ?? null;
+  const resolution: WorkAssistanceEvent['resolution'] =
+    kind === 'completed'
+      ? 'resolved'
+      : progressedSteps > 0
+        ? 'partially'
+        : 'not_resolved';
+  const isCorrection = ui.kind === 'correction' && !!ui.correctionType;
+  // 방법(대안 · 경로)은 검증된 label 만 남긴다. 값 확인은 slot 키만.
+  const checked =
+    ui.providedKind === 'value'
+      ? null
+      : verifyAlternative(ui.alternative, outcomeStatus, locs);
+  const validationResult: WorkAssistanceEvent['validation']['result'] = checked
+    ? checked.result
+    : outcomeStatus === 'SUCCESS' || outcomeStatus === 'PARTIAL_SUCCESS'
+      ? 'verified'
+      : outcomeStatus
+        ? 'failed'
+        : 'not_verified';
+  const structured: WorkAssistanceEvent['structured'] =
+    ui.providedKind === 'value'
+      ? { slots: resumeFrame?.ask?.slots ?? declaredAsk?.slots ?? [] }
+      : !isCorrection && checked?.strategy
+        ? { strategy: checked.strategy }
+        : null;
+  const event: WorkAssistanceEvent = {
+    kind: isCorrection ? 'correction' : 'assistance',
+    stageKey: ui.stage ?? resumeFrame?.stageKey ?? declaredStage ?? null,
+    askKind: ui.askKind,
+    providedKind: ui.providedKind,
+    structured,
+    resolution,
+    progressedSteps,
+    reusability: ui.reusability,
+    correction: isCorrection
+      ? {
+          type: ui.correctionType,
+          reason: ui.reason,
+          // 틀린 방법은 op 순서만 — Planner 가 적지 않았으면 질문 때 하던 방법(원래 업무 구조).
+          wrong: stripLabels(ui.wrong ?? resumeFrame?.strategy ?? null),
+          alternative: checked?.strategy ?? null,
+        }
+      : null,
+    validation: {
+      result: validationResult,
+      evidence: outcome?.evidence ?? null,
+    },
+  };
+  return event;
+}
+
 interface WorkTaskSessionInput {
   dataSource: DataSource;
   ledgerCtx: Parameters<typeof issueExperienceRecall>[1];
@@ -166,64 +240,22 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
         reason: state.takeover?.reason ?? null,
         plannerProposed: plannerTakeover,
       });
-      const outcomeStatus = outcome?.status ?? null;
       const progressedSteps = Math.min(
         1000,
         state.history.filter(
           (r) => r.status === 'success' && r.action.kind !== 'inspect',
         ).length,
       );
-      const resolution: WorkAssistanceEvent['resolution'] =
-        kind === 'completed'
-          ? 'resolved'
-          : progressedSteps > 0
-            ? 'partially'
-            : 'not_resolved';
-      const locs = successfulLocators();
-      const isCorrection = ui.kind === 'correction' && !!ui.correctionType;
-      // 방법(대안 · 경로)은 검증된 label 만 남긴다. 값 확인은 slot 키만.
-      const checked =
-        ui.providedKind === 'value'
-          ? null
-          : verifyAlternative(ui.alternative, outcomeStatus, locs);
-      const validationResult: WorkAssistanceEvent['validation']['result'] =
-        checked
-          ? checked.result
-          : outcomeStatus === 'SUCCESS' || outcomeStatus === 'PARTIAL_SUCCESS'
-            ? 'verified'
-            : outcomeStatus
-              ? 'failed'
-              : 'not_verified';
-      const structured: WorkAssistanceEvent['structured'] =
-        ui.providedKind === 'value'
-          ? { slots: resumeFrame?.ask?.slots ?? declaredAsk?.slots ?? [] }
-          : !isCorrection && checked?.strategy
-            ? { strategy: checked.strategy }
-            : null;
-      const event: WorkAssistanceEvent = {
-        kind: isCorrection ? 'correction' : 'assistance',
-        stageKey: ui.stage ?? resumeFrame?.stageKey ?? declaredStage ?? null,
-        askKind: ui.askKind,
-        providedKind: ui.providedKind,
-        structured,
-        resolution,
+      const event = buildAssistanceEvent(ui, {
+        kind,
+        outcome,
         progressedSteps,
-        reusability: ui.reusability,
-        correction: isCorrection
-          ? {
-              type: ui.correctionType,
-              reason: ui.reason,
-              // 틀린 방법은 op 순서만 — Planner 가 적지 않았으면 질문 때 하던 방법(원래 업무 구조).
-              wrong: stripLabels(ui.wrong ?? resumeFrame?.strategy ?? null),
-              alternative: checked?.strategy ?? null,
-            }
-          : null,
-        validation: {
-          result: validationResult,
-          evidence: outcome?.evidence ?? null,
-        },
-      };
-      if (isCorrection)
+        locs: successfulLocators(),
+        resumeFrame,
+        declaredAsk,
+        declaredStage,
+      });
+      if (event.kind === 'correction')
         state.userCorrectionCount = (state.userCorrectionCount ?? 0) + 1;
       lastAssistanceEvent = event;
       const r = await issueWorkRunAssistanceRecord(
@@ -241,7 +273,7 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
         askKind: event.askKind,
         providedKind: event.providedKind,
         correctionType: event.correction?.type ?? null,
-        validation: validationResult,
+        validation: event.validation.result,
         reusability: event.reusability,
         status: r.status,
         patternCount: r.safe?.patternCount ?? null,

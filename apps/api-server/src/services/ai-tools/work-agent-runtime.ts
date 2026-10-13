@@ -1,9 +1,10 @@
+import { createWorkActionSession, type WorkActionSession } from './work-action-session.js';
 import { createWorkTaskSession, type WorkTaskSession } from './work-task-session.js';
 import { createWorkPlanningSession, type WorkPlanningSession } from './work-planning-session.js';
 import { createWorkObservationSession, createWorkRunMeasurements, type WorkObservationSession } from './work-observation-session.js';
 import { dispatchWorkProposal } from './work-proposal-dispatch.js';
 import { createWorkReplay } from './work-replay.js';
-import type { WorkDispatchContext, ActDirective } from './work-execution-types.js';
+import type { WorkDispatchContext } from './work-execution-types.js';
 import { persistTerminalRun, persistWorkflow, recordExperience, buildWorkExecutionReport } from './work-run-finalization.js';
 import { WorkPlanner } from "./work-planner.js";
 export { METHOD_DISCOVERY_MAX, PlannerInput, WorkPlanner, WORK_PLANNER_SYSTEM_PROMPT, describeExecutionIntent, buildPlannerUserPrompt, PlannerTargetResolver, createPlannerTargetResolverForProvider, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, OPENAI_CHAT_COMPLETIONS_URL, buildOpenAiVisionBody, openAiMessageText, createLlmPlanner, createStrongLlmPlanner } from "./work-planner.js";
@@ -25,21 +26,21 @@ import type { DataSource } from 'typeorm';
 
 import logger from '../../utils/logger.js';
 import { AI_TOOL_NAMES, type VerifiedToolContext } from './ai-tool-contract.js';
-import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR } from '../local-agent/local-agent-protocol.js';
+import { LOCAL_AGENT_ERROR } from '../local-agent/local-agent-protocol.js';
 import { resolveTargetDevice, type DeviceRow } from '../local-agent/local-agent-service.js';
 import { nodeLedgerOwnerKey } from './node-ledger-owner.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
 
-import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, isSubmitWindowNamedInGoal, validateWorkImageInput, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkAction, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
+import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, validateWorkImageInput, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
 import { sanitizeRecoveryHint } from './automation-recovery-contract.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
 import { WORK_RUN_STATUS, checkResumable, createWorkRun, isValidRunId, transitionWorkRun, type ResumeRejectReason, type WorkRunCoordinationRow } from './work-run-coordination-service.js';
 import { issueWorkRunUpsert, issueWorkflowCandidateMatch } from './work-run-executor.js';
-import { experienceLocatorOf, isRuntimeLayerCode, type ExperienceStepMeta } from './work-experience.js';
-import { buildTrajectoryEntry, normalizeWorkflowText, replayPreflight, assessReplayValue, type TrajectoryEntry } from './workflow-candidate.js';
+import { isRuntimeLayerCode, type ExperienceStepMeta } from './work-experience.js';
+import { normalizeWorkflowText, replayPreflight, assessReplayValue, type TrajectoryEntry } from './workflow-candidate.js';
 
 /**
  * QUESTION 성격의 인계 사유(§조건 5) — 사용자의 판단/답만 있으면 같은 logical run 으로 이어갈 수 있는 국면.
@@ -180,9 +181,6 @@ export async function runWorkAgent(
    */
   let ledgerOwner: string | null = null;
   let neededInput: string | null = null;
-  // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
-  const safetyRejects: Record<string, number> = {};
-  let lastSafetyReason = '';
   const recoveryHint = sanitizeRecoveryHint(input.recoveryHint) ?? undefined;
   const sessions: { task?: WorkTaskSession; planning?: WorkPlanningSession } = {};
   // PHASE 1 — QUESTION↔TAKEOVER 분리 · 재개 원장(§조건 5). QUESTION 은 waiting_for_user(같은 runId 재개 가능),
@@ -211,8 +209,6 @@ export async function runWorkAgent(
   let inputMissing = false;
   /** 재생 이탈 원인(있으면). code 는 명령 오류 코드일 때만. */
   let replayDiverge: { cause: 'budget' | 'find_failed' | 'locator_not_found' | 'validation_rejected' | 'step_failed' | 'expect_mismatch'; code: string | null; stepSeq: number | null } | null = null;
-  /** execActOnce 가 이번 호출에서 남긴 단계 기록(실행 전 인계면 null). */
-  let lastActRecord: WorkStepRecord | null = null;
   /** 실패 종료가 실행 환경(runtime) 층인가 — Candidate 실패 통계에서 뺀다(D7 · §11). */
   const endedByRuntime = (): boolean =>
     isRuntimeLayerCode(terminalErrorCode) || state.takeover?.reason === 'site_not_ready';
@@ -388,20 +384,14 @@ export async function runWorkAgent(
   // Bind the observation session only after node ownership, target preparation and run claim have passed.
   const observationSession = createWorkObservationSession({ dataSource, ctx, deviceId: deviceId as string, executionNode: executionNode as DeviceRow, tool, siteId, surface, state, measurements });
   observationBinding.current = observationSession;
-  const { budgetLeft, overTime, dom, uia, computer, unitCapable, runUnit, applyDomObservation, unitObserveError, reobserve, observe } = observationSession;
-  // Visual action failure counting stays with action interpretation, independently of observation refreshes.
-  let visualFailureRun = 0;
-  const VISUAL_FAILURE_MAX = 2;
-  const enterVisualFallback = async (): Promise<{ ok: boolean; errorCode?: string }> => {
-    const outcome = await observationSession.enterVisualFallback();
-    if (outcome.ok) visualFailureRun = 0;
-    return outcome;
-  };
+  const { budgetLeft, overTime, dom, unitCapable, runUnit, applyDomObservation, unitObserveError, reobserve, observe } = observationSession;
+  const actionBinding: { current?: WorkActionSession } = {};
+  const enterVisualFallback = () => actionBinding.current!.enterVisualFallback();
 
   const planningSession = createWorkPlanningSession({
     state, planner, strongPlanner: options.strongPlanner, taskSession, observationSession, measurements, workflow, surface, stepMeta,
     request: { image, siteDisplayName: displayName, recoveryHint, intent: input.intent },
-    readFeedback: () => ({ lastRead, lastSafetyReason }), isReplaying: () => replaying,
+    readFeedback: () => ({ lastRead, lastSafetyReason: actionBinding.current?.safetyReason() ?? '' }), isReplaying: () => replaying,
     onNeededInput: (value) => { neededInput = value; }, onPlannerTakeover: () => { plannerTakeover = true; },
     finish, takeover, stuckEnd, observeFailed, enterVisualFallback,
   });
@@ -416,93 +406,9 @@ export async function runWorkAgent(
    * `pre` — Phase E 단위 경로: 노드가 이미 실행한 행동의 결과. 명령을 다시 보내지 않고 같은 기록 · 같은 오류 해석 · 같은 지시를 만든다
    * (단발 경로와 history · trajectory · Experience 가 같은 모양이 되게). 예산은 단발과 같이 행동 1.
    */
-  const execActOnce = async (act: WorkAction, snapshotId: string, pre?: { status: string; errorCode?: string; safe: Record<string, unknown> }): Promise<ActDirective> => {
-    const isVisual = act.kind === 'visual_click' || act.kind === 'visual_type' || act.kind === 'visual_key';
-    // 제출 키(ENTER/CTRL+ENTER)는 대상 창 제목이 요청에 있어야 한다(§5 COMMIT 경계) — uia·visual 공통.
-    if ((act.kind === 'key' || act.kind === 'visual_key') && (act.key === 'ENTER' || act.key === 'CTRL+ENTER') && !isSubmitWindowNamedInGoal(state.observation, goal.request)) {
-      return { do: 'reject', reason: 'WINDOW_NOT_NAMED_IN_GOAL' };
-    }
-    lastActRecord = null;
-    const t0 = Date.now();
-    const actEl = (state.observation?.elements ?? []).find((e) => e.elementRef === act.elementRef);
-    const actLocator = experienceLocatorOf(surface, act, actEl);
-    const record: WorkStepRecord = { step: state.stepCount + 1, action: act, status: 'failed' };
-    let outcome: { status: string; errorCode?: string; safe: Record<string, unknown> };
-    if (pre) {
-      state.stepCount += 1;
-      outcome = pre;
-    } else if (surface === 'uia') {
-      if (act.kind === 'set_input') outcome = await uia(LOCAL_AGENT_ACTIONS.UIA_SET_VALUE, { elementRef: act.elementRef, snapshotId, text: act.text });
-      else if (act.kind === 'click' && act.x !== undefined) outcome = await uia(LOCAL_AGENT_ACTIONS.UIA_CLICK, { elementRef: act.elementRef, snapshotId, x: act.x, y: act.y, ...(act.clicks ? { clicks: act.clicks } : {}) });
-      else if (act.kind === 'click') outcome = await uia(LOCAL_AGENT_ACTIONS.UIA_INVOKE, { elementRef: act.elementRef, snapshotId });
-      else if (act.kind === 'key') outcome = await uia(LOCAL_AGENT_ACTIONS.UIA_KEY, { key: act.key, snapshotId, ...(act.elementRef ? { elementRef: act.elementRef } : {}) });
-      // 시각 모드 조작 — 정규화 좌표(0..1)/허용 텍스트·키는 contract 에서 이미 검증됨. 이미지·base64 는 여기 흐르지 않는다.
-      else if (act.kind === 'visual_click') outcome = await computer(LOCAL_AGENT_ACTIONS.COMPUTER_CLICK, { x: act.x, y: act.y });
-      else if (act.kind === 'visual_type') outcome = await computer(LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT, { text: act.text });
-      else if (act.kind === 'visual_key') outcome = await computer(LOCAL_AGENT_ACTIONS.COMPUTER_KEY, { key: act.key });
-      else return { do: 'takeover', reason: 'planner_unavailable', progress: 'failed' };
-    } else {
-      if (act.kind === 'set_input') outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_SET_INPUT, { elementRef: act.elementRef, snapshotId, text: act.text });
-      else if (act.kind === 'select_option') outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION, { elementRef: act.elementRef, snapshotId, option: act.option });
-      else if (act.kind === 'click') outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_CLICK, { elementRef: act.elementRef, snapshotId });
-      else return { do: 'takeover', reason: 'planner_unavailable', progress: 'failed' };
-    }
-    record.status = outcome.status === 'success' ? 'success' : outcome.status === 'denied' ? 'denied' : 'failed';
-    record.errorCode = outcome.errorCode;
-    record.navigated = outcome.safe.navigated === true;
-    record.changed = isVisual ? true : outcome.safe.changed === true;
-    // PHASE 2 — 성공한 DOM 행동은 semantic trajectory 로 남긴다(행동 전 관찰의 같은 elementRef 요소 → role·name|text).
-    // 좌표·elementRef·snapshot 은 trajectory 에 들어가지 않는다. 값은 run 끝의 템플릿 일반화에만 쓴다.
-    if (surface === 'dom' && outcome.status === 'success') {
-      const el = (state.observation?.elements ?? []).find((e) => e.elementRef === act.elementRef);
-      const entry = buildTrajectoryEntry(act, el, record, state.observation?.path);
-      if (entry) trajectory.push(entry);
-    }
-    state.history.push(record);
-    state.lastResult = record;
-    stepMeta.set(record, { actor: currentActor(), locator: actLocator, durationMs: Date.now() - t0 });
-    lastActRecord = record;
-
-    if (outcome.status !== 'success') {
-      if (isVisual) {
-        // 시각 조작 실패 — 사용자 몫(자격/OTP)은 바로 인계, 그 밖(대상 상실·경계 밖·입력 실패)은 재관찰(=재캡처)해 화면을 다시 보게 하되 연속 실패면 인계.
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.COMPUTER_USER_ACTION_REQUIRED) return { do: 'takeover', reason: 'credential_required', progress: 'needs_user' };
-        visualFailureRun += 1;
-        if (visualFailureRun >= VISUAL_FAILURE_MAX) return { do: 'takeover', reason: 'vision_uncertain', progress: 'needs_user' };
-        return { do: 'observe', navigated: false };
-      }
-      if (surface === 'uia') {
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_USER_ACTION_REQUIRED) return { do: 'takeover', reason: 'credential_required', progress: 'needs_user' };
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_ACTION_NOT_ALLOWED) return { do: 'takeover', reason: 'commit_required', progress: 'needs_user' };
-        if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_TARGET_NOT_FOREGROUND) return { do: 'takeover', reason: 'site_not_ready', progress: 'needs_user' };
-        const safety = SAFETY_TAKEOVER[outcome.errorCode ?? ''];
-        if (safety) {
-          // §4 — 숨은 목록 항목(구조적 확인 불가)은 즉시 인계하지 않는다. 아직 시각 모드가 아니면 화면을 캡처해 AI 가 실제 화면을 보고 잇게 한다.
-          if (outcome.errorCode === LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL && !observationSession.isVisualFallback()) {
-            const v = await enterVisualFallback();
-            if (v.ok) { planningSession.setRejectReason(undefined); return { do: 'continue' }; }
-          }
-          safetyRejects[outcome.errorCode as string] = (safetyRejects[outcome.errorCode as string] ?? 0) + 1;
-          lastSafetyReason = typeof outcome.safe.safety === 'object' && outcome.safe.safety ? String((outcome.safe.safety as Record<string, unknown>).reason ?? '') : '';
-          if (safety.immediate || safetyRejects[outcome.errorCode as string] >= 2) return { do: 'takeover', reason: safety.reason, progress: 'needs_user' };
-          planningSession.setRejectReason('SAFETY_REJECT');
-          return { do: 'observe', navigated: false };
-        }
-        return { do: 'observe', navigated: false };
-      }
-      // dom — 사용자 몫은 바로, 나머지(stale · content · 요소 없음)는 재관찰.
-      if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return { do: 'takeover', reason: 'credential_required', progress: 'needs_user' };
-      if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_ACTION_NOT_ALLOWED && outcome.safe.riskLevel === 'COMMIT') return { do: 'takeover', reason: 'commit_required', progress: 'needs_user' };
-      if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED) return { do: 'takeover', reason: 'unsupported_control', progress: 'needs_user' };
-      return { do: 'observe', navigated: false };
-    }
-
-    // 성공 — set_input 은 응답(hasValue/verified)이 확인이라 재관찰 생략, 나머지는 §17 재관찰. dom 은 이동·변경일 때만.
-    if (isVisual) visualFailureRun = 0;
-    if (surface === 'uia') return act.kind === 'set_input' ? { do: 'continue' } : { do: 'observe', navigated: record.navigated === true };
-    const needsReobserve = act.kind === 'click' || record.navigated === true || record.changed === true;
-    return needsReobserve ? { do: 'observe', navigated: record.navigated === true } : { do: 'continue' };
-  };
+  const actionSession = createWorkActionSession({ state, surface, observationSession, stepMeta, trajectory, currentActor, setRejectReason: planningSession.setRejectReason });
+  actionBinding.current = actionSession;
+  const execActOnce = actionSession.execute;
 
   const first = await observe();
   if (!first.ok) {
@@ -524,7 +430,7 @@ export async function runWorkAgent(
     state,
     surface,
     get lastActRecord() {
-      return lastActRecord;
+      return actionSession.lastRecord();
     },
     budgetLeft,
     overTime,
@@ -596,7 +502,7 @@ export async function runWorkAgent(
     state,
     surface,
     get lastActRecord() {
-      return lastActRecord;
+      return actionSession.lastRecord();
     },
     budgetLeft,
     overTime,
@@ -648,19 +554,6 @@ export async function runWorkAgent(
 }
 
 // ─── 렌더 (§20·§21) ─────────────────────────────────────────────────────────
-
-/** SAFETY-V1 §31·§32 — agent 안전층 코드 → 인계 사유. immediate 는 Planner 에게 대안 기회 없이 바로 넘긴다. */
-const SAFETY_TAKEOVER: Record<string, { reason: TakeoverReason; immediate: boolean }> = {
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_USER_ACTIVE]: { reason: 'user_active', immediate: true },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_PAUSED]: { reason: 'user_active', immediate: true },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_TARGET_CHANGED]: { reason: 'target_changed', immediate: false },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_TARGET_UNCERTAIN]: { reason: 'target_identity_uncertain', immediate: false },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_UIA_AMBIGUOUS]: { reason: 'uia_target_ambiguous', immediate: false },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL]: { reason: 'uia_hidden_control', immediate: true },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_SUBMIT_UNVERIFIED]: { reason: 'submit_not_verified', immediate: false },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_KEY_UNKNOWN]: { reason: 'key_semantics_unknown', immediate: true },
-  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_VISION_UNCERTAIN]: { reason: 'vision_uncertain', immediate: true },
-};
 
 const TAKEOVER_LINE: Record<TakeoverReason, string> = {
   user_active: '자동화 중 사용자의 키보드·마우스 입력이 감지되어 멈췄습니다. 현재 화면을 확인한 뒤 다시 요청해 주세요.',

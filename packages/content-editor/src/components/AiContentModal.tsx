@@ -1,5 +1,4 @@
 import { CommunitySavePanel, StoreSavePanel, ProductionMaterialSavePanel } from './AiContentSavePanels';
-import { blocksToHtml, UrlBlock } from "./ai-content-conversion.js";
 /**
  * AiContentModal — AI 콘텐츠 변환 모달
  *
@@ -30,11 +29,13 @@ import { blocksToHtml, UrlBlock } from "./ai-content-conversion.js";
  * - initialMode: POP / 제목 추천 / 블로그 글 / QR 안내문 (Extension 진입). 없으면 flexible 자유 입력.
  */
 
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { aiContentGenerationReducer, INITIAL_GENERATION_STATE } from './ai-content-generation-state';
 import { useAiContentSaving } from './useAiContentSaving';
 import type { Editor } from '@tiptap/react';
-import { sanitizeHtml } from '../sanitize';
+import { useAiContentSession } from './useAiContentSession';
+import { useAiContentGeneration } from './useAiContentGeneration';
+import { AiContentResultPreview } from './AiContentResultPreview';
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
@@ -165,7 +166,6 @@ export interface AiContentModalProps {
 export type AiMode = 'pop' | 'title_suggest' | 'blog' | 'store_qr';
 type ToneOption = 'friendly' | 'professional' | 'concise';
 type LengthOption = 'short' | 'medium' | 'long';
-type ResultTab = 'preview' | 'html';
 type SourceTab = 'text' | 'url';
 type UrlTone = 'normal' | 'professional' | 'store';
 // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
@@ -249,12 +249,25 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
   const [length, setLength] = useState<LengthOption>(templateForcedOptions?.length ?? 'medium');
   const [generation, generationDispatch] = useReducer(aiContentGenerationReducer, INITIAL_GENERATION_STATE);
   const { loading, result, error, resultTab, copied, showUsageSnippets } = generation;
+  // Entry context is private memory only, never a permission decision or a persisted/logged value.
+  const requestHeadersKey = JSON.stringify(Object.entries(aiRequestHeaders ?? {}).sort(([a], [b]) => a.localeCompare(b)));
+  const entryContext = JSON.stringify([initialText, initialMode, initialSourceTab, templateId, templateSystemPrompt, sourceMetadata?.sourceContentId, sourceMetadata?.sourceOrigin, requestHeadersKey]);
+  const previousEntry = useRef(entryContext);
+  const session = useAiContentSession(open, entryContext);
   const saves = useAiContentSaving({
+    session,
     apiBaseUrl: API_BASE_URL, result, mode,
     outputType: MODE_CONFIG.find(c => c.key === mode)?.outputType ?? mode,
     aiRequestHeaders, onChannelSave, onProductionMaterialSaved, sourceMetadata, templateId,
   });
   const { channel, community, store, productionMaterial } = saves;
+  const requests = useAiContentGeneration({ apiBaseUrl: API_BASE_URL, aiRequestHeaders, session, dispatch: generationDispatch, onStart: saves.reset });
+  const cancelRequests = requests.cancel, resetSaves = saves.reset;
+  useLayoutEffect(() => {
+    const changed = previousEntry.current !== entryContext;
+    previousEntry.current = entryContext;
+    if (!open || changed) { cancelRequests(); resetSaves(); }
+  }, [open, entryContext, cancelRequests, resetSaves]);
 
   // URL 모드 상태 (WO-O4O-RICHTEXT-AI-URL-IMPORT-V1)
   // WO-O4O-AI-LESSON-INITIAL-URL-TAB-UX-FIX-V1: caller가 initialSourceTab='url' 지정 시 URL 모드로 시작
@@ -285,155 +298,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
     }
   };
 
-  const handleGenerate = async () => {
-    if (!input.trim()) {
-      generationDispatch({ type: 'error', error: '변환할 텍스트를 입력해 주세요.' });
-      return;
-    }
-    generationDispatch({ type: 'started' });
-
-    try {
-      // WO-O4O-STORE-PRODUCTION-TEMPLATE-REGISTRY-V1:
-      //   templateSystemPrompt 이 있으면 customPrompt 앞에 prepend.
-      //   template 지시문 + 사용자 지시문 stack 방식 (override가 아닌 supplement).
-      const effectiveCustomPrompt = [
-        templateSystemPrompt?.trim() ?? '',
-        customPrompt.trim(),
-      ].filter(Boolean).join('\n\n').slice(0, CUSTOM_PROMPT_MAX);
-
-      // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
-      //   initialMode 가 명시적으로 전달된 외부 호출(POP/QR/블로그 페이지 등) 은 기존 outputType 을
-      //   그대로 사용한다 (해당 페이지 컨텍스트가 곧 결과 형식). 모달이 일반 진입(initialMode 없음)
-      //   이면 'flexible' outputType 으로 보내 추가 요청사항 중심으로 생성된다.
-      const effectiveOutputType = initialMode ? currentConfig.outputType : 'flexible';
-
-      const response = await fetch(`${API_BASE_URL}/api/ai/content`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        body: JSON.stringify({
-          input: input.trim(),
-          outputType: effectiveOutputType,
-          options: { tone, length },
-          // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1
-          customPrompt: effectiveCustomPrompt,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'AI 생성에 실패했습니다.');
-      }
-
-      generationDispatch({ type: 'result', result: { html: data.html, title: data.title || '', summary: data.summary || '', usageWarning: data.usageWarning } });
-    } catch (err: any) {
-      generationDispatch({ type: 'error', error: err.message || 'AI 서비스 오류가 발생했습니다.' });
-    } finally {
-      generationDispatch({ type: 'finished' });
-    }
-  };
-
-  const handleGenerateFromUrl = async () => {
-    if (!urlInput.trim()) {
-      generationDispatch({ type: 'error', error: 'URL을 입력해 주세요.' });
-      return;
-    }
-    try {
-      new URL(urlInput.trim());
-    } catch {
-      generationDispatch({ type: 'error', error: '올바른 URL 형식이 아닙니다. (예: https://example.com)' });
-      return;
-    }
-
-    generationDispatch({ type: 'started' });
-
-    // 90s client-side guard — backend can hang on transcript/AI; without this
-    // the finally block never fires and the spinner never clears.
-    const abortCtrl = new AbortController();
-    const abortTimer = setTimeout(() => abortCtrl.abort(), 90000);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/url-to-blocks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...aiRequestHeaders },
-        credentials: 'include',
-        signal: abortCtrl.signal,
-        body: JSON.stringify({
-          url: urlInput.trim(),
-          // WO-O4O-KPA-AI-CONTENT-MODE-PRESET-REMOVAL-V1:
-          //   outputType 전송 제거. 결과 형식은 customInstruction 이 결정한다.
-          length: urlLength,
-          tone: urlTone,
-          // WO-O4O-AI-CONTENT-CUSTOM-PROMPT-AND-CORE-EXTENSION-AUDIT-V1:
-          //   동일한 customPrompt 입력란을 URL 모드의 customInstruction 으로도 매핑한다.
-          customInstruction: customPrompt.trim().slice(0, CUSTOM_PROMPT_MAX),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'URL 콘텐츠 생성에 실패했습니다.');
-      }
-
-      if (!data.blocks || data.blocks.length === 0) {
-        throw new Error('생성된 블록이 없습니다. URL 접근 가능 여부를 확인해 주세요.');
-      }
-
-      const html = blocksToHtml(data.blocks);
-      if (!html.trim()) {
-        throw new Error('HTML 변환 결과가 비어있습니다.');
-      }
-
-      // WO-O4O-AI-CONTENT-EDITOR-YOUTUBE-COMMAND-INSERT-V1:
-      //   o4o/youtube URL 목록을 별도로 보존 — handleInsert 에서
-      //   editor.commands.setYoutubeVideo({src}) 로 삽입한다.
-      const youtubeUrls = (data.blocks as UrlBlock[])
-        .filter((b) => b.type === 'o4o/youtube')
-        .map((b) => b.attributes?.url || b.attributes?.src || '')
-        .filter((u): u is string => Boolean(u));
-
-      // WO-O4O-AI-URL-BLOCKS-TITLE-AUTO-FILL-V1:
-      //   백엔드가 추출한 제목(YouTube oEmbed / HTML <title>·og·twitter / blocks fallback)을 사용.
-      //   미추출 시 빈 문자열 — 호출 측(ContentWritePage / ResourceWritePage)이 자체 fallback 적용.
-      generationDispatch({ type: 'result', result: {
-        html,
-        title: typeof data.title === 'string' ? data.title : '',
-        summary: `${data.blocks.length}개 블록 → HTML 변환 완료`,
-        youtubeUrls,
-        usageWarning: data.usageWarning,
-      } });
-    } catch (err: any) {
-      if (err?.name === 'AbortError') {
-        generationDispatch({ type: 'error', error: 'URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.' });
-      } else {
-        generationDispatch({ type: 'error', error: err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.' });
-      }
-    } finally {
-      clearTimeout(abortTimer);
-      generationDispatch({ type: 'finished' });
-    }
-  };
-
-  const handleCopy = async () => {
-    if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result.html);
-      generationDispatch({ type: 'copied', copied: true });
-      setTimeout(() => generationDispatch({ type: 'copied', copied: false }), 2000);
-    } catch {
-      // fallback: select + execCommand
-      const el = document.createElement('textarea');
-      el.value = result.html;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      generationDispatch({ type: 'copied', copied: true });
-      setTimeout(() => generationDispatch({ type: 'copied', copied: false }), 2000);
-    }
-  };
+  const handleGenerate = () => requests.generate({
+    input: input.trim(), outputType: initialMode ? currentConfig.outputType : 'flexible',
+    options: { tone, length },
+    customPrompt: [templateSystemPrompt?.trim() ?? '', customPrompt.trim()].filter(Boolean).join('\n\n').slice(0, CUSTOM_PROMPT_MAX),
+  });
+  const handleGenerateFromUrl = () => requests.generateFromUrl({ url: urlInput.trim(), length: urlLength, tone: urlTone, customInstruction: customPrompt.trim().slice(0, CUSTOM_PROMPT_MAX) });
+  const handleCopy = () => requests.copy(result);
 
   const handleInsert = () => {
     if (!result) return;
@@ -473,7 +344,8 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleClose = () => {
     setInput('');
-    generationDispatch({ type: 'closed' });
+    session.invalidate();
+    requests.cancel();
     saves.reset();
     setUrlInput('');
     setCustomPrompt('');
@@ -485,7 +357,9 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
   const handleSourceTabChange = (tab: SourceTab) => {
     setSourceTab(tab);
-    generationDispatch({ type: 'source_changed' });
+    session.invalidate();
+    requests.cancel('source_changed');
+    saves.reset();
   };
 
   return (
@@ -906,156 +780,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
             </div>
           )}
 
-          {/* Result */}
-          {result && (
-            <div
-              style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Result header */}
-              <div
-                style={{
-                  padding: '10px 14px',
-                  background: '#f0fdf4',
-                  borderBottom: '1px solid #e5e7eb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                <span style={{ color: '#16a34a', fontSize: '13px' }}>✓</span>
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#15803d' }}>AI 생성 완료</span>
-                {result.title && (
-                  <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '4px' }}>— {result.title}</span>
-                )}
-              </div>
-
-              {/* WO-O4O-AI-USAGE-CONDITION-DETECTION-UX-V1: 원문 이용조건 안내 카드 */}
-              {result.usageWarning?.detected && (
-                <div style={{
-                  padding: '10px 14px',
-                  background: '#fffbeb',
-                  borderBottom: '1px solid #fde68a',
-                  fontSize: '12px',
-                  color: '#92400e',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontWeight: 600 }}>⚠ 원문 이용조건 안내</span>
-                      <span style={{ marginLeft: '6px', fontWeight: 400, color: '#b45309' }}>
-                        원문에서 저작권 또는 콘텐츠 이용 관련 표현이 감지되었습니다.
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => generationDispatch({ type: 'usage_snippets' })}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', color: '#b45309', whiteSpace: 'nowrap', padding: 0 }}
-                    >
-                      {showUsageSnippets ? '접기' : '감지된 표현 보기'}
-                    </button>
-                  </div>
-                  <ul style={{ margin: '6px 0 0 0', paddingLeft: '16px' }}>
-                    {result.usageWarning.categories.map((cat) => (
-                      <li key={cat}>{cat}</li>
-                    ))}
-                  </ul>
-                  {showUsageSnippets && result.usageWarning.snippets.length > 0 && (
-                    <div style={{ marginTop: '6px', padding: '6px 8px', background: '#fef3c7', borderRadius: '4px' }}>
-                      {result.usageWarning.snippets.map((s, i) => (
-                        <div key={i} style={{ fontFamily: 'monospace', fontSize: '11px', color: '#78350f' }}>"{s}"</div>
-                      ))}
-                    </div>
-                  )}
-                  <div style={{ marginTop: '6px', color: '#b45309' }}>
-                    최종 활용 전 원문 이용조건을 확인하세요.
-                    {sourceTab === 'url' && urlInput.trim() && (
-                      <> &nbsp;<a href={urlInput.trim()} target="_blank" rel="noopener noreferrer" style={{ color: '#92400e', textDecoration: 'underline' }}>원문 보기</a></>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Tabs */}
-              <div
-                style={{
-                  display: 'flex',
-                  borderBottom: '1px solid #e5e7eb',
-                  background: '#f9fafb',
-                }}
-              >
-                {(['preview', 'html'] as ResultTab[]).map((tab) => (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => generationDispatch({ type: 'result_tab', tab })}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '13px',
-                      fontWeight: resultTab === tab ? 600 : 400,
-                      color: resultTab === tab ? '#4f46e5' : '#6b7280',
-                      background: 'none',
-                      border: 'none',
-                      borderBottom: resultTab === tab ? '2px solid #4f46e5' : '2px solid transparent',
-                      cursor: 'pointer',
-                      marginBottom: '-1px',
-                    }}
-                  >
-                    {tab === 'preview' ? '미리보기' : 'HTML'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab content */}
-              {resultTab === 'preview' ? (
-                <div
-                  style={{
-                    padding: '14px',
-                    fontSize: '14px',
-                    lineHeight: 1.7,
-                    maxHeight: '240px',
-                    overflowY: 'auto',
-                  }}
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(result.html || '') }}
-                />
-              ) : (
-                <pre
-                  style={{
-                    margin: 0,
-                    padding: '14px',
-                    fontSize: '12px',
-                    lineHeight: 1.6,
-                    maxHeight: '240px',
-                    overflowY: 'auto',
-                    background: '#1e1e2e',
-                    color: '#cdd6f4',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-all',
-                    fontFamily: 'monospace',
-                  }}
-                >
-                  {result.html}
-                </pre>
-              )}
-
-              {/* Summary */}
-              {result.summary && (
-                <div
-                  style={{
-                    padding: '8px 14px',
-                    background: '#f9fafb',
-                    borderTop: '1px solid #e5e7eb',
-                    fontSize: '12px',
-                    color: '#6b7280',
-                  }}
-                >
-                  {result.summary}
-                </div>
-              )}
-            </div>
-          )}
+          <AiContentResultPreview result={result} resultTab={resultTab} showUsageSnippets={showUsageSnippets} sourceUrl={sourceTab === 'url' ? urlInput.trim() : undefined} onResultTab={(tab) => generationDispatch({ type: 'result_tab', tab })} onToggleUsageSnippets={() => generationDispatch({ type: 'usage_snippets' })} />
 
           {/* WO-O4O-AI-CONTENT-COMMUNITY-SAVE-INTEGRATION-V1: 커뮤니티 저장 패널 */}
           {showCommunitySave && result && community.open && (

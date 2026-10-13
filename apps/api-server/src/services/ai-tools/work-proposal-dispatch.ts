@@ -1,3 +1,4 @@
+import { domFailureDirective } from './work-action-session.js';
 import {
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
@@ -93,6 +94,17 @@ async function dispatchRead(
   a: WorkAction,
   snapshotId: string,
 ): Promise<PhaseResult> {
+  if (a.kind === 'inspect') return dispatchInspect(ctx, a);
+  if (ctx.surface === 'uia') return dispatchUiaRead(ctx, a);
+  return dispatchDomRead(ctx, a, snapshotId);
+}
+async function dispatchInspect(
+  ctx: Pick<
+    ReadContext,
+    'state' | 'stepMeta' | 'currentActor' | 'observe' | 'observeFailed'
+  >,
+  a: WorkAction,
+): Promise<PhaseResult> {
   // ── inspect — 두 표면 공통: 재관찰. ──
   if (a.kind === 'inspect') {
     const rec: WorkStepRecord = {
@@ -114,6 +126,15 @@ async function dispatchRead(
     if (!o.ok) return ctx.observeFailed(o);
     return null;
   }
+  return NOT_HANDLED;
+}
+async function dispatchUiaRead(
+  ctx: Pick<
+    ReadContext,
+    'state' | 'lastRead' | 'stepMeta' | 'currentActor' | 'surface'
+  >,
+  a: WorkAction,
+): Promise<PhaseResult> {
   // ── uia 표면 읽기 — find · read_text 는 현재 관찰 안에서(명령 0). ──
   if (ctx.surface === 'uia' && a.kind === 'find') {
     const q = a.query ?? {};
@@ -170,6 +191,13 @@ async function dispatchRead(
     ctx.state.lastResult = rec;
     return null;
   }
+  return NOT_HANDLED;
+}
+async function dispatchDomRead(
+  ctx: ReadContext,
+  a: WorkAction,
+  snapshotId: string,
+): Promise<PhaseResult> {
   // ── dom 표면 읽기 — find · read_text · read_table 은 local.dom.* 명령. ──
   if (
     ctx.surface === 'dom' &&
@@ -219,26 +247,12 @@ async function dispatchRead(
       durationMs: Date.now() - t0,
     });
     if (outcome.status !== 'success') {
-      if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED)
+      const failure = domFailureDirective(outcome);
+      if (failure)
         return ctx.takeoverWith(
           outcome.errorCode,
-          'credential_required',
-          'needs_user',
-        );
-      if (
-        outcome.errorCode === LOCAL_AGENT_ERROR.DOM_ACTION_NOT_ALLOWED &&
-        outcome.safe.riskLevel === 'COMMIT'
-      )
-        return ctx.takeoverWith(
-          outcome.errorCode,
-          'commit_required',
-          'needs_user',
-        );
-      if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED)
-        return ctx.takeoverWith(
-          outcome.errorCode,
-          'unsupported_control',
-          'needs_user',
+          failure.reason,
+          failure.progress,
         );
       const o = await ctx.observe();
       if (!o.ok) return ctx.observeFailed(o);

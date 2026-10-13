@@ -74,7 +74,7 @@ export function aiContentGenerationReducer(
     case 'usage_snippets':
       return { ...state, showUsageSnippets: !state.showUsageSnippets };
     case 'source_changed':
-      return { ...state, result: null, error: '' };
+      return { ...state, loading: false, result: null, error: '' };
     case 'closed':
       return {
         ...state,
