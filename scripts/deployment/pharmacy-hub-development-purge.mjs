@@ -24,7 +24,7 @@ const byTable=new Map(roots.map(r=>[r.table,r]));
 const exclusiveOffer=a=>`(${byTable.get('supplier_product_offers').scope(a)})
   AND ${a}.is_public=FALSE AND COALESCE(cardinality(${a}.allowed_seller_ids),0)=0
   AND NOT EXISTS (SELECT 1 FROM unnest(${a}.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`;
-const deletedScope=(table,a)=>table==='supplier_product_offers'?exclusiveOffer(a):byTable.get(table)?.scope(a);
+const deletedScope=(table,a)=>table==='supplier_product_offers'?undefined:byTable.get(table)?.scope(a);
 function id(value) {
   if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_DEV_IDENTIFIER');
   return `"${value}"`;
@@ -92,6 +92,7 @@ async function ownership(q) {
 }
 async function references(q,fks,tables) {
   for(const fk of fks) {
+    if(fk.target==='supplier_product_offers')continue; // Shared supplier-owned records are retained.
     if(!Array.isArray(fk.source_columns)||!fk.source_columns.length||!Array.isArray(fk.target_columns)||fk.source_columns.length!==fk.target_columns.length)
       throw new Error('PH_DEV_FK_SHAPE');
     const source=fk.schema==='public'?deletedScope(fk.table,'s'):undefined;
@@ -102,7 +103,7 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
-  const targetIds=roots.filter(r=>r.table!=='checkout_order_logs').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
+  const targetIds=roots.filter(r=>!['checkout_order_logs','supplier_product_offers'].includes(r.table)).map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
   const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')
@@ -127,16 +128,14 @@ export class PharmacyHubDevelopmentPurge {
     if(!plan) {
       for(const r of roots) {
         if(r.table==='supplier_product_offers') {
-          const removed=await count(q,`WITH removed AS (DELETE FROM public.supplier_product_offers x
-            WHERE ${exclusiveOffer('x')} RETURNING 1) SELECT count(*)::text AS count FROM removed`);
-          if(removed!==exclusiveOffers)throw new Error('PH_DEV_EXCLUSIVE_OFFER_COUNT');
           const changed=await count(q,`WITH changed AS (UPDATE public.supplier_product_offers x
             SET service_keys=ARRAY(SELECT v FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')})),
+              is_active=CASE WHEN ${exclusiveOffer('x')} THEN FALSE ELSE x.is_active END,
               distribution_type=CASE WHEN x.is_public THEN 'PUBLIC'
                 WHEN EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')})) THEN 'SERVICE'
                 ELSE 'PRIVATE' END::supplier_product_offers_distribution_type_enum
             WHERE ${r.scope('x')} RETURNING 1) SELECT count(*)::text AS count FROM changed`);
-          if(changed!==r.count-exclusiveOffers)throw new Error('PH_DEV_ASSOCIATION_COUNT');
+          if(changed!==r.count)throw new Error('PH_DEV_ASSOCIATION_COUNT');
           continue;
         }
         const deleted=await count(q,`WITH removed AS (DELETE FROM public.${id(r.table)} x WHERE ${r.scope('x')} RETURNING 1)
@@ -146,7 +145,7 @@ export class PharmacyHubDevelopmentPurge {
       await census(q,true);
     }
     return {counts:Object.fromEntries(roots.map(r=>[r.table,r.count])),applied:!plan,
-      offerRowsPreserved:19-exclusiveOffers,offerAssociations:19-exclusiveOffers,
-      rowsToDelete:41+exclusiveOffers,mediaAndGcsPreserved:true};
+      offerRowsPreserved:19,offerAssociations:19,exclusiveOffersRetired:exclusiveOffers,
+      rowsToDelete:41,mediaAndGcsPreserved:true};
   }
 }

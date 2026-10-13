@@ -18,8 +18,7 @@ function fixture(problem) {
     if(sql.startsWith('SELECT count')&&sql.includes('FROM public.supplier_product_offers x'))return [{count:'18'}];
     if(sql.includes('NOT COALESCE')||sql.includes('AND EXISTS (SELECT 1 FROM unnest'))return [{count:problem==='mixed'?'1':'0'}];
     const table=sql.match(/FROM public\."([a-z0-9_]+)"/)?.[1];
-    if(sql.startsWith('WITH changed')){deleted.add('supplier_product_offers');return [{count:'1'}];}
-    if(sql.startsWith('WITH removed')&&sql.includes('DELETE FROM public.supplier_product_offers'))return [{count:'18'}];
+    if(sql.startsWith('WITH changed')){deleted.add('supplier_product_offers');return [{count:'19'}];}
     if(sql.startsWith('WITH removed')) {deleted.add(table);return [{count:String(problem==='deleteCount'?0:counts[table])}];}
     if(sql.startsWith('SELECT count')&&table)return [{count:String(problem==='count'?0:deleted.has(table)?0:counts[table])}];
     return [];
@@ -34,11 +33,11 @@ for(const problem of ['trigger','count','mixed','fk','value','payment','widening
   assert.ok(q.calls.every(s=>!s.includes('DELETE FROM')));
 });
 test('plan and apply preserve media/identity/schema and verify every delete',async()=>{
-  const plan=fixture();assert.deepEqual(await new PharmacyHubDevelopmentPurge().up(plan,true),{counts,applied:false,offerRowsPreserved:1,offerAssociations:1,rowsToDelete:59,mediaAndGcsPreserved:true});
+  const plan=fixture();assert.deepEqual(await new PharmacyHubDevelopmentPurge().up(plan,true),{counts,applied:false,offerRowsPreserved:19,offerAssociations:19,exclusiveOffersRetired:18,rowsToDelete:41,mediaAndGcsPreserved:true});
   assert.ok(plan.calls.every(s=>!s.includes('DELETE FROM')));
   const q=fixture();assert.equal((await new PharmacyHubDevelopmentPurge().up(q)).applied,true);
-  const writes=q.calls.filter(s=>s.includes('DELETE FROM'));assert.equal(writes.length,8);
-  assert.doesNotMatch(writes.join('\n'),/media_assets|\busers\b|organizations|\bALTER\b|\bDROP\b|\bTRUNCATE\b/);
+  const writes=q.calls.filter(s=>s.includes('DELETE FROM'));assert.equal(writes.length,7);
+  assert.doesNotMatch(writes.join('\n'),/supplier_product_offers|media_assets|\busers\b|organizations|\bALTER\b|\bDROP\b|\bTRUNCATE\b/);
   assert.match(q.calls.join('\n'),/checkoutOrderIds/);assert.match(q.calls.join('\n'),/paymentGroupId/);
 });
 test('delete count drift throws within caller transaction',async()=>{

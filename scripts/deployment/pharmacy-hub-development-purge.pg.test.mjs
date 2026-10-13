@@ -9,6 +9,8 @@ const ph='pharmacy-hub';
 test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, grouped payments and rollback',
   {skip:!process.env.PH_DEV_FIXTURE_URL},async()=>{
     const {Client}=createRequire(new URL('../../apps/api-server/package.json',import.meta.url))('pg');
+    const fixtureUrl=new URL(process.env.PH_DEV_FIXTURE_URL);
+    if(fixtureUrl.hostname!=='127.0.0.1'||fixtureUrl.pathname!=='/ph_dev_purge_fixture')throw new Error('Isolated loopback fixture database required');
     const client=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await client.connect();
     const q={isTransactionActive:true,query:async(sql,args)=>(await client.query(sql,args)).rows};
     const seed=async()=>{
@@ -77,10 +79,11 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await preserved();
       for(const table of ['checkout_order_logs','o4o_payments','cms_contents','forum_category_requests'])
         assert.equal((await client.query(`SELECT count(*)::text AS count FROM ${table}`)).rows[0].count,'0');
-      const offers=await client.query("SELECT count(*)::text AS count FROM supplier_product_offers");assert.equal(offers.rows[0].count,'1');
+      const offers=await client.query("SELECT count(*)::text AS count FROM supplier_product_offers");assert.equal(offers.rows[0].count,'19');
       const shared=await client.query('SELECT is_public,service_keys,allowed_seller_ids,distribution_type FROM supplier_product_offers WHERE id=$1',[uuid(301)]);
       assert.deepEqual(shared.rows[0],{is_public:true,service_keys:['neture'],allowed_seller_ids:['seller'],distribution_type:'PUBLIC'});
       assert.equal((await client.query("SELECT count(*)::text AS count FROM supplier_product_offers WHERE service_keys @> ARRAY['pharmacy-hub']")).rows[0].count,'0');
+      assert.equal((await client.query("SELECT count(*)::text AS count FROM supplier_product_offers WHERE is_active=false AND cardinality(service_keys)=0")).rows[0].count,'18');
       const missing=new Set(),removed=[];
       const storage={bucket(name){assert.equal(name,'o4o-media-library');return {file(path){return {
         async getMetadata(){if(missing.has(path))throw Object.assign(new Error('not found'),{code:404});return [{generation:'123',name:path,bucket:'o4o-media-library'}];},
