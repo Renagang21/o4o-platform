@@ -10,6 +10,17 @@ const paymentLink=`(o.id::text=p."orderId"::text OR
   CASE WHEN jsonb_typeof(p.metadata::jsonb->'checkoutOrderIds')='array'
     THEN (p.metadata::jsonb->'checkoutOrderIds') ? o.id::text ELSE FALSE END)`;
 const checks=[
+  ['exclusivePhOffers',['supplier_product_offers.service_keys','supplier_product_offers.is_public','supplier_product_offers.allowed_seller_ids'],
+    `SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE
+      EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE ${ph('v')}) AND x.is_public=FALSE
+      AND COALESCE(cardinality(x.allowed_seller_ids),0)=0
+      AND NOT EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`],
+  ['sharedOfferBaselineWidening',['supplier_product_offers.service_keys','supplier_product_offers.is_public','supplier_product_offers.allowed_seller_ids','supplier_product_offers.is_active','supplier_product_offers.approval_status'],
+    `SELECT count(*)::text AS count FROM public.supplier_product_offers x WHERE
+      EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE ${ph('v')})
+      AND (x.is_public OR COALESCE(cardinality(x.allowed_seller_ids),0)>0)
+      AND x.is_active AND x.approval_status::text='APPROVED'
+      AND NOT EXISTS (SELECT 1 FROM unnest(x.service_keys) v WHERE v IS NULL OR NOT (${ph('v')}))`],
   ['orderLogs',['checkout_order_logs.orderId','checkout_orders.id','checkout_orders.metadata'],
     `SELECT count(*)::text AS count FROM public.checkout_order_logs l JOIN public.checkout_orders o ON l."orderId"=o.id WHERE ${orderScope}`],
   ['paymentsWithoutPhOrder',paymentColumns,

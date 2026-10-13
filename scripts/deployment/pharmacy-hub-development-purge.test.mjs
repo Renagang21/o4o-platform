@@ -14,9 +14,12 @@ function fixture(problem) {
     if(sql.includes('strpos('))return [{count:problem==='value'?'1':'0'}];
     if(sql.includes('FROM "other"."refs"'))return [{count:problem==='fk'?'1':'0'}];
     if(sql.includes('FROM public.o4o_payments p'))return [{count:problem==='payment'?'1':'0'}];
+    if(sql.includes('FROM public.supplier_product_offers x')&&sql.includes('x.is_active'))return [{count:problem==='widening'?'1':'0'}];
+    if(sql.startsWith('SELECT count')&&sql.includes('FROM public.supplier_product_offers x'))return [{count:'18'}];
     if(sql.includes('NOT COALESCE')||sql.includes('AND EXISTS (SELECT 1 FROM unnest'))return [{count:problem==='mixed'?'1':'0'}];
     const table=sql.match(/FROM public\."([a-z0-9_]+)"/)?.[1];
-    if(sql.startsWith('WITH changed')){deleted.add('supplier_product_offers');return [{count:'19'}];}
+    if(sql.startsWith('WITH changed')){deleted.add('supplier_product_offers');return [{count:'1'}];}
+    if(sql.startsWith('WITH removed')&&sql.includes('DELETE FROM public.supplier_product_offers'))return [{count:'18'}];
     if(sql.startsWith('WITH removed')) {deleted.add(table);return [{count:String(problem==='deleteCount'?0:counts[table])}];}
     if(sql.startsWith('SELECT count')&&table)return [{count:String(problem==='count'?0:deleted.has(table)?0:counts[table])}];
     return [];
@@ -26,15 +29,15 @@ test('transaction is required before querying',async()=>{
   const q=fixture();q.isTransactionActive=false;
   await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/TRANSACTION_REQUIRED/);assert.equal(q.calls.length,0);
 });
-for(const problem of ['trigger','count','mixed','fk','value','payment'])test(`${problem} stops before any deletion`,async()=>{
+for(const problem of ['trigger','count','mixed','fk','value','payment','widening'])test(`${problem} stops before any deletion`,async()=>{
   const q=fixture(problem);await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/PH_DEV_/);
   assert.ok(q.calls.every(s=>!s.includes('DELETE FROM')));
 });
 test('plan and apply preserve media/identity/schema and verify every delete',async()=>{
-  const plan=fixture();assert.deepEqual(await new PharmacyHubDevelopmentPurge().up(plan,true),{counts,applied:false,offerRowsPreserved:19,offerAssociations:19,rowsToDelete:41,mediaAndGcsPreserved:true});
+  const plan=fixture();assert.deepEqual(await new PharmacyHubDevelopmentPurge().up(plan,true),{counts,applied:false,offerRowsPreserved:1,offerAssociations:1,rowsToDelete:59,mediaAndGcsPreserved:true});
   assert.ok(plan.calls.every(s=>!s.includes('DELETE FROM')));
   const q=fixture();assert.equal((await new PharmacyHubDevelopmentPurge().up(q)).applied,true);
-  const writes=q.calls.filter(s=>s.includes('DELETE FROM'));assert.equal(writes.length,7);
+  const writes=q.calls.filter(s=>s.includes('DELETE FROM'));assert.equal(writes.length,8);
   assert.doesNotMatch(writes.join('\n'),/media_assets|\busers\b|organizations|\bALTER\b|\bDROP\b|\bTRUNCATE\b/);
   assert.match(q.calls.join('\n'),/checkoutOrderIds/);assert.match(q.calls.join('\n'),/paymentGroupId/);
 });

@@ -17,7 +17,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
         CREATE TABLE checkout_order_logs(id uuid PRIMARY KEY,"orderId" uuid REFERENCES checkout_orders(id));
         CREATE TABLE o4o_payments(id uuid PRIMARY KEY,"orderId" varchar,"sourceService" varchar,metadata jsonb);
         CREATE TYPE supplier_product_offers_distribution_type_enum AS ENUM ('PUBLIC','SERVICE','PRIVATE');
-        CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY,service_keys text[],is_public boolean DEFAULT false,allowed_seller_ids text[],distribution_type supplier_product_offers_distribution_type_enum DEFAULT 'SERVICE');
+        CREATE TABLE supplier_product_offers(id uuid PRIMARY KEY,service_keys text[],is_public boolean DEFAULT false,allowed_seller_ids text[],distribution_type supplier_product_offers_distribution_type_enum DEFAULT 'SERVICE',is_active boolean DEFAULT true,approval_status varchar DEFAULT 'APPROVED');
         CREATE TABLE offer_service_approvals(id uuid PRIMARY KEY,offer_id uuid REFERENCES supplier_product_offers(id),service_key varchar);
         CREATE TABLE offer_service_prices(id uuid PRIMARY KEY,offer_id uuid REFERENCES supplier_product_offers(id),service_key varchar);
         CREATE TABLE cms_contents(id uuid PRIMARY KEY,"serviceKey" varchar);
@@ -55,6 +55,8 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       const plan=await new PharmacyHubDevelopmentPurge().up(q,true);assert.equal(plan.applied,false);
       assert.equal(Object.values(plan.counts).reduce((a,b)=>a+b,0),60);await client.query('ROLLBACK');
       const scenarios=[
+        ["UPDATE supplier_product_offers SET is_public=true WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
+        ["UPDATE supplier_product_offers SET allowed_seller_ids=ARRAY['seller'] WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
         ["UPDATE checkout_orders SET metadata=metadata||'{\"serviceKey\":\"kpa-society\"}' WHERE id='"+uuid(1)+"'",/MIXED_OWNERSHIP/],
 
         ["CREATE SCHEMA external;CREATE TABLE external.refs(order_id uuid REFERENCES checkout_orders(id));INSERT INTO external.refs VALUES('"+uuid(1)+"')",/SHARED_FK/],
@@ -75,10 +77,10 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await preserved();
       for(const table of ['checkout_order_logs','o4o_payments','cms_contents','forum_category_requests'])
         assert.equal((await client.query(`SELECT count(*)::text AS count FROM ${table}`)).rows[0].count,'0');
-      const offers=await client.query("SELECT count(*)::text AS count FROM supplier_product_offers");assert.equal(offers.rows[0].count,'19');
+      const offers=await client.query("SELECT count(*)::text AS count FROM supplier_product_offers");assert.equal(offers.rows[0].count,'1');
       const shared=await client.query('SELECT is_public,service_keys,allowed_seller_ids,distribution_type FROM supplier_product_offers WHERE id=$1',[uuid(301)]);
       assert.deepEqual(shared.rows[0],{is_public:true,service_keys:['neture'],allowed_seller_ids:['seller'],distribution_type:'PUBLIC'});
-      assert.equal((await client.query("SELECT count(*)::text AS count FROM supplier_product_offers WHERE distribution_type='PRIVATE'")).rows[0].count,'18');
+      assert.equal((await client.query("SELECT count(*)::text AS count FROM supplier_product_offers WHERE service_keys @> ARRAY['pharmacy-hub']")).rows[0].count,'0');
       const missing=new Set(),removed=[];
       const storage={bucket(name){assert.equal(name,'o4o-media-library');return {file(path){return {
         async getMetadata(){if(missing.has(path))throw Object.assign(new Error('not found'),{code:404});return [{generation:'123',name:path,bucket:'o4o-media-library'}];},
