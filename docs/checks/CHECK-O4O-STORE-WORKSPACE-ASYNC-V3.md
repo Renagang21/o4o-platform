@@ -61,3 +61,5 @@ main merge·배포와 PR CI는 미실행이다. DEPLOYMENT = REQUIRED: 추후 ma
 - Codex P1: My Home 직접 링크를 기존 `@o4o/auth-react` MyHomeButton으로 교체했다. 기존 authClient와 계정·세션 상태를 전달하며 공통 인증 코드는 수정하지 않았다. handoff 발급 및 실패 표시 회귀 테스트를 추가했다.
 - SonarCloud 초기 결과: 신규 중복률 10.9%와 신뢰성 D로 quality gate 실패. 실제 main ruleset의 필수 체크는 CI Gate이다. QR·스케줄 입력 label 연결, QR 안내 배경 닫기 버튼, 초안 CSS 중복 선택자·대비와 escapeHtml 명칭을 수정했다. 나머지 서비스 간 중복·복잡성 등의 정적 분석 항목은 O4O 전체 정비의 후보이며 새 공통 모듈이나 분석 제외 설정을 만들지 않는다.
 - PR 최신 HEAD CI·리뷰 결과, main merge와 실제 Delivery는 이 시점에 진행 중이다. 운영 제공 SHA 확인 전에는 배포 완료로 판정하지 않는다.
+
+추가 CI 정합: 서버 계약 `store-service-scoped-owner-entry.spec.ts`가 종전 Navigate 문자열만 요구하여 실패했다. 기존 기능에서 추가한 location.state 보존 속성을 정적 계약에 반영했다. 실제 query·hash·state 보존은 store-web Vitest에서 별도로 통과한 조건이며 런타임 변경이나 서버 권한 완화는 없다. 리뷰 수정 후 동일 production 빌드의 기존 업무 합성 브라우저 600개도 재통과했다.
