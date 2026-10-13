@@ -6,6 +6,8 @@
 > **작성일**: 2026-10-07 · **최종 갱신**: 2026-10-07
 > **근거**: 사용자 승인 — 공통 로그인, 메인 이메일 확인, 서비스별 가입, Store 약국 전용, 사업자 증빙, 전 서비스 Demo 버튼. 구현·검증·push·PR까지 승인, merge 제외.
 
+> **2026-10-13 후속 확인**: PR #359는 main `7fb1629170`에 이미 통합됐다. 해당 head의 CI Gate SUCCESS와 [Codex 완료 기록](https://github.com/Renagang21/o4o-platform/pull/359#issuecomment-6040710246)을 재조회했다. 아래 구현/로컬 검증은 당시 범위이며 후속 운영 검증으로 다시 쓰지 않는다. 현재 잔여 작업은 [인증 잔여 검증 CHECK](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)를 따른다.
+
 ## 정책
 
 메인은 이메일 확인으로 가입을 완료한다. 연결 서비스 가입과 승인은 독립이다. Store는 약국 대상이고, 공급자와 약국은 사업자등록증 기재 정보와 사본을 제출한다. 약국은 약사 면허번호를 추가하며 면허증 사본은 요구하지 않는다. 약국 자격은 운영자가 오프라인으로 확인한다. 공통 개인 모바일 번호와 수정 가능한 커뮤니티 닉네임을 활용한다. 이미 등록한 정보는 서비스마다 재입력하지 않는다. 약국 협력사업 조건은 서비스 개설 시 운영자와 정한다. 유료화는 후속 테스트에서 결정한다.
@@ -29,7 +31,7 @@ Auth·Membership·Approval·RBAC의 정책 연결, 로그인 게이트·handoff�
 - [x] focused test·typecheck·build
 - [x] desktop·mobile browser smoke 및 실제 API 결과 확인
 - [x] path-specific commit·push·PR 생성 (#359)
-- [ ] 최신 HEAD의 required CI·자동 Codex review 결과 확인
+- [x] PR #359 head의 required CI·자동 Codex review 완료 확인(2026-10-13 재조회; 후속 인증 Phase의 gate를 대신하지 않음).
 
 ## 검증 범위
 

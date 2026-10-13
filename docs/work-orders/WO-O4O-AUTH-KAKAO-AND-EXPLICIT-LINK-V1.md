@@ -4,6 +4,8 @@
 > 근거: 사용자의 카카오 추가·명시적 계정 연결 기획과 TODO → 코드/문서 검증 → TODO 수정 → 작업 진행 지시.
 > 정책: [인증·서비스 가입](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), [Demo](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md).
 
+> **2026-10-13 현재 잔여 계획**: [인증 잔여 검증 CHECK](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)에서 V04 일반 상태 계정, V05 시행일 이후 게시, V06 사용자 실제 인증, 전수 데이터 정리와 과거 E2E 드리프트를 구분한다. Demo3 연결·48조건 운영 검증은 완료다. 아래 날짜별 OPEN/계정 출처 표현은 당시 기록이며 최신 사용자 지시와 최종 완료 절을 우선한다. 이번 후속은 사용자 지시로 **push까지만** 진행한다.
+
 ## 실행 범위
 
 계정은 `users.id`, 소셜 식별자는 `(provider, providerId)`다. 이메일 동일성으로 자동 연결·병합하지 않는다.
