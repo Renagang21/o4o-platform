@@ -53,7 +53,7 @@ AGENTS, canonical index, [공통 소비처](../baseline/O4O-SHARED-MODULE-CHANGE
 | planNextProposal 직접 local capture | 23 | 17 |
 | acceptProposal 직접 local capture / 분기 / nesting | 29 / 42 / 4 | 20 / 31 / 3 |
 | 관련 Runtime/Task/Planning/finalization 함수별 분기 합 | 473 | 470 |
-| AI 후보 files/functions/duplicate groups | 325 / 5139 / 101 | 327 / 5165 / 101 |
+| 이번 정비 AI 후보 files/functions/duplicate groups | 325 / 5139 / 101 | 327 / 5165 / 101 |
 
 Task factory 전체 394줄/자체 97줄, Planning factory 전체 347줄/자체 75줄이다. getter/전달 함수와 private interface 및 formatter로 관련 전체 코드/함수 수는 늘었다. Runtime 줄 감소를 전체 업무 복잡성 제거로 해석하지 않는다. 분기 합 3개 감소는 run claim 이후 guard 위치와 private helper 조건 배치 차이이며 업무 검증·안전 단언을 없앤 결과가 아니다. 새 중복 hash 그룹 0, 조사 범위 relative import cycle 0이다. type-only runtime 참조를 사용하며 public 재수출 경로를 보존한다. alias/reexport/dynamic import까지 전체 그래프 무순환을 증명하는 지표는 아니다.
 
@@ -79,6 +79,6 @@ capture 수는 TypeScript local symbol의 직접 값 참조 기준(앞 WO와 동
 
 ### Git·종료 경계
 
-이번 구현/회귀/문서 소유 경로는 9개다. path-specific stage·scope guard·commit 후 작업 branch만 push한다. 종료 전 main `e36bcf9318`의 운영자 UI·문서 53개 경로를 확인했다. 이번 소유 경로·API/의존성/lockfile 겹침 0개다. AI 조사 모집단에는 SemiFranchiseContentFormPage 1개가 겹치므로 clean 통합 뒤 census를 다시 확인한다. main branch 직접 변경·PR 병합·배포는 이번 요청 범위가 아니다.
+이번 구현/회귀/문서 소유 경로는 9개다. path-specific stage·scope guard·commit 후 작업 branch만 push한다. 종료 전 main `e36bcf9318`의 운영자 UI·문서 53개 경로 및 후속 `75a28d9313`의 운영자 검증 문서 2개 경로 갱신을 확인했다. 이번 소유 경로·API/의존성/lockfile 겹침 0개다. 정비 커밋 `e437b17a59` 뒤 clean 상태에서 작업 branch에 최신 main을 충돌 없이 연결했다(`b0e3f8c7b7`). `git diff --exit-code e437b17a59..HEAD -- apps/api-server package.json pnpm-lock.yaml` 차이 0으로 검증 코드·의존성의 동일성을 확인했다. 따라서 UI/문서 통합을 이유로 API 전체 회귀를 반복하지 않았다. AI 조사 모집단의 SemiFranchiseContentFormPage가 별도 작업으로 변경되어 최종 census는 **327 files / 5171 functions / 101 duplicate groups**, scoped cycle 0이다. 이번 정비 기준 5165에서 늘어난 함수 6개는 upstream UI 변경이며 새 중복 hash 그룹은 0개다. main branch 직접 변경·PR 병합·배포는 이번 요청 범위가 아니다.
 
-WORKTREE_DISPOSITION: 전용 worktree `/workspace/o4o-wt/ai-work-agent-control-lifecycle-maintenance`, branch `wo/ai-work-agent-control-lifecycle-maintenance`, base `76941a5dae` + 앞 AI push `c4323f607a`. main integration/배포/실 PC smoke 미실행. branch-only 변경 보존 때문에 KEEP이다. 최종 원격 HEAD·미커밋 0은 push 직후 확인한다.
+WORKTREE_DISPOSITION: 전용 worktree `/workspace/o4o-wt/ai-work-agent-control-lifecycle-maintenance`, branch `wo/ai-work-agent-control-lifecycle-maintenance`, base `76941a5dae` + 앞 AI push `c4323f607a`. 작업 branch의 최신 main 연결은 완료했고 main branch 반영·배포·실 PC smoke는 미실행이다. branch-only 변경 보존 때문에 KEEP이다. 최종 원격 HEAD·미커밋 0은 push 직후 확인한다.
