@@ -86,6 +86,31 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     await runDemoAccountReconcile(client,{apply:true,expectedDigest:plan.digest});
     await expect(assertFoundationDemoProvisionIdentity(client)).resolves.toBeUndefined();
   },30000);
+  it('plans and audits retirement of only the registered owner legacy role, preserving current role and links',async()=>{
+    const legacy=(await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'kpa:store_owner',true,now()) RETURNING id",[owner]))[0].id;
+    const plan=await runDemoAccountReconcile(client);
+    expect(plan.accounts.find(account=>account.type==='STORE_OWNER')!.legacyOwnerRolesToRetire).toBe(1);
+    expect((await query('SELECT is_active FROM role_assignments WHERE id=$1',[legacy]))[0].is_active).toBe(true);
+    await runDemoAccountReconcile(client,{apply:true,expectedDigest:plan.digest});
+    expect((await query('SELECT is_active FROM role_assignments WHERE id=$1',[legacy]))[0].is_active).toBe(false);
+    expect((await query('SELECT role FROM role_assignments WHERE user_id=$1 AND is_active',[owner])).map(row=>row.role)).toEqual(['neture:store_owner']);
+    expect((await query("SELECT user_id FROM organization_members WHERE organization_id=$1 AND role='owner'",[store]))[0].user_id).toBe(owner);
+    const snapshot=(await query('SELECT snapshot FROM canonical_demo_repair_snapshots'))[0].snapshot;
+    expect(snapshot.before.roles.find((row:{id:string})=>row.id===legacy).is_active).toBe(true);
+    expect(snapshot.after.roles.find((row:{id:string})=>row.id===legacy).is_active).toBe(false);
+    expect((await runDemoAccountReconcile(client)).changes).toBe(0);
+  },30000);
+  it.each(['SUPPLIER','STORE_STAFF'])('does not accept the owner legacy marker on %s',async(type)=>{
+    const id=type==='SUPPLIER'?supplier:(await query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified") VALUES($1,'Staff fixture','active',true,true) RETURNING id`,[staff.email]))[0].id;
+    await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'kpa:store_owner',true,now())",[id]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('PROTECTED_OR_FOREIGN_ROLE');
+    expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
+  });
+  it('still refuses a privileged role on the registered owner alongside its legacy marker',async()=>{
+    for(const role of ['kpa:store_owner','neture:operator']) await query('INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,$2,true,now())',[owner,role]);
+    await expect(runDemoAccountReconcile(client)).rejects.toThrow('PROTECTED_OR_FOREIGN_ROLE');
+    expect((await query('SELECT is_active FROM role_assignments WHERE user_id=$1 AND role=$2',[owner,'kpa:store_owner']))[0].is_active).toBe(true);
+  });
   it.each([
     ['STORE_OWNER','valid_from',"now()+interval '1 day'"],
     ['SUPPLIER','valid_until',"now()-interval '1 day'"],
@@ -215,12 +240,14 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
     await expect(runDemoAccountReconcile(client)).rejects.toThrow('PROVIDER_IDENTITY_REQUIRES_REVIEW');
   });
   it('post-write failure rolls back emails, credentials, registry and staff relationships together',async()=>{
+    await query("INSERT INTO role_assignments(user_id,role,is_active,valid_from) VALUES($1,'kpa:store_owner',true,now())",[owner]);
     const planned=await runDemoAccountReconcile(client);
     const broken={query:async(sql:string,params?:unknown[])=>{if(sql.startsWith('UPDATE canonical_demo_repair_snapshots'))throw Error('FORCED_FAILURE');return query(sql,params);}};
     await expect(runDemoAccountReconcile(broken,{apply:true,expectedDigest:planned.digest})).rejects.toThrow('FORCED_FAILURE');
     expect(Number((await query('SELECT count(*) AS n FROM users'))[0].n)).toBe(2);
     expect((await query('SELECT email FROM users WHERE id=$1',[owner]))[0].email).toBe('teststoreowner@example.com');
     expect(await passwordCredentialService.verifyPassword(owner,'old-fixture-password',client)).toBe(true);
+    expect((await query('SELECT is_active FROM role_assignments WHERE user_id=$1 AND role=$2',[owner,'kpa:store_owner']))[0].is_active).toBe(true);
     expect(Number((await query('SELECT count(*) AS n FROM demo_accounts'))[0].n)).toBe(2);
     expect(Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n)).toBe(0);
   },30000);

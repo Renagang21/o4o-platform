@@ -274,6 +274,7 @@ PAUSED   apps/api-server/src/scripts/demo-account-provision.ts
 ACTIVE   apps/api-server/src/scripts/demo-account-reconcile.ts
          기존 경영자/공급자 UUID 유지·고정 credential 정정·직원 registry/관계 + kpa:store_member
          기본 read-only plan·정확한 before-image digest·일괄 transaction·변경 세션 폐기
+         등록된 경영자 Demo의 기존 kpa:store_owner만 before-image에 계획하고 비활성화; 삭제·신규 부여 없음
          foundation provision도 registry 주소 불일치 시 쓰기 전 중단; 계정/credential/registry/관계는 같은 transaction
 계약     src/scripts/__tests__/demo-account-provision.contract.test.ts ⑦
          allowlist 값 · 실제 부여 role · 금지 prefix · 선행 거절 · INSERT guard 순서를 고정
