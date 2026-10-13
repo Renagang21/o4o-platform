@@ -1,7 +1,7 @@
 # AI 누적 통합·배포 검증
 
 > **상태**: ACTIVE
-> **작성일 / 최종 갱신**: 2026-10-13 (Asia/Seoul)
+> **작성일 / 최종 갱신**: 2026-10-14 (Asia/Seoul)
 > **실행 WO**: [AI 누적 정비 main 통합·배포](../work-orders/WO-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)
 
 ## Shared Module Change Verification
@@ -47,3 +47,12 @@ Jest 고유 44 suites / 742 tests, UI 82 tests PASS. isolated PostgreSQL 15의 1
 PR #549 초기 CI에서 발견된 raw-source owner 누락·test literal lint 오류를 실제 owner 목록/불필요 escape 제거로 수정했다. root lint baseline 46/46 PASS이며 rule·baseline 조정 없음. 재현 shard의 실제 실패는 legacy App 은퇴 guard 1건으로 확인했고 해당 guard 및 selected-organization focused 40 tests PASS.
 
 Codex P1 rollback 보완은 pending quota migration에 한정한다. transaction/exclusive lock·고유 private recovery schema에서 예약/영수증 및 비용 정밀 원본 보존·이전 canonical fingerprint 복구·재적용·두 번째 archive 보존·overflow 전체 rollback을 실제 PG에서 검증했다. quota/schema 총 18 tests PASS, API build·변경 lint PASS. 정상 up의 SQL·최종 fingerprint·manifest는 변경하지 않았다. 운영 rollback/archive repair는 배포에 포함하지 않으며 별도 승인 경계다. 상세 근거·초기 실패/재검증은 WO 참조.
+
+
+## 최신 main·보조 분석 경계
+
+보완 head `7ccce4dda7`의 [필수 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38473146669)는 SUCCESS이며 required CI Gate PASS. Codex P1은 수정/PG 검증 뒤 resolve하여 미해결 thread 0. main에 새로 반영된 store quality 14파일은 AI/API/package 변경이 없는 것을 확인하고 conflict 없이 합쳤다. 관련 store async/operation/editor 25 tests PASS; 기존 서비스의 완료 기록/구현을 보존한다.
+
+Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required check는 CI Gate지만 보조 결과를 PASS로 바꾸어 보고하지 않는다. 공개 GitHub annotations 50개 중 failure 5개는 기존/분리된 함수의 cognitive complexity 지적이며 validator·저장/권한 계약을 변경하는 근거로 쓰지 않았다. 제한된 annotations에는 Security B 원인 상세가 없어 미확인이다. 상세 Sonar API와 Actions 로그 host는 현재 proxy 403이므로 network 경계 우회 없이 환경 초안에 `sonarcloud.io`·`results-receiver.actions.githubusercontent.com`만 추가 저장했다. 적용은 환경 설정 검토/저장·Publish가 필요하며 secret/운영 auth/CI 설정은 변경하지 않았다. 상세 분석이 제공되면 실제 보안 finding을 구분해 후속 조치한다.
+
+추가 main `c6b68da4e7`은 auth WO/e2e 4파일이며 API/package/runtime·migration 변경 없음. source delta를 확인하고 합쳤다. 최신 source 기반의 PR gate를 다시 확인한다.
