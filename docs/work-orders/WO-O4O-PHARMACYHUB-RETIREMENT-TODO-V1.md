@@ -327,10 +327,18 @@ FK catalog의 name[]를 pg client가 문자열로 읽는 문제를 text[] 집계
 별도 유지보수 실행은 기존 production workflow의 standalone owner/main/CI/freeze/idle gate를 사용한다. runner는 SQL에 연결하지 않고, 현재 API serving image digest의 일회성 Cloud Run job에 검토된 코드와 기존 socket/Secret Manager binding을 지정한다. plan은 READ ONLY transaction, apply는 SERIALIZABLE transaction·task/retry 1/0이다. 성공한 job은 제거하고, 실패/확인 불가 실행은 보존하여 read-only census 재확인 전 재실행하지 않는다. 분리된 PostgreSQL 16에서 PH 행 제거·Neture/사용자/조직/스키마 보존, cross-schema FK·혼합 귀속·건수 drift·삭제 trigger의 rollback을 확인했다. 이 기록은 production 삭제 완료가 아니다. PC Local Agent 업데이트는 담당 에이전트 범위다.
 
 - [x] PR #518 병합 및 읽을 수 있는 실제 census 결과 확보.
-- [ ] PH administrative data plan/apply 및 운영 잔여 검증.
+- [x] PH administrative data plan/apply 및 운영 잔여 검증.
 - [ ] 주문·결제·공급·콘텐츠·미디어의 비-FK/파일 참조 조사와 후속 삭제.
 - [ ] 인증서 목록 권한 보완 후 PH 인증서/map entry/DNS authorization/URL map 종료.
 
 PR #522 리뷰 보완: PH `roles.service_key`와 `roles.name`의 귀속 불일치를 양방향으로 차단한다. apply 전에는 관리자 측 원래 WIF 조건 백업과 해당 main SHA/PH workflow/owner에만 한정된 임시 조건이 필요하다. 코드가 provider의 실제 조건을 정확히 대조하며 다른 workflow/SHA·OR 우회를 허용하지 않는다. 기존 토큰을 가진 실행도 없는 단독 운영 구간을 확인하고, 동일 PH workflow의 concurrency와 함께 다른 운영 writer의 신규 인증을 작업 종료까지 차단한다. `iam.workloadIdentityPoolProviders.get` 읽기 권한이 필요하다. 작업·잔여 검증 뒤 원래 조건을 복구한다. 이 세션에서 기존 PC Local Agent를 변경하지 않는다.
 
 PR #522는 SonarCloud 정렬/복잡도 지적 수정, 관련 56 tests와 PostgreSQL 실검증, 필수 CI·리뷰 해결 후 main `e46f3467892e01f142af8bf58025ac33cd8e6eb7`에 병합했다. post-merge CI 38318999460도 SUCCESS다. 최초 Cloud Run plan 38320131242는 인증 전 safety test에서 중단됐다. 기존 resource-gate 테스트가 실제 workflow의 새 `PH_ADMIN_PURGE=true`를 상속하는 fixture 격리 문제다. DB 접속·job 생성·삭제는 실행하지 않았다. 테스트 환경을 명시적으로 격리하고 PH 입력과 resource retirement의 혼합 거절을 검사한다. 최신 census 38319576225도 인증서 권한 부족 complete=false이며 실제 자원 부재를 증명하지 않는다.
+
+### 2026-10-13 관리 데이터 삭제 및 인증 복구
+
+동일 WO의 연속 단계로 전용 worktree/branch를 유지했다. PR #523의 fixture 격리 수정 후 read-only Cloud Run plan [38322339531](https://github.com/Renagang21/o4o-platform/actions/runs/38322339531)은 SUCCESS였으며 쓰기는 없었다. 관리자가 읽기 권한을 추가한 뒤 census [38324906191](https://github.com/Renagang21/o4o-platform/actions/runs/38324906191)은 인증서 조사 complete=true, blockers 0을 확인했다. PH 전용 `cm-cert-pharmacyhub`, 공유 `o4o-main-cert-map` 안의 PH root/www entry 2개, PH DNS authorization 2개가 남아 있다. 공유 map/proxy/LB는 삭제 대상이 아니다.
+
+필수 CI가 통과한 main `e999db2b9e9460bc5ce9791d64dde35f8f09d081`에서 관리자가 원래 WIF 조건을 로컬 백업하고 정확한 SHA/PH workflow로 임시 제한했다. 실행·대기 중인 다른 Actions가 없음을 확인한 뒤 apply [38334494970](https://github.com/Renagang21/o4o-platform/actions/runs/38334494970)이 SUCCESS, `executionSucceeded=true`, `applied=true`로 종료했다. PH 서비스 등록·회원·역할·정책·로그 10개 테이블의 승인된 행 56건을 삭제했다. 성공한 일회성 Cloud Run job도 제거됐다. 후속 read-only census [38334641874](https://github.com/Renagang21/o4o-platform/actions/runs/38334641874)은 SUCCESS, failed=false, 해당 관리 scope의 잔여 nonzero 항목 0을 확인했다. 관리자는 이후 백업된 원래 조건 복구 및 재조회 검증 결과 `WIF_RESTORED`를 전달했다.
+
+잔여 데이터는 주문 6건·결제 6건, PH-only 공급 제안 19건과 승인 18건·가격 1건, 콘텐츠 3건·게시판 요청 1건·미디어 4건이다. 결제 sourceService/metadata 집계는 같은 행이므로 더하지 않는다. 이 후속 범위와 인증서·URL map은 아직 삭제하지 않았다. 사용자/조직/공유 상품·공급자 master와 migration 이력, PC Local Agent는 이번 실행의 삭제 대상이 아니다.
