@@ -1,6 +1,6 @@
 # TODO-O4O-AUTH-CODE-MAINTENANCE-V1
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED (승인된 구현·검증·branch push 범위)
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거 WO/IR**: [인증 리팩터링 WO](WO-O4O-AUTH-REFACTOR-V1.md), 사용자 코드 복잡성 조사 후 정비 지시
 > **종료 범위**: TODO 작성 → 코드/문서로 보완 → 구현·검증·branch push. main 통합·배포 없음.
@@ -8,7 +8,7 @@
 ## 범위와 불변식
 
 같은 미완료 인증 WO의 연속 Phase로 준비된 격리 checkout/`wo/auth-kakao-explicit-link`를 유지한다.
-조사 후 최신 main의 타 트랙 변경과 충돌 여부를 확인해 반영한다. PR #531의 기록-only 범위를 이번 구현으로 갱신한다.
+조사 후 main의 타 트랙 변경과 충돌 여부를 확인해 반영했다. PR #531의 기록-only 범위를 이번 구현으로 갱신했다.
 현행 [인증·가입 정본](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)과 shared module의 전 소비처 검증을 따른다.
 전체관리자 Google/cookie, 사용자 이메일·Google·카카오/localStorage, 계정/서비스 가입/역할/약관 분리,
 provider ID 식별·자동 이메일 병합 금지, 브라우저 logout·비밀번호 보안 세대·일회용 handoff 경계를 유지한다.
@@ -40,7 +40,7 @@ provider ID 식별·자동 이메일 병합 금지, 브라우저 logout·비밀�
 - [x] M07 이메일 복구와 Handoff 서버 내부 책임 분리·보안 회귀.
 - [x] M08 현행 주석/기록 정합·호환 코드 판정.
 - [x] API·공통 packages·사용자5웹 app·전체관리자 영향 검증, PC/mobile 합성 browser smoke.
-- [ ] 최신 diff·민감정보·stage 범위·CI/review 확인, 이번 변경 commit·push.
+- [x] 최신 diff·민감정보·stage 범위·CI/review 확인, 이번 변경 commit·push.
 
 ## 검증 및 완료 판정
 
@@ -79,8 +79,10 @@ provider ID 식별·자동 이메일 병합 금지, 브라우저 logout·비밀�
 - 추출 중 중복 import/미사용 type 및 lazy getter의 lint 오류를 정정했다.
 - 기존 정적 검사가 facade 내부 문자열만 검사해 실패한 경우 실제 분리 모듈과 위임 연결을 함께 검사하도록 갱신했다. 쿠키·Demo·약관·은퇴 경로의 거절 assertion은 유지했다.
 - 관리자 Vitest를 repository root에서 실행한 첫 시도는 setup 경로 오류로 테스트0이었다. 앱 작업 디렉터리에서 재실행해385건을 확인했다.
-- PG 초기 기동의 socket/role 전제와 최소 fixture의 schema 누락을 진단했다. 이번 검증용 새 cluster·계정/원장을 만들고 관련 실제 migration9개 및 필요한 fixture metadata를 준비해73건을 실행했다. 기존 데이터 cluster는 변경하지 않았으며 이번에 시작한 process는 종료한다.
+- PG 초기 기동의 socket/role 전제와 최소 fixture의 schema 누락을 진단했다. 이번 검증용 새 cluster·계정/원장을 만들고 관련 실제 migration9개 및 필요한 fixture metadata를 준비해73건을 실행했다. 기존 데이터 cluster는 변경하지 않았으며 이번에 시작한 process는 종료했다.
 - 브라우저 첫 fixture에서 community 응답 배열과 분회 Docker의 `/kpa/` asset alias가 누락됐다. fixture를 실제 소비 형식에 맞춰 보완하고40조건을 재실행했다. 제품의 해당 기능을 임의 변경하지 않았다.
 
-변경 경로별 stage/commit, branch push와 최종 required CI/review는 PR #531의 최신 HEAD에서 확인한다. 기존 기록-only PR 설명을 이번 인증 코드 정비 범위로 갱신하며 auto-merge는 사용하지 않는다.
+구현 commit `8b34a58717`을 `wo/auth-kakao-explicit-link`에 push했다. 해당 HEAD의 `CI Gate`, API Jest3 shards, 웹·전체관리자 build, Code Quality, SonarCloud와 보안 정적 검사가 PASS이며 Codex 자동 리뷰가 완료됐고 미해결 thread는0이다. [PR #531](https://github.com/Renagang21/o4o-platform/pull/531)은 open이며 auto-merge를 사용하지 않는다. 이 완료 기록의 후속 문서 commit도 같은 branch로 push하며 최종 HEAD의 CI/review 상태는 PR에서 확인한다.
+
+WORKTREE_DISPOSITION: `/workspace/o4o-platform` · `wo/auth-kakao-explicit-link`는 KEEP이다. 승인 범위가 push까지이므로 main 통합·배포 전 branch와 검증 기록을 보존한다. 이 TODO의 완료는 인증 전체 잔여 운영 작업이나 향후 배포의 완료를 뜻하지 않는다.
 DEPLOYMENT=REQUIRED_AFTER_MERGE이며 이번 실행은 push-only다. 실제 운영 반영·OAuth·일반 상태 계정·시행일 정책 적용을 완료로 표시하지 않는다.
