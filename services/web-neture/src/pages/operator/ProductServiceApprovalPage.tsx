@@ -23,6 +23,7 @@ import {
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { useAuth } from '../../contexts/AuthContext';
+import { buildServiceApprovalListParams, getSelectedPendingServiceApprovalIds } from './productServiceApprovalModel';
 
 // ==================== Constants ====================
 
@@ -163,24 +164,11 @@ export default function ProductServiceApprovalPage() {
     setLoading(true);
     setPermissionError(null);
     try {
-      const scoreParams: { minScore?: number; maxScore?: number } =
-        scoreRange === 'low' ? { minScore: 0, maxScore: 59 }
-        : scoreRange === 'mid' ? { minScore: 60, maxScore: 79 }
-        : scoreRange === 'high' ? { minScore: 80 }
-        : {};
       const [listResult, statsResult] = await Promise.all([
-        operatorServiceApprovalApi.list({
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          serviceKey: serviceFilter || undefined,
-          search: searchQuery || undefined,
-          dateFrom: dateFrom || undefined,
-          dateTo: dateTo || undefined,
-          page,
-          limit: 30,
-          ...scoreParams,
-          hasIssues: filterHasIssues ? 'true' : undefined,
-          priority: priorityFilter || undefined,
-        }),
+        operatorServiceApprovalApi.list(buildServiceApprovalListParams({
+          statusFilter, serviceFilter, searchQuery, dateFrom, dateTo,
+          scoreRange, filterHasIssues, priorityFilter,
+        }, page)),
         operatorServiceApprovalApi.stats(),
       ]);
       setItems(listResult.data);
@@ -241,9 +229,7 @@ export default function ProductServiceApprovalPage() {
   };
 
   // Only pending items can be batch-acted on
-  const selectedPendingIds = [...selectedIds].filter(
-    (id) => items.find((i) => i.id === id)?.approvalStatus === 'pending',
-  );
+  const selectedPendingIds = getSelectedPendingServiceApprovalIds(items, selectedIds);
 
   // ==================== Actions ====================
 
