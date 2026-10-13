@@ -121,8 +121,20 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       assert.equal(jobReferences.counts['mediaJobPurpose:INPUT'],'1');
       assert.equal(jobReferences.counts.mediaJobOtherAssets,'1');
       assert.equal(jobReferences.counts.mediaJobTempOutputs,'1');
-      await client.query('DELETE FROM media_entity_links WHERE id=$1',[uuid(822)]);
+      await client.query("UPDATE media_entity_links SET purpose='OUTPUT' WHERE id=$1",[uuid(820)]);
+      await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/LINK_CENSUS_CHANGED/);await client.query('ROLLBACK');
       await client.query('DELETE FROM automation_jobs');
+      await begin();
+      assert.equal((await new PharmacyHubMediaPurge({storage}).up(q,true)).links,1);
+      await client.query('ROLLBACK');
+      assert.equal(removed.length,0);
+      // Mirror production: one orphan PH OUTPUT and another service's link to the same absent job.
+      await begin();await new PharmacyHubMediaPurge({storage}).up(q);await client.query('ROLLBACK');
+      assert.equal(removed.length,4);
+      assert.equal((await client.query('SELECT count(*)::text AS count FROM media_entity_links WHERE id=$1',[uuid(822)])).rows[0].count,'1');
+      assert.equal((await client.query('SELECT count(*)::text AS count FROM media_assets')).rows[0].count,'5');
+      missing.clear();removed.length=0;
+      await client.query('DELETE FROM media_entity_links WHERE id=$1',[uuid(822)]);
       await client.query('CREATE TABLE product_masters(id uuid PRIMARY KEY,name text)');
       await client.query('INSERT INTO product_masters VALUES($1,$2)',[uuid(300),'shared product']);
       await client.query("UPDATE media_entity_links SET entity_type='product',entity_id=$1",[uuid(300)]);
