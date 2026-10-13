@@ -1,6 +1,6 @@
 # 운영자 정비 8개 트랙 main 통합·배포
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13
 > **근거 WO/IR**: 사용자 요청 — Main merge 및 배포까지 진행
 
@@ -29,11 +29,20 @@
 - [x] 공통 모듈 소비처 재확인: 회원 상세는 Neture/약사회 본회/전체 관리자, 회원 목록은 Neture/약사회 본회; 분회 소비 없음
 - [x] 전체 frontend 타입 검사, 변경 소스 lint, 관련 테스트·4개 앱 build
 - [x] 브라우저 통합 회귀 검증 및 CHECK 확정
-- [ ] PR CI·Codex blocker·현재 main gate 확인 후 정상 merge
-- [ ] 현재 Delivery 정책에 따라 `admin,neture,kpa-society,lecture` 배포 및 serving 검증
+- [x] PR CI·Codex blocker·현재 main gate 확인 후 정상 merge
+- [x] 현재 Delivery 정책에 따라 API 선행 후 `admin,neture,kpa-society,lecture` 배포 및 serving 검증
 
 ## 배포 경계
 
 main 직접 push·admin bypass·force push를 사용하지 않는다. CI Gate 통과가 선행 조건이다.
 LEVEL 3이면 target main SHA를 고정한 Promote를 사용한다. API와 migration 변경은 이번 diff에 없다.
 실계정 지정·재로그인·접근 검증은 사용자 담당이다. 합성 fixture 검증은 실계정 검증을 대신하지 않는다.
+
+## 완료
+
+- [PR #538](https://github.com/Renagang21/o4o-platform/pull/538) 정상 merge, main `e36bcf9318f2c52daee25bc6ffb637def93569d5`. 8개 source commit 모두 main ancestor 확인.
+- [main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38386448085) 및 CI Gate PASS. Codex 지적·미해결 thread 0.
+- [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/38387560873) SUCCESS, API·admin·neture·kpa-society·lecture verified rollout 및 최종 serving SHA 확인 PASS.
+- 기존 main의 API 변경에 프런트가 의존하여 API를 선행 배포했다. 마지막 API 배포 `88d45b820` 이후 database/bootstrap/migration/실행기 변경 0; 새 migration 추가 0. 기존 배포 절차의 migration 단계 PASS.
+- 약사회 분회 소스 변경·배포 0. 비선택 서비스 때문에 전체 `production` status는 `NOT_SELECTED/pending`이며 이번 선택한 5개 서비스 배포 실패를 뜻하지 않는다.
+- 실계정 검증은 사용자 담당. 이전 미커밋 문서와 작업공간을 보존한다.
