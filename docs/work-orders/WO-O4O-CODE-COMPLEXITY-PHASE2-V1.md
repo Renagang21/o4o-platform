@@ -341,7 +341,7 @@ Core/API·상태 정책·권한·운영 DB·분회 전용 개발·main 병합·�
 - [x] D03: 검증된 recovery 판정 책임 및 개별 저장 panel 상태 책임 추출.
 - [x] D04: 실제 React hook 상태 전이·runtime recovery 행동 회귀·빌드/lint 검증.
 - [x] D05: 상태 소유 목록·비동기 경쟁 상태·후속 수정안 기록.
-- [ ] D06: commit·push 후 원격 commit 확인. PR 생성/main 병합/배포 없음.
+- [x] D06: commit·push 후 원격 commit 확인. PR 생성/main 병합/배포 없음.
 
 
 ### 11.1 상태 소유 조사·TODO 검증 (구현 전)
@@ -392,10 +392,10 @@ content-editor/API type/build·공개 타입 동일성·Store 경계와 lint를 
 | runtime 본체 길이 / 분기 요소 | 1,469 / 216 | 1,463 / 216 |
 | AiContentModal 컴포넌트 길이 / 분기 요소 | 1,527 / 124 | 1,495 / 124 |
 | 추출 recovery 결정 함수 길이 / 분기 요소 | — | 25 / 9 |
-| runtime/모달 및 이번·기존 추출 파일 전체 길이 / 분기 요소 | 4,155 / 1,059 | 4,267 / 1,062 |
+| runtime/모달 및 이번·기존 추출 파일 전체 길이 / 분기 요소 | 4,155 / 1,059 | 4,266 / 1,062 |
 
 §6의 AST 비교 지표다. helper 포함 전체 분기 요소는 discriminated decision/옵션 처리로 3개 늘었고
-타입·상태 반환·open/reset 경계로 전체 줄 수는 112줄 늘었다. 큰 실행/렌더 분기(216/124)를 줄였다고
+타입·상태 반환·open/reset 경계로 전체 줄 수는 111줄 늘었다. 큰 실행/렌더 분기(216/124)를 줄였다고
 보고하지 않는다. 효과는 상태 소유와 recovery 판정의 변경·검증 지점을 격리한 것이다.
 
 검증:
@@ -442,3 +442,13 @@ content-editor/API type/build·공개 타입 동일성·Store 경계와 lint를 
 다음 첫 구현 후보는 D-N01의 오래된 **생성 응답 UI 반영 차단**이다.
 모달 내부의 요청 식별·결과 반영만 다루고 생성/저장 API·권한·Core/운영 DB는 바꾸지 않는 범위로
 구체 TODO와 실패/재열기/연속 요청 검증을 먼저 준비한다.
+
+
+### 11.4 push 종료
+
+구현 commit `d689c196541071b0862a6fa4ad53e3d768747857`을
+`wo/code-complexity-phase2`에 push했고 git ls-remote 원격 일치를 확인했다.
+새 hook 파일의 EOF 빈 줄을 최종 staged diff-check에서 발견해 후속 commit으로 정리했으며
+이 종료 기록과 함께 push한다. 동작 변경 없음. 최종 diff-check를 통과한 상태로 종료한다.
+main 기준은 `aa59a0962f` 유지. 이번 묶음 D01~D06 완료, D-N01~D-N04는 미완료다.
+PR 생성·main 병합·배포·운영 DB 변경 및 CI/리뷰 integration-ready 판정 없음.

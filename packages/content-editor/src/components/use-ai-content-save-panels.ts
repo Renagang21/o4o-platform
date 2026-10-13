@@ -114,4 +114,3 @@ export function useProductionMaterialSavePanelState() {
     reset: resetProductionMaterialSavePanel,
   };
 }
-
