@@ -1,4 +1,4 @@
-/** Presentation only: requests, ownership headers, state and completion callbacks remain in AiContentModal. */
+/** Presentation only: requests, ownership headers, state and completion callbacks belong to the modal's internal saving controllers. */
 interface CommunitySavePanelProps {
   communityTitle: string;
   setCommunityTitle: (value: string) => void;
