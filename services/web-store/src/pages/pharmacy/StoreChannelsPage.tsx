@@ -1,5 +1,7 @@
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { fetchAvailableProducts } from '../../api/channelProducts';
 import { ChannelPublicUrlCard } from './channels/ChannelPublicUrlCard';
-import { loadChannelWorkspace } from './hooks/storeWorkspaceLoaders';
+import { useChannelWorkspace } from './hooks/useChannelWorkspace';
 /**
  * StoreChannelsPage — 채널 중심 진열 실행 콘솔
  *
@@ -55,7 +57,6 @@ import {
 } from 'lucide-react';
 import {
   // WO-O4O-STORE-SLUG-EDITABLE-V1
-  type ChannelOverview,
   type ChannelType,
   type ChannelStatus,
 } from '../../api/storeHub';
@@ -66,14 +67,11 @@ import {
   type ChannelMap,
 } from '../../api/assetSnapshot';
 import {
-  fetchChannelProducts,
-  fetchAvailableProducts,
   addProductToChannel,
   deactivateChannelProduct,
   activateChannelProduct,
   bulkChannelProductAction,
   reorderChannelProducts,
-  type ChannelProduct,
   type AvailableProduct,
 } from '../../api/channelProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
@@ -274,6 +272,7 @@ function AddProductModal({
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreChannelsPage({ section }: { section?: 'settings' | 'products' } = {}) {
+  const { organizationId } = useStoreOrganizationId();
   const navigate = useNavigate();
   // WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1:
   //   section 지정(온라인 판매 모드) 시 B2C(온라인 스토어) 전용 — 탭 바/KIOSK 미노출.
@@ -287,10 +286,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const showSettings = section !== 'products'; // settings 또는 legacy
   const showProducts = section !== 'settings'; // products 또는 legacy
   const [activeTab, setActiveTab] = useState<ChannelType>('B2C');
-  const [channels, setChannels] = useState<ChannelOverview[]>([]);
-  const [assets, setAssets] = useState<StoreAssetItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
@@ -320,13 +315,9 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   }, []);
 
   // Product management state (WO-CHANNEL-EXECUTION-CONSOLE-V1)
-  const [channelProducts, setChannelProducts] = useState<ChannelProduct[]>([]);
-  const [availableProducts, setAvailableProducts] = useState<AvailableProduct[]>([]);
-  const [productLoading, setProductLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   // deactivatingId removed — replaced by actionLoading + confirmModal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1)
   const [reordering, setReordering] = useState(false);
-  const [orgCode, setOrgCode] = useState<string | null>(null);
 
   // WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -338,33 +329,36 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
-  // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change capability flag
-  const [canChangeSlug, setCanChangeSlug] = useState(false);
-
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
   const showToast = useCallback((type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
   }, []);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true); setLoadError(null);
-    try {
-      const { overview, assets: loadedAssets, slug } = await loadChannelWorkspace(showSettings);
-      setChannels(overview.channels); setOrgCode(overview.organizationCode);
-      if (loadedAssets) setAssets(loadedAssets);
-      if (slug) setCanChangeSlug(slug.canChange);
-      setLastFetched(new Date());
-    } catch {
-      setLoadError('채널 정보를 불러오지 못했습니다. 다시 시도해 주세요.');
-      showToast('error', '채널 정보를 불러오지 못했습니다.');
-    } finally { setLoading(false); }
-  }, [showToast, showSettings]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const {
+    channels,
+    setChannels,
+    assets,
+    setAssets,
+    loading,
+    loadError,
+    channelProducts,
+    setChannelProducts,
+    availableProducts,
+    setAvailableProducts,
+    productLoading,
+    productError,
+    orgCode,
+    setOrgCode,
+    canChangeSlug,
+    setCanChangeSlug,
+    lastFetched,
+    fetchData,
+    loadChannelProducts,
+    cancelChannelProducts,
+  } = useChannelWorkspace(showSettings, showToast, organizationId);
 
   // Current channel info
   const currentChannel = channels.find(ch => ch.channelType === activeTab);
@@ -373,25 +367,9 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const isProductChannel = PRODUCT_CHANNEL_TYPES.includes(activeTab);
 
   // Fetch channel products when tab changes
-  const loadChannelProducts = useCallback(async (channelId: string) => {
-    setProductLoading(true);
-    try {
-      const [products, available] = await Promise.all([
-        fetchChannelProducts(channelId),
-        fetchAvailableProducts(channelId),
-      ]);
-      setChannelProducts(products);
-      setAvailableProducts(available);
-    } catch {
-      setChannelProducts([]);
-      setAvailableProducts([]);
-      showToast('error', '제품 목록을 불러오지 못했습니다.');
-    } finally {
-      setProductLoading(false);
-    }
-  }, [showToast]);
-
   useEffect(() => {
+    cancelChannelProducts();
+    setChannelProducts([]); setAvailableProducts([]);
     setSelectedIds(new Set());
     setActionMenuId(null);
     if (isProductChannel && currentChannel?.id) {
@@ -400,7 +378,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       setChannelProducts([]);
       setAvailableProducts([]);
     }
-  }, [isProductChannel, currentChannel?.id, loadChannelProducts]);
+  }, [isProductChannel, currentChannel?.id, organizationId, loadChannelProducts, cancelChannelProducts, setChannelProducts, setAvailableProducts]);
 
   // Active products for display
   const activeProducts = useMemo(
@@ -622,6 +600,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {productError && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{productError}<button type="button" className="ml-3 underline" onClick={() => currentChannel && loadChannelProducts(currentChannel.id)}>다시 시도</button></div>}
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -773,7 +752,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
 
       {/* ─── 상태 기반 행동 유도 (WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1) ─── */}
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 시 행동 유도 숨김 */}
-      {showProducts && isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
+      {showProducts && !productError && isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
         if (channelProducts.length > 0) {
           return (
             <div className="flex items-start gap-4 p-5 mb-6 rounded-xl border border-green-200 bg-green-50">
@@ -869,7 +848,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       )}
 
       {/* ─── [D] Channel Product List (products 전용) ─── */}
-      {showProducts && isProductChannel && (
+      {showProducts && !productError && isProductChannel && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-700">진열 제품</h2>

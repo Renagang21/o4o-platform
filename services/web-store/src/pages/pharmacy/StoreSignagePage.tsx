@@ -1,3 +1,5 @@
+import { useSignagePlaylists } from './hooks/useSignagePlaylists';
+import { useSignageSchedules } from './hooks/useSignageSchedules';
 /**
  * StoreSignagePage — 사이니지 운영 엔진
  *
@@ -64,16 +66,7 @@ import {
   Search,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
-import {
-  fetchSchedules,
-  createSchedule,
-  updateSchedule,
-  deleteSchedule,
-  fetchSignagePlaylists,
-  type SignageScheduleItem,
-  type SignagePlaylistOption,
-  type CreateSchedulePayload,
-} from '../../api/signageSchedule';
+import type { SignageScheduleItem } from '../../api/signageSchedule';
 import {
   assetSnapshotApi,
   storeAssetControlApi,
@@ -81,19 +74,7 @@ import {
   type AssetPublishStatus,
   type ChannelMap,
 } from '../../api/assetSnapshot';
-import {
-  fetchStorePlaylists,
-  updateStorePlaylist,
-  deleteStorePlaylist,
-  fetchPlaylistItems,
-  addPlaylistItem,
-  addPlaylistItemFromLibrary,
-  addPlaylistItemFromSignage,
-  deletePlaylistItem,
-  reorderPlaylistItems,
-  type StorePlaylist,
-  type StorePlaylistItem,
-} from '../../api/storePlaylist';
+import type { StorePlaylist } from '../../api/storePlaylist';
 import {
   fetchSignageMedia,
   createSignageMedia,
@@ -102,7 +83,6 @@ import {
   type SignageMediaItem,
 } from '../../api/signageMedia';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
-import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 
 /* ─── Constants ──────────────────────────────── */
@@ -165,7 +145,6 @@ interface UnifiedVideoItem {
 
 type ActiveTab = 'assets' | 'playlist' | 'schedules';
 
-
 /* ─── Main Component ─────────────────────────── */
 
 async function loadSignageAssets(): Promise<StoreAssetItem[]> {
@@ -200,27 +179,41 @@ export function StoreSignagePage() {
     navigate(withWorkspaceMode(target, tab === 'schedules' ? 'use' : 'studio'), { replace: true });
   };
 
-  // ── Schedule state ──
-  const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
-  const [scheduleLoading, setScheduleLoading] = useState(false);
-  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1: 스케줄 조회 실패 표시용
-  const [scheduleError, setScheduleError] = useState<string | null>(null);
-  const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistOption[]>([]);
-  const [showScheduleForm, setShowScheduleForm] = useState(false);
-  const [editingSchedule, setEditingSchedule] = useState<SignageScheduleItem | null>(null);
-
-  // Schedule form state
-  const [schName, setSchName] = useState('');
-  const [schPlaylistId, setSchPlaylistId] = useState('');
-  const [schDays, setSchDays] = useState<number[]>([1, 2, 3, 4, 5]); // Mon-Fri default
-  const [schStartTime, setSchStartTime] = useState('09:00');
-  const [schEndTime, setSchEndTime] = useState('18:00');
-  const [schValidFrom, setSchValidFrom] = useState('');
-  const [schValidUntil, setSchValidUntil] = useState('');
-  const [schPriority, setSchPriority] = useState(0);
-  const [schIsActive, setSchIsActive] = useState(true);
-  const [schSaving, setSchSaving] = useState(false);
-  const [schSaveError, setSchSaveError] = useState<string | null>(null);
+  const {
+    loadSchedules,
+    loadSignagePlaylists,
+    schedules,
+    scheduleLoading,
+    scheduleError,
+    signagePlaylists,
+    showScheduleForm,
+    editingSchedule,
+    schName,
+    schPlaylistId,
+    schDays,
+    schStartTime,
+    schEndTime,
+    schValidFrom,
+    schValidUntil,
+    schPriority,
+    schIsActive,
+    schSaving,
+    schSaveError,
+    setShowScheduleForm,
+    setSchName,
+    setSchPlaylistId,
+    setSchPriority,
+    setSchStartTime,
+    setSchEndTime,
+    setSchValidFrom,
+    setSchValidUntil,
+    setSchIsActive,
+    resetScheduleForm,
+    openEditSchedule,
+    handleSaveSchedule,
+    handleDeleteSchedule,
+    toggleSchDay,
+  } = useSignageSchedules(organizationId);
 
   // ── Legacy asset state ──
   const { data: items, setData: setItems, loading, error: listError, reload: reloadItems } = useStoreResource(loadSignageAssets, []);
@@ -234,22 +227,36 @@ export function StoreSignagePage() {
   const [page, setPage] = useState(1);
   const [assetKeyword, setAssetKeyword] = useState('');
 
-  // ── Playlist state ──
-  const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
-  const [playlistLoading, setPlaylistLoading] = useState(true);
-  const [playlistError, setPlaylistError] = useState<string | null>(null);
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
-  const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
-  const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
-  const [playlistKeyword, setPlaylistKeyword] = useState('');
-  const [selectedPlaylistKeys, setSelectedPlaylistKeys] = useState<string[]>([]);
-
-  // ── Add video modal state ──
-  const [showAddVideoModal, setShowAddVideoModal] = useState(false);
-  const [addModalSearch, setAddModalSearch] = useState('');
-  const [addModalSelected, setAddModalSelected] = useState<Set<string>>(new Set());
-  const [addModalSaving, setAddModalSaving] = useState(false);
-  const [showLibrarySelector, setShowLibrarySelector] = useState(false);
+  const {
+    playlistActionError,
+    loadPlaylists,
+    playlists,
+    playlistLoading,
+    playlistError,
+    selectedPlaylistId,
+    setSelectedPlaylistId,
+    playlistItems,
+    playlistItemsLoading,
+    playlistKeyword,
+    setPlaylistKeyword,
+    selectedPlaylistKeys,
+    setSelectedPlaylistKeys,
+    showAddVideoModal,
+    setShowAddVideoModal,
+    addModalSearch,
+    setAddModalSearch,
+    addModalSelected,
+    setAddModalSelected,
+    addModalSaving,
+    showLibrarySelector,
+    setShowLibrarySelector,
+    handleTogglePublish,
+    handleDeletePlaylist,
+    handleAddFromLibrary,
+    handleDeleteItem,
+    handleBulkAdd,
+    handleMoveItem,
+  } = useSignagePlaylists(organizationId);
 
   // ── Direct video registration (signage_media) ──
   const [signageMediaItems, setSignageMediaItems] = useState<SignageMediaItem[]>([]);
@@ -274,57 +281,6 @@ export function StoreSignagePage() {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
 
-  const loadPlaylists = useCallback(async () => {
-    setPlaylistLoading(true);
-    setPlaylistError(null);
-    try {
-      const data = await fetchStorePlaylists();
-      setPlaylists(data);
-    } catch {
-      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setPlaylistLoading(false);
-    }
-  }, []);
-
-  const loadPlaylistItems = useCallback(async (playlistId: string) => {
-    setPlaylistItemsLoading(true);
-    try {
-      const data = await fetchPlaylistItems(playlistId);
-      setPlaylistItems(data);
-    } catch {
-      setPlaylistItems([]);
-      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setPlaylistItemsLoading(false);
-    }
-  }, []);
-
-  // ── Schedule loaders ──
-  const loadSchedules = useCallback(async () => {
-    if (!organizationId) return;
-    setScheduleLoading(true);
-    setScheduleError(null);
-    try {
-      const res = await fetchSchedules(organizationId);
-      setSchedules(Array.isArray(res.items) ? res.items : Array.isArray(res) ? res as unknown as SignageScheduleItem[] : []);
-    } catch {
-      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setScheduleLoading(false);
-    }
-  }, [organizationId]);
-
-  const loadSignagePlaylists = useCallback(async () => {
-    if (!organizationId) return;
-    try {
-      const data = await fetchSignagePlaylists(organizationId);
-      setSignagePlaylists(data);
-    } catch {
-      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    }
-  }, [organizationId]);
-
   const loadSignageMedia = useCallback(async () => {
     if (!organizationId) return;
     try {
@@ -337,93 +293,8 @@ export function StoreSignagePage() {
 
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
-    loadPlaylists();
-    loadSchedules();
-    loadSignagePlaylists();
     loadSignageMedia();
-  }, [loadPlaylists, loadSchedules, loadSignagePlaylists, loadSignageMedia]);
-
-  useEffect(() => {
-    if (activeTab === 'schedules' && schedules.length === 0) {
-      loadSchedules();
-      loadSignagePlaylists();
-    }
-  }, [activeTab, loadSchedules, loadSignagePlaylists, schedules.length]);
-
-  useEffect(() => {
-    if (selectedPlaylistId) loadPlaylistItems(selectedPlaylistId);
-  }, [selectedPlaylistId, loadPlaylistItems]);
-
-  // ── Playlist handlers ──
-  const handleTogglePublish = async (pl: StorePlaylist) => {
-    const next = pl.publishStatus === 'draft' ? 'published' : 'draft';
-    try {
-      await updateStorePlaylist(pl.id, { publishStatus: next });
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
-
-  const handleDeletePlaylist = async (pl: StorePlaylist) => {
-    if (!confirm(`"${pl.name}" 플레이리스트를 삭제하시겠습니까?`)) return;
-    try {
-      await deleteStorePlaylist(pl.id);
-      if (selectedPlaylistId === pl.id) {
-        setSelectedPlaylistId(null);
-        setPlaylistItems([]);
-      }
-      loadPlaylists();
-    } catch { /* user can retry */ }
-  };
-
-  const handleAddFromLibrary = async (item: LibrarySelectorResult) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await addPlaylistItemFromLibrary(selectedPlaylistId, item.id);
-      setShowLibrarySelector(false);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
-  const handleDeleteItem = async (itemId: string) => {
-    if (!selectedPlaylistId) return;
-    try {
-      await deletePlaylistItem(selectedPlaylistId, itemId);
-      loadPlaylistItems(selectedPlaylistId);
-    } catch { /* user can retry */ }
-  };
-
-  const handleBulkAdd = async () => {
-    if (!selectedPlaylistId || addModalSelected.size === 0) return;
-    setAddModalSaving(true);
-    for (const key of addModalSelected) {
-      try {
-        if (key.startsWith('media_')) {
-          await addPlaylistItemFromSignage(selectedPlaylistId, key.slice(6), organizationId);
-        } else {
-          await addPlaylistItem(selectedPlaylistId, key);
-        }
-      } catch { /* skip individual failures, user can retry */ }
-    }
-    setShowAddVideoModal(false);
-    setAddModalSelected(new Set());
-    setAddModalSearch('');
-    setAddModalSaving(false);
-    loadPlaylistItems(selectedPlaylistId);
-  };
-
-  const handleMoveItem = async (index: number, direction: -1 | 1) => {
-    if (!selectedPlaylistId) return;
-    const newItems = [...playlistItems];
-    const swapIdx = index + direction;
-    if (swapIdx < 0 || swapIdx >= newItems.length) return;
-    [newItems[index], newItems[swapIdx]] = [newItems[swapIdx], newItems[index]];
-    setPlaylistItems(newItems);
-    try {
-      await reorderPlaylistItems(selectedPlaylistId, newItems.map(i => i.id));
-    } catch {
-      loadPlaylistItems(selectedPlaylistId);
-    }
-  };
+  }, [loadSignageMedia]);
 
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
@@ -466,7 +337,7 @@ export function StoreSignagePage() {
     try {
       await deleteSignageMedia(organizationId, mediaId);
       loadSignageMedia();
-    } catch { /* user can retry */ }
+    } catch { setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
   };
 
   // ── Media / snapshot edit drawer handlers ──
@@ -545,14 +416,14 @@ export function StoreSignagePage() {
         await deleteSignageMedia(organizationId, editingMedia.id);
         handleCloseEditDrawer();
         loadSignageMedia();
-      } catch { /* user can retry */ }
+      } catch { setEditError('삭제하지 못했습니다. 다시 시도해 주세요.'); }
     } else if (editingSnapshot) {
       if (!confirm(`"${editingSnapshot.title}" 동영상(HUB 복사본)을 삭제하시겠습니까?`)) return;
       try {
         await assetSnapshotApi.remove(editingSnapshot.id);
         handleCloseEditDrawer();
         fetchItems();
-      } catch { /* user can retry */ }
+      } catch { setEditError('삭제하지 못했습니다. 다시 시도해 주세요.'); }
     }
   };
 
@@ -669,93 +540,9 @@ export function StoreSignagePage() {
       setItems(prev => prev.map(it =>
         it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
       ));
-    } catch { /* user can retry */ } finally {
+    } catch { setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.'); } finally {
       setUpdatingId(null);
     }
-  };
-
-  // ── Schedule handlers ──
-  const resetScheduleForm = () => {
-    setSchSaveError(null);
-    setSchName('');
-    setSchPlaylistId('');
-    setSchDays([1, 2, 3, 4, 5]);
-    setSchStartTime('09:00');
-    setSchEndTime('18:00');
-    setSchValidFrom('');
-    setSchValidUntil('');
-    setSchPriority(0);
-    setSchIsActive(true);
-    setEditingSchedule(null);
-    setShowScheduleForm(false);
-  };
-
-  const openEditSchedule = (sch: SignageScheduleItem) => {
-    setSchSaveError(null);
-    setEditingSchedule(sch);
-    setSchName(sch.name);
-    setSchPlaylistId(sch.storePlaylistId || sch.playlistId || '');
-    setSchDays([...sch.daysOfWeek]);
-    setSchStartTime(sch.startTime.slice(0, 5)); // HH:MM:SS → HH:MM
-    setSchEndTime(sch.endTime.slice(0, 5));
-    setSchValidFrom(sch.validFrom ?? '');
-    setSchValidUntil(sch.validUntil ?? '');
-    setSchPriority(sch.priority);
-    setSchIsActive(sch.isActive);
-    setShowScheduleForm(true);
-  };
-
-  const handleSaveSchedule = async () => {
-    if (!schName.trim() || !schPlaylistId || schDays.length === 0 || !organizationId) return;
-    setSchSaving(true);
-    setSchSaveError(null);
-    try {
-      if (editingSchedule) {
-        await updateSchedule(organizationId, editingSchedule.id, {
-          name: schName.trim(),
-          storePlaylistId: schPlaylistId,
-          daysOfWeek: schDays,
-          startTime: schStartTime,
-          endTime: schEndTime,
-          validFrom: schValidFrom || null,
-          validUntil: schValidUntil || null,
-          priority: schPriority,
-          isActive: schIsActive,
-        });
-      } else {
-        const payload: CreateSchedulePayload = {
-          name: schName.trim(),
-          storePlaylistId: schPlaylistId,
-          daysOfWeek: schDays,
-          startTime: schStartTime,
-          endTime: schEndTime,
-          priority: schPriority,
-          isActive: schIsActive,
-        };
-        if (schValidFrom) payload.validFrom = schValidFrom;
-        if (schValidUntil) payload.validUntil = schValidUntil;
-        await createSchedule(organizationId, payload);
-      }
-      resetScheduleForm();
-      loadSchedules();
-    } catch {
-      setSchSaveError('스케줄을 저장하지 못했습니다. 입력 내용을 확인한 후 다시 시도해 주세요.');
-    } finally {
-      setSchSaving(false);
-    }
-  };
-
-  const handleDeleteSchedule = async (sch: SignageScheduleItem) => {
-    if (!confirm(`"${sch.name}" 스케줄을 삭제하시겠습니까?`)) return;
-    if (!organizationId) return;
-    try {
-      await deleteSchedule(organizationId, sch.id);
-      loadSchedules();
-    } catch { /* user can retry */ }
-  };
-
-  const toggleSchDay = (day: number) => {
-    setSchDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort());
   };
 
   const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
@@ -774,6 +561,7 @@ export function StoreSignagePage() {
   return (
     <div className="w-full">
       <StoreWorkflowNavigation subject="사이니지" studioPath="/marketing/signage/playlist" usePath="/marketing/signage/schedules" />
+      {playlistActionError && !showAddVideoModal && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{playlistActionError}</div>}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
@@ -1802,6 +1590,7 @@ export function StoreSignagePage() {
                 </span>
               )}
             </div>
+            {playlistActionError && <div role="alert" className="px-4 py-3 text-sm text-red-700">{playlistActionError}</div>}
             {/* Search */}
             <div className="px-4 py-2.5 border-b border-slate-100">
               <div className="relative">
@@ -1976,6 +1765,4 @@ function KpiCard({ label, count, color, warning }: {
     </div>
   );
 }
-
-
 

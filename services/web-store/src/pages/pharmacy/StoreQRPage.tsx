@@ -1,3 +1,5 @@
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { useQrOperations } from './hooks/useQrOperations';
 /**
  * StoreQRPage — 매장 QR 코드 관리
  *
@@ -43,26 +45,18 @@ import {
   createStoreQrCode,
   deleteStoreQrCode,
   reactivateStoreQrCode,
-  getQrAnalytics,
-  listQrPlacements,
   startQrPlacement,
   endQrPlacement,
-  getQrPlacementAnalytics,
   cloneQrCode,
-  type StoreQrPlacementDto,
-  type QrPlacementScanRow,
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: export foundation 연결
   downloadQrExport,
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 저장
   updateStoreQrCode,
-  getStorePlacementAnalytics,
 } from '../../api/storeQr';
 import type {
   StoreQrCode,
-  QrAnalyticsData,
   QrExportFormat,
   QrExportPreset,
-  StoreQrPlacementAnalyticsDto,
 } from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
@@ -108,6 +102,7 @@ async function loadQrCodes(): Promise<StoreQrCode[]> {
 }
 
 export function StoreQRPage() {
+  const { organizationId } = useStoreOrganizationId();
   const location = useLocation();
   const navigate = useNavigate();
   const workspaceMode = new URLSearchParams(location.search).get('workspace') === 'use' ? 'use' : 'studio';
@@ -143,11 +138,6 @@ export function StoreQRPage() {
   // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠(page) QR 하단 상담 요청 버튼 옵션
   const [ctaEnabled, setCtaEnabled] = useState(false);
   const [ctaLabel, setCtaLabel] = useState('');
-
-  // Analytics state
-  const [analyticsId, setAnalyticsId] = useState<string | null>(null);
-  const [analyticsData, setAnalyticsData] = useState<QrAnalyticsData | null>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Print / download state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -392,110 +382,27 @@ export function StoreQRPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
-  //   표시·경고·폼은 공통 Core(StoreQrPlacementPanel)가 담당한다. 여기는 adapter 축뿐이다.
-  const [placementId, setPlacementId] = useState<string | null>(null);
-  const [placementItems, setPlacementItems] = useState<StoreQrPlacementDto[]>([]);
-  const [placementScans, setPlacementScans] = useState<QrPlacementScanRow[]>([]);
-  const [placementLoading, setPlacementLoading] = useState(false);
-  const [placementBusy, setPlacementBusy] = useState(false);
-  const [placementError, setPlacementError] = useState<string | null>(null);
-
-  const loadPlacements = async (id: string) => {
-    setPlacementLoading(true);
-    setPlacementError(null);
-    try {
-      const [list, scans] = await Promise.all([listQrPlacements(id), getQrPlacementAnalytics(id)]);
-      setPlacementItems(list?.data?.items ?? []);
-      setPlacementScans(scans?.data?.byPlacement ?? []);
-    } catch (e: any) {
-      setPlacementError(e?.response?.data?.error?.message || e?.message || '사용처를 불러오지 못했습니다.');
-    } finally {
-      setPlacementLoading(false);
-    }
-  };
-
-  const handleShowPlacements = async (id: string) => {
-    if (placementId === id) {
-      setPlacementId(null);
-      setPlacementItems([]);
-      setPlacementScans([]);
-      return;
-    }
-    setPlacementId(id);
-    await loadPlacements(id);
-  };
-
-  const runPlacementAction = async (id: string, fn: () => Promise<unknown>) => {
-    setPlacementBusy(true);
-    setPlacementError(null);
-    try {
-      await fn();
-      await loadPlacements(id);
-      await fetchItems();
-    } catch (e: any) {
-      setPlacementError(e?.response?.data?.error?.message || e?.message || '처리하지 못했습니다.');
-    } finally {
-      setPlacementBusy(false);
-    }
-  };
-
-  // ── 매장 전체 스캔 분포(§13) ────────────────────────────────────────────────
-  //   QR 1건 단위 통계와 다른 질문이다. "이 QR 이 몇 번 찍혔나" 가 아니라
-  //   "우리 매장 스캔이 어느 사용처/출처/대상에 몰려 있나" 를 본다.
-  const [distOpen, setDistOpen] = useState(false);
-  const [distDays, setDistDays] = useState<number | null>(30);
-  const [distData, setDistData] = useState<StoreQrPlacementAnalyticsDto | null>(null);
-  const [distLoading, setDistLoading] = useState(false);
-  const [distError, setDistError] = useState<string | null>(null);
-
-  const loadDistribution = async (days: number | null) => {
-    setDistLoading(true);
-    setDistError(null);
-    try {
-      const res = await getStorePlacementAnalytics(days);
-      setDistData(res?.data ?? null);
-    } catch (e: any) {
-      setDistError(e?.response?.data?.error?.message || e?.message || '분포를 불러오지 못했습니다.');
-    } finally {
-      setDistLoading(false);
-    }
-  };
-
-  const handleToggleDistribution = async () => {
-    if (distOpen) {
-      setDistOpen(false);
-      return;
-    }
-    setDistOpen(true);
-    await loadDistribution(distDays);
-  };
-
-  const handleChangeDistDays = async (days: number | null) => {
-    setDistDays(days);
-    await loadDistribution(days);
-  };
-
-  const handleShowAnalytics = async (id: string) => {
-    if (analyticsId === id) {
-      setAnalyticsId(null);
-      setAnalyticsData(null);
-      return;
-    }
-    setAnalyticsId(id);
-    setAnalyticsLoading(true);
-    setAnalyticsData(null);
-    try {
-      const res = await getQrAnalytics(id);
-      if (res.success && res.data) {
-        setAnalyticsData(res.data);
-      }
-    } catch {
-      // silent
-    } finally {
-      setAnalyticsLoading(false);
-    }
-  };
+  const {
+    placementId,
+    placementItems,
+    placementScans,
+    placementLoading,
+    placementBusy,
+    placementError,
+    handleShowPlacements,
+    runPlacementAction,
+    distOpen,
+    distDays,
+    distData,
+    distLoading,
+    distError,
+    handleToggleDistribution,
+    handleChangeDistDays,
+    analyticsId,
+    analyticsData,
+    analyticsLoading,
+    handleShowAnalytics,
+  } = useQrOperations(fetchItems, organizationId);
 
   const apiBase = import.meta.env.VITE_API_BASE_URL
     ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/${getActiveServicePrefix()}`

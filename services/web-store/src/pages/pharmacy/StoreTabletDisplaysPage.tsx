@@ -1,3 +1,4 @@
+import { useTabletScreenApplication } from './hooks/useTabletScreenApplication';
 import { useStoreResource } from './hooks/useStoreResource';
 /**
  * Store Tablet Displays Management Page
@@ -53,7 +54,6 @@ import {
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 카드 홈에 현재 화면 세트명/블록수 표시용.
   fetchScreenSets,
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 되돌리기(직전 화면 재적용/해제).
-  applyCurrentScreenSet, clearCurrentScreenSet,
   // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿(기기) 연결·이동·해제.
   fetchTabletDevices, createPairingCode, updateTabletDevice, disconnectTabletDevice,
   type TabletDevice,
@@ -152,7 +152,13 @@ export default function StoreTabletDisplaysPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Tablet state
-  const { data: tablets, setData: setTablets, loading: loadingTablets, error: tabletListError, reload: loadTablets } = useStoreResource(loadActiveTablets, []);
+  const {
+    data: tablets,
+    setData: setTablets,
+    loading: loadingTablets,
+    error: tabletListError,
+    reload: loadTablets,
+  } = useStoreResource(loadActiveTablets, []);
   const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
 
   // Pool & display state
@@ -391,68 +397,10 @@ export default function StoreTabletDisplaysPage() {
     }
   }, [selectedTabletId]);
 
-  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: '화면 바꾸기' 적용 후 상위 동기화 + 되돌리기 토스트.
-  const handleSwapApplied = useCallback((tabletId: string, newId: string, prevId: string | null, cornerName: string, newName: string) => {
-    setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: newId } : t)));
-    setToast({
-      type: 'success',
-      message: `“${cornerName}” 화면을 ‘${newName}’로 바꿨어요.`,
-      action: {
-        label: '되돌리기',
-        onClick: async () => {
-          try {
-            if (prevId) await applyCurrentScreenSet(tabletId, prevId);
-            else await clearCurrentScreenSet(tabletId);
-            setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: prevId } : t)));
-            setToast({ type: 'success', message: '이전 화면으로 되돌렸어요.' });
-          } catch (e: any) {
-            setToast({ type: 'error', message: e?.message || '되돌리지 못했습니다.' });
-          }
-        },
-      },
-    });
-  }, []);
-
   const handleClosePreview = useCallback(() => {
     setPreviewOpen(false);
     setPreviewSlug(null);
   }, []);
-
-  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿 콘텐츠' 카드 → 대상 태블릿에 바로 적용.
-  //   기존 current-screen-set API 재사용(신규 백엔드 없음). 적용 후 현재 적용 상태 즉시 반영 + 되돌리기.
-  const handleApplyToTablet = useCallback(async (screenSetId: string, tabletId: string) => {
-    const target = tablets.find((t) => t.id === tabletId);
-    const prevId = target?.currentScreenSetId ?? null;
-    const cornerName = target ? (target.location?.trim() || target.name) : '태블릿';
-    const setName = screenSetIndex[screenSetId]?.name || '선택한 콘텐츠';
-    try {
-      await applyCurrentScreenSet(tabletId, screenSetId);
-      setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: screenSetId } : t)));
-      setToast({
-        type: 'success',
-        message: `“${cornerName}” 태블릿에 ‘${setName}’를 적용했어요.`,
-        action: {
-          label: '되돌리기',
-          onClick: async () => {
-            try {
-              if (prevId) await applyCurrentScreenSet(tabletId, prevId);
-              else await clearCurrentScreenSet(tabletId);
-              setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: prevId } : t)));
-              setToast({ type: 'success', message: '이전 화면으로 되돌렸어요.' });
-            } catch (e: any) {
-              setToast({ type: 'error', message: e?.message || '되돌리지 못했습니다.' });
-            }
-          },
-        },
-      });
-    } catch (e: any) {
-      const msg = e?.code === 'SCREEN_SET_NOT_ACTIVE'
-        ? '이 콘텐츠는 지금 적용할 수 없는 상태입니다. 콘텐츠를 열어 저장한 뒤 다시 시도해 주세요.'
-        : (e?.message || '태블릿에 적용하지 못했습니다.');
-      setToast({ type: 'error', message: msg });
-      throw e;
-    }
-  }, [tablets, screenSetIndex]);
 
   // Tablet registration form (WO-O4O-STORE-TABLET-REGISTER-UI-V1)
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -463,6 +411,7 @@ export default function StoreTabletDisplaysPage() {
 
   // Toast — WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 변경 직후 '되돌리기' 액션(선택).
   const [toast, setToast] = useState<TabletOperationToast | null>(null);
+  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast);
   const [error, setError] = useState<string | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
