@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { BaseDetailDrawer } from "@o4o/ui";
 import { Trash2, Loader2 } from "lucide-react";
 import type {
@@ -24,21 +25,36 @@ export function StoreSignageMediaEditor({
   handleCloseEditDrawer,
   handleDeleteFromDrawer,
   handleSaveEdit,
-}: StoreSignageMediaEditorProps) {
+}: Readonly<StoreSignageMediaEditorProps>) {
+  const fieldId = useId();
   const editingMedia = target?.kind === "direct" ? target.media : null;
   const editingSnapshot = target?.kind === "snapshot" ? target.snapshot : null;
   const {
     name: editName,
-    description: editDescription,
-    tags: editTags,
     thumbnailUrl: editThumbnailUrl,
     sourceUrl: editSourceUrl,
   } = draft;
-  const setEditName = (value: string) => onChange("name", value);
-  const setEditDescription = (value: string) => onChange("description", value);
-  const setEditTags = (value: string) => onChange("tags", value);
-  const setEditThumbnailUrl = (value: string) =>
-    onChange("thumbnailUrl", value);
+  const fields = [
+    { key: "name", label: "제목", placeholder: "동영상 제목", type: "text" },
+    {
+      key: "description",
+      label: "설명",
+      placeholder: "동영상 설명 또는 용도 메모",
+      type: "textarea",
+    },
+    {
+      key: "tags",
+      label: "태그 (쉼표로 구분)",
+      placeholder: "예: 약국, 건강, 홍보",
+      type: "text",
+    },
+    {
+      key: "thumbnailUrl",
+      label: "썸네일 URL",
+      placeholder: "https://...",
+      type: "url",
+    },
+  ] as const;
   const setEditSourceUrl = (value: string) => onChange("sourceUrl", value);
   return (
     <BaseDetailDrawer
@@ -98,10 +114,14 @@ export function StoreSignageMediaEditor({
 
               {/* 소스 URL (수정 가능) */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor={`${fieldId}-url`}
+                  className="block text-xs font-medium text-slate-700 mb-1"
+                >
                   동영상 URL
                 </label>
                 <input
+                  id={`${fieldId}-url`}
                   type="url"
                   value={editSourceUrl}
                   onChange={(e) => setEditSourceUrl(e.target.value)}
@@ -138,71 +158,59 @@ export function StoreSignageMediaEditor({
                 )}
               </div>
 
-              {/* 수정 가능 필드 */}
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  제목 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="동영상 제목"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  설명
-                </label>
-                <textarea
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                  placeholder="동영상 설명 또는 용도 메모"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  태그{" "}
-                  <span className="text-slate-400 font-normal">
-                    (쉼표로 구분)
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  value={editTags}
-                  onChange={(e) => setEditTags(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="예: 약국, 건강, 홍보"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  썸네일 URL
-                </label>
-                <input
-                  type="url"
-                  value={editThumbnailUrl}
-                  onChange={(e) => setEditThumbnailUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  placeholder="https://..."
-                />
-                {editThumbnailUrl && (
-                  <img
-                    src={editThumbnailUrl}
-                    alt="썸네일 미리보기"
-                    className="mt-2 rounded-md w-full max-h-32 object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                )}
-              </div>
+              {/* Fields belong to this editor; no shared form/schema engine. */}
+              {fields.map((field) => {
+                const id = `${fieldId}-${field.key}`;
+                const className =
+                  "w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500";
+                return (
+                  <div key={field.key}>
+                    <label
+                      htmlFor={id}
+                      className="block text-xs font-medium text-slate-700 mb-1"
+                    >
+                      {field.label}{" "}
+                      {field.key === "name" && (
+                        <span className="text-red-500">*</span>
+                      )}
+                    </label>
+                    {field.type === "textarea" ? (
+                      <textarea
+                        id={id}
+                        value={draft[field.key]}
+                        onChange={(event) =>
+                          onChange(field.key, event.target.value)
+                        }
+                        rows={3}
+                        className={className + " resize-none"}
+                        placeholder={field.placeholder}
+                      />
+                    ) : (
+                      <input
+                        id={id}
+                        type={field.type}
+                        value={draft[field.key]}
+                        onChange={(event) =>
+                          onChange(field.key, event.target.value)
+                        }
+                        className={className}
+                        placeholder={field.placeholder}
+                      />
+                    )}
+                    {field.key === "thumbnailUrl" && editThumbnailUrl && (
+                      <img
+                        key={editThumbnailUrl}
+                        src={editThumbnailUrl}
+                        alt="썸네일 미리보기"
+                        className="mt-2 rounded-md w-full max-h-32 object-cover"
+                        onError={(event) => {
+                          event.currentTarget.style.display = "none";
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           );
         })()}
