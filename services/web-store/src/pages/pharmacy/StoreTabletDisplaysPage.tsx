@@ -1,3 +1,6 @@
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { resolveTabletDisplayEntries, toTabletDisplayPayload, tabletDisplayPayloadsEqual, appendSelectedTabletProducts, moveTabletDisplayEntry, type TabletDisplayEntry as DisplayEntry, type TabletDisplayPayload } from './tablet/tabletDisplayDraft';
+import { useTabletScreenApplication } from './hooks/useTabletScreenApplication';
 import { useStoreResource } from './hooks/useStoreResource';
 /**
  * Store Tablet Displays Management Page
@@ -11,11 +14,14 @@ import { useStoreResource } from './hooks/useStoreResource';
  * 페이지 구성:
  *   1. 진열 상품 (Pool / Display grid + 자체 저장)
  *   2. Idle 재생 목록 (IdlePlaylistEditor + 자체 저장)
- *      - 매장 단위 설정 (device pairing 부재로 매장당 N tablet 동일 idle 사용)
- *      - 데이터는 store_tablets.idle_playlist_items JSONB 에 저장
- *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
+ *      - 위치별 store_tablets.idle_playlist_items 에 저장하는 기존 대기 화면 설정
+ *      - 화면 세트가 적용된 위치는 공개 viewer의 화면 세트 계약을 우선 소비
  */
 
+import { TabletCommonIdlePicker, TabletOperationNotice, type TabletOperationToast } from './tablet/TabletOperationPanels';
+import { StoreTabletPreview } from './StoreTabletPreview';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
+import { StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -23,7 +29,7 @@ import {
   ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv, Link2, Unplug, MoveRight,
 } from 'lucide-react';
 import {
-  IdlePlaylistEditor, TabletKioskPage,
+  IdlePlaylistEditor,
   type IdlePlaylistItem, type TabletKioskApi,
 } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-PREVIEW-V1: 공개 뷰어 재사용 미리보기 — 공개 데이터 조회 + 매장 slug
@@ -49,7 +55,6 @@ import {
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 카드 홈에 현재 화면 세트명/블록수 표시용.
   fetchScreenSets,
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 되돌리기(직전 화면 재적용/해제).
-  applyCurrentScreenSet, clearCurrentScreenSet,
   // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿(기기) 연결·이동·해제.
   fetchTabletDevices, createPairingCode, updateTabletDevice, disconnectTabletDevice,
   type TabletDevice,
@@ -70,16 +75,6 @@ import TabletCornerSwapModal from './TabletCornerSwapModal';
 const PREVIEW_NO_CORNER = '__none__';
 
 // ==================== Types ====================
-
-interface DisplayEntry {
-  productType: 'supplier' | 'local';
-  productId: string;
-  productName: string;
-  sortOrder: number;
-  isVisible: boolean;
-  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(null=선택 안 함). 기본 콘텐츠 미지정.
-  contentId: string | null;
-}
 
 // 콘텐츠 상태 → 한글 라벨 (workspace_status)
 const CONTENT_STATUS_LABEL: Record<string, string> = {
@@ -107,6 +102,8 @@ async function loadActiveTablets(): Promise<TabletType[]> {
 }
 
 export default function StoreTabletDisplaysPage() {
+  const { organizationId } = useStoreOrganizationId();
+  const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -123,14 +120,19 @@ export default function StoreTabletDisplaysPage() {
     editScreenSetId?: string;
   } | null;
   const [activeTab, setActiveTab] = useState<'corners' | 'contents'>(
-    navState?.tab === 'contents' || navState?.editScreenSetId ? 'contents' : 'corners',
+    navState?.tab === 'contents' || navState?.editScreenSetId || new URLSearchParams(location.search).get('workspace') === 'studio' ? 'contents' : 'corners',
   );
+  useEffect(() => {
+    const mode = new URLSearchParams(location.search).get('workspace');
+    if (mode === 'studio') setActiveTab('contents');
+    if (mode === 'use') setActiveTab('corners');
+  }, [location.search]);
   const [highlightScreenSetId] = useState<string | null>(navState?.highlightScreenSetId ?? null);
   const [autoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
   // 소비 후 history state 제거(새로고침·뒤로가기 시 재트리거 방지).
   useEffect(() => {
     if (navState?.tab || navState?.highlightScreenSetId || navState?.editScreenSetId) {
-      navigate(location.pathname, { replace: true, state: null });
+      navigate(`${withWorkspaceMode(`${location.pathname}${location.search}`, 'studio')}${location.hash}`, { replace: true, state: null });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -143,15 +145,25 @@ export default function StoreTabletDisplaysPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Tablet state
-  const { data: tablets, setData: setTablets, loading: loadingTablets, error: tabletListError, reload: loadTablets } = useStoreResource(loadActiveTablets, []);
+  const {
+    data: tablets,
+    setData: setTablets,
+    loading: loadingTablets,
+    error: tabletListError,
+    reload: loadTablets,
+  } = useStoreResource(loadActiveTablets, []);
   const [selectedTabletId, setSelectedTabletId] = useState<string | null>(null);
+  const tabletLoadRevision = useRef(0);
 
   // Pool & display state
   const [pool, setPool] = useState<ProductPool | null>(null);
   const [displays, setDisplays] = useState<DisplayEntry[]>([]);
   const [loadingPool, setLoadingPool] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [savedDisplayPayload, setSavedDisplayPayload] = useState<TabletDisplayPayload>([]);
+  const displayPayload = useMemo(() => toTabletDisplayPayload(displays), [displays]);
+  const hasChanges = !tabletDisplayPayloadsEqual(displayPayload, savedDisplayPayload);
+  const displaySaveBusy = useRef(false);
   // WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 박스 → 버튼+모달.
   const [showGuide, setShowGuide] = useState(false);
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: currentScreenSetId → {name, blockCount} 인덱스(코너 카드 표시용).
@@ -202,28 +214,44 @@ export default function StoreTabletDisplaysPage() {
     idleSlideSeconds: 10,
   });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsLoadError, setSettingsLoadError] = useState<string | null>(null);
+  const [settingsRetry, setSettingsRetry] = useState(0);
+  const settingsSaveBusy = useRef(false);
+  const settingsRequestRevision = useRef(0);
+  const idleSaveBusy = useRef(false);
+  const ocWriteBusy = useRef(false);
 
-  // Load display settings (once)
+  const invalidateSettingsRequest = useCallback(() => { settingsRequestRevision.current++; }, []);
+  // A failed load is unconfirmed settings, not permission to overwrite defaults.
   useEffect(() => {
     let cancelled = false;
+    invalidateSettingsRequest();
+    setSettingsLoading(true); setSettingsLoadError(null);
     fetchTabletDisplaySettings()
-      .then((s) => { if (!cancelled) setSettings(s); })
-      .catch(() => { /* 기본값 유지 */ });
-    return () => { cancelled = true; };
-  }, []);
+      .then(value => { if (!cancelled) setSettings(value); })
+      .catch(() => { if (!cancelled) setSettingsLoadError('화면 설정을 불러오지 못했습니다. 다시 시도해 주세요.'); })
+      .finally(() => { if (!cancelled) setSettingsLoading(false); });
+    return () => { cancelled = true; invalidateSettingsRequest(); };
+  }, [organizationId, settingsRetry, invalidateSettingsRequest]);
 
   const handleSaveSettings = useCallback(async () => {
+    if (settingsSaveBusy.current || settingsLoading || settingsLoadError) return;
+    const submitted = settings, store = organizationId, revision = settingsRequestRevision.current;
+    settingsSaveBusy.current = true;
     setSavingSettings(true);
     try {
-      const saved = await saveTabletDisplaySettings(settings);
-      setSettings(saved);
+      const saved = await saveTabletDisplaySettings(submitted);
+      if (organizationRef.current !== store || revision !== settingsRequestRevision.current) return;
+      setSettings(current => current === submitted ? saved : current);
       setToast({ type: 'success', message: '전시 설정이 저장되었습니다.' });
     } catch {
-      setToast({ type: 'error', message: '전시 설정 저장에 실패했습니다.' });
+      if (organizationRef.current === store && revision === settingsRequestRevision.current) setToast({ type: 'error', message: '전시 설정 저장에 실패했습니다.' });
     } finally {
+      settingsSaveBusy.current = false;
       setSavingSettings(false);
     }
-  }, [settings]);
+  }, [settings, organizationId, settingsLoading, settingsLoadError]);
 
   // ── 고객 화면 미리보기 (WO-O4O-KPA-TABLET-PREVIEW-V1) ──
   //   kiosk-core 공개 뷰어를 재사용. 저장된 공개 데이터(products/settings) 기준.
@@ -296,33 +324,42 @@ export default function StoreTabletDisplaysPage() {
   }, []);
 
   const handleOcSelect = useCallback(async (forcedContentId: string) => {
-    if (!selectedTabletId || ocBusy) return;
+    if (!selectedTabletId || ocWriteBusy.current) return;
+    const revision = tabletLoadRevision.current;
+    ocWriteBusy.current = true;
     setOcBusy(true);
     try {
       await selectOperatorCommonIdle(selectedTabletId, forcedContentId);
-      setOcSelection(await fetchOperatorCommonIdleSelection(selectedTabletId));
+      const selection = await fetchOperatorCommonIdleSelection(selectedTabletId);
+      if (revision !== tabletLoadRevision.current) return;
+      setOcSelection(selection);
       setOcModalOpen(false);
       setToast({ type: 'success', message: '서비스 공통 대기 영상이 선택되었습니다.' });
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '선택에 실패했습니다.' });
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: e?.message || '선택에 실패했습니다.' });
     } finally {
+      ocWriteBusy.current = false;
       setOcBusy(false);
     }
-  }, [selectedTabletId, ocBusy]);
+  }, [selectedTabletId]);
 
   const handleOcClear = useCallback(async () => {
-    if (!selectedTabletId || ocBusy) return;
+    if (!selectedTabletId || ocWriteBusy.current) return;
+    const revision = tabletLoadRevision.current;
+    ocWriteBusy.current = true;
     setOcBusy(true);
     try {
       await clearOperatorCommonIdle(selectedTabletId);
+      if (revision !== tabletLoadRevision.current) return;
       setOcSelection(null);
       setToast({ type: 'success', message: '선택이 해제되었습니다.' });
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: e?.message || '해제에 실패했습니다.' });
     } finally {
+      ocWriteBusy.current = false;
       setOcBusy(false);
     }
-  }, [selectedTabletId, ocBusy]);
+  }, [selectedTabletId]);
 
   const ocStatusLabel: Record<string, string> = {
     active: '방영 중', upcoming: '방영 예정', expired: '기간 만료', unavailable: '사용 불가',
@@ -382,68 +419,10 @@ export default function StoreTabletDisplaysPage() {
     }
   }, [selectedTabletId]);
 
-  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: '화면 바꾸기' 적용 후 상위 동기화 + 되돌리기 토스트.
-  const handleSwapApplied = useCallback((tabletId: string, newId: string, prevId: string | null, cornerName: string, newName: string) => {
-    setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: newId } : t)));
-    setToast({
-      type: 'success',
-      message: `“${cornerName}” 화면을 ‘${newName}’로 바꿨어요.`,
-      action: {
-        label: '되돌리기',
-        onClick: async () => {
-          try {
-            if (prevId) await applyCurrentScreenSet(tabletId, prevId);
-            else await clearCurrentScreenSet(tabletId);
-            setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: prevId } : t)));
-            setToast({ type: 'success', message: '이전 화면으로 되돌렸어요.' });
-          } catch (e: any) {
-            setToast({ type: 'error', message: e?.message || '되돌리지 못했습니다.' });
-          }
-        },
-      },
-    });
-  }, []);
-
   const handleClosePreview = useCallback(() => {
     setPreviewOpen(false);
     setPreviewSlug(null);
   }, []);
-
-  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿 콘텐츠' 카드 → 대상 태블릿에 바로 적용.
-  //   기존 current-screen-set API 재사용(신규 백엔드 없음). 적용 후 현재 적용 상태 즉시 반영 + 되돌리기.
-  const handleApplyToTablet = useCallback(async (screenSetId: string, tabletId: string) => {
-    const target = tablets.find((t) => t.id === tabletId);
-    const prevId = target?.currentScreenSetId ?? null;
-    const cornerName = target ? (target.location?.trim() || target.name) : '태블릿';
-    const setName = screenSetIndex[screenSetId]?.name || '선택한 콘텐츠';
-    try {
-      await applyCurrentScreenSet(tabletId, screenSetId);
-      setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: screenSetId } : t)));
-      setToast({
-        type: 'success',
-        message: `“${cornerName}” 태블릿에 ‘${setName}’를 적용했어요.`,
-        action: {
-          label: '되돌리기',
-          onClick: async () => {
-            try {
-              if (prevId) await applyCurrentScreenSet(tabletId, prevId);
-              else await clearCurrentScreenSet(tabletId);
-              setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: prevId } : t)));
-              setToast({ type: 'success', message: '이전 화면으로 되돌렸어요.' });
-            } catch (e: any) {
-              setToast({ type: 'error', message: e?.message || '되돌리지 못했습니다.' });
-            }
-          },
-        },
-      });
-    } catch (e: any) {
-      const msg = e?.code === 'SCREEN_SET_NOT_ACTIVE'
-        ? '이 콘텐츠는 지금 적용할 수 없는 상태입니다. 콘텐츠를 열어 저장한 뒤 다시 시도해 주세요.'
-        : (e?.message || '태블릿에 적용하지 못했습니다.');
-      setToast({ type: 'error', message: msg });
-      throw e;
-    }
-  }, [tablets, screenSetIndex]);
 
   // Tablet registration form (WO-O4O-STORE-TABLET-REGISTER-UI-V1)
   const [showRegisterForm, setShowRegisterForm] = useState(false);
@@ -453,7 +432,8 @@ export default function StoreTabletDisplaysPage() {
   const [deletingTabletId, setDeletingTabletId] = useState<string | null>(null);
 
   // Toast — WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 변경 직후 '되돌리기' 액션(선택).
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string; action?: { label: string; onClick: () => void } } | null>(null);
+  const [toast, setToast] = useState<TabletOperationToast | null>(null);
+  const { handleSwapApplied, handleApplyToTablet } = useTabletScreenApplication(tablets, setTablets, screenSetIndex, setToast);
   const [error, setError] = useState<string | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
@@ -541,15 +521,14 @@ export default function StoreTabletDisplaysPage() {
   };
 
   // Load pool + displays + idle playlist when tablet changes
-  const tabletLoadRevision = useRef(0);
   const loadTabletData = useCallback(async () => {
     const revision = ++tabletLoadRevision.current;
-    if (!selectedTabletId) {
-      setError(null); setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
+    if (!selectedTabletId || !organizationId) {
+      setError(null); setPool(null); setDisplays([]); setSavedDisplayPayload([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
       return;
     }
     setLoadingPool(true);
-    setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]);
+    setPool(null); setDisplays([]); setSavedDisplayPayload([]); setIdleItems([]); setIdleInitial([]);
     setError(null);
     try {
       const { pool: poolData, displays: displayData, idle: idleData } = await loadTabletWorkspace(selectedTabletId);
@@ -558,34 +537,16 @@ export default function StoreTabletDisplaysPage() {
       setIdleItems(idleData);
       setIdleInitial(idleData);
 
-      // Map display items to entries with product names
-      const entries: DisplayEntry[] = displayData.map((d) => {
-        let productName = '(알 수 없음)';
-        if (d.product_type === 'supplier') {
-          const sp = poolData.supplierProducts.find((p) => p.id === d.product_id);
-          productName = sp?.product_name || '(삭제된 공급 상품)';
-        } else {
-          const lp = poolData.localProducts.find((p) => p.id === d.product_id);
-          productName = lp?.name || '(삭제된 자체 상품)';
-        }
-        return {
-          productType: d.product_type,
-          productId: d.product_id,
-          productName,
-          sortOrder: d.sort_order,
-          isVisible: d.is_visible,
-          contentId: d.contentId ?? null,
-        };
-      });
+      const entries = resolveTabletDisplayEntries(displayData, poolData);
       setDisplays(entries);
-      setHasChanges(false);
+      setSavedDisplayPayload(toTabletDisplayPayload(entries));
       setSelectedPoolIds(new Set());
     } catch (err: any) {
       if (revision === tabletLoadRevision.current) setError(err.message || '태블릿 데이터를 불러오는데 실패했습니다.');
     } finally {
       if (revision === tabletLoadRevision.current) setLoadingPool(false);
     }
-  }, [selectedTabletId]);
+  }, [selectedTabletId, organizationId]);
 
   const cancelTabletLoad = useCallback(() => { tabletLoadRevision.current++; }, []);
   useEffect(() => {
@@ -625,13 +586,11 @@ export default function StoreTabletDisplaysPage() {
       });
     })();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayKeysStr]);
 
   // 진열 항목 선택 콘텐츠 변경(null=선택 안 함). 콘텐츠가 1개여도 자동 선택하지 않는다(직접 선택).
   const setContentForIndex = useCallback((index: number, contentId: string | null) => {
     setDisplays((prev) => prev.map((d, i) => (i === index ? { ...d, contentId } : d)));
-    setHasChanges(true);
   }, []);
 
   // 후보 로드 후, 더 이상 연결되지 않은(unlink) 선택 콘텐츠는 자동 해제 → 저장 시 400 방지 + 폴백 정합.
@@ -677,62 +636,40 @@ export default function StoreTabletDisplaysPage() {
 
   // Add selected to display
   const handleAddToDisplay = () => {
-    const newEntries: DisplayEntry[] = [];
-    for (const item of poolItems) {
-      if (selectedPoolIds.has(item.id)) {
-        newEntries.push({
-          productType: item.type,
-          productId: item.id,
-          productName: item.name,
-          sortOrder: displays.length + newEntries.length,
-          isVisible: true,
-          contentId: null,
-        });
-      }
-    }
-    if (newEntries.length > 0) {
-      setDisplays((prev) => [...prev, ...newEntries]);
+    const next = appendSelectedTabletProducts(displays, poolItems, selectedPoolIds);
+    if (next !== displays) {
+      setDisplays(next);
       setSelectedPoolIds(new Set());
-      setHasChanges(true);
     }
   };
 
   // Move item in display
   const moveItem = (index: number, direction: 'up' | 'down') => {
-    const target = direction === 'up' ? index - 1 : index + 1;
-    if (target < 0 || target >= displays.length) return;
-    const next = [...displays];
-    [next[index], next[target]] = [next[target], next[index]];
-    setDisplays(next.map((d, i) => ({ ...d, sortOrder: i })));
-    setHasChanges(true);
+    setDisplays(previous => moveTabletDisplayEntry(previous, index, direction === 'up' ? -1 : 1));
   };
 
   // Remove item from display
   const removeItem = (index: number) => {
     setDisplays((prev) => prev.filter((_, i) => i !== index).map((d, i) => ({ ...d, sortOrder: i })));
-    setHasChanges(true);
   };
 
   // Save
   const handleSave = async () => {
-    if (!selectedTabletId) return;
+    if (!selectedTabletId || displaySaveBusy.current) return;
+    const submitted = displayPayload;
+    const revision = tabletLoadRevision.current;
+    displaySaveBusy.current = true;
     setSaving(true);
     try {
-      await saveTabletDisplays(
-        selectedTabletId,
-        displays.map((d, i) => ({
-          productType: d.productType,
-          productId: d.productId,
-          sortOrder: i,
-          isVisible: d.isVisible,
-          contentId: d.contentId,
-        })),
-      );
+      await saveTabletDisplays(selectedTabletId, submitted);
+      if (revision !== tabletLoadRevision.current) return;
+      // Advance only the submitted baseline; edits made during saving remain dirty.
+      setSavedDisplayPayload(submitted);
       setToast({ type: 'success', message: '진열 구성이 저장되었습니다.' });
-      setHasChanges(false);
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '저장에 실패했습니다.' });
+    } catch (err: unknown) {
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: err instanceof Error ? err.message : '저장에 실패했습니다.' });
     } finally {
+      displaySaveBusy.current = false;
       setSaving(false);
     }
   };
@@ -750,16 +687,20 @@ export default function StoreTabletDisplaysPage() {
 
   // Save idle playlist (WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1)
   const handleSaveIdle = async () => {
-    if (!selectedTabletId) return;
+    if (!selectedTabletId || idleSaveBusy.current) return;
+    const submitted = idleItems, revision = tabletLoadRevision.current;
+    idleSaveBusy.current = true;
     setSavingIdle(true);
     try {
-      const saved = await saveTabletIdlePlaylist(selectedTabletId, idleItems);
-      setIdleItems(saved);
+      const saved = await saveTabletIdlePlaylist(selectedTabletId, submitted);
+      if (revision !== tabletLoadRevision.current) return;
+      setIdleItems(current => current === submitted ? saved : current);
       setIdleInitial(saved);
       setToast({ type: 'success', message: 'Idle 재생 목록이 저장되었습니다.' });
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || 'Idle 저장에 실패했습니다.' });
+    } catch (err: unknown) {
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: err instanceof Error ? err.message : 'Idle 저장에 실패했습니다.' });
     } finally {
+      idleSaveBusy.current = false;
       setSavingIdle(false);
     }
   };
@@ -819,8 +760,9 @@ export default function StoreTabletDisplaysPage() {
 
   return (
     <div className="space-y-6">
+      <StoreWorkflowNavigation subject="태블릿" />
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
               뒤로가기가 '매장 자체 상품' 관리 화면으로 가던 잔재 정정 → 매장 홈으로 복귀. */}
@@ -863,7 +805,7 @@ export default function StoreTabletDisplaysPage() {
         ] as const).map((t) => (
           <button
             key={t.key}
-            onClick={() => setActiveTab(t.key)}
+            onClick={() => navigate(withWorkspaceMode(`${location.pathname}${location.search}`, t.key === 'contents' ? 'studio' : 'use'), { state: location.state })}
             className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
               activeTab === t.key
                 ? 'border-teal-600 text-teal-700'
@@ -1430,7 +1372,6 @@ export default function StoreTabletDisplaysPage() {
                 <IdlePlaylistEditor
                   items={idleItems}
                   onChange={setIdleItems}
-                  disabled={savingIdle}
                   fetchLibraryAssets={fetchIdleLibraryAssets}
                 />
               </div>
@@ -1444,7 +1385,7 @@ export default function StoreTabletDisplaysPage() {
                 <h3 className="text-sm font-bold text-slate-700">태블릿 화면 설정</h3>
                 <button
                   onClick={handleSaveSettings}
-                  disabled={savingSettings}
+                  disabled={savingSettings || settingsLoading || !!settingsLoadError}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {savingSettings ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -1516,6 +1457,7 @@ export default function StoreTabletDisplaysPage() {
             </div>
           )}
 
+          {settingsLoadError && <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{settingsLoadError}<button type="button" className="ml-3 underline" onClick={() => setSettingsRetry(value => value + 1)}>다시 시도</button></div>}
           {/* Editor */}
           {!loadingPool && pool && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1797,77 +1739,18 @@ export default function StoreTabletDisplaysPage() {
       {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1)
           WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §3: 미리보기 1종으로 통합 —
           태블릿/휴대전화 보기 전환 + 보조(새 창에서 열기 · 주소 복사). 코너 카드/상세 모두 이 모달을 연다. */}
-      {previewOpen && previewSlug && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.85)' }}>
-          {/* 상단 바: 보기 전환 + 보조 메뉴 + 닫기 */}
-          <div
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100001 }}
-            className="flex items-center justify-between gap-3 bg-slate-900/95 text-white px-4 py-2"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <p className="text-sm font-semibold whitespace-nowrap">고객 화면 미리보기</p>
-              {/* 태블릿 / 휴대전화 보기 */}
-              <div className="flex rounded-lg overflow-hidden border border-white/20">
-                {([
-                  { key: 'tablet', label: '태블릿' },
-                  { key: 'mobile', label: '휴대전화' },
-                ] as const).map((v) => (
-                  <button
-                    key={v.key}
-                    onClick={() => setPreviewView(v.key)}
-                    className={`px-3 py-1 text-xs font-semibold ${previewView === v.key ? 'bg-white text-slate-900' : 'bg-transparent text-slate-200 hover:bg-white/10'}`}
-                  >
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* 보조 메뉴 */}
-              {previewTabletIdRef.current && storeSlug && (
-                <>
-                  <button
-                    onClick={() => window.open(publicTabletUrl(previewTabletIdRef.current as string), '_blank', 'noopener,noreferrer')}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
-                  >
-                    새 창에서 열기
-                  </button>
-                  <button
-                    onClick={() => handleCopyTabletUrl(previewTabletIdRef.current as string)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
-                  >
-                    주소 복사
-                  </button>
-                </>
-              )}
-              <button
-                onClick={handleClosePreview}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap"
-              >
-                <X className="w-4 h-4" /> 닫기
-              </button>
-            </div>
-          </div>
-          {/* kiosk-core 재사용 (Router 중첩 금지 → slug prop 직접 주입). 휴대전화 보기 = 390px 프레임. */}
-          <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'auto' }} className="flex justify-center">
-            <div
-              style={
-                previewView === 'mobile'
-                  ? { position: 'relative', width: 390, maxWidth: '100%', height: '100%', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)', background: '#fff', overflow: 'hidden' }
-                  : { position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }
-              }
-            >
-              <TabletKioskPage
-                api={previewApi}
-                slug={previewSlug}
-                displaySettings={previewSettings}
-                showQrBadge={previewSettings?.showQr !== false}
-                embedded
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {previewOpen && previewSlug && <StoreTabletPreview
+        previewSlug={previewSlug}
+        previewView={previewView}
+        previewSettings={previewSettings}
+        previewApi={previewApi}
+        tabletId={previewTabletIdRef.current}
+        storeSlug={storeSlug}
+        publicUrl={previewTabletIdRef.current ? publicTabletUrl(previewTabletIdRef.current) : ''}
+        onCopy={() => { if (previewTabletIdRef.current) handleCopyTabletUrl(previewTabletIdRef.current); }}
+        onClose={handleClosePreview}
+        onViewChange={setPreviewView}
+      />}
 
       {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 '화면 바꾸기' 모달 */}
       {swapCorner && (
@@ -1881,78 +1764,18 @@ export default function StoreTabletDisplaysPage() {
       )}
 
       {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 공통 영상 선택 모달 */}
-      {ocModalOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.5)' }} className="flex items-center justify-center p-4" onClick={() => setOcModalOpen(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="px-4 py-3 border-b flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-700">서비스 공통 대기 영상 선택</h3>
-              <button onClick={() => setOcModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-lg">×</button>
-            </div>
-            <div className="p-4 overflow-y-auto">
-              {ocLoading ? (
-                <div className="text-center py-8 text-sm text-slate-400">불러오는 중…</div>
-              ) : ocLoadError ? (
-                <div className="text-center py-8">
-                  <p className="text-sm font-medium text-slate-900">데이터를 불러오지 못했습니다.</p>
-                  <p className="mt-1 text-sm text-slate-500">잠시 후 다시 시도해 주세요.</p>
-                  <button
-                    type="button"
-                    onClick={() => void openOcModal()}
-                    className="mt-3 px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50"
-                  >
-                    다시 시도
-                  </button>
-                </div>
-              ) : ocCandidates.filter(c => c.status !== 'expired').length === 0 ? (
-                <div className="text-center py-8 text-sm text-slate-400">현재 사용 가능한 서비스 공통 영상이 없습니다.</div>
-              ) : (
-                <ul className="divide-y">
-                  {ocCandidates.filter(c => c.status !== 'expired').map((c) => (
-                    <li key={c.id} className="flex items-center gap-3 py-2.5">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-slate-900 truncate">{c.title}</div>
-                        <div className="text-[11px] text-slate-500">
-                          {c.sourceType.toUpperCase()} · 방영 {c.startAt.slice(0, 10)} ~ {c.endAt.slice(0, 10)} · {ocStatusLabel[c.status] ?? c.status}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleOcSelect(c.id)}
-                        disabled={ocBusy}
-                        className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 whitespace-nowrap"
-                      >
-                        선택
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <p className="text-[11px] text-slate-400 mt-3">영상 등록·수정·삭제·기간 변경은 서비스 운영자만 할 수 있습니다.</p>
-            </div>
-          </div>
-        </div>
-      )}
+      {ocModalOpen && <TabletCommonIdlePicker
+        ocLoading={ocLoading}
+        ocLoadError={ocLoadError}
+        ocCandidates={ocCandidates}
+        ocStatusLabel={ocStatusLabel}
+        ocBusy={ocBusy}
+        onRetry={openOcModal}
+        onSelect={handleOcSelect}
+        onClose={() => setOcModalOpen(false)}
+      />}
 
-      {/* Toast — §2: 변경 직후 '되돌리기' 액션(선택) */}
-      {toast && (
-        <div
-          className="fixed bottom-6 right-6 z-[100002] px-4 py-3 rounded-xl shadow-lg border text-sm font-medium flex items-center gap-3"
-          style={{
-            backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
-            borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
-            color: toast.type === 'success' ? '#166534' : '#991b1b',
-          }}
-        >
-          <span>{toast.type === 'success' ? '✅' : '❌'} {toast.message}</span>
-          {toast.action && (
-            <button
-              onClick={() => { const a = toast.action!; setToast(null); a.onClick(); }}
-              className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
-            >
-              {toast.action.label}
-            </button>
-          )}
-        </div>
-      )}
+      <TabletOperationNotice toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );
 }

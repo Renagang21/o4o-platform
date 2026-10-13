@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { Navigate, Link, useLocation, useParams } from 'react-router-dom';
 import { useUnifiedStore } from '../../contexts/StoreContext';
-import { SERVICE_WORK_CONFIGS } from '../../config/storeMenu';
+import { SERVICE_WORK_CONFIGS, UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { isUnifiedServiceKey, setActiveServiceContext, type UnifiedServiceKey } from '../../lib/serviceContext';
 import { StoreAgreementGate, StoreWorkDashboard } from './UnifiedStoreLayout';
@@ -31,9 +31,10 @@ function ServiceWorkBody({ serviceKey, restoreServiceKey }: { serviceKey: Unifie
     setActiveServiceContext(serviceKey);
     return () => { setActiveServiceContext(restoreServiceKey); };
   }, [serviceKey, restoreServiceKey]);
+  const config = { ...withPharmacyStoreMenu(UNIFIED_STORE_CONFIG), basePath: `${WORKSPACE_PATHS.serviceWork}/${serviceKey}/store` };
   return (
     <StoreAgreementGate serviceKey={serviceKey}>
-      <StoreWorkDashboard config={SERVICE_WORK_CONFIGS[serviceKey]} />
+      <StoreWorkDashboard config={config} withCapabilities workspace serviceWorkConfig={SERVICE_WORK_CONFIGS[serviceKey]} />
     </StoreAgreementGate>
   );
 }
