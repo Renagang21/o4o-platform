@@ -63,3 +63,8 @@
 
 구체 결과와 다음 큰 묶음은 [inventory IR](../investigations/IR-O4O-ACCOUNT-ERASURE-DOMAIN-FILE-INVENTORY-V1.md)를 따른다.
 이 조사나 코드 보완으로 삭제 기능 flags/자동 job/정책 본문/재동의를 활성화하지 않는다.
+
+최신 main #549의 신규26단계를 반영해 local 공식 runner/collector를 재확인했다.
+현재308관계3965columns/기존private27/추가domain274/후보2608이며 FK60개는 그대로다.
+새 AI reservation의 비FK user_id/JSON·trigger0을 activation 전 domain/writer 잔여로 포함했다.
+이 source/격리 검증으로 운영26 적용을 승인하거나 실행하지 않는다. 상세 지문·소유 트랙 승인 경계는 IR §2.1 참조.

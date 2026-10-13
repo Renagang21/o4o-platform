@@ -241,3 +241,10 @@ source type-check/build PASS, focused ESLint0, migration contract21 PASS/0 FAIL,
 파일이름 후보222개를 구분했다. row/실제 파일/법정 보유 승인 또는 모든 handler 완료를 뜻하지 않는다.
 remote host/다른 port/다른 database 거절과 출력 미생성도 검증했다.
 상세 source/producer/다음 큰 묶음은 [inventory IR](../investigations/IR-O4O-ACCOUNT-ERASURE-DOMAIN-FILE-INVENTORY-V1.md)를 따른다.
+
+최신 main #549의 AI 통합/신규26단계를 정상 merge해 조사 범위를 갱신했다. 개인 제거 source 변경은 겹치지 않는다.
+새 격리 bootstrap/assertion·collector는26단계087e2d4c/6650 lines,308관계3965columns/기존private27/추가domain274/후보2608을 확인했다.
+users FK44관계60개는 동일하다. 신규 ai_usage_reservations는 비FK user_id/JSON과 trigger0이므로
+미분류 domain/producer/writer 검증 잔여에 포함한다. 과거25단계 결과를 현재 운영 schema로 주장하지 않는다.
+현재 ai-core dist를 기존 package build로 갱신한 뒤 API type-check/build PASS.
+운영26 migration은 AI 소유 WO에서 별도 명시 승인 대상으로 남겼으므로 기존23/24 승인으로 실행하지 않는다.

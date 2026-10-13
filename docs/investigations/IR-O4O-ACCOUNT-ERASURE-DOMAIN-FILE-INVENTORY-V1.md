@@ -17,11 +17,11 @@ request/resume transaction의 동일 caller 검사를 기존 private assertActor
 PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED 규칙으로 처리하도록 표기 누락만 보완했다.
 파일 소유 추정·새 삭제 handler·보존기간·법률 본문·권한/API/DDL 변경은 도입하지 않았다.
 
-## 2. 재현 가능한 schema inventory
+## 2. 최초 25단계 schema inventory와 최신 재확인
 
 조사 시작 main: `38d0eb81df`. 격리 PostgreSQL 15, loopback 55469, 새 조사 전용 DB에서
-공식 `src/migrate.ts`로 canonical baseline + 현재 incremental 25개를 적용했다.
-현재 지문은 `9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641`, 6,618 lines다.
+공식 `src/migrate.ts`로 canonical baseline + 당시 incremental 25개를 적용했다.
+최초 조사 지문은 `9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641`, 6,618 lines다.
 정식 post-migration assertion과 수집기의 지문·ordered history 비교 모두 일치했다.
 운영 DB schema 지문 또는 운영 데이터 조사 결과로 표시하지 않는다.
 
@@ -53,6 +53,26 @@ pnpm exec tsx scripts/privacy/collect-erasure-inventory.mjs --out /tmp/o4o-erasu
 전용 DB는 source의 현재 공식 schema 상태로 먼저 준비해야 한다. 실제 운영 connection이나
 기존 개발/사용자 DB 이름으로 대체하지 않는다. remote host·5432·다른 DB 이름 거절/출력 미생성 검증 PASS.
 새 schema 도입 시 지문/history mismatch가 실패하므로 현재 source 기준으로 조사 DB를 새로 준비한다.
+
+### 2.1 main #549 이후 현재 26단계
+
+main `de4cbf9f39`의 별도 AI 통합으로 신규26단계 CreateAiUsageReservations1791870434349가 추가됐다.
+개인정보 service/source의 직접 충돌은 없으며 ai-core의 기존 package build를 갱신해
+API type-check/build를 다시 확인했다. 새 전용 local DB에서 공식 runner와 READ ONLY collector를 재실행했다.
+현재 source 지문은 `087e2d4c4c9423c59774a622f681548d677aeab14567287a8ded9e52e71447ac`,6,650 lines다.
+
+현재 metadata는308관계/3,965columns, 기존private owner27관계, 추가domain274관계,
+신원·문자열·JSON 후보2,608개다. users FK44관계60개는 동일하다. 앞25단계 수치는 당시 기록으로 유지한다.
+
+새 public.ai_usage_reservations는 user_id(varchar)·pricing/receipt/reconciliation JSON 등
+신원 후보를 포함하지만 users FK 및 기존 private owner 명시 처리는 없다. 조사 schema의
+비internal trigger 조회 결과0이므로 기존 account-erasure writer fence를 전제하지 않는다.
+활성화 전 새 producer·비FK 기록의 보존/파기와 writer barrier를 다음 domain 처리 계약에서 확인해야 한다.
+새 데이터/트리거/기간을 임의 분류하거나 source/운영 DDL을 추가하지 않았다.
+
+운영 migration26은 [AI 소유 WO](../work-orders/WO-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)가 별도 명시 승인을 요구한다.
+이번 Core의 기존23/24 준비 승인이나 일반 API 배포 허가로 신규26을 실행하지 않는다.
+실제 운영 적용이 확인되기 전에는 API 배포에 전체 pending migration이 섞이는지 확인한다.
 
 ## 3. 확인한 producer와 미완료 계약
 
