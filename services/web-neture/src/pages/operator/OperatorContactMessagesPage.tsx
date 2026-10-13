@@ -19,6 +19,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useLatestRequest } from '../../hooks/useLatestRequest';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   operatorContactApi,
@@ -64,8 +65,11 @@ export default function OperatorContactMessagesPage() {
   const [contactTypeFilter, setContactTypeFilter] = useState<ContactTypeFilter>('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [markingRead, setMarkingRead] = useState(false);
+  const beginLoad = useLatestRequest(`operator-contact:${contactTypeFilter}:${statusFilter}`);
+  const beginMark = useLatestRequest(`operator-contact-mark:${contactTypeFilter}:${statusFilter}`);
 
   const load = useCallback(async (page = 1) => {
+    const current = beginLoad();
     setLoading(true);
     setError(null);
     try {
@@ -75,34 +79,39 @@ export default function OperatorContactMessagesPage() {
         page,
         limit: 20,
       });
+      if (!current()) return;
       if (result) {
         setMessages(result.items);
         setPagination(result.pagination);
       } else {
-        setMessages([]);
+        throw new Error('목록을 불러오지 못했습니다. 다시 시도해 주세요.');
       }
     } catch (e: any) {
-      setError(e?.message || '목록을 불러오지 못했습니다.');
+      if (current()) setError(e?.message || '목록을 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
-  }, [contactTypeFilter, statusFilter]);
+  }, [contactTypeFilter, statusFilter, beginLoad]);
 
   useEffect(() => {
     load(1);
   }, [load]);
 
   const handleBulkMarkRead = async () => {
-    if (markingRead) return;
+    if (markingRead || loading || error) return;
+    const current = beginMark();
     setMarkingRead(true);
     try {
       const result = await operatorContactApi.bulkMarkRead();
+      if (!current()) return;
       if (result) {
         // 새로고침 — supplier/partner 의 'new' 문의가 in_progress 로 전환됨
         await load(pagination.page);
-      }
+      } else throw new Error('일괄 확인에 실패했습니다. 다시 시도해 주세요.');
+    } catch (err: any) {
+      if (current()) setError(err?.message || '일괄 확인에 실패했습니다. 다시 시도해 주세요.');
     } finally {
-      setMarkingRead(false);
+      if (current()) setMarkingRead(false);
     }
   };
 
@@ -207,6 +216,8 @@ export default function OperatorContactMessagesPage() {
       <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
         <div className="flex flex-wrap gap-3 items-center">
           <select
+            aria-label="문의 유형"
+            disabled={markingRead}
             value={contactTypeFilter}
             onChange={(e) => setContactTypeFilter(e.target.value as ContactTypeFilter)}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
@@ -216,6 +227,8 @@ export default function OperatorContactMessagesPage() {
             ))}
           </select>
           <select
+            aria-label="문의 상태"
+            disabled={markingRead}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
@@ -228,7 +241,7 @@ export default function OperatorContactMessagesPage() {
           <button
             type="button"
             onClick={handleBulkMarkRead}
-            disabled={markingRead}
+            disabled={markingRead || loading || !!error}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-medium"
             title="공급자 문의(과거 파트너 문의 포함) 중 status='new' 항목을 한 번에 처리중으로 전환합니다."
           >
@@ -246,7 +259,7 @@ export default function OperatorContactMessagesPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
         </div>
       ) : error ? (
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm text-center py-16 text-red-500 text-sm">{error}</div>
+        <div role="alert" className="bg-white rounded-xl border border-slate-100 shadow-sm text-center py-16 text-red-500 text-sm">{error}<button className="ml-3 underline" onClick={() => void load(pagination.page)}>다시 시도</button></div>
       ) : (
         <DataTable<OperatorContactMessage>
           columns={columns}
