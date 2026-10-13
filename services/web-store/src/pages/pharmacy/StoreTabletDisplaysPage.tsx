@@ -1,3 +1,4 @@
+import { resolveTabletDisplayEntries, toTabletDisplayPayload, tabletDisplayPayloadsEqual, appendSelectedTabletProducts, moveTabletDisplayEntry, type TabletDisplayEntry as DisplayEntry, type TabletDisplayPayload } from './tablet/tabletDisplayDraft';
 import { useTabletScreenApplication } from './hooks/useTabletScreenApplication';
 import { useStoreResource } from './hooks/useStoreResource';
 /**
@@ -12,9 +13,8 @@ import { useStoreResource } from './hooks/useStoreResource';
  * 페이지 구성:
  *   1. 진열 상품 (Pool / Display grid + 자체 저장)
  *   2. Idle 재생 목록 (IdlePlaylistEditor + 자체 저장)
- *      - 매장 단위 설정 (device pairing 부재로 매장당 N tablet 동일 idle 사용)
- *      - 데이터는 store_tablets.idle_playlist_items JSONB 에 저장
- *      - kiosk runtime 은 매장의 첫 active tablet row 의 값을 사용 (public API)
+ *      - 위치별 store_tablets.idle_playlist_items 에 저장하는 기존 대기 화면 설정
+ *      - 화면 세트가 적용된 위치는 공개 viewer의 화면 세트 계약을 우선 소비
  */
 
 import { TabletCommonIdlePicker, TabletOperationNotice, type TabletOperationToast } from './tablet/TabletOperationPanels';
@@ -74,16 +74,6 @@ import TabletCornerSwapModal from './TabletCornerSwapModal';
 const PREVIEW_NO_CORNER = '__none__';
 
 // ==================== Types ====================
-
-interface DisplayEntry {
-  productType: 'supplier' | 'local';
-  productId: string;
-  productName: string;
-  sortOrder: number;
-  isVisible: boolean;
-  // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열별 선택 콘텐츠(null=선택 안 함). 기본 콘텐츠 미지정.
-  contentId: string | null;
-}
 
 // 콘텐츠 상태 → 한글 라벨 (workspace_status)
 const CONTENT_STATUS_LABEL: Record<string, string> = {
@@ -166,7 +156,10 @@ export default function StoreTabletDisplaysPage() {
   const [displays, setDisplays] = useState<DisplayEntry[]>([]);
   const [loadingPool, setLoadingPool] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [savedDisplayPayload, setSavedDisplayPayload] = useState<TabletDisplayPayload>([]);
+  const displayPayload = useMemo(() => toTabletDisplayPayload(displays), [displays]);
+  const hasChanges = !tabletDisplayPayloadsEqual(displayPayload, savedDisplayPayload);
+  const displaySaveBusy = useRef(false);
   // WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 박스 → 버튼+모달.
   const [showGuide, setShowGuide] = useState(false);
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: currentScreenSetId → {name, blockCount} 인덱스(코너 카드 표시용).
@@ -503,11 +496,11 @@ export default function StoreTabletDisplaysPage() {
   const loadTabletData = useCallback(async () => {
     const revision = ++tabletLoadRevision.current;
     if (!selectedTabletId) {
-      setError(null); setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
+      setError(null); setPool(null); setDisplays([]); setSavedDisplayPayload([]); setIdleItems([]); setIdleInitial([]); setLoadingPool(false);
       return;
     }
     setLoadingPool(true);
-    setPool(null); setDisplays([]); setIdleItems([]); setIdleInitial([]);
+    setPool(null); setDisplays([]); setSavedDisplayPayload([]); setIdleItems([]); setIdleInitial([]);
     setError(null);
     try {
       const { pool: poolData, displays: displayData, idle: idleData } = await loadTabletWorkspace(selectedTabletId);
@@ -516,27 +509,9 @@ export default function StoreTabletDisplaysPage() {
       setIdleItems(idleData);
       setIdleInitial(idleData);
 
-      // Map display items to entries with product names
-      const entries: DisplayEntry[] = displayData.map((d) => {
-        let productName = '(알 수 없음)';
-        if (d.product_type === 'supplier') {
-          const sp = poolData.supplierProducts.find((p) => p.id === d.product_id);
-          productName = sp?.product_name || '(삭제된 공급 상품)';
-        } else {
-          const lp = poolData.localProducts.find((p) => p.id === d.product_id);
-          productName = lp?.name || '(삭제된 자체 상품)';
-        }
-        return {
-          productType: d.product_type,
-          productId: d.product_id,
-          productName,
-          sortOrder: d.sort_order,
-          isVisible: d.is_visible,
-          contentId: d.contentId ?? null,
-        };
-      });
+      const entries = resolveTabletDisplayEntries(displayData, poolData);
       setDisplays(entries);
-      setHasChanges(false);
+      setSavedDisplayPayload(toTabletDisplayPayload(entries));
       setSelectedPoolIds(new Set());
     } catch (err: any) {
       if (revision === tabletLoadRevision.current) setError(err.message || '태블릿 데이터를 불러오는데 실패했습니다.');
@@ -583,13 +558,11 @@ export default function StoreTabletDisplaysPage() {
       });
     })();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayKeysStr]);
 
   // 진열 항목 선택 콘텐츠 변경(null=선택 안 함). 콘텐츠가 1개여도 자동 선택하지 않는다(직접 선택).
   const setContentForIndex = useCallback((index: number, contentId: string | null) => {
     setDisplays((prev) => prev.map((d, i) => (i === index ? { ...d, contentId } : d)));
-    setHasChanges(true);
   }, []);
 
   // 후보 로드 후, 더 이상 연결되지 않은(unlink) 선택 콘텐츠는 자동 해제 → 저장 시 400 방지 + 폴백 정합.
@@ -635,62 +608,40 @@ export default function StoreTabletDisplaysPage() {
 
   // Add selected to display
   const handleAddToDisplay = () => {
-    const newEntries: DisplayEntry[] = [];
-    for (const item of poolItems) {
-      if (selectedPoolIds.has(item.id)) {
-        newEntries.push({
-          productType: item.type,
-          productId: item.id,
-          productName: item.name,
-          sortOrder: displays.length + newEntries.length,
-          isVisible: true,
-          contentId: null,
-        });
-      }
-    }
-    if (newEntries.length > 0) {
-      setDisplays((prev) => [...prev, ...newEntries]);
+    const next = appendSelectedTabletProducts(displays, poolItems, selectedPoolIds);
+    if (next !== displays) {
+      setDisplays(next);
       setSelectedPoolIds(new Set());
-      setHasChanges(true);
     }
   };
 
   // Move item in display
   const moveItem = (index: number, direction: 'up' | 'down') => {
-    const target = direction === 'up' ? index - 1 : index + 1;
-    if (target < 0 || target >= displays.length) return;
-    const next = [...displays];
-    [next[index], next[target]] = [next[target], next[index]];
-    setDisplays(next.map((d, i) => ({ ...d, sortOrder: i })));
-    setHasChanges(true);
+    setDisplays(previous => moveTabletDisplayEntry(previous, index, direction === 'up' ? -1 : 1));
   };
 
   // Remove item from display
   const removeItem = (index: number) => {
     setDisplays((prev) => prev.filter((_, i) => i !== index).map((d, i) => ({ ...d, sortOrder: i })));
-    setHasChanges(true);
   };
 
   // Save
   const handleSave = async () => {
-    if (!selectedTabletId) return;
+    if (!selectedTabletId || displaySaveBusy.current) return;
+    const submitted = displayPayload;
+    const revision = tabletLoadRevision.current;
+    displaySaveBusy.current = true;
     setSaving(true);
     try {
-      await saveTabletDisplays(
-        selectedTabletId,
-        displays.map((d, i) => ({
-          productType: d.productType,
-          productId: d.productId,
-          sortOrder: i,
-          isVisible: d.isVisible,
-          contentId: d.contentId,
-        })),
-      );
+      await saveTabletDisplays(selectedTabletId, submitted);
+      if (revision !== tabletLoadRevision.current) return;
+      // Advance only the submitted baseline; edits made during saving remain dirty.
+      setSavedDisplayPayload(submitted);
       setToast({ type: 'success', message: '진열 구성이 저장되었습니다.' });
-      setHasChanges(false);
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '저장에 실패했습니다.' });
+    } catch (err: unknown) {
+      if (revision === tabletLoadRevision.current) setToast({ type: 'error', message: err instanceof Error ? err.message : '저장에 실패했습니다.' });
     } finally {
+      displaySaveBusy.current = false;
       setSaving(false);
     }
   };

@@ -1,3 +1,4 @@
+import { buildLibraryQrPayload } from './qr/libraryQrPayload';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { useQrOperations } from './hooks/useQrOperations';
 /**
@@ -305,32 +306,11 @@ export function StoreQRPage() {
     setFormError(null);
 
     try {
-      // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
-      //   운영자 콘텐츠 허브(kpa_contents) 참조형 — landingType='page', landingTargetId=content.id.
-      //   사본 복사가 아니므로 libraryItemId 는 보내지 않는다(백엔드가 page 랜딩으로 inline 렌더).
-      const isContentRef = selectedLibrary.source === 'content-hub';
-      // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
-      //   매장 직접 작성 콘텐츠(kpa_store_contents) 참조형 — content-hub 와 동일하게 page 참조
-      //   (landingType='page', landingTargetId=content.id, libraryItemId 미전송). 공개 landing 이 본문 inline 렌더.
-      const isDirectRef = selectedLibrary.source === 'direct-content';
-      const isPageRef = isContentRef || isDirectRef;
-      // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안) / MLC:
-      //   블로그·다국어 제품 콘텐츠 참조형 — landingType='link', landingTargetId=공개 URL(form 값).
-      //   사본 복사 아님(다국어는 publicKey 발급으로 매장 사본 그룹을 공개) → libraryItemId 미전송.
-      const isBlogRef = selectedLibrary.source === 'blog' || selectedLibrary.source === 'mlc';
-      const res = await createStoreQrCode({
-        // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 생성 제목/설명 우선 사용
-        title: formTitle.trim() || selectedLibrary.title,
-        description: formDescription.trim() || undefined,
-        libraryItemId: (isPageRef || isBlogRef) ? undefined : selectedLibrary.id,
-        landingType: isPageRef ? 'page' : formLandingType,
-        landingTargetId: isPageRef ? selectedLibrary.id : (formLandingTargetId || undefined),
-        slug: formSlug.trim(),
-        // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: page(콘텐츠 참조) QR 에서만 상담 CTA 설정 전송
-        ...(isPageRef && ctaEnabled
-          ? { consultationCtaEnabled: true, consultationCtaLabel: ctaLabel.trim() || undefined }
-          : {}),
-      });
+      const res = await createStoreQrCode(buildLibraryQrPayload({
+        library: selectedLibrary, title: formTitle, description: formDescription,
+        slug: formSlug, landingType: formLandingType, landingTargetId: formLandingTargetId,
+        ctaEnabled, ctaLabel,
+      }));
 
       if (res.success && res.data) {
         setCreatedTitle(res.data.title);

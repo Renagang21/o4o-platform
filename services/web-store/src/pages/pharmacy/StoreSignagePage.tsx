@@ -1,3 +1,4 @@
+import { buildSignageVideoList, filterSignageVideos, summarizePlaylistDuration, type UnifiedVideoItem, type SignageStatusFilter as StatusFilter, type SignageSortKey as SortKey } from './signage/signageVideoList';
 import { useSignagePlaylists } from './hooks/useSignagePlaylists';
 import { useSignageSchedules } from './hooks/useSignageSchedules';
 /**
@@ -35,7 +36,6 @@ import {
   formatSignageDate as formatDate,
   formatSignageShortDate as formatShortDate,
   daysUntil,
-  isForcedActive,
   isForcedExpiringSoon,
   isForcedExpired,
   toHHMM,
@@ -72,7 +72,6 @@ import {
   storeAssetControlApi,
   type StoreAssetItem,
   type AssetPublishStatus,
-  type ChannelMap,
 } from '../../api/assetSnapshot';
 import type { StorePlaylist } from '../../api/storePlaylist';
 import {
@@ -95,8 +94,6 @@ const STATUS_CONFIG: Record<AssetPublishStatus, { label: string; bg: string; tex
   hidden: { label: '숨김', bg: 'bg-orange-50', text: 'text-orange-700' },
 };
 
-type StatusFilter = 'all' | 'published' | 'draft' | 'hidden' | 'forced';
-type SortKey = 'newest' | 'forced-first' | 'published-first';
 
 /* ─── Helpers ────────────────────────────────── */
 
@@ -118,34 +115,7 @@ function deriveYtThumbnail(cj: Record<string, unknown> | undefined): string | un
   return undefined;
 }
 
-/* ─── Schedule Visibility Helpers ───────────── */
-
-/* ─── KPI Computation ────────────────────────── */
-
-/* ─── Unified Video Item (snapshot + direct media) ── */
-
-type VideoSource = 'snapshot' | 'direct';
-
-interface UnifiedVideoItem {
-  id: string;
-  title: string;
-  source: VideoSource;
-  sourceUrl?: string;
-  sourceType?: string;
-  publishStatus?: AssetPublishStatus;
-  channelMap?: ChannelMap;
-  isForced?: boolean;
-  isLocked?: boolean;
-  forcedStartAt?: string | null;
-  forcedEndAt?: string | null;
-  createdAt: string;
-  _snapshot?: StoreAssetItem;
-  _media?: SignageMediaItem;
-}
-
 type ActiveTab = 'assets' | 'playlist' | 'schedules';
-
-/* ─── Main Component ─────────────────────────── */
 
 async function loadSignageAssets(): Promise<StoreAssetItem[]> {
   const response = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
@@ -428,71 +398,16 @@ export function StoreSignagePage() {
   };
 
   // ── Unified video list (snapshots + direct media) ──
-  const unifiedVideos = useMemo((): UnifiedVideoItem[] => {
-    const snaps: UnifiedVideoItem[] = items.map(s => ({
-      id: s.id,
-      title: s.title,
-      source: 'snapshot' as const,
-      publishStatus: s.publishStatus,
-      channelMap: s.channelMap,
-      isForced: s.isForced,
-      isLocked: s.isLocked,
-      forcedStartAt: s.forcedStartAt,
-      forcedEndAt: s.forcedEndAt,
-      createdAt: s.createdAt,
-      _snapshot: s,
-    }));
-    const media: UnifiedVideoItem[] = signageMediaItems.map(m => ({
-      id: `media_${m.id}`,
-      title: m.name,
-      source: 'direct' as const,
-      sourceUrl: m.sourceUrl,
-      sourceType: m.sourceType,
-      createdAt: m.createdAt,
-      _media: m,
-    }));
-    return [...snaps, ...media];
-  }, [items, signageMediaItems]);
+  const unifiedVideos = useMemo(() => buildSignageVideoList(items, signageMediaItems), [items, signageMediaItems]);
 
   // KPI (snapshot 기준 유지)
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
   // Filter + Sort + Keyword (unified: snapshots + direct media)
-  const filteredUnified = useMemo(() => {
-    let filtered = unifiedVideos.filter(v => {
-      // Status filter: only apply to snapshots; direct always passes on 'all'
-      if (statusFilter !== 'all' && v.source === 'snapshot') {
-        if (statusFilter === 'published' && v.publishStatus !== 'published') return false;
-        if (statusFilter === 'draft' && v.publishStatus !== 'draft') return false;
-        if (statusFilter === 'hidden' && v.publishStatus !== 'hidden') return false;
-        if (statusFilter === 'forced' && !v._snapshot) return false;
-        if (statusFilter === 'forced' && v._snapshot && !isForcedActive(v._snapshot)) return false;
-      }
-      if (statusFilter !== 'all' && v.source === 'direct') return false;
-      return true;
-    });
-    if (assetKeyword.trim()) {
-      const kw = assetKeyword.toLowerCase();
-      filtered = filtered.filter(v => v.title.toLowerCase().includes(kw));
-    }
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortKey === 'forced-first' && a._snapshot && b._snapshot) {
-        const aF = isForcedActive(a._snapshot) ? 1 : 0;
-        const bF = isForcedActive(b._snapshot) ? 1 : 0;
-        if (bF !== aF) return bF - aF;
-      }
-      if (sortKey === 'published-first') {
-        const order: Record<string, number> = { published: 0, draft: 1, hidden: 2 };
-        const aO = a.publishStatus ? (order[a.publishStatus] ?? 9) : 9;
-        const bO = b.publishStatus ? (order[b.publishStatus] ?? 9) : 9;
-        if (aO !== bO) return aO - bO;
-      }
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-    return filtered;
-  }, [unifiedVideos, statusFilter, sortKey, assetKeyword]);
+  const filteredUnified = useMemo(() => filterSignageVideos(unifiedVideos, {
+    status: statusFilter, sort: sortKey, keyword: assetKeyword,
+  }), [unifiedVideos, statusFilter, sortKey, assetKeyword]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredUnified.length / PAGE_LIMIT));
@@ -504,16 +419,7 @@ export function StoreSignagePage() {
   useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
 
   // Total duration + missing-duration count for selected playlist items
-  const totalDurationInfo = useMemo(() => {
-    let totalSec = 0;
-    let missingCount = 0;
-    for (const item of playlistItems) {
-      const dur = item.contentJson?.duration as number | undefined;
-      if (dur && dur > 0) totalSec += Math.round(dur);
-      else missingCount++;
-    }
-    return { totalSec, missingCount };
-  }, [playlistItems]);
+  const totalDurationInfo = useMemo(() => summarizePlaylistDuration(playlistItems), [playlistItems]);
 
   // Filtered unified video list for add modal
   const addModalVideos = useMemo(() => {

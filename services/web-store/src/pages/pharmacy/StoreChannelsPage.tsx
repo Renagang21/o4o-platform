@@ -527,11 +527,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const handleBulkAction = (type: 'activate' | 'deactivate' | 'delete') => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
-    if (type === 'delete') {
-      setConfirmModal({ type: 'delete', ids, isBulk: true });
-    } else {
-      setConfirmModal({ type, ids, isBulk: true });
-    }
+    setConfirmModal({ type, ids, isBulk: true });
   };
 
   // ─── Confirm modal execute ───
