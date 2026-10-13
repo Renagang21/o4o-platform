@@ -51,13 +51,11 @@ export function useSignageSchedules(organizationId: string) {
     try {
       const res = await fetchSchedules(organizationId);
       if (!isCurrent()) return;
-      setSchedules(
-        Array.isArray(res.items)
-          ? res.items
-          : Array.isArray(res)
-            ? (res as unknown as SignageScheduleItem[])
-            : [],
-      );
+      let items: SignageScheduleItem[] = [];
+      if (Array.isArray(res.items)) items = res.items;
+      else if (Array.isArray(res))
+        items = res as unknown as SignageScheduleItem[];
+      setSchedules(items);
     } catch {
       if (isCurrent())
         setScheduleError(
