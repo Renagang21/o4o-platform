@@ -7,7 +7,8 @@
  *
  * 고정하는 것
  * -----------
- *  R1 은퇴 endpoint 는 **404**(route 부재). 401/400 이면 route 가 살아 있다는 뜻이므로 실패다.
+ *  R1 공개 라우터의 은퇴 endpoint 는 **404**(route 부재).
+ *     인증이 먼저 실행되는 라우터의 401 은 route 부재를 증명하지 않는다(R1-b·정적 P2 병행).
  *  R2 Google 경로는 살아 있고 **검증이 동작한다** — 가짜 idToken 에 401 `GOOGLE_ID_TOKEN_INVALID`.
  *     (성공 경로는 실제 Google 계정이 필요하므로 통제된 배포 창의 사용자 smoke 에서 본다.)
  *  R3 은퇴 endpoint 응답에 password 관련 힌트가 없다(존재를 알려주는 메시지 0).
@@ -45,18 +46,29 @@ test.describe('은퇴한 password endpoint (R1·R3)', () => {
     });
   }
 
-  test('관리자 비밀번호 설정 — PATCH /admin/platform-accounts/:id/password → 404', async ({ request }) => {
-    const res = await request.patch(
-      `${V1}/admin/platform-accounts/00000000-0000-4000-8000-000000000000/password`,
-      { data: { newPassword: 'x' }, failOnStatusCode: false },
-    );
-    // 인증 미보유 상태이므로 401 도 나올 수 있으나, route 자체가 없으면 404 다.
-    // 401 이면 route 가 남아 있다는 뜻이므로 실패로 본다.
-    expect(res.status()).toBe(404);
-  });
 });
 
 test.describe('requireAuth 뒤의 은퇴 경로 (R1-b)', () => {
+  test('관리자 password 경로는 같은 라우터의 임의 경로와 동일한 인증 거절을 반환한다', async ({ request }) => {
+    // platform-accounts.routes.ts의 router.use(authenticate)가 route 조회보다 먼저 실행된다.
+    // 익명 401만으로 은퇴를 판정하지 않는다. route 부재는 정적 P2가 별도로 검증한다.
+    const base = `${V1}/admin/platform-accounts/00000000-0000-4000-8000-000000000000`;
+    const retired = await request.patch(`${base}/password`, {
+      data: { newPassword: 'x' }, failOnStatusCode: false,
+    });
+    const nonexistent = await request.patch(`${base}/__does_not_exist__`, {
+      data: {}, failOnStatusCode: false,
+    });
+    expect(retired.status()).toBe(401);
+    expect(nonexistent.status()).toBe(401);
+    expect((await retired.json()).code).toBe('AUTH_REQUIRED');
+    expect((await nonexistent.json()).code).toBe('AUTH_REQUIRED');
+    const text = (await retired.text()).toLowerCase();
+    for (const hint of ['invalid_credentials', 'invalid password', 'password_not_set', '비밀번호가 올바르지']) {
+      expect(text).not.toContain(hint);
+    }
+  });
+
   /**
    * `PUT /users/password` 는 `/users/*` 라우터 전체에 `requireAuth` 가 걸려 있어 미인증 요청이
    * **404 이전에 401** 로 끝난다(2026-09-24 운영 실측: `/users/me/profile` · 없는 경로도 동일하게 401).
@@ -93,7 +105,16 @@ test.describe('Google 경로 생존 + 검증 동작 (R2)', () => {
 
   test('POST /auth/google/signup 도 같은 검증을 거친다 (동의만으로 계정이 생기지 않는다)', async ({ request }) => {
     const res = await request.post(`${V1}/auth/google/signup`, {
-      data: { idToken: 'not-a-real-google-id-token', consents: { terms: true, privacy: true, name: 'Fixture', phone: '01000000000' } },
+      // 가입은 계정 센터에서만 시작한다. 이 헤더가 없으면 토큰 검증 전에 origin gate가 거절한다.
+      headers: { Origin: 'https://neture.co.kr' },
+      data: {
+        idToken: 'not-a-real-google-id-token',
+        consents: {
+          // DTO 형식만 충족하는 합성 참조. 토큰 검증에서 거절되므로 약관 조회·계정 write에 도달하지 않는다.
+          termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 },
+          terms: true, privacy: true, name: 'Fixture', phone: '01000000000',
+        },
+      },
       failOnStatusCode: false,
     });
     expect(res.status()).toBe(401);

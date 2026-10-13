@@ -86,3 +86,48 @@ provider ID 식별·자동 이메일 병합 금지, 브라우저 logout·비밀�
 
 WORKTREE_DISPOSITION: `/workspace/o4o-platform` · `wo/auth-kakao-explicit-link`는 KEEP이다. 승인 범위가 push까지이므로 main 통합·배포 전 branch와 검증 기록을 보존한다. 이 TODO의 완료는 인증 전체 잔여 운영 작업이나 향후 배포의 완료를 뜻하지 않는다.
 DEPLOYMENT=REQUIRED_AFTER_MERGE이며 이번 실행은 push-only다. 실제 운영 반영·OAuth·일반 상태 계정·시행일 정책 적용을 완료로 표시하지 않는다.
+
+## main 통합·운영 배포 후속 — 2026-10-13 (KST)
+
+위 push-only 기록은 당시 종료 범위다. 이후 사용자가 PR #531 main 통합·배포를 승인했다.
+같은 미완료 인증 WO의 운영 검증 Phase로 기존 격리 checkout/branch를 유지했고,
+clean 상태·auth 경로 충돌 없음·branch-only commit0을 확인한 뒤 최신 main으로 fast-forward했다.
+2차 복잡성 정비 구현이나 타 트랙 변경은 이번 수정에 포함하지 않는다.
+
+- [x] PR #531 merge `aa59a0962f`와 배포 대상 `3809c42db3`의 포함 관계 확인.
+- [x] 대상 main의 CI Gate PASS 및 API·웹7개의 실제 배포/serving revision 확인.
+- [x] 사용자8 origin × PC/mobile × 공개 Demo3의 실제 로그인·접근·로그아웃48/48 PASS.
+- [x] Neture `/`의 로그인 모달에서 Demo3 × PC/mobile6/6 PASS.
+- [x] 공개 E2E 최초 실패를 코드·HTTP·전체64조건으로 재현해 test contract를 정정.
+- [x] 수정한 은퇴/거절 E2E26/26 및 정적 은퇴/Google DTO2 suites58/58 PASS.
+- [ ] 수정 HEAD의 GitHub 공개 E2E64조건·CI/review 확인 후 검증 보완 PR 통합. 결과는 해당 PR/check 링크에서 확인.
+
+[Promote run 38403004672](https://github.com/Renagang21/o4o-platform/actions/runs/38403004672)의
+API·전체관리자·Neture·약국 협력사업·강의·Store·분회 실제 배포 job과 최종 serving Report가 PASS다.
+최종 Report는7개 모두 target `3809c42db3`의 revision-label을 확인했고 API ready는200이다.
+이 실행의 source에 인증 정비가 포함된다. 이번 세션의 선행 Store/분회 전용 실행은
+API dependency gate에 보류되어 실제 배포0이었다. 보류 실행의 workflow success를 배포 성공으로 세지 않는다.
+
+운영 Demo 검증은 canonical 공개 버튼을 직접 클릭했고 mock 인증 응답을 사용하지 않았다.
+상속 proxy와 검증된 TLS의 실제 upstream 응답을 전달했다. 사용자8 origin은 Neture·공급자·커뮤니티·
+펀딩·약국 협력사업·Store·강의·분회다. 매장 경영자/직원 Store context200, 공급자 products200,
+다른 역할의 해당 API403을 확인했다. 로그아웃200 뒤 기존 access/refresh401,
+Neture에서 Store로 이동한 별도 세션이 원래 origin 로그아웃 후 유지되는 것도 확인했다.
+검증이 만든 세션만 종료했고 실제 Google/카카오·전체관리자 인증은 사용자 담당 범위다.
+
+[최초 GitHub 공개 E2E](https://github.com/Renagang21/o4o-platform/actions/runs/38404670005)는 실패했다.
+이 클라우드의 해당 로그 저장소 접근은 제한되어 있었으므로 로그를 읽었다고 보고하지 않는다.
+동일64개 assertion을 실제 운영에 실행한 로컬 재현은60 PASS·4 FAIL·skip0이다.
+관리자 password 경로404 기대와 Google signup의 필수 policy reference 누락이 각각 PC/mobile에서 실패했다.
+관리자 router는 `authenticate`가 선행되어 존재하지 않는 동일 router 경로도401이다.
+수정은 양쪽401/`AUTH_REQUIRED`·password 힌트 부재를 함께 확인하고 route 부재는 기존 정적 P2로 검증한다.
+Google signup은 DTO 형식의 합성 termsPolicy와 허용 계정 센터 Origin을 제공해
+실제 invalid ID token401/`GOOGLE_ID_TOKEN_INVALID` assertion을 유지했다. 토큰 검증 전에 origin을 검사하고,
+토큰 거절 뒤 계정 transaction·동의 기록에 도달하지 않는다. 최초 보완에서 Origin을 빠뜨려403이 난 것도
+기록하며, 두 필수 조건을 보완한 재실행26/26 PASS와 구분한다. 운영 인증·권한·DB·CI 설정을 바꾸지 않았다.
+
+문서 정합: 과거 push-only 기록은 보존하고 이후 통합·운영 검증 결과를 이 절에 추가했다.
+공개 E2E의 인증 선행 router 주석을 정정했으며 일반 상태 계정·사용자 OAuth·시행일 정책 적용 등
+[잔여 계획](../checks/CHECK-O4O-AUTH-REMAINING-PLAN-V1.md)의 별도 모집단을 완료로 확대하지 않는다.
+WORKTREE_DISPOSITION: KEEP — 같은 미완료 WO의 후속 검증·2차 조사에 사용하는 cloud checkout이며 제거하지 않는다.
+후속 변경은 E2E·검증 기록뿐으로 DEPLOYMENT=NOT_APPLICABLE이다. 런타임 배포는 위 target에 대한 증거로 판정한다.
