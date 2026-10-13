@@ -1,6 +1,8 @@
 # CHECK-O4O-AUTH-REMAINING-PLAN-V1
 
-> 확인일: 2026-10-13 KST · [상위 TODO](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md)
+> **상태**: ACTIVE
+> **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
+> **근거 WO/IR**: [WO-O4O-AUTH-REFACTOR-V1](../work-orders/WO-O4O-AUTH-REFACTOR-V1.md), [WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1](../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)
 > 같은 미완료 WO의 연속 Phase · 사용자 종료 범위: branch push까지만
 > 조사 기준: `e999db2b9e`; 조회한 origin/main: `b3f792578a`
 
@@ -18,7 +20,7 @@ push-only 단계에서 자동 동기화·main 통합·타 트랙 배포를 수�
 | Identity V3 문구 정합 | [V3](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md)의 2026-10-07 대체 고지가 과거 미가입 로그인 거부를 대체한다. [현행 정본](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md), `service-catalog.ts`의 gate 비활성, `serviceLoginEligibility.test.ts` 대조. Frozen의 과거 본문 재작성 불필요 |
 | 공급자·펀딩 로그인 순환 | 하위 [카카오 WO](../work-orders/WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)의 #423 운영 반영 기록. 최신 `LoginRedirect.test.tsx`의 공개 홈 진입 회귀와 대조 |
 | 정책 표시·개정 준비 | #457/#497 구현·배포, 공고 공개 및 계약 검증. [개정 설계](../design/DESIGN-O4O-AUTH-LEGAL-POLICY-REFRESH-V1.md)의 실행 절차와 대조. 새 정책 DB 게시 완료로 해석하지 않음 |
-| Demo3 연결·운영 검증 | #521/#524 구현과 승인된 계획 적용, #525 운영 기록. 기존 owner/supplier ID·FK 유지, 같은 매장 직원, 재실행 변경0.8 origin48조건·대표 홈6조건·전체관리자2조건. 전체 미사용 데이터 삭제나 일반 상태 계정 검증으로 확대하지 않음 |
+| Demo3 연결·운영 검증 | #521/#524 구현과 승인된 계획 적용, #525 운영 기록. 기존 owner/supplier ID·FK 유지, 같은 매장 직원, 재실행 변경 0 · 8 origin 48/48조건 · 대표 홈 6/6조건 · 전체관리자 2/2조건. 전체 미사용 데이터 삭제나 일반 상태 계정 검증으로 확대하지 않음 |
 
 ## V04: 일반 계정 상태 검증 준비
 
