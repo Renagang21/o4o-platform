@@ -7,6 +7,8 @@ const cert='cm-cert-pharmacyhub',map='o4o-main-cert-map';
 const entries=['cm-entry-pharmacyhub-root','cm-entry-pharmacyhub-www'];
 const auth=['dns-auth-pharmacyhub-root','dns-auth-pharmacyhub-www'];
 const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
+export const certificatePermissions=['certificatemanager.certmapentries.delete','certificatemanager.certs.delete',
+  'certificatemanager.dnsauthorizations.delete','certificatemanager.operations.get'];
 const resource=v=>String(v).replace(/^.*?projects\//,'projects/').replace('projects/117791934476/','projects/netureyoutube/');
 const path=(kind,name)=>`projects/netureyoutube/locations/global/${kind}/${name}`;
 function inspectCertificate(snapshot) {
@@ -101,5 +103,14 @@ export async function retireCertificates({mode,read=inventory,beforeWrite=gate,r
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   await gate();
-  console.log(JSON.stringify(await retireCertificates({mode:process.env.CUTOVER_MODE})));
+  const token=command(['auth','print-access-token']).trim();
+  const response=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/netureyoutube:testIamPermissions',{
+    method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
+    body:JSON.stringify({permissions:certificatePermissions}),signal:AbortSignal.timeout(15000),
+  });
+  if(!response.ok)throw new Error('PH_CERT_PERMISSION_CHECK_UNAVAILABLE');
+  const payload=await response.json();
+  const missingPermissions=certificatePermissions.filter(p=>!payload.permissions?.includes(p));
+  if(process.env.CUTOVER_MODE==='apply'&&missingPermissions.length)throw new Error('PH_CERT_DELETE_PERMISSIONS_REQUIRED');
+  console.log(JSON.stringify({...await retireCertificates({mode:process.env.CUTOVER_MODE}),missingPermissions}));
 }
