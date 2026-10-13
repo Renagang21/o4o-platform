@@ -65,6 +65,30 @@ const checks=[
   ['mediaCatalogOnlyLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_assets.id','media_assets.service_key'],
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
       WHERE ${ph('a.service_key')} AND l.entity_type IN ('product','brand','content','service')`],
+  ['mediaJobOrphanLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','automation_jobs.id'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND l.entity_type='video-production-job'
+      AND NOT EXISTS (SELECT 1 FROM public.automation_jobs j WHERE j.id::text=l.entity_id)`],
+  ...['DRAFT','IN_PROGRESS','WAITING','COMPLETED','CANCELLED'].map(status=>[
+    `mediaJobStatus:${status}`,['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','automation_jobs.id','automation_jobs.status'],
+    `SELECT count(*)::text AS count FROM public.automation_jobs j WHERE j.status='${status}' AND EXISTS
+      (SELECT 1 FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+        WHERE ${ph('a.service_key')} AND l.entity_type='video-production-job' AND l.entity_id=j.id::text)`,
+  ]),
+  ...['INPUT','INTERMEDIATE','OUTPUT'].map(purpose=>[
+    `mediaJobPurpose:${purpose}`,['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.purpose','media_assets.id','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND l.entity_type='video-production-job' AND l.purpose='${purpose}'`,
+  ]),
+  ['mediaJobOtherAssets',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM public.media_entity_links s JOIN public.media_assets other ON other.id=s.media_asset_id
+      WHERE s.entity_type='video-production-job' AND NOT COALESCE(${ph('other.service_key')},FALSE)
+      AND EXISTS (SELECT 1 FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+        WHERE ${ph('a.service_key')} AND l.entity_type='video-production-job' AND l.entity_id=s.entity_id)`],
+  ['mediaJobTempOutputs',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','automation_jobs.id','automation_jobs.temp_output_object_key'],
+    `SELECT count(*)::text AS count FROM public.automation_jobs j WHERE NULLIF(j.temp_output_object_key,'') IS NOT NULL AND EXISTS
+      (SELECT 1 FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
+        WHERE ${ph('a.service_key')} AND l.entity_type='video-production-job' AND l.entity_id=j.id::text)`],
   ['mediaUnownedEntityLinks',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
     `SELECT count(*)::text AS count FROM public.media_entity_links l JOIN public.media_assets a ON l.media_asset_id=a.id
       WHERE ${ph('a.service_key')} AND NOT COALESCE((l.entity_type='service' AND ${ph('l.entity_id')}),FALSE)
