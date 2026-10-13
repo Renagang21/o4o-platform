@@ -154,3 +154,32 @@ TLS를 검증한 운영 upstream으로 동일 assertion을 실행한 전체 로�
 현재 수동 workflow의 credential-free 명칭과 달리 이 한 조건은 **의도적으로 공개된 Demo 세션**을 사용하며,
 민감한 계정 fixture나 관리자 credential을 소비하지 않는다. 새 인프라/권한 정책은 추가하지 않는다.
 후속 HEAD의 CI/review·E2E·main 통합 결과는 PR #546의 실제 check와 merge 상태로 확인한다.
+
+### 최종 실행 경계 보완 — 기본 검사와 운영 session smoke 분리
+
+`a93fc1d263`의 전체 로컬64/64·GitHub [38471830955](https://github.com/Renagang21/o4o-platform/actions/runs/38471830955)
+PASS 이후 리뷰에서 ref별 workflow가 동시에 운영 Demo 세션을 변경할 수 있다는 P1이 나왔다.
+실제 로그인은 세션 발급·마지막 로그인 시각·브라우저 폐기 원장 write를 수반한다. 앞 절의
+"비밀번호/계정 write 없음"은 비밀번호·프로필·권한을 바꾸지 않았다는 범위이며, **DB write 전체0이라는 뜻은 아니다**.
+이 경계를 명시하고 CI 인프라를 확대하는 대신 실제 세션 검사를 별도로 분리했다.
+
+- 기본 `playwright.config.ts`는 기존 `*.spec.ts`64조건만 수집한다. 유효한 credential을 보내지 않는다.
+  관리자401 항목은 익명 인증 gate의 거절만 확인하며 route 부재 증거로 주장하지 않는다.
+- `admin-route-retirement.live-smoke.ts`의 실제 me200/관리자403/은퇴404 구분은
+  `playwright.live-smoke.config.ts`로 **사용자가 승인한 운영 smoke 창**에서만 실행한다.
+  `CI`가 설정되거나 승인 flag가 없으면 runner 시작 단계에서 거절한다. workers1·retry0이다.
+- 실행자는 같은 runtime의 배포/운영 DB 작업 및 다른 실제 session smoke가 없음을 먼저 확인하고
+  다른 ref/세션의 live 실행과 직렬화한다. flag를 setup script·workflow에서 자동 설정하지 않는다.
+- 이번 세션은 진행 중인 Promote/deploy/Auth Runtime workflow0과 기존 local live 검사 종료를 확인한 뒤
+  별도 검사를 순서대로 실행했다. PC/mobile2/2 PASS이며 그 검사에서 만든 세션만 종료했다.
+- 기본64조건과 별도 live2조건의 수집 분리를 확인했다. `CI=true`에서 승인 flag가 있어도
+  live config가 시작을 거절하는 것을 실제 확인했다. `.github` workflow·의존성·운영 인증 정책 변경은 없다.
+
+승인된 별도 명령(검사 전 공유 runtime 직렬화 확인 필요):
+
+```bash
+E2E_APPROVED_AUTH_LIVE_SMOKE=1 pnpm exec playwright test --config=e2e/auth-runtime/playwright.live-smoke.config.ts
+```
+
+문서 정합: 이전 회차의 세션 write 표현을 이 절에서 명확히 정정했다. 기본 workflow PASS와
+승인된 실제 세션 smoke PASS를 분리하며, 최종 통합은 PR #546의 최신 HEAD 기술 게이트를 따른다.

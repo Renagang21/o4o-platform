@@ -13,11 +13,10 @@
  *     (성공 경로는 실제 Google 계정이 필요하므로 통제된 배포 창의 사용자 smoke 에서 본다.)
  *  R3 은퇴 endpoint 응답에 password 관련 힌트가 없다(존재를 알려주는 메시지 0).
  *
- * 비밀번호·계정 데이터 쓰기 없음. 공개 Demo 세션을 만들고 그 세션만 종료한다.
- * 실제 사용자·운영자 자격정보는 사용하지 않는다.
+ * 쓰기 없음 — 기본 workflow는 전부 거절되는 요청이며 유효한 자격증명을 보내지 않는다.
+ * 관리자 은퇴 경로의 실제404 구분은 승인·직렬화한 별도 live smoke에서 검증한다.
  */
 import { test, expect } from '@playwright/test';
-import { PUBLIC_DEMO_ACCOUNTS } from '../../packages/auth-utils/src/demoAccounts';
 
 const API_BASE_URL = process.env.E2E_API_BASE_URL || 'https://api.neture.co.kr';
 const V1 = `${API_BASE_URL}/api/v1`;
@@ -51,7 +50,7 @@ test.describe('은퇴한 password endpoint (R1·R3)', () => {
 });
 
 test.describe('requireAuth 뒤의 은퇴 경로 (R1-b)', () => {
-  test('관리자 password 경로는 익명 인증 거절 뒤 공개 Demo 세션에서 실제 404로 구분된다', async ({ request }) => {
+  test('관리자 password 경로의 익명401은 route 부재 증거가 아니다', async ({ request }) => {
     // platform-accounts.routes.ts의 router.use(authenticate)가 route 조회보다 먼저 실행된다.
     // 익명 401만으로 은퇴를 판정하지 않는다. route 부재는 정적 P2가 별도로 검증한다.
     const base = `${V1}/admin/platform-accounts/00000000-0000-4000-8000-000000000000`;
@@ -70,41 +69,7 @@ test.describe('requireAuth 뒤의 은퇴 경로 (R1-b)', () => {
       expect(text).not.toContain(hint);
     }
 
-    // 실제 인증을 통과하되 관리자 권한이 없는 canonical 공개 Demo를 쓴다.
-    // 살아 있는 관리자 route는 ROLE_REQUIRED로 거절되고, 은퇴 route는 404다.
-    // 존재하지 않는 대상 UUID와 빈 body라 이전 password handler도 write에 도달하지 않는다.
-    const demo = PUBLIC_DEMO_ACCOUNTS.find((account) => account.type === 'SUPPLIER')!;
-    const originHeaders = { Origin: 'https://neture.co.kr' };
-    let tokens: { accessToken: string; refreshToken: string } | undefined;
-    try {
-      const login = await request.post(`${V1}/auth/email/login`, {
-        headers: originHeaders,
-        data: { email: demo.email, password: demo.password, includeLegacyTokens: true },
-      });
-      expect(login.status()).toBe(200);
-      const loginBody = await login.json();
-      tokens = loginBody.data?.tokens ?? loginBody.tokens;
-      expect(typeof tokens?.accessToken).toBe('string');
-      expect(typeof tokens?.refreshToken).toBe('string');
-      const headers = { ...originHeaders, Authorization: `Bearer ${tokens!.accessToken}` };
-      const me = await request.get(`${V1}/auth/me`, { headers });
-      expect(me.status()).toBe(200);
-      const protectedRoute = await request.get(`${V1}/admin/platform-accounts`, { headers });
-      expect(protectedRoute.status()).toBe(403);
-      expect((await protectedRoute.json()).code).toBe('ROLE_REQUIRED');
-      for (const path of ['/password', '/__does_not_exist__']) {
-        const response = await request.patch(`${base}${path}`, { headers, data: {} });
-        expect(response.status()).toBe(404);
-      }
-    } finally {
-      if (tokens?.accessToken) {
-        const logout = await request.post(`${V1}/auth/logout`, {
-          headers: { ...originHeaders, Authorization: `Bearer ${tokens.accessToken}` },
-          data: { refreshToken: tokens.refreshToken },
-        });
-        expect(logout.status()).toBe(200);
-      }
-    }
+
   });
 
   /**
