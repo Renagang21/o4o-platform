@@ -454,7 +454,7 @@ main 기준은 `aa59a0962f` 유지. 이번 묶음 D01~D06 완료, D-N01~D-N04는
 PR 생성·main 병합·배포·운영 DB 변경 및 CI/리뷰 integration-ready 판정 없음.
 
 
-## 12. 오래된 생성 응답 UI 반영 차단 — TODO 초안
+## 12. 오래된 생성 응답 UI 반영 차단 — TODO·검증 결과
 
 같은 WO/branch의 연속 묶음. 기준 main `aa59a0962f`, 직전 push `f674af98a4`.
 대상은 AiContentModal의 text/URL 생성 결과·오류·loading 반영이다.
@@ -465,7 +465,7 @@ PR 생성·main 병합·배포·운영 DB 변경 및 CI/리뷰 integration-ready
 - [x] E04: 내부 요청 수명 guard 및 text/URL 결과·오류·finally 차단 구현.
 - [x] E05: 닫기/외부 close/재열기/연속 요청/source 전환/JSON 대기/unmount/현재 오류·저장 callback 검증.
 - [x] E06: content-editor type/build·공개 타입·Store 경계·lint 검증 및 결과 기록.
-- [ ] E07: 전용 branch에 commit·push, 원격 확인. main 병합·배포 없음.
+- [x] E07: 전용 branch에 commit·push, 원격 확인. main 병합·배포 없음.
 
 
 ### 12.1 TODO 검증 결과 (구현 전)
@@ -536,3 +536,18 @@ PH 기록이며 이번 수정 경로·content-editor dependencies와 겹치지 �
 - [ ] E-N04: runtime observe/replay/dispatch의 공유 상태는 §11.3 D-N04 후속 유지.
 
 이번 수정의 종료는 push까지다. main 병합·배포·새 서비스 공통화는 진행하지 않는다.
+
+
+### 12.4 최종 검증·push 종료
+
+- 구현 commit `985c19d719`, 최신 main `90e49c3e60` 통합 commit
+  `a5604d2d86d40a8d2e6a3db53bb0a39da421c798`.
+- main 통합으로 이번 content-editor 코드/의존성·검증 대상은 바뀌지 않음을 diff로 확인했다.
+  최종 UI 19 tests·Store/변환 계약 164 tests 재실행 PASS, 합계 183건 (중복 실행 합산 없음).
+- 최종 lint ratchet PASS: errors 46 / baseline 46, warnings 1,006.
+  public index.d.ts byte 동일 및 main 대비 전체 작업 diff-check PASS.
+- 위 통합 commit을 `wo/code-complexity-phase2`에 push하고 git ls-remote SHA 일치 확인.
+  이 종료 기록도 같은 branch의 문서 후속 commit으로 push한다.
+- E01~E07 완료. §11.3의 생성 응답 재열기 문제는 해결했고, §12.3 저장/목록/context/runtime 잔여는 미완료.
+- PR 생성·우리 변경의 main 병합·배포·PH job/apply·운영 DB/GCS 작업은 실행하지 않았다.
+  CI/리뷰 integration-ready 판정은 하지 않으며 이번 결과는 로컬 실행 검증이다.
