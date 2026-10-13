@@ -58,3 +58,10 @@ PR/main merge·배포는 종료 범위 밖이다. 임시 브라우저 서버 519
 
 종료: 구현 `a130dc53a8734bd121a184ea573a031a5006bab1`를 `wo/supplier-code-phase5`에 push하고 원격 SHA 일치를 확인했다.
 이전/이번 clone과 미통합 branch는 KEEP이다. main 통합·배포는 수행하지 않았다.
+
+
+## 추가 요청 종료 — main 통합·배포 (2026-10-13)
+
+사용자의 추가 요청에 따라 누적 공급자 작업을 PR #542로 main에 병합하고, 최신 main `3809c42db3f9d7f87ea9ba0ff4e62e4ad1ac0eb4`를 Promote 38403004672로 API와 6개 frontend에 배포했다. required CI·post-merge CI·최신 main CI·verified rollout·7서비스 serving SHA 확인과 운영 HTTP 17건이 PASS다.
+
+이전 push-only 완료 기록은 당시 범위를 보존한다. 이번 배포·잔여 advisory·실계정 검증 구분·환경 제약·KEEP 근거의 SSOT는 [동일 CHECK의 통합·배포 완료 기록](../checks/CHECK-O4O-SUPPLIER-PRODUCT-UI-CODE-CLEANUP-V1.md)이다.
