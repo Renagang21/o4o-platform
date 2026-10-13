@@ -1,10 +1,11 @@
-import type { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from "typeorm";
+import { randomUUID } from "node:crypto";
 
 /** Review-only schema change. Apply only through the authorized incremental migration job. */
 export class CreateAiUsageReservations1791870434349
   implements MigrationInterface
 {
-  name = 'CreateAiUsageReservations1791870434349';
+  name = "CreateAiUsageReservations1791870434349";
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE TABLE ai_usage_reservations (
       id uuid PRIMARY KEY, scope varchar(50) NOT NULL, service_key varchar(100) NOT NULL,
@@ -23,15 +24,39 @@ export class CreateAiUsageReservations1791870434349
     );
     // Sub-cent model prices must accumulate instead of rounding each call to zero.
     await queryRunner.query(
-      'ALTER TABLE ai_usage_aggregate ALTER COLUMN current_value TYPE numeric(20,8)',
+      "ALTER TABLE ai_usage_aggregate ALTER COLUMN current_value TYPE numeric(20,8)",
     );
     await queryRunner.query(
       'ALTER TABLE ai_usage_logs ALTER COLUMN "costEstimated" TYPE numeric(20,8)',
     );
   }
-  async down(): Promise<void> {
-    throw new Error(
-      'AI usage receipts and reservations must be preserved; use an approved forward repair',
+  async down(queryRunner: QueryRunner): Promise<void> {
+    if (!queryRunner.isTransactionActive) {
+      throw new Error("AI usage rollback requires a migration transaction");
+    }
+    // Each rollback keeps a distinct private recovery copy. No receipt is dropped or overwritten.
+    // The canonical schemas return to the previous registered state; archives are for explicit repair.
+    const archive = `ai_usage_rollback_${randomUUID().replace(/-/g, "")}`;
+    await queryRunner.query(
+      "LOCK TABLE public.ai_usage_aggregate, public.ai_usage_logs, public.ai_usage_reservations IN ACCESS EXCLUSIVE MODE",
+    );
+    await queryRunner.query(`CREATE SCHEMA "${archive}"`);
+    await queryRunner.query(
+      `CREATE TABLE "${archive}".ai_usage_aggregate AS TABLE public.ai_usage_aggregate`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "${archive}".ai_usage_logs AS TABLE public.ai_usage_logs`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE public.ai_usage_reservations SET SCHEMA "${archive}"`,
+    );
+    // PostgreSQL rejects values outside the old precision: the transaction then preserves the new state.
+    // Full-precision values remain in the recovery schema when the old runtime precision is restored.
+    await queryRunner.query(
+      "ALTER TABLE public.ai_usage_aggregate ALTER COLUMN current_value TYPE numeric(15,4) USING current_value::numeric(15,4)",
+    );
+    await queryRunner.query(
+      'ALTER TABLE public.ai_usage_logs ALTER COLUMN "costEstimated" TYPE numeric(10,6) USING "costEstimated"::numeric(10,6)',
     );
   }
 }

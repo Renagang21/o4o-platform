@@ -40,3 +40,10 @@
 ## 로컬 검증 완료
 
 Jest 고유 44 suites / 742 tests, UI 82 tests PASS. isolated PostgreSQL 15의 15 tests는 skip 대신 실제 실행했다. 운영 DB·application connection은 사용하지 않았다. 통합 browser PC/mobile 모두 정상 화면 차이 0·runtime/console error 0. API/editor/Neture build/typecheck 및 변경 lint·문서 검사 PASS. 테스트 상세·수정/재검증 경계는 WO에 기록한다.
+
+
+## PR gate 보완 검증
+
+PR #549 초기 CI에서 발견된 raw-source owner 누락·test literal lint 오류를 실제 owner 목록/불필요 escape 제거로 수정했다. root lint baseline 46/46 PASS이며 rule·baseline 조정 없음. 재현 shard의 실제 실패는 legacy App 은퇴 guard 1건으로 확인했고 해당 guard 및 selected-organization focused 40 tests PASS.
+
+Codex P1 rollback 보완은 pending quota migration에 한정한다. transaction/exclusive lock·고유 private recovery schema에서 예약/영수증 및 비용 정밀 원본 보존·이전 canonical fingerprint 복구·재적용·두 번째 archive 보존·overflow 전체 rollback을 실제 PG에서 검증했다. quota/schema 총 18 tests PASS, API build·변경 lint PASS. 정상 up의 SQL·최종 fingerprint·manifest는 변경하지 않았다. 운영 rollback/archive repair는 배포에 포함하지 않으며 별도 승인 경계다. 상세 근거·초기 실패/재검증은 WO 참조.

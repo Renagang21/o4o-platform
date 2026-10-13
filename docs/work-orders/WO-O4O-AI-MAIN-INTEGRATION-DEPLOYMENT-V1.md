@@ -27,7 +27,7 @@ AGENTS §4-1(e/f/g), README Delivery, 실제 main ruleset, [운영 migration 기
 
 1. `ai_usage_reservations` 예약·정산 영수증 테이블/진행 중 예약 index 생성.
 2. `ai_usage_aggregate.current_value`와 `ai_usage_logs.costEstimated`를 `numeric(20,8)`로 변경해 소액 호출 비용을 누적.
-3. 데이터/영수증 보존을 위해 destructive down 대신 승인된 forward repair를 요구.
+3. rollback은 transaction 안에서 예약·영수증을 고유 private recovery schema로 옮기고 두 비용 테이블의 정밀 원본을 보관한 뒤 이전 등록 정밀도로 복귀한다. 일반 runtime은 archive를 읽지 않으며 복구 자료의 재적용은 별도 승인된 repair다.
 
 기존 incremental manifest/fingerprint에 포함되어 있다. 자동 배포는 migration 때문에 LEVEL_3이며 main CI/Delivery 판정 뒤 정상 promote만 사용한다. 해당 migration 운영 실행은 명시 승인 전 dispatch하지 않는다. 승인 대상은 위 생성/정밀도 변경과 표준 migration job이며 임의 DDL/seed/delete가 아니다. serving→target 누적 delta에 다른 migration이 있으면 별도로 검토한다.
 
@@ -55,3 +55,16 @@ AGENTS §4-1(e/f/g), README Delivery, 실제 main ruleset, [운영 migration 기
 - API build, content-editor build/typecheck, Neture app build PASS. 변경 TS/TSX lint 오류·경고 0, 문서 민감정보·링크·diff PASS. 신규 dependency/lockfile/CI 변경 없음.
 - 실제 통합 Modal 격리 browser: desktop 1280×900 / mobile 390×844 정상 생성/삽입/URL·desktop 저장·늦은 응답 격리 PASS, runtime/console error 0. 앞 완료 화면 대비 pixel 차이 0. 운영 메뉴/계정/유료 호출 없음.
 - 통합 AI 후보 census 342 files / 96 동일-body 그룹 / 상대 cycle 0. 형식 변환은 main format으로 통합하고 private conversion import는 reexport로 유지한다. 이전 335/98 모집단과 신규 main helper 포함 차이를 분리한다.
+
+
+## PR gate·review finding 보완
+
+[PR #549](https://github.com/Renagang21/o4o-platform/pull/549), 초기 source head `2423b4ede9`를 검증했다. [초기 CI](https://github.com/Renagang21/o4o-platform/actions/runs/38469476507)의 API shard 1/2·웹/관리자 build·CodeQL·Guard는 PASS. 품질/shard 3의 실제 실패를 수정하며 CI 기준·assertion을 완화하지 않는다.
+
+- Whole lint 47 > baseline 46: 누적 selected-organization test 제목의 불필요한 apostrophe escape 1개를 제거했다. root `lint-ratchet.mjs` 재실행 결과 **46 errors / baseline 46 PASS**. 기존 baseline/rule/검사 범위는 수정하지 않았다.
+- Shard 3: 동일 명령을 로컬 실행해 **165 suites PASS, 1 fail, 8 skip**으로 재현했다. 실패는 legacy App 은퇴 guard가 logging owner를 outer executor 한 파일에서만 찾은 것이며 기능/로그 삭제가 아니다. 실제 `AiAccountedExecution` owner를 목록에 포함하고 outer 위임 및 `getRepository(AIUsageLog)` 보존을 함께 확인한다. 기존 entity 보존·은퇴 재도입 금지 assertions는 유지한다. 해당 guard + selected-organization 2 suites / 40 tests PASS.
+- Codex P1 `4264162314`: pending quota migration의 비기능 down을 보완했다. TypeORM transaction 없이 변경을 거절하고, exclusive lock 뒤 고유 `ai_usage_rollback_<opaque-id>` schema에 예약/영수증을 이동 및 aggregate/log 정밀 원본을 보관한다. public/cosmetics/neture의 기존 fingerprint 범위·registry를 변경하지 않고 실제 이전 상태로 되돌린다. overflow 시 archive 생성·테이블 이동·history 변경까지 transaction 전체가 취소된다. 재적용/두 번째 rollback도 이전 archive를 덮어쓰지 않는다.
+- 실제 PostgreSQL quota/schema **2 suites / 18 tests PASS**: 이전/최종 등록 fingerprint, 상세 receipt·8자리 비용 원본 보존, 재적용/다중 cycle, 무transaction 거절, numeric overflow의 원자적 실패를 확인했다. 운영 DB 실행/DDL 없음. API build·변경 lint PASS. 초기 통합 44 suites / 742 tests에 rollback 3개가 추가되며 focused consumer 40개는 별도 결과다.
+- Actions 상세 로그는 허용되지 않은 results-receiver host로 redirect되어 다운로드 불가였다. network/TLS 경계 우회나 설정 변경 없이 동일 shard 명령으로 재현·진단했다.
+
+이 보완은 신규 migration의 정상 up(테이블/index 생성·비용 정밀도 변경)을 변경하지 않는다. 운영 migration의 명시 승인 경계도 그대로다. 후속 source head의 CI Gate·review thread·main 위치를 다시 확인한 뒤 병합한다.

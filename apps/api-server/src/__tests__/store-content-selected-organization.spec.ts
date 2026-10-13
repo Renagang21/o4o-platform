@@ -181,7 +181,7 @@ describe('AI translation uses existing store authorization and draft persistence
     expect(result.body.data.translation).toMatchObject({ title: 'translated', status: 'draft', execution: { requestId: 'run-a', providerRequestId: 'call-a' } });
     expect(repo.save).toHaveBeenCalledWith(expect.objectContaining({ organization_id: B, updated_by: 'synthetic-user' }));
   });
-  it("never invokes AI for a different store\'s material", async () => {
+  it("never invokes AI for a different store's material", async () => {
     const { ds, repo } = translationDatabase();
     const result = await request(appFor(ds)).post(`/contents/direct/${A}/translate`).set('X-Store-Organization-Id', A).send({ locale: 'en' });
     expect(result.status).toBe(404); expect(mockTranslation).not.toHaveBeenCalled(); expect(repo.save).not.toHaveBeenCalled();
