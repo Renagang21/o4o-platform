@@ -1,0 +1,41 @@
+/** Read-only, aggregate-only census of PH references not protected by foreign keys. */
+const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-event-offer'];
+const ph=value=>`(${value}::text = ANY($1::text[]) OR left(${value}::text,13)='pharmacy-hub:')`;
+const orderScope=['serviceKey','service_key','source','sourceService'].map(k=>`o.metadata->>'${k}' = ANY($1::text[])`).join(' OR ');
+const checks=[
+  ['orderLogs',['checkout_order_logs.orderId','checkout_orders.id','checkout_orders.metadata'],
+    `SELECT count(*)::text AS count FROM checkout_order_logs l JOIN checkout_orders o ON l."orderId"=o.id WHERE ${orderScope}`],
+  ['paymentsWithoutPhOrder',['o4o_payments.orderId','o4o_payments.sourceService','checkout_orders.id','checkout_orders.metadata'],
+    `SELECT count(*)::text AS count FROM o4o_payments p WHERE ${ph('p."sourceService"')} AND NOT EXISTS
+      (SELECT 1 FROM checkout_orders o WHERE o.id::text=p."orderId"::text AND (${orderScope}))`],
+  ['foreignPaymentsForPhOrder',['o4o_payments.orderId','o4o_payments.sourceService','checkout_orders.id','checkout_orders.metadata'],
+    `SELECT count(*)::text AS count FROM o4o_payments p JOIN checkout_orders o ON o.id::text=p."orderId"::text
+      WHERE (${orderScope}) AND NOT COALESCE(${ph('p."sourceService"')},FALSE)`],
+  ['mediaLinks',['media_entity_links.media_asset_id','media_assets.id','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM media_entity_links l JOIN media_assets a ON l.media_asset_id=a.id WHERE ${ph('a.service_key')}`],
+  ['mediaLinksOutsidePhContent',['media_entity_links.media_asset_id','media_entity_links.entity_type','media_entity_links.entity_id','media_assets.id','media_assets.service_key','cms_contents.id','cms_contents.serviceKey'],
+    `SELECT count(*)::text AS count FROM media_entity_links l JOIN media_assets a ON l.media_asset_id=a.id
+      WHERE ${ph('a.service_key')} AND NOT EXISTS (SELECT 1 FROM cms_contents c
+        WHERE l.entity_type='content' AND l.entity_id=c.id::text AND ${ph('c."serviceKey"')})`],
+  ['sharedMediaStorage',['media_assets.id','media_assets.service_key','media_assets.gcs_path','media_assets.url'],
+    `SELECT count(*)::text AS count FROM media_assets s WHERE NOT COALESCE(${ph('s.service_key')},FALSE)
+      AND EXISTS (SELECT 1 FROM media_assets a WHERE ${ph('a.service_key')} AND
+        ((NULLIF(a.gcs_path,'') IS NOT NULL AND a.gcs_path=s.gcs_path) OR (NULLIF(a.url,'') IS NOT NULL AND a.url=s.url)))`],
+  ['screenSetMediaReferences',['store_tablet_screen_blocks.config','media_assets.url','media_assets.service_key'],
+    `SELECT count(*)::text AS count FROM store_tablet_screen_blocks b WHERE EXISTS
+      (SELECT 1 FROM media_assets a WHERE ${ph('a.service_key')} AND NULLIF(a.url,'') IS NOT NULL AND strpos(b.config::text,a.url)>0)`],
+  ['mediaStorageObjects',['media_assets.service_key','media_assets.gcs_path'],
+    `SELECT count(*)::text AS count FROM media_assets a WHERE ${ph('a.service_key')} AND NULLIF(a.gcs_path,'') IS NOT NULL`],
+];
+export async function collectRetirementReferences(client,columns) {
+  const available=new Set(columns.map(c=>`${c.table_name}.${c.column_name}`));
+  const counts={},blockers=[];
+  for(const [name,required,sql]of checks) {
+    if(required.some(column=>!available.has(column))) {blockers.push({check:name,code:'REFERENCE_SCHEMA_UNAVAILABLE'});continue;}
+    const result=await client.query(sql,[keys]);
+    const value=result.rows?.[0]?.count;
+    if(typeof value!=='string'||!/^\d+$/.test(value))throw Object.assign(new Error('Invalid reference count'),{code:'REFERENCE_COUNT'});
+    counts[name]=value;
+  }
+  return {readOnly:true,complete:blockers.length===0,counts,blockers,deletionApproved:false};
+}
