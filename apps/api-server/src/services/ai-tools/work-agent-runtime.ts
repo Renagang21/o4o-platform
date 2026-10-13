@@ -1,20 +1,21 @@
+import { createWorkObservationSession, createWorkRunMeasurements, type WorkObservationSession } from './work-observation-session.js';
 import { dispatchWorkProposal } from './work-proposal-dispatch.js';
 import { createWorkReplay } from './work-replay.js';
-import type { WorkDispatchContext, UnitReport, UnitStop, UnitObservation, UnitRun, ActDirective } from './work-execution-types.js';
+import type { WorkDispatchContext, ActDirective } from './work-execution-types.js';
 import { persistTerminalRun, persistWorkflow, recordExperience } from './work-run-finalization.js';
 import { WorkPlanner, PlannerInput, METHOD_DISCOVERY_MAX } from "./work-planner.js";
 export { METHOD_DISCOVERY_MAX, PlannerInput, WorkPlanner, WORK_PLANNER_SYSTEM_PROMPT, describeExecutionIntent, buildPlannerUserPrompt, PlannerTargetResolver, createPlannerTargetResolverForProvider, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, OPENAI_CHAT_COMPLETIONS_URL, buildOpenAiVisionBody, openAiMessageText, createLlmPlanner, createStrongLlmPlanner } from "./work-planner.js";
 /**
- * Goal-Driven Multimodal Work Agent V0 — runtime loop · Planner · 렌더
+ * Goal-Driven Multimodal Work Agent — 세션 조율 · runtime loop · 렌더
  *
  * WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §3·§7~§9·§11~§15·§17~§20·§22·§34~§36·§44~§46
  *
  *   User Goal → Observe → Plan → (Interpret needed input) → Act → Observe Result → Progress → Continue / Takeover / Stop
  *
- *   - 관찰 · 행동은 전부 기존 `local.browser.dom.*`(issueDomCommand) 다. 새 agent action · 새 실행 수단은 없다(§14).
+ *   - 관찰 · 행동은 기존 DOM/UIA/computer executor를 쓴다. 관찰 세션은 내부 책임 분리이며 새 action/실행 수단이 아니다.
  *   - Planner(AI) 는 다음 행동 **하나**를 제안할 뿐이다. Runtime 이 `validateWorkProposal` 로 검증하고 실행한다(§9·§10).
  *   - 행동 성공 ≠ 목적 달성 — 행동 뒤에는 반드시 다시 관찰한다(§17).
- *   - 상태는 이 함수 호출 안에서만 산다(§40). DB · automation_jobs · 큐 · 스케줄러에 닿지 않는다(§41).
+ *   - 실행 상태/이미지는 요청 세션 안에서만 산다. 기존 coordination/최종 기록 서비스에 위임하며 automation_jobs/큐/스케줄러를 추가하지 않는다.
  *   - 이미지는 Planner 가 "현재 화면이 요구하는 입력" 을 정한 뒤 그 값을 뽑는 데만 쓴다(§11·§12). 전용 스키마가 없다.
  */
 
@@ -26,15 +27,10 @@ import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR } from '../local-agent/local-age
 import { resolveTargetDevice, type DeviceRow } from '../local-agent/local-agent-service.js';
 import { nodeLedgerOwnerKey } from './node-ledger-owner.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
-import { DOM_UNIT_MAX_COMMANDS, DOM_UNIT_MAX_DURATION_MS, type DomUnitStep, type SafeDomElement } from '../local-agent/browser-dom-contract.js';
-import { issueDomCommand, issueDomUnitCommand } from './browser-dom-executor.js';
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
-import { issueUiaCommand } from './windows-uia-executor.js';
-import { issueComputerCapture, issueComputerAction } from './windows-computer-executor.js';
 
-import type { SafeUiaElement, SafeUiaWindow } from '../local-agent/windows-uia-contract.js';
-import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, fingerprintObservation, isValidWorkGoalRequest, isSubmitWindowNamedInGoal, sameWorkAction, validateWorkImageInput, validateWorkProposal, type ProposalRejectReason, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkImageInput, type WorkObservation, type WorkProgress, type WorkStepRecord, type WorkElement, type WorkSurface, type WorkAction, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
+import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, isSubmitWindowNamedInGoal, sameWorkAction, validateWorkImageInput, validateWorkProposal, type ProposalRejectReason, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkObservation, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkAction, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
 import { RECOVERY_ERROR, RECOVERY_LIMITS, classifyFailure, decideRecovery, isEscalatable, noteNotRecovered, noteRecovered, sanitizeRecoveryHint, type ClassifyInput } from './automation-recovery-contract.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
@@ -98,8 +94,6 @@ function resumeRejectMessage(reason: ResumeRejectReason): string {
   }
 }
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const NAVIGATION_SETTLE_MS = 700;
 
 // ─── Runtime loop (§3·§17·§18·§34~§36) ──────────────────────────────────────
 
@@ -220,7 +214,6 @@ export async function runWorkAgent(
    */
   let ledgerOwner: string | null = null;
   let neededInput: string | null = null;
-  let sameObservationRun = 0;
   let repeatedActionRun = 0;
   let lastRejectReason: ProposalRejectReason | undefined;
   // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
@@ -251,16 +244,10 @@ export async function runWorkAgent(
   // ── Local Experience 최소 저장(WO-O4O-AUTOMATION-LOCAL-EXPERIENCE-MINIMUM-STORAGE-V1) — 요청 메모리 전용 계측. ──
   //   단계 부가정보(행위자 · semantic locator · 소요)는 history 기록과 짝으로만 둔다. 값 · 화면 글 · 관찰은 담지 않는다.
   const stepMeta = new WeakMap<WorkStepRecord, ExperienceStepMeta>();
+  const measurements = createWorkRunMeasurements();
   let replaying = false;
-  let aiMs = 0;
-  let aiCalls = 0;
-  let settleMs = 0;
-  let retryCount = 0;
-  // Phase E — 작업 단위 dispatch(V2 §11-2). roundTrips 는 서버↔노드 명령 왕복 수(단발 · 단위 모두 1), unitDispatches 는 그중 단위 수.
+  // Phase E — 작업 단위 dispatch(V2 §11-2). measurements.roundTrips 는 서버↔노드 명령 왕복 수(단발 · 단위 모두 1), measurements.unitDispatches 는 그중 단위 수.
   // unitDisabled 는 이번 run 안에서 단위 경로를 끈다(형상 거절 · 전송 실패 뒤 — 같은 단위를 다시 보내지 않는다).
-  let roundTrips = 0;
-  let unitDispatches = 0;
-  let unitDisabled = false;
   /** 종료(인계) 직전 실패의 오류 코드 — 근거가 있는 곳에서만 정한다. */
   let terminalErrorCode: string | null = null;
   /** 인계를 Planner 가 제안했는가(Outcome 근거 = agent_inferred). */
@@ -308,11 +295,6 @@ export async function runWorkAgent(
     plannerMode = next;
     activePlanner = nextPlanner;
     logger.info('work-agent planner mode', { mode: next, why, aiPlanCount: state.aiPlanCount });
-  };
-  const settle = async (): Promise<void> => {
-    const t = Date.now();
-    await sleep(NAVIGATION_SETTLE_MS);
-    settleMs += Date.now() - t;
   };
   /** 실패 종료가 실행 환경(runtime) 층인가 — Candidate 실패 통계에서 뺀다(D7 · §11). */
   const endedByRuntime = (): boolean =>
@@ -430,15 +412,15 @@ export async function runWorkAgent(
     const resumable = kind === 'waiting_for_user' && !!goal.runId;
     if (runCreated && goal.runId) coordinationVersion = await persistTerminalRun({ dataSource, ctx, goal, deviceId, ledgerOwner, coordinationVersion }, kind);
     if (runCreated && goal.runId) await persistWorkflow({ dataSource, ctx, goal, deviceId, ledgerOwner, targetRef, siteId, workflow, trajectory, resumedRun, hasRecoveryHint: !!recoveryHint, replayedCandidateId, replayDiverge, endedByRuntime: endedByRuntime() }, kind);
-    if (surfaceReady) await recordExperience({ dataSource, ctx, goal, deviceId, ledgerOwner, state, resumeRow, runCreated, targetRef, siteId, surface, stepMeta, terminalErrorCode, inputMissing, visualFallback, replayDiverge, resumedRun, plannerTakeover, aiCalls, aiMs, settleMs, retryCount }, kind);
+    if (surfaceReady) await recordExperience({ dataSource, ctx, goal, deviceId, ledgerOwner, state, resumeRow, runCreated, targetRef, siteId, surface, stepMeta, terminalErrorCode, inputMissing, visualFallback: observationBinding.current?.isVisualFallback() ?? false, replayDiverge, resumedRun, plannerTakeover, aiCalls: measurements.aiCalls, aiMs: measurements.aiMs, settleMs: measurements.settleMs, retryCount: measurements.retryCount }, kind);
     // Phase 2 — 질문으로 멈추면 원래 업무 구조를 남기고, 도움 · 교정은 구조로 남긴다(Experience 기록 뒤 — 같은 run 행).
     if (runCreated && goal.runId && kind === 'waiting_for_user') await saveRunContext();
     if (runCreated && goal.runId) await recordAssistance(kind);
     // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
     logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
     // Phase E — 왕복 수만(내용 없음). 단위 경로 이전/이후 비교의 운영 근거.
-    if (surface === 'dom' && roundTrips > 0) {
-      logger.info('work-agent dispatch', { roundTrips, unitDispatches, stepCount: state.stepCount, taskUnit: executionNode?.capabilities?.taskUnit === true });
+    if (surface === 'dom' && measurements.roundTrips > 0) {
+      logger.info('work-agent dispatch', { roundTrips: measurements.roundTrips, unitDispatches: measurements.unitDispatches, stepCount: state.stepCount, taskUnit: executionNode?.capabilities?.taskUnit === true });
     }
     // PHASE 2 — 재생/저장 결과는 enum · 개수만(AI 계획 횟수 감소 측정용). 단계 내용 · 템플릿 · 값은 싣지 않는다.
     if (workflow.replay !== 'none' || workflow.candidate !== 'none') {
@@ -528,12 +510,12 @@ export async function runWorkAgent(
       plannerMode = 'discovery'; // 막힘 → Discovery 역할로 되돌린다(B). 기록 actor 도 ai_strong.
       recoveryStatus = RECOVERY_ERROR.ESCALATED;
       state.invalidProposals = 0;
-      sameObservationRun = 0;
+      observationBinding.current?.resetSameObservationRun();
       repeatedActionRun = 0;
-      retryCount += 1;
+      measurements.retryCount += 1;
       return 'retry';
     }
-    if (!decision.askUser && !opts.normalSpent && strongPlanner) { retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
+    if (!decision.askUser && !opts.normalSpent && strongPlanner) { measurements.retryCount += 1; return 'retry'; } // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
     noteNotRecovered(state.recovery);
     recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
     // 복구 소진의 끝: escalatable 하고 사용자에게 넘기는 국면이면 QUESTION(답하면 같은 run 재개), 아니면 TAKEOVER(§조건 5).
@@ -553,7 +535,7 @@ export async function runWorkAgent(
   const surface: WorkSurface = targetRef.targetType === 'windows_app' ? 'uia' : 'dom';
   // Experience 기록은 기기 · 재개 검증을 지나 대상 준비에 들어간 뒤부터만(그 전 종료는 기록할 run 이 없다).
   let surfaceReady = false;
-  let visualFallback = false; // 시각 모드 여부(아래 Visual Computer Use 절) — Experience 기록이 대상 준비 실패에서도 읽으므로 여기서 선언.
+  const observationBinding: { current?: WorkObservationSession } = {};
   let resumeRow: WorkRunCoordinationRow | null = null;
 
   // ── PHASE 1 same-run resume(§조건 5·검증 A·B·F) — 재개 요청 runId 를 먼저 읽기 전용으로 검증한다(claim 은 대상 준비 뒤).
@@ -712,210 +694,17 @@ export async function runWorkAgent(
   };
 
 
-  const budgetLeft = () => WORK_LOOP_LIMITS.maxSteps - state.stepCount;
-  const overTime = () => Date.now() - state.startedAt > WORK_LOOP_LIMITS.maxDurationMs;
-  const dom = async (action: string, args?: Record<string, unknown>) => {
-    state.stepCount += 1;
-    roundTrips += 1;
-    return issueDomCommand(dataSource, ctx, deviceId as string, tool, action, siteId, args);
-  };
-  const uia = async (action: string, args?: Record<string, unknown>) => {
-    state.stepCount += 1;
-    roundTrips += 1;
-    return issueUiaCommand(dataSource, ctx, deviceId as string, tool, action, siteId, args);
-  };
-  const computer = async (action: string, args?: Record<string, unknown>) => {
-    state.stepCount += 1;
-    roundTrips += 1;
-    return issueComputerAction(dataSource, ctx, deviceId as string, tool, siteId, action, args);
-  };
-
-  // ── Visual Computer Use (§4·§4-1) — UIA 가 요소를 못 볼 때만 켜지는 시각 모드. ──
-  //   visualFallback 이 켜지면 관찰마다 등재 앱 foreground client 를 캡처해 Planner 에 이미지로 넘긴다.
-  //   base64 는 이 함수 지역(visualImage)에만 살고 로그·DB·state·history 에 절대 쓰지 않는다(SENSITIVE_IMAGE_PERSISTENCE 0).
-  let visualImage: WorkImageInput | null = null;
-  let visualFailureRun = 0; // 연속 visual 행동 실패 → 인계(§4 반복 visual 실패).
+  // Bind the observation session only after node ownership, target preparation and run claim have passed.
+  const observationSession = createWorkObservationSession({ dataSource, ctx, deviceId: deviceId as string, executionNode: executionNode as DeviceRow, tool, siteId, surface, state, measurements });
+  observationBinding.current = observationSession;
+  const { budgetLeft, overTime, dom, uia, computer, unitCapable, runUnit, applyDomObservation, unitObserveError, reobserve, observe } = observationSession;
+  // Visual action failure counting stays with action interpretation, independently of observation refreshes.
+  let visualFailureRun = 0;
   const VISUAL_FAILURE_MAX = 2;
-  /** 등재 앱 foreground client 캡처(요청 메모리 전용). 성공하면 visualImage 갱신. 예산 1 을 쓴다(관찰 성격). */
-  const captureForVisual = async (): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (budgetLeft() < 1) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
-    state.stepCount += 1;
-    const cap = await issueComputerCapture(dataSource, ctx, deviceId as string, tool, siteId);
-    if (cap.status !== 'success' || !cap.image) return { ok: false, errorCode: cap.errorCode ?? LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION };
-    visualImage = { mimeType: 'image/jpeg', base64: cap.image.base64, provenance: 'screen_capture' };
-    return { ok: true };
-  };
-  /** 시각 모드 진입 — UIA 가 못 본 화면을 한 번 캡처해 Planner 에 이미지를 준다. 캡처 실패면 ok=false(호출자가 인계). */
   const enterVisualFallback = async (): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (surface !== 'uia' || visualFallback) return { ok: false };
-    const cap = await captureForVisual();
-    if (!cap.ok) return { ok: false, errorCode: cap.errorCode };
-    visualFallback = true;
-    visualFailureRun = 0;
-    if (state.observation) state.observation.visualFallback = true; // 이미지는 담지 않는다 — 표식만.
-    return { ok: true };
-  };
-
-  /** uia 표면 관찰 — `local.uia.inspect` 한 번. 창 목록 + 요소(DOM 과 같은 형상 + editable/size/focused). */
-  const observeUia = async (): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (budgetLeft() < 1) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
-    const r = await uia(LOCAL_AGENT_ACTIONS.UIA_INSPECT);
-    if (r.status !== 'success') return { ok: false, errorCode: r.errorCode };
-    const rawEls = (Array.isArray(r.safe.elements) ? r.safe.elements : []) as SafeUiaElement[];
-    const windows = (Array.isArray(r.safe.windows) ? r.safe.windows : []) as SafeUiaWindow[];
-    const elements: WorkElement[] = rawEls.map((e) => ({
-      elementRef: e.elementRef, role: e.role, name: e.name, text: e.text, disabled: e.disabled, hasValue: e.hasValue, riskLevel: e.riskLevel,
-      editable: e.editable, size: e.size, focused: e.focused, userAction: e.userAction, windowRef: e.windowRef,
-    }));
-    const fg = windows.find((w) => w.foreground) ?? windows[0];
-    const path = `window:${fg?.title ?? ''}`;
-    const obs: WorkObservation & { snapshotId: string } = {
-      siteId, path, ready: true, elements, elementCount: typeof r.safe.elementCount === 'number' ? r.safe.elementCount : elements.length,
-      source: 'app_window', surface: 'uia', windows: windows.map((w) => ({ windowRef: w.windowRef, title: w.title, foreground: w.foreground, userAction: w.userAction })),
-      fingerprint: fingerprintObservation(path, elements), snapshotId: String(r.safe.snapshotId ?? ''),
-    };
-    // 시각 모드면 현재 화면을 다시 캡처(Planner 는 이 이미지를 본다). 캡처 실패해도 UIA 관찰은 유지한다.
-    if (visualFallback) {
-      obs.visualFallback = true;
-      await captureForVisual();
-      // UIA 지문은 시각 모드에서 화면 변화를 반영하지 못한다(요소 미노출) — 같은-관찰 카운터를 진전 신호로 쓰지 않는다.
-      state.observation = obs;
-      sameObservationRun = 0;
-      return { ok: true };
-    }
-    const same = state.observation?.fingerprint === obs.fingerprint;
-    sameObservationRun = same ? sameObservationRun + 1 : 0;
-    state.observation = obs;
-    return { ok: true };
-  };
-
-  // ── Phase E — 작업 단위 dispatch(V2 §11-2) ──────────────────────────────────────────────────────────────
-  //   판단은 Assistant(여기), 연속 실행은 Execution Node. 노드가 `taskUnit` 을 보고했을 때만 DOM 표면에서 쓴다.
-  //   단위 안의 각 단계는 노드에서 단발 action 과 같은 검증 · 같은 실행 경로를 지나고, 화면이 예상과 다르거나
-  //   (대상 없음/모호 · 이동 불일치 · 다른 사이트) 사용자 몫(자격 · COMMIT)이거나 예산/시간이 모자라면 노드가 멈추고
-  //   지금 화면을 관찰해 돌려준다. 다음 판단은 늘 여기서 한다. 단위는 Task 목적이나 절차를 정하지 않는다.
-
-
-
-
-  const unitCapable = (): boolean => surface === 'dom' && !unitDisabled && executionNode?.capabilities?.taskUnit === true;
-  /**
-   * 단위 하나를 보낸다. 예산 · 시간 상한은 이번 run 의 남은 몫 안에서 정한다(노드가 그 안에서 멈춘다).
-   * denied 는 노드가 아무것도 실행하지 않았다는 뜻(형상 거절) — 호출자가 단발 경로로 같은 일을 한다.
-   * 그 밖의 실패(만료 · 전송)는 무엇이 실행됐는지 모른다 — **다시 보내지 않고** 관찰부터 한다.
-   * 어느 쪽이든 이번 run 의 남은 부분은 단발 경로로 간다.
-   */
-  const runUnit = async (steps: DomUnitStep[], opts: { observe: boolean; afterNavigation?: boolean; reserve?: number }): Promise<UnitRun> => {
-    const remainingMs = WORK_LOOP_LIMITS.maxDurationMs - (Date.now() - state.startedAt);
-    const maxDurationMs = Math.max(1000, Math.min(DOM_UNIT_MAX_DURATION_MS, Math.floor(remainingMs)));
-    const maxCommands = Math.max(1, Math.min(DOM_UNIT_MAX_COMMANDS, budgetLeft() - (opts.reserve ?? 0)));
-    const docId = state.observation?.docId;
-    roundTrips += 1;
-    unitDispatches += 1;
-    const r = await issueDomUnitCommand(dataSource, ctx, deviceId as string, tool, siteId, {
-      steps, observe: opts.observe, maxCommands, maxDurationMs,
-      ...(typeof docId === 'string' ? { docId } : {}),
-      ...(steps.length === 0 && opts.afterNavigation ? { afterNavigation: true } : {}),
-    });
-    if (r.status === 'denied') { unitDisabled = true; return { kind: 'denied' }; }
-    if (r.status !== 'success') { unitDisabled = true; return { kind: 'lost', errorCode: r.errorCode }; }
-    if (typeof r.safe.probeCount === 'number') retryCount += r.safe.probeCount;
-    const obs = r.safe.observation && typeof r.safe.observation === 'object' ? (r.safe.observation as UnitObservation) : null;
-    return {
-      kind: 'ran',
-      reports: (Array.isArray(r.safe.reports) ? r.safe.reports : []) as UnitReport[],
-      stop: (r.safe.stop ?? null) as UnitStop,
-      observation: obs,
-      observeErrorCode: typeof r.safe.observeErrorCode === 'string' ? r.safe.observeErrorCode : null,
-    };
-  };
-  /** 관찰 반영 — 단발 observe() 와 같은 규칙(지문 · 같은-관찰 카운터 · snapshot · docId). 유효 관찰은 예산 2. */
-  const applyDomObservation = (o: UnitObservation, countSame = true): void => {
-    const elements = (Array.isArray(o.elements) ? o.elements : []) as SafeDomElement[];
-    const path = typeof o.path === 'string' ? o.path : '';
-    const obs: WorkObservation & { snapshotId: string } = {
-      siteId, path, ready: true, elements, elementCount: typeof o.elementCount === 'number' ? o.elementCount : elements.length,
-      source: 'webpage', fingerprint: fingerprintObservation(path, elements), snapshotId: String(o.snapshotId ?? ''),
-      ...(typeof o.docId === 'string' ? { docId: o.docId } : {}),
-    };
-    state.stepCount += 2;
-    if (countSame) {
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-    }
-    state.observation = obs;
-  };
-  /** 노드가 관찰하지 못한 이유 → 단발 observe() 와 같은 오류 축. */
-  const unitObserveError = (code: string | null): string => {
-    if (code === 'DOM_UNIT_BUDGET') return WORK_AGENT_ERROR.LOOP_LIMIT;
-    if (code === null || code === 'DOM_UNIT_TIME' || code === 'DOM_UNIT_NOT_READY') return WORK_AGENT_ERROR.SITE_NOT_READY;
-    return code;
-  };
-  /** 행동 뒤 재관찰 — 단위 경로면 대기(settle)까지 노드가 한다. 단발 경로는 예전 그대로 서버가 기다린 뒤 관찰한다. */
-  const reobserve = async (navigated: boolean): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (navigated && !unitCapable()) await settle();
-    return observe({ afterNavigation: navigated });
-  };
-
-  /**
-   * get_context + inspect → 관찰(§7). 이동 직후엔 content script 가 설 때까지 짧게 재시도한다.
-   *
-   * `afterNavigation` 이면 **이전 문서(docId 동일)를 새 관찰로 받아들이지 않는다** — 실 health.kr smoke(2026-09-12)에서
-   * click 이 `navigated:true` 를 돌려준 뒤 700 ms 안에 옛 문서가 아직 살아 있어 홈 화면을 "결과 화면" 으로 관찰한 결함.
-   * 새 docId 가 올 때까지 몇 번 더 기다리되, 한 번도 안 바뀌면(같은 문서 안 이동) 마지막 관찰을 그대로 쓴다.
-   */
-  const observe = async (opts: { afterNavigation?: boolean } = {}): Promise<{ ok: boolean; errorCode?: string }> => {
-    if (surface === 'uia') return observeUia();
-    // Phase E — 관찰 전용 단위: get_context · 대기 · inspect 를 노드가 한 번에(왕복 1). 같은 재시도 · 옛 문서 규칙.
-    if (unitCapable()) {
-      if (budgetLeft() < 2) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
-      const u = await runUnit([], { observe: true, afterNavigation: opts.afterNavigation });
-      if (u.kind === 'ran') {
-        if (u.observation) { applyDomObservation(u.observation); return { ok: true }; }
-        if (u.observeErrorCode !== LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) return { ok: false, errorCode: unitObserveError(u.observeErrorCode) };
-        // 관찰이 결과 상한을 넘었다 — 아래 단발 관찰로 다시 본다.
-      }
-      // denied · lost — 관찰은 상태를 바꾸지 않는다. 단발 경로로 다시 본다.
-    }
-    const previousDocId = state.observation?.docId;
-    const attempts = opts.afterNavigation ? 10 : 3; // 이동 뒤 최대 ~7 s(실 health.kr 폼 이동이 4 s 를 넘긴다)
-    for (let attempt = 0; attempt < attempts; attempt += 1) {
-      if (attempt > 0) await settle();
-      if (budgetLeft() < 2) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
-      const c = await dom(LOCAL_AGENT_ACTIONS.DOM_GET_CONTEXT);
-      // 아직 쓸 수 없는 문서(미도달 · 로딩 중 · 옛 문서)를 다시 두드린 probe 는 행동 예산을 쓰지 않는다 —
-      // 예산은 "행동 + 유효 관찰" 의 상한이고, 대기 자체는 attempts · maxDuration 이 막는다(실 smoke 에서 이동 대기
-      // probe 4회가 예산을 잠식해 결과 화면 직전에 loop_limit 에 걸린 결함).
-      const unspend = () => { state.stepCount -= 1; retryCount += 1; };
-      if (c.status !== 'success') {
-        if (c.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) { unspend(); continue; }
-        return { ok: false, errorCode: c.errorCode };
-      }
-      if (typeof c.safe.siteId === 'string' && c.safe.siteId !== siteId) return { ok: false, errorCode: LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED };
-      if (c.safe.ready !== true) { unspend(); continue; }
-      if (opts.afterNavigation && previousDocId && c.safe.docId === previousDocId && attempt < attempts - 1) {
-        // 아직 옛 문서다 — 새 문서가 설 때까지 기다린다(마지막 시도면 그대로 받아들인다).
-        unspend();
-        continue;
-      }
-      const i = await dom(LOCAL_AGENT_ACTIONS.DOM_INSPECT);
-      if (i.status !== 'success') {
-        if (i.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) { unspend(); continue; }
-        return { ok: false, errorCode: i.errorCode };
-      }
-      const elements = (Array.isArray(i.safe.elements) ? i.safe.elements : []) as SafeDomElement[];
-      const path = typeof c.safe.path === 'string' ? c.safe.path : '';
-      const obs: WorkObservation & { snapshotId: string } = {
-        siteId, path, ready: true, elements, elementCount: typeof i.safe.elementCount === 'number' ? i.safe.elementCount : elements.length,
-        source: 'webpage', fingerprint: fingerprintObservation(path, elements), snapshotId: String(i.safe.snapshotId ?? ''),
-        ...(typeof c.safe.docId === 'string' ? { docId: c.safe.docId } : {}),
-      };
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-      state.observation = obs;
-      return { ok: true };
-    }
-    return { ok: false, errorCode: WORK_AGENT_ERROR.SITE_NOT_READY };
+    const outcome = await observationSession.enterVisualFallback();
+    if (outcome.ok) visualFailureRun = 0;
+    return outcome;
   };
 
   // ── 행동 실행(단발·Fast Loop 배치 공용) — act-only 종류 하나를 실행하고 다음 지시만 돌려준다. 재관찰은 호출자가 한다. ──
@@ -988,7 +777,7 @@ export async function runWorkAgent(
         const safety = SAFETY_TAKEOVER[outcome.errorCode ?? ''];
         if (safety) {
           // §4 — 숨은 목록 항목(구조적 확인 불가)은 즉시 인계하지 않는다. 아직 시각 모드가 아니면 화면을 캡처해 AI 가 실제 화면을 보고 잇게 한다.
-          if (outcome.errorCode === LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL && !visualFallback) {
+          if (outcome.errorCode === LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL && !observationSession.isVisualFallback()) {
             const v = await enterVisualFallback();
             if (v.ok) { lastRejectReason = undefined; return { do: 'continue' }; }
           }
@@ -1110,7 +899,7 @@ export async function runWorkAgent(
     let raw: unknown;
     state.aiPlanCount += 1;
     const planT0 = Date.now();
-    aiCalls += 1;
+    measurements.aiCalls += 1;
     try {
       raw = await activePlanner.plan({
         goal,
@@ -1118,7 +907,7 @@ export async function runWorkAgent(
         observation: state.observation as WorkObservation,
         history: state.history,
         lastRead,
-        image: visualFallback && visualImage ? visualImage : image,
+        image: observationSession.isVisualFallback() && observationSession.plannerImage() ? observationSession.plannerImage() : image,
         lastRejectReason,
         lastSafetyReason: lastSafetyReason || undefined,
         recoveryHint,
@@ -1130,9 +919,9 @@ export async function runWorkAgent(
         ...(input.intent ? { intent: input.intent } : {}),
       });
       methodDiscovery = undefined;
-      aiMs += Date.now() - planT0;
+      measurements.aiMs += Date.now() - planT0;
     } catch {
-      aiMs += Date.now() - planT0;
+      measurements.aiMs += Date.now() - planT0;
       // planner 호출 실패(PLANNING_FAILURE) — 정상 재시도 → strong → 사용자(§16). strong 없으면 기존대로 즉시 인계.
       if (recover({ plannerFault: true }) === 'giveup')
         return { result: await takeover('planner_unavailable', 'failed') };
@@ -1247,9 +1036,9 @@ export async function runWorkAgent(
       methodDiscoveryAttempts += 1;
       refreshPlannerMode('method_discovery');
       declaredAsk = null;
-      const keepRun = sameObservationRun; // 다시 보기는 무진전으로 세지 않는다.
+      const keepRun = observationSession.sameObservationRun(); // 다시 보기는 무진전으로 세지 않는다.
       const o = await observe();
-      sameObservationRun = keepRun;
+      observationSession.restoreSameObservationRun(keepRun);
       if (!o.ok) return observeFailed(o);
       methodDiscovery = {
         attempt: methodDiscoveryAttempts,
@@ -1273,7 +1062,7 @@ export async function runWorkAgent(
       if (
         reason === 'unsupported_control' &&
         surface === 'uia' &&
-        !visualFallback
+        !observationSession.isVisualFallback()
       ) {
         const v = await enterVisualFallback();
         if (v.ok) {
@@ -1347,7 +1136,7 @@ export async function runWorkAgent(
     if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
     if (state.aiPlanCount >= WORK_LOOP_LIMITS.maxAiPlans) return takeover('loop_limit', 'no_progress');
     // 같은 관찰이 반복됐다(무진전) — 무작정 다시 계획하지 말고 복구 판단(§36·§16). strong 이 있으면 한 번 더 세게, 없으면 인계.
-    if (sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) {
+    if (observationSession.sameObservationRun() >= WORK_LOOP_LIMITS.maxSameObservation) {
       if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
     }
     const planned = await planNextProposal();
