@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {PharmacyHubDevelopmentPurge} from './pharmacy-hub-development-purge.mjs';
 import {PharmacyHubMediaPurge} from './pharmacy-hub-media-purge.mjs';
+import {collectRetirementReferences} from './pharmacy-hub-retirement-references.mjs';
 const uuid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const ph='pharmacy-hub';
 test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, grouped payments and rollback',
@@ -25,7 +26,8 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
         CREATE TABLE cms_contents(id uuid PRIMARY KEY,"serviceKey" varchar);
         CREATE TABLE forum_category_requests(id uuid PRIMARY KEY,service_code varchar);
         CREATE TABLE media_assets(id uuid PRIMARY KEY,service_key varchar,gcs_path text,url text);
-        CREATE TABLE media_entity_links(id uuid PRIMARY KEY,media_asset_id uuid REFERENCES media_assets(id),entity_type varchar,entity_id varchar);
+        CREATE TABLE media_entity_links(id uuid PRIMARY KEY,media_asset_id uuid REFERENCES media_assets(id),entity_type varchar,entity_id varchar,purpose varchar DEFAULT 'INPUT');
+        CREATE TABLE automation_jobs(id uuid PRIMARY KEY,status varchar,temp_output_object_key text);
         CREATE TABLE users(id uuid PRIMARY KEY); CREATE TABLE organizations(id uuid PRIMARY KEY);
         CREATE TABLE shared_notes(id uuid PRIMARY KEY,metadata jsonb);`);
       for(let i=1;i<=6;i++){
@@ -43,7 +45,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('INSERT INTO forum_category_requests VALUES($1,$2)',[uuid(700),ph]);
       for(let i=0;i<4;i++)await client.query('INSERT INTO media_assets VALUES($1,$2,$3,$4)',[uuid(800+i),ph,`media/fixture-${i}.png`,`https://storage.googleapis.com/o4o-media-library/media/fixture-${i}.png`]);
       await client.query('INSERT INTO media_assets VALUES($1,$2,$3,$4)',[uuid(810),'neture','media/shared.png','https://storage.googleapis.com/o4o-media-library/media/shared.png']);
-      await client.query('INSERT INTO media_entity_links VALUES($1,$2,$3,$4)',[uuid(820),uuid(800),'service',ph]);
+      await client.query('INSERT INTO media_entity_links(id,media_asset_id,entity_type,entity_id) VALUES($1,$2,$3,$4)',[uuid(820),uuid(800),'service',ph]);
       await client.query('INSERT INTO users VALUES($1);',[uuid(900)]);
       await client.query('INSERT INTO organizations VALUES($1);',[uuid(901)]);
     };
@@ -99,11 +101,28 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('INSERT INTO shared_notes VALUES($1,$2)',[uuid(999),{catalogLink:uuid(820)}]);
       await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_VALUE/);await client.query('ROLLBACK');
       await client.query('DELETE FROM shared_notes');
-      await client.query('INSERT INTO media_entity_links VALUES($1,$2,$3,$4)',[uuid(821),uuid(800),'product',uuid(300)]);
+      await client.query('INSERT INTO media_entity_links(id,media_asset_id,entity_type,entity_id) VALUES($1,$2,$3,$4)',[uuid(821),uuid(800),'product',uuid(300)]);
       await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/LINK_CENSUS_CHANGED/);await client.query('ROLLBACK');
       await client.query('DELETE FROM media_entity_links WHERE id=$1',[uuid(821)]);
       await client.query("UPDATE media_entity_links SET entity_type='video-production-job'");
       await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/LINK_CENSUS_CHANGED/);await client.query('ROLLBACK');
+      const {rows:columns}=await client.query("SELECT table_name,column_name FROM information_schema.columns WHERE table_schema='public'");
+      const inspect=async()=>{
+        await client.query('BEGIN READ ONLY');
+        try{return await collectRetirementReferences(client,columns);}finally{await client.query('ROLLBACK');}
+      };
+      assert.equal((await inspect()).counts.mediaJobOrphanLinks,'1');
+      await client.query('INSERT INTO automation_jobs VALUES($1,$2,$3)',[uuid(903),'IN_PROGRESS','fixture/output.mp4']);
+      await client.query('UPDATE media_entity_links SET entity_id=$1',[uuid(903)]);
+      await client.query('INSERT INTO media_entity_links(id,media_asset_id,entity_type,entity_id) VALUES($1,$2,$3,$4)',[uuid(822),uuid(810),'video-production-job',uuid(903)]);
+      const jobReferences=await inspect();
+      assert.equal(jobReferences.counts.mediaJobOrphanLinks,'0');
+      assert.equal(jobReferences.counts['mediaJobStatus:IN_PROGRESS'],'1');
+      assert.equal(jobReferences.counts['mediaJobPurpose:INPUT'],'1');
+      assert.equal(jobReferences.counts.mediaJobOtherAssets,'1');
+      assert.equal(jobReferences.counts.mediaJobTempOutputs,'1');
+      await client.query('DELETE FROM media_entity_links WHERE id=$1',[uuid(822)]);
+      await client.query('DELETE FROM automation_jobs');
       await client.query('CREATE TABLE product_masters(id uuid PRIMARY KEY,name text)');
       await client.query('INSERT INTO product_masters VALUES($1,$2)',[uuid(300),'shared product']);
       await client.query("UPDATE media_entity_links SET entity_type='product',entity_id=$1",[uuid(300)]);
