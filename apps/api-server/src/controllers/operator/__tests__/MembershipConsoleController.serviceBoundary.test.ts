@@ -144,3 +144,52 @@ it('membershipServiceKey cannot change a pending retired membership through an a
  expect(response.status).toHaveBeenCalledWith(410);
  expect(mockQuery).not.toHaveBeenCalled();
 });
+
+
+describe('list/detail membership projection preserves distinct response contracts', () => {
+  const createdAt = new Date('2026-01-01T00:00:00Z');
+  const updatedAt = new Date('2026-01-02T00:00:00Z');
+  const membership = {
+    id: 'fixture-membership', user_id: ID, service_key: 'neture', status: 'active',
+    role: 'member', approved_by: null, approved_at: null, rejection_reason: null,
+    created_at: createdAt, updated_at: updatedAt,
+  };
+  const summary = {
+    id: 'fixture-membership', serviceKey: 'neture', status: 'active', role: 'member',
+    approvedBy: null, approvedAt: null, rejectionReason: null, createdAt,
+  };
+  beforeEach(() => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
+      if (sql.includes('COUNT(*)')) return [{ total: 1 }];
+      if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID, status: 'inactive' }];
+      if (sql.includes('FROM service_memberships')) return [membership];
+      if (sql.includes('FROM role_assignments')) return [];
+      return [];
+    });
+  });
+
+  it('list uses membership status, preserves nulls, and omits detail-only updatedAt', async () => {
+    const response = await readMembers('getMembers', ['neture'], { serviceKey: 'neture' });
+    const payload = response.json.mock.calls[0][0];
+    expect(payload.users[0].status).toBe('active');
+    expect(payload.users[0].memberships).toEqual([summary]);
+    expect(payload.users[0].memberships[0]).not.toHaveProperty('updatedAt');
+    expect(payload.pagination).toEqual({ page: 1, limit: 20, total: 1, totalPages: 1 });
+  });
+
+  it('detail keeps account status and adds membership updatedAt', async () => {
+    const response = await readMembers('getMemberDetail', ['neture'], { serviceKey: 'neture' });
+    const payload = response.json.mock.calls[0][0];
+    expect(payload.user.status).toBe('inactive');
+    expect(payload.memberships).toEqual([{ ...summary, updatedAt }]);
+    expect(payload.roles).toEqual([]);
+  });
+
+  it('empty list returns pagination without fetching roles or memberships', async () => {
+    mockQuery.mockImplementation(async sql => sql.includes('COUNT(*)') ? [{ total: 0 }] : []);
+    const response = await readMembers('getMembers', ['neture'], { serviceKey: 'neture' });
+    expect(response.json).toHaveBeenCalledWith({ success: true, users: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+    expect(mockQuery).toHaveBeenCalledTimes(2);
+  });
+});
