@@ -452,3 +452,32 @@ describe('Regression (§51)', () => {
     expect(db.commands).toHaveLength(0);
   });
 });
+
+describe('planner input ownership (phase 2 cleanup)', () => {
+  it('planner cannot rewrite the runtime goal or an already recorded action through its input', async () => {
+    const request = '약학정보원에서 아모디핀정 찾아줘';
+    let calls = 0;
+    const planner: WorkPlanner = {
+      kind: 'scripted',
+      async plan(input) {
+        calls += 1;
+        input.goal.request = 'Planner-local replacement';
+        if (calls === 1) return { assessment: 'progress', action: { kind: 'set_input', elementRef: 'e_2', text: 'Fixture value' } };
+        input.history[0].action.text = 'Planner-local history replacement';
+        return { assessment: 'completed', action: { kind: 'done' } };
+      },
+    };
+    const { result } = await run(request, planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME_ELEMENTS)], set_input: [OK({ hasValue: true })] });
+    expect(result.goal.request).toBe(request);
+    expect(result.history[0].action.text).toBe('Fixture value');
+  });
+
+  it('each planner call retains the history at that decision rather than a live accumulating array', async () => {
+    const planner = scripted(searchPlan);
+    const { result } = await run('약학정보원에서 아모디핀정 찾아줘', planner, searchScript);
+    expect(planner.calls[0].history).toHaveLength(0);
+    expect(planner.calls[1].history).toHaveLength(1);
+    expect(result.history.length).toBeGreaterThan(1);
+    expect(planner.calls[1].history).not.toBe(result.history);
+  });
+});

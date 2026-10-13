@@ -48,7 +48,6 @@ import {
   fingerprintObservation,
   isValidWorkGoalRequest,
   isSubmitWindowNamedInGoal,
-  sameWorkAction,
   validateWorkImageInput,
   validateWorkProposal,
   type ProposalRejectReason,
@@ -72,6 +71,7 @@ import {
   type ClassifyInput,
 } from './automation-recovery-contract.js';
 import { decideWorkAgentRecoveryAttempt } from './work-agent-recovery-attempt.js';
+import { createWorkAgentExecutionState } from './work-agent-execution-state.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
 import {
@@ -731,6 +731,7 @@ export async function runWorkAgent(
   const displayName = targetRef.displayName;
   let targetOutcome: WorkTargetOutcome | null = null;
   const state: WorkAgentState = createWorkAgentState(goal, siteId);
+  const execution = createWorkAgentExecutionState(state);
   const image = imageCheck.image;
   const inputMode: 'text' | 'text+image' = image ? 'text+image' : 'text';
   let lastRead: string | null = null;
@@ -744,8 +745,6 @@ export async function runWorkAgent(
    */
   let ledgerOwner: string | null = null;
   let neededInput: string | null = null;
-  let sameObservationRun = 0;
-  let repeatedActionRun = 0;
   let lastRejectReason: ProposalRejectReason | undefined;
   // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
   const safetyRejects: Record<string, number> = {};
@@ -793,8 +792,6 @@ export async function runWorkAgent(
   let inputMissing = false;
   /** 재생 이탈 원인(있으면). code 는 명령 오류 코드일 때만. */
   let replayDiverge: { cause: 'budget' | 'find_failed' | 'locator_not_found' | 'validation_rejected' | 'step_failed' | 'expect_mismatch'; code: string | null; stepSeq: number | null } | null = null;
-  /** execActOnce 가 이번 호출에서 남긴 단계 기록(실행 전 인계면 null). */
-  let lastActRecord: WorkStepRecord | null = null;
   // ── Phase 2 User Assistance · Correction(WO-O4O-AUTOMATION-USER-ASSISTANCE-AND-CORRECTION-V1) — 요청 메모리 전용. ──
   //   구조(업무 키 · 단계 키 · 무엇을 물었나 · 방법)만 둔다. 재개 답변 원문은 Planner 프롬프트 · slot 채우기에만 쓰고 저장하지 않는다.
   /** 재개 시 Local 이 돌려준 원래 업무 구조. */
@@ -1167,8 +1164,7 @@ export async function runWorkAgent(
       plannerMode = 'discovery'; // 막힘 → Discovery 역할로 되돌린다(B). 기록 actor 도 ai_strong.
       recoveryStatus = decision.status;
       state.invalidProposals = 0;
-      sameObservationRun = 0;
-      repeatedActionRun = 0;
+      execution.resetProgress();
       retryCount += 1;
       return 'retry';
     }
@@ -1390,7 +1386,7 @@ export async function runWorkAgent(
     if (!cap.ok) return { ok: false, errorCode: cap.errorCode };
     visualFallback = true;
     visualFailureRun = 0;
-    if (state.observation) state.observation.visualFallback = true; // 이미지는 담지 않는다 — 표식만.
+    if (state.observation) execution.acceptObservation({ ...state.observation, visualFallback: true }, 'preserve'); // 이미지는 담지 않는다 — 표식만.
     return { ok: true };
   };
 
@@ -1417,13 +1413,10 @@ export async function runWorkAgent(
       obs.visualFallback = true;
       await captureForVisual();
       // UIA 지문은 시각 모드에서 화면 변화를 반영하지 못한다(요소 미노출) — 같은-관찰 카운터를 진전 신호로 쓰지 않는다.
-      state.observation = obs;
-      sameObservationRun = 0;
+      execution.acceptObservation(obs, 'reset');
       return { ok: true };
     }
-    const same = state.observation?.fingerprint === obs.fingerprint;
-    sameObservationRun = same ? sameObservationRun + 1 : 0;
-    state.observation = obs;
+    execution.acceptObservation(obs);
     return { ok: true };
   };
 
@@ -1480,11 +1473,7 @@ export async function runWorkAgent(
       ...(typeof o.docId === 'string' ? { docId: o.docId } : {}),
     };
     state.stepCount += 2;
-    if (countSame) {
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-    }
-    state.observation = obs;
+    execution.acceptObservation(obs, countSame ? 'count' : 'preserve');
   };
   /** 노드가 관찰하지 못한 이유 → 단발 observe() 와 같은 오류 축. */
   const unitObserveError = (code: string | null): string => {
@@ -1551,9 +1540,7 @@ export async function runWorkAgent(
         source: 'webpage', fingerprint: fingerprintObservation(path, elements), snapshotId: String(i.safe.snapshotId ?? ''),
         ...(typeof c.safe.docId === 'string' ? { docId: c.safe.docId } : {}),
       };
-      const same = state.observation?.fingerprint === obs.fingerprint;
-      sameObservationRun = same ? sameObservationRun + 1 : 0;
-      state.observation = obs;
+      execution.acceptObservation(obs);
       return { ok: true };
     }
     return { ok: false, errorCode: WORK_AGENT_ERROR.SITE_NOT_READY };
@@ -1577,7 +1564,7 @@ export async function runWorkAgent(
     if ((act.kind === 'key' || act.kind === 'visual_key') && (act.key === 'ENTER' || act.key === 'CTRL+ENTER') && !isSubmitWindowNamedInGoal(state.observation, goal.request)) {
       return { do: 'reject', reason: 'WINDOW_NOT_NAMED_IN_GOAL' };
     }
-    lastActRecord = null;
+    execution.beginAction();
     const t0 = Date.now();
     const actEl = (state.observation?.elements ?? []).find((e) => e.elementRef === act.elementRef);
     const actLocator = experienceLocatorOf(surface, act, actEl);
@@ -1613,10 +1600,10 @@ export async function runWorkAgent(
       const entry = buildTrajectoryEntry(act, el, record, state.observation?.path);
       if (entry) trajectory.push(entry);
     }
-    state.history.push(record);
-    state.lastResult = record;
+    execution.append(record);
+    execution.acceptResult(record);
     stepMeta.set(record, { actor: currentActor(), locator: actLocator, durationMs: Date.now() - t0 });
-    lastActRecord = record;
+    execution.rememberAction(record);
 
     if (outcome.status !== 'success') {
       if (isVisual) {
@@ -1698,9 +1685,7 @@ export async function runWorkAgent(
       if (!ref) { workflow.replay = 'diverged'; replayDiverge = { cause: 'locator_not_found', code: null, stepSeq: null }; break; }
       const prev = state.observation as WorkObservation & { snapshotId?: string };
       const findSnapshot = String(f.safe.snapshotId ?? prev.snapshotId ?? '');
-      state.observation = {
-        ...prev, elements: matches, elementCount: matches.length, fingerprint: fingerprintObservation(prev.path, matches), snapshotId: findSnapshot,
-      } as WorkObservation;
+      execution.narrowObservation(matches, findSnapshot);
       observationFresh = false;
       const action: WorkAction =
         step.actionKind === 'click' ? { kind: 'click', elementRef: ref }
@@ -1709,7 +1694,7 @@ export async function runWorkAgent(
       const checked = validateWorkProposal({ assessment: 'progress', action }, state.observation);
       if (!checked.ok || !checked.proposal) { workflow.replay = 'diverged'; replayDiverge = { cause: 'validation_rejected', code: null, stepSeq: null }; break; }
       const dir = await execActOnce(checked.proposal.action, findSnapshot);
-      if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
+      if (dir.do === 'takeover') return takeoverWith(execution.lastActRecord?.errorCode, dir.reason, dir.progress);
       if (dir.do === 'reject' || state.lastResult?.status !== 'success') {
         workflow.replay = 'diverged';
         replayDiverge = dir.do === 'reject'
@@ -1780,17 +1765,14 @@ export async function runWorkAgent(
       const target = rep.target;
       if (!step || !target || typeof target.elementRef !== 'string') break;
       state.stepCount += 1; // 이 단계의 find
-      const prev = state.observation as WorkObservation & { snapshotId?: string };
-      state.observation = {
-        ...prev, elements: [target], elementCount: 1, fingerprint: fingerprintObservation(prev.path, [target]), snapshotId: '',
-      } as WorkObservation;
+      execution.narrowObservation([target], '');
       const unitStep = steps[rep.index];
       const action: WorkAction =
         step.actionKind === 'click' ? { kind: 'click', elementRef: target.elementRef }
         : step.actionKind === 'set_input' ? { kind: 'set_input', elementRef: target.elementRef, text: unitStep.text as string }
         : { kind: 'select_option', elementRef: target.elementRef, option: unitStep.option as string };
       const dir = await execActOnce(action, '', { status: rep.status, errorCode: rep.errorCode, safe: { navigated: rep.navigated, changed: rep.changed, riskLevel: rep.riskLevel } });
-      if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
+      if (dir.do === 'takeover') return takeoverWith(execution.lastActRecord?.errorCode, dir.reason, dir.progress);
       if (rep.status === 'success') workflow.replayedSteps += 1;
     }
     const stop = u.stop;
@@ -1866,7 +1848,7 @@ export async function runWorkAgent(
     if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
     if (state.aiPlanCount >= WORK_LOOP_LIMITS.maxAiPlans) return takeover('loop_limit', 'no_progress');
     // 같은 관찰이 반복됐다(무진전) — 무작정 다시 계획하지 말고 복구 판단(§36·§16). strong 이 있으면 한 번 더 세게, 없으면 인계.
-    if (sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) {
+    if (execution.sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) {
       if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
     }
 
@@ -1876,7 +1858,8 @@ export async function runWorkAgent(
     const planT0 = Date.now();
     aiCalls += 1;
     try {
-      raw = await activePlanner.plan({
+      // Planner may retain or edit its input; execution evidence remains request-owned.
+      raw = await activePlanner.plan(structuredClone({
         goal, siteDisplayName: displayName, observation: state.observation as WorkObservation, history: state.history, lastRead,
         image: visualFallback && visualImage ? visualImage : image, lastRejectReason,
         lastSafetyReason: lastSafetyReason || undefined,
@@ -1887,7 +1870,7 @@ export async function runWorkAgent(
         ...(patterns.length ? { patterns } : {}),
         ...(methodDiscovery ? { methodDiscovery } : {}),
         ...(input.intent ? { intent: input.intent } : {}),
-      });
+      }));
       methodDiscovery = undefined;
       aiMs += Date.now() - planT0;
     } catch {
@@ -1901,7 +1884,7 @@ export async function runWorkAgent(
       state.invalidProposals += 1;
       lastRejectReason = checked.reason;
       const rejected: WorkStepRecord = { step: state.stepCount, action: { kind: 'inspect' }, status: 'rejected', rejectReason: checked.reason };
-      state.history.push(rejected);
+      execution.append(rejected);
       stepMeta.set(rejected, { actor: currentActor(), locator: null, durationMs: null });
       if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
         // 정상 planner 가 계속 무효 제안 — 정상 재시도 소진으로 보고 strong 부터 판단(§16). strong 없으면 기존대로 인계.
@@ -1934,7 +1917,7 @@ export async function runWorkAgent(
         state.invalidProposals += 1;
         lastRejectReason = 'AVOID_PATTERN';
         const rejected: WorkStepRecord = { step: state.stepCount, action: { kind: 'inspect' }, status: 'rejected', rejectReason: 'AVOID_PATTERN' };
-        state.history.push(rejected);
+        execution.append(rejected);
         stepMeta.set(rejected, { actor: currentActor(), locator: null, durationMs: null });
         logger.info('work-agent avoid pattern', { stage: stage ?? null, aiPlanCount: state.aiPlanCount });
         if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
@@ -1954,9 +1937,9 @@ export async function runWorkAgent(
       methodDiscoveryAttempts += 1;
       refreshPlannerMode('method_discovery');
       declaredAsk = null;
-      const keepRun = sameObservationRun; // 다시 보기는 무진전으로 세지 않는다.
+      const keepRun = execution.sameObservationRun; // 다시 보기는 무진전으로 세지 않는다.
       const o = await observe();
-      sameObservationRun = keepRun;
+      execution.restoreObservationRun(keepRun);
       if (!o.ok) return observeFailed(o);
       methodDiscovery = { attempt: methodDiscoveryAttempts, askKind: proposal.ask?.kind ?? 'unknown' };
       logger.info('work-agent method discovery', { attempt: methodDiscoveryAttempts, askKind: methodDiscovery.askKind, aiPlanCount: state.aiPlanCount });
@@ -1987,13 +1970,10 @@ export async function runWorkAgent(
     if (proposal.assessment === 'needs_user') { plannerTakeover = true; return takeover('user_judgment_required', 'needs_user'); }
 
     // 반복 행동 감지(§36) — 같은 행동을 무작정 반복하지 않는다. 복구 판단: strong 이 있으면 다른 계획을 세우게 하고, 없으면 인계.
-    if (sameWorkAction(state.lastResult?.action, proposal.action)) {
-      repeatedActionRun += 1;
-      if (repeatedActionRun >= WORK_LOOP_LIMITS.maxRepeatedAction) {
-        if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
-        continue; // strong planner 로 다시 계획한다(이 반복 행동은 실행하지 않는다).
-      }
-    } else repeatedActionRun = 0;
+    if (execution.noteProposedAction(proposal.action) >= WORK_LOOP_LIMITS.maxRepeatedAction) {
+      if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
+      continue; // strong planner 로 다시 계획한다(이 반복 행동은 실행하지 않는다).
+    }
 
     // Act (§14·§16). snapshot 은 직전 관찰과 짝이다. 비-행동(inspect·find·read_*)은 배치 대상이 아니라 표면별로 여기서 처리하고,
     // 행동(act-only)은 단발 또는 Fast Loop 배치로 execActOnce 에 위임한다.
@@ -2007,9 +1987,9 @@ export async function runWorkAgent(
       const o = await observe();
       rec.status = o.ok ? 'success' : 'failed';
       rec.errorCode = o.errorCode;
-      state.history.push(rec);
+      execution.append(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: Date.now() - t0 });
-      state.lastResult = rec;
+      execution.acceptResult(rec);
       if (!o.ok) return observeFailed(o);
       continue;
     }
@@ -2028,18 +2008,18 @@ export async function runWorkAgent(
       });
       lastRead = matches.length ? matches.slice(0, 20).map(describeObservationElement).join('\n') : '(일치하는 요소 없음)';
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
-      state.history.push(rec);
+      execution.append(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
-      state.lastResult = rec;
+      execution.acceptResult(rec);
       continue;
     }
     if (surface === 'uia' && a.kind === 'read_text') {
       const el = (state.observation?.elements ?? []).find((e) => e.elementRef === a.elementRef);
       lastRead = String(el?.text ?? el?.name ?? '').slice(0, READ_SUMMARY_MAX);
       const rec: WorkStepRecord = { step: state.stepCount + 1, action: a, status: 'success' };
-      state.history.push(rec);
+      execution.append(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: null, durationMs: 0 });
-      state.lastResult = rec;
+      execution.acceptResult(rec);
       continue;
     }
     // ── dom 표면 읽기 — find · read_text · read_table 은 local.dom.* 명령. ──
@@ -2053,8 +2033,8 @@ export async function runWorkAgent(
       else outcome = await dom(LOCAL_AGENT_ACTIONS.DOM_READ_TABLE, a.elementRef ? { elementRef: a.elementRef, snapshotId } : {});
       rec.status = outcome.status === 'success' ? 'success' : outcome.status === 'denied' ? 'denied' : 'failed';
       rec.errorCode = outcome.errorCode;
-      state.history.push(rec);
-      state.lastResult = rec;
+      execution.append(rec);
+      execution.acceptResult(rec);
       stepMeta.set(rec, { actor: currentActor(), locator: readLocator, durationMs: Date.now() - t0 });
       if (outcome.status !== 'success') {
         if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_USER_ACTION_REQUIRED) return takeoverWith(outcome.errorCode, 'credential_required', 'needs_user');
@@ -2067,11 +2047,7 @@ export async function runWorkAgent(
       // 읽기 결과는 Planner 컨텍스트로만(UNTRUSTED · 상한). find 는 새 snapshot 의 후보를 관찰로 삼는다.
       if (a.kind === 'find') {
         const matches = (Array.isArray(outcome.safe.matches) ? outcome.safe.matches : []) as SafeDomElement[];
-        const prev = state.observation as WorkObservation & { snapshotId?: string };
-        state.observation = {
-          ...prev, elements: matches, elementCount: matches.length, fingerprint: fingerprintObservation(prev.path, matches),
-          snapshotId: String(outcome.safe.snapshotId ?? snapshotId),
-        } as WorkObservation;
+        execution.narrowObservation(matches, String(outcome.safe.snapshotId ?? snapshotId));
         continue;
       }
       if (a.kind === 'read_text') {
@@ -2112,7 +2088,7 @@ export async function runWorkAgent(
           const act = steps[rep.index];
           if (!act) break;
           const dir = await execActOnce(act, snapshotId, { status: rep.status, errorCode: rep.errorCode, safe: { navigated: rep.navigated, changed: rep.changed, riskLevel: rep.riskLevel } });
-          if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
+          if (dir.do === 'takeover') return takeoverWith(execution.lastActRecord?.errorCode, dir.reason, dir.progress);
           if (dir.do === 'observe') { unitPending = { navigated: dir.navigated }; break; }
         }
         const stopped = u.stop !== null;
@@ -2139,13 +2115,13 @@ export async function runWorkAgent(
     for (let bi = 0; bi < steps.length; bi += 1) {
       if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
       const dir = await execActOnce(steps[bi], snapshotId);
-      if (dir.do === 'takeover') return takeoverWith(lastActRecord?.errorCode, dir.reason, dir.progress);
+      if (dir.do === 'takeover') return takeoverWith(execution.lastActRecord?.errorCode, dir.reason, dir.progress);
       if (dir.do === 'reject') {
         // 제출 창 미지정 등 — 실행하지 않았다. 무효 제안으로 세고 배치를 끊는다(다음은 재계획).
         state.invalidProposals += 1;
         lastRejectReason = dir.reason;
         const rejected: WorkStepRecord = { step: state.stepCount, action: steps[bi], status: 'rejected', rejectReason: dir.reason };
-        state.history.push(rejected);
+        execution.append(rejected);
         stepMeta.set(rejected, { actor: currentActor(), locator: null, durationMs: null });
         if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) return takeover('user_judgment_required', 'needs_user');
         batchInterrupted = true;

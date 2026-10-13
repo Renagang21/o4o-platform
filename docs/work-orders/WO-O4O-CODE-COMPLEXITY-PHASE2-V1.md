@@ -609,3 +609,74 @@ E-N04 runtime observe/replay/dispatch 공유 상태는 별도 도메인 후속�
 최종 원격 SHA 일치와 작업 범위 clean 여부는 push 이후 최종 보고에서 확인한다.
 PR/main 병합·배포·CI/리뷰 integration-ready 판정은 이 push-only 작업의 범위가 아니다.
 worktree disposition: KEEP — 같은 WO 연속 branch이며 작업 변경은 아직 main 미반영.
+
+## 14. AI 실행기 상태 소유 정비 — 전체 흐름 단일 묶음
+
+같은 WO/전용 branch 연속 작업. 시작 최신 main `76941a5dae` (#537); 추가 6경로는 PH scripts/기록이며 runtime과 겹치지 않는다.
+
+- [x] G01 observe/replay/dispatch/recovery/planner의 상태 쓰기 주체와 정본·소비처 조사, TODO 검증.
+- [x] G02 관찰·부분 관찰·이력·반복 감지의 갱신 소유자를 정리하고 모든 실행 경로 연결.
+- [x] G03 planner 입력의 참조 공유를 실제 실행 테스트로 검증하고 요청 메모리 snapshot으로 격리.
+- [x] G04 단발/단위/재생/복구/DOM/UIA/visual/재개/기억/안전 회귀 검증, 타입·빌드·lint.
+- [x] G05 결과 기록·동일 WO branch commit·push. main 병합·배포 없음.
+
+구현 전 처리 계약:
+- 실행 loop는 순차적이다. 병렬 worker·새 Execution Node 계약·성능 최적화로 확대하지 않는다.
+- 같은 지문은 DOM/UIA/단위의 전체 관찰에서만 반복 수를 갱신한다. find/replay의 후보 관찰은 지문을 바꾸지만 반복 수를 세지 않는다.
+- visual 관찰은 반복 수를 0으로, method discovery 재관찰은 기존 수를 유지한다. strong escalation은 반복 관찰/행동 수를 reset한다.
+- 행동/읽기 결과는 history와 lastResult에 반영한다. 무효 제안은 history에만 반영한다. replay actor/stepMeta/trajectory/원장 저장 순서를 유지한다.
+- planner에 goal/observation/history 등 내부 참조를 넘기고 있다. 입력 snapshot은 현재 값을 전달하되 planner mutation이나 이후 이력 append가 실행 상태/과거 planner 입력에 전파되지 않도록 한다.
+- 예산·재시도·unit denied/lost·전송 상실 후 재전송 금지·credential/COMMIT/타 사이트 인계·완료 판단 정책은 그대로 유지한다.
+- 공개 PlannerInput/WorkAgentRunResult/API·DB/프로토콜/권한 변경 없음. 큰 RuntimeContext나 새 서비스 공통 framework를 만들지 않는다.
+- Architecture V2 §18의 Execution Node 기존 구현 정비이며 새 V1 확장/실 PC smoke/배포를 진행하지 않는다.
+
+### 14.1 상태 전이와 소비처 검증 결과
+
+| 상태 | 변경 주체 | 이번 정리 |
+|---|---|---|
+| observation/지문/snapshot/docId | DOM·UIA 전체 관찰, 단위 observation, replay·find 후보 | 전체 관찰 count/preserve/reset 및 후보 narrow를 실행 증거 소유자로 모음 |
+| same observation/repeated action | 관찰, method discovery, recovery escalation, proposal 검사 | 동일 지문/동일 행동의 원래 기준 및 초기화 시점 유지 |
+| history/lastResult/last action | 거절 제안, 읽기, 단발·단위 행동, 재생 | append/결과 수락/행동 기록을 소유자로 모으되 record 객체와 stepMeta identity·기록 순서 유지 |
+| stepCount/왕복/unit/probe/settle | 명령·단위·관찰·재시도·재생 | 기존 runtime에서 명시적으로 유지. 단위 reports를 다시 전송하지 않음 |
+| replay actor/terminal/원장 | replay·복구·finish | 실행 수명과 정책 그대로. snapshot은 planner 호출 메모리에만 존재 |
+
+runtime의 observation 직접 대입·중첩 visual 표식 대입, history.push, lastResult 대입은 새 소유자 경유로 모두 옮겼다.
+세 후보 관찰과 DOM/UIA/단위 전체 관찰의 중복 변환·카운터 갱신을 합쳤고, transport/planner/원장 함수 주입은 하지 않았다.
+planner에 전달되는 goal/observation/history/known keys/patterns/resume/intent/image는 structuredClone으로 현재 값만 전달한다.
+이미지 원문은 기존처럼 요청 메모리에서만 쓰며 clone을 로그·DB·노드 원장으로 저장하지 않는다.
+
+실제 호출자는 ai-proxy.routes.performWorkAgentRun이고 Assistant가 이 경로를 사용한다.
+multimodal-chat은 provider 호출 패턴의 참조 문서이며 runtime 호출자가 아니다.
+공개 PlannerInput·runWorkAgent signature·HTTP 응답 projection·provider 선택·추가 headers/권한은 변경하지 않았다.
+
+수정 전 실제 runtime의 planner ownership 테스트 2건 실패: goal/history를 planner mutation이 덮고,
+첫 planner 호출의 빈 history가 실행 후 2건으로 늘었다. RED expected failure이며 PASS로 집계하지 않는다.
+수정 후 같은 테스트 2건 PASS, 필터 제외 14 skip. 최종 전체 suite에서 필터 없이 검증한다.
+
+
+### 14.2 최종 검증·종료 범위
+
+- 관찰 직접 write 8→0, history append 8→0, lastResult write 5→0 (runtime 원본 대비).
+  쓰기를 없앴다는 뜻이 아니라 한 private 소유자로 모았다는 뜻이다. 전체 코드 크기/분기 감소로 과장하지 않는다.
+- 전체 회귀: A 6 suites/61 tests + B 7/97 + C 7/106 = **20 suites / 264 tests PASS**, skip 없음.
+  단발/작업 단위 동등성, 전송 상실 후 재전송 금지, 재생 불일치·예산, recovery/strong routing,
+  DOM/UIA/visual·Windows 안전, 같은 run 재개·Cloud/노드 기억·Task 소유·planning 분리 포함.
+- 최종 private state/ownership focused 2 suites / 10 PASS / 필터 제외 14 skip.
+  전체 회귀와 같은 테스트이므로 중복 집계하지 않는다. 타입 보완 이후 다시 실행했다.
+- API type-check/build PASS. 초기 snapshotId excess-property 오류는 private Observed 타입의 지역 변수로 보완한 뒤 두 검사 통과.
+- 변경 source/test 4파일 ESLint 오류·경고 0, 저장소 ratchet PASS: errors 46 / baseline 46, warnings 1,006.
+- source/endpoint/provider/권한/공개 type 계약·dependency/lockfile/CI 변경 없음.
+  새 state 모듈은 내부 갱신 주체이며 Core/Node/Task/Memory 구조 계약을 바꾸지 않는다.
+- synthetic DB stub/agent 응답/scripted planner 및 기존 mocked provider suite로 검증했다.
+  실제 provider/OAuth/계정/사용자 PC·운영 DB/GCS·배포 smoke는 실행하지 않았다.
+
+검증 도중 main에 #538 `e36bcf9318`의 operator 정비가 추가됐다. 시작 전 #537과 합쳐 59경로이며
+API/content-editor/root dependencies/AGENTS/lint-ratchet 코드와는 겹치지 않음을 확인했다.
+자기 변경을 먼저 commit한 뒤 clean 상태에서 정상 merge한다. API source가 그대로임을 확인하고
+필요한 후속 검증을 진행한다. 다른 담당의 UI 구현·운영 검증·배포를 우리 작업 결과로 집계하지 않는다.
+
+이번 묶음으로 §11.3 D-N04 / §12.3 E-N04의 execution evidence 공유 상태 조사를 구현·검증까지 완료했다.
+모든 runtime 변수를 한 Context로 옮기지 않았다. terminal/routing/예산/원장 정책의 재설계는 별도 범위다.
+기록과 소스를 하나의 구현 commit으로 묶고 최신 main 통합 후 같은 `wo/code-complexity-phase2`에 push한다.
+최종 원격 SHA/clean 여부는 push 후 보고한다. PR 생성·main 병합·배포·integration-ready 판정 없음.
+worktree disposition: KEEP — 동일 WO 연속 branch, 우리 변경은 아직 main 미반영.
