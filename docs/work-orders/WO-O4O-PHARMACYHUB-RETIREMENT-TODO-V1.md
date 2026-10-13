@@ -372,3 +372,7 @@ PR #533은 필수 CI와 Codex 리뷰 통과 뒤 병합됐으나 SonarCloud의 AP
 후속 Sonar 검증에서도 동적 URL fetch 지적이 남아 있어 PR #534 병합/운영 적용을 중단했다. HTTP read/validate는 고정 literal URL만 사용하고, update URL은 고정 origin/path에 코드 내부에서 생성한 UUID query만 추가한다. 원격 operation name은 operation- 접두 및 단일 operand 형태를 검증한 뒤 고정 project/global의 Cloud SDK describe 인자로만 사용한다. 원격 응답/호출자가 목적지 URL·SDK flag·request UUID를 지정할 수 없음을 실제 client 경계 회귀로 검증한다. 검사 억제/quality gate 변경은 하지 않는다.
 
 HTTP URL 지적은 해소됐으며 SDK operation operand 입력 검사가 남아 적용을 계속 보류한다. 문자열 타입과 허용 문자 정제 결과의 원문 일치를 확인하고 operation- 접두의 단일 operand만 고정 SDK 명령에 전달한다. 메타문자·공백·제어문자·비문자열 및 다른 project flag 입력을 실제 client 경계 테스트에서 거절한다.
+
+### 2026-10-13 URL map 종료 plan 검증 완료
+
+PR #534의 최종 commit 73687cf93d779bf8ba6e3fefe389ec74af945a3d는 필수 CI·SonarCloud·최신 Codex 리뷰를 모두 통과하고 main f66ed5f5f8e6198e0043053b24cae6230ffa96cf에 병합됐다. post-merge CI 38355910041 및 CodeQL은 SUCCESS, Delivery 38356668088은 NO_DEPLOY로 종료했다. standalone domain_detachment plan [38356815800](https://github.com/Renagang21/o4o-platform/actions/runs/38356815800)은 SUCCESS이며 실제 map 귀속/퇴역 상태 및 Compute validation을 확인했다. 대상은 pharmacyhub.co.kr, www.pharmacyhub.co.kr, path-matcher-pharmacy-hub이며 제거할 PH validation test는 0건이었다. applied=false로 실제 URL map 변경은 없었다. 이 main SHA에 대한 관리자 임시 WIF 제한 적용 전에는 apply하지 않는다. 인증서 삭제 때의 제한은 이미 복구됐으며, 이번 새 제한은 아직 적용하지 않았다. PH 잔여 데이터/GCS 삭제도 미실행이다. 가비아 등록/자동연장은 사용자 지시에 따라 유지한다.
