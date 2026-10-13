@@ -37,3 +37,25 @@ it('does not reload another project when an old operation finishes late', async 
   view.rerender(<MemoryRouter><FundingCreatorOperations trial={trial('draft', 'other-project')} onChange={onChange} /></MemoryRouter>);
   await act(async () => finish()); expect(onChange).not.toHaveBeenCalled();
 });
+
+it('retries participant loading and shows updated operator payment records', async () => {
+  participants.mockRejectedValueOnce(new Error('unavailable')).mockResolvedValueOnce([{ id: 'p1', name: '샘플 회원', paymentStatus: 'paid' }]);
+  render(<MemoryRouter><FundingCreatorOperations trial={trial('recruiting')} onChange={() => {}} /></MemoryRouter>);
+  await screen.findByRole('alert');
+  fireEvent.click(screen.getByRole('button', { name: '현황 새로고침' }));
+  await screen.findByText('입금 확인');
+  expect(screen.queryByRole('alert')).toBeNull();
+  expect(participants).toHaveBeenCalledTimes(2);
+});
+
+it('reloads participants when the same project moves to another stage and ignores old rows', async () => {
+  let first!: (value: unknown) => void;
+  participants.mockImplementationOnce(() => new Promise(resolve => { first = resolve; }))
+    .mockResolvedValueOnce([{ id: 'new', name: '최신 회원', paymentStatus: 'paid' }]);
+  const view = render(<MemoryRouter><FundingCreatorOperations trial={trial('recruiting')} onChange={() => {}} /></MemoryRouter>);
+  view.rerender(<MemoryRouter><FundingCreatorOperations trial={trial('development')} onChange={() => {}} /></MemoryRouter>);
+  await screen.findByText('최신 회원');
+  await act(async () => first([{ id: 'old', name: '이전 회원', paymentStatus: 'unpaid' }]));
+  expect(screen.queryByText('이전 회원')).toBeNull();
+  expect(screen.getByText('최신 회원')).toBeTruthy();
+});

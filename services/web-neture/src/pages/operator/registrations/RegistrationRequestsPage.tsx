@@ -29,56 +29,8 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { OperatorActionType, getBusinessEntityTypeLabel } from '@o4o/types';
 import { operatorRegistrationApi } from '../../../lib/api';
-
-type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
-// WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
-// Neture 회원 유형에서 'consumer' 제거. 'user' 는 백엔드가 role 미지정 시 fallback 으로만 사용.
-type UserRole = 'supplier' | 'user' | 'seller' | 'pharmacist' | 'ALL';
-
-interface RegistrationRequest {
-  id: string;
-  email: string;
-  name: string;
-  phone: string;
-  role: UserRole;
-  service: string;
-  companyName?: string;
-  businessNumber?: string;
-  licenseNumber?: string;
-  // WO-O4O-NETURE-SUPPLIER-REGISTRATION-BUSINESS-INFO-V1
-  representativeName?: string;
-  taxInvoiceEmail?: string;
-  contactName?: string;
-  managerPhone?: string;
-  businessAddress?: string;
-  businessAddressDetail?: string;
-  businessType?: string;
-  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
-  //   사업자등록증 3 canonical 추가 (업태 businessType 는 기존). users.businessInfo 출처.
-  businessItem?: string;
-  businessEntityType?: string;
-  businessStartDate?: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
-  createdAt: string;
-  processedAt?: string;
-  processedBy?: string;
-  rejectReason?: string;
-  operatorNotes?: string;
-  supplierStatus?: string;
-}
-
-function mapStatus(raw: string | undefined): 'PENDING' | 'APPROVED' | 'REJECTED' {
-  switch (raw?.toLowerCase()) {
-    case 'active':
-    case 'approved':
-      return 'APPROVED';
-    case 'rejected':
-      return 'REJECTED';
-    case 'pending':
-    default:
-      return 'PENDING';
-  }
-}
+import { mapRegistrationRequest, filterRegistrationRequests, getSelectedPendingRegistrationIds } from './registrationRequestModel';
+import type { RegistrationRequest, RequestStatus, UserRole } from './registrationRequestModel';
 
 // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
 // 'consumer' 라벨 제거 — Neture 는 "소비자" 회원 유형을 사용하지 않는다.
@@ -128,36 +80,7 @@ export default function RegistrationRequestsPage() {
       setLoading(true);
       setFetchError(null);
       const data = await operatorRegistrationApi.getRegistrations();
-      const mapped: RegistrationRequest[] = (data || []).map((r) => ({
-        id: r.id,
-        email: r.email || '',
-        name: r.name || '',
-        phone: r.phone || '',
-        // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
-        // 백엔드가 role 을 빈 값으로 반환할 때 'consumer' 대신 'user' fallback.
-        role: (r.role as UserRole) || 'user',
-        service: r.service || 'neture',
-        companyName: r.companyName,
-        businessNumber: r.businessNumber,
-        licenseNumber: r.licenseNumber,
-        representativeName: r.representativeName,
-        taxInvoiceEmail: r.taxInvoiceEmail,
-        contactName: r.contactName,
-        managerPhone: r.managerPhone,
-        businessAddress: r.businessAddress,
-        businessAddressDetail: r.businessAddressDetail,
-        businessType: r.businessType,
-        businessItem: r.businessItem,
-        businessEntityType: r.businessEntityType,
-        businessStartDate: r.businessStartDate,
-        status: mapStatus(r.status),
-        createdAt: r.createdAt || new Date().toISOString(),
-        processedAt: r.processedAt,
-        processedBy: r.processedBy,
-        rejectReason: r.rejectReason,
-        operatorNotes: r.operatorNotes,
-        supplierStatus: r.supplierStatus,
-      }));
+      const mapped = (data || []).map(r => mapRegistrationRequest(r));
       setRequests(mapped);
     } catch (error) {
       console.error('Failed to fetch registration requests:', error);
@@ -190,7 +113,7 @@ export default function RegistrationRequestsPage() {
       setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다.` });
       setSelectedRequest(null);
       await fetchRequests();
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
     } finally {
       setProcessing(false);
@@ -217,7 +140,7 @@ export default function RegistrationRequestsPage() {
       setSelectedRequest(null);
       setShowRejectModal(false);
       await fetchRequests();
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
     } finally {
       setProcessing(false);
@@ -243,11 +166,13 @@ export default function RegistrationRequestsPage() {
     }
   };
 
+  const selectedPendingIds = useMemo(
+    () => getSelectedPendingRegistrationIds(requests, selectedIds),
+    [requests, selectedIds],
+  );
+
   const handleBulkApprove = async () => {
-    const ids = [...selectedIds].filter((id) => {
-      const r = requests.find((x) => x.id === id);
-      return r?.status === 'PENDING';
-    });
+    const ids = selectedPendingIds;
     if (ids.length === 0) return;
     setBulkProcessing(true);
     setMessage(null);
@@ -264,10 +189,7 @@ export default function RegistrationRequestsPage() {
   };
 
   const handleBulkReject = async () => {
-    const ids = [...selectedIds].filter((id) => {
-      const r = requests.find((x) => x.id === id);
-      return r?.status === 'PENDING';
-    });
+    const ids = selectedPendingIds;
     if (ids.length === 0) return;
     setBulkProcessing(true);
     setMessage(null);
@@ -283,24 +205,13 @@ export default function RegistrationRequestsPage() {
     }
   };
 
-  const filteredRequests = requests.filter((request) => {
-    const matchesSearch =
-      request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (request.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
-    const matchesStatus = statusFilter === 'ALL' || request.status === statusFilter;
-    const matchesRole = roleFilter === 'ALL' || request.role === roleFilter;
-    return matchesSearch && matchesStatus && matchesRole;
-  });
+  const filteredRequests = filterRegistrationRequests(requests, { searchQuery, statusFilter, roleFilter });
 
   const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
   const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
   const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
-  const selectedPendingCount = useMemo(
-    () => [...selectedIds].filter((id) => requests.find((r) => r.id === id)?.status === 'PENDING').length,
-    [selectedIds, requests],
-  );
+  const selectedPendingCount = selectedPendingIds.length;
 
   const handleToggleAll = (checked: boolean) => {
     if (checked) {

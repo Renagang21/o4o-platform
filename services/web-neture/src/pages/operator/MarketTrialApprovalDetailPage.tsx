@@ -33,6 +33,7 @@ import type {
   UpdateParticipantPaymentInput,
 } from '../../api/trial';
 import FundingParticipantsSection, { fundingParticipantFilters, type ParticipantFilter } from './FundingParticipantsSection';
+import { fundingStageTasks } from '../funding/fundingStageTasks';
 
 const STATUS_LABELS: Record<string, string> = {
   draft: '작성 중',
@@ -63,6 +64,7 @@ export default function MarketTrialApprovalDetailPage() {
   const beginReward = useLatestRequest(`funding-reward:${id}`);
   const beginExport = useLatestRequest(`funding-export:${id}`);
   const beginKpi = useLatestRequest(`funding-review-kpi:${id}`);
+  const beginAction = useLatestRequest(`funding-review-action:${id}`);
   const [loadedId, setLoadedId] = useState('');
   const [trial, setTrial] = useState<OperatorTrial | null>(null);
   const [participantData, setParticipantData] = useState<ParticipantListResponse | null>(null);
@@ -131,29 +133,32 @@ export default function MarketTrialApprovalDetailPage() {
   useEffect(() => { void loadParticipants(); }, [loadParticipants]);
 
   const handleApprove = async () => {
-    if (!id) return;
+    if (!id || actionLoading) return;
+    const current = beginAction();
     setActionLoading(true);
     try {
       await approveTrialFirst(id);
-      await loadAll();
+      if (current()) await Promise.all([loadAll(), loadParticipants()]);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '승인에 실패했습니다.');
+      if (current()) setError(err.response?.data?.message || err.message || '승인에 실패했습니다.');
     } finally {
-      setActionLoading(false);
+      if (current()) setActionLoading(false);
     }
   };
 
   const handleReject = async () => {
-    if (!id) return;
+    if (!id || actionLoading) return;
+    const current = beginAction();
     setActionLoading(true);
     try {
       await rejectTrialFirst(id, rejectReason);
+      if (!current()) return;
       setShowRejectModal(false);
       await loadAll();
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '반려에 실패했습니다.');
+      if (current()) setError(err.response?.data?.message || err.message || '반려에 실패했습니다.');
     } finally {
-      setActionLoading(false);
+      if (current()) setActionLoading(false);
     }
   };
 
@@ -197,19 +202,22 @@ export default function MarketTrialApprovalDetailPage() {
 
   useEffect(() => {
     setUpdatingPaymentId(null); setUpdatingId(null); setExportLoading(false); setParticipantData(null); setTrialKpi(null);
+    setActionLoading(false); setShowRejectModal(false); setShowStatusModal(false); setRejectReason('');
   }, [id]);
 
   const handleTrialStatusChange = async (newStatus: TrialStatus) => {
-    if (!id) return;
+    if (!id || actionLoading) return;
+    const current = beginAction();
     setActionLoading(true);
     try {
       await updateTrialStatus(id, newStatus);
+      if (!current()) return;
       setShowStatusModal(false);
-      await loadAll();
+      await Promise.all([loadAll(), loadParticipants()]);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.message || '유통참여형 펀딩 상태 변경에 실패했습니다.');
+      if (current()) setError(err.response?.data?.message || err.message || '유통참여형 펀딩 상태 변경에 실패했습니다.');
     } finally {
-      setActionLoading(false);
+      if (current()) setActionLoading(false);
     }
   };
 
@@ -262,6 +270,14 @@ export default function MarketTrialApprovalDetailPage() {
       )}
 
       {/* Summary Metrics Card */}
+      <section className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <h2 className="text-sm font-semibold text-blue-900">현재 단계의 운영 업무</h2>
+        <p className="mt-2 text-sm text-blue-900">{fundingStageTasks[trial.status]?.operator}</p>
+        <p className="mt-2 text-xs text-blue-800">개설자: {fundingStageTasks[trial.status]?.creator}</p>
+        <p className="mt-2 text-xs text-gray-600">단계 변경·입금 확인·참여자별 이행 기록·포럼 회원 승인은 별도 업무이며 자동으로 함께 처리되지 않습니다.</p>
+        <button onClick={() => void Promise.all([loadAll(), loadParticipants()])} disabled={actionLoading || participantsLoading || !!updatingId || !!updatingPaymentId} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
+      </section>
+
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
 
       {/* WO-O4O-MARKET-TRIAL-PARTICIPATION-REPORT-CLEANUP-V1: content-only 참여 리포트 (오프라인 입금 기준) */}

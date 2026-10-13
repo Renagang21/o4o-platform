@@ -5,8 +5,10 @@
 const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-event-offer'];
 const ph=field=>`${field}::text=ANY($1::text[])`;
 const assetScope=a=>ph(`${a}.service_key`);
+// These links annotate library resources; business renderers persist their own asset/URL refs.
+// VIDEO Job links are execution inputs/outputs and must never enter this catalog-only scope.
 const linkScope=l=>`EXISTS (SELECT 1 FROM public.media_assets a WHERE a.id=${l}.media_asset_id AND ${assetScope('a')})
-  AND (${l}.entity_type='service' AND ${ph(`${l}.entity_id`)})`;
+  AND ${l}.entity_type IN ('product','brand','content','service')`;
 function id(value) {
   if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_MEDIA_IDENTIFIER');
   return `"${value}"`;
@@ -65,10 +67,13 @@ async function references(q,locked) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_MEDIA_SCHEMA_CHANGED');
     const owned=c.schema==='public'&&c.table==='media_assets'?assetScope('s'):
       c.schema==='public'&&c.table==='media_entity_links'?linkScope('s'):'FALSE';
-    if(await count(q,`SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s
-      WHERE NOT COALESCE((${owned}),FALSE) AND EXISTS (SELECT 1 FROM public.media_assets a,
-        LATERAL unnest(ARRAY[a.id::text,a.url,a.gcs_path]) v WHERE ${assetScope('a')}
-        AND NULLIF(v,'') IS NOT NULL AND strpos(s.${id(c.column)}::text,v)>0)`))
+    if(await count(q,`WITH targets AS (
+        SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
+        UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')})
+      SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s
+      WHERE NOT COALESCE((${owned}),FALSE) AND EXISTS (SELECT 1 FROM targets a,
+        LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE
+        NULLIF(v,'') IS NOT NULL AND strpos(s.${id(c.column)}::text,v)>0)`))
       throw new Error(`PH_MEDIA_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
   }
 }
