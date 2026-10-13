@@ -107,3 +107,49 @@ mobile viewport 390px에서 이미지 선택 도구막대가 가로로 넘치는
 구현 `15498766a0cb946d52c8492d2cc1ea3e0b10a68d`의 branch push와 원격 일치를 확인했다.
 이번 범위는 main 통합/배포/실계정 검증을 포함하지 않는다.
 문서 정합: 정본 정책 변경 없음. 동일 트랙 CHECK에 추가하여 별도 회차 CHECK를 만들지 않았다.
+
+## 3차 — 프로필·API 책임 정비 (2026-10-13 KST)
+
+근거: [WO-O4O-SUPPLIER-PROFILE-API-CODE-CLEANUP-V1](../work-orders/WO-O4O-SUPPLIER-PROFILE-API-CODE-CLEANUP-V1.md).
+최신 main `aa59a0962` + 승인된 앞선 공급자 정비 `affa32bc4` 기반 전용 branch에서 검증했다.
+Node 22.18.0/pnpm 10.25.0, frozen install과 web dependency build를 사용했다.
+Profile 1,300 → 140행, supplier API 2,014 → 92행. 업무 controller/표시 섹션과 API 구현/타입을 분리했다.
+API caller와 실제 MyBusinessProfile route는 보존했다.
+
+| 검사 | 결과 |
+|---|---|
+| 신규 프로필 상호작용/전송 계약, 원래 코드 | 2 files / 30 tests PASS |
+| web-neture 전체 회귀 | 80 files / 707 tests PASS |
+| supplier cutover·Partner 은퇴·identity 소스 경계 | 3 suites / 93 tests PASS |
+| 타입 검사·운영 빌드 | PASS (`tsc && vite build`) |
+| 변경 TypeScript/TSX 범위 ESLint | PASS |
+| 원본 AST 비교 | 134 checks PASS — 공개 exports, 타입, 요청 함수·오류 helper·설정, 39개 메서드/순서, 프로필 8개 command, 6개 섹션 markup |
+| PC/mobile Chromium, 원래 코드 | 2 viewports / 18 checks PASS |
+| PC/mobile Chromium, 분리 후 | 2 viewports / 18 checks PASS |
+| 브라우저 전후 결과 비교 | 정상/재시도 API call 기록·payload·오류·섹션 위치/크기 동일 |
+| 실계정·운영 DB/API 쓰기 | NOT_RUN — 사용자 유예, fixture I/O만 사용 |
+| main merge·배포 | NOT_RUN — commit/push 종료 범위 |
+
+프로필 검사는 초기 전체 조회 대기, 기본 실패/부재, 보조 영역 독립 retry, 입력 유지,
+초기 tax email의 onboarding 우선/profile fallback, profile/onboarding 저장 경계,
+문서 PDF 업로드/재조회·잘못된 파일 차단, 품목군 선택·승인 상태 해제 금지와 기존 증빙 열람을 포함한다.
+전송 검사는 multipart/blob, 빈 결과/실패/403/404 구분, 주문/spot/library 오류,
+recruitment·event proposal·bulk Candidate 부분 결과와 원래 payload를 확인한다.
+AST 비교는 주석·괄호·포맷팅 공백을 제외하고 실제 선언/본문/값을 비교했다.
+내부 helper의 모듈 export는 기존 public facade에 추가되지 않는다.
+
+브라우저는 실제 Profile와 공통 BusinessRegistrationFields를 렌더했다. 주소검색과 서버 I/O는 fixture로 대체했다.
+PC 1440×1000, mobile 390×844에서 각각 9개 동작 묶음을 확인했다.
+정상/실패/재시도·profile/onboarding 저장·품목군 선택/해제·승인 보호·PDF/blob 동작 모두 전후 동일했다.
+프로필 전체 크기는 PC 1440×4965, mobile 390×5972로 전후 동일하며 양쪽 가로 overflow가 없다.
+스크린샷을 직접 확인했고 browser page error는 0건이다. 실제 운영 저장 성공을 뜻하지 않는다.
+
+빌드의 오래된 Browserslist 데이터/큰 chunk 안내와 Jest 강제 종료 안내는 기존 설정에서 나온다.
+이 안내 때문에 의존성·Jest 설정을 변경하지 않았다.
+종료 전 main `90e49c3e6`의 PharmacyHub 변경을 확인했다. 변경 대상 및 지침/정본 중 이번 범위와 겹친 항목은 없다.
+외부 변경을 현재 검증 결과에 포함하거나 main 통합 완료로 판정하지 않는다.
+
+로그/AST 결과: `/workspace/artifacts/supplier-code-phase3-*`.
+브라우저 전후 JSON/스크린샷: `/workspace/artifacts/supplier-phase3-browser/`.
+후속은 backend router/controller 최신 census와 실계정 검증이다. 앞선 Drawer/공통 에디터 사용성 한계는 유지된다.
+문서 정합: 잘못된 businessInfo 저장 소유권 코드 주석을 정본에 맞췄다. 정본 정책 변경 없음.

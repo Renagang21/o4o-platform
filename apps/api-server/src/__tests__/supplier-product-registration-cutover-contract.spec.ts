@@ -77,7 +77,12 @@ describe('A. web-neture — 레거시 createSupplierOffer 소비 0 · 3 경로 c
   });
 
   it('supplierApi 에 createOfferFromMaster(from-master) · submitProductCandidate(product-candidates) 가 있다', () => {
-    const api = stripComments(read(`${WEB}/lib/api/supplier.ts`));
+    const api = [
+      `${WEB}/lib/api/supplier.ts`,
+      ...fs.readdirSync(path.join(REPO_ROOT, WEB, 'lib/api/supplier'))
+        .filter((name) => name.endsWith('.ts')).sort()
+        .map((name) => `${WEB}/lib/api/supplier/${name}`),
+    ].map((rel) => stripComments(read(rel))).join('\n');
     expect(api).toMatch(/async createOfferFromMaster\([\s\S]*?api\.post\('\/neture\/supplier\/products\/from-master'/);
     expect(api).toMatch(/async submitProductCandidate\([\s\S]*?api\.post\('\/neture\/supplier\/product-candidates'/);
   });
