@@ -195,3 +195,56 @@ main #503(`64b8df16f1`)의 직원 접근/My Home 정본을 확인하고 정상 m
 사용자가23/24 migration 및 기능 OFF API/Admin 실행안을 승인했다. 현재 운영은 소유 트랙의 API/Admin verified target `88d45b8208`까지 이미 반영됐고23/24/25 history가 준비 상태다. 이번 standalone read-only plan38336196583도 세 history=true·schemaReady=true를 확인했다. 중복 DDL/재배포를 실행하지 않았다. 배포 설정은 erasure flags를 주입하지 않아 코드 기본 OFF이며, 실제 super-admin capability 응답은 마지막 본인 Google 검증으로 구분한다.
 
 상세 run/증거와 한계는 CHECK의2026-10-13 절을 따른다.12일 dry-run/HELD/운영 실행0 문구는 당시 기록이다. 운영 준비 확인으로 §10.2의 전수 분류·법정 적용 근거·GCS/backup/producer·lock 검증을 완료하거나 계정/파일 파기·job/법률 게시를 승인했다고 해석하지 않는다. 마지막 일반 계정/본인 OAuth/운영자 테스트도 아직 미완료다. 같은 통합 WO를 ACTIVE로 유지한다.
+
+### 10.7 필요한 내부 정비 후 원래 후속 재개 — 2026-10-13
+
+사용자 지시: 앞으로 반복 정비를 전제로 지금 효과가 있는 항목만 선별해 정비하고 원래 작업을 재개한다.
+같은 ACTIVE Core WO의 연속 phase이며 기존 `wo/integrated-account-erasure-contract` 작업공간을 유지한다.
+시작 시 최신 main `38d0eb81df`를 clean 상태에서 정상 fast-forward로 반영했다. 완료된 phase2 작업공간은 재사용하지 않는다.
+
+선별 기준: 다음 작업의 수정 지점을 줄이고, 현재 검증으로 동작 보존을 확인할 수 있는 내부 중복만 처리한다.
+- 선택: request transaction과 resume 준비 transaction의 현재 super-admin 검사. 같은 WHERE/시각/오류/행 잠금이며 기존 assertActor와 동일하다.
+- 유지: request 초입의 non-locking 검사. transaction의 FOR SHARE 검사를 이 시점으로 옮기지 않는다.
+- 유지: 대상 계정의 예정·유효 super-admin 보호는 caller 인가와 다른 규칙이므로 합치지 않는다.
+- 이번 제외: 서비스 간 공통화, 광범위한 파일/함수 분해, 회원 수정 원자성·권한 계약 변경, 키오스크 확장.
+
+TODO 및 구현 전 검증:
+- [x] 최신 main·승인된 Core WO·현재 서비스·검사 시점/SQL/lock 및 기존 합성 회귀 대조.
+- [x] 수정 전 전용 local PG 55469에서 기존 제거/파일 회귀 기준 확인.
+- [x] 두 transaction의 중복을 기존 private assertActor 호출로 정리, preflight/target 검사는 보존.
+- [x] 같은 실제 PG/인증·파일 회귀와 타입/빌드·lint로 동작 보존 확인.
+- [x] 원래 §10.2의 domain/file/producer inventory를 현재 schema·source 기반으로 재개하고 검증된 처리/미분류를 구분.
+- [ ] 변경 scope commit/push·required CI/review·정상 main 통합 및 현재 Delivery 판정.
+
+기존 Core 구현/운영 준비를 재구현하지 않는다. flags OFF를 유지하며, 실제 운영 계정·파일 제거,
+자동 파기 job, 정책 본문 게시/재동의, 새로운 운영 DDL은 이번 작업에 포함하지 않는다.
+
+원래 §10.2 파일 조사에서 실제 producer(`business-registration-document.service.ts`, supplier onboarding/regulation)가
+`gcs://...` 및 camelCase `fileUrl`을 저장함을 확인했다. 기존 private 첨부 predicate는 `gs://`/Google HTTPS와
+snake_case `file_url`만 인식하므로 미검토 개인 KYC manifest를 없애고 완료로 표시할 수 있다.
+이는 이미 승인된 미분류 개인 파일의 review_required 계약을 충족시키는 수정이다.
+새 삭제 범위/파일 handler/보존 정책·GCS 실행·권한/API/DDL 변경은 도입하지 않는다.
+
+- [x] 실제 KYC schema의 gcs://·외부 HTTPS fileUrl·기존 gs://를 합성 회귀로 재현(RED 확인).
+- [x] 이미 있는 PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED 조건에서 scheme/필드 표기 누락만 보완.
+- [x] KYC 원장/manifest·계정 보존 및 completed audit/외부 storage 호출 부재, 전체 회귀 확인.
+
+검증 결과: 수정 전41 PASS. 실제 KYC producer 회귀2 RED/기존gs1 PASS를 확인한 뒤
+전체44 PASS. native PG+실제 loopback HTTP 검증은 local CLI testTimeout=15000을 사용했으며
+기본5초 route1건의 일시 timeout도 기록했다. Assertions/test source timeout·운영 SLA는 바꾸지 않았다.
+source type-check/build PASS, focused ESLint0, migration contract21 PASS/0 FAIL, whitespace PASS.
+작업공간의 stale auth-utils dist는 기존 package build로 갱신해 Demo 타입6개 오류를 해소했다.
+새 dependency/lockfile/CI/workflow 변경0.
+
+현재25단계 공식 fresh bootstrap/assertion과 READ ONLY metadata collector를 검증했다.
+307관계/3944columns/44관계60 FK, 기존private owner27관계, 추가domain273관계, 신원·문자열·JSON 후보2595개와
+파일이름 후보222개를 구분했다. row/실제 파일/법정 보유 승인 또는 모든 handler 완료를 뜻하지 않는다.
+remote host/다른 port/다른 database 거절과 출력 미생성도 검증했다.
+상세 source/producer/다음 큰 묶음은 [inventory IR](../investigations/IR-O4O-ACCOUNT-ERASURE-DOMAIN-FILE-INVENTORY-V1.md)를 따른다.
+
+최신 main #549의 AI 통합/신규26단계를 정상 merge해 조사 범위를 갱신했다. 개인 제거 source 변경은 겹치지 않는다.
+새 격리 bootstrap/assertion·collector는26단계087e2d4c/6650 lines,308관계3965columns/기존private27/추가domain274/후보2608을 확인했다.
+users FK44관계60개는 동일하다. 신규 ai_usage_reservations는 비FK user_id/JSON과 trigger0이므로
+미분류 domain/producer/writer 검증 잔여에 포함한다. 과거25단계 결과를 현재 운영 schema로 주장하지 않는다.
+현재 ai-core dist를 기존 package build로 갱신한 뒤 API type-check/build PASS.
+운영26 migration은 AI 소유 WO에서 별도 명시 승인 대상으로 남겼으므로 기존23/24 승인으로 실행하지 않는다.
