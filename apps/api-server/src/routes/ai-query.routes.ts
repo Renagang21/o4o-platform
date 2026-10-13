@@ -26,7 +26,12 @@ import { AppDataSource } from '../database/connection.js';
 import { GEMINI_CANONICAL_MODEL, listGeminiModels, resetGeminiModelCache } from '../services/ai-model-registry.service.js';
 import { resolveEditingModel } from '../utils/ai-editing-model-resolver.js';
 
+import { listServiceAiProfiles } from '../services/ai-extensions/service-query.extension.js';
+
 const router: Router = Router();
+
+// Provider/key-free catalog. Availability is not domain authorization.
+router.get('/extensions', authenticate, (_req, res) => res.json({ success: true, data: listServiceAiProfiles() }));
 
 // ===========================================
 // Public routes (authenticated users)
