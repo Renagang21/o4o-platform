@@ -1,6 +1,6 @@
 # 공급자 이미지·콘텐츠·모바일 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13 (KST)
 > **근거**: 사용자 — 다음 작업을 작게 나누지 말고 진행. 공급자 코드 정비 5차, commit → push까지.
 
@@ -22,7 +22,7 @@
 - [x] 이미지 fetch 리다이렉트 안전 검사와 credential URL 사전 거부 보완
 - [x] Drawer viewport 제한과 공통 이미지 도구막대의 위치/폭/resize 보완
 - [x] 회귀·AST·타입·빌드·lint·PC/mobile·공유 소비처 검증
-- [ ] 명시적 파일 commit → 전용 branch push → 원격 일치 확인
+- [x] 명시적 파일 commit → 전용 branch push → 원격 일치 확인
 
 ## 한 묶음의 구현
 
@@ -55,3 +55,6 @@ userinfo 거부는 네트워크에 전달하기 전의 검사이며 실제 인�
 PR/main merge·배포는 종료 범위 밖이다. 임시 브라우저 서버 5192를 종료했다.
 
 문서 정합: 해당 없음 — 정본 정책 변경이나 이번 범위의 추가 문서 drift 없음.
+
+종료: 구현 `a130dc53a8734bd121a184ea573a031a5006bab1`를 `wo/supplier-code-phase5`에 push하고 원격 SHA 일치를 확인했다.
+이전/이번 clone과 미통합 branch는 KEEP이다. main 통합·배포는 수행하지 않았다.
