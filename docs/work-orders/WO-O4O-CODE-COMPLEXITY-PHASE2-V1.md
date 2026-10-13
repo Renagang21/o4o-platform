@@ -665,7 +665,7 @@ multimodal-chat은 provider 호출 패턴의 참조 문서이며 runtime 호출�
   전체 회귀와 같은 테스트이므로 중복 집계하지 않는다. 타입 보완 이후 다시 실행했다.
 - API type-check/build PASS. 초기 snapshotId excess-property 오류는 private Observed 타입의 지역 변수로 보완한 뒤 두 검사 통과.
 - 변경 source/test 4파일 ESLint 오류·경고 0, 저장소 ratchet PASS: errors 46 / baseline 46, warnings 1,006.
-- source/endpoint/provider/권한/공개 type 계약·dependency/lockfile/CI 변경 없음.
+- endpoint/provider/권한/공개 type 계약·dependency/lockfile/CI 변경 없음.
   새 state 모듈은 내부 갱신 주체이며 Core/Node/Task/Memory 구조 계약을 바꾸지 않는다.
 - synthetic DB stub/agent 응답/scripted planner 및 기존 mocked provider suite로 검증했다.
   실제 provider/OAuth/계정/사용자 PC·운영 DB/GCS·배포 smoke는 실행하지 않았다.
@@ -680,3 +680,18 @@ API/content-editor/root dependencies/AGENTS/lint-ratchet 코드와는 겹치지 
 기록과 소스를 하나의 구현 commit으로 묶고 최신 main 통합 후 같은 `wo/code-complexity-phase2`에 push한다.
 최종 원격 SHA/clean 여부는 push 후 보고한다. PR 생성·main 병합·배포·integration-ready 판정 없음.
 worktree disposition: KEEP — 동일 WO 연속 branch, 우리 변경은 아직 main 미반영.
+
+
+### 14.3 최신 main 반영 후 확인
+
+- 구현 `790b67dacb`, 최신 main `e36bcf9318` 통합 `cf2e8613c5`.
+- merge가 API/content-editor/root dependency/AGENTS/lint-ratchet 코드에 주는 diff 0을 확인했다.
+  API 타입·빌드와 전체 회귀 264건의 검증 소스는 그대로다.
+- merge 후 state/ownership 핵심 10 PASS / 필터 제외 14 skip. 기존 전체 회귀와 중복이므로 추가 집계하지 않는다.
+- 재개 답변·질문·교정·Avoid/Preferred 경로는 work-assistance 전체 suite를 추가 확인해 14 PASS / skip 없음.
+  따라서 최종 고유 회귀는 **21 suites / 278 tests PASS** (264 + 14).
+- merge 후 전체 lint ratchet PASS: errors 46 / baseline 46, warnings 1,001.
+  이전 1,006과의 차이는 main 담당 operator 변경을 포함한 결과이며 우리 오류 수정 실적으로 집계하지 않는다.
+- 최종 main 대비 diff-check PASS. 기록 문장의 source 변경 없음 오기를 contract 변경 없음으로 바로잡았다.
+- 이 확인 기록과 구현·main 통합 이력을 같은 branch에 push한다. 원격 SHA 일치/clean 여부는 최종 보고에서 확인한다.
+  push-only 종료, PR/main 병합/배포/운영 계정 또는 운영 자원 변경 없음.
