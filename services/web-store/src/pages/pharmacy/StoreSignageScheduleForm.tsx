@@ -55,7 +55,7 @@ export function StoreSignageScheduleForm({
   toggleSchDay,
   handleSaveSchedule,
   resetScheduleForm,
-}: StoreSignageScheduleFormProps) {
+}: Readonly<StoreSignageScheduleFormProps>) {
   const fieldId = useId();
   return (
     <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
@@ -75,7 +75,6 @@ export function StoreSignageScheduleForm({
         onChange={(e) => setSchName(e.target.value)}
         placeholder="스케줄명 *"
         className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-        autoFocus
       />
 
       {/* Row 2: Playlist + Priority */}
@@ -105,10 +104,14 @@ export function StoreSignageScheduleForm({
           </select>
         </div>
         <div className="flex items-center gap-1.5">
-          <label className="text-xs text-slate-500 whitespace-nowrap">
+          <label
+            htmlFor={`${fieldId}-priority`}
+            className="text-xs text-slate-500 whitespace-nowrap"
+          >
             우선순위
           </label>
           <input
+            id={`${fieldId}-priority`}
             type="number"
             aria-label="우선순위"
             value={schPriority}
@@ -121,11 +124,17 @@ export function StoreSignageScheduleForm({
 
       {/* Row 3: Days of week */}
       <div>
-        <label className="text-xs text-slate-500 mb-1 block">요일 선택 *</label>
-        <div className="flex flex-wrap gap-1.5">
+        <p id={`${fieldId}-days`} className="text-xs text-slate-500 mb-1 block">
+          요일 선택 *
+        </p>
+        <div
+          role="group"
+          aria-labelledby={`${fieldId}-days`}
+          className="flex flex-wrap gap-1.5"
+        >
           {DAY_LABELS.map((label, idx) => (
             <button
-              key={idx}
+              key={label}
               type="button"
               onClick={() => toggleSchDay(idx)}
               aria-pressed={schDays.includes(idx)}
@@ -144,7 +153,12 @@ export function StoreSignageScheduleForm({
       {/* Row 4: Start / End time */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0">
-          <label htmlFor={`${fieldId}-start`} className="text-xs text-slate-500 mb-1 block">시작 시간</label>
+          <label
+            htmlFor={`${fieldId}-start`}
+            className="text-xs text-slate-500 mb-1 block"
+          >
+            시작 시간
+          </label>
           <input
             id={`${fieldId}-start`}
             type="time"
@@ -155,7 +169,12 @@ export function StoreSignageScheduleForm({
           />
         </div>
         <div className="min-w-0">
-          <label htmlFor={`${fieldId}-end`} className="text-xs text-slate-500 mb-1 block">종료 시간</label>
+          <label
+            htmlFor={`${fieldId}-end`}
+            className="text-xs text-slate-500 mb-1 block"
+          >
+            종료 시간
+          </label>
           <input
             id={`${fieldId}-end`}
             type="time"
@@ -170,7 +189,10 @@ export function StoreSignageScheduleForm({
       {/* Row 5: Valid from / until */}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0">
-          <label htmlFor={`${fieldId}-from`} className="text-xs text-slate-500 mb-1 block">
+          <label
+            htmlFor={`${fieldId}-from`}
+            className="text-xs text-slate-500 mb-1 block"
+          >
             유효 시작일
           </label>
           <input
@@ -183,7 +205,10 @@ export function StoreSignageScheduleForm({
           />
         </div>
         <div className="min-w-0">
-          <label htmlFor={`${fieldId}-until`} className="text-xs text-slate-500 mb-1 block">
+          <label
+            htmlFor={`${fieldId}-until`}
+            className="text-xs text-slate-500 mb-1 block"
+          >
             유효 종료일
           </label>
           <input

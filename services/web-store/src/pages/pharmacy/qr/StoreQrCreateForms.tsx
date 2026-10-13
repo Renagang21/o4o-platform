@@ -84,8 +84,14 @@ export function StoreQrCreateForms({
   setShowSelector,
   handleCreateVideo,
   handleCreate,
-}: StoreQrCreateFormsProps) {
+}: Readonly<StoreQrCreateFormsProps>) {
   const fieldId = useId();
+  const targetLabels: Record<string, string> = {
+    product: "연결 상품 (선택)",
+    link: "연결 URL",
+  };
+  const landingTargetLabel =
+    targetLabels[formLandingType] ?? "연결 대상 (선택)";
   return (
     <>
       {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 QR 생성 폼 (library 자료 흐름과 분리) */}
@@ -132,7 +138,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>QR 제목</label>
+            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>
+              QR 제목
+            </label>
             <input
               id={`${fieldId}-title`}
               type="text"
@@ -145,7 +153,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>
+              짧은 안내문 (선택)
+            </label>
             <input
               id={`${fieldId}-description`}
               type="text"
@@ -158,7 +168,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>QR 주소 (URL 경로)</label>
+            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>
+              QR 주소 (URL 경로)
+            </label>
             <div style={styles.slugPreview}>
               <span style={styles.slugBase}>{qrBaseUrl}</span>
               <input
@@ -276,7 +288,9 @@ export function StoreQrCreateForms({
 
           {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: QR 제목 */}
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>QR 제목</label>
+            <label htmlFor={`${fieldId}-title`} style={styles.formLabel}>
+              QR 제목
+            </label>
             <input
               id={`${fieldId}-title`}
               type="text"
@@ -290,7 +304,9 @@ export function StoreQrCreateForms({
 
           {/* WO-O4O-QR-TEMPLATE-WORKFLOW-V1: 짧은 안내문 */}
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>짧은 안내문 (선택)</label>
+            <label htmlFor={`${fieldId}-description`} style={styles.formLabel}>
+              짧은 안내문 (선택)
+            </label>
             <input
               id={`${fieldId}-description`}
               type="text"
@@ -314,7 +330,9 @@ export function StoreQrCreateForms({
           </div>
 
           <div style={styles.formRow}>
-            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>QR 주소 (URL 경로)</label>
+            <label htmlFor={`${fieldId}-slug`} style={styles.formLabel}>
+              QR 주소 (URL 경로)
+            </label>
             <div style={styles.slugPreview}>
               <span style={styles.slugBase}>{qrBaseUrl}</span>
               <input
@@ -350,6 +368,7 @@ export function StoreQrCreateForms({
                 }}
               >
                 <label
+                  htmlFor={`${fieldId}-cta`}
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -358,38 +377,30 @@ export function StoreQrCreateForms({
                   }}
                 >
                   <input
+                    id={`${fieldId}-cta`}
                     type="checkbox"
+                    aria-label="콘텐츠 하단에 상담 요청 버튼 표시"
                     checked={ctaEnabled}
                     onChange={(e) => setCtaEnabled(e.target.checked)}
                     style={{ marginTop: "3px" }}
                   />
-                  <span>
-                    <span
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 600,
-                        color: colors.neutral800,
-                      }}
-                    >
-                      콘텐츠 하단에 상담 요청 버튼 표시
-                    </span>
-                    <span
-                      style={{
-                        display: "block",
-                        fontSize: "12px",
-                        color: colors.neutral500,
-                        marginTop: "2px",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      QR을 본 고객이 콘텐츠 하단에서 바로 상담을 요청할 수
-                      있습니다. 요청은 매장 알림으로 전달됩니다.
-                    </span>
-                  </span>
+                  콘텐츠 하단에 상담 요청 버튼 표시
                 </label>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: colors.neutral500,
+                    marginTop: "2px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  QR을 본 고객이 콘텐츠 하단에서 바로 상담을 요청할 수 있습니다.
+                  요청은 매장 알림으로 전달됩니다.
+                </p>
                 {ctaEnabled && (
                   <input
                     type="text"
+                    aria-label="상담 요청 버튼 문구"
                     value={ctaLabel}
                     onChange={(e) => setCtaLabel(e.target.value)}
                     style={{ ...styles.input, marginTop: "10px" }}
@@ -402,8 +413,14 @@ export function StoreQrCreateForms({
           ) : (
             <>
               <div style={styles.formRow}>
-                <label style={styles.formLabel}>연결 유형</label>
+                <label
+                  htmlFor={`${fieldId}-landing-type`}
+                  style={styles.formLabel}
+                >
+                  연결 유형
+                </label>
                 <select
+                  id={`${fieldId}-landing-type`}
                   value={formLandingType}
                   onChange={(e) => setFormLandingType(e.target.value)}
                   style={styles.select}
@@ -429,15 +446,15 @@ export function StoreQrCreateForms({
               )}
 
               <div style={styles.formRow}>
-                <label style={styles.formLabel}>
-                  {formLandingType === "product"
-                    ? "연결 상품 (선택)"
-                    : formLandingType === "link"
-                      ? "연결 URL"
-                      : "연결 대상 (선택)"}
+                <label
+                  htmlFor={`${fieldId}-landing-target`}
+                  style={styles.formLabel}
+                >
+                  {landingTargetLabel}
                 </label>
                 {formLandingType === "product" ? (
                   <select
+                    id={`${fieldId}-landing-target`}
                     value={formLandingTargetId}
                     onChange={(e) => setFormLandingTargetId(e.target.value)}
                     style={styles.select}
@@ -456,6 +473,7 @@ export function StoreQrCreateForms({
                   </select>
                 ) : (
                   <input
+                    id={`${fieldId}-landing-target`}
                     type="text"
                     value={formLandingTargetId}
                     onChange={(e) => setFormLandingTargetId(e.target.value)}
