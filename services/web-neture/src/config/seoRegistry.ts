@@ -20,11 +20,10 @@
 
 import type { PageSeoConfig, SeoRegistry } from '@o4o/shared-space-ui';
 import { setCanonical, setMeta } from '@o4o/shared-space-ui';
-import { HOST_ORIGIN, MAIN_ORIGIN, type HostProfile, type SubHost } from '../lib/hostProfile';
+import { HOST_ORIGIN, MAIN_ORIGIN, type HostProfile } from '../lib/hostProfile';
 
-/** O4O 대표 문구 — index.html 정적 title / description 과 같은 값 */
-export const O4O_BRAND_TITLE = 'O4O — 소규모 사업자를 위한 통합 업무 공간';
-export const O4O_BRAND_DESCRIPTION = '소규모 사업자를 위한 O4O(Online for Offline) 통합 업무 공간입니다.';
+import { O4O_BRAND_TITLE, O4O_BRAND_DESCRIPTION, SUBHOST_HOME_SEO } from './seoData';
+export { O4O_BRAND_TITLE, O4O_BRAND_DESCRIPTION, SUBHOST_HOME_SEO } from './seoData';
 
 /** 미등록 경로의 기본 메타 (O4O 대표) */
 export const NETURE_SEO_DEFAULTS: PageSeoConfig = {
@@ -122,25 +121,6 @@ export const netureSeoRegistry: SeoRegistry = {
 // 한 번들이 neture.co.kr · supplier · funding · community 네 host 를 서빙한다.
 // 하위 host 의 `/` 는 그 host 의 대표 화면이므로 O4O 대표 title 이 아니라 서비스 Hero 문구로 맞춘다.
 // og:url · canonical 은 현재 host origin 기준이다. og:image 는 실제 brand image 가 없으므로 넣지 않는다.
-
-/** 하위 host 대표 화면(`/`) 메타 — Hero 확정 문구와 같은 값 */
-export const SUBHOST_HOME_SEO: Readonly<Record<SubHost, PageSeoConfig>> = Object.freeze({
-  supplier: {
-    title: '공급자 — 제품과 콘텐츠를 매장과 연결합니다 | O4O',
-    description: '상품 등록부터 매장 연결과 운영까지 공급자 업무를 한곳에서 관리합니다.',
-    ogType: 'website',
-  },
-  funding: {
-    title: '유통참여형 펀딩 — 제품의 가능성을 유통 참여로 연결합니다 | O4O',
-    description: '새로운 제품과 유통 기회를 함께 검토하고 참여합니다.',
-    ogType: 'website',
-  },
-  community: {
-    title: 'O4O 커뮤니티 — 현장의 경험과 정보를 함께 나눕니다',
-    description: 'O4O 서비스 참여자들이 실무 정보와 경험을 공유하는 공간입니다.',
-    ogType: 'website',
-  },
-});
 
 const HOST_REGISTRIES: Readonly<Record<HostProfile, SeoRegistry>> = Object.freeze({
   main: netureSeoRegistry,

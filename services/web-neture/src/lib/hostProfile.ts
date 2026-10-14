@@ -13,16 +13,8 @@
  * 빌드 플래그를 false 로 지정하여 전환 전 상태로 되돌릴 수 있다.
  */
 
-export type SubHost = 'supplier' | 'funding' | 'community';
-export type HostProfile = 'main' | SubHost;
-
-export const MAIN_ORIGIN = 'https://neture.co.kr';
-
-export const HOST_ORIGIN: Readonly<Record<SubHost, string>> = Object.freeze({
-  supplier: 'https://supplier.neture.co.kr',
-  funding: 'https://funding.neture.co.kr',
-  community: 'https://community.neture.co.kr',
-});
+import { MAIN_ORIGIN, HOST_ORIGIN, type SubHost, type HostProfile } from './hostIdentity';
+export { MAIN_ORIGIN, HOST_ORIGIN, type SubHost, type HostProfile } from './hostIdentity';
 
 const HOST_BY_NAME: Readonly<Record<string, SubHost>> = Object.freeze({
   'supplier.neture.co.kr': 'supplier',
