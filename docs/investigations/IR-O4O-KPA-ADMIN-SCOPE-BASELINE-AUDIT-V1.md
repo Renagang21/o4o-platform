@@ -112,9 +112,9 @@
 
 | # | 항목 | 현황 | 판단 |
 |:-:|---|---|---|
-| R1 | 역할 관리 `/operator/roles` (adminOnly) | kpa:admin 이 kpa:operator/kpa:admin 부여 | WO 정책("운영자 지정=O4O 전체 관리자")과 충돌 가능. **단 즉시 제거 금지** — KPA `platformBypass:false`(super_admin cross 불가)로 service admin 의 within-service 부여가 운영상 필요할 수 있음. **정책 결정 항목**(O4O 전체관리자 부여 모델 확정 후). |
+| R1 | 역할 관리 `/operator/roles` (adminOnly) | kpa:admin 이 kpa:operator/kpa:admin 부여 | WO 정책("운영자 지정=O4O 전체 관리자")과 충돌 가능. **단 즉시 제거 금지** — KPA `platformBypass:false`(super_admin cross 불가)로 service admin 의 within-service 부여가 운영상 필요할 수 있음. **정책 결정 항목**(O4O 전체 관리자 부여 모델 확정 후). |
 
-→ G/KCos cleanup 처럼 "과대 admin 축소"가 아니라, KPA 는 **role 관리의 소속(서비스 admin vs 전체관리자) 정의**가 핵심 결정. 회원/문의/법정 경계는 이미 정상이므로 제거 대상 거의 없음.
+→ G/KCos cleanup 처럼 "과대 admin 축소"가 아니라, KPA 는 **role 관리의 소속(서비스 admin vs 전체 관리자) 정의**가 핵심 결정. 회원/문의/법정 경계는 이미 정상이므로 제거 대상 거의 없음.
 
 ## 10. 후속 WO 제안 (WO §8 기준 갱신)
 
@@ -123,7 +123,7 @@
 | **WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1** | KPA admin 에 공유 `ServiceLegalSettingsPage` 도입 → footer 법정정보(service_legal_profiles) 편집 가능. (WO §8.1 구체화) | **primary**, 저위험(공유 모듈 재사용, KCos/Neture 선례). 정책문서 탭은 G2 결정에 따름 |
 | **IR/WO-O4O-KPA-POLICY-DOCUMENT-TRACK-DECISION-V1** | `kpa_legal_documents`(legacy) vs `service_policy_documents`(cross-service) 단일화 결정 + (이관 시) `/policy`·`/privacy` 소스 교체·데이터 마이그레이션 | **선행 결정 필요**. 이중 표시·중복 편집 방지 |
 | WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1 | 법정정보/약관/개인정보/문의설정/footer 게시 상태 점검 화면 | WO §8.4 |
-| (정책) WO-O4O-KPA-ROLE-ASSIGNMENT-SCOPE-DECISION-V1 | `/operator/roles` 의 소속(service admin vs 전체관리자) 확정 | platformBypass 정책 고려 |
+| (정책) WO-O4O-KPA-ROLE-ASSIGNMENT-SCOPE-DECISION-V1 | `/operator/roles` 의 소속(service admin vs 전체 관리자) 확정 | platformBypass 정책 고려 |
 | (선택) WO-O4O-KPA-ADMIN-MEMBER-DATA-LABEL-ALIGNMENT-V1 | 회원 관리 라벨 "회원 데이터 관리" 정합 | 구조는 이미 정상 — 라벨만 |
 
 > WO §8.2(회원 데이터 관리 정리)·§8.3(문의 역할 분리)는 **이미 구현 완료** 확인 → 신규 WO 불필요(라벨 정합만 선택). WO §8.1 은 위 wiring WO 로 구체화. G2(정책 트랙) 가 추가 발견된 선결 항목.

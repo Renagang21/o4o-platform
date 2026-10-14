@@ -46,7 +46,7 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 서비스별 추가 정보는 실제 신청 DTO·저장 원장·승인 처리와 대조해 필수/선택을 확정한다.
 약국 협력사업의 조건은 기존 BusinessParticipationPage의 조건 표시·acceptedConditions·신청 시
 조건 snapshot을 재사용한다. 새 범용 약관이 개별 사업의 기존 조건 기록을 덮어쓰지 않는다.
-전체관리자는 공개 서비스 가입 약관 목록에 넣지 않고 Google 전용 관리 접근 정책을 유지한다.
+전체 관리자는 공개 서비스 가입 약관 목록에 넣지 않고 Google 전용 관리 접근 정책을 유지한다.
 
 ## 4. 코드 조사로 확인한 구현 차이
 
@@ -116,7 +116,7 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
   기존 Google Cloud·메일·활성 AI 위탁/국외 처리 고지는 보존하고, 인증 제공자 고지는 별도로 확정한다.
 
 필수 이름·개인 휴대전화, 공통 로그인, 서비스별 승인, 약국 전용과 면허증 파일 미수집,
-전체관리자 용어는 리팩터링 문서와 사용자 지시로 확정돼 다시 결정 요청하지 않는다.
+전체 관리자 용어는 리팩터링 문서와 사용자 지시로 확정돼 다시 결정 요청하지 않는다.
 유료화는 현재 미정이므로 신규 결제 제한·가격·무료 종료일을 본문에 임의 추가하지 않는다.
 
 ## 8. 2026-10-11 이번 구현 범위와 배포 경계
@@ -124,7 +124,7 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 [이번 검증 기록](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)의 정책 개편 절에
 소비처와 실행 결과를 기록한다. 정상 공통 계정의 Neture 약관 요구를 서비스 membership과 분리했으며,
 서비스별 반려·정지·미가입을 로그인 거부나 다른 서비스의 약관 미동의로 대체하지 않는다.
-불명인 이전 세션 범위는 보수적으로 처리한다. 전체관리자 업무 예외와 Demo registry 예외는 유지한다.
+불명인 이전 세션 범위는 보수적으로 처리한다. 전체 관리자 업무 예외와 Demo registry 예외는 유지한다.
 
 이번 코드·본문 보완은 push/PR 검토 범위다. 기존 공개 v1·동의 이력·운영 DB를 변경하지 않았다.
 새 공통 정책 적용은 완성된 본문·서비스 신청 정책과 실제 공고/시행 계획에 맞춰 운영에 반영해야 한다.
@@ -138,7 +138,7 @@ Neture 공통 계정의 이용약관과 개인정보 처리방침은 **neture.co
 정책 gate 18건은 통과했으나 서비스 신청 상태 전체와 실제 외부 인증을 검증한 결과는 아니다.
 
 
-전체관리자 관리 API는 기존 admin prefix 외에 settings/apps/users 등의 공유 API도 소비한다.
+전체 관리자 관리 API는 기존 admin prefix 외에 settings/apps/users 등의 공유 API도 소비한다.
 관리 맥락은 서명된 `admin` 세션과 현재 DB의 `platform:super_admin` 역할을 함께 확인한다.
 Google 전용·계정/세션 상태·각 route 권한 검사를 통과한 관리 세션은 재동의로 업무를 막지 않는다.
 동일 계정이 일반 서비스 세션을 사용하면 공통/해당 서비스 약관을 요구한다. Origin이나 JWT의
@@ -240,7 +240,7 @@ modal로 선언하지 않고 복수 제목 ID를 구분한다. 서비스 신청/
 - 새 서비스 문서의 표식은 `<service_key>-service-terms/privacy`이며 새 ID·version>=2·시행일을 요구한다.
   기존 통합 v1은 새 서비스 신청 동의로 재해석하지 않는다. API 선행 배포 때 기존 웹 신청은 유지된다.
 - supplier/community/funding은 독립 조직의 active admin 관리 범위를 연결했다. 약사회·강의의 기존
-  관리 경계를 유지하며 전체관리자가 약사회나 분회를 우회하지 않는다.
+  관리 경계를 유지하며 전체 관리자가 약사회나 분회를 우회하지 않는다.
 - 공급자 신청, 약국 기본 신청·약국 협력사업, 커뮤니티 가입·개설, 펀딩 참여, 강의 수강·강사 신청은
   현재 정책 ID/version/hash와 신청 ID를 같은 transaction으로 저장한다. 조건 원장이 있는 약국 사업과
   펀딩은 당시 조건을 함께 연결한다. 개인정보는 acknowledgement, 약관은 agreement로 기록한다.
@@ -366,7 +366,7 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 - PH 종료 후 WIF 복원을 사용자가 확인했다. 읽기 전용 인증 run38187804879와
   Delivery 진단38188246897이 SUCCESS다. 이전 WIF 거절 기록은 당시 결과이며 현재 blocker가 아니다.
 - Promote38189866093은 main 이동으로 SUPERSEDED되어 실제 배포하지 않았다. 최신 문서 변경을
-  포함한 Promote38190265457(target `0e1aa41eaf`)에서는 API·Neture·KPA Society·강의·매장·전체관리자
+  포함한 Promote38190265457(target `0e1aa41eaf`)에서는 API·Neture·KPA Society·강의·매장·전체 관리자
   이미지 배포 job이 SUCCESS였다. 분회는 Docker 이미지 빌드가 실패했고 전체 Report도 FAILED다.
   후속 Promote38192368264에서도 분회 빌드가 실패했다. 전체 배포 완료로 기록하지 않는다.
 - 분회 package.json에 추가한 `@o4o/shared-space-ui`가 기존 Docker COPY 목록에는 빠져 있었다.
@@ -384,7 +384,7 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 - 유지 서비스8개(Neture·공급자·커뮤니티·펀딩·약국·매장·강의·분회)의 PC/mobile ×
   매장 경영자/공급자 실제 Demo 버튼32조건을 검증했다. 초회30/32 PASS 뒤 공급자 화면2조건은
   정확한 전역 메뉴 선택과 공급자 정보 안내의 ‘나중에 하기’ 처리로 재검증 PASS다.
-  로그인/내 정보200, 전체관리자403, 역할별 업무200/403, Demo 비밀번호·연결 관리 제한,
+  로그인/내 정보200, 전체 관리자403, 역할별 업무200/403, Demo 비밀번호·연결 관리 제한,
   UI 로그아웃200 후 access/refresh401을 확인했다. Neture 매장 Demo의 매장 handoff와
   원래 Neture 세션 로그아웃 후 매장 세션 유지200도 PC/mobile에서 확인했다.
 - 운영 정책 계약14건은 PASS다. 가입8 origin의 현행 terms/privacy v1·정확한 privacy 소유권·no-store,
@@ -411,7 +411,7 @@ GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 �
 - 분회 최종 serving SHA는 `899e871ccee0114f6cf7ac73999011a1d364b994`다. Report는 GCP serving을
   다시 읽고 계획된 서비스의 SHA가 target과 일치할 때만 DEPLOYED로 판정한다.
   해당 SHA의 최종 production status도 SUCCESS/DEPLOYED다.
-- API·전체관리자·Neture·KPA Society·강의·매장의 실제 serving 검증은 앞선 run38190265457의
+- API·전체 관리자·Neture·KPA Society·강의·매장의 실제 serving 검증은 앞선 run38190265457의
   최종 production status에서 통과한6개를 확인했다(target `0e1aa41eafab8cd3bc1b2c099f20d903ac785a18`).
   최신 Promote에서는 추가 runtime 변경이 없는6개를 재배포하지 않고 분회만 배포했다.
   앞선 전체 FAILED는 분회 실패 때문이며 이번 성공으로 그 배포 잔여가 해소됐다.

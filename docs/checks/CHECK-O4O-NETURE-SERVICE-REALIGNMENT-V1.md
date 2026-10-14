@@ -44,7 +44,7 @@
 
 Chromium으로 실제 로컬 Vite·API를 이용했다. canonical HTTPS 호스트를 로컬 서버로 연결하는 테스트 proxy를 사용하며 운영 서버에 요청하지 않았다. API 주소 재작성은 이 테스트 proxy에서만 수행하고 제품 코드의 인증·CORS를 완화하지 않았다.
 
-10개 흐름 PASS, page JavaScript error 0: 승인된 독립 커뮤니티, 실제 글 작성·상세, 한 약국의 두 사업 진입, 내 매장 자료함, 공통 제공 자료 화면, 옛 HUB 자료 handoff의 실제 자료함 도착, 약국을 소유하지 않은 운영자의 모바일 신청 심사, pharmacy 담당 운영 화면, 모바일 커뮤니티 목록, study 독립 문의 화면. 담당 운영자의 비공개 사업 게시판 열람·중재도 실제 로컬 API로 추가 확인했다. 전체관리자 메뉴는 권한 registry 회귀와 아래 적용 전 확인 항목을 함께 따른다.
+10개 흐름 PASS, page JavaScript error 0: 승인된 독립 커뮤니티, 실제 글 작성·상세, 한 약국의 두 사업 진입, 내 매장 자료함, 공통 제공 자료 화면, 옛 HUB 자료 handoff의 실제 자료함 도착, 약국을 소유하지 않은 운영자의 모바일 신청 심사, pharmacy 담당 운영 화면, 모바일 커뮤니티 목록, study 독립 문의 화면. 담당 운영자의 비공개 사업 게시판 열람·중재도 실제 로컬 API로 추가 확인했다. 전체 관리자 메뉴는 권한 registry 회귀와 아래 적용 전 확인 항목을 함께 따른다.
 
 ### 2-3. PR 검토 후 보완
 
@@ -82,7 +82,7 @@ HEAD `f8cdffce5d`의 CI Gate·API Jest 3개 shard·Code Quality·앱 빌드·Cod
 
 1. 최신 main/HEAD의 required `CI Gate`, SonarCloud 실행 여부·결과, Codex 지적·미해결 스레드를 확인한다. 저장소 §4-1(e)에 따라 integration-ready를 보고하고 사용자 main 통합 승인 후 PR로 통합한다.
 2. branch와 main의 코드 차이에 대한 현행 판정기는 API·admin·공통 Neture 번들·pharmacy·PharmacyHub·study·store를 영향 대상으로 판정했다(LEVEL_3, 병원약국·분회는 제외). 실제 serving→main 차이는 통합 후 Delivery에서 다시 판정하며 HOLD라면 검토한 main SHA로 Promote를 승인한다. `VITE_UNIFIED_STORE_HANDOFF=true`는 pharmacy 앱에 적용하며 PH 플래그는 유지한다. 공급자·펀딩 전환의 개별 롤백은 Neture Docker build argument `VITE_HOST_CUTOVER_SUPPLIER=false` 또는 `VITE_HOST_CUTOVER_FUNDING=false`로 명시한다. 이 옵션은 빌드 시 반영되며 Cloud Run runtime 환경변수만으로 변경되지 않는다.
-3. 전체관리자가 pharmacy 사업의 별도 community_key와 담당 운영자를 설정하고 독립 약사 key와 충돌하지 않음을 확인한다. 신규 실제 계정 가입/메일 확인 → 증빙 업로드/담당 승인 → 한 약국의 복수 사업 → 공급자/제품 승인 → 모집·주문·test 결제·처리와 독립/사업 커뮤니티·사본·QR·태블릿·사이니지를 운영에서 확인한다. 실제 PG는 계약 후 별도 연결이며 test 모드 성공과 구분한다.
+3. 전체 관리자가 pharmacy 사업의 별도 community_key와 담당 운영자를 설정하고 독립 약사 key와 충돌하지 않음을 확인한다. 신규 실제 계정 가입/메일 확인 → 증빙 업로드/담당 승인 → 한 약국의 복수 사업 → 공급자/제품 승인 → 모집·주문·test 결제·처리와 독립/사업 커뮤니티·사본·QR·태블릿·사이니지를 운영에서 확인한다. 실제 PG는 계약 후 별도 연결이며 test 모드 성공과 구분한다.
 4. 1단계 API 안정·구버전 `ON CONFLICT` 소비처·rollback-floor를 확인한 뒤 수동 이벤트 인덱스를 전환한다. 단순 flag 입력은 업무 검증 증거가 아니다.
 5. PH 네 QR 경로를 실제 새 호스트에서 확인 → 실제 URL map export로 302 초안을 검토/적용 → 옛 주문·공급 설정의 소유권/FK/처분/복구 확인 → 조건 충족 후 301·서버 종료. 인쇄 QR의 기존 도메인·인증서 보존은 서버 종료와 별도로 판단한다.
 
