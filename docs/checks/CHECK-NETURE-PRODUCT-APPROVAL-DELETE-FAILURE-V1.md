@@ -1,8 +1,10 @@
 # Neture 승인대기 상품 삭제 실패·대상 보존 검증
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거 WO/IR**: [WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1](../work-orders/WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)
+
+> **현재 판정**: 코드·CI·API/Neture 배포 확인 완료. 과거 보류의 해소 근거는 문서 마지막 절을 따른다.
 
 ## 재현과 변경
 
@@ -70,3 +72,12 @@ source `dadc13e62`에서 정상 dependency closure와 API tsc 빌드 후 `build:
 이 기록은 동일 WO의 후속 문서 단계로 기존 세션 전용 clone을 유지하고 최신 main에서 closure branch를 만들었다. 실행 코드·배포 설정을 바꾸지 않는 문서 변경이며 source 배포를 다시 주장하지 않는다. source 작업공간은 선행 API/배포 재개를 위해 KEEP한다.
 
 API 타입 재export 문제의 별도 후속 [PR #557](https://github.com/Renagang21/o4o-platform/pull/557)이 진행 중인 것을 확인했다. 해당 API 작업은 그 PR을 따르며, 이번 운영자 문서 변경은 후속 source/serving 결과가 나오기 전 배포 완료로 판정하지 않는다.
+
+## 2026-10-14 배포 보류 해소·최종 완료
+
+- API 선행 수정 [PR #557](https://github.com/Renagang21/o4o-platform/pull/557)은 MERGED다. [Promote 38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074), target `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`: API build-and-deploy, 의존 Neture deploy, 최종 serving Report 모두 SUCCESS이며 `production`은 DEPLOYED다. 승인된 quota migration 실행 완료는 해당 AI WO/CHECK의 최종 운영 증거와 API workflow 결과를 따른다.
+- 배포 target에 이번 운영자 source `e74675667` 및 표시 정비가 포함되는 ancestry를 확인했다. 이후 [Neture Delivery 38499037614](https://github.com/Renagang21/o4o-platform/actions/runs/38499037614), target `40aafa414f2df4abb8a4d647728e43227d78bbce`도 deploy-neture·summary·serving Report SUCCESS, `production`은 `DEPLOYED · deploy: neture`다. 이 target 역시 이번 변경을 포함한다.
+- 최신 조사 main `6eeea05a2`의 [Delivery 38500377113](https://github.com/Renagang21/o4o-platform/actions/runs/38500377113)는 SUCCESS / NO_DEPLOY다. 현재 serving→target에 추가 배포가 필요 없다는 판정이며, 앞선 실제 배포 성공과 구분한다.
+- 이번 확인에서 Neture 공개 root와 API `/health`의 HTTP 200을 다시 확인했다. 실계정 승인·삭제 업무 검증은 사용자 담당이며, 운영 상품 삭제나 테스트용 DB write는 하지 않았다.
+
+**현재 상태: 이번 표시·삭제 실패 정비의 main 반영·CI·운영 배포 확인 완료.** 앞 절의 보류·실패는 당시 실행 기록으로 보존한다. API 선행 수정·migration·다중 서비스 rollout은 별도 실행에서 이미 완료됐으므로 이 확인 과정에서 다시 실행하지 않았다. 약사회 분회는 본 운영자 정비의 코드 변경·배포 선택에 포함하지 않았다. 이 최종 문서 변경은 DEPLOYMENT=NOT_APPLICABLE이다.
