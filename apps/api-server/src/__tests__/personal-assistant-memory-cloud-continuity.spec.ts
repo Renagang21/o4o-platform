@@ -574,14 +574,15 @@ describe('F. Phase D — 노드 원장 소유 주체 · 재개 구조 최신성'
     expect(validateLocalCommandArgs(A.DATA_WORK_RUN_CONTEXT_RECALL, { runId: 'g_1', targetId: SITE, slotValue: null, ownerKey: OWNER_ORG }).ok).toBe(false);
   });
 
-  it('소유 주체 원장 노드 — 경험 회상 · Candidate 대조 · run 기록에 Task 소유 주체 키가 실린다(재개 구조 · 상태에는 없다)', async () => {
+  it('소유 주체 원장 노드 — run은 Task 소유, Candidate 대조는 요청자 개인 소유(재개 구조 · 상태에는 없다)', async () => {
     const intent = { ...planAssistantTask(BASE).intent, node: { ownerKey: OWNER_ORG, preferredDeviceIds: [] } };
     const planner = scripted([DONE]);
     const { node } = await runOn('dev-pc-a', '약학정보원에서 게보린 검색해줘', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, { intent, nodeCaps: SCOPED });
     const by = (b: string) => node.ledger.filter((l) => l.base === b);
     expect(by(A.DATA_WORK_RUN_EXPERIENCE_RECALL).length).toBeGreaterThan(0);
     for (const l of by(A.DATA_WORK_RUN_EXPERIENCE_RECALL).filter((x) => x.args.taskKey === null)) expect(l.args.ownerKey).toBe(OWNER_ORG);
-    for (const l of by(A.DATA_WORK_RUN_CANDIDATE_MATCH)) expect(l.args.ownerKey).toBe(OWNER_ORG);
+    expect(by(A.DATA_WORK_RUN_CANDIDATE_MATCH).length).toBeGreaterThan(0);
+    for (const l of by(A.DATA_WORK_RUN_CANDIDATE_MATCH)) expect(l.args.ownerKey).toBe(nodeLedgerOwnerKey('USER', 'user-1'));
     for (const l of by(A.DATA_WORK_RUN_UPSERT)) expect(l.args.ownerKey).toBe(OWNER_ORG);
     for (const l of node.ledger.filter((x) => x.base === A.DATA_WORK_RUN_SET_STATUS || x.base === A.DATA_WORK_RUN_EXPERIENCE_RECORD)) expect(l.args).not.toHaveProperty('ownerKey');
   });
