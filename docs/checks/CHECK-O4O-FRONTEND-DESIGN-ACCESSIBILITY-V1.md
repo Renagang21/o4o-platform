@@ -26,7 +26,11 @@ PR #556의 등록/import 라벨 개선을 반영하고 두 runtime 파일의 중
 
 ## 남은 외부 요건
 
-PR #560 자동 리뷰의 P2는 primary pointer만 검사하면 마우스가 기본인 터치스크린 기기에서 이미지 삭제/선택 영역이 20px로 남는다는 지적이다. 세 영역의 CSS 조건을 `any-pointer: coarse`로 변경했다. 데스크톱/터치 viewport 검사와 영향 회귀를 다시 실행한다. Chromium의 media feature override는 fine+coarse 혼합 장치 구성을 재현하지 못했으므로 실제 하이브리드 기기 검증 완료로 표시하지 않는다.
+PR #560 자동 리뷰의 P2는 primary pointer만 검사하면 마우스가 기본인 터치스크린 기기에서 이미지 삭제/선택 영역이 20px로 남는다는 지적이다. 세 영역의 CSS 조건을 `any-pointer: coarse`로 변경했다. 데스크톱/터치 viewport, 영향 회귀 3 files / 50 tests, 빌드·lint를 다시 통과했다. 지적 thread는 해소했고 해당 커밋의 자동 재리뷰가 추가 finding 없이 완료됐다. Chromium의 media feature override는 fine+coarse 혼합 장치 구성을 재현하지 못했으므로 실제 하이브리드 기기 검증 완료로 표시하지 않는다.
+
+확대된 import 이미지 선택 영역을 추가 측정했을 때 320px에서 기존 별표 버튼과 가로 2.67px 겹치는 회귀를 발견했다. 모바일 그리드를 2열로 바꾸고 대표 이미지 버튼도 이름·pressed 상태·44px touch 영역을 제공했다. 실제 ImportResult와 Field를 렌더하되 ProxiedImg I/O만 로컬 SVG fixture로 대체했다. 1440/390/320px에서 선택/해제·대표 지정, 두 control 겹침 0, 터치 44px, overflow 0, page error 0을 확인했다. 추가 authoring 17 tests·lint PASS. 이미지 클릭/선택 callback은 그대로다. 총 9개 화면 screenshot을 보존했다. 초기 fixture의 null fallback와 별표 accessible-name locator 오류를 진단한 실패는 PASS로 세지 않는다.
+
+별도 API 오류 수정 PR #557이 병합된 것을 확인했다. 이 사실은 quota migration 적용이나 API 운영 배포 완료를 뜻하지 않는다.
 
 운영 계정 파일·정식 브랜드 자산이 없다. static host SEO는 현재 runtime 메타만으로 해소되지 않아 Docker/nginx/edge 변경 범위를 별도로 확정해야 한다. migration 포함 promote는 AGENTS.md §4-1(f)의 명시 승인 요건을 따른다. 외부 요건 확보와 무관한 로컬 수정·회귀 검증은 계속한다.
 

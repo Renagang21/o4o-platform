@@ -114,7 +114,7 @@ export default function SupplierImportResult({
               선택된 이미지 없음 — 등록 페이지에 이미지가 전달되지 않습니다.
             </p>
           )}
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
             {parsed.imageUrls.map((url, idx) => (
               <div
                 key={idx}
@@ -146,8 +146,10 @@ export default function SupplierImportResult({
 
                 {/* Thumbnail star */}
                 <button
+                  aria-label={`상품 이미지 ${idx + 1} 대표 이미지로 지정`}
+                  aria-pressed={thumbnailIdx === idx}
                   onClick={() => setThumbnailIdx(idx)}
-                  className={`absolute right-1 top-1 text-lg leading-none ${
+                  className={`absolute right-1 top-1 flex h-5 w-5 [@media(any-pointer:coarse)]:h-11 [@media(any-pointer:coarse)]:w-11 items-center justify-center text-lg leading-none ${
                     thumbnailIdx === idx ? 'text-yellow-400' : 'text-white/60 hover:text-yellow-300'
                   }`}
                   title="대표 이미지로 지정"
