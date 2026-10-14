@@ -209,9 +209,13 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
 
 
 export function extractJson(text: string): unknown {
-  const m = String(text ?? '').match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('planner: no json');
-  return JSON.parse(m[0]);
+  const source = String(text ?? '');
+  // Preserve the greedy first-opening/last-closing contract without retrying
+  // the entire suffix for every unmatched opening brace.
+  const start = source.indexOf('{');
+  const end = source.lastIndexOf('}');
+  if (start === -1 || end <= start) throw new Error('planner: no json');
+  return JSON.parse(source.slice(start, end + 1));
 }
 
 

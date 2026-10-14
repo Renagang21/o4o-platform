@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { O4O_SERVICES, REGULATORY_TYPE_OPTIONS } from './importHelpers';
 import type { useSupplierProductImport } from './useSupplierProductImport';
 
@@ -6,6 +7,7 @@ export default function SupplierImportSettings({
 }: {
   controller: ReturnType<typeof useSupplierProductImport>;
 }) {
+  const formId = useId();
   const {
     navigate,
     o4oCategoryId,
@@ -34,8 +36,8 @@ export default function SupplierImportSettings({
       <div className="grid gap-4 sm:grid-cols-2">
         {/* 카테고리 */}
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-slate-700">카테고리</label>
-          <select
+          <label htmlFor={`${formId}-field1`} className="mb-1 block text-sm font-medium text-slate-700">카테고리</label>
+          <select id={`${formId}-field1`}
             value={o4oCategoryId}
             onChange={(e) => setO4oCategoryId(e.target.value)}
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -53,10 +55,10 @@ export default function SupplierImportSettings({
 
         {/* 공급가 */}
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label htmlFor={`${formId}-field2`} className="mb-1 block text-sm font-medium text-slate-700">
             공급가 (원) <span className="text-red-500">*</span>
           </label>
-          <input
+          <input id={`${formId}-field2`}
             type="number"
             value={o4oPriceGeneral}
             onChange={(e) => setO4oPriceGeneral(e.target.value)}
@@ -70,10 +72,10 @@ export default function SupplierImportSettings({
         {/* 규제 유형 (조건부) */}
         {selectedCatIsRegulated && (
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor={`${formId}-field3`} className="mb-1 block text-sm font-medium text-slate-700">
               규제 유형 <span className="text-red-500">*</span>
             </label>
-            <select
+            <select id={`${formId}-field3`}
               value={o4oRegulatoryType}
               onChange={(e) => setO4oRegulatoryType(e.target.value)}
               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -90,7 +92,7 @@ export default function SupplierImportSettings({
 
       {/* 유통 설정 */}
       <div className="mt-5">
-        <label className="mb-2 block text-sm font-medium text-slate-700">유통 설정</label>
+        <p className="mb-2 block text-sm font-medium text-slate-700">유통 설정</p>
         <label className="mb-3 flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"

@@ -5,11 +5,11 @@
 
 ## 변경
 
-사용자용 전체/다른 기기 로그아웃을 공통 인증 클라이언트·Context·계정 보안 화면·전체관리자 메뉴에서 제거했다. 공개 `/auth/logout-all`과 계정 상태/약관 예외도 제거했다. 자동 review에서 확인된 API 안내·Postman의 폐기 요청도 제거하고, 과거 migration guide에는 현재 사용 금지 안내를 추가했다. 비밀번호 reset의 서버 내부 전역 폐기는 `revokeAllSessions`로 구분하여 유지했다. 일반 logout API·서비스 epoch 동작은 이번 단계에서 바꾸지 않았다.
+사용자용 전체/다른 기기 로그아웃을 공통 인증 클라이언트·Context·계정 보안 화면·전체 관리자 메뉴에서 제거했다. 공개 `/auth/logout-all`과 계정 상태/약관 예외도 제거했다. 자동 review에서 확인된 API 안내·Postman의 폐기 요청도 제거하고, 과거 migration guide에는 현재 사용 금지 안내를 추가했다. 비밀번호 reset의 서버 내부 전역 폐기는 `revokeAllSessions`로 구분하여 유지했다. 일반 logout API·서비스 epoch 동작은 이번 단계에서 바꾸지 않았다.
 
-보안 화면의 Google 고정 표기를 공통 O4O 계정 표시로 바꿨다. Neture/KPA 설정에는 일반 logout을 연결했고, 처리 중 중복 클릭 방지와 실패 안내를 유지했다. 전체관리자 메뉴의 일반 logout은 완료를 기다린 뒤 성공 메시지를 표시한다.
+보안 화면의 Google 고정 표기를 공통 O4O 계정 표시로 바꿨다. Neture/KPA 설정에는 일반 logout을 연결했고, 처리 중 중복 클릭 방지와 실패 안내를 유지했다. 전체 관리자 메뉴의 일반 logout은 완료를 기다린 뒤 성공 메시지를 표시한다.
 
-정본·색인에는 전체관리자 용어, 카카오 추가 정책, 테스트 데이터 재사용·정리 승인과 새 세션 정책을 반영했다. 정책과 구현 완료를 구분하며 후속 구현 TODO를 WO에 기록했다. 이전 WO/CHECK 기록과 Frozen 본문은 변경하지 않았다.
+정본·색인에는 전체 관리자 용어, 카카오 추가 정책, 테스트 데이터 재사용·정리 승인과 새 세션 정책을 반영했다. 정책과 구현 완료를 구분하며 후속 구현 TODO를 WO에 기록했다. 이전 WO/CHECK 기록과 Frozen 본문은 변경하지 않았다.
 
 ## Shared Module Change Verification
 
@@ -25,7 +25,7 @@
 | Pharmacy-Hub | 공통 auth·account UI | 기존 일반 logout 유지 | typecheck PASS |
 | Store | 공통 auth | 제거된 계약 직접 소비 없음 | typecheck PASS |
 | Lecture | 공통 auth | 제거된 계약 직접 소비 없음 | typecheck PASS |
-| 전체관리자 | auth-context·auth-client·header | 메뉴의 전체 logout 제거, Google/role guard 불변 | 338 tests·typecheck PASS |
+| 전체 관리자 | auth-context·auth-client·header | 메뉴의 전체 logout 제거, Google/role guard 불변 | 338 tests·typecheck PASS |
 | 사용자 서비스 operator/store/forum/mypage | 상위 auth Context의 간접 소비 | 역할·보호 route·capability 불변 | 서비스 타입 검사·관련 계약 테스트 PASS |
 | retired K-Cosmetics | 현재 앱 없음 | 신규 복구 없음 | 최신 checkout 소비처 검색 |
 | Hospital Pharmacy | 인증 모듈 미사용 | 변경 없음 | 최신 checkout 소비처 검색 |
@@ -47,11 +47,11 @@ Chromium에서 Neture와 KPA `/mypage/settings`를 1440×900 및 390×844로 확
 - 루트 `pnpm run type-check` PASS: 전체 앱·서비스·App Store packages.
 - `node scripts/lint-ratchet.mjs` PASS: 기존 오류 46건 유지, warning 998건. lint 오류 0으로 보고하지 않는다.
 - `node scripts/check-doc-sensitive.mjs` PASS.
-- Vitest: auth-react 149, auth-client 15, auth-context 13, Neture 360, KPA 69, KPA-Branch 34, 전체관리자 338 PASS.
+- Vitest: auth-react 149, auth-client 15, auth-context 13, Neture 360, KPA 69, KPA-Branch 34, 전체 관리자 338 PASS.
 - Jest: auth/API 관련 189 + 공개 logout 제거 계약 4 PASS. 기존 DB 통합 suite 1개/2 tests는 skip되었으며 PASS에 포함하지 않는다.
 - 합계 **1,171 tests PASS**, 기존 통합 2 tests skipped.
 - Neture/KPA production build PASS. 기존 bundle-size/Browserslist 경고 잔존.
-- 전체관리자 Vitest 첫 실행은 잘못된 작업 디렉터리로 setup 파일을 찾지 못해 0 tests 실행 실패. CI와 같은 앱 디렉터리에서 재실행하여 338 tests PASS.
+- 전체 관리자 Vitest 첫 실행은 잘못된 작업 디렉터리로 setup 파일을 찾지 못해 0 tests 실행 실패. CI와 같은 앱 디렉터리에서 재실행하여 338 tests PASS.
 
 ## 후속·제약
 

@@ -374,3 +374,22 @@ describe('Import existing workflow', () => {
     ).toBe('');
   });
 });
+
+
+describe('Supplier authoring accessible controls', () => {
+  it('associates registration labels without forcing initial focus, including both brand inputs', async () => {
+    mocks.product.getBrands.mockResolvedValue([{ id: 'brand-fixture', name: 'Fixture brand' }]);
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    for (const label of [/포장 상품명/, /^상품명/, /카테고리/, /규제 구분/, /^브랜드$/, /브랜드명 직접 입력/, /제조사/, /바코드/]) expect(screen.getByLabelText(label)).toBeTruthy();
+    expect(document.activeElement).not.toBe(screen.getByLabelText(/포장 상품명/));
+  });
+  it('associates imported registration settings while keeping distribution as a heading', async () => {
+    parseImport();
+    await screen.findByText('3. O4O 등록 설정');
+    expect(screen.getByLabelText('카테고리')).toBeTruthy();
+    expect(screen.getByLabelText(/공급가 \(원\)/)).toBeTruthy();
+    expect(screen.getByLabelText(/공개\(PUBLIC\)/)).toBeTruthy();
+    expect(screen.getByText('유통 설정').tagName).toBe('P');
+  });
+});

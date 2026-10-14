@@ -11,7 +11,14 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const tracked = execFileSync('git', ['ls-files', '-z'], {
+// Never resolve Git through a caller-controlled PATH or a repository-local shim.
+// Unsupported/custom installations fail closed instead of searching the environment.
+const gitCandidates = process.platform === 'win32'
+  ? ['C:/Program Files/Git/cmd/git.exe', 'C:/Program Files/Git/bin/git.exe']
+  : ['/usr/bin/git', '/bin/git'];
+const gitExecutable = gitCandidates.find(existsSync);
+if (!gitExecutable) throw new Error('A system Git installation is required for the source census');
+const tracked = execFileSync(gitExecutable, ['ls-files', '-z'], {
   cwd: root,
   maxBuffer: 32 * 1024 * 1024,
 })
@@ -85,6 +92,8 @@ const nestedControl = (node) =>
   ts.isIterationStatement(node, false) ||
   ts.isSwitchStatement(node) ||
   ts.isCatchClause(node);
+// Preserve Array.sort's existing UTF-16 string ordering without locale dependence.
+const comparePaths = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 function bodyHash(body, file) {
   const tokens = [];
   function collect(node) {
@@ -104,7 +113,7 @@ function bodyHash(body, file) {
     tokens: tokens.length,
   };
 }
-for (const path of [...new Set(paths)].sort()) {
+for (const path of [...new Set(paths)].sort(comparePaths)) {
   const source = readFileSync(resolve(root, path), 'utf8');
   const file = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true);
   if (file.parseDiagnostics.length) throw new Error(`Cannot parse ${path}`);
@@ -206,8 +215,8 @@ function visit(file) {
     if (
       !cycles.some(
         (c) =>
-          c.slice(0, -1).sort().join('|') ===
-          cycle.slice(0, -1).sort().join('|'),
+          c.slice(0, -1).sort(comparePaths).join('|') ===
+          cycle.slice(0, -1).sort(comparePaths).join('|'),
       )
     )
       cycles.push(cycle);

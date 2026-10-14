@@ -221,7 +221,7 @@ export function extractNaverBlogText(html: string): string {
 
   const contentCandidates = contentProbes.map((p) => p.text).filter((t) => t.length >= 100);
   if (contentCandidates.length > 0) {
-    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'contentCandidates',
       selectedTextLength: selected.length,
@@ -232,7 +232,7 @@ export function extractNaverBlogText(html: string): string {
 
   const lenientContent = contentProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (lenientContent.length > 0) {
-    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'lenientContent',
       selectedTextLength: selected.length,
@@ -247,7 +247,7 @@ export function extractNaverBlogText(html: string): string {
 
   const wrapperCandidates = wrapperProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (wrapperCandidates.length > 0) {
-    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'wrapperCandidates',
       selectedTextLength: selected.length,
@@ -446,38 +446,66 @@ export function decodeBasicHtmlEntities(s: string): string {
  *   2. og:title
  *   3. twitter:title
  *
- * meta 태그는 attribute 순서가 다양하므로 (name 먼저 / content 먼저) 양방향 패턴을 모두 시도.
+ * meta 태그는 기존 HTML parser로 읽고 attribute 순서와 기본 entity 정책을 유지한다.
  * 실패 시 undefined — 호출 측에서 blocks 기반 fallback 으로 넘긴다.
  */
 export function extractHtmlTitle(html: string): string | undefined {
+  try {
+    return extractParsedHtmlTitle(html);
+  } catch {
+    // Title metadata is optional: a parser/selector failure must not discard
+    // usable source text or prevent the caller's block-based title fallback.
+    return undefined;
+  }
+}
+
+function extractParsedHtmlTitle(html: string): string | undefined {
+  const root = parseHtml(html, {
+    lowerCaseTagName: true,
+    blockTextElements: { script: true, style: true, pre: true, title: true },
+  });
   // 1. <title>...</title>
-  const titleTagMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  if (titleTagMatch) {
+  const titleTag = root.querySelector('title');
+  if (titleTag && /<\/title>/i.test(html)) {
     const cleaned = decodeBasicHtmlEntities(
-      titleTagMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+      removeHtmlTags(titleTag.innerHTML, '').replace(/\s+/g, ' ').trim(),
     );
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   // 2. og:title (property=og:title content="...")
-  const og =
-    html.match(/<meta\s+[^>]*?property\s*=\s*["']og:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
-    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?property\s*=\s*["']og:title["']/i);
+  const metadata = root.querySelectorAll('meta');
+  const og = readMetadataTitle(metadata, 'property', 'og:title');
   if (og) {
-    const cleaned = decodeBasicHtmlEntities(og[1].trim());
+    const cleaned = decodeBasicHtmlEntities(og.trim());
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   // 3. twitter:title (name=twitter:title content="...")
-  const tw =
-    html.match(/<meta\s+[^>]*?name\s*=\s*["']twitter:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
-    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?name\s*=\s*["']twitter:title["']/i);
+  const tw = readMetadataTitle(metadata, 'name', 'twitter:title');
   if (tw) {
-    const cleaned = decodeBasicHtmlEntities(tw[1].trim());
+    const cleaned = decodeBasicHtmlEntities(tw.trim());
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   return undefined;
+}
+
+/** Keep raw entity values and the existing marker-before-content preference. */
+function readMetadataTitle(nodes: NodeHtmlElement[], field: string, marker: string): string | undefined {
+  let contentFirst: string | undefined;
+  for (const node of nodes) {
+    const entries = Object.entries(node.rawAttributes);
+    const markerIndex = entries.findIndex(([key, value]) =>
+      key.toLowerCase() === field && typeof value === 'string' && value.toLowerCase() === marker);
+    const contentIndex = entries.findIndex(([key, value]) =>
+      key.toLowerCase() === 'content' && typeof value === 'string' && value.length > 0);
+    if (markerIndex < 0 || contentIndex < 0) continue;
+    const content = entries[contentIndex][1];
+    if (markerIndex < contentIndex) return content;
+    contentFirst ??= content;
+  }
+  return contentFirst;
 }
 
 
@@ -489,7 +517,7 @@ export function extractHtmlTitle(html: string): string | undefined {
  *   6. 첫 o4o/paragraph 의 첫 문장 (또는 앞 40자)
  */
 export function deriveTitleFromBlocks(blocks: Array<{ type?: string; content?: string }>): string | undefined {
-  const stripTags = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  const stripTags = (s: string) => removeHtmlTags(s, '').replace(/\s+/g, ' ').trim();
 
   const firstHeading = blocks.find((b) => b.type === 'o4o/heading');
   if (firstHeading?.content) {
@@ -513,6 +541,25 @@ export function deriveTitleFromBlocks(blocks: Array<{ type?: string; content?: s
 }
 
 
+/** Match the existing nonempty <...> stripping rule in a single forward scan. */
+function removeHtmlTags(html: string, replacement: string): string {
+  const parts: string[] = [];
+  let cursor = 0;
+  let start = html.indexOf('<');
+  while (start !== -1) {
+    const end = html.indexOf('>', start + 1);
+    // An unclosed suffix stays as source text; never scan it again.
+    if (end === -1) break;
+    if (end > start + 1) {
+      parts.push(html.slice(cursor, start), replacement);
+      cursor = end + 1;
+    }
+    start = html.indexOf('<', end + 1);
+  }
+  parts.push(html.slice(cursor));
+  return parts.join('');
+}
+
 /**
  * HTML에서 의미있는 텍스트 추출
  * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 노이즈 제거 강화
@@ -521,7 +568,7 @@ export function stripHtml(html: string): string {
   // UI 노이즈 태그 전체 블록 제거 (nav/header/footer/aside/form/button/input/select)
   const noiseTagsRe = /<(nav|header|footer|aside|form|button|input|select|textarea|label|fieldset|dialog|menu|menuitem)[\s\S]*?<\/\1>/gi;
 
-  const cleaned = html
+  const withoutNoise = html
     // script/style 블록 제거
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
@@ -531,9 +578,9 @@ export function stripHtml(html: string): string {
     // 자기완결형 input/br/hr 제거
     .replace(/<(input|br|hr|img)[^>]*\/?>/gi, ' ')
     // 블록 태그를 줄바꿈으로
-    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th|section|article)>/gi, '\n')
-    // 나머지 태그 제거
-    .replace(/<[^>]+>/g, ' ')
+    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th|section|article)>/gi, '\n');
+  // 나머지 태그 제거
+  const cleaned = removeHtmlTags(withoutNoise, ' ')
     // HTML 엔티티 기본 변환
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')

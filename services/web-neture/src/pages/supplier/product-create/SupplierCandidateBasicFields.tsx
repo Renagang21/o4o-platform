@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { useSupplierCandidateForm } from './useSupplierCandidateForm';
 
 export default function SupplierCandidateBasicFields({
@@ -5,6 +6,7 @@ export default function SupplierCandidateBasicFields({
 }: {
   controller: ReturnType<typeof useSupplierCandidateForm>;
 }) {
+  const formId = useId();
   const {
     form,
     setForm,
@@ -36,17 +38,16 @@ export default function SupplierCandidateBasicFields({
 
         {/* Packaging Name */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor={`${formId}-field1`} className="block text-sm font-medium text-slate-700 mb-1">
             포장 상품명 <span className="text-xs text-slate-400">(선택)</span>
           </label>
-          <input
+          <input id={`${formId}-field1`}
             type="text"
             name="packagingName"
             value={form.packagingName}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             placeholder="포장에 인쇄된 공식 상품명"
-            autoFocus
           />
           <p className="mt-1 text-xs text-slate-400">
             포장에 인쇄된 공식 상품명 (상품 식별 기준, 입력 권장)
@@ -55,10 +56,10 @@ export default function SupplierCandidateBasicFields({
 
         {/* Marketing Name */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor={`${formId}-field2`} className="block text-sm font-medium text-slate-700 mb-1">
             상품명 <span className="text-red-500">*</span>
           </label>
-          <input
+          <input id={`${formId}-field2`}
             type="text"
             name="marketingName"
             value={form.marketingName}
@@ -70,7 +71,7 @@ export default function SupplierCandidateBasicFields({
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor={`${formId}-field3`} className="block text-sm font-medium text-slate-700 mb-1">
             카테고리 <span className="text-red-500">*</span>
           </label>
           {categoriesError ? (
@@ -89,7 +90,7 @@ export default function SupplierCandidateBasicFields({
               </button>
             </div>
           ) : (
-            <select
+            <select id={`${formId}-field3`}
               name="categoryId"
               value={form.categoryId}
               onChange={handleChange}
@@ -116,8 +117,8 @@ export default function SupplierCandidateBasicFields({
 
         {/* Regulatory Type — 항상 표시 */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">규제 구분</label>
-          <select
+          <label htmlFor={`${formId}-field4`} className="block text-sm font-medium text-slate-700 mb-1">규제 구분</label>
+          <select id={`${formId}-field4`}
             name="regulatoryType"
             value={form.regulatoryType}
             onChange={handleChange}
@@ -139,11 +140,11 @@ export default function SupplierCandidateBasicFields({
         {/* Brand & Manufacturer */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
+            <label htmlFor={`${formId}-${brands.length > 0 ? 'brandId' : 'brandName'}`} className="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
             {/* WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.10:
                     목록에서 고르면 brandId 를 보내고, 직접 입력하면 brandName 만 보낸다(자동 매칭·자동 생성 없음). */}
             {brands.length > 0 && (
-              <select
+              <select id={`${formId}-brandId`}
                 name="brandId"
                 value={form.brandId}
                 onChange={(e) => {
@@ -166,6 +167,8 @@ export default function SupplierCandidateBasicFields({
             )}
             <input
               type="text"
+              id={`${formId}-brandName`}
+              aria-label="브랜드명 직접 입력"
               name="brandName"
               value={form.brandName}
               onChange={(e) =>
@@ -177,8 +180,8 @@ export default function SupplierCandidateBasicFields({
             {form.brandId && <p className="mt-1 text-xs text-emerald-600">O4O 브랜드에 연결됨</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">제조사</label>
-            <input
+            <label htmlFor={`${formId}-field6`} className="block text-sm font-medium text-slate-700 mb-1">제조사</label>
+            <input id={`${formId}-field6`}
               type="text"
               name="manufacturerName"
               value={form.manufacturerName}
@@ -191,11 +194,11 @@ export default function SupplierCandidateBasicFields({
 
         {/* Barcode (optional) */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor={`${formId}-field7`} className="block text-sm font-medium text-slate-700 mb-1">
             바코드 <span className="text-xs text-slate-400">(선택)</span>
           </label>
           <div className="flex gap-3">
-            <input
+            <input id={`${formId}-field7`}
               type="text"
               name="barcode"
               value={form.barcode}
@@ -255,10 +258,10 @@ export default function SupplierCandidateBasicFields({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor={`${formId}-field8`} className="block text-sm font-medium text-slate-700 mb-1">
                 규제 유형 <span className="text-red-500">*</span>
               </label>
-              <select
+              <select id={`${formId}-field8`}
                 name="regulatoryType"
                 value={form.regulatoryType}
                 onChange={handleChange}
@@ -273,8 +276,8 @@ export default function SupplierCandidateBasicFields({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">허가번호</label>
-              <input
+              <label htmlFor={`${formId}-field9`} className="block text-sm font-medium text-slate-700 mb-1">허가번호</label>
+              <input id={`${formId}-field9`}
                 type="text"
                 name="mfdsPermitNumber"
                 value={form.mfdsPermitNumber}
@@ -286,10 +289,10 @@ export default function SupplierCandidateBasicFields({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor={`${formId}-field10`} className="block text-sm font-medium text-slate-700 mb-1">
               규제명 (식약처 공식명) <span className="text-red-500">*</span>
             </label>
-            <input
+            <input id={`${formId}-field10`}
               type="text"
               name="regulatoryName"
               value={form.regulatoryName}

@@ -252,7 +252,14 @@ describe('§6 Content — handoff 경계와 멱등성', () => {
 
 describe('§7 Programs — 3종은 의미가 다르다', () => {
   it('Event Offer 는 특가다 — 참여·예약·펀딩 런타임을 만들지 않는다', () => {
-    const page = stripComments(read(`${WEB}/pages/supplier/SupplierEventOfferPage.tsx`));
+    const page = stripComments([
+      'SupplierEventOfferPage.tsx',
+      'event-offer/useSupplierEventOffers.ts',
+      'event-offer/useEventOfferLists.ts',
+      'event-offer/useEventProposal.ts',
+      'event-offer/EventProposalModal.tsx',
+      'event-offer/presentation.ts',
+    ].map((file) => read(`${WEB}/pages/supplier/${file}`)).join('\n'));
     for (const forbidden of ['reservation', '예약', '구매의향', 'crowdfund']) {
       expect(page).not.toContain(forbidden);
     }
