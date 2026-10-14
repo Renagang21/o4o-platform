@@ -131,3 +131,14 @@ Sonar 도메인 추가는 이번 runtime에서 확인했다. 재시도는 proxy 
 Sonar allowlist 적용은 확인했으나 실제 site root/system API/dashboard/issues API가 모두 upstream CloudFront HTTP 403이다. 새 인증 연결이나 우회는 하지 않았다. GitHub의 기존 공개 Sonar check `115570828811`에는 Security B/Reliability D 및 50개 제한 annotation이 있다. 확인 가능한 backtracking 경고 2개는 PR #552에서 재현/수정/검증했다. PATH 경고는 분석 스크립트의 hotspot이며 실제 injection으로 확정하지 않는다. 현 main에는 새 Sonar check가 없고, CodeQL 공개 CI는 성공했지만 전체 alert API는 integration 권한 403이다. Sonar 전체 상세/해결 여부는 이 자료만으로 확인하지 못했다. 이 외부 차단은 운영 migration 승인 여부와 별개다.
 
 진행 TODO: 최신 main green 및 정상 promote → migration pre/post assertion·실행 수/이름 확인 → API/웹 serving SHA 및 건강·정적 asset·관리 quota 인증 경계 smoke → 결과 기록/push. 운영 DB 직접 접속/업무 데이터 조회·유료 AI 호출·실계정 사용은 하지 않는다.
+
+
+### 운영 배포 blocker·추가 보안 finding 보완
+
+- dispatch 직전 같은 target의 타 세션 Promote `38491748870`을 발견하여 중복 실행하지 않고 완료를 관찰했다. API가 NOT_SELECTED였고 실제 migration/API/frontend jobs는 모두 SKIPPED, `production`은 HELD_DEPENDENCY였다. 종료·동시 실행 없음·정확한 main/CI를 다시 확인한 뒤 services 제한 없는 정상 Promote `38491966980`을 본 세션에서 실행했다.
+- `38491966980`의 classify는 성공했으나 API `Build API server (bundled with tsup)`가 실패했다. **Run database migrations는 SKIPPED**, API traffic 전환/후속 frontend 배포도 실행되지 않았다. 실패를 숨기거나 같은 코드를 재시도하지 않는다. public check annotations는 exit 1만 제공하고 상세 logs/artifact 접근은 외부 host 403 또는 빈 응답이었다. 동일 코드/실제 `build:api`로 로컬에서 **8 missing exports**를 재현했다.
+- `ai-tool-router`의 supplier/DOM 타입 5개와 `work-agent-runtime`의 Planner 타입 3개가 bare value reexport였기 때문이다. type export/import를 명시하여 기존 TypeScript 타입명·경로·함수 수출과 runtime 계약은 보존한다. 앞 검증의 `tsc`만으로 운영 bundler 문제를 놓친 점을 기록한다. CI/build/tsup 설정·dependency/lockfile을 변경하거나 검사를 완화하지 않는다.
+- Sonar 이전 3개 source check의 제한 annotations를 모두 수집했다: 150개, unique 116개. 추가로 제목 metadata의 backtracking 경고를 확인했다. 미종결 `<meta ` + 공백 10k→20k에서 **117.44→471.79ms** 지연을 재현했다. 전체 Sonar Security B 상세는 여전히 제공되지 않으며 이 표본을 전체 finding으로 주장하지 않는다.
+- 제목 추출은 이 파일에서 이미 쓰던 `node-html-parser`를 재사용한다. title→og:title→twitter:title 우선순위, attribute 양방향/marker-first 선호, raw basic entity 정책·200자 한도를 유지한다. HTML 구조로 meta 값을 읽으며 잘못된 markup의 반복 suffix 탐색을 제거하고 제목 내부 태그도 기존 forward helper로 제거한다. 정상 title/metadata 2,000건 비교 차이 0. 로컬 source 비교의 공백 20k는 **455.21→0.22ms**였다(운영 SLA 측정 아님).
+- 실제 회귀 **4 suites / 50 tests PASS**: 기존 Work Planner/URL/LLM closure/recovery 및 추가 제목 순서/대소문자/인코딩/100k 미종결 shape 포함. 변경 lint 오류·경고 0. 배포와 같은 **tsc→database backup→tsup(main/migrate)→database restore** PASS, main/migrate/migration-config/이번 compiled migration 모두 존재하고 두 bundle의 Node syntax 검사 PASS. 신규 운영 DB 실행은 아직 없으며 표준 gate를 충족한 새 main에서 정상 promote를 다시 실행한다.
+- Shared 소비: 타입 alias의 이름/경로는 유지하고 whole API typecheck 및 실제 bundled runtime에서 소비를 확인한다. URL/LMS source/title 공개 함수 계약도 유지한다. Auth/RBAC/Node/COMMIT/비용 정책·menu·provider 선택 변경 없음. 배포 전 API health/ready + web HTML/JS 12 + quota 관리 GET 인증 guard 2 = **16/16 PASS**. 실계정 파일이 두 checkout 모두 없어 실계정/유료 AI 호출은 미실시다.
