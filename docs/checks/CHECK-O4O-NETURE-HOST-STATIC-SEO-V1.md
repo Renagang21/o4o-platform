@@ -9,7 +9,7 @@
 
 | 검사 | 결과 |
 |---|---|
-| Neture 전체 Vitest | 96파일 · 858테스트 PASS (신규 정적 SEO 9 포함) |
+| Neture 전체 Vitest | 최신 main 통합 후 98파일 · 883테스트 PASS (신규 정적 SEO 9 포함) |
 | Neture 타입 포함 Vite build | PASS · 호스트별 8문서 및 동일 번들 참조 확인 |
 | 빌드 플러그인 strict TypeScript · 변경 파일 lint | PASS |
 | 전체 frontend type-check | 디스크 고갈로 KPA-branch/lecture의 산출물 쓰기만 실패; 공간 확보 후 해당 두 검사 재실행 PASS |
@@ -26,7 +26,7 @@ Codex 초기 리뷰 P2: 심층 SPA의 og:url이 홈을 가리키는 문제를 �
 
 ## 컨테이너와 운영
 
-실제 Dockerfile 전체 빌드 PASS. 최종 이미지 `sha256:d3d765a3c77367269a0fcfa94ad5936238271c206cb29c976a98b211c5304297`(최종 image bytes는 artifact에 기록)의 8080 기본 PORT와 9090 변경 PORT에서 각각 140 assertions PASS. `nginx -t` PASS, UTF-8 Content-Type 및 runner에 임시 CA 파일 부재 확인. 원 Dockerfile의 버전 미지정 pnpm이 최신 12를 설치하여 저장소 지정 10.25.0으로 고정했다. optional BuildKit secret `proxy_ca`는 network RUN에만 마운트하고 TLS 검증을 유지한다. 이미지에 CA를 넣지 않는다. Sonar Docker 지적 후 기존 pnpm-lock.yaml을 COPY하고 frozen-lockfile·integrity 검증·lifecycle script 차단 및 별도 BuildKit package cache를 적용했다. dependency manifest와 lockfile 내용은 변경하지 않았다.
+실제 Dockerfile 전체 빌드 PASS. 최종 이미지 `sha256:714d006b714cf0d8f881efd050a296a2d905596121fa9b521412037216bb8ab1`(66324968 bytes)의 8080 기본 PORT와 9090 변경 PORT에서 각각 140 assertions PASS. `nginx -t` PASS, UTF-8 Content-Type 및 runner에 임시 CA 파일 부재 확인. 원 Dockerfile의 버전 미지정 pnpm이 최신 12를 설치하여 저장소 지정 10.25.0으로 고정했다. optional BuildKit secret `proxy_ca`는 network RUN에만 마운트하고 TLS 검증을 유지한다. 이미지에 CA를 넣지 않는다. Sonar Docker 지적 후 기존 pnpm-lock.yaml을 COPY하고 frozen-lockfile·integrity 검증·lifecycle script 차단 및 별도 BuildKit package cache를 적용했다. dependency manifest와 lockfile 내용은 변경하지 않았다.
 
 로컬 Docker `vfs` 및 기본 BuildKit `native`는 COPY마다 파일 복제로 디스크를 고갈시켜 해당 작업 캐시를 정리했다. daemon 저장 설정은 유지하고 전용 FUSE BuildKit에서 전체 빌드를 완료했다. 디스크 사용량은 약 8GB로 유지되었다. 서빙 runner는 공식 nginx 1.28 Alpine의 UID 101, PORT 기본 8080이며 nginx 변수는 PORT만 envsubst한다.
 
@@ -34,7 +34,7 @@ Codex 초기 리뷰 P2: 심층 SPA의 og:url이 홈을 가리키는 문제를 �
 
 ## 후속 보안 게이트 및 연결 상태
 
-최초 통합 HEAD `59f327f0fa`의 CI Pipeline은 PASS, Codex 재검토는 새 finding 없이 완료(이전 P2 스레드 resolved). Sonar는 정규식의 선행 공백 반복 두 곳에 대한 super-linear backtracking 지적으로 신규 보안 등급 C를 반환했다. 해당 반복을 제거하고 관련 17테스트·strict plugin TypeScript·lint·Neture 타입/Vite 빌드를 재검증했다. HTTP smoke의 독립 요청은 Promise.all로 병렬화했다. 변경 이미지 및 원격 Sonar 재검증은 진행 중이다. 비특권 nginx는 PID/temp를 /tmp에 두고 conf.d의 template 렌더링 권한만 준비한다. 신뢰된 로컬 pnpm store를 BuildKit cache에 준비했으며 frozen-lockfile·integrity 검증은 유지한다.
+최초 통합 HEAD `59f327f0fa`의 CI Pipeline은 PASS, Codex 재검토는 새 finding 없이 완료(이전 P2 스레드 resolved). Sonar는 정규식의 선행 공백 반복 두 곳에 대한 super-linear backtracking 지적으로 신규 보안 등급 C를 반환했다. 해당 반복을 제거하고 관련 17테스트·strict plugin TypeScript·lint·Neture 타입/Vite 빌드를 재검증했다. HTTP smoke의 독립 요청은 Promise.all로 병렬화했다. 변경 이미지 전체 빌드 PASS. 수정하지 않은 최종 이미지의 UID 101 · nginx -t · 각 PORT 140 assertions PASS. 로컬 0600 원본과 COPY의 상위 디렉터리 권한 문제를 확인하여 파일 0644·templates 디렉터리 0755·conf.d 렌더링 권한을 명시했다. 원격 Sonar 재검증은 진행 중이다. 비특권 nginx는 PID/temp를 /tmp에 두고 conf.d의 template 렌더링 권한만 준비한다. 신뢰된 로컬 pnpm store를 BuildKit cache에 준비했으며 frozen-lockfile·integrity 검증은 유지한다.
 
 GitHub는 일시적 401 뒤 정상 사용자 응답이 확인됐으나 Git/API 및 registry의 간헐적 503으로 원격 상태 갱신이 불안정했다. 승인 재요청 사유가 아니라 연결 장애다. 보호된 gate를 우회하지 않고 정상 push·review·CI·병합·Neture-only Promote 이후에 운영 완료로 전환한다.
 
@@ -46,6 +46,6 @@ GitHub는 일시적 401 뒤 정상 사용자 응답이 확인됐으나 Git/API �
 node services/web-neture/tools/checkHostServing.mjs http://127.0.0.1:8080
 ```
 
-이미지와 동일한 dist가 필요하면 두 번째 인자로 dist 경로를 지정한다. 로컬 artifact는 `/workspace/o4o-seo-artifacts/`의 HTTP/browser 결과·12 PNG·browser harness, build log는 `/tmp/o4o-seo-*.log`이다. 최종 이미지 build log는 `/tmp/o4o-seo-docker-reviewed.log`, 추출한 동일 dist는 `/workspace/o4o-seo-artifacts/reviewed-dist/`이다. production 응답 원문과 자격증명은 이 기록에 저장하지 않는다.
+이미지와 동일한 dist가 필요하면 두 번째 인자로 dist 경로를 지정한다. 로컬 artifact는 `/workspace/o4o-seo-artifacts/`의 HTTP/browser 결과·12 PNG·browser harness, build log는 `/tmp/o4o-seo-*.log`이다. 최종 이미지 build log는 `/tmp/o4o-seo-docker-hardened.log`, 추출한 동일 dist는 `/workspace/o4o-seo-artifacts/final-dist/`이다. production 응답 원문과 자격증명은 이 기록에 저장하지 않는다.
 
 문서 정합: 새 WO/CHECK와 수정 index.html 주석으로 현재 구현/검증 상태를 기록했다. 기존 완료 접근성 기록은 당시 판정을 유지한다. canonical index·공통 디자인 정책은 변경하지 않았다.
