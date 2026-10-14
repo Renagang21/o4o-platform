@@ -11,7 +11,7 @@ import { request as httpRequest } from 'node:http';
 const base = process.argv[2] || 'http://127.0.0.1:8080';
 assert.ok(new URL(base).protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(new URL(base).hostname), 'Use a local HTTP container endpoint');
 const dist = process.argv[3] || resolve(dirname(fileURLToPath(import.meta.url)), '../dist');
-const hosts = ['neture.co.kr', 'supplier.neture.co.kr', 'funding.neture.co.kr', 'community.neture.co.kr'];
+const hosts = ['neture.co.kr', 'supplier.neture.co.kr', 'funding.neture.co.kr', 'community.neture.co.kr', 'carepharm.neture.co.kr'];
 let count = 0;
 const check = (condition, message) => { assert.ok(condition, message); count++; };
 // Node fetch may replace Host with the URL host; use the HTTP transport explicitly.

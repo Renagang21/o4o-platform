@@ -127,6 +127,7 @@ const HOST_REGISTRIES: Readonly<Record<HostProfile, SeoRegistry>> = Object.freez
   supplier: { ...netureSeoRegistry, '/': SUBHOST_HOME_SEO.supplier },
   funding: { ...netureSeoRegistry, '/': SUBHOST_HOME_SEO.funding },
   community: { ...netureSeoRegistry, '/': SUBHOST_HOME_SEO.community },
+  carepharm: { ...netureSeoRegistry, '/': SUBHOST_HOME_SEO.carepharm },
 });
 
 /** host 별 registry — 같은 host 에서는 항상 같은 객체 (`usePageSeo` deps 안정성) */

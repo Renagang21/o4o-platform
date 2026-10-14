@@ -90,7 +90,7 @@ export function NetureGlobalHeader() {
 
   return (
     <GlobalHeader
-      brand={CURRENT_HOST_PROFILE === 'main' ? NETURE_HEADER_BRAND : { ...NETURE_HEADER_BRAND, name: { supplier: '공급자', funding: '유통참여형 펀딩', community: '커뮤니티' }[CURRENT_HOST_PROFILE], subtitle: '' }}
+      brand={CURRENT_HOST_PROFILE === 'main' ? NETURE_HEADER_BRAND : { ...NETURE_HEADER_BRAND, name: { supplier: '공급자', funding: '유통참여형 펀딩', community: '커뮤니티', carepharm: 'CarePharm' }[CURRENT_HOST_PROFILE], subtitle: '' }}
       publicNav={publicNav}
       contextualNav={contextualNav}
       user={headerUser}
