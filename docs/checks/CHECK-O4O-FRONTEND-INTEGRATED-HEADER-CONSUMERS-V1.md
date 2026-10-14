@@ -33,7 +33,7 @@
 | Unified Store | 독자 header, 이 component 미사용 | GlobalHeader 변경 직접 영향 없음 | work-scope/organization·capability·handoff 그대로 | 설정/제휴처/QR fixture 1440/390/320·40 tests·앱 build | PASS |
 | 강의/분회 | 독자 header, 미사용 | 직접 영향 없음 | LMS·분회 role/개체 scope 그대로 | 독자 내부 화면 fixture·6/35 tests·앱 build | PASS |
 | K-Cosmetics | GlobalHeader import 소비 0 | 직접 영향 없음 | 서비스 자체 header/route/role 변화 없음 | symbol/import/path 검색 | PASS, 영향 없음 |
-| 전체관리자 앱 | GlobalHeader import 소비 0, UI package 의존은 있음 | export/API 불변, component 소비 없음 | 중앙 계정/관리 guard 변경 없음 | symbol/import 검색·GitHub affected admin build SUCCESS | PASS |
+| 전체 관리자 앱 | GlobalHeader import 소비 0, UI package 의존은 있음 | export/API 불변, component 소비 없음 | 중앙 계정/관리 guard 변경 없음 | symbol/import 검색·GitHub affected admin build SUCCESS | PASS |
 | 공통 UI/core/extension | UI export 소비, Core/extension 구현 변경 없음 | 표현 component만 변경 | capability map·permission·core schema·API 계약 변경 없음 | 공통 UI 19 tests·packages build·import 검색 | PASS |
 
 ## Route / role / capability check

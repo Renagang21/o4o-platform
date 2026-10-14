@@ -11,7 +11,7 @@
 - 이메일·비밀번호, Google, 카카오 로그인을 계정 단위로 제공한다. 카카오는 새 구현 대상이다. `users.id`는 공통 주체이고, 소셜 식별자는 제공자별 고유 ID다. 같은 이메일로 자동 연결·병합하지 않는다.
 - 각 사용자 서비스 로그인 화면은 일반 이메일 로그인 경로를 사용하는 공개 테스트 로그인 버튼을 제공한다. 버튼 존재뿐 아니라 로그인 후 의미 있는 샘플 데이터를 사용하는 것까지 검증한다.
 - 사용자가 현재 계정과 데이터를 모두 테스트 데이터로 지정했다. 재사용할 데이터는 대표 Demo 소유권에 연결하고, 재사용하지 않는 데이터와 개발을 방해하는 계정은 정리할 수 있다. 기존 ‘실사용’ 분류는 현재 상태의 근거로 사용하지 않는다.
-- `admin.neture.co.kr`의 관리 주체는 문서에서 **전체관리자**라고 부른다. 서비스 관리자·서비스 운영자와 구분하며 기술 role 코드는 바꾸지 않는다. 전체관리자 인증은 Google 전용이다. 공개 Demo에 관리 권한을 주지 않는다.
+- `admin.neture.co.kr`의 관리 주체는 문서에서 **전체 관리자**라고 부른다. 서비스 관리자·서비스 운영자와 구분하며 기술 role 코드는 바꾸지 않는다. 전체 관리자 인증은 Google 전용이다. 공개 Demo에 관리 권한을 주지 않는다.
 
 ## 단계와 TODO
 
@@ -35,7 +35,7 @@
 - [x] refresh·handoff가 세션 폐기를 우회하지 못하도록 같은 판정 사용
 - [x] Store/KPA 별도 refresh 경로를 공통 coordinator로 수렴; logout·재로그인 중 늦게 도착한 응답 차단
 - [x] 공통 계정 보안 UI에 첫 비밀번호 추가·기존 비밀번호 변경 구현; Demo 계정 변경 차단
-- [x] 전체관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
+- [x] 전체 관리자 cookie 상태와 중복 저장소 소비처 조사 후 단일화
 - [x] 서비스별 일반 logout, 다른 기기 유지, 비밀번호 변경·reset 전역 폐기 회귀 검증
 
 - [x] 단계 2 PR 필수 CI·review, main 통합 승인 및 운영 적용 (PR #378, main `03f9729856`, Promote #37886624466)
@@ -47,7 +47,7 @@
 - [x] 이메일·Google 계정 가입이 서비스 membership·역할·매장을 자동 생성하지 않는지 검증
 - [x] 미가입·pending·rejected·suspended·withdrawn 상태와 승인 전후 접근 검증
 - [x] 약국장·공급자 Demo 데이터 연결, 매장 원장 기반 권한 및 가입 우회 방지 검증
-- [x] 전체관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
+- [x] 전체 관리자 Google 전용, 서비스 관리자·운영자 격리, 역할 회수의 즉시 반영 검증
 - [x] 유지 8개 서비스 × 두 Demo × PC·모바일 운영 검증과 실패 응답 기록
 - [x] 검증 자료·commit·push·PR 준비 (runtime 수정 없음)
 - [x] 회귀 기록 PR #382 필수 CI·review 및 사용자 승인 후 main 통합 (`2002214684`, 통합 후 CI #37892227465 PASS)
@@ -55,12 +55,12 @@
 
 ### 4. 카카오 로그인·명시적 연결
 
-문서·코드 조사로 구체화한 TODO와 하위 PR 순서는 [카카오·명시적 연결 WO](WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다. 4-A는 세션 수단·전체관리자 경계, 4-B는 카카오 OAuth, 4-C는 재인증 기반 계정 연결이다. 기존 Google 세션의 claim 부재 및 handoff의 Google 추정부터 해소한다.
+문서·코드 조사로 구체화한 TODO와 하위 PR 순서는 [카카오·명시적 연결 WO](WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)를 따른다. 4-A는 세션 수단·전체 관리자 경계, 4-B는 카카오 OAuth, 4-C는 재인증 기반 계정 연결이다. 기존 Google 세션의 claim 부재 및 handoff의 Google 추정부터 해소한다.
 
 - [x] 카카오 앱·고정 callback·서버 Secret Manager binding·runtime 접근 권한 확인 및 API 설정 활성화 (#38029009245, 비밀값 기록 없음)
 - [x] 서버 검증 REST code 교환, 브라우저에 바인딩한 state·일회 사용·redirect 검증과 카카오 ID 기반 조회 (PKCE 지원은 단정하지 않음)
 - [x] 카카오 확인 이메일이 없으면 O4O 이메일 확인 수행; 공통 이름·모바일·약관 가입 정책 적용
-- [x] `authMethod`를 Google/password/Kakao로 명시; 전체관리자 경계는 Google 긍정 판정
+- [x] `authMethod`를 Google/password/Kakao로 명시; 전체 관리자 경계는 Google 긍정 판정
 - [x] 공통 로그인 컴포넌트와 각 서비스·handoff에 카카오 방식 연결
 - [x] 기존 계정 재인증 + 외부 계정 인증을 거친 명시적 연결; Demo 소셜 연결 차단
 - [x] provider uniqueness 및 동시 연결 충돌·실패 rollback·마지막 로그인 수단 보호 검증
@@ -118,18 +118,18 @@
 
 ## 2026-10-10 단계 4 진행 (PR #392 배포 당시 및 후속 관측)
 
-4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체관리자·웹 배포 성공.
+4-A PR #387 main `7a11f7d201` 통합, Promote #38011885470 API·전체 관리자·웹 배포 성공.
 4-B/4-C PR #392는 사용자 승인 후 main `26b98a33c1`에 통합했다. post-merge CI #38019181483와
-CodeQL PASS, Promote #38019828704 API migration·전체관리자·웹 5개 배포 SUCCESS.
+CodeQL PASS, Promote #38019828704 API migration·전체 관리자·웹 5개 배포 SUCCESS.
 배포 후 유지 8개 origin × PC/mobile × 두 Demo 역할 32/32 PASS; 약국 업무의 매장 경영자 200,
 공급자 업무 200, 반대 역할 거절, Demo 소셜/비밀번호 변경 불가, 로그아웃 access/refresh 401 확인.
 운영 Kakao config는 8개 origin 모두 `enabled=false`다. 기존 Secret Manager 리소스 조회는
 `secretmanager.secrets.list` 권한 부족으로 미확인이다. 앱/키 연결과 실제 Google/Kakao 로그인·
-가입·재인증·명시적 연결, 전체관리자 실제 Google 재로그인은 OPEN으로 유지한다.
+가입·재인증·명시적 연결, 전체 관리자 실제 Google 재로그인은 OPEN으로 유지한다.
 검증: [카카오·명시적 연결 CHECK](../checks/CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md).
 
 후속 설정 배포 #38029009245는 API-only verified SUCCESS다. 유지 8개 origin Kakao
-enabled=true, 전체관리자 false, 실제 Demo 32/32·Demo 변경 차단 2/2 PASS를 확인했다.
+enabled=true, 전체 관리자 false, 실제 Demo 32/32·Demo 변경 차단 2/2 PASS를 확인했다.
 실제 소유자의 가입 시도는 문자 검사 오류가 보고돼 완료되지 않았다. 위 가입 차단 수정과
 취소 callback 브라우저 복귀, 실제 계정 연결 검증은 OPEN이다. 이전 enabled=false·리소스
 조회 실패 서술은 당시 관측이며 최신 설정 상태로 사용하지 않는다.

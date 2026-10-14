@@ -6,7 +6,7 @@
 ## 문제와 변경
 
 기존 Google 발급 토큰에는 인증 수단 표식이 없고, handoff 발급은 password가 아니면 Google로
-추정했다. 카카오를 그대로 추가하면 요청·refresh·handoff에서 Google 전용 전체관리자 경계를
+추정했다. 카카오를 그대로 추가하면 요청·refresh·handoff에서 Google 전용 전체 관리자 경계를
 우회하거나 카카오를 다른 수단으로 바꿀 수 있다. 현재 운영에 카카오 로그인이 있다는 주장은 아니다.
 
 - Google의 검증된 로그인/가입 발급은 access/refresh 모두 `authMethod: 'google'`을 명시한다.
@@ -19,7 +19,7 @@
   refresh HTTP는 이 거절을 일시적 인프라 오류(503)로 바꾸지 않고 비재시도 401·쿠키 정리로 처리한다.
 - refresh는 원래 수단·브라우저 ID·계정 보안 세대·서비스를 승계한다. handoff는 원장의 Google/password/Kakao를
   교환 토큰에 그대로 남긴다. 기존 원장 NULL/미지 값은 제한된 password 표식으로 읽는 호환을 유지한다.
-- 이전 수단 없는 일반 서비스 세션은 유지한다. 이전 Google 전체관리자 세션은 표식이 없으므로
+- 이전 수단 없는 일반 서비스 세션은 유지한다. 이전 Google 전체 관리자 세션은 표식이 없으므로
   적용 후 Google 재로그인이 필요하다. 일반 사용자 전체 세션을 강제로 폐기하거나 보안 세대를 회전하지 않는다.
 
 ## 문서·코드 검증 후 TODO 수정
@@ -30,7 +30,7 @@ WO의 D01–D10에 정책과 실제 소비처 근거를 연결했다. 핵심 수
    과거 변수 이름이 남았다는 사실은 앱 등록·키·실행 경로가 있다는 근거가 아니다.
 2. 카카오 버튼보다 Google 긍정 세션 경계를 4-A 선행 작업으로 분리했다. DB의 handoff CHECK도
    두 수단만 허용하므로 새 incremental migration이 필요하다.
-3. 공통 `LoginMethods`와 Neture 직접 Google 조립 화면을 함께 조사 대상으로 잡았다. 전체관리자에는
+3. 공통 `LoginMethods`와 Neture 직접 Google 조립 화면을 함께 조사 대상으로 잡았다. 전체 관리자에는
    카카오/비밀번호 수단을 추가하지 않는다. 대표 메인 포함 사용자 서비스 8개가 후속 화면 검증 대상이다.
 4. Google/Kakao 연결은 현재 계정 재인증과 외부 인증을 모두 요구한다. 서로 다른 두 `users.id`의
    데이터·가입·역할·사업자 병합은 별도 검토이며, 이번 연결 범위에서 자동 이동/권한 합집합을 만들지 않는다.
@@ -89,7 +89,7 @@ Vitest는 저장소 루트에서 `pnpm exec vitest run --config packages/auth-ut
 빌드된 `dist/migrate.js`로 실행했다. CI/review/main/운영 적용의 최신 상태는 해당 PR에서 확인한다.
 
 이번 PR은 runtime·migration 변경이므로 `DEPLOYMENT = MANUAL/GATED`다. main 승인 전 운영 migration,
-API 배포, 전체관리자 재로그인·유지 8개 서비스 PC/모바일 운영 smoke는 **미실행**이다.
+API 배포, 전체 관리자 재로그인·유지 8개 서비스 PC/모바일 운영 smoke는 **미실행**이다.
 4-B 카카오 앱 등록·키/redirect 설정·실제 OAuth, 4-C 명시적 계정 연결은 **미구현/미검증**이다.
 
 문서 정합: 상위 WO의 PR #382 통합 완료를 반영했다. Identity V3의 과거 로그인 게이트·카카오 금지,
@@ -128,5 +128,5 @@ neture/kpa-society/lecture/store/kpa-branch 웹 배포 완료. production commit
 access/refresh 폐기, 관리자 거절을 확인했다. Neture 실제 Store Workspace/공급자 목적지와
 매장 경영자 store context 200/공급자 STORE_OWNER_REQUIRED 경계도 확인했다. 상세 범위와
 harness 재검증 이유는 [후속 CHECK](CHECK-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1.md)에 기록했다.
-실제 Google 전체관리자 재로그인은 OPEN이다. 후속 Kakao/계정 연결 구현은 PR #392이며
+실제 Google 전체 관리자 재로그인은 OPEN이다. 후속 Kakao/계정 연결 구현은 PR #392이며
 이번 배포에 포함되지 않았다. 위 통합 전 기록의 미실행 상태는 이 후속 결과로 갱신한다.
