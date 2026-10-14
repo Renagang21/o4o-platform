@@ -1,0 +1,36 @@
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
+vi.mock('../../components/Toast', () => ({ useToast: () => toast }));
+vi.mock('../../api/lecture', () => ({ errorMessage: (_err: unknown, fallback: string) => fallback }));
+import { useOperatorQueue } from './useOperatorQueue';
+afterEach(() => { cleanup(); vi.clearAllMocks(); });
+it('a previous scope completion cannot clear the new scope lock or issue its notification', async () => {
+  const fetch = vi.fn().mockResolvedValue({ data: [{ id: 'fixture' }] });
+  let firstDone!: () => void; let secondDone!: () => void;
+  const firstWrite = vi.fn(() => new Promise<void>(resolve => { firstDone = resolve; }));
+  const secondWrite = vi.fn(() => new Promise<void>(resolve => { secondDone = resolve; }));
+  const { result, rerender } = renderHook(({ scope }) => useOperatorQueue(scope, fetch, '조회 실패'), { initialProps: { scope: 'a' } });
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  const old = result.current; let first!: Promise<boolean>; let second!: Promise<boolean>;
+  act(() => { first = old.run('first', firstWrite, 'first saved', 'failed'); });
+  rerender({ scope: 'b' }); await waitFor(() => expect(result.current.loading).toBe(false));
+  act(() => { second = result.current.run('second', secondWrite, 'second saved', 'failed'); });
+  expect(await old.run('stale', firstWrite, 'stale', 'failed')).toBe(false);
+  await act(async () => { firstDone(); expect(await first).toBe(false); });
+  expect(result.current.busy).toBe('second'); expect(toast.success).not.toHaveBeenCalled();
+  await act(async () => { secondDone(); expect(await second).toBe(true); });
+  expect(result.current.busy).toBeNull(); expect(toast.success).toHaveBeenCalledWith('second saved');
+});
+it('locks same-tick duplicate commands and rejects a retained unmounted callback', async () => {
+  const fetch = vi.fn().mockResolvedValue({ data: [] });
+  let finish!: () => void;
+  const write = vi.fn(() => new Promise<void>(resolve => { finish = resolve; }));
+  const { result, unmount } = renderHook(() => useOperatorQueue('fixture', fetch, 'failed'));
+  await waitFor(() => expect(result.current.loading).toBe(false));
+  const old = result.current; let first!: Promise<boolean>;
+  await act(async () => { first = old.run('a', write, 'saved', 'failed'); expect(await old.run('b', write, 'saved', 'failed')).toBe(false); });
+  unmount(); expect(await old.run('c', write, 'saved', 'failed')).toBe(false);
+  await act(async () => { finish(); expect(await first).toBe(false); });
+  expect(write).toHaveBeenCalledTimes(1); expect(toast.success).not.toHaveBeenCalled();
+});

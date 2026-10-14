@@ -6,49 +6,24 @@
  * 서버(`GET /lms/operator/courses/:courseId/review`)가 lecture scope 와 운영자 권한을 판정하며
  * legacy(KPA/PH) 강의는 404 로 비노출된다. 이 화면에서 콘텐츠를 편집할 수 없다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CourseStatusBadge, LmsEmptyState, LmsLoading } from '@o4o/lms-ui';
-import { operatorApi, errorMessage, errorStatus, type OperatorCourseReview } from '../../api/lecture';
-import { useToast } from '../../components/Toast';
+import { useOperatorCourseReview } from './useOperatorCourseReview';
+import OperatorReasonDialog from './OperatorReasonDialog';
 
 export default function OperatorCourseReviewPage() {
   const { courseId = '' } = useParams();
+  return <CourseReviewWorkspace key={courseId} courseId={courseId} />;
+}
+function CourseReviewWorkspace({ courseId }: { courseId: string }) {
   const navigate = useNavigate();
-  const toast = useToast();
-  const [data, setData] = useState<OperatorCourseReview | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true); setError(null);
-    try {
-      const res = await operatorApi.review(courseId);
-      setData((res as any).data ?? null);
-    } catch (err) {
-      setError(errorStatus(err) === 404
-        ? '강의를 찾을 수 없습니다.'
-        : errorMessage(err, '강의 정보를 불러오지 못했습니다.'));
-    } finally { setLoading(false); }
-  }, [courseId]);
-  useEffect(() => { void load(); }, [load]);
-
-  async function act(label: string, fn: () => Promise<unknown>) {
-    setBusy(true);
-    try { await fn(); toast.success(`${label} 완료`); navigate('/operator'); }
-    catch (err) { toast.error(errorMessage(err, `${label} 실패`)); }
-    finally { setBusy(false); }
-  }
-  function reject() {
-    const reason = window.prompt('반려 사유를 입력하세요.');
-    if (!reason) return;
-    void act('반려', () => operatorApi.reject(courseId, reason));
-  }
+  const { data, loading, error, actionError, busy, load, decide, clearActionError } = useOperatorCourseReview(courseId, () => navigate('/operator'));
+  const [rejecting, setRejecting] = useState(false);
 
   if (loading) return <main className="page page-wide"><LmsLoading message="불러오는 중..." /></main>;
   if (error) return <main className="page page-wide">
-    <div className="notice notice-error">{error}</div>
+    <div role="alert" className="notice notice-error">{error}</div><button className="btn" onClick={() => void load()}>다시 조회</button>
     <Link className="btn btn-ghost" to="/operator">강의 운영으로</Link>
   </main>;
   if (!data) return <main className="page page-wide"><LmsEmptyState title="강의를 찾을 수 없습니다" /></main>;
@@ -65,13 +40,14 @@ export default function OperatorCourseReviewPage() {
       </div>
       <div className="row-actions">
         {course.status === 'pending_review' && <>
-          <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void act('승인·게시', () => operatorApi.approve(courseId))}>승인(게시)</button>
-          <button type="button" className="btn btn-ghost danger" disabled={busy} onClick={reject}>반려</button>
+          <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void decide('approve')}>승인(게시)</button>
+          <button type="button" className="btn btn-ghost danger" disabled={busy} onClick={() => { clearActionError(); setRejecting(true); }}>반려</button>
         </>}
         <Link className="btn btn-ghost" to="/operator">목록</Link>
       </div>
     </div>
 
+    {actionError && !rejecting && <p role="alert" className="notice notice-error">{actionError}</p>}
     <section className="card">
       <h2>강의 정보</h2>
       <p>{course.description || <span className="muted">설명 없음</span>}</p>
@@ -118,5 +94,6 @@ export default function OperatorCourseReviewPage() {
         </li>)}
       </ol>
     </section>
+    {rejecting && <OperatorReasonDialog title="강좌 반려" target={course.title} busy={busy} error={actionError} onCancel={() => setRejecting(false)} onConfirm={reason => void decide('reject', reason)} />}
   </main>;
 }
