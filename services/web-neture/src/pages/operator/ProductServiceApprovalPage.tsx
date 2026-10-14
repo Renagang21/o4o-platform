@@ -107,8 +107,15 @@ export default function ProductServiceApprovalPage() {
   const [approveMemo, setApproveMemo] = useState('');
 
   // Delete (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ offerId: string; productName: string } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteWriting = useRef(false);
+  const deleteMounted = useRef(true);
+  useEffect(() => {
+    deleteMounted.current = true;
+    return () => { deleteMounted.current = false; };
+  }, []);
 
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
@@ -235,7 +242,7 @@ export default function ProductServiceApprovalPage() {
   // ==================== Actions ====================
 
   const openDecision = (decision: ServiceApprovalDecision, target: string) => {
-    if (decisionWriting.current) return;
+    if (decisionWriting.current || deleteWriting.current) return;
     setDecisionError(null);
     setDecisionNotice(null);
     if (decision === 'approve') {
@@ -253,7 +260,7 @@ export default function ProductServiceApprovalPage() {
 
   const handleDecisionConfirm = async (decision: ServiceApprovalDecision) => {
     const target = decision === 'approve' ? approveTarget : rejectTarget;
-    if (!target || !canManage || decisionWriting.current) return;
+    if (!target || !canManage || decisionWriting.current || deleteWriting.current) return;
     const isBatch = target === 'batch';
     const ids = [...selectedPendingIds];
     if (isBatch && ids.length === 0) return;
@@ -318,16 +325,36 @@ export default function ProductServiceApprovalPage() {
   };
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
+  const openDelete = (item: ServiceApprovalItem) => {
+    if (!canManage || decisionWriting.current || deleteWriting.current) return;
+    setDeleteError(null);
+    setDeleteTarget({ offerId: item.offerId, productName: item.productName || '(이름 없음)' });
+  };
+
   const handleDeleteConfirm = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !canManage || deleteWriting.current || decisionWriting.current) return;
+    const { offerId } = deleteTarget;
+    deleteWriting.current = true;
     setDeleteLoading(true);
-    const result = await operatorServiceApprovalApi.deletePendingOffer(deleteTarget);
-    setDeleteLoading(false);
-    setDeleteTarget(null);
-    if (result.success) {
-      if (drawerItem?.offerId === deleteTarget) setDrawerItem(null);
-      await refreshData();
+    setDeleteError(null);
+    let deleted = false;
+    try {
+      const result = await operatorServiceApprovalApi.deletePendingOffer(offerId);
+      if (!deleteMounted.current) return;
+      if (!result.success) {
+        setDeleteError(`삭제하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        return;
+      }
+      setDeleteTarget(null);
+      setDrawerItem(current => current?.offerId === offerId ? null : current);
+      deleted = true;
+    } catch {
+      if (deleteMounted.current) setDeleteError('삭제 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+    } finally {
+      deleteWriting.current = false;
+      if (deleteMounted.current) setDeleteLoading(false);
     }
+    if (deleted && deleteMounted.current) await refreshData();
   };
 
   // ==================== Render ====================
@@ -795,8 +822,8 @@ export default function ProductServiceApprovalPage() {
                         거절
                       </button>
                       <button
-                        onClick={() => setDeleteTarget(item.offerId)}
-                        disabled={!canManage || actionLoading === item.id}
+                        onClick={() => openDelete(item)}
+                        disabled={!canManage || decisionBusy || deleteLoading}
                         title="이 상품을 완전히 삭제합니다"
                         className="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs font-medium hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -922,28 +949,31 @@ export default function ProductServiceApprovalPage() {
 
       {/* Delete Confirm Modal (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1) */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <dialog open aria-modal="true" aria-label="상품 삭제" className="relative m-0 border-0 bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제</h3>
+            <p className="text-sm font-medium text-slate-800 mb-2">{deleteTarget.productName}</p>
             <p className="text-sm text-slate-500 mb-4">
               이 상품을 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다.
             </p>
+            {deleteError && <p role="alert" className="text-sm text-red-600">{deleteError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setDeleteTarget(null)}
+                onClick={() => { if (!deleteWriting.current) setDeleteTarget(null); }}
+                disabled={deleteLoading}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
               >
                 취소
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                disabled={deleteLoading}
+                disabled={!canManage || deleteLoading}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 {deleteLoading ? '삭제 중...' : '삭제 확인'}
               </button>
             </div>
-          </div>
+          </dialog>
         </div>
       )}
 
