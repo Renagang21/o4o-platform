@@ -138,9 +138,12 @@ async function references(q,fks,tables) {
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
     const owned=c.schema==='public'?deletedScope(c.table,'s'):undefined;
-    if(await count(q,`SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s
+    // Without a materialization barrier, the planner can recompute all seven
+    // scoped ID queries for every source row (production product_identifiers timeout).
+    if(await count(q,`WITH targets AS MATERIALIZED (${targetIds})
+      SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s
       WHERE NOT COALESCE((${owned??'FALSE'}),FALSE)
-      AND EXISTS (SELECT 1 FROM (${targetIds}) targets WHERE strpos(s.${id(c.column)}::text,targets.id)>0)`))
+      AND EXISTS (SELECT 1 FROM targets WHERE strpos(s.${id(c.column)}::text,targets.id)>0)`))
       throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
   }
 }

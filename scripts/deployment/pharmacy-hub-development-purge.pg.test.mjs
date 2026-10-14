@@ -67,6 +67,32 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await seed();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       const plan=await new PharmacyHubDevelopmentPurge().up(q,true);assert.equal(plan.applied,false);
       assert.equal(Object.values(plan.counts).reduce((a,b)=>a+b,0),60);await client.query('ROLLBACK');
+      // Real execution on a larger, unrelated product metadata table: scoped ID
+      // discovery runs once, while an embedded order-log UUID must still block.
+      await client.query(`CREATE TABLE product_identifiers(id uuid PRIMARY KEY,metadata jsonb);
+        INSERT INTO product_identifiers SELECT gen_random_uuid(),jsonb_build_object('externalTag',n)
+          FROM generate_series(1,5000) n; ANALYZE product_identifiers`);
+      const referencePlans=[];
+      const inspected={...q,query:async(sql,args)=>{
+        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('strpos('))
+          referencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
+        return q.query(sql,args);
+      }};
+      await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      assert.equal((await new PharmacyHubDevelopmentPurge().up(inspected,true)).applied,false);
+      await client.query('ROLLBACK');
+      const walk=node=>[node,...(node.Plans??[]).flatMap(walk)];
+      assert.equal(referencePlans.length,2);
+      for(const execution of referencePlans) {
+        const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE targets');
+        assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
+      }
+      await client.query('INSERT INTO product_identifiers VALUES($1,$2)',[uuid(990),{nested:{orderLog:uuid(101)}}]);
+      await begin();
+      await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/PH_DEV_SHARED_VALUE:public.product_identifiers.metadata/);
+      await client.query('ROLLBACK');
+      assert.equal((await client.query('SELECT count(*) FROM checkout_order_logs')).rows[0].count,'6');
+      await client.query('DELETE FROM product_identifiers WHERE id=$1',[uuid(990)]);
       const erasure=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await erasure.connect();
       try {
         const pid=(await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;

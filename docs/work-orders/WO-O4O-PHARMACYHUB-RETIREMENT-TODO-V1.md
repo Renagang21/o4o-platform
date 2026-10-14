@@ -440,3 +440,10 @@ P2 재리뷰 대응: PH worker도 계정 삭제 worker와 동일하게 shared o4
 PR #553은 필수 CI·Codex blocker 없음 확인 후 main 7f2956b0cbdf9901c4e8d5c879221e3077b29898에 병합했고 post-merge CI가 통과했다. development plan 38496164336은 실패했으며 관리자 worker 로그의 실제 코드는 PH_PURGE_FAILED다. 기존 PH_DEV_MUTATION_TRIGGER와는 다른 오류이고 원인은 아직 확정하지 않았다. 실제 census에서 offer_service_approvals/offer_service_prices의 UUID id가 확인돼 id 부재를 원인으로 단정하지 않는다.
 
 일회성 worker의 실패 진단에 고정 단계(connect/begin/purge/finish), 형식 검증된 SQLSTATE, 실패 쿼리의 SHA-256만 추가한다. rollback 쿼리가 실패 쿼리 지문을 덮어쓰지 않으며 원문 SQL·parameter·DB error detail·접속 정보는 출력하지 않는다. 읽기 전용 plan과 기존 apply 보호 검사는 그대로 유지한다. 오류 원인을 확인하기 전 운영 삭제는 실행하지 않는다. 별도 media plan 38496961613은 새 main CI 미확인 상태에서 발행한 오류로 취소했으며 성공 검증으로 취급하지 않는다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
+
+
+### 참조 검사 쿼리 취소 원인 확인 (2026-10-14)
+
+PR #561은 CI·SonarCloud PASS 및 Codex 무지적 후 main 35f1dd39f35e287ec7cec9fd43ec19b065ceac62에 병합했고 post-merge CI가 통과했다. 후속 문서 병합 이후 main 6eeea05a2cb9bf7256d5c0157e3c8d91b1d53fa1의 필수 CI와 운영 실행 부재를 다시 확인해 development plan 38500564796을 실행했다. 실제 worker 진단은 PH_PURGE_FAILED stage=purge code=57014, query_sha256=ff222aced979e0a253b3db17df17ae0aeb691914bfcf05a888660652151bc3ed다. 지문은 public.product_identifiers.metadata의 비-FK 참조 검사 SQL과 정확히 일치한다. worker는 쿼리당 statement_timeout 15초를 사용한다.
+
+이 검사에서 7개 삭제 대상 테이블의 ID 조회가 source 행마다 반복 평가될 수 있어, 동일 대상 ID 조회를 MATERIALIZED CTE로 한 번 실행하도록 변경한다. 타 서비스 전체 컬럼·JSON/배열/UUID 참조 검사는 유지하고 timeout을 늘리거나 특정 테이블을 제외하지 않는다. 격리 PostgreSQL의 상품 메타데이터 5,000행에서 실제 EXPLAIN ANALYZE로 CTE producer Actual Loops=1을 확인했으며, 중첩 주문 로그 UUID 참조는 삭제를 차단하고 기존 fence·동시 잠금·rollback 검사는 통과했다. 미디어 plan 38500950060도 실패했지만 worker 진단은 아직 확인 중이다. 운영 DB/GCS 삭제는 미실행이며 두 실패 Job은 조사용으로 보존한다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
