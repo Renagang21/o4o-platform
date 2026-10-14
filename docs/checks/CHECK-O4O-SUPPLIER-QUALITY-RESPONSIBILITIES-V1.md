@@ -19,7 +19,7 @@
 | 추가 접근성·동작 집중 검사 | 2 files / 25 tests PASS |
 | Supplier Domain 경계 검사 | 1 suite / 41 tests PASS. 이동한 Event Offer 구현 전체도 기존 금지 assertion의 검사 대상 |
 | 이동 callback/helper AST 비교 | 29개 PASS. 조회·retry·초기화·검증·제안 전송/부분 성공 본문 보존 |
-| Neture 전체 회귀 | 94 files / 838 tests PASS, unhandled error 0 |
+| Neture 전체 회귀 | 최초 94 files / 838 tests PASS; 운영자 main 변경 반영 후 95 files / 848 tests PASS, unhandled error 0 |
 | Neture 타입 검사·프로덕션 빌드 | PASS. 기존 큰 chunk 안내 유지 |
 | 변경 파일 ESLint | 오류/경고 0 |
 | Chromium PC1440/mobile390 | 5화면 × 2 viewport. 서비스 펼치기/출처 필터, 지표 접기, 이벤트 가격 gate/조건 전송, 등록 label·focus, 가져오기 공급가 입력 PASS |
