@@ -1,13 +1,13 @@
 # HANDOFF
 
-## ⚠️ 세션 시작 시 먼저 — PR #339 worktree 정리 (어느 PC 인지 미확인)
+## PR #339 작업공간 — 소유 세션 확인 후 정리
 
-PR #339(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`)는 main 통합(`918884634`) · 운영 배포(Promote `37614814922`, `447869cc5` DEPLOYED) 완료. 작업한 PC 를 모르므로 **모든 PC 에서 세션 시작 시 확인**한다.
+PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세션은 확인되지 않았다. 이 사실만으로 다른 세션의 작업공간을 삭제하지 않는다.
 
-1. `git worktree list` 에 branch `wo/kcosmetics-retirement-phase1b-store-api-admin-v1` worktree 가 있는지 본다. 없으면 이 PC 는 대상 아님 — `git branch -d` 로 로컬 branch 만 있으면 지운다.
-2. 있으면 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy) 종료 절차: clean · 남은 일 없음 확인 → node_modules junction / reparse point 해제 → 재스캔 0 확인 → `git worktree remove` → `git worktree prune` → `git branch -d`.
-3. 원격 branch 는 GitHub 에서 수동 삭제(전역 deny). head `7f0a466c3` 는 main 에 포함됨.
-4. 정리를 마친 PC 의 세션이 이 절을 삭제한다.
+1. 다른 세션은 `git worktree list`로 해당 branch/worktree의 존재만 확인하고 `KEEP` 또는 `UNCERTAIN`으로 보고한다. branch만 남아 있어도 임의로 삭제하지 않는다.
+2. 원래 소유 세션이 자기 작업공간임을 확인한 경우에만 [AGENTS.md §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy)의 main 포함·clean·남은 작업 및 다른 세션 사용 여부를 확인한다. Windows는 junction 해제·재스캔까지 통과해야 한다.
+3. 조건을 모두 충족한 원래 소유 세션만 자기 worktree와 branch를 정리한다. 불명확하면 보존하고 정확한 차단 사유를 보고한다. 원격 branch도 소유권·후속 사용 여부 확인 없이 삭제하지 않는다.
+4. 소유 세션의 실제 정리 완료 확인 후에만 이 안내를 제거한다. 이 문서 변경은 기존 작업공간을 정리했다는 증거가 아니다.
 
 > 마지막 작업: 2026-10-07 (KST) · PR #308 · #332 · #336 · #328 **main 통합 · 운영 배포 완료 · 테스트 결제 활성화** — **운영 업무 흐름 미검증**(계정 필요)
 
