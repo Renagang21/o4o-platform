@@ -142,3 +142,10 @@ Sonar allowlist 적용은 확인했으나 실제 site root/system API/dashboard/
 - 제목 추출은 이 파일에서 이미 쓰던 `node-html-parser`를 재사용한다. title→og:title→twitter:title 우선순위, attribute 양방향/marker-first 선호, raw basic entity 정책·200자 한도를 유지한다. HTML 구조로 meta 값을 읽으며 잘못된 markup의 반복 suffix 탐색을 제거하고 제목 내부 태그도 기존 forward helper로 제거한다. 정상 title/metadata 2,000건 비교 차이 0. 로컬 source 비교의 공백 20k는 **455.21→0.22ms**였다(운영 SLA 측정 아님).
 - 실제 회귀 **4 suites / 50 tests PASS**: 기존 Work Planner/URL/LLM closure/recovery 및 추가 제목 순서/대소문자/인코딩/100k 미종결 shape 포함. 변경 lint 오류·경고 0. 배포와 같은 **tsc→database backup→tsup(main/migrate)→database restore** PASS, main/migrate/migration-config/이번 compiled migration 모두 존재하고 두 bundle의 Node syntax 검사 PASS. 신규 운영 DB 실행은 아직 없으며 표준 gate를 충족한 새 main에서 정상 promote를 다시 실행한다.
 - Shared 소비: 타입 alias의 이름/경로는 유지하고 whole API typecheck 및 실제 bundled runtime에서 소비를 확인한다. URL/LMS source/title 공개 함수 계약도 유지한다. Auth/RBAC/Node/COMMIT/비용 정책·menu·provider 선택 변경 없음. 배포 전 API health/ready + web HTML/JS 12 + quota 관리 GET 인증 guard 2 = **16/16 PASS**. 실계정 파일이 두 checkout 모두 없어 실계정/유료 AI 호출은 미실시다.
+
+
+### PR #557 review 회귀 보완
+
+Codex P2 `4265707175`/`4265707181`의 두 회귀를 재현했다. 혼합 대소문자 title closing은 `lowerCaseTagName: true`로 정규화한다. 제목이 없는 약 110KB/10,000 depth HTML에서는 parser/selector가 RangeError를 던지므로 optional title extraction 전체에서 잡고 undefined로 반환한다. usable source text는 그대로 수집되고 blocks 기반 제목 fallback도 동작한다. 사용 가능한 앞 제목은 계속 보존한다. 운영 예외를 HTTP 성공으로 위장하거나 원문 fetch 실패를 삼키는 변경은 아니다.
+
+혼합 case 3개와 깊은 HTML 실제 `fetchUrlContent` 회귀를 추가했다. 최신 URL **1 suite / 26 tests PASS**, 앞 4 suites / 50 tests와 중복 합산하지 않는다. 최신 source의 tsc→database backup→tsup→restore 및 두 bundle Node syntax·compiled migration/config 존재·변경 lint PASS. 새로운 type/public API·권한·DB/CI 설정 변경 없음. main의 Neture 및 개발용 purge 스크립트/문서는 충돌 없이 반영했으며 운영 purge는 실행하지 않는다. 후기 target은 최신 main/serving→target migration delta·CI 및 동시 production 실행을 다시 확인한다.

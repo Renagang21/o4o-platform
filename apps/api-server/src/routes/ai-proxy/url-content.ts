@@ -450,7 +450,18 @@ export function decodeBasicHtmlEntities(s: string): string {
  * 실패 시 undefined — 호출 측에서 blocks 기반 fallback 으로 넘긴다.
  */
 export function extractHtmlTitle(html: string): string | undefined {
+  try {
+    return extractParsedHtmlTitle(html);
+  } catch {
+    // Title metadata is optional: a parser/selector failure must not discard
+    // usable source text or prevent the caller's block-based title fallback.
+    return undefined;
+  }
+}
+
+function extractParsedHtmlTitle(html: string): string | undefined {
   const root = parseHtml(html, {
+    lowerCaseTagName: true,
     blockTextElements: { script: true, style: true, pre: true, title: true },
   });
   // 1. <title>...</title>
