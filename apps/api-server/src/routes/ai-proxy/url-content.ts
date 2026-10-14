@@ -489,7 +489,7 @@ export function extractHtmlTitle(html: string): string | undefined {
  *   6. 첫 o4o/paragraph 의 첫 문장 (또는 앞 40자)
  */
 export function deriveTitleFromBlocks(blocks: Array<{ type?: string; content?: string }>): string | undefined {
-  const stripTags = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  const stripTags = (s: string) => removeHtmlTags(s, '').replace(/\s+/g, ' ').trim();
 
   const firstHeading = blocks.find((b) => b.type === 'o4o/heading');
   if (firstHeading?.content) {
@@ -513,6 +513,25 @@ export function deriveTitleFromBlocks(blocks: Array<{ type?: string; content?: s
 }
 
 
+/** Match the existing nonempty <...> stripping rule in a single forward scan. */
+function removeHtmlTags(html: string, replacement: string): string {
+  const parts: string[] = [];
+  let cursor = 0;
+  let start = html.indexOf('<');
+  while (start !== -1) {
+    const end = html.indexOf('>', start + 1);
+    // An unclosed suffix stays as source text; never scan it again.
+    if (end === -1) break;
+    if (end > start + 1) {
+      parts.push(html.slice(cursor, start), replacement);
+      cursor = end + 1;
+    }
+    start = html.indexOf('<', end + 1);
+  }
+  parts.push(html.slice(cursor));
+  return parts.join('');
+}
+
 /**
  * HTML에서 의미있는 텍스트 추출
  * WO-O4O-AI-URL-CONTENT-QUALITY-V2: 노이즈 제거 강화
@@ -521,7 +540,7 @@ export function stripHtml(html: string): string {
   // UI 노이즈 태그 전체 블록 제거 (nav/header/footer/aside/form/button/input/select)
   const noiseTagsRe = /<(nav|header|footer|aside|form|button|input|select|textarea|label|fieldset|dialog|menu|menuitem)[\s\S]*?<\/\1>/gi;
 
-  const cleaned = html
+  const withoutNoise = html
     // script/style 블록 제거
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
@@ -531,9 +550,9 @@ export function stripHtml(html: string): string {
     // 자기완결형 input/br/hr 제거
     .replace(/<(input|br|hr|img)[^>]*\/?>/gi, ' ')
     // 블록 태그를 줄바꿈으로
-    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th|section|article)>/gi, '\n')
-    // 나머지 태그 제거
-    .replace(/<[^>]+>/g, ' ')
+    .replace(/<\/(p|div|h[1-6]|li|br|tr|td|th|section|article)>/gi, '\n');
+  // 나머지 태그 제거
+  const cleaned = removeHtmlTags(withoutNoise, ' ')
     // HTML 엔티티 기본 변환
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')

@@ -1,6 +1,6 @@
 # AI 누적 정비 main 통합·배포 실행
 
-> **상태**: WAITING_OPERATION_APPROVAL (main 통합 완료, 운영 migration 미실행)
+> **상태**: ACTIVE
 > **작성일 / 최종 갱신**: 2026-10-14 (Asia/Seoul)
 > **요청**: 앞 push-only 완료 후 사용자 추가 지시: main 병합·배포
 > **선행 이력**: [코드 정비 완료 WO](WO-O4O-AI-COMPLEXITY-COMPLETION-V1.md) · [기존 소비처 CHECK](../checks/CHECK-O4O-AI-COMPLEXITY-MAINTENANCE-V1.md)
@@ -89,3 +89,25 @@ Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required ch
 - 배포 전 HTTP: API health/ready 2 + 웹 HTML 6 + 같은 host JS 6, **14/14 PASS**. 실제 계정·업무 write/유료 AI 호출은 없음. SourceModel/실 PC 호출과 배포 후 smoke는 미실시다.
 - 사용자가 승인하면 최신 main/serving delta·CI·동시 production run·migration 목록을 다시 확인해 승인 범위와 동일할 때 표준 verified rollout으로 진행한다. source target이 이동했으면 포함된 변경을 확인하고 재판정한다.
 - 이 대기 기록은 운영 target을 바꾸지 않도록 source branch에 보존한다. 기준 checkout·다른 세션 branch/dirty/worktree는 수정하지 않았다. 문서 정합은 구현/검증/미실행 운영 경계를 이번 WO/CHECK에 반영하고 선행 COMPLETED 이력을 유지했다.
+
+
+## 중요 잔여 정비 — 2026-10-14
+
+사용자 추가 지시: 정비는 추후 계속하므로 지금은 중요한 부분만 수행한다. 동일 통합 트랙의 review finding 후속으로 기존 전용 worktree를 사용하고, 최신 main `9b38fe5054`를 conflict 없이 합쳤다. 새 main의 privacy 변경은 이번 AI 수정 대상이 아니다.
+
+### 조사·TODO·개발 순서
+
+- [x] Sonar 최종 source check `115570828811`의 공개 annotations 재확인. JSON 추출과 일반 HTML 태그 제거에 backtracking 경고가 있다.
+- [x] 닫는 구분자 없는 입력으로 지연 재현. 10k→20k→40k에서 JSON 73→290→1203ms, HTML 57→235→991ms. 같은 환경의 관찰치이며 SLA/운영 측정이 아니다.
+- [x] JSON은 첫 `{` / 마지막 `}`의 기존 greedy 범위를 유지하면서 `indexOf` / `lastIndexOf`로 추출. malformed/multiple object의 JSON.parse 실패도 유지.
+- [x] 일반 HTML 태그 제거는 단일 전진 scan으로 대체. 빈 `<>`, 중첩 `<`, 닫히지 않은 suffix와 태그별 공백 정책을 유지하고 동일 파일의 제목 추출도 같은 private helper를 사용한다. script/style/noise 처리·본문/제목 길이·권한·provider·외부 fetch 계약은 유지한다. HTML 처리 전체가 선형이라고 주장하지 않는다.
+- [x] 실제 malformed/정상/100k 입력 회귀, Planner/URL 소비처 테스트·API build·변경 lint 검증.
+- [ ] 후속 수정 push·PR gate 확인.
+
+보류: 일반 함수 길이/cognitive complexity, 서비스 문맥이 다른 중복, 이름/스타일 및 추가 abstraction. 실제 권한 우회·저장 누락·비용 이중 정산 같은 결함이 확정되면 다시 최우선으로 처리한다. retained 중복의 이전 KEEP 판정은 미해결 TODO로 바꾸지 않는다.
+
+Sonar 도메인 추가는 이번 runtime에서 확인했다. 재시도는 proxy CONNECT 거절 대신 upstream CloudFront HTTP 403으로 실패했으며 Security B의 전체 issue 상세는 여전히 미확인이다. 공개 annotations의 재현된 성능 문제만 수정하며 B 원인의 전부를 해결했다고 판단하지 않는다. CodeQL/CI의 앞 PASS도 새 수정의 검증으로 대신하지 않는다.
+
+운영 migration 승인·배포 후 smoke는 코드 복잡성 정비와 분리하여 계속 대기한다. 이전 main `de4cbf9f39`의 HELD_LEVEL_3 이력은 그대로 보존하며, 향후 promote는 이동한 최신 main/serving delta·CI·migration·동시 실행을 다시 확인해야 한다. 이번 조사는 운영 DB 승인으로 해석하지 않는다. 상태 헤더는 문서 lifecycle의 ACTIVE로 정렬하고 운영 실행 대기는 본문에 기록했다.
+
+검증 결과: 실제 4 suites / 38 tests PASS, API build PASS, 변경 lint 오류/경고 0. 기존 함수와 수정 함수의 2,000개 deterministic HTML 샘플에서 본문/제목 4,000건 결과 차이 0. 같은 source 함수 비교의 40k 입력은 HTML 1243.58→0.27ms, JSON 925.03→0.04ms였으며 운영 latency 측정이 아니다. 첫 focused 실행의 부적절한 `br` prefix fixture와 존재하지 않는 planning suite 경로는 진단 후 수정해 위 4개 실제 suite를 완주했다. 기존 assertions나 동작은 완화하지 않았다. 문서 민감정보 0/diff 검사 PASS.

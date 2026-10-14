@@ -1,6 +1,20 @@
 import { fetchUrlContent, fetchUrlText, extractHtmlTitle, stripHtml, deriveTitleFromBlocks, detectUsageConditions } from '../routes/ai-proxy/url-content.js';
+import { performance } from 'node:perf_hooks';
 
 const originalFetch = global.fetch;
+it.each(['a <b>word</b> z', 'a <> b', 'a <<xyz> b', 'a <missing', 'a ><b>word</b>'])('preserves nonempty tag stripping for malformed markup: %s', (source) => {
+  const expected = source.replace(/<[^>]+>/g, ' ').replace(/[ \t]+/g, ' ').trim();
+  expect(stripHtml(source)).toBe(expected);
+  const title = source.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  expect(deriveTitleFromBlocks([{ type: 'o4o/heading', content: source }])).toBe(title);
+});
+it('processes a large unterminated HTML suffix without quadratic rescanning', () => {
+  const source = '<'.repeat(100_000);
+  const started = performance.now();
+  expect(stripHtml(source)).toBe(source.slice(0, 6000));
+  expect(deriveTitleFromBlocks([{ type: 'o4o/heading', content: source }])).toBe(source.slice(0, 80));
+  expect(performance.now() - started).toBeLessThan(1000);
+});
 afterEach(() => { global.fetch = originalFetch; });
 it('keeps title extraction separate from script-free source text and usage notices', async () => {
   global.fetch = jest.fn(async () => ({ ok: true, headers: new Headers({ 'content-type': 'text/html' }), text: async () => '<html><head><title>안내 &amp; 공지</title><script>secretScript()</script></head><body><p>매장에서활용하는자료의처리절차를 자세히 설명합니다.</p><p>무단 복제 금지</p></body></html>' })) as any;
