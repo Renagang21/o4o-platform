@@ -128,6 +128,7 @@ describe('현행 workspace 응답과 조회 실패 처리', () => {
         if (status) throw { response: { status } };
         return { data: { data: { communities } } } as never;
       }
+      if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [] } } } as never;
       if (path === '/neture/home/entry') return { data: { data: { serviceStates: { supplier: { status: 'none', source: 'none' } } } } } as never;
       return { data: { data: { services: [] } } } as never;
     });
