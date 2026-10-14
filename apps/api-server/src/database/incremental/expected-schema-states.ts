@@ -206,16 +206,73 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '515f8b4c82da92b5e8b94bc75ad90bccfa639454c2fbb2149a5ad72f8b69e93d',
     fingerprintLineCount: 6154,
   },
+  // Demo repair snapshot table, verified on isolated PostgreSQL 15.
+  {
+    appliedThrough: 'RepairCanonicalDemoExperience1791501198171',
+    fingerprint: '702c212dfaa42db0e0c5076ab4afb76f382e70992929aeda69d09c314d8112bf',
+    fingerprintLineCount: 6163,
+  },
+  // PostgreSQL 15: baseline + incrementals 1..19; migration 19 explicitly converges pgcrypto
+  // with the registered established states. Verified through the normal migration runner.
+  {
+    appliedThrough: 'CreateBrowserSessionRevocations1791509600000',
+    fingerprint: '49e6d7b2a2558750f52b42add1865a42495a6650d344ba916e0f464cba98dab0',
+    fingerprintLineCount: 6176,
+  },
+  // Isolated PostgreSQL 15: baseline + incrementals 1..20. The handoff CHECK alone
+  // admits Kakao; down restores state 19 and re-up restores this exact fingerprint.
+  {
+    appliedThrough: 'AllowKakaoHandoffAuthMethod1791527589096',
+    fingerprint: 'ee4c646d687460947bbb6f0fe0da6006075d1cbf4f1638c8fed588e554e2c68a',
+    fingerprintLineCount: 6176,
+  },
+  // Isolated PostgreSQL 15: state 20 -> social proofs/identity constraints -> down/up exact reproduction.
+  {
+    appliedThrough: 'CreateSocialAuthFlows1791592932097',
+    fingerprint: 'fbfbdec4d389108b2324d679c154bf9ed5766dac6c4f2d74cfa57186343348f3',
+    fingerprintLineCount: 6199,
+  },
+  // Isolated PostgreSQL 15 baseline + incremental replay; individual roles/status and audit ledger.
+  {
+    appliedThrough: 'AddCommunityMemberAdministration1791632505104',
+    fingerprint: '30be348978adb3aa0b5b0c378517b232ee36038c6bdbbdac70780d3c8f86f4bb',
+    fingerprintLineCount: 6218,
+  },
+  // Isolated PostgreSQL 15: exact down/up replay of the approved code/local erasure schema.
+  // No production migration execution is authorised by registration.
+  {
+    appliedThrough: 'CreateAccountErasureOperations1791777540800',
+    fingerprint: 'c45f9b5235a55aa0c5e008b159c7bc2bf0ddab97f9cc743d88322e916d12a45f',
+    fingerprintLineCount: 6617,
+  },
+  // Contact-hash retirement also removes the legacy contact branch from the writer function.
+  {
+    appliedThrough: 'RetireLegacyErasureIdentityHashes1791795139475',
+    fingerprint: '0d25da3dee92c48e7457571661be41c369fe27066009798e038309f5d20c4b50',
+    fingerprintLineCount: 6618,
+  },
+  // Isolated PostgreSQL 15 baseline + incremental 1..25; Demo type classification only.
+  {
+    appliedThrough: 'AllowStoreStaffDemoAccounts1791810417566',
+    fingerprint: '9f5faca8de1ce52bffb855460715a98129326c6caa0de0bb5de4c55551e02641',
+    fingerprintLineCount: 6618,
+  },
+  // Isolated PostgreSQL 15: baseline + incrementals 1..26; durable quota reservations, aggregate precision.
+  {
+    appliedThrough: 'CreateAiUsageReservations1791870434349',
+    fingerprint: '087e2d4c4c9423c59774a622f681548d677aeab14567287a8ded9e52e71447ac',
+    fingerprintLineCount: 6650,
+  },
   // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — assistant_run_frames.understanding jsonb(nullable) + COMMENT.
   // 질문 대기 run 의 업무 이해 중 글 없는 구조(결과 형태 · 확정 경계)만 재개 구조(M5)와 같은 행 · 같은 수명에 둔다(목표 · 조건 글 저장 금지 · M13).
-  // 운영 미적용 상태에서 main 의 17번(AlignSellerRecruitmentApplicationIdentity) 뒤로 epoch 재부여(1791349365734 → 1791498705173 · 내용 불변).
-  // baseline fresh bootstrap + incremental 1..18 을 격리 PostgreSQL 17(로컬 일회용 클러스터)에서 migrate.ts 로 실제 적용해 산출:
-  // 운영 DB fingerprint 채택 아님. 같은 DB 에서 18번만 되돌려 17번 상태 515f8b4c…(6154) 재현 확인 · 새 DB 재실행 POST PASS.
-  // 종전 값 4e37812d…(6157 · 17번 이전 위치)은 운영에 적용된 적 없다(미병합 PR).
+  // 운영 미적용 상태에서 main 의 마지막(CreateAiUsageReservations) 뒤로 epoch 재부여(1791349365734 → 1791970408318 · 내용 불변).
+  // baseline fresh bootstrap + incrementals 1..28 을 격리 PostgreSQL 17(로컬 일회용 클러스터)에서 migrate.ts 로 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님. 같은 DB 에서 이 migration 만 되돌려 직전 상태 087e2d4c…(6650) 재현 확인 · 새 DB 재실행 POST PASS.
+  // 종전 값 4e37812d…(6157) · 7f231dc7…(6156)는 앞선 위치의 값으로 운영에 적용된 적 없다(미병합 PR).
   {
-    appliedThrough: 'AddAssistantRunFrameUnderstanding1791498705173',
-    fingerprint: '7f231dc71310c35429905b7a51b4b19792014671ede95ebb300ea87efcef0ee2',
-    fingerprintLineCount: 6156,
+    appliedThrough: 'AddAssistantRunFrameUnderstanding1791970408318',
+    fingerprint: 'e432641d0e05b803a6ac9c08822248e5f693b761f80664808c8214187a568b23',
+    fingerprintLineCount: 6652,
   },
 ] as const;
 

@@ -1,7 +1,13 @@
 # O4O Global Header / Layout / Navigation Standard v1.0
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 > **작성일**: 2026-04-17
-> **최종 갱신**: 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **최종 갱신**: 2026-10-12 — WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1 (My Home 공통 직접 진입 정책·운영 배포, 실제 인증 검증 사용자 제외) · 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
 > **범위**: kpa-society, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
@@ -64,6 +70,9 @@ IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17) 핵심 수치:
 | TYPE E | 공유 컴포넌트 미활용 | neture (Store) |
 
 ### 2.2 현재 구현 상태 (2026-08-21 기준, 현행)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 | 항목 | 현재 상태 |
 |------|-----------|
@@ -180,8 +189,8 @@ GlobalLayout
 
 | 항목 | 설명 |
 |------|------|
-| 역할 | 사용자 인증 상태 및 계정 관리 |
-| 포함 요소 | 비인증: 로그인/회원가입 버튼. 인증: 사용자 아바타, 드롭다운(이름, 이메일, 역할, 대시보드, 마이페이지, 로그아웃) |
+| 역할 | 사용자 인증 상태, My Home 개인 통합 공간 및 계정 관리 진입 |
+| 포함 요소 | 비인증: 로그인/회원가입 버튼. 인증: **My Home 직접 링크**와 사용자 아바타·드롭다운(이름, 이메일, 역할, 계정 설정, 권한별 업무 진입, 로그아웃). 매장 업무 권한이 있으면 **내 매장** 진입을 구분해 제공 |
 | 서비스별 차이 | 최소한 — 아바타 gradient 색상 정도만 허용 |
 | 구조 차이 | 비허용 — 드롭다운 항목, 순서, 위치 통일 |
 
@@ -194,6 +203,9 @@ GlobalLayout
 모든 서비스의 Layout은 아래 3개 층위로 구분한다.
 
 #### Layer A: Global Layer
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 **모든 서비스 공통 상단 구조.**
 
@@ -339,8 +351,11 @@ serviceNavigation
 #### userMenu
 
 - 드롭다운 형태의 사용자 계정 메뉴
-- 대시보드, 마이페이지, 로그아웃 등
+- 계정 설정, 권한별 업무 진입, 로그아웃 등
 - 인증 시에만 표시
+- 개인 통합 공간의 이름은 **My Home**이다. 로그인 후 UserArea에 직접 링크를 두며 드롭다운 안에만 숨기지 않는다. 일반 회원에게도 제공하고, 매장 업무 권한이 있는 사용자는 **My Home · 내 매장**을 구분해 이용한다.
+- 데스크톱은 헤더 오른쪽 사용자 영역, 모바일은 공통 헤더의 직접 진입을 유지한다. 공통 하단 탐색이 있는 화면에서는 My Home을 고정 항목으로 제공한다. 서비스별로 새 하단 탐색을 무조건 생성하지 않는다.
+- 독립 서비스도 같은 이름과 공통 위치를 사용한다. 실제 목적지·세션 연결은 기존 route와 인증 계약으로 검증한다. 정책 정본은 [My Home](../../baseline/O4O-MY-HOME-CANONICAL-V1.md)이며 이 항목의 UI는 구현·로컬 검증·운영 배포를 완료했다. 실제 로그인 검증의 제한은 구현 CHECK를 따른다.
 
 ### 6.4 메뉴 정의 위치 원칙
 
@@ -433,6 +448,9 @@ serviceNavigation
 
 ### 8.3 서비스별 브랜드 토큰 (참고)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 각 서비스 bridge 의 `brand` prop 이 실제 주입값이다 (2026-09-17 기준 — neture 는 `NETURE_HEADER_BRAND`, WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1).
 
 | 서비스 | Primary Color | 로고 아이콘 | 서비스명 | 서브타이틀 |
@@ -497,6 +515,9 @@ serviceNavigation
 ---
 
 ## 11. 적용 우선순위
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 > 이 섹션은 구현 지시가 아니라 **표준 적용의 권장 순서**였다.
 > Phase 1~5 는 완료되었고(2.2), Phase 6 은 상시 규칙으로 계속 적용된다.
@@ -570,7 +591,7 @@ serviceNavigation
   제거 2026-08-21 · [CHECK-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1](../../checks/CHECK-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1.md))
 - `GlobalHeaderNavItem` 은 이제 `{ label, href }` 뿐이다. `children` 필드는 코드에 존재하지 않는다.
 - 즉 **Header submenu 는 본 표준의 구성 요소가 아니다.** PrimaryNav 는 1단 수평 메뉴를 유지하고,
-  하위 화면 진입은 허브 페이지·Footer·My Page nav 등 화면 내 UI 로 제공한다.
+  하위 화면 진입은 허브 페이지·Footer·My Home 내비게이션 등 화면 내 UI로 제공한다. My Home의 공통 직접 링크는 상단의 개인 공간 진입이며 submenu를 복원하는 근거가 아니다.
 - 상단 노출이 필요한 항목이 생기면 `children` 을 되살리지 말고 **parent 항목으로 승격**한다.
 
 ---
@@ -579,3 +600,8 @@ serviceNavigation
 *근거: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17)*
 *구현: WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 계열 — 완료 · Header/Footer 공통화 트랙 CLOSED*
 *현재 상태 정합: WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (2026-08-21)*
+
+
+## My Home 구현 상태 (2026-10-11)
+
+[구현 WO](../../work-orders/WO-O4O-MY-HOME-IMPLEMENTATION-V1.md) 및 [CHECK](../../checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md) 기준 공통 인증 헤더의 My Home 직접 진입과 Neture·KPA 모바일 고정 항목을 구현·로컬 검증했다. 대표 목적지는 `neture.co.kr/mypage`이며 독립 서비스에서는 세션 handoff를 사용한다. 두 행 모바일 진입을 담도록 공통 GlobalHeader는 고정 높이 대신 최소 높이를 사용한다. PR #449의 main 통합과 promote 배포가 완료됐으며 최종 서빙 SHA 확인을 통과했다. 공개 화면의 PC·모바일 검증은 완료했다. 후속 본 작업에서 제공된 `docs/local/TEST-ACCOUNT.txt`를 확인했으며, 두 이메일 계정의 현재 로그인 거절 뒤 사용자가 이메일 리팩터링 예정·검증 제외를 명시했다. 현재 실제 인증 검증은 SKIPPED_BY_USER다. 헤더의 기존 운영 반영과 PR #484 본문 개선의 배포 상태는 구분하며 최신 결과는 구현 CHECK를 따른다.

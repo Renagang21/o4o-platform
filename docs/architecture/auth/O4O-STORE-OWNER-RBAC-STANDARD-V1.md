@@ -1,5 +1,8 @@
 # O4O STORE OWNER RBAC STANDARD V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **상태**: ACTIVE · **최종 갱신**: 2026-10-04 (내부 모순 정합 — 접근 판정은 Role ∧ Relationship([STORE-ACCESS-AND-MEMBERSHIP](../../baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md)), `role_assignments` 는 Authorization SSOT 로 유지. §2.1 · §4 · §5 · §8 에 `2026-10-04 정합` 주석)
 
 ## 1. 목적
@@ -49,6 +52,9 @@ store_owner는 매장 운영 기능을 사용할 수 있는 권한이다.
 
 ### 3.1 서비스별 store_owner
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 공통 role 게이트(`isStoreOwner()`)가 아는 role 은 **이 3종이 전부**다 —
 런타임 정본은 `apps/api-server/src/utils/store-owner.utils.ts` 의 `STORE_OWNER_ROLES_BY_SERVICE` 다.
 
@@ -67,6 +73,9 @@ Cafe24 거래처 회원은 **HMAC 서명 쿠키 세션**으로 `/store/*` 에 �
 아는 role 인 것처럼 보인다.
 
 ### 3.1-A 서비스별 store_member (2026-10-04 추가)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 매장 접근 자격은 **Owner 하나가 아니다.** 사업자가 허가한 사용자(Store Member)가 같은 매장을 쓴다.
 
@@ -119,6 +128,9 @@ seller는 독립 역할로 사용하지 않는다.
 
 ### 3.4 role prefix ≠ 서비스 주소 의미 (2026-10-03 표기)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 role prefix 는 **내부 서비스 범위 이름**이며 현재 주소의 사업 의미와 다를 수 있다. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md).
 
 | role | serviceKey | 현재 의미 |
@@ -151,6 +163,9 @@ role_assignments.role IN ({service}:store_owner)
 ---
 
 ## 5. 승인 구조
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](../../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 매장 운영 권한은 다음 단계를 통해 부여된다.
 

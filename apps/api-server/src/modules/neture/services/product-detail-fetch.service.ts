@@ -64,7 +64,8 @@ function isBlockedIp(ip: string): boolean {
   const v = net.isIP(ip);
   if (v === 4) {
     const parts = ip.split('.').map((n) => parseInt(n, 10));
-    if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n) || n < 0 || n > 255)) return true;
+    if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n) || n < 0 || n > 255))
+      return true;
     const [a, b] = parts;
     if (a === 10) return true; // 10.0.0.0/8
     if (a === 127) return true; // loopback
@@ -104,9 +105,18 @@ async function assertSafeFetchUrl(rawUrl: string, sameOrigin?: string): Promise<
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new DetailFetchError('UNSUPPORTED_PROTOCOL', 'http/https 주소만 허용됩니다.');
   }
+  if (parsed.username || parsed.password) {
+    throw new DetailFetchError('INVALID_URL', '인증 정보가 포함된 주소는 허용되지 않습니다.');
+  }
 
   const host = parsed.hostname.toLowerCase();
-  if (host === 'localhost' || host === '0.0.0.0' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) {
+  if (
+    host === 'localhost' ||
+    host === '0.0.0.0' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host.endsWith('.internal')
+  ) {
     throw new DetailFetchError('BLOCKED_HOST', '내부 주소는 조회할 수 없습니다.');
   }
 
@@ -143,7 +153,10 @@ async function assertSafeFetchUrl(rawUrl: string, sameOrigin?: string): Promise<
   }
   for (const addr of addresses) {
     if (isBlockedIp(addr.address)) {
-      throw new DetailFetchError('BLOCKED_IP', '내부/사설 IP 로 해석되는 주소는 조회할 수 없습니다.');
+      throw new DetailFetchError(
+        'BLOCKED_IP',
+        '내부/사설 IP 로 해석되는 주소는 조회할 수 없습니다.',
+      );
     }
   }
 
@@ -170,18 +183,30 @@ async function fetchImageSafe(
   }
 
   let response: Response;
+  const signal = AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS);
   try {
-    response = await fetch(safe.href, {
-      method: 'GET',
-      redirect: 'follow',
-      signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-        Accept: 'image/*',
-        Referer: sameOrigin,
-      },
-    });
+    for (let redirects = 0; ; redirects++) {
+      response = await fetch(safe.href, {
+        method: 'GET',
+        redirect: 'manual',
+        signal,
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          Accept: 'image/*',
+          Referer: sameOrigin,
+        },
+      });
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      const location = response.headers.get('location');
+      await response.body?.cancel();
+      if (!location || redirects >= 5) return { error: 'fetch_error' };
+      try {
+        safe = await assertSafeFetchUrl(new URL(location, safe).href, sameOrigin);
+      } catch (error) {
+        return { error: error instanceof DetailFetchError ? error.code : 'unsafe_url' };
+      }
+    }
   } catch {
     return { error: 'fetch_error' };
   }
@@ -239,7 +264,7 @@ async function copyImageToStorage(
 ): Promise<{ url: string | null; reason?: string }> {
   const r = await fetchImageSafe(imageUrl, sameOrigin);
   if ('error' in r) {
-    logger.warn(`[ImportCopy] image copy failed (${r.error}): ${imageUrl}`);
+    logger.warn(`[ImportCopy] image copy failed (${r.error})`);
     return { url: null, reason: r.error };
   }
   try {
@@ -255,7 +280,7 @@ async function copyImageToStorage(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     const reason = msg.startsWith('IMAGE_TOO_TALL') ? 'too_tall' : 'upload_error';
-    logger.warn(`[ImportCopy] upload failed (${reason}): ${imageUrl}`);
+    logger.warn(`[ImportCopy] upload failed (${reason})`);
     return { url: null, reason };
   }
 }
@@ -301,7 +326,13 @@ export async function copyImages(
         continue;
       }
     }
-    const { url, reason } = await copyImageToStorage(originalUrl, originConstraint, mediaService, userId, imageMode);
+    const { url, reason } = await copyImageToStorage(
+      originalUrl,
+      originConstraint,
+      mediaService,
+      userId,
+      imageMode,
+    );
     out.push({ originalUrl, url, ok: !!url, reason: url ? undefined : reason });
   }
   return out;

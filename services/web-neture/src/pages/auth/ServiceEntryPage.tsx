@@ -12,6 +12,8 @@
  *   membership 을 만들거나 가입 정책을 바꾸지 않는다(handoff 는 가입 surface 가 아니다 — IDENTITY §7.4 · §7.5).
  */
 import { useEffect, useRef, useState } from 'react';
+import { O4OHomeButton } from '@o4o/auth-react';
+import { authClient } from '../../lib/apiClient';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth, useLoginModal } from '../../contexts';
 import { resolveServiceEntryUrl, ServiceEntryError } from '../../lib/home-entry';
@@ -84,9 +86,10 @@ export default function ServiceEntryPage() {
       .catch((e: Error) => setError({ message: e.message, code: e instanceof ServiceEntryError ? e.code : undefined }));
   }, [target, isLoading, isAuthenticated, openLoginModal, here, serviceKey, returnPath]);
 
+  const returnHome = <div className="mt-6"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>;
   const box = 'mx-auto max-w-md px-6 py-20 text-center';
   if (!target) {
-    return <main className={box}><p className="text-gray-700">알 수 없는 서비스 주소입니다.</p></main>;
+    return <main className={box}><p className="text-gray-700">알 수 없는 서비스 주소입니다.</p>{returnHome}</main>;
   }
   const denial = error?.code ? MEMBERSHIP_DENIAL_TEXT[error.code] : undefined;
   if (error && denial) {
@@ -111,7 +114,7 @@ export default function ServiceEntryPage() {
           <Link className="text-sm font-medium text-green-700 underline" to="/contact" data-testid="service-entry-inquiry">
             {target.label} 이용 문의하기
           </Link>
-          <Link className="text-sm text-gray-500 underline" to="/">Neture 홈으로</Link>
+          {returnHome}
         </div>
       </main>
     );
@@ -122,6 +125,7 @@ export default function ServiceEntryPage() {
         <h1 className="text-lg font-bold text-gray-900">{target.label}로 이동하지 못했습니다</h1>
         <p className="mt-3 text-sm text-gray-600" role="alert">{error.message}</p>
         <a className="mt-6 inline-block text-sm font-medium text-green-700 underline" href={`${target.origin}/`}>{target.label} 둘러보기</a>
+        {returnHome}
       </main>
     );
   }
@@ -133,6 +137,7 @@ export default function ServiceEntryPage() {
         <button type="button" onClick={() => openLoginModal(here)} className="mt-6 rounded-lg bg-green-600 px-5 py-2 text-sm font-medium text-white hover:bg-green-700">
           로그인
         </button>
+        {returnHome}
       </main>
     );
   }

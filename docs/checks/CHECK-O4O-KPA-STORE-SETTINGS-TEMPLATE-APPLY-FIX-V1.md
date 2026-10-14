@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **WO:** WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1
 **일자:** 2026-07-27
 **선행 CHECK:** [CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1](CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1.md) (판정 B — 은퇴 보류)
@@ -216,7 +218,7 @@ CLAUDE.md §8 "API 직접 호출(curl) ✅" 채널. **전용 테스트 매장**(
 | 6 | 권한 — 토큰 없음 | `PATCH` (no auth) | **401** ✅ |
 | 7 | 검증 — 타입 오류 | `PATCH {applyTemplateDefaults:"yes"}` | **400 VALIDATION_ERROR** ✅ |
 
-> **부수 발견(본 WO 무관):** `docs/local/TEST-ACCOUNTS.local.md` 의 **약국 경영자 `[REDACTED_EMAIL_B]` 비밀번호가 stale**
+> **부수 발견(본 WO 무관):** `docs/local/TEST-ACCOUNT.txt` 의 **약국 경영자 `[REDACTED_EMAIL_B]` 비밀번호가 stale**
 > (프로덕션 로그인 401 `INVALID_CREDENTIALS`). 같은 매장의 다른 owner 계정(`[REDACTED_EMAIL_C]`)은 정상 로그인되어
 > smoke 는 그 계정으로 수행했다. 로컬 SSOT 문서 갱신 필요.
 

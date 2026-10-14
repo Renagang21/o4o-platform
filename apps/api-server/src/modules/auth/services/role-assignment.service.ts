@@ -19,6 +19,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { isRetiredRoleValue, RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { invalidateRoles } from '../utils/role-cache.js';
 
 export interface AssignRoleInput {
@@ -45,7 +46,7 @@ export class RoleAssignmentService {
     });
 
     // Filter by validity period
-    return assignments.filter((a) => a.isValidNow());
+    return assignments.filter((a) => !isRetiredRoleValue(a.role) && a.isValidNow());
   }
 
   /**
@@ -60,6 +61,7 @@ export class RoleAssignmentService {
    * Check if user has a specific role
    */
   async hasRole(userId: string, role: string): Promise<boolean> {
+    if (isRetiredRoleValue(role)) return false;
     const assignment = await this.repository.findOne({
       where: { userId, role, isActive: true },
     });
@@ -79,7 +81,7 @@ export class RoleAssignmentService {
       where: { userId, role: In(roles), isActive: true },
     });
 
-    return assignments.some((a) => a.isValidNow());
+    return assignments.some((a) => !isRetiredRoleValue(a.role) && a.isValidNow());
   }
 
   /**
@@ -127,6 +129,7 @@ export class RoleAssignmentService {
    */
   async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil } = input;
+    if (isRetiredRoleValue(role)) throw new RetiredServiceError();
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists
@@ -218,8 +221,9 @@ export class RoleAssignmentService {
    *   비활성 행은 몇 개든 공존할 수 있으므로, 활성 행을 내리는 이 경로는 구조적으로 충돌하지 않는다.
    *   행을 지우지 않고 이력을 남긴다.
    */
-  async removeRole(userId: string, role: string): Promise<boolean> {
-    const assignment = await this.repository.findOne({
+  async removeRole(userId: string, role: string, manager?: EntityManager): Promise<boolean> {
+    const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
+    const assignment = await repository.findOne({
       where: { userId, role, isActive: true },
     });
 
@@ -231,7 +235,7 @@ export class RoleAssignmentService {
     }
 
     assignment.deactivate();
-    await this.repository.save(assignment);
+    await repository.save(assignment);
     invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
 
     logger.info(

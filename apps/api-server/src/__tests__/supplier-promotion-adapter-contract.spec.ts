@@ -9,6 +9,7 @@
  *   5. Core(promotion/product-promotion*.ts) · store-web adapter · 컨트롤러 promote-master handler 불변
  */
 import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 import { SUPPLIER_CREATE_ALLOWED_TYPES } from '../modules/neture/promotion/adapters/supplier/supplier-promotion.policy.js';
 import {
@@ -21,7 +22,7 @@ import {
 } from '../modules/neture/promotion/adapters/supplier/supplier-candidate.normalizer.js';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 
 const ADAPTER_DIR = 'apps/api-server/src/modules/neture/promotion/adapters/supplier';
 const CONTROLLER = 'apps/api-server/src/modules/neture/controllers/product-candidate.controller.ts';

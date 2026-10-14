@@ -19,7 +19,8 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { OrganizationProductChannel } from '../../../modules/store-core/entities/organization-product-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
@@ -40,7 +41,7 @@ export function createStoreChannelProductsController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   /**
    * Validate channel belongs to org and is a product-manageable type.

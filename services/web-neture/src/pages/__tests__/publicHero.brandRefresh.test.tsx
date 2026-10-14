@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 const auth = vi.hoisted(() => ({ isAuthenticated: false }));
 const openLoginModal = vi.hoisted(() => vi.fn());
@@ -21,8 +21,14 @@ vi.mock('../../components/auth/ServiceApplyPanel', () => ({
 }));
 vi.mock('../../api/trial', () => ({ getTrials: vi.fn(async () => []), getMyParticipations: vi.fn(async () => []) }));
 
+vi.mock('../../lib/apiClient', () => ({ api: { get: vi.fn(async () => ({ data: { data: { communities: [
+  { communityKey: 'pharmacy', name: '약사 커뮤니티', kind: 'independent', allowed: false },
+  { communityKey: 'business', name: '사업 회원 게시판', kind: 'semi-franchise', allowed: true },
+] } } })) } }));
+
 import SupplierLandingPage from '../SupplierLandingPage';
 import CommunityHostHomePage from '../community/CommunityHostHomePage';
+import { getTrials } from '../../api/trial';
 import { MarketTrialHubPage } from '../market-trial/MarketTrialHubPage';
 
 const renderAt = (ui: ReactNode) => render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -56,23 +62,31 @@ describe('supplier `/`', () => {
 });
 
 describe('community `/`', () => {
-  it('확정 Hero 문구 · 주 CTA = 독립 약사 커뮤니티', () => {
+  it('서비스 소개 없이 독립 커뮤니티 목록으로 시작하고 사업 게시판을 섞지 않는다', async () => {
     renderAt(<CommunityHostHomePage />);
-    expect(h1Text()).toBe('현장의 경험과 정보를함께 나눕니다');
-    expect(screen.getByTestId('community-hero-primary').getAttribute('href')).toBe('/communities/pharmacy/forum');
+    expect(h1Text()).toBe('커뮤니티 · 단체활동');
+    expect((await screen.findByRole('link', { name: /약사 커뮤니티/ })).getAttribute('href')).toBe('/communities/pharmacy/forum');
+    expect(screen.queryByText('사업 회원 게시판')).toBeNull();
   });
 });
 
 describe('funding `/`', () => {
-  it('확정 Hero 문구 · 주 CTA = 이 화면의 모집 중 목록 · 보조 = 이용 방법', async () => {
+  it('비로그인은 목록 API 호출 전에 로그인으로 이동한다', async () => {
+    vi.mocked(getTrials).mockClear();
+    render(<MemoryRouter initialEntries={['/market-trial?status=recruiting']}><Routes>
+      <Route path="/market-trial" element={<MarketTrialHubPage />} />
+      <Route path="/login" element={<h1>로그인</h1>} />
+    </Routes></MemoryRouter>);
+    expect(await screen.findByRole('heading', { name: '로그인' })).toBeTruthy();
+    expect(getTrials).not.toHaveBeenCalled();
+  });
+
+  it('로그인 후 소개 배너 없이 모집 목록으로 진입한다', async () => {
+    auth.isAuthenticated = true;
     renderAt(<MarketTrialHubPage />);
-    expect(h1Text()).toBe('제품의 가능성을유통 참여로 연결합니다');
-    expect(screen.getByTestId('funding-hero-primary').getAttribute('href')).toBe('#market-trial-recruiting');
-    expect(document.getElementById('market-trial-recruiting')).not.toBeNull();
-    expect(screen.getByRole('link', { name: '이용 방법' }).getAttribute('href')).toBe('/guide/features/market-trial');
-    // 모집이 없으면 빈 상태를 그대로 보여준다 (가짜 콘텐츠 없음)
+    expect(h1Text()).toBe('유통참여형 펀딩');
+    expect(screen.queryByTestId('funding-hero-primary')).toBeNull();
+    expect(screen.queryByRole('link', { name: '이용 방법' })).toBeNull();
     expect(await screen.findByText('현재 모집 중인 유통참여형 펀딩이 없습니다')).toBeTruthy();
-    // 은퇴 서비스명 문구 없음
-    expect(document.body.textContent).not.toMatch(/K-Cosmetics|KPA-a/);
   });
 });

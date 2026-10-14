@@ -622,10 +622,24 @@ jobs:
       if: inputs.migrate_only != 'true'
       env:
         NETURE_PHARMACY_PAYMENT_MODE: ${{ vars.NETURE_PHARMACY_PAYMENT_MODE }}
+        KAKAO_REST_CLIENT_ID: ${{ vars.KAKAO_CLIENT_ID }}
+        KAKAO_SECRET_RESOURCE: ${{ vars.KAKAO_CLIENT_SECRET_NAME }}
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
 
         # optional env — 앞 step 이 NUL 구분 flag 목록을 만든다(생략된 이름은 목록에 없다).
+        # No raw Kakao secret enters GitHub: bind the existing Secret Manager resource.
+        # Partial configuration fails before deployment. Empty configuration keeps the provider disabled.
+        KAKAO_ENV=(--set-env-vars=KAKAO_CLIENT_ID=)
+        if [ -n "$KAKAO_REST_CLIENT_ID" ] || [ -n "$KAKAO_SECRET_RESOURCE" ]; then
+          [[ "$KAKAO_REST_CLIENT_ID" =~ ^[[:alnum:]_-]+$ ]] || { echo 'Invalid Kakao REST client configuration'; exit 1; }
+          [[ "$KAKAO_SECRET_RESOURCE" =~ ^[[:alnum:]_-]+$ ]] || { echo 'Invalid Kakao Secret Manager resource name'; exit 1; }
+          gcloud secrets describe "$KAKAO_SECRET_RESOURCE" --project=${{ env.PROJECT_ID }} --format='value(name)' >/dev/null
+          KAKAO_ENV=(
+            "--set-env-vars=KAKAO_CLIENT_ID=$KAKAO_REST_CLIENT_ID,KAKAO_REDIRECT_URI=https://api.neture.co.kr/api/v1/auth/social/kakao/callback"
+            "--update-secrets=KAKAO_CLIENT_SECRET=$KAKAO_SECRET_RESOURCE:latest"
+          )
+        fi
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
 
@@ -696,6 +710,7 @@ jobs:
           --set-env-vars="PRIVACY_RETENTION_MODE=apply" \
           --set-env-vars="GOOGLE_ALLOWED_CLIENT_IDS=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
+          "${KAKAO_ENV[@]}" \
           "${OPTIONAL_ENV[@]}" \
           "${PAYMENT_ENV[@]}" \
           "${ROLLOUT_ARGS[@]}" \

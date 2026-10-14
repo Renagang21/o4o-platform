@@ -1,3 +1,4 @@
+import { respondErasure, respondErasureCapabilities } from '../../services/privacy/account-erasure.http.js';
 /**
  * @core O4O_PLATFORM_CORE — Approval
  * Core Routes: GET /admin/users, PATCH /admin/users/:id/status
@@ -34,6 +35,7 @@ const ADMIN_ROLES = ['platform:super_admin'];
 // User management routes (platform admin only)
 router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);
 router.get('/statistics', requireRole(ADMIN_ROLES), adminUserController.getUserStatistics);
+router.get('/erasure-capabilities', requireRole(ADMIN_ROLES), respondErasureCapabilities);
 router.get('/:id', requireRole(ADMIN_ROLES), adminUserController.getUser);
 
 // User creation (admin only) — IR-O4O-ADMIN-OPERATOR-CREATE-SUPERADMIN-AUTH-FAILURE-V1
@@ -92,6 +94,10 @@ router.patch('/:id/status',
 
 // User deletion (admin only) — IR-O4O-ADMIN-OPERATOR-CREATE-SUPERADMIN-AUTH-FAILURE-V1
 router.delete('/:id', requireRole(ADMIN_ROLES), adminUserController.deleteUser);
+
+// Approved status/retry routes retain the same platform/Google authentication boundary.
+router.get('/erasure-operations/:operationId', requireRole(ADMIN_ROLES), (req, res) => respondErasure(req, res, 'get'));
+router.post('/erasure-operations/:operationId/retry', requireRole(ADMIN_ROLES), (req, res) => respondErasure(req, res, 'resume'));
 
 // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
 // 단일 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화

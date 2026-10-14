@@ -192,6 +192,10 @@ export interface MembersBulkActionConfig {
 // ─── Wrapper Props ───────────────────────────────────────────
 
 export interface OperatorMembersConsolePageProps {
+  /** Daily restriction/restoration, independent of sensitive deletion. */
+  canManageLifecycle?: boolean;
+  /** Membership deletion is separately restricted to service admin. */
+  canDeleteMembership?: boolean;
   /** Canonical service key (neture / k-cosmetics). */
   serviceKey: string;
   /** Service-side API client. */

@@ -24,6 +24,9 @@ import type { DataSource, EntityManager } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import {
   ACCEPTANCE_KIND_AGREEMENT,
+  ACCOUNT_POLICY_SERVICE_KEY,
+  isCommonAccountTermsDocument,
+  selectPendingPoliciesForRequest,
   REQUIRED_MEMBERSHIP_STATUSES,
   REQUIRED_POLICY_DOCUMENT_TYPE,
   computePendingPolicyAcceptances,
@@ -31,6 +34,10 @@ import {
   type PublishedTermsDocument,
 } from '../../common/auth/terms-acceptance.policy.js';
 import { demoAccountService } from '../../services/auth/demo-account.service.js';
+import { resolveSupplierForUser, hasSupplierRuntimeRelation } from '../neture/middleware/supplier-context.resolver.js';
+import { resolveSemiFranchiseServiceAccess } from '../neture-pharmacy/services/semi-franchise-service-access.js';
+import { PHARMACY_STORE_MEMBER_ROLES } from '../neture-pharmacy/constants.js';
+import { getService } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
 
 type Queryable = Pick<DataSource, 'query'> | Pick<EntityManager, 'query'>;
@@ -43,7 +50,6 @@ const MANDATORY_AGREEMENT_TYPES: ReadonlySet<string> = new Set([REQUIRED_POLICY_
 const STORE_OWNER_ROLE_BY_SERVICE: Readonly<Record<string, string>> = {
   'kpa-society': 'kpa:store_owner',
   'k-cosmetics': 'cosmetics:store_owner',
-  'pharmacy-hub': 'pharmacy-hub:store_owner',
 };
 
 /** 승낙 당시 본문 동일성 검증용 안정 hash (WO §5). 게시 도구 sha256 과 같은 입력(원문 그대로). */
@@ -69,6 +75,7 @@ interface PublishedRow {
   version: number;
   title: string;
   content: string;
+  slug?: string | null;
 }
 
 function toPublished(row: PublishedRow): PublishedTermsDocument {
@@ -79,12 +86,13 @@ function toPublished(row: PublishedRow): PublishedTermsDocument {
     version: Number(row.version),
     title: row.title,
     contentHash: computePolicyContentHash(row.content),
+    slug: row.slug,
   };
 }
 
 /** 서비스별 최신 published terms 1건 (public API 와 같은 정렬: published_at DESC, version DESC). */
 const PUBLISHED_TERMS_SQL = `
-  SELECT DISTINCT ON (service_key) id, service_key, document_type, version, title, content
+  SELECT DISTINCT ON (service_key) id, service_key, document_type, version, title, content, slug
   FROM service_policy_documents
   WHERE document_type = $1 AND status = 'published'
   ORDER BY service_key, published_at DESC NULLS LAST, version DESC`;
@@ -92,7 +100,7 @@ const PUBLISHED_TERMS_SQL = `
 export class PolicyAcceptanceService {
   private publishedCache: { at: number; docs: PublishedTermsDocument[] } | null = null;
   private readonly publishedAgreementCache = new Map<string, { at: number; docs: PublishedTermsDocument[] }>();
-  private readonly userOkCache = new Map<string, number>();
+  private readonly userOkCache = new Map<string, { at: number; policyKey: string }>();
 
   constructor(private readonly db: () => Queryable = () => AppDataSource) {}
 
@@ -105,6 +113,21 @@ export class PolicyAcceptanceService {
 
   invalidateUser(userId: string): void {
     this.userOkCache.delete(userId);
+  }
+
+  /** Supplier business eligibility uses the existing canonical resolver, independently of operator memberships. */
+  async isSupplierPolicySubject(userId: string, q: Queryable = this.db()): Promise<boolean> {
+    const resolution = await resolveSupplierForUser(q as DataSource, userId, null);
+    const eligible = (status: string) => status === 'ACTIVE' || status === 'PENDING';
+    if (resolution.kind === 'resolved') return eligible(resolution.status);
+    return resolution.kind === 'context_required' && resolution.candidates.some(candidate => eligible(candidate.status));
+  }
+
+  /** Reuse the catalog-backed service-access contract; pharmacy approval alone is not service enrollment. */
+  async isLedgerServicePolicySubject(userId: string, serviceKey: string, q: Queryable = this.db()): Promise<boolean> {
+    const accessKey = getService(serviceKey)?.semiFranchiseAccessKey;
+    if (!accessKey) return false;
+    return (await resolveSemiFranchiseServiceAccess(q, userId, accessKey)).allowed;
   }
 
   async listPublishedTerms(force = false): Promise<PublishedTermsDocument[]> {
@@ -219,6 +242,23 @@ export class PolicyAcceptanceService {
       }));
   }
 
+  private async hasDynamicPolicyRelation(userId: string, published: PublishedTermsDocument[], q: Queryable): Promise<boolean> {
+    const hasSupplierPolicy = published.some(d => d.serviceKey === 'supplier');
+    const hasPharmacyPolicy = published.some(d => !!getService(d.serviceKey)?.semiFranchiseAccessKey);
+    // Probe current relations, not approval status. A newly added relation invalidates the hot path immediately.
+    // Unrelated accounts retain the empty-result cache without repeated membership/access resolver queries.
+    const [supplierRelated, relationRows] = await Promise.all([
+      hasSupplierPolicy ? hasSupplierRuntimeRelation(q, userId) : false,
+      hasPharmacyPolicy ? q.query(
+      `SELECT /* policy_dynamic_relation */
+        EXISTS (SELECT 1 FROM organization_members om WHERE om.user_id = $1 AND om.left_at IS NULL
+          AND om.role = ANY($2::text[])) AS related`,
+      [userId, PHARMACY_STORE_MEMBER_ROLES],
+    ) as Promise<{ related: boolean }[]> : [],
+    ]);
+    return supplierRelated || relationRows.some(row => row.related);
+  }
+
   /**
    * **raw pending** — 약관 데이터 기준 미승낙 목록 (WO §15 · §16). published terms 0 → 즉시 [] (테이블 미조회).
    * 서비스 접근 강제에는 이것이 아니라 `getEnforcedPendingForUser` 를 쓴다 (Demo 예외 반영).
@@ -228,20 +268,30 @@ export class PolicyAcceptanceService {
     const published = await this.listPublishedTerms();
     if (published.length === 0) return [];
 
-    const okAt = this.userOkCache.get(userId);
-    if (okAt !== undefined && Date.now() - okAt < USER_OK_TTL_MS) return [];
-
     const q = this.db();
+    const hasSupplierPolicy = published.some(d => d.serviceKey === 'supplier');
+    const dynamicSubjects = await this.hasDynamicPolicyRelation(userId, published, q);
+    const policyKey = published.map(d => `${d.id}:${d.version}:${d.slug ?? ''}`).sort((a, b) => a.localeCompare(b)).join('|');
+    const cached = this.userOkCache.get(userId);
+    if (!dynamicSubjects && cached?.policyKey === policyKey && Date.now() - cached.at < USER_OK_TTL_MS) return [];
+
     const memberships = (await q.query(
       `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
       [userId],
     )) as { serviceKey: string; status: string }[];
-    const relevant = memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status));
-    if (relevant.length === 0) {
-      this.userOkCache.set(userId, Date.now());
-      return [];
+    const relevant = [
+      ...(published.some(isCommonAccountTermsDocument) ? [{ serviceKey: ACCOUNT_POLICY_SERVICE_KEY, status: 'active' }] : []),
+      ...memberships.filter((m) => REQUIRED_MEMBERSHIP_STATUSES.has(m.status)),
+    ];
+    if (dynamicSubjects && hasSupplierPolicy && !relevant.some(m => m.serviceKey === 'supplier')
+      && await this.isSupplierPolicySubject(userId, q)) {
+      relevant.push({ serviceKey: 'supplier', status: 'active' });
     }
-
+    for (const { serviceKey } of published) {
+      if (dynamicSubjects && !relevant.some(m => m.serviceKey === serviceKey) && await this.isLedgerServicePolicySubject(userId, serviceKey, q)) {
+        relevant.push({ serviceKey, status: 'active' });
+      }
+    }
     const requiredIds = published
       .filter((d) => relevant.some((m) => m.serviceKey === d.serviceKey))
       .map((d) => d.id);
@@ -256,7 +306,7 @@ export class PolicyAcceptanceService {
     }
 
     const pending = computePendingPolicyAcceptances(relevant, published, acceptedIds);
-    if (pending.length === 0) this.userOkCache.set(userId, Date.now());
+    if (pending.length === 0 && !dynamicSubjects) this.userOkCache.set(userId, { at: Date.now(), policyKey });
     return pending;
   }
 
@@ -266,14 +316,14 @@ export class PolicyAcceptanceService {
    * WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1 · 정본 `O4O-CANONICAL-DEMO-ACCOUNTS-V1` §8-2
    *
    *   raw pending      = `getPendingForUser` — 약관 데이터 기준 미승낙 (정책 상태 그대로)
-   *   enforced pending = raw pending 에서 Demo 예외만 뺀 것. 일반 사용자는 둘이 같다.
+   *   enforced pending = raw pending을 요청 서비스 범위로 제한하고 Demo 예외를 반영한다. 표식된 새 공통 약관만 모든 범위에 포함한다.
    *
    * 활성 Demo 계정(`demo_accounts.user_id`)은 실제 개인·계약 주체가 아닌 공유 체험 계정이라 약관 동의
    * 강제 대상이 아니다. acceptance 를 만들거나 raw 상태를 바꾸지 않는다 — 여기서만 []로 본다.
    * raw pending 이 없으면 Demo 조회도 하지 않는다. Demo 조회가 실패하면 예외를 열지 않고 raw 를 돌려준다.
    */
-  async getEnforcedPendingForUser(userId: string): Promise<PendingPolicyAcceptance[]> {
-    const pending = await this.getPendingForUser(userId);
+  async getEnforcedPendingForUser(userId: string, sessionServiceKey?: string | null, rawUrl?: string, method?: string): Promise<PendingPolicyAcceptance[]> {
+    const pending = selectPendingPoliciesForRequest(await this.getPendingForUser(userId), sessionServiceKey, rawUrl, method);
     if (pending.length === 0) return pending;
     try {
       if (await demoAccountService.isDemoAccount(userId, this.db())) return [];

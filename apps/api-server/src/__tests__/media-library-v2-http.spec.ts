@@ -67,3 +67,14 @@ describe('Media V2 HTTP authorization and validation', () => {
     expect(bad.body.code).toBe('INVALID_BODY');
   });
 });
+
+test.each(['pharmacy-hub',' pharmacy-hub '])('multipart retired scope %s is blocked after parsing, before storage writes', async serviceKey => {
+ const app = express();
+ app.use(express.json());
+ app.use(createMediaLibraryRouter({} as DataSource));
+ const result = await request(app).post('/media-library/upload').set('x-test-role','neture:operator')
+  .field('serviceKey',serviceKey).field('consent','true')
+  .attach('file',Buffer.from('test media'),{filename:'fixture.txt',contentType:'text/plain'});
+ expect(result.status).toBe(410);
+ expect(result.body.code).toBe('SERVICE_RETIRED');
+});

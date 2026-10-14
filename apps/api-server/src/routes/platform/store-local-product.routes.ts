@@ -6,7 +6,7 @@
  * WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1:
  *   검증·SQL 계약을 services/store/store-local-products.service.ts 로 추출하고
  *   이 라우트는 **인증·조직 결정 + 상태코드 매핑**만 담당한다.
- *   조직 결정은 종전 그대로 `resolveStoreAccess`(공통) — 변경하지 않았다.
+ *   기존 `resolveStoreAccess` 판정 후 명시 선택 조직 일치를 상품 어댑터에서 확인한다.
  *   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다
  *   (routes/pharmacy-hub — 라우트 복사 금지).
  *
@@ -43,7 +43,7 @@ import { DataSource } from 'typeorm';
 
 type AuthMiddleware = RequestHandler;
 import type { AuthRequest } from '../../types/auth.js';
-import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { resolveStoreProductAccess } from '../../utils/store-product-access.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 import type { StoreOwnerServiceKey } from '../../utils/store-organization.resolver.js';
 import {
@@ -114,7 +114,7 @@ export function createStoreLocalProductRoutes(
       return null;
     }
     const userRoles: string[] = authReq.user?.roles || [];
-    return await resolveStoreAccess(dataSource, userId, userRoles, serviceKey, readPreferredStoreOrganizationId(req));
+    return await resolveStoreProductAccess(dataSource, userId, userRoles, serviceKey, readPreferredStoreOrganizationId(req));
   }
 
   /**

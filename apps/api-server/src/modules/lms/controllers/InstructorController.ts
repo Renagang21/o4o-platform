@@ -1,3 +1,5 @@
+import { recordEnrollmentApplication, recordEnrollmentPolicies } from '../../policy-acceptance/service-enrollment-policy.service.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
@@ -64,14 +66,15 @@ export class InstructorController extends BaseController {
         return BaseController.unauthorized(res);
       }
 
-      const repo = AppDataSource.getRepository(InstructorApplication);
+      const saved = await AppDataSource.transaction(async manager => {
+      const repo = manager.getRepository(InstructorApplication);
 
       // 중복 신청 확인
       const existing = await repo.findOne({
         where: { userId, status: 'pending' },
       });
       if (existing) {
-        return BaseController.badRequest(res, '이미 대기 중인 강사 신청이 있습니다');
+        throw Object.assign(new Error('이미 대기 중인 강사 신청이 있습니다'), { httpStatus: 400 });
       }
 
       // 이미 승인된 경우 확인
@@ -79,11 +82,15 @@ export class InstructorController extends BaseController {
         where: { userId, status: 'approved' },
       });
       if (approved) {
-        return BaseController.badRequest(res, '이미 강사로 승인되었습니다');
+        throw Object.assign(new Error('이미 강사로 승인되었습니다'), { httpStatus: 400 });
       }
 
+      const policies = await recordEnrollmentPolicies(manager, userId, 'lecture', req.body?.policyReferences);
       const application = repo.create({ userId, status: 'pending' });
       const saved = await repo.save(application);
+      await recordEnrollmentApplication(manager, userId, 'lecture', { type: 'instructor_application', id: saved.id }, policies);
+      return saved;
+      });
 
       logger.info('[InstructorController] Instructor application created', {
         applicationId: saved.id,
@@ -92,6 +99,8 @@ export class InstructorController extends BaseController {
 
       return BaseController.created(res, { application: saved });
     } catch (error: any) {
+      if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
+      if (error.httpStatus === 400) return BaseController.badRequest(res, error.message);
       logger.error('[InstructorController.apply] Error', { error: error.message });
       return BaseController.error(res, error);
     }

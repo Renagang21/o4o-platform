@@ -86,7 +86,7 @@ export interface UserDetailConfig {
    * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
    *   이 콘솔이 대상으로 하는 canonical service_key.
    *   상태 변경 / 재활성화 write 에 함께 전달해 **해당 서비스 membership 에만**
-   *   조치가 적용되게 한다 (미지정 시 서버는 종전 동작 = 운영자 보유 scope 전체).
+   *   조치가 적용되게 한다. 다중 서비스 운영자·플랫폼 관리자의 쓰기는 명시 키가 필요하다.
    */
   serviceKey?: string;
   /**
@@ -136,6 +136,8 @@ export interface UserDetailPageProps {
   config: UserDetailConfig;
   /** 현재 사용자가 admin인지 여부 (서비스별 판단 로직이 다름) */
   isAdmin: boolean;
+  /** Daily member actions; deletion stays gated by isAdmin. */
+  canManageMembers?: boolean;
   /** 서비스별 커스텀 동작 */
   actions?: UserDetailActions;
   /** react-router useNavigate (호환성을 위해 외부 주입) */
@@ -146,6 +148,7 @@ export interface UserDetailPageProps {
 
 export interface EditUserModalProps {
   userId: string;
+  serviceKey?: string;
   apiAdapter: UserDetailApiAdapter;
   theme: 'primary' | 'blue';
   onClose: () => void;

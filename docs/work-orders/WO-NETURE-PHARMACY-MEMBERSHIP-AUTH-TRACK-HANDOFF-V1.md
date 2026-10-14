@@ -1,5 +1,7 @@
 # WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1
 
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-05 · **최종 갱신**: 2026-10-05
 > **근거 WO/IR**: [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) · 설계 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §13
@@ -15,7 +17,7 @@ Neture 약국 기본 가입(가입 원장 · 신청/승인 · role 발급 · 승
 | 대상 | 파일 / 객체 | 비고 |
 |---|---|---|
 | 가입 원장 | 테이블 `neture_pharmacy_memberships` (migration `CreateNeturePharmacyCommerce1791200000000`) | 컬럼: 약국명 · 사업자번호(진행 중 UNIQUE) · 약사 면허번호 · 상태 · 결정자/일시/사유 · `organization_id UNIQUE` |
-| 상태 전이 규칙 | `apps/api-server/src/modules/neture-pharmacy/constants.ts` `nextMembershipStatus` · `canReapply` · `MEMBERSHIP_ACTIONS` | 세미프랜차이즈 가입(Store 소유)도 같은 함수를 쓴다 — 바꿀 때 Store 트랙과 함께 |
+| 상태 전이 규칙 | `apps/api-server/src/modules/neture-pharmacy/constants.ts` `nextMembershipStatus` · `canReapply` · `MEMBERSHIP_ACTIONS` | 약국 협력사업 가입(Store 소유)도 같은 함수를 쓴다 — 바꿀 때 Store 트랙과 함께 |
 | 신청 · 재신청 · 목록 · 운영자 처리 | `.../services/pharmacy-membership.service.ts` | `apply` · `findMine` · `list` · `decide` |
 | 승인 orchestration · role | `.../services/pharmacy-store-provisioner.ts` | 활성: `service_memberships('neture')` ensure + role `neture:store_owner` → Store 계약 `activatePharmacyStore`. 정지 · 종료: role 회수 → `deactivatePharmacyStore` |
 | API | `.../neture-pharmacy.routes.ts` 의 `GET/POST /api/v1/neture/pharmacy/membership` · `GET /api/v1/neture/operator/pharmacy-memberships` · `POST .../:id/:action` | 라우트 파일 분리는 인계 후 자유 |
@@ -34,14 +36,14 @@ activatePharmacyStore(ds, {organizationId, pharmacyName})                  activ
 deactivatePharmacyStore(ds, organizationId)                                정지 · 종료 후
 ```
 
-- Store 는 원장의 `organization_id` · `status='active'` 만 읽는다(매장 판정 `store-organization.resolver.ts` `kpa` 후보 · 매장 목록 `service-tenant.resolver.ts` · 계약 게이트 · 커뮤니티 접근 · 세미프랜차이즈 승인 전제).
+- Store 는 원장의 `organization_id` · `status='active'` 만 읽는다(매장 판정 `store-organization.resolver.ts` `kpa` 후보 · 매장 목록 `service-tenant.resolver.ts` · 계약 게이트 · 커뮤니티 접근 · 약국 협력사업 승인 전제).
 - 판정 의미(active = 매장 이용 가능)를 바꾸려면 Store 트랙과 함께 바꾼다. 그 밖의 컬럼 · 입력 항목 · 화면은 인증 트랙이 바꿀 수 있다.
 
 ## 3. 불변식 (회귀 금지)
 
 1. 약국 1 = 원장 1 = 조직 1 = 내 매장 1. 사용자당 owner 약국 1개 · 진행 중 사업자번호 1건.
 2. 기존 kpa-society 가입 · `kpa_members` · `kpa_pharmacist_profiles` 를 자격 근거로 재해석하지 않는다(자동 전환 없음).
-3. 기본 가입 승인은 세미프랜차이즈 가입을 만들지 않는다.
+3. 기본 가입 승인은 약국 협력사업 가입을 만들지 않는다.
 4. 원장이 판정 SSOT — role 표식 동기화 실패가 판정을 바꾸지 않는다. `service_memberships('neture')` 는 공급자 축과 공유될 수 있어 정지 시 건드리지 않는다.
 5. 승인 · 정지는 서버 API 에서 판정한다(neture:operator).
 

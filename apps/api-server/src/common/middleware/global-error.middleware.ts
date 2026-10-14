@@ -1,3 +1,4 @@
+import { redactOAuthUrl } from '../../utils/security-log-redaction.js';
 /**
  * Global Error Handler Middleware
  *
@@ -44,7 +45,7 @@ export function globalErrorHandler(
     }
 
     logger.error('[GlobalErrorHandler]', {
-      path: req.originalUrl,
+      path: redactOAuthUrl(req.originalUrl),
       method: req.method,
       message: err?.message,
       stack: err?.stack,

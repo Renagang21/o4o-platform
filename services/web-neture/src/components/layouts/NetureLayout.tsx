@@ -12,6 +12,7 @@ import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
+import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 import { loadFooterLegal } from '../../lib/footerLegal';
 
 export default function NetureLayout() {
@@ -37,9 +38,9 @@ export default function NetureLayout() {
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-400">
               {/* WO-O4O-PUBLIC-FOOTER-LINK-GUARD-V1: dead link /about 제거 (route 없음, About 페이지 부재) */}
-              <Link to="/contact" className="hover:text-primary-600 transition-colors">
+              {CURRENT_HOST_PROFILE !== 'community' && <Link to="/contact" className="hover:text-primary-600 transition-colors">
                 Contact Us
-              </Link>
+              </Link>}
               {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
                   /terms · /privacy 는 route 가 존재한다(공통 PolicyDocumentViewer). 다른 서비스
                   푸터와 같은 축으로 노출한다 — route 있는 실기능을 숨기지 않는다. */}

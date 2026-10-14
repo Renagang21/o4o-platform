@@ -1,3 +1,8 @@
+import { useChannelProductPicker } from './hooks/useChannelProductPicker';
+import { useChannelProductActions } from './hooks/useChannelProductActions';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { ChannelPublicUrlCard } from './channels/ChannelPublicUrlCard';
+import { useChannelWorkspace } from './hooks/useChannelWorkspace';
 /**
  * StoreChannelsPage — 채널 중심 진열 실행 콘솔
  *
@@ -47,21 +52,12 @@ import {
   Package,
   ChevronUp,
   ChevronDown,
-  ExternalLink,
   MoreVertical,
   Trash2,
-  Copy,
-  Link2,
   AlertCircle,
-  Pencil,
-  Save,
 } from 'lucide-react';
 import {
-  fetchChannelOverviewWithCode,
   // WO-O4O-STORE-SLUG-EDITABLE-V1
-  fetchStoreSlugStatus,
-  updateStoreSlug,
-  type ChannelOverview,
   type ChannelType,
   type ChannelStatus,
 } from '../../api/storeHub';
@@ -71,18 +67,6 @@ import {
   type AssetPublishStatus,
   type ChannelMap,
 } from '../../api/assetSnapshot';
-import {
-  fetchChannelProducts,
-  fetchAvailableProducts,
-  addProductToChannel,
-  deactivateChannelProduct,
-  activateChannelProduct,
-  bulkChannelProductAction,
-  reorderChannelProducts,
-  type ChannelProduct,
-  type AvailableProduct,
-} from '../../api/channelProducts';
-import { fetchChannelOverview } from '../../api/storeHub';
 import { GuideEditableSection } from '../../components/guide';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -144,45 +128,96 @@ function isForcedActive(item: StoreAssetItem): boolean {
 
 /* ─── AddProductModal ────────────────────────── */
 
-function AddProductModal({
+export function AddProductModal({
   open,
   onError,
   onClose,
   channelId,
+  organizationId,
   onProductAdded,
 }: {
   open: boolean;
   onClose: () => void;
   channelId: string;
+  organizationId: string;
   onProductAdded: () => void;
   onError?: (message: string) => void;
 }) {
-  const [available, setAvailable] = useState<AvailableProduct[]>([]);
-  const [loadingList, setLoadingList] = useState(false);
-  const [addingId, setAddingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!open || !channelId) return;
-    setLoadingList(true);
-    fetchAvailableProducts(channelId)
-      .then(setAvailable)
-      .catch(() => setAvailable([]))
-      .finally(() => setLoadingList(false));
-  }, [open, channelId]);
-
+  const { available, loadingList, loadError, addingId, add: handleAdd, retry } =
+    useChannelProductPicker(open, organizationId, channelId, onProductAdded, onError);
   if (!open) return null;
 
-  const handleAdd = async (productListingId: string) => {
-    setAddingId(productListingId);
-    try {
-      await addProductToChannel(channelId, productListingId);
-      setAvailable(prev => prev.filter(p => p.id !== productListingId));
-      onProductAdded();
-    } catch {
-      onError?.('제품 추가에 실패했습니다.');
-    } finally {
-      setAddingId(null);
-    }
+  const renderProductChoices = () => {
+    if (loadingList)
+      return (
+        <div className="flex items-center justify-center py-12 text-slate-400">
+          <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
+        </div>
+      );
+    if (loadError)
+      return (
+        <div role="alert" className="p-4 text-red-700">
+          <p>{loadError}</p>
+          <button type="button" onClick={retry}>
+            다시 시도
+          </button>
+        </div>
+      );
+    if (available.length === 0)
+      return (
+        <div className="text-center py-10">
+          <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+          <p className="text-sm font-medium text-slate-600">
+            추가할 수 있는 상품이 없습니다
+          </p>
+          <p className="text-xs mt-2 text-slate-400 leading-relaxed">
+            모든 상품이 이미 추가되었거나,
+            <br />
+            HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
+          </p>
+          <Link
+            to={pharmacyStorePath("supply")}
+            onClick={onClose}
+            className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
+          >
+            상품 보러가기 →
+          </Link>
+        </div>
+      );
+    return (
+      <div className="space-y-2">
+        {available.map((product) => (
+          <div
+            key={product.id}
+            className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm text-slate-900 truncate">
+                {product.productName}
+              </div>
+              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                <span className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
+                  {product.serviceKey}
+                </span>
+                <span>{formatPrice(product.retailPrice)}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleAdd(product.id)}
+              disabled={addingId === product.id}
+              className="ml-3 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+            >
+              {addingId === product.id ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Plus className="w-3 h-3" />
+              )}
+              추가
+            </button>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -205,60 +240,7 @@ function AddProductModal({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          {loadingList ? (
-            <div className="flex items-center justify-center py-12 text-slate-400">
-              <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
-            </div>
-          ) : available.length === 0 ? (
-            <div className="text-center py-10">
-              <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
-              <p className="text-sm font-medium text-slate-600">추가할 수 있는 상품이 없습니다</p>
-              <p className="text-xs mt-2 text-slate-400 leading-relaxed">
-                모든 상품이 이미 추가되었거나,<br />
-                HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
-              </p>
-              <Link
-                to={pharmacyStorePath('supply')}
-                onClick={onClose}
-                className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
-              >
-                상품 보러가기 →
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {available.map(product => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-slate-900 truncate">
-                      {product.productName}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                      <span className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
-                        {product.serviceKey}
-                      </span>
-                      <span>{formatPrice(product.retailPrice)}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleAdd(product.id)}
-                    disabled={addingId === product.id}
-                    className="ml-3 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
-                  >
-                    {addingId === product.id ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Plus className="w-3 h-3" />
-                    )}
-                    추가
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          {renderProductChoices()}
         </div>
 
         {/* Footer */}
@@ -277,243 +259,10 @@ function AddProductModal({
 
 /* ─── ChannelPublicUrlCard (WO-O4O-STORE-CHANNEL-PUBLIC-URL-GUIDE-V1) ── */
 
-function ChannelPublicUrlCard({
-  channelType,
-  orgCode,
-  showToast,
-  // WO-O4O-STORE-SLUG-EDITABLE-V1
-  canChangeSlug,
-  onSlugChanged,
-}: {
-  channelType: ChannelType;
-  orgCode: string | null;
-  showToast: (type: 'success' | 'error', message: string) => void;
-  canChangeSlug: boolean;
-  onSlugChanged: (newSlug: string) => void;
-}) {
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  // WO-O4O-STORE-SLUG-EDITABLE-V1: edit mode state
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  const startEdit = () => {
-    if (!orgCode || !canChangeSlug) return;
-    setDraft(orgCode);
-    setEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setEditing(false);
-    setDraft('');
-  };
-
-  const submitEdit = async () => {
-    const next = draft.trim();
-    if (!next) {
-      showToast('error', '주소를 입력해주세요.');
-      return;
-    }
-    if (orgCode && next === orgCode) {
-      cancelEdit();
-      return;
-    }
-    setSaving(true);
-    try {
-      const result = await updateStoreSlug(next);
-      onSlugChanged(result.slug);
-      showToast('success', '주소가 변경되었습니다. 기존 주소는 자동으로 새 주소로 이동합니다.');
-      setEditing(false);
-      setDraft('');
-    } catch (err: any) {
-      const code = err?.code as string | undefined;
-      const msg =
-        code === 'SLUG_RESERVED' ? '사용할 수 없는 주소입니다.'
-        : code === 'SLUG_DUPLICATE' ? '이미 사용 중인 주소입니다.'
-        : code === 'SLUG_INVALID' ? '잘못된 주소 형식입니다. (3~120자, 소문자·숫자·한글·하이픈만 허용)'
-        : code === 'SLUG_ALREADY_CHANGED' ? '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.'
-        : err?.message || '주소 변경에 실패했습니다.';
-      showToast('error', msg);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Determine URL and guidance per channel type
-  const getChannelUrl = (): { url: string | null; label: string; guidance: string | null; guidanceLink: string | null } => {
-    if (channelType === 'B2C') {
-      // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
-      //   자체몰 홈(/store/:slug) route 는 은퇴했다. 다만 slug 자체는 QR(/qr/:slug) ·
-      //   태블릿(/tablet/:slug) · 매장 블로그(/store/:slug/blog) 공용 식별자이므로
-      //   주소 표시·변경 UI 는 유지하고, 열기/복사 대상만 살아 있는 매장 블로그로 옮긴다.
-      if (!orgCode) return { url: null, label: '매장 공개', guidance: null, guidanceLink: null };
-      return { url: `${origin}/store/${orgCode}/blog`, label: '매장 공개', guidance: null, guidanceLink: null };
-    }
-    if (channelType === 'TABLET') {
-      if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
-      return { url: `${origin}/tablet/${orgCode}`, label: '태블릿 상품 안내', guidance: null, guidanceLink: null };
-    }
-    // KIOSK (보류) — WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1
-    return {
-      url: null,
-      label: '키오스크',
-      guidance: '키오스크는 업체 협의 후 제공 예정입니다. 현재는 채널 등록·상태 확인만 가능합니다.',
-      guidanceLink: null,
-    };
-  };
-
-  const { url, label, guidance, guidanceLink } = getChannelUrl();
-
-  const handleCopy = async () => {
-    if (!url) return;
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast('success', '공개 주소가 클립보드에 복사되었습니다.');
-    } catch {
-      showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
-    }
-  };
-
-  // No slug case for B2C/TABLET
-  if ((channelType === 'B2C' || channelType === 'TABLET') && !orgCode) {
-    return (
-      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-amber-200 bg-amber-50">
-        <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-amber-800">공개 주소가 아직 설정되지 않았습니다</p>
-          <p className="text-xs text-amber-600 mt-0.5">약국 정보에서 약국 코드를 등록하면 공개 URL이 생성됩니다.</p>
-        </div>
-        <Link
-          to="/store/info"
-          className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100"
-        >
-          설정으로 이동
-        </Link>
-      </div>
-    );
-  }
-
-  // KIOSK guidance (보류 안내)
-  if (guidance) {
-    return (
-      <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-slate-50">
-        <Link2 className="w-5 h-5 text-slate-400 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-slate-600">{guidance}</p>
-        </div>
-        {guidanceLink && (
-          <Link
-            to={guidanceLink}
-            className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50"
-          >
-            이동 <ExternalLink className="w-3 h-3" />
-          </Link>
-        )}
-      </div>
-    );
-  }
-
-  // B2C / TABLET with valid URL — WO-O4O-STORE-SLUG-EDITABLE-V1: editable mode
-  return (
-    <div className="flex items-center gap-3 p-4 mb-6 rounded-lg border border-slate-200 bg-white">
-      <Link2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
-      <div className="flex-1 min-w-0">
-        <div className="text-xs text-slate-500 mb-1 flex items-center gap-2">
-          <span>{label} 공개 주소</span>
-          {!canChangeSlug && (
-            <span
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500"
-              title="이 매장은 이미 주소가 변경된 적이 있어 추가 변경이 제한됩니다."
-            >
-              <Lock className="w-2.5 h-2.5" /> 변경 제한
-            </span>
-          )}
-        </div>
-        {editing ? (
-          <div className="flex items-center gap-1.5">
-            <span className="text-[14px] font-mono text-slate-500 truncate">{origin}/store/</span>
-            <input
-              type="text"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              disabled={saving}
-              autoFocus
-              spellCheck={false}
-              className="flex-1 min-w-0 px-2 py-1 text-[14px] font-mono font-medium text-slate-900 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder="새 주소 (영문 소문자/숫자/한글/하이픈)"
-            />
-          </div>
-        ) : (
-          <div className="text-[15px] font-mono font-medium text-slate-900 truncate">{url}</div>
-        )}
-        <div className="text-xs text-slate-400 mt-1">
-          {editing
-            ? '저장 후 기존 주소는 자동으로 새 주소로 이동합니다 (1회 변경 가능)'
-            : '이 주소(약국 코드)는 QR·태블릿·매장 블로그가 함께 사용합니다'}
-        </div>
-      </div>
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        {editing ? (
-          <>
-            <button
-              type="button"
-              onClick={cancelEdit}
-              disabled={saving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 disabled:opacity-50"
-            >
-              취소
-            </button>
-            <button
-              type="button"
-              onClick={submitEdit}
-              disabled={saving || draft.trim().length === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              저장
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={startEdit}
-              disabled={!canChangeSlug}
-              title={canChangeSlug ? '주소(slug) 변경 — 기존 주소는 자동으로 새 주소로 redirect 됩니다.' : '이 매장은 이미 주소가 변경되어 추가 변경이 제한됩니다.'}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border ${
-                canChangeSlug
-                  ? 'text-slate-700 bg-white border-slate-300 hover:bg-slate-50'
-                  : 'text-slate-400 bg-slate-50 border-slate-200 cursor-not-allowed'
-              }`}
-            >
-              <Pencil className="w-3.5 h-3.5" /> 주소 변경
-            </button>
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200"
-              title="주소 복사"
-            >
-              <Copy className="w-3.5 h-3.5" /> 복사
-            </button>
-            <a
-              href={url!}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-              title="새 탭에서 열기"
-            >
-              <ExternalLink className="w-3.5 h-3.5" /> 열기
-            </a>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreChannelsPage({ section }: { section?: 'settings' | 'products' } = {}) {
+  const { organizationId } = useStoreOrganizationId();
   const navigate = useNavigate();
   // WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1:
   //   section 지정(온라인 판매 모드) 시 B2C(온라인 스토어) 전용 — 탭 바/KIOSK 미노출.
@@ -527,9 +276,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const showSettings = section !== 'products'; // settings 또는 legacy
   const showProducts = section !== 'settings'; // products 또는 legacy
   const [activeTab, setActiveTab] = useState<ChannelType>('B2C');
-  const [channels, setChannels] = useState<ChannelOverview[]>([]);
-  const [assets, setAssets] = useState<StoreAssetItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
@@ -559,63 +305,42 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   }, []);
 
   // Product management state (WO-CHANNEL-EXECUTION-CONSOLE-V1)
-  const [channelProducts, setChannelProducts] = useState<ChannelProduct[]>([]);
-  const [availableProducts, setAvailableProducts] = useState<AvailableProduct[]>([]);
-  const [productLoading, setProductLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   // deactivatingId removed — replaced by actionLoading + confirmModal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1)
-  const [reordering, setReordering] = useState(false);
-  const [orgCode, setOrgCode] = useState<string | null>(null);
 
   // WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [confirmModal, setConfirmModal] = useState<{
-    type: 'delete' | 'deactivate' | 'activate';
-    ids: string[];
-    isBulk: boolean;
-  } | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
-
-  // WO-O4O-STORE-SLUG-EDITABLE-V1: slug change capability flag
-  const [canChangeSlug, setCanChangeSlug] = useState(false);
 
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
   const showToast = useCallback((type: 'success' | 'error', message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
   }, []);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    const results = await Promise.allSettled([
-      fetchChannelOverviewWithCode().catch(() => ({ channels: [] as ChannelOverview[], organizationCode: null })),
-      storeAssetControlApi.list({ limit: 200 }).then(r => r.data.items).catch(() => [] as StoreAssetItem[]),
-      // WO-O4O-STORE-SLUG-EDITABLE-V1: slug status (graceful degradation)
-      fetchStoreSlugStatus().catch(() => ({ slug: null, isActive: false, canChange: false })),
-    ]);
-    const chResult = results[0].status === 'fulfilled'
-      ? results[0].value as { channels: ChannelOverview[]; organizationCode: string | null }
-      : { channels: [], organizationCode: null };
-    setChannels(chResult.channels);
-    setOrgCode(chResult.organizationCode);
-    setAssets(results[1].status === 'fulfilled' ? results[1].value as StoreAssetItem[] : []);
-    if (results[2].status === 'fulfilled') {
-      setCanChangeSlug(results[2].value.canChange);
-    }
-    setLastFetched(new Date());
-    setLoading(false);
-
-    // WO-STORE-CHANNEL-BETA-READINESS-V1: error feedback
-    if (chResult.channels.length === 0 && results[0].status === 'rejected') {
-      showToast('error', '채널 정보를 불러오지 못했습니다.');
-    }
-  }, [showToast]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const {
+    channels,
+    assets,
+    setAssets,
+    loading,
+    loadError,
+    channelProducts,
+    setChannelProducts,
+    availableProducts,
+    setAvailableProducts,
+    productLoading,
+    productError,
+    orgCode,
+    setOrgCode,
+    canChangeSlug,
+    setCanChangeSlug,
+    lastFetched,
+    fetchData,
+    refreshOverview,
+    loadChannelProducts,
+    cancelChannelProducts,
+  } = useChannelWorkspace(showSettings, showToast, organizationId);
 
   // Current channel info
   const currentChannel = channels.find(ch => ch.channelType === activeTab);
@@ -624,26 +349,10 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const isProductChannel = PRODUCT_CHANNEL_TYPES.includes(activeTab);
 
   // Fetch channel products when tab changes
-  const loadChannelProducts = useCallback(async (channelId: string) => {
-    setProductLoading(true);
-    try {
-      const [products, available] = await Promise.all([
-        fetchChannelProducts(channelId),
-        fetchAvailableProducts(channelId),
-      ]);
-      setChannelProducts(products);
-      setAvailableProducts(available);
-    } catch {
-      setChannelProducts([]);
-      setAvailableProducts([]);
-      showToast('error', '제품 목록을 불러오지 못했습니다.');
-    } finally {
-      setProductLoading(false);
-    }
-  }, [showToast]);
-
   useEffect(() => {
-    setSelectedIds(new Set());
+    cancelChannelProducts();
+    setChannelProducts([]); setAvailableProducts([]);
+    setShowAddModal(false);
     setActionMenuId(null);
     if (isProductChannel && currentChannel?.id) {
       loadChannelProducts(currentChannel.id);
@@ -651,7 +360,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       setChannelProducts([]);
       setAvailableProducts([]);
     }
-  }, [isProductChannel, currentChannel?.id, loadChannelProducts]);
+  }, [isProductChannel, currentChannel?.id, organizationId, loadChannelProducts, cancelChannelProducts, setChannelProducts, setAvailableProducts]);
 
   // Active products for display
   const activeProducts = useMemo(
@@ -716,36 +425,19 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const handleProductAdded = () => {
     if (currentChannel) {
       loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
+      void refreshOverview();
       showToast('success', '제품이 채널에 추가되었습니다.');
     }
   };
 
-  // Reorder handler (Phase 2)
-  const handleMoveProduct = async (productId: string, direction: 'up' | 'down') => {
-    if (!currentChannel) return;
-    const idx = activeProducts.findIndex(p => p.id === productId);
-    if (idx < 0) return;
-    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= activeProducts.length) return;
-
-    // Optimistic UI swap
-    const updated = [...activeProducts];
-    [updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]];
-
-    // Build reorder items with new display_order
-    const items = updated.map((p, i) => ({ id: p.id, displayOrder: i }));
-
-    setReordering(true);
-    try {
-      await reorderChannelProducts(currentChannel.id, items);
-      await loadChannelProducts(currentChannel.id);
-    } catch {
-      showToast('error', '순서 변경에 실패했습니다.');
-      await loadChannelProducts(currentChannel.id);
-    } finally {
-      setReordering(false);
-    }
+  const {
+    selectedIds, setSelectedIds, confirmModal, setConfirmModal, actionLoading, reordering,
+    handleMoveProduct, handleSingleAction: runSingleAction, handleBulkAction, handleConfirmAction,
+  } = useChannelProductActions({ organizationId, channelId: currentChannel?.id, activeProducts,
+    refreshProducts: loadChannelProducts, refreshOverview, showToast });
+  const handleSingleAction = (type: 'activate' | 'deactivate' | 'delete', id: string) => {
+    setActionMenuId(null);
+    return runSingleAction(type, id);
   };
 
   // ─── Selection helpers ───
@@ -769,67 +461,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
     }
   };
 
-  // ─── Single row action handler ───
-  const handleSingleAction = async (type: 'activate' | 'deactivate' | 'delete', productChannelId: string) => {
-    if (!currentChannel) return;
-    setActionMenuId(null);
-    if (type === 'delete') {
-      setConfirmModal({ type: 'delete', ids: [productChannelId], isBulk: false });
-      return;
-    }
-    setActionLoading(true);
-    try {
-      if (type === 'deactivate') {
-        await deactivateChannelProduct(currentChannel.id, productChannelId);
-        showToast('success', '제품이 비활성화되었습니다.');
-      } else {
-        await activateChannelProduct(currentChannel.id, productChannelId);
-        showToast('success', '제품이 활성화되었습니다.');
-      }
-      await loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
-      setSelectedIds(prev => { const n = new Set(prev); n.delete(productChannelId); return n; });
-    } catch {
-      showToast('error', type === 'deactivate' ? '비활성화에 실패했습니다.' : '활성화에 실패했습니다.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // ─── Bulk action handler ───
-  const handleBulkAction = (type: 'activate' | 'deactivate' | 'delete') => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-    if (type === 'delete') {
-      setConfirmModal({ type: 'delete', ids, isBulk: true });
-    } else {
-      setConfirmModal({ type, ids, isBulk: true });
-    }
-  };
-
-  // ─── Confirm modal execute ───
-  const handleConfirmAction = async () => {
-    if (!confirmModal || !currentChannel) return;
-    setActionLoading(true);
-    try {
-      const result = await bulkChannelProductAction(currentChannel.id, confirmModal.type, confirmModal.ids);
-      const labels = { delete: '삭제', deactivate: '비활성화', activate: '활성화' };
-      if (result.requested === result.processed) {
-        showToast('success', `${result.processed}개 제품이 ${labels[confirmModal.type]}되었습니다.`);
-      } else {
-        showToast('error', `${result.requested}개 중 ${result.processed}개 처리 완료 (일부 실패)`);
-      }
-      await loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
-      setSelectedIds(new Set());
-    } catch {
-      showToast('error', '작업에 실패했습니다.');
-    } finally {
-      setActionLoading(false);
-      setConfirmModal(null);
-    }
-  };
-
   // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
   //   KPA 자체몰(B2C) 종료 — 신규 채널 활성화 UI 제거. 백엔드도 kpa serviceKey 에서 B2C 생성을 차단한다.
   //   기존 B2C row 는 역사 데이터로 보존하며, 진열/노출 관리 화면은 그대로 동작한다.
@@ -840,6 +471,14 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
         <Loader2 className="w-5 h-5 animate-spin mr-2" /> 채널 정보를 불러오는 중...
       </div>
     );
+  }
+
+  if (loadError) {
+    return <div role="alert" className="max-w-7xl mx-auto px-6 py-8 text-red-700">
+      <h1 className="text-2xl font-bold mb-4">{pageTitle}</h1>
+      <p>{loadError}</p>
+      <button type="button" onClick={() => void fetchData()}>다시 시도</button>
+    </div>;
   }
 
   if (!loading && channels.length === 0) {
@@ -865,6 +504,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {productError && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{productError}<button type="button" className="ml-3 underline" onClick={() => currentChannel && loadChannelProducts(currentChannel.id)}>다시 시도</button></div>}
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -1016,7 +656,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
 
       {/* ─── 상태 기반 행동 유도 (WO-O4O-CHANNEL-UX-STEP2-STATE-DRIVEN-V1) ─── */}
       {/* WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: KIOSK 보류 시 행동 유도 숨김 */}
-      {showProducts && isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
+      {showProducts && !productError && isProductChannel && activeTab !== 'KIOSK' && currentChannel?.status === 'APPROVED' && !productLoading && (() => {
         if (channelProducts.length > 0) {
           return (
             <div className="flex items-start gap-4 p-5 mb-6 rounded-xl border border-green-200 bg-green-50">
@@ -1112,7 +752,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       )}
 
       {/* ─── [D] Channel Product List (products 전용) ─── */}
-      {showProducts && isProductChannel && (
+      {showProducts && !productError && isProductChannel && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-700">진열 제품</h2>
@@ -1458,6 +1098,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
           open={showAddModal}
           onClose={() => setShowAddModal(false)}
           channelId={currentChannel.id}
+          organizationId={organizationId}
           onProductAdded={handleProductAdded}
           onError={(msg) => showToast('error', msg)}
         />

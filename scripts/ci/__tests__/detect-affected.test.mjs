@@ -899,7 +899,7 @@ test('W4. auth-client 변경 → 소비 서비스 전부 · 그래도 "9개 하�
   assert.deepEqual(onOf(v), expected);
   // hospital-pharmacy 는 무로그인 V1 로 auth 의존이 없다(WO-O4O-HOSPITAL-PHARMACY-V1-FIXED-LOCAL-FILE-AND-LOGINLESS-SIMPLIFICATION).
   // k-cosmetics 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1)로 web target 7 → 하한 6.
-  assert.ok(expected.length >= 6, 'auth 계열은 실제로 거의 전 서비스가 쓴다');
+  assert.ok(expected.length >= 5, 'auth-client는 활성 서비스의 의존성 그래프에 따라 배포한다');
   assert.ok(!expected.includes('hospital-pharmacy'), 'hospital-pharmacy 는 auth-client 를 소비하지 않는다');
   assert.equal(v.fallback, false, '넓은 판정이어도 fallback 이 아니라 graph 결과다');
 });

@@ -1,8 +1,8 @@
 /**
- * AdminSemiFranchisePage — 세미프랜차이즈 관리 (/admin/semi-franchises)
+ * AdminSemiFranchisePage — 약국 협력사업 관리 (/admin/semi-franchises)
  *
  * WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 · DESIGN §3-2
- *   세미프랜차이즈 = 데이터 행. 생성(행 + 운영 조직) · 이름/상태/커뮤니티 연결 수정 · 담당 운영자 지정/해제.
+ *   약국 협력사업 = 데이터 행. 생성(행 + 운영 조직) · 이름/상태/커뮤니티 연결 수정 · 담당 운영자 지정/해제.
  *   담당 지정은 이미 Neture 운영자 role 을 가진 사용자만(API 판정).
  *   결제 수취 주체 키는 사업 결정(D1) 전이라 미정 — 화면이 값을 미리 채우지 않는다.
  */
@@ -70,7 +70,7 @@ export default function AdminSemiFranchisePage() {
           communityKey: createForm.communityKey.trim() || undefined,
           registrationConditions: createForm.registrationConditions.trim(),
         }),
-      '세미프랜차이즈를 만들었습니다.',
+      '약국 협력사업을 만들었습니다.',
     );
     if (ok) setCreateForm({ key: '', name: '', communityKey: '', registrationConditions: '' });
   };
@@ -116,14 +116,14 @@ export default function AdminSemiFranchisePage() {
   return (
     <div className="space-y-6 p-6">
       <PageHeader
-        title="세미프랜차이즈 관리"
-        description="세미프랜차이즈를 만들고, 담당 운영자를 지정합니다. 담당 운영자는 Neture 운영자 역할이 있는 사용자만 지정할 수 있습니다."
+        title="약국 협력사업 관리"
+        description="약국 협력사업을 만들고, 담당 운영자를 지정합니다. 담당 운영자는 Neture 운영자 역할이 있는 사용자만 지정할 수 있습니다."
       />
 
       <Message message={message} />
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">
-        <h2 className="mb-3 text-base font-semibold text-gray-900">새 세미프랜차이즈</h2>
+        <h2 className="mb-3 text-base font-semibold text-gray-900">새 약국 협력사업</h2>
         <div className="grid gap-3 md:grid-cols-4">
           <input
             className={INPUT}
@@ -157,13 +157,13 @@ export default function AdminSemiFranchisePage() {
 
       <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
         결제 수취 주체(실제 수취인 · PG 연동)는 아직 정해지지 않았습니다. 수취 주체 키는 사업 결정이 내려진 뒤에만 입력하세요.
-        비어 있으면 세미프랜차이즈별 &lsquo;미정&rsquo;으로 따로 묶이고, 결제는 테스트 결제로만 처리됩니다.
+        비어 있으면 약국 협력사업별 &lsquo;미정&rsquo;으로 따로 묶이고, 결제는 테스트 결제로만 처리됩니다.
       </div>
 
       {loading ? (
         <div className="text-sm text-gray-500">불러오는 중...</div>
       ) : items.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">세미프랜차이즈가 없습니다.</div>
+        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">약국 협력사업이 없습니다.</div>
       ) : (
         <div className="space-y-4">
           {items.map((sf) => (

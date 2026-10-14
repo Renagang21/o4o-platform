@@ -13,16 +13,19 @@
  * - 거절 시 사유 입력 모달
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   operatorServiceApprovalApi,
   type ServiceApprovalItem,
-  type ServiceApprovalStats,
-  type ApprovalAnalytics,
 } from '../../lib/api/serviceApproval';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { useAuth } from '../../contexts/AuthContext';
+import { useProductServiceApprovalQuery } from './useProductServiceApprovalQuery';
+import { getServiceApprovalDecisionOutcome, type ServiceApprovalDecision, type ServiceApprovalDecisionOutcome } from './serviceApprovalDecisionResult';
+import { ProductServiceApprovalDrawer } from './ProductServiceApprovalDrawer';
+import { ProductServiceApprovalDecisionModal } from './ProductServiceApprovalDecisionModal';
+import { STATUS_BADGE, getRegulatoryBadge, getCompletenessBadge, hasPermitRisk, formatPrice, getQualityFlags, getRecommendation } from './productServiceApprovalPresentation';
 
 // ==================== Constants ====================
 
@@ -39,66 +42,6 @@ const SERVICE_OPTIONS = [
   { key: 'kpa-society', label: 'KPA Society' },
 ];
 
-const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> = {
-  pending: { label: '승인대기', bg: 'bg-amber-50', text: 'text-amber-700' },
-  approved: { label: '승인됨', bg: 'bg-green-50', text: 'text-green-700' },
-  rejected: { label: '거절됨', bg: 'bg-red-50', text: 'text-red-700' },
-};
-
-// ==================== Helpers ====================
-
-function getRegulatoryBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
-  const rt = item.regulatoryType;
-  if (!rt || rt === 'GENERAL') return { label: '일반', bg: 'bg-slate-50', text: 'text-slate-500' };
-  if (!item.mfdsPermitNumber) return { label: '⚠ 허가없음', bg: 'bg-red-50', text: 'text-red-700' };
-  if (item.isMfdsVerified) return { label: '검증됨', bg: 'bg-green-50', text: 'text-green-700' };
-  return { label: '미검증', bg: 'bg-amber-50', text: 'text-amber-700' };
-}
-
-function getCompletenessBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
-  if (item.offerApprovalStatus === 'approved') return { label: 'APPROVED', bg: 'bg-green-50', text: 'text-green-700' };
-  const score = item.completenessScore || 0;
-  if (score >= 60) return { label: 'READY', bg: 'bg-blue-50', text: 'text-blue-700' };
-  if (score > 0) return { label: 'INCOMPLETE', bg: 'bg-amber-50', text: 'text-amber-700' };
-  return { label: 'DRAFT', bg: 'bg-slate-50', text: 'text-slate-500' };
-}
-
-function hasPermitRisk(item: ServiceApprovalItem): boolean {
-  const rt = item.regulatoryType;
-  return !!rt && rt !== 'GENERAL' && !item.mfdsPermitNumber;
-}
-
-function formatPrice(price: number | null): string {
-  if (price == null) return '-';
-  return `₩${price.toLocaleString('ko-KR')}`;
-}
-
-// WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: 품질 판단 헬퍼
-
-function getQualityFlags(item: ServiceApprovalItem): string[] {
-  const flags: string[] = [];
-  if (!item.imageUrl) flags.push('이미지 없음');
-  if (!item.priceGeneral || item.priceGeneral <= 0) flags.push('가격 미설정');
-  if (!item.hasShortDescription) flags.push('간단 설명 없음');
-  if (!item.hasDetailDescription) flags.push('상세 설명 없음');
-  if (!item.distributionType) flags.push('유통 타입 미설정');
-  return flags;
-}
-
-function getRecommendation(score: number): { label: string; bg: string; text: string; icon: string } {
-  if (score >= 80) return { label: '승인 추천', bg: 'bg-green-50', text: 'text-green-700', icon: '✓' };
-  if (score >= 60) return { label: '검토 필요', bg: 'bg-amber-50', text: 'text-amber-700', icon: '!' };
-  return { label: '보완 필요', bg: 'bg-red-50', text: 'text-red-700', icon: '✕' };
-}
-
-const REJECT_TEMPLATES = [
-  '상품 이미지가 없습니다. 이미지를 추가한 후 다시 요청해 주세요.',
-  '상품 설명이 부족합니다. 간단 소개와 상세 설명을 작성해 주세요.',
-  '가격 정보가 누락되었습니다. 공급가를 설정해 주세요.',
-  '상품 정보가 불완전합니다. 완성도를 높인 후 재요청 바랍니다.',
-  '규제 정보 확인이 필요합니다. MFDS 허가번호를 입력해 주세요.',
-];
-
 // ==================== Component ====================
 
 export default function ProductServiceApprovalPage() {
@@ -107,40 +50,29 @@ export default function ProductServiceApprovalPage() {
     (r: string) => r === 'neture:admin' || r === 'neture:operator' || r === 'platform:super_admin',
   ) ?? false;
 
-  // Data
-  const [items, setItems] = useState<ServiceApprovalItem[]>([]);
-  const [stats, setStats] = useState<ServiceApprovalStats>({ pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 });
-  const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 0 });
-  const [loading, setLoading] = useState(true);
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-  const [analytics, setAnalytics] = useState<ApprovalAnalytics | null>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [analyticsPeriod, setAnalyticsPeriod] = useState<'all' | '7d' | '30d'>('all');
-
-  // Filters — URL param으로 초기 상태 결정 (Dashboard 링크 연동)
-  const [statusFilter, setStatusFilter] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status');
-    return s && ['pending', 'approved', 'rejected'].includes(s) ? s : 'all';
-  });
-  const [serviceFilter, setServiceFilter] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
-  const [scoreRange, setScoreRange] = useState<'' | 'low' | 'mid' | 'high'>('');
-  const [filterHasIssues, setFilterHasIssues] = useState(false);
-  // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: priority filter
-  const [priorityFilter, setPriorityFilter] = useState<'' | 'HIGH' | 'MEDIUM' | 'LOW'>('');
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Selection
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const {
+    items, stats, pagination, loading, permissionError,
+    analyticsResult, analytics, showAnalytics, setShowAnalytics, analyticsPeriod,
+    setAnalyticsPeriod, analyticsScope, statusFilter, setStatusFilter, serviceFilter,
+    setServiceFilter, searchInput, dateFrom, setDateFrom, dateTo,
+    setDateTo, scoreRange, setScoreRange, filterHasIssues, setFilterHasIssues,
+    priorityFilter, setPriorityFilter, selectedIds, setSelectedIds, selectedPendingIds,
+    fetchData, refreshData, applySearch, handleSearchChange, toggleSelect,
+    toggleSelectAll,
+  } = useProductServiceApprovalQuery(user?.id);
 
   // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [decisionError, setDecisionError] = useState<string | null>(null);
+  const [decisionNotice, setDecisionNotice] = useState<ServiceApprovalDecisionOutcome | null>(null);
+  const decisionWriting = useRef(false);
+  const decisionMounted = useRef(true);
+  const decisionBusy = batchLoading || actionLoading !== null;
+  useEffect(() => {
+    decisionMounted.current = true;
+    return () => { decisionMounted.current = false; };
+  }, []);
 
   // Reject modal
   const [rejectTarget, setRejectTarget] = useState<string | null>(null); // single ID or 'batch'
@@ -151,168 +83,163 @@ export default function ProductServiceApprovalPage() {
   const [approveMemo, setApproveMemo] = useState('');
 
   // Delete (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ offerId: string; productName: string } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteWriting = useRef(false);
+  const deleteMounted = useRef(true);
+  useEffect(() => {
+    deleteMounted.current = true;
+    return () => { deleteMounted.current = false; };
+  }, []);
+
+  const [trashError, setTrashError] = useState<string | null>(null);
+  const trashWriting = useRef(false);
 
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
 
-  // ==================== Data Fetching ====================
-
-  const fetchData = useCallback(async (page = 1) => {
-    setLoading(true);
-    setPermissionError(null);
-    try {
-      const scoreParams: { minScore?: number; maxScore?: number } =
-        scoreRange === 'low' ? { minScore: 0, maxScore: 59 }
-        : scoreRange === 'mid' ? { minScore: 60, maxScore: 79 }
-        : scoreRange === 'high' ? { minScore: 80 }
-        : {};
-      const [listResult, statsResult] = await Promise.all([
-        operatorServiceApprovalApi.list({
-          status: statusFilter !== 'all' ? statusFilter : undefined,
-          serviceKey: serviceFilter || undefined,
-          search: searchQuery || undefined,
-          dateFrom: dateFrom || undefined,
-          dateTo: dateTo || undefined,
-          page,
-          limit: 30,
-          ...scoreParams,
-          hasIssues: filterHasIssues ? 'true' : undefined,
-          priority: priorityFilter || undefined,
-        }),
-        operatorServiceApprovalApi.stats(),
-      ]);
-      setItems(listResult.data);
-      setPagination(listResult.pagination);
-      setStats(statsResult);
-      setSelectedIds(new Set());
-    } catch (err: any) {
-      setPermissionError(err?.message || '데이터를 불러올 수 없습니다');
-    } finally {
-      setLoading(false);
-    }
-  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
-
-  useEffect(() => {
-    fetchData(1);
-  }, [fetchData]);
-
-  // Fetch analytics (re-fetch on period change)
-  useEffect(() => {
-    operatorServiceApprovalApi
-      .analytics(analyticsPeriod)
-      .then((data) => {
-        if (data) {
-          setAnalytics(data);
-          setShowAnalytics(true);
-        }
-      })
-      .catch(() => {
-        // 분석 패널은 보조 정보 — 조회 실패 시 패널만 숨긴다(목록 화면 상태에는 영향 없음).
-        setShowAnalytics(false);
-      });
-  }, [analyticsPeriod]);
-
-  // Search debounce
-  const handleSearchChange = (value: string) => {
-    setSearchInput(value);
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => setSearchQuery(value), 300);
-  };
-
-  // ==================== Selection ====================
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === items.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(items.map((i) => i.id)));
-    }
-  };
-
-  // Only pending items can be batch-acted on
-  const selectedPendingIds = [...selectedIds].filter(
-    (id) => items.find((i) => i.id === id)?.approvalStatus === 'pending',
-  );
-
   // ==================== Actions ====================
 
-  const handleApprove = (id: string) => {
-    setApproveTarget(id);
-    setApproveMemo('');
+  const openDecision = (decision: ServiceApprovalDecision, target: string) => {
+    if (decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    setDecisionError(null);
+    setDecisionNotice(null);
+    if (decision === 'approve') {
+      setRejectTarget(null);
+      setApproveTarget(target);
+      setApproveMemo('');
+    } else {
+      setApproveTarget(null);
+      setRejectTarget(target);
+      setRejectReason('');
+    }
   };
 
-  const handleApproveConfirm = async () => {
-    if (!approveTarget) return;
+  const handleApprove = (id: string) => openDecision('approve', id);
 
-    if (approveTarget === 'batch') {
-      setBatchLoading(true);
-      await operatorServiceApprovalApi.batchApprove(selectedPendingIds, approveMemo || undefined);
-      setBatchLoading(false);
-    } else {
-      setActionLoading(approveTarget);
-      await operatorServiceApprovalApi.approve(approveTarget, approveMemo || undefined);
-      setActionLoading(null);
-      if (drawerItem?.id === approveTarget) setDrawerItem(null);
+  const handleDecisionConfirm = async (decision: ServiceApprovalDecision) => {
+    const target = decision === 'approve' ? approveTarget : rejectTarget;
+    if (!target || !canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    const isBatch = target === 'batch';
+    const ids = [...selectedPendingIds];
+    if (isBatch && ids.length === 0) return;
+    const reason = (decision === 'approve' ? approveMemo : rejectReason) || undefined;
+    decisionWriting.current = true;
+    setDecisionError(null);
+    setDecisionNotice(null);
+    if (isBatch) setBatchLoading(true);
+    else setActionLoading(target);
+    try {
+      const result = isBatch
+        ? await (decision === 'approve'
+          ? operatorServiceApprovalApi.batchApprove(ids, reason)
+          : operatorServiceApprovalApi.batchReject(ids, reason))
+        : await (decision === 'approve'
+          ? operatorServiceApprovalApi.approve(target, reason)
+          : operatorServiceApprovalApi.reject(target, reason));
+      if (!decisionMounted.current) return;
+      const outcome = getServiceApprovalDecisionOutcome(decision, result, isBatch);
+      if (outcome.kind === 'failure') {
+        setDecisionError(outcome.message);
+        return;
+      }
+      setDecisionNotice(outcome);
+      if (decision === 'approve') {
+        setApproveTarget(null);
+        setApproveMemo('');
+      } else {
+        setRejectTarget(null);
+        setRejectReason('');
+      }
+      if (isBatch) {
+        // 실패한 ID는 API에 없으므로 갱신된 목록에서 다시 선택한다. 성공 건 재전송 방지.
+        setSelectedIds(new Set());
+        setDrawerItem(null);
+      } else if (drawerItem?.id === target) {
+        setDrawerItem(null);
+      }
+      await refreshData();
+    } catch {
+      if (decisionMounted.current) {
+        setDecisionError(getServiceApprovalDecisionOutcome(decision, { success: false }, isBatch).message);
+      }
+    } finally {
+      decisionWriting.current = false;
+      if (decisionMounted.current) {
+        setBatchLoading(false);
+        setActionLoading(null);
+      }
     }
 
-    setApproveTarget(null);
-    setApproveMemo('');
-    await fetchData(pagination.page);
-  };
-
-  const handleRejectConfirm = async () => {
-    if (!rejectTarget) return;
-
-    if (rejectTarget === 'batch') {
-      setBatchLoading(true);
-      await operatorServiceApprovalApi.batchReject(selectedPendingIds, rejectReason || undefined);
-      setBatchLoading(false);
-    } else {
-      setActionLoading(rejectTarget);
-      await operatorServiceApprovalApi.reject(rejectTarget, rejectReason || undefined);
-      setActionLoading(null);
-      if (drawerItem?.id === rejectTarget) setDrawerItem(null);
-    }
-
-    setRejectTarget(null);
-    setRejectReason('');
-    await fetchData(pagination.page);
   };
 
   const handleBatchApprove = () => {
     if (selectedPendingIds.length === 0) return;
-    setApproveTarget('batch');
-    setApproveMemo('');
+    openDecision('approve', 'batch');
   };
 
   const handleBatchReject = () => {
     if (selectedPendingIds.length === 0) return;
-    setRejectTarget('batch');
-    setRejectReason('');
+    openDecision('reject', 'batch');
   };
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
+  const openDelete = (item: ServiceApprovalItem) => {
+    if (!canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    setDeleteError(null);
+    setDeleteTarget({ offerId: item.offerId, productName: item.productName || '(이름 없음)' });
+  };
+
   const handleDeleteConfirm = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !canManage || deleteWriting.current || decisionWriting.current || trashWriting.current) return;
+    const { offerId } = deleteTarget;
+    deleteWriting.current = true;
     setDeleteLoading(true);
-    const result = await operatorServiceApprovalApi.deletePendingOffer(deleteTarget);
-    setDeleteLoading(false);
-    setDeleteTarget(null);
-    if (result.success) {
-      if (drawerItem?.offerId === deleteTarget) setDrawerItem(null);
-      await fetchData(pagination.page);
+    setDeleteError(null);
+    let deleted = false;
+    try {
+      const result = await operatorServiceApprovalApi.deletePendingOffer(offerId);
+      if (!deleteMounted.current) return;
+      if (!result.success) {
+        setDeleteError(`삭제하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        return;
+      }
+      setDeleteTarget(null);
+      setDrawerItem(current => current?.offerId === offerId ? null : current);
+      deleted = true;
+    } catch {
+      if (deleteMounted.current) setDeleteError('삭제 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+    } finally {
+      deleteWriting.current = false;
+      if (deleteMounted.current) setDeleteLoading(false);
     }
+    if (deleted && deleteMounted.current) await refreshData();
+  };
+
+  const handleMoveToTrash = async (item: ServiceApprovalItem) => {
+    if (!canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    if (!confirm(`"${item.productName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
+    trashWriting.current = true;
+    setActionLoading(item.id);
+    setTrashError(null);
+    let deleted = false;
+    try {
+      const result = await productCleanupApi.softDelete(item.offerId);
+      if (!deleteMounted.current) return;
+      if (!result.success) {
+        setTrashError(`휴지통으로 이동하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        return;
+      }
+      setDrawerItem(current => current?.offerId === item.offerId ? null : current);
+      deleted = true;
+    } catch {
+      if (deleteMounted.current) setTrashError('휴지통 이동 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+    } finally {
+      trashWriting.current = false;
+      if (deleteMounted.current) setActionLoading(null);
+    }
+    if (deleted && deleteMounted.current) await refreshData(1);
   };
 
   // ==================== Render ====================
@@ -323,9 +250,17 @@ export default function ProductServiceApprovalPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">서비스별 상품 승인</h1>
         <p className="text-sm text-slate-500 mt-1">
-          공급자가 선���한 서비스별 상품 승인을 관리합니다.
+          공급자가 선택한 서비스별 상품 승인을 관리합니다.
         </p>
       </div>
+
+      {decisionNotice && (
+        <div role="status" className={`mb-4 rounded-lg border p-3 text-sm ${decisionNotice.kind === 'partial' ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-green-200 bg-green-50 text-green-800'}`}>
+          {decisionNotice.message}
+        </div>
+      )}
+
+      {trashError && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{trashError}</p>}
 
       {/* KPI Bar */}
       <div className="grid grid-cols-5 gap-3 mb-6">
@@ -374,6 +309,10 @@ export default function ProductServiceApprovalPage() {
           </div>
           {showAnalytics && (
             <>
+              {analyticsResult?.scope !== analyticsScope ? (
+                <p role="status" className="py-4 text-sm text-slate-500">선택한 기간의 분석을 불러오는 중...</p>
+              ) : (
+                <>
               {/* Actionable Alerts (WO-NETURE-APPROVAL-ACTIONABLE-INSIGHTS-V1) */}
               {analytics.alerts && (analytics.alerts.lowQualitySuppliers.length > 0 || analytics.alerts.stalePendingCount > 0) && (
                 <div className="flex flex-wrap gap-3 mb-4">
@@ -394,7 +333,7 @@ export default function ProductServiceApprovalPage() {
                       {analytics.alerts.lowQualitySuppliers.map((lq, i) => (
                         <button
                           key={lq.supplierId}
-                          onClick={() => { setSearchInput(lq.supplierName); setSearchQuery(lq.supplierName); }}
+                          onClick={() => applySearch(lq.supplierName)}
                           className="text-red-700 underline hover:text-red-900"
                         >
                           {i > 0 && ', '}{lq.supplierName} ({lq.approvalRate}%)
@@ -464,6 +403,8 @@ export default function ProductServiceApprovalPage() {
                     ))}
                   </div>
                 </div>
+              )}
+                </>
               )}
             </>
           )}
@@ -595,14 +536,14 @@ export default function ProductServiceApprovalPage() {
             <>
               <button
                 onClick={handleBatchApprove}
-                disabled={!canManage || batchLoading}
+                disabled={!canManage || decisionBusy}
                 className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 승인 ({selectedPendingIds.length})
               </button>
               <button
                 onClick={handleBatchReject}
-                disabled={!canManage || batchLoading}
+                disabled={!canManage || decisionBusy}
                 className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 거절 ({selectedPendingIds.length})
@@ -668,7 +609,7 @@ export default function ProductServiceApprovalPage() {
                 key={item.id}
                 className={`p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${borderClass}`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex flex-wrap items-start gap-3 xl:flex-nowrap">
                   {/* Checkbox */}
                   <input
                     type="checkbox"
@@ -693,24 +634,24 @@ export default function ProductServiceApprovalPage() {
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0" onClick={() => setDrawerItem(item)}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-slate-900 truncate">{item.productName || '(이름 없음)'}</span>
+                  <button type="button" aria-label={`상품 상세 열기: ${item.productName || '(이름 없음)'}`} className="text-left flex-1 min-w-0 basis-[calc(100%-6rem)] xl:basis-auto" onClick={() => setDrawerItem(item)}>
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                      <span className="font-medium text-slate-900 truncate max-w-full">{item.productName || '(이름 없음)'}</span>
                       {item.brandName && (
                         <span className="text-xs text-slate-400 shrink-0">({item.brandName})</span>
                       )}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                    </span>
+                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                       <span className="font-mono">{item.barcode || '-'}</span>
                       <span>·</span>
                       <span>{item.supplierName || '-'}</span>
                       <span>·</span>
                       <span>{formatPrice(item.priceGeneral)}</span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
 
                   {/* Badges + Recommendation */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0 w-full xl:w-auto">
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${recommendation.bg} ${recommendation.text}`}>
                       {recommendation.icon} {recommendation.label}
                     </span>
@@ -753,23 +694,23 @@ export default function ProductServiceApprovalPage() {
                       )}
                       <button
                         onClick={() => handleApprove(item.id)}
-                        disabled={!canManage || actionLoading === item.id}
+                        disabled={!canManage || decisionBusy}
                         title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         승인
                       </button>
                       <button
-                        onClick={() => { setRejectTarget(item.id); setRejectReason(''); }}
-                        disabled={!canManage || actionLoading === item.id}
+                        onClick={() => openDecision('reject', item.id)}
+                        disabled={!canManage || decisionBusy}
                         title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         거절
                       </button>
                       <button
-                        onClick={() => setDeleteTarget(item.offerId)}
-                        disabled={!canManage || actionLoading === item.id}
+                        onClick={() => openDelete(item)}
+                        disabled={!canManage || decisionBusy || deleteLoading}
                         title="이 상품을 완전히 삭제합니다"
                         className="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs font-medium hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -778,14 +719,8 @@ export default function ProductServiceApprovalPage() {
                     </>
                   ) : item.approvalStatus === 'approved' ? (
                     <button
-                      onClick={async () => {
-                        if (!confirm(`"${item.productName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
-                        setActionLoading(item.id);
-                        const res = await productCleanupApi.softDelete(item.offerId);
-                        setActionLoading(null);
-                        if (res.success) fetchData();
-                      }}
-                      disabled={!canManage || actionLoading === item.id}
+                      onClick={() => handleMoveToTrash(item)}
+                      disabled={!canManage || decisionBusy || deleteLoading}
                       className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
                       title="삭제 (휴지통으로 이동)"
                     >
@@ -880,287 +815,53 @@ export default function ProductServiceApprovalPage() {
         </div>
       )}
 
-      {/* Reject Modal */}
       {rejectTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {rejectTarget === 'batch' ? `일괄 거절 (${selectedPendingIds.length}건)` : '승인 거절'}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              {rejectTarget === 'batch'
-                ? '선택한 승인대기 상품을 일괄 거절합니다.'
-                : '이 상품의 서비스 승인을 거절합니다.'}
-            </p>
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {REJECT_TEMPLATES.map((tpl, i) => (
-                <button
-                  key={i}
-                  onClick={() => setRejectReason(tpl)}
-                  className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded text-xs hover:bg-slate-200 text-left"
-                >
-                  {tpl.length > 30 ? tpl.slice(0, 30) + '…' : tpl}
-                </button>
-              ))}
-            </div>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="거절 사유를 입력하세요 (선택)"
-              className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setRejectTarget(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleRejectConfirm}
-                disabled={batchLoading || (rejectTarget !== 'batch' && actionLoading === rejectTarget)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
-              >
-                거절 확인
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductServiceApprovalDecisionModal decision="reject" batch={rejectTarget === 'batch'} count={selectedPendingIds.length}
+          value={rejectReason} error={decisionError} busy={decisionBusy} canManage={canManage}
+          onChange={setRejectReason} onCancel={() => { if (!decisionWriting.current) setRejectTarget(null); }}
+          onConfirm={() => void handleDecisionConfirm('reject')} />
       )}
-
-      {/* Approve Modal (WO-NETURE-APPROVAL-ACTION-UX-V1) */}
       {approveTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">
-              {approveTarget === 'batch' ? `일괄 승인 (${selectedPendingIds.length}건)` : '상품 승인'}
-            </h3>
-            <p className="text-sm text-slate-500 mb-4">
-              {approveTarget === 'batch'
-                ? '선택한 승인대기 상품을 일괄 승인합니다.'
-                : '이 상품의 서비스 승인을 처리합니다.'}
-            </p>
-            <textarea
-              value={approveMemo}
-              onChange={(e) => setApproveMemo(e.target.value)}
-              placeholder="승인 메모를 입력하세요 (선택)"
-              className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setApproveTarget(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleApproveConfirm}
-                disabled={batchLoading || (approveTarget !== 'batch' && actionLoading === approveTarget)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                승인 확인
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductServiceApprovalDecisionModal decision="approve" batch={approveTarget === 'batch'} count={selectedPendingIds.length}
+          value={approveMemo} error={decisionError} busy={decisionBusy} canManage={canManage}
+          onChange={setApproveMemo} onCancel={() => { if (!decisionWriting.current) setApproveTarget(null); }}
+          onConfirm={() => void handleDecisionConfirm('approve')} />
       )}
 
       {/* Delete Confirm Modal (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1) */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <dialog open aria-modal="true" aria-label="상품 삭제" className="relative m-0 border-0 bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제</h3>
+            <p className="text-sm font-medium text-slate-800 mb-2">{deleteTarget.productName}</p>
             <p className="text-sm text-slate-500 mb-4">
               이 상품을 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다.
             </p>
+            {deleteError && <p role="alert" className="text-sm text-red-600">{deleteError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setDeleteTarget(null)}
+                onClick={() => { if (!deleteWriting.current) setDeleteTarget(null); }}
+                disabled={deleteLoading}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
               >
                 취소
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                disabled={deleteLoading}
+                disabled={!canManage || deleteLoading}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 {deleteLoading ? '삭제 중...' : '삭제 확인'}
               </button>
             </div>
-          </div>
+          </dialog>
         </div>
       )}
 
-      {/* Detail Drawer */}
       {drawerItem && (
-        <>
-          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setDrawerItem(null)} />
-          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
-            <div className="p-6">
-              {/* Drawer header */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-slate-900">상품 상세</h2>
-                <button
-                  onClick={() => setDrawerItem(null)}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Image */}
-              <div className="w-full h-48 rounded-lg overflow-hidden bg-slate-100 mb-6 flex items-center justify-center">
-                {drawerItem.imageUrl ? (
-                  <img src={drawerItem.imageUrl} alt="" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-slate-300 text-sm">이미지 없음</div>
-                )}
-              </div>
-
-              {/* Info grid */}
-              <div className="space-y-4 mb-6">
-                <div>
-                  <div className="text-xs text-slate-400 mb-1">상품명</div>
-                  <div className="font-medium text-slate-900">{drawerItem.productName || '-'}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">바코드</div>
-                    <div className="font-mono text-sm text-slate-700">{drawerItem.barcode || '-'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">브랜드</div>
-                    <div className="text-sm text-slate-700">{drawerItem.brandName || '-'}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">공급사</div>
-                    <div className="text-sm text-slate-700">{drawerItem.supplierName || '-'}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">공급가</div>
-                    <div className="text-sm font-medium text-slate-700">{formatPrice(drawerItem.priceGeneral)}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">서비스</div>
-                    <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
-                      {getServiceDisplay(drawerItem.serviceKeys) || drawerItem.serviceKey}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-xs text-slate-400 mb-1">유통</div>
-                    <div className="flex flex-wrap gap-1">
-                      {getSupplyPolicyBadges(drawerItem).map((b) => (
-                        <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
-                          {b.label}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status badges */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {(() => {
-                  const badge = STATUS_BADGE[drawerItem.approvalStatus] || { label: drawerItem.approvalStatus, bg: 'bg-slate-50', text: 'text-slate-600' };
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${badge.bg} ${badge.text}`}>
-                      상태: {badge.label}
-                    </span>
-                  );
-                })()}
-                {(() => {
-                  const rb = getRegulatoryBadge(drawerItem);
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${rb.bg} ${rb.text}`}>
-                      규제: {rb.label}
-                    </span>
-                  );
-                })()}
-                {(() => {
-                  const cb = getCompletenessBadge(drawerItem);
-                  return (
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${cb.bg} ${cb.text}`}>
-                      완성도: {cb.label} ({drawerItem.completenessScore}/100)
-                    </span>
-                  );
-                })()}
-              </div>
-
-              {/* Completeness detail */}
-              <div className="bg-slate-50 rounded-lg p-4 mb-6">
-                <div className="text-xs font-medium text-slate-500 mb-3">완성도 상세 (각 20점)</div>
-                <div className="space-y-2">
-                  {[
-                    { label: '공급가 설정', ok: drawerItem.priceGeneral != null && drawerItem.priceGeneral > 0 },
-                    { label: '상품 이미지', ok: !!drawerItem.imageUrl },
-                    { label: '간단 소개', ok: drawerItem.hasShortDescription },
-                    { label: '상세 설명', ok: drawerItem.hasDetailDescription },
-                    { label: '유통 타입', ok: !!drawerItem.distributionType },
-                  ].map((c) => (
-                    <div key={c.label} className="flex items-center gap-2 text-sm">
-                      <span className={c.ok ? 'text-green-600' : 'text-slate-300'}>{c.ok ? '✓' : '✗'}</span>
-                      <span className={c.ok ? 'text-slate-700' : 'text-slate-400'}>{c.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Decision reason */}
-              {drawerItem.reason && (
-                <div className={`border rounded-lg p-4 mb-6 ${
-                  drawerItem.approvalStatus === 'rejected'
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-green-50 border-green-200'
-                }`}>
-                  <div className={`text-xs font-medium mb-1 ${
-                    drawerItem.approvalStatus === 'rejected' ? 'text-red-600' : 'text-green-600'
-                  }`}>
-                    {drawerItem.approvalStatus === 'rejected' ? '거절 사유' : '승인 메모'}
-                  </div>
-                  <div className={`text-sm ${
-                    drawerItem.approvalStatus === 'rejected' ? 'text-red-800' : 'text-green-800'
-                  }`}>{drawerItem.reason}</div>
-                </div>
-              )}
-
-              {/* Date info */}
-              <div className="text-xs text-slate-400 mb-6">
-                등록일: {new Date(drawerItem.createdAt).toLocaleString('ko-KR')}
-                {drawerItem.decidedAt && (
-                  <span className="ml-3">처리일: {new Date(drawerItem.decidedAt).toLocaleString('ko-KR')}</span>
-                )}
-              </div>
-
-              {/* Drawer actions */}
-              {drawerItem.approvalStatus === 'pending' && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleApprove(drawerItem.id)}
-                    disabled={!canManage || actionLoading === drawerItem.id}
-                    className="flex-1 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    승인
-                  </button>
-                  <button
-                    onClick={() => { setRejectTarget(drawerItem.id); setRejectReason(''); }}
-                    disabled={!canManage || actionLoading === drawerItem.id}
-                    className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    거절
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </>
+        <ProductServiceApprovalDrawer item={drawerItem} canManage={canManage} decisionBusy={decisionBusy}
+          onClose={() => setDrawerItem(null)} onApprove={handleApprove}
+          onReject={(id) => openDecision('reject', id)} />
       )}
     </div>
   );

@@ -1,7 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { StoreLibraryNavigation } from '../StoreLibraryNavigation';
+import { UNIFIED_STORE_CONFIG, withPharmacyStoreMenu } from '../../config/storeMenu';
 import { WORKSPACE_PATHS } from '../../config/workspace';
 import { useUnifiedStore } from '../../contexts/StoreContext';
-import { RetiredServiceNotice, StoreAgreementGate, useRetiredOnlyStore } from './UnifiedStoreLayout';
+import { RetiredServiceNotice, StoreAgreementGate, useRetiredOnlyStore, StoreWorkDashboard } from './UnifiedStoreLayout';
 
 const SOURCES = [
   ['content', '일반 콘텐츠'], ['supplier-library', '공급자 공개 자료'],
@@ -14,11 +16,14 @@ export default function UnifiedStoreLibraryLayout() {
   const retiredOnly = useRetiredOnlyStore();
   if (retiredOnly) return <RetiredServiceNotice />;
   return <StoreAgreementGate serviceKey={commonServiceKey}>
+    <StoreWorkDashboard config={commonServiceKey === 'kpa-society' ? withPharmacyStoreMenu(UNIFIED_STORE_CONFIG) : UNIFIED_STORE_CONFIG} withCapabilities workspace>
+    <StoreLibraryNavigation section="sources" />
     <nav aria-label="이용 가능한 자료의 출처" className="flex flex-wrap gap-3 px-4 py-4">
-      <NavLink to={`${WORKSPACE_PATHS.myStore}/pharmacy/contents`}>사업 제공 콘텐츠</NavLink>
+      <NavLink to={`${WORKSPACE_PATHS.myStore}/pharmacy/contents`}>사업 제공 자료</NavLink>
       {SOURCES.map(([path, label]) => <NavLink key={path} to={`${WORKSPACE_PATHS.myStore}/library/${path}`}>{label}</NavLink>)}
       <NavLink to={`${WORKSPACE_PATHS.myStore}/library/contents`}>내 콘텐츠 · 사본</NavLink>
     </nav>
     <Outlet />
+    </StoreWorkDashboard>
   </StoreAgreementGate>;
 }

@@ -1,5 +1,8 @@
 # O4O-STORE-ACCESS-AND-MEMBERSHIP-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
 > **2026-10-07 정책 갱신**: [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md)이 메인 이메일 확인, 공통 모바일·커뮤니티 닉네임, Store 약국 전용 신규 가입, 사업자등록증 제출, 서비스별 가입과 로그인 분리의 현행 정본이다. 아래의 다업종 Store 신규 가입·최소 User 필수 정보 없음·메인 수동 승인·미가입 로그인 거부 서술은 해당 범위에서 대체됐다. 기존 역할·관계·인증 수단 경계는 유지한다.
 
 > **Status**: Active · **확정일**: 2026-10-03 · **갱신**: 2026-10-05 (§3-A 약국 자가 가입 제외)
@@ -7,6 +10,30 @@
 > **상위 정본**: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §3 ·
 > [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §3
 > **인접 정본**: [`O4O-STORE-OWNER-RBAC-STANDARD-V1`](../architecture/auth/O4O-STORE-OWNER-RBAC-STANDARD-V1.md)
+
+## 2026-10-12 직원 이용 정책 갱신
+
+현재 내 매장(약국) 직원 제도가 대상이다. 승인 직원의 매장 공급·자료·주문 업무는 개인 Neture 가입을
+추가 요구하지 않는다. 경영자의 기존 가입 조건과 개인 신청·다른 업무의 가입 조건은 유지한다.
+현역 외부 Café24 B2B의 기존 초대 수락·Role 발급은 별도 계약으로 유지하며 새 약국 승인 대기에
+가두지 않는다. PharmacyHub·K-Cosmetics 은퇴 권한을 새로 발급하지 않는다.
+
+사용자 확정: 소규모 매장의 직원은 **경영자 초대 → 본인 수락 → 경영자 최종 승인** 후
+내 매장 업무 전체를 이용한다. 수락만으로는 접근 권한이 생기지 않는다.
+직원 초대·승인·해제와 경영자 지위 관리는 경영자 전용이다.
+이 갱신은 아래의 수락 즉시 권한 부여·Member 조회 전용·다중 매장 선택 제외 서술을 대체한다.
+
+- My Home(`/mypage`)에서 경영자는 매장을 선택해 직원 초대·최종 승인·접근 해제를 관리한다.
+- 직원은 자신의 My Home에서 초대 수락·거절, 최종 승인 대기 상태를 확인한다.
+- `invited`: 수락 대기, 접근 0. `accepted`: 수락 후 최종 승인 대기, 접근 0.
+- `staff`: 최종 승인된 직원. 상품·자료·QR·POP·블로그·영상·사이니지·태블릿과 기존 매장 업무를 이용한다.
+- 현재 운영 약국 직원 접근은 active 약국 원장 ∧ 활성 `staff` 관계 ∧ 활성 `kpa:store_member` Role이다.
+  약사 개인 서비스 가입으로 직원 자격을 추정하지 않는다. 은퇴 서비스의 직원 권한을 새로 발급하지 않는다.
+- 모든 업무 요청은 현재 DB 관계·Role을 재확인한다. 해제는 `left_at`을 설정해 다음 요청부터 차단한다.
+  작성 자료와 매장 업무 데이터는 매장에 유지하며, 다른 매장의 직원 접근은 유지한다.
+- 명시한 선택 매장이 허용 후보에 없으면 직원 업무·구성원 변경 요청을 거절한다. 다른 매장으로 대신 쓰지 않는다.
+- 직원 상태 변경은 사용자 단위 DB 트랜잭션 잠금으로 직렬화한다. 최종 승인·해제의 관계와 Role 변경은 같은 트랜잭션이며 실패 시 롤백한다.
+- 기존 `staff` 관계를 대량 변환하거나 운영 데이터에 새 권한을 backfill하지 않는다.
 
 `store.neture.co.kr`(공통 Store Workspace)에 **누가 들어올 수 있는가**를 정한다.
 서비스 가입(`service_memberships`) · 사업자 소속(`organization_members`) · 매장 접근은 서로 다른
@@ -35,17 +62,21 @@
 |---|---|---|
 | **Store Owner** | 사업자 대표 · 소유 접근 | **기존 판정 그대로** — `role_assignments` 의 `{prefix}:store_owner` + 해당 서비스 active membership + 조직 해석 (`isStoreOwner()`) |
 | **Store Member** | 사업자가 허가한 사용자(직원 · 담당자) | **Role** `role_assignments` 의 `{prefix}:store_member` **∧ Relationship** `organization_members` 활성 `'staff'` 행 **∧** 조직↔서비스 linkage |
-| (없음) | 그 외 전부 | 초대 대기(`'invited'`) 포함 — **수락 전에는 아무 접근도 없다** |
+| (없음) | 그 외 전부 | 초대·승인 대기(`'invited'`·`'accepted'`) 포함 — **최종 승인 전에는 아무 접근도 없다** |
 
 V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들지 않는다 — 기존
 `organization_members` 에 이미 있는 값이고, 그 의미는 각 서비스 프로비저닝이 정한다.
 
 ### 결정 순서 (바꾸지 않는다)
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 ```text
 1. 세션 사용자        userId 는 세션에서만. body/query 의 userId 는 받지 않는다
 2. 조직 확정          Owner = isStoreOwner() 가 해석한 조직
-                     Member = 자기 활성 행의 조직 (요청이 고르지 않는다)
+                     Member = 자기 활성 관계·Role로 검증된 후보 중 명시 선택 매장
+                     허용 후보 밖 선택은 거절, 단일 후보만 선택 없이 해석
 3. Role              role 이 없으면 거부 (Identity V3 §7-1)
 4. Relationship      활성 'staff' 행이 없으면 거부
 5. 업종 경계          조직 ↔ serviceKey linkage (STORE_SERVICE_ORG_LINKAGE)
@@ -59,7 +90,7 @@ V1 은 이 둘만 둔다. admin · manager 같은 중간 등급을 새로 만들
 kpa:store_member · cosmetics:store_member · pharmacy-hub:store_member · cafe24-b2b:store_member
 ```
 
-owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해제가 회수하되, **같은 서비스의
+owner role 과 같은 `{prefix}:{role}` 규약이다. 최종 승인이 발급하고 해제가 회수하되, **같은 서비스의
 다른 매장에 아직 소속돼 있으면 회수하지 않는다**(한 곳에서 빠졌다고 나머지 접근까지 끊지 않는다).
 
 `x-store-organization-id` 선택 힌트는 **허용 후보 안에서만** 고르는 힌트다. 후보에 없는 매장을
@@ -95,6 +126,9 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 ---
 
 ## 3-A. 사업자 가입 (자가 가입)
+
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
 
 로그인한 사용자가 `store.neture.co.kr` 에서 직접 매장을 연다.
 
@@ -138,7 +172,9 @@ owner role 과 같은 `{prefix}:{role}` 규약이다. 수락이 발급하고 해
 Owner → 초대(이메일로 기존 가입자 조회)
       → organization_members(role='invited')      ← 접근 0
 초대받은 본인 → 수락
-      → role='staff'                              ← Store Member
+      → role='accepted'                           ← 접근 0 · 최종 승인 대기
+Owner → 최종 승인
+      → role='staff' + kpa:store_member             ← Store Member
 Owner → 해제
       → left_at = now()                           ← 행은 남긴다(이력)
 ```
@@ -149,9 +185,11 @@ Owner → 해제
 | `GET /membership` | 로그인 — 내 자격을 서버가 확정해 돌려준다 |
 | `GET /members` | Owner |
 | `POST /members/invite` | Owner |
-| `DELETE /members/:userId` | Owner — `'invited'`·`'staff'` 행만. owner·admin·manager 는 거절 |
+| `POST /members/:userId/approve` | Owner — 수락한 자기 매장 직원만 최종 승인 |
+| `DELETE /members/:userId` | Owner — `'invited'`·`'accepted'`·`'staff'` 행만. owner·admin·manager 는 거절 |
 | `GET /invitations` | 로그인 — 내가 받은 초대 |
-| `POST /invitations/:organizationId/accept` | **초대받은 본인만** |
+| `POST /invitations/:organizationId/accept` | **초대받은 본인만** — 최종 승인 대기로 전환 |
+| `POST /invitations/:organizationId/decline` | 본인 초대 거절·수락 취소. 승인된 관계는 변경하지 않음 |
 
 ### 메일을 보내지 않는다
 
@@ -163,7 +201,7 @@ Owner → 해제
 ## 5. 막는 것 (frontend 가드로 만족하지 않는다)
 
 ```text
-Store A 구성원 → Store B URL·id 직접 요청     → 자기 매장으로만 해석 (요청이 조직을 고르지 못한다)
+Store A 구성원 → Store B URL·id 직접 요청     → 거절 (허용 매장 밖 요청)
 다른 업종 매장 → 다른 serviceKey 로 접근       → linkage 불일치로 none
 membership 없는 로그인 사용자 → 매장 진입      → none
 Member → 초대 · 해제 · 구성원 목록            → 403 STORE_OWNER_REQUIRED
@@ -187,7 +225,7 @@ Member → 초대 · 해제 · 구성원 목록            → 403 STORE_OWNER_R
 | **미가입자 초대 불가** | 토큰·메일 발송이 필요하고, 은퇴한 초대 도메인을 되살리지 않기로 했다. 초대 대상은 먼저 가입해야 한다 |
 | **사업자번호 검증 없음** | V1 은 이름만 받는다. 사업자 identity 확인은 각 서비스의 승인 절차가 갖고 있다 |
 | **권한 등급 2개** | owner / member 뿐. 세분화는 실제 요구가 나온 뒤에 한다 |
-| **다중 Store** | 읽기는 이미 지원된다(`resolveAccessibleStores`). Member 의 다중 매장 선택 UI 는 V1 범위 밖 |
+| **다중 Store** | 경영자·승인 직원 모두 허용 매장 목록에서 선택한다. 권한을 매 요청 재검증 |
 
 ---
 

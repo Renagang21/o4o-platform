@@ -61,8 +61,6 @@ import { AddLocalAgentDeviceCapabilities1791177033073 } from '../migrations/1791
 // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (내 매장(약국) 신청 · 세미프랜차이즈 · 복수 공급 제안 · 이벤트 부분 unique)
 import { CreateNeturePharmacyCommerce1791200000000 } from '../migrations/1791200000000-CreateNeturePharmacyCommerce.js';
 import { AlignSellerRecruitmentApplicationIdentity1791477914134 } from '../migrations/1791477914134-AlignSellerRecruitmentApplicationIdentity.js';
-// WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 (assistant_run_frames.understanding)
-import { AddAssistantRunFrameUnderstanding1791498705173 } from '../migrations/1791498705173-AddAssistantRunFrameUnderstanding.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-18-id685',
@@ -76,6 +74,21 @@ export const INCREMENTAL_MIGRATION_CUTOFF = {
 export type MigrationClass = new () => MigrationInterface;
 
 /** Append only. Order must match ascending epoch. */
+import { RepairCanonicalDemoExperience1791501198171 } from '../migrations/1791501198171-RepairCanonicalDemoExperience.js';
+import { CreateBrowserSessionRevocations1791509600000 } from '../migrations/1791509600000-CreateBrowserSessionRevocations.js';
+import { AllowKakaoHandoffAuthMethod1791527589096 } from '../migrations/1791527589096-AllowKakaoHandoffAuthMethod.js';
+
+import { CreateSocialAuthFlows1791592932097 } from '../migrations/1791592932097-CreateSocialAuthFlows.js';
+
+import { AddCommunityMemberAdministration1791632505104 } from '../migrations/1791632505104-AddCommunityMemberAdministration.js';
+import { CreateAccountErasureOperations1791777540800 } from '../migrations/1791777540800-CreateAccountErasureOperations.js';
+import { RetireLegacyErasureIdentityHashes1791795139475 } from '../migrations/1791795139475-RetireLegacyErasureIdentityHashes.js';
+import { AllowStoreStaffDemoAccounts1791810417566 } from '../migrations/1791810417566-AllowStoreStaffDemoAccounts.js';
+
+import { CreateAiUsageReservations1791870434349 } from '../migrations/1791870434349-CreateAiUsageReservations.js';
+// WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 (assistant_run_frames.understanding)
+import { AddAssistantRunFrameUnderstanding1791970408318 } from '../migrations/1791970408318-AddAssistantRunFrameUnderstanding.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -94,7 +107,16 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddLocalAgentDeviceCapabilities1791177033073,
   CreateNeturePharmacyCommerce1791200000000,
   AlignSellerRecruitmentApplicationIdentity1791477914134,
-  AddAssistantRunFrameUnderstanding1791498705173,
+  RepairCanonicalDemoExperience1791501198171,
+  CreateBrowserSessionRevocations1791509600000,
+  AllowKakaoHandoffAuthMethod1791527589096,
+  CreateSocialAuthFlows1791592932097,
+  AddCommunityMemberAdministration1791632505104,
+  CreateAccountErasureOperations1791777540800,
+  RetireLegacyErasureIdentityHashes1791795139475,
+  AllowStoreStaffDemoAccounts1791810417566,
+  CreateAiUsageReservations1791870434349,
+  AddAssistantRunFrameUnderstanding1791970408318,
 ];
 
 export function incrementalMigrationNames(): string[] {

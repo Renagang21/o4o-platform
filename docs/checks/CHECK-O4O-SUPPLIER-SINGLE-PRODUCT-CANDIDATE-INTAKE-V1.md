@@ -1,5 +1,7 @@
 # CHECK-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: [`WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1`](../work-orders/WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1.md)
 > **선행**: [`CHECK-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1`](CHECK-O4O-PRODUCT-CANDIDATE-GENERAL-PROMOTION-CORE-FOUNDATION-V1.md) §9
 > **기준 코드**: `origin/main` `706f82108` 에서 착수 (WO 접수 `b16f4896b` · Promotion Core `cc287d3ee` 포함)
@@ -131,14 +133,14 @@ git diff --stat origin/main -- apps/api-server/src/modules/neture/promotion \
 | `product_masters` / `product_identifiers` / `supplier_product_offers` | 272,040 / 638,428 / 22 |
 | `product_candidates` | 394,495 · `source_type='supplier_web'` **0** · `source_label='neture-supplier-single'` **0** |
 
-**PENDING 사유**: `requireActiveSupplier` 는 `neture_suppliers.user_id = 로그인 user.id` 로 공급자를 찾는다. 현재 운영 DB 의 공급자 3건 전부 `user_id NULL`(사용자 테이블 reset 이후 재연결 안 됨) 이라 **어떤 계정으로 로그인해도 403 `NO_SUPPLIER`** 가 나온다. 201 경로 smoke 는 공급자 1건에 테스트 계정을 연결하는 **DB write(UPDATE neture_suppliers SET user_id)** 가 선행돼야 하며 사용자 승인 없이 실행하지 않았다. `docs/local/TEST-ACCOUNTS.local.md` §3(2026-08-09) 의 "`renagang21` = Neture 공급자" 기재는 reset 전 상태라 현재와 다르다.
+**PENDING 사유**: `requireActiveSupplier` 는 `neture_suppliers.user_id = 로그인 user.id` 로 공급자를 찾는다. 현재 운영 DB 의 공급자 3건 전부 `user_id NULL`(사용자 테이블 reset 이후 재연결 안 됨) 이라 **어떤 계정으로 로그인해도 403 `NO_SUPPLIER`** 가 나온다. 201 경로 smoke 는 공급자 1건에 테스트 계정을 연결하는 **DB write(UPDATE neture_suppliers SET user_id)** 가 선행돼야 하며 사용자 승인 없이 실행하지 않았다. `docs/local/TEST-ACCOUNT.txt` §3(2026-08-09) 의 "`renagang21` = Neture 공급자" 기재는 reset 전 상태라 현재와 다르다.
 
 **배포 후 실측(revision = Deploy run `35402294873` success · 2026-09-19)**:
 
 | 단계 | 결과 |
 |---|---|
 | (a) 쿠키 없이 `POST /api/v1/neture/supplier/product-candidates` | **401** ✅ (`AUTH_REQUIRED`) |
-| (b) `sohae2100` L1(serviceKey 없음) 로그인 | **401** — `TEST-ACCOUNTS.local.md` §1 의 L1 값(2026-08-09)이 users reset 이후 유효하지 않음. L2(서비스 웹) 비밀번호는 SSOT 에 unknown → 이 세션에서 로그인 채널 없음 |
+| (b) `sohae2100` L1(serviceKey 없음) 로그인 | **401** — `TEST-ACCOUNT.txt` §1 의 L1 값(2026-08-09)이 users reset 이후 유효하지 않음. L2(서비스 웹) 비밀번호는 SSOT 에 unknown → 이 세션에서 로그인 채널 없음 |
 | (b′) 로그인 쿠키 → 403 `NO_SUPPLIER` | **PENDING** (b 에 종속) |
 | 201 · SELECT · count 전후 · 운영자 화면 | **PENDING** (공급자 `user_id` 연결 write 선행) |
 
@@ -169,7 +171,7 @@ git diff --stat origin/main -- apps/api-server/src/modules/neture/promotion \
 
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
 
-- 발견: `docs/local/TEST-ACCOUNTS.local.md` §3 "`renagang21` = Neture 공급자" — 운영 `neture_suppliers.user_id` 전부 NULL 이라 현재와 불일치(로컬 전용 · git 미추적 · §16-1 대상 아님 → 보고만).
+- 발견: `docs/local/TEST-ACCOUNT.txt` §3 "`renagang21` = Neture 공급자" — 운영 `neture_suppliers.user_id` 전부 NULL 이라 현재와 불일치(로컬 전용 · git 미추적 · §16-1 대상 아님 → 보고만).
 
 ## 11. Git
 

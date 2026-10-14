@@ -1,5 +1,7 @@
 # IR-O4O-PRIVACY-DATA-CENSUS-V1 — O4O 개인정보 전수 Census 조사 결과
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태**: COMPLETE_WITH_UNKNOWNS · **조사일**: 2026-09-17 · **WO**: [`WO-O4O-PRIVACY-DATA-CENSUS-V1`](../work-orders/WO-O4O-PRIVACY-DATA-CENSUS-V1.md)
 > **성격**: 조사 전용(read-only). 코드 · DB · API · 로그인 구조 변경 0건. 프로덕션 DB 조회 0건(정적 코드 census 만).
 > **개인정보 실값**: 본 문서에 기록하지 않음(테스트 계정 이메일 도메인 패턴만 언급).
@@ -273,7 +275,7 @@ Kakao 관련 `users.kakao_open_chat_url` · `kakao_channel_url` 은 **삭제 후
 | L | Relationship 전환 후보 | ✅ §4-2 |
 | M | 외부 전송 | ✅ §6 |
 | N | AI prompt 입력 | ✅ §6 (다른 세션 dirty 파일 없음 — 작업트리 clean) |
-| O | seed/test/env | ✅ §7-1 #7·#8 (`docs/local/TEST-ACCOUNTS.local.md` 미열람 유지) |
+| O | seed/test/env | ✅ §7-1 #7·#8 (`docs/local/TEST-ACCOUNT.txt` 미열람 유지) |
 
 ## 11. 정책 추가결정 필요 (REVIEW 10)
 

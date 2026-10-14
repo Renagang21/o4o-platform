@@ -5,7 +5,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 기준
  *
- *   모든 O4O 사용자의 로그인 수단 = Google 하나
+ *   은퇴 당시 Google-only 경로 정리. 현행 이메일/Kakao 새 구현은 명시적 예외만 허용
  *   Google sub = external identity · users.id = internal identity
  *
  * 이 spec 은 **제거한 것들이 조용히 되살아나지 않는 것**을 고정한다. 각 항목은 IR 에서
@@ -90,8 +90,9 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/\/api\/v1\/social\//)).toEqual([]);
     });
 
-    it('Kakao / Naver 로그인 설정', () => {
-      expect(offenders(/\b(KAKAO|NAVER)_CLIENT_(ID|SECRET)\b/)).toEqual([]);
+    it('새 confidential Kakao 설정 한 곳만 허용하고 Naver/legacy 설정은 금지', () => {
+      expect(offenders(/\bKAKAO_CLIENT_(ID|SECRET)\b/).map(f => f.split(path.sep).join('/'))).toEqual(['config/kakao-identity.config.ts']);
+      expect(offenders(/\bNAVER_CLIENT_(ID|SECRET)\b/)).toEqual([]);
       expect(offenders(/socialAuthConfig/)).toEqual([]);
     });
 
@@ -105,11 +106,20 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
 
     it('이메일 인증 체인 (옛 구조)', () => {
       // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 확인은 새 구조로 다시 생겼다 — 해시 토큰
-      //   테이블 `email_verification_tokens`(재생성)는 `services/auth/email-auth.service.ts` 한 곳만 쓴다.
+      //   발급/검증은 email-auth만, 승인된 account-erasure는 소유 토큰 파기만 허용한다.
       //   옛 서비스·entity·경로 이름은 여전히 금지다.
       expect(offenders(/EmailVerificationService|EmailVerificationToken/)).toEqual([]);
       expect(offenders(/resend-verification|verifyEmailGet/)).toEqual([]);
-      expect(offenders(/email_verification_tokens/)).toEqual([path.join('services', 'auth', 'email-auth.service.ts')]);
+      expect(offenders(/email_verification_tokens/)).toEqual([
+        path.join('services','auth','email-auth.service.ts'),
+        path.join('services','auth','email-auth.shared.ts'),
+        path.join('services','privacy','account-erasure.service.ts'),
+      ]);
+      expect(codeOnly(read(path.join(SRC,'services','auth','email-auth.shared.ts')))).not.toMatch(/(?:dataSource|manager)\.query\(/);
+      const erasure=codeOnly(read(path.join(SRC,'services','privacy','account-erasure.service.ts')));
+      expect(erasure).not.toMatch(/(?:INSERT\s+INTO|UPDATE)\s+email_verification_tokens/i);
+      expect(erasure).toContain("email_verification_tokens: ['user_id']");
+      expect(erasure).toContain('DELETE FROM public.${quote(table)} WHERE ${where}');
     });
 
     it('refresh_tokens 소비', () => {

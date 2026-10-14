@@ -29,6 +29,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
           <NavLink to="/ward" className={({ isActive }) => (isActive ? 'active' : '')}>병동</NavLink>
           <NavLink to="/pharmacy" className={({ isActive }) => (isActive ? 'active' : '')}>원내 약품 파일</NavLink>
           <FileStatusArea />
+          <a href="https://neture.co.kr/" target="_blank" rel="noopener noreferrer" className="o4o-home-link">O4O 메인으로 <span className="muted">(새 탭)</span></a>
         </nav>
       </header>
       {/* 동작은 하지만 공식 지원 대상이 아닌 브라우저(Whale·Opera 등) — 안내만(§17). */}

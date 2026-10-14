@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import OperatorMembersPage from './pages/operator/OperatorMembersPage';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TermsAcceptanceGate } from './components/TermsAcceptanceGate';
 import { ToastProvider } from './components/Toast';
@@ -6,7 +7,6 @@ import AccessGate from './components/AccessGate';
 import SiteShell from './components/SiteShell';
 import ContactPage from './pages/ContactPage';
 import OperatorContactPage from './pages/operator/OperatorContactPage';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
@@ -37,7 +37,7 @@ export default function App() {
   return <BrowserRouter><AuthProvider><ToastProvider><TermsAcceptanceGate><Routes>
     <Route path="/handoff" element={<HandoffPage />} />
     <Route element={<SiteShell />}>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<Navigate to="/courses" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
@@ -64,6 +64,8 @@ export default function App() {
       </Route>
       <Route element={<AccessGate area="operator" />}>
         <Route path="/operator" element={<OperatorCoursesPage />} />
+        <Route path="/operator/members" element={<OperatorMembersPage />} />
+        <Route path="/operator/members/:id" element={<OperatorMembersPage />} />
         {/* 11차 P2: 운영자 검토 전용 read-only 화면 (수강 등록·편집 권한 없음) */}
         <Route path="/operator/courses/:courseId/review" element={<OperatorCourseReviewPage />} />
         <Route path="/operator/contact" element={<OperatorContactPage />} />

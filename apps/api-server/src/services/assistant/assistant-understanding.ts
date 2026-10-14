@@ -332,8 +332,10 @@ export function createLlmCompletionVerifier(dataSource: DataSource): CompletionV
     });
     const parsed = extractJsonObject(result.content) as { unmet?: unknown } | null;
     if (!parsed || !Array.isArray(parsed.unmet)) return null;
-    const ids = new Set(criteria.map((c) => c.id));
-    return parsed.unmet.map(String).filter((id) => ids.has(id));
+    // 원소가 하나라도 화면 조건(observed) id 가 아니면 무효 응답이다 — 걸러 빈 배열로 만들면 "모두 충족" 으로 읽힌다.
+    const ids = new Set(criteria.filter((c) => c.evidence === 'observed').map((c) => c.id));
+    const unmet = parsed.unmet.map(String);
+    return unmet.every((id) => ids.has(id)) ? unmet : null;
   };
 }
 

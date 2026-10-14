@@ -9,6 +9,7 @@ import type { Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { isPlatformAdmin } from '../../../utils/role.utils.js';
+import { rejectRetiredService, sendRetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { MediaLibraryService } from '../services/media-library.service.js';
 import logger from '../../../utils/logger.js';
@@ -22,7 +23,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
    * POST /media-library/upload
    * 공용 미디어 라이브러리 업로드 (동의 필수)
    */
-  router.post('/media-library/upload', authenticate, uploadSingleMiddleware('file'), async (req: any, res: Response) => {
+  router.post('/media-library/upload', authenticate, uploadSingleMiddleware('file'), rejectRetiredService, async (req: any, res: Response) => {
     try {
       const file = req.file as Express.Multer.File;
       if (!file) {
@@ -56,6 +57,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       logger.info(`[MediaLibrary] Upload success: ${asset.id} by ${userId}`);
       res.status(201).json({ success: true, data: asset });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Upload error:', error);
       res.status(500).json({ success: false, error: error.message || 'Upload failed' });
     }
@@ -86,6 +88,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
 
       res.json({ success: true, ...result });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] List error:', error);
       res.status(500).json({ success: false, error: 'Failed to list media assets' });
     }
@@ -108,6 +111,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
 
       res.json({ success: true, data: asset });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Get error:', error);
       res.status(500).json({ success: false, error: 'Failed to get media asset' });
     }
@@ -141,6 +145,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       const asset = await service.moveToFolder(id, folder);
       res.json({ success: true, data: asset });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Move folder error:', error);
       if (error.message === 'Asset not found') {
         res.status(404).json({ success: false, error: 'Asset not found' });
@@ -174,6 +179,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       const result = await service.getUsage(id);
       res.json({ success: true, ...result });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Usage error:', error);
       if (error.message === 'Asset not found') {
         res.status(404).json({ success: false, error: 'Asset not found' });
@@ -222,6 +228,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       const asset = await service.updateMetadata(id, patch, req.user?.id ?? null);
       res.json({ success: true, data: asset });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Update metadata error:', error);
       if (error.message === 'Asset not found') {
         res.status(404).json({ success: false, error: 'Asset not found' });
@@ -253,6 +260,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       await service.deleteAsset(id);
       res.json({ success: true });
     } catch (error: any) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MediaLibrary] Delete error:', error);
       if (error.message === 'Asset not found') {
         res.status(404).json({ success: false, error: 'Asset not found' });

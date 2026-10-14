@@ -2,13 +2,18 @@ name: GCP WIF Auth Smoke
 
 # WO-O4O-GITHUB-ACTIONS-GCP-WIF-CUTOVER-V1 — GitHub OIDC → WIF → github-actions SA 인증만 검증한다 (read-only).
 #
-#   배포 · revision 변경 · DB · secret 접근 0. 출력은 인증 주체 · project id · serving revision 이름뿐이다
+#   배포 · revision 변경 · DB · secret version 접근 0. 선택 입력은 설정/Secret Manager resource 이름만 조회한다. 출력은 인증 주체 · project id · serving revision 이름뿐이다
 #   (OIDC token · access token · credential 파일 내용은 출력하지 않는다).
 #   WIF provider 조건: repository_id · owner_id · environment=production · ref(main · deploy/*) ·
 #   event(workflow_run · workflow_dispatch — dispatch 는 소유자만) · 허용 workflow(이 파일 포함).
 
 on:
   workflow_dispatch:
+    inputs:
+      kakao_metadata:
+        description: '카카오 설정 이름·존재 여부만 조회 (secret version 접근 0)'
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
@@ -44,3 +49,21 @@ jobs:
           echo "project: $(gcloud projects describe netureyoutube --format='value(projectId)')"
           echo "o4o-core-api serving: $(gcloud run services describe o4o-core-api --region=asia-northeast3 --format='value(status.latestReadyRevisionName)')"
           echo "WIF_AUTH_PASS"
+
+      - name: Kakao configuration metadata (no values or secret versions)
+        if: inputs.kakao_metadata == true
+        run: |
+          set -euo pipefail
+          # These formats discard environment values before output; never request the full service JSON.
+          names=$(gcloud run services describe o4o-core-api --region=asia-northeast3 --format='value(spec.template.spec.containers[0].env.name)')
+          for name in KAKAO_CLIENT_ID KAKAO_CLIENT_SECRET KAKAO_REDIRECT_URI; do
+            if printf '%s' "$names" | tr ';\t' '\n' | grep -Fxq "$name"; then
+              echo "$name: configured name present"
+            else
+              echo "$name: configured name absent"
+            fi
+          done
+          resources=$(gcloud secrets list --project=netureyoutube --format='value(name)')
+          matches=$(printf '%s\n' "$resources" | grep -i kakao || true)
+          if [ -n "$matches" ]; then printf '%s\n' "$matches"; else echo 'No Kakao-named Secret Manager resource found'; fi
+          echo 'KAKAO_METADATA_READ_PASS (names only; app registration and usable values remain unverified)'

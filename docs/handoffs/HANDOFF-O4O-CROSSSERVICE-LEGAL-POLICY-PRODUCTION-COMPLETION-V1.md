@@ -1,5 +1,7 @@
 # HANDOFF-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작성일**: 2026-08-18
 - **인계자**: Agent E (Operator 트랙)
 - **인계 대상**: Agent A (cross-service legal/policy 축)
@@ -210,4 +212,4 @@ WO-O4O-SERVICE-LEGAL-CONTENT-PUBLICATION-V1  (법무 승인 선행 필요)
 | [`CHECK-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1.md`](../checks/CHECK-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1.md) | 잔여 404·인증·legal 정리 + Neture `/operator` 복귀 수정 |
 | [`CHECK-O4O-OPERATOR-REAL-LOGIN-CREDENTIAL-RECOVERY-AND-FINAL-PRODUCTION-E2E-V1.md`](../checks/CHECK-O4O-OPERATOR-REAL-LOGIN-CREDENTIAL-RECOVERY-AND-FINAL-PRODUCTION-E2E-V1.md) | 운영자 실제 로그인 · production E2E |
 | `apps/api-server/src/modules/service-legal/` | `public-service-legal.controller.ts` · `admin-service-legal.controller.ts` · `service-legal-scope.ts` |
-| `docs/local/TEST-ACCOUNTS.local.md` | 검증 계정 SSOT (gitignored, commit 금지) |
+| `docs/local/TEST-ACCOUNT.txt` | 검증 계정 SSOT (gitignored, commit 금지) |

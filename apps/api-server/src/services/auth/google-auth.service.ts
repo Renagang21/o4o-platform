@@ -1,7 +1,8 @@
+import { recordSignupTerms, recordSignupPrivacy, type SignupTermsReference } from './signup-policy.service.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
- * GoogleAuthService — Google-only Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
+ * GoogleAuthService — Google Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
  *
  * 흐름: Google ID token → `googleIdentityService.verifyGoogleIdToken`(단일 검증 경로)
  *       → Google `sub` → linked_accounts(provider='google', providerId=sub) → users.id → canonical 세션.
@@ -10,10 +11,10 @@ import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone
  *   - Identity Key 는 Google `sub`(외부) 와 `users.id`(내부) 뿐이다. email 은 lookup 키가 아니다.
  *   - **email 로 users / linked_accounts 를 조회하지 않는다** (자동 병합 금지 · AST guard G2).
  *     email UNIQUE 충돌은 사전 조회 없이 DB 23505 를 `EMAIL_IN_USE` 로 매핑한다.
- *   - Google 전용 JWT 없음 — `generateTokensWithContext` / `persistRefreshTokenFamily` 재사용, JWT sub = users.id.
+ *   - Google 전용 JWT 없음 — `generateTokensWithContext` 재사용, JWT sub = users.id.
  *   - signup 은 role_assignments · service_memberships · service_credentials 를 **만들지 않는다**.
  *   - linked_accounts 에 email/displayName/profileImage/providerData 스냅샷을 쓰지 않는다(picture 미저장).
- *   - users.name = NULL. (password 컬럼은 Phase B-1 에서 선언째 사라졌다 — 쓰지 않는다.)
+ *   - 신규 가입은 공통 이름·개인 모바일 정보를 저장한다. password credential은 별도 원장이다.
  *     email 은 `users.email NOT NULL UNIQUE` 가 남아 있어
  *     Google email claim 을 과도기 프로필 값으로만 저장한다. claim 이 없으면 placeholder 없이 실패.
  *
@@ -56,6 +57,8 @@ import {
 } from './google-identity.service.js';
 import {
   generateTokensWithContext,
+  freshenUserContext,
+  type UserContext,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import {
@@ -67,7 +70,6 @@ import {
   type SemiFranchiseAccessResolver,
 } from '../../common/auth/service-login-eligibility.policy.js';
 import type { SemiFranchiseAccessDetails } from '../../modules/neture-pharmacy/services/semi-franchise-service-access.js';
-import * as tokenUtils from '../../utils/token.utils.js';
 import logger from '../../utils/logger.js';
 
 export type GoogleAuthErrorCode =
@@ -135,6 +137,8 @@ export class GoogleAuthError extends Error {
 }
 
 export interface GoogleSignupConsents {
+  termsPolicy?: SignupTermsReference;
+  privacyPolicy?: SignupTermsReference;
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
@@ -167,6 +171,7 @@ export interface GoogleLoginInput extends GoogleAuthRequestMeta {
 }
 
 export interface GoogleSignupInput extends GoogleAuthRequestMeta {
+  policyServiceKey?: string;
   idToken: string;
   consents: GoogleSignupConsents;
 }
@@ -184,6 +189,7 @@ export interface GoogleAuthSession {
 export type SessionIssuer = (
   user: User,
   sessionServiceKey?: string | null,
+  context?: UserContext,
 ) => Promise<{
   tokens: AuthTokens;
   roles: string[];
@@ -194,6 +200,7 @@ export interface GoogleAuthServiceDeps {
   identity?: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   issueSession?: SessionIssuer;
+  readContext?: (userId: string) => Promise<UserContext>;
   /** Admin bootstrap 게이트 — 테스트에서 주입. 기본값은 요청마다 env 를 다시 읽는다. */
   /** 세미프랜차이즈 이용 자격 조회. 기본값은 `defaultSemiFranchiseAccessResolver`. */
   resolveSemiFranchiseAccess?: SemiFranchiseAccessResolver;
@@ -211,15 +218,17 @@ export class GoogleAuthService {
   private readonly identity: Pick<GoogleIdentityService, 'verifyGoogleIdToken' | 'findGoogleIdentityBySub'>;
   private readonly _dataSource?: Pick<DataSource, 'getRepository' | 'transaction'>;
   private readonly issueSession: SessionIssuer;
+  private readonly readContext: (userId: string) => Promise<UserContext>;
   private readonly resolveSemiFranchiseAccess: SemiFranchiseAccessResolver;
 
   constructor(deps: GoogleAuthServiceDeps = {}) {
     this.identity = deps.identity ?? googleIdentityService;
     this._dataSource = deps.dataSource;
     this.resolveSemiFranchiseAccess = deps.resolveSemiFranchiseAccess ?? defaultSemiFranchiseAccessResolver;
+    this.readContext = deps.readContext ?? freshenUserContext;
     this.issueSession =
       deps.issueSession ??
-      ((user, sessionServiceKey) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey));
+      ((user, sessionServiceKey, context) => generateTokensWithContext(user, 'neture.co.kr', sessionServiceKey, 'google', context));
   }
 
   /** env 는 요청 시점에 읽는다 — 플래그 제거(폐쇄)가 재배포 없이도 즉시 반영되도록. */
@@ -287,7 +296,12 @@ export class GoogleAuthService {
 
     if (typeof input.consents.name !== 'string' || !input.consents.name.trim() || input.consents.name.trim().length > 100) throw new GoogleAuthError('INVALID_NAME');
     if (!isPhoneShapeValid(input.consents.phone)) throw new GoogleAuthError('INVALID_PHONE');
-    const user = await this.dataSource.transaction((manager) => this.createGoogleUser(manager, identity, input.consents));
+    const user = await this.dataSource.transaction(async (manager) => {
+      const created = await this.createGoogleUser(manager, identity, input.consents);
+      await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
+      await recordSignupPrivacy(created.id, input.consents.privacyPolicy, manager, input.policyServiceKey ?? '');
+      return created;
+    });
 
     return this.establishSession(user, input, true);
   }
@@ -409,10 +423,10 @@ export class GoogleAuthService {
     isNewUser: boolean,
     loginMembershipGateKey?: string | null,
   ): Promise<GoogleAuthSession> {
-    const { tokens, roles, memberships } = await this.issueSession(user, meta.sessionServiceKey ?? null);
+    const { roles, memberships } = await this.readContext(user.id);
 
     // WO-O4O-SERVICE-NOT-MEMBER-AUTH-CONTRACT-RESTORATION-V1: 인증 성공 뒤 서비스 이용 자격.
-    //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 발급한 토큰은 쓰기 전에 버린다.
+    //   로그인만 판정한다(가입은 계정만 만든다 — 호출부가 키를 넘기지 않는다). 세션 발급과 family 기록 전에 판정한다.
     //   WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 서비스는 Neture 기본 ∧ 세미프랜차이즈 active 도 통과.
     const access = await evaluateServiceLoginAccess(
       this.resolveSemiFranchiseAccess, user.id, loginMembershipGateKey, roles, memberships,
@@ -422,14 +436,13 @@ export class GoogleAuthService {
       throw new GoogleAuthError(SERVICE_NOT_MEMBER_CODE, serviceNotMemberMessage(access.serviceAccess), access.serviceAccess);
     }
 
-    const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
+    const { tokens } = await this.issueSession(user, meta.sessionServiceKey ?? null, { roles, memberships });
     await this.userRepository.update(
       { id: user.id },
       {
         // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: loginAttempts/lockedUntil 리셋 제거 —
         //   password 로그인이 없으므로 증가시키는 주체가 없고, 두 컬럼은 B-2 에서 DROP 된다.
         lastLoginAt: new Date(),
-        ...(tokenFamily && { refreshTokenFamily: tokenFamily }),
       },
     );
 

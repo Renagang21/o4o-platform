@@ -67,10 +67,39 @@ export function handleAuthFailure(req: Request, error: string, userEmail?: strin
 /**
  * SQL injection detection middleware
  */
+const socialProofPaths = new Set([
+  '/api/v1/auth/social/kakao/complete',
+  '/api/v1/auth/social/reauth/complete',
+  '/api/v1/auth/social/link/verify',
+]);
+const socialTokenPaths = new Set([
+  ...socialProofPaths,
+  '/api/v1/auth/social/kakao/signup',
+  '/api/v1/auth/social/link/start',
+  '/api/v1/auth/social/link/confirm',
+]);
+
+/** Opaque proofs can contain `--`/`sp_`; SQL punctuation scanning is not their validator.
+ * This only excludes exact method/path/field + bounded URL-safe shapes from this heuristic.
+ * Controllers still validate origin, hashed one-use flow, browser binding and provider proof.
+ * These values are hashed/parameter-bound or sent as encoded provider data, never SQL text.
+ */
+function isOpaqueSocialProof(req: Request, section: string, field: string, value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  const flowToken = /^[A-Za-z0-9_-]{43}$/.test(value);
+  const providerCode = value.length > 0 && value.length <= 2048 && /^[A-Za-z0-9._~-]+$/.test(value);
+  if (req.method === 'GET' && req.path === '/api/v1/auth/social/kakao/callback' && section === 'query') {
+    return (field === 'state' && flowToken) || (field === 'code' && providerCode);
+  }
+  if (req.method !== 'POST' || section !== 'body') return false;
+  if (field === 'token' && socialTokenPaths.has(req.path)) return flowToken;
+  if (!socialProofPaths.has(req.path)) return false;
+  if (field === 'code') return providerCode;
+  return field === 'idToken' && value.length <= 16384 && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value);
+}
+
 export function sqlInjectionDetection(req: Request, res: Response, next: NextFunction) {
-  // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuth 콜백 allowlist 은퇴.
-  //   `/api/v1/social/*` 는 라우터에 **등록된 적이 없는 경로**였고(passport 전략의 callbackUrl
-  //   문자열만 존재), Passport 계층과 함께 제거했다. 죽은 예외를 남기지 않는다.
+  // Retired Passport `/api/v1/social/*` routes remain excluded from the proof contract above.
 
   const sqlPatterns = [
     /(\b(union|select|insert|update|delete|drop|create|alter|exec|execute)\b.*\b(from|into|where|table)\b)/i,
@@ -86,11 +115,17 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
     return false;
   };
 
-  // Check query params, body, and params
+  // Preserve the request for downstream validation; only filter this heuristic's candidates.
+  const candidates = (section: string, fields: Record<string, unknown>) => Object.fromEntries(
+    Object.entries(fields || {}).filter(([field, value]) => !isOpaqueSocialProof(req, section, field, value))
+  );
+  const query = candidates('query', req.query);
+  const body = candidates('body', req.body);
+  const params = candidates('params', req.params);
   const suspicious = 
-    Object.values(req.query || {}).some(checkValue) ||
-    Object.values(req.body || {}).some(checkValue) ||
-    Object.values(req.params || {}).some(checkValue);
+    Object.values(query).some(checkValue) ||
+    Object.values(body).some(checkValue) ||
+    Object.values(params).some(checkValue);
   
   if (suspicious) {
     const ipAddress = getTrustedClientIp(req);
@@ -111,9 +146,9 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
       details: {
         method: req.method,
         matchedFields: {
-          query: suspiciousFieldNames(req.query, checkValue),
-          body: suspiciousFieldNames(req.body, checkValue),
-          params: suspiciousFieldNames(req.params, checkValue)
+          query: suspiciousFieldNames(query, checkValue),
+          body: suspiciousFieldNames(body, checkValue),
+          params: suspiciousFieldNames(params, checkValue)
         }
       }
     });

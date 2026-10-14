@@ -56,7 +56,6 @@ describe('옛 호스트 수용 (session-origin)', () => {
     // 인쇄 QR · 북마크로 들어온 옛 호스트 — 종전 판정 그대로
     ['https://kpa-society.co.kr', 'kpa-society'],
     ['https://k-cosmetics.site', 'k-cosmetics'],
-    ['https://pharmacyhub.co.kr', 'pharmacy-hub'],
   ])('%s → %s', (origin, key) => {
     expect(resolveSessionServiceKey(origin)).toBe(key);
   });
@@ -73,14 +72,14 @@ describe('옛 호스트 수용 (session-origin)', () => {
 
 describe('Pharmacy-Hub 신규 가입 비노출', () => {
   it('joinEnabled=false · 가입 가능 목록에 없다', () => {
-    expect(getService('pharmacy-hub')?.joinEnabled).toBe(false);
+    expect(getService('pharmacy-hub')).toBeUndefined();
     expect(getJoinableServices().map((s) => s.key)).not.toContain('pharmacy-hub');
   });
 
-  it('카탈로그 · handoff 대상 origin 은 그대로다 (기존 회원 진입 보존)', () => {
-    expect(getService('pharmacy-hub')).toBeDefined();
-    expect(getServiceOrigin('pharmacy-hub')).toBe('https://pharmacyhub.co.kr');
-    expect(getService('pharmacy-hub')?.workspace?.storeWorkspaceEnabled).toBe(true);
+  it('retired identity and origins are no longer registered', () => {
+    expect(getService('pharmacy-hub')).toBeUndefined();
+    expect(getServiceOrigin('pharmacy-hub')).toBeUndefined();
+    expect(resolveSessionServiceKey('https://pharmacyhub.co.kr')).not.toBe('pharmacy-hub');
   });
 
   it('kpa-society 는 여전히 가입 가능하다', () => {

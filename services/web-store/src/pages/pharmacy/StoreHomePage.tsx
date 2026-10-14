@@ -254,7 +254,7 @@ export function StoreHomePage() {
                   items={[
                     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 상품 선택 = 공급 상품(공급 경로별 조건 · 주문). 옛 승인 카탈로그 진입 대체.
                     { to: pharmacyStorePath('supply'), label: '공급 상품', icon: <Package size={16} className="text-violet-600" /> },
-                    { to: '/store/handled-products', label: '매장 경영활용 제품', icon: <Store size={16} className="text-emerald-600" /> },
+                    { to: '/store/my-products', label: '내 매장 제품', icon: <Store size={16} className="text-emerald-600" /> },
                   ]}
                 />
               </div>

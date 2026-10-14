@@ -30,6 +30,9 @@ interface AuthModalContextType {
   /** 로그인 성공 후 실행할 콜백 */
   onLoginSuccess?: () => void;
   setOnLoginSuccess: (callback?: () => void) => void;
+  /** Survives modal close so the fallback cannot replace a completed login destination. */
+  loginNavigationHandled: boolean;
+  markLoginNavigationHandled: () => void;
 
   // 하위호환성 유지
   isLoginModalOpen: boolean;
@@ -41,12 +44,16 @@ const AuthModalContext = createContext<AuthModalContextType | undefined>(undefin
 export function AuthModalProvider({ children }: { children: ReactNode }) {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [onLoginSuccess, setOnLoginSuccessState] = useState<(() => void) | undefined>();
+  const [loginNavigationHandled, setLoginNavigationHandled] = useState(false);
+  const markLoginNavigationHandled = useCallback(() => setLoginNavigationHandled(true), []);
 
   const openLoginModal = useCallback(() => {
+    setLoginNavigationHandled(false);
     setActiveModal('login');
   }, []);
 
   const openRegisterModal = useCallback(() => {
+    setLoginNavigationHandled(false);
     setActiveModal('login');
   }, []);
 
@@ -72,6 +79,8 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
         closeModal,
         onLoginSuccess,
         setOnLoginSuccess,
+        loginNavigationHandled,
+        markLoginNavigationHandled,
         // 하위호환성
         isLoginModalOpen,
         closeLoginModal,

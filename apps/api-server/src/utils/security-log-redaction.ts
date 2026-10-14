@@ -20,6 +20,7 @@
 const SENSITIVE_KEY_PATTERNS: readonly RegExp[] = [
   /pass(word|wd)?/i,
   /^pwd$/i,
+  /^(code|state|nonce)$/i, // one-use OAuth credentials
   /token/i,          // token, accessToken, refreshToken, csrfToken ...
   /secret/i,
   /credential/i,
@@ -98,4 +99,9 @@ export function suspiciousFieldNames(
     if (out.length >= MAX_KEYS) break;
   }
   return out;
+}
+
+/** OAuth callback query contains a one-use code and state; retain only the route in diagnostics. */
+export function redactOAuthUrl(value: string): string {
+  return value.split('?')[0].endsWith('/auth/social/kakao/callback') ? value.split('?')[0] : value;
 }

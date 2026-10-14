@@ -23,7 +23,6 @@ import { createSupplierProductController } from './controllers/supplier-product.
 import { createSupplierProductCandidateController } from './controllers/supplier-product-candidate.controller.js';
 // WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
 // 공급자 직접 opt-in 서비스(운영자 승인 없음) 제공 설정·주문 처리 — Pharmacy-Hub 에서 이전.
-import { createSupplierServiceDeliveryController } from './controllers/supplier-service-delivery.controller.js';
 import { createSupplierStoreDescriptionController } from './controllers/supplier-store-description.controller.js';
 import { createSupplierOrderController } from './controllers/supplier-order.controller.js';
 import { createShipmentController } from './controllers/shipment.controller.js';
@@ -88,7 +87,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
 
   // Supplier domain
   // 하위 경로가 더 구체적이므로 '/supplier' 광역 마운트보다 먼저 건다.
-  router.use('/supplier/services', createSupplierServiceDeliveryController(dataSource));
   router.use('/supplier', createSupplierManagementController(dataSource));
   router.use('/supplier', createSupplierProductController(dataSource));
   // WO-O4O-SUPPLIER-SINGLE-PRODUCT-CANDIDATE-INTAKE-V1: 공급자 단건 제품 후보 intake (ProductCandidate 만 · Master/Offer 0)

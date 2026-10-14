@@ -1,5 +1,7 @@
 # CHECK-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1
 > **작업일**: 2026-08-13 · **worktree**: `C:\tmp\o4o-agent-e-operator-common` · **branch**: `work/operator-commonization-v1`
 > **main 병합 없음**
@@ -159,7 +161,7 @@ git diff --stat (기존 파일): 30 files changed, 678 insertions(+), 5891 delet
 
 ### 8-2. 브라우저 smoke
 
-> ⚠️ **로그인 자체는 검증하지 못했다.** `docs/local/TEST-ACCOUNTS.local.md` §2 기준
+> ⚠️ **로그인 자체는 검증하지 못했다.** `docs/local/TEST-ACCOUNT.txt` §2 기준
 > **4서비스 전부 L2 service credential 이 unknown** 이라 웹 로그인이 불가하다.
 > 같은 문서 §4-2 가 허용한 **L1 토큰 주입 우회**로 UI 만 검증했다. 토큰 주입은 로그인 성공이 아니다.
 

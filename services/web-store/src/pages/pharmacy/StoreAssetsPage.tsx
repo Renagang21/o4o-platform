@@ -11,14 +11,15 @@
  */
 
 import { StoreAssetsView } from '@o4o/store-asset-policy-core';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
 
 export default function StoreAssetsPage() {
   return (
-    <StoreAssetsView
+    <><StoreLibraryNavigation section="mine" /><StoreAssetsView
       api={storeAssetControlApi}
       dashboardPath="/store"
       contentListPath="/store/content"
-    />
+    /></>
   );
 }

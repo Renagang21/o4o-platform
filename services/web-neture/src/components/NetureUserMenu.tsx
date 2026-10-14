@@ -3,7 +3,7 @@
  *
  * WO-O4O-NETURE-MOBILE-NAV-PROFILE-UTILITY-AND-WORKSPACE-ACCESS-STANDARDIZE-V1
  *
- * 역할별 업무 공간 진입점 + 계정 메뉴(마이페이지/설정)를 단일 소스로 제공한다.
+ * 역할별 업무 공간 진입점 + 계정 메뉴(My Home/설정)를 단일 소스로 제공한다.
  * 데스크톱 프로필 드롭다운(NetureGlobalHeader.userMenuItems)과 모바일 프로필 시트
  * (NetureBottomNav '내정보')가 동일 데이터·동일 역할 판정을 재사용한다.
  *
@@ -80,7 +80,7 @@ export function NetureUserMenuItems({
         </GlobalHeaderMenuItem>
       )}
       <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>
-        마이페이지
+        My Home
       </GlobalHeaderMenuItem>
       <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />} onClick={onItemClick}>
         설정

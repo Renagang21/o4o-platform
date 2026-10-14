@@ -1,5 +1,7 @@
 # CHECK — Pharmacy-Hub Admin 역할 계층 도입
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: [`WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1`](../work-orders/WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1.md)
 > 작성일: 2026-08-10 · 상태: **완료** — Admin 계정 프로덕션 smoke 10항목 실측(§6-2) 후 관측용 `/admin/ping` 제거
 
@@ -103,7 +105,7 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 
 ## 6. 브라우저 smoke
 
-> 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 가 SSOT 다.
+> 자격증명은 `docs/local/TEST-ACCOUNT.txt` (gitignored) 가 SSOT 다.
 > **본 문서에 아이디·비밀번호를 기록하지 않는다.**
 
 배포: `Deploy API Server` · `Deploy Admin Dashboard` · `Deploy Web Services` 3종 모두 **success** (commit `c0de0d814`).
@@ -158,7 +160,7 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 | `roles` 카탈로그 | operator · store_owner · supplier | 동일 (**admin 없음** — §2 별도 WO) |
 
 > `pharmacy-hub:admin` 부여는 **사용자가 직접 수행**했다. 본 세션은 프로덕션 write 를 한 건도 하지 않았다.
-> 계정 아이디·비밀번호는 본 문서에 기록하지 않는다 — SSOT 는 `docs/local/TEST-ACCOUNTS.local.md` (gitignored).
+> 계정 아이디·비밀번호는 본 문서에 기록하지 않는다 — SSOT 는 `docs/local/TEST-ACCOUNT.txt` (gitignored).
 
 ### 6-4. `/admin/ping` 제거 후 재배포 · 재smoke
 

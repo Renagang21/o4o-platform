@@ -10,20 +10,17 @@
  * - Neture operator 1st approval (SUBMITTED → RECRUITING)
  * - Participant reward-status management (pending ↔ fulfilled)
  * - Trial status transitions (RECRUITING → DEVELOPMENT → ... → FULFILLED → CLOSED)
- * - Trial → Product conversion (link existing or create new ProductMaster)
+ * - Offline payment confirmation records with transactional audit
  * - Operator trial listing (all trials / service-scoped)
  */
 
 import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, IsNull } from 'typeorm';
 import {
   MarketTrial,
   TrialStatus,
   MarketTrialForum,
-  PaymentStatus,
-  VALID_PAYMENT_STATUSES,
-  isPaymentStatus,
   calculateAchievementRate,
   calculateParticipationRate,
   calculatePaymentCompletionRate,
@@ -37,60 +34,13 @@ import {
 } from '../../extensions/trial-forum-monitor/entities/MarketTrialForumSyncFailure.entity.js';
 import { marketTrialNotification } from '../../services/marketTrial.notification.js';
 import logger from '../../utils/logger.js';
-import { ActionLogService } from '@o4o/action-log-core';
-
-// Allowed trial status transitions (operator-initiated)
-const ALLOWED_TRIAL_TRANSITIONS: Partial<Record<TrialStatus, TrialStatus[]>> = {
-  [TrialStatus.RECRUITING]: [TrialStatus.DEVELOPMENT],
-  [TrialStatus.DEVELOPMENT]: [TrialStatus.OUTCOME_CONFIRMING],
-  [TrialStatus.OUTCOME_CONFIRMING]: [TrialStatus.FULFILLED],
-  [TrialStatus.FULFILLED]: [TrialStatus.CLOSED],
-};
-
-/**
- * WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1
- *
- * 승인된 trial 공고가 게시될 Neture 포럼.
- *
- * 현행 포럼 계약(WO-O4O-FORUM-CATEGORY-CLEANUP-V1):
- *   포럼 = `forum_category_requests` 의 status='completed' 행이고,
- *   `forum_post.forum_id` 가 그 행을 가리킨다. 정식 게시 경로
- *   (ForumPostController.createPost)도 slug 로 해석하므로 여기서도 slug 를 쓴다.
- *
- * 종전에는 고정 UUID(f0000000-0a00-4000-f000-0000000000f1)를 `forum_category_requests`
- * 에서 조회했는데, 그 행을 만드는 migration 2건은 이미 없어진 `forum_category`(단수)
- * 테이블을 대상으로 해 no-op 이었다. 결과적으로 조회가 0건이 되어 포럼 연동 전체가
- * **무음 skip** 됐다(실패 원장에도 남지 않음).
- *
- * slug 는 포럼 생성 시 무작위 접미사가 붙어 환경마다 다를 수 있으므로 **환경변수로
- * 덮어쓸 수 있게** 두고, 기본값만 현재 운영 값으로 고정한다. DB 행을 코드가 무조건
- * 존재한다고 전제하지 않으며, 없으면 실패로 기록한다.
- */
-const NETURE_FORUM_SERVICE_CODE = 'neture';
-const MARKET_TRIAL_FORUM_SLUG =
-  process.env.MARKET_TRIAL_FORUM_SLUG || '공급자파트너-서비스-개선-mrvj0ozg';
-
-/** 포럼 동기화 1회 시도 결과 */
-type ForumSyncOutcome =
-  | { status: 'created'; forumPostId: string }
-  | { status: 'already_linked'; forumPostId: string }
-  | { status: 'failed'; stage: ForumSyncStage; message: string };
-
-/**
- * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
- * 운영자가 허용하는 participant settlementStatus 전이 규칙
- * pending → choice_pending: 수동 개방 (cascade 또는 개별 예외)
- * choice_completed → offline_review: 운영자 검토 시작
- * offline_review → offline_settled: 운영자 정산 완료
- * offline_settled: 변경 불가 (locked)
- */
-const ALLOWED_SETTLEMENT_TRANSITIONS: Record<string, string[]> = {
-  pending: ['choice_pending'],
-  choice_pending: [],
-  choice_completed: ['offline_review'],
-  offline_review: ['offline_settled'],
-  offline_settled: [],
-};
+import type { RequestHandler } from 'express';
+import { hasFundingOperator } from '../../services/funding/funding-access.js';
+import { FundingWorkspaceService, FundingError } from '../../services/funding/funding-workspace.service.js';
+import { fundingReview, fundingForumSlug, fundingForumCode, FUNDING_PROGRESS_TRANSITIONS } from '../../services/funding/funding-review.js';
+import { participantFilters, participantCsvCell } from '../../services/funding/funding-participant-export.js';
+import { FundingPaymentRecordService } from '../../services/funding/funding-payment-record.service.js';
+import { forumFailureFilters, isForumFailureId } from '../../services/funding/funding-forum-failure-filters.js';
 
 // Valid participant reward status values
 const VALID_REWARD_STATUSES = ['pending', 'fulfilled'] as const;
@@ -149,152 +99,22 @@ export class MarketTrialOperatorController {
     }
   }
 
-  /**
-   * WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1
-   *
-   * 승인된 trial 을 Neture 포럼에 공고로 게시한다.
-   * 승인(approve1st)과 재시도(retryForumSync) 양쪽에서 재사용한다.
-   *
-   * 계약:
-   * - 승인 자체와 분리된 best-effort. 이 메서드는 throw 하지 않는다
-   *   (게시 실패가 승인을 되돌리지 않는다 — 기존 설계 의도 유지).
-   * - **무음 skip 을 하지 않는다.** 포럼을 못 찾으면 category_check 실패로 기록한다.
-   * - 같은 trial 에 이미 매핑이 있으면 재게시하지 않는다(멱등).
-   * - 성공하면 그 trial 의 미해결 실패 기록을 자동 해소한다.
-   */
-  private static async syncTrialToNetureForum(
-    trial: MarketTrial,
-    actorUserId: string | null,
-  ): Promise<ForumSyncOutcome> {
-    // ── 중복 방지: 이미 게시된 trial 은 다시 만들지 않는다 ────────────────────
-    const existingForum = await MarketTrialOperatorController.forumRepo.findOne({
-      where: { marketTrialId: trial.id },
-    });
-    if (existingForum) {
-      return { status: 'already_linked', forumPostId: existingForum.forumId };
-    }
-
-    const ds = MarketTrialOperatorController.dataSource;
-    if (!ds) {
-      const message = 'DataSource is not initialised';
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'category_check', 'critical', new Error(message),
-      );
-      return { status: 'failed', stage: 'category_check', message };
-    }
-
-    // ── Stage 1: 대상 포럼 해석 (slug → forum_category_requests.id) ───────────
-    let forumId: string | null = null;
+  private static async resolveForumFailures(trialId: string): Promise<void> {
     try {
-      const rows = await ds.query(
-        `SELECT id FROM forum_category_requests
-          WHERE slug = $1 AND service_code = $2 AND status = 'completed'
-          LIMIT 1`,
-        [MARKET_TRIAL_FORUM_SLUG, NETURE_FORUM_SERVICE_CODE],
-      );
-      forumId = rows[0]?.id ?? null;
-    } catch (catErr) {
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'category_check', 'critical', catErr,
-      );
-      return { status: 'failed', stage: 'category_check', message: String(catErr) };
-    }
-
-    // 종전에는 여기서 조용히 빠져나가 아무 흔적도 남지 않았다. 이제는 기록한다.
-    if (!forumId) {
-      const message =
-        `Neture forum not found (slug="${MARKET_TRIAL_FORUM_SLUG}", ` +
-        `service_code="${NETURE_FORUM_SERVICE_CODE}", status="completed"). ` +
-        `MARKET_TRIAL_FORUM_SLUG 환경변수 또는 포럼 승인 상태를 확인하세요.`;
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'category_check', 'critical', new Error(message),
-      );
-      return { status: 'failed', stage: 'category_check', message };
-    }
-
-    // ── Stage 2: 공고 게시글 생성 ────────────────────────────────────────────
-    // 정식 경로(ForumPostController.createPost)와 같은 계약을 쓴다:
-    // forum_id + author_id + slug + status='publish' + published_at.
-    // author_id 는 승인한 운영자다(운영 게시물 전량이 author 를 갖는다).
-    let forumPostId: string | null = null;
-    try {
-      const slug = `market-trial-${trial.id.slice(0, 8)}-${Date.now().toString(36)}`;
-      const excerpt = (trial.description || '').slice(0, 200);
-      const content = JSON.stringify([
-        { type: 'paragraph', data: { text: `[시범판매 모집] ${trial.title}` } },
-        { type: 'paragraph', data: { text: trial.description || '' } },
-        { type: 'paragraph', data: { text: `공급자: ${trial.supplierName || '-'}` } },
-        { type: 'paragraph', data: { text: `상태: 모집 중 (RECRUITING)` } },
-        { type: 'paragraph', data: { text: `※ 본 게시글은 운영자 승인으로 자동 생성되었습니다.` } },
-      ]);
-
-      const inserted = await ds.query(
-        `INSERT INTO forum_post (
-          "id", "title", "slug", "content", "excerpt",
-          "type", "status", "forum_id", "author_id",
-          "isPinned", "isLocked", "allowComments",
-          "viewCount", "commentCount", "likeCount",
-          "published_at", "created_at", "updated_at"
-        ) VALUES (
-          gen_random_uuid(), $1, $2, $3, $4,
-          'announcement', 'publish', $5, $6,
-          false, false, true,
-          0, 0, 0,
-          NOW(), NOW(), NOW()
-        ) RETURNING id`,
-        [`[시범판매] ${trial.title}`, slug, content, excerpt, forumId, actorUserId],
-      );
-      forumPostId = inserted[0]?.id ?? null;
-    } catch (postErr) {
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'forum_post_create', 'critical', postErr,
-      );
-      return { status: 'failed', stage: 'forum_post_create', message: String(postErr) };
-    }
-
-    if (!forumPostId) {
-      const message = 'forum_post INSERT returned no id';
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'forum_post_create', 'critical', new Error(message),
-      );
-      return { status: 'failed', stage: 'forum_post_create', message };
-    }
-
-    // ── Stage 3: 매핑 저장 ───────────────────────────────────────────────────
-    try {
-      const forumMapping = MarketTrialOperatorController.forumRepo.create({
-        marketTrialId: trial.id,
-        forumId: forumPostId,
-      });
-      await MarketTrialOperatorController.forumRepo.save(forumMapping);
-    } catch (mappingErr) {
-      await MarketTrialOperatorController.recordForumSyncFailure(
-        trial, 'forum_mapping_save', 'critical', mappingErr,
-      );
-      return { status: 'failed', stage: 'forum_mapping_save', message: String(mappingErr) };
-    }
-
-    // ── 성공: 이 trial 의 미해결 실패 기록을 정리한다 ────────────────────────
-    try {
-      await MarketTrialOperatorController.forumSyncFailureRepo
-        .createQueryBuilder()
-        .update(MarketTrialForumSyncFailure)
-        .set({
-          resolvedAt: new Date(),
-          resolutionNote: `자동 해소 — 포럼 게시 성공 (post ${forumPostId})`,
-        })
-        .where('trial_id = :trialId AND resolved_at IS NULL', { trialId: trial.id })
-        .execute();
-    } catch (resolveErr) {
-      // 해소 실패는 게시 성공을 취소하지 않는다
-      logger.warn('[MarketTrial] Failed to auto-resolve forum sync failures:', resolveErr);
-    }
-
-    logger.info(
-      `[MarketTrial] Forum announcement created — trial=${trial.id} post=${forumPostId}`,
-    );
-    return { status: 'created', forumPostId };
+      await this.forumSyncFailureRepo.createQueryBuilder().update(MarketTrialForumSyncFailure)
+        .set({ resolvedAt: new Date(), resolutionNote: '전용 포럼 개설 완료' }).where('trial_id = :trialId AND resolved_at IS NULL', { trialId }).execute();
+    } catch (error) { logger.error('[Funding] failed to resolve historical forum failure records', error); }
   }
+
+  /** Recheck the current DB role after the existing service membership gate. */
+  static readonly requireCurrentOperator: RequestHandler = (req, res, next) => {
+    const ds = MarketTrialOperatorController.dataSource;
+    if (!ds || !(req as any).user?.id) { res.status(403).json({ success: false, message: '운영 권한이 없습니다.' }); return; }
+    void hasFundingOperator(ds, (req as any).user.id).then(allowed => {
+      if (allowed) next();
+      else res.status(403).json({ success: false, message: '현재 펀딩 운영 권한이 없습니다.' });
+    }).catch(next);
+  };
 
   // ============================================================================
   // Neture Operator 1st Approval
@@ -404,7 +224,7 @@ export class MarketTrialOperatorController {
       const forumMapping = await MarketTrialOperatorController.forumRepo.findOne({
         where: { marketTrialId: id },
       });
-      let forumLink: { forumPostId: string; slug: string | null; url: string } | null = null;
+      let forumLink: { forumPostId?: string; forumId?: string; slug: string | null; url: string } | null = null;
       if (forumMapping && MarketTrialOperatorController.dataSource) {
         const rows = await MarketTrialOperatorController.dataSource.query(
           `SELECT slug FROM forum_post WHERE id = $1`,
@@ -420,6 +240,10 @@ export class MarketTrialOperatorController {
         }
       }
 
+      const [workspaceForum] = await MarketTrialOperatorController.dataSource!.query(
+        "SELECT id, slug FROM forum_category_requests WHERE slug = $1 AND service_code = $2 AND status = 'completed' LIMIT 1", [fundingForumSlug(id), fundingForumCode(id)]);
+      if (workspaceForum) forumLink = { forumId: workspaceForum.id, slug: workspaceForum.slug, url: `/market-trial/${id}/forum` };
+
       // WO-O4O-NETURE-MARKET-TRIAL-PRODUCT-REFERENCE-DISPLAY-V2: 연결 제품 조회
       const productMap = await buildOperatorProductRefMap(
         MarketTrialOperatorController.dataSource,
@@ -431,6 +255,7 @@ export class MarketTrialOperatorController {
         data: {
           ...toOperatorTrialDTO(trial, productMap.get(trial.productId ?? '')),
           forumLink,
+          forumReady: !!workspaceForum,
         },
       });
     } catch (error) {
@@ -442,92 +267,41 @@ export class MarketTrialOperatorController {
   /**
    * PATCH /api/v1/neture/operator/market-trial/:id/approve
    * WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1:
-   * 네뚜레 운영자 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 제거)
+   * 네뚜레 운영자 단일 승인: 승인 이력 저장 → 전용 포럼 개설 → RECRUITING
    */
   static async approve1st(req: AuthRequest, res: Response) {
     try {
-      const { id } = req.params;
-
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-      if (trial.status !== TrialStatus.SUBMITTED) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot approve: trial status is "${trial.status}", expected "submitted"`,
-        });
-      }
-
-      // 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 없이 바로 모집 시작)
-      trial.status = TrialStatus.RECRUITING;
-      await MarketTrialOperatorController.trialRepo.save(trial);
-
-      // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1:
-      // 승인 직후 Neture 포럼에 공고를 게시한다. 게시 실패는 승인을 되돌리지 않되
-      // (best-effort) 반드시 market_trial_forum_sync_failures 에 기록된다 — 무음 skip 금지.
-      // 운영자는 /forum-sync-failures 로 확인하고 /:id/forum-sync/retry 로 재처리한다.
+      const actor = req.user!.id;
+      const service = new FundingWorkspaceService(MarketTrialOperatorController.dataSource!);
+      let trial = await service.review(req.params.id, actor, true);
       try {
-        await MarketTrialOperatorController.syncTrialToNetureForum(
-          trial,
-          (req as any).user?.id ?? null,
-        );
-      } catch (forumError) {
-        // syncTrialToNetureForum 은 throw 하지 않도록 작성돼 있으나 최후 방어선.
-        await MarketTrialOperatorController.recordForumSyncFailure(
-          trial, 'forum_post_create', 'critical', forumError,
-        );
+        trial = (await service.ensureForum(trial.id, actor)).trial;
+        await MarketTrialOperatorController.resolveForumFailures(trial.id);
+        void marketTrialNotification.onApproved(trial, actor);
+      } catch (error) {
+        await MarketTrialOperatorController.recordForumSyncFailure(trial, 'forum_post_create', 'critical', error);
       }
-
-      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify supplier of approval.
-      // Idempotent at the call site — status precondition above blocks repeats.
-      void marketTrialNotification.onApproved(trial, (req as any).user?.id);
-
-      res.json({
-        success: true,
-        data: toOperatorTrialDTO(trial),
-        message: 'Trial approved. Now recruiting.',
-      });
+      res.json({ success: true, data: toOperatorTrialDTO(trial), message: fundingReview(trial).forumPending ? '승인되었습니다. 포럼 개설을 재처리해 주세요.' : '승인·포럼 개설 후 모집을 시작했습니다.' });
     } catch (error) {
-      console.error('Operator approve error:', error);
-      res.status(500).json({ success: false, message: 'Failed to approve trial' });
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      logger.error('[Funding] approval failed', error);
+      res.status(500).json({ success: false, message: '펀딩 승인에 실패했습니다.' });
     }
   }
 
   /**
    * PATCH /api/v1/neture/operator/market-trial/:id/reject
-   * 1차 반려: SUBMITTED → CLOSED
+   * 심사 반려: SUBMITTED → DRAFT (사유를 보존하고 보완·재신청 허용)
    */
   static async reject1st(req: AuthRequest, res: Response) {
     try {
-      const { id } = req.params;
-      const { reason } = req.body;
-
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-      if (trial.status !== TrialStatus.SUBMITTED) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot reject: trial status is "${trial.status}", expected "submitted"`,
-        });
-      }
-
-      trial.status = TrialStatus.CLOSED;
-      await MarketTrialOperatorController.trialRepo.save(trial);
-
-      // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: notify supplier of rejection.
-      void marketTrialNotification.onRejected(trial, reason, (req as any).user?.id);
-
-      res.json({
-        success: true,
-        data: toOperatorTrialDTO(trial),
-        message: reason ? `Trial rejected: ${reason}` : 'Trial rejected',
-      });
+      const trial = await new FundingWorkspaceService(MarketTrialOperatorController.dataSource!).review(req.params.id, req.user!.id, false, req.body.reason);
+      void marketTrialNotification.onRejected(trial, req.body.reason, req.user!.id);
+      res.json({ success: true, data: toOperatorTrialDTO(trial), message: '반려했습니다. 개설자가 보완 후 다시 신청할 수 있습니다.' });
     } catch (error) {
-      console.error('Operator reject 1st error:', error);
-      res.status(500).json({ success: false, message: 'Failed to reject trial' });
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      logger.error('[Funding] rejection failed', error);
+      res.status(500).json({ success: false, message: '반려에 실패했습니다.' });
     }
   }
 
@@ -595,7 +369,6 @@ export class MarketTrialOperatorController {
   static async listParticipants(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const { rewardType, rewardStatus } = req.query;
       const ds = MarketTrialOperatorController.dataSource;
       if (!ds) {
         return res.status(500).json({ success: false, message: 'DataSource not initialized' });
@@ -609,26 +382,12 @@ export class MarketTrialOperatorController {
       // Build filter conditions
       const conditions: string[] = [`p."marketTrialId" = $1`];
       const params: unknown[] = [id];
-      if (rewardType && typeof rewardType === 'string' && ['product', 'cash'].includes(rewardType)) {
-        params.push(rewardType);
-        conditions.push(`p."rewardType" = $${params.length}`);
-      }
-      if (rewardStatus && typeof rewardStatus === 'string' && VALID_REWARD_STATUSES.includes(rewardStatus as RewardStatus)) {
-        params.push(rewardStatus);
-        conditions.push(`p."rewardStatus" = $${params.length}`);
-      }
+      conditions.push(...participantFilters(req.query, params));
 
       // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1: settlement filter support
       if (req.query.settlementStatus && typeof req.query.settlementStatus === 'string') {
         params.push(req.query.settlementStatus);
         conditions.push(`p."settlementStatus" = $${params.length}`);
-      }
-
-      // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1: payment filter support
-      if (req.query.paymentStatus && typeof req.query.paymentStatus === 'string'
-        && isPaymentStatus(req.query.paymentStatus)) {
-        params.push(req.query.paymentStatus);
-        conditions.push(`COALESCE(p."paymentStatus", 'unpaid') = $${params.length}`);
       }
 
       const rows: Array<{
@@ -780,6 +539,7 @@ export class MarketTrialOperatorController {
         },
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Operator list participants error:', error);
       res.status(500).json({ success: false, message: 'Failed to list participants' });
     }
@@ -814,10 +574,10 @@ export class MarketTrialOperatorController {
 
       // Update participant rewardStatus
       const result = await ds.query(
-        `UPDATE market_trial_participants
-         SET "rewardStatus" = $1
+        `WITH updated AS (UPDATE market_trial_participants
+         SET "rewardStatus" = $1, "updatedAt" = now()
          WHERE id = $2 AND "marketTrialId" = $3
-         RETURNING id, "rewardType", "rewardStatus", "createdAt"`,
+         RETURNING id, "rewardType", "rewardStatus", "createdAt") SELECT * FROM updated`,
         [rewardStatus, participantId, id],
       );
 
@@ -840,284 +600,30 @@ export class MarketTrialOperatorController {
     }
   }
 
-  /**
-   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/settlement-status
-   * WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1:
-   * 운영자 participant 정산 상태 변경
-   * Body: { settlementStatus, settlementNote? }
-   * 허용 전이: pending→choice_pending, choice_completed→offline_review, offline_review→offline_settled
-   */
-  static async updateParticipantSettlementStatus(req: AuthRequest, res: Response) {
-    try {
-      // WO-O4O-MARKET-TRIAL-COMMERCE-WIRING-DISABLE-WITH-DATA-PRESERVATION-V1:
-      // 유통참여형 펀딩 = Neture 전용 content-only 모집. 신규 정산 상태 변경을 중단한다.
-      // (기존 settlementStatus 데이터는 건드리지 않음 — 신규 mutation 만 차단.)
-      return res.status(409).json({
-        success: false,
-        error: 'Market Trial settlement is disabled by content-only boundary policy.',
-        message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
-        code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
-      });
-
-      // eslint-disable-next-line no-unreachable -- 정책 비활성화. 기존 로직 보존(정의 재확인 시 참조).
-      const { id, participantId } = req.params;
-      const { settlementStatus: newStatus, settlementNote } = req.body;
-      const ds = MarketTrialOperatorController.dataSource;
-      if (!ds) {
-        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
-      }
-
-      if (!newStatus || typeof newStatus !== 'string') {
-        return res.status(400).json({ success: false, message: 'settlementStatus is required' });
-      }
-
-      // Verify trial exists
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-
-      // Fetch current participant status
-      const rows: Array<{ id: string; settlementStatus: string }> = await ds.query(
-        `SELECT id, COALESCE("settlementStatus", 'pending') AS "settlementStatus"
-         FROM market_trial_participants
-         WHERE id = $1 AND "marketTrialId" = $2`,
-        [participantId, id],
-      );
-      if (!rows || rows.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
-
-      const currentStatus = rows[0].settlementStatus;
-      const allowed = ALLOWED_SETTLEMENT_TRANSITIONS[currentStatus] ?? [];
-
-      if (!allowed.includes(newStatus)) {
-        const allowedStr = allowed.length > 0 ? allowed.join(', ') : '없음';
-        return res.status(400).json({
-          success: false,
-          message: `"${currentStatus}" 상태에서 "${newStatus}"로 전이할 수 없습니다. 허용: ${allowedStr}`,
-        });
-      }
-
-      // Build update query — include settlementNote if provided
-      let sql: string;
-      let sqlParams: unknown[];
-      if (settlementNote !== undefined) {
-        sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1, "settlementNote" = $2, "updatedAt" = now()
-               WHERE id = $3 AND "marketTrialId" = $4
-               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
-        sqlParams = [newStatus, settlementNote, participantId, id];
-      } else {
-        sql = `UPDATE market_trial_participants
-               SET "settlementStatus" = $1, "updatedAt" = now()
-               WHERE id = $2 AND "marketTrialId" = $3
-               RETURNING id, "settlementStatus", "settlementNote", "updatedAt"`;
-        sqlParams = [newStatus, participantId, id];
-      }
-
-      const result = await ds.query(sql, sqlParams);
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found' });
-      }
-
-      const row = result[0];
-      res.json({
-        success: true,
-        data: {
-          id: row.id,
-          settlementStatus: row.settlementStatus,
-          settlementNote: row.settlementNote,
-          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
-        },
-        message: `정산 상태가 "${newStatus}"로 변경되었습니다.`,
-      });
-    } catch (error) {
-      console.error('Update participant settlement status error:', error);
-      res.status(500).json({ success: false, message: 'Failed to update settlement status' });
-    }
+  /** Compatibility endpoint: new settlement mutations stay disabled; existing data is preserved. */
+  static async updateParticipantSettlementStatus(_req: AuthRequest, res: Response) {
+    return res.status(409).json({
+      success: false,
+      message: '유통참여형 펀딩은 O4O 정산 기능을 제공하지 않습니다.',
+      code: 'MARKET_TRIAL_SETTLEMENT_DISABLED',
+    });
   }
 
-  /**
-   * PATCH /api/v1/neture/operator/market-trial/:id/participants/:participantId/payment-status
-   * WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1:
-   *   Operator updates a participant's payment lifecycle state. PG integration is
-   *   out of scope for this WO — the endpoint is the manual reconciliation entry
-   *   point and the future PG webhook target.
-   *
-   *   Body (all optional except paymentStatus):
-   *     paymentStatus     : 'unpaid' | 'pending' | 'paid' | 'failed' | 'canceled' | 'refunded'
-   *     paymentMethod     : free-form (recommended: 'manual_transfer')
-   *     paymentProvider   : free-form (recommended: 'internal' for manual)
-   *     paymentReference  : PG tx id or transfer memo
-   *     paidAmount        : decimal
-   *     paidAt            : ISO datetime
-   *     confirmedAt       : ISO datetime (omit to auto-stamp on PAID)
-   *     paymentNote       : operator memo
-   *
-   *   Lifecycle policy:
-   *     - No transition matrix is enforced — operator may correct mistakes by
-   *       moving back to UNPAID, etc. WO §5: payment changes never auto-mutate
-   *       trial.status.
-   *     - When transitioning to PAID and confirmedAt is not supplied,
-   *       confirmedAt is auto-stamped to NOW() so the audit trail is preserved.
-   *
-   *   Future notification event point (NOT fired in this WO):
-   *     - PAID    → market_trial.payment_confirmed (supplier + participant)
-   *     - FAILED  → market_trial.payment_failed    (participant)
-   *     - REFUNDED → market_trial.refunded         (supplier + participant)
-   */
+  /** Offline confirmation records only; payment and audit commit together. */
   static async updateParticipantPaymentStatus(req: AuthRequest, res: Response) {
     try {
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-REACTIVATION-V1:
-      // content-only 운영 모델은 "운영자가 오프라인 입금을 확인·기록"하는 것을 전제한다
-      // (송금은 Neture 운영자 수령 → 입금 확인 완료자 명단 공유). 따라서 결제(payment) mutation 만
-      // 재활성화한다. 정산(settlement)·매장 진열·고객 전환은 content-only boundary 로 계속 차단(409 유지).
-      // 본 엔드포인트는 오프라인 입금 확인 기록일 뿐 온라인 결제(PG)가 아니다.
       const { id, participantId } = req.params;
-      const {
-        paymentStatus: newStatus,
-        paymentMethod,
-        paymentProvider,
-        paymentReference,
-        paidAmount,
-        paidAt,
-        confirmedAt,
-        paymentNote,
-      } = req.body ?? {};
       const ds = MarketTrialOperatorController.dataSource;
-      if (!ds) {
-        return res.status(500).json({ success: false, message: 'DataSource not initialized' });
-      }
-
-      if (!isPaymentStatus(newStatus)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid paymentStatus. Allowed: ${VALID_PAYMENT_STATUSES.join(', ')}`,
-        });
-      }
-
+      if (!ds) return res.status(500).json({ success: false, message: 'DataSource not initialized' });
       const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 감사용 변경 전 값(전후 비교).
-      const before: Array<{
-        id: string;
-        paymentStatus: string;
-        paidAmount: string | null;
-        paymentReference: string | null;
-        paymentNote: string | null;
-      }> = await ds.query(
-        `SELECT id, COALESCE("paymentStatus", 'unpaid') AS "paymentStatus",
-                "paidAmount", "paymentReference", "paymentNote"
-         FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2`,
-        [participantId, id],
-      );
-      if (!before || before.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found for this trial' });
-      }
-      const prev = before[0];
-
-      // Build the SET list dynamically so callers can omit fields they don't want
-      // to overwrite (e.g. update paymentStatus only without clearing paidAt).
-      const sets: string[] = [`"paymentStatus" = $1`];
-      const sqlParams: unknown[] = [newStatus];
-
-      const pushSet = (column: string, value: unknown, transform?: (v: any) => unknown) => {
-        if (value === undefined) return;
-        const idx = sqlParams.length + 1;
-        sets.push(`"${column}" = $${idx}`);
-        sqlParams.push(value === null ? null : transform ? transform(value) : value);
-      };
-
-      pushSet('paymentMethod', paymentMethod);
-      pushSet('paymentProvider', paymentProvider);
-      pushSet('paymentReference', paymentReference);
-      pushSet('paidAmount', paidAmount, (v) => Number(v));
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-PAIDAT-PRESERVE-V1:
-      // paidAt = 최초 입금 확인일. 기존 paidAt 이 있으면 보존(caller 가 값을 보내도 덮어쓰지 않음).
-      // PAID 최초 전환 시에만 설정(요청값 우선, 없으면 now). newStatus !== PAID 이면 paidAt 미변경(보존).
-      if (newStatus === PaymentStatus.PAID) {
-        const idx = sqlParams.length + 1;
-        sets.push(`"paidAt" = COALESCE("paidAt", $${idx})`);
-        sqlParams.push(paidAt !== undefined && paidAt !== null ? new Date(paidAt) : new Date());
-      }
-
-      pushSet('paymentNote', paymentNote);
-
-      // confirmedAt = 마지막 운영자 확인 시각. 입금 상태 변경/수정마다 now 로 갱신(요청값 있으면 우선).
-      {
-        const idx = sqlParams.length + 1;
-        sets.push(`"confirmedAt" = $${idx}`);
-        sqlParams.push(confirmedAt !== undefined && confirmedAt !== null ? new Date(confirmedAt) : new Date());
-      }
-
-      sets.push(`"updatedAt" = now()`);
-
-      const idIdx = sqlParams.length + 1;
-      const trialIdx = sqlParams.length + 2;
-      sqlParams.push(participantId, id);
-
-      const sql = `UPDATE market_trial_participants
-                   SET ${sets.join(', ')}
-                   WHERE id = $${idIdx} AND "marketTrialId" = $${trialIdx}
-                   RETURNING id, "paymentStatus", "paymentMethod", "paymentProvider",
-                             "paymentReference", "paidAmount", "paidAt", "confirmedAt",
-                             "paymentNote", "updatedAt"`;
-
-      const result = await ds.query(sql, sqlParams);
-      if (!result || result.length === 0) {
-        return res.status(404).json({ success: false, message: 'Participant not found' });
-      }
-
-      const row = result[0];
-      logger.info(
-        `[MarketTrialPayment] trial=${id} participant=${participantId} → paymentStatus=${newStatus} actor=${(req as any).user?.id ?? 'unknown'}`,
-      );
-
-      // WO-O4O-MARKET-TRIAL-OFFLINE-PAYMENT-AUDIT-LOG-V1: 구조화 감사(전후 상태/금액, reference·note 변경 여부).
-      // 기존 action_logs 테이블 재사용(migration 없음). paymentReference/paymentNote 원문은 기록하지 않는다.
-      // afterStatus 는 검증된 newStatus 를, afterAmount 는 요청값(있으면)·없으면 기존 금액(보존)을 사용한다
-      // (UPDATE RETURNING row 직접 의존 회피).
-      const beforeAmount = prev.paidAmount != null ? Number(prev.paidAmount) : null;
-      const afterAmount = paidAmount !== undefined && paidAmount !== null ? Number(paidAmount) : beforeAmount;
-      new ActionLogService(ds)
-        .logSuccess('neture', (req as any).user?.id ?? null, 'neture.operator.market_trial_payment_change', {
-          meta: {
-            trialId: id,
-            participantId,
-            beforeStatus: prev.paymentStatus,
-            afterStatus: newStatus,
-            beforeAmount,
-            afterAmount,
-            referenceChanged: paymentReference !== undefined && (paymentReference ?? null) !== (prev.paymentReference ?? null),
-            noteChanged: paymentNote !== undefined && (paymentNote ?? null) !== (prev.paymentNote ?? null),
-          },
-        })
-        .catch((e) => logger.warn(`[MarketTrialPayment] audit log failed: ${e?.message ?? e}`));
-
-      res.json({
-        success: true,
-        data: {
-          id: row.id,
-          paymentStatus: row.paymentStatus,
-          paymentMethod: row.paymentMethod || null,
-          paymentProvider: row.paymentProvider || null,
-          paymentReference: row.paymentReference || null,
-          paidAmount: row.paidAmount != null ? Number(row.paidAmount) : null,
-          paidAt: row.paidAt ? new Date(row.paidAt).toISOString() : null,
-          confirmedAt: row.confirmedAt ? new Date(row.confirmedAt).toISOString() : null,
-          paymentNote: row.paymentNote || null,
-          updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
-        },
-        message: `결제 상태가 "${newStatus}"로 변경되었습니다.`,
-      });
+      if (!trial) return res.status(404).json({ success: false, message: 'Trial not found' });
+      const record = await new FundingPaymentRecordService(ds).update(id, participantId, req.user!.id, req.body ?? {});
+      return res.json({ success: true, data: record, message: '오프라인 입금 기록을 저장했습니다.' });
     } catch (error) {
-      console.error('Update participant payment status error:', error);
-      res.status(500).json({ success: false, message: 'Failed to update payment status' });
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      // Database errors can include raw reference/note values; keep them out of application logs.
+      logger.error('[Funding] payment record transaction failed');
+      return res.status(500).json({ success: false, message: '입금 기록 저장에 실패했습니다. 다시 확인해 주세요.' });
     }
   }
 
@@ -1137,7 +643,7 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
-      const allowedNextStatuses = ALLOWED_TRIAL_TRANSITIONS[trial.status as TrialStatus];
+      const allowedNextStatuses = FUNDING_PROGRESS_TRANSITIONS[trial.status as TrialStatus];
       if (!allowedNextStatuses || !allowedNextStatuses.includes(newStatus as TrialStatus)) {
         const allowed = allowedNextStatuses?.join(', ') || '없음';
         return res.status(400).json({
@@ -1147,25 +653,8 @@ export class MarketTrialOperatorController {
       }
 
       const previousStatus = trial.status;
-      trial.status = newStatus as TrialStatus;
-      await MarketTrialOperatorController.trialRepo.save(trial);
-
-      // WO-MARKET-TRIAL-PHASE3-SETTLEMENT-OPERATOR-TRANSITION-V1
-      // Trial → OUTCOME_CONFIRMING 전환 시 pending 참여자 → choice_pending cascade
-      let cascadeCount = 0;
-      if (newStatus === TrialStatus.OUTCOME_CONFIRMING) {
-        const ds = MarketTrialOperatorController.dataSource;
-        if (ds) {
-          const result = await ds.query(
-            `UPDATE market_trial_participants
-             SET "settlementStatus" = 'choice_pending'
-             WHERE "marketTrialId" = $1
-               AND COALESCE("settlementStatus", 'pending') = 'pending'`,
-            [id],
-          );
-          cascadeCount = result?.rowCount ?? result?.length ?? 0;
-        }
-      }
+      const changed = await new FundingWorkspaceService(MarketTrialOperatorController.dataSource!).changeStatus(id, req.user!.id, newStatus as TrialStatus);
+      Object.assign(trial, changed);
 
       // WO-NETURE-MARKET-TRIAL-NOTIFICATION-INTEGRATION-V1: lifecycle notifications on operator transition.
       // Idempotent at the call site — ALLOWED_TRIAL_TRANSITIONS check above blocks repeats.
@@ -1183,9 +672,10 @@ export class MarketTrialOperatorController {
       res.json({
         success: true,
         data: toOperatorTrialDTO(trial),
-        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.${cascadeCount > 0 ? ` 참여자 ${cascadeCount}명 선택 대기로 전환.` : ''}`,
+        message: `Trial 상태가 "${newStatus}"로 변경되었습니다.`,
       });
     } catch (error) {
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       console.error('Update trial status error:', error);
       res.status(500).json({ success: false, message: 'Failed to update trial status' });
     }
@@ -1208,6 +698,8 @@ export class MarketTrialOperatorController {
         return res.status(404).json({ success: false, message: 'Trial not found' });
       }
 
+      const params: unknown[] = [id];
+      const conditions = ['p."marketTrialId" = $1', ...participantFilters(req.query, params)];
       const rows: Array<{
         participantName: string;
         participantType: string;
@@ -1216,6 +708,7 @@ export class MarketTrialOperatorController {
         contributionAmount: string | number | null;
         paymentStatus: string | null;
         paidAmount: string | number | null;
+        paidAt: Date | null;
         confirmedAt: Date | null;
         paymentReference: string | null;
         settlementChoice: string | null;
@@ -1230,6 +723,7 @@ export class MarketTrialOperatorController {
            p."contributionAmount",
            p."paymentStatus",
            p."paidAmount",
+           p."paidAt",
            p."confirmedAt",
            p."paymentReference",
            p."settlementChoice",
@@ -1237,9 +731,9 @@ export class MarketTrialOperatorController {
            p."createdAt"
          FROM market_trial_participants p
          LEFT JOIN users u ON u.id = p."participantId"
-         WHERE p."marketTrialId" = $1
+         WHERE ${conditions.join(' AND ')}
          ORDER BY p."createdAt" DESC`,
-        [id],
+        params,
       );
 
       // Human-readable label maps
@@ -1281,8 +775,8 @@ export class MarketTrialOperatorController {
       const won = (n: string | number | null) => (n != null && n !== '' ? `${Number(n).toLocaleString()}원` : '-');
 
       // CSV header + rows
-      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '입금확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
-      const trialTitle = (trial.title || '').replace(/"/g, '""');
+      const header = ['참여자명', '참여자유형', '보상방식', '보상상태', '참여금', '입금상태', '입금확인금액', '최초 입금 확인일', '마지막 확인일', '입금참조', '펀딩 처리 방식', '펀딩 처리 상태', '참여일', '유통참여형 펀딩 제목', '상태'];
+      const trialTitle = trial.title || '';
       const trialStatusLabel: Record<string, string> = {
         draft: '작성 중', submitted: '심사 대기',
         recruiting: '모집 중', development: '준비 중',
@@ -1291,21 +785,12 @@ export class MarketTrialOperatorController {
       const trialStatusText = trialStatusLabel[trial.status] || trial.status;
 
       const csvRows = rows.map((r) => [
-        `"${(r.participantName || '').replace(/"/g, '""')}"`,
-        `"${participantTypeLabel(r.participantType)}"`,
-        `"${rewardTypeLabel(r.rewardType)}"`,
-        `"${rewardStatusLabel(r.rewardStatus)}"`,
-        `"${won(r.contributionAmount)}"`,
-        `"${paymentStatusLabel(r.paymentStatus)}"`,
-        `"${won(r.paidAmount)}"`,
-        `"${r.confirmedAt ? fmtDate(r.confirmedAt) : '-'}"`,
-        `"${(r.paymentReference || '-').replace(/"/g, '""')}"`,
-        `"${settlementChoiceLabel(r.settlementChoice)}"`,
-        `"${settlementStatusLabel(r.settlementStatus)}"`,
-        `"${fmtDate(r.createdAt)}"`,
-        `"${trialTitle}"`,
-        `"${trialStatusText}"`,
-      ].join(','));
+        r.participantName, participantTypeLabel(r.participantType), rewardTypeLabel(r.rewardType),
+        rewardStatusLabel(r.rewardStatus), won(r.contributionAmount), paymentStatusLabel(r.paymentStatus),
+        won(r.paidAmount), r.paidAt ? fmtDate(r.paidAt) : '-', r.confirmedAt ? fmtDate(r.confirmedAt) : '-',
+        r.paymentReference, settlementChoiceLabel(r.settlementChoice), settlementStatusLabel(r.settlementStatus),
+        fmtDate(r.createdAt), trialTitle, trialStatusText,
+      ].map(participantCsvCell).join(','));
 
       // BOM for Excel UTF-8 compatibility
       const bom = '\uFEFF';
@@ -1321,7 +806,8 @@ export class MarketTrialOperatorController {
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"; filename*=UTF-8''${utf8Filename}`);
       res.send(csv);
     } catch (error) {
-      console.error('Operator export participants CSV error:', error);
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      logger.error('[Funding] participant export failed');
       res.status(500).json({ success: false, message: 'Failed to export participants' });
     }
   }
@@ -1340,54 +826,24 @@ export class MarketTrialOperatorController {
    * 포럼 공고 게시 재시도 (운영자 전용)
    *
    * WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1
-   * - 라우터에서 requireAuth + requireNetureScope('neture:operator') 가 이미 적용된다.
+   * - 라우터에서 funding scope guard + current DB role guard 가 이미 적용된다.
    *   공급자·일반 사용자는 이 경로에 도달할 수 없다.
-   * - 멱등: 이미 매핑이 있으면 재게시하지 않고 already_linked 로 응답한다.
+   * - 멱등: 전용 포럼이 있으면 중복 생성하지 않고 already_linked 로 응답한다.
    * - 승인 전(SUBMITTED 이전) trial 은 공고 대상이 아니므로 거부한다.
    */
   static async retryForumSync(req: AuthRequest, res: Response) {
     try {
-      const { id } = req.params;
-      const actorId = (req as any).user?.id ?? null;
-
-      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (!trial) {
-        return res.status(404).json({ success: false, message: 'Trial not found' });
-      }
-
-      // 아직 승인되지 않은 trial 은 공고를 만들지 않는다.
-      if (trial.status === TrialStatus.DRAFT || trial.status === TrialStatus.SUBMITTED) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot sync forum: trial status is "${trial.status}" (not yet approved)`,
-        });
-      }
-
-      const outcome = await MarketTrialOperatorController.syncTrialToNetureForum(trial, actorId);
-
-      logger.info(
-        `[MarketTrial] Forum sync retry by operator=${actorId} trial=${id} → ${outcome.status}`,
-      );
-
-      if (outcome.status === 'failed') {
-        return res.status(502).json({
-          success: false,
-          message: `Forum sync failed at stage "${outcome.stage}"`,
-          data: { stage: outcome.stage, reason: outcome.message },
-        });
-      }
-
-      return res.json({
-        success: true,
-        data: { status: outcome.status, forumPostId: outcome.forumPostId },
-        message:
-          outcome.status === 'already_linked'
-            ? 'Forum announcement already exists for this trial'
-            : 'Forum announcement created',
-      });
+      const actor = req.user!.id;
+      const service = new FundingWorkspaceService(MarketTrialOperatorController.dataSource!);
+      const result = await service.ensureForum(req.params.id, actor);
+      await MarketTrialOperatorController.resolveForumFailures(req.params.id);
+      if (result.created) void marketTrialNotification.onApproved(result.trial, actor);
+      return res.json({ success: true, data: { status: result.created ? 'created' : 'already_linked', forumId: result.forum.id } });
     } catch (error) {
-      logger.error('retryForumSync error:', error);
-      res.status(500).json({ success: false, message: 'Failed to retry forum sync' });
+      if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
+      const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id: req.params.id } });
+      if (trial) await MarketTrialOperatorController.recordForumSyncFailure(trial, 'forum_post_create', 'critical', error);
+      return res.status(502).json({ success: false, message: '포럼 개설에 실패했습니다. 다시 시도해 주세요.' });
     }
   }
 
@@ -1398,15 +854,14 @@ export class MarketTrialOperatorController {
    */
   static async listForumSyncFailures(req: AuthRequest, res: Response) {
     try {
-      const { trialId, resolved, limit: limitStr, page: pageStr } = req.query;
-
-      const limit = Math.min(100, Math.max(1, Number(limitStr) || 50));
-      const page = Math.max(1, Number(pageStr) || 1);
-      const offset = (page - 1) * limit;
+      const filters = forumFailureFilters(req.query);
+      if (!filters) return res.status(400).json({ success: false, message: '조회 조건을 확인해 주세요.' });
+      const { trialId, resolved, limit, page, offset } = filters;
 
       const qb = MarketTrialOperatorController.forumSyncFailureRepo
         .createQueryBuilder('f')
         .orderBy('f.occurredAt', 'DESC')
+        .addOrderBy('f.id', 'DESC')
         .take(limit)
         .skip(offset);
 
@@ -1440,7 +895,10 @@ export class MarketTrialOperatorController {
   static async resolveForumSyncFailure(req: AuthRequest, res: Response) {
     try {
       const { failureId } = req.params;
-      const { note } = req.body as { note?: string };
+      const { note } = req.body ?? {};
+      if (!isForumFailureId(failureId) || (note != null && typeof note !== 'string')) {
+        return res.status(400).json({ success: false, message: '해결 처리 입력을 확인해 주세요.' });
+      }
 
       const record = await MarketTrialOperatorController.forumSyncFailureRepo.findOne({
         where: { id: failureId },
@@ -1454,9 +912,15 @@ export class MarketTrialOperatorController {
         return res.status(400).json({ success: false, message: 'Already resolved' });
       }
 
-      record.resolvedAt = new Date();
-      record.resolutionNote = note ?? null;
-      await MarketTrialOperatorController.forumSyncFailureRepo.save(record);
+      const resolution = { resolvedAt: new Date(), resolutionNote: note ?? null };
+      // Only the first resolver can write its memo, including concurrent retry/automatic recovery.
+      const result = await MarketTrialOperatorController.forumSyncFailureRepo.update(
+        { id: failureId, resolvedAt: IsNull() }, resolution,
+      );
+      if (result.affected !== 1) {
+        return res.status(400).json({ success: false, message: 'Already resolved' });
+      }
+      Object.assign(record, resolution);
 
       res.json({ success: true, data: toForumSyncFailureDTO(record) });
     } catch (error) {
@@ -1560,6 +1024,7 @@ async function buildOperatorProductRefMap(
 function toOperatorTrialDTO(trial: MarketTrial, productRef?: OperatorTrialProductRef | null) {
   return {
     id: trial.id,
+    ...fundingReview(trial),
     title: trial.title,
     description: trial.description,
     supplierId: trial.supplierId,

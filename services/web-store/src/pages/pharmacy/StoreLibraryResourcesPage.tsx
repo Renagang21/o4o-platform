@@ -21,6 +21,7 @@
  *   본문(ActionBar + DataTable + Drawer)·삭제 정책·조회 경로는 무변경.
  */
 
+import { STORE_RESOURCES_HEADING } from '../../config/storeLibraryLabels';
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
 import { Library, ExternalLink, Trash2, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -34,6 +35,7 @@ import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapsho
 import { StorePageShell } from '@o4o/store-ui-core';
 import { colors } from '../../styles/theme';
 import { stripHtml, blocksToText } from '../../utils/ai-clipboard';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
 // WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: list 영역 표준 테이블
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -303,10 +305,7 @@ export default function StoreLibraryResourcesPage() {
   return (
     <StorePageShell
       labels={{
-        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
-        breadcrumbRoot: '약국 자료함',
-        pageTitle: '자료',
+        ...STORE_RESOURCES_HEADING,
         subtitle: (
           <>
             콘텐츠를 만들 때 참고할 원소스 자료를 보관합니다.
@@ -347,6 +346,7 @@ export default function StoreLibraryResourcesPage() {
       </div>
 
       {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: 카드 list → @o4o/ui DataTable */}
+      <StoreLibraryNavigation section="mine" />
       <DataTable<UnifiedResourceRow>
         rowSelection={{
           selectedRowKeys: Array.from(selected),

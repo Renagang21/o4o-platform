@@ -106,6 +106,7 @@ import {
   cachedUnderstanding,
   createCompletionJudge,
   createLlmTaskUnderstander,
+  createLlmCompletionVerifier,
   enforceCommitBoundary,
   fallbackUnderstanding,
   isCompletionDeclaration,
@@ -254,6 +255,23 @@ describe('① 업무 이해(실행 전)', () => {
     await createLlmTaskUnderstander(ds)({ request: 'x'.repeat(WORK_GOAL_MAX_LENGTH + 500) });
     expect((executeMock.mock.calls[1][0] as { userPrompt: string }).userPrompt).toContain('x'.repeat(WORK_GOAL_MAX_LENGTH));
     expect((executeMock.mock.calls[1][0] as { userPrompt: string }).userPrompt).not.toContain('x'.repeat(WORK_GOAL_MAX_LENGTH + 1));
+  });
+
+  it('의미 검증기 — 알 수 없는 · 화면 조건이 아닌 id 가 섞이면 무효(null)로 사용자 확인 · 정상 응답은 그대로', async () => {
+    const criteria = [C1, C2_USER];
+    const ev = [{ criterionId: 'c1', source: 'screen' as const, quote: 'x', grounded: true }];
+    const verify = createLlmCompletionVerifier(ds);
+    executeMock.mockResolvedValueOnce({ content: '{"unmet":["c99"]}' });
+    expect(await verify({ goal: 'g', criteria, evidence: ev })).toBeNull();
+    executeMock.mockResolvedValueOnce({ content: '{"unmet":["c2"]}' }); // 사용자 확인 조건은 검증 대상이 아니다
+    expect(await verify({ goal: 'g', criteria, evidence: ev })).toBeNull();
+    executeMock.mockResolvedValueOnce({ content: '{"unmet":["c1"]}' });
+    expect(await verify({ goal: 'g', criteria, evidence: ev })).toEqual(['c1']);
+    executeMock.mockResolvedValueOnce({ content: '{"unmet":[]}' });
+    expect(await verify({ goal: 'g', criteria, evidence: ev })).toEqual([]);
+    // 판정기로 이어지면 — 무효 응답은 complete 가 아니라 사용자 확인.
+    executeMock.mockResolvedValueOnce({ content: '{"unmet":["c99"]}' });
+    expect(await createCompletionJudge(U([C1]), { verify })({ evidence: ev, via: 'done' })).toMatchObject({ decision: 'ask' });
   });
 
   it('이해가 있으면 완료 계약은 criteria_evidence · 실행 지시 프롬프트에 목표 · 조건 · 빠진 정보 · 확정 경계가 실린다', () => {

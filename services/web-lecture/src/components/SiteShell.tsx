@@ -2,7 +2,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadFooterLegal } from '../lib/footerLegal';
-import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { canAccess } from './AccessGate';
@@ -18,10 +18,15 @@ export default function SiteShell() {
         <Link to="/courses">강의</Link>
         <Link to="/contact">이용 · 개설 문의</Link>
         {isAuthenticated && <Link to="/my/enrollments">내 학습</Link>}
-        {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
-        {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/contact">문의 관리</Link></>}
-        {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = O4O 계정 전체 종료 */}
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" />
+        {(canAccess('instructor', user) || canAccess('operator', user)) && <details className="work-menu">
+          <summary>업무 메뉴</summary>
+          <nav aria-label="강의 업무 메뉴">
+            {canAccess('instructor', user) && <Link to="/instructor">강사</Link>}
+            {canAccess('operator', user) && <><Link to="/operator">운영</Link><Link to="/operator/contact">문의 관리</Link><Link to="/operator/members">회원 관리</Link></>}
+          </nav>
+        </details>}
+        {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
+        <span className="inline-flex flex-wrap items-center gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
         {isAuthenticated ? <button className="link-button" type="button" onClick={logout}>{O4O_LOGOUT_LABEL}</button> : <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link>}
       </nav>
     </header>

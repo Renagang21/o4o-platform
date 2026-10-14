@@ -1,3 +1,6 @@
+import { SessionResponse } from './session-response.js';
+import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Google Auth Controller: Google-only Signup/Login endpoints
@@ -7,13 +10,10 @@
  * displayName · pendingPolicyAcceptances). 검증·조회·세션 발급은 전부 `googleAuthService` 가 담당한다.
  */
 import { Request, Response } from 'express';
-import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { resolveSessionServiceKey } from '../../../utils/session-origin.js';
 import { resolveLoginMembershipGateKey } from '../../../common/auth/service-login-eligibility.policy.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
-import { authenticationService } from '../../../services/authentication.service.js';
-import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
 import { googleAuthService, GoogleAuthError, type GoogleAuthSession } from '../../../services/auth/google-auth.service.js';
 import { GoogleIdTokenError } from '../../../services/auth/google-identity.service.js';
 import { googleIdentityConfig } from '../../../config/google-identity.config.js';
@@ -23,7 +23,6 @@ import type {
 } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
-import { isCrossOriginRequest } from './auth-helpers.js';
 import { resolveExposableAccountStatus } from '../../../common/auth/account-access.policy.js';
 
 /** 프런트 GIS 초기화용 공개 Client ID env(선택). 없으면 allowlist 첫 항목을 쓴다. secret 아님. */
@@ -74,6 +73,7 @@ export class GoogleAuthController extends BaseController {
     const { idToken, consents, includeLegacyTokens } = req.body as GoogleSignupRequestDto;
     try {
       const session = await googleAuthService.signup({
+        policyServiceKey: await resolveSignupPolicyKeyFromOrigin(req.get('origin')),
         idToken,
         consents,
         ipAddress: getTrustedClientIp(req),
@@ -93,7 +93,7 @@ export class GoogleAuthController extends BaseController {
   //   목적이던 "기존 관리자 users.id 에 Google 연결"은 완료됐고 1회용이라 재사용 경로가 없다.
   //   운영 env 에 플래그/코드가 없어 이미 fail-closed 로 닫혀 있었다.
 
-  private static async respondWithSession(
+  static async respondWithSession(
     req: Request,
     res: Response,
     session: GoogleAuthSession,
@@ -101,40 +101,14 @@ export class GoogleAuthController extends BaseController {
     message: string,
     status: 200 | 201 = 200,
   ): Promise<any> {
-    authenticationService.setAuthCookies(req, res, session.tokens);
-
-    const user = session.user;
-    // name 은 NULL 허용 — /auth/login 과 같은 우선순위로 null-safe 하게 만든다.
-    user.displayName =
-      (user.name as string | null | undefined)
-      || `${(user.lastName as string) || ''}${(user.firstName as string) || ''}`.trim()
-      || (user.email as string | undefined)?.split('@')[0]
-      || '사용자';
-    try {
-      user.pendingPolicyAcceptances = await policyAcceptanceService.getPendingForUser(String(user.id));
-    } catch { user.pendingPolicyAcceptances = []; }
-
-    const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);
-    const body = {
-      message,
-      user,
-      isNewUser: session.isNewUser,
-      ...(session.serviceMembership && { serviceMembership: session.serviceMembership }),
-      ...(includeTokensInBody && {
-        tokens: {
-          accessToken: session.tokens.accessToken,
-          refreshToken: session.tokens.refreshToken,
-          expiresIn: session.tokens.expiresIn,
-        },
-      }),
-    };
-    return status === 201 ? BaseController.created(res, body) : BaseController.ok(res, body);
+    return SessionResponse.send(req, res, session, { includeLegacyTokens, message, status });
   }
 
   private static handleError(res: Response, error: unknown, op: 'login' | 'signup' | 'link'): any {
     const err = error as Error & { code?: string; reason?: string; statusCode?: number; details?: { status?: unknown } };
     monitoringMetrics.recordAuthFailure(err.code || 'UNKNOWN');
 
+    if (error instanceof PolicyAcceptanceError) return BaseController.error(res, error.message, error.httpStatus, error.code);
     if (error instanceof GoogleIdTokenError) {
       // reason 은 로그에만 — 클라이언트에는 단일 code 로 응답한다(allowlist 상태 노출 최소화).
       logger.warn(`[GoogleAuthController.${op}] ID token rejected`, { reason: error.reason });
@@ -146,6 +120,9 @@ export class GoogleAuthController extends BaseController {
         return BaseController.forbidden(res, error.message, error.code, { serviceAccess: error.serviceAccess });
       }
       return BaseController.error(res, error.message, error.statusCode, error.code);
+    }
+    if (err.code === 'SESSION_CHANGED_RETRY_LOGIN') {
+      return BaseController.error(res, err.message, 409, err.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {
       const accountStatus = resolveExposableAccountStatus(err.details?.status);

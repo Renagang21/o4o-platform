@@ -1,14 +1,4 @@
-/**
- * BranchHomePage — 분회 홈 (고정 템플릿 'classic')
- * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
- *
- * 1차 범위: 로고 / 이름 / 소개 / 연락처 + 공지·자료실 최신 목록.
- *
- * WO-O4O-KPA-BRANCH-IA-AND-NAVIGATION-FINALIZATION-V1 §5:
- *   공개 홈은 소개 · 공지 · 다가오는 행사다. 행사는 기존 공개 API 를 그대로 쓰고
- *   새 통계 API 를 만들지 않는다. 행사 조회가 실패해도 홈 전체를 죽이지 않는다
- *   (섹션만 비운다) — 소개·공지는 행사와 무관하게 보여야 한다.
- */
+/** Branch entry displays current notices, events and resources without a separate introduction page. */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPublicSite, getPublicPosts, type BranchPost, type BranchSite } from '../lib/api/branch';
@@ -66,21 +56,11 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
   if (state.kind === 'loading') return <p className="text-gray-500">불러오는 중입니다…</p>;
   if (state.kind === 'error') return <p className="text-gray-700">{state.message}</p>;
 
-  const { site, notices, resources } = state;
+  const { notices, resources } = state;
 
   return (
     <div className="space-y-10">
-      <section>
-        <h1 className="text-2xl font-bold text-gray-900">{site.title}</h1>
-        {site.tagline && <p className="mt-1 text-gray-600">{site.tagline}</p>}
-      </section>
-
-      {site.intro && (
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-gray-900">분회 소개</h2>
-          <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{site.intro}</p>
-        </section>
-      )}
+      <h1 className="text-2xl font-bold text-gray-900">공지 · 행사</h1>
 
       <section>
         <div className="mb-2 flex items-center justify-between">
@@ -109,24 +89,6 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
         <PostPreview title="자료실" to={`${basePath}/resources`} items={resources} />
       </div>
 
-      <section>
-        <h2 className="mb-2 text-lg font-semibold text-gray-900">연락처</h2>
-        <dl className="space-y-1 text-sm text-gray-700">
-          {site.contact?.address && <Row label="주소" value={site.contact.address} />}
-          {site.contact?.phone && <Row label="전화" value={site.contact.phone} />}
-          {site.contact?.email && <Row label="이메일" value={site.contact.email} />}
-          {site.contact?.hours && <Row label="운영시간" value={site.contact.hours} />}
-        </dl>
-      </section>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex gap-3">
-      <dt className="w-20 shrink-0 text-gray-500">{label}</dt>
-      <dd>{value}</dd>
     </div>
   );
 }

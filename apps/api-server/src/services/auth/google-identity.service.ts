@@ -44,6 +44,7 @@ export interface VerifiedIdTokenPayload {
   iat?: number;
   email?: string;
   email_verified?: boolean;
+  nonce?: string;
 }
 
 export type GoogleIdTokenRejectReason =
@@ -53,7 +54,8 @@ export type GoogleIdTokenRejectReason =
   | 'TOKEN_EXPIRED'
   | 'ISSUER_MISMATCH'
   | 'AUDIENCE_NOT_ALLOWED'
-  | 'SUB_MISSING';
+  | 'SUB_MISSING'
+  | 'CHALLENGE_MISMATCH';
 
 export class GoogleIdTokenError extends Error {
   readonly code = 'GOOGLE_ID_TOKEN_INVALID';
@@ -124,7 +126,7 @@ export class GoogleIdentityService {
    * audience 는 **서버 allowlist(`GOOGLE_ALLOWED_CLIENT_IDS`)** 로만 대조한다. allowlist 가 비어 있으면
    * 어떤 토큰도 통과하지 못한다(fail-closed). 통과 시 Identity Key = `sub`.
    */
-  async verifyGoogleIdToken(idToken: string): Promise<VerifiedGoogleIdentity> {
+  async verifyGoogleIdToken(idToken: string, challenge?: { nonce: string; issuedAfter: Date }): Promise<VerifiedGoogleIdentity> {
     const allowedAudiences = this.config.allowedClientIds;
     if (allowedAudiences.length === 0) {
       throw new GoogleIdTokenError('ALLOWLIST_EMPTY', 'GOOGLE_ALLOWED_CLIENT_IDS is not configured');
@@ -158,6 +160,10 @@ export class GoogleIdentityService {
     }
     if (!payload.sub) {
       throw new GoogleIdTokenError('SUB_MISSING');
+    }
+    if (challenge && (payload.nonce !== challenge.nonce || typeof payload.iat !== 'number' ||
+        payload.iat * 1000 < challenge.issuedAfter.getTime() - 60000)) {
+      throw new GoogleIdTokenError('CHALLENGE_MISMATCH');
     }
 
     return {

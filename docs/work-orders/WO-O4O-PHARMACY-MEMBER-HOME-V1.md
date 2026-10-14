@@ -1,0 +1,116 @@
+# 약국 경영지원 회원 초기화면 TODO
+
+> **상태**: COMPLETED
+> **작성일**: 2026-10-10 · **최종 갱신**: 2026-10-10
+> **근거 WO/IR**: 사용자 지시 — 프랜차이즈 가맹점 UI 조사·비교 후 초기화면 정비, TODO 작성 → 문서·코드 조사 보완 → 전체 작업·push.
+
+## 사용자 기준
+
+로그인하면 약국 협력사업의 실제 회원 화면이 바로 나온다. 커뮤니티 선택·신청 상태를 거쳐 다시 진입하지 않는다. Hero·공지·회원 활동·지원 자료는 회원 초기화면에서 직접 표시한다. 주문 등 매장 지원 실행은 내 매장에 유지하고, 내 매장 이동은 콘텐츠 메뉴와 구분한다. 실제 프랜차이즈 가맹점 UI를 먼저 조사해 앞선 기획안과 비교한다.
+
+## 조사 후 보완한 TODO
+
+- [x] 1. TODO 초안 작성·최신 main 기반 전용 worktree·branch 준비.
+- [x] 2. 외부 UI 사례·정본·현재 코드·메뉴 소비처·로그인·데이터 경계를 조사하고 TODO 보완.
+- [x] 3. 조사 근거와 앞선안 비교를 기록하고 회원 초기화면·URL·메뉴 설계를 구체화.
+- [x] 4. 실제 공지·게시글·자료를 바로 보여주는 회원 초기화면 구현.
+- [x] 5. 루트·로그인 기본 화면·기존 URL 연결·내 매장 위치·신청/관리 분리 정비.
+- [x] 6. 관련 회귀·빌드·PC/모바일 직접 화면 검증.
+- [x] 7. 정본·실행 기록 정합 및 전용 branch commit·push·PR·CI 상태 확인.
+
+## 조사·비교 평가
+
+기준 main: `847ee5d6bda405358ac42234b2551898df343048`. 조사일: 2026-10-10. 외부 자료는 공식 공개 제품 안내·제품 이미지이며 실제 고객 계정에 로그인한 조사는 아니다. 모든 프랜차이즈의 동일한 표준이라고 일반화하지 않는다.
+
+| 공식 근거 | 확인 사실 | O4O 적용 판단 |
+|---|---|---|
+| [FranConnect The Hub](https://www.franconnect.com/platform-overview/the-hub/) | 공지·업데이트, 커뮤니티·협업, 권한별 자료함, 지원을 하나의 회원 경험으로 제공한다고 안내한다. 해당 페이지의 대표 이미지는 홍보 사진이며 UI 캡처가 아니다. | 신청 상태를 첫 화면으로 두지 않고 회원 콘텐츠를 직접 모은다. |
+| [World Manager Frontline](https://www.franconnect.com/platform-overview/world-manager-frontline/) · [공개 Notices 제품 이미지](https://www.franconnect.com/wp-content/uploads/2024/04/World-Manager-Social-Collaboration.png) | 제품 이미지에서 브랜드 헤더·공지 Hero·실제 공지 제목/본문/댓글·오른쪽 My Tasks/Links가 함께 보인다. World Manager는 FranConnect 제품군이며 별도 업체 사례로 중복 집계하지 않는다. | Hero를 회원 소통의 브랜드 영역으로 두고 공지·게시글을 바로 표시한다. 업무 바로가기는 옆 패널로 분리한다. |
+| [FranchiseSoft Digital Library](https://franchisesoft.com/digital-library/) · [Franchisee Management](https://franchisesoft.com/franchisee-management/) | 자료함은 운영 매뉴얼·브랜드 자료의 권한별 저장소이고 회원 정보·소통·운영 기록을 통합한다고 안내한다. 관리 제품 설명을 가맹점 첫 화면으로 오인하지 않는다. | 기존 사업별 승인·콘텐츠 범위를 지키며 자료 제목·요약을 첫 화면에 보여준다. 신규 티켓·교육·할 일 기능은 만들지 않는다. |
+
+| 비교 항목 | 앞선안·현재 구현 | 보완한 구현 |
+|---|---|---|
+| 첫 화면 | 신청 상태 → 참여자 게시판 링크 → 게시글 | `/`에서 회원 초기화면이 바로 표시되고 실제 최근 공지·글·자료를 읽는다. 게시판 목록은 세부 탐색 기능이다. |
+| 브랜드·Hero | 내부 사업명 `pharmacy`와 승인 상태 | O4O 약국 경영지원 회원 Hero. 대형 서비스 소개나 별도 Home 메뉴를 만들지 않는다. |
+| 공지 | 게시판 안으로 들어가야 확인 | 기존 게시글 중 상단 고정/공지 유형을 최근 공지로 표시한다. 신규 공지 원장·확인 여부·가짜 수치를 만들지 않는다. |
+| 내 매장 | 기본 로그인 이동·콘텐츠 메뉴·모바일 경영 탭 | 회원 첫 화면의 업무 바로가기에서 기존 로그인 유지 handoff로 이동. 주문 기능은 복제하지 않는다. 계정 메뉴의 기존 업무 진입은 유지한다. |
+| 신청·개설·운영 | 초기화면·회원 게시글 메뉴에 섞임 | 참여 상태는 `/my/participation`, 게시판 개설/운영은 별도 관리 링크. 담당 운영자 경계 유지. |
+| URL | `/businesses/pharmacy/...` | `/`, `/community`, `/materials`, `/tools`, `/my/participation`. 이전 pharmacy 주소는 query/hash를 보존해 전환. 다른 사업 키의 경로와 공통 커뮤니티 `/forum/*` 이동은 보존. |
+
+## 조사한 문서·코드 모집단
+
+- 정본: [서비스 탐색](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md) §5, [역할·업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §0·§3·§5·§9, [공통 변경 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
+- 라우트·기본 로그인: `services/web-kpa-society/src/App.tsx`, `config/dashboard.ts` → App fallback·LoginModal. 일반 회원·매장 경영자의 기본 로그인은 회원 초기화면, 기존 운영자/관리자 기본 업무 이동과 명시적 returnTo는 유지한다.
+- 메뉴 소비처: `config/navigation.ts` → KpaGlobalHeader·Footer·브랜드 회귀; MobileBottomNav → Layout. 공통 UI 패키지 및 타 서비스 config는 수정하지 않는다.
+- 사업 범위: BusinessWorkspace → 사업 정보·community access 판정 → 참여/자료/게시판/운영/도구. 사업 UI 경로는 기존 모든 소비처를 함께 변경한다.
+- 게시글 API: 기존 `/communities/:key/forum/posts`; 공개 상태·폐쇄 게시판 자격·게시판 범위는 서버가 판정한다. 첫 페이지 최근 20개 중 공지/일반 글을 표시하며 전체 공지 집계라고 표시하지 않는다.
+- 자료 API: 기존 `/neture/pharmacy/store/contents` + `sf=pharmacy`; 승인 회원만 조회하고 응답의 사업 키도 확인한다. 담당 운영자에게 약국 소유자 전용 조회를 요구하지 않고 기존 운영 화면을 연결한다.
+
+## 구현 순서·검증 조건
+
+1. 사업 UI 경로 helper·이전 URL 전환을 만들고 기존 사업 페이지 링크 전체를 정비한다.
+2. 루트 회원 화면에 Hero·최근 공지·최근 게시글·자료 제목/요약·별도 업무 바로가기를 구현한다. 신청 전 사용자는 Hero와 자격 안내만 보며 회원 데이터를 조회하지 않는다. 오류·로딩·정상 빈 목록을 구분하고 재시도를 제공한다.
+3. 헤더·푸터·모바일 메뉴를 콘텐츠 중심으로 정비하고 매장 경영자의 강제 내 매장 로그인 이동을 제거한다. 운영자·관리자 기본 이동과 명시적 상세 화면 returnTo는 보존한다.
+4. 기존 pharmacy URL 전환·다른 사업 키 격리·회원 API 실패/재시도·미승인·운영자·사업 자료 범위·직접 게시글 열기를 회귀 검증한다. PC·모바일 브라우저에서는 실제 콘텐츠 노출·메뉴·handoff 실패·URL·가로 넘침을 확인한다.
+5. 정본 §5에 이 화면/URL 규칙을 반영하고 현재 WO에 실행 결과를 기록한다. 대표 홈 과거 상태 정비는 PR #409에서 준비한 근거를 조사하고, 이번 PR 리뷰의 정합 보완으로 같은 정본·색인에 반영한다.
+6. frozen 설치·서비스 빌드·관련 테스트·문서 검사 후 파일별 stage·범위 검사·commit·명시적 branch push·PR을 완료한다.
+
+신규 권한·API·DB 계약을 만들지 않고 기존 사업 승인·소유권·자료 공개 범위를 유지한다. main 통합·운영 배포와 이전 작업공간 삭제는 이번 push 작업에 포함하지 않는다. 운영 계정 없이 수행한 브라우저 fixture 검증을 운영 검증으로 보고하지 않는다.
+
+## 로컬 실행·검증 결과
+
+- 구현: 회원 초기화면·최근 공지/게시글/자료·업무 바로가기, 짧은 URL·기존 상세 URL 전환, 콘텐츠 메뉴·회원/관리 분리, 일반 회원/약국 경영자의 기본 로그인 이동을 완료했다.
+- 회귀: web-kpa-society Vitest **15 파일·120 tests PASS**. 사업 범위·미승인·운영자·계정 전환·오류/빈 목록·재시도·기존 상세 경로와 로그인 콜백 우선순위를 검증했다.
+- 인증·서비스 이동: 기존 API Jest `neture-pharmacy-handoff-semi-franchise.spec.ts` **1 suite·7 tests PASS**. 이동으로 회원 자격을 부여하지 않는 기존 경계를 확인했다.
+- 빌드: pinned Node/pnpm frozen 설치, 약국 서비스 의존 패키지 빌드, `pnpm --filter @o4o/web-kpa-society build`(TypeScript + Vite) PASS. 기존 Browserslist/큰 chunk 안내는 남아 있다.
+- 브라우저: Chromium **1440×900 / 390×844**, 각 5상황(회원·미승인·운영자·비로그인·게시글 조회 실패) **10상황 PASS**. 첫 화면 실제 응답 제목/요약, 게시글/자료 직접 열기, 기존 상세 주소 query/hash 보존, 재시도, 내 매장 handoff 요청·성공 목적지/실패 안내, 모바일 메뉴와 가로 넘침 0을 확인했다.
+- 브라우저 응답·계정·매장 이동 목적지는 합성 fixture이며 운영 계정 로그인·실제 세션 교환·운영 DB 검증은 수행하지 않았다. 외부 제품 UI는 공식 공개 자료 조사다.
+- 정본 §5에 회원 초기화면 정책을 반영했다. PR #409에서 준비한 대표 홈 배포 상태 근거를 재사용해 과거 미적용 표기·§6·색인 설명을 이번 PR에서 정비한다. PR #409 자체는 병합하지 않는다. 두 PR의 문서 변경이 겹치므로 이후 통합 시 중복 상태 정리를 확인한다.
+- [PR #414](https://github.com/Renagang21/o4o-platform/pull/414)를 제출하고 `wo/pharmacy-member-home`에 구현 커밋 `90bbd331f9f894d16742b430004f4719e8174973`을 push했다. 작업 중 들어온 main 변경은 QR/DB 재연결 운영 스크립트이며 화면·패키지와 겹치지 않았다. push 전에 최신 main `0f66555b4fb5e49cda5c4c789151d3fb840cfdef`에 정렬했고 검증한 앱 소스의 동일성을 확인했다.
+- GitHub CI·자동 리뷰의 최종 상태는 PR #414의 최신 HEAD checks·리뷰 스레드에서 확인한다. 제출 후 정적 검사·문서 검사·약국 운영 빌드·관리자 앱 빌드·CodeQL 통과를 확인했다. 변하는 GitHub 결과를 이 기록에 최종 상태로 고정하지 않는다. main 병합·운영 배포는 미수행이며 운영 반영에는 Pharmacy 프런트엔드 배포가 필요하다.
+
+## 구현·push 당시 작업공간 판정
+
+`/workspace/o4o-wt/pharmacy-member-home` · `wo/pharmacy-member-home`은 main 미통합 상태이므로 **KEEP**한다. 이전 작업공간은 삭제하지 않았다. 운영 배포 전이며 새 화면은 branch에만 존재한다.
+
+## PR 리뷰 보완 TODO
+
+- [x] P1: 모달 종료 후에도 로그인 목적지 처리 완료를 보존하고 fallback이 명시적 상세 경로를 덮어쓰지 않도록 수정·회귀 검증. 일반 회원 세션 복원 시 상세 URL 보존과 지연 운영 컨텍스트 fallback도 확인한다.
+- [x] P2: 대표 홈·참여자 공간의 과거 미적용 상태를 정본·색인에서 정비한다. 대표 홈의 기존 운영 반영과 이번 회원 초기화면의 branch 구현/운영 미반영을 구분한다. 색인 갱신은 이 문서 보완 항목을 별도 근거로 수행한다.
+
+AuthModalContext 소비처는 LoginModal·LoginRoute/RegisterRoute·Header·MobileBottomNav·계정 및 자료/게시판 로그인 유도이며 기존 열기/닫기/콜백 인터페이스를 유지한다. 공통 패키지와 다른 서비스 인증 컨텍스트는 변경하지 않는다.
+
+P1 보완은 실제 AuthModalProvider·LoginModal·fallback을 함께 실행해 콜백 제거와 인증 완료가 겹치는 일반 회원/운영자의 `/mypage/profile` 복귀를 확인했다. 로그인 완료 표시는 모달 종료 후 유지하고 다음 모달 열기에서 초기화한다. 일반 회원 세션 복원은 현재 상세 URL을 유지하며, 처리되지 않은 운영자 fallback은 지연 컨텍스트를 기다린다. 보완 후 120 tests·서비스 빌드·PC/모바일 10상황을 다시 통과했다.
+
+## 최신 main 인증 변경과의 통합 확인
+
+PR #407의 가입 약관 로딩 변경이 main에 들어와 공개된 작업 branch에서 `origin/main`을 merge했다(기준 main `2a8b80cf2`, merge commit `813fe0e02`). LoginModal의 기존 `getSignupTermsConfig` 주입과 이번 목적지 처리 완료 표시를 모두 유지한다. auth-client를 다시 빌드하고 약국 서비스 120 tests 및 auth-react 공통 인증 16 파일·182 tests를 통과했다. 서비스 빌드·PC/모바일 10상황도 최신 인증 변경을 반영한 소스로 재검증했다. API·공통 패키지 변경은 이미 main에 반영된 기반 변경이며 이번 PR의 main 대비 변경 범위에는 포함하지 않는다.
+
+## main 통합·배포 Phase TODO
+
+사용자 후속 지시 `MAIN 병합 배포`에 따라 같은 WO와 전용 branch에서 통합·배포·문서 종료를 이어간다. 앞선 구현·push 기록은 당시 상태로 보존한다.
+
+- [x] 최신 main 동기화·충돌 및 인증 영향 확인·필요한 재검증·push.
+- [x] 최신 HEAD의 CI Gate·리뷰 스레드·main 규칙 확인 후 PR #414 병합.
+- [x] 병합 commit의 main CI와 Delivery 판정을 확인하고 Pharmacy 프런트엔드 운영 배포.
+- [x] 운영 serving SHA·실제 비로그인 진입·배포된 PC/모바일 UI를 확인.
+- [x] 정본·색인의 운영 반영 상태와 이번 WO 종료 기록을 정비·push·통합.
+
+최신 main `b29c0d46c`를 공개 branch에 merge한 `f2d3e7bc8`에서 약국 120 tests·공통 인증 186 tests·서비스 빌드·PC/모바일 합성 10상황이 통과했다. 공통 인증 첫 동시 실행은 약관 링크 대기 한 건이 실패했으며 동시 실행 수를 줄인 전체 재검증은 통과했다. [최종 PR CI](https://github.com/Renagang21/o4o-platform/actions/runs/38052267604)가 통과했고 두 리뷰 스레드는 해결됐다. PR #414는 2026-10-10 main commit `c3d81b8b3b9961762763fb0b049a1de670c9ceab`으로 병합됐다. 운영 DB write·migration과 다른 세션의 배포는 이번 작업 범위에 포함하지 않는다.
+
+
+## 운영 배포·검증 완료
+
+- [병합 후 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38052798484) PASS. 판정 중 문서 PR #415가 main에 들어와 기존 Delivery는 `SUPERSEDED`로 종료됐다. 최신 main `3bf6b9828e0e83bc9d67744cb5ed1295c2e67209`과 구현 병합 commit 사이의 변경은 문서 3개뿐이며 약국 코드·공통 패키지는 동일하다. [최신 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/38053360152)도 PASS.
+- [최신 Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38053474270)는 로그인 표현·목적지 처리 파일을 `LEVEL_3`로 판정했다. 사용자 배포 승인에 따라 `promote.yml`에 최신 SHA와 `services=kpa-society`를 전달했다. 앞선 다른 세션의 배포가 완료된 것을 확인하고 실행했다.
+- [Promote 38053501667](https://github.com/Renagang21/o4o-platform/actions/runs/38053501667) SUCCESS. 계획은 `deploy_api=false`, `web_parallel=[kpa-society]`이며 API·다른 웹·관리자 배포는 skip됐다. 신규 revision 검증 후 트래픽 전환·serving SHA 재확인이 성공했다. serving commit은 `3bf6b9828e0e83bc9d67744cb5ed1295c2e67209`이며 GitHub `production` 상태는 `DEPLOYED · deploy: kpa-society` success다. 전체 플랫폼을 다시 배포한 결과가 아니다.
+- 운영 번들 PC 1440·모바일 390에서 회원·승인 대기·운영자·비로그인·조회 오류 10상황 PASS. 루트 Hero·공지·게시글·자료, 직접 상세·자료 열기, 이전 상세 URL의 query/hash 보존, 매장 handoff 실패·재시도·목적지, 메뉴·가로 넘침·pageerror를 확인했다. 회원·API·handoff는 합성 fixture이며 실제 운영 계정·소속·세션 교환 검증과 구분한다.
+- 운영 HTML의 HTTP 200과 취득된 운영 코드에서 루트·게시글·자료·이전 참여 주소의 비로그인 로그인 이동 및 `returnTo`, PC·모바일 배치를 8상황 확인했다. 이전 참여 주소는 `/my/participation`으로 먼저 정규화된다. 배포 전에는 루트가 이전 참여 상태 주소로 이어져 기대값 검증이 실패했고, 배포 후 루트의 로그인 복귀 주소는 `/`로 통과했다.
+- 이 클라우드의 Chromium은 운영 HTTPS에서 프록시 CA 신뢰 오류가 났다. 제공된 CA의 사용자 신뢰 저장소 등록은 자동 승인 검토가 광범위한 신뢰 변경이라는 이유로 거부했다. 인증서 저장소·TLS 예외 설정은 변경하지 않았다. 운영 HTML·JS·CSS는 기존 시스템 신뢰를 사용하는 curl로 TLS를 검증해 취득하고 그대로 격리 Chromium에 제공했다. 외부 파일의 TLS 검증과 UI 실행을 분리한 검증이며, Chromium이 직접 운영 TLS를 검증한 결과는 아니다.
+- 문서 정합: 대표 홈 정본과 색인의 회원 초기화면 운영 미반영 표기를 실제 배포 근거로 정비했다. 기존 구현·push·PR 리뷰 기록은 당시 시점으로 보존했다. 이 종료 정비는 문서만 변경하므로 추가 runtime 배포는 `NOT_APPLICABLE`이다. 문서 종료 PR의 checks·병합 결과는 GitHub에서 확인한다.
+
+## 종료 작업공간 판정
+
+동일 WO의 배포·문서 종료 Phase를 `wo/pharmacy-member-home`에서 이어갔다. 다른 작업공간·branch와 이전 클라우드 작업공간은 삭제하지 않았다.
+
+`WORKTREE_DISPOSITION`: **KEEP** — 운영 검증 helper와 합성 화면의 재현에 이 worktree의 dependency 경로가 필요하여 보존한다. 구현 PR #414 main 통합·CI PASS·Pharmacy DEPLOYED·합성 UI smoke PASS. 실제 운영 테스트 계정 SSOT는 없어 실계정 검증은 미수행이다. 종료 문서는 같은 branch에 push하고 문서 PR로 main에 통합한다.

@@ -26,6 +26,7 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync(opt-in)
 import { useSearchParams } from 'react-router-dom';
+import { useMembersConsoleQuery } from './useMembersConsoleQuery';
 import {
   Users,
   CheckCircle,
@@ -61,9 +62,7 @@ import { toast } from '@o4o/error-handling';
  */
 
 import type {
-  MembersConsoleListParams,
   OperatorMembersConsolePageProps,
-  PaginationData,
   UserData,
   MembersStatusTab,
   MembersRowActionConfig,
@@ -153,6 +152,8 @@ export function OperatorMembersConsolePage({
   syncUrl = false,
   // WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
   consoleMode = 'members',
+  canManageLifecycle = false,
+  canDeleteMembership = canManageLifecycle,
   rejectReason,
   fullDetailHref,
 }: OperatorMembersConsolePageProps) {
@@ -161,7 +162,7 @@ export function OperatorMembersConsolePage({
 
   /** 각 affordance 는 승인 전용 모드 + client/slot 존재 여부로 함께 결정한다. */
   const canEdit = !isApprovalOnly && !!renderEditModal;
-  const canDelete = !isApprovalOnly && !!renderDeleteFlow;
+  const canDelete = canDeleteMembership && !isApprovalOnly && !!renderDeleteFlow;
   const canBulk = !isApprovalOnly && !!client.batchUpdateStatus;
   const showStats = !isApprovalOnly && !!client.stats;
   const getPrimaryRole = useMemo(
@@ -185,15 +186,6 @@ export function OperatorMembersConsolePage({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
     initOrder === 'asc' || initOrder === 'desc' ? initOrder : 'desc',
   );
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [pagination, setPagination] = useState<PaginationData>({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [search, setSearch] = useState(() => initParam('search') || '');
   const [searchQuery, setSearchQuery] = useState(() => initParam('search') || '');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -204,84 +196,11 @@ export function OperatorMembersConsolePage({
   const [rejectReasonText, setRejectReasonText] = useState('');
   const batch = useBatchAction();
 
-  const [stats, setStats] = useState({
-    total: 0,
-    active: 0,
-    pending: 0,
-    rejected: 0,
-    roleCounts: {} as Record<string, number>,
-    statusCounts: {} as Record<string, number>,
-  });
-
-  // ─── Fetch ──────────────────────────────────────────────────
-
-  // page 는 state 기반(URL sync/복원 대응). 별도 인자 없이 현재 page 를 조회.
-  const fetchUsers = useCallback(
-    async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const activeStatusTab = (statusTabs ?? []).find((t) => t.key === activeTab);
-        const params: MembersConsoleListParams = {
-          page,
-          limit: 20,
-          ...(activeTab === 'pending' ? { status: 'pending' } : {}),
-          ...(activeStatusTab ? { status: activeStatusTab.status } : {}),
-          ...(searchQuery ? { search: searchQuery } : {}),
-          ...(serverSort ? { sortBy, sortOrder: sortOrder.toUpperCase() as 'ASC' | 'DESC' } : {}),
-        };
-        const data = await client.list(params);
-        setUsers(data.users || []);
-        setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
-      } catch (err: any) {
-        setError(err?.message || '회원 목록을 불러오지 못했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [client, page, activeTab, searchQuery, statusTabs, serverSort, sortBy, sortOrder],
-  );
-
-  const fetchStats = useCallback(async () => {
-    // client.stats / listAll 은 선택 계약이다. 미제공 서비스(가입 승인 전용 콘솔)는
-    // 통계·탭 count 없이 동작한다 — 없는 endpoint 를 호출하지 않는다.
-    if (!client.stats) return;
-    try {
-      const statsRes = await client.stats();
-      const byStatus = statsRes.statistics?.byStatus || [];
-      const getCount = (s: string) => byStatus.find((b) => b.status === s)?.count || 0;
-
-      const allData = client.listAll ? await client.listAll() : { users: [] as UserData[] };
-      const allUsers: UserData[] = allData.users || [];
-      const roleCounts: Record<string, number> = {};
-      roleTabs.forEach((tab) => {
-        roleCounts[tab.key] = allUsers.filter((u) => tab.roleFilter.includes(getPrimaryRole(u))).length;
-      });
-
-      const statusCounts: Record<string, number> = {};
-      (statusTabs ?? []).forEach((st) => {
-        statusCounts[st.key] = getCount(st.status);
-      });
-
-      setStats({
-        total: statsRes.statistics?.total || 0,
-        active: getCount('active') + getCount('approved'),
-        pending: getCount('pending'),
-        rejected: getCount('rejected'),
-        roleCounts,
-        statusCounts,
-      });
-    } catch {
-      // stats failure is non-critical
-    }
-  }, [client, roleTabs, statusTabs, getPrimaryRole]);
-
-  useEffect(() => {
-    void fetchUsers();
-  }, [fetchUsers]);
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+  const { users, pagination, loading, error, stats, fetchUsers, fetchStats } =
+    useMembersConsoleQuery({
+      client, roleTabs, statusTabs, activeTab, page, searchQuery,
+      serverSort, sortBy, sortOrder, getPrimaryRole,
+    });
 
   // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1: URL query sync (opt-in)
   useEffect(() => {
@@ -667,7 +586,7 @@ export function OperatorMembersConsolePage({
         disabled: isLoading,
       });
     }
-    if (u.status === 'active' || u.status === 'approved') {
+    if (canManageLifecycle && (u.status === 'active' || u.status === 'approved')) {
       actions.push({
         label: '비활성화',
         onClick: () => handleStatusChange(u.id, 'suspended', u.status, u),
@@ -676,7 +595,7 @@ export function OperatorMembersConsolePage({
         disabled: isLoading,
       });
     }
-    if (u.status === 'suspended') {
+    if (canManageLifecycle && u.status === 'suspended') {
       actions.push({
         label: '활성화',
         onClick: () => handleStatusChange(u.id, 'approved', u.status, u),
@@ -687,7 +606,7 @@ export function OperatorMembersConsolePage({
     }
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUser, actionLoading, isApprovalOnly, rejectReason, rejectReasonText]);
+  }, [selectedUser, actionLoading, isApprovalOnly, canManageLifecycle, rejectReason, rejectReasonText]);
 
   // ─── Render ─────────────────────────────────────────────────
 
@@ -1018,7 +937,7 @@ export function OperatorMembersConsolePage({
         })}
 
       {/* Delete Flow — service-provided slot */}
-      {deleteTarget &&
+      {canDelete && deleteTarget &&
         renderDeleteFlow &&
         renderDeleteFlow({
           user: deleteTarget,

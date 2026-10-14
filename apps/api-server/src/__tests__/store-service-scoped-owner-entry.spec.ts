@@ -6,7 +6,7 @@
  * - 옮긴 화면에서도 KPA 앱의 owner-only 권한 동작(`PharmacyOwnerOnlyGuard`)을 보존한다.
  * - `/work/:serviceKey` 업무에서 돌아올 때는 고정 서비스 문맥으로 복원한다.
  * - KPA 앱의 handoff 는 공통 매장 화면을 KPA 서비스 지정 경로로 보낸다(플래그는 기본 꺼짐 그대로).
- * web-store 는 CI 테스트 러너가 없어 텍스트 계약으로 고정한다. DB · 네트워크 0.
+ * 서비스 경계는 정적 계약으로 고정한다. 실제 라우팅·전달 자료 보존은 web-store Vitest에서 검증한다. DB · 네트워크 0.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -27,12 +27,13 @@ describe('web-store — 서비스 지정 매장 화면', () => {
     expect(norm(app)).toContain('<Route path={`${W}/kpa-society/store`} element={gated(<ServiceStoreLayout />)}> {storeChildRoutes()}');
   });
 
-  it('owner-only 화면 4개는 StoreOwnerOnly 로 감싼다', () => {
+  it('매장 업무 화면은 승인 직원에게도 제공하고 구성원 관리는 Owner 전용이다', () => {
     for (const p of ['my-products', 'handled-products', 'commerce/local-products', 'products/multilingual/:targetKind/:targetId']) {
-      expect(norm(app)).toMatch(new RegExp(`<Route path="${p.replace(/[/:]/g, (c) => `\\${c}`)}" element=\\{<StoreOwnerOnly>`));
+      const route = norm(app).split(`<Route path="${p}"`)[1]?.split('/>')[0];
+      expect(route).toBeDefined();
+      expect(route).not.toContain('<StoreOwnerOnly>');
     }
-    expect(svc).toContain('`${short}:store_owner`');
-    expect(svc).toContain("'platform:super_admin'");
+    expect(norm(app)).toContain('<Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />');
   });
 
   it('서비스 고정은 이 매장의 활성 서비스일 때만 · 세션 유지 · 매장 변경 시 해제', () => {
@@ -70,7 +71,9 @@ describe('KPA 전환 차단 요인 정리 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21
     // K-Cosmetics 는 서비스 종료 — /work/k-cosmetics/* 전체가 종료 안내 하나다(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
     expect(norm(app)).toContain('<Route path={`${W}/k-cosmetics/*`} element={KcosRetired} />');
     expect(layout).toContain('toServiceScopedStorePath(scopedServiceKey, `${pathname}${search}${hash}`)');
-    expect(layout).toContain('<Navigate to={scopedPath} replace />');
+    // QR 제작 자료 등 location.state도 서비스 지정 경로로 보존한다.
+    expect(layout).toContain('const { pathname, search, hash, state } = useLocation();');
+    expect(layout).toContain('<Navigate to={scopedPath} state={state} replace />');
   });
 
   it('다른 서비스 업무로 옮기면 서비스 고정을 푼다', () => {
@@ -125,7 +128,7 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
   });
 
   it('k-cosmetics 는 더 이상 web-store 의 서비스 문맥이 아니다', () => {
-    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society' | 'pharmacy-hub';");
+    expect(svc).toContain("export type UnifiedServiceKey = 'kpa-society';");
     expect(layout).not.toContain("'k-cosmetics':");
     expect(app).not.toContain('KCOS_STORE_INFO_ROLES');
   });
@@ -141,8 +144,8 @@ describe('K-Cosmetics 매장 화면 이전(§21-15) 은퇴 — WO-O4O-KCOSMETICS
     // 옛 HUB는 자료함·공급 화면으로 이동하며 자료함도 종료 서비스 판정을 유지한다.
     expect(read('services/web-store/src/components/layouts/UnifiedStoreLibraryLayout.tsx')).toContain('if (retiredOnly) return <RetiredServiceNotice />;');
     expect(read('services/web-store/src/config/workspace.ts')).not.toContain("key: 'store-hub'");
-    // 홈 집계는 내 서비스와 같은 기준(workServiceKeys)이다.
-    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('const available = workServiceKeys;');
+    // 대표 루트는 소개 없이 위의 종료 판정을 유지하는 실제 내 매장 화면으로 이동한다.
+    expect(read('services/web-store/src/pages/HomePage.tsx')).toContain('to={WORKSPACE_PATHS.myStore}');
   });
 });
 

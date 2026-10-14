@@ -1,5 +1,6 @@
 ﻿import type { DataSource, EntityManager } from 'typeorm';
 import { MediaAsset } from '../entities/MediaAsset.entity.js';
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 
 export class MediaCatalogError extends Error {
   constructor(
@@ -141,6 +142,7 @@ export class MediaCatalogService {
       lock: { mode: 'pessimistic_write' },
     });
     if (!asset) throw new MediaCatalogError('ASSET_NOT_FOUND', 404);
+    if (isRetiredServiceValue(asset.serviceKey)) throw new MediaCatalogError('SERVICE_RETIRED', 410);
     return asset;
   }
   async createExternal(input: Record<string, unknown>, userId: string) {
@@ -218,6 +220,7 @@ export class MediaCatalogService {
     mediaUuid(id);
     const asset = await this.ds.getRepository(MediaAsset).findOneBy({ id });
     if (!asset) throw new MediaCatalogError('ASSET_NOT_FOUND', 404);
+    if (isRetiredServiceValue(asset.serviceKey)) throw new MediaCatalogError('SERVICE_RETIRED', 410);
     const links = await this.ds.query(
       `SELECT id, media_asset_id AS "mediaAssetId", entity_type AS "entityType", entity_id AS "entityId", purpose, created_at AS "createdAt" FROM media_entity_links WHERE media_asset_id=$1 ORDER BY created_at,id`,
       [id],
@@ -240,6 +243,8 @@ export class MediaCatalogService {
       throw new MediaCatalogError('INVALID_ENTITY_TYPE');
     // Service slugs and future production job IDs are opaque identifiers, never SQL/table names.
     const entityId = mediaText(input.entityId, 200);
+    if (entityType === 'service' && isRetiredServiceValue(entityId))
+      throw new MediaCatalogError('SERVICE_RETIRED', 410);
     const purpose = mediaText(input.purpose, 100);
     return this.ds.transaction(async (manager) => {
       await this.locked(manager, id);

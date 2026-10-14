@@ -1,5 +1,7 @@
 # CHECK — O4O URL 중심 서비스 재구성 G0/G1 전수 대응표
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **이 문서는 URL 재구성 통합 작업의 단일 TODO 이다** (2026-09-26 사용자 지시 · 실행 규칙: 큰 목표 1 = 작업 1, 새 문제 발견 ≠ 새 WO). 진행 기록은 §21.
 >
 > **INITIAL_PURPOSE** — 기존 서브디렉토리와 독립 도메인에 흩어진 O4O 기능을 확정된 URL 체계에 배치한다. 서비스별 운영 영역 · 독립 커뮤니티 · 매장 Hub 와 내 매장의 경계를 코드와 주소에서 일치시키고, 기존 QR · 인증 · 주문 경로가 전환 과정에서 끊기지 않게 한다.
@@ -1228,7 +1230,7 @@ gcloud compute url-maps add-host-rule o4o-global-lb --global --hosts=supplier.ne
 
 #### 4. 운영 검증 절차 (배포 후 · 플래그 false)
 
-계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNTS.local.md` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
+계정: `renagang21`(KPA · KCos 매장 경영자 · Google 전용 — `docs/local/TEST-ACCOUNT.txt` §3). 운영 실측(read-only): **같은 서비스 복수 매장 사용자 0 · 매장 조직 2개 이상 사용자 0.**
 
 | # | 항목 | KPA | K-Cosmetics |
 |---|---|---|---|

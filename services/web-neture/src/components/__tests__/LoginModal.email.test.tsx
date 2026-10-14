@@ -26,7 +26,7 @@ vi.mock('@o4o/auth-client', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@o4o/auth-client')>()),
   renderGoogleButton: vi.fn(async () => () => undefined),
 }));
-vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn() } }));
+vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn(), getKakaoAuthConfig: vi.fn(async () => ({ enabled: false })) } }));
 
 import LoginModal from '../LoginModal';
 

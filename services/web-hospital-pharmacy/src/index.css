@@ -38,3 +38,7 @@ a{color:inherit}
 .ds .meta b{color:#0f172a}
 .footer{padding:24px 28px;background:#151827;color:#c9ced9;font-size:12px}
 @media(max-width:720px){.header{height:auto;padding:16px 18px}.cards{grid-template-columns:1fr}.page{padding-top:40px}}
+
+/* Keep the local file session open when returning to O4O in a new tab. */
+.nav .o4o-home-link{display:inline-flex;align-items:center;gap:4px;min-height:44px;white-space:nowrap}
+@media(max-width:720px){.header{flex-wrap:wrap;gap:12px}.nav{flex-wrap:wrap;justify-content:flex-start;min-width:0}.nav .muted{overflow-wrap:anywhere}}

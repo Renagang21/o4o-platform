@@ -45,3 +45,5 @@ export type {
   OwnedForum,
   OwnedForumUpdate,
 } from './types.js';
+
+export { createCommunityForumOwnerAdapters } from './communityAdapter.js';

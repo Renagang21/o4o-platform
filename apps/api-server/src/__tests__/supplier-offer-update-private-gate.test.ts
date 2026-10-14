@@ -23,7 +23,7 @@ jest.mock('../utils/auto-listing.utils.js', () => ({
   autoExpandPublicProduct: jest.fn(async () => 0),
 }));
 
-import { NetureOfferService } from '../modules/neture/services/offer.service.js';
+import { SupplierOfferWriteService } from '../modules/neture/services/supplier-offer-write.service.js';
 
 type OfferRow = {
   id: string;
@@ -58,7 +58,7 @@ function newlyRegisteredOffer(over: Partial<OfferRow> = {}): OfferRow {
 }
 
 function withOffer(row: OfferRow) {
-  const svc = Object.create(NetureOfferService.prototype) as any;
+  const svc = Object.create(SupplierOfferWriteService.prototype) as any;
   const saved: OfferRow[] = [];
   Object.defineProperty(svc, 'offerRepo', {
     value: {

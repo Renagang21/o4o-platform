@@ -20,7 +20,6 @@ import type { StoreDashboardConfig } from '../config/storeMenuConfig';
 import {
   COSMETICS_STORE_CONFIG,
   KPA_SOCIETY_STORE_CONFIG,
-  PHARMACY_HUB_STORE_CONFIG,
 } from '../config/storeMenuConfig';
 
 export type StoreWorkspaceTabKey = 'home' | 'my-store' | 'store-hub' | 'my-services';
@@ -95,7 +94,6 @@ export function resolveActiveStoreWorkspaceTab(
 export const STORE_CONFIGS_BY_SERVICE_KEY: Readonly<Record<string, StoreDashboardConfig>> = Object.freeze({
   'kpa-society': KPA_SOCIETY_STORE_CONFIG,
   'k-cosmetics': COSMETICS_STORE_CONFIG,
-  'pharmacy-hub': PHARMACY_HUB_STORE_CONFIG,
 });
 
 export function getStoreWorkspacePathsForService(serviceKey: string): StoreWorkspacePaths | null {

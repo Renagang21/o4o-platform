@@ -1,3 +1,4 @@
+> **PH 운영 상태 정정 (2026-10-11 · #427):** PharmacyHub는 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)에 따라 운영/가입/발급/복구 대상이 아니다. 아래 PH 서비스/가입화면/활성 개수 표기는 v1 게시·종전 운영 당시의 범위이며 현행 PH 운영 의무로 적용하지 않는다. 종전 PH 데이터의 법정 보유·동의/거래 증빙 의무와 게시 원문은 변경하지 않는다. 이 표기는 저장소 메타이며 약관/처리방침 개정·새 version 게시·보유기간 면제를 뜻하지 않는다.
 > **상태**: ACTIVE · **문서 종류**: 게시 원문(개인정보 처리방침 v1.0) · **확정일**: 2026-09-17
 > **런타임 SSOT**: 게시 본문의 실제 공개 출처는 `service_policy_documents`(document_type=`privacy`, status=`published`) 이며 각 서비스 `/privacy` 는 그 API 만 읽는다. 이 파일은 등록·게시에 사용하는 **원문 사본**이다 — 본문 변경은 이 파일 개정 → `service_policy_documents` 신규 version 게시 순으로 한다(코드 하드코딩 금지).
 > **보유기간 근거**: [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) §15 (본문 제2조·제7조 기간은 그 표를 옮긴 것 · 여기서 바꾸지 않는다)

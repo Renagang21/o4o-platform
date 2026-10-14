@@ -20,6 +20,10 @@ const db: {
   demoLookupFails: boolean;
 } = { communities: [], requests: [], memberships: [], serviceMemberships: [], roleWrites: [], demoUsers: [], demoLookupFails: false };
 
+let beforeServiceLock: (() => void) | undefined;
+let mainRow: Row | null;
+let mainLookupFails = false;
+let beforeApplicantLock: (() => void) | undefined;
 let seq = 0;
 const uid = () => `id-${++seq}`;
 
@@ -32,13 +36,23 @@ function repoFor(name: string) {
 const manager = {
   getRepository: (e: { name?: string }) => repoFor(e?.name ?? ''),
   query: async (sql: string, params: any[]) => {
-    if (/FROM users u/i.test(sql)) return [{ account_status: 'active', account_active: true, email_verified: true }];
+    if (/SELECT id FROM users.*FOR UPDATE/i.test(sql)) {
+      beforeApplicantLock?.();
+      beforeApplicantLock = undefined;
+      return [];
+    }
+    if (/FROM users u/i.test(sql)) {
+      if (mainLookupFails) throw new Error('main lookup unavailable');
+      return mainRow ? [mainRow] : [];
+    }
     if (/SELECT nickname FROM users/i.test(sql)) return [{ nickname: '테스트 닉네임' }];
     if (/FROM demo_accounts/i.test(sql)) {
       if (db.demoLookupFails) throw new Error('db down');
       return db.demoUsers.includes(params[0]) ? [{ '?column?': 1 }] : [];
     }
     if (/^\s*SELECT status FROM service_memberships/i.test(sql)) {
+      beforeServiceLock?.();
+      beforeServiceLock = undefined;
       const [userId, serviceKey] = params;
       return db.serviceMemberships
         .filter((r) => r.user_id === userId && r.service_key === serviceKey)
@@ -48,8 +62,8 @@ const manager = {
     if (/INSERT INTO service_memberships/i.test(sql)) {
       const [userId, serviceKey] = params;
       const found = db.serviceMemberships.find((r) => r.user_id === userId && r.service_key === serviceKey);
-      if (found) found.status = 'active';
-      else db.serviceMemberships.push({ user_id: userId, service_key: serviceKey, status: 'active' });
+      if (found && /DO UPDATE/i.test(sql)) found.status = 'active';
+      else if (!found) db.serviceMemberships.push({ user_id: userId, service_key: serviceKey, status: 'active' });
     }
     if (/role_assignments/i.test(sql)) db.roleWrites.push(sql);
     return [];
@@ -81,7 +95,11 @@ beforeEach(() => {
   db.roleWrites = [];
   db.demoUsers = [];
   db.demoLookupFails = false;
+  mainRow = { account_status: 'active', account_active: true, email_verified: true };
+  mainLookupFails = false;
+  beforeApplicantLock = undefined;
   seq = 0;
+  beforeServiceLock = undefined;
 });
 
 const membershipOf = (userId: string) => db.memberships.find((m) => m.userId === userId);
@@ -155,7 +173,7 @@ describe('개설 승인 — 검사 2회차', () => {
 
     expect(out.outcome).toBe('created');
     const m = membershipOf(REQUESTER)!;
-    expect({ role: m.role, status: m.status }).toEqual({ role: 'operator', status: 'active' });
+    expect({ role: m.role, status: m.status }).toEqual({ role: 'admin', status: 'active' });
     expect(r.status).toBe('approved');
   });
 
@@ -256,11 +274,46 @@ describe('정지(suspended) 회원을 승인 경로가 되살리지 않는다', 
     expect(serviceMembershipOf(JOINER)!.status).toBe('suspended');
   });
 
-  it('탈퇴(withdrawn) 뒤 재가입은 승인으로 다시 active 가 된다 — 막는 것은 정지뿐', async () => {
-    db.serviceMemberships.push({ user_id: JOINER, service_key: COMMUNITY_SERVICE_KEY, status: 'withdrawn' });
+  it.each(['withdrawn', 'rejected', 'pending'])('서비스 %s 상태를 개별 가입 승인으로 복구하지 않는다', async (status) => {
+    db.serviceMemberships.push({ user_id: JOINER, service_key: COMMUNITY_SERVICE_KEY, status, updated_at: 'unchanged' });
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    await expect(service.approveJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER }))
+      .rejects.toMatchObject({ code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE', statusCode: 409 });
+    expect(serviceMembershipOf(JOINER)).toMatchObject({ status, updated_at: 'unchanged' });
+    expect(membershipOf(JOINER)!.status).toBe('pending');
+  });
+
+  it.each(['withdrawn', 'rejected', 'pending'])('개설 승인도 서비스 %s 상태를 복구하지 않는다', async (status) => {
+    const r = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    db.serviceMemberships.push({ user_id: REQUESTER, service_key: COMMUNITY_SERVICE_KEY, status });
+    await expect(service.approveCreation({ requestId: r.id, reviewerUserId: REVIEWER }))
+      .rejects.toMatchObject({ code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE' });
+    expect(db.communities).toHaveLength(0);
+    expect(membershipOf(REQUESTER)).toBeUndefined();
+    expect(r.status).toBe('pending');
+    expect(serviceMembershipOf(REQUESTER)!.status).toBe(status);
+  });
+
+  it('가입 충돌 처리와 현재 상태 확인 사이의 정지는 보존하고 승인을 막는다', async () => {
+    db.serviceMemberships.push({ user_id: JOINER, service_key: COMMUNITY_SERVICE_KEY, status: 'active' });
+    const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    beforeServiceLock = () => { serviceMembershipOf(JOINER)!.status = 'suspended'; };
+    await expect(service.approveJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER }))
+      .rejects.toMatchObject({ code: 'SERVICE_MEMBERSHIP_SUSPENDED' });
+    expect(serviceMembershipOf(JOINER)!.status).toBe('suspended');
+    expect(membershipOf(JOINER)!.status).toBe('pending');
+  });
+
+  it('활성 서비스 가입의 기존 정보와 다른 서비스 상태는 보존한다', async () => {
+    db.serviceMemberships.push(
+      { user_id: JOINER, service_key: COMMUNITY_SERVICE_KEY, status: 'active', updated_at: 'unchanged' },
+      { user_id: JOINER, service_key: 'other-service', status: 'suspended' },
+    );
+    const before = structuredClone(db.serviceMemberships);
     const m = await service.requestJoin({ communityId: 'c1', userId: JOINER });
     await service.approveJoin({ communityId: 'c1', membershipId: m.id, reviewerUserId: REVIEWER });
-    expect(serviceMembershipOf(JOINER)!.status).toBe('active');
+    expect(membershipOf(JOINER)!.status).toBe('active');
+    expect(db.serviceMemberships).toEqual(before);
   });
 
   it('개설 승인 — 신청자가 정지면 커뮤니티·첫 운영자를 만들지 않는다', async () => {
@@ -288,6 +341,7 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
     const svc = new CommunityLifecycleService({
       query: async (sql: string, params: unknown[]) => {
         calls.push({ sql, params });
+        if (sql.includes('COUNT(*)')) return [{ total: 1 }];
         return [
           {
             id: 'm1',
@@ -302,7 +356,8 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
         ];
       },
     } as any);
-    const rows = await svc.listMembershipsForReview({ communityId: 'c1', status: 'pending' });
+    const { memberships: rows, pagination } = await svc.listMembershipsForReview({ communityId: 'c1', status: 'pending' });
+    expect(pagination).toEqual({ page: 1, pageSize: 20, total: 1, totalPages: 1 });
     expect(calls[0].params).toEqual(['c1', COMMUNITY_SERVICE_KEY, 'pending']);
     expect(calls[0].sql).toMatch(/WHERE cm\.community_id = \$1 AND cm\.status = \$3/);
     expect(calls[0].sql).not.toMatch(/'pending'/);
@@ -316,15 +371,17 @@ describe('가입 심사 화면 조회 — 개체 한정 · 이메일 가림', ()
     const calls: Array<{ sql: string; params: unknown[] }> = [];
     const svc = new CommunityLifecycleService({
       query: async (sql: string, params: unknown[]) => {
+        if (sql.includes('FROM users u')) return [{ account_status: 'active', account_active: true, email_verified: true }];
+        if (!sql.includes('SELECT c.id, c.slug, c.name')) return [];
         calls.push({ sql, params });
         return [{ id: 'c1', slug: 'alpha', name: 'Alpha', pending_count: 2 }];
       },
     } as any);
     const out = await svc.listOperatedCommunities('u-op');
-    expect(out).toEqual([{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2 }]);
+    expect(out).toEqual([{ id: 'c1', slug: 'alpha', name: 'Alpha', pendingCount: 2, canRestrictMembers: false }]);
     const sql = calls[0].sql.replace(/\s+/g, ' ');
     expect(calls[0].params).toEqual(['u-op', COMMUNITY_SERVICE_KEY]);
-    expect(sql).toMatch(/cm\.user_id = \$1 AND cm\.status = 'active' AND cm\.role = 'operator' AND c\.status = 'active'/);
+    expect(sql).toMatch(/cm\.user_id = \$1 AND cm\.status = 'active' AND cm\.role IN \('admin', 'operator'\) AND c\.status = 'active'/);
     expect(sql).toMatch(/sm\.service_key = \$2 AND sm\.status = 'active'/);
   });
 });
@@ -371,4 +428,63 @@ describe('거절 — 승인과 같은 주체가, 자격은 만들지 않고', ()
     const again = await service.requestJoin({ communityId: 'c1', userId: JOINER });
     expect(again.status).toBe('pending');
   });
+});
+
+
+describe('승인 시점 신청자 메인 자격', () => {
+  const cases: Array<[string, Row | null, string]> = [
+    ['계정 정지', { account_status: 'suspended', account_active: true, email_verified: true }, 'suspended'],
+    ['계정 비활성', { account_status: 'active', account_active: false, email_verified: true }, 'suspended'],
+    ['이메일 미확인', { account_status: 'active', account_active: true, email_verified: false }, 'pending'],
+    ['메인 가입 해지', { account_status: 'active', account_active: true, email_verified: true, membership_status: 'withdrawn' }, 'withdrawn'],
+    ['계정 없음', null, 'none'],
+  ];
+
+  it.each(cases)('%s이면 개설과 가입 모두 쓰기 전에 거절한다', async (_label, row, status) => {
+    const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    db.serviceMemberships.push({ user_id: JOINER, service_key: 'other-service', status: 'active' });
+    const before = JSON.stringify(db);
+    mainRow = row;
+    for (const approve of [
+      () => service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER }),
+      () => service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER }),
+    ]) {
+      await expect(approve()).rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED', httpStatus: 409, membershipStatus: status });
+      expect(JSON.stringify(db)).toBe(before);
+    }
+  });
+
+  it('조회 실패 시 승인하지 않고 신청을 보존한다', async () => {
+    const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+    const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+    const before = JSON.stringify(db);
+    mainLookupFails = true;
+    await expect(service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER })).rejects.toThrow('main lookup unavailable');
+    await expect(service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER })).rejects.toThrow('main lookup unavailable');
+    expect(JSON.stringify(db)).toBe(before);
+  });
+});
+
+
+it.each(['creation', 'join'])('%s: 잠금 대기 중 먼저 완료된 메인 정지를 다시 읽고 승인을 막는다', async (kind) => {
+  const request = await service.requestCreation({ requesterUserId: REQUESTER, desiredSlug: 'alpha', name: 'Alpha' });
+  const membership = await service.requestJoin({ communityId: 'c1', userId: JOINER });
+  const before = JSON.stringify(db);
+  // The fixture models the result visible after waiting for another transaction.
+  // PostgreSQL row-lock scheduling itself requires separate integration coverage.
+  beforeApplicantLock = () => { mainRow!.account_status = 'suspended'; };
+  const approve = kind === 'creation'
+    ? service.approveCreation({ requestId: request.id, reviewerUserId: REVIEWER })
+    : service.approveJoin({ communityId: 'c1', membershipId: membership.id, reviewerUserId: REVIEWER });
+  await expect(approve).rejects.toMatchObject({ code: 'NETURE_MEMBERSHIP_REQUIRED', httpStatus: 409 });
+  expect(beforeApplicantLock).toBeUndefined();
+  expect(JSON.stringify(db)).toBe(before);
+});
+
+
+it('메인 이용이 정지되면 개별 admin 행이 남아도 운영 목록을 반환하지 않는다', async () => {
+  const query = jest.fn(async () => [{ account_status:'suspended', account_active:true, email_verified:true }]);
+  expect(await new CommunityLifecycleService({query} as any).listOperatedCommunities('admin')).toEqual([]);
+  expect(query).toHaveBeenCalledTimes(1);
 });

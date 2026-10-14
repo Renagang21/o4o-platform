@@ -21,7 +21,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 export const REPRESENTATIVE_ENTRY_SERVICE_KEY = 'neture';
 /** O4O 대표 홈 주소 — service-catalog 의 neture domain. */
 export const O4O_HOME_URL = 'https://neture.co.kr/';
-export const O4O_HOME_LABEL = 'O4O 홈';
+export const O4O_HOME_LABEL = 'O4O 메인으로';
 /** 전역 로그아웃(모든 서비스 세션 종료) 표기 — 서버 logout 이 사용자 refresh family 전체를 폐기한다. */
 export const O4O_LOGOUT_LABEL = 'O4O 로그아웃';
 
@@ -181,7 +181,7 @@ export function O4OHomeButton({ className, errorClassName, label = O4O_HOME_LABE
         aria-busy={busy || authLoading || undefined}
         data-testid="o4o-home-button"
       >
-        {busy ? `${label}으로 이동 중…` : label}
+        {busy ? 'O4O 메인으로 이동 중…' : label}
       </button>
       {error && (
         <span role="alert" className={errorClassName} style={errorClassName ? undefined : { display: 'block', fontSize: 12, color: '#dc2626' }}>

@@ -1,3 +1,9 @@
+import type { EnrollmentPolicyReference } from '../modules/policy-acceptance/service-enrollment-policy.service.js';
+import { PolicyAcceptanceError } from '../modules/policy-acceptance/policy-acceptance.service.js';
+import { parseCommunityMemberListQuery, CommunityMemberListQueryError } from '../services/community/community-member-list-query.js';
+import { hasCommunityServiceAdmin } from '../services/community/community-service-operator-access.js';
+import { CommunityMemberManagementService, type CommunityMemberAction } from '../services/community/community-member-management.service.js';
+import { CommunityMembershipMutationError } from '../services/community/community-membership-mutations.js';
 import { forumRequestService } from '../services/forum/ForumRequestService.js';
 /**
  * Communities — Community Catalog read contract (service-neutral)
@@ -11,9 +17,9 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *
  *   POST /requests                             개설 신청 (slug 검사 1회차)
  *   GET  /requests/mine                        내 신청 이력 (slug_conflict 재신청 안내 도달점)
- *   GET  /requests                             승인 대기 목록        — community:admin
- *   POST /requests/:requestId/approve          개설 승인 (검사 2회차) — community:admin
- *   POST /requests/:requestId/reject           개설 거절             — community:admin
+ *   GET  /requests                             승인 대기 목록        — community:operator 이상
+ *   POST /requests/:requestId/approve          개설 승인 (검사 2회차) — community:operator 이상
+ *   POST /requests/:requestId/reject           개설 거절             — community:operator 이상
  *   GET  /operating                            내가 운영하는 커뮤니티 (가입 심사 화면 진입 목록)
  *   POST /:communitySlug/join                  가입 신청 (승인형 하나)
  *   GET  /:communitySlug/memberships           가입 신청·회원 목록    — 그 커뮤니티 operator
@@ -21,7 +27,7 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *   POST /:communitySlug/memberships/:membershipId/reject   가입 거절 — 그 커뮤니티 operator
  *
  * 두 심사 주체가 **다른 축**이라는 점이 요점이다:
- *   개설 심사 = 아직 어떤 커뮤니티에도 속하지 않은 요청 -> 서비스 전체 역할 `community:admin`
+ *   개설 심사 = 아직 어떤 커뮤니티에도 속하지 않은 요청 -> 서비스 전체 역할 `community:operator` 이상
  *   가입 심사 = 그 커뮤니티 안의 일 -> 개체 운영자 (`requireCommunityScope('operator')`)
  * 개설 승인으로 만들어지는 첫 운영자는 **개체 운영자일 뿐** 서비스 전체 역할을 받지 않는다.
  *
@@ -34,7 +40,9 @@ import { forumRequestService } from '../services/forum/ForumRequestService.js';
  *   - 비로그인도 200 으로 목록을 돌려주되 canParticipate=false · reason=AUTH_REQUIRED (공개 read 정책과 분리).
  */
 
+import { NetureMainMembershipRequiredError } from '../modules/neture/services/neture-main-membership.js';
 import { createServiceForumRouter } from './forum/service-forum.routes.js';
+import { createCommunityPublicReadRoutes } from './community-public-read.routes.js';
 import { listCommunityWorkspaces, resolveCommunityWorkspace, createCommunityBoard } from '../services/community/community-workspace.service.js';
 import { Router, type RequestHandler, type Response } from 'express';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -66,7 +74,12 @@ async function currentCommunityUser(req: AuthRequest): Promise<CommunityAccessUs
 
 /** lifecycle 오류를 응답으로 옮긴다 — 라우트마다 분기를 복제하지 않는다. */
 function sendLifecycleError(res: Response, error: unknown): boolean {
-  if (!(error instanceof CommunityLifecycleError)) return false;
+  if (error instanceof PolicyAcceptanceError) { res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message }); return true; }
+  if (error instanceof NetureMainMembershipRequiredError) {
+    res.status(error.httpStatus).json({ success: false, error: error.message, code: error.code });
+    return true;
+  }
+  if (!(error instanceof CommunityLifecycleError) && !(error instanceof CommunityMembershipMutationError)) return false;
   res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
   return true;
 }
@@ -85,8 +98,7 @@ function requesterId(req: AuthRequest, res: Response): string | null {
   return id;
 }
 
-const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'withdrawn'] as const;
-type MembershipStatus = (typeof MEMBERSHIP_STATUSES)[number];
+const MEMBERSHIP_STATUSES = ['pending', 'active', 'rejected', 'suspended', 'withdrawn'] as const;
 
 const bodyOf = (req: { body?: unknown }): Record<string, unknown> =>
   (req.body ?? {}) as Record<string, unknown>;
@@ -97,11 +109,23 @@ export function createCommunitiesRoutes(
   authenticate: RequestHandler,
 ): Router {
   const router = Router({ mergeParams: true });
+  router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));
 
   // 개체 운영자 경계: slug -> 행 확인 -> active 가입 -> role='operator'
   const operatorOnly: RequestHandler[] = [apiLimiter, authenticate, resolveCommunity, requireCommunityScope('operator')];
   // 서비스 전체 심사 경계
-  const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin')];
+  const serviceOperatorOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:operator')];
+  const serviceAdminOnly: RequestHandler[] = [apiLimiter, authenticate, requireCommunityServiceScope('community:admin'),
+    asyncHandler(async (req, res, next) => {
+      // Entity designation belongs to explicitly assigned service admins; generic
+      // platform bypass must not turn a central account into an entity operator.
+      if (!await hasCommunityServiceAdmin(AppDataSource, (req as AuthRequest).user!.id)) {
+        res.status(403).json({ success: false, code: 'COMMUNITY_SERVICE_ADMIN_REQUIRED', error: '지정된 커뮤니티 서비스 admin만 역할을 관리할 수 있습니다.' });
+        return;
+      }
+      next();
+    }),
+  ];
 
   router.get(
     '/',
@@ -113,13 +137,13 @@ export function createCommunitiesRoutes(
   );
 
   // ── 개별 커뮤니티 운영자 지정·해제 (커뮤니티 서비스 운영자) ──────────────
-  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — Admin 은 서비스 운영자(community:admin)만 지정한다.
+  // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 — Admin 은 서비스 Admin/Operator를 지정한다.
   //   개별 커뮤니티 운영자(community_memberships.role)는 서비스 운영자가 각 커뮤니티의 승인된 회원 중에서
   //   지정·해제한다. 가입 승인 자체는 여전히 개체 운영자(operatorOnly) 경로다.
   //   `/:communitySlug/...` 파라미터 라우트보다 먼저 등록한다.
   const designation = () => new CommunityOperatorDesignationService(AppDataSource);
   const sendDesignationError = (res: Response, error: unknown): boolean => {
-    if (!(error instanceof CommunityOperatorDesignationError)) return false;
+    if (!(error instanceof CommunityOperatorDesignationError)) return sendLifecycleError(res, error);
     res.status(error.statusCode).json({ success: false, error: error.message, code: error.code });
     return true;
   };
@@ -137,8 +161,9 @@ export function createCommunitiesRoutes(
     ...serviceAdminOnly,
     asyncHandler(async (req, res) => {
       try {
-        res.json({ success: true, data: await designation().listMembers(req.params.communityId) });
+        res.json({ success: true, data: await designation().listMembers(req.params.communityId, parseCommunityMemberListQuery(req.query, ['active', 'suspended'])) });
       } catch (error) {
+        if (error instanceof CommunityMemberListQueryError) { res.status(400).json({ success: false, error: error.message, code: error.code }); return; }
         if (!sendDesignationError(res, error)) throw error;
       }
     }),
@@ -152,7 +177,9 @@ export function createCommunitiesRoutes(
         const data = await designation().setRole({
           communityId: req.params.communityId,
           membershipId: req.params.membershipId,
-          role: trimmed(bodyOf(req).role) as 'operator' | 'member',
+          role: trimmed(bodyOf(req).role) as 'admin' | 'operator' | 'member',
+          actorUserId: (req as AuthRequest).user!.id,
+          reason: trimmed(bodyOf(req).reason),
         });
         res.json({ success: true, data });
       } catch (error) {
@@ -183,6 +210,7 @@ export function createCommunitiesRoutes(
           desiredSlug: String(body.slug ?? ''),
           name,
           description: typeof body.description === 'string' ? body.description : null,
+          policyReferences: body.policyReferences as EnrollmentPolicyReference[] | undefined,
         });
         res.status(201).json({ success: true, data: created });
       } catch (error) {
@@ -208,7 +236,7 @@ export function createCommunitiesRoutes(
 
   router.get(
     '/requests',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (_req, res) => {
       res.json({ success: true, data: { requests: await lifecycle().listPendingCreationRequests() } });
     }),
@@ -216,7 +244,7 @@ export function createCommunitiesRoutes(
 
   router.post(
     '/requests/:requestId/approve',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (req, res) => {
       const reviewerUserId = requesterId(req as AuthRequest, res);
       if (!reviewerUserId) return;
@@ -235,7 +263,7 @@ export function createCommunitiesRoutes(
 
   router.post(
     '/requests/:requestId/reject',
-    ...serviceAdminOnly,
+    ...serviceOperatorOnly,
     asyncHandler(async (req, res) => {
       const reviewerUserId = requesterId(req as AuthRequest, res);
       if (!reviewerUserId) return;
@@ -286,11 +314,25 @@ export function createCommunitiesRoutes(
       const userId = requesterId(req as AuthRequest, res);
       if (!userId) return;
       try {
-        const membership = await lifecycle().requestJoin({ communityId: req.community!.id, userId });
+        const membership = await lifecycle().requestJoin({ communityId: req.community!.id, userId, policyReferences: req.body?.policyReferences });
         res.status(201).json({ success: true, data: membership });
       } catch (error) {
+        if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, code: error.code, error: error.message });
         if (!sendLifecycleError(res, error)) throw error;
       }
+    }),
+  );
+
+  router.post('/:communitySlug/leave', apiLimiter, authenticate, resolveCommunity,
+    asyncHandler(async (req, res) => {
+      const actorUserId = requesterId(req as AuthRequest, res);
+      if (!actorUserId) return;
+      try {
+        const data = await new CommunityMemberManagementService(AppDataSource).withdrawSelf({
+          communityId: req.community!.id, actorUserId,
+        });
+        res.json({ success: true, data });
+      } catch (error) { if (!sendLifecycleError(res, error)) throw error; }
     }),
   );
 
@@ -298,21 +340,15 @@ export function createCommunitiesRoutes(
     '/:communitySlug/memberships',
     ...operatorOnly,
     asyncHandler(async (req, res) => {
-      const raw = req.query.status;
-      const status = typeof raw === 'string' && raw ? raw : undefined;
-      if (status && !MEMBERSHIP_STATUSES.includes(status as MembershipStatus)) {
-        res.status(400).json({ success: false, error: '알 수 없는 가입 상태입니다.', code: 'INVALID_STATUS' });
-        return;
+      try {
+        const query = parseCommunityMemberListQuery(req.query, MEMBERSHIP_STATUSES);
+        res.json({ success: true, data: await lifecycle().listMembershipsForReview({
+          communityId: req.community!.id, query,
+        }) });
+      } catch (error) {
+        if (!(error instanceof CommunityMemberListQueryError)) throw error;
+        res.status(400).json({ success: false, error: error.message, code: error.code });
       }
-      res.json({
-        success: true,
-        data: {
-          memberships: await lifecycle().listMembershipsForReview({
-            communityId: req.community!.id,
-            status: status as MembershipStatus | undefined,
-          }),
-        },
-      });
     }),
   );
 
@@ -358,6 +394,36 @@ export function createCommunitiesRoutes(
       }
     }),
   );
+
+  router.get('/:communitySlug/memberships/:membershipId/history',
+    apiLimiter, authenticate, resolveCommunity, requireCommunityScope('admin'),
+    asyncHandler(async (req, res) => {
+      const ids = [req.community!.id, String(req.params.membershipId)];
+      const target = await AppDataSource.query('SELECT id FROM community_memberships WHERE community_id = $1 AND id = $2', ids);
+      if (!target.length) { res.status(404).json({ success: false, code: 'MEMBERSHIP_NOT_FOUND', error: '가입 행을 찾을 수 없습니다.' }); return; }
+      const changes = await AppDataSource.query(`SELECT h.id, h.action, h.before_role, h.after_role, h.before_status, h.after_status,
+        h.reason, h.created_at, u.name AS actor_name FROM community_membership_changes h
+        LEFT JOIN users u ON u.id = h.actor_user_id WHERE h.community_id = $1 AND h.membership_id = $2
+        ORDER BY h.created_at DESC, h.id DESC LIMIT 50`, ids);
+      res.json({ success: true, data: { changes } });
+    }),
+  );
+
+  for (const action of ['suspend', 'restore', 'withdraw'] as const) {
+    router.post(`/:communitySlug/memberships/:membershipId/${action}`,
+      apiLimiter, authenticate, resolveCommunity, requireCommunityScope('admin'),
+      asyncHandler(async (req, res) => {
+        try {
+          const data = await new CommunityMemberManagementService(AppDataSource).change({
+            communityId: req.community!.id, membershipId: String(req.params.membershipId),
+            actorUserId: (req as AuthRequest).user!.id, action: action as CommunityMemberAction,
+            reason: trimmed(bodyOf(req).reason),
+          });
+          res.json({ success: true, data });
+        } catch (error) { if (!sendLifecycleError(res, error)) throw error; }
+      }),
+    );
+  }
 
   // Forum creation requests keep the existing state machine and historical storage codes.
   // Scope is always resolved on the server, never from client serviceCode/organizationId.

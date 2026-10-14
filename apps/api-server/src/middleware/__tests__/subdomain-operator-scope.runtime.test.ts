@@ -162,3 +162,34 @@ describe('서브도메인 운영자 경계 — 가드 실제 판정', () => {
     expect([m.supplierAdmin, m.supplierOperator, m.fundingOperator, m.communityAdmin]).toEqual([true, true, true, true]);
   });
 });
+
+
+describe('커뮤니티 Admin / Operator 분리', () => {
+  const review = requireCommunityServiceScope('community:operator') as RequestHandler;
+  const designation = requireCommunityServiceScope('community:admin') as RequestHandler;
+  it('Operator는 개설 심사를 허용하고 운영자 지정은 거부한다', async () => {
+    const persona: Persona = { roles: ['community:operator'], memberships: [['community', 'active']] };
+    expect(await passes(review, persona)).toBe(true);
+    expect(await passes(designation, persona)).toBe(false);
+  });
+  it('Admin은 두 업무를 수행한다', async () => {
+    const persona: Persona = { roles: ['community:admin'], memberships: [['community', 'active']] };
+    expect(await passes(review, persona)).toBe(true);
+    expect(await passes(designation, persona)).toBe(true);
+  });
+  it.each(['pending', 'suspended', 'rejected'])('%s 서비스 회원은 Operator여도 거부한다', async (status) => {
+    expect(await passes(review, { roles: ['community:operator'], memberships: [['community', status]] })).toBe(false);
+  });
+  it('다른 서비스 회원 자격은 대신할 수 없다', async () => {
+    expect(await passes(review, { roles: ['community:operator'], memberships: [['neture', 'active']] })).toBe(false);
+  });
+});
+
+
+describe('커뮤니티 조회 권한의 일반 회원 경계', () => {
+  it.each([{ roles: [] }, { roles: ['neture:store_owner'] }, { roles: ['neture:supplier'] }])('활성 community 소속만으로는 관리 조회가 허용되지 않는다: %j', async ({ roles }) => {
+    const persona: Persona = { roles, memberships: [['community', 'active']] };
+    expect(await passes(requireCommunityServiceScope('community:operator') as RequestHandler, persona)).toBe(false);
+    expect(await passes(requireCommunityServiceScope('community:admin') as RequestHandler, persona)).toBe(false);
+  });
+});

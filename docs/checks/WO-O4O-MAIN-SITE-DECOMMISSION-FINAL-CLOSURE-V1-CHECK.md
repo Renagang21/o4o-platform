@@ -1,5 +1,7 @@
 # WO-O4O-MAIN-SITE-DECOMMISSION-FINAL-CLOSURE-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작업일**: 2026-08-20
 - **대상**: Cloud Run `o4o-main-site` (GCP `netureyoutube` / `asia-northeast3`)
 - **선행**: [RUNTIME-CONTRACT-AUDIT](WO-O4O-MAIN-SITE-RUNTIME-CONTRACT-AUDIT-AND-DECOMMISSION-DECISION-V1-CHECK.md) · [UNIQUE-VIEWER-MIGRATION](WO-O4O-MAIN-SITE-UNIQUE-VIEWER-MIGRATION-AND-PREVIEW-LINK-CLOSURE-V1-CHECK.md)
@@ -152,7 +154,7 @@ main-site 전용 secret·IAM 은 존재하지 않았다. 삭제 대상 없음.
 | LB 5xx (30m) | **0** |
 | auth smoke (쿠키 자 사용) | login 200 · `/auth/me` 200 · `/auth/services` 200 · `/auth/logout` 200 — **4/4 PASS** |
 
-삭제 전 baseline 과 동일 → **회귀 없음**. 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 참조했고 어디에도 기록하지 않았다.
+삭제 전 baseline 과 동일 → **회귀 없음**. 자격증명은 `docs/local/TEST-ACCOUNT.txt` 에서만 참조했고 어디에도 기록하지 않았다.
 
 ---
 

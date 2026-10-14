@@ -20,7 +20,6 @@ describe('getServicePublicOrigin — 역할 접두 키 alias 해석', () => {
     ['kpa-society', 'https://pharmacy.neture.co.kr'],
     ['cosmetics', 'https://retail.neture.co.kr'],
     ['k-cosmetics', 'https://retail.neture.co.kr'],
-    ['pharmacy-hub', 'https://pharmacyhub.co.kr'],
     ['neture', 'https://neture.co.kr'],
   ])('%s → %s', (key, origin) => {
     expect(getServicePublicOrigin(key)).toBe(origin);
@@ -35,9 +34,9 @@ describe('제휴 QR 랜딩 URL', () => {
   it('cosmetics 는 카탈로그 canonical 호스트(retail.neture.co.kr)를 쓴다', () => {
     expect(buildAffiliateLandingUrl('cosmetics', 'abc')).toBe('https://retail.neture.co.kr/foreign-visitor/affiliate/abc');
   });
-  it('kpa 는 canonical 호스트 · pharmacy-hub 값은 이전과 같다', () => {
+  it('kpa origin remains canonical and retired PH cannot generate a landing', () => {
     expect(buildAffiliateLandingUrl('kpa', 'x')).toBe('https://pharmacy.neture.co.kr/foreign-visitor/affiliate/x');
-    expect(buildAffiliateLandingUrl('pharmacy-hub', 'x')).toBe('https://pharmacyhub.co.kr/foreign-visitor/affiliate/x');
+    expect(() => buildAffiliateLandingUrl('pharmacy-hub', 'x')).toThrow('SERVICE_RETIRED');
   });
 });
 
@@ -46,6 +45,9 @@ describe('존재하지 않는 호스트 하드코딩 재유입 금지', () => {
     'routes/o4o-store/controllers/multilingual-product-content.controller.ts',
     'modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.service.ts',
     'modules/neture/services/neture-dashboard.service.ts',
+    'modules/neture/services/supplier-dashboard.service.ts',
+    'modules/neture/services/admin-dashboard.service.ts',
+    'modules/neture/services/seller-dashboard.service.ts',
     'modules/neture/neture.routes.ts',
   ];
   it.each(FILES)('%s', (rel) => {

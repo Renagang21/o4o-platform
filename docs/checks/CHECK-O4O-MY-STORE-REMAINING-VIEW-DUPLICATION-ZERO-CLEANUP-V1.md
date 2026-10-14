@@ -1,5 +1,7 @@
 # CHECK-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **대상 WO**: WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
 **선행 CHECK**: [`CHECK-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1`](CHECK-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1.md)
 **작성일**: 2026-08-13
@@ -243,7 +245,7 @@ Core 에 추가한 것은 개의 **구조화된 override** 뿐이고, 기본값�
 
 ### 7-1. 브라우저 smoke (WO §6) — **수행함**
 
-**프로덕션 계정 로그인은 불가하다.** `docs/local/TEST-ACCOUNTS.local.md` §2·§4 기준
+**프로덕션 계정 로그인은 불가하다.** `docs/local/TEST-ACCOUNT.txt` §2·§4 기준
 모든 (계정 × 서비스) L2 credential 이 `unknown / needs verification` 이며, 문서가
 "서비스 웹 로그인(모든 서비스) ❌ 불가" 로 명시한다. 추측 대입은 금지다.
 
@@ -355,4 +357,4 @@ L2 credential 해소 후 프로덕션 계정 smoke 로 확인이 필요하다. *
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 
 - 별도 WO 제안: **L2 service credential 해소 후 내 매장 7화면 프로덕션 계정 smoke**
-  (§7-1 미검증 3항목). `docs/local/TEST-ACCOUNTS.local.md` §2-1 절차 선행 필요.
+  (§7-1 미검증 3항목). `docs/local/TEST-ACCOUNT.txt` §2-1 절차 선행 필요.

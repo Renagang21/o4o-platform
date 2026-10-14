@@ -1,7 +1,7 @@
 /**
  * WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1 — 로그인 모달 '체험하기'
  *
- *   - Demo 버튼 2개 · credential 화면 비노출 · 입력칸을 채우지 않는다
+ *   - Demo 버튼 3개 · credential 화면 비노출 · 입력칸을 채우지 않는다
  *   - 기존 loginWithEmail 재사용 · 중복 클릭 1회
  *   - 공급자 → /supplier/dashboard · 매장 경영자 → 홈 매장 버튼과 같은 handoff URL 로 이동
  *   - 실패 문구: 인증 · 권한 · 서버 · (로그인 성공 후) 매장 이동 실패
@@ -20,7 +20,7 @@ vi.mock('../../contexts', () => ({
     getGoogleAuthConfig: vi.fn(async () => ({ enabled: false, clientId: null })),
   }),
 }));
-vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn() }, api: {} }));
+vi.mock('../../lib/apiClient', () => ({ authClient: { resendVerificationEmail: vi.fn(), getKakaoAuthConfig: vi.fn(async () => ({ enabled: false })) }, api: {} }));
 const resolveSingleStoreWorkspaceUrl = vi.fn<(u: unknown) => Promise<string>>();
 vi.mock('../../lib/home-entry', () => ({
   resolveSingleStoreWorkspaceUrl: (u: unknown) => resolveSingleStoreWorkspaceUrl(u),
@@ -57,13 +57,15 @@ afterEach(() => {
 
 const store = DEMO_ACCOUNTS.find((d) => d.type === 'STORE_OWNER')!;
 const supplier = DEMO_ACCOUNTS.find((d) => d.type === 'SUPPLIER')!;
+const staff = DEMO_ACCOUNTS.find((d) => d.type === 'STORE_STAFF')!;
 
 describe('LoginModal — 체험하기', () => {
-  it('Demo 버튼 2개 · credential 비노출 · 입력칸 비어 있음', () => {
+  it('Demo 버튼 3개 · credential 비노출 · 입력칸 비어 있음', () => {
     mount();
     expect(screen.getByRole('heading', { name: '체험하기' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '매장 경영자 Demo 체험' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '공급자 Demo 체험' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '매장 직원 Demo 체험' })).toBeTruthy();
     const text = document.body.textContent ?? '';
     for (const d of DEMO_ACCOUNTS) {
       expect(text).not.toContain(d.email);
@@ -107,6 +109,18 @@ describe('LoginModal — 체험하기', () => {
     expect(await screen.findByText(/매장 Demo 화면으로 이동하지 못했습니다/)).toBeTruthy();
     expect(assign).not.toHaveBeenCalled();
     expect((screen.getByRole('button', { name: '매장 경영자 Demo 체험' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('직원 Demo는 자기 자격으로 기존 매장 handoff를 요청한다', async () => {
+    const user = { id: 'staff-demo', roles: ['kpa:store_member'] };
+    loginWithEmail.mockResolvedValue({ success: true, user });
+    resolveSingleStoreWorkspaceUrl.mockResolvedValue('https://store.neture.co.kr/handoff#code=fixture');
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: '매장 직원 Demo 체험' }));
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('https://store.neture.co.kr/handoff#code=fixture'));
+    expect(loginWithEmail).toHaveBeenCalledWith(staff.email, staff.password);
+    expect(resolveSingleStoreWorkspaceUrl).toHaveBeenCalledWith(user);
+    expect((screen.getByRole('button', { name: '매장 경영자 Demo 체험' }) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it.each([

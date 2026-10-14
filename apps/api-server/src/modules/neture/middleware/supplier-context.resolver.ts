@@ -25,6 +25,26 @@ import logger from '../../../utils/logger.js';
 /** 조직에서 공급자 업무를 수행할 수 있는 member role (현행: 등록 시 setOwner 가 만드는 owner) */
 export const SUPPLIER_WORK_MEMBER_ROLES: readonly string[] = ['owner'];
 
+/** Read-only cache candidate probe. It never grants access or selects a supplier. */
+export async function hasSupplierRuntimeRelation(dataSource: Pick<DataSource, 'query'>, userId: string): Promise<boolean> {
+  const rows: { related: boolean }[] = await dataSource.query(
+    `SELECT /* policy_dynamic_relation */
+      EXISTS (SELECT 1 FROM organization_members om WHERE om.user_id = $1
+        AND om.left_at IS NULL AND om.role = ANY($2::text[]))
+      OR EXISTS (SELECT 1 FROM neture_suppliers s WHERE s.user_id = $1) AS related`,
+    [userId, SUPPLIER_WORK_MEMBER_ROLES],
+  );
+  return rows.some(row => row.related);
+}
+
+/** Read-only maintenance protection probe; never selects or grants a supplier context. */
+export async function hasLegacySupplierIdentityPointer(dataSource: Pick<DataSource, 'query'>, userId: string): Promise<boolean> {
+  const rows: { related: boolean }[] = await dataSource.query(
+    'SELECT EXISTS (SELECT 1 FROM neture_suppliers s WHERE s.user_id = $1) AS related', [userId],
+  );
+  return rows.some(row => row.related);
+}
+
 export interface SupplierCandidate {
   supplierId: string;
   organizationId: string;

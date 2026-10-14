@@ -122,11 +122,11 @@ export const adminSupplierApi = {
   async getGovernanceSuppliers(): Promise<GovernanceSupplier[]> {
     try {
       const response = await api.get('/neture/admin/suppliers/governance');
-      return response.data.data || [];
+      if (!Array.isArray(response.data.data)) throw new Error('Invalid governance list');
+      return response.data.data;
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch governance suppliers:', error);
-      return [];
+      throw new Error('공급자 상태 목록을 불러오지 못했습니다. 다시 시도해 주세요.');
     }
   },
 
@@ -428,7 +428,15 @@ export const adminSettlementApi = {
         period_end: periodEnd,
       });
       return response.data;
-    } catch { return { success: false, error: 'NETWORK_ERROR' }; }
+    } catch (error: unknown) {
+      const response = (error as { response?: { status?: number; data?: { error?: string; message?: string } } })?.response;
+      const conflict = response?.data;
+      if (response?.status === 409 && conflict?.error &&
+          ['DUPLICATE_SETTLEMENT', 'SETTLEMENT_ORDER_SUPPLIER_CONFLICT'].includes(conflict.error)) {
+        return { success: false, error: conflict.error, message: typeof conflict.message === 'string' ? conflict.message : undefined };
+      }
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
   },
 
   async approve(id: string, notes?: string): Promise<boolean> {

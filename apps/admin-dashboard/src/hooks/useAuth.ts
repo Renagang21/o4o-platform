@@ -1,14 +1,2 @@
-import { useAuthStore } from '@/stores/authStore';
-
-export const useAuth = () => {
-  const { user, isAuthenticated, isLoading, login, logout, updateUser } = useAuthStore();
-  
-  return {
-    user,
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    updateUser
-  };
-};
+// The shared provider is the only authentication owner.
+export { useAuth } from '@o4o/auth-context';

@@ -9,8 +9,8 @@
  *   [ 이 PC 연결 ] 카드를 여기에 둔다. 별도 설정 화면을 만들지 않는다 (§5).
  *
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   "로그인 방법" Google 연결 카드는 은퇴했다. 연결에 쓰던 현재 비밀번호 재인증 수단이 없고,
- *   계정 자체가 Google Identity 로만 만들어진다(연결할 legacy 계정이 남지 않는다).
+ *   이전 Google 연결 경로는 은퇴한 채 유지한다.
+ *   Phase 4-C 신규 연결은 현재 계정 재인증·대상 인증·명시적 확인을 모두 요구한다.
  *
  * /mypage/settings — 보안 / 계정 관리.
  */
@@ -22,6 +22,8 @@ import { useLoginModal } from '../../contexts/LoginModalContext';
 import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
 import LocalAgentCard from '../../components/mypage/LocalAgentCard';
+import { PasswordSecuritySettings, SocialAccountConnections } from '@o4o/auth-react';
+import { authClient } from '../../lib/apiClient';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -48,7 +50,7 @@ export default function MySettingsPage() {
       <MyPageLayout title="설정" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
-          description="마이페이지를 이용하려면 로그인해주세요."
+          description="My Home을 이용하려면 로그인해주세요."
           onAction={() => openLoginModal('/mypage/settings')}
         />
       </MyPageLayout>
@@ -63,7 +65,7 @@ export default function MySettingsPage() {
       navItems={getNetureMyPageNavItems(user.roles)}
       breadcrumb={[
         { label: '홈', href: '/' },
-        { label: '마이페이지', href: '/mypage' },
+        { label: 'My Home', href: '/mypage' },
         { label: '설정' },
       ]}
     >
@@ -75,6 +77,8 @@ export default function MySettingsPage() {
         notify={{ success: toast.success, error: toast.error }}
         onLogout={logout}
       />
+      <SocialAccountConnections client={authClient} />
+      <PasswordSecuritySettings client={authClient} notify={{ success: toast.success }} onSessionEnded={() => openLoginModal('/mypage/settings')} />
     </MyPageLayout>
   );
 }

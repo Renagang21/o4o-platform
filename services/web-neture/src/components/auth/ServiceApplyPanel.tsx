@@ -1,3 +1,4 @@
+import { ServiceEnrollmentPolicyAgreement, useServiceEnrollmentPolicies } from '@o4o/shared-space-ui';
 /**
  * ServiceApplyPanel — 로그인 회원의 공급자 서비스 신청 · 상태 패널 (랜딩 페이지용)
  *
@@ -11,9 +12,9 @@
  *   suspended / withdrawn → 안내만
  * 상태 출처는 서버 serviceStates 뿐이다 (role 문자열로 판정하지 않는다).
  *
- * CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E3: 공급자 신청의 전제는 Neture 가입 승인(active)이다.
+ * 공급자 신청의 전제는 이메일 확인을 마친 정상 Neture 계정(active)이다.
  *   서버가 신청 시점에 직접 확인한다(`NETURE_MEMBERSHIP_REQUIRED`). 이 패널은 `serviceStates.netureMain` 이
- *   승인 전이면 폼 대신 Neture 가입 안내를 보인다(값이 없으면 — 구 API — 폼을 그대로 두고 서버 판정에 맡긴다).
+ *   active가 아니면 폼 대신 계정 상태 확인 안내를 보인다(값이 없으면 — 구 API — 폼을 그대로 두고 서버 판정에 맡긴다).
  * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 서비스 신청 은퇴.
  *
  * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: 관리자 우회 분기 제거.
@@ -22,7 +23,8 @@
  */
 
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { O4OHomeButton, O4O_HOME_URL } from '@o4o/auth-react';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
@@ -36,13 +38,14 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_SLUG: '식별자는 영문 소문자 · 숫자 · 하이픈(-)만 사용할 수 있습니다.',
   SLUG_ALREADY_EXISTS: '이미 사용 중인 식별자입니다. 다른 값을 입력해 주세요.',
   USER_ALREADY_HAS_SUPPLIER: '이미 공급자 서비스 신청 이력이 있습니다. 운영자에게 문의해 주세요.',
-  NETURE_MEMBERSHIP_REQUIRED: 'Neture 가입 승인 후 공급자 서비스를 신청할 수 있습니다. 대표 홈에서 가입 상태를 확인해 주세요.',
+  NETURE_MEMBERSHIP_REQUIRED: '정상적으로 이용할 수 있는 Neture 계정이 필요합니다. 대표 홈에서 계정 상태를 확인해 주세요.',
 };
 
-export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
-  const { user, isAuthenticated } = useAuth();
-  const { states, loading, error, reload } = useNetureServiceStates(isAuthenticated);
+export function ServiceApplyPanel({ service, enterWorkspace = false }: { service: ServiceKey; enterWorkspace?: boolean }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { states, loading, error, restrictedAccount, reload } = useNetureServiceStates(isAuthenticated);
   const info = NETURE_SERVICE_INFO[service];
+  const agreement = useServiceEnrollmentPolicies('supplier', async () => (await api.get('/public/services/supplier/enrollment-policies')).data.data, user?.id ?? 'signed-out');
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -54,8 +57,18 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
 
   const box = 'bg-white/95 text-gray-900 rounded-xl p-6 text-left max-w-lg mx-auto shadow-lg';
 
-  if (loading || (!states && !error)) {
+  if (loading || (!states && !error && !restrictedAccount)) {
     return <div className={box}><p className="text-sm text-gray-500">서비스 이용 상태를 확인하는 중...</p></div>;
+  }
+
+  if (restrictedAccount) {
+    return (
+      <div className={box} data-testid={`service-apply-${service}-account-restricted`}>
+        <p className="text-sm text-gray-700 mb-4">Neture 계정 확인이 필요합니다. 계정의 이메일 확인이나 이용 제한 상태를 확인해 주세요. 공급자 신청과 업무는 계정 확인 후 이용할 수 있습니다.</p>
+        <button type="button" onClick={reload} className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-semibold">계정 상태 다시 확인</button>
+        <a href={O4O_HOME_URL} className="block mt-4 text-sm text-gray-600 underline">Neture 공개 메인으로</a>
+      </div>
+    );
   }
 
   if (error || !states) {
@@ -75,6 +88,7 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   );
 
   if (status === 'active') {
+    if (enterWorkspace) return <Navigate to={info.work} replace />;
     return (
       <div className={box} data-testid={`service-apply-${service}-active`}>
         {header}
@@ -110,7 +124,7 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
     );
   }
 
-  // 신청 전제 — Neture 가입 승인 전이면 폼 대신 안내(판정은 서버가 한다)
+  // 신청 전제 — 정상 Neture 계정이 아니면 폼 대신 안내(판정은 서버가 한다)
   const netureMain = states.netureMain?.status;
   if (status === 'none' && netureMain && netureMain !== 'active') {
     return (
@@ -118,12 +132,16 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
         {header}
         <p className="text-sm text-gray-700 mb-4">
           {netureMain === 'pending'
-            ? `Neture 가입 승인 대기 중입니다. 승인된 뒤 ${info.name}를 신청할 수 있습니다.`
-            : `${info.name}는 Neture 가입 승인 후 신청할 수 있습니다.`}
+            ? `Neture 계정 확인이 필요합니다. 대표 홈에서 계정 상태를 확인한 뒤 ${info.name}를 신청해 주세요.`
+            : `${info.name}를 신청하려면 정상적으로 이용할 수 있는 Neture 계정이 필요합니다.`}
         </p>
-        <Link to="/" className="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800">
-          대표 홈에서 가입 상태 확인 <ArrowRight className="ml-2 w-4 h-4" />
-        </Link>
+        <O4OHomeButton
+          api={api}
+          isAuthenticated={isAuthenticated}
+          authLoading={isLoading}
+          label="대표 홈에서 계정 상태 확인"
+          className="inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800"
+        />
       </div>
     );
   }
@@ -132,13 +150,15 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   const isReapply = status !== 'none';
   const submit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!agreement.ready || submitting) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email });
+      await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email, policyReferences: agreement.references });
       reload();
     } catch (err: unknown) {
       const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code;
+      if (code === 'POLICY_VERSION_MISMATCH' || code === 'ENROLLMENT_POLICY_REQUIRED') { agreement.reload(); setSubmitError('서비스 약관이 변경되었습니다. 입력 내용은 유지됩니다. 최신 약관을 확인해 주세요.'); return; }
       setSubmitError((code && ERROR_MESSAGES[code]) || '신청에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setSubmitting(false);
@@ -169,8 +189,9 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
             <input className={input} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder={user?.email} />
           </label>
         </div>
+      <ServiceEnrollmentPolicyAgreement agreement={agreement} />
       {submitError && <p className="text-sm text-red-600 mt-3">{submitError}</p>}
-      <button type="submit" disabled={submitting} className="mt-4 inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50">
+      <button type="submit" disabled={submitting || !agreement.ready} className="mt-4 inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50">
         {submitting ? '신청 중...' : isReapply ? '다시 신청하기' : `${info.name} 신청`}
       </button>
     </form>

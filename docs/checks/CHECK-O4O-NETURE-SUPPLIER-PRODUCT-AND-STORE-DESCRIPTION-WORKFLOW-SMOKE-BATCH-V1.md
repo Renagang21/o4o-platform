@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1`
 - **작성일**: 2026-08-11
 - **판정**: **PASS (부분 제약 명시)** — 필수 route 9개 blank 0 / console error 0 / API 4xx·5xx 0. 단, smoke 계정의 등록 상품이 0건이라 상품 상세 Drawer CTA 는 실데이터로 클릭 검증하지 못했다(§5-3).
@@ -90,7 +92,7 @@ commit `eda5e182b` — 4 files, +65/−7. **권한·API·schema·정책 변경 0
 ## 5. 실브라우저 smoke 결과
 
 - **환경**: `https://neture.co.kr` (프로덕션), 배포 후
-- **계정**: Neture 공급자2 (`docs/local/TEST-ACCOUNTS.local.md` — (주)네뚜레 공급자 테스트 / supplier owner). 자격증명은 본 문서에 기재하지 않는다.
+- **계정**: Neture 공급자2 (`docs/local/TEST-ACCOUNT.txt` — (주)네뚜레 공급자 테스트 / supplier owner). 자격증명은 본 문서에 기재하지 않는다.
 - **방법**: route 별 이동 후 `main` 렌더 확인 + console `error` 수집 + `/api/` 응답 4xx·5xx 수집
 
 ### 5-1. 필수 route (WO §8)

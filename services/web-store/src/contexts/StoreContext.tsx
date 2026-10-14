@@ -50,7 +50,7 @@ export interface UnifiedStoreContextValue {
   organizationName: string | null;
   services: StoreServiceMembership[];
   /**
-   * §8-4 서비스 문맥(2차 축). 이 매장의 활성 enrollment 중 canonical 우선순위(KPA → KCos → PH)로 고른 공통 문맥.
+   * §8-4 서비스 문맥(2차 축). 이 매장의 활성 enrollment 중 canonical 우선순위(KPA)로 고른 공통 문맥.
    * 내 매장(/store) · 매장 HUB(/hub) 의 백엔드 호출은 이 문맥으로 나간다. null = 이용 가능한 서비스 업무공간 없음.
    */
   commonServiceKey: UnifiedServiceKey | null;
@@ -118,9 +118,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         clearSelectedOrganizationId();
         setSelectedId(null);
         setError('선택한 매장에 대한 접근 권한이 확인되지 않습니다. 매장을 다시 선택해 주세요.');
-        setTick((t) => t + 1);
+        setListState('error');
       })
-      .catch(() => { if (!cancelled) setError('매장의 서비스 목록을 불러오지 못했습니다.'); });
+      .catch(() => { if (!cancelled) { setListState('error'); setError('매장의 서비스 목록을 불러오지 못했습니다.'); } });
     return () => { cancelled = true; };
   }, [effectiveId]);
 

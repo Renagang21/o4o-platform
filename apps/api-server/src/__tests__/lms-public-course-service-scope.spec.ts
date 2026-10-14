@@ -239,10 +239,8 @@ describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
     for (const rel of [
       'services/web-k-cosmetics/src/api/lms.ts',
       'services/web-kpa-society/src/api/lms.ts',
-      'services/web-pharmacy-hub/src/api/lms.ts',
       'services/web-k-cosmetics/src/pages/operator/OperatorLmsCoursesPage.tsx',
       'services/web-kpa-society/src/pages/operator/OperatorLmsCoursesPage.tsx',
-      'services/web-pharmacy-hub/src/pages/operator/OperatorLmsCoursesPage.tsx',
     ]) {
       expect(fs.existsSync(path.join(REPO_ROOT, rel))).toBe(false);
     }

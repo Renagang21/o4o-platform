@@ -16,6 +16,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 // ForumCategory removed — WO-O4O-FORUM-CATEGORY-TABLE-DROP-V1
 import logger from '../../utils/logger.js';
+import { withoutPublicReadDesignation } from '../community/community-public-read-metadata.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -109,7 +110,7 @@ export class ForumRequestService {
       iconEmoji: iconEmoji || undefined,
       iconUrl: iconUrl || undefined,
       tags: sanitizedTags,
-      metadata: metadata || undefined,
+      metadata: withoutPublicReadDesignation(metadata),
       status: 'pending' as any,
       requesterId: user.id,
       requesterName: user.name || user.email || 'Unknown',
@@ -174,7 +175,7 @@ export class ForumRequestService {
     if (input.iconEmoji !== undefined) row.iconEmoji = input.iconEmoji || undefined;
     if (input.iconUrl !== undefined) row.iconUrl = input.iconUrl || undefined;
     if (input.tags !== undefined) row.tags = input.tags || undefined;
-    if (input.metadata !== undefined) row.metadata = input.metadata || undefined;
+    if (input.metadata !== undefined) row.metadata = withoutPublicReadDesignation(input.metadata);
 
     // revision_requested 상태에서 수정하면 pending으로 복귀
     if (row.status === 'revision_requested') {

@@ -16,14 +16,17 @@ export interface SemiFranchiseCommunityAccess {
   operator?: boolean;
 }
 
-export async function resolveSemiFranchiseCommunityAccess(
+async function resolveAccess(
   exec: Exec,
   userId: string | null | undefined,
-  communityKey: string,
+  identifier: string,
+  byBusinessKey: boolean,
 ): Promise<SemiFranchiseCommunityAccess> {
   const [sf] = await exec.query(
-    `SELECT id, key, status FROM semi_franchises WHERE community_key = $1 LIMIT 1`,
-    [communityKey],
+    byBusinessKey
+      ? `SELECT id, key, status FROM semi_franchises WHERE key = $1 LIMIT 1`
+      : `SELECT id, key, status FROM semi_franchises WHERE community_key = $1 LIMIT 1`,
+    [identifier],
   );
   if (!sf) return { semiFranchise: false, allowed: false, semiFranchiseKey: null };
   if (sf.status !== 'active') return { semiFranchise: true, allowed: false, semiFranchiseKey: sf.key };
@@ -50,4 +53,14 @@ export async function resolveSemiFranchiseCommunityAccess(
     [sf.id, userId],
   );
   return { semiFranchise: true, allowed: rows.length > 0, semiFranchiseKey: sf.key };
+}
+
+/** Existing community lookup; the participant approval predicate remains shared. */
+export function resolveSemiFranchiseCommunityAccess(exec: Exec, userId: string | null | undefined, communityKey: string) {
+  return resolveAccess(exec, userId, communityKey, false);
+}
+
+/** Business access does not depend on whether a participant forum has been configured. */
+export function resolveSemiFranchiseBusinessAccess(exec: Exec, userId: string | null | undefined, businessKey: string) {
+  return resolveAccess(exec, userId, businessKey, true);
 }

@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * Trial API Client
  *
@@ -44,7 +45,7 @@ export interface Trial {
   id: string;
   title: string;
   // WO-O4O-NETURE-MARKET-TRIAL-SUPPLIER-PRODUCT-REFERENCE-V1 / DISPLAY-V2:
-  // 공급자가 등록 상품 기준으로 개설한 펀딩의 soft 참조. 없으면 둘 다 null.
+  // 참고한 등록 제품의 optional legacy reference. 주문·가격·개설 조건이 아니다.
   productId?: string | null;
   product?: TrialProductRef | null;
   // WO-MARKET-TRIAL-PROPOSAL-STRUCTURE-V1
@@ -57,6 +58,9 @@ export interface Trial {
   supplierId: string;
   supplierName?: string;
   status: TrialStatus;
+  reviewStatus?: string;
+  reviewReason?: string | null;
+  forumPending?: boolean;
   outcomeSnapshot?: {
     expectedType: 'product' | 'cash';
     description: string;
@@ -89,8 +93,10 @@ export interface Trial {
 }
 
 export interface OperatorTrial extends Trial {
+  forumReady?: boolean;
   forumLink?: {
-    forumPostId: string;
+    forumPostId?: string;
+    forumId?: string;
     slug: string | null;
     url: string;
   } | null;
@@ -209,6 +215,7 @@ export interface TrialResultsSummary {
 }
 
 export interface TrialResults {
+  forum?: { id: string; slug: string } | null;
   trial: Trial;
   summary: TrialResultsSummary;
   forumPostId: string | null;
@@ -284,9 +291,10 @@ export async function getTrial(trialId: string): Promise<Trial> {
 
 export async function joinTrial(
   trialId: string,
-  rewardType: 'cash' | 'product'
+  rewardType: 'cash' | 'product',
+  policyReferences?: EnrollmentPolicyReference[]
 ): Promise<Participation> {
-  const { data } = await api.post(`${API_BASE_URL}/api/market-trial/${trialId}/join`, { rewardType });
+  const { data } = await api.post(`${API_BASE_URL}/api/market-trial/${trialId}/join`, { rewardType, policyReferences });
   return data.data || data;
 }
 
@@ -337,7 +345,7 @@ export async function saveSettlementChoice(
 // ============================================================================
 
 export async function createTrial(payload: CreateTrialPayload): Promise<Trial> {
-  const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload);
+  const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload, fundingOrganizationConfig());
   return data.data || data;
 }
 
@@ -353,7 +361,7 @@ export async function submitTrial(trialId: string): Promise<Trial> {
 }
 
 export async function getMyTrials(): Promise<Trial[]> {
-  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my`);
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my`, fundingOrganizationConfig());
   return data.data || data;
 }
 
@@ -442,16 +450,20 @@ export async function rejectTrialFirst(trialId: string, reason: string): Promise
  * WO-MARKET-TRIAL-OPERATION-READINESS-V1: 참여자 목록 JSON (인라인 표시)
  * WO-MARKET-TRIAL-SETTLEMENT-AND-FULFILLMENT-MANAGEMENT-V1: 필터 지원 추가
  */
+export interface ParticipantFilters {
+  rewardType?: 'product' | 'cash';
+  rewardStatus?: 'pending' | 'fulfilled';
+  paymentStatus?: PaymentStatus;
+}
+
 export async function getOperatorTrialParticipants(
   trialId: string,
-  filters?: {
-    rewardType?: 'product' | 'cash';
-    rewardStatus?: 'pending' | 'fulfilled';
-  },
+  filters?: ParticipantFilters,
 ): Promise<ParticipantListResponse> {
   const params = new URLSearchParams();
   if (filters?.rewardType) params.append('rewardType', filters.rewardType);
   if (filters?.rewardStatus) params.append('rewardStatus', filters.rewardStatus);
+  if (filters?.paymentStatus) params.append('paymentStatus', filters.paymentStatus);
   const qs = params.toString();
   const { data } = await api.get(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants${qs ? `?${qs}` : ''}`,
@@ -562,16 +574,21 @@ export async function updateTrialStatus(trialId: string, status: TrialStatus): P
 /**
  * WO-MARKET-TRIAL-PARTICIPANT-EXPORT-V1: 참여자 CSV 다운로드
  */
-export async function exportParticipantsCSV(trialId: string): Promise<void> {
+export async function exportParticipantsCSV(trialId: string, filters?: ParticipantFilters): Promise<void> {
+  const params = new URLSearchParams();
+  for (const [field, value] of Object.entries(filters || {})) if (value) params.set(field, value);
+  const query = params.toString();
   const response = await api.get(
-    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export`,
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/participants/export${query ? `?${query}` : ''}`,
     { responseType: 'blob' },
   );
   const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
   const url = window.URL.createObjectURL(blob);
   const disposition = response.headers['content-disposition'] || '';
-  const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
-  const filename = filenameMatch ? filenameMatch[1] : `market-trial-${trialId}-participants.csv`;
+  const utf8Name = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  const fallback = disposition.match(/filename="([^"]+)"/i);
+  let filename = fallback?.[1] || `market-trial-${trialId}-participants.csv`;
+  if (utf8Name) { try { filename = decodeURIComponent(utf8Name[1]); } catch { /* Use ASCII fallback. */ } }
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
@@ -641,7 +658,7 @@ export async function resolveForumSyncFailure(
  */
 export async function retryTrialForumSync(
   trialId: string,
-): Promise<{ status: 'created' | 'already_linked'; forumPostId: string }> {
+): Promise<{ status: 'created' | 'already_linked'; forumId: string }> {
   const { data } = await api.post(
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/forum-sync/retry`,
   );
@@ -709,4 +726,28 @@ export async function getOperatorTrialKpi(trialId: string): Promise<MarketTrialD
     `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/kpi`,
   );
   return data.data || data;
+}
+
+const FUNDING_ORGANIZATION_KEY = 'funding_supplier_org';
+export function selectFundingOrganization(id: string) { if (id) window.sessionStorage.setItem(FUNDING_ORGANIZATION_KEY, id); else window.sessionStorage.removeItem(FUNDING_ORGANIZATION_KEY); }
+function fundingOrganizationConfig() {
+  const id = typeof window === 'undefined' ? null : window.sessionStorage.getItem(FUNDING_ORGANIZATION_KEY);
+  return id ? { headers: { 'x-organization-id': id } } : {};
+}
+export async function getFundingCreatorEligibility() {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/creator-eligibility`, fundingOrganizationConfig());
+  return data.data;
+}
+export async function changeFundingCreatorStatus(id: string, status: TrialStatus) {
+  const { data } = await api.patch(`${API_BASE_URL}/api/market-trial/${id}/creator-status`, { status });
+  return data.data;
+}
+export async function getFundingCreatorParticipants(id: string): Promise<{ id: string; name: string; paymentStatus: string }[]> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/creator-participants`);
+  return data.data;
+}
+export interface FundingForumAccess { forum: { id: string; slug: string } | null; canRead: boolean; canWrite: boolean; canManage: boolean; canModerate: boolean; member: boolean; participant: boolean; }
+export async function getFundingForumAccess(id: string): Promise<FundingForumAccess> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${id}/forum-access`);
+  return data.data;
 }

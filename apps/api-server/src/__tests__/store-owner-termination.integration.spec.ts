@@ -74,7 +74,7 @@ describe('store-owner termination isolated PostgreSQL lifecycle',()=>{
     await ds.query(`INSERT INTO store_playlists (organization_id,name) VALUES ($1,'매장 플레이리스트')`,[ORG2]);
     const service=new StoreOwnerTerminationService(ds);
     const now=new Date('2026-09-18T00:00:00Z');
-    const c=await service.createCase({serviceKey:'pharmacy-hub',organizationId:ORG2,userId:USER2,returnRequested:false,terminationEffectiveAt:now.toISOString()});
+    const [c]=await ds.query(`INSERT INTO store_owner_termination_cases(service_key,organization_id,user_id,status,return_requested,termination_effective_at) VALUES ('pharmacy-hub',$1,$2,'termination_scheduled',false,$3) RETURNING id`,[ORG2,USER2,now.toISOString()]);
     const returned:any=await service.buildReturnPackage(c.id);
     expect(returned.format).toBe('O4O_STORE_OWNER_DATA_RETURN_V1');
     expect(returned.serviceKey).toBe('pharmacy-hub');

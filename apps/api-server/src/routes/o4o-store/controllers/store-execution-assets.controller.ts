@@ -29,7 +29,8 @@ import { StoreExecutionAsset } from '../../platform/entities/store-execution-ass
 // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1: 원본↔파생 관계 조회
 import { StoreAssetDerivation } from '../../platform/entities/store-asset-derivation.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 
 const VALID_ASSET_TYPES = ['file', 'content', 'external-link'] as const;
 
@@ -45,7 +46,7 @@ export function createStoreExecutionAssetsController(
   const router = Router();
   const assetsRepo = dataSource.getRepository(StoreExecutionAsset);
 
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // ─── GET /store/assets — 자산 목록 (페이지네이션) ──────────
   router.get(

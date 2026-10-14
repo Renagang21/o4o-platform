@@ -1,5 +1,7 @@
 # CHECK-O4O-POST-LEGACY-RESIDUE-AND-ENVIRONMENT-CLEANUP-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: `WO-O4O-POST-LEGACY-RESIDUE-AND-ENVIRONMENT-CLEANUP-V1`
 > **일자**: 2026-08-05
 > **브랜치**: `main` (직접 작업)
@@ -184,7 +186,7 @@ const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV =
 
 기능 작업은 중단 없이 완주했다.
 
-`docs/local/TEST-ACCOUNTS.local.md` 에 검증 상태 메모를 추가했다. 이 문서는 `.gitignore:139` 로 **추적 제외**이며 **커밋되지 않는다.** 자격증명·토큰은 보고서·문서·커밋 어디에도 기록하지 않았다.
+`docs/local/TEST-ACCOUNT.txt` 에 검증 상태 메모를 추가했다. 이 문서는 `.gitignore:139` 로 **추적 제외**이며 **커밋되지 않는다.** 자격증명·토큰은 보고서·문서·커밋 어디에도 기록하지 않았다.
 
 ---
 

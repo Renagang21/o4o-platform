@@ -13,8 +13,11 @@
  *   - snapshot 은 공개 landing 이 렌더하지 못하므로 지원하지 않는다(호출 측에서 게이트).
  */
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { X, QrCode, ExternalLink, Loader2 } from 'lucide-react';
+import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
+import { storeWorkspaceBase } from './StoreWorkflowNavigation';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { createStoreQrCode } from '../../api/storeQr';
 
 export type InlineQrOrigin = 'direct' | 'execution-asset';
@@ -46,6 +49,7 @@ interface StoreQrCreateModalProps {
 
 export function StoreQrCreateModal({ open, target, onClose, onCreated }: StoreQrCreateModalProps) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [ctaEnabled, setCtaEnabled] = useState(false);
@@ -124,14 +128,14 @@ export function StoreQrCreateModal({ open, target, onClose, onCreated }: StoreQr
           <div style={styles.body}>
             <p style={styles.successMsg}>QR-code가 생성되었습니다.</p>
             <div style={styles.urlRow}>
-              <a href={`/qr/${createdSlug}`} target="_blank" rel="noreferrer" style={styles.urlLink}>
+              <a href={`${getActiveServicePublicOrigin()}/qr/${encodeURIComponent(createdSlug)}`} target="_blank" rel="noreferrer" style={styles.urlLink}>
                 /qr/{createdSlug} <ExternalLink size={12} />
               </a>
             </div>
             <div style={styles.footer}>
               <button type="button" onClick={onClose} style={styles.secondaryBtn}>닫기</button>
-              <button type="button" onClick={() => navigate('/store/marketing/qr')} style={styles.primaryBtn}>
-                QR-code 목록 보기
+              <button type="button" onClick={() => navigate(withWorkspaceMode(`${storeWorkspaceBase(pathname)}/marketing/qr`, 'use'))} style={styles.primaryBtn}>
+                QR 배치·출력으로 이어가기
               </button>
             </div>
           </div>

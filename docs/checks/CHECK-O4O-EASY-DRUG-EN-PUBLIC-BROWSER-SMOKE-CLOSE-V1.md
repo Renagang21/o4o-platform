@@ -1,5 +1,7 @@
 # CHECK — WO-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > LIVE 적용된 EN 19,360건의 **실제 공개 화면**에서 언어 선택·렌더링·레이아웃 회귀만 검증하고
 > EN LIVE 트랙을 최종 종료한다. **번역 수정 0 · DB write 0 · 재apply 0.**
 > 선행 CHECK: [`CHECK-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1.md`](CHECK-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1.md)
@@ -24,7 +26,7 @@ Chromium 이 이미 설치되어 있었다** (`node_modules/playwright`, `ms-pla
 | 공개 URL | `https://neture.co.kr/p/:publicKey` (`ProductLandingPage`) |
 | 브라우저 | Chromium (Playwright, headless) |
 | viewport | mobile `390×844` · tablet `768×1024` · desktop `1440×900` |
-| 계정 | `docs/local/TEST-ACCOUNTS.local.md` Neture 운영자 — 값은 **환경변수 주입**, 로그·문서·커밋에 미포함 |
+| 계정 | `docs/local/TEST-ACCOUNT.txt` Neture 운영자 — 값은 **환경변수 주입**, 로그·문서·커밋에 미포함 |
 | 기준 HEAD | `76c035e4c` |
 | DB 접근 | `SELECT` 만 (publicKey·제품명 조회) — **write 0** |
 

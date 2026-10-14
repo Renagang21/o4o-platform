@@ -21,7 +21,8 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import {
   assertExternalSalesEligibleById,
   ExternalSalesErrorCode,
@@ -80,7 +81,7 @@ export function createStoreExternalSalesController(
   serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
-  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   /** 경로 채널코드 검증 — 응답을 이미 보냈으면 null 반환 */
   function validateChannel(raw: string, res: Response): ExternalChannelCode | null {

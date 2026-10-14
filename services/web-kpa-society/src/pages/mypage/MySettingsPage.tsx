@@ -1,3 +1,5 @@
+import { SocialAccountConnections } from '@o4o/auth-react';
+import { authClient } from '../../contexts/AuthContext';
 /**
  * MySettingsPage - 설정 페이지
  *
@@ -108,6 +110,7 @@ export function MySettingsPage() {
       ]}
       width="form"
     >
+      <SocialAccountConnections client={authClient} />
       {/* 알림 설정 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>
         <h3 style={styles.sectionTitle}>알림 설정</h3>

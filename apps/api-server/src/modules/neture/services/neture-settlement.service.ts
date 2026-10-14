@@ -1,487 +1,71 @@
-/**
- * Neture Settlement Service
- *
- * WO-O4O-SETTLEMENT-SERVICE-EXTRACTION-V1
- * WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1 — CommissionEngine 통합
- *
- * neture.routes.ts 인라인 정산 로직을 Service Layer로 추출.
- * Platform Fee 계산은 CommissionEngine에 위임.
- */
-
-// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
-import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
+/** Compatibility façade for existing settlement callers and DataSource injection. */
 import type { DataSource } from 'typeorm';
-import logger from '../../../utils/logger.js';
-import { listSupplierOwnerUserIds } from '../middleware/supplier-context.resolver.js';
-// WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
-// 정산 지급(완료) 알림용 canonical notificationService.
-import { notificationService } from '../../../services/NotificationService.js';
-
-// Commission helpers (inlined from @o4o/financial-core)
-const PLATFORM_FEE_RATE = 0.10;
-const getPlatformFeeRate = () => PLATFORM_FEE_RATE;
-const calculatePlatformFee = (total: number) => Math.round(total * PLATFORM_FEE_RATE);
-const calculateSupplierAmount = (total: number, fee: number) => total - fee;
-
-const VALID_STATUSES = ['pending', 'calculated', 'approved', 'paid', 'cancelled'] as const;
-
-interface SettlementFilters {
-  page: number;
-  limit: number;
-  status?: string;
-}
+import type { SettlementFilters } from './settlement-query-types.js';
+import { SupplierSettlementReadService } from './supplier-settlement-read.service.js';
+import { AdminSettlementReadService } from './admin-settlement-read.service.js';
+import { SettlementCommandService } from './settlement-command.service.js';
 
 export class NetureSettlementService {
   constructor(private dataSource: DataSource) {}
 
-  // ─────────────────────────────────────────────
-  // Supplier endpoints
-  // ─────────────────────────────────────────────
+  private _supplierRead?: SupplierSettlementReadService;
 
-  /**
-   * 공급자 정산 목록 (페이지네이션 + 상태 필터)
-   */
+  private get supplierRead(): SupplierSettlementReadService {
+    this._supplierRead ??= new SupplierSettlementReadService(this.dataSource);
+    return this._supplierRead;
+  }
+
+  private _adminRead?: AdminSettlementReadService;
+
+  private get adminRead(): AdminSettlementReadService {
+    this._adminRead ??= new AdminSettlementReadService(this.dataSource);
+    return this._adminRead;
+  }
+
+  private _command?: SettlementCommandService;
+
+  private get command(): SettlementCommandService {
+    this._command ??= new SettlementCommandService(this.dataSource);
+    return this._command;
+  }
+
   async getSupplierSettlements(supplierId: string, filters: SettlementFilters) {
-    const { page, limit, status } = filters;
-    const offset = (page - 1) * limit;
-
-    const baseParams: any[] = [supplierId];
-    let statusClause = '';
-    if (status && VALID_STATUSES.includes(status as any)) {
-      statusClause = 'AND s.status = $2';
-      baseParams.push(status);
-    }
-
-    const [settlements, countResult] = await Promise.all([
-      this.dataSource.query(
-        `SELECT s.id, s.supplier_id, s.period_start, s.period_end,
-                s.total_sales, s.platform_fee, s.supplier_amount,
-                s.platform_fee_rate, s.order_count, s.status,
-                s.paid_at, s.notes, s.created_at, s.updated_at
-         FROM neture_settlements s
-         WHERE s.supplier_id = $1 ${statusClause}
-         ORDER BY s.period_end DESC, s.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      this.dataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM neture_settlements s
-         WHERE s.supplier_id = $1 ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-    return {
-      success: true,
-      data: settlements,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    };
+    return this.supplierRead.getSupplierSettlements(supplierId, filters);
   }
 
-  /**
-   * 공급자 정산 KPI (대시보드용)
-   */
   async getSupplierKpi(supplierId: string) {
-    const result = await this.dataSource.query(
-      `SELECT
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved')), 0)::int AS pending_amount,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved', 'paid')), 0)::int AS total_amount,
-         COUNT(*) FILTER (WHERE status IN ('calculated', 'approved'))::int AS pending_count,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count
-       FROM neture_settlements
-       WHERE supplier_id = $1 AND status != 'cancelled'`,
-      [supplierId],
-    );
-
-    return {
-      success: true,
-      data: {
-        pending_amount: Number(result[0]?.pending_amount || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-        total_amount: Number(result[0]?.total_amount || 0),
-        pending_count: Number(result[0]?.pending_count || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-      },
-    };
+    return this.supplierRead.getSupplierKpi(supplierId);
   }
 
-  /**
-   * 공급자 정산 상세 (연결된 주문 포함)
-   */
   async getSupplierSettlementDetail(settlementId: string, supplierId: string) {
-    const rows = await this.dataSource.query(
-      `SELECT * FROM neture_settlements WHERE id = $1 AND supplier_id = $2 LIMIT 1`,
-      [settlementId, supplierId],
-    );
-    if (rows.length === 0) {
-      return null;
-    }
-    const settlement = rows[0];
-
-    const orders = await this.dataSource.query(
-      `SELECT so.order_id, so.supplier_sales_amount,
-              o.order_number, o.status AS order_status,
-              o.orderer_name, o.created_at AS order_date
-       FROM neture_settlement_orders so
-       JOIN neture_orders o ON o.id = so.order_id
-       WHERE so.settlement_id = $1
-       ORDER BY o.created_at DESC`,
-      [settlementId],
-    );
-
-    return { success: true, data: { ...settlement, orders } };
+    return this.supplierRead.getSupplierSettlementDetail(settlementId, supplierId);
   }
 
-  // ─────────────────────────────────────────────
-  // Admin endpoints
-  // ─────────────────────────────────────────────
-
-  /**
-   * 정산 일괄 계산 (배송 완료 + 결제/수금 확인 주문 기반)
-   *
-   * WO-O4O-SUPPLIER-SETTLEMENT-READINESS-GUARD-V1
-   * (상위: IR-O4O-STORE-ORDER-PAYMENT-READINESS-MODEL-V1)
-   *
-   * 정산 대상 = delivered AND payment/collection readiness (+ 미정산).
-   * legacy 의 "delivered 만 보면 정산" 흐름은 일반 전자상거래 원칙과 맞지 않으므로 제거하고,
-   * 결제(또는 명시적 수금) 확인된 주문만 정산 후보로 한다. sourceType/pricingSource 와 무관.
-   *
-   * readiness 판단 (§10.1 주의):
-   *   delivered 주문은 status 가 'delivered' 로 덮여 'paid' 가 아니므로 status='paid' 는 쓰지 않는다.
-   *   - paid_at IS NOT NULL                       : legacy online 결제 흔적(핸들러는 은퇴, 컬럼은 유지)
-   *   - metadata.paymentStatus='paid'|paymentReady : checkout_order-origin / future bridge 주문
-   *   - (제거됨) metadata.collectionStatus — WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1:
-   *     정산은 PAID + DELIVERED 만 인정한다(후불·수금확인 예외 없음).
-   * → 결제 확인 없이 delivered 만 된 주문(legacy 우회·테스트)은 정산에서 제외된다. (pre-launch: 0건이 정상)
-   */
   async calculateSettlements(periodStart: string, periodEnd: string) {
-    // Find delivered AND payment/collection-ready orders not in any settlement, grouped by supplier
-    const supplierAggregates = await this.dataSource.query(
-      `SELECT
-         spo.supplier_id,
-         ARRAY_AGG(DISTINCT o.id) AS order_ids,
-         COUNT(DISTINCT o.id)::int AS order_count,
-         SUM(oi.total_price)::int AS total_sales
-       FROM neture_orders o
-       JOIN neture.neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE o.status = 'delivered'
-         AND (
-           o.paid_at IS NOT NULL
-           OR o.metadata->>'paymentStatus' = 'paid'
-           OR o.metadata->>'paymentReady' = 'true'
-           /* WO-O4O-SUPPLIER-ORDER-PAYMENT-FULFILLMENT-SETTLEMENT-CANONICALIZATION-V1: collectionStatus OR 제거(payment-first) */
-         )
-         AND o.updated_at >= $1::date
-         AND o.updated_at < ($2::date + INTERVAL '1 day')
-         AND NOT EXISTS (
-           SELECT 1 FROM neture_settlement_orders nso
-           WHERE nso.order_id = o.id
-         )
-         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
-         --   공용 fulfillment 원장에는 여러 서비스 주문이 담긴다. Neture 정산은
-         --   Neture 주문만 집계해야 한다(미표기 = neture). 다른 서비스 정산은 각자 축에서 처리한다.
-         AND ${netureOrderServiceScopeSql('o', '$3')}
-       GROUP BY spo.supplier_id
-       HAVING SUM(oi.total_price) > 0`,
-      [periodStart, periodEnd, NETURE_FULFILLMENT_SERVICE_KEY],
-    );
-
-    if (supplierAggregates.length === 0) {
-      return {
-        success: true,
-        data: { created: 0, settlements: [] },
-        message: 'No unsettled, payment-ready delivered orders found in the given period.',
-      };
-    }
-
-    const created: any[] = [];
-    const feeRate = getPlatformFeeRate();
-
-    for (const agg of supplierAggregates) {
-      const totalSales = Number(agg.total_sales);
-      const platformFee = calculatePlatformFee(totalSales);
-      const supplierAmount = calculateSupplierAmount(totalSales, platformFee);
-      const orderIds: string[] = agg.order_ids;
-
-      const [settlement] = await this.dataSource.query(
-        `INSERT INTO neture_settlements
-           (supplier_id, period_start, period_end, total_sales, platform_fee,
-            supplier_amount, platform_fee_rate, order_count, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'calculated')
-         RETURNING *`,
-        [agg.supplier_id, periodStart, periodEnd, totalSales,
-         platformFee, supplierAmount, feeRate, agg.order_count],
-      );
-
-      // Per-order supplier sales for the junction table
-      const orderSales = await this.dataSource.query(
-        `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
-         FROM neture_orders o
-         JOIN neture.neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE o.id = ANY($1::uuid[]) AND spo.supplier_id = $2
-         GROUP BY o.id`,
-        [orderIds, agg.supplier_id],
-      );
-
-      for (const os of orderSales) {
-        await this.dataSource.query(
-          `INSERT INTO neture_settlement_orders (settlement_id, order_id, supplier_sales_amount)
-           VALUES ($1, $2, $3)`,
-          [settlement.id, os.order_id, os.supplier_sales_amount],
-        );
-      }
-
-      created.push(settlement);
-    }
-
-    logger.info(`[Neture Settlement] Created ${created.length} settlements for period ${periodStart} ~ ${periodEnd}`);
-
-    return {
-      success: true,
-      data: { created: created.length, settlements: created },
-    };
+    return this.command.calculateSettlements(periodStart, periodEnd);
   }
 
-  /**
-   * 정산 취소 (calculated/approved → cancelled)
-   */
   async cancelSettlement(settlementId: string, notes?: string) {
-    const setClauses = ['status = $1', 'updated_at = NOW()'];
-    const params: any[] = ['cancelled'];
-    let paramIdx = 2;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status IN ('calculated', 'approved')
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
-      return null;
-    }
-
-    // Delete junction rows to allow re-settlement
-    await this.dataSource.query(
-      `DELETE FROM neture_settlement_orders WHERE settlement_id = $1`,
-      [settlementId],
-    );
-
-    return { success: true, data: result[0] };
+    return this.command.cancelSettlement(settlementId, notes);
   }
 
-  /**
-   * 운영자 정산 목록 (페이지네이션 + 상태 필터 + 공급자명)
-   */
   async getAdminSettlements(filters: SettlementFilters) {
-    const { page, limit, status } = filters;
-    const offset = (page - 1) * limit;
-
-    const baseParams: any[] = [];
-    let statusClause = '';
-    let paramIdx = 1;
-    if (status && VALID_STATUSES.includes(status as any)) {
-      statusClause = `WHERE s.status = $${paramIdx}`;
-      baseParams.push(status);
-      paramIdx++;
-    }
-
-    const [settlements, countResult] = await Promise.all([
-      this.dataSource.query(
-        `SELECT s.id, s.supplier_id, supplier_org.name AS supplier_name,
-                s.period_start, s.period_end,
-                s.total_sales, s.platform_fee, s.supplier_amount,
-                s.platform_fee_rate, s.order_count, s.status,
-                s.approved_at, s.paid_at, s.notes, s.created_at, s.updated_at
-         FROM neture_settlements s
-         LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
-         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
-         ${statusClause}
-         ORDER BY s.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      this.dataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM neture_settlements s
-         ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-    return {
-      success: true,
-      data: settlements,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    };
+    return this.adminRead.getAdminSettlements(filters);
   }
 
-  /**
-   * 운영자 정산 KPI (calculated/approved/paid 건수 + 금액)
-   */
   async getAdminKpi() {
-    const result = await this.dataSource.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE status = 'calculated')::int AS calculated_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'calculated'), 0)::int AS calculated_amount,
-         COUNT(*) FILTER (WHERE status = 'approved')::int AS approved_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'approved'), 0)::int AS approved_amount,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount
-       FROM neture_settlements
-       WHERE status != 'cancelled'`,
-    );
-
-    return {
-      success: true,
-      data: {
-        calculated_count: Number(result[0]?.calculated_count || 0),
-        calculated_amount: Number(result[0]?.calculated_amount || 0),
-        approved_count: Number(result[0]?.approved_count || 0),
-        approved_amount: Number(result[0]?.approved_amount || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-      },
-    };
+    return this.adminRead.getAdminKpi();
   }
 
-  /**
-   * 운영자 정산 상세 (공급자명 + 연결 주문)
-   */
   async getAdminSettlementDetail(settlementId: string) {
-    const rows = await this.dataSource.query(
-      `SELECT s.*, supplier_org.name AS supplier_name
-       FROM neture_settlements s
-       LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
-       LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
-       WHERE s.id = $1 LIMIT 1`,
-      [settlementId],
-    );
-    if (rows.length === 0) {
-      return null;
-    }
-
-    const orders = await this.dataSource.query(
-      `SELECT so.order_id, so.supplier_sales_amount,
-              o.order_number, o.status AS order_status,
-              o.orderer_name, o.created_at AS order_date
-       FROM neture_settlement_orders so
-       JOIN neture_orders o ON o.id = so.order_id
-       WHERE so.settlement_id = $1
-       ORDER BY o.created_at DESC`,
-      [settlementId],
-    );
-
-    return { success: true, data: { ...rows[0], orders } };
+    return this.adminRead.getAdminSettlementDetail(settlementId);
   }
 
-  /**
-   * 운영자 정산 승인 (calculated → approved)
-   */
   async approveSettlement(settlementId: string, notes?: string) {
-    const setClauses = ["status = 'approved'", 'approved_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'calculated'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
-      return null;
-    }
-
-    logger.info(`[Neture Settlement] Settlement ${settlementId} approved`);
-    return { success: true, data: result[0] };
+    return this.command.approveSettlement(settlementId, notes);
   }
 
-  /**
-   * 운영자 정산 지급 처리 (approved → paid)
-   */
   async paySettlement(settlementId: string, notes?: string) {
-    const setClauses = ["status = 'paid'", 'paid_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await this.dataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'approved'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
-      return null;
-    }
-
-    logger.info(`[Neture Settlement] Settlement ${settlementId} paid`);
-
-    // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
-    // 정산 완료(approved → paid) 알림 — 단일 수신자(정산 대상 공급자 본인)에게 fire-and-forget.
-    // 지급 성공 후에만 발송하고, 알림 실패가 지급 결과에 영향을 주지 않도록 try/catch. 금액·계좌 등은 metadata 에 넣지 않는다.
-    await this.notifySupplierSettlementPaid(result[0]?.supplier_id, settlementId);
-
-    return { success: true, data: result[0] };
-  }
-
-  /**
-   * 정산 완료 알림 (fire-and-forget).
-   * WO-O4O-SUPPLIER-CANONICAL-RUNTIME-AND-PRODUCTION-FINAL-CLOSURE-V1: 수신자 = 공급자 사업자 본인 =
-   *   현재 organization_members(owner) 전부. owner 가 없을 때만 legacy user_id fallback.
-   * targetUrl 은 canonical `/supplier/settlements`(목록; 정산 상세 route 부재). 공급자는 활성 상태이므로 guard 통과.
-   */
-  private async notifySupplierSettlementPaid(
-    supplierId: string | null | undefined,
-    settlementId: string,
-  ): Promise<void> {
-    if (!supplierId) return;
-    try {
-      const recipients = await listSupplierOwnerUserIds(this.dataSource, supplierId);
-      for (const userId of recipients) {
-        await notificationService.createNotification({
-          userId,
-          // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축 §11):
-          //   legacy 'custom' → canonical 'settlement.paid' 수렴.
-          //   새 notification transport 는 만들지 않고 기존 notificationService 를 그대로 쓴다.
-          type: 'settlement.paid',
-          title: '정산이 완료되었습니다',
-          message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.',
-          serviceKey: 'neture',
-          metadata: { settlementId, status: 'paid', targetUrl: '/supplier/settlements' },
-        });
-      }
-    } catch (err) {
-      logger.warn('[Neture Settlement] Failed to send settlement-paid notification', err);
-    }
+    return this.command.paySettlement(settlementId, notes);
   }
 }

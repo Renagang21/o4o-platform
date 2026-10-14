@@ -12,7 +12,7 @@
  *   ListModels 를 조회한(1h 캐시) **실제 사용 가능한 모델** ∪ 정적 whitelist — 를 쓴다. 새 Gemini 모델이
  *   나오면 여기서 고르면 되고 코드 배포가 필요 없다. 서버는 저장 시 같은 목록으로 다시 검증한다(INVALID_MODEL).
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
 //   backend 는 `/api/ai/policy` (ai-query.routes, /api/ai mount) 이다. authClient.api 의 base 는
 //   `/api/v1` 이라 `/api/v1/ai/policy` → 404 였다 → base `/api` 인 unifiedApi.raw 로 호출한다.
@@ -58,12 +58,31 @@ const SOURCE_LABEL: Record<GeminiModelListing['source'], string> = {
   static: '내장 목록(Google 조회 불가)',
 };
 
+function readPolicy(body: { success?: boolean; data?: unknown }): AiQueryPolicy {
+  const data = body?.data as AiQueryPolicy | undefined;
+  if (body?.success !== true || !data ||
+      !Number.isInteger(data.freeDailyLimit) || data.freeDailyLimit < 0 ||
+      !Number.isInteger(data.paidDailyLimit) || data.paidDailyLimit < 0 ||
+      typeof data.aiEnabled !== 'boolean' ||
+      typeof data.defaultModel !== 'string' || !data.defaultModel.trim() ||
+      !(data.systemPrompt === null || typeof data.systemPrompt === 'string') ||
+      typeof data.updatedAt !== 'string') {
+    throw new Error('AI 정책 응답을 확인할 수 없습니다.');
+  }
+  return data;
+}
+
 const AiQuerySettings: React.FC = () => {
   const [policy, setPolicy] = useState<AiQueryPolicy | null>(null);
   const [models, setModels] = useState<GeminiModelListing | null>(null);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [modelsError, setModelsError] = useState<string | null>(null);
+  const savingRef = useRef(false);
+  const policyRead = useRef(0);
+  const modelRead = useRef(0);
   const [formData, setFormData] = useState({
     freeDailyLimit: 10,
     paidDailyLimit: 100,
@@ -73,61 +92,86 @@ const AiQuerySettings: React.FC = () => {
   });
 
   useEffect(() => {
+    const policyRequests = policyRead;
+    const modelRequests = modelRead;
     loadPolicy();
     loadModels();
+    return () => {
+      policyRequests.current++;
+      modelRequests.current++;
+    };
   }, []);
 
   const loadModels = async (refresh = false) => {
+    const request = ++modelRead.current;
     setModelsLoading(true);
+    setModelsError(null);
     try {
       const response = await unifiedApi.raw.get(refresh ? '/ai/models?refresh=1' : '/ai/models');
-      if (response.data.success) setModels(response.data.data);
-    } catch (error: any) {
-      console.error('Error loading AI models:', error);
-      toast.error('모델 목록을 불러오지 못했습니다.');
+      if (request !== modelRead.current) return;
+      const listing = response.data?.data as GeminiModelListing | undefined;
+      if (response.data?.success !== true || !listing || !Array.isArray(listing.models) ||
+          !listing.models.every(model => typeof model.id === 'string' && typeof model.displayName === 'string') ||
+          !['google', 'google-stale', 'static'].includes(listing.source)) {
+        throw new Error('Invalid model listing');
+      }
+      setModels(listing);
+    } catch {
+      if (request !== modelRead.current) return;
+      setModelsError('모델 목록을 불러오지 못했습니다. 다시 조회해주세요.');
     } finally {
-      setModelsLoading(false);
+      if (request === modelRead.current) setModelsLoading(false);
     }
   };
 
   const loadPolicy = async () => {
+    if (savingRef.current) return;
+    const request = ++policyRead.current;
     setLoading(true);
+    setLoadError(null);
     try {
       const response = await unifiedApi.raw.get('/ai/policy');
-      if (response.data.success) {
-        const data = response.data.data;
-        setPolicy(data);
-        setFormData({
-          freeDailyLimit: data.freeDailyLimit,
-          paidDailyLimit: data.paidDailyLimit,
-          aiEnabled: data.aiEnabled,
-          defaultModel: data.defaultModel,
-          systemPrompt: data.systemPrompt || '',
-        });
-      }
-    } catch (error: any) {
-      console.error('Error loading AI policy:', error);
-      toast.error('AI 정책을 불러오는데 실패했습니다.');
+      if (request !== policyRead.current) return;
+      const data = readPolicy(response.data);
+      setPolicy(data);
+      setFormData({
+        freeDailyLimit: data.freeDailyLimit,
+        paidDailyLimit: data.paidDailyLimit,
+        aiEnabled: data.aiEnabled,
+        defaultModel: data.defaultModel,
+        systemPrompt: data.systemPrompt || '',
+      });
+    } catch {
+      if (request !== policyRead.current) return;
+      setLoadError('저장된 AI 정책을 불러오지 못했습니다. 다시 불러온 뒤 수정해주세요.');
     } finally {
-      setLoading(false);
+      if (request === policyRead.current) setLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || loadError || !policy || savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     try {
       const response = await unifiedApi.raw.put('/ai/policy', formData);
-      if (response.data.success) {
-        setPolicy(response.data.data);
-        toast.success('AI 정책이 저장되었습니다.');
-      }
+      const saved = readPolicy(response.data);
+      setPolicy(saved);
+      setFormData({
+        freeDailyLimit: saved.freeDailyLimit,
+        paidDailyLimit: saved.paidDailyLimit,
+        aiEnabled: saved.aiEnabled,
+        defaultModel: saved.defaultModel,
+        systemPrompt: saved.systemPrompt || '',
+      });
+      toast.success('AI 정책이 저장되었습니다.');
     } catch (error: any) {
-      console.error('Error saving AI policy:', error);
-      // 서버가 모델을 거절한 경우(INVALID_MODEL)는 사유를 그대로 보여 준다 — 조용히 fallback 되지 않는다.
+      // Preserve server validation feedback without treating unsuccessful envelopes as saves.
       const serverMessage = error?.response?.data?.error;
       toast.error(serverMessage ? String(serverMessage) : 'AI 정책 저장에 실패했습니다.');
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   };
@@ -162,7 +206,22 @@ const AiQuerySettings: React.FC = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {loadError && (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <p>{loadError}</p>
+          <button type="button" onClick={loadPolicy} className="mt-2 underline">다시 불러오기</button>
+        </div>
+      )}
+      {modelsError && (
+        <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
+          <p>{modelsError}</p>
+          <button type="button" disabled={modelsLoading || saving} onClick={() => loadModels(true)} className="mt-2 underline">
+            모델 목록 다시 조회
+          </button>
+        </div>
+      )}
+      <form onSubmit={handleSubmit}>
+        <fieldset disabled={saving || !!loadError || !policy} className="space-y-6">
         {/* AI 활성화 토글 */}
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
@@ -323,6 +382,7 @@ const AiQuerySettings: React.FC = () => {
           <button
             type="button"
             onClick={loadPolicy}
+            disabled={saving || !!loadError || !policy}
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
@@ -331,7 +391,7 @@ const AiQuerySettings: React.FC = () => {
 
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || !!loadError || !policy}
             className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? (
@@ -354,6 +414,7 @@ const AiQuerySettings: React.FC = () => {
             마지막 업데이트: {new Date(policy.updatedAt).toLocaleString('ko-KR')}
           </p>
         )}
+        </fieldset>
       </form>
     </div>
   );

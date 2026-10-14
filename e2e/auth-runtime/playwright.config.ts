@@ -1,21 +1,12 @@
-/**
- * Auth Runtime E2E — Playwright config
- *
- * CHECK-O4O-AUTH-RUNTIME-PLAYWRIGHT-E2E-V1
- *
- * 대상: 4개 배포 서비스의 공통 auth runtime regression 검증
- * 실행: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
- *
- * 자격증명: 없음 — Google-only 재정의(WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1)로 서비스별 관리자 email/password
- * 환경변수 계약은 은퇴했고, 그 GitHub repository secret 6개도 2026-10-02 삭제됐다
- * (WO-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1). 남은 환경변수는 E2E_API_BASE_URL(선택) 뿐.
- * 이유는 helpers/auth.helpers.ts 상단 주석 참조. (변수 이름을 여기 적지 않는다 — e2e-auth-runtime.yml 의 재도입 차단 grep 대상)
+/** Credential-free PC/mobile surface and denial checks for maintained origins.
+ * Real OAuth and ordinary account state validation are separate evidence.
+ * Run manually: pnpm exec playwright test --config=e2e/auth-runtime/playwright.config.ts
  */
-
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
+  expect: { timeout: 20_000 },
   testMatch: '*.spec.ts',
   fullyParallel: false,  // auth state 공유, 순차 실행
   forbidOnly: !!process.env.CI,
@@ -36,9 +27,10 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
+    { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } },
   ],
   timeout: 45_000,
 });

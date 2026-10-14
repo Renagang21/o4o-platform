@@ -1,3 +1,4 @@
+import { RetiredServiceError } from '../../../middleware/retired-service.middleware.js';
 /**
  * WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1
  *
@@ -30,6 +31,7 @@ jest.mock('../../../database/connection.js', () => ({
 
 jest.mock('../../../services/approval/MembershipApprovalService.js', () => ({
   MembershipApprovalService: jest.fn().mockImplementation(() => mockApprovalService),
+  StoreOwnerBusinessInfoRequiredError: class extends Error {},
 }));
 
 jest.mock('../../../utils/logger.js', () => ({
@@ -82,7 +84,7 @@ function primeQuery(membershipIds: string[], inScope = true) {
   mockQuery.mockImplementation((sql: string) => {
     const s = String(sql).replace(/\s+/g, ' ').trim();
     if (/^SELECT 1 FROM service_memberships/i.test(s)) return Promise.resolve(inScope ? [{ ok: 1 }] : []);
-    if (/^SELECT id FROM service_memberships/i.test(s)) {
+    if (/^SELECT id(?:, service_key, role)? FROM service_memberships/i.test(s)) {
       return Promise.resolve(membershipIds.map((id) => ({ id })));
     }
     return Promise.resolve([]);
@@ -124,7 +126,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       const selects = mockQuery.mock.calls
         .map(([sql, params]) => ({ sql: String(sql).replace(/\s+/g, ' '), params }))
-        .filter((c) => /SELECT id FROM service_memberships/i.test(c.sql));
+        .filter((c) => /SELECT id(?:, service_key, role)? FROM service_memberships/i.test(c.sql));
 
       expect(selects).toHaveLength(1);
       expect(selects[0].sql).toContain('service_key = ANY($2)');
@@ -251,13 +253,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       await controller.updateMemberStatus(makeReq('approved'), res);
 
-      const writes = usersWrites();
-      expect(writes).toHaveLength(1);
-      // 활성화 방향만 허용 — 비활성화는 없어야 한다
-      expect(writes[0]).not.toMatch(/"isActive" = false/);
-      // approveMembership STEP2 와 동일한 화이트리스트 → 'suspended' 제외
-      expect(writes[0]).toContain("status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')");
-      expect(writes[0]).not.toContain("'suspended'");
+      expect(usersWrites()).toEqual([]);
     });
   });
 
@@ -300,5 +296,131 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
         }),
       );
     });
+  });
+});
+
+it('ID-only approval reports retirement as 410 instead of a server failure',async()=>{
+ mockApprovalService.approveMembership.mockRejectedValueOnce(new RetiredServiceError());
+ const request:any={body:{},params:{membershipId:'membership'},user:{id:'actor'},serviceScope:{isPlatformAdmin:true,serviceKeys:[]}};
+ const response=makeRes();
+ await new MembershipConsoleController().approveMembership(request,response);
+ expect(response.status).toHaveBeenCalledWith(410);
+ expect(response.json).toHaveBeenCalledWith(expect.objectContaining({code:'SERVICE_RETIRED'}));
+});
+
+ describe('retired memberships in user approval', () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'].flatMap(key => [[key, false], [key, true]]))('filters %s before approving current services (retired first=%s)', async (retiredKey, retiredFirst) => {
+    jest.clearAllMocks();
+    const rows = [{ id: 'live', service_key: 'neture', role: 'pharmacy' }, { id: 'retired', service_key: retiredKey, role: 'pharmacy' }];
+    if (retiredFirst) rows.reverse();
+    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? rows : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
+    mockApprovalService.approveMembership.mockResolvedValue({ id: 'live' });
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved', { body: { status: 'approved', serviceKey: 'neture' }, serviceScope: { isPlatformAdmin: true, serviceKeys: [] } }), makeRes());
+    expect(mockApprovalService.approveMembership).toHaveBeenCalledTimes(1);
+    expect(mockApprovalService.approveMembership).toHaveBeenCalledWith(expect.objectContaining({ membershipId: 'live' }));
+  });
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('refuses %s-only approval before any approval transaction', async retiredKey => {
+    jest.clearAllMocks();
+    mockQuery.mockImplementation(async (sql: string) => /SELECT id, service_key, role FROM service_memberships/.test(sql) ? [{ id: 'retired', service_key: retiredKey }] : /SELECT 1 FROM service_memberships/.test(sql) ? [{ ok: 1 }] : []);
+    const res = makeRes();
+    await new MembershipConsoleController().updateMemberStatus(makeReq('approved', { body: { status: 'approved', serviceKey: 'neture' }, serviceScope: { isPlatformAdmin: true, serviceKeys: [] } }), res);
+    expect(res.status).toHaveBeenCalledWith(410);
+    expect(mockApprovalService.approveMembership).not.toHaveBeenCalled();
+  });
+});
+
+
+// Extraction must preserve endpoint results and sequential Core calls, not private method names.
+describe('same membership operation, distinct single/batch outcomes', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockApprovalService.rejectMembership.mockReset();
+    mockApprovalService.approveMembership.mockReset();
+    mockApprovalService.reactivateMembership.mockReset();
+    primeQuery(['m1', 'm2']);
+  });
+
+  function request(batch: boolean, status = 'rejected') {
+    return makeReq(status, {
+      body: { status, serviceKey: 'neture', reason: 'FIXTURE-REASON', ...(batch ? { ids: [USER_ID] } : {}) },
+      serviceScope: { isPlatformAdmin: false, serviceKeys: ['neture'] },
+      memberAdminServiceKeys: ['neture'],
+    });
+  }
+
+  it.each([false, true])('반려는 순차 처리하고 한 건만 반영되어도 기존 성공 결과를 유지한다 (batch=%s)', async batch => {
+    const completed: string[] = [];
+    mockApprovalService.rejectMembership.mockImplementation(async ({ membershipId }) => {
+      if (membershipId === 'm2') expect(completed).toEqual(['m1']);
+      await Promise.resolve();
+      completed.push(membershipId);
+      return membershipId === 'm2' ? { id: membershipId } : null;
+    });
+    const res = makeRes();
+    const controller = new MembershipConsoleController();
+    await (batch ? controller.batchUpdateStatus : controller.updateMemberStatus)(request(batch), res);
+    expect(completed).toEqual(['m1', 'm2']);
+    expect(mockApprovalService.rejectMembership).toHaveBeenNthCalledWith(1, {
+      membershipId: 'm1', reason: 'FIXTURE-REASON', adminServiceKeys: ['neture'],
+      isPlatformAdmin: false, serviceKeys: ['neture'],
+    });
+    expect(res.json).toHaveBeenCalledWith(batch
+      ? { success: true, data: { results: [{ id: USER_ID, status: 'success' }] } }
+      : { success: true, message: 'User status updated to rejected' });
+    expect(usersWrites()).toEqual([]);
+  });
+
+  it.each([false, true])('조회 대상은 있으나 Core 반영이 0건이면 단건 404/일괄 skipped를 유지한다 (batch=%s)', async batch => {
+    mockApprovalService.rejectMembership.mockResolvedValue(null);
+    const res = makeRes();
+    const controller = new MembershipConsoleController();
+    await (batch ? controller.batchUpdateStatus : controller.updateMemberStatus)(request(batch), res);
+    expect(mockApprovalService.rejectMembership).toHaveBeenCalledTimes(2);
+    if (batch) {
+      expect(res.json).toHaveBeenCalledWith({ success: true, data: { results: [
+        { id: USER_ID, status: 'skipped', error: 'No memberships found to reject' },
+      ] } });
+    } else {
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ success: false, error: 'No memberships found to reject' });
+    }
+  });
+
+  it('일괄 Core 실패는 해당 항목만 failed로 남기고 다음 회원을 처리한다', async () => {
+    const secondId = '22222222-3333-4444-8555-666666666666';
+    mockApprovalService.rejectMembership.mockRejectedValueOnce(new Error('fixture reject failure'))
+      .mockResolvedValue({ id: 'accepted' });
+    const req = request(true);
+    req.body.ids = [USER_ID, secondId];
+    const res = makeRes();
+    await new MembershipConsoleController().batchUpdateStatus(req, res);
+    expect(res.json).toHaveBeenCalledWith({ success: true, data: { results: [
+      { id: USER_ID, status: 'failed', error: 'fixture reject failure' },
+      { id: secondId, status: 'success' },
+    ] } });
+    expect(mockApprovalService.rejectMembership).toHaveBeenCalledTimes(3);
+    expect(usersWrites()).toEqual([]);
+  });
+
+  it('단건 Core 실패는 500이며 다음 membership을 처리하지 않는다', async () => {
+    mockApprovalService.rejectMembership.mockRejectedValueOnce(new Error('fixture reject failure'));
+    const res = makeRes();
+    await new MembershipConsoleController().updateMemberStatus(request(false), res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+    expect(mockApprovalService.rejectMembership).toHaveBeenCalledTimes(1);
+    expect(usersWrites()).toEqual([]);
+  });
+
+  it.each([false, true])('승인 조회는 동일 서비스와 상태 조건을 유지한다 (batch=%s)', async batch => {
+    const res = makeRes();
+    const controller = new MembershipConsoleController();
+    await (batch ? controller.batchUpdateStatus : controller.updateMemberStatus)(request(batch, 'approved'), res);
+    const selects = mockQuery.mock.calls.filter(([sql]) => /^SELECT id, service_key, role/.test(sql));
+    expect(selects).toHaveLength(1);
+    expect(selects[0][0]).toContain("status IN ('pending', 'rejected') AND service_key = ANY($2)");
+    expect(selects[0][1]).toEqual([USER_ID, ['neture']]);
+    expect(mockApprovalService.approveMembership.mock.calls.map(([arg]) => arg.membershipId)).toEqual(['m1', 'm2']);
+    expect(usersWrites()).toEqual([]);
   });
 });

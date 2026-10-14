@@ -4,6 +4,7 @@
  * Extracted from auth.middleware.ts (WO-O4O-AUTH-MIDDLEWARE-SPLIT-V1)
  * Contains: requireAuth, optionalAuth, requirePlatformUser, compat aliases
  */
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 import { Response, NextFunction } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -26,11 +27,12 @@ import {
 import { policyAcceptanceService } from '../../../modules/policy-acceptance/policy-acceptance.service.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 import {
-  isPasswordSessionAllowed,
-  PASSWORD_SESSION_NOT_ALLOWED_CODE,
-  PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
+  isSessionAuthMethodAllowed,
+  sessionAuthMethodError,
 } from '../../auth/password-session.policy.js';
 import type { AccessTokenPayload } from '../../../types/auth.js';
+import { isBrowserSessionLive } from '../../../services/auth/browser-session.service.js';
+import { isPlatformAdmin } from '../../../utils/role.utils.js';
 
 /**
  * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
@@ -97,12 +99,16 @@ function enforceAccountAccess(req: AuthRequest, res: Response, user: { id: strin
  *
  * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
  */
-async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string }): Promise<boolean> {
+async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { id: string; roles?: string[] }): Promise<boolean> {
+  // Management context is the signed admin session plus current DB platform role, never Origin/body/JWT roles.
+  // The same account using a normal service session still follows that service's acceptance rules.
+  // Auth-method, account/session status, and downstream route role guards remain mandatory.
+  if (req.sessionServiceKey === 'admin' && isPlatformAdmin(user.roles ?? [])) return false;
   if (isTermsPendingRequestAllowed(req.method, req.originalUrl)) return false;
   let pending;
   try {
-    // enforced pending — Demo 계정 예외만 반영(정본 O4O-CANONICAL-DEMO-ACCOUNTS-V1 §8-2). 판정 로직은 불변.
-    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id);
+    // 공통 계정과 요청 서비스의 pending만 적용한다. 서명된 세션 범위와 서버 경로를 사용하며 Demo 예외를 유지한다.
+    pending = await policyAcceptanceService.getEnforcedPendingForUser(user.id, req.sessionServiceKey, req.originalUrl, req.method);
   } catch (error) {
     logger.warn('[termsAcceptance] pending check failed (fail-open)', {
       userId: user.id,
@@ -126,49 +132,28 @@ async function enforceTermsAcceptance(req: AuthRequest, res: Response, user: { i
   return true;
 }
 
-/**
- * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 · §5-3 — 비밀번호 세션의 관리자 경계
- *
- * Admin · `platform:*` 는 Google 전용이다. 비밀번호로 발급된 세션(`authMethod:'password'`)이
- * `platform:*` 역할을 가진 계정이면 **어떤 경로든** 거절한다 — 개별 admin guard 가 JWT roles 를 보든
- * DB 를 보든 그 앞에서 막는다. 역할은 JWT 가 아니라 DB 에서 다시 읽는다(발급 뒤 부여를 잡는다).
- * Google 세션에는 claim 이 없으므로 조회도 하지 않는다(기존 hot path 비용 0).
- *
- * 판정 실패(DB 오류)는 **fail-closed** 다 — 약관 게이트와 달리 이것은 권한 경계다.
- *
- * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
- */
-async function enforcePasswordSessionBoundary(
+/** Current DB roles + signed method: admin/platform accounts require an explicit Google session. */
+async function enforceSessionAuthMethodBoundary(
   req: AuthRequest,
   res: Response,
-  user: { id: string },
+  user: { id: string; roles?: string[] },
   payload: AccessTokenPayload,
 ): Promise<boolean> {
-  if (payload.authMethod !== 'password') return false;
-  let allowed = false;
   try {
-    const roles = await roleAssignmentService.getRoleNames(user.id);
-    allowed = isPasswordSessionAllowed(payload.serviceKey, roles);
-  } catch (error) {
-    logger.warn('[passwordSessionBoundary] role check failed (fail-closed)', {
-      userId: user.id,
-      error: error instanceof Error ? error.message : String(error),
-    });
+    user.roles = await roleAssignmentService.getRoleNames(user.id);
+  } catch (error_) {
+    // Preserve the password error contract; all other lookup failures reach the outer 401 handler.
+    if (payload.authMethod !== 'password') throw error_;
+    const error = sessionAuthMethodError(payload.authMethod);
+    res.status(403).json({ success: false, error: error.message, code: error.code });
+    return true;
   }
-  if (allowed) {
-    (req as AuthRequest & { authMethod?: string }).authMethod = 'password';
+  if (isSessionAuthMethodAllowed(payload.authMethod, payload.serviceKey, user.roles)) {
+    (req as AuthRequest & { authMethod?: string }).authMethod = payload.authMethod;
     return false;
   }
-  logger.warn('[passwordSessionBoundary] password session rejected', {
-    userId: user.id,
-    path: req.originalUrl,
-    method: req.method,
-  });
-  res.status(403).json({
-    success: false,
-    error: PASSWORD_SESSION_NOT_ALLOWED_MESSAGE,
-    code: PASSWORD_SESSION_NOT_ALLOWED_CODE,
-  });
+  const error = sessionAuthMethodError(payload.authMethod);
+  res.status(403).json({ success: false, error: error.message, code: error.code });
   return true;
 }
 
@@ -220,6 +205,10 @@ export const requireAuth = async (
       });
     }
 
+    if (isRetiredServiceValue(payload.serviceKey)) {
+      return res.status(401).json({ success: false, code: 'SERVICE_SESSION_REVOKED', error: '세션이 종료되었습니다. 현재 서비스에서 다시 로그인해 주세요.' });
+    }
+
     // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1:
     //   requireAuth 는 사람 사용자(tokenType:'user') 경계다. service / guest 등 다른 tokenType 은
     //   userId 가 실제 users.id 와 일치하더라도 통과시키지 않는다 (Human Auth ≠ Service Auth).
@@ -257,15 +246,18 @@ export const requireAuth = async (
       });
     }
 
+    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily))) {
+      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', code: 'SESSION_REVOKED' });
+    }
+
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
     if (enforceAccountAccess(req, res, user)) return;
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
-    if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
+    // Auth phase 4-A: fresh roles + explicit Google evidence for admin/platform accounts.
+    if (await enforceSessionAuthMethodBoundary(req, res, user, payload)) return;
     // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
+    req.sessionServiceKey = payload.serviceKey;
     if (await enforceTermsAcceptance(req, res, user)) return;
 
-    // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
-    user.roles = payload.roles || [];
     // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload
     user.memberships = (payload as any).memberships || [];
 
@@ -320,6 +312,8 @@ export const optionalAuth = async (
       return next(); // Invalid token, continue without authentication
     }
 
+    if (isRetiredServiceValue(payload.serviceKey)) return next();
+
     // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1: requireAuth 와 동일 — 사용자 토큰이 아니면 비로그인 취급
     if (payload.tokenType && payload.tokenType !== 'user') {
       return next();
@@ -342,29 +336,22 @@ export const optionalAuth = async (
       optionalAccess === 'normal' ||
       (optionalAccess === 'restricted' && isRestrictedRequestAllowed(req.method, req.originalUrl));
 
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 관리자 경계에 걸리는 비밀번호 세션은
-    //   403 대신 비로그인과 같게 취급한다(공개 경로의 성질을 유지한다).
-    let passwordSessionAllowed = true;
-    if (user && payload.authMethod === 'password') {
-      try {
-        passwordSessionAllowed = isPasswordSessionAllowed(
-          payload.serviceKey,
-          await roleAssignmentService.getRoleNames(user.id),
-        );
-      } catch {
-        passwordSessionAllowed = false;
-      }
+    // A session failing the Google-positive boundary is anonymous on optional routes.
+    if (user?.isActive && optionalAllowed) {
+      user.roles = await roleAssignmentService.getRoleNames(user.id);
     }
+    const sessionMethodAllowed = isSessionAuthMethodAllowed(
+      payload.authMethod, payload.serviceKey, user?.roles ?? [],
+    );
 
-    if (user && user.isActive && optionalAllowed && passwordSessionAllowed) {
-      // Phase3-E: Assign roles from JWT payload
-      user.roles = payload.roles || [];
+    if (user?.isActive && optionalAllowed && sessionMethodAllowed &&
+        await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily)) {
       (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
       req.user = user;
     }
 
     next();
-  } catch (error) {
+  } catch {
     // Continue without authentication on error
     next();
   }
@@ -414,52 +401,8 @@ export const requirePlatformUser = async (
       });
     }
 
-    // Continue with standard platform user auth
-    const payload = verifyAccessToken(token);
-
-    if (!payload) {
-      return res.status(401).json({
-        success: false,
-        error: 'Access token is invalid or has expired',
-        code: 'INVALID_TOKEN',
-      });
-    }
-
-    // Get user from database
-    const userRepo = AppDataSource.getRepository(User);
-    const user = await userRepo.findOne({
-      where: { id: payload.userId },
-      relations: ['linkedAccounts'],
-    });
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: 'User account not found or has been deactivated',
-        code: 'INVALID_USER',
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        error: 'User account is inactive',
-        code: 'USER_INACTIVE',
-      });
-    }
-
-    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
-    if (enforceAccountAccess(req, res, user)) return;
-    // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 비밀번호 세션의 관리자 경계
-    if (await enforcePasswordSessionBoundary(req, res, user, payload)) return;
-    // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §18: 약관 acceptance 게이트
-    if (await enforceTermsAcceptance(req, res, user)) return;
-
-    // Phase3-E: Assign roles from JWT payload
-    user.roles = payload.roles || [];
-
-    req.user = user;
-    next();
+    // Keep the service-token 403 above, then share the complete human/session/account boundary.
+    return requireAuth(req, res, next);
   } catch (error) {
     logger.error('[requirePlatformUser] Token verification failed', {
       error: error instanceof Error ? error.message : String(error),

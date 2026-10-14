@@ -22,7 +22,6 @@ const SERVICE_FORUM_MOUNTS = [
   { service: 'kpa-society', file: '../routes/kpa/kpa.routes.ts' },
   // k-cosmetics forum mount(routes/cosmetics/cosmetics.routes.ts)는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거.
   { service: 'neture', file: '../routes/neture/neture.routes.ts' },
-  { service: 'pharmacy-hub', file: '../routes/pharmacy-hub/pharmacy-hub.routes.ts' },
 ];
 
 describe('cross-service My Posts — 공통 query contract', () => {

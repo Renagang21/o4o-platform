@@ -10,15 +10,18 @@
  *   §C     신규 등록이 canonical owner membership 을 만든다
  *   §10·§11 Regulated Category 불변 · Operator/Admin 경계 불변
  */
-import fs from 'node:fs';
+import { readSupplierControllerSource } from './setup/supplier-controller-source.js';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../../../..');
-const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+const read = (rel: string) => readSupplierControllerSource(REPO_ROOT, rel);
 
 const RESOLVER = 'apps/api-server/src/modules/neture/middleware/supplier-context.resolver.ts';
 const MIDDLEWARE = 'apps/api-server/src/modules/neture/middleware/neture-identity.middleware.ts';
 const SUPPLIER_SVC = 'apps/api-server/src/modules/neture/services/supplier.service.ts';
+const LIFECYCLE_SVC = 'apps/api-server/src/modules/neture/services/supplier-lifecycle.service.ts';
+const DIRECTORY_SVC = 'apps/api-server/src/modules/neture/services/supplier-directory.service.ts';
+const BUSINESS_SVC = 'apps/api-server/src/modules/neture/services/supplier-business.service.ts';
 const MGMT_CTL = 'apps/api-server/src/modules/neture/controllers/supplier-management.controller.ts';
 const REGCAT_SVC = 'apps/api-server/src/modules/neture/services/supplier-regulated-category.service.ts';
 const ADMIN_CTL = 'apps/api-server/src/modules/neture/controllers/admin.controller.ts';
@@ -81,7 +84,7 @@ describe('§A·§B authorization canonical relation', () => {
 });
 
 describe('§D·§G users.businessInfo Supplier runtime 은퇴', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('supplier.service 가 businessInfo write 헬퍼를 더 이상 쓰지 않는다', () => {
     expect(svc).not.toContain('buildBusinessInfoUpdateStatement');
@@ -102,7 +105,7 @@ describe('§D·§G users.businessInfo Supplier runtime 은퇴', () => {
 });
 
 describe('§D businessEntityType / businessStartDate 의 canonical 저장 위치', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('Organization 확장 필드에 저장한다 (migration 0)', () => {
     expect(svc).toContain('businessProfile');
@@ -144,7 +147,7 @@ describe('§E taxInvoiceEmail 소유 단일화', () => {
 });
 
 describe('§9 silent skip / silent success 금지', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('조직이 없어 저장 위치가 없으면 명시적 오류로 거부한다 (조용한 성공 금지)', () => {
     expect(svc).toContain('SupplierProfileFieldUnsupportedError');
@@ -171,7 +174,7 @@ describe('§9 silent skip / silent success 금지', () => {
 });
 
 describe('§F profile write atomicity', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('organizations + neture_suppliers write 가 단일 트랜잭션 안에 있다', () => {
     expect(svc).toMatch(/AppDataSource\.transaction\(async \(manager\)/);
@@ -190,7 +193,7 @@ describe('§F profile write atomicity', () => {
 });
 
 describe('§C 신규 등록의 canonical 관계', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('등록 시 organization owner membership 을 만든다', () => {
     expect(svc).toContain('organizationOpsService.setOwner');

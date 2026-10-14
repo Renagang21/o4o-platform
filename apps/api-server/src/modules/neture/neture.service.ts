@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '../policy-acceptance/service-enrollment-policy.service.js';
 /**
  * NetureService — Thin Facade
  *
@@ -25,7 +26,7 @@ import { NetureDashboardService } from './services/neture-dashboard.service.js';
 // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: Partner 계약/제휴 서비스 은퇴, 판매자 모집만 분리 유지
 import { SellerRecruitmentService } from './services/seller-recruitment.service.js';
 
-import type { NetureSupplier, SupplierStatus, OfferDistributionType, OfferApprovalStatus, ContactVisibility, ProductMaster, ProductCategory, Brand, ProductImage } from './entities/index.js';
+import type { NetureSupplier, SupplierStatus, OfferDistributionType, OfferApprovalStatus, ProductMaster, ProductCategory, Brand, ProductImage } from './entities/index.js';
 import type { RecruitmentStatus } from './entities/index.js';
 import { ExposureStatus } from './entities/index.js';
 
@@ -91,7 +92,7 @@ export class NetureService {
 
   async registerSupplier(
     userId: string,
-    data: { name: string; slug: string; contactEmail?: string },
+    data: { name: string; slug: string; contactEmail?: string; policyReferences?: EnrollmentPolicyReference[] },
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     return this.supplierService.registerSupplier(userId, data);
   }
@@ -224,42 +225,7 @@ export class NetureService {
 
   async updateSupplierProfile(
     supplierId: string,
-    data: {
-      contactEmail?: string;
-      contactPhone?: string;
-      contactWebsite?: string;
-      contactKakao?: string;
-      contactEmailVisibility?: ContactVisibility;
-      contactPhoneVisibility?: ContactVisibility;
-      contactWebsiteVisibility?: ContactVisibility;
-      contactKakaoVisibility?: ContactVisibility;
-      businessNumber?: string;
-      representativeName?: string;
-      businessAddress?: string;
-      // WO-O4O-POSTAL-CODE-ADDRESS-V1
-      businessZipCode?: string;
-      businessAddressDetail?: string;
-      managerName?: string;
-      managerPhone?: string;
-      businessType?: string;
-      businessItem?: string;
-      taxInvoiceEmail?: string;
-      // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1
-      businessEntityType?: string;
-      businessStartDate?: string;
-      // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
-      minOrderAmount?: number | null;
-      minOrderSurcharge?: number | null;
-      orderConditionNote?: string | null;
-      // WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1
-      baseShippingFee?: number | null;
-      freeShippingThreshold?: number | null;
-      averageDispatchDays?: number | null;
-      returnExchangeNotice?: string | null;
-      shippingStandard?: string | null;
-      shippingIsland?: string | null;
-      shippingMountain?: string | null;
-    },
+    data: Parameters<NetureSupplierService['updateSupplierProfile']>[1],
   ) {
     return this.supplierService.updateSupplierProfile(supplierId, data);
   }
@@ -347,19 +313,6 @@ export class NetureService {
     input: { isPublic?: boolean; serviceKeys?: string[] },
   ) {
     return this.offerService.updateDistribution(offerId, supplierId, userId, input);
-  }
-
-  /**
-   * 승인 대상이 아닌 서비스 1개의 제공 시작/중지 (pharmacy-hub 등).
-   * WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
-   */
-  async setServiceDelivery(
-    offerId: string,
-    supplierId: string,
-    serviceKey: string,
-    input: { enabled: boolean; unitPrice?: number | null },
-  ) {
-    return this.offerService.setServiceDelivery(offerId, supplierId, serviceKey, input);
   }
 
   // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1

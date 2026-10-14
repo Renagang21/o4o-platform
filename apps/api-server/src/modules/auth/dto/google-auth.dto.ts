@@ -1,3 +1,4 @@
+import { SignupTermsReferenceDto } from './signup-terms.dto.js';
 import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -24,6 +25,16 @@ export class GoogleLoginRequestDto {
 }
 
 export class GoogleSignupConsentsDto {
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => SignupTermsReferenceDto)
+  termsPolicy!: SignupTermsReferenceDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => SignupTermsReferenceDto)
+  privacyPolicy?: SignupTermsReferenceDto;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)

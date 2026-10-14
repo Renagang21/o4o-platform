@@ -1,6 +1,7 @@
 # COLLABORATOR-START-HERE
 
 > **대상**: O4O 에 새로 참여하는 사람 공동개발자 · **일자**: 2026-09-30
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-14 — AI 공통 기반·운영 적용 및 신규 개발자 착수 안내 정합
 > 기술 교육 문서가 아니다. **"O4O 가 무엇을 중요하게 보는가, 이 저장소를 어떻게 읽어야 하는가, 어디부터 보면 되는가"** 만 다룬다.
 > 규칙의 원문은 각 정본 문서에 있고, 이 문서는 그 문서들을 가리키기만 한다.
 
@@ -33,40 +34,62 @@ O4O 는 전체 리팩토링 중이다. 그래서 다음을 전제로 읽는다.
 
 현행 여부가 궁금하면 [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) 를 본다. 문서별 상태(ACTIVE · FROZEN · 판정 대기)가 적혀 있다. `docs/checks/` · `docs/work-orders/` · `docs/ir/` · `docs/investigations/` · `docs/archive/` 는 **과거 시점의 실행 기록**이므로 현재 정책으로 읽지 않는다.
 
-## 3. 첫 공동개발 대상 — neture.co.kr Main 의 O4O Agent
+### AI 개발의 현재 기준 — 2026-10-14
 
-### O4O Agent 는 무엇인가
+신규 개발자는 현재 `main`에서 로컬 개발·테스트·PR 작업을 시작할 수 있다. 다음 공통 기반이 구현·통합됐다.
 
-단순한 AI 챗봇이 아니다. 사용자가 O4O 에서 **무언가를 하려고 할 때 쓰는 자연어 기반 공통 진입점**이다.
+- 기존 `@o4o/ai-core` 실행기 위에 업체와 독립적인 업무 Extension 계약을 연결했다. 서비스 카탈로그의 질의·요약·초안/운영 요약과 기존 콘텐츠 번역·LMS 피드백·Neture 추천 등이 이를 사용한다.
+- 기존 `modules/ai-policy`에 가격 snapshot·원자 quota 예약/정산·사용 이력을 연결했다. 새 결제·Assistant·Memory 기반을 중복 생성하지 않는다.
+- Work Agent의 관찰·계획·실행·Task 책임을 분리하고 요청별 state를 공유한다. 공통 콘텐츠 편집기의 문맥 변경·늦은 응답·저장 중복 처리도 정비했다.
+- 누적 변경은 PR #549/#552/#557로 main에 반영됐다. 승인된 quota migration과 API·admin·neture·kpa-society·lecture·store·kpa-branch 배포가 성공했고, 배포 후 읽기 전용 HTTP 점검 16/16이 통과했다.
 
-```text
-기존:       사용자 → 메뉴 탐색 → 기능 선택 → 화면 이동 → 작업
-O4O Agent:  사용자 → 자연어로 의도 표현 → Agent 가 의도 파악
-            → O4O 정보 · 기능 · (필요하면) 외부 AI 등 적절한 capability 활용
-            → 결과 제시, 또는 필요한 작업 화면으로 연결
-```
+이는 모든 서비스 화면의 AI 기능이나 Windows/실계정 업무 자동화가 검증됐다는 뜻은 아니다. 최신 Sonar 등급, 실계정 사용량·비용·한도, 직접 transport/멀티모달 전체 비용 이관, 매장·사용자 청구/외부 계정 연결은 후속 확인·개발 범위다. 신규 PC 설치·로그인도 해당 PC에서 검증한다.
 
-Agent 가 모든 기능을 새로 구현하는 것이 아니다. 기존 O4O 의 데이터와 기능을 활용하고, 필요할 때 외부 AI 를 쓰며, 사용자를 알맞은 O4O 기능으로 연결한다.
+책임과 적용 범위는 [AI Core + Extension 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md), 운영 증거는 [최종 통합·배포 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)를 읽는다. CHECK는 적용 증거이며 사업·권한 정책을 대신하지 않는다.
 
-### 장기적으로 연결할 수 있는 범위 (예)
+## 3. 첫 공동개발 대상 — O4O Personal Assistant의 약국 경영 업무 지원
 
-상품 · 약품 정보 검색 · 주문 관련 지원 · 콘텐츠 제작 · B2C 사업자의 리뷰 지원 · O4O 기능 안내 · 반복작업 자동화 · 다른 O4O 서비스 / capability 연결 · 외부 AI 활용.
+### 서비스 정의
 
-**이 목록을 첫 개발에서 모두 구현한다는 뜻이 아니다.** 먼저 공통 진입점을 만들고, 리팩토링으로 안정되었거나 실제 필요가 확인된 capability 를 하나씩 붙인다. 1차 개발 범위는 별도 작업요청서로 정한다.
+**O4O Personal Assistant**는 사용자별 하나의 AI 업무 비서다. 사용자의 업무 목적과 상황을 이해하고, 필요한 업무를 계획·수행·검증하며, 업무 경험과 사용자 교정을 다음 작업에 활용한다. **완전 자동화가 아니라 실제 업무시간 절감**이 목표다.
 
-### 현장 검증과 함께 개선한다
+첫 공동개발 대상은 **O4O를 이용하는 약국 경영자의 일상적인 반복업무**이며, 진입점은 `neture.co.kr` 메인의 자연어 채팅이다. 특정 웹사이트나 PC 프로그램 하나를 자동화하는 제품으로 정의하지 않는다.
 
-O4O Agent 는 코드를 작성하는 것만으로 끝나는 트랙이 아니다. 실제 사용 환경에서 다음을 확인하며 개선한다.
+- **일반 웹사이트:** 의약품·상품정보 조회, 공급업체 웹사이트 등에서 반복되는 업무
+- **PC 프로그램:** 약국 경영자가 사용하는 Windows 업무 프로그램의 반복 조작
+- **O4O 내부 기능:** 상품·매장·콘텐츠 등 권한 내 업무
+- **로컬 데이터와 복합 업무:** PC 자료를 활용하거나 여러 환경을 연결하는 업무
 
-- 사용자가 실제로 무엇을 요청하는가
-- 어떤 기능이 필요하고, 어디서 반복 업무가 줄어드는가
-- 그 요청이 특정 사용자만의 것인가, 여러 사용자에게 공통인가
+위 항목은 **적용 대상의 예시**이며, 모두 현재 구현·운영 검증됐다는 의미는 아니다. 업무 유형과 절차를 처음부터 고정하지 않고, 실제 사용자 요청과 경험에 따라 확장한다. 사용자·매장별 검증된 방법을 우선하며 여러 매장에 하나의 표준 Workflow를 강제하지 않는다.
 
-현장 요청을 그대로 모두 기능화하지는 않는다. 기본 흐름은 다음과 같다.
+### AI 서비스 용어와 관계
 
-```text
-현장 요구 → 업무 문제 확인 → 공통성 판단 → O4O capability 여부 결정 → 구현
-```
+| 용어 | 의미 |
+|---|---|
+| **O4O Personal Assistant** | 사용자별 하나의 공통 AI 업무 비서. 의도·Task·업무 맥락·기억·실행 조정·결과 확인을 담당 |
+| **O4O Service AI Agent** | 각 O4O 서비스의 업무·데이터에 특화하는 전문 AI 기능. 공통 질의/요약·기존 업무 Extension 기반을 재사용해 확대하며, Personal Assistant와 연계하고 별도 개인 비서를 강제하지 않음 |
+| **O4O Local Agent** | 사용자 PC의 브라우저·Windows 프로그램·로컬 자원을 활용하는 **실행 도구**. Personal Assistant 자체가 아님 |
+| **Execution Layer / Node** | API·브라우저·MCP·RPA 등 실행 수단과 PC·클라우드 등 실행 장소 |
+| **Experience / Skill** | 실제 업무 수행과 사용자 교정에서 얻는 경험, 검증을 거쳐 재사용하는 수행 능력 |
+
+**구조 정본:** [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md). 과거 [O4O-AUTOMATION-AGENT-ARCHITECTURE-V1](../baseline/O4O-AUTOMATION-AGENT-ARCHITECTURE-V1.md)은 SUPERSEDED이므로 신규 설계의 기준으로 사용하지 않는다.
+
+### 첫 공동개발 착수와 산출물
+
+첫 단계는 대규모 신규 개발이 아니라 **기존 구현을 확인하고 첫 적용 업무를 정하는 것**이다.
+
+1. 개발자가 자신의 PC와 선호 도구로 로컬 개발환경을 구성하고 실행을 확인한다.
+2. 메인 채팅·AI 요청 처리·Personal Assistant·Local Agent·일반 웹사이트/Windows 실행·경험/기억/Skill·실행 노드의 현행 구현을 필요한 범위에서 조사한다.
+3. 위의 완료된 공통 기반과 실제 검증 범위를 먼저 읽고, 담당 업무의 재사용 기능·미구현 부분을 구분한다. 기존 Core·정산·Task·저장을 다시 만들지 않는다.
+4. 약국 경영자의 반복업무 중 첫 적용 후보와 구현 방향·현장 검증 방법을 제안한다.
+
+**1차 산출물:** (a) 개발환경 실행 확인 결과, (b) 현행 구현과 재사용 기능 요약, (c) 보완 필요사항, (d) 첫 자동화 적용 후보 및 구현·검증 제안.
+
+사용자는 사업 목적·업무분석·우선순위를 결정하고, 개발자는 기술 설계·구현을 담당한다. 경험 있는 PM은 본업과 병행하여 필요할 때 **조정·조언**을 제공하며 상시 개발관리나 코드 검토를 맡지 않는다. 첫 개발범위는 조사 결과를 놓고 함께 확정한다.
+
+### 현장 검증과 개선
+
+사용자의 실제 요청, 소요시간, 질문·교정, 성공·부분완료·인계 사례를 확인한다. **사용자 편의와 업무 성공 가능성을 AI 비용보다 우선**하고, 반복 경험을 통해 시간·비용·사용자 개입을 줄인다. 검증되지 않은 기능을 운영 완료로 소개하지 않는다.
 
 ## 4. 어디부터 볼 것인가
 
@@ -80,12 +103,14 @@ monorepo 전체를 먼저 분석할 필요는 없다. **`services/web-neture` �
 | 로그인 후 업무 진입 패널 | [services/web-neture/src/components/home/HomeEntryPanel.tsx](../../services/web-neture/src/components/home/HomeEntryPanel.tsx) |
 | API client | [services/web-neture/src/lib/apiClient.ts](../../services/web-neture/src/lib/apiClient.ts) (`@o4o/auth-client`) |
 
-메인에는 Agent 의 전신인 AI 입력 경로가 이미 있다. 다만 어디까지가 운영에 반영 · 검증되었는지는 착수 시점에 사용자와 확인한다. 코드가 있다고 해서 현재 제공 중인 기능으로 간주하지 않는다.
+메인에는 O4O Personal Assistant로 이어지는 AI 입력 경로가 이미 있다. 위 완료 기록과 담당 업무의 최신 CHECK에서 적용/검증 범위를 확인한다. 적용 업무·자료·도구 범위는 사용자와 정하며, 코드 존재나 배포 성공만으로 실계정 업무 검증을 완료로 간주하지 않는다.
 
 그 다음은 **구현에 실제로 필요할 때만** 따라간다.
 
 - 백엔드 AI 라우트: [apps/api-server/src/routes/ai-proxy.routes.ts](../../apps/api-server/src/routes/ai-proxy.routes.ts) (`/api/ai` 로 mount — [register-routes.ts](../../apps/api-server/src/bootstrap/register-routes.ts))
 - 라우팅 · 런타임: [apps/api-server/src/services/ai-tools/](../../apps/api-server/src/services/ai-tools/)
+- 공통 실행·업무 계약: [packages/ai-core/src/](../../packages/ai-core/src/), 서비스 Extension: [apps/api-server/src/services/ai-extensions/](../../apps/api-server/src/services/ai-extensions/)
+- 가격·quota·정산: [apps/api-server/src/modules/ai-policy/](../../apps/api-server/src/modules/ai-policy/) — 기존 실행과 원장을 재사용
 - 인증 · 권한 · 데이터 구조 · 공통 package: 필요한 지점에서만
 
 ### 처음부터 분석하지 않아도 되는 것
@@ -101,27 +126,28 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 ## 5. 작업 방식
 
 - **도구는 자유다.** IDE · LLM · 코딩 에이전트 등은 본인 판단과 비용으로 쓴다. O4O 가 특정 도구(Claude · Codex · Cursor 등)를 요구하지 않는다. 중요한 것은 결과물과 저장소 규칙 준수다. 다만 production secret · 실제 개인정보 · 운영 DB credential 등 외부 반출이 금지된 정보를 외부 도구에 넣지 않는다.
-- **`main` 이 저장소 정본이다.** 공동개발자는 별도 branch 에서 작업하고 PR 로 반영한다.
+- **`main` 이 저장소 정본이다.** 독립 작업은 최신 main에서 전용 worktree·branch로 시작하고 PR로 반영한다([AGENTS §4-1](../../AGENTS.md#4-1-parallel-session--worktree-policy)). 개발은 병렬, main 통합·공유 runtime 변경은 순차다.
 - 다른 작업자의 변경을 임의로 되돌리지 않는다. 사람과 AI 세션 여럿이 같은 저장소에서 동시에 작업한다.
 - 리팩토링 중이므로 기존 구조를 무조건 보존해야 한다고 가정하지 않는다. 반대로, 기존 구조를 이해하지 않은 채 대규모로 재설계하지도 않는다.
+- 중복·함수 길이만으로 즉시 공통화하지 않는다. 개별 서비스 작업에서는 업무 차이를 확인하고, 서비스 간 공통화는 전체 정비에서 소비처를 함께 조사한다.
 - AI 코딩 도구를 쓴다면 [CLAUDE.md](../../CLAUDE.md) · [AGENTS.md](../../AGENTS.md) 가 에이전트용 진입점이다(Git · DB 안전 규칙 포함).
 
 ## 6. Production 경계
 
-이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 branch → PR → 소유자 승인 → `main`** 이다.
+이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 worktree/branch → PR → required CI·review blocker 확인 → PR merge → `main`** 이다.
 
-- `main` 은 ruleset 으로 보호된다(직접 push · force push · 삭제 불가, PR + required check `CI Gate` 필수). 필수 human approval 은 없고, `main` 반영은 소유자의 통합 승인 후 PR merge 로 한다 — 상세는 [AGENTS.md §4-1(e)](../../AGENTS.md#4-1-parallel-session--worktree-policy).
+- `main`은 PR + required check `CI Gate`로 보호된다. 필수 human approval은 기본 gate가 아니며, 기술 gate와 계정 권한을 충족한 정상 PR merge에는 반복 사용자 승인을 요구하지 않는다. 직접 push·force push·ruleset 우회는 하지 않는다 — 상세는 [AGENTS.md §4-1(e)](../../AGENTS.md#4-1-parallel-session--worktree-policy). 실제 ruleset은 통합 직전에 조회한다.
 - Production 은 소유자 통제다: `production` Environment 는 `main` · `deploy/*` tag 에서만 실행되고, `deploy/*` tag 는 소유자만 만들 수 있으며, 수동 배포는 소유자가 실행할 때만 게이트가 열린다.
-- production credential 은 `production` environment secret 으로 둔다 — 공동개발자 branch · PR 의 workflow 는 받지 못한다(이행 상태는 [README — 배포](../../README.md)).
+- production credential은 `production` environment secret으로 둔다. [2026-10-02 이행 CHECK](../checks/CHECK-O4O-PRODUCTION-SECRET-ENVIRONMENT-MIGRATION-AND-COLLABORATOR-SAFETY-CLOSURE-V1.md)는 이전·repository 사본 삭제 완료를 기록한다. 이후 실제 등록 상태는 권한 있는 운영자가 확인하며, 과거 기록을 현재 live 조회 결과로 대신하지 않는다. 개발환경에 운영 key를 전달하지 않는다.
 - GitHub Actions 의 GCP 인증은 WIF(장기 SA key 없음)이며 소유자 통제 workflow(`main` · `deploy/*` · `production` environment)에서만 성립한다. 공동개발자에게 production GCP credential 은 제공하지 않는다.
 
 **사용자(저장소 소유자) 승인 없이 하지 않는 것:**
 
 - `.github/workflows/**` 변경 (PR 로 올려도 merge 전 소유자 검토)
-- `DEPLOY_FREEZE` 해제(`false` 로 변경) · production 통제 배포 실행 · `workflow_dispatch` 로 하는 production 작업
-  (비상 시 `DEPLOY_FREEZE=true` 설정은 즉시 해도 된다. 일상 LEVEL 2 배포는 main CI 뒤 자동이다)
+- `DEPLOY_FREEZE` 해제(`false`로 변경)·새 배포 인프라/운영 설정 변경
+  (비상 시 `DEPLOY_FREEZE=true` 설정은 즉시 해도 된다. 정상 배포는 현재 Delivery gate·실행 계정 권한·공유 runtime 직렬화 규칙을 따른다)
 - `deploy/*` tag 생성 · push
-- production migration · production DB write
+- 아직 명시적으로 승인되지 않은 production migration·production DB write. 이전 AI quota up 승인은 다른 migration·rollback·repair·seed/delete 승인으로 확대하지 않는다.
 - Secret · production credential 의 변경 · 열람 · 반출
 
 원문: [README.md — 배포 · Production 변경 원칙](../../README.md#production-변경-원칙-공동개발자-포함--전원-적용)
@@ -135,5 +161,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 3. [README.md](../../README.md) — 기여 · Production 변경 원칙
 4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB. 공동개발 로컬환경(로컬 API + web-neture, 운영 credential 불필요)은 [§3-1](../../SETUP.md#3-1-공동개발-로컬환경--로컬-api--web-neture)
 5. [O4O-API-SERVER-SCRIPTS-INVENTORY-V1](../baseline/operations/O4O-API-SERVER-SCRIPTS-INVENTORY-V1.md)
-6. O4O Agent 1차 작업요청서 — 별도로 전달 예정
-7. 필요할 때: [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) — 전체 정본 지도. 특히 역할 경계는 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), 매장 commerce 경계는 [O4O-STORE-COMMERCE-BOUNDARY-V1](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)
+6. O4O Personal Assistant 약국 경영 업무 자동화 1차 개발범위 — 현행 구현 조사 후 확정
+7. [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](../baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) — AI 업무 비서의 현재 구조 정본
+8. [AI Core + Extension 구조](../architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md) — 공통 계약·현재 코드 위치·적용 완료/후속 범위. [최종 통합·배포 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)는 운영 증거
+9. 필요할 때: [docs/CANONICAL-INDEX.md](../CANONICAL-INDEX.md) — 전체 정본 지도. 특히 역할 경계는 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), 매장 commerce 경계는 [O4O-STORE-COMMERCE-BOUNDARY-V1](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)

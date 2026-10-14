@@ -8,7 +8,7 @@
 | 선행 | [`IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1`](../investigations/IR-O4O-CROSS-SERVICE-PUBLIC-HOME-AND-BRAND-DESIGN-CENSUS-V1.md) (PR #331 MERGED) |
 | 성격 | 프런트엔드 표시 계층만 변경. route·API·권한·DB·serviceKey·package name 은 바꾸지 않았다 |
 | 기준 | `origin/main` 0e283ba10 · branch `wo/o4o-cross-service-public-design-brand-refresh-v1` |
-| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_DEPLOYED`** — 단계 배포 01~05 완료. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) · 04 web-store(store) · 05 web-kpa-branch(kpa) 배포 · production smoke PASS(§9 · §10 · §11 · §13 · §14). 로그인 후 smoke 는 PENDING_USER_VERIFICATION · 잔여 정리는 06 별도 WO |
+| 완료 판정 | **`CODE_COMPLETE` / `PRODUCTION_DEPLOYED`** — 단계 배포 01~05 완료. 01 web-neture(neture · supplier · community · funding) · 02 web-kpa-society(pharmacy) · 03 web-lecture(study) · 04 web-store(store) · 05 web-kpa-branch(kpa) 배포 · production smoke PASS(§9 · §10 · §11 · §13 · §14). 로그인 후 smoke 는 PENDING_USER_VERIFICATION. 06 final polish(§15~§19): study · kpa 운영 반영, pharmacy · store 는 API 선행 의존(#349)으로 배포 보류 — **`PARTIALLY_DEPLOYED`** (§19) |
 | 작성일 | 2026-10-07 |
 
 ---
@@ -763,3 +763,78 @@ web-neture 는 정적 index.html 하나라 JS 를 실행하지 않는 crawler �
 ### 17-4. AUTHENTICATED_SMOKE
 
 Neture · Pharmacy · Study · Store · KPA 의 로그인 후 smoke 는 하나로 묶어 **PENDING_USER_VERIFICATION** 이다. 테스트 계정을 만들거나 DB 를 수정하지 않았다. 세션 복구 중 O4O 홈 비활성은 공통 단위 테스트(`O4OHomeButton`)와 소비처 스캔 테스트(§16-2)로 보장한다.
+
+---
+
+## 18. 06 배포 · Final Production Smoke
+
+### 18-1. 배포 판정 (main `d23a267d6` = PR #357 merge)
+
+- 사용자 "main 통합 진행" 후 PR #357 merge. main CI Pipeline success.
+- 06 사이에 다른 세션이 `447869cc5`(#339 K-Cosmetics 은퇴 · #352 kpa canonical 호스트 포함)를 운영에 반영했다. 그래서 06 배포에 남은 다른 트랙 변경은 **#349(a66ef4697, Neture 약국 가입 구조)** 하나다.
+- 이 commit 은 API 와 web 을 함께 바꿨다. web 쪽 변경(문구 · 새 오류 코드 처리)은 API 보다 먼저 나가도 깨지지 않지만, 배포 파이프라인은 같은 commit 의 API 를 먼저 요구한다.
+
+Promote dry-run **37627419412** (`services=store,lecture,kpa-society,kpa-branch`):
+
+| service | 판정 |
+|---|---|
+| lecture · kpa-branch | PROMOTE (LEVEL_2 · API 와 독립) |
+| store · kpa-society | **HELD_API_NOT_DEPLOYED** — #349 의 API 가 아직 배포되지 않았다 |
+
+- 결정: 파이프라인의 의존 판정을 따른다. #349 의 API(가입 판정 변경)는 그 트랙이 단계별로 배포하는 변경이므로, 이 WO 에서 API 를 함께 승격하지 않았다.
+- pharmacy · store 의 06 변경은 #349 API 배포 뒤 promote 한다(§19).
+
+### 18-2. 배포 실행
+
+| 항목 | 값 |
+|---|---|
+| 자동 배포 | merge 직후 Delivery run **37627260995**(workflow_run · LEVEL_2 자동 경로)가 lecture · kpa-branch 를 `d23a267d6` 으로 배포했다 |
+| 수동 promote | run 37628052140(`services=lecture,kpa-branch`) → 두 서비스 모두 이미 UP_TO_DATE 라 배포 0 |
+| lecture-web | `lecture-web-00049-juz`(447869cc5) → **`lecture-web-00052-jiw`** · `o4o-commit-sha=d23a267d6…` · traffic 100% |
+| kpa-branch-web | `kpa-branch-web-00208-biv`(447869cc5) → **`kpa-branch-web-00211-kuc`** · `o4o-commit-sha=d23a267d6…` · traffic 100% |
+| 보류 | store-web `00065-jel` · kpa-society-web `02035-rok`(둘 다 447869cc5) 그대로 |
+| 손대지 않음 | API(`o4o-core-api-03843-bob`) · neture · admin · hospital-pharmacy · DB · migration · `DEPLOY_FREEZE` |
+
+### 18-3. Final Production Smoke (비로그인 · Chrome headless · 실 URL)
+
+8 host × 1280/390 = 16 viewport, 여기에 kpa 분회 `/o4o-pilot` 2 run 을 더해 총 18 run.
+
+**공통 결과 (18/18):** HTTP 200 · pageerror 0 · console error 0 · 4xx/5xx 응답 0 · 가로 overflow 0.
+
+| host | 1280 / 390 h1 | O4O 홈 | favicon | 390 header | 비고 |
+|---|---|---|---|---|---|
+| neture.co.kr | O4O 60 / 48px | (O4O 홈 자체) | /favicon.png | — | 회귀 0 |
+| pharmacy | Hero 52 / 32px | 보임 | /favicon.png | 65px | **06 보류** — footer "약사회 소개" · "Copyright © 2026 약사회" 가 운영에 남아 있다 |
+| supplier | Hero 52 / 32px | 보임 | /favicon.png | 65px | 회귀 0 |
+| community | Hero 52 / 32px | 보임 | /favicon.png | 65px | 회귀 0 |
+| study | Hero 52 / 32px | 헤더 · footer | /favicon.svg | 69px | **06 반영** (authLoading) |
+| funding | Hero 52 / 32px | 보임 | /favicon.png | 65px | `[SMOKE]` row 그대로(§17-1) |
+| store | 카드 16px | 헤더 · footer | /favicon.svg | 102px | **06 보류** — 옛 헤더 · 카드 |
+| kpa `/` | 약사회 분회 24px | 헤더 · footer | /kpa/favicon.svg | 105px | 회귀 0 |
+| kpa `/o4o-pilot` | 분회명 24px | 헤더 | /kpa/favicon.svg | **97px**(05 배포 때 171px) | **06 반영** — 2단 |
+
+- 화면 판독: 8 host 가 같은 Pretendard · 토큰 · O4O 홈 위치(헤더 오른쪽)를 쓴다. 서비스 정체성은 서비스마다 다르게 보인다(O4O 약국 · 공급자 · 커뮤니티 · O4O 강의 · 유통참여형 펀딩 · 내 매장 · 약사회 분회).
+- Hero 는 공개 서비스(pharmacy · supplier · community · study · funding)에만 있다. Workspace(store)와 KPA 에는 없다.
+- 로그인 후 smoke 는 하지 않았다(§17-4).
+- 스크린샷은 세션 scratchpad 에만 두었다.
+
+---
+
+## 19. Closure (06)
+
+| 판정 | 값 |
+|---|---|
+| CROSS_SERVICE_PUBLIC_DESIGN | **PRODUCTION_COMPLETE** (01~05) · 06 polish **PARTIALLY_DEPLOYED** — study · kpa 반영, pharmacy · store 보류 |
+| O4O_HOME_RETURN | **PASS** — 8 host 헤더(neture 는 자체). 세션 복구 중 비활성: 운영 반영은 neture · kpa · study, store 는 06 보류분 |
+| RESPONSIVE | **PASS** — 18 run 가로 overflow 0. KPA 분회 390 은 2단 |
+| PHARMACY_BRAND | **PENDING_USER_ASSET** — 로고/favicon 파일 대기(§16-4). 표시명 O4O 약국은 02 에서 완료 |
+| PUBLIC_LEGACY_BRANDING | **코드 CLEAN** (main) · 운영은 pharmacy footer 2건이 06 보류분으로 남아 있다 |
+| FUNDING_SMOKE_DATA | **SEPARATE_TRACK** (§17-1) |
+| STATIC_OG | **SEPARATE_TRACK** (§17-2) |
+| REPRODUCIBLE_WEB_BUILD | **SEPARATE_TRACK** (§17-3) |
+| AUTHENTICATED_SMOKE | **PENDING_USER_VERIFICATION** (§17-4) |
+
+남은 일:
+
+1. #349 API 배포(그 트랙 소관) 뒤 `services=store,kpa-society` promote → pharmacy · store smoke. 로고 자산이 그 전에 오면 pharmacy 는 한 번에 배포한다.
+2. O4O 약국 로고/favicon 투입(§16-4).

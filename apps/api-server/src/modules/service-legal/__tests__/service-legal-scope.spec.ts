@@ -17,8 +17,8 @@ import {
 } from '../service-legal-scope.js';
 
 describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
-  it('pharmacy-hub 를 legal 서비스로 받아들인다 (footer-legal 404 원인 제거)', () => {
-    expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(true);
+  it('은퇴한 pharmacy-hub 관리 경로를 허용하지 않는다', () => {
+    expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(false);
   });
 
   it('기존 3서비스는 그대로 accept 된다 (회귀 없음)', () => {
@@ -43,13 +43,15 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('lecture')).toBe(true);
   });
 
-  it('집합은 정확히 5개 canonical key 다 (의도치 않은 확장 감지)', () => {
+  it('현재 관리 대상 7개 canonical key만 포함한다', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',
       'lecture',
       'neture',
-      'pharmacy-hub',
-    ]);
+      'community',
+      'funding',
+      'supplier',
+    ].sort());
   });
 });

@@ -6,6 +6,7 @@
  */
 
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
@@ -61,6 +62,10 @@ export async function resolvePublicStore(
 ): Promise<ResolvedStore | null> {
   const slugService = new StoreSlugService(dataSource);
   const record = await slugService.findBySlug(slug);
+  if (record && isRetiredServiceValue(record.serviceKey)) {
+    res.status(410).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Service has been retired' } });
+    return null;
+  }
 
   if (!record || !record.isActive) {
     const redirect = await slugService.findOldSlugRedirect(slug);

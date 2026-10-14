@@ -73,11 +73,11 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
       ...screen.getAllByRole('button').map((b) => b.textContent ?? ''),
       ...screen.getAllByRole('link').map((l) => l.textContent ?? ''),
     ];
-    expect(labels.filter((t) => /매장 HUB|^내 매장$|Neture 커뮤니티|KPA Society 커뮤니티|주요 업무|내가 이용하는 서비스/.test(t))).toEqual([]);
+    expect(labels.filter((t) => /매장 HUB|^내 매장$|Neture 커뮤니티|O4O 약국 경영지원 커뮤니티|주요 업무|내가 이용하는 서비스/.test(t))).toEqual([]);
     expect(within(cards()[0]).getByRole('link', { name: /O4O 공통 커뮤니티/ }).getAttribute('href')).toBe('/community');
   });
 
-  it('복수 매장이면 버튼 안 보조 정보로 서비스 이름 · 반복 note 목록 없음', () => {
+  it('삭제 대상 PH 매장을 제외하면 단일 약국 버튼만 표시', () => {
     renderPanel(
       user(),
       data({
@@ -89,7 +89,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
       }),
     );
     const store = cards()[1];
-    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국KPA Society', '테스트 허브약국Pharmacy Hub']);
+    expect(within(store).getAllByRole('button').map((b) => b.textContent)).toEqual(['테스트 약국']);
     expect(store.querySelector('ul')).toBeNull();
   });
 
@@ -97,7 +97,7 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     renderPanel(user(['platform:super_admin']), data({ operatorServices: [{ serviceKey: 'kpa-society', serviceName: 'kpa-society', scope: 'operator', workspaceMode: 'standard', workspaceAvailable: true }] }), <section><h2>O4O 서비스 소식</h2></section>);
     expect(headings()).toEqual(['내 업무 공간', '플랫폼 관리', '내 서비스', 'O4O 서비스 소식', '가입 가능한 서비스']);
     const operator = cards()[3];
-    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['KPA Society']);
+    expect(within(operator).getAllByRole('button').map((b) => b.textContent)).toEqual(['O4O 약국 경영지원']);
     expect(within(operator).queryByText(/관리자/)).toBeNull();
     const platform = screen.getByRole('heading', { level: 2, name: '플랫폼 관리' }).parentElement!;
     expect(within(platform).getByRole('link', { name: /플랫폼 관리/ }).getAttribute('href')).toBe('/admin');
@@ -109,5 +109,63 @@ describe('HomeEntryPanel — 내 업무 공간 4 카드', () => {
     const my = screen.getByRole('heading', { level: 2, name: '내 서비스' }).parentElement!;
     expect(within(my).getByRole('link', { name: /공급자 서비스/ })).toBeTruthy();
     expect(within(my).queryByRole('link', { name: /공급자 업무/ })).toBeNull();
+  });
+});
+
+it('소속 매장·개인 공급자 자격이 없는 운영자도 각 카드에서 기존 운영 화면으로 진입한다', () => {
+  renderPanel(user(['neture:admin', 'supplier:admin']), data({
+    stores: [],
+    operatorServices: ['neture', 'supplier'].map(serviceKey => ({ serviceKey, serviceName: serviceKey, scope: 'admin', workspaceMode: 'standard', workspaceAvailable: true })),
+  }));
+  expect(within(cards()[1]).getByRole('link', { name: '내 매장 신청 심사' }).getAttribute('href')).toBe('/operator/pharmacy-memberships');
+  expect(within(cards()[2]).getByRole('link', { name: '공급자 관리' }).getAttribute('href')).toBe('/admin/supplier-governance');
+  expect(within(cards()[1]).queryByText('이용 중인 항목이 없습니다.')).toBeNull();
+  expect(within(cards()[2]).queryByText('이용 중인 항목이 없습니다.')).toBeNull();
+  expect(within(cards()[2]).queryByRole('link', { name: '공급자 업무' })).toBeNull();
+});
+
+describe('My Home available workspace entries', () => {
+  const workspace = (d: HomeEntryData, selected?: string) => render(<MemoryRouter><HomeEntryPanel user={user()} data={d} loading={false} error={null} onReload={() => {}} workspaceOnly storeOrganizationId={selected} /></MemoryRouter>);
+  it('compact overview keeps one entry per available role and routes additional work to Services', () => {
+    render(<MemoryRouter><HomeEntryPanel user={user()} data={data({
+      stores: [
+        { serviceKey: 'kpa-society', organizationId: 'o1', name: '첫 번째 매장', memberRole: 'owner' },
+        { serviceKey: 'kpa-society', organizationId: 'o2', name: '두 번째 매장', memberRole: 'owner' },
+      ],
+      serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } },
+      operatorServices: [{ serviceKey: 'kpa-society', serviceName: 'kpa-society', scope: 'operator', workspaceMode: 'standard', workspaceAvailable: true }],
+    })} loading={false} error={null} onReload={() => {}} workspaceOnly compactWorkspace /></MemoryRouter>);
+    expect(screen.getAllByRole('heading', { level: 3 }).map(h => h.textContent)).toEqual(['커뮤니티', '매장', '공급자', '서비스 운영']);
+    expect(screen.getByRole('button', { name: /첫 번째 매장/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /두 번째 매장/ })).toBeNull();
+    expect(screen.getByRole('link', { name: '공급자 업무' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /약사 커뮤니티/ })).toBeNull();
+    expect(screen.getByRole('link', { name: '참여 서비스와 이용 상태 보기 →' }).getAttribute('href')).toBe('/mypage/services');
+  });
+  it('shows available community and supplier work, but no empty store/operator cards', () => {
+    workspace(data({ stores: [], serviceStates: { supplier: { status: 'active', source: 'neture_suppliers' } } }));
+    expect(screen.getByRole('heading', { name: '내 업무 바로가기' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '공급자 업무' }).getAttribute('href')).toBe('/supplier/dashboard');
+    expect(screen.queryByRole('heading', { name: '매장', exact: true })).toBeNull();
+    expect(screen.queryByRole('heading', { name: '서비스 운영', exact: true })).toBeNull();
+  });
+  it('retains pending membership information without creating an entry', () => {
+    workspace(data({ stores: [], communities: [], services: [svc('lecture', 'Study', 'pending')] as HomeEntryData['services'] }));
+    expect(screen.getByText('가입 신청 중')).toBeTruthy();
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByText(/현재 바로 이동할 수 있는 업무가 없습니다/)).toBeTruthy();
+  });
+  it('offers only the selected store, excluding other stores and inactive/retired services', () => {
+    workspace(data({
+      stores: [
+        { serviceKey: 'kpa-society', organizationId: 'o1', name: '선택 매장', memberRole: 'owner' },
+        { serviceKey: 'kpa-society', organizationId: 'o2', name: '다른 매장', memberRole: 'owner' },
+        { serviceKey: 'pharmacy-hub', organizationId: 'o1', name: '은퇴한 서비스 매장', memberRole: 'owner' },
+      ],
+    }), 'o1');
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: /선택 매장/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /다른 매장|은퇴한/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'O4O 공통 커뮤니티' })).toBeNull();
   });
 });

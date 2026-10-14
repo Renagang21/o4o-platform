@@ -133,13 +133,16 @@ export type TokenType = 'user' | 'service' | 'guest';
 /**
  * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 — 세션을 **어떤 수단으로** 발급했는가.
  *
- * 비밀번호 세션에만 `'password'` 를 싣는다. claim 이 없으면 Google(또는 이 WO 이전) 세션이다.
- * 관리자 경계의 판정 축이다: 비밀번호 세션은 `platform:*` 역할 경로에서 서버가 거절한다
- * (`authentication.middleware.ts` 의 enforcePasswordSessionBoundary). 화면 숨김이 아니다.
+ * WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1: 검증한 로그인 수단을 명시한다.
+ * 전체관리자 경계는 정확히 'google' 인 세션만 허용한다. 누락/미지 값은 Google 증거가 아니다.
  */
-export type SessionAuthMethod = 'password';
+export type SessionAuthMethod = 'google' | 'password' | 'kakao';
 
 export interface AccessTokenPayload {
+  /** Browser session identity; absent legacy tokens require re-login. */
+  sessionId?: string;
+  /** Account security generation, shared by access/refresh/handoff. */
+  tokenFamily?: string;
   userId?: string;
   id?: string; // Primary ID field
   email?: string;
@@ -206,24 +209,16 @@ export interface AccessTokenPayload {
   sessionEpoch?: number;
 }
 
-/**
- * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 (3차) — 세션 귀속 claim 두 개.
- *
- * refresh token 에만 있으면 **refresh 경로만** 막힌다. 로그아웃 뒤에도 남은 access token
- * (최대 15분)으로 `POST /auth/handoff` 를 불러 **수명이 긴 세션을 새로 얻을 수 있었다.**
- * 그래서 access token 에도 같은 두 값을 싣고, 긴 세션을 만들어 주는 경로가 그것을 검사한다.
- *
- * 모든 API 요청마다 검사하지는 않는다 — `requireAuth` 에 DB 조회를 넣으면 Core 경로의 비용이
- * 요청마다 늘어난다. 막아야 하는 것은 "짧은 인증으로 긴 세션을 새로 만드는 일" 이다.
- */
+/** Signed origin scope. Browser-session ID and account family are checked on every protected request. */
 export interface SessionScopeClaims {
   /** 이 토큰이 속한 서비스(또는 `store`·`admin` 같은 surface) 키 */
   serviceKey?: string;
-  /** 발급 시점의 `service_session_revocations.session_epoch` */
+  /** Compatibility claim only; ordinary logout is enforced by sessionId. */
   sessionEpoch?: number;
 }
 
 export interface RefreshTokenPayload {
+  sessionId?: string;
   userId: string;
   tokenVersion: number;
   sub?: string; // JWT standard claim
@@ -239,17 +234,7 @@ export interface RefreshTokenPayload {
    * `auth-token-session.service.ts` 의 폐기 검사 주석 참조.
    */
   serviceKey?: string;
-  /**
-   * WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8 — 이 세션의 **세대**.
-   *
-   * 서비스 단위 로그아웃 판정은 시각이 아니라 이 값으로 한다. `iat` 는 **초 단위**라
-   * 같은 초의 기존 토큰과 새 토큰을 구별할 수 없고, 그래서 로그아웃한 같은 초에 다시
-   * 로그인하면 새 토큰까지 거절되는 결함이 있었다. 세대는 단조 증가하므로 시각이 같아도
-   * 선후가 갈린다. 발급 시점의 `service_session_revocations.session_epoch` 를 새긴다.
-   *
-   * 배포 전에 발급된 토큰에는 이 claim 이 **없다** — 처리는 `service-session-epoch.ts` 의
-   * `isSessionEpochLive` 주석 참조.
-   */
+  /** Compatibility claim; not the browser logout axis. */
   sessionEpoch?: number;
   /** WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4 — 회전이 승계한다(`SessionAuthMethod`) */
   authMethod?: SessionAuthMethod;

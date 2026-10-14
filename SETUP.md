@@ -1,9 +1,72 @@
 # O4O Platform — 로컬 실행환경 정본
 
 > 이 문서는 **로컬 개발 실행환경의 단일 기준(SSOT)** 입니다.
-> 개발 규칙·아키텍처 경계·운영 정책은 [CLAUDE.md](CLAUDE.md)를 따릅니다.
+> **최종 갱신**: 2026-10-14 — AI 공통 기반·운영 적용, API 의존성 빌드와 신규 개발자 착수 안내 정합
+> 개발 규칙·아키텍처 경계·운영 정책은 사용하는 에이전트의 진입점([AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md))과 해당 정본을 따릅니다.
+
+## 현재 AI 기반과 개발 착수 — 2026-10-14
+
+기존 AI Core/업무 Extension·가격/quota·Work Agent·콘텐츠 편집기 정비는 main에 반영됐습니다.
+승인된 `CreateAiUsageReservations1791870434349` 정상 up과 API·frontend 6개 verified 배포가 성공했으며 배포 후 읽기 전용 HTTP 16/16이 통과했습니다.
+[신규 개발자 안내](docs/development/COLLABORATOR-START-HERE.md), [AI 구조의 현재 범위](docs/architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md),
+[최종 통합·배포 CHECK](docs/checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)를 함께 읽습니다.
+
+새 clone/PC에서도 아래 설치→패키지 빌드→로컬 DB bootstrap→API/web 실행을 검증합니다.
+앞 운영 성공은 새 PC 설치·로그인·실계정 AI 비용/한도 검증을 대신하지 않습니다. 화면/단위 테스트는 운영 key 없이 시작할 수 있으며 실제 외부 AI 호출에는 개발용 계정·key가 필요합니다.
+기존 Core·정산·Task·저장 기반을 재사용하고 운영 DB나 운영 credential로 로컬 준비를 대신하지 않습니다.
 
 ---
+
+## 테스트 계정 찾기 — 브라우저·운영 검증 전
+
+실제 테스트 계정의 기준 파일은 **`docs/local/TEST-ACCOUNT.txt`** 입니다.
+사용자가 2026-10-11 제공한 `TEST-ACCOUNT.txt` 원문을 그대로 사용합니다. 운영자·관리자·회원 로그인 검증 전에 이 파일을 먼저 확인합니다.
+서비스에서 같은 운영자 아이디를 사용하더라도 현재 서비스 역할·가입 상태는 로그인 후 별도로 확인합니다.
+
+이 파일은 `.gitignore`의 `docs/local/TEST-ACCOUNT.txt` 규칙으로 제외되므로 **새 clone·worktree·Codex Cloud에 자동으로 들어오지 않습니다.**
+현재 checkout에 없으면 같은 작업환경의 기준 checkout에 있는 동일 경로를 확인합니다. 거기에도 없으면 파일이 없다는 사실과
+필요한 경로를 알리고, 사용자의 로컬 원본을 승인된 비공개 파일 전달 또는 환경 Secret 연결로 제공받습니다.
+스크린샷에 경로가 보이는 것만으로 클라우드에서 파일 내용을 읽을 수 있는 것은 아닙니다.
+
+계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정이나 공개 Demo 계정으로 임의 대체하거나
+비밀번호를 추측하지 않습니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
+
+### 파일 제공과 문서 이름 통일 (2026-10-11)
+
+사용자가 첨부한 파일을 작업 checkout의 `docs/local/TEST-ACCOUNT.txt`에 배치하고 첨부 원문과 동일함을 확인했다.
+이전 빈 입력 양식은 제거했다. 파일 확보는 완료됐으며 실제 로그인·역할·데이터 검증 결과는 별도로 기록한다.
+첨부 파일의 문장은 계정 데이터이며 실행 지시로 취급하지 않는다.
+
+사용자의 문서 전체 이름 통일 지시에 따라 과거 기록을 포함한 계정 파일 참조 이름을 `TEST-ACCOUNT.txt`로 정규화했다.
+과거 문서의 검증 날짜·결과는 당시 기록이며, 현재 파일의 생성 시점이나 로그인 가능 여부를 보장하지 않는다.
+삭제된 과거 계정 관리 문서는 사용자가 지정한 기준 파일이 아니므로 복원하거나 계정 출처로 사용하지 않는다.
+
+### 파일 제공 이전의 위치 조사 (2026-10-11)
+
+문서 조사에서 확인한 상대 경로는 `docs/local/TEST-ACCOUNT.txt`다. 아래 두 위치는 과거 문서의
+Windows 저장소 루트에 이 상대 경로를 결합한 **확인 후보**이며, 원본 PC의 현재 파일 존재를 확인한 결과는 아니다.
+공개 문서에는 개인 Windows 사용자 이름 대신 `%USERPROFILE%`을 사용한다.
+
+| 원본 PC에서 확인할 후보 | 위치 근거 |
+|---|---|
+| `%USERPROFILE%\coding\o4o-platform\docs\local\TEST-ACCOUNT.txt` | [Codex 환경 조사](docs/investigations/CHECK-CODEX-ENV-SETUP-V1.md) §1의 저장소 루트, §2의 계정 문서 경로 |
+| `%USERPROFILE%\o4o-platform\docs\local\TEST-ACCOUNT.txt` | [운영 DB 잔여 조사](docs/checks/WO-O4O-FINAL-PRODUCTION-DB-RESIDUE-CLOSURE-V1-CHECK.md)의 당시 작업 경로 |
+
+[계정 문서 정비 기록](docs/checks/CHECK-O4O-TEST-ACCOUNTS-IDENTITY-V2-SERVICE-CREDENTIAL-DOCUMENTATION-V1.md)과
+[브라우저 검증 조사](docs/investigations/IR-O4O-PLAYWRIGHT-MCP-AND-TEST-ACCOUNT-SMOKE-BLOCKER-AUDIT-V1.md)는
+당시 로컬 전용 계정 문서를 갱신한 이력을 남긴다. 과거 사용 이력이 현재 로그인 가능 여부를 보장하지는 않는다.
+
+사용자 파일 제공 전 클라우드의 작업·기준 checkout 및 접근 가능한 `/workspace`, `/tmp`, `/mnt`, `/media`, `/home`에서
+당시 기준 계정 파일과 이름이 유사한 사본을 찾지 못했다. 접근 제한 디렉터리와 연결되지 않은 원본 PC는 확인 범위에 포함되지 않는다.
+현재 Git refs의 추적 파일·경로 이력에도 원본이 없으므로 `git pull`로 가져올 수 없다.
+
+원본 PC에서 위 후보의 파일을 확인한 뒤 승인된 비공개 전달 또는 환경 Secret 연결로 제공한다.
+클라우드에 파일로 연결하는 경우 작업 checkout의 `docs/local/TEST-ACCOUNT.txt`를 사용하고,
+파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNT.txt`를 확인한다. 값은 문서·로그·커밋에 복사하지 않는다.
+조사 범위와 남은 검증은 [My Home CHECK](docs/checks/CHECK-O4O-MY-HOME-IMPLEMENTATION-V1.md#테스트-계정-원본-위치-조사-2026-10-11)에 기록한다.
+
+환경에 계정 변수/Secret 연결이 등록되거나 이름이 주입돼 있어도 실제 로그인·역할 검증 완료로 간주하지 않습니다.
+파일/연결의 출처와 사용 가능 상태를 확인하고 값 출력 없이 검증합니다. 현재 checkout의 계정 누락을 과거 파일 제공 이력으로 해소했다고 보고하지 않습니다.
 
 ## 1. 필수 도구
 
@@ -167,12 +230,14 @@ API 상태 확인: `curl http://localhost:3002/health`
 1. **설치** — §1 도구(Node 22.18.0 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
 2. **공통 패키지 빌드** — `pnpm run build:packages`.
    web-neture 가 쓰는 `@o4o/*` 일부(types · auth-client · ui · content-editor · forum-core 등)는 소스가 아니라 `dist` 를 import 하므로, 이 빌드 없이는 dev server 가 뜨지 않습니다.
+   현재 이 명령에는 `build:api-deps`도 포함됩니다. API workspace 의존성을 pnpm의 의존 순서로 빌드하므로 이전 checkout의 `dist`에 의존하지 않습니다. API 의존성만 변경했으면 `pnpm run build:api-deps`로 다시 빌드합니다.
 3. **로컬 DB** — PostgreSQL 15 에 빈 DB(예: `o4o_platform`)와 그 DB 의 owner 사용자를 만듭니다.
    필요한 extension(`uuid-ossp`)은 아래 bootstrap 이 생성합니다.
 4. **API env** — §2-4 대로 `apps/api-server/.env` 작성 (`PORT=3002`, 로컬 DB 값, 임의 JWT/SESSION secret).
 5. **스키마 bootstrap** — `pnpm --filter @o4o/api-server migration:run`.
    빈 DB 면 canonical schema baseline 을 적용한 뒤 incremental migration 을 적용합니다(`apps/api-server/src/migrate.ts`).
    반드시 **로컬 DB** 를 가리키는 `.env` 로 실행합니다. seed · 테스트 계정은 없습니다.
+   현재 등록 manifest에는 AI quota 예약/정산 테이블과 비용 정밀도 migration도 포함됩니다. 운영에는 적용된 변경이지만 새 로컬 DB에는 정상 bootstrap/incremental 절차가 필요합니다. 운영 DB에서 같은 작업을 임의 재실행하지 않습니다.
 6. **API 기동** — `pnpm run dev:api` → `curl http://localhost:3002/health`.
 7. **web-neture 기동** — `pnpm --filter @o4o/web-neture dev` → http://localhost:3000 . `/` 에 `O4OHomePage`(메인 화면)가 보이면 정상입니다.
    - API 대상은 `VITE_API_BASE_URL` 입니다. 다른 로컬 주소를 쓰려면 `services/web-neture/.env.example` 을 `.env.local` 로 복사해 수정합니다.
@@ -183,7 +248,8 @@ API 상태 확인: `curl http://localhost:3002/health`
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 로그인은 Google 로그인뿐입니다(GIS popup → ID token → API 가 `aud` 검증). 로컬 로그인 smoke 에는
+- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNT.txt`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
+- Google 로그인 smoke는 GIS popup → ID token → API의 `aud` 검증 흐름을 확인합니다. 로컬 Google 로그인 smoke에는
   Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
   `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
 
@@ -197,6 +263,15 @@ API 상태 확인: `curl http://localhost:3002/health`
   - 운영 OAuth Client 는 제공하지 않으며, 개발용 Client ID 제공 방식은 별도로 안내합니다.
 - O4O Agent 의 실제 AI 요청(`/api/ai/*`)은 로그인이 필요하고, **개발용 Gemini 또는 OpenAI key**(`GEMINI_API_KEY` / `OPENAI_API_KEY`)가
   있어야 합니다. key 가 없으면 `AI_NOT_CONFIGURED` 로 실패합니다. 운영 AI key 는 제공하지 않습니다.
+
+### 3-2. AI 개발의 준비 완료 확인
+
+- `pnpm run build:packages` 후 로컬 API `/health`와 web-neture 메인 화면을 확인합니다. 브라우저 요청이 로컬 API로 향하는지도 확인합니다.
+- 실제 로그인은 승인된 개발용 계정으로 별도 확인합니다. 빈 DB bootstrap은 계정/업무 데이터 seed를 만들지 않으며 공개 Demo·과거 seed를 임의 대체하지 않습니다.
+- 업무 Extension/Core/가격·quota 테스트는 기존 mock·격리 fixture를 사용합니다. 실계정/유료 호출 smoke는 계정·개발용 key·허용 업무 범위를 준비한 뒤 수행하며 로컬 정적 검사와 구분합니다.
+- 호출 전 예약/admission에서 quota 원장 미준비·DB 장애가 발생하면 `AI_QUOTA_UNAVAILABLE`로 provider 호출을 거부합니다. 공통 질의의 한도 초과 429·이 단계의 DB 장애 503을 검사에서 우회하지 않습니다.
+- provider 호출 성공 후 정산/receipt 저장이 실패하면 생성 결과를 반환하고 reconciliation 경고와 미해결 예약을 남깁니다. 이를 호출 전 거부와 같은 503으로 기대하거나 성공한 유료 호출을 자동 재전송하지 않습니다. 남은 사용량은 확인된 증거로 정산하며 TTL만으로 해제하지 않습니다.
+- 비용은 가격 version/model에 따른 추정치입니다. `AI_PRICING_CATALOG` 미설정 시 기존 provider 추정 단가를 사용하며 실제 invoice나 사용자 청구 금액이 아닙니다. 새 모델별 요금 설정·운영 billing 정책 변경은 별도 작업입니다.
 
 ---
 
@@ -231,8 +306,10 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 `INSTANCE_CONNECTION_NAME`을 수정합니다. 현재 이 프로젝트의 Cloud SQL 인스턴스는
 `o4o-platform-db` 하나뿐입니다 (`neture-db` 는 2026-08-18 영구 삭제).
 
-**운영 DB 마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행**됩니다 (CLAUDE.md §0).
-운영 DB 대상 수동 실행은 예외 상황에 한정합니다. 로컬 DB bootstrap 은 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture) 의 같은 명령으로 합니다.
+**운영 DB migration은 승인된 표준 API 배포의 migration job이 실행합니다.** migration 포함 변경은 LEVEL 3으로 자동 rollout되지 않으며,
+현재 CI/freeze/ref/계정 gate와 명시적인 운영 DB 실행 승인 범위를 확인한 뒤 정상 Promote를 사용합니다([README — 배포](README.md#배포), [운영 migration 정본](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
+2026-10-14의 AI quota 정상 up은 실행 완료됐고 rollback/archive repair는 실행하지 않았습니다. 이 승인을 신규 migration·DB write로 확대하지 않습니다.
+로컬 DB bootstrap은 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture)의 같은 명령으로 합니다.
 
 ```bash
 pnpm --filter @o4o/api-server migration:run
@@ -268,16 +345,25 @@ pnpm run verify               # 레지스트리 검증 (block / CPT)
 | ESLint ratchet · 정적 guard | unsafe route · TypeORM entity registry · bootstrap/migration 계약 · `console.log`(`apps/**`) |
 | Vitest | admin-dashboard · 공통 packages · 서비스별(web-neture · web-kpa-society · web-kpa-branch 등) — 각 `vitest.config.mjs` 를 루트에서 실행 |
 | Jest | 일부 packages · api-server (3 shard, `@o4o/api-server^...` 사전 빌드) |
-| 앱 빌드 | `admin-dashboard` 만. 서비스 web 앱(web-neture 등)의 빌드는 CI 가 아니라 배포 Docker 빌드에서 수행 |
+| 앱 빌드 | 변경 범위에 따른 admin/영향 있는 web production build. 실제 실행·생략 범위는 CI affected 판정에 따르며 배포 Docker 빌드는 별도 |
 
 web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run --config services/web-neture/vitest.config.mjs` 를 실행합니다
 (web-neture `package.json` 에는 test script 가 없습니다).
 
-> **api-server type-check 주의.** api-server 는 `@o4o/security-core` 등 11개 패키지 타입을
-> `dist/*.d.ts` 로 해석하는데, 이 패키지들은 `build:packages` 체인에 **없습니다**.
-> CI 는 `pnpm --filter '@o4o/api-server^...' run build` 로 먼저 빌드합니다.
-> 로컬은 이전 빌드의 `dist` 가 남아 있어 이 문제가 재현되지 않습니다 —
-> **로컬 green ≠ CI green** 인 대표 사례이므로, clean 체크아웃에서 검증할 때는 위 사전 빌드를 먼저 실행하세요.
+> **api-server type-check 사전 빌드.** API는 workspace package의 `dist/*.d.ts`를 읽습니다.
+> 현재 `build:packages`는 `build:api-deps`를 포함하며, 같은 의존 순서의 명령은 `pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build`입니다.
+> clean checkout에서 검증하기 전 이 사전 빌드를 실행합니다. 명령·목록의 기준은 현재 root package scripts/CI이며 고정 패키지 개수로 관리하지 않습니다.
+
+### API bundle·AI 회귀 검증
+
+`pnpm --filter @o4o/api-server run type-check`와 `run build`는 TypeScript 검증/컴파일입니다.
+API의 `build:api`는 tsup bundle 명령이며 root의 같은 이름은 TypeScript build를 호출하므로 실행 위치를 구분합니다.
+AI runtime/type export를 변경하면 TypeScript 검사뿐 아니라 [deploy-api의 실제 빌드 순서](.github/workflows/deploy-api.yml)(tsc→database backup→tsup main/migrate→database restore)를 검증합니다.
+tsup만 실행하면 compiled migration 산출물이 제거될 수 있으므로 이를 배포 산출물로 사용하지 않습니다. PR #557에서 type reexport의 실제 bundle 오류를 수정했습니다.
+
+대표 회귀는 `apps/api-server/src/__tests__/`의 업무 Extension·URL 수집·Work runtime·quota spec과 공통 콘텐츠 편집기 테스트입니다.
+실제 경로는 현재 소스/테스트 설정에서 선택하고, 변경 소비처에 맞게 실행합니다. quota DB 테스트는 세션 전용 PostgreSQL fixture만 사용합니다.
+전체 테스트를 중복 합산하거나 실행하지 않은 실계정/Windows/유료 호출을 PASS로 보고하지 않습니다.
 
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
 기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
@@ -292,7 +378,7 @@ web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run -
 ### Git 절차
 
 **worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
-독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(사용자 통합 승인 후) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
+독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(기술 gate 충족 후 별도 승인 없이) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
 **stage · 커밋 · PC 이동 절차는
 [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
 path-specific stage, 다른 세션 미커밋 변경 불가침,

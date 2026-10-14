@@ -54,11 +54,11 @@
 ## 실행 원칙
 
 ```text
-조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR → CI · Codex → 완료 보고 · STOP
-→ (사용자 "main 통합 진행" 승인 시) PR merge → post-merge 확인 → worktree 종료 정리 → 트랙 종료
+개발 담당: 조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → PR 생성 → 인계
+통합 담당: PR 검토 → CI · Codex → 순차 PR merge → post-merge 확인 → 필요한 배포 · 검증 → 결과 전달 → worktree 종료 정리
 ```
 
-- **작업 완료와 main 통합은 별개다.** main 통합은 사용자의 명시 승인 후에만 PR merge 로 한다 — owner direct push · bypass 로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
+- **개발 담당의 기본 종료점은 검증 · commit · push · PR 생성 및 인계다.** 수정 요청을 받은 경우에도 기존 PR branch에 추가 push하고 재인계한다. PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy).
 - **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
 
 - CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
@@ -94,7 +94,7 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 - **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
 - 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
 - **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + 내 커밋이 push 된 PR 이 integration-ready**. `origin/main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다 — 완료 조건을 채우려고 먼저 merge 하지 않는다.
+- 개발 담당의 완료 조건은 **이번 WO 범위 미커밋 변경 0건 + 작업 branch push + PR 생성 + 검증 결과 · CI 상태 · 미해결 사항 인계**다. CI 성공만으로 병합 권한을 얻지 않는다. 명시적으로 지정된 통합 담당만 병합 · post-merge 확인 · 필요한 배포 검증을 진행한다. 병합 전 branch/worktree는 후속 수정을 위해 보존한다. 상세는 [`AGENTS.md` §4-2](AGENTS.md#4-2-stage--commit--push).
 
 ## 명령 실행 원칙
 
@@ -162,7 +162,7 @@ import type { RelatedEntity } from './related.entity.js';
 ## 4. Order / Commerce Contract
 
 - **주문 생성은 `checkoutService.createOrder()` 단일 지점.** 독립 `*_orders` · `*_payments` 테이블 신설 금지 (`scripts/check-forbidden-tables.mjs` 가 검사).
-- 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B / PharmacyHub → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
+- 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
 - 새 주문 구조 · 결제 · 환불을 만들기 전에 위 두 정본을 먼저 확인한다. 이는 현행 계약이며, 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차를 따른다.
 - 주문 생성 기술 계약(`createOrder()` 단일 지점 · 독립 테이블 금지 · PaymentCore)의 정본은 [`CHECKOUT-STABLE-DECLARATION-V2`](docs/baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2 다. 구 `E-COMMERCE-ORDER-CONTRACT` 는 2026-10-07 SUPERSEDED(`OrderType` 열거는 현행 코드에 없음, 서비스 구분은 `metadata.serviceKey`) — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) 판정 해제 기록.
 
@@ -250,7 +250,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ## 15. Browser Verification Test Accounts
 
-- SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적). 브라우저 검증 전 반드시 참조.
+- SSOT: `docs/local/TEST-ACCOUNT.txt` (로컬 전용 · git 미추적). 브라우저 검증 전 반드시 참조.
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

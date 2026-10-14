@@ -12,6 +12,7 @@
 import { Application } from 'express';
 import { DataSource } from 'typeorm';
 import logger from '../utils/logger.js';
+import { rejectRetiredService } from '../middleware/retired-service.middleware.js';
 
 // ============================================================================
 // CORE ROUTE IMPORTS (registered before server listen)
@@ -80,6 +81,7 @@ import organizationRoutes from '../routes/organization.routes.js';
 //   `/api/v1/membership` (@o4o/membership-yaksa) mount 와 그 관리자 guard 제거.
 //   약사회 전용 회원 자격 도메인이며 다른 운영 서비스 소비처가 없다.
 import marketTrialRoutes from '../routes/market-trial.routes.js';
+import { createFundingForumRoutes } from '../routes/funding-forum.routes.js';
 import aiQueryRoutes from '../routes/ai-query.routes.js';
 import aiProxyRoutes from '../routes/ai-proxy.routes.js';
 import aiAdminRoutes from '../routes/ai-admin.routes.js';
@@ -101,7 +103,6 @@ import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.rout
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
 //   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
-import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
 // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
 import { createKpaBranchRoutes } from '../routes/kpa-branch/kpa-branch.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
@@ -123,6 +124,7 @@ import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.
 // PHASE 1: Core routes — registered BEFORE server listen
 // ============================================================================
 export async function registerCoreRoutes(app: Application): Promise<void> {
+  app.use('/api', rejectRetiredService);
   // Register core API routes
   // WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §20: 약관 pending 조회·승낙 제출.
   //   authRoutes(Core) 보다 먼저 — 더 구체적인 prefix. allowlist(terms-acceptance.policy) 경로와 일치해야 한다.
@@ -422,6 +424,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     // 22. Register Market Trial routes (Phase L-1)
     MarketTrialController.setDataSource(dataSource);
+    app.use('/api/v1/funding/:id/forum', createFundingForumRoutes());
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
 
@@ -697,24 +700,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   legacy `/api/v1/yaksa/*` 12 endpoint 는 production 소비처·내부 호출·운영 데이터가 모두 0으로
     //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
     //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
-
-    // 27b. Register Pharmacy-Hub routes (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
-    //      Foundation 범위: service-info / me-access / 역할별 scope ping 만.
-    try {
-      app.use('/api/v1/pharmacy-hub', createPharmacyHubRoutes());
-      logger.info('✅ Pharmacy-Hub routes registered at /api/v1/pharmacy-hub');
-
-      // WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1:
-      //   결제 완료 → 주문 paid 전이 → 공급자 fulfillment bridge.
-      //   serviceKey='pharmacy-hub' 구독이라 Neture 핸들러와 서로 간섭하지 않는다.
-      const { initializePharmacyHubPaymentHandler } = await import(
-        '../services/pharmacy-hub/PharmacyHubPaymentEventHandler.js'
-      );
-      initializePharmacyHubPaymentHandler(dataSource);
-      logger.info('✅ PharmacyHubPaymentEventHandler initialized');
-    } catch (pharmacyHubError) {
-      logger.error('Failed to register Pharmacy-Hub routes:', pharmacyHubError);
-    }
 
     // 27c. Register KPA Branch routes
     //      WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1

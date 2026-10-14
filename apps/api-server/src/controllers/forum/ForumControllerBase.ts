@@ -16,7 +16,7 @@ import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
 import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
-import { CATALOG_FORUM_STORAGE_CODES, communityKeyForServiceEntry } from '../../config/community-catalog.js';
+import { CATALOG_FORUM_STORAGE_CODES, communityKeyForForumStorageCode } from '../../config/community-catalog.js';
 
 /**
  * ForumControllerBase
@@ -69,7 +69,7 @@ export class ForumControllerBase {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
     const codes = this.getContextForumCodes(ctx);
     if (ctx.excludeScopedCommunities) {
-      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%' AND ${alias}.serviceCode NOT IN (:...ctxExcludedCommunityCodes)`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+      qb.andWhere(`${alias}.serviceCode NOT LIKE 'sf:%' AND ${alias}.serviceCode NOT LIKE 'community:%' AND ${alias}.serviceCode NOT LIKE 'funding:%' AND ${alias}.serviceCode NOT IN (:...ctxExcludedCommunityCodes)`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
       if (!codes) return;
     }
     if (codes) {
@@ -177,7 +177,7 @@ export class ForumControllerBase {
   ): void {
     const codes = this.getContextForumCodes(ctx);
     if (ctx?.excludeScopedCommunities) {
-      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = ${alias}.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
+      qb.andWhere(`EXISTS (SELECT 1 FROM forum_category_requests _public WHERE _public.id = ${alias}.forum_id AND _public.service_code NOT LIKE 'sf:%' AND _public.service_code NOT LIKE 'community:%' AND _public.service_code NOT LIKE 'funding:%' AND _public.service_code NOT IN (:...ctxExcludedCommunityCodes))`, { ctxExcludedCommunityCodes: CATALOG_FORUM_STORAGE_CODES });
     }
     if (!codes) return; // generic/admin route — 무필터 현행 유지
     if (!codes.length) { qb.andWhere('1 = 0'); return; }
@@ -235,7 +235,7 @@ export class ForumControllerBase {
     const codes = this.getContextForumCodes(ctx);
     if (ctx?.excludeScopedCommunities && forumId) {
       const rows = await AppDataSource.query(
-        `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code NOT LIKE 'sf:%' AND service_code NOT LIKE 'community:%' AND NOT (service_code = ANY($2::text[]))`, [forumId, CATALOG_FORUM_STORAGE_CODES],
+        `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code NOT LIKE 'sf:%' AND service_code NOT LIKE 'community:%' AND service_code NOT LIKE 'funding:%' AND NOT (service_code = ANY($2::text[]))`, [forumId, CATALOG_FORUM_STORAGE_CODES],
       );
       if (!rows.length) return false;
     }
@@ -353,13 +353,19 @@ export class ForumControllerBase {
       [forumId],
     );
     if (!forum || !forum.service_code) return false;
-    const legacyCommunityKey = communityKeyForServiceEntry(forum.service_code);
+    if (forum.service_code.startsWith('funding:')) {
+      if (!userId) return false;
+      const { resolveFundingAccess } = await import('../../services/funding/funding-access.js');
+      const funding = await resolveFundingAccess(AppDataSource, forum.service_code.slice('funding:'.length), userId);
+      return !!funding?.canRead && funding.forum?.id === forumId && (funding.creator || funding.operator);
+    }
+    const legacyCommunityKey = communityKeyForForumStorageCode(forum.service_code);
     if (userId && (/^(sf|community):/.test(forum.service_code) || legacyCommunityKey)) {
       const rows = legacyCommunityKey ? [{ key: legacyCommunityKey }] : await AppDataSource.query(
-        `SELECT community_key AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
+        `SELECT COALESCE(NULLIF(community_key, ''), 'business:' || key) AS key FROM semi_franchises WHERE 'sf:' || id::text = $1
          UNION ALL SELECT slug AS key FROM communities WHERE 'community:' || id::text = $1`, [forum.service_code],
       );
-      if (!rows[0]) return false;
+      if (typeof rows[0]?.key !== 'string' || !rows[0].key) return false;
       const { resolveCommunityWorkspace } = await import('../../services/community/community-workspace.service.js');
       const workspace = await resolveCommunityWorkspace(AppDataSource, { id: userId, roles: userRoles }, rows[0].key);
       if (workspace?.allowed && workspace.canManage) return true;
@@ -388,6 +394,11 @@ export class ForumControllerBase {
       [forumId],
     );
     if (!forum) return { allowed: true }; // 404 handled by caller
+    if (forum.service_code?.startsWith('funding:')) {
+      const { resolveFundingAccess } = await import('../../services/funding/funding-access.js');
+      const funding = await resolveFundingAccess(AppDataSource, forum.service_code.slice('funding:'.length), userId);
+      return { allowed: !!funding?.canRead && funding.forum?.id === forumId, forumType: 'closed' };
+    }
     if (!forum.forum_type || forum.forum_type !== 'closed') {
       return { allowed: true, forumType: forum.forum_type };
     }

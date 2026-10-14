@@ -69,9 +69,9 @@ describe('가입 가능한 서비스 — canonical 호스트 · Pharmacy-Hub 비
     }
   });
 
-  it('기존 Pharmacy-Hub 신청자의 상태 안내는 그대로 남는다', () => {
+  it('삭제 대상 Pharmacy-Hub는 기존 신청 상태도 대표 홈에서 제외한다', () => {
     const m = buildHomeEntryModel(user, data(CATALOG('pending')));
-    expect(m.statusItems.map((s) => s.id)).toContain('status:pharmacy-hub');
+    expect(m.statusItems.map((s) => s.id)).not.toContain('status:pharmacy-hub');
     expect(m.joinable.map((j) => j.id)).not.toContain('join:pharmacy-hub');
   });
 });

@@ -1,5 +1,7 @@
 # WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 ## 1. 목적
 
 Neture의 공급자 / 파트너 / 운영 관련 셸에 존재하는 인라인 Footer 3건이 법정정보와 약관 링크 계약에서 빠져 있는 문제를 정리한다.
@@ -624,7 +626,7 @@ Neture 공개 Footer 가 이미 쓰고 있다. **새로 만들 것이 없다.**
 
 ### G. §11.2 인증 — supplier/partner/operator 는 공개 route 가 아니다
 
-- 세 shell 모두 role guard 뒤에 있다. 계정은 CLAUDE.md §15 / `docs/local/TEST-ACCOUNTS.local.md` 를 따른다(Neture 공급자 smoke 계정 `renagang21`).
+- 세 shell 모두 role guard 뒤에 있다. 계정은 CLAUDE.md §15 / `docs/local/TEST-ACCOUNT.txt` 를 따른다(Neture 공급자 smoke 계정 `renagang21`).
 - 로그인 API 는 **serviceKey 가 없으면 401** 이다. UI 로그인은 항상 보내므로 문제되지 않지만 curl 검증 시 주의한다.
 - 진입 못 한 shell 은 **어느 것을 왜 못 했는지, 대신 무엇을 정적으로 확인했는지**를 CHECK 에 적는다(§11.2). 미검증을 PASS 로 쓰지 않는다.
 - 프로덕션 미배포면 preview smoke 와 production 미확인을 **구분해서** 적는다.

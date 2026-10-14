@@ -39,6 +39,9 @@ const IMPORT_COMMON = `${API}/modules/neture/services/product-import-common.serv
 const HANDOFF_SVC = `${API}/modules/neture/services/supplier-library-handoff.service.ts`;
 const CONTENT_SUBMIT = `${API}/routes/kpa/services/supplier-content.service.ts`;
 const RESOLVER = `${API}/modules/neture/middleware/supplier-context.resolver.ts`;
+const LIFECYCLE_SVC = 'apps/api-server/src/modules/neture/services/supplier-lifecycle.service.ts';
+const DIRECTORY_SVC = 'apps/api-server/src/modules/neture/services/supplier-directory.service.ts';
+const BUSINESS_SVC = `${API}/modules/neture/services/supplier-business.service.ts`;
 const SUPPLIER_SVC = `${API}/modules/neture/services/supplier.service.ts`;
 const BASELINE = 'docs/baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md';
 
@@ -100,6 +103,7 @@ describe('§2 Products — ProductMaster 는 플랫폼 SSOT', () => {
       `${API}/modules/neture/controllers/supplier-product-candidate.controller.ts`,
       `${API}/modules/neture/services/supplier-library-handoff.service.ts`,
       `${API}/modules/neture/services/supplier.service.ts`,
+      BUSINESS_SVC, LIFECYCLE_SVC, DIRECTORY_SVC,
     ]) {
       const body = stripComments(read(rel));
       for (const forbidden of ['openai', 'OpenAI', 'anthropic', 'Anthropic', 'gemini', 'generateContent']) {
@@ -114,7 +118,14 @@ describe('§2 Products — ProductMaster 는 플랫폼 SSOT', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§3 Distribution — distribution_type 은 파생 표기다', () => {
-  const offer = stripComments(read(OFFER_SVC));
+  const offer = [
+    OFFER_SVC,
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-registration.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-write.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'supplier-offer-distribution.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'offer-lifecycle.service.ts'),
+    OFFER_SVC.replace('offer.service.ts', 'offer-write-policy.ts'),
+  ].map((rel) => stripComments(read(rel))).join('\n');
 
   it('파생 규칙이 단일 함수로 존재한다', () => {
     expect(offer).toContain('function deriveDistributionType(');
@@ -143,7 +154,7 @@ describe('§3 Distribution — distribution_type 은 파생 표기다', () => {
   });
 
   it('PRIVATE 매장범위 축(allowed_seller_ids)은 살아 있다 — 은퇴시키지 않는다', () => {
-    const dash = read(`${API}/modules/neture/services/neture-dashboard.service.ts`);
+    const dash = read(`${API}/modules/neture/services/seller-dashboard.service.ts`);
     expect(dash).toContain('allowed_seller_ids');
   });
 });
@@ -241,7 +252,14 @@ describe('§6 Content — handoff 경계와 멱등성', () => {
 
 describe('§7 Programs — 3종은 의미가 다르다', () => {
   it('Event Offer 는 특가다 — 참여·예약·펀딩 런타임을 만들지 않는다', () => {
-    const page = stripComments(read(`${WEB}/pages/supplier/SupplierEventOfferPage.tsx`));
+    const page = stripComments([
+      'SupplierEventOfferPage.tsx',
+      'event-offer/useSupplierEventOffers.ts',
+      'event-offer/useEventOfferLists.ts',
+      'event-offer/useEventProposal.ts',
+      'event-offer/EventProposalModal.tsx',
+      'event-offer/presentation.ts',
+    ].map((file) => read(`${WEB}/pages/supplier/${file}`)).join('\n'));
     for (const forbidden of ['reservation', '예약', '구매의향', 'crowdfund']) {
       expect(page).not.toContain(forbidden);
     }
@@ -319,7 +337,7 @@ const LEGACY_USER_ID_LOOKUP_ALLOWLIST: Record<string, string> = {
   // ONBOARDING_BRIDGE — 가입 승인 멱등성(같은 가입자의 row 재생성 방지) · 운영자 가입 신청 목록 표시.
   [`${API}/modules/neture/services/operator-registration.service.ts`]: 'ONBOARDING_BRIDGE',
   // ONBOARDING_BRIDGE — registerSupplier 중복 신청 방지(같은 가입자). 인가 판정 아님.
-  [`${API}/modules/neture/services/supplier.service.ts`]: 'ONBOARDING_BRIDGE',
+  [LIFECYCLE_SVC]: 'ONBOARDING_BRIDGE',
   // OPERATOR_FILTER — owner membership 이 하나도 없는 organization 에만 legacy 로 fallback.
   [`${API}/routes/market-trial-operator.routes.ts`]: 'OPERATOR_FILTER',
 };
@@ -367,7 +385,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
 
   it('공급자 알림 수신자는 owner membership 집합이다 (legacy 단일 user_id 아님)', () => {
     for (const f of [
-      `${API}/modules/neture/services/neture-settlement.service.ts`,
+      `${API}/modules/neture/services/settlement-command.service.ts`,
       `${API}/modules/neture/services/offer-service-approval.service.ts`,
     ]) {
       expect(stripComments(read(f))).toContain('listSupplierOwnerUserIds(');
@@ -381,7 +399,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
     expect(reg).not.toMatch(/INSERT INTO neture_suppliers/);
     expect(reg).not.toContain('setOwner(');
 
-    const svc = stripComments(read(SUPPLIER_SVC));
+    const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
     expect(svc).toContain('await this.syncSupplierOrganization(supplier, { isActive: true });');
     // owner 는 공급자 신청 본인이다 — 승인 운영자(approvedBy)를 owner 로 넣지 않는다.
     expect(svc).toContain('organizationOpsService.setOwner(orgId, supplier.userId)');
@@ -394,7 +412,7 @@ describe('§8-b Identity runtime 전수 — legacy user_id 로 공급자를 고�
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§9 Business Profile — Organization 이 SSOT', () => {
-  const svc = stripComments(read(SUPPLIER_SVC));
+  const svc = stripComments(read(SUPPLIER_SVC) + read(BUSINESS_SVC) + read(LIFECYCLE_SVC) + read(DIRECTORY_SVC));
 
   it('Supplier profile 이 users.businessInfo 를 read/write 하지 않는다', () => {
     expect(svc).not.toContain('businessInfo');

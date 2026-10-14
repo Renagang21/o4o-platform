@@ -117,25 +117,3 @@ describe('cms_contents lifecycle 은 서버 계약을 미러링한다 (§3·§4)
     });
   });
 });
-
-describe('PharmacyHub 채택 (§4)', () => {
-  const ph = read('services/web-pharmacy-hub/src/pages/operator/ResourcesPage.tsx');
-
-  it('PH 자료실은 공통 console 을 소비한다 (전용 사본 폐기)', () => {
-    expect(ph).toContain('OperatorResourcesConsolePage');
-    expect(ph).toContain('CMS_CONTENTS_RESOURCES_LIFECYCLE');
-  });
-
-  it('PH 페이지에 표/상태 사본이 남아있지 않다', () => {
-    const src = stripComments(ph);
-    expect(src).not.toContain('DataTable');
-    expect(src).not.toContain('STATUS_LABEL');
-    expect(src).not.toContain('NEXT_STATUSES');
-  });
-
-  it('PH 공지·뉴스 관리는 공통 CmsContentManager 를 소비한다', () => {
-    const content = read('services/web-pharmacy-hub/src/pages/operator/ContentPage.tsx');
-    expect(content).toContain('CmsContentManager');
-    expect(content).toContain('/api/v1/pharmacy-hub');
-  });
-});

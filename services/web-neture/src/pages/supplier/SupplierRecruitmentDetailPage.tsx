@@ -190,10 +190,10 @@ export default function SupplierRecruitmentDetailPage() {
           <div><div className="text-xs text-slate-400">상태</div><div className="text-slate-700">{r.status === 'recruiting' ? '모집중' : '마감'}</div></div>
           {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1 */}
           <div>
-            <div className="text-xs text-slate-400">노출 승인</div>
+            <div className="text-xs text-slate-400">게시 구분</div>
             <div className="mt-0.5">
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${(EXPOSURE_BADGE[r.exposureStatus] || { cls: 'bg-gray-100 text-gray-600' }).cls}`}>
-                {(EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus }).label}
+                {r.recruitmentKind === 'public' ? '일반 공개 · 즉시 게시' : (EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus }).label}
               </span>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function SupplierRecruitmentDetailPage() {
         </div>
 
         {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 노출 상태별 안내 (공급자 조회 전용 — 변경 불가) */}
-        {EXPOSURE_NOTICE[r.exposureStatus] && (
+        {r.recruitmentKind !== 'public' && EXPOSURE_NOTICE[r.exposureStatus] && (
           <div className={`mt-3 text-xs rounded border px-2.5 py-2 ${EXPOSURE_NOTICE[r.exposureStatus].cls}`}>
             {EXPOSURE_NOTICE[r.exposureStatus].text}
             {r.exposureStatus === 'rejected' && (

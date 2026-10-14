@@ -59,7 +59,6 @@ const AR = `${REGION}-docker.pkg.dev/${PROJECT_ID}/o4o-api`;
 const WEB_CLOUD_RUN = {
   neture: 'neture-web',
   'kpa-society': 'kpa-society-web',
-  'pharmacy-hub': 'pharmacy-hub-web',
   lecture: 'lecture-web',
   store: 'store-web',
   'kpa-branch': 'kpa-branch-web',

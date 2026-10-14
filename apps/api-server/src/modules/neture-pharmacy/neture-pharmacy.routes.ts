@@ -1,3 +1,4 @@
+import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 import multer from 'multer';
 import { BusinessRegistrationDocumentService } from './services/business-registration-document.service.js';
 /**
@@ -20,7 +21,7 @@ import { requireNetureMainMembership } from '../../middleware/neture-main-member
 import { requireRole } from '../../middleware/auth.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
-import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
+import { createPharmacyStoreAccess } from './pharmacy-store-access.js';
 import { createRequireActiveSupplier } from '../neture/middleware/neture-identity.middleware.js';
 import { checkoutService } from '../../services/checkout.service.js';
 import { EventOfferService } from '../../routes/kpa/services/event-offer.service.js';
@@ -38,6 +39,7 @@ import {
   type MembershipAction,
   type SupplyKind,
 } from './constants.js';
+import { getBusinessInfo } from './services/business-info.js';
 import { PharmacyMembershipService } from './services/pharmacy-membership.service.js';
 import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provisioner.js';
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
@@ -63,7 +65,7 @@ function handle(fn: Handler): RequestHandler {
       const data = await fn(req as Req, res);
       if (!res.headersSent) res.json({ success: true, data });
     } catch (err) {
-      if (err instanceof NeturePharmacyError) {
+      if (err instanceof NeturePharmacyError || err instanceof PolicyAcceptanceError) {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
         return;
       }
@@ -112,7 +114,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   });
 
   const mainAccess = requireNetureMainMembership(dataSource);
-  const store = [requireAuth, mainAccess, createRequireStoreOwner(dataSource, 'kpa')] as RequestHandler[];
+  const store = [requireAuth, createPharmacyStoreAccess(dataSource)] as RequestHandler[];
   const operator = [requireAuth, requireNetureScope('neture:operator') as RequestHandler];
   const admin = [requireAuth, requireRole(['platform:super_admin']) as RequestHandler];
   const supplier = [requireAuth, mainAccess, createRequireActiveSupplier(dataSource) as RequestHandler];
@@ -171,6 +173,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
     paymentMode: payments.mode(),
   })));
 
+  // Application surface: authentication only; membership still gates every business resource.
+  router.get('/pharmacy/businesses/:key', requireAuth, handle(async (req) => getBusinessInfo(dataSource, req.params.key)));
   router.get('/pharmacy/semi-franchises', ...store, handle(async (req) => semiFranchises.listForPharmacy(org(req))));
   router.post('/pharmacy/semi-franchises/:key/apply', ...store, handle(async (req) =>
     semiFranchises.apply(org(req), req.user!.id, req.params.key, req.body ?? {})));

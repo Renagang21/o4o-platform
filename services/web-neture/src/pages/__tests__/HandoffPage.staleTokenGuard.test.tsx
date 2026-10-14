@@ -48,7 +48,7 @@ describe('HandoffPage stale-token guard 실행 순서', () => {
     // jsdom 의 location 은 대체 불가 → 필요한 필드만 가진 객체로 바꾼다.
     Object.defineProperty(window, 'location', {
       configurable: true,
-      value: { search: '?token=h-1&returnTo=/store', replace, href: 'https://neture.test/handoff' },
+      value: { origin: 'https://neture.test', search: '?token=h-1&returnTo=/store', replace, href: 'https://neture.test/handoff' },
     });
     fetchMock = vi.fn(async () => {
       storageAtExchange = { at: localStorage.getItem(AT), rt: localStorage.getItem(RT) };
@@ -73,7 +73,7 @@ describe('HandoffPage stale-token guard 실행 순서', () => {
       </AuthProvider>,
     );
 
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/store'));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('https://neture.test/store'));
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String((fetchMock.mock.calls[0] as unknown[])[0])).toContain('/api/v1/auth/handoff/exchange');

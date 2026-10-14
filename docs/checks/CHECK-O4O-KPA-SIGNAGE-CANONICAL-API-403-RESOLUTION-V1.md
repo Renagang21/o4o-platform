@@ -1,5 +1,7 @@
 # CHECK-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1`
 - **작업일**: 2026-08-19
 - **브랜치/워크트리**: `work/kpa-signage-403` (base `852ff2060`, 별도 worktree)
@@ -27,7 +29,7 @@ KPA signage 프론트 3개 화면이 `X-Organization-Id` 로 **약사회 회원 
 
 | 항목 | 값 |
 |---|---|
-| 계정 | KPA 약국 경영자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md`, 자격증명 미기재) |
+| 계정 | KPA 약국 경영자 테스트 계정 (`docs/local/TEST-ACCOUNT.txt`, 자격증명 미기재) |
 | 로그인 | `POST /api/v1/auth/login` · `serviceKey='kpa-society'` · 200 · 인증은 httpOnly cookie(`accessToken`/`refreshToken`) |
 | roles | `kpa:store_owner`, `cosmetics:store_owner`, `pharmacy-hub:store_owner`, `lms:instructor` 외 |
 | service_memberships | `kpa-society=active`, `platform=active`, `pharmacy-hub=active`, `k-cosmetics=active`, `neture=active`, `kpa-branch=active` |

@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { authClient } from '@o4o/auth-client';
-import { useAuthStore } from '@/stores/authStore';
+import { adminAuthClient } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 
 /**
@@ -38,54 +37,6 @@ class UnifiedApiClient {
   }
 
   private setupInterceptors() {
-    // Request interceptor
-    this.client.interceptors.request.use(
-      (config) => {
-        // Get token from multiple sources
-        const token = this.getAuthToken();
-
-        // Decode JWT token to check expiration
-        let tokenInfo = null;
-        if (token) {
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const now = Math.floor(Date.now() / 1000);
-            tokenInfo = {
-              exp: payload.exp,
-              iat: payload.iat,
-              userId: payload.sub || payload.userId,
-              isExpired: payload.exp ? payload.exp < now : false,
-              expiresIn: payload.exp ? payload.exp - now : null
-            };
-          } catch (e) {
-            tokenInfo = { error: 'Failed to decode token' };
-          }
-        }
-
-        // Debug logging disabled for production
-        // console.log('[UnifiedAPI] Request:', {
-        //   url: config.url,
-        //   method: config.method,
-        //   hasToken: !!token,
-        //   tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
-        //   tokenInfo
-        // });
-
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-
-        // Dev environment logging
-        // if (import.meta.env.DEV) {
-        // }
-
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-
     // Response interceptor
     this.client.interceptors.response.use(
       (response) => {
@@ -94,58 +45,19 @@ class UnifiedApiClient {
         return response;
       },
       async (error: AxiosError) => {
-        // 세션 이탈 방지: 401 을 곧바로 로그아웃으로 확정하지 않는다.
-        //   이 클라이언트는 canonical authClient 와 달리 refresh 절차가 없어,
-        //   하드 이동(window.location) 직후 access token 만 만료된 상태에서도
-        //   즉시 localStorage 를 비우고 /login 으로 튕겼다.
-        //   (useAdminMenu 가 매 페이지 로드마다 이 클라이언트를 호출한다.)
-        //   → cookie 기반 refresh 를 1회 시도하고, 실패했을 때만 기존 처리로 넘긴다.
-        const originalRequest = error.config as any;
-        if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-          originalRequest._retry = true;
+        // Preserve legacy /api routes but delegate authentication to the provider's
+        // cookie client. Its refresh queue/generation owns failures and late responses.
+        const originalRequest = error.config;
+        if (error.response?.status === 401 && originalRequest) {
           try {
-            await authClient.api.post('/auth/refresh', {});
-            return await this.client.request(originalRequest);
-          } catch {
-            // refresh 실패 → 아래 공통 처리(로그아웃)로 진행
+            return await adminAuthClient.api.request({ ...originalRequest, baseURL: this.baseURL });
+          } catch (failure) {
+            return this.handleError(failure as AxiosError);
           }
         }
         return this.handleError(error);
       }
     );
-  }
-
-  private getAuthToken(): string | null {
-    // Check multiple token sources
-    let token = useAuthStore.getState().token;
-    
-    if (!token) {
-      token = localStorage.getItem('authToken');
-    }
-    
-    if (!token) {
-      token = localStorage.getItem('accessToken');
-    }
-    
-    if (!token) {
-      token = localStorage.getItem('token');
-    }
-    
-    if (!token) {
-      const adminStorage = localStorage.getItem('admin-auth-storage');
-      if (adminStorage) {
-        try {
-          const parsed = JSON.parse(adminStorage);
-          if (parsed.state?.token) {
-            token = parsed.state.token;
-          }
-        } catch {
-          // Failed to parse
-        }
-      }
-    }
-    
-    return token;
   }
 
   private handleError(error: AxiosError): Promise<never> {
@@ -161,7 +73,7 @@ class UnifiedApiClient {
 
     switch (status) {
       case 401:
-        this.handleUnauthorized();
+        toast.error('인증이 만료되었습니다. 다시 로그인해 주세요.');
         break;
       case 403:
         toast.error('접근 권한이 없습니다.');
@@ -184,25 +96,6 @@ class UnifiedApiClient {
     }
 
     return Promise.reject(error);
-  }
-
-  private handleUnauthorized() {
-    const currentPath = window.location.pathname;
-
-    // Don't block - just show error
-    toast.error('인증이 만료되었습니다.');
-
-    setTimeout(() => {
-      if (currentPath !== '/login') {
-        // Clear all auth data
-        localStorage.removeItem('auth-storage');
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('admin-auth-storage');
-
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
-      }
-    }, 100);
   }
 
   // Versioned API methods
@@ -289,7 +182,7 @@ class UnifiedApiClient {
   // Auth API
   auth = {
     login: (credentials: any) => this.client.post(this.v1('/auth/login'), credentials),
-    logout: () => this.client.post(this.v1('/auth/logout')),
+    logout: () => adminAuthClient.logout(),
     register: (data: any) => this.client.post(this.v1('/auth/register'), data),
     me: () => this.client.get(this.v1('/auth/me')),
     refresh: () => this.client.post(this.v1('/auth/refresh')),

@@ -1,5 +1,10 @@
 # O4O-SUPPLIER-DOMAIN-BOUNDARY-V1
 
+> **본문 전체 PH 부분 폐기 우선순위 (2026-10-11 · #427):** [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md)은 이 문서의 모든 절·표·코드 예시·불변식·후속 계획·최종 판정에 있는 PharmacyHub/PH 전용 유지·확장 계약을 대체한다. 개별 절의 표기는 이를 다시 명시한 것이며 표기가 없는 다른 PH 지시도 현행 운영/구현 의무가 아니다. 다른 서비스·공통 Core/Freeze·인쇄 QR 연결과 법정 보유 판단은 그대로다.
+
+
+> **2026-10-10 용어 정비**: 현행 사업 명칭은 **약국 협력사업**이다. 내부 식별자·가입/승인·주문 계약과 과거 실행 결과는 유지한다. 대표 홈의 탐색 분류·준비 중 노출은 [서비스 탐색 정본](O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 이 갱신은 화면 구현·배포 완료를 뜻하지 않는다.
+
 > **상태**: Active · **FROZEN ARCHITECTURE** — 구조 변경은 명시적 WO 필수 (버그 수정 · 성능 · 문서 · 테스트는 허용)
 > **근거 WO**: [`WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1`](../work-orders/WO-O4O-SUPPLIER-DOMAIN-SCOPE-FREEZE-AND-FINAL-REALIGNMENT-V1.md)
 > **소스 계약**: `apps/api-server/src/__tests__/supplier-domain-boundary.spec.ts`
@@ -78,6 +83,9 @@ Supplier
 
 ## 4. Distribution 판정 SSOT
 
+> **PH 전용 판정 부분 대체 (2026-10-11 · #427):** 이 절의 PharmacyHub 운영·가입·role·공급/결제·공통화/parity·호환 보존 판정은 [완전 폐기 정책](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 1~6항으로 대체한다. PH는 복구/발급/확장 대상이 아니며 전용 자원·데이터는 귀속/FK·법정 보유 확인 후 제거한다. 인쇄 QR 연결과 공용·Neture 데이터 및 이 절의 다른 서비스/Common/Core/Freeze 계약은 유지한다. 아래 PH 표기는 폐기 전 구조·구현 이력이며 현행 운영 의무가 아니다.
+
+
 > **Supplier 가 고른 노출 범위(`is_public` · `service_keys` · `allowed_seller_ids`)에 필요한 서비스 운영자의 승인(`offer_service_approvals`)이 더해져 공급 가능이 결정된다.**
 
 | 필드 | 성격 | 의미 |
@@ -95,8 +103,8 @@ Supplier
 물리 컬럼 DROP 은 이 경계의 완료 조건이 아니다.
 
 **예외 — Neture 약국 매장 흐름 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 명시 WO)**
-- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 세미프랜차이즈 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
-- 세미프랜차이즈별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
+- 공급처를 지정하지 않은(`service_keys` 비어 있음 · OSA 0행) 제품의 `approval_status` 는 Neture 운영자의 **제품 등록 승인**이 직접 기록한다(파생 불가였던 결함 해소). 이 제품은 `pharmacy` 약국 협력사업 기본 공급 대상이다. OSA 행이 있는 제품은 위 파생 규칙 그대로다.
+- 약국 협력사업별 공급 승인 · 가격은 `supply_proposals`(SPO 하위 복수 제안 — 가격 · 대상 · 승인만, 설명 · 재고는 SPO)가 맡는다. SPO `(master_id, supplier_id)` UNIQUE 는 유지한다.
 - Neture 약국 흐름의 이용 판정은 이 절의 축(`is_public` · `service_keys` · `allowed_seller_ids` · OSA)을 AND 로 더하지 않고 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §4 SSOT 로 대체한다. 이 축들과 다른 서비스 흐름은 보존한다.
 
 ---

@@ -12,11 +12,6 @@ export const SERVICE_KEYS = [
   'platform',
   'kpa',
   'neture',
-  'cosmetics',
-  // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
-  //   role prefix 이자 canonical service_key 가 동일한 서비스('pharmacy-hub').
-  //   backend 는 이미 role·scope guard·Membership 을 갖추고 있었고 이 카탈로그만 비어 있었다.
-  'pharmacy-hub',
   'lecture',
   // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
   //   약사회 분회 서비스. role prefix = canonical service_key = 'kpa-branch' (security-core self-map).
@@ -24,8 +19,7 @@ export const SERVICE_KEYS = [
   'kpa-branch',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1:
   //   커뮤니티 서비스. role prefix = canonical service_key = 'community' (security-core self-map).
-  //   지정 가능한 역할은 `community:admin` **하나**다 — 개별 커뮤니티 운영은 개체 역할
-  //   (`community_memberships.role='operator'`)이며 서비스 전역 operator 를 만들지 않았다.
+  // 서비스 Admin/Operator와 개별 커뮤니티 membership 운영자는 별도 권한이다.
   'community',
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §4 — 서브도메인 전체 운영자 범위 분리.
   'supplier',
@@ -44,8 +38,6 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   platform: { key: 'platform', label: 'Platform', badgeClass: 'text-red-700 bg-red-50' },
   kpa: { key: 'kpa', label: 'KPA', badgeClass: 'text-blue-700 bg-blue-50' },
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
-  cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
-  'pharmacy-hub': { key: 'pharmacy-hub', label: 'Pharmacy-Hub', badgeClass: 'text-teal-700 bg-teal-50' },
   lecture: { key: 'lecture', label: 'O4O 강의', badgeClass: 'text-violet-700 bg-violet-50' },
   'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
   community: { key: 'community', label: '커뮤니티', badgeClass: 'text-emerald-700 bg-emerald-50' },
@@ -148,7 +140,7 @@ export function isOperatorRole(raw: string): boolean {
  *
  * WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
  *   - Platform 은 super_admin role 의 namespace 로만 의미가 있어 운영자 필터 옵션에서 제외.
- *   - canonical 운영 서비스: KPA / Neture / K-Cosmetics
+ *   - canonical 운영 서비스: KPA / Neture / O4O 강의
  *
  */
 const EXCLUDED_FROM_FACET: ReadonlySet<ServiceKey> = new Set(['platform']);

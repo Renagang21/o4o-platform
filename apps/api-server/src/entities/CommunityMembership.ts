@@ -11,8 +11,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
  * 서비스 전체 역할(`community:admin`)과 다른 축이다. 개설 승인으로 첫 운영자가 될 때
  * 여기 행만 만들고 서비스 전체 역할은 주지 않는다(§3-3-2).
  */
-export type CommunityMemberRole = 'operator' | 'member';
-export type CommunityMemberStatus = 'pending' | 'active' | 'rejected' | 'withdrawn';
+export type CommunityMemberRole = 'admin' | 'operator' | 'member';
+export type CommunityMemberStatus = 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
 
 @Entity('community_memberships')
 @Index(['communityId', 'userId'], { unique: true })

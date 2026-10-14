@@ -15,7 +15,8 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import type { StoreAddress } from '../../../types/store-address.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
@@ -71,7 +72,7 @@ export function createPharmacyInfoController(
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
-  const requireStoreOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requireStoreOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // ─── GET /info — 약국 기본 정보 조회 ─────────────────────
   router.get('/info', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {

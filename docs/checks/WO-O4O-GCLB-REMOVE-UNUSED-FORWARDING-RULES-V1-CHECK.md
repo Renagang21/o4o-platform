@@ -1,5 +1,7 @@
 # WO-O4O-GCLB-REMOVE-UNUSED-FORWARDING-RULES-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **작업일**: 2026-08-19 (삭제 실행 03:30:16 / 03:30:34 UTC)
 - **프로젝트**: `netureyoutube` (display name `neture-services`)
 - **선행 문서**: [WO-O4O-GCLB-FORWARDING-RULE-STATIC-IP-CENSUS-V1-CHECK.md](WO-O4O-GCLB-FORWARDING-RULE-STATIC-IP-CENSUS-V1-CHECK.md)
@@ -181,7 +183,7 @@ static IP 관련 후속 삭제 후보 **없음**.
 | `o4o-core-api` Ready | ✅ |
 | `GET /health` | **200** |
 | `GET /health/database` | **healthy** (PostgreSQL 15.17, pingMs 2, activeConnections 10, longRunningQueries 0) |
-| 로그인 smoke | **200 · `success: true`** (`POST /api/v1/auth/login`, `serviceKey: neture`, 계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT) |
+| 로그인 smoke | **200 · `success: true`** (`POST /api/v1/auth/login`, `serviceKey: neture`, 계정은 `docs/local/TEST-ACCOUNT.txt` SSOT) |
 | TLS / redirect error | 0 |
 | LB connection 관련 신규 5xx | **0** — LB 로그의 503 2건은 §7 의 **본 검증용 curl 이 삭제된 IP 를 친 것**(`retriable_error`) |
 

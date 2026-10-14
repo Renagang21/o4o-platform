@@ -11,17 +11,7 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-// Add auth token to requests
-apiClient.interceptors.request.use((config) => {
-  // Try multiple keys for backward compatibility
-  const token = localStorage.getItem('accessToken') || 
-                localStorage.getItem('token') || 
-                localStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Cookie authentication is the sole credential source for the whole-platform admin.
 
 // Handle auth errors
 apiClient.interceptors.response.use(

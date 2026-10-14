@@ -1,5 +1,7 @@
 # CHECK-O4O-BUSINESS-CONTACT-FIELDS-BUNDLE-DEPLOY-SMOKE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **작업명:** O4O 사업자 기본정보/연락처 정비 묶음 배포 스모크
 > **유형:** 배포(force dispatch) + 운영 브라우저 스모크(Playwright headless, 프로덕션). 코드 변경 0(본 문서 docs-only).
 > **결과: PASS — 5개 서비스(web 4 + api) 강제 배포 success(skip 0). 4서비스 가입 화면 + 3서비스 정보수정 화면 연락처 필드 정상 렌더·조회·수정. console/page/연락처-API 에러 0. Neture role=store_owner 400 차단 확인.**
@@ -78,7 +80,7 @@ console error / page error / 연락처-API 4xx·5xx = **전 서비스 0**.
 ## 9. 검증 방식 / 비범위
 
 - 검증: gh/gcloud 배포 확인 + 프로덕션 read-only API + Playwright headless(chromium) 렌더/로그 수집. 운영 데이터 변경 0(가입 제출·저장 미실행 — 렌더/조회만, 정보수정도 저장 미클릭).
-- 자격증명: SSOT(`docs/local/TEST-ACCOUNTS.local.md`) env 주입 — 로그/문서 미출력.
+- 자격증명: SSOT(`docs/local/TEST-ACCOUNT.txt`) env 주입 — 로그/문서 미출력.
 - 비범위: 코드 수정 / K-Cosmetics store-dashboard 500 수정 / Neture supplier profile surfacing / operator 표시 / 배포 외 기능 변경.
 
 ---

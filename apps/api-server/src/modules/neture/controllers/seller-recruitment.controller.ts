@@ -27,7 +27,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import type { SellerRecruitmentService } from '../services/seller-recruitment.service.js';
-import { RecruitmentStatus, ExposureStatus } from '../entities/index.js';
+import { RecruitmentStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
@@ -47,14 +47,14 @@ export function createSellerRecruitmentController(deps: {
 
   /**
    * GET /recruitments — 모집 목록 (public browse)
-   * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: exposureStatus=APPROVED 강제, serviceKey scope(query)
+   * 일반 공개 모집만 반환. 세미프랜차이즈 모집은 매장 문맥에서 승인·가입을 확인한다.
    */
   router.get('/recruitments', async (req: Request, res: Response) => {
     try {
       const { status, serviceKey } = req.query;
-      const filters: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus } = {
-        // public browse 는 노출 승인된 모집만 — serviceKey 누락 시에도 미승인 모집은 절대 노출 금지
-        exposureStatus: ExposureStatus.APPROVED,
+      const filters: { status?: RecruitmentStatus; serviceKey?: string; publicOnly?: boolean } = {
+        // 일반 공개 모집은 운영자의 노출 승인 없이 게시된다.
+        publicOnly: true,
       };
       if (status && typeof status === 'string') filters.status = status as RecruitmentStatus;
       if (serviceKey && typeof serviceKey === 'string') filters.serviceKey = serviceKey;

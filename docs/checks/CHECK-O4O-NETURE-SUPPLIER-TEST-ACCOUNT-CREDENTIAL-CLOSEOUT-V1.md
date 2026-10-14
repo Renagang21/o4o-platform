@@ -1,10 +1,12 @@
 # CHECK-O4O-NETURE-SUPPLIER-TEST-ACCOUNT-CREDENTIAL-CLOSEOUT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-NETURE-SUPPLIER-TEST-ACCOUNT-CREDENTIAL-CLOSEOUT-V1`
 - **작성일**: 2026-08-12
 - **판정**: **PASS** — 비밀번호 갱신 불필요. 원인은 자격증명이 아니라 **로그인 호출 방식(`serviceKey` 누락)** 이었다.
 
-> 비밀번호 원문은 이 문서에 기록하지 않는다. SSOT 는 `docs/local/TEST-ACCOUNTS.local.md` (git 미추적).
+> 비밀번호 원문은 이 문서에 기록하지 않는다. SSOT 는 `docs/local/TEST-ACCOUNT.txt` (git 미추적).
 
 ---
 
@@ -30,7 +32,7 @@
 | `serviceKey` 있음 + row 없음 | `users.password` (V1 fallback) |
 | **`serviceKey` 없음** | `users.password` (V1 fallback) |
 
-`docs/local/TEST-ACCOUNTS.local.md` 의 비밀번호는 **서비스별 credential** 값이다.
+`docs/local/TEST-ACCOUNT.txt` 의 비밀번호는 **서비스별 credential** 값이다.
 직전 WO 에서 `serviceKey` 없이 `POST /api/v1/auth/login` 을 호출했기 때문에 `users.password` 와
 대조되어 401 `INVALID_CREDENTIALS` 가 났다. **계정·비밀번호 문제가 아니었다.**
 
@@ -100,7 +102,7 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 
 ## 7. 로컬 문서 갱신 여부
 
-`docs/local/TEST-ACCOUNTS.local.md` (git 미추적) 갱신:
+`docs/local/TEST-ACCOUNT.txt` (git 미추적) 갱신:
 
 - 직전 WO 가 남긴 "비밀번호 불일치" 메모를 **오해로 정정**
 - `serviceKey` 필수 규칙과 검증 대상 해시 표, curl 예시(❌/✅) 추가

@@ -1,10 +1,11 @@
+import { communityMemberPage, type CommunityMemberListOptions, type CommunityMemberPage } from './communityMemberList';
 /**
  * 커뮤니티 서비스 관리자(`community:admin`) API — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1
  *
- * Admin 은 서비스 운영자(`community:admin`)만 지정한다. 그 이후의
+ * Admin은 서비스 Admin/Operator를 지정한다. 그 이후의
  *   - 커뮤니티 개설 신청 심사(`/communities/requests*`)
  *   - 개별 커뮤니티 운영자 지정·해제(`/communities/admin/communities*`) — 그 커뮤니티의 승인된 회원 중에서
- * 는 커뮤니티 서비스 운영자가 이 화면에서 한다. 실제 경계는 backend `requireCommunityServiceScope('community:admin')`.
+ * 는 커뮤니티 서비스 운영자가 이 화면에서 한다. 개설 심사는 서비스 Admin/Operator, 개별 운영자 지정은 서비스 Admin만 허용하며 실제 경계는 backend가 판정한다.
  *
  * 조회 실패를 빈 목록으로 삼키지 않는다: 실패는 throw 하고 화면이 오류 상태를 표시한다.
  */
@@ -36,8 +37,15 @@ export interface CommunityMemberRow {
   userId: string;
   name: string | null;
   email: string | null;
-  role: 'operator' | 'member';
+  role: 'admin' | 'operator' | 'member';
   serviceMembershipStatus: string | null;
+  membershipStatus: string;
+  /** 이전 API 응답에는 없을 수 있다. 누락 시 화면은 승격을 차단한다. */
+  designationEligibility?: {
+    eligible: boolean;
+    code: string | null;
+    message: string | null;
+  };
 }
 
 export async function listCreationRequests(): Promise<CommunityCreationRequestRow[]> {
@@ -61,19 +69,20 @@ export async function listAdminCommunities(): Promise<CommunityAdminRow[]> {
   return res.data?.data?.communities ?? [];
 }
 
-export async function listCommunityMembers(communityId: string): Promise<CommunityMemberRow[]> {
-  const res = await api.get(`${BASE}/admin/communities/${encodeURIComponent(communityId)}/members`);
-  return res.data?.data?.members ?? [];
+export async function listCommunityMembers(communityId: string, options: CommunityMemberListOptions = {}): Promise<CommunityMemberPage<CommunityMemberRow>> {
+  const res = await api.get(`${BASE}/admin/communities/${encodeURIComponent(communityId)}/members`, { params: options });
+  return communityMemberPage<CommunityMemberRow>(res.data?.data?.members ?? [], res.data?.data?.pagination);
 }
 
 export async function setCommunityMemberRole(
   communityId: string,
   membershipId: string,
-  role: 'operator' | 'member',
+  role: 'admin' | 'operator' | 'member',
+  reason: string,
 ): Promise<void> {
   await api.post(
     `${BASE}/admin/communities/${encodeURIComponent(communityId)}/members/${encodeURIComponent(membershipId)}/role`,
-    { role },
+    { role, reason },
   );
 }
 

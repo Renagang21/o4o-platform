@@ -1,5 +1,7 @@
 # IR-O4O-DEVELOPMENT-ENVIRONMENT-CURRENT-STATE-AND-BOUNDARY-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **유형**: 읽기 전용 조사 (read-only) — 코드/문서/설정/DB **무변경**. 본 IR 문서 1건만 생성.
 > **목적**: 현재 저장소에 남아 있는 개발환경·AI 작업환경 과제를 좁히고, **지금 정비할 것**과 **전반 리팩터링 이후로 미룰 것**을 분리한다.
 > **범위 조정**: 직전 커밋 `efcd54f8a`에서 이미 해결된 환경문서 문제는 **재조사하지 않는다**. AI 작업환경 경계 · build/검증 기준 · 잔존 문서 · 자동화 스크립트에 집중한다.
@@ -83,7 +85,7 @@
   .env.example (루트, 추적)      : 공통 예제
   apps/api-server/env.example    : API 서버 예제 (PostgreSQL, DB_*)
   .env / .env.local / ... : .gitignore 85-90 로 전부 미추적
-  docs/local/*.local.md   : .gitignore 139 로 미추적 (TEST-ACCOUNTS.local.md, mfds-api-key.local.md)
+  docs/local/*.local.md   : .gitignore 139 로 미추적 (TEST-ACCOUNT.txt, mfds-api-key.local.md)
 
 [Claude Code]
   CLAUDE.md (추적, 470L) — 헌법

@@ -204,7 +204,7 @@ requireCommunityScope(level)
 |---|---|
 | **중간 판정 (폐기)** | `supplier` · `funding` 키를 만들지 않고 `neture` 재사용 |
 | **그 근거였던 실측** | ① FROZEN [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §7 이 `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers` 를 canonical authorization 으로 고정 ② `funding` 운영자 가드 = `requireNetureScope('neture:operator')`. 두 관찰 자체는 **사실이다** |
-| **왜 틀렸는가** | 두 사실은 "**이 사용자가 어느 공급자 조직을 소유하는가**" 에 답한다. 요구사항은 "**누가 그 서브도메인 영역을 운영하는가**" 다. 서로 다른 질문인데 하나로 묶어 "기존 축으로 충분" 이라 읽었다. 조직 소유권 검사가 있다는 사실은 서브도메인 전체 운영자 권한을 구분하지 않아도 된다는 뜻이 아니다 |
+| **왜 틀렸는가** | 두 사실은 "**이 사용자가 어느 공급자 조직을 소유하는가**" 에 답한다. 요구사항은 "**누가 그 서브도메인 영역을 운영하는가**" 다. 서로 다른 질문인데 하나로 묶어 "기존 축으로 충분" 이라 읽었다. 조직 소유권 검사가 있다는 사실은 서비스 관리자(admin) 권한을 구분하지 않아도 된다는 뜻이 아니다 |
 | **FROZEN 과 충돌하지 않는 이유** | 새 키는 조직 소유권 관계를 **대체하지 않는다.** `neture-identity.middleware` 와 `organization_members` 는 그대로다. 추가되는 것은 운영자측 경계뿐이므로 같은 질문에 답이 둘이 되는 상황(= 인가 축 분열)이 아니다 |
 | **최종 판정** | `supplier` · `funding` · `community` **3키 신설** + 각 `:admin` · `:operator` |
 | **전환 영향** | `/suppliers/*` 운영자 9경로가 `neture:admin` → `supplier:admin`, market-trial 운영자 라우터가 `neture:operator` → `funding:operator` 로 바뀐다. **기존 `neture:*` 보유자는 이 두 영역 접근을 잃는다** — 배포 전후로 새 역할을 부여해야 한다. `platform:super_admin` 은 platformBypass 로 계속 통과하므로 전면 잠금은 발생하지 않는다 |
@@ -234,7 +234,7 @@ branch_creation_requests  id · requester_user_id · desired_slug · desired_hos
                           · status(pending|approved|rejected|slug_conflict) · reviewed_by · reason
 ```
 
-- 승인 주체: **`kpa-branch:admin`** — `kpa.neture.co.kr` **서브도메인 전체 운영자**.
+- 승인 주체: **`kpa-branch:admin`** — `kpa.neture.co.kr` **서비스 관리자(admin)**.
   기존 super_admin 전용 `POST /admin/branches` 는 **남긴다**(플랫폼 경로).
 
   > **`kpa-branch:operator` 로 열면 안 된다(실측).** 이 역할은 **서비스 전역 역할**이고,

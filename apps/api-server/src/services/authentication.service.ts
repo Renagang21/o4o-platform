@@ -24,8 +24,8 @@ import { AuthGuestService } from './auth/auth-guest.service.js';
  * - Guest token issuance
  *
  * WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
- *   로그인 자체는 Google 경로(GoogleAuthController)가 수행하고, 이 서비스는
- *   그 뒤의 토큰·세션 축만 담당한다. password / password reset 축은 존재하지 않는다.
+ *   이 facade는 토큰·세션 축을 담당한다. 로그인/가입은 각 provider 서비스,
+ *   이메일 확인·비밀번호 복구는 EmailAuthService가 담당한다.
  *
  * DO NOT use:
  * - AuthService (DEPRECATED)
@@ -74,12 +74,12 @@ export class AuthenticationService {
    *   `serviceKey` 는 **요청 origin 에서 파생**된 값이다(클라이언트 입력 아님).
    *   없으면 서버측 무효화를 하지 않는다 — 범위를 모르는 채 전역으로 넓히지 않는다.
    */
-  async logout(userId: string, serviceKey?: string | null): Promise<void> {
-    return this.tokenSessionService.logout(userId, serviceKey);
+  async logout(userId: string, serviceKey: string, sessionId: string): Promise<void> {
+    return this.tokenSessionService.logout(userId, serviceKey, sessionId);
   }
 
-  async revokeAllSessions(userId: string): Promise<void> {
-    return this.tokenSessionService.revokeAllSessions(userId);
+  async revokeAllSessions(userId: string, manager?: Pick<import('typeorm').EntityManager, 'query'>): Promise<void> {
+    return this.tokenSessionService.revokeAllSessions(userId, manager);
   }
 
   setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {

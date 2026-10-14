@@ -1,3 +1,4 @@
+import { SignupTermsController } from '../controllers/signup-terms.controller.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Core Routes: google login/signup/link, refresh, status, logout, handoff
@@ -23,6 +24,8 @@ import {
 import { HandoffController } from '../controllers/handoff.controller.js';
 import { GoogleAuthController } from '../controllers/google-auth.controller.js';
 import { EmailAuthController } from '../controllers/email-auth.controller.js';
+import { SocialAuthController } from '../controllers/social-auth.controller.js';
+import { SocialStartDto,SocialProviderStartDto,SocialLinkStartDto,SocialProofDto,SocialSignupDto,SocialPasswordReauthDto,SocialConfirmDto } from '../dto/social-auth.dto.js';
 import {
   validateDto,
 } from '../../../common/middleware/validation.middleware.js';
@@ -54,6 +57,21 @@ import {
 import { requireJsonBody } from '../../../middleware/require-json-body.middleware.js';
 
 const router: IRouter = Router();
+
+// CORE_CHANGE: WO-O4O-AUTH-KAKAO-AND-EXPLICIT-LINK-V1 (user-approved phase 4).
+// New browser-bound routes. Retired /google/link and legacy passport routes stay retired.
+router.get('/social/kakao/config',asyncHandler(SocialAuthController.config));
+router.post('/social/kakao/start',requireJsonBody,emailTokenLimiter,validateDto(SocialStartDto),asyncHandler(SocialAuthController.startLogin));
+router.get('/social/kakao/callback',asyncHandler(SocialAuthController.callback));
+router.post('/social/kakao/complete',requireJsonBody,emailLoginLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.completeLogin));
+router.post('/social/kakao/signup',requireJsonBody,emailSignupLimiter,validateDto(SocialSignupDto),asyncHandler(SocialAuthController.signup));
+router.get('/social/accounts',requireAuth,asyncHandler(SocialAuthController.accounts));
+router.post('/social/reauth/password',requireJsonBody,requireAuth,emailLoginLimiter,validateDto(SocialPasswordReauthDto),asyncHandler(SocialAuthController.reauthenticatePassword));
+router.post('/social/reauth/start',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialProviderStartDto),asyncHandler(SocialAuthController.startReauthentication));
+router.post('/social/reauth/complete',requireJsonBody,requireAuth,emailLoginLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.completeReauthentication));
+router.post('/social/link/start',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialLinkStartDto),asyncHandler(SocialAuthController.startLink));
+router.post('/social/link/verify',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialProofDto),asyncHandler(SocialAuthController.verifyLink));
+router.post('/social/link/confirm',requireJsonBody,requireAuth,emailTokenLimiter,validateDto(SocialConfirmDto),asyncHandler(SocialAuthController.confirmLink));
 
 /**
  * ========================================
@@ -98,6 +116,7 @@ router.post(
 // POST /api/v1/auth/password/reset   - { token, newPassword } → 새 비밀번호 + 전역 세션 폐기
 // POST /api/v1/auth/account/find-id  - { name, phone } → 가린 이메일 힌트 | 일반 안내 (IP · 입력값 기준 제한 둘 다)
 // 모두 JSON 본문만 받는다(requireJsonBody) — 교차 사이트 form 요청 방어
+router.get('/signup/terms', asyncHandler(SignupTermsController.get));
 router.post('/email/signup', requireJsonBody, emailSignupLimiter, validateDto(EmailSignupRequestDto), asyncHandler(EmailAuthController.signup));
 router.post('/email/verify', requireJsonBody, emailTokenLimiter, validateDto(EmailTokenRequestDto), asyncHandler(EmailAuthController.verify));
 router.post('/email/resend', requireJsonBody, emailMailLimiter, validateDto(EmailAddressRequestDto), asyncHandler(EmailAuthController.resend));
@@ -135,6 +154,7 @@ router.patch(
 );
 
 // POST /api/v1/auth/password - 로그인 사용자의 비밀번호 설정·변경 (WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1)
+router.get('/password', requireAuth, asyncHandler(EmailAuthController.passwordStatus));
 router.post(
   '/password',
   requireJsonBody,
@@ -147,6 +167,7 @@ router.post(
 // POST /api/v1/auth/logout - Logout current session
 router.post(
   '/logout',
+  asyncHandler(AuthSessionController.prepareLogoutAuth),
   requireAuth,
   asyncHandler(AuthSessionController.logout)
 );

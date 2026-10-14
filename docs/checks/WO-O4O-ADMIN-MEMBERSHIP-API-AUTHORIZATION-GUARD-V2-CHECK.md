@@ -1,5 +1,7 @@
 # WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - 작업일: 2026-08-03
 - 브랜치: `main`
 - 소스 커밋: `82077439a`
@@ -196,7 +198,7 @@ WO 의 기대 결과 — "존재하지 않는 ID 로 보내는 PUT·PATCH·DELET
 
 ## 10. 프로덕션 검증 — 로그인 사용자
 
-사용 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 KPA 운영자 계정 (자격증명은 기록하지 않는다).
+사용 계정: `docs/local/TEST-ACCOUNT.txt` 의 KPA 운영자 계정 (자격증명은 기록하지 않는다).
 보유 역할에 `platform:*` 이 없고 `kpa:admin`, `neture:admin` 등 서비스 역할만 있다.
 
 | 요청 | 결과 |
@@ -210,7 +212,7 @@ WO 의 기대 결과 — "존재하지 않는 ID 로 보내는 PUT·PATCH·DELET
 
 대조군이 같은 응답을 낸다는 것은 이 계정이 **원래부터** 플랫폼 관리자가 아니었다는 뜻이며, 이번 변경이 새로운 종류의 차단을 만든 것이 아님을 보여준다. Membership 관리자 API 가 기존 `/api/v1/admin/*` 경계와 동일한 선에 정렬됐다.
 
-**미확인 항목:** `platform:admin` / `platform:super_admin` 토큰으로의 **정상 통과**는 프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNTS.local.md` 에 플랫폼 관리자 계정이 없기 때문이다. 대신 다음으로 갈음했다.
+**미확인 항목:** `platform:admin` / `platform:super_admin` 토큰으로의 **정상 통과**는 프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNT.txt` 에 플랫폼 관리자 계정이 없기 때문이다. 대신 다음으로 갈음했다.
 
 - 단위 테스트에서 두 역할 모두 6개 endpoint 전부 통과 확인 (§6 #3, #4)
 - 프로덕션 403 응답이 `platform:admin, platform:super_admin` 두 역할을 정확히 요구한다고 응답 본문에 명시 → 역할 목록이 배포본에 그대로 반영됨

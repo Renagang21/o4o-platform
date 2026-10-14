@@ -144,7 +144,11 @@ describe('B축 — legacy App 축 제거 · canonical AppRegistry 보존', () =>
 
   it('AI 사용 로그(AIUsageLog · ai_usage_logs) 는 legacy App 축이 아니며 보존된다', () => {
     expect(exists('apps', 'api-server', 'src', 'entities', 'AIUsageLog.ts')).toBe(true);
-    expect(codeOf('apps', 'api-server', 'src', 'modules', 'ai-policy', 'ai-policy-executor.service.ts')).toContain('AIUsageLog');
+    const executor = codeOf('apps', 'api-server', 'src', 'modules', 'ai-policy', 'ai-policy-executor.service.ts');
+    const accounting = codeOf('apps', 'api-server', 'src', 'modules', 'ai-policy', 'ai-accounted-execution.ts');
+    expect(executor).toContain('AiAccountedExecution');
+    expect([executor, accounting].join('\n')).toContain('AIUsageLog');
+    expect(accounting).toContain('getRepository(AIUsageLog)');
   });
 
   it('apps / app_usage_logs 를 DROP 하는 migration 을 만들지 않았다 (본 WO 자동 포함 금지)', () => {

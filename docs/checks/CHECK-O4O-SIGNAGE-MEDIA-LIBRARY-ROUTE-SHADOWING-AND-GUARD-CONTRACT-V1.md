@@ -1,5 +1,7 @@
 # CHECK-O4O-SIGNAGE-MEDIA-LIBRARY-ROUTE-SHADOWING-AND-GUARD-CONTRACT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-SIGNAGE-MEDIA-LIBRARY-ROUTE-SHADOWING-AND-GUARD-CONTRACT-V1`
 - **일자**: 2026-08-20
 - **기준 commit**: `8502aec8d` (worktree 생성 시점 `origin/main`)
@@ -22,7 +24,7 @@
 
 ## 2. 수정 전 재현 (production, `api.neture.co.kr`)
 
-로그인 계정은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 의 매장 계정. **DB write 0 · 조회만.**
+로그인 계정은 `docs/local/TEST-ACCOUNT.txt` (gitignored) 의 매장 계정. **DB write 0 · 조회만.**
 
 | serviceKey | 요청 | 결과 |
 |---|---|---|
@@ -283,7 +285,7 @@ organization 자동 치환 없음 · `requireAuth` 제거 없음 · cross-servic
 ## 12. Production 검증 (배포 후)
 
 - 배포: commit `42bdf122f` → GitHub Actions run `32343552278` **success** → Cloud Run revision **`o4o-core-api-03409-8f2`** (100% traffic).
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 매장 계정 (store_owner). **전 요청 GET · production DB write 0.**
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 매장 계정 (store_owner). **전 요청 GET · production DB write 0.**
 
 | serviceKey | 요청 | 결과 |
 |---|---|---|

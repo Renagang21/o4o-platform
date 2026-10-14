@@ -6,6 +6,7 @@
 > **상태**: 확정 (2026-05-22)
 > **근거 조사**: `docs/archive/investigations/IR-O4O-APPRECIATION-POINT-LIKE-SYSTEM-AUDIT-V1.md`
 > **정책 WO**: WO-O4O-APPRECIATION-POINT-POLICY-FINALIZATION-V1
+> **최종 갱신**: 2026-10-11 — 사용자용 개인 공간 명칭을 [My Home](O4O-MY-HOME-CANONICAL-V1.md)으로 정렬 (`WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`). 포인트 정책·원장·API·UI 구현 상태는 변경하지 않는다.
 
 ---
 
@@ -181,7 +182,7 @@ GET  /api/v1/appreciation/:targetType/:targetId/summary
 ```
 상세 페이지:  [❤️ 좋아요 123]  [🎁 감사하기]
 목록/카드:   [❤️ 123]           (감사 표시 없음)
-마이페이지:  포인트 내역에 appreciation_send / receive 항목 표시
+My Home:   기존 포인트 내역에 appreciation_send / receive 항목 표시
 ```
 
 - 감사하기 버튼 → 금액 입력 모달 (1P ~ 100P 슬라이더 또는 직접 입력)
@@ -194,7 +195,7 @@ GET  /api/v1/appreciation/:targetType/:targetId/summary
 | WO | 범위 | 선행 조건 |
 |----|------|---------|
 | WO-O4O-APPRECIATION-POINT-BACKEND-V1 | `AppreciationService`, `appreciation_sends` 테이블, API 3개, sourceType 추가 | 이 문서 확정 |
-| WO-O4O-APPRECIATION-POINT-UI-V1 | 상세 페이지 감사하기 버튼, 금액 입력 모달, 마이페이지 내역 | Backend WO 완료 |
+| WO-O4O-APPRECIATION-POINT-UI-V1 | 상세 페이지 감사하기 버튼, 금액 입력 모달, My Home 내 포인트 내역 | Backend WO 완료 |
 | WO-O4O-APPRECIATION-POINT-PHASE2-V1 | LMS Lesson, 목록 총액, 모니터링 | Phase 1 운영 후 |
 
 ---

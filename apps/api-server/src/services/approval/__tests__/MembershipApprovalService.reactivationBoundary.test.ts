@@ -6,10 +6,8 @@
  * 배경: WO-...-REJECTION-CROSS-SERVICE-ISOLATION-V1 이 "서비스 운영자 → users 전역 차단"을 막았다.
  *       그 대칭 결함이 "서비스 운영자 → 플랫폼 정지 해제" 이며 본 테스트가 그 경계를 고정한다.
  *
- * 축 구분:
- *   users.status='suspended' → admin API 만 기록하는 **플랫폼 조치** → 플랫폼 관리자만 해제
- *   users.status='deleted'   → 서비스 운영자도 호출 가능한 deleteMember(mode='soft') 의 결과
- *                              → 운영자 복구 허용 (Neture 공급자 복구 계약 보존)
+ * 현재 정책(2026-10-09 사용자 확정): 서비스 API는 admin/operator/platform 호출자 모두
+ * users 상태를 보존한다. 공통 계정 정지·삭제 복구는 중앙 계정 관리 전용이다.
  */
 
 type Row = Record<string, any>;
@@ -122,7 +120,7 @@ const service = new MembershipApprovalService();
 function seed(userStatus: string) {
   db = {
     memberships: [
-      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' },
+      { id: 'm-ph', user_id: 'u1', service_key: 'lecture', role: 'pharmacy', status: 'suspended' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'suspended' },
     ],
     roles: [{ id: 'ra-1', user_id: 'u1', role: 'member', is_active: false }],
@@ -139,7 +137,7 @@ const reactivateAsOperator = () =>
     userId: 'u1',
     reactivatedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['pharmacy-hub'],
+    serviceKeys: ['lecture'],
   });
 
 const reactivateAsPlatformAdmin = () =>
@@ -162,9 +160,7 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
       expect(user().status).toBe('suspended');
       expect(user().isActive).toBe(false);
       // 해제 후보에서 'suspended' 가 빠졌는지 파라미터로 확인
-      const usersUpdate = queries.find((q) => /^UPDATE users/i.test(q.sql));
-      expect(usersUpdate).toBeDefined();
-      expect(usersUpdate!.params[1]).toEqual(['deleted']);
+      expect(queries.some(q => /^UPDATE users/i.test(q.sql))).toBe(false);
     });
 
     it('플랫폼 정지 상태여도 자기 서비스 membership 은 정상 재활성화된다', async () => {
@@ -183,13 +179,13 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
       expect(db.memberships.find((m) => m.id === 'm-kpa')!.status).toBe('suspended');
     });
 
-    it('soft-delete(users.status=deleted) 복구는 계속 가능하다 (Neture 공급자 복구 계약 보존)', async () => {
+    it('서비스 복구는 deleted 공통 계정을 복구하지 않는다', async () => {
       seed('deleted');
 
       await reactivateAsOperator();
 
-      expect(user().status).toBe('active');
-      expect(user().isActive).toBe(true);
+      expect(user().status).toBe('deleted');
+      expect(user().isActive).toBe(false);
     });
 
     it('정상 계정(users.status=active)에는 불필요한 변경을 하지 않는다', async () => {
@@ -199,29 +195,17 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 
       expect(user().status).toBe('active');
       // WHERE 조건 불일치 → 실제 행 갱신 0건
-      const usersUpdate = queries.find((q) => /^UPDATE users/i.test(q.sql));
-      expect(usersUpdate!.params[1]).toEqual(['deleted']);
+      expect(queries.some(q => /^UPDATE users/i.test(q.sql))).toBe(false);
     });
   });
 
   describe('플랫폼 관리자', () => {
-    it('플랫폼 정지를 해제할 수 있다 (통제권 보존)', async () => {
-      seed('suspended');
-
+    it.each(['suspended', 'deleted'])('platform service restoration preserves shared account %s', async (status) => {
+      seed(status);
       await reactivateAsPlatformAdmin();
-
-      expect(user().status).toBe('active');
-      expect(user().isActive).toBe(true);
-      const usersUpdate = queries.find((q) => /^UPDATE users/i.test(q.sql));
-      expect(usersUpdate!.params[1]).toEqual(['suspended', 'deleted']);
-    });
-
-    it('soft-delete 계정도 복구할 수 있다', async () => {
-      seed('deleted');
-
-      await reactivateAsPlatformAdmin();
-
-      expect(user().status).toBe('active');
+      expect(user().status).toBe(status);
+      expect(user().isActive).toBe(false);
+      expect(queries.some(q => /^UPDATE users/i.test(q.sql))).toBe(false);
     });
 
     it('스코프 없이 모든 서비스 membership 을 재활성화한다', async () => {
@@ -233,4 +217,36 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
       expect(db.memberships.find((m) => m.id === 'm-kpa')!.status).toBe('active');
     });
   });
+});
+
+
+it.each(['operator', 'other-service-admin'])('does not restore a withdrawn membership with %s authority', async role => {
+  seed('active');
+  db.memberships[0].status = 'withdrawn';
+  await expect(service.reactivateMembership({ userId: 'u1', reactivatedBy: 'op-1', isPlatformAdmin: false, serviceKeys: ['lecture'], adminServiceKeys: role === 'operator' ? [] : ['kpa-society'] }))
+    .rejects.toMatchObject({ code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED' });
+  expect(db.memberships[0].status).toBe('withdrawn');
+  expect(queries.some(q => /^UPDATE/i.test(q.sql))).toBe(false);
+});
+it('same-service admin can restore a withdrawn membership', async () => {
+  seed('active'); db.memberships[0].status = 'withdrawn';
+  await service.reactivateMembership({ userId: 'u1', reactivatedBy: 'admin-1', isPlatformAdmin: false, serviceKeys: ['lecture'], adminServiceKeys: ['lecture'] });
+  expect(db.memberships[0].status).toBe('active');
+});
+ describe('PH retirement mixed membership recovery', () => {
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('recovers current services while leaving %s suspended', async (retiredKey) => {
+    seed('active');
+    db.memberships.push({ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' });
+    const result = await reactivateAsPlatformAdmin();
+    expect(result?.reactivatedMemberships).toBe(2);
+    expect(db.memberships.find(m => m.id === 'retired')?.status).toBe('suspended');
+    expect(db.memberships.filter(m => m.id !== 'retired').every(m => m.status === 'active')).toBe(true);
+  });
+  it.each(['pharmacy-hub', 'k-cosmetics', 'cosmetics'])('returns 410 without updates when only %s remains', async (retiredKey) => {
+    seed('active');
+    db.memberships = [{ id: 'retired', user_id: 'u1', service_key: retiredKey, role: 'pharmacy', status: 'suspended' }];
+    await expect(reactivateAsPlatformAdmin()).rejects.toMatchObject({ httpStatus: 410 });
+    expect(queries.some(q => /^UPDATE /i.test(q.sql))).toBe(false);
+  });
+
 });

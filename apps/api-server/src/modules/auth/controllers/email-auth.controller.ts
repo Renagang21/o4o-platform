@@ -1,3 +1,6 @@
+import { SessionResponse } from './session-response.js';
+import { resolveSignupPolicyKeyFromOrigin } from '../../../services/auth/signup-policy.service.js';
+import { PolicyAcceptanceError } from '../../policy-acceptance/policy-acceptance.service.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * Email Auth Controller: 이메일·비밀번호 가입 · 확인 · 로그인 · 재설정 · 아이디 찾기
@@ -15,8 +18,6 @@ import { resolveLoginMembershipGateKey } from '../../../common/auth/service-logi
 import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
-import { policyAcceptanceService } from '../../policy-acceptance/policy-acceptance.service.js';
-import { demoAccountService } from '../../../services/auth/demo-account.service.js';
 import {
   emailAuthService,
   EmailAuthError,
@@ -34,7 +35,6 @@ import type {
 } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
-import { isCrossOriginRequest } from './auth-helpers.js';
 import { resolveExposableAccountStatus } from '../../../common/auth/account-access.policy.js';
 
 type Op = 'signup' | 'login' | 'resend' | 'verify' | 'forgot' | 'reset' | 'set' | 'findId';
@@ -53,7 +53,7 @@ export class EmailAuthController extends BaseController {
   static async signup(req: Request, res: Response): Promise<any> {
     const body = req.body as EmailSignupRequestDto;
     try {
-      const result = await emailAuthService.signup({ ...body, ...meta(req) });
+      const result = await emailAuthService.signup({ ...body, ...meta(req), policyServiceKey: await resolveSignupPolicyKeyFromOrigin(req.get('origin')) });
       return BaseController.created(res, {
         message: '확인 메일을 보냈습니다. 메일의 링크를 열면 가입이 완료됩니다.',
         maskedEmail: result.maskedEmail,
@@ -99,35 +99,8 @@ export class EmailAuthController extends BaseController {
         ...meta(req),
         loginMembershipGateKey: resolveLoginMembershipGateKey(req.get('origin')),
       });
-      authenticationService.setAuthCookies(req, res, session.tokens);
-
-      const user = session.user;
-      user.displayName =
-        (user.name as string | null | undefined) ||
-        `${(user.lastName as string) || ''}${(user.firstName as string) || ''}`.trim() ||
-        (user.email as string | undefined)?.split('@')[0] ||
-        '사용자';
-      try {
-        // enforced pending — 서버 게이트와 같은 값(Demo 계정은 약관 화면 대상이 아니다).
-        user.pendingPolicyAcceptances = await policyAcceptanceService.getEnforcedPendingForUser(String(user.id));
-      } catch {
-        user.pendingPolicyAcceptances = [];
-      }
-      // WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: Demo 배지 · 안내용 (판정 정본 demo_accounts.user_id · 실패 시 isDemo:false).
-      user.demo = await demoAccountService.getDemoMetadata(String(user.id));
-
-      const includeTokensInBody = includeLegacyTokens || isCrossOriginRequest(req);
-      return BaseController.ok(res, {
-        message: 'Login successful',
-        user,
-        isNewUser: false,
-        ...(includeTokensInBody && {
-          tokens: {
-            accessToken: session.tokens.accessToken,
-            refreshToken: session.tokens.refreshToken,
-            expiresIn: session.tokens.expiresIn,
-          },
-        }),
+      return await SessionResponse.send(req, res, session, {
+        includeLegacyTokens, message: 'Login successful', includeDemoMetadata: true,
       });
     } catch (error) {
       return EmailAuthController.handleError(res, error, 'login');
@@ -165,7 +138,17 @@ export class EmailAuthController extends BaseController {
     const { currentPassword, newPassword } = req.body as PasswordSetRequestDto;
     try {
       await emailAuthService.setPasswordForUser(String(userId), { currentPassword, newPassword });
+      authenticationService.clearAuthCookies(req, res);
       return BaseController.ok(res, { message: '비밀번호를 저장했습니다.' });
+    } catch (error) {
+      return EmailAuthController.handleError(res, error, 'set');
+    }
+  }
+
+  static async passwordStatus(req: AuthRequest, res: Response): Promise<any> {
+    if (!req.user?.id) return BaseController.unauthorized(res);
+    try {
+      return BaseController.ok(res, await emailAuthService.getPasswordStatus(String(req.user.id)));
     } catch (error) {
       return EmailAuthController.handleError(res, error, 'set');
     }
@@ -198,6 +181,7 @@ export class EmailAuthController extends BaseController {
     const err = error as Error & { code?: string; details?: { status?: unknown } };
     if (op === 'login') monitoringMetrics.recordAuthFailure(err.code || 'UNKNOWN');
 
+    if (error instanceof PolicyAcceptanceError) return BaseController.error(res, error.message, error.httpStatus, error.code);
     if (error instanceof EmailAuthError) {
       return res.status(error.statusCode).json({
         success: false,
@@ -207,6 +191,9 @@ export class EmailAuthController extends BaseController {
         // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 상태(인증을 마친 본인에게만, 서버 선별 필드)
         ...(error.serviceAccess ? { serviceAccess: error.serviceAccess } : {}),
       });
+    }
+    if (err.code === 'SESSION_CHANGED_RETRY_LOGIN') {
+      return BaseController.error(res, err.message, 409, err.code);
     }
     if (err.code === 'ACCOUNT_NOT_ACTIVE') {
       const accountStatus = resolveExposableAccountStatus(err.details?.status);

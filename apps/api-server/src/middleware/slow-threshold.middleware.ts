@@ -1,3 +1,4 @@
+import { redactOAuthUrl } from '../utils/security-log-redaction.js';
 /**
  * Slow Request Threshold Middleware
  *
@@ -50,7 +51,7 @@ export function slowThresholdMiddleware(req: Request, res: Response, next: NextF
     if (duration > thresholdMs) {
       logger.warn('[SlowRequest]', {
         method: req.method,
-        url: req.originalUrl,
+        url: redactOAuthUrl(req.originalUrl),
         statusCode: res.statusCode,
         durationMs: duration,
         thresholdMs,

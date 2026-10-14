@@ -1,0 +1,272 @@
+/** Read-only retirement census. Counts and schema only; no identities or credentials. */
+import { createRequire } from 'node:module';
+import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+import { resolve4 } from 'node:dns/promises';
+import { createHash } from 'node:crypto';
+import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
+import { collectDomainInventory } from './pharmacy-hub-domain-inventory.mjs';
+import { collectRetirementReferences } from './pharmacy-hub-retirement-references.mjs';
+
+/** Inspect the same mutations rejected by the development worker; never expose function bodies. */
+export async function collectMutationTriggers(client) {
+  const targets=['checkout_order_logs','o4o_payments','offer_service_approvals','offer_service_prices',
+    'supplier_product_offers','cms_contents','forum_category_requests','checkout_orders'];
+  const {rows}=await client.query(`SELECT t.relname AS table_name,g.tgname AS trigger_name,
+    g.tgtype::int AS event_type,g.tgenabled AS enabled,pn.nspname AS function_schema,
+    p.proname AS function_name,p.prosrc AS function_body,p.prosecdef AS security_definer,l.lanname AS language
+    FROM pg_trigger g JOIN pg_class t ON t.oid=g.tgrelid JOIN pg_namespace n ON n.oid=t.relnamespace
+    JOIN pg_proc p ON p.oid=g.tgfoid JOIN pg_namespace pn ON pn.oid=p.pronamespace
+    JOIN pg_language l ON l.oid=p.prolang
+    WHERE n.nspname='public' AND t.relname=ANY($1::text[]) AND NOT g.tgisinternal
+      AND g.tgenabled<>'D' AND ((g.tgtype::int & 8)<>0 OR
+        (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))
+    ORDER BY t.relname,g.tgname`,[targets]);
+  return rows.map(r=>{
+    for(const k of ['table_name','trigger_name','function_schema','function_name','language'])identifiers(r[k]);
+    if(typeof r.function_body!=='string'||!Number.isInteger(r.event_type)||typeof r.security_definer!=='boolean'||
+      !['O','A','R'].includes(r.enabled))throw Object.assign(new Error('Invalid trigger metadata'),{code:'TRIGGER_METADATA'});
+    return {table:r.table_name,trigger:r.trigger_name,eventType:r.event_type,enabled:r.enabled,
+      functionSchema:r.function_schema,functionName:r.function_name,language:r.language,securityDefiner:r.security_definer,
+      functionSha256:createHash('sha256').update(r.function_body).digest('hex')};
+  });
+}
+
+const identifiers = value => {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw Object.assign(new Error('Unsupported schema identifier'), { code: 'SCHEMA_IDENTIFIER' });
+  return `"${value}"`;
+};
+export const retiredKeys = ['pharmacy-hub', 'pharmacy_hub', 'pharmacy_hub_cart', 'pharmacy-hub-event-offer'];
+const scopes = new Set(['service_key', 'service_code', 'source_service', 'service', 'source', 'source_module', 'service_keys', 'scope', 'scope_key', 'role', 'name', 'code', 'serviceKey', 'serviceCode', 'sourceService', 'sourceModule', 'serviceKeys', 'scopeKey']);
+
+export function countQuery(table, column, array = false) {
+  const field = identifiers(column);
+  // Role prefixes are exact namespace matches, never arbitrary PH substrings.
+  const predicate = array
+    ? `EXISTS (SELECT 1 FROM unnest(${field}) v WHERE v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')`
+    : `${field}::text = ANY($1::text[]) OR left(${field}::text,13) = 'pharmacy-hub:'`;
+  return `SELECT count(*)::text AS count FROM public.${identifiers(table)} WHERE ${predicate}`;
+}
+
+export function jsonScopeQuery(table, column) {
+  const field=identifiers(column);
+  const clauses=['serviceKey','service_key','source','sourceService'].map(key=>`${field}->>'${key}' = ANY($1::text[])`);
+  return `SELECT count(*)::text AS count FROM public.${identifiers(table)} WHERE ${clauses.join(' OR ')}`;
+}
+
+export async function collectRetirementInventory(client) {
+  await client.query('BEGIN READ ONLY');
+  let failure;
+  let result;
+  let stage = 'retirement-schema';
+  try {
+    await client.query("SET LOCAL statement_timeout = '10s'");
+    const { rows: columns } = await client.query(`SELECT c.table_name,c.column_name,c.data_type,c.udt_name
+      FROM information_schema.columns c JOIN information_schema.tables t
+        ON t.table_schema=c.table_schema AND t.table_name=c.table_name
+      WHERE c.table_schema='public' AND t.table_type='BASE TABLE'
+      ORDER BY c.table_name,c.ordinal_position`);
+    const dedicated = [...new Set(columns.filter(c => /^(ph_|pharmacy_hub_)/.test(c.table_name)).map(c => c.table_name))];
+    const dedicatedTables = [];
+    for (const table of dedicated) {
+      identifiers(table);
+      stage = `retirement-dedicated:${table}`;
+      const { rows } = await client.query(`SELECT count(*)::text AS count FROM public.${identifiers(table)}`);
+      dedicatedTables.push({ table, count: rows[0].count, columns: columns.filter(c => c.table_name === table).map(c => ({ name: c.column_name, type: c.data_type })) });
+    }
+    const scopeCounts = [];
+    for (const c of columns.filter(c => (scopes.has(c.column_name) || /service/i.test(c.column_name)) && (['text','character varying','character','USER-DEFINED'].includes(c.data_type) || ['_text','_varchar'].includes(c.udt_name)))) {
+      identifiers(c.table_name); identifiers(c.column_name);
+      stage = `retirement-scope:${c.table_name}.${c.column_name}`;
+      const { rows } = await client.query(countQuery(c.table_name,c.column_name,['_text','_varchar'].includes(c.udt_name)), [retiredKeys]);
+      if (rows[0].count !== '0') scopeCounts.push({ table:c.table_name, column:c.column_name, count:rows[0].count });
+    }
+    for (const c of columns.filter(c => c.column_name==='metadata' && ['json','jsonb'].includes(c.data_type))) {
+      identifiers(c.table_name); identifiers(c.column_name);
+      stage = `retirement-json:${c.table_name}.${c.column_name}`;
+      const { rows }=await client.query(jsonScopeQuery(c.table_name,c.column_name),[retiredKeys]);
+      if(rows[0].count!=='0')scopeCounts.push({table:c.table_name,column:`${c.column_name}.{serviceKey,service_key,source,sourceService}`,count:rows[0].count});
+    }
+    const targets = [...new Set([...dedicated,...scopeCounts.map(c => c.table)])];
+    stage = 'retirement-foreign-keys';
+    const { rows: foreignKeys } = await client.query(`SELECT source.relname AS source_table,target.relname AS target_table,
+        pg_get_constraintdef(c.oid) AS definition
+      FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
+        JOIN pg_namespace sn ON sn.oid=source.relnamespace
+        JOIN pg_class target ON target.oid=c.confrelid JOIN pg_namespace tn ON tn.oid=target.relnamespace
+      WHERE c.contype='f' AND sn.nspname='public' AND tn.nspname='public'
+        AND (source.relname=ANY($1::text[]) OR target.relname=ANY($1::text[]))
+      ORDER BY source.relname,target.relname,c.conname`, [targets]);
+    const predicates = new Map();
+    for (const c of scopeCounts) {
+      const schemaColumn = columns.find(column => column.table_name === c.table &&
+        column.column_name === c.column.split('.{')[0]);
+      if (!schemaColumn) throw Object.assign(new Error('Scope column unavailable'), { code: 'SCHEMA_IDENTIFIER' });
+      const query = c.column.includes('.{') ? jsonScopeQuery(c.table, schemaColumn.column_name)
+        : countQuery(c.table, schemaColumn.column_name, ['_text','_varchar'].includes(schemaColumn.udt_name));
+      const list = predicates.get(c.table) ?? [];
+      list.push(`(${query.slice(query.indexOf(' WHERE ') + 7)})`);
+      predicates.set(c.table, list);
+    }
+    const incoming = await client.query(`SELECT sn.nspname AS source_schema,source.relname AS source_table,
+        tn.nspname AS target_schema,target.relname AS target_table,c.conname AS constraint_name,
+        array_agg(sa.attname::text ORDER BY k.ordinality) AS source_columns,
+        array_agg(ta.attname::text ORDER BY k.ordinality) AS target_columns
+      FROM pg_constraint c JOIN pg_class source ON source.oid=c.conrelid
+        JOIN pg_namespace sn ON sn.oid=source.relnamespace
+        JOIN pg_class target ON target.oid=c.confrelid JOIN pg_namespace tn ON tn.oid=target.relnamespace
+        CROSS JOIN LATERAL unnest(c.conkey,c.confkey) WITH ORDINALITY k(source_key,target_key,ordinality)
+        JOIN pg_attribute sa ON sa.attrelid=c.conrelid AND sa.attnum=k.source_key
+        JOIN pg_attribute ta ON ta.attrelid=c.confrelid AND ta.attnum=k.target_key
+      WHERE c.contype='f' AND tn.nspname='public' AND target.relname=ANY($1::text[])
+      GROUP BY sn.nspname,source.relname,tn.nspname,target.relname,c.conname
+      ORDER BY sn.nspname,source.relname,c.conname`, [targets]);
+    const dependencyCounts = [];
+    for (const fk of incoming.rows) {
+      const filter = predicates.get(fk.target_table)?.join(' OR ');
+      if (!filter && !dedicated.includes(fk.target_table)) continue;
+      if (!Array.isArray(fk.source_columns) || !Array.isArray(fk.target_columns) ||
+          !fk.source_columns.length || fk.source_columns.length !== fk.target_columns.length) {
+        throw Object.assign(new Error('Unsupported FK shape'), { code: 'SCHEMA_IDENTIFIER' });
+      }
+      const join = fk.source_columns.map((col,i) => `s.${identifiers(col)} = p.${identifiers(fk.target_columns[i])}`).join(' AND ');
+      stage = `retirement-dependency:${fk.source_schema}.${fk.source_table}`;
+      const { rows } = await client.query(`SELECT count(*)::text AS count
+        FROM ${identifiers(fk.source_schema)}.${identifiers(fk.source_table)} s
+        JOIN (SELECT * FROM public.${identifiers(fk.target_table)} WHERE ${filter ?? 'TRUE'}) p ON ${join}`,
+      filter ? [retiredKeys] : []);
+      dependencyCounts.push({ ...fk, count: rows[0].count });
+    }
+    let offerScopes;
+    if (predicates.has('supplier_product_offers') && columns.some(c => c.table_name === 'supplier_product_offers' && c.column_name === 'service_keys')) {
+      stage = 'retirement-offer-sharing';
+      const { rows } = await client.query(`SELECT count(*)::text AS total,
+        count(*) FILTER (WHERE EXISTS (SELECT 1 FROM unnest(service_keys) v
+          WHERE NOT (v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')))::text AS mixed,
+        count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM unnest(service_keys) v
+          WHERE NOT (v::text = ANY($1::text[]) OR left(v::text,13) = 'pharmacy-hub:')))::text AS ph_only
+        FROM public.supplier_product_offers WHERE ${predicates.get('supplier_product_offers').join(' OR ')}`, [retiredKeys]);
+      offerScopes = rows[0];
+    }
+    const inspectedTables = new Set([...targets, ...incoming.rows.filter(fk => fk.source_schema === 'public').map(fk => fk.source_table)]);
+    stage='retirement-non-fk-references';
+    const references=await collectRetirementReferences(client,columns);
+    stage='retirement-mutation-triggers';
+    const mutationTriggers=await collectMutationTriggers(client);
+    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,references,mutationTriggers,
+      targetColumns: columns.filter(c => inspectedTables.has(c.table_name)),
+      deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
+  } catch (error) {
+    failure=safeInventoryError(error,stage);
+  }
+  try { await client.query('ROLLBACK'); } catch(error) { failure ??= safeInventoryError(error,'retirement-rollback'); }
+  if (failure) throw failure;
+  return result;
+}
+
+export function collectCloudInventory(run = spawnSync) {
+  const project='netureyoutube', region='asia-northeast3';
+  const checks=[
+    ['applicationMap',['compute','url-maps','describe','o4o-global-lb']],
+    ['httpsProxy',['compute','target-https-proxies','describe','o4o-global-lb-target-proxy-2']],
+    ['urlMaps',['compute','url-maps','list']],
+    ['backends',['compute','backend-services','list']],
+    ['negs',['compute','network-endpoint-groups','list']],
+    ['runService',['run','services','describe','pharmacy-hub-web',`--region=${region}`]],
+  ];
+  const result={readOnly:true,project,region,resources:{},blockers:[]};
+  for (const [key,args] of checks) {
+    try {
+      const output=run('gcloud',[...args,`--project=${project}`,'--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000});
+      // gcloud list can return exit 0 and [] while warning that required permissions
+      // prevented enumeration. Such partial results must never prove no references.
+      if (typeof output !== 'string' && (output.status !== 0 || /Some requests did not succeed|required.*permission|PERMISSION_DENIED|Forbidden/i.test(output.stderr ?? ''))) {
+        throw { stderr: output.stderr ?? '' };
+      }
+      const value=JSON.parse(typeof output === 'string' ? output : output.stdout);
+      if(key==='applicationMap') {
+        result.resources.applicationMap={name:value.name,phMatchers:(value.pathMatchers??[]).filter(m=>m.name==='path-matcher-pharmacy-hub')};
+      } else if (key==='httpsProxy') {
+        result.resources.httpsProxy={name:value.name,urlMap:value.urlMap};
+      } else if (key==='urlMaps') {
+        result.resources.urlMaps=value.map(map=>({name:map.name,region:map.region??'global',
+          phReferences:JSON.stringify(map).includes('backend-pharmacy-hub-web'),
+          phHostRules:(map.hostRules??[]).filter(r=>r.hosts?.some(h=>['pharmacyhub.co.kr','www.pharmacyhub.co.kr'].includes(h))),
+          phMatchers:(map.pathMatchers??[]).filter(m=>m.name==='path-matcher-pharmacy-hub')}));
+      } else if (key==='backends') {
+        result.resources.backends=value.map(b=>({name:b.name,region:b.region??'global',groups:(b.backends??[]).map(v=>v.group)}));
+      } else if (key==='negs') {
+        result.resources.negs=value.filter(n=>n.cloudRun?.service==='pharmacy-hub-web'||n.name?.includes('pharmacy-hub')).map(n=>({name:n.name,region:n.region,type:n.networkEndpointType,cloudRunService:n.cloudRun?.service,selfLink:n.selfLink}));
+      } else {
+        result.resources.runService={name:value.metadata?.name,present:true};
+      }
+    } catch(error) {
+      // Never echo arbitrary subprocess output (service envs/credentials may be embedded).
+      const raw=String(error.stderr??'');
+      result.blockers.push({check:key,code:/PERMISSION_DENIED|permission|Forbidden/i.test(raw)?'PERMISSION_DENIED':'UNAVAILABLE',permissions:[...new Set(raw.match(/(?:compute|run)\.[A-Za-z]+\.[A-Za-z]+/g)??[])]});
+    }
+  }
+  return result;
+}
+
+async function collectDns(host,apiAddresses,resolve) {
+  try {
+    const addresses=await resolve(host);
+    return {host,addressCount:addresses.length,matchesApiAddress:apiAddresses.length?addresses.some(a=>apiAddresses.includes(a)):null};
+  } catch { return {host,error:'DNS_UNAVAILABLE'}; }
+}
+
+async function collectHttpProbe(host,path,request) {
+  try {
+    const response=await request(`https://${host}${path}`,{redirect:'manual',signal:AbortSignal.timeout(15000)});
+    await response.body?.cancel();
+    const location=response.headers.get('location');
+    let target=null;
+    try { if(location)target=new URL(location,`https://${host}`); } catch { /* retain status without raw Location */ }
+    const expected=new URL(path.startsWith('/terms')?path.replace('/terms','/policy'):path,'https://pharmacy.neture.co.kr');
+    return {host,family:path.split('?')[0],status:response.status,locationPresent:!!location,hostMatch:target?.host===expected.host,pathMatch:target?.pathname===expected.pathname,queryMatch:target?.search===expected.search,schemeMatch:target?.protocol===expected.protocol};
+  } catch { return {host,family:path.split('?')[0],error:'HTTPS_UNAVAILABLE'}; }
+}
+
+export async function collectHttpInventory(request=fetch,resolve=resolve4) {
+  const hosts=['pharmacyhub.co.kr','www.pharmacyhub.co.kr'];
+  const paths=['/','/qr/__ph_retirement_rule_check__?ruleCheck=1','/tablet/__ph_retirement_rule_check__?ruleCheck=1','/multilingual-products/__ph_retirement_rule_check__?ruleCheck=1','/foreign-visitor/affiliate/__ph_retirement_rule_check__?ruleCheck=1','/terms?ruleCheck=1'];
+  const apiAddresses=await resolve('api.neture.co.kr').catch(()=>[]);
+  const [dns,checks]=await Promise.all([
+    Promise.all(hosts.map(host=>collectDns(host,apiAddresses,resolve))),
+    Promise.all(hosts.flatMap(host=>paths.map(path=>collectHttpProbe(host,path,request)))),
+  ]);
+  return {readOnly:true,dns,checks};
+}
+
+export async function collectCensus(database, cloud = collectCloudInventory, http = collectHttpInventory) {
+  let databaseResult;
+  let failed = false;
+  try { databaseResult = await database(); }
+  catch (error) {
+    failed = true;
+    databaseResult = { readOnly: true, complete: false, error: safeInventoryError(error, 'retirement-census').message };
+  }
+  // Database failure must not conceal independent Cloud permission and redirect evidence.
+  return { failed, database: databaseResult, cloud: cloud(), http: await http() };
+}
+
+if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
+  let client;
+  try {
+    const result = await collectCensus(async () => {
+      if (!process.env.DB_USERNAME||!process.env.DB_NAME) throw new Error('Database bindings missing');
+      const require=createRequire(new URL('../../apps/api-server/package.json',import.meta.url));
+      const { Client }=require('pg');
+      client=new Client({host:'127.0.0.1',port:55432,user:process.env.DB_USERNAME,database:process.env.DB_NAME,password:readPassword(),connectionTimeoutMillis:15000,options:'-c default_transaction_read_only=on'});
+      await client.connect();
+      return collectRetirementInventory(client);
+    });
+    result.domains = collectDomainInventory();
+    console.log(JSON.stringify(result, null, 2));
+    if (result.failed) process.exitCode=1;
+  } catch(error) {
+    console.error(safeInventoryError(error,'retirement-census').message);
+    process.exitCode=1;
+  } finally { await client?.end(); }
+}

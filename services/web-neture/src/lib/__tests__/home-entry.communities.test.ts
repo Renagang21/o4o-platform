@@ -9,7 +9,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../apiClient', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 
-import { buildHomeEntryModel, type EntryCommunity, type HomeEntryData } from '../home-entry';
+import { fetchHomeEntryData, buildHomeEntryModel, type EntryCommunity, type HomeEntryData } from '../home-entry';
 import type { User } from '../../contexts/AuthContext';
 
 const svc = (key: string, nameKo: string, status = 'active') => ({
@@ -49,11 +49,11 @@ const group = (m: ReturnType<typeof buildHomeEntryModel>) => {
 };
 
 describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
-  it('Scenario B: PH 만 가입한 회원 → 약사 커뮤니티는 PH surface 로, KPA membership 을 만들지 않는다', () => {
+  it('Scenario B: PH 가입 이력과 무관하게 활성 커뮤니티 진입만 유지한다', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY, GENERAL, { ...COSMETICS, canParticipate: false, reason: 'SERVICE_MEMBERSHIP_REQUIRED' }], { 'pharmacy-hub': 'active' }));
     const g = group(m)!;
     expect(g.items.map((i) => [i.id, i.label, i.action])).toEqual([
-      ['community:pharmacy', '약사 커뮤니티', { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/forum' }],
+      ['community:pharmacy', '약사 커뮤니티', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }],
       ['community:o4o-general', 'O4O 공통 커뮤니티', { kind: 'internal', to: '/community' }],
     ]);
     expect(g.items.some((i) => i.id === 'community:cosmetics')).toBe(false);
@@ -74,14 +74,14 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
       .map((i) => i.action as { serviceKey?: string })
       .filter((a) => a.serviceKey === 'k-cosmetics');
     expect(handoffs).toEqual([]);
-    expect(m.myServices.map((i) => i.id)).toEqual(['svc:pharmacy-hub']);
+    expect(m.myServices.map((i) => i.id)).toEqual([]);
   });
 
   it('운영 종료 서비스 surface 만 빠진다 — 다른 surface 가 남은 Community 는 그 surface 로 들어간다', () => {
     const MIXED: EntryCommunity = { ...PHARMACY, entries: [{ serviceKey: 'k-cosmetics', path: '/forum' }, ...PHARMACY.entries] };
     const m = buildHomeEntryModel(user(), data([MIXED], { 'k-cosmetics': 'active', 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     expect(group(m)!.items.map((i) => [i.id, i.action, i.note])).toEqual([
-      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, 'KPA Society에서 참여'],
+      ['community:pharmacy', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/forum' }, undefined],
     ]);
   });
 
@@ -104,6 +104,44 @@ describe('buildHomeEntryModel — 커뮤니티 = /communities 만', () => {
     const m = buildHomeEntryModel(user(), data([PHARMACY], { 'kpa-society': 'active', 'pharmacy-hub': 'active' }));
     const items = group(m)!.items.filter((i) => i.id.startsWith('community:pharmacy'));
     expect(items).toHaveLength(1);
-    expect(items[0].note).toBe('KPA Society에서 참여');
+    expect(items[0].note).toBeUndefined();
+  });
+});
+
+describe('사업 참여자 공간은 해당 사업 서비스로 진입한다', () => {
+  it('공통 커뮤니티 목록에 섞지 않고 서버 허용된 사업만 내 서비스에서 연결한다', () => {
+    const business: EntryCommunity = { communityKey: 'members', businessKey: 'pharmacy', kind: 'semi-franchise',
+      name: '약국 협력사업', canParticipate: true, reason: null, entries: [{ serviceKey: 'community', path: '/communities/members/forum' }] };
+    const model = buildHomeEntryModel(user(), data([GENERAL, business, { ...business, businessKey: 'blocked', canParticipate: false }], {}));
+    expect(model.groups.find(g => g.id === 'community')!.items.map(item => item.id)).toEqual(['community:o4o-general']);
+    expect(model.myServices.find(item => item.id === 'business:pharmacy')?.action).toEqual({ kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/businesses/pharmacy/forum' });
+    expect(model.myServices.some(item => item.id === 'business:blocked')).toBe(false);
+  });
+});
+
+
+describe('현행 workspace 응답과 조회 실패 처리', () => {
+  const setupResponses = async (communities: unknown, status?: number) => {
+    const { api } = await import('../apiClient');
+    vi.mocked(api.get).mockImplementation(async path => {
+      if (path === '/communities') {
+        if (status) throw { response: { status } };
+        return { data: { data: { communities } } } as never;
+      }
+      if (path === '/neture/home/entry') return { data: { data: { serviceStates: { supplier: { status: 'none', source: 'none' } } } } } as never;
+      return { data: { data: { services: [] } } } as never;
+    });
+  };
+  it('allowed 판정을 보존하고 사업 identity와 독립 커뮤니티 진입을 정규화한다', async () => {
+    await setupResponses([{ communityKey: 'public', name: '공통', kind: 'independent', allowed: true },
+      { communityKey: 'members', name: '사업', kind: 'semi-franchise', businessKey: 'pharmacy', allowed: false }]);
+    const result = await fetchHomeEntryData();
+    expect(result.communities?.[0]).toMatchObject({ canParticipate: true, entries: [{ serviceKey: 'community', path: '/communities/public/forum' }] });
+    expect(result.communities?.[1]).toMatchObject({ canParticipate: false, businessKey: 'pharmacy' });
+  });
+  it.each([404, 503])('404 배포 간극만 허용하고 %s 오류를 미가입으로 만들지 않는다', async status => {
+    await setupResponses([], status);
+    if (status === 404) expect((await fetchHomeEntryData()).communities).toEqual([]);
+    else await expect(fetchHomeEntryData()).rejects.toMatchObject({ response: { status: 503 } });
   });
 });

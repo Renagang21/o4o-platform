@@ -93,8 +93,6 @@ interface AdoptedOwnerPage {
 }
 
 const ADOPTED_PAGES: AdoptedOwnerPage[] = [
-  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/pages/forum/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard' },
-  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement' },
 ];
 
 const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
@@ -103,8 +101,6 @@ const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
 const ADAPTERS: Array<{ service: string; file: string }> = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/api/forumOwnerAdapter.ts' },
   { service: 'Neture', file: 'services/web-neture/src/services/forumOwnerAdapter.ts' },
-  // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §7·§8 채택분
-  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/services/forumOwnerAdapter.ts' },
 ];
 
 /** 어댑터가 반드시 채워야 하는 accent 토큰 */
@@ -175,9 +171,7 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
     expect(after).toBeLessThanOrEqual(80);
   });
 
-  it.each(ADOPTED_PAGES)('$service $component — 채택분도 wrapper 상한(≤ 80줄)을 지킨다', ({ file }) => {
-    expect(loc(file)).toBeLessThanOrEqual(80);
-  });
+
 
   it('소유자 화면 총 LOC 가 census 기준 대비 1/5 미만이다', () => {
     const beforeTotal = CENSUS_PAGES.reduce((sum, p) => sum + p.before, 0);
@@ -265,50 +259,6 @@ describe('서비스 고유 정책이 보존된다', () => {
     expect(members).toContain('MyPageNavigation');
     expect(members).toContain("backHref=\"/mypage/my-forums\"");
   });
-
-  // KCos 💄 이모지 단언은 앱(services/web-k-cosmetics) 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
-
-  /**
-   * WO-O4O-CI-FORUM-OWNER-AREA-COMMONIZATION-TEST-BASELINE-RECOVERY-V1
-   *
-   * 이전 단언은 census 시점 사실("PharmacyHub 는 소유자 영역이 없다")을 그대로 고정했다.
-   * 그 뒤 WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 이 PH 소유자 영역을
-   * **공통 View 채택**으로 신설했으므로(복제가 아니다) 그 단언은 낡았다.
-   *
-   * 이 축이 실제로 지켜야 할 계약은 "없어야 한다"가 아니라
-   * **"PH 의 ForumOwner 소비는 공통 View wrapper + adapter 3곳뿐"** 이다.
-   * 즉 PH 안에 소유자 화면을 다시 구현한 파일이 생기면 실패한다.
-   */
-  it('Pharmacy-Hub — 소유자 영역은 공통 View 채택으로만 존재한다 (자체 재구현 0)', () => {
-    const phDir = path.join(REPO, 'services/web-pharmacy-hub/src');
-    const hits: string[] = [];
-    const walk = (dir: string) => {
-      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-        const full = path.join(dir, entry.name);
-        if (entry.isDirectory()) walk(full);
-        else if (/\.tsx?$/.test(entry.name) && fs.readFileSync(full, 'utf8').includes('ForumOwner')) {
-          hits.push(path.relative(phDir, full).split(path.sep).join('/'));
-        }
-      }
-    };
-    walk(phDir);
-
-    // 허용되는 소비처는 이 3곳뿐이다 — 늘어나면 복제 회귀로 본다.
-    expect(hits.sort()).toEqual([
-      'pages/forum/ForumMemberManagementPage.tsx',
-      'pages/forum/MyForumDashboardPage.tsx',
-      'services/forumOwnerAdapter.ts',
-    ]);
-
-    // 그리고 그 소비는 공통 컴포넌트/factory 여야 한다 (자체 구현 금지).
-    const dash = read('services/web-pharmacy-hub/src/pages/forum/MyForumDashboardPage.tsx');
-    const members = read('services/web-pharmacy-hub/src/pages/forum/ForumMemberManagementPage.tsx');
-    const adapter = read('services/web-pharmacy-hub/src/services/forumOwnerAdapter.ts');
-    expect(dash).toContain(`from '@o4o/shared-space-ui'`);
-    expect(members).toContain(`from '@o4o/shared-space-ui'`);
-    expect(adapter).toContain('createForumOwnerApi');
-    expect(adapter).toContain('createForumOwnerMembershipApi');
-  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -330,7 +280,7 @@ describe('accent 주입과 Tailwind 스캔', () => {
   });
 
   it('소유 서비스 3곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
-    for (const svc of ['web-kpa-society', 'web-neture', 'web-pharmacy-hub']) {
+    for (const svc of ['web-kpa-society', 'web-neture',]) {
       const config = read(`services/${svc}/tailwind.config.js`);
       expect(`${svc}:${config.includes('packages/shared-space-ui/src')}`).toBe(`${svc}:true`);
     }

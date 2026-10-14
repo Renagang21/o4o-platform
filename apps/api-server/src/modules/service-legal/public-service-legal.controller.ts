@@ -23,16 +23,19 @@ import { ServiceLegalProfile } from './entities/ServiceLegalProfile.entity.js';
 import { ServicePolicyDocument } from './entities/ServicePolicyDocument.entity.js';
 import { toPublicLegalProfile, toPublicPolicyDocument } from './service-legal.mapper.js';
 import { isSupportedLegalServiceKey } from './service-legal-scope.js';
+import { getService } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
+import { getEnrollmentPolicies } from '../policy-acceptance/service-enrollment-policy.service.js';
+import { PolicyAcceptanceError } from '../policy-acceptance/policy-acceptance.service.js';
 
 export function createPublicServiceLegalController(dataSource: DataSource): Router {
   const router = Router();
   const profileRepo = dataSource.getRepository(ServiceLegalProfile);
   const policyRepo = dataSource.getRepository(ServicePolicyDocument);
 
-  function guardServiceKey(req: Request, res: Response): string | null {
+  function guardServiceKey(req: Request, res: Response, allowCatalogPolicy = false): string | null {
     const { serviceKey } = req.params;
-    if (!serviceKey || !isSupportedLegalServiceKey(serviceKey)) {
+    if (!serviceKey || (!isSupportedLegalServiceKey(serviceKey) && !(allowCatalogPolicy && getService(serviceKey)))) {
       res.status(404).json({
         success: false,
         error: { code: 'UNKNOWN_SERVICE', message: '지원하지 않는 서비스입니다.' },
@@ -59,9 +62,22 @@ export function createPublicServiceLegalController(dataSource: DataSource): Rout
   router.get('/:serviceKey/legal-profile', handleLegalProfile);
   router.get('/:serviceKey/footer-legal', handleLegalProfile);
 
+  router.get('/:serviceKey/enrollment-policies', async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    try {
+      const documents = await getEnrollmentPolicies(dataSource, req.params.serviceKey);
+      res.json({ success: true, data: documents.map(doc => ({ policyDocumentId: doc.id, serviceKey: doc.service_key,
+        documentType: doc.document_type, version: Number(doc.version), title: doc.title, content: doc.content })) });
+    } catch (error) {
+      if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
+      res.status(503).json({ success: false, error: { code: 'POLICY_UNAVAILABLE', message: '정책 문서를 불러올 수 없습니다.' } });
+    }
+  });
+
   // ── GET /:serviceKey/policies/:documentType (최신 published) ──
   router.get('/:serviceKey/policies/:documentType', async (req: Request, res: Response) => {
-    const serviceKey = guardServiceKey(req, res);
+    // Read only already-published documents for canonical services; management scopes are unchanged.
+    const serviceKey = guardServiceKey(req, res, true);
     if (!serviceKey) return;
     const { documentType } = req.params;
     try {

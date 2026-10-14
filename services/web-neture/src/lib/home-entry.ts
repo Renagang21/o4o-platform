@@ -10,7 +10,7 @@
  *   - 매장 카드: 서비스별 "매장 HUB / 내 매장" 반복 나열 없음. 버튼 = **매장 하나**(매장 이름) →
  *     그 매장의 Store Workspace Home (`<basePath>/workspace`). Home / My Store / Store Hub / My Services
  *     선택은 Store Workspace 안에서 한다. 서비스 이름은 매장이 여럿일 때만 보조 정보.
- *   - 공급자 카드: 공급자 서비스 이용 상태 active 만. 관리자 bypass 로 개인 업무 공간처럼 노출하지 않는다.
+ *   - 공급자 카드: 개인 업무는 공급자 active만, 운영자는 기존 공급자 관리 화면 진입을 별도로 표시한다.
  *   - 서비스 운영 카드: `GET /work-scope/operator-services` 목록만 (platformBypass 는 목록에 없다).
  *   - Platform Admin(`platform:super_admin`) 은 4 업무 공간과 섞지 않고 `platformAdmin`(플랫폼 관리) 로 분리한다.
  *
@@ -110,6 +110,8 @@ export interface EntryCommunity {
   communityKey: string;
   name: string;
   canParticipate: boolean;
+  kind?: 'independent' | 'semi-franchise';
+  businessKey?: string;
   reason: string | null;
   /** 진입 surface — Community 하나에 여러 URL 이 있을 수 있다 (같은 Community 데이터) */
   entries: { serviceKey: string; path: string }[];
@@ -217,7 +219,6 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
   //   서비스 운영 화면(`/admin/communities`)은 대표 호스트에 있고 SUBDOMAIN_OPERATOR_SCREENS 로 진입한다.
   community: { home: '/' },
   'kpa-society': { home: '/', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
-  'pharmacy-hub': { home: '/', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
   // k-cosmetics: 운영 종료 — 매장 · 운영자 · 가입 진입을 만들지 않는다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},
@@ -225,9 +226,9 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
 
 /**
  * 운영 종료된 서비스 — membership · community catalog 가 남아 있어도 대표 홈에서 그 서비스 호스트로 가는
- * 진입(커뮤니티 · 내 서비스)을 만들지 않는다. service identity · catalog 정리는 후속 범위다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
+ * 진입(커뮤니티 · 매장 · 운영 · 내 서비스 · 가입)을 만들지 않는다. service identity · catalog 정리는 후속 범위다 (WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1).
  */
-const RETIRED_SERVICE_KEYS: ReadonlySet<string> = new Set(['k-cosmetics']);
+const RETIRED_SERVICE_KEYS: ReadonlySet<string> = new Set(['k-cosmetics', 'pharmacy-hub']);
 
 /** role prefix → canonical service key (role_assignments 의 prefix 는 service_key 와 다르다) */
 export const STATUS_LABELS: Record<string, string> = {
@@ -288,13 +289,20 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
     //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
     //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
-    api.get('/communities').catch(() => null),
+    api.get('/communities').catch((error: unknown) => {
+      if ((error as { response?: { status?: number } })?.response?.status === 404) return null;
+      throw error;
+    }),
   ]);
   const services = servicesRes.data?.data?.services;
   const entry = entryRes.data?.data;
   const operatorServices = operatorRes.data?.data?.services;
   const communitiesRaw = communitiesRes?.data?.data?.communities;
-  const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
+  const communities: EntryCommunity[] = Array.isArray(communitiesRaw) ? communitiesRaw.map(c => ({
+    ...c,
+    canParticipate: typeof c.allowed === 'boolean' ? c.allowed : c.canParticipate === true,
+    entries: Array.isArray(c.entries) ? c.entries : [{ serviceKey: 'community', path: `/communities/${encodeURIComponent(c.communityKey)}/forum` }],
+  })) : [];
   if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
     throw new Error('bad response');
   }
@@ -312,8 +320,9 @@ export async function fetchHomeEntryData(): Promise<HomeEntryData> {
  * 로그인 상태에서만 조회한다. 어느 한쪽이라도 실패하면 전체를 error 로 둔다 —
  * 부분 데이터로 "미가입" 처럼 보이는 화면을 만들지 않기 위해서다.
  */
-export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
+export function useHomeEntry(enabled: boolean, accountId?: string): UseHomeEntryResult {
   const [data, setData] = useState<HomeEntryData | null>(null);
+  const [loadedAccount, setLoadedAccount] = useState<string | undefined>(accountId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -321,6 +330,7 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
+    setLoadedAccount(accountId);
     if (!enabled) {
       setData(null);
       setError(null);
@@ -328,12 +338,14 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
       return;
     }
     let cancelled = false;
+    setData(null);
     setLoading(true);
     setError(null);
     (async () => {
       try {
         const next = await fetchHomeEntryData();
         if (cancelled) return;
+        setLoadedAccount(accountId);
         setData(next);
       } catch {
         if (cancelled) return;
@@ -346,9 +358,9 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     return () => {
       cancelled = true;
     };
-  }, [enabled, tick]);
+  }, [enabled, accountId, tick]);
 
-  return { data, loading, error, reload };
+  return { data: loadedAccount === accountId ? data : null, loading: enabled && loadedAccount !== accountId || loading, error, reload };
 }
 
 // ─── 서비스 이동 ──────────────────────────────────────────────────────────────
@@ -368,7 +380,7 @@ const HANDOFF_ERROR_MESSAGES: Record<string, string> = {
 };
 
 /**
- * 다른 서비스 진입 URL 을 발급받는다 — 기존 handoff 계약 재사용(서버 계약 무변경).
+ * 서비스 또는 약국의 공통 Store 진입 URL을 발급받는다 — 기존 handoff 계약 재사용.
  * 이동은 하지 않는다: 호출부가 응답이 아직 유효한지(뒤로가기 복원 이후 늦게 도착한 응답이 아닌지)
  * 판단한 뒤 `window.location.assign` 한다 (WO-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1).
  * 실패는 예외로 돌려 호출부가 화면에 표시한다. 토큰 · 개인정보를 로그에 남기지 않는다.
@@ -376,7 +388,12 @@ const HANDOFF_ERROR_MESSAGES: Record<string, string> = {
 export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: string): Promise<string> {
   let targetUrl: string | undefined;
   try {
-    const res = await api.post('/auth/handoff', { targetServiceKey: serviceKey, returnPath });
+    // 승인된 약국의 내 매장은 KPA 개인 회원 공간이 아닌 공통 Store 공간이다.
+    // 커뮤니티/운영 등 다른 KPA 진입의 service handoff는 그대로 구분한다.
+    const target = serviceKey === 'kpa-society' && returnPath === SERVICE_PATHS['kpa-society'].myStore
+      ? { targetWorkspace: 'store', returnPath: '/' }
+      : { targetServiceKey: serviceKey, returnPath };
+    const res = await api.post('/auth/handoff', target);
     targetUrl = res.data?.data?.targetUrl;
   } catch (err: unknown) {
     const body = (err as { response?: { data?: { code?: string; error?: string; serviceAccess?: unknown } } })?.response?.data;
@@ -406,7 +423,8 @@ export async function openServiceEntry(serviceKey: string, returnPath?: string):
  */
 export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string> {
   const data = await fetchHomeEntryData();
-  const items = buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [];
+  const items = (buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [])
+    .filter((item) => item.action.kind === 'handoff');
   const only = items.length === 1 ? items[0].action : null;
   if (!only || only.kind !== 'handoff') throw new ServiceEntryError('이동할 매장을 하나로 정하지 못했습니다.');
   return resolveServiceEntryUrl(only.serviceKey, only.returnPath);
@@ -425,7 +443,7 @@ const hasAnyRole = (roles: string[], set: string[]) => roles.some((r) => set.inc
 export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryModel {
   const roles = user.roles ?? [];
   const byKey = new Map(data.services.map((s) => [s.key, s]));
-  const nameOf = (key: string) => byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
+  const nameOf = (key: string) => key === 'kpa-society' ? 'O4O 약국 경영지원' : byKey.get(key)?.nameKo ?? byKey.get(key)?.name ?? key;
   const isActive = (key: string) => byKey.get(key)?.membership?.status === 'active';
   const isPlatformAdmin = hasAnyRole(roles, PLATFORM_ROLES);
 
@@ -437,7 +455,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   //   운영 종료 서비스의 surface 는 진입 후보에서 뺀다 — 남는 surface 가 없으면 카드도 없다.
   const community: EntryItem[] = [];
   for (const c of data.communities ?? []) {
-    if (!c.canParticipate || !Array.isArray(c.entries)) continue;
+    if (c.kind === 'semi-franchise' || !c.canParticipate || !Array.isArray(c.entries)) continue;
     const entries = c.entries.filter((e) => !RETIRED_SERVICE_KEYS.has(e.serviceKey));
     if (entries.length === 0) continue;
     const entry =
@@ -462,7 +480,10 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   //   "매장 HUB" 는 Store Workspace 안의 탭이므로 대표 홈에 별도 진입을 두지 않는다.
   const store: EntryItem[] = [];
   for (const s of data.stores) {
-    if (!isActive(s.serviceKey)) continue;
+    if (RETIRED_SERVICE_KEYS.has(s.serviceKey)) continue;
+    // 약국은 API가 승인 원장·조직 관계로 확정한 매장이다. KPA 개인 가입을
+    // UI에서 추가 요구하지 않는다. 다른 서비스의 가입 판정은 유지한다.
+    if (s.serviceKey !== 'kpa-society' && !isActive(s.serviceKey)) continue;
     const path = SERVICE_PATHS[s.serviceKey]?.myStore;
     if (!path) continue; // Store Workspace 경로가 확인된 서비스만 (dead link 0)
     store.push({
@@ -495,6 +516,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   for (const svc of data.operatorServices ?? []) {
     if (!svc.workspaceAvailable) continue;
     const key = svc.serviceKey;
+    if (RETIRED_SERVICE_KEYS.has(key)) continue;
     const note = svc.scope === 'admin' ? '관리자' : undefined;
     const label = byKey.has(key) ? nameOf(key) : svc.serviceName;
     if (key === 'neture') {
@@ -515,8 +537,9 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     //   한 서비스에 수준이 다른 화면이 여럿이면 **그 scope 가 들어갈 수 있는 것**을 고른다 —
     //   admin scope 는 admin 화면, operator scope 는 operator 화면(admin ⊃ operator). 채울 수 없으면
     //   카드를 만들지 않는다(dead link 0).
-    //   community 는 admin 단일 계층 — `/admin/communities`(개설 심사 · 커뮤니티 운영자 지정).
-    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key);
+    //   community 는 Admin(`/admin/communities`)과 Operator(`/operator/communities`)로 구분한다.
+    // Policy settings remain secondary links, without replacing a service's primary management workspace.
+    const screens = SUBDOMAIN_OPERATOR_SCREENS.filter((s) => s.key === key && !s.path.startsWith('/operator/legal/'));
     if (screens.length > 0) {
       const screen = screens.find((s) => s.level === svc.scope) ?? screens.find((s) => s.level === 'operator');
       if (!screen) continue;
@@ -531,6 +554,19 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     operator.push({ id, label, note, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
   }
 
+  // 운영 진입은 개인 공급자/매장 자격과 구분한다. 서버가 확정한 운영 목록과
+  // 기존 platform 예외만 사용하고 개인 데이터 접근 guard는 변경하지 않는다.
+  const supplierScope = data.operatorServices?.find((s) => s.serviceKey === 'supplier' && s.workspaceAvailable)?.scope;
+  if (supplierScope || isPlatformAdmin) {
+    const level = supplierScope ?? 'admin';
+    const screen = SUBDOMAIN_OPERATOR_SCREENS.find((s) => s.key === 'supplier' && s.level === level);
+    if (screen) supplier.push({ id: 'supplier:management', label: '공급자 관리', action: { kind: 'internal', to: screen.path } });
+  }
+  const netureOperator = data.operatorServices?.some((s) => s.serviceKey === 'neture' && s.workspaceAvailable);
+  if (netureOperator || isPlatformAdmin) {
+    store.push({ id: 'store:management', label: '내 매장 신청 심사', action: { kind: 'internal', to: '/operator/pharmacy-memberships' } });
+  }
+
   const itemsOf: Record<WorkspaceKey, EntryItem[]> = { community, store, supplier, operator };
   const groups: EntryGroup[] = WORKSPACE_CARDS.map((c) => ({ ...c, items: itemsOf[c.id] }));
 
@@ -541,6 +577,11 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내 서비스 (Service Identity 목록 · active 만 — 업무 공간이 아니다) ──
   const myServices: EntryItem[] = [];
+  for (const business of data.communities ?? []) {
+    if (business.kind !== 'semi-franchise' || !business.canParticipate || !business.businessKey) continue;
+    myServices.push({ id: `business:${business.businessKey}`, label: `${business.name} · 참여자 공간`,
+      action: { kind: 'handoff', serviceKey: 'kpa-society', returnPath: `/businesses/${encodeURIComponent(business.businessKey)}/forum` } });
+  }
   for (const svcKey of ['supplier'] as const) {
     if (states[svcKey].status !== 'active') continue;
     const info = NETURE_SERVICE_INFO[svcKey];
@@ -585,6 +626,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     statusItems.push({ id: `status:neture-${svcKey}`, serviceName: info.name, status, statusLabel: SERVICE_STATUS_LABELS[status], guide });
   }
   for (const svc of data.services) {
+    if (svc.key === 'pharmacy-hub') continue;
     const status = svc.membership?.status;
     if (!status || status === 'active') continue;
     const paths = SERVICE_PATHS[svc.key];
@@ -614,6 +656,7 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     });
   }
   for (const svc of data.services) {
+    if (RETIRED_SERVICE_KEYS.has(svc.key)) continue;
     if (svc.membership) continue;
     if (!svc.joinEnabled) continue;
     const join = SERVICE_PATHS[svc.key]?.join;

@@ -1,3 +1,4 @@
+import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * Neture 약국 매장 commerce API — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  * 설계: docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md §3-1 · §3-2 · §4 · §8
@@ -28,6 +29,7 @@ export interface PharmacyMembership {
 }
 
 export interface PharmacyMembershipInput {
+  policyReferences?: EnrollmentPolicyReference[];
   pharmacyName: string;
   businessNumber: string;
   pharmacistLicenseNumber: string;
@@ -87,8 +89,8 @@ export interface PharmacyRecruitment {
   supplyUnitPrice: number | string | null;
   consumerPrice: number | string | null;
   createdAt: string;
-  semiFranchiseKey: string;
-  semiFranchiseName: string;
+  semiFranchiseKey: string | null;
+  semiFranchiseName: string | null;
   applicationId: string | null;
   applicationStatus: string | null;
 }
@@ -146,7 +148,7 @@ export interface PharmacyOrder {
   createdAt: string;
   paidAt: string | null;
   supplierId: string | null;
-  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number }> | null;
+  items: Array<{ productName?: string; quantity?: number; unitPrice?: number; subtotal?: number; metadata?: { semiFranchiseKey?: string } }> | null;
   paymentGroupId: string | null;
   receiverKey: string | null;
   testPayment: boolean;

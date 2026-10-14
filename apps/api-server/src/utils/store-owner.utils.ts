@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from './store-member-access.js';
 /**
  * Store Owner Utilities
  *
@@ -66,7 +67,6 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
   //   `kpa` 매장 판정 자체는 아래 isStoreOwner 에서 내 매장(약국) 신청 원장으로 한다 — 이 목록은 role 기반 소비처용.
   kpa: ['kpa:store_owner', 'neture:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
-  'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
 
 /**
@@ -131,7 +131,7 @@ export async function isStoreOwner(
   preferredOrganizationId?: string | null,
 ): Promise<StoreOwnerCheckResult> {
   const allowedRoles: readonly string[] = serviceKey
-    ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
+    ? (STORE_OWNER_ROLES_BY_SERVICE[serviceKey] ?? [])
     : ALL_STORE_OWNER_ROLES;
 
   // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7
@@ -370,6 +370,6 @@ export async function resolveStoreAccess(
   // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
   // preferredOrganizationId(선택 매장 헤더)는 허용 후보 안에서만 고르는 힌트다(§21-14).
   const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey, preferredOrganizationId);
-  if (isOwner) return organizationId;
-  return null;
+  if (isOwner && organizationId && (!preferredOrganizationId || preferredOrganizationId === organizationId)) return organizationId;
+  return resolveApprovedStoreMemberOrganization(dataSource, userId, serviceKey, preferredOrganizationId);
 }

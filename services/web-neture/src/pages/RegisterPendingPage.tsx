@@ -58,6 +58,8 @@ export function RegisterPendingPage() {
           </Link>
         </div>
 
+        <p><a href="https://neture.co.kr/" style={styles.loginButton}>O4O 메인으로</a></p>
+
         <p style={styles.helpText}>
           문의사항이 있으시면 운영자에게 연락해주세요.
         </p>

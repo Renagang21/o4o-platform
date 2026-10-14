@@ -7,14 +7,14 @@
  *   - 상태 조회를 관리자라고 건너뛰지 않는다
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-const authState = { user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] } as { id: string; email: string; name: string; roles: string[] } | null };
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user }) }));
+const authState = { isLoading: false, user: { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] } as { id: string; email: string; name: string; roles: string[] } | null };
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user, isLoading: authState.isLoading }) }));
 
 const statesResult = {
-  states: null as null | { supplier: { status: string; source: string } },
+  states: null as null | { supplier: { status: string; source: string }; netureMain?: { status: string; source: string } },
   loading: false,
   error: null as string | null,
   reload: vi.fn(),
@@ -23,6 +23,7 @@ const useStates = vi.fn((_enabled: boolean) => statesResult);
 vi.mock('../../../lib/neture-service-state', () => ({ useNetureServiceStates: (enabled: boolean) => useStates(enabled) }));
 vi.mock('../../../lib/apiClient', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 
+import { api } from '../../../lib/apiClient';
 import { ServiceApplyPanel } from '../ServiceApplyPanel';
 
 const st = (supplier: string) => ({ supplier: { status: supplier, source: 'test' } });
@@ -36,15 +37,46 @@ function mount() {
 }
 
 describe('ServiceApplyPanel', () => {
-  afterEach(() => cleanup());
+  const assign = vi.fn();
+  afterEach(() => {
+    cleanup();
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    localStorage.clear();
+    vi.unstubAllGlobals();
+  });
   beforeEach(() => {
+    authState.isLoading = false;
+    assign.mockReset();
+    vi.stubGlobal('location', { ...window.location, assign });
     authState.user = { id: 'u1', email: 'u1@example.test', name: '회원', roles: ['user'] };
     statesResult.states = null;
     statesResult.loading = false;
     statesResult.error = null;
     useStates.mockClear();
+    vi.mocked(api.get).mockReset().mockResolvedValue({ data: { data: [] } } as any);
+    vi.mocked(api.post).mockReset();
   });
 
+  it('requires supplier documents and preserves fields while reloading a changed version', async () => {
+    statesResult.states = st('none');
+    const doc = { policyDocumentId: '11111111-1111-4111-8111-111111111111', serviceKey: 'supplier', documentType: 'terms', version: 2, title: '공급자 조건', content: '공급자 신청 본문' };
+    vi.mocked(api.get).mockResolvedValueOnce({ data: { data: [doc] } } as any).mockResolvedValueOnce({ data: { data: [{ ...doc, version: 3 }] } } as any);
+    vi.mocked(api.post).mockRejectedValueOnce({ response: { data: { error: { code: 'POLICY_VERSION_MISMATCH' } } } });
+    mount();
+    fireEvent.change(screen.getByLabelText(/회사명/), { target: { value: '입력 회사' } });
+    fireEvent.change(screen.getByLabelText(/식별자/), { target: { value: 'fixture' } });
+    await screen.findByText(/공급자 조건/);
+    expect((screen.getByRole('button', { name: /공급자.*신청/ }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.submit(screen.getByTestId('service-apply-supplier-none'));
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+    await screen.findByText(/입력 내용은 유지됩니다/);
+    expect((screen.getByLabelText(/회사명/) as HTMLInputElement).value).toBe('입력 회사');
+    expect((screen.getByLabelText(/식별자/) as HTMLInputElement).value).toBe('fixture');
+    await screen.findByText(/버전 3/);
+    expect((screen.getByRole('checkbox') as HTMLInputElement).checked).toBe(false);
+    expect(vi.mocked(api.post).mock.calls[0][1]).toMatchObject({ policyReferences: [{ policyDocumentId: doc.policyDocumentId, version: 2, documentType: 'terms' }] });
+  });
   it.each([['neture:admin'], ['platform:super_admin']])('%s 도 상태가 none 이면 신청 폼 (관리자 우회 링크 없음)', (role) => {
     authState.user!.roles = ['user', role];
     statesResult.states = st('none');
@@ -76,4 +108,65 @@ describe('ServiceApplyPanel', () => {
     expect(screen.getByTestId('service-apply-supplier-none')).toBeTruthy();
     expect(screen.queryByRole('link')).toBeNull();
   });
+
+  it.each(['pending', 'rejected', 'suspended', 'withdrawn'])('공통 계정 %s → 계정 상태 확인이며 서비스 수동 승인 대기로 안내하지 않는다', (status) => {
+    statesResult.states = { ...st('none'), netureMain: { status, source: 'account_verification' } };
+    mount();
+    expect(screen.getByTestId('service-apply-supplier-neture-required')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '대표 홈에서 계정 상태 확인' })).toBeTruthy();
+    expect(screen.queryByText(/가입 승인|승인 대기/)).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(api.post).not.toHaveBeenCalled();
+  });
+
+  const accountPending = () => {
+    statesResult.states = { ...st('none'), netureMain: { status: 'pending', source: 'account_verification' } };
+  };
+  const homeHandoff = { data: { data: { targetUrl: 'https://neture.co.kr/handoff?token=synthetic-fixture' } } };
+
+  it('대표 홈 계정 확인은 현재 로그인으로 handoff를 발급하고 원래 세션을 삭제하지 않는다', async () => {
+    accountPending();
+    localStorage.setItem('o4o_accessToken', 'synthetic-local-fixture');
+    vi.mocked(api.post).mockResolvedValueOnce(homeHandoff as any);
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: '대표 홈에서 계정 상태 확인' }));
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(homeHandoff.data.data.targetUrl));
+    expect(api.post).toHaveBeenCalledTimes(1);
+    expect(api.post).toHaveBeenCalledWith('/auth/handoff', { targetServiceKey: 'neture', returnPath: '/' });
+    expect(localStorage.getItem('o4o_accessToken')).toBe('synthetic-local-fixture');
+  });
+
+  it('제한 계정의 handoff 거절은 오류를 표시하고 이동·로그아웃 없이 재시도할 수 있다', async () => {
+    accountPending();
+    localStorage.setItem('o4o_accessToken', 'synthetic-local-fixture');
+    vi.mocked(api.post).mockRejectedValueOnce({ response: { status: 403, data: { code: 'ACCOUNT_NOT_ACTIVE' } } }).mockResolvedValueOnce(homeHandoff as any);
+    mount();
+    fireEvent.click(screen.getByRole('button', { name: '대표 홈에서 계정 상태 확인' }));
+    expect((await screen.findByRole('alert')).textContent).toContain('이용할 수 없는 계정 상태');
+    expect(assign).not.toHaveBeenCalled();
+    expect(localStorage.getItem('o4o_accessToken')).toBe('synthetic-local-fixture');
+    const retry = screen.getByRole('button', { name: '대표 홈에서 계정 상태 확인' }) as HTMLButtonElement;
+    expect(retry.disabled).toBe(false);
+    fireEvent.click(retry);
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(homeHandoff.data.data.targetUrl));
+    expect(api.post).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(api.post).mock.calls.every(([url]) => url === '/auth/handoff')).toBe(true);
+  });
+
+  it('세션 복구 중에는 대표 홈 이동을 발급하지 않는다', () => {
+    accountPending();
+    authState.isLoading = true;
+    mount();
+    const button = screen.getByRole('button', { name: '대표 홈에서 계정 상태 확인' }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    fireEvent.click(button);
+    expect(api.post).not.toHaveBeenCalled();
+    expect(assign).not.toHaveBeenCalled();
+  });
+
+  it('공급자 진입에서 승인된 서비스는 기존 guard가 있는 업무 주소로 이동한다', async () => {
+   statesResult.states = st('active');
+   render(<MemoryRouter><Routes><Route path="/" element={<ServiceApplyPanel service="supplier" enterWorkspace />} /><Route path="/supplier/dashboard" element={<h1>공급자 업무</h1>} /></Routes></MemoryRouter>);
+   expect(await screen.findByRole('heading', { name: '공급자 업무' })).toBeTruthy();
+ });
 });

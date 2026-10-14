@@ -46,6 +46,7 @@ export default function CommunityAnnouncementsPage() {
       <p className="text-gray-600 mb-8">플랫폼 공지와 업데이트 안내</p>
 
       {/* Loading */}
+      <Link to="/policies/account-update" className="mb-6 block rounded-lg border border-blue-200 bg-blue-50 p-5 text-blue-800">계정 이용약관·개인정보 처리방침 개정 공고 · 시행 예정 2026-11-13</Link>
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (

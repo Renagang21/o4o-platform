@@ -7,9 +7,10 @@
  * 테스트 결제 주문은 "테스트 결제" 로 표시한다 — 실제 결제 · 공급자 지급 근거가 아니다.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
-import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder } from '../../api/neturePharmacy';
+import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder, type SemiFranchiseRow } from '../../api/neturePharmacy';
+import { BusinessTabs } from '../../components/BusinessTabs';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 import { PaymentGroupPay, usePaymentMode } from './PaymentGroupPay';
 
@@ -40,6 +41,10 @@ function itemSummary(o: PharmacyOrder): string {
 
 export default function PharmacyOrdersPage() {
   const mode = usePaymentMode();
+  const [params, setParams] = useSearchParams();
+  const business = params.get('business') || '';
+  const [businesses, setBusinesses] = useState<SemiFranchiseRow[]>([]);
+  useEffect(() => { let active = true; neturePharmacyApi.listSemiFranchises().then(rows => { if (active) setBusinesses(rows.filter(r => r.membershipStatus !== null)); }).catch(() => {}); return () => { active = false; }; }, []);
   const [orders, setOrders] = useState<PharmacyOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +65,7 @@ export default function PharmacyOrdersPage() {
 
   useEffect(() => { void load(); }, [load]);
 
+  const visibleOrders = business ? orders.filter(o => o.items?.some(i => i.metadata?.semiFranchiseKey === business)) : orders;
   /** 결제 전 주문을 결제 그룹별로 묶는다(금액 = 그룹 주문 합계 — 확정 금액은 서버가 다시 계산한다). */
   const unpaidGroups = useMemo(() => {
     const m = new Map<string, { paymentGroupId: string; amount: number; count: number }>();
@@ -99,11 +105,13 @@ export default function PharmacyOrdersPage() {
       </>}
     >
       {message && <Notice>{message}</Notice>}
+      <BusinessTabs businesses={businesses} value={business} onChange={key => setParams(prev => { const p = new URLSearchParams(prev); if (key) p.set('business', key); else p.delete('business'); return p; })} />
+      {business && <p className="mb-3 text-sm text-slate-500">선택한 사업의 항목이 포함된 주문입니다. 주문 금액·결제 그룹은 원래 주문 전체 기준입니다.</p>}
       {error && <Notice tone="error">{error}</Notice>}
 
       {!loading && unpaidGroups.length > 0 && (
         <section className="mb-6 rounded-lg border border-amber-200 bg-white p-4">
-          <h2 className="mb-2 text-base font-semibold text-gray-900">결제 대기</h2>
+          <h2 className="mb-2 text-base font-semibold text-gray-900">전체 사업의 결제 대기</h2>
           {unpaidGroups.map((g, idx) => (
             <div key={g.paymentGroupId} className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
               <span><strong>결제 그룹 {idx + 1}</strong> · 주문 {g.count}건 · {formatWon(g.amount)}</span>
@@ -115,7 +123,7 @@ export default function PharmacyOrdersPage() {
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : orders.length === 0 ? (
+      ) : visibleOrders.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
           <p>주문 내역이 없습니다.</p>
           <p className="mt-1"><Link className="underline" to={pharmacyStorePath('supply')}>공급 상품 보기</Link></p>
@@ -135,7 +143,7 @@ export default function PharmacyOrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((o) => (
+              {visibleOrders.map((o) => (
                 <tr key={o.id} className="border-b border-gray-100 last:border-0">
                   <td className="px-4 py-3 font-mono text-xs">{o.orderNumber}</td>
                   <td className="px-4 py-3">{itemSummary(o)}</td>

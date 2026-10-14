@@ -14,7 +14,7 @@
  *   목록은 선택 후 일괄 작업이 정의되어 있지 않으므로 체크박스/ActionBar 는 넣지 않는다.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   CONTACT_STATUSES,
@@ -62,50 +62,73 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
   const [detailStatus, setDetailStatus] = useState('');
   const [detailNote, setDetailNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const state = useRef({ mounted: false, list: 0, detail: 0, saving: false });
+  useEffect(() => {
+    const lifecycle = state.current;
+    lifecycle.mounted = true; lifecycle.saving = false; setSaving(false); setDetail(null); setMessage(null); setResult(null);
+    return () => { lifecycle.mounted = false; lifecycle.list++; lifecycle.detail++; };
+  }, [api, serviceKey]);
 
   const typeLabel = (t: string) => inquiryTypeLabels[t] || t;
 
   const load = useCallback(async (page = 1) => {
+    const request = ++state.current.list;
+    const current = () => state.current.mounted && state.current.list === request;
     setLoading(true);
     try {
       const r = await api.list(serviceKey, { status: statusFilter || undefined, page, limit: 20 });
-      setResult(r);
+      if (current()) setResult(r);
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.message || '문의 목록을 불러오지 못했습니다.' });
+      if (current()) { setResult(null); setMessage({ type: 'error', text: err?.message || '문의 목록을 불러오지 못했습니다.' }); }
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
   }, [api, serviceKey, statusFilter]);
 
   useEffect(() => { load(1); }, [load]);
 
   const openDetail = async (id: string) => {
-    setMessage(null);
+    if (state.current.saving) return;
+    const request = ++state.current.detail;
+    setMessage(null); setDetail(null);
     try {
       const d = await api.getDetail(serviceKey, id);
+      if (!state.current.mounted || request !== state.current.detail) return;
       setDetail(d);
       setDetailStatus(d.status);
       setDetailNote(d.internalNote ?? '');
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.message || '문의 상세를 불러오지 못했습니다.' });
+      if (state.current.mounted && request === state.current.detail) setMessage({ type: 'error', text: err?.message || '문의 상세를 불러오지 못했습니다.' });
     }
   };
 
   const handleSave = async () => {
-    if (!detail) return;
+    if (!detail || state.current.saving) return;
+    state.current.saving = true;
+    const request = state.current.detail;
+    const current = () => state.current.mounted && request === state.current.detail;
     setSaving(true);
     setMessage(null);
+    let statusSaved = false;
     try {
       let updated = detail;
-      if (detailStatus !== detail.status) updated = await api.setStatus(serviceKey, detail.id, detailStatus);
-      if (detailNote !== (detail.internalNote ?? '')) updated = await api.setNote(serviceKey, detail.id, detailNote);
+      if (detailStatus !== detail.status) {
+        updated = await api.setStatus(serviceKey, detail.id, detailStatus);
+        statusSaved = true;
+        if (!current()) return;
+        setDetail(updated); setDetailStatus(updated.status);
+      }
+      if (detailNote !== (updated.internalNote ?? '')) updated = await api.setNote(serviceKey, detail.id, detailNote);
+      if (!current()) return;
       setDetail(updated);
+      setDetailStatus(updated.status); setDetailNote(updated.internalNote ?? '');
       setMessage({ type: 'success', text: '저장되었습니다.' });
       await load(result?.pagination.page ?? 1);
     } catch (err: any) {
-      setMessage({ type: 'error', text: err?.message || '저장에 실패했습니다.' });
+      if (current()) setMessage({ type: 'error', text: err?.message || '저장에 실패했습니다.' });
+      if (current() && statusSaved) await load(result?.pagination.page ?? 1);
     } finally {
-      setSaving(false);
+      if (current()) { state.current.saving = false; setSaving(false); }
     }
   };
 
@@ -135,6 +158,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
 
       {message && (
         <div
+          role={message.type === 'error' ? 'alert' : 'status'}
           className={`px-4 py-2.5 rounded-lg text-sm mb-4 border ${
             message.type === 'success'
               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -147,6 +171,8 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
 
       <div className="flex flex-wrap items-center gap-2 mb-3.5">
         <select
+          aria-label="문의 상태 필터"
+          disabled={saving}
           className="px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg bg-white"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
@@ -154,7 +180,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
           <option value="">전체 상태</option>
           {CONTACT_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button type="button" className={BTN_GHOST} onClick={() => load(1)}>새로고침</button>
+        <button type="button" className={BTN_GHOST} disabled={loading || saving} onClick={() => { setMessage(null); void load(1); }}>새로고침</button>
       </div>
 
       <DataTable<ContactInquiryListItem>
@@ -162,7 +188,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
         data={result?.items ?? []}
         rowKey={(i) => i.id}
         loading={loading}
-        emptyMessage="접수된 문의가 없습니다."
+        emptyMessage={message?.type === 'error' ? '목록을 다시 불러와 주세요.' : '접수된 문의가 없습니다.'}
         onRowClick={(i) => openDetail(i.id)}
       />
 
@@ -193,7 +219,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
       {detail && (
         <div
           className="fixed inset-0 z-50 flex justify-end bg-slate-900/40"
-          onClick={() => setDetail(null)}
+          onClick={() => { if (!state.current.saving) { state.current.detail++; setDetail(null); } }}
         >
           <div
             className="w-[min(560px,100%)] h-full bg-white overflow-y-auto p-6"
@@ -201,7 +227,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
           >
             <div className="flex items-start justify-between mb-3">
               <h2 className="text-lg font-bold text-slate-900 m-0">{detail.subject}</h2>
-              <button type="button" className={BTN_GHOST} onClick={() => setDetail(null)}>닫기</button>
+              <button type="button" className={BTN_GHOST} disabled={saving} onClick={() => { state.current.detail++; setDetail(null); }}>닫기</button>
             </div>
 
             <div className="mb-3"><span className={FIELD_LABEL}>유형</span><span className={FIELD_VALUE}>{typeLabel(detail.inquiryType)}</span></div>
@@ -233,6 +259,8 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
             <div className="mb-3">
               <span className={FIELD_LABEL}>상태</span>
               <select
+                aria-label="문의 처리 상태"
+                disabled={saving}
                 className="w-full px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg bg-white"
                 value={detailStatus}
                 onChange={(e) => setDetailStatus(e.target.value)}
@@ -243,6 +271,8 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
             <div className="mb-3">
               <span className={FIELD_LABEL}>내부 메모</span>
               <textarea
+                aria-label="문의 내부 메모"
+                disabled={saving}
                 className="w-full box-border px-2.5 py-2 text-sm border border-slate-300 rounded-lg min-h-20 font-[inherit]"
                 value={detailNote}
                 onChange={(e) => setDetailNote(e.target.value)}

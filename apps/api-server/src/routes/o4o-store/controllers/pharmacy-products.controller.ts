@@ -23,7 +23,8 @@ import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { ApiError } from '../../../utils/api-error.js';
-import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreWorkspaceAccess } from '../../../utils/store-workspace-access.js';
 import { semiFranchiseAccessKeyFor } from '../../../common/auth/service-login-eligibility.policy.js';
 import { hasServiceSemiFranchiseSupplyAccess } from '../../../modules/neture-pharmacy/services/supply-access.js';
 
@@ -188,7 +189,7 @@ export function createPharmacyProductsController(
 
   // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
   // serviceKey 전파.
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
+  const requirePharmacyOwner = createRequireStoreWorkspaceAccess(dataSource, serviceKey);
 
   // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1:
   //   마운트 serviceKey 캡처. /apply 내부에서 body-resolved serviceKey 가 동명 지역변수로 가려지므로

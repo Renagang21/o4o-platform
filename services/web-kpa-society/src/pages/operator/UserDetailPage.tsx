@@ -40,13 +40,14 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isCurrentUserAdmin = currentUser?.roles?.includes(ROLES.KPA_ADMIN) ?? false;
+  const isCurrentUserAdmin = currentUser?.roles?.some(role => role === ROLES.KPA_ADMIN || role === 'platform:super_admin') ?? false;
 
   return (
     <CommonUserDetailPage
       apiAdapter={apiAdapter}
       config={kpaConfig}
       isAdmin={isCurrentUserAdmin}
+      canManageMembers={isCurrentUserAdmin || (currentUser?.roles?.includes('kpa:operator') ?? false)}
       navigate={navigate}
       userId={id}
     />

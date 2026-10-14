@@ -1,6 +1,6 @@
 # AI Core
 
-> **AI 기능을 제공하지 않는다. AI의 정책, 계약, 로그 기준을 정의한다.**
+> **AI 공통 계약과 실행 흐름, provider 호출을 제공한다. 업무 규칙과 도메인 권한·저장은 호스트/Extension이 담당한다.**
 
 ---
 
@@ -10,7 +10,7 @@ AI Core는 O4O Platform에서 AI 관련 **책임 경계와 기준점을 정의**
 
 ### 핵심 원칙
 
-- 이 앱은 **AI 기능을 직접 구현하지 않음**
+- 업무별 기능은 Extension이 구현하고, 공통 실행은 기존 `execute`/`executeStream`을 재사용
 - AI의 **정책, 계약, 로그 기준**을 정의
 - 모든 AI 관련 작업의 **참조 대상**
 
@@ -68,8 +68,8 @@ ai-logs/
 | 추천 알고리즘 | 각 서비스 Extension | AI Core가 제공하지 않음 |
 | 벡터 DB | 인프라 영역 | AI Core가 제공하지 않음 |
 | 과금/결제 | payment-core | AI Core가 제공하지 않음 |
-| 모델 다중화 | 인프라 영역 | AI Core가 제공하지 않음 |
-| LLM 프롬프트 | ai-common-core | Chat UI용 프롬프트는 별도 |
+| 업체/모델 선택 정책 | 서버 정책·외부 연결부 | Core의 기존 provider adapter로 실제 호출 |
+| 업무 LLM 프롬프트 | `@o4o/ai-prompts` · 업무 Extension | Core에서 업무 prompt를 정의하지 않음 |
 
 ---
 
@@ -78,7 +78,7 @@ ai-logs/
 | 패키지 | 역할 | 관계 |
 |--------|------|------|
 | `@o4o/ai-core` | 정책/계약/로그 기준 | **본 패키지** |
-| `@o4o/ai-common-core` | Chat UI, 프롬프트 레지스트리 | AI Core 정책 준수 |
+| `@o4o/ai-prompts` | 업무별 prompt | Extension에서 재사용 |
 | 각 서비스 AI 컴포넌트 | 서비스별 AI UI | AI Core 계약 준수 |
 
 ### 4.1 AI를 사용하는 독립 서비스
@@ -127,10 +127,27 @@ import { AiLogEntry } from '@o4o/ai-core/ai-logs';
 
 ## 한 줄 요약
 
-> **"AI Core는 기능을 만드는 앱이 아니라, AI의 기준과 책임을 고정하는 앱이다."**
+> **"공통 실행은 AI Core, 업무 규칙은 Extension, 권한·정책·저장은 기존 호스트가 담당한다."**
 
 ---
 
 *Created: 2026-01-15*
 *Work Order: WO-AI-CORE-APP-SCAFFOLD-V0*
 *Status: Active Core App*
+
+
+## 업무 Extension 실행 (2026-10-13)
+
+[공통 구조·조사·TODO](../../docs/architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)와
+[구현 WO](../../docs/work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)를 따른다.
+`AiBusinessExtension`은 provider와 독립적인 prepare/parse만 제공한다.
+`runAiExtension(request, runtime, host)`는 기존 domain authorize → started → prepare → runtime.invoke → provider-completed → parse → completed 순서다.
+read/draft만 허용하며, consumer 요청에 staff 자료는 거부한다. host.record는 원문·key를 저장하지 않는다.
+미연결·한도·provider 오류는 안전한 코드로 반환한다. 자료 audience 표시는 권한 증명이 아니다.
+첫 연결은 기존 콘텐츠 번역 + CONTENT_TRANSLATION 정책이다. 로그 observer는 구조화 logger이며 durable 실행 원장/원자 quota/외부 계정 연결은 후속이다.
+기존 execute/stream/runAIInsight 계약과 호출부는 보존한다.
+
+
+서비스 확대: 카탈로그별 question/summary/draft·운영 요약, LMS 피드백, Neture 추천, 공용 리서치를 기존 실행에 연결했다.
+기본 principal은 인증 actor다. 명시적 public principal은 actor 없이 consumer read/no-materials만 허용하며 호스트의 기존 공개 접근 판정이 반드시 필요하다.
+public으로 직원 자료·draft·도메인 실행을 열 수 없다. [구조안 §9](../../docs/architecture/O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)에서 연결 범위와 호환 유지 경로를 확인한다.

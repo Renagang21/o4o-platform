@@ -94,7 +94,7 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
   // 대표 홈 공급자 카드는 실제 이용 상태 active 만. (서버 guard 의 운영 목적 통과는 그대로 — UI 노출만 분리)
   it('관리자(neture:admin · platform:super_admin)라도 공급자 서비스가 active 가 아니면 공급자 업무 진입이 없다', () => {
     expect(groupIds(buildHomeEntryModel(user(['neture:admin']), data({})))).not.toContain('supplier');
-    expect(groupIds(buildHomeEntryModel(user(['platform:super_admin']), data({})))).not.toContain('supplier');
+    expect(buildHomeEntryModel(user(['platform:super_admin']), data({})).groups.find(g => g.id === 'supplier')!.items.map(i => i.label)).toEqual(['공급자 관리']);
     // 실제 공급자이기도 한 관리자는 진입이 있다
     const m = buildHomeEntryModel(user(['platform:super_admin']), data({ supplier: { status: 'active', source: 'neture_suppliers' } }));
     expect(groupIds(m)).toContain('supplier');
@@ -138,8 +138,7 @@ describe('buildHomeEntryModel — 매장 카드 = Store Workspace Home', () => {
     const store = m.groups.find((g) => g.id === 'store')!;
     expect(store.title).toBe('매장');
     expect(store.items.map((i) => [i.label, i.note, i.action])).toEqual([
-      ['매장 A', 'KPA Society', { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' }],
-      ['매장 A', 'Pharmacy Hub', { kind: 'handoff', serviceKey: 'pharmacy-hub', returnPath: '/store-owner/workspace' }],
+      ['매장 A', undefined, { kind: 'handoff', serviceKey: 'kpa-society', returnPath: '/store/workspace' }],
     ]);
     // 매장 HUB · 내 매장 최상위 그룹 없음 · "/store-hub" 직접 진입 없음 · "내 매장" 라벨 없음
     expect(m.groups.map((g) => g.id)).toEqual(['community', 'store', 'supplier', 'operator']);

@@ -6,7 +6,7 @@
  * isRegulated 토글 — 건강기능식품 등 규제 카테고리 구분
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useId } from 'react';
 import { Plus, Pencil, Trash2, ChevronRight, ChevronDown, X, Loader2, Shield } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { operatorCategoryApi, type CategoryNode } from '../../lib/api/operatorCategory';
@@ -46,6 +46,7 @@ function getParentOptions(nodes: CategoryNode[], level = 0): { id: string; name:
 }
 
 export default function CategoryManagementPage() {
+  const formId = useId();
   const [tree, setTree] = useState<CategoryNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -172,7 +173,7 @@ export default function CategoryManagementPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap gap-3 justify-between items-center">
         <h1 className="text-2xl font-bold text-slate-800">카테고리 관리</h1>
         <button
           onClick={() => openCreate(null)}
@@ -184,7 +185,7 @@ export default function CategoryManagementPage() {
       </div>
 
       {/* Tree Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+      <section className="bg-white rounded-xl border border-slate-200 overflow-x-auto" aria-label="카테고리 목록">
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
@@ -212,6 +213,8 @@ export default function CategoryManagementPage() {
                     <div className="flex items-center" style={{ paddingLeft: `${level * 24}px` }}>
                       {hasChildren ? (
                         <button
+                          aria-label={`${node.name} ${isExpanded ? '접기' : '펼치기'}`}
+                          aria-expanded={isExpanded}
                           onClick={() => toggleExpand(node.id)}
                           className="p-0.5 mr-1 text-slate-400 hover:text-slate-600"
                         >
@@ -281,7 +284,7 @@ export default function CategoryManagementPage() {
             })}
           </tbody>
         </table>
-      </div>
+      </section>
 
       {/* Create/Edit Modal */}
       {showModal && (
@@ -291,15 +294,20 @@ export default function CategoryManagementPage() {
               <h2 className="text-lg font-semibold text-slate-800">
                 {editId ? '카테고리 수정' : '카테고리 생성'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="p-1 text-slate-400 hover:text-slate-600">
+              <button
+                type="button"
+                aria-label="카테고리 편집 창 닫기"
+                onClick={() => setShowModal(false)}
+                className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="px-6 py-4 space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">카테고리 이름 *</label>
+                <label htmlFor={`${formId}-name`} className="block text-sm font-medium text-slate-700 mb-1">카테고리 이름 *</label>
                 <input
+                  id={`${formId}-name`}
                   type="text"
                   value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -312,8 +320,9 @@ export default function CategoryManagementPage() {
               {/* Parent (생성 시만) */}
               {!editId && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">상위 카테고리</label>
+                  <label htmlFor={`${formId}-parent`} className="block text-sm font-medium text-slate-700 mb-1">상위 카테고리</label>
                   <select
+                    id={`${formId}-parent`}
                     value={form.parentId || ''}
                     onChange={e => setForm(f => ({ ...f, parentId: e.target.value || null }))}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"

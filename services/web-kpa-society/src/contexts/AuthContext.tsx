@@ -1,3 +1,4 @@
+import type { SocialProof, KakaoSignupRequest } from '@o4o/auth-client';
 /**
  * Auth Context
  *
@@ -128,6 +129,8 @@ interface AuthContextType {
   loginWithGoogle: (idToken: string) => Promise<AuthLoginResult<User>>;
   /** WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1: 플랫폼 이메일 계정 로그인(세션 서비스는 서버가 Origin 으로 정한다). */
   loginWithEmail: (email: string, password: string) => Promise<AuthLoginResult<User>>;
+  loginWithKakao: (proof: SocialProof) => Promise<AuthLoginResult<User>>;
+  signupWithKakao: (token: string, input: KakaoSignupRequest) => Promise<AuthLoginResult<User>>;
   signupWithGoogle: (idToken: string, consents: GoogleSignupConsents) => Promise<AuthLoginResult<User>>;
   getGoogleAuthConfig: () => Promise<GoogleAuthConfig>;
   logout: () => Promise<void>;
@@ -280,7 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1 의 "토큰 없으면 /auth/me 생략" 규칙과
-   * 로그인/로그아웃/전체 로그아웃은 Core(useServiceAuth)가 동일하게 수행한다.
+   * 로그인/현재 브라우저 로그아웃은 Core(useServiceAuth)가 수행한다.
    * checkAuth 는 기존 이름을 유지하되 Core.refresh 로 위임한다(외부 계약 불변).
    */
   const checkAuth = core.refresh;
@@ -319,6 +322,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loginWithGoogle: core.loginWithGoogle,
         loginWithEmail: core.loginWithEmail,
         signupWithGoogle: core.signupWithGoogle,
+        loginWithKakao: core.loginWithKakao, signupWithKakao: core.signupWithKakao,
         getGoogleAuthConfig,
         logout,
         checkAuth,

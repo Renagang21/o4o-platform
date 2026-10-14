@@ -1,5 +1,7 @@
 # WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — CHECK
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태**: **CLOSED** (사용자 승인 2026-09-09) · 프로덕션 배포 검증 PASS (§5)
 > **종결 범위**: `ADMIN_IA_AND_MENU_REFACTOR = CLOSED` / `ADMIN_PRODUCTION_ADOPTION = PASS` / `ADMIN_PLATFORM_ONLY_ACCESS = PENDING` / `POST_REFACTOR_RESIDUALS = OPEN` — 상세 §6-0
 > **작성일**: 2026-09-09
@@ -68,7 +70,7 @@ endpoint 의 응답**:
 `adminRouteAccess.ts` 의 `matchesRequiredRole` 이 요구 집합에 `admin` 이 있으면 **모든 서비스 접두
 `:admin`/`:operator` 역할**을 통과시키므로, 이 floor 를 좁히는 것이 "플랫폼 관리자 전용"의 마지막 조각이다.
 
-**지금 좁히면 실제 잠금 사고가 난다.** `docs/local/TEST-ACCOUNTS.local.md` §3 (2026-08-09 DB 실측):
+**지금 좁히면 실제 잠금 사고가 난다.** `docs/local/TEST-ACCOUNT.txt` §3 (2026-08-09 DB 실측):
 
 | 계정 | 보유 role | floor 축소 시 |
 |---|---|---|

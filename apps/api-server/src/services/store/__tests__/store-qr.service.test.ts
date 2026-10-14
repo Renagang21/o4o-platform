@@ -254,6 +254,35 @@ describe('deactivateStoreQrCode', () => {
 describe('resolvePublicQrLanding', () => {
   const scan = { deviceType: 'mobile', userAgent: 'ua', referer: null, ipHash: 'h' };
 
+  it('공개 자료 조회는 QR과 동일 매장의 활성 자산만 JOIN한다', async () => {
+    const { ds, query } = makeDataSource({ queryResults: [
+      [{ id: 'q', landingType: 'page', isActive: true, organizationId: ORG,
+        libraryItemHtml: '<p>매장 A 자료</p>', libraryItemTitle: '내 자료' }],
+      [],
+    ] });
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', { ...scan, recordScan: false });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.pageContent).toEqual(expect.objectContaining({
+      title: '내 자료', body: '<p>매장 A 자료</p>', source: 'store_asset',
+    }));
+    const sql = String(query.mock.calls[0][0]).replace(/\s+/g, ' ');
+    expect(sql).toMatch(/ON li\.id = qr\.library_item_id AND li\.organization_id = qr\.organization_id AND li\.is_active = true/);
+  });
+
+  it('JOIN에서 제외된 자료는 본문·이미지로 폴백하지 않는다', async () => {
+    const { ds } = makeDataSource({ queryResults: [
+      [{ id: 'q', landingType: 'page', isActive: true, organizationId: ORG,
+        libraryItemHtml: null, libraryItemTitle: null, imageUrl: null }],
+      [],
+    ] });
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', { ...scan, recordScan: false });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.pageContent).toBeNull();
+    expect(result.data.imageUrl).toBeNull();
+  });
+
   it('없는 slug 는 404', async () => {
     const { ds } = makeDataSource({ queryResults: [[]] });
     const result = (await resolvePublicQrLanding(ds, 'nope', 'kpa', scan)) as QrFailure;
@@ -297,6 +326,17 @@ describe('resolvePublicQrLanding', () => {
     );
     // 원문 IP 가 아니라 해시만 저장한다.
     expect(insert?.[1]).toContain('h');
+  });
+
+  it('read-only HEAD resolves landing data without inserting a scan', async () => {
+    const { ds, query } = makeDataSource({ queryResults: [
+      [{ id: 'q', landingType: 'link', landingTargetId: 'https://x', isActive: true, organizationId: ORG, slug: 's' }],
+      [{ slug: 'store-slug' }],
+    ] });
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', { ...scan, recordScan: false });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.data.storeSlug).toBe('store-slug');
+    expect(query.mock.calls.some((call: any[]) => /INSERT|UPDATE|DELETE/i.test(call[0]))).toBe(false);
   });
 
   // ── WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1 회귀 가드 ──

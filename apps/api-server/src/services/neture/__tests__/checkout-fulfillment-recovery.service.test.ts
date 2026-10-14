@@ -74,7 +74,7 @@ describe('listStuckOrders — 전 producer 공통 탐지', () => {
     const ds = makeDataSource(null, []);
     await new CheckoutFulfillmentRecoveryService(ds).listStuckOrders();
     const params = ds.query.mock.calls[0][1];
-    for (const src of ['neture_b2b_checkout', 'pharmacy_hub_cart', 'store_b2b_cart', 'store_cart_checkout']) {
+    for (const src of ['neture_b2b_checkout', 'store_b2b_cart', 'store_cart_checkout']) {
       expect(params[0]).toContain(src);
     }
   });
@@ -142,7 +142,7 @@ describe('recoverOrder — 복구 · 멱등 · 거부', () => {
   });
 
   it('scope 밖 source → OUT_OF_SCOPE', async () => {
-    const svc = new CheckoutFulfillmentRecoveryService(makeDataSource(paidOrder({ source: 'pharmacy_hub_cart' })));
+    const svc = new CheckoutFulfillmentRecoveryService(makeDataSource(paidOrder({ source: 'neture_b2b_checkout' })));
     const out = await svc.recoverOrder(ORDER, { scope: { sources: ['store_cart_checkout'] } });
     expect(out).toMatchObject({ ok: false, code: 'OUT_OF_SCOPE' });
     expect(bridgeMock).not.toHaveBeenCalled();

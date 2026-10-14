@@ -1,5 +1,7 @@
 # CHECK-O4O-BROWSER-CONTROL-V0
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: `WO-O4O-BROWSER-CONTROL-V0`
 > **상태**: 검증 완료 — §52 완료 기준 전 항목 PASS (WO 종료 판단은 사용자 몫)
 > **작성일**: 2026-09-10
@@ -204,7 +206,7 @@ neture.co.kr (실브라우저 · 로그인 · /mypage/settings [이 PC 연결] �
 
 이 PC 는 이번이 첫 연결이라 One-click Pairing 부터 실측했다(`이 PC 연결됨` · agent 로그
 `이 PC 가 연결되었습니다`). 로그인은 Neture 웹 폼이 L2 자격을 요구해(테스트 계정 L2 unknown)
-`TEST-ACCOUNTS.local.md` §4-2 의 L1 채널로 세션을 만들었다 — Home 화면과 설정 화면은
+`TEST-ACCOUNT.txt` §4-2 의 L1 채널로 세션을 만들었다 — Home 화면과 설정 화면은
 role gate 가 없어 이 채널이 유효하다.
 
 ### 12-2. 사용자 UX smoke (§40) — 실측 답변

@@ -40,6 +40,9 @@ const writesTo = (src: string, table: string) =>
 
 const CONNECTED_SERVICE_FILES = [
   'modules/neture/services/supplier.service.ts',
+  'modules/neture/services/supplier-business.service.ts',
+  'modules/neture/services/supplier-lifecycle.service.ts',
+  'modules/neture/services/supplier-directory.service.ts',
   'modules/neture-pharmacy/services/pharmacy-membership.service.ts',
   'modules/neture-pharmacy/services/pharmacy-store-provisioner.ts',
   'modules/neture-pharmacy/services/semi-franchise.service.ts',
@@ -52,7 +55,7 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
   });
 
   it('공급자 신청 · 승인 · 재활성화는 현재 Neture 가입 상태를 전제조건으로 읽는다', () => {
-    const src = read('modules/neture/services/supplier.service.ts');
+    const src = read('modules/neture/services/supplier-lifecycle.service.ts');
     expect(src).toContain(`return { success: false, error: 'NETURE_MEMBERSHIP_REQUIRED' }`);
     expect(src.match(/APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
   });
@@ -347,7 +350,7 @@ describe('L4 세미프랜차이즈 제공 자료는 항목 단위로 판정한�
 
   it('세미프랜차이즈 모집 신청 POST 는 실제 모집 행 기준으로 직접 호출을 방어한다', () => {
     const svc = read('modules/neture/services/seller-recruitment.service.ts');
-    expect(svc).toContain('if (recruitment.semiFranchiseId || PHARMACY_RECRUITMENT_SERVICE_KEYS.includes(');
+    expect(svc).toContain('if (!isPublicRecruitment(recruitment)) {');
     expect(svc).toContain('[applicantId, recruitment.semiFranchiseId, [...PHARMACY_STORE_MEMBER_ROLES], storeOrganizationId]');
     // 판정은 신청 저장보다 먼저
     const createFn = svc.slice(svc.indexOf('async createApplication('));

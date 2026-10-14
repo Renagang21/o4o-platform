@@ -1,26 +1,34 @@
+import { communityMemberListFilter, communityMemberPagination, DEFAULT_MEMBER_LIST_QUERY, type CommunityMemberListQuery } from './community-member-list-query.js';
 /**
  * 개별 커뮤니티 운영자 지정·해제 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (권한 경계 정리)
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 원칙: Admin 은 서비스 운영자(`community:admin`)만 지정한다. 개별 커뮤니티 운영자는
- * `community_memberships.role` 의 **개체 역할**이고, 커뮤니티 서비스 운영자가 각 커뮤니티의
+ * 원칙: 중앙 관리자는 서비스 Admin/Operator 를 지정한다. 개별 커뮤니티 운영자는
+ * `community_memberships.role` 의 **개체 역할**이고, 커뮤니티 서비스 Admin 이 각 커뮤니티의
  * **승인된(active) 회원 중에서** 지정·해제한다. 서비스 전역 역할은 만들지 않는다(role_assignments 무변경).
  *
  * 고정하는 것
  *   - 대상은 그 커뮤니티의 active 가입 행뿐이다(pending · rejected · 다른 커뮤니티 행 → 409 / 404)
  *   - 서비스 membership(`community`)이 active 가 아닌 회원은 운영자로 올리지 않는다 — 진입 자격이 없으면
  *     운영자여도 화면에 들어갈 수 없다(V8). 여기서 되살리지 않는다.
- *   - 마지막 운영자는 내리지 않는다 — 커뮤니티가 운영자 없이 남으면 가입 승인이 멈춘다.
+ *   - 메인과 커뮤니티 서비스 이용이 가능한 마지막 유효 admin은 내리지 않는다.
  *     같은 커뮤니티의 운영자 행을 `FOR UPDATE` 로 잠그고 판정·UPDATE 를 한 트랜잭션에서 한다.
  */
+import { hasEligibleCommunityMembership, protectLastCommunityAdmin, recordCommunityMembershipChange } from './community-membership-mutations.js';
 import { COMMUNITY_SERVICE_KEY } from './community-lifecycle.service.js';
+import { resolveNetureMainMembershipStatus, NETURE_MAIN_MEMBERSHIP_MESSAGES, NETURE_MAIN_SERVICE_KEY, type NetureMainMembershipRow } from '../../modules/neture/services/neture-main-membership.js';
 import {
   demoAccountService,
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from '../auth/demo-account.service.js';
 
-export type CommunityMemberRole = 'operator' | 'member';
+export type CommunityMemberRole = 'admin' | 'operator' | 'member';
+export type CommunityDesignationEligibility = {
+  eligible: boolean;
+  code: 'MEMBERSHIP_NOT_ACTIVE' | 'DEMO_ACCOUNT_FORBIDDEN' | 'MAIN_MEMBERSHIP_NOT_ACTIVE' | 'SERVICE_MEMBERSHIP_NOT_ACTIVE' | null;
+  message: string | null;
+};
 
 export interface CommunityOperatorTx {
   query: (sql: string, params?: unknown[]) => Promise<any>;
@@ -52,7 +60,7 @@ export class CommunityOperatorDesignationService {
   > {
     const rows = await this.db.query(
       `SELECT c.id, c.slug, c.name, c.status,
-              COUNT(cm.id) FILTER (WHERE cm.status = 'active' AND cm.role = 'operator')::int AS operator_count,
+              COUNT(cm.id) FILTER (WHERE cm.status = 'active' AND cm.role IN ('admin', 'operator'))::int AS operator_count,
               COUNT(cm.id) FILTER (WHERE cm.status = 'active')::int AS member_count
          FROM communities c
          LEFT JOIN community_memberships cm ON cm.community_id = c.id
@@ -69,15 +77,16 @@ export class CommunityOperatorDesignationService {
     }));
   }
 
-  private async requireCommunity(m: CommunityOperatorTx, communityId: string): Promise<{ id: string; name: string }> {
+  private async requireCommunity(m: CommunityOperatorTx, communityId: string, lock = false): Promise<{ id: string; name: string }> {
     if (!UUID.test(communityId)) throw notFound();
-    const rows = await m.query(`SELECT id, name FROM communities WHERE id = $1`, [communityId]);
+    const rows = await m.query(`SELECT id, name FROM communities WHERE id = $1${lock ? ' FOR UPDATE' : ''}`, [communityId]);
     if (!rows?.length) throw notFound();
     return rows[0];
   }
 
   /** 그 커뮤니티의 승인된(active) 회원 — 지정 후보와 현재 운영자. */
-  async listMembers(communityId: string): Promise<{
+  async listMembers(communityId: string, query: CommunityMemberListQuery = DEFAULT_MEMBER_LIST_QUERY): Promise<{
+    pagination: ReturnType<typeof communityMemberPagination>;
     community: { id: string; name: string };
     members: Array<{
       membershipId: string;
@@ -86,58 +95,89 @@ export class CommunityOperatorDesignationService {
       email: string | null;
       role: CommunityMemberRole;
       serviceMembershipStatus: string | null;
+      membershipStatus: string;
+      designationEligibility: CommunityDesignationEligibility;
     }>;
   }> {
     const community = await this.requireCommunity(this.db, communityId);
+    const params: unknown[] = [communityId, COMMUNITY_SERVICE_KEY, NETURE_MAIN_SERVICE_KEY];
+    const filter = communityMemberListFilter(params, query);
+    const counts = await this.db.query(`SELECT COUNT(*)::int AS total FROM community_memberships cm
+      JOIN users u ON u.id = cm.user_id
+      LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
+      LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
+      WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}`, params);
+    const pagination = communityMemberPagination(Number(counts[0]?.total ?? 0), query);
+    const pageParams = query.paginate === false ? params : [...params, pagination.pageSize, (pagination.page - 1) * pagination.pageSize];
+    const pageClause = query.paginate === false ? '' : `LIMIT $${pageParams.length - 1} OFFSET $${pageParams.length}`;
     const rows = await this.db.query(
-      `SELECT cm.id AS membership_id, cm.user_id, cm.role, u.name AS user_name, u.email AS user_email,
-              sm.status AS service_status
+      `SELECT cm.id AS membership_id, cm.user_id, cm.role, cm.status, u.name AS user_name, u.email AS user_email,
+              sm.status AS service_status, u.status AS account_status, u."isActive" AS account_active,
+              u."isEmailVerified" AS email_verified, main_sm.status AS membership_status,
+              EXISTS (SELECT 1 FROM demo_accounts da WHERE da.user_id = cm.user_id AND da.is_active) AS is_demo_account
          FROM community_memberships cm
          JOIN users u ON u.id = cm.user_id
          LEFT JOIN service_memberships sm ON sm.user_id = cm.user_id AND sm.service_key = $2
-        WHERE cm.community_id = $1 AND cm.status = 'active'
-        ORDER BY (cm.role = 'operator') DESC, u.name ASC NULLS LAST`,
-      [communityId, COMMUNITY_SERVICE_KEY],
+         LEFT JOIN service_memberships main_sm ON main_sm.user_id = cm.user_id AND main_sm.service_key = $3
+        WHERE cm.community_id = $1 AND cm.status IN ('active', 'suspended')${filter}
+        ORDER BY (cm.role IN ('admin', 'operator')) DESC, u.name ASC NULLS LAST, cm.id ASC
+        ${pageClause}`,
+      pageParams,
     );
     return {
-      community,
+      community, pagination,
       members: rows.map((r: any) => ({
         membershipId: r.membership_id,
         userId: r.user_id,
         name: r.user_name,
         email: r.user_email,
-        role: r.role === 'operator' ? 'operator' : 'member',
+        role: ['admin', 'operator'].includes(r.role) ? r.role : 'member',
         serviceMembershipStatus: r.service_status,
+        membershipStatus: r.status,
+        designationEligibility: this.designationEligibility(r),
       })),
     };
   }
 
-  /** 운영자 지정(role='operator') · 해제(role='member'). */
+  /** 조회 안내만 제공한다. 실제 지정은 setRole의 트랜잭션에서 다시 판정한다. */
+  private designationEligibility(row: NetureMainMembershipRow & { status: string; service_status: string | null; is_demo_account: boolean }): CommunityDesignationEligibility {
+    if (row.status !== 'active') return { eligible: false, code: 'MEMBERSHIP_NOT_ACTIVE', message: '개별 커뮤니티 가입이 활성 상태여야 지정할 수 있습니다.' };
+    if (row.is_demo_account) return { eligible: false, code: 'DEMO_ACCOUNT_FORBIDDEN', message: DEMO_ACCOUNT_FORBIDDEN_MESSAGE };
+    const mainStatus = resolveNetureMainMembershipStatus(row);
+    if (mainStatus !== 'active') return { eligible: false, code: 'MAIN_MEMBERSHIP_NOT_ACTIVE', message: NETURE_MAIN_MEMBERSHIP_MESSAGES[mainStatus] };
+    if (row.service_status !== 'active') return { eligible: false, code: 'SERVICE_MEMBERSHIP_NOT_ACTIVE', message: '커뮤니티 서비스 가입이 활성 상태여야 지정할 수 있습니다.' };
+    return { eligible: true, code: null, message: null };
+  }
+
+  /** 운영자 지정(role IN ('admin','operator')) · 해제(role='member'). */
   async setRole(input: {
     communityId: string;
     membershipId: string;
     role: CommunityMemberRole;
+    actorUserId: string;
+    reason: string;
   }): Promise<{ membershipId: string; role: CommunityMemberRole; changed: boolean }> {
-    if (input.role !== 'operator' && input.role !== 'member') {
-      throw new CommunityOperatorDesignationError(400, 'INVALID_ROLE', "role 은 'operator' 또는 'member' 여야 합니다.");
+    if (!['admin', 'operator', 'member'].includes(input.role)) {
+      throw new CommunityOperatorDesignationError(400, 'INVALID_ROLE', "role 은 'admin', 'operator', 'member' 중 하나여야 합니다.");
     }
+    if (!input.reason?.trim() || input.reason.trim().length > 1000) throw new CommunityOperatorDesignationError(400, 'REASON_REQUIRED', '역할 변경 사유를 1~1000자로 입력하세요.');
     if (!UUID.test(input.membershipId)) {
       throw new CommunityOperatorDesignationError(404, 'MEMBERSHIP_NOT_FOUND', '가입 행을 찾을 수 없습니다.');
     }
     return this.db.transaction(async (m) => {
-      await this.requireCommunity(m, input.communityId);
+      await this.requireCommunity(m, input.communityId, true);
       // 그 커뮤니티의 운영자 행 + 대상 행을 잠근다 — 동시 해제로 운영자 0 이 되는 것을 막는다.
       const locked: Array<{ id: string; user_id: string; role: string; status: string }> = await m.query(
         `SELECT id, user_id, role, status FROM community_memberships
-          WHERE community_id = $1 AND (id = $2 OR (role = 'operator' AND status = 'active'))
-          FOR UPDATE`,
+          WHERE community_id = $1 AND (id = $2 OR (role = 'admin' AND status = 'active'))
+          ORDER BY id FOR UPDATE`,
         [input.communityId, input.membershipId],
       );
       const target = locked.find((r) => r.id === input.membershipId);
       if (!target) {
         throw new CommunityOperatorDesignationError(404, 'MEMBERSHIP_NOT_FOUND', '가입 행을 찾을 수 없습니다.');
       }
-      if (target.status !== 'active') {
+      if (target.status !== 'active' && input.role !== 'member') {
         throw new CommunityOperatorDesignationError(
           409,
           'MEMBERSHIP_NOT_ACTIVE',
@@ -151,32 +191,20 @@ export class CommunityOperatorDesignationService {
         throw new CommunityOperatorDesignationError(403, DEMO_ACCOUNT_FORBIDDEN_CODE, DEMO_ACCOUNT_FORBIDDEN_MESSAGE);
       }
 
-      if (input.role === 'operator') {
-        const sm = await m.query(
-          `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-          [target.user_id, COMMUNITY_SERVICE_KEY],
-        );
-        if (sm?.[0]?.status !== 'active') {
-          throw new CommunityOperatorDesignationError(
-            409,
-            'SERVICE_MEMBERSHIP_NOT_ACTIVE',
-            '커뮤니티 서비스 가입이 active 가 아닌 회원은 운영자로 지정할 수 없습니다.',
-          );
-        }
-      } else {
-        const others = locked.filter((r) => r.id !== target.id && r.role === 'operator' && r.status === 'active');
-        if (others.length === 0) {
-          throw new CommunityOperatorDesignationError(
-            409,
-            'LAST_OPERATOR_PROTECTED',
-            '마지막 커뮤니티 운영자는 해제할 수 없습니다. 다른 운영자를 먼저 지정하세요.',
-          );
-        }
+      if (input.role !== 'member' && !await hasEligibleCommunityMembership(m, target.user_id)) {
+        throw new CommunityOperatorDesignationError(409, 'SERVICE_MEMBERSHIP_NOT_ACTIVE', '메인 계정과 커뮤니티 서비스 가입이 활성 상태인 회원만 지정할 수 있습니다.');
       }
+      if (target.role === 'admin' && target.status === 'active' && input.role !== 'admin') {
+        await protectLastCommunityAdmin(m, input.communityId, target.id);
+      }
+      await recordCommunityMembershipChange(m, {
+        ...input, reason: input.reason.trim(), action: 'role', beforeRole: target.role, afterRole: input.role,
+        beforeStatus: target.status, afterStatus: target.status,
+      });
 
       await m.query(
         `UPDATE community_memberships SET role = $1, updated_at = NOW()
-          WHERE id = $2 AND community_id = $3 AND status = 'active'`,
+          WHERE id = $2 AND community_id = $3`,
         [input.role, target.id, input.communityId],
       );
       return { membershipId: target.id, role: input.role, changed: true };

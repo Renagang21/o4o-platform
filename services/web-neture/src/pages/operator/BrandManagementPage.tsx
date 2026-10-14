@@ -179,14 +179,14 @@ export default function BrandManagementPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">브랜드 관리</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <div className="text-sm text-slate-500 mt-1">
           {/* WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: 운영자 inline 편집 가능 안내 */}
           <GuideEditableSection
             pageKey="operator.brand.management"
             sectionKey="page-help"
             defaultContent="중복 브랜드를 검색하고 병합하여 데이터 품질을 관리합니다"
           />
-        </p>
+        </div>
       </div>
 
       {/* GuideBlock — guideblock-page-help DB override (GuideEditableSection은 page-help 유지) */}
@@ -208,6 +208,7 @@ export default function BrandManagementPage() {
         <Search className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
         <input
           type="text"
+          aria-label="브랜드 검색"
           placeholder="브랜드 검색..."
           value={search}
           onChange={e => handleSearch(e.target.value)}
@@ -256,7 +257,11 @@ export default function BrandManagementPage() {
                   "<span className="font-medium text-orange-600">{mergeSource.name}</span>"을(를) 병합할 대상 브랜드를 선택하세요
                 </p>
               </div>
-              <button onClick={() => setShowMergeModal(false)} className="p-1 text-slate-400 hover:text-slate-600">
+              <button
+                type="button"
+                aria-label="브랜드 병합 창 닫기"
+                onClick={() => setShowMergeModal(false)}
+                className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 text-slate-400 hover:text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -267,6 +272,7 @@ export default function BrandManagementPage() {
                 <Search className="absolute left-3 top-2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
+                  aria-label="병합 대상 브랜드 검색"
                   placeholder="대상 브랜드 검색..."
                   value={mergeSearch}
                   onChange={e => setMergeSearch(e.target.value)}

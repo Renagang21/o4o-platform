@@ -1,5 +1,5 @@
 /**
- * <LoginMethods /> — 서비스 로그인 화면 공통 조립: 이메일 로그인 → "또는" → Google 로 계속하기
+ * <LoginMethods /> — 서비스 로그인 화면 공통 조립: 이메일·Google·카카오와 공개 Demo 진입
  * WO-O4O-CROSS-SERVICE-LOGIN-ENTRY-AND-RETURN-FLOW-FIX-V1
  *
  * 이메일 계정은 플랫폼 계정이라 어느 서비스 호스트에서든 같은 수단으로 로그인한다(세션 서비스는 서버가 Origin 으로 정한다).
@@ -7,6 +7,7 @@
  * 오류 표시는 각 폼이 한다. 호출부는 `onGoogleError` · `onEmailFailure` 로 서비스 고유 안내(예: SERVICE_NOT_MEMBER)만 더한다.
  */
 import type { CSSProperties, ReactNode } from 'react';
+import { KakaoContinue, type KakaoContinueProps } from './KakaoContinue';
 import { GoogleContinue, type GoogleContinueProps } from './GoogleContinue';
 import { DemoLoginButtons } from './DemoLoginButtons';
 import { EmailLoginForm } from './email/EmailLoginForm';
@@ -28,6 +29,7 @@ export interface LoginMethodsProps<TUser = unknown> {
   /** 확인 메일 재발송(`authClient`). */
   api: Pick<EmailAuthApi, 'resendVerificationEmail'>;
   /** Google 버튼 설정 — `onSuccess` 는 아래 공통 `onSuccess` 를 쓴다. `hint` 미지정이면 기본 안내. */
+  kakao?: Omit<KakaoContinueProps<TUser>, 'onSuccess'>;
   google: Omit<GoogleContinueProps<TUser>, 'onSuccess' | 'className'>;
   /** 이메일 · Google 어느 쪽이든 세션이 성립하면 호출. */
   onSuccess: (user: TUser) => void;
@@ -46,7 +48,7 @@ const hintStyle: CSSProperties = { fontSize: 12, color: '#6b7280', textAlign: 'c
 export function LoginMethods<TUser = unknown>({
   loginWithEmail,
   api,
-  google,
+  google, kakao,
   onSuccess,
   onEmailFailure,
   accountLinks = O4O_ACCOUNT_LINKS,
@@ -66,6 +68,7 @@ export function LoginMethods<TUser = unknown>({
         <span style={rule} />또는<span style={rule} />
       </div>
       <GoogleContinue<TUser> {...google} hint={hint} onSuccess={({ user }) => onSuccess(user)} />
+      {kakao && <KakaoContinue {...kakao} onSuccess={onSuccess} />}
       <DemoLoginButtons loginWithEmail={loginWithEmail} onSuccess={onSuccess} onFailure={onEmailFailure} />
     </div>
   );

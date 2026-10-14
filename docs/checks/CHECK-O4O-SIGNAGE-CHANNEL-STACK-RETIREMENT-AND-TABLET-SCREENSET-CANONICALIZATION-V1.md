@@ -1,5 +1,7 @@
 # CHECK-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 **대상 WO**: WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
 **선행 감사**: [CHECK-O4O-SIGNAGE-CHANNEL-STACK-REDUCTION-AND-SIMPLE-VIDEO-PLAYBACK-AUDIT-V1](CHECK-O4O-SIGNAGE-CHANNEL-STACK-REDUCTION-AND-SIMPLE-VIDEO-PLAYBACK-AUDIT-V1.md)
 **제정 문서**: [docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md](../baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md)
@@ -264,7 +266,7 @@ https://www.youtube.com/embed/{videoId}?autoplay=1&mute=1&loop=1&playlist={video
 숨기지 않고 기록한다. **이번 변경 때문이 아니라 자격증명 문제로 막혔다.**
 
 ```text
-막힌 이유: docs/local/TEST-ACCOUNTS.local.md §2 — 모든 (계정 × 서비스) L2 credential 이 unknown.
+막힌 이유: docs/local/TEST-ACCOUNT.txt §2 — 모든 (계정 × 서비스) L2 credential 이 unknown.
            서비스 웹 로그인이 전 서비스에서 불가하다.
            문서가 허용하는 우회(L1 토큰 주입)는 "로그인 자체의 검증에는 쓸 수 없다" 고 §4-2 가 명시한다.
 확인한 것: L1 API 로그인 200 · GET /api/v1/store/tablets 200 (계약 살아 있음)

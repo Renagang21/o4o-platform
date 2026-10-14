@@ -6,13 +6,18 @@
  * 어떤 콘텐츠를 볼 수 있는지는 서버 판정이다(가입 상태 · 게시 상태). 화면은 응답을 그대로 보여준다.
  * 다른 출처(커뮤니티 · 운영자 콘텐츠 / 공급자 자료)는 기존 화면으로 안내만 한다 — 이 화면에 새 가져오기 흐름을 두지 않는다.
  */
+import { useLatestList } from '../../hooks/useLatestList';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import { neturePharmacyApi, pharmacyErrorMessage, type SemiFranchiseContent, type SemiFranchiseRow } from '../../api/neturePharmacy';
 import { WORKSPACE_PATHS } from '../../config/workspace';
+import { BusinessTabs } from '../../components/BusinessTabs';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { Notice, PharmacyPage, btn, formatDate, pharmacyStorePath } from './shared';
+
+const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '콘텐츠 목록을 불러오지 못했습니다.');
 
 const PAGE_SIZE = 20;
 const STORE_LIBRARY_PATH = `${WORKSPACE_PATHS.myStore}/library/contents`;
@@ -34,14 +39,12 @@ function ContentBody({ body }: { body: string | null }) {
 
 export default function PharmacyContentSourcesPage() {
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
-  const [sf, setSf] = useState(() => new URLSearchParams(window.location.search).get('business') || '');
+  const [params, setParams] = useSearchParams();
+  const sf = params.get('business') || '';
+  const setSf = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); if (value) p.set('business', value); else p.delete('business'); return p; }); };
   const [qInput, setQInput] = useState('');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
-  const [items, setItems] = useState<SemiFranchiseContent[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -52,21 +55,9 @@ export default function PharmacyContentSourcesPage() {
       .catch(() => setFranchises([]));
   }, []);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
-      setItems(res.items);
-      setTotal(res.total);
-    } catch (e) {
-      setError(pharmacyErrorMessage(e, '콘텐츠 목록을 불러오지 못했습니다.'));
-    } finally {
-      setLoading(false);
-    }
-  }, [sf, q, page]);
+  const fetchList = useCallback(() => neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE }), [sf, q, page]);
+  const { items, total, loading, error, setError, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
 
-  useEffect(() => { void load(); }, [load]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -92,10 +83,12 @@ export default function PharmacyContentSourcesPage() {
 
   return (
     <PharmacyPage
-      title="이용 가능 콘텐츠"
+      title="자료 가져오기"
       description="가입한 세미프랜차이즈가 게시한 콘텐츠를 확인하고 내 매장 사본으로 가져와 편집할 수 있습니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
+      <StoreLibraryNavigation section="sources" />
+      <BusinessTabs businesses={franchises} value={sf} onChange={key => { setSf(key); setPage(1); }} />
       <section className="mb-6 grid gap-3 sm:grid-cols-3" data-testid="pharmacy-content-other-sources">
         {OTHER_SOURCES.map((s) => (
           <Link key={s.key} to={s.to} className="rounded-lg border border-gray-200 bg-white px-4 py-3 hover:border-emerald-300 hover:bg-emerald-50">
@@ -117,15 +110,6 @@ export default function PharmacyContentSourcesPage() {
       {error && <Notice tone="error">{error}</Notice>}
 
       <form className="mb-4 flex flex-wrap gap-2" onSubmit={onSearch}>
-        <select
-          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-          value={sf}
-          onChange={(e) => { setSf(e.target.value); setPage(1); }}
-          aria-label="세미프랜차이즈 선택"
-        >
-          <option value="">전체 세미프랜차이즈</option>
-          {franchises.map((f) => <option key={f.key} value={f.key}>{f.name}</option>)}
-        </select>
         <input
           className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
           placeholder="제목 · 요약 검색"

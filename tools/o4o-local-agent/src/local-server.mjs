@@ -49,8 +49,6 @@ export const LOCAL_AGENT_PORT = 47821;
 const ALLOWED_ORIGINS = new Set([
   'https://neture.co.kr',
   'https://www.neture.co.kr',
-  'https://pharmacyhub.co.kr',
-  'https://www.pharmacyhub.co.kr',
   'https://kpa-society.co.kr',
   'https://www.kpa-society.co.kr',
 ]);

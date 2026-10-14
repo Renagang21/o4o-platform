@@ -28,6 +28,7 @@ jest.mock('../database/connection.js', () => ({
     manager: {
       query: (...args: unknown[]) => {
         const sql = String(args[0] ?? '');
+        if (/browser_session_revocations/i.test(sql)) return Promise.resolve([{ '?column?': 1 }]);
         if (/service_session_revocations/i.test(sql)) return Promise.resolve([]);
         return query(...args);
       },
@@ -46,7 +47,7 @@ const generateTokens = jest.fn(() => ({ accessToken: 'AT', refreshToken: 'RT', e
 //   (service-logout-auth-boundary.spec.ts)에서 실제 토큰으로 본다.
 jest.mock('../utils/token.utils.js', () => ({
   generateTokens: (...a: unknown[]) => generateTokens(...a),
-  verifyAccessToken: () => null,
+  verifyAccessToken: () => ({ userId: 'user-1', serviceKey: 'neture', sessionId: '00000000-0000-4000-8000-000000000001', tokenFamily: 'fam-1' }),
 }));
 const persistRefreshTokenFamily = jest.fn(async () => undefined);
 jest.mock('../services/auth/auth-context.helper.js', () => ({
@@ -78,7 +79,7 @@ function mockReq(body: Record<string, unknown>, origin?: string, user: unknown =
     return {
       body,
       user,
-      headers: {},
+      headers: { authorization: 'Bearer fixture-access' },
       cookies: {},
       get: (h: string) => (h.toLowerCase() === 'origin' ? origin : undefined),
     } as any;
@@ -151,10 +152,10 @@ describe('B. generateHandoff', () => {
     expect(sqlCalls()).not.toEqual(expect.arrayContaining([expect.stringContaining('service_memberships')]));
     // target 은 neture 로 고정 기록. source 는 Origin 이 아니라 **토큰 claim** 이 증명한다 —
     //   이 대역의 토큰은 claim 이 없으므로 'unknown'(Origin 은 클라이언트가 지정할 수 있다 · §8 5차).
-    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'unknown', 'neture', null]);
+    expect(query.mock.calls[0][1].slice(0, 4)).toEqual(['user-1', 'neture', 'neture', null]);
   });
 
-  it("target=neture 는 returnPath '/' 만 허용 — 다른 경로는 400 (범용 redirect 0)", async () => {
+  it("target=neture 는 대표 홈·My Home 이외의 returnPath 거부 — 다른 경로는 400 (범용 redirect 0)", async () => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     let res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: '/' }, 'https://study.neture.co.kr'), res);
@@ -170,6 +171,22 @@ describe('B. generateHandoff', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
+  it.each(['/mypage', ...['store', 'study', 'community', 'funding', 'supplier', 'pharmacy', 'kpa', 'admin'].map(key => `/mypage?from=${key}`)])('My Home %s: 활성 계정의 세션만 전달 · membership 생성/검사 없음', async path => {
+    query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
+    const res = mockRes();
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: path }), res);
+    expect(res.statusCode).toBe(200);
+    expect(new URL(res.body.data.targetUrl).searchParams.get('returnTo')).toBe(path);
+    expect(sqlCalls().some(sql => sql.includes('service_memberships'))).toBe(false);
+  });
+
+  it.each(['/mypage?from=evil', '/mypage?from=store&next=https://evil.test', '/mypage/profile', '/mypage/../admin', '/mypage?from=%73tore', '/mypage#admin'])('My Home 외부/비정형 목적지 %s 거부 · token INSERT 0', async path => {
+    const res = mockRes();
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: path }), res);
+    expect([res.statusCode, res.body.code]).toEqual([400, 'VALIDATION_ERROR']);
+    expect(query).not.toHaveBeenCalled();
+  });
+
   it.each([
     [[], 'HANDOFF_TARGET_NO_MEMBERSHIP'],
     [[{ status: 'pending' }], 'HANDOFF_TARGET_NOT_ACTIVE'],
@@ -179,7 +196,7 @@ describe('B. generateHandoff', () => {
   ])('서비스 가입 상태 %j 와 무관하게 인증 이동 허용 · 가입 원장 변경 없음 (%s)', async (rows, code) => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'pharmacy-hub' }, 'https://neture.co.kr'), res);
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'lecture' }, 'https://neture.co.kr'), res);
     expect(res.statusCode).toBe(200);
     expect(sqlCalls().join(' ')).not.toMatch(/INSERT INTO service_memberships|UPDATE service_memberships/);
   });
@@ -211,7 +228,7 @@ describe('B. generateHandoff', () => {
 describe('C. exchangeHandoff', () => {
   // 원장 수단 = Google 세션 출발(종전 계약: claim 없음 = null). 수단 승계 자체는 unified-store-workspace-handoff.spec D.
   const consumed = (target: string, source = 'kpa-society') =>
-    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, target_service_key: target, target_workspace: null, created_at: new Date(0), source_auth_method: 'google' }], 1]);
+    query.mockResolvedValueOnce([[{ user_id: 'user-1', source_service_key: source, source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: target, target_workspace: null, created_at: new Date(0), source_auth_method: 'google' }], 1]);
   const withProduction = async (fn: () => Promise<void>) => {
     const prev = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
@@ -238,8 +255,8 @@ describe('C. exchangeHandoff', () => {
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §8: 마지막 인자 = 이 세션이 속한 서비스.
       //   handoff 로 발급되는 토큰은 **대상 서비스의 세션**이어야 한다. 그러지 않으면 그 서비스에서
       //   로그아웃해도 이 토큰을 지목할 수 없다(서비스 단위 무효화가 무력해진다).
-      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, null);
-      expect(persistRefreshTokenFamily).toHaveBeenCalledWith('user-1', 'RT');
+      expect(generateTokens).toHaveBeenCalledWith(KPA_ONLY_USER, ['kpa:store_owner'], 'neture.co.kr', KPA_ONLY_MEMBERSHIPS, 'fam-1', 'neture', 0, 'google');
+      expect(persistRefreshTokenFamily).not.toHaveBeenCalled();
       // SQL 은 토큰 consume(UPDATE handoff_tokens) + memberships SELECT 뿐 — membership·role 생성/수정 0.
       //   세션 세대 조회는 이 spec 에서 connection double 의 `manager` 가 직접 답하므로 여기 집계에
       //   들어오지 않는다(세대 판정은 전용 spec 이 본다). write 0 계약은 그대로다.
@@ -322,13 +339,12 @@ describe('C. exchangeHandoff', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
-  it('일반 서비스 토큰은 회귀 0 — neture.co.kr 에서 받은 kpa 토큰도 기존처럼 kpa membership 으로 판정', async () => {
+  it('previously issued PH handoff cannot create a new session', async () => {
     consumed('pharmacy-hub', 'neture');
-    findOne.mockResolvedValueOnce(KPA_ONLY_USER);
-    query.mockResolvedValueOnce(KPA_ONLY_MEMBERSHIPS); // pharmacy-hub membership 없음
     const res = mockRes();
     await HandoffController.exchangeHandoff(mockReq({ token: uuid }, 'https://pharmacyhub.co.kr', undefined), res);
-    expect(res.statusCode).toBe(200);
-    expect(generateTokens).toHaveBeenCalled();
+    expect(res.statusCode).toBe(410);
+    expect(generateTokens).not.toHaveBeenCalled();
+    expect(findOne).not.toHaveBeenCalled();
   });
 });

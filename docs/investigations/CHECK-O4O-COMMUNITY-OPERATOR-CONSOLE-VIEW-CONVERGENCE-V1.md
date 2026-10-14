@@ -1,5 +1,7 @@
 # CHECK — O4O 커뮤니티 운영자 콘솔 View 수렴
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1`
 - **선행 CHECK**: [`CHECK-O4O-COMMUNITY-CROSSSERVICE-FINAL-CENSUS-AND-COMMONIZATION-CLOSURE-AUDIT-V1.md`](CHECK-O4O-COMMUNITY-CROSSSERVICE-FINAL-CENSUS-AND-COMMONIZATION-CLOSURE-AUDIT-V1.md)
 - **일자**: 2026-08-20
@@ -194,7 +196,7 @@ backend 변경 0 → `apps/api-server` 전체 build 불필요. DB migration **�
 ## 9-1. 배포 · 브라우저 smoke (§14)
 
 - CI `Deploy Web Services (Cloud Run)` run `32322639212` — 7 job 전부 success (kpa-society · neture · k-cosmetics · kpa-branch · pharmacy-hub)
-- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 운영자 계정 (실 로그인, 권한 없는 계정 강제 접근 테스트 없음)
+- 계정: `docs/local/TEST-ACCOUNT.txt` 의 운영자 계정 (실 로그인, 권한 없는 계정 강제 접근 테스트 없음)
 
 | 화면 | 결과 |
 |---|---|

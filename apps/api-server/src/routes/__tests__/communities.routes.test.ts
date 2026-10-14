@@ -1,3 +1,4 @@
+import * as communityServiceAccess from '../../services/community/community-service-operator-access.js';
 /**
  * 커뮤니티 개설·가입 경로 배선 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 §3
  *
@@ -48,6 +49,11 @@ jest.mock('../../services/auth/auth-context.helper.js', () => ({
   freshenUserContext: async () => ({ roles: [], memberships: [] }),
 }));
 
+import express from 'express';
+import request from 'supertest';
+import { CommunityLifecycleService } from '../../services/community/community-lifecycle.service.js';
+import { CommunityMemberManagementService } from '../../services/community/community-member-management.service.js';
+import { NetureMainMembershipRequiredError } from '../../modules/neture/services/neture-main-membership.js';
 import { createCommunitiesRoutes } from '../communities.routes.js';
 
 const optionalAuth = mark('optionalAuth');
@@ -91,8 +97,8 @@ describe('개설 — 서비스 전체 역할이 심사한다', () => {
     ['GET', '/requests'],
     ['POST', '/requests/:requestId/approve'],
     ['POST', '/requests/:requestId/reject'],
-  ])('%s %s 는 community:admin 이 심사한다', (method, path) => {
-    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:admin']);
+  ])('%s %s 는 서비스 Operator 이상이 심사한다', (method, path) => {
+    expect(find(method, path).guards).toEqual(['authenticate', 'serviceScope:community:operator']);
   });
 
   it('개설 심사 경로에는 **개체 가드가 붙지 않는다** (첫 커뮤니티를 만들 수 있어야 한다)', () => {
@@ -203,5 +209,89 @@ describe('개별 커뮤니티 운영자 지정·해제 — 커뮤니티 서비�
     const slug = order.findIndex((k) => k.includes('/:communitySlug'));
     expect(first).toBeGreaterThan(-1);
     expect(first).toBeLessThan(slug);
+  });
+});
+
+
+describe('메인 자격 오류 HTTP 응답', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each([
+    ['requestCreation', '/requests', 403],
+    ['requestJoin', '/example/join', 403],
+    ['approveCreation', '/requests/request-id/approve', 409],
+    ['approveJoin', '/example/memberships/member-id/approve', 409],
+  ] as const)('%s는 자격 오류를 %s에서 %s로 전달한다', async (method, url, status) => {
+    jest.spyOn(CommunityLifecycleService.prototype, method).mockRejectedValue(
+      new NetureMainMembershipRequiredError('suspended', '신청자의 이용 자격을 확인해 주세요.', status),
+    );
+    const app = express();
+    app.use(express.json());
+    app.use((req, _res, next) => {
+      Object.assign(req, { user: { id: 'reviewer-id' }, community: { id: 'community-id' } });
+      next();
+    });
+    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    const response = await request(app).post(url).send({ desiredSlug: 'example', name: 'Example' });
+    expect(response.status).toBe(status);
+    expect(response.body).toEqual({ success: false, error: '신청자의 이용 자격을 확인해 주세요.', code: 'NETURE_MEMBERSHIP_REQUIRED' });
+  });
+});
+
+
+it.each(['suspend','restore','withdraw'])('%s는 admin guard와 인증을 요구한다', action => {
+  expect(find('POST', `/:communitySlug/memberships/:membershipId/${action}`).guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});
+it('회원 이력도 admin guard로 한정한다', () => {
+  expect(find('GET','/:communitySlug/memberships/:membershipId/history').guards)
+    .toEqual(['authenticate','resolveCommunity','communityScope:admin']);
+});
+
+describe('본인 탈퇴 route', () => {
+  afterEach(() => jest.restoreAllMocks());
+  it('인증과 커뮤니티 확인을 요구하고 관리자 권한은 요구하지 않는다', () => {
+    expect(find('POST', '/:communitySlug/leave').guards).toEqual(['authenticate', 'resolveCommunity']);
+  });
+  it('클라이언트 대상 ID·역할을 무시하고 세션 사용자만 전달한다', async () => {
+    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf').mockResolvedValue({ changed: true, status: 'withdrawn' });
+    const app = express(); app.use(express.json());
+    app.use((req, _res, next) => { Object.assign(req, { user: { id: 'self' }, community: { id: 'a' } }); next(); });
+    app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    const response = await request(app).post('/fixture/leave').send({ userId: 'other', membershipId: 'other', role: 'admin' });
+    expect(response.status).toBe(200);
+    expect(leave).toHaveBeenCalledWith({ communityId: 'a', actorUserId: 'self' });
+  });
+  it('세션 사용자가 없으면 401이고 변경하지 않는다', async () => {
+    const leave = jest.spyOn(CommunityMemberManagementService.prototype, 'withdrawSelf');
+    const app = express(); app.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    expect((await request(app).post('/fixture/leave')).status).toBe(401);
+    expect(leave).not.toHaveBeenCalled();
+  });
+});
+
+describe('회원 검색 및 페이지 HTTP 계약', () => {
+  afterEach(() => jest.restoreAllMocks());
+  const app = () => {
+    const instance = express();
+    instance.use((req, _res, next) => { Object.assign(req, { user: { id: 'service-admin' }, community: { id: 'scoped-community' } }); next(); });
+    instance.use(createCommunitiesRoutes(optionalAuth, authenticate));
+    return instance;
+  };
+  it.each(['/example/memberships', '/admin/communities/example/members'])('%s validates query before database list access', async url => {
+    jest.spyOn(communityServiceAccess, 'hasCommunityServiceAdmin').mockResolvedValue(true);
+    const { CommunityOperatorDesignationService } = await import('../../services/community/community-operator-designation.service.js');
+    const review = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview');
+    const designation = jest.spyOn(CommunityOperatorDesignationService.prototype, 'listMembers');
+    const response = await request(app()).get(url).query({ pageSize: 101 });
+    expect(response.status).toBe(400); expect(response.body.code).toBe('INVALID_QUERY');
+    expect(review).not.toHaveBeenCalled(); expect(designation).not.toHaveBeenCalled();
+  });
+  it('review uses the resolved community identity and returns page metadata', async () => {
+    const pagination = { page: 2, pageSize: 20, total: 21, totalPages: 2 };
+    const list = jest.spyOn(CommunityLifecycleService.prototype, 'listMembershipsForReview').mockResolvedValue({ memberships: [], pagination });
+    const response = await request(app()).get('/example/memberships').query({ status: 'active', q: ' 회원 ', page: 2 });
+    expect(response.status).toBe(200); expect(response.body.data.pagination).toEqual(pagination);
+    expect(list).toHaveBeenCalledWith({ communityId: 'scoped-community', query: { q: '회원', status: 'active', page: 2, pageSize: 20, paginate: true } });
   });
 });

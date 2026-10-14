@@ -176,20 +176,31 @@ export interface NormalizedAiContentResponse {
   type: string;
 }
 
+/** Shared response fields; output-specific short/long text policy stays in each parser. */
+export function normalizeAiContentFields(parsed: Record<string, any>, rawText: string) {
+  return {
+    html: parsed.html || `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
+    title: typeof parsed.title === 'string' ? parsed.title : '',
+    summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+    bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [],
+  };
+}
+/** Same explicit short/long fallback for QR/SNS wrappers. Prompts and model selection stay independent. */
+export function normalizeAiShortLongResponse(parsed: Record<string, any>, rawText: string): Omit<NormalizedAiContentResponse, 'type'> {
+  const title = typeof parsed.title === 'string' ? parsed.title : '';
+  const shortText = typeof parsed.shortText === 'string' ? parsed.shortText : '';
+  const longText = typeof parsed.longText === 'string' ? parsed.longText : '';
+  const html = parsed.html || [title ? `<p><strong>${title}</strong></p>` : '', shortText ? `<p>${shortText}</p>` : '', longText ? `<p>${longText}</p>` : ''].filter(Boolean).join('') || `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+  return { html, title, summary: typeof parsed.summary === 'string' ? parsed.summary : '', bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [], shortText, longText };
+}
+
 export function normalizeAiResponse(
   parsed: Record<string, any>,
   rawText: string,
   outputType: string
 ): NormalizedAiContentResponse {
-  const html =
-    parsed.html ||
-    `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-
   return {
-    html,
-    title: typeof parsed.title === 'string' ? parsed.title : '',
-    summary: typeof parsed.summary === 'string' ? parsed.summary : '',
-    bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [],
+    ...normalizeAiContentFields(parsed, rawText),
     shortText: typeof parsed.shortText === 'string' ? parsed.shortText : '',
     longText: typeof parsed.longText === 'string' ? parsed.longText : '',
     type: outputType,

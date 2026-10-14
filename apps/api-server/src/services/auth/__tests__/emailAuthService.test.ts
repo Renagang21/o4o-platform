@@ -71,6 +71,10 @@ function makeHarness(
 
   const query = jest.fn(async (q: string, p: any[] = []) => {
     sql.push({ q, p });
+    if (/pg_advisory_xact_lock/.test(q)) return [];
+    if (/FROM service_policy_documents/.test(q)) return [{ id: '11111111-1111-4111-8111-111111111111', service_key: 'neture', document_type: 'terms', version: 1, title: 'Fixture terms', content: 'Fixture agreement', status: 'published' }];
+    if (/INSERT INTO user_policy_acceptances/.test(q)) return [{ id: 'acceptance-fixture' }];
+    if (/UPDATE users SET tos_accepted_at/.test(q)) return [];
     const s = q.replace(/\s+/g, ' ').trim();
     // WO-O4O-CANONICAL-DEMO-ACCOUNT-…-V1: Demo 보호 판정(demo_accounts).
     //   기본은 'Demo 아님'(빈 배열). Demo 를 흉내 내려면 store.demoUserIds 에 넣는다.
@@ -82,6 +86,7 @@ function makeHarness(
         : store.demoUserIds.includes(target);
       return hit ? [{ demo_type: 'STORE_OWNER' }] : [];
     }
+    if (s.startsWith('SELECT id FROM users WHERE id = $1 FOR UPDATE')) return store.users.filter((u) => u.id === p[0]).map((u) => ({ id: u.id }));
     if (s.startsWith('SELECT id FROM users WHERE lower(email)')) {
       return store.users.filter((u) => u.email.toLowerCase() === p[0]).slice(0, 2).map((u) => ({ id: u.id }));
     }
@@ -186,6 +191,8 @@ function makeHarness(
   const revokeAllSessions = jest.fn(async (id: string) => {
     revoked.push(id);
     order.push('revoke');
+    const u = store.users.find((row) => row.id === id);
+    if (u) u.refreshTokenFamily = uuid();
   });
   (passwords.setPassword as jest.Mock).mockImplementation(async (id: string, plain: string) => {
     order.push('setPassword');
@@ -202,11 +209,14 @@ function makeHarness(
     mailer,
     revokeAllSessions,
     readRoles: async (id) => roles[id] ?? [],
-    issueSession: async (user, key) => ({
-      tokens: tokenUtils.generateTokens(user, roles[user.id] ?? [], 'neture.co.kr', [], null, key, null, 'password'),
-      roles: roles[user.id] ?? [],
-      memberships: opts.memberships?.[user.id] ?? [],
-    }),
+    readContext: async (id) => ({ roles: roles[id] ?? [], memberships: opts.memberships?.[id] ?? [] }),
+    issueSession: async (user, key) => {
+      user.refreshTokenFamily ??= uuid();
+      return {
+        tokens: tokenUtils.generateTokens(user, roles[user.id] ?? [], 'neture.co.kr', [], user.refreshTokenFamily, key, null, 'password'),
+        roles: roles[user.id] ?? [], memberships: opts.memberships?.[user.id] ?? [],
+      };
+    },
     resolveSemiFranchiseAccess: semiFranchiseResolver,
     now: () => nowRef.t,
   });
@@ -246,14 +256,14 @@ function makeHarness(
   };
 }
 
-const META = { ipAddress: '127.0.0.1', userAgent: 'jest', sessionServiceKey: 'neture' };
+const META = { policyServiceKey: 'neture', ipAddress: '127.0.0.1', userAgent: 'jest', sessionServiceKey: 'neture' };
 const GOOD_PW = 'abcd1234!';
 const signupInput = (over: Partial<Record<string, any>> = {}) => ({
   email: 'New.User@Example.com',
   password: GOOD_PW,
   name: '홍길동',
   phone: '010-1234-5678',
-  consents: { terms: true, privacy: true },
+  consents: { terms: true, privacy: true, termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 } },
   ...META,
   ...over,
 });
@@ -641,7 +651,7 @@ describe('EmailAuthService', () => {
       return h;
     }
 
-    it('메일 링크 → 새 비밀번호, 전역 폐기가 저장보다 먼저, 이전 비밀번호 무효', async () => {
+    it('메일 링크 → 새 비밀번호, 비밀번호 저장·전역 폐기가 같은 transaction에서 실행, 이전 비밀번호 무효', async () => {
       const h = await verifiedUser();
       h.order.length = 0;
       await h.service.requestPasswordReset('New.User@example.com', META);
@@ -651,7 +661,7 @@ describe('EmailAuthService', () => {
 
       await h.service.resetPassword(token, 'newpass99$');
       expect(h.revoked).toEqual([h.store.users[0].id]);
-      expect(h.order).toEqual(['revoke', 'setPassword']);
+      expect(h.order).toEqual(['setPassword', 'revoke']);
 
       await expectCode(h.service.login({ email: 'new.user@example.com', password: GOOD_PW, ...META }), 'INVALID_CREDENTIALS');
       await expect(h.service.login({ email: 'new.user@example.com', password: 'newpass99$', ...META })).resolves.toBeDefined();
@@ -859,7 +869,7 @@ describe('EmailAuthService', () => {
         'CURRENT_PASSWORD_MISMATCH',
       );
       await h.service.setPasswordForUser(g.id, { currentPassword: GOOD_PW, newPassword: 'next999$x' });
-      expect(h.revoked).toEqual([]);
+      expect(h.revoked).toEqual([g.id, g.id]);
     });
 
     it('어느 경로도 평문 비밀번호를 SQL 파라미터 · 활동 로그에 싣지 않는다', async () => {
@@ -955,7 +965,7 @@ describe('EmailAuthService', () => {
       const token = h.lastLinkToken('/reset-password');
       await h.service.resetPassword(token, 'third999$x');
       expect(h.store.creds.get(normal.id)).toBe(`fakehash:${hashToken('third999$x')}`);
-      expect(h.revoked).toEqual([normal.id]);
+      expect(h.revoked).toEqual([normal.id, normal.id]);
     });
 
     it('판정은 user_id 로 한다 — 같은 주소라도 registry 행이 없으면 일반 계정이다', async () => {

@@ -33,7 +33,10 @@ const COS_ROUTES = 'apps/api-server/src/routes/cosmetics/cosmetics.routes.ts';
 const KPA_LEGACY_PAY = 'apps/api-server/src/routes/kpa/controllers/kpa-payment.controller.ts';
 const COS_LEGACY_PAY = 'apps/api-server/src/routes/cosmetics/controllers/cosmetics-payment.controller.ts';
 const SUPPLIER_ORDER_SVC = 'apps/api-server/src/modules/neture/services/supplier-order.service.ts';
-const SETTLEMENT_SVC = 'apps/api-server/src/modules/neture/services/neture-settlement.service.ts';
+const SETTLEMENT_SVCS = [
+  'neture-settlement.service.ts', 'supplier-settlement-read.service.ts',
+  'admin-settlement-read.service.ts', 'settlement-command.service.ts', 'settlement-query-types.ts',
+].map((file) => `apps/api-server/src/modules/neture/services/${file}`);
 const SHIPMENT_SVC = 'apps/api-server/src/modules/neture/services/shipment.service.ts';
 const SHIPMENT_CTL = 'apps/api-server/src/modules/neture/controllers/shipment.controller.ts';
 const BOOTSTRAP = 'apps/api-server/src/bootstrap/register-routes.ts';
@@ -53,7 +56,7 @@ describe('§2-C bridge — Event Offer 가 공급자에게 전달된다', () => 
   });
 
   it('기존 3 source 는 그대로다 (무회귀)', () => {
-    expect(bridge).toContain('pharmacy_hub_cart:');
+    expect(bridge).not.toContain('pharmacy_hub_cart:');
     expect(bridge).toContain('store_b2b_cart:');
     expect(bridge).toMatch(/\[NETURE_B2B_ORDER_SOURCE\]:/);
   });
@@ -166,8 +169,10 @@ describe('§2-K collectionStatus — 무결제 fulfillment/settlement 0', () => 
   });
 
   it('settlement eligibility SQL 이 collectionStatus 를 보지 않는다', () => {
-    const code = stripComments(read(SETTLEMENT_SVC));
-    expect(code).not.toContain('collectionStatus');
+    for (const file of SETTLEMENT_SVCS) {
+      const code = stripComments(read(file));
+      expect(code).not.toContain('collectionStatus');
+    }
   });
 });
 

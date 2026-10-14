@@ -113,8 +113,9 @@ export default function SupplierRecruitmentsPage() {
     },
     {
       key: 'exposure',
-      header: '노출 승인',
+      header: '게시 구분',
       render: (_v, r) => {
+        if (r.recruitmentKind === 'public') return <span className="text-xs text-green-700">일반 공개 · 즉시 게시</span>;
         const exposure = EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus, cls: 'bg-gray-100 text-gray-600' };
         return (
           <>
@@ -206,9 +207,9 @@ export default function SupplierRecruitmentsPage() {
 
       {/* WO-O4O-SELLER-RECRUITMENT-EXPOSURE-SUPPLIER-STATUS-V1: 노출 승인 개념 안내 */}
       <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-800">
-        모집은 <strong>서비스 운영자의 노출 승인</strong>을 받은 뒤에야 매장/약국 사용자에게 보입니다.
-        <span className="text-blue-700"> 노출 대기·노출 반려</span> 상태의 모집은 아직(또는 더 이상) 매장/약국 사용자에게 노출되지 않습니다.
-        노출 승인은 서비스 운영자가 결정하며, 공급자가 직접 변경할 수 없습니다.
+        <strong>일반 공개 모집</strong>은 공급자가 게시하면 운영자의 노출 승인 없이 내 매장에 안내됩니다.
+        세미프랜차이즈 대상 모집은 해당 사업의 노출 승인과 매장 가입 조건을 적용합니다.
+        제품 등재 및 공급 승인 조건은 모집 참여와 별도로 유지됩니다.
       </div>
 
       {actionError && (

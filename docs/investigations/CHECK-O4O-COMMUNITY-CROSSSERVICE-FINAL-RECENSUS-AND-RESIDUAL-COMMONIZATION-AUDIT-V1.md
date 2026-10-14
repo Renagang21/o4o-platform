@@ -1,5 +1,7 @@
 # CHECK-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: `WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1`  
 > **작성일**: 2026-08-19 · **기준 브랜치**: `main` · **시작 commit**: `df128fc51`  
 > **성격**: 커뮤니티 cross-service 공통화 **최종 전수 재감사** — 과거 census 재사용 금지, 현재 코드에서 모집단 재산출
@@ -409,7 +411,7 @@ N 이 295 로 같은 것은 우연이 아니라 **같은 6축 프레임(Forum 18
 ## 14. Production browser smoke (§17)
 
 배포 commit `ed7d6ed17` (Deploy Web Services / Deploy API Server 모두 success) 기준, 실제 브라우저(Chromium)로 로그인 후 순회했다.
-계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT 를 런타임 env 로만 주입했고 스크립트·저장소 어디에도 기록하지 않았다.
+계정은 `docs/local/TEST-ACCOUNT.txt` SSOT 를 런타임 env 로만 주입했고 스크립트·저장소 어디에도 기록하지 않았다.
 측정 항목: 문서 status / body innerText 길이(white screen) / console error / pageerror / 4xx·5xx 응답 / 390px 폭 가로 overflow.
 
 ### 14-1. 서비스별 결과

@@ -3,7 +3,7 @@
 > WO-O4O-GIT-PARALLEL-WORK-SAFETY-CLEANUP-V1 (2026-08-07)
 >
 > 대상: 다중 PC · 다중 세션(사람 + AI)이 같은 저장소에서 stage · commit · push 하는 방식.
-> **2026-10-04 개정**: `main` 직접 커밋 운영은 종료됐다. 작업은 전용 worktree + branch, `main` 반영은 사용자 통합 승인 후
+> **2026-10-04 개정**: `main` 직접 커밋 운영은 종료됐다. 작업은 전용 worktree + branch, `main` 반영은 명시적으로 지정된 통합 담당이 기술 gate 충족 후
 > PR merge 로만 한다 — 정본은 [`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy). 이 문서는 그 안의
 > stage · commit · push 안전 계약을 다룬다.
 
@@ -60,14 +60,14 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 - 개별 stage 가 **불가능**한 형태(같은 파일에 두 작업이 섞임)
 
 **완료 조건**은 저장소 전체 clean 이 아니라
-`이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + PR integration-ready` 이다.
-`main` 포함은 사용자가 통합을 승인해 merge 한 뒤의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
+`이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + PR 생성 + 검증 결과 · CI 상태 · 미해결 사항 인계`이다.
+개발 담당은 수정 요청에도 추가 push 후 재인계하며, PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경을 자동으로 진행하지 않는다. 사용자가 명시적으로 지정한 통합 담당 공간만 기술 gate를 확인해 순차 병합 · 배포 결과 검증을 수행한다. 기존 GitHub Actions 자동 배포는 유지한다. `main` 포함은 merge 후의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
 
 ---
 
 ## 4. PC 이동 기준
 
-> 2026-10-04 개정: 작업은 전용 worktree + branch 에서 하고 `main` 반영은 사용자 통합 승인 후 PR merge 로만 한다
+> 2026-10-04 개정: 작업은 전용 worktree + branch 에서 하고 `main` 반영은 명시적으로 지정된 통합 담당이 기술 gate 충족 후 PR merge로만 한다
 > ([`AGENTS.md` §4-1](../../../AGENTS.md#4-1-parallel-session--worktree-policy)). 아래는 그 흐름 기준이다 — 작업 commit 이
 > `origin/main` 에 아직 없는 것이 정상이다.
 

@@ -31,6 +31,7 @@
  *   본문(StoreContentsSelector)·모달·동작은 무변경.
  */
 
+import { STORE_CONTENTS_HEADING } from '../../config/storeLibraryLabels';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
@@ -41,6 +42,7 @@ import { storeAssetControlApi } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
 import { CreateContentFromResourcesModal, type CreateContentProductContext } from './CreateContentFromResourcesModal';
+import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
 export default function StoreLibraryContentsPage() {
@@ -102,10 +104,7 @@ export default function StoreLibraryContentsPage() {
   return (
     <StorePageShell
       labels={{
-        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
-        breadcrumbRoot: '약국 자료함',
-        pageTitle: '콘텐츠',
+        ...STORE_CONTENTS_HEADING,
         subtitle:
           '매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.',
       }}
@@ -131,6 +130,7 @@ export default function StoreLibraryContentsPage() {
         </>
       }
     >
+      <StoreLibraryNavigation section="mine" />
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector

@@ -1,5 +1,7 @@
 # CHECK-O4O-TMP-OPERATIONAL-RECOVERY-AND-TEMPORARY-ARTIFACT-DISPOSITION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: WO-O4O-TMP-OPERATIONAL-RECOVERY-AND-TEMPORARY-ARTIFACT-DISPOSITION-V1
 - **작업일**: 2026-09-12
 - **입력**: `IR-O4O-REPOSITORY-WIDE-DEAD-CODE-AND-LEGACY-SURFACE-CENSUS-V1-PASS2` §8 (`tmp/**` 169 파일 · 42MB) · `WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1-CHECK` §5 (tmp 인계)
@@ -138,7 +140,7 @@ removed  73 파일 ·  9,614,284 bytes ( 9.2 MB)
 
 | 히트 | 파일 | 판정 |
 |---|---|---|
-| `password` / `cookie` 5·3·3 | `admin-product-description-auth-boundary/smoke.mjs` · `cosmetics-store-to-b2b-copy/smoke.mjs` · `product-db-write-authority/smoke.mjs` | 변수명·주석. 실값은 gitignore 된 `docs/local/TEST-ACCOUNTS.local.md` 에서 **런타임에 읽는** 구조 — 하드코딩 0. (제거됨) |
+| `password` / `cookie` 5·3·3 | `admin-product-description-auth-boundary/smoke.mjs` · `cosmetics-store-to-b2b-copy/smoke.mjs` · `product-db-write-authority/smoke.mjs` | 변수명·주석. 실값은 gitignore 된 `docs/local/TEST-ACCOUNT.txt` 에서 **런타임에 읽는** 구조 — 하드코딩 0. (제거됨) |
 | `secret` 59·55 | `cosmetics-retail-census/source-musinsa.json.gz` · `retail-raw-union.json.gz` | 브랜드명 (`secretkey` · `Paradise Secrets` · `hollywoodfashionsecrets` …) |
 | 이메일 3종 (`[REDACTED_EMAIL_A]` · `[REDACTED_EMAIL_B]` · `[REDACTED_EMAIL_C]`) | smoke 관련 6 파일 | §15 검증 계정 식별자(비밀번호 0). `tmp/` 밖 추적 파일 131 · 104 · 48 곳에 이미 존재 → 신규 노출 아님. (6 파일 모두 제거) |
 | 휴대전화 | — | **0** |
@@ -188,7 +190,7 @@ removed  73 파일 ·  9,614,284 bytes ( 9.2 MB)
 
 | 단계 | 내용 | 결과 |
 |---|---|---|
-| 1 | Actions secret 6개 등록 `E2E_{KPA,KCOS,NETURE}_ADMIN_{EMAIL,PASSWORD}` (값 = `TEST-ACCOUNTS.local.md` 서비스별 admin 행, stdin 으로 전달 · 로그 출력 0) | 완료 03:09Z |
+| 1 | Actions secret 6개 등록 `E2E_{KPA,KCOS,NETURE}_ADMIN_{EMAIL,PASSWORD}` (값 = `TEST-ACCOUNT.txt` 서비스별 admin 행, stdin 으로 전달 · 로그 출력 0) | 완료 03:09Z |
 | 2 | 1차 재실행 [34669662809](https://github.com/Renagang21/o4o-platform/actions/runs/34669662809) | `Validate E2E credentials` PASS · Neture/KCos PASS · **KPA 로그인 401** (`INVALID_CREDENTIALS` — kpa-society 스코프 비밀번호 drift, API 직접 확인) |
 | 3 | 2차 재실행 [34670923633](https://github.com/Renagang21/o4o-platform/actions/runs/34670923633) — KPA 를 `[REDACTED_EMAIL_B]` 으로 시도 | 로그인 200 이나 `/admin` `accessDenied=true` (kpa:store_owner) → 워크플로 계약(`E2E_KPA_ADMIN_*` · `protectedPath '/admin'`)에 부적합. 계정 교체안 폐기 |
 | 4 | 사용자가 kpa-society.co.kr 에서 `[REDACTED_EMAIL_A]`(kpa:admin) 비밀번호를 문서값으로 reset → API `serviceKey=kpa-society` 200 확인 → KPA secret 2개 sohae2100 으로 재등록 | 완료 04:43Z |
@@ -217,7 +219,7 @@ removed  73 파일 ·  9,614,284 bytes ( 9.2 MB)
 2. **`*_install.sql` 4** — `yaksa_*` 운영 테이블 처분 WO (forum-yaksa CHECK §후속 2) 에서 함께 판정.
 3. **PASS2 §8 정정 2건** (기록물이라 본문은 고치지 않고 여기 정정): (a) `delete_list_*.json` 은 DB 삭제 원장이 아니라 2025-12 문서 재구성 후보 목록 → DELETE. (b) `.mjs` 35 는 ACTIVE_FIXTURE_RELOCATE 가 아니라 전부 일회성 → DELETE (파이프라인 본체는 이미 `scripts/**`).
 4. **`tmp/` 명명** — 남은 96 파일은 "임시" 가 아니라 운영 복구자료다. 디렉터리명을 `ops-recovery/` 류로 바꾸는 것은 README 3 · CHECK 다수 · 파이프라인 `lib.mjs` 8곳의 경로 계약을 바꾸므로 별도 WO 로 분리(본 WO 는 경로 불변).
-5. ~~`e2e-auth-runtime.yml` Actions secret 6개 등록~~ → **완료** (§11-A). 남은 인계 1건: `[REDACTED_EMAIL_A]` 의 **k-cosmetics · neture 운영 비밀번호 ↔ `TEST-ACCOUNTS.local.md` drift** — 문서는 세 서비스 admin 행을 KPA reset 값으로 통일했으나 운영은 KPA 만 그 값(KCos/Neture 는 이전 값, API 401 확인). GitHub secret 은 이전(유효) 값이라 E2E 는 green. 해소 = KCos/Neture 운영 비밀번호를 문서값으로 reset 후 secret 2쌍 재등록, 또는 문서 두 행을 이전 값으로 복원.
+5. ~~`e2e-auth-runtime.yml` Actions secret 6개 등록~~ → **완료** (§11-A). 남은 인계 1건: `[REDACTED_EMAIL_A]` 의 **k-cosmetics · neture 운영 비밀번호 ↔ `TEST-ACCOUNT.txt` drift** — 문서는 세 서비스 admin 행을 KPA reset 값으로 통일했으나 운영은 KPA 만 그 값(KCos/Neture 는 이전 값, API 401 확인). GitHub secret 은 이전(유효) 값이라 E2E 는 green. 해소 = KCos/Neture 운영 비밀번호를 문서값으로 reset 후 secret 2쌍 재등록, 또는 문서 두 행을 이전 값으로 복원.
 6. 향후 배치 WO 의 `tmp/<wo>/` 에는 탐침·smoke `.mjs` 를 커밋하지 않는다 — 결과 JSON/CHECK 만 남기고 스크립트는 `scripts/**` 파이프라인에 두거나 버린다.
 
 ---

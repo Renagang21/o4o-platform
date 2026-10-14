@@ -31,7 +31,18 @@ export async function getNetureMainMembershipStatus(exec: QueryExec, userId: str
       WHERE u.id = $1 LIMIT 1`,
     [userId, NETURE_MAIN_SERVICE_KEY],
   );
-  const row = rows?.[0];
+  return resolveNetureMainMembershipStatus(rows?.[0]);
+}
+
+export interface NetureMainMembershipRow {
+  account_status?: string | null;
+  account_active?: boolean | null;
+  email_verified?: boolean | null;
+  membership_status?: string | null;
+}
+
+/** Single-user and joined list reads share the same policy; this function does no IO. */
+export function resolveNetureMainMembershipStatus(row?: NetureMainMembershipRow): ServiceMembershipStatus {
   if (!row) return 'none';
   if (row.account_status === 'suspended' || row.account_active === false) return 'suspended';
   if (row.account_status === 'rejected') return 'rejected';

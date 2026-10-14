@@ -15,7 +15,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
-import { O4OHomeButton } from '@o4o/auth-react';
+import { MyHomeButton, O4OHomeButton } from '@o4o/auth-react';
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
@@ -24,16 +24,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { DEMO_NOTICE } from '../lib/demoAccounts';
 import {
-  NETURE_PUBLIC_NAV,
+  getServicePublicNav,
   NETURE_CONTEXTUAL_NAV,
 } from '../config/navigation';
+import { CURRENT_HOST_PROFILE } from '../lib/hostProfile';
 import { NetureUserMenuItems } from './NetureUserMenu';
 import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
 // ─── Brand ───────────────────────────────────────────────────────────────────
 
 /**
  * WO-O4O-NETURE-O4O-BRAND-HEADER-SEO-ALIGNMENT-V1
- * 이 헤더는 Neture chrome(커뮤니티 · 마이페이지 · 안내 · Supplier / Operator / Admin 업무 공간)에 쓰이고
+ * 이 헤더는 Neture chrome(커뮤니티 · My Home · 안내 · Supplier / Operator / Admin 업무 공간)에 쓰이고
  * O4O 대표 홈(`/`)에는 씌우지 않는다. 브랜드 이름은 서비스 Identity(Neture) 그대로, 부제는
  * Legacy Partner 은퇴 후 "공급자·파트너 협업 플랫폼" 대신 O4O 정체성으로 가장 짧게 둔다.
  */
@@ -75,7 +76,8 @@ export function NetureGlobalHeader() {
   // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: contextual nav 는 진입 가능한 사람에게만 보인다.
   //   유일 항목 '공급자 대시보드'(SupplierRoute)는 operator/admin 역할로 통과하지 못하므로
   //   operator/admin showAll(WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)을 이 서비스에서는 쓰지 않는다.
-  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier });
+  const publicNav = getServicePublicNav(CURRENT_HOST_PROFILE);
+  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, { supplier: !!isSupplier }).filter(item => !publicNav.some(publicItem => publicItem.href === item.href));
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
@@ -88,8 +90,8 @@ export function NetureGlobalHeader() {
 
   return (
     <GlobalHeader
-      brand={NETURE_HEADER_BRAND}
-      publicNav={NETURE_PUBLIC_NAV}
+      brand={CURRENT_HOST_PROFILE === 'main' ? NETURE_HEADER_BRAND : { ...NETURE_HEADER_BRAND, name: { supplier: '공급자', funding: '유통참여형 펀딩', community: '커뮤니티' }[CURRENT_HOST_PROFILE], subtitle: '' }}
+      publicNav={publicNav}
       contextualNav={contextualNav}
       user={headerUser}
       onLogin={openLoginModal}
@@ -99,7 +101,7 @@ export function NetureGlobalHeader() {
       logoutLabel="O4O 로그아웃"
       /* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: 로그인 여부와 무관하게 O4O 홈 복귀.
          로고(브랜드) 링크는 서비스 홈 그대로 두고 O4O 홈은 별도 버튼으로 둔다. */
-      homeSlot={<O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" />}
+      homeSlot={<span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} local={CURRENT_HOST_PROFILE === 'main'} api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>}
       utilitySlot={
         <>
           {/* WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1: 서버 판정(user.demo) 기준 Demo 배지 — modal 없음 */}

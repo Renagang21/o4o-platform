@@ -17,15 +17,18 @@
  */
 
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { StorePlaylistCreateView } from '@o4o/shared-space-ui';
 import type { SignagePlaylistCreateValues } from '@o4o/shared-space-ui';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { withWorkspaceMode } from '../../config/storeWorkspace';
 import { createStorePlaylist } from '../../api/storePlaylist';
 
-const LIST_PATH = '/store/marketing/signage/playlist';
 
 export function StorePlaylistCreatePage() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const listPath = withWorkspaceMode(`${storeWorkspaceBase(pathname)}/marketing/signage/playlist`, 'studio');
 
   const handleSubmit = useCallback(async (values: SignagePlaylistCreateValues) => {
     await createStorePlaylist({
@@ -34,13 +37,13 @@ export function StorePlaylistCreatePage() {
       description: values.description || undefined,
       tags: values.tags.length > 0 ? values.tags : undefined,
     });
-    navigate(LIST_PATH);
-  }, [navigate]);
+    navigate(listPath);
+  }, [navigate, listPath]);
 
   return (
     <StorePlaylistCreateView
       accentColor="#2563eb"
-      onBack={() => navigate(LIST_PATH)}
+      onBack={() => navigate(listPath)}
       onSubmit={handleSubmit}
       config={{
         descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',

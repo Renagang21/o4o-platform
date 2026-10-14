@@ -26,10 +26,14 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace package manifests needed for this service
 #   auth-react → { auth-utils, auth-client } → types
+#   shared-space-ui → { ui → types, content-editor }
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/content-editor/package.json ./packages/content-editor/
+COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 
 # Copy service package.json
 COPY services/web-kpa-branch/package.json ./services/web-kpa-branch/
@@ -42,6 +46,9 @@ COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
+COPY packages/ui/ ./packages/ui/
+COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 
 # Copy service source
 COPY services/web-kpa-branch/ ./services/web-kpa-branch/
@@ -50,6 +57,8 @@ COPY services/web-kpa-branch/ ./services/web-kpa-branch/
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
+RUN pnpm --filter @o4o/ui build
+RUN pnpm --filter @o4o/content-editor build
 
 WORKDIR /app/services/web-kpa-branch
 

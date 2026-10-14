@@ -6,14 +6,16 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
+import { isRetiredRoleValue, isRetiredServiceValue, RetiredServiceError, sendRetiredServiceError } from '../../middleware/retired-service.middleware.js';
 import { In } from 'typeorm';
+import { resolveCanonicalServiceKey, resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
+import type { Role } from '../../modules/auth/entities/Role.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
-// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
-import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
+import { buildMemberProfileUpdate } from './membership-profile-update.js';
 import { MembershipApprovalService, StoreOwnerBusinessInfoRequiredError } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
@@ -63,6 +65,37 @@ const INVALID_USER_ID_RESPONSE = {
  */
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
 
+function currentApprovalMemberships(rows: Array<{ id: string; service_key?: string; role?: string }>) {
+  const current = rows.filter(m => !isRetiredRoleValue(m.service_key) && !isRetiredRoleValue(m.role));
+  if (rows.length > 0 && current.length === 0) throw new RetiredServiceError();
+  return current;
+}
+
+type MembershipReadRow = {
+  id: string;
+  service_key: string;
+  status: string;
+  role: string | null;
+  approved_by: string | null;
+  approved_at: Date | null;
+  rejection_reason: string | null;
+  created_at: Date;
+};
+
+/** Only the fields shared by list and detail; detail adds updatedAt separately. */
+function toMembershipSummary(row: MembershipReadRow) {
+  return {
+    id: row.id,
+    serviceKey: row.service_key,
+    status: row.status,
+    role: row.role,
+    approvedBy: row.approved_by,
+    approvedAt: row.approved_at,
+    rejectionReason: row.rejection_reason,
+    createdAt: row.created_at,
+  };
+}
+
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
 
@@ -76,43 +109,44 @@ export class MembershipConsoleController {
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1:
   //   changeMemberServicePassword 는 은퇴했다 (service_credentials write-path).
 
-  /**
-   * Service boundary check — non-platform-admin can only access users in their service scope
-   */
-  /**
-   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (lifecycle fan-out 경계)
-   *
-   * 원칙: "서비스 운영자의 회원 상태 변경은 해당 serviceKey 의 membership 에만 영향을 줘야 한다."
-   *
-   * 기존 write 경로(updateMemberStatus / batchUpdateStatus / reactivateMember)는
-   * `scope.serviceKeys`(= 운영자가 보유한 **모든** 서비스)를 그대로 MembershipApprovalService 에
-   * 넘겼다. 다중 서비스 operator 나 platform admin 이 한 콘솔에서 정지/재활성화하면
-   * 같은 사용자의 **다른 서비스 membership 과 role_assignments 까지** 함께 바뀐다.
-   * 읽기 경로는 이미 `resolveOperatorScope` 로 좁혀져 있어 축이 어긋나 있었다.
-   *
-   * 교정: write 요청도 명시 serviceKey(body 우선, query fallback)로 좁힌다.
-   *   - service operator : 보유 scope 안이면 그 키 하나로 축소, 밖이면 빈 scope (권한 확대 불가)
-   *   - platform admin   : 지정한 키 하나로 축소 (scope 필터가 실제 적용되도록 flag 도 내린다)
-   *   - serviceKey 미지정: 종전 동작 유지 (하위 호환 — 미채택 클라이언트 보호)
-   *
-   * users.status(플랫폼 축)는 이 helper 로 바뀌지 않는다 — 기존 계약 그대로다.
-   */
+  /** Resolve one authorized service for a user-ID-based mutation. */
   private resolveWriteScope(
     req: Request,
     scope: ServiceScope,
-  ): { isPlatformAdmin: boolean; serviceKeys: string[] } {
-    const raw = (req.body && (req.body as any).serviceKey) ?? (req.query as any)?.serviceKey;
+    res: Response,
+  ): { isPlatformAdmin: boolean; serviceKeys: string[] } | null {
+    const raw = req.body?.serviceKey ?? req.query?.serviceKey;
     const sk = typeof raw === 'string' ? raw.trim() : '';
-    if (!sk || sk === 'all') {
-      return { isPlatformAdmin: scope.isPlatformAdmin, serviceKeys: scope.serviceKeys };
+    // A sole service is unambiguous. Never infer all services or platform-wide writes.
+    const serviceKey = raw === undefined && !scope.isPlatformAdmin && scope.serviceKeys.length === 1
+      ? scope.serviceKeys[0] : sk;
+    if (!serviceKey || serviceKey === 'all') {
+      res.status(400).json({ success: false, code: 'SERVICE_KEY_REQUIRED', error: '대상 서비스 한 개를 지정해야 합니다.' });
+      return null;
     }
-    if (scope.isPlatformAdmin) {
-      return { isPlatformAdmin: false, serviceKeys: [sk] };
+    if (!scope.isPlatformAdmin && !scope.serviceKeys.includes(serviceKey)) {
+      res.status(403).json({ success: false, code: 'SERVICE_SCOPE_FORBIDDEN', error: '해당 서비스에 대한 권한이 없습니다.' });
+      return null;
     }
-    return {
-      isPlatformAdmin: false,
-      serviceKeys: scope.serviceKeys.includes(sk) ? [sk] : [],
-    };
+    return { isPlatformAdmin: false, serviceKeys: [serviceKey] };
+  }
+
+  private roleReadScopeParams(serviceKeys: string[] | null): [string[] | null, string[] | null] {
+    const prefixes = serviceKeys?.map(key => resolveRolePrefixFromCanonicalServiceKey(key)) ?? null;
+    return [prefixes?.map(prefix => `${prefix}:%`) ?? null, prefixes];
+  }
+
+  /** The same catalogue ownership check applies to role assignment and removal. */
+  private requireMemberRoleScope(req: Request, res: Response, serviceKey: string): boolean {
+    const scope: ServiceScope = (req as any).serviceScope;
+    const selected = req.body?.serviceKey ?? req.query?.serviceKey;
+    if (typeof selected === 'string' && resolveCanonicalServiceKey(selected) !== resolveCanonicalServiceKey(serviceKey)) {
+      res.status(400).json({ success: false, code: 'SERVICE_KEY_MISMATCH', error: '선택한 서비스와 역할의 서비스가 일치하지 않습니다.' });
+      return false;
+    }
+    if (scope.isPlatformAdmin || scope.serviceKeys.includes(resolveCanonicalServiceKey(serviceKey))) return true;
+    res.status(403).json({ success: false, code: 'SERVICE_SCOPE_REQUIRED', error: '역할이 속한 서비스의 운영 권한이 필요합니다.' });
+    return false;
   }
 
   private async checkServiceBoundary(userId: string, serviceKeys: string[]): Promise<boolean> {
@@ -121,6 +155,75 @@ export class MembershipConsoleController {
       [userId, serviceKeys]
     );
     return result.length > 0;
+  }
+
+  /** Resolve the catalogue entry only. Assignment/revocation authorization stays at the caller. */
+  private async resolveMemberRole(role: string, scope: ServiceScope): Promise<Role | null> {
+    let roleEntity = await roleService.getRoleByName(role);
+    // Cross-service collision: unprefixed name이 다른 서비스 role과 매칭된 경우 caller prefix로 재검색
+    if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
+      if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
+        for (const prefix of scope.rolePrefixes) {
+          const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
+          if (prefixed) { roleEntity = prefixed; break; }
+        }
+      }
+    }
+    // Fallback: 못 찾은 경우 prefix 붙여서 재시도
+    if (!roleEntity && !role.includes(':')) {
+      for (const prefix of scope.rolePrefixes) {
+        roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
+        if (roleEntity) break;
+      }
+    }
+    return roleEntity;
+  }
+
+  /** The single and batch approval endpoints read the same pending candidates. */
+  private async findApprovableMemberships(
+    userId: string,
+    scope: Pick<ServiceScope, 'isPlatformAdmin' | 'serviceKeys'>,
+  ): Promise<Array<{ id: string; service_key?: string; role?: string }>> {
+    return scope.isPlatformAdmin
+      ? AppDataSource.query(
+          `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+          [userId],
+        )
+      : AppDataSource.query(
+          `SELECT id, service_key, role FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+          [userId, scope.serviceKeys],
+        );
+  }
+
+  /** Reject scoped memberships sequentially; each endpoint owns its HTTP/batch result. */
+  private async rejectUserMemberships(
+    userId: string,
+    scope: Pick<ServiceScope, 'isPlatformAdmin' | 'serviceKeys'>,
+    reason: string | null,
+    adminServiceKeys: string[] | undefined,
+  ): Promise<number> {
+    const memberships: Array<{ id: string }> = scope.isPlatformAdmin
+      ? await AppDataSource.query(
+          `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
+          [userId],
+        )
+      : await AppDataSource.query(
+          `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
+          [userId, scope.serviceKeys],
+        );
+
+    let rejectedCount = 0;
+    for (const membership of memberships) {
+      const rejected = await approvalService.rejectMembership({
+        membershipId: membership.id,
+        reason,
+        adminServiceKeys,
+        isPlatformAdmin: scope.isPlatformAdmin,
+        serviceKeys: scope.serviceKeys,
+      });
+      if (rejected) rejectedCount += 1;
+    }
+    return rejectedCount;
   }
 
   /**
@@ -233,11 +336,14 @@ export class MembershipConsoleController {
 
       // Batch fetch role_assignments
       const roleRows = await AppDataSource.query(
-        `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles
-         FROM role_assignments
-         WHERE user_id = ANY($1) AND is_active = true
-         GROUP BY user_id`,
-        [userIds]
+        `SELECT ra.user_id, ARRAY_AGG(ra.role ORDER BY ra.role) as roles
+         FROM role_assignments ra
+         LEFT JOIN roles r ON ra.role = r.name
+         WHERE ra.user_id = ANY($1) AND ra.is_active = true
+           AND ($2::text[] IS NULL OR ra.role LIKE ANY($2)
+                OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
+         GROUP BY ra.user_id`,
+        [userIds, ...this.roleReadScopeParams(resolved.serviceKeys)]
       );
       const roleMap: Record<string, string[]> = {};
       for (const row of roleRows) {
@@ -245,7 +351,7 @@ export class MembershipConsoleController {
       }
 
       // Batch fetch service_memberships (scoped by service)
-      const membershipRows = scope.isPlatformAdmin
+      const membershipRows = resolved.serviceKeys === null
         ? await AppDataSource.query(
             `SELECT id, user_id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at
              FROM service_memberships
@@ -258,21 +364,12 @@ export class MembershipConsoleController {
              FROM service_memberships
              WHERE user_id = ANY($1) AND service_key = ANY($2)
              ORDER BY created_at DESC`,
-            [userIds, scope.serviceKeys]
+            [userIds, resolved.serviceKeys]
           );
       const membershipMap: Record<string, any[]> = {};
       for (const row of membershipRows) {
         if (!membershipMap[row.user_id]) membershipMap[row.user_id] = [];
-        membershipMap[row.user_id].push({
-          id: row.id,
-          serviceKey: row.service_key,
-          status: row.status,
-          role: row.role,
-          approvedBy: row.approved_by,
-          approvedAt: row.approved_at,
-          rejectionReason: row.rejection_reason,
-          createdAt: row.created_at,
-        });
+        membershipMap[row.user_id].push(toMembershipSummary(row));
       }
 
       // Compose response
@@ -327,6 +424,7 @@ export class MembershipConsoleController {
         pagination: { page: pageNum, limit: limitNum, total, totalPages },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMembers error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -341,6 +439,10 @@ export class MembershipConsoleController {
   getMemberDetail = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
+      const resolved = resolveOperatorScope(scope, req.query);
+      if (!resolved) { res.status(400).json(PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE); return; }
+      if (resolved.crossService) logCrossServiceQuery(req);
+      const serviceKeys = resolved.serviceKeys;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -348,8 +450,8 @@ export class MembershipConsoleController {
       }
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary check
-      if (!scope.isPlatformAdmin) {
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+      if (serviceKeys !== null) {
+        const hasAccess = await this.checkServiceBoundary(userId, serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -380,12 +482,13 @@ export class MembershipConsoleController {
          FROM role_assignments ra
          LEFT JOIN roles r ON ra.role = r.name
          WHERE ra.user_id = $1
+           AND ($2::text[] IS NULL OR ra.role LIKE ANY($2) OR (POSITION(':' IN ra.role) = 0 AND r.service_key = ANY($3)))
          ORDER BY ra.is_active DESC, ra.created_at DESC`,
-        [userId]
+        [userId, ...this.roleReadScopeParams(serviceKeys)]
       );
 
       // Fetch service_memberships (scoped by service)
-      const membershipRows = scope.isPlatformAdmin
+      const membershipRows = serviceKeys === null
         ? await AppDataSource.query(
             `SELECT id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at, updated_at
              FROM service_memberships
@@ -398,7 +501,7 @@ export class MembershipConsoleController {
              FROM service_memberships
              WHERE user_id = $1 AND service_key = ANY($2)
              ORDER BY created_at DESC`,
-            [userId, scope.serviceKeys]
+            [userId, serviceKeys]
           );
 
       res.json({
@@ -430,19 +533,13 @@ export class MembershipConsoleController {
           scopeId: r.scope_id,
           createdAt: r.created_at,
         })),
-        memberships: membershipRows.map((m: any) => ({
-          id: m.id,
-          serviceKey: m.service_key,
-          status: m.status,
-          role: m.role,
-          approvedBy: m.approved_by,
-          approvedAt: m.approved_at,
-          rejectionReason: m.rejection_reason,
-          createdAt: m.created_at,
+        memberships: membershipRows.map((m: MembershipReadRow & { updated_at: Date }) => ({
+          ...toMembershipSummary(m),
           updatedAt: m.updated_at,
         })),
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getMemberDetail error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -479,6 +576,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
@@ -516,6 +614,7 @@ export class MembershipConsoleController {
       const membership = await approvalService.rejectMembership({
         membershipId,
         reason: reason || null,
+        adminServiceKeys: (req as any).memberAdminServiceKeys,
         isPlatformAdmin: scope.isPlatformAdmin,
         serviceKeys: scope.serviceKeys,
       });
@@ -532,6 +631,7 @@ export class MembershipConsoleController {
       }).catch(() => {});
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       if (sendDemoAccountForbidden(res, error)) return;
       logger.error('[MembershipConsole] rejectMembership error', {
         membershipId: req.params.membershipId,
@@ -554,7 +654,8 @@ export class MembershipConsoleController {
   updateMemberStatus = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -582,17 +683,10 @@ export class MembershipConsoleController {
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
         // (membership + user + role_assignments in single transaction)
-        const pendingMemberships = writeScope.isPlatformAdmin
-          ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
-              [userId]
-            )
-          : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-              [userId, writeScope.serviceKeys]
-            );
+        let pendingMemberships = await this.findApprovableMemberships(userId, writeScope);
 
         if (pendingMemberships.length > 0) {
+          pendingMemberships = currentApprovalMemberships(pendingMemberships);
           for (const m of pendingMemberships) {
             await approvalService.approveMembership({
               membershipId: m.id,
@@ -601,12 +695,16 @@ export class MembershipConsoleController {
               serviceKeys: writeScope.serviceKeys,
             });
           }
+        } else if ((req as any).memberManagementApprovalOnly) {
+          res.status(403).json({ success: false, code: 'SERVICE_MEMBER_ADMIN_REQUIRED', error: '가입 승인 이외의 활성화는 서비스 관리자만 가능합니다.' });
+          return;
         } else if (
           await approvalService.reactivateMembership({
             userId,
             reactivatedBy: updatedBy,
             isPlatformAdmin: writeScope.isPlatformAdmin,
             serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
           })
         ) {
           // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -614,24 +712,12 @@ export class MembershipConsoleController {
           //   아래 users 화이트리스트 분기로 떨어졌고, 그 화이트리스트가 (정당하게)
           //   'suspended' 를 제외하므로 **200 + 아무 변화 없음** 이었다.
           //   재활성화의 canonical 경로는 이미 존재한다 — reactivateMembership
-          //   (membership + user + role_assignments atomic, POST /:userId/reactivate 와 동일).
+          //   (membership + ordinary roles atomic, POST /:userId/reactivate 와 동일).
           //   비활성화(suspended)의 역동작이므로 활성화 요청은 여기로 위임한다.
           //   경계는 그대로다: 비-platform-admin 은 writeScope.serviceKeys 안의 membership 만
           //   되살리고 users.status='suspended'(플랫폼 조치)는 건드리지 않는다.
         } else {
-          // No pending / reactivatable memberships — just activate user (idempotent)
-          // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-          //   가드 없이 활성화하면 **다른 서비스가 정지시킨 계정을 되살린다.**
-          //   MembershipApprovalService.approveMembership STEP2 와 동일한 status 화이트리스트를
-          //   적용해 'suspended'(플랫폼/타 서비스 정지)는 건드리지 않는다.
-          await AppDataSource.query(
-            `UPDATE users SET status = 'active', "isActive" = true,
-             "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
-             "updatedAt" = NOW()
-             WHERE id = $2
-               AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
-            [updatedBy, userId]
-          );
+          // Already active membership: preserve shared account state (idempotent).
         }
       } else if (status.toLowerCase() === 'suspended') {
         // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: service-level suspend via atomic transaction
@@ -656,26 +742,9 @@ export class MembershipConsoleController {
         //   suspendMembership 이 이미 users 를 건드리지 않는 계약이므로 그 형태로 통일한다.
         //
         //   service_memberships.status(SSOT) 갱신은 그대로 유지 — 목록 필터가 이 값을 본다.
-        const rejectableMemberships = writeScope.isPlatformAdmin
-          ? await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
-              [userId]
-            )
-          : await AppDataSource.query(
-              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-              [userId, writeScope.serviceKeys]
-            );
-
-        let rejectedCount = 0;
-        for (const m of rejectableMemberships) {
-          const rejected = await approvalService.rejectMembership({
-            membershipId: m.id,
-            reason: req.body.reason || null,
-            isPlatformAdmin: writeScope.isPlatformAdmin,
-            serviceKeys: writeScope.serviceKeys,
-          });
-          if (rejected) rejectedCount += 1;
-        }
+        const rejectedCount = await this.rejectUserMemberships(
+          userId, writeScope, req.body.reason || null, (req as any).memberAdminServiceKeys,
+        );
 
         // suspend 분기와 동일한 계약 — 스코프 안에 대상이 없으면 404.
         if (rejectedCount === 0) {
@@ -725,6 +794,12 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `User status updated to ${status}` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
+
       if (error instanceof StoreOwnerBusinessInfoRequiredError) {
         res.status(error.httpStatus).json({
           success: false,
@@ -769,7 +844,8 @@ export class MembershipConsoleController {
       }
 
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const updatedBy = (req as any).user?.id || null;
       const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
@@ -791,17 +867,10 @@ export class MembershipConsoleController {
           }
 
           if (targetStatus === 'approved') {
-            const pendingMemberships = writeScope.isPlatformAdmin
-              ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
-                  [userId]
-                )
-              : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-                  [userId, writeScope.serviceKeys]
-                );
+            let pendingMemberships = await this.findApprovableMemberships(userId, writeScope);
 
             if (pendingMemberships.length > 0) {
+              pendingMemberships = currentApprovalMemberships(pendingMemberships);
               for (const m of pendingMemberships) {
                 await approvalService.approveMembership({
                   membershipId: m.id,
@@ -810,27 +879,22 @@ export class MembershipConsoleController {
                   serviceKeys: writeScope.serviceKeys,
                 });
               }
+            } else if ((req as any).memberManagementApprovalOnly) {
+              results.push({ id: userId, status: 'failed', error: 'SERVICE_MEMBER_ADMIN_REQUIRED' });
+              continue;
             } else if (
               await approvalService.reactivateMembership({
                 userId,
                 reactivatedBy: updatedBy,
                 isPlatformAdmin: writeScope.isPlatformAdmin,
                 serviceKeys: writeScope.serviceKeys,
+            adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
               })
             ) {
               // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
               //   단건 경로와 동일 — suspended/withdrawn 은 canonical reactivate 로 위임한다.
             } else {
-              // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-              //   단건 경로와 동일 가드 — 'suspended' 계정은 되살리지 않는다.
-              await AppDataSource.query(
-                `UPDATE users SET status = 'active', "isActive" = true,
-                 "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
-                 "updatedAt" = NOW()
-                 WHERE id = $2
-                   AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
-                [updatedBy, userId]
-              );
+              // Already active membership: preserve shared account state (idempotent).
             }
           } else if (targetStatus === 'suspended') {
             const result = await approvalService.suspendMembership({
@@ -844,28 +908,9 @@ export class MembershipConsoleController {
               continue;
             }
           } else if (targetStatus === 'rejected') {
-            const pendingMemberships = writeScope.isPlatformAdmin
-              ? await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
-                  [userId]
-                )
-              : await AppDataSource.query(
-                  `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-                  [userId, writeScope.serviceKeys]
-                );
-
-            // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
-            //   단건 경로와 동일 — membership 만 반려하고 users 전역 상태는 건드리지 않는다.
-            let rejectedCount = 0;
-            for (const m of pendingMemberships) {
-              const rejected = await approvalService.rejectMembership({
-                membershipId: m.id,
-                reason: req.body.reason || null,
-                isPlatformAdmin: writeScope.isPlatformAdmin,
-                serviceKeys: writeScope.serviceKeys,
-              });
-              if (rejected) rejectedCount += 1;
-            }
+            const rejectedCount = await this.rejectUserMemberships(
+              userId, writeScope, req.body.reason || null, (req as any).memberAdminServiceKeys,
+            );
 
             if (rejectedCount === 0) {
               results.push({ id: userId, status: 'skipped', error: 'No memberships found to reject' });
@@ -886,6 +931,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, data: { results } });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] batchUpdateStatus error', {
         error: error instanceof Error ? error.message : String(error),
       });
@@ -904,7 +950,8 @@ export class MembershipConsoleController {
   reactivateMember = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -928,6 +975,7 @@ export class MembershipConsoleController {
         reactivatedBy,
         isPlatformAdmin: writeScope.isPlatformAdmin,
         serviceKeys: writeScope.serviceKeys,
+        adminServiceKeys: (req as any).memberAdminServiceKeys ?? [],
       });
 
       if (!result) {
@@ -952,6 +1000,12 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User reactivated', data: result });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
+      if ((error as { code?: string })?.code === 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED') {
+        res.status(403).json({ success: false, code: 'WITHDRAWN_MEMBERSHIP_ADMIN_REQUIRED', error: '탈퇴 회원 복구는 해당 서비스 관리자만 가능합니다.' });
+        return;
+      }
+
       logger.error('[MembershipConsole] reactivateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -965,31 +1019,45 @@ export class MembershipConsoleController {
 
   /**
    * PUT /api/v1/operator/members/:userId
-   * 사용자 정보 수정 (프로필 + 비밀번호 + 사업자 정보)
+   * 사용자 정보 수정 (프로필 + 회원 유형 + 사업자 정보)
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
+      if (isRetiredServiceValue(req.body?.membershipServiceKey) || isRetiredRoleValue(req.body?.membershipRole)) {
+        res.status(410).json({ success:false, code:'SERVICE_RETIRED' });
+        return;
+      }
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
         return;
       }
-      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail/managerPhone canonical 수용.
-      // taxEmail/representativeName 은 legacy alias — controller 에서 canonical key 로만 저장.
-      const {
-        lastName, firstName, nickname, phone,
-        businessName, businessNumber, businessType,
-        businessCategory, zipCode, address1, address2,
-        ceoName, contactName, taxInvoiceEmail, pharmacyPhone, managerPhone,
-        taxEmail, representativeName, // legacy aliases
-        membershipRole, // service_memberships.role 변경
-      } = req.body;
+      const { membershipRole } = req.body;
 
       if (!scope.isPlatformAdmin) {
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
+
+      // Validate the selected membership service before any membership/profile write.
+      let membershipServiceKey: string | undefined;
+      if (membershipRole && typeof membershipRole === 'string') {
+        const explicit = req.body.membershipServiceKey;
+        if (explicit !== undefined && req.body.serviceKey !== undefined && explicit !== req.body.serviceKey) {
+          res.status(400).json({ success: false, code: 'SERVICE_KEY_MISMATCH', error: '서비스 지정이 일치하지 않습니다.' });
+          return;
+        }
+        const writeScope = this.resolveWriteScope(
+          { ...req, body: { ...req.body, serviceKey: explicit ?? req.body.serviceKey } } as Request, scope, res,
+        );
+        if (!writeScope) return;
+        membershipServiceKey = writeScope.serviceKeys[0];
+        if (!(await this.checkServiceBoundary(userId, [membershipServiceKey]))) {
+          res.status(404).json({ success: false, error: 'Membership not found' });
           return;
         }
       }
@@ -1008,10 +1076,14 @@ export class MembershipConsoleController {
           });
           return;
         }
+        if (membershipRole.includes(':') && resolveCanonicalServiceKey(membershipRole.split(':')[0]) !== membershipServiceKey) {
+          res.status(400).json({ success: false, code: 'INVALID_MEMBERSHIP_ROLE', error: '다른 서비스의 회원 유형은 저장할 수 없습니다.' });
+          return;
+        }
         // Demo 계정 보호(정책 §8 role 변경): 회원 유형 변경도 write **전에** 막는다.
         if (await rejectDemoAccountTarget(res, userId)) return;
         // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
-        const serviceKey = req.body.membershipServiceKey || scope.serviceKeys[0];
+        const serviceKey = membershipServiceKey;
         if (serviceKey) {
           await AppDataSource.query(
             `UPDATE service_memberships SET role = $1, updated_at = NOW()
@@ -1026,85 +1098,14 @@ export class MembershipConsoleController {
       //   회원 로그인은 Google sub → users.id 하나로만 이뤄진다.
       //   운영자가 대신 바꿔줄 비밀번호가 존재하지 않으므로 이 경로는 무의미하다.
 
-      // 2. Profile fields update
-      const sets: string[] = [];
-      const params: any[] = [];
-      let idx = 1;
-
-      if (lastName !== undefined) { sets.push(`"lastName" = $${idx++}`); params.push(lastName); }
-      if (firstName !== undefined) { sets.push(`"firstName" = $${idx++}`); params.push(firstName); }
-      if (nickname !== undefined) { sets.push(`nickname = $${idx++}`); params.push(nickname); }
-      if (phone !== undefined) { sets.push(`phone = $${idx++}`); params.push(phone.replace(/\D/g, '')); }
-
-      // name 동기화 (lastName+firstName → name)
-      if (lastName !== undefined || firstName !== undefined) {
-        sets.push(`name = $${idx++}`);
-        params.push(`${lastName || ''}${firstName || ''}`.trim());
-      }
-
-      // 3. businessInfo JSONB 머지
-      // WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1:
-      //   ceoName / taxInvoiceEmail / managerPhone canonical write.
-      //   taxEmail → email overwrite 제거 (대표 이메일과 세금계산서 이메일 의미 분리).
-      //   legacy alias (taxEmail / representativeName) 는 client 보내도 canonical key 로 저장.
-      const bizFields: Record<string, any> = {};
-      if (businessName !== undefined) bizFields.businessName = businessName;
-      if (businessNumber !== undefined) bizFields.businessNumber = businessNumber;
-      if (businessType !== undefined) bizFields.businessType = businessType;
-      if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
-      const effectiveCeoName = ceoName ?? representativeName;
-      if (effectiveCeoName !== undefined) bizFields.ceoName = effectiveCeoName;
-      if (contactName !== undefined) bizFields.contactName = contactName;
-      const effectiveTaxInvoiceEmail = taxInvoiceEmail ?? taxEmail;
-      if (effectiveTaxInvoiceEmail !== undefined) bizFields.taxInvoiceEmail = effectiveTaxInvoiceEmail;
-      if (pharmacyPhone !== undefined) bizFields.pharmacyPhone = pharmacyPhone;
-      if (managerPhone !== undefined) bizFields.managerPhone = managerPhone;
-      // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
-      if (zipCode !== undefined) bizFields.zipCode = zipCode;
-      if (address1 !== undefined) bizFields.address = address1;
-      if (address2 !== undefined) bizFields.address2 = address2;
-      // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 동기화
-      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
-      //   기존 구현은 storeAddress 를 **통째로 새로 만들어** 넣었다. 그래서
-      //   상세주소만 수정해도 `baseAddress` 가 '' 로 덮이고 `zipCode` 키가 사라졌다
-      //   (실측: 프로덕션 storeAddress 보유 11명 중 zipCode 보유 6 / detailAddress 보유 9).
-      //   교정: 요청이 보낸 하위 키만 담아 중첩 부분 병합에 맡긴다 — 형제 키는 보존된다.
-      //   빈 문자열은 최상위 키(address/address2)와 동일하게 "그 값으로 수정" 으로 다룬다
-      //   (그래야 상세주소 지우기가 계속 동작한다).
-      const storeAddressFields: Record<string, any> = {};
-      if (zipCode !== undefined) storeAddressFields.zipCode = zipCode;
-      if (address1 !== undefined) storeAddressFields.baseAddress = address1;
-      if (address2 !== undefined) storeAddressFields.detailAddress = address2;
-
-      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
-      //   read → 병합 → 전체 재저장 제거. 부분 갱신 표현식을 같은 UPDATE 문에 합쳐
-      //   scalar 컬럼과 businessInfo 가 단일 statement 로 원자적으로 반영되게 한다.
-      const bizFragment = buildBusinessInfoUpdate(
-        {
-          root: bizFields,
-          ...(Object.keys(storeAddressFields).length > 0
-            ? { nested: { storeAddress: storeAddressFields } }
-            : {}),
-        },
-        idx,
-      );
-      if (bizFragment) {
-        sets.push(`"businessInfo" = ${bizFragment.expression}`);
-        params.push(...bizFragment.params);
-        idx = bizFragment.nextIndex;
-      }
-
-      if (sets.length > 0) {
-        sets.push(`"updatedAt" = NOW()`);
-        params.push(userId);
-        await AppDataSource.query(
-          `UPDATE users SET ${sets.join(', ')} WHERE id = $${idx}`,
-          params
-        );
+      const profileUpdate = buildMemberProfileUpdate(req.body, userId);
+      if (profileUpdate) {
+        await AppDataSource.query(profileUpdate.sql, profileUpdate.params);
       }
 
       res.json({ success: true, message: 'User updated' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] updateMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1165,6 +1166,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getDeleteRisk error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1233,7 +1235,8 @@ export class MembershipConsoleController {
 
       // 보유 범위 검증은 다른 write 경로와 같은 규칙(`resolveWriteScope`)에 맡긴다.
       //   platform admin → [명시 키] · 서비스 운영자 → 보유한 키일 때만 [명시 키], 아니면 []
-      const writeScope = this.resolveWriteScope(req, scope);
+      const writeScope = this.resolveWriteScope(req, scope, res);
+      if (!writeScope) return;
       if (writeScope.serviceKeys.length !== 1 || writeScope.serviceKeys[0] !== targetServiceKey) {
         res.status(403).json({
           success: false,
@@ -1261,6 +1264,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] deleteMember error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1292,41 +1296,36 @@ export class MembershipConsoleController {
         return;
       }
 
+      if (isRetiredRoleValue(role)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
+        return;
+      }
+
       // Demo 계정 보호(정책 §8 role 변경 · ownership 해제): write **전에** 막는다.
       if (await rejectDemoAccountTarget(res, userId)) return;
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
-      let roleEntity = await roleService.getRoleByName(role);
-      // Cross-service collision: unprefixed name이 다른 서비스 role과 매칭된 경우 caller prefix로 재검색
-      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
-        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
-          for (const prefix of scope.rolePrefixes) {
-            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
-            if (prefixed) { roleEntity = prefixed; break; }
-          }
-        }
-      }
-      // Fallback: 못 찾은 경우 prefix 붙여서 재시도
-      if (!roleEntity && !role.includes(':')) {
-        for (const prefix of scope.rolePrefixes) {
-          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
-          if (roleEntity) break;
-        }
-      }
+      const roleEntity = await this.resolveMemberRole(role, scope);
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
       }
 
+      if (isRetiredRoleValue(roleEntity.serviceKey) || isRetiredRoleValue(roleEntity.name)) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED' });
+        return;
+      }
+
       // Service boundary check
       if (!scope.isPlatformAdmin) {
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
         // Assignability check
         if (!roleEntity.isAssignable) {
           res.status(403).json({ success: false, error: 'This role is not assignable' });
           return;
         }
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -1372,6 +1371,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} assigned`, assignment });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] assignMemberRole error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
@@ -1432,21 +1432,7 @@ export class MembershipConsoleController {
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
-      let roleEntity = await roleService.getRoleByName(role);
-      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
-        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
-          for (const prefix of scope.rolePrefixes) {
-            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
-            if (prefixed) { roleEntity = prefixed; break; }
-          }
-        }
-      }
-      if (!roleEntity && !role.includes(':')) {
-        for (const prefix of scope.rolePrefixes) {
-          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
-          if (roleEntity) break;
-        }
-      }
+      const roleEntity = await this.resolveMemberRole(role, scope);
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
@@ -1454,7 +1440,8 @@ export class MembershipConsoleController {
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!this.requireMemberRoleScope(req, res, roleEntity.serviceKey)) return;
+        const hasAccess = await this.checkServiceBoundary(userId, [resolveCanonicalServiceKey(roleEntity.serviceKey)]);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -1560,6 +1547,7 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: `Role ${role} removed` });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] removeMemberRole error', {
         userId: req.params.userId,
         role: req.params.role,
@@ -1629,6 +1617,7 @@ export class MembershipConsoleController {
         },
       });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[MembershipConsole] getStats error', {
         error: error instanceof Error ? error.message : String(error),
       });

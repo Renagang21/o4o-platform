@@ -1,3 +1,4 @@
+import { resolveApprovedStoreMemberOrganization } from '../utils/store-member-access.js';
 /**
  * Auth Context Middleware
  *
@@ -40,6 +41,17 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
       return;
     }
 
+    let delegated: string | null;
+    try {
+      delegated = await resolveApprovedStoreMemberOrganization(dataSource, user.id, serviceKey, readPreferredStoreOrganizationId(req));
+    } catch (error) { next(error); return; }
+    if (delegated) {
+      req.organizationId = delegated;
+      req.authContext = { userId: user.id, organizationId: delegated, memberRole: 'staff', roles: user.roles || [] };
+      next();
+      return;
+    }
+
     const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(
       dataSource,
       user.id,
@@ -56,7 +68,7 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
       });
       return;
     }
-    if (!isOwner || !organizationId) {
+    if (!isOwner || !organizationId || (readPreferredStoreOrganizationId(req) && readPreferredStoreOrganizationId(req) !== organizationId)) {
       res.status(403).json({
         success: false,
         error: 'Store owner access required',
@@ -94,13 +106,20 @@ export function optionalStoreAuth(dataSource: DataSource, serviceKey?: StoreOwne
     }
 
     try {
+      const delegated = await resolveApprovedStoreMemberOrganization(dataSource, user.id, serviceKey, readPreferredStoreOrganizationId(req));
+      if (delegated) {
+        req.organizationId = delegated;
+        req.authContext = { userId: user.id, organizationId: delegated, memberRole: 'staff', roles: user.roles || [] };
+        next();
+        return;
+      }
       const { isOwner, organizationId, memberRole } = await isStoreOwner(
         dataSource,
         user.id,
         serviceKey,
         readPreferredStoreOrganizationId(req),
       );
-      if (isOwner && organizationId) {
+      if (isOwner && organizationId && (!readPreferredStoreOrganizationId(req) || readPreferredStoreOrganizationId(req) === organizationId)) {
         const authContext: AuthContext = {
           userId: user.id,
           organizationId,

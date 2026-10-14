@@ -1,5 +1,7 @@
 # CHECK-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **WO**: WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1
 > **작업일**: 2026-08-14 · **worktree**: `D:\o4o-event-offer-order` · **branch**: `work/store-hub-event-offer-order-visibility-v1`
 > **main 병합·프로덕션 배포 완료** (사용자 승인)
@@ -257,7 +259,7 @@ JS 예외 0 · white screen 0 · dead link 0.
 
 ### 8-1. 로그인 E2E 미검증
 
-`docs/local/TEST-ACCOUNTS.local.md` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
+`docs/local/TEST-ACCOUNT.txt` §2 기준 **4서비스 전부 L2 service credential 이 unknown** 이라
 웹 로그인 폼 자체는 검증하지 못했다. 같은 문서 §4-2 가 허용한 **L1 토큰 주입 우회**로 UI 를 검증했다.
 
 > 토큰 주입은 로그인 성공이 아니다. **로그인 E2E 는 이번에도 미검증**이다.

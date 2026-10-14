@@ -17,7 +17,7 @@
  */
 
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Bell, User } from 'lucide-react';
+import { Home, Bell, User, LayoutDashboard } from 'lucide-react';
 import {
   useNotifications,
   NotificationSheet,
@@ -28,6 +28,9 @@ import {
   useMobileBottomNavSheet,
 } from '@o4o/account-ui';
 import type { NotificationItem, MobileBottomNavItem } from '@o4o/account-ui';
+import { useMyHomeReturn } from '@o4o/auth-react';
+import { CURRENT_HOST_PROFILE } from '../lib/hostProfile';
+import { api } from '../lib/apiClient';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
 import { useAuth } from '../contexts/AuthContext';
 import { NetureUserMenuItems, getNetureUserDisplayName } from './NetureUserMenu';
@@ -40,9 +43,10 @@ const ACTIVE_COLOR = '#059669';
 const BADGE_STYLE: React.CSSProperties = { top: -6, fontWeight: 600 };
 
 export function NetureBottomNav() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const myHome = useMyHomeReturn({ accountId: user?.id, api, isAuthenticated, authLoading: isLoading, local: CURRENT_HOST_PROFILE === 'main', navigate: href => href.startsWith('/') ? navigate(href) : window.location.assign(href) });
 
   const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
 
@@ -74,6 +78,7 @@ export function NetureBottomNav() {
   if (!isAuthenticated || !user) return null;
 
   const items: MobileBottomNavItem[] = [
+    { key: 'my-home', label: myHome.busy ? '이동 중…' : 'My Home', ariaLabel: 'My Home', icon: LayoutDashboard, onClick: () => { closeSheet(); void myHome.go(); }, active: pathname.startsWith('/mypage') },
     { key: 'home', label: '홈', icon: Home, to: '/', active: pathname === '/' },
     {
       key: 'notif',
@@ -100,6 +105,7 @@ export function NetureBottomNav() {
   return (
     <>
       {/* 하단 nav(고정) 높이만큼 문서 흐름 여백 — 콘텐츠 가림 방지. 인증 시에만 렌더. */}
+      {myHome.error && <p role="alert" className="fixed bottom-20 left-4 right-4 z-50 rounded-lg bg-red-50 p-3 text-sm text-red-700">{myHome.error}</p>}
       <MobileBottomNavSpacer />
       <MobileBottomNav items={items} activeColor={ACTIVE_COLOR}>
         {openSheet !== 'none' && <MobileBottomNavBackdrop onClick={closeSheet} />}

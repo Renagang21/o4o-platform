@@ -19,7 +19,6 @@
 | `neture-web` | neture.co.kr | 네처 서비스 웹 | `deploy-web-services.yml` |
 | `k-cosmetics-web` | retail.neture.co.kr | K-화장품 — 퇴역(2026-10-06 배포 경로 · 앱 소스 은퇴, Cloud Run 정리 대기) | 없음 |
 | `kpa-society-web` | kpa-society.co.kr | 약사회 SaaS | `deploy-web-services.yml` |
-| `pharmacy-hub-web` | pharmacyhub.co.kr | 약국 허브 | `deploy-web-services.yml` |
 
 ### GitHub Actions Workflows
 

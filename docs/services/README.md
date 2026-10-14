@@ -1,7 +1,7 @@
 # O4O 서비스 색인
 
 > **상태**: ACTIVE
-> **작성일**: 2025-12 · **최종 갱신**: 2026-10-03
+> **작성일**: 2025-12 · **최종 갱신**: 2026-10-11 (PH 완전 폐기 정책 반영)
 > **근거 WO/IR**: WO-O4O-DOCS-ONBOARDING-ENTRY-V1
 
 O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. 서비스 정의를 여기 복제하지 않는다.
@@ -15,6 +15,8 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 
 ## 1. 서비스 (service-catalog 등재)
 
+> **PH 전용 판정 부분 대체:** catalog의 잔여 등록은 서비스 운영·복구 근거가 아니다. 사용자 승인된 PH 완전 폐기 정책이 이 색인의 PH 전용 유지·확장 계약을 대체한다. 다른 서비스·공통 계약은 유지한다.
+
 | serviceKey | 웹 앱 | 기준 문서 |
 |---|---|---|
 | `neture` | `services/web-neture` | [NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3](../baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md) · [SUPPLIER-DOMAIN-BOUNDARY](../baseline/O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) · [NETURE-DISTRIBUTION-ENGINE-FREEZE](../baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
@@ -22,7 +24,7 @@ O4O 의 서비스 목록과 서비스별 기준 문서를 찾는 색인이다. �
 | `kpa-society` | `services/web-kpa-society` | [KPA-SOCIETY-SERVICE-STRUCTURE](../baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md) · [KPA-UX-BASELINE](../baseline/KPA-UX-BASELINE-V1.md) · [KPA-ROLE-MATRIX](../baseline/KPA-ROLE-MATRIX-V1.md) · [KPA-SIGNAGE-STRUCTURE](../baseline/KPA-SIGNAGE-STRUCTURE-V1.md) |
 | `kpa-branch` | `services/web-kpa-branch` | 약사회 분회 홈페이지 — 주소 의미는 [SUBDOMAIN-SERVICE-SEMANTICS](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) §2. 역할 · 접근 정본은 [KPA-BRANCH-ROLE-MATRIX](../baseline/KPA-BRANCH-ROLE-MATRIX-V1.md)(2026-10-06). 그 밖의 구조 정본 없음 — catalog 주석과 [SERVICE-IDENTITY CHECK](../checks/CHECK-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1.md) |
 | `k-cosmetics` | 없음 — 독립 웹 앱은 퇴역 1차-A, web-store 기능 화면 · `/api/v1/cosmetics` 는 1차-B(PR #339)로 삭제(`/work/k-cosmetics/*` 는 종료 안내만) | **퇴역 결정(2026-10-05) · 운영 runtime 제거 완료** — [DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §14. 퇴역 잔여 계약 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) (2026-10-07 · 구 COSMETICS-DOMAIN-RULES 는 SUPERSEDED). `cosmetics/service-definition.md` 는 퇴역 이전 기록(stale — "운영중" · 제거된 기능 열거)이라 기준 문서가 아니다 |
-| `pharmacy-hub` | `services/web-pharmacy-hub` | [PHARMACY-HUB-SERVICE-MODEL-BASELINE](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) |
+| `pharmacy-hub` | 없음 — 독립 웹 앱·서비스 API 제거 완료(PR #375); 공용 코드 등록·운영 자원은 후속 폐기 대상 | **완전 폐기 결정(2026-10-11)** — [PHARMACY-HUB-SERVICE-MODEL-BASELINE](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md). 기존 도메인·DNS·인증서는 인쇄 QR 연결용으로 유지하며 운영 전환·자원/데이터 삭제 완료는 [실행 TODO](../work-orders/WO-O4O-PHARMACYHUB-RETIREMENT-TODO-V1.md)를 따른다. |
 | `lecture` | `services/web-lecture` | O4O 강의 — neture 에서 분리된 독립 서비스. 정본 없음 — [WO](../work-orders/WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md) · [CHECK](../checks/CHECK-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1.md) |
 | `cafe24-b2b` | 별도 웹 앱 없음 | Cafe24 회원 로그인 기반 매장 판매지원 파일럿. 정본 없음 — catalog 주석 |
 

@@ -7,6 +7,11 @@ Disallow: /operator/
 Disallow: /store/
 Disallow: /store-hub/
 Disallow: /mypage/
+Disallow: /my/
+Disallow: /community
+Disallow: /materials
+Disallow: /tools
+Disallow: /businesses/
 Disallow: /tablet/
 Disallow: /qr/
 Disallow: /instructor/

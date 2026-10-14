@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1`
 > **결과: PASS (수정 3파일 배포 완료) / write smoke 는 HOLD — 상품 보유 공급자 계정 없음**
 
@@ -35,7 +37,7 @@ Neture 로그인 폼은 `serviceKey:'neture'` 를 보내 L2 자격으로 판정�
 | `[REDACTED_EMAIL_B]` (Neture 공급자) | `neture` | **401** |
 | `[REDACTED_EMAIL_B]` | 없음(L1) | 200 |
 
-→ 직전 WO 와 동일하게 **문서화된 L1 토큰 주입 우회**(`TEST-ACCOUNTS.local.md §4-2`)를 사용했다.
+→ 직전 WO 와 동일하게 **문서화된 L1 토큰 주입 우회**(`TEST-ACCOUNT.txt §4-2`)를 사용했다.
 `roles` 에 `supplier` 가 있어 `SupplierRoute` 를 통과한다. **로그인 자체는 미검증.**
 
 ### 2-2. 실데이터 실측 (read-only, 쿠키 인증)

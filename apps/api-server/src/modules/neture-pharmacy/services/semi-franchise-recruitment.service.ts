@@ -12,7 +12,7 @@ import { NeturePharmacyError, NETURE_PHARMACY_SERVICE_KEY, DEFAULT_SEMI_FRANCHIS
   rowsOf,
 } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
-import { recruitmentTargetMatch } from './recruitment-target.js';
+import { recruitmentTargetMatch, recruitmentAvailable } from './recruitment-target.js';
 
 const RECRUITMENT_VIEW = `
   SELECT sr.id, sr.product_id AS "masterId", sr.product_name AS "productName", sr.seller_name AS "supplierName",
@@ -106,7 +106,7 @@ export class SemiFranchiseRecruitmentService {
     return rows[0];
   }
 
-  /** 약국 — 가입한 세미프랜차이즈의 진행 중 모집 + 내 약국의 참여 상태 */
+  /** 약국 — 일반 공개 및 가입한 세미프랜차이즈의 모집 + 내 약국의 참여 상태 */
   async pharmacyBrowse(organizationId: string) {
     return this.dataSource.query(
       `SELECT sr.id, sr.product_name AS "productName", sr.seller_name AS "supplierName",
@@ -114,12 +114,12 @@ export class SemiFranchiseRecruitmentService {
               sf.key AS "semiFranchiseKey", sf.name AS "semiFranchiseName",
               sra.id AS "applicationId", sra.status::text AS "applicationStatus"
          FROM seller_recruitments sr
-         JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
-         JOIN semi_franchise_memberships sfm
+         LEFT JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
+         LEFT JOIN semi_franchise_memberships sfm
            ON sfm.semi_franchise_id = sf.id AND sfm.organization_id = $1 AND sfm.status = 'active'
          LEFT JOIN seller_recruitment_applications sra
            ON sra.recruitment_id = sr.id AND sra.applicant_organization_id = $1
-        WHERE sr.exposure_status = 'approved' AND sr.status = 'recruiting'
+        WHERE ${recruitmentAvailable()} AND sr.status = 'recruiting'
         ORDER BY sr.created_at DESC`,
       [organizationId],
     );
@@ -130,10 +130,10 @@ export class SemiFranchiseRecruitmentService {
     return this.dataSource.transaction(async (m) => {
       const [rec] = await m.query(
         `SELECT sr.id FROM seller_recruitments sr
-           JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
-           JOIN semi_franchise_memberships sfm
+           LEFT JOIN semi_franchises sf ON ${recruitmentTargetMatch()} AND sf.status = 'active'
+           LEFT JOIN semi_franchise_memberships sfm
              ON sfm.semi_franchise_id = sf.id AND sfm.organization_id = $2 AND sfm.status = 'active'
-          WHERE sr.id = $1::uuid AND sr.exposure_status = 'approved' AND sr.status = 'recruiting'`,
+          WHERE sr.id = $1::uuid AND ${recruitmentAvailable()} AND sr.status = 'recruiting'`,
         [recruitmentId, organizationId],
       );
       if (!rec) throw new NeturePharmacyError(404, 'RECRUITMENT_NOT_AVAILABLE', '참여할 수 있는 모집이 아닙니다.');

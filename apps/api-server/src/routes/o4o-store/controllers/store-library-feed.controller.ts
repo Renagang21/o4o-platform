@@ -43,20 +43,11 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../../kpa/entities/kpa-member.entity.js';
-import type { AuthRequest } from '../../../types/auth.js';
-import { isStoreOwner } from '../../../utils/store-owner.utils.js';
+import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
+import { sendEmptyContentPage, readContentUserId, resolveKpaContentOrganization } from './kpa-content-organization.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
-async function resolveDualOrgId(dataSource: DataSource, userId: string): Promise<string | null> {
-  // store-content.controller 와 동일: organization_members(role_assignments) 우선,
-  // kpa_members fallback. direct 작성/조회와 조회 일관성 유지를 위함.
-  const { organizationId: orgFromRa } = await isStoreOwner(dataSource, userId, 'kpa');
-  if (orgFromRa) return orgFromRa;
-  const member = await dataSource.getRepository(KpaMember).findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
 
 export function createStoreLibraryFeedController(
   dataSource: DataSource,
@@ -69,19 +60,12 @@ export function createStoreLibraryFeedController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
-        const organizationId = await resolveDualOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({
-            success: true,
-            data: { items: [], total: 0, page: 1, limit: 20, totalPages: 1 },
-          });
+          sendEmptyContentPage(res);
           return;
         }
 
@@ -397,12 +381,8 @@ export function createStoreLibraryFeedController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
+        const userId = readContentUserId(req, res);
+        if (!userId) return;
 
         const contentId = typeof req.params.id === 'string' ? req.params.id.trim() : '';
         // UUID 형식 가드 — soft-ref varchar 비교(store_qr_codes)에서 임의 문자열 유입 차단.
@@ -412,7 +392,7 @@ export function createStoreLibraryFeedController(
           return;
         }
 
-        const organizationId = await resolveDualOrgId(dataSource, userId);
+        const organizationId = await resolveKpaContentOrganization(dataSource, userId, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
           res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
           return;

@@ -1,5 +1,7 @@
 # WO-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > **상태**: HANDOFF ONLY — **차단: 유효한 store-owner 테스트 계정**. 계정 확보 전에는 착수하지 않는다. · **접수**: 2026-09-22 · **CHECK**: (실행 후 `docs/checks/CHECK-O4O-STORE-AI-FIRST-E2E-CLOSURE-V1.md`)
 > 내 매장 AI First 리팩터링 **5단계(마지막)**. WO1 [`EDITOR-BOUNDARY`](WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1.md) · WO2 [`EXTERNAL-LLM-CONTENT-AUTHORING`](WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1.md) · WO3 [`PRODUCTION-EXTERNAL-LLM-REALIGNMENT`](WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1.md) · WO4 [`INTERNAL-AI-RETIREMENT`](WO-O4O-STORE-INTERNAL-AI-RETIREMENT-V1.md) 가 남긴 **브라우저 smoke PENDING_USER_VERIFICATION 을 일괄 실측**해 트랙을 닫는다. 새 기능·리팩터링은 하지 않는다.
 
@@ -18,7 +20,7 @@
 
 로그인 가능한 **store-owner(매장 경영자) 계정**이 필요하다. 현재 불가 사유:
 
-- `docs/local/TEST-ACCOUNTS.local.md` §7 내 매장 smoke 전용 계정 2개 = `suspended`(smoke 종료 후 비활성화, 2026-08-13).
+- `docs/local/TEST-ACCOUNT.txt` §7 내 매장 smoke 전용 계정 2개 = `suspended`(smoke 종료 후 비활성화, 2026-08-13).
 - `renagang21` = Google-only 계정(`users.password` NULL) → 폼 로그인 불가.
 - WO1 CHECK 실측: store-owner 계정 KPA·PH `401 INVALID_USER`, 보조 계정 KPA `403` lockout. 이후 users reset 으로 테스트 계정 0.
 

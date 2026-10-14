@@ -1,5 +1,7 @@
 # CHECK-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1`
 - **일자**: 2026-08-11
 - **판정**: **PASS** — 상·하위 가드 충돌 해소. 기존 `super_admin` 전용 경계 불변, schema/migration/DB write 0
@@ -83,7 +85,7 @@ route-level integration test (`admin-route-auth-boundary.test.ts`, 실제 router
 ## 7. 프로덕션 smoke (§9)
 
 배포 **전** 상태에서 실계정으로 실측했다. GET 만 호출 — **DB write 0**.
-자격증명은 `docs/local/TEST-ACCOUNTS.local.md`(gitignore) 에서 런타임에 읽는다 — 스크립트/문서에 하드코딩하지 않았다.
+자격증명은 `docs/local/TEST-ACCOUNT.txt`(gitignore) 에서 런타임에 읽는다 — 스크립트/문서에 하드코딩하지 않았다.
 스크립트: `tmp/admin-product-description-auth-boundary/smoke.mjs`
 
 계정: `[REDACTED_EMAIL_A]` — 보유 역할 `cosmetics:admin/operator`, `neture:admin/operator`, `kpa:admin/operator`, `pharmacy-hub:admin/operator`, `kpa:store_owner`. **`platform:super_admin` 미보유.**

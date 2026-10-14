@@ -16,7 +16,7 @@ describe('user all-device logout retirement', () => {
   });
 
   it('keeps password-reset security revocation internal', () => {
-    expect(read('services/auth/email-auth.service.ts')).toContain('authenticationService.revokeAllSessions(userId)');
+    expect(read('services/auth/email-auth.service.ts')).toContain('authenticationService.revokeAllSessions(userId, manager)');
     expect(read('services/authentication.service.ts')).not.toContain('async logoutAll');
   });
 

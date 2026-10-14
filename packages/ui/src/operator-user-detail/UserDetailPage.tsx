@@ -47,6 +47,7 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   pending: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
   rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
   suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
+  withdrawn: { label: '탈퇴', color: 'text-slate-500', bg: 'bg-slate-100' },
   inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
 };
 
@@ -101,8 +102,8 @@ function themeClasses(theme: 'primary' | 'blue') {
 
 interface AssignableRole { value: string; label: string; isAdminRole: boolean; }
 
-function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose, onSuccess }: {
-  userId: string; existingRoles: string[]; isAdmin: boolean;
+function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, theme, onClose, onSuccess }: {
+  userId: string; existingRoles: string[]; isAdmin: boolean; serviceKey?: string;
   apiAdapter: UserDetailApiAdapter; theme: 'primary' | 'blue';
   onClose: () => void; onSuccess: () => void;
 }) {
@@ -114,7 +115,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
   const [rolesLoading, setRolesLoading] = useState(true);
 
   useEffect(() => {
-    apiAdapter.get('/operator/roles')
+    apiAdapter.get(`/operator/roles${serviceKey ? `?service=${encodeURIComponent(serviceKey)}` : ''}`)
       .then((res: any) => {
         const data = res.success !== undefined ? res : res.data || res;
         if (data.success !== false) {
@@ -130,11 +131,11 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
       })
       .catch(() => {})
       .finally(() => setRolesLoading(false));
-  }, [apiAdapter]);
+  }, [apiAdapter, serviceKey]);
 
   const filteredRoles = isAdmin
     ? assignableRoles
-    : assignableRoles.filter(r => !r.isAdminRole);
+    : assignableRoles.filter(r => !r.isAdminRole && !/(^|:)(admin|operator)$/.test(r.value));
   const availableRoles = filteredRoles.filter(r => !existingRoles.includes(r.value));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,7 +144,7 @@ function RoleModal({ userId, existingRoles, isAdmin, apiAdapter, theme, onClose,
     setLoading(true);
     setError('');
     try {
-      await apiAdapter.post(`/operator/members/${userId}/roles`, { role: selectedRole });
+      await apiAdapter.post(`/operator/members/${userId}/roles`, { role: selectedRole, ...(serviceKey ? { serviceKey } : {}) });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -200,6 +201,7 @@ export default function UserDetailPage({
   apiAdapter,
   config,
   isAdmin,
+  canManageMembers = isAdmin,
   actions,
   navigate,
   userId: id,
@@ -220,7 +222,8 @@ export default function UserDetailPage({
     setLoading(true);
     setError('');
     try {
-      const data = await apiAdapter.get(`/operator/members/${id}`);
+      const query = config.serviceKey ? `serviceKey=${encodeURIComponent(config.serviceKey)}` : 'all=true';
+      const data = await apiAdapter.get(`/operator/members/${id}?${query}`);
       setUser(data.user);
       setRoles(data.roles || []);
       setMemberships(data.memberships || []);
@@ -229,7 +232,7 @@ export default function UserDetailPage({
     } finally {
       setLoading(false);
     }
-  }, [id, apiAdapter]);
+  }, [id, apiAdapter, config.serviceKey]);
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
@@ -277,7 +280,7 @@ export default function UserDetailPage({
   // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: 서비스 멤버십 + 역할 복구
   const handleReactivate = async () => {
     if (!id || !user) return;
-    if (!confirm('이 사용자의 멤버십과 역할을 복구하시겠습니까?')) return;
+    if (!confirm('해당 서비스의 가입 상태와 일반 회원 역할을 복구하시겠습니까?\n운영 권한 지정·회수는 별도 업무입니다.')) return;
     setActionLoading('reactivate');
     try {
       await apiAdapter.post(`/operator/members/${id}/reactivate`, config.serviceKey ? { serviceKey: config.serviceKey } : undefined);
@@ -291,16 +294,16 @@ export default function UserDetailPage({
 
   const handleDelete = async () => {
     if (!user || !id) return;
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    if (!config.serviceKey) {
+      alert('대상 서비스를 알 수 없어 탈퇴 처리를 중단했습니다.');
+      return;
+    }
+    if (!confirm(`${getUserName(user)} (${user.email}) 회원을 해당 서비스에서 탈퇴 처리하시겠습니까?\n공통 계정과 다른 서비스 가입은 유지됩니다.`)) return;
     setActionLoading('delete');
     try {
       // WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1:
       //   status/reactivate 와 같은 규칙 — 대상 서비스를 명시한다.
       //   범위 없는 요청은 서버가 거부하므로(전 서비스 종료 방지) 여기서 먼저 막는다.
-      if (!config.serviceKey) {
-        alert('대상 서비스를 알 수 없어 삭제를 중단했습니다.');
-        return;
-      }
       await apiAdapter.delete(
         `/operator/members/${id}?serviceKey=${encodeURIComponent(config.serviceKey)}`,
       );
@@ -327,6 +330,7 @@ export default function UserDetailPage({
 
   const handleMembershipReject = async (membershipId: string) => {
     const reason = prompt('거부 사유를 입력하세요 (선택사항):');
+    if (reason === null) return;
     setActionLoading(membershipId);
     try {
       await apiAdapter.patch(`/operator/members/${membershipId}/reject`, { reason });
@@ -343,7 +347,7 @@ export default function UserDetailPage({
     if (!confirm(`역할 "${role}"을(를) 제거하시겠습니까?`)) return;
     setActionLoading(`role-${role}`);
     try {
-      await apiAdapter.delete(`/operator/members/${id}/roles/${encodeURIComponent(role)}`);
+      await apiAdapter.delete(`/operator/members/${id}/roles/${encodeURIComponent(role)}${config.serviceKey ? `?serviceKey=${encodeURIComponent(config.serviceKey)}` : ''}`);
       fetchDetail();
     } catch (err: any) {
       alert(err.message || '오류가 발생했습니다.');
@@ -436,9 +440,15 @@ export default function UserDetailPage({
                 </tr>
               )}
               <tr className="border-b border-slate-50">
-                <td className="py-2.5 pr-4 text-slate-500">상태</td>
+                <td className="py-2.5 pr-4 text-slate-500">공통 계정 상태</td>
                 <td className="py-2.5"><StatusBadge status={user.status} /></td>
               </tr>
+              {config.serviceKey && (
+                <tr className="border-b border-slate-50">
+                  <td className="py-2.5 pr-4 text-slate-500">서비스 가입 상태</td>
+                  <td className="py-2.5"><StatusBadge status={lifecycleStatus} /></td>
+                </tr>
+              )}
               <tr className="border-b border-slate-50">
                 <td className="py-2.5 pr-4 text-slate-500">가입일</td>
                 <td className="py-2.5 text-slate-800">{new Date(user.createdAt).toLocaleString('ko-KR')}</td>
@@ -472,7 +482,7 @@ export default function UserDetailPage({
                 </button>
               </>
             )}
-            {(lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
+            {canManageMembers && (lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
               <button
                 onClick={() => handleStatusChange('suspended')}
                 disabled={actionLoading === 'status'}
@@ -481,13 +491,13 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {lifecycleStatus === 'suspended' && (
+            {((canManageMembers && lifecycleStatus === 'suspended') || (isAdmin && lifecycleStatus === 'withdrawn')) && (
               <button
                 onClick={handleReactivate}
                 disabled={actionLoading === 'reactivate'}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
-                <CheckCircle className="w-4 h-4" />복구
+                <CheckCircle className="w-4 h-4" />{lifecycleStatus === 'withdrawn' ? '탈퇴 회원 복구' : '복구'}
               </button>
             )}
             {lifecycleStatus === 'rejected' && (
@@ -505,13 +515,13 @@ export default function UserDetailPage({
             >
               <Pencil className="w-4 h-4" />정보 수정
             </button>
-            <button
+            {isAdmin && (<button
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-red-200 text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50 ml-auto"
             >
-              <Trash2 className="w-4 h-4" />삭제
-            </button>
+              <Trash2 className="w-4 h-4" />{config.serviceKey ? '서비스 탈퇴' : '삭제'}
+            </button>)}
           </div>
         </div>
       </section>
@@ -577,12 +587,12 @@ export default function UserDetailPage({
           <Shield className="w-4 h-4 text-slate-500" />
           <h2 className="text-base font-semibold text-slate-800">역할 (Role Assignments)</h2>
           <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
-          <button
+          {canManageMembers && (<button
             onClick={() => setShowRoleModal(true)}
             className={`flex items-center gap-1 px-2.5 py-1 text-xs ${tc.btnBg} text-white rounded-lg`}
           >
             <Plus className="w-3.5 h-3.5" />역할 추가
-          </button>
+          </button>)}
         </div>
         {roles.length > 0 ? (
           <div className="overflow-x-auto">
@@ -613,7 +623,7 @@ export default function UserDetailPage({
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                     <td className="px-5 py-2.5">
                       <div className="flex items-center justify-end">
-                        {r.isActive && (isAdmin || !r.isAdminRole) && (
+                        {r.isActive && canManageMembers && (!config.serviceKey || !/(^|:)(admin|operator)$/.test(r.role)) && (
                           actionLoading === `role-${r.role}` ? (
                             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                           ) : (
@@ -679,7 +689,7 @@ export default function UserDetailPage({
                                 <UserCheck className="w-4 h-4" />
                               </button>
                             )}
-                            {(m.status === 'pending' || m.status === 'active') && (
+                            {(m.status === 'pending' || (isAdmin && m.status === 'active')) && (
                               <button
                                 onClick={() => handleMembershipReject(m.id)}
                                 title="멤버십 거부"
@@ -707,7 +717,8 @@ export default function UserDetailPage({
         <RoleModal
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
-          isAdmin={isAdmin}
+          isAdmin={isAdmin && !config.serviceKey}
+          serviceKey={config.serviceKey}
           apiAdapter={apiAdapter}
           theme={config.theme}
           onClose={() => setShowRoleModal(false)}
@@ -719,6 +730,7 @@ export default function UserDetailPage({
       {showEditModal && (
         <EditUserModal
           userId={user.id}
+          serviceKey={config.serviceKey}
           apiAdapter={apiAdapter}
           theme={config.theme}
           onClose={() => setShowEditModal(false)}

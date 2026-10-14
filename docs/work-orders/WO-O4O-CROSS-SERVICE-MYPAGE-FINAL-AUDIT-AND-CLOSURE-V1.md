@@ -1,5 +1,7 @@
 # WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 * **대상**: Agent D
 * **성격**: My Page 전체 cross-service 최종 감사 + 잔존 공통화 결함 판정 + production 검증 + 전체 트랙 FINAL CLOSE
 * **선행 상태**
@@ -1100,7 +1102,7 @@ A 가 아니면 손대지 않는다.
 
 ### K. 검증 계정 · 도메인
 
-* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNTS.local.md` (CLAUDE.md §15) — 자격증명을 코드·문서·CHECK 에 적지 말 것
+* 테스트 계정 SSOT: `docs/local/TEST-ACCOUNT.txt` (CLAUDE.md §15) — 자격증명을 코드·문서·CHECK 에 적지 말 것
 * KCos 프로덕션 도메인은 **`k-cosmetics.site`** (`k-cosmetics.co.kr` 은 외부 쇼핑몰)
 * 로그인 API 는 **serviceKey 필수** — 없으면 정상 계정도 401. "UI 는 되는데 curl 만 401"이면 이 원인
 * API 실 진입점은 `api.neture.co.kr` (run.app 직접 URL 은 `/health` 까지 404)

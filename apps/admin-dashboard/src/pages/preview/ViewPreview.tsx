@@ -1,123 +1,79 @@
-/**
- * Admin Dashboard - View Preview Page
- *
- * Renders CMS views in the same domain to avoid cross-origin issues
- */
-
+/** Preserved CMS V2 public preview; no private content API fallback. */
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-
-// Import Main Site's ViewRenderer logic
-interface ViewSchema {
-  viewId: string;
-  meta?: any;
-  layout: {
-    type: string;
-    props?: Record<string, any>;
-  };
-  components: Array<{
-    type: string;
-    props?: Record<string, any>;
-    if?: any;
-    loop?: any;
-  }>;
-}
+import { getViewPreviewUrl, previewStatusMessage, readPreviewComponents, type PreviewComponent } from './view-preview-data';
 
 export default function ViewPreview() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const preview = searchParams.get('preview') === '1';
-
-  const [view, setView] = useState<ViewSchema | null>(null);
+  const [components, setComponents] = useState<PreviewComponent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     if (!slug) return;
-
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    setComponents([]);
     const loadView = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Fetch view from Main Site API
-        // Use VITE_API_BASE_URL (without /api/v1 suffix) to avoid duplication
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        const response = await fetch(`${apiBaseUrl}/api/v1/cms/public/view/${slug}`, {
-          headers: { 'Accept': 'application/json' },
+        const response = await fetch(getViewPreviewUrl(slug), {
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
         });
-
+        if (controller.signal.aborted) return;
         if (!response.ok) {
-          throw new Error(`Failed to fetch view: ${response.statusText}`);
+          setError(previewStatusMessage(response.status));
+          return;
         }
-
-        const result = await response.json();
-
-        if (!result.success || !result.data?.view) {
-          throw new Error('View not found');
+        const body: unknown = await response.json();
+        if (controller.signal.aborted) return;
+        try {
+          setComponents(readPreviewComponents(body));
+        } catch {
+          setError('미리보기 응답 형식을 확인할 수 없습니다.');
         }
-
-        // Adapt CMS view to ViewSchema format
-        const cmsView = result.data.view;
-        const viewSchema: ViewSchema = {
-          viewId: cmsView.slug,
-          meta: {
-            title: cmsView.name,
-            description: cmsView.description,
-          },
-          layout: {
-            type: 'DefaultLayout',
-            props: {},
-          },
-          components: cmsView.schema.components || [],
-        };
-
-        setView(viewSchema);
-      } catch (err: any) {
-        console.error('[ViewPreview] Error loading view:', err);
-        setError(err.message || 'Failed to load view');
+      } catch {
+        if (!controller.signal.aborted) setError('미리보기를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
+    void loadView();
+    return () => controller.abort();
+  }, [slug, preview, retry]);
 
-    loadView();
-  }, [slug, preview]);
-
+  if (!slug) {
+    return <div role="alert" className="p-6 text-center">미리보기 주소를 확인해주세요.</div>;
+  }
   if (loading) {
+    return <div role="status" className="flex items-center justify-center min-h-screen bg-white">미리보기를 불러오는 중입니다.</div>;
+  }
+  if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="text-center">
-          <div className="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <div className="text-gray-600">Loading preview...</div>
+      <div className="flex items-center justify-center min-h-screen bg-white p-6">
+        <div className="text-center space-y-3">
+          <h1 className="text-red-600 text-lg">미리보기를 표시할 수 없습니다</h1>
+          <p role="alert" className="text-gray-600">{error}</p>
+          <button type="button" onClick={() => setRetry((value) => value + 1)} className="text-blue-700 underline">다시 불러오기</button>
+          <p className="text-sm text-gray-500">미리보기 조회 기능은 현재 서버에 연결되어 있지 않습니다.</p>
         </div>
       </div>
     );
   }
-
-  if (error || !view) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="text-center">
-          <div className="text-red-600 text-lg mb-2">Preview Error</div>
-          <div className="text-gray-600">{error || 'View not found'}</div>
-        </div>
-      </div>
-    );
+  if (components.length === 0) {
+    return <div role="status" className="min-h-screen bg-white p-6 text-center">표시할 미리보기 구성 요소가 없습니다.</div>;
   }
-
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Render view components */}
-      <ViewComponentRenderer components={view.components} />
-    </div>
-  );
+  return <div className="min-h-screen bg-white"><ViewComponentRenderer components={components} /></div>;
 }
 
 /**
  * Simple component renderer for preview
  */
-function ViewComponentRenderer({ components }: { components: any[] }) {
+function ViewComponentRenderer({ components }: { components: PreviewComponent[] }) {
   return (
     <div className="container mx-auto p-4">
       {components.map((component, index) => (
@@ -130,7 +86,7 @@ function ViewComponentRenderer({ components }: { components: any[] }) {
 /**
  * Render individual component based on type
  */
-function ComponentRenderer({ component }: { component: any }) {
+function ComponentRenderer({ component }: { component: PreviewComponent }) {
   const { type, props = {} } = component;
 
   switch (type) {

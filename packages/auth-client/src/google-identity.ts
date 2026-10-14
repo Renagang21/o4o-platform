@@ -10,6 +10,7 @@ const GIS_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 
 export interface GoogleIdConfiguration {
   client_id: string;
+  nonce?: string;
   callback: (response: { credential?: string; select_by?: string }) => void;
   auto_select?: boolean;
   cancel_on_tap_outside?: boolean;
@@ -82,6 +83,7 @@ export function loadGoogleIdentityScript(): Promise<GoogleAccountsId> {
 
 export interface RenderGoogleButtonOptions {
   clientId: string;
+  nonce?: string;
   container: HTMLElement;
   /** Google 이 돌려준 ID token. 서버 검증 전이므로 그대로 /auth/google/* 에 넘기기만 한다. */
   onCredential: (idToken: string) => void;
@@ -99,6 +101,7 @@ export async function renderGoogleButton(options: RenderGoogleButtonOptions): Pr
     const id = await loadGoogleIdentityScript();
     id.initialize({
       client_id: clientId,
+      ...(options.nonce && { nonce: options.nonce }),
       callback: (response) => {
         if (response.credential) onCredential(response.credential);
         else onError?.(new Error('Google credential missing'));

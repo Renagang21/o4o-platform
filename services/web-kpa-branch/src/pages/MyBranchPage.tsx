@@ -240,7 +240,8 @@ export default function MyBranchPage() {
         {history === null && !error ? (
           <p className="text-sm text-gray-500">불러오는 중입니다…</p>
         ) : history && history.length > 0 ? (
-          <table className="w-full border-collapse text-sm">
+          <div className="overflow-x-auto rounded-lg border border-gray-200" role="region" aria-label="전입·전출 이력" tabIndex={0}>
+          <table className="w-full min-w-[560px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-gray-200 text-left text-xs text-gray-500">
                 <th className="py-2">분회</th>
@@ -262,6 +263,7 @@ export default function MyBranchPage() {
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <p className="text-sm text-gray-500">이력이 없습니다.</p>
         )}

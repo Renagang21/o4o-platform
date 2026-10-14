@@ -7,8 +7,9 @@
  * 목록은 서버가 이 약국이 지금 이용 · 주문할 수 있는 공급 옵션만 돌려준다(미가입 세미프랜차이즈 항목 0).
  * 같은 제품의 여러 공급 경로를 그대로 나열한다 — 가격 비교 · 최저가 강조 · 자동 선택을 하지 않는다.
  */
+import { useLatestList } from '../../hooks/useLatestList';
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import {
   neturePharmacyApi,
@@ -16,6 +17,7 @@ import {
   type SemiFranchiseRow,
   type SupplyOption,
 } from '../../api/neturePharmacy';
+import { BusinessTabs } from '../../components/BusinessTabs';
 import { Notice, PharmacyPage, SUPPLY_KIND_LABEL, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 
 const TABS: ReadonlyArray<{ source: string; label: string }> = [
@@ -25,6 +27,8 @@ const TABS: ReadonlyArray<{ source: string; label: string }> = [
   { source: 'event', label: '이벤트' },
   { source: 'recruitment', label: '모집 참여' },
 ];
+
+const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '공급 상품을 불러오지 못했습니다.');
 
 const PAGE_SIZE = 50;
 
@@ -45,14 +49,12 @@ function Conditions({ o }: { o: SupplyOption }) {
 }
 
 export default function SupplyOptionsPage() {
-  const [source, setSource] = useState(() => new URLSearchParams(window.location.search).get('source') || 'all');
+  const [params, setParams] = useSearchParams();
+  const source = params.get('source') || 'all';
+  const setSource = (value: string) => { setParams(prev => { const p = new URLSearchParams(prev); p.set('source', value); return p; }); };
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [items, setItems] = useState<SupplyOption[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [qty, setQty] = useState<Record<string, string>>({});
@@ -64,23 +66,9 @@ export default function SupplyOptionsPage() {
       .catch(() => setFranchises([]));
   }, []);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await neturePharmacyApi.listSupplyOptions({ source, q: query || undefined, page, limit: PAGE_SIZE });
-      setItems(res.items);
-      setTotal(res.total);
-    } catch (e) {
-      setError(pharmacyErrorMessage(e, '공급 상품을 불러오지 못했습니다.'));
-      setItems([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [source, query, page]);
+  const fetchList = useCallback(() => neturePharmacyApi.listSupplyOptions({ source, q: query || undefined, page, limit: PAGE_SIZE }), [source, query, page]);
+  const { items, total, loading, error, setError } = useLatestList<SupplyOption>(fetchList, listErrorMessage);
 
-  useEffect(() => { void load(); }, [load]);
 
   const choose = (next: string) => { setSource(next); setPage(1); };
   const rowKey = (o: SupplyOption) => `${o.kind}:${o.optionId}`;
@@ -106,7 +94,6 @@ export default function SupplyOptionsPage() {
   };
 
   const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const sfSelected = source.startsWith('sf:') ? source : '';
 
   return (
     <PharmacyPage
@@ -114,6 +101,7 @@ export default function SupplyOptionsPage() {
       description="가입한 세미프랜차이즈에서 지금 주문할 수 있는 공급 상품입니다. 같은 제품도 공급 경로마다 조건과 단가가 다를 수 있으니 확인 후 선택하세요."
       actions={<Link className={btn.secondary} to={pharmacyStorePath('cart')}>장바구니 보기</Link>}
     >
+      <BusinessTabs businesses={franchises} value={source.startsWith('sf:') ? source.slice(3) : ''} onChange={key => { setSource(key ? `sf:${key}` : 'all'); setPage(1); }} />
       <div className="mb-4 flex flex-wrap items-center gap-2" role="tablist" aria-label="공급 경로">
         {TABS.map((t) => (
           <button
@@ -127,15 +115,7 @@ export default function SupplyOptionsPage() {
             {t.label}
           </button>
         ))}
-        <select
-          aria-label="세미프랜차이즈별 보기"
-          value={sfSelected}
-          onChange={(e) => choose(e.target.value || 'all')}
-          className="rounded-lg border border-slate-200 px-2 py-1 text-sm"
-        >
-          <option value="">세미프랜차이즈별 보기</option>
-          {franchises.map((f) => <option key={f.key} value={`sf:${f.key}`}>{f.name}</option>)}
-        </select>
+
       </div>
 
       <form className="mb-4 flex max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); setQuery(q.trim()); setPage(1); }}>

@@ -1,23 +1,6 @@
-/**
- * MarketTrialHubPage — Neture 유통참여형 펀딩(Market Trial) 허브
- *
- * WO-NETURE-MARKET-TRIAL-PARTICIPANT-PAGES-V1
- * KPA-Society MarketTrialHubPage.tsx → Neture canonical 이식
- *
- * 구조:
- * 1. 헤더 + 허브 설명
- * 2. 참여 안내 (3단 흐름)
- * 3. 내가 참여한 유통참여형 펀딩 (로그인 시)
- * 4. 모집 중 / 진행 중 / 종료 섹션
- * 5. 포럼/안내 풋터
- *
- * WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1: funding.neture.co.kr `/` 대표 화면 —
- *   상단을 공통 O4OPublicHero(확정 문구)로. 주 CTA = 이 화면의 모집 중 목록(앵커), 보조 = 이용 방법 안내.
- *   목록 · 상태 · 데이터는 그대로 — 모집이 없으면 빈 상태를 그대로 보여준다(가짜 콘텐츠 없음).
- */
-
+/** Funding entry: login first, then participation and trial lists. Existing participant APIs and permissions are preserved. */
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { FlaskConical } from 'lucide-react';
 import {
   getTrials,
@@ -27,8 +10,6 @@ import {
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadError } from '@o4o/ui';
-import { O4OPublicHero } from '@o4o/auth-react';
-import { FUNDING_HERO } from '../../config/publicHero';
 
 type DisplayGroup = 'recruiting' | 'active' | 'ended';
 
@@ -53,90 +34,70 @@ const REWARD_LABELS: Record<string, string> = {
 };
 
 export function MarketTrialHubPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const location = useLocation();
   const [trials, setTrials] = useState<Trial[]>([]);
   const [participationMap, setParticipationMap] = useState<Map<string, MyParticipationSummary>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
   // 조회 실패를 setTrials([]) 로 삼켜 "현재 모집 중인 유통참여형 펀딩이 없습니다" 로 위장했다.
   const [loadError, setLoadError] = useState(false);
+  const [participationError, setParticipationError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    if (authLoading || !isAuthenticated) return;
     let active = true;
     const fetchData = async () => {
+      setIsLoading(true);
       setLoadError(false);
-      try {
-        const [trialsData, partData] = await Promise.all([
-          getTrials(),
-          isAuthenticated ? getMyParticipations().catch(() => []) : Promise.resolve([] as MyParticipationSummary[]),
-        ]);
-        if (!active) return;
-        setTrials(Array.isArray(trialsData) ? trialsData : []);
-        if (partData.length > 0) {
-          const map = new Map<string, MyParticipationSummary>();
-          for (const p of partData) {
-            map.set(p.trialId, p);
-          }
-          setParticipationMap(map);
-        }
-      } catch {
-        if (active) setLoadError(true);
-      } finally {
-        if (active) setIsLoading(false);
+      setParticipationError(false);
+      setTrials([]);
+      setParticipationMap(new Map());
+      const [trialsResult, participationResult] = await Promise.allSettled([
+        getTrials(),
+        getMyParticipations(),
+      ]);
+      if (!active) return;
+      if (trialsResult.status === 'fulfilled' && Array.isArray(trialsResult.value)) {
+        setTrials(trialsResult.value);
+      } else {
+        setLoadError(true);
       }
+      if (participationResult.status === 'fulfilled' && Array.isArray(participationResult.value)) {
+        setParticipationMap(new Map(participationResult.value.map((p) => [p.trialId, p])));
+      } else {
+        setParticipationError(true);
+      }
+      setIsLoading(false);
     };
     fetchData();
     return () => {
       active = false;
     };
-  }, [isAuthenticated, reloadKey]);
+  }, [isAuthenticated, authLoading, user?.id, reloadKey]);
 
   const recruiting = trials.filter((t) => getDisplayGroup(t.status) === 'recruiting');
   const activeTrials = trials.filter((t) => getDisplayGroup(t.status) === 'active');
   const ended = trials.filter((t) => getDisplayGroup(t.status) === 'ended');
   const myTrials = trials.filter((t) => participationMap.has(t.id));
 
+  if (authLoading) return <output aria-live="polite" className="p-6">로그인 상태를 확인하고 있습니다…</output>;
+  if (!isAuthenticated) return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname + location.search)}`} replace />;
   return (
     <>
-    {/* 1. Hero (공통) */}
-    <O4OPublicHero
-      eyebrow={FUNDING_HERO.eyebrow}
-      title={FUNDING_HERO.title}
-      description={FUNDING_HERO.description}
-      accent={FUNDING_HERO.accent}
-      actions={
-        <>
-          <a href="#market-trial-recruiting" className="o4o-cta" data-testid="funding-hero-primary">
-            모집 중인 펀딩 보기
-          </a>
-          <Link to="/guide/features/market-trial" className="o4o-cta-secondary">
-            이용 방법
-          </Link>
-        </>
-      }
-    />
     <div style={s.container}>
-      <p style={s.subtitle}>
-        공급자가 제안한 신제품을 매장에서 먼저 체험하고,
-        현장 의견을 공유하는 참여형 프로그램입니다. 모집부터 보상까지 이 공간에서 확인할 수 있습니다.
-      </p>
-
-      {/* 2. 참여 안내 */}
-      <section style={s.guideGrid}>
-        {[
-          { step: '1', label: '공급자 제안', desc: '공급자가 신제품 유통참여형 펀딩을 제안하고, 운영자 검토를 거쳐 모집이 오픈됩니다.' },
-          { step: '2', label: '매장 참여', desc: '모집 중인 유통참여형 펀딩에 참여 신청하고, 제품을 직접 체험합니다.' },
-          { step: '3', label: '결과/보상', desc: '체험 결과를 정리하고, 제품 또는 현금 보상을 선택하여 보상을 받습니다.' },
-        ].map((item) => (
-          <div key={item.step} style={s.guideCard}>
-            <div style={s.guideStep}>{item.step}</div>
-            <p style={s.guideLabel}>{item.label}</p>
-            <p style={s.guideDesc}>{item.desc}</p>
-          </div>
-        ))}
-      </section>
-
+      <h1 className="mb-3 text-2xl font-semibold">유통참여형 펀딩</h1>
+      <Link to="/market-trial/manage" className="mb-6 inline-flex min-h-11 items-center rounded border px-4 text-blue-700">내 펀딩·개설 신청</Link>
+      {participationError && !isLoading && (
+        <LoadError
+          className="mb-6"
+          compact
+          title="내 참여 내역을 불러오지 못했습니다."
+          description={loadError ? '참여 여부는 다시 조회해 주세요.' : '모집 목록은 볼 수 있습니다. 참여 여부는 다시 조회해 주세요.'}
+          onRetry={() => setReloadKey((k) => k + 1)}
+        />
+      )}
       {/* 3. 내가 참여한 유통참여형 펀딩 */}
       {isAuthenticated && myTrials.length > 0 && (
         <Section title="내가 참여한 유통참여형 펀딩" count={myTrials.length} accentColor="#7C3AED">
@@ -157,7 +118,7 @@ export function MarketTrialHubPage() {
       )}
 
       {/* 4. 모집 중 */}
-      <Section id="market-trial-recruiting" title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
+      <Section id="market-trial-recruiting" title="모집 중" count={isLoading || loadError ? undefined : recruiting.length} accentColor="#059669" isLoading={isLoading}>
         {loadError ? (
           <LoadError compact onRetry={() => setReloadKey((k) => k + 1)} />
         ) : recruiting.length > 0 ? (
@@ -244,7 +205,7 @@ function Section({
 }: {
   id?: string;
   title: string;
-  count: number;
+  count?: number;
   accentColor: string;
   isLoading?: boolean;
   children: React.ReactNode;
@@ -254,7 +215,7 @@ function Section({
       <div style={s.sectionHeader}>
         <div style={{ width: '4px', height: '20px', borderRadius: '2px', backgroundColor: accentColor }} />
         <h2 style={s.sectionTitle}>{title}</h2>
-        <span
+        {count != null && <span
           style={{
             fontSize: '0.75rem',
             fontWeight: 600,
@@ -265,7 +226,7 @@ function Section({
           }}
         >
           {count}
-        </span>
+        </span>}
       </div>
       {isLoading ? (
         <div style={s.loading}>불러오는 중...</div>

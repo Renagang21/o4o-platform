@@ -1,5 +1,7 @@
 # CHECK-O4O-OPERATOR-USER-DETAIL-PASSWORD-SERVICEKEY-SELECTION-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 > WO: `WO-O4O-OPERATOR-USER-DETAIL-PASSWORD-SERVICEKEY-SELECTION-V1`
 > 대상: 운영자 **회원 상세** 화면의 비밀번호 변경 모달에 대상 서비스(`serviceKey`) 선택 추가
 > 기준: `origin/main` `b2f4f65ee`
@@ -144,7 +146,7 @@ apps/api-server                             → 무변경
 ```
 
 **실브라우저 검증은 하지 않았다.** 다중 후보 상황을 재현하려면 관리 범위가 2개 이상인
-운영자 계정이 필요한데 `docs/local/TEST-ACCOUNTS.local.md` 기준으로 확보하지 못했다.
+운영자 계정이 필요한데 `docs/local/TEST-ACCOUNT.txt` 기준으로 확보하지 못했다.
 대신 컴포넌트를 실제 DOM(jsdom)에 렌더해 클릭·선택·제출까지 수행하고 전송 payload 를 단언했다.
 
 ---

@@ -138,3 +138,11 @@ export const BUSINESS_TYPE_OPTIONS = Object.entries(BUSINESS_TYPES).map(([key, v
   value: key,
   label: value
 }));
+
+/** Complete-erasure API: 202 means accepted/incomplete, never a void deletion success. */
+export interface UserErasureResult {
+  operationId: string;
+  state: 'pending' | 'processing' | 'review_required' | 'retry_required' | 'completed';
+  erased: boolean;
+  reviewDueAt: string | null;
+}

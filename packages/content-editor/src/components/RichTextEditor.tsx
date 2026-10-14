@@ -3,7 +3,7 @@
  * TipTap 기반 리치 텍스트 에디터
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { ContentRenderer } from './ContentRenderer';
@@ -88,6 +88,8 @@ export function RichTextEditor({
   // 이미지 선택 시 React-제어 폭/정렬/삭제 툴바 (tippy BubbleMenu 미사용 — React reconcile 크래시 방지)
   const containerRef = useRef<HTMLDivElement>(null);
   const [imgMenuPos, setImgMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const imageMenuRef = useRef<HTMLDivElement>(null);
+  const [imageMenuLeft, setImageMenuLeft] = useState(0);
 
   // 이미지 선택 시 폭/정렬/삭제 툴바 위치 계산. 탭 가시성은 렌더에서 activeTab==='edit' 로 게이트.
   const updateImageMenu = useCallback((ed: any) => {
@@ -103,6 +105,29 @@ export function RichTextEditor({
   }, []);
   const [pasteUploading, setPasteUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<'edit' | 'html' | 'preview'>('edit');
+
+  // Keep the complete image actions inside the editor, including right-aligned images
+  // and viewport changes while the menu is open. Width/align/save semantics stay unchanged.
+  useLayoutEffect(() => {
+    if (!imgMenuPos || !editable || activeTab !== 'edit') return;
+    const container = containerRef.current;
+    const menu = imageMenuRef.current;
+    if (!container || !menu) return;
+    const constrain = () => {
+      const rightmost = Math.max(0, container.clientWidth - menu.offsetWidth - 8);
+      const left = Math.max(0, Math.min(imgMenuPos.left, rightmost));
+      setImageMenuLeft((previous) => previous === left ? previous : left);
+    };
+    constrain();
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(constrain) : null;
+    observer?.observe(container);
+    observer?.observe(menu);
+    window.addEventListener('resize', constrain);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', constrain);
+    };
+  }, [imgMenuPos, editable, activeTab]);
   // WO-O4O-COMMON-EDITOR-HTML-TAB-SAVE-RAW-PRESERVE-V1:
   //   htmlSource(HTML 탭/미리보기 원문)를 외부 value 로 초기화 → 재오픈 시 raw HTML 보존 노출.
   const [htmlSource, setHtmlSource] = useState(() => (isBlankHtml(value) ? '' : value));
@@ -540,7 +565,8 @@ export function RichTextEditor({
           탭 이탈 시 switchTab 에서 blur 로 선택 해제 → 캔버스 숨김 전에 버블 사라짐(insertBefore 방지). */}
       {editor && editable && imgMenuPos && activeTab === 'edit' && (
         <div
-          style={{ position: 'absolute', top: imgMenuPos.top, left: imgMenuPos.left, zIndex: 60 }}
+          ref={imageMenuRef}
+          style={{ position: 'absolute', top: imgMenuPos.top, left: imageMenuLeft, width: 'max-content', maxWidth: 'calc(100% - 16px)', zIndex: 60 }}
           onMouseDown={(e) => e.preventDefault()}
         >
           <div style={bubbleStyles.bar}>
@@ -602,8 +628,8 @@ export function RichTextEditor({
 }
 
 const bubbleStyles: Record<string, CSSProperties> = {
-  bar: { display: 'flex', alignItems: 'center', gap: 4, padding: '4px 6px', background: 'white', border: '1px solid #e2e8f0', borderRadius: 8, boxShadow: '0 6px 20px rgba(0,0,0,0.12)' },
-  group: { display: 'inline-flex', gap: 2 },
+  bar: { display: 'flex', flexWrap: 'wrap', maxWidth: '100%', boxSizing: 'border-box', alignItems: 'center', gap: 4, padding: '4px 6px', background: 'white', border: '1px solid #e2e8f0', borderRadius: 8, boxShadow: '0 6px 20px rgba(0,0,0,0.12)' },
+  group: { display: 'inline-flex', flexWrap: 'wrap', maxWidth: '100%', gap: 2 },
   sep: { width: 1, height: 16, background: '#e5e7eb', margin: '0 2px' },
   btn: { padding: '3px 7px', fontSize: 11, fontWeight: 600, border: '1px solid transparent', borderRadius: 5, background: 'transparent', color: '#475569', cursor: 'pointer', lineHeight: 1 },
   btnActive: { background: '#eff6ff', borderColor: '#93c5fd', color: '#2563eb' },

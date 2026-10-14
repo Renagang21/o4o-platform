@@ -43,7 +43,7 @@ describe('상수 계약', () => {
   it("대표 진입 key = 'neture' · 홈 = https://neture.co.kr/ · 라벨 = O4O 홈 / O4O 로그아웃", () => {
     expect(REPRESENTATIVE_ENTRY_SERVICE_KEY).toBe('neture');
     expect(O4O_HOME_URL).toBe('https://neture.co.kr/');
-    expect(O4O_HOME_LABEL).toBe('O4O 홈');
+    expect(O4O_HOME_LABEL).toBe('O4O 메인으로');
     expect(O4O_LOGOUT_LABEL).toBe('O4O 로그아웃');
   });
 });
@@ -105,7 +105,7 @@ describe('O4OHomeButton', () => {
     expect(post).toHaveBeenCalledTimes(1);
     expect((desktop as HTMLButtonElement).disabled).toBe(true);
     expect((mobile as HTMLButtonElement).disabled).toBe(true);
-    expect(desktop.textContent).toBe('O4O 홈으로 이동 중…');
+    expect(desktop.textContent).toBe('O4O 메인으로 이동 중…');
     d.resolve(ok());
     await flush();
     expect(navigate).toHaveBeenCalledTimes(1);
@@ -184,7 +184,7 @@ describe('O4OHomeButton', () => {
       window.dispatchEvent(ev);
     });
     expect((screen.getByTestId('o4o-home-button') as HTMLButtonElement).disabled).toBe(false);
-    expect(screen.getByTestId('o4o-home-button').textContent).toBe('O4O 홈');
+    expect(screen.getByTestId('o4o-home-button').textContent).toBe('O4O 메인으로');
 
     late.resolve(ok());
     await flush();

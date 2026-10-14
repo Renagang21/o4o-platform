@@ -32,12 +32,10 @@ const GENERAL_AUTHORING = [
   'services/web-kpa-society/src/pages/pharmacy/CreateContentFromResourcesModal.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreDirectContentPage.tsx',
   'services/web-kpa-society/src/pages/pharmacy/StoreContentEditPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/ContentPage.tsx',
 ];
 /** 제작 자료(PRODUCTION_MATERIAL) — 직접 소비 */
 const PRODUCTION_MATERIAL_DIRECT = [
   'services/web-kpa-society/src/pages/pharmacy/ProductionMaterialEditorPage.tsx',
-  'services/web-pharmacy-hub/src/pages/store-owner/LibraryResourcesPage.tsx',
 ];
 // 셸 소비처(KCos ProductionMaterialEditorPage)는 앱 퇴역 삭제로 제거 — WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1.
 

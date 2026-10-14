@@ -114,21 +114,18 @@ describe('Demo 계정 보호 계약', () => {
   });
 
   // ── D4 ────────────────────────────────────────────────────────────────────
-  it('D4 계정 삭제 2경로가 registry 판정을 호출하고 403 을 돌려준다', () => {
-    const paths = ['controllers/admin/AdminUserController.ts', 'controllers/UserManagementController.ts'];
-    const missing: string[] = [];
-    for (const rel of paths) {
-      const src = read(rel);
-      if (!/demoAccountService\.isDemoAccount\(/.test(src)) missing.push(`${rel}: 판정 호출 없음`);
-      if (!/DEMO_ACCOUNT_FORBIDDEN_CODE/.test(src)) missing.push(`${rel}: 사유 코드 없음`);
-      // 삭제 **전에** 막는다 — 호출 순서가 뒤바뀌면 행이 지워진 뒤 403 을 낸다.
-      const guardAt = src.indexOf('isDemoAccount(');
-      const deleteAt = Math.min(
-        ...[src.indexOf('userRepo.remove('), src.indexOf('softDeleteUser(')].filter((i) => i >= 0),
-      );
-      if (!(guardAt >= 0 && deleteAt >= 0 && guardAt < deleteAt)) missing.push(`${rel}: 판정이 삭제보다 뒤에 있다`);
+  it('D4 both deletion routes delegate to the registry-protected orchestrator before writes', () => {
+    for (const rel of ['controllers/admin/AdminUserController.ts', 'controllers/UserManagementController.ts']) {
+      const src=read(rel);
+      const method=src.slice(src.indexOf('deleteUser ='),src.indexOf('};',src.indexOf('deleteUser =')));
+      expect(method).toContain('await respondErasure(req, res)');
+      expect(method).not.toMatch(/softDeleteUser|userRepo\.remove/);
     }
-    expect(missing).toEqual([]);
+    const core=read('services/privacy/account-erasure.service.ts');
+    expect(core).toContain('FROM demo_accounts WHERE user_id=$1 AND is_active FOR SHARE');
+    expect(core).toContain("if(demo.length)throw new AccountErasureError('DEMO_ACCOUNT_FORBIDDEN',403)");
+    expect(core.indexOf('await this.assertTarget(m,userId)')).toBeLessThan(core.indexOf('INSERT INTO account_erasure_operations'));
+    // Actual JWT/router/DB no-write behavior is covered by the isolated integration fixture.
   });
 
   // ── D5 ────────────────────────────────────────────────────────────────────
@@ -151,9 +148,10 @@ describe('Demo 계정 보호 계약', () => {
     // role · membership · ownership 해제/변경
     ['services/approval/MembershipApprovalService.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
     ['services/store-owner-termination.service.ts', /assertNotDemoStoreOwner\(this\.dataSource, input\.userId\)/, /INSERT INTO store_owner_termination_cases/],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(supplier\.userId/, /supplierRepo\.save\(supplier\)/, 'async approveSupplier('],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async deactivateSupplier('],
-    ['modules/neture/services/supplier.service.ts', /isDemoSupplier\(locked\.user_id/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /isDemoSupplier\(locked\.user_id/, /return \{ supplier: locked \}/, 'private async lockSupplierForTransition('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /isDemoSupplier\(supplier\.userId/, /supplierRepo\.save\(supplier\)/, 'async approveSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async deactivateSupplier('],
+    ['modules/neture/services/supplier-lifecycle.service.ts', /lockSupplierForTransition\(/, /UPDATE neture_suppliers SET status/, 'async reactivateSupplier('],
     ['controllers/operator/MembershipConsoleController.ts', /rejectDemoAccountTarget\(|isDemoAccount\(/, /UPDATE service_memberships/],
   ];
 
@@ -181,7 +179,6 @@ describe('Demo 계정 보호 계약', () => {
       'controllers/admin/OperatorAssignmentController.ts',
       'controllers/operator/MembershipConsoleController.ts',
       'controllers/kpa-branch/BranchServiceMembershipController.ts',
-      'controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.ts',
       'modules/auth/controllers/auth-account.controller.ts',
       'modules/neture/controllers/operator-registration.controller.ts',
       // routes/cosmetics/controllers/cosmetics-store.controller.ts 는 WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 K-Cos API 와 함께 제거.
@@ -198,7 +195,9 @@ describe('Demo 계정 보호 계약', () => {
     expect(DEMO_ACCOUNT_FORBIDDEN_CODE).toBe('DEMO_ACCOUNT_FORBIDDEN');
     expect(DEMO_ACCOUNT_FORBIDDEN_MESSAGE).toContain('테스트 계정');
     // 비밀번호·이메일 경로도 같은 상수를 쓴다(문구 복제 0).
-    expect(read('services/auth/email-auth.service.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
+    expect(read('services/auth/email-auth.service.ts')).toContain('EmailAuthRecovery');
+    expect(read('services/auth/email-auth.recovery.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
+    expect(read('services/auth/email-auth.shared.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_CODE');
     expect(read('services/auth/google-auth.service.ts')).toContain('DEMO_ACCOUNT_FORBIDDEN_MESSAGE');
   });
 });

@@ -75,7 +75,7 @@ function normalize(sql: string): string {
 }
 
 /** 테스트용 DataSource 더블 — transaction 경계와 SQL 흐름을 기록한다. */
-function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string } = {}) {
+function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string; currentMembershipStatus?: string } = {}) {
   const calls: Call[] = [];
   const saves: Array<{ entity: string; scope: 'tx' | 'global'; value: any }> = [];
   const state: any = {
@@ -108,6 +108,7 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
     if (options.failOn && options.failOn.test(n)) {
       throw new Error('INJECTED_FAILURE');
     }
+    if (/SELECT status FROM service_memberships/i.test(n)) return [{ status: options.currentMembershipStatus ?? 'pending' }];
     if (/SELECT "businessInfo" FROM users/i.test(n)) {
       return [{ businessInfo: { businessNumber: '123-45-67890', legacyKeep: 'keep-me' } }];
     }
@@ -188,7 +189,7 @@ function makeRes() {
 const req = (body: Record<string, any>) => ({
   params: { id: MEMBER_ID },
   body,
-  user: { id: OPERATOR_ID, roles: ['kpa:operator'] },
+  user: { id: OPERATOR_ID, roles: ['kpa:admin'] },
 }) as any;
 
 beforeEach(() => jest.clearAllMocks());
@@ -282,7 +283,7 @@ describe('PATCH /kpa/members/:id/status — approval atomicity', () => {
 
     expect(h.state.txCommitted).toBe(1);
     const txWrites = h.calls.filter((c) => c.scope === 'tx' && WRITE_RE.test(c.sql));
-    expect(txWrites.some((c) => /UPDATE users SET status = 'active'/i.test(c.sql))).toBe(true);
+    expect(txWrites.some((c) => /UPDATE users SET status = 'active'/i.test(c.sql))).toBe(false);
     expect(txWrites.some((c) => /INSERT INTO kpa_pharmacist_profiles/i.test(c.sql))).toBe(true);
     expect(txWrites.some((c) => /UPDATE service_memberships/i.test(c.sql))).toBe(true);
     expect(h.saves.filter((s) => s.entity === 'KpaMember' && s.scope === 'tx')).toHaveLength(1);
@@ -428,4 +429,37 @@ describe('PATCH /kpa/members/:id/status — approval atomicity', () => {
     expect(h.state.txCommitted).toBe(0);
     expect(h.state.txRolledBack).toBe(1);
   });
+});
+
+describe('KPA member management role policy', () => {
+  it.each(['suspended', 'withdrawn'])('operator cannot set %s before any writes', async status => {
+    const h = makeDataSource(); const handler = getHandler(h.dataSource, '/:id/status', 'patch'); const out = makeRes();
+    const r: any = req({ status }); r.user.roles = ['kpa:operator'];
+    await handler(r, out);
+    expect(out.status).toHaveBeenCalledWith(403); expect(h.saves).toHaveLength(0);
+  });
+  it('operator can approve a pending application without restoring the common account', async () => {
+    const h = makeDataSource(); const handler = getHandler(h.dataSource, '/:id/status', 'patch'); const out = makeRes();
+    const r: any = req({ status: 'active' }); r.user.roles = ['kpa:operator'];
+    await handler(r, out);
+    expect(out.statusCode).toBe(200);
+    expect(h.calls.some(c => /UPDATE users.*status/i.test(c.sql))).toBe(false);
+  });
+  it('operator application decision cannot restrict a concurrently activated membership', async () => {
+    const h = makeDataSource({ currentMembershipStatus: 'active' }); const handler = getHandler(h.dataSource, '/:id/status', 'patch'); const out = makeRes();
+    const r: any = req({ status: 'rejected' }); r.user.roles = ['kpa:operator'];
+    await handler(r, out); expect(out.statusCode).toBe(403); expect(h.state.txRolledBack).toBe(1);
+  });
+});
+
+it('KPA operator can edit common profile but cannot change membership type', async () => {
+  const h = makeDataSource();
+  const handler = getHandler(h.dataSource, '/:id/info', 'patch');
+  const edit: any = req({ name: '프로필 수정' }); edit.user.roles = ['kpa:operator'];
+  const edited = makeRes(); await handler(edit, edited);
+  expect(edited.statusCode).toBe(200);
+  expect(h.calls.some(c => /^UPDATE users SET name/.test(c.sql))).toBe(true);
+  const change: any = req({ membership_type: 'student' }); change.user.roles = ['kpa:operator'];
+  const blocked = makeRes(); await handler(change, blocked);
+  expect(blocked.statusCode).toBe(403);
 });

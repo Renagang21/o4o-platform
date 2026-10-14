@@ -1,5 +1,7 @@
 # CHECK-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1`
 - **작성일**: 2026-08-12
 - **판정**: **PASS_WITH_HOLD** — 코드 수정·회귀 테스트·배포 완료 / 실데이터 공급자 write smoke 는 **계정 자격증명 불일치로 수행 불가(HOLD)**
@@ -109,7 +111,7 @@ if ((distributionChanged || activating) && PRIVATE && sellerIds 비어있음) �
 | `[REDACTED_EMAIL_C]` (Neture 공급자) | **401 `ACCOUNT_NOT_ACTIVE`** — `users.status='deleted'` |
 
 - `[REDACTED_EMAIL_B]` 은 `users.status='active'` · password 존재이므로 계정 문제가 아니라
-  **`docs/local/TEST-ACCOUNTS.local.md` 의 값이 현재 프로덕션과 불일치**한다 (해당 문서에 실측 메모 추가).
+  **`docs/local/TEST-ACCOUNT.txt` 의 값이 현재 프로덕션과 불일치**한다 (해당 문서에 실측 메모 추가).
 - 직전 WO 의 브라우저 smoke 는 Playwright 프로필에 남아 있던 **기존 세션**으로 수행된 것이며,
   현재 그 프로필의 세션은 `[REDACTED_EMAIL_A]`(공급자 아님) 으로 바뀌어 있다.
 - 비밀번호 추측·DB 직접 보정·비밀번호 재설정은 모두 WO §3 금지 범위 / 상시 제약에 해당하므로 수행하지 않았다.
@@ -193,9 +195,9 @@ FROM supplier_product_offers WHERE deleted_at IS NULL;
 | # | 내용 | 필요 조치 |
 |---|---|---|
 | a | 공급자 계정 실데이터 write smoke (§9 ① ② ⑤ ⑥ ⑦ ⑧ ⑨) | `[REDACTED_EMAIL_B]` 프로덕션 비밀번호 확인·갱신 후 재실행 |
-| b | `docs/local/TEST-ACCOUNTS.local.md` 비밀번호 3건 불일치 | 사용자만 갱신 가능 (git 미추적) |
+| b | `docs/local/TEST-ACCOUNT.txt` 비밀번호 3건 불일치 | 사용자만 갱신 가능 (git 미추적) |
 
 ## 13. 문서 정합
 
 - 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
-- `docs/local/TEST-ACCOUNTS.local.md` 는 git 미추적 로컬 SSOT 로, 실측 메모만 추가했다 (커밋 대상 아님).
+- `docs/local/TEST-ACCOUNT.txt` 는 git 미추적 로컬 SSOT 로, 실측 메모만 추가했다 (커밋 대상 아님).

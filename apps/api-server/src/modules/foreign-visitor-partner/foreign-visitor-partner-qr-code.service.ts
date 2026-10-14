@@ -6,6 +6,7 @@
  * shortCode/landingUrl 은 서버 생성(public URL 에 partnerId 미노출). V1 템플릿=AFFILIATE_MARKETING.
  */
 import { randomBytes } from 'crypto';
+import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
 import type { DataSource, Repository } from 'typeorm';
 import {
   ForeignVisitorPartnerQrCode,
@@ -19,6 +20,7 @@ import { getServicePublicOrigin } from '../../config/service-catalog.js';
  * 파일별 호스트 표는 존재하지 않는 `cosmetics.neture.co.kr` 을 찍었다(CHECK-O4O-URL-FIRST-CENSUS-V1 §7-1).
  */
 export function buildAffiliateLandingUrl(serviceKey: string, shortCode: string): string {
+  if (serviceKey === 'pharmacy-hub') throw new Error('SERVICE_RETIRED');
   const origin = getServicePublicOrigin(serviceKey) || 'https://pharmacy.neture.co.kr';
   return `${origin}/foreign-visitor/affiliate/${shortCode}`;
 }
@@ -88,7 +90,7 @@ export class ForeignVisitorPartnerQrCodeService {
     now: Date = new Date(),
   ): Promise<ForeignVisitorPartnerQrCode | null> {
     const qr = await this.repo.findOne({ where: { shortCode } });
-    if (!qr || qr.status !== 'ACTIVE') return null;
+    if (!qr || qr.status !== 'ACTIVE' || isRetiredServiceValue(qr.serviceKey)) return null;
     if (qr.validFrom && qr.validFrom.getTime() > now.getTime()) return null;
     if (qr.validTo && qr.validTo.getTime() < now.getTime()) return null;
     return qr;

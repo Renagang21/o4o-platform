@@ -9,11 +9,12 @@
  *   - isLoading 초기값 = 토큰 유무 (토큰 없으면 spinner 없이 즉시 시작)
  *   - 세션 복구: 토큰 없으면 `/auth/me` 를 호출조차 하지 않는다(불필요한 401 방지)
  *   - AUTH_TOKEN_CLEARED_EVENT 수신 시 user 정리(토큰 갱신 실패 → stale auth 제거)
- *   - loginWithGoogle / signupWithGoogle / logout
+ *   - 이메일·Google·카카오 로그인/가입과 현재 브라우저 logout
  *
  * **서비스명 조건문을 두지 않는다.** 차이는 전부 `ServiceAuthConfig` 주입으로 표현한다.
  */
 
+import type { SocialProof, KakaoSignupRequest, KakaoAuthResponse } from '@o4o/auth-client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseAuthResponse, resolveAuthError, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import type {
@@ -89,18 +90,56 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
   const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
 
   // config 는 매 렌더 새 객체일 수 있다. effect 를 재실행시키지 않도록 ref 로 고정한다.
+  const sessionGeneration = useRef(0);
+  const refreshRequest = useRef(0);
+  const policyRequest = useRef(0);
+  const authenticatingGeneration = useRef<number | null>(null);
+  const mounted = useRef(true);
   const cfgRef = useRef(config);
   cfgRef.current = config;
 
-  const refresh = useCallback(async () => {
+  const isCurrentSession = useCallback((generation: number) =>
+    mounted.current && generation === sessionGeneration.current, []);
+
+  // Changing identity invalidates background reads and outstanding consent work together.
+  const advanceSession = useCallback(() => {
+    const generation = ++sessionGeneration.current;
+    refreshRequest.current += 1;
+    policyRequest.current += 1;
+    authenticatingGeneration.current = null;
+    return generation;
+  }, []);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      advanceSession();
+    };
+  }, [advanceSession]);
+
+  const refresh = useCallback(async (throwOnTransientError = false) => {
+    const generation = sessionGeneration.current;
+    const request = ++refreshRequest.current;
+    const ownsResponse = () => isCurrentSession(generation) && request === refreshRequest.current &&
+      authenticatingGeneration.current === null;
+    // Route guards treat foreground resolution as a verified server snapshot.
+    // A superseded check must fail closed; background reads may be discarded.
+    const discardSuperseded = () => {
+      if (throwOnTransientError) throw new Error('인증 확인이 취소되었습니다. 다시 시도해 주세요.');
+    };
     const cfg = cfgRef.current;
     if (!cfg.getAccessToken()) {
+      if (!ownsResponse()) return discardSuperseded();
+      setPendingPolicyAcceptances([]);
       setUser(null);
       setIsLoading(false);
       return;
     }
     try {
       const response = await cfg.authClient.api.get(cfg.meEndpoint ?? '/auth/me');
+      if (!ownsResponse()) return discardSuperseded();
+      if (!cfg.getAccessToken()) return;
       const { user: apiUser } = parseAuthResponse(response.data as never);
       if (apiUser) {
         const built = cfg.toUser(apiUser as unknown as Record<string, unknown>);
@@ -108,17 +147,25 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         setUser(built);
         cfg.onAuthenticated?.(built);
       } else {
+        if (throwOnTransientError) throw new Error('Invalid auth user response');
         setPendingPolicyAcceptances([]);
         setUser(null);
       }
-    } catch {
+    } catch (error) {
+      if (!ownsResponse()) return discardSuperseded();
+      // Access rechecks distinguish a temporary transport/server failure from an
+      // invalid session. Existing background refresh keeps its previous behavior.
+      const { status } = readErrorResponse(error);
+      if (throwOnTransientError && status !== 401 && status !== 403) throw error;
       // 세션 없음/만료 — 비로그인 상태로 진행(정상 경로).
       setPendingPolicyAcceptances([]);
       setUser(null);
     } finally {
-      setIsLoading(false);
+      if (ownsResponse()) setIsLoading(false);
     }
-  }, []);
+  }, [isCurrentSession]);
+
+  const refreshForAccess = useCallback(() => refresh(true), [refresh]);
 
   useEffect(() => {
     void refresh();
@@ -126,10 +173,14 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
 
   // 토큰 갱신 실패 시 stale auth 정리 (auth-client 가 이벤트를 발행).
   useEffect(() => {
-    const handleTokenCleared = () => setUser(null);
+    const handleTokenCleared = () => {
+      advanceSession();
+      setPendingPolicyAcceptances([]); setUser(null);
+      setIsLoading(false);
+    };
     window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
     return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-  }, []);
+  }, [advanceSession]);
 
   /**
    * 세션 채택 공통 — /auth/google/login · /auth/google/signup.
@@ -145,9 +196,14 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       //   공통 코드표(AUTH_ERROR_MESSAGES)에 이메일 코드를 넣지 않고 서버 `error` 를 그대로 쓴다.
       preferServerMessage = false,
     ): Promise<AuthLoginResult<TUser>> => {
+      const generation = advanceSession();
+      authenticatingGeneration.current = generation;
       setIsLoading(true);
+      const cancelled = (): AuthLoginResult<TUser> => ({ success: false, error: '로그인이 취소되었습니다. 다시 시도해 주세요.' });
       try {
-        const result = (await request()) as { user?: unknown };
+        const result = (await request()) as KakaoAuthResponse;
+        if (!isCurrentSession(generation)) return cancelled();
+        if (result.nextStep === 'signup' || result.nextStep === 'verify-email') return { success: false, nextStep: result.nextStep, signupTicket: result.signupTicket, email: result.email, maskedEmail: result.maskedEmail, mailSent: result.mailSent };
         const apiUser = result?.user as Record<string, unknown> | undefined;
         if (!apiUser) {
           return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
@@ -158,6 +214,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         onAuthenticated?.(built);
         return { success: true, user: built };
       } catch (error: unknown) {
+        if (!isCurrentSession(generation)) return cancelled();
         const { data, status } = readErrorResponse(error);
         if (data) {
           // WO-NETURE-PHARMACY-CUTOVER-COMPAT-V1: 세미프랜차이즈 자격 거절은 서버 문구가 상태별 안내다.
@@ -183,10 +240,15 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         }
         return { success: false, error: failMessage };
       } finally {
-        setIsLoading(false);
+        if (isCurrentSession(generation)) {
+          authenticatingGeneration.current = null;
+          // A read started while authentication was pending cannot later adopt the old identity.
+          refreshRequest.current += 1;
+          setIsLoading(false);
+        }
       }
     },
-    [toUser, onAuthenticated],
+    [advanceSession, isCurrentSession, toUser, onAuthenticated],
   );
 
   /**
@@ -223,16 +285,28 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     [adoptSession, authClient],
   );
 
+  const loginWithKakao = useCallback((proof: SocialProof): Promise<AuthLoginResult<TUser>> =>
+    authClient.loginWithKakao ? adoptSession(() => authClient.loginWithKakao!(proof), '카카오 로그인에 실패했습니다.', true)
+      : Promise.resolve({ success: false, error: '카카오 로그인은 준비 중입니다.' }), [adoptSession, authClient]);
+  const signupWithKakao = useCallback((token: string, input: KakaoSignupRequest): Promise<AuthLoginResult<TUser>> =>
+    authClient.signupWithKakao ? adoptSession(() => authClient.signupWithKakao!(token, input), '카카오 가입에 실패했습니다.', true)
+      : Promise.resolve({ success: false, error: '카카오 가입은 준비 중입니다.' }), [adoptSession, authClient]);
+
   const logout = useCallback(async () => {
+    const generation = advanceSession();
+    setPendingPolicyAcceptances([]); setUser(null);
+    setIsLoading(false);
     try {
       await authClient.logout();
     } catch {
       // 서버 로그아웃 실패해도 로컬 상태는 반드시 정리한다.
     } finally {
-      setPendingPolicyAcceptances([]);
-      setUser(null);
+      if (isCurrentSession(generation)) {
+        setPendingPolicyAcceptances([]);
+        setUser(null);
+      }
     }
-  }, [authClient]);
+  }, [advanceSession, authClient, isCurrentSession]);
 
   /**
    * WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17·§20
@@ -240,17 +314,27 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
    * pending 을 서버 판정으로 다시 채운다. 실패해도 throw 하지 않는다.
    */
   const acceptPendingPolicies = useCallback(async (): Promise<PolicyAcceptanceResult> => {
+    const generation = sessionGeneration.current;
+    const request = ++policyRequest.current;
+    const ownsResponse = () => isCurrentSession(generation) && request === policyRequest.current &&
+      authenticatingGeneration.current === null;
+    const cancelled = (): PolicyAcceptanceResult => ({
+      success: false, error: '인증 상태가 변경되어 약관 동의를 중단했습니다. 현재 계정에서 다시 시도해 주세요.', pending: [],
+    });
     let remaining = pendingPolicyAcceptances;
     for (const item of pendingPolicyAcceptances) {
+      if (!ownsResponse()) return cancelled();
       try {
         const response = await authClient.api.post('/auth/policy-acceptances', {
           serviceKey: item.serviceKey,
           policyDocumentId: item.policyDocumentId,
           version: item.version,
         });
+        if (!ownsResponse()) return cancelled();
         const body = (response?.data ?? {}) as { data?: { pending?: unknown } };
         remaining = readPendingPolicyAcceptances({ pendingPolicyAcceptances: body.data?.pending });
       } catch (error: unknown) {
+        if (!ownsResponse()) return cancelled();
         const { data, status } = readErrorResponse(error);
         const code = typeof data?.code === 'string' ? data.code : undefined;
         const message = typeof data?.error === 'string'
@@ -261,10 +345,12 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         return { success: false, error: message, code, pending: remaining };
       }
     }
+    if (!ownsResponse()) return cancelled();
     setPendingPolicyAcceptances(remaining);
     await refresh();
+    if (!ownsResponse()) return cancelled();
     return { success: true, pending: remaining };
-  }, [authClient, pendingPolicyAcceptances, refresh]);
+  }, [authClient, isCurrentSession, pendingPolicyAcceptances, refresh]);
 
   return {
     user,
@@ -274,9 +360,11 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     acceptPendingPolicies,
     loginWithGoogle,
     signupWithGoogle,
+    loginWithKakao, signupWithKakao,
     loginWithEmail,
     logout,
     refresh,
+    refreshForAccess,
     setUser,
   };
 }

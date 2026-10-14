@@ -21,7 +21,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
-import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { resolveStoreProductAccess } from '../../utils/store-product-access.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR(ProductMaster Landing) — 다국어 무관 항상 발급.
 import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
@@ -61,25 +61,38 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
     return requireAuth;
   }
 
+  async function resolveProductOrganization(
+    req: Request,
+    res: Response,
+    emptyOnNoOrganization = false,
+  ): Promise<string | null> {
+    const auth = await getAuth();
+    await new Promise<void>((resolve, reject) => {
+      (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+    });
+    const user = (req as AuthRequest).user;
+    const error = emptyOnNoOrganization
+      ? 'Store owner or operator role required'
+      : 'Store owner access required';
+    if (!user?.id) {
+      res.status(403).json({ success: false, error, code: 'FORBIDDEN' });
+      return null;
+    }
+    const organizationId = await resolveStoreProductAccess(dataSource, user.id, user.roles || [], 'kpa', readPreferredStoreOrganizationId(req));
+    if (!organizationId && !emptyOnNoOrganization) {
+      res.status(403).json({ success: false, error, code: 'FORBIDDEN' });
+    }
+    return organizationId;
+  }
+
   /**
    * GET /handled-products
    * Query: page, limit, search, source(all|listing|local)
    */
   router.get('/handled-products', async (req: Request, res: Response): Promise<void> => {
     try {
-      const auth = await getAuth();
-      await new Promise<void>((resolve, reject) => {
-        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
-      });
-
-      const authReq = req as AuthRequest;
-      const userId = authReq.user?.id;
-      if (!userId) {
-        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
-        return;
-      }
-      const userRoles: string[] = authReq.user?.roles || [];
-      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa', readPreferredStoreOrganizationId(req));
+      const organizationId = await resolveProductOrganization(req, res, true);
+      if (res.headersSent) return;
       if (!organizationId) {
         res.json({ success: true, data: { items: [], pagination: { page: 1, limit: 20, total: 0 } } });
         return;
@@ -115,23 +128,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
    */
   router.post('/handled-products/remove', async (req: Request, res: Response): Promise<void> => {
     try {
-      const auth = await getAuth();
-      await new Promise<void>((resolve, reject) => {
-        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
-      });
-
-      const authReq = req as AuthRequest;
-      const userId = authReq.user?.id;
-      if (!userId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
-      const userRoles: string[] = authReq.user?.roles || [];
-      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, 'kpa', readPreferredStoreOrganizationId(req));
-      if (!organizationId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
+      const organizationId = await resolveProductOrganization(req, res);
+      if (!organizationId) return;
 
       const valid = parseHandledProductRefs(req.body?.items);
       if (valid.length === 0) {
@@ -160,21 +158,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
    */
   router.get('/handled-products/qr', async (req: Request, res: Response): Promise<void> => {
     try {
-      const auth = await getAuth();
-      await new Promise<void>((resolve, reject) => {
-        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
-      });
-      const authReq = req as AuthRequest;
-      const userId = authReq.user?.id;
-      if (!userId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
-      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa', readPreferredStoreOrganizationId(req));
-      if (!organizationId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
+      const organizationId = await resolveProductOrganization(req, res);
+      if (!organizationId) return;
 
       const UUID_RE = /^[0-9a-fA-F-]{36}$/;
       const sourceType = String(req.query.sourceType || '');
@@ -232,21 +217,8 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
    */
   router.get('/handled-products/qr/export', async (req: Request, res: Response): Promise<void> => {
     try {
-      const auth = await getAuth();
-      await new Promise<void>((resolve, reject) => {
-        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
-      });
-      const authReq = req as AuthRequest;
-      const userId = authReq.user?.id;
-      if (!userId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
-      const organizationId = await resolveStoreAccess(dataSource, userId, authReq.user?.roles || [], 'kpa', readPreferredStoreOrganizationId(req));
-      if (!organizationId) {
-        res.status(403).json({ success: false, error: 'Store owner access required', code: 'FORBIDDEN' });
-        return;
-      }
+      const organizationId = await resolveProductOrganization(req, res);
+      if (!organizationId) return;
 
       const UUID_RE = /^[0-9a-fA-F-]{36}$/;
       const sourceType = String(req.query.sourceType || '');

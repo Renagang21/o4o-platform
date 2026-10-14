@@ -13,16 +13,8 @@
  * 빌드 플래그를 false 로 지정하여 전환 전 상태로 되돌릴 수 있다.
  */
 
-export type SubHost = 'supplier' | 'funding' | 'community';
-export type HostProfile = 'main' | SubHost;
-
-export const MAIN_ORIGIN = 'https://neture.co.kr';
-
-export const HOST_ORIGIN: Readonly<Record<SubHost, string>> = Object.freeze({
-  supplier: 'https://supplier.neture.co.kr',
-  funding: 'https://funding.neture.co.kr',
-  community: 'https://community.neture.co.kr',
-});
+import { MAIN_ORIGIN, HOST_ORIGIN, type SubHost, type HostProfile } from './hostIdentity';
+export { MAIN_ORIGIN, HOST_ORIGIN, type SubHost, type HostProfile } from './hostIdentity';
 
 const HOST_BY_NAME: Readonly<Record<string, SubHost>> = Object.freeze({
   'supplier.neture.co.kr': 'supplier',
@@ -34,9 +26,9 @@ const HOST_BY_NAME: Readonly<Record<string, SubHost>> = Object.freeze({
 const OWNED_PREFIXES: Readonly<Record<SubHost, readonly string[]>> = Object.freeze({
   // /workspace/* 는 공급자 운영 화면(SupplierOpsLayout)과 공급자 레거시 리다이렉트다.
   // 기존 공급자 포럼 주소는 아래 community adapter 가 먼저 처리한다.
-  supplier: ['/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
-  funding: ['/market-trial', '/operator/market-trial', '/admin/market-trial'],
-  community: ['/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
+  supplier: ['/operator/service-members/supplier', '/supplier', '/account/supplier', '/workspace', '/operator/suppliers', '/operator/supplier-quality', '/admin/supplier-governance', '/admin/admin-suppliers', '/admin/supplier-quality'],
+  funding: ['/operator/service-members/funding', '/market-trial', '/operator/market-trial', '/admin/market-trial'],
+  community: ['/operator/service-members/community', '/communities', '/pharmacist', '/mypage/communities', '/admin/communities', '/operator/communities', '/admin/forum-delete-requests', '/admin/forum-deleted', '/admin/forum-analytics', '/operator/forum-delete', '/operator/forum-delete-requests', '/operator/forum-analytics'],
 });
 
 /**
@@ -106,6 +98,12 @@ export function decideHost(
 ): HostDecision {
   const { pathname, search, hash } = location;
   const suffix = `${pathname}${search}${hash}`;
+
+  // Funding work has one host; old supplier URLs are narrow aliases.
+  if (matchesPrefix(pathname, '/supplier/market-trial')) {
+    const tail = pathname.slice('/supplier/market-trial'.length);
+    return { kind: 'external', href: `${HOST_ORIGIN.funding}/market-trial/manage${tail}${search}${hash}` };
+  }
 
   // Preserve old forum addresses while the community owns the actual workspace.
   const generalBase = '/communities/o4o-general/forum';

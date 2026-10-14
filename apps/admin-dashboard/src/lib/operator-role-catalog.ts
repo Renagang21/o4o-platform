@@ -30,17 +30,9 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
     { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
     { value: 'neture:operator', label: 'Operator', description: 'Neture 운영자' },
   ],
-  'pharmacy-hub': [
-    { value: 'pharmacy-hub:admin', label: 'Admin', description: 'Pharmacy-Hub 관리자 (운영 권한 포함)' },
-    { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
-  ],
   lecture: [
     { value: 'lecture:admin', label: 'Admin', description: 'O4O 강의 서비스 관리자 (운영 권한 포함)' },
     { value: 'lecture:operator', label: 'Operator', description: 'O4O 강의 서비스 운영자' },
-  ],
-  cosmetics: [
-    { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
-    { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
   'kpa-branch': [
     {
@@ -52,9 +44,10 @@ export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = {
   community: [
     {
       value: 'community:admin',
-      label: '커뮤니티 전체 관리자',
-      description: '커뮤니티 개설 신청 승인. 개별 커뮤니티 운영은 그 커뮤니티 운영자가 합니다.',
+      label: 'Admin',
+      description: '커뮤니티 개설 심사 · 개별 커뮤니티 운영자 지정',
     },
+    { value: 'community:operator', label: 'Operator', description: '커뮤니티 개설·가입 신청 심사 · 게시판 운영' },
   ],
   supplier: [
     {

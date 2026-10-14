@@ -1,5 +1,7 @@
 # CHECK — 분회 연회비 정책·원장 (W5)
 
+> **계정 파일명 정규화 (2026-10-11):** 사용자의 문서 전체 이름 통일 지시에 따라 계정 파일 참조를 `TEST-ACCOUNT.txt`로 표기합니다. 이 이름의 파일이 아래 과거 검증 당시 존재했다는 의미는 아닙니다. 당시 원본의 줄 수·존재 확인·검증 날짜·결과는 당시 기록으로 읽고, 현재 파일 제공 상태는 [SETUP](../../SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)을 확인합니다.
+
 - **WO**: `WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1`
 - **일자**: 2026-09-08
 - **판정**: **CLOSED** — 구현 + migration + 프로덕션 E2E 31항목 실측 · fixture 전량 원복
@@ -214,7 +216,7 @@ resolveAssociationValues('fee.category')
 ### 제약 기록
 
 1. **검증 계정 2개는 실사용 계정이다** (`sohae2100` · `renagang21`). 프로덕션에 전용 테스트
-   계정이 없어 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에 등재된 계정을 썼다.
+   계정이 없어 SSOT(`docs/local/TEST-ACCOUNT.txt`)에 등재된 계정을 썼다.
    두 계정의 `kpa_members.fee_category` 는 검증 중에만 값을 가졌고 NULL 로 복귀했다.
 2. **`kpa_members.fee_category` 폴백 경로는 단독으로 실측하지 못했다.** 부과 후에는
    두 계정 모두 원장 행을 가져 우선순위상 ledger 가 이겼다. 폴백은 코드 경로와

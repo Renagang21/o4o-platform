@@ -53,7 +53,7 @@ describe('funding 호스트', () => {
     expect(decideHost('funding', loc('/market-trial/my')).kind).toBe('stay');
     expect(decideHost('funding', loc('/supplier/market-trial/3'))).toEqual({
       kind: 'external',
-      href: 'https://neture.co.kr/supplier/market-trial/3',
+      href: 'https://funding.neture.co.kr/market-trial/manage/3',
     });
   });
 });
@@ -66,7 +66,7 @@ describe('community 호스트', () => {
     expect(decideHost('community', loc('/')).kind).toBe('stay');
   });
   it('독립 약사 커뮤니티 진입과 가입·운영은 커뮤니티 호스트 소유', () => {
-    for (const p of ['/pharmacist', '/communities/pharmacy/forum/posts', '/mypage/communities', '/admin/communities']) {
+    for (const p of ['/pharmacist', '/communities/pharmacy/forum/posts', '/mypage/communities', '/admin/communities', '/operator/communities']) {
       expect(decideHost('community', loc(p))).toEqual({ kind: 'stay' });
     }
   });
@@ -105,7 +105,7 @@ describe('운영 기능의 소유 호스트', () => {
     for (const [path, origin] of [
       ['/operator/suppliers', 'supplier'], ['/admin/supplier-governance', 'supplier'],
       ['/operator/market-trial/requests', 'funding'], ['/admin/market-trial', 'funding'],
-      ['/admin/communities', 'community'], ['/mypage/communities', 'community'],
+      ['/admin/communities', 'community'], ['/operator/communities', 'community'], ['/mypage/communities', 'community'],
     ]) {
       expect(decideHost('main', loc(path, '?page=2', '#review'))).toEqual({
         kind: 'external', href: `https://${origin}.neture.co.kr${path}?page=2#review`,
@@ -145,4 +145,19 @@ describe('이전 커뮤니티 주소', () => {
     expect(decideHost('main', loc('/forum/service-update/new'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/write?forum=service-update' });
     expect(decideHost('main', loc('/forum/service-update/notice'))).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/communities/o4o-general/forum/post/notice' });
   });
+});
+
+
+it.each(['supplier', 'funding', 'community'] as const)('%s member list/detail remain on their own service host', profile => {
+  for (const tail of ['', '/fixture-user']) {
+    const pathname = `/operator/service-members/${profile}${tail}`;
+    expect(decideHost(profile, { pathname, search: '', hash: '' })).toEqual({ kind: 'stay' });
+    expect(decideHost('main', { pathname, search: '?page=2', hash: '' })).toEqual({ kind: 'external', href: `https://${profile}.neture.co.kr${pathname}?page=2` });
+  }
+});
+
+
+it.each(['main', 'supplier', 'funding', 'community'] as const)('%s preserves old creator URLs and routes directly to funding', profile => {
+  expect(decideHost(profile, loc('/supplier/market-trial/new', '?from=nav', '#form'))).toEqual({ kind: 'external', href: 'https://funding.neture.co.kr/market-trial/manage/new?from=nav#form' });
+  if (profile === 'funding') for (const path of ['/market-trial/manage/new', '/market-trial/manage/project/edit', '/market-trial/project/forum/write']) expect(decideHost(profile, loc(path))).toEqual({ kind: 'stay' });
 });
