@@ -107,4 +107,19 @@ describe('adminRouteAccess — permission 판정', () => {
   it('빈 permissions 배열은 "데이터 없음"으로 보고 역할 게이트로 되돌아간다 (기존 사용자 잠김 방지)', () => {
     expect(hasRequiredPermissions({ role: 'admin', permissions: [] }, ['users:write'])).toBe(true);
   });
+
+  it('platform:super_admin 은 /auth/me 가 다른 어휘의 permissions 를 채워 보내도(새로고침) 관리자 화면 permission 을 통과한다', () => {
+    // 새로고침 시 /auth/me 응답 형상 — role 은 첫 역할, roles 배열, 백엔드 어휘(users.view · admin.settings)의 permissions.
+    const refreshed = {
+      role: 'kpa:store_owner',
+      roles: ['kpa:store_owner', 'platform:super_admin'],
+      permissions: ['users.view', 'admin.settings', 'api.access'],
+    };
+    for (const p of ['settings:read', 'users:read', 'users:create', 'users:update', 'templates:write', 'pharmacy-ai-insight.read']) {
+      expect(hasRequiredPermissions(refreshed, [p])).toBe(true);
+    }
+    // super_admin 이 아니면 채워진 permissions 의 실검사는 그대로다.
+    const operator = { role: 'neture:operator', roles: ['neture:operator'], permissions: ['users.view'] };
+    expect(hasRequiredPermissions(operator, ['settings:read'])).toBe(false);
+  });
 });
