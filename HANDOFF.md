@@ -1,5 +1,14 @@
 # HANDOFF
 
+## ⚠️ 세션 시작 시 먼저 — PR #339 worktree 정리 (어느 PC 인지 미확인)
+
+PR #339(`WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1`)는 main 통합(`918884634`) · 운영 배포(Promote `37614814922`, `447869cc5` DEPLOYED) 완료. 작업한 PC 를 모르므로 **모든 PC 에서 세션 시작 시 확인**한다.
+
+1. `git worktree list` 에 branch `wo/kcosmetics-retirement-phase1b-store-api-admin-v1` worktree 가 있는지 본다. 없으면 이 PC 는 대상 아님 — `git branch -d` 로 로컬 branch 만 있으면 지운다.
+2. 있으면 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy) 종료 절차: clean · 남은 일 없음 확인 → node_modules junction / reparse point 해제 → 재스캔 0 확인 → `git worktree remove` → `git worktree prune` → `git branch -d`.
+3. 원격 branch 는 GitHub 에서 수동 삭제(전역 deny). head `7f0a466c3` 는 main 에 포함됨.
+4. 정리를 마친 PC 의 세션이 이 절을 삭제한다.
+
 > 마지막 작업: 2026-10-07 (KST) · PR #308 · #332 · #336 · #328 **main 통합 · 운영 배포 완료 · 테스트 결제 활성화** — **운영 업무 흐름 미검증**(계정 필요)
 
 ## 요약
