@@ -58,7 +58,7 @@ PR #555 P2: 삭제가 성공해 확인창은 닫혔지만 refresh가 끝날 때�
 ### 별도 API 선행 문제
 
 다른 실행의 [Promote 38491966980](https://github.com/Renagang21/o4o-platform/actions/runs/38491966980)는 API `Build API server (bundled with tsup)`에서 실패했고 후속 frontend 배포는 SKIPPED다.
-로컬에서 정상 dependency closure와 API tsc 빌드 후 `build:api` 실패를 재현했다. AI 영역 `ai-tool-router.ts`와 `work-agent-runtime.ts`가 타입 8개를 값으로 재export하여 esbuild가 실제 export를 찾지 못한다.
+source `dadc13e62`에서 정상 dependency closure와 API tsc 빌드 후 `build:api` 실패를 로컬 재현했다. AI 영역 `ai-tool-router.ts`와 `work-agent-runtime.ts`가 타입 8개를 값으로 재export하여 esbuild가 실제 export를 찾지 못한다.
 해당 타입은 `SupplierLookupIntent`, `SupplierRequestGap`, `AiToolInvocation`, `DomIntent`, `DomRequestGap`, `PlannerInput`, `WorkPlanner`, `PlannerTargetResolver`다. `export type` 구분 보완안을 별도 준비했으며 이번 운영자 WO에서 AI source는 수정하지 않았다.
 
 또한 main에는 별도 AI 작업의 미적용 `CreateAiUsageReservations1791870434349`가 있다. 정상 up은 `ai_usage_reservations` table·pending index 생성 및 `ai_usage_aggregate.current_value`, `ai_usage_logs.costEstimated`를 `numeric(20,8)`로 변경한다.
@@ -68,3 +68,5 @@ PR #555 P2: 삭제가 성공해 확인창은 닫혔지만 refresh가 끝날 때�
 약사회 분회 코드 변경·본 세션의 배포 선택은 0이다. 현재 public root와 API health의 HTTP 200은 기존 운영 가용성 확인이며 새 코드 배포 검증이 아니다.
 
 이 기록은 동일 WO의 후속 문서 단계로 기존 세션 전용 clone을 유지하고 최신 main에서 closure branch를 만들었다. 실행 코드·배포 설정을 바꾸지 않는 문서 변경이며 source 배포를 다시 주장하지 않는다. source 작업공간은 선행 API/배포 재개를 위해 KEEP한다.
+
+API 타입 재export 문제의 별도 후속 [PR #557](https://github.com/Renagang21/o4o-platform/pull/557)이 진행 중인 것을 확인했다. 해당 API 작업은 그 PR을 따르며, 이번 운영자 문서 변경은 후속 source/serving 결과가 나오기 전 배포 완료로 판정하지 않는다.
