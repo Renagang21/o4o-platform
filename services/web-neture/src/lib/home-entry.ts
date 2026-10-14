@@ -483,6 +483,24 @@ export function homeEntryStoreOrganizationIds(data: HomeEntryData): string[] {
   return [...new Set(source.map((s) => s.organizationId))];
 }
 
+/** 내 매장 화면(경영 현황 · 참여 현황)이 고르는 매장 — 조직 단위. 조회 API 는 조직 헤더로 서버가 범위를 판정한다. */
+export interface HomeEntryStoreRef {
+  organizationId: string;
+  name: string | null;
+}
+
+/**
+ * 내 매장 화면의 매장 목록 — workspaceStores 가 정본, 없을 때만 기존 KPA 약국 stores(종전 동작).
+ */
+export function homeEntryManagedStores(data: HomeEntryData): HomeEntryStoreRef[] {
+  if (data.workspaceStores !== undefined) {
+    return data.workspaceStores.map((s) => ({ organizationId: s.organizationId, name: s.organizationName || null }));
+  }
+  return data.stores
+    .filter((s) => s.serviceKey === 'kpa-society')
+    .map((s) => ({ organizationId: s.organizationId, name: s.name ?? null }));
+}
+
 /** 매장 항목이 해당 조직의 것인지 — workspace-store:<org> 와 기존 store:<org>:<serviceKey> 모두 판정 */
 export function isStoreEntryItemFor(item: EntryItem, organizationId: string): boolean {
   return item.id === `workspace-store:${organizationId}` || item.id.startsWith(`store:${organizationId}:`);

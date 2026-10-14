@@ -10,7 +10,7 @@ import { MY_HOME_SOURCES, MyHomeButton } from "@o4o/auth-react";
 import { useAuth } from "../../contexts";
 import { useLoginModal } from "../../contexts/LoginModalContext";
 import { api } from "../../lib/apiClient";
-import { useHomeEntry, buildHomeEntryModel, homeEntryStoreOrganizationIds, type EntryStore } from "../../lib/home-entry";
+import { useHomeEntry, buildHomeEntryModel, homeEntryStoreOrganizationIds, type HomeEntryStoreRef } from "../../lib/home-entry";
 import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import HomeEntryPanel from "../../components/home/HomeEntryPanel";
 import { MyHomeParticipation } from "../../components/mypage/MyHomeParticipation";
@@ -66,8 +66,8 @@ function MyHomeContent({ view }: { view: View }) {
 
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
-  const hasStore = !!entry.data?.stores.length;
-  const renderStoreWorkspace = (store: EntryStore) => <HomeEntryPanel
+  const hasStore = !!entry.data && homeEntryStoreOrganizationIds(entry.data).length > 0;
+  const renderStoreWorkspace = (store: HomeEntryStoreRef) => <HomeEntryPanel
     key={`${user.id}:${store.organizationId}`}
     user={user}
     data={entry.data}

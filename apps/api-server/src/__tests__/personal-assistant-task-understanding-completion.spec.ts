@@ -836,6 +836,30 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(done).toHaveLength(0);
   });
 
+  it('동시 "됐어요" 재시도 — Task 가 이미 running 이어도 run 이 질문 대기면 선언으로 닫는다(오래된 Task 상태로 판정하지 않음)', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d6')));
+    tasks.get(first.task!.taskId)!.status = 'running'; // 먼저 들어온 요청의 acquireTask 갱신
+    coord.mock = true;
+    coord.row = { runId: 'g_d6', userId: ME, status: 'waiting_for_user', version: 5 };
+    const exec = jest.fn();
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d6' }, requestedTaskId: first.task!.taskId }, exec);
+    expect(exec).not.toHaveBeenCalled();
+    expect(coord.transitioned).toEqual([{ runId: 'g_d6', status: 'completed', expectedVersion: 5 }]);
+    expect(out.task?.status).toBe('completed');
+  });
+
+  it('Task running · run 실행 중(대기 아님)이면 "됐어요" 도 선언으로 닫지 않는다', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d7')));
+    tasks.get(first.task!.taskId)!.status = 'running';
+    coord.mock = true;
+    coord.row = null;
+    coord.stored = { runId: 'g_d7', userId: ME, status: 'active', version: 2 };
+    const exec = jest.fn(async (): Promise<WorkExecutionReply> => ({ status: 200, body: { success: true, data: { runId: null } } }));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d7' }, requestedTaskId: first.task!.taskId }, exec);
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(coord.transitioned).toEqual([]);
+  });
+
   it('"됐어요" 여도 종결 run 이 남의 것이면 선언으로 닫지 않는다', async () => {
     const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d5')));
     coord.mock = true;

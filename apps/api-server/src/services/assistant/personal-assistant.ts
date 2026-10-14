@@ -309,7 +309,9 @@ export async function runAssistantWorkTask(
   }) : EMPTY_ASSISTANT_MEMORY;
 
   // ── 사용자 완료 선언 — 질문 대기 중 "됐어요" 는 실행 없이 Task 를 닫는다 ──
-  if (task && resuming && priorStatus === 'waiting_for_user'
+  // Task 상태는 동시 요청이 먼저 running 으로 바꿨을 수 있다 — 판정의 정본은 run 상태다(completeByUserDeclaration 이
+  // 같은 사용자의 waiting · completed run 만 받는다). running 은 그 경쟁 창을 덮기 위해서만 허용한다.
+  if (task && resuming && (priorStatus === 'waiting_for_user' || priorStatus === 'running')
     && isCompletionDeclaration(input.workBody.request, memory.resumeFrame?.ask?.kind ?? null)) {
     try {
       const declared = await completeByUserDeclaration(dataSource, input, task);
