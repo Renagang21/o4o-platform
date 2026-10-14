@@ -58,19 +58,29 @@ export function jobArguments({image,source,mode,runId,attempt,username,database,
   if(!username||!database||[username,database].some(v=>/[:\r\n]/.test(v)))throw new Error('PH_JOB_DB_BINDING');
   const entry=`
 import {createRequire} from 'node:module';
+import {createHash as diagnosticHash} from 'node:crypto';
 const {Client}=createRequire('/app/package.json')('pg');
 ${purge==='media'?"const {Storage}=createRequire('/app/package.json')('@google-cloud/storage');":''}
 const client=new Client({host:process.env.DB_HOST,port:5432,user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME});
+let stage='connect',queryHash='none';
+async function query(sql,args) {
+  queryHash=diagnosticHash('sha256').update(sql).digest('hex');
+  return client.query(sql,args);
+}
 try {
   await client.connect();
-  await client.query(${JSON.stringify(mode==='plan'?'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY':'BEGIN ISOLATION LEVEL SERIALIZABLE')});
-  const result=await new ${selected.className}(${purge==='media'?'{storage:new Storage({retryOptions:{autoRetry:false,maxRetries:0}})}':''}).up({isTransactionActive:true,query:async(sql,args)=>(await client.query(sql,args)).rows},${mode==='plan'});
-  await client.query(${JSON.stringify(mode==='plan'?'ROLLBACK':'COMMIT')});
+  stage='begin';
+  await query(${JSON.stringify(mode==='plan'?'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY':'BEGIN ISOLATION LEVEL SERIALIZABLE')});
+  stage='purge';
+  const result=await new ${selected.className}(${purge==='media'?'{storage:new Storage({retryOptions:{autoRetry:false,maxRetries:0}})}':''}).up({isTransactionActive:true,query:async(sql,args)=>(await query(sql,args)).rows},${mode==='plan'});
+  stage='finish';
+  await query(${JSON.stringify(mode==='plan'?'ROLLBACK':'COMMIT')});
   console.log(JSON.stringify(result??{applied:true,administrativeScopeOnly:true}));
 } catch(error) {
   try{await client.query('ROLLBACK')}catch{}
   const message=typeof error.message==='string'&&/^PH_(?:PURGE|DEV|MEDIA)_[A-Z_]+(?::[a-zA-Z0-9_.]+)?$/.test(error.message)?error.message:'PH_PURGE_FAILED';
-  console.error(message);process.exitCode=1;
+  const code=typeof error.code==='string'&&/^[0-9A-Z]{5}$/.test(error.code)?error.code:'unknown';
+  console.error(message+' stage='+stage+' code='+code+' query_sha256='+queryHash);process.exitCode=1;
 } finally {try{await client.end()}catch{process.exitCode=1}}
 `;
   const payload=Buffer.from(source+entry).toString('base64');

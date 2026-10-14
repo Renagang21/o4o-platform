@@ -79,3 +79,40 @@ test('the actual workflow rejects mixed flags, wrong owner/ref, invalid mode and
     assert.ok(proxy.if.includes('inputs.domain_detachment != true'));
   } finally {rmSync(dir,{recursive:true,force:true});}
 });
+
+// Execute the generated worker, including its catch/rollback path, without a real DB.
+test('worker diagnostics preserve failing SQL fingerprint and redact database payloads',async()=>{
+  const {createHash}=await import('node:crypto');
+  const sql='SELECT fixture';
+  const {args}=jobArguments({...input,source:`export class PharmacyHubAdministrativePurge {
+    async up(runner){ await runner.query('${sql}',['private parameter']); }
+  }`});
+  const payload=Buffer.from(args.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
+  const executable=payload.replace('export class','class').replace("import {createRequire} from 'node:module';",'')
+    .replace("import {createHash as diagnosticHash} from 'node:crypto';",'');
+  for(const failure of ['connect','begin','purge','finish']) {
+    const calls=[],errors=[];
+    class Client {
+      async connect(){if(failure==='connect')throw Object.assign(new Error('private host'),{code:'08006'});}
+      async query(text){
+        calls.push(text);
+        if((failure==='begin'&&text.startsWith('BEGIN'))||(failure==='purge'&&text===sql)||
+          (failure==='finish'&&text==='ROLLBACK'&&calls.filter(x=>x==='ROLLBACK').length===1))
+          throw Object.assign(new Error('private SQL detail'),{code:'42703',detail:'private row'});
+        return {rows:[]};
+      }
+      async end(){}
+    }
+    const fakeProcess={env:{},exitCode:0};
+    const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
+    await new AsyncFunction('createRequire','diagnosticHash','console','process',executable)(
+      ()=>()=>({Client}),createHash,{error:x=>errors.push(x),log:()=>{}},fakeProcess);
+    assert.equal(fakeProcess.exitCode,1);
+    assert.equal(errors.length,1);
+    assert.match(errors[0],new RegExp('^PH_PURGE_FAILED stage='+failure+' code='));
+    assert.ok(!errors[0].includes('private'));
+    if(failure==='purge')assert.ok(errors[0].endsWith('query_sha256='+createHash('sha256').update(sql).digest('hex')));
+    if(failure==='connect')assert.ok(errors[0].endsWith('query_sha256=none'));
+    assert.ok(calls.includes('ROLLBACK'));
+  }
+});
