@@ -860,6 +860,38 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(coord.transitioned).toEqual([]);
   });
 
+  it('완료 선언 재전송(응답 유실) — 이미 completed 인 Task · run 이면 같은 완료 응답 · 새 Task 없음 · 실행 없음', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d8')));
+    const taskId = first.task!.taskId;
+    tasks.get(taskId)!.status = 'completed'; // 첫 선언이 이미 닫았다
+    const store = jest.requireMock('../services/assistant/assistant-task-store.js') as { findTaskIdByRun: jest.Mock };
+    store.findTaskIdByRun.mockResolvedValueOnce(taskId);
+    coord.mock = true;
+    coord.stored = { runId: 'g_d8', userId: ME, status: 'completed', version: 6 };
+    const createsBefore = storeCalls.filter((c: any) => c[0] === 'create').length;
+    const exec = jest.fn();
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d8' } }, exec);
+    expect(exec).not.toHaveBeenCalled();
+    expect(out.task).toEqual({ taskId, status: 'completed' });
+    expect(out.reply.body.data).toMatchObject({ runId: 'g_d8', progress: 'completed', goal: { status: 'completed' } });
+    expect(storeCalls.filter((c: any) => c[0] === 'create').length).toBe(createsBefore);
+    expect(coord.transitioned).toEqual([]);
+  });
+
+  it('완료 선언 재전송이라도 run 이 completed 가 아니면 되살리지 않는다', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d9')));
+    const taskId = first.task!.taskId;
+    tasks.get(taskId)!.status = 'completed';
+    const store = jest.requireMock('../services/assistant/assistant-task-store.js') as { findTaskIdByRun: jest.Mock };
+    store.findTaskIdByRun.mockResolvedValueOnce(taskId);
+    coord.mock = true;
+    coord.stored = { runId: 'g_d9', userId: ME, status: 'taken_over', version: 3 };
+    const exec = jest.fn(async (): Promise<WorkExecutionReply> => ({ status: 200, body: { success: true, data: { runId: null } } }));
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d9' } }, exec);
+    expect(exec).toHaveBeenCalledTimes(1);
+    expect(out.task?.taskId).not.toBe(taskId);
+  });
+
   it('"됐어요" 여도 종결 run 이 남의 것이면 선언으로 닫지 않는다', async () => {
     const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d5')));
     coord.mock = true;
