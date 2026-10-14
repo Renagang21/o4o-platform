@@ -1,8 +1,10 @@
 # AI 누적 통합·배포 검증
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일 / 최종 갱신**: 2026-10-14 (Asia/Seoul)
 > **실행 WO**: [AI 누적 정비 main 통합·배포](../work-orders/WO-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)
+
+> **최종 결과**: PR #557 main 반영, 승인된 quota migration·7개 서비스 verified 배포 SUCCESS, 배포 후 HTTP 16/16 PASS. 아래 승인 대기·실패 기록은 당시 이력이며 마지막 완료 절이 현재 결과다. 최신 Sonar 재분석 등급과 실계정 비용 집계는 미확인이다.
 
 ## Shared Module Change Verification
 
@@ -123,3 +125,25 @@ Codex P2 `4265707175`/`4265707181`의 두 회귀를 재현했다. 혼합 대소�
 - 최신 URL/업무 Extension 회귀 **3 suites / 82 tests PASS**(URL 26 포함), 변경 lint 오류/경고 0. tsc→database backup→tsup(main/migrate)→restore 및 Node syntax/compiled migration/config 검사 PASS. Node/기존 Work tests와 중복 합산하지 않는다. 일반 212개 스타일·cognitive complexity 전체 정비는 이번 범위에 추가하지 않는다.
 
 외부 Sonar API 403은 계속되지만 확인 가능한 Security B의 실제 원인을 이제 확보·수정했다. 최종 원격 등급/issue 상태는 최신 source 재분석이 필요하며 과거 B/D 분석을 PASS로 바꾸지 않는다. 사용자 지시의 운영 quota migration 승인과 재배포는 유지한다.
+
+
+## 승인된 운영 적용 최종 증거 — 2026-10-14
+
+| 확인 항목 | 관찰 결과 |
+| --- | --- |
+| Source/main | [PR #557](https://github.com/Renagang21/o4o-platform/pull/557) MERGED; source `70582ba251d936627bc13323cd4ea581149be28b`, target `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`; tree 차이 0/ancestry 확인 |
+| 원격 gate | [PR CI 38495834324](https://github.com/Renagang21/o4o-platform/actions/runs/38495834324)·[main CI 38496785481](https://github.com/Renagang21/o4o-platform/actions/runs/38496785481)·[main CodeQL 38496785535](https://github.com/Renagang21/o4o-platform/actions/runs/38496785535) SUCCESS, required CI Gate PASS, 미해결 review thread 0 |
+| 실행 직전 | 자동 Delivery `38497609048` HELD_LEVEL_3 / mutation SKIPPED, 다른 production mutation 없음, serving→target DB delta는 승인된 quota migration·등록 manifest/fingerprint뿐 |
+| 표준 Promote | [38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074) SUCCESS; `ref=main`, 위 target, `dry_run=false`, 서비스 제한 없음 |
+| 실제 운영 migration | API job의 **Run database migrations SUCCESS**. 정상 up이며 rollback/archive repair·purge·seed/delete 없음 |
+| API traffic | 실제 bundled build/image push·Cloud Run deploy·새 revision readiness·traffic 전환 모두 SUCCESS |
+| 의존 frontend | API 성공 후 admin·neture·kpa-society·lecture·store·kpa-branch 각각 verified rollout SUCCESS |
+| 최종 serving 확인 | Report SUCCESS, target의 `production` = **success / DEPLOYED · deploy: api,admin,neture,kpa-society,lecture,store,kpa-branch** |
+| 배포 후 API HTTP | `/health`·`/health/ready` 200, 관리 quota/status GET 미인증 401 = 4/4 PASS |
+| 배포 후 웹 HTTP | admin/neture/kpa/study/store/community 공개 HTML 6 + 각 동일 host JS 6 = 12/12 PASS |
+
+배포 전후 동일한 읽기 전용 HTTP 점검은 각각 **16/16 PASS**. 이전 실패 `38491966980`의 migration SKIPPED와 이번 실제 migration SUCCESS를 구분한다. 정상 migration CLI는 pre-state 및 post-migration 등록 fingerprint 검증 실패 시 exit 1이며 workflow가 성공 후에만 API 배포한다. 이 환경에서는 Cloud Run stdout/상세 artifact를 직접 확보하지 못했으므로 실행 수·이름 목록·실측 fingerprint hash를 확인한 것으로 기록하지 않는다. source delta 1개와 실제 로그의 실행 건수는 다른 증거다.
+
+보안 원인 수정 및 운영 quota 기반 적용은 완료다. 최신 Sonar 원격 등급/issue 상태는 API 403 때문에 미확인, 테스트 계정 SSOT 누락으로 실계정 사용량·비용/한도·유료 AI 호출은 미실시, Windows Git 경로 실행도 미실시다. 익명 HTTP 검사·isolated PostgreSQL 검증을 실계정 검증으로 보고하지 않는다. 외부 서비스 계약/운영 인증·CI 설정·사업/메뉴/권한 계약 변경 없음.
+
+문서 정합: 현재 WO/CHECK를 COMPLETED로 정렬하고 최종 운영 증거를 추가했다. 이전 승인 대기/실패와 선행 완료 이력·canonical/index는 보존한다. 최종 증거 기록 변경은 문서-only로 **DEPLOYMENT=NOT_APPLICABLE**이며 위 runtime target을 다시 배포할 이유가 없다.

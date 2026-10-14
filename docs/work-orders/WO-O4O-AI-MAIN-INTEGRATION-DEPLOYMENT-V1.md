@@ -1,9 +1,11 @@
 # AI 누적 정비 main 통합·배포 실행
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일 / 최종 갱신**: 2026-10-14 (Asia/Seoul)
 > **요청**: 앞 push-only 완료 후 사용자 추가 지시: main 병합·배포
 > **선행 이력**: [코드 정비 완료 WO](WO-O4O-AI-COMPLEXITY-COMPLETION-V1.md) · [기존 소비처 CHECK](../checks/CHECK-O4O-AI-COMPLEXITY-MAINTENANCE-V1.md)
+
+> **최종 결과**: PR #557 main 반영, 승인된 quota migration·7개 서비스 verified 배포 SUCCESS, 배포 후 HTTP 16/16 PASS. 아래 승인 대기·실패 기록은 당시 이력이며 마지막 완료 절이 현재 결과다. 최신 Sonar 재분석 등급과 실계정 비용 집계는 미확인이다.
 
 ## 범위·실행 기준
 
@@ -39,7 +41,7 @@ AGENTS §4-1(e/f/g), README Delivery, 실제 main ruleset, [운영 migration 기
 - [x] 통합 runtime·accounting/provider/Extension·boundary·isolated quota DB·build/lint 검증.
 - [x] PR CI·Codex blocker/미해결 thread·최신 main 위치 검토 후 병합.
 - [x] post-merge CI/Delivery 판정 및 운영 migration 승인 조건 확인.
-- [ ] 정상 verified 배포·serving SHA/revision·HTTP smoke·문서 정합 확인.
+- [x] 정상 verified 배포·serving SHA 확인·새 revision readiness/traffic gate·HTTP smoke·문서 정합 확인.
 
 테스트 DB는 cached official PostgreSQL 15의 이번 세션 전용 container로 localhost fixture 포트만 노출한다. 운영 connection 설정을 읽거나 사용하지 않는다. 운영 계정 파일은 누락되어 사용자별 업무 write smoke는 별도로 구분한다. GitHub variable 조회는 integration 권한 403이므로 freeze 값을 추정/변경하지 않고 실제 Delivery gate 결과로 확인한다.
 
@@ -161,3 +163,19 @@ Codex P2 `4265707175`/`4265707181`의 두 회귀를 재현했다. 혼합 대소�
 - 최신 URL/업무 Extension 회귀 **3 suites / 82 tests PASS**(URL 26 포함), 변경 lint 오류/경고 0. tsc→database backup→tsup(main/migrate)→restore 및 Node syntax/compiled migration/config 검사 PASS. Node/기존 Work tests와 중복 합산하지 않는다. 일반 212개 스타일·cognitive complexity 전체 정비는 이번 범위에 추가하지 않는다.
 
 외부 Sonar API 403은 계속되지만 확인 가능한 Security B의 실제 원인을 이제 확보·수정했다. 최종 원격 등급/issue 상태는 최신 source 재분석이 필요하며 과거 B/D 분석을 PASS로 바꾸지 않는다. 사용자 지시의 운영 quota migration 승인과 재배포는 유지한다.
+
+
+## 승인된 운영 적용 완료 — 2026-10-14
+
+- [PR #557](https://github.com/Renagang21/o4o-platform/pull/557) MERGED. 검증 source `70582ba251d936627bc13323cd4ea581149be28b`, main/운영 target `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`; source/main tree 차이 0 및 ancestry 확인. PATH 실행 경고, Reliability 6개, 실제 tsup 타입 reexport blocker 및 제목 metadata 성능/예외 회귀를 포함한다. 범위 밖 212개 전체 정비는 수행하지 않았다.
+- [최종 PR CI 38495834324](https://github.com/Renagang21/o4o-platform/actions/runs/38495834324) SUCCESS, CI Gate·API 3 shards·품질·admin build·CodeQL PASS, 미해결 review thread 0. [main CI 38496785481](https://github.com/Renagang21/o4o-platform/actions/runs/38496785481) 및 [main CodeQL 38496785535](https://github.com/Renagang21/o4o-platform/actions/runs/38496785535) SUCCESS. ruleset 우회·force push·검사 완화 없음.
+- 자동 Delivery `38497609048`은 classify SUCCESS / HELD_LEVEL_3, mutation jobs SKIPPED였다. 동시 production mutation 없음·정확한 main/CI·serving→target DB delta를 재확인했다. DB delta는 승인된 `CreateAiUsageReservations1791870434349`와 등록 manifest/fingerprint뿐이다. 2026-10-14T01:51:14Z에 표준 Promote를 `ref=main`, 위 target, `dry_run=false`, 서비스 제한 없이 dispatch했다.
+- [Promote 38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074) **SUCCESS**. 실제 API bundled build/image push·**Run database migrations SUCCESS** 이후 새 revision Ready 검사·traffic 전환 SUCCESS. API 성공 뒤 admin·neture·kpa-society·lecture·store·kpa-branch 6개 verified 배포가 모두 SUCCESS다. 최종 serving SHA 재조회 Report SUCCESS, target의 `production` commit status는 **success / DEPLOYED · deploy: api,admin,neture,kpa-society,lecture,store,kpa-branch**다.
+- migration job은 정상 CLI의 pre-state 판정·post-migration 등록 schema fingerprint assertion을 강제하며 성공 후에만 API 배포한다. Cloud Run stdout/상세 artifact는 이 환경에서 직접 확보하지 못했으므로 실행 수·이름 목록·실측 fingerprint hash를 로그 관찰값으로 만들지 않는다. 승인된 정상 up의 운영 적용 근거는 해당 migration job 및 후속 rollout 성공이다. 운영 rollback/archive repair·purge·seed/delete는 실행하지 않았다.
+- 배포 후 읽기 전용 HTTP **16/16 PASS**: API `/health`·`/health/ready` 200, 웹 6개 HTML·각 동일 host JS 12개 200, `/api/ai/admin/quotas`·`/api/ai/admin/quotas/status` 미인증 401. 배포 전의 같은 16개 점검도 PASS였다. 응답 원문·실제 업무 데이터·credential은 저장소에 기록하지 않는다.
+
+### 완료 범위·후속 확인
+
+사용자 제공 PR #549 화면의 Security B 원인을 확보하고 수정했으며, 비용·quota 기반을 운영에 적용했다. 외부 Sonar API는 계속 403이므로 최신 등급/issue closed 상태를 PASS로 단정하지 않는다. 최신 main을 재분석해 확인하는 일은 후속 검증이다. 테스트 계정 SSOT가 본인·기준 checkout 모두 없어 실계정/유료 AI 호출에 의한 사용량·비용·quota 차단 검증은 미실시다. 이를 익명 HTTP guard 점검이나 isolated PostgreSQL 회귀 결과로 대체하지 않는다. Windows 고정 Git 경로 실행도 미실시다.
+
+문서 정합: 본 WO/CHECK의 현재 결과·TODO·상태를 운영 증거와 맞췄다. 이전 승인 대기·초기 실패·선행 COMPLETED 이력은 보존하고 canonical/index 및 사업·권한·메뉴·운영 인증/배포 설정은 변경하지 않았다. 마지막 결과 기록은 문서-only이며 추가 runtime 배포 대상이 아니다.
