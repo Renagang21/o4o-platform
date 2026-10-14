@@ -24,6 +24,7 @@
 - [x] 실패/성공/예외/중복/취소/권한/대상 보존 조건으로 TODO 보완.
 - [x] 실패를 먼저 재현하는 화면 회귀 테스트.
 - [x] 최소 수정, focused 회귀·타입·빌드·desktop/mobile fixture 검증.
-- [ ] CHECK·전체 TODO 정합, commit/push·PR 기술 gate 확인.
+- [x] CHECK·전체 TODO 정합, 구현 commit/push·PR #555 생성.
+- [ ] PR 기술 gate·main 통합·배포 판정 확인.
 
 실계정 검증은 사용자 담당이다. 기존 PR #544의 병합·배포 완료는 별도로 확인한다.

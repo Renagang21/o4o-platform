@@ -260,7 +260,7 @@ export default function ProductServiceApprovalPage() {
 
   const handleDecisionConfirm = async (decision: ServiceApprovalDecision) => {
     const target = decision === 'approve' ? approveTarget : rejectTarget;
-    if (!target || !canManage || decisionWriting.current) return;
+    if (!target || !canManage || decisionWriting.current || deleteWriting.current) return;
     const isBatch = target === 'batch';
     const ids = [...selectedPendingIds];
     if (isBatch && ids.length === 0) return;

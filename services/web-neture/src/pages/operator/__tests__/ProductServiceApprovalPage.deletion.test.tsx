@@ -98,3 +98,14 @@ it('keeps the captured target during writing and does not close a different curr
   expect(screen.getByText('상품명')).toBeTruthy();
   expect(api.deletePendingOffer).toHaveBeenCalledWith('offer-a');
 });
+
+it('blocks an already-open approval confirmation while deletion is writing', async () => {
+  let finish!: (result: {success: boolean; error?: string}) => void;
+  api.deletePendingOffer.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  render(<Page />); await screen.findByText('검증상품-a');
+  fireEvent.click(screen.getByRole('button', { name: '승인', exact: true }));
+  fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true })); confirmDelete();
+  fireEvent.click(within(screen.getByRole('dialog', { name: '상품 승인', exact: true })).getByRole('button', { name: '승인 확인' }));
+  expect(api.approve).not.toHaveBeenCalled();
+  finish({success: false, error: 'NOT_PENDING'}); await screen.findByRole('alert');
+});
