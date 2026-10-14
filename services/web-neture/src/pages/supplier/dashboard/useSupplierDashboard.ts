@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   supplierCopilotApi,
   supplierApi,
@@ -34,6 +34,10 @@ import {
 } from './presentation';
 
 export function useSupplierDashboard() {
+  const metricsRequest = useRef(0);
+  useEffect(() => () => {
+    metricsRequest.current += 1;
+  }, []);
   // 운영 현황
   const [kpi, setKpi] = useState<SupplierKpiSummary | null>(null);
   const [orderKpi, setOrderKpi] = useState<SupplierOrderKpi | null>(null);
@@ -68,6 +72,8 @@ export function useSupplierDashboard() {
     useState<ContentDistributionFailures>(NO_CD_FAILURE);
 
   const fetchData = useCallback(async () => {
+    // Invalidate old metrics even if this refresh fails its primary permission check.
+    const request = ++metricsRequest.current;
     setLoading(true);
     setError(null);
     setOpsFailed(NO_OPS_FAILURE);
@@ -190,11 +196,14 @@ export function useSupplierDashboard() {
       supplierCopilotApi.getTrendingProducts(),
     ])
       .then(([products, stores, growth]) => {
+        if (request !== metricsRequest.current) return;
         setPerformance(products);
         setDistribution(stores);
         setTrending(growth);
       })
-      .catch(() => setMetricsFailed(true));
+      .catch(() => {
+        if (request === metricsRequest.current) setMetricsFailed(true);
+      });
 
     setLoading(false);
   }, []);

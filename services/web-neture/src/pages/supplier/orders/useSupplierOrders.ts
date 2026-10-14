@@ -1,8 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supplierApi, type OrderSummaryResponse } from '../../../lib/api';
 import type { UnifiedSupplierOrder } from '../../../lib/api/supplier';
 
 export function useSupplierOrders() {
+  const unifiedRequest = useRef(0);
+  useEffect(() => () => {
+    unifiedRequest.current += 1;
+  }, []);
   const [data, setData] = useState<OrderSummaryResponse>({
     services: [],
     totalApprovedSellers: 0,
@@ -43,6 +47,7 @@ export function useSupplierOrders() {
   }, []);
 
   const fetchUnified = useCallback(async () => {
+    const request = ++unifiedRequest.current;
     setUnifiedLoading(true);
     setUnifiedError(false);
     try {
@@ -51,14 +56,16 @@ export function useSupplierOrders() {
         limit: 20,
         source: sourceFilter,
       });
+      if (request !== unifiedRequest.current) return;
       setUnifiedOrders(result.data);
       setUnifiedTotal(result.meta.total);
     } catch {
+      if (request !== unifiedRequest.current) return;
       setUnifiedOrders([]);
       setUnifiedTotal(0);
       setUnifiedError(true);
     } finally {
-      setUnifiedLoading(false);
+      if (request === unifiedRequest.current) setUnifiedLoading(false);
     }
   }, [sourceFilter]);
 

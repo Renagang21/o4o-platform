@@ -13,6 +13,13 @@ import {
 } from './productListFeedback';
 
 export function useSupplierProducts() {
+  // Search/filter requests may finish out of order. Rows and counts stay independent.
+  const productsRequest = useRef(0);
+  const countsRequest = useRef(0);
+  useEffect(() => () => {
+    productsRequest.current += 1;
+    countsRequest.current += 1;
+  }, []);
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
   const [keyword, setKeyword] = useState('');
@@ -125,6 +132,7 @@ export function useSupplierProducts() {
   // getProductsPaginated 는 조회 실패 시 throw 한다. 실패를 빈 목록으로 렌더하지 않고 loadError 로 분리한다.
   const fetchProducts = useCallback(
     async (page = 1, searchKeyword?: string) => {
+      const request = ++productsRequest.current;
       setLoading(true);
       const kw = searchKeyword !== undefined ? searchKeyword : keyword;
       try {
@@ -138,18 +146,20 @@ export function useSupplierProducts() {
           completenessStatus: filterCompleteness || undefined,
           serviceApprovalStatus: activeTab === 'all' ? undefined : activeTab,
         });
+        if (request !== productsRequest.current) return;
         setProducts(result.data);
         setPagination(result.pagination);
         setSelectedIds(new Set());
         setDrawerProduct(null);
         setLoadError(false);
       } catch {
+        if (request !== productsRequest.current) return;
         setProducts([]);
         setSelectedIds(new Set());
         setDrawerProduct(null);
         setLoadError(true);
       } finally {
-        setLoading(false);
+        if (request === productsRequest.current) setLoading(false);
       }
     },
     [
@@ -169,6 +179,7 @@ export function useSupplierProducts() {
   //   카운트 조회 실패는 throw 된다. 목록(loadError)과 **독립된** 상태로 관리해
   //   한쪽 실패가 다른 쪽을 덮어쓰지 않게 한다. 실패 시 0 으로 표시하지 않는다.
   const fetchTabCounts = useCallback(async () => {
+    const request = ++countsRequest.current;
     setCountsError(false);
     try {
       const counts = await supplierApi.getApprovalCounts({
@@ -178,8 +189,10 @@ export function useSupplierProducts() {
         barcodeSource: filterBarcodeSource || undefined,
         completenessStatus: filterCompleteness || undefined,
       });
+      if (request !== countsRequest.current) return;
       setTabCounts(counts);
     } catch {
+      if (request !== countsRequest.current) return;
       setTabCounts(null);
       setCountsError(true);
     }
