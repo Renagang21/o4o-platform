@@ -283,6 +283,12 @@ export async function runWorkAgent(
    * QUESTION 으로 돌린다 — 그 경우 답하면 같은 runId 로 이어간다. never-escalate(credential·commit 등)는 여기 그대로 인계다.
    */
   const takeover = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> => {
+    // Automation still stops at COMMIT. A verified Assistant contract may await the user's own completion.
+    if (reason === 'commit_required' && input.judge && input.intent?.understanding?.commitBoundary) {
+      sessions.task?.setAsk({ kind: 'success_confirmation', slots: [] });
+      neededInput = '최종 저장·제출·확정은 직접 진행해 주세요. 요청한 결과까지 완료되면 알려 주세요.';
+      return question(reason);
+    }
     if (QUESTION_TAKEOVER_REASONS.has(reason)) return question(reason);
     if (terminalKind === null) terminalKind = 'takeover';
     state.takeover = { reason, step: state.stepCount };

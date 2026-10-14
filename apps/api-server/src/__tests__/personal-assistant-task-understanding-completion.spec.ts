@@ -419,6 +419,20 @@ const DONE = { assessment: 'completed', action: { kind: 'done' } };
 const DONE_EV = (quote: string, criterion = 'c1') => ({ assessment: 'completed', action: { kind: 'done' }, evidence: [{ criterion, source: 'screen', quote }] });
 
 describe('③ runtime — done 은 주장일 뿐 · Assistant 가 조건과 근거로 판정', () => {
+  it('commit handoff waits for user completion of the original task without executing the commit', async () => {
+    const u = U([C2_USER], { commitBoundary: true });
+    const intent = planAssistantTask({ ...BASE, understanding: u }).intent;
+    const proposal = { assessment: 'blocked', action: { kind: 'takeover', reason: 'commit_required' } };
+    const result = await run(scripted([proposal]), SEARCH, intent, createCompletionJudge(u));
+    expect(result.goal.status).toBe('waiting_for_user');
+    expect(result.resumable).toBe(true);
+    expect(result.takeover?.reason).toBe('commit_required');
+    expect(result.neededInput).toContain('직접');
+    expect(judgeTaskStatus(intent.completion, result.report!)).toBe('waiting_for_user');
+    const direct = await run(scripted([proposal]), SEARCH, intent);
+    expect(direct.goal.status).toBe('taken_over');
+    expect(direct.resumable).toBe(false);
+  });
   it('근거 없는 done → continue(이유가 다음 계획에 실린다) → 실제 읽은 글 인용 → complete', async () => {
     const u = U([{ id: 'c1', text: '아모디핀정 5mg 의 성분이 보인다', evidence: 'observed' }]);
     const intent = planAssistantTask({ ...BASE, understanding: u }).intent;
