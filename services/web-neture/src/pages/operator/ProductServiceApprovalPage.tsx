@@ -13,22 +13,19 @@
  * - 거절 시 사유 입력 모달
  */
 
-import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   operatorServiceApprovalApi,
   type ServiceApprovalItem,
-  type ServiceApprovalStats,
-  type ApprovalAnalytics,
 } from '../../lib/api/serviceApproval';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { useAuth } from '../../contexts/AuthContext';
-import { buildServiceApprovalListParams, getSelectedPendingServiceApprovalIds } from './productServiceApprovalModel';
+import { useProductServiceApprovalQuery } from './useProductServiceApprovalQuery';
 import { getServiceApprovalDecisionOutcome, type ServiceApprovalDecision, type ServiceApprovalDecisionOutcome } from './serviceApprovalDecisionResult';
 import { ProductServiceApprovalDrawer } from './ProductServiceApprovalDrawer';
 import { ProductServiceApprovalDecisionModal } from './ProductServiceApprovalDecisionModal';
 import { STATUS_BADGE, getRegulatoryBadge, getCompletenessBadge, hasPermitRisk, formatPrice, getQualityFlags, getRecommendation } from './productServiceApprovalPresentation';
-import { useLatestRequest } from '../../hooks/useLatestRequest';
 
 // ==================== Constants ====================
 
@@ -53,37 +50,16 @@ export default function ProductServiceApprovalPage() {
     (r: string) => r === 'neture:admin' || r === 'neture:operator' || r === 'platform:super_admin',
   ) ?? false;
 
-  // Data
-  const [items, setItems] = useState<ServiceApprovalItem[]>([]);
-  const [stats, setStats] = useState<ServiceApprovalStats>({ pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 });
-  const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 0 });
-  const [loading, setLoading] = useState(true);
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-  const [analyticsResult, setAnalyticsResult] = useState<{ scope: string; data: ApprovalAnalytics | null } | null>(null);
-  const analytics = analyticsResult?.data ?? null;
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [analyticsPeriod, setAnalyticsPeriod] = useState<'all' | '7d' | '30d'>('all');
-
-  // Filters — URL param으로 초기 상태 결정 (Dashboard 링크 연동)
-  const [statusFilter, setStatusFilter] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status');
-    return s && ['pending', 'approved', 'rejected'].includes(s) ? s : 'all';
-  });
-  const [serviceFilter, setServiceFilter] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
-  const [scoreRange, setScoreRange] = useState<'' | 'low' | 'mid' | 'high'>('');
-  const [filterHasIssues, setFilterHasIssues] = useState(false);
-  // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: priority filter
-  const [priorityFilter, setPriorityFilter] = useState<'' | 'HIGH' | 'MEDIUM' | 'LOW'>('');
-  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Selection
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const {
+    items, stats, pagination, loading, permissionError,
+    analyticsResult, analytics, showAnalytics, setShowAnalytics, analyticsPeriod,
+    setAnalyticsPeriod, analyticsScope, statusFilter, setStatusFilter, serviceFilter,
+    setServiceFilter, searchInput, dateFrom, setDateFrom, dateTo,
+    setDateTo, scoreRange, setScoreRange, filterHasIssues, setFilterHasIssues,
+    priorityFilter, setPriorityFilter, selectedIds, setSelectedIds, selectedPendingIds,
+    fetchData, refreshData, applySearch, handleSearchChange, toggleSelect,
+    toggleSelectAll,
+  } = useProductServiceApprovalQuery(user?.id);
 
   // Actions
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -117,132 +93,16 @@ export default function ProductServiceApprovalPage() {
     return () => { deleteMounted.current = false; };
   }, []);
 
+  const [trashError, setTrashError] = useState<string | null>(null);
+  const trashWriting = useRef(false);
+
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
-
-  // 목록과 분석의 요청 채널을 분리해 각 응답 순서를 관리한다.
-  const listScope = JSON.stringify([user?.id ?? null, statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
-  const analyticsScope = JSON.stringify([user?.id ?? null, analyticsPeriod]);
-  const beginListRequest = useLatestRequest(listScope);
-  const beginAnalyticsRequest = useLatestRequest(analyticsScope);
-  const activeList = useRef<{ scope: string; page: number; fetch: ((page?: number) => Promise<void>) | null }>({ scope: listScope, page: 1, fetch: null });
-
-  // ==================== Data Fetching ====================
-
-  const fetchData = useCallback(async (page = 1) => {
-    // 이전 조건을 캡처한 callback은 새 조건의 유효 요청도 무효화하지 않는다.
-    if (activeList.current.scope !== listScope) return;
-    const isCurrent = beginListRequest();
-    if (!isCurrent()) return;
-    activeList.current.page = page;
-    setLoading(true);
-    setPermissionError(null);
-    try {
-      const [listResult, statsResult] = await Promise.all([
-        operatorServiceApprovalApi.list(buildServiceApprovalListParams({
-          statusFilter, serviceFilter, searchQuery, dateFrom, dateTo,
-          scoreRange, filterHasIssues, priorityFilter,
-        }, page)),
-        operatorServiceApprovalApi.stats(),
-      ]);
-      if (!isCurrent()) return;
-      activeList.current.page = listResult.pagination.page;
-      setItems(listResult.data);
-      setPagination(listResult.pagination);
-      setStats(statsResult);
-      setSelectedIds(new Set());
-    } catch (err: any) {
-      if (isCurrent()) setPermissionError(err?.message || '데이터를 불러올 수 없습니다');
-    } finally {
-      if (isCurrent()) setLoading(false);
-    }
-  }, [listScope, beginListRequest, statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
-
-  useLayoutEffect(() => {
-    const current = activeList.current;
-    if (current.scope !== listScope) {
-      current.scope = listScope;
-      current.page = 1;
-    }
-    current.fetch = fetchData;
-  }, [listScope, fetchData]);
-
-  const refreshData = useCallback((page?: number) => {
-    const current = activeList.current;
-    return current.fetch?.(page ?? current.page);
-  }, []);
-
-  useEffect(() => {
-    fetchData(1);
-  }, [fetchData]);
-
-  // 분석은 목록과 독립적인 최신 기간의 결과만 반영한다.
-  useEffect(() => {
-    const isCurrent = beginAnalyticsRequest();
-    operatorServiceApprovalApi.analytics(analyticsPeriod)
-      .then(data => {
-        if (!isCurrent()) return;
-        setAnalyticsResult({ scope: analyticsScope, data });
-        setShowAnalytics(!!data);
-      })
-      .catch(() => {
-        if (!isCurrent()) return;
-        setAnalyticsResult({ scope: analyticsScope, data: null });
-        setShowAnalytics(false);
-      });
-  }, [analyticsPeriod, analyticsScope, beginAnalyticsRequest]);
-
-  const cancelSearchTimer = useCallback(() => {
-    if (searchTimer.current !== null) {
-      clearTimeout(searchTimer.current);
-      searchTimer.current = null;
-    }
-  }, []);
-
-  useEffect(() => cancelSearchTimer, [cancelSearchTimer]);
-
-  const applySearch = (value: string) => {
-    cancelSearchTimer();
-    setSearchInput(value);
-    setSearchQuery(value);
-  };
-
-  // Search debounce
-  const handleSearchChange = (value: string) => {
-    setSearchInput(value);
-    cancelSearchTimer();
-    searchTimer.current = setTimeout(() => {
-      searchTimer.current = null;
-      setSearchQuery(value);
-    }, 300);
-  };
-
-  // ==================== Selection ====================
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === items.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(items.map((i) => i.id)));
-    }
-  };
-
-  // Only pending items can be batch-acted on
-  const selectedPendingIds = getSelectedPendingServiceApprovalIds(items, selectedIds);
 
   // ==================== Actions ====================
 
   const openDecision = (decision: ServiceApprovalDecision, target: string) => {
-    if (decisionWriting.current || deleteWriting.current) return;
+    if (decisionWriting.current || deleteWriting.current || trashWriting.current) return;
     setDecisionError(null);
     setDecisionNotice(null);
     if (decision === 'approve') {
@@ -260,7 +120,7 @@ export default function ProductServiceApprovalPage() {
 
   const handleDecisionConfirm = async (decision: ServiceApprovalDecision) => {
     const target = decision === 'approve' ? approveTarget : rejectTarget;
-    if (!target || !canManage || decisionWriting.current || deleteWriting.current) return;
+    if (!target || !canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
     const isBatch = target === 'batch';
     const ids = [...selectedPendingIds];
     if (isBatch && ids.length === 0) return;
@@ -326,13 +186,13 @@ export default function ProductServiceApprovalPage() {
 
   // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
   const openDelete = (item: ServiceApprovalItem) => {
-    if (!canManage || decisionWriting.current || deleteWriting.current) return;
+    if (!canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
     setDeleteError(null);
     setDeleteTarget({ offerId: item.offerId, productName: item.productName || '(이름 없음)' });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteTarget || !canManage || deleteWriting.current || decisionWriting.current) return;
+    if (!deleteTarget || !canManage || deleteWriting.current || decisionWriting.current || trashWriting.current) return;
     const { offerId } = deleteTarget;
     deleteWriting.current = true;
     setDeleteLoading(true);
@@ -357,6 +217,31 @@ export default function ProductServiceApprovalPage() {
     if (deleted && deleteMounted.current) await refreshData();
   };
 
+  const handleMoveToTrash = async (item: ServiceApprovalItem) => {
+    if (!canManage || decisionWriting.current || deleteWriting.current || trashWriting.current) return;
+    if (!confirm(`"${item.productName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
+    trashWriting.current = true;
+    setActionLoading(item.id);
+    setTrashError(null);
+    let deleted = false;
+    try {
+      const result = await productCleanupApi.softDelete(item.offerId);
+      if (!deleteMounted.current) return;
+      if (!result.success) {
+        setTrashError(`휴지통으로 이동하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        return;
+      }
+      setDrawerItem(current => current?.offerId === item.offerId ? null : current);
+      deleted = true;
+    } catch {
+      if (deleteMounted.current) setTrashError('휴지통 이동 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+    } finally {
+      trashWriting.current = false;
+      if (deleteMounted.current) setActionLoading(null);
+    }
+    if (deleted && deleteMounted.current) await refreshData(1);
+  };
+
   // ==================== Render ====================
 
   return (
@@ -374,6 +259,8 @@ export default function ProductServiceApprovalPage() {
           {decisionNotice.message}
         </div>
       )}
+
+      {trashError && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{trashError}</p>}
 
       {/* KPI Bar */}
       <div className="grid grid-cols-5 gap-3 mb-6">
@@ -832,14 +719,8 @@ export default function ProductServiceApprovalPage() {
                     </>
                   ) : item.approvalStatus === 'approved' ? (
                     <button
-                      onClick={async () => {
-                        if (!confirm(`"${item.productName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
-                        setActionLoading(item.id);
-                        const res = await productCleanupApi.softDelete(item.offerId);
-                        setActionLoading(null);
-                        if (res.success) refreshData(1);
-                      }}
-                      disabled={!canManage || actionLoading === item.id}
+                      onClick={() => handleMoveToTrash(item)}
+                      disabled={!canManage || decisionBusy || deleteLoading}
                       className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
                       title="삭제 (휴지통으로 이동)"
                     >
