@@ -118,7 +118,8 @@ describe('runAssistantWorkTask', () => {
     expect(tasks.size).toBe(1);
     expect(runs.get('g_new')?.taskId).toBe(out.task?.taskId);
     // 실행 본체에는 원문이 그대로 간다 + Phase B: Assistant 의 실행 지시(구조만)가 함께 간다
-    expect(exec).toHaveBeenCalledWith(ME, { request: SENTINEL }, expect.objectContaining({ version: 1, taskId: out.task?.taskId }));
+    //   + Task 이해 · 완료 판정: 이해가 있으면 Assistant 완료 판정기가 4번째 인자로 간다
+    expect(exec).toHaveBeenCalledWith(ME, { request: SENTINEL }, expect.objectContaining({ version: 1, taskId: out.task?.taskId }), expect.any(Function));
     const upd = storeCalls.find((c: any) => c[0] === 'update' && c[1].status === 'completed') as any;
     expect(upd[1]).toMatchObject({ targetKind: 'browser_site', targetId: 'healthkr', taskTypeKey: 'pharmacy.drug_search' });
   });

@@ -156,7 +156,9 @@ export function StoreSignagePage() {
     loadSignagePlaylists,
     schedules,
     scheduleLoading,
+    deletingScheduleIds,
     scheduleError,
+    schedulePlaylistError,
     signagePlaylists,
     showScheduleForm,
     editingSchedule,
@@ -201,6 +203,10 @@ export function StoreSignagePage() {
 
   const {
     playlistActionError,
+    playlistItemsError,
+    loadPlaylistItems,
+    playlistBusy,
+    busyPlaylistIds,
     loadPlaylists,
     playlists,
     playlistLoading,
@@ -445,6 +451,12 @@ export function StoreSignagePage() {
   return (
     <div className="w-full">
       <StoreWorkflowNavigation subject="사이니지" studioPath="/marketing/signage/playlist" usePath="/marketing/signage/schedules" />
+      {activeTab === 'schedules' && schedulePlaylistError && (
+        <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          스케줄의 재생목록 정보를 불러오지 못했습니다.
+          <button type="button" onClick={() => void loadSignagePlaylists()} className="ml-2 underline">다시 시도</button>
+        </div>
+      )}
       {playlistActionError && !showAddVideoModal && <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{playlistActionError}</div>}
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -670,6 +682,7 @@ export function StoreSignagePage() {
                     dataIndex: 'publishStatus',
                     render: (_v, pl) => (
                       <button
+                        disabled={busyPlaylistIds.has(pl.id)}
                         onClick={e => { e.stopPropagation(); handleTogglePublish(pl); }}
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
                           pl.publishStatus === 'published' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
@@ -711,6 +724,7 @@ export function StoreSignagePage() {
                           {selectedPlaylistId === pl.id ? '닫기' : '편집'}
                         </button>
                         <button
+                          disabled={busyPlaylistIds.has(pl.id)}
                           onClick={e => { e.stopPropagation(); handleDeletePlaylist(pl); }}
                           className="p-1 text-slate-400 hover:text-red-500 rounded"
                           title="삭제"
@@ -780,7 +794,9 @@ export function StoreSignagePage() {
               )}
 
               {/* Item list */}
-              {playlistItemsLoading ? (
+              {playlistItemsError ? (
+                <div role="alert" className="p-4 text-sm text-red-700">{playlistItemsError}<button type="button" onClick={() => void loadPlaylistItems(selectedPlaylistId)} className="ml-2 underline">다시 시도</button></div>
+              ) : playlistItemsLoading ? (
                 <div className="py-8 text-center text-slate-400 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" /> 로딩 중...
                 </div>
@@ -803,7 +819,7 @@ export function StoreSignagePage() {
                           <span className="text-[10px] text-slate-400 w-5 text-center leading-none mb-0.5">{idx + 1}</span>
                           <button
                             onClick={() => handleMoveItem(idx, -1)}
-                            disabled={idx === 0}
+                            disabled={playlistBusy || idx === 0}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="위로"
                           >
@@ -811,7 +827,7 @@ export function StoreSignagePage() {
                           </button>
                           <button
                             onClick={() => handleMoveItem(idx, 1)}
-                            disabled={idx === playlistItems.length - 1}
+                            disabled={playlistBusy || idx === playlistItems.length - 1}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="아래로"
                           >
@@ -852,6 +868,7 @@ export function StoreSignagePage() {
                           <Lock className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
                         ) : (
                           <button
+                            disabled={playlistBusy}
                             onClick={() => handleDeleteItem(item.id)}
                             className="p-1 text-slate-300 hover:text-red-500 rounded flex-shrink-0"
                             title="삭제"
@@ -1026,7 +1043,8 @@ export function StoreSignagePage() {
                       <button onClick={() => openEditSchedule(sch)} className="p-1 text-slate-400 hover:text-blue-600 rounded" title="수정">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => handleDeleteSchedule(sch)} className="p-1 text-slate-400 hover:text-red-500 rounded" title="삭제">
+                      <button disabled={deletingScheduleIds.has(sch.id)}
+                          onClick={() => handleDeleteSchedule(sch)} className="p-1 text-slate-400 hover:text-red-500 rounded" title="삭제">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -1574,7 +1592,7 @@ export function StoreSignagePage() {
               </button>
               <button
                 onClick={handleBulkAdd}
-                disabled={addModalSelected.size === 0 || addModalSaving}
+                disabled={addModalSelected.size === 0 || addModalSaving || playlistBusy}
                 className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {addModalSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}

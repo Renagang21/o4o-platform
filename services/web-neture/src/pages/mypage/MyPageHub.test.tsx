@@ -17,6 +17,7 @@ const { auth, openLoginModal, entry } = vi.hoisted(() => ({
     data: {
       services: [],
       stores: [] as { serviceKey: string; organizationId: string; name: string; memberRole: string }[],
+      workspaceStores: undefined as { organizationId: string; organizationName: string; memberRole: string }[] | undefined,
       branches: [],
       serviceStates: { supplier: { status: "none", source: "none" } },
     },
@@ -31,7 +32,8 @@ vi.mock("../../contexts/LoginModalContext", () => ({
 }));
 vi.mock("../../lib/hostProfile", () => ({ CURRENT_HOST_PROFILE: "main" }));
 vi.mock("../../lib/apiClient", () => ({ api: { post: vi.fn() } }));
-vi.mock("../../lib/home-entry", () => ({
+vi.mock("../../lib/home-entry", async (importOriginal) => ({
+  homeEntryStoreOrganizationIds: (await importOriginal<typeof import("../../lib/home-entry")>()).homeEntryStoreOrganizationIds,
   useHomeEntry: () => entry,
   buildHomeEntryModel: () => ({ myServices: [] }),
 }));
@@ -58,6 +60,7 @@ beforeEach(() => {
   auth.isLoading = false;
   openLoginModal.mockClear();
   entry.data.stores = [];
+  entry.data.workspaceStores = undefined;
 });
 const app = (path = "/mypage") => (
   <MemoryRouter initialEntries={[path]}>
@@ -106,6 +109,11 @@ it("offers management details for an approved store without mounting statistics"
   expect(screen.getByText("1개 매장 · 사업 요약과 방문 통계")).toBeTruthy();
   fireEvent.click(screen.getByRole("link", { name: /경영 현황 →/ }));
   expect(screen.getByText("권한 있는 매장 통계")).toBeTruthy();
+});
+it("offers management for an organization-only Store Workspace (workspaceStores without legacy stores)", () => {
+  entry.data.workspaceStores = [{ organizationId: "fixture-org", organizationName: "조직 매장", memberRole: "owner" }];
+  render(app());
+  expect(screen.getByText("1개 매장 · 사업 요약과 방문 통계")).toBeTruthy();
 });
 it("keeps participation history in Services", () => {
   render(app());

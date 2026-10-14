@@ -258,9 +258,12 @@ async function run(): Promise<void> {
       }
     }
 
+    // Include the missing ledger in dry-run output; ownership alone does not grant pharmacy access.
+    let pharmacyAction = demo.demoType === 'STORE_OWNER' && willHaveUser ? 'CREATE(plan)' : '-';
     // Demo registry is explicit synthetic provisioning; normal pharmacy signup still requires evidence and review.
     if (demo.demoType === 'STORE_OWNER' && userId && orgId) {
       const pharmacy = await one(`SELECT id FROM neture_pharmacy_memberships WHERE organization_id = $1`, [orgId]);
+      pharmacyAction = pharmacy ? 'exists(unverified)' : 'CREATE';
       if (!pharmacy && APPLY) {
         await runner.query(
           `INSERT INTO neture_pharmacy_memberships (organization_id, applicant_user_id, status,
@@ -316,7 +319,7 @@ async function run(): Promise<void> {
 
     summary.push(
       `${demo.demoType}  user=${userAction} password=${pwAction} registry=${regAction} ` +
-        `org=${orgAction} owner=${ownerAction} supplier=${supplierAction} memberships=[${memberships.join(' ')}] roles=[${roleActions.join(' ')}]`,
+        `org=${orgAction} owner=${ownerAction} supplier=${supplierAction} pharmacy=${pharmacyAction} memberships=[${memberships.join(' ')}] roles=[${roleActions.join(' ')}]`,
     );
   }
 

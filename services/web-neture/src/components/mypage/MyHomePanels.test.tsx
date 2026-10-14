@@ -65,6 +65,17 @@ describe("My Home self-scoped data", () => {
     fireEvent.change(screen.getByLabelText("참여 현황을 볼 매장"), { target: { value: "second" } });
     expect(JSON.parse(sessionStorage.getItem("o4o_my_home_store")!).organizationId).toBe("second");
   });
+  it("uses workspaceStores as the store source when present (organization-only Store Workspace)", async () => {
+    get.mockResolvedValueOnce(stats(5));
+    render(wrap(<MyHomeManagement accountId="owner" data={{
+      ...empty,
+      stores: [],
+      workspaceStores: [{ organizationId: "org-only", organizationName: "조직 매장", memberRole: "owner" }],
+    }} />));
+    await screen.findByText("5", { selector: "dd" });
+    expect(screen.getByRole("option", { name: "조직 매장" })).toBeTruthy();
+    expect(get.mock.calls.map((c) => c[1].headers["X-Store-Organization-Id"])).toEqual(["org-only"]);
+  });
   it("allows ordinary accounts without requesting store analytics", () => {
     render(wrap(<MyHomeManagement accountId="normal" data={empty} />));
     expect(

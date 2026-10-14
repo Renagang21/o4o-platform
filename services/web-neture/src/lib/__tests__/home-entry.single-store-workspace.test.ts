@@ -17,12 +17,13 @@ import type { User } from '../../contexts/AuthContext';
 
 const user: User = { id: 'o1', email: 'owner@example.test', name: '점주', roles: ['neture:store_owner'] };
 const kpa = { key: 'kpa-society', name: 'kpa', nameKo: 'KPA', domain: 'pharmacy.example', basePath: '', description: '', joinEnabled: true, membership: { status: 'active' } };
-const store = (organizationId: string) => ({ serviceKey: 'kpa-society', organizationId, name: `매장 ${organizationId}`, memberRole: 'owner' });
+const store = (organizationId: string) => ({ organizationId, organizationName: `매장 ${organizationId}`, memberRole: 'owner' });
 
 function respond(stores: unknown[], services: unknown[] = [kpa]) {
   get.mockImplementation(async (url: string) => {
+    if (url === '/work-scope/accessible-stores') return { data: { data: { stores } } };
     if (url === '/auth/services') return { data: { data: { services } } };
-    if (url === '/neture/home/entry') return { data: { data: { stores, branches: [], serviceStates: { supplier: { status: 'none', source: 'none' } } } } };
+    if (url === '/neture/home/entry') return { data: { data: { stores: [], branches: [], serviceStates: { supplier: { status: 'none', source: 'none' } } } } };
     if (url === '/work-scope/operator-services') return { data: { data: { services: [] } } };
     if (url === '/communities') return { data: { data: { communities: [] } } };
     throw new Error(`unexpected ${url}`);
@@ -37,10 +38,10 @@ beforeEach(() => {
 describe('resolveSingleStoreWorkspaceUrl', () => {
   it('매장 하나 → 홈 매장 버튼과 같은 handoff 요청', async () => {
     respond([store('org-1')]);
-    post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
-    await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.example/handoff?token=1');
+    post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.neture.co.kr/handoff?token=synthetic' } } });
+    await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.neture.co.kr/handoff?token=synthetic');
     expect(post).toHaveBeenCalledTimes(1);
-    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
+    expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store' });
   });
 
   it.each([
@@ -50,9 +51,9 @@ describe('resolveSingleStoreWorkspaceUrl', () => {
   ])(
     '승인 원장으로 반환된 약국은 KPA 개인 가입 $services와 무관하게 Store로 이동한다', async ({ services }) => {
       respond([store('org-1')], services);
-      post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
-      await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.example/handoff?token=1');
-      expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
+      post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.neture.co.kr/handoff?token=synthetic' } } });
+      await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.neture.co.kr/handoff?token=synthetic');
+      expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store' });
     },
   );
 
@@ -78,9 +79,9 @@ describe('resolveSingleStoreWorkspaceUrl', () => {
 it('관리 링크는 단일 매장 자동 진입을 늘리거나 없는 매장을 선택하게 하지 않는다', async () => {
   const operator = { ...user, roles: ['platform:super_admin'] };
   respond([store('org-1')]);
-  post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.example/handoff?token=1' } } });
-  await expect(resolveSingleStoreWorkspaceUrl(operator)).resolves.toBe('https://store.example/handoff?token=1');
-  expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/' });
+  post.mockResolvedValue({ data: { data: { targetUrl: 'https://store.neture.co.kr/handoff?token=synthetic' } } });
+  await expect(resolveSingleStoreWorkspaceUrl(operator)).resolves.toBe('https://store.neture.co.kr/handoff?token=synthetic');
+  expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store' });
   post.mockClear();
   respond([]);
   await expect(resolveSingleStoreWorkspaceUrl(operator)).rejects.toBeInstanceOf(ServiceEntryError);

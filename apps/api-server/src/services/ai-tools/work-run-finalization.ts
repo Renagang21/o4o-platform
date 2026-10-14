@@ -41,6 +41,7 @@ import {
   type ExperienceStepMeta,
 } from './work-experience.js';
 import logger from '../../utils/logger.js';
+import { nodeLedgerOwnerKey } from './node-ledger-owner.js';
 
 /** End-of-run recording only. No planning, observation or domain execution; raw inputs are never persisted here. */
 interface RunPersistenceContext {
@@ -163,6 +164,7 @@ export async function persistWorkflow(
   if (!goal.runId || !deviceId || targetRef.targetType === 'windows_app')
     return;
   const ledgerCtx = { userId: ctx.userId, deviceId, ownerKey: ledgerOwner };
+  const candidateCtx = { ...ledgerCtx, ownerKey: ledgerOwner ? nodeLedgerOwnerKey('USER', ctx.userId) : null };
   let saved = false;
   try {
     if (kind === 'completed' && trajectory.length > 0) {
@@ -177,7 +179,7 @@ export async function persistWorkflow(
               ? 'none'
               : 'not_generalizable';
         } else {
-          const r = await issueWorkflowCandidateSave(dataSource, ledgerCtx, {
+          const r = await issueWorkflowCandidateSave(dataSource, candidateCtx, {
             runId: goal.runId,
             targetId: siteId,
             template: built.template,
@@ -202,7 +204,7 @@ export async function persistWorkflow(
           ? isRuntimeLayerCode(replayDiverge.code)
           : endedByRuntime);
       if (!runtimeOnly)
-        await issueWorkflowCandidateResult(dataSource, ledgerCtx, {
+        await issueWorkflowCandidateResult(dataSource, candidateCtx, {
           candidateId: replayedCandidateId,
           outcome,
         });
@@ -405,10 +407,17 @@ export function buildWorkExecutionReport(
     plannerMode: ExecutionReport['plannerMode'];
     taskKey: string | null;
     memory?: ExecutionReport['memory'];
+    /** Task Understanding — 완료조건별 근거(메모리 전용 — 로그 · 저장 금지) · Assistant 판정 · 실행 비용. */
+    evidence?: ExecutionReport['evidence'];
+    verdict?: ExecutionReport['verdict'];
+    metrics?: ExecutionReport['metrics'];
   },
 ): ExecutionReport {
-  const { kind, runCreated, workflow, plannerMode, taskKey, memory } = input;
+  const { kind, runCreated, workflow, plannerMode, taskKey, memory, evidence, verdict, metrics } = input;
   return {
+    ...(evidence !== undefined ? { evidence } : {}),
+    ...(verdict !== undefined ? { verdict } : {}),
+    ...(metrics !== undefined ? { metrics } : {}),
     claim:
       kind === 'completed'
         ? 'execution_complete'

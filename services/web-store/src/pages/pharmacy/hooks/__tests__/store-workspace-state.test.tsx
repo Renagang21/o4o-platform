@@ -60,7 +60,9 @@ vi.mock("../../../../api/storeQr", () => ({
   getStorePlacementAnalytics: m.distribution,
   getQrAnalytics: m.analytics,
 }));
-vi.mock("../../../../api/storeHub", () => ({ fetchChannelOverview: m.refreshOverview }));
+vi.mock("../../../../api/storeHub", () => ({
+  fetchChannelOverview: m.refreshOverview,
+}));
 vi.mock("../storeWorkspaceLoaders", () => ({
   loadChannelWorkspace: m.overview,
 }));
@@ -448,6 +450,7 @@ it("a playlist bulk response cannot clear a different selected playlist draft", 
   });
   act(() => {
     result.current.setSelectedPlaylistId("B");
+    result.current.setShowAddVideoModal(true);
     result.current.setAddModalSelected(new Set(["new-choice"]));
   });
   await waitFor(() => expect(m.playlistItems).toHaveBeenCalledWith("B"));
@@ -514,16 +517,307 @@ it("tablet undo failure leaves the applied screen intact and permits retry", asy
   expect(result.current.tablets[0].currentScreenSetId).toBe("old");
 });
 
-
 it("channel overview refresh supersedes an older load and settles its loading state", async () => {
-  const initial = deferred<{ overview: { channels: never[]; organizationCode: string }; assets: null; slug: null }>();
+  const initial = deferred<{
+    overview: { channels: never[]; organizationCode: string };
+    assets: null;
+    slug: null;
+  }>();
   m.overview.mockReturnValue(initial.promise);
-  m.refreshOverview.mockResolvedValue([{ id: 'fresh-channel' }]);
-  const { result } = renderHook(() => useChannelWorkspace(false, notify, 'store-A'));
+  m.refreshOverview.mockResolvedValue([{ id: "fresh-channel" }]);
+  const { result } = renderHook(() =>
+    useChannelWorkspace(false, notify, "store-A"),
+  );
   expect(result.current.loading).toBe(true);
-  await act(async () => { await result.current.refreshOverview(); });
+  await act(async () => {
+    await result.current.refreshOverview();
+  });
   expect(result.current.loading).toBe(false);
-  expect(result.current.channels[0].id).toBe('fresh-channel');
-  await act(async () => { initial.resolve({ overview: { channels: [], organizationCode: 'old' }, assets: null, slug: null }); });
-  expect(result.current.channels[0].id).toBe('fresh-channel');
+  expect(result.current.channels[0].id).toBe("fresh-channel");
+  await act(async () => {
+    initial.resolve({
+      overview: { channels: [], organizationCode: "old" },
+      assets: null,
+      slug: null,
+    });
+  });
+  expect(result.current.channels[0].id).toBe("fresh-channel");
+});
+
+it("schedule save preserves edits made during the request while refreshing saved schedules", async () => {
+  const pending = deferred<void>();
+  m.createSchedule.mockReturnValueOnce(pending.promise);
+  const { result } = renderHook(() => useSignageSchedules("A"));
+  await waitFor(() => expect(result.current.scheduleLoading).toBe(false));
+  act(() => {
+    result.current.setSchName("Submitted");
+    result.current.setSchPlaylistId("playlist");
+    result.current.setShowScheduleForm(true);
+  });
+  let task!: Promise<void>;
+  act(() => {
+    task = result.current.handleSaveSchedule();
+  });
+  act(() => result.current.setSchName("Next edit"));
+  await act(async () => {
+    pending.resolve();
+    await task;
+  });
+  expect(m.createSchedule.mock.calls[0][1].name).toBe("Submitted");
+  expect(result.current.schName).toBe("Next edit");
+  expect(result.current.showScheduleForm).toBe(true);
+  expect(m.schedules).toHaveBeenCalledTimes(2);
+});
+it("cancel and another schedule editor survive a pending save failure", async () => {
+  const pending = deferred<void>();
+  m.createSchedule.mockReturnValueOnce(pending.promise);
+  const { result } = renderHook(() => useSignageSchedules("A"));
+  act(() => {
+    result.current.setSchName("Old");
+    result.current.setSchPlaylistId("playlist");
+  });
+  let task!: Promise<void>;
+  act(() => {
+    task = result.current.handleSaveSchedule();
+  });
+  act(() => {
+    result.current.resetScheduleForm();
+    result.current.openEditSchedule({
+      id: "next",
+      name: "Next",
+      storePlaylistId: "next-playlist",
+      daysOfWeek: [1],
+      startTime: "09:00",
+      endTime: "10:00",
+      priority: 0,
+      isActive: true,
+    } as never);
+  });
+  await act(async () => {
+    pending.reject(new Error("synthetic"));
+    await task;
+  });
+  expect(result.current.editingSchedule?.id).toBe("next");
+  expect(result.current.schSaveError).toBeNull();
+});
+it("a new store can save while an old store save is pending, without old completion unlocking it", async () => {
+  const first = deferred<void>(),
+    second = deferred<void>();
+  m.createSchedule
+    .mockReturnValueOnce(first.promise)
+    .mockReturnValueOnce(second.promise);
+  const { result, rerender } = renderHook(({ id }) => useSignageSchedules(id), {
+    initialProps: { id: "A" },
+  });
+  act(() => {
+    result.current.setSchName("A");
+    result.current.setSchPlaylistId("playlist");
+  });
+  let a!: Promise<void>, b!: Promise<void>;
+  act(() => {
+    a = result.current.handleSaveSchedule();
+  });
+  rerender({ id: "B" });
+  act(() => {
+    result.current.setSchName("B");
+    result.current.setSchPlaylistId("playlist");
+  });
+  act(() => {
+    b = result.current.handleSaveSchedule();
+  });
+  expect(m.createSchedule).toHaveBeenCalledTimes(2);
+  await act(async () => {
+    first.resolve();
+    await a;
+  });
+  expect(result.current.schSaving).toBe(true);
+  expect(result.current.schName).toBe("B");
+  await act(async () => {
+    second.resolve();
+    await b;
+  });
+  expect(result.current.schSaving).toBe(false);
+});
+it("schedule delete blocks duplicates and cannot report errors in another store", async () => {
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+  const pending = deferred<void>();
+  m.deleteSchedule.mockReturnValueOnce(pending.promise);
+  const { result, rerender } = renderHook(({ id }) => useSignageSchedules(id), {
+    initialProps: { id: "A" },
+  });
+  let task!: Promise<void>;
+  act(() => {
+    task = result.current.handleDeleteSchedule({
+      id: "schedule",
+      name: "Fixture",
+    } as never);
+    void result.current.handleDeleteSchedule({
+      id: "schedule",
+      name: "Fixture",
+    } as never);
+  });
+  expect(m.deleteSchedule).toHaveBeenCalledOnce();
+  rerender({ id: "B" });
+  await act(async () => {
+    pending.reject(new Error("synthetic"));
+    await task;
+  });
+  expect(result.current.scheduleError).toBeNull();
+  vi.restoreAllMocks();
+});
+it("playlist item failure has its own retry and does not hide the playlist list", async () => {
+  m.playlists.mockResolvedValue([{ id: "A" }]);
+  m.playlistItems
+    .mockRejectedValueOnce(new Error("synthetic"))
+    .mockResolvedValueOnce([{ id: "new" }]);
+  const { result } = renderHook(() => useSignagePlaylists("store"));
+  act(() => result.current.setSelectedPlaylistId("A"));
+  await waitFor(() => expect(result.current.playlistItemsError).toBeTruthy());
+  expect(result.current.playlistError).toBeNull();
+  expect(result.current.playlists[0]?.id).toBe("A");
+  await act(() => result.current.loadPlaylistItems("A"));
+  expect(result.current.playlistItemsError).toBeNull();
+  expect(result.current.playlistItems[0]?.id).toBe("new");
+});
+it("deleting the old playlist does not deselect a different playlist", async () => {
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+  const pending = deferred<void>();
+  m.deletePlaylist.mockReturnValueOnce(pending.promise);
+  const { result } = renderHook(() => useSignagePlaylists("store"));
+  act(() => result.current.setSelectedPlaylistId("A"));
+  let task!: Promise<void> | undefined;
+  act(() => {
+    task = result.current.handleDeletePlaylist({
+      id: "A",
+      name: "Fixture",
+    } as never);
+  });
+  act(() => result.current.setSelectedPlaylistId("B"));
+  await act(async () => {
+    pending.resolve();
+    await task;
+  });
+  expect(result.current.selectedPlaylistId).toBe("B");
+  vi.restoreAllMocks();
+});
+it("library add completion cannot close a newly opened picker in a different playlist", async () => {
+  const pending = deferred<void>();
+  m.addLibrary.mockReturnValueOnce(pending.promise);
+  const { result } = renderHook(() => useSignagePlaylists("store"));
+  act(() => {
+    result.current.setSelectedPlaylistId("A");
+    result.current.setShowLibrarySelector(true);
+  });
+  let task!: Promise<void> | undefined;
+  act(() => {
+    task = result.current.handleAddFromLibrary({ id: "asset" } as never);
+  });
+  act(() => {
+    result.current.setSelectedPlaylistId("B");
+    result.current.setShowLibrarySelector(true);
+  });
+  await act(async () => {
+    pending.resolve();
+    await task;
+  });
+  expect(result.current.selectedPlaylistId).toBe("B");
+  expect(result.current.showLibrarySelector).toBe(true);
+});
+it("closing and reopening a picker preserves its new draft while a successful write refreshes the original playlist", async () => {
+  const pending = deferred<void>();
+  m.add.mockReturnValueOnce(pending.promise);
+  const { result } = renderHook(() => useSignagePlaylists("store"));
+  act(() => {
+    result.current.setSelectedPlaylistId("A");
+    result.current.setShowAddVideoModal(true);
+    result.current.setAddModalSelected(new Set(["old"]));
+  });
+  await waitFor(() => expect(m.playlistItems).toHaveBeenCalledWith("A"));
+  const initialLoads = m.playlistItems.mock.calls.length;
+  let task!: Promise<void>;
+  act(() => {
+    task = result.current.handleBulkAdd();
+  });
+  act(() => {
+    result.current.setShowAddVideoModal(false);
+    result.current.setShowAddVideoModal(true);
+    result.current.setAddModalSelected(new Set(["new"]));
+  });
+  await act(async () => {
+    pending.resolve();
+    await task;
+  });
+  expect([...result.current.addModalSelected]).toEqual(["new"]);
+  expect(result.current.showAddVideoModal).toBe(true);
+  expect(m.playlistItems).toHaveBeenCalledTimes(initialLoads + 1);
+  expect(result.current.playlistBusy).toBe(false);
+});
+it("a store change stops remaining bulk writes through the implicit selected-store API", async () => {
+  const pending = deferred<void>();
+  m.add.mockReturnValueOnce(pending.promise);
+  const { result, rerender } = renderHook(({ id }) => useSignagePlaylists(id), {
+    initialProps: { id: "A" },
+  });
+  act(() => {
+    result.current.setSelectedPlaylistId("playlist");
+    result.current.setShowAddVideoModal(true);
+    result.current.setAddModalSelected(new Set(["first", "second"]));
+  });
+  let task!: Promise<void>;
+  act(() => {
+    task = result.current.handleBulkAdd();
+  });
+  rerender({ id: "B" });
+  await act(async () => {
+    pending.resolve();
+    await task;
+  });
+  expect(m.add).toHaveBeenCalledOnce();
+  expect(result.current.playlistActionError).toBeNull();
+});
+it("independent playlist requests retain their individual locks", async () => {
+  const first = deferred<void>(),
+    second = deferred<void>();
+  m.updatePlaylist
+    .mockReturnValueOnce(first.promise)
+    .mockReturnValueOnce(second.promise);
+  const { result } = renderHook(() => useSignagePlaylists("store"));
+  let a!: Promise<void>, b!: Promise<void>;
+  act(() => {
+    a = result.current.handleTogglePublish({
+      id: "A",
+      publishStatus: "draft",
+    } as never);
+    b = result.current.handleTogglePublish({
+      id: "B",
+      publishStatus: "draft",
+    } as never);
+  });
+  expect(result.current.busyPlaylistIds.size).toBe(2);
+  await act(async () => {
+    first.resolve();
+    await a;
+  });
+  expect([...result.current.busyPlaylistIds]).toEqual(["B"]);
+  await act(async () => {
+    second.resolve();
+    await b;
+  });
+  expect(result.current.busyPlaylistIds.size).toBe(0);
+});
+
+it("schedule playlist metadata failure has an independent retry and does not mask the schedules", async () => {
+  m.options
+    .mockRejectedValueOnce(new Error("synthetic"))
+    .mockResolvedValueOnce([{ id: "retry" }]);
+  m.schedules.mockResolvedValue({ items: [{ id: "schedule" }] });
+  const { result } = renderHook(() => useSignageSchedules("store"));
+  await waitFor(() =>
+    expect(result.current.schedulePlaylistError).toBeTruthy(),
+  );
+  expect(result.current.scheduleError).toBeNull();
+  expect(result.current.schedules[0]?.id).toBe("schedule");
+  await act(() => result.current.loadSignagePlaylists());
+  expect(result.current.schedulePlaylistError).toBeNull();
+  expect(result.current.signagePlaylists[0]?.id).toBe("retry");
 });

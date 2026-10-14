@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/apiClient";
 import { listOperatedCommunities } from "../../lib/api/communityOperator";
-import type { HomeEntryData, EntryStore } from "../../lib/home-entry";
+import { homeEntryManagedStores, type HomeEntryData, type HomeEntryStoreRef } from "../../lib/home-entry";
 import { PolicyAcceptanceGate, type PendingPolicyAcceptanceLike } from "@o4o/shared-space-ui";
 import { loadPolicy } from "../../pages/legal/PolicyDocumentPage";
 import { useAuth } from "../../contexts/AuthContext";
@@ -605,7 +605,7 @@ function StoreMetrics({
   compact = false,
 }: {
   accountId: string;
-  store: EntryStore;
+  store: HomeEntryStoreRef;
   compact?: boolean;
 }) {
   const result = useMyHomeResource(
@@ -718,7 +718,7 @@ export function MyHomeManagement({
   accountId: string;
   data: HomeEntryData;
   compact?: boolean;
-  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
+  renderStoreWorkspace?: (store: HomeEntryStoreRef) => ReactNode;
 }) {
   return (
     <StoreManagement
@@ -733,7 +733,7 @@ export function MyHomeManagement({
 export function MyHomeStoreParticipation({ accountId, data, renderStoreWorkspace }: {
   accountId: string;
   data: HomeEntryData;
-  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
+  renderStoreWorkspace?: (store: HomeEntryStoreRef) => ReactNode;
 }) {
   return <StoreManagement key={accountId} accountId={accountId} data={data} renderStoreWorkspace={renderStoreWorkspace} participationOnly />;
 }
@@ -747,11 +747,11 @@ function StoreManagement({
   accountId: string;
   data: HomeEntryData;
   compact?: boolean;
-  renderStoreWorkspace?: (store: EntryStore) => ReactNode;
+  renderStoreWorkspace?: (store: HomeEntryStoreRef) => ReactNode;
   participationOnly?: boolean;
 }) {
   // Only an existing scoped analytics endpoint is consumed. No cross-store aggregation.
-  const stores = data.stores.filter((s) => s.serviceKey === "kpa-society");
+  const stores = homeEntryManagedStores(data);
   const [selected, setSelected] = useState(() => {
     try {
       const previous = JSON.parse(

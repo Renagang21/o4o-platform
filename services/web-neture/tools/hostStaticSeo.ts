@@ -2,7 +2,7 @@ import type { Plugin } from 'vite';
 import { MAIN_ORIGIN, HOST_ORIGIN, type HostProfile } from '../src/lib/hostIdentity';
 import { O4O_BRAND_TITLE, O4O_BRAND_DESCRIPTION, SUBHOST_HOME_SEO } from '../src/config/seoData';
 
-export const SEO_PROFILES = ['main', 'supplier', 'funding', 'community'] as const;
+export const SEO_PROFILES = ['main', 'supplier', 'funding', 'community', 'carepharm'] as const;
 
 const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',

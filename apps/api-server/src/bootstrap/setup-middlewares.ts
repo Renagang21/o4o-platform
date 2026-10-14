@@ -69,6 +69,7 @@ export const getAllowedOrigins = (): string[] => {
     "https://pharmacy.neture.co.kr",
     "https://kpa.neture.co.kr",
     "https://community.neture.co.kr",
+    "https://carepharm.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",

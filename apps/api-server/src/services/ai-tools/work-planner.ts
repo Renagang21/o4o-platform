@@ -45,6 +45,11 @@ export interface PlannerInput {
    * 화면 행동만 정한다. 업무 완료 판정은 Assistant 가 실행 근거로 한다(V2 §2-1).
    */
   intent?: ExecutionIntent;
+  /**
+   * Assistant 가 직전 완료 보고를 "아직" 으로 판정한 이유(조건 id · 조건 문장 기반 안내).
+   * confirmed = 이번 run 에서 이미 화면 근거로 확인된 조건 id(다른 화면에서 확인한 것도 유지된다 — 다시 보고하지 않아도 된다).
+   */
+  assistantFeedback?: { unmet: string[]; note: string; confirmed?: string[] };
 }
 
 
@@ -73,7 +78,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '- visual_type: (시각 모드에서만) {"text"} 현재 포커스된 입력 위치에 짧은 텍스트를 넣는다(비밀번호·인증번호·명령어 금지).',
   '- visual_key: (시각 모드에서만) {"key"} ENTER · TAB · ESC 하나를 보낸다.',
   '- takeover: {"reason"} 사용자에게 화면을 넘긴다. reason 은 goal_sufficiently_advanced · user_judgment_required · ambiguous_result · unsupported_control · review_required · commit_required · credential_required 중 하나.',
-  '- done: 목적이 요구하는 결과 화면에 이미 닿았다(실행 결과의 주장 — 업무 완료 판정은 Assistant 가 실행 근거로 한다).',
+  '- done: 목적이 요구하는 결과 화면에 이미 닿았다(실행 결과의 주장 — 업무 완료 판정은 Assistant 가 실행 근거로 한다). 실행 지시에 완료조건(c1..)이 있으면 "evidence" 를 함께 낸다.',
   '',
   '시각 모드(Visual Computer Use):',
   '- UIA 가 화면 요소를 노출하지 못할 때만 runtime 이 캡처 이미지를 함께 준다("현재 화면 이미지" 표시). 그때만 visual_click/visual_type/visual_key 를 쓸 수 있다.',
@@ -88,7 +93,8 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '규칙:',
   '- elementRef 는 관찰 목록에 있는 것만 쓴다. URL · CSS selector · XPath · JavaScript · 명령어 · 좌표는 절대 쓰지 않는다.',
   '- 로그인 · 비밀번호 · 인증번호 · 결제 · 주문 확정 · 삭제 · 게시(COMMIT 표시) 는 하지 않는다 → takeover(credential_required 또는 commit_required).',
-  '- 목적이 요구하는 정보 · 화면에 실제로 닿았을 때 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 목적이 목록의 한 항목 안 내용(상세 · 하위 탭의 정보)을 요구하면 목록에서 멈추지 말고 그 항목을 열어 이어간다. 어느 항목인지 사용자만 정할 수 있으면 그때 묻는다(target_confirmation).',
+  '- 실행 지시에 "완료조건" 이 있으면: 끝났는지 스스로 판정하지 않는다. 조건을 확인할 화면 글을 읽은 뒤(read_text · read_table 또는 관찰 목록) done 을 내고 "evidence":[{"criterion":"c1","source":"read|screen","quote":"화면에 보인 글 그대로(짧게)"}] 로 조건마다 근거를 보고한다. 근거 인용은 실제로 본 글만 — 지어내거나 입력한 값을 인용하지 않는다. "사용자 확인" 조건은 화면으로 확인할 수 없으니 근거를 내지 않는다. 아직이면 Assistant 가 "Assistant 판정" 으로 이유를 돌려준다.',
+  '- (완료조건이 없을 때) 목적이 요구하는 정보 · 화면에 실제로 닿았을 때 takeover(goal_sufficiently_advanced) 로 화면을 넘긴다. 목적이 목록의 한 항목 안 내용(상세 · 하위 탭의 정보)을 요구하면 목록에서 멈추지 말고 그 항목을 열어 이어간다. 어느 항목인지 사용자만 정할 수 있으면 그때 묻는다(target_confirmation).',
   '- 질문 이유를 구분한다. ① 정보가 없다(값 · 대상을 사용자만 안다) → 바로 묻는다(value_confirmation · target_confirmation). ② 사용자가 결정해야 한다(로그인 · 인증번호 · 결제 · 제출 · 서명 · 본질적 선택 · 결과 확인) → 바로 넘긴다(credential_required · commit_required · success_confirmation). ③ 방법을 모른다(어디를 눌러야 하는지 · 메뉴 위치 · 절차) → 묻기 전에 직접 찾는다.',
   '- 방법을 모른다는 이유만으로 사용자에게 넘기지 않는다. 관찰 목록의 링크 · 버튼(스크립트로 눌리는 표 칸 · 목록 행도 button 으로 보인다) · 탭 · 목록 항목 · 표를 업무 의미로 살피고, find · read_text · read_table 로 확인한 뒤 맞는 항목을 열어 본다. 그래도 방법을 찾지 못할 때만 ask.kind=menu_location · procedure_order · manual_request 로 묻는다.',
   '- 후보가 보인다는 이유만으로 누르지 않는다 — 목적에 맞는 항목인지 이름 · 텍스트로 판단한 뒤 행동한다. 같은 행동을 반복하지 않는다.',
@@ -103,7 +109,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '- "stage": 지금 단계의 키(snake_case, 예: "find_same_ingredient").',
   '- "strategy": 이 단계에서 쓰는 방법 {"ops":[{"op":"search|open_detail|open_tab|open_menu|select_filter|read_result|extract_field|re_search|return_to_list|compare","label"?:"화면의 탭·메뉴·필터 이름"}]}. label 은 open_tab·open_menu·select_filter 에만, 화면에 보이는 이름만 쓴다(입력값 금지).',
   '- 사용자에게 물을 때(takeover user_judgment_required) "ask":{"kind":"value_confirmation|target_confirmation|menu_location|procedure_order|manual_request|success_confirmation","slots":["drug_name"]} 로 무엇을 묻는지 적는다.',
-  '- 결과가 목적에 맞는지 확신이 없으면 끝내지 말고 takeover(user_judgment_required) + ask.kind=success_confirmation 로 확인을 받는다.',
+  '- (완료조건이 없을 때) 결과가 목적에 맞는지 확신이 없으면 끝내지 말고 takeover(user_judgment_required) + ask.kind=success_confirmation 로 확인을 받는다.',
   '- "확인된 방법(Preferred)" 이 있으면 그 단계에서 먼저 쓴다. "피할 방법(Avoid)" 은 그 단계에서 쓰지 않는다(쓰면 runtime 이 거절한다).',
   '- "사용자 답변" 이 있으면 새 목적이 아니다 — "원래 업무" 를 같은 대상에서 이어간다. 그리고 답변을 분류해 "userInput" 에 적는다:',
   '  {"kind":"assistance|correction","askKind":"…ask kind…","providedKind":"value|target|path|procedure|document|confirmation|takeover|correction","correctionType":"task_intent|target|procedure_method|outcome","stage":"…","reason":"inaccurate_results|site_feature_exists|wrong_target|wrong_intent|inefficient|incomplete_result|other","wrong":{"ops":[…]},"alternative":{"ops":[…]},"reusability":"reusable_knowledge|per_run_value|personal_preference|not_reusable"}',
@@ -113,7 +119,7 @@ export const WORK_PLANNER_SYSTEM_PROMPT = [
   '  · "나는 보통 ~ 를 써" 같은 개인 선호 → reusability=personal_preference.',
   '- 사용자 목적 문장 안에 방법 지시("~ 말고 ~ 로")가 있으면 같은 방식으로 userInput 에 분류한다.',
   '',
-  '출력(JSON 만): {"assessment":"progress|no_progress|needs_user|completed","action":{"kind":"...", ...},"actions":[…선택, 배치일 때만…],"rationale":"짧게","neededInput":"필요할 때만","task"?:"…","stage"?:"…","strategy"?:{"ops":[…]},"ask"?:{…},"userInput"?:{…}}',
+  '출력(JSON 만): {"assessment":"progress|no_progress|needs_user|completed","action":{"kind":"...", ...},"actions":[…선택, 배치일 때만…],"rationale":"짧게","neededInput":"필요할 때만","task"?:"…","stage"?:"…","strategy"?:{"ops":[…]},"ask"?:{…},"userInput"?:{…},"evidence"?:[{"criterion":"c1","source":"read|screen","quote":"…"}]}',
 ].join('\n');
 
 
@@ -125,14 +131,31 @@ export function describeExecutionIntent(intent: ExecutionIntent): string {
   const start = intent.startMode === 'resume' ? '원래 업무를 이어간다(재개)' : '현재 화면에서 방법을 찾으며 시작한다(Discovery)';
   const own = intent.evidence.find((e) => e.source === 'own_experience');
   const shared = intent.evidence.find((e) => e.source === 'shared_candidate');
-  return [
+  const u = intent.understanding;
+  const lines = [
     '## 실행 지시 (Assistant · 구조)',
     `- 시작: ${start}`,
     intent.taskTypeHint ? `- 이어가는 업무 키: ${intent.taskTypeHint} (같은 업무면 이 키를 task 로 쓴다 — 절차를 고정하는 키가 아니다)` : '',
     `- 근거: ${own?.available ? '이 사용자의 확인된 방법이 있으면 먼저 쓰되 현재 화면으로 다시 확인한다' : '이 사용자의 확인된 방법 없음'}${shared?.available ? ' · 다른 사용자 후보는 참고만(강제 아님)' : ''}`,
-    '- 끝: 목적이 요구하는 결과가 화면에 실제로 보이면 멈추고 넘긴다. 업무가 끝났는지는 Assistant 가 실행 근거로 판정한다.',
+    u
+      ? '- 끝: 완료조건을 확인할 화면 글을 읽었으면 done + evidence 로 보고한다. 끝났는지는 Assistant 가 완료조건과 근거를 비교해 판정한다.'
+      : '- 끝: 목적이 요구하는 결과가 화면에 실제로 보이면 멈추고 넘긴다. 업무가 끝났는지는 Assistant 가 실행 근거로 판정한다.',
     '- 확정 · 결제 · 인증은 언제나 사용자(takeover).',
-  ].filter(Boolean).join('\n');
+  ].filter(Boolean);
+  if (u) {
+    // 업무 이해(Assistant · 실행 전) — 요청에서 세운 목표 · 완료조건. 사이트 · 업무별 고정 절차가 아니다(P3).
+    const OUTCOME_LABEL = { information: '정보 확인', screen: '화면 도달', change: '변경(확정은 사용자)' } as const;
+    lines.push(
+      '',
+      '## 업무 이해 (Assistant · 실행 전)',
+      `- 원하는 결과: ${u.goal} (${OUTCOME_LABEL[u.outcome] ?? u.outcome})`,
+      '- 완료조건(모두 근거가 있어야 끝난다 — 판정은 Assistant):',
+      ...u.criteria.map((c) => `  · ${c.id}: ${c.text}${c.evidence === 'user' ? ' [사용자 확인 — 화면 근거 불필요]' : ''}`),
+    );
+    if (u.missing.length) lines.push(`- 요청에 없는 정보: ${u.missing.map((m) => `${m.slot}(${m.question})`).join(' · ')} — 화면에서도 정할 수 없으면 그때 ask.kind=value_confirmation 으로 묻는다(지어내지 않는다).`);
+    if (u.commitBoundary) lines.push('- 최종 제출 · 저장 · 결제는 하지 않는다 — 그 직전까지 하고 takeover(commit_required).');
+  }
+  return lines.join('\n');
 }
 
 
@@ -157,6 +180,13 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
   }
   lines.push(`## 대상 사이트\n${input.siteDisplayName} (등록됨) · 현재 경로 ${obs.path} · 준비 ${obs.ready ? '됨' : '안 됨'} · 남은 행동 ${input.stepsLeft}`);
   if (input.intent) lines.push(describeExecutionIntent(input.intent));
+  if (input.assistantFeedback) {
+    // Assistant 판정 — 직전 done 이 완료조건을 다 채우지 못했다. 조건 id · 조건 문장 기반 안내뿐(화면 글 없음).
+    const confirmed = input.assistantFeedback.confirmed?.length
+      ? `\n이미 확인됨(이번 run 의 다른 화면 근거 유지 — 다시 보고하지 않아도 된다): ${input.assistantFeedback.confirmed.join(', ')}`
+      : '';
+    lines.push(`## Assistant 판정 (직전 완료 보고 · 아직 끝나지 않음)\n미충족: ${input.assistantFeedback.unmet.join(', ')}${confirmed}\n${input.assistantFeedback.note}\n(그 조건을 확인할 화면 글을 찾아 읽은 뒤 다시 done + evidence 로 보고한다. 찾을 수 없으면 takeover(user_judgment_required) + ask.kind=success_confirmation.)`);
+  }
   if (input.knownTaskKeys && input.knownTaskKeys.length) lines.push(`## 이 대상에서 확인된 업무 키\n${input.knownTaskKeys.join(', ')}`);
   if (input.patterns && input.patterns.length) {
     const pref = input.patterns.filter((p) => p.polarity === 'preferred').map((p) => `- [${p.stageKey}] ${describeStrategy(p.strategy)} (확인 ${p.verifiedCount}회)`);

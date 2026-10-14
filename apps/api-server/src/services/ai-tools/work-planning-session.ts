@@ -16,7 +16,10 @@ import {
   type WorkProgress,
   type ProposalRejectReason,
   type WorkSurface,
+  type CompletionJudge,
+  type CompletionVerdict,
 } from "./work-agent-contract.js";
+import type { CompletionEvidenceSession } from "./work-completion-evidence.js";
 import {
   noteRecovered,
   type ClassifyInput,
@@ -106,7 +109,13 @@ interface WorkPlanningSessionInput {
     | "hasPatterns"
     | "avoidedStage"
     | "clearAsk"
+    | "setAsk"
   >;
+  /**
+   * Task Understanding — 있으면 Execution 의 완료 주장(done · goal_sufficiently_advanced)을 Assistant 판정에 넘긴다.
+   * 없으면(직접 /work-agent/run) 종전 판정 그대로다.
+   */
+  completion?: { judge: CompletionJudge; evidence: CompletionEvidenceSession };
   observationSession: Pick<
     WorkObservationSession,
     | "budgetLeft"
@@ -162,6 +171,7 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
     stuckEnd,
     observeFailed,
     enterVisualFallback,
+    completion,
   } = input;
   const {
     image,
@@ -179,6 +189,8 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
   const execution =
     input.executionState ?? createWorkAgentExecutionState(state);
   let lastRejectReason: ProposalRejectReason | undefined;
+  /** Assistant 가 직전 완료 보고를 "아직" 으로 판정한 이유 — 다음 계획 한 번에만 싣는다. */
+  let assistantFeedback: PlannerInput["assistantFeedback"] = undefined;
   const currentActor = (): ExperienceActor =>
     isReplaying()
       ? "deterministic"
@@ -274,6 +286,64 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
     }
   };
 
+  /**
+   * Task Understanding — Execution 의 완료 주장(done · goal_sufficiently_advanced)을 Assistant 판정에 넘긴다.
+   *   근거 인용은 이번 run 에서 실제 본 화면 글에 있어야 grounded 다(CompletionEvidenceSession.ground).
+   *   complete → 완료로 끝낸다 · continue → 미충족 안내를 planner 에 돌려주고 루프를 잇는다(null) · ask → 사용자에게 묻는다(QUESTION).
+   *   판정 hook 이 실패하면 종전 판정으로 끝낸다(회귀 금지) — 로그만 남긴다.
+   */
+  const judgeCompletion = async (
+    c: NonNullable<typeof completion>,
+    proposal: WorkProposal,
+    via: "done" | "goal_sufficiently_advanced",
+  ): Promise<WorkAgentRunResult | null> => {
+    c.evidence.noteObservation(state.observation);
+    const evidence = c.evidence.ground(proposal, state.history);
+    let verdict: CompletionVerdict | null = null;
+    try {
+      verdict = await c.judge({ evidence, via });
+    } catch (e) {
+      logger.warn("work-agent completion judge failed", {
+        code: (e as { code?: string })?.code ?? null,
+      });
+    }
+    c.evidence.setVerdict(verdict);
+    // 판정 없음(판정기 실패) → 종전 경로 그대로. 판정이 complete 면 Assistant 가 완료조건 충족을 확인한 것이므로
+    // 어느 경로(done · goal_sufficiently_advanced)로 왔든 실행 완료로 보고한다 — 끝났는지는 Assistant 판정이 정한다.
+    if (!verdict) {
+      markRecovered();
+      if (via === "goal_sufficiently_advanced") {
+        onPlannerTakeover();
+        return takeover("goal_sufficiently_advanced", "completed");
+      }
+      state.progress = "completed";
+      return finish();
+    }
+    if (verdict.decision === "complete") {
+      markRecovered();
+      state.progress = "completed";
+      return finish();
+    }
+    if (verdict.decision === "continue") {
+      const confirmed = c.evidence.confirmedExcept(verdict.unmet);
+      assistantFeedback = {
+        unmet: verdict.unmet.slice(0, 4),
+        note: String(verdict.note ?? "").slice(0, 300),
+        ...(confirmed.length ? { confirmed } : {}),
+      };
+      lastRejectReason = undefined;
+      return null;
+    }
+    taskSession.setAsk({
+      kind: verdict.askKind ?? "success_confirmation",
+      slots: [],
+    });
+    // 무엇을 확인받는지 질문에 싣는다 — 사용자의 "네" 가 그 조건의 확인이 되게(막연한 동의로 Task 를 닫지 않는다).
+    if (verdict.question) onNeededInput(verdict.question);
+    onPlannerTakeover();
+    return takeover("user_judgment_required", "needs_user");
+  };
+
   /** One planning attempt, validation and recovery. null retries the existing loop. */
   const planNextProposal = async (): Promise<{
     proposal?: WorkProposal;
@@ -283,6 +353,7 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
     const { lastRead, lastSafetyReason } = readFeedback();
     // Plan (§8)
     let raw: unknown;
+    completion?.evidence.noteObservation(state.observation);
     state.aiPlanCount += 1;
     const planT0 = Date.now();
     measurements.aiCalls += 1;
@@ -307,9 +378,11 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
           ...taskSession.plannerFields(),
           ...(methodDiscovery ? { methodDiscovery } : {}),
           ...(intent ? { intent: intent } : {}),
+          ...(assistantFeedback ? { assistantFeedback } : {}),
         }),
       );
       methodDiscovery = undefined;
+      assistantFeedback = undefined;
       measurements.aiMs += Date.now() - planT0;
     } catch {
       measurements.aiMs += Date.now() - planT0;
@@ -442,6 +515,12 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
           return "continue";
         }
       }
+      if (reason === "goal_sufficiently_advanced" && completion) {
+        return (
+          (await judgeCompletion(completion, proposal, "goal_sufficiently_advanced")) ??
+          "continue"
+        );
+      }
       if (reason === "goal_sufficiently_advanced") markRecovered();
       onPlannerTakeover();
       return takeover(
@@ -453,6 +532,9 @@ export function createWorkPlanningSession(input: WorkPlanningSessionInput) {
       proposal.action.kind === "done" ||
       proposal.assessment === "completed"
     ) {
+      // Task Understanding — 실행의 완료 주장일 뿐이다. 판정 hook 이 있으면 Assistant 가 완료조건과 근거로 판정한다.
+      if (completion)
+        return (await judgeCompletion(completion, proposal, "done")) ?? "continue";
       state.progress = "completed";
       markRecovered();
       return finish();

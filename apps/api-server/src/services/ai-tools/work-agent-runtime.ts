@@ -34,7 +34,8 @@ import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
 
-import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, validateWorkImageInput, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkProposal, type ExecutionIntent, type ExecutionReport } from './work-agent-contract.js';
+import { WORK_AGENT_ERROR, WORK_LOOP_LIMITS, buildWorkAgentUsageEvent, createWorkAgentState, isValidWorkGoalRequest, validateWorkImageInput, type TakeoverReason, type WorkAgentState, type WorkGoal, type WorkGoalStatus, type WorkProgress, type WorkStepRecord, type WorkSurface, type WorkProposal, type ExecutionIntent, type ExecutionReport, type CompletionJudge } from './work-agent-contract.js';
+import { createCompletionEvidenceSession } from './work-completion-evidence.js';
 import { sanitizeRecoveryHint } from './automation-recovery-contract.js';
 // PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
 // Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
@@ -79,6 +80,11 @@ export interface WorkAgentRunInput {
   runId?: string;
   /** Personal Assistant Phase B — Assistant Planning 의 실행 지시. 없으면 종전 동작(지시 없이 실행). */
   intent?: ExecutionIntent;
+  /**
+   * Task Understanding — Execution 이 완료를 주장할 때(done · goal_sufficiently_advanced) Assistant 에 판정을 묻는 hook.
+   * 있으면 완료는 Assistant 가 완료조건과 근거를 비교해 정하고, 없으면(직접 /work-agent/run) 종전 판정 그대로다.
+   */
+  judge?: CompletionJudge;
 }
 
 /** runWorkAgent 선택 의존성. strongPlanner 는 복구 계층의 "더 강한 추론" 경로(§11·§12) — 없으면 escalation 없이 기존대로 동작한다. */
@@ -200,6 +206,9 @@ export async function runWorkAgent(
   //   단계 부가정보(행위자 · semantic locator · 소요)는 history 기록과 짝으로만 둔다. 값 · 화면 글 · 관찰은 담지 않는다.
   const stepMeta = new WeakMap<WorkStepRecord, ExperienceStepMeta>();
   const measurements = createWorkRunMeasurements();
+  // Task Understanding — 완료 근거 대조용 "이번 run 에서 실제 본 화면 글" · 조건별 근거 · 판정(메모리 전용 · 로그 · 저장 금지).
+  const completionEvidence = createCompletionEvidenceSession();
+  const runT0 = Date.now();
   let replaying = false;
   // Phase E — 작업 단위 dispatch(V2 §11-2). measurements.roundTrips 는 서버↔노드 명령 왕복 수(단발 · 단위 모두 1), measurements.unitDispatches 는 그중 단위 수.
   // 관찰 세션은 형상 거절/전송 실패 뒤 이번 run의 단위 경로를 끄며 같은 단위를 다시 보내지 않는다.
@@ -256,6 +265,9 @@ export async function runWorkAgent(
         kind, runCreated, workflow, plannerMode: sessions.planning?.mode() ?? 'discovery',
         taskKey: sessions.task?.taskKey() ?? null,
         memory: runCreated ? sessions.task?.memoryReport(kind, targetRef.targetType) : undefined,
+        evidence: completionEvidence.evidence(),
+        verdict: completionEvidence.verdict(),
+        metrics: { aiCalls: measurements.aiCalls, aiMs: measurements.aiMs, roundTrips: measurements.roundTrips, stepCount: state.stepCount, totalMs: Date.now() - runT0 },
       }),
     };
   };
@@ -271,6 +283,12 @@ export async function runWorkAgent(
    * QUESTION 으로 돌린다 — 그 경우 답하면 같은 runId 로 이어간다. never-escalate(credential·commit 등)는 여기 그대로 인계다.
    */
   const takeover = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> => {
+    // Automation still stops at COMMIT. A verified Assistant contract may await the user's own completion.
+    if (reason === 'commit_required' && input.judge && input.intent?.understanding?.commitBoundary) {
+      sessions.task?.setAsk({ kind: 'success_confirmation', slots: [] });
+      neededInput = '최종 저장·제출·확정은 직접 진행해 주세요. 요청한 결과까지 완료되면 알려 주세요.';
+      return question(reason);
+    }
     if (QUESTION_TAKEOVER_REASONS.has(reason)) return question(reason);
     if (terminalKind === null) terminalKind = 'takeover';
     state.takeover = { reason, step: state.stepCount };
@@ -398,6 +416,7 @@ export async function runWorkAgent(
     readFeedback: () => ({ lastRead, lastSafetyReason: actionBinding.current?.safetyReason() ?? '' }), isReplaying: () => replaying,
     onNeededInput: (value) => { neededInput = value; }, onPlannerTakeover: () => { plannerTakeover = true; },
     finish, takeover, stuckEnd, observeFailed, enterVisualFallback,
+    completion: input.judge ? { judge: input.judge, evidence: completionEvidence } : undefined,
   });
   sessions.planning = planningSession;
   const { currentActor, refreshPlannerMode, recover, planNextProposal, acceptProposal } = planningSession;
@@ -468,7 +487,7 @@ export async function runWorkAgent(
   if (surface === 'dom' && !resumedRun && !recoveryHint && !image) {
     let match: Awaited<ReturnType<typeof issueWorkflowCandidateMatch>> | null = null;
     try {
-      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
+      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner ? nodeLedgerOwnerKey('USER', ctx.userId) : null }, {
         targetId: siteId, request: normalizeWorkflowText(goal.request).slice(0, 500),
       });
     } catch (e) {
@@ -536,6 +555,7 @@ export async function runWorkAgent(
     set lastRejectReason(value) {
       planningSession.setRejectReason(value);
     },
+    completionEvidence,
   };
   refreshPlannerMode('start');
   while (true) {
