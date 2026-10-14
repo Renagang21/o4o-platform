@@ -150,6 +150,12 @@ export const hasRequiredRoles = (user: unknown, requiredRoles: string[]): boolea
  * 이 fallback 은 영구 정책이 아니다. permission 공급은 후속 과제다.
  */
 export const hasRequiredPermissions = (user: unknown, requiredPermissions: string[]): boolean => {
+  // 플랫폼 전역 관리자는 관리자 화면의 모든 permission 을 가진다. admin 사이트 진입 floor 가 이미
+  // `platform:super_admin` 이므로 이 판정이 넓히는 접근은 없다.
+  // `/auth/me`(새로고침 경로)는 `users.view` · `admin.settings` 같은 다른 어휘의 permissions 를 채워 보내는데,
+  // 화면 선언(`settings:read` · `users:read` …)과 이름이 맞지 않아 super_admin 이 새로고침마다 거부되던 결함을 막는다.
+  if (collectUserRoles(user).includes('platform:super_admin')) return true;
+
   const granted = (user as { permissions?: unknown } | null | undefined)?.permissions;
 
   if (Array.isArray(granted) && granted.length > 0) {
