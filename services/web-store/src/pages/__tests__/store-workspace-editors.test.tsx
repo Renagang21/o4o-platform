@@ -22,32 +22,14 @@ function props(): ComponentProps<typeof StoreQrCreateForms> {
       htmlContent: null,
       source: "content-hub",
     },
-    formTitle: "안내",
-    formDescription: "본문",
-    formSlug: "sample",
-    formLandingType: "product",
-    formLandingTargetId: "other",
+    draft: { title: '안내', description: '본문', slug: 'sample', landingType: 'product', landingTargetId: 'other', ctaEnabled: false, ctaLabel: '' },
     selectedTemplate: null,
-    ctaEnabled: false,
-    ctaLabel: "",
     formError: null,
     saving: false,
     qrBaseUrl: "https://example.test/qr/",
     loadingProducts: false,
     productOptions: [],
-    setFormTitle: vi.fn(),
-    setFormDescription: vi.fn(),
-    setFormSlug: vi.fn(),
-    setFormLandingType: vi.fn(),
-    setFormLandingTargetId: vi.fn(),
-    setCtaEnabled: vi.fn(),
-    setCtaLabel: vi.fn(),
-    setCreating: vi.fn(),
-    setVideoTarget: vi.fn(),
-    setSelectedLibrary: vi.fn(),
-    setShowSelector: vi.fn(),
-    handleCreate: vi.fn(),
-    handleCreateVideo: vi.fn(),
+    onChange: vi.fn(), onCancel: vi.fn(), onChangeSource: vi.fn(), onSave: vi.fn(),
   };
 }
 it("운영자 콘텐츠 QR은 추출 후에도 연결 유형을 잠그고 기존 저장을 호출한다", () => {
@@ -56,11 +38,9 @@ it("운영자 콘텐츠 QR은 추출 후에도 연결 유형을 잠그고 기존
   expect(screen.queryByRole("combobox")).toBeNull();
   expect(screen.getByText("운영자 콘텐츠 연결 QR")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "QR 만들기" }));
-  expect(handlers.handleCreate).toHaveBeenCalledOnce();
+  expect(handlers.onSave).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole("button", { name: "자료 변경" }));
-  expect(handlers.setCreating).toHaveBeenCalledWith(false);
-  expect(handlers.setSelectedLibrary).toHaveBeenCalledWith(null);
-  expect(handlers.setShowSelector).toHaveBeenCalledWith(true);
+  expect(handlers.onChangeSource).toHaveBeenCalledOnce();
 });
 it("동영상 QR 저장과 취소는 일반 콘텐츠 처리와 섞이지 않는다", () => {
   const handlers = props();
@@ -72,10 +52,9 @@ it("동영상 QR 저장과 취소는 일반 콘텐츠 처리와 섞이지 않는
     />,
   );
   fireEvent.click(screen.getByRole("button", { name: "QR 만들기" }));
-  expect(handlers.handleCreateVideo).toHaveBeenCalledOnce();
-  expect(handlers.handleCreate).not.toHaveBeenCalled();
+  expect(handlers.onSave).toHaveBeenCalledOnce();
   fireEvent.click(screen.getByRole("button", { name: "취소" }));
-  expect(handlers.setVideoTarget).toHaveBeenCalledWith(null);
+  expect(handlers.onCancel).toHaveBeenCalledOnce();
 });
 it("태블릿 미리보기는 선택 slug와 보기 전환을 유지하고 Escape로 닫힌다", () => {
   const onClose = vi.fn(),
@@ -106,7 +85,7 @@ it("태블릿 미리보기는 선택 slug와 보기 전환을 유지하고 Escap
 
 it("QR CTA and landing controls are reachable by their visible labels", () => {
   const value = props();
-  const { rerender } = render(<StoreQrCreateForms {...value} ctaEnabled />);
+  const { rerender } = render(<StoreQrCreateForms {...value} draft={{ ...value.draft, ctaEnabled: true }} />);
   expect(
     (
       screen.getByLabelText(
@@ -119,7 +98,7 @@ it("QR CTA and landing controls are reachable by their visible labels", () => {
     <StoreQrCreateForms
       {...value}
       selectedLibrary={{ ...value.selectedLibrary!, source: "direct-content" }}
-      formLandingType="product"
+      draft={{ ...value.draft, landingType: "product" }}
     />,
   );
   expect(screen.getByLabelText("연결 유형").tagName).toBe("SELECT");
@@ -128,7 +107,7 @@ it("QR CTA and landing controls are reachable by their visible labels", () => {
     <StoreQrCreateForms
       {...value}
       selectedLibrary={{ ...value.selectedLibrary!, source: "direct-content" }}
-      formLandingType="link"
+      draft={{ ...value.draft, landingType: "link" }}
     />,
   );
   expect(screen.getByLabelText("연결 URL").tagName).toBe("INPUT");

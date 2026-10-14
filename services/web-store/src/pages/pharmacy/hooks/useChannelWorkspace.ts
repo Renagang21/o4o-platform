@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLatestStoreRequest } from "./useLatestStoreRequest";
 import { loadChannelWorkspace } from "./storeWorkspaceLoaders";
-import type { ChannelOverview } from "../../../api/storeHub";
+import { fetchChannelOverview, type ChannelOverview } from "../../../api/storeHub";
 import {
   fetchChannelProducts,
   fetchAvailableProducts,
@@ -62,6 +62,18 @@ export function useChannelWorkspace(
     }
   }, [showToast, showSettings, overviewRequest]);
 
+  const refreshOverview = useCallback(async () => {
+    const isCurrent = overviewRequest.begin();
+    try {
+      const overview = await fetchChannelOverview();
+      if (isCurrent()) { setChannels(overview); setLoadError(null); }
+    } catch {
+      if (isCurrent()) showToast('error', '채널 현황을 갱신하지 못했습니다.');
+    } finally {
+      if (isCurrent()) setLoading(false);
+    }
+  }, [overviewRequest, showToast]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -97,6 +109,7 @@ export function useChannelWorkspace(
   }, [productRequest]);
   return {
     cancelChannelProducts,
+    refreshOverview,
     channels,
     setChannels,
     assets,

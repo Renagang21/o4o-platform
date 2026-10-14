@@ -30,6 +30,7 @@ const m = vi.hoisted(() => ({
   distribution: vi.fn(),
   analytics: vi.fn(),
   overview: vi.fn(),
+  refreshOverview: vi.fn(),
   products: vi.fn(),
   available: vi.fn(),
   apply: vi.fn(),
@@ -59,6 +60,7 @@ vi.mock("../../../../api/storeQr", () => ({
   getStorePlacementAnalytics: m.distribution,
   getQrAnalytics: m.analytics,
 }));
+vi.mock("../../../../api/storeHub", () => ({ fetchChannelOverview: m.refreshOverview }));
 vi.mock("../storeWorkspaceLoaders", () => ({
   loadChannelWorkspace: m.overview,
 }));
@@ -510,4 +512,18 @@ it("tablet undo failure leaves the applied screen intact and permits retry", asy
     await undo?.();
   });
   expect(result.current.tablets[0].currentScreenSetId).toBe("old");
+});
+
+
+it("channel overview refresh supersedes an older load and settles its loading state", async () => {
+  const initial = deferred<{ overview: { channels: never[]; organizationCode: string }; assets: null; slug: null }>();
+  m.overview.mockReturnValue(initial.promise);
+  m.refreshOverview.mockResolvedValue([{ id: 'fresh-channel' }]);
+  const { result } = renderHook(() => useChannelWorkspace(false, notify, 'store-A'));
+  expect(result.current.loading).toBe(true);
+  await act(async () => { await result.current.refreshOverview(); });
+  expect(result.current.loading).toBe(false);
+  expect(result.current.channels[0].id).toBe('fresh-channel');
+  await act(async () => { initial.resolve({ overview: { channels: [], organizationCode: 'old' }, assets: null, slug: null }); });
+  expect(result.current.channels[0].id).toBe('fresh-channel');
 });
