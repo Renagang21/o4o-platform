@@ -152,6 +152,14 @@ export interface PharmacyOrder {
   paymentGroupId: string | null;
   receiverKey: string | null;
   testPayment: boolean;
+  fulfillmentStatus?: string | null;
+  shipment?: {
+    status: string;
+    carrierName: string;
+    trackingNumber: string;
+    shippedAt: string | null;
+    deliveredAt: string | null;
+  } | null;
 }
 
 /** 가입(active) 세미프랜차이즈의 게시 콘텐츠 — 서버가 가입 상태 · 게시 상태로 거른다. */
