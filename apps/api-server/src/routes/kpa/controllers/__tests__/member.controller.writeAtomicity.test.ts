@@ -64,6 +64,7 @@ import express from 'express';
 import request from 'supertest';
 import { createMembershipScopeGuard } from '../../../../common/middleware/membership-guard.middleware.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { notificationService } from '../../../../services/NotificationService.js';
 import { roleAssignmentService } from '../../../../modules/auth/services/role-assignment.service.js';
 import { createMemberController } from '../member.controller.js';
 
@@ -579,5 +580,37 @@ describe('KPA route middleware and membership type validation', () => {
     const app = httpApp(h);
     expect((await request(app).patch(`/members/${USER_ID}/status`).send({ status: 'suspended' })).status).toBe(200);
     expect((await request(app).patch(`/members/${USER_ID}/status`).send({ status: 'withdrawn' })).status).toBe(403);
+  });
+});
+
+// PR #579: 권한 확인과 실행 분기가 같은 locked canonical 상태를 사용해야 한다.
+describe('operator transition dispatch follows the locked membership state', () => {
+  it.each([
+    ['active', 'suspended', false, true, false],
+    ['pending', 'suspended', false, true, false],
+    ['suspended', 'pending', true, false, true],
+    ['pending', 'active', false, false, false],
+  ])('snapshot %s / locked %s → active', async (snapshot, locked, approval, reactivation, notification) => {
+    const h = makeDataSource({ currentMembershipStatus: locked }); h.member.status = snapshot;
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator'];
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(200);
+    expect(mockApprovalService.reactivateMembership).toHaveBeenCalledTimes(reactivation ? 1 : 0);
+    const approvalWrites = h.calls.filter(c => /^UPDATE service_memberships/.test(c.sql));
+    expect(approvalWrites.length > 0).toBe(approval);
+    expect(h.calls.some(c => /^INSERT INTO kpa_pharmacist_profiles/.test(c.sql))).toBe(approval);
+    expect(Boolean(h.member.joined_at)).toBe(locked === 'pending');
+    expect(notificationService.createNotification).toHaveBeenCalledTimes(notification ? 1 : 0);
+    const audit = h.saves.find(s => s.entity === 'KpaAuditLog');
+    expect(audit?.value.metadata).toEqual({ previousStatus: locked, newStatus: 'active' });
+    expect(h.state.txCommitted).toBe(1);
+  });
+  it('rolls back a raced restoration failure without saving the projection', async () => {
+    mockApprovalService.reactivateMembership.mockRejectedValueOnce(new Error('INJECTED_FAILURE'));
+    const h = makeDataSource({ currentMembershipStatus: 'suspended' }); h.member.status = 'active';
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator']; const out = makeRes();
+    await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(500); expect(h.state.txRolledBack).toBe(1);
+    expect(h.saves).toHaveLength(0);
   });
 });

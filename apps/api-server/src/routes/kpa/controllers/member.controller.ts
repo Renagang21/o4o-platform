@@ -697,31 +697,7 @@ export function createMemberController(
         const member = resolvedMember.member;
         if (resolvedMember.ensured) warnings.push(KPA_MEMBER_ENSURED_WARNING);
 
-        const oldStatus = member.status;
-        if (!canAdministerMembers && !canOperatorChangeMemberStatus(oldStatus, newStatus)) {
-          throw memberAdminRequired();
-        }
-
-        member.status = newStatus;
-
-        // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
-        //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
-        //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
-        //   (warnings 선언은 ID 해석 단계로 이동 — skeleton ensure 경고를 함께 담는다.)
-
-        // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
-        if (newStatus === 'suspended' || newStatus === 'rejected') {
-          member.identity_status = 'suspended';
-        } else if (newStatus === 'withdrawn') {
-          member.identity_status = 'withdrawn';
-        } else if (newStatus === 'active' || newStatus === 'pending') {
-          member.identity_status = 'active';
-        }
-
-        // 가입 승인 시 joined_at 설정
-        if (oldStatus === 'pending' && newStatus === 'active') {
-          member.joined_at = new Date();
-        }
+        const snapshotStatus = member.status;
 
         // ============================================================
         // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1
@@ -748,9 +724,8 @@ export function createMemberController(
         //   (동일 manager 이므로 FOR UPDATE 행 잠금도 같은 transaction 안에서 성립).
         //   상태 의미 · 권한 규칙 · 응답 계약은 변경하지 않는다.
         // ============================================================
-        const isApprovalTransition = ['pending', 'rejected'].includes(oldStatus) && newStatus === 'active';
-
-        const saved = await dataSource.transaction(async (manager) => {
+        const { saved, oldStatus } = await dataSource.transaction(async (manager) => {
+          let oldStatus = snapshotStatus;
           if (!canAdministerMembers) {
             const [current] = await manager.query(
               `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society' FOR UPDATE`,
@@ -759,6 +734,30 @@ export function createMemberController(
             if (!current || !canOperatorChangeMemberStatus(current.status, newStatus)) {
               throw memberAdminRequired();
             }
+            // 권한·위임·가입일·후속 이력/알림은 같은 잠금 상태를 기준으로 한다.
+            oldStatus = current.status;
+          }
+          const isApprovalTransition = ['pending', 'rejected'].includes(oldStatus) && newStatus === 'active';
+
+          member.status = newStatus;
+
+          // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+          //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
+          //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
+          //   (warnings 선언은 ID 해석 단계로 이동 — skeleton ensure 경고를 함께 담는다.)
+
+          // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
+          if (newStatus === 'suspended' || newStatus === 'rejected') {
+            member.identity_status = 'suspended';
+          } else if (newStatus === 'withdrawn') {
+            member.identity_status = 'withdrawn';
+          } else if (newStatus === 'active' || newStatus === 'pending') {
+            member.identity_status = 'active';
+          }
+
+          // 가입 승인 시 joined_at 설정
+          if (oldStatus === 'pending' && newStatus === 'active') {
+            member.joined_at = new Date();
           }
 
           if (!isApprovalTransition) {
@@ -868,7 +867,7 @@ export function createMemberController(
             await manager.save(KpaMemberService, newSvc);
           }
 
-          return savedMember;
+          return { saved: savedMember, oldStatus };
         });
 
         // Store access is granted only by the separate pharmacy application approval.
