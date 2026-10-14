@@ -1,6 +1,7 @@
 /** Fixed, owner-approved PH development rows. Media/GCS and shared identities stay intact.
  * Caller owns the transaction. Any ownership, dependency or census drift aborts before writes.
  */
+import {createHash} from 'node:crypto';
 const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-event-offer'];
 const ph=field=>`${field}::text = ANY($1::text[])`;
 const jsonScope=alias=>['serviceKey','service_key','source','sourceService'].map(k=>ph(`${alias}.metadata->>'${k}'`)).join(' OR ');
@@ -41,6 +42,9 @@ async function lock(q,tables,plan) {
 async function dependencies(q,plan) {
   await q.query("SET LOCAL lock_timeout='5s'");
   await q.query("SET LOCAL statement_timeout='15s'");
+  // Match the Core erasure worker's advisory-before-table order. The live fence
+  // reuses this shared transaction lock when the supplier-offer update occurs.
+  await q.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
   // All application relations are held stable for the conservative non-FK ID scan.
   const tables=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",c.relrowsecurity AS row_security FROM pg_class c
     JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','p')
@@ -58,11 +62,32 @@ async function dependencies(q,plan) {
     JOIN pg_attribute ta ON ta.attrelid=c.confrelid AND ta.attnum=k.target_key
     WHERE c.contype='f' AND tn.nspname='public' AND t.relname=ANY($1::text[])
     GROUP BY sn.nspname,s.relname,t.relname,c.conname`,[[...byTable.keys()]]);
-  if(await count(q,`SELECT count(*)::text AS count FROM pg_trigger g
+  const triggers=await q.query(`SELECT t.relname AS table_name,g.tgname AS trigger_name,
+    g.tgtype::int AS event_type,g.tgenabled AS enabled,pn.nspname AS function_schema,
+    p.proname AS function_name,p.prosrc AS function_body,
+    (p.prokind='f' AND p.pronargs=0 AND p.prorettype='trigger'::regtype AND NOT p.proretset
+      AND NOT p.prosecdef AND p.provolatile='v' AND p.proparallel='u' AND p.proconfig IS NULL
+      AND l.lanname='plpgsql' AND g.tgnargs=0 AND octet_length(g.tgargs)=0
+      AND g.tgqual IS NULL AND g.tgattr::text='' AND g.tgconstraint=0 AND g.tgparentid=0) AS expected_shape
+    FROM pg_trigger g
     JOIN pg_class t ON t.oid=g.tgrelid JOIN pg_namespace n ON n.oid=t.relnamespace
+    JOIN pg_proc p ON p.oid=g.tgfoid JOIN pg_namespace pn ON pn.oid=p.pronamespace
+    JOIN pg_language l ON l.oid=p.prolang
     WHERE n.nspname='public' AND t.relname=ANY($1::text[]) AND NOT g.tgisinternal
-    AND g.tgenabled<>'D' AND ((g.tgtype::int & 8)<>0 OR
-      (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))`,[[...byTable.keys()]]))throw new Error('PH_DEV_MUTATION_TRIGGER');
+    AND (g.tgenabled<>'D' OR g.tgname='account_erasure_write_fence') AND ((g.tgtype::int & 8)<>0 OR
+      (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))`,[[...byTable.keys()]]);
+  if(!triggers.some(t=>t.table_name==='supplier_product_offers'&&t.trigger_name==='account_erasure_write_fence'))
+    throw new Error('PH_DEV_MUTATION_TRIGGER');
+  for(const t of triggers) {
+    // Keep the approved fence active: no trigger disabling or erasure-operation bypass setting.
+    // Fingerprint is the exact body of RetireLegacyErasureIdentityHashes1791795139475,
+    // confirmed by production read-only census 38487657820. Any drift stops the purge.
+    if(t.table_name!=='supplier_product_offers'||t.trigger_name!=='account_erasure_write_fence'||
+      t.function_schema!=='public'||t.function_name!=='account_erasure_write_fence'||
+      t.event_type!==23||t.enabled!=='O'||t.expected_shape!==true||typeof t.function_body!=='string'||
+      createHash('sha256').update(t.function_body).digest('hex')!=='51cc91dfa608b87c5ac66564d67dc7f58d08e41e8132e01e271fc95fadf6bdb9')
+      throw new Error('PH_DEV_MUTATION_TRIGGER');
+  }
   return {fks,tables};
 }
 async function census(q,residual=false) {
