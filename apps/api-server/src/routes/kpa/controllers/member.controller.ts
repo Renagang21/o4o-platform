@@ -103,10 +103,18 @@ function memberAdminRequired(): MemberInfoAbort {
   return new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '서비스 관리자 권한이 필요합니다.');
 }
 
+/** operator의 일상 상태 전이. 탈퇴 복구와 가입 신청으로 되돌림은 admin 업무다. */
+function canOperatorChangeMemberStatus(current: string, next: string): boolean {
+  if (next === 'active') return ['pending', 'rejected', 'active', 'suspended'].includes(current);
+  if (next === 'suspended') return ['active', 'suspended'].includes(current);
+  if (next === 'rejected') return ['pending', 'rejected'].includes(current);
+  return false;
+}
+
 async function resolveKpaMemberByAnyId(
   manager: KpaMemberResolveRunner,
   id: string,
-  applicationOnly = false,
+  operatorTargetStatus?: string,
 ): Promise<{ member: KpaMember; ensured: boolean }> {
   // 1) kpa_members.id
   const byMemberId = await manager.findMember({ id });
@@ -128,7 +136,7 @@ async function resolveKpaMemberByAnyId(
     throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
   }
   const sm = smRows[0];
-  if (applicationOnly && !['pending', 'rejected'].includes(sm.status)) {
+  if (operatorTargetStatus && !canOperatorChangeMemberStatus(sm.status, operatorTargetStatus)) {
     throw memberAdminRequired();
   }
   await assertNotDemoMember(manager, sm.user_id);
@@ -148,15 +156,17 @@ async function resolveKpaMemberByAnyId(
   const hasSp = !!profilePresence[0]?.has_sp;
   const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
   const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
-  const safeStatus = sm.status === 'active' ? 'active' : 'pending';
+  const safeStatus = ['pending', 'active', 'suspended', 'rejected', 'withdrawn'].includes(sm.status) ? sm.status : 'pending';
+  const identityStatus = ['suspended', 'rejected'].includes(safeStatus) ? 'suspended'
+    : safeStatus === 'withdrawn' ? 'withdrawn' : 'active';
   const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
 
   const insertResult = await manager.query(
     `INSERT INTO kpa_members
        (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
-     VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
+     VALUES ($1, $2, $3, $6, $4, $5, NOW(), NOW())
      RETURNING id`,
-    [sm.user_id, safeRole, safeStatus, derivedType, joinedAt],
+    [sm.user_id, safeRole, safeStatus, derivedType, joinedAt, identityStatus],
   );
   const insertedId: string | undefined = insertResult?.[0]?.id;
   const ensured = insertedId ? await manager.findMember({ id: insertedId }) : null;
@@ -665,7 +675,7 @@ export function createMemberController(
         const warnings: string[] = [];
         const newStatus = req.body.status;
         const canAdministerMembers = req.user?.roles?.some(role => role === 'kpa:admin' || role === 'platform:super_admin') ?? false;
-        if (!canAdministerMembers && !['active', 'rejected'].includes(newStatus)) {
+        if (!canAdministerMembers && !['active', 'rejected', 'suspended'].includes(newStatus)) {
           throw memberAdminRequired();
         }
         let resolvedMember: { member: KpaMember; ensured: boolean };
@@ -673,7 +683,7 @@ export function createMemberController(
           resolvedMember = await resolveKpaMemberByAnyId(
             resolveRunnerFromDataSource(dataSource),
             req.params.id,
-            !canAdministerMembers,
+            canAdministerMembers ? undefined : newStatus,
           );
         } catch (resolveError) {
           if (resolveError instanceof MemberInfoAbort) {
@@ -687,32 +697,7 @@ export function createMemberController(
         const member = resolvedMember.member;
         if (resolvedMember.ensured) warnings.push(KPA_MEMBER_ENSURED_WARNING);
 
-        const oldStatus = member.status;
-        const applicationDecision = (oldStatus === 'pending' || oldStatus === 'rejected') && ['active', 'rejected'].includes(newStatus);
-        if (!canAdministerMembers && !applicationDecision) {
-          throw memberAdminRequired();
-        }
-
-        member.status = newStatus;
-
-        // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
-        //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
-        //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
-        //   (warnings 선언은 ID 해석 단계로 이동 — skeleton ensure 경고를 함께 담는다.)
-
-        // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
-        if (newStatus === 'suspended' || newStatus === 'rejected') {
-          member.identity_status = 'suspended';
-        } else if (newStatus === 'withdrawn') {
-          member.identity_status = 'withdrawn';
-        } else if (newStatus === 'active' || newStatus === 'pending') {
-          member.identity_status = 'active';
-        }
-
-        // 가입 승인 시 joined_at 설정
-        if (oldStatus === 'pending' && newStatus === 'active') {
-          member.joined_at = new Date();
-        }
+        const snapshotStatus = member.status;
 
         // ============================================================
         // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1
@@ -739,17 +724,40 @@ export function createMemberController(
         //   (동일 manager 이므로 FOR UPDATE 행 잠금도 같은 transaction 안에서 성립).
         //   상태 의미 · 권한 규칙 · 응답 계약은 변경하지 않는다.
         // ============================================================
-        const isApprovalTransition = ['pending', 'rejected'].includes(oldStatus) && newStatus === 'active';
-
-        const saved = await dataSource.transaction(async (manager) => {
+        const { saved, oldStatus } = await dataSource.transaction(async (manager) => {
+          let oldStatus = snapshotStatus;
           if (!canAdministerMembers) {
             const [current] = await manager.query(
               `SELECT status FROM service_memberships WHERE user_id = $1 AND service_key = 'kpa-society' FOR UPDATE`,
               [member.user_id],
             );
-            if (!current || !['pending', 'rejected'].includes(current.status) || !['active', 'rejected'].includes(newStatus)) {
+            if (!current || !canOperatorChangeMemberStatus(current.status, newStatus)) {
               throw memberAdminRequired();
             }
+            // 권한·위임·가입일·후속 이력/알림은 같은 잠금 상태를 기준으로 한다.
+            oldStatus = current.status;
+          }
+          const isApprovalTransition = ['pending', 'rejected'].includes(oldStatus) && newStatus === 'active';
+
+          member.status = newStatus;
+
+          // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
+          //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
+          //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
+          //   (warnings 선언은 ID 해석 단계로 이동 — skeleton ensure 경고를 함께 담는다.)
+
+          // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
+          if (newStatus === 'suspended' || newStatus === 'rejected') {
+            member.identity_status = 'suspended';
+          } else if (newStatus === 'withdrawn') {
+            member.identity_status = 'withdrawn';
+          } else if (newStatus === 'active' || newStatus === 'pending') {
+            member.identity_status = 'active';
+          }
+
+          // 가입 승인 시 joined_at 설정
+          if (oldStatus === 'pending' && newStatus === 'active') {
+            member.joined_at = new Date();
           }
 
           if (!isApprovalTransition) {
@@ -859,7 +867,7 @@ export function createMemberController(
             await manager.save(KpaMemberService, newSvc);
           }
 
-          return savedMember;
+          return { saved: savedMember, oldStatus };
         });
 
         // Store access is granted only by the separate pharmacy application approval.
@@ -1137,6 +1145,7 @@ export function createMemberController(
     requireAuth,
     requireScope('kpa:operator'),
     param('id').isUUID(),
+    body('membership_type').optional().isIn(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member']),
     body('activity_type').optional().isString().isIn([
       'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
       'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
@@ -1221,10 +1230,6 @@ export function createMemberController(
 
           // kpa_members 필드 업데이트
           const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
-          if (membership_type && membership_type !== member.membership_type
-            && !(req as any).user?.roles?.some((role: string) => role === 'kpa:admin' || role === 'platform:super_admin')) {
-            throw new MemberInfoAbort(403, 'SERVICE_MEMBER_ADMIN_REQUIRED', '회원 유형 변경은 서비스 관리자만 가능합니다.');
-          }
           if (membership_type && validMembershipTypes.includes(membership_type)) {
             changes.membership_type = membership_type;
             member.membership_type = membership_type;

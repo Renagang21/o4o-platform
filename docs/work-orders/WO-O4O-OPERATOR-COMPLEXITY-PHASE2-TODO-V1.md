@@ -52,7 +52,7 @@
 - [x] Neture 상품 승인: 승인대기 상품 삭제 실패·대상 보존·재시도 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI·운영 배포 확인 완료).
 - [x] Neture 상품 승인: 승인 상품 휴지통 이동 오류 처리, 목록/분석 상태 책임 분리 구현·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [x] Neture 공급자 승인: 심사 입력·서류 표시·요청 수명 C1/R1/A1 정비·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
-- [ ] 약국 사업자 회원관리: 필드 변경값·검증·순차 저장 결과 F1/C1/A1 조사.
+- [x] 약국 사업자 회원관리: 변경값·검증·info/status 부분 성공 및 재시도 정비·로컬 검증 ([WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)). 이번 종료는 commit/push, main·배포 제외.
 - [x] 약국 협력사업 운영자: 담당 사업 조회·행사/모집 조건 심사·콘텐츠 편집의 R1/S1/A1 조사·첫 정비 ([WO](WO-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)). 공급자 참여 심사 화면은 별도 후속. 종료는 push/PR 인계.
 - [ ] 펀딩: 단계별 안내·상태 변경·참여/KPI 갱신 F1/R1/A1 조사. 단계 연결은 main/배포 완료; 구조 분리는 별도.
 - [ ] 강의: 문의·심사·수료증 입력/처리/결과 R1/S1/A1 조사. 오류 보완은 main/배포 완료; 구조 분리는 별도.
@@ -124,6 +124,23 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 
 [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.
 
+### 약국 사업자 회원 수정 후속 정합
+
+[회원 수정 WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)는 KPA 전용 editor 한 소비처의
+입력/요청 모델과 저장 수명 정비다. 공통 패키지에 있는 기존 코드를 내부 정비했으며
+다른 서비스와 공통화하지 않았다. 약사회 분회 수정·배포는 없다.
+다음 업무 큐는 약국 협력사업·행사이며, 회원관리 API 차수에 아래 불일치를 추가한다.
+
+- [x] KPA 전용 status API의 operator 정지·복구 차단 정비. 단건/일괄 공통 요청 경로·잠금 후 상태 재확인·탈퇴 복구 차단 검증 ([WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md), push 단계).
+- [x] KPA 약사/약대생 유형 변경의 operator 권한을 UI/API에 일치시키고 운영 tier 주입 거부 검증 ([WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md), push 단계).
+- [ ] 쓰기 응답 유실 시 재시도 멱등성은 서버 계약 조사 대상으로 유지.
+
+### KPA 일상 회원관리 권한 후속 결과
+
+[전용 WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md)에서 앞서 발견한 정지·복구/회원 유형 권한 불일치를 해소했다.
+모달의 일상 상태 선택과 admin 민감 상태 선택도 분리한다. 선행 회원 수정 정비를 새 branch에 포함하며
+두 작업의 main 병합·배포는 아직 하지 않는다. 약사회 분회는 제외한다.
+
 ### 협력사업·행사 운영 흐름 정비 결과
 
 기존 공유 모듈의 조회/심사 수명과 콘텐츠 초안/저장 수명을 분리했다.
@@ -132,3 +149,9 @@ Neture 전체 담당 사업과 약국 사업자 businessKey=pharmacy 소비처�
 모집 조건 승인(운영자)과 참여 승인(공급자)은 분리하며 공급자 참여 심사 화면 자체는 후속이다.
 [CHECK](../checks/CHECK-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)에 검증·참여/내 매장 연결·인계 범위를 기록한다.
 개발 담당은 push/PR까지, 통합·배포는 별도 담당 공간에서 진행한다. 약사회 분회는 제외한다.
+
+### PR #579 잠금 상태 리뷰 보완
+
+권한은 최신 잠금 상태를 확인했으나 승인/복구·가입일·이력/알림이 잠금 전 상태를 사용하던 경합을
+[리뷰 보완 WO](WO-KPA-MEMBER-LOCKED-STATUS-REVIEW-FIX-V1.md)로 수정했다. API 회귀 148건·빌드 PASS.
+기존 PR에 추가 push 후 통합 담당에게 재인계하며 main 병합·운영 반영 완료로 표시하지 않는다.

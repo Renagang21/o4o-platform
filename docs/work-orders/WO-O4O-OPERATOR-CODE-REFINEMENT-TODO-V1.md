@@ -54,7 +54,7 @@
 - [ ] 단건·일괄 처리 후 갱신 절차를 정리하되 성공/실패 결과와 권한 유지.
 - [ ] 상세 Drawer 표시·행동을 분리하고 서비스 확장 slot 유지.
 - [ ] 공통 회원 수정의 변경값 계산과 입력 검증을 순수 함수로 분리.
-- [ ] 약국 사업자 회원 수정의 필드 변경 계산과 단계별 저장 결과를 별도로 정리.
+- [x] 약국 사업자 회원 수정의 변경값 모델·단계별 저장 결과·실패 재시도 정비 ([WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)). 이번 종료는 commit/push, main·배포 제외.
 - [ ] 공통 회원 상세의 조회·표시·행동 분리 검토.
 - [ ] 차수 종료 재조사: 남은 복잡성과 2차 선행 조건 확정.
 
@@ -130,9 +130,30 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 
 [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.
 
+### 약국 사업자 회원 수정 실행 상태
+
+[WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)의 입력·검증·info/status 순차 저장을 한 묶음으로 정비했다.
+공개 export/props·API·DB 변경 없이 KPA 전용 모델/hook을 분리하고 부분 성공 후 재전송을 방지한다.
+전체 TODO는 ACTIVE이며 약사회 분회·서비스 간 공통화는 제외한다.
+다음 회원관리 API 정비에서는 KPA 전용 status의 operator 정지 차단과
+회원 유형 select/API 권한 불일치를 공통 상세·단건·일괄 경로와 함께 확인한다.
+로컬/fixture 검증과 실계정 검증(사용자 담당)은 구분한다. main 병합·배포는 실행하지 않는다.
+
+### KPA 일상 회원관리 권한 후속 결과
+
+[전용 WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md)에서 앞서 발견한 정지·복구/회원 유형 권한 불일치를 해소했다.
+모달의 일상 상태 선택과 admin 민감 상태 선택도 분리한다. 선행 회원 수정 정비를 새 branch에 포함하며
+두 작업의 main 병합·배포는 아직 하지 않는다. 약사회 분회는 제외한다.
+
 ### 협력사업 운영자 정비 인계
 
 [WO](WO-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)에서 조회·확인/사유 입력·처리/재조회와
 콘텐츠 초안/요청값/저장 수명을 분리했다. API/DB·권한·모집 참여 주체·이벤트 가격/인덱스는 변경하지 않았다.
 전체 TODO는 ACTIVE다. 공급자 참여 심사 화면과 실계정 내 매장 반영 검증은 완료로 표시하지 않는다.
 종료는 push/PR이며 통합·배포는 별도 담당 공간에서 진행한다.
+
+### PR #579 잠금 상태 리뷰 보완
+
+권한은 최신 잠금 상태를 확인했으나 승인/복구·가입일·이력/알림이 잠금 전 상태를 사용하던 경합을
+[리뷰 보완 WO](WO-KPA-MEMBER-LOCKED-STATUS-REVIEW-FIX-V1.md)로 수정했다. API 회귀 148건·빌드 PASS.
+기존 PR에 추가 push 후 통합 담당에게 재인계하며 main 병합·운영 반영 완료로 표시하지 않는다.
