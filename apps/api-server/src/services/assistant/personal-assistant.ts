@@ -236,7 +236,9 @@ async function completeByUserDeclaration(
  */
 async function findDeclaredCompletion(dataSource: DataSource, input: AssistantWorkInput): Promise<AssistantTaskRow | null> {
   const runId = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0 ? input.workBody.runId : null;
-  if (!runId || !isCompletionDeclaration(input.workBody.request, null)) return null;
+  // A lexical candidate only: replay is allowed below only after both owned records are completed.
+  // The original success-confirmation frame is deleted on completion, so retries may also say "네".
+  if (!runId || !isCompletionDeclaration(input.workBody.request, 'success_confirmation')) return null;
   const taskId = await findTaskIdByRun(dataSource, runId, input.userId);
   if (!taskId) return null;
   const task = await getAssistantTaskForRequester(dataSource, taskId, input.userId);
