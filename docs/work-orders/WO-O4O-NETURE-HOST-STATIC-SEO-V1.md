@@ -1,6 +1,6 @@
 # Neture 호스트별 정적 SEO
 
-> **상태**: ACTIVE · **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
+> **상태**: COMPLETED · **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거**: 프론트엔드 디자인 잔여 진행 요청 및 Docker·빌드·배포 인프라 변경에 대한 사용자 명시 승인
 
 ## 문제와 범위
@@ -25,3 +25,7 @@ Design Reference: [Design Core](../rules/DESIGN-CORE-GOVERNANCE.md). 기존 화�
 Neture 전체 테스트·타입 포함 빌드·변경 파일 lint, 실제 Docker build/run을 확인한다. JS 없는 HTTP로 4호스트 메타·미지 호스트·심층 경로·정적 자산 MIME/캐시/404·HEAD/range/gzip·PORT 변경을 검증한다. Chromium 공개 홈 1440/390/320px에서 CTA·overflow·실제 host 프로필을 검사한다. 로그인/운영 쓰기 smoke는 별도 승인 계정이 필요하다.
 
 CI·Codex gate 이후 정상 PR 병합과 Neture만의 통제 배포를 진행한다. DB migration을 실행하지 않는다. 배포는 기존 verified rollout의 무트래픽 검증→traffic 전환을 따르며 실패 시 기존 revision을 유지한다. 운영 이후 회귀는 기존 정상 revision으로 rollback하거나 이 변경을 정상 revert PR로 되돌린다. 결과는 [CHECK](../checks/CHECK-O4O-NETURE-HOST-STATIC-SEO-V1.md)에 기록한다.
+
+## 완료
+
+Source PR [#571](https://github.com/Renagang21/o4o-platform/pull/571), main `97035d93b7a6eb80b65a060fadb8356e0b45d401`. source/main CI PASS, source Sonar·Codex PASS. Neture 전용 정상 Promote `38514041041` 및 최종 실제 serving SHA 확인 PASS, 운영 HTTPS 52 requests PASS. API/DB migration은 실행하지 않았다. 클라우드 기본 Node/pnpm 정렬 및 재사용 환경 지침 초안 저장도 완료했고 다음 snapshot에는 사용자 재게시가 필요하다. 상세 증거와 보존 판정은 [CHECK](../checks/CHECK-O4O-NETURE-HOST-STATIC-SEO-V1.md)를 따른다.
