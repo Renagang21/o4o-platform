@@ -352,6 +352,7 @@ web-neture 테스트를 로컬에서 돌리려면 루트에서 `npx vitest run -
 
 > **api-server type-check 사전 빌드.** API는 workspace package의 `dist/*.d.ts`를 읽습니다.
 > 현재 `build:packages`는 `build:api-deps`를 포함하며, 같은 의존 순서의 명령은 `pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build`입니다.
+> 공통 패키지를 빌드한 뒤 `pnpm --filter @o4o/api-server run type-check`로 API 타입을 검사합니다. API 의존성만 갱신할 때는 `pnpm run build:api-deps`를 사용할 수 있으며, 전체 패키지 빌드 뒤 같은 의존성을 중복 빌드할 필요는 없습니다.
 > clean checkout에서 검증하기 전 이 사전 빌드를 실행합니다. 명령·목록의 기준은 현재 root package scripts/CI이며 고정 패키지 개수로 관리하지 않습니다.
 
 ### API bundle·AI 회귀 검증
