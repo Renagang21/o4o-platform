@@ -8,7 +8,7 @@
 
 전체를 한 번에 재작성하지 않는다. 1차에서 책임을 분리하고, 그 결과를 다시 조사해 2차를 확정한다.
 각 차수 안에서도 검증 가능한 작은 작업 단위로 나눈다. 앞선 완료 단위는 통합 WO에 따라 main/배포됐으며 초기 종료 범위는 commit/push였으나 사용자 후속 요청으로 PR 정상 병합·필요한 배포까지 진행한다.
-표시 정비 PR #544와 삭제 보완 PR #555는 main/CI 완료이며 Neture 배포는 선행 API 문제로 보류됐다. 실계정 지정·재로그인·접근 검증은 사용자가 담당한다.
+표시 정비 PR #544와 삭제 보완 PR #555는 main/CI 및 운영 배포 확인 완료다. 배포 보류 해소 근거는 아래 실행 상태와 삭제 CHECK를 따른다. 실계정 지정·재로그인·접근 검증은 사용자가 담당한다.
 
 - 전체 관리자(`admin.neture.co.kr`)와 개별 서비스 운영자(`admin`, `operator`)를 구분한다.
 - 일상 회원관리와 admin의 민감한 처리를 분리한 현재 권한 정책을 유지한다.
@@ -75,7 +75,7 @@
 
 - [x] Neture 상품 승인: 요청값·선택 함수, 승인/거절 실행 절차·실패 UX·조회 수명 정비 및 main/배포.
 - [x] Neture 상품 승인: 상세/입력/품질 표시 분리 (이번 [TODO](WO-NETURE-PRODUCT-APPROVAL-PRESENTATION-V1.md)).
-- [x] Neture 상품 승인: 승인대기 삭제 실패·대상 보존 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI 완료, 운영 배포는 API 의존 보류).
+- [x] Neture 상품 승인: 승인대기 삭제 실패·대상 보존 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI·운영 배포 확인 완료).
 - [ ] Neture 상품 승인: 승인 상품 휴지통 오류 처리와 목록/분석 책임 추가 조사.
 - [ ] Neture 등록 상품·가입 신청: 실제 경로와 상태 전이 대조 후 조회/행동 분리.
 - [ ] 공급자 승인: 상세·서류 확인·반려 입력·상태 변경 분리, 사유/오류 보존 유지.
@@ -119,5 +119,5 @@
 
 ### 2026-10-14 실행 상태
 
-PR #544·#555의 main CI는 모두 통과했다. 코드 정비 완료와 운영 배포를 분리한다. Neture-only 배포는 API 의존 보류이며, 별도 AI 타입 재export 번들 오류와 미적용 quota migration/API 배포가 선행한다.
+PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #557과 API/migration 배포는 Promote `38497933074`에서 완료됐고, 의존 Neture 배포 및 후속 Neture Delivery `38499037614`도 실제 deploy/serving Report가 통과했다. 최신 조사 main `6eeea05a2` Delivery `38500377113`은 NO_DEPLOY다. 과거 API 의존 보류는 해소됐다.
 삭제 실패·대상 보존 WO의 실제 판정 기록을 따른다. 다음 운영자 정비는 승인 상품 휴지통 이동 오류 처리, 이후 목록/분석 상태 책임 조사다. 서비스 간 공통화와 약사회 분회는 제외한다.
