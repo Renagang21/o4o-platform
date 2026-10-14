@@ -74,7 +74,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
           FROM generate_series(1,5000) n; ANALYZE product_identifiers`);
       const referencePlans=[];
       const inspected={...q,query:async(sql,args)=>{
-        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('strpos('))
+        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('LIKE ANY('))
           referencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
@@ -84,7 +84,7 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       const walk=node=>[node,...(node.Plans??[]).flatMap(walk)];
       assert.equal(referencePlans.length,2);
       for(const execution of referencePlans) {
-        const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE targets');
+        const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE target_patterns');
         assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
       }
       await client.query('INSERT INTO product_identifiers VALUES($1,$2)',[uuid(990),{nested:{orderLog:uuid(101)}}]);
@@ -93,6 +93,18 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('ROLLBACK');
       assert.equal((await client.query('SELECT count(*) FROM checkout_order_logs')).rows[0].count,'6');
       await client.query('DELETE FROM product_identifiers WHERE id=$1',[uuid(990)]);
+      // Substring semantics remain literal even if a legacy ID contains LIKE
+      // wildcards or an escape character; similar foreign text must stay safe.
+      const literalId='literal_%\\token';
+      await client.query('ALTER TABLE offer_service_prices ALTER COLUMN id TYPE text');
+      await client.query('UPDATE offer_service_prices SET id=$1',[literalId]);
+      await client.query("CREATE TABLE literal_refs(value text); INSERT INTO literal_refs VALUES('literal-ABCtoken')");
+      await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      assert.equal((await new PharmacyHubDevelopmentPurge().up(q,true)).applied,false);await client.query('ROLLBACK');
+      await client.query('INSERT INTO literal_refs VALUES($1)',['prefix '+literalId+' suffix']);
+      await begin();
+      await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),/PH_DEV_SHARED_VALUE:public.literal_refs.value/);
+      await client.query('ROLLBACK');await client.query('DELETE FROM literal_refs');
       const erasure=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await erasure.connect();
       try {
         const pid=(await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
