@@ -104,6 +104,8 @@ import { judgeTaskStatus, planAssistantTask } from '../services/assistant/assist
 import {
   __resetUnderstandingCacheForTest,
   cachedUnderstanding,
+  cacheUnderstanding,
+  UNDERSTANDING_CACHE_TTL_MS,
   createCompletionJudge,
   createLlmTaskUnderstander,
   createLlmCompletionVerifier,
@@ -119,6 +121,8 @@ import {
   sanitizeUnderstanding,
 } from '../services/assistant/assistant-understanding.js';
 import { purgeEndedRunFrames, readRunResume, saveRunFrame } from '../services/assistant/procedural-memory-store.js';
+import { WORK_RUN_TTL_MS } from '../services/ai-tools/work-run-coordination-service.js';
+import { createCompletionEvidenceSession } from '../services/ai-tools/work-completion-evidence.js';
 import {
   RUN_FRAME_PURGE_INTERVAL_MS,
   __resetRunFramePurgeForTest,
@@ -588,6 +592,26 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     const execA = jest.fn(async (): Promise<WorkExecutionReply> => waiting('g_ra'));
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '5mg 로', runId: 'g_ra' }, requestedTaskId: out.task!.taskId }, execA);
     expect((execA.mock.calls[0] as any)[2].understanding).toMatchObject({ criteria: [C1, C2_USER] });
+  });
+
+  it('요소 경계를 지킨다 — 따로 보인 "결제" · "완료" 는 "결제 완료" 인용의 근거가 아니다 · 한 요소 안의 글은 근거', () => {
+    const s = createCompletionEvidenceSession();
+    s.noteElements([
+      { elementRef: 'e_1', role: 'button', name: '결제' } as any,
+      { elementRef: 'e_2', role: 'text', name: '완료' } as any,
+      { elementRef: 'e_3', role: 'text', name: '주문 상태', text: '배송 준비중' } as any,
+    ]);
+    const ev = (quote: string) => s.ground({ assessment: 'completed', action: { kind: 'done' }, evidence: [{ criterion: 'c1', source: 'screen', quote }] } as any, []);
+    expect(ev('결제 완료')[0].grounded).toBe(false);
+    expect(ev('배송 준비중')[0].grounded).toBe(true);
+  });
+
+  it('재개용 이해 캐시는 run 만료와 같은 수명이다 — 만료된 run 의 이해(요청 파생 글)가 남지 않는다', () => {
+    expect(UNDERSTANDING_CACHE_TTL_MS).toBe(WORK_RUN_TTL_MS);
+    const t0 = 1_000_000;
+    cacheUnderstanding('g_ttl', U([C1]), t0);
+    expect(cachedUnderstanding('g_ttl', t0 + WORK_RUN_TTL_MS - 1)).not.toBeNull();
+    expect(cachedUnderstanding('g_ttl', t0 + WORK_RUN_TTL_MS + 1)).toBeNull();
   });
 
   it('입력 · 선택 칸의 현재 값은 근거 모집단에 들어가지 않는다(이름 · 라벨만)', () => {
