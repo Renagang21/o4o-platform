@@ -77,13 +77,13 @@ main 통합·운영 배포와 인증 트랙 종료는 아직 실행하지 않았
 | auth-react | 19 suites · 229/229 PASS (최초 수명 회귀 13개 + foreground 리뷰 회귀 2개 포함) |
 | auth-client | 기존 token storage/refresh 경계 5 suites · 40/40 PASS |
 | API | 4 suites · 76/76 PASS (신규 검증 우선순위 11개 + 기존 family/binding/password/HTTP logout) |
-| Neture | 92 suites · 822/822 PASS |
+| Neture | main repair sync 후 95 suites · 848/848 PASS (이전 92 suites · 822/822도 PASS) |
 | 분회 | 5 suites · 39/39 PASS |
 | Store | 14 suites · 132/132 PASS |
 | 강의 | 5 suites · 18/18 PASS |
 | 약국 협력사업 | 17 suites · 135/135 PASS (@o4o/ui 산출물 갱신 후) |
 | 타입/빌드 | API type-check·표준 tsc build PASS, 실제 5웹의 타입/production build 모두 PASS |
-| API 배포용 ESM | FAIL: 기준 main의 AI type 재수출 오류와 동일. 아래 참조 |
+| API 배포용 ESM | 초기 기준에서는 FAIL. PR #557 repair 소비 후 실제 checkout tsc/tsup·두 bundle syntax PASS. 후속 CHECK 참조 |
 | lint | 변경 코드/테스트 4파일 errors0 · warnings0 |
 | 브라우저 | built bundle + 합성 API fixture, 8서비스 PC/모바일 viewport에서 로그인·handoff 성공/거절 36/36 PASS |
 
@@ -130,6 +130,11 @@ build가 모두 PASS다. `auth-foreground-*` 로그에 최초 실패와 수정 �
 ESM 재수출 실패의 후속 독립 검증은 [CHECK](../checks/CHECK-O4O-AUTH-API-ESM-EXPORT-UNBLOCK-V1.md)에 기록했다.
 PR #557의 타입 수정안과 본 인증 server source를 함께 적용한 격리 사본도 tsc/tsup·bundle syntax 및 오류
 우선순위 11개를 통과했다. source repair는 upstream PR의 책임이며 main/운영 반영과 구분한다.
+
+upstream repair의 main `ce876b0ab0` 통합을 확인한 뒤 자기 branch만 정상 merge(`e7b183e2b7`, clean·충돌0)하여
+원래 클라우드 checkout에서도 API tsc/tsup·산출물 복원·bundle syntax PASS를 확인했다. 같은 6개 인증/검증
+경로 외 추가 수정을 만들지 않았고, 인증 PR의 main 통합·배포는 실행하지 않았다. sync 후 Neture는 848/848,
+hook은 229/229 및 Neture 타입/production build PASS다. 앞선 기준 실패는 당시 기록으로 보존한다.
 
 문서 정합: 앞선 1차 및 검증 PR의 완료 기록을 변경하지 않고 이 후속 TODO를 분리했다.
 WORKTREE_DISPOSITION: KEEP — 같은 미완료 인증 WO의 연속 Phase와 cloud 검증 자원을 유지한다.

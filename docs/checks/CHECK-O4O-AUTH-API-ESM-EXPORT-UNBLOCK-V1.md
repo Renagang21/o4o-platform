@@ -97,5 +97,25 @@ Node 22.18.0에서 원래 tsconfig/tsup 설정·기존 의존성으로 실행했
 해당 인증 hook 보완·추가 회귀는 앞선 TODO의 후속 리뷰 항목에 기록한다. AI 재수출 source 작업과 구분하며
 본 CHECK의 상태는 lifecycle 정본에 따라 ACTIVE로 정정했다.
 
+## main 반영 후 현재 checkout의 실제 빌드
+
+upstream PR #557은 main `ce876b0ab0`에 통합됐다. 타입 재수출 두 파일은 독립 검증한 `113ceee949`와
+같음을 확인했다. 기록 준비 이후 실제 CI/리뷰와 원격 상태를 재조회해 판정을 갱신한 것이며, 앞의 진행 중
+관측은 그 당시 상태로 보존한다. 운영 배포 실행/완료를 이 main 반영만으로 주장하지 않는다.
+
+원래 작업 branch가 이전 main에 있어 오류를 계속 갖고 있었으므로, clean·진행 operation0·본 작업 6경로의
+main 추가 변경0을 확인한 뒤 **자기 branch에만** 최신 main을 정상 merge했다(`e7b183e2b7`, 충돌0).
+upstream repair를 소비해 이 클라우드의 실제 빌드 오류를 해소하기 위한 sync이며 자동 ahead sync나
+공유 main 수정이 아니다. main 대비 본 PR 변경은 같은 인증/검증 6경로만 유지한다.
+
+이제 격리 사본뿐 아니라 `/workspace/o4o-platform/apps/api-server`의 기존 `pnpm run build` → 산출물 보존 →
+`pnpm run build:api` → 복원도 모두 exit0다. 실제 main/migrate의 Node syntax 각각 PASS, 컴파일 database
+2,348파일의 복원 checksum 동일. runtime·운영 DB에 접속하거나 migration을 실행하지 않았다.
+`ai-export-root-*` 로그에 원래 checkout 검증을 독립 사본의 결과와 구분했다. 오류 우선순위도 11/11 PASS다.
+
+sync 후 공통 hook 229/229, 변경된 Neture 소비처 전체 95 suites / 848 tests 및 Neture 타입/production build
+PASS다. 다른 4웹은 이 main 이동에서 runtime 변경이 없어 앞선 검증을 유지한다. 최종 branch push와 최신
+HEAD CI/review 결과는 인증 PR #554에 기록한다.
+
 문서 정합: 인증 정비의 기존 실패 기록을 소급 수정하지 않고 upstream 수정안과 실제 ESM 검증을 분리 기록한다.
 WORKTREE_DISPOSITION: KEEP — 인증 PR의 push-only 후속 기록, main 통합·배포 미실행.
