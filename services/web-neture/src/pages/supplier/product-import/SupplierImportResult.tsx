@@ -134,7 +134,7 @@ export default function SupplierImportResult({
                 />
 
                 {/* Checkbox */}
-                <label className="absolute left-1 top-1 flex h-5 w-5 [@media(pointer:coarse)]:h-11 [@media(pointer:coarse)]:w-11 cursor-pointer items-center justify-center rounded bg-white/80 focus-within:ring-2 focus-within:ring-emerald-500">
+                <label className="absolute left-1 top-1 flex h-5 w-5 [@media(any-pointer:coarse)]:h-11 [@media(any-pointer:coarse)]:w-11 cursor-pointer items-center justify-center rounded bg-white/80 focus-within:ring-2 focus-within:ring-emerald-500">
                   <input
                     type="checkbox"
                     aria-label={`상품 이미지 ${idx + 1} 선택`}

@@ -53,7 +53,7 @@ export default function SupplierCandidateMediaFields({
                 type="button"
                 aria-label="대표 이미지 삭제"
                 onClick={removeThumbnail}
-                className="absolute top-1 right-1 w-5 h-5 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="absolute top-1 right-1 w-5 h-5 [@media(any-pointer:coarse)]:w-11 [@media(any-pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               >
                 X
               </button>
@@ -116,7 +116,7 @@ export default function SupplierCandidateMediaFields({
                     type="button"
                     aria-label={`${idx + 1}번 성분/라벨 이미지 삭제`}
                     onClick={() => removeImageItem(idx, contentItems, setContentItems)}
-                    className="absolute top-1 right-1 w-5 h-5 [@media(pointer:coarse)]:w-11 [@media(pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    className="absolute top-1 right-1 w-5 h-5 [@media(any-pointer:coarse)]:w-11 [@media(any-pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                   >
                     X
                   </button>

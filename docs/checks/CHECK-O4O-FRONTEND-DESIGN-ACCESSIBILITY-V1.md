@@ -26,6 +26,8 @@ PR #556의 등록/import 라벨 개선을 반영하고 두 runtime 파일의 중
 
 ## 남은 외부 요건
 
+PR #560 자동 리뷰의 P2는 primary pointer만 검사하면 마우스가 기본인 터치스크린 기기에서 이미지 삭제/선택 영역이 20px로 남는다는 지적이다. 세 영역의 CSS 조건을 `any-pointer: coarse`로 변경했다. 데스크톱/터치 viewport 검사와 영향 회귀를 다시 실행한다. Chromium의 media feature override는 fine+coarse 혼합 장치 구성을 재현하지 못했으므로 실제 하이브리드 기기 검증 완료로 표시하지 않는다.
+
 운영 계정 파일·정식 브랜드 자산이 없다. static host SEO는 현재 runtime 메타만으로 해소되지 않아 Docker/nginx/edge 변경 범위를 별도로 확정해야 한다. migration 포함 promote는 AGENTS.md §4-1(f)의 명시 승인 요건을 따른다. 외부 요건 확보와 무관한 로컬 수정·회귀 검증은 계속한다.
 
 문서 정합: 이번 WO/CHECK로 현재 작업 범위와 실제 검증을 기록한다. 과거 COMPLETED 이력과 canonical 정책을 재작성하지 않는다.
