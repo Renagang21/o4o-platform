@@ -1,5 +1,7 @@
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { resolveTabletDisplayEntries, toTabletDisplayPayload, tabletDisplayPayloadsEqual, appendSelectedTabletProducts, moveTabletDisplayEntry, type TabletDisplayEntry as DisplayEntry, type TabletDisplayPayload } from './tablet/tabletDisplayDraft';
+import { useTabletDevices } from './hooks/useTabletDevices';
+import { TabletDeviceList, TabletPairingModal, tabletLastSeenLabel } from './tablet/TabletDevicePanels';
 import { useTabletScreenApplication } from './hooks/useTabletScreenApplication';
 import { useStoreResource } from './hooks/useStoreResource';
 /**
@@ -26,7 +28,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Loader2, Tablet, ChevronUp, ChevronDown, X, Plus, Info,
-  ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv, Link2, Unplug, MoveRight,
+  ArrowLeft, Save, Package, ShoppingBag, AlertTriangle, Tv, Link2,
 } from 'lucide-react';
 import {
   IdlePlaylistEditor,
@@ -56,14 +58,12 @@ import {
   fetchScreenSets,
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 되돌리기(직전 화면 재적용/해제).
   // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿(기기) 연결·이동·해제.
-  fetchTabletDevices, createPairingCode, updateTabletDevice, disconnectTabletDevice,
-  type TabletDevice,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
 import TabletScreenSetManager from './TabletScreenSetManager';
 // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §5: 운영(B) 공통 Core 채택.
-import { templateLabel, TabletCornerBoard, cornerPrimaryLabel, type TabletCornerItem } from '@o4o/tablet-screen-set-editor';
+import { templateLabel, TabletCornerBoard, cornerPrimaryLabel } from '@o4o/tablet-screen-set-editor';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
 import { getActiveServicePublicOrigin } from '../../lib/serviceContext';
@@ -449,76 +449,8 @@ export default function StoreTabletDisplaysPage() {
     }
   }, [toast]);
 
-  // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿(기기) 축.
-  //   store_tablets = 위치(카드), store_tablet_devices = 실제 기기. 기기는 위치 사이를 옮길 수 있다(current_location_id 만 변경).
-  const [devices, setDevices] = useState<TabletDevice[]>([]);
-  const reloadDevices = useCallback(async () => {
-    try {
-      setDevices(await fetchTabletDevices());
-    } catch {
-      /* 기기 목록 실패는 위치 운영을 막지 않는다 */
-    }
-  }, []);
-  useEffect(() => { void reloadDevices(); }, [reloadDevices]);
-  const devicesByLocation = useMemo(() => {
-    const m: Record<string, TabletDevice[]> = {};
-    for (const d of devices) {
-      if (!d.isActive || d.pairingPending || !d.currentLocationId) continue;
-      (m[d.currentLocationId] ||= []).push(d);
-    }
-    return m;
-  }, [devices]);
-  const connectedDevices = useMemo(() => devices.filter((d) => d.isActive && !d.pairingPending), [devices]);
-  // [태블릿 연결] → 6자리 코드 모달
-  const [pairing, setPairing] = useState<{ locationId: string; locationLabel: string; code: string; expiresAt: string } | null>(null);
-  const [pairingBusyId, setPairingBusyId] = useState<string | null>(null);
-  const handleCreatePairingCode = async (t: TabletCornerItem) => {
-    setPairingBusyId(t.id);
-    try {
-      const r = await createPairingCode(t.id);
-      setPairing({ locationId: t.id, locationLabel: cornerPrimaryLabel(t), code: r.code, expiresAt: r.expiresAt });
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '연결 코드를 발급하지 못했습니다.' });
-    } finally {
-      setPairingBusyId(null);
-    }
-  };
-  const [deviceBusyId, setDeviceBusyId] = useState<string | null>(null);
-  const handleMoveDevice = async (d: TabletDevice, locationId: string) => {
-    if (!locationId || locationId === d.currentLocationId) return;
-    setDeviceBusyId(d.id);
-    try {
-      await updateTabletDevice(d.id, { currentLocationId: locationId });
-      await reloadDevices();
-      const target = tablets.find((t) => t.id === locationId);
-      setToast({ type: 'success', message: `"${d.name}" 을(를) ${target ? cornerPrimaryLabel(target) : '선택한 위치'} 로 옮겼습니다. 태블릿 화면은 자동으로 바뀝니다.` });
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '위치 이동에 실패했습니다.' });
-    } finally {
-      setDeviceBusyId(null);
-    }
-  };
-  const handleDisconnectDevice = async (d: TabletDevice) => {
-    if (!confirm(`"${d.name}" 연결을 해제하시겠습니까?\n그 태블릿은 더 이상 이 매장 화면을 자동 갱신하지 않으며, 다시 쓰려면 새 연결 코드로 연결해야 합니다.`)) return;
-    setDeviceBusyId(d.id);
-    try {
-      await disconnectTabletDevice(d.id);
-      await reloadDevices();
-      setToast({ type: 'success', message: `"${d.name}" 연결을 해제했습니다.` });
-    } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '연결 해제에 실패했습니다.' });
-    } finally {
-      setDeviceBusyId(null);
-    }
-  };
-  const lastSeenLabel = (iso: string | null) => {
-    if (!iso) return '아직 접속 없음';
-    const diff = Date.now() - new Date(iso).getTime();
-    if (diff < 60_000) return '방금 접속';
-    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}분 전 접속`;
-    if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}시간 전 접속`;
-    return `${new Date(iso).toLocaleDateString('ko-KR')} 접속`;
-  };
+  const deviceOperations = useTabletDevices(organizationId, tablets, setToast);
+  const { devicesByLocation, pairingBusyId, handleCreatePairingCode } = deviceOperations;
 
   // Load pool + displays + idle playlist when tablet changes
   const loadTabletData = useCallback(async () => {
@@ -943,34 +875,7 @@ export default function StoreTabletDisplaysPage() {
           KPA 에 남는 것은 adapter 축뿐 — 데이터 조회·콜백·아이콘·accent.
           빈 상태(태블릿 0대)도 Core 가 담당한다. 단 등록 폼이 열려 있는 동안에는 감춘다(기존 동작). */}
       {/* WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 연결 코드 모달 (PC → 태블릿 온보딩) */}
-      {pairing && (
-        <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-center justify-center p-4" onClick={() => setPairing(null)} role="presentation">
-          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" data-testid="pairing-code-modal">
-            <div className="px-5 py-4 border-b flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2"><Link2 className="w-5 h-5 text-teal-600" /> 태블릿 연결 — {pairing.locationLabel}</h3>
-              <button onClick={() => setPairing(null)} className="text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="px-5 py-5 space-y-4 text-sm text-slate-700">
-              <p>태블릿의 크롬 브라우저에서 아래 주소를 열고 연결 코드를 입력하세요.</p>
-              <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
-                <div className="text-[11px] text-slate-400">연결 주소</div>
-                <div className="font-mono text-sm break-all select-all">{`${getActiveServicePublicOrigin()}/tablet/setup`}</div>
-              </div>
-              <div className="rounded-xl bg-teal-50 border border-teal-100 px-4 py-4 text-center">
-                <div className="text-[11px] text-teal-700">연결 코드</div>
-                <div className="font-mono text-4xl font-bold tracking-[0.3em] text-teal-800 select-all" data-testid="pairing-code-value">{pairing.code}</div>
-                <div className="mt-1 text-[11px] text-teal-700">{new Date(pairing.expiresAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })} 까지 · 1회만 사용</div>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                연결이 끝나면 그 태블릿은 이 위치의 콘텐츠를 자동으로 보여주며, 이후 위치를 옮기거나 콘텐츠를 바꿔도 자동 반영됩니다.
-              </p>
-            </div>
-            <div className="px-5 py-3 border-t flex justify-end">
-              <button onClick={() => { setPairing(null); void reloadDevices(); }} className="px-4 py-2 text-sm font-medium text-white bg-slate-700 rounded-lg hover:bg-slate-800">닫기</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <TabletPairingModal pairing={deviceOperations.pairing} onClose={deviceOperations.closePairing} />
 
       {activeTab === 'corners' && !selectedTabletId && !showRegisterForm && (
         <TabletCornerBoard
@@ -999,11 +904,11 @@ export default function StoreTabletDisplaysPage() {
             return (
               <div className="mt-2 rounded-lg bg-slate-50 border border-slate-100 px-2.5 py-2 text-xs" data-testid={`location-devices-${t.id}`}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-slate-500">연결된 태블릿 {list.length}대</span>
+                  <span className="text-slate-500">{deviceOperations.loading ? '연결 상태 확인 중' : deviceOperations.loadError ? '연결 상태 확인 필요' : `연결된 태블릿 ${list.length}대`}</span>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); void handleCreatePairingCode(t); }}
-                    disabled={pairingBusyId === t.id}
+                    disabled={pairingBusyId !== null}
                     className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-teal-700 bg-teal-50 hover:bg-teal-100 disabled:opacity-50"
                     data-testid={`pair-device-${t.id}`}
                   >
@@ -1015,7 +920,7 @@ export default function StoreTabletDisplaysPage() {
                     {list.map((d) => (
                       <li key={d.id} className="flex items-center justify-between gap-2 text-slate-700">
                         <span className="truncate">{d.name}</span>
-                        <span className="text-slate-400 shrink-0">{lastSeenLabel(d.lastSeenAt)}</span>
+                        <span className="text-slate-400 shrink-0">{tabletLastSeenLabel(d.lastSeenAt)}</span>
                       </li>
                     ))}
                   </ul>
@@ -1028,50 +933,8 @@ export default function StoreTabletDisplaysPage() {
 
       {/* WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 연결된 실제 태블릿 목록 — 위치 이동 · 연결 해제.
           위치 이동 = store_tablet_devices.current_location_id 만 변경(위치·콘텐츠 데이터 무변경). */}
-      {activeTab === 'corners' && !selectedTabletId && !showRegisterForm && !loadingTablets && connectedDevices.length > 0 && (
-        <section className="bg-white rounded-2xl shadow-sm overflow-hidden" data-testid="connected-devices">
-          <div className="px-4 py-3 border-b bg-slate-50 flex items-center gap-2">
-            <Tablet className="w-4 h-4 text-teal-600" />
-            <h3 className="text-sm font-bold text-slate-700">연결된 실제 태블릿 ({connectedDevices.length})</h3>
-            <span className="text-xs text-slate-400">기기를 다른 위치로 옮기면 그 태블릿 화면이 자동으로 바뀝니다.</span>
-          </div>
-          <ul className="divide-y divide-slate-100">
-            {connectedDevices.map((d) => {
-              const loc = d.currentLocationId ? tablets.find((t) => t.id === d.currentLocationId) : null;
-              return (
-                <li key={d.id} className="px-4 py-2.5 flex flex-wrap items-center gap-3 text-sm" data-testid={`device-row-${d.id}`}>
-                  <div className="min-w-[160px] flex-1">
-                    <div className="font-medium text-slate-800 truncate">{d.name}</div>
-                    <div className="text-xs text-slate-400">{lastSeenLabel(d.lastSeenAt)} · 현재 위치: {loc ? cornerPrimaryLabel(loc) : '미지정'}</div>
-                  </div>
-                  <label className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <MoveRight className="w-3.5 h-3.5" /> 위치 이동
-                    <select
-                      className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs bg-white"
-                      value={d.currentLocationId ?? ''}
-                      disabled={deviceBusyId === d.id}
-                      onChange={(e) => { void handleMoveDevice(d, e.target.value); }}
-                      aria-label={`${d.name} 위치 이동`}
-                      data-testid={`device-move-${d.id}`}
-                    >
-                      {!d.currentLocationId && <option value="">(미지정)</option>}
-                      {tablets.map((t) => <option key={t.id} value={t.id}>{cornerPrimaryLabel(t)}</option>)}
-                    </select>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => { void handleDisconnectDevice(d); }}
-                    disabled={deviceBusyId === d.id}
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50"
-                    data-testid={`device-disconnect-${d.id}`}
-                  >
-                    {deviceBusyId === d.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Unplug className="w-3 h-3" />} 연결 해제
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+      {activeTab === 'corners' && !selectedTabletId && !showRegisterForm && !loadingTablets && (
+        <TabletDeviceList tablets={tablets} operations={deviceOperations} />
       )}
 
       {/* Tablet list DataTable + editor (선택 위치 상세 — 기존 2단 레이아웃 재사용, 위치별 운영 탭 전용) */}

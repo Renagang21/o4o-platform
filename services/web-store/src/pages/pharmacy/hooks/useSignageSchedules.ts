@@ -15,13 +15,33 @@ import {
 export function useSignageSchedules(organizationId: string) {
   const scheduleRequest = useLatestStoreRequest(organizationId);
   const playlistRequest = useLatestStoreRequest(organizationId);
-  const saving = useRef(false);
+  const saving = useRef(new Set<string>());
+  const deleting = useRef(new Map<string, Set<string>>());
+  const [deletingScheduleIds, setDeletingScheduleIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const currentStore = useRef(organizationId);
+  const storeRevision = useRef(0);
+  if (currentStore.current !== organizationId) {
+    currentStore.current = organizationId;
+    storeRevision.current++;
+  }
+  useEffect(
+    () => () => {
+      storeRevision.current++;
+    },
+    [],
+  );
+  const draftRevision = useRef(0);
   const saveRequest = useLatestStoreRequest(organizationId);
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
   // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1: 스케줄 조회 실패 표시용
   const [scheduleError, setScheduleError] = useState<string | null>(null);
+  const [schedulePlaylistError, setSchedulePlaylistError] = useState<
+    string | null
+  >(null);
   const [signagePlaylists, setSignagePlaylists] = useState<
     SignagePlaylistOption[]
   >([]);
@@ -44,7 +64,7 @@ export function useSignageSchedules(organizationId: string) {
 
   // ── Schedule loaders ──
   const loadSchedules = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || currentStore.current !== organizationId) return;
     const isCurrent = scheduleRequest.begin();
     setScheduleLoading(true);
     setScheduleError(null);
@@ -67,14 +87,15 @@ export function useSignageSchedules(organizationId: string) {
   }, [organizationId, scheduleRequest]);
 
   const loadSignagePlaylists = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || currentStore.current !== organizationId) return;
     const isCurrent = playlistRequest.begin();
+    setSchedulePlaylistError(null);
     try {
       const data = await fetchSignagePlaylists(organizationId);
       if (isCurrent()) setSignagePlaylists(data);
     } catch {
       if (isCurrent())
-        setScheduleError(
+        setSchedulePlaylistError(
           "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
         );
     }
@@ -86,6 +107,7 @@ export function useSignageSchedules(organizationId: string) {
   }, [loadSchedules, loadSignagePlaylists]);
   // ── Schedule handlers ──
   const resetScheduleForm = useCallback(() => {
+    draftRevision.current++;
     setSchSaveError(null);
     setSchName("");
     setSchPlaylistId("");
@@ -101,6 +123,7 @@ export function useSignageSchedules(organizationId: string) {
   }, []);
 
   const openEditSchedule = (sch: SignageScheduleItem) => {
+    draftRevision.current++;
     setSchSaveError(null);
     setEditingSchedule(sch);
     setSchName(sch.name);
@@ -120,12 +143,14 @@ export function useSignageSchedules(organizationId: string) {
       !schName.trim() ||
       !schPlaylistId ||
       schDays.length === 0 ||
-      !organizationId
+      !organizationId ||
+      currentStore.current !== organizationId
     )
       return;
-    if (saving.current) return;
+    if (saving.current.has(organizationId)) return;
+    const submittedRevision = draftRevision.current;
     const isCurrent = saveRequest.begin();
-    saving.current = true;
+    saving.current.add(organizationId);
     setSchSaving(true);
     setSchSaveError(null);
     try {
@@ -156,37 +181,57 @@ export function useSignageSchedules(organizationId: string) {
         await createSchedule(organizationId, payload);
       }
       if (!isCurrent()) return;
-      resetScheduleForm();
-      loadSchedules();
+      if (submittedRevision === draftRevision.current) resetScheduleForm();
+      await loadSchedules();
     } catch {
-      if (isCurrent())
+      if (isCurrent() && submittedRevision === draftRevision.current)
         setSchSaveError(
           "스케줄을 저장하지 못했습니다. 입력 내용을 확인한 후 다시 시도해 주세요.",
         );
     } finally {
-      saving.current = false;
-      setSchSaving(false);
+      saving.current.delete(organizationId);
+      if (currentStore.current === organizationId) setSchSaving(false);
     }
   };
 
   const handleDeleteSchedule = async (sch: SignageScheduleItem) => {
+    if (!organizationId || currentStore.current !== organizationId) return;
+    const locks = deleting.current.get(organizationId) ?? new Set<string>();
+    if (locks.has(sch.id)) return;
     if (!confirm(`"${sch.name}" 스케줄을 삭제하시겠습니까?`)) return;
-    if (!organizationId) return;
+    const revision = storeRevision.current;
+    const isCurrent = () =>
+      revision === storeRevision.current &&
+      currentStore.current === organizationId;
+    deleting.current.set(organizationId, locks);
+    locks.add(sch.id);
+    setDeletingScheduleIds(new Set(locks));
     try {
       await deleteSchedule(organizationId, sch.id);
-      loadSchedules();
+      if (isCurrent()) await loadSchedules();
     } catch {
-      setScheduleError("스케줄을 삭제하지 못했습니다. 다시 시도해 주세요.");
+      if (isCurrent())
+        setScheduleError("스케줄을 삭제하지 못했습니다. 다시 시도해 주세요.");
+    } finally {
+      locks.delete(sch.id);
+      if (!locks.size) deleting.current.delete(organizationId);
+      if (currentStore.current === organizationId)
+        setDeletingScheduleIds(new Set(locks));
     }
   };
 
   useEffect(() => {
     setSchedules([]);
     setSignagePlaylists([]);
+    setScheduleError(null);
+    setSchedulePlaylistError(null);
+    setSchSaving(saving.current.has(organizationId));
+    setDeletingScheduleIds(new Set(deleting.current.get(organizationId)));
     resetScheduleForm();
   }, [organizationId, resetScheduleForm]);
 
   const toggleSchDay = (day: number) => {
+    draftRevision.current++;
     setSchDays((prev) =>
       prev.includes(day)
         ? prev.filter((d) => d !== day)
@@ -194,12 +239,22 @@ export function useSignageSchedules(organizationId: string) {
     );
   };
 
+  const changeDraft =
+    <T>(setter: (value: T) => void) =>
+    (value: T) => {
+      draftRevision.current++;
+      setSchSaveError(null);
+      setter(value);
+    };
+
   return {
     loadSchedules,
     loadSignagePlaylists,
     schedules,
     scheduleLoading,
+    deletingScheduleIds,
     scheduleError,
+    schedulePlaylistError,
     signagePlaylists,
     showScheduleForm,
     editingSchedule,
@@ -214,15 +269,15 @@ export function useSignageSchedules(organizationId: string) {
     schIsActive,
     schSaving,
     schSaveError,
-    setShowScheduleForm,
-    setSchName,
-    setSchPlaylistId,
-    setSchPriority,
-    setSchStartTime,
-    setSchEndTime,
-    setSchValidFrom,
-    setSchValidUntil,
-    setSchIsActive,
+    setShowScheduleForm: changeDraft(setShowScheduleForm),
+    setSchName: changeDraft(setSchName),
+    setSchPlaylistId: changeDraft(setSchPlaylistId),
+    setSchPriority: changeDraft(setSchPriority),
+    setSchStartTime: changeDraft(setSchStartTime),
+    setSchEndTime: changeDraft(setSchEndTime),
+    setSchValidFrom: changeDraft(setSchValidFrom),
+    setSchValidUntil: changeDraft(setSchValidUntil),
+    setSchIsActive: changeDraft(setSchIsActive),
     resetScheduleForm,
     openEditSchedule,
     handleSaveSchedule,
