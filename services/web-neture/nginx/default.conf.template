@@ -10,6 +10,7 @@ server {
     listen ${PORT};
     server_name _;
     root /usr/share/nginx/html;
+    charset utf-8;
     server_tokens off;
     gzip on;
     gzip_vary on;

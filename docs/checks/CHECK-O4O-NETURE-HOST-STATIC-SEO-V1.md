@@ -24,9 +24,9 @@ HTTP 검사: host title/description/OG/canonical, 홈 `/`·`index.html`·query, 
 
 ## 컨테이너와 운영
 
-실제 Dockerfile 전체 빌드와 최종 이미지 서빙 검증 진행 중. 원 Dockerfile의 버전 미지정 pnpm이 최신 12를 설치하여 저장소 지정 10.25.0으로 고정했다. optional BuildKit secret `proxy_ca`는 network RUN에만 마운트하고 TLS 검증을 유지한다. 이미지에 CA를 넣지 않는다. 원 builder의 lockfile 미복사 계약은 이번 범위에서 변경하지 않았다.
+실제 Dockerfile 전체 빌드 PASS. 최종 이미지 `sha256:6861688b88451264cb8bb5b9f693f5bbbab1ca388cb4f4e9f5bf07db2698cb4d`(66,350,870 bytes)의 8080 기본 PORT와 9090 변경 PORT에서 각각 140 assertions PASS. `nginx -t` PASS, UTF-8 Content-Type 및 runner에 임시 CA 파일 부재 확인. 원 Dockerfile의 버전 미지정 pnpm이 최신 12를 설치하여 저장소 지정 10.25.0으로 고정했다. optional BuildKit secret `proxy_ca`는 network RUN에만 마운트하고 TLS 검증을 유지한다. 이미지에 CA를 넣지 않는다. 원 builder의 lockfile 미복사 계약은 이번 범위에서 변경하지 않았다.
 
-로컬 Docker `vfs` 및 기본 BuildKit `native`는 COPY마다 파일 복제로 디스크를 고갈시켜 해당 작업 캐시를 정리했다. daemon 저장 설정은 유지하고 전용 FUSE BuildKit을 사용한다. 서빙 runner는 nginx 1.28 Alpine, PORT 기본 8080이며 nginx 변수는 PORT만 envsubst한다.
+로컬 Docker `vfs` 및 기본 BuildKit `native`는 COPY마다 파일 복제로 디스크를 고갈시켜 해당 작업 캐시를 정리했다. daemon 저장 설정은 유지하고 전용 FUSE BuildKit에서 전체 빌드를 완료했다. 디스크 사용량은 약 8GB로 유지되었다. 서빙 runner는 nginx 1.28 Alpine, PORT 기본 8080이며 nginx 변수는 PORT만 envsubst한다.
 
 운영 반영은 CI·리뷰 gate 이후 Neture 전용 Promote와 실제 serving/HTTP 결과를 확인한 뒤 기록한다. DB migration은 실행하지 않는다. 기존 verified rollout의 검사/traffic 전환·실패 시 기존 revision 유지 계약을 따른다.
 
@@ -38,6 +38,6 @@ HTTP 검사: host title/description/OG/canonical, 홈 `/`·`index.html`·query, 
 node services/web-neture/tools/checkHostServing.mjs http://127.0.0.1:8080
 ```
 
-이미지와 동일한 dist가 필요하면 두 번째 인자로 dist 경로를 지정한다. 로컬 artifact는 `/workspace/o4o-seo-artifacts/`의 HTTP/browser 결과·12 PNG·browser harness, build log는 `/tmp/o4o-seo-*.log`이다. production 응답 원문과 자격증명은 이 기록에 저장하지 않는다.
+이미지와 동일한 dist가 필요하면 두 번째 인자로 dist 경로를 지정한다. 로컬 artifact는 `/workspace/o4o-seo-artifacts/`의 HTTP/browser 결과·12 PNG·browser harness, build log는 `/tmp/o4o-seo-*.log`이다. 최종 이미지 build log는 `/tmp/o4o-seo-docker-final.log`, 추출한 동일 dist는 `/workspace/o4o-seo-artifacts/image-dist/`이다. production 응답 원문과 자격증명은 이 기록에 저장하지 않는다.
 
 문서 정합: 새 WO/CHECK와 수정 index.html 주석으로 현재 구현/검증 상태를 기록했다. 기존 완료 접근성 기록은 당시 판정을 유지한다. canonical index·공통 디자인 정책은 변경하지 않았다.
