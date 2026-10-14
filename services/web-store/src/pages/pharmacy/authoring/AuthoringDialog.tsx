@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useNativeStoreDialog } from '../hooks/useNativeStoreDialog';
+import { type ReactNode } from "react";
 
 export function AuthoringDialog({
   labelId,
@@ -11,21 +12,7 @@ export function AuthoringDialog({
   children: ReactNode;
   className?: string;
 }>) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const trigger =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-    if (typeof dialog.showModal === "function") dialog.showModal();
-    else dialog.setAttribute("open", "");
-    return () => {
-      if (typeof dialog.close === "function") dialog.close();
-      if (trigger?.isConnected) trigger.focus();
-    };
-  }, []);
+  const dialogRef = useNativeStoreDialog();
   return (
     <dialog
       ref={dialogRef}

@@ -140,3 +140,15 @@ it('failed usage remains optional and never blocks the library', async () => {
   const { result } = renderHook(() => useContentUsage(['direct']));
   await waitFor(() => expect(result.current.direct).toBeNull());
 });
+
+it('snapshot display metadata rejects objects and unknown resource kinds without losing its copied body', async () => {
+  api.snapshots.mockResolvedValue(page([{ ...snapshot(), contentJson: {
+    body: '<p>Copied body</p>', summary: { unexpected: true }, description: 'Safe description',
+    sourceUrl: { url: 'unexpected' }, sourceType: 'toString', category: ['unexpected'],
+  } }]));
+  const { result } = await resources();
+  expect(result.current.items.find(row => row.kind === 'snapshot')).toMatchObject({
+    id: 'snap:snapshot', rawId: 'snapshot', assetType: 'content', bodyText: 'Copied body',
+    description: 'Safe description', href: null, category: null,
+  });
+});

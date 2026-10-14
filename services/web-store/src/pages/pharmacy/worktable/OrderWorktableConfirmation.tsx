@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useNativeStoreDialog } from '../hooks/useNativeStoreDialog';
 import { Loader2 } from "lucide-react";
 import type { WorktableConfirmation } from "../hooks/useOrderWorktable";
 
@@ -20,21 +20,7 @@ export function OrderWorktableConfirmation({
   onAdd,
   onViewCart,
 }: Readonly<Props>) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const returnFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-    if (typeof dialog.showModal === "function") dialog.showModal();
-    else dialog.setAttribute("open", "");
-    return () => {
-      if (typeof dialog.close === "function") dialog.close();
-      if (returnFocus?.isConnected) returnFocus.focus();
-    };
-  }, []);
+  const dialogRef = useNativeStoreDialog();
   const suppliers = new Map<string, typeof confirmation.targets>();
   for (const target of confirmation.targets) {
     const group = suppliers.get(target.product.supplierId) ?? [];
