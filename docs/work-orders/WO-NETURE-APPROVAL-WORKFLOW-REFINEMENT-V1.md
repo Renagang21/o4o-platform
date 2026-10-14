@@ -1,7 +1,7 @@
 # Neture 상품·공급자 승인 업무 정비
 
-> **상태**: ACTIVE
-> **작성일**: 2026-10-14
+> **상태**: COMPLETED
+> **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거**: 사용자 요청 — 너무 작은 단위로 나누지 않고 TODO → 보완 → 구현 → 검증.
 
 ## 범위와 최초 TODO
@@ -11,7 +11,7 @@
 - [x] 상품 승인 조회/분석/필터/선택 상태의 책임 분리와 승인 상품 휴지통 이동 실패·재시도 보완.
 - [x] 공급자 승인 상세/서류 표시·입력 모델 분리와 저장/심사 요청 수명 정비.
 - [x] 두 승인 흐름 통합 회귀, 타입·lint·production build·fixture browser 검증.
-- [ ] CHECK와 ACTIVE TODO 정합, push/PR 및 기술 gate 확인.
+- [x] CHECK와 ACTIVE TODO 정합, push/PR 및 기술 gate 확인.
 
 ## 조사 후 보완
 
@@ -35,3 +35,7 @@
 실행 결과는 [CHECK](../checks/CHECK-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)에 기록한다.
 DEPLOYMENT = REQUIRED (Neture frontend only). API/migration 배포는 범위 밖이다.
 기준 정본: [역할별 업무공간 §9](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md), [문서 생명주기](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
+
+## 최종 결과
+
+PR #570 정상 병합(main `3a42d584d085c09a0e861c71c8c3a66f0d4644d9`), PR CI `38505562796`·main CI `38506413681` 통과. [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952)의 실제 Neture 배포와 serving Report 성공 및 production success를 확인했다. 서빙 소스 `3a42d584d085c09a0e861c71c8c3a66f0d4644d9`에 이번 변경이 포함된다. 세부 증적은 CHECK를 따른다.
