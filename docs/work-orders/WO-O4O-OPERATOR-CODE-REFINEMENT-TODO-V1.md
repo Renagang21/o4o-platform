@@ -76,9 +76,9 @@
 - [x] Neture 상품 승인: 요청값·선택 함수, 승인/거절 실행 절차·실패 UX·조회 수명 정비 및 main/배포.
 - [x] Neture 상품 승인: 상세/입력/품질 표시 분리 (이번 [TODO](WO-NETURE-PRODUCT-APPROVAL-PRESENTATION-V1.md)).
 - [x] Neture 상품 승인: 승인대기 삭제 실패·대상 보존 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI·운영 배포 확인 완료).
-- [ ] Neture 상품 승인: 승인 상품 휴지통 오류 처리와 목록/분석 책임 추가 조사.
+- [x] Neture 상품 승인: 승인 상품 휴지통 오류 처리·목록/분석 책임 분리 완료 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [ ] Neture 등록 상품·가입 신청: 실제 경로와 상태 전이 대조 후 조회/행동 분리.
-- [ ] 공급자 승인: 상세·서류 확인·반려 입력·상태 변경 분리, 사유/오류 보존 유지.
+- [x] 공급자 승인: 상세·서류 표시·입력 모델·심사 요청 수명 분리와 사유/오류 보존 정비 완료 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [ ] 약국 사업 행사: 행사 편집과 모집·참여 관리 분리.
 - [ ] 펀딩 심사 상세: 단계별 안내, 심사, 상태 변경, 참여/KPI 갱신 분리.
 - [ ] 펀딩 개설자 화면: 운영자 화면과 같은 책임을 공유할지 계약을 먼저 확인.

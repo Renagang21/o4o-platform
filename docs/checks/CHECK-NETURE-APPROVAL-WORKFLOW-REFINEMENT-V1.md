@@ -1,7 +1,7 @@
 # Neture 상품·공급자 승인 통합 정비 검증
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-14
+> **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거 WO**: [WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1](../work-orders/WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)
 
 ## 구현과 보존
