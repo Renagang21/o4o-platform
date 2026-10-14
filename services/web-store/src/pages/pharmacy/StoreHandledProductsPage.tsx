@@ -3,7 +3,7 @@
  */
 
 import { STORE_PRODUCT_NAME, STORE_PRODUCT_MESSAGES } from '../../config/productTerminology';
-import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -25,6 +25,7 @@ import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from
 import { ProductFormModal } from './StoreLocalProductsPage';
 import { createLocalProduct, getLocalProduct, updateLocalProduct, type LocalProduct, type LocalProductInput } from '../../api/localProducts';
 import { useUnifiedStore } from '../../contexts/StoreContext';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { colors } from '../../styles/theme';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
 import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './StoreDescriptionViewModal';
@@ -70,6 +71,9 @@ export default function StoreHandledProductsPage() {
   const [page, setPage] = useState(() => parsePage(searchParams.get('page')));
   const [limit, setLimit] = useState(() => parsePageSize(searchParams.get('limit')));
   const { organizationId } = useUnifiedStore();
+  // 제품 조회·저장 결과는 요청 당시 매장과 마지막 양식 선택에만 반영한다.
+  const localRequests = useLatestStoreRequest(organizationId ?? '');
+  const localMutation = useRef<(() => boolean) | null>(null);
   const source = searchParams.get('source') === 'local' ? 'local' : searchParams.get('source') === 'listing' ? 'listing' : 'all';
   const [localForm, setLocalForm] = useState<{ product: LocalProduct | null } | null>(null);
   const [localSaving, setLocalSaving] = useState(false);
@@ -141,21 +145,43 @@ export default function StoreHandledProductsPage() {
   }, [page, limit, searchQuery, reloadKey, source, organizationId]);
 
   const reload = useCallback(() => setReloadKey((k) => k + 1), []);
+  const openLocalCreate = () => {
+    if (localMutation.current?.()) return;
+    localRequests.cancel();
+    setLocalError(null); setLocalForm({ product: null });
+  };
   const saveLocal = async (input: LocalProductInput) => {
+    if (!localForm || localMutation.current?.()) return;
+    const isCurrent = localRequests.begin();
+    localMutation.current = isCurrent;
     setLocalSaving(true); setLocalError(null);
     try {
-      if (localForm?.product) await updateLocalProduct(localForm.product.id, input);
+      if (localForm.product) await updateLocalProduct(localForm.product.id, input);
       else await createLocalProduct(input);
+      if (!isCurrent()) return;
       setLocalForm(null); reload();
       toast.success('내 매장 제품을 저장했습니다.');
-    } catch (e) { setLocalError(e instanceof Error ? e.message : '제품을 저장하지 못했습니다.'); }
-    finally { setLocalSaving(false); }
+    } catch (e) {
+      if (isCurrent()) setLocalError(e instanceof Error ? e.message : '제품을 저장하지 못했습니다.');
+    } finally {
+      if (isCurrent()) { localMutation.current = null; setLocalSaving(false); }
+    }
   };
   const editLocal = async (id: string) => {
-    try { setLocalError(null); setLocalForm({ product: await getLocalProduct(id) }); }
-    catch (e) { toast.error(e instanceof Error ? e.message : '제품을 불러오지 못했습니다.'); }
+    if (localMutation.current?.()) return;
+    const isCurrent = localRequests.begin();
+    setLocalError(null);
+    try {
+      const product = await getLocalProduct(id);
+      if (isCurrent()) setLocalForm({ product });
+    } catch (e) {
+      if (isCurrent()) toast.error(e instanceof Error ? e.message : '제품을 불러오지 못했습니다.');
+    }
   };
-  useEffect(() => { setLocalForm(null); setLocalError(null); }, [organizationId]);
+  useEffect(() => {
+    setLocalForm(null); setLocalError(null); setLocalSaving(false);
+    localMutation.current = null;
+  }, [organizationId]);
 
 
   // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용 상세설명서 보기(읽기 전용, listing 전용)
@@ -304,7 +330,7 @@ export default function StoreHandledProductsPage() {
           </button>
           {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1):
               O4O DB 에 없는 신규 상품의 등록 요청(제출·상태). 기존 상품은 위 '표준 상품에서 추가'로. */}
-          <button onClick={() => { setLocalError(null); setLocalForm({ product: null }); }} style={styles.primaryBtn}>
+          <button onClick={openLocalCreate} disabled={localSaving} style={styles.primaryBtn}>
             <PlusCircle size={14} /> 직접 등록하기
           </button>
           <button onClick={() => navigate('/store/product-settings')} style={styles.refreshBtn}>제품 진열 설정</button>
@@ -460,7 +486,7 @@ export default function StoreHandledProductsPage() {
         onClose={() => setQrTarget(null)}
       />
 
-      {localForm && <ProductFormModal product={localForm.product} saving={localSaving} error={localError} onSave={saveLocal} onClose={() => { if (!localSaving) setLocalForm(null); }} onNavigateHub={() => navigate('/store/library/multilingual-product-contents')} />}
+      {localForm && <ProductFormModal product={localForm.product} saving={localSaving} error={localError} onSave={saveLocal} onClose={() => { if (!localMutation.current?.()) { localRequests.cancel(); setLocalForm(null); } }} onNavigateHub={() => navigate('/store/library/multilingual-product-contents')} />}
       <p style={styles.footnote}>
         {STORE_PRODUCT_MESSAGES.usage}
         O4O DB 원본은 이 화면에서 수정하지 않습니다.
