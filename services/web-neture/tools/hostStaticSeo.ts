@@ -26,14 +26,14 @@ export function renderHostHtml(html: string, profile: HostProfile, home: boolean
     ['property', 'og:description', seo.description ?? ''],
     ['property', 'og:url', `${origin}/`],
   ]) {
-    replaceOne(new RegExp(`<meta ${attribute}="${name}" content="[^"]*"\\s*/?>`),
+    replaceOne(new RegExp(String.raw`<meta ${attribute}="${name}" content="[^"]*"\s*/?>`),
       `<meta ${attribute}="${name}" content="${escapeHtml(value)}" />`);
   }
   // Root URL metadata must never leak into a deep SPA path. Its actual URL
   // is unknown at build time; SeoWatcher supplies it after client navigation.
-  html = html.replace(/\s*<link\s+rel="canonical"[^>]*>/g, '');
+  html = html.replace(/<link rel="canonical"[^>]*>/g, '');
   if (home) html = html.replace('</head>', `  <link rel="canonical" href="${origin}" />\n  </head>`);
-  else html = html.replace(/\s*<meta\s+property="og:url"[^>]*>/g, '');
+  else html = html.replace(/<meta property="og:url"[^>]*>/g, '');
   return html;
 }
 
@@ -45,7 +45,7 @@ export function hostStaticSeo(): Plugin {
     enforce: 'post',
     generateBundle(_options, bundle) {
       const index = bundle['index.html'];
-      if (!index || index.type !== 'asset' || typeof index.source !== 'string') {
+      if (index?.type !== 'asset' || typeof index.source !== 'string') {
         throw new Error('Static SEO requires Vite index.html');
       }
       const html = index.source;

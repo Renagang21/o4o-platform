@@ -32,28 +32,28 @@ const request = (host, path, options = {}) => new Promise((resolveRequest, rejec
   req.end();
 });
 
-for (const [index, host] of hosts.entries()) {
+async function checkHost(host, index) {
   const profile = index === 0 ? 'main' : host.split('.')[0];
   const expected = await readFile(resolve(dist, `__seo/${profile}-home.html`), 'utf8');
-  for (const path of ['/', '/?utm_source=smoke', '/index.html']) {
+  await Promise.all(['/', '/?utm_source=smoke', '/index.html'].map(async path => {
     const response = await request(host, path);
     check(response.status === 200 && await response.text() === expected, `${host}${path}: host HTML`);
     check(response.headers.get('cache-control') === 'no-cache' && response.headers.get('vary')?.includes('Host'), `${host}${path}: HTML cache`);
-  }
-  for (const path of ['/supplier/products/new', '/market-trial/fixture', '/communities/fixture/forum', '/login', '/missing-route']) {
+  }));
+  await Promise.all(['/supplier/products/new', '/market-trial/fixture', '/communities/fixture/forum', '/login', '/missing-route'].map(async path => {
     const response = await request(host, path);
     const body = await response.text();
     check(response.status === 200 && body.includes('<div id="root">') && !body.includes('rel="canonical"') && !body.includes('property="og:url"'), `${host}${path}: SPA without home URL metadata`);
-  }
-  for (const path of ['/assets/missing.js', '/missing.css', '/missing.png', '/__seo/supplier-home.html', '/__seo/main-spa.html']) {
+  }));
+  await Promise.all(['/assets/missing.js', '/missing.css', '/missing.png', '/__seo/supplier-home.html', '/__seo/main-spa.html'].map(async path => {
     const response = await request(host, path);
     check(response.status === 404 && !(await response.text()).includes('<div id="root">'), `${host}${path}: real 404`);
-  }
+  }));
   const head = await request(host, '/', { method: 'HEAD' });
   check(head.status === 200 && await head.text() === '', `${host}: HEAD`);
   const assets = [...expected.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(match => match[1]);
   check(assets.length > 0, `${host}: bundle references`);
-  for (const asset of assets) {
+  await Promise.all(assets.map(async asset => {
     const response = await request(host, asset);
     const mime = response.headers.get('content-type') || '';
     check(response.status === 200 && mime.includes(asset.endsWith('.js') ? 'javascript' : 'text/css') && response.headers.get('cache-control')?.includes('immutable'), `${host}${asset}: MIME/cache`);
@@ -62,13 +62,14 @@ for (const [index, host] of hosts.entries()) {
     check(range.status === 206 && (await range.arrayBuffer()).byteLength === 10, `${host}${asset}: range`);
     const cached = await request(host, asset, { headers: { 'If-None-Match': response.headers.get('etag') } });
     check(cached.status === 304, `${host}${asset}: ETag`);
-  }
+  }));
   const compressed = await request(host, assets[0], { headers: { 'Accept-Encoding': 'gzip' } });
   check(compressed.status === 200 && compressed.headers.get('content-encoding') === 'gzip', `${host}: gzip`);
   await compressed.arrayBuffer();
 }
-for (const host of ['localhost', 'www.neture.co.kr', 'unknown.example', 'supplier.neture.co.kr.evil.example']) {
+await Promise.all(hosts.map(checkHost));
+await Promise.all(['localhost', 'www.neture.co.kr', 'unknown.example', 'supplier.neture.co.kr.evil.example'].map(async host => {
   const response = await request(host, '/');
   check(response.status === 200 && (await response.text()).includes('<title>O4O '), `${host}: default identity`);
-}
+}));
 console.info(`Host serving smoke: ${count} assertions passed`);

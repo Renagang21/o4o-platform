@@ -14,11 +14,12 @@ WORKDIR /app
 # Optional managed-environment proxy CA; never stored in an image layer.
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    npm install -g pnpm@10.25.0
+    npm install -g pnpm@10.25.0 --ignore-scripts
 
 # Copy workspace configuration
 COPY pnpm-workspace.yaml ./
 COPY package.json ./
+COPY pnpm-lock.yaml ./
 COPY tsconfig.base.json ./
 COPY tsconfig.packages.json ./
 
@@ -56,8 +57,10 @@ COPY services/web-neture/package.json ./services/web-neture/
 # packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
 RUN --mount=type=secret,id=proxy_ca \
+    --mount=type=cache,id=o4o-neture-pnpm,target=/pnpm/store \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter @o4o/web-neture... --ignore-scripts
+    pnpm install --filter @o4o/web-neture... --frozen-lockfile --ignore-scripts \
+      --store-dir=/pnpm/store --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -118,7 +121,7 @@ WORKDIR /app/services/web-neture
 RUN npx vite build
 
 # Production stage
-FROM nginx:1.28-alpine AS runner
+FROM nginxinc/nginx-unprivileged:1.28-alpine AS runner
 
 # Copy built files
 COPY --from=builder /app/services/web-neture/dist /usr/share/nginx/html
@@ -128,6 +131,7 @@ COPY services/web-neture/nginx/default.conf.template /etc/nginx/templates/defaul
 ENV PORT=8080
 # Restrict envsubst to PORT so nginx's host/uri variables survive unchanged.
 ENV NGINX_ENVSUBST_FILTER=^PORT$
+USER 101
 
 EXPOSE 8080
 
