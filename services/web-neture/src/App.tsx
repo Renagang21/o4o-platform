@@ -71,6 +71,7 @@ import SupplierLandingPage from './pages/SupplierLandingPage';
 import CommunityWorkspacePage from './pages/community/CommunityWorkspacePage';
 import CommunityPublicPostsPage from './pages/community/CommunityPublicPostsPage';
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
+import CarePharmHomePage from './pages/carepharm/CarePharmHomePage';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -716,6 +717,7 @@ function App() {
               {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierServiceEntry />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
+              {CURRENT_HOST_PROFILE === 'carepharm' && <Route path="/" element={<CarePharmHomePage />} />}
               <Route path="/pharmacist" element={<Navigate to="/communities/pharmacy/forum" replace />} />
               <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />

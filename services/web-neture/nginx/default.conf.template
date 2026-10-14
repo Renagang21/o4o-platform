@@ -4,6 +4,7 @@ map $host $seo_profile {
     supplier.neture.co.kr supplier;
     funding.neture.co.kr funding;
     community.neture.co.kr community;
+    carepharm.neture.co.kr carepharm;
 }
 
 server {

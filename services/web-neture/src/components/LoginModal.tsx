@@ -35,6 +35,7 @@ const LOGIN_MODAL_SUBTITLE: Readonly<Record<HostProfile, string>> = Object.freez
   supplier: '공급자 업무 공간',
   funding: '유통참여형 펀딩',
   community: '커뮤니티',
+  carepharm: '만성질환 관리 약국 협업 모임',
 });
 
 interface LoginModalProps {
@@ -182,7 +183,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
           <div className="flex items-center gap-3">
             <span className="text-2xl">🌿</span>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Neture 로그인</h2>
+              <h2 className="text-lg font-bold text-gray-900">{CURRENT_HOST_PROFILE === 'carepharm' ? 'CarePharm 로그인' : 'Neture 로그인'}</h2>
               <p className="text-xs text-gray-500">{LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]}</p>
             </div>
           </div>

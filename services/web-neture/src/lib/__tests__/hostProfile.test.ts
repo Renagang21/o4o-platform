@@ -6,6 +6,23 @@ import { decideHost, getHostProfile, isOwnedPath, readCutoverFlags } from '../ho
 
 const loc = (pathname: string, search = '', hash = '') => ({ pathname, search, hash });
 
+describe('CarePharm host boundary', () => {
+  it('recognizes only the exact hostname', () => {
+    expect(getHostProfile('CAREPHARM.neture.co.kr')).toBe('carepharm');
+    expect(getHostProfile('carepharm.neture.co.kr.example.com')).toBe('main');
+  });
+  it.each(['/', '/login', '/terms', '/mypage', '/communities/carepharm/forum', '/communities/carepharm/public/post/example'])('keeps its own route %s', path => {
+    expect(decideHost('carepharm', loc(path))).toEqual({ kind: 'stay' });
+  });
+  it.each(['/communities/pharmacy/forum', '/communities/carepharm-other/forum', '/operator/service-members/community'])('does not claim another community or service role at %s', path => {
+    expect(isOwnedPath('carepharm', path)).toBe(false);
+    expect(decideHost('carepharm', loc(path, '?page=2', '#item'))).toEqual({kind:'external',href:`https://neture.co.kr${path}?page=2#item`});
+  });
+  it('preserves the main host community routing', () => {
+    expect(decideHost('main', loc('/communities/carepharm/forum'))).toEqual({kind:'external',href:'https://community.neture.co.kr/communities/carepharm/forum'});
+  });
+});
+
 describe('getHostProfile', () => {
   it('서브도메인 · 대표 · 기타', () => {
     expect(getHostProfile('supplier.neture.co.kr')).toBe('supplier');
