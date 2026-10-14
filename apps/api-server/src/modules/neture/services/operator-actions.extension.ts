@@ -103,6 +103,6 @@ export const operatorActionsExtension: AiBusinessExtension<OperatorContext, AiAc
     const parsed = JSON.parse(content);
     const raw: unknown[] = Array.isArray(parsed) ? parsed : [];
     return raw.filter(isValidLlmAction).filter(a => a.confidence >= 0.6).slice(0, 3)
-      .map(mapLlmToActionItem).filter((a): a is AiActionItem => a !== null);
+      .map((action, index) => mapLlmToActionItem(action, index)).filter((a): a is AiActionItem => a !== null);
   },
 };

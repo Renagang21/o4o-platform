@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, existsSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -95,6 +95,26 @@ test('paths outside the repository and empty input are rejected', () => {
       encoding: 'utf8',
     });
     assert.notEqual(result.status, 0);
+  }
+});
+
+test('a caller-controlled PATH cannot replace the census Git executable', { skip: process.platform === 'win32' }, () => {
+  const directory = mkdtempSync(resolve(root, 'scripts/quality/.audit-fixture-'));
+  try {
+    const marker = resolve(directory, 'unexpected-git-invocation');
+    const shim = resolve(directory, 'git');
+    const source = resolve(directory, 'source.ts');
+    writeFileSync(shim, '#!/bin/sh\n: > "$O4O_AUDIT_ATTACK_MARKER"\n', { mode: 0o755 });
+    writeFileSync(source, 'export const fixture = () => 1;');
+    const output = execFileSync(process.execPath, [cli, relative(root, source)], {
+      cwd: root,
+      encoding: 'utf8',
+      env: { ...process.env, PATH: directory, O4O_AUDIT_ATTACK_MARKER: marker },
+    });
+    assert.equal(existsSync(marker), false);
+    assert.equal(JSON.parse(output).functions.length, 1);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
 

@@ -111,3 +111,15 @@ Sonar allowlist 적용은 확인했으나 실제 site root/system API/dashboard/
 Codex P2 `4265707175`/`4265707181`의 두 회귀를 재현했다. 혼합 대소문자 title closing은 `lowerCaseTagName: true`로 정규화한다. 제목이 없는 약 110KB/10,000 depth HTML에서는 parser/selector가 RangeError를 던지므로 optional title extraction 전체에서 잡고 undefined로 반환한다. usable source text는 그대로 수집되고 blocks 기반 제목 fallback도 동작한다. 사용 가능한 앞 제목은 계속 보존한다. 운영 예외를 HTTP 성공으로 위장하거나 원문 fetch 실패를 삼키는 변경은 아니다.
 
 혼합 case 3개와 깊은 HTML 실제 `fetchUrlContent` 회귀를 추가했다. 최신 URL **1 suite / 26 tests PASS**, 앞 4 suites / 50 tests와 중복 합산하지 않는다. 최신 source의 tsc→database backup→tsup→restore 및 두 bundle Node syntax·compiled migration/config 존재·변경 lint PASS. 새로운 type/public API·권한·DB/CI 설정 변경 없음. main의 Neture 및 개발용 purge 스크립트/문서는 충돌 없이 반영했으며 운영 purge는 실행하지 않는다. 후기 target은 최신 main/serving→target migration delta·CI 및 동시 production 실행을 다시 확인한다.
+
+
+### 사용자 제공 Sonar 상세·확정 판정
+
+사용자가 PR #549의 Sonar 화면을 제공했다. 전체 new issues 212 중 현재 필터된 Reliability bug 6개, Security vulnerability 1개(Low/Minor)가 확인된다. **Security B의 원인은 `scripts/quality/audit-code-complexity.mjs:14`의 PATH 의존 실행**이다. 이 코드의 실제 명령은 `git ls-files`이며 rg가 아니다. 앞 제한 annotation만으로 hotspot으로 추정했던 분류를 이 증거로 정정한다. 새로운 Sonar 분석의 PASS를 이 과거 화면으로 주장하지 않는다.
+
+- Git 실행은 PATH 검색을 제거하고 POSIX `/usr/bin/git`·`/bin/git`, Windows 표준 Program Files Git의 고정 절대 경로로 제한한다. 없는/custom 설치는 환경 검색 없이 fail-closed한다. 기존 tracked 파일 모집단과 읽기 전용/메타데이터 출력은 유지한다. Windows 실행은 이 Linux 회차에서 미실시다.
+- 실제 fake Git을 PATH 앞에 놓은 회귀에서 CLI는 정상 census를 수행하고 fake executable은 실행되지 않는다. 분석 도구 기존 5 + 공격 회귀 1 = **Node 6 tests PASS**.
+- Reliability 6개는 실제 조건을 확인했다. Operator mapper의 두 번째 인자는 의도한 index이고, path/cycle sort는 문자열의 UTF-16 순서이며, Naver reduce는 비어 있지 않은 길이 조건 아래에 있다. 현재 코드에서 오류가 발생하는 것으로 확정하지 않는다. 명시적 `(action,index)` callback, 같은 UTF-16 comparator, 초기값 `''`을 추가하여 기존 결과를 유지하고 암묵성을 없앴다. 별도 공통 기반·서비스 간 공통화·사업/API/권한 계약 변경은 없다.
+- 최신 URL/업무 Extension 회귀 **3 suites / 82 tests PASS**(URL 26 포함), 변경 lint 오류/경고 0. tsc→database backup→tsup(main/migrate)→restore 및 Node syntax/compiled migration/config 검사 PASS. Node/기존 Work tests와 중복 합산하지 않는다. 일반 212개 스타일·cognitive complexity 전체 정비는 이번 범위에 추가하지 않는다.
+
+외부 Sonar API 403은 계속되지만 확인 가능한 Security B의 실제 원인을 이제 확보·수정했다. 최종 원격 등급/issue 상태는 최신 source 재분석이 필요하며 과거 B/D 분석을 PASS로 바꾸지 않는다. 사용자 지시의 운영 quota migration 승인과 재배포는 유지한다.

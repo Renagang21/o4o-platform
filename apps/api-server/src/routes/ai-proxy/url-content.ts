@@ -221,7 +221,7 @@ export function extractNaverBlogText(html: string): string {
 
   const contentCandidates = contentProbes.map((p) => p.text).filter((t) => t.length >= 100);
   if (contentCandidates.length > 0) {
-    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'contentCandidates',
       selectedTextLength: selected.length,
@@ -232,7 +232,7 @@ export function extractNaverBlogText(html: string): string {
 
   const lenientContent = contentProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (lenientContent.length > 0) {
-    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'lenientContent',
       selectedTextLength: selected.length,
@@ -247,7 +247,7 @@ export function extractNaverBlogText(html: string): string {
 
   const wrapperCandidates = wrapperProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (wrapperCandidates.length > 0) {
-    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'wrapperCandidates',
       selectedTextLength: selected.length,
