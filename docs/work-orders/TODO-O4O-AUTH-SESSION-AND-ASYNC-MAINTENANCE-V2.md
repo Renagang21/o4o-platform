@@ -1,6 +1,6 @@
 # TODO-O4O-AUTH-SESSION-AND-ASYNC-MAINTENANCE-V2
 
-> **상태**: IN_PROGRESS
+> **상태**: IMPLEMENTED_PUSHED · CI/review 판정은 PR 최신 HEAD 결과 기준
 > **작성일**: 2026-10-14 (KST)
 > **근거**: [인증 정비 1차](TODO-O4O-AUTH-CODE-MAINTENANCE-V1.md) 이후 사용자 지정 ② 세션 검증 정리 · ④ 비동기 상태 조사
 > **종료 범위**: 이전 정비와 같은 TODO 작성 → 코드/문서로 보완 → 구현·검증 → branch push
@@ -40,7 +40,8 @@
 - [x] 서버 검증 책임 추출과 오류 우선순위 회귀.
 - [x] 확인된 hook 상태 경쟁 최소 수정·소비처 회귀.
 - [x] 관련 타입/빌드·변경 lint·문서/민감정보/diff 검증(기준 main의 실패는 아래 분리).
-- [ ] commit·branch push와 최신 HEAD CI/review 확인.
+- [x] 이번 경로만 commit·branch push. [PR #554](https://github.com/Renagang21/o4o-platform/pull/554) 생성.
+- [ ] 최신 HEAD CI/review gate PASS. 기준 main의 별도 실패를 해결된 것으로 간주하지 않는다.
 
 ## 조사 근거
 
@@ -95,7 +96,10 @@ baseline 진단의 runner 시작 실패는 실행 테스트0으로 구분하고,
    원본 auth-react source를 alias한 기준 실행도 2 FAIL / 1 PASS다. auth context는 테스트에서 mock되며
    본 hook 변경과 별개다. 역할/UI 정책이나 해당 fixture는 이번 작업에서 수정하지 않았다.
 
-push 이후 최신 HEAD CI/Codex 결과를 PR에 기록한다. 위 실패를 passing/skipped로 바꾸거나 배포 가능하다고 판정하지 않는다.
+구현 commit `8c36ce7695`를 `wo/auth-kakao-explicit-link`에 push하고 PR #554를 생성했다.
+검증 중 main은 `f8d1887ef2`로 이동했으나 변경은 AI parser/기록 6경로이며 이번 5경로와 충돌하지 않는다.
+push-only 종료 범위에서 main sync/merge·배포를 실행하지 않았다. 기준 검증 SHA는 `eebd5621de`다.
+최신 HEAD CI/Codex 결과는 PR에 기록한다. 위 실패를 passing/skipped로 바꾸거나 배포 가능하다고 판정하지 않는다.
 
 문서 정합: 앞선 1차 및 검증 PR의 완료 기록을 변경하지 않고 이 후속 TODO를 분리했다.
 WORKTREE_DISPOSITION: KEEP — 같은 미완료 인증 WO의 연속 Phase와 cloud 검증 자원을 유지한다.
