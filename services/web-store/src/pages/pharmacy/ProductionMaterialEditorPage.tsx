@@ -287,6 +287,7 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
     gap: '8px',
     flex: 1,
+    minWidth: 'max-content',
     justifyContent: 'center',
   },
   pageTitle: {
@@ -294,6 +295,7 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     color: colors.neutral800,
     margin: 0,
+    whiteSpace: 'nowrap',
   },
   backBtn: {
     display: 'inline-flex',

@@ -15,7 +15,7 @@
 | `StoreDirectContentPage` | 저장·삭제 경합, 실패 후 초안 및 매장 전환 처리 중복 | 동일 문서 쓰기 잠금, 실패·재시도, 현재 매장에서만 후속 이동 |
 | `ProductionMaterialEditorPage` | 기존 자산 편집과 생성 분기의 저장 상태 중복, 저장 후 새 편집 유실 | 기존 ID 유지, 제출 후 수정이 있으면 이동 보류, 알 수 없는 기존 category 보존 |
 
-네 화면 내부의 비동기 상태 관리는 store-web 전용 `useContentAuthoringSession`으로 옮겼다. API 호출·응답 확인과 저장 형식은 `contentAuthoringAdapters`, 기존 JSON 변환은 `contentAuthoringModels`로 분리했다. 공통 Core로 승격하지 않았다. 페이지 자체는 합계 1,746줄에서 1,349줄로 줄었으나 추출 모듈·회귀 테스트를 포함한 전체 코드량 감소를 뜻하지 않는다.
+네 화면 내부의 비동기 상태 관리는 store-web 전용 `useContentAuthoringSession`으로 옮겼다. API 호출·응답 확인과 저장 형식은 `contentAuthoringAdapters`, 기존 JSON 변환은 `contentAuthoringModels`로 분리했다. 공통 Core로 승격하지 않았다. 페이지 자체는 합계 1,746줄에서 1,351줄로 줄었으나 추출 모듈·회귀 테스트를 포함한 전체 코드량 감소를 뜻하지 않는다.
 
 자료 목록·선택 흐름(`StoreLibraryContentsPage`, `StoreLibraryResourcesPage`)과 PDF 내보내기는 이번 네 작성 화면과 별도 후속 조사 대상으로 남긴다.
 
@@ -52,6 +52,8 @@ Node `22.18.0`, pnpm `10.25.0`을 활성화하고 frozen lockfile 설치 시 sto
 브라우저는 production 소스의 네 화면·RichTextEditor·TagInput·LlmAssistPanel을 사용하고 API·매장 컨텍스트만 합성 fixture로 대체했다. 외부 요청을 차단한 별도 임시 harness에서 실행했다. 읽기 실패 후 재시도, body 우선 읽기, 저장 중 추가 편집, 작성창 닫기·재열기, 중복 생성 방지, 후속 ID 재사용, 저장 실패 후 재시도, metadata·tags·productRef 보존, 삭제창 Escape·초점 복원, 이전 매장 삭제 결과의 이동 차단, 제작 자료 ID·htmlContent 보존, 모바일 가로 overflow와 브라우저 예외를 확인했다.
 
 모바일에서 일시 알림이 사라지는 순간과 자동 스크롤·클릭이 겹친 초기 harness 실패는 알림 종료를 기다린 후 동일 버튼을 실제 클릭하는 방식으로 구분했다. 후속 저장과 이동은 정상 확인됐다. 테스트 fixture의 필수 metadata 필드·제작 유형 타입 누락은 수정한 뒤 테스트와 빌드를 재실행했다.
+
+마지막 320px 이미지 점검에서 제작 자료 제목의 과도한 줄바꿈을 보완하고 production build · focused lint · 동일 브라우저 87개 항목을 재검증했다.
 
 빌드는 기존 bundle 크기·Browserslist 안내를 출력한다. 전체 lint 기존 오류 46개를 해결한 작업은 아니다.
 
