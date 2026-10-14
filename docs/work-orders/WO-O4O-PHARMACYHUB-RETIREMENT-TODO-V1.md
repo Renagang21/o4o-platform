@@ -420,3 +420,16 @@ PR #539는 최신 main 통합 후 CI·SonarCloud PASS 및 Codex blocker 없음�
 관리자가 PH 개발/미디어 Job 이름 범위로 roles/run.invoker를 추가한 뒤 development plan 38469425232를 실행했다. 관리자의 Cloud Run execution 조회에서 Started=True 및 failedCount=1, worker 로그에서 PH_DEV_MUTATION_TRIGGER를 확인했다. 따라서 이 실행은 IAM execute 거부가 아니라 worker의 변경 trigger 안전 검사에서 중단됐다. plan은 읽기 전용 transaction이며 삭제/update를 하지 않았다. 종전 run.jobs.execute 문자열은 subprocess 명령명을 permission처럼 추출한 진단으로, 실제 IAM permission이라고 단정하지 않는다. 실패 Job ph-dev-38469425232-1은 아직 남아 있다.
 
 계정 삭제 migration의 account_erasure_write_fence는 supplier_product_offers UPDATE에도 설치되는 보호 trigger다. 운영의 실제 trigger가 이것인지는 아직 확정하지 않았다. 동일 delete/update 대상의 활성 trigger 이름·이벤트·함수 schema/name·언어·security definer 여부와 함수 body의 SHA-256만 read-only census에 추가했다. 함수 원문·운영 행·자격정보는 출력하지 않는다. trigger를 해제하거나 보호 검사를 우회하지 않는다. 실제 함수 지문 확인 후 실행 가능한 보호 trigger와 부작용 mutation trigger를 구분한다. 동일 WO의 후속 조사로 전용 branch/worktree를 유지한다.
+
+
+### 계정 삭제 보호 trigger 호환 수정 (2026-10-14)
+
+PR #551은 CI·SonarCloud·Codex blocker 없음 확인 후 main eebd5621ded2d06aacd48a04e556f6ce979f511b에 병합했다. read-only census 38487657820은 SUCCESS, failed=false, references.complete=true이며 잔여 건수는 동일하다. 차단 trigger는 supplier_product_offers의 public.account_erasure_write_fence 1개, BEFORE INSERT OR UPDATE FOR EACH ROW(type=23), enabled=O, plpgsql, securityDefiner=false다. 함수 body SHA-256은 51cc91dfa608b87c5ac66564d67dc7f58d08e41e8132e01e271fc95fadf6bdb9로 RetireLegacyErasureIdentityHashes1791795139475와 정확히 일치한다.
+
+PH 도구는 이 확인된 함수 지문과 trigger/function schema/name·이벤트·활성 상태·반환형·인자·언어·실행 속성·설정/조건 부재를 모두 검증한 경우에만 기존 fence를 그대로 실행하며 공급 제안을 갱신한다. trigger를 끄거나 o4o.erasure_operation bypass를 설정하지 않는다. 정의/설정 변조·비활성화·다른 mutation trigger는 중단한다. Core 함수/migration은 변경하지 않는다. 실제 PostgreSQL fixture에서 승인된 fence가 있는 plan/apply, 보호 UUID에 대한 ACCOUNT_ERASURE_PENDING 차단, 삭제 rollback, fence 활성 상태 보존을 검증했다. 운영 DB/GCS 삭제는 아직 미실행이다. 동일 WO의 후속 Phase로 branch/worktree를 유지한다.
+
+보강: 운영에서 존재가 확인된 supplier_product_offers fence 자체가 사라져도 중단한다. 모든 PostgreSQL cleanup scenario를 실제 승인된 fence가 설치된 상태에서 다시 실행했으며 통과했다. Core 보호 장치 부재를 정리 허가로 해석하지 않는다.
+
+P2 재리뷰 대응: PH worker도 계정 삭제 worker와 동일하게 shared o4o-account-erasure-writes advisory transaction lock을 table lock보다 먼저 획득한다. 두 DB connection의 실제 동시 실행에서 erasure가 exclusive advisory lock을 보유한 동안 PH가 advisory에서 대기하고, erasure는 table lock을 획득할 수 있으며 COMMIT 뒤 PH read-only plan이 완료됨을 검증했다. 잠금 순서를 뒤집어 발생할 수 있는 deadlock을 피하며 보호 fence는 유지한다. 최신 main f8d1887ef2f0cd9920667a7275749195d9e28d8a를 자기 branch에 정상 merge했다. 운영 삭제는 미실행이다.
+
+동시 잠금 fixture를 실제 apply(SHARE ROW EXCLUSIVE table locks)에도 확장했다. exclusive advisory 보유자와 PH apply의 순서 충돌 없이 완료 후 rollback하며, read-only plan/apply 양쪽에서 검증했다. 운영 worker 코드는 이 테스트 확장으로 변경하지 않았다.
