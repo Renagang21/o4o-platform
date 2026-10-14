@@ -255,12 +255,10 @@ it("material creation preserves generated content and source description fields"
   });
 });
 it("unknown material category is left untouched rather than overwritten", async () => {
-  const draft = materialDraftFromRecord({
-    ...asset,
-    category: "legacy-category",
-  });
+  const legacyAsset = { ...asset, category: "legacy-category" };
+  const draft = materialDraftFromRecord(legacyAsset);
   expect(draft.category).toBeNull();
-  await saveMaterial(draft, asset, "A");
+  await saveMaterial(draft, legacyAsset, "A");
   expect(api.saveAsset.mock.calls[0][1]).not.toHaveProperty("category");
 });
 it("manual creation preserves tags, empty resources and the original product reference", async () => {

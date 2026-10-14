@@ -27,6 +27,15 @@ it('legacy text, image and list blocks survive PDF extraction with escaped attri
   expect(html).toContain('Legacy &lt;text&gt;'); expect(html).toContain('fixture&quot;');
   expect(html).toContain('<li>First</li>'); expect(html).toContain('&lt;script&gt;Second');
 });
+async function printedHtml() {
+  const blob = vi.mocked(URL.createObjectURL).mock.calls.at(-1)![0];
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(blob as Blob);
+  });
+}
 function documentHtml(bodyHtml: string, density: 'standard' | 'compact' | 'large' = 'standard') {
   return buildPrintHtml({ contentTitle: '<Fixture>', bodyHtml, density,
     opts: { title: true, pharmacyName: true, phone: true, address: true, consult: true, printDate: false },
@@ -59,6 +68,9 @@ it('popup block keeps the dialog and options and allows retry in the user gestur
   expect(popup).toHaveBeenCalledTimes(2); expect(onClose).toHaveBeenCalledOnce();
   expect(win.opener).toBeNull(); expect(replace).toHaveBeenCalledWith('blob:fixture');
   expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+  const html = await printedHtml();
+  expect(html).toContain('Current body'); expect(html).toContain('Fixture Store');
+  expect(html).not.toContain('Old body');
 });
 it('window document failure closes the partial window and permits retry', async () => {
   const close = vi.fn(); vi.spyOn(window, 'open').mockReturnValue({ location: { replace: () => { throw Error('synthetic'); } }, addEventListener: vi.fn(), close } as unknown as Window);
@@ -91,6 +103,7 @@ it('closing and reopening discards old info responses and option selections', as
   const replace = vi.fn(); vi.spyOn(window, 'open').mockReturnValue({ location: { replace }, addEventListener: vi.fn() } as unknown as Window);
   fireEvent.click(screen.getByRole('checkbox', { name: '약국명' })); fireEvent.click(generate());
   expect(replace).toHaveBeenCalledWith('blob:fixture');
+  expect(await printedHtml()).not.toContain('>Old<');
   expect((screen.getByRole('checkbox', { name: '약국명' }) as HTMLInputElement).checked).toBe(true);
 });
 it('stale export callback cannot open a window after the active store changes', () => {
