@@ -76,3 +76,9 @@ API 빌드 수정은 [PR #557](https://github.com/Renagang21/o4o-platform/pull/5
 이번 supplier refactor/main 기록은 위 target의 조상으로 포함된다. 뒤에 main에 추가된 [PR #560](https://github.com/Renagang21/o4o-platform/pull/560)의 추가 frontend 접근성 변경과 그 Delivery는 별도 버전이며 위 배포 증거로 최신 main 전체 배포를 주장하지 않는다.
 자세한 결과와 한계는 동일 CHECK의 운영 완료 절을 따른다. 현재 WO의 구현·검증·main 통합·API 의존 보류 해소·해당 source 운영 배포 범위는 완료다.
 문서 정합: 기존 완료 기록/정본 정책 변경 없이 이번 WO/CHECK의 실행 상태를 완료로 갱신했다.
+
+### 후속 frontend 버전 확인
+
+추가 접근성 #560의 target `40aafa414f2df4abb8a4d647728e43227d78bbce`는 [자동 Delivery 38499037614](https://github.com/Renagang21/o4o-platform/actions/runs/38499037614) SUCCESS, `production` DEPLOYED / success (`deploy: neture`)를 확인했다.
+이 후속 실행은 Neture frontend 배포이며 API/quota migration을 다시 실행한 증거가 아니다. API 선행 배포의 target `ce876b0ab`와 구분한다.
+이후 main에 추가된 PH 관리 도구 진단 변경은 이 서빙 버전 검증에 포함하지 않는다.

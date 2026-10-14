@@ -69,3 +69,9 @@ source main의 [post-merge CI 38494717087](https://github.com/Renagang21/o4o-pla
 상세 Actions job log는 외부 blob host의 접근 거절로 내려받지 못했다. 서명된 다운로드 URL이나 자격정보를 문서에 저장하지 않는다.
 실행 job/step 결과, 표준 runner의 실패 조건, 최종 serving Report/status와 TLS 검증을 유지한 HTTP 결과를 증거로 구분한다. 운영 DB 직접 SQL·실계정 업무 쓰기·유료 AI 호출은 미실행이다.
 후속 main #560 frontend 접근성 변경은 이 target 뒤의 별도 변경이다. 이번 배포 결과를 그 새 버전의 배포 검증으로 표현하지 않는다.
+
+### 후속 frontend 버전 확인
+
+추가 접근성 #560의 target `40aafa414f2df4abb8a4d647728e43227d78bbce`는 [자동 Delivery 38499037614](https://github.com/Renagang21/o4o-platform/actions/runs/38499037614) SUCCESS, `production` DEPLOYED / success (`deploy: neture`)를 확인했다.
+이 후속 실행은 Neture frontend 배포이며 API/quota migration을 다시 실행한 증거가 아니다. API 선행 배포의 target `ce876b0ab`와 구분한다.
+이후 main에 추가된 PH 관리 도구 진단 변경은 이 서빙 버전 검증에 포함하지 않는다.
