@@ -82,3 +82,14 @@ Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required ch
 
 
 [중요 수정 PR #552](https://github.com/Renagang21/o4o-platform/pull/552) main `f8d1887ef2f0cd9920667a7275749195d9e28d8a`에 MERGED. source `03d6ee37c7`와 tree 차이 0. [PR CI 38488237043](https://github.com/Renagang21/o4o-platform/actions/runs/38488237043) SUCCESS, 3 API shards·품질·admin build·CI Gate PASS, CodeQL PASS, 미해결 review thread 0. main CI `38489272848`과 main CodeQL은 기록 시점 IN_PROGRESS. 이전 Sonar Security B가 해결되었다고 판단하지 않는다. 정상 promote/운영 migration/배포 후 smoke 미실행. 운영 승인 및 최신 main/serving delta 검토·후속 증적 보존 때문에 본인 worktree KEEP, 코드 수정과 기록은 source branch에 push한다.
+
+
+## 사용자 승인 후 운영 적용 — 2026-10-14
+
+사용자가 보안 경고 상세 확인과 비용·quota 운영 DB migration/배포 실행 승인 대기 항목을 인용하고 “진행하자”라고 지시했다. 앞서 구체적으로 제시한 `CreateAiUsageReservations1791870434349` 정상 up과 표준 verified 배포에 대한 명시 승인으로 해석한다. 같은 이유로 재승인을 요청하지 않는다. 정상 up 범위는 예약 테이블/index 생성과 두 비용 컬럼 numeric(20,8) 변경이며 rollback/archive repair·seed/delete·외부 유료 계약·운영 인증 변경은 포함하지 않는다.
+
+시작 target은 최신 main `24b96f373059b2ffe534ce4257c5d2e21bf3952d`이며 CI 실행 중이다. 앞 main `f8d1887ef2`의 main CI/CodeQL은 SUCCESS. Delivery `38490190772`의 API serving은 `5742dce8d`, quota migration이 미적용된 누적 LEVEL_3 때문에 API와 의존 frontend 모두 HOLD다. 지난 Promote `38482057513`은 dry-run이며 운영 적용 증거로 쓰지 않는다. serving→target database delta는 manifest/expected registry와 위 quota migration 1개뿐이다. 그 뒤 main의 Neture UI/문서 변경은 API/DB/migration을 바꾸지 않는다. 현재 실행 중/queued인 Promote/Delivery는 없다. dispatch 직전 최신 main·CI·동시 실행·migration delta를 다시 확인한다.
+
+Sonar allowlist 적용은 확인했으나 실제 site root/system API/dashboard/issues API가 모두 upstream CloudFront HTTP 403이다. 새 인증 연결이나 우회는 하지 않았다. GitHub의 기존 공개 Sonar check `115570828811`에는 Security B/Reliability D 및 50개 제한 annotation이 있다. 확인 가능한 backtracking 경고 2개는 PR #552에서 재현/수정/검증했다. PATH 경고는 분석 스크립트의 hotspot이며 실제 injection으로 확정하지 않는다. 현 main에는 새 Sonar check가 없고, CodeQL 공개 CI는 성공했지만 전체 alert API는 integration 권한 403이다. Sonar 전체 상세/해결 여부는 이 자료만으로 확인하지 못했다. 이 외부 차단은 운영 migration 승인 여부와 별개다.
+
+진행 TODO: 최신 main green 및 정상 promote → migration pre/post assertion·실행 수/이름 확인 → API/웹 serving SHA 및 건강·정적 asset·관리 quota 인증 경계 smoke → 결과 기록/push. 운영 DB 직접 접속/업무 데이터 조회·유료 AI 호출·실계정 사용은 하지 않는다.
