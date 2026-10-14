@@ -1,7 +1,7 @@
 # 강의 운영 심사·문의·수료증 흐름 검증
 
 > 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
-> 상태: 로컬 검증 PASS · push/PR 인계 준비
+> 상태: 개발 검증 PASS · [PR #587](https://github.com/Renagang21/o4o-platform/pull/587) 인계
 > 작업: [WO](../work-orders/WO-LECTURE-OPERATOR-WORKFLOW-REFINEMENT-V1.md)
 
 ## 구현과 보존

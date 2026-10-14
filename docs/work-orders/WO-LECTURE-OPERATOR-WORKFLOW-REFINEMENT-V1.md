@@ -1,6 +1,6 @@
 # 강의 운영 심사·문의·수료증 흐름 정비
 
-> 상태: ACTIVE · 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
+> 상태: COMPLETED (개발 범위: push/PR 인계) · 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
 > 종료: 구현·검증·push·PR 인계. main 병합·배포는 통합 담당.
 
 ## 조사 → TODO 보완
@@ -24,7 +24,7 @@
 - [x] 문의 어댑터 계약과 기존 문의 저장/조회 실패 복구 정비.
 - [x] 수료증 입력·실행·결과 책임 분리와 사유 보존.
 - [x] 실패/부분 성공/동시 실행/대상 변경 회귀, 강의 전체 테스트·타입·빌드·합성 UI 검증.
-- [ ] 활성 전체 TODO·CHECK 정합, commit/push/PR 인계.
+- [x] 활성 전체 TODO·CHECK 정합, commit/push/PR 인계.
 
 서비스 간 공통화·공유 패키지·API/DB/role/운영 정책 변경·약사회 분회 제외. 실계정 검증은 사용자 담당이며 운영 DB 쓰기 없음.
 
@@ -33,3 +33,11 @@
 [CHECK](../checks/CHECK-LECTURE-OPERATOR-WORKFLOW-REFINEMENT-V1.md): 강의 10 files/40 tests, 기존 DB-free API/원문 계약 2 suites/140 tests, 타입 포함 빌드, PC/모바일 합성 UI PASS.
 
 수료증 폐기 reason은 기존 서버가 보관하지 않는다. UI 입력/재시도 보존까지 완료했으며 서버 영속·감사 이력은 별도 API/DB·정책 범위로 유보한다. 공통 문의 화면 구조 정비도 전체 정비 단계에서 판단한다.
+
+## 개발 완료·통합 인계
+
+- PR: [#587](https://github.com/Renagang21/o4o-platform/pull/587), branch `wo/lecture-operator-workflow`, 소스 commit `2c6c3dc5ab`.
+- 기준 main `d9dce2e5a4`. 강의 40 tests·기존 API/원문 계약 140 tests·서비스 type-check/build·PC/모바일 합성 화면 PASS.
+- 개발 범위 완료와 integration-ready는 구분한다. main 병합·배포 미수행이며 통합 담당이 PR 최신 HEAD의 CI·Codex/미해결 리뷰를 확인한다.
+- 문서 정합: 이번 WO/CHECK와 ACTIVE 전체 TODO 2개를 갱신했으며 과거 완료 기록은 변경하지 않았다.
+- `/workspace/o4o-lecture-operator-workflow`는 후속 수정용 KEEP. 실계정·운영 배포 검증은 이번 로컬 검증에 포함하지 않는다.
