@@ -8,230 +8,37 @@
  * 운영자 상세 — Trial 정보 확인 + 승인/반려 + 참여자 이행 상태 관리
  */
 
-import { useLatestRequest } from '../../hooks/useLatestRequest';
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  getOperatorTrialDetail,
-  getOperatorTrialParticipants,
-  approveTrialFirst,
-  rejectTrialFirst,
-  exportParticipantsCSV,
-  updateParticipantRewardStatus,
-  updateParticipantPaymentStatus,
-  updateTrialStatus,
-  getOperatorTrialKpi,
-  retryTrialForumSync,
-} from '../../api/trial';
-import type {
-  OperatorTrial,
-  TrialParticipant,
-  ParticipantListResponse,
-  TrialStatus,
-  PaymentStatus,
-  MarketTrialDetailKpi,
-  UpdateParticipantPaymentInput,
-} from '../../api/trial';
-import FundingParticipantsSection, { fundingParticipantFilters, type ParticipantFilter } from './FundingParticipantsSection';
+import type { OperatorTrial, ParticipantListResponse, TrialStatus, MarketTrialDetailKpi } from '../../api/trial';
+import FundingParticipantsSection from './FundingParticipantsSection';
 import { fundingStageTasks } from '../funding/fundingStageTasks';
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: '작성 중',
-  submitted: '심사 대기',
-  approved: '승인됨',
-  recruiting: '모집 중',
-  development: '준비 중',
-  outcome_confirming: '결과 확정',
-  fulfilled: '이행 완료',
-  closed: '종료',
-};
-
-// Operator-allowed status transitions
-const NEXT_STATUS: Partial<Record<string, { status: TrialStatus; label: string }>> = {
-  recruiting: { status: 'development', label: '준비 중으로 전환' },
-  development: { status: 'outcome_confirming', label: '결과 확정으로 전환' },
-  outcome_confirming: { status: 'fulfilled', label: '이행 완료 처리' },
-  fulfilled: { status: 'closed', label: '종료 처리' },
-};
+import { STATUS_LABELS, NEXT_STATUS } from './fundingOperatorModel';
+import { useFundingOperatorWorkflow } from './useFundingOperatorWorkflow';
 
 export default function MarketTrialApprovalDetailPage() {
   const { id } = useParams<{ id: string }>();
+  return id ? <FundingOperatorWorkspace key={id} id={id} /> : <p>유통참여형 펀딩을 찾을 수 없습니다.</p>;
+}
+
+function FundingOperatorWorkspace({ id }: { id: string }) {
   const navigate = useNavigate();
-  const beginLoad = useLatestRequest(`funding-review:${id}`);
-  const beginParticipants = useLatestRequest(`funding-review-participants:${id}`);
-  const beginRetry = useLatestRequest(`funding-forum-retry:${id}`);
-  const beginPayment = useLatestRequest(`funding-payment:${id}`);
-  const beginReward = useLatestRequest(`funding-reward:${id}`);
-  const beginExport = useLatestRequest(`funding-export:${id}`);
-  const beginKpi = useLatestRequest(`funding-review-kpi:${id}`);
-  const beginAction = useLatestRequest(`funding-review-action:${id}`);
-  const [loadedId, setLoadedId] = useState('');
-  const [trial, setTrial] = useState<OperatorTrial | null>(null);
-  const [participantData, setParticipantData] = useState<ParticipantListResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
+  const {
+    trial, participantData, trialKpi, loading, error, setError,
+    actionLoading, pending, refreshing, refreshRequired, savedBeforeRefresh, kpiError,
+    filter, setFilter, paymentFilter, setPaymentFilter,
+    participantsLoading, participantsError, updatingId, updatingPaymentId, exportLoading,
+    loadParticipants, refresh, handleExport, handleToggleRewardStatus, handlePaymentStatusChange,
+    approve, reject, changeStatus, retryForum,
+  } = useFundingOperatorWorkflow(id);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
-  const [exportLoading, setExportLoading] = useState(false);
-  const [filter, setFilter] = useState<ParticipantFilter>('all');
-  const [paymentFilter, setPaymentFilter] = useState<PaymentStatus | ''>('');
-  const [participantsLoading, setParticipantsLoading] = useState(true);
-  const [participantsError, setParticipantsError] = useState('');
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  // WO-NETURE-MARKET-TRIAL-PAYMENT-READINESS-V1
-  const [updatingPaymentId, setUpdatingPaymentId] = useState<string | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
-  // WO-NETURE-MARKET-TRIAL-ANALYTICS-AND-KPI-V1
-  const [trialKpi, setTrialKpi] = useState<MarketTrialDetailKpi | null>(null);
+  const handleReject = async () => { if (await reject(rejectReason)) setShowRejectModal(false); };
+  const handleTrialStatusChange = async (status: TrialStatus) => { if (await changeStatus(status)) setShowStatusModal(false); };
 
-  const refreshKpi = useCallback(async () => {
-    if (!id) return;
-    const current = beginKpi();
-    try { const value = await getOperatorTrialKpi(id); if (current()) setTrialKpi(value); }
-    catch { if (current()) setTrialKpi(null); }
-  }, [id, beginKpi]);
-
-  const loadParticipants = useCallback(async () => {
-    if (!id) return;
-    const current = beginParticipants();
-    if (!current()) return;
-    setParticipantsLoading(true); setParticipantsError('');
-    try {
-      const data = await getOperatorTrialParticipants(id, fundingParticipantFilters(filter, paymentFilter));
-      if (!Array.isArray(data?.participants) || !data?.summary) throw new Error('참여자 응답을 확인할 수 없습니다.');
-      if (current()) setParticipantData(data);
-    } catch (err: any) {
-      if (current()) { setParticipantData(null); setParticipantsError(err.message || '참여자 조회에 실패했습니다.'); }
-    } finally {
-      if (current()) setParticipantsLoading(false);
-    }
-  }, [id, filter, paymentFilter, beginParticipants]);
-
-  const loadAll = useCallback(async () => {
-    if (!id) return;
-    const current = beginLoad();
-    if (!current()) return;
-    setLoading(true); setError('');
-    try {
-      const trialData = await getOperatorTrialDetail(id);
-      if (!current()) return;
-      setTrial(trialData); setLoadedId(id);
-      // KPI is best-effort — never blocks the page
-      void refreshKpi();
-    } catch (err: any) {
-      if (current()) setError(err.message || '유통참여형 펀딩을 불러오는데 실패했습니다.');
-    } finally {
-      if (current()) setLoading(false);
-    }
-  }, [id, beginLoad, refreshKpi]);
-
-  useEffect(() => {
-    loadAll();
-  }, [loadAll]);
-
-  useEffect(() => { void loadParticipants(); }, [loadParticipants]);
-
-  const handleApprove = async () => {
-    if (!id || actionLoading) return;
-    const current = beginAction();
-    setActionLoading(true);
-    try {
-      await approveTrialFirst(id);
-      if (current()) await Promise.all([loadAll(), loadParticipants()]);
-    } catch (err: any) {
-      if (current()) setError(err.response?.data?.message || err.message || '승인에 실패했습니다.');
-    } finally {
-      if (current()) setActionLoading(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!id || actionLoading) return;
-    const current = beginAction();
-    setActionLoading(true);
-    try {
-      await rejectTrialFirst(id, rejectReason);
-      if (!current()) return;
-      setShowRejectModal(false);
-      await loadAll();
-    } catch (err: any) {
-      if (current()) setError(err.response?.data?.message || err.message || '반려에 실패했습니다.');
-    } finally {
-      if (current()) setActionLoading(false);
-    }
-  };
-
-  const handleExport = async () => {
-    if (!id || exportLoading) return;
-    const current = beginExport();
-    setExportLoading(true);
-    try { await exportParticipantsCSV(id, fundingParticipantFilters(filter, paymentFilter)); }
-    catch (err: any) { if (current()) setError(err.response?.data?.message || err.message || 'CSV 다운로드에 실패했습니다.'); }
-    finally { if (current()) setExportLoading(false); }
-  };
-
-  const handleToggleRewardStatus = async (participant: TrialParticipant) => {
-    if (!id || updatingId) return;
-    const current = beginReward();
-    setUpdatingId(participant.id); setError('');
-    try {
-      await updateParticipantRewardStatus(id, participant.id, participant.rewardStatus === 'fulfilled' ? 'pending' : 'fulfilled');
-      if (current()) await loadParticipants();
-    } catch (err: any) {
-      if (current()) setError(err.response?.data?.message || err.message || '상태 변경에 실패했습니다.');
-    } finally { if (current()) setUpdatingId(null); }
-  };
-
-  const handlePaymentStatusChange = async (participant: TrialParticipant, input: UpdateParticipantPaymentInput) => {
-    if (!id || updatingPaymentId) return false;
-    const current = beginPayment();
-    setUpdatingPaymentId(participant.id); setError('');
-    try {
-      await updateParticipantPaymentStatus(id, participant.id, input);
-      if (!current()) return false;
-      await loadParticipants();
-      if (!current()) return false;
-      void refreshKpi();
-      return true;
-    } catch (err: any) {
-      if (current()) setError(err.response?.data?.message || err.message || '입금 기록 저장에 실패했습니다.');
-      return false;
-    } finally { if (current()) setUpdatingPaymentId(null); }
-  };
-
-  useEffect(() => {
-    setUpdatingPaymentId(null); setUpdatingId(null); setExportLoading(false); setParticipantData(null); setTrialKpi(null);
-    setActionLoading(false); setShowRejectModal(false); setShowStatusModal(false); setRejectReason('');
-  }, [id]);
-
-  const handleTrialStatusChange = async (newStatus: TrialStatus) => {
-    if (!id || actionLoading) return;
-    const current = beginAction();
-    setActionLoading(true);
-    try {
-      await updateTrialStatus(id, newStatus);
-      if (!current()) return;
-      setShowStatusModal(false);
-      await Promise.all([loadAll(), loadParticipants()]);
-    } catch (err: any) {
-      if (current()) setError(err.response?.data?.message || err.message || '유통참여형 펀딩 상태 변경에 실패했습니다.');
-    } finally {
-      if (current()) setActionLoading(false);
-    }
-  };
-
-  if (loading || !error && loadedId !== id) {
-    return <div className="p-6 text-center text-gray-500">불러오는 중...</div>;
-  }
-
-  if (!trial || loadedId !== id) {
-    return (
-      <div className="p-6 text-center text-gray-500">
-        {error || '유통참여형 펀딩을 찾을 수 없습니다.'}
-      </div>
-    );
-  }
+  if (loading) return <div className="p-6 text-center text-gray-500">불러오는 중...</div>;
+  if (!trial) return <div className="p-6 text-center text-gray-500"><p role="alert">{error || '유통참여형 펀딩을 찾을 수 없습니다.'}</p><button onClick={() => void refresh()}>다시 시도</button></div>;
 
   const isSubmitted = trial.status === 'submitted' && !trial.forumPending;
   const recruitRate =
@@ -269,13 +76,20 @@ export default function MarketTrialApprovalDetailPage() {
         </div>
       )}
 
+      {refreshRequired && <div role="status" className="mb-4 rounded border border-amber-300 bg-amber-50 p-4 text-sm">
+        {savedBeforeRefresh ? '처리는 완료됐지만 최신 운영 현황을 확인하지 못했습니다. 다시 저장하지 말고 운영 현황을 새로고침해 주세요.' : '최신 운영 현황을 확인하지 못했습니다. 추가 처리 전에 운영 현황을 새로고침해 주세요.'}
+      </div>}
+      {kpiError && <div role="alert" className="mb-4 rounded border border-amber-300 p-4 text-sm">
+        운영 지표: {kpiError} <button disabled={pending || refreshing} onClick={() => void refresh()} className="underline">운영 지표 다시 조회</button>
+      </div>}
+
       {/* Summary Metrics Card */}
       <section className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
         <h2 className="text-sm font-semibold text-blue-900">현재 단계의 운영 업무</h2>
         <p className="mt-2 text-sm text-blue-900">{fundingStageTasks[trial.status]?.operator}</p>
         <p className="mt-2 text-xs text-blue-800">개설자: {fundingStageTasks[trial.status]?.creator}</p>
         <p className="mt-2 text-xs text-gray-600">단계 변경·입금 확인·참여자별 이행 기록·포럼 회원 승인은 별도 업무이며 자동으로 함께 처리되지 않습니다.</p>
-        <button onClick={() => void Promise.all([loadAll(), loadParticipants()])} disabled={actionLoading || participantsLoading || !!updatingId || !!updatingPaymentId} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
+        <button onClick={() => void refresh()} disabled={pending || refreshing || participantsLoading} className="mt-3 min-h-11 rounded border border-blue-200 bg-white px-3 text-sm disabled:opacity-50">운영 현황 새로고침</button>
       </section>
 
       <SummaryMetrics trial={trial} recruitRate={recruitRate} summary={summary} />
@@ -333,14 +147,7 @@ export default function MarketTrialApprovalDetailPage() {
       {(trial.forumPending || !trial.forumReady && ['recruiting', 'development', 'outcome_confirming', 'fulfilled'].includes(trial.status)) && (
         <div className="mb-4 rounded border border-amber-300 bg-amber-50 p-4">
           <p>승인된 펀딩의 전용 포럼을 개설합니다. 준비 완료 후 모집을 시작합니다.</p>
-          <button disabled={actionLoading} className="mt-2 min-h-11 rounded border px-4 disabled:opacity-50" onClick={async () => {
-            if (!id || actionLoading) return;
-            const current = beginRetry();
-            setActionLoading(true); setError('');
-            try { await retryTrialForumSync(id); if (current()) await loadAll(); }
-            catch (e: any) { if (current()) setError(e.response?.data?.message || '포럼 개설을 다시 시도해 주세요.'); }
-            finally { if (current()) setActionLoading(false); }
-          }}>포럼 개설 재처리</button>
+          <button disabled={actionLoading} className="mt-2 min-h-11 rounded border px-4 disabled:opacity-50" onClick={() => void retryForum()}>포럼 개설 재처리</button>
         </div>
       )}
       {/* Forum Link */}
@@ -363,7 +170,7 @@ export default function MarketTrialApprovalDetailPage() {
 
       {/* Participant List Section */}
       <FundingParticipantsSection
-        key={id}
+        disabled={actionLoading}
         participants={participants}
         totalCount={summary?.totalCount ?? trial.currentParticipants}
         filter={filter}
@@ -372,7 +179,7 @@ export default function MarketTrialApprovalDetailPage() {
         onPaymentFilterChange={setPaymentFilter}
         loading={participantsLoading}
         error={participantsError}
-        onRetry={loadParticipants}
+        onRetry={() => void (refreshRequired ? refresh() : loadParticipants())}
         onExport={handleExport}
         exportLoading={exportLoading}
         onToggleRewardStatus={handleToggleRewardStatus}
@@ -424,11 +231,11 @@ export default function MarketTrialApprovalDetailPage() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-4">
             <button
-              onClick={handleApprove}
+              onClick={() => void approve()}
               disabled={actionLoading}
               className="flex-1 sm:flex-none px-5 py-2.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {actionLoading ? '처리 중...' : '승인'}
+              {pending ? '처리 중...' : '승인'}
             </button>
             <button
               onClick={() => setShowRejectModal(true)}
@@ -448,6 +255,7 @@ export default function MarketTrialApprovalDetailPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-3">유통참여형 펀딩 반려</h3>
             <textarea
               value={rejectReason}
+              disabled={pending}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="반려 사유를 입력해주세요."
               rows={3}
@@ -458,6 +266,7 @@ export default function MarketTrialApprovalDetailPage() {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowRejectModal(false)}
+                disabled={pending}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 취소
@@ -467,7 +276,7 @@ export default function MarketTrialApprovalDetailPage() {
                 disabled={actionLoading}
                 className="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
-                {actionLoading ? '처리 중...' : '반려하기'}
+                {pending ? '처리 중...' : '반려하기'}
               </button>
             </div>
           </div>
@@ -487,6 +296,7 @@ export default function MarketTrialApprovalDetailPage() {
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowStatusModal(false)}
+                disabled={pending}
                 className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 취소
@@ -496,7 +306,7 @@ export default function MarketTrialApprovalDetailPage() {
                 disabled={actionLoading}
                 className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
               >
-                {actionLoading ? '처리 중...' : '확인'}
+                {pending ? '처리 중...' : '확인'}
               </button>
             </div>
           </div>

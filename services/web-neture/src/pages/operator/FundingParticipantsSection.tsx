@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { PAYMENT_STATUS_LABELS } from '../../api/trial';
-import type { ParticipantFilters, PaymentStatus, TrialParticipant, TrialStatus, UpdateParticipantPaymentInput } from '../../api/trial';
+import type { PaymentStatus, TrialParticipant, TrialStatus, UpdateParticipantPaymentInput } from '../../api/trial';
 
-export type ParticipantFilter = 'all' | 'product' | 'cash' | 'pending' | 'fulfilled';
-export function fundingParticipantFilters(filter: ParticipantFilter, payment: PaymentStatus | ''): ParticipantFilters {
-  return {
-    ...(filter === 'product' || filter === 'cash' ? { rewardType: filter } : {}),
-    ...(filter === 'pending' || filter === 'fulfilled' ? { rewardStatus: filter } : {}),
-    ...(payment ? { paymentStatus: payment } : {}),
-  };
-}
+import type { ParticipantFilter } from './fundingOperatorModel';
+export { fundingParticipantFilters } from './fundingOperatorModel';
 
 type Form = { id: string; action: 'confirm' | 'refund' | 'reset'; amount: string; reference: string; note: string };
 type Props = {
+  disabled?: boolean;
   participants: TrialParticipant[]; totalCount: number; trialStatus: TrialStatus;
   filter: ParticipantFilter; paymentFilter: PaymentStatus | '';
   onFilterChange: (value: ParticipantFilter) => void;
@@ -34,7 +29,7 @@ const invalidAmount = (value: string) => value.trim() !== ''
 
 export default function FundingParticipantsSection(props: Props) {
   const [form, setForm] = useState<Form | null>(null);
-  const busy = props.updatingPaymentId !== null || props.updatingId !== null;
+  const busy = !!props.disabled || props.updatingPaymentId !== null || props.updatingId !== null;
   const open = (p: TrialParticipant, action: Form['action']) => setForm({
     id: p.id, action, amount: p.paidAmount == null ? '' : String(p.paidAmount),
     reference: p.paymentReference || '', note: action === 'confirm' ? p.paymentNote || '' : '',
