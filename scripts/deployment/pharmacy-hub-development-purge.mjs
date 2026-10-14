@@ -42,6 +42,9 @@ async function lock(q,tables,plan) {
 async function dependencies(q,plan) {
   await q.query("SET LOCAL lock_timeout='5s'");
   await q.query("SET LOCAL statement_timeout='15s'");
+  // Match the Core erasure worker's advisory-before-table order. The live fence
+  // reuses this shared transaction lock when the supplier-offer update occurs.
+  await q.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
   // All application relations are held stable for the conservative non-FK ID scan.
   const tables=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",c.relrowsecurity AS row_security FROM pg_class c
     JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.relkind IN ('r','p')

@@ -67,6 +67,24 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await seed();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       const plan=await new PharmacyHubDevelopmentPurge().up(q,true);assert.equal(plan.applied,false);
       assert.equal(Object.values(plan.counts).reduce((a,b)=>a+b,0),60);await client.query('ROLLBACK');
+      const erasure=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await erasure.connect();
+      try {
+        const pid=(await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+        await erasure.query("BEGIN;SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
+        await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+        const waitingPlan=new PharmacyHubDevelopmentPurge().up(q,true);
+        let blocked=false;
+        for(let i=0;i<100;i++) {
+          blocked=(await erasure.query("SELECT EXISTS(SELECT 1 FROM pg_locks WHERE locktype='advisory' AND pid=$1 AND NOT granted) AS blocked",[pid])).rows[0].blocked;
+          if(blocked)break;
+          await new Promise(resolve=>setTimeout(resolve,20));
+        }
+        assert.equal(blocked,true);
+        // A live erasure holding the exclusive advisory lock can still acquire its table locks.
+        await erasure.query("SET LOCAL lock_timeout='500ms';LOCK TABLE supplier_product_offers IN SHARE ROW EXCLUSIVE MODE");
+        await erasure.query('COMMIT');
+        assert.equal((await waitingPlan).applied,false);await client.query('ROLLBACK');
+      } finally {await erasure.query('ROLLBACK');await erasure.end();}
       await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       assert.equal((await new PharmacyHubDevelopmentPurge().up(q,true)).applied,false);await client.query('ROLLBACK');
       await client.query("INSERT INTO account_erasure_operations VALUES($1,'completed',NULL,encode(public.digest($2,'sha256'),'hex'))",[uuid(950),uuid(301)]);

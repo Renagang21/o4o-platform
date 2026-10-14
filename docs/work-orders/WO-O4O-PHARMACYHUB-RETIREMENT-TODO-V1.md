@@ -429,3 +429,5 @@ PR #551은 CI·SonarCloud·Codex blocker 없음 확인 후 main eebd5621ded2d06a
 PH 도구는 이 확인된 함수 지문과 trigger/function schema/name·이벤트·활성 상태·반환형·인자·언어·실행 속성·설정/조건 부재를 모두 검증한 경우에만 기존 fence를 그대로 실행하며 공급 제안을 갱신한다. trigger를 끄거나 o4o.erasure_operation bypass를 설정하지 않는다. 정의/설정 변조·비활성화·다른 mutation trigger는 중단한다. Core 함수/migration은 변경하지 않는다. 실제 PostgreSQL fixture에서 승인된 fence가 있는 plan/apply, 보호 UUID에 대한 ACCOUNT_ERASURE_PENDING 차단, 삭제 rollback, fence 활성 상태 보존을 검증했다. 운영 DB/GCS 삭제는 아직 미실행이다. 동일 WO의 후속 Phase로 branch/worktree를 유지한다.
 
 보강: 운영에서 존재가 확인된 supplier_product_offers fence 자체가 사라져도 중단한다. 모든 PostgreSQL cleanup scenario를 실제 승인된 fence가 설치된 상태에서 다시 실행했으며 통과했다. Core 보호 장치 부재를 정리 허가로 해석하지 않는다.
+
+P2 재리뷰 대응: PH worker도 계정 삭제 worker와 동일하게 shared o4o-account-erasure-writes advisory transaction lock을 table lock보다 먼저 획득한다. 두 DB connection의 실제 동시 실행에서 erasure가 exclusive advisory lock을 보유한 동안 PH가 advisory에서 대기하고, erasure는 table lock을 획득할 수 있으며 COMMIT 뒤 PH read-only plan이 완료됨을 검증했다. 잠금 순서를 뒤집어 발생할 수 있는 deadlock을 피하며 보호 fence는 유지한다. 최신 main f8d1887ef2f0cd9920667a7275749195d9e28d8a를 자기 branch에 정상 merge했다. 운영 삭제는 미실행이다.
