@@ -125,3 +125,7 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 ### 2026-10-14 상품·공급자 승인 통합 정비 착수
 
 사용자 요청에 따라 함수/모달 단위로 종료하지 않고 두 승인 화면의 책임·실패·재시도를 하나의 업무 묶음으로 정비한다. [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 조사 후 보완 TODO를 따른다. 서비스 간 공통화와 약사회 분회는 제외한다.
+
+### 상품·공급자 승인 통합 정비 결과
+
+[이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.
