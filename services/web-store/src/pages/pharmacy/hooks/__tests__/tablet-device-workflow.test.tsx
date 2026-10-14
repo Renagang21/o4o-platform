@@ -228,3 +228,24 @@ it("the pairing dialog has an accessible name and Escape closes it", () => {
   fireEvent.keyDown(window, { key: "Escape" });
   expect(close).toHaveBeenCalledOnce();
 });
+
+it("the visible close button dismisses pairing, refreshes devices and restores focus", async () => {
+  api.pair.mockResolvedValue({ code: "synthetic", expiresAt: "2099-01-01" });
+  function Panel() {
+    const operations = useTabletDevices("A", locations, notify);
+    return <>
+      <button onClick={() => void operations.handleCreatePairingCode(locations[0])}>연결 코드</button>
+      <TabletPairingModal pairing={operations.pairing} onClose={operations.closePairing} />
+    </>;
+  }
+  render(<Panel />);
+  await waitFor(() => expect(api.list).toHaveBeenCalledOnce());
+  const trigger = screen.getByRole("button", { name: "연결 코드" });
+  trigger.focus();
+  fireEvent.click(trigger);
+  await screen.findByRole("dialog");
+  fireEvent.click(screen.getByText("닫기", { selector: "button" }));
+  await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
+  expect(document.activeElement).toBe(trigger);
+});

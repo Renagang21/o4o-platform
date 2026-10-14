@@ -87,6 +87,8 @@ export interface O4OService {
    *   여기서 빼는 것은 그 호스트의 로그인 세션 귀속을 끊는 일이므로 DNS · LB 정리와 같은 별도 WO 에서 한다.
    */
   legacyDomains?: readonly string[];
+  /** 현재 branded 진입의 정확한 세션 수용 호스트. URL 생성·서비스 가입·역할 부여에는 사용하지 않는다. */
+  sessionDomains?: readonly string[];
   /**
    * 공개 진입 경로 prefix (optional — 미지정 시 host 루트).
    *
@@ -139,6 +141,8 @@ export const O4O_SERVICES: O4OService[] = [
     key: 'neture',
     name: 'Neture',
     domain: 'neture.co.kr',
+    // CarePharm은 기존 계정 센터의 세션을 사용하며 독립 serviceKey를 만들지 않는다.
+    sessionDomains: ['carepharm.neture.co.kr'],
     description: 'O4O 공급자 및 유통 플랫폼',
     joinEnabled: true,
     // SPECIAL — O4O 대표 진입(REPRESENTATIVE_ENTRY_SERVICE_KEY) · 공급자 축. 매장 identity 축이 없다

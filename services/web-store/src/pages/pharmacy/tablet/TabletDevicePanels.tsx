@@ -114,7 +114,7 @@ export function TabletPairingModal({
         </div>
         <div className="px-5 py-3 border-t flex justify-end">
           <button
-            onClick={() => onClose}
+            onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-white bg-slate-700 rounded-lg hover:bg-slate-800"
           >
             닫기

@@ -8,9 +8,20 @@ import { EmailSignupRequestDto } from '../../../modules/auth/dto/email-auth.dto.
 import { GoogleSignupRequestDto } from '../../../modules/auth/dto/google-auth.dto.js';
 import { SocialSignupDto } from '../../../modules/auth/dto/social-auth.dto.js';
 import { SignupTermsController } from '../../../modules/auth/controllers/signup-terms.controller.js';
+import { socialOrigin } from '../../../modules/auth/controllers/social-auth.helpers.js';
 
 const policy = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 };
 describe('signup policy boundary', () => {
+  it('CarePharm uses the existing account signup and social session scope', () => {
+    const origin = 'https://carepharm.neture.co.kr';
+    expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
+    expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
+  });
+  it.each(['https://carepharm.neture.co.kr.attacker.invalid', 'https://carepharm.neture.co.kr/path'])
+    ('CarePharm lookalike or path origin remains rejected: %s', origin => {
+      expect(() => signupPolicyKeyFromOrigin(origin)).toThrow(expect.objectContaining({ code: 'SIGNUP_ORIGIN_NOT_ALLOWED' }));
+      expect(() => socialOrigin({ get: () => origin } as never)).toThrow(expect.objectContaining({ code: 'SOCIAL_ORIGIN_NOT_ALLOWED' }));
+    });
   it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr'])('preserves the pre-rollout signup agreement for %s', host => {
     expect(signupPolicyKeyFromOrigin(`https://${host}`)).toBe(host === 'pharmacy.neture.co.kr' ? 'kpa-society' : 'neture');
   });

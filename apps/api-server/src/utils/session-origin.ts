@@ -9,7 +9,7 @@
  *   로그아웃 어느 서비스의 세션을 끝내는가
  *   handoff  어느 서비스로 넘기는가 (그쪽은 대상이 명시되므로 이 함수가 필요 없다)
  *
- * 판정은 `service-catalog` 의 `domain` · `legacyDomains` 한 곳에서만 나온다 — 호스트 목록을 파일마다
+ * 판정은 `service-catalog` 의 `domain` · `legacyDomains` · `sessionDomains` 한 곳에서만 나온다 — 호스트 목록을 파일마다
  * 따로 적으면 카탈로그와 어긋난다. 서비스가 아닌 **surface** 두 개만 예외로 둔다:
  *
  *   `store.neture.co.kr`   공통 Store Workspace (handoff 의 WORKSPACE 계약과 같은 값)
@@ -61,6 +61,7 @@ export function resolveSessionServiceKey(origin: string | undefined | null): str
     O4O_SERVICES.find(
       (svc) =>
         svc.domain.toLowerCase() === catalogHost ||
+        (svc.sessionDomains ?? []).some((alias) => alias.toLowerCase() === host) ||
         (svc.legacyDomains ?? []).some((legacy) => legacy.toLowerCase() === catalogHost),
     )?.key ?? null
   );
