@@ -18,6 +18,10 @@ vi.mock("../pharmacy/ContentPdfExportModal", () => ({
 vi.mock("../../components/store/StoreQrCreateModal", () => ({
   StoreQrCreateModal: () => null,
 }));
+vi.mock("../pharmacy/library/useLibraryScope", () => {
+  const isCurrent = () => true;
+  return { useLibraryScope: () => ({ scope: "A:kpa-society", isCurrent }) };
+});
 afterEach(cleanup);
 beforeEach(() => vi.resetAllMocks());
 const empty = { success: true, data: { items: [], total: 0, totalPages: 1 } };

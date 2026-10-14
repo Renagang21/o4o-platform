@@ -22,138 +22,27 @@
  */
 
 import { STORE_RESOURCES_HEADING } from '../../config/storeLibraryLabels';
-import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import { Library, ExternalLink, Trash2, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import {
-  getStoreExecutionAssets,
-  deleteStoreExecutionAsset,
-  type StoreExecutionAsset,
-  type AssetType,
-} from '../../api/storeExecutionAssets';
-import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
+import type { AssetType } from '../../api/storeExecutionAssets';
+import { LibraryDialog } from './library/LibraryDialog';
+import { useLibraryScope } from './library/useLibraryScope';
+import { useLibraryResources } from './library/useLibraryResources';
+import type { UnifiedResourceRow } from './library/libraryResources';
 import { StorePageShell } from '@o4o/store-ui-core';
 import { colors } from '../../styles/theme';
-import { stripHtml, blocksToText } from '../../utils/ai-clipboard';
 import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
 // WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: list 영역 표준 테이블
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
 
-const PAGE_LIMIT = 50;
 
 const ASSET_TYPE_LABEL: Record<AssetType, { label: string; bg: string; color: string; Icon: typeof FileText }> = {
   file:            { label: '파일',     bg: '#EFF6FF', color: '#2563EB', Icon: FileDown },
   content:         { label: '콘텐츠',   bg: '#DCFCE7', color: '#16A34A', Icon: FileText },
   'external-link': { label: '외부 링크', bg: '#FEF3C7', color: '#D97706', Icon: LinkIcon },
 };
-
-// WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 두 source(library / snapshot) 통합 표시용
-type SourceKind = 'library' | 'snapshot';
-
-interface UnifiedResourceRow {
-  id: string;                          // library: 'lib:<id>', snapshot: 'snap:<id>'
-  rawId: string;                       // 원본 id (삭제 시 사용)
-  kind: SourceKind;
-  title: string;
-  description: string | null;          // 짧은 요약/메모 (summary)
-  bodyText: string | null;             // 본문 plain text — snapshot.contentJson.body|content|blocks 또는 library.htmlContent 에서 도출
-  assetType: AssetType;                // 표시용 (snapshot 도 file/content/external-link 로 매핑)
-  category: string | null;
-  createdAt: string;
-  updatedAt: string;
-  href: string | null;
-  sourceFileName: string | null;
-  fileSize: number | null;
-  mimeType: string | null;
-  thumbnailUrl: string | null;
-  authorName: string | null;
-}
-
-// WO-O4O-STORE-LIBRARY-RESOURCE-SNAPSHOT-CONTENT-COPY-FIX-V1
-// snapshot.contentJson 또는 library.htmlContent 에서 본문 plain text 추출.
-// 우선순위: contentJson.body(HTML) → contentJson.content(HTML) → contentJson.blocks(배열) → null
-// 본문은 가져가기 시점의 snapshot 값이며 원본 자료와 독립적이다.
-function deriveBodyText(source: Record<string, unknown> | null | undefined): string | null {
-  if (!source) return null;
-  const body = source.body;
-  if (typeof body === 'string' && body.trim()) {
-    const t = stripHtml(body);
-    if (t) return t;
-  }
-  const content = source.content;
-  if (typeof content === 'string' && content.trim()) {
-    const t = stripHtml(content);
-    if (t) return t;
-  }
-  const blocks = source.blocks;
-  if (Array.isArray(blocks) && blocks.length > 0) {
-    const t = blocksToText(blocks).trim();
-    if (t) return t;
-  }
-  return null;
-}
-
-function libraryToUnified(it: StoreExecutionAsset): UnifiedResourceRow {
-  return {
-    id: `lib:${it.id}`,
-    rawId: it.id,
-    kind: 'library',
-    title: it.title,
-    description: it.description,
-    bodyText: it.htmlContent ? stripHtml(it.htmlContent) || null : null,
-    assetType: it.assetType,
-    category: it.category,
-    createdAt: it.createdAt,
-    updatedAt: it.updatedAt,
-    href: it.assetType === 'file' ? it.fileUrl : it.assetType === 'external-link' ? it.url : null,
-    sourceFileName: it.fileName,
-    fileSize: it.fileSize,
-    mimeType: it.mimeType,
-    thumbnailUrl: null,
-    authorName: null,
-  };
-}
-
-function snapshotToUnified(snap: AssetSnapshotItem): UnifiedResourceRow {
-  // contentJson 은 KpaAssetResolver.resolveResource() 가 채운 snapshot (가져가기 시점 복사).
-  // 원본 자료가 이후 수정/삭제되어도 snapshot 은 유지된다.
-  const cj = snap.contentJson as Record<string, unknown> | undefined;
-  const sourceUrl = (cj?.sourceUrl as string | null | undefined) ?? null;
-  const sourceFileName = (cj?.sourceFileName as string | null | undefined) ?? null;
-  const summary = (cj?.summary as string | null | undefined) ?? null;
-  const description = (cj?.description as string | null | undefined) ?? null;
-  const category = (cj?.category as string | null | undefined) ?? null;
-  const sourceType = (cj?.sourceType as string | null | undefined) ?? null;
-  const thumbnailUrl = (cj?.thumbnailUrl as string | null | undefined) ?? null;
-  const authorName = (cj?.authorName as string | null | undefined) ?? null;
-
-  // resource 의 source_type(upload/external/manual) → assetType(file/external-link/content) 매핑
-  const assetType: AssetType =
-    sourceType === 'external' ? 'external-link'
-    : sourceType === 'upload' ? 'file'
-    : 'content';
-
-  return {
-    id: `snap:${snap.id}`,
-    rawId: snap.id,
-    kind: 'snapshot',
-    title: snap.title,
-    // 메모: summary 우선, 없으면 description fallback
-    description: summary ?? description ?? null,
-    bodyText: deriveBodyText(cj),
-    assetType,
-    category,
-    createdAt: snap.createdAt,
-    updatedAt: snap.createdAt,
-    href: sourceUrl,
-    sourceFileName,
-    fileSize: null,
-    mimeType: null,
-    thumbnailUrl,
-    authorName,
-  };
-}
 
 // 자료 유형(PDF / 파일 / URL / 이미지 / 기타) 도출
 function deriveResourceKindLabel(row: UnifiedResourceRow): string {
@@ -190,110 +79,40 @@ function isImageResource(row: UnifiedResourceRow): boolean {
 }
 
 export default function StoreLibraryResourcesPage() {
-  const [items, setItems] = useState<UnifiedResourceRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { scope } = useLibraryScope();
+  return <LibraryResources key={scope} />;
+}
+
+function LibraryResources() {
+  const { items, loading, deleting, errors, hasMore, reload, loadMore, retryFailed, remove } = useLibraryResources();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detailId, setDetailId] = useState<string | null>(null);
   const [registerOpen, setRegisterOpen] = useState(false);
-
-  const fetchItems = useCallback(async () => {
-    setLoading(true);
-    try {
-      // 두 source 병렬 조회. 한쪽 실패해도 가능한 항목은 표시 (graceful degradation).
-      const [libRes, snapRes] = await Promise.allSettled([
-        getStoreExecutionAssets({ page: 1, limit: PAGE_LIMIT }),
-        assetSnapshotApi.list({ type: 'resource', page: 1, limit: PAGE_LIMIT }),
-      ]);
-
-      const libraryRows = libRes.status === 'fulfilled'
-        ? (libRes.value.data?.items ?? []).map(libraryToUnified)
-        : [];
-      const snapshotRows = snapRes.status === 'fulfilled'
-        ? (snapRes.value.data?.items ?? []).map(snapshotToUnified)
-        : [];
-
-      // updatedAt 기준 내림차순 merge
-      const merged = [...libraryRows, ...snapshotRows].sort((a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-      );
-      setItems(merged);
-      setSelected(new Set());
-
-      if (libRes.status === 'rejected' && snapRes.status === 'rejected') {
-        toast.error('불러오는 데 실패했습니다');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
-
-  // 직접 업로드(library) 항목만 삭제 가능. snapshot 삭제는 후속 WO 후보.
+  const fetchItems = () => {
+    if (deleting) return;
+    setSelected(new Set()); setDetailId(null);
+    void reload();
+  };
+  const selectedKeys = new Set(items.filter(row => selected.has(row.id)).map(row => row.id));
+  const deleteRows = async (rows: UnifiedResourceRow[]) => {
+    const result = await remove(rows);
+    if (!result) return;
+    setSelected(prev => new Set([...prev].filter(id => !result.removed.has(id))));
+    if (result.failed) toast.error(`${result.removed.size}개 삭제, ${result.failed}개 실패했습니다. 실패한 자료를 다시 시도해 주세요.`);
+    else toast.success(`${result.removed.size}개 삭제되었습니다`);
+  };
   const handleDelete = async (row: UnifiedResourceRow) => {
-    const confirmMsg = row.kind === 'snapshot'
+    if (loading || deleting) return;
+    const message = row.kind === 'snapshot'
       ? `"${row.title}" 자료를 내 자료함에서 제거하시겠습니까?\n원본 커뮤니티 자료는 삭제되지 않습니다.`
       : `"${row.title}" 자료를 삭제하시겠습니까?`;
-    if (!confirm(confirmMsg)) return;
-    setDeletingId(row.id);
-    try {
-      if (row.kind === 'snapshot') {
-        await assetSnapshotApi.remove(row.rawId);
-      } else {
-        await deleteStoreExecutionAsset(row.rawId);
-      }
-      setItems((prev) => prev.filter((it) => it.id !== row.id));
-      setSelected((prev) => {
-        const next = new Set(prev);
-        next.delete(row.id);
-        return next;
-      });
-      toast.success('삭제되었습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    } finally {
-      setDeletingId(null);
-    }
+    if (confirm(message)) await deleteRows([row]);
   };
-
-  // WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1:
-  //   자체 toggleOne / toggleAll / allSelected 제거 — DataTable rowSelection 이 처리.
-  //   selected (Set<string>) state 는 그대로 보존하여 handleBulkDelete 로직 변경 0.
-
-  // library + snapshot 항목 모두 일괄 삭제 가능.
   const handleBulkDelete = async () => {
-    if (selected.size === 0) return;
-    const selectedRows = items.filter((it) => selected.has(it.id));
-    if (selectedRows.length === 0) return;
-    const libraryCount = selectedRows.filter((it) => it.kind === 'library').length;
-    const snapshotCount = selectedRows.filter((it) => it.kind === 'snapshot').length;
-    const parts: string[] = [];
-    if (libraryCount > 0) parts.push(`직접 업로드 ${libraryCount}개`);
-    if (snapshotCount > 0) parts.push(`가져온 자료 ${snapshotCount}개`);
-    const confirmMsg = snapshotCount > 0
-      ? `${parts.join(', ')}를 삭제합니다.\n가져온 자료는 내 자료함에서만 제거되며 원본은 유지됩니다.`
-      : `선택한 ${libraryCount}개 자료를 삭제하시겠습니까?`;
-    if (!confirm(confirmMsg)) return;
-    try {
-      await Promise.all(selectedRows.map((it) =>
-        it.kind === 'snapshot'
-          ? assetSnapshotApi.remove(it.rawId)
-          : deleteStoreExecutionAsset(it.rawId),
-      ));
-      const removedIds = new Set(selectedRows.map((it) => it.id));
-      setItems((prev) => prev.filter((it) => !removedIds.has(it.id)));
-      setSelected((prev) => {
-        const next = new Set(prev);
-        for (const id of removedIds) next.delete(id);
-        return next;
-      });
-      toast.success(`${selectedRows.length}개 삭제되었습니다`);
-    } catch (e: any) {
-      toast.error(e?.message || '일괄 삭제에 실패했습니다');
-    }
+    if (loading || deleting) return;
+    const rows = items.filter(row => selectedKeys.has(row.id));
+    if (!rows.length) return;
+    if (confirm(`선택한 ${rows.length}개 자료를 삭제하시겠습니까?\n가져온 자료는 내 자료함에서만 제거되며 원본은 유지됩니다.`)) await deleteRows(rows);
   };
 
   const visibleItems = useMemo(() => items, [items]);
@@ -328,17 +147,18 @@ export default function StoreLibraryResourcesPage() {
       {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: ActionBar — 선택 일괄 삭제 */}
       <div style={{ marginBottom: '12px' }}>
         <ActionBar
-          selectedCount={selected.size}
+          selectedCount={selectedKeys.size}
           onClearSelection={() => setSelected(new Set())}
           actions={[
             {
               key: 'bulk-delete',
-              label: `선택 삭제 (${selected.size})`,
+              label: `선택 삭제 (${selectedKeys.size})`,
               onClick: handleBulkDelete,
               variant: 'danger' as const,
               icon: <Trash2 className="w-3.5 h-3.5" />,
               group: 'actions',
-              visible: selected.size > 0,
+              visible: selectedKeys.size > 0,
+              disabled: loading || deleting,
               tooltip: '선택한 자료를 일괄 삭제합니다 (가져온 자료는 내 자료함에서만 제거)',
             },
           ]}
@@ -347,9 +167,13 @@ export default function StoreLibraryResourcesPage() {
 
       {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: 카드 list → @o4o/ui DataTable */}
       <StoreLibraryNavigation section="mine" />
+      {errors.length > 0 && <div role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+        <p>{errors.join(' ')} 현재 불러온 자료만 표시합니다.</p>
+        <button type="button" disabled={loading || deleting} onClick={() => void retryFailed()}>실패한 조회 다시 시도</button>
+      </div>}
       <DataTable<UnifiedResourceRow>
         rowSelection={{
-          selectedRowKeys: Array.from(selected),
+          selectedRowKeys: Array.from(selectedKeys),
           onChange: (keys) => setSelected(new Set(keys)),
         }}
         columns={[
@@ -447,16 +271,16 @@ export default function StoreLibraryResourcesPage() {
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     style={styles.openLink}
-                    title="원본 열기"
+                    title="원본 열기" aria-label={`${item.title} 원본 열기`}
                   >
                     <ExternalLink size={14} />
                   </a>
                 )}
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
-                  disabled={deletingId === item.id}
+                  disabled={loading || deleting}
                   style={styles.deleteBtn}
-                  title={item.kind === 'snapshot' ? '내 자료함에서 제거' : '삭제'}
+                  title={item.kind === 'snapshot' ? '내 자료함에서 제거' : '삭제'} aria-label={`${item.title} 삭제`}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -467,13 +291,18 @@ export default function StoreLibraryResourcesPage() {
         dataSource={visibleItems}
         rowKey="id"
         loading={loading}
-        emptyText="보관된 자료가 없습니다. 커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다."
+        emptyText={errors.length ? "조회에 실패한 자료가 있습니다. 다시 시도해 주세요." : "보관된 자료가 없습니다. 커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다."}
         onRow={(row) => ({
           onClick: () => setDetailId(row.id),
           style: { cursor: 'pointer' },
         })}
       />
 
+
+      {hasMore && <button type="button" disabled={loading || deleting} onClick={() => void loadMore()} className="mt-4 rounded border px-4 py-2 text-sm">
+        {loading ? '불러오는 중…' : '자료 더 불러오기'}
+      </button>}
+      {!loading && <p role="status" className="mt-3 text-sm text-slate-500">{items.length}개 자료 표시</p>}
 
       {detailRow && (
         <ResourceDetailDrawer row={detailRow} onClose={() => setDetailId(null)} />
@@ -499,9 +328,8 @@ function ResourceDetailDrawer({ row, onClose }: { row: UnifiedResourceRow; onClo
   const showImagePreview = isImageResource(row) && !!row.href;
 
   return (
-    <>
-      <div style={drawerStyles.backdrop} onClick={onClose} aria-hidden="true" />
-      <aside style={drawerStyles.panel} role="dialog" aria-label="자료 상세">
+    <LibraryDialog label="자료 상세" onClose={onClose} style={{ margin: '0 0 0 auto', width: 'min(460px, 100%)', maxHeight: '100vh', height: '100vh', borderRadius: 0 }}>
+      <div style={{ ...drawerStyles.panel, position: 'static', height: '100%' }}>
         <header style={drawerStyles.header}>
           <h2 style={drawerStyles.headerTitle}>자료 상세</h2>
           <button type="button" onClick={onClose} style={drawerStyles.closeBtn} aria-label="닫기">
@@ -573,8 +401,8 @@ function ResourceDetailDrawer({ row, onClose }: { row: UnifiedResourceRow; onClo
             </section>
           )}
         </div>
-      </aside>
-    </>
+      </div>
+    </LibraryDialog>
   );
 }
 
