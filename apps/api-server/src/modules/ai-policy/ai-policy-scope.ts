@@ -16,7 +16,11 @@ export type AiPolicyScope =
   | 'CONTENT_TRANSLATION'
   // WO-O4O-HEALTH-FUNCTIONAL-FOOD-STORE-DESCRIPTION-BULK-APPLY-EXECUTE-V1: 건기식 후보 매장 설명 생성
   | 'HEALTH_FUNCTIONAL_FOOD_STORE_DESCRIPTION'
-  | 'AI_PROXY';
+  | 'AI_PROXY'
+  | 'SERVICE_QUERY'
+  | 'OPERATOR_INSIGHT'
+  | 'OPERATOR_ACTIONS'
+  | 'LMS_ASSISTANCE';
 
 /** Scope → Service 매핑 (quota 계층 해결용) */
 export const SERVICE_FOR_SCOPE: Record<AiPolicyScope, string> = {
@@ -32,4 +36,11 @@ export const SERVICE_FOR_SCOPE: Record<AiPolicyScope, string> = {
   // 매장 내 소비자 설명 content → store/content 계층
   HEALTH_FUNCTIONAL_FOOD_STORE_DESCRIPTION: 'store',
   AI_PROXY: 'proxy',
+  SERVICE_QUERY: 'neture',
+  OPERATOR_INSIGHT: 'neture',
+  OPERATOR_ACTIONS: 'neture',
+  LMS_ASSISTANCE: 'lecture',
 };
+
+/** These features accept a verified catalogue service binding rather than a fixed legacy service. */
+export const DYNAMIC_SERVICE_SCOPES: readonly AiPolicyScope[] = ['SERVICE_QUERY', 'OPERATOR_INSIGHT', 'OPERATOR_ACTIONS', 'LMS_ASSISTANCE'];

@@ -202,3 +202,20 @@ test('array scopes retain nested predicates; cross-schema dependencies and mixed
  assert.deepEqual(result.offerScopes,{total:'19',mixed:'2',ph_only:'17'});
  assert.equal(result.deletionApprovedByInventory,false);
 });
+
+test('mutation trigger census hashes bodies and emits only reviewed schema metadata',async()=>{
+  const {collectMutationTriggers}=await import('./pharmacy-hub-retirement-inventory.mjs');
+  const {createHash}=await import('node:crypto');
+  const body='private function literal';
+  const result=await collectMutationTriggers({query:async(sql,args)=>{
+    assert.match(sql,/g\.tgenabled<>'D'/);assert.match(sql,/g\.tgisinternal/);
+    assert.match(sql,/supplier_product_offers/);assert.ok(args[0].includes('checkout_orders'));
+    assert.equal(/^(?:UPDATE|DELETE|INSERT|ALTER|CREATE)\b/.test(sql),false);
+    return {rows:[{table_name:'supplier_product_offers',trigger_name:'account_erasure_write_fence',event_type:23,
+      enabled:'O',function_schema:'public',function_name:'account_erasure_write_fence',function_body:body,
+      security_definer:false,language:'plpgsql'}]};
+  }});
+  assert.equal(result[0].functionSha256,createHash('sha256').update(body).digest('hex'));
+  assert.equal(JSON.stringify(result).includes(body),false);
+  assert.equal(result[0].eventType,23);
+});

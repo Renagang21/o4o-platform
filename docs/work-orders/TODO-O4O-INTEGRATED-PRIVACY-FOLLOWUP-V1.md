@@ -47,3 +47,24 @@
 환경: frozen-lockfile 설치 완료. GitHub API allowlist 적용 후 PR/ruleset 조회 성공; 이전 Forbidden은 현재 blocker가 아니다. 운영 활성화·법률 시행·일반 사용자 테스트는 아직 완료하지 않았다.
 
 최신 운영 준비 근거는 [CHECK의2026-10-13 재확인](../checks/CHECK-O4O-TWO-STAGE-ACCOUNT-ERASURE-V1.md#운영-준비-재확인--2026-10-13)을 따른다. 이전12일 HELD 기록을 현재 미해소로 반복하지 않는다. 새3 Demo 소유 트랙 검증도 일반 상태 계정/본인 OAuth/운영자 최종 테스트를 대신하지 않는다.
+
+## 5. 선택 정비 종료 후 원래 domain/file 조사 재개 — 2026-10-13
+
+코드 복잡성 정비 PR #541은 정상 main 통합·선택6개 배포까지 완료됐다. 사용자 지시에 따라
+추가 대규모 정비/서비스 간 공통화는 미루고 기존 ACTIVE Core WO를 이어간다.
+
+- [x] 현재 prefix25의 공식 격리 bootstrap/assertion 및 source hash를 기준으로
+ 307관계/3,944columns/44관계60 users FK metadata inventory 수집. 계정 행/파일 값 조회0.
+- [x] 기존 private owner27관계와 owner field 대조; 추가 domain273관계/신원·문자열·JSON 후보2,595개/파일 후보222개 분리.
+ 후보 수를 개인정보/실제 파일 수 또는 전수 처리 완료로 표시하지 않는다.
+- [x] 실제 producer의 gcs:// 및 camelCase fileUrl 누락으로 인한 잘못된 completed를 합성 회귀로 재현하고 기존 review_required 계약으로 보완.
+- [x] 기존 transaction 인가 함수 재사용. 초입 non-locking 검사·transaction lock/시점·target 보호 유지.
+- [ ] 사업/타인/domain handler, 개인 file/producer/orphan·실제 GCS/backup·lock, 법정 근거/본문·시행과 마지막 사용자 검증 후속.
+
+구체 결과와 다음 큰 묶음은 [inventory IR](../investigations/IR-O4O-ACCOUNT-ERASURE-DOMAIN-FILE-INVENTORY-V1.md)를 따른다.
+이 조사나 코드 보완으로 삭제 기능 flags/자동 job/정책 본문/재동의를 활성화하지 않는다.
+
+최신 main #549의 신규26단계를 반영해 local 공식 runner/collector를 재확인했다.
+현재308관계3965columns/기존private27/추가domain274/후보2608이며 FK60개는 그대로다.
+새 AI reservation의 비FK user_id/JSON·trigger0을 activation 전 domain/writer 잔여로 포함했다.
+이 source/격리 검증으로 운영26 적용을 승인하거나 실행하지 않는다. 상세 지문·소유 트랙 승인 경계는 IR §2.1 참조.

@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { withWorkspaceMode } from "../../config/storeWorkspace";
 
 export function storeWorkspaceBase(pathname: string): string {
-  return pathname.match(/^\/work\/[^/]+\/store(?=\/|$)/)?.[0] ?? "/store";
+  return /^\/work\/[^/]+\/store(?=\/|$)/.exec(pathname)?.[0] ?? "/store";
 }
 
 /** Existing resource/production router state is carried between work modes. */
@@ -37,17 +37,23 @@ export function StoreWorkflowNavigation({
             ["studio", "제작·편집"],
             ["use", "매장에서 활용"],
           ] as const
-        ).map(([area, label]) => (
-          <Link
-            key={area}
-            to={`${withWorkspaceMode(`${area === "studio" && studioPath ? base + studioPath : area === "use" && usePath ? base + usePath : location.pathname}${location.search}`, area)}${location.hash}`}
-            state={location.state}
-            aria-current={mode === area ? "page" : undefined}
-            className={`rounded-lg border px-3 py-2.5 text-sm ${mode === area ? "border-teal-700 bg-teal-50 font-semibold text-teal-800" : "border-slate-200"}`}
-          >
-            {label}
-          </Link>
-        ))}
+        ).map(([area, label]) => {
+          let target = location.pathname;
+          if (area === "studio" && studioPath) target = base + studioPath;
+          if (area === "use" && usePath) target = base + usePath;
+          const modePath = withWorkspaceMode(target + location.search, area);
+          return (
+            <Link
+              key={area}
+              to={modePath + location.hash}
+              state={location.state}
+              aria-current={mode === area ? "page" : undefined}
+              className={`rounded-lg border px-3 py-2.5 text-sm ${mode === area ? "border-teal-700 bg-teal-50 font-semibold text-teal-800" : "border-slate-200"}`}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </nav>
       <p className="mt-2 text-sm text-slate-500">
         {mode === "studio"

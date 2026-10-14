@@ -413,3 +413,10 @@ PR #537은 필수 CI·SonarCloud·Codex 무지적 후 main 76941a5dae61470ebf53a
 PR #539는 최신 main 통합 후 CI·SonarCloud PASS 및 Codex blocker 없음으로 main 4604f947e50d38eb558081cc50d9a6059f88aee5에 병합했다. read-only census [38398176276](https://github.com/Renagang21/o4o-platform/actions/runs/38398176276)은 SUCCESS, failed=false, references.complete=true다. PH media 연결 1건은 존재하지 않는 VIDEO Job의 OUTPUT이며, 실제 job 상태별 건수·임시 output은 모두 0이다. 같은 고아 job 식별자의 비-PH 자산 연결 1건은 별도로 남아 있다. 공용 GCS/화면 참조는 0이다.
 
 후속 media scope는 소속 자산이 PH인 catalog 관계 또는 대상 job 부재를 transaction lock 안에서 재확인한 고아 OUTPUT만 허용한다. 고아 INPUT/INTERMEDIATE, 존재하는 job의 OUTPUT, 비-PH 자산과 연결은 계속 보호한다. 링크 1건·자산 4건·개별 GCS 객체 4건의 고정 census 및 cross-schema FK/자산·링크 UUID/URL/경로 검사와 generation 조건은 유지한다. 격리 PostgreSQL fixture에서 존재하는 job 및 고아 INPUT 차단, 고아 OUTPUT plan/apply·rollback, 같은 식별자를 가진 타 서비스 자산/연결 보존을 검증했다. 운영 삭제는 아직 0건이며 run.jobs.execute 권한과 로컬 IAM 조회 결과가 blocker다. WIF는 원래 조건으로 복구된 상태다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
+
+
+### 실행 권한 확인 및 활성 trigger 진단 (2026-10-14)
+
+관리자가 PH 개발/미디어 Job 이름 범위로 roles/run.invoker를 추가한 뒤 development plan 38469425232를 실행했다. 관리자의 Cloud Run execution 조회에서 Started=True 및 failedCount=1, worker 로그에서 PH_DEV_MUTATION_TRIGGER를 확인했다. 따라서 이 실행은 IAM execute 거부가 아니라 worker의 변경 trigger 안전 검사에서 중단됐다. plan은 읽기 전용 transaction이며 삭제/update를 하지 않았다. 종전 run.jobs.execute 문자열은 subprocess 명령명을 permission처럼 추출한 진단으로, 실제 IAM permission이라고 단정하지 않는다. 실패 Job ph-dev-38469425232-1은 아직 남아 있다.
+
+계정 삭제 migration의 account_erasure_write_fence는 supplier_product_offers UPDATE에도 설치되는 보호 trigger다. 운영의 실제 trigger가 이것인지는 아직 확정하지 않았다. 동일 delete/update 대상의 활성 trigger 이름·이벤트·함수 schema/name·언어·security definer 여부와 함수 body의 SHA-256만 read-only census에 추가했다. 함수 원문·운영 행·자격정보는 출력하지 않는다. trigger를 해제하거나 보호 검사를 우회하지 않는다. 실제 함수 지문 확인 후 실행 가능한 보호 trigger와 부작용 mutation trigger를 구분한다. 동일 WO의 후속 조사로 전용 branch/worktree를 유지한다.

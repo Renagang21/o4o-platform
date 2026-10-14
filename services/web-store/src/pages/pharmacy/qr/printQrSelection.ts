@@ -23,8 +23,8 @@ export async function printQrSelection(
     showPdf(await response.blob());
     return 1;
   }
-  const template =
-    request.template === "flyer1" ? 1 : request.template === "flyer4" ? 4 : 8;
+  const template = { flyer1: 1, flyer4: 4, flyer8: 8 }[request.template] ?? 8;
+  // Sequential by contract: emit successful PDFs, then stop at the first failure. Parallel requests would change retry/output behavior.
   for (const id of request.productQrIds) {
     const response = await fetch(
       `${request.apiBase}/pharmacy/qr/${id}/flyer?template=${template}`,

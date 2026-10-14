@@ -200,7 +200,11 @@ it("editor input emits a single field action without resetting another field", (
       handleSaveEdit={vi.fn()}
     />,
   );
-  fireEvent.change(screen.getByPlaceholderText("동영상 제목"), {
+  expect(screen.getByLabelText("동영상 URL")).toBeTruthy();
+  expect(screen.getByLabelText("설명")).toBeTruthy();
+  expect(screen.getByLabelText(/태그/)).toBeTruthy();
+  expect(screen.getByLabelText("썸네일 URL")).toBeTruthy();
+  fireEvent.change(screen.getByLabelText(/제목/), {
     target: { value: "Edited" },
   });
   expect(change).toHaveBeenCalledWith("name", "Edited");

@@ -59,6 +59,10 @@ export interface ExecuteRequest {
 }
 
 export interface ExecuteResult {
+  /** Number of provider attempts; failed attempts may have unknown billable usage. */
+  attempts?: number;
+  /** Actual selected provider, including policy fallback. Additive metadata. */
+  provider?: AIExecuteProviderId;
   /** LLM 응답 본문 (JSON 문자열 또는 free-text) */
   content: string;
   /** 사용된 모델명 */
@@ -155,7 +159,9 @@ export async function execute(request: ExecuteRequest): Promise<ExecuteResult> {
       );
 
       return {
+        attempts: attempt,
         content: response.content,
+        provider: providerId,
         model: response.model,
         promptTokens: response.promptTokens,
         completionTokens: response.completionTokens,

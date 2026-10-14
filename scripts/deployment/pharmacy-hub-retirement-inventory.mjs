@@ -3,9 +3,34 @@ import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { resolve4 } from 'node:dns/promises';
+import { createHash } from 'node:crypto';
 import { readPassword, safeInventoryError } from './pharmacy-hub-qr-probes.mjs';
 import { collectDomainInventory } from './pharmacy-hub-domain-inventory.mjs';
 import { collectRetirementReferences } from './pharmacy-hub-retirement-references.mjs';
+
+/** Inspect the same mutations rejected by the development worker; never expose function bodies. */
+export async function collectMutationTriggers(client) {
+  const targets=['checkout_order_logs','o4o_payments','offer_service_approvals','offer_service_prices',
+    'supplier_product_offers','cms_contents','forum_category_requests','checkout_orders'];
+  const {rows}=await client.query(`SELECT t.relname AS table_name,g.tgname AS trigger_name,
+    g.tgtype::int AS event_type,g.tgenabled AS enabled,pn.nspname AS function_schema,
+    p.proname AS function_name,p.prosrc AS function_body,p.prosecdef AS security_definer,l.lanname AS language
+    FROM pg_trigger g JOIN pg_class t ON t.oid=g.tgrelid JOIN pg_namespace n ON n.oid=t.relnamespace
+    JOIN pg_proc p ON p.oid=g.tgfoid JOIN pg_namespace pn ON pn.oid=p.pronamespace
+    JOIN pg_language l ON l.oid=p.prolang
+    WHERE n.nspname='public' AND t.relname=ANY($1::text[]) AND NOT g.tgisinternal
+      AND g.tgenabled<>'D' AND ((g.tgtype::int & 8)<>0 OR
+        (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))
+    ORDER BY t.relname,g.tgname`,[targets]);
+  return rows.map(r=>{
+    for(const k of ['table_name','trigger_name','function_schema','function_name','language'])identifiers(r[k]);
+    if(typeof r.function_body!=='string'||!Number.isInteger(r.event_type)||typeof r.security_definer!=='boolean'||
+      !['O','A','R'].includes(r.enabled))throw Object.assign(new Error('Invalid trigger metadata'),{code:'TRIGGER_METADATA'});
+    return {table:r.table_name,trigger:r.trigger_name,eventType:r.event_type,enabled:r.enabled,
+      functionSchema:r.function_schema,functionName:r.function_name,language:r.language,securityDefiner:r.security_definer,
+      functionSha256:createHash('sha256').update(r.function_body).digest('hex')};
+  });
+}
 
 const identifiers = value => {
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw Object.assign(new Error('Unsupported schema identifier'), { code: 'SCHEMA_IDENTIFIER' });
@@ -126,7 +151,9 @@ export async function collectRetirementInventory(client) {
     const inspectedTables = new Set([...targets, ...incoming.rows.filter(fk => fk.source_schema === 'public').map(fk => fk.source_table)]);
     stage='retirement-non-fk-references';
     const references=await collectRetirementReferences(client,columns);
-    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,references,
+    stage='retirement-mutation-triggers';
+    const mutationTriggers=await collectMutationTriggers(client);
+    result = { readOnly:true, dedicatedTables,scopeCounts,foreignKeys, dependencyCounts, offerScopes,references,mutationTriggers,
       targetColumns: columns.filter(c => inspectedTables.has(c.table_name)),
       deletionApprovedByInventory:false, protected:['users','organizations','printed QR identifiers','shared Neture data','migration history','statutory retention assessment'] };
   } catch (error) {

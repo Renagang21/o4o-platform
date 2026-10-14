@@ -1,3 +1,4 @@
+import { normalizeAiContentFields } from './common.js';
 /**
  * AI Prompt — blog
  *
@@ -52,16 +53,5 @@ export function parseBlogResponse(
   parsed: Record<string, any>,
   rawText: string
 ): Omit<NormalizedAiContentResponse, 'type'> {
-  const html =
-    parsed.html ||
-    `<p>${rawText.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-
-  return {
-    html,
-    title: typeof parsed.title === 'string' ? parsed.title : '',
-    summary: typeof parsed.summary === 'string' ? parsed.summary : '',
-    bullets: Array.isArray(parsed.bullets) ? parsed.bullets : [],
-    shortText: '',
-    longText: '',
-  };
+  return { ...normalizeAiContentFields(parsed, rawText), shortText: '', longText: '' };
 }
