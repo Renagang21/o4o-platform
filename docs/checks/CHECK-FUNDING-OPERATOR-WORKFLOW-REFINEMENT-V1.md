@@ -30,6 +30,10 @@
 
 로컬 실행 로그/합성 fixture/스크린샷은 `/tmp/funding-*`에 보관하며 저장소에는 추가하지 않는다. 자동화 회귀 테스트는 위 소스 경로에 포함한다. 로컬 검증은 실계정 권한/실제 송금/배포 검증을 대체하지 않는다.
 
+## 최신 main 반영
+
+PR #579가 포함된 `origin/main d9dce2e5a4` 위로 미공개 작업 commit을 rebase했다. 펀딩 소스 충돌 없음. 상류의 KPA/공통 모듈 변경을 보존했으며, 소스를 직접 export하는 operator-core-ui에는 별도 build script가 없어 Neture 소비처의 `tsc && vite build`로 검증했다. 반영 후 Neture 빌드와 관련 4 files/36 tests 재검증 PASS.
+
 ## 범위·인계
 
 - 개설자는 supplier API로 개설 진행·포럼 회원 관리, 운영자는 operator API로 심사·입금 확인을 담당한다. 개설자 화면을 같은 hook으로 합치지 않았다.

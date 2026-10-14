@@ -27,4 +27,3 @@ export const NEXT_STATUS: Partial<Record<string, { status: TrialStatus; label: s
   outcome_confirming: { status: 'fulfilled', label: '이행 완료 처리' },
   fulfilled: { status: 'closed', label: '종료 처리' },
 };
-
