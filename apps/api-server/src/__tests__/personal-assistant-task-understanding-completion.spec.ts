@@ -878,6 +878,35 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     expect(coord.transitioned).toEqual([]);
   });
 
+  it.each(['됐어요', '네', '맞아요'])('completion during Task acquisition (%s) reuses the original Task without execution', async request => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_race')));
+    const taskId = first.task!.taskId;
+    const store = jest.requireMock('../services/assistant/assistant-task-store.js');
+    const find = store.findTaskIdByRun as jest.Mock;
+    const get = store.getAssistantTaskForRequester as jest.Mock;
+    const findImpl = find.getMockImplementation();
+    const getImpl = get.getMockImplementation()!;
+    find.mockImplementation(async () => taskId);
+    coord.mock = true;
+    get.mockImplementationOnce(async (...args: unknown[]) => {
+      const snapshot = await getImpl(...args);
+      tasks.get(taskId)!.status = 'completed';
+      coord.stored = { runId: 'g_race', userId: ME, status: 'completed', version: 6 };
+      return snapshot;
+    });
+    const createsBefore = storeCalls.filter((c: any) => c[0] === 'create').length;
+    const exec = jest.fn(async () => waiting('g_race'));
+    try {
+      const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request, runId: 'g_race' } }, exec);
+      expect(out.task).toEqual({ taskId, status: 'completed' });
+      expect(exec).not.toHaveBeenCalled();
+      expect(storeCalls.filter((c: any) => c[0] === 'create')).toHaveLength(createsBefore);
+      expect(coord.transitioned).toEqual([]);
+    } finally {
+      find.mockImplementation(findImpl);
+    }
+  });
+
   it.each(['됐어요', '네'])('완료 선언 재전송(%s)이라도 run 이 completed 가 아니면 되살리지 않는다', async request => {
     const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d9')));
     const taskId = first.task!.taskId;

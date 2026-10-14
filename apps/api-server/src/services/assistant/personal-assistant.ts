@@ -179,6 +179,10 @@ async function continueExistingTask(
     if (!id) continue;
     const task = await getAssistantTaskForRequester(dataSource, id, input.userId);
     if (task && !isTerminalTaskStatus(task.status)) return task;
+    // Select replayable terminal Tasks here, rather than in a separate preflight read.
+    if (task?.status === 'completed' && id === candidateIds[0] && runId
+      && isCompletionDeclaration(input.workBody.request, 'success_confirmation')
+      && await isRunCompletedFor(dataSource, runId, input.userId)) return task;
   }
   return null;
 }
@@ -189,12 +193,8 @@ async function acquireTask(
 ): Promise<{ task: AssistantTaskRow; priorStatus: AssistantTaskStatus | null }> {
   const existing = await continueExistingTask(dataSource, input);
   if (existing) {
-    const resumed = await updateAssistantTask(dataSource, {
-      taskId: existing.taskId,
-      requestedByUserId: input.userId,
-      status: 'running',
-    });
-    return { task: resumed ?? existing, priorStatus: existing.status };
+    // Completion replies are resolved before claiming ordinary execution below.
+    return { task: existing, priorStatus: existing.status };
   }
   const ownership = await resolveTaskOwnership(dataSource, { userId: input.userId, workScope: input.workScope });
   return { task: await createAssistantTask(dataSource, { requestedByUserId: input.userId, ownership }), priorStatus: null };
@@ -213,11 +213,13 @@ async function completeByUserDeclaration(
   dataSource: DataSource,
   input: AssistantWorkInput,
   task: AssistantTaskRow,
+  allowWaiting: boolean,
 ): Promise<{ reply: WorkExecutionReply; won: boolean } | null> {
   const runId = String(input.workBody.runId);
   const lostRace = async () => (await isRunCompletedFor(dataSource, runId, input.userId)
     ? { reply: declaredCompletionReply(task, runId), won: false }
     : null);
+  if (!allowWaiting) return lostRace();
   const check = await checkResumable(dataSource, { runId, userId: input.userId });
   const row = check.ok ? check.row : null;
   if (!row) return lostRace();
@@ -228,22 +230,6 @@ async function completeByUserDeclaration(
       .catch((err) => logger.warn('assistant declared run local persist failed', { error: err instanceof Error ? err.name : 'unknown' }));
   }
   return { reply: declaredCompletionReply(task, runId), won: true };
-}
-
-/**
- * 이미 끝난 완료 선언의 재전송(응답 유실 후 재시도) — run 과 그 Task 가 모두 같은 사용자 소유로 completed 면
- * 그 Task 를 돌려준다. 종결 Task 는 다시 열지 않고 새 Task 도 만들지 않는다.
- */
-async function findDeclaredCompletion(dataSource: DataSource, input: AssistantWorkInput): Promise<AssistantTaskRow | null> {
-  const runId = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0 ? input.workBody.runId : null;
-  // A lexical candidate only: replay is allowed below only after both owned records are completed.
-  // The original success-confirmation frame is deleted on completion, so retries may also say "네".
-  if (!runId || !isCompletionDeclaration(input.workBody.request, 'success_confirmation')) return null;
-  const taskId = await findTaskIdByRun(dataSource, runId, input.userId);
-  if (!taskId) return null;
-  const task = await getAssistantTaskForRequester(dataSource, taskId, input.userId);
-  if (task?.status !== 'completed') return null;
-  return (await isRunCompletedFor(dataSource, runId, input.userId)) ? task : null;
 }
 
 async function isRunCompletedFor(dataSource: DataSource, runId: string, userId: string): Promise<boolean> {
@@ -302,20 +288,6 @@ export async function runAssistantWorkTask(
 ): Promise<AssistantWorkOutcome> {
   const t0 = Date.now();
   maybePurgeEndedRunFrames(dataSource, t0);
-  // ── 완료 선언 재전송 — 이미 닫힌 Task 의 같은 완료 응답을 돌려준다(새 Task · 재개 없음) ──
-  try {
-    const done = await findDeclaredCompletion(dataSource, input);
-    if (done) {
-      const runId = String(input.workBody.runId);
-      const plan = planAssistantTask({
-        taskId: done.taskId, resuming: true, priorTaskTypeKey: done.taskTypeKey ?? null, userMethodHint: false, nodeExperienceReachable: true,
-      });
-      return { reply: declaredCompletionReply(done, runId), task: { taskId: done.taskId, status: 'completed' }, plan };
-    }
-  } catch (err) {
-    logger.warn('assistant declared completion replay check failed', { error: err instanceof Error ? err.name : 'unknown' });
-  }
-
   // ── Assistant → Task ──
   let task: AssistantTaskRow | null = null;
   let priorStatus: AssistantTaskStatus | null = null;
@@ -330,6 +302,12 @@ export async function runAssistantWorkTask(
 
   // ── Assistant Memory (Phase C) — 실행 노드와 무관한 기억. Task 소유 주체 경계 안에서만 읽는다 ──
   const resuming = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0;
+  if (task?.status === 'completed' && resuming) {
+    const plan = planAssistantTask({
+      taskId: task.taskId, resuming: true, priorTaskTypeKey: task.taskTypeKey ?? null, userMethodHint: false, nodeExperienceReachable: true,
+    });
+    return { reply: declaredCompletionReply(task, String(input.workBody.runId)), task: { taskId: task.taskId, status: 'completed' }, plan };
+  }
   const ownership = task ? { scope: task.ownershipScope, organizationId: task.organizationId, serviceKey: task.serviceKey } : null;
   const memory = task ? await recallAssistantMemory(dataSource, {
     userId: input.userId,
@@ -342,9 +320,10 @@ export async function runAssistantWorkTask(
   // Task 상태는 동시 요청이 먼저 running 으로 바꿨을 수 있다 — 판정의 정본은 run 상태다(completeByUserDeclaration 이
   // 같은 사용자의 waiting · completed run 만 받는다). running 은 그 경쟁 창을 덮기 위해서만 허용한다.
   if (task && resuming && (priorStatus === 'waiting_for_user' || priorStatus === 'running')
-    && isCompletionDeclaration(input.workBody.request, memory.resumeFrame?.ask?.kind ?? null)) {
+    && isCompletionDeclaration(input.workBody.request, 'success_confirmation')) {
     try {
-      const declared = await completeByUserDeclaration(dataSource, input, task);
+      const declared = await completeByUserDeclaration(dataSource, input, task,
+        isCompletionDeclaration(input.workBody.request, memory.resumeFrame?.ask?.kind ?? null));
       if (declared) {
         forgetUnderstanding(String(input.workBody.runId));
         // 진 쪽도 completed 로 쓴다 — acquireTask 의 running 갱신이 이긴 쪽의 completed 를 덮었을 수 있다.
@@ -365,6 +344,15 @@ export async function runAssistantWorkTask(
       }
     } catch (err) {
       logger.warn('assistant completion declaration failed', { taskId: task.taskId, error: err instanceof Error ? err.name : 'unknown' });
+    }
+  }
+
+  // Ordinary execution starts only after completion handling, so a duplicate never reopens a closed Task.
+  if (task && priorStatus !== null) {
+    try {
+      task = await updateAssistantTask(dataSource, { taskId: task.taskId, requestedByUserId: input.userId, status: 'running' }) ?? task;
+    } catch (err) {
+      logger.warn('assistant task start failed', { error: err instanceof Error ? err.name : 'unknown' });
     }
   }
 
