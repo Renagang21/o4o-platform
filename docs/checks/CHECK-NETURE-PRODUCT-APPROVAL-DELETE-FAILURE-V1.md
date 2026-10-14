@@ -16,7 +16,7 @@
 
 | 검증 | 실행 및 결과 |
 |---|---|
-| 삭제 회귀 | 새 9건 통과: 응답 실패→동일 Offer 재시도, 예외 복구, 중복/취소 잠금, 오류 초기화, 권한 재확인, unmount, 상세 보존/성공 닫기, 다른 상세 보호, 이미 열린 승인 확인의 동시 실행 차단 |
+| 삭제 회귀 | 새 10건 통과: 응답 실패→동일 Offer 재시도, 예외 복구, 중복/취소 잠금, 오류 초기화, 권한 재확인, unmount, 상세 보존/성공 닫기, 다른 상세 보호, 이미 열린 승인 확인의 동시 실행 차단, 느린 갱신 중 잠금 해제 |
 | 상품 승인 회귀 | `pnpm exec vitest run --config services/web-neture/vitest.config.mjs services/web-neture/src/pages/operator/__tests__/ProductServiceApprovalPage*.test.tsx` — 4파일·42건 통과 |
 | Neture 전체 | `pnpm exec vitest run --config services/web-neture/vitest.config.mjs` — 93파일·830건 통과 |
 | 타입/빌드 | `pnpm --filter @o4o/web-neture build` — tsc 및 Vite production build 통과 |
@@ -43,3 +43,7 @@ API·DB·권한/삭제 정책·공통 모듈 변경 없음. 약사회 분회 제
 배포 사전 조사에서 별도 AI 작업의 미적용 `CreateAiUsageReservations1791870434349`와 API 의존 보류를 확인했다.
 이는 이번 운영자 정비가 도입한 migration이 아니다. 운영 적용 승인 없이 API/migration을 실행하거나 배포 guard를 우회하지 않는다.
 Neture-only 정상 판정과 최신 main CI 결과를 확인한 뒤 배포 가능 여부를 기록한다.
+
+## 리뷰 보완
+
+PR #555 P2: 삭제가 성공해 확인창은 닫혔지만 refresh가 끝날 때까지 mutation ref가 잠겨, 활성 일괄 버튼이 동작하지 않는 경우를 재현했다. 새 회귀 1건 실패로 확인 후, 삭제 mutation의 try/finally를 먼저 끝내고 잠금이 해제된 뒤 목록을 갱신하도록 분리했다. 다른 상품 선택이 남아 있고 갱신이 멈춘 상황에서도 일괄 확인창이 열리는 것을 검증했다. 보완 후 상품 승인 5파일·50건 통과.

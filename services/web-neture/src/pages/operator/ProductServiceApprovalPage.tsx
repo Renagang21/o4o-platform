@@ -337,6 +337,7 @@ export default function ProductServiceApprovalPage() {
     deleteWriting.current = true;
     setDeleteLoading(true);
     setDeleteError(null);
+    let deleted = false;
     try {
       const result = await operatorServiceApprovalApi.deletePendingOffer(offerId);
       if (!deleteMounted.current) return;
@@ -346,13 +347,14 @@ export default function ProductServiceApprovalPage() {
       }
       setDeleteTarget(null);
       setDrawerItem(current => current?.offerId === offerId ? null : current);
-      await refreshData();
+      deleted = true;
     } catch {
       if (deleteMounted.current) setDeleteError('삭제 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
     } finally {
       deleteWriting.current = false;
       if (deleteMounted.current) setDeleteLoading(false);
     }
+    if (deleted && deleteMounted.current) await refreshData();
   };
 
   // ==================== Render ====================

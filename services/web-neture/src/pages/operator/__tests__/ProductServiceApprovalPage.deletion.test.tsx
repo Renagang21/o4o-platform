@@ -109,3 +109,16 @@ it('blocks an already-open approval confirmation while deletion is writing', asy
   expect(api.approve).not.toHaveBeenCalled();
   finish({success: false, error: 'NOT_PENDING'}); await screen.findByRole('alert');
 });
+it('releases the mutation lock before a slow refresh so remaining selections stay actionable', async () => {
+  const initial = { data: [item('a', 'pending'), item('b', 'pending')], pagination: { page: 1, limit: 30, total: 2, totalPages: 1 } };
+  let finishRead!: (result: typeof initial) => void;
+  api.list.mockResolvedValueOnce(initial).mockImplementationOnce(() => new Promise(resolve => { finishRead = resolve; }));
+  render(<Page />); await screen.findByText('검증상품-a');
+  fireEvent.click(screen.getAllByRole('checkbox')[2]);
+  fireEvent.click(screen.getAllByRole('button', { name: '삭제', exact: true })[0]); confirmDelete();
+  await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
+  fireEvent.click(screen.getByRole('button', { name: '일괄 승인 (1)' }));
+  expect(screen.getByRole('dialog', { name: '일괄 승인 (1건)', exact: true })).toBeTruthy();
+  finishRead({ ...initial, data: [item('b', 'pending')] });
+  await waitFor(() => expect(screen.queryByText('1건 선택됨')).toBeNull());
+});
