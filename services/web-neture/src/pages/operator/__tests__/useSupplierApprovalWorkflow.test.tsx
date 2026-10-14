@@ -1,0 +1,55 @@
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { useSupplierApprovalWorkflow } from '../useSupplierApprovalWorkflow';
+import type { AdminSupplier } from '../../../lib/api';
+const api = vi.hoisted(() => ({ approveSupplier: vi.fn(), rejectSupplier: vi.fn(), updateBasicInfo: vi.fn(), batchProcess: vi.fn() }));
+vi.mock('../../../lib/api', () => ({ operatorSupplierApi: api, PROFILE_FIELD_LABELS: {} }));
+const supplier = { id: 'fixture-a', name: '합성 공급자', status: 'PENDING', createdAt: '2026-01-01' } as AdminSupplier;
+const refresh = vi.fn();
+const clear = vi.fn();
+const setup = () => renderHook(() => useSupplierApprovalWorkflow([supplier], new Set([supplier.id]), clear, refresh));
+beforeEach(() => { vi.resetAllMocks(); });
+afterEach(cleanup);
+it('serializes same-tick single approval, batch and save requests and keeps the captured drawer', async () => {
+  let finish!: (result: {success: boolean}) => void;
+  api.approveSupplier.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  const { result } = setup();
+  act(() => result.current.openDrawer(supplier));
+  act(() => {
+    void result.current.handleApproveSingle(supplier);
+    void result.current.handleApproveSingle(supplier);
+    void result.current.handleBulkApprove();
+    void result.current.handleSaveEdit();
+    result.current.openDrawer({ ...supplier, id: 'fixture-b' });
+    result.current.closeDrawer();
+  });
+  expect(api.approveSupplier).toHaveBeenCalledTimes(1);
+  expect(api.batchProcess).not.toHaveBeenCalled(); expect(api.updateBasicInfo).not.toHaveBeenCalled();
+  expect(result.current.drawer?.id).toBe('fixture-a');
+  await act(async () => { finish({success: false}); });
+  expect(result.current.busy).toBe(false);
+});
+it('retains failed batch IDs and reason for retry and prevents duplicate retry requests', async () => {
+  api.batchProcess.mockResolvedValueOnce({ data: { results: [{id: supplier.id, status: 'failed', error: 'fixture'}] } });
+  const { result } = setup();
+  act(() => result.current.handleBulkReject());
+  act(() => result.current.setRejectReason('합성 사유'));
+  await act(async () => { await result.current.handleRejectConfirm(); });
+  expect(result.current.batch.result?.failedCount).toBe(1);
+  let finish!: (value: unknown) => void;
+  api.batchProcess.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  act(() => { void result.current.retryBatch(); void result.current.retryBatch(); result.current.closeBatchResult(); });
+  expect(api.batchProcess).toHaveBeenCalledTimes(2);
+  expect(api.batchProcess).toHaveBeenLastCalledWith(['fixture-a'], 'reject', '합성 사유');
+  expect(result.current.batch.showResult).toBe(true);
+  await act(async () => { finish({ data: { results: [{id: supplier.id, status: 'success'}] } }); });
+  await waitFor(() => expect(result.current.batch.result?.successCount).toBe(1));
+});
+it('does not refresh when a single supplier write completes after unmount', async () => {
+  let finish!: (value: {success: boolean}) => void;
+  api.approveSupplier.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  const { result, unmount } = setup();
+  act(() => { void result.current.handleApproveSingle(supplier); });
+  unmount(); await act(async () => { finish({success: true}); });
+  expect(refresh).not.toHaveBeenCalled();
+});
