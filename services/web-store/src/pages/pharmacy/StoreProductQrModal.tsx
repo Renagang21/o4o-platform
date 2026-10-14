@@ -8,7 +8,7 @@
  *   - PDF/브라우저 인쇄 모두 선택한 실제 mm 크기로 출력(데이터 재생성/URL 변경 없음).
  */
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { X, Download, Printer, Loader2, ChevronDown, ArrowLeft } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
@@ -17,6 +17,7 @@ import {
   type HandledProductSource,
 } from '../../api/handledProducts';
 import { STORE_MLC_LOCALE_LABELS, type StoreMlcLocale } from '../../api/multilingualProductContentStore';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { colors } from '../../styles/theme';
 
 export interface StoreProductQrTarget {
@@ -58,6 +59,12 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export function StoreProductQrModal({ open, target, onClose }: Props) {
+  // 닫힘·상품 전환은 이전 파일 요청을 무효화한다. 같은 상품의 재렌더는 유지한다.
+  const sourceType = target?.sourceType;
+  const sourceId = target?.sourceId;
+  const sessionKey = open && sourceType && sourceId ? `${sourceType}:${sourceId}` : '';
+  const downloads = useLatestStoreRequest(sessionKey);
+  const activeDownload = useRef<(() => boolean) | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [qr, setQr] = useState<{ svg: string; url: string; publicKey: string } | null>(null);
@@ -70,7 +77,9 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
   const [customMm, setCustomMm] = useState(50);
 
   useEffect(() => {
-    if (!open || !target) return;
+    setBusy(null);
+    activeDownload.current = null;
+    if (!open || !sourceType || !sourceId) return;
     let cancelled = false;
     setQr(null);
     setError(null);
@@ -79,7 +88,7 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
     setDlMenu(false);
     setPreset('medium');
     setLoading(true);
-    fetchHandledProductQr(target.sourceType, target.sourceId)
+    fetchHandledProductQr(sourceType, sourceId)
       .then((res) => {
         if (cancelled) return;
         if (res.qr) setQr(res.qr);
@@ -95,36 +104,42 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [open, target]);
+  }, [open, sourceType, sourceId]);
 
   const sizeMm = preset === 'custom' ? Math.min(Math.max(customMm || 50, 15), 200) : PRESET_MM[preset];
   const langText = languages.map(localeLabel).join(', ');
 
   // ── 다운로드: png/svg 즉시, pdf 는 크기 화면 경유 ──
   const doDownloadImage = async (format: 'png' | 'svg') => {
-    if (!target || busy) return;
+    if (!open || !target || activeDownload.current?.()) return;
     setDlMenu(false);
+    const isCurrent = downloads.begin();
+    activeDownload.current = isCurrent;
     setBusy(format);
     try {
       const blob = await fetchHandledProductQrFile(target.sourceType, target.sourceId, format);
+      if (!isCurrent()) return;
       downloadBlob(blob, safeFileName(target.name, format));
     } catch (e: any) {
-      toast.error(e?.message || '다운로드에 실패했습니다');
+      if (isCurrent()) toast.error(e?.message || '다운로드에 실패했습니다');
     } finally {
-      setBusy(null);
+      if (isCurrent()) { activeDownload.current = null; setBusy(null); }
     }
   };
 
   const doDownloadPdf = async () => {
-    if (!target || busy) return;
+    if (!open || !target || activeDownload.current?.()) return;
+    const isCurrent = downloads.begin();
+    activeDownload.current = isCurrent;
     setBusy('pdf');
     try {
       const blob = await fetchHandledProductQrFile(target.sourceType, target.sourceId, 'pdf', sizeMm);
+      if (!isCurrent()) return;
       downloadBlob(blob, safeFileName(target.name, 'pdf'));
     } catch (e: any) {
-      toast.error(e?.message || 'PDF 저장에 실패했습니다');
+      if (isCurrent()) toast.error(e?.message || 'PDF 저장에 실패했습니다');
     } finally {
-      setBusy(null);
+      if (isCurrent()) { activeDownload.current = null; setBusy(null); }
     }
   };
 
