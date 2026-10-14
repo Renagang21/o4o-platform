@@ -365,6 +365,31 @@ tsup만 실행하면 compiled migration 산출물이 제거될 수 있으므로 
 실제 경로는 현재 소스/테스트 설정에서 선택하고, 변경 소비처에 맞게 실행합니다. quota DB 테스트는 세션 전용 PostgreSQL fixture만 사용합니다.
 전체 테스트를 중복 합산하거나 실행하지 않은 실계정/Windows/유료 호출을 PASS로 보고하지 않습니다.
 
+### 공급자→매장 PostgreSQL 통합 검증
+
+`supplier-store-round-trip.integration.spec.ts`는 실제 repository·transaction과 상품 연결·수정·승인,
+매장 장바구니·checkout·테스트 결제·fulfillment bridge·배송·재고·정산 서비스를 함께 실행합니다.
+외부 알림 전달은 대체하며 실제 PG 결제나 운영 계정의 HTTP round-trip을 실행하지 않습니다.
+
+- 별도로 만든 PostgreSQL 15의 `127.0.0.1:55432`에 **전용 빈 DB** `o4o_supplier_store_integration`을 준비합니다.
+- 해당 DB만 대상으로 기존 `migration:run`을 실행해 baseline과 incremental schema를 적용합니다.
+  기존 개발 DB나 운영 DB를 전용 fixture로 사용하지 않습니다.
+- 그 DB의 로컬 전용 접속값으로 `NETURE_SUPPLIER_STORE_IT_DATABASE_URL`을 설정합니다.
+  프로토콜은 `postgresql:`이며, query/hash 없이 위 host·port·DB명과 정확히 일치해야 합니다.
+  접속값은 로컬 비공개 환경에만 보관하고 로그·문서·Git에 기록하지 않습니다.
+- `pnpm run build:packages`를 실행한 뒤 저장소 루트에서 다음 명령을 사용합니다.
+
+```text
+pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts
+```
+
+변수가 없으면 두 integration test는 skip입니다. skip을 DB 통합 검증 PASS로 보고하지 않습니다.
+테스트는 합성 데이터만 생성하며 실행 후 연결을 닫습니다. 종료 후 자신이 만든 전용 DB를 제거해
+fixture를 정리합니다. 다른 PostgreSQL DB나 컨테이너를 삭제하지 않습니다.
+
+약국 매장(`neture-pharmacy`) 주문의 Neture 정산 제외 정책은 유지합니다. 약국 구매·배송과
+기존 Neture 정산 대상 주문의 계산·승인·지급을 구분해 검증하며, 정산 범위를 임의 확대하지 않습니다.
+
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
 기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
 `scripts/lint-ratchet.mjs` 가 `pnpm run lint` 와 동일한 설정·범위로 검사해
