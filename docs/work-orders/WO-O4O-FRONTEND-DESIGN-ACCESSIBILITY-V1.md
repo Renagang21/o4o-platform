@@ -1,6 +1,6 @@
 # 프론트엔드 디자인 잔여 — 공급자 접근성
 
-> **상태**: ACTIVE · **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
+> **상태**: COMPLETED · **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거**: 사용자 요청 — 프론트엔드 디자인 진행/잔여 조사 후 진행
 
 ## 범위와 기준
@@ -23,10 +23,12 @@ Design Reference: `Service.Professional` ([기준](../../ui-guidelines/theme-pro
 
 | 항목 | 현재 요건 |
 |---|---|
-| 최신 운영자 개선 배포 | 최근 성공 Promote도 배포 job이 전부 skipped인 사례가 있다. API dependency와 현재 main CI, 실제 배포 job/serving 판정을 확인한다 |
+| 최신 운영자 개선 배포 | 선행 API/7서비스 Promote가 완료되어 기존 의존성을 해결했다. 이번 접근성 source도 Neture 자동 배포·서빙 Report 완료. 실제 job/serving 결과는 CHECK에 구분해 기록한다 |
 | 운영 로그인 검증 | `docs/local/TEST-ACCOUNT.txt`가 현재 클라우드에 없다. 승인된 비공개 전달/환경 바인딩이 필요하며 채팅에 값을 요청하지 않는다 |
 | O4O 약국 자산 | `PHARMACY_BRAND_ASSETS_READY=false`, 기존 slot 유지. 사용자 제작 로고/favicon/OG/PWA 자산이 필요하다. 임의 심볼을 제작하지 않는다 |
 | 정적 host SEO | Neture runner는 현재 Node 20 + serve이며 nginx가 아니다. runtime 메타와 같은 데이터로 host별 HTML을 생성하고, nginx/edge 또는 HTTP 서버에서 Host별 HTML을 선택해야 한다. Docker/서빙 인프라 변경은 별도 명시 범위로 준비한다 |
 | 내부 화면 구조 정비 | 최신 운영자·공급자 TODO와 동시 진행 결과를 재조사해 작은 업무 단위로 확정한다. 과거 미병합/결함 기록을 현재 상태로 재사용하지 않는다 |
 
 검증 결과와 남은 요건은 [CHECK](../checks/CHECK-O4O-FRONTEND-DESIGN-ACCESSIBILITY-V1.md)에 기록한다.
+
+첫 공급자 접근성 작업은 PR #560·source/main CI·Neture 실제 자동 배포·정적 번들 marker 확인까지 완료했다. 실제 계정 검증·사용자 브랜드 자산·정적 host SEO의 서빙 구조 변경은 독립 후속 요건이며 첫 작업의 구현/배포 완료와 혼동하지 않는다.
