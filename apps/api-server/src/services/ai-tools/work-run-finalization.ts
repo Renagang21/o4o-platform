@@ -405,10 +405,17 @@ export function buildWorkExecutionReport(
     plannerMode: ExecutionReport['plannerMode'];
     taskKey: string | null;
     memory?: ExecutionReport['memory'];
+    /** Task Understanding — 완료조건별 근거(메모리 전용 — 로그 · 저장 금지) · Assistant 판정 · 실행 비용. */
+    evidence?: ExecutionReport['evidence'];
+    verdict?: ExecutionReport['verdict'];
+    metrics?: ExecutionReport['metrics'];
   },
 ): ExecutionReport {
-  const { kind, runCreated, workflow, plannerMode, taskKey, memory } = input;
+  const { kind, runCreated, workflow, plannerMode, taskKey, memory, evidence, verdict, metrics } = input;
   return {
+    ...(evidence !== undefined ? { evidence } : {}),
+    ...(verdict !== undefined ? { verdict } : {}),
+    ...(metrics !== undefined ? { metrics } : {}),
     claim:
       kind === 'completed'
         ? 'execution_complete'

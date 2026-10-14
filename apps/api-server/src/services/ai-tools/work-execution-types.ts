@@ -17,6 +17,7 @@ import type {
   ProposalRejectReason,
 } from './work-agent-contract.js';
 import type { ExperienceActor, ExperienceStepMeta } from './work-experience.js';
+import type { CompletionEvidenceSession } from './work-completion-evidence.js';
 export type UnitReport = {
   index: number;
   status: string;
@@ -108,6 +109,11 @@ export interface WorkDispatchContext extends WorkExecutionContext {
   lastRejectReason: ProposalRejectReason | undefined;
   stepMeta: WeakMap<WorkStepRecord, ExperienceStepMeta>;
   currentActor(): ExperienceActor;
+  /**
+   * Task Understanding — 완료 근거 대조용 "이번 run 에서 실제 본 화면 글"(메모리 전용). 없으면 기록하지 않는다.
+   * 요소는 입력 · 선택 칸의 값을 뺀 글만 남긴다(CompletionEvidenceSession).
+   */
+  completionEvidence?: Pick<CompletionEvidenceSession, 'noteSeen' | 'noteElements'>;
 }
 export interface WorkReplayContext extends WorkExecutionContext {
   workflow: WorkflowRunSummary;

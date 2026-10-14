@@ -33,6 +33,7 @@ type ReadContext = Pick<
   | 'observeFailed'
   | 'dom'
   | 'takeoverWith'
+  | 'completionEvidence'
 >;
 type UnitContext = Pick<
   WorkDispatchContext,
@@ -131,7 +132,7 @@ async function dispatchInspect(
 async function dispatchUiaRead(
   ctx: Pick<
     ReadContext,
-    'state' | 'lastRead' | 'stepMeta' | 'currentActor' | 'surface'
+    'state' | 'lastRead' | 'stepMeta' | 'currentActor' | 'surface' | 'completionEvidence'
   >,
   a: WorkAction,
 ): Promise<PhaseResult> {
@@ -155,6 +156,8 @@ async function dispatchUiaRead(
     ctx.lastRead = matches.length
       ? matches.slice(0, 20).map(describeObservationElement).join('\n')
       : '(일치하는 요소 없음)';
+    // 근거 모집단에는 직렬화 글(입력 칸의 text="값" 포함)이 아니라 값을 뺀 요소 글만 넣는다.
+    ctx.completionEvidence?.noteElements(matches.slice(0, 20));
     const rec: WorkStepRecord = {
       step: ctx.state.stepCount + 1,
       action: a,
@@ -177,6 +180,8 @@ async function dispatchUiaRead(
       0,
       READ_SUMMARY_MAX,
     );
+    // 입력 칸을 읽은 값은 근거가 아니다 — 값을 뺀 요소 글만 근거 모집단에.
+    if (el) ctx.completionEvidence?.noteElements([el]);
     const rec: WorkStepRecord = {
       step: ctx.state.stepCount + 1,
       action: a,
@@ -277,6 +282,7 @@ async function dispatchDomRead(
     }
     if (a.kind === 'read_text') {
       ctx.lastRead = String(outcome.safe.text ?? '').slice(0, READ_SUMMARY_MAX);
+      ctx.completionEvidence?.noteSeen(ctx.lastRead);
       return null;
     }
     const columns = (
@@ -290,6 +296,7 @@ async function dispatchDomRead(
         .join('\n')
         .slice(0, READ_SUMMARY_MAX) +
       (rows.length > 8 ? `\n… (전체 ${rows.length}행)` : '');
+    ctx.completionEvidence?.noteSeen(ctx.lastRead);
     return null;
   }
   return NOT_HANDLED;

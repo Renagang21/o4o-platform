@@ -1,7 +1,7 @@
 # O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2
 
 > **상태**: ACTIVE — O4O AI 업무 비서 · 자동화 **구조 정본** (`CANONICAL-INDEX` §6)
-> **작성일**: 2026-10-03 · **개정**: 2026-10-06 Phase E 구현 반영 — §11-2 작업 단위 dispatch · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1`) · 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
+> **작성일**: 2026-10-03 · **개정**: 2026-10-07 Task 이해 · 완료 판정 구현 반영 — §0-1 (8) · §2-1 · §4-3 · §18-2 단계 대응 · §23 L1 · L2 · Memory (`WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1`) · 2026-10-06 Phase E 구현 반영 — §11-2 작업 단위 dispatch · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-E-TASK-UNIT-DISPATCH-V1`) · 2026-10-05 Phase D 구현 반영 — §3-1 · §11-1 (4)(5) · §23 L5 · 노드 원장 KNOWN GAP ①~④ 해소 상태 (`WO-O4O-PERSONAL-ASSISTANT-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`) · 2026-10-05 PC 독립 정렬 — §3 (4)(5) · §3-1 네 가지 구분 · §11-1 (3)~(5)(M9 사설 대상 예외 포함) · §11-1-a 검증 두 종류 + Phase A·B·C 잔여 실측 현재 분류 · §18-1 · §22 · §23 L5 (`WO-O4O-PERSONAL-ASSISTANT-PC-INDEPENDENCE-DOCUMENT-ALIGNMENT-V1`) · 2026-10-04 §0-1 개인화 원칙(P3) 신설 · §4-4 · §7 · §8-3 · §10 · §19 · §22 정렬 (`WO-O4O-PERSONAL-ASSISTANT-PERSONALIZATION-PRINCIPLE-ALIGNMENT-V1`)
 > **근거 WO**: `WO-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICALIZATION` + `WO-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH-AND-CANONICALIZATION-UPDATE` (사용자 확정 2026-10-03)
 > **근거 IR**: [`IR-…-V2-GAP-CENSUS`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-GAP-CENSUS.md) (코드 vs 목표) · [`IR-…-V2-CANONICAL-CONSISTENCY-REVIEW`](../investigations/IR-O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2-CANONICAL-CONSISTENCY-REVIEW.md) (초안 vs 정본) · [`IR-…-V2-ENVIRONMENT-REFRESH`](../investigations/IR-O4O-PERSONAL-ASSISTANT-V2-ENVIRONMENT-REFRESH.md) (환경 기준선)
 > **상위 정본**: [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) (2026-10-03 부분 개정으로 이 문서와 정합). EVOLUTION = 왜 그렇게 발전해야 하는가 · 이 문서 = 그것을 어떤 구조로 만드는가. 둘이 충돌하면 EVOLUTION 이 우선하며, 충돌은 개정 WO 로 해소한다.
@@ -42,6 +42,8 @@
 5. **Skill 은 공통 RPA Workflow 가 아니다.** Skill / Procedure 는 Assistant 가 상황에 따라 **고르고 조합하는 재사용 수행 능력**이다(§7). 같은 Task type 에 여러 Skill 이 공존할 수 있고, 사용자 · 매장마다 다른 Skill 을 쓸 수 있다.
 6. **Task 소유 ≠ 절차 선택.** Task 의 소유 범위(`USER` / `ORGANIZATION` — §4 · §9)는 그 업무와 기억이 누구에게 속하는가다. 어떤 Procedure 로 수행할지는 별개로, Assistant 가 그 소유 주체의 Experience 와 현재 상황으로 고른다. ORGANIZATION 소유 Task 라고 매장 전원이 하나의 고정 절차를 따라야 하는 것은 아니다.
 7. **하나의 Assistant 가 이어진다.** 사용자 · 업무공간(Work Context) · 요청 채널 · 실행 노드가 달라졌다는 이유로 서로 다른 자동화 체계를 만들지 않는다. 같은 사용자의 Assistant 와 그 기억은 여러 공간과 접점에서 지속된다(§3 · §11 · §14). 다르게 처리되는 것은 소유 경계(§9) 와 노드 capability(§11) 뿐이다.
+
+8. **개인 Experience ≠ 조직 정책** (2026-10-07). 개별 사용자의 Correction · Preferred · Avoid 를 조직 전체의 실행 규칙으로 **자동 승격하지 않는다.** ORGANIZATION 소유 Task 여도 방법 기억(검증된 방법 · 도움 · 교정)은 **요청자 개인**에 귀속되고 그 사람의 다음 Task 에서만 근거가 된다. 업무 run · 재개 구조 · Task type 이력은 Task 소유 주체를 따른다(6). 조직이 모두에게 적용하려는 방법은 개인 Experience 가 아니라 **명시적 조직 정책**으로 따로 정하는 채널이어야 한다 — 아직 없다(§24). 소유 주체를 알 수 없는 이전 기억은 승격하지 않는다.
 
 **설계 금지**: 다수 사용자의 성공 경로를 모아 하나의 표준 Workflow 로 만들고 모든 사용자에게 적용하는 설계. "가장 많이 성공한 경로" 는 추천 근거이지 정답이 아니다.
 
@@ -89,6 +91,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 
 - 두 판단을 한 planner 출력에 섞지 않는다. 화면 조작 판단이 업무 완료를 선언하거나, 업무 판단이 DOM 후보를 고르지 않는다.
 - Execution 이 어긋나면 판단을 Assistant 로 되돌린다(V1 §8-1 "실행 계층은 두뇌가 아니다" 승계).
+- **무엇을 해야 하는지와 언제 업무가 끝났는지는 Assistant 가 책임진다** (2026-10-07). Assistant 는 실행 전에 **업무 이해**(목표 · 결과 형태 · 완료조건 · 빠진 정보 · 확정 경계)를 세운다. Execution 은 결과와 **근거**(이번 run 에서 실제로 읽은 글의 인용)를 돌려줄 뿐이고, 화면 읽기 · 이동 성공이 업무 완료가 아니다. Assistant 가 근거를 완료조건과 비교해 완료 · 계속(이유와 함께 Execution 에 되돌림) · 사용자 확인 중 하나로 판정한다.
 
 ---
 
@@ -132,6 +135,7 @@ Assistant 가 Experience 를 대체하지 않는다. Assistant 는 Experience �
 - 완료 계약은 **실행 검증 기준**이다. KPI 가 아니다(EVOLUTION §4 · §22 — 핵심 지표는 업무 완료율이 아니라 시간 절감).
 - `USER_COMPLETED`(사용자가 이어서 끝냄) · 부분 완료 · `BLOCKED`(사용자 결정 · 권한 · 정책) 는 **정상 결과**다. 실패로 세지 않는다(EXPERIENCE-MODEL §9).
 - 완료는 planner 가 `done` 을 선언해서가 아니라 완료 계약의 확인으로 판정한다. 확인 근거의 등급은 EXPERIENCE-MODEL §9 Outcome 근거를 따른다.
+- **완료조건은 Task 마다 Assistant 가 세운다** (2026-10-07). 사이트 · 업무별로 미리 정한 완료 절차가 아니다(§0-1 · §4-4). 조건은 화면 근거로 확인할 것(observed)과 사용자만 확인할 수 있는 것(user — 확정 · 저장 등)으로 나뉜다. 화면 조건이 근거로 충족돼도 사용자 조건이 남으면 Assistant 가 성공 확인을 묻고, 사용자의 "됐어요" 선언은 Task 완료로 연결된다. 근거는 그 run 에서 실제로 본 글이어야 하며 Assistant 가 직접 입력한 값은 근거가 아니다.
 
 ### 4-4. Task type 은 미리 정하지 않는다
 
@@ -497,6 +501,7 @@ I  Worker                         업무 단위 병렬 (parent/child run · 탭 
 - §17 Compliance Gate 는 단계 사이의 차단선이 아니다 — 어느 단계든 개발은 진행하고, 정식 운영 · 실사용 확대 전에 그때의 데이터 흐름으로 점검한다(2026-10-04 사용자 확정).
 - **Runtime 은 0번 트랙이다**(V1 §10-1 원칙 승계). 진행 중 runtime 결함은 필요한 만큼 마감하되, 새로운 runtime 최적화(polling · vision · 프로토콜 튜닝)는 해당 구조 단계보다 선행하지 않는다. D 를 성능 튜닝으로 시작하면 "더 좋은 RPA" 로 기운 것이다.
 - 순서를 바꾸려면 이 절을 고치는 명시 WO 가 필요하다.
+- **구현 Phase 명칭과의 대응** (2026-10-07): 구현 WO 의 Phase A · B · C 는 위 A · B · C 에 대응한다. 구현 **Phase D(노드 capability · 선택)와 Phase E(작업 단위 dispatch)는 둘 다 위 D** 에 속한다. 위 **E(Skill)는 아직 시작하지 않았다.** Task 이해 · 완료 판정(2026-10-07)은 새 단계가 아니라 A · B(L1 · L2 Assistant Planning)의 보강이다.
 
 ### 18-3. 작업 선택 질문 (V1 §10 승계 · orphan O12)
 
@@ -595,12 +600,12 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 
 | 계층 | 판정 | 근거 |
 |---|---|---|
-| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. 기억 · 대화 맥락 없음(단계 C) | Phase A · B CHECK |
-| L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장) | Phase A · B CHECK |
+| L1 Personal Assistant | PARTIAL — 논리 계층(Assistant = f(userId)) · Assistant Planning(결정론 ExecutionIntent) · 완료 판정. **2026-10-07**: 실행 전 업무 이해(기존 provider · 실패 시 결정적 기본 이해) · 완료 판정기(조건 ↔ 근거, 의미 검증 선택) · 질문 중 사용자 완료 선언. 이해 글은 프로세스 메모리(재개용 캐시)에만 두고, run 이 질문으로 멈춘 동안 재개 구조(M5) 행에는 글 없는 구조(결과 형태 · 확정 경계)만 둔다 — 다른 인스턴스에서 재개되면 조건을 지어내지 않고 사용자 확인으로 판정하며 확정 경계는 유지한다(목표 · 조건 글은 업무 값을 담을 수 있어 저장 금지 · M13)(MEMORY-PLACEMENT M10 좁은 예외 · run 종결 시 삭제 · 로그 없음 — §17). 저장된 이해마저 없으면(이전 저장분 · 만료) 조건을 지어내지 않고 사용자 확인 조건 하나로 판정한다(종전 결과 근거로 조용히 닫지 않는다). 확정 경계는 AI 출력에 맡기지 않는다 — 요청 글의 확정 의도(저장 · 제출 · 등록 · 결제 등을 하라는 말)가 경계를 켜고, 경계가 있으면 사용자 확인 조건이 결정적으로 붙는다(sanitize · 판정기 · 저장 복원 모두 같은 불변식) | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
+| L2 Task | EXISTS — `assistant_tasks` 1급 객체 · Task 1:N run · 완료 계약으로 상태 판정(planner `done` 은 주장). 이해가 있는 Task 는 `criteria_evidence` 계약 — Assistant 판정이 Task 상태를 정한다. 직접 `/work-agent/run` 은 종전 판정 | Phase A · B CHECK · Task 이해 · 완료 판정 PR |
 | L3 Skill / Discovery | PARTIAL (Candidate · adapter seed · Strong-first routing) | GAP-CENSUS §J · §M |
 | L4 Execution | EXISTS | GAP-CENSUS §F |
 | L5 Execution Node | EXISTS — **Phase D(2026-10-05)**: 에이전트가 heartbeat 로 capability(브라우저 확장 연결 · Windows UIA · 로컬 데이터 · 소유 주체 원장)를 보고하고, `resolveTargetDevice` 가 필요 capability → Assistant 선호 노드(이 run 이 마지막으로 질문한 노드 · 같은 Task 의 최근 노드) → 최근 heartbeat 순으로 고른다. 여러 노드가 online 이어도 멈추지 않고, 사용자에게 PC 정리를 요구하는 안내는 없앴다. **Phase E(2026-10-06)**: Browser DOM 작업 단위 dispatch(`run_unit` · §11-2) — 관찰 2→1 · 행동 묶음+재관찰 n+2→1 · 재생 단계당 4→단위 전체 1 왕복. 남은 한계: UIA · Computer Use 표면과 읽기 행동은 명령 1개씩 왕복 · 실 PC 왕복/시간 실측 대기 | Phase D CHECK · Phase E CHECK |
-| Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
+| Memory 배치 | **Cloud Continuity 구현** — 소유 주체 전용 Cloud 에 검증된 방법(M3 · 공개 사이트 대상) · 재개 구조(M5)를 저장하고 Assistant Memory 가 recall → ExecutionIntent → Execution 이 노드 원장과 합쳐 현재 화면으로 재검증. Task type 이력도 Cloud. 도움 · 교정 · 실행 원기록(M7 · M8)과 결정적 재생 단계(Workflow Candidate)는 노드. **2026-10-07 P3**: 방법 기억(Cloud 검증 방법 · 노드 taskKey 경험 회상 · 도움 기록)은 Task 소유와 무관하게 요청자 개인 키 — 기존 조직 소유 방법 행은 더 이상 읽히지 않는다(승격 없음). 조직 정책 채널 없음. §17 Compliance Gate PENDING(실사용 확대 전 점검) | GAP-CENSUS §G · Phase C CHECK · Cloud Continuity 커밋 |
 
 **노드 원장 KNOWN GAP — Phase D 해소 상태 (2026-10-05 · `WO-…-PHASE-D-EXECUTION-NODE-RUNTIME-STATE-COORDINATION-V1`)**
 
@@ -629,6 +634,7 @@ V1 에서 **승계하지 않는 것**: Local-first 저장 원칙(ARCH §5 의 Lo
 | 외부 도매 가격 · 재고의 저장 위치 · `storeProductId` 의 기존 엔티티 매핑 | 단계 H 설계 |
 | Boundary Policy 에 Assistant 도메인 신설 여부(1차 경계 = `organizationId` + `userId`) | 단계 A 설계 — Boundary(F6) 변경이 필요하면 명시 WO |
 | 의약품 외부 도매 발주 자동화의 법률 검토 | §17 Gate |
+| 조직 정책 채널(조직이 모두에게 적용하는 방법을 개인 Experience 와 분리해 명시적으로 정하는 곳 · §0-1 (8)) | 별도 설계 WO |
 
 ---
 

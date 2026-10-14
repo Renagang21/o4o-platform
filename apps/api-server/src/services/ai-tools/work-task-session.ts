@@ -3,6 +3,7 @@
 import type { DataSource } from 'typeorm';
 import logger from '../../utils/logger.js';
 import type { PlannerInput } from './work-planner.js';
+import { nodeLedgerOwnerKey } from './node-ledger-owner.js';
 import type {
   WorkAgentState,
   WorkGoalStatus,
@@ -148,6 +149,12 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
   const goal = state.goal;
   const { deviceId, ownerKey: ledgerOwner } = ledgerCtx;
   const ctx = { userId: ledgerCtx.userId };
+  /**
+   * P3 — 개인 교정 · 선호 · 회피(assistance)와 그것에서 나온 방법 패턴은 **요청자 개인** 원장에 둔다
+   * (WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1). 조직 Task 여도 한 사람의 Correction/Preferred/Avoid 가
+   * 조직 전체 실행 규칙이 되지 않는다. run · 경험 · 후보 · 업무 키 목록은 Task 소유 원장 그대로다. 개인 Task 면 두 키가 같다.
+   */
+  const personalLedgerOwner = ledgerOwner ? nodeLedgerOwnerKey('USER', ctx.userId) : null;
   /** 재개 시 Local 이 돌려준 원래 업무 구조. */
   let resumeFrame: PlannerInput['resumeFrame'] = null;
   /** 재개 답변이 막힌 재생 자리를 채워 결정적으로 이어간 경우의 재생 단계. */
@@ -260,7 +267,7 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
       lastAssistanceEvent = event;
       const r = await issueWorkRunAssistanceRecord(
         dataSource,
-        { userId: ctx.userId, deviceId, ownerKey: ledgerOwner },
+        { userId: ctx.userId, deviceId, ownerKey: personalLedgerOwner },
         {
           runId: goal.runId,
           targetId: siteId,
@@ -300,7 +307,9 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
     let nodePatterns: RecalledPattern[] = [];
     // Phase D — 소유 주체 원장 노드면 ledgerCtx.ownerKey 로 이 소유 주체의 기억만 돌아온다.
     try {
-      const r = await issueExperienceRecall(dataSource, ledgerCtx, {
+      // 업무 키 목록은 Task 소유 원장, 그 업무의 방법 패턴(개인 교정에서 나온다)은 요청자 개인 원장(P3).
+      const recallCtx = taskKey === null ? ledgerCtx : { ...ledgerCtx, ownerKey: personalLedgerOwner };
+      const r = await issueExperienceRecall(dataSource, recallCtx, {
         targetId: siteId,
         taskKey,
       });
@@ -462,6 +471,10 @@ export function createWorkTaskSession(input: WorkTaskSessionInput) {
     avoidedStage,
     clearAsk: (): void => {
       declaredAsk = null;
+    },
+    /** Assistant 판정이 사용자 확인을 묻기로 했을 때 — 재개 구조(M5)에 그 질문 종류를 남긴다. */
+    setAsk: (ask: ProposalAsk): void => {
+      declaredAsk = ask;
     },
     plannerFields: (): Pick<
       PlannerInput,

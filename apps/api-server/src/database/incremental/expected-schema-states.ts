@@ -263,6 +263,17 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: '087e2d4c4c9423c59774a622f681548d677aeab14567287a8ded9e52e71447ac',
     fingerprintLineCount: 6650,
   },
+  // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — assistant_run_frames.understanding jsonb(nullable) + COMMENT.
+  // 질문 대기 run 의 업무 이해 중 글 없는 구조(결과 형태 · 확정 경계)만 재개 구조(M5)와 같은 행 · 같은 수명에 둔다(목표 · 조건 글 저장 금지 · M13).
+  // 운영 미적용 상태에서 main 의 마지막(CreateAiUsageReservations) 뒤로 epoch 재부여(1791349365734 → 1791970408318 · 내용 불변).
+  // baseline fresh bootstrap + incrementals 1..28 을 격리 PostgreSQL 17(로컬 일회용 클러스터)에서 migrate.ts 로 실제 적용해 산출:
+  // 운영 DB fingerprint 채택 아님. 같은 DB 에서 이 migration 만 되돌려 직전 상태 087e2d4c…(6650) 재현 확인 · 새 DB 재실행 POST PASS.
+  // 종전 값 4e37812d…(6157) · 7f231dc7…(6156)는 앞선 위치의 값으로 운영에 적용된 적 없다(미병합 PR).
+  {
+    appliedThrough: 'AddAssistantRunFrameUnderstanding1791970408318',
+    fingerprint: 'e432641d0e05b803a6ac9c08822248e5f693b761f80664808c8214187a568b23',
+    fingerprintLineCount: 6652,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

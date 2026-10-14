@@ -28,6 +28,7 @@ import type {
   ExecutionIntent,
   ExecutionReport,
   PlanningEvidence,
+  TaskUnderstanding,
 } from '../ai-tools/work-agent-contract.js';
 import type { AssistantTaskStatus } from './assistant-task-store.js';
 
@@ -46,6 +47,12 @@ export interface AssistantPlanningInput {
   knownTaskTypes?: readonly string[];
   /** Cloud Continuity — Assistant Memory 가 돌려준 검증 방법 · 재개 구조. 근거로만 넘긴다(강제 아님). */
   memory?: ExecutionIntent['memory'];
+  /**
+   * WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1 — 실행 전 업무 이해(원하는 결과 · 완료조건 · 빠진 정보).
+   * 있으면 완료 계약이 `criteria_evidence` 가 된다 — Execution 은 근거만 보고하고, 끝났는지는 Assistant 가 조건과 비교한다.
+   * 메모리에서만 쓰고 저장 · 로그하지 않는다(V2 §17).
+   */
+  understanding?: TaskUnderstanding | null;
 }
 
 export interface AssistantPlan {
@@ -55,6 +62,7 @@ export interface AssistantPlan {
 }
 
 const COMPLETION: CompletionContract = Object.freeze({ requires: 'result_observed', acceptsUserCompletion: true }) as CompletionContract;
+const CRITERIA_COMPLETION: CompletionContract = Object.freeze({ requires: 'criteria_evidence', acceptsUserCompletion: true }) as CompletionContract;
 
 /**
  * 판단 근거의 자리(V2 §0-1-1 · §0-1-2). 순서는 가까운 근거부터이며 모두 비구속(binding:false)이다.
@@ -92,7 +100,8 @@ export function planAssistantTask(input: AssistantPlanningInput): AssistantPlan 
       knownTaskTypes: [...(input.knownTaskTypes ?? [])],
       ...(input.memory ? { memory: { patterns: [...input.memory.patterns], resumeFrame: input.memory.resumeFrame } } : {}),
       evidence: planningEvidence(input.nodeExperienceReachable || (input.memory?.patterns.length ?? 0) > 0),
-      completion: COMPLETION,
+      ...(input.understanding ? { understanding: input.understanding } : {}),
+      completion: input.understanding ? CRITERIA_COMPLETION : COMPLETION,
       approval: { commit: 'user_only', credential: 'user_only' },
     },
   };
@@ -104,11 +113,17 @@ export function planAssistantTask(input: AssistantPlanningInput): AssistantPlan 
  *   execution_complete + 결과 근거 없음 → handed_over (화면은 사용자에게 넘어갔지만 업무 완료는 확인되지 않았다)
  *   needs_user → waiting_for_user · handed_over → handed_over · stopped → stopped
  *   not_started(run 이 열리지 않음) → blocked (사용자 조치 뒤 같은 Task 로 다시 할 수 있다)
+ *
+ * criteria_evidence(업무 이해가 있는 Task) — 실행이 "완료"를 주장해도 Assistant 판정(verdict)이 complete 일 때만 completed.
+ *   판정이 없으면(판정기 실패 · 미호출) 기존 결과 근거 규칙으로 내려간다 — 판정기 장애가 완료를 막거나 꾸며내지 않는다.
  */
 export function judgeTaskStatus(contract: CompletionContract, report: ExecutionReport): AssistantTaskStatus {
   switch (report.claim) {
     case 'execution_complete': {
-      const evidenced = contract.requires === 'result_observed' && (report.resultObserved || report.replayVerified);
+      if (contract.requires === 'criteria_evidence' && report.verdict) {
+        return report.verdict.decision === 'complete' ? 'completed' : 'handed_over';
+      }
+      const evidenced = report.resultObserved || report.replayVerified;
       return evidenced ? 'completed' : 'handed_over';
     }
     case 'needs_user':

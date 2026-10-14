@@ -209,7 +209,10 @@ describe('⑦ sentinel — 원문은 실행 지시 · Task 저장 경로에 닿�
     const workBody = { request: SENTINEL, recoveryHint: `${SENTINEL} 힌트` };
     const out = await runAssistantWorkTask(ds, { userId: ME, workBody }, exec);
     expect(exec.mock.calls[0][1]).toEqual(workBody);
-    const serialized = JSON.stringify([out.plan, exec.mock.calls[0][2], storeCalls]);
+    // 업무 이해(Task Understanding)는 요청에서 파생한 글 — 실행 지시의 메모리 전용 칸에만 있고(로그 · 저장 없음) 구조 칸에는 없다.
+    const structural = ({ understanding: _u, ...rest }: any) => rest;
+    expect(exec.mock.calls[0][2].understanding).toMatchObject({ source: 'fallback' });
+    const serialized = JSON.stringify([{ ...out.plan, intent: structural(out.plan.intent) }, structural(exec.mock.calls[0][2]), storeCalls]);
     expect(serialized).not.toContain('SENTINEL_RAW_TEXT');
     expect(serialized).not.toContain('게보린');
     expect(out.plan.reason).toBe('user_method_hint');

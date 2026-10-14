@@ -278,13 +278,15 @@ describe('C. remember — 소유 주체 기억 반영', () => {
       .resolves.toEqual({ patternsWritten: 0, failedRecorded: false, frame: 'none' });
   });
 
-  it('Assistant 경로 — 실행 보고의 기억 후보가 Task 소유 주체(조직) 기억으로 · 다음 Task 에서 recall 되어 실행 지시로', async () => {
+  // P3(WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1) — 방법 기억(Preferred/Avoid)은 요청자 개인 것이다.
+  //   조직 Task 여도 한 직원의 방법이 조직 전체 실행 규칙으로 자동 승격되지 않는다.
+  it('Assistant 경로 — 조직 Task 여도 방법 기억은 요청자 개인 기억으로 · 본인 다음 Task 에서만 recall', async () => {
     ownership = ORG_OWN;
     const stored: any[] = [];
     const ds = recordingDs((sql, params) => {
       if (sql.includes('INSERT INTO assistant_procedural_patterns')) { stored.push(params); return []; }
       if (sql.includes('SELECT id, task_type_key')) {
-        return stored.map((p, i) => ({ id: `00000000-0000-4000-8000-00000000000${i}`, task_type_key: p[3], stage_key: p[4], polarity: p[5], strategy: JSON.parse(p[7]), verified_count: 1 }));
+        return stored.filter((p) => p[0] === params[0] && p[1] === params[1]).map((p, i) => ({ id: `00000000-0000-4000-8000-00000000000${i}`, task_type_key: p[3], stage_key: p[4], polarity: p[5], strategy: JSON.parse(p[7]), verified_count: 1 }));
       }
       return [];
     });
@@ -296,11 +298,15 @@ describe('C. remember — 소유 주체 기억 반영', () => {
     }));
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '약학정보원에서 동일성분 찾아줘' }, workScope: { workspace: 'store' } }, exec);
     expect(stored).toHaveLength(1);
-    expect(stored[0].slice(0, 2)).toEqual(['ORGANIZATION', ORG]);
+    expect(stored[0].slice(0, 2)).toEqual(['USER', ME]);
 
-    // 다음 Task(다른 직원이어도 같은 조직) — Assistant Memory 가 같은 방법을 실행 지시에 싣는다.
+    // 같은 조직의 다른 직원 — 내 방법은 그의 실행 지시에 실리지 않는다.
     await runAssistantWorkTask(ds, { userId: '00000000-0000-4000-8000-0000000000e2', workBody: { request: '약학정보원에서 동일성분 찾아줘' }, workScope: { workspace: 'store' } }, exec);
-    const intent = (exec.mock.calls[1] as unknown[])[2] as any;
+    expect(((exec.mock.calls[1] as unknown[])[2] as any).memory.patterns).toEqual([]);
+
+    // 본인 다음 Task — Assistant Memory 가 같은 방법을 실행 지시에 싣는다.
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '약학정보원에서 동일성분 찾아줘' }, workScope: { workspace: 'store' } }, exec);
+    const intent = (exec.mock.calls[2] as unknown[])[2] as any;
     expect(intent.memory.patterns).toEqual([{ taskKey: 'drug_info.same_ingredient', stageKey: 'find_same_ingredient', polarity: 'preferred', strategy: ALT, verifiedCount: 1 }]);
     expect(intent.memory.resumeFrame).toBeNull();
   });
@@ -574,10 +580,29 @@ describe('F. Phase D — 노드 원장 소유 주체 · 재개 구조 최신성'
     const { node } = await runOn('dev-pc-a', '약학정보원에서 게보린 검색해줘', planner, { get_context: [CTX('/')], inspect: [INSPECT(HOME)] }, { intent, nodeCaps: SCOPED });
     const by = (b: string) => node.ledger.filter((l) => l.base === b);
     expect(by(A.DATA_WORK_RUN_EXPERIENCE_RECALL).length).toBeGreaterThan(0);
-    for (const l of by(A.DATA_WORK_RUN_EXPERIENCE_RECALL)) expect(l.args.ownerKey).toBe(OWNER_ORG);
+    for (const l of by(A.DATA_WORK_RUN_EXPERIENCE_RECALL).filter((x) => x.args.taskKey === null)) expect(l.args.ownerKey).toBe(OWNER_ORG);
     for (const l of by(A.DATA_WORK_RUN_CANDIDATE_MATCH)) expect(l.args.ownerKey).toBe(OWNER_ORG);
     for (const l of by(A.DATA_WORK_RUN_UPSERT)) expect(l.args.ownerKey).toBe(OWNER_ORG);
     for (const l of node.ledger.filter((x) => x.base === A.DATA_WORK_RUN_SET_STATUS || x.base === A.DATA_WORK_RUN_EXPERIENCE_RECORD)) expect(l.args).not.toHaveProperty('ownerKey');
+  });
+
+  it('P3 — 조직 Task 여도 방법 기억(taskKey 경험 회상 · 사용자 보조 기록)은 요청자 개인 키 · 업무 run 원장은 Task 소유 주체 키', async () => {
+    const PERSONAL = nodeLedgerOwnerKey('USER', 'user-1');
+    const intent = { ...planAssistantTask({ ...BASE, resuming: true }).intent, node: { ownerKey: OWNER_ORG, preferredDeviceIds: [] } };
+    const planner = scripted([
+      { assessment: 'progress', action: { kind: 'set_input', elementRef: 'e_2', text: '게보린' }, userInput: { kind: 'assistance', askKind: 'value_confirmation', providedKind: 'value', reusability: 'per_run_value' } },
+      DONE,
+    ]);
+    const { node } = await runOn('dev-pc-a', '게보린', planner, {
+      get_context: [CTX('/')], inspect: [INSPECT(HOME)], set_input: [OK({ elementRef: 'e_2', hasValue: true })],
+    }, { runId: 'g_p3', intent, nodeCaps: SCOPED, node: { contextReply: { found: true, ...frameOf('drug_info.lookup', 'search_product') } } });
+    const recalls = node.ledger.filter((l) => l.base === A.DATA_WORK_RUN_EXPERIENCE_RECALL);
+    expect(recalls.find((l) => l.args.taskKey === null)?.args.ownerKey).toBe(OWNER_ORG);
+    expect(recalls.find((l) => l.args.taskKey === 'drug_info.lookup')?.args.ownerKey).toBe(PERSONAL);
+    const assistance = node.ledger.filter((x) => x.base === A.DATA_WORK_RUN_ASSISTANCE_RECORD);
+    expect(assistance.length).toBeGreaterThan(0);
+    for (const l of assistance) expect(l.args.ownerKey).toBe(PERSONAL);
+    for (const l of node.ledger.filter((x) => x.base === A.DATA_WORK_RUN_UPSERT)) expect(l.args.ownerKey).toBe(OWNER_ORG);
   });
 
   it('Task 없이 온 실행 + 소유 주체 원장 노드 — 요청자 개인(USER) 키로 나눈다', async () => {
