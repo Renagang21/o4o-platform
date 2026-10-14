@@ -15,26 +15,24 @@
  * └─ 상담 요청 목록 (5초 polling)
  */
 
-import { useEffect, useState, useRef, useCallback, useMemo, type CSSProperties } from 'react';
-import { CheckCircle2, Send, X, Trash2 } from 'lucide-react';
+import { useEffect, useState, useMemo, type CSSProperties } from 'react';
+import { CheckCircle2, Send, Trash2 } from 'lucide-react';
 import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
-import { useBatchAction } from '@o4o/operator-ux-core';
+import { useConsultationRequests } from './monitoring/useConsultationRequests';
+import { MonitoringNavigation } from './monitoring/MonitoringNavigation';
+import { useMonitoringScope } from './monitoring/useMonitoringScope';
 import { GuideEditableSection } from '../../components/guide';
-import {
-  fetchStaffInterestRequests,
-  updateInterestAction,
-  type StaffInterestRequest,
-} from '../../api/tabletStaff';
+import type { StaffInterestRequest } from '../../api/tabletStaff';
 
 function formatElapsed(createdAt: string): string {
-  const diff = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
+  const diff = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000));
   if (diff < 60) return `${diff}초 전`;
   if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
   return `${Math.floor(diff / 3600)}시간 전`;
 }
 
 function formatDuration(from: string, to: string): string {
-  const diff = Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 1000);
+  const diff = Math.max(0, Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 1000));
   if (diff < 60) return `${diff}초`;
   if (diff < 3600) return `${Math.floor(diff / 60)}분`;
   return `${Math.floor(diff / 3600)}시간`;
@@ -62,89 +60,22 @@ const URGENCY_BADGE: Record<Urgency, { label: string; bg: string; color: string;
 };
 
 export function TabletRequestsPage() {
-  const [interestRequests, setInterestRequests] = useState<StaffInterestRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scope = useMonitoringScope();
+  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주세요.</p>;
+  return <ConsultationRequests key={scope.key} organizationId={scope.organizationId!} />;
+}
 
-  // WO-O4O-KPA-TABLET-REQUESTS-STANDARD-TABLE-V1: 표준 테이블 selection + bulk
-  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const batch = useBatchAction();
-
-  const fetchInterests = useCallback(async () => {
-    try {
-      const data = await fetchStaffInterestRequests();
-      setInterestRequests(data);
-      setError(null);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Poll every 5 seconds — WO 명시 유지
-  useEffect(() => {
-    setLoading(true);
-    fetchInterests();
-    pollRef.current = setInterval(fetchInterests, 5000);
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, [fetchInterests]);
-
-  // 단건 액션 — 기존 흐름 보존
-  const handleInterestAction = async (id: string, action: 'acknowledge' | 'complete' | 'cancel') => {
-    try {
-      await updateInterestAction(id, action);
-      await fetchInterests();
-    } catch (e: any) {
-      setError(e.message);
-    }
-  };
-
-  // Force re-render elapsed times every 10s — urgency badge / "N초 전" 갱신
+function ConsultationRequests({ organizationId }: { organizationId: string }) {
+  const workflow = useConsultationRequests(organizationId);
+  const { rows: interestRequests, loading, error, busy, selectedKeys, setSelectedKeys } = workflow;
+  const handleInterestAction = workflow.run;
+  const blocked = busy || loading || !!error;
   const [, setTick] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setTick((v) => v + 1), 10_000);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setTick(v => v + 1), 10_000);
+    return () => clearInterval(timer);
   }, []);
-
-  // ── Bulk action — Promise.allSettled fan-out (backend 신규 없음) ──
-  type BulkOp = 'acknowledge' | 'complete' | 'cancel';
-  const batchInterestOp = useCallback(
-    async (
-      ids: string[],
-      options?: Record<string, unknown>,
-    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
-      const op = options?.op as BulkOp | undefined;
-      if (!op) {
-        return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: 'op missing' })) } };
-      }
-      const settled = await Promise.allSettled(ids.map((id) => updateInterestAction(id, op)));
-      const results = settled.map((r, i) => {
-        const id = ids[i];
-        if (r.status === 'fulfilled') return { id, status: 'success' as const };
-        const err = r.reason as { message?: string } | null;
-        return { id, status: 'failed' as const, error: err?.message || 'Network error' };
-      });
-      return { data: { results } };
-    },
-    [],
-  );
-
-  const runBulk = useCallback(
-    async (ids: string[], op: BulkOp, confirmMsg?: string) => {
-      if (ids.length === 0) return;
-      if (confirmMsg && !window.confirm(confirmMsg)) return;
-      const result = await batch.executeBatch(batchInterestOp, ids, { op });
-      if (result.successCount > 0) {
-        setSelectedKeys([]);
-        await fetchInterests();
-      }
-    },
-    [batch, batchInterestOp, fetchInterests],
-  );
+  const runBulk = workflow.run;
 
   // status별 selection 분류 (서버 거절 사전 차단)
   // - acknowledge: 'REQUESTED' 만 의미 있음 (기존 단건 노출 조건과 동일)
@@ -247,7 +178,8 @@ export function TabletRequestsPage() {
         <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
           {req.status === 'REQUESTED' && (
             <button
-              onClick={(e) => { e.stopPropagation(); handleInterestAction(req.id, 'acknowledge'); }}
+              disabled={blocked}
+              onClick={(e) => { e.stopPropagation(); void handleInterestAction([req.id], 'acknowledge'); }}
               style={{ ...rowBtn, backgroundColor: '#3b82f6', color: '#fff' }}
               title="확인"
             >
@@ -255,14 +187,16 @@ export function TabletRequestsPage() {
             </button>
           )}
           <button
-            onClick={(e) => { e.stopPropagation(); handleInterestAction(req.id, 'complete'); }}
+            disabled={blocked}
+            onClick={(e) => { e.stopPropagation(); void handleInterestAction([req.id], 'complete'); }}
             style={{ ...rowBtn, backgroundColor: '#22c55e', color: '#fff' }}
             title="완료"
           >
             완료
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); handleInterestAction(req.id, 'cancel'); }}
+            disabled={blocked}
+            onClick={(e) => { e.stopPropagation(); void handleInterestAction([req.id], 'cancel'); }}
             style={{ ...rowBtn, backgroundColor: '#fff', color: '#ef4444', border: '1px solid #fecaca' }}
             title="취소"
           >
@@ -272,11 +206,11 @@ export function TabletRequestsPage() {
       ),
     },
   // urgency calc + formatElapsed 는 매 render 호출 — tick state 갱신으로 자동 재렌더
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], []);
+  ], [handleInterestAction, blocked]);
 
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto' }}>
+      <MonitoringNavigation />
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>상담 요청</h1>
         <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
@@ -305,14 +239,15 @@ export function TabletRequestsPage() {
         );
       })()}
 
+      {busy && <p role="status">상담 요청을 처리하고 최신 목록을 확인하는 중입니다.</p>}
       {error && (
-        <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
-          {error}
+        <div role="alert" style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
+          {error} <button type="button" disabled={busy} onClick={() => void workflow.refresh()}>다시 불러오기</button>
         </div>
       )}
 
       {/* WO-O4O-KPA-TABLET-REQUESTS-STANDARD-TABLE-V1: ActionBar — bulk 3종 */}
-      <div style={{ marginBottom: '12px' }}>
+      <fieldset disabled={blocked} className="[&>div>div]:flex-wrap [&_button]:whitespace-nowrap" style={{ border: 0, padding: 0, minWidth: 0, marginBottom: '12px' }}>
         <ActionBar
           selectedCount={selectedKeys.length}
           onClearSelection={() => setSelectedKeys([])}
@@ -323,7 +258,7 @@ export function TabletRequestsPage() {
               onClick: handleBulkAcknowledge,
               variant: 'primary' as const,
               icon: <Send className="w-3.5 h-3.5" />,
-              loading: batch.loading,
+              loading: busy,
               group: 'actions',
               visible: selectedRequestedIds.length > 0,
               tooltip: '선택한 대기 요청(REQUESTED)을 일괄 확인 처리합니다',
@@ -334,7 +269,7 @@ export function TabletRequestsPage() {
               onClick: handleBulkComplete,
               variant: 'default' as const,
               icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-              loading: batch.loading,
+              loading: busy,
               group: 'actions',
               visible: selectedAllIds.length > 0,
               tooltip: '선택한 요청을 일괄 완료 처리',
@@ -345,35 +280,27 @@ export function TabletRequestsPage() {
               onClick: handleBulkCancel,
               variant: 'danger' as const,
               icon: <Trash2 className="w-3.5 h-3.5" />,
-              loading: batch.loading,
+              loading: busy,
               group: 'actions',
               visible: selectedAllIds.length > 0,
               tooltip: '선택한 요청을 일괄 취소',
             },
-            {
-              key: 'clear',
-              label: '선택 해제',
-              onClick: () => setSelectedKeys([]),
-              variant: 'default' as const,
-              icon: <X className="w-3.5 h-3.5" />,
-              group: 'meta',
-              visible: selectedKeys.length > 0,
-            },
+
           ]}
         />
-      </div>
+      </fieldset>
 
       <BulkResultModal
-        open={batch.showResult}
-        onClose={() => batch.clearResult()}
-        result={batch.result}
-        onRetry={() => batch.retryFailed()}
+        open={workflow.showResult}
+        onClose={workflow.closeResult}
+        result={workflow.result}
+        onRetry={!blocked ? workflow.retryFailed : undefined}
       />
 
       {/* WO-O4O-KPA-TABLET-REQUESTS-STANDARD-TABLE-V1:
           DataTable emptyText 가 string 만 허용 → GuideEditableSection (편집 가능 텍스트)
           을 보존하기 위해 empty 시 별도 panel 분기 (기존 카드형 panel 유지). */}
-      {!loading && interestRequests.length === 0 ? (
+      {!loading && !error && interestRequests.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 0' }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>💡</div>
           <p style={{ color: '#94a3b8', fontSize: '15px' }}>
@@ -385,17 +312,24 @@ export function TabletRequestsPage() {
           </p>
         </div>
       ) : (
-        <DataTable<StaffInterestRequest>
-          rowSelection={{
-            selectedRowKeys: selectedKeys,
-            onChange: setSelectedKeys,
-          }}
-          columns={columns}
-          dataSource={interestRequests}
-          rowKey="id"
-          loading={loading}
-          emptyText="현재 대기 중인 상담 요청이 없습니다"
-        />
+        <section>
+          <p className="mb-2 text-xs text-slate-500 md:hidden">표를 좌우로 이동하면 경과 시간과 처리 버튼을 확인할 수 있습니다.</p>
+          <div className="overflow-x-auto" role="region" aria-label="상담 요청 목록, 좌우로 이동 가능" tabIndex={0} aria-busy={busy}>
+            <div className="min-w-[720px]">
+            <DataTable<StaffInterestRequest>
+              rowSelection={blocked ? undefined : {
+                selectedRowKeys: selectedKeys,
+                onChange: setSelectedKeys,
+              }}
+              columns={columns}
+              dataSource={interestRequests}
+              rowKey="id"
+              loading={loading}
+              emptyText={error ? '목록을 다시 불러와 주세요' : '현재 대기 중인 상담 요청이 없습니다'}
+            />
+            </div>
+          </div>
+        </section>
       )}
     </div>
   );
