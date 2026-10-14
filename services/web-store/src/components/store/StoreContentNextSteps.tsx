@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { StoreQrCreateModal, type InlineQrTarget } from "./StoreQrCreateModal";
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { storeWorkspaceBase } from "./StoreWorkflowNavigation";
 
 /** Only persisted content is passed here; the existing QR contract owns origin support. */
-export function StoreContentNextSteps({
-  contentId,
-  title,
-}: {
-  contentId?: string;
-  title?: string;
-}) {
+interface NextStepsProps { contentId?: string; title?: string }
+export function StoreContentNextSteps(props: NextStepsProps) {
+  const { key } = useStoreOperationScope();
+  return <ContentNextStepsSession key={`${key}:${props.contentId ?? ''}`} {...props} />;
+}
+function ContentNextStepsSession({ contentId, title }: NextStepsProps) {
+  const { isCurrent } = useStoreOperationScope();
   const { pathname } = useLocation();
   const base = storeWorkspaceBase(pathname);
   const [qrOpen, setQrOpen] = useState(false);
@@ -30,7 +31,7 @@ export function StoreContentNextSteps({
         {target && (
           <button
             type="button"
-            onClick={() => setQrOpen(true)}
+            onClick={() => { if (isCurrent()) setQrOpen(true); }}
             className="rounded-lg border border-teal-300 bg-white px-3 py-2.5 text-sm text-teal-900"
           >
             이 콘텐츠로 QR 만들기
@@ -49,6 +50,7 @@ export function StoreContentNextSteps({
           매장에서 활용
         </Link>
       </div>
+      <p className="mt-3 text-xs text-teal-800">저장한 콘텐츠를 활용할 수 있습니다. 게시 설정과 QR·기기 적용 결과는 각각 확인해 주세요.</p>
       <StoreQrCreateModal
         open={qrOpen}
         target={target}

@@ -33,7 +33,7 @@ export function StoreWorkspacePage({
       {area === "use" && (
         <p className="rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm text-teal-900">
           저장된 자료를 골라 사용 위치에 적용하세요. 제작·게시 상태와 실제
-          배치·기기 재생 상태는 다릅니다.
+          배치·기기 재생 상태는 다릅니다. 게시 상태를 확인한 뒤 QR 출력이나 기기 적용 결과를 각각 확인하세요.
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -85,8 +85,7 @@ export function StoreWorkspacePage({
       )}
       {area === "studio" && (
         <p className="text-sm text-slate-500">
-          제작 화면에서 직접 작성하거나 기존 AI 제작 도움 기능을 사용할 수
-          있습니다.
+          제작 화면에서 직접 작성하거나 초안을 붙여넣고 검토한 뒤 저장하세요. 저장만으로 게시·배치가 완료되지는 않습니다.
         </p>
       )}
     </div>

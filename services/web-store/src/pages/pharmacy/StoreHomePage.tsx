@@ -36,7 +36,10 @@
  *   홈 CTA 재추가 금지.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { useStoreHomeOverview } from './operations/useStoreHomeOverview';
 import {
   QrCode,
   BookOpen,
@@ -71,66 +74,19 @@ import {
   StoreHomeShortcutGrid,
 } from '@o4o/store-ui-core';
 import type { StoreHomeMetricItem, StoreHomeSignalItem } from '@o4o/store-ui-core';
-import { kpaConfig } from '@o4o/operator-ux-core';
-import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
-import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
-import { getStoreExecutionAssets } from '../../api/storeExecutionAssets';
-import { getListings } from '../../api/pharmacyProducts';
-import { getStoreSlug } from '../../api/pharmacyInfo';
-import { fetchLiveSignals } from '../../api/storeHub';
-import type { LiveSignals } from '../../api/storeHub';
 import { pharmacyStorePath } from '../neture-pharmacy/shared';
 import { GuideEditableSection } from '../../components/guide';
 
 export function StoreHomePage() {
-  const [analytics, setAnalytics] = useState<MarketingAnalyticsData | null>(null);
-  const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
-  const [libraryCount, setLibraryCount] = useState<number | null>(null);
-  const [productCount, setProductCount] = useState<number | null>(null);
-  const [liveSignals, setLiveSignals] = useState<LiveSignals | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [noStore, setNoStore] = useState(false);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 매장 미연결 시 inline 안내
-      // (navigate('/pharmacy') 사용 금지 — PharmacyPage의 hasStoreRole→/store redirect와 무한루프 발생)
-      const storeSlug = await getStoreSlug();
-      if (!storeSlug) { setNoStore(true); setLoading(false); return; }
-
-      const [analyticsRes, scansRes, libraryRes, listingsRes, signalsRes] = await Promise.all([
-        getMarketingAnalytics().catch(() => null),
-        getRecentScans().catch(() => null),
-        getStoreExecutionAssets({ page: 1, limit: 1 }).catch(() => null),
-        getListings().catch(() => null),
-        fetchLiveSignals().catch(() => null),
-      ]);
-      if (analyticsRes?.success && analyticsRes.data) {
-        setAnalytics(analyticsRes.data);
-      }
-      if (scansRes?.success && scansRes.data) {
-        setRecentScans(scansRes.data);
-      }
-      if (libraryRes?.success && libraryRes.data) {
-        setLibraryCount(libraryRes.data.total);
-      }
-      if (listingsRes?.success && listingsRes.data) {
-        setProductCount(listingsRes.data.filter((p) => p.is_active).length);
-      }
-      if (signalsRes) {
-        setLiveSignals(signalsRes);
-      }
-    } catch {
-      // silent
-    } finally {
-      setLoading(false);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const { key } = useStoreOperationScope();
+  return <StoreHomeSession key={key} />;
+}
+function StoreHomeSession() {
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
+  const { analytics, scans, libraryCount, productCount, signals: liveSignals,
+    loading, noStore, unavailable, reload: fetchData } = useStoreHomeOverview();
+  const recentScans = scans ?? [];
 
   if (noStore) {
     return (
@@ -138,8 +94,8 @@ export function StoreHomePage() {
         <StoreHomeStateView
           state="empty"
           icon={<AlertCircle size={32} className="text-slate-400" />}
-          title="약국 매장이 아직 연결되지 않았습니다"
-          description="약국 경영지원 서비스 신청 후 매장이 활성화됩니다."
+          title="매장을 선택해 주세요"
+          description="선택된 매장의 현황을 확인할 수 있습니다."
         />
       </div>
     );
@@ -154,7 +110,7 @@ export function StoreHomePage() {
   }
 
   const deviceIcon: Record<string, React.ReactNode> = {
-    mobile: <Smartphone size={13} className="text-primary" />,
+    mobile: <Smartphone size={13} className="text-primary-600" />,
     tablet: <TabletIcon size={13} className="text-violet-600" />,
     desktop: <Monitor size={13} className="text-emerald-600" />,
   };
@@ -176,7 +132,7 @@ export function StoreHomePage() {
         key: 'tablet-requests',
         tone: 'blue',
         message: `상담 요청 ${liveSignals.pendingTabletRequests}건 대기`,
-        to: '/store/requests',
+        to: `${base}/requests`,
       });
     }
     if (liveSignals.pendingSalesRequests > 0) {
@@ -193,17 +149,17 @@ export function StoreHomePage() {
   const metricItems: StoreHomeMetricItem[] = [
     {
       key: 'library',
-      label: '자료실 파일',
+      label: '직접 등록·제작 자료',
       value: libraryCount ?? undefined,
       icon: <BookOpen size={20} className="text-emerald-600 mx-auto" />,
-      to: '/store/library/contents',
+      to: `${base}/library/resources`,
     },
     {
       key: 'active-qr',
       label: '활성 QR',
       value: analytics?.activeQrCount ?? undefined,
-      icon: <QrCode size={20} className="text-primary mx-auto" />,
-      to: '/store/marketing/qr',
+      icon: <QrCode size={20} className="text-primary-600 mx-auto" />,
+      to: `${base}/marketing/qr`,
     },
     {
       key: 'listed-products',
@@ -215,7 +171,7 @@ export function StoreHomePage() {
       key: 'weekly-scans',
       label: '이번주 스캔',
       value: analytics?.weeklyScans?.toLocaleString() ?? undefined,
-      icon: <BarChart3 size={20} className="text-primary mx-auto" />,
+      icon: <BarChart3 size={20} className="text-primary-600 mx-auto" />,
     },
   ];
 
@@ -225,11 +181,23 @@ export function StoreHomePage() {
           헤더(제목·부제·새로고침) → 처리필요신호 → KPI → 본문 → 온보딩 순서를
           canonical StoreHomeShell 이 담당한다. 데이터 fetch/문구는 KPA service-local 유지. */}
       <StoreHomeShell
-        title={kpaConfig.uiText.storeHomeTitle}
-        subtitle={kpaConfig.uiText.storeHomeSubtitle}
+        title="내 매장 홈"
+        subtitle="선택한 매장의 현황과 처리할 업무를 확인합니다."
         loading={loading}
         onRefresh={fetchData}
-        signalsSlot={<StoreHomeSignalList items={signalItems} />}
+        statusSlot={<section className="mb-5 space-y-3" aria-label="현황 조회 상태">
+          {unavailable.length > 0 && <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <p>확인하지 못한 현황: {unavailable.join(' · ')}. 해당 항목은 0건으로 표시하지 않습니다.</p>
+            <button type="button" onClick={() => void fetchData()} className="mt-2 underline">현황 다시 시도</button>
+          </div>}
+          <nav aria-label="매장 업무 바로가기" className="flex flex-wrap gap-2">
+            <Link to={`${base}/workspace/studio`} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">자료 준비·제작</Link>
+            <Link to={`${base}/content`} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">게시 상태 확인</Link>
+            <Link to={`${base}/workspace/use`} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">매장에서 활용</Link>
+          </nav>
+          <p className="text-xs text-slate-500">게시 설정은 실제 기기 연결·재생 상태와 다릅니다. 활용 화면에서 별도로 확인하세요.</p>
+        </section>}
+        signalsSlot={liveSignals ? (signalItems.length ? <StoreHomeSignalList items={signalItems} /> : <p role="status" className="mb-4 text-sm text-slate-500">조회된 주문·상담·판매 요청 대기 항목이 없습니다.</p>) : null}
         metricsSlot={
           <div className="mb-5 sm:mb-6">
             <StoreHomeMetricGrid items={metricItems} variant="icon-centered" />
@@ -244,8 +212,8 @@ export function StoreHomePage() {
                   O4O 제품(공급·주문 카탈로그) / 매장 경영활용 제품(설명·QR 활용) 진입 분리) */}
               <div className="py-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary text-[11px] font-bold text-white flex-shrink-0">1</span>
-                  <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
+                  <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary-600 text-[11px] font-bold text-white flex-shrink-0">1</span>
+                  <span className="text-[13px] font-semibold text-primary-600 tracking-wide">상품 선택</span>
                 </div>
                 <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">판매할 O4O 제품을 찾거나, 매장에서 경영에 활용할 제품을 등록·관리합니다.</p>
                 <StoreHomeShortcutGrid
@@ -254,7 +222,7 @@ export function StoreHomePage() {
                   items={[
                     // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1: 상품 선택 = 공급 상품(공급 경로별 조건 · 주문). 옛 승인 카탈로그 진입 대체.
                     { to: pharmacyStorePath('supply'), label: '공급 상품', icon: <Package size={16} className="text-violet-600" /> },
-                    { to: '/store/my-products', label: '내 매장 제품', icon: <Store size={16} className="text-emerald-600" /> },
+                    { to: `${base}/my-products`, label: '내 매장 제품', icon: <Store size={16} className="text-emerald-600" /> },
                   ]}
                 />
               </div>
@@ -273,7 +241,7 @@ export function StoreHomePage() {
                   variant="chip"
                   className="flex flex-wrap gap-2 pl-[30px]"
                   items={[
-                    { to: '/store/library/contents', label: '콘텐츠 자료함', icon: <FileEdit size={16} className="text-emerald-600" /> },
+                    { to: `${base}/library/contents`, label: '콘텐츠 자료함', icon: <FileEdit size={16} className="text-emerald-600" /> },
                   ]}
                 />
               </div>
@@ -286,7 +254,7 @@ export function StoreHomePage() {
                   <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-violet-600 text-[11px] font-bold text-white flex-shrink-0">3</span>
                   <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
                 </div>
-                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 사이니지·태블릿·온라인 판매 등 매장 채널에 배포·운영합니다.</p>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">저장된 자료의 게시 설정을 확인하고, 사이니지·태블릿 적용과 QR 출력을 진행합니다.</p>
                 {/* WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1 §6.2: legacy redirect 경유 제거 —
                   최종 canonical route(/marketing/signage/playlist, /online-sales/settings)로 직접 이동. */}
                 {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6:
@@ -295,9 +263,9 @@ export function StoreHomePage() {
                   variant="chip"
                   className="flex flex-wrap gap-2 pl-[30px]"
                   items={[
-                    { to: '/store/marketing/signage/playlist', label: '사이니지', icon: <Monitor size={16} className="text-primary" /> },
-                    { to: '/store/commerce/tablet-displays', label: '태블릿 화면 제작', icon: <TabletIcon size={16} className="text-violet-600" /> },
-                    { to: '/store/marketing/qr', label: 'QR 코드', icon: <QrCode size={16} className="text-primary" /> },
+                    { to: `${base}/marketing/signage/playlist?workspace=use`, label: '사이니지 적용', icon: <Monitor size={16} className="text-primary-600" /> },
+                    { to: `${base}/commerce/tablet-displays?workspace=use`, label: '태블릿 적용', icon: <TabletIcon size={16} className="text-violet-600" /> },
+                    { to: `${base}/marketing/qr?workspace=use`, label: 'QR 배치·출력', icon: <QrCode size={16} className="text-primary-600" /> },
                     { to: '/work/kpa-society/online-sales/settings', label: '판매 설정', icon: <Settings size={16} className="text-emerald-600" /> },
                   ]}
                 />
@@ -313,15 +281,12 @@ export function StoreHomePage() {
           <StoreHomeActivityPanel
             title="홍보 성과 요약"
             moreLabel="상세 분석"
-            moreTo="/store/analytics/marketing"
+            moreTo={`${base}/analytics/marketing`}
             moreIcon={<ArrowRight size={12} />}
             isEmpty={!analytics || analytics.topQrCodes.length === 0}
             emptyContent={
-              <GuideEditableSection
-                pageKey="store"
-                sectionKey="empty-marketing"
-                defaultContent="아직 홍보 성과 데이터가 없습니다"
-              />
+              analytics ? <GuideEditableSection pageKey="store" sectionKey="empty-marketing" defaultContent="아직 홍보 성과 데이터가 없습니다" />
+                : <p role="status" className="text-sm text-amber-800">홍보 성과를 확인하지 못했습니다. 현황을 다시 조회해 주세요.</p>
             }
           >
             {analytics && (
@@ -344,11 +309,8 @@ export function StoreHomePage() {
             title="최근 활동"
             isEmpty={recentScans.length === 0}
             emptyContent={
-              <GuideEditableSection
-                pageKey="store"
-                sectionKey="empty-activity"
-                defaultContent="최근 활동 기록이 없습니다"
-              />
+              scans ? <GuideEditableSection pageKey="store" sectionKey="empty-activity" defaultContent="최근 활동 기록이 없습니다" />
+                : <p role="status" className="text-sm text-amber-800">최근 활동을 확인하지 못했습니다. 현황을 다시 조회해 주세요.</p>
             }
           >
             <div className="flex flex-col gap-1">
@@ -381,7 +343,8 @@ export function StoreHomePage() {
 function formatRelativeTime(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
+  if (!Number.isFinite(then)) return '시간 미확인';
+  const diffMs = Math.max(0, now - then);
   const diffMin = Math.floor(diffMs / 60000);
   if (diffMin < 1) return '방금 전';
   if (diffMin < 60) return `${diffMin}분 전`;
