@@ -7,11 +7,14 @@
  * 보완 요청 건은 '수정 재제출'로 편집 모달(StoreNewProductRequestModal editRequest)로 이어진다.
  */
 
-import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { X, RefreshCw, Loader2, Package, Pencil } from 'lucide-react';
 import { Pagination } from '@o4o/operator-ux-core';
 import { colors } from '../../styles/theme';
-import { listProductRequests, type StoreProductRequest, type StoreRequestDisplayStatus } from '../../api/storeProductRequests';
+import { type StoreProductRequest, type StoreRequestDisplayStatus } from '../../api/storeProductRequests';
+
+import { ProductRequestDialog, useProductRequestScope } from './productRequests/requestSession';
+import { useProductRequestList } from './productRequests/useProductRequestList';
 
 interface Props {
   open: boolean;
@@ -21,8 +24,6 @@ interface Props {
   /** 목록 강제 갱신 트리거 (제출/재제출 후 증가) */
   refreshKey?: number;
 }
-
-const PAGE_LIMIT = 20;
 
 const STATUS_TONE: Record<StoreRequestDisplayStatus, CSSProperties> = {
   reviewing: { background: '#DBEAFE', color: '#1D4ED8' },
@@ -36,31 +37,17 @@ function formatDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
 }
 
-export function StoreProductRequestsListModal({ open, onClose, onEdit, refreshKey }: Props) {
-  const [page, setPage] = useState(1);
-  const [items, setItems] = useState<StoreProductRequest[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function StoreProductRequestsListModal(props: Props) {
+  const scope = useProductRequestScope();
+  if (!props.open || !scope.ready) return null;
+  return <ProductRequestList key={scope.key} {...props} organizationId={scope.organizationId!} />;
+}
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    listProductRequests({ page, limit: PAGE_LIMIT })
-      .then((r) => { setItems(r.items); setTotal(r.meta.total); })
-      .catch((e: any) => setError(e?.message || '요청 목록을 불러오지 못했습니다'))
-      .finally(() => setLoading(false));
-  }, [page]);
-
-  useEffect(() => { if (open) setPage(1); }, [open]);
-  useEffect(() => { if (open) load(); }, [open, load, refreshKey]);
-
-  if (!open) return null;
+function ProductRequestList({ onClose, onEdit, refreshKey, organizationId }: Props & { organizationId: string }) {
+  const { page, setPage, items, total, loading, error, refresh: load, totalPages } = useProductRequestList(organizationId, refreshKey);
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
+    <ProductRequestDialog style={styles.overlay} label="내 신규 상품 등록 요청" onClose={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
           <div>
@@ -68,12 +55,13 @@ export function StoreProductRequestsListModal({ open, onClose, onEdit, refreshKe
             <p style={styles.subtitle}>제출한 요청의 처리 상태를 확인합니다. 보완 요청은 수정 후 다시 제출할 수 있습니다.</p>
           </div>
           <div style={styles.headerActions}>
-            <button onClick={load} style={styles.refreshBtn} aria-label="새로고침"><RefreshCw size={14} /></button>
+            <button onClick={load} disabled={loading} style={styles.refreshBtn} aria-label="새로고침"><RefreshCw size={14} /></button>
             <button onClick={onClose} style={styles.closeBtn} aria-label="닫기"><X size={18} /></button>
           </div>
         </div>
 
-        <div style={styles.tableWrap}>
+        <p className="mb-2 text-xs text-slate-500 md:hidden">표를 좌우로 이동하면 요청 상태와 수정 버튼을 확인할 수 있습니다.</p>
+        <div style={styles.tableWrap} role="region" aria-label="신규 상품 요청 목록, 좌우로 이동 가능" tabIndex={0} aria-busy={loading}>
           <table style={styles.table}>
             <thead>
               <tr>
@@ -89,7 +77,7 @@ export function StoreProductRequestsListModal({ open, onClose, onEdit, refreshKe
               {loading ? (
                 <tr><td colSpan={6} style={styles.empty}><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> 불러오는 중…</td></tr>
               ) : error ? (
-                <tr><td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td></tr>
+                <tr><td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}><div role="alert">{error} <button type="button" onClick={load}>다시 시도</button></div></td></tr>
               ) : items.length === 0 ? (
                 <tr><td colSpan={6} style={styles.empty}>아직 제출한 신규 상품 등록 요청이 없습니다.</td></tr>
               ) : (
@@ -133,19 +121,21 @@ export function StoreProductRequestsListModal({ open, onClose, onEdit, refreshKe
           </table>
         </div>
 
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+        <fieldset disabled={loading || !!error} className="[&>div]:flex-wrap" style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+        </fieldset>
 
         <p style={styles.footnote}>
           ※ 등록 완료된 요청의 상품은 관리자 승인 후 <b>매장 경영활용 제품</b>으로 자동 연결됩니다(후속 단계). 현재 단계에서는 요청 접수·상태 확인만 제공합니다.
         </p>
       </div>
-    </div>
+    </ProductRequestDialog>
   );
 }
 
 const styles: Record<string, CSSProperties> = {
   overlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.45)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '40px 16px', overflowY: 'auto' },
-  modal: { background: colors.white, borderRadius: '12px', width: '100%', maxWidth: '860px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', padding: '20px 22px' },
+  modal: { minWidth: 0, background: colors.white, borderRadius: '12px', width: '100%', maxWidth: '860px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)', padding: '20px 22px' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '14px' },
   title: { fontSize: '17px', fontWeight: 600, color: colors.neutral800, margin: 0 },
   subtitle: { fontSize: '13px', color: colors.neutral500, margin: '4px 0 0' },

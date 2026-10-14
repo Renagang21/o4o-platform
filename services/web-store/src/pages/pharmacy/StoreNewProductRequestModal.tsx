@@ -11,18 +11,12 @@
  * 상세설명서·허가번호·가격·재고·배송 입력란 없음(WO 요구).
  */
 
-import { useEffect, useState, useCallback, type CSSProperties, type ReactNode } from 'react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { X, Search, Loader2, Package, Plus, Send, ImagePlus, Trash2 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
-import { searchO4oStandardProducts, registerStandardProductToStore, type O4oStandardProduct } from '../../api/o4oStandardProducts';
-import {
-  submitProductRequest,
-  resubmitProductRequest,
-  type StoreProductRequest,
-  type StoreProductRequestInput,
-  type StoreRequestApiError,
-} from '../../api/storeProductRequests';
+import type { StoreProductRequest } from '../../api/storeProductRequests';
+import { useProductRequestForm } from './productRequests/useProductRequestForm';
+import { ProductRequestDialog, useProductRequestScope } from './productRequests/requestSession';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 /** O4O 표준 분류 선택지 (자유입력 금지 — 백엔드 PRODUCT_CLASSIFICATION_CODES 정합) */
@@ -47,170 +41,23 @@ interface Props {
   onAddExisting?: () => void;
 }
 
-interface FormState {
-  productName: string;
-  classification: string;
-  barcode: string;
-  noBarcode: boolean;
-  manufacturer: string;
-  spec: string;
-  unit: string;
-  imageUrl: string;
+export function StoreNewProductRequestModal(props: Props) {
+  const scope = useProductRequestScope();
+  if (!props.open || !scope.ready) return null;
+  return <ProductRequestForm key={`${scope.key}:${props.editRequest?.id ?? 'new'}`}
+    {...props} organizationId={scope.organizationId!} />;
 }
 
-const EMPTY_FORM: FormState = {
-  productName: '',
-  classification: '',
-  barcode: '',
-  noBarcode: false,
-  manufacturer: '',
-  spec: '',
-  unit: '',
-  imageUrl: '',
-};
-
-export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRequest, onAddExisting }: Props) {
+function ProductRequestForm({ onClose, onSubmitted, editRequest, onAddExisting, organizationId }: Props & { organizationId: string }) {
   const isEdit = !!editRequest;
-  const [step, setStep] = useState<'search' | 'form'>(isEdit ? 'form' : 'search');
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
+  const state = useProductRequestForm({ organizationId, editRequest, onSubmitted, onClose });
+  const { step, setStep, form, patch, searchInput, setSearchInput, searched, searchLoading, searchResults,
+    runSearch, goToForm, registeringId, handleRegisterExisting, submitting, handleSubmit } = state;
+  const busy = submitting || registeringId !== null;
   const [showMediaPicker, setShowMediaPicker] = useState(false);
 
-  // 중복검색 상태
-  const [searchInput, setSearchInput] = useState('');
-  const [searched, setSearched] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<O4oStandardProduct[]>([]);
-  const [registeringId, setRegisteringId] = useState<string | null>(null);
-
-  // 열릴 때 초기화 (신규/편집 분기)
-  useEffect(() => {
-    if (!open) return;
-    if (editRequest) {
-      setStep('form');
-      setForm({
-        productName: editRequest.productName ?? '',
-        classification: editRequest.classification?.code ?? '',
-        barcode: editRequest.barcode ?? '',
-        noBarcode: editRequest.noBarcode,
-        manufacturer: editRequest.manufacturer ?? '',
-        spec: editRequest.spec ?? '',
-        unit: editRequest.unit ?? '',
-        imageUrl: editRequest.imageUrl ?? '',
-      });
-    } else {
-      setStep('search');
-      setForm(EMPTY_FORM);
-    }
-    setSearchInput('');
-    setSearched(false);
-    setSearchResults([]);
-    setSubmitting(false);
-  }, [open, editRequest]);
-
-  const patch = useCallback((p: Partial<FormState>) => setForm((f) => ({ ...f, ...p })), []);
-
-  const runSearch = useCallback(async () => {
-    const q = searchInput.trim();
-    if (!q) {
-      toast.info('상품명 또는 바코드를 입력하세요.');
-      return;
-    }
-    setSearchLoading(true);
-    setSearched(true);
-    try {
-      const r = await searchO4oStandardProducts({ q, page: 1, limit: 20 });
-      setSearchResults(r.items);
-    } catch (e: any) {
-      toast.error(e?.message || '검색에 실패했습니다');
-      setSearchResults([]);
-    } finally {
-      setSearchLoading(false);
-    }
-  }, [searchInput]);
-
-  // 검색 결과의 기존 상품을 매장 경영활용 제품으로 추가
-  const handleRegisterExisting = useCallback(async (p: O4oStandardProduct) => {
-    setRegisteringId(p.id);
-    try {
-      const res = await registerStandardProductToStore(p.id);
-      if (res.message === 'ALREADY_LISTED') {
-        toast.info(`이미 매장 경영활용 제품에 등록된 상품입니다: ${p.name}`);
-      } else {
-        toast.success(`매장 경영활용 제품으로 추가했습니다: ${p.name}`);
-      }
-      onSubmitted();
-      onClose();
-    } catch (e: any) {
-      if (e?.code === 'NO_ACTIVE_MEMBERSHIP') {
-        toast.error('활성화된 매장 멤버십이 없어 추가할 수 없습니다.');
-      } else {
-        toast.error(e?.message || '추가에 실패했습니다');
-      }
-    } finally {
-      setRegisteringId(null);
-    }
-  }, [onSubmitted, onClose]);
-
-  // 신규 등록 요청 폼으로 전환 (검색어를 상품명/바코드에 프리필)
-  const goToForm = useCallback(() => {
-    const q = searchInput.trim();
-    // 숫자로만 이뤄진 검색어는 바코드로 추정하여 프리필
-    const looksBarcode = /^\d{6,14}$/.test(q);
-    setForm((f) => ({
-      ...f,
-      productName: looksBarcode ? f.productName : (f.productName || q),
-      barcode: looksBarcode ? q : f.barcode,
-    }));
-    setStep('form');
-  }, [searchInput]);
-
-  const handleSubmit = useCallback(async () => {
-    const productName = form.productName.trim();
-    if (!productName) { toast.info('포장 표시 상품명을 입력하세요.'); return; }
-    if (!form.classification) { toast.info('O4O 표준 분류를 선택하세요.'); return; }
-    const barcode = form.barcode.trim();
-    if (!barcode && !form.noBarcode) { toast.info('바코드를 입력하거나 ‘바코드 없음’을 선택하세요.'); return; }
-
-    const input: StoreProductRequestInput = {
-      productName,
-      classification: form.classification,
-      barcode: barcode || undefined,
-      noBarcode: barcode ? false : form.noBarcode,
-      manufacturer: form.manufacturer.trim() || undefined,
-      spec: form.spec.trim() || undefined,
-      unit: form.unit.trim() || undefined,
-      imageUrl: form.imageUrl || undefined,
-    };
-
-    setSubmitting(true);
-    try {
-      if (isEdit && editRequest) {
-        await resubmitProductRequest(editRequest.id, input);
-        toast.success('보완 내용을 반영해 다시 제출했습니다.');
-      } else {
-        await submitProductRequest(input);
-        toast.success('신규 상품 등록 요청을 제출했습니다. 검토 결과는 요청 목록에서 확인할 수 있습니다.');
-      }
-      onSubmitted();
-      onClose();
-    } catch (e: any) {
-      const err = e as StoreRequestApiError;
-      if (err?.code === 'EXISTING_PRODUCT_FOUND') {
-        toast.info('이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품 추가로 전환하세요.');
-        if (onAddExisting) { onClose(); onAddExisting(); }
-      } else {
-        toast.error(err?.message || '요청 제출에 실패했습니다');
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  }, [form, isEdit, editRequest, onSubmitted, onClose, onAddExisting]);
-
-  if (!open) return null;
-
   return (
-    <div style={styles.overlay} onClick={onClose}>
+    <ProductRequestDialog preventBackdropClose={busy} focusKey={step} style={styles.overlay} label={isEdit ? '등록 요청 보완 · 재제출' : '신규 상품 등록 요청'} onClose={() => showMediaPicker ? setShowMediaPicker(false) : onClose()}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={styles.header}>
           <div>
@@ -224,19 +71,26 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
           <button onClick={onClose} style={styles.closeBtn} aria-label="닫기"><X size={18} /></button>
         </div>
 
+        {state.actionError && <div role="alert" className="mb-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {state.actionError}
+          {state.existingFound && onAddExisting && <button type="button" className="ml-2 underline" onClick={() => { onClose(); onAddExisting(); }}>기존 상품 추가로 이동</button>}
+        </div>}
+        {busy && <p role="status">처리 중입니다. 결과를 확인할 때까지 기다려 주세요.</p>}
+        <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
         {step === 'search' ? (
           <>
             <div style={styles.searchRow}>
               <div style={styles.searchWrap}>
                 <Search size={15} style={styles.searchIcon} />
                 <input
+                  aria-label="상품명 또는 바코드 검색"
+                  data-request-autofocus
                   type="search"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
                   placeholder="상품명 또는 바코드로 검색"
                   style={styles.searchInput}
-                  autoFocus
                 />
               </div>
               <button onClick={runSearch} disabled={searchLoading} style={styles.searchBtn}>
@@ -252,6 +106,8 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
                 </div>
               ) : searchLoading ? (
                 <div style={styles.empty}><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> 검색 중…</div>
+              ) : state.searchError ? (
+                <div role="alert" style={styles.empty}>{state.searchError} <button type="button" onClick={() => void runSearch()}>다시 검색</button></div>
               ) : searchResults.length === 0 ? (
                 <div style={styles.empty}>검색 결과가 없습니다. 아래에서 신규 등록을 요청하세요.</div>
               ) : (
@@ -296,17 +152,19 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
               <Field label="포장 표시 상품명" required>
                 <input
                   type="text"
+                  aria-label="포장 표시 상품명"
+                  data-request-autofocus
                   value={form.productName}
                   onChange={(e) => patch({ productName: e.target.value })}
                   placeholder="포장에 표기된 상품명"
                   style={styles.input}
                   maxLength={255}
-                  autoFocus
                 />
               </Field>
 
               <Field label="O4O 표준 분류" required>
                 <select
+                  aria-label="O4O 표준 분류"
                   value={form.classification}
                   onChange={(e) => patch({ classification: e.target.value })}
                   style={styles.input}
@@ -322,6 +180,7 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
                 <div style={styles.barcodeRow}>
                   <input
                     type="text"
+                    aria-label="바코드"
                     value={form.barcode}
                     onChange={(e) => patch({ barcode: e.target.value })}
                     placeholder="숫자 바코드"
@@ -344,6 +203,7 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
               <Field label="제조사 또는 판매원">
                 <input
                   type="text"
+                  aria-label="제조사 또는 판매원"
                   value={form.manufacturer}
                   onChange={(e) => patch({ manufacturer: e.target.value })}
                   placeholder="제조사/판매원명"
@@ -356,6 +216,7 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
                 <Field label="규격·용량">
                   <input
                     type="text"
+                    aria-label="규격·용량"
                     value={form.spec}
                     onChange={(e) => patch({ spec: e.target.value })}
                     placeholder="예: 500"
@@ -366,6 +227,7 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
                 <Field label="단위">
                   <input
                     type="text"
+                    aria-label="단위"
                     value={form.unit}
                     onChange={(e) => patch({ unit: e.target.value })}
                     placeholder="예: ml, 정, g"
@@ -410,6 +272,7 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
             </div>
           </>
         )}
+        </fieldset>
       </div>
 
       <MediaPickerModal
@@ -418,18 +281,19 @@ export function StoreNewProductRequestModal({ open, onClose, onSubmitted, editRe
         onSelect={(asset) => { patch({ imageUrl: asset.url }); setShowMediaPicker(false); }}
         title="상품 이미지 선택"
       />
-    </div>
+    </ProductRequestDialog>
   );
 }
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: ReactNode }) {
+  const id = useId();
   return (
     <div style={styles.field}>
-      <label style={styles.label}>
+      <span id={`${id}-label`} style={styles.label}>
         {label}
         {required && <span style={styles.req}> *</span>}
-      </label>
-      {children}
+      </span>
+      <div role="group" aria-labelledby={`${id}-label`}>{children}</div>
     </div>
   );
 }
@@ -444,7 +308,7 @@ const styles: Record<string, CSSProperties> = {
 
   // search step
   searchRow: { display: 'flex', gap: '8px', marginBottom: '12px' },
-  searchWrap: { position: 'relative', flex: 1 },
+  searchWrap: { minWidth: 0, position: 'relative', flex: 1 },
   searchIcon: { position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
   searchInput: { width: '100%', padding: '10px 14px 10px 34px', border: `1px solid ${colors.neutral300}`, borderRadius: '8px', fontSize: '14px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
   searchBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0 16px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '8px', fontSize: '13px', fontWeight: 500, color: colors.white, cursor: 'pointer', whiteSpace: 'nowrap' },
@@ -458,13 +322,13 @@ const styles: Record<string, CSSProperties> = {
   resultName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   resultSub: { fontSize: '12px', color: colors.neutral400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' },
   addExistingBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', fontWeight: 500, color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
-  searchFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '12px', borderTop: `1px solid ${colors.neutral200}` },
+  searchFooter: { flexWrap: 'wrap', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '12px', borderTop: `1px solid ${colors.neutral200}` },
   footerNote: { fontSize: '13px', color: colors.neutral500 },
 
   // form step
   formBody: { display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '58vh', overflowY: 'auto', paddingRight: '4px' },
   field: { display: 'flex', flexDirection: 'column', gap: '6px' },
-  twoCol: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' },
+  twoCol: { minWidth: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' },
   label: { fontSize: '13px', fontWeight: 500, color: colors.neutral700 },
   req: { color: '#DC2626' },
   input: { width: '100%', padding: '9px 12px', border: `1px solid ${colors.neutral300}`, borderRadius: '8px', fontSize: '14px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
@@ -477,7 +341,7 @@ const styles: Record<string, CSSProperties> = {
   previewImg: { width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: `1px solid ${colors.neutral200}` },
   removeImgBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '6px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '6px', fontSize: '12px', color: '#DC2626', cursor: 'pointer' },
   formNote: { fontSize: '12px', color: colors.neutral500, lineHeight: 1.6, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px', margin: 0 },
-  formFooter: { display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${colors.neutral200}` },
+  formFooter: { flexWrap: 'wrap', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', paddingTop: '14px', borderTop: `1px solid ${colors.neutral200}` },
   backBtn: { padding: '8px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '8px', fontSize: '13px', color: colors.neutral600, cursor: 'pointer' },
   cancelBtn: { padding: '8px 14px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '8px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '8px', fontSize: '13px', fontWeight: 500, color: colors.white, cursor: 'pointer' },
