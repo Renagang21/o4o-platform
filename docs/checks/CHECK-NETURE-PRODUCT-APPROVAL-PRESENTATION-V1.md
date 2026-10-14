@@ -1,7 +1,7 @@
 # Neture 상품 승인 표시·입력 책임 정비 CHECK
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13
+> **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-14
 > **근거 WO/IR**: [TODO](../work-orders/WO-NETURE-PRODUCT-APPROVAL-PRESENTATION-V1.md)
 
 ## 변경과 효과
@@ -54,3 +54,9 @@ Chromium desktop/mobile 16개 승인·거절 실패/전체 실패/부분 성공/
 통합 CI에서 약관 안내 asset과 검토 문서의 byte 일치 검사로 전체 관리자 띄어쓰기 2곳의 미동기화를 발견했다. Neture account notice asset에 같은 띄어쓰기만 반영했고, 다른 문장·정책/버전/DB·동의 조건은 변경하지 않았다. 기존 asset을 동일 단어 치환한 결과가 검토 draft와 정확히 일치하는지 assert한 뒤 회귀 검증한다.
 
 native dialog의 UA 기본 height:fit-content가 기존 full-height Drawer와 다름을 Chromium에서 확인했다(400px 내용/1000px viewport). Drawer에 h-full을 명시하여 기존 화면 높이와 overflow 스크롤 계약을 유지한다.
+
+## 2026-10-14 main 반영과 배포 판정
+
+PR #544 (`24b96f373`)과 PR #555 (`dadc13e62`)는 정상 main 병합 후 CI까지 통과했다. 최신 Neture 전체 94파일·838건 및 focused 50건 통과.
+Neture-only 배포는 API 의존으로 보류됐다. 별도 API 번들 타입 재export 오류와 미적용 AI quota migration/API 배포가 선행한다. **main 반영 완료이며 운영 배포 완료는 아니다.**
+실행·검증·원인·서비스 범위의 상세 근거는 [최종 CHECK](CHECK-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)를 따른다. 이 세션에서 API/migration 배포와 약사회 분회 배포는 실행하지 않았다.

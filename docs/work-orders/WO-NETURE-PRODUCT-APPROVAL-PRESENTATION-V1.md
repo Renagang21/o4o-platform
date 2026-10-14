@@ -1,7 +1,7 @@
 # Neture 상품 승인 표시·입력 책임 정비 TODO
 
 > **상태**: COMPLETED
-> **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-13
+> **작성일**: 2026-10-13 · **최종 갱신**: 2026-10-14
 > **근거 WO/IR**: 사용자 요청 — 남은 복잡성 작업 진행, 조사 → TODO 보완 → 작업 → push
 
 기준 main `75a28d9313fc2be31cc53c12b94d566314748d75`. 세션 전용 clone/branch에서 진행한다.
@@ -33,3 +33,9 @@
 ## 통합·배포 후속
 
 사용자 요청: 이 세션에서 작업한 미병합·미배포 항목 모두 merge/배포. 앞선 8개 트랙은 PR #538 및 Promote 38387560873으로 완료. 남은 표시 정비 branch는 최신 main `3809c42db`를 merge했고 source 파일 충돌은 없었다. 신규 migration 변경 없이 Neture 배포 범위를 Delivery 판정으로 확정한다. 약사회 분회는 제외하며 무관한 다른 세션 PR·기존 미커밋 문서는 보존한다.
+
+## 2026-10-14 main 반영과 배포 판정
+
+PR #544 (`24b96f373`)과 PR #555 (`dadc13e62`)는 정상 main 병합 후 CI까지 통과했다. 최신 Neture 전체 94파일·838건 및 focused 50건 통과.
+Neture-only 배포는 API 의존으로 보류됐다. 별도 API 번들 타입 재export 오류와 미적용 AI quota migration/API 배포가 선행한다. **main 반영 완료이며 운영 배포 완료는 아니다.**
+실행·검증·원인·서비스 범위의 상세 근거는 [최종 CHECK](../checks/CHECK-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)를 따른다. 이 세션에서 API/migration 배포와 약사회 분회 배포는 실행하지 않았다.
