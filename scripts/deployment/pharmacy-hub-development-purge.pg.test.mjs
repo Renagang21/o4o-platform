@@ -58,6 +58,26 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await seed();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       const plan=await new PharmacyHubDevelopmentPurge().up(q,true);assert.equal(plan.applied,false);
       assert.equal(Object.values(plan.counts).reduce((a,b)=>a+b,0),60);await client.query('ROLLBACK');
+      const {readFile}=await import('node:fs/promises');
+      const migration=await readFile(new URL('../../apps/api-server/src/database/migrations/1791795139475-RetireLegacyErasureIdentityHashes.ts',import.meta.url),'utf8');
+      const fenceBody=migration.match(/AS \$\$(.*?)\$\$/s)[1];
+      await client.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+        CREATE TABLE account_erasure_operations(id uuid,state text,expires_at timestamptz,subject_hash text);
+        CREATE TABLE account_erasure_reference_keys(operation_id uuid,key_kind text,key_hash text);
+        CREATE FUNCTION account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$${fenceBody}$$;
+        CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON supplier_product_offers
+          FOR EACH ROW EXECUTE FUNCTION account_erasure_write_fence()`);
+      await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      assert.equal((await new PharmacyHubDevelopmentPurge().up(q,true)).applied,false);await client.query('ROLLBACK');
+      await client.query("INSERT INTO account_erasure_operations VALUES($1,'completed',NULL,encode(public.digest($2,'sha256'),'hex'))",[uuid(950),uuid(301)]);
+      await begin();
+      await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),error=>error.code==='P0001'&&error.message==='ACCOUNT_ERASURE_PENDING');
+      await client.query('ROLLBACK');
+      assert.equal((await client.query('SELECT count(*)::text AS count FROM o4o_payments')).rows[0].count,'6');
+      await client.query('DELETE FROM account_erasure_operations');
+      await begin();assert.equal((await new PharmacyHubDevelopmentPurge().up(q)).applied,true);await client.query('ROLLBACK');
+      assert.equal((await client.query("SELECT tgenabled FROM pg_trigger WHERE tgname='account_erasure_write_fence'")).rows[0].tgenabled,'O');
+      await seed();
       const scenarios=[
         ["UPDATE supplier_product_offers SET is_public=true WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
         ["UPDATE supplier_product_offers SET allowed_seller_ids=ARRAY['seller'] WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
