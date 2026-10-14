@@ -16,9 +16,13 @@
 
 ## 통합·배포
 
-현재 source main 통합, required CI, 운영 배포는 미완료다. PR #556의 등록/import 라벨 개선을 반영하고 중복을 제거한 후 재검증한다. 과거 기록의 미병합 표시는 현재 Git ancestry와 별도 배포 CHECK로 판단한다.
+PR #556의 등록/import 라벨 개선을 반영하고 두 runtime 파일의 중복 변경을 제거했다. 이번 변경은 프로필·서류·배송·이미지·import 결과/HTML 입력·스팟 날짜 접근성을 담당한다. 기존 두 파일의 라벨과 브랜드 두 입력 계약은 upstream 구현을 그대로 유지한다.
 
-운영자 PR #544의 실제 Promote 38491966980에서 API의 `Build API server (bundled with tsup)` 단계가 실패했고 downstream이 보류됐다. 이후 Promote 38493246341은 classify SUCCESS지만 deploy/report job 모두 skipped다. 성공한 run 상태만으로 DEPLOYED로 기록하지 않는다. 상세 실패 로그는 허용되지 않은 리다이렉트 destination 때문에 읽지 못했으며 근본 원인은 아직 확정하지 않는다.
+최신 main `f2bc1076f` 반영 후 Neture 전체 95 files / 849 tests PASS, 타입 포함 빌드와 변경 TS/TSX lint PASS. Chromium 1440/390/320px를 다시 실행하여 같은 6 fixture 화면 모두 PASS, 6 screenshot을 보존했다. 9개 runtime 파일의 onChange/onClick 등 이벤트 handler AST를 upstream과 대조해 전부 동일함을 확인했다. 브라우저는 현재 적용된 Basic 컴포넌트의 브랜드 직접 입력 이름을 사용하도록 fixture를 정합했다.
+
+현재 source main 통합, required CI, 운영 배포는 미완료다. 과거 기록의 미병합 표시는 현재 Git ancestry와 별도 배포 CHECK로 판단한다.
+
+운영자 PR #544의 실제 Promote 38491966980에서 API의 `Build API server (bundled with tsup)` 단계가 실패했고 downstream이 보류됐다. 이후 Promote 38493246341은 classify SUCCESS지만 deploy/report job 모두 skipped다. 성공한 run 상태만으로 DEPLOYED로 기록하지 않는다. 상세 실패 로그는 허용되지 않은 리다이렉트 destination 때문에 읽지 못했으며 근본 원인은 아직 확정하지 않는다. 이후 별도 PR #557이 운영 번들 타입 수출 오류를 다루고 있는 것을 확인했다. 해당 소스/CI/배포를 이번 UI 변경의 검증으로 대신 세지 않는다.
 
 ## 남은 외부 요건
 

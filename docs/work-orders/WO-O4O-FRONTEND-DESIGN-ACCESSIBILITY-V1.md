@@ -9,7 +9,7 @@
 
 Design Reference: `Service.Professional` ([기준](../../ui-guidelines/theme-profiles/service.professional.md)). [Design Core](../rules/DESIGN-CORE-GOVERNANCE.md)와 [역할별 업무공간](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)을 따른다. 기존 공통 컴포넌트를 소비하며 새로운 공통 API·정책·권한·저장 payload를 만들지 않는다.
 
-착수 main `7f2956b0c`. 다른 세션의 공급자 등록/가져오기 라벨 정비가 후속 PR #556에 포함되었다. 통합 전 최신 main을 반영해 해당 중복 변경을 제거한다. 최초 조사에서의 완료/미완료 판정은 후속 배포와 코드 증거에 따라 갱신한다.
+착수 main `7f2956b0c`. 다른 세션의 공급자 등록/가져오기 라벨 정비가 후속 PR #556에 포함되었다. 최신 main `f2bc1076f`를 반영해 해당 중복 변경을 제거하고 기존 브랜드 두 입력의 이름/연결을 유지했다. 최초 조사에서의 완료/미완료 판정은 후속 배포와 코드 증거에 따라 갱신한다.
 
 ## 검증과 종료
 
@@ -26,7 +26,7 @@ Design Reference: `Service.Professional` ([기준](../../ui-guidelines/theme-pro
 | 최신 운영자 개선 배포 | 최근 성공 Promote도 배포 job이 전부 skipped인 사례가 있다. API dependency와 현재 main CI, 실제 배포 job/serving 판정을 확인한다 |
 | 운영 로그인 검증 | `docs/local/TEST-ACCOUNT.txt`가 현재 클라우드에 없다. 승인된 비공개 전달/환경 바인딩이 필요하며 채팅에 값을 요청하지 않는다 |
 | O4O 약국 자산 | `PHARMACY_BRAND_ASSETS_READY=false`, 기존 slot 유지. 사용자 제작 로고/favicon/OG/PWA 자산이 필요하다. 임의 심볼을 제작하지 않는다 |
-| 정적 host SEO | Neture 공용 HTML의 runtime SEO는 정적 crawler를 해결하지 않는다. supplier/funding/community HTML 선택을 nginx/edge에서 처리해야 하므로 Docker/배포 인프라 변경은 별도 명시 범위로 준비한다 |
+| 정적 host SEO | Neture runner는 현재 Node 20 + serve이며 nginx가 아니다. runtime 메타와 같은 데이터로 host별 HTML을 생성하고, nginx/edge 또는 HTTP 서버에서 Host별 HTML을 선택해야 한다. Docker/서빙 인프라 변경은 별도 명시 범위로 준비한다 |
 | 내부 화면 구조 정비 | 최신 운영자·공급자 TODO와 동시 진행 결과를 재조사해 작은 업무 단위로 확정한다. 과거 미병합/결함 기록을 현재 상태로 재사용하지 않는다 |
 
 검증 결과와 남은 요건은 [CHECK](../checks/CHECK-O4O-FRONTEND-DESIGN-ACCESSIBILITY-V1.md)에 기록한다.
