@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { RichTextEditor } from '@o4o/content-editor';
 import ProxiedImg from './ProxiedImportImage';
 import type { useSupplierProductImport } from './useSupplierProductImport';
@@ -133,9 +134,10 @@ export default function SupplierImportResult({
                 />
 
                 {/* Checkbox */}
-                <label className="absolute left-1 top-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded bg-white/80">
+                <label className="absolute left-1 top-1 flex h-5 w-5 [@media(pointer:coarse)]:h-11 [@media(pointer:coarse)]:w-11 cursor-pointer items-center justify-center rounded bg-white/80 focus-within:ring-2 focus-within:ring-emerald-500">
                   <input
                     type="checkbox"
+                    aria-label={`상품 이미지 ${idx + 1} 선택`}
                     checked={selectedImages.has(idx)}
                     onChange={() => toggleImage(idx)}
                     className="h-3.5 w-3.5 accent-emerald-600"
@@ -343,10 +345,12 @@ function Field({
   onChange: (v: string) => void;
   type?: string;
 }) {
+  const fieldId = useId();
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
+      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
       <input
+        id={fieldId}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}

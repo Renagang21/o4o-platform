@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { inputClass } from './profilePresentation';
 import type { useSupplierBusinessProfile } from './useSupplierBusinessProfile';
@@ -7,6 +8,7 @@ export default function SupplierOrderShippingFields({
 }: {
   controller: ReturnType<typeof useSupplierBusinessProfile>;
 }) {
+  const fieldId = useId();
   const {
     minOrderAmount,
     setMinOrderAmount,
@@ -44,10 +46,14 @@ export default function SupplierOrderShippingFields({
         <div className="space-y-5">
           {/* 최소 주문 금액 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-0`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
               최소 주문 금액 (원)
             </label>
             <input
+              id={`${fieldId}-field-0`}
               type="text"
               inputMode="numeric"
               value={minOrderAmount}
@@ -62,10 +68,14 @@ export default function SupplierOrderShippingFields({
 
           {/* 미달 시 물류비 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-1`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
               최소 주문 금액 미달 시 물류비 (원)
             </label>
             <input
+              id={`${fieldId}-field-1`}
               type="text"
               inputMode="numeric"
               value={minOrderSurcharge}
@@ -80,10 +90,14 @@ export default function SupplierOrderShippingFields({
 
           {/* 안내 문구 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-2`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
               주문 조건 안내 문구 (선택)
             </label>
             <textarea
+              id={`${fieldId}-field-2`}
               value={orderConditionNote}
               onChange={(e) => setOrderConditionNote(e.target.value)}
               placeholder="예: 도서/산간 지역은 별도 협의가 필요합니다."
@@ -147,10 +161,14 @@ export default function SupplierOrderShippingFields({
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-3`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 기본 배송비 (원)
               </label>
               <input
+                id={`${fieldId}-field-3`}
                 type="text"
                 inputMode="numeric"
                 value={baseShippingFee}
@@ -160,10 +178,14 @@ export default function SupplierOrderShippingFields({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-4`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 무료배송 기준 금액 (원)
               </label>
               <input
+                id={`${fieldId}-field-4`}
                 type="text"
                 inputMode="numeric"
                 value={freeShippingThreshold}
@@ -173,10 +195,14 @@ export default function SupplierOrderShippingFields({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-5`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 평균 출고 소요일 (일)
               </label>
               <input
+                id={`${fieldId}-field-5`}
                 type="text"
                 inputMode="numeric"
                 value={averageDispatchDays}
@@ -188,10 +214,14 @@ export default function SupplierOrderShippingFields({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-6`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
               일반 배송 안내 (선택)
             </label>
             <textarea
+              id={`${fieldId}-field-6`}
               value={shippingStandard}
               onChange={(e) => setShippingStandard(e.target.value)}
               placeholder="예: 평일 14시 이전 주문 시 당일 출고"
@@ -202,10 +232,14 @@ export default function SupplierOrderShippingFields({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-7`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 제주/도서산간 안내 (선택)
               </label>
               <textarea
+                id={`${fieldId}-field-7`}
                 value={shippingIsland}
                 onChange={(e) => setShippingIsland(e.target.value)}
                 placeholder="예: 제주/도서산간 추가 배송비 협의"
@@ -215,10 +249,14 @@ export default function SupplierOrderShippingFields({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-8`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 산간지역 안내 (선택)
               </label>
               <textarea
+                id={`${fieldId}-field-8`}
                 value={shippingMountain}
                 onChange={(e) => setShippingMountain(e.target.value)}
                 placeholder="예: 일부 산간지역 배송 지연 가능"
@@ -229,10 +267,14 @@ export default function SupplierOrderShippingFields({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-9`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
               반품/교환 안내 (선택)
             </label>
             <textarea
+              id={`${fieldId}-field-9`}
               value={returnExchangeNotice}
               onChange={(e) => setReturnExchangeNotice(e.target.value)}
               placeholder="예: 단순 변심 반품은 수령 후 7일 이내, 왕복 배송비 구매자 부담"

@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Building2, FileText, MapPin } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
@@ -9,6 +10,7 @@ export default function SupplierBusinessInfo({
 }: {
   controller: ReturnType<typeof useSupplierBusinessProfile>;
 }) {
+  const fieldId = useId();
   const {
     profile,
     representativeName,
@@ -42,15 +44,32 @@ export default function SupplierBusinessInfo({
         <div className="space-y-5">
           {/* 상호명 (읽기 전용) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">상호명</label>
-            <input type="text" value={profile.name} disabled className={disabledInputClass} />
+            <label
+              htmlFor={`${fieldId}-field-0`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              상호명
+            </label>
+            <input
+              id={`${fieldId}-field-0`}
+              type="text"
+              value={profile.name}
+              disabled
+              className={disabledInputClass}
+            />
             <p className="mt-1 text-xs text-gray-400">상호명은 공급자 등록 시 설정됩니다.</p>
           </div>
 
           {/* 대표자명 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">대표자명</label>
+            <label
+              htmlFor={`${fieldId}-field-1`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              대표자명
+            </label>
             <input
+              id={`${fieldId}-field-1`}
               type="text"
               value={representativeName}
               onChange={(e) => setRepresentativeName(e.target.value)}
@@ -61,11 +80,15 @@ export default function SupplierBusinessInfo({
 
           {/* 사업자등록번호 */}
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-2`}
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5"
+            >
               <FileText className="w-3.5 h-3.5 text-gray-400" />
               사업자등록번호
             </label>
             <input
+              id={`${fieldId}-field-2`}
               type="text"
               value={businessNumber}
               onChange={(e) => setBusinessNumber(e.target.value)}
@@ -98,11 +121,11 @@ export default function SupplierBusinessInfo({
           />
 
           {/* 사업장 주소 — WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
-          <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+          <div role="group" aria-labelledby={`${fieldId}-address`}>
+            <p id={`${fieldId}-address`} className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
               <MapPin className="w-3.5 h-3.5 text-gray-400" />
               사업장 주소
-            </label>
+            </p>
             <AddressSearch
               zipCode={businessZipCode}
               address={businessAddress}

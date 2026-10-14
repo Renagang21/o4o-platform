@@ -10,6 +10,7 @@
  * 원칙: 관리자 HTML 원문은 서버/DB/로그에 저장하지 않는다(선택 이미지 URL 만 복사 요청).
  */
 
+import { useId } from 'react';
 import SupplierActivationGate from '../../components/supplier/SupplierActivationGate';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import { useSupplierProductImport } from './product-import/useSupplierProductImport';
@@ -17,6 +18,7 @@ import SupplierImportResult from './product-import/SupplierImportResult';
 import SupplierImportSettings from './product-import/SupplierImportSettings';
 
 export default function SupplierProductImportPage() {
+  const fieldId = useId();
   const controller = useSupplierProductImport();
   const {
     sourceUrl,
@@ -122,13 +124,17 @@ export default function SupplierProductImportPage() {
           </p>
 
           {/* Shop domain */}
-          <label className="mb-1 block text-sm font-medium text-slate-700">
+          <label
+            htmlFor={`${fieldId}-source-url`}
+            className="mb-1 block text-sm font-medium text-slate-700"
+          >
             내 쇼핑몰 주소{' '}
             <span className="font-normal text-slate-400">
               (이미지 주소 기준 — 자동 감지되며 필요 시 수정)
             </span>
           </label>
           <input
+            id={`${fieldId}-source-url`}
             type="url"
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
@@ -138,7 +144,9 @@ export default function SupplierProductImportPage() {
 
           {/* HTML textarea + file load */}
           <div className="mb-1 flex items-center justify-between">
-            <label className="block text-sm font-medium text-slate-700">관리자 HTML *</label>
+            <label htmlFor={`${fieldId}-html`} className="block text-sm font-medium text-slate-700">
+              관리자 HTML *
+            </label>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -147,6 +155,7 @@ export default function SupplierProductImportPage() {
               HTML 파일 불러오기 (.html / .txt)
             </button>
             <input
+              aria-label="관리자 HTML 파일"
               ref={fileInputRef}
               type="file"
               accept=".html,.htm,.txt,text/html,text/plain"
@@ -155,6 +164,7 @@ export default function SupplierProductImportPage() {
             />
           </div>
           <textarea
+            id={`${fieldId}-html`}
             value={html}
             onChange={(e) => setHtml(e.target.value)}
             rows={12}
@@ -191,7 +201,11 @@ export default function SupplierProductImportPage() {
           open={!!mediaPickerTarget}
           onClose={() => setMediaPickerTarget(null)}
           onSelect={(asset) => {
-            mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
+            mediaPickerTarget?.({
+              type: 'image',
+              url: asset.url,
+              title: asset.originalName,
+            });
             setMediaPickerTarget(null);
           }}
           title="상세 설명 이미지 선택"

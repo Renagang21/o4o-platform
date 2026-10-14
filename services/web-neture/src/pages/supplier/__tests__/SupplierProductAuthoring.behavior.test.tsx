@@ -7,16 +7,29 @@ import SupplierProductCreatePage from '../SupplierProductCreatePage';
 import SupplierProductImportPage from '../SupplierProductImportPage';
 
 const mocks = vi.hoisted(() => ({
-  supplier: { submitProductCandidate: vi.fn(), copyImages: vi.fn(), proxyImageObjectUrl: vi.fn() },
-  product: { getCategories: vi.fn(), getBrands: vi.fn(), getMasterByBarcode: vi.fn() },
+  supplier: {
+    submitProductCandidate: vi.fn(),
+    copyImages: vi.fn(),
+    proxyImageObjectUrl: vi.fn(),
+  },
+  product: {
+    getCategories: vi.fn(),
+    getBrands: vi.fn(),
+    getMasterByBarcode: vi.fn(),
+  },
   media: { upload: vi.fn() },
   toast: { error: vi.fn() },
 }));
-vi.mock('../../../lib/api', () => ({ supplierApi: mocks.supplier, productApi: mocks.product }));
+vi.mock('../../../lib/api', () => ({
+  supplierApi: mocks.supplier,
+  productApi: mocks.product,
+}));
 vi.mock('../../../lib/api/supplier', () => ({ supplierApi: mocks.supplier }));
 vi.mock('../../../lib/api/media', () => ({ mediaApi: mocks.media }));
 vi.mock('@o4o/error-handling', () => ({ toast: mocks.toast }));
-vi.mock('../../../api/guideContent', () => ({ fetchGuidePageContent: async () => ({}) }));
+vi.mock('../../../api/guideContent', () => ({
+  fetchGuidePageContent: async () => ({}),
+}));
 vi.mock('@o4o/shared-space-ui', () => ({ GuideBlock: () => null }));
 vi.mock('../../../components/supplier/SupplierActivationGate', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -101,20 +114,22 @@ const firstmallHtml =
 async function createStep3(query = '') {
   const view = mount('create', query);
   await screen.findByRole('option', { name: '일반 카테고리' });
-  fireEvent.change(view.container.querySelector('input[name="marketingName"]')!, {
+  fireEvent.change(screen.getByLabelText(/^상품명/), {
     target: { value: '검증 상품' },
   });
-  fireEvent.change(view.container.querySelector('select[name="categoryId"]')!, {
+  fireEvent.change(screen.getByLabelText(/^카테고리/), {
     target: { value: 'cat-a' },
   });
   fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
-  fireEvent.change(screen.getByLabelText('검증 공급가'), { target: { value: '2000' } });
+  fireEvent.change(screen.getByLabelText('검증 공급가'), {
+    target: { value: '2000' },
+  });
   fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
   return view;
 }
 function parseImport() {
   const view = mount('import', '?productType=quasi_drug');
-  fireEvent.change(screen.getByPlaceholderText('관리자 상품 수정 페이지의 HTML을 붙여넣으세요'), {
+  fireEvent.change(screen.getByLabelText('관리자 HTML *'), {
     target: { value: firstmallHtml },
   });
   fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
@@ -126,7 +141,10 @@ beforeEach(() => {
   vi.spyOn(window, 'confirm').mockReturnValue(true);
   vi.stubGlobal(
     'URL',
-    Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:fixture'), revokeObjectURL: vi.fn() }),
+    Object.assign(URL, {
+      createObjectURL: vi.fn(() => 'blob:fixture'),
+      revokeObjectURL: vi.fn(),
+    }),
   );
   mocks.product.getCategories.mockResolvedValue([
     { id: 'cat-a', name: '일반 카테고리', isRegulated: false },
@@ -137,7 +155,10 @@ beforeEach(() => {
     success: true,
     data: { candidateId: 'candidate-a' },
   });
-  mocks.media.upload.mockResolvedValue({ success: true, data: { url: '/fixture-upload.png' } });
+  mocks.media.upload.mockResolvedValue({
+    success: true,
+    data: { url: '/fixture-upload.png' },
+  });
   mocks.supplier.proxyImageObjectUrl.mockResolvedValue('blob:fixture');
   mocks.supplier.copyImages.mockImplementation(async (urls: string[]) => ({
     copied: urls.length,
@@ -247,10 +268,15 @@ describe('Candidate creation existing workflow', () => {
     expect(screen.queryByText('제품 정보 검토 요청 완료')).toBeNull();
   });
   it('continues a successful Candidate request after a failed master-less image upload', async () => {
-    mocks.media.upload.mockResolvedValue({ success: false, error: 'UPLOAD_FAILED' });
+    mocks.media.upload.mockResolvedValue({
+      success: false,
+      error: 'UPLOAD_FAILED',
+    });
     const view = await createStep3();
     fireEvent.change(view.container.querySelector('input[type="file"]')!, {
-      target: { files: [new File(['fixture'], 'fixture.png', { type: 'image/png' })] },
+      target: {
+        files: [new File(['fixture'], 'fixture.png', { type: 'image/png' })],
+      },
     });
     fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
     await screen.findByText('제품 정보 검토 요청 완료');
