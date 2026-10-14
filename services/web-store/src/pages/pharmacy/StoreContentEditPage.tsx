@@ -20,7 +20,6 @@
  */
 
 import { StoreContentNextSteps } from '../../components/store/StoreContentNextSteps';
-import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Loader2,
@@ -39,123 +38,11 @@ import {
 //   snapshot 은 body(html) 권위 + usage 설정 별도 보존. body 없으면 blocks→html 정규화.
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
-import { storeContentApi } from '../../api/assetSnapshot';
-
-type ContentBlock = {
-  type: 'text' | 'image' | 'link' | 'list';
-  value: string;
-  label?: string;
-  items?: string[];
-};
-
-type DisplayMode = 'default' | 'banner' | 'landing';
-
-interface UsageSettings {
-  displayMode: DisplayMode;
-  cta: {
-    enabled: boolean;
-    label: string;
-    url: string;
-    target: '_blank' | '_self';
-  };
-  qr: {
-    enabled: boolean;
-  };
-  print: {
-    enabled: boolean;
-  };
-}
-
-const DEFAULT_USAGE: UsageSettings = {
-  displayMode: 'default',
-  cta: { enabled: false, label: '', url: '', target: '_blank' },
-  qr: { enabled: false },
-  print: { enabled: false },
-};
-
-function parseContentJson(json: Record<string, unknown>): {
-  blocks: ContentBlock[];
-  usage: UsageSettings;
-  raw: Record<string, unknown>;
-} {
-  // Parse usage settings
-  const rawUsage = (json.usage || {}) as Partial<UsageSettings>;
-  const usage: UsageSettings = {
-    displayMode: rawUsage.displayMode || 'default',
-    cta: {
-      enabled: rawUsage.cta?.enabled || false,
-      label: rawUsage.cta?.label || '',
-      url: rawUsage.cta?.url || '',
-      target: rawUsage.cta?.target || '_blank',
-    },
-    qr: { enabled: rawUsage.qr?.enabled || false },
-    print: { enabled: rawUsage.print?.enabled || false },
-  };
-
-  // Try structured blocks format
-  if (Array.isArray(json.blocks)) {
-    return {
-      blocks: (json.blocks as any[]).map(b => {
-        // KPA block format: { type: 'text', content: '...' } or { type: 'image', url: '...' }
-        if ('content' in b && !('value' in b)) {
-          return { type: b.type === 'text' ? 'text' : b.type, value: b.content || '', label: b.label } as ContentBlock;
-        }
-        if ('url' in b && !('value' in b)) {
-          return { type: 'image', value: b.url || '' } as ContentBlock;
-        }
-        if (b.type === 'list' && Array.isArray(b.items)) {
-          return { type: 'list' as const, value: '', items: b.items };
-        }
-        // Standard format: { type, value, label }
-        return { type: b.type || 'text', value: b.value || '', label: b.label, items: b.items } as ContentBlock;
-      }),
-      usage,
-      raw: json,
-    };
-  }
-
-  // Fallback: convert flat fields to blocks
-  const blocks: ContentBlock[] = [];
-  if (typeof json.body === 'string' || typeof json.content === 'string') {
-    blocks.push({ type: 'text', value: (json.body || json.content || '') as string });
-  }
-  if (typeof json.imageUrl === 'string' && json.imageUrl) {
-    blocks.push({ type: 'image', value: json.imageUrl as string });
-  }
-  if (typeof json.linkUrl === 'string' && json.linkUrl) {
-    blocks.push({ type: 'link', value: json.linkUrl as string, label: (json.linkLabel || '') as string });
-  }
-
-  if (blocks.length === 0) {
-    blocks.push({ type: 'text', value: JSON.stringify(json, null, 2) });
-  }
-
-  return { blocks, usage, raw: json };
-}
-
-// WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
-//   저장된 contentJson 을 o4o 표준 편집기(html)용으로 정규화. snapshot 은 body(html) 가 권위 출처.
-//   body 없으면 html/content, 그래도 없으면 레거시 blocks 를 html 로 변환(내용 무손실).
-function contentJsonToHtml(json: Record<string, unknown>): string {
-  if (typeof json.html === 'string' && json.html.trim()) return json.html;
-  if (typeof json.body === 'string' && json.body.trim()) return json.body;
-  if (typeof json.content === 'string' && json.content.trim()) return json.content as string;
-  if (Array.isArray(json.blocks) && json.blocks.length > 0) {
-    return (json.blocks as any[])
-      .map((b) => {
-        const type = b?.type || 'text';
-        const value = b?.value ?? b?.content ?? '';
-        const url = b?.url ?? value;
-        if (type === 'image') return url ? `<p><img src="${url}" alt="" /></p>` : '';
-        if (type === 'link') return value || url ? `<p><a href="${value || url}">${b?.label || value || url}</a></p>` : '';
-        if (type === 'list' && Array.isArray(b?.items)) return `<ul>${b.items.map((i: string) => `<li>${i}</li>`).join('')}</ul>`;
-        return value ? `<p>${value}</p>` : '';
-      })
-      .filter(Boolean)
-      .join('\n');
-  }
-  return '';
-}
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { getActiveServiceKey } from '../../lib/serviceContext';
+import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
+import { emptySnapshotDraft, loadSnapshot, saveSnapshot, snapshotDraftFromRecord } from './authoring/contentAuthoringAdapters';
+import type { UsageSettings, DisplayMode } from './authoring/contentAuthoringModels';
 
 const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[] = [
   { value: 'default', label: '기본', desc: '일반 콘텐츠 표시' },
@@ -166,73 +53,24 @@ const DISPLAY_MODE_OPTIONS: { value: DisplayMode; label: string; desc: string }[
 export default function StoreContentEditPage() {
   const { snapshotId } = useParams<{ snapshotId: string }>();
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
-
-  const [title, setTitle] = useState('');
-  // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1: 레거시 블록 편집기 → o4o 표준 RichTextEditor(html)
-  const [editorContent, setEditorContent] = useState<EditorContent>({ html: '' });
-  const [editorInitialHtml, setEditorInitialHtml] = useState('');
-  const [usage, setUsage] = useState<UsageSettings>(DEFAULT_USAGE);
-  const [rawJson, setRawJson] = useState<Record<string, unknown>>({});
-  const [orgId, setOrgId] = useState<string | null>(null);
-  const [source, setSource] = useState<'store' | 'snapshot'>('snapshot');
-
-  const fetchContent = useCallback(async () => {
-    if (!snapshotId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await storeContentApi.get(snapshotId);
-      const data = res.data;
-      setTitle(data.title);
-      setSource(data.source);
-      setOrgId(data.organizationId);
-      const parsed = parseContentJson(data.contentJson);
-      const html = contentJsonToHtml(data.contentJson);
-      setEditorInitialHtml(html);
-      setEditorContent({ html });
-      setUsage(parsed.usage);
-      setRawJson(parsed.raw);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [snapshotId]);
-
-  useEffect(() => { fetchContent(); }, [fetchContent]);
-
-  const handleSave = async () => {
-    if (!snapshotId) return;
-    setSaving(true);
-    try {
-      // WO-O4O-KPA-STORE-LIBRARY-SNAPSHOT-EDITOR-UNIFY-V1:
-      //   body(html) 를 권위 출처로 저장 + 레거시 blocks 비움(공개 소비처는 body 우선 — 데모 작동 포맷).
-      //   usage 설정 및 기타 키(tags/summary 등)는 보존.
-      const contentJson: Record<string, unknown> = {
-        ...rawJson,
-        body: editorContent.html,
-        blocks: [],
-        usage,
-      };
-      await storeContentApi.save(snapshotId, { title, contentJson });
-      setSource('store');
-      setToast('저장 완료');
-      setTimeout(() => setToast(null), 3000);
-    } catch (e: any) {
-      setToast(`저장 실패: ${e.message}`);
-      setTimeout(() => setToast(null), 5000);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const updateUsage = (patch: Partial<UsageSettings>) => {
-    setUsage(prev => ({ ...prev, ...patch }));
-  };
+  const { organizationId } = useStoreOrganizationId();
+  const session = useContentAuthoringSession({
+    organizationId, serviceKey: getActiveServiceKey(), target: `snapshot:${snapshotId ?? ''}`,
+    initialDraft: emptySnapshotDraft,
+    load: () => snapshotId ? loadSnapshot(snapshotId, organizationId) : Promise.reject(new Error('Missing snapshot')),
+    toDraft: snapshotDraftFromRecord,
+    persist: (draft, record) => saveSnapshot(snapshotId!, draft, record),
+  });
+  const { loading, saving, error, reload: fetchContent, save: handleSave } = session;
+  const { title, usage } = session.draft;
+  const editorContent = { html: session.draft.html };
+  const editorInitialHtml = session.seed.html;
+  const source = session.record?.source ?? 'snapshot', orgId = session.record?.organizationId ?? null;
+  const toast = session.notice ? (session.notice.ok ? session.notice.message : `저장 실패: ${session.notice.message}`) : null;
+  const setTitle = (value: string) => session.changeDraft({ title: value });
+  const setEditorContent = (value: EditorContent) => session.changeDraft({ html: value.html });
+  const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);
+  const updateUsage = (patch: Partial<UsageSettings>) => session.changeDraft({ usage: { ...usage, ...patch } });
 
   const publicUrl = snapshotId && orgId ? `${window.location.origin}/view/${snapshotId}?org=${orgId}` : '';
 
@@ -252,7 +90,7 @@ export default function StoreContentEditPage() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         <div className="flex flex-col items-center justify-center py-20 text-red-500">
           <AlertCircle className="w-6 h-6 mb-2" />
-          <p className="text-sm">{error}</p>
+          <p role="alert" className="text-sm">{error}</p>
           <button onClick={fetchContent} className="mt-3 text-sm text-blue-600 hover:underline">
             다시 시도
           </button>
@@ -266,7 +104,7 @@ export default function StoreContentEditPage() {
       <StoreContentNextSteps />
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
+        <div role={session.notice?.ok ? 'status' : 'alert'} className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
           toast.startsWith('저장 실패') ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'
         }`}>
           <CheckCircle className="w-4 h-4" />
@@ -284,7 +122,7 @@ export default function StoreContentEditPage() {
           <ArrowLeft className="w-4 h-4" />
           내 자료함 콘텐츠로
         </Link>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-slate-900">콘텐츠 편집</h1>
             <p className="text-xs text-slate-400 mt-1">
@@ -320,6 +158,7 @@ export default function StoreContentEditPage() {
         <input
           type="text"
           value={title}
+          aria-label="콘텐츠 제목"
           onChange={e => setTitle(e.target.value)}
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           placeholder="콘텐츠 제목"
@@ -343,8 +182,8 @@ export default function StoreContentEditPage() {
                 additionalInstruction,
               })}
               currentHtml={editorContent.html}
-              onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
-              onNotify={(message) => { setToast(message); setTimeout(() => setToast(null), 3000); }}
+              onApplyHtml={setEditorInitialHtml}
+              onNotify={(message, kind) => session.notify(message, kind === 'success')}
             />
           </div>
           <RichTextEditor showInternalAi={false}

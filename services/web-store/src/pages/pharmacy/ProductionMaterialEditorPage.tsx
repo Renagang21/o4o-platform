@@ -35,18 +35,16 @@
  *   - 저장 후 → /store/library/contents 이동 (canonical 결과 탐색 화면. 생성·편집 두 분기 모두 동일)
  */
 
-import { useState, useCallback, useEffect, type CSSProperties } from 'react';
+import { useCallback, type CSSProperties } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, FileText, Loader2 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import type { EditorContent } from '@o4o/content-editor';
-import {
-  createStoreExecutionAsset,
-  getStoreExecutionAsset,
-  updateStoreExecutionAsset,
-} from '../../api/storeExecutionAssets';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { getActiveServiceKey } from '../../lib/serviceContext';
+import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
+import { loadMaterial, saveMaterial, materialDraftFromRecord, validateNewContent, type MaterialDraft } from './authoring/contentAuthoringAdapters';
 import { colors } from '../../styles/theme';
 import { PRODUCTION_TARGET_CATALOG, type ProductionTarget } from './productionTargets';
 import { findTemplate } from './productionTemplates';
@@ -102,97 +100,22 @@ export default function ProductionMaterialEditorPage() {
         ? '제작 자료 편집'
         : '매장 제작 자료 편집';
 
-  const [title, setTitle] = useState(state.title ?? '');
-  const [selectedType, setSelectedType] = useState<ProductionTarget | null>(null);
-  const [editorContent, setEditorContent] = useState<EditorContent>({ html: createInitialHtml });
-  const [saving, setSaving] = useState(false);
-
-  // 편집 모드: 본문 로드 전까지 editor 를 렌더하지 않아 RichTextEditor 초기값이 정확히 주입되게 한다.
-  const [loading, setLoading] = useState(isEditMode);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [editorInitialHtml, setEditorInitialHtml] = useState(createInitialHtml);
-
-  useEffect(() => {
-    if (!editId) return;
-    let cancelled = false;
-    setLoading(true);
-    setLoadError(null);
-    (async () => {
-      try {
-        const res = await getStoreExecutionAsset(editId);
-        if (cancelled) return;
-        const asset = res.data;
-        const html = asset.htmlContent ?? '';
-        setTitle(asset.title ?? '');
-        setEditorInitialHtml(html);
-        setEditorContent({ html });
-        // 콘텐츠형이 아닌 자산은 본문 편집 대상이 아님 — 방어적으로 안내 후 목록 복귀.
-        if (asset.assetType !== 'content') {
-          toast.error('이 자료는 본문 편집을 지원하지 않습니다.');
-          navigate('/store/library/contents', { replace: true });
-          return;
-        }
-      } catch {
-        if (!cancelled) setLoadError('제작 자료를 불러올 수 없습니다.');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [editId, navigate]);
-
-  const handleChange = useCallback((content: EditorContent) => {
-    setEditorContent(content);
-  }, []);
-
-  const handleSave = useCallback(async () => {
-    if (!title.trim()) {
-      toast.error('제목을 입력해 주세요.');
-      return;
-    }
-    const html = editorContent.html;
-    if (!html || html === '<p></p>' || html.trim() === '') {
-      toast.error('내용을 입력해 주세요.');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      if (isEditMode && editId) {
-        // WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1:
-        //   같은 store_execution_assets row 를 update — id/organization_id/asset_type 보존.
-        //   이 자산을 참조하는 QR(library_item_id)은 무변경, 공개 랜딩은 수정된 최신 본문을 표시.
-        await updateStoreExecutionAsset(editId, {
-          title: title.trim(),
-          htmlContent: html,
-          ...(selectedType ? { category: selectedType } : {}),
-        });
-        toast.success('제작 자료가 저장되었습니다.');
-        navigate('/store/library/contents');
-      } else {
-        await createStoreExecutionAsset({
-          title: title.trim(),
-          assetType: 'content',
-          sourceType: 'generated',
-          category: selectedType ?? undefined,
-          htmlContent: html,
-          description: state.sourceMetadata?.sourceTitle
-            ? `출처: ${state.sourceMetadata.sourceTitle}`
-            : undefined,
-        });
-        toast.success('제작 자료가 저장되었습니다.');
-        // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: 제작 자료 메뉴를 숨겼으므로 저장 후 콘텐츠 자료함으로 이동.
-        //   신규 자산(asset_type='content')은 콘텐츠 목록(origin='execution-asset')에 노출되어 결과를 바로 확인할 수 있다.
-        navigate('/store/library/contents');
-      }
-    } catch {
-      toast.error('저장에 실패했습니다. 다시 시도해 주세요.');
-    } finally {
-      setSaving(false);
-    }
-  }, [title, selectedType, editorContent, state.sourceMetadata, navigate, isEditMode, editId]);
+  const { organizationId } = useStoreOrganizationId();
+  const initialDraft: MaterialDraft = { title: state.title ?? '', html: createInitialHtml, category: null,
+    description: state.sourceMetadata?.sourceTitle ? `출처: ${state.sourceMetadata.sourceTitle}` : undefined };
+  const session = useContentAuthoringSession({
+    organizationId, serviceKey: getActiveServiceKey(), target: `material:${editId ?? `new:${location.key}`}`,
+    initialDraft, load: editId ? () => loadMaterial(editId, organizationId) : undefined,
+    toDraft: materialDraftFromRecord, persist: (draft, record) => saveMaterial(draft, record, organizationId), validate: validateNewContent,
+    onSaved: (_record, unchanged) => { if (unchanged) navigate('/store/library/contents'); },
+  });
+  const { title, category: selectedType } = session.draft;
+  const editorContent = { html: session.draft.html }, editorInitialHtml = session.seed.html;
+  const { saving, loading, error: loadError, save: handleSave } = session;
+  const setTitle = (title: string) => session.changeDraft({ title });
+  const setSelectedType = (category: ProductionTarget | null) => session.changeDraft({ category });
+  const handleChange = (value: EditorContent) => session.changeDraft({ html: value.html });
+  const setEditorInitialHtml = (html: string) => session.changeDraft({ html }, true);
 
   const handleCancel = useCallback(() => {
     navigate(-1);
@@ -209,7 +132,8 @@ export default function ProductionMaterialEditorPage() {
   if (isEditMode && loadError) {
     return (
       <div style={{ ...styles.page, alignItems: 'center', paddingTop: '80px', gap: '12px' }}>
-        <p style={{ color: colors.neutral600, fontSize: '14px' }}>{loadError}</p>
+        <p role="alert" style={{ color: colors.neutral600, fontSize: '14px' }}>{loadError}</p>
+        <button type="button" onClick={() => void session.reload()} style={styles.cancelBtn}>다시 시도</button>
         <button onClick={() => navigate('/store/library/contents')} style={styles.cancelBtn}>
           내 자료함 콘텐츠로 돌아가기
         </button>
@@ -219,6 +143,7 @@ export default function ProductionMaterialEditorPage() {
 
   return (
     <div style={styles.page}>
+      {session.notice && <p role={session.notice.ok ? 'status' : 'alert'} className={session.notice.ok ? 'text-sm text-green-700' : 'text-sm text-red-700'}>{session.notice.message}</p>}
       {/* Header */}
       <div style={styles.header}>
         <button onClick={handleCancel} style={styles.backBtn} aria-label="뒤로">
@@ -244,6 +169,7 @@ export default function ProductionMaterialEditorPage() {
             id="pm-title"
             type="text"
             value={title}
+            aria-label="콘텐츠 제목"
             onChange={(e) => setTitle(e.target.value)}
             placeholder="제작 자료 제목을 입력하세요"
             style={styles.titleInput}
@@ -310,8 +236,8 @@ export default function ProductionMaterialEditorPage() {
             additionalInstruction,
           })}
           currentHtml={editorContent.html}
-          onApplyHtml={(html) => { setEditorInitialHtml(html); setEditorContent({ html }); }}
-          onNotify={(message, kind) => (kind === 'error' ? toast.error(message) : toast.success(message))}
+          onApplyHtml={setEditorInitialHtml}
+          onNotify={(message, kind) => session.notify(message, kind === 'success')}
         />
       </div>
 
@@ -352,6 +278,7 @@ const styles: Record<string, CSSProperties> = {
   header: {
     display: 'flex',
     alignItems: 'center',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: '12px',
   },

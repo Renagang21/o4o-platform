@@ -19,13 +19,16 @@
  *   → POST /store-contents → navigate('/store/content/direct/:id')
  */
 
-import { useEffect, useState, useCallback, type CSSProperties } from 'react';
+import {  type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Save, Loader2 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { RichTextEditor, LlmAssistPanel, type EditorContent } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, resolveStoreContentLlmTask, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
-import { apiClient } from '../../api/client';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
+import { getActiveServiceKey } from '../../lib/serviceContext';
+import { useContentAuthoringSession } from './hooks/useContentAuthoringSession';
+import { createOrUpdateDirect, emptyTextDraft, validateNewContent, type CreatedContent, type TextContentDraft } from './authoring/contentAuthoringAdapters';
+import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { colors } from '../../styles/theme';
 import { TagInput } from '../../components/store/TagInput';
 
@@ -48,79 +51,35 @@ interface Props {
 export function CreateContentFromResourcesModal({ open, onClose, onCreated, product }: Props) {
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState('');
-  // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 콘텐츠 태그 (string[])
-  const [tags, setTags] = useState<string[]>([]);
-  const [editorHtml, setEditorHtml] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  // open/close 시 상태 초기화
-  useEffect(() => {
-    if (!open) {
-      setTitle('');
-      setTags([]);
-      setEditorHtml('');
-      setSaving(false);
-    }
-  }, [open]);
-
-  const handleEditorChange = useCallback((content: EditorContent) => setEditorHtml(content.html), []);
-
-  // 저장 — direct content 로 POST /store-contents (manual-direct, sourceResources=[]).
-  const handleSave = useCallback(async () => {
-    if (!title.trim()) {
-      toast.error('제목을 입력해 주세요');
-      return;
-    }
-    const html = editorHtml.trim();
-    if (!html || html === '<p></p>') {
-      toast.error('콘텐츠 본문이 비어 있습니다. 직접 작성하거나 붙여넣어 주세요.');
-      return;
-    }
-    setSaving(true);
-    try {
-      const res = await apiClient.post<{ success: boolean; data: { id: string } }>(
-        '/store-contents',
-        {
-          title: title.trim(),
-          // WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1: 태그(string[]) 전달 — 백엔드에서 sanitize.
-          tags,
-          contentJson: {
-            html,
-            // WO-O4O-KPA-CONTENT-CREATE-AI-STEP-REMOVE-V1: 빈 편집기 직접 작성 = manual-direct, 원소스 없음.
-            sourceResources: [],
-            generatedBy: 'manual-direct',
-          },
-          // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품 진입 시 자동 연결.
-          ...(product ? { productRef: { sourceType: product.sourceType, sourceId: product.sourceId } } : {}),
-        },
-      );
-      const newId = res?.data?.id;
-      toast.success('내 자료함 콘텐츠로 저장되었습니다');
-      onCreated?.(newId);
-      onClose();
-      if (newId) navigate(`/store/content/direct/${newId}`);
-    } catch (err: any) {
-      if (err?.status === 403) {
-        toast.error('매장 경영자 권한이 필요합니다');
-      } else {
-        toast.error(err?.message || '저장에 실패했습니다');
-      }
-    } finally {
-      setSaving(false);
-    }
-  }, [title, tags, editorHtml, product, onCreated, onClose, navigate]);
+  const { organizationId } = useStoreOrganizationId();
+  const session = useContentAuthoringSession<TextContentDraft, CreatedContent>({
+    organizationId, serviceKey: getActiveServiceKey(), target: `create:${product?.sourceType ?? ''}:${product?.sourceId ?? ''}`,
+    enabled: open, initialDraft: emptyTextDraft,
+    toDraft: () => emptyTextDraft,
+    persist: (draft, record) => createOrUpdateDirect(draft, record, product),
+    validate: validateNewContent,
+    onSaved: (saved, unchanged) => {
+      onCreated?.(saved.id);
+      if (unchanged) { onClose(); navigate(`/store/content/direct/${saved.id}`); }
+    },
+  });
+  const { title, tags, html: editorHtml } = session.draft;
+  const { saving, save: handleSave } = session;
+  const setTitle = (title: string) => session.changeDraft({ title });
+  const setTags = (tags: string[]) => session.changeDraft({ tags });
+  const setEditorHtml = (html: string) => session.changeDraft({ html }, true);
+  const handleEditorChange = (content: EditorContent) => session.changeDraft({ html: content.html });
 
   if (!open) return null;
 
-  const canSave = !!title.trim() && !!editorHtml.trim() && !saving;
+  const canSave = !!title.trim() && !!editorHtml.trim() && !saving && !session.loading && !session.error;
 
   return (
-    <div style={styles.backdrop} role="presentation" onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+    <AuthoringDialog labelId="create-content-title" onClose={onClose} className="max-w-3xl">
+      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
         <header style={styles.header}>
           <div style={styles.headerLeft}>
-            <h2 style={styles.title}>콘텐츠 작성</h2>
+            <h2 id="create-content-title" style={styles.title}>콘텐츠 작성</h2>
           </div>
           <button type="button" onClick={onClose} style={styles.iconBtn} aria-label="닫기">
             <X size={16} />
@@ -128,6 +87,8 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
         </header>
 
         <div style={styles.body}>
+          {session.error && <p role="alert" className="mb-3 text-sm text-red-700">{session.error}<button type="button" onClick={() => void session.reload()} className="ml-2 underline">다시 시도</button></p>}
+          {session.notice && <p role={session.notice.ok ? 'status' : 'alert'} className={session.notice.ok ? 'mb-3 text-sm text-green-700' : 'mb-3 text-sm text-red-700'}>{session.notice.message}</p>}
           {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-ACTIONS-V1: 제품에서 진입한 경우 연결 대상 표시 */}
           {product && (
             <div style={styles.productBanner}>
@@ -149,15 +110,15 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="콘텐츠 제목"
+              aria-label="콘텐츠 제목" placeholder="콘텐츠 제목"
               style={styles.input}
               maxLength={200}
             />
           </div>
 
           <div style={styles.composeRow}>
-            <label style={styles.label}>태그</label>
-            <TagInput tags={tags} onChange={setTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
+            <label htmlFor="create-content-tags" style={styles.label}>콘텐츠 태그</label>
+            <TagInput id="create-content-tags" tags={tags} onChange={setTags} placeholder="예: 간 건강, 면역 (Enter·쉼표로 구분)" />
           </div>
 
           <div style={styles.composeRow}>
@@ -176,12 +137,12 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
                 })}
                 currentHtml={editorHtml}
                 onApplyHtml={(html) => setEditorHtml(html)}
-                onNotify={(message, kind) => (kind === 'error' ? toast.error(message) : toast.success(message))}
+                onNotify={(message, kind) => session.notify(message, kind === 'success')}
               />
             </div>
             <div style={styles.editorWrap}>
               <RichTextEditor showInternalAi={false}
-                value={editorHtml}
+                value={session.seed.html}
                 onChange={handleEditorChange}
                 placeholder="본문을 직접 작성하거나, 외부 AI에서 만든 초안을 붙여넣은 뒤 편집하세요."
                 minHeight="320px"
@@ -213,7 +174,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
           </div>
         </footer>
       </div>
-    </div>
+    </AuthoringDialog>
   );
 }
 
@@ -245,6 +206,8 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 10,
     padding: '14px 18px',
     borderBottom: `1px solid ${colors.neutral100}`,
     flexShrink: 0,
@@ -317,7 +280,7 @@ const styles: Record<string, CSSProperties> = {
     flexWrap: 'wrap',
   },
   footerHint: { fontSize: 12, color: colors.neutral500 },
-  footerActions: { display: 'flex', gap: 8 },
+  footerActions: { display: 'flex', flexWrap: 'wrap', gap: 8 },
   secondaryBtn: {
     padding: '8px 14px',
     background: colors.white,
