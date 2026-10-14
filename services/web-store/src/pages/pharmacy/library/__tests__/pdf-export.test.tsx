@@ -28,7 +28,8 @@ it('legacy text, image and list blocks survive PDF extraction with escaped attri
   expect(html).toContain('<li>First</li>'); expect(html).toContain('&lt;script&gt;Second');
 });
 async function printedHtml() {
-  const blob = vi.mocked(URL.createObjectURL).mock.calls.at(-1)![0];
+  const calls = vi.mocked(URL.createObjectURL).mock.calls;
+  const blob = calls[calls.length - 1][0];
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
