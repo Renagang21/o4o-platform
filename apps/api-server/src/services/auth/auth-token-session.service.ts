@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { Repository, type EntityManager } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../entities/User.js';
-import { AuthTokens, AccessTokenPayload } from '../../types/auth.js';
+import { AuthTokens, AccessTokenPayload, type RefreshTokenPayload } from '../../types/auth.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import * as cookieUtils from '../../utils/cookie.utils.js';
 import { freshenUserContext } from './auth-context.helper.js';
@@ -46,6 +46,33 @@ export class AuthTokenSessionService {
    * - USER_NOT_FOUND: User does not exist or is inactive (do NOT retry)
    */
   async refreshTokens(refreshToken: string): Promise<AuthTokens> {
+    const payload = this.readRefreshPayload(refreshToken);
+    const user = await this.userRepository.findOne({
+      where: { id: payload.userId, isActive: true },
+    });
+    this.assertRefreshAccount(user, payload);
+
+    // Bind this browser to the current database generation before reading roles.
+    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily, this.userRepository.manager))) {
+      this.throwServiceSessionRevoked(user.id, payload.serviceKey ?? 'LEGACY_SESSION');
+    }
+    const ctx = await freshenUserContext(user.id);
+    if (!isSessionAuthMethodAllowed(payload.authMethod, payload.serviceKey, ctx.roles)) {
+      const rejection = sessionAuthMethodError(payload.authMethod);
+      throw Object.assign(new Error(rejection.message), { code: rejection.code });
+    }
+
+    // Preserve signed scope, compatibility epoch, method and browser identity.
+    // Refresh never writes the account family: a concurrent password change must win.
+    return tokenUtils.generateTokens(
+      user, ctx.roles, 'neture.co.kr', ctx.memberships, payload.tokenFamily,
+      payload.serviceKey ?? null, payload.sessionEpoch ?? null,
+      payload.authMethod ?? null, payload.sessionId,
+    );
+  }
+
+  /** Verify signed claims and retired scope before any repository access. */
+  private readRefreshPayload(refreshToken: string): RefreshTokenPayload {
     // Phase 2.5: Verify JWT token (includes issuer/audience check for server isolation)
     const payload = tokenUtils.verifyRefreshToken(refreshToken);
 
@@ -66,14 +93,11 @@ export class AuthTokenSessionService {
       throw error;
     }
 
-    // Find user with matching token family
-    const user = await this.userRepository.findOne({
-      where: {
-        id: payload.userId,
-        isActive: true,
-      },
-    });
+    return payload;
+  }
 
+  /** Keep account status/family error precedence ahead of browser and role checks. */
+  private assertRefreshAccount(user: User | null, payload: RefreshTokenPayload): asserts user is User {
     if (!user) {
       const error = new Error('User not found or inactive') as Error & { code: string };
       error.code = 'USER_NOT_FOUND';
@@ -131,39 +155,6 @@ export class AuthTokenSessionService {
       error.code = 'TOKEN_FAMILY_MISMATCH';
       throw error;
     }
-
-    // The database check binds this browser to the current account generation.
-    if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily, this.userRepository.manager))) {
-      this.throwServiceSessionRevoked(user.id, payload.serviceKey ?? 'LEGACY_SESSION');
-    }
-
-    // Refresh preserves both the browser ID and current account security family.
-    // Only a password security event rotates that family; no refresh/handoff writes it.
-    const ctx = await freshenUserContext(user.id);
-
-    // Do not promote missing/Kakao/password markers to Google during refresh.
-    if (!isSessionAuthMethodAllowed(payload.authMethod, payload.serviceKey, ctx.roles)) {
-      const rejection = sessionAuthMethodError(payload.authMethod);
-      throw Object.assign(new Error(rejection.message), { code: rejection.code });
-    }
-
-    // Preserve signed scope and compatibility epoch without rereading either.
-    const tokens = tokenUtils.generateTokens(
-      user,
-      ctx.roles,
-      'neture.co.kr',
-      ctx.memberships,
-      payload.tokenFamily,
-      payload.serviceKey ?? null,
-      payload.sessionEpoch ?? null,
-      // WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1 §2-4: 수단 표식도 승계한다.
-      payload.authMethod ?? null,
-      payload.sessionId,
-    );
-
-    // Refresh never writes the account family: a concurrent password change must win.
-
-    return tokens;
   }
 
   /**
