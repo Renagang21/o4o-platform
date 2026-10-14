@@ -79,3 +79,6 @@ Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required ch
 환경 allowlist에 Sonar host가 반영되었으나 실제 API는 upstream CloudFront HTTP 403이다. 제한된 GitHub annotations로 전체 Security B 원인을 확인했다고 보고하지 않는다. 운영 DB migration/production promote는 미실행이며 앞 운영 대기 기록과 현재 코드 검증을 구분한다.
 
 검증: `work-planner-json`, `ai-url-content`, `work-agent-llm-closure`, `work-agent-recovery-runtime` 실제 **4 suites / 38 tests PASS**. 100k 미종결 입력 두 경로와 greedy/malformed/HTML 제목·본문 기존 계약 포함. API build PASS, 변경 lint 오류/경고 0, 문서 민감정보/diff PASS. 기존/신규 함수 2,000개 deterministic markup × 본문/제목 = 4,000 비교 차이 0. source 기준 40k HTML 1243.58→0.27ms, JSON 925.03→0.04ms(로컬 관찰치). 최초 실행의 잘못된 노이즈 fixture 및 존재하지 않는 suite 경로는 수정 후 실제 경로에서 재검증했다. 운영 호출/계정/유료 AI/DB/PC smoke는 하지 않았다.
+
+
+[중요 수정 PR #552](https://github.com/Renagang21/o4o-platform/pull/552) main `f8d1887ef2f0cd9920667a7275749195d9e28d8a`에 MERGED. source `03d6ee37c7`와 tree 차이 0. [PR CI 38488237043](https://github.com/Renagang21/o4o-platform/actions/runs/38488237043) SUCCESS, 3 API shards·품질·admin build·CI Gate PASS, CodeQL PASS, 미해결 review thread 0. main CI `38489272848`과 main CodeQL은 기록 시점 IN_PROGRESS. 이전 Sonar Security B가 해결되었다고 판단하지 않는다. 정상 promote/운영 migration/배포 후 smoke 미실행. 운영 승인 및 최신 main/serving delta 검토·후속 증적 보존 때문에 본인 worktree KEEP, 코드 수정과 기록은 source branch에 push한다.

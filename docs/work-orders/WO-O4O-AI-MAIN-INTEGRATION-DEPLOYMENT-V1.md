@@ -102,7 +102,7 @@ Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required ch
 - [x] JSON은 첫 `{` / 마지막 `}`의 기존 greedy 범위를 유지하면서 `indexOf` / `lastIndexOf`로 추출. malformed/multiple object의 JSON.parse 실패도 유지.
 - [x] 일반 HTML 태그 제거는 단일 전진 scan으로 대체. 빈 `<>`, 중첩 `<`, 닫히지 않은 suffix와 태그별 공백 정책을 유지하고 동일 파일의 제목 추출도 같은 private helper를 사용한다. script/style/noise 처리·본문/제목 길이·권한·provider·외부 fetch 계약은 유지한다. HTML 처리 전체가 선형이라고 주장하지 않는다.
 - [x] 실제 malformed/정상/100k 입력 회귀, Planner/URL 소비처 테스트·API build·변경 lint 검증.
-- [ ] 후속 수정 push·PR gate 확인.
+- [x] 후속 수정 push·PR gate 확인·main 통합.
 
 보류: 일반 함수 길이/cognitive complexity, 서비스 문맥이 다른 중복, 이름/스타일 및 추가 abstraction. 실제 권한 우회·저장 누락·비용 이중 정산 같은 결함이 확정되면 다시 최우선으로 처리한다. retained 중복의 이전 KEEP 판정은 미해결 TODO로 바꾸지 않는다.
 
@@ -111,3 +111,12 @@ Sonar 도메인 추가는 이번 runtime에서 확인했다. 재시도는 proxy 
 운영 migration 승인·배포 후 smoke는 코드 복잡성 정비와 분리하여 계속 대기한다. 이전 main `de4cbf9f39`의 HELD_LEVEL_3 이력은 그대로 보존하며, 향후 promote는 이동한 최신 main/serving delta·CI·migration·동시 실행을 다시 확인해야 한다. 이번 조사는 운영 DB 승인으로 해석하지 않는다. 상태 헤더는 문서 lifecycle의 ACTIVE로 정렬하고 운영 실행 대기는 본문에 기록했다.
 
 검증 결과: 실제 4 suites / 38 tests PASS, API build PASS, 변경 lint 오류/경고 0. 기존 함수와 수정 함수의 2,000개 deterministic HTML 샘플에서 본문/제목 4,000건 결과 차이 0. 같은 source 함수 비교의 40k 입력은 HTML 1243.58→0.27ms, JSON 925.03→0.04ms였으며 운영 latency 측정이 아니다. 첫 focused 실행의 부적절한 `br` prefix fixture와 존재하지 않는 planning suite 경로는 진단 후 수정해 위 4개 실제 suite를 완주했다. 기존 assertions나 동작은 완화하지 않았다. 문서 민감정보 0/diff 검사 PASS.
+
+
+### 중요 수정 main 반영·남은 경계
+
+[PR #552](https://github.com/Renagang21/o4o-platform/pull/552) MERGED, source `03d6ee37c79cfabc2feb44c9a99e09641e1203f6`, main `f8d1887ef2f0cd9920667a7275749195d9e28d8a`. 두 tree의 차이 0, 최신 main 위치와 clean worktree/필수 gate·review thread 0을 확인하고 정상 merge했다. [PR CI 38488237043](https://github.com/Renagang21/o4o-platform/actions/runs/38488237043) SUCCESS: API 3 shards·품질·admin build·CI Gate PASS. CodeQL PASS. admin bypass/force push 없음.
+
+기록 시점의 [main CI 38489272848](https://github.com/Renagang21/o4o-platform/actions/runs/38489272848) 및 main CodeQL은 IN_PROGRESS이며 완료/PASS로 보고하지 않는다. 배포는 하지 않았다. 앞 quota migration의 승인 대기와 serving→현재 main의 누적 변경 재검토 조건은 계속 유효하다. confirmed parser 성능 결함의 구현·검증·push·병합은 완료했고, 추가 중요 코드 결함은 이번 조사에서 확정되지 않았다. Sonar 전체 보안 finding 상세는 외부 403으로 미확인, 실제 계정/배포 후 smoke도 미실시다. 일반 복잡성·문맥별 중복·스타일 정비는 후순위다.
+
+이 결과 기록은 운영 target을 바꾸지 않고 source branch에 보존한다. WORKTREE_DISPOSITION: 본인 worktree/branch clean·검증 코드 main 반영, 운영 migration·배포 후 검증/증적 대기이므로 KEEP. 다른 세션의 checkout/branch/공유 운영 runtime은 수정하지 않았다. 문서 정합: 본 WO/CHECK의 중요 항목 TODO·검증·main 반영·미실행 경계를 정렬했고 canonical·index·선행 COMPLETED 기록은 그대로 유지했다.
