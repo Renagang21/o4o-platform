@@ -1,6 +1,6 @@
 # Neture 상품 승인 — 삭제 실패·대상 보존 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거 WO/IR**: 사용자 요청 — 다음 운영자 작업 진행, TODO → 조사·보완 → 작업·검증
 
@@ -26,7 +26,7 @@
 - [x] 최소 수정, focused 회귀·타입·빌드·desktop/mobile fixture 검증.
 - [x] CHECK·전체 TODO 정합, 구현 commit/push·PR #555 생성.
 - [x] PR 기술 gate·main 통합·배포 판정 확인.
-- [ ] 별도 API 선행 정비·승인된 migration/API 배포 후 Neture 배포·운영 확인.
+- [x] 별도 API 선행 정비·승인된 migration/API 배포 완료와 Neture serving/공개 HTTP 확인.
 
 실계정 검증은 사용자 담당이다. 기존 PR #544의 병합·배포 완료는 별도로 확인한다.
 
@@ -35,3 +35,8 @@
 PR #544 (`24b96f373`)과 PR #555 (`dadc13e62`)는 정상 main 병합 후 CI까지 통과했다. 최신 Neture 전체 94파일·838건 및 focused 50건 통과.
 Neture-only 배포는 API 의존으로 보류됐다. 별도 API 번들 타입 재export 오류와 미적용 AI quota migration/API 배포가 선행한다. **main 반영 완료이며 운영 배포 완료는 아니다.**
 실행·검증·원인·서비스 범위의 상세 근거는 [최종 CHECK](../checks/CHECK-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)를 따른다. 이 세션에서 API/migration 배포와 약사회 분회 배포는 실행하지 않았다.
+
+## 최종 완료 — 2026-10-14
+
+선행 PR #557과 API/Neture 운영 배포 완료를 확인했다. Promote `38497933074` 및 후속 Neture Delivery `38499037614`의 실제 deploy/serving Report는 SUCCESS이며, 두 배포 source가 이번 운영자 변경을 포함한다. 최신 main `6eeea05a2` Delivery `38500377113`은 NO_DEPLOY다. Neture root·API health는 현재 HTTP 200이다.
+상세 증거는 [최종 CHECK](../checks/CHECK-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)의 배포 보류 해소 절을 따른다. 과거 보류 기록은 보존한다. 실계정 업무 검증은 사용자 담당이다. 문서-only 후속이며 API/migration·약사회 분회 배포를 새로 실행하지 않았다.
