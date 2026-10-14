@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Phase 1 - Service Web Server Dockerfile
 # Cloud Run 호환 정적 파일 서빙
 #
@@ -10,7 +11,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm
+# Optional managed-environment proxy CA; never stored in an image layer.
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g pnpm@10.25.0
 
 # Copy workspace configuration
 COPY pnpm-workspace.yaml ./
@@ -51,7 +55,9 @@ COPY services/web-neture/package.json ./services/web-neture/
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts로 prepare 자동 빌드 skip.
 # packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
-RUN pnpm install --filter @o4o/web-neture... --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter @o4o/web-neture... --ignore-scripts
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -112,20 +118,18 @@ WORKDIR /app/services/web-neture
 RUN npx vite build
 
 # Production stage
-FROM node:20-alpine AS runner
-
-WORKDIR /app
-
-# Install serve for static file serving
-RUN npm install -g serve
+FROM nginx:1.28-alpine AS runner
 
 # Copy built files
-COPY --from=builder /app/services/web-neture/dist ./dist
+COPY --from=builder /app/services/web-neture/dist /usr/share/nginx/html
+COPY services/web-neture/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 
 # Cloud Run uses PORT env variable
 ENV PORT=8080
+# Restrict envsubst to PORT so nginx's host/uri variables survive unchanged.
+ENV NGINX_ENVSUBST_FILTER=^PORT$
 
 EXPOSE 8080
 
-# Serve static files
-CMD ["serve", "-s", "dist", "-l", "8080"]
+# The nginx entrypoint renders the PORT template before starting the server.
+CMD ["nginx", "-g", "daemon off;"]

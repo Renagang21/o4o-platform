@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { hostStaticSeo } from './tools/hostStaticSeo';
 
 // WO-O4O-COLLABORATOR-LOCAL-DEV-SAFETY-AND-SETUP-ALIGNMENT-V1:
 // dev server 에서 API URL 이 없으면 로컬 API 를 주입한다. src/lib/apiBaseUrl.ts 뿐 아니라
@@ -17,7 +18,7 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    plugins: [react()],
+    plugins: [react(), hostStaticSeo()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
