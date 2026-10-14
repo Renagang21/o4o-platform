@@ -37,8 +37,27 @@
 - [x] 29개 이동 callback/helper AST 동일성 확인
 - [x] 집중 동작·접근성 25건, Supplier Boundary 41건, PC/mobile fixture 브라우저 검증
 - [x] 최종 전체 회귀·타입/빌드/lint·독립 diff 점검
-- [ ] commit/push·PR·required CI·review·main 통합·Delivery 확인
+- [x] commit/push·PR·required CI·review·main 통합
+- [ ] Delivery의 API 의존 보류 해소 후 운영 배포 확인
 
 실계정·운영 상품/주문/정산 write는 이번 범위가 아니다.
 검증 및 미확인 결과는 [CHECK](../checks/CHECK-O4O-SUPPLIER-QUALITY-RESPONSIBILITIES-V1.md)에 구분한다.
 문서 정합: 현행 정본 정책 변경 없음.
+
+## main 통합과 운영 선행조건
+
+[PR #556](https://github.com/Renagang21/o4o-platform/pull/556)이 main `f2bc1076fb60e203c5cb2c1ece3caede0b176719`에 정상 병합됐다.
+최종 source HEAD `88dce2d5c`의 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38493766203)은 SUCCESS다.
+CI Gate·API Jest 3 shards·전체 품질·Admin/Neture build·CodeQL이 통과했다.
+최초 code HEAD `78de72b`의 SonarCloud는 PASS, 자동 Codex review COMPLETED·findings 0·미해결 thread 0이다.
+두 HEAD 사이의 supplier source 및 경계 테스트 차이 0을 확인했다.
+병합에 포함된 직전 main 추가 변경은 운영자 완료 기록 4개 문서이며 supplier runtime 차이 0이다.
+
+운영 배포는 코드 통합과 구분한다. [운영자 배포 판정](../checks/CHECK-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md)에
+별도 API 타입 재export 번들 오류와 미적용 `CreateAiUsageReservations1791870434349` 때문에 Neture 의존 보류가 기록되어 있다.
+API 빌드 수정은 [PR #557](https://github.com/Renagang21/o4o-platform/pull/557)의 별도 작업이다.
+그 API 빌드 및 승인된 migration/API 배포 후 이번 공급자 frontend의 Delivery/운영 확인을 재개한다.
+이번 실행에서 API/migration을 dispatch하거나 dependency guard를 우회하지 않았다.
+현재 API health·Neture HTML의 HTTP 200은 기존 운영 가용성 증거이며 새 코드 배포 증거가 아니다.
+
+이 문서 후속은 같은 WO의 main/Delivery 기록 단계다. 검증 harness와 artifact 재현을 위해 작업 worktree는 KEEP하며 기존 원본 checkout과 다른 세션 자원은 보존한다.
