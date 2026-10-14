@@ -98,10 +98,7 @@ export class AccountErasureService {
     const operationId = await this.db.transaction(async m => {
       await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
       await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hash(userId)]);
-      const [actor] = await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-        WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
-        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
-      if (!actor) throw new AccountErasureError('FORBIDDEN',403);
+      await this.assertActor(m,actorId);
       const [existing] = await m.query('SELECT * FROM account_erasure_operations WHERE subject_hash=$1 FOR UPDATE', [hash(userId)]);
       if (existing) return existing.id as string;
       const [user] = await m.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
@@ -143,10 +140,7 @@ export class AccountErasureService {
         if (!hint) throw new AccountErasureError('ERASURE_OPERATION_NOT_FOUND', 404);
         await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
         await m.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [hint.subject_hash]);
-        const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
-          WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
-        AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
-        if(!actor)throw new AccountErasureError('FORBIDDEN',403);
+        await this.assertActor(m,actorId);
         const [o]: Operation[] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE NOWAIT', [operationId]);
         if (o.state === 'completed') return false;
         await m.query("UPDATE account_erasure_operations SET state='processing',error_code=NULL,updated_at=now() WHERE id=$1", [operationId]);
@@ -393,8 +387,8 @@ export class AccountErasureService {
       for (const row of rows) for (const [field, value] of Object.entries(row)) {
         if (value == null || value === '' || (Array.isArray(value) && !value.length)) continue;
         const text = typeof value === 'string' ? value : JSON.stringify(value);
-        if (/storage\.googleapis\.com|gs:\/\/|(?:^|\s)(?:uploads|media)\//i.test(text) ||
-            /(?:file_path|file_url|attachment|gcs_path)/i.test(field)) {
+        if (/storage\.googleapis\.com|(?:gcs|gs):\/\/|(?:^|\s)(?:uploads|media)\//i.test(text) ||
+            /(?:file_?path|file_?url|attachment|gcs_?path)/i.test(field)) {
           throw new AccountErasureError('PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED', 409);
         }
       }
