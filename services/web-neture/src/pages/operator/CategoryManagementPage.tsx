@@ -185,7 +185,7 @@ export default function CategoryManagementPage() {
       </div>
 
       {/* Tree Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto" role="region" aria-label="카테고리 목록" tabIndex={0}>
+      <section className="bg-white rounded-xl border border-slate-200 overflow-x-auto" aria-label="카테고리 목록">
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
@@ -284,7 +284,7 @@ export default function CategoryManagementPage() {
             })}
           </tbody>
         </table>
-      </div>
+      </section>
 
       {/* Create/Edit Modal */}
       {showModal && (

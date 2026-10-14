@@ -18,9 +18,11 @@
 | Chromium 실제 페이지/CSS | 3페이지 × 1440/390/320px + 매핑 2인스턴스 = 10 cases PASS |
 | 브라우저 결과 | pageerror·console error·문서 overflow 0 |
 
-Chromium은 실제 컴포넌트를 별도 로컬 진입점에 렌더링하고 API를 합성 응답으로 가로챘다. 실제 계정·운영 API·DB write 0. 라벨 클릭 초점, 생성/수정/추천 입력과 기존 trim·parentId·priority payload, 카테고리 수정 시 부모 선택 부재, 트리 펼침 상태, 닫기 Enter 조작/44px, 모바일 표 ArrowRight 스크롤, 두 컴포넌트의 6개 ID/값 격리를 확인했다. 브랜드 검색/대상 필터·창 닫기는 write 요청이 없었다. 브랜드 실제 병합·삭제·운영 로그인·모달 전체 focus trap/복귀는 검증하지 않았다.
+Chromium은 실제 컴포넌트를 별도 로컬 진입점에 렌더링하고 API를 합성 응답으로 가로챘다. 실제 계정·운영 API·DB write 0. 라벨 클릭 초점, 생성/수정/추천 입력과 기존 trim·parentId·priority payload, 카테고리 수정 시 부모 선택 부재, 트리 펼침 상태, 닫기 Enter 조작/44px, 긴 카테고리 이름이 있는 모바일 표의 Tab 행 작업 버튼 초점·자동 내부 스크롤, 두 컴포넌트의 6개 ID/값 격리를 확인했다. 브랜드 검색/대상 필터·창 닫기는 write 요청이 없었다. 브랜드 실제 병합·삭제·운영 로그인·모달 전체 focus trap/복귀는 검증하지 않았다.
 
 초기 fixture의 API 패턴이 `/src/lib/api/` 모듈까지 JSON으로 가로채는 MIME 오류와 Vite 실행 cwd의 Tailwind 설정 탐색 오류를 수정하고 재실행했다. 이는 테스트 도구 오류이며 앱 회귀로 집계하지 않았다. 최종 로그 `browser-final.log`는 10 cases PASS다. 초기 package cache 복사도 이미 생성된 types/dist를 발견해 중단된 것을 확인하고 없는 동일 package 산출물만 준비했다. 최종 타입/빌드와 회귀 PASS이며 checksum/TLS/frozen-lockfile 검증을 유지했다.
+
+최초 HEAD `6e60281cc4`의 CI Gate PASS(run `38525040568`), Codex finding/미해결 스레드 0, Sonar Quality Gate PASS. Sonar의 native section 및 비대화형 tabIndex 권고 두 건은 이름 있는 section과 실제 행 버튼의 Tab 초점 경로로 보완했다. 긴 분류 이름을 포함한 Chromium 10 cases·최종 타입/Vite build·lint 재검증 PASS. 최종 push HEAD의 원격 검사는 별도로 확인한다.
 
 ## Git 및 후속
 
