@@ -48,14 +48,14 @@ main 병합은 사용자 별도 승인 후 수행한다.
 ## 로컬 검증 결과
 
 - 인증·회원 경계 및 서비스 접근 관련 Jest: 13 suites / 220 tests PASS.
-- 중앙 운영자 지정·역할 수정, branch/community 지정, 기존 회원 lifecycle 추가 회귀: 10 suites / 134 tests PASS (위 집합과 일부 중복).
+- 전체 관리자의 서비스 운영자 지정·역할 수정, branch/community 지정, 기존 회원 lifecycle 추가 회귀: 10 suites / 134 tests PASS (위 집합과 일부 중복).
 - `packages/ui` Vitest: 2 files / 13 tests PASS.
 - `operator-core-ui` Vitest: 5 files / 47 tests PASS.
 - API·공통 UI·KPA Society·Pharmacy-Hub·Admin 타입 검사 PASS.
 - 공통 패키지 전체 빌드 및 Neture production 빌드 PASS.
 - unsafe route·TypeORM entity·문서 민감정보 검사, `git diff --check` PASS.
 
-중앙 운영자 지정 API는 정상 판정하여 기존 동작을 유지했고 해당 회귀 테스트를 실행했다.
+전체 관리자의 서비스 운영자 지정 API는 정상 판정하여 기존 동작을 유지했고 해당 회귀 테스트를 실행했다.
 실제 운영 DB·로그인 계정으로 역할별 브라우저 E2E는 실행하지 않았다.
 모의 역할 저장소·요청으로 동일 token의 다음 요청 권한을 검증했으며 운영 데이터 변경은 없다.
 인증 요청마다 최신 역할 DB 조회가 한 번 추가되므로 운영 DB 지연·부하 영향은 배포 후 관측 대상이다.
@@ -165,7 +165,7 @@ admin/operator 권한을 구분할 경우 버튼과 API guard를 함께 변경�
 - DB migration·운영 데이터 변경·dependency/lockfile 변경 없음.
 
 권한 완료 기준: operator의 제한 업무 직접 API 요청 차단, 타 서비스 admin 권한 재사용 차단,
-승인/복구의 공통 계정 상태 불변, 중앙 회수 역할 미복구, 서비스 탈퇴의 중앙 운영자 지정 보존.
+승인/복구의 공통 계정 상태 불변, 중앙 회수 역할 미복구, 서비스 탈퇴의 전체 관리자의 서비스 운영자 지정 보존.
 실 사용자·운영 DB E2E는 수행하지 않는다. 로컬 테스트와 synthetic mock API 브라우저 검증을 구분해 보고한다.
 
 ### 개별 커뮤니티 운영자 후속 조사 지시서

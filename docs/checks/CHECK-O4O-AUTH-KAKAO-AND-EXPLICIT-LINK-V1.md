@@ -8,7 +8,7 @@
 Kakao REST code는 고정 client/secret/callback으로 서버에서만 교환한다. 5분 원장은 token/binding
 hash만 저장하며 origin·용도·현재 사용자·browser session·security family를 함께 확인한다.
 GET callback은 읽기와 고정 origin redirect만 수행한다. 프런트는 fragment를 즉시 지우고
-동일 탭의 pending state와 비교한 뒤 POST로 일회 소비한다. 전체관리자는 실제 Google 인증만 허용한다.
+동일 탭의 pending state와 비교한 뒤 POST로 일회 소비한다. 전체 관리자는 실제 Google 인증만 허용한다.
 
 Kakao ID로만 기존 연결을 조회한다. 가입은 이메일·이름·휴대전화·필수 약관을 요구하며,
 provider가 소유를 확인한 입력 이메일만 verified로 채택한다. 그 외 O4O 확인 메일을 보내며
@@ -24,7 +24,7 @@ provider가 소유를 확인한 입력 이메일만 verified로 채택한다. �
 auth-client/AuthClient, auth-react/useServiceAuth/LoginMethods의 import·리터럴·수정 파일 경로를
 전수 조회했다. 현재 로그인 소비처는 Neture modal/가입, Store, KPA Society modal, KPA Branch
 login/join이며 Lecture는 기존 Neture service-entry와 handoff를 사용한다. Neture 단일 bundle을
-쓰는 supplier/community/funding/pharmacy origin도 동일 공통 컴포넌트를 사용한다. 전체관리자
+쓰는 supplier/community/funding/pharmacy origin도 동일 공통 컴포넌트를 사용한다. 전체 관리자
 Kakao UI는 추가하지 않는다. 은퇴 서비스의 코드 존재를 운영 복원 근거로 사용하지 않는다.
 
 계정 설정 소비처는 Neture·KPA Society에 공통 연결 화면을 붙였다. Store/Lecture의 계정센터
@@ -90,7 +90,7 @@ DB rollback은 현존 identity/flow를 확인한 별도 절차로 판단한다.
 기존 운영 app/key 존재와 등록 상태는 **미확인**이다. 초기 cloud에는 GCP/Kakao binding이 없고
 GitHub secret/variable metadata 조회는 403이었다. 이후 승인된 main WIF에서 실제 metadata를
 조회한 결과와 운영 배포·회귀는 아래 PR #392 기록을 따른다. 권한 부족을 부재로 단정하거나
-새 앱/secret을 중복 생성하지 않는다. 실제 Google/Kakao 소유자 인증과 전체관리자 재로그인은
+새 앱/secret을 중복 생성하지 않는다. 실제 Google/Kakao 소유자 인증과 전체 관리자 재로그인은
 **미실행**이며, Demo·mock 검증을 실제 외부 OAuth의 증거로 사용하지 않는다.
 
 문서 정합: 실행 중 WO/TODO의 로컬 구현과 운영 완료를 구분했다. Identity V3의 과거 카카오 제한과
@@ -100,8 +100,8 @@ MYPAGE의 오래된 password UI 서술은 후속 정합 TODO다. Frozen 본문·
 
 선행 PR #387 main `7a11f7d2018fae7eb827a066762291298ccb2d87`에 대해
 [Promote #38011885470](https://github.com/Renagang21/o4o-platform/actions/runs/38011885470)
-SUCCESS, API migration·0% revision smoke·traffic 전환과 전체관리자/웹 5개 배포를 확인했다.
-전체관리자 실제 Google 재로그인은 소유자 인증 없이 수행하지 않았다.
+SUCCESS, API migration·0% revision smoke·traffic 전환과 전체 관리자/웹 5개 배포를 확인했다.
+전체 관리자 실제 Google 재로그인은 소유자 인증 없이 수행하지 않았다.
 
 Neture/supplier/community/funding/pharmacy/store/study/kpa × PC 1440/mobile 390 × 매장 경영자/공급자
 **32/32 PASS**. 로그인 화면의 실제 Demo 버튼 → email login 200 → me 200 → admin 403
@@ -145,7 +145,7 @@ cross-site Lax binding 미전달 / Secure None 전달을 확인했다. 외부 OA
 
 사용자의 명시적 승인 후 [PR #392](https://github.com/Renagang21/o4o-platform/pull/392)를
 main `26b98a33c182e5de9f9e6df2ce9a6a6fb5696bc4`에 merge했다. 최신 main `3364d0837a`를
-공개 작업 branch에 merge한 exact head `0535183bc2`에서 required CI Gate·API Jest 3개·웹/전체관리자
+공개 작업 branch에 merge한 exact head `0535183bc2`에서 required CI Gate·API Jest 3개·웹/전체 관리자
 build·Code Quality·CodeQL·Sonar PASS, 기존 Codex 두 finding 수정 및 미해결 thread 0을 확인했다.
 로컬 추가 회귀는 Kakao identity/logout 54건, 최신 main 업무/커뮤니티 46건, Neture 395건,
 격리 PG15 social flow/link/signup 18건 PASS다. PG를 지정하지 않은 첫 재실행은 SKIP이었고,
@@ -158,14 +158,14 @@ build·Code Quality·CodeQL·Sonar PASS, 기존 Codex 두 finding 수정 및 미
 | Delivery 위험도 판정 | HELD_LEVEL_3 | migration/인증 변경의 자동 배포 차단 유지 |
 | 사용자 승인 Promote | SUCCESS | [#38019828704](https://github.com/Renagang21/o4o-platform/actions/runs/38019828704), 승인된 정확한 main SHA |
 | API | SUCCESS | migration 21 포함 승인 이미지의 정식 migration Job, traffic 0% revision smoke, traffic 전환·전환 후 검증; readiness HTTP 200 |
-| 전체관리자 + 웹 5개 | SUCCESS | 선택된 deploy job 7개 전체 SUCCESS; 선택하지 않은 deploy job 25개는 SKIPPED |
+| 전체 관리자 + 웹 5개 | SUCCESS | 선택된 deploy job 7개 전체 SUCCESS; 선택하지 않은 deploy job 25개는 SKIPPED |
 | 최종 serving SHA / production status | DEPLOYED | api/admin/neture/kpa-society/lecture/store/kpa-branch 모두 확인 |
 | 유지 8개 origin Demo PC/mobile | 32/32 PASS | 실제 로그인 화면 버튼; 실제 upstream HTTP, provider/API mock 없음 |
 | 신규 social accounts Demo 경계 | 32/32 PASS | HTTP 200 / canManage=false; 계정 연결·수단 변경 실행 없음 |
 | Demo 실제 소셜 변경 진입 차단 | 2/2 PASS | Neture 두 역할에서 잘못된 임의 password로 재인증 요청 → 403 DEMO_ACCOUNT_FORBIDDEN; 연결 권한 발급/비밀번호 변경 없음 |
 | 신규 설정 UI·Kakao 비활성 UI | 2/2 PASS | Neture 실제 설정 화면의 Demo 변경 불가 안내와 Kakao 버튼 미노출 확인 |
 | 약국 업무·공급자 업무 | 16 + 16 PASS | 매장 경영자: store context 200 / supplier products 403 NO_SUPPLIER; 공급자: supplier products 200 / store context 403 STORE_OWNER_REQUIRED |
-| 전체관리자·비밀번호 경계 | 32/32 PASS | Demo admin 403 ROLE_REQUIRED, password canManage=false |
+| 전체 관리자·비밀번호 경계 | 32/32 PASS | Demo admin 403 ROLE_REQUIRED, password canManage=false |
 | UI 로그아웃과 보안 폐기 | 32/32 PASS | logout 200 후 이전 access/refresh 모두 401; Neture 매장 Demo 두 viewport에서 Store 세션은 200 유지 |
 | Kakao public config | 8/8 HTTP 200 | 현재 enabled=false; 실제 Kakao 활성화/성공을 뜻하지 않음 |
 | 비인증 social accounts | HTTP 401 AUTH_REQUIRED | 신규 보호 route 운영 등록 확인 |
@@ -190,7 +190,7 @@ IAM 변경·새 앱/secret 생성은 수행하지 않았다.
 완료 확인 후 같은 read-only 조회를 재실행한다. 이후 기존 앱의 REST ID/client secret ON/고정
 callback 등록, GitHub KAKAO_CLIENT_ID 및 Secret Manager resource 이름 binding을 확인해야 한다.
 실제 로그인·가입·이메일 확인·handoff·Google/Kakao 현재 계정 재인증·최종 명시적 연결과
-취소/충돌, 전체관리자 실제 Google 재로그인은 OPEN이다.
+취소/충돌, 전체 관리자 실제 Google 재로그인은 OPEN이다.
 
 ### main Sonar 분석 OPEN
 
@@ -249,7 +249,7 @@ proxy 차단으로 미조회이며 단계 결과와 공개 API 응답을 근거�
 | 운영 확인 | 결과 | 한계 |
 |---|---|---|
 | `/health/ready` | HTTP 200 | 전환 후 공개 LB 경로 |
-| Kakao config | 유지 8개 origin HTTP 200 / enabled=true; 전체관리자 enabled=false | 구성 활성화이며 Client Secret의 provider 교환 성공은 아님 |
+| Kakao config | 유지 8개 origin HTTP 200 / enabled=true; 전체 관리자 enabled=false | 구성 활성화이며 Client Secret의 provider 교환 성공은 아님 |
 | 비인증 social accounts | HTTP 401 | 인증 우회 없음 |
 | 실제 Demo UI | PC/mobile × 8 origin × 두 역할 32/32 PASS | TLS 검증된 실제 요청; credentials/tokens 출력 없음 |
 | 역할·logout | 매장 경영자 context 16/16 HTTP 200, 공급자 products 16/16 HTTP 200; 반대 역할 403; logout access/refresh 32/32 HTTP 401 | 별도로 생성한 Store 세션 유지 후 테스트 생성 세션만 정리 |
@@ -290,12 +290,12 @@ PR #401은 사용자 승인 후 main `73cd907d20`에 통합했다. post-merge CI
 CodeQL #38034473752 PASS. Delivery #38035024444는 API LEVEL_3로 배포 보류했고,
 정상 통제 경로 Promote #38035112556를 같은 SHA·services=api로 실행해 SUCCESS다.
 정식 migration Job·revision readiness·traffic 전환·전환 후 health·serving SHA report PASS,
-production status는 DEPLOYED/api다. 웹/전체관리자는 SKIPPED, force/break-glass 태그/새 schema/IAM 변경 없음.
+production status는 DEPLOYED/api다. 웹/전체 관리자는 SKIPPED, force/break-glass 태그/새 schema/IAM 변경 없음.
 
 운영 API 17/17 PASS: 합성 `--`/`sp_`/`xp_` code와 `--` state는 문자 오탐 400 대신
 401 SOCIAL_FLOW_INVALID로 거부됐다. 무관한 필드의 SQL은 400 차단 유지. 유지 8 origin
-enabled=true/전체관리자 false. 실제 Demo PC/mobile × 8 origin × 두 역할 32/32 PASS,
-매장 경영자 context 16/16 200·공급자 products 16/16 200·반대 역할/전체관리자 403,
+enabled=true/전체 관리자 false. 실제 Demo PC/mobile × 8 origin × 두 역할 32/32 PASS,
+매장 경영자 context 16/16 200·공급자 products 16/16 200·반대 역할/전체 관리자 403,
 logout 후 access/refresh 32/32 401, 별도 Store session 유지 2건 200. Demo 변경 차단 2/2 PASS.
 실제 UI start/provider 302/callback 취소 303 뒤 복귀 주소를 UI에서 수동 따라가기 4/4 PASS.
 native API 브라우저 탐색과 실제 외부 소유자 가입/로그인/연결 완료는 계속 OPEN이다.
@@ -320,7 +320,7 @@ native API 브라우저 탐색과 실제 외부 소유자 가입/로그인/연�
 | Pharmacy (KPA Society) | LoginMethods를 통해 사용 | origin·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
 | KPA Branch | LoginMethods 로그인·join 사용 | route·role 변경 없음 | 전체 frontend type-check PASS, 웹 배포 후 smoke 대기 |
 | Lecture/Study | 자체 KakaoContinue 사용 없음, Neture 계정센터 경유 | gateway 보존 | symbol/route 검색·전체 frontend type-check PASS |
-| 전체관리자·그 밖의 auth-react 사용 앱 | KakaoContinue runtime 사용 없음 | Google 전용/기존 인가 보존 | import·symbol·path 검색, 전체 frontend type-check PASS |
+| 전체 관리자·그 밖의 auth-react 사용 앱 | KakaoContinue runtime 사용 없음 | Google 전용/기존 인가 보존 | import·symbol·path 검색, 전체 frontend type-check PASS |
 | 삭제 대상 Pharmacy-Hub/K-Cosmetics | 복구 없음 | 은퇴 계약 보존 | 신규 경로/사용처 추가 없음 |
 
 raw-source 파일 경로 검사와 symbol/label/endpoint 검색을 함께 수행했다. 기존 UI tests가 실제
@@ -347,7 +347,7 @@ PC/mobile × 실패 재시도/지연 재시도/명시적 미설정 12/12 PASS, �
 
 사용자 승인 후 PR #403을 main `82742b84e8`에 통합했다. post-merge CI #38039051314 및
 CodeQL #38039051297 SUCCESS, required CI Gate PASS다. Delivery #38039592334는 LEVEL_3로
-보류했고 정상 Promote #38039708401을 동일 SHA로 실행해 SUCCESS다. 전체관리자와 웹
+보류했고 정상 Promote #38039708401을 동일 SHA로 실행해 SUCCESS다. 전체 관리자와 웹
 Neture·KPA Society·Lecture·Store·KPA Branch의 build/push·새 revision 검증·traffic 전환·
 전환 후 serving SHA report가 통과했다. production status는 위 6개 대상 DEPLOYED다.
 API 배포·migration·schema·키/IAM 변경·force/break-glass는 실행하지 않았다.
@@ -356,9 +356,9 @@ API 배포·migration·schema·키/IAM 변경·force/break-glass는 실행하지
 |---|---|---|
 | 유지 8개 origin × PC/mobile 화면 진입 | 16/16 PASS | 카카오 config 200/true; Lecture는 Neture 계정센터 진입 링크, 다른 7곳은 버튼 가시성 |
 | Neture 홈 modal·Store × PC/mobile × config 실패/지연/명시적 미설정 | 12/12 PASS | 읽기 전용 조회에 합성 장애 주입, 재시도는 실제 운영 200/true로 복구; 명시적 false는 숨김; 인증 쓰기 0 |
-| 공개 API/전체관리자 진입 | 12/12 PASS | 유지 8 origin config true·전체관리자 false, ready 200·비인증 계정 조회 401·전체관리자 로그인 화면 200 |
+| 공개 API/전체 관리자 진입 | 12/12 PASS | 유지 8 origin config true·전체 관리자 false, ready 200·비인증 계정 조회 401·전체 관리자 로그인 화면 200 |
 | 유지 8개 origin × PC/mobile × 두 역할 Demo UI | 32/32 PASS | 실제 공개 Demo 버튼으로 로그인·Neture 목적지 이동 및 각 서비스 세션 확인 |
-| 업무 역할·세션 폐기 | 매장 경영자 context 16/16 200·공급자 products 16/16 200; 반대 역할/전체관리자 403; logout 후 access/refresh 32/32 401 | Demo 소셜/비밀번호 변경 불가, 별도 Store 세션 유지 2건 200; 테스트가 만든 세션만 정리 |
+| 업무 역할·세션 폐기 | 매장 경영자 context 16/16 200·공급자 products 16/16 200; 반대 역할/전체 관리자 403; logout 후 access/refresh 32/32 401 | Demo 소셜/비밀번호 변경 불가, 별도 Store 세션 유지 2건 200; 테스트가 만든 세션만 정리 |
 
 화면 16건과 config 장애 12건의 합계가 28/28이며 Demo 32건과 별개다. 브라우저 요청은
 정상 TLS 검증을 수행하는 `route.fetch`로 운영 upstream에 전달했다. 인증서 검증 우회 없음.
@@ -398,7 +398,7 @@ gate의 대상이 될 수 있다. 실제 사용자 membership/pending 상태를 
 - [ ] 실제 소유자 Google/Kakao 가입·로그인·명시적 연결·취소·충돌 PC/mobile 검증.
 
 정책 본문/버전은 이번에 수정·게시하지 않았다. 실제 소유자 가입/계정 연결 완료와 약관
-반복 문제는 OPEN이다. 전체관리자 Google 전용 및 동일 이메일 자동 병합 금지는 유지한다.
+반복 문제는 OPEN이다. 전체 관리자 Google 전용 및 동일 이메일 자동 병합 금지는 유지한다.
 
 ## 2026-10-10 signup 약관 원자 저장 및 공통 UI 검증
 
@@ -412,7 +412,7 @@ gate의 대상이 될 수 있다. 실제 사용자 membership/pending 상태를 
 DTO에서 거부한다. 현재 published terms ID/version을 재검증하고 기존 acceptance service가 본문 hash를
 계산해 계정/provider/password와 같은 transaction에 기록한다. row lock은 commit까지 유지한다.
 일회 카카오 grant도 실패 시 소비되지 않는다. 역할/membership/조직 자동 생성은 추가하지 않았다.
-operator 초대의 별도 `createGoogleUser` 및 전체관리자 Google-only 계약은 공개 가입으로 전환하지 않았다.
+operator 초대의 별도 `createGoogleUser` 및 전체 관리자 Google-only 계약은 공개 가입으로 전환하지 않았다.
 
 | 소비처 | 적용/확인 |
 |---|---|
@@ -423,7 +423,7 @@ operator 초대의 별도 `createGoogleUser` 및 전체관리자 Google-only 계
 | KPA Society LoginModal | Society 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
 | KPA Branch LoginPage / JoinPage | 계정센터 약관 선택·loader 주입; frontend 타입 및 origin 단위 검증 |
 | Lecture/Study gateway | 기존 Neture 계정센터 사용; 자체 소셜 가입 UI 추가 없음 |
-| 전체관리자 및 operator invite | 공개 signup 대상 아님; Google-only 및 초대 생성 경로 유지 |
+| 전체 관리자 및 operator invite | 공개 signup 대상 아님; Google-only 및 초대 생성 경로 유지 |
 | 은퇴 K-Cosmetics / Pharmacy-Hub | 재활성화 없음; 신규 공개 가입 origin 거부 |
 
 공통 UI는 약관을 못 읽으면 동의/제출을 차단한다. 10초 제한·명시적 read-only retry·늦은 응답/unmount
@@ -477,8 +477,8 @@ DEPLOYED다. 검증 중 이후 main에 통합된 별도 커뮤니티 권한 변�
 
 | 운영 검증 | 결과 | 범위와 제한 |
 | --- | --- | --- |
-| 게시 가입 약관 API | 9/9 PASS | 유지 8개 origin의 현재 게시 문서/version·정책별 URL·no-store 및 전체관리자 가입 origin 거부 |
-| 실제 Demo 버튼 PC/mobile × 8개 origin × 2역할 | 최초 30/32 PASS, 실패 2건 각각 재실행 PASS | 실제 이메일 로그인·me·업무 API 역할 경계·전체관리자 거부·Demo 소셜/비밀번호 변경 차단·UI logout 및 access/refresh 폐기. Neture의 Store handoff 세션은 원래 origin logout 뒤 유지 |
+| 게시 가입 약관 API | 9/9 PASS | 유지 8개 origin의 현재 게시 문서/version·정책별 URL·no-store 및 전체 관리자 가입 origin 거부 |
+| 실제 Demo 버튼 PC/mobile × 8개 origin × 2역할 | 최초 30/32 PASS, 실패 2건 각각 재실행 PASS | 실제 이메일 로그인·me·업무 API 역할 경계·전체 관리자 거부·Demo 소셜/비밀번호 변경 차단·UI logout 및 access/refresh 폐기. Neture의 Store handoff 세션은 원래 origin logout 뒤 유지 |
 | 배포된 가입 UI PC/mobile × 8개 origin | 최초 13/16 PASS, 경로 안정성 3 FAIL | 실제 게시 약관 API·배포 bundle; provider complete와 가입 제출만 합성 응답, 계정 생성 없음. 실제 OAuth 완료 근거가 아님 |
 | 공급자·펀딩 가입 UI 추가 진단 | 경로 순환 재현 | 각각 PC/mobile에서 문서/version 일치·제출 1회·이메일 확인 안내는 확인. `/login`과 `/`가 순환해 경로 안정성 FAIL; 약관 페이지 이동으로 오인하지 않음 |
 
@@ -504,7 +504,7 @@ compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로
 
 이 절의 실제 외부 인증 항목은 **OPEN**이다. 합성 provider 응답·로컬 테스트로 완료 처리하지 않는다.
 다음 구현 PR은 로그인 경로와 검증안 push 범위이며 통합·배포 뒤 실제 브라우저에서 실행한다.
-유지 8개 서비스는 PC·모바일로 확인한다. study는 Neture 계정 진입, 전체관리자는 별도 Google 전용
+유지 8개 서비스는 PC·모바일로 확인한다. study는 Neture 계정 진입, 전체 관리자는 별도 Google 전용
 검증 대상으로 구분한다. 모든 항목은 test 계정/승인된 본인 계정으로 실행하며 결과에는 문구 및
 도메인·경로만 남긴다. OAuth query/fragment, 토큰, 이메일·전화번호·실명은 기록하지 않는다.
 
@@ -518,7 +518,7 @@ compound 항목에 섞였던 실제 사용자 흐름 및 공급자/펀딩 경로
 | 연결 충돌 | 이미 다른 회원에 연결된 외부 계정으로 연결 시도 | 충돌 안내; 두 회원과 기존 수단·권한 보존 | OPEN |
 | 해제·마지막 수단 | 여러 수단 중 하나 해제, 유일 수단 해제 시도 | 가능 수단만 해제; 마지막 로그인 수단 거부; 다음 로그인 확인 | OPEN |
 | 소유자 반복 약관 사례 | 본인 카카오 인증 → 추가 정보 적용 | 제출 후 예상 다음 단계, 현재 정책 pending 없음; 새 정책이면 한 번의 정당한 재동의 | OPEN |
-| 전체관리자 경계 | admin에서 Google 및 다른 로그인 진입 | 승인된 Google 관리자만 접근; 카카오·이메일·Demo 관리자 진입 거부 | OPEN |
+| 전체 관리자 경계 | admin에서 Google 및 다른 로그인 진입 | 승인된 Google 관리자만 접근; 카카오·이메일·Demo 관리자 진입 거부 | OPEN |
 
 실제 본인 카카오 가입이 아직 완료되지 않았다면 기존 회원 로그인·연결 테스트와 섞지 않는다.
 이메일 확인은 실제 수신 확인을 별도 기록하며 fixture의 mailSent 응답으로 대체하지 않는다.
@@ -554,7 +554,7 @@ communities 배열을 추가한 독립 전체 재실행이 24/24 PASS다. 운영
 ### Shared Module Change Verification
 
 변경: API signup-policy/terms-acceptance/policy-acceptance, 공통 PolicyAcceptanceGate.
-전체관리자 관리 경로 예외·서비스 membership/role/매장 원장 guard는 유지한다. 요청 경로와 서명된
+전체 관리자 관리 경로 예외·서비스 membership/role/매장 원장 guard는 유지한다. 요청 경로와 서명된
 세션 범위로 서비스 pending을 선택한다. common Neture acceptance 때문에 membership/role을 만들지 않는다.
 legacy 범위 미상은 전체 raw pending으로 보수적으로 처리한다. GET/POST 약관 응답은 세션 범위로 제한하며,
 Demo 예외는 enforcement에만 적용하고 raw 이력은 그대로 유지한다.
@@ -565,7 +565,7 @@ Demo 예외는 enforcement에만 적용하고 raw 이력은 그대로 유지한�
 | 약국 | 가입 문서는 Neture; 공통/약국 본문 각각 확인 | API origin·가입 회귀; 약국 build 및 PC/mobile production bundle | PASS(로컬) |
 | 분회 | 공통 재동의 화면 신규 연결, 공통 workspace 의존성 한 건 | 분회 build/타입, 기존 4 files/35 tests; PC/mobile production bundle | PASS(로컬) |
 | 내 매장·강의 | 기존 공통 gate 소비; 서로 다른 문서 조회·표시 계약 적용 | 전체 frontend 타입 + 공통 UI 회귀 | PASS(로컬; 이번 별도 브라우저 smoke 미실행) |
-| 전체관리자 | 기존 관리 경로 exemption와 역할 guard 유지 | API admin 경로 회귀 | PASS(로컬) |
+| 전체 관리자 | 기존 관리 경로 exemption와 역할 guard 유지 | API admin 경로 회귀 | PASS(로컬) |
 | 은퇴 K-Cosmetics/PharmacyHub | 신규 가입·운영 화면 추가 없음 | 현행 소비처 검색 | 운영 smoke 제외 |
 | raw-source 계약 | auth-logout-retirement-contract의 약관 정책 경로 문자열 참조 | literal consumer 검색·raw-source 4 tests | PASS |
 
@@ -616,7 +616,7 @@ Neture 공통 본문과 서비스 신청 조건이 완성되기 전에 운영의
 ### 실제 운영자 mount의 추가 리뷰 보완
 
 일반 Neture prefix보다 먼저 공급자 운영자·서비스 관리자 및 펀딩 운영자의 실제 하위 mount를
-판정하도록 추가했다. 전체관리자 `/api/v1/admin/**` 예외와 서비스 역할 guard는 변경하지 않았다.
+판정하도록 추가했다. 전체 관리자 `/api/v1/admin/**` 예외와 서비스 역할 guard는 변경하지 않았다.
 전체 등록 경로를 대조하며 `/api/market-trial`과 `/api/v1/communities`도 해당 서비스로 연결했다.
 공유 store/forum API는 여러 소비처가 있으므로 서명된 세션 범위를 유지한다.
 
@@ -627,9 +627,9 @@ Neture 공통 본문과 서비스 신청 조건이 완성되기 전에 운영의
 이 서버 판정 수정으로 재실행하지 않았으며 해당 검증의 범위를 그대로 유지한다.
 
 
-### 전체관리자 관리 세션의 추가 리뷰 보완
+### 전체 관리자 관리 세션의 추가 리뷰 보완
 
-전체관리자 화면은 `/api/v1/admin/**`뿐 아니라 settings·apps/availability·users 및 서비스 관리
+전체 관리자 화면은 `/api/v1/admin/**`뿐 아니라 settings·apps/availability·users 및 서비스 관리
 API도 사용한다. 공통 Neture 약관을 membership 없이 요구한 변경으로 이 관리 업무가 차단될 수
 있음을 확인했다. `requireAuth`의 계정/세션 상태 및 Google 인증수단 검증 후, **서명된 admin
 세션 + 현재 DB platform:super_admin 역할**일 때만 약관 enforcement를 면제한다.
@@ -1001,7 +1001,7 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 - PH 종료 후 WIF 복원을 사용자가 확인했다. 읽기 전용 인증 run38187804879와
   Delivery 진단38188246897이 SUCCESS다. 이전 WIF 거절 기록은 당시 결과이며 현재 blocker가 아니다.
 - Promote38189866093은 main 이동으로 SUPERSEDED되어 실제 배포하지 않았다. 최신 문서 변경을
-  포함한 Promote38190265457(target `0e1aa41eaf`)에서는 API·Neture·KPA Society·강의·매장·전체관리자
+  포함한 Promote38190265457(target `0e1aa41eaf`)에서는 API·Neture·KPA Society·강의·매장·전체 관리자
   이미지 배포 job이 SUCCESS였다. 분회는 Docker 이미지 빌드가 실패했고 전체 Report도 FAILED다.
   후속 Promote38192368264에서도 분회 빌드가 실패했다. 전체 배포 완료로 기록하지 않는다.
 - 분회 package.json에 추가한 `@o4o/shared-space-ui`가 기존 Docker COPY 목록에는 빠져 있었다.
@@ -1019,7 +1019,7 @@ main 통합·운영 배포 검증은 아직 진행 중이며 WIF 진단의 인�
 - 유지 서비스8개(Neture·공급자·커뮤니티·펀딩·약국·매장·강의·분회)의 PC/mobile ×
   매장 경영자/공급자 실제 Demo 버튼32조건을 검증했다. 초회30/32 PASS 뒤 공급자 화면2조건은
   정확한 전역 메뉴 선택과 공급자 정보 안내의 ‘나중에 하기’ 처리로 재검증 PASS다.
-  로그인/내 정보200, 전체관리자403, 역할별 업무200/403, Demo 비밀번호·연결 관리 제한,
+  로그인/내 정보200, 전체 관리자403, 역할별 업무200/403, Demo 비밀번호·연결 관리 제한,
   UI 로그아웃200 후 access/refresh401을 확인했다. Neture 매장 Demo의 매장 handoff와
   원래 Neture 세션 로그아웃 후 매장 세션 유지200도 PC/mobile에서 확인했다.
 - 운영 정책 계약14건은 PASS다. 가입8 origin의 현행 terms/privacy v1·정확한 privacy 소유권·no-store,
@@ -1046,7 +1046,7 @@ GitHub 배포 로그/자료의 `productionresultssa7.blob.core.windows.net`은 �
 - 분회 최종 serving SHA는 `899e871ccee0114f6cf7ac73999011a1d364b994`다. Report는 GCP serving을
   다시 읽고 계획된 서비스의 SHA가 target과 일치할 때만 DEPLOYED로 판정한다.
   해당 SHA의 최종 production status도 SUCCESS/DEPLOYED다.
-- API·전체관리자·Neture·KPA Society·강의·매장의 실제 serving 검증은 앞선 run38190265457의
+- API·전체 관리자·Neture·KPA Society·강의·매장의 실제 serving 검증은 앞선 run38190265457의
   최종 production status에서 통과한6개를 확인했다(target `0e1aa41eafab8cd3bc1b2c099f20d903ac785a18`).
   최신 Promote에서는 추가 runtime 변경이 없는6개를 재배포하지 않고 분회만 배포했다.
   앞선 전체 FAILED는 분회 실패 때문이며 이번 성공으로 그 배포 잔여가 해소됐다.
