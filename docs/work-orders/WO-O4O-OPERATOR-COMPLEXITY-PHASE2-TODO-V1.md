@@ -53,7 +53,7 @@
 - [x] Neture 상품 승인: 승인 상품 휴지통 이동 오류 처리, 목록/분석 상태 책임 분리 구현·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [x] Neture 공급자 승인: 심사 입력·서류 표시·요청 수명 C1/R1/A1 정비·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [ ] 약국 사업자 회원관리: 필드 변경값·검증·순차 저장 결과 F1/C1/A1 조사.
-- [ ] 약국 사업 행사/협력사업: 편집·모집·참여·사업 전환 R1/S1/A1 조사.
+- [x] 약국 협력사업 운영자: 담당 사업 조회·행사/모집 조건 심사·콘텐츠 편집의 R1/S1/A1 조사·첫 정비 ([WO](WO-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)). 공급자 참여 심사 화면은 별도 후속. 종료는 push/PR 인계.
 - [ ] 펀딩: 단계별 안내·상태 변경·참여/KPI 갱신 F1/R1/A1 조사. 단계 연결은 main/배포 완료; 구조 분리는 별도.
 - [ ] 강의: 문의·심사·수료증 입력/처리/결과 R1/S1/A1 조사. 오류 보완은 main/배포 완료; 구조 분리는 별도.
 - [ ] 개별 커뮤니티: 가입·제재·탈퇴·이력 C1/R1 조사. 새 신고/승계 정책 설계는 별도.
@@ -123,3 +123,12 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 ### 상품·공급자 승인 통합 정비 결과
 
 [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.
+
+### 협력사업·행사 운영 흐름 정비 결과
+
+기존 공유 모듈의 조회/심사 수명과 콘텐츠 초안/저장 수명을 분리했다.
+Neture 전체 담당 사업과 약국 사업자 businessKey=pharmacy 소비처를 함께 검증했다.
+실패 사유·대상 보존, 성공 후 조회만 재시도, 이전 사업 요청 무효화를 정비했다.
+모집 조건 승인(운영자)과 참여 승인(공급자)은 분리하며 공급자 참여 심사 화면 자체는 후속이다.
+[CHECK](../checks/CHECK-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)에 검증·참여/내 매장 연결·인계 범위를 기록한다.
+개발 담당은 push/PR까지, 통합·배포는 별도 담당 공간에서 진행한다. 약사회 분회는 제외한다.
