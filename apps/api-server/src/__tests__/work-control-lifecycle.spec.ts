@@ -49,6 +49,7 @@ import {
   type PlannerInput,
 } from '../services/ai-tools/work-agent-runtime.js';
 import type { ExecutionIntent } from '../services/ai-tools/work-agent-contract.js';
+import { nodeLedgerOwnerKey } from '../services/ai-tools/node-ledger-owner.js';
 
 const trace: string[] = [];
 const contexts: Record<
@@ -223,6 +224,14 @@ beforeEach(() => {
   });
 });
 
+it('organization execution matches procedures only in the requesting user ledger', async () => {
+  const p = scripted([done]);
+  await runWorkAgent(db, ctx(), { request }, p.planner, { intent: intent(undefined) });
+  expect(executor.issueWorkflowCandidateMatch).toHaveBeenCalledWith(
+    db, expect.objectContaining({ ownerKey: nodeLedgerOwnerKey('USER', ctx().userId) }), expect.anything(),
+  );
+});
+
 it('recalls declarations before execution, switches role after await, preserves first input and terminal recording order', async () => {
   const gate = deferred<any>(),
     recalled = deferred<void>();
@@ -352,7 +361,7 @@ it('keeps concurrent task keys, node/owner recall, planner roles and plan counte
   expect(calls.find((c) => c[2].taskKey === 'task.alpha')[1]).toEqual({
     userId: 'actor-a',
     deviceId: 'node-a',
-    ownerKey: 'owner-a',
+    ownerKey: nodeLedgerOwnerKey('USER', 'actor-a'),
   });
   expect(calls.find((c) => c[2].taskKey === 'task.beta')[1]).toMatchObject({
     userId: 'actor-b',

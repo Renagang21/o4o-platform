@@ -481,7 +481,7 @@ export async function runWorkAgent(
   if (surface === 'dom' && !resumedRun && !recoveryHint && !image) {
     let match: Awaited<ReturnType<typeof issueWorkflowCandidateMatch>> | null = null;
     try {
-      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
+      match = await issueWorkflowCandidateMatch(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner ? nodeLedgerOwnerKey('USER', ctx.userId) : null }, {
         targetId: siteId, request: normalizeWorkflowText(goal.request).slice(0, 500),
       });
     } catch (e) {
