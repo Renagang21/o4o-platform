@@ -47,7 +47,7 @@ export function useQrCreation(
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const revision = useRef(0);
-  const busy = useRef(false);
+  const busy = useRef(new Set<string>());
   const request = useLatestStoreRequest(organizationId);
   const currentOrganization = useRef(organizationId);
   currentOrganization.current = organizationId;
@@ -63,6 +63,7 @@ export function useQrCreation(
     setTarget(null);
     setDraft(emptyDraft);
     setError(null);
+    setSaving(busy.current.has(organizationId));
   }, [organizationId]);
   const changeDraft = <K extends keyof QrCreationDraft>(
     field: K,
@@ -107,7 +108,7 @@ export function useQrCreation(
     setError(null);
   };
   const save = async () => {
-    if (!target || busy.current) return;
+    if (!target || busy.current.has(organizationId)) return;
     if (!draft.slug.trim()) {
       setError("슬러그를 입력해주세요");
       return;
@@ -124,7 +125,7 @@ export function useQrCreation(
             landingType: "video",
             landingTargetId: target.item.id,
           };
-    busy.current = true;
+    busy.current.add(organizationId);
     setSaving(true);
     setError(null);
     try {
@@ -141,8 +142,8 @@ export function useQrCreation(
       if (isCurrent() && submittedRevision === revision.current)
         setError("슬러그가 이미 사용중이거나 저장에 실패했습니다");
     } finally {
-      busy.current = false;
-      setSaving(false);
+      busy.current.delete(organizationId);
+      if (currentOrganization.current === organizationId) setSaving(false);
     }
   };
   return {

@@ -1,7 +1,6 @@
-import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { useChannelProductPicker } from './hooks/useChannelProductPicker';
 import { useChannelProductActions } from './hooks/useChannelProductActions';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
-import { fetchAvailableProducts } from '../../api/channelProducts';
 import { ChannelPublicUrlCard } from './channels/ChannelPublicUrlCard';
 import { useChannelWorkspace } from './hooks/useChannelWorkspace';
 /**
@@ -37,7 +36,7 @@ import { useChannelWorkspace } from './hooks/useChannelWorkspace';
  *  [E] 자산 리스트(채널맵)
  */
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Loader2,
@@ -69,8 +68,6 @@ import {
   type ChannelMap,
 } from '../../api/assetSnapshot';
 import {
-  addProductToChannel,
-  type AvailableProduct,
 } from '../../api/channelProducts';
 import { GuideEditableSection } from '../../components/guide';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
@@ -138,52 +135,19 @@ function AddProductModal({
   onError,
   onClose,
   channelId,
+  organizationId,
   onProductAdded,
 }: {
   open: boolean;
   onClose: () => void;
   channelId: string;
+  organizationId: string;
   onProductAdded: () => void;
   onError?: (message: string) => void;
 }) {
-  const [available, setAvailable] = useState<AvailableProduct[]>([]);
-  const [loadingList, setLoadingList] = useState(false);
-  const [addingId, setAddingId] = useState<string | null>(null);
-
-  const listRequest = useLatestStoreRequest(`${channelId}:${open}`);
-  const addRequest = useLatestStoreRequest(`${channelId}:${open}`);
-  const addBusy = useRef(false);
-  const notifyError = useRef(onError);
-  notifyError.current = onError;
-  useEffect(() => {
-    if (!open || !channelId) return;
-    const isCurrent = listRequest.begin();
-    setLoadingList(true);
-    fetchAvailableProducts(channelId)
-      .then(items => { if (isCurrent()) setAvailable(items); })
-      .catch(() => { if (isCurrent()) notifyError.current?.('추가 가능한 제품을 불러오지 못했습니다.'); })
-      .finally(() => { if (isCurrent()) setLoadingList(false); });
-  }, [open, channelId, listRequest]);
-
+  const { available, loadingList, loadError, addingId, add: handleAdd, retry } =
+    useChannelProductPicker(open, organizationId, channelId, onProductAdded, onError);
   if (!open) return null;
-
-  const handleAdd = async (productListingId: string) => {
-    if (addBusy.current) return;
-    const isCurrent = addRequest.begin();
-    addBusy.current = true;
-    setAddingId(productListingId);
-    try {
-      await addProductToChannel(channelId, productListingId);
-      if (!isCurrent()) return;
-      setAvailable(prev => prev.filter(p => p.id !== productListingId));
-      onProductAdded();
-    } catch {
-      if (isCurrent()) onError?.('제품 추가에 실패했습니다.');
-    } finally {
-      addBusy.current = false;
-      setAddingId(null);
-    }
-  };
 
   return (
     <>
@@ -208,6 +172,11 @@ function AddProductModal({
           {loadingList ? (
             <div className="flex items-center justify-center py-12 text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
+            </div>
+          ) : loadError ? (
+            <div role="alert" className="p-4 text-red-700">
+              <p>{loadError}</p>
+              <button type="button" onClick={retry}>다시 시도</button>
             </div>
           ) : available.length === 0 ? (
             <div className="text-center py-10">
@@ -1116,6 +1085,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
           open={showAddModal}
           onClose={() => setShowAddModal(false)}
           channelId={currentChannel.id}
+          organizationId={organizationId}
           onProductAdded={handleProductAdded}
           onError={(msg) => showToast('error', msg)}
         />

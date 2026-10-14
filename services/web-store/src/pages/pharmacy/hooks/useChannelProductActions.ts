@@ -36,29 +36,32 @@ export function useChannelProductActions({
   const [confirmModal, setConfirmModal] = useState<Confirmation | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [reordering, setReordering] = useState(false);
-  const busy = useRef(false);
+  const scope = `${organizationId}:${channelId ?? ""}`;
+  const busy = useRef(new Map<string, boolean>());
+  const currentScope = useRef(scope);
+  currentScope.current = scope;
   const request = useLatestStoreRequest(`${organizationId}:${channelId ?? ""}`);
   useEffect(() => {
     setSelectedIds(new Set());
     setConfirmModal(null);
-    setActionLoading(false);
-    setReordering(false);
-  }, [organizationId, channelId]);
+    setActionLoading(busy.current.has(scope) && !busy.current.get(scope));
+    setReordering(busy.current.get(scope) === true);
+  }, [scope]);
 
   const run = async (
     reorder: boolean,
     task: (isCurrent: () => boolean) => Promise<void>,
   ) => {
-    if (!channelId || busy.current) return;
+    if (!channelId || busy.current.has(scope)) return;
     const isCurrent = request.begin();
-    busy.current = true;
+    busy.current.set(scope, reorder);
     if (reorder) setReordering(true);
     else setActionLoading(true);
     try {
       await task(isCurrent);
     } finally {
-      busy.current = false;
-      if (isCurrent()) {
+      busy.current.delete(scope);
+      if (currentScope.current === scope) {
         setActionLoading(false);
         setReordering(false);
       }
@@ -89,7 +92,7 @@ export function useChannelProductActions({
     });
   };
   const handleSingleAction = async (type: Action, id: string) => {
-    if (!channelId || busy.current) return;
+    if (!channelId || busy.current.has(scope)) return;
     if (type === "delete") {
       setConfirmModal({ type, ids: [id], isBulk: false, channelId });
       return;
@@ -127,7 +130,7 @@ export function useChannelProductActions({
     });
   };
   const handleBulkAction = (type: Action) => {
-    if (channelId && selectedIds.size && !busy.current)
+    if (channelId && selectedIds.size && !busy.current.has(scope))
       setConfirmModal({
         type,
         ids: Array.from(selectedIds),
