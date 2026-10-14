@@ -131,6 +131,12 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 다른 서비스와 공통화하지 않았다. 약사회 분회 수정·배포는 없다.
 다음 업무 큐는 약국 협력사업·행사이며, 회원관리 API 차수에 아래 불일치를 추가한다.
 
-- [ ] KPA 전용 status API는 operator에게 active/rejected만 허용해 전용 화면의 정지를 거절한다. 일상 정지/복구 원칙과 공통 상세/단건/일괄 전 경로 대조.
-- [ ] KPA 회원 유형 변경 select는 operator에게도 열리지만 info API는 admin으로 제한한다. 일반 역할 변경과 회원 유형 변경 의미를 구분해 UI/API 정합 확인.
+- [x] KPA 전용 status API의 operator 정지·복구 차단 정비. 단건/일괄 공통 요청 경로·잠금 후 상태 재확인·탈퇴 복구 차단 검증 ([WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md), push 단계).
+- [x] KPA 약사/약대생 유형 변경의 operator 권한을 UI/API에 일치시키고 운영 tier 주입 거부 검증 ([WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md), push 단계).
 - [ ] 쓰기 응답 유실 시 재시도 멱등성은 서버 계약 조사 대상으로 유지.
+
+### KPA 일상 회원관리 권한 후속 결과
+
+[전용 WO](WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md)에서 앞서 발견한 정지·복구/회원 유형 권한 불일치를 해소했다.
+모달의 일상 상태 선택과 admin 민감 상태 선택도 분리한다. 선행 회원 수정 정비를 새 branch에 포함하며
+두 작업의 main 병합·배포는 아직 하지 않는다. 약사회 분회는 제외한다.

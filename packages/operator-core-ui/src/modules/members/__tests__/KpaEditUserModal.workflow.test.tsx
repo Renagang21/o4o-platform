@@ -123,7 +123,7 @@ describe('KPA member editing workflow', () => {
   });
   it('does not resend a completed status when refreshing fails, including withdrawal protection', async () => {
     const onSuccess = vi.fn().mockImplementationOnce(() => { throw new Error('callback'); }).mockImplementation(() => {});
-    const { props } = setup({ onSuccess }); edit('상태', 'withdrawn'); save();
+    const { props } = setup({ onSuccess, canAdministerMemberStatus: true }); edit('상태', 'withdrawn'); save();
     await screen.findByText(/목록 갱신에 실패/);
     edit('상태', 'active'); save();
     await screen.findByText('탈퇴 처리된 회원은 수정할 수 없습니다.');
@@ -151,4 +151,27 @@ describe('KPA member editing workflow', () => {
       const { props } = setup({ member: protectedMember });
       expect(screen.queryByRole('button', { name: '저장' })).toBeNull(); expect(props.makeRequest).not.toHaveBeenCalled();
     });
+});
+
+
+describe('KPA daily status controls', () => {
+  it.each([
+    ['active', ['active', 'suspended']], ['suspended', ['active', 'suspended']],
+    ['pending', ['pending', 'active', 'rejected']], ['rejected', ['active', 'rejected']],
+  ] as const)('operator %s sees only daily status actions', (status, expected) => {
+    setup({ member: { ...member, status } });
+    const select = screen.getByLabelText('상태') as HTMLSelectElement;
+    expect(Array.from(select.options, option => option.value)).toEqual(expected);
+  });
+  it('keeps sensitive status options for service admins', () => {
+    setup({ canAdministerMemberStatus: true });
+    const select = screen.getByLabelText('상태') as HTMLSelectElement;
+    expect(Array.from(select.options, option => option.value)).toEqual(['pending', 'active', 'suspended', 'rejected', 'withdrawn']);
+  });
+  it('updates visible status choices after approval even when the refresh callback fails', async () => {
+    const onSuccess = vi.fn(() => { throw new Error('refresh'); });
+    setup({ member: { ...member, status: 'pending' }, onSuccess });
+    edit('상태', 'active'); save(); await screen.findByText(/목록 갱신에 실패/);
+    expect(Array.from((screen.getByLabelText('상태') as HTMLSelectElement).options, o => o.value)).toEqual(['active', 'suspended']);
+  });
 });

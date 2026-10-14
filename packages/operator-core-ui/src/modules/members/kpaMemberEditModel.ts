@@ -1,4 +1,4 @@
-import type { KpaMemberForEdit } from './KpaEditUserModal';
+import type { KpaMemberForEdit, KpaMemberStatus } from './KpaEditUserModal';
 
 /** KPA 전용 편집 초안. API 읽기 alias는 여기서만 해석하고 쓰기는 canonical key를 사용한다. */
 export function createKpaMemberDraft(member: KpaMemberForEdit) {
@@ -78,4 +78,21 @@ export function validateKpaMemberInfo(info: KpaMemberInfoPatch): string | undefi
     return '활동 유형을 선택해 주세요.';
   }
   return undefined;
+}
+
+export const KPA_MEMBER_STATUS_OPTIONS = [
+  { value: 'pending', label: '대기' },
+  { value: 'active', label: '활성' },
+  { value: 'suspended', label: '정지' },
+  { value: 'rejected', label: '반려' },
+  { value: 'withdrawn', label: '탈퇴' },
+] as const;
+
+/** KPA 전용 status API의 operator 일상 업무 범위와 일치시킨다. */
+export function canEditKpaMemberStatus(current: KpaMemberStatus, next: KpaMemberStatus, isAdmin: boolean): boolean {
+  if (isAdmin) return true;
+  if (next === 'active') return ['pending', 'rejected', 'active', 'suspended'].includes(current);
+  if (next === 'suspended') return ['active', 'suspended'].includes(current);
+  if (next === 'rejected') return ['pending', 'rejected'].includes(current);
+  return false;
 }

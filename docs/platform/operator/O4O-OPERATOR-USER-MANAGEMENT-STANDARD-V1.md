@@ -1,6 +1,6 @@
 # O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
 
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-13 (일상 업무·민감 업무의 현행 권한 표와 서비스 탈퇴/전체 계정 제거 구분 정합. 후속 UI 보완은 push 단계이며 main·배포 전)
+> **상태**: ACTIVE · **최종 갱신**: 2026-10-14 (KPA 전용 회원관리 일상 권한 불일치 정비. 해당 후속 구현은 push 단계이며 main·배포 전)
 > (2026-10-04 정합) **운영자의 회원 비밀번호 변경은 은퇴했다** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`([CHECK](../../checks/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md): admin/operator password 변경 surface 0 · PasswordModal 제거). 이후 도입된 이메일 · 비밀번호 로그인([CHECK](../../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md))은 **사용자 본인**의 인증 수단(가입 · 재설정 · 로그인 상태 `POST /auth/password`)이며 Admin 화면 · `platform:*` 세션은 Google 전용이다. 운영자가 대신 바꾸는 비밀번호 경로는 없다. 아래 §3.2 · §4.2 · §6.1 의 비밀번호 항목은 무효.
 
 > **O4O 운영자 회원관리 표준 v1**
@@ -118,7 +118,7 @@ K-Cosmetics·Pharmacy-Hub 웹 서비스는 은퇴했으므로 공통 API의 역�
 | suspended | 활성화 |
 | 모든 상태 | 수정, 비밀번호 변경, 삭제 |
 
-> (2026-10-09 정합) "비밀번호 변경" 은 은퇴. 수정은 admin/operator 모두, 정지·활성 회원 복구·삭제는 admin만 허용한다(§1.1).
+> (2026-10-14 정합) "비밀번호 변경"은 은퇴. 수정·사용중지·정지 복구·일반 회원 유형 변경은 admin/operator 모두, 서비스 탈퇴·삭제·탈퇴 복구는 admin만 허용한다(§1.1).
 
 ### 3.3 행 클릭
 
@@ -511,3 +511,14 @@ WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
 공통 서비스 가입 관리에 적용하며 개별 커뮤니티·분회·담당 사업 회원 원장에 자동 적용하지 않는다.
 서비스 탈퇴 안내·탈퇴 회원 복구 화면·반려 취소의 후속 정비와 서비스별 사용자 직접 테스트는
 [공통 회원관리 후속 WO](../../work-orders/WO-O4O-COMMON-MEMBER-MANAGEMENT-FOLLOWUP-V1.md)에서 추적한다.
+
+
+### 2026-10-14 KPA 전용 회원 API 후속 정합 (push 단계)
+
+KPA Society 약국 사업자 `/operator/members`가 사용하는 전용 `/kpa/members/:id/status`의
+operator 정지·정지 복구 차단과 `/info`의 회원 유형 admin 제한을 후속 정비했다.
+약사/약대생 및 기존 alias의 변경은 일상 업무이며 서비스 운영 tier 지정과 별개다.
+탈퇴·가입 대기 되돌림·탈퇴 복구의 admin 제한, 최신 잠금 상태에 따른 가입 반려 판단은 유지한다.
+공통 계정 상태·다른 서비스 가입·약사회 분회는 이 변경 대상이 아니다.
+이 정비의 코드/검증/전달 상태는 [전용 WO](../../work-orders/WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md)를 따른다.
+이 문구만으로 main 병합·운영 반영·실계정 검증 완료로 보지 않는다.

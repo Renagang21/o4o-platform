@@ -349,7 +349,7 @@ export default function MemberManagementPage() {
           tableId="kpa-operator-members"
           drawerExtraSections={(u) => <KpaDrawerSections user={u as KpaUserData} />}
           renderEditModal={({ user, onClose, onSuccess }) => (
-            <KpaEditModalSlot canChangeMembershipType={canManageLifecycle} user={user as KpaUserData} onClose={onClose} onSuccess={onSuccess} />
+            <KpaEditModalSlot canAdministerMemberStatus={canDeleteMembership} canChangeMembershipType={canManageLifecycle} user={user as KpaUserData} onClose={onClose} onSuccess={onSuccess} />
           )}
           extraRowActions={[
             {
@@ -463,6 +463,7 @@ export default function MemberManagementPage() {
 // ─── KpaEditModalSlot — super_admin / withdrawn guard 적용 ───
 
 function KpaEditModalSlot({
+  canAdministerMemberStatus,
   canChangeMembershipType,
   user,
   onClose,
@@ -470,6 +471,7 @@ function KpaEditModalSlot({
 }: {
   user: KpaUserData;
   canChangeMembershipType: boolean;
+  canAdministerMemberStatus: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -510,6 +512,7 @@ function KpaEditModalSlot({
   return (
     <KpaEditUserModal
       canChangeMembershipType={canChangeMembershipType}
+      canAdministerMemberStatus={canAdministerMemberStatus}
       member={member}
       makeRequest={kpaEditModalMakeRequest}
       onClose={onClose}

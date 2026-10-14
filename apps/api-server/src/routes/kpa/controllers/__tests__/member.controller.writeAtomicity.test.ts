@@ -60,9 +60,15 @@ jest.mock('@o4o/platform-core/store-identity', () => ({
   })),
 }), { virtual: true });
 
+import express from 'express';
+import request from 'supertest';
+import { createMembershipScopeGuard } from '../../../../common/middleware/membership-guard.middleware.js';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { roleAssignmentService } from '../../../../modules/auth/services/role-assignment.service.js';
 import { createMemberController } from '../member.controller.js';
 
 const MEMBER_ID = '11111111-2222-4333-8444-555555555555';
+const MEMBERSHIP_ID = '33333333-4444-4555-8666-777777777777';
 const USER_ID = '22222222-3333-4444-8555-666666666666';
 const OPERATOR_ID = '99999999-8888-4777-8666-555555555555';
 
@@ -75,7 +81,7 @@ function normalize(sql: string): string {
 }
 
 /** 테스트용 DataSource 더블 — transaction 경계와 SQL 흐름을 기록한다. */
-function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string; currentMembershipStatus?: string } = {}) {
+function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string; currentMembershipStatus?: string; missingMember?: boolean; demo?: boolean } = {}) {
   const calls: Call[] = [];
   const saves: Array<{ entity: string; scope: 'tx' | 'global'; value: any }> = [];
   const state: any = {
@@ -102,11 +108,20 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
     student_year: null,
   };
 
+  let memberExists = !options.missingMember;
   const runQuery = async (scope: 'tx' | 'global', sql: string, params: any[] = []) => {
     const n = normalize(sql);
     calls.push({ sql: n, params, scope });
     if (options.failOn && options.failOn.test(n)) {
       throw new Error('INJECTED_FAILURE');
+    }
+    if (/SELECT 1 FROM demo_accounts/i.test(n)) return options.demo ? [{ exists: 1 }] : [];
+    if (/SELECT id, user_id, status, role, created_at FROM service_memberships/i.test(n)) {
+      return [{ id: MEMBERSHIP_ID, user_id: USER_ID, status: options.currentMembershipStatus ?? 'pending', role: 'member', created_at: '2026-10-01' }];
+    }
+    if (/INSERT INTO kpa_members/i.test(n)) {
+      memberExists = true; member.status = params[2]; member.identity_status = params[5];
+      return [{ id: MEMBER_ID }];
     }
     if (/SELECT status FROM service_memberships/i.test(n)) return [{ status: options.currentMembershipStatus ?? 'pending' }];
     if (/SELECT "businessInfo" FROM users/i.test(n)) {
@@ -120,7 +135,7 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
 
   const makeManager = (scope: 'tx' | 'global') => ({
     query: (sql: string, params?: any[]) => runQuery(scope, sql, params ?? []),
-    findOne: async (entity: any, _opts: any) => (entityName(entity) === 'KpaMember' ? member : null),
+    findOne: async (entity: any, _opts: any) => (entityName(entity) === 'KpaMember' && memberExists && (_opts.where?.id === MEMBER_ID || _opts.where?.user_id === USER_ID) ? member : null),
     save: async (entity: any, value: any) => {
       const name = entityName(entity);
       saves.push({ entity: name, scope, value });
@@ -133,7 +148,7 @@ function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEnti
   });
 
   const repo = (name: string) => ({
-    findOne: async () => (name === 'KpaMember' ? member : null),
+    findOne: async (opts: any) => (name === 'KpaMember' && memberExists && (opts.where?.id === MEMBER_ID || opts.where?.user_id === USER_ID) ? member : null),
     save: async (value: any) => {
       saves.push({ entity: name, scope: 'global', value });
       return value;
@@ -432,7 +447,7 @@ describe('PATCH /kpa/members/:id/status — approval atomicity', () => {
 });
 
 describe('KPA member management role policy', () => {
-  it.each(['suspended', 'withdrawn'])('operator cannot set %s before any writes', async status => {
+  it.each(['pending', 'withdrawn'])('operator cannot set %s before any writes', async status => {
     const h = makeDataSource(); const handler = getHandler(h.dataSource, '/:id/status', 'patch'); const out = makeRes();
     const r: any = req({ status }); r.user.roles = ['kpa:operator'];
     await handler(r, out);
@@ -452,7 +467,7 @@ describe('KPA member management role policy', () => {
   });
 });
 
-it('KPA operator can edit common profile but cannot change membership type', async () => {
+it('KPA operator can edit common profile and change ordinary membership type', async () => {
   const h = makeDataSource();
   const handler = getHandler(h.dataSource, '/:id/info', 'patch');
   const edit: any = req({ name: '프로필 수정' }); edit.user.roles = ['kpa:operator'];
@@ -460,6 +475,109 @@ it('KPA operator can edit common profile but cannot change membership type', asy
   expect(edited.statusCode).toBe(200);
   expect(h.calls.some(c => /^UPDATE users SET name/.test(c.sql))).toBe(true);
   const change: any = req({ membership_type: 'student' }); change.user.roles = ['kpa:operator'];
-  const blocked = makeRes(); await handler(change, blocked);
-  expect(blocked.statusCode).toBe(403);
+  const changed = makeRes(); await handler(change, changed);
+  expect(changed.statusCode).toBe(200);
+  expect(h.member.membership_type).toBe('student');
+  expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
+  expect(roleAssignmentService.removeRole).not.toHaveBeenCalled();
+});
+
+
+describe('KPA daily lifecycle authority and ID compatibility', () => {
+  it.each([
+    ['active', 'suspended', 'suspendMembership'],
+    ['suspended', 'active', 'reactivateMembership'],
+    ['suspended', 'suspended', 'suspendMembership'],
+  ])('operator %s→%s uses the same KPA transaction', async (current, next, method) => {
+    const h = makeDataSource({ currentMembershipStatus: current }); h.member.status = current;
+    const r = req({ status: next }); r.user.roles = ['kpa:operator'];
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(200); expect(h.member.status).toBe(next);
+    expect((mockApprovalService as any)[method]).toHaveBeenCalledWith(expect.objectContaining({
+      userId: USER_ID, serviceKeys: ['kpa-society'], manager: h.state.txManager,
+    }));
+    expect(h.state.txCommitted).toBe(1);
+    expect(h.calls.some(c => /UPDATE users.*status/i.test(c.sql))).toBe(false);
+    expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
+  });
+  it.each([USER_ID, MEMBERSHIP_ID])('operator can restore a suspended member by canonical/legacy ID %s', async id => {
+    const h = makeDataSource({ currentMembershipStatus: 'suspended' }); h.member.status = 'suspended';
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator']; r.params.id = id;
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(200); expect(mockApprovalService.reactivateMembership).toHaveBeenCalledTimes(1);
+  });
+  it('preserves suspended state when ensuring a missing KPA row before restoration', async () => {
+    const h = makeDataSource({ currentMembershipStatus: 'suspended', missingMember: true });
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator']; r.params.id = USER_ID;
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(200);
+    const ensure = h.calls.find(c => /^INSERT INTO kpa_members/.test(c.sql))!;
+    expect(ensure.params[2]).toBe('suspended'); expect(ensure.params[5]).toBe('suspended');
+    expect(mockApprovalService.reactivateMembership).toHaveBeenCalledTimes(1);
+    expect(mockApprovalService.approveMembership).not.toHaveBeenCalled();
+  });
+  it.each([MEMBER_ID, USER_ID, MEMBERSHIP_ID])('operator cannot restore withdrawn state through ID %s', async id => {
+    const h = makeDataSource({ currentMembershipStatus: 'withdrawn' }); h.member.status = 'withdrawn';
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator']; r.params.id = id;
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(403); expect(h.saves).toHaveLength(0);
+    expect(h.calls.filter(c => WRITE_RE.test(c.sql))).toHaveLength(0);
+    expect(mockApprovalService.reactivateMembership).not.toHaveBeenCalled();
+  });
+  it('rejects withdrawn canonical state before inserting a missing KPA row', async () => {
+    const h = makeDataSource({ currentMembershipStatus: 'withdrawn', missingMember: true });
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator']; r.params.id = USER_ID;
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(403); expect(h.calls.filter(c => WRITE_RE.test(c.sql))).toHaveLength(0);
+  });
+  it('rechecks a concurrent withdrawal under the service membership lock before writes', async () => {
+    const h = makeDataSource({ currentMembershipStatus: 'withdrawn' }); h.member.status = 'suspended';
+    const r = req({ status: 'active' }); r.user.roles = ['kpa:operator'];
+    const out = makeRes(); await getHandler(h.dataSource, '/:id/status', 'patch')(r, out);
+    expect(out.statusCode).toBe(403); expect(h.state.txRolledBack).toBe(1);
+    expect(h.calls.filter(c => WRITE_RE.test(c.sql))).toHaveLength(0); expect(h.saves).toHaveLength(0);
+  });
+  it('keeps Demo guard ahead of daily type/status writes', async () => {
+    for (const [path, body] of [['/:id/info', { membership_type: 'student' }], ['/:id/status', { status: 'suspended' }]] as const) {
+      const h = makeDataSource({ demo: true }); h.member.status = 'active';
+      const r = req(body); r.user.roles = ['kpa:operator']; const out = makeRes();
+      await getHandler(h.dataSource, path, 'patch')(r, out);
+      expect(out.statusCode).toBe(403); expect(h.calls.filter(c => WRITE_RE.test(c.sql))).toHaveLength(0);
+      expect(h.saves).toHaveLength(0);
+    }
+  });
+});
+
+function httpApp(h: ReturnType<typeof makeDataSource>, roles = ['kpa:operator']) {
+  const app = express(); app.use(express.json());
+  app.use('/members', createMemberController(h.dataSource, ((r: any, _res: any, next: any) => {
+    r.user = { id: OPERATOR_ID, roles, memberships: [{ serviceKey: 'kpa-society', status: 'active' }] }; next();
+  }) as any, createMembershipScopeGuard(KPA_SCOPE_CONFIG)));
+  return app;
+}
+
+describe('KPA route middleware and membership type validation', () => {
+  it.each(['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'])('operator may save ordinary type %s', async type => {
+    const h = makeDataSource();
+    const out = await request(httpApp(h)).patch(`/members/${USER_ID}/info`).send({ membership_type: type });
+    expect(out.status).toBe(200); expect(h.member.membership_type).toBe(type);
+    expect(roleAssignmentService.assignRole).not.toHaveBeenCalled();
+    expect(roleAssignmentService.removeRole).not.toHaveBeenCalled();
+  });
+  it.each(['admin', 'operator', 'kpa:admin', 'kpa:operator', 'neture:member'])('rejects type escalation or other service %s before writes', async type => {
+    const h = makeDataSource();
+    const out = await request(httpApp(h)).patch(`/members/${USER_ID}/info`).send({ membership_type: type });
+    expect(out.status).toBe(400); expect(h.state.txStarted).toBe(0); expect(h.saves).toHaveLength(0);
+  });
+  it.each([['neture:operator'], ['kpa:pharmacist'], ['platform:super_admin']])('preserves KPA scope guard for roles %j', async (...roles) => {
+    const h = makeDataSource();
+    const out = await request(httpApp(h, roles)).patch(`/members/${USER_ID}/info`).send({ membership_type: 'student' });
+    expect(out.status).toBe(403); expect(h.state.txStarted).toBe(0);
+  });
+  it('allows operator suspension through the actual validation/scope chain but denies withdrawal', async () => {
+    const h = makeDataSource({ currentMembershipStatus: 'active' }); h.member.status = 'active';
+    const app = httpApp(h);
+    expect((await request(app).patch(`/members/${USER_ID}/status`).send({ status: 'suspended' })).status).toBe(200);
+    expect((await request(app).patch(`/members/${USER_ID}/status`).send({ status: 'withdrawn' })).status).toBe(403);
+  });
 });

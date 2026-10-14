@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from '@o4o/error-handling';
 import type { KpaEditUserModalProps } from './KpaEditUserModal';
-import { buildKpaMemberSavePlan, createKpaMemberDraft, validateKpaMemberInfo } from './kpaMemberEditModel';
+import { buildKpaMemberSavePlan, canEditKpaMemberStatus, createKpaMemberDraft, validateKpaMemberInfo } from './kpaMemberEditModel';
 
 function errorMessage(error: unknown) {
   if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
@@ -11,7 +11,7 @@ function errorMessage(error: unknown) {
 }
 
 /** info→status 순서, 성공한 단계의 기준값, 아직 저장하지 못한 초안의 소유자. */
-export function useKpaMemberEdit({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false }: KpaEditUserModalProps) {
+export function useKpaMemberEdit({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false, canAdministerMemberStatus = false }: KpaEditUserModalProps) {
   const [form, setForm] = useState(() => createKpaMemberDraft(member));
   const baseline = useRef(form);
   const busy = useRef(false);
@@ -54,7 +54,9 @@ export function useKpaMemberEdit({ member, makeRequest, onClose, onSuccess, canC
     const hasInfoChanges = Object.keys(plan.info).length > 0;
     const validationError = baseline.current.status === 'withdrawn' && (hasInfoChanges || plan.status !== undefined)
       ? '탈퇴 처리된 회원은 수정할 수 없습니다.'
-      : validateKpaMemberInfo(plan.info);
+      : plan.status && !canEditKpaMemberStatus(baseline.current.status, plan.status, canAdministerMemberStatus)
+        ? '이 상태 변경은 서비스 관리자 권한이 필요합니다.'
+        : validateKpaMemberInfo(plan.info);
     setActionError(validationError || '');
     if (validationError) return;
     busy.current = true;
@@ -86,5 +88,5 @@ export function useKpaMemberEdit({ member, makeRequest, onClose, onSuccess, canC
     }
   };
 
-  return { form, setForm, saving, actionError, savedInfo, savedActivity: baseline.current.activity_type, handleSave, handleClose };
+  return { form, setForm, saving, actionError, savedInfo, savedActivity: baseline.current.activity_type, savedStatus: baseline.current.status, handleSave, handleClose };
 }

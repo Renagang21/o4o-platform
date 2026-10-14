@@ -27,7 +27,7 @@
 import type { CSSProperties } from 'react';
 import { X, Loader2, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useKpaMemberEdit } from './useKpaMemberEdit';
-import { KPA_ACTIVITY_LABELS } from './kpaMemberEditModel';
+import { KPA_ACTIVITY_LABELS, KPA_MEMBER_STATUS_OPTIONS, canEditKpaMemberStatus } from './kpaMemberEditModel';
 import { AddressSearch } from '@o4o/ui';
 import type { ApiRequestFn } from './CommonEditUserModal';
 
@@ -79,6 +79,8 @@ export interface KpaMemberForEdit {
 
 export interface KpaEditUserModalProps {
   canChangeMembershipType?: boolean;
+  /** 탈퇴·가입 대기로 되돌림 등 민감한 상태 처리는 서비스 admin 전용. */
+  canAdministerMemberStatus?: boolean;
   member: KpaMemberForEdit;
   /** Injected API adapter. Paths are relative to /api/v1/kpa (e.g. /members/:id/info) */
   makeRequest: ApiRequestFn;
@@ -92,10 +94,10 @@ export function KpaEditUserModal(props: Readonly<KpaEditUserModalProps>) {
 }
 
 function KpaMemberEditor(props: Readonly<KpaEditUserModalProps>) {
-  const { member, canChangeMembershipType = false } = props;
+  const { member, canChangeMembershipType = false, canAdministerMemberStatus = false } = props;
   const isSuperAdmin = (member.capabilities ?? []).includes('platform:super_admin');
   const isWithdrawn = member.status === 'withdrawn';
-  const { form, setForm, saving, actionError, savedInfo, savedActivity, handleSave, handleClose } = useKpaMemberEdit(props);
+  const { form, setForm, saving, actionError, savedInfo, savedActivity, savedStatus, handleSave, handleClose } = useKpaMemberEdit(props);
   const onClose = () => { void handleClose(); };
 
   const inputStyle: CSSProperties = {
@@ -238,11 +240,9 @@ function KpaMemberEditor(props: Readonly<KpaEditUserModalProps>) {
                 disabled={saving}
                 style={inputStyle}
               >
-                <option value="pending">대기</option>
-                <option value="active">활성</option>
-                <option value="suspended">정지</option>
-                <option value="rejected">반려</option>
-                <option value="withdrawn">탈퇴</option>
+                {KPA_MEMBER_STATUS_OPTIONS
+                  .filter(({ value }) => value === form.status || canEditKpaMemberStatus(savedStatus, value, canAdministerMemberStatus))
+                  .map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
               </select>
             </div>
 
