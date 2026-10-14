@@ -17,11 +17,11 @@ API·권한·메뉴·서버·DB·공통 Core·의존성·lockfile·AI 연결은 
 ## 검증 근거
 
 - frozen-lockfile 설치: pnpm 10.25.0, Node 24.19.0, tracked manifest/lockfile 변화 없음.
-- store-web Vitest: 16개 파일 153개 통과. 새 회귀 21개는 QR 중복/후속 입력/대상 변경/오류/재시도/매장 전환/참조 payload, 채널 확인 대상/늦은 응답/부분 성공/새 선택/재시도/overview loading, 콘텐츠 오류·재시도·외부 reload를 검증한다.
+- store-web Vitest: 17개 파일 157개 통과. 새 회귀 25개는 QR 중복/후속 입력/대상 변경/오류/재시도/매장 전환/참조 payload, 채널 확인 대상/늦은 응답/부분 성공/새 선택/재시도/overview loading, 콘텐츠 오류·재시도·외부 reload를 검증한다.
 - `pnpm --filter store-web run build`: TypeScript 포함 production build 통과. 기존 500kB 초과 chunk 경고 유지.
 - 변경 런타임 TS/TSX 집중 ESLint: 오류·경고 0.
 - 전체 lint ratchet: 오류 46 / 기준 46, 경고 996, 통과.
-- 실제 변경 컴포넌트·훅을 Vite production build한 로컬 검증 화면: Chromium 1280·375·320px에서 30개 assertion 통과. 콘텐츠 오류→재시도→실제 빈 목록, QR 저장 중 입력·취소·대상 변경, 채널 응답 전환, 페이지 오류 0·전체 가로 넘침 0 확인. 320px 화면 시각 확인.
+- 실제 변경 컴포넌트·훅을 Vite production build한 로컬 검증 화면: Chromium 1280·375·320px에서 42개 assertion 통과. 콘텐츠 오류→재시도→실제 빈 목록, QR 저장 중 입력·취소·대상 변경, 채널 응답 전환, 실제 제품 추가창 오류·재시도·닫힌 뒤 성공 콜백, 페이지 오류 0·전체 가로 넘침 0 확인. 320px 화면 시각 확인.
 
 브라우저는 변경 컴포넌트 중심의 별도 검증 화면이며 전체 앱 로그인 smoke가 아니다. 모든 API를 합성 응답으로 intercept했으며 실제 로그인과 운영 write는 없다. 검증 스크립트·스크린샷·로그는 `/tmp/store-editor-*` 로컬 산출물이다.
 
@@ -42,3 +42,5 @@ PR #569 최초 리뷰의 P2 네 건을 반영했다. 제품 추가창의 view �
 실패한 후보 목록을 제거하며, QR·채널·추가창의 mutation lock을 매장/채널별로 귀속했다.
 추가 회귀 6개는 닫힌 뒤 성공한 추가의 목록 갱신, 후보 조회 실패·재시도, 다른 채널 응답 배제,
 매장/채널 A 요청이 진행 중이어도 B가 작업 가능한 조건과 A 응답이 B의 busy 상태를 해제하지 않는 조건을 확인한다.
+
+추가 정적 분석 경고의 빈 import와 추가창 중첩 삼항을 제거했다. 실제 추가창 UI 테스트 4개 및 PC/모바일 브라우저 검증을 추가했으며, 검증 화면은 앱과 같은 Tailwind 설정으로 빌드했다.

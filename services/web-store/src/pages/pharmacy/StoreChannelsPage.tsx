@@ -67,8 +67,6 @@ import {
   type AssetPublishStatus,
   type ChannelMap,
 } from '../../api/assetSnapshot';
-import {
-} from '../../api/channelProducts';
 import { GuideEditableSection } from '../../components/guide';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -130,7 +128,7 @@ function isForcedActive(item: StoreAssetItem): boolean {
 
 /* ─── AddProductModal ────────────────────────── */
 
-function AddProductModal({
+export function AddProductModal({
   open,
   onError,
   onClose,
@@ -148,6 +146,79 @@ function AddProductModal({
   const { available, loadingList, loadError, addingId, add: handleAdd, retry } =
     useChannelProductPicker(open, organizationId, channelId, onProductAdded, onError);
   if (!open) return null;
+
+  const renderProductChoices = () => {
+    if (loadingList)
+      return (
+        <div className="flex items-center justify-center py-12 text-slate-400">
+          <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
+        </div>
+      );
+    if (loadError)
+      return (
+        <div role="alert" className="p-4 text-red-700">
+          <p>{loadError}</p>
+          <button type="button" onClick={retry}>
+            다시 시도
+          </button>
+        </div>
+      );
+    if (available.length === 0)
+      return (
+        <div className="text-center py-10">
+          <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
+          <p className="text-sm font-medium text-slate-600">
+            추가할 수 있는 상품이 없습니다
+          </p>
+          <p className="text-xs mt-2 text-slate-400 leading-relaxed">
+            모든 상품이 이미 추가되었거나,
+            <br />
+            HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
+          </p>
+          <Link
+            to={pharmacyStorePath("supply")}
+            onClick={onClose}
+            className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
+          >
+            상품 보러가기 →
+          </Link>
+        </div>
+      );
+    return (
+      <div className="space-y-2">
+        {available.map((product) => (
+          <div
+            key={product.id}
+            className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
+          >
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm text-slate-900 truncate">
+                {product.productName}
+              </div>
+              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                <span className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
+                  {product.serviceKey}
+                </span>
+                <span>{formatPrice(product.retailPrice)}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleAdd(product.id)}
+              disabled={addingId === product.id}
+              className="ml-3 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
+            >
+              {addingId === product.id ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Plus className="w-3 h-3" />
+              )}
+              추가
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -169,65 +240,7 @@ function AddProductModal({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          {loadingList ? (
-            <div className="flex items-center justify-center py-12 text-slate-400">
-              <Loader2 className="w-5 h-5 animate-spin mr-2" /> 제품 목록 로딩 중...
-            </div>
-          ) : loadError ? (
-            <div role="alert" className="p-4 text-red-700">
-              <p>{loadError}</p>
-              <button type="button" onClick={retry}>다시 시도</button>
-            </div>
-          ) : available.length === 0 ? (
-            <div className="text-center py-10">
-              <Package className="w-8 h-8 mx-auto mb-3 text-slate-300" />
-              <p className="text-sm font-medium text-slate-600">추가할 수 있는 상품이 없습니다</p>
-              <p className="text-xs mt-2 text-slate-400 leading-relaxed">
-                모든 상품이 이미 추가되었거나,<br />
-                HUB에서 신청한 상품의 승인이 아직 완료되지 않았습니다.
-              </p>
-              <Link
-                to={pharmacyStorePath('supply')}
-                onClick={onClose}
-                className="inline-flex items-center gap-1 mt-4 text-xs font-medium text-blue-600 hover:underline"
-              >
-                상품 보러가기 →
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {available.map(product => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-slate-900 truncate">
-                      {product.productName}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                      <span className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600">
-                        {product.serviceKey}
-                      </span>
-                      <span>{formatPrice(product.retailPrice)}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleAdd(product.id)}
-                    disabled={addingId === product.id}
-                    className="ml-3 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-1"
-                  >
-                    {addingId === product.id ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <Plus className="w-3 h-3" />
-                    )}
-                    추가
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          {renderProductChoices()}
         </div>
 
         {/* Footer */}
