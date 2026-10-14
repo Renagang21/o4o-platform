@@ -365,6 +365,22 @@ tsup만 실행하면 compiled migration 산출물이 제거될 수 있으므로 
 실제 경로는 현재 소스/테스트 설정에서 선택하고, 변경 소비처에 맞게 실행합니다. quota DB 테스트는 세션 전용 PostgreSQL fixture만 사용합니다.
 전체 테스트를 중복 합산하거나 실행하지 않은 실계정/Windows/유료 호출을 PASS로 보고하지 않습니다.
 
+### 매장 주문·배송 조회 PostgreSQL 검증
+
+`pharmacy-order-read.integration.spec.ts`는 실제 SQL로 구매자·선택 매장·서비스·공급자 격리와
+배송·송장 연결, 주문 중복 방지, 최근 200건 제한을 확인합니다.
+별도 로컬 PostgreSQL에 빈 전용 DB `o4o_store_order_read_fixture`를 준비하고,
+그 포트를 `O4O_STORE_ORDER_READ_TEST_PORT`로 설정합니다(1024 초과, 5432·5442 제외).
+host는 loopback으로 고정되며 비밀번호는 로컬 비공개 `PGPASSWORD` 설정을 사용합니다.
+
+```text
+pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture-pharmacy/__tests__/pharmacy-order-read.integration.spec.ts
+```
+
+운영 또는 기존 개발 DB를 fixture로 사용하지 않습니다. 이 검증은 connection-local TEMP 테이블을
+만들고 종료 시 rollback하므로 baseline migration이 필요하지 않습니다. 포트 변수가 없으면 7건은 skip입니다.
+검증 종료 후 자신이 준비한 전용 DB를 정리하며 다른 DB나 컨테이너를 삭제하지 않습니다.
+
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
 기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
 `scripts/lint-ratchet.mjs` 가 `pnpm run lint` 와 동일한 설정·범위로 검사해

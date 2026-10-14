@@ -48,6 +48,7 @@ import { SupplyProposalService, type ProposalAction } from './services/supply-pr
 import { SemiFranchiseEventService, type EventAction } from './services/semi-franchise-event.service.js';
 import { SemiFranchiseRecruitmentService } from './services/semi-franchise-recruitment.service.js';
 import { PharmacyCartService, isUuid } from './services/pharmacy-cart.service.js';
+import { listPharmacyOrders } from './services/pharmacy-order-read.service.js';
 import { PharmacyPaymentService } from './services/pharmacy-payment.service.js';
 import { SemiFranchiseContentService } from './services/semi-franchise-content.service.js';
 import { resolveSemiFranchiseServiceAccess, SEMI_FRANCHISE_ACCESS_MESSAGES } from './services/semi-franchise-service-access.js';
@@ -219,16 +220,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource): ExpressRoute
   router.delete('/pharmacy/cart/items/:id', ...store, handle(async (req) => cart.remove(req.user!.id, org(req), uuidParam(req, 'id'))));
   router.post('/pharmacy/cart/checkout', ...store, handle(async (req) => cart.checkout(req.user!.id, org(req), req.body ?? {})));
 
-  router.get('/pharmacy/orders', ...store, handle(async (req) => dataSource.query(
-    `SELECT id, "orderNumber", status::text AS status, "paymentStatus"::text AS "paymentStatus",
-            "totalAmount", "shippingFee", "createdAt", "paidAt", "supplierId", items,
-            metadata->>'paymentGroupId' AS "paymentGroupId", metadata->>'receiverKey' AS "receiverKey",
-            COALESCE((metadata->>'testPayment')::boolean, false) AS "testPayment"
-       FROM checkout_orders
-      WHERE "buyerId" = $1 AND "sellerOrganizationId" = $2 AND metadata->>'serviceKey' = $3
-      ORDER BY "createdAt" DESC LIMIT 200`,
-    [req.user!.id, org(req), NETURE_PHARMACY_SERVICE_KEY],
-  )));
+  router.get('/pharmacy/orders', ...store, handle(async (req) => listPharmacyOrders(dataSource, req.user!.id, org(req))));
   router.post('/pharmacy/orders/:id/cancel', ...store, handle(async (req) => {
     const result = await cancelStoreOrderBeforePayment(dataSource, {
       orderId: uuidParam(req, 'id'),

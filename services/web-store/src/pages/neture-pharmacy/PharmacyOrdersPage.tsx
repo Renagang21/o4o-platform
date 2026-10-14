@@ -13,6 +13,13 @@ import { neturePharmacyApi, pharmacyErrorMessage, type PharmacyOrder, type SemiF
 import { BusinessTabs } from '../../components/BusinessTabs';
 import { Notice, PharmacyPage, StatusBadge, btn, formatDate, formatWon, pharmacyStorePath } from './shared';
 import { PaymentGroupPay, usePaymentMode } from './PaymentGroupPay';
+import { useLatestList } from '../../hooks/useLatestList';
+
+const listErrorMessage = (error: unknown) => pharmacyErrorMessage(error, '주문 내역을 불러오지 못했습니다.');
+const DELIVERY_STATUS_LABEL: Record<string, string> = {
+  paid: '배송 준비 전', preparing: '배송 준비', shipped: '배송 중',
+  in_transit: '배송 중', delivered: '배송 완료', cancelled: '취소',
+};
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
   created: '주문 생성',
@@ -45,25 +52,14 @@ export default function PharmacyOrdersPage() {
   const business = params.get('business') || '';
   const [businesses, setBusinesses] = useState<SemiFranchiseRow[]>([]);
   useEffect(() => { let active = true; neturePharmacyApi.listSemiFranchises().then(rows => { if (active) setBusinesses(rows.filter(r => r.membershipStatus !== null)); }).catch(() => {}); return () => { active = false; }; }, []);
-  const [orders, setOrders] = useState<PharmacyOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      setOrders(await neturePharmacyApi.listOrders());
-    } catch (e) {
-      setError(pharmacyErrorMessage(e, '주문 내역을 불러오지 못했습니다.'));
-    } finally {
-      setLoading(false);
-    }
+  const fetchList = useCallback(async () => {
+    const items = await neturePharmacyApi.listOrders();
+    return { items, total: items.length };
   }, []);
-
-  useEffect(() => { void load(); }, [load]);
+  const { items: orders, loading, error, setError, load } = useLatestList<PharmacyOrder>(fetchList, listErrorMessage);
 
   const visibleOrders = business ? orders.filter(o => o.items?.some(i => i.metadata?.semiFranchiseKey === business)) : orders;
   /** 결제 전 주문을 결제 그룹별로 묶는다(금액 = 그룹 주문 합계 — 확정 금액은 서버가 다시 계산한다). */
@@ -123,14 +119,14 @@ export default function PharmacyOrdersPage() {
 
       {loading ? (
         <p className="py-12 text-center text-gray-500">불러오는 중...</p>
-      ) : visibleOrders.length === 0 ? (
+      ) : error ? null : visibleOrders.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-10 text-center text-sm text-gray-500">
           <p>주문 내역이 없습니다.</p>
           <p className="mt-1"><Link className="underline" to={pharmacyStorePath('supply')}>공급 상품 보기</Link></p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[900px] text-sm" aria-label="주문 목록">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-gray-600">
                 <th className="px-4 py-3 font-medium">주문번호</th>
@@ -138,6 +134,7 @@ export default function PharmacyOrdersPage() {
                 <th className="px-4 py-3 text-right font-medium">금액</th>
                 <th className="px-4 py-3 font-medium">주문 상태</th>
                 <th className="px-4 py-3 font-medium">결제</th>
+                <th className="px-4 py-3 font-medium">배송 · 송장</th>
                 <th className="px-4 py-3 font-medium">주문일</th>
                 <th className="px-4 py-3 text-center font-medium">작업</th>
               </tr>
@@ -152,6 +149,13 @@ export default function PharmacyOrdersPage() {
                   <td className="px-4 py-3">
                     <StatusBadge status={o.paymentStatus} label={PAYMENT_STATUS_LABEL[o.paymentStatus] ?? o.paymentStatus} />
                     {o.testPayment && <span className="ml-1 rounded bg-violet-50 px-1.5 py-0.5 text-xs text-violet-700" data-testid="test-payment-badge">테스트 결제</span>}
+                  </td>
+                  <td className="px-4 py-3">
+                    {o.fulfillmentStatus ? <>
+                      <StatusBadge status={o.fulfillmentStatus}
+                        label={DELIVERY_STATUS_LABEL[o.fulfillmentStatus] ?? o.fulfillmentStatus} />
+                      {o.shipment && <p className="mt-1 text-xs text-gray-500">{o.shipment.carrierName} · {o.shipment.trackingNumber}</p>}
+                    </> : <span className="text-xs text-gray-500">{isUnpaid(o) ? '결제 전' : '배송 정보 대기'}</span>}
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500">{formatDate(o.createdAt)}</td>
                   <td className="px-4 py-3 text-center">
