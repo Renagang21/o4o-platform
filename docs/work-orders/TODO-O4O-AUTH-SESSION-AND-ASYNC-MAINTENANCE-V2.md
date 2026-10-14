@@ -14,7 +14,7 @@
 [공통 모듈 절차](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md)를 따른다.
 
 세션 갱신 검증의 순서·오류 code/message·로그·서명된 claim 승계·DB 읽기 순서를 유지한다.
-전체관리자 Google 전용·브라우저 폐기·계정 보안 세대·refresh/handoff의 세대 쓰기0을 유지한다.
+전체 관리자 Google 전용·브라우저 폐기·계정 보안 세대·refresh/handoff의 세대 쓰기0을 유지한다.
 공통 hook은 재현한 늦은 응답의 UI 상태 소유를 정리한다. 서비스별 wrapper/권한/인증 수단/반환 type 계약을 유지한다.
 회원 수정 원자성·가입 승인 Core·서비스 간 새 공통화·DB/migration·OAuth/CI/의존성 변경은 이 묶음에 포함하지 않는다.
 운영 DB·실계정·실제 OAuth는 사용하지 않는다. 테스트는 합성 응답과 격리된 검증 자원으로 구분한다.
@@ -39,9 +39,10 @@
 - [x] 비동기 실패 재현 후 A02/A03의 구현/보류 목록 보완.
 - [x] 서버 검증 책임 추출과 오류 우선순위 회귀.
 - [x] 확인된 hook 상태 경쟁 최소 수정·소비처 회귀.
-- [x] 관련 타입/빌드·변경 lint·문서/민감정보/diff 검증(기준 main의 실패는 아래 분리).
+- [x] 관련 타입/빌드·변경 lint·문서/민감정보/diff 검증(로컬 산출물 문제와 기준 main의 배포 빌드 실패는 아래 분리).
 - [x] 이번 경로만 commit·branch push. [PR #554](https://github.com/Renagang21/o4o-platform/pull/554) 생성.
-- [ ] 최신 HEAD CI/review gate PASS. 기준 main의 별도 실패를 해결된 것으로 간주하지 않는다.
+- [x] PR CI/review 실행 연결 및 결과 확인. 최종 gate PASS/FAIL은 PR 최신 HEAD 결과로 판정한다.
+  기준 main의 배포 빌드 실패를 CI PASS만으로 해결된 것으로 간주하지 않는다.
 
 ## 조사 근거
 
@@ -76,7 +77,7 @@
 | 분회 | 5 suites · 39/39 PASS |
 | Store | 14 suites · 132/132 PASS |
 | 강의 | 5 suites · 18/18 PASS |
-| 약국 협력사업 | 17 suites · 133 PASS / 2 FAIL (기준 소스에서도 동일 실패, 아래 참조) |
+| 약국 협력사업 | 17 suites · 135/135 PASS (@o4o/ui 산출물 갱신 후) |
 | 타입/빌드 | API type-check·표준 tsc build PASS, 실제 5웹의 타입/production build 모두 PASS |
 | API 배포용 ESM | FAIL: 기준 main의 AI type 재수출 오류와 동일. 아래 참조 |
 | lint | 변경 코드/테스트 4파일 errors0 · warnings0 |
@@ -87,17 +88,24 @@
 초기 stale ai-core generated 출력은 기존 dependency closure build로 갱신한 뒤 API 타입 검증을 통과했다.
 baseline 진단의 runner 시작 실패는 실행 테스트0으로 구분하고, 아래 실패는 실제 runner가 실행된 재현만 근거로 삼았다.
 
-### 범위 밖의 기준 main 실패 — 수정하지 않음
+### 로컬 환경 진단 정정
+
+초기 약국 협력사업 버튼 assertion 2개 실패는 원본 hook alias에서도 재현됐지만, 원인이 원본 auth source의
+결함이라고 확정할 근거는 아니었다. `@o4o/ui`의 dist가 소스보다 오래됐고 API dependency closure에 이
+프론트엔드 패키지 build가 포함되지 않았다. 기존 `pnpm --filter @o4o/ui run build`로 갱신하니 전체 135/135,
+원본 hook alias + 권한 파일 3/3 모두 PASS다. **기준 코드 결함으로 분류한 최초 기록을 정정한다**.
+소스·권한 정책·fixture 수정 없이 해결했으며 갱신된 산출물로 5웹 소비처 test/build를 다시 확인해 모두 PASS다.
+최종 로그는 `auth-v2-fresh-web-*-tests/build.log` 및 `auth-v2-pharmacy-baseline-fresh-ui.log`다.
+
+### 범위 밖의 기준 main 배포 빌드 실패 — 수정하지 않음
 
 1. API 배포 ESM(`build:api`/tsup): AI tool router/work-agent runtime의 interface-only 이름을 value로 재수출해
    `No matching export`로 실패한다. 원본 main의 API를 checkout 밖 git archive fixture에서 같은 Node/CLI로 실행해
    동일 오류를 재현했다. 일반 tsc build 통과와 별도로 **API 배포 빌드는 통과하지 않았다**.
-2. 약국 협력사업 `UserDetailPage.authority.test.tsx`: 전체관리자·kpa:admin 탈퇴/복구 버튼 assertion 2개가 실패한다.
-   원본 auth-react source를 alias한 기준 실행도 2 FAIL / 1 PASS다. auth context는 테스트에서 mock되며
-   본 hook 변경과 별개다. 역할/UI 정책이나 해당 fixture는 이번 작업에서 수정하지 않았다.
 
 구현 commit `8c36ce7695`를 `wo/auth-kakao-explicit-link`에 push하고 PR #554를 생성했다.
-검증 중 main은 `f8d1887ef2`로 이동했으나 변경은 AI parser/기록 6경로이며 이번 5경로와 충돌하지 않는다.
+검증 중 main은 `f8d1887ef2`(AI parser/기록) → `24b96f3730`(Neture 승인 UI·전체 관리자 문서 표기)로 이동했다.
+이번 5경로와 충돌하지 않으며 auth 정책 변경은 없다. 본 TODO의 전체 관리자 표기도 최신 정본에 맞췄다.
 push-only 종료 범위에서 main sync/merge·배포를 실행하지 않았다. 기준 검증 SHA는 `eebd5621de`다.
 최신 HEAD CI/Codex 결과는 PR에 기록한다. 위 실패를 passing/skipped로 바꾸거나 배포 가능하다고 판정하지 않는다.
 
