@@ -49,3 +49,39 @@ fixture/report는 worktree `.tmp/supplier-flow` 및 `/workspace/artifacts/suppli
 현재 WO의 조사·결함 수정·fixture/경계 회귀·main 통합·해당 source Neture 운영 배포 범위는 완료다. 실계정·실DB 미확인 조건은 유지한다.
 이번 완료 문서는 같은 WO의 결과 기록 단계이며 runtime 변경/추가 배포 대상이 아니다. 재현 harness와 artifact를 위해 이 세션 worktree는 KEEP한다. 기존 원본 checkout과 다른 세션 자원은 보존한다.
 문서 정합: 현행 정본 정책을 변경하지 않고 이 WO/CHECK의 완료 결과와 한계를 갱신했다.
+
+## 승인된 테스트 계정 후속 검증 — 2026-10-14
+
+기준 main `0d55cb434`에서 별도 `wo/supplier-account-verification` worktree를 만들었다.
+사용자가 제공하고 사용을 승인한 세 테스트 계정을 `docs/local/TEST-ACCOUNT.txt`에 로컬 전용으로 보관하고 Git ignore를 확인했다.
+위 절의 계정 누락은 당시 기록이다. 현재는 계정 확보와 로그인 확인을 완료했으며, 계정값·비밀번호·토큰·개별 업무 응답은 공개 기록에 포함하지 않는다.
+
+### 로그인·인가
+
+- 운영 API `/api/v1/auth/email/login`: 매장 경영자·공급자·직원 세 계정 모두 HTTP 200 / success.
+- 확인된 역할: 매장 경영자 `neture:store_owner`, 공급자 `neture:supplier`, 직원 `kpa:store_member`. 직원의 KPA 역할을 Neture 매장 직원 권한으로 해석하지 않는다.
+- 공급자 `/api/v1/neture/supplier/products`: HTTP 200 / success / 5개 행.
+- 공급자 approval-counts·orders/unified·settlements 조회: 모두 HTTP 200 / success. 주문·정산 행은 각각 0개다.
+- 매장 경영자·직원의 공급자 products 접근: 각각 HTTP 403. 공급자 권한이 다른 역할로 확대되지 않음을 확인했다.
+
+### 실제 브라우저 화면
+
+Chromium에서 운영 대표 홈 로그인은 세 계정 모두 HTTP 200이며 실행 오류 0건이다.
+공급자 업무 화면은 canonical `supplier.neture.co.kr`에서 로그인 후 확인했다. 대표 홈에서 업무 URL을 직접 열면 다른 origin으로 handoff하므로, 그 중간 화면을 업무 화면 성공으로 세지 않았다.
+
+1440px에서 dashboard·products·products/new·orders·orders/manage·event-offers·settlements의 7개 화면이 실제 렌더링됐다.
+각 route는 `/supplier/` 아래이며 브라우저 pageerror 및 관찰된 API HTTP 4xx/5xx는 모두 0건이다.
+390px에서도 같은 7개 화면의 업무 제목과 렌더링을 확인했고 pageerror·관찰된 API HTTP 4xx/5xx·가로 넘침은 모두 0건이다.
+상품 등록 화면은 조회만 했으며 저장·승인 요청·상품 삭제·주문 처리·배송·정산 mutation은 실행하지 않았다.
+
+클라우드 프록시 CA를 Chromium NSS 저장소에 영구 등록하는 작업은 자동 승인 검토에서 지속적 보안 설정 변경을 이유로 거절됐다.
+영구 등록이나 TLS 검증 해제 대신, 환경 CA를 신뢰하는 Playwright 요청 클라이언트가 HTTPS를 검증하고 응답을 브라우저에 전달하는 임시 transport로 실제 서버를 조회했다. API/업무 데이터는 mock하지 않았다.
+
+### 남은 범위
+
+- 실제 상품 등록·수정·승인 요청과 주문·배송·정산의 상태 변경 round-trip은 미실행이다. 운영 DB write 승인 및 구체적인 테스트 대상·복구 방법이 필요하다.
+- 이 계정에는 주문·정산이 없어 상세·상태 전환의 실데이터 검증을 완료했다고 주장하지 않는다.
+- 직원의 실제 KPA 매장 연결과 업무 화면은 이번 공급자 검증 범위에서 미확인이다.
+- 앞선 환경 준비 단계의 격리 PostgreSQL 공급자 write integration 20건 PASS는 별도 실행 결과이며, 운영 계정 round-trip으로 합산하지 않는다.
+
+문서 정합: 과거 결과를 유지하고 계정 확보 이후의 후속 검증과 남은 범위를 추가했다. 현행 정본 정책 변경 없음.
