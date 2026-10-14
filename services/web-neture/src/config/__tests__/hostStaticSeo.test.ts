@@ -27,6 +27,7 @@ describe('crawler-visible host HTML', () => {
     const home = renderHostHtml(built, profile, true);
     const spa = renderHostHtml(home, profile, false);
     expect(spa).not.toContain('rel="canonical"');
+    expect(spa).not.toContain('property="og:url"');
     expect(spa).toContain('/assets/index-buildhash.js');
   });
 

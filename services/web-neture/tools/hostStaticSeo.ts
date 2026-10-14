@@ -29,9 +29,11 @@ export function renderHostHtml(html: string, profile: HostProfile, home: boolean
     replaceOne(new RegExp(`<meta ${attribute}="${name}" content="[^"]*"\\s*/?>`),
       `<meta ${attribute}="${name}" content="${escapeHtml(value)}" />`);
   }
-  // A root canonical must never leak into an unregistered/authenticated SPA path.
+  // Root URL metadata must never leak into a deep SPA path. Its actual URL
+  // is unknown at build time; SeoWatcher supplies it after client navigation.
   html = html.replace(/\s*<link\s+rel="canonical"[^>]*>/g, '');
   if (home) html = html.replace('</head>', `  <link rel="canonical" href="${origin}" />\n  </head>`);
+  else html = html.replace(/\s*<meta\s+property="og:url"[^>]*>/g, '');
   return html;
 }
 

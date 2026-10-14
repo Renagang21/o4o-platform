@@ -43,7 +43,7 @@ for (const [index, host] of hosts.entries()) {
   for (const path of ['/supplier/products/new', '/market-trial/fixture', '/communities/fixture/forum', '/login', '/missing-route']) {
     const response = await request(host, path);
     const body = await response.text();
-    check(response.status === 200 && body.includes('<div id="root">') && !body.includes('rel="canonical"'), `${host}${path}: SPA without home canonical`);
+    check(response.status === 200 && body.includes('<div id="root">') && !body.includes('rel="canonical"') && !body.includes('property="og:url"'), `${host}${path}: SPA without home URL metadata`);
   }
   for (const path of ['/assets/missing.js', '/missing.css', '/missing.png', '/__seo/supplier-home.html', '/__seo/main-spa.html']) {
     const response = await request(host, path);
