@@ -3,9 +3,10 @@ import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-li
 import Page from '../ProductServiceApprovalPage';
 import type { ServiceApprovalItem } from '../../../lib/api/serviceApproval';
 const api = vi.hoisted(() => ({ list: vi.fn(), stats: vi.fn(), analytics: vi.fn(), approve: vi.fn(), reject: vi.fn(), deletePendingOffer: vi.fn() }));
+const cleanupApi = vi.hoisted(() => ({ softDelete: vi.fn() }));
 const auth = vi.hoisted(() => ({ id: 'fixture-session', roles: ['neture:operator'] as string[] }));
 vi.mock('../../../lib/api/serviceApproval', () => ({ operatorServiceApprovalApi: api }));
-vi.mock('../../../lib/api/operatorProductCleanup', () => ({ productCleanupApi: { softDelete: vi.fn() } }));
+vi.mock('../../../lib/api/operatorProductCleanup', () => ({ productCleanupApi: cleanupApi }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: auth }) }));
 function item(id: string, approvalStatus: string): ServiceApprovalItem {
   return { id, approvalStatus, offerId: `offer-${id}`, serviceKey: 'kpa-society', productName: `검증상품-${id}`, barcode: '', supplierName: '검증공급자', decidedBy: null, decidedAt: null, reason: null, createdAt: '2026-01-01', regulatoryType: 'GENERAL', mfdsPermitNumber: null, isMfdsVerified: false, offerApprovalStatus: 'approved', distributionType: 'PUBLIC', completenessScore: 80, imageUrl: null, brandName: null, priceGeneral: 100, hasShortDescription: true, hasDetailDescription: true, imageCount: 0, isStale: false, isLowQualitySupplier: false, priority: 'LOW' };
@@ -15,6 +16,7 @@ beforeEach(() => {
   vi.resetAllMocks(); auth.roles = ['neture:operator']; window.history.replaceState(null, '', '/');
   api.list.mockResolvedValue({ data: [item('a', 'pending')], pagination: { page: 1, limit: 30, total: 1, totalPages: 1 } });
   api.stats.mockResolvedValue({ total: 1, pending: 1, approved: 0, rejected: 0, todayPending: 0 });
+  cleanupApi.softDelete.mockResolvedValue({ success: true });
   api.analytics.mockResolvedValue(null); api.deletePendingOffer.mockResolvedValue({ success: true }); api.approve.mockResolvedValue({ success: true }); api.reject.mockResolvedValue({ success: true });
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
@@ -121,4 +123,50 @@ it('releases the mutation lock before a slow refresh so remaining selections sta
   expect(screen.getByRole('dialog', { name: '일괄 승인 (1건)', exact: true })).toBeTruthy();
   finishRead({ ...initial, data: [item('b', 'pending')] });
   await waitFor(() => expect(screen.queryByText('1건 선택됨')).toBeNull());
+});
+
+async function openApproved() {
+  api.list.mockResolvedValue({ data: [item('a', 'approved')], pagination: { page: 1, limit: 30, total: 1, totalPages: 1 } });
+  vi.spyOn(window, 'confirm').mockReturnValue(true);
+  const view = render(<Page />);
+  await screen.findByText('검증상품-a');
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  return view;
+}
+const moveToTrash = () => fireEvent.click(screen.getByRole('button', { name: '삭제 (휴지통으로 이동)' }));
+it('preserves approved Offer, selection and detail on trash failure and allows retry', async () => {
+  cleanupApi.softDelete.mockResolvedValueOnce({ success: false, error: 'BLOCKED' }).mockResolvedValueOnce({ success: true });
+  await openApproved(); fireEvent.click(screen.getByText('검증상품-a')); moveToTrash();
+  expect((await screen.findByRole('alert')).textContent).toContain('BLOCKED');
+  expect(screen.getByText('상품명')).toBeTruthy(); expect(screen.getByText('1건 선택됨')).toBeTruthy();
+  expect(api.list).toHaveBeenCalledTimes(1);
+  moveToTrash(); await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
+  expect(cleanupApi.softDelete.mock.calls).toEqual([['offer-a'], ['offer-a']]);
+  expect(screen.queryByText('상품명')).toBeNull(); expect(screen.queryByRole('alert')).toBeNull();
+});
+it('releases trash loading after exception and retries without changing target', async () => {
+  cleanupApi.softDelete.mockRejectedValueOnce(new Error('fixture'));
+  await openApproved(); moveToTrash(); await screen.findByRole('alert');
+  expect((screen.getByRole('button', { name: '삭제 (휴지통으로 이동)' }) as HTMLButtonElement).disabled).toBe(false);
+  moveToTrash(); await waitFor(() => expect(cleanupApi.softDelete).toHaveBeenCalledTimes(2));
+});
+it('blocks duplicate trash requests and decision confirmation while trash is writing', async () => {
+  let finish!: (result: {success: boolean}) => void;
+  cleanupApi.softDelete.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  await openApproved(); moveToTrash(); moveToTrash();
+  expect(cleanupApi.softDelete).toHaveBeenCalledTimes(1);
+  expect(window.confirm).toHaveBeenCalledTimes(1);
+  finish({success: false}); await screen.findByRole('alert');
+});
+it('does not mutate when trash confirmation is cancelled or current permission is absent', async () => {
+  const view = await openApproved(); vi.mocked(window.confirm).mockReturnValue(false); moveToTrash();
+  expect(cleanupApi.softDelete).not.toHaveBeenCalled();
+  auth.roles = ['neture:user']; view.rerender(<Page />); moveToTrash();
+  expect(cleanupApi.softDelete).not.toHaveBeenCalled();
+});
+it('does not refresh when an approved Offer finishes moving after unmount', async () => {
+  let finish!: (result: {success: boolean}) => void;
+  cleanupApi.softDelete.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  const view = await openApproved(); moveToTrash(); view.unmount(); finish({success: true});
+  await new Promise(resolve => setTimeout(resolve, 0)); expect(api.list).toHaveBeenCalledTimes(1);
 });
