@@ -41,7 +41,9 @@ export function TabletPairingModal({
   }, [pairing]);
   useEffect(() => {
     if (!pairing) return;
+    // 대화상자 밖에 초점이 있을 때(showModal 미지원 환경)만 처리한다. 안쪽은 dialog onKeyDown 이 처리.
     const onKey = (event: KeyboardEvent) => {
+      if (event.target instanceof Node && dialogRef.current?.contains(event.target)) return;
       if (event.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
@@ -55,6 +57,11 @@ export function TabletPairingModal({
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        onClose();
+      }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -64,7 +71,6 @@ export function TabletPairingModal({
     >
       <div
         className="bg-white rounded-2xl w-full max-w-md overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
         data-testid="pairing-code-modal"
       >
         <div className="px-5 py-4 border-b flex items-center justify-between">

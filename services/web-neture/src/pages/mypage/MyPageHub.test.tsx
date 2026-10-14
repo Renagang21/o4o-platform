@@ -31,7 +31,8 @@ vi.mock("../../contexts/LoginModalContext", () => ({
 }));
 vi.mock("../../lib/hostProfile", () => ({ CURRENT_HOST_PROFILE: "main" }));
 vi.mock("../../lib/apiClient", () => ({ api: { post: vi.fn() } }));
-vi.mock("../../lib/home-entry", () => ({
+vi.mock("../../lib/home-entry", async (importOriginal) => ({
+  homeEntryStoreOrganizationIds: (await importOriginal<typeof import("../../lib/home-entry")>()).homeEntryStoreOrganizationIds,
   useHomeEntry: () => entry,
   buildHomeEntryModel: () => ({ myServices: [] }),
 }));

@@ -168,4 +168,17 @@ describe('My Home available workspace entries', () => {
     expect(screen.queryByRole('button', { name: /다른 매장|은퇴한/ })).toBeNull();
     expect(screen.queryByRole('link', { name: 'O4O 공통 커뮤니티' })).toBeNull();
   });
+  it('offers the selected Store Workspace entry when workspaceStores is provided', () => {
+    workspace(data({
+      stores: [],
+      workspaceStores: [
+        { organizationId: 'o1', organizationName: '선택 매장', memberRole: 'owner' },
+        { organizationId: 'o2', organizationName: '다른 매장', memberRole: 'owner' },
+      ],
+    }), 'o1');
+    expect(screen.getByText(/선택 매장/)).toBeTruthy();
+    expect(screen.queryByText(/다른 매장/)).toBeNull();
+    expect(screen.queryByText(/현재 바로 이동할 수 있는 업무가 없습니다/)).toBeNull();
+    expect(screen.getByText(/매장이 여러 곳이면/)).toBeTruthy();
+  });
 });

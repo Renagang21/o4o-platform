@@ -10,7 +10,7 @@ import { MY_HOME_SOURCES, MyHomeButton } from "@o4o/auth-react";
 import { useAuth } from "../../contexts";
 import { useLoginModal } from "../../contexts/LoginModalContext";
 import { api } from "../../lib/apiClient";
-import { useHomeEntry, buildHomeEntryModel, type EntryStore } from "../../lib/home-entry";
+import { useHomeEntry, buildHomeEntryModel, homeEntryStoreOrganizationIds, type EntryStore } from "../../lib/home-entry";
 import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import HomeEntryPanel from "../../components/home/HomeEntryPanel";
 import { MyHomeParticipation } from "../../components/mypage/MyHomeParticipation";
@@ -118,7 +118,7 @@ function MyHomeContent({ view }: { view: View }) {
                 ...(hasStore ? [{
                   to: "/mypage/management",
                   title: "경영 현황",
-                  value: `${new Set(entry.data!.stores.map(store => store.organizationId)).size}개 매장 · 사업 요약과 방문 통계`,
+                  value: `${homeEntryStoreOrganizationIds(entry.data!).length}개 매장 · 사업 요약과 방문 통계`,
                 }] : []),
                 { to: "/mypage/settings", title: "계정 설정", value: "프로필·로그인 설정" },
               ].map(item => <Link key={item.to} to={item.to} className="rounded-lg border border-slate-100 p-3 no-underline hover:border-blue-400">

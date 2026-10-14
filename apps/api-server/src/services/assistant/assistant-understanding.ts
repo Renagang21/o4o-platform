@@ -251,10 +251,13 @@ export function createLlmTaskUnderstander(dataSource: DataSource): TaskUnderstan
 }
 
 function extractJsonObject(text: string): unknown {
-  const m = String(text ?? '').match(/\{[\s\S]*\}/);
-  if (!m) return null;
+  // 첫 '{' 부터 마지막 '}' 까지 — 정규식 backtracking 없이 선형으로 자른다.
+  const s = typeof text === 'string' ? text : '';
+  const start = s.indexOf('{');
+  const end = s.lastIndexOf('}');
+  if (start < 0 || end <= start) return null;
   try {
-    return JSON.parse(m[0]);
+    return JSON.parse(s.slice(start, end + 1));
   } catch {
     return null;
   }

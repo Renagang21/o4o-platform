@@ -474,6 +474,20 @@ export function publicServiceUrl(svc: Pick<EntryService, 'domain' | 'basePath'>,
 
 const hasAnyRole = (roles: string[], set: string[]) => roles.some((r) => set.includes(r));
 
+/**
+ * 내 매장 조직 ID — buildHomeEntryModel 의 매장 항목과 같은 출처를 쓴다.
+ * workspaceStores 가 있으면 그것이 정본이고, 없을 때만 기존 서비스별 stores 를 쓴다.
+ */
+export function homeEntryStoreOrganizationIds(data: HomeEntryData): string[] {
+  const source = data.workspaceStores ?? data.stores;
+  return [...new Set(source.map((s) => s.organizationId))];
+}
+
+/** 매장 항목이 해당 조직의 것인지 — workspace-store:<org> 와 기존 store:<org>:<serviceKey> 모두 판정 */
+export function isStoreEntryItemFor(item: EntryItem, organizationId: string): boolean {
+  return item.id === `workspace-store:${organizationId}` || item.id.startsWith(`store:${organizationId}:`);
+}
+
 export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryModel {
   const roles = user.roles ?? [];
   const byKey = new Map(data.services.map((s) => [s.key, s]));
