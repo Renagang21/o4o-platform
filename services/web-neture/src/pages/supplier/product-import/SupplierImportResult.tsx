@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { RichTextEditor } from '@o4o/content-editor';
 import ProxiedImg from './ProxiedImportImage';
 import type { useSupplierProductImport } from './useSupplierProductImport';
@@ -113,7 +114,7 @@ export default function SupplierImportResult({
               선택된 이미지 없음 — 등록 페이지에 이미지가 전달되지 않습니다.
             </p>
           )}
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
             {parsed.imageUrls.map((url, idx) => (
               <div
                 key={idx}
@@ -133,9 +134,10 @@ export default function SupplierImportResult({
                 />
 
                 {/* Checkbox */}
-                <label className="absolute left-1 top-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded bg-white/80">
+                <label className="absolute left-1 top-1 flex h-5 w-5 [@media(any-pointer:coarse)]:h-11 [@media(any-pointer:coarse)]:w-11 cursor-pointer items-center justify-center rounded bg-white/80 focus-within:ring-2 focus-within:ring-emerald-500">
                   <input
                     type="checkbox"
+                    aria-label={`상품 이미지 ${idx + 1} 선택`}
                     checked={selectedImages.has(idx)}
                     onChange={() => toggleImage(idx)}
                     className="h-3.5 w-3.5 accent-emerald-600"
@@ -144,8 +146,10 @@ export default function SupplierImportResult({
 
                 {/* Thumbnail star */}
                 <button
+                  aria-label={`상품 이미지 ${idx + 1} 대표 이미지로 지정`}
+                  aria-pressed={thumbnailIdx === idx}
                   onClick={() => setThumbnailIdx(idx)}
-                  className={`absolute right-1 top-1 text-lg leading-none ${
+                  className={`absolute right-1 top-1 flex h-5 w-5 [@media(any-pointer:coarse)]:h-11 [@media(any-pointer:coarse)]:w-11 items-center justify-center text-lg leading-none ${
                     thumbnailIdx === idx ? 'text-yellow-400' : 'text-white/60 hover:text-yellow-300'
                   }`}
                   title="대표 이미지로 지정"
@@ -343,10 +347,12 @@ function Field({
   onChange: (v: string) => void;
   type?: string;
 }) {
+  const fieldId = useId();
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
+      <label htmlFor={fieldId} className="mb-1 block text-sm font-medium text-slate-700">{label}</label>
       <input
+        id={fieldId}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}

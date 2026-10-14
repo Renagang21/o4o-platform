@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { RichTextEditor } from '@o4o/content-editor';
 import type { useSupplierCandidateForm } from './useSupplierCandidateForm';
 import type { useSupplierCandidateMedia } from './useSupplierCandidateMedia';
@@ -9,6 +10,7 @@ export default function SupplierCandidateMediaFields({
   formState: ReturnType<typeof useSupplierCandidateForm>;
   media: ReturnType<typeof useSupplierCandidateMedia>;
 }) {
+  const fieldId = useId();
   const { form, consumerShortDesc, setConsumerShortDesc, handleChange } = formState;
   const {
     thumbnailSource,
@@ -49,20 +51,22 @@ export default function SupplierCandidateMediaFields({
               </span>
               <button
                 type="button"
+                aria-label="대표 이미지 삭제"
                 onClick={removeThumbnail}
-                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 w-5 h-5 [@media(any-pointer:coarse)]:w-11 [@media(any-pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               >
                 X
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <label className="block w-32 h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors flex items-center justify-center">
+              <label className="block w-32 h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 focus-within:ring-2 focus-within:ring-emerald-500 transition-colors flex items-center justify-center">
                 <input
                   type="file"
+                  aria-label="대표 이미지 파일"
                   accept="image/*"
                   onChange={handleThumbnailSelect}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <span className="text-slate-400 text-xs text-center">
                   클릭하여
@@ -110,8 +114,9 @@ export default function SupplierCandidateMediaFields({
                   )}
                   <button
                     type="button"
+                    aria-label={`${idx + 1}번 성분/라벨 이미지 삭제`}
                     onClick={() => removeImageItem(idx, contentItems, setContentItems)}
-                    className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-5 h-5 [@media(any-pointer:coarse)]:w-11 [@media(any-pointer:coarse)]:h-11 bg-red-500 text-white rounded-full text-xs flex items-center justify-center focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                   >
                     X
                   </button>
@@ -120,13 +125,14 @@ export default function SupplierCandidateMediaFields({
             </div>
           )}
           <div className="flex gap-2">
-            <label className="flex-1 block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
+            <label className="flex-1 block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 focus-within:ring-2 focus-within:ring-emerald-500 transition-colors">
               <input
                 type="file"
+                aria-label="성분/라벨 이미지 파일"
                 accept="image/*"
                 multiple
                 onChange={(e) => handleMultiImageSelect(e, setContentItems)}
-                className="hidden"
+                className="sr-only"
               />
               <div className="text-slate-400 text-sm">
                 <p className="font-medium">파일에서 추가</p>
@@ -156,10 +162,10 @@ export default function SupplierCandidateMediaFields({
         </p>
 
         {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 에디터 이미지 기능 연결 */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+        <div role="group" aria-labelledby={`${fieldId}-field-0`}>
+          <p id={`${fieldId}-field-0`} className="block text-sm font-medium text-slate-700 mb-1">
             소비자용 간이 설명
-          </label>
+          </p>
           <RichTextEditor
             value={consumerShortDesc}
             onChange={(c) => setConsumerShortDesc(c.html)}
@@ -176,8 +182,14 @@ export default function SupplierCandidateMediaFields({
         <h3 className="text-lg font-semibold text-slate-800">추가 정보 (선택)</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">제품 규격</label>
+            <label
+              htmlFor={`${fieldId}-field-1`}
+              className="block text-sm font-medium text-slate-700 mb-1"
+            >
+              제품 규격
+            </label>
             <input
+              id={`${fieldId}-field-1`}
               type="text"
               name="specification"
               value={form.specification}
@@ -187,8 +199,14 @@ export default function SupplierCandidateMediaFields({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">원산지</label>
+            <label
+              htmlFor={`${fieldId}-field-2`}
+              className="block text-sm font-medium text-slate-700 mb-1"
+            >
+              원산지
+            </label>
             <input
+              id={`${fieldId}-field-2`}
               type="text"
               name="originCountry"
               value={form.originCountry}

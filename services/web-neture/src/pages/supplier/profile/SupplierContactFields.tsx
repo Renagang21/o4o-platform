@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { User, Mail, Phone, Globe, MessageCircle } from 'lucide-react';
 import { inputClass, VisibilitySelector } from './profilePresentation';
 import type { useSupplierBusinessProfile } from './useSupplierBusinessProfile';
@@ -7,6 +8,7 @@ export default function SupplierContactFields({
 }: {
   controller: ReturnType<typeof useSupplierBusinessProfile>;
 }) {
+  const fieldId = useId();
   const {
     managerName,
     setManagerName,
@@ -40,8 +42,14 @@ export default function SupplierContactFields({
         <div className="space-y-5">
           {/* 담당자명 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">담당자명</label>
+            <label
+              htmlFor={`${fieldId}-field-0`}
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              담당자명
+            </label>
             <input
+              id={`${fieldId}-field-0`}
               type="text"
               value={managerName}
               onChange={(e) => setManagerName(e.target.value)}
@@ -52,11 +60,15 @@ export default function SupplierContactFields({
 
           {/* 담당자 전화번호 */}
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-1`}
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5"
+            >
               <Phone className="w-3.5 h-3.5 text-gray-400" />
               담당자 전화번호
             </label>
             <input
+              id={`${fieldId}-field-1`}
               type="tel"
               value={managerPhone}
               onChange={(e) => setManagerPhone(e.target.value)}
@@ -80,11 +92,15 @@ export default function SupplierContactFields({
         <div className="space-y-6">
           {/* Email */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor={`${fieldId}-field-2`}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
+            >
               <Mail className="w-4 h-4 text-gray-400" />
               이메일
             </label>
             <input
+              id={`${fieldId}-field-2`}
               type="email"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
@@ -96,11 +112,15 @@ export default function SupplierContactFields({
 
           {/* Phone */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor={`${fieldId}-field-3`}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
+            >
               <Phone className="w-4 h-4 text-gray-400" />
               전화번호
             </label>
             <input
+              id={`${fieldId}-field-3`}
               type="tel"
               value={contactPhone}
               onChange={(e) => setContactPhone(e.target.value)}
@@ -112,11 +132,15 @@ export default function SupplierContactFields({
 
           {/* Website */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor={`${fieldId}-field-4`}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
+            >
               <Globe className="w-4 h-4 text-gray-400" />
               웹사이트
             </label>
             <input
+              id={`${fieldId}-field-4`}
               type="url"
               value={contactWebsite}
               onChange={(e) => setContactWebsite(e.target.value)}
@@ -128,11 +152,15 @@ export default function SupplierContactFields({
 
           {/* Kakao */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor={`${fieldId}-field-5`}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
+            >
               <MessageCircle className="w-4 h-4 text-gray-400" />
               카카오톡 채널
             </label>
             <input
+              id={`${fieldId}-field-5`}
               type="url"
               value={contactKakao}
               onChange={(e) => setContactKakao(e.target.value)}

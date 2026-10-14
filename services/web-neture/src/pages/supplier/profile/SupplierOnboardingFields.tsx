@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Mail, Save, Loader2, CheckCircle, FileText, Upload, Download } from 'lucide-react';
 import { inputClass, fileInputClass } from './profilePresentation';
 import type { useSupplierOnboarding } from './useSupplierOnboarding';
@@ -7,6 +8,7 @@ export default function SupplierOnboardingFields({
 }: {
   controller: ReturnType<typeof useSupplierOnboarding>;
 }) {
+  const fieldId = useId();
   const {
     onboarding,
     onboardingSaving,
@@ -78,11 +80,15 @@ export default function SupplierOnboardingFields({
           {/* 세금계산서 이메일 — WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §E:
               쓰기 소유 = PATCH /supplier/onboarding. 이 섹션의 "정산 정보 저장" 이 저장한다. */}
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+            <label
+              htmlFor={`${fieldId}-field-0`}
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5"
+            >
               <Mail className="w-3.5 h-3.5 text-gray-400" />
               세금계산서 이메일 <span className="text-red-500">*</span>
             </label>
             <input
+              id={`${fieldId}-field-0`}
               type="email"
               value={taxInvoiceEmail}
               onChange={(e) => setTaxInvoiceEmail(e.target.value)}
@@ -93,10 +99,14 @@ export default function SupplierOnboardingFields({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-1`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 은행명 <span className="text-red-500">*</span>
               </label>
               <input
+                id={`${fieldId}-field-1`}
                 type="text"
                 value={settlementBankName}
                 onChange={(e) => setSettlementBankName(e.target.value)}
@@ -105,10 +115,14 @@ export default function SupplierOnboardingFields({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-2`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 계좌번호 <span className="text-red-500">*</span>
               </label>
               <input
+                id={`${fieldId}-field-2`}
                 type="text"
                 value={settlementAccountNumber}
                 onChange={(e) => setSettlementAccountNumber(e.target.value)}
@@ -122,10 +136,14 @@ export default function SupplierOnboardingFields({
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-3`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 예금주 <span className="text-red-500">*</span>
               </label>
               <input
+                id={`${fieldId}-field-3`}
                 type="text"
                 value={settlementAccountHolder}
                 onChange={(e) => setSettlementAccountHolder(e.target.value)}
@@ -137,10 +155,14 @@ export default function SupplierOnboardingFields({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-4`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 정산 담당자명
               </label>
               <input
+                id={`${fieldId}-field-4`}
                 type="text"
                 value={settlementContactName}
                 onChange={(e) => setSettlementContactName(e.target.value)}
@@ -149,10 +171,14 @@ export default function SupplierOnboardingFields({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-5`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 정산 담당자 이메일
               </label>
               <input
+                id={`${fieldId}-field-5`}
                 type="email"
                 value={settlementContactEmail}
                 onChange={(e) => setSettlementContactEmail(e.target.value)}
@@ -164,7 +190,10 @@ export default function SupplierOnboardingFields({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor={`${fieldId}-field-6`}
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 사업자등록증 PDF <span className="text-red-500">*</span>
               </label>
               {onboarding?.businessRegistrationDocument && (
@@ -178,6 +207,7 @@ export default function SupplierOnboardingFields({
                 </button>
               )}
               <input
+                id={`${fieldId}-field-6`}
                 type="file"
                 accept="application/pdf,.pdf"
                 onChange={(e) => setBusinessRegistrationFile(e.target.files?.[0] || null)}
@@ -199,7 +229,10 @@ export default function SupplierOnboardingFields({
             </div>
 
             <div className="rounded-lg border border-gray-200 p-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor={`${fieldId}-field-7`}
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 통장 사본 PDF <span className="text-red-500">*</span>
               </label>
               {onboarding?.settlementBankbookDocument && (
@@ -213,6 +246,7 @@ export default function SupplierOnboardingFields({
                 </button>
               )}
               <input
+                id={`${fieldId}-field-7`}
                 type="file"
                 accept="application/pdf,.pdf"
                 onChange={(e) => setBankbookFile(e.target.files?.[0] || null)}
