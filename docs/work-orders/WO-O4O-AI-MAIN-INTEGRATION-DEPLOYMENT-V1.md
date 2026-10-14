@@ -37,8 +37,8 @@ AGENTS §4-1(e/f/g), README Delivery, 실제 main ruleset, [운영 migration 기
 - [x] 두 충돌 정리, 기존 main helper와 신규 세션/비동기 계약 연결.
 - [x] main 편집기 4 files / 48 tests, 선행 편집기 3 files / 34 tests PASS.
 - [x] 통합 runtime·accounting/provider/Extension·boundary·isolated quota DB·build/lint 검증.
-- [ ] PR CI·Codex blocker/미해결 thread·최신 main 위치 검토 후 병합.
-- [ ] post-merge CI/Delivery 판정 및 운영 migration 승인 조건 확인.
+- [x] PR CI·Codex blocker/미해결 thread·최신 main 위치 검토 후 병합.
+- [x] post-merge CI/Delivery 판정 및 운영 migration 승인 조건 확인.
 - [ ] 정상 verified 배포·serving SHA/revision·HTTP smoke·문서 정합 확인.
 
 테스트 DB는 cached official PostgreSQL 15의 이번 세션 전용 container로 localhost fixture 포트만 노출한다. 운영 connection 설정을 읽거나 사용하지 않는다. 운영 계정 파일은 누락되어 사용자별 업무 write smoke는 별도로 구분한다. GitHub variable 조회는 integration 권한 403이므로 freeze 값을 추정/변경하지 않고 실제 Delivery gate 결과로 확인한다.
@@ -77,3 +77,37 @@ AGENTS §4-1(e/f/g), README Delivery, 실제 main ruleset, [운영 migration 기
 Sonar advisory는 Security B / Reliability D로 FAIL. 실제 ruleset required check는 CI Gate지만 보조 결과를 PASS로 바꾸어 보고하지 않는다. 공개 GitHub annotations 50개 중 failure 5개는 기존/분리된 함수의 cognitive complexity 지적이며 validator·저장/권한 계약을 변경하는 근거로 쓰지 않았다. 제한된 annotations에는 Security B 원인 상세가 없어 미확인이다. 상세 Sonar API와 Actions 로그 host는 현재 proxy 403이므로 network 경계 우회 없이 환경 초안에 `sonarcloud.io`·`results-receiver.actions.githubusercontent.com`만 추가 저장했다. 적용은 환경 설정 검토/저장·Publish가 필요하며 secret/운영 auth/CI 설정은 변경하지 않았다. 상세 분석이 제공되면 실제 보안 finding을 구분해 후속 조치한다.
 
 추가 main `c6b68da4e7`은 auth WO/e2e 4파일이며 API/package/runtime·migration 변경 없음. source delta를 확인하고 합쳤다. 최신 source 기반의 PR gate를 다시 확인한다.
+
+
+## main 병합·Delivery 판정 완료, 운영 실행 대기
+
+- [PR #549](https://github.com/Renagang21/o4o-platform/pull/549) MERGED, main `de4cbf9f3989ec7c2b417adf0388e1d6e174d8c7`, source `834335d98d6329ecd62ca18dba8a4972e1f952d2`. main tree와 검증 source tree 차이 0, source/main ancestry 확인. 누적 AI Core/Extension·accounting/quota·Work/editor 정비를 모두 포함한다.
+- [최신 PR CI 38476208289](https://github.com/Renagang21/o4o-platform/actions/runs/38476208289) SUCCESS, required CI Gate PASS. CodeQL·Guard PASS. Codex P1 수정/PG 검증·resolve, 미해결 review thread 0. admin bypass·force push·gate 변경 없음.
+- [main CI 38477654253](https://github.com/Renagang21/o4o-platform/actions/runs/38477654253) SUCCESS; main CodeQL SUCCESS.
+- [Delivery 38478659593](https://github.com/Renagang21/o4o-platform/actions/runs/38478659593) classify SUCCESS, commit `production` 상태 **pending / HELD_LEVEL_3**: API L3, frontend needs-api. API/Web/Admin deploy jobs SKIPPED. source ref·CI/freeze/serving/risk gate를 우회하지 않았다. **배포 완료가 아니며 운영 migration·traffic 전환은 실행하지 않았다.**
+- 정상 다음 동작은 target `de4cbf9f3989ec7c2b417adf0388e1d6e174d8c7`의 promote 1회다. `CreateAiUsageReservations1791870434349`의 운영 테이블/index 생성과 두 비용 컬럼 `numeric(20,8)` 변경은 사용자 명시 승인 전이므로 dispatch하지 않는다. rollback/archive repair는 이번 정상 up 실행에 포함하지 않는다.
+- 배포 전 HTTP: API health/ready 2 + 웹 HTML 6 + 같은 host JS 6, **14/14 PASS**. 실제 계정·업무 write/유료 AI 호출은 없음. SourceModel/실 PC 호출과 배포 후 smoke는 미실시다.
+- 사용자가 승인하면 최신 main/serving delta·CI·동시 production run·migration 목록을 다시 확인해 승인 범위와 동일할 때 표준 verified rollout으로 진행한다. source target이 이동했으면 포함된 변경을 확인하고 재판정한다.
+- 이 대기 기록은 운영 target을 바꾸지 않도록 source branch에 보존한다. 기준 checkout·다른 세션 branch/dirty/worktree는 수정하지 않았다. 문서 정합은 구현/검증/미실행 운영 경계를 이번 WO/CHECK에 반영하고 선행 COMPLETED 이력을 유지했다.
+
+
+## 중요 잔여 정비 — 2026-10-14
+
+사용자 추가 지시: 정비는 추후 계속하므로 지금은 중요한 부분만 수행한다. 동일 통합 트랙의 review finding 후속으로 기존 전용 worktree를 사용하고, 최신 main `9b38fe5054`를 conflict 없이 합쳤다. 새 main의 privacy 변경은 이번 AI 수정 대상이 아니다.
+
+### 조사·TODO·개발 순서
+
+- [x] Sonar 최종 source check `115570828811`의 공개 annotations 재확인. JSON 추출과 일반 HTML 태그 제거에 backtracking 경고가 있다.
+- [x] 닫는 구분자 없는 입력으로 지연 재현. 10k→20k→40k에서 JSON 73→290→1203ms, HTML 57→235→991ms. 같은 환경의 관찰치이며 SLA/운영 측정이 아니다.
+- [x] JSON은 첫 `{` / 마지막 `}`의 기존 greedy 범위를 유지하면서 `indexOf` / `lastIndexOf`로 추출. malformed/multiple object의 JSON.parse 실패도 유지.
+- [x] 일반 HTML 태그 제거는 단일 전진 scan으로 대체. 빈 `<>`, 중첩 `<`, 닫히지 않은 suffix와 태그별 공백 정책을 유지하고 동일 파일의 제목 추출도 같은 private helper를 사용한다. script/style/noise 처리·본문/제목 길이·권한·provider·외부 fetch 계약은 유지한다. HTML 처리 전체가 선형이라고 주장하지 않는다.
+- [x] 실제 malformed/정상/100k 입력 회귀, Planner/URL 소비처 테스트·API build·변경 lint 검증.
+- [ ] 후속 수정 push·PR gate 확인.
+
+보류: 일반 함수 길이/cognitive complexity, 서비스 문맥이 다른 중복, 이름/스타일 및 추가 abstraction. 실제 권한 우회·저장 누락·비용 이중 정산 같은 결함이 확정되면 다시 최우선으로 처리한다. retained 중복의 이전 KEEP 판정은 미해결 TODO로 바꾸지 않는다.
+
+Sonar 도메인 추가는 이번 runtime에서 확인했다. 재시도는 proxy CONNECT 거절 대신 upstream CloudFront HTTP 403으로 실패했으며 Security B의 전체 issue 상세는 여전히 미확인이다. 공개 annotations의 재현된 성능 문제만 수정하며 B 원인의 전부를 해결했다고 판단하지 않는다. CodeQL/CI의 앞 PASS도 새 수정의 검증으로 대신하지 않는다.
+
+운영 migration 승인·배포 후 smoke는 코드 복잡성 정비와 분리하여 계속 대기한다. 이전 main `de4cbf9f39`의 HELD_LEVEL_3 이력은 그대로 보존하며, 향후 promote는 이동한 최신 main/serving delta·CI·migration·동시 실행을 다시 확인해야 한다. 이번 조사는 운영 DB 승인으로 해석하지 않는다. 상태 헤더는 문서 lifecycle의 ACTIVE로 정렬하고 운영 실행 대기는 본문에 기록했다.
+
+검증 결과: 실제 4 suites / 38 tests PASS, API build PASS, 변경 lint 오류/경고 0. 기존 함수와 수정 함수의 2,000개 deterministic HTML 샘플에서 본문/제목 4,000건 결과 차이 0. 같은 source 함수 비교의 40k 입력은 HTML 1243.58→0.27ms, JSON 925.03→0.04ms였으며 운영 latency 측정이 아니다. 첫 focused 실행의 부적절한 `br` prefix fixture와 존재하지 않는 planning suite 경로는 진단 후 수정해 위 4개 실제 suite를 완주했다. 기존 assertions나 동작은 완화하지 않았다. 문서 민감정보 0/diff 검사 PASS.
