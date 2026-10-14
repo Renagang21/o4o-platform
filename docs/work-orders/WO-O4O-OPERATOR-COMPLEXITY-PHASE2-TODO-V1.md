@@ -52,7 +52,7 @@
 - [x] Neture 상품 승인: 승인대기 상품 삭제 실패·대상 보존·재시도 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI·운영 배포 확인 완료).
 - [x] Neture 상품 승인: 승인 상품 휴지통 이동 오류 처리, 목록/분석 상태 책임 분리 구현·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [x] Neture 공급자 승인: 심사 입력·서류 표시·요청 수명 C1/R1/A1 정비·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
-- [ ] 약국 사업자 회원관리: 필드 변경값·검증·순차 저장 결과 F1/C1/A1 조사.
+- [x] 약국 사업자 회원관리: 변경값·검증·info/status 부분 성공 및 재시도 정비·로컬 검증 ([WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)). 이번 종료는 commit/push, main·배포 제외.
 - [ ] 약국 사업 행사/협력사업: 편집·모집·참여·사업 전환 R1/S1/A1 조사.
 - [ ] 펀딩: 단계별 안내·상태 변경·참여/KPI 갱신 F1/R1/A1 조사. 단계 연결은 main/배포 완료; 구조 분리는 별도.
 - [ ] 강의: 문의·심사·수료증 입력/처리/결과 R1/S1/A1 조사. 오류 보완은 main/배포 완료; 구조 분리는 별도.
@@ -123,3 +123,14 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 ### 상품·공급자 승인 통합 정비 결과
 
 [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.
+
+### 약국 사업자 회원 수정 후속 정합
+
+[회원 수정 WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)는 KPA 전용 editor 한 소비처의
+입력/요청 모델과 저장 수명 정비다. 공통 패키지에 있는 기존 코드를 내부 정비했으며
+다른 서비스와 공통화하지 않았다. 약사회 분회 수정·배포는 없다.
+다음 업무 큐는 약국 협력사업·행사이며, 회원관리 API 차수에 아래 불일치를 추가한다.
+
+- [ ] KPA 전용 status API는 operator에게 active/rejected만 허용해 전용 화면의 정지를 거절한다. 일상 정지/복구 원칙과 공통 상세/단건/일괄 전 경로 대조.
+- [ ] KPA 회원 유형 변경 select는 operator에게도 열리지만 info API는 admin으로 제한한다. 일반 역할 변경과 회원 유형 변경 의미를 구분해 UI/API 정합 확인.
+- [ ] 쓰기 응답 유실 시 재시도 멱등성은 서버 계약 조사 대상으로 유지.

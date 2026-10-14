@@ -10,23 +10,24 @@
  * KPA 는 아래 구조 차이로 인해 CommonEditUserModal 적용 대상이 아니다.
  * 해당 이유가 해소되지 않는 한 이 파일을 CommonEditUserModal 로 대체하지 말 것.
  *
- *   1. ID 기준: kpa_members.id — CommonEditUserModal 은 users.id 기반
+ *   1. ID 해석: 현재 wrapper는 users.id, KPA 서버가 km/sm ID도 해석
  *   2. 분리 API: /info (기본 정보) vs /status (상태) — CommonEditUserModal 은 단일 PUT
  *   3. KPA 전용 비즈니스 로직: activity_type → store_owner 자동 부여/회수 + warnings[]
  *   4. makeRequest 경로 기준: /api/v1/kpa 상대경로 (/members/...)
  * ────────────────────────────────────────────────────────────────
  *
  * KPA 특수 사항:
- *   - ID: kpa_members.id (또는 service_memberships.id) — users.id 아님
+ *   - ID: 현재 wrapper는 users.id (서버는 kpa_members/service_memberships ID도 허용)
  *   - PATCH /members/:id/info  — 기본 정보 + 약국 정보 + activity_type
  *   - PATCH /members/:id/status — 상태 변경 (별도 엔드포인트)
  *   - activity_type → pharmacy_owner: backend store_owner 자동 부여/회수 + warnings[]
  *   - makeRequest paths: /api/v1/kpa 기준 상대경로 (/members/... )
  */
 
-import { useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { X, Loader2, AlertCircle, ShieldAlert } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
+import { useKpaMemberEdit } from './useKpaMemberEdit';
+import { KPA_ACTIVITY_LABELS } from './kpaMemberEditModel';
 import { AddressSearch } from '@o4o/ui';
 import type { ApiRequestFn } from './CommonEditUserModal';
 
@@ -62,7 +63,7 @@ export interface KpaMemberBusinessInfo {
 }
 
 export interface KpaMemberForEdit {
-  /** kpa_members.id (또는 service_memberships.id) — users.id 아님 */
+  /** 현재 서비스 wrapper의 users.id. 서버에서 기존 km/sm ID도 해석한다. */
   id: string;
   user_id?: string;
   user?: { name?: string; email?: string; nickname?: string | null };
@@ -85,50 +86,17 @@ export interface KpaEditUserModalProps {
   onSuccess: () => void;
 }
 
-// ─── Constants ───────────────────────────────────────────────
+/** 대상이 바뀌면 입력과 저장 수명을 함께 새로 시작한다. */
+export function KpaEditUserModal(props: Readonly<KpaEditUserModalProps>) {
+  return <KpaMemberEditor key={props.member.id} {...props} />;
+}
 
-const ACTIVITY_TYPE_LABELS: Record<string, string> = {
-  pharmacy_owner: '약국 개설자',
-  pharmacy_employee: '약국 근무 약사',
-  hospital: '병원 약사',
-  manufacturer: '제조업',
-  importer: '수입업',
-  wholesaler: '도매업',
-  other_industry: '산업체',
-  government: '공무원',
-  school: '학교',
-  other: '기타',
-  inactive: '비활동',
-};
-
-// ─── Component ───────────────────────────────────────────────
-
-export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canChangeMembershipType = false }: Readonly<KpaEditUserModalProps>) {
+function KpaMemberEditor(props: Readonly<KpaEditUserModalProps>) {
+  const { member, canChangeMembershipType = false } = props;
   const isSuperAdmin = (member.capabilities ?? []).includes('platform:super_admin');
   const isWithdrawn = member.status === 'withdrawn';
-
-  const [saving, setSaving] = useState(false);
-  const [actionError, setActionError] = useState('');
-
-  const [form, setForm] = useState({
-    name: member.user?.name || '',
-    nickname: member.user?.nickname || '',
-    membership_type: member.membership_type || 'pharmacist',
-    activity_type: member.activity_type || '',
-    license_number: member.license_number || '',
-    pharmacy_name: member.pharmacy_name || '',
-    pharmacy_address: member.pharmacy_address || '',
-    contactName: member.business_info?.contactName || '',
-    zipCode: member.business_info?.zipCode || '',
-    address1: member.business_info?.address || '',
-    address2: member.business_info?.address2 || '',
-    business_number: member.business_info?.businessNumber || '',
-    pharmacy_phone: member.business_info?.pharmacy_phone || '',
-    ownerPhone: member.business_info?.ownerPhone || '',
-    ceoName: member.business_info?.ceoName || member.business_info?.representativeName || '',
-    taxInvoiceEmail: member.business_info?.taxInvoiceEmail || member.business_info?.taxEmail || '',
-    status: member.status,
-  });
+  const { form, setForm, saving, actionError, savedInfo, savedActivity, handleSave, handleClose } = useKpaMemberEdit(props);
+  const onClose = () => { void handleClose(); };
 
   const inputStyle: CSSProperties = {
     width: '100%',
@@ -149,121 +117,15 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
   };
   const fieldStyle: CSSProperties = { marginBottom: 12 };
 
-  const handleSave = async () => {
-    if (isSuperAdmin || isWithdrawn) return;
-    setSaving(true);
-    setActionError('');
-
-    try {
-      // ─ 변경 감지 ─────────────────────────────────────────
-      const trim = (v: string | null | undefined) => (v || '').trim();
-
-      const nameChanged = trim(form.name) !== trim(member.user?.name);
-      const nicknameChanged = trim(form.nickname) !== trim(member.user?.nickname);
-      const typeChanged = canChangeMembershipType && form.membership_type !== (member.membership_type || '');
-      const activityChanged = form.activity_type !== (member.activity_type || '');
-      const licenseChanged = trim(form.license_number) !== trim(member.license_number);
-      const pharmacyNameChanged = trim(form.pharmacy_name) !== trim(member.pharmacy_name);
-
-      const newZipCode = trim(form.zipCode);
-      const newAddress1 = trim(form.address1);
-      const newAddress2 = trim(form.address2);
-      const addressChanged = newAddress1.length > 0 && (
-        newZipCode !== trim(member.business_info?.zipCode)
-        || newAddress1 !== trim(member.business_info?.address)
-        || newAddress2 !== trim(member.business_info?.address2)
-      );
-
-      const newPharmacyAddress = trim(form.pharmacy_address);
-      const pharmacyAddressChanged = newPharmacyAddress.length > 0
-        && newPharmacyAddress !== trim(member.pharmacy_address);
-
-      const businessNumberChanged = form.business_number !== (member.business_info?.businessNumber || '');
-
-      const newPharmacyPhone = trim(form.pharmacy_phone);
-      const pharmacyPhoneChanged = newPharmacyPhone.length > 0
-        && newPharmacyPhone !== trim(member.business_info?.pharmacy_phone);
-
-      const newContactName = trim(form.contactName);
-      const contactNameChanged = newContactName !== trim(member.business_info?.contactName);
-
-      const newOwnerPhone = trim(form.ownerPhone);
-      const ownerPhoneChanged = newOwnerPhone.length > 0
-        && newOwnerPhone !== trim(member.business_info?.ownerPhone);
-
-      const newCeoName = trim(form.ceoName);
-      const ceoNameChanged = newCeoName.length > 0 && newCeoName !== trim(
-        member.business_info?.ceoName || member.business_info?.representativeName,
-      );
-
-      const newTaxEmail = trim(form.taxInvoiceEmail);
-      const taxEmailChanged = newTaxEmail.length > 0 && newTaxEmail !== trim(
-        member.business_info?.taxInvoiceEmail || member.business_info?.taxEmail,
-      );
-
-      const statusChanged = form.status !== member.status;
-
-      const infoChanged = nameChanged || nicknameChanged || typeChanged || activityChanged
-        || licenseChanged || pharmacyNameChanged || pharmacyAddressChanged
-        || businessNumberChanged || pharmacyPhoneChanged || contactNameChanged || addressChanged
-        || ownerPhoneChanged || ceoNameChanged || taxEmailChanged;
-
-      if (!infoChanged && !statusChanged) {
-        onClose();
-        return;
-      }
-
-      // ─ PATCH /members/:id/info ────────────────────────────
-      if (infoChanged) {
-        const payload: Record<string, string> = {};
-        if (nameChanged) payload.name = trim(form.name);
-        if (nicknameChanged) payload.nickname = trim(form.nickname);
-        if (typeChanged) payload.membership_type = form.membership_type;
-        if (activityChanged) payload.activity_type = form.activity_type;
-        if (licenseChanged) payload.license_number = trim(form.license_number);
-        if (pharmacyNameChanged) payload.pharmacy_name = trim(form.pharmacy_name);
-        if (pharmacyAddressChanged) payload.pharmacy_address = newPharmacyAddress;
-        if (businessNumberChanged) payload.business_number = form.business_number;
-        if (pharmacyPhoneChanged) payload.pharmacy_phone = newPharmacyPhone;
-        if (contactNameChanged) payload.contactName = newContactName;
-        if (addressChanged) {
-          payload.zipCode = newZipCode;
-          payload.address1 = newAddress1;
-          payload.address2 = newAddress2;
-        }
-        if (ownerPhoneChanged) payload.ownerPhone = newOwnerPhone;
-        if (ceoNameChanged) payload.ceoName = newCeoName;
-        if (taxEmailChanged) payload.taxInvoiceEmail = newTaxEmail;
-
-        const infoRes = await makeRequest('PATCH', `/members/${member.id}/info`, payload) as any;
-        if (Array.isArray(infoRes?.warnings) && infoRes.warnings.length > 0) {
-          for (const w of infoRes.warnings) {
-            toast.warning(w);
-          }
-        }
-      }
-
-      // ─ PATCH /members/:id/status ─────────────────────────
-      if (statusChanged) {
-        await makeRequest('PATCH', `/members/${member.id}/status`, { status: form.status });
-      }
-
-      toast.success('회원 정보가 저장되었습니다.');
-      onSuccess();
-      onClose();
-    } catch (err: any) {
-      setActionError(err?.message || '저장에 실패했습니다.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="회원정보 수정"
         style={{ background: '#fff', borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.18)', width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', padding: 24 }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -279,6 +141,8 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
           </h3>
           <button
             onClick={onClose}
+            aria-label="닫기"
+            disabled={saving}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 6, color: '#94a3b8' }}
           >
             <X size={18} />
@@ -299,9 +163,14 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
           </div>
         )}
 
+        {savedInfo && (
+          <p role="status" style={{ fontSize: 13, color: '#0369a1', marginBottom: 12 }}>
+            회원 정보는 저장되었습니다. 남은 변경 사항을 저장하거나 닫을 수 있습니다.
+          </p>
+        )}
         {/* Error */}
         {actionError && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#fef2f2', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
+          <div role="alert" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#fef2f2', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
             <AlertCircle size={14} />
             {actionError}
           </div>
@@ -314,6 +183,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
               <label style={labelStyle}>이름</label>
               <input
                 type="text"
+                aria-label="이름"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 placeholder="이름"
@@ -327,6 +197,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
               <label style={labelStyle}>닉네임 <span style={{ fontWeight: 400, color: '#94a3b8' }}>(비우면 해제)</span></label>
               <input
                 type="text"
+                aria-label="닉네임"
                 value={form.nickname}
                 onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
                 placeholder="닉네임 (선택)"
@@ -341,6 +212,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
               <label style={labelStyle}>유형</label>
               <select
                 disabled={!canChangeMembershipType || saving}
+                aria-label="유형"
                 value={form.membership_type}
                 onChange={(e) => setForm((f) => ({ ...f, membership_type: e.target.value }))}
                 style={inputStyle}
@@ -360,6 +232,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
             <div style={fieldStyle}>
               <label style={labelStyle}>상태</label>
               <select
+                aria-label="상태"
                 value={form.status}
                 onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as KpaMemberStatus }))}
                 disabled={saving}
@@ -378,6 +251,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
               <label style={labelStyle}>면허번호</label>
               <input
                 type="text"
+                aria-label="면허번호"
                 value={form.license_number}
                 onChange={(e) => setForm((f) => ({ ...f, license_number: e.target.value }))}
                 placeholder="면허번호 (선택)"
@@ -390,25 +264,26 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
             <div style={fieldStyle}>
               <label style={labelStyle}>활동 유형</label>
               <select
+                aria-label="활동 유형"
                 value={form.activity_type}
                 onChange={(e) => setForm((f) => ({ ...f, activity_type: e.target.value }))}
                 disabled={saving}
                 style={inputStyle}
               >
                 <option value="">-</option>
-                {Object.entries(ACTIVITY_TYPE_LABELS).map(([val, label]) => (
+                {Object.entries(KPA_ACTIVITY_LABELS).map(([val, label]) => (
                   <option key={val} value={val}>{label}</option>
                 ))}
               </select>
               {form.activity_type === 'pharmacy_owner'
-                && member.activity_type !== 'pharmacy_owner' && (
+                && savedActivity !== 'pharmacy_owner' && (
                 <p style={{ fontSize: 11, color: '#0369a1', marginTop: 4 }}>
                   약국 개설자로 지정 시, <strong>사업자번호와 약국명</strong>이 입력되어 있으면
                   매장 운영 권한(store_owner)이 자동 부여됩니다.
                   누락 시 경고가 표시되며 권한 부여는 보류됩니다.
                 </p>
               )}
-              {member.activity_type === 'pharmacy_owner'
+              {savedActivity === 'pharmacy_owner'
                 && form.activity_type !== 'pharmacy_owner' && (
                 <p style={{ fontSize: 11, color: '#b45309', marginTop: 4 }}>
                   다른 활동 유형으로 변경하면 매장 운영 권한(store_owner)이 회수됩니다.
@@ -426,6 +301,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>약국명 <span style={{ color: '#dc2626' }}>*</span></label>
                   <input
                     type="text"
+                    aria-label="약국명"
                     value={form.pharmacy_name}
                     onChange={(e) => setForm((f) => ({ ...f, pharmacy_name: e.target.value }))}
                     placeholder="약국명 (store_owner 자동 부여 필수)"
@@ -442,6 +318,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>약국 전화번호</label>
                   <input
                     type="text"
+                    aria-label="약국 전화번호"
                     value={form.pharmacy_phone}
                     onChange={(e) => setForm((f) => ({ ...f, pharmacy_phone: e.target.value }))}
                     placeholder="예: 02-1234-5678"
@@ -455,6 +332,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>개설자 연락처</label>
                   <input
                     type="text"
+                    aria-label="개설자 연락처"
                     value={form.ownerPhone}
                     onChange={(e) => setForm((f) => ({ ...f, ownerPhone: e.target.value }))}
                     placeholder="개설자 본인 연락처 (선택)"
@@ -468,6 +346,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>대표자명</label>
                   <input
                     type="text"
+                    aria-label="대표자명"
                     value={form.ceoName}
                     onChange={(e) => setForm((f) => ({ ...f, ceoName: e.target.value }))}
                     placeholder="사업자등록증 대표자명 (선택)"
@@ -482,6 +361,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>담당자명</label>
                   <input
                     type="text"
+                    aria-label="담당자명"
                     value={form.contactName}
                     onChange={(e) => setForm((f) => ({ ...f, contactName: e.target.value }))}
                     placeholder="담당자 이름 (선택)"
@@ -496,6 +376,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>사업자등록번호 <span style={{ color: '#dc2626' }}>*</span></label>
                   <input
                     type="text"
+                    aria-label="사업자등록번호"
                     value={form.business_number}
                     onChange={(e) => setForm((f) => ({ ...f, business_number: e.target.value }))}
                     placeholder="사업자등록번호 (store_owner 자동 부여 필수, 숫자만 추출됨)"
@@ -512,6 +393,7 @@ export function KpaEditUserModal({ member, makeRequest, onClose, onSuccess, canC
                   <label style={labelStyle}>세금계산서 이메일</label>
                   <input
                     type="email"
+                    aria-label="세금계산서 이메일"
                     value={form.taxInvoiceEmail}
                     onChange={(e) => setForm((f) => ({ ...f, taxInvoiceEmail: e.target.value }))}
                     placeholder="세금계산서 수신 이메일 (선택)"
