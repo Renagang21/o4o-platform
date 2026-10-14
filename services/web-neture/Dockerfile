@@ -121,11 +121,14 @@ WORKDIR /app/services/web-neture
 RUN npx vite build
 
 # Production stage
-FROM nginxinc/nginx-unprivileged:1.28-alpine AS runner
+FROM nginx:1.28-alpine AS runner
 
 # Copy built files
 COPY --from=builder /app/services/web-neture/dist /usr/share/nginx/html
 COPY services/web-neture/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY services/web-neture/nginx/nginx.conf /etc/nginx/nginx.conf
+# The entrypoint renders the template as UID 101; all runtime temp files use /tmp.
+RUN chown nginx:nginx /etc/nginx/conf.d /etc/nginx/conf.d/default.conf
 
 # Cloud Run uses PORT env variable
 ENV PORT=8080

@@ -28,13 +28,13 @@ Codex 초기 리뷰 P2: 심층 SPA의 og:url이 홈을 가리키는 문제를 �
 
 실제 Dockerfile 전체 빌드 PASS. 최종 이미지 `sha256:d3d765a3c77367269a0fcfa94ad5936238271c206cb29c976a98b211c5304297`(최종 image bytes는 artifact에 기록)의 8080 기본 PORT와 9090 변경 PORT에서 각각 140 assertions PASS. `nginx -t` PASS, UTF-8 Content-Type 및 runner에 임시 CA 파일 부재 확인. 원 Dockerfile의 버전 미지정 pnpm이 최신 12를 설치하여 저장소 지정 10.25.0으로 고정했다. optional BuildKit secret `proxy_ca`는 network RUN에만 마운트하고 TLS 검증을 유지한다. 이미지에 CA를 넣지 않는다. Sonar Docker 지적 후 기존 pnpm-lock.yaml을 COPY하고 frozen-lockfile·integrity 검증·lifecycle script 차단 및 별도 BuildKit package cache를 적용했다. dependency manifest와 lockfile 내용은 변경하지 않았다.
 
-로컬 Docker `vfs` 및 기본 BuildKit `native`는 COPY마다 파일 복제로 디스크를 고갈시켜 해당 작업 캐시를 정리했다. daemon 저장 설정은 유지하고 전용 FUSE BuildKit에서 전체 빌드를 완료했다. 디스크 사용량은 약 8GB로 유지되었다. 서빙 runner는 nginx-unprivileged 1.28 Alpine의 UID 101, PORT 기본 8080이며 nginx 변수는 PORT만 envsubst한다.
+로컬 Docker `vfs` 및 기본 BuildKit `native`는 COPY마다 파일 복제로 디스크를 고갈시켜 해당 작업 캐시를 정리했다. daemon 저장 설정은 유지하고 전용 FUSE BuildKit에서 전체 빌드를 완료했다. 디스크 사용량은 약 8GB로 유지되었다. 서빙 runner는 공식 nginx 1.28 Alpine의 UID 101, PORT 기본 8080이며 nginx 변수는 PORT만 envsubst한다.
 
 운영 반영은 CI·리뷰 gate 이후 Neture 전용 Promote와 실제 serving/HTTP 결과를 확인한 뒤 기록한다. DB migration은 실행하지 않는다. 기존 verified rollout의 검사/traffic 전환·실패 시 기존 revision 유지 계약을 따른다.
 
 ## 후속 보안 게이트 및 연결 상태
 
-최초 통합 HEAD `59f327f0fa`의 CI Pipeline은 PASS, Codex 재검토는 새 finding 없이 완료(이전 P2 스레드 resolved). Sonar는 정규식의 선행 공백 반복 두 곳에 대한 super-linear backtracking 지적으로 신규 보안 등급 C를 반환했다. 해당 반복을 제거하고 관련 17테스트·strict plugin TypeScript·lint·Neture 타입/Vite 빌드를 재검증했다. HTTP smoke의 독립 요청은 Promise.all로 병렬화했다. 변경 이미지 및 원격 Sonar 재검증은 진행 중이다.
+최초 통합 HEAD `59f327f0fa`의 CI Pipeline은 PASS, Codex 재검토는 새 finding 없이 완료(이전 P2 스레드 resolved). Sonar는 정규식의 선행 공백 반복 두 곳에 대한 super-linear backtracking 지적으로 신규 보안 등급 C를 반환했다. 해당 반복을 제거하고 관련 17테스트·strict plugin TypeScript·lint·Neture 타입/Vite 빌드를 재검증했다. HTTP smoke의 독립 요청은 Promise.all로 병렬화했다. 변경 이미지 및 원격 Sonar 재검증은 진행 중이다. 비특권 nginx는 PID/temp를 /tmp에 두고 conf.d의 template 렌더링 권한만 준비한다. 신뢰된 로컬 pnpm store를 BuildKit cache에 준비했으며 frozen-lockfile·integrity 검증은 유지한다.
 
 GitHub는 일시적 401 뒤 정상 사용자 응답이 확인됐으나 Git/API 및 registry의 간헐적 503으로 원격 상태 갱신이 불안정했다. 승인 재요청 사유가 아니라 연결 장애다. 보호된 gate를 우회하지 않고 정상 push·review·CI·병합·Neture-only Promote 이후에 운영 완료로 전환한다.
 
