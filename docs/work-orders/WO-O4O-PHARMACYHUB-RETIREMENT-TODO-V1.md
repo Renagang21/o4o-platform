@@ -427,3 +427,5 @@ PR #539는 최신 main 통합 후 CI·SonarCloud PASS 및 Codex blocker 없음�
 PR #551은 CI·SonarCloud·Codex blocker 없음 확인 후 main eebd5621ded2d06aacd48a04e556f6ce979f511b에 병합했다. read-only census 38487657820은 SUCCESS, failed=false, references.complete=true이며 잔여 건수는 동일하다. 차단 trigger는 supplier_product_offers의 public.account_erasure_write_fence 1개, BEFORE INSERT OR UPDATE FOR EACH ROW(type=23), enabled=O, plpgsql, securityDefiner=false다. 함수 body SHA-256은 51cc91dfa608b87c5ac66564d67dc7f58d08e41e8132e01e271fc95fadf6bdb9로 RetireLegacyErasureIdentityHashes1791795139475와 정확히 일치한다.
 
 PH 도구는 이 확인된 함수 지문과 trigger/function schema/name·이벤트·활성 상태·반환형·인자·언어·실행 속성·설정/조건 부재를 모두 검증한 경우에만 기존 fence를 그대로 실행하며 공급 제안을 갱신한다. trigger를 끄거나 o4o.erasure_operation bypass를 설정하지 않는다. 정의/설정 변조·비활성화·다른 mutation trigger는 중단한다. Core 함수/migration은 변경하지 않는다. 실제 PostgreSQL fixture에서 승인된 fence가 있는 plan/apply, 보호 UUID에 대한 ACCOUNT_ERASURE_PENDING 차단, 삭제 rollback, fence 활성 상태 보존을 검증했다. 운영 DB/GCS 삭제는 아직 미실행이다. 동일 WO의 후속 Phase로 branch/worktree를 유지한다.
+
+보강: 운영에서 존재가 확인된 supplier_product_offers fence 자체가 사라져도 중단한다. 모든 PostgreSQL cleanup scenario를 실제 승인된 fence가 설치된 상태에서 다시 실행했으며 통과했다. Core 보호 장치 부재를 정리 허가로 해석하지 않는다.

@@ -73,6 +73,8 @@ async function dependencies(q,plan) {
     WHERE n.nspname='public' AND t.relname=ANY($1::text[]) AND NOT g.tgisinternal
     AND (g.tgenabled<>'D' OR g.tgname='account_erasure_write_fence') AND ((g.tgtype::int & 8)<>0 OR
       (t.relname='supplier_product_offers' AND (g.tgtype::int & 16)<>0))`,[[...byTable.keys()]]);
+  if(!triggers.some(t=>t.table_name==='supplier_product_offers'&&t.trigger_name==='account_erasure_write_fence'))
+    throw new Error('PH_DEV_MUTATION_TRIGGER');
   for(const t of triggers) {
     // Keep the approved fence active: no trigger disabling or erasure-operation bypass setting.
     // Fingerprint is the exact body of RetireLegacyErasureIdentityHashes1791795139475,
