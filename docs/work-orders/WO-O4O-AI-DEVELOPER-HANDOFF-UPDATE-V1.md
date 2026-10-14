@@ -20,6 +20,8 @@ AI 공통 기반·quota·Runtime/editor 정비의 [최종 통합/배포 CHECK](.
 
 검증: 변경 4파일 민감정보 0건, 상대 링크 대상 86개 존재, `git diff --check` PASS. 실제 CI docs consumer selector가 고른 `store-role-registry-alignment.spec.ts` 1 suite / 11 tests PASS. 이는 문서를 읽는 기존 소비처 검증이며 신규 PC 실행·유료 AI 호출을 수행한 결과가 아니다.
 
+PR #567 Codex P2 `4266328018`은 DB 장애 단계 설명이 너무 넓다는 지적이다. 실제 `settleResult()`와 quota 예약 경로를 대조해 호출 전 admission 거부와 provider 성공 후 정산 오류의 결과 반환/미해결 예약을 구분했다. 동작이나 테스트 기대값을 변경하지 않고 SETUP/구조 설명만 정정한다.
+
 Git 통합은 이 4파일만 path-specific commit/push하고 실제 required CI·review blocker·최신 main을 확인한 뒤 정상 PR merge한다. 원격 CI/병합 결과는 해당 PR과 최종 완료 보고에서 확인한다. 문서 작성/로컬 검증 완료와 원격 gate를 혼동하지 않는다.
 
 문서-only이므로 **DEPLOYMENT=NOT_APPLICABLE**. 실제 AI 호출·로그인·DB migration·운영 배포를 새로 실행하지 않는다. 완료된 운영 적용을 fresh PC 설치 성공이나 실계정 비용 검증으로 보고하지 않는다.

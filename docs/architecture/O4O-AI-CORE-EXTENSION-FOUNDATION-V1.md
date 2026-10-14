@@ -204,4 +204,6 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 3. 기존 공통 기반과 업무 Extension을 활용해 담당 서비스의 자료·문맥·도구·권한·draft 저장·미리보기·실행 확인을 연결한다. 내 매장 메뉴 재배치는 별도 범위이며 모든 화면 신규 AI UI가 완료된 상태가 아니다.
 4. legacy 직접 transport/멀티모달/public research의 전체 비용 이관, store/user/external-account 실제 청구·외부 인증, 신규 모델 가격/요금 운영 정책은 별도 작업이다. 보수적 추정 예산은 업체 invoice·tool/image 비용의 완전한 상한을 보장하지 않는다. 미해결 예약은 TTL만으로 삭제하지 않고 확인된 증거로 reconcile한다.
 
+비용 장애 검증은 단계를 구분한다. 예약/admission의 DB 장애는 provider 호출 전 거부(공통 질의 503)다. provider 성공 후 정산/receipt 저장 장애는 생성 결과를 반환하고 경고·미해결 예약을 유지하므로 자동 유료 재호출이나 시간 경과만으로 해제하지 않는다.
+
 [시작 안내](../development/COLLABORATOR-START-HERE.md)와 [SETUP](../../SETUP.md)을 따라 최신 main의 전용 작업공간에서 착수한다. 개별 서비스의 중복을 성급하게 전역 공통화하지 않으며 전체 정비에서 소비처·업무 차이를 함께 판단한다. 새 Core/Memory/정산 기반·퇴역 서비스 기능을 중복 생성하지 않는다. 외부 유료 계약·운영 credential/DB 변경은 개발 착수와 구분한다.

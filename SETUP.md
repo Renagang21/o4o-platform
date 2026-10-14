@@ -269,7 +269,8 @@ API 상태 확인: `curl http://localhost:3002/health`
 - `pnpm run build:packages` 후 로컬 API `/health`와 web-neture 메인 화면을 확인합니다. 브라우저 요청이 로컬 API로 향하는지도 확인합니다.
 - 실제 로그인은 승인된 개발용 계정으로 별도 확인합니다. 빈 DB bootstrap은 계정/업무 데이터 seed를 만들지 않으며 공개 Demo·과거 seed를 임의 대체하지 않습니다.
 - 업무 Extension/Core/가격·quota 테스트는 기존 mock·격리 fixture를 사용합니다. 실계정/유료 호출 smoke는 계정·개발용 key·허용 업무 범위를 준비한 뒤 수행하며 로컬 정적 검사와 구분합니다.
-- quota 원장이 없거나 DB에 문제가 있으면 accounting 연결 경로는 `AI_QUOTA_UNAVAILABLE`로 호출을 거부합니다. 공통 질의의 한도 초과 429·DB 장애 503을 검사에서 우회하지 않습니다.
+- 호출 전 예약/admission에서 quota 원장 미준비·DB 장애가 발생하면 `AI_QUOTA_UNAVAILABLE`로 provider 호출을 거부합니다. 공통 질의의 한도 초과 429·이 단계의 DB 장애 503을 검사에서 우회하지 않습니다.
+- provider 호출 성공 후 정산/receipt 저장이 실패하면 생성 결과를 반환하고 reconciliation 경고와 미해결 예약을 남깁니다. 이를 호출 전 거부와 같은 503으로 기대하거나 성공한 유료 호출을 자동 재전송하지 않습니다. 남은 사용량은 확인된 증거로 정산하며 TTL만으로 해제하지 않습니다.
 - 비용은 가격 version/model에 따른 추정치입니다. `AI_PRICING_CATALOG` 미설정 시 기존 provider 추정 단가를 사용하며 실제 invoice나 사용자 청구 금액이 아닙니다. 새 모델별 요금 설정·운영 billing 정책 변경은 별도 작업입니다.
 
 ---
