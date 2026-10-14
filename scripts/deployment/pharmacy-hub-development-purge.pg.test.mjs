@@ -15,6 +15,9 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
     const client=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await client.connect();
     const q={isTransactionActive:true,query:async(sql,args)=>(await client.query(sql,args)).rows};
     const seed=async()=>{
+      const {readFile}=await import('node:fs/promises');
+      const migration=await readFile(new URL('../../apps/api-server/src/database/migrations/1791795139475-RetireLegacyErasureIdentityHashes.ts',import.meta.url),'utf8');
+      const fenceBody=migration.match(/AS \$\$(.*?)\$\$/s)[1];
       await client.query('DROP SCHEMA IF EXISTS external CASCADE; DROP SCHEMA public CASCADE; CREATE SCHEMA public');
       await client.query(`CREATE TABLE checkout_orders(id uuid PRIMARY KEY,metadata jsonb);
         CREATE TABLE checkout_order_logs(id uuid PRIMARY KEY,"orderId" uuid REFERENCES checkout_orders(id));
@@ -48,6 +51,12 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('INSERT INTO media_entity_links(id,media_asset_id,entity_type,entity_id) VALUES($1,$2,$3,$4)',[uuid(820),uuid(800),'service',ph]);
       await client.query('INSERT INTO users VALUES($1);',[uuid(900)]);
       await client.query('INSERT INTO organizations VALUES($1);',[uuid(901)]);
+      await client.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+        CREATE TABLE account_erasure_operations(id uuid,state text,expires_at timestamptz,subject_hash text);
+        CREATE TABLE account_erasure_reference_keys(operation_id uuid,key_kind text,key_hash text);
+        CREATE FUNCTION account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$${fenceBody}$$;
+        CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON supplier_product_offers
+          FOR EACH ROW EXECUTE FUNCTION account_erasure_write_fence()`);
     };
     const begin=async()=>client.query('BEGIN ISOLATION LEVEL SERIALIZABLE');
     const preserved=async()=>{
@@ -58,6 +67,37 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await seed();await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       const plan=await new PharmacyHubDevelopmentPurge().up(q,true);assert.equal(plan.applied,false);
       assert.equal(Object.values(plan.counts).reduce((a,b)=>a+b,0),60);await client.query('ROLLBACK');
+      const erasure=new Client({connectionString:process.env.PH_DEV_FIXTURE_URL});await erasure.connect();
+      try {
+        const pid=(await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+        for(const planMode of [true,false]) {
+        await erasure.query("BEGIN;SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
+        await client.query(planMode?'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY':'BEGIN ISOLATION LEVEL SERIALIZABLE');
+        const waitingPlan=new PharmacyHubDevelopmentPurge().up(q,planMode);
+        let blocked=false;
+        for(let i=0;i<100;i++) {
+          blocked=(await erasure.query("SELECT EXISTS(SELECT 1 FROM pg_locks WHERE locktype='advisory' AND pid=$1 AND NOT granted) AS blocked",[pid])).rows[0].blocked;
+          if(blocked)break;
+          await new Promise(resolve=>setTimeout(resolve,20));
+        }
+        assert.equal(blocked,true);
+        // A live erasure holding the exclusive advisory lock can still acquire its table locks.
+        await erasure.query("SET LOCAL lock_timeout='500ms';LOCK TABLE supplier_product_offers IN SHARE ROW EXCLUSIVE MODE");
+        await erasure.query('COMMIT');
+        assert.equal((await waitingPlan).applied,!planMode);await client.query('ROLLBACK');
+        }
+      } finally {await erasure.query('ROLLBACK');await erasure.end();}
+      await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      assert.equal((await new PharmacyHubDevelopmentPurge().up(q,true)).applied,false);await client.query('ROLLBACK');
+      await client.query("INSERT INTO account_erasure_operations VALUES($1,'completed',NULL,encode(public.digest($2,'sha256'),'hex'))",[uuid(950),uuid(301)]);
+      await begin();
+      await assert.rejects(new PharmacyHubDevelopmentPurge().up(q),error=>error.code==='P0001'&&error.message==='ACCOUNT_ERASURE_PENDING');
+      await client.query('ROLLBACK');
+      assert.equal((await client.query('SELECT count(*)::text AS count FROM o4o_payments')).rows[0].count,'6');
+      await client.query('DELETE FROM account_erasure_operations');
+      await begin();assert.equal((await new PharmacyHubDevelopmentPurge().up(q)).applied,true);await client.query('ROLLBACK');
+      assert.equal((await client.query("SELECT tgenabled FROM pg_trigger WHERE tgname='account_erasure_write_fence'")).rows[0].tgenabled,'O');
+      await seed();
       const scenarios=[
         ["UPDATE supplier_product_offers SET is_public=true WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
         ["UPDATE supplier_product_offers SET allowed_seller_ids=ARRAY['seller'] WHERE id='"+uuid(301)+"'",/SHARED_BASELINE_WIDENING/],
