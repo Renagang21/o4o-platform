@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
+import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -253,10 +254,6 @@ function DocumentsSection({
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState<DocumentRow[]>([]);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 인쇄용 PDF 대상(단일)
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
@@ -288,35 +285,32 @@ function DocumentsSection({
     return () => clearTimeout(handle);
   }, [searchInput]);
 
-  const reqIdRef = useRef(0);
+  const loadDocuments = useCallback(async () => {
+    const res = await storeLibraryApi.listContents({
+      type: 'document', page, limit: PAGE_LIMIT,
+      search: searchQuery || undefined,
+      source: source !== 'all' ? source : undefined,
+      tag: activeTag || undefined,
+    });
+    if (!res.success || !res.data) throw new Error('DOCUMENT_LOAD_FAILED');
+    return { rows: res.data.items.map(toDocumentRow), total: res.data.total,
+      totalPages: Math.max(1, res.data.totalPages) };
+  }, [page, searchQuery, source, activeTag]);
+  const { data: documents, loading, error: loadError, reload: retryDocuments } = useStoreResource(
+    loadDocuments, { rows: [] as DocumentRow[], total: 0, totalPages: 1 },
+  );
+  const { rows, total, totalPages } = documents;
+  const reloadVersion = `${reloadKey}:${internalReload}`;
+  const lastReloadVersion = useRef(reloadVersion);
   useEffect(() => {
-    const myReq = ++reqIdRef.current;
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      const res = await storeLibraryApi
-        .listContents({
-          type: 'document',
-          page,
-          limit: PAGE_LIMIT,
-          search: searchQuery || undefined,
-          // 'ai-description' 탭 = content_json.aiDescription.mode 필터(SSOT). 'all' → 미지정.
-          source: source !== 'all' ? source : undefined,
-          tag: activeTag || undefined,
-        })
-        .catch(() => null);
-      if (cancelled || myReq !== reqIdRef.current) return;
+    if (lastReloadVersion.current === reloadVersion) return;
+    lastReloadVersion.current = reloadVersion;
+    void retryDocuments();
+  }, [reloadVersion, retryDocuments]);
+  useEffect(() => {
+    if (loadError) setSelected(new Set());
+  }, [loadError]);
 
-      const items = res?.data?.items ?? [];
-      setRows(items.map(toDocumentRow));
-      setTotal(res?.data?.total ?? 0);
-      setTotalPages(Math.max(1, res?.data?.totalPages ?? 1));
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [page, searchQuery, source, activeTag, reloadKey, internalReload]);
 
   useEffect(() => {
     setSelected((prev) => {
@@ -741,6 +735,12 @@ function DocumentsSection({
         <p style={styles.pdfHint}>인쇄용 PDF 만들기는 콘텐츠 1개 선택 시 사용할 수 있습니다.</p>
       )}
 
+      {loadError ? (
+        <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <p>{loadError}</p>
+          <button type="button" onClick={() => void retryDocuments()}>다시 시도</button>
+        </div>
+      ) : <>
       <DataTable<DocumentRow>
         columns={columns}
         dataSource={rows}
@@ -759,6 +759,8 @@ function DocumentsSection({
         onPageChange={setPage}
         total={total}
       />
+      </>}
+
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 옵션 모달 */}
       {showPdfExport && (

@@ -1,3 +1,4 @@
+import type { QrCreationDraft } from "./useQrCreation";
 import { useId } from "react";
 import { LayoutTemplate, ArrowRight } from "lucide-react";
 import { GuideBlock } from "@o4o/shared-space-ui";
@@ -26,65 +27,47 @@ interface StoreQrCreateFormsProps {
   creating: boolean;
   videoTarget: { id: string; title: string } | null;
   selectedLibrary: LibrarySelectorResult | null;
-  formTitle: string;
-  formDescription: string;
-  formSlug: string;
-  formLandingType: string;
-  formLandingTargetId: string;
   selectedTemplate: ProductionTemplate | null;
-  ctaEnabled: boolean;
-  ctaLabel: string;
   formError: string | null;
   saving: boolean;
   qrBaseUrl: string;
   loadingProducts: boolean;
   productOptions: { id: string; name: string }[];
-  setFormTitle: (value: string) => void;
-  setFormDescription: (value: string) => void;
-  setFormSlug: (value: string) => void;
-  setFormLandingType: (value: string) => void;
-  setFormLandingTargetId: (value: string) => void;
-  setCtaEnabled: (value: boolean) => void;
-  setCtaLabel: (value: string) => void;
-  setCreating: (value: boolean) => void;
-  setVideoTarget: (value: null) => void;
-  setSelectedLibrary: (value: null) => void;
-  setShowSelector: (value: boolean) => void;
-  handleCreateVideo: () => void;
-  handleCreate: () => void;
+  draft: QrCreationDraft;
+  onChange: <K extends keyof QrCreationDraft>(
+    field: K,
+    value: QrCreationDraft[K],
+  ) => void;
+  onCancel: () => void;
+  onChangeSource: () => void;
+  onSave: () => void;
 }
 
 export function StoreQrCreateForms({
   creating,
   videoTarget,
   selectedLibrary,
-  formTitle,
-  formDescription,
-  formSlug,
-  formLandingType,
-  formLandingTargetId,
   selectedTemplate,
-  ctaEnabled,
-  ctaLabel,
   formError,
   saving,
   qrBaseUrl,
   loadingProducts,
   productOptions,
-  setFormTitle,
-  setFormDescription,
-  setFormSlug,
-  setFormLandingType,
-  setFormLandingTargetId,
-  setCtaEnabled,
-  setCtaLabel,
-  setCreating,
-  setVideoTarget,
-  setSelectedLibrary,
-  setShowSelector,
-  handleCreateVideo,
-  handleCreate,
+  draft,
+  onChange,
+  onCancel,
+  onChangeSource,
+  onSave,
 }: Readonly<StoreQrCreateFormsProps>) {
+  const {
+    title: formTitle,
+    description: formDescription,
+    slug: formSlug,
+    landingType: formLandingType,
+    landingTargetId: formLandingTargetId,
+    ctaEnabled,
+    ctaLabel,
+  } = draft;
   const fieldId = useId();
   const targetLabels: Record<string, string> = {
     product: "연결 상품 (선택)",
@@ -145,7 +128,7 @@ export function StoreQrCreateForms({
               id={`${fieldId}-title`}
               type="text"
               value={formTitle}
-              onChange={(e) => setFormTitle(e.target.value)}
+              onChange={(e) => onChange("title", e.target.value)}
               style={styles.input}
               placeholder="QR 스캔 후 표시될 제목"
               maxLength={60}
@@ -160,7 +143,7 @@ export function StoreQrCreateForms({
               id={`${fieldId}-description`}
               type="text"
               value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
+              onChange={(e) => onChange("description", e.target.value)}
               style={styles.input}
               placeholder="QR 스캔 후 표시될 짧은 설명 (선택)"
               maxLength={150}
@@ -178,7 +161,7 @@ export function StoreQrCreateForms({
                 type="text"
                 value={formSlug}
                 onChange={(e) =>
-                  setFormSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))
+                  onChange("slug", e.target.value.replace(/[^a-z0-9-]/g, ""))
                 }
                 style={styles.slugInput}
                 placeholder="my-video-qr"
@@ -189,17 +172,11 @@ export function StoreQrCreateForms({
           {formError && <p style={styles.formError}>{formError}</p>}
 
           <div style={styles.formActions}>
-            <button
-              onClick={() => {
-                setCreating(false);
-                setVideoTarget(null);
-              }}
-              style={styles.cancelBtn}
-            >
+            <button onClick={onCancel} style={styles.cancelBtn}>
               취소
             </button>
             <button
-              onClick={handleCreateVideo}
+              onClick={onSave}
               disabled={saving}
               style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
             >
@@ -269,14 +246,7 @@ export function StoreQrCreateForms({
                 {selectedLibrary.title}
               </p>
             </div>
-            <button
-              onClick={() => {
-                setCreating(false);
-                setSelectedLibrary(null);
-                setShowSelector(true);
-              }}
-              style={styles.changeLibraryBtn}
-            >
+            <button onClick={onChangeSource} style={styles.changeLibraryBtn}>
               자료 변경
               <ArrowRight size={14} />
             </button>
@@ -295,7 +265,7 @@ export function StoreQrCreateForms({
               id={`${fieldId}-title`}
               type="text"
               value={formTitle}
-              onChange={(e) => setFormTitle(e.target.value)}
+              onChange={(e) => onChange("title", e.target.value)}
               style={styles.input}
               placeholder="QR 스캔 후 표시될 제목"
               maxLength={60}
@@ -311,7 +281,7 @@ export function StoreQrCreateForms({
               id={`${fieldId}-description`}
               type="text"
               value={formDescription}
-              onChange={(e) => setFormDescription(e.target.value)}
+              onChange={(e) => onChange("description", e.target.value)}
               style={styles.input}
               placeholder="QR 스캔 후 표시될 짧은 설명 (50자 이내 권장)"
               maxLength={150}
@@ -340,7 +310,7 @@ export function StoreQrCreateForms({
                 type="text"
                 value={formSlug}
                 onChange={(e) =>
-                  setFormSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))
+                  onChange("slug", e.target.value.replace(/[^a-z0-9-]/g, ""))
                 }
                 style={styles.slugInput}
                 placeholder="my-qr-code"
@@ -381,7 +351,7 @@ export function StoreQrCreateForms({
                     type="checkbox"
                     aria-label="콘텐츠 하단에 상담 요청 버튼 표시"
                     checked={ctaEnabled}
-                    onChange={(e) => setCtaEnabled(e.target.checked)}
+                    onChange={(e) => onChange("ctaEnabled", e.target.checked)}
                     style={{ marginTop: "3px" }}
                   />{" "}
                   콘텐츠 하단에 상담 요청 버튼 표시
@@ -402,7 +372,7 @@ export function StoreQrCreateForms({
                     type="text"
                     aria-label="상담 요청 버튼 문구"
                     value={ctaLabel}
-                    onChange={(e) => setCtaLabel(e.target.value)}
+                    onChange={(e) => onChange("ctaLabel", e.target.value)}
                     style={{ ...styles.input, marginTop: "10px" }}
                     placeholder="버튼 문구 (기본: 상담 요청하기)"
                     maxLength={100}
@@ -422,7 +392,7 @@ export function StoreQrCreateForms({
                 <select
                   id={`${fieldId}-landing-type`}
                   value={formLandingType}
-                  onChange={(e) => setFormLandingType(e.target.value)}
+                  onChange={(e) => onChange("landingType", e.target.value)}
                   style={styles.select}
                 >
                   {LANDING_TYPE_OPTIONS.map((opt) => (
@@ -456,7 +426,9 @@ export function StoreQrCreateForms({
                   <select
                     id={`${fieldId}-landing-target`}
                     value={formLandingTargetId}
-                    onChange={(e) => setFormLandingTargetId(e.target.value)}
+                    onChange={(e) =>
+                      onChange("landingTargetId", e.target.value)
+                    }
                     style={styles.select}
                     disabled={loadingProducts}
                   >
@@ -476,7 +448,9 @@ export function StoreQrCreateForms({
                     id={`${fieldId}-landing-target`}
                     type="text"
                     value={formLandingTargetId}
-                    onChange={(e) => setFormLandingTargetId(e.target.value)}
+                    onChange={(e) =>
+                      onChange("landingTargetId", e.target.value)
+                    }
                     style={styles.input}
                     placeholder={
                       formLandingType === "link"
@@ -492,19 +466,11 @@ export function StoreQrCreateForms({
           {formError && <p style={styles.formError}>{formError}</p>}
 
           <div style={styles.formActions}>
-            <button
-              onClick={() => {
-                setCreating(false);
-                setSelectedLibrary(null);
-                setCtaEnabled(false);
-                setCtaLabel("");
-              }}
-              style={styles.cancelBtn}
-            >
+            <button onClick={onCancel} style={styles.cancelBtn}>
               취소
             </button>
             <button
-              onClick={handleCreate}
+              onClick={onSave}
               disabled={saving}
               style={{ ...styles.saveBtn, opacity: saving ? 0.7 : 1 }}
             >

@@ -1,0 +1,36 @@
+# 매장 콘텐츠·QR·채널 편집 상태 정비 검증
+
+> **상태**: COMPLETED
+> **작성일**: 2026-10-14 (한국시간)
+> **범위**: 사용자 승인 — 남은 매장 화면 리팩터링을 작은 작업으로 나누지 않고 묶어서 진행
+> **기준 main**: `334094e7c5` · 전용 branch: `wo/store-editor-async-cohesion`
+
+## 변경과 경계
+
+- 콘텐츠 목록은 transport 실패와 success=false 응답을 빈 목록으로 변환하지 않는다. 기존 `useStoreResource`를 소비해 오류·재시도·외부 reload를 처리하며, 오류 때 이전 선택을 해제한다.
+- QR 생성은 단일 대상 판별 상태와 입력 draft를 페이지 내부 전용 훅으로 옮겼다. 개별 입력 setter 전달 대신 draft 변경·취소·자료 변경·저장 동작을 전달한다. 제출 당시 payload를 유지하며 중복 저장을 차단한다. 저장 중 새 입력·취소·다른 대상 선택은 이전 저장 완료나 오류가 덮어쓰지 않는다. 매장이 바뀌면 이전 결과를 현재 목록에 추가하지 않는다. 늦은 router 자료 prefill도 이후 사용자 선택을 덮어쓰지 않는다.
+- 채널 상품의 선택·확인·단건/일괄 변경·순서 변경은 단일 화면 소비 훅으로 분리했다. 확인창은 원래 channelId를 보유하며 매장/채널 전환 때 해제한다. 이전 변경 응답은 다른 채널의 목록·알림·선택·확인창을 바꾸지 않는다. 일괄 처리 중 새로 선택한 항목은 보존한다. 제품 추가창의 조회·변경도 닫힘/대상 전환과 중복 제출을 구분한다.
+- 채널 overview 재조회는 기존 조회 revision을 사용하며, superseded 초기 조회의 loading 상태도 정리한다.
+
+API·권한·메뉴·서버·DB·공통 Core·의존성·lockfile·AI 연결은 변경하지 않았다. QR page 참조·영상 참조·상담 CTA payload와 채널 부분 성공 안내를 유지한다. 새 훅은 store-web의 해당 화면만 소비하며 서비스 간 공통화가 아니다.
+
+## 검증 근거
+
+- frozen-lockfile 설치: pnpm 10.25.0, Node 24.19.0, tracked manifest/lockfile 변화 없음.
+- store-web Vitest: 16개 파일 147개 통과. 새 회귀 15개는 QR 중복/후속 입력/대상 변경/오류/재시도/매장 전환/참조 payload, 채널 확인 대상/늦은 응답/부분 성공/새 선택/재시도/overview loading, 콘텐츠 오류·재시도·외부 reload를 검증한다.
+- `pnpm --filter store-web run build`: TypeScript 포함 production build 통과. 기존 500kB 초과 chunk 경고 유지.
+- 변경 런타임 TS/TSX 집중 ESLint: 오류·경고 0.
+- 전체 lint ratchet: 오류 46 / 기준 46, 경고 996, 통과.
+- 실제 변경 컴포넌트·훅을 Vite production build한 로컬 검증 화면: Chromium 1280·375·320px에서 30개 assertion 통과. 콘텐츠 오류→재시도→실제 빈 목록, QR 저장 중 입력·취소·대상 변경, 채널 응답 전환, 페이지 오류 0·전체 가로 넘침 0 확인. 320px 화면 시각 확인.
+
+브라우저는 변경 컴포넌트 중심의 별도 검증 화면이며 전체 앱 로그인 smoke가 아니다. 모든 API를 합성 응답으로 intercept했으며 실제 로그인과 운영 write는 없다. 검증 스크립트·스크린샷·로그는 `/tmp/store-editor-*` 로컬 산출물이다.
+
+초기 검증에서 변경된 QR props를 반영하지 않은 기존 테스트 fixture를 수정했다. 루트 TypeScript 대신 해당 서비스의 설치된 TypeScript를 사용했다. 실패 실행은 PASS 집계에 포함하지 않았다.
+
+## 남은 범위와 통합 상태
+
+태블릿 기기 관리의 큰 화면 분리, 사이니지 재생목록 인터페이스 정비, 주문 작업대 분리는 후속 후보로 유지한다. 실제 계정·QR 출력·실기기 연결/재생은 사용자 결정에 따라 별도 지시까지 보류한다. Google 운영자/전체 관리자 검증은 로컬 진행 대상이다.
+
+이 기록의 COMPLETED는 개발·로컬 검증 범위다. PR CI·main 통합·운영 Delivery는 해당 PR/commit status에서 별도 확인하며 여기서 선행 주장하지 않는다. DEPLOYMENT = AUTOMATIC 후보이며 현재 Delivery의 실제 판정이 우선한다.
+
+문서 정합: 웹 기획에 이번 정비와 남은 범위를 추가했다. 과거 회차 기록은 변경하지 않았다.

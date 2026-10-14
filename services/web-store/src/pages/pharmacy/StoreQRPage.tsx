@@ -1,5 +1,5 @@
 import { printQrSelection } from './qr/printQrSelection';
-import { buildLibraryQrPayload } from './qr/libraryQrPayload';
+import { useQrCreation } from './qr/useQrCreation';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { useQrOperations } from './hooks/useQrOperations';
 /**
@@ -44,7 +44,6 @@ import { QrPrintTemplateModal } from './QrPrintTemplateModal';
 import type { PrintTemplate } from './QrPrintTemplateModal';
 import {
   getStoreQrCodes,
-  createStoreQrCode,
   deleteStoreQrCode,
   reactivateStoreQrCode,
   startQrPlacement,
@@ -77,21 +76,6 @@ type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 
 // isArchivedCornerQr 판정(보관 코너 QR)은 @o4o/store-ui-core 가 정본이다 — PH 와 같은 판정을 쓴다.
 
-function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[가-힣]/g, '')
-    .replace(/[^a-z0-9-]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 60) || `qr-${Date.now()}`;
-}
-
-function autoLandingType(assetType: string): string {
-  if (assetType === 'external-link') return 'link';
-  return 'page'; // file, content → page
-}
-
 // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 안내(상황 → 추천 파일 → 이유)
 // 출력 메뉴(QR_EXPORT_PRESETS 5종 · DataTable overflow 클리핑을 피하는 portal)는
 // @o4o/store-ui-core 의 StoreQrOperationBoard 안으로 옮겼다
@@ -123,23 +107,17 @@ export function StoreQRPage() {
     setShowSelector(true);
   };
 
-  // Create form state
-  const [creating, setCreating] = useState(false);
-  const [selectedLibrary, setSelectedLibrary] = useState<LibrarySelectorResult | null>(null);
-  const [formSlug, setFormSlug] = useState('');
-  const [formLandingType, setFormLandingType] = useState('product');
-  const [formLandingTargetId, setFormLandingTargetId] = useState('');
-  // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 내 매장 동영상 → QR 생성 prefill (library 자료와 별도 경로)
-  const [videoTarget, setVideoTarget] = useState<{ id: string; title: string } | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: title/description AI 생성 + template 상태
-  const [formTitle, setFormTitle] = useState('');
-  const [formDescription, setFormDescription] = useState('');
+  const creation = useQrCreation(organizationId, (qr) => {
+    setCreatedTitle(qr.title);
+    setItems(prev => [qr, ...prev]);
+  });
+  const { creating, selectedLibrary, videoTarget, saving, error: formError, draft } = creation;
+  const { landingType: formLandingType } = draft;
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
-  // WO-O4O-KPA-QR-PAGE-CONSULTATION-CTA-V1: 콘텐츠(page) QR 하단 상담 요청 버튼 옵션
-  const [ctaEnabled, setCtaEnabled] = useState(false);
-  const [ctaLabel, setCtaLabel] = useState('');
+  const handleLibrarySelect = (item: LibrarySelectorResult) => {
+    creation.selectLibrary(item);
+    setShowSelector(false);
+  };
 
   // Print / download state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -191,6 +169,8 @@ export function StoreQRPage() {
   // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1
   // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: selectedTemplateId 수신
   useEffect(() => {
+    let cancelled = false;
+    const isDraftCurrent = creation.captureDraft();
     const state = location.state as ProductionRouterState | null;
     // template 조회: selectedTemplateId 우선, 없으면 qr-product-intro 기본값
     const templateId = state?.production?.selectedTemplateId ?? 'qr-product-intro';
@@ -206,6 +186,7 @@ export function StoreQRPage() {
         try {
           const res = await getStoreExecutionAsset(incoming.id);
           const lib = res.data;
+          if (cancelled || !isDraftCurrent()) return;
           handleLibrarySelect({
             id: lib.id,
             title: lib.title,
@@ -218,10 +199,11 @@ export function StoreQRPage() {
         } catch {
           // skip
         } finally {
-          window.history.replaceState({}, document.title);
+          if (!cancelled) window.history.replaceState({}, document.title);
         }
       })();
     }
+    return () => { cancelled = true; };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: PharmacyVideoPage 에서 "QR 생성" 진입 시 동영상 대상 prefill.
@@ -230,106 +212,10 @@ export function StoreQRPage() {
     const state = location.state as { prefillVideo?: { id: string; title: string } } | null;
     const pv = state?.prefillVideo;
     if (pv && pv.id) {
-      setVideoTarget({ id: pv.id, title: pv.title });
-      setSelectedLibrary(null);
-      setFormLandingType('video');
-      setFormLandingTargetId(pv.id);
-      setFormTitle(pv.title);
-      setFormDescription('');
-      setFormSlug(toSlug(pv.title));
-      setFormError(null);
-      setCreating(true);
+      creation.selectVideo({ id: pv.id, title: pv.title });
       window.history.replaceState({}, document.title);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleCreateVideo = async () => {
-    if (!videoTarget) return;
-    if (!formSlug.trim()) {
-      setFormError('슬러그를 입력해주세요');
-      return;
-    }
-    setSaving(true);
-    setFormError(null);
-    try {
-      const res = await createStoreQrCode({
-        title: formTitle.trim() || videoTarget.title,
-        description: formDescription.trim() || undefined,
-        landingType: 'video',
-        landingTargetId: videoTarget.id,
-        slug: formSlug.trim(),
-      });
-      if (res.success && res.data) {
-        setCreatedTitle(res.data.title);
-        setItems((prev) => [res.data, ...prev]);
-        setCreating(false);
-        setVideoTarget(null);
-      } else {
-        setFormError('저장에 실패했습니다');
-      }
-    } catch {
-      setFormError('슬러그가 이미 사용중이거나 저장에 실패했습니다');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleLibrarySelect = (item: LibrarySelectorResult) => {
-    setSelectedLibrary(item);
-    setFormSlug(toSlug(item.title));
-    // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안) / MLC:
-    //   블로그(source='blog')·다국어 제품 콘텐츠(source='mlc')는 공개 URL link 연결 —
-    //   landingType='link', landingTargetId=절대 URL.
-    //   콘텐츠 허브(source='content-hub')는 handleCreate 에서 page 참조형으로 처리(여기선 page prefill).
-    //   그 외(asset)는 기존 autoLandingType 규칙.
-    if (item.source === 'blog' || item.source === 'mlc') {
-      setFormLandingType('link');
-      setFormLandingTargetId(item.url || '');
-    } else {
-      setFormLandingType(autoLandingType(item.assetType || 'file'));
-      setFormLandingTargetId(item.assetType === 'external-link' && item.url ? item.url : '');
-    }
-    // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: title/description 초기화
-    setFormTitle(item.title);
-    setFormDescription('');
-    setFormError(null);
-    setShowSelector(false);
-    setCreating(true);
-  };
-
-  const handleCreate = async () => {
-    if (!selectedLibrary) return;
-    if (!formSlug.trim()) {
-      setFormError('슬러그를 입력해주세요');
-      return;
-    }
-
-    setSaving(true);
-    setFormError(null);
-
-    try {
-      const res = await createStoreQrCode(buildLibraryQrPayload({
-        library: selectedLibrary, title: formTitle, description: formDescription,
-        slug: formSlug, landingType: formLandingType, landingTargetId: formLandingTargetId,
-        ctaEnabled, ctaLabel,
-      }));
-
-      if (res.success && res.data) {
-        setCreatedTitle(res.data.title);
-        setItems((prev) => [res.data, ...prev]);
-        setCreating(false);
-        setSelectedLibrary(null);
-        setCtaEnabled(false);
-        setCtaLabel('');
-      } else {
-        setFormError('저장에 실패했습니다');
-      }
-    } catch {
-      setFormError('슬러그가 이미 사용중이거나 저장에 실패했습니다');
-    } finally {
-      setSaving(false);
-    }
-  };
 
   /**
    * QR 내리기 — 물리 삭제가 아니라 is_active=false 다(서버도 soft delete 만 한다).
@@ -564,32 +450,17 @@ export function StoreQRPage() {
         creating={creating}
         videoTarget={videoTarget}
         selectedLibrary={selectedLibrary}
-        formTitle={formTitle}
-        formDescription={formDescription}
-        formSlug={formSlug}
-        formLandingType={formLandingType}
-        formLandingTargetId={formLandingTargetId}
         selectedTemplate={selectedTemplate}
-        ctaEnabled={ctaEnabled}
-        ctaLabel={ctaLabel}
         formError={formError}
         saving={saving}
         qrBaseUrl={qrBaseUrl}
         loadingProducts={loadingProducts}
         productOptions={productOptions}
-        setFormTitle={setFormTitle}
-        setFormDescription={setFormDescription}
-        setFormSlug={setFormSlug}
-        setFormLandingType={setFormLandingType}
-        setFormLandingTargetId={setFormLandingTargetId}
-        setCtaEnabled={setCtaEnabled}
-        setCtaLabel={setCtaLabel}
-        setCreating={setCreating}
-        setVideoTarget={setVideoTarget}
-        setSelectedLibrary={setSelectedLibrary}
-        setShowSelector={(value) => { if (value) openSelector(); else setShowSelector(false); }}
-        handleCreateVideo={handleCreateVideo}
-        handleCreate={handleCreate}
+        draft={draft}
+        onChange={creation.changeDraft}
+        onCancel={creation.cancel}
+        onChangeSource={() => { creation.cancel(); openSelector(); }}
+        onSave={creation.save}
       />}
 
       {/* QR Code List — WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1:

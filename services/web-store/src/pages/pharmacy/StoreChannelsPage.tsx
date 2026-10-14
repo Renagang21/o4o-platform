@@ -1,3 +1,5 @@
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { useChannelProductActions } from './hooks/useChannelProductActions';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { fetchAvailableProducts } from '../../api/channelProducts';
 import { ChannelPublicUrlCard } from './channels/ChannelPublicUrlCard';
@@ -35,7 +37,7 @@ import { useChannelWorkspace } from './hooks/useChannelWorkspace';
  *  [E] 자산 리스트(채널맵)
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Loader2,
@@ -68,13 +70,8 @@ import {
 } from '../../api/assetSnapshot';
 import {
   addProductToChannel,
-  deactivateChannelProduct,
-  activateChannelProduct,
-  bulkChannelProductAction,
-  reorderChannelProducts,
   type AvailableProduct,
 } from '../../api/channelProducts';
-import { fetchChannelOverview } from '../../api/storeHub';
 import { GuideEditableSection } from '../../components/guide';
 // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1
 import { GuideBlock } from '@o4o/shared-space-ui';
@@ -153,26 +150,37 @@ function AddProductModal({
   const [loadingList, setLoadingList] = useState(false);
   const [addingId, setAddingId] = useState<string | null>(null);
 
+  const listRequest = useLatestStoreRequest(`${channelId}:${open}`);
+  const addRequest = useLatestStoreRequest(`${channelId}:${open}`);
+  const addBusy = useRef(false);
+  const notifyError = useRef(onError);
+  notifyError.current = onError;
   useEffect(() => {
     if (!open || !channelId) return;
+    const isCurrent = listRequest.begin();
     setLoadingList(true);
     fetchAvailableProducts(channelId)
-      .then(setAvailable)
-      .catch(() => setAvailable([]))
-      .finally(() => setLoadingList(false));
-  }, [open, channelId]);
+      .then(items => { if (isCurrent()) setAvailable(items); })
+      .catch(() => { if (isCurrent()) notifyError.current?.('추가 가능한 제품을 불러오지 못했습니다.'); })
+      .finally(() => { if (isCurrent()) setLoadingList(false); });
+  }, [open, channelId, listRequest]);
 
   if (!open) return null;
 
   const handleAdd = async (productListingId: string) => {
+    if (addBusy.current) return;
+    const isCurrent = addRequest.begin();
+    addBusy.current = true;
     setAddingId(productListingId);
     try {
       await addProductToChannel(channelId, productListingId);
+      if (!isCurrent()) return;
       setAvailable(prev => prev.filter(p => p.id !== productListingId));
       onProductAdded();
     } catch {
-      onError?.('제품 추가에 실패했습니다.');
+      if (isCurrent()) onError?.('제품 추가에 실패했습니다.');
     } finally {
+      addBusy.current = false;
       setAddingId(null);
     }
   };
@@ -317,16 +325,8 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   // Product management state (WO-CHANNEL-EXECUTION-CONSOLE-V1)
   const [showAddModal, setShowAddModal] = useState(false);
   // deactivatingId removed — replaced by actionLoading + confirmModal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1)
-  const [reordering, setReordering] = useState(false);
 
   // WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [confirmModal, setConfirmModal] = useState<{
-    type: 'delete' | 'deactivate' | 'activate';
-    ids: string[];
-    isBulk: boolean;
-  } | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
   // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
@@ -339,7 +339,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
 
   const {
     channels,
-    setChannels,
     assets,
     setAssets,
     loading,
@@ -356,6 +355,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
     setCanChangeSlug,
     lastFetched,
     fetchData,
+    refreshOverview,
     loadChannelProducts,
     cancelChannelProducts,
   } = useChannelWorkspace(showSettings, showToast, organizationId);
@@ -370,7 +370,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   useEffect(() => {
     cancelChannelProducts();
     setChannelProducts([]); setAvailableProducts([]);
-    setSelectedIds(new Set());
+    setShowAddModal(false);
     setActionMenuId(null);
     if (isProductChannel && currentChannel?.id) {
       loadChannelProducts(currentChannel.id);
@@ -443,36 +443,19 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   const handleProductAdded = () => {
     if (currentChannel) {
       loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
+      void refreshOverview();
       showToast('success', '제품이 채널에 추가되었습니다.');
     }
   };
 
-  // Reorder handler (Phase 2)
-  const handleMoveProduct = async (productId: string, direction: 'up' | 'down') => {
-    if (!currentChannel) return;
-    const idx = activeProducts.findIndex(p => p.id === productId);
-    if (idx < 0) return;
-    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= activeProducts.length) return;
-
-    // Optimistic UI swap
-    const updated = [...activeProducts];
-    [updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]];
-
-    // Build reorder items with new display_order
-    const items = updated.map((p, i) => ({ id: p.id, displayOrder: i }));
-
-    setReordering(true);
-    try {
-      await reorderChannelProducts(currentChannel.id, items);
-      await loadChannelProducts(currentChannel.id);
-    } catch {
-      showToast('error', '순서 변경에 실패했습니다.');
-      await loadChannelProducts(currentChannel.id);
-    } finally {
-      setReordering(false);
-    }
+  const {
+    selectedIds, setSelectedIds, confirmModal, setConfirmModal, actionLoading, reordering,
+    handleMoveProduct, handleSingleAction: runSingleAction, handleBulkAction, handleConfirmAction,
+  } = useChannelProductActions({ organizationId, channelId: currentChannel?.id, activeProducts,
+    refreshProducts: loadChannelProducts, refreshOverview, showToast });
+  const handleSingleAction = (type: 'activate' | 'deactivate' | 'delete', id: string) => {
+    setActionMenuId(null);
+    return runSingleAction(type, id);
   };
 
   // ─── Selection helpers ───
@@ -493,63 +476,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(allProducts.map(p => p.id)));
-    }
-  };
-
-  // ─── Single row action handler ───
-  const handleSingleAction = async (type: 'activate' | 'deactivate' | 'delete', productChannelId: string) => {
-    if (!currentChannel) return;
-    setActionMenuId(null);
-    if (type === 'delete') {
-      setConfirmModal({ type: 'delete', ids: [productChannelId], isBulk: false });
-      return;
-    }
-    setActionLoading(true);
-    try {
-      if (type === 'deactivate') {
-        await deactivateChannelProduct(currentChannel.id, productChannelId);
-        showToast('success', '제품이 비활성화되었습니다.');
-      } else {
-        await activateChannelProduct(currentChannel.id, productChannelId);
-        showToast('success', '제품이 활성화되었습니다.');
-      }
-      await loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
-      setSelectedIds(prev => { const n = new Set(prev); n.delete(productChannelId); return n; });
-    } catch {
-      showToast('error', type === 'deactivate' ? '비활성화에 실패했습니다.' : '활성화에 실패했습니다.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // ─── Bulk action handler ───
-  const handleBulkAction = (type: 'activate' | 'deactivate' | 'delete') => {
-    const ids = Array.from(selectedIds);
-    if (ids.length === 0) return;
-    setConfirmModal({ type, ids, isBulk: true });
-  };
-
-  // ─── Confirm modal execute ───
-  const handleConfirmAction = async () => {
-    if (!confirmModal || !currentChannel) return;
-    setActionLoading(true);
-    try {
-      const result = await bulkChannelProductAction(currentChannel.id, confirmModal.type, confirmModal.ids);
-      const labels = { delete: '삭제', deactivate: '비활성화', activate: '활성화' };
-      if (result.requested === result.processed) {
-        showToast('success', `${result.processed}개 제품이 ${labels[confirmModal.type]}되었습니다.`);
-      } else {
-        showToast('error', `${result.requested}개 중 ${result.processed}개 처리 완료 (일부 실패)`);
-      }
-      await loadChannelProducts(currentChannel.id);
-      fetchChannelOverview().then(setChannels).catch(() => {});
-      setSelectedIds(new Set());
-    } catch {
-      showToast('error', '작업에 실패했습니다.');
-    } finally {
-      setActionLoading(false);
-      setConfirmModal(null);
     }
   };
 
