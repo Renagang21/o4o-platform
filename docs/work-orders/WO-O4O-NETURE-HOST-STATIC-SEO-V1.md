@@ -7,7 +7,7 @@
 
 기존 Node `serve -s dist`는 네 호스트에 같은 O4O HTML을 반환했다. supplier/funding/community의 서비스 메타는 JavaScript 실행 후에만 반영되었다. 실제 브랜드 자산 없이 OG 이미지를 만들지 않는다.
 
-내부 DOM 독립 데이터로 기존 SEO export와 호스트 origin을 유지한다. Vite 최종 HTML에서 호스트별 홈·SPA fallback 문서를 생성하고 같은 JS/CSS 번들을 참조한다. nginx runner가 세 호스트만 정확히 선택하고 나머지 호스트는 O4O로 처리한다. PORT 기본값은 8080이며 환경변수도 지원한다. 홈 canonical·og:url은 심층 경로에 전달하지 않는다. 경로별 런타임 메타와 호스트 이동/cutover 규칙은 유지한다.
+내부 DOM 독립 데이터로 기존 SEO export와 호스트 origin을 유지한다. Vite 최종 HTML에서 호스트별 홈·SPA fallback 문서를 생성하고 같은 JS/CSS 번들을 참조한다. nginx runner가 세 호스트만 정확히 선택하고 나머지 호스트는 O4O로 처리한다. PORT 기본값은 8080이며 환경변수도 지원한다. 후속 사용자 요청에 따라 Neture 빌더는 저장소 Node 22.18.0·pnpm 10.25.0 기준으로 고정하고 클라우드 기본 도구도 맞춘다. 홈 canonical·og:url은 심층 경로에 전달하지 않는다. 경로별 런타임 메타와 호스트 이동/cutover 규칙은 유지한다.
 
 Design Reference: [Design Core](../rules/DESIGN-CORE-GOVERNANCE.md). 기존 화면·공통 UI·인증·권한·DB·의존성 manifest는 변경하지 않는다. 시작 main `334094e7c5`, 전용 branch `wo/neture-host-static-seo`.
 

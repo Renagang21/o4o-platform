@@ -67,7 +67,7 @@ async function checkHost(host, index) {
   check(compressed.status === 200 && compressed.headers.get('content-encoding') === 'gzip', `${host}: gzip`);
   await compressed.arrayBuffer();
 }
-await Promise.all(hosts.map(checkHost));
+await Promise.all(hosts.map((host, index) => checkHost(host, index)));
 await Promise.all(['localhost', 'www.neture.co.kr', 'unknown.example', 'supplier.neture.co.kr.evil.example'].map(async host => {
   const response = await request(host, '/');
   check(response.status === 200 && (await response.text()).includes('<title>O4O '), `${host}: default identity`);

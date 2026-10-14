@@ -6,7 +6,7 @@
 # docker build -f services/web-neture/Dockerfile .
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.18.0-alpine AS builder
 
 WORKDIR /app
 
