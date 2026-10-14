@@ -230,6 +230,20 @@ async function completeByUserDeclaration(
   return { reply: declaredCompletionReply(task, runId), won: true };
 }
 
+/**
+ * 이미 끝난 완료 선언의 재전송(응답 유실 후 재시도) — run 과 그 Task 가 모두 같은 사용자 소유로 completed 면
+ * 그 Task 를 돌려준다. 종결 Task 는 다시 열지 않고 새 Task 도 만들지 않는다.
+ */
+async function findDeclaredCompletion(dataSource: DataSource, input: AssistantWorkInput): Promise<AssistantTaskRow | null> {
+  const runId = typeof input.workBody.runId === 'string' && input.workBody.runId.length > 0 ? input.workBody.runId : null;
+  if (!runId || !isCompletionDeclaration(input.workBody.request, null)) return null;
+  const taskId = await findTaskIdByRun(dataSource, runId, input.userId);
+  if (!taskId) return null;
+  const task = await getAssistantTaskForRequester(dataSource, taskId, input.userId);
+  if (task?.status !== 'completed') return null;
+  return (await isRunCompletedFor(dataSource, runId, input.userId)) ? task : null;
+}
+
 async function isRunCompletedFor(dataSource: DataSource, runId: string, userId: string): Promise<boolean> {
   const row = await getWorkRun(dataSource, runId);
   return !!row && row.userId === userId && row.status === WORK_RUN_STATUS.COMPLETED;
@@ -286,6 +300,20 @@ export async function runAssistantWorkTask(
 ): Promise<AssistantWorkOutcome> {
   const t0 = Date.now();
   maybePurgeEndedRunFrames(dataSource, t0);
+  // ── 완료 선언 재전송 — 이미 닫힌 Task 의 같은 완료 응답을 돌려준다(새 Task · 재개 없음) ──
+  try {
+    const done = await findDeclaredCompletion(dataSource, input);
+    if (done) {
+      const runId = String(input.workBody.runId);
+      const plan = planAssistantTask({
+        taskId: done.taskId, resuming: true, priorTaskTypeKey: done.taskTypeKey ?? null, userMethodHint: false, nodeExperienceReachable: true,
+      });
+      return { reply: declaredCompletionReply(done, runId), task: { taskId: done.taskId, status: 'completed' }, plan };
+    }
+  } catch (err) {
+    logger.warn('assistant declared completion replay check failed', { error: err instanceof Error ? err.name : 'unknown' });
+  }
+
   // ── Assistant → Task ──
   let task: AssistantTaskRow | null = null;
   let priorStatus: AssistantTaskStatus | null = null;
