@@ -1,10 +1,15 @@
 # O4O AI Core + Extension 공통 기반
 
-> 상태: ACTIVE · 작성일: 2026-10-13 · 범위: 이번에 추가하는 업무 실행 계약과 전환 계획
+> 상태: ACTIVE · 작성일: 2026-10-13 · 최종 갱신: 2026-10-14 · 범위: 공통 업무 실행 계약·현재 구현/운영 적용·전환 계획
 > 근거: 사용자 요청 · [구현 WO](../work-orders/WO-O4O-AI-CORE-EXTENSION-FOUNDATION-V1.md)
+> 이번 정합 WO: [신규 개발자 AI 개발 안내 정합](../work-orders/WO-O4O-AI-DEVELOPER-HANDOFF-UPDATE-V1.md)
 > 조사 기준: `3c95dc170103f739a3e3a33b20f85350ae0ecef5`. 코드 존재는 현행 사업 기능이라는 증거가 아니다.
 
-## 1. 기존 구조·문제
+**현재 범위:** 기존 Core/업무 Extension·가격/quota·Runtime/editor 정비는 main에 통합됐으며 승인된 quota migration·7개 서비스 배포가 완료됐다.
+현재 코드 위치와 완료/후속 구분은 §11을 먼저 읽는다. §1은 최초 조사, §8/§9의 테스트·push-only 종료 기록은 당시 증거다.
+공통 기반 적용은 모든 전문 route의 비용 이관·모든 화면 AI UI·실계정 업무 검증 완료를 뜻하지 않는다.
+
+## 1. 최초 조사 당시 구조·문제 (2026-10-13)
 
 | 영역 | 현재 구현 | 재사용·정비 방향 |
 |---|---|---|
@@ -51,7 +56,7 @@ Extension → Core. 서버가 runtime/Extension을 조립하고 새 업무 실�
 O4O는 필요한 유료 호출 비용을 부담할 수 있다. 플랫폼 부담 금지 정책을 만들지 않는다.
 service+feature+Extension+audience별 provider/model/credential binding과 부담 주체를 별도로 선택한다.
 가격은 모델·통화·버전별, 한도는 요청/토큰/비용과 조직/사용자별로 관리해야 한다. 추정 cost ≠ invoice/결제. payment-core 재사용.
-quota는 원자 예약/정산/해제로 보강하고 usage/이력 실패를 관측해야 한다. 첫 연결은 기존 정책을 유지한다.
+기존 정책 실행 및 연결된 업무 Extension의 quota는 원자 예약/정산/해제를 사용하며 usage/이력 실패를 관측한다. 직접 transport/멀티모달 등 남은 경로의 범위는 §11을 따른다.
 미연결/한도/장애는 NOT_CONFIGURED/QUOTA_EXCEEDED/PROVIDER_FAILED. fallback은 자료 전송·부담·한도 정책이 허용한 명시 후보만.
 외부 계정 OAuth·신규 결제 계약·운영 credential 변경은 별도다.
 
@@ -74,10 +79,10 @@ quota는 원자 예약/정산/해제로 보강하고 usage/이력 실패를 관�
 
 | 단계 | 완료 기준 | 처리 |
 |---|---|---|
-| P0 | 자산/소비처/정본 조사·공통 계약·연결안 | 이번 문서 |
-| P1 | additive 실행·번역 연결·actor/자료/부담·거부/실패/교체 테스트 | 이번 구현 |
-| P2 | 모델별 가격/정책 버전·서비스 기능 선택·원자 quota 예약·신뢰 가능한 usage/이력 연결 | 후속 DB/정책 작업 |
-| P3 | 편집/요약/상품 비교 확대·기존 HTTP/stream/multimodal 회귀 후 이관 | 후속 |
+| P0 | 자산/소비처/정본 조사·공통 계약·연결안 | 완료, 최초 조사 기록은 §1 |
+| P1 | additive 실행·번역 연결·actor/자료/부담·거부/실패/교체 테스트 | 완료, 서비스 카탈로그 연결은 §9 |
+| P2 | 모델별 가격/정책 버전·서비스 기능 선택·원자 quota 예약·신뢰 가능한 usage/이력 연결 | 연결 범위의 코드·quota migration 적용 완료. 실계정 비용/한도·운영 가격 정책 검증은 후속(§10/§11) |
+| P3 | 편집/요약/상품 비교 확대·기존 HTTP/stream/multimodal 회귀 후 이관 | 기존 편집기/Runtime 정비 완료. 신규 업무 확대·남은 직접 호출 이관은 후속 |
 | P4 | 게시/주문 도구 proposal/confirmation/idempotency를 기존 업무 실행에 연결 | 별도 실행 범위 |
 | P5 | 개인/매장 외부 계정·외부 비서 ingress·scope/consent·직원/소비자 상담 | 별도 인증/자료 전송 검토 |
 
@@ -90,7 +95,7 @@ Assistant V2 A→I 순서와 Memory/Experience/Node 구조를 대체하지 않�
 번역의 직접 소비처는 공통 store-content controller(KPA/Neture store)이다. 기존 ai-core export/provider 호출 형태는 유지해 Care/Forum/LMS/관리자/Home/도구/stream 소비처를 보존한다.
 import·symbol·endpoint·파일 경로·raw-source assertion census를 수행한다. 퇴역 K-Cosmetics/SiteGuide/PharmacyHub 기능을 재생성하지 않는다.
 
-## 8. 검증 결과
+## 8. 초기 기반 검증 결과 (당시 기록)
 
 - `pnpm run build:packages`: PASS.
 - `pnpm --filter @o4o/ai-core run build` 및 `typecheck`: PASS.
@@ -103,7 +108,7 @@ import·symbol·endpoint·파일 경로·raw-source assertion census를 수행�
 - provider 호출은 mock이며 실제 유료 호출·운영 인증·실계정·UI 재배치는 미실행. 담당 간 실시간 협의와 운영 적용은 아직 하지 않았다.
 
 
-### 현재 한계
+### 초기 기반 당시 한계
 
 첫 adapter는 platform 부담·기존 정책만 동작한다. store/user/external-account는 공통 계약과 mock runtime 검증 수준이며 실제 계정/청구 구현이 아니다.
 provider-completed 이력은 파싱 실패에도 usage를 남기지만 host observer는 구조화 logger다. durable 실행 원장은 P2이며 기존 usage/aggregate의 fire-and-forget과 quota 경쟁은 남는다.
@@ -148,19 +153,57 @@ provider/model/key/timeout은 호스트 runtime의 기존 resolver/execute가 �
 
 기존 ai-proxy의 구조화 편집·multimodal transport, Assistant/Task/노드 실행, Forum의 rule-based adapter, 상품 AI와 legacy runAIInsight 계약은 호환성을 유지한다.
 그 경로를 새 private-data 권한 없이 공통 질의로 우회하지 않았다. **모든 기존 specialty route의 이관 완료나 각 화면 신규 AI UI 배포를 주장하지 않는다.**
-텍스트 질의/서비스 운영 요약 기반을 전체 카탈로그에 제공하고 기존 업무 사례를 Core+Extension으로 연결한 코드 단계다.
-모델별 정책/가격·원자 quota·durable 이력·외부 계정은 §6 P2/P5로 남는다.
+텍스트 질의/서비스 운영 요약 기반을 전체 카탈로그에 제공하고 기존 업무 사례를 Core+Extension으로 연결했다.
+이후 가격 snapshot·원자 quota·사용 이력은 §10의 연결 범위에 적용됐다. 외부 계정·전체 직접 호출 비용 이관·실계정 검증은 §11의 후속 범위다.
 
 ### 서비스 확대 검증
 
 서비스별 Core task·LMS/추천 검증 56개, 실제 질의 HTTP 경로 15개, 기존 AI/번역/리서치/병원약국/모델 선택 회귀 127개 PASS.
 운영자 요약 10개 PASS. 합계 208개 테스트(11 suite) PASS. Core build·API build/type-check PASS. 변경 파일 ESLint 오류 0(기존 ai-query route unused catch warning 4건), docs 민감정보 검사 3881개 파일 PASS, git diff --check PASS. 외부 provider는 mock, 실제 유료 호출/운영 인증/서비스 UI 변경은 미실행.
 
-종료 범위는 작업 branch push이며 main 통합/PR 병합/배포는 실행하지 않는다. WORKTREE_DISPOSITION: `wo/ai-core-extension-foundation` / base `b3f792578a` / main integration 없음 / CI 원격 미실행 / deployment 미실행 / KEEP(검토·후속 작업용).
+당시 종료 범위는 작업 branch push였다. 당시 WORKTREE_DISPOSITION: `wo/ai-core-extension-foundation` / base `b3f792578a` / main integration 없음 / CI 원격 미실행 / deployment 미실행 / KEEP(검토·후속 작업용). 이후 main 통합/운영 적용은 §11의 별도 완료 증거를 따른다.
 
 
 ## 10. 비용·quota/Runtime 후속 정비 (2026-10-13)
 
 [후속 WO](../work-orders/WO-O4O-AI-QUOTA-RUNTIME-MAINTENANCE-V1.md)는 위 P2의 가격 snapshot·원자 예약·정산·관측을 기존 정책 실행과 전체 catalogue 공통 질의/운영 요약·LMS/Neture 추천에 연결한다. 기존 aggregate/billing 정본을 유지하고 예약 상태만 별도 원장으로 둔다. 플랫폼 부담 유지, 모델별 가격 version, UTC 기간 귀속, 검증된 actor quota, DB 장애 거부, 성공 뒤 기록 실패의 중복 유료 호출 방지를 구현했다. 새 원문/Memory/결제/인증 기반을 만들지 않는다.
 
-`ExecuteResult.attempts`는 additive metadata다. Core의 업무 계약·권한 callback과 서비스별 Extension prompt는 그대로다. 직접 transport/멀티모달/public research의 전체 비용 이관, store/user/external-account billing, 운영 migration/가격 설정 적용은 후속 WO의 한계·적용 전제를 따른다. 앞 절의 과거 검증과 초기 한계는 당시 단계 기록이며 이 절과 후속 WO가 현재 구현 범위를 설명한다.
+`ExecuteResult.attempts`는 additive metadata다. Core의 업무 계약·권한 callback과 서비스별 Extension prompt는 그대로다. quota 정상 up의 운영 migration은 2026-10-14 완료됐다(§11). 직접 transport/멀티모달/public research의 전체 비용 이관, store/user/external-account billing, 신규 운영 가격 설정은 후속 범위다. 앞 절의 과거 검증과 초기 한계는 당시 단계 기록이다.
+
+## 11. 현재 구현·main 통합·운영 적용 (2026-10-14)
+
+### 기존 기반과 코드 위치
+
+| 책임 | 현재 코드 | 정비 결과/경계 |
+| --- | --- | --- |
+| AI Core 실행·업무 계약 | [ai-core](../../packages/ai-core/src/), [Extension 계약](../../packages/ai-core/src/contracts/ai-extension.contract.ts), [run-extension](../../packages/ai-core/src/orchestration/run-extension.ts) | 기존 execute/stream/provider stack을 재사용. 업무 prepare/parse와 외부 업체 호출 분리, 기존 권한 callback 연결 |
+| 서버 정책·비용·quota | [ai-policy](../../apps/api-server/src/modules/ai-policy/) | AiAccountedExecution·가격 snapshot·quota 예약/정산/미해결 사용 관측. 기존 aggregate/billing/usage log 유지, 새 결제 원장 없음 |
+| 서비스별 업무 | [ai-extensions](../../apps/api-server/src/services/ai-extensions/) 및 기존 콘텐츠 번역·LMS/Neture Extension | 카탈로그별 question/summary/draft·운영 요약과 업무 입력/출력 규칙. serviceId는 자료 접근 권한이 아님 |
+| Work 실행 | [ai-tools](../../apps/api-server/src/services/ai-tools/)의 work-observation/planning/action/task-session | 요청별 state를 한 번 구성해 공유, 계획 입력 snapshot·recovery helper 재사용. 기존 Task/Node/확인/권한 경계 유지 |
+| 공통 편집기 | [AiContentModal](../../packages/content-editor/src/components/AiContentModal.tsx)와 기존 generation/write/format helper | 문맥·view 변경의 늦은 응답 격리, single-flight 저장, 원래 caller callback 한 번. 이미 보낸 POST 자동 취소/재전송 없음 |
+| 코드 안전/성능 | [URL 수집](../../apps/api-server/src/routes/ai-proxy/url-content.ts), Work Planner, [complexity audit](../../scripts/quality/audit-code-complexity.mjs) | 미종결 JSON/HTML/metadata 반복 탐색 제거, 제목 대소문자·깊은 HTML 예외 회귀 보완, 고정 Git 경로·명시적 map/sort/reduce, type-only reexport bundle 오류 수정 |
+
+Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 기존 업무 guard 통과 후 전달하고, 게시·주문·삭제는 기존 도메인 검증/실행 확인을 유지한다. 소비자 자료와 직원 자료를 분리한다. 특정 모델·부담 주체로 업무 Extension을 고정하지 않으며 O4O의 필요한 유료 호출 부담을 금지하지 않는다.
+
+### 적용과 검증 증거
+
+누적 Core/Extension·quota·Work/editor는 [PR #549](https://github.com/Renagang21/o4o-platform/pull/549), 성능 후속은 [#552](https://github.com/Renagang21/o4o-platform/pull/552), 실제 bundle·추가 성능/보안·review 회귀는 [#557](https://github.com/Renagang21/o4o-platform/pull/557)로 main에 통합됐다.
+검증/운영 target은 `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`이며 [Promote 38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074)가 성공했다. 이는 해당 시점의 rollout 증거이며 이후 live serving 상태를 대신하지 않는다.
+
+- 사용자 승인 범위의 `CreateAiUsageReservations1791870434349` 정상 up: 예약/정산 테이블·pending index, aggregate/log 비용 `numeric(20,8)` 적용. 실제 migration job 성공 뒤 API readiness/traffic 전환 및 admin·neture·kpa-society·lecture·store·kpa-branch verified 배포 성공. rollback/archive repair 미실행.
+- source/main CI·CodeQL PASS, required CI Gate PASS 및 미해결 review thread 0. API 실제 tsc→database backup→tsup→restore 경로를 검증했다.
+- 배포 후 HTTP 16/16 PASS: API health/ready, 6개 웹 HTML/동일 host JS, 관리 quota API 미인증 401. 익명 상태 점검이며 실계정 권한별 AI 업무/과금 검증은 아니다.
+- 실제 PostgreSQL 격리 fixture에서 quota/schema 18 tests PASS. 최신 URL/업무 Extension 3 suites/82 tests 및 fake Git PATH 공격 회귀를 포함한 Node 6 tests PASS. 초기/통합 테스트와 중복 합산하지 않는다.
+
+상세 실패·수정·재검증·배포 증거는 [통합 WO](../work-orders/WO-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)와 [최종 CHECK](../checks/CHECK-O4O-AI-MAIN-INTEGRATION-DEPLOYMENT-V1.md)에 있다. 이력은 정책을 변경하지 않는다.
+
+### 남은 범위와 신규 개발자의 다음 작업
+
+1. 실제 계정의 서비스/역할·자료 접근, 사용량·비용 누적·한도 초과·실패 예약 처리·중복 호출을 검증한다. 당시 checkout의 테스트 계정 부재로 미실시였으며 새 환경의 계정 주입/로그인도 확인해야 한다.
+2. 수정한 PATH 보안·Reliability 경고와 성능 finding은 최신 Sonar 재분석으로 확인한다. 당시 외부 API 403 때문에 최신 등급/issue closed 상태는 미확인이다. Windows 고정 Git 실행도 미검증이다.
+3. 기존 공통 기반과 업무 Extension을 활용해 담당 서비스의 자료·문맥·도구·권한·draft 저장·미리보기·실행 확인을 연결한다. 내 매장 메뉴 재배치는 별도 범위이며 모든 화면 신규 AI UI가 완료된 상태가 아니다.
+4. legacy 직접 transport/멀티모달/public research의 전체 비용 이관, store/user/external-account 실제 청구·외부 인증, 신규 모델 가격/요금 운영 정책은 별도 작업이다. 보수적 추정 예산은 업체 invoice·tool/image 비용의 완전한 상한을 보장하지 않는다. 미해결 예약은 TTL만으로 삭제하지 않고 확인된 증거로 reconcile한다.
+
+비용 장애 검증은 단계를 구분한다. 예약/admission의 DB 장애는 provider 호출 전 거부(공통 질의 503)다. provider 성공 후 정산/receipt 저장 장애는 생성 결과를 반환하고 경고·미해결 예약을 유지하므로 자동 유료 재호출이나 시간 경과만으로 해제하지 않는다.
+
+[시작 안내](../development/COLLABORATOR-START-HERE.md)와 [SETUP](../../SETUP.md)을 따라 최신 main의 전용 작업공간에서 착수한다. 개별 서비스의 중복을 성급하게 전역 공통화하지 않으며 전체 정비에서 소비처·업무 차이를 함께 판단한다. 새 Core/Memory/정산 기반·퇴역 서비스 기능을 중복 생성하지 않는다. 외부 유료 계약·운영 credential/DB 변경은 개발 착수와 구분한다.
