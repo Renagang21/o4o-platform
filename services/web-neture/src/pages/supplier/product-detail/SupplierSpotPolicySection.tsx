@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Section } from '@o4o/operator-ux-core';
 import type { SupplierProduct } from '../../../lib/api';
@@ -10,6 +11,7 @@ export default function SupplierSpotPolicySection({
   product: SupplierProduct;
   controller: ReturnType<typeof useSupplierSpotPolicies>;
 }) {
+  const fieldId = useId();
   const {
     spotPolicies,
     spotLoading,
@@ -149,8 +151,11 @@ export default function SupplierSpotPolicySection({
             />
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] text-slate-400">시작일</label>
+                <label htmlFor={`${fieldId}-field-0`} className="text-[10px] text-slate-400">
+                  시작일
+                </label>
                 <input
+                  id={`${fieldId}-field-0`}
                   type="date"
                   value={spotForm.startAt}
                   onChange={(e) => setSpotForm((f) => ({ ...f, startAt: e.target.value }))}
@@ -158,8 +163,11 @@ export default function SupplierSpotPolicySection({
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-400">종료일</label>
+                <label htmlFor={`${fieldId}-field-1`} className="text-[10px] text-slate-400">
+                  종료일
+                </label>
                 <input
+                  id={`${fieldId}-field-1`}
                   type="date"
                   value={spotForm.endAt}
                   onChange={(e) => setSpotForm((f) => ({ ...f, endAt: e.target.value }))}
@@ -179,7 +187,12 @@ export default function SupplierSpotPolicySection({
               <button
                 onClick={() => {
                   setSpotFormOpen(false);
-                  setSpotForm({ policyName: '', spotPrice: '', startAt: '', endAt: '' });
+                  setSpotForm({
+                    policyName: '',
+                    spotPrice: '',
+                    startAt: '',
+                    endAt: '',
+                  });
                 }}
                 className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded hover:bg-slate-200"
               >

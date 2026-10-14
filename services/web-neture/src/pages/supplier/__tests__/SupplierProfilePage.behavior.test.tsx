@@ -10,7 +10,12 @@ const api = vi.hoisted(() => ({
     uploadDocument: vi.fn(),
     downloadDocument: vi.fn(),
   },
-  categories: { list: vi.fn(), select: vi.fn(), remove: vi.fn(), downloadEvidence: vi.fn() },
+  categories: {
+    list: vi.fn(),
+    select: vi.fn(),
+    remove: vi.fn(),
+    downloadEvidence: vi.fn(),
+  },
 }));
 vi.mock('../../../lib/api', () => ({
   supplierProfileApi: api.profile,
@@ -28,7 +33,11 @@ vi.mock('@o4o/ui', () => ({
   }) => (
     <button
       onClick={() =>
-        onChange({ zipCode: 'FIXTURE', address: '검증 주소', addressDetail: '검증 상세' })
+        onChange({
+          zipCode: 'FIXTURE',
+          address: '검증 주소',
+          addressDetail: '검증 상세',
+        })
       }
     >
       검증 주소 적용
@@ -66,7 +75,10 @@ beforeEach(() => {
   api.profile.getProfile.mockResolvedValue(profile);
   api.profile.updateProfile.mockResolvedValue({ success: true });
   api.onboarding.getOnboarding.mockResolvedValue(onboarding);
-  api.onboarding.updateOnboarding.mockResolvedValue({ success: true, data: onboarding });
+  api.onboarding.updateOnboarding.mockResolvedValue({
+    success: true,
+    data: onboarding,
+  });
   api.onboarding.uploadDocument.mockResolvedValue({ success: true });
   api.onboarding.downloadDocument.mockResolvedValue(null);
   api.categories.list.mockResolvedValue([]);
@@ -129,8 +141,14 @@ describe('SupplierProfilePage existing section ownership', () => {
     api.onboarding.getOnboarding.mockRejectedValueOnce(new Error('unavailable'));
     render(<SupplierProfilePage />);
     await loaded();
-    fireEvent.change(screen.getByPlaceholderText('홍길동'), { target: { value: '수정 대표' } });
-    fireEvent.click(card('공급자 서류 및 정산 정보').getByRole('button', { name: '다시 시도' }));
+    fireEvent.change(screen.getByPlaceholderText('홍길동'), {
+      target: { value: '수정 대표' },
+    });
+    fireEvent.click(
+      card('공급자 서류 및 정산 정보').getByRole('button', {
+        name: '다시 시도',
+      }),
+    );
     await waitFor(() =>
       expect(screen.queryByText('온보딩 정보를 불러오지 못했습니다.')).toBeNull(),
     );
@@ -151,9 +169,11 @@ describe('SupplierProfilePage existing section ownership', () => {
   it('saves business/contact/shipping through profile while excluding tax and account fields', async () => {
     render(<SupplierProfilePage />);
     await loaded();
-    fireEvent.change(screen.getByPlaceholderText('홍길동'), { target: { value: '수정 대표' } });
+    fireEvent.change(screen.getByPlaceholderText('홍길동'), {
+      target: { value: '수정 대표' },
+    });
     fireEvent.click(screen.getByRole('button', { name: '검증 주소 적용' }));
-    fireEvent.change(screen.getByPlaceholderText('tax@company.com'), {
+    fireEvent.change(screen.getByLabelText(/^세금계산서 이메일/), {
       target: { value: 'fixture-tax@example.invalid' },
     });
     fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
@@ -176,6 +196,28 @@ describe('SupplierProfilePage existing section ownership', () => {
     ])
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
+  });
+  it('edits contact and shipping values through their visible field labels', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.change(screen.getByLabelText('담당자명'), {
+      target: { value: '검증 담당자 변경' },
+    });
+    fireEvent.change(screen.getByLabelText('이메일', { exact: true }), {
+      target: { value: 'updated@example.invalid' },
+    });
+    fireEvent.change(screen.getByLabelText('기본 배송비 (원)'), {
+      target: { value: '4500' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledTimes(1));
+    expect(api.profile.updateProfile.mock.lastCall?.[0]).toEqual(
+      expect.objectContaining({
+        managerName: '검증 담당자 변경',
+        contactEmail: 'updated@example.invalid',
+        baseShippingFee: 4500,
+      }),
+    );
   });
   it('keeps onboarding tax/account/mail-order fields under its own save button', async () => {
     render(<SupplierProfilePage />);
@@ -220,9 +262,15 @@ describe('SupplierProfilePage existing section ownership', () => {
     const view = render(<SupplierProfilePage />);
     await loaded();
     fireEvent.change(view.container.querySelector('input[type=file]')!, {
-      target: { files: [new File(['fixture'], 'fixture.pdf', { type: 'application/pdf' })] },
+      target: {
+        files: [new File(['fixture'], 'fixture.pdf', { type: 'application/pdf' })],
+      },
     });
-    fireEvent.click(card('공급자 서류 및 정산 정보').getAllByRole('button', { name: '업로드' })[0]);
+    fireEvent.click(
+      card('공급자 서류 및 정산 정보').getAllByRole('button', {
+        name: '업로드',
+      })[0],
+    );
     await waitFor(() => expect(api.onboarding.getOnboarding).toHaveBeenCalledTimes(2));
     expect(api.onboarding.uploadDocument).toHaveBeenCalledWith(
       'business_registration',
@@ -240,9 +288,15 @@ describe('SupplierProfilePage existing section ownership', () => {
     const view = render(<SupplierProfilePage />);
     await loaded();
     fireEvent.change(view.container.querySelector('input[type=file]')!, {
-      target: { files: [new File(['fixture'], 'fixture.txt', { type: 'text/plain' })] },
+      target: {
+        files: [new File(['fixture'], 'fixture.txt', { type: 'text/plain' })],
+      },
     });
-    fireEvent.click(card('공급자 서류 및 정산 정보').getAllByRole('button', { name: '업로드' })[0]);
+    fireEvent.click(
+      card('공급자 서류 및 정산 정보').getAllByRole('button', {
+        name: '업로드',
+      })[0],
+    );
     expect(
       card('공급자 서류 및 정산 정보').getByText('PDF 파일만 업로드할 수 있습니다.'),
     ).toBeTruthy();
@@ -258,7 +312,11 @@ describe('SupplierProfilePage existing section ownership', () => {
   });
   it('prevents deselecting an approved category and retains prior evidence access', async () => {
     api.categories.list.mockResolvedValue([
-      { category: 'drug', status: 'approved', evidenceDocument: { fileName: 'fixture.pdf' } },
+      {
+        category: 'drug',
+        status: 'approved',
+        evidenceDocument: { fileName: 'fixture.pdf' },
+      },
     ]);
     render(<SupplierProfilePage />);
     await loaded();

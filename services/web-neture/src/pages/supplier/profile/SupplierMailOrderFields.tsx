@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Save, Loader2, CheckCircle, FileText, Upload, Download } from 'lucide-react';
 import { inputClass, fileInputClass } from './profilePresentation';
 import type { useSupplierOnboarding } from './useSupplierOnboarding';
@@ -7,6 +8,7 @@ export default function SupplierMailOrderFields({
 }: {
   controller: ReturnType<typeof useSupplierOnboarding>;
 }) {
+  const fieldId = useId();
   const {
     onboarding,
     onboardingSaving,
@@ -40,10 +42,14 @@ export default function SupplierMailOrderFields({
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-0`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 통신판매업 신고 상태
               </label>
               <select
+                id={`${fieldId}-field-0`}
                 value={mailOrderSalesStatus}
                 onChange={(e) => setMailOrderSalesStatus(e.target.value)}
                 className={inputClass}
@@ -55,11 +61,15 @@ export default function SupplierMailOrderFields({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label
+                htmlFor={`${fieldId}-field-1`}
+                className="block text-sm font-medium text-gray-700 mb-1.5"
+              >
                 통신판매업 신고번호
                 {mailOrderSalesStatus === 'reported' && <span className="text-red-500"> *</span>}
               </label>
               <input
+                id={`${fieldId}-field-1`}
                 type="text"
                 value={mailOrderSalesRegistrationNumber}
                 onChange={(e) => setMailOrderSalesRegistrationNumber(e.target.value)}
@@ -75,7 +85,10 @@ export default function SupplierMailOrderFields({
           </div>
 
           <div className="rounded-lg border border-gray-200 p-4 max-w-md">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor={`${fieldId}-field-2`}
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               통신판매업 신고증 PDF
             </label>
             {onboarding?.mailOrderSalesDocument && (
@@ -89,6 +102,7 @@ export default function SupplierMailOrderFields({
               </button>
             )}
             <input
+              id={`${fieldId}-field-2`}
               type="file"
               accept="application/pdf,.pdf"
               onChange={(e) => setMailOrderReportFile(e.target.files?.[0] || null)}
