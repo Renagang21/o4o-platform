@@ -98,6 +98,28 @@ describe('authentication request lifetimes', () => {
     expect(h.hook.result.current.pendingPolicyAcceptances).toEqual([policy('current-policy')]);
   });
 
+  it.each(['response', 'error'] as const)('a superseded access check cannot verify a route (%s)', async (completion) => {
+    const h = setup('fixture-token');
+    await waitFor(() => expect(h.hook.result.current.user?.id).toBe('initial'));
+    const foreground = deferred<{ data: unknown }>(), background = deferred<{ data: unknown }>();
+    h.client.api.get.mockReturnValueOnce(foreground.promise).mockReturnValueOnce(background.promise);
+    const verified = vi.fn();
+    let checking!: Promise<unknown>, refreshing!: Promise<void>;
+    act(() => {
+      checking = h.hook.result.current.refreshForAccess().then(verified, (error) => error);
+      refreshing = h.hook.result.current.refresh();
+    });
+    await act(async () => {
+      if (completion === 'response') foreground.resolve(me('old'));
+      else foreground.reject(new Error('Old transport failure'));
+      expect(await checking).toBeInstanceOf(Error);
+    });
+    expect(verified).not.toHaveBeenCalled();
+    expect(h.hook.result.current.user?.id).toBe('initial');
+    await act(async () => { background.resolve(me('current')); await refreshing; });
+    expect(h.hook.result.current.user?.id).toBe('current');
+  });
+
   it('an unmounted login never invokes the consumer authentication callback', async () => {
     const h = setup(); const login = deferred<unknown>(); h.client.loginWithGoogle.mockReturnValueOnce(login.promise);
     let pending!: ReturnType<typeof h.hook.result.current.loginWithGoogle>;

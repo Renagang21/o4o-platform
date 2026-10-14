@@ -1,9 +1,13 @@
 # TODO-O4O-AUTH-SESSION-AND-ASYNC-MAINTENANCE-V2
 
-> **상태**: IMPLEMENTED_PUSHED · CI/review 판정은 PR 최신 HEAD 결과 기준
+> **상태**: ACTIVE
 > **작성일**: 2026-10-14 (KST)
+> **최종 갱신**: 2026-10-14 (KST)
 > **근거**: [인증 정비 1차](TODO-O4O-AUTH-CODE-MAINTENANCE-V1.md) 이후 사용자 지정 ② 세션 검증 정리 · ④ 비동기 상태 조사
 > **종료 범위**: 이전 정비와 같은 TODO 작성 → 코드/문서로 보완 → 구현·검증 → branch push
+
+구현 및 후속 검증 기록을 push했다. 추가 리뷰 보완·최신 CI/review 판정은 PR 최신 HEAD를 기준으로 한다.
+main 통합·운영 배포와 인증 트랙 종료는 아직 실행하지 않았으므로 ACTIVE로 유지한다.
 
 ## 범위와 불변식
 
@@ -70,7 +74,7 @@
 | 대상 | 결과·범위 |
 |---|---|
 | 변경 전 기준 | auth-react 214/214, API family/password 경계 55/55 PASS |
-| auth-react | 19 suites · 227/227 PASS (신규 수명 회귀 13개 포함) |
+| auth-react | 19 suites · 229/229 PASS (최초 수명 회귀 13개 + foreground 리뷰 회귀 2개 포함) |
 | auth-client | 기존 token storage/refresh 경계 5 suites · 40/40 PASS |
 | API | 4 suites · 76/76 PASS (신규 검증 우선순위 11개 + 기존 family/binding/password/HTTP logout) |
 | Neture | 92 suites · 822/822 PASS |
@@ -108,6 +112,24 @@ baseline 진단의 runner 시작 실패는 실행 테스트0으로 구분하고,
 이번 5경로와 충돌하지 않으며 auth 정책 변경은 없다. 본 TODO의 전체 관리자 표기도 최신 정본에 맞췄다.
 push-only 종료 범위에서 main sync/merge·배포를 실행하지 않았다. 기준 검증 SHA는 `eebd5621de`다.
 최신 HEAD CI/Codex 결과는 PR에 기록한다. 위 실패를 passing/skipped로 바꾸거나 배포 가능하다고 판정하지 않는다.
+
+## 2026-10-14 후속 리뷰 보완 TODO
+
+- [x] `refreshForAccess()`의 성공 resolution을 Neture CommunityOperatorRoute가 검증 완료로 소비함을 확인.
+- [x] foreground 응답/실패가 후속 background refresh에 밀린 2개 사례를 기존 코드에서 실패로 재현.
+- [x] 오래된 background 결과는 무시하되, 취소된 foreground 권한 확인은 reject해 검증 완료로 채택되지 않게 보완.
+- [x] 공통 hook 및 5웹 소비처 회귀/타입·빌드·lint 확인. push 및 최종 최신 리뷰/CI 결과는 PR #554를 기준으로 한다.
+- [x] 본 TODO/CHECK의 custom 상태를 문서 lifecycle 정본의 ACTIVE로 정정. 세부 push/검증 결과는 본문에 유지.
+
+foreground 성공 응답과 오류 응답 각각의 `.then(검증완료)`를 재현했다. 최초 2 FAIL / 13 PASS에서
+보완 후 hook 전체 229/229 PASS, 변경 lint errors0/warnings0이다. private 요청 소유만 보완하며 서버 권한·
+공개 method signature·일반 background 완료 계약은 유지한다.
+보완 후 Neture 822/822·약국 협력사업 135/135·분회 39/39·Store 132/132·강의 18/18 및 5웹 타입/production
+build가 모두 PASS다. `auth-foreground-*` 로그에 최초 실패와 수정 후 결과를 구분했다.
+
+ESM 재수출 실패의 후속 독립 검증은 [CHECK](../checks/CHECK-O4O-AUTH-API-ESM-EXPORT-UNBLOCK-V1.md)에 기록했다.
+PR #557의 타입 수정안과 본 인증 server source를 함께 적용한 격리 사본도 tsc/tsup·bundle syntax 및 오류
+우선순위 11개를 통과했다. source repair는 upstream PR의 책임이며 main/운영 반영과 구분한다.
 
 문서 정합: 앞선 1차 및 검증 PR의 완료 기록을 변경하지 않고 이 후속 TODO를 분리했다.
 WORKTREE_DISPOSITION: KEEP — 같은 미완료 인증 WO의 연속 Phase와 cloud 검증 자원을 유지한다.

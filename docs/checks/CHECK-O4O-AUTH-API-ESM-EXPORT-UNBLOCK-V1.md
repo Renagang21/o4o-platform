@@ -1,8 +1,11 @@
 # 인증 후속 — API ESM 타입 재수출 오류 검증
 
 > **작성일**: 2026-10-14 (KST)
-> **상태**: VERIFIED_UPSTREAM_BUILD · main/운영 반영은 upstream PR 결과와 구분
+> **상태**: ACTIVE
+> **최종 갱신**: 2026-10-14 (KST)
 > **근거**: [세션·비동기 정비 TODO](../work-orders/TODO-O4O-AUTH-SESSION-AND-ASYNC-MAINTENANCE-V2.md)의 API 배포용 ESM 실패 후 사용자의 “해결해 줘” 지시
+
+upstream source의 실제 ESM 빌드 검증은 완료했다. main/운영 반영 및 인증 트랙 종료는 별도이며 ACTIVE로 유지한다.
 
 ## TODO → 코드·문서 조사로 보완
 
@@ -29,7 +32,7 @@ PR #557은 `type` export/import를 명시한다. 타입 이름/경로는 보존�
 `113ceee9495a3502dffd3d239c81d88784e94aef`로 갱신했다. 주요 수정 source를 Git blob과 직접 대조했다.
 `git archive`로 전체 tracked source를 checkout 밖에 복사하고 의존성 파일은 hardlink, 변경 없는 workspace
 package의 generated dist만 링크한 **Git checkout이 아닌 검증 사본**이다.
-원래 checkout의 source·다른 branch는 변경하지 않으며 운영 env/DB·실계정·유료 AI를 사용하지 않는다.
+이 ESM 검증은 원래 checkout의 AI source·다른 branch를 변경하지 않으며 운영 env/DB·실계정·유료 AI를 사용하지 않는다.
 산출물 보존/복원도 이 사본 안의 컴파일 결과만 대상으로 하며 운영 DB backup/restore나 migration 실행이 아니다.
 
 초기 API-only 사본의 테스트는 raw-source 소비처 `tools/**`가 없어 8건 실패했고, 외부 node_modules symlink는
@@ -46,7 +49,7 @@ PR #557에는 별도 제목 metadata 처리 수정도 포함돼 있다. 해당 �
 ### Changed shared module
 
 상위 PR #557의 API 내부 router/runtime 재수출 두 곳이다. 공통 workspace package와 provider/Frozen 인터페이스는
-변경하지 않는다. 본 인증 세션의 source 변경은 없으며 원본 AI 함수/타입의 소비 이름·import 경로를 유지한다.
+변경하지 않는다. 본 인증 세션의 AI source 변경은 없으며 원본 AI 함수/타입의 소비 이름·import 경로를 유지한다.
 심볼 및 파일 import 경로 전수 검색과 테스트의 raw-source 경로를 함께 확인했다.
 
 ### Consumer impact matrix
@@ -75,6 +78,13 @@ Node 22.18.0에서 원래 tsconfig/tsup 설정·기존 의존성으로 실행했
 이는 애플리케이션 ESM 빌드 해소 증거이며 Docker image·운영 migration 실행·serving SHA 전환의 증거가 아니다.
 로그와 사본은 checkout 밖 `/workspace/.o4o-tools/ai-export-*`에 유지한다.
 
+### 인증 수정안과의 조합 검증
+
+위 upstream 사본에 인증 PR #554의 server source(`8c36ce7695`, 기록 HEAD `498e84aae9`)와 오류 우선순위
+회귀를 추가한 조합도 tsc → 산출물 보존 → tsup → 복원 및 두 bundle syntax 모두 PASS다.
+조합한 오류 우선순위 회귀는 11/11 PASS. 이는 Git main 병합/배포가 아니라 checkout 밖 검증이며,
+`COMBINED_AUTH_HEAD`와 `ai-export-combined-*` 로그로 upstream-only 결과와 구분한다.
+
 ## upstream 상태와 이번 세션의 종료 범위
 
 조사 시 PR #557에 제목 parser의 대소문자·deep nesting 리뷰 2건이 있었다. `113ceee949`는 해당 보완과 회귀를
@@ -82,6 +92,10 @@ Node 22.18.0에서 원래 tsconfig/tsup 설정·기존 의존성으로 실행했
 이 관측을 완료/PASS 또는 merge/운영 적용으로 바꾸어 주장하지 않는다. 이후 정확한 최신 상태는 PR #557을 따른다.
 본 세션은 독립 확인 기록만 인증 PR #554에 push한다. 타입 오류의 source 수정은 PR #557의 책임으로 유지하며
 배포 동시 실행이나 소유권 혼선을 만들지 않는다. 인증 PR은 기존 push-only 범위를 유지한다.
+
+독립 검증 후 인증 PR 재리뷰에서 foreground 권한 확인의 취소와 문서 상태 표기 지적이 나왔다.
+해당 인증 hook 보완·추가 회귀는 앞선 TODO의 후속 리뷰 항목에 기록한다. AI 재수출 source 작업과 구분하며
+본 CHECK의 상태는 lifecycle 정본에 따라 ACTIVE로 정정했다.
 
 문서 정합: 인증 정비의 기존 실패 기록을 소급 수정하지 않고 upstream 수정안과 실제 ESM 검증을 분리 기록한다.
 WORKTREE_DISPOSITION: KEEP — 인증 PR의 push-only 후속 기록, main 통합·배포 미실행.

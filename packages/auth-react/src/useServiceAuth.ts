@@ -123,18 +123,23 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     const request = ++refreshRequest.current;
     const ownsResponse = () => isCurrentSession(generation) && request === refreshRequest.current &&
       authenticatingGeneration.current === null;
+    // Route guards treat foreground resolution as a verified server snapshot.
+    // A superseded check must fail closed; background reads may be discarded.
+    const discardSuperseded = () => {
+      if (throwOnTransientError) throw new Error('인증 확인이 취소되었습니다. 다시 시도해 주세요.');
+    };
     const cfg = cfgRef.current;
     if (!cfg.getAccessToken()) {
-      if (ownsResponse()) {
-        setPendingPolicyAcceptances([]);
-        setUser(null);
-        setIsLoading(false);
-      }
+      if (!ownsResponse()) return discardSuperseded();
+      setPendingPolicyAcceptances([]);
+      setUser(null);
+      setIsLoading(false);
       return;
     }
     try {
       const response = await cfg.authClient.api.get(cfg.meEndpoint ?? '/auth/me');
-      if (!ownsResponse() || !cfg.getAccessToken()) return;
+      if (!ownsResponse()) return discardSuperseded();
+      if (!cfg.getAccessToken()) return;
       const { user: apiUser } = parseAuthResponse(response.data as never);
       if (apiUser) {
         const built = cfg.toUser(apiUser as unknown as Record<string, unknown>);
@@ -147,7 +152,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         setUser(null);
       }
     } catch (error) {
-      if (!ownsResponse()) return;
+      if (!ownsResponse()) return discardSuperseded();
       // Access rechecks distinguish a temporary transport/server failure from an
       // invalid session. Existing background refresh keeps its previous behavior.
       const { status } = readErrorResponse(error);
