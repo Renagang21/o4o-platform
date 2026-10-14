@@ -5,7 +5,7 @@
  * 키워드 → 카테고리 매핑 규칙 CRUD + 테스트
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useId } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   operatorCategoryMappingApi,
@@ -28,6 +28,7 @@ function flattenCategories(nodes: CategoryNode[], prefix = ''): { id: string; la
 }
 
 export default function CategoryMappingRulesPage() {
+  const formId = useId();
   const [rules, setRules] = useState<CategoryMappingRule[]>([]);
   const [categories, setCategories] = useState<{ id: string; label: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -164,11 +165,12 @@ export default function CategoryMappingRulesPage() {
         <div className="flex gap-2">
           <input
             type="text"
+            aria-label="추천 테스트 상품명"
             value={testName}
             onChange={(e) => setTestName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleTest()}
             placeholder="상품명 입력 (예: 리브레 CGM 센서)"
-            className="flex-1 px-3 py-2 border rounded-lg text-sm"
+            className="flex-1 min-w-0 px-3 py-2 border rounded-lg text-sm"
           />
           <button
             onClick={handleTest}
@@ -197,9 +199,10 @@ export default function CategoryMappingRulesPage() {
         <h2 className="text-sm font-semibold text-gray-700 mb-3">규칙 추가</h2>
         <div className="flex flex-wrap gap-2 items-end">
           <div className="flex-1 min-w-[120px]">
-            <label className="block text-xs text-gray-500 mb-1">키워드</label>
+            <label htmlFor={`${formId}-keyword`} className="block text-xs text-gray-500 mb-1">키워드</label>
             <input
               type="text"
+              id={`${formId}-keyword`}
               value={newKeyword}
               onChange={(e) => setNewKeyword(e.target.value)}
               placeholder="혈당, CGM, 비타민..."
@@ -207,8 +210,9 @@ export default function CategoryMappingRulesPage() {
             />
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs text-gray-500 mb-1">카테고리</label>
+            <label htmlFor={`${formId}-category`} className="block text-xs text-gray-500 mb-1">카테고리</label>
             <select
+              id={`${formId}-category`}
               value={newCategoryId}
               onChange={(e) => setNewCategoryId(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg text-sm"
@@ -220,11 +224,12 @@ export default function CategoryMappingRulesPage() {
             </select>
           </div>
           <div className="w-20">
-            <label className="block text-xs text-gray-500 mb-1">우선순위</label>
+            <label htmlFor={`${formId}-priority`} className="block text-xs text-gray-500 mb-1">우선순위</label>
             <input
               type="number"
               min={0}
               max={10}
+              id={`${formId}-priority`}
               value={newPriority}
               onChange={(e) => setNewPriority(Number(e.target.value))}
               className="w-full px-3 py-2 border rounded-lg text-sm"
@@ -270,6 +275,7 @@ export default function CategoryMappingRulesPage() {
                         <td className="px-4 py-2">
                           <input
                             type="text"
+                            aria-label="편집 키워드"
                             value={editKeyword}
                             onChange={(e) => setEditKeyword(e.target.value)}
                             className="w-full px-2 py-1 border rounded text-sm"
@@ -277,6 +283,7 @@ export default function CategoryMappingRulesPage() {
                         </td>
                         <td className="px-4 py-2">
                           <select
+                            aria-label="편집 카테고리"
                             value={editCategoryId}
                             onChange={(e) => setEditCategoryId(e.target.value)}
                             className="w-full px-2 py-1 border rounded text-sm"
@@ -291,6 +298,7 @@ export default function CategoryMappingRulesPage() {
                             type="number"
                             min={0}
                             max={10}
+                            aria-label="편집 우선순위"
                             value={editPriority}
                             onChange={(e) => setEditPriority(Number(e.target.value))}
                             className="w-16 px-2 py-1 border rounded text-sm text-center"

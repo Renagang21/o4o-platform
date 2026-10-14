@@ -3,11 +3,10 @@
  *
  * WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1
  *
- * 서비스 운영자가 노출 승인한(exposure_status='approved', status='recruiting') KPA 판매자 모집을
- * 매장 경영자(kpa:store_owner)가 조회하고 참여 신청한다.
+ * 일반 공개 모집과 가입 조건을 충족한 세미프랜차이즈 모집을 조회·신청한다.
  *
  * - 목록: apiClient(/api/v1/kpa) → GET /store/seller-recruitments
- *     (backend 가 serviceKey='kpa-society' · approved · recruiting 을 고정 — 프론트 필터 의존 없음)
+ *     (backend 가 서비스·진행 상태 및 사업 모집의 승인·가입 조건을 판정)
  * - 참여: coreApiClient(/api/v1) → POST /neture/seller-recruitment/applications { recruitmentId }
  *     (backend 가 NOT_EXPOSED/CLOSED/DUPLICATE 강제)
  * - 이미 신청: coreApiClient → GET /neture/seller-recruitment/applications/mine
@@ -31,6 +30,7 @@ interface SellerRecruitment {
   serviceId: string;
   imageUrl: string;
   status: 'recruiting' | 'closed';
+  recruitmentKind?: 'public' | 'semi-franchise';
   exposureStatus: string;
   createdAt: string;
 }
@@ -38,6 +38,12 @@ interface SellerRecruitment {
 interface MyApplication {
   recruitmentId?: string;
   recruitment_id?: string;
+}
+
+function recruitmentLabel(kind: SellerRecruitment['recruitmentKind']): string {
+  if (kind === 'public') return '일반 공개 모집';
+  if (kind === 'semi-franchise') return '세미프랜차이즈 모집';
+  return '판매자 모집';
 }
 
 function formatPrice(price: number): string {
@@ -130,7 +136,7 @@ export default function SellerRecruitmentsBrowsePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">판매자 모집</h1>
           <p className="mt-1 text-sm text-gray-600">
-            공급자가 등록하고 서비스 운영자가 승인한 판매자 모집입니다. 조건을 확인하고 참여를 신청하세요.
+            일반 공개 모집은 공급자가 게시하면 바로 안내됩니다. 세미프랜차이즈 모집은 해당 사업의 승인·가입 조건을 적용합니다.
           </p>
         </div>
         <button
@@ -174,7 +180,7 @@ export default function SellerRecruitmentsBrowsePage() {
       ) : items.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
           <p className="text-lg text-gray-500">현재 참여 가능한 판매자 모집이 없습니다.</p>
-          <p className="mt-1 text-sm text-gray-400">새로운 모집이 승인되면 이 화면에서 확인할 수 있습니다.</p>
+          <p className="mt-1 text-sm text-gray-400">공개 모집이 게시되거나 세미프랜차이즈 모집의 참여 조건이 충족되면 이 화면에서 확인할 수 있습니다.</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
@@ -218,6 +224,7 @@ export default function SellerRecruitmentsBrowsePage() {
                         >
                           {p.productName}
                         </button>
+                        <p className="mt-1 text-xs text-gray-500">{recruitmentLabel(p.recruitmentKind)}</p>
                       </td>
                       <td className="px-4 py-3 text-gray-600">{p.manufacturer || '-'}</td>
                       <td className="px-4 py-3 text-right font-medium tabular-nums text-gray-900">
@@ -289,10 +296,18 @@ export default function SellerRecruitmentsBrowsePage() {
                 )}
               </div>
               <dl className="flex-1 space-y-1.5 text-sm">
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">제조사</dt><dd className="text-gray-800">{detail.manufacturer || '-'}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">공급자</dt><dd className="text-gray-800">{detail.sellerName}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">소비자가</dt><dd className="font-medium text-gray-900">{formatPrice(detail.consumerPrice)}</dd></div>
-                <div className="flex gap-2"><dt className="w-20 shrink-0 text-gray-500">수수료</dt><dd className="text-gray-800">{detail.commissionRate}%</dd></div>
+                {[
+                  { label: '모집 구분', value: recruitmentLabel(detail.recruitmentKind) },
+                  { label: '제조사', value: detail.manufacturer || '-' },
+                  { label: '공급자', value: detail.sellerName },
+                  { label: '소비자가', value: formatPrice(detail.consumerPrice) },
+                  { label: '수수료', value: `${detail.commissionRate}%` },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex gap-2">
+                    <dt className="w-20 shrink-0 text-gray-500">{label}</dt>
+                    <dd className={label === '소비자가' ? 'font-medium text-gray-900' : 'text-gray-800'}>{value}</dd>
+                  </div>
+                ))}
                 {detail.shopUrl && (
                   <div className="flex gap-2">
                     <dt className="w-20 shrink-0 text-gray-500">몰 URL</dt>
