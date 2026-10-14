@@ -55,7 +55,7 @@
 - [x] 약국 사업자 회원관리: 변경값·검증·info/status 부분 성공 및 재시도 정비·로컬 검증 ([WO](WO-KPA-PHARMACY-MEMBER-EDIT-WORKFLOW-V1.md)). 이번 종료는 commit/push, main·배포 제외.
 - [x] 약국 협력사업 운영자: 담당 사업 조회·행사/모집 조건 심사·콘텐츠 편집의 R1/S1/A1 조사·첫 정비 ([WO](WO-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md)). 공급자 참여 심사 화면은 별도 후속. 종료는 push/PR 인계.
 - [x] 펀딩 운영: 심사·단계·포럼 복구·입금/이행·CSV·KPI의 R1/S1/A1 정비와 저장/조회 결과 분리 ([WO](WO-FUNDING-OPERATOR-WORKFLOW-REFINEMENT-V1.md)). 기존 단계 연결의 main/배포 완료와 구분하며, 이번 종료는 push/PR 인계. 개설자 화면은 별도 책임으로 유지.
-- [ ] 강의: 문의·심사·수료증 입력/처리/결과 R1/S1/A1 조사. 오류 보완은 main/배포 완료; 구조 분리는 별도.
+- [x] 강의: 강사·강좌 심사·검토·문의 어댑터/기존 문의·수료증의 R1/S1/A1 정비 ([WO](WO-LECTURE-OPERATOR-WORKFLOW-REFINEMENT-V1.md)). 실패 입력 보존·저장/조회 분리·요청 수명 검증 완료, 이번 종료는 push/PR 인계. 수료증 폐기 사유 서버 보관은 별도 후속.
 - [ ] 개별 커뮤니티: 가입·제재·탈퇴·이력 C1/R1 조사. 새 신고/승계 정책 설계는 별도.
 - [ ] 전체 관리자 지정 화면: 검색·대상 선택·지정/회수·가입 안내 R1/S1 조사.
 - [ ] 회원관리 API: 단건/일괄 중복과 서비스 경계·트랜잭션 D1/C1 조사. 별도 검증 작업.

@@ -82,7 +82,8 @@
 - [ ] 약국 사업 행사: 운영자 행사/모집 조건 심사는 [첫 정비](WO-PHARMACY-PROGRAM-WORKFLOW-REFINEMENT-V1.md) 완료. 공급자 행사 작성·참여 승인 화면 자체의 책임 분리는 후속.
 - [x] 펀딩 심사 상세: 심사·단계/포럼 복구·입금/이행·CSV·KPI 요청 책임 분리, 동기 쓰기 잠금·저장 후 조회 실패 복구 정비 ([WO](WO-FUNDING-OPERATOR-WORKFLOW-REFINEMENT-V1.md)). 이번 종료는 push/PR 인계이며 main 병합·배포는 통합 담당.
 - [x] 펀딩 개설자/운영자 계약 대조: supplier API·개설 진행/포럼 회원 관리와 operator API·심사/입금 확인은 별도 책임. 이번 작업에서 합치지 않음 ([조사](WO-FUNDING-OPERATOR-WORKFLOW-REFINEMENT-V1.md)). 개설자 화면 자체의 구조 정비는 별도 후속.
-- [ ] 강의: 심사·문의·수료증의 입력/처리/결과 상태 분리 필요성 재평가.
+- [x] 강의: 심사 목록/검토·문의 어댑터/기존 문의·수료증 요청/입력/결과 흐름 정비 ([WO](WO-LECTURE-OPERATOR-WORKFLOW-REFINEMENT-V1.md)). push/PR 인계이며 main 병합·배포는 통합 담당.
+- [ ] 강의 수료증 폐기 사유 서버 보관·감사 이력: 현재 서버가 reason을 소비하지 않음. 별도 API/DB·보유 정책 작업.
 - [ ] 개별 커뮤니티: 현재 가입·제재·탈퇴·이력 코드의 책임 분리 조사.
 - [ ] 전체 관리자 지정 화면: 검색·대상 선택·지정/회수·가입 상태 안내 분리.
 - [ ] 업무별 완료 후 재조사. 약사회 분회는 추가하지 않음.

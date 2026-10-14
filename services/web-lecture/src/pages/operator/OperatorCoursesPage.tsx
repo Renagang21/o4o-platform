@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { CourseStatusBadge, LmsEmptyState, LmsLoading } from '@o4o/lms-ui';
 import { operatorApi, type CourseStatus } from '../../api/lecture';
 import { useOperatorQueue } from './useOperatorQueue';
+import OperatorReasonDialog from './OperatorReasonDialog';
 
 const STATUS_FILTERS: { key: '' | CourseStatus; label: string }[] = [
   { key: '', label: '전체' }, { key: 'pending_review', label: '검토 대기' }, { key: 'published', label: '게시 중' },
@@ -17,16 +18,17 @@ export default function OperatorCoursesPage() {
   const [status, setStatus] = useState<'' | CourseStatus>('pending_review');
   const [search, setSearch] = useState('');
   const fetch = useCallback(() => operatorApi.courses({ limit: 100, ...(status ? { status } : {}), ...(search ? { search } : {}) }), [status, search]);
-  const { items, loading, error, busy, load, run } = useOperatorQueue(`${status}:${search}`, fetch, '강의 목록을 불러오지 못했습니다.');
+  const [rejection, setRejection] = useState<{ id: string; label: string; scope: string } | null>(null);
+  const { items, loading, error, busy, actionError, refreshNotice, clearActionError, load, run } = useOperatorQueue(`${status}:${search}`, fetch, '강의 목록을 불러오지 못했습니다.');
 
   async function act(id: string, label: string, fn: () => Promise<unknown>) {
     await run(id, fn, `${label} 완료`, `${label} 실패`);
   }
-  function reject(id: string) {
-    const reason = window.prompt('반려 사유를 입력하세요.');
-    if (!reason?.trim()) return;
-    void act(id, '반려', () => operatorApi.reject(id, reason.trim()));
-  }
+  const scope = `${status}:${search}`;
+  const decision = rejection?.scope === scope ? rejection : null;
+  const reject = async (reason: string) => {
+    if (decision && await run(decision.id, () => operatorApi.reject(decision.id, reason.trim()), '반려 완료', '반려 실패')) setRejection(null);
+  };
 
   return <main className="page page-wide">
     <div className="page-head row">
@@ -34,9 +36,11 @@ export default function OperatorCoursesPage() {
       <div className="row-actions"><Link className="btn btn-ghost" to="/operator/instructors">강사 관리</Link><Link className="btn btn-ghost" to="/operator/certificates">수료증 운영</Link></div>
     </div>
     <div className="toolbar">
-      <div className="chips">{STATUS_FILTERS.map((f) => <button key={f.key} type="button" disabled={busy !== null} className={`chip${status === f.key ? ' on' : ''}`} onClick={() => setStatus(f.key)}>{f.label}</button>)}</div>
-      <form className="search" onSubmit={(e) => { e.preventDefault(); if (!busy) void load(); }}><input aria-label="강의 검색" disabled={busy !== null} value={search} placeholder="강의 검색" onChange={(e) => setSearch(e.target.value)} /><button type="submit" disabled={busy !== null} className="btn">검색</button></form>
+      <div className="chips">{STATUS_FILTERS.map((f) => <button key={f.key} type="button" disabled={busy !== null} className={`chip${status === f.key ? ' on' : ''}`} onClick={() => { setRejection(null); setStatus(f.key); }}>{f.label}</button>)}</div>
+      <form className="search" onSubmit={(e) => { e.preventDefault(); if (!busy) void load(); }}><input aria-label="강의 검색" disabled={busy !== null} value={search} placeholder="강의 검색" onChange={(e) => { setRejection(null); setSearch(e.target.value); }} /><button type="submit" disabled={busy !== null} className="btn">검색</button></form>
     </div>
+    {refreshNotice && <p role="status" className="notice">{refreshNotice}</p>}
+    {actionError && !decision && <p role="alert" className="notice notice-error">{actionError}</p>}
     {loading && <LmsLoading message="불러오는 중..." />}
     {error && <div role="alert" className="notice notice-error">{error} <button type="button" className="btn" disabled={busy !== null} onClick={() => void load()}>다시 조회</button></div>}
     {!loading && !error && items.length === 0 && <LmsEmptyState title="해당 상태의 강의가 없습니다" />}
@@ -47,7 +51,7 @@ export default function OperatorCoursesPage() {
         <div className="list-actions">
           {c.status === 'pending_review' && <>
             <button type="button" className="btn btn-primary" disabled={busy !== null || loading || !!error} onClick={() => void act(c.id, '승인·게시', () => operatorApi.approve(c.id))}>승인(게시)</button>
-            <button type="button" className="btn btn-ghost danger" disabled={busy !== null || loading || !!error} onClick={() => reject(c.id)}>반려</button>
+            <button type="button" className="btn btn-ghost danger" disabled={busy !== null || loading || !!error} onClick={() => { clearActionError(); setRejection({ id: c.id, label: c.title, scope }); }}>반려</button>
           </>}
           {(c.status === 'draft' || c.status === 'rejected') && <button type="button" className="btn" disabled={busy !== null || loading || !!error} onClick={() => void act(c.id, '게시', () => operatorApi.publish(c.id))}>강제 게시</button>}
           {c.status === 'published' && <button type="button" className="btn" disabled={busy !== null || loading || !!error} onClick={() => void act(c.id, '게시 중단', () => operatorApi.unpublish(c.id))}>게시 중단</button>}
@@ -55,5 +59,6 @@ export default function OperatorCoursesPage() {
         </div>
       </li>)}
     </ul>
+    {decision && <OperatorReasonDialog key={`${decision.scope}:${decision.id}`} title="강좌 반려" target={decision.label} busy={busy !== null} error={actionError} onConfirm={reason => void reject(reason)} onCancel={() => setRejection(null)} />}
   </main>;
 }

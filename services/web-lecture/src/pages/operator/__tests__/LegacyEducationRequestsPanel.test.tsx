@@ -60,3 +60,28 @@ describe('Study handles pre-existing education inquiries', () => {
     expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).value).toBe('pending');
   });
 });
+
+it('keeps a saved status distinct from a failed list refresh and retries reads only', async () => {
+  get.mockImplementationOnce(async () => ({ data: { data: { items: [inquiry], pagination: { totalPages: 1 } } } }))
+    .mockResolvedValueOnce({ data: { data: { ...inquiry, email: 'synthetic@example.invalid', message: '기존 문의 내용' } } })
+    .mockRejectedValueOnce(new Error('read failed'))
+    .mockResolvedValueOnce({ data: { data: { items: [{ ...inquiry, status: 'done' }], pagination: { totalPages: 1 } } } });
+  render(<LegacyEducationRequestsPanel />);
+  fireEvent.click(await screen.findByRole('button', { name: '기존 강의 문의 · 문의자' })); await screen.findByText('기존 문의 내용');
+  fireEvent.change(screen.getByLabelText('처리 상태'), { target: { value: 'done' } });
+  await screen.findByRole('status');
+  expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: '다시 불러오기' }));
+  await waitFor(() => expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).disabled).toBe(false));
+  expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).value).toBe('done'); expect(patch).toHaveBeenCalledTimes(1);
+});
+it('retries the failed detail without confusing it with a list retry', async () => {
+  get.mockRejectedValueOnce(new Error('list')); render(<LegacyEducationRequestsPanel />); await screen.findByRole('alert');
+  fireEvent.click(screen.getByRole('button', { name: '다시 불러오기' }));
+  await screen.findByRole('button', { name: '기존 강의 문의 · 문의자' });
+  get.mockRejectedValueOnce(new Error('detail'));
+  fireEvent.click(screen.getByRole('button', { name: '기존 강의 문의 · 문의자' }));
+  await screen.findByText('문의 상세를 불러오지 못했습니다.');
+  fireEvent.click(screen.getByRole('button', { name: '다시 불러오기' }));
+  await screen.findByText('기존 문의 내용'); expect(get).toHaveBeenLastCalledWith(`${base}/existing-id`);
+});
