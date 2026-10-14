@@ -50,8 +50,8 @@
 - [x] Neture 상품 승인: 요청값·pending 선택, 결정 실행·실패 UX, 조회/분석/검색 수명 정비 및 main/배포 완료.
 - [x] Neture 상품 승인: 상세 Drawer·결정 입력·품질 표시의 R1/F1 정비 ([이번 TODO](WO-NETURE-PRODUCT-APPROVAL-PRESENTATION-V1.md)).
 - [x] Neture 상품 승인: 승인대기 상품 삭제 실패·대상 보존·재시도 검증 및 정비 ([TODO](WO-NETURE-PRODUCT-APPROVAL-DELETE-FAILURE-V1.md), PR #555 main/CI·운영 배포 확인 완료).
-- [x] Neture 상품 승인: 승인 상품 휴지통 이동 오류 처리, 목록/분석 상태 책임 분리 구현·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR/배포 확인 중).
-- [x] Neture 공급자 승인: 심사 입력·서류 표시·요청 수명 C1/R1/A1 정비·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR/배포 확인 중).
+- [x] Neture 상품 승인: 승인 상품 휴지통 이동 오류 처리, 목록/분석 상태 책임 분리 구현·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
+- [x] Neture 공급자 승인: 심사 입력·서류 표시·요청 수명 C1/R1/A1 정비·로컬 검증 ([통합 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md), PR #570 main·CI·운영 배포 확인 완료).
 - [ ] 약국 사업자 회원관리: 필드 변경값·검증·순차 저장 결과 F1/C1/A1 조사.
 - [ ] 약국 사업 행사/협력사업: 편집·모집·참여·사업 전환 R1/S1/A1 조사.
 - [ ] 펀딩: 단계별 안내·상태 변경·참여/KPI 갱신 F1/R1/A1 조사. 단계 연결은 main/배포 완료; 구조 분리는 별도.
@@ -119,3 +119,7 @@ PR #544·#555의 main CI 및 운영 배포 확인이 완료됐다. 선행 PR #55
 ### 2026-10-14 상품·공급자 승인 통합 정비 착수
 
 사용자 요청에 따라 함수/모달 단위로 종료하지 않고 두 승인 화면의 책임·실패·재시도를 하나의 업무 묶음으로 정비한다. [이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 조사 후 보완 TODO를 따른다. 서비스 간 공통화와 약사회 분회는 제외한다.
+
+### 상품·공급자 승인 통합 정비 결과
+
+[이번 WO](WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)의 두 승인 업무 정비를 하나의 묶음으로 완료했다. PR #570·main CI·Neture [Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952) 운영 반영을 확인했다. 전체 운영자 TODO는 ACTIVE이며, 다음 조사 큐는 약국 사업자 회원관리의 변경값·검증·순차 저장 결과다. 서비스 간 공통화와 약사회 분회는 제외한다.

@@ -1,10 +1,11 @@
 import React from 'react';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import SupplierOrdersPage from '../SupplierOrdersPage';
 import SupplierDashboardPage from '../SupplierDashboardPage';
 import SupplierEventOfferPage from '../SupplierEventOfferPage';
+import { useSupplierDashboard } from '../dashboard/useSupplierDashboard';
 
 const api = vi.hoisted(() => ({
   summary: vi.fn(), unified: vi.fn(), kpi: vi.fn(), orders: vi.fn(), inventory: vi.fn(), settlements: vi.fn(), approval: vi.fn(), profile: vi.fn(), recruitments: vi.fn(), descriptions: vi.fn(), trials: vi.fn(), stats: vi.fn(), performance: vi.fn(), distribution: vi.fn(), trending: vi.fn(), offers: vi.fn(), proposals: vi.fn(), available: vi.fn(), propose: vi.fn(),
@@ -37,6 +38,28 @@ beforeEach(() => {
 const mount = (page: React.ReactNode, path = '/') => render(<MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>);
 
 describe('supplier workspace read and proposal contracts', () => {
+  it.each(['resolve', 'reject'] as const)('keeps refreshed dashboard metrics after an older %s', async (outcome) => {
+    let resolveOld!: (items: { productName: string }[]) => void;
+    let rejectOld!: (error: Error) => void;
+    const old = new Promise<{ productName: string }[]>((resolve, reject) => {
+      resolveOld = resolve;
+      rejectOld = reject;
+    });
+    const latest = [{ productName: 'Latest fixture' }];
+    api.performance.mockReturnValueOnce(old).mockResolvedValueOnce(latest);
+    const { result } = renderHook(useSupplierDashboard);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(async () => result.current.fetchData());
+    await waitFor(() => expect(result.current.performance).toEqual(latest));
+    await act(async () => {
+      if (outcome === 'resolve') resolveOld([{ productName: 'Old fixture' }]);
+      else rejectOld(new Error('Old metrics request'));
+    });
+    expect(result.current.performance).toEqual(latest);
+    expect(result.current.metricsFailed).toBe(false);
+    expect(api.kpi).toHaveBeenCalledTimes(2);
+  });
+
   it('keeps summary and unified failures independent and retries the selected area', async () => {
     api.summary.mockRejectedValueOnce(new Error('summary unavailable'));
     mount(<SupplierOrdersPage />);

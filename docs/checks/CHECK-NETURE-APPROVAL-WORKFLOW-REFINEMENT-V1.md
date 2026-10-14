@@ -1,7 +1,7 @@
 # Neture 상품·공급자 승인 통합 정비 검증
 
-> **상태**: ACTIVE
-> **작성일**: 2026-10-14
+> **상태**: COMPLETED
+> **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거 WO**: [WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1](../work-orders/WO-NETURE-APPROVAL-WORKFLOW-REFINEMENT-V1.md)
 
 ## 구현과 보존
@@ -21,15 +21,24 @@
 - `pnpm --filter @o4o/web-neture build` PASS. 기존 큰 chunk 경고는 남아 있다.
 - 변경 소스 6파일과 테스트 3파일 ESLint 오류/경고 0.
 - Chromium 실제 컴포넌트/스타일 fixture: **1440/390px 모두 PASS**. 휴지통 false→retry 성공/선택 보존, 공급자 save 예외→입력 보존→retry, 거절 false→사유 보존→retry, 모바일 입력 viewport 범위, pageerror 0. API/auth만 합성 fixture로 치환했고 fixture 서버/코드는 저장소 외부에 두었다.
-- 상세 Row를 render 외부로 이동하고 props readonly 및 선택 순서 보존 보완 후 관련 **2파일 10건 재검증** 결과는 후속 기록에서 확인한다.
+- 상세 Row를 render 외부로 이동하고 props readonly 및 선택 순서 보존 보완 후 관련 **2파일 10건 재검증 PASS**, 최종 tsc·소스 ESLint도 PASS.
 - `node scripts/check-doc-sensitive.mjs` PASS (민감정보 패턴 0).
 
 실계정 심사·저장·상품 삭제 및 운영 DB write는 실행하지 않았다. 사용자 담당 실계정 검증과 fixture 검증은 구분한다.
 
 ## 통합/배포
 
-로컬 구현·검증 완료. push/PR·main CI·Neture 배포는 확인 후 기록한다. DEPLOYMENT = REQUIRED (Neture frontend only).
+[PR #570](https://github.com/Renagang21/o4o-platform/pull/570)은 source `f931179a9783a15fc00f8db583c6a7702bea5dec`로 정상 병합됐다. main merge `3a42d584d085c09a0e861c71c8c3a66f0d4644d9`.
+PR CI `38505562796`·CodeQL·Sonar·CI Gate PASS, 자동 코드 리뷰 지적 0·미해결 thread 0. main CI `38506413681` PASS.
+[Delivery](https://github.com/Renagang21/o4o-platform/actions/runs/38507211952)의 실제 Neture deploy·serving Report SUCCESS, production success. serving source `3a42d584d085c09a0e861c71c8c3a66f0d4644d9`에 source commit 포함 확인.
+Neture 페이지·첫 JS asset 및 API health의 read-only HTTP 확인 결과는 아래 보완 기록을 따른다.
+DEPLOYMENT = REQUIRED → Neture 운영 반영 확인 완료. 이번 작업에서 API/migration/약사회 분회 배포는 실행하지 않았다.
 
 ## 문서 정합
 
 새 WO/CHECK와 ACTIVE 운영자 TODO 2종을 갱신했다. 기존 COMPLETED 기록·정본 정책·canonical index는 수정하지 않았다.
+
+### 공개 응답과 종료 상태
+
+운영 반영 후 read-only 확인: `https://www.neture.co.kr/` HTTP 200, 해당 HTML의 첫 module JS HTTP 200, `https://api.neture.co.kr/health` HTTP 200. 인증된 실제 심사/삭제 기능은 이 HTTP 확인으로 검증했다고 주장하지 않는다.
+이번 세션의 합성 fixture 서버는 종료했다. 소스 PR 작업 공간은 clean이며 source commit이 main에 포함됨을 확인했다. 같은 WO의 배포 완료 기록을 위해 이 전용 clone에서 최신 main 기반 closure branch를 사용한다. 별도 독립 개발 WO의 작업 공간 재사용이 아니다.
