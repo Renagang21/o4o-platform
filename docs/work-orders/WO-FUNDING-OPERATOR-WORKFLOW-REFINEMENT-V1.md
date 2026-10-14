@@ -1,6 +1,6 @@
 # 펀딩 운영 심사·참여 처리 흐름 2차 정비
 
-> 상태: ACTIVE · 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
+> 상태: COMPLETED (개발 범위: push/PR 인계) · 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
 > 종료점: 검증 → commit/push → PR → 통합 담당 인계. main 병합·배포 제외.
 
 ## 조사와 TODO 보완
@@ -29,8 +29,17 @@
 - [x] 심사·단계·포럼 복구·입금·이행·CSV·KPI workflow 구현.
 - [x] 저장 실패 입력 보존, 저장 성공/조회 실패 재시도, 쓰기 직렬화, 이전 응답 회귀 검증.
 - [x] Neture 테스트·타입·빌드·실제 UI 합성 fixture 검증.
-- [ ] 검증 CHECK·전체 TODO 정합, commit/push/PR 인계.
+- [x] 검증 CHECK·전체 TODO 정합, commit/push/PR 인계.
 
 실계정·실제 입금 확인은 사용자 담당. 운영 DB 쓰기 없음.
 
 검증 결과: [CHECK](../checks/CHECK-FUNDING-OPERATOR-WORKFLOW-REFINEMENT-V1.md). Neture 99 files/893 tests, 타입 포함 빌드, PC/모바일 합성 UI PASS.
+
+## 개발 완료·통합 인계
+
+- PR: [#583](https://github.com/Renagang21/o4o-platform/pull/583), branch `wo/funding-operator-workflow`.
+- 최신 기준 main: `d9dce2e5a4` (KPA #579 포함). 작업 소스 commit `8198910b20`, 최신 main 재검증 기록 `4bea30e288`.
+- Neture 전체 893 tests, 타입 포함 빌드, PC/모바일 합성 UI PASS. main 반영 후 36 tests·빌드 재검증 PASS.
+- main 병합·배포 미수행. 통합 담당이 PR 최신 HEAD의 CI·Codex/미해결 리뷰를 확인한 뒤 진행한다. 개발 완료와 integration-ready를 구분한다.
+- 작업 clone `/workspace/o4o-funding-operator-workflow`는 후속 수정용 KEEP. 실계정 검증은 사용자 담당.
+- 문서 정합: 현재 WO/CHECK와 ACTIVE 전체 TODO 2개 갱신, 과거 COMPLETED 기록 보존.

@@ -1,7 +1,7 @@
 # 펀딩 운영 심사·참여 처리 흐름 정비 검증
 
 > 작성일: 2026-10-14 · 최종 갱신: 2026-10-14
-> 상태: 로컬 검증 PASS · push/PR 인계 준비
+> 상태: 개발 검증 PASS · [PR #583](https://github.com/Renagang21/o4o-platform/pull/583) 인계
 > 작업: [WO](../work-orders/WO-FUNDING-OPERATOR-WORKFLOW-REFINEMENT-V1.md)
 
 ## 결과
