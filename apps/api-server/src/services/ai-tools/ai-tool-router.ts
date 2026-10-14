@@ -1,7 +1,7 @@
 import { executeSupplierProductLookup, detectSupplierAdapter, detectSupplierLookupIntent, supplierRequestGap, isSupplierToolName, renderSupplierLookup } from "./supplier-tools.js";
-export { detectSupplierAdapter, asksForSupplierLookup, SupplierLookupIntent, SupplierRequestGap, detectSupplierLookupIntent, supplierRequestGap, isSupplierToolName } from "./supplier-tools.js";
-import { executeDomTool, detectDomIntent, domRequestGap, isDomToolName, renderDomResult, selectDomToolInvocation, extractQuotedStrings, asksForTyping, detectRegisteredSite, asksForLogin, AiToolInvocation, QUOTE_PAIRS, renderBrowserFailure } from "./dom-tools.js";
-export { detectRegisteredSite, asksForLogin, asksForTyping, AiToolInvocation, extractQuotedStrings, DomIntent, DomRequestGap, isCredentialTarget, detectDomIntent, domRequestGap, isDomToolName } from "./dom-tools.js";
+export { detectSupplierAdapter, asksForSupplierLookup, type SupplierLookupIntent, type SupplierRequestGap, detectSupplierLookupIntent, supplierRequestGap, isSupplierToolName } from "./supplier-tools.js";
+import { executeDomTool, detectDomIntent, domRequestGap, isDomToolName, renderDomResult, selectDomToolInvocation, extractQuotedStrings, asksForTyping, detectRegisteredSite, asksForLogin, type AiToolInvocation, QUOTE_PAIRS, renderBrowserFailure } from "./dom-tools.js";
+export { detectRegisteredSite, asksForLogin, asksForTyping, type AiToolInvocation, extractQuotedStrings, type DomIntent, type DomRequestGap, isCredentialTarget, detectDomIntent, domRequestGap, isDomToolName } from "./dom-tools.js";
 /**
  * AI Tool Router — 실행 계층
  *

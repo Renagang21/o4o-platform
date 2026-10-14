@@ -221,7 +221,7 @@ export function extractNaverBlogText(html: string): string {
 
   const contentCandidates = contentProbes.map((p) => p.text).filter((t) => t.length >= 100);
   if (contentCandidates.length > 0) {
-    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = contentCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'contentCandidates',
       selectedTextLength: selected.length,
@@ -232,7 +232,7 @@ export function extractNaverBlogText(html: string): string {
 
   const lenientContent = contentProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (lenientContent.length > 0) {
-    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = lenientContent.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'lenientContent',
       selectedTextLength: selected.length,
@@ -247,7 +247,7 @@ export function extractNaverBlogText(html: string): string {
 
   const wrapperCandidates = wrapperProbes.map((p) => p.text).filter((t) => t.length >= 50);
   if (wrapperCandidates.length > 0) {
-    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b));
+    const selected = wrapperCandidates.reduce((a, b) => (a.length >= b.length ? a : b), '');
     logger.info('[NAVER_FINAL_SELECTION]', {
       source: 'wrapperCandidates',
       selectedTextLength: selected.length,
@@ -446,38 +446,66 @@ export function decodeBasicHtmlEntities(s: string): string {
  *   2. og:title
  *   3. twitter:title
  *
- * meta 태그는 attribute 순서가 다양하므로 (name 먼저 / content 먼저) 양방향 패턴을 모두 시도.
+ * meta 태그는 기존 HTML parser로 읽고 attribute 순서와 기본 entity 정책을 유지한다.
  * 실패 시 undefined — 호출 측에서 blocks 기반 fallback 으로 넘긴다.
  */
 export function extractHtmlTitle(html: string): string | undefined {
+  try {
+    return extractParsedHtmlTitle(html);
+  } catch {
+    // Title metadata is optional: a parser/selector failure must not discard
+    // usable source text or prevent the caller's block-based title fallback.
+    return undefined;
+  }
+}
+
+function extractParsedHtmlTitle(html: string): string | undefined {
+  const root = parseHtml(html, {
+    lowerCaseTagName: true,
+    blockTextElements: { script: true, style: true, pre: true, title: true },
+  });
   // 1. <title>...</title>
-  const titleTagMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  if (titleTagMatch) {
+  const titleTag = root.querySelector('title');
+  if (titleTag && /<\/title>/i.test(html)) {
     const cleaned = decodeBasicHtmlEntities(
-      titleTagMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(),
+      removeHtmlTags(titleTag.innerHTML, '').replace(/\s+/g, ' ').trim(),
     );
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   // 2. og:title (property=og:title content="...")
-  const og =
-    html.match(/<meta\s+[^>]*?property\s*=\s*["']og:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
-    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?property\s*=\s*["']og:title["']/i);
+  const metadata = root.querySelectorAll('meta');
+  const og = readMetadataTitle(metadata, 'property', 'og:title');
   if (og) {
-    const cleaned = decodeBasicHtmlEntities(og[1].trim());
+    const cleaned = decodeBasicHtmlEntities(og.trim());
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   // 3. twitter:title (name=twitter:title content="...")
-  const tw =
-    html.match(/<meta\s+[^>]*?name\s*=\s*["']twitter:title["'][^>]*?content\s*=\s*["']([^"']+)["']/i) ||
-    html.match(/<meta\s+[^>]*?content\s*=\s*["']([^"']+)["'][^>]*?name\s*=\s*["']twitter:title["']/i);
+  const tw = readMetadataTitle(metadata, 'name', 'twitter:title');
   if (tw) {
-    const cleaned = decodeBasicHtmlEntities(tw[1].trim());
+    const cleaned = decodeBasicHtmlEntities(tw.trim());
     if (cleaned) return cleaned.slice(0, 200);
   }
 
   return undefined;
+}
+
+/** Keep raw entity values and the existing marker-before-content preference. */
+function readMetadataTitle(nodes: NodeHtmlElement[], field: string, marker: string): string | undefined {
+  let contentFirst: string | undefined;
+  for (const node of nodes) {
+    const entries = Object.entries(node.rawAttributes);
+    const markerIndex = entries.findIndex(([key, value]) =>
+      key.toLowerCase() === field && typeof value === 'string' && value.toLowerCase() === marker);
+    const contentIndex = entries.findIndex(([key, value]) =>
+      key.toLowerCase() === 'content' && typeof value === 'string' && value.length > 0);
+    if (markerIndex < 0 || contentIndex < 0) continue;
+    const content = entries[contentIndex][1];
+    if (markerIndex < contentIndex) return content;
+    contentFirst ??= content;
+  }
+  return contentFirst;
 }
 
 

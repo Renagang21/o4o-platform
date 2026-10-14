@@ -7,8 +7,8 @@ import { dispatchWorkProposal } from './work-proposal-dispatch.js';
 import { createWorkReplay } from './work-replay.js';
 import type { WorkDispatchContext } from './work-execution-types.js';
 import { persistTerminalRun, persistWorkflow, recordExperience, buildWorkExecutionReport } from './work-run-finalization.js';
-import { WorkPlanner } from "./work-planner.js";
-export { METHOD_DISCOVERY_MAX, PlannerInput, WorkPlanner, WORK_PLANNER_SYSTEM_PROMPT, describeExecutionIntent, buildPlannerUserPrompt, PlannerTargetResolver, createPlannerTargetResolverForProvider, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, OPENAI_CHAT_COMPLETIONS_URL, buildOpenAiVisionBody, openAiMessageText, createLlmPlanner, createStrongLlmPlanner } from "./work-planner.js";
+import type { WorkPlanner } from "./work-planner.js";
+export { METHOD_DISCOVERY_MAX, type PlannerInput, type WorkPlanner, WORK_PLANNER_SYSTEM_PROMPT, describeExecutionIntent, buildPlannerUserPrompt, type PlannerTargetResolver, createPlannerTargetResolverForProvider, createLlmPlannerForProvider, createStrongLlmPlannerForProvider, OPENAI_CHAT_COMPLETIONS_URL, buildOpenAiVisionBody, openAiMessageText, createLlmPlanner, createStrongLlmPlanner } from "./work-planner.js";
 /**
  * Goal-Driven Multimodal Work Agent — 세션 조율 · runtime loop · 렌더
  *
