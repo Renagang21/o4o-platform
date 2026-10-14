@@ -31,6 +31,7 @@ export function AuthoringDialog({
       ref={dialogRef}
       aria-modal="true"
       aria-labelledby={labelId}
+      onPointerDown={event => { if (event.target === event.currentTarget) onClose(); }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();

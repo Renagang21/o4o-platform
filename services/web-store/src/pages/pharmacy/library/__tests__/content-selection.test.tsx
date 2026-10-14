@@ -1,0 +1,80 @@
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { StoreContentsSelector } from '../../StoreContentsSelector';
+const api = vi.hoisted(() => ({ store: 'A', list: vi.fn(), usage: vi.fn(), reimport: vi.fn() }));
+vi.mock('../../../../hooks/useStoreOrganizationId', () => ({ useStoreOrganizationId: () => ({ organizationId: api.store }) }));
+vi.mock('../../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
+vi.mock('../../../../lib/serviceContext', () => ({ getActiveServiceKey: () => 'kpa-society' }));
+vi.mock('../../../../api/assetSnapshot', () => ({ storeLibraryApi: { listContents: api.list, getContentUsage: api.usage, reimportSource: api.reimport } }));
+vi.mock('../../../../components/store/StoreQrCreateModal', () => ({ StoreQrCreateModal: () => null }));
+vi.mock('../../ContentPdfExportModal', () => ({ ContentPdfExportModal: ({ open }: { open: boolean }) => open ? <p>PDF target open</p> : null }));
+const row = (id = 'one', origin = 'direct') => ({ id, selectionKey: `${origin}:${id}`, origin, title: `Fixture ${id}`, contentJson: { html: '<p>Fixture</p>' }, tags: ['Fixture tag'], hasSourceUpdate: false, createdAt: '2026-10-15T00:00:00Z' });
+const feed = (items = [row()], totalPages = 1) => ({ success: true, data: { items, total: items.length, totalPages } });
+beforeEach(() => { vi.restoreAllMocks(); vi.resetAllMocks(); api.store = 'A'; api.list.mockResolvedValue(feed()); api.usage.mockResolvedValue({ success: true, data: { usage: { qr: 2, tablet_display: 1, product_link: 0, pop_pdf: 0 } } }); });
+afterEach(cleanup);
+const start = vi.fn(), remove = vi.fn(), afterRemove = vi.fn();
+function Location() { const location = useLocation(); return <p data-testid="location">{location.pathname}{location.search}</p>; }
+function show(entry = '/library', modal = false) {
+  return render(<MemoryRouter initialEntries={[entry]}><Location /><Routes>
+    <Route path="/library" element={<StoreContentsSelector onStartProduction={start} onRemoveSnapshots={remove} onAfterRemove={afterRemove} enablePdfExport mode={modal ? 'modal' : 'page'} />} />
+    <Route path="/store/content/direct/:id" element={<p>Editor fixture</p>} />
+  </Routes></MemoryRouter>);
+}
+async function select(id = 'one') {
+  const link = await screen.findByRole('link', { name: `Fixture ${id}` });
+  fireEvent.click(within(link.closest('tr')!).getByRole('checkbox'));
+}
+it('selects the current row and preserves execution-asset identity in production handoff', async () => {
+  api.list.mockResolvedValue(feed([row('asset', 'execution-asset')])); show(); await select('asset');
+  fireEvent.click(screen.getByRole('button', { name: '제작 시작' }));
+  expect(start).toHaveBeenCalledWith([{ id: 'asset', title: 'Fixture asset', origin: 'library' }]);
+});
+it('filter changes immediately hide old selection and reject late list responses', async () => {
+  let resolve!: (value: ReturnType<typeof feed>) => void;
+  api.list.mockResolvedValueOnce(feed()).mockReturnValueOnce(new Promise(done => { resolve = done; })).mockResolvedValueOnce(feed([row('new')]));
+  show(); await select(); fireEvent.click(screen.getByRole('button', { name: '운영자 제공' }));
+  expect(screen.queryByRole('link', { name: 'Fixture one' })).toBeNull();
+  expect(screen.queryByRole('button', { name: '제작 시작' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '내가 만든 콘텐츠' }));
+  await screen.findByRole('link', { name: 'Fixture new' });
+  await act(async () => { resolve(feed([row('old')])); });
+  expect(screen.queryByRole('link', { name: 'Fixture old' })).toBeNull();
+});
+it('restores search/source/tag/page from the URL without resetting to page one on mount', async () => {
+  api.list.mockResolvedValue(feed([row()], 3)); show('/library?librarySearch=Fixture&librarySource=mine&libraryTag=Tag&libraryPage=2');
+  await screen.findByRole('link', { name: 'Fixture one' });
+  expect(api.list.mock.calls[0][0]).toMatchObject({ page: 2, search: 'Fixture', source: 'mine', tag: 'Tag' });
+  await act(async () => { await new Promise(done => setTimeout(done, 350)); });
+  expect(api.list).toHaveBeenCalledOnce();
+  expect((screen.getByRole('searchbox', { name: '콘텐츠 검색' }) as HTMLInputElement).value).toBe('Fixture');
+});
+it('debounced search preserves unrelated product parameters in the current URL', async () => {
+  show('/library?pId=fixture'); await screen.findByRole('link', { name: 'Fixture one' });
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: '  Revised  ' } });
+  await waitFor(() => expect(api.list.mock.calls[api.list.mock.calls.length - 1][0].search).toBe('Revised'));
+  expect(screen.getByTestId('location').textContent).toContain('pId=fixture');
+  await waitFor(() => expect(screen.getByTestId('location').textContent).toContain('librarySearch=Revised'));
+});
+it('usage summary arrives and survives the state change caused by its own request', async () => {
+  api.list.mockResolvedValue(feed([{ ...row(), hasSourceUpdate: true }])); show();
+  await screen.findByText('QR 2 · 태블릿 1에서 사용 중'); expect(api.usage).toHaveBeenCalledOnce();
+});
+it('modal mode never rewrites its host URL or exposes destructive actions', async () => {
+  show('/library?host=retained', true); await select();
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Modal query' } });
+  await waitFor(() => expect(api.list.mock.calls[api.list.mock.calls.length - 1][0].search).toBe('Modal query'));
+  expect(screen.getByTestId('location').textContent).toBe('/library?host=retained');
+  expect(screen.queryByRole('button', { name: '선택 삭제' })).toBeNull();
+});
+it('store switch before React rerenders prevents using the old selected rows', async () => {
+  show(); await select(); api.store = 'B';
+  fireEvent.click(screen.getByRole('button', { name: '제작 시작' })); expect(start).not.toHaveBeenCalled();
+});
+it('duplicate snapshot removal is locked and reports only confirmed results', async () => {
+  let resolve!: (count: number) => void; remove.mockReturnValue(new Promise(done => { resolve = done; }));
+  vi.spyOn(window, 'confirm').mockReturnValue(true); api.list.mockResolvedValue(feed([row('copy', 'snapshot')]));
+  show(); await select('copy'); const button = screen.getByRole('button', { name: '선택 삭제' });
+  fireEvent.click(button); fireEvent.click(button); expect(remove).toHaveBeenCalledOnce();
+  await act(async () => { resolve(1); }); expect(afterRemove).toHaveBeenCalledOnce();
+});

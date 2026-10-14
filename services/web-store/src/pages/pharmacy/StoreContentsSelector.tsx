@@ -20,8 +20,10 @@
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
+import { useLibraryScope } from './library/useLibraryScope';
+import { useContentUsage } from './library/useContentUsage';
 import { useStoreResource } from './hooks/useStoreResource';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
@@ -209,27 +211,12 @@ export interface StoreContentsSelectorProps {
   enablePdfExport?: boolean;
 }
 
-export function StoreContentsSelector({
-  reloadKey = 0,
-  onStartProduction,
-  onRemoveSnapshots,
-  onAfterRemove,
-  mode = 'page',
-  startButtonLabel,
-  enablePdfExport = false,
-}: StoreContentsSelectorProps) {
-  // WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1: 콘텐츠 전용 — DocumentsSection 직접 렌더.
-  return (
-    <DocumentsSection
-      reloadKey={reloadKey}
-      onStartProduction={onStartProduction}
-      onAfterRemove={onAfterRemove}
-      onRemoveSnapshots={onRemoveSnapshots}
-      mode={mode}
-      startButtonLabel={startButtonLabel}
-      enablePdfExport={enablePdfExport}
-    />
-  );
+export function StoreContentsSelector(props: StoreContentsSelectorProps) {
+  const { scope } = useLibraryScope();
+  return <DocumentsSection key={scope} reloadKey={props.reloadKey ?? 0}
+    onStartProduction={props.onStartProduction} onAfterRemove={props.onAfterRemove}
+    onRemoveSnapshots={props.onRemoveSnapshots} mode={props.mode ?? 'page'}
+    startButtonLabel={props.startButtonLabel} enablePdfExport={props.enablePdfExport} />;
 }
 
 // ─── DocumentsSection ────────────────────────────────────────────────────────
@@ -251,10 +238,18 @@ function DocumentsSection({
   startButtonLabel?: string;
   enablePdfExport?: boolean;
 }) {
-  const [searchInput, setSearchInput] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [params, setParams] = useSearchParams();
+  const initialSearch = mode === 'page' ? params.get('librarySearch') ?? '' : '';
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [page, setPage] = useState(() => {
+    const value = mode === 'page' ? Number(params.get('libraryPage')) : 1;
+    return Number.isSafeInteger(value) && value > 0 ? value : 1;
+  });
+  const [selection, setSelected] = useState<Set<string>>(new Set());
+  const { isCurrent } = useLibraryScope();
+  const mutation = useRef(false);
+  const [removing, setRemoving] = useState(false);
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 인쇄용 PDF 대상(단일)
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 인라인 QR 생성 대상(단일)
@@ -262,15 +257,15 @@ function DocumentsSection({
   // WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1: POP 만들기 = V2 편집기로 handoff
   const navigate = useNavigate();
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
-  const [source, setSource] = useState<SourceFilter>('all');
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [source, setSource] = useState<SourceFilter>(() => mode === 'page' ? SOURCE_TABS.find(tab => tab.key === params.get('librarySource'))?.key ?? 'all' : 'all');
+  const [activeTag, setActiveTag] = useState<string | null>(() => mode === 'page' ? params.get('libraryTag') : null);
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1: 재가져오기 진행중 표식 + 내부 목록 새로고침 트리거
   const [reimportingId, setReimportingId] = useState<string | null>(null);
   const [internalReload, setInternalReload] = useState(0);
   // WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
   //   "원본 갱신됨" 사본(direct)에 대해서만 사용처(QR/태블릿/취급제품/POP) 요약을 lazy 조회.
   //   덮어쓰기(REIMPORT-OVERWRITE) 판단 전, 이 사본이 실제로 쓰이는지 표시하기 위함. read-only.
-  const [usageById, setUsageById] = useState<Record<string, StoreContentUsage | null>>({});
+
 
   // 출처 탭/태그 필터 변경 시 1페이지로 리셋
   const changeSource = useCallback((s: SourceFilter) => { setSource(s); setPage(1); }, []);
@@ -279,13 +274,26 @@ function DocumentsSection({
 
   useEffect(() => {
     const handle = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
-      setPage(1);
+      if (searchInput.trim() !== searchQuery) {
+        setSearchQuery(searchInput.trim()); setPage(1);
+      }
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(handle);
-  }, [searchInput]);
+  }, [searchInput, searchQuery]);
 
+  const queryKey = JSON.stringify([page, searchQuery, source, activeTag]);
+  useEffect(() => {
+    if (mode !== 'page') return;
+    const next = new URLSearchParams(params);
+    const filters = { librarySearch: searchQuery, librarySource: source === 'all' ? '' : source,
+      libraryTag: activeTag ?? '', libraryPage: page === 1 ? '' : String(page) };
+    for (const [key, value] of Object.entries(filters)) {
+      if (value) next.set(key, value); else next.delete(key);
+    }
+    if (next.toString() !== params.toString()) setParams(next, { replace: true });
+  }, [mode, params, setParams, searchQuery, source, activeTag, page]);
   const loadDocuments = useCallback(async () => {
+    if (!isCurrent()) throw new Error('No active store');
     const res = await storeLibraryApi.listContents({
       type: 'document', page, limit: PAGE_LIMIT,
       search: searchQuery || undefined,
@@ -293,13 +301,18 @@ function DocumentsSection({
       tag: activeTag || undefined,
     });
     if (!res.success || !res.data) throw new Error('DOCUMENT_LOAD_FAILED');
-    return { rows: res.data.items.map(toDocumentRow), total: res.data.total,
+    return { queryKey, rows: res.data.items.map(toDocumentRow), total: res.data.total,
       totalPages: Math.max(1, res.data.totalPages) };
-  }, [page, searchQuery, source, activeTag]);
-  const { data: documents, loading, error: loadError, reload: retryDocuments } = useStoreResource(
-    loadDocuments, { rows: [] as DocumentRow[], total: 0, totalPages: 1 },
+  }, [page, searchQuery, source, activeTag, queryKey, isCurrent]);
+  const { data: documents, loading: reading, error: loadError, reload: retryDocuments } = useStoreResource(
+    loadDocuments, { queryKey: null as string | null, rows: [] as DocumentRow[], total: 0, totalPages: 1 },
   );
-  const { rows, total, totalPages } = documents;
+  const loading = reading || documents.queryKey !== queryKey;
+  const rows = useMemo(() => loading || loadError ? [] : documents.rows, [loading, loadError, documents.rows]);
+  const { total, totalPages } = documents;
+  useEffect(() => { if (!loading && !loadError && page > totalPages) setPage(totalPages); }, [loading, loadError, page, totalPages]);
+  const selected = useMemo(() => new Set(rows.filter(row => selection.has(row.selectionKey)).map(row => row.selectionKey)), [rows, selection]);
+  const usageById = useContentUsage(rows.filter(row => row.origin === 'direct' && row.hasSourceUpdate).map(row => row.id));
   const reloadVersion = `${reloadKey}:${internalReload}`;
   const lastReloadVersion = useRef(reloadVersion);
   useEffect(() => {
@@ -323,54 +336,20 @@ function DocumentsSection({
     });
   }, [rows]);
 
-  // WO-O4O-STORE-CONTENT-USAGE-TRACE-FOR-REIMPORT-V1:
-  //   현재 페이지의 "원본 갱신됨" direct 사본 각각에 대해 사용처 요약을 병렬 조회(미조회 항목만).
-  //   실패는 조용히 무시(요약 미표시) — 목록/편집 흐름에 영향 없음. rows 변경마다 신규 대상만 fetch.
-  useEffect(() => {
-    const targets = rows.filter(
-      (r) => r.origin === 'direct' && r.hasSourceUpdate && usageById[r.id] === undefined,
-    );
-    if (targets.length === 0) return;
-    let cancelled = false;
-    // 조회 시작 표식(null) — 중복 요청 방지.
-    setUsageById((prev) => {
-      const next = { ...prev };
-      for (const t of targets) next[t.id] = null;
-      return next;
-    });
-    (async () => {
-      const results = await Promise.all(
-        targets.map((t) =>
-          storeLibraryApi
-            .getContentUsage(t.id)
-            .then((res) => ({ id: t.id, usage: res?.data ?? null }))
-            .catch(() => ({ id: t.id, usage: null })),
-        ),
-      );
-      if (cancelled) return;
-      setUsageById((prev) => {
-        const next = { ...prev };
-        for (const r of results) next[r.id] = r.usage;
-        return next;
-      });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [rows, usageById]);
+  useEffect(() => { setPdfTarget(null); setQrTarget(null); }, [queryKey, reloadVersion]);
 
   const handleStart = useCallback(() => {
-    if (selected.size === 0) return;
+    if (!isCurrent() || selected.size === 0) return;
     const items: ProductionSourceItem[] = rows
       .filter((r) => selected.has(r.selectionKey))
       // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATED-BUT-LIST-MISSING-V1:
       //   'execution-asset'(store_execution_assets) → ProductionSourceItem 의 canonical origin 'library' 로 매핑.
       .map((r) => ({ id: r.id, title: r.title, origin: r.origin === 'execution-asset' ? 'library' : r.origin }));
     onStartProduction(items);
-  }, [selected, rows, onStartProduction]);
+  }, [selected, rows, onStartProduction, isCurrent]);
 
   const handleRemove = useCallback(async () => {
-    if (!onRemoveSnapshots) return;
+    if (!isCurrent() || mutation.current || !onRemoveSnapshots) return;
     const snapshotIds = rows
       .filter((r) => selected.has(r.selectionKey) && r.origin === 'snapshot')
       .map((r) => r.id);
@@ -387,27 +366,30 @@ function DocumentsSection({
       )
     )
       return;
+    mutation.current = true; setRemoving(true);
     try {
       const n = await onRemoveSnapshots(snapshotIds);
+      if (!isCurrent()) return;
+      if (n < snapshotIds.length) toast.error(`${n}개 삭제, ${snapshotIds.length - n}개 실패했습니다. 목록을 확인하고 다시 시도해 주세요.`);
       if (n > 0) {
-        toast.success(`${n}개 콘텐츠를 내 자료함에서 삭제했습니다`);
+        if (n === snapshotIds.length) toast.success(`${n}개 콘텐츠를 내 자료함에서 삭제했습니다`);
         setSelected(new Set());
         onAfterRemove?.();
       }
     } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    }
-  }, [selected, rows, onRemoveSnapshots, onAfterRemove]);
+      if (isCurrent()) toast.error(e?.message || '삭제에 실패했습니다');
+    } finally { mutation.current = false; if (isCurrent()) setRemoving(false); }
+  }, [selected, rows, onRemoveSnapshots, onAfterRemove, isCurrent]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1:
   //   콘텐츠 1개 선택 시에만 인쇄용 PDF 만들기 활성. 선택 행에서 id/title/origin 을 PDF 모달로 전달.
   const handlePdfExport = useCallback(() => {
-    if (selected.size !== 1) return;
+    if (!isCurrent() || selected.size !== 1) return;
     const key = Array.from(selected)[0];
     const row = rows.find((r) => r.selectionKey === key);
     if (!row) return;
     setPdfTarget({ id: row.id, title: row.title, origin: row.origin, contentJson: row.contentJson });
-  }, [selected, rows]);
+  }, [selected, rows, isCurrent]);
 
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1:
   //   콘텐츠 1개 선택 시 QR 만들기 바로 호출. direct/execution-asset 만 공개 landing 이 렌더 가능 →
@@ -419,10 +401,10 @@ function DocumentsSection({
   }, [selected, rows]);
   const qrEligible = !!singleSelectedRow && (singleSelectedRow.origin === 'direct' || singleSelectedRow.origin === 'execution-asset');
   const handleCreateQr = useCallback(() => {
-    if (!singleSelectedRow) return;
+    if (!isCurrent() || !singleSelectedRow) return;
     if (singleSelectedRow.origin !== 'direct' && singleSelectedRow.origin !== 'execution-asset') return;
     setQrTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
-  }, [singleSelectedRow]);
+  }, [singleSelectedRow, isCurrent]);
 
   // WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1:
   //   POP V2 source resolver 가 direct / library(=execution-asset) / snapshot 3 origin 을 모두 읽으므로
@@ -430,7 +412,7 @@ function DocumentsSection({
   //   row origin 'execution-asset' → V2 어휘 'library' 매핑은 handleStart 와 동일. 본문은 싣지 않는다.
   const popEligible = !!singleSelectedRow;
   const handleCreatePop = useCallback(() => {
-    if (!singleSelectedRow) return;
+    if (!isCurrent() || !singleSelectedRow) return;
     const r = singleSelectedRow;
     navigate(CANONICAL_STORE_POP_V2_ROUTE, {
       state: buildPopV2HandoffState(
@@ -441,18 +423,20 @@ function DocumentsSection({
         }),
       ),
     });
-  }, [singleSelectedRow, navigate]);
+  }, [singleSelectedRow, navigate, isCurrent]);
 
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1:
   //   "원본 갱신됨" 사본에서 현재 canonical 원본을 **새 사본으로 다시 가져오기**(덮어쓰기 아님).
   //   기존 사본(본문/QR/태블릿 연결)은 그대로 유지되고, 새 사본이 별도로 목록에 추가된다.
   const handleReimport = useCallback(async (row: DocumentRow) => {
-    if (reimportingId) return;
+    if (!isCurrent() || mutation.current) return;
     if (!confirm('현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다.\n(기존 QR·태블릿 연결은 변경되지 않습니다.)\n계속할까요?')) return;
-    setReimportingId(row.id);
+    mutation.current = true; setReimportingId(row.id);
     try {
       const res = await storeLibraryApi.reimportSource(row.id);
-      const data = res?.data;
+      if (!isCurrent()) return;
+      if (!res.success || !res.data) throw new Error('Unconfirmed import');
+      const data = res.data;
       if (data?.mode === 'already_latest') {
         toast.success('이미 최신 원본입니다.');
       } else {
@@ -460,13 +444,14 @@ function DocumentsSection({
         setInternalReload((n) => n + 1);
       }
     } catch (e: any) {
+      if (!isCurrent()) return;
       const code = e?.response?.data?.error?.code;
       const msg = e?.response?.data?.error?.message;
       toast.error(msg || (code === 'NO_CURRENT_CANONICAL' ? '현재 가져올 수 있는 새 원본이 없습니다.' : '다시 가져오기에 실패했습니다.'));
     } finally {
-      setReimportingId(null);
+      mutation.current = false; if (isCurrent()) setReimportingId(null);
     }
-  }, [reimportingId]);
+  }, [isCurrent]);
 
   // WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: @o4o/ui Column<T>
   const columns = useMemo<Column<DocumentRow>[]>(
@@ -589,7 +574,7 @@ function DocumentsSection({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); handleReimport(row); }}
-                disabled={reimportingId === row.id}
+                disabled={removing || !!reimportingId}
                 style={{ ...styles.viewBtn, background: '#FEF3C7', color: '#B45309', borderColor: '#FCD34D', cursor: reimportingId === row.id ? 'default' : 'pointer', opacity: reimportingId === row.id ? 0.6 : 1 }}
                 title="현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다."
               >
@@ -609,7 +594,7 @@ function DocumentsSection({
         ),
       },
     ],
-    [mode, applyTag, handleReimport, reimportingId, usageById],
+    [mode, applyTag, handleReimport, reimportingId, removing, usageById],
   );
 
   const showRemoveButton = mode === 'page' && !!onRemoveSnapshots;
@@ -640,6 +625,7 @@ function DocumentsSection({
               <button
                 key={key}
                 type="button"
+                aria-pressed={active}
                 onClick={() => changeSource(key)}
                 style={{ ...styles.sourceTab, ...(active ? styles.sourceTabActive : styles.sourceTabInactive) }}
               >
@@ -664,7 +650,7 @@ function DocumentsSection({
         <div style={styles.searchWrap}>
           <Search size={14} style={styles.searchIcon} />
           <input
-            type="search"
+            type="search" aria-label="콘텐츠 검색"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="제목·요약·본문·태그 검색"
@@ -674,6 +660,7 @@ function DocumentsSection({
       </div>
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: custom toolbar → @o4o/ui ActionBar */}
+      <div className="[&>div>div]:flex-wrap [&>div>div>span]:whitespace-nowrap [&_button]:shrink-0 [&_button]:whitespace-nowrap">
       <ActionBar
         selectedCount={selected.size}
         onClearSelection={() => setSelected(new Set())}
@@ -718,9 +705,11 @@ function DocumentsSection({
             icon: <Trash2 size={14} />,
             variant: 'danger' as const,
             onClick: handleRemove,
+            disabled: loading || removing || !!reimportingId || selected.size === 0,
           }] : []),
         ]}
       />
+      </div>
 
       {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1 / INLINE-POP: QR·POP 만들기 선택 안내 */}
       {(showInlineQr || showInlinePop) && selected.size >= 2 && (
@@ -756,7 +745,7 @@ function DocumentsSection({
       <Pagination
         page={page}
         totalPages={totalPages}
-        onPageChange={setPage}
+        onPageChange={next => { if (!loading) setPage(next); }}
         total={total}
       />
       </>}
@@ -993,7 +982,7 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     borderRadius: '999px',
     cursor: 'pointer',
-    border: '1px solid transparent',
+    borderWidth: '1px', borderStyle: 'solid', borderColor: 'transparent',
   },
   sourceTabActive: {
     background: '#1D4ED8',
