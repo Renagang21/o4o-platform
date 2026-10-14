@@ -1,6 +1,6 @@
 # 공급자 접근성·화면 책임 정비 검증
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **실행 WO**: [공급자 접근성·화면 책임 정비](../work-orders/WO-O4O-SUPPLIER-QUALITY-RESPONSIBILITIES-V1.md)
 
@@ -48,3 +48,30 @@ SonarCloud의 최신 분석·PR/CI·main·배포와 최종 전체 회귀 건수�
 Neture source main 반영과 운영 배포는 구분한다. 별도 API 번들 오류/AI quota migration/API 배포 선행은 WO의 운영 선행조건을 따른다.
 source merge 뒤 main CI/Delivery는 진행 중이며 결과를 후속 확인한다. 실제 계정·운영 업무 쓰기는 수행하지 않았다.
 브라우저 fixture 서버는 종료했다. 작업 tree는 fixture 재현과 배포 재개 근거를 위해 KEEP이다.
+
+## 2026-10-14 운영 배포 완료
+
+선행 API 수정 PR #557 MERGED·CI Gate/CodeQL/SonarCloud PASS.
+동일 승인 범위의 기존 [Promote 38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074)가 실행 중인 것을 확인하고 중복 실행 없이 완료를 관찰했다.
+전체 run SUCCESS, source target `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`의 `production` status DEPLOYED / success.
+
+| 운영 검사 | 결과 |
+|---|---|
+| API-specific dependency/tsup bundle/image | SUCCESS |
+| 표준 Run database migrations | SUCCESS. target의 quota migration/등록 fingerprint가 포함된 runner 사용 |
+| 새 revision readiness·traffic switch·전환 후 검사 | SUCCESS |
+| Neture verified rollout | SUCCESS, 기존 API 의존 보류 해소 |
+| 최종 read-only serving SHA Report | SUCCESS, 선택 7서비스의 target/traffic 검증 |
+| API health·readiness·Neture HTML | 3/3 HTTP 200 |
+| Neture entry JS·local CSS | HTTP 200, JavaScript/CSS content-type 확인 |
+
+source main의 [post-merge CI 38494717087](https://github.com/Renagang21/o4o-platform/actions/runs/38494717087)와 기록 main의 [CI 38495340789](https://github.com/Renagang21/o4o-platform/actions/runs/38495340789)는 SUCCESS다.
+상세 Actions job log는 외부 blob host의 접근 거절로 내려받지 못했다. 서명된 다운로드 URL이나 자격정보를 문서에 저장하지 않는다.
+실행 job/step 결과, 표준 runner의 실패 조건, 최종 serving Report/status와 TLS 검증을 유지한 HTTP 결과를 증거로 구분한다. 운영 DB 직접 SQL·실계정 업무 쓰기·유료 AI 호출은 미실행이다.
+후속 main #560 frontend 접근성 변경은 이 target 뒤의 별도 변경이다. 이번 배포 결과를 그 새 버전의 배포 검증으로 표현하지 않는다.
+
+### 후속 frontend 버전 확인
+
+추가 접근성 #560의 target `40aafa414f2df4abb8a4d647728e43227d78bbce`는 [자동 Delivery 38499037614](https://github.com/Renagang21/o4o-platform/actions/runs/38499037614) SUCCESS, `production` DEPLOYED / success (`deploy: neture`)를 확인했다.
+이 후속 실행은 Neture frontend 배포이며 API/quota migration을 다시 실행한 증거가 아니다. API 선행 배포의 target `ce876b0ab`와 구분한다.
+이후 main에 추가된 PH 관리 도구 진단 변경은 이 서빙 버전 검증에 포함하지 않는다.

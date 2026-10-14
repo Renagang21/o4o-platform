@@ -1,6 +1,6 @@
 # 공급자 접근성·화면 책임 정비
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED
 > **작성일**: 2026-10-14 · **최종 갱신**: 2026-10-14
 > **근거**: 사용자 공급자 접근성·복잡도 보완 및 큰 화면 책임 분리 진행 지시
 > **기준 main**: `24b96f373` · 작업 branch: `wo/supplier-quality-responsibilities`
@@ -38,13 +38,13 @@
 - [x] 집중 동작·접근성 25건, Supplier Boundary 41건, PC/mobile fixture 브라우저 검증
 - [x] 최종 전체 회귀·타입/빌드/lint·독립 diff 점검
 - [x] commit/push·PR·required CI·review·main 통합
-- [ ] Delivery의 API 의존 보류 해소 후 운영 배포 확인
+- [x] 사용자 후속 승인에 따른 API quota migration/API 배포 및 Neture 의존 보류 해소 확인
 
 실계정·운영 상품/주문/정산 write는 이번 범위가 아니다.
 검증 및 미확인 결과는 [CHECK](../checks/CHECK-O4O-SUPPLIER-QUALITY-RESPONSIBILITIES-V1.md)에 구분한다.
 문서 정합: 현행 정본 정책 변경 없음.
 
-## main 통합과 운영 선행조건
+## main 통합과 운영 선행조건 — 당시 판정
 
 [PR #556](https://github.com/Renagang21/o4o-platform/pull/556)이 main `f2bc1076fb60e203c5cb2c1ece3caede0b176719`에 정상 병합됐다.
 최종 source HEAD `88dce2d5c`의 [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38493766203)은 SUCCESS다.
@@ -61,3 +61,24 @@ API 빌드 수정은 [PR #557](https://github.com/Renagang21/o4o-platform/pull/5
 현재 API health·Neture HTML의 HTTP 200은 기존 운영 가용성 증거이며 새 코드 배포 증거가 아니다.
 
 이 문서 후속은 같은 WO의 main/Delivery 기록 단계다. 검증 harness와 artifact 재현을 위해 작업 worktree는 KEEP하며 기존 원본 checkout과 다른 세션 자원은 보존한다.
+
+## 2026-10-14 API 선행조건 해소·운영 배포 완료
+
+사용자가 “별도 API 빌드 수정과 AI quota migration/API 배포 → 진행하자”로 표준 quota migration/API 배포를 승인했다.
+확인 시 같은 목적의 [Promote 38497933074](https://github.com/Renagang21/o4o-platform/actions/runs/38497933074)가 이미 실행 중이어서 중복 dispatch하지 않고 완료를 관찰했다.
+
+- API 빌드 수정 [PR #557](https://github.com/Renagang21/o4o-platform/pull/557)은 main에 병합됐으며 CI Gate·CodeQL·SonarCloud PASS다.
+- 실제 배포 target은 `ce876b0ab03aeb8c61e15a2a378f89d55af3580b`다. API tsup bundle, 표준 migration job, 새 revision readiness, traffic 전환과 전환 후 검사가 모두 SUCCESS다.
+- 이 target의 incremental manifest에는 `CreateAiUsageReservations1791870434349`가 포함된다. migration runner는 최종 expected-schema fingerprint 불일치 시 실패하고 API 배포를 중단한다. 성공한 job/후속 배포를 근거로 quota migration/API 선행조건 해소를 확인했다. 운영 DB 직접 SQL 조회·별도 DDL/rollback/repair는 실행하지 않았다.
+- API 먼저 배포한 뒤 Neture 및 나머지 선택 frontend가 성공했다. 최종 read-only serving Report SUCCESS, commit status `production`은 DEPLOYED / success이며 7서비스(API·admin·Neture·KPA-Society·lecture·store·KPA-branch)를 기록한다.
+- 운영 API `/health`, `/health/ready`, Neture HTML은 200이다. Neture module asset이 이전 bundle과 달라졌고 해당 JS/CSS의 HTTP 200과 JavaScript/CSS content-type을 확인했다. 실제 계정 업무 쓰기·유료 AI provider 호출은 하지 않는다.
+
+이번 supplier refactor/main 기록은 위 target의 조상으로 포함된다. 뒤에 main에 추가된 [PR #560](https://github.com/Renagang21/o4o-platform/pull/560)의 추가 frontend 접근성 변경과 그 Delivery는 별도 버전이며 위 배포 증거로 최신 main 전체 배포를 주장하지 않는다.
+자세한 결과와 한계는 동일 CHECK의 운영 완료 절을 따른다. 현재 WO의 구현·검증·main 통합·API 의존 보류 해소·해당 source 운영 배포 범위는 완료다.
+문서 정합: 기존 완료 기록/정본 정책 변경 없이 이번 WO/CHECK의 실행 상태를 완료로 갱신했다.
+
+### 후속 frontend 버전 확인
+
+추가 접근성 #560의 target `40aafa414f2df4abb8a4d647728e43227d78bbce`는 [자동 Delivery 38499037614](https://github.com/Renagang21/o4o-platform/actions/runs/38499037614) SUCCESS, `production` DEPLOYED / success (`deploy: neture`)를 확인했다.
+이 후속 실행은 Neture frontend 배포이며 API/quota migration을 다시 실행한 증거가 아니다. API 선행 배포의 target `ce876b0ab`와 구분한다.
+이후 main에 추가된 PH 관리 도구 진단 변경은 이 서빙 버전 검증에 포함하지 않는다.
