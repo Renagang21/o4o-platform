@@ -85,7 +85,7 @@ Pharmacy-Hub는 사용자 지정 삭제 대상이므로 인증·Demo 검증에�
 
 Pharmacy-Hub는 요청대로 삭제 대상·smoke 제외이며 실제 삭제는 별도 의존 관계 확인 대상이다.
 K-Cosmetics/소매 서비스는 기존 퇴역 CHECK의 운영 종료 대상, Partner 주소는 예약 상태다.
-전체관리자는 Google 전용 공개 로그인 경계와 Demo의 권한 거절만 검사하며 관리자 로그인 성공을 주장하지 않는다.
+전체 관리자는 Google 전용 공개 로그인 경계와 Demo의 권한 거절만 검사하며 관리자 로그인 성공을 주장하지 않는다.
 삭제 census와 미사용 계정·데이터 정리는 완료하지 않았고 이번 실행에 무관한 삭제는 없다.
 
 실제 결과: [운영 Demo 데이터 복구 CHECK](../checks/CHECK-O4O-DEMO-DATA-RECOVERY-V1.md).

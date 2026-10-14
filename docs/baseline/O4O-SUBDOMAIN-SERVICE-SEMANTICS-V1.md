@@ -52,7 +52,7 @@
 | `study.neture.co.kr` | 강좌 이용자 · 운영자 | 강좌 · Neture 메인에서 접근 | `lecture` | catalog·해당 서비스 계약 참조 | 내 매장과 독립 | 기존 강좌 진입 |
 | `funding.neture.co.kr` | 펀딩 참여자 · 제품개발자 · 운영자 | 유통참여형 펀딩 (내부 `market-trial`) · Neture 메인에서 접근 | `funding` | `funding:admin` · `funding:operator` (운영자 범위) | 내 매장과 독립 | `neture.co.kr/market-trial` |
 | `community.neture.co.kr` | 일반 커뮤니티 회원 · 사업 참여 회원 | 독립 가입 커뮤니티와 약국 협력사업 회원 전용 공간을 함께 배치 | `community` | `community:admin` · 사업별 운영 권한은 해당 계약 참조 | 회원 전용 공간은 해당 사업 가입 자격 확인 | 각 서비스의 `/forum` |
-| `admin.neture.co.kr` | 전체관리자 | 플랫폼 전체 관리 전용. 각 서비스의 관리자(운영자)는 해당 서브도메인에 배치. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
+| `admin.neture.co.kr` | 전체 관리자 | 플랫폼 전체 관리 전용. 각 서비스의 관리자(운영자)는 해당 서브도메인에 배치. Demo 대상 아님 | — | `platform:super_admin` | 없음 | — |
 
 **약국 협력사업 식별 (2026-10-05, WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1)**: 위 표의 serviceKey 는 도메인 · 앱의 **서비스 식별**이다. 약국 대상 약국 협력사업(`pharmacy` 포함)의 식별 · 가입 · 운영 담당은 serviceKey 가 아니라 데이터 행(`semi_franchises` · `semi_franchise_memberships` · `semi_franchise_operators`)이 정한다. `kpa-society` service membership 은 내 매장(약국) 신청이나 `pharmacy` 약국 협력사업 가입의 근거가 아니며, 약국 협력사업을 추가할 때 serviceKey 를 만들지 않는다 — [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §1 · §3.
 
@@ -61,7 +61,7 @@ Partner는 대표 홈에 **준비 중**으로 노출하고 서비스 설명 페�
 ### 2-1. 사업자 실체와 운영자 범위는 다른 축이다
 
 - 공급자 **사업자 본인**의 접근은 serviceKey `supplier` 가 아니라 `organization_members(role=owner) → organizations(type='supplier') → neture_suppliers` 가 판정한다(FROZEN, [`O4O-SUPPLIER-DOMAIN-BOUNDARY-V1`](O4O-SUPPLIER-DOMAIN-BOUNDARY-V1.md) §7). `supplier:*` · `funding:*` · `community:admin` · `kpa-branch:admin` 은 그 영역을 **운영하는 쪽**의 범위다.
-- **2026-10-08 사용자 결정**: 각 서브도메인의 관리자(=운영자)는 해당 서비스 호스트에서 일한다. 공급자·펀딩·커뮤니티 관리도 각각 `supplier`·`funding`·`community`에 배치한다. **전체관리자는 `admin.neture.co.kr`에만** 둔다. 과거 URL-FIRST §9의 공통 운영 배치 설명은 이 결정으로 대체한다. 화면의 /admin 이름과 전체관리자 권한은 별개이며 기존 role 문자열·서비스별 업무 권한을 일괄 합치거나 개명하지 않는다. 재배치 branch에서 해당 호스트로 연결하고, 매장 심사는 store, pharmacy 사업 운영은 pharmacy, 사업 등록·담당 지정과 플랫폼 계정 관리는 admin에 배치했다. 소유 게이트와 심사 운영 게이트를 구분하며 새 store serviceKey나 가입 원장을 만들지 않는다. 운영 적용 상태는 전체 재배치 CHECK를 따른다.
+- **2026-10-08 사용자 결정**: 각 서브도메인의 관리자(=운영자)는 해당 서비스 호스트에서 일한다. 공급자·펀딩·커뮤니티 관리도 각각 `supplier`·`funding`·`community`에 배치한다. **전체 관리자는 `admin.neture.co.kr`에만** 둔다. 과거 URL-FIRST §9의 공통 운영 배치 설명은 이 결정으로 대체한다. 화면의 /admin 이름과 전체 관리자 권한은 별개이며 기존 role 문자열·서비스별 업무 권한을 일괄 합치거나 개명하지 않는다. 재배치 branch에서 해당 호스트로 연결하고, 매장 심사는 store, pharmacy 사업 운영은 pharmacy, 사업 등록·담당 지정과 플랫폼 계정 관리는 admin에 배치했다. 소유 게이트와 심사 운영 게이트를 구분하며 새 store serviceKey나 가입 원장을 만들지 않는다. 운영 적용 상태는 전체 재배치 CHECK를 따른다.
 - **일반 서비스 operator 와 `platform:super_admin` 을 혼동하지 않는다.** O4O 운영자에게 `platform:super_admin` 을 부여하지 않는다(URL-FIRST CONFIRMED_DECISIONS · §15).
 
 ### 2-2. PharmacyHub
