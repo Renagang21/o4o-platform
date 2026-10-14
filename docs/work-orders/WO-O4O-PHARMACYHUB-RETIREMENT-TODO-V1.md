@@ -433,3 +433,10 @@ PH 도구는 이 확인된 함수 지문과 trigger/function schema/name·이벤
 P2 재리뷰 대응: PH worker도 계정 삭제 worker와 동일하게 shared o4o-account-erasure-writes advisory transaction lock을 table lock보다 먼저 획득한다. 두 DB connection의 실제 동시 실행에서 erasure가 exclusive advisory lock을 보유한 동안 PH가 advisory에서 대기하고, erasure는 table lock을 획득할 수 있으며 COMMIT 뒤 PH read-only plan이 완료됨을 검증했다. 잠금 순서를 뒤집어 발생할 수 있는 deadlock을 피하며 보호 fence는 유지한다. 최신 main f8d1887ef2f0cd9920667a7275749195d9e28d8a를 자기 branch에 정상 merge했다. 운영 삭제는 미실행이다.
 
 동시 잠금 fixture를 실제 apply(SHARE ROW EXCLUSIVE table locks)에도 확장했다. exclusive advisory 보유자와 PH apply의 순서 충돌 없이 완료 후 rollback하며, read-only plan/apply 양쪽에서 검증했다. 운영 worker 코드는 이 테스트 확장으로 변경하지 않았다.
+
+
+### 후속 plan 오류 진단 (2026-10-14)
+
+PR #553은 필수 CI·Codex blocker 없음 확인 후 main 7f2956b0cbdf9901c4e8d5c879221e3077b29898에 병합했고 post-merge CI가 통과했다. development plan 38496164336은 실패했으며 관리자 worker 로그의 실제 코드는 PH_PURGE_FAILED다. 기존 PH_DEV_MUTATION_TRIGGER와는 다른 오류이고 원인은 아직 확정하지 않았다. 실제 census에서 offer_service_approvals/offer_service_prices의 UUID id가 확인돼 id 부재를 원인으로 단정하지 않는다.
+
+일회성 worker의 실패 진단에 고정 단계(connect/begin/purge/finish), 형식 검증된 SQLSTATE, 실패 쿼리의 SHA-256만 추가한다. rollback 쿼리가 실패 쿼리 지문을 덮어쓰지 않으며 원문 SQL·parameter·DB error detail·접속 정보는 출력하지 않는다. 읽기 전용 plan과 기존 apply 보호 검사는 그대로 유지한다. 오류 원인을 확인하기 전 운영 삭제는 실행하지 않는다. 별도 media plan 38496961613은 새 main CI 미확인 상태에서 발행한 오류로 취소했으며 성공 검증으로 취급하지 않는다. 동일 WO 후속 Phase로 전용 branch/worktree를 유지한다.
