@@ -25,18 +25,27 @@ const resolveSingleStoreWorkspaceUrl = vi.fn<(u: unknown) => Promise<string>>();
 vi.mock('../../lib/home-entry', () => ({
   resolveSingleStoreWorkspaceUrl: (u: unknown) => resolveSingleStoreWorkspaceUrl(u),
 }));
+// 호스트 프로필은 모듈 상수다 — 테스트마다 바꿀 수 있게 getter 로 노출한다.
+const host = vi.hoisted(() => ({ profile: 'main' as string }));
+vi.mock('../../lib/hostProfile', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  const mod: Record<string, unknown> = { ...actual };
+  Object.defineProperty(mod, 'CURRENT_HOST_PROFILE', { get: () => host.profile, enumerable: true });
+  return mod;
+});
 
 import LoginModal from '../LoginModal';
 import { DEMO_ACCOUNTS } from '../../lib/demoAccounts';
 
 const assign = vi.fn();
 
-function mount(onClose = vi.fn()) {
+function mount(onClose = vi.fn(), returnUrl?: string) {
   render(
     <MemoryRouter initialEntries={['/']}>
       <Routes>
-        <Route path="/" element={<LoginModal isOpen onClose={onClose} />} />
+        <Route path="/" element={<LoginModal isOpen onClose={onClose} returnUrl={returnUrl} />} />
         <Route path="/supplier/dashboard" element={<div data-testid="supplier-dashboard" />} />
+        <Route path="/carepharm-return" element={<div data-testid="carepharm-return" />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -47,6 +56,7 @@ beforeEach(() => {
   loginWithEmail.mockReset();
   resolveSingleStoreWorkspaceUrl.mockReset();
   assign.mockReset();
+  host.profile = 'main';
   vi.stubGlobal('location', { ...window.location, assign });
   sessionStorage.clear();
 });
@@ -86,6 +96,17 @@ describe('LoginModal — 체험하기', () => {
     expect(loginWithEmail).toHaveBeenCalledWith(supplier.email, supplier.password);
     expect(onClose).toHaveBeenCalled();
     expect(sessionStorage.getItem('neture_login_explicit_nav')).toBe('1');
+  });
+
+  it('CarePharm 호스트의 공급자 Demo → 대표 호스트 경로 대신 같은 호스트의 returnUrl 로 (세션 유지)', async () => {
+    host.profile = 'carepharm';
+    loginWithEmail.mockResolvedValue({ success: true, user: { id: 's1' } });
+    const onClose = mount(vi.fn(), '/carepharm-return');
+    fireEvent.click(screen.getByRole('button', { name: '공급자 Demo 체험' }));
+    await waitFor(() => expect(screen.getByTestId('carepharm-return')).toBeTruthy());
+    expect(screen.queryByTestId('supplier-dashboard')).toBeNull();
+    expect(assign).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
   });
 
   it('매장 경영자 Demo → 로그인 → 같은 handoff URL 로 이동', async () => {

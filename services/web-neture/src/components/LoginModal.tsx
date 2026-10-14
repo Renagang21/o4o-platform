@@ -135,7 +135,8 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       return;
     }
 
-    if (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community') {
+    // 서브 호스트(펀딩 · 커뮤니티 · CarePharm) 세션은 그 origin 에 묶인다 — 대표 호스트 경로로 보내면 세션을 잃는다.
+    if (CURRENT_HOST_PROFILE === 'funding' || CURRENT_HOST_PROFILE === 'community' || CURRENT_HOST_PROFILE === 'carepharm') {
       navigate(returnUrl || '/');
       demoBusyRef.current = false;
       setDemoBusy(null);

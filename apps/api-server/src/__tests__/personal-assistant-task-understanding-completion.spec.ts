@@ -60,7 +60,7 @@ jest.mock('../services/assistant/assistant-task-store.js', () => {
 });
 
 // 사용자 완료 선언 경로만 coordination 을 가로챈다 — runtime 은 실제 구현을 그대로 쓴다.
-const coord = { mock: false, row: null as any, transitioned: [] as any[] };
+const coord = { mock: false, row: null as any, stored: undefined as any, transitioned: [] as any[] };
 jest.mock('../services/ai-tools/work-run-coordination-service.js', () => {
   const actual = jest.requireActual('../services/ai-tools/work-run-coordination-service.js');
   return {
@@ -68,6 +68,10 @@ jest.mock('../services/ai-tools/work-run-coordination-service.js', () => {
     checkResumable: jest.fn((...a: any[]) => (coord.mock
       ? Promise.resolve(coord.row ? { ok: true, row: coord.row } : { ok: false, reason: 'terminal' })
       : actual.checkResumable(...a))),
+    // 선언 경로에서 run 원장 재조회 — stored 를 지정한 테스트만 가로챈다.
+    getWorkRun: jest.fn((...a: any[]) => (coord.mock && coord.stored !== undefined
+      ? Promise.resolve(coord.stored)
+      : actual.getWorkRun(...a))),
     transitionWorkRun: jest.fn((...a: any[]) => {
       if (!coord.mock) return actual.transitionWorkRun(...a);
       coord.transitioned.push(a[1]);
@@ -147,6 +151,7 @@ beforeEach(() => {
   storeCalls.length = 0;
   coord.mock = false;
   coord.row = null;
+  coord.stored = undefined;
   coord.transitioned = [];
   __resetUnderstandingCacheForTest();
 });
@@ -812,6 +817,33 @@ describe('④ Assistant — 이해 → 판정기 위임 → 질문 → 사용자
     await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d2' }, requestedTaskId: first.task!.taskId }, exec);
     expect(exec).toHaveBeenCalledTimes(1);
     expect(coord.transitioned).toEqual([]);
+  });
+
+  it('동시 "됐어요" 에서 진 쪽 — run 이 이미 completed 면 같은 완료 응답 · Task completed 유지 · 완료 계측 중복 없음', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d4')));
+    coord.mock = true;
+    coord.row = null; // checkResumable → terminal (이긴 쪽이 먼저 닫았다)
+    coord.stored = { runId: 'g_d4', userId: ME, status: 'completed', version: 4 };
+    (logger.info as jest.Mock).mockClear();
+    const exec = jest.fn();
+    const out = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d4' }, requestedTaskId: first.task!.taskId }, exec);
+    expect(exec).not.toHaveBeenCalled();
+    expect(coord.transitioned).toEqual([]);
+    expect(localSetStatus).not.toHaveBeenCalled();
+    expect(out.task?.status).toBe('completed');
+    expect(out.reply.body.data).toMatchObject({ runId: 'g_d4', progress: 'completed', goal: { status: 'completed' } });
+    const done = (logger.info as jest.Mock).mock.calls.filter((c) => c[0] === 'assistant task completion');
+    expect(done).toHaveLength(0);
+  });
+
+  it('"됐어요" 여도 종결 run 이 남의 것이면 선언으로 닫지 않는다', async () => {
+    const first = await runAssistantWorkTask(ds, { userId: ME, workBody: { request: REQUEST } }, jest.fn(async () => waiting('g_d5')));
+    coord.mock = true;
+    coord.row = null;
+    coord.stored = { runId: 'g_d5', userId: 'someone-else', status: 'completed', version: 2 };
+    const exec = jest.fn(async (): Promise<WorkExecutionReply> => ({ status: 200, body: { success: true, data: { runId: null } } }));
+    await runAssistantWorkTask(ds, { userId: ME, workBody: { request: '됐어요', runId: 'g_d5' }, requestedTaskId: first.task!.taskId }, exec);
+    expect(exec).toHaveBeenCalledTimes(1);
   });
 
   it('값 답변("게보린")은 선언이 아니다 — 실행으로 이어간다', async () => {
