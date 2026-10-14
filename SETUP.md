@@ -382,6 +382,55 @@ pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules
 만들고 종료 시 rollback하므로 baseline migration이 필요하지 않습니다. 포트 변수가 없으면 7건은 skip입니다.
 검증 종료 후 자신이 준비한 전용 DB를 정리하며 다른 DB나 컨테이너를 삭제하지 않습니다.
 
+### 공급자→매장 PostgreSQL 통합 검증
+
+`supplier-store-round-trip.integration.spec.ts`는 실제 repository·transaction과 상품 연결·수정·승인,
+매장 장바구니·checkout·테스트 결제·fulfillment bridge·배송·재고·정산 서비스를 함께 실행합니다.
+외부 알림 전달은 대체하며 실제 PG 결제나 운영 계정의 HTTP round-trip을 실행하지 않습니다.
+
+- 별도로 만든 PostgreSQL 15의 `127.0.0.1:55432`에 **전용 빈 DB** `o4o_supplier_store_integration`을 준비합니다.
+- 그 DB의 로컬 전용 접속값으로 `NETURE_SUPPLIER_STORE_IT_DATABASE_URL`을 설정합니다.
+  프로토콜은 `postgresql:`이며, query/hash 없이 위 host·port·DB명과 정확히 일치해야 합니다.
+  접속값은 로컬 비공개 환경에만 보관하고 로그·문서·Git에 기록하지 않습니다.
+- `NETURE_SUPPLIER_STORE_IT_DATABASE_URL`만 설정해도 `migration:run`의 대상은 바뀌지 않습니다.
+  migration runner는 `DB_*`를 읽으므로, 저장소 루트에서 아래 대상 검증·명시적 환경 전달로만
+  전용 fixture의 baseline과 incremental schema를 적용합니다. 기존 개발·운영 DB를 사용하지 않습니다.
+
+```bash
+node --input-type=module <<'NODE'
+import { spawnSync } from 'node:child_process';
+const raw = process.env.NETURE_SUPPLIER_STORE_IT_DATABASE_URL;
+if (!raw) throw new Error('Dedicated fixture URL is required');
+const target = new URL(raw);
+if (target.protocol !== 'postgresql:' || target.hostname !== '127.0.0.1' ||
+    target.port !== '55432' || target.pathname !== '/o4o_supplier_store_integration' ||
+    target.search || target.hash || !target.username || !target.password) {
+  throw new Error('Refusing migration outside the dedicated loopback fixture');
+}
+const result = spawnSync('pnpm', ['--filter', '@o4o/api-server', 'run', 'migration:run'], {
+  stdio: 'inherit',
+  env: { ...process.env, NODE_ENV: 'development', DB_HOST: '127.0.0.1', DB_PORT: '55432',
+    DB_NAME: 'o4o_supplier_store_integration', DB_USERNAME: decodeURIComponent(target.username),
+    DB_PASSWORD: decodeURIComponent(target.password) },
+});
+if (result.error) throw new Error('Fixture migration could not start');
+process.exit(result.status ?? 1);
+NODE
+```
+
+- `pnpm run build:packages`를 실행한 뒤 저장소 루트에서 다음 명령을 사용합니다.
+
+```text
+pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture-pharmacy/__tests__/supplier-store-round-trip.integration.spec.ts
+```
+
+변수가 없으면 두 integration test는 skip입니다. skip을 DB 통합 검증 PASS로 보고하지 않습니다.
+테스트는 합성 데이터만 생성하며 실행 후 연결을 닫습니다. 종료 후 자신이 만든 전용 DB를 제거해
+fixture를 정리합니다. 다른 PostgreSQL DB나 컨테이너를 삭제하지 않습니다.
+
+약국 매장(`neture-pharmacy`) 주문의 Neture 정산 제외 정책은 유지합니다. 약국 구매·배송과
+기존 Neture 정산 대상 주문의 계산·승인·지급을 구분해 검증하며, 정산 범위를 임의 확대하지 않습니다.
+
 **lint 는 완전 blocking 이 아니라 회귀 차단(ratchet) 입니다.**
 기존 오류 **46건**(warning 1,005건)이 baseline 으로 남아 있고,
 `scripts/lint-ratchet.mjs` 가 `pnpm run lint` 와 동일한 설정·범위로 검사해
