@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   netureEventOfferApi,
   supplierKpaEventOfferApi,
@@ -13,6 +13,10 @@ import {
 } from './presentation';
 
 export function useEventOfferLists() {
+  const itemsRequest = useRef(0);
+  useEffect(() => () => {
+    itemsRequest.current += 1;
+  }, []);
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
 
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
@@ -79,6 +83,9 @@ export function useEventOfferLists() {
   }, []);
 
   const fetchItems = useCallback(async (p: number, status: StatusTab) => {
+    const request = ++itemsRequest.current;
+    // Retry must use this requested page even when the request fails.
+    setPage(p);
     setLoading(true);
     setItemsError(false);
     try {
@@ -87,17 +94,18 @@ export function useEventOfferLists() {
         limit: 20,
         status,
       });
+      if (request !== itemsRequest.current) return;
       const body = res.data;
       setItems(body.data ?? []);
       setTotal(body.pagination?.total ?? 0);
       setTotalPages(body.pagination?.totalPages ?? 1);
-      setPage(p);
     } catch {
+      if (request !== itemsRequest.current) return;
       // 조회 실패는 '오퍼 0건'이 아니다 — 오류 표시 후 재시도 가능.
       setItems([]);
       setItemsError(true);
     } finally {
-      setLoading(false);
+      if (request === itemsRequest.current) setLoading(false);
     }
   }, []);
   return {
