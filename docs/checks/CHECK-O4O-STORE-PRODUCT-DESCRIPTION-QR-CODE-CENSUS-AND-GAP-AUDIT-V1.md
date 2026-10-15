@@ -1,7 +1,8 @@
 # CHECK-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1
 
-Status: **DONE (조사 전용)** — 전수 census · 원인 확정 · 백필 계획 산출 완료. **DB write 0 · migration 0 · deploy 0.**
+Status: **DONE (조사 전용)** — 전수 census · 원인 확정 · 백필 계획 산출 완료. **조사 대상 데이터 write 0(로그인 인증 부수 write 는 별개 — §10) · migration 0 · deploy 0.**
 IR: `IR-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1`
+> **회수 시 주(2026-10-15)**: 위 IR 은 세션 요청으로만 전달됐고 저장소에 파일로 커밋된 적이 없다. 본문의 `IR §N` 은 그 요청의 절 번호이며, 판정에 쓴 기준(QR 계약 4지선다 · 소비 경로 · census · 원인 후보 · 중지 조건 5개)은 이 CHECK 의 해당 절(§1~§9)에 각각 재기술돼 있어 이 문서만으로 추적된다. 원 커밋 `9aa2a48f8` 은 branch `work/store-description-qr-audit-v1` 에만 있다. 이후 누락 QR backfill 은 `122a7c03a`(main) 에서 수행됐다.
 Date: 2026-09-04
 작업공간: worktree `C:\tmp\o4o-store-description-qr-audit` / branch `work/store-description-qr-audit-v1` (origin/main `466c8ec3c` 기준)
 산출물: `tmp/store-description-qr-audit/` (qr-contract · store-census · qr-census · missing-qr · broken-qr · source-analysis · backfill-plan) — 프로덕션 조회 원문이라 저장소에는 포함하지 않는다(2026-10-15 회수 시 제외)
@@ -234,6 +235,7 @@ IR §6 이 제시한 후보 중 **해당하는 것은 "대량 INSERT pipeline �
 ## 10. 안전 / 범위
 
 - **DB write 0.** 전 과정 SELECT + HTTP GET / 로그인 POST 만 수행. `QR_MISSING` 표본에 대한 mint 는 write 이므로 **하지 않았다**.
+  - **회수 시 정정(2026-10-15)**: "DB write 0" 은 **조사 대상 데이터(QR · landing · 설명서) 기준**이다. §2 의 로그인 요청을 얻기 위한 로그인 POST 는 인증 부수 write(`linked_accounts.lastUsedAt` · `users.lastLoginAt` · 세션 상태 발급)를 유발하므로 프로덕션 write 가 전혀 없었던 것은 아니다. 회피한 것은 QR mint write 이다.
 - 코드 변경 0 · migration 0 · deploy 0 · 문서 이동/삭제 0.
 - 기준 repo 의 다른 세션 dirty · 미추적 파일 미접촉(별도 worktree 작업).
 - 보고 · 산출물에 자격증명 literal 없음.

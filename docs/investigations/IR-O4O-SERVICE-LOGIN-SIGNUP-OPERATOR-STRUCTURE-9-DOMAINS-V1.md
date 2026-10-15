@@ -84,7 +84,7 @@ neture.co.kr = 전체 서비스 메인. Google 로그인 후 가입한 서비스
 
 | 역할 | 효력이 미치는 호스트 | 비고 |
 |---|---|---|
-| `neture:admin` · `neture:operator` | `neture.co.kr` **+ `supplier`·`funding`·`community`** | 같은 번들·같은 키라 **세 서브도메인이 자동으로 포함된다.** 구분 불가 |
+| `neture:admin` · `neture:operator` | `neture.co.kr` (+ 세 서브도메인은 **라우트별 가드에 따름** — 아래 정정) | **회수 시 정정(2026-10-15)**: 같은 번들·같은 키라는 사실이 곧 세 서브도메인 권한을 뜻하지는 않는다. `supplier` 화면 가드(`SUPPLIER_HUB_ACCESS_ROLES`)는 `neture:admin` 은 포함하나 **`neture:operator` 는 제외**한다(§2 #2). `funding` 의 `/market-trial/*` 는 **역할 가드 자체가 없어** 역할과 무관하게 열린다(§2 #3). `community` 도 운영자 역할 축이 없다(§2 #4). 즉 세 호스트에서 `neture:operator` 가 여는 것은 역할 효력이 아니라 각 라우트 가드의 결과다 |
 | `kpa:admin` · `kpa:operator` | `pharmacy.neture.co.kr` (+ `kpa-society.co.kr`) | 같은 앱의 두 호스트 |
 | `cosmetics:admin` · `cosmetics:operator` | `retail.neture.co.kr` (+ `k-cosmetics.site`) | 〃 |
 | `lecture:admin` · `lecture:operator` | `study.neture.co.kr` | |
@@ -235,7 +235,7 @@ Community 파티션이자 **운영자 governance(어느 서비스 운영자가 �
 
 | # | 위험 | 왜 |
 |---|---|---|
-| R1 | **`neture:operator` 하나가 4개 호스트를 연다** | `neture.co.kr` + `supplier`·`funding`·`community` 가 같은 키. 공급자 영역 운영자에게 준 권한이 펀딩·커뮤니티 호스트까지 미친다 |
+| R1 | **세 서브도메인에 호스트 단위 권한 축이 없다** | **회수 시 정정(2026-10-15)**: 원문은 "`neture:operator` 하나가 4개 호스트를 연다" 였으나 부정확하다. `supplier` 가드는 `neture:operator` 를 제외하고(§2 #2), `funding` 은 역할 가드가 없어 누구나 열리며(§2 #3), `community` 는 운영자 축이 없다(§2 #4). 실제 위험은 역할 공유가 아니라 **세 호스트가 같은 `neture` 키를 공유해 호스트별로 운영자를 구분할 단위가 없고, `funding` 은 역할 가드가 비어 있다는 것**이다 |
 | R2 | **커뮤니티 중재 권한이 서비스 전체 권한과 같다** | 커뮤니티 단위 역할이 없어 `kpa:*` · `cosmetics:*` 로 대리된다. "자기 커뮤니티만" 이 성립하지 않는다 |
 | R3 | **`kpa-branch:admin` 은 모든 분회를 연다** | `requireBranchScope` 를 통과한다. 분회 경계는 operator 급에만 적용 |
 | R4 | 역할 이름 ≠ 도메인 이름 | `pharmacy.neture.co.kr` 운영자는 `kpa:*`. 이름으로 부여하면 엉뚱한 범위가 열린다 |
