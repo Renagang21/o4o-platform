@@ -13,15 +13,17 @@
  * operator 저작 편집기(OperatorMultilingualContentWritePage)를 store 스코프로 이식.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, ArrowLeft, Send, Globe } from 'lucide-react';
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
 import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/store-ui-core';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreMlcGroup,
+  hasPublishableMlcPage,
   createStoreMlcGroup,
+  updateStoreMlcGroup,
   upsertStoreMlcPage,
   setStoreMlcPageStatus,
   listMyMlcGroups,
@@ -32,6 +34,9 @@ import {
   type StoreMlcPageDetail,
   type StoreMlcTargetKind,
 } from '../../api/multilingualProductContentStore';
+import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
 
 interface PageDraft {
@@ -45,7 +50,7 @@ function draftFromPage(p?: StoreMlcPageDetail): PageDraft {
   return {
     title: p?.title ?? '',
     summary: p?.summary ?? '',
-    html: typeof (p?.content as any)?.html === 'string' ? ((p!.content as any).html as string) : '',
+    html: typeof p?.content?.html === 'string' ? p.content.html : '',
     status: p?.status ?? 'draft',
   };
 }
@@ -55,13 +60,26 @@ function isTargetKind(v: string | undefined): v is StoreMlcTargetKind {
 }
 
 export default function StoreProductMultilingualContentPage() {
+  const scope = useStoreOperationScope();
+  const { targetKind, targetId } = useParams();
+  const [params] = useSearchParams();
+  return <AuthoringSession key={`${scope.key}:${targetKind}:${targetId}:${params.get('groupId') || ''}`} isCurrent={scope.isCurrent} />;
+}
+
+function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
   const { targetKind, targetId } = useParams<{ targetKind?: string; targetId?: string }>();
   const [searchParams] = useSearchParams();
   const productName = searchParams.get('name') || '';
-
+  const requestedGroupId = searchParams.get('groupId');
   const validTarget = isTargetKind(targetKind) && !!targetId;
-
+  const reads = useLatestStoreRequest();
+  const writes = useLatestStoreRequest();
+  const lock = useRef(false);
+  const [retry, setRetry] = useState(0);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [group, setGroup] = useState<StoreMlcGroupDetail | null>(null);
   const [title, setTitle] = useState('');
   const [defaultLocale, setDefaultLocale] = useState<StoreMlcLocale>('ko');
@@ -76,7 +94,7 @@ export default function StoreProductMultilingualContentPage() {
 
   const isNew = !group;
 
-  const hydrate = (g: StoreMlcGroupDetail) => {
+  const hydrate = useCallback((g: StoreMlcGroupDetail) => {
     setGroup(g);
     setTitle(g.title);
     setDefaultLocale(g.defaultLocale);
@@ -86,50 +104,47 @@ export default function StoreProductMultilingualContentPage() {
     }
     setDrafts(next);
     setActiveLocale(g.defaultLocale);
-  };
+  }, []);
 
-  // 진입 시 이 상품에 연결된 default 그룹이 있으면 로드, 없으면 신규 작성 모드.
-  useEffect(() => {
-    if (!validTarget) {
-      setIsLoading(false);
-      setError('잘못된 상품 대상입니다.');
-      return;
-    }
-    let canceled = false;
-    (async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const groups = await listMyMlcGroups({
-          targetKind: targetKind as StoreMlcTargetKind,
-          targetId: targetId!,
-          includeArchived: false,
-        });
-        const existing = groups.find((g) => g.contentKey === 'default') ?? groups[0];
-        if (canceled) return;
-        if (existing) {
-          const full = await getStoreMlcGroup(existing.id);
-          if (canceled) return;
-          hydrate(full);
-        } else {
-          // 신규: 기본 제목을 상품명으로 프리필.
-          setTitle(productName ? `${productName} 다국어 안내` : '');
-        }
-      } catch (e: any) {
-        if (!canceled) setError(e?.message || '콘텐츠를 불러올 수 없습니다');
-      } finally {
-        if (!canceled) setIsLoading(false);
-      }
-    })();
-    return () => {
-      canceled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const verifyGroup = useCallback((value: StoreMlcGroupDetail) => {
+    if (!value?.id || value.targetKind !== targetKind || value.targetId !== targetId || !Array.isArray(value.pages))
+      throw new Error('Invalid product content');
+    return value;
   }, [targetKind, targetId]);
+  useEffect(() => {
+    if (!validTarget) { setIsLoading(false); setError('잘못된 상품 대상입니다.'); return; }
+    const current = reads.begin();
+    void (async () => {
+      setIsLoading(true); setError(null);
+      try {
+        let id = requestedGroupId;
+        if (!id) {
+          const groups = await listMyMlcGroups({ targetKind: targetKind as StoreMlcTargetKind, targetId, includeArchived: false });
+          if (!current() || !isCurrent()) return;
+          id = (groups.find(g => g.contentKey === 'default') ?? groups[0])?.id || null;
+        }
+        if (!current() || !isCurrent()) return;
+        if (id) {
+          const full = verifyGroup(await getStoreMlcGroup(id));
+          if (full.id !== id) throw new Error('Invalid group');
+          if (current() && isCurrent()) hydrate(full);
+        } else if (current() && isCurrent()) setTitle(productName ? `${productName} 다국어 안내` : '');
+      } catch {
+        if (current() && isCurrent()) setError('콘텐츠를 불러오지 못했습니다. 다시 시도해 주세요.');
+      } finally { if (current() && isCurrent()) setIsLoading(false); }
+    })();
+    return reads.cancel;
+  }, [validTarget, requestedGroupId, targetKind, targetId, productName, retry, reads, hydrate, verifyGroup, isCurrent]);
 
   const activeDraft = drafts[activeLocale] ?? draftFromPage();
-  const setActiveDraft = (patch: Partial<PageDraft>) =>
-    setDrafts((prev) => ({ ...prev, [activeLocale]: { ...(prev[activeLocale] ?? draftFromPage()), ...patch } }));
+  const setActiveDraft = (patch: Partial<PageDraft>) => {
+    if (!lock.current && isCurrent()) setDrafts(prev => ({ ...prev, [activeLocale]: { ...(prev[activeLocale] ?? draftFromPage()), ...patch } }));
+  };
+  const busy = isSavingGroup || isSavingPage;
+  const unsupported = !!group?.pages.some(p => p.locale === activeLocale && p.contentFormat !== 'html');
+  const dirty = !!group && (title !== group.title || defaultLocale !== group.defaultLocale || STORE_MLC_LOCALES.some(loc =>
+    JSON.stringify(drafts[loc] ?? draftFromPage()) !== JSON.stringify(draftFromPage(group.pages.find(p => p.locale === loc)))));
+
 
   // WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §14: 외부 LLM 번역 기준 본문 선택 — 메모리의 locale draft 만 사용(새 fetch 없음).
   //   target locale 본문은 currentHtml(참고해 다듬기) · 기준 source = defaultLocale 본문 → 없으면 한국어 본문 → 없으면 없음.
@@ -157,73 +172,60 @@ export default function StoreProductMultilingualContentPage() {
     [drafts],
   );
 
-  const handleSaveGroup = async (): Promise<StoreMlcGroupDetail | null> => {
-    if (!validTarget) return null;
-    if (!title.trim()) {
-      toast.error('콘텐츠 제목을 입력하세요');
-      return null;
-    }
-    setIsSavingGroup(true);
+  const handleSaveGroup = async () => {
+    if (!validTarget || lock.current || !isCurrent()) return;
+    if (!title.trim()) { setSaveError('콘텐츠 제목을 입력하세요.'); return; }
+    const current = writes.begin();
+    lock.current = true; setIsSavingGroup(true); setSaveError(null);
     try {
-      const saved = await createStoreMlcGroup({
-        targetKind: targetKind as StoreMlcTargetKind,
-        targetId: targetId!,
-        title: title.trim(),
-        defaultLocale,
-      });
-      hydrate(saved);
-      toast.success(isNew ? '다국어 콘텐츠가 생성되었습니다 (초안)' : '저장되었습니다');
-      return saved;
-    } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다');
-      return null;
-    } finally {
-      setIsSavingGroup(false);
-    }
+      const saved = verifyGroup(group
+        ? await updateStoreMlcGroup(group.id, { title: title.trim(), defaultLocale })
+        : await createStoreMlcGroup({ targetKind: targetKind as StoreMlcTargetKind, targetId: targetId!, title: title.trim(), defaultLocale }));
+      if (!current() || !isCurrent()) return;
+      // Updating metadata must not replace unsaved text in any language.
+      if (group) { setGroup(saved); setTitle(saved.title); setDefaultLocale(saved.defaultLocale); }
+      else hydrate(saved);
+      toast.success(isNew ? '다국어 콘텐츠가 생성되었습니다 (초안)' : '기본 정보가 저장되었습니다');
+    } catch { if (current() && isCurrent()) setSaveError('기본 정보 저장 결과를 확인하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주세요.'); }
+    finally { lock.current = false; if (current() && isCurrent()) setIsSavingGroup(false); }
   };
 
-  const handleSavePage = async (publish: boolean) => {
-    if (!group) return;
-    const d = activeDraft;
-    if (!d.title.trim()) {
-      toast.error('이 언어의 제목을 입력하세요');
-      return;
-    }
-    setIsSavingPage(true);
+  const persistPage = async (publish: boolean, statusOnly = false) => {
+    // Non-HTML pages keep their original body: block upserts, but allow status-only changes (e.g. unpublish).
+    if (!group || lock.current || (unsupported && !statusOnly) || !isCurrent()) return;
+    if (!statusOnly && !activeDraft.title.trim()) { setSaveError('이 언어의 제목을 입력하세요.'); return; }
+    const locale = activeLocale;
+    const current = writes.begin();
+    lock.current = true; setIsSavingPage(true); setSaveError(null);
     try {
-      const g = await upsertStoreMlcPage(group.id, activeLocale, {
-        title: d.title.trim(),
-        summary: d.summary.trim() || undefined,
-        contentFormat: 'html',
-        content: { html: d.html },
-        status: publish ? 'published' : d.status === 'published' ? 'published' : 'draft',
-      });
-      hydrate(g);
-      setActiveLocale(activeLocale);
-      toast.success(
-        `${STORE_MLC_LOCALE_LABELS[activeLocale]} 페이지가 ${publish ? '발행' : '저장'}되었습니다`,
-      );
-    } catch (e: any) {
-      toast.error(e?.message || '페이지 저장에 실패했습니다');
-    } finally {
-      setIsSavingPage(false);
-    }
+      const saved = verifyGroup(statusOnly
+        ? await setStoreMlcPageStatus(group.id, locale, 'draft')
+        : await upsertStoreMlcPage(group.id, locale, {
+          title: activeDraft.title.trim(), summary: activeDraft.summary.trim(), contentFormat: 'html',
+          content: { html: activeDraft.html }, status: publish || activeDraft.status === 'published' ? 'published' : 'draft',
+        }));
+      if (!current() || !isCurrent()) return;
+      setGroup(saved);
+      // Preserve the metadata form and every other locale's unsaved draft.
+      setDrafts(prev => ({ ...prev, [locale]: statusOnly
+        ? { ...prev[locale], status: saved.pages.find(p => p.locale === locale)?.status ?? 'draft' }
+        : draftFromPage(saved.pages.find(p => p.locale === locale)) }));
+      toast.success(`${STORE_MLC_LOCALE_LABELS[locale]} 페이지가 ${statusOnly ? '초안으로 변경' : publish ? '발행' : '저장'}되었습니다`);
+    } catch { if (current() && isCurrent()) setSaveError('언어별 저장 결과를 확인하지 못했습니다. 선택한 언어와 입력을 유지했습니다. 다시 시도해 주세요.'); }
+    finally { lock.current = false; if (current() && isCurrent()) setIsSavingPage(false); }
   };
 
-  const handleTogglePageStatus = async () => {
-    if (!group) return;
-    const next = activeDraft.status === 'published' ? 'draft' : 'published';
-    setIsSavingPage(true);
-    try {
-      const g = await setStoreMlcPageStatus(group.id, activeLocale, next);
-      hydrate(g);
-      setActiveLocale(activeLocale);
-      toast.success(`상태가 '${next === 'published' ? '발행됨' : '초안'}' 으로 변경되었습니다`);
-    } catch (e: any) {
-      toast.error(e?.message || '상태 변경에 실패했습니다');
-    } finally {
-      setIsSavingPage(false);
-    }
+  const refreshPublication = async () => {
+    // Serialize with editor writes: a save/unpublish that starts during this GET supersedes it, and the
+    // late response must not overwrite the newer result. Skip while a write is already in flight.
+    if (!group || lock.current || !isCurrent()) return;
+    const current = writes.begin();
+    const saved = verifyGroup(await getStoreMlcGroup(group.id));
+    if (!current() || !isCurrent()) return;
+    setGroup(saved);
+    setDrafts(prev => Object.fromEntries(STORE_MLC_LOCALES.map(loc => [loc, {
+      ...(prev[loc] ?? draftFromPage()), status: saved.pages.find(p => p.locale === loc)?.status ?? 'draft',
+    }])));
   };
 
   if (isLoading) {
@@ -238,8 +240,9 @@ export default function StoreProductMultilingualContentPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3 text-slate-500">
         <AlertCircle className="w-8 h-8 text-red-400" />
-        <p className="text-sm">{error}</p>
-        <button onClick={() => navigate('/store/handled-products')} className="text-sm text-blue-600 hover:underline">
+        <p className="text-sm" role="alert">{error}</p>
+        <button onClick={() => setRetry(v => v + 1)} className="min-h-11 underline text-blue-700">다시 시도</button>
+        <button onClick={() => navigate(`${base}/handled-products`)} className="text-sm text-blue-600 hover:underline">
           상품 목록으로 돌아가기
         </button>
       </div>
@@ -247,11 +250,12 @@ export default function StoreProductMultilingualContentPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl p-6">
+    <div className="space-y-6 max-w-4xl p-4 sm:p-6">
+      {saveError && <p role="alert" className="text-sm text-red-700">{saveError}</p>}
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/store/handled-products')} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500" title="상품 목록">
+          <button onClick={() => navigate(`${base}/handled-products`)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-500" title="상품 목록">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
@@ -265,7 +269,7 @@ export default function StoreProductMultilingualContentPage() {
         </div>
         <button
           onClick={handleSaveGroup}
-          disabled={isSavingGroup}
+          disabled={busy}
           className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 disabled:opacity-50"
         >
           {isSavingGroup ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -280,20 +284,22 @@ export default function StoreProductMultilingualContentPage() {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">콘텐츠 제목 <span className="text-red-400">*</span></label>
             <input
               type="text"
+              aria-label="콘텐츠 제목"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="예: 아쿠아셀 오메가-3 안내"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isSavingGroup}
+              disabled={busy}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">기본 언어</label>
             <select
+              aria-label="기본 언어"
               value={defaultLocale}
               onChange={(e) => setDefaultLocale(e.target.value as StoreMlcLocale)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              disabled={isSavingGroup}
+              disabled={busy}
             >
               {STORE_MLC_LOCALES.map((loc) => (
                 <option key={loc} value={loc}>{STORE_MLC_LOCALE_LABELS[loc]}</option>
@@ -303,9 +309,10 @@ export default function StoreProductMultilingualContentPage() {
         </div>
 
         {/* QR / 고객용 링크 — 그룹이 있을 때만. publicKey QR(언어 탭 랜딩). */}
-        {group && <MultilingualPublicActions groupId={group.id} />}
+        {group && <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={busy || dirty} onPublished={refreshPublication} />}
       </div>
 
+      {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주세요.</p>}
       {!group && (
         <div className="flex items-start gap-3 p-4 border rounded-xl text-sm bg-amber-50/70 border-amber-200 text-amber-800">
           <Globe className="w-4 h-4 shrink-0 mt-0.5 opacity-70" />
@@ -333,7 +340,8 @@ export default function StoreProductMultilingualContentPage() {
               return (
                 <button
                   key={loc}
-                  onClick={() => setActiveLocale(loc)}
+                  disabled={busy}
+                  onClick={() => { if (!lock.current) setActiveLocale(loc); }}
                   className={`relative px-3 py-2 text-sm rounded-t-lg ${
                     activeLocale === loc ? 'bg-slate-100 text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-700'
                   }`}
@@ -354,7 +362,7 @@ export default function StoreProductMultilingualContentPage() {
 
           {/* Active locale editor */}
           <div className="p-6 space-y-4">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm text-slate-500">
                 <span className="font-semibold text-slate-700">{STORE_MLC_LOCALE_LABELS[activeLocale]}</span> 페이지
                 <span className={`ml-2 inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${
@@ -363,27 +371,27 @@ export default function StoreProductMultilingualContentPage() {
                   {activeDraft.status === 'published' ? '발행됨' : '초안'}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {activeDraft.status === 'published' && (
                   <button
-                    onClick={handleTogglePageStatus}
-                    disabled={isSavingPage}
+                    onClick={() => void persistPage(false, true)}
+                    disabled={busy}
                     className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     초안으로 내리기
                   </button>
                 )}
                 <button
-                  onClick={() => handleSavePage(false)}
-                  disabled={isSavingPage}
+                  onClick={() => persistPage(false)}
+                  disabled={busy || unsupported}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium hover:bg-slate-200 disabled:opacity-50"
                 >
                   {isSavingPage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                   임시 저장
                 </button>
                 <button
-                  onClick={() => handleSavePage(true)}
-                  disabled={isSavingPage}
+                  onClick={() => persistPage(true)}
+                  disabled={busy || unsupported}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSavingPage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
@@ -396,22 +404,24 @@ export default function StoreProductMultilingualContentPage() {
               <label className="block text-sm font-medium text-slate-700 mb-1.5">제목 <span className="text-red-400">*</span></label>
               <input
                 type="text"
+                aria-label="언어별 제목"
                 value={activeDraft.title}
                 onChange={(e) => setActiveDraft({ title: e.target.value })}
                 placeholder={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 제목`}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isSavingPage}
+                disabled={busy || unsupported}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">요약 <span className="text-xs text-slate-400 font-normal">(선택)</span></label>
               <textarea
+                aria-label="언어별 요약"
                 value={activeDraft.summary}
                 onChange={(e) => setActiveDraft({ summary: e.target.value })}
                 rows={2}
                 placeholder="한 줄 요약"
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                disabled={isSavingPage}
+                disabled={busy || unsupported}
               />
             </div>
             <div>
@@ -419,7 +429,7 @@ export default function StoreProductMultilingualContentPage() {
                 <label className="block text-sm font-medium text-slate-700">본문 (HTML)</label>
                 {/* WO-O4O-STORE-PRODUCTION-EXTERNAL-LLM-REALIGNMENT-V1 §22~§23: 외부 LLM 번역/현지화(task='translate'). 결과는 이 언어 draft.html 에만 반영 —
                     자동 임시저장·발행·QR 생성 없음(기존 버튼을 사용자가 누른다). */}
-                <LlmAssistPanel
+                {!busy && !unsupported && <LlmAssistPanel
                   label={STORE_LLM_ASSIST_LABEL}
                   contextLabel={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 본문 — 기준 본문을 이 언어로 옮기거나 현재 본문을 다듬습니다`}
                   guideText={({ additionalInstruction }) =>
@@ -436,15 +446,16 @@ export default function StoreProductMultilingualContentPage() {
                   }
                   currentHtml={activeDraft.html}
                   onApplyHtml={(html) => setActiveDraft({ html })}
-                />
+                />}
               </div>
+              {unsupported && <p role="status" className="text-sm text-amber-800">이 언어는 HTML 편집을 지원하지 않는 형식입니다. 원본 형식을 유지하며 발행 내용 보기에서 확인해 주세요.</p>}
               <RichTextEditor showInternalAi={false}
-                key={activeLocale}
+                key={`${group.id}:${activeLocale}`}
                 value={activeDraft.html}
                 onChange={(c) => setActiveDraft({ html: c.html })}
                 placeholder={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 본문을 작성하세요`}
                 minHeight="360px"
-                editable={!isSavingPage}
+                editable={!busy && !unsupported}
               />
             </div>
             <p className="text-xs text-slate-400">
