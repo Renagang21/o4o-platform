@@ -49,7 +49,7 @@
 | neture | neture | 대표 /admin, /operator; store의 약국 가입 심사도 기존 Neture 운영 역할 경계 | admin/operator 현재 · 가입 active |
 | kpa | kpa-society | 약국 협력사업 운영 화면. membership/조직별 역할을 서비스 운영자 역할과 구분 | admin/operator 현재 · 가입 active |
 | lecture | lecture | study 호스트 /operator; lecture 역할과 active membership | admin/operator 현재 · 가입 active |
-| kpa-branch | kpa-branch | 분회 서비스 /service-admin; 개별 분회 운영자는 별도 개체 지정 | 현재 지정 역할 없음 · 가입 active |
+| kpa-branch | kpa-branch | 분회 서비스 /service-admin; 개별 분회 운영자는 별도 개체 지정 | 현재 지정 역할 없음 · 가입 active · 새 분회 구축 후 재개(사용자 결정) |
 | supplier | supplier | /admin/supplier-governance, /operator/suppliers | admin 현재 · 가입 active |
 | funding | funding | /operator/market-trial | admin 현재 · 가입 active |
 | community | community | /admin/communities, /operator/communities; 개별 커뮤니티 운영자와 구분 | admin/operator 현재 · 가입 active |
@@ -104,6 +104,7 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 - [x] Core 목록 유효기간 조건 두 곳의 최소 수정 범위 확인·실제 PostgreSQL 회귀.
 - [x] 후속 변경의 API/안전 회귀·CI/review·push·main 통합(PR #600).
 - [ ] 운영 데이터 불일치가 확인되면 before/after 계획을 별도로 검토하고 전체 관리자 지정 경로로 수정.
+- [ ] **보류:** 분회 운영자 지정은 새 분회 서비스를 만든 뒤 역할 계약·실제 원장을 재확인하고 재개(2026-10-15 사용자 결정).
 - [x] main 통합·자동 API verified rollout과 4개 웹 origin의 수정 메뉴 map 제공 확인.
 - [ ] 본인 운영자 Google 로그인 후 실제 운영 메뉴/업무 접근 확인(사용자 담당).
 
@@ -175,13 +176,12 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 
 1. 허용 도메인 반영 후 화면 표시 계정의 기존 job 결과를 확보해 전체 관리자와 서비스 운영자를 대조한다.
    과거 문서의 계정 명칭을 현재 운영자 지정 사실로 사용하지 않는다.
-2. 분회도 동일 대상 계정이 담당해야 한다면 **전체 관리자 직접 지정 경로**에서 그 계정의 userId를
-   선택하고 `serviceKey=kpa-branch`, `role=kpa-branch:admin`만 지정하는 계획이다.
-   before: 현재 역할 없음 / active 가입, after: 현재 역할 1개 / 기존 active 가입 보존.
-   기존 `OperatorAssignmentService.assign` transaction을 쓰며 다른 role·계정 이메일·Google 연결·
-   전체 관리자 권한은 변경하지 않는다. `kpa-branch:operator`나 플랫폼 권한을 새로 부여하지 않는다.
-   현재 승인은 조회와 Core 두 조회 조건 수정이므로 이 실제 권한 부여는 AGENTS.md §5 확인 전 실행하지 않는다.
-   전체 관리자 인증이 필요한 운영 변경이며 계정/권한 수정용 새 우회 경로를 만들지 않는다.
+2. **분회 운영자 지정 보류 — 2026-10-15 사용자 결정.** 분회는 완전히 새로 만들기로 했으므로
+   구축 이후 다시 진행한다. 현재 active 가입만 있고 지정 역할이 없는 상태는 조회 사실로 보존하며
+   지금 고쳐야 할 권한 오류로 취급하지 않는다. 앞서 제안한 `kpa-branch:admin` 추가 계획은 실행하지 않는다.
+   새 분회 구축 완료 후 해당 서비스의 역할·전체 관리자 지정 계약과 현재 원장을 다시 확인하고,
+   그 시점의 승인 범위에 따라 운영자를 지정한다. 이 결정만으로 기존 역할/가입/Google 연결을
+   수정·삭제하거나 분회 재구축을 시작하지 않는다.
 3. API·웹 배포 단계에서는 현재 Delivery/Promote gate와 migration 포함 여부를 확인하고 승인된 범위로
    진행한다. 실제 운영자 Google 로그인은 사용자 담당이며 본 단계의 합성 PC/모바일 회귀를 실제 OAuth
    PASS로 바꾸지 않는다.
