@@ -427,7 +427,8 @@ export class SellerRecruitmentService {
        ORDER BY a.applied_at DESC`,
       [applicantUserId, storeOrganizationId ?? null],
     );
-    return rows.map((a) => ({
+    // 퇴역 서비스 모집에 넣었던 신청은 신청자 이력에도 나오지 않는다
+    return rows.filter((a) => !isRetiredServiceValue(a.service_id)).map((a) => ({
       applicationId: a.id,
       recruitmentId: a.recruitment_id,
       productId: a.product_id,

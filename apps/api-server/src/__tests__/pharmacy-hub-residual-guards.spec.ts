@@ -73,6 +73,14 @@ describe('seller recruitment — 저장된 퇴역 serviceId', () => {
     expect(AppDataSource.query).not.toHaveBeenCalledWith(expect.stringContaining('LEFT JOIN users u'), ['retired']);
   });
 
+  it('신청자 본인 이력에서도 퇴역 서비스 모집 신청은 보이지 않는다', async () => {
+    (AppDataSource.query as jest.Mock).mockResolvedValueOnce([
+      { id: 'a-live', recruitment_id: 'live', status: 'pending', service_id: 'kpa-society', seller_id: 'supplier-user' },
+      { id: 'a-retired', recruitment_id: 'retired', status: 'approved', service_id: 'pharmacy-hub', seller_id: 'supplier-user' },
+    ]);
+    expect((await service.getApplicationsForApplicant('user', 'org-1')).map((a) => a.applicationId)).toEqual(['a-live']);
+  });
+
   it('controller 는 RetiredServiceError 를 410 으로 응답한다', () => {
     for (const path of [
       'modules/neture/controllers/seller-recruitment.controller.ts',
