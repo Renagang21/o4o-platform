@@ -15,7 +15,7 @@
  * 권한 (backend 검증): kpa:store_owner
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
+import { storeScopedFetch } from './storeScopedFetch';
 import { getActiveServicePrefix } from '../lib/serviceContext';
 
 function getApiBase(): string {
@@ -96,18 +96,13 @@ export interface StoreMlcImportInput {
 }
 
 async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
-  const token = getAccessToken();
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-  const json = await res.json();
-  if (!json.success) {
-    throw new Error(json.error?.message || json.error || `Request failed (${res.status})`);
+  const res = await storeScopedFetch(url, options, 'application/json');
+  const json = await res.json().catch(() => null);
+  if (!res.ok || json?.success !== true || json.data == null) {
+    const error = new Error('다국어 콘텐츠 요청을 완료하지 못했습니다. 다시 시도해 주세요.') as Error & { code?: string; status: number };
+    error.status = res.status;
+    error.code = json?.error?.code || json?.code;
+    throw error;
   }
   return json;
 }
@@ -122,6 +117,8 @@ export async function listMlcHub(
   if (params?.search) query.set('search', params.search);
   const qs = query.toString();
   const json = await authFetch(`${getApiBase()}/hub${qs ? `?${qs}` : ''}`);
+  if (!Array.isArray(json.data) || !Number.isSafeInteger(json.meta?.total) || json.meta.total < 0)
+    throw new Error('제공 자료 목록을 확인하지 못했습니다. 다시 시도해 주세요.');
   return { data: json.data, meta: json.meta };
 }
 
@@ -141,6 +138,8 @@ export async function listMyMlcGroups(
   if (params?.includeArchived) query.set('includeArchived', 'true');
   const qs = query.toString();
   const json = await authFetch(`${getApiBase()}${qs ? `?${qs}` : ''}`);
+  if (!Array.isArray(json.data) || json.data.some((g: StoreMlcGroup) => !g?.id || typeof g.title !== 'string' || !g.targetId || !['local', 'listing'].includes(g.targetKind) || !STORE_MLC_LOCALES.includes(g.defaultLocale) || !Array.isArray(g.pages)))
+    throw new Error('내 매장 콘텐츠 목록을 확인하지 못했습니다.');
   return json.data;
 }
 
@@ -179,7 +178,7 @@ export async function getMlcSummaryMap(
 export async function resolveMlc(
   groupId: string,
   locale: StoreMlcLocale,
-): Promise<{ group: StoreMlcGroup; page: any; requestedLocale: StoreMlcLocale | null }> {
+): Promise<{ group: StoreMlcGroup; page: StoreMlcPageDetail & { resolvedLocale: StoreMlcLocale; fallbackReason: string | null }; requestedLocale: StoreMlcLocale | null }> {
   const json = await authFetch(
     `${getApiBase()}/${encodeURIComponent(groupId)}/resolve?locale=${encodeURIComponent(locale)}`,
   );
@@ -233,6 +232,17 @@ export async function createStoreMlcGroup(input: StoreMlcCreateGroupInput): Prom
   const json = await authFetch(`${getApiBase()}`, {
     method: 'POST',
     body: JSON.stringify({ sourceType: 'store_created', ...input }),
+  });
+  return json.data;
+}
+
+/** 기존 그룹은 PATCH로 갱신해 출처·상태·metadata를 보존한다. */
+export async function updateStoreMlcGroup(
+  groupId: string,
+  input: { title: string; defaultLocale: StoreMlcLocale },
+): Promise<StoreMlcGroupDetail> {
+  const json = await authFetch(`${getApiBase()}/${encodeURIComponent(groupId)}`, {
+    method: 'PATCH', body: JSON.stringify(input),
   });
   return json.data;
 }
