@@ -15,7 +15,7 @@
  * endpoint · payload · 권한은 호출부(execute)가 그대로 소유한다 — 계약 변경 없음.
  */
 
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { ConfirmActionDialog } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
 import type { UserData } from './types';
@@ -64,28 +64,38 @@ export function OperatorMemberSoftDeleteFlow({
   errorMessage,
 }: OperatorMemberSoftDeleteFlowProps) {
   const [loading, setLoading] = useState(false);
+  const [failure, setFailure] = useState('');
+  const state = useRef({ mounted: false, writing: false });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, writing: false }; state.current = scope;
+    setLoading(false); setFailure('');
+    return () => { scope.mounted = false; };
+  }, [user.id]);
   const displayName = resolveDisplayName(user);
 
   const handle = async () => {
-    setLoading(true);
+    const scope = state.current;
+    if (!scope.mounted || scope.writing) return;
+    scope.writing = true; setFailure(''); setLoading(true);
     try {
       await execute(user.id);
+      if (!scope.mounted) return;
       toast.success(successMessage);
       onDeleted();
     } catch (err: any) {
-      toast.error(err?.message || errorMessage);
+      if (scope.mounted) { setFailure(err?.response?.data?.error || err?.message || errorMessage); toast.error(err?.response?.data?.error || err?.message || errorMessage); }
     } finally {
-      setLoading(false);
+      scope.writing = false; if (scope.mounted) setLoading(false);
     }
   };
 
   return (
     <ConfirmActionDialog
       open
-      onClose={onClose}
+      onClose={() => { if (!state.current.writing) onClose(); }}
       onConfirm={handle}
       title={title}
-      message={buildMessage(displayName, user)}
+      message={`${buildMessage(displayName, user)}${failure ? `\n${failure}` : ''}`}
       confirmText={confirmText}
       variant="warning"
       loading={loading}
