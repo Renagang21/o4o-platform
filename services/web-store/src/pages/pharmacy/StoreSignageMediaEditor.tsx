@@ -1,4 +1,5 @@
-import { useId } from "react";
+import { videoPreviewUrl } from './signage/videoPreview';
+import { useId, useState } from "react";
 import { BaseDetailDrawer } from "@o4o/ui";
 import { Trash2, Loader2 } from "lucide-react";
 import type {
@@ -27,6 +28,10 @@ export function StoreSignageMediaEditor({
   handleSaveEdit,
 }: Readonly<StoreSignageMediaEditorProps>) {
   const fieldId = useId();
+  const targetKey = target?.kind === 'direct' ? `media:${target.media.id}` : `snapshot:${target?.snapshot.id}`;
+  const [preview, setPreview] = useState<{ target: string; url: string } | null>(null);
+  const previewUrl = videoPreviewUrl(draft.sourceUrl);
+  const close = () => { if (!editSaving) handleCloseEditDrawer(); };
   const editingMedia = target?.kind === "direct" ? target.media : null;
   const editingSnapshot = target?.kind === "snapshot" ? target.snapshot : null;
   const {
@@ -55,11 +60,12 @@ export function StoreSignageMediaEditor({
       type: "url",
     },
   ] as const;
-  const setEditSourceUrl = (value: string) => onChange("sourceUrl", value);
+  const setEditSourceUrl = (value: string) => { if (!editSaving) { setPreview(null); onChange("sourceUrl", value); } };
+  if (!target) return null;
   return (
     <BaseDetailDrawer
       open={!!editingMedia || !!editingSnapshot}
-      onClose={handleCloseEditDrawer}
+      onClose={close}
       title="동영상 편집"
       width={480}
       footer={
@@ -74,7 +80,8 @@ export function StoreSignageMediaEditor({
           </button>
           <div className="flex gap-2">
             <button
-              onClick={handleCloseEditDrawer}
+              onClick={close}
+              disabled={editSaving}
               className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
             >
               취소
@@ -123,6 +130,7 @@ export function StoreSignageMediaEditor({
                 <input
                   id={`${fieldId}-url`}
                   type="url"
+                  disabled={editSaving}
                   value={editSourceUrl}
                   onChange={(e) => setEditSourceUrl(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -133,6 +141,17 @@ export function StoreSignageMediaEditor({
                   플레이리스트에는 변경된 URL이 적용됩니다.
                 </p>
               </div>
+
+              <section aria-label="입력 영상 미리보기" className="space-y-2">
+                <p className="text-xs text-slate-500">미리보기는 입력한 영상만 확인하며 저장하거나 매장 화면에 적용하지 않습니다.</p>
+                <button type="button" disabled={editSaving || !previewUrl} onClick={() => previewUrl && setPreview({ target: targetKey, url: previewUrl })}
+                  className="min-h-11 px-3 border rounded text-sm disabled:opacity-50">입력한 영상 미리보기</button>
+                {!previewUrl && <p className="text-xs text-amber-700">올바른 YouTube 또는 Vimeo 영상 URL을 입력해 주세요.</p>}
+                {preview && preview.target === targetKey && preview.url === previewUrl && <div>
+                  <iframe title="입력한 동영상 미리보기" src={preview.url} className="w-full aspect-video border-0" sandbox="allow-scripts allow-same-origin allow-presentation" allow="fullscreen" />
+                  <button type="button" onClick={() => setPreview(null)} className="min-h-11 underline text-sm">영상 미리보기 닫기</button>
+                </div>}
+              </section>
 
               {/* 읽기 전용 메타 */}
               <div className="flex gap-4 text-[11px]">
@@ -181,6 +200,7 @@ export function StoreSignageMediaEditor({
                         onChange={(event) =>
                           onChange(field.key, event.target.value)
                         }
+                        disabled={editSaving}
                         rows={3}
                         className={className + " resize-none"}
                         placeholder={field.placeholder}
@@ -188,6 +208,7 @@ export function StoreSignageMediaEditor({
                     ) : (
                       <input
                         id={id}
+                        disabled={editSaving}
                         type={field.type}
                         value={draft[field.key]}
                         onChange={(event) =>
