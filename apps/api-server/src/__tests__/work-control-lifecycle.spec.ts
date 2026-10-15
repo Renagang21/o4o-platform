@@ -358,6 +358,13 @@ it('keeps concurrent task keys, node/owner recall, planner roles and plan counte
   expect(aNormal.calls[0].patterns).toEqual([preferred]);
   expect(bNormal.calls).toHaveLength(0);
   const calls = m(executor.issueExperienceRecall).mock.calls;
+  // 업무 키 목록은 Task 소유 원장, 그 업무의 방법 패턴(개인 교정에서 나온다)은 요청자 개인 원장이다(P3 ·
+  // WO-O4O-PERSONAL-ASSISTANT-TASK-UNDERSTANDING-AND-COMPLETION-V1). 조직 Task 여도 개인 교정이 조직 규칙이 되지 않는다.
+  expect(calls.find((c) => c[1].userId === 'actor-a' && c[2].taskKey === null)[1]).toEqual({
+    userId: 'actor-a',
+    deviceId: 'node-a',
+    ownerKey: 'owner-a',
+  });
   expect(calls.find((c) => c[2].taskKey === 'task.alpha')[1]).toEqual({
     userId: 'actor-a',
     deviceId: 'node-a',

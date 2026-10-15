@@ -15,19 +15,13 @@
  */
 
 import { DIRECT_PRODUCT_MANAGER_LABELS, directProductFormTitle } from '../../config/productTerminology';
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo, useRef, useId, isValidElement, cloneElement } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { X, Loader2, AlertTriangle, ImagePlus, FileDown } from 'lucide-react';
 // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1:
 //   대표 이미지 파일 업로드(공용 미디어 라이브러리) + 내 매장 콘텐츠 본문 가져오기(복사)
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import StoreContentImportModal from '../../components/store/StoreContentImportModal';
-import {
-  fetchLocalProducts,
-  createLocalProduct,
-  updateLocalProduct,
-  deleteLocalProduct,
-} from '../../api/localProducts';
 import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/localProducts';
 // WO-KPA-STORE-LOCAL-PRODUCT-RICHTEXT-INTEGRATION-V1: AI 정리 기능 활성화
 import { RichTextEditor, LlmAssistPanel } from '@o4o/content-editor';
@@ -48,8 +42,23 @@ import { MultilingualPublicActions } from '../../components/MultilingualPublicAc
 
 // ==================== Component ====================
 
+import { StoreProductDialog, useStoreProductScope, useStoreProductSession } from '../../components/store/StoreProductSession';
+import { createLocalProductAdapter } from './productRegistration/localProductAdapter';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+
 export default function StoreLocalProductsPage() {
+  const scope = useStoreProductScope();
+  if (!scope.ready) return <p role="status">매장을 선택해 주세요.</p>;
+  return <LocalProductsWorkspace key={scope.key} organizationId={scope.organizationId!} />;
+}
+function LocalProductsWorkspace({ organizationId }: { organizationId: string }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const base = storeWorkspaceBase(pathname);
+  const current = useStoreProductSession(organizationId);
+  const [busy, setBusy] = useState(false);
+  const [summaryError, setSummaryError] = useState(false);
+  const [retrySummary, setRetrySummary] = useState(0);
 
   // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 상품별 다국어 콘텐츠 연결 요약
   const [mlcSummary, setMlcSummary] = useState<Map<string, StoreMlcSummaryItem>>(new Map());
@@ -58,15 +67,12 @@ export default function StoreLocalProductsPage() {
   useEffect(() => {
     let cancelled = false;
     getMlcSummaryMap('local')
-      .then((map) => { if (!cancelled) setMlcSummary(map); })
-      .catch(() => { /* 배지는 보조 정보 — 실패해도 목록 동작에 영향 없음 */ });
+      .then((map) => { if (!cancelled && current()) { setMlcSummary(map); setSummaryError(false); } })
+      .catch(() => { if (!cancelled && current()) setSummaryError(true); });
     return () => { cancelled = true; };
-  }, []);
+  }, [current, retrySummary]);
 
-  const api = useMemo(
-    () => ({ fetchLocalProducts, createLocalProduct, updateLocalProduct, deleteLocalProduct }),
-    [],
-  );
+  const api = useMemo(() => createLocalProductAdapter(current, setBusy), [current]);
 
   // KPA 고유 컬럼 — 다국어 콘텐츠 연결 상태
   const extraColumns = useMemo<Array<StoreLocalProductsExtraColumn<LocalProduct>>>(
@@ -82,7 +88,12 @@ export default function StoreLocalProductsPage() {
   );
 
   return (
+    <>
+    {summaryError && <div role="alert" className="mb-3 rounded bg-amber-50 p-3 text-sm">다국어 연결 상태를 확인하지 못했습니다. <button onClick={() => setRetrySummary(v => v + 1)}>연결 상태 다시 조회</button></div>}
+    <fieldset disabled={busy} className="min-w-0 border-0 p-0 [&>div>div:first-child]:flex-wrap [&>div>div:first-child]:gap-3 [&_table]:min-w-[720px] [&_.overflow-x-auto]:outline-offset-2" style={{ margin: 0 }}>
     <StoreLocalProductsManager<LocalProduct, LocalProductInput>
+      actions={{ onTabletDisplays: () => navigate(`${base}/commerce/tablet-displays`),
+        onMarketingAssets: product => navigate(`${base}/commerce/products/${product.id}/marketing`) }}
       api={api}
       labels={{
         ...DIRECT_PRODUCT_MANAGER_LABELS,
@@ -99,16 +110,19 @@ export default function StoreLocalProductsPage() {
       extraColumns={extraColumns}
       renderFormModal={({ product, saving, error, onSave, onClose }) => (
         <ProductFormModal
+          key={product?.id ?? 'new'}
           product={product}
           saving={saving}
           error={error}
           mlcSummary={product ? mlcSummary.get(product.id) : undefined}
-          onNavigateHub={() => navigate('/store/library/multilingual-product-contents')}
+          onNavigateHub={() => navigate(`${base}/library/multilingual-product-contents`)}
           onSave={onSave}
           onClose={onClose}
         />
       )}
     />
+    </fieldset>
+    </>
   );
 }
 
@@ -131,6 +145,9 @@ function ProductFormModal({
   onSave: (data: LocalProductInput) => void;
   onClose: () => void;
 }) {
+  const submitLock = useRef(false);
+  useEffect(() => { if (!saving) submitLock.current = false; }, [saving]);
+  const closeForm = () => { if (!saving && !submitLock.current) onClose(); };
   const [name, setName] = useState(product?.name || '');
   const [barcode, setBarcode] = useState(product?.barcode || '');
   const [category, setCategory] = useState(product?.category || '');
@@ -157,6 +174,7 @@ function ProductFormModal({
 
   // 콘텐츠 본문 가져오기 — 비어 있으면 즉시 삽입, 내용이 있으면 처리 방식 선택
   const handleContentImport = (html: string) => {
+    if (saving || submitLock.current) return;
     setShowContentImport(false);
     if (descIsEmpty) {
       setDescription(html);
@@ -167,6 +185,7 @@ function ProductFormModal({
   };
 
   const applyImport = (mode: 'replace' | 'append') => {
+    if (saving || submitLock.current) return;
     if (pendingImportHtml == null) return;
     setDescription((prev) => (mode === 'replace' ? pendingImportHtml : `${prev}\n${pendingImportHtml}`));
     setEditorKey((k) => k + 1);
@@ -175,26 +194,27 @@ function ProductFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (submitLock.current || saving || !name.trim()) return;
+    submitLock.current = true;
 
     const data: LocalProductInput = {
       name: name.trim(),
     };
 
-    if (category.trim()) data.category = category.trim();
+    data.category = category.trim();
     // 바코드/대표 이미지는 항상 전송 — 수정 시 비우면(삭제) null 로 정규화되도록
     data.barcode = barcode.trim();
     data.thumbnailUrl = thumbnailUrl.trim();
     // RichTextEditor returns HTML — strip tags to detect genuinely empty content
     const descText = description.replace(/<[^>]*>/g, '').trim();
-    if (descText) data.description = description;
-    if (summary.trim()) data.summary = summary.trim();
-    if (priceDisplay.trim()) data.priceDisplay = priceDisplay.trim();
+    data.description = descText || /<(img|video|audio|iframe)\b/i.test(description) ? description : '';
+    data.summary = summary.trim();
+    data.priceDisplay = priceDisplay.trim();
     const gallery = galleryImages
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean);
-    if (gallery.length > 0) data.galleryImages = gallery;
+    data.galleryImages = gallery;
     data.badgeType = badgeType;
     data.highlightFlag = highlightFlag;
     data.sortOrder = Number(sortOrder) || 0;
@@ -203,20 +223,26 @@ function ProductFormModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4">
+    <StoreProductDialog label={directProductFormTitle(Boolean(product))} style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,.5)' }} preventBackdropClose={saving} onClose={() => {
+      if (showMediaPicker) setShowMediaPicker(false);
+      else if (showContentImport) setShowContentImport(false);
+      else if (pendingImportHtml != null) setPendingImportHtml(null);
+      else closeForm();
+    }}>
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-slate-900">
             {directProductFormTitle(Boolean(product))}
           </h2>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
+          <button aria-label="제품 편집 닫기" onClick={closeForm} disabled={saving} className="p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <form id="direct-product-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          <fieldset disabled={saving} className="min-w-0 space-y-4 border-0 p-0 m-0">
           {/* WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 연결된 다국어 콘텐츠 상세 */}
           {product && (
             mlcSummary ? (
@@ -306,6 +332,8 @@ function ProductFormModal({
             <Field label="상품명" required>
               <input
                 type="text"
+                aria-label="제품명"
+                data-request-autofocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="상품명을 입력하세요"
@@ -361,6 +389,7 @@ function ProductFormModal({
                   }
                   currentHtml={description}
                   onApplyHtml={(html) => {
+                    if (saving || submitLock.current) return;
                     // 콘텐츠 가져오기와 동일하게 재마운트로 확실히 반영. 저장은 기존 폼 저장 버튼.
                     setDescription(html);
                     setEditorKey((k) => k + 1);
@@ -376,10 +405,10 @@ function ProductFormModal({
                 </button>
               </div>
             </div>
-            <RichTextEditor showInternalAi={false}
+            <RichTextEditor editable={!saving} showInternalAi={false}
               key={editorKey}
               value={description}
-              onChange={({ html }) => setDescription(html)}
+              onChange={({ html }) => { if (!saving && !submitLock.current) setDescription(html); }}
               preset="full"
               minHeight="200px"
               placeholder="상품 상세 설명을 직접 작성하거나 외부에서 작성한 내용을 붙여넣으세요..."
@@ -465,19 +494,22 @@ function ProductFormModal({
               {error}
             </div>
           )}
+          </fieldset>
         </form>
 
         {/* Footer */}
         <div className="px-6 py-3 border-t flex justify-end gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={closeForm}
+            disabled={saving}
             className="px-4 py-2 text-sm text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
           >
             취소
           </button>
           <button
-            onClick={handleSubmit as any}
+            type="submit"
+            form="direct-product-form"
             disabled={saving || !name.trim()}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -491,7 +523,7 @@ function ProductFormModal({
       <MediaPickerModal
         open={showMediaPicker}
         onClose={() => setShowMediaPicker(false)}
-        onSelect={(asset) => setThumbnailUrl(asset.url)}
+        onSelect={(asset) => { if (!saving) setThumbnailUrl(asset.url); setShowMediaPicker(false); }}
         title="제품 대표 이미지"
         defaultFolder="product-thumbnail"
       />
@@ -537,7 +569,7 @@ function ProductFormModal({
           </div>
         </div>
       )}
-    </div>
+    </StoreProductDialog>
   );
 }
 
@@ -552,13 +584,15 @@ function Field({
   required?: boolean;
   children: React.ReactNode;
 }) {
+  const id = useId();
+  const control = isValidElement(children) && typeof children.type === 'string' && ['input', 'select', 'textarea'].includes(children.type);
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-700 mb-1">
+      <label htmlFor={control ? id : undefined} className="block text-sm font-medium text-slate-700 mb-1">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
-      {children}
+      {control ? cloneElement(children as React.ReactElement<{ id?: string }>, { id }) : children}
     </div>
   );
 }

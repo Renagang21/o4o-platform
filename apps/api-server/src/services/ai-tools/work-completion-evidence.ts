@@ -18,8 +18,11 @@ import {
   type WorkStepRecord,
 } from './work-agent-contract.js';
 
-/** 완료 근거 대조용으로 기억하는 화면 글 묶음 수(읽기 결과 · 관찰 요소). 메모리 전용. */
-export const SEEN_TEXT_MAX = 40;
+/**
+ * 완료 근거 대조용으로 기억하는 화면 글 수(읽기 결과 · 관찰 요소 하나하나). 메모리 전용.
+ * 요소는 따로 남기므로 관찰 한 번(DOM 80 · UIA 150 요소 상한)이 읽기 결과를 밀어내지 않을 만큼 둔다. 같은 글은 한 번만.
+ */
+export const SEEN_TEXT_MAX = 600;
 
 export function createCompletionEvidenceSession() {
   const seenTexts: string[] = [];
@@ -31,10 +34,15 @@ export function createCompletionEvidenceSession() {
   const noteSeen = (text: string | null | undefined): void => {
     const t = normalizeEvidenceText(String(text ?? ''));
     if (!t) return;
+    const previous = seenTexts.indexOf(t);
+    if (previous >= 0) seenTexts.splice(previous, 1);
     seenTexts.push(t);
     if (seenTexts.length > SEEN_TEXT_MAX) seenTexts.shift();
   };
-  /** 요소 글 — 입력 · 선택 칸의 현재 값은 근거가 아니다(elementEvidenceText). */
+  /**
+   * 요소 글 — 입력 · 선택 칸의 현재 값은 근거가 아니다(elementEvidenceText).
+   * 요소마다 따로 남긴다: 합친 뒤 공백을 지우면 인접 요소("결제" · "완료")가 실제로 보이지 않은 한 문구("결제완료")처럼 대조된다.
+   */
   const noteElements = (elements: readonly WorkElement[]): void => {
     for (const element of elements) noteSeen(elementEvidenceText(element));
   };

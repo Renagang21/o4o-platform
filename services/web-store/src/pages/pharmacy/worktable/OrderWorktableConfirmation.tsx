@@ -1,4 +1,4 @@
-import { useNativeStoreDialog } from '../hooks/useNativeStoreDialog';
+import { useNativeStoreDialog } from '../../../hooks/useNativeStoreDialog';
 import { Loader2 } from "lucide-react";
 import type { WorktableConfirmation } from "../hooks/useOrderWorktable";
 
