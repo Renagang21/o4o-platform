@@ -17,7 +17,20 @@ import {
   ADMIN_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ONLY_ROLES,
+  canSeeSubdomainOperatorPath,
 } from '../lib/role-constants';
+import { CURRENT_HOST_PROFILE, type HostProfile } from '../lib/hostProfile';
+
+/** Existing service-owned routes; role/membership checks remain with their route policy. */
+const OPERATOR_ENTRIES: Record<HostProfile, { admin?: string; operator: string }> = {
+  main: { admin: '/admin', operator: '/operator' },
+  supplier: { admin: '/admin/supplier-governance', operator: '/operator/suppliers' },
+  funding: { operator: '/operator/market-trial' },
+  community: { admin: '/admin/communities', operator: '/operator/communities' },
+  // This community landing has no separately designated service-operator role.
+  // Preserve its existing representative-site entry contract in this scoped repair.
+  carepharm: { admin: '/admin', operator: '/operator' },
+};
 
 export interface NetureUserRoles {
   isAdmin: boolean;
@@ -29,9 +42,13 @@ export interface NetureUserRoles {
 export function useNetureUserRoles(user: any, isAuthenticated: boolean): NetureUserRoles {
   const roles: string[] = (isAuthenticated && user?.roles) || [];
   const has = (set: string[]) => roles.some((r) => set.includes(r));
+  const entries = OPERATOR_ENTRIES[CURRENT_HOST_PROFILE];
+  const representativeRoles = CURRENT_HOST_PROFILE === 'main' || CURRENT_HOST_PROFILE === 'carepharm';
+  const canEnter = (path: string | undefined) =>
+    !!path && isAuthenticated && canSeeSubdomainOperatorPath(user, path);
   return {
-    isAdmin: has(ADMIN_ROLES),
-    isOperator: has(OPERATOR_OR_ABOVE_ROLES),
+    isAdmin: representativeRoles ? has(ADMIN_ROLES) : canEnter(entries.admin),
+    isOperator: representativeRoles ? has(OPERATOR_OR_ABOVE_ROLES) : canEnter(entries.operator),
     isSupplier: has(SUPPLIER_ONLY_ROLES),
   };
 }
@@ -62,15 +79,16 @@ export function NetureUserMenuItems({
   onItemClick?: () => void;
 }) {
   const { isAdmin, isOperator, isSupplier } = useNetureUserRoles(user, isAuthenticated);
+  const entries = OPERATOR_ENTRIES[CURRENT_HOST_PROFILE];
   return (
     <>
-      {isAdmin && (
-        <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
+      {isAdmin && entries.admin && (
+        <GlobalHeaderMenuItem to={entries.admin} icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
           관리자 대시보드
         </GlobalHeaderMenuItem>
       )}
       {isOperator && (
-        <GlobalHeaderMenuItem to="/operator" icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
+        <GlobalHeaderMenuItem to={entries.operator} icon={<Shield className="w-4 h-4" />} onClick={onItemClick}>
           운영 대시보드
         </GlobalHeaderMenuItem>
       )}
