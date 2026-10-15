@@ -1,4 +1,4 @@
-import { useNativeStoreDialog } from '../hooks/useNativeStoreDialog';
+import { useNativeStoreDialog } from '../../../hooks/useNativeStoreDialog';
 import { type CSSProperties, type ReactNode } from 'react';
 
 export function LibraryDialog({ label, onClose, children, style }: Readonly<{

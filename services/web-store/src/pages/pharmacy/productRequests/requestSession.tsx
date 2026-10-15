@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { useNativeStoreDialog } from '../hooks/useNativeStoreDialog';
+import { useNativeStoreDialog } from '../../../hooks/useNativeStoreDialog';
 import { useUnifiedStore } from '../../../contexts/StoreContext';
 import { getActiveStoreOrganizationId } from '../../../lib/storeOrganizationHeader';
 
