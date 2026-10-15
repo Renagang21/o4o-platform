@@ -4,9 +4,8 @@
  * WO-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1
  * 선행 감사: IR-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CANONICALIZATION-AUDIT-V1 (판정 B)
  *
- * KPA / K-Cosmetics 의 회원 콘텐츠·자료실 backend 는 서로 다른 물리 테이블
- * (`kpa_contents` / `cosmetics_contents`)을 쓰지만 handler 로직은
- * 사실상 동일하다.
+ * 회원 콘텐츠·자료실 backend 의 공통 handler 로직. 서비스마다 물리 테이블
+ * (현재 `kpa_contents`)이 다르므로 테이블은 config 로 주입한다.
  *
  * 본 Core 는 그 공통 로직만 갖고, 서비스 정책은 일절 알지 않는다.
  * 서비스는 {@link ContentResourceConfig} 를 주입한다.
@@ -129,9 +128,9 @@ export interface ListVisibilityDecision {
 export interface ContentResourceConfig {
   /** 물리 테이블명. **기본값 없음 — 반드시 주입** (WO §4-A) */
   tableName: string;
-  /** console.error 접두어 (예: 'K-Cosmetics') */
+  /** console.error 접두어 (예: 'KPA') */
   logPrefix: string;
-  /** operator/admin 판정에 쓰는 role 목록 (예: ['cosmetics:operator', ...]) */
+  /** operator/admin 판정에 쓰는 role 목록 (예: ['kpa:operator', ...]) */
   operatorRoles: string[];
   /** 목록 SELECT 컬럼 — 서비스별 응답 필드가 달라 그대로 보존한다 */
   listColumns: string;
@@ -160,11 +159,11 @@ export interface ContentResourceConfig {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 공통 유틸 (3서비스 동일 로직)
+// 공통 유틸
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * K-Cosmetics 기존 동작과 동일한 기본 가시성 규칙.
+ * 기본 가시성 규칙.
  *
  *   my=true + 로그인 → 내 것만
  *   비로그인          → 공개만
@@ -502,204 +501,4 @@ export function createContentResourceCore(
   }
 
   return { isOperatorOrAdmin, list, detail, remove, incrementView, operatorList, operatorUpdateStatus, operatorRemove };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// K-Cosmetics 전용 write handler (G3 create · G4 update)
-//
-// KPA 는 `content_type` 컬럼(NOT NULL)을 갖고 KPA 전용 검증이 붙어 감사에서
-// DATA_MODEL_DIFFERENT 로 판정됐다 → KPA 는 이 factory 를 쓰지 않고 자기 구현을 유지한다.
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function createMemberWriteHandlers(dataSource: DataSource, config: ContentResourceConfig) {
-  const table = assertSafeTableName(config.tableName);
-  const prefix = config.logPrefix;
-  const isOperatorOrAdmin = (user: any): boolean =>
-    Array.isArray(user?.roles) && user.roles.some((r: string) => config.operatorRoles.includes(r));
-
-  async function create(req: Request, res: Response): Promise<void> {
-    try {
-      const user = (req as any).user;
-      const {
-        title, summary, body, tags, category, thumbnail_url,
-        source_type = 'manual', source_url, source_file_name,
-        sub_type: subType, usage_type: reqUsageType,
-        status: reqStatus, reusable_policy: reqReusablePolicy,
-      } = req.body;
-
-      if (!title?.trim()) {
-        fail(res, 400, 'VALIDATION_ERROR', 'title은 필수입니다');
-        return;
-      }
-
-      const sanitizedTags = sanitizeContentTags(tags);
-      if (sanitizedTags.length === 0) {
-        fail(res, 400, 'VALIDATION_ERROR', '태그를 1개 이상 입력해주세요');
-        return;
-      }
-
-      const status = (VALID_STATUSES as readonly string[]).includes(reqStatus) ? reqStatus : 'draft';
-      const usageType = deriveUsageType(reqUsageType, source_type);
-      if (usageType === 'COPY' && !(typeof body === 'string' && body.trim().length > 0)) {
-        fail(res, 400, 'VALIDATION_ERROR', 'COPY 타입은 본문(body)이 필요합니다');
-        return;
-      }
-      const reusablePolicy = (VALID_REUSABLE_POLICIES as readonly string[]).includes(reqReusablePolicy)
-        ? reqReusablePolicy
-        : 'platform';
-      const authorName = user?.name || user?.email || null;
-
-      const [inserted] = await dataSource.query(
-        `INSERT INTO ${table}
-           (title, summary, body, tags, category, thumbnail_url, sub_type,
-            source_type, source_url, source_file_name, usage_type, status,
-            created_by, updated_by, author_name, reusable_policy)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$13,$14,$15)
-         RETURNING *`,
-        [
-          title.trim(), summary || null, body || null, JSON.stringify(sanitizedTags),
-          category || null, thumbnail_url || null, subType || null, source_type,
-          source_url || null, source_file_name || null, usageType, status,
-          user?.id || null, authorName, reusablePolicy,
-        ],
-      );
-
-      res.status(201).json({ success: true, data: inserted });
-    } catch (err) {
-      internalError(res, prefix, 'POST /contents', err, '등록 중 오류가 발생했습니다');
-    }
-  }
-
-  async function update(req: Request, res: Response): Promise<void> {
-    try {
-      const user = (req as any).user;
-      const [existing] = await dataSource.query(
-        `SELECT * FROM ${table} WHERE id = $1 AND is_deleted = false LIMIT 1`,
-        [req.params.id],
-      );
-      if (!existing) {
-        fail(res, 404, 'NOT_FOUND', '콘텐츠를 찾을 수 없습니다');
-        return;
-      }
-      if (existing.created_by !== user?.id && !isOperatorOrAdmin(user)) {
-        fail(res, 403, 'FORBIDDEN', '수정 권한이 없습니다');
-        return;
-      }
-
-      const {
-        title, summary, body, tags, category, thumbnail_url,
-        source_type, source_url, source_file_name,
-        sub_type: subType, usage_type: reqUsageType,
-        status: reqStatus, reusable_policy: reqReusablePolicy,
-      } = req.body;
-
-      const sets: string[] = ['updated_at = NOW()'];
-      const params: any[] = [];
-      let idx = 1;
-
-      if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title.trim()); }
-      if (summary !== undefined) { sets.push(`summary = $${idx++}`); params.push(summary || null); }
-      if (body !== undefined) { sets.push(`body = $${idx++}`); params.push(body || null); }
-      if (tags !== undefined) {
-        const sanitized = sanitizeContentTags(tags);
-        if (sanitized.length === 0) {
-          fail(res, 400, 'VALIDATION_ERROR', '태그를 1개 이상 입력해주세요');
-          return;
-        }
-        sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitized));
-      }
-      if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
-      if (thumbnail_url !== undefined) { sets.push(`thumbnail_url = $${idx++}`); params.push(thumbnail_url || null); }
-      if (source_type !== undefined) { sets.push(`source_type = $${idx++}`); params.push(source_type); }
-      if (source_url !== undefined) { sets.push(`source_url = $${idx++}`); params.push(source_url || null); }
-      if (source_file_name !== undefined) { sets.push(`source_file_name = $${idx++}`); params.push(source_file_name || null); }
-      if (subType !== undefined) { sets.push(`sub_type = $${idx++}`); params.push(subType || null); }
-      if (reqUsageType !== undefined) {
-        sets.push(`usage_type = $${idx++}`);
-        params.push((VALID_USAGE_TYPES as readonly string[]).includes(reqUsageType) ? reqUsageType : existing.usage_type);
-      }
-      if (reqStatus !== undefined) {
-        sets.push(`status = $${idx++}`);
-        params.push((VALID_STATUSES as readonly string[]).includes(reqStatus) ? reqStatus : existing.status);
-      }
-      if (reqReusablePolicy !== undefined) {
-        sets.push(`reusable_policy = $${idx++}`);
-        params.push(
-          (VALID_REUSABLE_POLICIES as readonly string[]).includes(reqReusablePolicy)
-            ? reqReusablePolicy
-            : existing.reusable_policy,
-        );
-      }
-      sets.push(`updated_by = $${idx++}`); params.push(user?.id || null);
-
-      params.push(existing.id);
-      const [updated] = await dataSource.query(
-        `UPDATE ${table} SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
-        params,
-      );
-      res.json({ success: true, data: updated });
-    } catch (err) {
-      internalError(res, prefix, 'PATCH /contents/:id', err, '수정 중 오류가 발생했습니다');
-    }
-  }
-
-  return { create, update };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 운영자 자료 직접 등록 (G12) — K-Cosmetics 전용
-//
-// 감사에서 UNIQUE 판정. KPA 에는 의도적으로 없으므로 KPA 로 확산시키지 않는다.
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function createOperatorResourceCreateHandler(dataSource: DataSource, config: ContentResourceConfig) {
-  const table = assertSafeTableName(config.tableName);
-  const prefix = config.logPrefix;
-
-  return async function operatorCreate(req: Request, res: Response): Promise<void> {
-    try {
-      const user = (req as any).user;
-      const {
-        title, summary, blocks, tags, category, thumbnail_url,
-        source_type = 'manual', source_url, source_file_name,
-        usage_type: reqUsageType, status: reqStatus, reusable_policy: reqReusablePolicy,
-      } = req.body;
-
-      if (!title?.trim()) {
-        fail(res, 400, 'VALIDATION_ERROR', 'title은 필수입니다');
-        return;
-      }
-
-      // 운영자 등록은 태그 길이 제한 없이 중복만 제거한다 (기존 동작 보존).
-      const sanitizedTags = Array.isArray(tags)
-        ? [...new Set<string>(tags.map((v: any) => String(v).trim().replace(/^#/, '')).filter(Boolean))]
-        : [];
-
-      const status = (VALID_STATUSES as readonly string[]).includes(reqStatus) ? reqStatus : 'draft';
-      const usageType = deriveUsageType(reqUsageType, source_type);
-      const reusablePolicy = (VALID_REUSABLE_POLICIES as readonly string[]).includes(reqReusablePolicy)
-        ? reqReusablePolicy
-        : 'platform';
-      const authorName = user?.name || user?.email || null;
-
-      const [inserted] = await dataSource.query(
-        `INSERT INTO ${table}
-           (title, summary, blocks, tags, category, thumbnail_url, sub_type,
-            source_type, source_url, source_file_name, usage_type, status,
-            created_by, updated_by, author_name, reusable_policy)
-         VALUES ($1,$2,$3,$4,$5,$6,'resource',$7,$8,$9,$10,$11,$12,$12,$13,$14)
-         RETURNING *`,
-        [
-          title.trim(), summary || null, JSON.stringify(Array.isArray(blocks) ? blocks : []),
-          JSON.stringify(sanitizedTags), category || null, thumbnail_url || null,
-          source_type, source_url || null, source_file_name || null, usageType, status,
-          user?.id || null, authorName, reusablePolicy,
-        ],
-      );
-
-      res.status(201).json({ success: true, data: inserted });
-    } catch (err) {
-      internalError(res, prefix, 'POST /operator/resources', err, '등록 중 오류가 발생했습니다');
-    }
-  };
 }

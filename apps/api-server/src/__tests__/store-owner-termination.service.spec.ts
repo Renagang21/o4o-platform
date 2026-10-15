@@ -73,7 +73,7 @@ describe('StoreOwnerTerminationService', () => {
     const ds=fakeDs((sql)=>{
       queries.push(sql);
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'terminated',
+        id:'1', service_key:'kpa-society', organization_id:'2', user_id:'3', status:'terminated',
         requested_at:due, requested_by:null, return_requested:false, return_completed_at:null,
         termination_effective_at:due, purge_due_at:due, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:due, updated_at:due,
@@ -97,7 +97,7 @@ describe('StoreOwnerTerminationService', () => {
     const now=new Date('2026-09-18T00:00:00Z');
     const ds=fakeDs((sql)=>{
       if (sql.includes('FROM store_owner_termination_cases WHERE id=')) return [{
-        id:'1', service_key:'k-cosmetics', organization_id:'2', user_id:'3', status:'return_pending',
+        id:'1', service_key:'kpa-society', organization_id:'2', user_id:'3', status:'return_pending',
         requested_at:now, requested_by:null, return_requested:true, return_completed_at:null,
         termination_effective_at:now, purge_due_at:null, purge_completed_at:null, cancelled_at:null,
         failure_reason:null, created_at:now, updated_at:now,

@@ -17,7 +17,6 @@ interface FakeDb {
   roles: Row[];
   kpaMembers: Row[];
   users: Row[];
-  cosmeticsMembers: Row[];
 }
 
 let db: FakeDb;
@@ -122,7 +121,7 @@ function runQuery(sql: string, params: any[] = []): any {
     return driverShape(s, [{ id: row.id }]);
   }
 
-  // ---- users / kpa_members / cosmetics_members ----
+  // ---- users / kpa_members ----
   if (has(s, 'UPDATE users')) return driverShape(s, []);
   if (has(s, 'UPDATE kpa_members')) {
     const userId = params[0];
@@ -143,10 +142,6 @@ function runQuery(sql: string, params: any[] = []): any {
   }
   if (has(s, 'INSERT INTO kpa_members')) {
     db.kpaMembers.push({ user_id: params[0], status: 'active' });
-    return driverShape(s, []);
-  }
-  if (has(s, 'INSERT INTO cosmetics_members')) {
-    db.cosmeticsMembers.push({ user_id: params[0], status: 'active' });
     return driverShape(s, []);
   }
 
@@ -207,7 +202,6 @@ beforeEach(() => {
     kpaMembers: [{ user_id: 'u1', status: 'active' }],
     // 현역 서비스 승인/반려 격리 fixture; 퇴역 K-Cosmetics는 별도 거절·회수 테스트로 검증
     users: [{ id: 'u1', status: 'pending', businessInfo: COMPLETE_BUSINESS_INFO }],
-    cosmeticsMembers: [],
   };
   jest.clearAllMocks();
 });

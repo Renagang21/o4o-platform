@@ -92,9 +92,8 @@ export function PlatformRoutes() {
     //       것처럼 읽히는데, `checkout_orders` 는 **공급자→매장 B2B 주문 축**이다
     //       (CLAUDE.md Priority Chain 3 · 3-A). 단일 서비스 운영 현황은 해당 서비스
     //       operator 영역이 적절하며, K-Cosmetics operator 에 이미 `매장 관리`·`주문 현황`이 있다.
-    //       ⚠ 백엔드(`/api/v1/admin/store-network` · `/api/v1/admin/physical-stores`),
-    //         `physical_stores`·`physical_store_links` 테이블, `checkout_orders` 는
-    //         **삭제하지 않았다** — 소비처·데이터 관계 조사 후 별도 판정.
+    //       백엔드(`/api/v1/admin/store-network` · `/api/v1/admin/physical-stores`)는
+    //       K-Cosmetics 완전 퇴역(IR-O4O-FOUR-RETIRED-SERVICES-FULL-RETIREMENT-CENSUS-V1)에서 제거됐다.
     //
     //   [2] `/monitoring` · `/monitoring/performance` · `/monitoring/security` (+ pages/monitoring)
     //       `/api/v1/monitoring/*` 는 `register-routes.ts` 에 마운트된 적이 없다 →

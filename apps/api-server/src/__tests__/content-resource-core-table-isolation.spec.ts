@@ -63,15 +63,13 @@ function touchedTables(queries: string[]): string[] {
 }
 
 /**
- * 두 번째 테이블 fixture — K-Cosmetics 의 `/api/v1/cosmetics/contents|resources` 소비처가
- * WO-O4O-KCOSMETICS-RETIREMENT-PHASE1B-STORE-API-ADMIN-V1 에서 제거돼 운영 config 가 사라졌다. Core 의 cross-table 격리는
- * 소비처가 하나여도 계약이므로, 제거 직전 운영 config 를 그대로 옮긴 fixture 로 계속 검증한다.
- * (테이블 `cosmetics_contents` 는 DB 에 보존 — 이 fixture 는 SQL 을 실행하지 않는다.)
+ * 두 번째 테이블 fixture — 운영 소비처는 KPA 하나뿐이지만 Core 의 cross-table 격리는 계약이므로
+ * 가상의 두 번째 테이블 config 로 계속 검증한다. 이 fixture 는 SQL 을 실행하지 않는다.
  */
-const COSMETICS_CONTENT_CONFIG: ContentResourceConfig = {
-  tableName: 'cosmetics_contents',
-  logPrefix: 'K-Cosmetics',
-  operatorRoles: ['cosmetics:operator', 'cosmetics:admin', 'platform:super_admin'],
+const FIXTURE_CONTENT_CONFIG: ContentResourceConfig = {
+  tableName: 'fixture_contents',
+  logPrefix: 'Fixture',
+  operatorRoles: ['fixture:operator', 'fixture:admin', 'platform:super_admin'],
   listColumns: `c.id, c.title, c.summary, c.tags, c.category, c.status,
                   c.sub_type, c.source_type, c.usage_type, c.source_url, c.source_file_name,
                   c.thumbnail_url, c.created_by, c.author_name,
@@ -97,11 +95,11 @@ const KPA_CONFIG = createKpaContentResourceConfig({
 });
 
 const SERVICE_CASES: Array<{ name: string; config: ContentResourceConfig; table: string }> = [
-  { name: 'K-Cosmetics(fixture)', config: COSMETICS_CONTENT_CONFIG, table: 'cosmetics_contents' },
+  { name: 'Fixture', config: FIXTURE_CONTENT_CONFIG, table: 'fixture_contents' },
   { name: 'KPA-Society', config: KPA_CONFIG, table: 'kpa_contents' },
 ];
 
-const OTHER_TABLES = ['cosmetics_contents', 'kpa_contents'];
+const OTHER_TABLES = ['fixture_contents', 'kpa_contents'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. tableName 안전 계약
@@ -116,19 +114,19 @@ describe('tableName 안전 계약 (WO §4)', () => {
   it('Core 생성 시 즉시 검증한다 — 첫 요청까지 미루지 않는다', () => {
     const ds = createSpyDataSource();
     expect(() =>
-      createContentResourceCore(ds, { ...COSMETICS_CONTENT_CONFIG, tableName: undefined as any }),
+      createContentResourceCore(ds, { ...FIXTURE_CONTENT_CONFIG, tableName: undefined as any }),
     ).toThrow(/tableName 은 필수/);
   });
 
   it('식별자 패턴을 벗어나면 거부한다 (동적 SQL 안전)', () => {
     for (const bad of [
-      'cosmetics_contents; DROP TABLE users',
-      'cosmetics_contents--',
-      'CosmeticsContents',
-      'public.cosmetics_contents',
-      '"cosmetics_contents"',
+      'fixture_contents; DROP TABLE users',
+      'fixture_contents--',
+      'FixtureContents',
+      'public.fixture_contents',
+      '"fixture_contents"',
       '1_contents',
-      'cosmetics contents',
+      'fixture contents',
     ]) {
       expect(() => assertSafeTableName(bad)).toThrow(/안전하지 않은 tableName/);
     }
@@ -170,19 +168,19 @@ describe('cross-service table isolation', () => {
 
   it('요청 입력으로 테이블을 바꿀 수 없다', async () => {
     const ds = createSpyDataSource();
-    const core = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
+    const core = createContentResourceCore(ds, FIXTURE_CONTENT_CONFIG);
 
     // query/body/params 에 테이블명을 심어도 무시돼야 한다
     await core.list(
       req({
         query: { tableName: 'kpa_contents', table: 'kpa_contents', sub_type: 'resource' },
-        body: { tableName: 'cosmetics_contents' },
+        body: { tableName: 'fixture_contents' },
         params: { tableName: 'kpa_contents' },
       }),
       createRes(),
     );
 
-    expect(touchedTables(ds.queries)).toEqual(['cosmetics_contents']);
+    expect(touchedTables(ds.queries)).toEqual(['fixture_contents']);
   });
 });
 
@@ -203,7 +201,7 @@ describe('목록 가시성 (계약 보존)', () => {
 
   it('가시성 절과 status 필터는 독립이다 (my=true & status=draft)', async () => {
     const ds = createSpyDataSource();
-    const core = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
+    const core = createContentResourceCore(ds, FIXTURE_CONTENT_CONFIG);
     await core.list(req({ query: { my: 'true', status: 'draft' }, user: { id: 'u1' } }), createRes());
     const listSql = ds.queries.find((q) => /SELECT c\.id/.test(q)) ?? '';
     expect(listSql).toContain('c.created_by =');
@@ -242,7 +240,7 @@ describe('필터 계약', () => {
   });
 
   it('KCos(fixture) 회원 목록은 sub_type/usage_type/source_type 을 읽는다', () => {
-    for (const config of [COSMETICS_CONTENT_CONFIG]) {
+    for (const config of [FIXTURE_CONTENT_CONFIG]) {
       expect(config.listFilters.map((f) => f.param).sort()).toEqual(['source_type', 'sub_type', 'usage_type']);
     }
   });
@@ -255,7 +253,7 @@ describe('필터 계약', () => {
 
   it('KPA 목록 select 는 content_type 을 포함한다 (KPA 전용 컬럼)', () => {
     expect(KPA_CONFIG.listColumns).toContain('c.content_type');
-    expect(COSMETICS_CONTENT_CONFIG.listColumns).not.toContain('c.content_type');
+    expect(FIXTURE_CONTENT_CONFIG.listColumns).not.toContain('c.content_type');
   });
 });
 
@@ -279,8 +277,8 @@ describe('공통 유틸', () => {
 
   it('operator 판정은 config 의 role 목록만 본다', () => {
     const ds = createSpyDataSource();
-    const cos = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
-    expect(cos.isOperatorOrAdmin({ roles: ['cosmetics:operator'] })).toBe(true);
+    const cos = createContentResourceCore(ds, FIXTURE_CONTENT_CONFIG);
+    expect(cos.isOperatorOrAdmin({ roles: ['fixture:operator'] })).toBe(true);
     expect(cos.isOperatorOrAdmin({ roles: ['platform:super_admin'] })).toBe(true);
     // 타 서비스 운영자 역할로는 통과하지 못한다
     expect(cos.isOperatorOrAdmin({ roles: ['kpa:operator'] })).toBe(false);
