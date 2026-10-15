@@ -26,7 +26,7 @@
 - [x] 이력 대상·행동·전후 상태 표시, 독립 재시도·닫기·늦은 응답 방어.
 - [x] 기존 API·권한·마지막 admin 보호 회귀, 화면 tests·타입·build·ESLint·PC/모바일 격리 fixture 검증.
 - [x] 전체 TODO·CHECK 정합, commit/push 완료.
-- [ ] PR 생성·필수 CI 확인 후 통합 담당에게 인계 (api.github.com 403 차단).
+- [x] PR #605 생성·CI 실행 상태 확인·통합 담당 인계. 필수 CI 최종 PASS와 병합/배포는 통합 담당이 확인한다.
 
 ## 실행 경계
 
@@ -45,3 +45,10 @@ production build/격리 API 응답으로 PC 1440·모바일 390에서 각각 8�
 최종 기준 `761fb49e3`의 강의·펀딩 기록을 보존하며 전용 branch를 동기화했고 프런트 72건·Neture 타입/빌드·PC/모바일 검증을 재확인했다.
 구현 `518feb511` push 완료, PR 생성은 실제 시도했으나 GitHub API 정책 403으로 실패했다. 코드 구현 완료와 PR/CI·main·운영 미완료를 구분한다.
 환경 설정의 api.github.com 허용 초안을 저장·Publish한 뒤 PR 생성을 재개한다. [CHECK의 최종 인계](../checks/CHECK-O4O-COMMUNITY-MEMBER-WORKFLOW-REFINEMENT-V1.md#최종-개발-검증인계-2026-10-15)를 따른다.
+
+## GitHub 접근 복구·PR 인계 (2026-10-15)
+
+사용자 재시도 요청 후 현재 runtime에서 api.github.com 허용과 실제 GitHub API 접근을 확인했다.
+[PR #605](https://github.com/Renagang21/o4o-platform/pull/605)를 생성했으며 최초 확인은 OPEN·MERGEABLE, CI Pipeline/CodeQL/Guard 실행 중이다.
+이전 403 차단은 해소됐다. 필수 CI의 최종 통과·리뷰 결과 확인과 main 병합·Neture 배포는 통합 담당에게 인계한다.
+이번 공간에서는 merge/auto-merge/배포를 실행하지 않았다. 앞선 차단 기록은 당시 상태다.

@@ -85,3 +85,14 @@ PR 생성과 필수 CI 상태는 확인하지 못했다. PR title/body는 준비
 
 `WORKTREE_DISPOSITION`: 전용 worktree/branch KEEP. 이번 작업 변경·untracked 0을 확인한 뒤 인계하며 다른 작업공간은 정리하지 않는다.
 main 통합·운영 배포·실계정 검증은 미실행이다. 개발 코드와 원격 branch는 보존됐고 외부 차단으로 PR 인계만 남는다.
+
+## GitHub API 복구와 PR 생성 (2026-10-15)
+
+사용자 재시도 요청에 따라 runtime 정책과 실제 GitHub API를 재확인했다. api.github.com 허용이 반영됐고 같은 branch의 기존 PR이 없음을 확인한 후 [PR #605](https://github.com/Renagang21/o4o-platform/pull/605)를 생성했다.
+이전 403 차단은 해소됐으며 추가 토큰 없이 기존 인증으로 동작했다.
+최초 조회 HEAD는 `3be2f3ba6578de015617ee6b72c05689f5d3656d`, OPEN·MERGEABLE이다.
+[CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/38667990768), CodeQL, Guard는 시작됐으며 최종 PASS로 보고하지 않는다.
+
+인계: 최신 PR HEAD의 필수 CI·리뷰·미해결 thread·main 대비 위치를 확인한 뒤 통합 담당이 정상 병합·Delivery 판정·필요한 Neture 배포를 진행한다.
+이 공간에서는 merge·auto-merge·배포를 실행하지 않았다. 기존 로컬 개발 검증 결과는 유지하며 이번 후속 변경은 문서뿐이다.
+worktree/branch는 후속 review 대응을 위해 KEEP이다. 위의 PR 미생성·domain 차단 기록은 당시 상태다.
