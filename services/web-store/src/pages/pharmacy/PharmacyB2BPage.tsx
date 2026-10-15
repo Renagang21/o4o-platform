@@ -21,7 +21,7 @@ import { getOrderable, type OrderableProduct, type OrderableSourceTab } from '..
 import { colors, borderRadius } from '../../styles/theme';
 import { EventOfferContentPanel } from '../../components/event-offer/EventOfferContentPanel';
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
-import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
+import { getMlcSummaryMap, hasPublishableMlcSummary, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
 // WO-O4O-KPA-O4O-LISTING-MULTILINGUAL-QR-ACTIONS-V1: 고객용 링크/QR
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
@@ -514,7 +514,7 @@ export function PharmacyB2BPage() {
                   <span key={l} className="inline-flex items-center px-1.5 py-0.5 text-[11px] rounded border bg-white border-slate-200 text-slate-600">{localeLabel(l)}</span>
                 ))}
               </div>
-              <MultilingualPublicActions groupId={qrPanel.summary.groupId} />
+              <MultilingualPublicActions groupId={qrPanel.summary.groupId} publishable={hasPublishableMlcSummary(qrPanel.summary)} />
             </div>
           </div>
         </div>

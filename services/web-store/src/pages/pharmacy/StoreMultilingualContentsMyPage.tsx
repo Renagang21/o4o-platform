@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { sanitizeRichHtml } from '@o4o/content-editor';
-import { getStoreMlcGroup, listMyMlcGroups, resolveMlc, STORE_MLC_LOCALES, STORE_MLC_LOCALE_LABELS, type StoreMlcGroup, type StoreMlcLocale } from '../../api/multilingualProductContentStore';
+import { getStoreMlcGroup, hasPublishableMlcPage, listMyMlcGroups, resolveMlc, STORE_MLC_LOCALES, STORE_MLC_LOCALE_LABELS, type StoreMlcGroup, type StoreMlcLocale } from '../../api/multilingualProductContentStore';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { MultilingualPublicActions } from '../../components/MultilingualPublicActions';
@@ -89,7 +89,7 @@ function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonl
       <h3 className="font-semibold">{result.page.title}</h3><p>{result.page.summary}</p>
       {typeof html === 'string' ? <div className="prose max-w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }} /> : <p className="text-sm">이 형식의 전체 내용은 고객용 보기에서 확인해 주세요.</p>}
     </div>}
-    <MultilingualPublicActions groupId={group.id} onPublished={async () => {
+    <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} onPublished={async () => {
       const current = publication.begin();
       const saved = await getStoreMlcGroup(group.id);
       if (saved.id !== group.id || saved.targetId !== group.targetId) throw new Error('Invalid group');

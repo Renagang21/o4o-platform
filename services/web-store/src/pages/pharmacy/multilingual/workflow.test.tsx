@@ -6,7 +6,7 @@ import { HubMultilingualContentLibraryPage } from '../HubMultilingualContentLibr
 import { StoreMultilingualContentsMyPage } from '../StoreMultilingualContentsMyPage';
 import Editor from '../StoreProductMultilingualContentPage';
 import { MultilingualPublicActions } from '../../../components/MultilingualPublicActions';
-import type { StoreMlcGroupDetail, StoreMlcPageDetail, StoreMlcLocale, StoreMlcStatus } from '../../../api/multilingualProductContentStore';
+import { hasPublishableMlcPage, hasPublishableMlcSummary, type StoreMlcGroupDetail, type StoreMlcPageDetail, type StoreMlcLocale, type StoreMlcStatus } from '../../../api/multilingualProductContentStore';
 const api = vi.hoisted(() => ({ store: 'A', active: 'A', hub: vi.fn(), list: vi.fn(), get: vi.fn(), create: vi.fn(), update: vi.fn(), page: vi.fn(), status: vi.fn(), resolve: vi.fn(), imported: vi.fn(), products: vi.fn(), key: vi.fn(), qr: vi.fn(), success: vi.fn(), error: vi.fn() }));
 vi.mock('../../../contexts/AuthContext', () => ({ getAccessToken: () => 'synthetic' }));
 vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store }) }));
@@ -158,28 +158,71 @@ it('clears old product drafts and ignores an old save when the route changes', a
 });
 it('serializes public issuance and exposes QR failures for retry', async () => {
   const pending = deferred<{ url: string }>(); api.key.mockReturnValueOnce(pending.promise); api.qr.mockRejectedValueOnce(new Error('private'));
-  render(wrap(<MultilingualPublicActions groupId="group" />)); const qr = screen.getByRole('button', { name: 'QR 보기' }); fireEvent.click(qr); fireEvent.click(qr); expect(api.key).toHaveBeenCalledTimes(1);
+  render(wrap(<MultilingualPublicActions groupId="group" publishable />)); const qr = screen.getByRole('button', { name: 'QR 보기' }); fireEvent.click(qr); fireEvent.click(qr); expect(api.key).toHaveBeenCalledTimes(1);
   await act(async () => pending.resolve({ url: 'https://example.test/key' })); await screen.findByRole('alert'); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
 });
 it('does not issue a second QR request under the newly selected store', async () => {
-  const pending = deferred<{ url: string }>(); api.key.mockReturnValue(pending.promise); const h = render(wrap(<MultilingualPublicActions groupId="group" />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' }));
-  api.active = api.store = 'B'; h.rerender(wrap(<MultilingualPublicActions groupId="other-group" />)); await act(async () => pending.resolve({ url: 'https://example.test/key' })); expect(api.qr).not.toHaveBeenCalled(); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
+  const pending = deferred<{ url: string }>(); api.key.mockReturnValue(pending.promise); const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' }));
+  api.active = api.store = 'B'; h.rerender(wrap(<MultilingualPublicActions groupId="other-group" publishable />)); await act(async () => pending.resolve({ url: 'https://example.test/key' })); expect(api.qr).not.toHaveBeenCalled(); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
 });
 it('clears old QR and copy status when the group changes', async () => {
-  const h = render(wrap(<MultilingualPublicActions groupId="group" />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
-  h.rerender(wrap(<MultilingualPublicActions groupId="other" />)); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
+  const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
+  h.rerender(wrap(<MultilingualPublicActions groupId="other" publishable />)); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
 });
 it('opens a tab synchronously and closes a stale pending popup on unmount', async () => {
   const pending = deferred<{ url: string }>(); api.key.mockReturnValue(pending.promise); const popup = { opener: {}, close: vi.fn(), location: { replace: vi.fn() } };
-  vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window); const h = render(wrap(<MultilingualPublicActions groupId="group" />)); fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
+  vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window); const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
   expect(window.open).toHaveBeenCalledWith('about:blank', '_blank'); expect(popup.opener).toBeNull(); h.unmount(); expect(popup.close).toHaveBeenCalled();
   await act(async () => pending.resolve({ url: 'https://example.test/key' })); expect(popup.location.replace).not.toHaveBeenCalled();
 });
 it('reports blocked popups without publishing and copies a usable URL', async () => {
-  vi.spyOn(window, 'open').mockReturnValue(null); render(wrap(<MultilingualPublicActions groupId="group" />)); fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
+  vi.spyOn(window, 'open').mockReturnValue(null); render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: '고객용 보기' }));
   expect(screen.getByText(/새 창이 차단/)).toBeTruthy(); expect(api.key).not.toHaveBeenCalled(); fireEvent.click(screen.getByRole('button', { name: 'URL 복사' }));
   await screen.findByRole('button', { name: '복사됨' }); expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://example.test/multilingual-products/key');
 });
 it('survives StrictMode read cleanup without showing a stale failure', async () => {
   render(wrap(<StrictMode><StoreMultilingualContentsMyPage /></StrictMode>)); await screen.findByRole('heading', { name: 'Store guide' }); expect(screen.queryByRole('alert')).toBeNull();
+});
+it('treats only non-archived groups with a saved non-archived page as publicly publishable', () => {
+  expect(hasPublishableMlcPage(group())).toBe(true);
+  expect(hasPublishableMlcPage(group({ pages: [localePage('ko', 'Live', 'published')] }))).toBe(true);
+  expect(hasPublishableMlcPage(group({ pages: [] }))).toBe(false);
+  expect(hasPublishableMlcPage(group({ pages: [localePage('ko', 'Old', 'archived'), localePage('en', 'Old', 'archived')] }))).toBe(false);
+  expect(hasPublishableMlcPage(group({ status: 'archived' }))).toBe(false);
+  expect(hasPublishableMlcPage(null)).toBe(false);
+  expect(hasPublishableMlcSummary({ status: 'draft', locales: ['ko'] })).toBe(true);
+  expect(hasPublishableMlcSummary({ status: 'draft', locales: [] })).toBe(false);
+  expect(hasPublishableMlcSummary({ status: 'archived', locales: ['ko'] })).toBe(false);
+});
+it('disables customer link and QR actions for groups without a publishable page', async () => {
+  api.list.mockResolvedValue([
+    group({ id: 'empty', title: 'Empty guide', pages: [] }),
+    group({ id: 'archived', title: 'Archived pages', pages: [localePage('ko', 'Old', 'archived')] }),
+  ]);
+  render(wrap(<StoreMultilingualContentsMyPage />));
+  for (const name of ['Empty guide', 'Archived pages']) {
+    const card = await screen.findByRole('region', { name });
+    for (const label of ['고객용 보기', '태블릿 보기', 'URL 복사', 'QR 보기']) {
+      const button = Array.from(card.querySelectorAll('button')).find(b => b.textContent?.includes(label)) as HTMLButtonElement;
+      expect(button.disabled).toBe(true); fireEvent.click(button);
+    }
+    expect(card.textContent).toContain('공개할 수 있는 저장된 언어 페이지가 없습니다');
+  }
+  expect(api.key).not.toHaveBeenCalled(); expect(api.qr).not.toHaveBeenCalled();
+});
+it('keeps public actions enabled for a group with a saved draft page', async () => {
+  render(wrap(<StoreMultilingualContentsMyPage />)); const card = await screen.findByRole('region', { name: 'Store guide' });
+  const qr = Array.from(card.querySelectorAll('button')).find(b => b.textContent?.includes('QR 보기')) as HTMLButtonElement;
+  expect(qr.disabled).toBe(false); fireEvent.click(qr); await waitFor(() => expect(api.qr).toHaveBeenCalledWith('group'));
+});
+it('disables public actions in the product editor when every saved page is archived', async () => {
+  api.get.mockResolvedValue(group({ pages: [localePage('ko', 'Old', 'archived')] })); api.list.mockResolvedValue([group({ pages: [localePage('ko', 'Old', 'archived')] })]);
+  editor('/store/products/multilingual/local/local-a?groupId=group');
+  const qr = await screen.findByRole('button', { name: 'QR 보기' }); expect((qr as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(qr); expect(api.key).not.toHaveBeenCalled();
+});
+it('blocks the public action component itself when not publishable', () => {
+  render(wrap(<MultilingualPublicActions groupId="group" publishable={false} />));
+  fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); expect(api.key).not.toHaveBeenCalled();
+  expect((screen.getByRole('button', { name: 'URL 복사' }) as HTMLButtonElement).disabled).toBe(true);
 });

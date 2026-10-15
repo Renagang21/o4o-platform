@@ -88,6 +88,20 @@ export interface StoreMlcGroup {
   pages: StoreMlcPage[];
 }
 
+/**
+ * Public landing serves only `published` pages of a non-archived group (NO_PUBLISHED_PAGE otherwise).
+ * Issuing the public key (POST .../public-key) promotes saved `draft` pages to `published`, so a group is
+ * publishable when it is not archived and has at least one non-archived saved page.
+ */
+export function hasPublishableMlcPage(group: Pick<StoreMlcGroup, 'status' | 'pages'> | null | undefined): boolean {
+  return !!group && group.status !== 'archived' && group.pages.some(p => p.status === 'draft' || p.status === 'published');
+}
+
+/** Summary rows already exclude archived groups; `locales` lists only non-archived pages. */
+export function hasPublishableMlcSummary(summary: Pick<StoreMlcSummaryItem, 'status' | 'locales'> | null | undefined): boolean {
+  return !!summary && summary.status !== 'archived' && Array.isArray(summary.locales) && summary.locales.length > 0;
+}
+
 export interface StoreMlcImportInput {
   sourceGroupId: string;
   targetKind: StoreMlcTargetKind;

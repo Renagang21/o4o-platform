@@ -18,6 +18,8 @@ import { ensureMlcPublicKey, getMlcQr } from '../api/multilingualProductContentS
 
 interface Props {
   groupId: string;
+  /** At least one saved, non-archived page exists (see hasPublishableMlcPage); otherwise the landing 404s. */
+  publishable: boolean;
   disabled?: boolean;
   onPublished?: () => Promise<void>;
 }
@@ -34,7 +36,8 @@ export function MultilingualPublicActions(props: Readonly<Props>) {
 
 type PublicAction = 'open' | 'tablet' | 'copy' | 'qr';
 
-function PublicActionsSession({ groupId, disabled = false, onPublished, isCurrent }: Readonly<Props & { isCurrent: () => boolean }>) {
+function PublicActionsSession({ groupId, publishable, disabled: disabledProp = false, onPublished, isCurrent }: Readonly<Props & { isCurrent: () => boolean }>) {
+  const disabled = disabledProp || !publishable;
   const [busy, setBusy] = useState<null | PublicAction>(null);
   const lock = useRef(false);
   const [copied, setCopied] = useState(false);
@@ -109,6 +112,11 @@ function PublicActionsSession({ groupId, disabled = false, onPublished, isCurren
       <p className="text-[11px] text-slate-500 mb-2">
         고객용 보기·태블릿 보기·URL 복사·QR 보기를 실행하면 저장된 초안 언어도 함께 공개됩니다. 미저장 내용은 포함되지 않습니다.
       </p>
+      {!publishable && (
+        <p className="text-xs text-amber-800 mb-2">
+          공개할 수 있는 저장된 언어 페이지가 없습니다. 언어별 내용을 저장한 뒤 고객용 링크·QR을 사용할 수 있습니다.
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-1.5">
         <button type="button" onClick={() => void run('open')} disabled={disabled || busy !== null} className={btn}>
           {busy === 'open' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}

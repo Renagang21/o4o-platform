@@ -21,6 +21,7 @@ import { buildStoreContentAuthoringPrompt, STORE_LLM_ASSIST_LABEL } from '@o4o/s
 import { toast } from '@o4o/error-handling';
 import {
   getStoreMlcGroup,
+  hasPublishableMlcPage,
   createStoreMlcGroup,
   updateStoreMlcGroup,
   upsertStoreMlcPage,
@@ -304,7 +305,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
         </div>
 
         {/* QR / 고객용 링크 — 그룹이 있을 때만. publicKey QR(언어 탭 랜딩). */}
-        {group && <MultilingualPublicActions groupId={group.id} disabled={busy || dirty} onPublished={refreshPublication} />}
+        {group && <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={busy || dirty} onPublished={refreshPublication} />}
       </div>
 
       {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주세요.</p>}
