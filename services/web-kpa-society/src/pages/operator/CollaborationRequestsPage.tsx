@@ -6,7 +6,7 @@
  * Contact 페이지에서 접수된 협업·강의 문의를 목록·상세·상태 변경으로 처리한다.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -51,47 +51,63 @@ export default function CollaborationRequestsPage() {
   const [error, setError]           = useState<string | null>(null);
   const [success, setSuccess]       = useState<string | null>(null);
 
+  const [actionError, setActionError] = useState<string | null>(null);
+  const state = useRef({ mounted: false, list: 0, writing: false });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, list: 0, writing: false }; state.current = scope;
+    return () => { scope.mounted = false; scope.list++; };
+  }, []);
+  useLayoutEffect(() => { state.current.list++; setSelected(null); }, [page, statusFilter, typeFilter]);
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    const scope = state.current;
+    if (!scope.mounted) return false;
+    const request = ++scope.list;
+    const current = () => scope.mounted && request === scope.list;
+    setLoading(true); setError(null);
     try {
-      const res = await collaborationRequestApi.list({
-        page,
-        limit: 20,
-        status: statusFilter || undefined,
-        type: typeFilter || undefined,
-      });
-      if (res.success) {
-        setItems(res.data.items);
-        setTotal(res.data.total);
-        setTotalPages(res.data.totalPages);
-      }
-    } catch {
-      setError('데이터를 불러오지 못했습니다.');
-    } finally {
-      setLoading(false);
-    }
+      const res = await collaborationRequestApi.list({ page, limit: 20, status: statusFilter || undefined, type: typeFilter || undefined });
+      if (!res?.success || !Array.isArray(res.data?.items)) throw new Error((res as { error?: string })?.error || '데이터를 불러오지 못했습니다.');
+      if (!current()) return false;
+      const lastPage = Math.max(1, res.data.totalPages);
+      if (page > lastPage) { setPage(lastPage); return true; }
+      setItems(res.data.items); setTotal(res.data.total); setTotalPages(lastPage);
+      return true;
+    } catch (e) {
+      if (current()) setError(e instanceof Error ? e.message : '데이터를 불러오지 못했습니다.');
+      return false;
+    } finally { if (current()) setLoading(false); }
   }, [page, statusFilter, typeFilter]);
+  useEffect(() => { void load(); }, [load]);
 
-  useEffect(() => { load(); }, [load]);
-
-  const handleStatusChange = async (newStatus: ContactRequestStatus) => {
-    if (!selected) return;
-    setUpdating(true);
-    setError(null);
-    try {
-      const res = await collaborationRequestApi.updateStatus(selected.id, newStatus);
-      if (res.success) {
-        setSuccess('상태가 변경되었습니다.');
-        setSelected(prev => prev ? { ...prev, status: newStatus } : null);
-        await load();
-      }
-    } catch (err: any) {
-      setError(err?.data?.error || err?.message || '상태 변경 중 오류가 발생했습니다.');
-    } finally {
-      setUpdating(false);
-    }
+  const openDetail = (item: ContactRequestItem) => {
+    if (state.current.writing || loading || error) return;
+    setSelected(item); setActionError(null); setSuccess(null);
   };
+  const closeDetail = () => { if (!state.current.writing) setSelected(null); };
+  const handleStatusChange = async (newStatus: ContactRequestStatus) => {
+    const scope = state.current;
+    if (!selected || scope.writing || selected.status === newStatus) return;
+    const targetId = selected.id;
+    scope.writing = true; setUpdating(true); setActionError(null); setSuccess(null);
+    try {
+      const res = await collaborationRequestApi.updateStatus(targetId, newStatus);
+      if (!res?.success) throw new Error((res as { error?: string })?.error || '상태 변경 중 오류가 발생했습니다.');
+      if (!scope.mounted) return;
+      setSuccess('상태가 변경되었습니다.');
+      setSelected(previous => previous?.id === targetId ? { ...previous, status: newStatus } : previous);
+      await load();
+    } catch (err: any) {
+      if (scope.mounted) setActionError(err?.data?.error || err?.message || '상태 변경 중 오류가 발생했습니다.');
+    } finally { scope.writing = false; if (scope.mounted) setUpdating(false); }
+  };
+  const feedback = <>
+    {success && <div role="status" style={styles.successBanner}>{success}</div>}
+    {actionError && <div role="alert" style={styles.errorBanner}>{actionError}</div>}
+    {error && <div role="alert" style={styles.errorBanner}>
+      {success && <p>처리는 완료했지만 최신 목록을 확인하지 못했습니다.</p>}
+      <p>{error}</p><button disabled={loading || updating} onClick={() => void load()}>다시 조회</button>
+    </div>}
+  </>;
 
   // ─── 컬럼 정의 ───────────────────────────────────────────────────────────────
 
@@ -152,9 +168,9 @@ export default function CollaborationRequestsPage() {
       system: true,
       onCellClick: () => {},
       render: (_v, row) => (
-        <RowActionMenu
+        <RowActionMenu disabled={loading || updating || !!error}
           actions={[
-            { key: 'detail', label: '상세보기', onClick: () => { setSelected(row); setSuccess(null); setError(null); } },
+            { key: 'detail', label: '상세보기', onClick: () => openDetail(row) },
           ]}
         />
       ),
@@ -167,14 +183,15 @@ export default function CollaborationRequestsPage() {
     <div style={styles.container}>
       <h1 style={styles.title}>협업 문의</h1>
 
-      {error   && <div style={styles.errorBanner}>{error}</div>}
-      {success && <div style={styles.successBanner}>{success}</div>}
+      {!selected && feedback}
 
       {/* 필터 */}
       <div style={styles.filters}>
         <select
+          aria-label="협업 문의 상태"
+          disabled={updating}
           value={statusFilter}
-          onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
+          onChange={e => { if (!state.current.writing) { setSuccess(null); setActionError(null); setStatusFilter(e.target.value); setPage(1); } }}
           style={styles.select}
         >
           <option value="">전체 상태</option>
@@ -183,41 +200,43 @@ export default function CollaborationRequestsPage() {
           ))}
         </select>
         <select
+          aria-label="협업 문의 유형"
+          disabled={updating}
           value={typeFilter}
-          onChange={e => { setTypeFilter(e.target.value); setPage(1); }}
+          onChange={e => { if (!state.current.writing) { setSuccess(null); setActionError(null); setTypeFilter(e.target.value); setPage(1); } }}
           style={styles.select}
         >
           <option value="">전체 유형</option>
           <option value="partner">운영자/단체 협력</option>
         </select>
-        <span style={styles.totalBadge}>총 {total}건</span>
+        {!loading && !error && <span style={styles.totalBadge}>총 {total}건</span>}
       </div>
 
-      <DataTable<ContactRequestItem>
+      {(!error || items.length > 0) && <DataTable<ContactRequestItem>
         columns={columns}
         data={items}
         rowKey="id"
         loading={loading}
         emptyMessage="접수된 협업 문의가 없습니다"
         tableId="kpa-collaboration-requests"
-        onRowClick={(row) => { setSelected(row); setSuccess(null); setError(null); }}
-      />
+        onRowClick={openDetail}
+      />}
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div style={styles.pagination}>
           <button
             style={styles.pageBtn}
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
+            onClick={() => { if (!state.current.writing) { setSuccess(null); setActionError(null); setPage(p => Math.max(1, p - 1)); } }}
+            disabled={updating || loading || !!error || page === 1}
           >
             이전
           </button>
           <span style={styles.pageInfo}>{page} / {totalPages}</span>
           <button
             style={styles.pageBtn}
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
+            onClick={() => { if (!state.current.writing) { setSuccess(null); setActionError(null); setPage(p => Math.min(totalPages, p + 1)); } }}
+            disabled={updating || loading || !!error || page === totalPages}
           >
             다음
           </button>
@@ -227,13 +246,14 @@ export default function CollaborationRequestsPage() {
       {/* 상세 Drawer */}
       <BaseDetailDrawer
         open={!!selected}
-        onClose={() => setSelected(null)}
+        onClose={closeDetail}
         title="협업 문의 상세"
         width={520}
         actions={[]}
       >
         {selected && (
           <div>
+            {feedback}
             {/* 기본 정보 */}
             <div style={styles.infoBox}>
               <p style={styles.infoBoxLabel}>문의 유형</p>

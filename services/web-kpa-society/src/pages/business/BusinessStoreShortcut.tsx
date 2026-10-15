@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import { authClient } from '../../contexts/AuthContext';
 
@@ -12,7 +12,8 @@ export default function BusinessStoreShortcut({ businessKey, contentId, supply =
     ? supply ? `/store/pharmacy/supply?${new URLSearchParams({ source: `sf:${businessKey}` })}` : `/store/pharmacy/contents?${new URLSearchParams({ business: businessKey, ...(contentId ? { content: contentId } : {}) })}`
     : '/store';
   const returnPath = businessKey ? `/select-store?returnTo=${encodeURIComponent(materialPath)}` : materialPath;
-  useEffect(() => {
+  // Reset the scope before committed UI can accept a navigation click.
+  useLayoutEffect(() => {
     const reset = () => { generation.current++; pending.current = false; setBusy(false); setError(''); };
     reset();
     const restore = (event: PageTransitionEvent) => { if (event.persisted) reset(); };
