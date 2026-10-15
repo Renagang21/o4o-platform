@@ -6,6 +6,7 @@
 >
 > **하나의 통합 작업이다.** 단계별로 새 WO 를 만들지 않는다. 이 문서의 TODO 가 진행·최종 보고의 기준이다.
 > T5 · T6 · T7 결과가 채워지기 전에는 **DONE 으로 선언하지 않는다.**
+> **역사 기록 주(2026-10-15 회수)**: 이 문서는 작성 시점의 기록이다. 그 뒤 PharmacyHub · K-Cosmetics 퇴역, `community` · `supplier` · `funding` 서비스 키 · 운영자 역할 신설, `kpa-branch` canonical 호스트 `kpa.neture.co.kr` 전환, 이메일·비밀번호 병행 인증, Demo 3계정 정본화가 있었다. 본문의 남은 단계(호스트 · 역할 · 테이블 · Demo 절차 포함)는 **실행 전에 현행 정본으로 재검증해야 하며 이 문서를 그대로 실행 근거로 쓰지 않는다.** 현행 정본: [`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · [`SETUP.md`](../../SETUP.md) · [`CANONICAL-INDEX`](../CANONICAL-INDEX.md)
 
 ## 0-A. 최초 목적과 확정 정책 (재개 시점 재확인 · 2026-09-26)
 
@@ -303,6 +304,8 @@ Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까�
 따라서 T5-8 검증 주소는 **`https://kpa-society.co.kr/kpa`** 로 고정한다.
 장래 구상인 `kpa.neture.co.kr/{분회}` 는 이번 작업에서 열지 않는다.
 
+> **회수 시 정정(2026-10-15)**: 위 T5-8 검증 주소(`https://kpa-society.co.kr/kpa`)는 2026-09-26 시점 값이다. 현행 `kpa-branch` canonical 호스트는 **`kpa.neture.co.kr`** 이다([`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) `kpa-branch` 항목). 재검증 시 현행 호스트를 쓴다.
+
 ### T6 — 운영 DB 실측 `[!] 미확인 (차단)`
 
 **2026-09-26 재시도 결과**: ADC 파일 부재(`application_default_credentials.json` 없음) ·
@@ -367,6 +370,8 @@ SELECT service_key, url FROM services WHERE service_key = 'kpa-branch';
 -- 5) 행이 있는 테이블만: 데이터 성격 판단용 최소 표본 (개인정보 컬럼 제외)
 --    예) SELECT id, status, created_at FROM operator_invitations ORDER BY created_at DESC LIMIT 5;
 ```
+
+> **회수 시 정정(2026-10-15)**: 위 4) 쿼리의 `services(service_key, url)` 테이블은 존재하지 않는다. 서비스 카탈로그 테이블은 `platform_services`(entity `PlatformService` · migration `2026020500001-CreatePlatformServicesCatalog`)이며, 해당 값은 `SELECT code, entry_url FROM platform_services WHERE code = 'kpa-branch';` 로 조회한다. 본문 다른 곳의 `services.url` 표기도 `platform_services.entry_url` 로 읽는다.
 
 값이 도착하면 T7 표의 '행 수' 칸을 채우고 그 자리에서 KEEP/REMOVE/HOLD 를 판정한다.
 

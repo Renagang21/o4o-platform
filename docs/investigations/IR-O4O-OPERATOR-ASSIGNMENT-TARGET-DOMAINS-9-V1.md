@@ -1,7 +1,10 @@
 # IR-O4O-OPERATOR-ASSIGNMENT-TARGET-DOMAINS-9-V1
 
 > 작성일: 2026-09-27 · 상태: **조사 완료 / 방향 결정 대기**
+> **상태**: SUPERSEDED · **대체 문서**: [`apps/api-server/src/config/service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`apps/api-server/src/config/operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · **표기일**: 2026-10-15
+> **회수 시 주(2026-10-15)**: 조사는 COMPLETED 이며 "방향 결정 대기" 는 더 이상 열린 항목이 아니다. 이후 9개 대상 도메인의 서비스 키(`community` · `supplier` · `funding` 포함)와 Admin 부여 운영자 역할이 위 카탈로그로 확정됐다.
 > **코드 변경 0 · migration 0 · production write 0**
+> **역사 기록 주(2026-10-15 회수)**: 이 문서는 작성 시점의 기록이다. 그 뒤 PharmacyHub · K-Cosmetics 퇴역, `community` · `supplier` · `funding` 서비스 키 · 운영자 역할 신설, `kpa-branch` canonical 호스트 `kpa.neture.co.kr` 전환, 이메일·비밀번호 병행 인증, Demo 3계정 정본화가 있었다. 본문의 남은 단계(호스트 · 역할 · 테이블 · Demo 절차 포함)는 **실행 전에 현행 정본으로 재검증해야 하며 이 문서를 그대로 실행 근거로 쓰지 않는다.** 현행 정본: [`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · [`SETUP.md`](../../SETUP.md) · [`CANONICAL-INDEX`](../CANONICAL-INDEX.md)
 
 ---
 

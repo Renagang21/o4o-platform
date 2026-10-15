@@ -1,6 +1,7 @@
 # CHECK-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1
 
 > **상태**: COMPLETED
+> **역사 기록 주(2026-10-15 회수)**: 이 문서는 작성 시점의 기록이다. 그 뒤 PharmacyHub · K-Cosmetics 퇴역, `community` · `supplier` · `funding` 서비스 키 · 운영자 역할 신설, `kpa-branch` canonical 호스트 `kpa.neture.co.kr` 전환, 이메일·비밀번호 병행 인증, Demo 3계정 정본화가 있었다. 본문의 남은 단계(호스트 · 역할 · 테이블 · Demo 절차 포함)는 **실행 전에 현행 정본으로 재검증해야 하며 이 문서를 그대로 실행 근거로 쓰지 않는다.** 현행 정본: [`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · [`SETUP.md`](../../SETUP.md) · [`CANONICAL-INDEX`](../CANONICAL-INDEX.md)
 
 조사 전용 — 전수 census · 원인 확정 · 백필 계획 산출 완료. **조사 대상 데이터 write 0(로그인 인증 부수 write 는 별개 — §10) · migration 0 · deploy 0.**
 IR: `IR-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1`

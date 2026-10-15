@@ -2,6 +2,7 @@
 
 > 대상 WO: [`WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1`](../work-orders/WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md)
 > 작성: 2026-09-30 · 갱신: 2026-10-01 (운영 적용 · neture-web 통제 배포 · 화면 1차 확인) · 상태: **운영 반영 완료 / 실계정 전 과정 검증 전 (DONE 아님)**
+> **역사 기록 주(2026-10-15 회수)**: 이 문서는 작성 시점의 기록이다. 그 뒤 PharmacyHub · K-Cosmetics 퇴역, `community` · `supplier` · `funding` 서비스 키 · 운영자 역할 신설, `kpa-branch` canonical 호스트 `kpa.neture.co.kr` 전환, 이메일·비밀번호 병행 인증, Demo 3계정 정본화가 있었다. 본문의 남은 단계(호스트 · 역할 · 테이블 · Demo 절차 포함)는 **실행 전에 현행 정본으로 재검증해야 하며 이 문서를 그대로 실행 근거로 쓰지 않는다.** 현행 정본: [`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · [`SETUP.md`](../../SETUP.md) · [`CANONICAL-INDEX`](../CANONICAL-INDEX.md)
 
 ---
 
