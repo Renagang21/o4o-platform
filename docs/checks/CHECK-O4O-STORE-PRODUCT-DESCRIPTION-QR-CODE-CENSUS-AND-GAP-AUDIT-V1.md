@@ -1,6 +1,8 @@
 # CHECK-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1
 
-Status: **DONE (조사 전용)** — 전수 census · 원인 확정 · 백필 계획 산출 완료. **조사 대상 데이터 write 0(로그인 인증 부수 write 는 별개 — §10) · migration 0 · deploy 0.**
+> **상태**: COMPLETED
+
+조사 전용 — 전수 census · 원인 확정 · 백필 계획 산출 완료. **조사 대상 데이터 write 0(로그인 인증 부수 write 는 별개 — §10) · migration 0 · deploy 0.**
 IR: `IR-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1`
 > **회수 시 주(2026-10-15)**: 위 IR 은 세션 요청으로만 전달됐고 저장소에 파일로 커밋된 적이 없다. 본문의 `IR §N` 은 그 요청의 절 번호이며, 판정에 쓴 기준(QR 계약 4지선다 · 소비 경로 · census · 원인 후보 · 중지 조건 5개)은 이 CHECK 의 해당 절(§1~§9)에 각각 재기술돼 있어 이 문서만으로 추적된다. 원 커밋 `9aa2a48f8` 은 branch `work/store-description-qr-audit-v1` 에만 있다. 이후 누락 QR backfill 은 `122a7c03a`(main) 에서 수행됐다.
 Date: 2026-09-04

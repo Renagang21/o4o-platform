@@ -331,8 +331,8 @@ Google 인증 → Store 복귀 → 세션 성립 → 사용자 정보 표시까�
 | 요소 | 상태 |
 |---|---|
 | 프록시 바이너리 `bin/cloud-sql-proxy-v2.exe` | **있음** |
-| 인스턴스 · 포트 | `netureyoutube:asia-northeast3:o4o-platform-db` · 로컬 `5442` (SETUP.md) |
-| DB 사용자 · DB 이름 | `o4o_api_v2` · `o4o_platform` (Cloud Run env 에서 확인 — 값은 비밀이 아님) |
+| 인스턴스 · 포트 | `<CLOUD_SQL_CONNECTION_NAME>` (실제 값은 `SETUP.md` 참조 · 회수 시 마스킹 2026-10-15) · 로컬 `5442` (SETUP.md) |
+| DB 사용자 · DB 이름 | `<DB_USER>` · `<DB_NAME>` (실제 값은 `SETUP.md` 참조 — 공개 저장소이므로 회수 시 마스킹 2026-10-15) |
 | DB 비밀번호 | Secret Manager `o4o-db-password` (**이름만 확인**. 값은 조회하지 않았고 이 문서에 남기지 않는다) |
 | **ADC** | **없음 → 유일한 차단** (proxy v2 는 `--token` 을 받지 않는다. `--credentials-file` 은 서비스 계정 키가 필요해 채택하지 않는다) |
 
@@ -378,7 +378,7 @@ SELECT service_key, url FROM services WHERE service_key = 'kpa-branch';
 |---|---|---|---|---|
 | `operator_invitations` | **0**(제거 완료·배포됨) | 미확인 | **보류** | 0행 → REMOVE / 행 있으면 성격 확인 후 HOLD |
 | `linking_sessions` | **0** | 미확인 | **보류** | 동일 |
-| `email_verification_tokens` | **0** | 미확인 | **보류** | 동일 |
+| `email_verification_tokens` | ~~**0**~~ → **사용 중** | 미확인 | **KEEP** | **회수 시 정정(2026-10-15)**: 원 판정(0 참조 · 0행이면 REMOVE)은 2026-09-29 이전 Google 전용 결정 기준이며 **SUPERSEDED** 다. 2026-09-29 Google+이메일·비밀번호 병행 정책 이후 `EmailAuthService.issueToken()`(`email-auth.service.ts` · `email-auth.shared.ts`)이 이 테이블에 쓰고 Identity V3 가 채택했다. DROP 대상 아님 |
 | `refresh_tokens` | **0** | 미확인 | **보류** | writer 가 0이었으므로 0행 예상 — 확인 전 단정 금지 |
 | `mobile_product_drafts` | **0** | 미확인 | **보류** | 행 있으면 **업무 데이터**다. 보존·이관 판단 선행 |
 | `login_attempts` | **0** | 미확인 | **보류** | + **auth-core manifest 변경 명시 승인** 필요(CLAUDE.md §3·§14). 승인 없으면 REMOVE 대상에서 제외하고 사유 기록 |
