@@ -29,6 +29,10 @@ API 타입 검사도 통과했다. 전체 Jest의 최종 판정은 이 통합 he
 
 ## 실제 삭제와 분리
 
+공개 QR의 별도 slug 선택 쿼리도 접두사 판정 helper로 통일했고 관련 QR·PH API2 suites/44 tests 및 타입 검사 PASS. 퇴역 키 상수를 직접 소비하는 SQL 경로를 전체 검색해 남은 exact-only slug 필터가 없는 것을 확인했다.
+
+head `d90ed83fb`의 CI38696961700 웹 검증 단계에서 기존 장바구니 회귀2건이 실패했다. 해당 Store 파일은 이번 변경에서 수정하지 않았다. 같은 파일의 단독8건과 Store 전체34 files/436 tests가 로컬에서 통과했다. 이 결과로 실패한 CI를 PASS로 대체하지 않으며 최신 head의 CI 결과를 다시 확인한다.
+
 추가 접두사 리뷰는 조직의 퇴역 slug 이력과 활성 slug 생존 근거에도 동일한 키 판정을 적용해 보완했다. NULL slug는 활성 서비스의 근거로 승격하지 않는다. 격리 PostgreSQL15에서 접두사 단독 이력·등록 이력과의 조합·활성 Neture 공유 조직 보존·NULL slug 4경우를 검증했고 모두 통과했다. 관련 API77건도 재통과했다. opt-in PostgreSQL 회귀3건을 추가했으며 CI에서는 fixture 미설정 시 실행되지 않는다.
 
 사용자는 PH 데이터가 테스트용이며 PH/전용 인프라를 재사용하지 않는다고 확인했다. 실제 삭제 전 development plan38673377851은 실패했고 apply는 실행하지 않았다. worker 진단은 로컬 관리자 로그 조회로 확인 중이다. GitHub job 로그 redirect는 현재 환경의 네트워크 정책으로 거절돼 우회하지 않았다.

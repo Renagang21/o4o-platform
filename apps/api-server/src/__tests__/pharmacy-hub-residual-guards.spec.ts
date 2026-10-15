@@ -179,6 +179,7 @@ describe('store slug · 조직 경로', () => {
       'services/store/store-qr.service.ts',
     ]) expect(src(path)).toContain('retiredServiceOnlyOrganizationSql(');
     expect(src('utils/store-organization.resolver.ts').match(/retiredServiceOnlyOrganizationSql\(/g)?.length).toBe(2);
+    expect(src('services/store/store-qr.service.ts')).toContain("retiredServiceKeySql('service_key')");
   });
 
   it('태블릿 기기 토큰 경로(페어링 조회 · claim · heartbeat · 런타임)도 퇴역 조직을 막는다', () => {

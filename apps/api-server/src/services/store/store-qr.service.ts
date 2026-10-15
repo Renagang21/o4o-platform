@@ -26,8 +26,7 @@
 
 import type { DataSource } from 'typeorm';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
-import { RETIRED_SERVICE_KEYS } from '../../middleware/retired-service.middleware.js';
-import { retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
+import { retiredServiceKeySql, retiredServiceOnlyOrganizationSql } from '../../utils/retired-organization.js';
 import { StoreQrCode } from '../../routes/platform/entities/store-qr-code.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
@@ -234,9 +233,9 @@ export async function resolvePublicQrLanding(
   // 매장(조직)은 서비스마다 slug 를 가질 수 있다(1 Store : N Services). storeSlug 는 종전대로 최신 slug.
   const storeRows: Array<{ slug: string; service_key: string }> = await dataSource.query(
     `SELECT slug, service_key FROM platform_store_slugs
-     WHERE store_id = $1 AND is_active = true AND NOT (service_key = ANY($2::text[]))
+     WHERE store_id = $1 AND is_active = true AND service_key IS NOT NULL AND NOT ${retiredServiceKeySql('service_key')}
      ORDER BY created_at DESC`,
-    [qrData.organizationId, [...RETIRED_SERVICE_KEYS]],
+    [qrData.organizationId],
   );
   // WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (pharmacyhub.co.kr QR 착지 이전):
   //   QR slug 는 전역 고유라 어느 호스트에서 열어도 같은 QR 을 찾는다. 다만 화면 구성(Screen Set 상품 노출 범위 ·

@@ -415,8 +415,9 @@ describe('resolvePublicQrLanding', () => {
     const { ds, query } = landingDataSource();
     await resolvePublicQrLanding(ds, 's', 'kpa', scan);
     const slugCall = query.mock.calls.find((c: any[]) => String(c[0]).includes('FROM platform_store_slugs') && !String(c[0]).includes('AS retired'));
-    expect(String(slugCall?.[0])).toContain('NOT (service_key = ANY($2::text[]))');
-    expect(slugCall?.[1]?.[1]).toEqual(expect.arrayContaining(['pharmacy-hub', 'pharmacy-hub-event-offer']));
+    expect(String(slugCall?.[0])).toContain("btrim(service_key) LIKE 'pharmacy-hub:%'");
+    expect(String(slugCall?.[0])).toContain("btrim(service_key) IN ('pharmacy-hub', 'pharmacy-hub-event-offer')");
+    expect(slugCall?.[1]).toEqual([ORG]);
   });
 
   it('스캔 INSERT 가 실패해도 랜딩 응답은 정상이다 (fire-and-forget)', async () => {
