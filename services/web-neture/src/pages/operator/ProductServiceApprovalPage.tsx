@@ -13,6 +13,7 @@
  * - 거절 시 사유 입력 모달
  */
 
+import { OperatorDialog } from './OperatorDialog';
 import { useState, useEffect, useRef } from 'react';
 import {
   operatorServiceApprovalApi,
@@ -45,6 +46,7 @@ const SERVICE_OPTIONS = [
 // ==================== Component ====================
 
 export default function ProductServiceApprovalPage() {
+  const dialogFallback = useRef<HTMLHeadingElement>(null);
   const { user } = useAuth();
   const canManage = user?.roles?.some(
     (r: string) => r === 'neture:admin' || r === 'neture:operator' || r === 'platform:super_admin',
@@ -248,7 +250,7 @@ export default function ProductServiceApprovalPage() {
     <div className="relative">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">서비스별 상품 승인</h1>
+        <h1 ref={dialogFallback} tabIndex={-1} className="text-2xl font-bold text-slate-900">서비스별 상품 승인</h1>
         <p className="text-sm text-slate-500 mt-1">
           공급자가 선택한 서비스별 상품 승인을 관리합니다.
         </p>
@@ -816,13 +818,13 @@ export default function ProductServiceApprovalPage() {
       )}
 
       {rejectTarget && (
-        <ProductServiceApprovalDecisionModal decision="reject" batch={rejectTarget === 'batch'} count={selectedPendingIds.length}
+        <ProductServiceApprovalDecisionModal fallbackFocus={dialogFallback} decision="reject" batch={rejectTarget === 'batch'} count={selectedPendingIds.length}
           value={rejectReason} error={decisionError} busy={decisionBusy} canManage={canManage}
           onChange={setRejectReason} onCancel={() => { if (!decisionWriting.current) setRejectTarget(null); }}
           onConfirm={() => void handleDecisionConfirm('reject')} />
       )}
       {approveTarget && (
-        <ProductServiceApprovalDecisionModal decision="approve" batch={approveTarget === 'batch'} count={selectedPendingIds.length}
+        <ProductServiceApprovalDecisionModal fallbackFocus={dialogFallback} decision="approve" batch={approveTarget === 'batch'} count={selectedPendingIds.length}
           value={approveMemo} error={decisionError} busy={decisionBusy} canManage={canManage}
           onChange={setApproveMemo} onCancel={() => { if (!decisionWriting.current) setApproveTarget(null); }}
           onConfirm={() => void handleDecisionConfirm('approve')} />
@@ -830,8 +832,7 @@ export default function ProductServiceApprovalPage() {
 
       {/* Delete Confirm Modal (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1) */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-          <dialog open aria-modal="true" aria-label="상품 삭제" className="relative m-0 border-0 bg-white rounded-lg p-6 w-full max-w-md">
+        <OperatorDialog label="상품 삭제" fallbackFocus={dialogFallback} busy={deleteLoading} onCancel={() => { if (!deleteWriting.current) setDeleteTarget(null); }} className="bg-white rounded-lg p-6 max-w-md">
             <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제</h3>
             <p className="text-sm font-medium text-slate-800 mb-2">{deleteTarget.productName}</p>
             <p className="text-sm text-slate-500 mb-4">
@@ -840,7 +841,7 @@ export default function ProductServiceApprovalPage() {
             {deleteError && <p role="alert" className="text-sm text-red-600">{deleteError}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => { if (!deleteWriting.current) setDeleteTarget(null); }}
+                data-dialog-initial-focus onClick={() => { if (!deleteWriting.current) setDeleteTarget(null); }}
                 disabled={deleteLoading}
                 className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
               >
@@ -854,12 +855,11 @@ export default function ProductServiceApprovalPage() {
                 {deleteLoading ? '삭제 중...' : '삭제 확인'}
               </button>
             </div>
-          </dialog>
-        </div>
+          </OperatorDialog>
       )}
 
       {drawerItem && (
-        <ProductServiceApprovalDrawer item={drawerItem} canManage={canManage} decisionBusy={decisionBusy}
+        <ProductServiceApprovalDrawer fallbackFocus={dialogFallback} item={drawerItem} canManage={canManage} decisionBusy={decisionBusy}
           onClose={() => setDrawerItem(null)} onApprove={handleApprove}
           onReject={(id) => openDecision('reject', id)} />
       )}

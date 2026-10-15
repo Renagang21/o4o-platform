@@ -253,12 +253,8 @@ export const forumOperatorApi = {
 
   // WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
   getCategories: async () => {
-    try {
-      const res = await authClient.api.get(`${OPERATOR_BASE}/categories?${SVC}`);
-      return res.data;
-    } catch {
-      return { success: true, data: [], count: 0 };
-    }
+    const res = await authClient.api.get(`${OPERATOR_BASE}/categories?${SVC}`);
+    return res.data;
   },
 
   updateCategory: async (id: string, data: { name?: string; description?: string; tags?: string[] }) => {

@@ -12,6 +12,7 @@
 
 import { Router, Request, Response } from 'express';
 import { In, type DataSource } from 'typeorm';
+import { isHomePresentationMetadata, ordinaryCmsMetadata, ORDINARY_CMS_CONTENT_SQL } from './cms-reserved-presentation.js';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
 import { optionalAuth } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
@@ -110,7 +111,7 @@ export function createCmsContentQueryRoutes(deps: {
       }
 
       // Build base where clause for scope
-      const baseWhere: any = {};
+      const baseWhere: any = { metadata: ordinaryCmsMetadata() };
       if (scope.serviceKeys) {
         baseWhere.serviceKey = In(scope.serviceKeys);
       }
@@ -238,7 +239,7 @@ export function createCmsContentQueryRoutes(deps: {
       }
 
       // Build where clause
-      const where: any = {};
+      const where: any = { metadata: ordinaryCmsMetadata() };
       if (scope.serviceKeys) {
         where.serviceKey = In(scope.serviceKeys);
       }
@@ -304,9 +305,10 @@ export function createCmsContentQueryRoutes(deps: {
       const qb = contentRepo.createQueryBuilder('c');
       Object.entries(where).forEach(([key, val]) => {
         // serviceKey 는 alias 집합이라 `= :key` 로 바인딩하면 안 된다 (FindOperator 가 그대로 들어간다).
-        if (key === 'serviceKey') return;
+        if (key === 'serviceKey' || key === 'metadata') return;
         qb.andWhere(`c."${key}" = :${key}`, { [key]: val });
       });
+      qb.andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`);
       if (scope.serviceKeys) {
         qb.andWhere('c."serviceKey" IN (:...scopeServiceKeys)', {
           scopeServiceKeys: scope.serviceKeys,
@@ -441,7 +443,7 @@ export function createCmsContentQueryRoutes(deps: {
 
       // WO-O4O-CMS-PUBLIC-VISIBILITY-HARDENING-V1:
       // 비인증 사용자에게 미게시 콘텐츠는 404 반환 (존재 노출 방지)
-      if (!content || (!(req as any).user && content.status !== 'published')) {
+      if (!content || isHomePresentationMetadata(content.metadata) || (!(req as any).user && content.status !== 'published')) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },

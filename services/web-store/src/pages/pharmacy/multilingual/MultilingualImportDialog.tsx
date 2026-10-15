@@ -107,7 +107,7 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
         <label className="block text-sm">제품 종류<select aria-label="제품 종류" className="block border rounded p-2 w-full min-h-11" value={kind} onChange={e => {
           if (writing.current) return;
           setKind(e.target.value as StoreMlcTargetKind); setPage(1); setSelected(null); setProducts([]); setLoading(true); setError(null); setWriteError(null);
-        }}><option value="local">매장 경영활용 제품</option><option value="listing">O4O 주문 가능 상품</option></select></label>
+        }}><option value="local">매장 경영활용 제품</option><option value="listing">O4O DB 기반 제품</option></select></label>
         <form className="flex gap-2" onSubmit={e => { e.preventDefault(); if (!writing.current) { setQuery(search.trim()); setPage(1); } }}>
           <input aria-label="연결할 제품 검색" value={search} onChange={e => setSearch(e.target.value)} className="min-w-0 flex-1 border rounded p-2" />
           <button type="submit" className="min-h-11 px-3 border rounded">검색</button>

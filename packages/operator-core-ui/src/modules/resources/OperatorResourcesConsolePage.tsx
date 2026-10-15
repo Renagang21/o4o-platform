@@ -11,7 +11,7 @@
  *   허용되지 않은 전이 · 지원하지 않는 삭제는 **CTA 자체를 그리지 않는다**.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import type React from 'react';
 import {
   FileText,
@@ -31,7 +31,6 @@ import {
   Archive,
 } from 'lucide-react';
 import { RowActionMenu, ActionBar, BulkResultModal, BaseDetailDrawer } from '@o4o/ui';
-import { toast } from '@o4o/error-handling';
 import {
   DataTable,
   Pagination,
@@ -100,13 +99,22 @@ function formatDate(iso: string): string {
 function unwrapList(res: any): { items: ResourcesConsoleItem[]; total: number } {
   // 서비스별 axios wrapper 와 KPA 의 apiClient wrapper 의 응답 shape 변형 모두 흡수.
   const d = res?.data?.data ?? res?.data ?? res;
-  return {
-    items: d?.items ?? [],
-    total: d?.total ?? 0,
-  };
+  ensureSuccess(res);
+  if (!Array.isArray(d?.items) || typeof d.total !== 'number') throw new Error('자료 목록 응답을 확인하지 못했습니다.');
+  return { items: d.items, total: d.total };
 }
 
+function ensureSuccess(res: any) {
+  for (const envelope of [res, res?.data, res?.data?.data]) {
+    if (envelope?.success === false) throw new Error(envelope.error || envelope.message || '처리에 실패했습니다.');
+  }
+}
+function errorMessage(e: unknown, fallback: string) {
+  const error = e as { response?: { data?: { error?: string } }; message?: string };
+  return error?.response?.data?.error || error?.message || fallback;
+}
 function unwrapItem(res: any): any {
+  ensureSuccess(res);
   return res?.data?.data ?? res?.data ?? res;
 }
 
@@ -156,7 +164,30 @@ export function OperatorResourcesConsolePage({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formInitial, setFormInitial] = useState<ResourcesFormValue | null>(null);
 
+  const [writing, setWriting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const scopeRef = useRef({ mounted: false, list: 0, form: 0, writing: false });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, list: 0, form: 0, writing: false };
+    scopeRef.current = scope;
+    setItems([]); setTotal(0); setSelectedIds(new Set()); setSelectedItem(null);
+    setFormOpen(false); setFormLoading(false); setAiOpen(false); setWriting(false);
+    setNotice(null); setActionError(null); setRefreshFailed(false); setFormError(null);
+    return () => { scope.mounted = false; scope.list++; scope.form++; };
+  }, [client, serviceKey, lifecycle]);
+  useLayoutEffect(() => {
+    scopeRef.current.list++;
+    setSelectedIds(new Set()); setSelectedItem(null);
+  }, [page, search, sourceTypeFilter, statusFilter, usageTypeFilter]);
+
   const fetchItems = useCallback(async () => {
+    const scope = scopeRef.current;
+    if (!scope.mounted) return false;
+    const sequence = ++scope.list;
+    const current = () => scope.mounted && sequence === scope.list;
     setLoading(true);
     setError(null);
     try {
@@ -171,21 +202,55 @@ export function OperatorResourcesConsolePage({
         usage_type: usageTypeFilter || undefined,
       });
       const { items: rows, total: t } = unwrapList(res);
-      setItems(rows);
-      setTotal(t);
+      if (!current()) return false;
+      const lastPage = Math.max(1, Math.ceil(t / PAGE_SIZE));
+      if (page > lastPage) { setPage(lastPage); return true; }
+      setItems(rows); setTotal(t); setSelectedIds(new Set());
+      setRefreshFailed(false);
+      return true;
     } catch (e: any) {
-      setError(e?.message || `${nouns.entity} 목록을 불러오지 못했습니다`);
+      if (current()) setError(errorMessage(e, `${nouns.entity} 목록을 불러오지 못했습니다`));
+      return false;
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
-  }, [client, page, search, sourceTypeFilter, statusFilter, usageTypeFilter]);
+  }, [client, page, search, sourceTypeFilter, statusFilter, usageTypeFilter, nouns.entity]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
+  const renderedScope = scopeRef.current;
+  const renderedList = renderedScope.list;
+  const refreshAfterWrite = async () => {
+    const scope = scopeRef.current;
+    if (!scope.mounted) return;
+    const ok = await fetchItems();
+    if (scope.mounted) setRefreshFailed(!ok);
+  };
+  const runWrite = async (operation: () => Promise<void>) => {
+    const scope = scopeRef.current;
+    if (!scope.mounted || scope.writing || scope !== renderedScope) return;
+    if (loading || error || renderedList !== scope.list) {
+      setActionError('목록을 다시 확인한 뒤 처리해 주세요.'); return;
+    }
+    scope.writing = true; setWriting(true); setActionError(null); setNotice(null);
+    try { await operation(); }
+    finally { scope.writing = false; if (scope.mounted) setWriting(false); }
+  };
+  const closeForm = () => {
+    if (scopeRef.current.writing) return;
+    scopeRef.current.form++;
+    setFormOpen(false); setEditingId(null); setFormError(null); setFormLoading(false);
+  };
+  const controlsLocked = writing || formOpen || aiOpen;
+
+  const changeView = (change: () => void) => {
+    if (scopeRef.current.writing || formOpen || aiOpen) return;
+    setNotice(null); setActionError(null); setRefreshFailed(false); change();
+  };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearch(searchInput.trim());
-    setPage(1);
+    if (scopeRef.current.writing) return;
+    changeView(() => { setSearch(searchInput.trim()); setPage(1); });
   };
 
   // ─── Action Policy (lifecycle 기반 조립) ──────────────────────────────────
@@ -243,76 +308,67 @@ export function OperatorResourcesConsolePage({
 
   // ─── Single-item actions ──────────────────────────────────────────────────
 
-  const handleTransition = async (item: ResourcesConsoleItem, t: ResourcesTransitionActionDef) => {
+  const handleTransition = (item: ResourcesConsoleItem, t: ResourcesTransitionActionDef) => runWrite(async () => {
+    const scope = scopeRef.current;
     try {
-      await client.operatorUpdateStatus(item.id, t.to);
-      toast.success(
-        t.successMessage ? t.successMessage(item.title) : `"${item.title}" ${t.label} 처리되었습니다`,
-      );
-      fetchItems();
-    } catch (err: any) {
-      toast.error(err?.message || `${t.label} 처리에 실패했습니다`);
-    }
-  };
+      ensureSuccess(await client.operatorUpdateStatus(item.id, t.to));
+      if (!scope.mounted) return;
+      setNotice(t.successMessage ? t.successMessage(item.title) : `"${item.title}" ${t.label} 처리되었습니다`);
+      setSelectedItem(null);
+      await refreshAfterWrite();
+    } catch (e) { if (scope.mounted) setActionError(errorMessage(e, `${t.label} 처리에 실패했습니다`)); }
+  });
 
-  const handleDelete = async (item: ResourcesConsoleItem) => {
+  const handleDelete = (item: ResourcesConsoleItem) => runWrite(async () => {
     if (!client.operatorDelete) return;
+    const scope = scopeRef.current;
     try {
-      await client.operatorDelete(item.id);
-      toast.success(`"${item.title}" 삭제되었습니다`);
-      fetchItems();
-    } catch (err: any) {
-      toast.error(err?.message || '삭제에 실패했습니다');
-    }
-  };
+      ensureSuccess(await client.operatorDelete(item.id));
+      if (!scope.mounted) return;
+      setNotice(`"${item.title}" 삭제되었습니다`); setSelectedItem(null);
+      await refreshAfterWrite();
+    } catch (e) { if (scope.mounted) setActionError(errorMessage(e, '삭제에 실패했습니다')); }
+  });
 
   // ─── Create / Edit ────────────────────────────────────────────────────────
 
   const openCreate = () => {
-    setEditingId(null);
-    setFormInitial(null);
-    setFormOpen(true);
+    if (scopeRef.current.writing) return;
+    scopeRef.current.form++;
+    setFormLoading(false); setFormError(null); setEditingId(null);
+    setFormInitial(null); setFormOpen(true);
   };
 
   const openEdit = async (item: ResourcesConsoleItem) => {
-    setEditingId(item.id);
+    const scope = scopeRef.current;
+    if (scope.writing || loading || error) return;
+    const sequence = ++scope.form;
+    const current = () => scope.mounted && sequence === scope.form;
+    setEditingId(item.id); setFormError(null);
     setFormInitial({ title: item.title, summary: item.summary ?? '' });
     setFormOpen(true);
     if (!client.operatorGet) return;
     setFormLoading(true);
     try {
       const detail = unwrapItem(await client.operatorGet(item.id));
-      setFormInitial({
-        title: detail?.title ?? item.title,
-        summary: detail?.summary ?? '',
-        body: detail?.body ?? '',
-        linkUrl: detail?.linkUrl ?? '',
-        linkText: detail?.linkText ?? '',
-      });
-    } catch (err: any) {
-      toast.error(err?.message || `${nouns.entity}를 불러오지 못했습니다`);
-      setFormOpen(false);
-    } finally {
-      setFormLoading(false);
-    }
+      if (!current()) return;
+      setFormInitial({ title: detail?.title ?? item.title, summary: detail?.summary ?? '', body: detail?.body ?? '', linkUrl: detail?.linkUrl ?? '', linkText: detail?.linkText ?? '' });
+    } catch (e) {
+      if (current()) { setActionError(errorMessage(e, `${nouns.entity}를 불러오지 못했습니다`)); setFormOpen(false); }
+    } finally { if (current()) setFormLoading(false); }
   };
 
-  const handleFormSubmit = async (value: ResourcesFormValue) => {
+  const handleFormSubmit = (value: ResourcesFormValue) => runWrite(async () => {
+    const scope = scopeRef.current;
+    setFormError(null);
     try {
-      if (editingId) {
-        await client.operatorUpdate!(editingId, value);
-        toast.success(`${nouns.entity}를 수정했습니다`);
-      } else {
-        await client.operatorCreate!(value);
-        toast.success(`${nouns.entity}를 등록했습니다`);
-      }
-      setFormOpen(false);
-      setEditingId(null);
-      fetchItems();
-    } catch (err: any) {
-      toast.error(err?.message || '저장에 실패했습니다');
-    }
-  };
+      ensureSuccess(editingId ? await client.operatorUpdate!(editingId, value) : await client.operatorCreate!(value));
+      if (!scope.mounted) return;
+      setNotice(`${nouns.entity}를 ${editingId ? '수정' : '등록'}했습니다`);
+      setFormOpen(false); setEditingId(null); scope.form++;
+      await refreshAfterWrite();
+    } catch (e) { if (scope.mounted) setFormError(errorMessage(e, '저장에 실패했습니다')); }
+  });
 
   // ─── Bulk Actions (Promise.allSettled wrap — canonical) ───────────────────
 
@@ -320,7 +376,7 @@ export function OperatorResourcesConsolePage({
     op: (id: string) => Promise<unknown>,
     ids: string[],
   ): Promise<{ data: { results: { id: string; status: 'success' | 'failed'; error?: string }[] } }> => {
-    const results = await Promise.allSettled(ids.map((id) => op(id)));
+    const results = await Promise.allSettled(ids.map(async (id) => ensureSuccess(await op(id))));
     return {
       data: {
         results: results.map((r, i) => ({
@@ -334,12 +390,17 @@ export function OperatorResourcesConsolePage({
     };
   };
 
-  const runBulk = async (op: (id: string) => Promise<unknown>) => {
-    const ids = [...selectedIds];
+  const runBulk = (op: (id: string) => Promise<unknown>) => runWrite(async () => {
+    const scope = scopeRef.current;
+    const ids = [...selectedIds].filter(id => items.some(item => item.id === id));
     if (ids.length === 0) return;
     const result = await batch.executeBatch((batchIds: string[]) => wrapBulk(op, batchIds), ids);
-    if (result.successCount > 0) setSelectedIds(new Set());
-  };
+    if (!scope.mounted) return;
+    if (result.successCount > 0) {
+      setNotice(`${result.successCount}건 처리 완료${result.failedCount ? ` · ${result.failedCount}건 실패` : ''}`);
+      setSelectedIds(new Set()); await refreshAfterWrite();
+    }
+  });
 
   const bulkActions = [
     ...lifecycle.transitionActions
@@ -350,7 +411,8 @@ export function OperatorResourcesConsolePage({
         onClick: () => runBulk((id) => client.operatorUpdateStatus(id, t.to)),
         variant: (t.variant ?? 'default') as 'primary' | 'default' | 'danger',
         icon: t.icon ? BULK_ICONS[t.icon] : undefined,
-        loading: batch.loading,
+        loading: writing,
+        disabled: writing || loading || !!error || formOpen || aiOpen,
         confirm: {
           title: t.bulkConfirm!.title,
           message: `${selectedIds.size}건을 ${t.label} 처리합니다.`,
@@ -366,7 +428,8 @@ export function OperatorResourcesConsolePage({
             onClick: () => runBulk((id) => client.operatorDelete!(id)),
             variant: 'danger' as const,
             icon: <Trash2 size={14} />,
-            loading: batch.loading,
+            loading: writing,
+            disabled: writing || loading || !!error || formOpen || aiOpen,
             confirm: {
               title: `선택 ${nouns.entity} 삭제`,
               message: `${selectedIds.size}건을 삭제합니다.`,
@@ -494,6 +557,7 @@ export function OperatorResourcesConsolePage({
       onCellClick: () => {},
       render: (_v: any, row: ResourcesConsoleItem) => (
         <RowActionMenu
+          disabled={controlsLocked || loading || !!error}
           actions={buildRowActions(
             resourceActionPolicy,
             row,
@@ -515,42 +579,48 @@ export function OperatorResourcesConsolePage({
     },
   ];
 
+  const aiScope = scopeRef.current;
+
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>{nouns.consoleTitle}</h1>
           <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
-            {nouns.collection} {nouns.entity} 운영 관리 — 총 {total}개
+            {nouns.collection} {nouns.entity} 운영 관리{!loading && !error ? ` — 총 ${total}개` : ''}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {canCreate && (
-            <button onClick={openCreate} style={createBtnStyle}>
+            <button disabled={controlsLocked || loading || !!error} onClick={openCreate} style={createBtnStyle}>
               <Plus size={14} />
               {lifecycle.form?.createLabel ?? `새 ${nouns.entity}`}
             </button>
           )}
           {aiSlot && (
-            <button onClick={() => setAiOpen(true)} style={aiCreateBtnStyle}>
+            <button disabled={controlsLocked} onClick={() => setAiOpen(true)} style={aiCreateBtnStyle}>
               <Sparkles size={14} />
               {aiSlot.buttonLabel}
             </button>
           )}
-          <button onClick={fetchItems} style={refreshBtnStyle}>
+          <button disabled={controlsLocked || loading} onClick={() => void fetchItems()} style={refreshBtnStyle}>
             <RefreshCw size={14} />
             새로고침
           </button>
         </div>
       </div>
 
+      {notice && <p role="status" className="mb-3 text-emerald-700">{notice}</p>}
+      {actionError && <p role="alert" className="mb-3 text-red-700">{actionError}</p>}
+      {refreshFailed && <p role="alert" className="mb-3 text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 목록만 다시 조회해 주세요.</p>}
       {/* 정책 안내 */}
       <div style={policyBannerStyle}>{policyBanner ?? defaultPolicyBanner(nouns)}</div>
 
       {/* Search + Filters */}
+      <fieldset disabled={controlsLocked} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         {caps.search && (
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
@@ -577,8 +647,9 @@ export function OperatorResourcesConsolePage({
         )}
         {caps.sourceType && (
           <select
+            aria-label="자료 유형"
             value={sourceTypeFilter}
-            onChange={(e) => { setSourceTypeFilter(e.target.value as typeof sourceTypeFilter); setPage(1); }}
+            onChange={(e) => changeView(() => { setSourceTypeFilter(e.target.value as typeof sourceTypeFilter); setPage(1); })}
             style={selectStyle}
           >
             <option value="">전체 유형</option>
@@ -588,8 +659,9 @@ export function OperatorResourcesConsolePage({
           </select>
         )}
         <select
+          aria-label="자료 상태"
           value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          onChange={(e) => changeView(() => { setStatusFilter(e.target.value); setPage(1); })}
           style={selectStyle}
         >
           <option value="">전체 상태</option>
@@ -601,8 +673,9 @@ export function OperatorResourcesConsolePage({
         </select>
         {caps.usageType && (
           <select
+            aria-label="자료 활용방식"
             value={usageTypeFilter}
-            onChange={(e) => { setUsageTypeFilter(e.target.value as typeof usageTypeFilter); setPage(1); }}
+            onChange={(e) => changeView(() => { setUsageTypeFilter(e.target.value as typeof usageTypeFilter); setPage(1); })}
             style={selectStyle}
           >
             <option value="">전체 활용방식</option>
@@ -616,17 +689,18 @@ export function OperatorResourcesConsolePage({
         {(search || sourceTypeFilter || statusFilter || usageTypeFilter) && (
           <button
             type="button"
-            onClick={() => {
+            onClick={() => changeView(() => {
               setSearch(''); setSearchInput('');
               setSourceTypeFilter(''); setStatusFilter(''); setUsageTypeFilter('');
               setPage(1);
-            }}
+            })}
             style={clearBtnStyle}
           >
             초기화
           </button>
         )}
       </form>
+      </fieldset>
 
       {/* Loading */}
       {loading && items.length === 0 && (
@@ -638,10 +712,10 @@ export function OperatorResourcesConsolePage({
 
       {/* Error */}
       {error && !loading && (
-        <div style={{ textAlign: 'center', padding: 60 }}>
+        <div role="alert" style={{ textAlign: 'center', padding: 60 }}>
           <AlertCircle size={28} style={{ margin: '0 auto 12px', color: '#dc2626' }} />
           <p style={{ fontSize: 14, color: '#dc2626', marginBottom: 16 }}>{error}</p>
-          <button onClick={fetchItems} style={retryBtnStyle}>
+          <button disabled={controlsLocked || loading} onClick={() => void fetchItems()} style={retryBtnStyle}>
             <RefreshCw size={14} /> 다시 시도
           </button>
         </div>
@@ -662,9 +736,13 @@ export function OperatorResourcesConsolePage({
       {/* BulkResultModal */}
       <BulkResultModal
         open={batch.showResult}
-        onClose={() => { batch.clearResult(); fetchItems(); }}
+        onClose={() => { if (!scopeRef.current.writing) batch.clearResult(); }}
         result={batch.result}
-        onRetry={() => batch.retryFailed()}
+        onRetry={() => runWrite(async () => {
+          const scope = scopeRef.current;
+          const result = await batch.retryFailed();
+          if (scope.mounted && result?.successCount) { setNotice(`${result.successCount}건 재시도 완료`); await refreshAfterWrite(); }
+        })}
       />
 
       {/* ActionBar */}
@@ -688,14 +766,14 @@ export function OperatorResourcesConsolePage({
             emptyMessage={`${nouns.entity}가 없습니다`}
             selectable={bulkActions.length > 0}
             selectedKeys={selectedIds}
-            onSelectionChange={setSelectedIds}
-            onRowClick={(row) => setSelectedItem(row)}
+            onSelectionChange={ids => { if (!controlsLocked && !loading) setSelectedIds(ids); }}
+            onRowClick={(row) => { if (!controlsLocked && !loading) setSelectedItem(row); }}
           />
           {total > PAGE_SIZE && (
             <Pagination
               page={page}
               totalPages={Math.ceil(total / PAGE_SIZE)}
-              onPageChange={setPage}
+              onPageChange={next => changeView(() => setPage(next))}
               total={total}
             />
           )}
@@ -765,7 +843,8 @@ export function OperatorResourcesConsolePage({
           config={lifecycle.form}
           initial={formInitial}
           loading={formLoading}
-          onClose={() => { setFormOpen(false); setEditingId(null); }}
+          onClose={closeForm}
+          error={formError}
           onSubmit={handleFormSubmit}
           nouns={nouns}
         />
@@ -775,7 +854,7 @@ export function OperatorResourcesConsolePage({
       {aiSlot && aiSlot.render({
         open: aiOpen,
         onClose: () => setAiOpen(false),
-        onSaved: () => { setAiOpen(false); fetchItems(); },
+        onSaved: () => { if (aiScope.mounted) { setAiOpen(false); setNotice(`${nouns.entity} 저장이 완료되었습니다`); void refreshAfterWrite(); } },
       })}
     </div>
   );

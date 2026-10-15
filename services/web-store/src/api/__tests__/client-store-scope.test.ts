@@ -1,3 +1,5 @@
+import { createBlogPost } from '../blogStaff';
+import { getPharmacyInfo } from '../pharmacyInfo';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiClient } from '../client';
 import { setActiveStoreOrganizationId } from '../../lib/storeOrganizationHeader';
@@ -5,14 +7,14 @@ import { storeScopedFetch } from '../storeScopedFetch';
 import { registerStandardProductToStore } from '../o4oStandardProducts';
 import { submitProductRequest } from '../storeProductRequests';
 import { importOperatorTemplate } from '../storeScreenSetHub';
-import { saveTabletDisplaySettings } from '../tabletDisplays';
+import { saveTabletDisplaySettings, captureScreenSetWrites } from '../tabletDisplays';
 import { mediaApi } from '../media';
 
 const mocks = vi.hoisted(() => ({ refresh: vi.fn() }));
 vi.mock('@o4o/auth-client', () => ({ getAccessToken: () => 'synthetic-old' }));
 vi.mock('../../contexts/AuthContext', () => ({ getAccessToken: () => 'synthetic-old' }));
 vi.mock('../../lib/apiClient', () => ({ API_BASE_URL: '/api/v1', api: { interceptors: { request: { use: vi.fn() } } } }));
-vi.mock('../../lib/serviceContext', () => ({ apiV1Base: () => 'https://api.example/api/v1', apiV1Service: () => 'https://api.example/api/v1/kpa' }));
+vi.mock('../../lib/serviceContext', () => ({ apiV1Base: () => 'https://api.example/api/v1', apiV1Service: () => 'https://api.example/api/v1/kpa', getActiveServicePrefix: () => 'kpa' }));
 vi.mock('../token-refresh', () => ({ tryRefreshToken: mocks.refresh }));
 
 beforeEach(() => {
@@ -90,6 +92,7 @@ describe('shared request store scope', () => {
     }
   });
   it.each([
+    ['blog draft', () => createBlogPost('fixture-store', { title: 'Fixture title', content: 'Fixture body' })],
     ['standard product', () => registerStandardProductToStore('synthetic-master')],
     ['product request', () => submitProductRequest({ productName: 'synthetic', classification: 'synthetic' })],
     ['template copy', () => importOperatorTemplate('synthetic-template')],
@@ -123,4 +126,23 @@ describe('shared request store scope', () => {
     await new ApiClient(() => 'https://api.example').get('/test');
     expect(seen.map(h => h.get('X-Store-Organization-Id'))).toEqual(['store-a', 'store-a']);
   });
+});
+
+it('screen-set metadata and blocks stay in the original store after switching during the first write', async () => {
+  const seen: Array<{ url: string; headers: Headers }> = [];
+  vi.stubGlobal('fetch', vi.fn(async (url, options) => {
+    seen.push({ url, headers: new Headers(options.headers) });
+    setActiveStoreOrganizationId('store-b');
+    return new Response(JSON.stringify({ success: true, data: url.endsWith('/blocks') ? [] : { id: 'set-a' } }));
+  }));
+  const writer = captureScreenSetWrites();
+  const header = await writer.create({ name: 'Synthetic screen' });
+  await writer.saveBlocks(header.id, []);
+  expect(seen.map(request => request.headers.get('X-Store-Organization-Id'))).toEqual(['store-a', 'store-a']);
+  expect(seen.map(request => request.url)).toEqual(['https://api.example/api/v1/kpa/store/screen-sets', 'https://api.example/api/v1/kpa/store/screen-sets/set-a/blocks']);
+});
+
+it('an unsuccessful store-info envelope cannot masquerade as an unlinked store', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{"success":false,"data":null}')));
+  await expect(getPharmacyInfo()).rejects.toThrow('매장 정보를 불러오지 못했습니다');
 });

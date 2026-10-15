@@ -1,3 +1,4 @@
+import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 /**
  * TabletContentLibraryList — 태블릿 콘텐츠(화면 세트) O4O 표준 리스트
  *
@@ -125,7 +126,10 @@ export interface ApplyTargetTablet {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+const alwaysCurrent = () => true;
+
 interface Props {
+  isCurrent?: () => boolean;
   /** 전체 화면 세트(부모 reload 가 includeArchived 포함해 전달). */
   sets: ScreenSet[];
   loading: boolean;
@@ -181,7 +185,13 @@ export default function TabletContentLibraryList({
   tablets,
   onApplyToTablet,
   highlightId,
+  isCurrent = alwaysCurrent,
 }: Props) {
+  const previewRequests = useLatestStoreRequest();
+  const renameRequests = useLatestStoreRequest();
+  const renameLock = useRef(false);
+  const duplicateLock = useRef(false);
+  const applyLock = useRef(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('available');
   const [templateFilter, setTemplateFilter] = useState<string>('');
@@ -212,41 +222,46 @@ export default function TabletContentLibraryList({
   );
 
   const openRename = useCallback((s: ScreenSet) => {
+    renameRequests.cancel();
     setRenameFor(s);
     setRenameName(s.name);
     setRenameDesc(s.description ?? '');
-  }, []);
+  }, [renameRequests]);
 
   const submitRename = useCallback(async () => {
-    if (!renameFor || renameBusy) return;
+    if (!renameFor || renameLock.current || !isCurrent()) return;
+    const current = renameRequests.begin();
     const name = renameName.trim();
     if (!name) { toast.error('이름을 입력해 주세요.'); return; }
-    setRenameBusy(true);
+    renameLock.current = true; setRenameBusy(true);
     try {
       await updateScreenSet(renameFor.id, { name, description: renameDesc.trim() || null });
+      if (!current() || !isCurrent()) return;
       toast.success('이름 · 설명을 저장했습니다.');
       setRenameFor(null);
       onRefresh();
-    } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다.');
+    } catch {
+      if (current() && isCurrent()) toast.error('이름·설명을 저장하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주세요.');
     } finally {
-      setRenameBusy(false);
+      renameLock.current = false; if (current() && isCurrent()) setRenameBusy(false);
     }
-  }, [renameFor, renameBusy, renameName, renameDesc, onRefresh]);
+  }, [renameFor, renameName, renameDesc, onRefresh, renameRequests, isCurrent]);
 
   const handleDuplicate = useCallback(async (s: ScreenSet) => {
-    if (duplicateBusyId) return;
+    if (duplicateLock.current || !isCurrent()) return;
+    duplicateLock.current = true;
     setDuplicateBusyId(s.id);
     try {
       const copy = await duplicateScreenSet(s.id);
+      if (!isCurrent()) return;
       toast.success(`“${copy.name}” 으로 복제했습니다. (현재 적용 · 위치 연결은 복사되지 않습니다)`);
       onRefresh();
     } catch (e: any) {
-      toast.error(e?.message || '복제에 실패했습니다.');
+      if (isCurrent()) toast.error(e?.message || '복제에 실패했습니다.');
     } finally {
-      setDuplicateBusyId(null);
+      duplicateLock.current = false; if (isCurrent()) setDuplicateBusyId(null);
     }
-  }, [duplicateBusyId, onRefresh]);
+  }, [onRefresh, isCurrent]);
 
   // HUB 가져오기 완료 → 방금 가져온 사본을 보이게: 필터 초기화(전체) + 1페이지(최신순이라 상단) + 스크롤 + 하이라이트.
   useEffect(() => {
@@ -274,18 +289,20 @@ export default function TabletContentLibraryList({
   }, [tablets, onApplyToTablet]);
 
   const handleApplySelect = useCallback(async (tabletId: string) => {
-    if (!applyFor || !onApplyToTablet || applyBusyTabletId) return;
+    if (!applyFor || !onApplyToTablet || applyLock.current || !isCurrent()) return;
+    applyLock.current = true;
     setApplyBusyTabletId(tabletId);
     try {
       await onApplyToTablet(applyFor.id, tabletId);
+      if (!isCurrent()) return;
       setApplyFor(null);
       onRefresh();
     } catch {
       /* 오류 토스트는 부모(onApplyToTablet)에서 표시 */
     } finally {
-      setApplyBusyTabletId(null);
+      applyLock.current = false; if (isCurrent()) setApplyBusyTabletId(null);
     }
-  }, [applyFor, onApplyToTablet, applyBusyTabletId, onRefresh]);
+  }, [applyFor, onApplyToTablet, onRefresh, isCurrent]);
 
   // 미리보기 모달 (WO-...-SEARCH-PAGINATION-PREVIEW-V1)
   const canPreview = !!previewApi && !!storeSlug;
@@ -293,19 +310,22 @@ export default function TabletContentLibraryList({
   const [previewBusy, setPreviewBusy] = useState<string | null>(null);
   const handlePreview = useCallback(async (s: ScreenSet) => {
     if (!canPreview) { toast.error('매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
-    if (previewBusy) return;
+    if (!isCurrent()) return;
+    const current = previewRequests.begin();
     // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 단독 미리보기 = 코너 문맥 없음 → Screen Set 원본 기준(상품 미표시).
     onPreviewContext?.(PREVIEW_NO_CORNER);
     setPreviewBusy(s.id);
     try {
       const detail = await fetchScreenSet(s.id);
+      if (!current() || !isCurrent()) return;
       const screen = await previewScreenSet({ templateKey: detail.templateKey, blocks: detail.blocks });
-      setPreview({ name: s.name, screen, view: 'tablet' });
-    } catch (e: any) {
-      toast.error(e?.message || '미리보기를 불러오지 못했습니다.');
-    } finally { setPreviewBusy(null); }
-  }, [canPreview, previewBusy]);
+      if (current() && isCurrent()) setPreview({ name: s.name, screen, view: 'tablet' });
+    } catch {
+      if (current() && isCurrent()) toast.error('미리보기를 불러오지 못했습니다. 다시 시도해 주세요.');
+    } finally { if (current() && isCurrent()) setPreviewBusy(null); }
+  }, [canPreview, previewRequests, isCurrent, onPreviewContext]);
 
+  const closePreview = () => { previewRequests.cancel(); setPreview(null); setPreviewBusy(null); };
   // ── 코너 QR 보기·출력 (WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦) ──
   //   자동 생성된 screen_set QR 을 '매장 QR 관리'로 이동하지 않고 콘텐츠 목록에서 바로 확인·출력한다.
   //   미리보기 이미지·다운로드는 기존 QR export 엔드포인트(GET /pharmacy/qr/:id/export)를 그대로 사용한다.
@@ -388,6 +408,7 @@ export default function TabletContentLibraryList({
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
   const clampedPage = Math.min(page, totalPages);
   const pageRows = useMemo(
     () => filtered.slice((clampedPage - 1) * pageSize, clampedPage * pageSize),
@@ -425,12 +446,14 @@ export default function TabletContentLibraryList({
       return;
     }
     if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 보관하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘보관’ 필터에서 다시 확인할 수 있습니다.\n(위치에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
+    if (!isCurrent()) return;
     const result = await batch.executeBatch(batchArchiveOp, ids);
+    if (!isCurrent()) return;
     if (result.successCount > 0) {
       setSelectedKeys(new Set());
       onRefresh();
     }
-  }, [pageRows, selectedKeys, batch, batchArchiveOp, onRefresh]);
+  }, [pageRows, selectedKeys, batch, batchArchiveOp, onRefresh, isCurrent]);
 
   const archivableSelectedCount = useMemo(
     () => pageRows.filter((s) => selectedKeys.has(s.id) && s.status !== 'archived').length,
@@ -665,7 +688,7 @@ export default function TabletContentLibraryList({
 
       {/* ── 미리보기 모달(read-only, 태블릿/QR 모바일 전환) ── */}
       {preview && previewApi && (
-        <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
+        <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => closePreview()} role="presentation">
           <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-sm font-semibold truncate">{preview.name}</span>
@@ -676,7 +699,7 @@ export default function TabletContentLibraryList({
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일 화면</button>
               </div>
             </div>
-            <button onClick={() => setPreview(null)} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap">
+            <button onClick={() => closePreview()} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap">
               <X className="w-4 h-4" /> 닫기
             </button>
           </div>
@@ -830,9 +853,11 @@ export default function TabletContentLibraryList({
 
       {/* WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정(product_list 선택 목록만). */}
       {quickEditFor && (
-        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="presentation" onClick={() => setQuickEditFor(null)}>
+        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="presentation">
           <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
             <TabletProductListQuickEditor
+              key={quickEditFor.id}
+              isCurrent={isCurrent}
               load={quickEditLoad}
               save={quickEditSave}
               onSaved={() => { toast.success('표시 상품을 저장했습니다. 연결된 태블릿에 자동 반영됩니다.'); onRefresh(); }}
@@ -851,6 +876,7 @@ export default function TabletContentLibraryList({
               <span className="text-slate-600">이름</span>
               <input
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                disabled={renameBusy}
                 value={renameName}
                 maxLength={200}
                 onChange={(e) => setRenameName(e.target.value)}
@@ -863,6 +889,7 @@ export default function TabletContentLibraryList({
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 rows={3}
                 maxLength={1000}
+                disabled={renameBusy}
                 value={renameDesc}
                 onChange={(e) => setRenameDesc(e.target.value)}
                 data-testid="content-rename-description"

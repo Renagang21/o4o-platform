@@ -2004,6 +2004,9 @@ importers:
 
   packages/shared-space-ui:
     dependencies:
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
       '@o4o/content-editor':
         specifier: workspace:*
         version: link:../content-editor

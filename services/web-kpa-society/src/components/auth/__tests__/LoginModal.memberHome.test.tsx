@@ -12,7 +12,8 @@ vi.mock('../../../contexts/AuthContext', () => ({
 vi.mock('../../../contexts/AuthModalContext', () => ({
   useAuthModal: () => ({ activeModal: 'login', closeModal: mocks.close, onLoginSuccess: mocks.callback, markLoginNavigationHandled: mocks.mark }),
 }));
-vi.mock('@o4o/auth-react', () => ({
+vi.mock('@o4o/auth-react', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@o4o/auth-react')>(),
   O4OHomeButton: () => null,
   LoginMethods: ({ onSuccess }: { onSuccess: (user: unknown) => void }) => <button type="button" onClick={() => onSuccess({ roles: mocks.roles })}>샘플 로그인 완료</button>,
 }));

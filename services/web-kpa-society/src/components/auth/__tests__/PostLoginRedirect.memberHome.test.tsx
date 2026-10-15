@@ -5,7 +5,8 @@ import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-rou
 
 const mocks = vi.hoisted(() => ({ auth: { user: null as null | { roles: string[] }, isAuthenticated: false, isKpaContextLoaded: false, isLoading: false } }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => mocks.auth, authClient: { api: {} } }));
-vi.mock('@o4o/auth-react', () => ({
+vi.mock('@o4o/auth-react', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@o4o/auth-react')>(),
   O4OHomeButton: () => null,
   LoginMethods: ({ onSuccess }: { onSuccess: (user: unknown) => void }) => <button type="button" onClick={() => {
     mocks.auth = { ...mocks.auth, isAuthenticated: true, isKpaContextLoaded: true };

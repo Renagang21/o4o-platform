@@ -50,7 +50,11 @@ export interface CommunityMemberRow {
 
 export async function listCreationRequests(): Promise<CommunityCreationRequestRow[]> {
   const res = await api.get(`${BASE}/requests`);
-  return res.data?.data?.requests ?? [];
+  if (res.data?.success === false || !Array.isArray(res.data?.data?.requests)) {
+    const message = typeof res.data?.error === 'string' ? res.data.error : '개설 신청 목록 응답을 확인하지 못했습니다.';
+    throw Object.assign(new Error(message), { response: { data: { error: message } } });
+  }
+  return res.data.data.requests;
 }
 
 export async function approveCreationRequest(

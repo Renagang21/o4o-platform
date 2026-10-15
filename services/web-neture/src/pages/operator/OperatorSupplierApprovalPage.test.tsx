@@ -87,3 +87,15 @@ it('keeps backend profile warning informational and refreshes an already process
   await screen.findAllByText('이미 처리된 공급자입니다. 목록을 새로고침합니다.');
   await waitFor(() => expect(api.getSuppliersPaged).toHaveBeenCalledTimes(2));
 });
+
+it('focuses the rejection reason and cancels back to the detail action without writing', async () => {
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.click(await screen.findByText('합성 공급자'));
+  const trigger = screen.getByRole('button', { name: '승인 거절' });
+  trigger.focus(); fireEvent.click(trigger);
+  const dialog = screen.getByRole('dialog', { name: '공급자 거절' });
+  expect(document.activeElement).toBe(within(dialog).getByRole('textbox', { name: '거절 사유' }));
+  fireEvent(dialog, new Event('cancel', { cancelable: true }));
+  await waitFor(() => expect(document.activeElement).toBe(trigger));
+  expect(api.rejectSupplier).not.toHaveBeenCalled();
+});

@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * KPA Operator Summary Controller
  *
@@ -108,7 +109,7 @@ export function createOperatorSummaryController(
       // Total COUNT queries (Hub/BranchOperator 통계용)
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
-        WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'
+        WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM signage_media
@@ -122,12 +123,12 @@ export function createOperatorSummaryController(
       // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required COUNT queries
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
-        WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'
+        WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'
       `),
       // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: pending approval count
       dataSource.query(`
         SELECT COUNT(*) as count FROM cms_contents
-        WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'
+        WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'
       `),
       // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: pending = approval 대기 상태
       dataSource.query(`

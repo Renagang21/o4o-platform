@@ -1,3 +1,5 @@
+import type { RefObject } from 'react';
+import { OperatorDialog } from './OperatorDialog';
 import type { ServiceApprovalDecision } from './serviceApprovalDecisionResult';
 
 const REJECT_TEMPLATES = [
@@ -9,13 +11,14 @@ const REJECT_TEMPLATES = [
 ];
 
 interface Props {
+  fallbackFocus: RefObject<HTMLElement | null>;
   decision: ServiceApprovalDecision; batch: boolean; count: number;
   value: string; error: string | null; busy: boolean; canManage: boolean;
   onChange: (value: string) => void; onCancel: () => void; onConfirm: () => void;
 }
 
 /** 입력/표시만 담당한다. 요청과 입력 보존·중복 전송 방어는 부모가 소유한다. */
-export function ProductServiceApprovalDecisionModal({ decision, batch, count, value, error, busy, canManage, onChange, onCancel, onConfirm }: Readonly<Props>) {
+export function ProductServiceApprovalDecisionModal({ fallbackFocus, decision, batch, count, value, error, busy, canManage, onChange, onCancel, onConfirm }: Readonly<Props>) {
   const reject = decision === 'reject';
   const action = reject ? '거절' : '승인';
   const singleTitle = reject ? '승인 거절' : '상품 승인';
@@ -23,8 +26,7 @@ export function ProductServiceApprovalDecisionModal({ decision, batch, count, va
   const singleDescription = reject ? '이 상품의 서비스 승인을 거절합니다.' : '이 상품의 서비스 승인을 처리합니다.';
   const description = batch ? `선택한 승인대기 상품을 일괄 ${action}합니다.` : singleDescription;
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <dialog open aria-modal="true" aria-label={title} className="relative m-0 border-0 bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <OperatorDialog label={title} fallbackFocus={fallbackFocus} busy={busy} onCancel={onCancel} className="bg-white rounded-lg p-6 max-w-md">
         <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
         <p className="text-sm text-slate-500 mb-4">
           {description}
@@ -35,7 +37,7 @@ export function ProductServiceApprovalDecisionModal({ decision, batch, count, va
             {tpl.length > 30 ? tpl.slice(0, 30) + '…' : tpl}
           </button>)}
         </div>}
-        <textarea value={value} onChange={(e) => onChange(e.target.value)} disabled={busy}
+        <textarea data-dialog-initial-focus aria-label={reject ? '거절 사유' : '승인 메모'} value={value} onChange={(e) => onChange(e.target.value)} disabled={busy}
           placeholder={reject ? '거절 사유를 입력하세요 (선택)' : '승인 메모를 입력하세요 (선택)'}
           className={`w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 ${reject ? 'focus:ring-blue-500' : 'focus:ring-green-500'}`} />
         {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
@@ -46,7 +48,6 @@ export function ProductServiceApprovalDecisionModal({ decision, batch, count, va
             {reject ? '거절 확인' : '승인 확인'}
           </button>
         </div>
-      </dialog>
-    </div>
+      </OperatorDialog>
   );
 }

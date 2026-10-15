@@ -1,5 +1,6 @@
 import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
 import OperatorInvitePage from './pages/OperatorInvitePage';
+import HomePresentationPage from './pages/operator/HomePresentationPage';
 import { consumeLoginNavigation } from './lib/loginNavigation';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
@@ -51,10 +52,8 @@ import { LoginRedirect } from './components/auth/LoginRedirect';
 import HostBoundary from './components/HostBoundary';
 import { CURRENT_HOST_PROFILE } from './lib/hostProfile';
 
-// ============================================================================
-// Neture 메인 페이지 (항상 로드)
-// ============================================================================
-// NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
+// =====================================================================// Neture 메인 페이지 (항상 로드)
+// =====================================================================// NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
 import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 // WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §10:
@@ -75,10 +74,8 @@ import CommunityPublicPostsPage from './pages/community/CommunityPublicPostsPage
 import CommunityHostHomePage from './pages/community/CommunityHostHomePage';
 import CarePharmHomePage from './pages/carepharm/CarePharmHomePage';
 
-// ============================================================================
-// o4o 공통 페이지 (항상 로드)
-// ============================================================================
-// WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
+// =====================================================================// o4o 공통 페이지 (항상 로드)
+// =====================================================================// WO-O4O-NETURE-CONCEPT-PAGES-DEPRECATE-V1:
 //   O4OIntroPage / O4OConceptsPage / O4OPrinciplesPage / O4OStructurePage / O4OServicesPage / ChannelMapPage
 //   6 페이지를 /o4o 메인으로 흡수 + redirect. App.tsx 의 import 만 제거, 페이지 파일은 보존.
 import SellerOverviewPage from './pages/SellerOverviewPage';
@@ -106,10 +103,8 @@ import {
 } from './pages/admin-vault';
 
 
-// ============================================================================
-// Neture 공통 페이지 (즉시 로드)
-// ============================================================================
-// RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
+// =====================================================================// Neture 공통 페이지 (즉시 로드)
+// =====================================================================// RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: AccountRecoveryPage · ResetPasswordPage 는 은퇴했다.
 // WO-O4O-AUTH-VERIFY-EMAIL-FRONTEND-PAGE-V1: 이메일 인증 결과 페이지
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
@@ -139,10 +134,8 @@ import ForumMyPostsPage from './pages/forum/MyPostsPage';
 // WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: 일반 회원 포럼 개설 신청 진입
 import ForumRequestPage from './pages/forum/ForumRequestPage';
 
-// ============================================================================
-// Lazy loaded pages (heavy / rarely accessed)
-// ============================================================================
-
+// =====================================================================// Lazy loaded pages (heavy / rarely accessed)
+// =====================================================================
 // Supplier Dashboard
 const SupplierDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardPage }))
@@ -673,8 +666,7 @@ function App() {
             {/* 서브도메인(supplier · funding) 경계 — CHECK-O4O-URL-FIRST-CENSUS-V1 §21-8 */}
             <HostBoundary>
             <Routes>
-            {/* ================================================================
-                인증 페이지 (레이아웃 없음)
+            {/* =========================================================                인증 페이지 (레이아웃 없음)
             ================================================================ */}
             <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/operator-invite" element={<OperatorInvitePage />} />
@@ -698,8 +690,7 @@ function App() {
                 NetureLayout 밖·guard 없이 둔다. WorkScopeProvider 안이라 useWorkScope() 가 동작한다. */}
             <Route path="/hospital-drug" element={<HospitalDrugPage />} />
 
-            {/* ================================================================
-                O4O 공통 Home (WO-O4O-COMMON-HOME-PHASE1-V1)
+            {/* =========================================================                O4O 공통 Home (WO-O4O-COMMON-HOME-PHASE1-V1)
                 `/` 는 O4O 전체 서비스의 대표 진입점이다. Neture 전용 chrome
                 (NetureGlobalHeader/Footer/BottomNav)을 씌우지 않으므로
                 NetureLayout 밖에 배치한다. 기존 Neture 커뮤니티 홈은 /community.
@@ -710,8 +701,7 @@ function App() {
               <Route path="/services/partner" element={<PartnerServicePage />} />
             </>}
 
-            {/* ================================================================
-                Neture 메인 (NetureLayout)
+            {/* =========================================================                Neture 메인 (NetureLayout)
                 WO-O4O-NETURE-UI-REFACTORING-V1
             ================================================================ */}
             <Route element={<NetureLayout />}>
@@ -848,8 +838,7 @@ function App() {
                   문의는 /contact 로 이관. 구 URL 은 별도 redirect WO 에서 처리. */}
             </Route>
 
-            {/* ================================================================
-                Supplier Space (/supplier/*)
+            {/* =========================================================                Supplier Space (/supplier/*)
                 WO-O4O-NETURE-UI-REFACTORING-V1
                 WO-O4O-AUTH-RBAC-STABILIZATION-V1: SupplierRoute guard 추가
             ================================================================ */}
@@ -923,8 +912,7 @@ function App() {
               <Route path="/supplier/forum/request-category" element={<SupplierRequestCategoryPage />} />
             </Route>
 
-            {/* ================================================================
-                Supplier Account (/account/supplier/*) — legacy redirect 전용
+            {/* =========================================================                Supplier Account (/account/supplier/*) — legacy redirect 전용
                 WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1
                 WO-O4O-AUTH-RBAC-STABILIZATION-V1: SupplierRoute guard 추가
                 WO-O4O-NETURE-SUPPLIER-LEGACY-DASHBOARD-AND-ACCOUNT-SHELL-RETIREMENT-V1:
@@ -952,8 +940,7 @@ function App() {
               <Route path="/account/supplier/settlements" element={<Navigate to="/supplier/settlements" replace />} />
             </Route>
 
-            {/* ================================================================
-                Store Space (/store/*)
+            {/* =========================================================                Store Space (/store/*)
                 WO-O4O-STORE-CART-PAGE-V1
             ================================================================ */}
             <Route element={<MainLayout />}>
@@ -976,8 +963,7 @@ function App() {
               {/* removed: /store/event-offers — WO-O4O-EVENT-OFFER-NETURE-ROLE-UX-ALIGNMENT-V1 */}
             </Route>
 
-            {/* ================================================================
-                공통 영역 (MainLayout) — store/seller/forum
+            {/* =========================================================                공통 영역 (MainLayout) — store/seller/forum
                 ※ /o4o/* 는 NetureLayout으로 이동 (WO-O4O-ABOUT-URL-SEMANTIC-ALIGNMENT-V1)
             ================================================================ */}
             <Route element={<MainLayout />}>
@@ -996,8 +982,7 @@ function App() {
               <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
             </Route>
 
-            {/* ================================================================
-                Admin Vault (/admin-vault)
+            {/* =========================================================                Admin Vault (/admin-vault)
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={ADMIN_ROLES}>
@@ -1011,8 +996,7 @@ function App() {
               <Route path="/admin-vault/inquiries" element={<VaultInquiriesPage />} />
             </Route>
 
-            {/* ================================================================
-                Workspace - Admin/Operator 전용 (SupplierOpsLayout 유지)
+            {/* =========================================================                Workspace - Admin/Operator 전용 (SupplierOpsLayout 유지)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
               {/* Workspace 공통 페이지 */}
@@ -1032,8 +1016,7 @@ function App() {
 
             </Route>
 
-            {/* ================================================================
-                Admin Dashboard (/admin/*)
+            {/* =========================================================                Admin Dashboard (/admin/*)
                 WO-O4O-ROLE-ROUTE-ISOLATION-V1
                 admin 전용 레이아웃. 전체 메뉴 (adminOnly 포함).
             ================================================================ */}
@@ -1107,8 +1090,7 @@ function App() {
               <Route path="/admin/semi-franchises" element={<AdminSemiFranchisePage />} />
             </Route>
 
-            {/* ================================================================
-                서브도메인 운영자 화면 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
+            {/* =========================================================                서브도메인 운영자 화면 — WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1 (배포 2 전 경계 보정)
                 백엔드가 두 영역의 운영자 경계를 neture:* 에서 독립 키로 옮겼다. 화면도 같은 판정을 쓴다:
                   공급자 상태 관리  supplier:admin + supplier membership   ← /neture/admin/suppliers*
                   공급자 승인·거절  supplier:operator(admin 포함) + supplier membership ← /neture/operator/suppliers*
@@ -1139,6 +1121,7 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
               <Route path="/operator/service-members/supplier" element={<ServiceMembersPage serviceKey="supplier" />} />
               <Route path="/operator/service-members/supplier/:id" element={<ServiceMembersPage serviceKey="supplier" />} />
+              <Route path="/operator/home-presentation/supplier" element={<HomePresentationPage surface="supplier" />} />
               <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
             </Route>
             <Route element={
@@ -1151,6 +1134,7 @@ function App() {
               <Route path="/operator/service-members/funding" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/service-members/funding/:id" element={<ServiceMembersPage serviceKey="funding" />} />
               <Route path="/operator/legal/funding" element={<SubdomainOperatorRoute serviceKey="funding" level="admin"><ServiceLegalSettingsPage serviceKey="funding" /></SubdomainOperatorRoute>} />
+              <Route path="/operator/home-presentation/funding" element={<HomePresentationPage surface="funding" />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
@@ -1161,6 +1145,7 @@ function App() {
             }>
               <Route path="/operator/service-members/community" element={<ServiceMembersPage serviceKey="community" />} />
               <Route path="/operator/service-members/community/:id" element={<ServiceMembersPage serviceKey="community" />} />
+              <Route path="/operator/home-presentation/community" element={<HomePresentationPage surface="community" />} />
               <Route path="/operator/communities" element={<CommunityServiceAdminPage operatorOnly />} />
             </Route>
             <Route element={
@@ -1172,8 +1157,7 @@ function App() {
               <Route path="/admin/communities" element={<CommunityServiceAdminPage />} />
             </Route>
 
-            {/* ================================================================
-                Operator Dashboard (/operator/*)
+            {/* =========================================================                Operator Dashboard (/operator/*)
                 WO-O4O-ROLE-ROUTE-ISOLATION-V1
                 operator 전용 레이아웃. adminOnly 항목 제외.
             ================================================================ */}
@@ -1213,6 +1197,7 @@ function App() {
               <Route path="/operator/ai-operations" element={<Navigate to="/admin/ai-operations" replace />} />
               {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
+              <Route path="/operator/home-presentation/neture" element={<HomePresentationPage surface="neture" />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
@@ -1235,8 +1220,7 @@ function App() {
               <Route path="/operator/semi-franchises/:key/contents/:id/edit" element={<SemiFranchiseContentFormPage />} />
             </Route>
 
-            {/* ================================================================
-                레거시 리다이렉트 (기존 경로 → 신규 경로)
+            {/* =========================================================                레거시 리다이렉트 (기존 경로 → 신규 경로)
             ================================================================ */}
             {/* Workspace → 새 경로 */}
             <Route path="/workspace" element={<Navigate to="/" replace />} />
@@ -1272,8 +1256,7 @@ function App() {
                 랭킹 동점 시 선언 순서상 항상 그쪽이 승리했다(실행된 적 없는 정의).
                 제거 후 `/supplier/dashboard` 실행 route 는 1개다. */}
 
-            {/* ================================================================
-                catch-all — 반드시 마지막
+            {/* =========================================================                catch-all — 반드시 마지막
                 WO-O4O-NETURE-ABOUT-LINK-AND-CATCH-ALL-ROUTE-V1:
                   선언되지 않은 경로는 지금까지 아무 route 도 매치하지 못해 빈 화면이 됐다.
                   redirect 로 흡수하지 않고 404 안내 화면을 렌더한다(주소는 그대로 유지).

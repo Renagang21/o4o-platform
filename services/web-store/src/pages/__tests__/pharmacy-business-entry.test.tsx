@@ -2,6 +2,8 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 const mocks = vi.hoisted(() => ({ organizationId: 'store-a', role: 'owner', listSemiFranchises: vi.fn(), listContents: vi.fn(), getContent: vi.fn(), copyContent: vi.fn(), handoff: vi.fn() }));
+vi.mock('../../lib/storeOrganizationHeader', async original => ({ ...(await original<object>()), getActiveStoreOrganizationId: () => mocks.organizationId }));
+vi.mock('../../lib/serviceContext', async original => ({ ...(await original<object>()), getActiveServiceKey: () => 'kpa-society' }));
 vi.mock('../../api/neturePharmacy', () => ({ neturePharmacyApi: mocks, pharmacyErrorCode: () => '', pharmacyErrorMessage: (_e: unknown, fallback: string) => fallback || '요청 실패' }));
 vi.mock('../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ organizationId: mocks.organizationId, stores: [{ organizationId: mocks.organizationId, memberRole: mocks.role }], effectiveServiceKey: 'kpa-society' }) }));
 vi.mock('../../lib/apiClient', () => ({ api: {} }));

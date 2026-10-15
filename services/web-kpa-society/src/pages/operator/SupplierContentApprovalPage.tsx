@@ -13,7 +13,7 @@
  * Route: /operator/approvals
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import { RowActionMenu, BaseDetailDrawer } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -97,62 +97,79 @@ export default function SupplierContentApprovalPage() {
   const [decision, setDecision] = useState<'approve' | 'reject' | null>(null);
   const [note, setNote] = useState('');
   const [acting, setActing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [refreshFailed, setRefreshFailed] = useState(false);
+  const lifecycle = useRef({ mounted: true, sequence: 0, writing: false });
+  useLayoutEffect(() => {
+    const scope = { mounted: true, sequence: 0, writing: false };
+    lifecycle.current = scope;
+    return () => { scope.mounted = false; scope.sequence++; };
+  }, []);
+  const queryKey = `${entityTypeTab}:${statusFilter}:${page}`;
+  const currentQuery = useRef(queryKey);
+  currentQuery.current = queryKey;
+  const loadedQuery = useRef<string | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    const scope = lifecycle.current;
+    const sequence = ++scope.sequence;
+    const current = () => scope.mounted && sequence === scope.sequence && currentQuery.current === queryKey;
+    setLoading(true); setError(null);
     try {
-      const params: Record<string, string | number> = {
-        status: statusFilter,
-        page,
-        limit: 20,
-      };
+      const params: Record<string, string | number> = { status: statusFilter, page, limit: 20 };
       if (entityTypeTab !== 'all') params.entity_type = entityTypeTab;
       const res = await apiClient.get<ListResponse>(BASE, params);
-      // 조회 실패는 catch 로 위임 — 여기서는 정상 응답만 반영(빈 목록 위장 금지)
-      setItems(res?.data ?? []);
-      setTotal(res?.total ?? 0);
-      setTotalPages(res?.totalPages ?? 1);
-    } catch {
-      setError('승인 요청을 불러오지 못했습니다.');
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [entityTypeTab, statusFilter, page]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const openDecision = (row: ApprovalRequest, action: 'approve' | 'reject') => {
-    setSelected(row);
-    setDecision(action);
-    setNote('');
-    setError(null);
-    setSuccess(null);
-  };
-
-  const executeDecision = async () => {
-    if (!selected || !decision) return;
-    setActing(true);
-    setError(null);
-    try {
-      if (decision === 'approve') {
-        await apiClient.post(`${BASE}/${selected.id}/approve`, { comment: note || undefined });
-        setSuccess('승인이 완료되었습니다.');
-      } else {
-        await apiClient.post(`${BASE}/${selected.id}/reject`, { reason: note || undefined });
-        setSuccess('반려 처리가 완료되었습니다.');
+      if (!res?.success || !Array.isArray(res.data)) throw new Error('승인 요청 응답이 올바르지 않습니다.');
+      if (!current()) return false;
+      if (page > Math.max(1, res.totalPages)) {
+        setPage(Math.max(1, res.totalPages));
+        return false;
       }
-      setSelected(null);
-      setDecision(null);
-      setNote('');
-      await load(); // mutation 후 목록·건수 재조회 (optimistic 위장 금지)
+      setItems(res.data); setTotal(res.total); setTotalPages(Math.max(1, res.totalPages));
+      loadedQuery.current = queryKey;
+      setRefreshFailed(false);
+      return true;
+    } catch {
+      if (current()) setError('승인 요청을 불러오지 못했습니다.');
+      return false;
+    } finally { if (current()) setLoading(false); }
+  }, [entityTypeTab, statusFilter, page, queryKey]);
+
+  useEffect(() => { void load(); }, [load]);
+  // Explicit view changes end the old decision and receipt; automatic last-page correction keeps the receipt.
+  const changeView = (change: () => void) => {
+    if (lifecycle.current.writing) return;
+    lifecycle.current.sequence++; loadedQuery.current = null;
+    setSelected(null); setDecision(null); setNote(''); setSuccess(null); setActionError(null); setRefreshFailed(false);
+    change();
+  };
+  const openDetail = (item: ApprovalRequest) => {
+    if (lifecycle.current.writing || loading || error || loadedQuery.current !== queryKey) return;
+    setSelected(item); setDecision(null); setNote(''); setActionError(null); setSuccess(null);
+  };
+  const openDecision = (item: ApprovalRequest, action: 'approve' | 'reject') => {
+    if (lifecycle.current.writing || loading || error || loadedQuery.current !== queryKey || item.status !== 'pending') return;
+    setSelected(item); setDecision(action); setNote(''); setActionError(null); setSuccess(null);
+  };
+  const executeDecision = async () => {
+    const scope = lifecycle.current;
+    if (!selected || !decision || scope.writing || loading || error || loadedQuery.current !== queryKey) return;
+    const target = selected; const action = decision; const comment = note;
+    scope.writing = true; setActing(true); setActionError(null); setSuccess(null);
+    try {
+      const res = await apiClient.post<{ success: boolean }>(`${BASE}/${target.id}/${action}`, action === 'approve'
+        ? { comment: comment || undefined } : { reason: comment || undefined });
+      if (!res?.success) throw new Error('처리에 실패했습니다.');
+      if (!scope.mounted) return;
+      setSuccess(action === 'approve' ? '승인이 완료되었습니다.' : '반려 처리가 완료되었습니다.');
+      setSelected(null); setDecision(null); setNote('');
+      const refreshed = await load();
+      if (scope.mounted) setRefreshFailed(!refreshed);
     } catch (err: any) {
-      setError(err?.data?.error || err?.message || '처리 중 오류가 발생했습니다.');
+      if (scope.mounted) setActionError(err?.data?.error || err?.message || '처리 중 오류가 발생했습니다.');
     } finally {
-      setActing(false);
+      scope.writing = false;
+      if (scope.mounted) setActing(false);
     }
   };
 
@@ -227,9 +244,9 @@ export default function SupplierContentApprovalPage() {
         return (
           <RowActionMenu
             actions={[
-              { key: 'detail', label: '상세보기', onClick: () => { setSelected(row); setDecision(null); setSuccess(null); setError(null); } },
-              { key: 'approve', label: '승인', variant: 'primary', disabled: !isPending, onClick: () => openDecision(row, 'approve') },
-              { key: 'reject', label: '반려', variant: 'danger', disabled: !isPending, onClick: () => openDecision(row, 'reject') },
+              { key: 'detail', label: '상세보기', onClick: () => openDetail(row) },
+              { key: 'approve', label: '승인', variant: 'primary', disabled: !isPending || acting || loading || !!error, onClick: () => openDecision(row, 'approve') },
+              { key: 'reject', label: '반려', variant: 'danger', disabled: !isPending || acting || loading || !!error, onClick: () => openDecision(row, 'reject') },
             ]}
           />
         );
@@ -244,16 +261,18 @@ export default function SupplierContentApprovalPage() {
       <h1 style={styles.title}>공급자 콘텐츠 승인</h1>
       <p style={styles.subtitle}>공급자 자료 제출과 사이니지 캠페인 요청을 검토하고 승인·반려합니다.</p>
 
-      {error && <div style={styles.errorBanner}>{error}</div>}
+      {error && <div role="alert" style={styles.errorBanner}>{refreshFailed ? '처리는 완료됐지만 목록 갱신에 실패했습니다. ' : ''}{error} <button onClick={() => { if (!lifecycle.current.writing) void load(); }} disabled={acting}>목록 다시 조회</button></div>}
+      {actionError && !selected && <div role="alert" style={styles.errorBanner}>{actionError}</div>}
       {success && <div style={styles.successBanner}>{success}</div>}
 
+      <fieldset disabled={acting} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       {/* entity_type 탭 */}
       <div style={styles.tabs}>
         {ENTITY_TYPE_TABS.map((tab) => (
           <button
             key={tab.value}
             style={{ ...styles.tab, ...(entityTypeTab === tab.value ? styles.tabActive : {}) }}
-            onClick={() => { setEntityTypeTab(tab.value); setPage(1); }}
+            onClick={() => { if (entityTypeTab !== tab.value || page !== 1) changeView(() => { setEntityTypeTab(tab.value); setPage(1); }); }}
           >
             {tab.label}
           </button>
@@ -267,7 +286,7 @@ export default function SupplierContentApprovalPage() {
             <button
               key={f.value}
               style={{ ...styles.pill, ...(statusFilter === f.value ? styles.pillActive : {}) }}
-              onClick={() => { setStatusFilter(f.value); setPage(1); }}
+              onClick={() => { if (statusFilter !== f.value || page !== 1) changeView(() => { setStatusFilter(f.value); setPage(1); }); }}
             >
               {f.label}
             </button>
@@ -283,34 +302,36 @@ export default function SupplierContentApprovalPage() {
         data={items}
         rowKey="id"
         loading={loading}
-        emptyMessage={statusFilter === 'pending' ? '대기 중인 승인 요청이 없습니다.' : '해당 조건의 요청이 없습니다.'}
+        emptyMessage={error ? '목록을 다시 조회해 주세요.' : statusFilter === 'pending' ? '대기 중인 승인 요청이 없습니다.' : '해당 조건의 요청이 없습니다.'}
         tableId="kpa-supplier-content-approvals"
-        onRowClick={(row) => { setSelected(row); setDecision(null); setSuccess(null); setError(null); }}
+        onRowClick={openDetail}
       />
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div style={styles.pagination}>
-          <button style={styles.pageBtn} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+          <button style={styles.pageBtn} onClick={() => changeView(() => setPage((p) => Math.max(1, p - 1)))} disabled={page <= 1}>
             이전
           </button>
           <span style={styles.pageInfo}>{page} / {totalPages}</span>
-          <button style={styles.pageBtn} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
+          <button style={styles.pageBtn} onClick={() => changeView(() => setPage((p) => Math.min(totalPages, p + 1)))} disabled={page >= totalPages}>
             다음
           </button>
         </div>
       )}
 
+      </fieldset>
       {/* 상세 + 승인/반려 Drawer */}
       <BaseDetailDrawer
         open={!!selected}
-        onClose={() => { if (!acting) { setSelected(null); setDecision(null); setNote(''); } }}
+        onClose={() => { if (!lifecycle.current.writing) { setSelected(null); setDecision(null); setNote(''); } }}
         title={decision === 'approve' ? '승인 확인' : decision === 'reject' ? '반려 확인' : '승인 요청 상세'}
         width={520}
         actions={[]}
       >
         {selected && (
           <div>
+            {actionError && <div role="alert" style={styles.errorBanner}>{actionError}</div>}
             <div style={styles.infoBox}>
               <p style={styles.infoBoxLabel}>유형</p>
               <p style={styles.infoBoxValue}>{ENTITY_TYPE_LABEL[selected.entity_type] ?? selected.entity_type}</p>

@@ -1,5 +1,5 @@
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LoginMethods } from '@o4o/auth-react';
+import { LoginCard, LoginLayout, LoginMethods } from '@o4o/auth-react';
 import { BRAND, PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../config/workspace';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,9 +16,8 @@ export default function LoginPage() {
   // 원래 경로 보존(§21-14) — 같은 앱 경로만
   const next = readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home;
   if (isAuthenticated) return <Navigate to={next} replace />;
-  return <main className="center-card"><section className="card">
-    <h1>{BRAND.name} 로그인</h1>
-    <p>O4O 계정으로 로그인하면 이 계정으로 접근할 수 있는 매장 업무공간이 열립니다.</p>
+  return <LoginLayout tone="blue" brand={BRAND.name} headline={<>매장의 하루를,<br />한곳에서.</>} description="매장에 필요한 업무와 서비스를 O4O 계정으로 이어가세요.">
+    <LoginCard tone="blue" brand={BRAND.name} title={`${BRAND.name} 로그인`} heading="h1" description="O4O 계정으로 내 매장 업무공간에 연결하세요.">
     <LoginMethods
       loginWithEmail={loginWithEmail}
       api={authClient}
@@ -33,6 +32,6 @@ export default function LoginPage() {
         privacyHref: `${PLATFORM_ORIGIN}/privacy`,
       }}
     />
-    <p className="muted">계정 · 약관은 <a href={PLATFORM_ORIGIN}>Neture</a>에서 통합 관리합니다.</p>
-  </section></main>;
+    <p className="o4o-login-footnote">계정 · 약관은 <a href={PLATFORM_ORIGIN}>Neture</a>에서 통합 관리합니다.</p>
+  </LoginCard></LoginLayout>;
 }
