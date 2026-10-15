@@ -7,7 +7,7 @@
  * AGModal 기반 — 사유 입력(textarea) 옵션 포함.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import type { OperatorActionType } from '@o4o/types';
 import { OPERATOR_ACTION_CONFIGS } from '@o4o/types';
 import { AGModal } from '../ag-components/AGModal';
@@ -18,7 +18,7 @@ export interface OperatorConfirmModalProps {
   /** 닫기 핸들러 */
   onClose: () => void;
   /** 확인 핸들러 (reason 포함) */
-  onConfirm: (reason?: string) => void | Promise<void>;
+  onConfirm: (reason?: string) => void | boolean | Promise<void | boolean>;
   /** 액션 타입 — 기본 설정 자동 적용 */
   actionType: OperatorActionType;
   /** 제목 오버라이드 */
@@ -33,6 +33,8 @@ export interface OperatorConfirmModalProps {
   reasonPlaceholder?: string;
   /** 로딩 상태 */
   loading?: boolean;
+  /** 실패 후 입력과 함께 표시할 오류. */
+  error?: string | null;
 }
 
 export function OperatorConfirmModal({
@@ -46,6 +48,7 @@ export function OperatorConfirmModal({
   requireReason: requireReasonOverride,
   reasonPlaceholder: placeholderOverride,
   loading = false,
+  error,
 }: OperatorConfirmModalProps) {
   const config = OPERATOR_ACTION_CONFIGS[actionType];
   const title = titleOverride ?? config.title;
@@ -56,16 +59,26 @@ export function OperatorConfirmModal({
   const confirmVariant = config.confirmVariant;
 
   const [reason, setReason] = useState('');
+  const confirming = useRef(false);
 
   const handleClose = useCallback(() => {
+    if (loading || confirming.current) return;
     setReason('');
     onClose();
-  }, [onClose]);
+  }, [onClose, loading]);
 
   const handleConfirm = useCallback(async () => {
-    await onConfirm(requireReason || reason ? reason : undefined);
-    setReason('');
-  }, [onConfirm, reason, requireReason]);
+    if (loading || confirming.current) return;
+    confirming.current = true;
+    try {
+      const result = await onConfirm(
+        requireReason || reason ? reason : undefined,
+      );
+      if (result !== false) setReason('');
+    } finally {
+      confirming.current = false;
+    }
+  }, [onConfirm, reason, requireReason, loading]);
 
   const confirmDisabled = loading || (requireReason && !reason.trim());
 
@@ -102,8 +115,15 @@ export function OperatorConfirmModal({
       }
     >
       <p className="text-gray-600 mb-4">{message}</p>
+      {error && (
+        <p role="alert" className="mb-3 text-sm text-red-600">
+          {error}
+        </p>
+      )}
       {(requireReason || config.requireReason) && (
         <textarea
+          aria-label="처리 사유"
+          disabled={loading}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder={placeholder}
