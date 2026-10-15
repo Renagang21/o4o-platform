@@ -56,7 +56,7 @@
 
 CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운영자 지정 role가 catalog에 없다.
 이번 최소 수정은 기존 대표 업무 진입을 유지한다. 도메인을 독립 지정 서비스로 확정하거나
-`carepharm:operator`를 새로 부여하지 않는다. store도 이 조사에서 새 operator role를 만들지 않는다.
+  `carepharm:operator`를 새로 부여하지 않는다. store도 이 조사에서 새 operator role를 만들지 않는다.
 
 ## 첫 수정과 실제 검증 — 2026-10-15 KST
 
@@ -85,27 +85,33 @@ CarePharm은 현재 main의 커뮤니티 진입 host이며 별도 서비스 운�
 아래 범위 확인에 이어 진행한다. WORKTREE_DISPOSITION: KEEP — 이번 조사·후속 수정이 미완료이며
 기존 인증 checkout/다른 세션 작업공간은 변경하지 않았다. 자기 격리 PostgreSQL process는 검증 후 종료했다.
 
-## Core 조회 최소 수정 제안 — 적용 승인 대기
+## Core 조회 최소 수정 — 2026-10-15 사용자 승인·구현
 
 `AdminUserController.getUsers`에서 이미 쓰는 두 조회의 `is_active=true` 조건 다음에
-`valid_from <= CURRENT_TIMESTAMP`와 `(valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)`를
+`(valid_from IS NULL OR valid_from <= CURRENT_TIMESTAMP)`와 `(valid_until IS NULL OR valid_until >= CURRENT_TIMESTAMP)`를
 추가해 현재 RoleAssignment의 유효기간 계약과 맞춘다. role 부여/회수/쓰기·반환 필드·권한 계층을 바꾸지 않는다.
-Core 표시 파일을 실제 변경하기 전에 이 두 조회 범위를 확인한다. 진단에 쓴 PostgreSQL은 자기 세션의
+두 조회의 최소 정합 수정을 사용자가 승인해 적용했다. 진단에 쓴 PostgreSQL은 자기 세션의
 Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 테이블, 조회 이후 ROLLBACK이다.
+기존 SQL의 실패와 수정 후 실제 SQL의 통과를 구분했다. 실제 PostgreSQL 회귀 2건은 대상/타 계정,
+현재/만료/미시작/회수 역할·가입 상태·Google 연결 존재·변경 없는 재조회와 시간 경계 포함을 확인한다.
 
 ## 후속 실행 TODO
 
-- [ ] 기존 WIF read-only census 옵션 추가·실행 범위 확인.
+- [x] 기존 WIF read-only census 옵션 추가·실행 범위 확인(2026-10-15 사용자 승인).
+- [x] 기존 WIF 경로의 standalone read-only 옵션과 masked census 구현.
 - [ ] 운영 원장의 대상 계정별 서비스 지정·유효기간·가입 상태 확인.
 - [ ] 확인한 원장의 userId와 실제 로그인·Google 연결 결과 비교.
-- [ ] Core 목록 유효기간 조건 두 곳의 최소 수정 범위 확인·회귀·push.
+- [x] Core 목록 유효기간 조건 두 곳의 최소 수정 범위 확인·실제 PostgreSQL 회귀.
+- [ ] 후속 변경의 API/안전 회귀·CI/review·push·main 통합.
 - [ ] 운영 데이터 불일치가 확인되면 before/after 계획을 별도로 검토하고 전체 관리자 지정 경로로 수정.
 - [ ] 필요한 main 통합·배포 후 실제 운영 화면 검증. 현재 첫 UI 수정은 로컬 검증이며 배포 완료가 아니다.
 
-## 운영 조회 경로 제안 — 실행 승인 대기
+## 운영 조회 경로 — 2026-10-15 사용자 승인·구현
 
 기존 `.github/workflows/pharmacyhub-qr-cutover.yml`의 WIF·Cloud SQL proxy·DB secret 연결을
-재사용하는 **standalone 운영자 read-only census 옵션**을 추가한다.
+재사용하는 **standalone 운영자 read-only census 옵션**을 추가했다. 워크플로의 기존 입력은 25개로
+한도에 도달했으므로 입력을 삭제/추가하지 않고 기존 mode에 `operator-census`를 더했다.
+해당 모드에서만 `probe_paths`는 대상 이메일 SHA256로 해석되며 기존 plan/apply의 경로 의미는 유지한다.
 새 WIF/IAM/secret 값이나 운영 HTTP debug endpoint는 만들지 않는다.
 
 - owner actor + main ref를 요구하고 다른 작업 입력과 혼합 실행을 거절한다.
@@ -113,6 +119,23 @@ Unix socket 전용 격리 fixture이며 users/role_assignments는 합성 임시 
 - `BEGIN READ ONLY` / read-only 연결 / timeout / 반드시 ROLLBACK으로 서비스별 역할과 대상 계정
   일치 여부·유효 기간·가입 상태·Google 연결 존재를 요약한다. 다른 운영자의 개인정보는 출력하지 않는다.
 - 계정·권한·연결·DB/schema·배포·revision·IAM 변경을 수행하지 않는다.
-- workflow 변경은 AGENTS.md §5의 CI infrastructure 경계 때문에 범위를 확인한 뒤 적용한다.
+- workflow 변경과 조회 실행은 AGENTS.md §5의 CI infrastructure 경계에 따라 사용자가 승인했다.
+- CLI는 기존 서버 운영자 catalog·canonical service key mapper를 그대로 읽는다. DB identity helper를
+  사용하고 공백 DB_NAME·잘못된 fingerprint에서 secret/접속 전에 실패한다. 운영 후보 inventory에
+  read-only 경로만 ACTIVE로 등록했다. 숫자·공개 role/service key·열거된 상태만 출력하며 추가 개인정보
+  컬럼이 반환돼도 버린다. target 미존재·중복은 다른 계정을 고르지 않고 별도 결과로 보고한다.
+- 전체 관리자의 target 권한 유무도 집계로 구분한다. Google 연결 존재는 실제 OAuth 소유 확인을 뜻하지 않는다.
+- collector/실제 workflow gate/기존 Demo gate 10/10 PASS, 실제 격리 PostgreSQL 2/2 PASS,
+  CLI 미연결 config 거절을 실제 runner로 확인했다. 운영 조회는 아직 실행하지 않았다.
+- 기존 workflow 전체 안전 회귀는 193 PASS / 1 SKIP(기존 PostgreSQL cleanup integration)다.
+  이번 census와 Controller SQL의 실제 PostgreSQL 2건은 별도 fixture에서 실제 실행해 PASS다.
+  기존 Controller/DB identity 회귀 5 suites 70/70 PASS, API tsc·main/migrate ESM 빌드와 두 bundle syntax PASS.
+  compiled database 코드 2352파일은 bundling 전후 보존했다(운영 DB backup/migration이 아님).
+  새 CLI·collector·테스트 lint 오류/경고 0이며 Controller는 기존 UserStatus 미사용 warning 1개를
+  그대로 유지한다. 승인된 두 조회 범위를 넓혀 import를 정리하지 않았다.
+- 최신 리뷰 P2의 NULL 시작 시각 경계를 수용했다. `isValidNow()`가 nullable 시작을 현재 권한으로
+  인정하므로 두 Controller 조회와 census의 현재 역할/전체 관리자 집계도 NULL을 허용하도록 맞췄다.
+  실제 PostgreSQL fixture에 NULL 시작 서비스 운영자·전체 관리자와 필터/목록 비교를 추가해 2/2 PASS,
+  collector/gate 포함 11/11 PASS다. NOT NULL migration이나 기존 역할 데이터 변경은 수행하지 않는다.
 
 문서 정합: 과거 운영자 연결 기록은 당시 기록으로 유지한다. 현재 지정 결과는 새 실제 조회 근거로 판정한다.
