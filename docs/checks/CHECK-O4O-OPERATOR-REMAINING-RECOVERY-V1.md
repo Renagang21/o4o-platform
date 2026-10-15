@@ -1,6 +1,6 @@
 # 운영자 가입·콘텐츠 승인·포럼 변경 검증
 
-> 상태: ACTIVE · 작성일: 2026-10-15
+> 상태: COMPLETED (개발 검증·push/PR 인계) · 작성일: 2026-10-15
 > WO: [작업 범위](../work-orders/WO-O4O-OPERATOR-REMAINING-RECOVERY-V1.md)
 
 ## 대상·경계
@@ -71,5 +71,13 @@ pageerror 0·페이지 가로 넘침 0. Neture 포럼 완전 삭제 비노출 �
 모바일 콘텐츠 Drawer와 포럼 실패 모달은 스크린샷을 직접 확인했다.
 공개 저장소에는 합성 fixture 테스트만 커밋하며 브라우저 산출물·인증 값은 넣지 않는다.
 
-ESLint·문서 민감정보 검사·diff 검사는 commit 직전 최종 실행한다.
+변경 파일 ESLint·문서 민감정보 검사(4,003 files, 패턴 0건)·diff 검사 PASS.
 프로덕션 chunk 크기·Browserslist 경고는 빌드를 막지 않았으며 이번 업무 변경과 별도다.
+
+## Git·통합 인계
+
+PR [#636](https://github.com/Renagang21/o4o-platform/pull/636), 소스 `e067220da`를
+`wo/operator-remaining-recovery`에 push했다. 생성 시 OPEN/MERGEABLE·CI QUEUED다.
+선행 #612 포함과 TODO 충돌 해소를 PR 본문에 명시했다. #616/#628은 독립 미병합 상태다.
+CI 완료·원격 병합·운영 배포·실계정 smoke는 이번 로컬 검증의 PASS에 포함하지 않는다.
+checkout/branch는 미병합 PR 후속 수정용 KEEP, 다른 작업트리는 변경하지 않았다.

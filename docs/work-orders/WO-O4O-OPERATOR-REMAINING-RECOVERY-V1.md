@@ -1,6 +1,6 @@
 # 운영자 가입·콘텐츠 승인·포럼 변경 실패 복구
 
-> 상태: ACTIVE (구현·로컬 검증 완료, push/PR 인계 진행) · 작성일: 2026-10-15
+> 상태: COMPLETED (개발 범위: 구현·검증·push/PR 인계) · 작성일: 2026-10-15
 > 범위: Neture 가입 신청, KPA 공급자 콘텐츠 승인, Neture/KPA 공통 포럼 변경.
 
 ## 기준과 경계
@@ -24,6 +24,14 @@ Neture의 hard delete 금지·게시글 있는 포럼명 확인, KPA 삭제 사�
 - [x] 콘텐츠 승인 조회의 필터/페이지 수명, 중복·대상 변경·저장 후 조회 실패 복구.
 - [x] 포럼 단건/일괄 변경·재시도의 쓰기 잠금과 사유/대상 보존, 삭제 검사 응답 수명.
 - [x] 관련 회귀·타입/빌드·PC/모바일 격리 화면 검증.
-- [ ] CHECK/활성 TODO 정합·commit/push/PR·CI/통합 인계.
+- [x] CHECK/활성 TODO 정합·commit/push/PR·CI/통합 인계.
 
 실계정 기준 파일은 현재 checkout에 없으므로 운영 쓰기를 하지 않고 격리 API fixture로 검증한다.
+
+## 개발 완료·통합 인계
+
+- PR [#636](https://github.com/Renagang21/o4o-platform/pull/636), 소스 commit `e067220da`, 선행 #612 포함.
+- PR 생성 시 OPEN/MERGEABLE, CI QUEUED. CI 완료·main 반영·운영 배포 완료로 표시하지 않는다.
+- [CHECK](../checks/CHECK-O4O-OPERATOR-REMAINING-RECOVERY-V1.md)의 전체 회귀·후속 집중 검사·타입/빌드·격리 PC/mobile 검증 통과.
+- #612와 중복 통합하지 않으며 #616/#628은 독립 통합 대상이다. 강의 사유 서버 저장 등 별도 후속은 미완료다.
+- 문서 정합: 이번 WO/CHECK와 ACTIVE 전체 TODO 갱신. 과거 COMPLETED 문서는 수정하지 않음.
