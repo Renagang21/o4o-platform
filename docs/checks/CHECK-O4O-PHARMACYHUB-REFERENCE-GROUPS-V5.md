@@ -3,7 +3,7 @@
 - 일자: 2026-10-15
 - 범위: PharmacyHub 완전 퇴역 WO 후속 성능 수정
 - 기준: main `20a04ee2a3337687eae86c4029b01d83b2479a1a`
-- 상태: 구현·격리 검증 중. 운영 plan 성공·데이터 삭제 완료 아님.
+- 상태: 구현·격리 검증 완료, PR CI·리뷰 대기. 운영 plan 성공·데이터 삭제 완료 아님.
 
 ## 실패 근거
 
@@ -21,7 +21,8 @@ UUID 열의 동등 검사와 legacy fallback, 상속/partition 부모 및 비키
 
 - focused Node52 PASS: 기존49건과 그룹 구성·대상1회 읽기·cached bind·발견 열·잘못된 응답 회귀.
 - 실제 생성 worker의 전체 격리 PostgreSQL fixture PASS(26.4초): plan/apply·공유 보존·FK·Core fence·rollback·상속 자손·각5000행×128KiB JSON 포함.
-- 대용량 그룹 fixture 및 추가 literal/Unicode/배열 검증: 진행 중, 완료 후 기록한다.
+- 생성 worker의200만 행·세 열 그룹 fixture PASS(총281.8초): 개발43169ms/미디어48968ms, 각각1954개 구간·scanned합계200만 행. 동일 테이블 세 열을 한 번 순회하고 PK 범위 인덱스, 마지막 최대 UUID 참조, NULL, 원래 literal/배열 의미를 확인했다.
+- 추가100,000행 비PH 대상 원본 +3200행 source fixture PASS(1.1초): 대상 집합1회 조회, 열 사이에 나뉜 token의 오탐 없음, 뒤쪽 열·배열 참조 발견, Unicode·빈 token·NULL 의미. 공통 identifier quoting 추출 후 생성 worker로 재검증했다.
 - 변경 파일 ESLint PASS.
 - 운영 plan 재검증 전이다. 로컬 속도를 운영 완료 시간으로 보장하지 않는다.
 

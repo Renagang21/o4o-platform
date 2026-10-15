@@ -1,5 +1,9 @@
 /** Complete bounded reference scans; source row payloads stay inside PostgreSQL. */
 export const referenceBatchSize=1024;
+function quote(value) {
+  if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_PURGE_IDENTIFIER');
+  return `"${value}"`;
+}
 export async function countReferenceBatches(q,sql,keys,errorCode,group) {
   let previous=null;
   for(;;) {
@@ -24,10 +28,6 @@ export async function countReferenceBatches(q,sql,keys,errorCode,group) {
   }
 }
 export function referenceBatchQuery(c,patterns,owned) {
-  const quote=value=>{
-    if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_PURGE_IDENTIFIER');
-    return `"${value}"`;
-  };
   return `${patterns},
         reference_source AS MATERIALIZED (
           SELECT s.${quote(c.scan_key)} AS scan_id,s.${quote(c.column)}::text AS scan_value,(${owned}) AS owned
@@ -62,10 +62,6 @@ export async function prepareReferenceGroups(q,columns,targetSql,keys,errorCode)
   return result;
 }
 export function groupedReferenceQuery(c,owned) {
-  const quote=value=>{
-    if(typeof value!=='string'||! /^[A-Za-z_]\w*$/.test(value))throw new Error('PH_PURGE_IDENTIFIER');
-    return `"${value}"`;
-  };
   if(!Array.isArray(c.columns)||!c.columns.length||!Array.isArray(c.target_tokens)||c.target_tokens.some(t=>typeof t!=='string'))
     throw new Error('PH_PURGE_REFERENCE_GROUP');
   return `WITH target_patterns AS MATERIALIZED (
