@@ -78,6 +78,9 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   const reads = useLatestStoreRequest();
   const writes = useLatestStoreRequest();
   const lock = useRef(false);
+  // Held by a public link/QR action: shares `lock` so editor writes cannot race public-key promotion.
+  const publicLock = useRef(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [retry, setRetry] = useState(0);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [group, setGroup] = useState<StoreMlcGroupDetail | null>(null);
@@ -140,7 +143,12 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   const setActiveDraft = (patch: Partial<PageDraft>) => {
     if (!lock.current && isCurrent()) setDrafts(prev => ({ ...prev, [activeLocale]: { ...(prev[activeLocale] ?? draftFromPage()), ...patch } }));
   };
-  const busy = isSavingGroup || isSavingPage;
+  const busy = isSavingGroup || isSavingPage || isPublishing;
+  const acquirePublicLock = useCallback(() => {
+    if (lock.current) return null;
+    lock.current = true; publicLock.current = true; setIsPublishing(true);
+    return () => { lock.current = false; publicLock.current = false; setIsPublishing(false); };
+  }, []);
   const unsupported = !!group?.pages.some(p => p.locale === activeLocale && p.contentFormat !== 'html');
   const dirty = !!group && (title !== group.title || defaultLocale !== group.defaultLocale || STORE_MLC_LOCALES.some(loc =>
     JSON.stringify(drafts[loc] ?? draftFromPage()) !== JSON.stringify(draftFromPage(group.pages.find(p => p.locale === loc)))));
@@ -219,7 +227,8 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   const refreshPublication = async (): Promise<boolean> => {
     // Serialize with editor writes: a save/unpublish that starts during this GET supersedes it, and the
     // late response must not overwrite the newer result. Skip while a write is already in flight.
-    if (!group || lock.current || !isCurrent()) return false;
+    // The public action itself holds the shared lock (publicLock); any other holder is an editor write.
+    if (!group || (lock.current && !publicLock.current) || !isCurrent()) return false;
     const current = writes.begin();
     const saved = verifyGroup(await getStoreMlcGroup(group.id));
     if (!current() || !isCurrent()) return false;
@@ -311,7 +320,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
         </div>
 
         {/* QR / 고객용 링크 — 그룹이 있을 때만. publicKey QR(언어 탭 랜딩). */}
-        {group && <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={busy || dirty} onPublished={refreshPublication} />}
+        {group && <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} disabled={isSavingGroup || isSavingPage || dirty} onPublished={refreshPublication} acquireLock={acquirePublicLock} />}
       </div>
 
       {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주세요.</p>}

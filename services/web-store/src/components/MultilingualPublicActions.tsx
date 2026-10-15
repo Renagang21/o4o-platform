@@ -23,6 +23,12 @@ interface Props {
   disabled?: boolean;
   /** Refresh after publication. Resolving `false` means the refresh was skipped/superseded: delivery is cancelled. */
   onPublished?: () => Promise<void | boolean>;
+  /**
+   * Optional shared write lock with a parent editor. Called synchronously before issuance starts; returns a
+   * release function, or null when an editor write is in flight (the action then does not start). While held,
+   * the parent must block its own writes so a draft/unpublish cannot race the public-key promotion.
+   */
+  acquireLock?: () => (() => void) | null;
 }
 
 /** url 에 mode=tablet 쿼리 부여 (기존 쿼리 유무 안전 처리). */
@@ -37,7 +43,7 @@ export function MultilingualPublicActions(props: Readonly<Props>) {
 
 type PublicAction = 'open' | 'tablet' | 'copy' | 'qr';
 
-function PublicActionsSession({ groupId, publishable, disabled: disabledProp = false, onPublished, isCurrent }: Readonly<Props & { isCurrent: () => boolean }>) {
+function PublicActionsSession({ groupId, publishable, disabled: disabledProp = false, onPublished, acquireLock, isCurrent }: Readonly<Props & { isCurrent: () => boolean }>) {
   const disabled = disabledProp || !publishable;
   const [busy, setBusy] = useState<null | PublicAction>(null);
   const lock = useRef(false);
@@ -79,9 +85,11 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
   const run = async (action: PublicAction) => {
     if (lock.current || disabled || !isCurrent()) return;
     if (action === 'qr' && qr) { setQr(null); return; }
+    const release = acquireLock ? acquireLock() : () => {};
+    if (!release) { setError('편집 내용을 저장하는 중입니다. 저장이 끝난 뒤 다시 시도해 주세요.'); return; }
     // Never leave a stale store's tab open.
     const { ok, popup } = openPopup(action);
-    if (!ok) return;
+    if (!ok) { release(); return; }
     const current = requests.begin();
     const owned = () => current() && isCurrent();
     lock.current = true; setBusy(action); setError(null); setCopied(false);
@@ -106,6 +114,7 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
       }
     } finally {
       lock.current = false;
+      release();
       if (owned()) setBusy(null);
     }
   };

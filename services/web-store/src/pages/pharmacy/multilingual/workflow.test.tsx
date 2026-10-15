@@ -179,15 +179,30 @@ it('clears old QR and copy status when the group changes', async () => {
   const h = render(wrap(<MultilingualPublicActions groupId="group" publishable />)); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
   h.rerender(wrap(<MultilingualPublicActions groupId="other" publishable />)); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
 });
-it('drops a late publication refresh when an editor write finished during it', async () => {
+it('serializes public issuance with editor writes so a draft change cannot race the public-key promotion', async () => {
   const published = group({ pages: [localePage('ko', 'Saved KO', 'published'), localePage('en', 'Saved EN')] });
-  api.list.mockResolvedValue([published]); const refresh = deferred<StoreMlcGroupDetail>(); api.get.mockResolvedValueOnce(published).mockReturnValue(refresh.promise);
-  api.status.mockResolvedValue(group({ pages: [localePage('ko', 'Saved KO', 'draft'), localePage('en', 'Saved EN')] }));
-  editor(); fireEvent.click(await screen.findByRole('button', { name: 'QR 보기' })); await waitFor(() => expect(api.get.mock.calls.length).toBeGreaterThanOrEqual(2));
-  fireEvent.click(screen.getByRole('button', { name: '초안으로 내리기' })); await waitFor(() => expect(api.status).toHaveBeenCalledWith('group', 'ko', 'draft'));
-  await waitFor(() => expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull());
-  await act(async () => refresh.resolve(published)); expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull();
-  await screen.findByText(/고객용 링크·QR 전달을 중단했습니다/); expect(api.qr).not.toHaveBeenCalled(); expect(screen.queryByRole('button', { name: 'QR 숨기기' })).toBeNull();
+  api.list.mockResolvedValue([published]); api.get.mockResolvedValue(published); const issuing = deferred<{ url: string }>(); api.key.mockReturnValue(issuing.promise);
+  editor(); fireEvent.click(await screen.findByRole('button', { name: 'QR 보기' })); await waitFor(() => expect(api.key).toHaveBeenCalledTimes(1));
+  const unpublish = screen.getByRole('button', { name: '초안으로 내리기' }) as HTMLButtonElement;
+  expect(unpublish.disabled).toBe(true); expect((screen.getByRole('button', { name: '임시 저장' }) as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByRole('button', { name: '저장 후 이 언어 발행' }) as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(unpublish); expect(api.status).not.toHaveBeenCalled();
+  await act(async () => issuing.resolve({ url: 'https://example.test/multilingual-products/key' }));
+  await screen.findByRole('button', { name: 'QR 숨기기' }); expect(api.qr).toHaveBeenCalledWith('group');
+  await waitFor(() => expect((screen.getByRole('button', { name: '초안으로 내리기' }) as HTMLButtonElement).disabled).toBe(false));
+});
+it('does not start a public action while the shared editor lock is held', async () => {
+  vi.spyOn(window, 'open');
+  render(wrap(<MultilingualPublicActions groupId="group" publishable acquireLock={() => null} />));
+  fireEvent.click(screen.getByRole('button', { name: '고객용 보기' })); fireEvent.click(screen.getByRole('button', { name: 'QR 보기' }));
+  await screen.findByText(/편집 내용을 저장하는 중입니다/); expect(api.key).not.toHaveBeenCalled(); expect(window.open).not.toHaveBeenCalled();
+});
+it('releases the shared lock after a public action, including a blocked popup', async () => {
+  const release = vi.fn(); const acquire = vi.fn(() => release); vi.spyOn(window, 'open').mockReturnValue(null);
+  render(wrap(<MultilingualPublicActions groupId="group" publishable acquireLock={acquire} />));
+  fireEvent.click(screen.getByRole('button', { name: '고객용 보기' })); expect(release).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole('button', { name: 'QR 보기' })); await screen.findByRole('button', { name: 'QR 숨기기' });
+  expect(acquire).toHaveBeenCalledTimes(2); expect(release).toHaveBeenCalledTimes(2);
 });
 it('cancels link delivery and closes the popup when the publication refresh was not applied', async () => {
   const popup = { opener: {}, close: vi.fn(), location: { replace: vi.fn() } };
