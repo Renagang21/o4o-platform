@@ -53,6 +53,7 @@ function PharmacyContentSources() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -70,7 +71,7 @@ function PharmacyContentSources() {
     if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
     return { ...result, items: [selected, ...result.items] };
   }, [sf, q, page, selectedContentId]);
-  const { items, total, loading, error, setError, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
+  const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
   useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
   const onSearch = (e: FormEvent) => {
@@ -81,13 +82,13 @@ function PharmacyContentSources() {
 
   const copy = async (c: SemiFranchiseContent) => {
     setBusyId(c.id);
-    setError(null);
+    setCopyError(null);
     setCopied(null);
     try {
       await neturePharmacyApi.copyContent(c.id);
       setCopied(c.title);
     } catch (e) {
-      setError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
+      setCopyError(pharmacyErrorMessage(e, '내 매장 사본을 만들지 못했습니다.'));
     } finally {
       setBusyId(null);
     }
@@ -121,7 +122,7 @@ function PharmacyContentSources() {
           '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={STORE_LIBRARY_PATH} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
-      {error && <Notice tone="error">{error}</Notice>}
+      {(error || copyError) && <Notice tone="error">{error || copyError}</Notice>}
 
       <form className="mb-4 flex flex-wrap gap-2" onSubmit={onSearch}>
         <input

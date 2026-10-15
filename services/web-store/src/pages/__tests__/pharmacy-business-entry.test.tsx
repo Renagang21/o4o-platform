@@ -70,3 +70,16 @@ it('직원에게는 가입자 공간 대신 매장 상품·자료 진입을 유�
   expect(within(section).queryByRole('button', { name: '가입자 공간' })).toBeNull();
   expect(within(section).getByRole('link', { name: '자료 가져오기' })).toBeTruthy();
 });
+
+it('복사 실패는 자료 목록을 숨기지 않고 같은 자료에서 바로 재시도한다', async () => {
+  mocks.listContents.mockResolvedValue({ items: [content], total: 1 });
+  mocks.copyContent.mockRejectedValueOnce(new Error('Unavailable'));
+  render(<MemoryRouter><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByText('선택한 자료');
+  fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
+  await screen.findByRole('alert');
+  expect(screen.getByText('선택한 자료')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
+  await screen.findByRole('link', { name: '내 매장 자료함에서 보기' });
+  expect(mocks.copyContent).toHaveBeenCalledTimes(2);
+});

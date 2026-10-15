@@ -56,3 +56,12 @@ it('URL의 약국이 현재 접근 목록에 없으면 다른 약국으로 대�
   await screen.findByRole('combobox', { name: '자료를 이용할 약국' });
   expect(transport.get).not.toHaveBeenCalled();
 });
+
+it('자료 2페이지에서 다른 약국을 선택하면 새 약국의 1페이지부터 조회한다', async () => {
+  transport.stores.push({ organizationId: 'store-b', organizationName: '약국 B', memberRole: 'owner' });
+  mount(true, false, '/materials?store=store-a');
+  fireEvent.click(await screen.findByRole('button', { name: '다음' }));
+  await waitFor(() => expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 2, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } }));
+  fireEvent.change(screen.getByRole('combobox', { name: '자료를 이용할 약국' }), { target: { value: 'store-b' } });
+  await waitFor(() => expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-b' } }));
+});

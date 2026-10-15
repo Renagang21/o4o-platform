@@ -9,6 +9,11 @@ import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 export default function BusinessMaterialsPage() {
   const { business, access } = useBusiness();
   const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage);
+  return <BusinessMaterialRecords key={`${business.key}:${materialStore.organizationId ?? ''}`} materialStore={materialStore} />;
+}
+
+function BusinessMaterialRecords({ materialStore }: { materialStore: ReturnType<typeof useBusinessMaterialStore> }) {
+  const { business, access } = useBusiness();
   const [params] = useSearchParams();
   const [items, setItems] = useState<BusinessContent[]>([]);
   const [error, setError] = useState('');
