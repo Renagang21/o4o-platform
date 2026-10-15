@@ -6,9 +6,10 @@
  * isRegulated 토글 — 건강기능식품 등 규제 카테고리 구분
  */
 
-import { useState, useEffect, useCallback, useId } from 'react';
+import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import { Plus, Pencil, Trash2, ChevronRight, ChevronDown, X, Loader2, Shield } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { useTaxonomyDialog } from './hooks/useTaxonomyDialog';
 import { operatorCategoryApi, type CategoryNode } from '../../lib/api/operatorCategory';
 
 interface FormData {
@@ -53,6 +54,9 @@ export default function CategoryManagementPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [dialogError, setDialogError] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const dialogRef = useTaxonomyDialog(showModal, headingRef);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const loadCategories = useCallback(async () => {
@@ -77,12 +81,14 @@ export default function CategoryManagementPage() {
   };
 
   const openCreate = (parentId: string | null = null) => {
+    setDialogError(null);
     setEditId(null);
     setForm({ ...emptyForm, parentId });
     setShowModal(true);
   };
 
   const openEdit = (node: CategoryNode) => {
+    setDialogError(null);
     setEditId(node.id);
     setForm({ name: node.name, parentId: node.parentId, isRegulated: node.isRegulated });
     setShowModal(true);
@@ -90,9 +96,11 @@ export default function CategoryManagementPage() {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
+      setDialogError('카테고리 이름을 입력하세요');
       toast.error('카테고리 이름을 입력하세요');
       return;
     }
+    setDialogError(null);
     setSaving(true);
     try {
       if (editId) {
@@ -115,7 +123,9 @@ export default function CategoryManagementPage() {
       loadCategories();
     } catch (err: any) {
       const msg = err?.message || '저장 실패';
-      toast.error(msg === 'MAX_CATEGORY_DEPTH_EXCEEDED' ? '최대 4단계까지만 가능합니다' : msg);
+      const message = msg === 'MAX_CATEGORY_DEPTH_EXCEEDED' ? '최대 4단계까지만 가능합니다' : msg;
+      setDialogError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -174,7 +184,7 @@ export default function CategoryManagementPage() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap gap-3 justify-between items-center">
-        <h1 className="text-2xl font-bold text-slate-800">카테고리 관리</h1>
+        <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-bold text-slate-800">카테고리 관리</h1>
         <button
           onClick={() => openCreate(null)}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium"
@@ -288,10 +298,11 @@ export default function CategoryManagementPage() {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <dialog ref={dialogRef} aria-labelledby={`${formId}-title`}
+          onCancel={(event) => { event.preventDefault(); if (!saving) setShowModal(false); }}
+          className="!m-auto w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto border-0 p-0 bg-white rounded-xl shadow-xl text-inherit backdrop:bg-black/50">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">
+              <h2 id={`${formId}-title`} className="text-lg font-semibold text-slate-800">
                 {editId ? '카테고리 수정' : '카테고리 생성'}
               </h2>
               <button
@@ -303,6 +314,7 @@ export default function CategoryManagementPage() {
               </button>
             </div>
             <div className="px-6 py-4 space-y-4">
+              {dialogError && <p role="alert" className="text-sm text-red-700">{dialogError}</p>}
               {/* Name */}
               <div>
                 <label htmlFor={`${formId}-name`} className="block text-sm font-medium text-slate-700 mb-1">카테고리 이름 *</label>
@@ -313,7 +325,7 @@ export default function CategoryManagementPage() {
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="예: 건강기능식품"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  autoFocus
+                  data-dialog-initial-focus
                 />
               </div>
 
@@ -366,8 +378,7 @@ export default function CategoryManagementPage() {
                 {saving ? '저장 중...' : editId ? '수정' : '생성'}
               </button>
             </div>
-          </div>
-        </div>
+        </dialog>
       )}
     </div>
   );
