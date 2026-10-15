@@ -200,7 +200,7 @@ export default function SupplierProductImportPage({ onApplyDraft, onCancel }: { 
 
         {parsed && <SupplierImportResult controller={controller} />}
 
-        {parsed && <SupplierImportSettings controller={controller} />}
+        {parsed && <SupplierImportSettings controller={controller} onCancel={onCancel} />}
 
         <MediaPickerModal
           open={!!mediaPickerTarget}

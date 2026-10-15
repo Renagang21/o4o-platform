@@ -301,27 +301,27 @@ export default function SupplierStoreDescriptionsPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-slate-800">{p.name || p.masterName || '(이름 없음)'}</p>
                       <p className="truncate font-mono text-xs text-slate-400">{p.barcode}</p>
+                      {hasAny && (
+                        <div className="mt-1 flex flex-wrap items-center gap-1">
+                          {langRows.map(({ lang, row }) => {
+                            const badge = DRAFT_STATUS_BADGE[row.status] ?? {
+                              label: row.status,
+                              cls: 'bg-slate-100 text-slate-600',
+                            };
+                            return (
+                              <span
+                                key={lang}
+                                title={`${LANG_LABELS[lang]} — ${badge.label}`}
+                                className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}
+                              >
+                                <span className="font-mono text-[10px] opacity-70">{LANG_SHORT[lang]}</span>
+                                {badge.label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                    {hasAny && (
-                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
-                        {langRows.map(({ lang, row }) => {
-                          const badge = DRAFT_STATUS_BADGE[row.status] ?? {
-                            label: row.status,
-                            cls: 'bg-slate-100 text-slate-600',
-                          };
-                          return (
-                            <span
-                              key={lang}
-                              title={`${LANG_LABELS[lang]} — ${badge.label}`}
-                              className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}
-                            >
-                              <span className="font-mono text-[10px] opacity-70">{LANG_SHORT[lang]}</span>
-                              {badge.label}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
                     <button
                       type="button"
                       onClick={() => { setInitialLanguage('ko'); setSelected(p); }}

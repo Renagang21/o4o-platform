@@ -231,6 +231,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     fireEvent.change(screen.getByLabelText('상품 검색'), { target: { value: '바코드' } });
+    fireEvent.click(screen.getByRole('button', { name: '검색 실행' }));
     fireEvent.click(screen.getByRole('button', { name: /승인 요청 중/ }));
     await waitFor(() =>
       expect(api.getProductsPaginated).toHaveBeenLastCalledWith(

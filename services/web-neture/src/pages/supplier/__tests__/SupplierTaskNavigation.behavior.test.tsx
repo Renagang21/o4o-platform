@@ -76,8 +76,8 @@ vi.mock("@o4o/error-handling", () => ({
   toast: { success: vi.fn(), error: vi.fn() },
 }));
 vi.mock("@o4o/content-editor", () => ({
-  RichTextEditor: ({ value }: { value: string }) => (
-    <textarea aria-label="자료 본문" value={value} readOnly />
+  RichTextEditor: ({ value, editable, onChange }: { value: string; editable: boolean; onChange: (value: { html: string }) => void }) => (
+    <textarea aria-label="자료 본문" value={value} readOnly={!editable} onChange={(event) => onChange({ html: event.target.value })} />
   ),
 }));
 vi.mock("@o4o/tablet-screen-set-editor", () => ({
@@ -279,6 +279,66 @@ describe("supplier task navigation", () => {
     ]);
     mount('/supplier/store-descriptions?masterId=master-a&language=en&descriptionId=current');
     await waitFor(() => expect((screen.getByLabelText('자료 본문') as HTMLTextAreaElement).value).toBe('<p>Current content</p>'));
+  });
+
+  it.each(['hidden', 'canonical'])('keeps a %s row read-only and opens the current draft before saving', async (status) => {
+    api.descriptions.mockResolvedValue([
+      { id: 'historical', masterId: 'master-a', language: 'en', status, content: '<p>Historical content</p>' },
+      { id: 'current', masterId: 'master-a', language: 'en', status: 'draft', content: '<p>Current content</p>' },
+    ]);
+    api.saveDescription.mockResolvedValue({ id: 'current', masterId: 'master-a', descriptionType: 'STORE', language: 'en', status: 'draft' });
+    mount('/supplier/store-descriptions?masterId=master-a&language=en&descriptionId=historical');
+    const body = await screen.findByLabelText('자료 본문') as HTMLTextAreaElement;
+    expect(body.value).toBe('<p>Historical content</p>');
+    expect(body.readOnly).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+    fireEvent.click(screen.getByRole('button', { name: '검수요청', exact: true }));
+    expect(api.saveDescription).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '현재 작업본 열기' }));
+    expect(body.value).toBe('<p>Current content</p>');
+    expect(body.readOnly).toBe(false);
+    fireEvent.change(body, { target: { value: '<p>Edited current draft</p>' } });
+    fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+    await waitFor(() => expect(api.saveDescription).toHaveBeenCalledWith({ offerId: 'offer-a', language: 'en', content: '<p>Edited current draft</p>', submit: false }));
+  });
+
+  it('prefers the active working row when opening a product without a description ID', async () => {
+    api.descriptions.mockResolvedValue([
+      { id: 'historical', masterId: 'master-a', language: 'en', status: 'hidden', content: '<p>Historical content</p>' },
+      { id: 'current', masterId: 'master-a', language: 'en', status: 'draft', content: '<p>Current content</p>' },
+    ]);
+    mount('/supplier/store-descriptions?masterId=master-a&language=en');
+    const body = await screen.findByLabelText('자료 본문') as HTMLTextAreaElement;
+    expect(body.value).toBe('<p>Current content</p>');
+    expect(body.readOnly).toBe(false);
+  });
+
+  it('starts a new draft explicitly from published content when no working row exists', async () => {
+    api.descriptions.mockResolvedValue([{ id: 'published', masterId: 'master-a', language: 'en', status: 'canonical', content: '<p>Published content</p>' }]);
+    mount('/supplier/store-descriptions?masterId=master-a&language=en&descriptionId=published');
+    const body = await screen.findByLabelText('자료 본문') as HTMLTextAreaElement;
+    expect(body.readOnly).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: '새 작업본 작성' }));
+    expect(body.readOnly).toBe(false);
+    expect(body.value).toBe('<p>Published content</p>');
+    expect(api.saveDescription).not.toHaveBeenCalled();
+  });
+
+  it('keeps unsaved content after a failed save and cancelled close, then retries the same draft', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    api.saveDescription.mockRejectedValueOnce(new Error('Fixture save failure')).mockResolvedValueOnce({ id: 'current', masterId: 'master-a', descriptionType: 'STORE', language: 'en', status: 'draft' });
+    mount('/supplier/store-descriptions?masterId=master-a&language=en');
+    const body = await screen.findByLabelText('자료 본문') as HTMLTextAreaElement;
+    fireEvent.change(body, { target: { value: '<p>Unsaved content</p>' } });
+    fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+    await waitFor(() => expect((screen.getByRole('button', { name: '임시저장' }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole('button', { name: '닫기' }));
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(body.value).toBe('<p>Unsaved content</p>');
+    fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+    await waitFor(() => expect(api.saveDescription).toHaveBeenCalledTimes(2));
+    expect(api.saveDescription.mock.calls[0]).toEqual(api.saveDescription.mock.calls[1]);
+    confirm.mockRestore();
   });
 
   it("opens the requested description language and returns to the filtered material list", async () => {

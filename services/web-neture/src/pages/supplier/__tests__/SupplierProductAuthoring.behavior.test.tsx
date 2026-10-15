@@ -331,13 +331,15 @@ describe('Candidate creation existing workflow', () => {
 });
 
 describe('Import existing workflow', () => {
-  it('returns from source input without losing form fields or selected files', async () => {
+  it.each(['top', 'bottom'])('returns from the %s import cancel without losing fields or selected files', async (exit) => {
     const view = await createStep3('?productType=non_drug');
     const file = new File(['fixture'], 'retained.png', { type: 'image/png' });
     const fileInput = view.container.querySelector('input[type="file"][accept="image/*"]') as HTMLInputElement;
     fireEvent.change(fileInput, { target: { files: [file] } });
     fireEvent.click(screen.getByRole('button', { name: /상세페이지 소스로 자동 입력/ }));
-    fireEvent.click(screen.getByRole('button', { name: '입력 내용 유지하고 돌아가기' }));
+    fireEvent.change(screen.getByLabelText('관리자 HTML *'), { target: { value: firstmallHtml } });
+    fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
+    fireEvent.click(screen.getByRole('button', { name: exit === 'top' ? '입력 내용 유지하고 돌아가기' : '취소', exact: true }));
     expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
     await screen.findByText('제품 정보 검토 요청 완료');

@@ -85,10 +85,24 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   const [dirty, setDirty] = useState(false);
   // WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 철회 진행 상태.
   const [withdrawing, setWithdrawing] = useState(false);
+  const readOnly = !!existing && !WITHDRAWABLE_STATUSES.has(existing.status);
+  const workingRow = rows.find((r) => normLang(r.language) === language && WITHDRAWABLE_STATUSES.has(r.status));
+
+  const requestClose = () => {
+    if (saving || withdrawing) return;
+    if (dirty && !window.confirm('저장하지 않은 변경사항이 있습니다. 닫으면 현재 편집 내용이 사라집니다. 계속하시겠습니까?')) return;
+    onClose();
+  };
 
   // 특정 언어의 작업행을 캐시에서 찾아 편집기에 로드(없으면 빈 편집기 — 자동 복사 금지).
   const loadLanguageFrom = useCallback((all: SupplierStoreDescriptionDraft[], lang: SupportedLang, descriptionId?: string) => {
-    const row = all.find((r) => normLang(r.language) === lang && (!descriptionId || r.id === descriptionId)) ?? null;
+    const languageRows = all.filter((r) => normLang(r.language) === lang);
+    // Saving upserts the active product/language draft, not an arbitrary historical ID.
+    const row = descriptionId
+      ? languageRows.find((r) => r.id === descriptionId) ?? null
+      : languageRows.find((r) => WITHDRAWABLE_STATUSES.has(r.status))
+        ?? languageRows.find((r) => r.status === 'canonical')
+        ?? languageRows[0] ?? null;
     setExisting(row);
     setContent(row?.content || '');
     setDirty(false);
@@ -128,13 +142,13 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   // 언어 전환: 미저장 변경 보호 → 해당 언어 초안 로드(캐시).
   const selectLanguage = useCallback((lang: SupportedLang) => {
     if (lang === language) return;
-    if (saving) return;
+    if (saving || withdrawing) return;
     if (dirty && !window.confirm(`저장하지 않은 변경사항이 있습니다.\n‘${LANG_LABELS[lang]}’ 로 전환하면 현재 편집 내용이 사라집니다. 계속하시겠습니까?`)) {
       return;
     }
     setLanguage(lang);
     loadLanguageFrom(rows, lang);
-  }, [language, saving, dirty, rows, loadLanguageFrom]);
+  }, [language, saving, withdrawing, dirty, rows, loadLanguageFrom]);
 
   const editorImageUpload = useCallback(
     async (file: File): Promise<string> => {
@@ -147,6 +161,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   );
 
   const doSave = async (submit: boolean) => {
+    if (readOnly || loading || loadError || saving || withdrawing) return;
     const trimmed = content.trim();
     if (!trimmed || trimmed === '<p></p>') {
       toast.error('설명서 본문을 입력하세요');
@@ -177,7 +192,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
       setExisting(savedRow);
       setDirty(false);
       setRows((prev) => {
-        const idx = prev.findIndex((r) => normLang(r.language) === language);
+        const idx = prev.findIndex((r) => r.id === saved.id);
         if (idx >= 0) { const next = prev.slice(); next[idx] = savedRow; return next; }
         return [...prev, savedRow];
       });
@@ -202,8 +217,8 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     try {
       await supplierStoreDescriptionApi.withdraw(existing.id);
       toast.success(`철회되었습니다 (${LANG_LABELS[language]})`);
-      // 캐시에서 해당 언어 행 제거 + 편집기 초기화(빈 상태). 다른 언어 행 무변경.
-      setRows((prev) => prev.filter((r) => normLang(r.language) !== language));
+      // 철회한 ID만 캐시에서 제거한다. 같은 언어의 게시·과거 행도 보존한다.
+      setRows((prev) => prev.filter((r) => r.id !== existing.id));
       setExisting(null);
       setContent('');
       setDirty(false);
@@ -225,7 +240,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-40" onClick={saving ? undefined : onClose} />
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={requestClose} />
       <div className="fixed top-0 right-0 h-full w-full max-w-[720px] bg-white shadow-2xl z-50 flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-slate-200">
@@ -239,7 +254,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
               )}
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-slate-100 rounded-lg" aria-label="닫기" disabled={saving}>
+          <button onClick={requestClose} className="p-1.5 hover:bg-slate-100 rounded-lg" aria-label="닫기" disabled={saving || withdrawing}>
             <X size={18} className="text-slate-500" />
           </button>
         </div>
@@ -285,7 +300,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
                         key={l}
                         type="button"
                         onClick={() => selectLanguage(l)}
-                        disabled={saving}
+                        disabled={saving || withdrawing}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 ${
                           active ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                         }`}
@@ -300,9 +315,17 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
                   언어별로 <b>독립된 설명서</b>입니다. 한 언어를 저장해도 다른 언어에는 영향이 없으며, 언어마다 따로 검수받습니다. (● = 작성됨)
                 </p>
               </div>
-              {isCanonical && (
-                <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
-                  이 설명서는 운영자 검수를 통과해 매장에 노출 중입니다. 수정 후 다시 저장하면 새 초안으로 검수를 받습니다.
+              {readOnly && (
+                <div className="mb-3 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
+                  <p>{isCanonical ? '매장에 노출 중인 설명서' : '보관된 설명서'}는 읽기 전용입니다. 수정은 작업본에서 진행합니다.</p>
+                  <button type="button" className="mt-2 font-medium text-emerald-700 underline" onClick={() => {
+                    setExisting(workingRow ?? null);
+                    // An existing draft always wins. Only an explicit new draft may start from published content.
+                    setContent(workingRow?.content ?? (isCanonical ? content : ''));
+                    setDirty(false);
+                  }}>
+                    {workingRow ? '현재 작업본 열기' : '새 작업본 작성'}
+                  </button>
                 </div>
               )}
               {isRevision && (
@@ -312,15 +335,14 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
                   <div className="mt-1 text-orange-700">수정 후 <strong>다시 검수 요청</strong>하세요. 기한이 지나면 이 설명서는 자동 삭제됩니다.</div>
                 </div>
               )}
-              {initialDescriptionId && <p className="mb-2 text-xs text-slate-500">선택한 자료를 불러왔습니다. 저장·검수 요청은 이 상품·언어의 작업본에 적용됩니다.</p>}
               <RichTextEditor
                 value={content}
-                onChange={(c) => { setContent(c.html); setDirty(true); }}
-                editable={!saving}
+                onChange={(c) => { if (!readOnly) { setContent(c.html); setDirty(true); } }}
+                editable={!saving && !withdrawing && !readOnly}
                 placeholder="매장 경영자가 고객 응대·QR·태블릿에 활용할 매장용 설명서를 작성하세요"
                 minHeight="360px"
-                onImageUpload={editorImageUpload}
-                showTemplateActions
+                onImageUpload={readOnly ? undefined : editorImageUpload}
+                showTemplateActions={!readOnly}
                 templateCategory="product"
                 templates={tpl.templates}
                 templatesLoading={tpl.loading}
@@ -352,14 +374,14 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => doSave(false)}
-              disabled={saving || loading || loadError || withdrawing}
+              disabled={readOnly || saving || loading || loadError || withdrawing}
               className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
             >
               {saving ? '저장 중...' : '임시저장'}
             </button>
             <button
               onClick={() => doSave(true)}
-              disabled={saving || loading || loadError || withdrawing}
+              disabled={readOnly || saving || loading || loadError || withdrawing}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               {saving ? '처리 중...' : isRevision ? '다시 검수 요청' : '검수요청'}
