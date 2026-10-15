@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * KPA Operator Dashboard Service
  *
@@ -145,7 +146,7 @@ async function fetchSummaryShape(
     workspace?.allowed ? forumService.listRecentPosts(5) : [],
     dataSource.query(`
       SELECT COUNT(*) as count FROM cms_contents
-      WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'
+      WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'
     `),
     dataSource.query(`
       SELECT COUNT(*) as count FROM signage_media
@@ -158,11 +159,11 @@ async function fetchSummaryShape(
     workspace?.allowed ? forumService.countVisiblePosts() : 0,
     dataSource.query(`
       SELECT COUNT(*) as count FROM cms_contents
-      WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'
+      WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'
     `),
     dataSource.query(`
       SELECT COUNT(*) as count FROM cms_contents
-      WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'
+      WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'
     `),
     dataSource.query(`
       SELECT COUNT(*) as count FROM signage_media

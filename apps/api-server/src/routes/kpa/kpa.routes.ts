@@ -1,3 +1,4 @@
+import { isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from '../cms-content/cms-reserved-presentation.js';
 /**
  * KPA Routes
  * 약사회 SaaS API 라우트 설정
@@ -1087,7 +1088,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
     const qb = contentRepo.createQueryBuilder('c')
-      .where('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS });
+      .where('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`);
 
     if (type && ALLOWED_TYPES.includes(type)) {
       qb.andWhere('c.type = :type', { type });
@@ -1160,8 +1162,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -1193,8 +1196,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -1213,8 +1217,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const existing = await contentRepo.createQueryBuilder('c')
       .where('c.id = :id', { id: req.params.id })
       .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .getOne();
-    if (!existing) {
+    if (!existing || isHomePresentationMetadata(existing.metadata)) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
     }
@@ -1245,8 +1250,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if (item.status !== 'draft') { results.push({ id, status: 'skipped', error: 'Not in draft status' }); continue; }
         item.status = 'published';
         item.publishedAt = new Date();
@@ -1278,8 +1284,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if (item.status === 'archived') { results.push({ id, status: 'skipped', error: 'Already archived' }); continue; }
         item.status = 'archived';
         await contentRepo.save(item);
@@ -1310,8 +1317,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const item = await contentRepo.createQueryBuilder('c')
           .where('c.id = :id', { id })
           .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+          .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
           .getOne();
-        if (!item) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
+        if (!item || isHomePresentationMetadata(item.metadata)) { results.push({ id, status: 'failed', error: 'Not found' }); continue; }
         if (item.status !== 'archived') { results.push({ id, status: 'skipped', error: 'Only archived items can be hard deleted' }); continue; }
         const title = item.title;
         await contentRepo.delete({ id });
@@ -1338,6 +1346,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const now = new Date();
     const rows = await contentRepo.createQueryBuilder('c')
       .where('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .andWhere(`c.${ORDINARY_CMS_CONTENT_SQL}`)
       .andWhere('c.type = :type', { type: 'notice' })
       .andWhere('c.status = :status', { status: 'published' })
       .andWhere('(c.publishedAt IS NULL OR c.publishedAt <= :now)', { now })

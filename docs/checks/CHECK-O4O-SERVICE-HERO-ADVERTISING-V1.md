@@ -92,3 +92,10 @@ other session usage: 없음 / verdict: KEEP (PR 후속 검토·수정용)
 - Neture 전체1020 PASS(실제 Hero 앞에 AI composer가 오는 회귀 포함), shared-space-ui 전체118 PASS, Neture production build PASS.
 - 실제 대표 홈·빌드 CSS와 합성 인증/공개 응답으로 Chromium PC1440x900/mobile390x844/짧은390x480의3 viewport에서 AI 입력이 첫 viewport에 보이고 Hero보다 앞에 있는지 확인했다. pageerror0·외부 write0·문서 가로 overflow0. 소식은 합성 빈 응답에 대한 실패 안내이며 실제 소식 API 성공 검증이 아니다. screenshot3장·측정 JSON은 /tmp에 보관했다. 임시 서버·symlink 정리 완료.
 - 원개발의 다른 소비 앱 build·30 browser 기록은 앞 절에 보존하며 이번에 전체 재실행한 것으로 보고하지 않는다. 실제 계정·운영 DB write·메일·배포는 미실행이다. 최종 CI·Sonar·Codex·최신 main 정렬은 후속 판정이다.
+
+
+### 통합 리뷰 후속 — 공유 CMS 전 경로의 예약 구성 격리
+
+#646 리뷰에서 일반 ContentQueryService와 KPA 뉴스 경로가 예약된 홈 구성 metadata를 직접 반환하거나 수정할 수 있음을 확인했다. 공유 콘텐츠 조회·추천·engagement·자료 복사·hub·대시보드·slot·승인·뉴스 단건/일괄 변경에서 home-presentation을 SQL 조건과 단건 방어로 제외했다. pagination/count도 같은 조건을 쓴다. purge·migration·감사 참조 검사는 제외하지 않으며 Frozen Core·schema는 변경하지 않았다.
+
+실제 TypeORM entity와 격리 PostgreSQL15에서 15개 통합 테스트 PASS: 공개 detail/feed/hub/복사 차단, 잘못 published 된 예약 row 차단, slot 조회/변경 차단, 일반 콘텐츠 조회·배치·승인 유지. Raw alias는 PostgreSQL의 대소문자 식별자를 인용하며 승인 갱신은 canonical CMS updatedAt 열을 쓴다. 실제 KPA 및 shared 뉴스 Express 라우트 20개 PASS(권한 검사 유지·단건/일괄 변경 무쓰기·일반 조회/편집 유지). 관련 API 5 suite 108 PASS, 타입 검사 PASS, 변경 lint 오류0/기존 경고5. PG fixture schema0 확인 및 컨테이너 제거 완료. 기존 frontend 2780건·production build·브라우저27건 검증은 frontend 불변 범위의 결과다. 운영 DB·GCS·WIF 변경은 없으며 새 head CI/리뷰는 별도 판정한다.

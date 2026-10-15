@@ -616,7 +616,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         const rows = await dataSource.query(
           `SELECT id, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", metadata
            FROM cms_contents
-           WHERE type = $1 AND "serviceKey" = 'neture' AND status = 'published'
+           WHERE ${ORDINARY_CMS_CONTENT_SQL} AND type = $1 AND "serviceKey" = 'neture' AND status = 'published'
              AND ("expiresAt" IS NULL OR "expiresAt" > NOW())${metadataFilter}
            ORDER BY "sortOrder" ASC, "createdAt" DESC`,
           params,

@@ -11,8 +11,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { In, Raw, type DataSource } from 'typeorm';
-import { isHomePresentationMetadata, ORDINARY_CMS_CONTENT_SQL } from './cms-reserved-presentation.js';
+import { In, type DataSource } from 'typeorm';
+import { isHomePresentationMetadata, ordinaryCmsMetadata, ORDINARY_CMS_CONTENT_SQL } from './cms-reserved-presentation.js';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
 import { optionalAuth } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
@@ -111,7 +111,7 @@ export function createCmsContentQueryRoutes(deps: {
       }
 
       // Build base where clause for scope
-      const baseWhere: any = { metadata: Raw((alias) => `${alias}->>'section' IS DISTINCT FROM 'home-presentation'`) };
+      const baseWhere: any = { metadata: ordinaryCmsMetadata() };
       if (scope.serviceKeys) {
         baseWhere.serviceKey = In(scope.serviceKeys);
       }
@@ -239,7 +239,7 @@ export function createCmsContentQueryRoutes(deps: {
       }
 
       // Build where clause
-      const where: any = { metadata: Raw((alias) => `${alias}->>'section' IS DISTINCT FROM 'home-presentation'`) };
+      const where: any = { metadata: ordinaryCmsMetadata() };
       if (scope.serviceKeys) {
         where.serviceKey = In(scope.serviceKeys);
       }

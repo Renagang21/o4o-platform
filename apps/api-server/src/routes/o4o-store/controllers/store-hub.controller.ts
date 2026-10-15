@@ -1,3 +1,4 @@
+import { ORDINARY_CMS_CONTENT_SQL } from '../../cms-content/cms-reserved-presentation.js';
 /**
  * Store Hub Controller — Unified Storefront Rendering API
  *
@@ -137,7 +138,7 @@ export function createStoreHubController(
           const contentResult = await dataSource.query(
             `SELECT COUNT(*)::int as count
              FROM cms_contents
-             WHERE "organizationId" = $1 AND status = 'published'`,
+             WHERE ${ORDINARY_CMS_CONTENT_SQL} AND "organizationId" = $1 AND status = 'published'`,
             [organizationId]
           );
           orgContentCount = contentResult[0]?.count || 0;

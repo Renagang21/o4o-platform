@@ -8,6 +8,28 @@ import {
   PresentationConflict,
   type PresentationScope,
 } from "../home-presentation.service";
+import express from 'express';
+import request from 'supertest';
+import { CANONICAL_SCHEMA_BASELINE_STATEMENTS } from '../../../database/bootstrap/canonical-schema-baseline.js';
+import { ContentQueryService } from '../../../modules/content/content-query.service.js';
+import { HubContentQueryService } from '../../../modules/hub-content/hub-content.service.js';
+import { ContentApprovalService } from '../../kpa/services/content-approval.service.js';
+jest.mock('@o4o-apps/cms-core', () => ({
+  ...jest.requireActual('../../../../../../packages/cms-core/src/entities/CmsContent.entity.ts'),
+  ...jest.requireActual('../../../../../../packages/cms-core/src/entities/CmsContentSlot.entity.ts'),
+}), { virtual: true });
+jest.mock('@o4o-apps/cms-core/entities', () => ({
+  ...jest.requireActual('../../../../../../packages/cms-core/src/entities/CmsContent.entity.ts'),
+}), { virtual: true });
+jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({ roleAssignmentService: { hasAnyRole: async (id: string) => id === 'fixture', getActiveRoles: async () => [] } }));
+jest.mock('../../../middleware/auth.middleware.js', () => ({
+  optionalAuth: (req: any, _res: any, next: any) => { if (req.headers['x-test-admin']) req.user = { id: 'fixture', roles: ['platform:super_admin'] }; next(); },
+  requireAuth: (req: any, res: any, next: any) => { if (!req.headers['x-test-admin']) return res.sendStatus(401); req.user = { id: 'fixture', roles: ['platform:super_admin'] }; next(); },
+}));
+const { CmsContent } = jest.requireActual('../../../../../../packages/cms-core/src/entities/CmsContent.entity.ts');
+const { CmsContentSlot } = jest.requireActual('../../../../../../packages/cms-core/src/entities/CmsContentSlot.entity.ts');
+import { KpaAssetResolver } from '../../../modules/asset-snapshot/resolvers/kpa-asset.resolver.js';
+import { createCmsContentSlotRoutes } from '../../cms-content/cms-content-slot.handler.js';
 const run =
   process.env.O4O_HOME_PRESENTATION_PG_TEST === "1" ? describe : describe.skip;
 run("home presentation PostgreSQL persistence", () => {
@@ -33,18 +55,22 @@ run("home presentation PostgreSQL persistence", () => {
       password,
       database: "o4o_home_presentation_test",
       synchronize: false,
+      schema,
+      entities: [CmsContent, CmsContentSlot],
       extra: { options: `-c search_path=${schema}` },
     });
     await ds.initialize();
     await ds.query(`CREATE SCHEMA "${schema}"`);
     created = true;
-    await ds.query(
-      `CREATE TABLE cms_contents (id uuid PRIMARY KEY, "serviceKey" varchar(50), "organizationId" uuid, type varchar(50) NOT NULL, title varchar(255) NOT NULL, status varchar(20) NOT NULL DEFAULT 'draft', metadata jsonb NOT NULL DEFAULT '{}', "authorRole" varchar(20) NOT NULL DEFAULT 'admin', "visibilityScope" varchar(20) NOT NULL DEFAULT 'platform', "createdBy" uuid, "createdAt" timestamp NOT NULL DEFAULT NOW(), "updatedAt" timestamp NOT NULL DEFAULT NOW())`,
-    );
+    for (const table of ['cms_contents', 'cms_content_slots']) {
+      const sql = CANONICAL_SCHEMA_BASELINE_STATEMENTS.find(statement => statement.startsWith(`CREATE TABLE public.${table} (`));
+      if (!sql) throw new Error('Missing canonical CMS fixture table');
+      await ds.query(sql.replace(`public.${table}`, table));
+    }
     service = new HomePresentationService(ds);
   });
   beforeEach(async () => {
-    await ds.query("TRUNCATE cms_contents");
+    await ds.query("TRUNCATE cms_content_slots, cms_contents");
   });
   afterAll(async () => {
     if (ds?.isInitialized) {
@@ -66,6 +92,64 @@ run("home presentation PostgreSQL persistence", () => {
     expect(await service.publicRead(neture)).toBeNull();
     expect(cmsMutationRows(await ds.query(`UPDATE cms_contents SET status='published' WHERE id=$1 AND ${where} RETURNING id`, [ordinaryId]))).toEqual([{ id: ordinaryId }]);
     expect(cmsMutationRows(await ds.query(`DELETE FROM cms_contents WHERE id=$1 AND ${where} RETURNING id`, [ordinaryId]))).toEqual([{ id: ordinaryId }]);
+  });
+  it.each(['neture', 'kpa-society'])('hides reserved metadata from shared readers and copies for %s', async (serviceKey) => {
+    const localScope: PresentationScope = { surface: serviceKey === 'neture' ? 'neture' : 'pharmacy', organizationId: null };
+    await service.save(localScope, initialHomePresentation(localScope.surface), 0, false, actor);
+    const [privateRow] = await ds.query('SELECT id FROM cms_contents');
+    // Even a malformed legacy status must not expose the private draft/published pair.
+    await ds.query(`UPDATE cms_contents SET status='published' WHERE id=$1`, [privateRow.id]);
+    const reader = new ContentQueryService(ds, { serviceKeys: [serviceKey] });
+    expect(await reader.getById(privateRow.id)).toBeNull();
+    expect(await reader.getByIdWithRecommendations(privateRow.id)).toBeNull();
+    expect((await reader.listPublished()).pagination.total).toBe(0);
+    expect(await reader.listForHome(['hero'], 5)).toEqual([]);
+    expect(await reader.listFeatured(['hero'], 5)).toEqual([]);
+    await reader.incrementViewCount(privateRow.id);
+    expect(await reader.toggleRecommendation(privateRow.id, actor)).toEqual({ recommendCount: 0, isRecommendedByMe: false });
+    const ordinary = randomUUID();
+    await ds.query(`INSERT INTO cms_contents(id,"serviceKey",type,title,status) VALUES($1,$2,'hero','Ordinary','published')`, [ordinary, serviceKey]);
+    expect((await reader.listPublished()).data.map(item => item.id)).toEqual([ordinary]);
+    expect((await new HubContentQueryService(ds).getContents({ serviceKey, sourceDomain: 'cms' })).data.map(item => item.id)).toEqual([ordinary]);
+    expect((await reader.getById(ordinary))?.title).toBe('Ordinary');
+    if (serviceKey === 'kpa-society') {
+      expect(await new KpaAssetResolver(ds).resolve(privateRow.id, 'cms')).toBeNull();
+      expect(await new KpaAssetResolver(ds).resolve(ordinary, 'cms')).toMatchObject({ title: 'Ordinary' });
+    }
+    expect((await ds.query('SELECT "viewCount", "likeCount" FROM cms_contents WHERE id=$1', [privateRow.id]))[0]).toEqual({ viewCount: 0, likeCount: 0 });
+    expect((await service.read(localScope)).revision).toBe(1);
+  });
+  it('rejects private CMS publication through approval but keeps ordinary publication', async () => {
+    await service.save(scope, initialHomePresentation(scope.surface), 0, false, actor);
+    const [privateRow] = await ds.query('SELECT id FROM cms_contents');
+    const publisher = new ContentApprovalService(ds);
+    const q = ds.createQueryRunner();
+    try {
+      await expect((publisher as any).publishContent(q, 'cms', privateRow.id)).rejects.toThrow('Content not found');
+      expect((await ds.query('SELECT status FROM cms_contents WHERE id=$1', [privateRow.id]))[0].status).toBe('draft');
+      const ordinary = randomUUID();
+      await ds.query(`INSERT INTO cms_contents(id,"serviceKey",type,title) VALUES($1,'supplier','news','Ordinary')`, [ordinary]);
+      await (publisher as any).publishContent(q, 'cms', ordinary);
+      expect((await ds.query('SELECT status FROM cms_contents WHERE id=$1', [ordinary]))[0].status).toBe('published');
+    } finally { await q.release(); }
+  });
+  it('hides pre-existing reserved slots even with activeOnly=false and blocks slot mutation/replacement', async () => {
+    const localScope: PresentationScope = { surface: 'neture', organizationId: null };
+    await service.save(localScope, initialHomePresentation('neture'), 0, false, actor);
+    const [privateRow] = await ds.query('SELECT id FROM cms_contents');
+    const ordinary = randomUUID(), privateSlot = randomUUID(), ordinarySlot = randomUUID();
+    await ds.query(`INSERT INTO cms_contents(id,"serviceKey",type,title,status) VALUES($1,'neture','hero','Ordinary','published')`, [ordinary]);
+    await ds.query(`INSERT INTO cms_content_slots(id,"slotKey","serviceKey","contentId") VALUES($1,'fixture','neture',$2),($3,'fixture','neture',$4)`, [privateSlot,privateRow.id,ordinarySlot,ordinary]);
+    const app = express(); app.use(express.json()); app.use('/cms', createCmsContentSlotRoutes({ dataSource: ds }));
+    const response = await request(app).get('/cms/slots/fixture?serviceKey=neture&activeOnly=false');
+    expect(response.status).toBe(200); expect(response.body.data.map((slot: any) => slot.id)).toEqual([ordinarySlot]); expect(response.body.meta.total).toBe(1);
+    expect((await request(app).put('/cms/slots/'+privateSlot).set('x-test-admin','1').send({sortOrder:3})).status).toBe(404);
+    expect((await request(app).delete('/cms/slots/'+privateSlot).set('x-test-admin','1')).status).toBe(404);
+    expect((await request(app).post('/cms/slots').set('x-test-admin','1').send({slotKey:'other',serviceKey:'neture',contentId:privateRow.id})).status).toBe(400);
+    expect((await ds.query('SELECT "sortOrder" FROM cms_content_slots WHERE id=$1',[privateSlot]))[0].sortOrder).toBe(0);
+    expect((await request(app).put('/cms/slots/'+ordinarySlot).set('x-test-admin','1').send({sortOrder:3})).status).toBe(200);
+    expect((await ds.query('SELECT "sortOrder" FROM cms_content_slots WHERE id=$1',[ordinarySlot]))[0].sortOrder).toBe(3);
+    expect((await service.read(localScope)).revision).toBe(1);
   });
   it("starts without any persisted or published configuration", async () => {
     expect(await service.read(scope)).toEqual({
