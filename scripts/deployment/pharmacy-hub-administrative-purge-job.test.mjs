@@ -89,7 +89,8 @@ test('worker diagnostics preserve failing SQL fingerprint and redact database pa
   }`});
   const payload=Buffer.from(args.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
   const executable=payload.replace('export class','class').replace("import {createRequire} from 'node:module';",'')
-    .replace("import {createHash as diagnosticHash} from 'node:crypto';",'');
+    .replace("import {createHash as diagnosticHash} from 'node:crypto';",'')
+    .replace("import {writeSync as diagnosticWrite} from 'node:fs';",'');
   for(const failure of ['connect','begin','purge','finish']) {
     const calls=[],errors=[];
     class Client {
@@ -105,8 +106,8 @@ test('worker diagnostics preserve failing SQL fingerprint and redact database pa
     }
     const fakeProcess={env:{},exitCode:0,once(){},removeListener(){}};
     const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
-    await new AsyncFunction('createRequire','diagnosticHash','console','process',executable)(
-      ()=>()=>({Client}),createHash,{error:x=>errors.push(x),log:()=>{}},fakeProcess);
+    await new AsyncFunction('createRequire','diagnosticHash','console','process','diagnosticWrite',executable)(
+      ()=>()=>({Client}),createHash,{error:x=>errors.push(x),log:()=>{}},fakeProcess,(fd,message)=>{assert.equal(fd,2);errors.push(message.trimEnd());});
     assert.equal(fakeProcess.exitCode,1);
     assert.equal(errors.length,1);
     assert.match(errors[0],new RegExp('^PH_PURGE_FAILED stage='+failure+' code='));
@@ -143,7 +144,8 @@ test('generated worker logs only stage and SQL hash on SIGTERM and exits unsucce
   }`});
   const payload=Buffer.from(args.find(a=>a.startsWith('--args=')).match(/base64,([^']+)/)[1],'base64').toString();
   const executable=payload.replace('export class','class').replace("import {createRequire} from 'node:module';",'')
-    .replace("import {createHash as diagnosticHash} from 'node:crypto';",'');
+    .replace("import {createHash as diagnosticHash} from 'node:crypto';",'')
+    .replace("import {writeSync as diagnosticWrite} from 'node:fs';",'');
   let handler,removed=false,exitStatus;
   const errors=[];
   const fakeProcess={env:{},once(signal,fn){assert.equal(signal,'SIGTERM');handler=fn;},
@@ -155,8 +157,8 @@ test('generated worker logs only stage and SQL hash on SIGTERM and exits unsucce
     async end(){}
   }
   const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
-  await new AsyncFunction('createRequire','diagnosticHash','console','process',executable)(
-    ()=>()=>({Client}),createHash,{error:x=>errors.push(x),log:()=>{}},fakeProcess);
+  await new AsyncFunction('createRequire','diagnosticHash','console','process','diagnosticWrite',executable)(
+    ()=>()=>({Client}),createHash,{error:x=>errors.push(x),log:()=>{}},fakeProcess,(fd,message)=>{assert.equal(fd,2);errors.push(message.trimEnd());});
   assert.equal(exitStatus,1);assert.equal(removed,true);
   assert.equal(errors[0],'PH_PURGE_INTERRUPTED stage=purge signal=SIGTERM query_sha256='+createHash('sha256').update(sql).digest('hex'));
   assert.ok(errors.every(message=>!message.includes('private')&&!message.includes(sql)));

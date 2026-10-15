@@ -59,12 +59,13 @@ export function jobArguments({image,source,mode,runId,attempt,username,database,
   const entry=`
 import {createRequire} from 'node:module';
 import {createHash as diagnosticHash} from 'node:crypto';
+import {writeSync as diagnosticWrite} from 'node:fs';
 const {Client}=createRequire('/app/package.json')('pg');
 ${purge==='media'?"const {Storage}=createRequire('/app/package.json')('@google-cloud/storage');":''}
 const client=new Client({host:process.env.DB_HOST,port:5432,user:process.env.DB_USERNAME,password:process.env.DB_PASSWORD,database:process.env.DB_NAME});
 let stage='connect',queryHash='none';
 function interrupted() {
-  console.error('PH_PURGE_INTERRUPTED stage='+stage+' signal=SIGTERM query_sha256='+queryHash);
+  diagnosticWrite(2,'PH_PURGE_INTERRUPTED stage='+stage+' signal=SIGTERM query_sha256='+queryHash+'\\n');
   process.exit(1);
 }
 process.once('SIGTERM',interrupted);
