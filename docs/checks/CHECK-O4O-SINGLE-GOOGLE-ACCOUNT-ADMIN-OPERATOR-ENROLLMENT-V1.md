@@ -1,8 +1,7 @@
 # CHECK-O4O-SINGLE-GOOGLE-ACCOUNT-ADMIN-OPERATOR-ENROLLMENT-V1
 
 > 시작: 2026-09-26 · 상태: **`BLOCKED — 실행 전 사용자 결정 1건 + 사용자 조작 필요`**
-> **상태**: SUPERSEDED · **대체 문서**: [`apps/api-server/src/config/operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · **표기일**: 2026-10-15
-> **회수 시 주(2026-10-15)**: §1-1 · §9 의 "운영자 역할 11개 부여" 할 일은 **종료(obsolete)** 다. 그 목록의 `pharmacy-hub:*` · `cosmetics:*` 는 서비스 은퇴로 현행 운영자 역할 카탈로그에 없고, `kpa-branch:operator` 는 Admin 이 부여하지 않는다(분회 서비스 관리자가 분회 화면에서 지정). 현행 부여 대상은 위 카탈로그가 정본이다. 이 문서는 2026-09-26 시점 기록으로만 남긴다.
+> **회수 시 주(2026-10-15)**: 이 CHECK 는 **ACTIVE** 로 유지한다. 역사 기록으로 표기하는 것은 §1-1 · §9 ② 의 "운영자 역할 11개 부여" 목록뿐이다 — 그 목록의 `pharmacy-hub:*` · `cosmetics:*` 는 서비스 은퇴로 현행 운영자 역할 카탈로그에 없고, `kpa-branch:operator` 는 Admin 이 부여하지 않는다(분회 서비스 관리자가 분회 화면에서 지정). 현행 서비스 운영자 부여 대상은 [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) 를 참고하되, 이 카탈로그는 `platform:*` 를 다루지 않으므로 **B2(관리자 권한 `platform:super_admin` 부여) · B3(새 계정 관리자 · 운영자 화면 검증)는 여전히 열린 단계**이며 이 표기로 종료되지 않는다. A4 · A6 은 현행 카탈로그 기준으로 대상 역할을 다시 정해 진행한다.
 > 대상 계정: `[REDACTED_EMAIL_B]` (**이미 등록된 Google 사용자 1명**)
 > **역사 기록 주(2026-10-15 회수)**: 이 문서는 작성 시점의 기록이다. 그 뒤 PharmacyHub · K-Cosmetics 퇴역, `community` · `supplier` · `funding` 서비스 키 · 운영자 역할 신설, `kpa-branch` canonical 호스트 `kpa.neture.co.kr` 전환, 이메일·비밀번호 병행 인증, Demo 3계정 정본화가 있었다. 본문의 남은 단계(호스트 · 역할 · 테이블 · Demo 절차 포함)는 **실행 전에 현행 정본으로 재검증해야 하며 이 문서를 그대로 실행 근거로 쓰지 않는다.** 현행 정본: [`service-catalog.ts`](../../apps/api-server/src/config/service-catalog.ts) · [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) · [`O4O-IDENTITY-ARCHITECTURE-V3`](../architecture/O4O-IDENTITY-ARCHITECTURE-V3.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1`](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) · [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · [`SETUP.md`](../../SETUP.md) · [`CANONICAL-INDEX`](../CANONICAL-INDEX.md)
 
@@ -307,7 +306,7 @@ register-routes · setup-middlewares 등). API 를 배포하면 함께 나간다
 | ① | **Console**: 승인된 JavaScript 원본에 위 7개 등록 | 통합 배포의 게이트 |
 | ② | **Admin 화면**: 운영자 역할 11개 부여 (후보 검색 → Google 연결된 후보 선택) | **무관 — 지금 가능**. B2 의 선행 조건 |
 
-> **회수 시 정정(2026-10-15)**: ② 는 **종료(obsolete)** — 11개 목록은 은퇴한 `pharmacy-hub:*` · `cosmetics:*` 와 Admin 부여 대상이 아닌 `kpa-branch:operator` 를 포함한다. 현행 대상은 [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) 를 따른다.
+> **회수 시 정정(2026-10-15)**: ② 의 11개 목록은 **역사 기록**이다 — 은퇴한 `pharmacy-hub:*` · `cosmetics:*` 와 Admin 부여 대상이 아닌 `kpa-branch:operator` 를 포함한다. 서비스 운영자 부여 대상은 [`operator-role-catalog.ts`](../../apps/api-server/src/config/operator-role-catalog.ts) 를 참고해 다시 정한다. **B2 · B3 의 super_admin 부여와 로그인 · 접근 검증은 이 정정과 무관하게 열린 단계로 남는다.**
 
 ②에서 후보가 **유일하게 식별되지 않으면**(0건 · 동명이인 · Google 미연결) **부여를 중지하고 알린다.**
 
