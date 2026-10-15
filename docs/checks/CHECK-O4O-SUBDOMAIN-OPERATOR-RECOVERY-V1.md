@@ -59,3 +59,17 @@ Chromium으로 **실제 production build**를 1440×1000, 390×844에서 확인�
 통합 WO와 전체 운영자 TODO에 결과/경계를 연결했다. 정본·정책·canonical index 변경은 없다.
 전체 관리자·약사회 분회·신고/소유자 승계 정책·강의 수료증 폐기 사유 서버 보관은 별도 후속으로 유지한다.
 개발 종료는 commit/push·PR. PR URL·CI의 최신 상태는 PR 및 완료 보고에 기록하고 main 병합·배포는 통합 담당에게 인계한다.
+
+
+## 2026-10-16 통합 후속 — Consumer Impact Matrix
+
+아래 원개발 검증은 위 자동·브라우저 절의 결과를 소비처별로 대응한 것이다. 통합 branch에서 재실행한 검증은 후속 절에 별도로 기록하며 운영 로그인·배포로 확대 해석하지 않는다.
+
+| 소비처 | 사용 여부·변경 영향 | route / role / capability 영향 | 검증 방식·기록된 결과 |
+|---|---|---|---|
+| 약국 상품 신청 | ProductApplicationManagementConsole 직접 wrapper, 실패 대상·사유와 재시도 유지 | `/operator/product-applications`, 기존 약국 운영자 guard·상태 전이 유지 | 공통 실패/역전 회귀 및 PC/mobile 실제 build+합성 API PASS |
+| 약국 포럼 | OperatorForumCategoriesPage 및 약국 API 어댑터, 조회 오류 전파·저장 후 읽기 복구 | `/operator/forum-categories`, 기존 포럼 권한·영구 삭제 사전검사 유지 | 어댑터 회귀2개 및 PC/mobile 실패→재조회 PASS |
+| Neture 포럼 | 같은 공통 콘솔 및 Neture 어댑터 | `/operator/forum-delete`, disableHardDelete와 이름 확인·기존 role 유지 | 어댑터 회귀2개 및 PC/mobile 읽기 복구·삭제 비노출 PASS |
+| 커뮤니티 개설 심사 | Neture 앱의 CreationRequestsPanel, 반려 사유·실패 대상 보존 | community 호스트 `/operator/communities`, 기존 서비스 운영자 guard·지정 경계 유지 | 개설 실패·중복 처리 회귀 및 PC/mobile 반려 재시도 PASS |
+| Neture 등록 신청 | 공통 OperatorConfirmModal / useOperatorAction 간접 소비 | 기존 등록 심사 route·권한·void callback 유지 | Neture 전체 회귀에 포함, 원개발967+어댑터2 PASS |
+| 공급자·펀딩·강의·중앙 관리자·분회 | 이번 상품/포럼 콘솔 직접 소비 없음. 공통 확인 모달 간접 소비는 기존 props 호환 유지 | 새 route·role·capability 없음, 범위 확장 없음 | import·심볼·리터럴 전수 검색, 공통 UI33회귀 PASS. 이 범위의 실계정·별도 브라우저 미실행 |

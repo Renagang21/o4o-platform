@@ -81,3 +81,26 @@ PR [#636](https://github.com/Renagang21/o4o-platform/pull/636), 소스 `e067220d
 선행 #612 포함과 TODO 충돌 해소를 PR 본문에 명시했다. #616/#628은 독립 미병합 상태다.
 CI 완료·원격 병합·운영 배포·실계정 smoke는 이번 로컬 검증의 PASS에 포함하지 않는다.
 checkout/branch는 미병합 PR 후속 수정용 KEEP, 다른 작업트리는 변경하지 않았다.
+
+
+## 2026-10-16 통합 후속 — 운영 흐름·접근성
+
+통합 담당 전용 branch `wo/operator-pr-integration-20261016`에서 #636(`5b6139c016`, #612 포함), #616(`620e6b453a`), #628(`21c3ce7475`), #613(`c33e90728e`)을 합쳤다. 코드 충돌은 없었다. 소스 PR의 원개발 검증과 아래 통합 재검증은 구분한다. PH 운영 창이 끝나기 전에는 main 병합·운영 배포하지 않는다.
+
+### 리뷰·품질 보완
+
+- 포럼 비활성화·태그·영구 삭제 모달 배경을 접근 가능한 이름의 native button으로 바꿨다. 처리 중 비활성화와 기존 쓰기 잠금을 유지한다. mouse 전용 div 때문에 발생한 Reliability 실패를 해소하는 변경이다.
+- 모호한 한 줄 조건문을 명시적 block으로 정리했다. 상품 삭제의 endWrite는 기존처럼 mount 여부와 무관하게 실행한다.
+- 개설 목록 응답 오류는 원래 response.data.error 계약을 가진 Error 객체로 전달한다.
+- #612·#628 기존 CHECK에 소비처별 사용 여부·변경 영향·route/role/capability·검증/미검증 범위를 추가했다. 새로운 회차 CHECK는 만들지 않았다.
+
+### 이번 통합본에서 실행한 검증
+
+- frozen install 및 build:packages PASS. 처음에는 공통 dist 미생성으로 테스트 import가 실패했고, 정본 빌드 후 재실행했다.
+- Vitest **1432 PASS**: operator-core-ui151, ui33, Neture1045, 약국163, 강의40. 각 suite를 현재 통합본에서 실행했다.
+- operator-core-ui tsc, Neture·약국·강의 production build PASS.
+- 변경 TS/TSX 전체 ESLint 오류0. MarketTrialApprovalsPage의 기존 Hook dependency 경고2개는 원개발과 같으며 수정하지 않았다.
+- 실제 포럼 공통 컴포넌트와 빌드 CSS + 합성 client로 Chromium PC1440/mobile390 **8개 시나리오 PASS**. 세 모달 Enter 닫기, 저장 중 닫기 차단, 실패 후 Space 닫기, 중복 쓰기 없음, pageerror0·문서 가로 넘침0. screenshot6장·결과 JSON은 작업공간 /tmp에 보관했다. 이 추가 smoke는 전체 서비스 로그인·권한 smoke가 아니다.
+- 임시 fixture 서버는 종료했고 임시 node_modules symlink를 해제했다. 실제 계정·운영 API·DB write·상태 전이·migration·배포는 실행하지 않았다.
+
+CI·Sonar·Codex 및 최종 main 통합·배포는 후속 확인이다. 원본 PR별 미해결 스레드는 해당 변경을 포함한 최종 통합 결과로 대조하며 근거 없이 완료 처리하지 않는다.

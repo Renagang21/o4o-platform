@@ -292,7 +292,10 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
       await refreshAfterWrite();
     } catch (e) {
       if (scope.mounted) setToastMsg({ type: 'error', message: actionFailure(e, '삭제에 실패했습니다.') });
-    } finally { if (scope.mounted) setDeleteLoading(false); endWrite(token); }
+    } finally {
+      if (scope.mounted) { setDeleteLoading(false); }
+      endWrite(token);
+    }
   };
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0 || actionTargetId || loading || error) return;

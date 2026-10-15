@@ -72,3 +72,18 @@ Chromium, 1440×1000 / 390×844. 모든 요청을 가로채 자산은 로컬 pre
 정본·canonical index 변경 없음. 신규 정책·서버 멱등성·공통 전체 상세 변경은 별도 후속이다.
 개발 종료는 commit/push·PR. PR URL·최신 CI는 PR/완료 보고에 기록하며 main 병합·배포는 통합 담당 소관이다.
 전용 worktree는 미병합 후속 수정용 KEEP. 타 세션 파일·branch를 변경하지 않는다.
+
+
+## 2026-10-16 통합 후속 — Consumer Impact Matrix
+
+원개발 검증은 위453 PASS 및12개 PC/mobile fixture 시나리오의 소비처별 대응이다. 통합 재검증은 기존 결과와 구분해 후속으로 기록한다.
+
+| 소비처 | 사용 여부·변경 영향 | route / role / capability 영향 | 검증 방식·기록된 결과 |
+|---|---|---|---|
+| Neture | UsersManagementPage의 공통 콘솔·EditUserModal·soft delete flow, 조회/쓰기 수명·입력 보존 | `/operator/members`, 기존 운영자 guard·역할 옵션·soft delete 범위 유지 | 공통 회귀·진입53개, PC/mobile 목록/승인 실패 복구·수정 입력 재시도 PASS |
+| 약국(KPA 앱) | MemberManagementPage의 공통 콘솔, KpaEditUserModal은 기존 구현 유지 | `/operator/members`, 약국 승인/복구·마지막 관리자 보호·확장 slot 유지 | 약국145개 및 API 권한/쓰기 원자성, PC/mobile 처리/조회 분리 PASS |
+| 강의 | OperatorMembersPage → ServiceMembersWorkspace → 공통 콘솔·수정창 | 강의 `/operator/members`, 기존 강의 membership/role guard와 API 유지 | 강의40개, PC/mobile 목록·처리 복구 및 공통 수정 실패 입력 유지 PASS |
+| 공급자 | ServiceMembersPage → ServiceMembersWorkspace | `/operator/service-members/supplier`, 기존 공급자 지정 운영자·승인 전용 제한 유지 | 공통114개 및 PC/mobile 목록/처리/수정 재시도 PASS |
+| 펀딩 | ServiceMembersPage → ServiceMembersWorkspace | `/operator/service-members/funding`, 기존 펀딩 지정 운영자·승인 전용 제한 유지 | 공통114개 및 PC/mobile 목록/처리·조회만 재시도 PASS |
+| 커뮤니티 | ServiceMembersPage → ServiceMembersWorkspace | `/operator/service-members/community`, 서비스 운영자와 개별 커뮤니티 운영자를 통합하지 않음 | 공통114개 및 PC/mobile 목록/처리·조회만 재시도 PASS |
+| 중앙 관리자·분회·공통 전체 사용자 상세 | 공통 콘솔 직접 소비 범위 밖, 별도 상세/권한 구현 유지 | route/role/capability 변경 없음, 전체 계정 복구·삭제를 서비스 관리로 노출하지 않음 | import/심볼·API/파일명 리터럴 검색, 새 브라우저·실계정 검증 미실행 |

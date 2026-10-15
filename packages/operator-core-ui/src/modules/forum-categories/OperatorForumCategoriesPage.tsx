@@ -456,7 +456,13 @@ export function OperatorForumCategoriesPage({
           actions={buildRowActions(forumCategoryPolicy, row, {
             editTags: () => openTagEditModal(row),
             activate: () => handleActivate(row),
-            deactivate: () => { if (read.current.writing || isCatsLoading || loadError) return; setActionError(null); setDeactivateTarget(row); setDeactivateReason(''); setDeactivateNameConfirm(''); },
+            deactivate: () => {
+              if (read.current.writing || isCatsLoading || loadError) { return; }
+              setActionError(null);
+              setDeactivateTarget(row);
+              setDeactivateReason('');
+              setDeactivateNameConfirm('');
+            },
             hardDelete: () => openHardDeleteModal(row),
           }, {
             icons: CATEGORY_ACTION_ICONS,
@@ -641,7 +647,7 @@ export function OperatorForumCategoriesPage({
       {/* ── 비활성화 확인 모달 ── */}
       {deactivateTarget && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); } }} />
+          <button type="button" aria-label="포럼 비활성화 대화상자 닫기" disabled={writing} className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); } }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
@@ -726,7 +732,7 @@ export function OperatorForumCategoriesPage({
       {/* ── 태그 수정 모달 ── */}
       {tagEditTarget && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) setTagEditTarget(null); }} />
+          <button type="button" aria-label="태그 수정 대화상자 닫기" disabled={writing} className="fixed inset-0 bg-black/50 z-40" onClick={() => { if (!read.current.writing) setTagEditTarget(null); }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200">
               <h2 className="text-lg font-semibold text-slate-800">태그 수정</h2>
@@ -799,7 +805,7 @@ export function OperatorForumCategoriesPage({
       {/* ── Hard Delete 모달 (안전 가드 보존) ── */}
       {hardDeleteTarget && (
         <>
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={closeHardDelete} />
+          <button type="button" aria-label="포럼 영구 삭제 대화상자 닫기" disabled={writing} className="fixed inset-0 bg-black/60 z-40" onClick={closeHardDelete} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-rose-200 bg-rose-50 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
