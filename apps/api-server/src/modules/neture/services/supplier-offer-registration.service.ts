@@ -176,11 +176,10 @@ export class SupplierOfferRegistrationService {
 
     // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
     //
-    // serviceKeys 는 등록 서비스 목록(allowlist)으로 검증되지 않으므로, 유통 축을 뒤집는
-    // 값은 여기서 입력 단계에 걸러낸다. 'neture' 는 PUBLIC 축이고 'glucoseview' 는 폐지된
-    // 서비스 키다 — 둘 중 하나라도 통과하면 deriveDistributionType 이 offer 를
-    // SERVICE 유통으로 잘못 판정한다.
-    const filteredServiceKeys = (input.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
+    // serviceKeys 는 승인 대상 서비스 키(SSOT: approval-service-keys) 허용 목록으로만 받는다.
+    // 'neture'(PUBLIC 축)나 등록되지 않은 키가 통과하면 deriveDistributionType 이 offer 를
+    // SERVICE 유통으로 잘못 판정하므로 입력 단계에서 걸러낸다. 수정 경로(supplier-offer-distribution)와 같은 기준이다.
+    const filteredServiceKeys = filterApprovalEligibleServiceKeys(input.serviceKeys);
 
     // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
     // 규제 상품은 약국 대상 서비스(service_audience_policies)에만 연결 가능

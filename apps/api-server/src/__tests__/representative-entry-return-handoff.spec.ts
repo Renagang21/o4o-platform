@@ -137,7 +137,7 @@ describe('B. generateHandoff', () => {
 
   it('알 수 없는 target → 400 INVALID_SERVICE', async () => {
     const res = mockRes();
-    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'glucoseview' }), res);
+    await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'unknown-service' }), res);
     expect([res.statusCode, res.body.code]).toEqual([400, 'INVALID_SERVICE']);
     expect(query).not.toHaveBeenCalled();
   });

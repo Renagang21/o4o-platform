@@ -17,7 +17,6 @@ import {
   Index,
 } from 'typeorm';
 
-// 'siteguide' 유형은 서비스 폐기로 은퇴 — 운영 데이터 삭제 완료 (CHECK-O4O-SITEGUIDE-RETIREMENT-V1 §5)
 export type InquiryType = 'platform' | 'partnership' | 'other';
 export type InquiryStatus = 'new' | 'in_progress' | 'resolved' | 'closed';
 

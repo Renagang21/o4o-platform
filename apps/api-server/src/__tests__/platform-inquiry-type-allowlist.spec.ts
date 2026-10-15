@@ -1,8 +1,8 @@
 /**
- * 플랫폼 문의 — 은퇴 유형 'siteguide' 접수 거부 (CHECK-O4O-SITEGUIDE-RETIREMENT-V1 §5)
+ * 플랫폼 문의 — 문의 유형 허용 목록
  *
- * 운영에서 삭제한 siteguide 문의가 공개 접수(POST /api/v1/platform/inquiries)로 다시 생기지 않아야 하고,
- * 다른 유형의 접수 동작은 그대로여야 한다. DB · 메일은 mock 이다.
+ * 공개 접수(POST /api/v1/platform/inquiries)는 허용 목록(platform · partnership · other)의 유형만 저장한다.
+ * 목록 밖 값(퇴역 서비스 유형 포함)은 400 으로 거부하고 저장하지 않는다. DB · 메일은 mock 이다.
  */
 
 const mockRepo = {
@@ -43,22 +43,22 @@ const base = { name: '테스트', email: 'tester@example.com', subject: '제목'
 const req = (body: Record<string, unknown>) =>
   ({ body, ip: '127.0.0.1', socket: {}, headers: {} }) as any;
 
-describe('platform inquiry — retired type', () => {
+describe('platform inquiry — type allowlist', () => {
   beforeEach(() => {
     mockRepo.create.mockClear();
     mockRepo.save.mockClear();
   });
 
-  it("type 'siteguide' 는 400 RETIRED_INQUIRY_TYPE 으로 거부하고 저장하지 않는다", async () => {
+  it.each(['siteguide', 'unknown', '', 'PLATFORM'])("허용 목록 밖 type '%s' 는 400 INVALID_INQUIRY_TYPE 으로 거부하고 저장하지 않는다", async (type) => {
     const res = makeRes();
-    await submitInquiry(req({ ...base, type: 'siteguide' }), res as any);
+    await submitInquiry(req({ ...base, type }), res as any);
     expect(res.statusCode).toBe(400);
-    expect(res.body).toMatchObject({ success: false, code: 'RETIRED_INQUIRY_TYPE' });
+    expect(res.body).toMatchObject({ success: false, code: 'INVALID_INQUIRY_TYPE' });
     expect(mockRepo.create).not.toHaveBeenCalled();
     expect(mockRepo.save).not.toHaveBeenCalled();
   });
 
-  it.each(['platform', 'partnership', 'other'])("type '%s' 는 기존대로 접수된다 (201)", async (type) => {
+  it.each(['platform', 'partnership', 'other'])("type '%s' 는 접수된다 (201)", async (type) => {
     const res = makeRes();
     await submitInquiry(req({ ...base, type }), res as any);
     expect(res.statusCode).toBe(201);
