@@ -14,7 +14,7 @@ function fixture(problem) {
     if(sql.includes('FROM pg_attribute a'))return [{schema:'public',table:'media_assets',column:'url'}];
     if(sql.startsWith('SELECT gcs_path,url'))return assets;
     if(sql.includes('FROM pg_trigger'))return [{count:problem==='trigger'?'1':'0'}];
-    if(sql.includes('strpos(')||sql.includes('JOIN public."media_assets"'))return [{count:['fk','reference'].includes(problem)?'1':'0'}];
+    if(sql.includes('~ targets.pattern')||sql.includes('JOIN public."media_assets"'))return [{count:['fk','reference'].includes(problem)?'1':'0'}];
     if(sql.startsWith('WITH removed')){writes.push(sql);return [{count:sql.includes('DELETE FROM public.media_assets')?'4':'1'}];}
     if(sql.includes('FROM public.media_entity_links'))return [{count:problem==='link'?'0':'1'}];
     if(sql.includes('FROM public.media_assets'))return [{count:writes.length?'0':problem==='count'?'5':'4'}];
