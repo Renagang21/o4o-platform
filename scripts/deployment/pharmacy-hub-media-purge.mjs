@@ -78,6 +78,9 @@ export function mediaReferenceQuery(c) {
       c.schema==='public'&&c.table==='media_entity_links'?linkScope('s'):'FALSE';
     if(c.type==='uuid') {
       const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+      // Partition live/deleted landings to use the partial index without omitting references.
+      const partitions=c.schema==='public'&&c.table==='product_landings'&&c.column==='product_master_id'
+        ? ['s.deleted_at IS NULL','s.deleted_at IS NOT NULL'] : ['TRUE'];
       // Include every original token. URL/path tokens cannot match UUID text,
       // but hypothetical short hexadecimal legacy IDs still use the gated fallback.
       return `WITH target_values AS MATERIALIZED (
@@ -88,9 +91,10 @@ export function mediaReferenceQuery(c) {
           SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
           FROM target_values WHERE id ~ '^[0-9a-f-]{1,36}$' AND id !~ '${canonical}')
         SELECT count(*)::text AS count FROM (
-          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
+${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
           WHERE NOT COALESCE((${owned}),FALSE)
             AND s.${id(c.column)} = ANY(ARRAY(SELECT id::uuid FROM target_values WHERE id ~ '${canonical}'))
+            AND ${partition}`).join('\n          UNION ALL\n')}
           UNION ALL
           SELECT 1 FROM target_patterns targets CROSS JOIN ${id(c.schema)}.${id(c.table)} s
           WHERE targets.pattern IS NOT NULL AND NOT COALESCE((${owned}),FALSE)

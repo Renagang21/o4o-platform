@@ -145,6 +145,9 @@ export function developmentReferenceQuery(c) {
     const targetIds=roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
     if(c.type==='uuid') {
       const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+      // Partition live/deleted landings to use the partial index without omitting references.
+      const partitions=c.schema==='public'&&c.table==='product_landings'&&c.column==='product_master_id'
+        ? ['s.deleted_at IS NULL','s.deleted_at IS NOT NULL'] : ['TRUE'];
       // UUID text is canonical lowercase. Keep a separate, gated fallback for
       // short legacy tokens that could occur inside it; do not cast the indexed column.
       return `WITH target_values AS MATERIALIZED (${targetIds}),
@@ -152,9 +155,10 @@ export function developmentReferenceQuery(c) {
           SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
           FROM target_values WHERE id ~ '^[0-9a-f-]{1,36}$' AND id !~ '${canonical}')
         SELECT count(*)::text AS count FROM (
-          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
+${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
           WHERE NOT COALESCE((${owned??'FALSE'}),FALSE)
             AND s.${id(c.column)} = ANY(ARRAY(SELECT id::uuid FROM target_values WHERE id ~ '${canonical}'))
+            AND ${partition}`).join('\n          UNION ALL\n')}
           UNION ALL
           SELECT 1 FROM target_patterns targets CROSS JOIN ${id(c.schema)}.${id(c.table)} s
           WHERE targets.pattern IS NOT NULL AND NOT COALESCE((${owned??'FALSE'}),FALSE)

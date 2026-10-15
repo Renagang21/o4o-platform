@@ -37,10 +37,10 @@ test('UUID reference queries preserve exact/legacy matches and use indexes witho
       const rows=process.env.PH_PURGE_UUID_STRESS_FIXTURE==='1'?1000000:5000;
       // Loading/index creation are fixture setup, outside the production query timeout.
       for(const table of ['product_landings','product_identifiers']) {
-        await client.query(`CREATE TABLE ${table}(product_master_id uuid);
-          INSERT INTO ${table} SELECT md5(n::text)::uuid FROM generate_series(1,${rows}) n;
-          INSERT INTO ${table} VALUES(NULL);
-          CREATE INDEX ON ${table}(product_master_id); ANALYZE ${table}`);
+        await client.query(`CREATE TABLE ${table}(product_master_id uuid${table==='product_landings'?',deleted_at timestamptz':''});
+          INSERT INTO ${table}(product_master_id) SELECT md5(n::text)::uuid FROM generate_series(1,${rows}) n;
+          INSERT INTO ${table}(product_master_id) VALUES(NULL);
+          CREATE INDEX ON ${table}(product_master_id) ${table==='product_landings'?'WHERE deleted_at IS NULL':''}; ANALYZE ${table}`);
       }
       await client.query("SET statement_timeout='15s'");
       for(const [kind,build,table,target,legacyTable] of [
@@ -59,20 +59,25 @@ test('UUID reference queries preserve exact/legacy matches and use indexes witho
         assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
         console.log(JSON.stringify({kind,accesses:accesses.map(n=>({type:n['Node Type'],loops:n['Actual Loops'],index:n['Index Name']}))}));
         assert.ok(accesses.some(n=>n['Actual Loops']>0&&walk(n).some(child=>/Index/.test(child['Node Type'])&&child['Actual Loops']>0)));
-        assert.ok(accesses.every(n=>n['Node Type']!=='Seq Scan'||n['Actual Loops']===0));
+        assert.ok(accesses.filter(n=>n['Node Type']==='Seq Scan'&&n['Actual Loops']>0).every(n=>table==='product_landings'&&n.Filter.includes('deleted_at IS NOT NULL')));
         let legacyStatus='passed';
         const before=performance.now();
         try {assert.equal(await count(build(column)),0);} catch(error) {if(error.code!=='57014')throw error;legacyStatus='57014';}
         console.log(JSON.stringify({kind,rows,indexedMs,legacyMs:performance.now()-before,legacyStatus}));
         // Exact UUID references still block; NULL and unrelated masters stay safe.
-        await client.query(`INSERT INTO ${table} VALUES($1)`,[uuid(target)]);
+        await client.query(`INSERT INTO ${table}(product_master_id) VALUES($1)`,[uuid(target)]);
         assert.equal(await count(sql),1);
         assert.equal(await count(build(column)),1);
         await client.query(`DELETE FROM ${table} WHERE product_master_id=$1`,[uuid(target)]);
+        if(table==='product_landings') {
+          await client.query(`INSERT INTO ${table}(product_master_id,deleted_at) VALUES($1,now())`,[uuid(target)]);
+          assert.equal(await count(sql),1);
+          await client.query(`DELETE FROM ${table} WHERE deleted_at IS NOT NULL`);
+        }
         // Legacy text IDs may be proper substrings of UUID text; retain that guard.
         const originalId=uuid(kind==='development'?5:9),partial=uuid(999).slice(1);
         await client.query(`UPDATE ${legacyTable} SET id=$1 WHERE id=$2`,[partial,originalId]);
-        await client.query(`INSERT INTO ${table} VALUES($1)`,[uuid(999)]);
+        await client.query(`INSERT INTO ${table}(product_master_id) VALUES($1)`,[uuid(999)]);
         assert.equal(await count(sql),1);
         assert.equal(await count(build(column)),1);
         await client.query(`DELETE FROM ${table} WHERE product_master_id=$1`,[uuid(999)]);

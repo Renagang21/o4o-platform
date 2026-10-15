@@ -19,9 +19,9 @@ text·JSON·array는 기존 literal 정규식 검사를 그대로 사용한다. 
 
 - Node focused36 PASS. 기존 두 실패 SQL의 SHA256을 고정한 회귀와 새 UUID 경로 검사를 포함한다.
 - 실제 PostgreSQL15 기존 plan/apply·shared ownership·cross-schema FK·문자열/JSON 참조·Core fence·rollback fixture PASS. JSON 대용량 조건은 두 테이블 각각5000행×128KiB이며 동일15초 제한에서 통과했다.
-- 별도 실제 PostgreSQL UUID query fixture PASS: 테이블별100만 행+NULL, 두 경로 모두 Bitmap Heap/Index Scan 실행, fallback Seq Scan Actual Loops0, target_values 생산1회. 실제 exact UUID 및35자 레거시 부분 문자열 탐지 결과가 기존 정규식 검사와 일치했다.
-- 해당100만 행의 축약 대상 query fixture에서 개발 구식2825ms/수정2.1ms, 미디어 구식2196ms/수정1.2ms. 구식도 이 로컬 fixture에서는15초 안에 끝났다. 운영 timeout 재현·운영 속도 보장을 주장하지 않는다. 전체 삭제 검증의 고정 census는 별도 기존 fixture가 검증한다.
-- 초기 planner 검사는 Index Scan만 허용해 실제 Bitmap Heap/Index Scan을 실패로 오인했다. 자식 Bitmap Index Scan 실행까지 확인하도록 검사를 수정했고 실제 전수 검사 미실행 조건은 유지했다.
+- 별도 실제 PostgreSQL UUID query fixture PASS: 테이블별100만 행+NULL, 실제 부분 인덱스와 동일하게 product_landings는 deleted_at IS NULL 인덱스를 구성했다. 활성 행은 Bitmap Heap/Index Scan, 삭제 행은 별도 UUID 동등 비교로 전수 검사하며 양쪽 모두 보존한다. 레거시 fallback Seq Scan Actual Loops0, target_values 생산1회. 삭제 행의 실제 UUID 참조도 탐지했다. 실제 exact UUID 및35자 레거시 부분 문자열 탐지 결과가 기존 정규식 검사와 일치했다.
+- 해당100만 행의 축약 대상 query fixture에서 개발 구식3061ms/수정35ms, 미디어 구식2382ms/수정1.4ms. 구식도 이 로컬 fixture에서는15초 안에 끝났다. 운영 timeout 재현·운영 속도 보장을 주장하지 않는다. 전체 삭제 검증의 고정 census는 별도 기존 fixture가 검증한다.
+- 초기 planner 검사는 Index Scan만 허용해 실제 Bitmap Heap/Index Scan을 실패로 오인했다. 자식 Bitmap Index Scan 실행까지 확인하도록 검사를 수정했고 레거시 fallback 미실행 조건은 유지했다. 이후 Codex P1(4282293320)으로 운영 부분 인덱스 차이를 확인하고 활성/삭제 분리 검사와 실제 부분 인덱스 fixture로 수정·재검증했다.
 - source/tests ESLint 오류0·문서 민감정보0·diff 검사 PASS. CI·Codex·main 반영·운영 plan 재실행은 아직 미완료다.
 
 ## 다음 실행
