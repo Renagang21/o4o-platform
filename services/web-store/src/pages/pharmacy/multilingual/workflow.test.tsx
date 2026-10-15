@@ -149,6 +149,16 @@ it('preserves unsupported imported page formats instead of saving empty HTML', a
   api.get.mockResolvedValue(group({ pages: [{ ...localePage(), contentFormat: 'blocks', content: { blocks: [] } }] })); editor(); await screen.findByText(/HTML 편집을 지원하지 않는 형식/);
   expect((screen.getByRole('button', { name: '임시 저장' }) as HTMLButtonElement).disabled).toBe(true); expect(api.page).not.toHaveBeenCalled();
 });
+it('lets a published non-HTML page be moved back to draft without touching its body', async () => {
+  const blocksPage = (status: StoreMlcStatus) => ({ ...localePage('ko', 'Imported blocks', status), contentFormat: 'blocks', content: { blocks: [] } });
+  const published = group({ pages: [blocksPage('published')] });
+  api.list.mockResolvedValue([published]); api.get.mockResolvedValue(published); api.status.mockResolvedValue(group({ pages: [blocksPage('draft')] }));
+  editor(); await screen.findByText(/HTML 편집을 지원하지 않는 형식/);
+  expect((screen.getByRole('button', { name: '저장 후 이 언어 발행' }) as HTMLButtonElement).disabled).toBe(true);
+  const unpublish = screen.getByRole('button', { name: '초안으로 내리기' }) as HTMLButtonElement; expect(unpublish.disabled).toBe(false);
+  fireEvent.click(unpublish); await waitFor(() => expect(api.status).toHaveBeenCalledWith('group', 'ko', 'draft'));
+  await waitFor(() => expect(screen.queryByRole('button', { name: '초안으로 내리기' })).toBeNull()); expect(api.page).not.toHaveBeenCalled();
+});
 it('clears old product drafts and ignores an old save when the route changes', async () => {
   const pending = deferred<StoreMlcGroupDetail>(); api.page.mockReturnValue(pending.promise);
   function Host() { const nav = useNavigate(); return <><button onClick={() => nav('/store/products/multilingual/local/local-b')}>Other product</button><Routes><Route path="/store/products/multilingual/:targetKind/:targetId" element={<Editor />} /></Routes></>; }

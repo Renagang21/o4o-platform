@@ -191,7 +191,8 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
   };
 
   const persistPage = async (publish: boolean, statusOnly = false) => {
-    if (!group || lock.current || unsupported || !isCurrent()) return;
+    // Non-HTML pages keep their original body: block upserts, but allow status-only changes (e.g. unpublish).
+    if (!group || lock.current || (unsupported && !statusOnly) || !isCurrent()) return;
     if (!statusOnly && !activeDraft.title.trim()) { setSaveError('이 언어의 제목을 입력하세요.'); return; }
     const locale = activeLocale;
     const current = writes.begin();
@@ -371,7 +372,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
                 {activeDraft.status === 'published' && (
                   <button
                     onClick={() => void persistPage(false, true)}
-                    disabled={busy || unsupported}
+                    disabled={busy}
                     className="px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     초안으로 내리기
