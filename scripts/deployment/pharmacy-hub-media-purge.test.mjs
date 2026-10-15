@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PharmacyHubMediaPurge,validateMediaObject} from './pharmacy-hub-media-purge.mjs';
+import {PharmacyHubMediaPurge,validateMediaObject,mediaReferenceQuery} from './pharmacy-hub-media-purge.mjs';
+import {createHash} from 'node:crypto';
+
+test('production UUID timeout query retains every token and gates substring fallback',()=>{
+  const c={schema:'public',table:'product_identifiers',column:'product_master_id'};
+  assert.equal(createHash('sha256').update(mediaReferenceQuery(c)).digest('hex'),'d16a1d52d2e1e16a6118e0dbaa95720722dbe6986b04e0563e0c11f307c86cbc');
+  const sql=mediaReferenceQuery({...c,type:'uuid'});
+  assert.match(sql,/s\."product_master_id" = ANY\(ARRAY\(SELECT id::uuid/);
+  assert.match(sql,/unnest\(ARRAY\[a.id,a.url,a.gcs_path\]\)/);
+  assert.match(sql,/targets.pattern IS NOT NULL/);
+});
 import {jobArguments} from './pharmacy-hub-administrative-purge-job.mjs';
 function fixture(problem) {
   const calls=[],deleted=[],writes=[],missing=new Set();

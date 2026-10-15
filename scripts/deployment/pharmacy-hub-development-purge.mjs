@@ -128,8 +128,7 @@ async function references(q,fks,tables) {
   }
   // Also refuse references embedded in application text/JSON/arrays/UUID columns.
   // Only counts leave this job; no row identifiers or payloads are logged.
-  const targetIds=roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
-  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column
+  const columns=await q.query(`SELECT n.nspname AS schema,c.relname AS "table",a.attname AS column,t.typname AS type
     FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
     JOIN pg_type t ON t.oid=a.atttypid WHERE a.attnum>0 AND NOT a.attisdropped AND c.relkind IN ('r','p')
     AND n.nspname NOT IN ('pg_catalog','information_schema') AND n.nspname NOT LIKE 'pg_%'
@@ -137,18 +136,44 @@ async function references(q,fks,tables) {
   const locked=new Set(tables.map(t=>`${t.schema}.${t.table}`));
   for(const c of columns) {
     if(!locked.has(`${c.schema}.${c.table}`))throw new Error('PH_DEV_SCHEMA_CHANGED');
+    if(await count(q,developmentReferenceQuery(c)))
+      throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
+  }
+}
+export function developmentReferenceQuery(c) {
     const owned=c.schema==='public'?deletedScope(c.table,'s'):undefined;
+    const targetIds=roots.filter(r=>r.table!=='supplier_product_offers').map(r=>`SELECT id::text FROM public.${id(r.table)} x WHERE ${deletedScope(r.table,'x')}`).join(' UNION ');
+    if(c.type==='uuid') {
+      const canonical='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
+      // Partition live/deleted landings to use the partial index without omitting references.
+      const partitions=c.schema==='public'&&c.table==='product_landings'&&c.column==='product_master_id'
+        ? ['s.deleted_at IS NULL','s.deleted_at IS NOT NULL'] : ['TRUE'];
+      // UUID text is canonical lowercase. Keep a separate, gated fallback for
+      // short legacy tokens that could occur inside it; do not cast the indexed column.
+      return `WITH target_values AS MATERIALIZED (${targetIds}),
+        target_patterns AS MATERIALIZED (
+          SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
+          FROM target_values WHERE id ~ '^[0-9a-f-]{1,36}$' AND id !~ '${canonical}')
+        SELECT count(*)::text AS count FROM (
+${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.table)} s
+          WHERE NOT COALESCE((${owned??'FALSE'}),FALSE)
+            AND s.${id(c.column)} = ANY(ARRAY(SELECT id::uuid FROM target_values WHERE id ~ '${canonical}'))
+            AND ${partition}`).join('\n          UNION ALL\n')}
+          UNION ALL
+          SELECT 1 FROM target_patterns targets CROSS JOIN ${id(c.schema)}.${id(c.table)} s
+          WHERE targets.pattern IS NOT NULL AND NOT COALESCE((${owned??'FALSE'}),FALSE)
+            AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
+        ) references_found`;
+    }
     // Discover IDs once and search the source text with one compiled expression.
     // LIKE ANY still rescans large JSON for every ID. Escape every punctuation
     // character so the alternation preserves literal substring semantics.
-    if(await count(q,`WITH target_patterns AS MATERIALIZED (
+    return `WITH target_patterns AS MATERIALIZED (
         SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
         FROM (${targetIds}) ids)
       SELECT count(*)::text AS count FROM ${id(c.schema)}.${id(c.table)} s CROSS JOIN target_patterns targets
       WHERE NOT COALESCE((${owned??'FALSE'}),FALSE)
-      AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern`))
-      throw new Error(`PH_DEV_SHARED_VALUE:${c.schema}.${c.table}.${c.column}`);
-  }
+      AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern`;
 }
 export class PharmacyHubDevelopmentPurge {
   async up(q,plan=false) {
