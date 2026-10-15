@@ -48,7 +48,7 @@ import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigati
 
 export default function StoreLocalProductsPage() {
   const scope = useStoreProductScope();
-  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주세요.</p>;
+  if (!scope.ready) return <p role="status">매장을 선택해 주세요.</p>;
   return <LocalProductsWorkspace key={scope.key} organizationId={scope.organizationId!} />;
 }
 function LocalProductsWorkspace({ organizationId }: { organizationId: string }) {

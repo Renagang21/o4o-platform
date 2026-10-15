@@ -1,16 +1,21 @@
 import { StrictMode } from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import StoreLocalProductsPage from '../StoreLocalProductsPage';
 import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { AddO4oStandardProductModal } from '../AddO4oStandardProductModal';
 import { useStandardProductSelection } from './useStandardProductSelection';
 import { latestRead, createLocalProductAdapter } from './localProductAdapter';
 import StoreContentImportModal from '../../../components/store/StoreContentImportModal';
 import { useContentImport } from '../../../components/store/useContentImport';
 
-const api = vi.hoisted(() => ({ store: 'A', search: vi.fn(), register: vi.fn(), products: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(), contents: vi.fn(), success: vi.fn(), info: vi.fn() }));
-vi.mock('../../../api/o4oStandardProducts', () => ({ searchO4oStandardProducts: api.search, registerStandardProductToStore: api.register }));
+const api = vi.hoisted(() => ({ store: 'A', serviceKey: 'kpa-society' as string | null, search: vi.fn(), register: vi.fn(), products: vi.fn(), create: vi.fn(), update: vi.fn(), remove: vi.fn(), contents: vi.fn(), success: vi.fn(), info: vi.fn() }));
+vi.mock('../../../api/o4oStandardProducts', () => ({ searchO4oStandardProducts: api.search, registerStandardProductToStore: api.register, buildProductVariantLabel: () => '' }));
+vi.mock('../../../api/multilingualProductContentStore', () => ({ getMlcSummaryMap: async () => new Map() }));
+vi.mock('../../../components/common/MediaPickerModal', () => ({ default: () => null }));
 vi.mock('../../../api/localProducts', () => ({ fetchLocalProducts: api.products, createLocalProduct: api.create, updateLocalProduct: api.update, deleteLocalProduct: api.remove }));
 vi.mock('../../../api/assetSnapshot', () => ({ storeLibraryApi: { listContents: api.contents } }));
-vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store, effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store, effectiveServiceKey: api.serviceKey }) }));
 vi.mock('../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
 vi.mock('@o4o/error-handling', () => ({ toast: { success: api.success, info: api.info } }));
 const product = { id: 'master', name: 'Fixture product' };
@@ -24,7 +29,7 @@ function deferred<T>() {
 }
 const tick = () => act(async () => { await vi.advanceTimersByTimeAsync(300); });
 beforeEach(() => {
-  vi.useFakeTimers(); vi.clearAllMocks(); api.store = 'A';
+  vi.useFakeTimers(); vi.clearAllMocks(); api.store = 'A'; api.serviceKey = 'kpa-society';
   api.search.mockReset().mockResolvedValue(searchResult()); api.register.mockReset().mockResolvedValue({ success: true });
   api.products.mockReset().mockResolvedValue({ items: [{ id: 'local', name: 'Fixture local' }], total: 1 });
   api.create.mockReset().mockResolvedValue({ id: 'local', name: 'Fixture local' }); api.update.mockReset().mockResolvedValue({ id: 'local', name: 'Fixture local' });
@@ -167,4 +172,23 @@ it('keeps the content list available after selecting an empty body so another it
   fireEvent.click(screen.getByRole('button', { name: '본문 가져오기' }));
   expect(onImport).toHaveBeenCalledWith('<p>Fixture body</p>', 'Fixture usable');
   expect(api.contents).toHaveBeenCalledOnce();
+});
+
+it('opens standard selection and content import for a ready store with no service enrollment', async () => {
+  api.serviceKey = null;
+  const view = render(<AddO4oStandardProductModal open onClose={vi.fn()} onRegistered={registered} />);
+  await tick();
+  expect(screen.getByText('Fixture product')).toBeTruthy();
+  view.unmount();
+  render(<StoreContentImportModal open onClose={vi.fn()} onImport={vi.fn()} />);
+  await tick();
+  expect(screen.getByRole('button', { name: 'Fixture content' })).toBeTruthy();
+});
+
+it('loads the direct product manager for a ready store without service enrollment', async () => {
+  api.serviceKey = null;
+  render(<MemoryRouter><StoreLocalProductsPage /></MemoryRouter>);
+  await tick();
+  expect(screen.getByText('Fixture local')).toBeTruthy();
+  expect(api.products).toHaveBeenCalledOnce();
 });

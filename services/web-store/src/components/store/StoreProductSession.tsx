@@ -6,7 +6,7 @@ import { getActiveStoreOrganizationId } from '../../lib/storeOrganizationHeader'
 export function useStoreProductScope() {
   const { status, organizationId, effectiveServiceKey } = useUnifiedStore();
   return { organizationId, key: `${organizationId ?? ''}:${effectiveServiceKey ?? ''}`,
-    ready: status === 'ready' && !!organizationId && !!effectiveServiceKey };
+    ready: status === 'ready' && !!organizationId };
 }
 
 export function useStoreProductSession(organizationId: string) {

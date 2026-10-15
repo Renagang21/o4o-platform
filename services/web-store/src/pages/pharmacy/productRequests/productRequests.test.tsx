@@ -8,10 +8,10 @@ import { StoreNewProductRequestModal } from '../StoreNewProductRequestModal';
 import { StoreProductRequestsListModal } from '../StoreProductRequestsListModal';
 import type { StoreProductRequest } from '../../../api/storeProductRequests';
 
-const api = vi.hoisted(() => ({ store: 'A', search: vi.fn(), register: vi.fn(), submit: vi.fn(), resubmit: vi.fn(), list: vi.fn(), success: vi.fn(), info: vi.fn() }));
+const api = vi.hoisted(() => ({ store: 'A', serviceKey: 'kpa-society' as string | null, search: vi.fn(), register: vi.fn(), submit: vi.fn(), resubmit: vi.fn(), list: vi.fn(), success: vi.fn(), info: vi.fn() }));
 vi.mock('../../../api/o4oStandardProducts', () => ({ searchO4oStandardProducts: api.search, registerStandardProductToStore: api.register }));
 vi.mock('../../../api/storeProductRequests', () => ({ submitProductRequest: api.submit, resubmitProductRequest: api.resubmit, listProductRequests: api.list }));
-vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store, effectiveServiceKey: 'kpa-society' }) }));
+vi.mock('../../../contexts/StoreContext', () => ({ useUnifiedStore: () => ({ status: 'ready', organizationId: api.store, effectiveServiceKey: api.serviceKey }) }));
 vi.mock('../../../lib/storeOrganizationHeader', () => ({ getActiveStoreOrganizationId: () => api.store }));
 vi.mock('@o4o/error-handling', () => ({ toast: { success: api.success, info: api.info } }));
 vi.mock('../../../components/common/MediaPickerModal', () => ({ default: () => null }));
@@ -34,7 +34,7 @@ function fill(h: ReturnType<typeof renderHook<ReturnType<typeof useForm>, unknow
   act(() => { h.result.current.goToForm(); h.result.current.patch({ productName: ' Fixture draft ', classification: 'general', noBarcode: true, manufacturer: ' Fixture maker ' }); });
 }
 beforeEach(() => {
-  api.store = 'A'; vi.clearAllMocks();
+  api.store = 'A'; api.serviceKey = 'kpa-society'; vi.clearAllMocks();
   api.search.mockReset().mockResolvedValue({ items: [product] });
   api.register.mockReset().mockResolvedValue({ success: true });
   api.submit.mockReset().mockResolvedValue(request()); api.resubmit.mockReset().mockResolvedValue(request());
@@ -250,4 +250,15 @@ it('native request dialog closes from its backdrop or Escape but preserves an ac
   expect(onClose).not.toHaveBeenCalled();
   fireEvent(dialog, new Event('cancel', { bubbles: true, cancelable: true }));
   expect(onClose).toHaveBeenCalledOnce();
+});
+
+it('opens request creation and its list for an approved store without service enrollment', async () => {
+  api.serviceKey = null;
+  const view = render(<StoreNewProductRequestModal open onClose={closed} onSubmitted={submitted} />);
+  expect(screen.getByRole('dialog', { name: '신규 상품 등록 요청' })).toBeTruthy();
+  expect(screen.getByRole('searchbox')).toBeTruthy();
+  view.unmount();
+  render(<StoreProductRequestsListModal open onClose={closed} onEdit={vi.fn()} />);
+  await screen.findByText('Fixture request');
+  expect(api.list).toHaveBeenCalledOnce();
 });
