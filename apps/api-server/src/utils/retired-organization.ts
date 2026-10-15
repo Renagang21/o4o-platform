@@ -27,13 +27,13 @@ export function retiredServiceOnlyOrganizationSql(orgIdExpr: string): string {
               WHERE rse.organization_id = ${orgIdExpr}
                 AND (rse.service_code IN (${keyList}) OR rse.service_code LIKE ${prefixLike}))
       OR EXISTS (SELECT 1 FROM platform_store_slugs rss
-                  WHERE rss.store_id = ${orgIdExpr} AND rss.service_key IN (${keyList})))
+                  WHERE rss.store_id = ${orgIdExpr} AND ${retiredServiceKeySql('rss.service_key')}))
     AND NOT EXISTS (SELECT 1 FROM organization_service_enrollments lse
                      WHERE lse.organization_id = ${orgIdExpr} AND lse.status = 'active'
                        AND lse.service_code NOT IN (${keyList}) AND lse.service_code NOT LIKE ${prefixLike})
     AND NOT EXISTS (SELECT 1 FROM platform_store_slugs lss
                      WHERE lss.store_id = ${orgIdExpr} AND lss.is_active = true
-                       AND lss.service_key NOT IN (${keyList}))
+                       AND lss.service_key IS NOT NULL AND NOT ${retiredServiceKeySql('lss.service_key')})
     AND NOT EXISTS (SELECT 1 FROM neture_pharmacy_memberships lnm
                      WHERE lnm.organization_id = ${orgIdExpr} AND lnm.status = 'active')
   )`;

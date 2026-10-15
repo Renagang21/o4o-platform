@@ -41,6 +41,19 @@ pgSuite('retired-only organization SQL with real PostgreSQL', () => {
     await client.query('INSERT INTO platform_store_slugs VALUES($1,$2,true)', [org, 'neture']);
     expect(await retired()).toBe(false);
   });
+  it('does not revive a PH organization with a retired-prefix slug', async () => {
+    await client.query('INSERT INTO platform_store_slugs VALUES($1,$2,true)', [org, 'pharmacy-hub:legacy']);
+    expect(await retired()).toBe(true);
+  });
+  it('recognizes retired-prefix slug history without enrollment', async () => {
+    await client.query('TRUNCATE organization_service_enrollments');
+    await client.query('INSERT INTO platform_store_slugs VALUES($1,$2,true)', [org, ' pharmacy-hub:legacy ']);
+    expect(await retired()).toBe(true);
+  });
+  it('does not use a service-neutral slug as proof of an active service', async () => {
+    await client.query('INSERT INTO platform_store_slugs VALUES($1,NULL,true)', [org]);
+    expect(await retired()).toBe(true);
+  });
   it('does not use another organization membership as evidence', async () => {
     await client.query('INSERT INTO neture_pharmacy_memberships VALUES($1,$2)', ['00000000-0000-4000-8000-000000000610', 'active']);
     expect(await retired()).toBe(true);
