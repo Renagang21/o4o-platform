@@ -72,15 +72,18 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query(`CREATE TABLE product_identifiers(id uuid PRIMARY KEY,metadata jsonb);
         INSERT INTO product_identifiers SELECT gen_random_uuid(),jsonb_build_object('externalTag',n)
           FROM generate_series(1,5000) n; ANALYZE product_identifiers`);
+      const stress=process.env.PH_PURGE_STRESS_FIXTURE==='1';
+      if(stress)await client.query("UPDATE product_identifiers SET metadata=metadata||jsonb_build_object('padding',repeat('z',131072))");
       const referencePlans=[];
       const inspected={...q,query:async(sql,args)=>{
-        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('LIKE ANY('))
+        if(sql.includes('FROM "public"."product_identifiers" s')&&sql.includes('~ targets.pattern'))
           referencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
         return q.query(sql,args);
       }};
       await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       assert.equal((await new PharmacyHubDevelopmentPurge().up(inspected,true)).applied,false);
       await client.query('ROLLBACK');
+      if(stress)await client.query("UPDATE product_identifiers SET metadata=metadata-'padding'");
       const walk=node=>[node,...(node.Plans??[]).flatMap(walk)];
       assert.equal(referencePlans.length,2);
       for(const execution of referencePlans) {
@@ -93,9 +96,9 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
       await client.query('ROLLBACK');
       assert.equal((await client.query('SELECT count(*) FROM checkout_order_logs')).rows[0].count,'6');
       await client.query('DELETE FROM product_identifiers WHERE id=$1',[uuid(990)]);
-      // Substring semantics remain literal even if a legacy ID contains LIKE
-      // wildcards or an escape character; similar foreign text must stay safe.
-      const literalId='literal_%\\token';
+      // Substring semantics remain literal even if a legacy ID contains regex
+      // metacharacters or an escape character; similar foreign text must stay safe.
+      const literalId='literal_[x].+(y){z}^$|?*%\\token';
       await client.query('ALTER TABLE offer_service_prices ALTER COLUMN id TYPE text');
       await client.query('UPDATE offer_service_prices SET id=$1',[literalId]);
       await client.query("CREATE TABLE literal_refs(value text); INSERT INTO literal_refs VALUES('literal-ABCtoken')");
@@ -170,9 +173,29 @@ test('PostgreSQL: real plan/apply, mixed ownership, cross-schema FK, JSON refs, 
         async getMetadata(){if(missing.has(path))throw Object.assign(new Error('not found'),{code:404});return [{generation:'123',name:path,bucket:'o4o-media-library'}];},
         async delete(options){assert.equal(options.ifGenerationMatch,'123');missing.add(path);removed.push(path);},
       };}};}};
+      await client.query(`CREATE TABLE product_candidates(id uuid PRIMARY KEY,raw_payload jsonb);
+        INSERT INTO product_candidates SELECT gen_random_uuid(),jsonb_build_object('externalTag',n)
+          FROM generate_series(1,5000) n; ANALYZE product_candidates`);
+      if(stress)await client.query("UPDATE product_candidates SET raw_payload=raw_payload||jsonb_build_object('padding',repeat('z',131072))");
+      const mediaReferencePlans=[];
+      const inspectedMedia={...q,query:async(sql,args)=>{
+        if(sql.includes('FROM "public"."product_candidates" s')&&sql.includes('~ targets.pattern'))
+          mediaReferencePlans.push((await client.query('EXPLAIN (ANALYZE,FORMAT JSON) '+sql,args)).rows[0]['QUERY PLAN'][0].Plan);
+        return q.query(sql,args);
+      }};
+      await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      assert.equal((await new PharmacyHubMediaPurge({storage}).up(inspectedMedia,true)).assets,4);await client.query('ROLLBACK');
+      assert.equal(mediaReferencePlans.length,2);
+      for(const execution of mediaReferencePlans) {
+        const producers=walk(execution).filter(node=>node['Subplan Name']==='CTE target_patterns');
+        assert.equal(producers.length,1);assert.equal(producers[0]['Actual Loops'],1);
+      }
+      if(stress)await client.query("UPDATE product_candidates SET raw_payload=raw_payload-'padding'");
+      assert.equal(removed.length,0);
+      await client.query('INSERT INTO shared_notes VALUES($1,$2)',[uuid(999),{image:'https://storageXgoogleapisXcom/o4o-media-library/media/fixture-0Xpng'}]);
       await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
       assert.equal((await new PharmacyHubMediaPurge({storage}).up(q,true)).assets,4);await client.query('ROLLBACK');
-      assert.equal(removed.length,0);
+      await client.query('DELETE FROM shared_notes');
       await client.query('INSERT INTO shared_notes VALUES($1,$2)',[uuid(999),{image:'https://storage.googleapis.com/o4o-media-library/media/fixture-0.png'}]);
       await begin();await assert.rejects(new PharmacyHubMediaPurge({storage}).up(q),/SHARED_VALUE/);await client.query('ROLLBACK');
       await client.query('DELETE FROM shared_notes');

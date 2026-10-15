@@ -14,7 +14,7 @@ function fixture(problem) {
     if(sql.includes('FROM pg_constraint'))return problem==='fk'?[{schema:'other',table:'refs',target:'checkout_orders',source_columns:['order_id'],target_columns:['id']}]:[];
     if(sql.includes('FROM pg_attribute a'))return [{schema:'public',table:'checkout_orders',column:'metadata'}];
     if(sql.includes('FROM pg_trigger'))return problem==='trigger'?[{trigger_name:'unknown'}]:[fence];
-    if(sql.includes('LIKE ANY('))return [{count:problem==='value'?'1':'0'}];
+    if(sql.includes('~ targets.pattern'))return [{count:problem==='value'?'1':'0'}];
     if(sql.includes('FROM "other"."refs"'))return [{count:problem==='fk'?'1':'0'}];
     if(sql.includes('FROM public.o4o_payments p'))return [{count:problem==='payment'?'1':'0'}];
     if(sql.includes('FROM public.supplier_product_offers x')&&sql.includes('x.is_active'))return [{count:problem==='widening'?'1':'0'}];
