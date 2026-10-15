@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), user: { id: 'owner' } as { id: string } | null }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } }) : mocks.get(path, config), post: mocks.post } } }));
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: mocks.user, isLoading: false }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } }) : path === '/neture/pharmacy/semi-franchises' && (config as { headers?: unknown })?.headers ? Promise.resolve({ data: { data: ['pharmacy','other'].map(key => ({ key, membershipStatus: 'active' })) } }) : mocks.get(path, config), post: mocks.post } } }));
 import BusinessWorkspace from '../BusinessWorkspace';
 import BusinessParticipationPage from '../BusinessParticipationPage';
 import BusinessMaterialsPage from '../BusinessMaterialsPage';

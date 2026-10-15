@@ -16,7 +16,7 @@ const isRecentNotice = (post: ForumPostResponse) => !post.isPinned && post.type 
 export default function PharmacyMemberHomePage() {
   const { business, access } = useBusiness();
   const { user } = useAuth();
-  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage);
+  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage, business.key);
   const scope = `${user?.id}:${materialStore.organizationId}:${business.key}:${business.communityKey}:${access?.allowed}:${access?.canManage}`;
   const [posts, setPosts] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));
   const [noticesState, setNoticesState] = useState<LoadedSection<ForumPostResponse>>(() => pending(scope));

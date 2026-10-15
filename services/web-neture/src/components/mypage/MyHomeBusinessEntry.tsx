@@ -21,9 +21,10 @@ export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity 
     const request = ++generation.current;
     setBusy(true); setError(false);
     const key = encodeURIComponent(businessKey);
+    const storePath = destination === 'supply' ? `/store/pharmacy/supply?source=${encodeURIComponent(`sf:${businessKey}`)}` : `/store/pharmacy/contents?business=${key}`;
     const target = destination === 'community'
       ? { serviceKey: 'kpa-society', origin: 'https://pharmacy.neture.co.kr', returnPath: `${businessKey === 'pharmacy' ? '/' : `/businesses/${key}`}?store=${encodeURIComponent(organizationId)}` }
-      : { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: destination === 'supply' ? `/store/pharmacy/supply?source=${encodeURIComponent(`sf:${businessKey}`)}` : `/store/pharmacy/contents?business=${key}` };
+      : { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: `/select-store?returnTo=${encodeURIComponent(storePath)}` };
     try {
       const href = await requestServiceHandoff(api, target);
       if (request === generation.current) window.location.assign(href);

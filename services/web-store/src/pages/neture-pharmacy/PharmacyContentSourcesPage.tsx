@@ -46,6 +46,7 @@ export default function PharmacyContentSourcesPage() {
 
 function PharmacyContentSources() {
   const { begin: beginCopy, invalidate: invalidateCopy } = useLatestRequest();
+  const { begin: beginSelection } = useLatestRequest();
   const [franchises, setFranchises] = useState<SemiFranchiseRow[]>([]);
   const [params, setParams] = useSearchParams();
   const sf = params.get('business') || '';
@@ -56,6 +57,7 @@ function PharmacyContentSources() {
   const [page, setPage] = useState(1);
   const [copied, setCopied] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(params.get('content'));
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -66,15 +68,22 @@ function PharmacyContentSources() {
   }, []);
 
   const fetchList = useCallback(async () => {
+    const isCurrent = beginSelection();
     invalidateCopy();
+    setSelectionError(null);
     setCopyError(null); setCopied(null); setBusyId(null);
     const result = await neturePharmacyApi.listContents({ sf: sf || undefined, q: q || undefined, page, limit: PAGE_SIZE });
     if (!selectedContentId || page !== 1 || q || result.items.some(item => item.id === selectedContentId)) return result;
     // A linked material may not be on this page. The existing detail API rechecks store membership.
-    const selected = await neturePharmacyApi.getContent(selectedContentId);
-    if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
-    return { ...result, items: [selected, ...result.items] };
-  }, [sf, q, page, selectedContentId, invalidateCopy]);
+    try {
+      const selected = await neturePharmacyApi.getContent(selectedContentId);
+      if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
+      return { ...result, items: [selected, ...result.items] };
+    } catch {
+      if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주세요.');
+      return result;
+    }
+  }, [sf, q, page, selectedContentId, invalidateCopy, beginSelection]);
   const { items, total, loading, error, load } = useLatestList<SemiFranchiseContent>(fetchList, listErrorMessage);
   useEffect(() => { setExpandedId(selectedContentId || null); }, [sf, selectedContentId]);
 
@@ -131,7 +140,7 @@ function PharmacyContentSources() {
           '{copied}' 를 내 매장 사본으로 만들었습니다. <Link to={STORE_LIBRARY_PATH} className="font-medium text-emerald-700 underline">내 매장 자료함에서 보기</Link>
         </Notice>
       )}
-      {(error || copyError) && <Notice tone="error">{error || copyError}</Notice>}
+      {(error || copyError || selectionError) && <Notice tone="error">{error || copyError || selectionError}</Notice>}
 
       <form className="mb-4 flex flex-wrap gap-2" onSubmit={onSearch}>
         <input

@@ -8,7 +8,7 @@ import { useBusinessMaterialStore } from './useBusinessMaterialStore';
 
 export default function BusinessMaterialsPage() {
   const { business, access } = useBusiness();
-  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage);
+  const materialStore = useBusinessMaterialStore(!!access?.allowed && !access.canManage, business.key);
   return <BusinessMaterialRecords key={`${business.key}:${materialStore.organizationId ?? ''}`} materialStore={materialStore} />;
 }
 

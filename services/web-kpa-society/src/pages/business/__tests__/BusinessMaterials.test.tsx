@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Outlet, Route, Routes } from 'react-router-dom';
-const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner' } }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: transport.stores } } }) : transport.get(path, config), post: transport.post } } }));
+const transport = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), memberships: {} as Record<string, boolean>, stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] }));
+vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'owner' } }), authClient: { api: { get: (path: string, config: unknown) => path === '/work-scope/accessible-stores' ? Promise.resolve({ data: { data: { stores: transport.stores } } }) : path === '/neture/pharmacy/semi-franchises' ? Promise.resolve({ data: { data: ['pharmacy','other','network-a'].map(key => ({ key, membershipStatus: transport.memberships[(config as { headers: Record<string,string> }).headers['X-Store-Organization-Id']] === false ? null : 'active' })) } }) : transport.get(path, config), post: transport.post } } }));
 vi.mock('@o4o/content-editor', () => ({ ContentRenderer: ({ html }: { html: string }) => <p>{html}</p> }));
 import BusinessMaterialsPage from '../BusinessMaterialsPage';
 const item = { id: 'resource', title: '샘플 자료', summary: '샘플 요약', body: '샘플 본문', semiFranchiseKey: 'pharmacy' };
 function mount(allowed = true, canManage = false, path = '/materials?content=resource') {
   return render(<MemoryRouter initialEntries={[path]}><Routes><Route element={<Outlet context={{ business: { key: 'pharmacy' }, access: { allowed, canManage } }} />}><Route path="/materials" element={<BusinessMaterialsPage />} /></Route></Routes></MemoryRouter>);
 }
-beforeEach(() => { transport.stores = [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }]; transport.get.mockReset(); transport.get.mockResolvedValue({ data: { data: { items: [item], total: 21 } } }); });
+beforeEach(() => { transport.memberships = {}; transport.stores = [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }]; transport.get.mockReset(); transport.get.mockResolvedValue({ data: { data: { items: [item], total: 21 } } }); });
 afterEach(cleanup);
 it('선택한 자료를 바로 펼치고 다른 사업 자료는 표시하지 않는다', async () => {
   transport.get.mockResolvedValue({ data: { data: { items: [item, { ...item, id: 'foreign', title: '다른 사업 자료', semiFranchiseKey: 'other' }], total: 2 } } });
@@ -38,7 +38,7 @@ it('선택한 사업과 자료를 내 매장 이동 경로에 유지한다', asy
   fireEvent.click(await screen.findByRole('button', { name: '내 매장으로 자료 가져오기' }));
   await screen.findByRole('alert');
   expect(transport.post).toHaveBeenCalledWith('/auth/handoff', {
-    targetWorkspace: 'store', returnPath: '/store/pharmacy/contents?business=pharmacy&content=resource',
+    targetWorkspace: 'store', returnPath: '/select-store?returnTo=' + encodeURIComponent('/store/pharmacy/contents?business=pharmacy&content=resource'),
   });
 });
 
@@ -64,4 +64,13 @@ it('자료 2페이지에서 다른 약국을 선택하면 새 약국의 1페이�
   await waitFor(() => expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 2, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } }));
   fireEvent.change(screen.getByRole('combobox', { name: '자료를 이용할 약국' }), { target: { value: 'store-b' } });
   await waitFor(() => expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-b' } }));
+});
+
+it('현재 사업에 미가입인 다른 약국은 자료 선택 후보에서 제외한다', async () => {
+  transport.stores.push({ organizationId: 'store-b', organizationName: '미가입 약국 B', memberRole: 'owner' });
+  transport.memberships['store-b'] = false;
+  mount();
+  await screen.findByText('샘플 자료');
+  expect(screen.queryByRole('option', { name: '미가입 약국 B' })).toBeNull();
+  expect(transport.get).toHaveBeenLastCalledWith('/neture/pharmacy/store/contents', { params: { sf: 'pharmacy', page: 1, limit: 20 }, headers: { 'X-Store-Organization-Id': 'store-a' } });
 });

@@ -8,9 +8,10 @@ export default function BusinessStoreShortcut({ businessKey, contentId }: { busi
   const [error, setError] = useState('');
   const generation = useRef(0);
   const pending = useRef(false);
-  const returnPath = businessKey
+  const materialPath = businessKey
     ? `/store/pharmacy/contents?${new URLSearchParams({ business: businessKey, ...(contentId ? { content: contentId } : {}) })}`
     : '/store';
+  const returnPath = businessKey ? `/select-store?returnTo=${encodeURIComponent(materialPath)}` : materialPath;
   useEffect(() => {
     const reset = () => { generation.current++; pending.current = false; setBusy(false); setError(''); };
     reset();

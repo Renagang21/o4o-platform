@@ -79,7 +79,7 @@ it('only active memberships expose scoped business actions; a failed move can be
   await screen.findByRole('alert');
   expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetServiceKey: 'kpa-society', returnPath: '/businesses/network-a?store=store-one' });
   fireEvent.click(within(active).getByRole('button', { name: '자료 가져오기' }));
-  await waitFor(() => expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store/pharmacy/contents?business=network-a' }));
+  await waitFor(() => expect(post).toHaveBeenLastCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/select-store?returnTo=' + encodeURIComponent('/store/pharmacy/contents?business=network-a') }));
   for (const name of ['pending', 'suspended', 'terminated']) expect(within(screen.getByText(name).closest('li')!).queryByRole('button')).toBeNull();
 });
 it('drops a handoff failure after changing the selected store', async () => {

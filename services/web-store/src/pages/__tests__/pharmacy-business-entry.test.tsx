@@ -47,7 +47,6 @@ it('사업과 맞지 않는 선택 자료를 표시하거나 복사하지 않는
   render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=selected']}><PharmacyContentSourcesPage /></MemoryRouter>);
   await screen.findByRole('alert');
   expect(screen.queryByText('선택한 자료')).toBeNull();
-  expect(screen.queryByText('이용할 수 있는 세미프랜차이즈 콘텐츠가 없습니다.')).toBeNull();
   expect(mocks.copyContent).not.toHaveBeenCalled();
 });
 
@@ -114,4 +113,15 @@ it('새 조회가 시작되면 이전 복사 오류와 늦은 복사 응답을 �
   await screen.findByText('선택한 자료');
   await act(async () => reject(new Error('Old request')));
   expect(screen.queryByRole('alert')).toBeNull();
+});
+
+it('이용 불가한 자료 딥링크여도 성공한 목록은 유지하고 다른 자료를 복사할 수 있다', async () => {
+  mocks.listContents.mockResolvedValue({ items: [{ ...content, id: 'available', title: '이용 가능한 자료' }], total: 1 });
+  mocks.getContent.mockRejectedValue({ status: 404 });
+  render(<MemoryRouter initialEntries={['/store/pharmacy/contents?business=network-a&content=missing']}><PharmacyContentSourcesPage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.getByText('이용 가능한 자료')).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: /사본|가져오기/ }));
+  await screen.findByRole('link', { name: '내 매장 자료함에서 보기' });
+  expect(mocks.copyContent).toHaveBeenCalledWith('available');
 });

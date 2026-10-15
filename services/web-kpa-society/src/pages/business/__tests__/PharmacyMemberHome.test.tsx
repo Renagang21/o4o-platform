@@ -27,6 +27,7 @@ beforeEach(() => {
   mocks.user = { id: 'member' }; access = { ...access, allowed: true, canManage: false }; mocks.get.mockReset(); mocks.handoff.mockReset();
   mocks.get.mockImplementation(async (path: string, config?: { params?: Record<string, unknown> }) => {
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
+    if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/pharmacy')) return { data: { data: business } };
     if (path.endsWith('/access')) return { data: { data: access } };
     if (path.endsWith('/forum/posts')) return { data: { data: config?.params?.isPinned === 'true' ? [post('notice', true)] : config?.params?.isPinned === 'false' ? [] : [post('notice', true), post('conversation')] } };
@@ -149,6 +150,7 @@ describe('약국 회원 초기화면', () => {
 it('다른 가입 사업의 홈도 사업 이름과 해당 사업 자료를 표시한다', async () => {
   mocks.get.mockImplementation(async (path: string) => {
     if (path === '/work-scope/accessible-stores') return { data: { data: { stores: [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }] } } };
+    if (path === '/neture/pharmacy/semi-franchises') return { data: { data: ['pharmacy','network-a'].map(key => ({ key, membershipStatus: 'active' })) } };
     if (path.endsWith('/businesses/network-a')) return { data: { data: { ...business, key: 'network-a', name: '네트워크 A', communityKey: 'forum-a' } } };
     if (path.endsWith('/access')) return { data: { data: { ...access, businessKey: 'network-a' } } };
     if (path.endsWith('/forum/posts')) return { data: { data: [] } };
