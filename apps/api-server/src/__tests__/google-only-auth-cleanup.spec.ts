@@ -126,8 +126,15 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       expect(offenders(/\bRefreshToken\b(?!Family|Payload|Contract)/)).toEqual([]);
     });
 
-    it('운영자 이메일 초대 도메인', () => {
-      expect(offenders(/OperatorInvitation|operator_invitations|operator-invitations/)).toEqual([]);
+    it('사용자 승인된 서비스 운영자 확인 도메인만 허용하며 과거 초대 runtime은 복구하지 않는다', () => {
+      expect(offenders(/OperatorInvitation|operator_invitations|operator-invitations/)).toEqual([
+        path.join('bootstrap','register-routes.ts'),
+        path.join('controllers','admin','OperatorAssignmentController.ts'),
+        path.join('routes','admin','service-operator-invitations.routes.ts'),
+        path.join('services','admin','service-operator-invitation.service.ts'),
+        path.join('services','privacy','account-erasure.service.ts'),
+      ].sort());
+      expect(fs.existsSync(path.join(SRC,'services','admin','operator-invitation.service.ts'))).toBe(false);
     });
 
     it('mobile 전용 백엔드', () => {

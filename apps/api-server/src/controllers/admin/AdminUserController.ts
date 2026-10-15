@@ -150,10 +150,6 @@ export function buildUserSearchWhere(alias: string): string {
  * (WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 — 직접 지정·초대 수락이 같은 함수를 쓴다).
  * 기존 import 경로를 유지하기 위해 여기서 re-export 한다. 구현을 여기에 복제하지 않는다.
  */
-import {
-  ensureServiceMembershipsForRoles,
-  type MembershipPolicy,
-} from '../../services/admin/service-membership-ensure.js';
 // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: Admin 은 서비스 운영자 역할만 추가·해제한다.
 import {
   AdminRoleEditForbiddenError,
@@ -301,7 +297,7 @@ export class AdminUserController {
 
   // Create new user
   /**
-   * POST /admin/users — **기존 사용자에게 운영 역할·membership 을 추가하는 경로만 남는다.**
+   * POST /admin/users — 기존 즉시 운영 권한 부여 경로는 초대·확인 수락으로 대체한다.
    *
    * WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §17 · §18:
    *   운영자 onboarding 의 Identity 계약이 Google 기준으로 바뀌었다. 관리자는 더 이상 타인의
@@ -324,7 +320,6 @@ export class AdminUserController {
       }
 
       const {
-        email,
         password,
         role = UserRole.USER,
         roles: rolesArray,
@@ -340,7 +335,6 @@ export class AdminUserController {
         return;
       }
 
-      const userRepo = AppDataSource.getRepository(User);
       // 서비스 범위 운영자 역할만 받는다 — 일반 회원 역할 · 개별 분회 운영자는 거절(ROLE_NOT_ASSIGNABLE).
       const rolesToAssign = assertAdminAssignableRoles(
         Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role],
@@ -356,52 +350,15 @@ export class AdminUserController {
         });
         return;
       }
-      const targetServiceKey = target.serviceKey;
-
-      const existingUser = await userRepo.findOne({ where: { email } });
-
-      // 은퇴 2 — 미가입자는 초대 경로로만 운영자가 된다. 여기서 users 를 만들지 않는다.
-      if (!existingUser) {
-        res.status(400).json({
-          success: false,
-          error: '가입하지 않은 사용자입니다. 대상자가 Google 로 O4O 에 가입한 뒤 운영자로 지정하세요.',
-          code: 'USER_SIGNUP_REQUIRED',
-        });
-        return;
-      }
-
-      // Demo 계정 보호(정책 §8 role 변경): 기존 계정에 역할을 더하기 **전에** 막는다.
-      if (await demoAccountService.isDemoAccount(existingUser.id)) {
-        respondDemoAccountForbidden(res);
-        return;
-      }
-
-      let membershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
-      let membershipStatuses: Record<string, string> = {};
-
-      await AppDataSource.transaction(async (manager) => {
-        for (const r of rolesToAssign) {
-          await roleAssignmentService.assignRole({ userId: existingUser.id, role: r }, manager);
-        }
-        const ensured = await ensureServiceMembershipsForRoles(existingUser.id, rolesToAssign, manager);
-        membershipPolicy = ensured.policy;
-        membershipStatuses = ensured.existingStatuses;
-      });
-
-      res.status(200).json({
-        success: true,
-        user: sanitizeAdminUser(existingUser),
-        message: 'Roles added to existing user',
-        isExistingUser: true,
-        serviceKey: targetServiceKey,
-        // 이 경로는 users.password 도 service_credentials 도 쓰지 않는다.
-        passwordPolicy: 'KEEP_EXISTING_PASSWORD',
-        credentialPolicy: 'NOT_APPLICABLE',
-        // 기존 membership 은 승격되지 않는다 — 관리자가 그 사실을 알 수 있게 명시한다.
-        membershipPolicy,
-        membershipStatuses,
+      res.status(400).json({
+        success: false, code: 'OPERATOR_INVITATION_REQUIRED',
+        error: '운영자 지정은 서비스 운영자 초대 메일의 확인·수락 절차를 이용하세요. 이메일로 기존 계정을 찾아 즉시 권한을 부여하지 않습니다.',
       });
     } catch (error) {
+      if (error instanceof OperatorRoleContractError) {
+        res.status(error.statusCode).json({success:false,code:error.code,error:error.message});
+        return;
+      }
       if (error instanceof OperatorRegistrationContractError) {
         res.status(error.status).json({
           success: false,
