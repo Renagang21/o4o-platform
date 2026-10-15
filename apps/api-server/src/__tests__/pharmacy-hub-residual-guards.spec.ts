@@ -22,6 +22,7 @@ import { SellerRecruitmentService } from '../modules/neture/services/seller-recr
 import { RetiredServiceError } from '../middleware/retired-service.middleware.js';
 import { retiredServiceOnlyOrganizationSql } from '../utils/retired-organization.js';
 import { findCmsSlotContentConflict } from '../routes/cms-content/cms-content-utils.js';
+import { isRetiredOldSlugHistory } from '../utils/retired-slug-history.js';
 
 const src = (path: string) => readFileSync(resolve(__dirname, '..', path), 'utf8');
 
@@ -60,6 +61,7 @@ describe('seller recruitment — 저장된 퇴역 serviceId', () => {
     recruitmentRepo.findOne.mockResolvedValue({ ...recruitment('retired', 'pharmacy-hub'), status: 'closed' });
     await expect(service.reopenRecruitment('retired', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
     recruitmentRepo.findOne.mockResolvedValue(recruitment('retired', 'pharmacy-hub'));
+    await expect(service.closeRecruitment('retired', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
     await expect(service.createApplication('retired', 'user', '사용자')).rejects.toBeInstanceOf(RetiredServiceError);
     await expect(service.approveApplication('app', 'supplier-user')).rejects.toBeInstanceOf(RetiredServiceError);
     await expect(service.setRecruitmentExposure('retired', 'operator', 'approved' as any)).rejects.toBeInstanceOf(RetiredServiceError);
@@ -123,6 +125,14 @@ describe('CMS — 저장된 퇴역 serviceKey', () => {
     expect(slot.match(/isRetiredServiceValue\(slot\.serviceKey\)/g)?.length).toBe(2);
   });
 
+  it('slot 일괄 교체는 삭제 전에 기존 퇴역 slot 을 확인해 410 으로 거절한다', () => {
+    const slot = src('routes/cms-content/cms-content-slot.handler.ts');
+    const guard = slot.indexOf('existingScopeSlots.some((s) => isRetiredServiceValue(s.serviceKey))');
+    expect(guard).toBeGreaterThan(-1);
+    expect(guard).toBeLessThan(slot.indexOf('await slotRepo.delete(scopeWhere);'));
+    expect(slot).toContain('isRetiredServiceValue(serviceKey) || existingScopeSlots');
+  });
+
   it('공개 slot 조회는 저장된 퇴역 · 타 서비스 콘텐츠를 응답에서 뺀다', () => {
     const slot = src('routes/cms-content/cms-content-slot.handler.ts');
     expect(slot).toContain('findCmsSlotContentConflict(slot.content.serviceKey, slot.serviceKey) === null');
@@ -137,6 +147,18 @@ describe('store slug · 조직 경로', () => {
     expect(policy.match(/isRetiredServiceValue\(redirect\.serviceKey\)/g)?.length).toBe(2);
     expect(policy).toContain('isRetiredServiceValue(slugRecord.serviceKey)');
     expect(policy).toContain('isRetiredServiceValue(current.serviceKey)');
+    // 옛 slug 의 history 행 serviceKey 도 확인한다 (findOldSlugRedirect 는 현재 slug 의 serviceKey 만 준다)
+    expect(policy.match(/await isRetiredOldSlugHistory\(dataSource, slug\)/g)?.length).toBe(2);
+    expect(src('routes/platform/store-public/store-public-utils.ts')).toContain('await isRetiredOldSlugHistory(dataSource, slug)');
+  });
+
+  it('옛 slug 의 최근 history 행이 퇴역 서비스면 true, 살아 있는 서비스 · 기록 없음이면 false', async () => {
+    const ds = (rows: unknown[]) => ({ query: jest.fn().mockResolvedValue(rows) }) as any;
+    const retired = ds([{ service_key: 'pharmacy-hub' }]);
+    expect(await isRetiredOldSlugHistory(retired, ' Old-Slug ')).toBe(true);
+    expect(retired.query).toHaveBeenCalledWith(expect.stringContaining('ORDER BY changed_at DESC'), ['old-slug']);
+    expect(await isRetiredOldSlugHistory(ds([{ service_key: 'kpa-society' }]), 'old')).toBe(false);
+    expect(await isRetiredOldSlugHistory(ds([]), 'old')).toBe(false);
   });
 
   it('퇴역 서비스 전용 조직 판정은 살아 있는 연결이 있으면 퇴역으로 보지 않는다', () => {

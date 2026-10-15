@@ -250,6 +250,7 @@ export class SellerRecruitmentService {
   async closeRecruitment(recruitmentId: string, supplierUserId: string) {
     const recruitment = await this.recruitmentRepo.findOne({ where: { id: recruitmentId } });
     if (!recruitment || recruitment.sellerId !== supplierUserId) return { success: false as const, error: 'NOT_FOUND' };
+    if (isRetiredServiceValue(recruitment.serviceId)) throw new RetiredServiceError();
     if (recruitment.status !== RecruitmentStatus.CLOSED) {
       recruitment.status = RecruitmentStatus.CLOSED;
       await this.recruitmentRepo.save(recruitment);

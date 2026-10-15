@@ -29,6 +29,7 @@ import { StorePolicyService, PaymentConfigService } from '@o4o/platform-core/sto
 import { authenticate } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { isRetiredServiceValue } from '../../middleware/retired-service.middleware.js';
+import { isRetiredOldSlugHistory } from '../../utils/retired-slug-history.js';
 import { encrypt, decrypt, isEncryptionKeyConfigured } from '../../utils/crypto.js';
 import { isStoreOwner } from './store-policy.ownership.js';
 
@@ -113,7 +114,7 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       if (!slugRecord || !slugRecord.isActive) {
         // WO-STORE-SLUG-REDIRECT-LAYER-V1: old slug → 301 redirect
         const redirect = await slugService.findOldSlugRedirect(slug);
-        if (redirect && isRetiredServiceValue(redirect.serviceKey)) {
+        if (redirect && (isRetiredServiceValue(redirect.serviceKey) || await isRetiredOldSlugHistory(dataSource, slug))) {
           res.status(410).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Service has been retired' } });
           return;
         }
@@ -500,7 +501,7 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
 
       // Check if it's an old slug with redirect
       const redirect = await slugService.findOldSlugRedirect(slug);
-      if (redirect && isRetiredServiceValue(redirect.serviceKey)) {
+      if (redirect && (isRetiredServiceValue(redirect.serviceKey) || await isRetiredOldSlugHistory(dataSource, slug))) {
         res.status(410).json({ success: false, error: { code: 'SERVICE_RETIRED', message: 'Service has been retired' } });
         return;
       }

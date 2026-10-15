@@ -834,6 +834,13 @@ export function createCmsContentSlotRoutes(deps: {
         scopeWhere.organizationId = organizationId;
       }
 
+      // 퇴역 서비스 slot 은 교체(삭제 후 재생성) 대상이 아니다 — serviceKey 없이 호출한 admin 의 일괄 삭제 포함.
+      const existingScopeSlots = await slotRepo.find({ where: scopeWhere, select: ['id', 'serviceKey'] });
+      if (isRetiredServiceValue(serviceKey) || existingScopeSlots.some((s) => isRetiredServiceValue(s.serviceKey))) {
+        res.status(410).json({ success: false, code: 'SERVICE_RETIRED', error: 'Service has been retired' });
+        return;
+      }
+
       // Delete existing slots for this slotKey/scope
       await slotRepo.delete(scopeWhere);
 

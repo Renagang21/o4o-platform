@@ -91,6 +91,7 @@ export function createSellerRecruitmentController(deps: {
       }
       res.json({ success: true, data: result.data });
     } catch (error) {
+      if (sendRetiredServiceError(res, error)) return;
       logger.error('[SellerRecruitment API] Error closing recruitment:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to close recruitment' });
     }
