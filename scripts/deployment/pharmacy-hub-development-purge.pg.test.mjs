@@ -2,8 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-import {PharmacyHubDevelopmentPurge} from './pharmacy-hub-development-purge.mjs';
-import {PharmacyHubMediaPurge} from './pharmacy-hub-media-purge.mjs';
+import {loadPurgeSource} from './pharmacy-hub-administrative-purge-job.mjs';
+const {PharmacyHubDevelopmentPurge}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('development')).toString('base64')}`);
+const {PharmacyHubMediaPurge}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('media')).toString('base64')}`);
 import {collectRetirementReferences} from './pharmacy-hub-retirement-references.mjs';
 const uuid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const ph='pharmacy-hub';

@@ -93,6 +93,18 @@ try {
     `--set-env-vars=^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${username}::DB_NAME=${database}`,
     '--command=node',`--args=^|^--input-type=module|-e|${boot}`]};
 }
+export async function loadPurgeSource(purge) {
+  const files={administrative:'pharmacy-hub-administrative-purge.mjs',development:'pharmacy-hub-development-purge.mjs',media:'pharmacy-hub-media-purge.mjs'};
+  if(!Object.hasOwn(files,purge))throw new Error('PH_JOB_SCOPE');
+  const source=await readFile(new URL(files[purge],import.meta.url),'utf8');
+  if(purge==='administrative')return source;
+  // A data-URL worker cannot resolve repository-relative imports. Embed the
+  // shared pure scanner as a data module; never depend on the serving image's files.
+  const relative="from './pharmacy-hub-reference-batches.mjs'";
+  if(source.split(relative).length!==2)throw new Error('PH_JOB_SOURCE');
+  const helper=await readFile(new URL('./pharmacy-hub-reference-batches.mjs',import.meta.url),'utf8');
+  return source.replace(relative,`from 'data:text/javascript;base64,${Buffer.from(helper).toString('base64')}'`);
+}
 export async function runJob({development=false,media=false}={}) {
   if(development&&media)throw new Error('PH_JOB_SCOPE');
   await gate();
@@ -102,10 +114,8 @@ export async function runJob({development=false,media=false}={}) {
   const revision=traffic[0].revisionName;
   if(!/^o4o-core-api-[a-z0-9-]+$/.test(revision))throw new Error('PH_JOB_REVISION');
   const image=run(['run','revisions','describe',revision,...base,'--format=value(status.imageDigest)']);
-  let file='./pharmacy-hub-administrative-purge.mjs',purge='administrative';
-  if(development){file='./pharmacy-hub-development-purge.mjs';purge='development';}
-  if(media){file='./pharmacy-hub-media-purge.mjs';purge='media';}
-  const source=await readFile(new URL(file,import.meta.url),'utf8');
+  const purge=development?'development':media?'media':'administrative';
+  const source=await loadPurgeSource(purge);
   const {name,args}=jobArguments({image,source,mode:process.env.CUTOVER_MODE,runId:process.env.GITHUB_RUN_ID,
     attempt:process.env.GITHUB_RUN_ATTEMPT,username:process.env.DB_USERNAME,database:process.env.DB_NAME,purge});
   await gate();

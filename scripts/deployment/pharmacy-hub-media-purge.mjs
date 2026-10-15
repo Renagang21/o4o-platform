@@ -1,3 +1,4 @@
+import {countReferenceBatches,referenceBatchQuery} from './pharmacy-hub-reference-batches.mjs';
 /** PH-only media retirement. GCS deletes cannot roll back with PostgreSQL.
  * Missing objects may resume a failed attempt, but replacements are generation-protected.
  * No asset identifiers, URLs, object names or credentials leave the worker.
@@ -78,24 +79,10 @@ async function references(q,locked) {
 }
 // Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
 // partition parents retain the complete scan (including foreign descendants).
-const referenceBatchSize=1024;
 export async function countMediaReferences(q,c) {
-  if(!c.scan_key||c.type==='uuid')return count(q,mediaReferenceQuery(c));
-  let previous=null;
-  for(;;) {
-    const rows=await q.query(mediaReferenceQuery(c),[keys,previous]);
-    const row=rows?.[0];
-    if(rows?.length!==1||!row||typeof row.count!=='string'||!/^\d+$/.test(row.count)||
-      typeof row.scanned!=='string'||!/^\d+$/.test(row.scanned))throw new Error('PH_MEDIA_REFERENCE_BATCH');
-    const found=Number(row.count),scanned=Number(row.scanned);
-    if(!Number.isSafeInteger(found)||!Number.isSafeInteger(scanned)||scanned>referenceBatchSize||found>scanned||
-      (scanned===0?row.last_id!==null:typeof row.last_id!=='string'||
-        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(row.last_id)||
-        (previous!==null&&row.last_id<=previous)))throw new Error('PH_MEDIA_REFERENCE_BATCH');
-    if(found)return found;
-    if(scanned<referenceBatchSize)return 0;
-    previous=row.last_id;
-  }
+  const sql=mediaReferenceQuery(c);
+  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  return countReferenceBatches(q,sql,keys,'PH_MEDIA_REFERENCE_BATCH');
 }
 export function mediaReferenceQuery(c) {
     const owned=c.schema==='public'&&c.table==='media_assets'?assetScope('s'):
@@ -125,21 +112,11 @@ ${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.tabl
             AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
         ) references_found`;
     }
-    if(c.scan_key)return `WITH target_patterns AS MATERIALIZED (
+    if(c.scan_key)return referenceBatchQuery(c,`WITH target_patterns AS MATERIALIZED (
         SELECT string_agg(regexp_replace(v,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
         FROM (SELECT a.id::text AS id,a.url,a.gcs_path FROM public.media_assets a WHERE ${assetScope('a')}
           UNION ALL SELECT l.id::text,NULL::text,NULL::text FROM public.media_entity_links l WHERE ${linkScope('l')}) a
-        CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL),
-        reference_source AS MATERIALIZED (
-          SELECT s.${id(c.scan_key)} AS scan_id,s.${id(c.column)}::text AS scan_value,(${owned}) AS owned
-          FROM ONLY ${id(c.schema)}.${id(c.table)} s
-          WHERE ($2::uuid IS NULL OR s.${id(c.scan_key)}>$2::uuid)
-          ORDER BY s.${id(c.scan_key)} LIMIT ${referenceBatchSize})
-      SELECT count(*) FILTER(WHERE NOT COALESCE(source.owned,FALSE)
-        AND (source.scan_value COLLATE "C") ~ targets.pattern)::text AS count,
-        (SELECT count(*)::text FROM reference_source) AS scanned,
-        (SELECT scan_id::text FROM reference_source ORDER BY scan_id DESC LIMIT 1) AS last_id
-      FROM reference_source source CROSS JOIN target_patterns targets`;
+        CROSS JOIN LATERAL unnest(ARRAY[a.id,a.url,a.gcs_path]) v WHERE NULLIF(v,'') IS NOT NULL)`,owned);
     // Freeze target discovery and scan each large payload once. Escaping every
     // punctuation character keeps ID/full-URL/object-path matching literal.
     return `WITH target_patterns AS MATERIALIZED (

@@ -1,3 +1,4 @@
+import {countReferenceBatches,referenceBatchQuery} from './pharmacy-hub-reference-batches.mjs';
 /** Fixed, owner-approved PH development rows. Media/GCS and shared identities stay intact.
  * Caller owns the transaction. Any ownership, dependency or census drift aborts before writes.
  */
@@ -145,24 +146,10 @@ async function references(q,fks,tables) {
 }
 // Only catalog-confirmed leaf UUID primary keys may paginate. Inheritance/
 // partition parents retain the complete scan (including foreign descendants).
-const referenceBatchSize=1024;
 export async function countDevelopmentReferences(q,c) {
-  if(!c.scan_key||c.type==='uuid')return count(q,developmentReferenceQuery(c));
-  let previous=null;
-  for(;;) {
-    const rows=await q.query(developmentReferenceQuery(c),[keys,previous]);
-    const row=rows?.[0];
-    if(rows?.length!==1||!row||typeof row.count!=='string'||!/^\d+$/.test(row.count)||
-      typeof row.scanned!=='string'||!/^\d+$/.test(row.scanned))throw new Error('PH_DEV_REFERENCE_BATCH');
-    const found=Number(row.count),scanned=Number(row.scanned);
-    if(!Number.isSafeInteger(found)||!Number.isSafeInteger(scanned)||scanned>referenceBatchSize||found>scanned||
-      (scanned===0?row.last_id!==null:typeof row.last_id!=='string'||
-        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(row.last_id)||
-        (previous!==null&&row.last_id<=previous)))throw new Error('PH_DEV_REFERENCE_BATCH');
-    if(found)return found;
-    if(scanned<referenceBatchSize)return 0;
-    previous=row.last_id;
-  }
+  const sql=developmentReferenceQuery(c);
+  if(!c.scan_key||c.type==='uuid')return count(q,sql);
+  return countReferenceBatches(q,sql,keys,'PH_DEV_REFERENCE_BATCH');
 }
 export function developmentReferenceQuery(c) {
     const owned=c.schema==='public'?deletedScope(c.table,'s'):undefined;
@@ -189,19 +176,9 @@ ${partitions.map(partition=>`          SELECT 1 FROM ${id(c.schema)}.${id(c.tabl
             AND (s.${id(c.column)}::text COLLATE "C") ~ targets.pattern
         ) references_found`;
     }
-    if(c.scan_key)return `WITH target_patterns AS MATERIALIZED (
+    if(c.scan_key)return referenceBatchQuery(c,`WITH target_patterns AS MATERIALIZED (
         SELECT string_agg(regexp_replace(id,'([[:punct:]])',repeat(chr(92),3)||'1','g'),'|') AS pattern
-        FROM (${targetIds}) ids),
-        reference_source AS MATERIALIZED (
-          SELECT s.${id(c.scan_key)} AS scan_id,s.${id(c.column)}::text AS scan_value,(${owned??'FALSE'}) AS owned
-          FROM ONLY ${id(c.schema)}.${id(c.table)} s
-          WHERE ($2::uuid IS NULL OR s.${id(c.scan_key)}>$2::uuid)
-          ORDER BY s.${id(c.scan_key)} LIMIT ${referenceBatchSize})
-      SELECT count(*) FILTER(WHERE NOT COALESCE(source.owned,FALSE)
-        AND (source.scan_value COLLATE "C") ~ targets.pattern)::text AS count,
-        (SELECT count(*)::text FROM reference_source) AS scanned,
-        (SELECT scan_id::text FROM reference_source ORDER BY scan_id DESC LIMIT 1) AS last_id
-      FROM reference_source source CROSS JOIN target_patterns targets`;
+        FROM (${targetIds}) ids)`,owned??'FALSE');
     // Discover IDs once and search the source text with one compiled expression.
     // LIKE ANY still rescans large JSON for every ID. Escape every punctuation
     // character so the alternation preserves literal substring semantics.

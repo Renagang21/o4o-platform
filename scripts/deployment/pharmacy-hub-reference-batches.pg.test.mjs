@@ -2,8 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-import {countDevelopmentReferences,developmentReferenceQuery} from './pharmacy-hub-development-purge.mjs';
-import {countMediaReferences,mediaReferenceQuery} from './pharmacy-hub-media-purge.mjs';
+import {loadPurgeSource} from './pharmacy-hub-administrative-purge-job.mjs';
+const {countDevelopmentReferences,developmentReferenceQuery}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('development')).toString('base64')}`);
+const {countMediaReferences,mediaReferenceQuery}=await import(`data:text/javascript;base64,${Buffer.from(await loadPurgeSource('media')).toString('base64')}`);
 const uuid=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const keys=['pharmacy-hub','pharmacy_hub','pharmacy_hub_cart','pharmacy-hub-event-offer'];
 const walk=n=>[n,...(n.Plans??[]).flatMap(walk)];

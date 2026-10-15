@@ -25,10 +25,11 @@ catalog에서 유효한 단일 UUID 기본키를 확인하고, 자손 relation�
 
 ## 검증
 
-- focused Node47 PASS: 구간 경계, 마지막 구간의 참조, cursor 정지/비정상 응답, 중간 오류, 기존 UUID/비키 테이블 경로 포함.
+- focused Node49 PASS: 구간 경계, 마지막 구간의 참조, cursor 정지/비정상 응답, 중간 오류, 기존 UUID/비키 테이블 경로 포함.
 - 실제 PostgreSQL 기존 전체 fixture PASS: plan/apply·공유 보존·Core fence·FK·rollback, 상속 자손 참조 거절, 각5000행×128KiB JSON 대용량 검사. 기존 fixture의 실행 계획 수는 한 번의 전체 검사에서 여러 구간으로 바뀐 것에 맞춰 갱신했다.
 - 진단 실험: 격리200만 행에서 기존 cross join 정규식은 문자열·JSON 모두15초 timeout. scalar subquery 변경은 문자열8924ms였으나 JSON은 여전히15초 timeout이어서 해결책으로 채택하지 않았다.
-- 실제 분할 검사200만 행 fixture PASS(총204.5초): 개발45153ms/미디어23646ms, 각각1954개 구간에서 scanned합계200만 행과 PK 범위 인덱스를 확인했다. 마지막 최대 UUID의 참조·NULL·literal 메타문자·배열 참조를 검증했다. 이후 작은 fixture에서 이름이 id가 아닌 UUID 기본키와 all-zero UUID 첫 행도 검증했다. 운영 속도 보장·운영 plan 성공을 주장하지 않는다.
+- 실제 분할 검사200만 행 fixture PASS(총196.2초): 개발40428ms/미디어21711ms, 각각1954개 구간에서 scanned합계200만 행과 PK 범위 인덱스를 확인했다. 마지막 최대 UUID의 참조·NULL·literal 메타문자·배열 참조를 검증했다. 이후 작은 fixture에서 이름이 id가 아닌 UUID 기본키와 all-zero UUID 첫 행도 검증했다. 운영 속도 보장·운영 plan 성공을 주장하지 않는다.
+- 초기 head1080da47b의 CI Gate는 통과했으나 SonarCloud는 새 코드 중복11.8%로 실패했다. 구간 SQL·진행 검증을 공통 pure 모듈로 추출했다. job loader는 이 모듈을 data URL로 포함해 serving image의 저장소 파일에 의존하지 않는다. 생성된 실제 worker 모듈로 전체 PostgreSQL fixture와200만 행 검사를 다시 실행해 통과했다.
 - 새 Node 회귀를 기존 CI quality job에 blocking 단계로 연결했다. PostgreSQL fixture는 격리 DB opt-in이며 실제로 실행해 검증했다.
 
 ## 다음 단계
