@@ -113,3 +113,16 @@ Artifacts는 checkout 밖 `/workspace/.o4o-non-ai-browser`에 보존했다.
 - smoke: 합성 API desktop/mobile 120 flows
 - other session usage: 이 작업 전용
 - verdict: KEEP — 미병합 개발 PR의 후속 수정·검증 artifacts 보존
+
+
+## 2026-10-16 통합 담당 후속
+
+고정 main `df5f28a934cb4bb3db0e51427ebcbfdf7c838f32`에서 전용 `wo/store-pr-integration-20261016` branch에 #634 `0dcf0b0829`를 합쳤다. #619 `d20823d669`·#625 `38cb5e4411`·#614 `7a9f327e75` 모두 이 head의 조상임을 확인했다. 원본 branch는 수정하지 않았다.
+
+- #619의 두 요청 사이 취소 결함: 이미 시작한 header/write + blocks를 캡처한 원래 writer로 완료하고, 새 화면 세션에 이전 결과를 적용하지 않는 실제 구현을 대조했다.
+- #614의 preview allowlist 결함: 일반 snapshot patch는 videoPreviewUrl로 거절하지 않고 선택적 미리보기·직접 영상 등록에서만 해당 검사를 사용하는 것을 대조했다.
+- 현재 통합본에서 frozen install/build:packages, Store 전체 Vitest **569 PASS**, 선택한 Store 접근·QR·POP·내부 AI 차단·원문 계약 Jest **7 suites/142 PASS**, production build, 변경 TS/TSX 전체 ESLint 오류/경고0, docs/diff 검사를 실행했다. 원개발의7 suites/198과 이번 선택 목록은 다르므로 같은 집계로 대체하지 않는다.
+- `services/web-store`, `packages`, lockfile의 런타임 tree는 #634 head와 diff0다. 이번 통합은 UI를 추가 수정하지 않았으며 위 원개발120개 browser 흐름과 이번711개 자동 검증을 구분한다. 이번 회차에 browser120개를 다시 실행했다고 보고하지 않는다.
+- 실계정·운영 API/DB·QR 스캔·실기기 재생·배포 smoke는 미실행이다. PH plan·삭제 운영 창 뒤 CI·Sonar·Codex를 확인해 순차 통합/배포한다.
+
+새 회차 CHECK를 만들지 않고 기존 기록에 이어 쓴다. 정본·정책·canonical index 변경은 없다.
