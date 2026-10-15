@@ -17,8 +17,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
-import { O4OHomeButton, LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
+import { LoginCard, O4OHomeButton, LoginMethods, type AuthLoginResult, type AuthServiceAccess } from '@o4o/auth-react';
 import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { getKpaPostLoginRoute } from '../config/dashboard';
@@ -97,38 +96,10 @@ export default function LoginModal() {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => e.target === e.currentTarget && closeModal()}
-    >
-      {/* 반투명 배경 */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+    <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label="O4O 약국 로그인"
+      onClick={(event) => event.target === event.currentTarget && closeModal()}>
+      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title="O4O 약국 로그인" description="약국의 일상과 비즈니스를 연결하세요." onClose={closeModal}>
 
-      {/* 모달 카드 */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🏛️</span>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                O4O 약국 로그인
-              </h2>
-              {/* 이 앱(pharmacy.neture.co.kr)은 약국 사업자 서비스다 — O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1 */}
-              <p className="text-xs text-gray-500">
-                약국 사업자 서비스
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={closeModal}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="p-6">
           {error && !isNotMember && (
             <div className="mb-4 p-3 rounded-lg border bg-red-50 border-red-200">
               <p className="text-sm text-red-600">{error}</p>
@@ -164,8 +135,7 @@ export default function LoginModal() {
             }}
           />
           <div className="mt-5 border-t pt-4"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></div>
-        </div>
-      </div>
+      </LoginCard>
     </div>
   );
 }
