@@ -8,7 +8,7 @@
  * 서비스 분기 없음 — serviceKey 를 참조하지 않는다.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type React from 'react';
 import { Loader2, X } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
@@ -26,6 +26,7 @@ export interface ResourcesFormModalProps {
   onSubmit: (value: ResourcesFormValue) => Promise<void>;
   /** 도메인 명사. 미지정 시 기존 문구("자료")를 그대로 쓴다. */
   nouns?: ResourcesNouns;
+  error?: string | null;
 }
 
 const EMPTY: ResourcesFormValue = { title: '', summary: '', body: '', linkUrl: '', linkText: '' };
@@ -38,12 +39,16 @@ export function ResourcesFormModal({
   onClose,
   onSubmit,
   nouns = DEFAULT_RESOURCES_NOUNS,
+  error,
 }: ResourcesFormModalProps) {
   const [value, setValue] = useState<ResourcesFormValue>(EMPTY);
   const [saving, setSaving] = useState(false);
+  const submitting = useRef(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    setSubmitError(null);
     setValue(initial ? { ...EMPTY, ...initial } : EMPTY);
   }, [open, initial]);
 
@@ -54,15 +59,18 @@ export function ResourcesFormModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting.current || loading) return;
     if (!value.title.trim()) {
       toast.error('제목을 입력해 주세요');
       return;
     }
-    setSaving(true);
+    submitting.current = true; setSubmitError(null); setSaving(true);
     try {
       await onSubmit({ ...value, title: value.title.trim() });
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : '저장에 실패했습니다');
     } finally {
-      setSaving(false);
+      submitting.current = false; setSaving(false);
     }
   };
 
@@ -73,7 +81,7 @@ export function ResourcesFormModal({
           <h2 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0 }}>
             {isEdit ? `${nouns.entity} 편집` : (config.createLabel ?? `새 ${nouns.entity}`)}
           </h2>
-          <button type="button" onClick={onClose} style={iconBtnStyle} aria-label="닫기">
+          <button type="button" disabled={saving} onClick={() => { if (!submitting.current) onClose(); }} style={iconBtnStyle} aria-label="닫기">
             <X size={16} />
           </button>
         </div>
@@ -85,6 +93,8 @@ export function ResourcesFormModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ padding: 20, overflowY: 'auto' }}>
+            {(error || submitError) && <p role="alert" style={{ color: '#b91c1c' }}>{error || submitError}</p>}
+            <fieldset disabled={saving} style={{ border: 0, padding: 0, margin: 0 }}>
             <label style={labelStyle}>
               제목 <span style={{ color: '#dc2626' }}>*</span>
             </label>
@@ -149,8 +159,9 @@ export function ResourcesFormModal({
               <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 14px' }}>{config.createHint}</p>
             )}
 
+            </fieldset>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-              <button type="button" onClick={onClose} style={cancelBtnStyle}>
+              <button type="button" disabled={saving} onClick={() => { if (!submitting.current) onClose(); }} style={cancelBtnStyle}>
                 취소
               </button>
               <button type="submit" disabled={saving} style={{ ...submitBtnStyle, opacity: saving ? 0.6 : 1 }}>
